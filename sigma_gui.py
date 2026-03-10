@@ -895,6 +895,7 @@ class SigmaGUI(tk.Tk):
             "visual_customizer": self._build_visual_customizer_page,
             "gmail_ai":         self._build_gmail_ai_page,
             "sovereign_suite":  self._build_sovereign_suite_page,
+            "network_vanguard": self._build_network_vanguard_page,
         }
         
         # Oracle VM Discovery (Professional Integration)
@@ -948,7 +949,7 @@ class SigmaGUI(tk.Tk):
         
         pins = [
             ("🌐", "browser"), ("📁", "explorer"), ("📦", "store"),
-            ("🧪", "sovereign_suite"), ("🧠", "brain"), ("⚡", "zenith"), ("🛡️", "network_warden"), 
+            ("🧪", "sovereign_suite"), ("📡", "network_vanguard"), ("🧠", "brain"), ("⚡", "zenith"), ("🛡️", "network_warden"), 
             ("📧", "gmail_ai"), ("🎨", "visual_customizer"), ("🚀", "aether_orch"), ("🪐", "ag_physics"), ("💠", "ag_hub")
         ]
         for icon, page in pins:
@@ -7282,6 +7283,77 @@ class SigmaGUI(tk.Tk):
 
         ttk.Button(audit_card, text="Verify Ledger Integrity", command=_verify_ledger).pack(fill="x", pady=(5,0))
         self._log(audit_log, "APEX: Ready for Forensic Analysis.", "INFO")
+
+    # ─── Network Vanguard Page ─────────────────────────────────────────
+
+    def _build_network_vanguard_page(self):
+        """USP: Network Vanguard — Sovereign Traffic Intelligence."""
+        p = tk.Frame(self._content, bg=PAL["bg"])
+        self._pages["network_vanguard"] = p
+        self._build_page_header(p, "NETWORK VANGUARD", "Zero-Trust Traffic Analysis & Anti-Telemetry")
+
+        main = tk.Frame(p, bg=PAL["bg"])
+        main.pack(fill="both", expand=True, padx=20, pady=10)
+
+        # Top Stats
+        stats_fr = tk.Frame(main, bg=PAL["bg"])
+        stats_fr.pack(fill="x", pady=(0,15))
+        
+        self._v_shunted = tk.StringVar(value="0")
+        self._v_anonymity = tk.StringVar(value="98.2%")
+        
+        s1 = self._card(stats_fr, "Packets Shunted")
+        s1.master.pack(side="left", fill="both", expand=True, padx=(0,10))
+        tk.Label(s1, textvariable=self._v_shunted, font=("Inter Bold", 20), fg=PAL["red"], bg=PAL["card"]).pack()
+
+        s2 = self._card(stats_fr, "Anonymity Index")
+        s2.master.pack(side="left", fill="both", expand=True)
+        tk.Label(s2, textvariable=self._v_anonymity, font=("Inter Bold", 20), fg=PAL["teal"], bg=PAL["card"]).pack()
+
+        # Traffic Feed
+        feed_c = self._card(main, "📡 Live Traffic Shunt-Stream")
+        feed_c.master.pack(fill="both", expand=True)
+        
+        cols = ("Time", "Domain", "Status", "Protocol", "Risk")
+        tree = ttk.Treeview(feed_c, columns=cols, show='headings', height=15)
+        for col in cols: tree.heading(col, text=col)
+        tree.pack(fill="both", expand=True, pady=10)
+        
+        def _update_feed():
+            v = self.kernel.registry.get("vanguard")
+            if v:
+                self._v_shunted.set(str(v.stats["packets_shunted"]))
+                # Clear and insert latest
+                for item in tree.get_children(): tree.delete(item)
+                for entry in reversed(v.get_telemetry()[-20:]):
+                    tag = "danger" if entry["status"] == "SHUNTED" else "safe"
+                    ts = time.strftime("%H:%M:%S", time.localtime(entry["timestamp"]))
+                    tree.insert("", "end", values=(ts, entry["domain"], entry["status"], entry["protocol"], entry["risk"]), tags=(tag,))
+                
+                tree.tag_configure("danger", foreground=PAL["red"])
+                tree.tag_configure("safe", foreground=PAL["dim"])
+            
+            self.after(2000, _update_feed)
+
+        _update_feed()
+
+        # Controls
+        ctrl = tk.Frame(main, bg=PAL["bg"], pady=10)
+        ctrl.pack(fill="x")
+        
+        tk.Label(ctrl, text="Manual Shunt (Blackhole Domain):", font=FONT_SMALL, fg=PAL["dim"], bg=PAL["bg"]).pack(side="left")
+        shunt_e = ttk.Entry(ctrl, width=30)
+        shunt_e.pack(side="left", padx=10)
+        
+        def _do_shunt():
+            d = shunt_e.get()
+            v = self.kernel.registry.get("vanguard")
+            if v and d:
+                res = v.shunt_domain(d)
+                self._notify("VANGUARD", res, "WARN")
+                shunt_e.delete(0, tk.END)
+
+        ttk.Button(ctrl, text="LOCK DOMAIN", command=_do_shunt).pack(side="left")
 
     def _vbox_check(self):
         """Standard Host-Guest Discovery."""

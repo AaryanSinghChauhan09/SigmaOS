@@ -23,6 +23,7 @@ from .ledger import SovereignLedger
 from .cache import SigmaCache
 from .integrity import IntegrityGuard
 from .customizer import SovereignCustomizer
+from .vanguard import NetworkVanguard
 
 # Late imports (avoid circular at package level)
 def _import_kernel_module(name):
@@ -49,9 +50,11 @@ class SigmaKernel:
         self.cache = SigmaCache(self)
         self.integrity = IntegrityGuard(self)
         self.customizer = SovereignCustomizer(self)
+        self.vanguard = NetworkVanguard(self)
         self.registry.register("cache", self.cache)
         self.registry.register("integrity", self.integrity)
         self.registry.register("customizer", self.customizer)
+        self.registry.register("vanguard", self.vanguard)
         self._file_hashes = {}
         
         # --- Observability ---
@@ -63,6 +66,8 @@ class SigmaKernel:
                 self.watchdog.start_monitoring()
             if self.shadow:
                 self.shadow.start_periodic_sync()
+            if self.vanguard:
+                self.vanguard.start_monitoring()
             if self.crusher:
                 self.crusher.start_crusher_engine()
                 self.crusher.defeat_telemetry()

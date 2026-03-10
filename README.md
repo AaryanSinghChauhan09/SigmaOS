@@ -21,6 +21,10 @@ SigmaOS is a high-performance, modular operating environment designed for absolu
   - **Big-O Profiler**: Automated algorithmic density analysis.
   - **Digital Forensics**: Bit-stream event logs & evidence hashing for incident response.
   - **Integrity Guard**: Bit-level cryptographic verification of system shards.
+  - **Evidence Vault**: Automated preservation of tampered system components.
+- **Network Vanguard (CS/Cyber)**:
+  - **Autonomous Firewall**: Local traffic shunting & anti-telemetry blackholing.
+  - **Zero-Trust Stream**: Real-time packet risk analysis and anonymity indexing.
 - **Sovereign Legal Academy**:
   - **Bharat Law Index**: Interactive mapping for BNS, BNSS, and BSA procedural flows.
   - **Cognitive Guard**: Anki-parity Spaced Repetition (SRL) to crush educational curves.
