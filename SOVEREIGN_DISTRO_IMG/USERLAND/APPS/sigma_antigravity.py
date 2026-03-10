@@ -619,7 +619,7 @@ class SigmaAntigravity(tk.Tk):
     def _launch_server(self):
         """Launch the standalone Antigravity AI Orchestrator server."""
         candidates = [
-            r"C:\Users\Aaryan\.gemini\antigravity\scratch\proprietary_setup\AI_Orchestrator_v2.0_GDrive_20260208_121931\LAUNCH_AI_ORCHESTRATOR.bat",
+            r"C:\Users\Sovereign-User\.gemini\antigravity\scratch\proprietary_setup\AI_Orchestrator_v2.0_GDrive_20260208_121931\LAUNCH_AI_ORCHESTRATOR.bat",
         ]
         for bat in candidates:
             if os.path.exists(bat):
@@ -629,7 +629,7 @@ class SigmaAntigravity(tk.Tk):
                 self.after(5000, self._check_server_async)
                 return
         # Fallback: try python app.py
-        app_py = r"C:\Users\Aaryan\.gemini\antigravity\scratch\proprietary_setup\AI_Orchestrator_v2.0_GDrive_20260208_121931\app.py"
+        app_py = r"C:\Users\Sovereign-User\.gemini\antigravity\scratch\proprietary_setup\AI_Orchestrator_v2.0_GDrive_20260208_121931\app.py"
         if os.path.exists(app_py):
             subprocess.Popen([sys.executable, app_py], cwd=os.path.dirname(app_py),
                              creationflags=subprocess.CREATE_NEW_CONSOLE)

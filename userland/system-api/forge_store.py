@@ -13,7 +13,7 @@ from typing import Dict, List, Any
 class SigmaForgeStore:
     def __init__(self, kernel):
         self.kernel = kernel
-        self.installed_userland/apps_file = Path(r'C:\Users\Aaryan\.gemini\antigravity\scratch\SigmaOS\config\installed_userland/apps.json')
+        self.installed_userland/apps_file = Path(r'C:\Users\Sovereign-User\.gemini\antigravity\scratch\SigmaOS\config\installed_userland/apps.json')
         self.installed_userland/apps = self._load_installed()
         
         # IP-Safe Open Source Game Clones & Tools

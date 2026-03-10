@@ -109,7 +109,7 @@ class EmailDisco(tk.Tk):
     def _sync_threads(self):
         self.tree.delete(*self.tree.get_children())
         items = [
-            ("Aaryan", "SigmaOS v4.0 Deployment", "URGENT"),
+            ("Sovereign-User", "SigmaOS v4.0 Deployment", "URGENT"),
             ("Antigravity", "Model Quota Exhaustion", "HIGH"),
             ("Security Warden", "Unauthorized Shim Blocked", "CRITICAL"),
             ("Board Hub", "New Game Assets Ready", "LOW")

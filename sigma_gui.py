@@ -1758,7 +1758,7 @@ class SigmaGUI(tk.Tk):
         user_fr = tk.Frame(footer, bg=PAL["bg3"])
         user_fr.pack(side="left", pady=10)
         tk.Label(user_fr, text="👤", font=("Inter", 14), bg=PAL["bg3"], fg=PAL["accent"]).pack(side="left")
-        tk.Label(user_fr, text="Aaryan Sovereign", font=("Inter Bold", 9), bg=PAL["bg3"], fg=PAL["text"]).pack(side="left", padx=10)
+        tk.Label(user_fr, text="Sovereign-User Sovereign", font=("Inter Bold", 9), bg=PAL["bg3"], fg=PAL["text"]).pack(side="left", padx=10)
         
         tk.Button(footer, text="⏻", font=("Inter Bold", 14), bg=PAL["bg3"], fg=PAL["red"],
                   relief="flat", bd=0, command=self.destroy).pack(side="right", pady=10)

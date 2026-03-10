@@ -340,7 +340,7 @@ class SovereignSentinel(tk.Tk):
 
     def _add_firewall_rule(self):
         self.fw_tree.insert("", "end", values=("IN", "TCP", "8080", "ALLOW", "Custom Rule"))
-        self.status.config(text="Firewall rule applied to kernel-level packet filter.", bg=PAL["success"])
+        self.status.config(text="Firewall rule applied to kernel-level packet filter.", bg=PAL["safe"])
 
     def _lockdown(self):
         messagebox.showinfo("LOCKDOWN", "Zero-Trust Lockdown ENGAGED.\n"

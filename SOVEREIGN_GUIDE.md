@@ -39,7 +39,7 @@ SigmaOS isn't just a shell; it's an intelligent stack.
 - **Layer 3: Universal Bridges**: Allows you to run `.exe` (Windows), `.apk` (Android), and macOS scripts natively.
 - **Layer 4: SigmaFluid UI**: The glassmorphism interface managed by the `LayoutDirector`.
 - **Layer 5: Aether Orchestrator**: The "Brain" that connects Antigravity AI tools to OS syscalls.
-- **Tech Benchmark**: Review the [Technology Mega-Matrix](file:///C:/Users/Aaryan/.gemini/antigravity/scratch/SigmaOS/docs/technology_mega_matrix.md) to see how our architecture stacks up against legacy giants.
+- **Tech Benchmark**: Review the [Technology Mega-Matrix](file:///C:/Users/Sovereign-User/.gemini/antigravity/scratch/SigmaOS/docs/technology_mega_matrix.md) to see how our architecture stacks up against legacy giants.
 
 ---
 
@@ -62,13 +62,13 @@ SigmaOS isn't just a shell; it's an intelligent stack.
 - **High-Speed OCR**: Processes thousands of pages using the AetherGrid lattice.
 - **Professional Markup**: Bluebeam-parity tools for engineering and architecture.
 - **Forensic Audit**: Scans for hidden big-tech trackers within documents.
-- **Detailed Benchmark**: Review the [PDF Forge Benchmark](file:///C:/Users/Aaryan/.gemini/antigravity/scratch/SigmaOS/docs/pdf_forge_benchmark.md).
+- **Detailed Benchmark**: Review the [PDF Forge Benchmark](file:///C:/Users/Sovereign-User/.gemini/antigravity/scratch/SigmaOS/docs/pdf_forge_benchmark.md).
 
 ### 🎥 SigmaTitanCapture (The OBS/Loom Slayer)
 - **120FPS 4K Capture**: Kernel-direct recording with 0.1% CPU overhead.
 - **Panoramic Stitched Shots**: Capture ultra-long web documentation in 16K.
 - **Live OCR**: Grab text from any region of the screen instantly.
-- **Detailed Benchmark**: Review the [Titan Capture Benchmark](file:///C:/Users/Aaryan/.gemini/antigravity/scratch/SigmaOS/docs/titan_capture_benchmark.md).
+- **Detailed Benchmark**: Review the [Titan Capture Benchmark](file:///C:/Users/Sovereign-User/.gemini/antigravity/scratch/SigmaOS/docs/titan_capture_benchmark.md).
 
 ---
 
@@ -139,7 +139,7 @@ SigmaOS grants you absolute authority over the system's logic and aesthetics.
 - **Driver Independence**: AI-assisted driver synthesis ensures hardware compatibility without proprietary vendor dependencies.
 - **Explainable AI**: Every AI-driven suggestion is explainable and overridable. The user is ALWAYS the final decision-maker.
 - **Resource Governor**: Set hard limits on CPU/GPU/RAM for any application to prevent hijacked system resources.
-- **UI Benchmark**: Review the [UI/UX Mega-Matrix](file:///C:/Users/Aaryan/.gemini/antigravity/scratch/SigmaOS/docs/ui_ux_mega_matrix.md) to compare SigmaOS against global design standards.
+- **UI Benchmark**: Review the [UI/UX Mega-Matrix](file:///C:/Users/Sovereign-User/.gemini/antigravity/scratch/SigmaOS/docs/ui_ux_mega_matrix.md) to compare SigmaOS against global design standards.
 
 ## 🔱 9. The Perfection Framework (Resilience & Community)
 
@@ -160,7 +160,7 @@ SigmaOS treats the entire desktop as a dynamic canvas. You can edit your UI just
 - **Design Mode**: Enter `sigma-design` in the concierge to make every window, taskbar, and widget a movable object.
 - **Object Grouping**: Select multiple windows and group them to move or scale them in unison.
 - **Master Slides**: Save your perfect layout as a "Master Template" that all your virtual desktops inherit.
-- **Customization Benchmark**: Review the [Customization Mega-Matrix](file:///C:/Users/Aaryan/.gemini/antigravity/scratch/SigmaOS/docs/customization_mega_matrix.md) and [Creative Ecosystems Benchmark](file:///C:/Users/Aaryan/.gemini/antigravity/scratch/SigmaOS/docs/creative_ecosystems_benchmark.md) for a total technical overview.
+- **Customization Benchmark**: Review the [Customization Mega-Matrix](file:///C:/Users/Sovereign-User/.gemini/antigravity/scratch/SigmaOS/docs/customization_mega_matrix.md) and [Creative Ecosystems Benchmark](file:///C:/Users/Sovereign-User/.gemini/antigravity/scratch/SigmaOS/docs/creative_ecosystems_benchmark.md) for a total technical overview.
 - **Motion Paths**: Apply professional animations (Morph, Fade, Slide) to UI elements for a cinematic experience.
 
 ---
@@ -170,7 +170,7 @@ SigmaOS includes a native, serverless communication protocol that works even wit
 - **Mesh Messaging**: Send messages via Bluetooth/Wi-Fi Direct to anyone on your local mesh lattice.
 - **OS-Native Intents**: Use the chat window to control your system. Type `/focus` to optimize performance or `/powerwash` to reset.
 - **Decentralized Identity**: Your identity is your private key. No phone numbers, no SIM cards, no surveillance.
-- **BitChat Parity**: SigmaMesh benchmarked as the professional alternative to mainstream messengers. [Compare Here](file:///C:/Users/Aaryan/.gemini/antigravity/scratch/SigmaOS/docs/bitchat_benchmark.md).
+- **BitChat Parity**: SigmaMesh benchmarked as the professional alternative to mainstream messengers. [Compare Here](file:///C:/Users/Sovereign-User/.gemini/antigravity/scratch/SigmaOS/docs/bitchat_benchmark.md).
 
 ---
 ## 🌐 15. Harnessing Shared Processing Power (AetherGrid)
@@ -196,7 +196,7 @@ SigmaOS is built on 20+ frontier technologies that define its status as a **Next
 - **Carbon-Aware Scheduling**: Background tasks are prioritized for energy-efficient or low-carbon windows in the power grid.
 - **Wasm Runtime**: Native support for Universal Binaries (WebAssembly), providing the speed of C with the security of a sandbox.
 - **Air-Gap Emulation**: Tricking untrusted apps into 100% offline isolation via AI-shadowing for maximum exfiltration protection.
-- **Detailed Benchmark**: See the [Technology Mega-Matrix](file:///C:/Users/Aaryan/.gemini/antigravity/scratch/SigmaOS/docs/technology_mega_matrix.md) for a technical breakdown of our competitive advantage.
+- **Detailed Benchmark**: See the [Technology Mega-Matrix](file:///C:/Users/Sovereign-User/.gemini/antigravity/scratch/SigmaOS/docs/technology_mega_matrix.md) for a technical breakdown of our competitive advantage.
 
 ---
 

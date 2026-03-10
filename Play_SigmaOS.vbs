@@ -1,2 +1,4 @@
 Set objShell = WScript.CreateObject("WScript.Shell")
-objShell.Run "cmd /c cd /d ""C:\Users\Aaryan\.gemini\antigravity\scratch\SigmaOS"" && python sigma_gui.py", 0, False
+strPath = Left(WScript.ScriptFullName, InStrRev(WScript.ScriptFullName, "\") - 1)
+objShell.CurrentDirectory = strPath
+objShell.Run "cmd /c py boot.py", 0, False

@@ -180,9 +180,12 @@ class SigmaKernel:
                     if self._sync_lock.acquire(blocking=False):
                         try:
                             self.bus.emit("kernel.automation", {"msg": f"Detected change in {changed}. Syncing..."})
-                            import subprocess
-                            # USP: Non-blocking, atomic sync execution
-                            subprocess.Popen(["powershell.exe", "-ExecutionPolicy", "Bypass", "-File", "sync.ps1"])
+                            # USP: Cross-Platform Sync Detection
+                            if sys.platform == "win32":
+                                subprocess.Popen(["powershell.exe", "-ExecutionPolicy", "Bypass", "-File", "sync.ps1"], shell=True)
+                            else:
+                                subprocess.Popen(["bash", "sync.sh"], shell=True)
+                            
                             self.ledger.commit("SYNC", "GITHUB_AUTO_PUSH", {"files": changed})
                         finally:
                             # Hold lock for 10s to prevent rapid-fire syncs
@@ -318,7 +321,7 @@ class SigmaKernel:
                 print(f"[TRUST] REJECT: {reg_key} failed signature check.")
                 continue
             try:
-                mod = __import__(mod_file)
+                mod = _import_kernel_module(mod_file)
                 cls = getattr(mod, cls_name)
                 # Specialized initializers
                 if reg_key == "customizer":
@@ -335,7 +338,7 @@ class SigmaKernel:
         for mod_file, cls_name, reg_key in _em:
             if not self._verify_module_signature(mod_file, cls_name): continue
             try:
-                mod = __import__(mod_file)
+                mod = _import_kernel_module(mod_file)
                 cls = getattr(mod, cls_name)
                 if reg_key in ("aether_orch", "converter", "aether", "nexus", "pdf_forge", "titan_capture", "social", "visual", "lab", "ai_lab", "studio", "manual", "linux_bridge", "univ_bridge", "remote", "voice", "assistant", "erp", "law", "buyhatke", "writesense", "flow_ai", "automation", "trust_validator"):
                     inst = cls(self)

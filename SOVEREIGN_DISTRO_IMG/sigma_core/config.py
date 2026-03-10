@@ -92,7 +92,7 @@ class SigmaConfig:
         self.ACTIVE_VIBE = "Enterprise"
         
         self.USER_PERSONA = {
-            "name": "Aaryan Sovereign",
+            "name": "Sovereign-User Sovereign",
             "role": "Lead Architect",
             "voice_preference": "Sophisticated",
             "ai_autonomy_level": 0.85 # 0.0 to 1.0 proactivity

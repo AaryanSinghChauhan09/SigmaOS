@@ -126,7 +126,7 @@ class WelcomeAssistant(tk.Tk):
 
     def _finalize(self):
         self.title_lbl.config(text="Sovereignty Established.", fg=PAL["accent"])
-        self.desc_lbl.config(text="All systems operational. Zero-Trust policy enforced.\nWelcome home, Aaryan. Your workspace is ready.")
+        self.desc_lbl.config(text="All systems operational. Zero-Trust policy enforced.\nWelcome home, Sovereign-User. Your workspace is ready.")
         self.icon_lbl.config(text="✓", fg="#32D74B")
         self.next_btn.config(state="disabled", text="ESTABLISHING...")
         self.update()

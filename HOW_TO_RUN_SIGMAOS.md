@@ -21,7 +21,7 @@ Since `vagrant` is not installed on your system, we will use the **VirtualBox GU
 2. Go to **Shared Folders**.
 3. Click the **Plus Icon (+)**.
 4. Folder Path: 
-   `C:\Users\Aaryan\.gemini\antigravity\scratch\SigmaOS`
+   `C:\Users\Sovereign-User\.gemini\antigravity\scratch\SigmaOS`
 5. Check **"Auto-mount"** and **"Make Permanent"**.
 6. Click **OK**.
 
@@ -43,7 +43,7 @@ Since `vagrant` is not installed on your system, we will use the **VirtualBox GU
 ## 📋 3. FULL STEP-BY-STEP DOCUMENTATION
 
 > [!IMPORTANT]
-> **Check the [Novice_VirtualBox_Manual.md](file:///C:/Users/Aaryan/.gemini/antigravity/brain/f1b31537-5fb7-41ba-8c62-5b4453b90bde/Novice_VirtualBox_Manual.md) for the complete, high-detail walkthrough.**
+> **Check the [Novice_VirtualBox_Manual.md](file:///C:/Users/Sovereign-User/.gemini/antigravity/brain/f1b31537-5fb7-41ba-8c62-5b4453b90bde/Novice_VirtualBox_Manual.md) for the complete, high-detail walkthrough.**
 
 ---
 *SigmaOS Engineering | Optimized for the VirtualBox Silo.*

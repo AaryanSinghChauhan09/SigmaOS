@@ -20,7 +20,7 @@ SigmaOS is a next-generation, zero-trust operating system designed for maximum u
 
 ## 🔐 Privacy & Personal Data (Sovereign Audit)
 
-SigmaOS has been audited to ensure NO personal data (Gmails, local paths like `C:\Users\Aaryan`) is hardcoded in the public repository. All paths use dynamic environment variables (`%USERPROFILE%`) for portability and security.
+SigmaOS has been audited to ensure NO personal data (Gmails, local paths like `C:\Users\Sovereign-User`) is hardcoded in the public repository. All paths use dynamic environment variables (`%USERPROFILE%`) for portability and security.
 
 ## 🔄 Gmail-Independent Sync Setup
 
@@ -32,7 +32,7 @@ To ensure synchronization works irrespective of which Gmail is logged into Antig
 2. Run this command locally in the SigmaOS folder:
 
 ```bash
-git remote set-url origin https://YOUR_TOKEN@github.com/AaryanSinghChauhan09/SigmaOS.git
+git remote set-url origin https://YOUR_TOKEN@github.com/O-Sovereign/SigmaOS.git
 ```
 
 This forces Git to use this token for all pushes, bypassing the IDE's account.
@@ -43,7 +43,7 @@ This forces Git to use this token for all pushes, bypassing the IDE's account.
 2. Switch the remote to SSH:
 
 ```bash
-git remote set-url origin git@github.com:AaryanSinghChauhan09/SigmaOS.git
+git remote set-url origin git@github.com:O-Sovereign/SigmaOS.git
 ```
 
 Sync will now use your local SSH identity instead of the Gmail session.

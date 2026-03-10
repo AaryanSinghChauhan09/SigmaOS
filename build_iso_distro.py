@@ -3,111 +3,77 @@ import shutil
 import json
 from pathlib import Path
 
+# Root should be relative to the script
+ROOT = Path(os.path.dirname(os.path.abspath(__file__)))
+
 def build_distro_iso():
-    root = Path("C:/Users/Aaryan/.gemini/antigravity/scratch/SigmaOS")
-    dist_img = root / "SOVEREIGN_DISTRO_IMG"
+    print("[*] Initiating SigmaOS Sovereign Distro Build...")
+    dist_img = ROOT / "SOVEREIGN_DISTRO_IMG"
     
     # Clean old distro if it exists
     if dist_img.exists():
-        shutil.rmtree(dist_img)
+        try:
+            shutil.rmtree(dist_img)
+        except Exception as e:
+            print(f"[!] Cleanup failed (likely open file): {e}")
     
     # Create Professional Native Structure
     dirs = [
-        "BOOT",             # Pure x86/ARM boot vectors
-        "KERNEL",           # Native C/Rust/ASM Binaries
-        "LIBC",             # Standard System Libraries
-        "USERLAND/API",     # Sovereign Python System API
-        "USERLAND/UI",      # Sovereign HTML5/JS Interface
-        "USERLAND/APPS",    # Multi-Disciplinary AI Apps
-        "RECOVERY"          # Self-Healing & Forensic Tools
+        "BOOT", "KERNEL", "LIBC", "USERLAND/API", 
+        "USERLAND/UI", "USERLAND/APPS", "RECOVERY"
     ]
     
     for d in dirs:
         (dist_img / d).mkdir(parents=True, exist_ok=True)
         
-    # 1. Map Native Core
-    kernel_src = root / "kernel"
-    if kernel_src.exists():
-        for f in kernel_src.iterdir():
-            if f.is_file():
-                shutil.copy2(f, dist_img / "KERNEL" / f.name)
-
-    boot_src = root / "bootloader"
-    if boot_src.exists():
-        for f in boot_src.iterdir():
-            if f.is_file():
-                shutil.copy2(f, dist_img / "BOOT" / f.name)
-
-    libc_src = root / "libc"
-    if libc_src.exists():
-        for f in libc_src.iterdir():
-            if f.is_file():
-                shutil.copy2(f, dist_img / "LIBC" / f.name)
+    # 1. Map Native Core (if present)
+    for src_dir, dest_dir in [("sigma_core", "KERNEL"), ("bootloader", "BOOT"), ("libc", "LIBC")]:
+        src = ROOT / src_dir
+        if src.exists():
+            for f in src.iterdir():
+                if f.is_file():
+                    shutil.copy2(f, dist_img / dest_dir / f.name)
 
     # 2. Map Userland
-    api_src = root / "userland" / "system-api"
-    if api_src.exists():
-        for f in api_src.iterdir():
-            if f.is_file():
-                shutil.copy2(f, dist_img / "USERLAND" / "API" / f.name)
+    mapping = [
+        ("userland/system-api", "USERLAND/API"),
+        ("userland/desktop-gui", "USERLAND/UI"),
+        ("userland/apps", "USERLAND/APPS")
+    ]
+    for src_sub, dest_sub in mapping:
+        src = ROOT / src_sub
+        if src.exists():
+            for f in src.iterdir():
+                if f.is_file():
+                    shutil.copy2(f, dist_img / dest_sub / f.name)
 
-    ui_src = root / "userland" / "desktop-gui"
-    if ui_src.exists():
-        for f in ui_src.iterdir():
-            if f.is_file():
-                shutil.copy2(f, dist_img / "USERLAND" / "UI" / f.name)
-
-    apps_src = root / "userland" / "apps"
-    if apps_src.exists():
-        for f in apps_src.iterdir():
-            if f.is_file():
-                shutil.copy2(f, dist_img / "USERLAND" / "APPS" / f.name)
-
-    # 3. Essential Orchestrator Files (Root of Distro)
+    # 3. Essential Orchestrator Files
     top_files = [
-        "sigma.py",
-        "sigma_gui.py",
-        "sigma_cli.py",
-        "sigma_core", # Dir
-        "ecosystem",  # Dir
-        "SET_AS_NATIVE_BOOT.bat",
-        "Vagrantfile",
-        "available_features.md"
+        "boot.py", "sigma_setup.py", "sigma_gui.py", "sigma_cli.py",
+        "sigma_core", "ecosystem", "requirements.txt", "README.md"
     ]
     
     for item in top_files:
-        src = root / item
+        src = ROOT / item
         if src.exists():
             if src.is_dir():
                 shutil.copytree(src, dist_img / item, dirs_exist_ok=True)
             else:
                 shutil.copy2(src, dist_img / item)
 
-    # Create Sovereign Boot Manifest
+    # 4. Create Sovereign Boot Manifest
     manifest = {
         "OS_NAME": "SigmaOS Sovereign",
         "VERSION": "2.0.0-APEX",
-        "ARCHITECTURE": "x86_64 / ARM64 Hybrid",
-        "BOOT_ENTRY": "sigma.py",
-        "KERNEL_LINK": "NATIVE_LINKED",
-        "USERLAND_MODEL": "DISTRIBUTED_API",
+        "ARCHITECTURE": "Universal Python-Orchestrated x86/ARM",
+        "BOOT_ENTRY": "boot.py",
         "SECURITY_GRADE": "TITAN_ZERO_TRUST"
     }
     
     with open(dist_img / "BOOT" / "manifest.json", 'w') as f:
         json.dump(manifest, f, indent=4)
 
-    # Professional ISO Readme
-    with open(dist_img / "SOVEREIGN_README.txt", 'w') as f:
-        f.write("============================================================\n")
-        f.write(" SIGMA OS SOVEREIGN v2.0 - ARCHITECTURE COMPLIANCE IMAGE \n")
-        f.write("============================================================\n\n")
-        f.write("PRINCIPLE:\n")
-        f.write("  - Ring 0: C/Rust/ASM Kernel (Location: /KERNEL)\n")
-        f.write("  - Ring 3: Python/JS/HTML Userland (Location: /USERLAND)\n\n")
-        f.write("Sovereignty is built on this foundation.")
-
-    print(f"✅ SIGMAOS ISO DISTRO ASSEMBLED AT: {dist_img}")
+    print(f"DONE - SIGMAOS ISO DISTRO ASSEMBLED AT: {dist_img}")
 
 if __name__ == "__main__":
     build_distro_iso()

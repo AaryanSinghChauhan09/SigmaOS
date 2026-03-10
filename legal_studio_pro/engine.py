@@ -13,7 +13,9 @@ import json
 import os
 
 class SigmaLegalPro:
-    def __init__(self, workspace_path: str = "C:/Users/Aaryan/.gemini/antigravity/scratch/SigmaOS/legal_studio_pro"):
+    def __init__(self, workspace_path: str = None):
+        if workspace_path is None:
+            workspace_path = os.path.join(os.path.dirname(__file__), "vault")
         self.workspace = workspace_path
         self._initialize_vault()
         

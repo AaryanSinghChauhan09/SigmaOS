@@ -5,7 +5,7 @@ class SigmaFluidUI:
     Key Principle: Minimalist aesthetics with extreme responsiveness.
     """
 
-    def __init__(self, user_name="Aaryan"):
+    def __init__(self, user_name="Sovereign-User"):
         self.user = user_name
         self.layout_mode = "Dynamic_Glass"
 
