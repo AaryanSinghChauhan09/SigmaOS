@@ -8,6 +8,7 @@ SigmaOS is a high-performance, modular operating environment designed for absolu
 
 | Feature | SigmaOS Sovereign | Competitors (Windows/macOS/Siri) |
 | :--- | :--- | :--- |
+| **Utility Suite** | **Sovereign Suite (30+ Tools).** Local Grammarly, Rufus, iLovePDF clones. | Fragmented. Web-based/Ad-heavy. |
 | **Data Privacy** | **Zero-Telemetry.** Local-only processing. | Cloud-first. Extensive data harvesting. |
 | **Voice Nexus** | **Auralis Core.** On-device intent mapping. | Siri/Alexa. Voice sent to servers. |
 | **App Parity** | **Universal App Layer (UAL).** Bridges Win32, Android, Linux. | Siloed. Restricted to hardware ecosystems. |
@@ -29,11 +30,10 @@ SigmaOS is a high-performance, modular operating environment designed for absolu
    git clone https://github.com/AaryanSinghChauhan09/SigmaOS.git
    ```
 
-2. **Hydrate the FS**:
+2. **One-Click Deploy (Hydrate)**:
 
-   ```bash
-   py sigma_setup.py
-   ```
+   - **Windows**: Right-click `setup.ps1` -> Run with PowerShell.
+   - **POSIX (Linux/Mac)**: `chmod +x setup.sh && ./setup.sh`
 
 3. **Boot into APEX**:
 

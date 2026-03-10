@@ -11,11 +11,13 @@ import os
 from pathlib import Path
 from typing import Dict, List, Any
 from conversion_engine import SigmaConversionEngine
+from sovereign_utility_suite import SovereignUtilitySuite
 
 class SigmaForgeStore:
     def __init__(self, kernel):
         self.kernel = kernel
         self.conversion = SigmaConversionEngine(kernel) if SigmaConversionEngine else None
+        self.utils = SovereignUtilitySuite(kernel) if SovereignUtilitySuite else None
         # Use USERPROFILE env var so it works on any Windows user account
         _config_dir = Path(os.environ.get("USERPROFILE", os.path.expanduser("~"))) / ".sigmaos" / "config"
         self._installed_apps_file = _config_dir / "installed_apps.json"
@@ -225,6 +227,41 @@ class SigmaForgeStore:
                 "size_mb": 25.0,
                 "description": "Generate on-device transcripts from video files.",
                 "exec": "bus.emit('app.launch.transcribe')"
+            },
+            "grammar_checker": {
+                "name": "Sovereign Grammarly",
+                "category": "Productivity",
+                "size_mb": 4.2,
+                "description": "Local writing and grammar assistant.",
+                "exec": "bus.emit('app.launch.grammar')"
+            },
+            "carbon_code": {
+                "name": "Carbon: Code to Image",
+                "category": "DevTools",
+                "size_mb": 1.1,
+                "description": "Generate beautiful code snippets locally.",
+                "exec": "bus.emit('app.launch.carbon')"
+            },
+            "pdf_buddy": {
+                "name": "iLovePDF: PDF Toolkit",
+                "category": "Utilities",
+                "size_mb": 8.5,
+                "description": "Merge, Split, and Morph PDFs offline.",
+                "exec": "bus.emit('app.launch.pdf_buddy')"
+            },
+            "speed_test": {
+                "name": "Ookla SpeedTest Pro",
+                "category": "Performance",
+                "size_mb": 0.5,
+                "description": "Measure raw network throughput through the Mesh.",
+                "exec": "bus.emit('app.launch.speedtest')"
+            },
+            "rufus_flash": {
+                "name": "Rufus ISO Creator",
+                "category": "Utilities",
+                "size_mb": 3.0,
+                "description": "Create bootable USB drives with Sovereign signatures.",
+                "exec": "bus.emit('app.launch.rufus')"
             }
         }
 

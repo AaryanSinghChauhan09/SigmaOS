@@ -137,6 +137,12 @@ class SigmaOmniAutomator:
                 "category": "Conversion",
                 "actions": ["MD_to_PDF_Morph", "Sovereign_Signing", "Push_to_Inbox"],
                 "description": "Converts project notes to signed PDFs and delivers to sovereign inbox."
+            },
+            "Utility_Turbo": {
+                "name": "🛠️ Sovereign Utility Pulse",
+                "category": "Productivity",
+                "actions": ["Grammar_Scan", "Code_Snapshot", "Speed_Pulse", "Compact_Workspace"],
+                "description": "Orchestrates quick developer utilities in a single reactive sequence."
             }
         }
 
@@ -532,6 +538,14 @@ class SigmaOmniAutomator:
             msg = "MORPH: Rendering forensic PDF from project documentation..."
         elif action == "Sovereign_Signing":
             msg = "SECURITY: Applying cryptographic signature to exported artifact..."
+        elif action == "Grammar_Scan":
+            msg = "UTIL: Writing clarity and grammar scan in progress..."
+        elif action == "Code_Snapshot":
+            msg = "UTIL: Rendering beautiful Carbon-code visual..."
+        elif action == "Speed_Pulse":
+            msg = "PERF: Evaluating Mesh network throughput (Ookla-Parity)..."
+        elif action == "ISO_Prepare":
+            msg = "UTIL: Creating bootable partition map for external media..."
         
         self._log_bus(msg)
         return msg
