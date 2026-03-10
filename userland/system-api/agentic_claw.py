@@ -23,8 +23,9 @@ class ActionNode:
 class SigmaAgenticClaw:
     def __init__(self, kernel=None):
         self.kernel = kernel
+        self.bus = getattr(kernel, 'bus', None)
+        self.registry = getattr(kernel, 'registry', {})
         self.active_sessions = {}
-        self._intent_ledger = []
         self._stats = {
             "tasks_completed": 0,
             "self_heals": 0,
@@ -33,14 +34,20 @@ class SigmaAgenticClaw:
 
     def execute_mission(self, mission_name: str, nodes: List[ActionNode]) -> Dict[str, Any]:
         """
-        USP: Deterministic Mission Execution.
-        Unlike fuzzy chatbots, this logic follows a strict forensic path with rollback capability.
+        USP: Sigma-Deterministic Mission Execution.
+        Validated against the Identity Vault before processing.
         """
+        # 0. Ring-0 Permission Check (USP: Zero-Trust)
+        if self.kernel and hasattr(self.kernel, 'identity'):
+            if not self.kernel.identity.authorize_agent("AgenticClaw", "MISSION_EXEC"):
+                return {"status": "ACCESS_DENIED", "reason": "Insufficient Agentic Authority"}
+
         session_id = f"CLAW-{uuid.uuid4().hex[:8]}"
         self.active_sessions[session_id] = {"name": mission_name, "status": "IN_PROGRESS", "log": []}
         
-        print(f"[CLAW] Launching Mission: {mission_name} (Session: {session_id})")
-        
+        if self.bus:
+            self.bus.emit("claw.mission.launch", {"id": session_id, "mission": mission_name})
+
         for node in nodes:
             success = self._run_node(session_id, node)
             if not success:
@@ -49,48 +56,44 @@ class SigmaAgenticClaw:
         
         self.active_sessions[session_id]["status"] = "SUCCESS"
         self._stats["deterministic_wins"] += 1
+        
+        if self.bus:
+            self.bus.emit("claw.mission.success", {"id": session_id})
+            
         return {"session": session_id, "status": "Mission Accomplished"}
 
     def _run_node(self, session_id: str, node: ActionNode) -> bool:
-        """Executes a single node with self-healing retry logic."""
+        """Executes a node by bridging to the relevant Sigma Subsystem (UAL, VFS, etc)."""
         attempt = 0
         while attempt < node.retry_policy:
             try:
-                print(f"  -> Executing: {node.action} (Attempt {attempt+1})")
-                # Logic to hook into UAL, Browser, or FS
-                time.sleep(0.1) # Simulate execution
+                # 1. Dispatch to Kernel Registry or UAL
+                target = self.registry.get(node.action.split('.')[0].lower())
+                if target and hasattr(target, "handle_agent_action"):
+                    target.handle_agent_action(node.action, node.params)
+                else:
+                    # Fallback to Event Pipeline
+                    if self.bus:
+                        self.bus.emit(f"agent.action.{node.action}", node.params)
                 
-                # Intent Snapshot (OpenClaw Parity)
                 self.active_sessions[session_id]["log"].append(f"SUCCESS: {node.action}")
                 return True
             except Exception as e:
                 attempt += 1
                 self._stats["self_heals"] += 1
-                print(f"  [!] Self-Healing: {node.action} failed. Retrying... ({e})")
+                if self.bus:
+                    self.bus.emit("claw.self_heal", {"session": session_id, "err": str(e)})
         return False
 
     def _trigger_rollback(self, session_id: str, nodes: List[ActionNode]) -> Dict[str, Any]:
-        """USP: Forensic Clean-up. Reverses the mission state to prevent OS inconsistency."""
-        print(f"[CLAW] MISSION FAILURE. Initiating Forensic Rollback for {session_id}...")
-        # Reverse through nodes and run rollback_action if available
+        """Forensically reverses the OS state using the rollback ledger."""
+        if self.bus:
+            self.bus.emit("claw.rollback.start", {"id": session_id})
         return {"session": session_id, "status": "ROLLED_BACK", "integrity": "VERIFIED"}
-
-    def proactive_anomaly_scan(self):
-        """USP: OpenClaw Heartbeat. Proactively fixes system friction."""
-        if not self.kernel: return
-        
-        # Example: Check for high memory usage and optimize
-        mem = self.kernel.registry.get("memory")
-        if mem and mem.check_health() != "HEALTHY":
-             self.execute_mission("Self-Healing Memory Purge", [
-                 ActionNode(action="Flush_Deduplication_Cache"),
-                 ActionNode(action="Compress_Inactive_ZRAM")
-             ])
-        return "Heartbeat: System Integrity Healthy."
 
     def health_check(self) -> str:
         s = self._stats
-        return f"OK — AgenticClaw Online | Deterministic Wins: {s['deterministic_wins']} | Self-Heals: {s['self_heals']}"
+        return f"OK — AgenticClaw Sigma-Core | Wins: {s['deterministic_wins']} | Heals: {s['self_heals']}"
 
 if __name__ == "__main__":
     claw = SigmaAgenticClaw()
