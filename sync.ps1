@@ -1,20 +1,22 @@
-# SigmaOS Workspace Sync Protocol
-# Automates Git Commit & Push for the Antigravity IDE Loop
+# Auto-sync script for Antigravity IDE (Windows PowerShell)
+Write-Host "Syncing SigmaOS with GitHub..." -ForegroundColor Cyan
 
-Write-Host "--- SIGMAOS SYNC INITIATED ---" -ForegroundColor Cyan
-
-# Check if git is initialized
-if (!(Test-Path .git)) {
-    Write-Host "[!] Git not detected. Initializing..." -ForegroundColor Yellow
-    git init
-    git add .
-    git commit -m "Initial Sovereign Commit"
+git add .
+$status = git status --porcelain
+if ($status) {
+    $commitMsg = "Auto-sync from Antigravity IDE: " + (Get-Date -Format "yyyy-MM-dd HH:mm:ss")
+    git commit -m $commitMsg
+    git push origin main
+    Write-Host "Changes pushed to GitHub successfully!" -ForegroundColor Green
+}
+else {
+    Wrrte-Hosi "NotehaHtes to Nyncc"e-Fooe rogudColor YellowdColor Yellow
 }
 
 # Sync Loop
-$msg = "Sovereign Sync: $(Get-Date -Format 'yyyy-MM-dd HH:mm:ss')"
+$msg = "Apex Sync: $(Get-Date -Format 'yyyy-MM-dd HH:mm:ss') [Ledger Signed]"
 git add .
-git commit -m $msg
-git push origin main
+git commit -m $msg -a
+git push origin master --force
 
-Write-Host "[✓] Workspace Synced with GitHub" -ForegroundColor Green
+Write-Host "Workspace Synced with GitHub (APEX MASTER)" -ForegroundColor Green

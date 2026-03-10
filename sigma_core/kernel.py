@@ -40,7 +40,9 @@ class SigmaKernel:
         self.os_name = self.cfg.OS_NAME
         self.version  = self.cfg.VERSION
         self._sentinel_running = False
+        self._github_sync_active = True
         self.ledger = SovereignLedger()
+        self._file_hashes = {}
         
         # --- Observability ---
         self.bus.subscribe("*", self._audit_event)
@@ -76,6 +78,7 @@ class SigmaKernel:
                         severity=p["severity"]
                     ) if p else None)
             self.start_sentinel()
+            self._start_github_sentinel()
             
             # --- APEX AUTOMATION: Auto-Sync ---
             if self.automator and os.path.exists("sync.ps1"):
@@ -144,6 +147,41 @@ class SigmaKernel:
 
             except Exception:
                 pass
+
+    def _start_github_sentinel(self):
+        """USP: Real-Time Workspace Synchronization (Automated IDE-GitHub Sync)."""
+        if self._github_sync_active:
+            t = threading.Thread(target=self._github_sentinel_loop, daemon=True)
+            t.start()
+            print("[KERNEL] GitHub Sovereign Sentinel initialized.")
+
+    def _github_sentinel_loop(self):
+        """Watches for changes and triggers sync.ps1 within 2s of a save."""
+        root = _ROOT
+        while self._github_sync_active:
+            time.sleep(2)
+            try:
+                changed = []
+                # Watch critical directories
+                for d in [".", "sigma_core", "userland/system-api"]:
+                    dp = os.path.join(root, d)
+                    if not os.path.exists(dp): continue
+                    
+                    for f in os.listdir(dp):
+                        if f.endswith(".py") or f == "sync.ps1":
+                            fp = os.path.join(dp, f)
+                            mtime = os.path.getmtime(fp)
+                            if fp not in self._file_hashes or self._file_hashes[fp] < mtime:
+                                self._file_hashes[fp] = mtime
+                                changed.append(f)
+                
+                if changed:
+                    self.bus.emit("kernel.automation", {"msg": f"Detected change in {changed}. Syncing..."})
+                    import subprocess
+                    subprocess.Popen(["powershell.exe", "-ExecutionPolicy", "Bypass", "-File", "sync.ps1"])
+                    self.ledger.commit("SYNC", "GITHUB_AUTO_PUSH", {"files": changed})
+            except Exception as e:
+                print(f"[SENTINEL] Sync Error: {e}")
 
     # ─── Module Loading ───────────────────────────────────────────────────────
 
