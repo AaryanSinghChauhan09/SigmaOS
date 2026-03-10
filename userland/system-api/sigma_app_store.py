@@ -129,7 +129,7 @@ class SigmaAppStore:
         self._ledger: List[str] = []   # Immutable audit log (simplified)
         self._pending_updates: Dict[str, str] = {}
 
-        # Load built-in userland/apps into catalog
+        # Load built-in apps into catalog
         for app_data in self._BUILTIN_APPS:
             app = SigmaApp(**app_data)
             app.checksum = self._compute_checksum(app.app_id, app.version)
@@ -192,7 +192,7 @@ class SigmaAppStore:
 
         # Mark installed
         app.installed = True
-        app.install_path = f"/sigma/userland/apps/{app.app_id.replace('.', '/')}"
+        app.install_path = f"/sigma/apps/{app.app_id.replace('.', '/')}"
         app.downloads += 1
         self._installed[app_id] = app
         self._reviews[app_id] = []

@@ -188,7 +188,7 @@ class SigmaCompetitorIntelligence:
             "vs Windows 11":    "SigmaOS boots 7× faster, uses 14× less RAM, and has 35× lower UI latency.",
             "vs macOS Sequoia": "SigmaOS has 2× the AI throughput, 1.2× faster NVME writes, and 75× faster crash recovery.",
             "vs Ubuntu 24.04":  "SigmaOS has 4× faster boot, 75× faster recovery, and 1.4× higher AI inference.",
-            "vs ChromeOS Flex": "SigmaOS launches userland/apps 10× faster and delivers 9.6× higher AI throughput.",
+            "vs ChromeOS Flex": "SigmaOS launches apps 10× faster and delivers 9.6× higher AI throughput.",
             "overall":          "SigmaOS Sovereign v2.0 leads in ALL 9 benchmark categories simultaneously.",
         }
 

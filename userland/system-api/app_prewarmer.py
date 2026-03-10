@@ -8,7 +8,7 @@ When the user clicks the app, it instantly un-pauses.
 
 Competitor Analysis:
   Windows (Superfetch): High disk I/O thrashing, slow.
-  macOS (App Nap): Good at sleeping userland/apps, poor at predictive waking.
+  macOS (App Nap): Good at sleeping apps, poor at predictive waking.
   SigmaOS: Neural prediction of next app launch -> Pre-executes binary into RAM -> Pauses thread.
 """
 
@@ -76,7 +76,7 @@ class SigmaAppPrewarmer:
                 if self.kernel.memory:
                     self.kernel.memory.free("shadow", shadow.memory_reserved_mb)
                 
-                # Predict next userland/apps based on this launch
+                # Predict next apps based on this launch
                 self._predict_and_warm(app_name)
                 
                 return f"INSTANT LAUNCH: '{app_name}' unpaused from Shadow RAM (0.0ms delay)."

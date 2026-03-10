@@ -40,7 +40,7 @@ class SigmaNeuralShell:
         return [f"{fragment} --git", f"{fragment} --vault", f"{fragment} -force"]
 
     def nl_to_bash(self, intent: str) -> str:
-        """USP: Converts natural language (e.g., 'Kill all python userland/apps') into safe, shored shell script."""
+        """USP: Converts natural language (e.g., 'Kill all python apps') into safe, shored shell script."""
         return f"NeuralShell: Synthesized bash script for '{intent}'. Review & Execute?"
 
     def health_check(self) -> str:

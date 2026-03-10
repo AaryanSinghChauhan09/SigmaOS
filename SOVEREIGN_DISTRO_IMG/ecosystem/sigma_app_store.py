@@ -14,7 +14,7 @@ from app_sandbox import SigmaAppSandbox
 class SigmaAppStore:
     def __init__(self, kernel):
         self.kernel = kernel
-        self.installed_userland/apps = {} # Changed to dict: app_id -> silo_id
+        self.installed_apps = {} # Changed to dict: app_id -> silo_id
         self.sandbox = SigmaAppSandbox(kernel)
         self._load_catalog()
 
@@ -49,10 +49,10 @@ class SigmaAppStore:
             {"id": "t_slidesgo", "name": "Slidesgo Vault", "category": "AI Design", "size": "5MB", "icon": "📑", "description": "Direct access to AI-powered presentation templates."},
             
             # Workflow & Automation Engines
-            {"id": "t_zapier", "name": "Zapier Mesh", "category": "Automation", "size": "6MB", "icon": "⚡", "description": "Automate workflows across 6000+ cloud userland/apps locally."},
-            {"id": "t_make", "name": "Make (formerly Integromat)", "category": "Automation", "size": "10MB", "icon": "🌀", "description": "Visual visual workflow orchestrator for cloud userland/apps."},
+            {"id": "t_zapier", "name": "Zapier Mesh", "category": "Automation", "size": "6MB", "icon": "⚡", "description": "Automate workflows across 6000+ cloud apps locally."},
+            {"id": "t_make", "name": "Make (formerly Integromat)", "category": "Automation", "size": "10MB", "icon": "🌀", "description": "Visual visual workflow orchestrator for cloud apps."},
             {"id": "t_n8n", "name": "n8n Self-Host", "category": "Automation", "size": "45MB", "icon": "🐙", "description": "Next-gen self-hosted workflow automation."},
-            {"id": "t_integrately", "name": "Integrately Bridge", "category": "Automation", "size": "4MB", "icon": "🔗", "description": "1-click automation sync with external SaaS userland/apps."},
+            {"id": "t_integrately", "name": "Integrately Bridge", "category": "Automation", "size": "4MB", "icon": "🔗", "description": "1-click automation sync with external SaaS apps."},
             
             # Project & Task AI
             {"id": "t_monday", "name": "Monday.com OS Sync", "category": "Management", "size": "30MB", "icon": "📅", "description": "Work OS integration for team and task management."},
@@ -87,7 +87,7 @@ class SigmaAppStore:
         ]
         self.catalog["Tools"] = tools
 
-    def list_userland/apps(self, category: str = None) -> Dict:
+    def list_apps(self, category: str = None) -> Dict:
         """Returns the current catalog (can filter by category)."""
         self._load_catalog() # Refresh
         if category:
@@ -95,7 +95,7 @@ class SigmaAppStore:
         return self.catalog
 
     def install_app(self, app_id: str) -> str:
-        """One-click 'hydration' install for userland/apps and games."""
+        """One-click 'hydration' install for apps and games."""
         app_name = "Unknown App"
         found = False
         
@@ -113,7 +113,7 @@ class SigmaAppStore:
         if not found:
             return f"Error: App '{app_id}' not found."
 
-        if app_id in self.installed_userland/apps:
+        if app_id in self.installed_apps:
             return f"'{app_name}' is already installed."
 
         # Logic-specific installation
@@ -122,12 +122,12 @@ class SigmaAppStore:
             if hasattr(self.kernel, "games"):
                 res = self.kernel.games.install_game(app_id)
                 if res["status"] == "success":
-                    self.installed_userland/apps.append(app_id)
+                    self.installed_apps.append(app_id)
                     return res["message"]
         
         # Create a dedicated silo for the tool
         silo_id = self.sandbox.create_silo(app_id)
-        self.installed_userland/apps[app_id] = silo_id
+        self.installed_apps[app_id] = silo_id
         
         # 3. Create FileSystem Snapshot for recovery (if fs available)
         if hasattr(self.kernel, "fs"):
@@ -136,7 +136,7 @@ class SigmaAppStore:
         return f"Successfully hydrated '{app_name}' and siloted in {silo_id}."
 
     def launch_app(self, app_id: str) -> str:
-        silo_id = self.installed_userland/apps.get(app_id)
+        silo_id = self.installed_apps.get(app_id)
         if not silo_id:
             return f"Error: '{app_id}' is not installed."
         
@@ -145,4 +145,4 @@ class SigmaAppStore:
         return f"{app_id} Silo [ACTIVE]: {msg}"
 
     def health_check(self) -> str:
-        return f"OK — Store: {len(self.catalog['Games'])} Games, {len(self.catalog['Tools'])} Tools | {len(self.installed_userland/apps)} Installed."
+        return f"OK — Store: {len(self.catalog['Games'])} Games, {len(self.catalog['Tools'])} Tools | {len(self.installed_apps)} Installed."

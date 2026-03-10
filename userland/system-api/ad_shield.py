@@ -2,7 +2,7 @@ class SigmaAdShield:
     """
     Sovereign Ad-Shield: OS-Wide Ad, Tracker, and Malware Blocking.
     Operates at the DNS and Network level to ensure no app can bypass protection.
-    USP: Faster browsing and cleaner userland/apps without needing third-party extensions.
+    USP: Faster browsing and cleaner apps without needing third-party extensions.
     """
 
     def __init__(self):
@@ -16,7 +16,7 @@ class SigmaAdShield:
         return "Protection Active: [BLOCKING Ads, Trackers, and Telemetry]"
 
     def scrub_pixel_trackers(self):
-        """Identifies and neutralizes invisible tracking pixels in emails and userland/apps."""
+        """Identifies and neutralizes invisible tracking pixels in emails and apps."""
         return "Privacy Engine: [NEUTRALIZED 12 Hidden Trackers in last session]"
 
     def get_shield_metrics(self):

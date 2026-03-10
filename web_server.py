@@ -4,7 +4,7 @@ import os
 import webbrowser
 
 PORT = 8080
-DIRECTORY = os.path.join(os.path.dirname(os.path.abspath(__file__)), "userland/desktop-gui")
+DIRECTORY = os.path.join(os.path.dirname(os.path.abspath(__file__)), "web_os")
 
 class Handler(http.server.SimpleHTTPRequestHandler):
     def __init__(self, *args, **kwargs):

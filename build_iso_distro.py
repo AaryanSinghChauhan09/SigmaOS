@@ -37,8 +37,8 @@ def build_distro_iso():
     # 2. Map Userland
     mapping = [
         ("userland/system-api", "USERLAND/API"),
-        ("userland/desktop-gui", "USERLAND/UI"),
-        ("userland/apps", "USERLAND/APPS")
+        ("web_os", "USERLAND/UI"),
+        ("apps", "USERLAND/APPS")
     ]
     for src_sub, dest_sub in mapping:
         src = ROOT / src_sub

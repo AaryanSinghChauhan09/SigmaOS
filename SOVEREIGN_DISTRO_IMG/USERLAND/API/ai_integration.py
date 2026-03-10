@@ -57,7 +57,7 @@ class SigmaAIIntegrator:
     def context_injection_feed(self):
         """
         Provides a real-time 'Snapshot' of OS state for AI models to understand user workspace.
-        Includes active userland/apps, window focus, resource pressure, and recent snippets.
+        Includes active apps, window focus, resource pressure, and recent snippets.
         """
         return {
             "Active_Focus": "SigmaWord Pro",

@@ -132,7 +132,7 @@ class SigmaCAAT:
         """Restores the exact multi-app workflow state from the last known context."""
         return {
             "status": "Recalled",
-            "message": "CAAT: Instant-On Session Recall complete. Restored 3 userland/apps, 12 browser tabs, and VPN state seamlessly."
+            "message": "CAAT: Instant-On Session Recall complete. Restored 3 apps, 12 browser tabs, and VPN state seamlessly."
         }
 
     def eco_efficiency_optimizer(self) -> dict:

@@ -7,7 +7,7 @@ class SigmaMarketplace:
     """
 
     def __init__(self):
-        self.verified_userland/apps = [
+        self.verified_apps = [
             {"id": "V101", "name": "Sigma Office", "tags": ["productivity", "docs"]},
             {"id": "A202", "name": "Neural Render", "tags": ["AI", "Graphics"]},
             {"id": "S505", "name": "Cyber Sentinel", "tags": ["Security", "Network"]}
@@ -15,7 +15,7 @@ class SigmaMarketplace:
 
     def install_sovereign_app(self, app_id):
         """Standard secure install protocol."""
-        app = next((a for a in self.verified_userland/apps if a["id"] == app_id), None)
+        app = next((a for a in self.verified_apps if a["id"] == app_id), None)
         if not app:
             return "Application identifier not found in Sovereign Registry."
         

@@ -45,26 +45,26 @@ class SigmaOmniWorkspaces:
         configs = {
             "Programmer": {
                 "competitor_usp": "Combines macOS UNIX terminal speed, Windows WSL compatibility, and VS Code extension architecture without the telemetry.",
-                "active_userland/apps": ["DevForge IDE", "TensorShell", "SigmaContainers", "MeshGit"],
+                "active_apps": ["DevForge IDE", "TensorShell", "SigmaContainers", "MeshGit"],
                 "kernel_state": "Multi-core Compilation Burst; Background telemetry disabled.",
                 "theme": "Sovereign_Dark (Monokai inspired)"
             },
             "Video Editor": {
                 "competitor_usp": "Combines Final Cut's magnetic timeline rendering speed with DaVinci Resolve's localized color grading, bypassing Adobe's subscription lag.",
-                "active_userland/apps": ["Sigma Media Studio", "Asset Vault", "Hardware Monitor"],
+                "active_apps": ["Sigma Media Studio", "Asset Vault", "Hardware Monitor"],
                 "kernel_state": "GPU-exclusive acceleration; RAM cache expanded to 80%.",
                 "theme": "Studio_Graphite (Low-glare)"
             },
             "Designer": {
                 "competitor_usp": "Fuses Figma's vector agility with Photoshop's raster layers, running purely offline with native AI auto-enhance.",
-                "active_userland/apps": ["VectorForge", "Sigma Canvas", "Font Matrix"],
+                "active_apps": ["VectorForge", "Sigma Canvas", "Font Matrix"],
                 "kernel_state": "Display-first latency optimization; Wacom/Tablet pen input prioritized over mouse.",
                 "theme": "Creator_Canvas (True-Tone White)"
             }
         }
         return configs.get(workspace_name, {
             "competitor_usp": "Standard setup.",
-            "active_userland/apps": ["Explorer", "App Matrix", "Defender"],
+            "active_apps": ["Explorer", "App Matrix", "Defender"],
             "kernel_state": "Balanced",
             "theme": "Sovereign_Default"
         })

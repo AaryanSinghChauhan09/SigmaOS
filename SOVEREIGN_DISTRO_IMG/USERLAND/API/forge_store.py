@@ -13,8 +13,8 @@ from typing import Dict, List, Any
 class SigmaForgeStore:
     def __init__(self, kernel):
         self.kernel = kernel
-        self.installed_userland/apps_file = Path(r'C:\Users\Sovereign-User\.gemini\antigravity\scratch\SigmaOS\config\installed_userland/apps.json')
-        self.installed_userland/apps = self._load_installed()
+        self.installed_apps_file = Path(r'C:\Users\Sovereign-User\.gemini\antigravity\scratch\SigmaOS\config\installed_apps.json')
+        self.installed_apps = self._load_installed()
         
         # IP-Safe Open Source Game Clones & Tools
         self.catalog = {
@@ -203,17 +203,17 @@ class SigmaForgeStore:
         }
 
     def _load_installed(self) -> List[str]:
-        if self.installed_userland/apps_file.exists():
+        if self.installed_apps_file.exists():
             try:
-                with open(self.installed_userland/apps_file, 'r', encoding='utf-8') as f:
+                with open(self.installed_apps_file, 'r', encoding='utf-8') as f:
                     return json.load(f)
             except: pass
         return []
 
     def _save_installed(self):
-        self.installed_userland/apps_file.parent.mkdir(parents=True, exist_ok=True)
-        with open(self.installed_userland/apps_file, 'w', encoding='utf-8') as f:
-            json.dump(self.installed_userland/apps, f)
+        self.installed_apps_file.parent.mkdir(parents=True, exist_ok=True)
+        with open(self.installed_apps_file, 'w', encoding='utf-8') as f:
+            json.dump(self.installed_apps, f)
 
     def get_catalog(self) -> Dict[str, Any]:
         return self.catalog
@@ -221,16 +221,16 @@ class SigmaForgeStore:
     def install_app(self, app_id: str) -> Dict[str, Any]:
         if app_id not in self.catalog:
             return {"status": "ERROR", "msg": "App not found."}
-        if app_id in self.installed_userland/apps:
+        if app_id in self.installed_apps:
             return {"status": "OK", "msg": "Already installed."}
             
         # Simulate quick download and extraction (compressed AppImage style)
-        self.installed_userland/apps.append(app_id)
+        self.installed_apps.append(app_id)
         self._save_installed()
         return {"status": "SUCCESS", "msg": f"{self.catalog[app_id]['name']} installed successfully (Compressed)."}
 
     def launch_app(self, app_id: str) -> str:
-        if app_id not in self.installed_userland/apps:
+        if app_id not in self.installed_apps:
             return f"Error: {app_id} is not installed."
         app = self.catalog.get(app_id)
         if not app:

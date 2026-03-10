@@ -58,7 +58,7 @@ class GuideApex(tk.Tk):
 SigmaOS is not just an operating system; it's a statement of user supremacy.
 This guide will walkthrough the core pillars of your new environment.
 
-1. THE DASHBOARD: Your central hub for userland/apps, telemetry, and system health.
+1. THE DASHBOARD: Your central hub for apps, telemetry, and system health.
 2. AI NEXUS (🧬): Your agentic partner. Ask it to 'audit security' or 'open browser'.
 3. THE APPS: Every tool is isolated in a Zero-Trust sandbox.
 4. VFS: A virtualized file system designed for project-based automation.
@@ -123,7 +123,7 @@ PRO TIP: Use the 'Security Guardian' (SENTINEL) to monitor real-time thread acti
         msg = tk.Label(tab, text="Co-Piloting with the Nexus AI", font=("Inter Bold", 14), fg=PAL["accent"], bg=PAL["bg"])
         msg.pack(pady=20)
         
-        items = ["Speak naturally to launch userland/apps", "Real-time security auditing", "Automated file organization", "Neural hinting in CodeForge"]
+        items = ["Speak naturally to launch apps", "Real-time security auditing", "Automated file organization", "Neural hinting in CodeForge"]
         for i in items:
             tk.Label(tab, text=f"✦ {i}", font=("Inter", 11), fg=PAL["text"], bg=PAL["bg"], pady=5).pack()
 

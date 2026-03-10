@@ -145,7 +145,7 @@ class SigmaPackageManager:
 
     def health_check(self) -> str:
         s = self._stats
-        return f"OK — {len(self._installed)} userland/apps installed. Updates: {s['updates']}, Delta Saved: {s['delta_saves_mb']:.1f}MB."
+        return f"OK — {len(self._installed)} apps installed. Updates: {s['updates']}, Delta Saved: {s['delta_saves_mb']:.1f}MB."
 
 
 if __name__ == "__main__":

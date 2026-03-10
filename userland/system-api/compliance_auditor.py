@@ -6,7 +6,7 @@ USP: Real-time, logic-layer auditor enforcing Digital Rights, Apple ATT,
 
 Features & Compliance:
 1. Omni-Tracking Ban: Beyond Apple's ATT, blocks telemetry at the kernel VFS/Network layer.
-2. Anti-Monopoly Engine (EU DMA): Prevents userland/apps from forcing proprietary payment gateways or locking data.
+2. Anti-Monopoly Engine (EU DMA): Prevents apps from forcing proprietary payment gateways or locking data.
 3. IP-Law Enforcer: Warns users executing non-compliant GPL/Proprietary binaries without uploading data.
 4. GDPR Right-to-be-Forgotten API: Cryptographically shreds local app data globally on request.
 5. Asimov Guard: AI models executing on SigmaOS are dynamically blocked from generating malware or exploiting vulnerabilities.

@@ -35,7 +35,7 @@ class SigmaResourceOrchestrator:
              allocation = self._allocations["High_Priority"]
         elif "Bare" in intent or "Minimum" in intent:
              # Aggressive Purge
-             self.kernel.prewarmer.purge_cold_userland/apps()
+             self.kernel.prewarmer.purge_cold_apps()
              allocation = self._allocations["Bare_Minimum"]
         else:
              allocation = self._allocations["Foreground"]

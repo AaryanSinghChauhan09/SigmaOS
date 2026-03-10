@@ -262,7 +262,7 @@ class SigmaOSKernel:
         return self.offline_guard.enforce_offline_integrity()
 
     def run_foreign_app(self, app_path):
-        """Universal Bridge: Executes userland/apps from other OS ecosystems."""
+        """Universal Bridge: Executes apps from other OS ecosystems."""
         return self.universal_bridge.execute_foreign_binary(app_path)
 
     def locate_antigravity_assets(self):

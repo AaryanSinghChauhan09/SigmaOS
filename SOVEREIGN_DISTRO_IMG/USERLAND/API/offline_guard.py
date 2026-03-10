@@ -26,7 +26,7 @@ class SigmaOfflineGuard:
             "p2p_discovery_only": True,
             "app_sovereignty_enforced": True
         }
-        self._sovereign_userland/apps = [
+        self._sovereign_apps = [
             "pdf_forge", "titan_capture", "sigma_browser", "sigma_studio", 
             "sigma_lab", "sigma_data_pro", "omni_converter", "aether_orchestrator"
         ]
@@ -36,8 +36,8 @@ class SigmaOfflineGuard:
         self._stats["app_sovereignty_enforced"] = True
         return {
             "status": "ENFORCED",
-            "certified_userland/apps": len(self._sovereign_userland/apps),
-            "message": f"SovereignGuard: Full sovereignty enforced across {len(self._sovereign_userland/apps)} native applications."
+            "certified_apps": len(self._sovereign_apps),
+            "message": f"SovereignGuard: Full sovereignty enforced across {len(self._sovereign_apps)} native applications."
         }
 
     def verify_privacy_perimeter(self) -> dict:

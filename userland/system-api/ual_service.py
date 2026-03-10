@@ -2,7 +2,7 @@
 SigmaOS Universal Application Layer (UAL)
 ==========================================
 USP: Surpassing WSL2, Wine, and Rosetta.
-Ensures 100% compatibility for userland/apps from Windows, macOS, Linux, and Android.
+Ensures 100% compatibility for apps from Windows, macOS, Linux, and Android.
 Any App. Any Device. One Sovereign OS.
 """
 from enum import Enum
@@ -33,7 +33,7 @@ class BridgeConfig:
 class SigmaUAL:
     """
     Universal Application Layer (UAL) — The 'Any Machine' Runtime.
-    Ensures absolute parity for userland/apps across PC, Mobile, and Tablet.
+    Ensures absolute parity for apps across PC, Mobile, and Tablet.
     """
 
     def __init__(self, kernel=None):
@@ -74,11 +74,11 @@ class SigmaUAL:
     def vfs_lookup(self, foreign_path: str) -> str:
         """Translates path structures between OS flavors."""
         if "\\" in foreign_path:
-            return f"/sigma/storage/virtual_c/{foreign_path.replace(':','').replace('\\','/')}"
+            return f"/sigma/storage/virtual_c/{foreign_path.replace(':','').replace('\\\\','/')}"
         return f"/sigma/storage/virtual_nix{foreign_path}"
 
     def morph_input(self, app_id: str, x: int, y: int, event_type: str):
-        """Translates Mouse-Clicks to Touch-Taps and vice-versa for foreign userland/apps."""
+        """Translates Mouse-Clicks to Touch-Taps and vice-versa for foreign apps."""
         self._stats["input_morphs"] += 1
         return f"UAL Input-Shim: Mapped {event_type} ({x},{y}) to target ABI native event. Zero lag."
 
@@ -87,7 +87,7 @@ class SigmaUAL:
         return f"UAL Graphics: Shimming {target_api} -> Sigma-Atoms. Cross-Hardware acceleration ENABLED."
 
     def mock_hardware_capabilities(self, capabilities: list):
-        """Mocks hardware (GPS, Camera, Gyro) for userland/apps running on devices without them."""
+        """Mocks hardware (GPS, Camera, Gyro) for apps running on devices without them."""
         return f"UAL Virtual-Hardware: Mocking {capabilities} via Sovereign Sensor Layer."
 
     def health_check(self) -> str:

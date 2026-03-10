@@ -49,10 +49,10 @@ class SigmaAppStore:
             {"id": "t_slidesgo", "name": "Slidesgo Vault", "category": "AI Design", "size": "5MB", "icon": "📑", "description": "Direct access to AI-powered presentation templates."},
             
             # Workflow & Automation Engines
-            {"id": "t_zapier", "name": "Zapier Mesh", "category": "Automation", "size": "6MB", "icon": "⚡", "description": "Automate workflows across 6000+ cloud userland/apps locally."},
-            {"id": "t_make", "name": "Make (formerly Integromat)", "category": "Automation", "size": "10MB", "icon": "🌀", "description": "Visual visual workflow orchestrator for cloud userland/apps."},
+            {"id": "t_zapier", "name": "Zapier Mesh", "category": "Automation", "size": "6MB", "icon": "⚡", "description": "Automate workflows across 6000+ cloud apps locally."},
+            {"id": "t_make", "name": "Make (formerly Integromat)", "category": "Automation", "size": "10MB", "icon": "🌀", "description": "Visual visual workflow orchestrator for cloud apps."},
             {"id": "t_n8n", "name": "n8n Self-Host", "category": "Automation", "size": "45MB", "icon": "🐙", "description": "Next-gen self-hosted workflow automation."},
-            {"id": "t_integrately", "name": "Integrately Bridge", "category": "Automation", "size": "4MB", "icon": "🔗", "description": "1-click automation sync with external SaaS userland/apps."},
+            {"id": "t_integrately", "name": "Integrately Bridge", "category": "Automation", "size": "4MB", "icon": "🔗", "description": "1-click automation sync with external SaaS apps."},
             
             # Project & Task AI
             {"id": "t_monday", "name": "Monday.com OS Sync", "category": "Management", "size": "30MB", "icon": "📅", "description": "Work OS integration for team and task management."},
@@ -95,7 +95,7 @@ class SigmaAppStore:
         return self.catalog
 
     def install_app(self, app_id: str) -> str:
-        """One-click 'hydration' install for userland/apps and games."""
+        """One-click 'hydration' install for apps and games."""
         app_name = "Unknown App"
         found = False
         

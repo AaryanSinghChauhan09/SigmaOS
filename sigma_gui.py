@@ -1069,7 +1069,8 @@ class SigmaGUI(tk.Tk):
         start_fr = tk.Frame(bar, bg=PAL["bg2"])
         start_fr.pack(side="left", padx=(12,0))
         ttk.Button(start_fr, text="σ", width=3, command=self._show_start_menu).pack(side="left")
-        ttk.Button(start_fr, text="🌐 Web OS", width=12, command=self._launch_userland/desktop-gui).pack(side="left", padx=(5,0))
+        ttk.Button(start_fr, text="🌐 Web OS", width=12, 
+                   command=self._launch_web_os).pack(side="left", padx=(5,0))
         self._logo_lbl = tk.Label(start_fr, textvariable=self._dashboard_title, font=FONT_LOGO, fg=PAL["cyan"], bg=PAL["bg2"])
         self._logo_lbl.pack(side="left", padx=8)
 
@@ -1085,7 +1086,7 @@ class SigmaGUI(tk.Tk):
         
         ttk.Button(intent_fr, text="🚀 Execute", command=self._intent_exec).pack(side="left")
 
-    def _launch_userland/desktop-gui(self):
+    def _launch_web_os(self):
         """USP: Expand SigmaOS entirely into a parallel web dimension."""
         self._log_voice("Starting Web OS Sandbox on Localhost. Spawning Local Server...")
         import subprocess, sys, os
@@ -1718,14 +1719,14 @@ class SigmaGUI(tk.Tk):
         s_entry = tk.Entry(s_box, bg=PAL["bg4"], fg=PAL["text"], insertbackground=PAL["cyan"],
                            font=FONT_MED, relief="flat", borderwidth=0)
         s_entry.pack(side="left", fill="x", expand=True, padx=10)
-        s_entry.insert(0, "Search for userland/apps, settings, or AI help...")
+        s_entry.insert(0, "Search for apps, settings, or AI help...")
         s_entry.focus_set()
 
         # 🔵 App Pinned Grid
         grid_fr = tk.Frame(main, bg=PAL["bg2"], padx=30, pady=20)
         grid_fr.pack(fill="both", expand=True)
         
-        userland/apps = [
+        pinned_apps = [
             ("🌐", "Browser", "browser"), ("📁", "Explorer", "explorer"),
             ("📦", "App Store", "store"), ("🧪", "Lab", "lab"),
             ("🧠", "Aether AI", "brain"), ("📊", "Data Studio", "ds_studio"),
@@ -1734,7 +1735,7 @@ class SigmaGUI(tk.Tk):
             ("📱", "Mirror", "phone_mirror"), ("🧬", "Nexus", "nexus")
         ]
         
-        for i, (icon, name, page) in enumerate(userland/apps):
+        for i, (icon, name, page) in enumerate(pinned_apps):
             c, r = i % 4, i // 4
             btn = tk.Frame(grid_fr, bg=PAL["bg2"], width=130, height=90)
             btn.grid(row=r, column=c, padx=5, pady=5)
@@ -2825,7 +2826,7 @@ class SigmaGUI(tk.Tk):
         msg = (
             "Welcome to SigmaOS Sovereign!\n\n"
             "1. Use the 'Sovereign Intent' bar (Top) to ask for anything.\n"
-            "2. The Start Menu (σ) gives quick access to Apex userland/apps.\n"
+            "2. The Start Menu (σ) gives quick access to Apex apps.\n"
             "3. Your data never leaves this machine.\n\n"
             "Sovereignty is yours."
         )
@@ -3847,7 +3848,7 @@ class SigmaGUI(tk.Tk):
         # 3. Agentic Pipelines (Power Automate)
         agent_card = self._card(left_col, "🧠 Agentic Pipelines")
         agent_card.master.pack(fill="x", pady=(0, 10))
-        tk.Label(agent_card, text="AI logic bridges multiple userland/apps (Power Automate).", font=FONT_SMALL, fg=PAL["dim"], bg=PAL["card"]).pack(anchor="w")
+        tk.Label(agent_card, text="AI logic bridges multiple apps (Power Automate).", font=FONT_SMALL, fg=PAL["dim"], bg=PAL["card"]).pack(anchor="w")
         
         goal_ent = ttk.Entry(agent_card)
         goal_ent.pack(fill="x", pady=5)
@@ -3875,7 +3876,7 @@ class SigmaGUI(tk.Tk):
         
         lisp_ent = ttk.Entry(lisp_log)
         lisp_ent.pack(fill="x", side="left", expand=True, padx=5)
-        lisp_ent.insert(0, "(defun hello () (print \"Sovereign Logic Active\"))")
+        lisp_ent.insert(0, "(defun hello () (print 'Sovereign Logic Active'))")
         
         def _eval_lisp():
             self._log(self._auto_log, f"> {lisp_ent.get()}", "INFO")
@@ -4253,7 +4254,7 @@ class SigmaGUI(tk.Tk):
         pap_c = self._card(l_fr, "🧊 Predictive App Prewarmer (PAP)")
         pap_c.master.pack(fill="x", pady=5)
         ttk.Button(pap_c, text="Sync with Context", command=lambda: self._log_voice(self.kernel.prewarmer.synchronize_with_context())).pack(side="left", padx=5)
-        ttk.Button(pap_c, text="Cold Flush", command=lambda: self._log_voice(self.kernel.prewarmer.purge_cold_userland/apps())).pack(side="left", padx=5)
+        ttk.Button(pap_c, text="Cold Flush", command=lambda: self._log_voice(self.kernel.prewarmer.purge_cold_apps())).pack(side="left", padx=5)
 
         # Sovereign Compliance Auditor (SCA)
         sca_c = self._card(l_fr, "⚖️ Sovereign Compliance Auditor (SCA)")
@@ -4287,8 +4288,8 @@ class SigmaGUI(tk.Tk):
         inner.pack(fill="both", expand=True)
         
         # Simulated app list for isolation
-        userland/apps = ["Browser_Core", "Untrusted_Game", "Legacy_Win32", "P2P_Mesh_Node"]
-        for app in userland/apps:
+        apps = ["Browser_Core", "Untrusted_Game", "Legacy_Win32", "P2P_Mesh_Node"]
+        for app in apps:
              fr = tk.Frame(inner, bg=PAL["card"], pady=8)
              fr.pack(fill="x", pady=2)
              tk.Label(fr, text=f"📦 {app}", font=FONT_BOLD, fg=PAL["cyan"], bg=PAL["card"]).pack(side="left")
@@ -4842,13 +4843,13 @@ class SigmaGUI(tk.Tk):
         ctrl = self._card(body, "🚀  Bridge Foreign App (Any App, Any Device)")
         ctrl.master.pack(side="left", fill="y", padx=(0,6))
         
-        userland/apps = [
+        bridge_apps = [
             ("Microsoft Photoshop (.exe)", "photoshop.exe"),
             ("Apple Xcode (.app)", "xcode.app"),
             ("Android WhatsApp (.apk)", "whatsapp.apk"),
             ("Linux Blender (ELF)", "blender"),
         ]
-        for label, path in userland/apps:
+        for label, path in bridge_apps:
             ttk.Button(ctrl, text=label, command=lambda p=path: self._ual_bridge(p)).pack(fill="x", pady=4)
 
         # Log
@@ -5495,7 +5496,7 @@ class SigmaGUI(tk.Tk):
                         self._log(self._term_out, f"  🚀 Dispatching Mission to Zenith: {prompt[:30]}...", "INFO")
                         import urllib.request, urllib.parse, json
                         try:
-                            data = urllib.parse.urlencode({"prompt": prompt, "nodes": "[\"ChatGPT\", \"Claude\"]"}).encode()
+                            data = urllib.parse.urlencode({"prompt": prompt, "nodes": '["ChatGPT","Claude"]'}).encode()
                             req = urllib.request.Request("http://localhost:8001/api/dispatch", data=data)
                             with urllib.request.urlopen(req) as response:
                                 res = json.loads(response.read().decode())
@@ -6143,37 +6144,37 @@ class SigmaGUI(tk.Tk):
         import subprocess as _sp
         app_map = {
             # Developer Tools
-            "sigma.dev.codeforge":     "userland/apps/codeforge.py",
-            "sigma.dev.indent_flow":   "userland/apps/indent_flow.py",
-            "sigma.dev.bash":          "userland/apps/bash.py",
+            "sigma.dev.codeforge":     "apps/codeforge.py",
+            "sigma.dev.indent_flow":   "apps/indent_flow.py",
+            "sigma.dev.bash":          "apps/bash.py",
             # Media & Creative
-            "sigma.media.aurapaint":   "userland/apps/aurapaint.py",
-            "sigma.media.pulseplay":   "userland/apps/pulseplayer.py",
+            "sigma.media.aurapaint":   "apps/aurapaint.py",
+            "sigma.media.pulseplay":   "apps/pulseplayer.py",
             # Security & System
-            "sigma.sys.sentinel":      "userland/apps/sentinel.py",
-            "sigma.sys.shield":        "userland/apps/shield.py",
-            "sigma.sys.titan_capture": "userland/apps/titan_capture.py",
+            "sigma.sys.sentinel":      "apps/sentinel.py",
+            "sigma.sys.shield":        "apps/shield.py",
+            "sigma.sys.titan_capture": "apps/titan_capture.py",
             # Productivity
-            "sigma.prod.writer":       "userland/apps/writer.py",
-            "sigma.prod.pdf_forge":    "userland/apps/pdf_forge.py",
-            "sigma.prod.text_cleaner": "userland/apps/text_cleaner.py",
-            "sigma.prod.pure_text":    "userland/apps/text_cleaner.py",
-            "sigma.prod.excel_ai":     "userland/apps/excel_hub.py",
-            "sigma.prod.project_flow": "userland/apps/project_flow.py",
-            "sigma.prod.board_hub":    "userland/apps/board_hub.py",
-            "sigma.sys.welcome":       "userland/apps/welcome_guide.py",
+            "sigma.prod.writer":       "apps/writer.py",
+            "sigma.prod.pdf_forge":    "apps/pdf_forge.py",
+            "sigma.prod.text_cleaner": "apps/text_cleaner.py",
+            "sigma.prod.pure_text":    "apps/text_cleaner.py",
+            "sigma.prod.excel_ai":     "apps/excel_hub.py",
+            "sigma.prod.project_flow": "apps/project_flow.py",
+            "sigma.prod.board_hub":    "apps/board_hub.py",
+            "sigma.sys.welcome":       "apps/welcome_guide.py",
             # Communication
-            "sigma.comm.omnibrowser":  "userland/apps/omnibrowser.py",
-            "sigma.comm.meshtalk":     "userland/apps/meshtalk.py",
+            "sigma.comm.omnibrowser":  "apps/omnibrowser.py",
+            "sigma.comm.meshtalk":     "apps/meshtalk.py",
             # AI & Orchestration
-            "sigma.ai.antigravity":    "userland/apps/sigma_antigravity.py",
-            "sigma.ai.nexus_ai":       "userland/apps/nexus_ai.py",
-            "sigma.ai.prompt_o_matic": "userland/apps/prompt_o_matic.py",
-            "sigma.ai.ag_finder":      "userland/apps/ag_finder.py",
-            "sigma.ai.email_disco":    "userland/apps/email_disco.py",
+            "sigma.ai.antigravity":    "apps/sigma_antigravity.py",
+            "sigma.ai.nexus_ai":       "apps/nexus_ai.py",
+            "sigma.ai.prompt_o_matic": "apps/prompt_o_matic.py",
+            "sigma.ai.ag_finder":      "apps/ag_finder.py",
+            "sigma.ai.email_disco":    "apps/email_disco.py",
             # Games
-            "sigma.game.chess":        "userland/apps/chess.py",
-            "sigma.game.ludo":         "userland/apps/ludo.py",
+            "sigma.game.chess":        "apps/chess.py",
+            "sigma.game.ludo":         "apps/ludo.py",
         }
 
         self._notify("Sigma Launcher", f"Launching {app_id}…", "OK")
@@ -6733,7 +6734,7 @@ class SigmaGUI(tk.Tk):
                 conf = res["ux_config"]
                 self._log(self._omni_log, f"TRANSFORMING OS -> {mode.upper()}", "WARN")
                 self._log(self._omni_log, f"USP Challenge: {conf['competitor_usp']}", "INFO")
-                self._log(self._omni_log, f"Active Suite: {', '.join(conf['active_userland/apps'])}", "OK")
+                self._log(self._omni_log, f"Active Suite: {', '.join(conf['active_apps'])}", "OK")
                 self._log(self._omni_log, f"Kernel Tuning: {conf['kernel_state']}", "OK")
                 self._log(self._omni_log, f"Theme Engine: {conf['theme']}\n", "INFO")
             else:
@@ -8383,7 +8384,7 @@ class SigmaGUI(tk.Tk):
         for cat in ["DevTools", "AI & Math", "Sovereign Productivity", "Gaming", "Security"]:
             fr = self._card(cat_f, cat)
             fr.master.pack(side="left", fill="both", expand=True, padx=5)
-            tk.Label(fr, text=f"Explore {cat} userland/apps...", bg=PAL["card"], fg=PAL["dim"], font=FONT_SMALL).pack()
+            tk.Label(fr, text=f"Explore {cat} apps...", bg=PAL["card"], fg=PAL["dim"], font=FONT_SMALL).pack()
 
 
     def _build_config_page(self):
@@ -8738,8 +8739,8 @@ class SigmaGUI(tk.Tk):
             canvas.pack(side="left", fill="both", expand=True)
             sb.pack(side="right", fill="y")
             
-            userland/apps = self.kernel.app_store.get_catalog(category=cat)
-            for i, app in enumerate(userland/apps):
+            apps = self.kernel.app_store.get_catalog(category=cat)
+            for i, app in enumerate(apps):
                 row, col = i // 3, i % 3
                 item = tk.Frame(grid, bg=PAL["card"], padx=10, pady=10, width=280, height=200)
                 item.grid(row=row, column=col, padx=10, pady=10)
@@ -9835,17 +9836,17 @@ class SigmaGUI(tk.Tk):
             c = self._card(main_panel, f"\ud83d\udd52 {name}")
             c.master.pack(fill="x", pady=5)
             tk.Label(c, text=f"Scheduled: {time_str}", font=FONT_SMALL, fg=PAL["cyan"], bg=PAL["card"]).pack(anchor="w")
-            tk.Label(c, text=desc, font=(\"Segoe UI\", 8), fg=PAL["dim"], bg=PAL["card"]).pack(anchor=\"w\")
-            ttk.Button(c, text=\"Run Manually\", command=lambda n=name: self._notify(\"Routines\", f\"Executing {n} now.\", \"OK\")).pack(side=\"right\", pady=(0,10))
+            tk.Label(c, text=desc, font=("Segoe UI", 8), fg=PAL["dim"], bg=PAL["card"]).pack(anchor="w")
+            ttk.Button(c, text="Run Manually", command=lambda n=name: self._notify("Routines", f"Executing {n} now.", "OK")).pack(side="right", pady=(0,10))
 
     def _build_ag_physics_page(self):
-        \"\"\"Antigravity Physics Control: Managing Zero-G Drift.\"\"\"
-        p = tk.Frame(self._content, bg=PAL[\"bg\"])
-        self._pages[\"ag_physics\"] = p
-        self._build_page_header(p, \"ANTIGRAVITY ENGINE\", \"Zero-G Physics \u0026 Verlet UI Interaction Control\")
+        """Antigravity Physics Control: Managing Zero-G Drift."""
+        p = tk.Frame(self._content, bg=PAL["bg"])
+        self._pages["ag_physics"] = p
+        self._build_page_header(p, "ANTIGRAVITY ENGINE", "Zero-G Physics & Verlet UI Interaction Control")
         
-        main_panel = tk.Frame(p, bg=PAL[\"bg\"])
-        main_panel.pack(fill=\"both\", expand=True, padx=20, pady=10)
+        main_panel = tk.Frame(p, bg=PAL["bg"])
+        main_panel.pack(fill="both", expand=True, padx=20, pady=10)
         
         # Instantiate kernel module dynamically
         if not hasattr(self.kernel, 'ag_physics'):
@@ -9854,56 +9855,56 @@ class SigmaGUI(tk.Tk):
                 self.kernel.ag_physics = SigmaAntigravityEngine(self.kernel)
             except Exception: pass
             
-        c = self._card(main_panel, \"Zero-G Drift Engine Status\")
-        c.master.pack(fill=\"x\", pady=5)
+        c = self._card(main_panel, "Zero-G Drift Engine Status")
+        c.master.pack(fill="x", pady=5)
         
         def _toggle_ag():
             if hasattr(self.kernel, 'ag_physics'):
                 new_state = not self.kernel.ag_physics.is_active
                 self.kernel.ag_physics.toggle_drift(new_state)
-                ag_btn.configure(text=f\"Physics Engine: {'ACTIVE \ud83e\ude90' if new_state else 'STABLE/GRAVITY'}\")
-                self._notify(\"Physics Engine\", \"Drift Protocol updated.\", \"OK\")
+                ag_btn.configure(text=f"Physics Engine: {'ACTIVE \ud83e\ude90' if new_state else 'STABLE/GRAVITY'}")
+                self._notify("Physics Engine", "Drift Protocol updated.", "OK")
 
-        ag_btn = ttk.Button(c, text=\"Physics Engine: STABLE/GRAVITY\", command=_toggle_ag)
+        ag_btn = ttk.Button(c, text="Physics Engine: STABLE/GRAVITY", command=_toggle_ag)
         ag_btn.pack(pady=10)
         
         def _gather():
             if hasattr(self, 'trigger_action'):
-                self.trigger_action(\"ag.gather\")
+                self.trigger_action("ag.gather")
 
-        ttk.Button(main_panel, text=\"\u2b07\ufe0f Trigger Gravity Gather (Pulse)\", command=_gather).pack(pady=10)
+        ttk.Button(main_panel, text="\u2b07\ufe0f Trigger Gravity Gather (Pulse)", command=_gather).pack(pady=10)
         
-        tk.Label(main_panel, text=\"Mass Projection: Heavier userland/apps (Store, Enterprise) drift slower than lightweight ones (Aether).\",
-                 font=(\"Segoe UI\", 8), fg=PAL[\"dim\"], bg=PAL[\"bg\"], wraplength=500).pack(pady=20)
+        tk.Label(main_panel, text="Mass Projection: Heavier apps (Store, Enterprise) drift slower than lightweight ones (Aether).",
+                 font=("Segoe UI", 8), fg=PAL["dim"], bg=PAL["bg"], wraplength=500).pack(pady=20)
 
     def _build_ag_hub_page(self):
-        \"\"\"Antigravity Enterprise Hub: One-stop access to all integrated productivity tools.\"\"\"
-        p = tk.Frame(self._content, bg=PAL[\"bg\"])
-        self._pages[\"ag_hub\"] = p
-        self._build_page_header(p, \"ANTIGRAVITY ENTERPRISE HUB\", \"Unified Access to Sovereign Productivity Suite\")
+        """Antigravity Enterprise Hub: One-stop access to all integrated productivity tools."""
+        p = tk.Frame(self._content, bg=PAL["bg"])
+        self._pages["ag_hub"] = p
+        self._build_page_header(p, "ANTIGRAVITY ENTERPRISE HUB", "Unified Access to Sovereign Productivity Suite")
         
-        main_panel = tk.Frame(p, bg=PAL[\"bg\"])
-        main_panel.pack(fill=\"both\", expand=True, padx=20, pady=10)
+        main_panel = tk.Frame(p, bg=PAL["bg"])
+        main_panel.pack(fill="both", expand=True, padx=20, pady=10)
         
         # Tools Grid
         tools = [
-            (\"\ud83d\udcc1 Tools Finder\", \"ag_finder\", \"sigma.sys.ag_finder\"),
-            (\"\ud83d\udce7 Email Discovery\", \"email_disco\", \"sigma.ai.email_disco\"),
-            (\"\ud83d\udcca Excel AI Filler\", \"excel_ai\", \"sigma.prod.excel_ai\"),
-            (\"\ud83e\uddea Excel Preproc\", \"excel_preproc\", \"sigma.prod.excel_preproc\"),
-            (\"\ud83d\udcd1 PDF Forge\", \"pdf_forge\", \"sigma.prod.pdf_forge\"),
-            (\"\ud83d\udd21 Pure Text\", \"pure_text\", \"sigma.prod.pure_text\"),
-            (\"\u2728 Text Cleaner\", \"text_cleaner\", \"sigma.prod.text_cleaner\"),
-            (\"\ud83d\udcfd Titan Capture\", \"titan_capture\", \"sigma.sys.titan_capture\"),
-            (\"\ud83d\uddec IndentFlow\", \"indent_flow\", \"sigma.dev.indent_flow\"),
-            (\"\ud83e\ude90 AG Zenith\", \"ag_zenith\", \"sigma.ai.ag_zenith\"),
-            (\"\ud83c\udf10 Mesh Monitor\", \"mesh_monitor\", \"sigma.ai.mesh_monitor\"),
-            (\"\u26a1 Sovereign De-bloater\", \"debloater\", \"sigma.sys.debloater\"),
-            (\"\ud83c\udf2a\ufe0f AG Shuffler\", \"shuffler\", \"sigma.sys.shuffler\"),
-            (\"\ud83d\udcd6 Software Guide\", \"guide\", \"sigma.doc.ag_guide\"),
-            (\"\ud83d\udccb Scrum Board\", \"scrum\", \"sigma.prod.scrum\"),
-            (\"\ud83d\udcca Gantt Chart\", \"gantt\", \"sigma.prod.gantt\"),
-            (\"\u23f2\ufe0f Time Tracker\", \"tracker\", \"sigma.prod.tracker\"),
+            ("\ud83d\udcc1 Tools Finder", "ag_finder", "sigma.sys.ag_finder"),
+            ("\ud83d\udce7 Email Discovery", "email_disco", "sigma.ai.email_disco"),
+            ("\ud83d\udcca Excel AI Filler", "excel_ai", "sigma.prod.excel_ai"),
+            ("\ud83e\uddea Excel Preproc", "excel_preproc", "sigma.prod.excel_preproc"),
+            ("\ud83d\udcd1 PDF Forge", "pdf_forge", "sigma.prod.pdf_forge"),
+            ("\ud83d\udd21 Pure Text", "pure_text", "sigma.prod.pure_text"),
+            ("\u2728 Text Cleaner", "text_cleaner", "sigma.prod.text_cleaner"),
+            ("\ud83d\udcfd Titan Capture", "titan_capture", "sigma.sys.titan_capture"),
+            ("\ud83d\uddec IndentFlow", "indent_flow", "sigma.dev.indent_flow"),
+            ("\ud83e\ude90 AG Zenith", "ag_zenith", "sigma.ai.ag_zenith"),
+            ("\ud83c\udf10 Mesh Monitor", "mesh_monitor", "sigma.ai.mesh_monitor"),
+            ("\u26a1 Sovereign De-bloater", "debloater", "sigma.sys.debloater"),
+            ("\ud83c\udf2a\ufe0f AG Shuffler", "shuffler", "sigma.sys.shuffler"),
+            ("\ud83d\udcd6 Software Guide", "guide", "sigma.doc.ag_guide"),
+            ("\ud83d\udccb Scrum Board", "scrum", "sigma.prod.scrum"),
+            ("\ud83d\udcca Gantt Chart", "gantt", "sigma.prod.gantt"),
+            ("\u23f2\ufe0f Time Tracker", "tracker", "sigma.prod.tracker"),
         ]
 
         def _debloat():
@@ -9974,14 +9975,15 @@ class SigmaGUI(tk.Tk):
                      content = f.read()
                      txt.insert("1.0", content)
              else:
+                 txt.insert("1.0", "Antigravity Software Guide\n\nGuide file not found. All tools are accessible from the Enterprise Hub.")
         except Exception as e:
-             txt.insert(\"1.0\", f\"Error loading guide: {e}\")
+             txt.insert("1.0", f"Error loading guide: {e}")
         
-        txt.configure(state=\"disabled\")
+        txt.configure(state="disabled")
 
     def _generate_demo_pdf(self):
         try:
-            path = os.path.join(os.path.expanduser(\"~\"), \"Sigma_Draft.pdf\")
+            path = os.path.join(os.path.expanduser("~"), "Sigma_Draft.pdf")
             if hasattr(self.kernel, 'ag_ent'):
                 from ag_enterprise import PDFForge
                 forge = PDFForge(self.kernel)

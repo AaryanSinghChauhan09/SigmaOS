@@ -66,7 +66,7 @@ class SigmaSetupEngine:
         print("[*] Hydrating SigmaFS Structure and Scripts...")
         dirs = [
             "sigma_core/hal", "sigma_core/memory", "sigma_core/scheduler",
-            "userland/system-api", "userland/desktop-gui/pages",
+            "userland/system-api", "web_os/pages",
             "ecosystem/apps", "assets/themes", "releases/stable", "logs/kernel"
         ]
         for d in dirs:

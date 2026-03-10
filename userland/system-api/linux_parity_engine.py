@@ -345,7 +345,7 @@ class SigmaDisplayServer:
     """
     Dual-stack display: Wayland-first with X11 XWayland fallback.
     Competes with: Wayland (GNOME/KDE on Ubuntu/Fedora/Arch),
-                   X11/Xorg (legacy userland/apps on Debian/SUSE),
+                   X11/Xorg (legacy apps on Debian/SUSE),
                    Mir (Ubuntu), Quartz (macOS).
     """
     def __init__(self):

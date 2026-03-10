@@ -18,7 +18,7 @@ class SigmaAntigravityEngine:
         self.mass_map = {
             "browser": 1.5,
             "explorer": 1.0,
-            "store": 2.5, # Heavier userland/apps drift slower
+            "store": 2.5, # Heavier apps drift slower
             "ai": 0.5    # Aether is lightweight
         }
         self.entities = {} # {page_id: {"pos": [x,y], "vel": [vx,vy], "mass": m}}

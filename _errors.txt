@@ -1,0 +1,12 @@
+.\SOVEREIGN_DISTRO_IMG\sigma_gui.py:921:expected '('
+.\SOVEREIGN_DISTRO_IMG\ecosystem\marketplace.py:10:cannot assign to expression here. Maybe you meant '==' instead of '='?
+.\SOVEREIGN_DISTRO_IMG\ecosystem\sigma_app_store.py:17:cannot assign to expression here. Maybe you meant '==' instead of '='?
+.\SOVEREIGN_DISTRO_IMG\USERLAND\API\aether_assistant.py:58:cannot assign to expression here. Maybe you meant '==' instead of '='?
+.\SOVEREIGN_DISTRO_IMG\USERLAND\API\app_prewarmer.py:95:expected '('
+.\SOVEREIGN_DISTRO_IMG\USERLAND\API\forge_store.py:16:cannot assign to expression here. Maybe you meant '==' instead of '='?
+.\SOVEREIGN_DISTRO_IMG\USERLAND\API\offline_guard.py:29:cannot assign to expression here. Maybe you meant '==' instead of '='?
+.\SOVEREIGN_DISTRO_IMG\USERLAND\API\omni_automator.py:151:unexpected indent
+.\SOVEREIGN_DISTRO_IMG\USERLAND\API\sentinel.py:15:cannot assign to expression here. Maybe you meant '==' instead of '='?
+.\SOVEREIGN_DISTRO_IMG\USERLAND\API\sigma_app_store.py:142:cannot assign to expression here. Maybe you meant '==' instead of '='?
+.\SOVEREIGN_DISTRO_IMG\USERLAND\API\support_ecosystem.py:143:invalid syntax
+.\SOVEREIGN_DISTRO_IMG\USERLAND\API\ual_service.py:41:cannot assign to expression here. Maybe you meant '==' instead of '='?

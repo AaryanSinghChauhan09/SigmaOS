@@ -2,7 +2,7 @@
 Sovereign Syscall Gateway — v1.0
 =================================
 USP: Secure entry point (int 0x80) for Ring-3 logic.
-     Bridges User-Space userland/apps with Kernel-Space sovereignty.
+     Bridges User-Space apps with Kernel-Space sovereignty.
 """
 
 from typing import Dict, Any

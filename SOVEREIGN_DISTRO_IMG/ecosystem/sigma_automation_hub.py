@@ -77,7 +77,7 @@ class SigmaOmniAutomator:
 
     # ─── 3. Agentic Pipelines (Power Automate Parity) ─────────────────────
     def launch_agentic_pipeline(self, goal: str) -> str:
-        """USP: Power Automate Parity. Uses LLM logic to bridge multiple userland/apps."""
+        """USP: Power Automate Parity. Uses LLM logic to bridge multiple apps."""
         try:
             pipe_id = f"pipe-{random.randint(10,99)}"
             self._active_pipelines[pipe_id] = {"goal": goal, "status": "Executing", "start": time.time()}

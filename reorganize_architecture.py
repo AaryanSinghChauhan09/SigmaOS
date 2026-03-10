@@ -9,7 +9,7 @@ def create_dirs():
     print("[*] Creating OS Geometry...")
     dirs = [
         "bootloader", "kernel", "libc", "userland", 
-        "userland/system-api", "userland/desktop-gui", "userland/apps"
+        "userland/system-api", "web_os", "apps"
     ]
     for d in dirs:
         (ROOT / d).mkdir(parents=True, exist_ok=True)
@@ -23,7 +23,7 @@ def move_files():
         pass
 
     # Fix userland structure
-    old_apps = ROOT / "userland/apps"
+    old_apps = ROOT / "apps"
     new_apps = ROOT / "userland" / "apps"
     if old_apps.exists() and old_apps != new_apps:
         for f in old_apps.iterdir():

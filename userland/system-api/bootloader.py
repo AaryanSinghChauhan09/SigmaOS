@@ -60,7 +60,7 @@ class SigmaBootloader:
         """Saves current kernel and user space to NVMe. Preps for Instant-On."""
         # Simulated snapshot creation
         self._snapshot_hash = hashlib.sha256(f"snapshot_{time.time()}".encode()).hexdigest()
-        self._current_session = {"state": "FROZEN", "ram_gb": 8.0, "userland/apps": ["Chrome", "VSCode"]}
+        self._current_session = {"state": "FROZEN", "ram_gb": 8.0, "apps": ["Chrome", "VSCode"]}
         
         return {
             "status": "Saved",

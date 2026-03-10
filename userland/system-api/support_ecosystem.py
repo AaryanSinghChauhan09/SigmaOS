@@ -38,8 +38,8 @@ class SigmaSupportEcosystem:
         self._stats = {"ai_queries": 0, "telemetry_synced": 0, "auto_resolutions": 0, "shares": 0}
         self._knowledge_base = {
             "network_drop": "If networking drops, check the Active Mesh Nodes in the Network Panel.",
-            "high_ram": "ZramCache will automatically compress background userland/apps. If OOM, the Governor will kill low-priority userland/apps.",
-            "app_crash": "OmniContainer restarts crashed userland/apps instantly. Review the microVM logs for segmentation faults.",
+            "high_ram": "ZramCache will automatically compress background apps. If OOM, the Governor will kill low-priority apps.",
+            "app_crash": "OmniContainer restarts crashed apps instantly. Review the microVM logs for segmentation faults.",
         }
         self.whatsapp_bridge_active = True
 

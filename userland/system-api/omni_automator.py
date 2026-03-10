@@ -423,7 +423,7 @@ class SigmaOmniAutomator:
         
         # 2. UAL Bridge Setup
         if self.kernel and hasattr(self.kernel, 'ual'): # Check if kernel and ual attribute exist
-            for app in p.get("ual_userland/apps", []):
+            for app in p.get("ual_apps", []):
                 self.kernel.ual.bridge_app(app)
 
         # 3. Emit Global Bus Event

@@ -184,7 +184,7 @@ class SigmaSelfRepairEngine:
         if not getattr(self.kernel, "secure_boot", True):
              vulnerabilities.append({"issue": "INSECURE_BOOT", "risk": "HIGH", "fix": "Enable RSA-4k Boot Seal"})
         
-        # Check for non-sandboxed high-risk userland/apps
+        # Check for non-sandboxed high-risk apps
         pm = self.kernel.registry.get("process_manager")
         if pm:
             for pid, proc in getattr(pm, "_procs", {}).items():

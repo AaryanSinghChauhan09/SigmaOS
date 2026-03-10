@@ -3,7 +3,7 @@ SigmaOS Sovereign App Store
 ============================
 A fully sovereign, IP-safe application marketplace for SigmaOS.
 Zero dependence on Apple App Store, Google Play, or Microsoft Store.
-All userland/apps are sandboxed, signed, and verified via the Sovereign Ledger.
+All apps are sandboxed, signed, and verified via the Sovereign Ledger.
 
 Architecture: Clean-room implementation with no third-party APIs.
 IP Compliance: 100% original logic. No GPL/proprietary code included.
@@ -129,7 +129,7 @@ class SigmaAppStore:
         self._ledger: List[str] = []   # Immutable audit log (simplified)
         self._pending_updates: Dict[str, str] = {}
 
-        # Load built-in userland/apps into catalog
+        # Load built-in apps into catalog
         for app_data in self._BUILTIN_APPS:
             app = SigmaApp(**app_data)
             app.checksum = self._compute_checksum(app.app_id, app.version)
@@ -139,10 +139,10 @@ class SigmaAppStore:
 
     def get_catalog(self, category: Optional[str] = None) -> List[Dict]:
         """Returns the full sovereign app catalog, optionally filtered by category."""
-        userland/apps = self._catalog.values()
+        apps = self._catalog.values()
         if category:
-            userland/apps = [a for a in userland/apps if a.category.lower() == category.lower()]
-        return [a.to_dict() for a in userland/apps]
+            apps = [a for a in apps if a.category.lower() == category.lower()]
+        return [a.to_dict() for a in apps]
 
     def search(self, query: str) -> List[Dict]:
         """Full-text search across app names, descriptions, and categories."""
@@ -154,7 +154,7 @@ class SigmaAppStore:
         return results
 
     def get_featured(self) -> List[Dict]:
-        """Returns top-rated userland/apps across key categories."""
+        """Returns top-rated apps across key categories."""
         featured_ids = [
             "sigma.ai.aether", "sigma.dev.codeforge", "sigma.security.vault",
             "sigma.productivity.writer", "sigma.comm.mesh_talk"
@@ -192,7 +192,7 @@ class SigmaAppStore:
 
         # Mark installed
         app.installed = True
-        app.install_path = f"/sigma/userland/apps/{app.app_id.replace('.', '/')}"
+        app.install_path = f"/sigma/apps/{app.app_id.replace('.', '/')}"
         app.downloads += 1
         self._installed[app_id] = app
         self._reviews[app_id] = []
@@ -221,7 +221,7 @@ class SigmaAppStore:
         return f"✅ '{app.name}' uninstalled. Sandbox cleaned. Sovereign state restored."
 
     def update_all(self) -> List[str]:
-        """Checks and installs updates for all installed userland/apps."""
+        """Checks and installs updates for all installed apps."""
         results = []
         for app_id, app in self._installed.items():
             # Simulate a patch available for older versions
@@ -233,7 +233,7 @@ class SigmaAppStore:
             app.checksum = self._compute_checksum(app.app_id, app.version)
             self._ledger_write(f"UPDATE | {app.name} {old_ver} → {new_ver}")
             results.append(f"✅ {app.name}: {old_ver} → {new_ver}")
-        return results if results else ["All userland/apps are up to date."]
+        return results if results else ["All apps are up to date."]
 
     # ── Reviews ──────────────────────────────────────────────────────────────
 
@@ -284,8 +284,8 @@ class SigmaAppStore:
 
     def get_store_stats(self) -> Dict[str, Any]:
         return {
-            "total_userland/apps":     len(self._catalog),
-            "installed_userland/apps": len(self._installed),
+            "total_apps":     len(self._catalog),
+            "installed_apps": len(self._installed),
             "categories":     len(self.get_categories()),
             "ledger_entries": len(self._ledger),
             "top_rated":      max(self._catalog.values(), key=lambda a: a.rating).name,
@@ -294,7 +294,7 @@ class SigmaAppStore:
     def health_check(self) -> str:
         stats = self.get_store_stats()
         return (
-            f"OK — Sovereign App Store | {stats['total_userland/apps']} userland/apps in catalog | "
-            f"{stats['installed_userland/apps']} installed | Ledger: {stats['ledger_entries']} entries. "
+            f"OK — Sovereign App Store | {stats['total_apps']} apps in catalog | "
+            f"{stats['installed_apps']} installed | Ledger: {stats['ledger_entries']} entries. "
             f"IP Compliance: 100% Clean-Room. No external marketplace dependencies."
         )

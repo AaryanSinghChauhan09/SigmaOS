@@ -32,7 +32,7 @@ class SigmaSnapGrid:
     def create_snap_group(self, group_name: str, window_ids: List[str]) -> str:
         """Windows 11 USP Parity: Groups snapped windows to minimize/restore them together."""
         self._snap_groups[group_name] = window_ids
-        return f"SnapGrid: Created Snap Group '{group_name}' with {len(window_ids)} userland/apps."
+        return f"SnapGrid: Created Snap Group '{group_name}' with {len(window_ids)} apps."
 
     def build_bsp_tree(self) -> str:
         """Linux i3/Sway USP Parity: Dynamic Binary Space Partitioning tiling."""

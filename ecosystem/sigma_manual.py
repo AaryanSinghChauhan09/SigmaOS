@@ -24,7 +24,7 @@ class SigmaManual:
                 "Dashboard": "Your central hub for system stats (Boot Time, RAM, Security) and quick actions."
             },
             "Neural Fabric (Performance)": {
-                "What is it?": "The system's brain. It predicts your next move and warms up userland/apps before you even click them.",
+                "What is it?": "The system's brain. It predicts your next move and warms up apps before you even click them.",
                 "Performance Profiles": "Includes Efficiency Max (Battery), Mesh Pooling (Maximum Power), and Local Hardened (Privacy/Local Computing).",
                 "Neural Prefetch": "Allows the OS to intelligently preload work environments based on 'Work', 'Creative', or 'Gaming' intents."
             },
@@ -44,7 +44,7 @@ class SigmaManual:
                 "Zero-Trust": "Every connection is verified via PQC (Post-Quantum Cryptography) for maximum security."
             },
             "Future-Ready OS Features": {
-                "Adaptive Intelligence": "SigmaOS predicts user needs and pre-loads relevant environments/userland/apps automatically.",
+                "Adaptive Intelligence": "SigmaOS predicts user needs and pre-loads relevant environments/apps automatically.",
                 "Mood-Based Customization": "Wallpapers, themes, and soundscapes morph according to your current emotional state.",
                 "Sovereign Security Sandbox": "Launch any untrusted program in a totally isolated, RAM-only container.",
                 "Sustainability (Eco-Mode)": "Carbon-aware task scheduling to minimize energy footprints during high-intensity compute.",
@@ -116,7 +116,7 @@ class SigmaManual:
             },
             "Security & Sovereignty": {
                 "Zero-Trust Shield": "SigmaOS operates on a default-deny policy. All external traffic is blocked unless explicitly bridged.",
-                "Universal Bridge (UAL)": "The ONLY way to run non-sovereign userland/apps. Encapsulates external userland/apps (like VSCode or Photoshop) in a secure wrapper.",
+                "Universal Bridge (UAL)": "The ONLY way to run non-sovereign apps. Encapsulates external apps (like VSCode or Photoshop) in a secure wrapper.",
                 "Self-Healing": "The OS automatically detects and repairs corrupted system files using the Registry-UAL-Lattice consensus."
             },
             "SigmaLegalPro (The Universal Legal OS)": {
@@ -159,7 +159,7 @@ class SigmaManual:
                 "Retina-Bridge (macOS)": "Seamlessly execute .app and .dmg binaries. Translates AppKit and Metal commands in real-time.",
                 "AOSP-Shadow (Android)": "A lightweight Android runtime that sideloads .apk files directly into your sovereign desktop workspace.",
                 "Native-POSIX (Linux)": "Zero-latency execution for .deb, .rpm, and raw ELF binaries. Outperforms WSL2 in resource efficiency.",
-                "Omni-Shim (Input Mapping)": "Dynamically converts MOUSE input to TOUCH-Taps for Android userland/apps, and STYLUS input for creative Mac software."
+                "Omni-Shim (Input Mapping)": "Dynamically converts MOUSE input to TOUCH-Taps for Android apps, and STYLUS input for creative Mac software."
             },
             "Logic & Control Flows": {
                 "Core Conditionals": (
@@ -219,7 +219,7 @@ class SigmaManual:
                 "Smart Buy Verdict": "AI-driven analysis (EXCELLENT/WAIT/DECENT) based on historical average and lowest recorded price."
             },
             "SigmaWriteSense (Writing Intelligence)": {
-                "Sovereign Grammar & Tone": "Grammarly-style real-time corrections and tone adjustments across all OS userland/apps.",
+                "Sovereign Grammar & Tone": "Grammarly-style real-time corrections and tone adjustments across all OS apps.",
                 "Hemingway Readability Audit": "Analyze sentence complexity, passive voice, and adverb usage to simplify your prose.",
                 "Semantic Paraphrasing": "QuillBot-style rephrasing (Formal/Simple/Creative) while maintaining original meaning.",
                 "Deep Editorial Reports": "ProWritingAid-style deep dives into sentence variety, glue words, and repetitive patterns.",
@@ -268,7 +268,7 @@ class SigmaManual:
                 "Sovereign Commerce": "Shopify/Amazon USP. An independent Shopping OS with native catalog, inventory, and logistics engines.",
                 "Sigma Core Brain": "Meta-OS USP. Abstracted logic and service adapters that ensure the OS is independent of any specific vendor tool.",
                 "Sigma Pulse": "Ambient Sentience USP. Ultra-low-power sentinel mode that keeps the kernel 'alive' at 1% CPU for mesh-sync and wake-word detection.",
-                "Semantic Bus": "IPC 3.0 USP. Replacing traditional D-Bus with an AI-moderated intent relay where userland/apps communicate via semantic meaning.",
+                "Semantic Bus": "IPC 3.0 USP. Replacing traditional D-Bus with an AI-moderated intent relay where apps communicate via semantic meaning.",
                 "Temporal Loop Computation": "Zero-Crash USP. A probabilistic core that rewinds time (crash logic) and simulates alternative execution paths to find stability.",
                 "Entropic Entropy Shield": "Kinetic Security USP. A memory protection layer where sensitive data constantly shifts its address and keys at 10Hz to avoid static exploits.",
                 "Sigma Vanguard Security": "McAfee/Defender/VirusTotal USP. A sovereign security suite with real-time heuristic scanning and mesh-based P2P threat intelligence."

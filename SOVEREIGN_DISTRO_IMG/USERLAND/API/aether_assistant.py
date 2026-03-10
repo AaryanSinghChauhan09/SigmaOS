@@ -55,8 +55,8 @@ class AetherAssistant:
         """Extracts the target object/parameter from the user's prompt."""
         text_lower = text.lower()
         if intent == "launch_app":
-            userland/apps = ["lab", "vanguard", "forge", "commerce", "access", "identity", "brain", "studio"]
-            for app in userland/apps:
+            apps = ["lab", "vanguard", "forge", "commerce", "access", "identity", "brain", "studio"]
+            for app in apps:
                 if app in text_lower: return app
         if intent == "sys_theme":
              if "dark" in text_lower: return "dark"

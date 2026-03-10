@@ -303,7 +303,7 @@ class SigmaModeManager:
         
         # Free up Shadow Apps cached by the Prewarmer
         if hasattr(self.kernel, 'prewarmer') and self.kernel.prewarmer:
-            self.kernel.prewarmer.purge_cold_userland/apps()
+            self.kernel.prewarmer.purge_cold_apps()
         self._current_mode = mode_name
         
         # Link to Global Config (Apex Feature Sync)

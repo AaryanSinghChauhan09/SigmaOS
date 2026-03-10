@@ -206,7 +206,7 @@ class SigmaPerformanceBoost:
             # Target common competitor background noise
             # Target common competitor background noise
             if any(x in name for x in ['telemetry', 'update', 'metrics', 'mscorsvw', 'chrome', 'teams', 'slack', 'svchost', 'gnome-shell', 'kwin', 'systemd-journald']):
-                # Only target background/idle shims, don't kill active user userland/apps unless in Apex
+                # Only target background/idle shims, don't kill active user apps unless in Apex
                 if p['qos'] != 'USER_INTERACTIVE' or self.active_profile == "Apex":
                     self.kernel.process.restrict(p['pid'], throttle=0.01) # Force to 1% cycle limit
                     targeted.append({"name": p['name'], "pid": p['pid'], "savings": "9.4%" if self.active_profile == "Apex" else "4.2%"})

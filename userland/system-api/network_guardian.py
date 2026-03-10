@@ -7,7 +7,7 @@ Features:
   - Deep Packet Inspection (DPI) at the kernel level.
   - Hard-coded telemetry sinkholing (crushing Windows/macOS/Google trackers).
   - Dynamic bandwidth allocation based on the active Mode Manager profile.
-  - Zero-Trust Sandboxing for untrusted userland/apps (forces them into `sigmaos-sandbox` netns).
+  - Zero-Trust Sandboxing for untrusted apps (forces them into `sigmaos-sandbox` netns).
 
 Competition comparison:
   Windows → Telemetry built-in, hard to disable.

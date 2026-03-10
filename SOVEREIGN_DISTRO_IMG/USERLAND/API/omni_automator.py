@@ -92,61 +92,6 @@ class SigmaOmniAutomator:
             }
         }
 
-    def launch_mission(self, intent: str) -> str:
-        """Decomposes intent into a staged Mission Graph and initiates execution."""
-        mid = f"mission-{uuid.uuid4().hex[:8]}"
-        self.active_missions[mid] = self._decompose_intent(intent)
-        self.stats["workflows_executed"] += 1
-        
-        if hasattr(self.kernel, 'bus'):
-            self.kernel.bus.emit("auto.mission_started", {"mid": mid, "intent": intent})
-            
-        return f"OmniAutomator Pro: Mission '{mid}' launched for intent: '{intent}'."
-
-    def _decompose_intent(self, intent: str) -> List[MissionNode]:
-        """Simple NLP-based decomposition of mission nodes."""
-        nodes = []
-        if "backup" in intent.lower():
-            nodes = [
-                MissionNode("n1", "Snapshot_Kernel", "action"),
-                MissionNode("n2", "Deduplicate_Vault", "action", {"engine": "ZFS"}),
-                MissionNode("n3", "Notify_User", "action", {"msg": "Backup Secure."})
-            ]
-            nodes[0].next_node_id = "n2"
-            nodes[1].next_node_id = "n3"
-        else:
-            nodes = [MissionNode("n1", "General_Task", "action", {"intent": intent})]
-        return nodes
-
-    def execute_ai_broadcast(self, prompt: str) -> dict:
-        """USP: Simultaneous prompt injection across multi-model containers."""
-        # Simulated multi-container orchestration
-        models = ["ChatGPT-4o", "Claude-3.5-Sonnet", "Gemini-1.5-Pro"]
-        results = [f"Injected into {m}" for m in models]
-        
-        self.stats["actions_automated"] += len(models)
-        return {
-            "status": "HOLD_FOR_REVIEW",
-            "models": models,
-            "prompt_hash": hash(prompt),
-            "message": "Prompts staged in isolated UAL containers. User review required before submission."
-        }
-
-    def get_proactive_suggestion(self) -> str:
-        """Predicts the next high-value automation based on current system state."""
-        load = self.kernel.stats.get("cpu_load", 0) if self.kernel else 10
-        if load > 70:
-            return "Proactive: High load detected. Enable 'Starve_Background_Shims'?"
-        return "Proactive: System nominal. Recommend 'Nightly_Purge' at 03:00."
-
-    def health_check(self) -> str:
-        return f"OK — OmniAutomator Pro | Missions: {self.stats['workflows_executed']} | Time Saved: {self.stats['time_saved_min']}m"
-
-if __name__ == "__main__":
-    auto = SigmaOmniAutomator()
-    print(auto.launch_mission("Strategic Backup of VFS"))
-    print(auto.health_check())
-
         # --- Scratch-Based Visual Block Library (Exhaustive Apex v3.0) ---
         self.BLOCK_LIBRARY = {
             "Triggers":   ["OnStartup", "TimerReached", "AppLaunched", "MeshEvent", "BT_Connected", "Webcam_Slouch", "WiFi_Changed", "Low_Battery", "Temp_Rise"],
@@ -227,10 +172,6 @@ if __name__ == "__main__":
                 "Listen_Ambient_Wake_Word", "Identify_Voice_Biometrics", "Synthesize_Aura_Response",
                 "Execute_Audio_Macro", "Detect_Speaker_Emotion", "Isolate_Ambient_Noise"
             ],
-            "Audio_Automation": [
-                "Listen_Ambient_Wake_Word", "Identify_Voice_Biometrics", "Synthesize_Aura_Response",
-                "Execute_Audio_Macro", "Detect_Speaker_Emotion", "Isolate_Ambient_Noise"
-            ],
             "Guided_Assistant": [
                 "Initiate_Goal_Mission", "Request_Step_Permission", "Refine_Step_Guidance",
                 "Approve_Current_Action", "Cancel_Active_Goal", "Audit_Mission_Log"
@@ -280,6 +221,64 @@ if __name__ == "__main__":
             },
             "Sensors":    ["CPU_Load_Check", "VRAM_Telemetry", "Mesh_Lattice_Verify", "Ambient_Light", "User_Mood_Est"]
         }
+
+
+    def launch_mission(self, intent: str) -> str:
+        """Decomposes intent into a staged Mission Graph and initiates execution."""
+        mid = f"mission-{uuid.uuid4().hex[:8]}"
+        self.active_missions[mid] = self._decompose_intent(intent)
+        self.stats["workflows_executed"] += 1
+        
+        if hasattr(self.kernel, 'bus'):
+            self.kernel.bus.emit("auto.mission_started", {"mid": mid, "intent": intent})
+            
+        return f"OmniAutomator Pro: Mission '{mid}' launched for intent: '{intent}'."
+
+    def _decompose_intent(self, intent: str) -> List[MissionNode]:
+        """Simple NLP-based decomposition of mission nodes."""
+        nodes = []
+        if "backup" in intent.lower():
+            nodes = [
+                MissionNode("n1", "Snapshot_Kernel", "action"),
+                MissionNode("n2", "Deduplicate_Vault", "action", {"engine": "ZFS"}),
+                MissionNode("n3", "Notify_User", "action", {"msg": "Backup Secure."})
+            ]
+            nodes[0].next_node_id = "n2"
+            nodes[1].next_node_id = "n3"
+        else:
+            nodes = [MissionNode("n1", "General_Task", "action", {"intent": intent})]
+        return nodes
+
+    def execute_ai_broadcast(self, prompt: str) -> dict:
+        """USP: Simultaneous prompt injection across multi-model containers."""
+        # Simulated multi-container orchestration
+        models = ["ChatGPT-4o", "Claude-3.5-Sonnet", "Gemini-1.5-Pro"]
+        results = [f"Injected into {m}" for m in models]
+        
+        self.stats["actions_automated"] += len(models)
+        return {
+            "status": "HOLD_FOR_REVIEW",
+            "models": models,
+            "prompt_hash": hash(prompt),
+            "message": "Prompts staged in isolated UAL containers. User review required before submission."
+        }
+
+    def get_proactive_suggestion(self) -> str:
+        """Predicts the next high-value automation based on current system state."""
+        load = self.kernel.stats.get("cpu_load", 0) if self.kernel else 10
+        if load > 70:
+            return "Proactive: High load detected. Enable 'Starve_Background_Shims'?"
+        return "Proactive: System nominal. Recommend 'Nightly_Purge' at 03:00."
+
+    def health_check(self) -> str:
+        return f"OK — OmniAutomator Pro | Missions: {self.stats['workflows_executed']} | Time Saved: {self.stats['time_saved_min']}m"
+
+
+if __name__ == "__main__":
+    auto = SigmaOmniAutomator()
+    print(auto.launch_mission("Strategic Backup of VFS"))
+    print(auto.health_check())
+
 
     # --- Section 1: OpenClaw Mission Planning & Agentic Pipelines ---
     def launch_agentic_pipeline(self, goal: str) -> str:
@@ -381,7 +380,7 @@ if __name__ == "__main__":
         
         # 2. UAL Bridge Setup
         if self.kernel and hasattr(self.kernel, 'ual'): # Check if kernel and ual attribute exist
-            for app in p.get("ual_userland/apps", []):
+            for app in p.get("ual_apps", []):
                 self.kernel.ual.bridge_app(app)
 
         # 3. Emit Global Bus Event

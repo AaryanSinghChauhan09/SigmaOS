@@ -1,7 +1,7 @@
 """
 SigmaOS Multi-OS Virtualization & Container Layer
 ===================================================
-USP: Run Windows, macOS, Linux, and Android userland/apps natively side-by-side.
+USP: Run Windows, macOS, Linux, and Android apps natively side-by-side.
 
 Competition comparison:
   Windows → Hyper-V, WSL (Linux only), WSA (Android only)
@@ -13,7 +13,7 @@ Core innovations:
   1. OmniContainer     — Lightweight sandbox that translates ABI on-the-fly.
   2. Cloud Orchestration — Instantly span a VM across local and cloud resources.
   3. Zero-Boot VMs     — MicroVMs that boot in <50ms (Firecracker-inspired).
-  4. App Projection    — Virtualized userland/apps run seamlessly in the host GUI, not a separate window.
+  4. App Projection    — Virtualized apps run seamlessly in the host GUI, not a separate window.
 """
 import time
 import uuid
@@ -87,7 +87,7 @@ class SigmaVirtualizationLayer:
             "boot_ms": c.boot_time_ms,
             "message": (
                 f"Virtualization: '{c.name}' booted in {c.boot_time_ms}ms. "
-                "Running seamlessly alongside host userland/apps."
+                "Running seamlessly alongside host apps."
             )
         }
 

@@ -36,7 +36,7 @@ class SigmaAPITranslator:
         self._stats = {
             "syscalls_translated": 0,
             "latency_ms_avg": 0.05,
-            "userland/apps_abstracted": 0
+            "apps_abstracted": 0
         }
         self._active_mappings = {
             "RegOpenKeyExW": "kernel.registry.get_key",
@@ -69,7 +69,7 @@ class SigmaAPITranslator:
 
     def prepare_container_shim(self, app_name: str, flavor: OSFlavor) -> dict:
         """Sets up the lightweight translation environment for the target app."""
-        self._stats["userland/apps_abstracted"] += 1
+        self._stats["apps_abstracted"] += 1
         return {
             "app": app_name,
             "mode": flavor.value,
@@ -79,7 +79,7 @@ class SigmaAPITranslator:
 
     def health_check(self) -> str:
         s = self._stats
-        return f"OK — Calls Translated: {s['syscalls_translated']}, Active Shims: {s['userland/apps_abstracted']}."
+        return f"OK — Calls Translated: {s['syscalls_translated']}, Active Shims: {s['apps_abstracted']}."
 
 
 if __name__ == "__main__":

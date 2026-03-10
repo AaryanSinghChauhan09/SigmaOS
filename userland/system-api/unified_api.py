@@ -23,7 +23,7 @@ Architecture:
 Core innovations:
   1. Universal Binary        — single .sigma binary runs on all targets
   2. SyscallInterceptor      — audits/transforms every OS syscall
-  3. APIVersionRouter        — forward-compatible; old userland/apps run on new API
+  3. APIVersionRouter        — forward-compatible; old apps run on new API
   4. CrossPlatformShim       — translates Win32/macOS/Android calls → SigmaAPI
   5. FunctionMesh            — serverless-style function deployment in kernel space
   6. ABI Compatibility Table — tracks every registered capability

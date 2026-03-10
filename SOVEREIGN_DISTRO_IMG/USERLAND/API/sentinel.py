@@ -12,7 +12,7 @@ class SigmaSentinel:
     def __init__(self, kernel):
         self.kernel = kernel
         self._uptime = 0
-        self._focused_userland/apps = {"Law_Bridge": 45, "Terminal": 12, "Forge": 5}
+        self._focused_apps = {"Law_Bridge": 45, "Terminal": 12, "Forge": 5}
         self._warnings = ["CPU Temp Spike", "Screen Time Alert (2h)"]
 
     def activate_deep_focus(self, focus_mode: str) -> str:
@@ -23,7 +23,7 @@ class SigmaSentinel:
         """USP: Synthesis of user and hardware health."""
         return {
             "Uptime": f"{int(time.time() - self._start_time) if hasattr(self, '_start_time') else 0}s",
-            "Top_Apps": self._focused_userland/apps,
+            "Top_Apps": self._focused_apps,
             "Hardware_Health": "Excellent (45°C Load)",
             "System_Posture": "Focused"
         }

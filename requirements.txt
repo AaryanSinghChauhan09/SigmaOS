@@ -3,12 +3,32 @@
 # ----------------------------------------------------------------------
 
 # Required for GUI logic
-tk >= 8.6
+# (Usually built-in, but pip 'tk' is an alias for 'tkinter')
+# tkinter (via python install)
 
-# Core python libraries (usually built-in, listed for clarity)
-importlib-metadata
-typing-extensions
+# Core Networking & Agentic Protocols
+requests >= 2.25.1
+aiohttp >= 3.8.0
+urllib3 >= 1.26.0
 
-# Optional high-performance extensions
-# numpy >= 1.20 # If physics engine needs heavy matrix math
-# psutil >= 5.8 # For advanced de-bloat monitoring
+# IO & File-System Mesh
+psutil >= 5.8.0
+pycryptodome >= 3.10.1
+watchdog >= 2.1.0
+
+# AI/ML Tools (Sovereign Lab)
+numpy >= 1.20.0
+# scikit-learn >= 0.24.0 # Optional: High-Performance ML
+# pandas >= 1.2.0        # Optional: Data Studio Logic
+
+# Multimedia & Gaming Parity (UAL)
+# pygame >= 2.0.0       # Optional: Logic Game Core
+# Pillow >= 8.2.0       # Optional: Image Forge
+
+# Performance & Analytics
+# setuptools-scm
+typing-extensions >= 3.10.0
+importlib-metadata >= 4.0.0
+
+# Git Mesh Sync
+# GitPython >= 3.1.18 # Optional: if sync.ps1 is converted to python
