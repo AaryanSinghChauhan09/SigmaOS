@@ -7242,15 +7242,46 @@ class SigmaGUI(tk.Tk):
         tk.Label(aca_card, text="Due Cards: 12 | Recall Rate: 88%", font=FONT_SMALL, fg=PAL["dim"], bg=PAL["card"]).pack(anchor="w")
         ttk.Button(aca_card, text="Start Review Session").pack(fill="x", pady=10)
 
-        # --- Bottom Area: System Statistics Console ---
-        console_card = self._card(main, "📟 System Apex Telemetry")
-        console_card.master.pack(fill="both", expand=True, pady=10)
+        # --- Bottom Area: Forensic Evidence & Audit ---
+        evidence_row = tk.Frame(main, bg=PAL["bg"])
+        evidence_row.pack(fill="both", expand=True, pady=10)
+
+        # 5. Evidence Vault List
+        vault_card = self._card(evidence_row, "📂 Forensic Evidence Vault (Locked Shards)")
+        vault_card.master.pack(side="left", fill="both", expand=True, padx=(0, 10))
         
-        apex_log_cons = self._console(console_card, height=12)
-        apex_log_cons.pack(fill="both", expand=True)
-        self._log(apex_log_cons, "APEX: Cache Sharding Active. Bit-Integrity: PURE.", "INFO")
-        self._log(apex_log_cons, "APEX: Agent Gateway bridged with Telegram mission node.", "OK")
-        self._log(apex_log_cons, "APEX: DevLiaison scanning VFS for docstring maintenance...", "TRACE")
+        vault_list = tk.Listbox(vault_card, bg="#0A0A14", fg=PAL["red"], font=FONT_MONO, borderwidth=0)
+        vault_list.pack(fill="both", expand=True, pady=5)
+        
+        def _refresh_vault():
+            vault_list.delete(0, tk.END)
+            vault_path = os.path.join(_ROOT, "evidence_vault")
+            if os.path.exists(vault_path):
+                for f in os.listdir(vault_path):
+                    vault_list.insert(tk.END, f" 🚩 {f}")
+        
+        ttk.Button(vault_card, text="Refresh Vault", command=_refresh_vault).pack(fill="x")
+        _refresh_vault()
+
+        # 6. Ledger Audit
+        audit_card = self._card(evidence_row, "⚖️ Quantum-Secure Audit Ledger")
+        audit_card.master.pack(side="left", fill="both", expand=True)
+        
+        audit_log = self._console(audit_card, height=12)
+        audit_log.pack(fill="both", expand=True)
+        
+        def _verify_ledger():
+            self._log(audit_log, "APEX: Commencing Deep Forensic Audit...", "INFO")
+            is_valid = self.kernel.ledger.verify_integrity()
+            if is_valid:
+                self._log(audit_log, "APEX: Merkle-Chain Integrity: PURE.", "OK")
+                self._notify("AUDIT COMPLETE", "System Ledger verified via Merkle Epochs.", "OK")
+            else:
+                self._log(audit_log, "🚩 ALERT: Ledger Tampered or Chain Broken!", "ERR")
+                self._notify("AUDIT FAILURE", "Cryptographic chain compromised!", "ERR")
+
+        ttk.Button(audit_card, text="Verify Ledger Integrity", command=_verify_ledger).pack(fill="x", pady=(5,0))
+        self._log(audit_log, "APEX: Ready for Forensic Analysis.", "INFO")
 
     def _vbox_check(self):
         """Standard Host-Guest Discovery."""

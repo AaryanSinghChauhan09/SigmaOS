@@ -14,10 +14,14 @@ class IntegrityGuard:
     def __init__(self, kernel=None):
         self.kernel = kernel
         self.manifest_path = os.path.join(os.path.dirname(__file__), "integrity_manifest.json")
+        self.vault_path = os.path.join(os.path.dirname(__file__), "..", "evidence_vault")
+        if not os.path.exists(self.vault_path):
+            os.makedirs(self.vault_path)
         self.stats = {
             "verifications": 0,
             "tamper_events": 0,
-            "shards_verified": 0
+            "shards_verified": 0,
+            "evidence_locked": 0
         }
 
     def generate_baseline(self, directories: List[str]):
@@ -57,6 +61,7 @@ class IntegrityGuard:
             current_hash = self._hash_file(abs_path)
             if current_hash != expected_hash:
                 tampered.append({"path": rel_path, "reason": "MODIFIED"})
+                self._preserve_evidence(abs_path, current_hash)
 
         self.stats["verifications"] += 1
         self.stats["shards_verified"] = len(manifest)
@@ -66,6 +71,23 @@ class IntegrityGuard:
             return {"status": "TAMPERED", "violations": tampered}
             
         return {"status": "PURE", "shards": len(manifest)}
+
+    def _preserve_evidence(self, path: str, current_hash: str):
+        """USP: Forensic Evidence Locking. Copies tampered file to the vault."""
+        import shutil
+        import time
+        timestamp = int(time.time())
+        filename = os.path.basename(path)
+        vault_name = f"evidence_{timestamp}_{current_hash[:8]}_{filename}"
+        target = os.path.join(self.vault_path, vault_name)
+        
+        try:
+            shutil.copy2(path, target)
+            self.stats["evidence_locked"] += 1
+            if self.kernel:
+                self.kernel.bus.emit("forensic.evidence_locked", {"file": filename, "vault": vault_name})
+        except Exception as e:
+            print(f"Forensic Vault Failure: {e}")
 
     def _hash_file(self, path: str) -> str:
         sha = hashlib.sha256()
