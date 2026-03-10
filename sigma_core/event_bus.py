@@ -22,7 +22,7 @@ class EventBus:
         self._event_history: List[Dict[str, Any]] = []
         self._lock = threading.Lock()
         self._max_history = 1000
-        self._executor = ThreadPoolExecutor(max_workers=4)
+        self._executor = ThreadPoolExecutor(max_workers=16)
     
     def subscribe(self, event_name: str, callback: Callable) -> None:
         """
