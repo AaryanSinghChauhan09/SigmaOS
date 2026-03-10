@@ -10,7 +10,24 @@ class SigmaISOManager:
     def __init__(self, kernel):
         self.kernel = kernel
         self.iso_version = "2.0.0-Sovereign"
-        self.iso_path = "C:/Users/Aaryan/.gemini/antigravity/scratch/SigmaOS/ISO_IMAGE/SigmaOS_Sovereign_v2.iso"
+        # Using environment variables to ensure portability and privacy
+        base_user_dir = os.environ.get("USERPROFILE") or os.environ.get("HOME")
+
+        if base_user_dir:
+             # Construct iso_path dynamically
+             self.iso_path = Path(base_user_dir) / ".gemini" / "antigravity" / "scratch" / "SigmaOS" / "ISO_IMAGE" / "SigmaOS_Sovereign_v2.iso"
+             
+             # Construct config_dir dynamically
+             self.config_dir = Path(base_user_dir) / ".gemini" / "antigravity" / "scratch" / "SigmaOS" / "config" / "zenith"
+        else:
+             # Fallback for iso_path if USERPROFILE/HOME is not set
+             self.iso_path = Path("SigmaOS_Sovereign_v2.iso")
+             # Fallback for config_dir if USERPROFILE/HOME is not set
+             self.config_dir = Path("config/zenith")
+        
+        # Ensure the config directory exists
+        self.config_dir.mkdir(parents=True, exist_ok=True)
+
 
     def generate_iso_manifest(self) -> dict:
         """Generates the file manifest for the Master ISO."""

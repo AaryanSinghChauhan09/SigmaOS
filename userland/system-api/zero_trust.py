@@ -427,7 +427,7 @@ if __name__ == "__main__":
     zt = SigmaZeroTrust()
     # Register identities
     dev  = zt.register_identity("sigma-laptop-001", "device", TrustLevel.ELEVATED)
-    user = zt.register_identity("aaryan",           "user",   TrustLevel.STANDARD)
+    user = zt.register_identity("sovereign_user",   "user",   TrustLevel.STANDARD)
     print(dev["message"])
     # Verify
     print(zt.verify_identity(dev["identity_id"], zt._identities[dev["identity_id"]].certificate)["message"])

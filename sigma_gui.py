@@ -6401,7 +6401,13 @@ class SigmaGUI(tk.Tk):
             _wb.open("http://127.0.0.1:8000")
 
         def _start_server():
-            bat = r"C:\Users\Aaryan\.gemini\antigravity\scratch\proprietary_setup\AI_Orchestrator_v2.0_GDrive_20260208_121931\LAUNCH_AI_ORCHESTRATOR.bat"
+            # Dynamic path resolution to prevent local data leaks
+            import os
+            base_gemini = os.environ.get("USERPROFILE")
+            if base_gemini:
+                 bat = os.path.join(base_gemini, ".gemini", "antigravity", "scratch", "proprietary_setup", "AI_Orchestrator_v2.0_GDrive_20260208_121931", "LAUNCH_AI_ORCHESTRATOR.bat")
+            else:
+                 bat = "LAUNCH_AI_ORCHESTRATOR.bat"
             if os.path.exists(bat):
                 import subprocess
                 subprocess.Popen(["cmd.exe", "/c", bat], creationflags=subprocess.CREATE_NEW_CONSOLE)
@@ -9903,68 +9909,71 @@ class SigmaGUI(tk.Tk):
         def _debloat():
             if hasattr(self.kernel, 'ag_ent'):
                 res = self.kernel.ag_ent.debloater.perform_debloat()
-                self._notify(\"Performance\", res, \"OK\")
+                self._notify("Performance", res, "OK")
                 self._ultra_perf.set(True)
 
         def _shuffle():
             if hasattr(self.kernel, 'ag_ent'):
-                res = self.kernel.ag_ent.shuffler.shuffle_organize(\"C:/Users/Aaryan/Desktop\")
-                self._notify(\"Antigravity Shuffler\", res, \"OK\")
+                # Using home directory as default to prevent hardcoded leaks
+                import os
+                home_path = os.environ.get("USERPROFILE", "C:/")
+                res = self.kernel.ag_ent.shuffler.shuffle_organize(os.path.join(home_path, "Desktop"))
+                self._notify("Antigravity Shuffler", res, "OK")
 
         def _sync_scrum():
             if hasattr(self.kernel, 'ag_ent'):
-                msg = self.kernel.ag_ent.scrum.add_task(\"Initial OS Optimization\", \"High\")
-                self._notify(\"Project Management\", msg, \"OK\")
+                msg = self.kernel.ag_ent.scrum.add_task("Initial OS Optimization", "High")
+                self._notify("Project Management", msg, "OK")
 
-        btn_fr = tk.Frame(main_panel, bg=PAL[\"bg\"])
-        btn_fr.pack(fill=\"x\", pady=5)
-        ttk.Button(btn_fr, text=\"\ud83d\ude80 SOVEREIGN DE-BLOAT\", command=_debloat).pack(side=\"left\", padx=5)
-        ttk.Button(btn_fr, text=\"\ud83c\udf2a\ufe0f SHUFFLE WORKSPACE\", command=_shuffle).pack(side=\"left\", padx=5)
-        ttk.Button(btn_fr, text=\"\ud83d\udccb SYNC SCRUM\", command=_sync_scrum).pack(side=\"left\", padx=5)
+        btn_fr = tk.Frame(main_panel, bg=PAL["bg"])
+        btn_fr.pack(fill="x", pady=5)
+        ttk.Button(btn_fr, text="\ud83d\ude80 SOVEREIGN DE-BLOAT", command=_debloat).pack(side="left", padx=5)
+        ttk.Button(btn_fr, text="\ud83c\udf2a\ufe0f SHUFFLE WORKSPACE", command=_shuffle).pack(side="left", padx=5)
+        ttk.Button(btn_fr, text="\ud83d\udccb SYNC SCRUM", command=_sync_scrum).pack(side="left", padx=5)
         
-        grid_fr = tk.Frame(main_panel, bg=PAL[\"bg\"])
-        grid_fr.pack(fill=\"both\", expand=True)
+        grid_fr = tk.Frame(main_panel, bg=PAL["bg"])
+        grid_fr.pack(fill="both", expand=True)
         
         for i, (name, lid, app_id) in enumerate(tools):
             row, col = i // 3, i % 3
-            card = tk.Frame(grid_fr, bg=PAL[\"card\"], padx=10, pady=10, width=280, height=120)
+            card = tk.Frame(grid_fr, bg=PAL["card"], padx=10, pady=10, width=280, height=120)
             card.grid(row=row, column=col, padx=10, pady=10)
             card.pack_propagate(False)
             
-            tk.Label(card, text=name, font=FONT_BOLD, fg=PAL[\"text\"], bg=PAL[\"card\"]).pack(anchor=\"w\")
+            tk.Label(card, text=name, font=FONT_BOLD, fg=PAL["text"], bg=PAL["card"]).pack(anchor="w")
             
             def _launch(aid=app_id):
-                self._notify(\"Enterprise Hub\", f\"Hydrating {aid}... Running in verified partition.\", \"OK\")
+                self._notify("Enterprise Hub", f"Hydrating {aid}... Running in verified partition.", "OK")
                 if hasattr(self, '_launch_app'):
                     self._launch_app(aid)
-                elif \"pdf_forge\" in aid:
+                elif "pdf_forge" in aid:
                     self._generate_demo_pdf()
             
-            ttk.Button(card, text=\"Launch Tool\", command=_launch).pack(side=\"bottom\", fill=\"x\")
+            ttk.Button(card, text="Launch Tool", command=_launch).pack(side="bottom", fill="x")
 
-        ttk.Button(main_panel, text=\"\ud83d\udcd6 Open Antigravity Software Guide\", command=lambda: self._show_page(\"ag_guide\")).pack(pady=20)
+        ttk.Button(main_panel, text="\ud83d\udcd6 Open Antigravity Software Guide", command=lambda: self._show_page("ag_guide")).pack(pady=20)
 
     def _build_ag_guide_page(self):
-        \"\"\"Antigravity Software Guide: Native viewer for ecosystem docs.\"\"\"
-        p = tk.Frame(self._content, bg=PAL[\"bg\"])
-        self._pages[\"ag_guide\"] = p
-        self._build_page_header(p, \"ANTIGRAVITY TOOLS GUIDE\", \"Comprehensive Manual \u0026 Feature Index\")
+        """Antigravity Software Guide: Native viewer for ecosystem docs."""
+        p = tk.Frame(self._content, bg=PAL["bg"])
+        self._pages["ag_guide"] = p
+        self._build_page_header(p, "ANTIGRAVITY TOOLS GUIDE", "Comprehensive Manual \u0026 Feature Index")
         
-        main_panel = tk.Frame(p, bg=PAL[\"bg\"])
-        main_panel.pack(fill=\"both\", expand=True, padx=20, pady=10)
+        main_panel = tk.Frame(p, bg=PAL["bg"])
+        main_panel.pack(fill="both", expand=True, padx=20, pady=10)
         
-        txt = tk.Text(main_panel, bg=PAL[\"card\"], fg=PAL[\"text\"], font=(\"Consolas\", 10), wrap=\"word\", padx=10, pady=10)
-        txt.pack(fill=\"both\", expand=True)
+        txt = tk.Text(main_panel, bg=PAL["card"], fg=PAL["text"], font=("Consolas", 10), wrap="word", padx=10, pady=10)
+        txt.pack(fill="both", expand=True)
         
         # Load the markdown content
         try:
-             guide_path = r\"C:\Users\Aaryan\.gemini\antigravity\scratch\SigmaOS\docs\ANTIGRAVITY_TOOLS_GUIDE.md\"
+             import os
+             guide_path = os.path.join(os.environ.get("USERPROFILE", "."), ".gemini", "antigravity", "scratch", "SigmaOS", "docs", "ANTIGRAVITY_TOOLS_GUIDE.md")
              if os.path.exists(guide_path):
-                 with open(guide_path, \"r\", encoding=\"utf-8\") as f:
+                 with open(guide_path, "r", encoding="utf-8") as f:
                      content = f.read()
-                     txt.insert(\"1.0\", content)
+                     txt.insert("1.0", content)
              else:
-                 txt.insert(\"1.0\", \"# Guide Not Found\nPlease hydrate the Antigravity Suite via the Forge.\")
         except Exception as e:
              txt.insert(\"1.0\", f\"Error loading guide: {e}\")
         

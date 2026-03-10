@@ -21,7 +21,12 @@ from cryptography.hazmat.primitives.kdf.pbkdf2 import PBKDF2HMAC
 class ZenithOrchestrator:
     def __init__(self, kernel):
         self.kernel = kernel
-        self.config_dir = Path(r'C:\Users\Aaryan\.gemini\antigravity\scratch\SigmaOS\config\zenith')
+        import os
+        base_user = os.environ.get("USERPROFILE") or os.environ.get("HOME")
+        if base_user:
+             self.config_dir = Path(base_user) / ".gemini" / "antigravity" / "scratch" / "SigmaOS" / "config" / "zenith"
+        else:
+             self.config_dir = Path("config/zenith")
         self.config_dir.mkdir(parents=True, exist_ok=True)
         
         self.vault_path = self.config_dir / 'credentials.vault'

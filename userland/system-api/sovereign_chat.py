@@ -171,12 +171,12 @@ class SigmaSovereignMesh:
 
 if __name__ == "__main__":
     mesh = SigmaSovereignMesh()
-    print(mesh.create_identity("Aaryan_Official", PersonaType.VERIFIED_PUBLIC)["message"])
+    print(mesh.create_identity("Sovereign_Official", PersonaType.VERIFIED_PUBLIC)["message"])
     print(mesh.create_identity("Ghost_Protocol", PersonaType.STEALTH_ANON)["message"])
     print(mesh.broadcast_to_stream("Just dropped the new SigmaOS update!")["message"])
     print(mesh.switch_persona("Ghost_Protocol")["message"])
     print(mesh.send_secure_message("Edward_S", "Meeting coordinates in the encrypted attachment.", True)["message"])
     print(mesh.set_algorithm_sliders(10, 50, 20, 20, True)["message"])
-    print(mesh.switch_persona("Aaryan_Official")["message"])
+    print(mesh.switch_persona("Sovereign_Official")["message"])
     print(mesh.direct_micro_transaction("Creator_Dev", 5.50)["message"])
     print(mesh.join_decentralized_guild("Advanced_OS_Architects")["message"])

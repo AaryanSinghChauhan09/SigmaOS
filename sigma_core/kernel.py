@@ -41,6 +41,7 @@ class SigmaKernel:
         self.version  = self.cfg.VERSION
         self._sentinel_running = False
         self._github_sync_active = True
+        self._sync_lock = threading.Lock()
         self.ledger = SovereignLedger()
         self._file_hashes = {}
         
@@ -176,10 +177,18 @@ class SigmaKernel:
                                 changed.append(f)
                 
                 if changed:
-                    self.bus.emit("kernel.automation", {"msg": f"Detected change in {changed}. Syncing..."})
-                    import subprocess
-                    subprocess.Popen(["powershell.exe", "-ExecutionPolicy", "Bypass", "-File", "sync.ps1"])
-                    self.ledger.commit("SYNC", "GITHUB_AUTO_PUSH", {"files": changed})
+                    if self._sync_lock.acquire(blocking=False):
+                        try:
+                            self.bus.emit("kernel.automation", {"msg": f"Detected change in {changed}. Syncing..."})
+                            import subprocess
+                            # USP: Non-blocking, atomic sync execution
+                            subprocess.Popen(["powershell.exe", "-ExecutionPolicy", "Bypass", "-File", "sync.ps1"])
+                            self.ledger.commit("SYNC", "GITHUB_AUTO_PUSH", {"files": changed})
+                        finally:
+                            # Hold lock for 10s to prevent rapid-fire syncs
+                            threading.Timer(10, self._sync_lock.release).start()
+                    else:
+                        print("[SENTINEL] Sync in progress. Skipping redundant trigger.")
             except Exception as e:
                 print(f"[SENTINEL] Sync Error: {e}")
 
@@ -385,10 +394,6 @@ class SigmaKernel:
     def layout(self):             return self.registry.get("layout")
     @property
     def manual(self):             return self.registry.get("manual")
-    @property
-    def remote(self):             return self.registry.get("remote")
-    @property
-    def voice(self):              return self.registry.get("voice")
     @property
     def assistant(self):          return self.registry.get("aura_assistant")
     @property

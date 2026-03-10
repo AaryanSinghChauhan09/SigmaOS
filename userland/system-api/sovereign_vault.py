@@ -16,7 +16,7 @@ class SigmaSovereignVault:
              "MAINFRAME_ROOT": "********",
              "LAWYER_PORTAL": "********"
         }
-        self._identities = ["Aaryan_Primary", "Aaryan_Legal", "Aaryan_Dev"]
+        self._identities = ["Sovereign_Primary", "Sovereign_Legal", "Sovereign_Dev"]
         self._vault_status = "LOCKED"
 
     def access_vault(self, auth_token: str) -> bool:

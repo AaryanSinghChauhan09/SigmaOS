@@ -47,9 +47,10 @@ class SigmaConfig:
     
     # --- [SECURE IDENTITY VAULT] ---
     # These should be changed by the user via the Global Config Hub (Ctrl+,)
-    DEFAULT_USER_EMAIL = "aaryan@gmail.com"
-    DEFAULT_VAULT_SECRET = "sovereign-ultra-secret-42"
-    DEFAULT_OAUTH_TOKEN = "SIGMA_SECURE_TOKEN_2026"
+    # CORE: Use environment variables (SIGMA_USER_EMAIL, etc.) for production.
+    DEFAULT_USER_EMAIL = "USER_EMAIL_PLACEHOLDER@GMAIL.COM"
+    DEFAULT_VAULT_SECRET = "REPLACE_WITH_YOUR_SECRET"
+    DEFAULT_OAUTH_TOKEN = "REPLACE_WITH_YOUR_OAUTH_TOKEN"
     
     # VIBES & Themes
     VIBES = {
