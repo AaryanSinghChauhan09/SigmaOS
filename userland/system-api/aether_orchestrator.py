@@ -39,10 +39,19 @@ class SigmaAetherOrchestrator:
         
         # Determine target model
         target = self.routes["default"]
-        if not ctx or ctx.get("is_offline"):
+        if not ctx or ctx.get("is_offline") or target == "llama_local":
             target = self.routes["offline"]
-        elif ctx.get("is_heavy_compute"):
-            target = self.routes["mesh"]
+            # USP: Bridge to Local AI Nexus for TRUE Sovereignty
+            local_ai = self.kernel.registry.get("local_ai")
+            if local_ai:
+                inference = local_ai.process_sovereign_logic(intent_raw)
+                return {
+                    "status": "OK",
+                    "model": f"Sovereign-{inference['source']}",
+                    "orchestrated_intent": inference['response'].upper(),
+                    "telemetry": inference['telemetry'],
+                    "confidence": 1.0
+                }
             
         # Simulate AI logical routing
         res = {

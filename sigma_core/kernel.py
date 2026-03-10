@@ -215,7 +215,7 @@ class SigmaKernel:
             ("sigma_fs",             "SigmaFS",                   "fs"),
             ("sigma_core.memory_manager","SigmaMemoryManager",        "memory"),
             ("process_manager",      "SigmaProcessManager",       "process"),
-            ("network_stack",        "SigmaNetworkStack",         "net_stack"),
+            ("sigma_core.network_guardian", "SigmaNetworkGuardian",  "net_guard"),
             ("unified_api",          "SigmaUnifiedAPI",           "unified_api"),
             ("virtualization",       "SigmaVirtualizationLayer",  "virtualization"),
             
@@ -243,6 +243,7 @@ class SigmaKernel:
             ("agentic_runtime",      "SigmaAgenticRuntime",       "agentic"),
             ("identity_vault",       "SigmaIdentityVault",        "identity"),
             ("cognitive_fabric",     "SigmaCognitiveFabric",      "cog_fabric"),
+            ("userland.system-api.local_ai_nexus", "SigmaLocalAINexus", "local_ai"),
             ("competitor_intel",     "SigmaCompetitorIntelligence","intel"),
             ("competitor_crusher",   "SovereignCompetitorCrusher","crusher"),
             
@@ -420,6 +421,10 @@ class SigmaKernel:
     def memory(self):             return self.registry.get("memory")
     @property
     def pkg(self):                return self.registry.get("package_manager")
+    @property
+    def net(self):                return self.registry.get("net_guard")
+    @property
+    def local_ai(self):           return self.registry.get("local_ai")
     @property
     def math(self):               return self.registry.get("calculator")
     @property
