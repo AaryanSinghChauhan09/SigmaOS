@@ -12,12 +12,16 @@ from pathlib import Path
 from typing import Dict, List, Any
 from conversion_engine import SigmaConversionEngine
 from sovereign_utility_suite import SovereignUtilitySuite
+from ad_shield import SigmaAdShield
+from youtube_downloader import SigmaYouTubeSovereignFetcher
 
 class SigmaForgeStore:
     def __init__(self, kernel):
         self.kernel = kernel
         self.conversion = SigmaConversionEngine(kernel) if SigmaConversionEngine else None
         self.utils = SovereignUtilitySuite(kernel) if SovereignUtilitySuite else None
+        self.shield = SigmaAdShield(kernel) if SigmaAdShield else None
+        self.yt_fetcher = SigmaYouTubeSovereignFetcher(kernel) if SigmaYouTubeSovereignFetcher else None
         # Use USERPROFILE env var so it works on any Windows user account
         _config_dir = Path(os.environ.get("USERPROFILE", os.path.expanduser("~"))) / ".sigmaos" / "config"
         self._installed_apps_file = _config_dir / "installed_apps.json"
@@ -262,6 +266,27 @@ class SigmaForgeStore:
                 "size_mb": 3.0,
                 "description": "Create bootable USB drives with Sovereign signatures.",
                 "exec": "bus.emit('app.launch.rufus')"
+            },
+            "brave_shield": {
+                "name": "Brave-Grade AdShield",
+                "category": "Security",
+                "size_mb": 12.0,
+                "description": "OS-wide, regional-aware blocking. No trackers allowed.",
+                "exec": "bus.emit('app.launch.brave_shield')"
+            },
+            "yt_fetcher": {
+                "name": "Sovereign YouTube Downloader",
+                "category": "Media",
+                "size_mb": 15.6,
+                "description": "Download YT videos/audio locally without ads.",
+                "exec": "bus.emit('app.launch.yt_fetcher')"
+            },
+            "universal_morpher": {
+                "name": "Universal Format Morpher",
+                "category": "Conversion",
+                "size_mb": 55.0,
+                "description": "Local CloudConvert: DOC to PDF, MP4 to MKV, and more.",
+                "exec": "bus.emit('app.launch.universal_morpher')"
             }
         }
 

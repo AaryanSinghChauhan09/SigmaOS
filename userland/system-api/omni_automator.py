@@ -143,6 +143,18 @@ class SigmaOmniAutomator:
                 "category": "Productivity",
                 "actions": ["Grammar_Scan", "Code_Snapshot", "Speed_Pulse", "Compact_Workspace"],
                 "description": "Orchestrates quick developer utilities in a single reactive sequence."
+            },
+            "Shield_Aura": {
+                "name": "🛡️ Brave-Grade Shield Aura",
+                "category": "Security",
+                "actions": ["Activate_Global_Shield", "Neutralize_Beacons", "Block_Cookie_Syncs"],
+                "description": "OS-wide, regional-aware blocking with ZERO tracker leakage."
+            },
+            "Media_Symmetry": {
+                "name": "🎞️ Media Universe Symmetry",
+                "category": "Media",
+                "actions": ["YouTube_Sovereign_Harvest", "Multi_Format_Morph", "Sovereign_Metadata_Strip"],
+                "description": "Orchestrates deep video extraction and universal format casting."
             }
         }
 
@@ -546,6 +558,18 @@ class SigmaOmniAutomator:
             msg = "PERF: Evaluating Mesh network throughput (Ookla-Parity)..."
         elif action == "ISO_Prepare":
             msg = "UTIL: Creating bootable partition map for external media..."
+        elif action == "Activate_Global_Shield":
+            msg = "SHIELD: Injecting Brave-grade DNS/Socket filters OS-wide."
+        elif action == "Neutralize_Beacons":
+            msg = "SHIELD: Scrubbing 1x1 tracking pixels from process memory."
+        elif action == "Block_Cookie_Syncs":
+            msg = "SHIELD: Intercepting advertiser ID-sync handshakes."
+        elif action == "YouTube_Sovereign_Harvest":
+            msg = "MEDIA: Harvesting HQ stream from YouTube locally (Zero-Web-Trace)."
+        elif action == "Multi_Format_Morph":
+            msg = "MEDIA: Performing universal format symmetry (CloudConvert-Parity)."
+        elif action == "Sovereign_Metadata_Strip":
+            msg = "SECURITY: Forensically stripping PII metadata from media assets."
         
         self._log_bus(msg)
         return msg
