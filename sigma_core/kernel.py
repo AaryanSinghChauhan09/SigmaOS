@@ -242,7 +242,8 @@ class SigmaKernel:
             
             # Intelligence & Agents
             ("ai_integration",       "SigmaAIIntegrator",         "ai"),
-            ("aether_assistant",     "AetherAssistant",           "aether"),
+            ("userland.system-api.aether_assistant", "AetherAssistant",           "aether"),
+            ("userland.system-api.auralis_voice",   "SigmaAuralis",            "auralis"),
             ("agentic_runtime",      "SigmaAgenticRuntime",       "agentic"),
             ("identity_vault",       "SigmaIdentityVault",        "identity"),
             ("cognitive_fabric",     "SigmaCognitiveFabric",      "cog_fabric"),
@@ -326,7 +327,7 @@ class SigmaKernel:
                 # Specialized initializers
                 if reg_key == "customizer":
                     inst = cls(str(self.cfg.WORKSPACE_DIR))
-                elif reg_key in ("ai_lifecycle", "ag_physics", "ag_ent", "sandbox", "warden", "hw_warden", "aura", "netguard", "repair_engine", "crash_reporter", "kad", "intel", "pbs", "crusher", "memory", "process", "fs", "shadow", "watchdog", "mesh", "layout", "fabric", "aura_mesh", "automator", "forge", "modes", "spotlight", "snap_grid", "time_vault", "ssl", "controls", "continuity", "privacy_shield", "context", "core_boost", "projector", "relay", "vision", "sentinel", "vault_plus", "neural_shell", "translator_plus", "commerce", "brain", "pulse", "semantic_bus", "loop", "entropy", "vanguard", "frontier", "orchestrator", "prewarmer", "auditor", "qa_auditor", "update_manager", "energy_hub", "locale_manager", "scalability_hub", "stress_silo", "silo_manager", "media", "omni_work", "omni_stud", "ds_studio", "app_matrix", "browser", "mesh_drive", "virtualizer", "suggest", "projects", "familiarity", "hyper_drive", "caat", "dev_forge", "agentic", "explorer", "translator", "identity", "aether", "defender", "app_store", "games", "linux_parity", "perf", "compression", "mesh_compute", "cog_fabric", "routines", "bridge_core", "zenith_intel", "browser_pro", "scrubber", "firewall", "automation_service"):
+                elif reg_key in ("aether", "auralis", "ai_lifecycle", "ag_physics", "ag_ent", "sandbox", "warden", "hw_warden", "aura", "netguard", "repair_engine", "crash_reporter", "kad", "intel", "pbs", "crusher", "memory", "process", "fs", "shadow", "watchdog", "mesh", "layout", "fabric", "aura_mesh", "automator", "forge", "modes", "spotlight", "snap_grid", "time_vault", "ssl", "controls", "continuity", "privacy_shield", "context", "core_boost", "projector", "relay", "vision", "sentinel", "vault_plus", "neural_shell", "translator_plus", "commerce", "brain", "pulse", "semantic_bus", "loop", "entropy", "vanguard", "frontier", "orchestrator", "prewarmer", "auditor", "qa_auditor", "update_manager", "energy_hub", "locale_manager", "scalability_hub", "stress_silo", "silo_manager", "media", "omni_work", "omni_stud", "ds_studio", "app_matrix", "browser", "mesh_drive", "virtualizer", "suggest", "projects", "familiarity", "hyper_drive", "caat", "dev_forge", "agentic", "explorer", "translator", "identity", "aether", "defender", "app_store", "games", "linux_parity", "perf", "compression", "mesh_compute", "cog_fabric", "routines", "bridge_core", "zenith_intel", "browser_pro", "scrubber", "firewall", "automation_service"):
                     inst = cls(self)
                 else:
                     inst = cls()
@@ -426,6 +427,8 @@ class SigmaKernel:
     def pkg(self):                return self.registry.get("package_manager")
     @property
     def net(self):                return self.registry.get("net_guard")
+    @property
+    def voice(self):              return self.registry.get("auralis")
     @property
     def local_ai(self):           return self.registry.get("local_ai")
     @property
