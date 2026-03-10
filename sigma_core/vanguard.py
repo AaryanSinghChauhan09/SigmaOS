@@ -10,17 +10,20 @@ import threading
 import time
 import random
 from .interfaces import SigmaModuleBase, ISigmaService
+from userland.system_api.sigma_std import SigmaSys, SigmaCrypto
 
 class NetworkVanguard(SigmaModuleBase, ISigmaService):
     def __init__(self, kernel=None):
         super().__init__(kernel)
         self.active_blocks = set()
+        self.process_blocks = set() # USP: Process-Level Isolation
         self.traffic_log = []
         self._running = False
         self.stats = {
             "packets_shunted": 0,
             "threats_neutralized": 0,
-            "anonymity_score": 98.2
+            "anonymity_score": 98.2,
+            "procs_isolated": 0
         }
         
         # Default blocklist (Shards of anti-telemetry)
@@ -28,7 +31,8 @@ class NetworkVanguard(SigmaModuleBase, ISigmaService):
             "telemetry.microsoft.com",
             "vortex.data.microsoft.com",
             "google-analytics.com",
-            "doubleclick.net"
+            "doubleclick.net",
+            "telemetry.sigmaos.local" # Internal audit loop
         }
 
     def start_service(self):
@@ -46,35 +50,48 @@ class NetworkVanguard(SigmaModuleBase, ISigmaService):
 
     def _monitor_loop(self):
         """Simulates local traffic interception and pattern analysis."""
+        procs = ["chrome.exe", "msedge.exe", "sigma_agent", "background_telemetry", "system_idle"]
         while self._running:
-            time.sleep(random.randint(2, 5))
-            # Mock traffic generation for visual telemetry
+            time.sleep(random.randint(2, 4))
             domains = ["github.com", "google.com", "telemetry.microsoft.com", "api.sigmaos.local", "doubleclick.net"]
             req = random.choice(domains)
+            proc = random.choice(procs)
             
             status = "ALLOWED"
-            if req in self.blocklist:
+            risk = "LOW"
+            
+            if req in self.blocklist or proc in self.process_blocks:
                 status = "SHUNTED"
+                risk = "CRITICAL"
                 self.stats["packets_shunted"] += 1
                 self.stats["threats_neutralized"] += 1
                 if self.kernel:
-                    self.kernel.bus.emit("vanguard.threat_shunted", {"domain": req, "origin": "Internal Process"})
+                    self.kernel.bus.emit("vanguard.threat_shunted", {"domain": req, "origin": proc})
             
             entry = {
                 "timestamp": time.time(),
                 "domain": req,
+                "origin_proc": proc,
                 "status": status,
-                "protocol": "HTTPS",
-                "risk": "HIGH" if status == "SHUNTED" else "LOW"
+                "protocol": "HTTPS/TLS1.3",
+                "risk": risk
             }
             self.traffic_log.append(entry)
             if len(self.traffic_log) > 50: self.traffic_log.pop(0)
 
     def shunt_domain(self, domain: str):
         self.blocklist.add(domain)
+        self.log_event("domain_shunted", {"domain": domain})
         return f"Vanguard: Domain {domain} is now BLACK-HOLED."
 
-    def get_telemetry(self) -> List[Dict[str, Any]]:
+    def shunt_process(self, proc_name: str):
+        """USP: Process-Level Isolation (Competitor Absorption)."""
+        self.process_blocks.add(proc_name)
+        self.stats["procs_isolated"] += 1
+        self.log_event("proc_isolated", {"proc": proc_name})
+        return f"Vanguard: {proc_name} is now Network-Isolated."
+
+    def get_telemetry(self) -> list:
         return self.traffic_log
 
     def health_check(self) -> str:

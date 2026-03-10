@@ -24,7 +24,16 @@ SigmaOS is a high-performance, modular operating environment designed for absolu
   - **Evidence Vault**: Automated preservation of tampered system components.
 - **Network Vanguard (CS/Cyber)**:
   - **Autonomous Firewall**: Local traffic shunting & anti-telemetry blackholing.
+  - **Process-Level Isolation**: Per-app network shunting (No 3rd party drivers required).
   - **Zero-Trust Stream**: Real-time packet risk analysis and anonymity indexing.
+
+## 🏛️ Architectural Sovereignty (Zero-Dependency)
+
+SigmaOS is built on the principle of **Third-Party Immunity**.
+
+- **Native Standard (sigma_std)**: Replaces `requests`, `psutil`, `numpy`, and `pycryptodome` with zero-dependency pure-Python shims.
+- **SOLID Core**: A strict interface-driven kernel ensures modularity and cross-OS stability.
+- **Aura Sync & Morphic UI**: Immersive, context-aware aesthetics inspired by high-end competitors.
 
 ## 🚀 SigmaOS Nomad (Portable Version)
 

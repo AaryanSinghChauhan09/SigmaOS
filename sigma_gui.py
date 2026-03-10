@@ -24,6 +24,7 @@ except ImportError:
 
 from sigma_core import SigmaKernel, SigmaConfig
 from sigma_projects import TaskStatus, Priority
+from userland.system_api.sigma_std import SigmaSys, SigmaNetwork
 
 # ─── Palette ─────────────────────────────────────────────────────────────────
 PAL = {
@@ -1512,11 +1513,11 @@ class SigmaGUI(tk.Tk):
             warden = self.kernel.warden
             warden_report = warden.get_security_audit() if warden else {"lockdown": "OFF"}
 
-            # Update Meters
+            # Update Meters (USP: Authentic Zero-3P Telemetry)
             vals = {
-                "CPU": random.randint(5, 12) if "Performance" in metrics.get("Active_Tuning", "") else 25,
-                "GPU": random.randint(1, 6),
-                "RAM": 32 if hasattr(self.kernel.memory, "_nmc_active") else 45,
+                "CPU": SigmaSys.cpu_usage(),
+                "GPU": random.randint(1, 4), # GPU still mock as native WMI is heavy for a GUI pulse
+                "RAM": SigmaSys.ram_usage(),
                 "CONSCIOUS": int((self.kernel.cog_fabric.conscious_score if hasattr(self.kernel, "cog_fabric") else 0.8) * 100)
             }
             
@@ -1573,9 +1574,21 @@ class SigmaGUI(tk.Tk):
             self._apply_windows_11_layout()
 
     def _show_page(self, key: str):
-        """Intelligent Page Switcher with Lazy-Loading."""
+        """Intelligent Page Switcher with Lazy-Loading + Dynamic Aura Sync."""
+        # 🟢 Aura Sync: Adapt visual atmosphere to context (Competitor Absorption: Immersive UX)
+        aura_map = {
+            "dashboard": PAL["cyan"],
+            "network_vanguard": PAL["red"],
+            "sovereign_suite": PAL["teal"],
+            "visual_customizer": PAL["purple"],
+            "brain": PAL["accent2"],
+            "gmail_ai": PAL["orange"]
+        }
+        active_aura = aura_map.get(key, PAL["accent"])
+        self._morphic_island(f"FOCUS: {key.upper()}", active_aura, 1000)
+        
         # 1. Clean up suggestions if open
-        if self._suggest_pop and self._suggest_pop.winfo_exists():
+        if hasattr(self, '_suggest_pop') and self._suggest_pop and self._suggest_pop.winfo_exists():
             self._suggest_pop.destroy()
             
         # 2. Build if not exists (Lazy Load)
@@ -1584,49 +1597,29 @@ class SigmaGUI(tk.Tk):
                 try:
                     self._page_defs[key]()
                 except Exception as e:
-                    self._log(self._dash_log, f"⚠️ GUI Implementation Gap: Space '{key}' failed to build. Error: {e}", "ERR")
+                    self._log(self._dash_log, f"⚠️ GUI Gap: Space '{key}' failed. {e}", "ERR")
                     self._build_placeholder_page(key)
-            else:
-                self._build_placeholder_page(key)
+            else: self._build_placeholder_page(key)
 
         prev = self._active_tab.get()
-        # Update Nav Sidebar Buttons (if visible)
         if prev in self._nav_btns and self._nav_btns[prev].winfo_exists():
             self._nav_btns[prev].configure(bg=PAL["bg2"], fg=PAL["dim"])
             
         self._active_tab.set(key)
-        
         if key in self._nav_btns and self._nav_btns[key].winfo_exists():
-            self._nav_btns[key].configure(bg=PAL["accent"], fg="white")
+            self._nav_btns[key].configure(bg=active_aura, fg="white")
             
-        # 3. Geometric Handoff (Hide others, pack active)
-        # 🟢 Professional Animation: Opacity/Transition simulation
-        # In Tkinter, we can simulate a fade by hiding/showing or using a transition canvas
-        # For now, let's use a "Slide" effect if transitions are enabled
+        # 3. Geometric Handoff
         target = self._pages[key]
-        
         for k, p in self._pages.items():
-            if p.winfo_exists() and k != key:
-                p.pack_forget()
-                
+            if p.winfo_exists() and k != key: p.pack_forget()
         target.pack(fill="both", expand=True)
     
-        # 🟢 Professional Animation: Fade-in
-        def _fade(alpha=0.2):
-            if alpha < 1.0:
-                target.attributes = "-alpha" # Wait, Tkinter frames don't have alpha. 
-                # Simulated fade using background color shifting or just a quick reveal
-                pass
-        # Actually, let's keep it simple but smooth
-        target.attributes = None # dummy
-        
         # 🔵 Stage Manager Logic (Sidebar of Recents)
         if hasattr(self, '_stage_manager') and self._stage_manager.winfo_exists():
             self._update_stage_manager(key)
 
-        self._log(self._dash_log, f"➤ Space Focused: {key.upper()}", "OK")
         self._history.append(key)
-        self._morphic_island(f"SWITCHED TO {key.upper()} HUB", PAL["cyan"], 1500)
 
     def _update_stage_manager(self, active_key):
         """Competitor UX: Stage Manager sidebar with visual 'recent' stacks."""
@@ -7314,9 +7307,10 @@ class SigmaGUI(tk.Tk):
         feed_c = self._card(main, "📡 Live Traffic Shunt-Stream")
         feed_c.master.pack(fill="both", expand=True)
         
-        cols = ("Time", "Domain", "Status", "Protocol", "Risk")
-        tree = ttk.Treeview(feed_c, columns=cols, show='headings', height=15)
+        cols = ("Time", "Origin Proc", "Domain", "Status", "Protocol", "Risk")
+        tree = ttk.Treeview(feed_c, columns=cols, show='headings', height=12)
         for col in cols: tree.heading(col, text=col)
+        tree.column("Origin Proc", width=120)
         tree.pack(fill="both", expand=True, pady=10)
         
         def _update_feed():
@@ -7328,7 +7322,7 @@ class SigmaGUI(tk.Tk):
                 for entry in reversed(v.get_telemetry()[-20:]):
                     tag = "danger" if entry["status"] == "SHUNTED" else "safe"
                     ts = time.strftime("%H:%M:%S", time.localtime(entry["timestamp"]))
-                    tree.insert("", "end", values=(ts, entry["domain"], entry["status"], entry["protocol"], entry["risk"]), tags=(tag,))
+                    tree.insert("", "end", values=(ts, entry.get("origin_proc", "N/A"), entry["domain"], entry["status"], entry["protocol"], entry["risk"]), tags=(tag,))
                 
                 tree.tag_configure("danger", foreground=PAL["red"])
                 tree.tag_configure("safe", foreground=PAL["dim"])
@@ -7341,9 +7335,10 @@ class SigmaGUI(tk.Tk):
         ctrl = tk.Frame(main, bg=PAL["bg"], pady=10)
         ctrl.pack(fill="x")
         
-        tk.Label(ctrl, text="Manual Shunt (Blackhole Domain):", font=FONT_SMALL, fg=PAL["dim"], bg=PAL["bg"]).pack(side="left")
-        shunt_e = ttk.Entry(ctrl, width=30)
-        shunt_e.pack(side="left", padx=10)
+        # Domain Shunt
+        tk.Label(ctrl, text="Lock Domain:", font=FONT_SMALL, fg=PAL["dim"], bg=PAL["bg"]).pack(side="left")
+        shunt_e = ttk.Entry(ctrl, width=20)
+        shunt_e.pack(side="left", padx=5)
         
         def _do_shunt():
             d = shunt_e.get()
@@ -7353,7 +7348,22 @@ class SigmaGUI(tk.Tk):
                 self._notify("VANGUARD", res, "WARN")
                 shunt_e.delete(0, tk.END)
 
-        ttk.Button(ctrl, text="LOCK DOMAIN", command=_do_shunt).pack(side="left")
+        ttk.Button(ctrl, text="SHANT", command=_do_shunt).pack(side="left", padx=5)
+
+        # Process Lockdown
+        tk.Label(ctrl, text="  |  Lock App:", font=FONT_SMALL, fg=PAL["dim"], bg=PAL["bg"]).pack(side="left")
+        proc_e = ttk.Entry(ctrl, width=20)
+        proc_e.pack(side="left", padx=5)
+
+        def _do_proc_lock():
+            p_name = proc_e.get()
+            v = self.kernel.registry.get("vanguard")
+            if v and p_name:
+                res = v.shunt_process(p_name)
+                self._notify("VANGUARD", res, "CRITICAL")
+                proc_e.delete(0, tk.END)
+
+        ttk.Button(ctrl, text="ISOLATE", command=_do_proc_lock).pack(side="left", padx=5)
 
     def _vbox_check(self):
         """Standard Host-Guest Discovery."""
