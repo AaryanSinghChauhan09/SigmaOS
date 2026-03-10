@@ -17,6 +17,8 @@ from youtube_downloader import SigmaYouTubeSovereignFetcher
 from sovereign_clipboard import SigmaSovereignClipboard
 from agentic_claw import SigmaAgenticClaw
 from sovereign_scheduler import SigmaSovereignScheduler
+from sigma_gateway import SigmaGatewayAgent
+from dev_liaison import SigmaDevLiaison
 
 class SigmaForgeStore:
     def __init__(self, kernel):
@@ -28,6 +30,8 @@ class SigmaForgeStore:
         self.clipboard = SigmaSovereignClipboard(kernel) if SigmaSovereignClipboard else None
         self.claw = SigmaAgenticClaw(kernel) if SigmaAgenticClaw else None
         self.scheduler = SigmaSovereignScheduler(kernel) if SigmaSovereignScheduler else None
+        self.gateway = SigmaGatewayAgent(kernel) if SigmaGatewayAgent else None
+        self.liaison = SigmaDevLiaison(kernel) if SigmaDevLiaison else None
         # Use USERPROFILE env var so it works on any Windows user account
         _config_dir = Path(os.environ.get("USERPROFILE", os.path.expanduser("~"))) / ".sigmaos" / "config"
         self._installed_apps_file = _config_dir / "installed_apps.json"
@@ -314,6 +318,20 @@ class SigmaForgeStore:
                 "size_mb": 4.1,
                 "description": "AI smart-scheduling with focus defense. (Reclaim Clone).",
                 "exec": "bus.emit('app.launch.scheduler')"
+            },
+            "gateway_agent": {
+                "name": "SigmaGateway (Clawdbot)",
+                "category": "Automation",
+                "size_mb": 12.0,
+                "description": "Messenger gateway: Control your OS via WhatsApp/Telegram.",
+                "exec": "bus.emit('app.launch.gateway')"
+            },
+            "dev_liaison": {
+                "name": "DevLiaison (Devin)",
+                "category": "Development",
+                "size_mb": 45.0,
+                "description": "Autonomous software engineer for OS maintenance.",
+                "exec": "bus.emit('app.launch.liaison')"
             }
         }
 

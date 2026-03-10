@@ -17,11 +17,15 @@ try:
     from mesh_sync import SigmaMeshSyncAgent
     from gmail_ai_bridge import GmailAIBridge
     from agentic_claw import SigmaAgenticClaw, ActionNode
+    from sigma_gateway import SigmaGatewayAgent
+    from dev_liaison import SigmaDevLiaison
 except ImportError:
     SigmaMeshSyncAgent = None
     GmailAIBridge = None
     SigmaAgenticClaw = None
     ActionNode = None
+    SigmaGatewayAgent = None
+    SigmaDevLiaison = None
 
 @dataclass
 class MissionNode:
@@ -42,6 +46,8 @@ class SigmaOmniAutomator:
         self.mesh = SigmaMeshSyncAgent(kernel) if SigmaMeshSyncAgent else None
         self.gmail = GmailAIBridge(kernel) if GmailAIBridge else None
         self.claw = SigmaAgenticClaw(kernel) if SigmaAgenticClaw else None
+        self.gateway = SigmaGatewayAgent(kernel) if SigmaGatewayAgent else None
+        self.liaison = SigmaDevLiaison(kernel) if SigmaDevLiaison else None
         self.active_missions: Dict[str, List[MissionNode]] = {}
         self.stats = {
             "workflows_executed": 0,
@@ -166,6 +172,18 @@ class SigmaOmniAutomator:
                 "category": "Maintenance Pro",
                 "actions": ["Start_Claw_Mission", "Heartbeat_Heal", "Scrub_Anomalies"],
                 "description": "Claw-style proactive maintenance. Identifies friction and heals it deterministically."
+            },
+            "Morning_Briefing": {
+                "name": "🌅 Sigma Morning Brief",
+                "category": "Productivity",
+                "actions": ["Generate_Sovereign_Brief", "Push_to_Gateway"],
+                "description": "Inspired by Clawdbot. A secure summary of your OS health and schedule."
+            },
+            "Dev_Audit": {
+                "name": "🛠️ Devin Forensic Audit",
+                "category": "Development",
+                "actions": ["Scan_for_Lint_Bugs", "Fix_Dangling_Docstrings", "Run_Health_Verified"],
+                "description": "Autonomous developer agent audit. Scans and heals code autonomously."
             }
         }
 
@@ -591,6 +609,16 @@ class SigmaOmniAutomator:
             msg = "SCHEDULER: Re-balancing calendar to protect focus time (Reclaim-Parity)."
         elif action == "Shift_Writing_Tone":
             msg = "UTIL: Re-phrasing active document for Professional clarity (Apple-Intel Parity)."
+        elif action == "Generate_Sovereign_Brief":
+            msg = "GATEWAY: Aggregating OS status into a proactive morning briefing."
+        elif action == "Push_to_Gateway":
+            msg = "GATEWAY: Formatting brief for WhatsApp/Telegram delivery..."
+        elif action == "Scan_for_Lint_Bugs":
+            msg = "LIAISON: Performing autonomous Devin-style code audit..."
+        elif action == "Fix_Dangling_Docstrings":
+            msg = "LIAISON: Refactoring source code per sovereign standards."
+        elif action == "Run_Health_Verified":
+            msg = "LIAISON: Executing forensic health tests on modified shards."
         
         self._log_bus(msg)
         return msg
