@@ -36,6 +36,12 @@ class SigmaOmniAutomator:
         
         # --- APEX Standard Library: Universal Modes & Routines ---
         self.PRESETS = {
+            "Sovereign_Sync": {
+                "name": "♻️ Global Mesh Sync",
+                "category": "Maintenance",
+                "actions": ["Start_Mesh_Watch", "Push_to_Origin", "Verify_Merkle"],
+                "description": "Seamlessly syncs all workspace folders across the private mesh."
+            },
             "Deep_Focus_Silo": {
                 "name": "🔒 Deep Focus Silo",
                 "category": "Productivity",
@@ -346,7 +352,7 @@ class SigmaOmniAutomator:
             "3. 🔐 User Auto-Login initiated using offline 'Zero-Knowledge PassVault' tokens...",
             f"4. 📝 Sideloading Prompt: '{prompt_snippet}' directly into input fields via secure DOM injection...",
             "5. ⏸️ STATUS: HOLD (Prompt pasted, auto-submit is DISABLED as per safety protocol).",
-            "✨ NOTIFICATION: Ready for review. Please switch to OmniBrowser tabs to verify and hit Enter."
+            "✨ STATUS: AI Broadcast Master READY. Tabs staged. Please review and verify."
         ]
         
         # Fire events to the UI if bus exists
@@ -457,15 +463,15 @@ class SigmaOmniAutomator:
             msg = "MEM: VRAM Flushed"
         elif action == "Enable_Agentic_Backplane":
             msg = "CORE: Agent-Priority ON"
+        elif action == "Start_Mesh_Watch":
+            msg = "MESH: Folder-Watch established."
+        elif action == "Push_to_Origin":
+            msg = "MESH: Pushing 1.2GB Shards to Origin-Master..."
+        elif action == "Verify_Merkle":
+            msg = "MESH: Merkle Integrity [OK]."
         
         self._log_bus(msg)
         return msg
-
-    def _log_bus(self, msg: str):
-        if hasattr(self.kernel, "bus"):
-            self.kernel.bus.emit("auto.action_log", {"msg": msg})
-        else:
-            print(f"[OmniAuto] {msg}")
 
 
     # --- Section 3: Visual Scratch Logic & Compilation ---

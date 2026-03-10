@@ -1,7 +1,7 @@
 import os
 from pathlib import Path
 
-root = Path("C:/Users/Sovereign-User/.gemini/antigravity/scratch/SigmaOS")
+root = Path(os.path.expanduser("~")) / ".gemini" / "antigravity" / "scratch" / "SigmaOS"
 
 def fix_imports():
     for f in root.rglob("*.py"):

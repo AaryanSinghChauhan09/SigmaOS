@@ -10,7 +10,7 @@ class SigmaISOManager:
     def __init__(self, kernel):
         self.kernel = kernel
         self.iso_version = "2.0.0-Sovereign"
-        self.iso_path = "C:/Users/Sovereign-User/.gemini/antigravity/scratch/SigmaOS/ISO_IMAGE/SigmaOS_Sovereign_v2.iso"
+        self.iso_path = "SIGMA_VIRTUAL_ROOT/.gemini/antigravity/scratch/SigmaOS/ISO_IMAGE/SigmaOS_Sovereign_v2.iso"
 
     def generate_iso_manifest(self) -> dict:
         """Generates the file manifest for the Master ISO."""

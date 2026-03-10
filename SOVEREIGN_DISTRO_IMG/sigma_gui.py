@@ -6125,7 +6125,7 @@ class SigmaGUI(tk.Tk):
             _wb.open("http://127.0.0.1:8000")
 
         def _start_server():
-            bat = r"C:\Users\Sovereign-User\.gemini\antigravity\scratch\proprietary_setup\AI_Orchestrator_v2.0_GDrive_20260208_121931\LAUNCH_AI_ORCHESTRATOR.bat"
+            bat = r"SIGMA_VIRTUAL_ROOT\.gemini\antigravity\scratch\proprietary_setup\AI_Orchestrator_v2.0_GDrive_20260208_121931\LAUNCH_AI_ORCHESTRATOR.bat"
             if os.path.exists(bat):
                 import subprocess
                 subprocess.Popen(["cmd.exe", "/c", bat], creationflags=subprocess.CREATE_NEW_CONSOLE)
@@ -6768,7 +6768,7 @@ class SigmaGUI(tk.Tk):
                 self._log(self._m_log, res["message"], "OK")
                 self._log(self._m_log, f"Sync Speed: {res['speed_mbps']} Mbps", "INFO")
             elif action == "vault":
-                res = mesh.encrypt_and_vault("C:/Users/Sigma/Documents/Work.docx")
+                res = mesh.encrypt_and_vault("SIGMA_VIRTUAL_ROOT/Documents/Work.docx")
                 self._log(self._m_log, res["message"], "OK")
 
         ttk.Button(cat_c, text="Trigger P2P Sync (Mesh-wide)", command=lambda: _m_act("sync")).pack(fill="x", pady=5)
@@ -9654,7 +9654,7 @@ class SigmaGUI(tk.Tk):
 
         def _shuffle():
             if hasattr(self.kernel, 'ag_ent'):
-                res = self.kernel.ag_ent.shuffler.shuffle_organize("C:/Users/Sovereign-User/Desktop")
+                res = self.kernel.ag_ent.shuffler.shuffle_organize("SIGMA_VIRTUAL_ROOT/Desktop")
                 self._notify("Antigravity Shuffler", res, "OK")
 
         def _sync_scrum():
@@ -9704,7 +9704,7 @@ class SigmaGUI(tk.Tk):
         
         # Load the markdown content
         try:
-             guide_path = r"C:\Users\Sovereign-User\.gemini\antigravity\scratch\SigmaOS\docs\ANTIGRAVITY_TOOLS_GUIDE.md"
+             guide_path = r"SIGMA_VIRTUAL_ROOT\.gemini\antigravity\scratch\SigmaOS\docs\ANTIGRAVITY_TOOLS_GUIDE.md"
              if os.path.exists(guide_path):
                  with open(guide_path, "r", encoding="utf-8") as f:
                      content = f.read()
