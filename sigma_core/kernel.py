@@ -11,7 +11,7 @@ import hashlib
 
 # Bootstrap path so kernel/ and ecosystem/ are importable
 _ROOT = os.path.abspath(os.path.join(os.path.dirname(__file__), ".."))
-for _sub in ("userland/system-api", "ecosystem"):
+for _sub in ("userland/system_api", "ecosystem"):
     _p = os.path.join(_ROOT, _sub)
     if _p not in sys.path:
         sys.path.insert(0, _p)
@@ -201,7 +201,7 @@ class SigmaKernel:
             try:
                 changed = []
                 # Watch critical directories
-                for d in [".", "sigma_core", "userland/system-api"]:
+                for d in [".", "sigma_core", "userland/system_api"]:
                     dp = os.path.join(root, d)
                     if not os.path.exists(dp): continue
                     
@@ -279,12 +279,12 @@ class SigmaKernel:
             
             # Intelligence & Agents
             ("ai_integration",       "SigmaAIIntegrator",         "ai"),
-            ("userland.system-api.aether_assistant", "AetherAssistant",           "aether"),
-            ("userland.system-api.auralis_voice",   "SigmaAuralis",            "auralis"),
+            ("userland.system_api.aether_assistant", "AetherAssistant",           "aether"),
+            ("userland.system_api.auralis_voice",   "SigmaAuralis",            "auralis"),
             ("agentic_runtime",      "SigmaAgenticRuntime",       "agentic"),
             ("identity_vault",       "SigmaIdentityVault",        "identity"),
             ("cognitive_fabric",     "SigmaCognitiveFabric",      "cog_fabric"),
-            ("userland.system-api.local_ai_nexus", "SigmaLocalAINexus", "local_ai"),
+            ("userland.system_api.local_ai_nexus", "SigmaLocalAINexus", "local_ai"),
             ("competitor_intel",     "SigmaCompetitorIntelligence","intel"),
             ("competitor_crusher",   "SovereignCompetitorCrusher","crusher"),
             

@@ -36,7 +36,7 @@ def build_distro_iso():
 
     # 2. Map Userland
     mapping = [
-        ("userland/system-api", "USERLAND/API"),
+        ("userland/system_api", "USERLAND/API"),
         ("web_os", "USERLAND/UI"),
         ("apps", "USERLAND/APPS")
     ]

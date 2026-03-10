@@ -11,7 +11,7 @@ import os
 _ROOT = os.path.dirname(os.path.abspath(__file__))
 sys.path.insert(0, _ROOT)
 sys.path.insert(0, os.path.join(_ROOT, "sigma_core"))
-sys.path.insert(0, os.path.join(_ROOT, "userland/system-api"))
+sys.path.insert(0, os.path.join(_ROOT, "userland/system_api"))
 sys.path.insert(0, os.path.join(_ROOT, "ecosystem"))
 
 from sigma_core.kernel import SigmaKernel

@@ -22,7 +22,7 @@ if sys.platform == "win32":
     sys.stderr = io.TextIOWrapper(sys.stderr.buffer, encoding="utf-8", errors="replace")
 
 _ROOT = os.path.abspath(os.path.dirname(__file__))
-for _sub in ("", "userland/system-api", "ecosystem"):
+for _sub in ("", "userland/system_api", "ecosystem"):
     sys.path.insert(0, os.path.join(_ROOT, _sub))
 
 from sigma_core import SigmaKernel, SigmaConfig

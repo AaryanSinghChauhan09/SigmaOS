@@ -18,7 +18,7 @@ import random
 # Adjust paths
 _ROOT = os.getcwd()
 sys.path.append(os.path.join(_ROOT, "sigma_core"))
-sys.path.append(os.path.join(_ROOT, "userland", "system-api"))
+sys.path.append(os.path.join(_ROOT, "userland", "system_api"))
 sys.path.append(_ROOT)
 
 from sigma_core.kernel import SigmaKernel

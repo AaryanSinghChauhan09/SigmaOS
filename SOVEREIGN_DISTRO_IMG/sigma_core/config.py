@@ -23,7 +23,7 @@ class SigmaConfig:
         self._initialized = True
 
         self.BASE_DIR = Path(__file__).resolve().parent.parent
-        self.KERNEL_DIR  = self.BASE_DIR / "userland" / "system-api"
+        self.KERNEL_DIR  = self.BASE_DIR / "userland" / "system_api"
         self.NATIVE_KERNEL_DIR = self.BASE_DIR / "kernel"
         self.ECOSYSTEM_DIR = self.BASE_DIR / "ecosystem"
         self.WORKSPACE_DIR = self.BASE_DIR / "workspace"

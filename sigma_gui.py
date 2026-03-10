@@ -12,7 +12,7 @@ import importlib
 import random
 
 _ROOT = os.path.abspath(os.path.dirname(__file__))
-for _sub in ("", "userland/system-api", "ecosystem"):
+for _sub in ("", "userland/system_api", "ecosystem"):
     sys.path.insert(0, os.path.join(_ROOT, _sub))
 
 try:
@@ -6030,7 +6030,7 @@ class SigmaGUI(tk.Tk):
         view.pack(side="left", fill="both", expand=True)
         
         items = [
-            ("📁", "userland/system-api"), ("📁", "modules"), ("📁", "drivers"),
+            ("📁", "userland/system_api"), ("📁", "modules"), ("📁", "drivers"),
             ("📝", "sigma.py"), ("📝", "gui.py"), ("📊", "stats.vfs")
         ]
         for i, (icon, name) in enumerate(items):

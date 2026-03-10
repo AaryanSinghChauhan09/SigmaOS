@@ -104,5 +104,5 @@ class IntegrityGuard(SigmaModuleBase):
 if __name__ == "__main__":
     guard = IntegrityGuard()
     # Baseline the core and userland
-    print(guard.generate_baseline(["sigma_core", "userland/system-api"]))
+    print(guard.generate_baseline(["sigma_core", "userland/system_api"]))
     print(guard.verify_system_integrity())

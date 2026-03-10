@@ -14,8 +14,8 @@ os.chdir(_ROOT)
 
 if _ROOT not in sys.path:
     sys.path.insert(0, _ROOT)
-    # Add userland/system-api for the agents
-    sys.path.insert(0, os.path.join(_ROOT, "userland/system-api"))
+    # Add userland/system_api for the agents
+    sys.path.insert(0, os.path.join(_ROOT, "userland/system_api"))
 
 try:
     # Need to import with package name for sigma_core if we aren't running AS a package

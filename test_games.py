@@ -1,6 +1,6 @@
 import sys
 import os
-sys.path.append(os.path.join(os.getcwd(), 'userland', 'system-api'))
+sys.path.append(os.path.join(os.getcwd(), 'userland', 'system_api'))
 sys.path.append(os.path.join(os.getcwd(), 'sigma_core'))
 sys.path.append(os.getcwd())
 

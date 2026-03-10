@@ -30,7 +30,7 @@ except ImportError:
     # Manual injection if relative imports fail
     print("  ⚠ Adjusting import strategy...")
     sys.path.append(os.path.join(_ROOT, "sigma_core"))
-    sys.path.append(os.path.join(_ROOT, "userland/system-api"))
+    sys.path.append(os.path.join(_ROOT, "userland/system_api"))
     from sigma_core.kernel import SigmaKernel
     from process_manager import QoSClass, ProcessState
 

@@ -24,8 +24,8 @@ Strict adherence to the **Native vs. Userland split** for performance, security,
 **Languages:** Python (System API), HTML5/CSS3/JavaScript (GUI).  
 **Location:** `/userland`.
 
-- **System API (`/userland/system-api`):** Python orchestration layer. Handles high-level logic and interfaces with the Native Core via the `FFI_Bridge`.
-- **Desktop GUI (`/userland/desktop-gui`):** High-fidelity Web interface rendered via Chromium/Blink engines.
+- **System API (`/userland/system_api`):** Python orchestration layer. Handles high-level logic and interfaces with the Native Core via the `FFI_Bridge`.
+- **Desktop GUI (`/userland/desktop_gui`):** High-fidelity Web interface rendered via Chromium/Blink engines.
 - **AI Apps (`/userland/apps`):** High-level multidisciplinary tools (Agentic AI, Legal Pros, Data Matrix).
 
 ## 4. The Bridge Layer (FFI)

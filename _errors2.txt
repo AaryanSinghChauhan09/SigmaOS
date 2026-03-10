@@ -1,5 +1,0 @@
-.\sanitize_os.py:13:unterminated string literal (detected at line 13)
-.\SOVEREIGN_DISTRO_IMG\sigma_gui.py:5213:invalid syntax. Is this intended to be part of the string?
-.\SOVEREIGN_DISTRO_IMG\USERLAND\API\omni_automator.py:151:unexpected indent
-.\SOVEREIGN_DISTRO_IMG\USERLAND\API\ual_service.py:76:unterminated string literal (detected at line 76); perhaps you escaped the end quote?
-.\userland\system-api\ual_service.py:76:unterminated string literal (detected at line 76); perhaps you escaped the end quote?
