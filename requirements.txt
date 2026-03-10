@@ -1,0 +1,14 @@
+# SigmaOS Sovereign v2.0 Dependency Manifest
+# Fulfills 'Professional Application' status across Windows/Linux/macOS.
+# ----------------------------------------------------------------------
+
+# Required for GUI logic
+tk >= 8.6
+
+# Core python libraries (usually built-in, listed for clarity)
+importlib-metadata
+typing-extensions
+
+# Optional high-performance extensions
+# numpy >= 1.20 # If physics engine needs heavy matrix math
+# psutil >= 5.8 # For advanced de-bloat monitoring
