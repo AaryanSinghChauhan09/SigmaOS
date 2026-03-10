@@ -883,6 +883,7 @@ class SigmaGUI(tk.Tk):
             "virtualbox":       self._build_virtualbox_page,
             "ag_physics":       self._build_ag_physics_page,
             "visual_customizer": self._build_visual_customizer_page,
+            "gmail_ai":         self._build_gmail_ai_page,
         }
         
         # Oracle VM Discovery (Professional Integration)
@@ -1423,6 +1424,7 @@ class SigmaGUI(tk.Tk):
             ("dev_forge",      "💻",  "Dev Forge"),
             ("sovereign_lab",  "🔬",  "Sovereign Lab"),
             ("kernel_debug",   "🐛",  "Kernel Debug"),
+            ("gmail_ai",       "📧",  "Gmail AI"),
             ("automation_hub", "🤖",  "Automation"),
             ("ai_lifecycle",   "🧠",  "AI Mission"),
             ("zenith",         "🚀",  "Zenith AI"),

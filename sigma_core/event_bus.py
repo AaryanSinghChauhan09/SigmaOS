@@ -5,11 +5,14 @@ Implements publish-subscribe event messaging for inter-module communication.
 
 from typing import Dict, Callable, List, Any
 import threading
+import time
+from concurrent.futures import ThreadPoolExecutor
 
 class EventBus:
     """
     Central event bus for SigmaOS kernel.
     Enables decoupled communication between modules via events.
+    USP: High-Performance Concurrent Event Delivery Engine.
     """
     
     def __init__(self):
@@ -18,6 +21,7 @@ class EventBus:
         self._event_history: List[Dict[str, Any]] = []
         self._lock = threading.Lock()
         self._max_history = 1000
+        self._executor = ThreadPoolExecutor(max_workers=4)
     
     def subscribe(self, event_name: str, callback: Callable) -> None:
         """
@@ -39,13 +43,14 @@ class EventBus:
                 if callback in self._subscribers[event_name]:
                     self._subscribers[event_name].remove(callback)
     
-    def emit(self, event_name: str, data: Any = None) -> None:
+    def emit(self, event_name: str, data: Any = None, synchronous: bool = False) -> None:
         """
-        Emit an event to all subscribers
+        Emit an event to all subscribers.
         
         Args:
             event_name: Name of the event
             data: Event payload data
+            synchronous: If True, waits for callback completion in calling thread.
         """
         with self._lock:
             # Record event in history
@@ -64,10 +69,20 @@ class EventBus:
         
         # Invoke subscribers outside lock to avoid deadlocks
         for callback in subscribers:
-            try:
-                callback(data)
-            except Exception as e:
-                print(f"[EventBus] Error in callback for '{event_name}': {e}")
+            if synchronous:
+                try:
+                    callback(data)
+                except Exception as e:
+                    print(f"[EventBus] Error in sync callback for '{event_name}': {e}")
+            else:
+                self._executor.submit(self._safe_invoke, callback, event_name, data)
+
+    def _safe_invoke(self, callback: Callable, event_name: str, data: Any):
+        """Internal helper for safe asynchronous callback execution."""
+        try:
+            callback(data)
+        except Exception as e:
+            print(f"[EventBus] Error in async callback for '{event_name}': {e}")
     
     def get_history(self, event_name: str = None) -> List[Dict]:
         """
