@@ -22,6 +22,7 @@ from .registry import ModuleRegistry
 from .ledger import SovereignLedger
 from .cache import SigmaCache
 from .integrity import IntegrityGuard
+from .customizer import SovereignCustomizer
 
 # Late imports (avoid circular at package level)
 def _import_kernel_module(name):
@@ -47,8 +48,10 @@ class SigmaKernel:
         self.ledger = SovereignLedger()
         self.cache = SigmaCache(self)
         self.integrity = IntegrityGuard(self)
+        self.customizer = SovereignCustomizer(self)
         self.registry.register("cache", self.cache)
         self.registry.register("integrity", self.integrity)
+        self.registry.register("customizer", self.customizer)
         self._file_hashes = {}
         
         # --- Observability ---

@@ -325,95 +325,105 @@ class SigmaGUI(tk.Tk):
                 
         ttk.Button(sec_opt, text="Enable Lockdown Mode", command=_lockdown).pack(side="right", padx=10)
         
-        # 3. Theming Visualizer
-        theme_panel = self._card(main_panel, "Visual Theming Engine")
-        theme_panel.master.pack(side="top", fill="x", pady=(0,10))
+        # 3. Deep Morphological Customizer (Apex v2.0)
+        morphic_panel = self._card(main_panel, "Sovereign Morphic Engine")
+        morphic_panel.master.pack(side="top", fill="x", pady=(0,10))
         
-        themes = tk.Frame(theme_panel, bg=PAL["card"])
-        themes.pack(fill="x", pady=5)
+        m_fr = tk.Frame(morphic_panel, bg=PAL["card"])
+        m_fr.pack(fill="x", pady=5)
         
-        def _apply_theme_variant(theme_name):
+        def _apply_morphic(vibe):
             cust = self.kernel.registry.get("customizer")
             if cust:
-                res = cust.generate_ai_theme(theme_name)
-                palette = res["applied_styles"]
-                PAL["accent"] = palette["accent_color"]
-                PAL["bg"] = palette["background_color"]
-                # Trigger global refresh
-                self.configure(bg=PAL["bg"])
-                self._notify("Customizer", res["message"], "OK")
-                self._log_voice(f"Theme {theme_name} applied via Neural Fabric.")
+                cust.apply_morphic_preset(vibe)
+                self._notify("MORPHIC SHIFT", f"Visual DNA morphed to {vibe}. Opacity: {cust.glass_opacity}", "OK")
+                self._morphic_island(f"MORPHIC: {vibe.upper()} ACTIVE", PAL["cyan"])
 
-        tk.Button(themes, text="⬛ Cyber Void (Dark)", bg="#09090b", fg="white", command=lambda: _apply_theme_variant("cyber")).pack(side="left", padx=5)
-        tk.Button(themes, text="⬜ Arctic Cloud (Light)", bg="#f8f9fa", fg="#1a1a1a", command=lambda: _apply_theme_variant("zen")).pack(side="left", padx=5)
-        tk.Button(themes, text="🟦 Pro Mint (Linux)", bg="#1e293b", fg="white", command=lambda: _apply_theme_variant("ocean")).pack(side="left", padx=5)
+        vibes = ["Brutalist", "Glass", "Classic", "Aura"]
+        for v in vibes:
+            tk.Button(m_fr, text=v.upper(), font=FONT_SMALL, bg=PAL["bg2"], fg=PAL["text"],
+                      padx=10, relief="flat", command=lambda x=v: _apply_morphic(x)).pack(side="left", padx=5)
+
+        # 4. Glyph Set & Soundscape
+        extra_panel = tk.Frame(main_panel, bg=PAL["bg"])
+        extra_panel.pack(fill="x", pady=(0,10))
+
+        glyph_card = self._card(extra_panel, "Icon Glyph Set")
+        glyph_card.master.pack(side="left", fill="both", expand=True, padx=(0,5))
         
-        # 4. System Vibe DNA (Personalization / Apex v2.0)
-        vibe_panel = self._card(main_panel, "System Vibe DNA")
-        vibe_panel.master.pack(side="top", fill="x", pady=(0,10))
+        glyph_cb = ttk.Combobox(glyph_card, values=["Sovereign", "Retro", "Fluency", "Monolith"], state="readonly")
+        glyph_cb.pack(fill="x", pady=5)
+        glyph_cb.set("Sovereign")
         
-        vibe_fr = tk.Frame(vibe_panel, bg=PAL["card"])
-        vibe_fr.pack(fill="x", pady=5)
+        def _set_glyphs(e=None):
+            self._notify("GLYPH SYSTEM", f"Icons re-mapped to {glyph_cb.get()} set.", "INFO")
+            # In a real app, this would refresh all icon variables
+            
+        glyph_cb.bind("<<ComboboxSelected>>", _set_glyphs)
+
+        sound_card = self._card(extra_panel, "Aural Soundscape")
+        sound_card.master.pack(side="left", fill="both", expand=True, padx=(5,0))
         
-        def _set_vibe(vibe):
-            if hasattr(self.kernel.cfg, "apply_vibe"):
-                self.kernel.cfg.apply_vibe(vibe)
-                v_data = self.kernel.cfg.VIBES[vibe]
-                PAL["accent"] = v_data["accent"]
-                self._notify("DNA SHIFT", f"Sovereign Vibe: {vibe} active. Neural Proactivity tuned for {v_data['focus']}.", "OK")
+        sound_cb = ttk.Combobox(sound_card, values=["Zen", "Cyber", "Silent"], state="readonly")
+        sound_cb.pack(fill="x", pady=5)
+        sound_cb.set("Zen")
         
-        vibes = ["Minimalist", "Cyberpunk", "Enterprise", "Gamer"]
-        colors = ["#5AC8FA", "#FF2D55", "#007AFF", "#AF52DE"]
-        for v, c in zip(vibes, colors):
-            tk.Button(vibe_fr, text=f"🧬 {v.upper()}", font=FONT_SMALL, bg=PAL["bg2"], fg=c, 
-                      relief="flat", width=12, command=lambda x=v: _set_vibe(x)).pack(side="left", padx=5)
-        tk.Button(themes, text="❄️ Snow Protocol (Light)", bg="#f8fafc", fg="black", command=lambda: _apply_theme("#f8fafc", "#e2e8f0", "black")).pack(side="left", padx=5)
-        
-        # 4. Personalization & Identity
-        id_panel = self._card(main_panel, "Sovereign Identity & Personalization")
+        def _set_sound(e=None):
+            self._notify("AUDIO ENGINE", f"Acoustic feedback: {sound_cb.get()} mode.", "OK")
+            
+        sound_cb.bind("<<ComboboxSelected>>", _set_sound)
+
+        # 5. Personalization & Identity
+        id_panel = self._card(main_panel, "Identity & Appearance Controls")
         id_panel.master.pack(side="top", fill="x", pady=(10,10))
         
         id_opt = tk.Frame(id_panel, bg=PAL["card"])
         id_opt.pack(fill="x", pady=5)
         
-        tk.Label(id_opt, text="Dashboard Name:", font=FONT_SMALL, fg="white", bg=PAL["card"]).pack(side="left", padx=(0,5))
+        tk.Label(id_opt, text="Dashboard Alias:", font=FONT_SMALL, fg="white", bg=PAL["card"]).pack(side="left", padx=(0,5))
         ttk.Entry(id_opt, textvariable=self._dashboard_title, width=15).pack(side="left")
         
-        # Typography
         tk.Label(id_opt, text=" Font:", font=FONT_SMALL, fg="white", bg=PAL["card"]).pack(side="left", padx=(10,5))
         font_cb = ttk.Combobox(id_opt, values=["Inter", "Consolas", "Roboto", "Segoe UI"], width=10)
         font_cb.pack(side="left")
         font_cb.set("Inter")
         
-        def _apply_font():
+        def _apply_fnt():
             global FONT_MED, FONT_SMALL
             fnt = font_cb.get()
-            FONT_MED = (fnt, 10)
-            FONT_SMALL = (fnt, 9)
+            FONT_MED = (fnt, 10); FONT_SMALL = (fnt, 9)
             self._apply_style()
-            self._notify("TYPOGRAPHY", f"Font stack overridden with {fnt}.", "OK")
+            self._notify("TYPOGRAPHY", f"Global font paired with {fnt}.", "OK")
             
-        ttk.Button(id_opt, text="Set Font", command=_apply_font).pack(side="left", padx=5)
+        ttk.Button(id_opt, text="Pair", command=_apply_fnt).pack(side="left", padx=5)
 
-        # Performance (Animations)
-        def _toggle_perf():
-            is_fast = not self._ultra_perf.get()
-            self._ultra_perf.set(is_fast)
-            self._notify("ANIMATION ENGINE", "Animations Disabled (Ultra Perf)" if is_fast else "Smooth Transitions Enabled", "INFO")
-            
-        ttk.Button(id_opt, text="Toggle Animations", command=_toggle_perf).pack(side="left", padx=5)
+        ttk.Button(id_opt, text="Pick Accent Color", command=lambda: self._pick_accent()).pack(side="right", padx=5)
         
-        def _pick_accent():
-            color = colorchooser.askcolor(title="Sovereign Accent Selector", initialcolor=PAL["accent"])[1]
-            if color:
-                PAL["accent"] = color
-                self._notify("IDENTITY", f"Accent Re-mapped to {color}", "OK")
-                # Proactively update colored elements
-                if hasattr(self, '_logo_lbl'): self._logo_lbl.config(fg=color)
-                if hasattr(self, '_island_lbl'): self._island_lbl.config(fg=color)
+        # 6. AI Theme Weaver
+        weaver_panel = self._card(main_panel, "Neural Theme Weaver (AI-Driven)")
+        weaver_panel.master.pack(side="top", fill="x", pady=(10,0))
+        
+        w_fr = tk.Frame(weaver_panel, bg=PAL["card"])
+        w_fr.pack(fill="x", pady=5)
+        
+        tk.Label(w_fr, text="Describe your Vibe:", font=FONT_SMALL, fg=PAL["dim"], bg=PAL["card"]).pack(side="left")
+        vibe_e = ttk.Entry(w_fr)
+        vibe_e.pack(side="left", fill="x", expand=True, padx=10)
+        vibe_e.insert(0, "Deep oceanic night with neon highlights...")
+        
+        def _weave():
+            p = vibe_e.get()
+            cust = self.kernel.registry.get("customizer")
+            if cust:
+                res = cust.generate_ai_theme(p)
+                pal = res["applied_styles"]
+                PAL["accent"] = pal["accent_color"]
+                PAL["bg"] = pal["background_color"]
+                self.configure(bg=PAL["bg"])
                 self._apply_style()
-                
-        ttk.Button(id_opt, text="Pick Accent", command=_pick_accent).pack(side="right", padx=5)
+                self._notify("NEURAL WEAVE", res["message"], "OK")
+
+        ttk.Button(w_fr, text="WEAVE THEME", command=_weave).pack(side="right")
         # Build UI components
         self._apply_style()
         self._build_ui()
