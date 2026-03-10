@@ -587,6 +587,10 @@ class SigmaOmniAutomator:
             msg = "CLAW: Executing proactive heartbeat self-healing pulse."
         elif action == "Scrub_Anomalies":
             msg = "CLAW: Neutralizing system-level friction points."
+        elif action == "Smart_Reschedule":
+            msg = "SCHEDULER: Re-balancing calendar to protect focus time (Reclaim-Parity)."
+        elif action == "Shift_Writing_Tone":
+            msg = "UTIL: Re-phrasing active document for Professional clarity (Apple-Intel Parity)."
         
         self._log_bus(msg)
         return msg
