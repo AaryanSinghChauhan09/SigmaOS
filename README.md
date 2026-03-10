@@ -25,6 +25,17 @@ SigmaOS is a high-performance, modular operating environment designed for absolu
 - **Network Vanguard (CS/Cyber)**:
   - **Autonomous Firewall**: Local traffic shunting & anti-telemetry blackholing.
   - **Zero-Trust Stream**: Real-time packet risk analysis and anonymity indexing.
+
+## 🚀 SigmaOS Nomad (Portable Version)
+
+**SigmaOS Nomad (PVE)** is a host-agnostic, zero-install version of the OS designed to run seamlessly on top of Windows, Linux, or macOS.
+
+- **Virtualized Root**: Runs within a protected `sigma_portable_drive` container.
+- **Cross-OS Portability**: Move your entire workspace (including agents and history) via a single folder.
+- **Quick Deployment**:
+  - **Windows**: Run `nomad_boot.bat`
+  - **Linux/macOS**: Run `sh nomad_boot.sh`
+
 - **Sovereign Legal Academy**:
   - **Bharat Law Index**: Interactive mapping for BNS, BNSS, and BSA procedural flows.
   - **Cognitive Guard**: Anki-parity Spaced Repetition (SRL) to crush educational curves.
