@@ -74,7 +74,7 @@ class SigmaConfig:
         """Set a custom configuration value"""
         self._custom_settings[key] = value
     
-    def apply_vibe(self, vibe):
+    def apply_vibe(self, vibe: str):
         """
         Declarative State Management (Automation Principle).
         Transforms the OS 'DNA' based on the requested persona.
@@ -97,8 +97,30 @@ class SigmaConfig:
             self.SECURITY_LEVEL = "QUANTUM_SAFE"
             self.ZERO_TRUST_MODE = True
             
-        print(f"[DNA] System State re-calculated for {vibe}. Applied policy shifts.")
+        print(f"[DNA] System State re-calculated for vibe '{vibe}'. Applied policy shifts.")
         return v_data
+
+    def apply_mode(self, mode_name: str):
+        """
+        USP: Atomic Environment Profile Sync.
+        Maps the higher-level OS 'Mode' to internal configuration and vibes.
+        Called by SigmaModeManager for deep-kernel/userland alignment.
+        """
+        mode_name = mode_name.lower()
+        if mode_name == "gaming":
+            self.apply_vibe("Gamer")
+            self.HIGH_PERFORMANCE_IO = True
+        elif mode_name == "programmer" or mode_name == "ai_engineer":
+            self.apply_vibe("Enterprise")
+            self.ENABLE_AGENTIC = True
+        elif mode_name == "standard":
+            self.apply_vibe("Enterprise")
+        elif mode_name == "bare_minimum":
+            self.apply_vibe("Minimalist")
+            self.ENABLE_GUI = False
+            
+        self.set("ACTIVE_MODE", mode_name)
+        print(f"[DNA] System State re-calculated for mode '{mode_name}'.")
 
     def to_dict(self):
         """Export configuration as dictionary"""

@@ -145,8 +145,13 @@ class SigmaKernel:
                                 "event_rate": random.gauss(55.0, 6.0),
                                 "error_rate":  random.gauss(0.05, 0.02),
                             })
+                
+                # 7. Mesh Discovery Pulse (Zero-Conf Parity)
+                if self.registry.get("mesh"):
+                    self.bus.emit("mesh.discovery.pulse", {"node": "SIGMA-APEX-1"})
 
-            except Exception:
+            except Exception as e:
+                print(f"[KERNEL] Sentinel recovered from pulse error: {e}")
                 pass
 
     def _start_github_sentinel(self):

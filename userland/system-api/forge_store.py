@@ -14,6 +14,7 @@ from conversion_engine import SigmaConversionEngine
 from sovereign_utility_suite import SovereignUtilitySuite
 from ad_shield import SigmaAdShield
 from youtube_downloader import SigmaYouTubeSovereignFetcher
+from sovereign_clipboard import SigmaSovereignClipboard
 
 class SigmaForgeStore:
     def __init__(self, kernel):
@@ -22,6 +23,7 @@ class SigmaForgeStore:
         self.utils = SovereignUtilitySuite(kernel) if SovereignUtilitySuite else None
         self.shield = SigmaAdShield(kernel) if SigmaAdShield else None
         self.yt_fetcher = SigmaYouTubeSovereignFetcher(kernel) if SigmaYouTubeSovereignFetcher else None
+        self.clipboard = SigmaSovereignClipboard(kernel) if SigmaSovereignClipboard else None
         # Use USERPROFILE env var so it works on any Windows user account
         _config_dir = Path(os.environ.get("USERPROFILE", os.path.expanduser("~"))) / ".sigmaos" / "config"
         self._installed_apps_file = _config_dir / "installed_apps.json"
@@ -287,6 +289,13 @@ class SigmaForgeStore:
                 "size_mb": 55.0,
                 "description": "Local CloudConvert: DOC to PDF, MP4 to MKV, and more.",
                 "exec": "bus.emit('app.launch.universal_morpher')"
+            },
+            "mesh_clipboard": {
+                "name": "Sovereign Clipboard (Mesh-Sync)",
+                "category": "Productivity",
+                "size_mb": 1.2,
+                "description": "Universal Copy-Paste across your private mesh.",
+                "exec": "bus.emit('app.launch.clipboard')"
             }
         }
 
