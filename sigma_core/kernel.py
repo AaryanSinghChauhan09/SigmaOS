@@ -20,6 +20,7 @@ from .config import SigmaConfig
 from .event_bus import EventBus
 from .registry import ModuleRegistry
 from .ledger import SovereignLedger
+from .cache import SigmaCache
 
 # Late imports (avoid circular at package level)
 def _import_kernel_module(name):
@@ -43,6 +44,8 @@ class SigmaKernel:
         self._github_sync_active = True
         self._sync_lock = threading.Lock()
         self.ledger = SovereignLedger()
+        self.cache = SigmaCache(self)
+        self.registry.register("cache", self.cache)
         self._file_hashes = {}
         
         # --- Observability ---

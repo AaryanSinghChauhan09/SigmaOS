@@ -19,6 +19,8 @@ from agentic_claw import SigmaAgenticClaw
 from sovereign_scheduler import SigmaSovereignScheduler
 from sigma_gateway import SigmaGatewayAgent
 from dev_liaison import SigmaDevLiaison
+from sovereign_lab import SovereignLab
+from sovereign_legal_academy import SovereignLegalAcademy
 
 class SigmaForgeStore:
     def __init__(self, kernel):
@@ -32,6 +34,8 @@ class SigmaForgeStore:
         self.scheduler = SigmaSovereignScheduler(kernel) if SigmaSovereignScheduler else None
         self.gateway = SigmaGatewayAgent(kernel) if SigmaGatewayAgent else None
         self.liaison = SigmaDevLiaison(kernel) if SigmaDevLiaison else None
+        self.lab = SovereignLab(kernel) if SovereignLab else None
+        self.academy = SovereignLegalAcademy(kernel) if SovereignLegalAcademy else None
         # Use USERPROFILE env var so it works on any Windows user account
         _config_dir = Path(os.environ.get("USERPROFILE", os.path.expanduser("~"))) / ".sigmaos" / "config"
         self._installed_apps_file = _config_dir / "installed_apps.json"
@@ -332,6 +336,20 @@ class SigmaForgeStore:
                 "size_mb": 45.0,
                 "description": "Autonomous software engineer for OS maintenance.",
                 "exec": "bus.emit('app.launch.liaison')"
+            },
+            "sovereign_lab": {
+                "name": "Sovereign Lab (AI/CS/Cyber)",
+                "category": "Research",
+                "size_mb": 115.0,
+                "description": "Local AI RAG, Big-O Auditor, and Forensic Timeline.",
+                "exec": "bus.emit('app.launch.lab')"
+            },
+            "legal_academy": {
+                "name": "Sovereign Legal Academy",
+                "category": "Education",
+                "size_mb": 22.0,
+                "description": "Bharat Law roadmaps + Anki spaced-repetition.",
+                "exec": "bus.emit('app.launch.academy')"
             }
         }
 

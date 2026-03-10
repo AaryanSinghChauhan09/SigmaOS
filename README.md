@@ -6,45 +6,38 @@ SigmaOS is a high-performance, modular operating environment designed for absolu
 
 ## 🚀 Competitive USPs (Why SigmaOS?)
 
-| Feature | SigmaOS Sovereign | Competitors (Windows/macOS/Siri) |
+| Feature | SigmaOS Sovereign | Competitors |
 | :--- | :--- | :--- |
-| **Utility Suite** | **Sovereign Suite (30+ Tools).** Local Grammarly, Rufus, iLovePDF clones. | Fragmented. Web-based/Ad-heavy. |
-| **Data Privacy** | **Zero-Telemetry.** Local-only processing. | Cloud-first. Extensive data harvesting. |
-| **Voice Nexus** | **Auralis Core.** On-device intent mapping. | Siri/Alexa. Voice sent to servers. |
-| **App Parity** | **Universal App Layer (UAL).** Bridges Win32, Android, Linux. | Siloed. Restricted to hardware ecosystems. |
-| **Automation** | **OmniAutomator Pro.** Plan missions across apps. | Shortcuts. Static and limited to simple APIs. |
-| **File Sync** | **Merkle-Mesh.** Zero-trust P2P sync. | iCloud/OneDrive. Centralized & Slow. |
+| **Local Intelligence** | **Sovereign Lab.** Vector RAG, Big-O Auditor, Forensic Timeline. | OpenAI/Perplexity. Cloud-bound. |
+| **Legal & Academy** | **Bharat Law GPS.** BNS/BNSS procedural mapping + Spaced Repetition. | Fragmented web tools (Anki, Kanoon). |
+| **Productivity** | **Sovereign Scheduler.** AI Focus Protection & Adaptive Habits. | Reclaim.ai. Paid & Cloud-first. |
+| **Automation** | **Agentic Claw.** Self-healing missions across all apps. | MultiOn AI. High cost/latency. |
+| **Privacy** | **Ring-0 Shield.** Zero-telemetry browser + forensic scrubbing. | Brave/Windows. Partial privacy. |
 
-## 🛠️ Project Architecture
+## 🛠️ Key Components
 
-- **`sigma_core/`**: The Lean Kernel. Event-bus orchestrator and Merkle-Mesh engine.
-- **`userland/`**: System-API layers for Auralis (Voice), UAL (Apps), and OmniAutomator (Logic).
-- **`ecosystem/`**: The Forge Store. A collection of IP-safe, sovereign productive tools.
-- **`SOVEREIGN_DISTRO_IMG/`**: Ready-to-deploy system states.
+- **Sovereign Lab (AI/CS/Cyber)**:
+  - **Local RAG**: In-memory vector search for private research.
+  - **Big-O Profiler**: Automated algorithmic density analysis.
+  - **Digital Forensics**: Bit-stream event logs & evidence hashing for incident response.
+- **Sovereign Legal Academy**:
+  - **Bharat Law Index**: Interactive mapping for BNS, BNSS, and BSA procedural flows.
+  - **Cognitive Guard**: Anki-parity Spaced Repetition (SRL) to crush educational curves.
+- **OmniAutomator Pro**: Orchestrate complex missions like "Morning Briefing" or "Dev Audit."
+- **DevLiaison Agent**: An autonomous Devin-style agent that keeps your OS codebase healthy.
+
+## ⚡ Performance & Security
+
+- **Ultra-Low Latency**: Optimized by **SigmaCache**, reducing IO overhead significantly.
+- **Forensic Sanitization**: All updates are scrubbed by `sigma_scrubber.py` to ensure zero data leakage.
+- **Atomic Sync**: Integrated GitHub synchronization ensures you are always on the Apex Origin.
 
 ## 📦 Getting Started (Any Device)
 
-1. **Clone the Mesh**:
-
-   ```bash
-   git clone https://github.com/AaryanSinghChauhan09/SigmaOS.git
-   ```
-
-2. **One-Click Deploy (Hydrate)**:
-
-   - **Windows**: Right-click `setup.ps1` -> Run with PowerShell.
-   - **POSIX (Linux/Mac)**: `chmod +x setup.sh && ./setup.sh`
-
-3. **Boot into APEX**:
-
-   ```bash
-   py boot.py
-   ```
-
-## 🛡️ Security & Sovereignty
-
-SigmaOS includes a **Forensic Scrubber** (`sigma_scrubber.py`) that ensures zero leakage of private dev-keys or local paths. It is built for the public, by the sovereign.
+1. **Clone & Mesh**: `git clone https://github.com/AaryanSinghChauhan09/SigmaOS.git`
+2. **One-Click Setup**: Run `setup.ps1` (Windows) or `setup.sh` (POSIX).
+3. **Boot Apex**: `py boot.py`
 
 ---
-**SigmaOS is in sync with the Apex-Origin Ledger.**
-[✓] Verified Signed. [✓] Zero Telemetry. [✓] 100% Sovereign.
+**SigmaOS: Your Identity. Your Machine. Your Sovereignty.**
+[✓] Verified Signed. [✓] Zero Telemetry. [✓] 100% Agentic.

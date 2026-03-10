@@ -184,6 +184,18 @@ class SigmaOmniAutomator:
                 "category": "Development",
                 "actions": ["Scan_for_Lint_Bugs", "Fix_Dangling_Docstrings", "Run_Health_Verified"],
                 "description": "Autonomous developer agent audit. Scans and heals code autonomously."
+            },
+            "Research_Sprint": {
+                "name": "🧠 Sovereign Research Sprint",
+                "category": "Education",
+                "actions": ["Vector_Ingest_Current", "Anki_Due_Review", "BigO_Audit_Workspace"],
+                "description": "Combines Local RAG, Spaced Repetition, and CS Profiling for high-speed learning."
+            },
+            "Legal_Forensic_Map": {
+                "name": "⚖️ Forensic Legal Roadmap",
+                "category": "Compliance",
+                "actions": ["Map_BNSS_Procedure", "Record_Forensic_Evidence", "Verify_BSA_Admissibility"],
+                "description": "Maps current digital artifacts to Bharat legal procedures (BNSS/BSA)."
             }
         }
 
@@ -619,6 +631,16 @@ class SigmaOmniAutomator:
             msg = "LIAISON: Refactoring source code per sovereign standards."
         elif action == "Run_Health_Verified":
             msg = "LIAISON: Executing forensic health tests on modified shards."
+        elif action == "Vector_Ingest_Current":
+            msg = "LAB: Indexing current project into local Vector RAG store."
+        elif action == "Anki_Due_Review":
+            msg = "ACADEMY: Launching due knowledge shards for Spaced Repetition."
+        elif action == "BigO_Audit_Workspace":
+            msg = "LAB: Profiling computational complexity of active source tree (Big-O)."
+        elif action == "Map_BNSS_Procedure":
+            msg = "LAW: Generating procedural roadmap under BNSS Sec 173(3)."
+        elif action == "Record_Forensic_Evidence":
+            msg = "LAB: Hashing current digital state for legal admissibility."
         
         self._log_bus(msg)
         return msg
