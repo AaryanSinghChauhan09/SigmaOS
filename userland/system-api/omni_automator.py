@@ -125,6 +125,18 @@ class SigmaOmniAutomator:
                 "category": "Conversion",
                 "actions": ["OCR_Sync", "Transcript_Launch", "HTML_Finalize"],
                 "description": "Orchestrates complex multi-stage media conversions (OCR -> Transcribe -> HTML)."
+            },
+            "Workspace_Compaction": {
+                "name": "📦 High-Speed Compaction",
+                "category": "Maintenance",
+                "actions": ["Folder_to_Zip", "Mesh_Replication", "Scrub_Temp_Files"],
+                "description": "Archives current project and syncs the artifact to the mesh."
+            },
+            "Document_Export_Master": {
+                "name": "📄 Sovereign Doc Export",
+                "category": "Conversion",
+                "actions": ["MD_to_PDF_Morph", "Sovereign_Signing", "Push_to_Inbox"],
+                "description": "Converts project notes to signed PDFs and delivers to sovereign inbox."
             }
         }
 
@@ -514,6 +526,12 @@ class SigmaOmniAutomator:
             msg = "MORPH: Auralis Video-Transcription active."
         elif action == "HTML_Finalize":
             msg = "MORPH: Sigma-HTML output generated."
+        elif action == "Folder_to_Zip":
+            msg = "MAINTENANCE: Compacting current workspace into sovereign archive..."
+        elif action == "MD_to_PDF_Morph":
+            msg = "MORPH: Rendering forensic PDF from project documentation..."
+        elif action == "Sovereign_Signing":
+            msg = "SECURITY: Applying cryptographic signature to exported artifact..."
         
         self._log_bus(msg)
         return msg
