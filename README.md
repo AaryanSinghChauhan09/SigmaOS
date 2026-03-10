@@ -26,6 +26,15 @@ SigmaOS is a high-performance, modular operating environment designed for absolu
   - **Autonomous Firewall**: Local traffic shunting & anti-telemetry blackholing.
   - **Process-Level Isolation**: Per-app network shunting (No 3rd party drivers required).
   - **Zero-Trust Stream**: Real-time packet risk analysis and anonymity indexing.
+- **Intelligence Studio (Data Science)**:
+  - **Morphic Analytics**: Pure-Python predictive trend analysis (Zero NumPy).
+  - **Sovereign BI**: Local-first data visualization and pattern discovery.
+- **Gurukul Academy (Education)**:
+  - **Cognitive Guard**: Integrated Spaced Repetition (SRS) for accelerated learning.
+  - **Bharat Law GPS**: Procedural knowledge mapping for BNS/BNSS/DPDPA.
+- **Compliance Guard (Legal)**:
+  - **Regulatory Audit**: Autonomous verification of DPDPA/Indian IT Law compliance.
+  - **Forensic Transparency**: Real-time audit trails of system data sovereignty.
 
 ## 🏛️ Architectural Sovereignty (Zero-Dependency)
 

@@ -25,6 +25,9 @@ from .integrity import IntegrityGuard
 from .customizer import SovereignCustomizer
 from .vanguard import NetworkVanguard
 from .loader import SigmaModuleLoader
+from .intelligence_studio import IntelligenceStudio
+from .gurukul_engine import GurukulEngine
+from .compliance_guard import ComplianceGuard
 
 # Late imports (avoid circular at package level)
 def _import_kernel_module(name):
@@ -313,6 +316,11 @@ class SigmaKernel:
             ("sigma_games_engine",   "SigmaGamesEngine",          "games"),
             ("sigma_fs",             "SigmaFS",                   "sigma_fs"), # Legacy alias
             
+            # Sovereign APEX Extensions
+            ("sigma_core.intelligence_studio", "IntelligenceStudio",    "intelligence"),
+            ("sigma_core.gurukul_engine",      "GurukulEngine",         "gurukul"),
+            ("sigma_core.compliance_guard",    "ComplianceGuard",       "compliance"),
+
             # Extensions & Bridges
             ("linux_parity_engine",  "LinuxParityEngine",         "linux_parity"),
             ("universal_bridge",     "SigmaUniversalBridge",      "bridge"),

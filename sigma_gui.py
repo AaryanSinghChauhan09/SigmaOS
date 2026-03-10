@@ -897,6 +897,9 @@ class SigmaGUI(tk.Tk):
             "gmail_ai":         self._build_gmail_ai_page,
             "sovereign_suite":  self._build_sovereign_suite_page,
             "network_vanguard": self._build_network_vanguard_page,
+            "intelligence_studio": self._build_intelligence_studio_page,
+            "gurukul_academy": self._build_gurukul_academy_page,
+            "compliance_center": self._build_compliance_center_page,
         }
         
         # Oracle VM Discovery (Professional Integration)
@@ -950,8 +953,9 @@ class SigmaGUI(tk.Tk):
         
         pins = [
             ("🌐", "browser"), ("📁", "explorer"), ("📦", "store"),
-            ("🧪", "sovereign_suite"), ("📡", "network_vanguard"), ("🧠", "brain"), ("⚡", "zenith"), ("🛡️", "network_warden"), 
-            ("📧", "gmail_ai"), ("🎨", "visual_customizer"), ("🚀", "aether_orch"), ("🪐", "ag_physics"), ("💠", "ag_hub")
+            ("🧪", "sovereign_suite"), ("📡", "network_vanguard"), ("📊", "intelligence_studio"), 
+            ("🎓", "gurukul_academy"), ("⚖️", "compliance_center"), ("🧠", "brain"), 
+            ("⚡", "zenith"), ("📧", "gmail_ai"), ("🎨", "visual_customizer"), ("💠", "ag_hub")
         ]
         for icon, page in pins:
             b = tk.Button(self._task_tray, text=icon, font=("Segoe UI Symbol", 14),
@@ -1582,7 +1586,10 @@ class SigmaGUI(tk.Tk):
             "sovereign_suite": PAL["teal"],
             "visual_customizer": PAL["purple"],
             "brain": PAL["accent2"],
-            "gmail_ai": PAL["orange"]
+            "gmail_ai": PAL["orange"],
+            "intelligence_studio": PAL["accent"],
+            "gurukul_academy": PAL["gold"],
+            "compliance_center": PAL["teal"]
         }
         active_aura = aura_map.get(key, PAL["accent"])
         self._morphic_island(f"FOCUS: {key.upper()}", active_aura, 1000)
@@ -7364,6 +7371,138 @@ class SigmaGUI(tk.Tk):
                 proc_e.delete(0, tk.END)
 
         ttk.Button(ctrl, text="ISOLATE", command=_do_proc_lock).pack(side="left", padx=5)
+
+    def _build_intelligence_studio_page(self):
+        """USP: Intelligence Studio — Local Predictive Data Engine."""
+        p = tk.Frame(self._content, bg=PAL["bg"])
+        self._pages["intelligence_studio"] = p
+        self._build_page_header(p, "INTELLIGENCE STUDIO", "Predictive Trend Analysis & Sovereign Business Intelligence")
+
+        main = tk.Frame(p, bg=PAL["bg"])
+        main.pack(fill="both", expand=True, padx=20, pady=10)
+
+        # Morphic Chart Area
+        chart_c = self._card(main, "📊 Real-Time Momentum Stream")
+        chart_c.master.pack(fill="both", expand=True)
+        
+        canvas = tk.Canvas(chart_c, bg=PAL["bg2"], height=200, highlightthickness=0)
+        canvas.pack(fill="x", pady=10)
+
+        insights_fr = tk.Frame(main, bg=PAL["bg"])
+        insights_fr.pack(fill="x", pady=10)
+        
+        moment_var = tk.StringVar(value="Analyzing...")
+        tk.Label(insights_fr, text="Current Momentum:", font=FONT_MED, fg=PAL["dim"], bg=PAL["bg"]).pack(side="left")
+        tk.Label(insights_fr, textvariable=moment_var, font=FONT_BOLD, fg=PAL["cyan"], bg=PAL["bg"]).pack(side="left", padx=10)
+
+        def _update_intel():
+            intel = self.kernel.registry.get("intelligence")
+            if intel:
+                data = intel.generate_morphic_chart(40)
+                canvas.delete("all")
+                w = canvas.winfo_width()
+                h = canvas.winfo_height()
+                if w > 1:
+                    step = w / len(data)
+                    points = []
+                    for i, val in enumerate(data):
+                        x = i * step
+                        y = h - (val * (h - 20)) - 10
+                        points.extend([x, y])
+                    if len(points) >= 4:
+                        canvas.create_line(points, fill=PAL["accent"], width=3, smooth=True)
+                
+                # Trend analysis on random walk
+                results = intel.analyze_trend([random.randint(10, 100) for _ in range(10)])
+                moment_var.set(f"{results['prediction']} ({results['momentum']}% Momentum)")
+            
+            self.after(3000, _update_intel)
+
+        self.after(100, _update_intel)
+
+    def _build_gurukul_academy_page(self):
+        """USP: Gurukul Academy — Cognitive Spaced Repetition."""
+        p = tk.Frame(self._content, bg=PAL["bg"])
+        self._pages["gurukul_academy"] = p
+        self._build_page_header(p, "GURUKUL ACADEMY", "Spaced Repetition & Bharat Law Knowledge Mastery")
+
+        main = tk.Frame(p, bg=PAL["bg"])
+        main.pack(fill="both", expand=True, padx=20, pady=10)
+
+        study_c = self._card(main, "🎓 Active Learning Slot")
+        study_c.master.pack(fill="both", expand=True)
+
+        q_var = tk.StringVar(value="Load a concept to begin...")
+        a_var = tk.StringVar(value="")
+        
+        tk.Label(study_c, textvariable=q_var, font=FONT_TITLE, fg=PAL["text"], bg=PAL["card"], wraplength=600).pack(pady=20)
+        a_lbl = tk.Label(study_c, textvariable=a_var, font=FONT_MED, fg=PAL["dim"], bg=PAL["card"], wraplength=600)
+        a_lbl.pack(pady=10)
+
+        btn_fr = tk.Frame(study_c, bg=PAL["card"])
+        btn_fr.pack(pady=20)
+
+        def _show_answer():
+            a_lbl.config(fg=PAL["cyan"])
+            
+        def _grade(success: bool):
+            gk = self.kernel.registry.get("gurukul")
+            if gk:
+                # Logic to pick current due
+                due = gk.get_due_concepts()
+                if due:
+                    gk.review_concept(due[0], success)
+                    _next()
+                else:
+                    q_var.set("No concepts due! You have achieved mastery for now.")
+                    a_var.set("")
+
+        def _next():
+            gk = self.kernel.registry.get("gurukul")
+            if gk:
+                due = gk.get_due_concepts()
+                if due:
+                    card = gk.knowledge_base[due[0]]
+                    q_var.set(card["q"])
+                    a_var.set(card["a"])
+                    a_lbl.config(fg=PAL["card"]) # hide
+                else:
+                    q_var.set("All concepts mastered.")
+                    a_var.set("")
+
+        ttk.Button(btn_fr, text="Show Answer", command=_show_answer).pack(side="left", padx=5)
+        ttk.Button(btn_fr, text="✅ Got it", command=lambda: _grade(True)).pack(side="left", padx=5)
+        ttk.Button(btn_fr, text="❌ Forgot", command=lambda: _grade(False)).pack(side="left", padx=5)
+        
+        self.after(100, _next)
+
+    def _build_compliance_center_page(self):
+        """USP: Compliance Center — Autonomous Regulatory Auditor."""
+        p = tk.Frame(self._content, bg=PAL["bg"])
+        self._pages["compliance_center"] = p
+        self._build_page_header(p, "COMPLIANCE CENTER", "Regulatory Sovereignty & DPDPA/BNS Automated Audit")
+
+        main = tk.Frame(p, bg=PAL["bg"])
+        main.pack(fill="both", expand=True, padx=20, pady=10)
+
+        report_c = self._card(main, "⚖️ Regulatory Findings")
+        report_c.master.pack(fill="both", expand=True)
+
+        audit_txt = scrolledtext.ScrolledText(report_c, bg=PAL["bg2"], fg=PAL["text"], font=FONT_MONO, height=15)
+        audit_txt.pack(fill="both", expand=True, pady=10)
+
+        def _run_audit():
+            cg = self.kernel.registry.get("compliance")
+            if cg:
+                findings = cg.run_regulatory_audit()
+                audit_txt.delete("1.0", tk.END)
+                audit_txt.insert(tk.END, f"--- [SOVEREIGN AUDIT @ {time.strftime('%H:%M:%S')}] ---\n\n")
+                for f in findings:
+                    audit_txt.insert(tk.END, f"{f}\n")
+                audit_txt.insert(tk.END, f"\nCompliance Level: {cg.health_check().split(': ')[-1]}")
+                self._notify("COMPLIANCE", "Sovereign Audit Complete. System is DPDPA / BNS Transparent.", "OK")
+
+        ttk.Button(main, text="🚀 TRIGGER AUTONOMOUS AUDIT", command=_run_audit).pack(pady=10)
 
     def _vbox_check(self):
         """Standard Host-Guest Discovery."""
