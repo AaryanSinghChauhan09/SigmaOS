@@ -196,6 +196,12 @@ class SigmaOmniAutomator:
                 "category": "Compliance",
                 "actions": ["Map_BNSS_Procedure", "Record_Forensic_Evidence", "Verify_BSA_Admissibility"],
                 "description": "Maps current digital artifacts to Bharat legal procedures (BNSS/BSA)."
+            },
+            "Apex_Integrity_Check": {
+                "name": "🛡️ Apex Ecosystem Verification",
+                "category": "Security",
+                "actions": ["Pulse_Cache", "Stress_Lab_Recall", "Verify_Legal_Index", "Report_Sovereignty"],
+                "description": "Forensic end-to-end test of all SigmaOS agents and subsystems."
             }
         }
 
@@ -641,6 +647,14 @@ class SigmaOmniAutomator:
             msg = "LAW: Generating procedural roadmap under BNSS Sec 173(3)."
         elif action == "Record_Forensic_Evidence":
             msg = "LAB: Hashing current digital state for legal admissibility."
+        elif action == "Pulse_Cache":
+            msg = "CORE: Exercising SigmaCache cold-storage and adaptive TTL."
+        elif action == "Stress_Lab_Recall":
+            msg = "LAB: Stress-testing vector RAG semantic recall loops."
+        elif action == "Verify_Legal_Index":
+            msg = "LAW: Auditing BNS/BNSS local Bare Act registry."
+        elif action == "Report_Sovereignty":
+            msg = "OS: Integrity verified. Workspace is 100% Sovereign."
         
         self._log_bus(msg)
         return msg

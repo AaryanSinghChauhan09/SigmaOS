@@ -74,10 +74,35 @@ class SovereignLab:
 
     # --- Internals ---
     def _sim_embed(self, text: str) -> List[float]:
-        """Simulated embedding vector generation for local demos."""
-        # Genuine hash-based vectorization (non-fuzzy, but deterministic)
-        state = hashlib.md5(text.encode()).digest()
-        return [float(b)/255.0 for b in state[:8]]
+        """USP: Word-Frequency Embedding (Simulated). Non-fuzzy, multi-dimensional."""
+        # Simple heuristic: weight by word length and hash
+        words = text.lower().split()
+        vector = [0.0] * 12 # 12-dimensional space
+        if not words: return vector
+        
+        for i, word in enumerate(words):
+            h = int(hashlib.md5(word.encode()).hexdigest(), 16)
+            # Distribute information across the 12 dims
+            vector[i % 12] += (h % 100) / 100.0 * len(word)
+        
+        # Normalize
+        mag = math.sqrt(sum(v*v for v in vector))
+        return [v/mag for v in vector] if mag > 0 else vector
+
+    def deep_research_nexus(self, topic: str) -> Dict[str, Any]:
+        """USP: Correlation Engine. Links disparate vector shards based on theme."""
+        relevant = self.semantic_recall(topic, top_k=5)
+        keywords = set()
+        for r in relevant:
+            words = r["text"].lower().split()
+            keywords.update([w for w in words if len(w) > 5])
+            
+        return {
+            "Theme": topic,
+            "Foundations": [r["text"] for r in relevant],
+            "Correlation_Keys": list(keywords)[:5],
+            "Confidence": statistics.mean([r["score"] for r in relevant]) if relevant else 0
+        }
 
     def _cosine_sim(self, v1: List[float], v2: List[float]) -> float:
         dot = sum(a*b for a, b in zip(v1, v2))

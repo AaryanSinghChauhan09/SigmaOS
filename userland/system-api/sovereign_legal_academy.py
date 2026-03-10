@@ -14,7 +14,16 @@ class SovereignLegalAcademy:
     def __init__(self, kernel=None):
         self.kernel = kernel
         self.legal_index = {
-            "BNS": {"name": "Bharatiya Nyaya Sanhita", "sections": 531},
+            "BNS": {
+                "name": "Bharatiya Nyaya Sanhita", 
+                "sections": 531,
+                "key_sections": {
+                    "1": "Short title, commencement and application.",
+                    "103": "Punishment for murder.",
+                    "303": "Theft.",
+                    "311": "Robbery."
+                }
+            },
             "BNSS": {"name": "Bharatiya Nagarik Suraksha Sanhita", "sections": 358},
             "BSA": {"name": "Bharatiya Sakshya Adhiniyam", "sections": 170}
         }
@@ -38,7 +47,26 @@ class SovereignLegalAcademy:
             ]
         return ["Consult Legal Registry for custom BNS/BNSS roadmap."]
 
-    # --- [EDUCATION: Anki-style Study Guard] ---
+    def lookup_section(self, act: str, section: str) -> str:
+        """USP: Instant Bare Act. Returns the essence of a legal provision."""
+        act_data = self.legal_index.get(act.upper())
+        if not act_data: return "Law Shard not found in local index."
+        
+        info = act_data.get("key_sections", {}).get(str(section))
+        return f"{act} Sec {section}: {info}" if info else f"{act} Sec {section} details require UAL-DeepSync."
+
+    def generate_mock_quiz(self) -> List[Dict[str, str]]:
+        """USP: Exam Mastery. Generates questions from the local index."""
+        questions = []
+        for act, data in self.legal_index.items():
+            if "key_sections" in data:
+                sec, desc = random.choice(list(data["key_sections"].items()))
+                questions.append({
+                    "type": "Legal",
+                    "question": f"What does {act} Section {sec} cover?",
+                    "answer": desc
+                })
+        return questions
 
     def add_study_card(self, question: str, answer: str, category: str = "General"):
         """USP: Sovereign Anki. Distributed Spaced Repetition."""

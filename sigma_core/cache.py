@@ -7,6 +7,8 @@ Reduces IO latency by 40% and VFS read overhead by 60%.
 
 import time
 import hashlib
+import zlib
+import sys
 from typing import Any, Dict, Optional
 
 class SigmaCache:
@@ -16,7 +18,8 @@ class SigmaCache:
         self.stats = {
             "hits": 0,
             "misses": 0,
-            "evictions": 0
+            "evictions": 0,
+            "compression_savings_kb": 0.0
         }
         self.max_shards = 1000
 
@@ -27,7 +30,10 @@ class SigmaCache:
             record = self.store[h]
             if record["expiry"] > time.time():
                 self.stats["hits"] += 1
-                return record["data"]
+                data = record["data"]
+                if record.get("compressed"):
+                    data = zlib.decompress(data).decode('utf-8')
+                return data
             else:
                 del self.store[h]
                 self.stats["evictions"] += 1
@@ -40,10 +46,20 @@ class SigmaCache:
             self._prune_oldest()
             
         h = self._hash_key(key)
+        compressed = False
+        
+        # USP: Cold Storage Compression for blobs > 1KB
+        if isinstance(data, str) and len(data) > 1024:
+            orig_size = sys.getsizeof(data)
+            data = zlib.compress(data.encode('utf-8'))
+            compressed = True
+            self.stats["compression_savings_kb"] += (orig_size - sys.getsizeof(data)) / 1024.0
+
         self.store[h] = {
             "data": data,
             "expiry": time.time() + ttl,
-            "key_ref": key
+            "key_ref": key,
+            "compressed": compressed
         }
 
     def invalidate(self, pattern: str):
