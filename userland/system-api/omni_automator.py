@@ -119,6 +119,12 @@ class SigmaOmniAutomator:
                 "tuning": "Apex",
                 "actions": ["Hyper_Drive_Engage", "Zero_Latency_Flow", "Full_Kernel_Unlock"],
                 "description": "All governors set to Max Performance. No safety locks."
+            },
+            "Media_Morph": {
+                "name": "🎞️ Universal Media Morph",
+                "category": "Conversion",
+                "actions": ["OCR_Sync", "Transcript_Launch", "HTML_Finalize"],
+                "description": "Orchestrates complex multi-stage media conversions (OCR -> Transcribe -> HTML)."
             }
         }
 
@@ -497,11 +503,17 @@ class SigmaOmniAutomator:
             msg = "MESH: Merkle Integrity [OK]."
         elif action == "Scrub_Personal_Paths":
             # Call the scrubber if available (simulated or imported)
-            msg = "SCRUB: Sanitizing C:/Users/Aaryan paths..."
+            msg = "SCRUB: Sanitizing SIGMA_VIRTUAL_ROOT paths..."
         elif action == "Fetch_Latest_Statutes":
             msg = "LAW: Syncing with eCourts & IndianKanoon endpoints..."
         elif action == "Verify_Limitation":
             msg = "LAW: Limitation period verified for pending writ petitions."
+        elif action == "OCR_Sync":
+            msg = "MORPH: Image-to-Text engine synchronized."
+        elif action == "Transcript_Launch":
+            msg = "MORPH: Auralis Video-Transcription active."
+        elif action == "HTML_Finalize":
+            msg = "MORPH: Sigma-HTML output generated."
         
         self._log_bus(msg)
         return msg

@@ -10,10 +10,12 @@ import json
 import os
 from pathlib import Path
 from typing import Dict, List, Any
+from conversion_engine import SigmaConversionEngine
 
 class SigmaForgeStore:
     def __init__(self, kernel):
         self.kernel = kernel
+        self.conversion = SigmaConversionEngine(kernel) if SigmaConversionEngine else None
         # Use USERPROFILE env var so it works on any Windows user account
         _config_dir = Path(os.environ.get("USERPROFILE", os.path.expanduser("~"))) / ".sigmaos" / "config"
         self._installed_apps_file = _config_dir / "installed_apps.json"
@@ -202,6 +204,27 @@ class SigmaForgeStore:
                 "size_mb": 1.9,
                 "description": "Offline-only, encrypted password manager.",
                 "exec": "bus.emit('app.launch.pass_vault')"
+            },
+            "image_to_text": {
+                "name": "Sovereign OCR (Image to Text)",
+                "category": "Conversion",
+                "size_mb": 5.2,
+                "description": "Extract text from hand-drawn or digital documents locally.",
+                "exec": "bus.emit('app.launch.ocr_tool')"
+            },
+            "text_to_html": {
+                "name": "Sovereign Morph (Text to HTML)",
+                "category": "Conversion",
+                "size_mb": 0.8,
+                "description": "Convert markdown/txt to premium glassmorphic HTML.",
+                "exec": "bus.emit('app.launch.html_morph')"
+            },
+            "video_transcript": {
+                "name": "Sovereign Transcript (Video to Text)",
+                "category": "Conversion",
+                "size_mb": 25.0,
+                "description": "Generate on-device transcripts from video files.",
+                "exec": "bus.emit('app.launch.transcribe')"
             }
         }
 

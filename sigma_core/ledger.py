@@ -21,7 +21,7 @@ class SovereignLedger:
             # Recover last hash from the end of file
             try:
                 with open(self.path, "r") as f:
-                    lines = f.readlines()
+                    lines = [line.strip() for line in f.readlines() if line.strip()]
                     if lines:
                         last_entry = json.loads(lines[-1])
                         self._last_hash = last_entry["this_hash"]
