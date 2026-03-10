@@ -16,9 +16,12 @@ import sys
 try:
     from mesh_sync import SigmaMeshSyncAgent
     from gmail_ai_bridge import GmailAIBridge
+    from agentic_claw import SigmaAgenticClaw, ActionNode
 except ImportError:
     SigmaMeshSyncAgent = None
     GmailAIBridge = None
+    SigmaAgenticClaw = None
+    ActionNode = None
 
 @dataclass
 class MissionNode:
@@ -38,12 +41,14 @@ class SigmaOmniAutomator:
         self.kernel = kernel
         self.mesh = SigmaMeshSyncAgent(kernel) if SigmaMeshSyncAgent else None
         self.gmail = GmailAIBridge(kernel) if GmailAIBridge else None
+        self.claw = SigmaAgenticClaw(kernel) if SigmaAgenticClaw else None
         self.active_missions: Dict[str, List[MissionNode]] = {}
         self.stats = {
             "workflows_executed": 0,
             "actions_automated": 0,
             "proactive_interventions": 0,
-            "time_saved_min": 0
+            "time_saved_min": 0,
+            "claw_missions": 0
         }
         
         # --- APEX Standard Library: Universal Modes & Routines ---
@@ -155,6 +160,12 @@ class SigmaOmniAutomator:
                 "category": "Media",
                 "actions": ["YouTube_Sovereign_Harvest", "Multi_Format_Morph", "Sovereign_Metadata_Strip"],
                 "description": "Orchestrates deep video extraction and universal format casting."
+            },
+            "Claw_Heartbeat": {
+                "name": "🦞 Agentic Claw Heartbeat",
+                "category": "Maintenance Pro",
+                "actions": ["Start_Claw_Mission", "Heartbeat_Heal", "Scrub_Anomalies"],
+                "description": "Claw-style proactive maintenance. Identifies friction and heals it deterministically."
             }
         }
 
@@ -570,6 +581,12 @@ class SigmaOmniAutomator:
             msg = "MEDIA: Performing universal format symmetry (CloudConvert-Parity)."
         elif action == "Sovereign_Metadata_Strip":
             msg = "SECURITY: Forensically stripping PII metadata from media assets."
+        elif action == "Start_Claw_Mission":
+            msg = "CLAW: Launching deterministic mission node sequence..."
+        elif action == "Heartbeat_Heal":
+            msg = "CLAW: Executing proactive heartbeat self-healing pulse."
+        elif action == "Scrub_Anomalies":
+            msg = "CLAW: Neutralizing system-level friction points."
         
         self._log_bus(msg)
         return msg
@@ -796,6 +813,9 @@ class SigmaOmniAutomator:
         if load > 80:
             intervention["actions"].append("Shift_to_Apex_Mode")
             intervention["actions"].append("Cryo_Freeze_Back_Tasks")
+            if self.claw:
+                 intervention["actions"].append("Start_Claw_Mission")
+                 
         if mood == "Stressed":
             intervention["actions"].append("Enable_Zen_Aesthetics")
             intervention["actions"].append("Silence_All_Except_VIP")
@@ -831,3 +851,16 @@ if __name__ == "__main__":
     auto = SigmaOmniAutomator()
     print(auto.launch_mission("Strategic Backup of VFS"))
     print(auto.health_check())
+    def execute_claw_mission(self, name: str, node_list: list):
+        """USP: Claw-Style Determinism. Direct hook for high-stakes agentic work."""
+        if self.claw and ActionNode:
+            nodes = [ActionNode(action=n["action"], params=n.get("params", {})) for n in node_list]
+            res = self.claw.execute_mission(name, nodes)
+            self.stats["claw_missions"] += 1
+            return res
+        return "Claw Engine Offline."
+
+if __name__ == "__main__":
+    automator = SigmaOmniAutomator()
+    print(automator.launch_preset("Claw_Heartbeat"))
+    print(automator.get_proactive_suggestion())
