@@ -20,6 +20,7 @@ SigmaOS is a high-performance, modular operating environment designed for absolu
   - **Local RAG**: In-memory vector search for private research.
   - **Big-O Profiler**: Automated algorithmic density analysis.
   - **Digital Forensics**: Bit-stream event logs & evidence hashing for incident response.
+  - **Integrity Guard**: Bit-level cryptographic verification of system shards.
 - **Sovereign Legal Academy**:
   - **Bharat Law Index**: Interactive mapping for BNS, BNSS, and BSA procedural flows.
   - **Cognitive Guard**: Anki-parity Spaced Repetition (SRL) to crush educational curves.

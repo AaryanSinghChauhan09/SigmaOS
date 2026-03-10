@@ -66,15 +66,26 @@ def run_apex_test_suite():
         print("      BNS/BNSS Roadmap: FAILED.")
 
     # 5. Gateway Interaction
-    print("[5/5] Pinging SigmaGateway...")
+    print("[5/6] Pinging SigmaGateway...")
     gateway = SigmaGatewayAgent(kernel)
-    # Mocking registry for the brief
     gateway.registry = {"shield": None, "scheduler": None}
     brief = gateway.generate_proactive_briefing()
     if "MORNING BRIEF" in brief:
         print("      Morning Briefing: SUCCESS.")
     else:
         print("      Morning Briefing: FAILED.")
+
+    # 6. Integrity Verification
+    print("[6/6] Auditing Integrity Guard...")
+    from sigma_core.integrity import IntegrityGuard
+    guard = IntegrityGuard(kernel)
+    # Use a small test directory for speed
+    guard.generate_baseline(["sigma_core"])
+    report = guard.verify_system_integrity()
+    if report["status"] == "PURE":
+        print(f"      Integrity Guard: SUCCESS ({report['shards']} shards verified).")
+    else:
+        print(f"      Integrity Guard: FAILED.")
 
     print("\n--- [HEALTH RESULT: 100% SOVEREIGN] ---")
 

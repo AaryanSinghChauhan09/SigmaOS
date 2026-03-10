@@ -21,6 +21,7 @@ from .event_bus import EventBus
 from .registry import ModuleRegistry
 from .ledger import SovereignLedger
 from .cache import SigmaCache
+from .integrity import IntegrityGuard
 
 # Late imports (avoid circular at package level)
 def _import_kernel_module(name):
@@ -45,7 +46,9 @@ class SigmaKernel:
         self._sync_lock = threading.Lock()
         self.ledger = SovereignLedger()
         self.cache = SigmaCache(self)
+        self.integrity = IntegrityGuard(self)
         self.registry.register("cache", self.cache)
+        self.registry.register("integrity", self.integrity)
         self._file_hashes = {}
         
         # --- Observability ---
@@ -149,13 +152,29 @@ class SigmaKernel:
                                 "error_rate":  random.gauss(0.05, 0.02),
                             })
                 
-                # 7. Mesh Discovery Pulse (Zero-Conf Parity)
+                # 7. Integrity Audit (every 10 ticks)
+                if _tick_count % 10 == 0:
+                    report = self.integrity.verify_system_integrity()
+                    if report["status"] == "TAMPERED":
+                        self.bus.emit("security.violation", {"details": report})
+                        print(f"[KERNEL] ALERT: System Tamper Detected! {len(report['violations'])} violations.")
+
+                # 8. Agentic Layer Heartbeat (Claw & Scheduler)
+                claw = self.registry.get("claw")
+                if claw and hasattr(claw, "proactive_anomaly_scan"):
+                    claw.proactive_anomaly_scan()
+                
+                sched = self.registry.get("scheduler")
+                if sched and hasattr(sched, "_recompute_schedule"):
+                    sched._recompute_schedule()
+
+                # 9. Mesh Discovery Pulse (Zero-Conf Parity)
                 if self.registry.get("mesh"):
                     self.bus.emit("mesh.discovery.pulse", {"node": "SIGMA-APEX-1"})
 
             except Exception as e:
-                print(f"[KERNEL] Sentinel recovered from pulse error: {e}")
-                pass
+                print(f"[KERNEL] Sentinel Failure on tick {_tick_count}: {e}")
+                self.bus.emit("kernel.error", {"tick": _tick_count, "err": str(e)})
 
     def _start_github_sentinel(self):
         """USP: Real-Time Workspace Synchronization (Automated IDE-GitHub Sync)."""

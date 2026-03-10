@@ -17,6 +17,7 @@ class SigmaGatewayAgent:
         self.kernel = kernel
         self.bus = getattr(kernel, 'bus', None)
         self.registry = getattr(kernel, 'registry', {})
+        self.context_memory = [] # USP: Local Conversational Buffer
         self._stats = {
             "messages_bridged": 0,
             "proactive_briefs_sent": 0,
@@ -38,8 +39,7 @@ class SigmaGatewayAgent:
             self.bus.emit("chat.outgoing", {"user": user, "message": response})
 
     def handle_incoming_chat(self, platform: str, user: str, message: str) -> str:
-        """USP: Sovereign Messaging Bridge with Ring-0 Authorization."""
-        # Check Identity Vault (USP: Absolute Security)
+        """USP: Sovereign Messaging Bridge with Contextual Memory."""
         if self.kernel and hasattr(self.kernel, 'identity'):
             if not self.kernel.identity.verify_user_access(user, "GATEWAY_ACCESS"):
                 return "ACCESS_DENIED: Identity scrub battle initiated."
@@ -47,14 +47,21 @@ class SigmaGatewayAgent:
         self._stats["messages_bridged"] += 1
         low_msg = message.lower()
         
+        # 1. Memory Update (Last 5)
+        self.context_memory.append(f"U: {message}")
+        if len(self.context_memory) > 5: self.context_memory.pop(0)
+
         if "brief" in low_msg: return self.generate_proactive_briefing()
         if "status" in low_msg: return self._kernel_status_report()
+        if "clear" in low_msg and "memory" in low_msg:
+            self.context_memory.clear()
+            return "Gateway: Local context buffer purged."
+            
         if "fix" in low_msg:
-             # Deep hook into OmniAutomator
              automator = self.registry.get("automator")
              if automator: return automator.launch_preset("Claw_Heartbeat")
              
-        return f"ACK: Sigma-Core received '{message}'. Routing to Agentic Backplane..."
+        return f"ACK: Sigma-Core received '{message}'. (Context Buffer: {len(self.context_memory)} messages)."
 
     def generate_proactive_briefing(self) -> str:
         """USP: Proactive Briefing pulling REAL data from the Kernel Registry."""
