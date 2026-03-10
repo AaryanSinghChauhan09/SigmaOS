@@ -24,6 +24,7 @@ from .cache import SigmaCache
 from .integrity import IntegrityGuard
 from .customizer import SovereignCustomizer
 from .vanguard import NetworkVanguard
+from .loader import SigmaModuleLoader
 
 # Late imports (avoid circular at package level)
 def _import_kernel_module(name):
@@ -46,6 +47,7 @@ class SigmaKernel:
         self._sentinel_running = False
         self._github_sync_active = True
         self._sync_lock = threading.Lock()
+        self.loader = SigmaModuleLoader(self)
         self.ledger = SovereignLedger()
         self.cache = SigmaCache(self)
         self.integrity = IntegrityGuard(self)
@@ -233,7 +235,7 @@ class SigmaKernel:
     # ─── Module Loading ───────────────────────────────────────────────────────
 
     def _load_core_modules(self):
-        """Import and register all built-in kernel & ecosystem modules."""
+        """Import and register all built-in kernel & ecosystem modules using SOLID Loader."""
         _km = [
             # Core System & Security
             ("security_warden",      "SecurityWarden",            "security"),
@@ -351,38 +353,45 @@ class SigmaKernel:
             ("sigma_data_pro",       "SigmaDataProfessional",     "data_pro"),
         ]
 
-        # Hydrate Kernel Modules
+        # Hydrate Kernel Modules (SOLID Hybrid)
         for mod_file, cls_name, reg_key in _km:
             if not self._verify_module_signature(mod_file, cls_name):
                 print(f"[TRUST] REJECT: {reg_key} failed signature check.")
                 continue
-            try:
-                mod = _import_kernel_module(mod_file)
-                cls = getattr(mod, cls_name)
-                # Specialized initializers
-                if reg_key == "customizer":
-                    inst = cls(str(self.cfg.WORKSPACE_DIR))
-                elif reg_key in ("aether", "auralis", "ai_lifecycle", "ag_physics", "ag_ent", "sandbox", "warden", "hw_warden", "aura", "netguard", "repair_engine", "crash_reporter", "kad", "intel", "pbs", "crusher", "memory", "process", "fs", "shadow", "watchdog", "mesh", "layout", "fabric", "aura_mesh", "automator", "forge", "modes", "spotlight", "snap_grid", "time_vault", "ssl", "controls", "continuity", "privacy_shield", "context", "core_boost", "projector", "relay", "vision", "sentinel", "vault_plus", "neural_shell", "translator_plus", "commerce", "brain", "pulse", "semantic_bus", "loop", "entropy", "vanguard", "frontier", "orchestrator", "prewarmer", "auditor", "qa_auditor", "update_manager", "energy_hub", "locale_manager", "scalability_hub", "stress_silo", "silo_manager", "media", "omni_work", "omni_stud", "ds_studio", "app_matrix", "browser", "mesh_drive", "virtualizer", "suggest", "projects", "familiarity", "hyper_drive", "caat", "dev_forge", "agentic", "explorer", "translator", "identity", "aether", "defender", "app_store", "games", "linux_parity", "perf", "compression", "mesh_compute", "cog_fabric", "routines", "bridge_core", "zenith_intel", "browser_pro", "scrubber", "firewall", "automation_service"):
-                    inst = cls(self)
-                else:
-                    inst = cls()
-                self.registry.register(reg_key, inst, {"source": "kernel", "class": cls_name})
-            except Exception as exc:
-                print(f"[ERROR] Failed to load kernel module {reg_key}: {exc}")
+            
+            # Use SOLID Loader for modern Apex modules
+            inst = self.loader.load_module(mod_file, cls_name, reg_key)
+            if not inst:
+                # Fallback for legacy initialization logic
+                try:
+                    mod = _import_kernel_module(mod_file)
+                    cls = getattr(mod, cls_name)
+                    if reg_key == "customizer":
+                        inst = cls(str(self.cfg.WORKSPACE_DIR))
+                    elif reg_key in ("aether", "auralis", "ai_lifecycle", "ag_physics", "ag_ent", "sandbox", "warden", "hw_warden", "aura", "netguard", "repair_engine", "crash_reporter", "kad", "intel", "pbs", "crusher", "memory", "process", "fs", "shadow", "watchdog", "mesh", "layout", "fabric", "aura_mesh", "automator", "forge", "modes", "spotlight", "snap_grid", "time_vault", "ssl", "controls", "continuity", "privacy_shield", "context", "core_boost", "projector", "relay", "vision", "sentinel", "vault_plus", "neural_shell", "translator_plus", "commerce", "brain", "pulse", "semantic_bus", "loop", "entropy", "vanguard", "frontier", "orchestrator", "prewarmer", "auditor", "qa_auditor", "update_manager", "energy_hub", "locale_manager", "scalability_hub", "stress_silo", "silo_manager", "media", "omni_work", "omni_stud", "ds_studio", "app_matrix", "browser", "mesh_drive", "virtualizer", "suggest", "projects", "familiarity", "hyper_drive", "caat", "dev_forge", "agentic", "explorer", "translator", "identity", "aether", "defender", "app_store", "games", "linux_parity", "perf", "compression", "mesh_compute", "cog_fabric", "routines", "bridge_core", "zenith_intel", "browser_pro", "scrubber", "firewall", "automation_service"):
+                        inst = cls(self)
+                    else:
+                        inst = cls()
+                    self.registry.register(reg_key, inst, {"source": "kernel", "class": cls_name})
+                except Exception as exc:
+                    print(f"[ERROR] Failed to load kernel module {reg_key}: {exc}")
 
-        # Hydrate Ecosystem Modules
+        # Hydrate Ecosystem Modules (SOLID Hybrid)
         for mod_file, cls_name, reg_key in _em:
             if not self._verify_module_signature(mod_file, cls_name): continue
-            try:
-                mod = _import_kernel_module(mod_file)
-                cls = getattr(mod, cls_name)
-                if reg_key in ("aether_orch", "converter", "aether", "nexus", "pdf_forge", "titan_capture", "social", "visual", "lab", "ai_lab", "studio", "manual", "linux_bridge", "univ_bridge", "remote", "voice", "assistant", "erp", "law", "buyhatke", "writesense", "flow_ai", "automation", "trust_validator"):
-                    inst = cls(self)
-                else:
-                    inst = cls()
-                self.registry.register(reg_key, inst, {"source": "ecosystem", "class": cls_name})
-            except Exception as exc:
-                pass
+            
+            inst = self.loader.load_module(mod_file, cls_name, reg_key)
+            if not inst:
+                try:
+                    mod = _import_kernel_module(mod_file)
+                    cls = getattr(mod, cls_name)
+                    if reg_key in ("aether_orch", "converter", "aether", "nexus", "pdf_forge", "titan_capture", "social", "visual", "lab", "ai_lab", "studio", "manual", "linux_bridge", "univ_bridge", "remote", "voice", "assistant", "erp", "law", "buyhatke", "writesense", "flow_ai", "automation", "trust_validator"):
+                        inst = cls(self)
+                    else:
+                        inst = cls()
+                    self.registry.register(reg_key, inst, {"source": "ecosystem", "class": cls_name})
+                except Exception as exc:
+                    pass
 
     def _verify_module_signature(self, name: str, cls_name: str) -> bool:
         """USP: Zero-Trust verification of kernel modules before hydration."""

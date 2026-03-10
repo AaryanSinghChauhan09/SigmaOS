@@ -10,10 +10,11 @@ import hashlib
 import zlib
 import sys
 from typing import Any, Dict, Optional
+from .interfaces import SigmaModuleBase
 
-class SigmaCache:
+class SigmaCache(SigmaModuleBase):
     def __init__(self, kernel=None):
-        self.kernel = kernel
+        super().__init__(kernel)
         self.store: Dict[str, Dict[str, Any]] = {}
         self.stats = {
             "hits": 0,

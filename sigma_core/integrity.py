@@ -9,10 +9,11 @@ import hashlib
 import os
 import json
 from typing import Dict, List, Any
+from .interfaces import SigmaModuleBase
 
-class IntegrityGuard:
+class IntegrityGuard(SigmaModuleBase):
     def __init__(self, kernel=None):
-        self.kernel = kernel
+        super().__init__(kernel)
         self.manifest_path = os.path.join(os.path.dirname(__file__), "integrity_manifest.json")
         self.vault_path = os.path.join(os.path.dirname(__file__), "..", "evidence_vault")
         if not os.path.exists(self.vault_path):

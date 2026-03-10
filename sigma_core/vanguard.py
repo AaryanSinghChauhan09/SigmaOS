@@ -9,11 +9,11 @@ import socket
 import threading
 import time
 import random
-from typing import Dict, List, Any
+from .interfaces import SigmaModuleBase, ISigmaService
 
-class NetworkVanguard:
+class NetworkVanguard(SigmaModuleBase, ISigmaService):
     def __init__(self, kernel=None):
-        self.kernel = kernel
+        super().__init__(kernel)
         self.active_blocks = set()
         self.traffic_log = []
         self._running = False
@@ -31,13 +31,18 @@ class NetworkVanguard:
             "doubleclick.net"
         }
 
-    def start_monitoring(self):
-        """Standard Network Sentinel Protocol."""
+    def start_service(self):
+        """Satisfies ISigmaService: Standard Network Sentinel Protocol."""
         if not self._running:
             self._running = True
             t = threading.Thread(target=self._monitor_loop, daemon=True)
             t.start()
+            self.log_event("service_start", {"msg": "Sentinel Online"})
             return "Vanguard: Network Sentinel Active."
+
+    def stop_service(self):
+        self._running = False
+        self.log_event("service_stop", {"msg": "Sentinel Offline"})
 
     def _monitor_loop(self):
         """Simulates local traffic interception and pattern analysis."""

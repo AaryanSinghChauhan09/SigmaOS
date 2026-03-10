@@ -7,15 +7,16 @@ Handles system-wide themes, soundscapes, and visual DNA.
 
 import os
 import json
+from .interfaces import SigmaModuleBase
 
-class SovereignCustomizer:
+class SovereignCustomizer(SigmaModuleBase):
     """
     Sovereign Customizer manages the 'Vibe' and 'Aura' of SigmaOS.
     It provides high-fidelity aesthetic presets and morphological controls.
     """
 
     def __init__(self, kernel):
-        self.kernel = kernel
+        super().__init__(kernel)
         self.active_vibe = "Minimalist"
         self.glass_opacity = 0.85
         self.blur_strength = 10
