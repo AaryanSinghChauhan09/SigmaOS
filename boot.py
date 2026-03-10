@@ -4,6 +4,12 @@ from sigma_core.kernel import SigmaKernel
 from sigma_gui import SigmaGUI
 
 def main():
+    # --- Environment Hydration Check ---
+    if not os.path.exists("ecosystem/registry.json"):
+        print("[!] Environment not hydrated. Running Sovereign Setup...")
+        import subprocess
+        subprocess.run([sys.executable, "sigma_setup.py"])
+    
     print("Initializing SigmaOS Kernel...")
     kernel = SigmaKernel()
     

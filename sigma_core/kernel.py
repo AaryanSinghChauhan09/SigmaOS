@@ -207,13 +207,13 @@ class SigmaKernel:
             ("boot_selector",        "SigmaBootSelector",         "boot_selector"),
             ("modular_engine",       "SigmaModularEngine",        "modular_engine"),
             ("driver_layer",         "SigmaDriverLayer",          "driver_layer"),
-            ("hal",                  "SigmaHAL",                  "hal"),
+            ("sigma_core.hal",        "SigmaHAL",                  "hal"),
             ("bootloader",           "SigmaBootloader",           "bootloader"),
             ("package_manager",      "SigmaPackageManager",       "package_manager"),
             
             # Subsystems
             ("sigma_fs",             "SigmaFS",                   "fs"),
-            ("memory_manager",       "SigmaMemoryManager",        "memory"),
+            ("sigma_core.memory_manager","SigmaMemoryManager",        "memory"),
             ("process_manager",      "SigmaProcessManager",       "process"),
             ("network_stack",        "SigmaNetworkStack",         "net_stack"),
             ("unified_api",          "SigmaUnifiedAPI",           "unified_api"),
@@ -414,6 +414,12 @@ class SigmaKernel:
     def modes(self):              return self.registry.get("modes")
     @property
     def projects(self):           return self.registry.get("projects")
+    @property
+    def hal(self):                return self.registry.get("hal")
+    @property
+    def memory(self):             return self.registry.get("memory")
+    @property
+    def pkg(self):                return self.registry.get("package_manager")
     @property
     def math(self):               return self.registry.get("calculator")
     @property
