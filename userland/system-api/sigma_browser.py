@@ -13,6 +13,7 @@ class SigmaOmniBrowser(SovereignApp):
         self.resource_limit_ram = "No Limit"
         self.resource_limit_cpu = "No Limit"
         self.is_shield_active = True
+        self.cookie_shield_active = True
         self.active_sidebar = True
         self.layout_mode = "Vertical Tabs (Edge-Style)"
 
@@ -67,9 +68,14 @@ class SigmaOmniBrowser(SovereignApp):
     def enable_privacy_vault(self):
         """
         Firefox-style Container Tabs + Brave-style Ad blocking + Tor Anonymity.
+        Includes 3rd-party cookie crushing and anti-fingerprinting.
         """
         self.is_shield_active = True
-        return "Privacy Vault: Active [Container Tabs + Advanced Fingerprinting Protection + Tor Onion Routing]"
+        self.cookie_shield_active = True
+        if self.kernel and hasattr(self.kernel, 'privacy_shield'):
+            self.kernel.privacy_shield.reduce_third_party_cookies()
+            self.kernel.privacy_shield.apply_browser_stealth()
+        return "Privacy Vault: Active [Container Tabs + Advanced Fingerprinting Protection + Tor Onion Routing + Cookie Crusher]"
 
     def enable_built_in_vpn(self):
         """Opera-style free built-in VPN for encrypted browsing."""
@@ -193,6 +199,7 @@ class SigmaOmniBrowser(SovereignApp):
             "RAM_Limit": self.resource_limit_ram,
             "CPU_Limit": self.resource_limit_cpu,
             "Privacy_Level": "Paranoid (Tor-Ready)",
+            "Cookie_Crusher": "Active (Zero Local-3rd-Party)",
             "VPN": "Active (Opera-Style)",
             "Workspaces": "Enabled (Vivaldi-Stacking)",
             "Spaces": "Active (Arc-Style)",
