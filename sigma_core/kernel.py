@@ -55,11 +55,11 @@ class SigmaKernel:
         self.cache = SigmaCache(self)
         self.integrity = IntegrityGuard(self)
         self.customizer = SovereignCustomizer(self)
-        self.vanguard = NetworkVanguard(self)
+        self.vanguard_engine = NetworkVanguard(self)
         self.registry.register("cache", self.cache)
         self.registry.register("integrity", self.integrity)
         self.registry.register("customizer", self.customizer)
-        self.registry.register("vanguard", self.vanguard)
+        self.registry.register("vanguard", self.vanguard_engine)
         self._file_hashes = {}
         
         # --- Observability ---
