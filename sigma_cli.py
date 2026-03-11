@@ -372,6 +372,22 @@ def interactive_shell(kernel: SigmaKernel):
         elif cmd == "help":
             print(REPL_HELP)
 
+        elif cmd == "ghostchat":
+            if len(parts) < 2:
+                print("Usage: ghostchat send <text> | ghostchat status")
+                continue
+            sub = parts[1]
+            gc = kernel.registry.get("ghostchat")
+            if gc is None:
+                err("GhostChat module not loaded.")
+                continue
+            if sub == "send":
+                txt = " ".join(parts[2:])
+                res = gc.send_message(txt)
+                print(f"[GHOST] {res}")
+            elif sub == "status":
+                print(gc.health_check())
+        
         elif cmd == "boot":
             class _A: pass
             cmd_boot(kernel, _A())

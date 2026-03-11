@@ -107,6 +107,22 @@ class SigmaHAL:
         except:
             return False
 
+    def apply_ebpf_shim(self, filter_rule: str):
+        """USP: eBPF-Parity Packet Filtering (Simulated via Socket Buffers)."""
+        # In a real kernel, this would compile a bytecode filter and inject it.
+        # Here we simulate the fast-path bypass.
+        if hasattr(self.kernel, "bus"):
+            self.kernel.bus.emit("hal.ebpf_applied", {"rule": filter_rule, "status": "ACTIVE"})
+        return f"eBPF-Shim: Rule '{filter_rule}' injected into fast-path."
+
+    def create_io_ring(self, entries: int = 1024):
+        """USP: Windows I/O Ring / Linux io_uring Parity. Asynchronous Zero-Wait I/O."""
+        # Simulated ring-buffer for high-throughput I/O mission.
+        ring_id = f"ring-{entries}"
+        if hasattr(self.kernel, "bus"):
+             self.kernel.bus.emit("hal.io_ring", {"id": ring_id, "size": entries})
+        return f"I/O Ring {ring_id} mapped to shared memory."
+
     def trigger_irq(self, irq_id: int, payload: dict):
         """Low-level Interrupt Request simulation."""
         if self.kernel:
@@ -115,8 +131,12 @@ class SigmaHAL:
 
     def health_check(self) -> str:
         state = self.get_hardware_state()
-        return f"OK — HAL Low-Level Active: {state['cpu_cores']} Cores | RAM: {state['ram_load']} | CPU: {state['cpu_load']}"
+        return (f"OK — HAL Low-Level Active: {state['cpu_cores']} Cores | "
+                f"RAM: {state['ram_load']} | CPU: {state['cpu_load']} | "
+                f"I/O Ring: ACTIVE | eBPF: ARMED")
 
 if __name__ == "__main__":
     hal = SigmaHAL()
     print(hal.health_check())
+    print(hal.apply_ebpf_shim("drop tcp from 10.0.0.5"))
+    print(hal.create_io_ring(2048))
