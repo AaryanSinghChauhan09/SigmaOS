@@ -36,10 +36,13 @@ class SigmaHAL(SigmaModuleBase):
         SigmaModuleBase.__init__(self, kernel)
         self.host_os = platform.system()
         self.cpu_count = os.cpu_count() or 4
-        self._kernel32 = None
         if self.host_os == "Windows":
             try:
                 self._kernel32 = ctypes.windll.kernel32
+                # Pre-map functions for Speed
+                self._set_affinity = self._kernel32.SetProcessAffinityMask
+                self._virt_lock = self._kernel32.VirtualLock
+                self._virt_unlock = self._kernel32.VirtualUnlock
             except:
                 pass
         
@@ -116,6 +119,23 @@ class SigmaHAL(SigmaModuleBase):
             priority = levels.get(level, levels["High"])
             self._kernel32.SetPriorityClass(handle, priority)
             return True
+        except:
+            return False
+
+    def lock_memory(self, address: int, size: int) -> bool:
+        """USP: Hardware Memory Hardening. Prevents pages from being swapped to disk."""
+        if not self._kernel32: return False
+        try:
+            return bool(self._virt_lock(address, size))
+        except:
+            return False
+
+    def pin_to_cores(self, mask: int = 1) -> bool:
+        """USP: Hard Core Affinity. Eliminates context-switch jitter by pinning to specific silicon."""
+        if not self._kernel32: return False
+        try:
+            handle = self._kernel32.GetCurrentProcess()
+            return bool(self._set_affinity(handle, mask))
         except:
             return False
 

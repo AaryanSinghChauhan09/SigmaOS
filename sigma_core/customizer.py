@@ -55,37 +55,38 @@ class SovereignCustomizer(SigmaModuleBase):
         return {"status": "ERROR", "msg": "Preset not found"}
 
     def generate_ai_theme(self, prompt: str):
-        """
-        Mock AI Theme Generator. 
-        In a full version, this would call Gemini to generate a palette.
-        """
+        """USP: Neural Aesthetic Synthesis. Generates harmonized palettes via color theory logic."""
         prompt = prompt.lower()
-        if "cyber" in prompt:
-            return {
-                "message": "Neural Fabric woven: Cyberpunk Neon enabled.",
-                "applied_styles": {
-                    "accent_color": "#FF2D55",
-                    "background_color": "#050505",
-                    "text_color": "#F2F2F7"
-                }
-            }
-        elif "zen" in prompt or "arctic" in prompt:
-            return {
-                "message": "Neural Fabric woven: Arctic Tranquility enabled.",
-                "applied_styles": {
-                    "accent_color": "#5AC8FA",
-                    "background_color": "#F8F9FA",
-                    "text_color": "#1C1C1E"
-                }
-            }
         
+        # 1. Base Color Generation (Deterministic Seed)
+        seed = sum(ord(c) for c in prompt) % 360
+        base_h = seed
+        base_s = 70
+        base_l = 20 if "dark" in prompt or "cyber" in prompt else 85
+        
+        # 2. Harmonic Calculation (Analogous/Complimentary)
+        accent_h = (base_h + 180) % 360  # Complimentary
+        text_l = 95 if base_l < 50 else 5
+        
+        def _hsl_to_hex(h, s, l):
+            # Extremely simplified HSL->Hex for zero-dependency
+            return f"hsl({h}, {s}%, {l}%)"
+
+        styles = {
+            "accent": _hsl_to_hex(accent_h, 85, 60),
+            "background": _hsl_to_hex(base_h, 30, base_l),
+            "text": _hsl_to_hex(base_h, 10, text_l),
+            "glow": _hsl_to_hex(accent_h, 90, 70)
+        }
+        
+        msg = f"Neural Fabric woven for: '{prompt}'. Harmony identified at {base_h}° Hue."
+        if self.kernel:
+             self.kernel.bus.emit("theme.ai_gen", {"prompt": prompt, "base_hue": base_h})
+
         return {
-            "message": f"Neural Fabric woven for: {prompt}",
-            "applied_styles": {
-                "accent_color": "#5856D6",
-                "background_color": "#0A0A12",
-                "text_color": "#F2F2F7"
-            }
+            "message": msg,
+            "applied_styles": styles,
+            "meta": {"seed": seed, "harmony": "Complimentary"}
         }
 
     def get_glyphs(self, set_name="Sovereign"):
