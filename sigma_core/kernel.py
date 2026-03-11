@@ -103,6 +103,9 @@ class SigmaKernel:
             if self.crusher:
                 self.crusher.start_crusher_engine()
                 self.crusher.defeat_telemetry()
+
+            if self.automator and hasattr(self.automator, "start_sentinel"):
+                self.automator.start_sentinel()
             
             # Start HEALER (Apex Automation)
             if hasattr(self, "healer") and self.healer:
@@ -117,9 +120,13 @@ class SigmaKernel:
             
             # --- APEX AUTOMATION: Auto-Sync ---
             if self.automator and os.path.exists("sync.ps1"):
-                # Register folder action for the project root to auto-sync with GitHub
                 self.automator.register_folder_action(_ROOT, "sync.ps1")
-                self.bus.emit("kernel.automation", {"msg": "Workspace Auto-Sync ARMED via OmniAutomator"})
+                self.bus.emit("kernel.automation", {"msg": "Workspace Auto-Sync ARMED"})
+            
+            # --- APEX COSMETICS: Theme Engine ---
+            if hasattr(self, "aura") and self.aura:
+                self.aura.apply_aura("DeepSpace")
+                self.bus.emit("theme.init", {"aura": "DeepSpace"})
 
     def _low_level_init(self):
         """Win32/POSIX Low-Level Memory & Priority Locking."""
@@ -283,6 +290,7 @@ class SigmaKernel:
             ("omni_automator",               "SigmaOmniAutomator",        "automator"),
             ("mode_manager",                 "SigmaModeManager",          "modes"),
             ("omni_search",                  "SigmaOmniSearch",           "search"),
+            ("userland.system_api.theme_engine", "SigmaThemeEngine",         "aura"),
             ("sigma_core.competitor_crusher", "SovereignCompetitorCrusher", "crusher"),
             ("offline_guard",                "SigmaOfflineGuard",         "offline"),
             ("stability_watchdog",           "SigmaStabilityWatchdog",    "watchdog"),
@@ -368,6 +376,8 @@ class SigmaKernel:
     @property
     def security(self):           return self.registry.get("security")
     @property
+    def warden(self):             return self.security
+    @property
     def user_supremacy(self):      return self.registry.get("user_supremacy")
     @property
     def zero_trust(self):          return self.registry.get("zero_trust")
@@ -402,45 +412,33 @@ class SigmaKernel:
     @property
     def repair_engine(self):       return self.registry.get("repair_engine")
     @property
+    def healer(self):             return self.registry.get("healer")
+    @property
     def intelligence(self):        return self.registry.get("intelligence")
     @property
     def gurukul(self):             return self.registry.get("gurukul")
     @property
     def antigravity(self):         return self.registry.get("antigravity")
-
-    # --- [ ECOSYSTEM PROPERTIES ] ---
     @property
-    def aether_orch(self):        return self.registry.get("aether_orch")
+    def aura(self):                return self.registry.get("aura")
     @property
-    def pdf_forge(self):          return self.registry.get("pdf_forge")
+    def shield(self):             return self.registry.get("shield")
     @property
-    def titan_capture(self):      return self.registry.get("titan_capture")
+    def energy_hub(self):          return self.registry.get("energy")
     @property
-    def nexus(self):              return self.registry.get("nexus")
+    def energy(self):             return self.registry.get("energy")
     @property
-    def studio(self):             return self.registry.get("studio")
+    def prewarmer(self):           return self.registry.get("prewarmer")
     @property
-    def assistant(self):          return self.registry.get("assistant")
-    
-    # OS Service Mappings
+    def sandbox(self):             return self.registry.get("sandbox")
     @property
-    def offline_guard(self):      return self.registry.get("offline")
+    def kad(self):                 return self.registry.get("kad")
     @property
-    def shared_processor(self):   return self.registry.get("shared_proc")
+    def monitor(self):             return self.registry.get("monitor")
     @property
-    def universal_bridge(self):   return self.registry.get("bridge")
+    def shadow(self):              return self.registry.get("shadow")
     @property
-    def bridge(self):             return self.registry.get("bridge")
-    @property
-    def continuity(self):         return self.registry.get("continuity")
-    @property
-    def accessibility(self):      return self.registry.get("accessibility")
-    @property
-    def agentic_runtime(self):    return self.registry.get("agentic_runtime")
-    @property
-    def identity_vault(self):     return self.registry.get("identity_vault")
-    @property
-    def browser(self):            return self.registry.get("browser")
+    def watchdog(self):            return self.registry.get("watchdog")
     @property
     def automator(self):          return self.registry.get("automator")
     @property
@@ -448,67 +446,68 @@ class SigmaKernel:
     @property
     def search(self):             return self.registry.get("search")
     @property
-    def crusher(self):            return self.registry.get("crusher")
-    @property
-    def pulse(self):              return self.registry.get("pulse")
-    @property
-    def shadow(self):             return self.registry.get("shadow")
-    @property
-    def update_manager(self):     return self.registry.get("update_manager")
-    @property
-    def updates(self):            return self.registry.get("update_manager")
-    @property
-    def kad(self):                return self.registry.get("kad")
-    @property
-    def crash_reporter(self):     return self.registry.get("crash_reporter")
-    @property
-    def monitor(self):            return self.registry.get("monitor")
-    @property
-    def vanguard(self):           return self.registry.get("vanguard")
-    @property
-    def compliance(self):         return self.registry.get("compliance")
-    @property
-    def healer(self):             return self.registry.get("healer")
-    @property
-    def shell(self):              return self.registry.get("shell")
-    @property
     def sync(self):               return self.registry.get("sync")
-    @property
-    def shield(self):             return self.registry.get("shield")
     @property
     def ghostchat(self):          return self.registry.get("ghostchat")
     @property
-    def watchdog(self):           return self.registry.get("watchdog")
+    def compliance(self):         return self.registry.get("compliance")
     @property
-    def energy_hub(self):         return self.registry.get("energy")
+    def vanguard(self):           return self.registry.get("vanguard")
     @property
-    def energy(self):             return self.registry.get("energy")
-    @property
-    def prewarmer(self):           return self.registry.get("prewarmer")
-    @property
-    def sandbox(self):            return self.registry.get("sandbox")
-    @property
-    def aura(self):               return self.registry.get("shield")
-    @property
-    def shield(self):             return self.registry.get("shield")
-    @property
-    def qa_auditor(self):         return self.registry.get("qa_auditor")
-    @property
-    def games(self):              return self.registry.get("games")
-    @property
-    def stress_silo(self):        return self.registry.get("stress_silo")
-    @property
-    def silos(self):              return self.registry.get("silos")
+    def shell(self):              return self.registry.get("shell")
     @property
     def scrubber(self):           return self.registry.get("scrubber")
     @property
-    def warden(self):             return self.registry.get("security")
+    def silos(self):              return self.registry.get("silos")
+    @property
+    def games(self):              return self.registry.get("games")
+    @property
+    def assistant(self):          return self.registry.get("assistant")
+    @property
+    def nexus(self):              return self.registry.get("nexus")
+    @property
+    def studio(self):             return self.registry.get("studio")
+    @property
+    def aether_orch(self):        return self.registry.get("aether_orch")
+    @property
+    def titan_capture(self):      return self.registry.get("titan_capture")
+    @property
+    def pdf_forge(self):          return self.registry.get("pdf_forge")
+    @property
+    def identity_vault(self):     return self.registry.get("identity_vault")
+    @property
+    def agentic_runtime(self):    return self.registry.get("agentic_runtime")
+    @property
+    def accessibility(self):      return self.registry.get("accessibility")
+    @property
+    def continuity(self):         return self.registry.get("continuity")
+    @property
+    def bridge(self):             return self.registry.get("bridge")
+    @property
+    def universal_bridge(self):   return self.registry.get("bridge")
+    @property
+    def shared_processor(self):   return self.registry.get("shared_proc")
+    @property
+    def offline_guard(self):      return self.registry.get("offline")
+    @property
+    def crusher(self):            return self.registry.get("crusher")
     @property
     def intel(self):              return self.registry.get("intelligence")
     @property
-    def is_sovereign(self):
-        og = self.registry.get("offline")
-        return og._independence_score == 100.0 if og else True
+    def kad_oracle(self):          return self.registry.get("kad")
+    @property
+    def crash_reporter(self):      return self.registry.get("crash_reporter")
+    @property
+    def update_manager(self):      return self.registry.get("update_manager")
+    @property
+    def shadow(self):              return self.registry.get("shadow")
+    @property
+    def watchdog(self):            return self.registry.get("watchdog")
+
+    @property
+    def is_sovereign(self) -> bool:
+        og = self.offline_guard
+        return og._independence_score == 100.0 if (og and hasattr(og, "_independence_score")) else True
 
     # ─── Core Kernel Operations ───────────────────────────────────────────────
 
@@ -518,13 +517,6 @@ class SigmaKernel:
         gc.collect()
         self.bus.emit("kernel.turbo", {"status": "MAX_THROUGHPUT"})
         return "TURBO_ENABLED: Cache Flushed, Priority Locked, GC Purged."
-
-    def self_healing_recovery(self) -> str:
-        """Atomic restoration of missing kernel shards via Bit-Level Resilvering."""
-        if not self.healer: return "Error: Healer Offline"
-        res = self.healer.trigger_full_resilver()
-        self.bus.emit("kernel.resilver", {"action": "FULL_RESTORE"})
-        return f"RECOVERY: {res}"
 
     def boot(self) -> dict:
         """

@@ -64,6 +64,7 @@ class ModuleBaseline:
 class SigmaAnomalyDetector(SigmaModuleBase):
     def __init__(self, kernel=None):
         SigmaModuleBase.__init__(self, kernel)
+        self.kernel = kernel # Explicit for linter
         self._baselines: Dict[str, Dict[str, ModuleBaseline]] = {}
         self._alerts: List[Dict] = []
         self._lock = threading.Lock()
