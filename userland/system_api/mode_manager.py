@@ -7,9 +7,10 @@ and optimizes performance/priority/UI state accordingly.
 
 from typing import Dict, List, Any, Callable
 import time
+from typing import Dict, List, Any, Callable, Optional
 
 class SigmaModeManager:
-    def __init__(self, kernel):
+    def __init__(self, kernel=None):
         self.kernel = kernel
         self._current_mode = "Standard"
         self._app_heuristics = {
@@ -70,11 +71,22 @@ class SigmaModeManager:
                 "GPU_Profile": "Low",
                 "RAM_Focus": "Process_Isolation",
                 "Background_Task_Limit": 100,
-                "Description": "Massive background task orchestration.",
+                "Description": "Massive background task orchestration. Native Zapier/Make replacement.",
                 "AI_Config": {"max_depth": 20, "max_tokens": 8192, "style": "Agentic", "tool_budget": "High"},
                 "Kernel_Flags": ["container-isolation", "network-qos-high"],
-                "Routines_On_Enter": ["start_automation_agent", "isolate_network_traffic"],
+                "Routines_On_Enter": ["start_automation_agent", "isolate_network_traffic", "forge_global_mesh"],
                 "Routines_On_Exit": ["stop_automation_agent", "restore_network_traffic"]
+            },
+            "Sovereign_Orchestrator": {
+                "CPU_Priority": "Supreme (Agentic Lock)",
+                "GPU_Profile": "Compute_Accelerated (LLM Routing)",
+                "RAM_Focus": "DAG_Cache / Vector_DB",
+                "Background_Task_Limit": 200,
+                "Description": "HyperSwarm Intelligence Pipeline. Replaces CrewAI, AutoGen, and LangChain natively.",
+                "AI_Config": {"max_depth": 100, "max_tokens": 32768, "style": "Orchestrator", "tool_budget": "Infinite"},
+                "Kernel_Flags": ["zero-latency-ring", "quantum-routing"],
+                "Routines_On_Enter": ["spawn_hyper_swarm", "build_cognitive_dag"],
+                "Routines_On_Exit": ["cooldown_swarm"]
             },
             "Shopping": {
                 "CPU_Priority": "Balanced",
@@ -233,6 +245,10 @@ class SigmaModeManager:
             "isolate_network_traffic": self._isolate_network_traffic,
             "stop_automation_agent": self._stop_automation_agent,
             "restore_network_traffic": self._restore_network_traffic,
+            "forge_global_mesh": self._forge_global_mesh,
+            "spawn_hyper_swarm": self._spawn_hyper_swarm,
+            "build_cognitive_dag": self._build_cognitive_dag,
+            "cooldown_swarm": self._cooldown_swarm,
             "activate_ad_blocker": self._activate_ad_blocker,
             "open_shopping_browser": self._open_shopping_browser,
             "deactivate_ad_blocker": self._deactivate_ad_blocker,
@@ -299,7 +315,9 @@ class SigmaModeManager:
         new_profile = self._modes[mode_name]
 
         # Execute exit routines for the old mode
-        exit_routine_results = self._apply_routines(old_profile.get("Routines_On_Exit", []), "exit")
+        exit_list: Any = old_profile.get("Routines_On_Exit", [])
+        if not isinstance(exit_list, list): exit_list = []
+        exit_routine_results = self._apply_routines(exit_list, "exit")
         
         # Free up Shadow Apps cached by the Prewarmer
         if hasattr(self.kernel, 'prewarmer') and self.kernel.prewarmer:
@@ -307,15 +325,18 @@ class SigmaModeManager:
         self._current_mode = mode_name
         
         # Link to Global Config (Apex Feature Sync)
-        config = self.kernel.registry.get("config")
-        if config:
-            config.apply_mode(mode_name.lower())
+        if self.kernel and hasattr(self.kernel, "registry"):
+            config = self.kernel.registry.get("config")
+            if config and hasattr(config, "apply_mode"):
+                config.apply_mode(mode_name.lower())
 
         # Simulate Kernel re-tuning
         tune_status = self._apply_tuning(new_profile)
 
         # Execute enter routines for the new mode
-        enter_routine_results = self._apply_routines(new_profile.get("Routines_On_Enter", []), "enter")
+        enter_list: Any = new_profile.get("Routines_On_Enter", [])
+        if not isinstance(enter_list, list): enter_list = []
+        enter_routine_results = self._apply_routines(enter_list, "enter")
         
         return {
             "From": old_mode,
@@ -368,12 +389,12 @@ class SigmaModeManager:
         self._modes[mode_name] = config
         return {"Status": f"Mode '{mode_name}' added successfully."}
 
-    def remove_mode(self, mode_name: str) -> Dict:
+    def remove_mode(self, mode_name: str) -> Dict[str, str]:
         if mode_name not in self._modes:
             return {"Error": f"Mode '{mode_name}' not found."}
         if mode_name == self._current_mode:
             return {"Error": f"Cannot remove active mode '{mode_name}'. Switch to another mode first."}
-        del self._modes[mode_name]
+        self._modes.pop(mode_name, None)
         return {"Status": f"Mode '{mode_name}' removed successfully."}
 
     def update_mode(self, mode_name: str, config: Dict) -> Dict:
@@ -395,10 +416,10 @@ class SigmaModeManager:
         self._routines[routine_name] = routine_func
         return {"Status": f"Routine '{routine_name}' added successfully."}
 
-    def remove_routine(self, routine_name: str) -> Dict:
+    def remove_routine(self, routine_name: str) -> Dict[str, str]:
         if routine_name not in self._routines:
             return {"Error": f"Routine '{routine_name}' not found."}
-        del self._routines[routine_name]
+        self._routines.pop(routine_name, None)
         return {"Status": f"Routine '{routine_name}' removed successfully."}
 
     def get_all_routines(self) -> List[str]:
@@ -608,20 +629,49 @@ class SigmaModeManager:
 
     def _engage_hyper_drive(self, phase: str = "") -> str:
         """USP: Engages the Hyper-Drive Quantum Optimizer."""
-        hd = self.kernel.registry.get("hyper_drive")
-        if hd:
-            hd.execute_ai_debloat()
-            hd.trigger_precognitive_cache("Optimizing for Apex performance.")
-            return "Hyper-Drive engaged: AI De-bloat and Pre-cognitive cache active."
+        if self.kernel and hasattr(self.kernel, "registry"):
+            hd = self.kernel.registry.get("hyper_drive")
+            if hd and hasattr(hd, "execute_ai_debloat") and hasattr(hd, "trigger_precognitive_cache"):
+                hd.execute_ai_debloat()
+                hd.trigger_precognitive_cache("Optimizing for Apex performance.")
+                return "Hyper-Drive engaged: AI De-bloat and Pre-cognitive cache active."
         return "Hyper-Drive module not found."
 
     def _activate_zen_latency(self, phase: str = "") -> str:
         """USP: Activates Zen Latency mode for instant UI feedback."""
-        hd = self.kernel.registry.get("hyper_drive")
-        if hd:
-            return hd.engage_zen_latency_mode()
+        if self.kernel and hasattr(self.kernel, "registry"):
+            hd = self.kernel.registry.get("hyper_drive")
+            if hd and hasattr(hd, "engage_zen_latency_mode"):
+                return hd.engage_zen_latency_mode()
         return "Hyper-Drive module not available for Zen Latency."
 
     def _disengage_hyper_drive(self, phase: str = "") -> str:
         """Disengages Hyper-Drive optimizations."""
         return "Hyper-Drive disengaged. Reverting to standard scheduling."
+
+    # --- Agentic Runtime Integrations (Zapier/Make/LangGraph Killers) ---
+    def _forge_global_mesh(self, phase: str = "") -> str:
+        if self.kernel and hasattr(self.kernel, "registry"):
+             ar = self.kernel.registry.get("agentic_runtime")
+             if ar and hasattr(ar, "forge_automation_mesh"):
+                  ar.forge_automation_mesh("sys.mode_shifted", ["notify_mesh", "optimize_ram"])
+                  return "Global Automation Mesh engaged (0ms Zapier Alternative)."
+        return "Agentic Runtime offline."
+
+    def _spawn_hyper_swarm(self, phase: str = "") -> str:
+        if self.kernel and hasattr(self.kernel, "registry"):
+             ar = self.kernel.registry.get("agentic_runtime")
+             if ar and hasattr(ar, "spawn_agent_swarm"):
+                  return ar.spawn_agent_swarm("Autonomous Mode Coordination", top_k_agents=5)
+        return "Agentic Runtime offline."
+
+    def _build_cognitive_dag(self, phase: str = "") -> str:
+        if self.kernel and hasattr(self.kernel, "registry"):
+             ar = self.kernel.registry.get("agentic_runtime")
+             if ar and hasattr(ar, "build_sovereign_graph"):
+                  ar.build_sovereign_graph("OS-Orchestrator", ["Listen", "Decide", "Act"], {"Listen": ["Decide"], "Decide":["Act"]})
+                  return "Sovereign Cognitive DAG built (LangGraph Alternative)."
+        return "Agentic Runtime offline."
+
+    def _cooldown_swarm(self, phase: str = "") -> str:
+        return "Agentic Swarm compute cooled. Matrix returning to standby."
