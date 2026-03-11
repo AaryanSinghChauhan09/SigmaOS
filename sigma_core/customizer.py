@@ -7,11 +7,9 @@ Handles system-wide themes, soundscapes, and visual DNA.
 
 import os
 import json
-try:
-    from sigma_core.interfaces import SigmaModuleBase
-except ImportError:
-    class SigmaModuleBase:
-        def __init__(self, kernel=None): self.kernel = kernel
+class ISigmaModule: pass
+class SigmaModuleBase:
+    def __init__(self, kernel=None): self.kernel = kernel
 
 class SovereignCustomizer(SigmaModuleBase):
     """
@@ -19,12 +17,15 @@ class SovereignCustomizer(SigmaModuleBase):
     It provides high-fidelity aesthetic presets and morphological controls.
     """
 
-    def __init__(self, kernel):
+    def __init__(self, kernel=None):
         SigmaModuleBase.__init__(self, kernel)
+        self.kernel = kernel
         self.active_vibe = "Minimalist"
         self.glass_opacity = 0.85
         self.blur_strength = 10
         self.border_radius = 12
+        self.transition_speed_ms = 250
+        self.animation_curve = "ease-in-out"
         
         # GLYPH SETS (Icon Packs)
         self.GLYPH_SETS = {
@@ -42,12 +43,14 @@ class SovereignCustomizer(SigmaModuleBase):
         }
 
     def apply_morphic_preset(self, preset_name: str):
-        """Applies a morphological 'Vibe' preset."""
+        """Applies a morphological 'Vibe' preset with UI Physics."""
         presets = {
-            "Brutalist": {"radius": 0, "opacity": 1.0, "blur": 0},
-            "Glass":     {"radius": 16, "opacity": 0.6, "blur": 25},
-            "Classic":   {"radius": 8, "opacity": 0.95, "blur": 5},
-            "Aura":      {"radius": 24, "opacity": 0.75, "blur": 40}
+            "Brutalist": {"radius": 0, "opacity": 1.0, "blur": 0, "speed": 50, "curve": "linear"},
+            "Glass":     {"radius": 16, "opacity": 0.6, "blur": 25, "speed": 400, "curve": "cubic-bezier(0.4, 0, 0.2, 1)"},
+            "Classic":   {"radius": 8, "opacity": 0.95, "blur": 5, "speed": 150, "curve": "ease"},
+            "Aura":      {"radius": 24, "opacity": 0.75, "blur": 40, "speed": 600, "curve": "ease-out"},
+            "Fluency":   {"radius": 12, "opacity": 0.80, "blur": 15, "speed": 300, "curve": "cubic-bezier(0.25, 1, 0.5, 1)"},
+            "Monolith":  {"radius": 2, "opacity": 1.0, "blur": 0, "speed": 0, "curve": "step-end"}
         }
         
         if preset_name in presets:
@@ -55,6 +58,9 @@ class SovereignCustomizer(SigmaModuleBase):
             self.border_radius = int(p["radius"])
             self.glass_opacity = float(p["opacity"])
             self.blur_strength = int(p["blur"])
+            self.transition_speed_ms = int(p["speed"])
+            self.animation_curve = str(p["curve"])
+            self.active_vibe = preset_name
             return {"status": "SUCCESS", "preset": preset_name}
         return {"status": "ERROR", "msg": "Preset not found"}
 

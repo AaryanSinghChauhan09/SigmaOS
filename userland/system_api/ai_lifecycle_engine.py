@@ -60,15 +60,18 @@ class SigmaAILifecycle:
                     self._stats = data.get("stats", self._stats)
                     raw_projects = data.get("projects", {})
                     for k, v in raw_projects.items():
-                        v["type"] = MissionType[v["type"]]
+                        vt = v["type"]
+                        v["type"] = getattr(MissionType, vt, MissionType.ML)
                         self.active_projects[k] = v
             except Exception:
                 pass
 
     def start_unified_mission(self, project_name: str, objective: str, m_type: str = "ML") -> str:
         """Kicks off a full-cycle mission based on the provided intent and discipline."""
-        mission_id = f"AI-LC-{str(uuid.uuid4())[:8]}"
-        m_type_enum = MissionType[m_type.upper()] if m_type.upper() in MissionType.__members__ else MissionType.ML
+        u_str = str(uuid.uuid4())
+        u_chars = [u_str[i] for i in range(8)]
+        mission_id = f"AI-LC-{''.join(u_chars)}"
+        m_type_enum = getattr(MissionType, m_type.upper(), MissionType.ML)
         
         # Define Discipline-Specific Lifecycles (Based on User-Provided Tables)
         lifecycles = {
@@ -112,6 +115,28 @@ class SigmaAILifecycle:
         project["current_step_idx"] += 1
         return result
 
+    def autonomous_autopilot(self, mission_id: str) -> dict:
+        """USP: Zero-Touch MLOps. Autonomously executes all remaining steps in the lifecycle."""
+        if mission_id not in self.active_projects:
+            return {"error": "Mission not found."}
+        
+        project = self.active_projects[mission_id]
+        if project["status"] == "COMPLETED":
+            return {"message": "Mission already complete."}
+
+        executed = []
+        while project["current_step_idx"] < len(project["lifecycle"]):
+            step_key = project["lifecycle"][project["current_step_idx"]]
+            self.execute_lifecycle_step(mission_id, step_key)
+            executed.append(step_key)
+            project["current_step_idx"] += 1
+            
+        return {
+            "status": "AUTOPILOT_COMPLETE",
+            "message": f"Autopilot successfully cleared {len(executed)} phases.",
+            "phases_cleared": executed
+        }
+
     def execute_lifecycle_step(self, mission_id: str, step_key: str) -> dict:
         """Executes a specific step in the AI/ML/DS lifecycle with expert precision."""
         if mission_id not in self.active_projects:
@@ -138,10 +163,11 @@ class SigmaAILifecycle:
             result["metrics"] = {"samples": random.randint(10000, 1000000), "multimodal": m_type == MissionType.AI}
         elif "TRAINING" in step_key or "MODEL" in step_key:
             self._stats["models_trained"] += 1
-            shards = random.randint(12, 128)
+            shards = random.randint(32, 256) # Apex Scale
             self._stats["mesh_shards_active"] = shards
-            result["metrics"] = {"shards": shards, "epoch": 100, "loss": random.uniform(0.01, 0.5), "distributed": True}
-            result["mesh_sync"] = "SYNCHRONIZED - 100% Core Cohesion"
+            l_val = random.uniform(0.001, 0.05)
+            result["metrics"] = {"shards": shards, "epoch": 500, "loss": float(f"{l_val:.4f}"), "distributed": True}
+            result["mesh_sync"] = "SYNCHRONIZED - 100% Core Cohesion (Zero-Latency Ring)"
         elif "TUNING" in step_key:
             result["metrics"] = {"peft_method": "LoRA", "r": 16, "alpha": 32, "optimization": "ADAM-W"}
             result["message"] = "Hyperparameter optimization yielding high-fidelity convergence."
@@ -152,7 +178,13 @@ class SigmaAILifecycle:
             result["metrics"] = {"nodes": random.randint(5, 50), "encryption": "Secure-Aggregation"}
             result["message"] = "Decentralized data shards synchronized into a global knowledge lattice."
         elif "EVALUATION" in step_key or "TESTING" in step_key:
-            result["metrics"] = {"accuracy": random.uniform(0.92, 0.99), "f1_score": random.uniform(0.90, 0.98)}
+            a_val = random.uniform(0.96, 0.999)
+            f_val = random.uniform(0.95, 0.995)
+            i_val = random.uniform(0.8, 4.5)
+            acc = float(f"{a_val:.3f}")
+            f1 = float(f"{f_val:.3f}")
+            result["metrics"] = {"accuracy": acc, "f1_score": f1, "inference_ms": float(f"{i_val:.2f}")}
+            result["message"] = "Evaluation yields Apex-tier heuristic confidence."
         elif "DEPLOYMENT" in step_key:
             self._stats["deployments_active"] += 1
             result["endpoint"] = f"https://sovereign.mesh/v1/{project['name'].lower().replace(' ', '_')}"

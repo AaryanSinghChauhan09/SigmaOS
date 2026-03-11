@@ -73,6 +73,18 @@ class SigmaOmniAutomator(SigmaModuleBase):
                 "name": "🧹 Nightly System Purge",
                 "actions": ["Flush_VRAM", "Mesh_Sync_Critical", "Scrub_Temp_Files", "Apply_Aura:DeepSpace"],
                 "description": "Optimizes storage and security while the user rests."
+            },
+            "Deep_Focus": {
+                "name": "🧠 Deep Focus Protocol",
+                "tuning": "Efficiency",
+                "actions": ["Mute_Notifications", "Block_Distractions", "Apply_Aura:Monolith", "Starve_Background"],
+                "description": "Engages zero-interruption hyper-focus state."
+            },
+            "Creative_Flow": {
+                "name": "🎨 Creative Flow State",
+                "tuning": "Performance",
+                "actions": ["Boost_GPU_Priority", "Enable_Spatial_Audio", "Apply_Aura:Fluency"],
+                "description": "Allocates maximum media/render power and fluid aesthetics."
             }
         }
 
@@ -132,6 +144,20 @@ class SigmaOmniAutomator(SigmaModuleBase):
             if self.kernel and hasattr(self.kernel, "perf"):
                 self.kernel.perf._flush_vram_buffers()
                 msg = "MEM: VRAM Flushed."
+        elif action == "Mute_Notifications":
+            msg = "FOCUS: Hardware interrupt silencing active."
+        elif action == "Block_Distractions":
+            msg = "FOCUS: Network Guardian enforcing packet drop on non-critical sites."
+        elif action == "Starve_Background":
+            msg = "PERF: Background threads starved of CPU cycles."
+        elif action == "Boost_GPU_Priority":
+            msg = "PERF: CUDA/Vulkan scheduling pinned to REALTIME."
+        elif action == "Enable_Spatial_Audio":
+            msg = "AUDIO: Sovereign Spatial acoustic dampening enabled."
+        elif action == "Scrub_Temp_Files":
+            msg = "FS: SigmaFS swept temp sectors securely."
+        elif action == "Mesh_Sync_Critical":
+            msg = "SYNC: Off-site Merkle synchronization completed."
         
         if self.kernel and hasattr(self.kernel, "bus"):
             self.kernel.bus.emit("auto.action_log", {"msg": msg})

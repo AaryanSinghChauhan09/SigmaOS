@@ -12,6 +12,7 @@ Architecture:
 """
 import re
 import time
+from typing import Dict, List, Any
 
 class AetherAssistant:
     def __init__(self, kernel):
@@ -27,7 +28,19 @@ class AetherAssistant:
             "launch_app": ["open", "launch", "start", "run", "go to", "show"],
             "agentic_task": ["research", "analyze", "find out", "summarize", "workflow", "automate", "digital worker"],
             "accessibility": ["read", "screen reader", "voice", "blind", "vision", "focus", "neuro"],
-            "privacy": ["lock", "clear", "revoke", "privacy", "secure", "shield"]
+            "privacy": ["lock", "clear", "revoke", "privacy", "secure", "shield"],
+            "set_persona": ["behave like", "act like", "change personality", "persona", "switch persona", "voice profile"]
+        }
+
+        # Context window for Multi-Turn conversations
+        self._context_buffer = []
+        
+        # Generative Persona Engine
+        self.active_persona = "Sovereign"
+        self._personas = {
+            "Sovereign": "Professional, hyper-efficient, and precise. Direct answers.",
+            "Maverick": "Casual, slightly rebellious, optimized for high-speed hacker workflows.",
+            "Scholar": "Detailed, highly analytical, explains the 'why' behind system actions."
         }
 
     def _tokenize(self, text: str) -> list:
@@ -35,21 +48,30 @@ class AetherAssistant:
         words = re.findall(r'\b\w+\b', text.lower())
         return [w for w in words if w not in self._stop_words]
 
-    def _classify_intent(self, tokens: list) -> str:
+    def _classify_intent(self, tokens: List[str]) -> str:
         """Calculates probabilistic match for intents based on token density."""
-        scores = {intent: 0 for intent in self._intents}
+        scores: Dict[str, float] = {}
+        for intent in self._intents:
+            scores[intent] = 0.0
+            
         for token in tokens:
             for intent, keywords in self._intents.items():
                 if token in keywords:
-                    scores[intent] += 1
+                    scores[intent] = scores[intent] + 1
                 # Check for partial matches or multi-word keywords
                 for kw in keywords:
                     if kw in " ".join(tokens):
-                        scores[intent] += 1.5 # Higher weight for exact phrase match
+                        scores[intent] = scores[intent] + 1.5 # Higher weight for exact phrase match
         
         # Determine highest scoring intent
-        best_intent = max(scores, key=scores.get)
-        return best_intent if scores[best_intent] > 0 else "unknown"
+        best_intent = "unknown"
+        max_score = 0.0
+        for k, v in scores.items():
+            if v > max_score:
+                max_score = v
+                best_intent = k
+                
+        return best_intent if max_score > 0 else "unknown"
 
     def _extract_entity(self, text: str, intent: str) -> str:
         """Extracts the target object/parameter from the user's prompt."""
@@ -65,6 +87,10 @@ class AetherAssistant:
              # Extract everything after the action verb
              match = re.search(r'(research|analyze|summarize)\s+(.*)', text_lower)
              if match: return match.group(2)
+        if intent == "set_persona":
+             for p in self._personas.keys():
+                 if p.lower() in text_lower:
+                     return p
         return ""
 
     def process_prompt(self, prompt: str) -> dict:
@@ -79,14 +105,29 @@ class AetherAssistant:
         # 2. Execution Routing
         response = self._execute_intent(intent, entity, prompt)
         
+        # 3. Context Append
+        self._context_buffer.append({"u": prompt, "intent": intent, "entity": entity})
+        if len(self._context_buffer) > 10: self._context_buffer.pop(0) # Keep recent 10 turns
+        
         ms_taken = (time.perf_counter() - start_t) * 1000
         return {
             "intent": intent,
             "entity": entity,
-            "response": response,
-            "latency_ms": round(ms_taken, 2),
+            "persona": self.active_persona,
+            "response": self._apply_persona(response),
+            "latency_ms": float(f"{ms_taken:.2f}"),
             "status": "SUCCESS" if intent != "unknown" else "UNRECOGNIZED"
         }
+
+    def _apply_persona(self, raw_response: str) -> str:
+        """USP: Modifies dialogue output based on the active structural persona."""
+        if self.active_persona == "Sovereign": return raw_response
+        if self.active_persona == "Maverick":
+            if "Optimal" in raw_response: return "We're flying fast. RAM is tight but holding."
+            return f"[MAVERICK] {raw_response} — Done. What's next?"
+        if self.active_persona == "Scholar":
+            return f"According to system telemetry: {raw_response}. This indicates nominal operation."
+        return raw_response
 
     def _execute_intent(self, intent: str, entity: str, raw_prompt: str) -> str:
         """Hooks into the Kernel Registry to perform the action."""
@@ -128,8 +169,14 @@ class AetherAssistant:
                  return iv.revoke_all_sessions()
              return "Privacy module offline."
 
+        elif intent == "set_persona":
+             if entity and entity in self._personas:
+                 self.active_persona = entity
+                 return f"Persona matrix shifted to: {entity}."
+             return f"Available Personas: {', '.join(self._personas.keys())}. Which one?"
+
         else:
-            return "I am Aether, your Sovereign Assistant. I understand system commands, agentic workflows, and accessibility. How can I help?"
+             return f"I am Aether, your {self.active_persona} Assistant. I understand system commands, agentic workflows, and accessibility. How can I help?"
 
     def health_check(self) -> str:
         return f"OK — Aether Core NLP Engine Active. Vocabulary constraint: {len(self._intents)} intents."
@@ -143,3 +190,4 @@ if __name__ == "__main__":
     print(aether.process_prompt("Revoke my active sessions now."))
     print(aether.process_prompt("How is the system performance doing?"))
     print(aether.process_prompt("Hello, who are you?"))
+
