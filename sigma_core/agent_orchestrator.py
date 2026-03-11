@@ -9,6 +9,7 @@ Surpasses: CrewAI (multi-agent loops), AutoGen (conversational patterns),
 import time
 import uuid
 import threading
+from concurrent.futures import ThreadPoolExecutor
 from typing import Dict, List, Any, Optional
 from .interfaces import SigmaModuleBase, ISigmaService
 
@@ -107,6 +108,25 @@ class SigmaAgentOrchestrator(SigmaModuleBase, ISigmaService):
             
         self.stats["consensus_reached"] += 1
         return f"Consensus Reached in Swarm {swarm_id}: {len(results)} agents synchronized via Kernel Bus."
+
+    def execute_swarm_task(self, swarm_id: str, task: str) -> List[str]:
+        """USP: Low-Latency Swarm Parallelism with ThreadPoolExecutor."""
+        swarm = self.active_swarms.get(swarm_id)
+        if not swarm: return ["Error: Swarm not found."]
+        
+        results = []
+        with ThreadPoolExecutor(max_workers=len(swarm)) as executor:
+            futures = [executor.submit(agent.execute_step, task) for agent in swarm]
+            for future in futures:
+                try:
+                    results.append(future.result())
+                    self.stats["agent_interactions"] += 1
+                except Exception as e:
+                    results.append(f"Agent Fault: {e}")
+        
+        self.stats["consensus_reached"] += 1
+        self.bus.emit("agent.consensus", {"swarm": swarm_id, "size": len(results)})
+        return results
 
     def register_tool_shim(self, name: str, description: str):
         """USP: Tool-Bus integration for the agents."""
