@@ -203,7 +203,21 @@ class SigmaFS:
     # ── File Operations (POSIX-compatible) ──────────────────────────────────
 
     def create(self, path: str, content: bytes = b"", encrypted: bool = True) -> dict:
-        """Create or overwrite a file. CoW on write, dedup check on content."""
+        """Create or overwrite a file. CoW on write, dedup check on content. Enforces Data Amnesia."""
+        
+        # PII Scrubbing / Data Amnesia injection
+        if self.kernel and hasattr(self.kernel, 'registry'):
+            scrubber = self.kernel.registry.get('privacy_engine')
+            if scrubber:
+                try:
+                    text_content = content.decode('utf-8')
+                    if scrubber.check_and_block_save(text_content):
+                        # Alternatively, actively scrub instead of purely blocking
+                        scrubbed_text = scrubber.scrub(text_content)
+                        content = scrubbed_text.encode('utf-8')
+                except UnicodeDecodeError:
+                    pass # Binary file, skip PII text scrub
+        
         sha = hashlib.sha256(content).hexdigest() if content else "0" * 64
         # Dedup check
         if sha in self._dedup and self._dedup[sha] != path:

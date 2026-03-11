@@ -7,8 +7,9 @@ Mission: Eliminate 3rd party access, scrub PII, and enforce Ring-0 Sovereignty.
 import hashlib
 import json
 import re
+from .interfaces import ISigmaModule
 
-class PrivacyScrubber:
+class PrivacyScrubber(ISigmaModule):
     """Deep-cleans system logs, telemetry, and network packets of PII."""
     def __init__(self, kernel=None):
         self.kernel = kernel
@@ -16,15 +17,27 @@ class PrivacyScrubber:
             r'\b\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}\b', # IP Addresses
             r'\b[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Z|a-z]{2,}\b', # Emails
             r'\b[0-9]{4}-[0-9]{4}-[0-9]{4}-[0-9]{4}\b', # Credit Cards
+            r'\b\+?\d{1,3}[-.\s]?\(?\d{1,4}\)?[-.\s]?\d{1,4}[-.\s]?\d{1,9}\b', # Phone Numbers
+            r'\b(Aaryan|Chauhan)\b', # Personal Names (Example bounds)
         ]
-        print("[PRIVACY] Scrubber Initialized. Monitoring all outbound streams.")
+        self.mode = "Strict_Amnesia"
+        print("[PRIVACY] Scrubber Initialized: Data Amnesia Enforced. No PII written to disk.")
 
     def scrub(self, data: str) -> str:
-        """Replace sensitive patterns with [SCRUBBED]."""
+        """Replace sensitive patterns with [SCRUBBED] dynamically before saving."""
+        if not isinstance(data, str):
+            return data
         clean_data = data
         for pattern in self._pii_patterns:
-            clean_data = re.sub(pattern, "[SCRUBBED]", clean_data)
+            clean_data = re.sub(pattern, "[SCRUBBED]", clean_data, flags=re.IGNORECASE)
         return clean_data
+        
+    def check_and_block_save(self, data: str) -> bool:
+        """Fails the save operation if dense PII is detected, ensuring no tools store personal info."""
+        for pattern in self._pii_patterns:
+            if re.search(pattern, data, flags=re.IGNORECASE):
+                return True # Block
+        return False
 
 class NeuralFirewall:
     """AI-driven packet inspection based on entropy and signature desync."""
