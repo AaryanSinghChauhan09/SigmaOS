@@ -1,16 +1,19 @@
-# SigmaOS Complete Architecture & Tooling 
+# SigmaOS Complete Architecture & Tooling
 
 Welcome to the internal documentation for **SigmaOS (Singularity Apex)**. This repository houses the world's most advanced, zero-trust, autonomously orchestrating operating system environment.
 
 ## 🧠 What is SigmaOS?
+
 SigmaOS is not just an interface; it's a **Cognitive Mesh**. It aggressively manages hardware, isolates processes automatically, learns from user behavior to predict workflows, and deploys local AI Swarms to replace external services like Zapier, CloudConvert, and CrewAI natively.
 
 ## 🛠 Directory Structure
+
 - `/userland/system_api/` - The core application logic and autonomous systems.
 - `/docs/` - System architecture and capability manuals.
 - `_apex_test.py` - The ultimate CI/CD system integrity checker ensuring 100% operational safety.
 
 ## ⚡ Core Systems
+
 1. **Universal Mode Manager (`mode_manager.py`)** 
    - Radically re-tunes CPU/GPU mapping and DAG caching depending on user context. Features *Sovereign_Orchestrator* to run AI Multi-Agent tasks without overhead.
 2. **OmniAutomator (`omni_automator.py`)**
@@ -23,8 +26,10 @@ SigmaOS is not just an interface; it's a **Cognitive Mesh**. It aggressively man
    - The Hardware Abstraction Layer that intercepts thermal limits and forces the metal to obey software instructions securely.
 
 ## 🛡️ Privacy & Security
+
 - **Forensic Scrubber**: Destroys PII locally. Prevents any sensitive payload from leaving the host machine.
 - **Vanguard Sandbox**: Quarantines erratic programs in custom memory-hardened silos to prevent system contamination.
 
 ---
 *Created by Aaryan Singh Chauhan | SigmaOS Singularity Branch*
+

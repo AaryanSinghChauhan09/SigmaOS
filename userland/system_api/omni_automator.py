@@ -58,6 +58,7 @@ class SigmaOmniAutomator(SigmaModuleBase):
         }
         self.benchmark_ledger: Dict[str, float] = {}
         self.routine_evolution_memory: Dict[str, int] = {}
+        self.transparent_ledger: List[Dict[str, Any]] = []
         
         self.MISSION_LIBRARY = {
             "Hardening": ["Kill_Legacy_Shims", "Update_Sovereign_Policies", "Seal_Shadow_Vault"],
@@ -160,6 +161,10 @@ class SigmaOmniAutomator(SigmaModuleBase):
         """USP: Benchmark and compare the efficiency of different automations directly in the OS."""
         return self.benchmark_ledger
 
+    def get_transparent_ledger(self) -> List[Dict[str, Any]]:
+        """USP: Human-readable execution log that traces every single action taken by the AI swarm."""
+        return self.transparent_ledger
+
     def _execute_action_logic(self, action: str) -> str:
         msg = f"Executed: {action}"
         
@@ -193,6 +198,13 @@ class SigmaOmniAutomator(SigmaModuleBase):
         
         if self.kernel and hasattr(self.kernel, "bus"):
             self.kernel.bus.emit("auto.action_log", {"msg": msg})
+            
+        self.transparent_ledger.append({
+            "timestamp": time.ctime(),
+            "action": action,
+            "result_status": msg,
+            "trust_verifier": "Sigma_Swarm_Audit_0x0"
+        })
         return msg
 
     def register_folder_action(self, folder: str, action: str):

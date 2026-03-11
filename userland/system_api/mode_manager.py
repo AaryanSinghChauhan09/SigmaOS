@@ -27,6 +27,8 @@ class SigmaModeManager:
                 "CPU_Priority": "Balanced",
                 "GPU_Profile": "Adaptive",
                 "RAM_Focus": "System_Stability",
+                "Storage_IO": "Balanced",
+                "Network_Bandwidth": "Adaptive_QoS",
                 "Background_Task_Limit": 10,
                 "Description": "General purpose sovereign computing.",
                 "AI_Config": {"max_depth": 3, "max_tokens": 1024, "style": "Helpful", "tool_budget": "Medium"},
@@ -48,6 +50,8 @@ class SigmaModeManager:
                 "CPU_Priority": "High (Max Frequency)",
                 "GPU_Profile": "High-Performance / Unlocked",
                 "RAM_Focus": "Direct_Access / Zero_Swap",
+                "Storage_IO": "NVMe_Bypass_DirectStorage",
+                "Network_Bandwidth": "Aggressive_Ping_Prioritization",
                 "Background_Task_Limit": 2,
                 "Description": "Maximum throughput for immersive gaming.",
                 "AI_Config": {"max_depth": 2, "max_tokens": 512, "style": "Playful", "tool_budget": "Low"},
@@ -81,6 +85,8 @@ class SigmaModeManager:
                 "CPU_Priority": "Supreme (Agentic Lock)",
                 "GPU_Profile": "Compute_Accelerated (LLM Routing)",
                 "RAM_Focus": "DAG_Cache / Vector_DB",
+                "Storage_IO": "Memory_Mapped_Datasets",
+                "Network_Bandwidth": "Swarm_P2P_Unlocked",
                 "Background_Task_Limit": 200,
                 "Description": "HyperSwarm Intelligence Pipeline. Replaces CrewAI, AutoGen, and LangChain natively.",
                 "AI_Config": {"max_depth": 100, "max_tokens": 32768, "style": "Orchestrator", "tool_budget": "Infinite"},
@@ -351,7 +357,9 @@ class SigmaModeManager:
     def _apply_tuning(self, profile: Dict) -> str:
         """Simulates atomic tuning of kernel schedulers and power states."""
         flags = profile.get("Kernel_Flags", [])
-        return f"Schedulers: {profile['CPU_Priority']} | I/O: {profile['RAM_Focus']} | Flags: {', '.join(flags) if flags else 'NONE'}"
+        net = profile.get("Network_Bandwidth", "Default")
+        io = profile.get("Storage_IO", "Default")
+        return f"Schedulers: {profile['CPU_Priority']} | Mem: {profile['RAM_Focus']} | Net: {net} | I/O: {io} | Flags: {', '.join(flags) if flags else 'NONE'}"
 
     def _apply_routines(self, routine_names: List[str], phase: str) -> Dict[str, str]:
         """Executes a list of routines."""
