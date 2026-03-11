@@ -59,8 +59,9 @@ class SigmaOmniAutomator(SigmaModuleBase):
         self.benchmark_ledger: Dict[str, float] = {}
         self.routine_evolution_memory: Dict[str, int] = {}
         self.transparent_ledger: List[Dict[str, Any]] = []
+        self.workflow_genome_db: Dict[str, str] = {}
         
-        self.MISSION_LIBRARY = {
+        self.MISSION_LIBRARY: Dict[str, List[str]] = {
             "Hardening": ["Kill_Legacy_Shims", "Update_Sovereign_Policies", "Seal_Shadow_Vault"],
             "Optimization": ["Flush_VRAM", "Steer_IRQs", "Trigger_Prewarmer"],
             "Sync": ["Mesh_Merkle_Verify", "Push_to_Origin_Master"]
@@ -164,6 +165,31 @@ class SigmaOmniAutomator(SigmaModuleBase):
     def get_transparent_ledger(self) -> List[Dict[str, Any]]:
         """USP: Human-readable execution log that traces every single action taken by the AI swarm."""
         return self.transparent_ledger
+
+    def extract_workflow_genome(self, preset_key: str) -> str:
+        """USP: Phase 2 - Synthesize workflows into reusable DNA mapped structurally via DAG."""
+        p = self.PRESETS.get(preset_key)
+        if not p: return "ERROR: NO_GENOME"
+        
+        actions = p.get("actions", [])
+        genome_sig = f"SGM-{hash('|'.join(actions))}-v1"
+        self.workflow_genome_db[genome_sig] = "|".join(actions)
+        return genome_sig
+        
+    def synthesize_from_genome(self, genome_sig: str) -> str:
+        """USP: Recombine and execute a workflow directly from its DNA string."""
+        if genome_sig not in self.workflow_genome_db:
+            return f"Genome {genome_sig} not found in sequence library."
+            
+        actions_str = self.workflow_genome_db[genome_sig]
+        actions = actions_str.split("|")
+        
+        results = []
+        for action in actions:
+            results.append(self._execute_action_logic(action))
+            
+        self.stats["workflows_executed"] += 1
+        return f"GENOME RE-SEQUENCED: Executed {len(actions)} nodes seamlessly."
 
     def _execute_action_logic(self, action: str) -> str:
         msg = f"Executed: {action}"
