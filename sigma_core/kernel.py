@@ -342,6 +342,7 @@ class SigmaKernel:
             ("app_sandbox",          "SigmaAppSandbox",           "sandbox"),
             ("automation_service",   "AutomationService",         "automation_service"),
             ("agent_sandbox",        "SigmaAgentSandbox",         "agent_sandbox"),
+            ("userland.system_api.openclaw_agents", "OpenClawEcosystem", "openclaw"),
         ]
         _em = [
             ("aether_orchestrator",  "AetherOrchestrator",        "aether_orch"),
