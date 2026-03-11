@@ -263,6 +263,8 @@ class SigmaKernel:
 
             # Specialized Extensions (Sovereign)
             ("sigma_core.intelligence_studio", "IntelligenceStudio",    "intelligence"),
+            ("sigma_core.sync_engine",         "SigmaSyncEngine",       "sync"),
+            ("sigma_core.aura_shield",         "SigmaAuraShield",       "shield"),
             ("sigma_core.gurukul_engine",      "GurukulEngine",         "gurukul"),
             ("sigma_core.ghostchat",           "SigmaGhostChat",        "ghostchat"),
             ("userland.system_api.antigravity_core", "AntigravityLayer", "antigravity"),

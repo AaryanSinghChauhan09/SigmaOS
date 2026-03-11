@@ -288,6 +288,13 @@ class SigmaFS:
     def delete(self, path: str, secure_wipe: bool = True) -> dict:
         if path not in self._inodes:
             return {"error": f"SigmaFS: '{path}' not found."}
+        
+        # Trigger AuraShield check for mass deletion if this is part of a pool
+        # This is a bit simulated but effective
+        recent_deletes = [l for l in self._ledger[-10:] if l['event'] == FSEvent.DELETE.value]
+        if len(recent_deletes) > 5 and self.kernel and hasattr(self.kernel, 'bus'):
+            self.kernel.bus.emit("fs.mass_delete", {"count": len(recent_deletes)})
+
         node = self._inodes.pop(path)
         wipe_passes = 7 if secure_wipe else 0
         self._log_event(FSEvent.DELETE, path, f"secure_wipe_passes={wipe_passes}")
