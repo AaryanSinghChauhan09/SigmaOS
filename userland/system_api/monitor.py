@@ -2,15 +2,13 @@ import os
 import random
 import time
 try:
-    from .interfaces import ISigmaModule
+    from sigma_core.interfaces import ISigmaModule, SigmaModuleBase
 except ImportError:
-    try:
-        from interfaces import ISigmaModule
-    except ImportError:
-        class ISigmaModule:
-            def health_check(self) -> str: return "OK"
+    class ISigmaModule: pass
+    class SigmaModuleBase:
+        def __init__(self, kernel): self.kernel = kernel
 
-class SigmaWorkstationMonitor(ISigmaModule):
+class SigmaWorkstationMonitor(SigmaModuleBase):
     """
     Sovereign Workstation Monitor: Industry-Leading Low-Level Observability.
     Provides professional-grade insights into bare-metal memory, thread priority, and automated self-healing.

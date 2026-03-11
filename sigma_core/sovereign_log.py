@@ -10,12 +10,19 @@ import base64
 import hashlib
 import threading
 
-class SovereignLog:
+try:
+    from sigma_core.interfaces import ISigmaModule, SigmaModuleBase
+except ImportError:
+    class ISigmaModule: pass
+    class SigmaModuleBase:
+        def __init__(self, kernel): self.kernel = kernel
+
+class SovereignLog(SigmaModuleBase):
     """
     Centralized High-Speed Kernel & Userland Logging System.
     """
     def __init__(self, kernel=None):
-        self.kernel = kernel
+        super().__init__(kernel)
         self._log_ring = [] # Circular buffer (Memory-Resident)
         self._max_entries = 1000
         self._lock = threading.Lock()

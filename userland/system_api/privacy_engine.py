@@ -7,9 +7,14 @@ Mission: Eliminate 3rd party access, scrub PII, and enforce Ring-0 Sovereignty.
 import hashlib
 import json
 import re
-from .interfaces import ISigmaModule
+try:
+    from sigma_core.interfaces import ISigmaModule, SigmaModuleBase
+except ImportError:
+    class ISigmaModule: pass
+    class SigmaModuleBase:
+        def __init__(self, kernel): self.kernel = kernel
 
-class PrivacyScrubber(ISigmaModule):
+class PrivacyScrubber(SigmaModuleBase):
     """Deep-cleans system logs, telemetry, and network packets of PII."""
     def __init__(self, kernel=None):
         self.kernel = kernel

@@ -188,8 +188,9 @@ class SigmaPerformanceBoost:
     def trigger_workload_hoard(self) -> str:
         """USP: Actively starves non-Sovereign background shims to boost the foreground app."""
         reclaimed = self.steal_cycle_from_shims()
-        self.stats["stolen_cycles_tflops"] += reclaimed
-        return f"Hyper-Hoard: Reclaimed {reclaimed} TFLOPS from background competitor shims. Foreground priority: 99."
+        tflops = reclaimed.get("reclaimed_tflops", 0.0)
+        self.stats["stolen_cycles_tflops"] += tflops
+        return f"Hyper-Hoard: Reclaimed {tflops} TFLOPS from background competitor shims. Foreground priority: 99."
 
     def steal_cycle_from_shims(self) -> Dict[str, Any]:
         """

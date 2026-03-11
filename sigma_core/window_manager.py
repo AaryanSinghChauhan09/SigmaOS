@@ -21,12 +21,19 @@ class SigmaWindow:
     is_active: bool = False
     type:      str  = "Generic" # App, Tool, Overlay, Modal
 
-class SigmaWindowManager:
+try:
+    from sigma_core.interfaces import ISigmaModule, SigmaModuleBase
+except ImportError:
+    class ISigmaModule: pass
+    class SigmaModuleBase:
+        def __init__(self, kernel): self.kernel = kernel
+
+class SigmaWindowManager(SigmaModuleBase):
     """
     Handles window state, stacking order, tiling algorithms, and snap-zones.
     """
     def __init__(self, kernel=None):
-        self.kernel = kernel
+        super().__init__(kernel)
         self._windows: dict[str, SigmaWindow] = {}
         self._stack:   list[str] = [] # Z-order stacking
         self._screen_w = 1920 # Default
