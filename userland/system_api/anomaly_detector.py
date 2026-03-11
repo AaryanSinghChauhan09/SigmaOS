@@ -12,6 +12,12 @@ import collections
 import random
 from typing import Dict, List, Any, Optional
 
+try:
+    from sigma_core.interfaces import SigmaModuleBase
+except ImportError:
+    class SigmaModuleBase:
+        def __init__(self, kernel): self.kernel = kernel
+
 _SIGMA_THRESHOLD = 2.5
 _CRITICAL_SIGMA  = 4.5
 _MIN_SAMPLES     = 10
@@ -25,21 +31,20 @@ class ModuleBaseline:
         self.history = collections.deque(maxlen=1000)
         self.z_history = collections.deque(maxlen=100)
         self.last    = 0.0
-        self.drift   = 0.0 # Rate of change of Z-Score
+        self.drift   = 0.0 
         self.anomaly_count = 0
 
     def update(self, value: float):
-        self.n += 1
+        self.n = self.n + 1
         self.last = value
         self.history.append(value)
         delta = value - self._mean
-        self._mean += delta / self.n
+        self._mean = self._mean + (delta / self.n)
         delta2 = value - self._mean
-        self._m2 += delta * delta2
+        self._m2 = self._m2 + (delta * delta2)
         
-        # Calculate Drift
         z = self.z_score(value)
-        if len(self.z_history) > 1:
+        if len(self.z_history) > 0:
             self.drift = z - self.z_history[-1]
         self.z_history.append(z)
 
@@ -56,9 +61,9 @@ class ModuleBaseline:
         if s < 1e-9: return 0.0
         return abs(value - self.mean) / s
 
-class SigmaAnomalyDetector:
+class SigmaAnomalyDetector(SigmaModuleBase):
     def __init__(self, kernel=None):
-        self.kernel = kernel
+        SigmaModuleBase.__init__(self, kernel)
         self._baselines: Dict[str, Dict[str, ModuleBaseline]] = {}
         self._alerts: List[Dict] = []
         self._lock = threading.Lock()
@@ -73,6 +78,7 @@ class SigmaAnomalyDetector:
                     "event_rate": ModuleBaseline(name),
                     "error_rate": ModuleBaseline(name),
                     "mem_usage_mb": ModuleBaseline(name),
+                    "cpu_pressure": ModuleBaseline(name),
                 }
 
     def feed(self, module: str, metric: str, value: float) -> Optional[Dict]:
@@ -85,13 +91,16 @@ class SigmaAnomalyDetector:
             z = bl.z_score(value)
             drift = bl.drift
             
-            # 1. Predictive Pre-Trip (V3.0 "Oracle"): Trip if z > 2.0 AND drift is positive
-            is_predictive = (z > 2.0 and drift > 0.5)
+            # Multivariate Synergistic Correlation (Apex v3.0)
+            # If multiple metrics in the same module are drifting, escalate
+            composite_risk = self._calculate_composite_risk(module)
+            
+            is_predictive = (z > 2.0 and drift > 0.5) or composite_risk > 0.7
             is_anomaly = (z > _SIGMA_THRESHOLD) or is_predictive
 
             if is_anomaly:
-                bl.anomaly_count += 1
-                severity = "CRITICAL" if z > _CRITICAL_SIGMA else "PREDICTIVE" if is_predictive else "WARNING"
+                bl.anomaly_count = bl.anomaly_count + 1
+                severity = "CRITICAL" if (z > _CRITICAL_SIGMA or composite_risk > 0.9) else "PREDICTIVE" if is_predictive else "WARNING"
                 
                 alert = {
                     "ts": time.strftime("%Y-%m-%dT%H:%M:%S"),
@@ -99,6 +108,7 @@ class SigmaAnomalyDetector:
                     "metric": metric,
                     "z_score": round(z, 2),
                     "drift": round(drift, 2),
+                    "risk_composite": round(composite_risk, 2),
                     "severity": severity,
                     "forensic_code": f"SIGMA-{random.randint(100, 999)}"
                 }
@@ -108,34 +118,36 @@ class SigmaAnomalyDetector:
                     self.kernel.bus.emit("kad.anomaly", alert)
                     if severity in ["CRITICAL", "PREDICTIVE"]:
                          self.kernel.bus.emit("kad.pre_trip", alert)
+                         # Trigger Auto-Repair if z is extreme
+                         if z > 5.0 and hasattr(self.kernel, "repair_engine"):
+                             self.kernel.repair_engine.repair(module, f"KAD High-Z: {z}")
                 
                 return alert
         return None
 
-    def start_scanning(self):
-        if self._running: return
-        self._running = True
-        threading.Thread(target=self._scan_loop, daemon=True).start()
-
-    def _scan_loop(self):
-        while self._running:
-            time.sleep(self._scan_interval)
-            with self._lock: mods = list(self._baselines.keys())
-            for mod in mods:
-                spike = 35.0 if random.random() > 0.99 else 0.0
-                self.feed(mod, "latency_ms", random.gauss(10.0, 2.0) + spike)
-
-    def stop_scanning(self):
-        self._running = False
+    def _calculate_composite_risk(self, module: str) -> float:
+        """USP: Multivariate Correlation. Calculates if module is failing across multiple dimensions."""
+        metrics = self._baselines.get(module, {})
+        if not metrics: return 0.0
+        
+        # High Z-scores across multiple metrics = high risk
+        z_scores = [b.z_score(b.last) for b in metrics.values() if b.n > _MIN_SAMPLES]
+        if not z_scores: return 0.0
+        
+        # Sigmoid-style normalization of average Z
+        avg_z = sum(z_scores) / len(z_scores)
+        return 1.0 / (1.0 + math.exp(- (avg_z - 2.0)))
 
     def health_check(self) -> str:
-        return f"OK — KAD v3.0 Oracle | Monitoring {len(self._baselines)} modules | {len(self._alerts)} Anomalies | Active: {self._running}"
+        s = self.get_realtime_metrics()
+        driftiest = max(s.items(), key=lambda x: x[1].get("drift", 0), default=("NONE", {}))
+        return f"OK — KAD v3.0 Oracle | Modules: {len(self._baselines)} | Alerts: {len(self._alerts)} | Peak Drift: {driftiest[0]}"
 
     def get_realtime_metrics(self) -> Dict:
-        """Returns a snapshot of the most drifting modules."""
         with self._lock:
             res = {}
             for mod, met_dict in self._baselines.items():
-                max_z = max(b.z_score(b.last) for b in met_dict.values())
-                res[mod] = {"z_max": round(max_z, 1), "drift": round(max(b.drift for b in met_dict.values()), 2)}
+                max_z = max((b.z_score(b.last) for b in met_dict.values()), default=0.0)
+                max_drift = max((b.drift for b in met_dict.values()), default=0.0)
+                res[mod] = {"z_max": round(max_z, 1), "drift": round(max_drift, 2)}
             return res
