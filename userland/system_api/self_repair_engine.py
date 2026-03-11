@@ -64,6 +64,7 @@ class SigmaSelfRepairEngine:
         self._jobs:  List[RepairJob] = []
         self._lock   = threading.Lock()
         self._scrub_running = False
+        self.pfa = PredictiveFaultAnalyzer(self)
         self._stats  = {
             "repairs_total": 0,
             "t1_repairs": 0,
@@ -72,6 +73,22 @@ class SigmaSelfRepairEngine:
             "healed_mb":  0.0,
             "failed":     0,
         }
+
+    def check_proactive_health(self):
+        """Polls HAL to see if we should trigger a repair *before* anything breaks."""
+        hal = self.kernel.registry.get("hal")
+        if not hal: return
+        
+        state = hal.get_hardware_state()
+        try:
+             cpu_val = float(state["cpu_load"].replace("%", ""))
+             ram_val = float(state["ram_load"].replace("%", ""))
+             
+             if self.pfa.analyze_trend("CPU", cpu_val):
+                  self.repair("HAL", "CPU Thermal/Load Spike Predicted", z_score=2.5)
+             if self.pfa.analyze_trend("RAM", ram_val):
+                  self.repair("HAL", "Memory Pressure Surge Predicted", z_score=1.5)
+        except: pass
 
     def trigger_self_heal(self, module="KERNEL") -> Dict:
         """Convenience method to trigger a system-wide heal pulse."""
@@ -230,6 +247,25 @@ class SigmaSelfRepairEngine:
             "action":  "T3 attempted; no rollback target available.",
             "notes":   "Manual intervention required. System in DEGRADED state.",
         }
+
+class PredictiveFaultAnalyzer:
+    """USP: Anticipatory Healing via Telemetry Analysis."""
+    def __init__(self, engine):
+        self.engine = engine
+        self.history = []
+
+    def analyze_trend(self, metric: str, value: float) -> bool:
+        """Analyzes trends to predict failures (e.g. rapid memory growth)."""
+        self.history.append(value)
+        if len(self.history) > 10: self.history.pop(0)
+        
+        if len(self.history) < 5: return False
+        
+        # Simple slope calculation
+        trend = self.history[-1] - self.history[0]
+        if trend > 40: # Sharp spike
+             return True
+        return False
 
     # ── Bit-Rot Scrubber ──────────────────────────────────────────────────────
 

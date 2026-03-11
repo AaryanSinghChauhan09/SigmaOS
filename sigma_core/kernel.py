@@ -151,6 +151,11 @@ class SigmaKernel:
                 if kad and _tick_count % 2 == 0:
                     kad.scan_memory_anomalies()
 
+                # 6. Proactive Health Pulse (USP: Hardware-Aware Predictive Healing)
+                repair = self.registry.get("repair_engine")
+                if repair and hasattr(repair, "check_proactive_health"):
+                    repair.check_proactive_health()
+
             except Exception as e:
                 print(f"[KERNEL] Sentinel Failure on tick {_tick_count}: {e}")
                 self.bus.emit("kernel.error", {"tick": _tick_count, "err": str(e)})
