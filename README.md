@@ -17,6 +17,11 @@ By extracting the best unified selling propositions (USPs) from mainstream and n
 | **OpenClaw Multi-Agent Parity** | **OpenClaw Alternatives (Nanobot, ZeroClaw, TrustClaw, IronClaw):** Managed AI Task Automators. | **Sovereign Agent Ecosystem.** 100% Native, zero-dependency implementations of Nanobot (Lightweight), ZeroClaw (Rust-parity local speed), NanoClaw (Sandboxed Docking), SuperAGI/IronClaw (enterprise Swarms), and memU (Persistent UI Memory). Works completely offline or via OAuth managed online pipelines. |
 | **AI Intelligence** | **Windows Copilot/OpenAI:** Deeply integrated AI agents. | **Sovereign Lab & Agentic Claw.** 100% local, vector-RAG AI without cloud dependency. |
 | **Universal Ascendancy** | **Universal Android/Linux:** Runs everywhere. | **Zero-Dependency Core Engine.** 100% Python Native. Runs unmodified on *any* host (Windows, Linux, Android/Termux, Mac) without requiring 3rd-party libs. |
+| **Forensic-First Core** | **Alpine/MX Linux:** General purpose efficiency. | **Live Forensic Mode & Custody Ledger.** Treats every session as an investigation with snapshot overlay persistence and native Cryptographic Chain-of-Custody logging, making OS activity court-ready. |
+| **Jurisprudence Engine** | **Standard Linux Shell:** Basic file/system search. | **Statutory-Aware Shell & Legal RAG.** Terminal commands instantly pull up Indian Statutes (CPC, BNS) and SLM-based semantic search indexes legal research papers locally. |
+| **Antigravity Layer** | **Standard VM/Docker:** Heavy resource overhead. | **MicroVM Agent Mission Control.** True zero-trust isolated containers with Context-Aware ML Kernel Scheduling; dynamically prioritizes high-stakes legal scrapes natively. |
+| **硬件 Ghost Mode** | **Samsung Knox:** Mobile hardware encryption. | **Evanescent RAM-FS.** Extremely sensitive workloads run safely in encrypted RAM that evaporates entirely instantly alongside Bluetooth UWB "Samsung Hub" proximity key unlocking. |
+| **Antigravity IDE** | **Traditional DE (GNOME/KDE):** App-centric workflow. | **Agent-First Mission Desktop.** Booting directly into an environment mapping jurisprudence vs. time (Statute-Diffing tools) using an integrated tiled window workspace. |
 
 ## 🛠️ Key Components
 

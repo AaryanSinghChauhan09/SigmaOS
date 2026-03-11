@@ -343,6 +343,11 @@ class SigmaKernel:
             ("automation_service",   "AutomationService",         "automation_service"),
             ("agent_sandbox",        "SigmaAgentSandbox",         "agent_sandbox"),
             ("userland.system_api.openclaw_agents", "OpenClawEcosystem", "openclaw"),
+            ("userland.system_api.antigravity_core", "AntigravityForensicCore", "forensics"),
+            ("userland.system_api.antigravity_core", "JurisprudenceEngine", "jurisprudence"),
+            ("userland.system_api.antigravity_core", "AntigravityLayer", "antigravity"),
+            ("userland.system_api.antigravity_core", "AntigravityGhostMode", "ghost_mode"),
+            ("userland.system_api.antigravity_core", "AntigravityDeveloperTools", "ide_tools"),
         ]
         _em = [
             ("aether_orchestrator",  "AetherOrchestrator",        "aether_orch"),
