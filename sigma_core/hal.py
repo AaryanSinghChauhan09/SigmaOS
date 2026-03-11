@@ -8,6 +8,7 @@ Bypasses high-level shell commands for sub-millisecond telemetry.
 import platform
 import os
 import ctypes
+import time
 from ctypes import wintypes
 
 class MEMORYSTATUSEX(ctypes.Structure):
