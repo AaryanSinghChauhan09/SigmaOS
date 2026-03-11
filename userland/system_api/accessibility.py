@@ -26,6 +26,12 @@ class AccessMode(Enum):
     MOTOR        = "Motor Control"
     NEURO_FOCUS  = "Neuro-Divergent Focus"
 
+class InputMode(Enum):
+    STANDARD = auto()
+    VOICE_NATIVE = auto()
+    GESTURE_HAPTIC = auto()
+    EYE_TRACKING = auto()
+
 
 import threading
 try:
@@ -61,6 +67,26 @@ class SigmaAccessibilityHub:
             except Exception:
                 # Use a local flag or just catch silently
                 pass
+                
+        self._current_input_mode = InputMode.STANDARD
+        
+        self.ACCESSIBILITY_PROFILES = {
+            "low_vision_mode": {
+                "name": "Low Vision Mode",
+                "features": {"magnifier": True, "high_contrast": True, "screen_reader": True, "ai_describer": True},
+                "input_mode": InputMode.VOICE_NATIVE
+            },
+            "sensory_focus": {
+                "name": "Sensory Focus Mode",
+                "features": {"neuro_focus": True, "color_blind_filter": False, "magnifier": False},
+                "input_mode": InputMode.STANDARD
+            },
+            "motor_assistance": {
+                "name": "Motor Assistance Mode",
+                "features": {"voice_control": True, "ai_describer": False},
+                "input_mode": InputMode.EYE_TRACKING
+            }
+        }
 
     def speak(self, text: str, interrupt: bool = True):
         """USP: Sovereign TTS - Reads text aloud for visually impaired users."""
@@ -110,6 +136,40 @@ class SigmaAccessibilityHub:
             "state": status,
             "message": f"OmniAccess: {feature.upper()} is now {status}. {effect_msg}"
         }
+
+    def switch_input_mode(self, new_mode: str) -> dict[str, str]:
+        """USP: Adaptive Input Modes - Seamlesly transition between gesture, voice, and eye tracking."""
+        try:
+            mode_enum = getattr(InputMode, new_mode.upper())
+            self._current_input_mode = mode_enum
+            # Signal HAL to load required drivers
+            return {"status": "SUCCESS", "message": f"Adaptive Input switched to: {mode_enum.name}"}
+        except (KeyError, AttributeError):
+            return {"error": "Invalid Input Mode requested."}
+
+    def apply_profile(self, profile_key: str) -> dict[str, str]:
+        """USP: Personalized Accessibility Profiles. Loads an entire user setup instantly."""
+        prof: dict = self.ACCESSIBILITY_PROFILES.get(profile_key, {})
+        if not prof:
+            return {"error": "Profile not found."}
+            
+        messages = []
+        raw_feat = prof.get("features", {})
+        if not isinstance(raw_feat, dict): raw_feat = {}
+        for feat in list(raw_feat.keys()):
+            state = raw_feat[feat]
+            res = self.toggle_feature(str(feat), bool(state))
+            if "message" in res: messages.append(res["message"])
+            
+        i_mode_val = prof.get("input_mode", InputMode.STANDARD)
+        i_mode = i_mode_val if isinstance(i_mode_val, InputMode) else InputMode.STANDARD
+        self._current_input_mode = i_mode
+        messages.append(f"Input Mode forced to: {i_mode.name}")
+        
+        # Inclusive Gamification
+        self._stats["sessions_assisted"] += 5  # Give a boost for using a full profile
+        
+        return {"status": "PROFILE APPLIED", "summary": " | ".join(messages)}
 
     def list_active(self) -> list[str]:
         return [f for f, active in self._active_features.items() if active]
