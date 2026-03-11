@@ -43,3 +43,20 @@ class SigmaModuleLoader:
         except Exception as e:
             print(f"[LOADER_ERR] Failed to load {module_name}: {e}")
         return None
+
+    def load_modules_parallel(self, module_list: list):
+        """
+        USP: Concurrent Apex Hydration. 
+        Loads multiple kernel/ecosystem shards in parallel via ThreadPool.
+        """
+        from concurrent.futures import ThreadPoolExecutor
+        with ThreadPoolExecutor(max_workers=10) as executor:
+            futures = []
+            for m_file, c_name, r_key in module_list:
+                futures.append(executor.submit(self.load_module, m_file, c_name, r_key))
+            
+            # Wait for all core shards to link
+            for future in futures:
+                try: future.result()
+                except: pass
+        return True
