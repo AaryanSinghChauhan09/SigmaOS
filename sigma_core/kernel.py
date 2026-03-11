@@ -100,6 +100,11 @@ class SigmaKernel:
                         p["module"], f"KAD: {p['metric']}={p['value']} z={p['z_score']}",
                         severity=p["severity"]
                     ) if p else None)
+            
+            # Start HEALER (Apex Automation)
+            if hasattr(self, "healer") and self.healer:
+                self.healer.start_service()
+                
             self.start_sentinel()
             self._start_github_sentinel()
             
@@ -250,6 +255,7 @@ class SigmaKernel:
             ("stability_watchdog",           "SigmaStabilityWatchdog",    "watchdog"),
             ("pulse_engine",                 "SigmaPulseEngine",          "pulse"),
             ("shadow_state",                 "SigmaShadowState",          "shadow"),
+            ("sigma_core.system_healer",      "SigmaSystemHealer",         "healer"),
             ("update_manager",               "SigmaUpdateManager",        "update_manager"),
             ("anomaly_detector",             "SigmaAnomalyDetector",      "kad"),
             ("crash_reporter",               "SigmaCrashReporter",        "crash_reporter"),
@@ -286,6 +292,15 @@ class SigmaKernel:
     def self_healing_recovery(self) -> str:
         """USP: Sovereign Repair Engine. Restores integrity from evidence vault if possible."""
         print("[HEALING] Executing Bit-Level Restoration Protocol...")
+        
+        # Priority 1: Multi-Layer System Healer
+        healer = self.registry.get("healer")
+        if healer and hasattr(healer, "trigger_full_resilver"):
+             res = healer.trigger_full_resilver()
+             self.bus.emit("kernel.healed", {"method": "SigmaSystemHealer", "status": res})
+             return f"Healed: {res}"
+
+        # Priority 2: Mesh Repair Engine
         repair = self.registry.get("repair_engine")
         if repair:
             return repair.trigger_mesh_resilver()
@@ -474,8 +489,8 @@ class SigmaKernel:
     def predictive_ai_scheduler(self) -> str:
         """USP: Forward-looking task allocation."""
         pbs = self.pbs
-        if pbs and hasattr(pbs, 'predict_all_bursts'):
-            pbs.predict_all_bursts()
+        if pbs and hasattr(pbs, 'tick_all'):
+            pbs.tick_all()
         return "Predictive Scheduler Active: Silicon-aware jitter neutralized."
 
     def initialize_zram(self) -> str:

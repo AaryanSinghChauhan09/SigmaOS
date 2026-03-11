@@ -25,9 +25,10 @@ class IntegrityGuard(SigmaModuleBase):
             "evidence_locked": 0
         }
 
-    def generate_baseline(self, directories: List[str]):
-        """Generates a signed manifest of the current OS state."""
+    def generate_baseline(self, directories: List[str], create_backups: bool = True):
+        """Generates a signed manifest of the current OS state and optional backups."""
         manifest = {}
+        import shutil
         for directory in directories:
             abs_dir = os.path.abspath(directory)
             if not os.path.exists(abs_dir): continue
@@ -39,10 +40,16 @@ class IntegrityGuard(SigmaModuleBase):
                         h = self._hash_file(path)
                         rel_path = os.path.relpath(path, os.path.dirname(__file__))
                         manifest[rel_path] = h
+                        
+                        if create_backups:
+                            bak_path = path + ".bak"
+                            try:
+                                shutil.copy2(path, bak_path)
+                            except: pass
         
         with open(self.manifest_path, 'w') as f:
             json.dump(manifest, f, indent=4)
-        return f"Integrity: Baseline generated for {len(manifest)} shards."
+        return f"Integrity: Baseline generated for {len(manifest)} shards. Backups: {create_backups}"
 
     def verify_system_integrity(self) -> Dict[str, Any]:
         """USP: Deep Forensic Audit. Compares system shards against the manifest."""
@@ -69,9 +76,25 @@ class IntegrityGuard(SigmaModuleBase):
         
         if tampered:
             self.stats["tamper_events"] += len(tampered)
+            # Notify kernel if present to trigger healing
+            if self.kernel and hasattr(self.kernel, "bus"):
+                self.kernel.bus.emit("integrity.tamper", {"violations": tampered})
             return {"status": "TAMPERED", "violations": tampered}
             
         return {"status": "PURE", "shards": len(manifest)}
+
+    def restore_shard(self, rel_path: str) -> bool:
+        """Restores a shard from its .bak backup."""
+        import shutil
+        abs_path = os.path.abspath(os.path.join(os.path.dirname(__file__), rel_path))
+        bak_path = abs_path + ".bak"
+        if os.path.exists(bak_path):
+            try:
+                shutil.copy2(bak_path, abs_path)
+                return True
+            except:
+                return False
+        return False
 
     def _preserve_evidence(self, path: str, current_hash: str):
         """USP: Forensic Evidence Locking. Copies tampered file to the vault."""
@@ -92,9 +115,15 @@ class IntegrityGuard(SigmaModuleBase):
 
     def _hash_file(self, path: str) -> str:
         sha = hashlib.sha256()
-        with open(path, 'rb') as f:
-            while chunk := f.read(4096):
-                sha.update(chunk)
+        # Optimization: use memoryview for faster hashing
+        try:
+            with open(path, 'rb') as f:
+                content = f.read()
+                sha.update(memoryview(content))
+        except:
+             with open(path, 'rb') as f:
+                while chunk := f.read(4096):
+                    sha.update(chunk)
         return sha.hexdigest()
 
     def health_check(self) -> str:

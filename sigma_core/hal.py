@@ -75,6 +75,38 @@ class SigmaHAL:
             "status": "APEX_READY"
         }
 
+    def set_process_priority(self, level: str = "High"):
+        """USP: Low-level Process Elevation via SetPriorityClass."""
+        if self.host_os != "Windows" or not self._kernel32: return False
+        
+        levels = {
+            "Realtime": 0x00000100,
+            "High":     0x00000080,
+            "Above":    0x00008000,
+            "Normal":   0x00000020,
+            "Below":    0x00004000,
+            "Idle":     0x00000040
+        }
+        
+        try:
+            handle = self._kernel32.GetCurrentProcess()
+            priority = levels.get(level, levels["High"])
+            self._kernel32.SetPriorityClass(handle, priority)
+            return True
+        except:
+            return False
+
+    def trim_working_set(self):
+        """USP: Low-level Memory Trimming via SetProcessWorkingSetSize."""
+        if self.host_os != "Windows" or not self._kernel32: return False
+        try:
+            handle = self._kernel32.GetCurrentProcess()
+            # -1, -1 tells the OS to trim as much as possible
+            self._kernel32.SetProcessWorkingSetSize(handle, -1, -1)
+            return True
+        except:
+            return False
+
     def trigger_irq(self, irq_id: int, payload: dict):
         """Low-level Interrupt Request simulation."""
         if self.kernel:
