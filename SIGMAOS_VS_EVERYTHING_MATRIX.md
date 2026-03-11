@@ -51,13 +51,13 @@ SigmaOS Sovereign v2.0 doesn't just "compete" with agent frameworks; it **obsole
 
 | Framework / Platform | SigmaOS Advantage | Technology Gap (USPs Crushed) | Status |
 | :--- | :--- | :--- | :--- |
-| **AutoGen / CrewAI** | **Persona-Aware Isolate Bus** | Static role-play vs Local-first, Bus-coordinated Multi-Agent Shards. | ✅ INTEGRATED |
-| **Composio / LangChain** | **Universal Tool-Bus (HAL)** | Polyfill-heavy toolsets vs Direct Win32/X11 syscall Tool shims. | ✅ INTEGRATED |
-| **n8n / Langflow / Dify** | **Canvas-to-Kernel Compiler** | Browser-heavy React flows vs Ring-buffered Visual IR (Intermediate Rep). | ✅ INTEGRATED |
-| **Aider / Claude Code** | **Forensic VFS Indexing** | Single-file/Directory parsing vs Kernel-level Block-Address Indexing. | ✅ INTEGRATED |
+| **AutoGen / CrewAI** | **Persona-Aware Isolate Bus** | Static role-play vs Local-first, Parallel Multi-Agent Shards (Kernel-Bus). | ✅ APEX v3.0 |
+| **Composio / LangChain** | **Universal Tool-Bus (HAL)** | Polyfill-heavy toolsets vs Direct Win32/X11 syscall Tool shims. | ✅ APEX v3.0 |
+| **n8n / Langflow / Dify** | **Canvas-to-Kernel Compiler** | Browser-heavy React flows vs Ring-buffered Parallel Agent execution. | ✅ APEX v3.0 |
+| **Aider / Claude Code** | **Forensic VFS Indexing** | Single-file/Directory parsing vs Kernel-level Block-Address Indexing. | ✅ APEX v3.0 |
 | **RAGFlow / Pathway** | **In-Memory Vector Inlining** | External Vector-DB lookup vs ZRAM-integrated Semantic Cache. | ✅ INTEGRATED |
 | **DeepSeek-V3 / Gemini** | **Model-Agnostic P2P Fabric** | API-latency (Cloud) vs Mesh-compute distributed model-sharding. | ✅ INTEGRATED |
-| **BabyAGI / AutoGPT** | **Predictive Self-Healing** | Infinite loop loops vs Kernel-level Singularity Shield & Recovery. | ✅ INTEGRATED |
+| **BabyAGI / AutoGPT** | **Predictive Self-Healing** | Infinite loop loops vs Apex v3.0 Autonomous System Healer & Recovery. | ✅ APEX v3.0 |
 | **AgentUniverse / AGiXT** | **Zero-Knowledge Token Guard** | Shared secrets in RAM vs Vault-masked Ephemeral Proxy Tokens. | ✅ INTEGRATED |
 | **Symphony / Async-Agents** | **Dynamic Priority Throttling** | Static threading vs Predictive Burst Scheduler (PBS) prioritization. | ✅ INTEGRATED |
 | **Phidata / PydanticAI** | **Structured Kernel Objects** | JSON-schema parsing vs Native C-struct validation via HAL. | ✅ INTEGRATED |
