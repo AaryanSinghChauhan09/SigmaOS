@@ -14,7 +14,7 @@ SigmaOS is not just an interface; it's a **Cognitive Mesh**. It aggressively man
 
 ## ⚡ Core Systems
 
-1. **Universal Mode Manager (`mode_manager.py`)** 
+1. **Universal Mode Manager (`mode_manager.py`)**
    - Radically re-tunes CPU/GPU mapping and DAG caching depending on user context. Features *Sovereign_Orchestrator* to run AI Multi-Agent tasks without overhead.
 2. **OmniAutomator (`omni_automator.py`)**
    - The OS Native automation mesh. It learns from your habits with the *Routine Evolution Engine* and previews workflows transparently before execution.

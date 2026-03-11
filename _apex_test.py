@@ -31,18 +31,22 @@ chk("PREWARM",  getattr(k, "prewarmer", None))
 chk("AURA",     getattr(k, "aura", None))
 chk("WARDEN",   getattr(k, "warden", None))
 chk("SANDBOX",  getattr(k, "sandbox", None))
+chk("POLYGLOT", getattr(k, "polyglot_runtime", None))
 
 print("\n" + "="*60)
 print("   SIGMAOS SOVEREIGN — APEX FULL SYSTEM HEALTH REPORT")
 print("="*60)
-ok = 0
+ok: int = 0
 for k_name, v in results.items():
-    status = "OK" if ("OK" in str(v) or "APEX" in str(v) or "HEALTHY" in str(v) or "NOT LOADED" not in str(v)) else "WARN"
-    if "ERROR" in str(v) or "NOT LOADED" in str(v):
+    v_str = str(v)
+    status = "OK" if ("OK" in v_str or "APEX" in v_str or "HEALTHY" in v_str or "NOT LOADED" not in v_str) else "WARN"
+    if "ERROR" in v_str or "NOT LOADED" in v_str:
         status = "FAIL"
     else:
         ok += 1
-    print(f"  [{status:4}] {k_name:12} {str(v)[:70]}")
+    
+    safe_v = "".join([v_str[i] for i in range(min(70, len(v_str)))])
+    print(f"  [{status:4}] {k_name:12} {safe_v}")
 
 print("="*60)
 print(f"  RESULT: {ok}/{len(results)} modules nominal")
