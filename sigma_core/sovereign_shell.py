@@ -55,10 +55,14 @@ class SovereignShell(SigmaModuleBase, ISigmaService):
         elif main_cmd == "turbo":
             if self.kernel: return self.kernel.apply_turbo_mode()
             return "Kernel not attached."
-        elif main_cmd in ["help", "?"]:
-            return self._get_help()
+        elif main_cmd == "vibe":
+            return self._handle_vibe(args)
+        elif main_cmd == "auto":
+            return self._handle_auto(args)
         elif main_cmd == "clear":
             return "\033[2J\033[H" # ANSI Clear Screen
+        elif main_cmd in ["help", "?"]:
+            return self._get_help()
         else:
             return f"Error: Command '{main_cmd}' unknown to the Aethereal Bus."
 
@@ -101,6 +105,31 @@ class SovereignShell(SigmaModuleBase, ISigmaService):
             return "FS Module does not support temporal rewind."
         return "Usage: fs [snapshot|rewind|list]"
 
+    def _handle_vibe(self, args: List[str]) -> str:
+        if not self.kernel: return "Kernel Required."
+        cust = self.kernel.registry.get("customizer")
+        if not cust: return "Customizer Offline."
+        if not args: return "Usage: vibe [Glass|Classic|Aura|Brutalist]"
+        res = cust.apply_morphic_preset(args[0])
+        return f"VIBE: Applied '{args[0]}' Morph. Output: {res['status']}"
+
+    def _handle_auto(self, args: List[str]) -> str:
+        if not self.kernel: return "Kernel Required."
+        auto = self.kernel.registry.get("automator")
+        if not auto: return "OmniAutomator Offline."
+        if not args: return f"Auto Status: {auto.health_check()}"
+        sub = args[0].lower()
+        if sub == "start":
+            auto.start_sentinel()
+            return "SENTINEL: Proactive Intelligence Loop STARTED."
+        if sub == "stop":
+            auto.stop_sentinel()
+            return "SENTINEL: Proactive Intelligence Loop STOPPED."
+        if sub == "mission":
+            intent = " ".join(args[1:]) if len(args) > 1 else "Optimize System"
+            return auto.launch_mission(intent)
+        return "Usage: auto [start|stop|mission <intent>]"
+
     def _get_help(self) -> str:
         return """
 Sovereign Shell Help
@@ -108,6 +137,8 @@ Sovereign Shell Help
 system [cmd]       - Hardware & Kernel telemetry
 swarm [cmd] [args] - Deploy or manage AI swarms
 fs [cmd] [args]    - SigmaFS temporal operations
+vibe [preset]      - Shift Morphological Aesthetic
+auto [cmd] [args]  - OmniAutomator / Proactive Sentinel
 turbo              - Engage Max Throughput mode
 clear              - Clear the terminal screen
 help               - This help menu
