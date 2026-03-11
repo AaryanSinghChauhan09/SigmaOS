@@ -9,19 +9,11 @@ import sys
 import os
 import time
 from typing import List, Optional, Any
-try:
-    from .interfaces import SigmaModuleBase, ISigmaService
-except ImportError:
-    import sys
-    import os
-    _ROOT = os.path.abspath(os.path.join(os.path.dirname(__file__), ".."))
-    if _ROOT not in sys.path:
-        sys.path.insert(0, _ROOT)
-    from sigma_core.interfaces import SigmaModuleBase, ISigmaService
+from sigma_core.interfaces import SigmaModuleBase, ISigmaService
 
 class SovereignShell(SigmaModuleBase, ISigmaService):
     def __init__(self, kernel=None):
-        super().__init__(kernel)
+        SigmaModuleBase.__init__(self, kernel)
         self.prompt = "Σos> "
         self.history: List[str] = []
         self._running = False
@@ -40,7 +32,7 @@ class SovereignShell(SigmaModuleBase, ISigmaService):
         if not parts: return ""
         
         main_cmd = parts[0].lower()
-        args = parts[1:] if len(parts) > 1 else []
+        args = [parts[i] for i in range(1, len(parts))] if len(parts) > 1 else []
         
         self.history.append(cmd_line)
         self.log_event("shell_command", {"cmd": main_cmd, "args": args})
@@ -82,7 +74,8 @@ class SovereignShell(SigmaModuleBase, ISigmaService):
         
         sub = args[0].lower()
         if sub == "deploy":
-            roles = args[1:] if len(args) > 1 else ["Generalist"]
+            args_count = len(args)
+            roles = [args[i] for i in range(1, args_count)] if args_count > 1 else ["Generalist"]
             sid = orch.deploy_swarm("User Mission", roles)
             return f"Swarm: Deployed {sid} with roles: {roles}"
         elif sub == "list":

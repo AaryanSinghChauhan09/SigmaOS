@@ -7,7 +7,11 @@ Handles system-wide themes, soundscapes, and visual DNA.
 
 import os
 import json
-from .interfaces import SigmaModuleBase
+try:
+    from sigma_core.interfaces import SigmaModuleBase
+except ImportError:
+    class SigmaModuleBase:
+        def __init__(self, kernel=None): self.kernel = kernel
 
 class SovereignCustomizer(SigmaModuleBase):
     """
@@ -16,7 +20,7 @@ class SovereignCustomizer(SigmaModuleBase):
     """
 
     def __init__(self, kernel):
-        super().__init__(kernel)
+        SigmaModuleBase.__init__(self, kernel)
         self.active_vibe = "Minimalist"
         self.glass_opacity = 0.85
         self.blur_strength = 10
@@ -48,9 +52,9 @@ class SovereignCustomizer(SigmaModuleBase):
         
         if preset_name in presets:
             p = presets[preset_name]
-            self.border_radius = p["radius"]
-            self.glass_opacity = p["opacity"]
-            self.blur_strength = p["blur"]
+            self.border_radius = int(p["radius"])
+            self.glass_opacity = float(p["opacity"])
+            self.blur_strength = int(p["blur"])
             return {"status": "SUCCESS", "preset": preset_name}
         return {"status": "ERROR", "msg": "Preset not found"}
 

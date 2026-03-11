@@ -30,7 +30,7 @@ class SigmaOmniSearch:
                     results.append({
                         "type": "File",
                         "path": path,
-                        "relevance": round(score, 3)
+                        "relevance": float(f"{score:.3f}")
                     })
 
         # 2. Search System Actions
@@ -47,14 +47,17 @@ class SigmaOmniSearch:
                 results.append({
                     "type": "Action",
                     "action": cmd,
-                    "relevance": round(score, 2)
+                    "relevance": float(f"{score:.2f}")
                 })
 
-        # Sort by relevance
-        results.sort(key=lambda x: x["relevance"], reverse=True)
+        results.sort(key=lambda x: x.get("relevance", 0.0), reverse=True)
+        
+        # Safely slice results
+        res_list = results
+        final_results = res_list[0:10] if len(res_list) > 10 else res_list
         
         elapsed = time.time() - start_time
-        return {"Results": results[:10], "Time": f"{elapsed:.3f}s"}
+        return {"Results": final_results, "Time": f"{elapsed:.3f}s"}
 
     def _fuzzy_match(self, term: str, target: str) -> float:
         """USP: Jaro-Winkler Simplicity for high-speed local relevance."""
