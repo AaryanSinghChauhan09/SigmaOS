@@ -6,13 +6,15 @@ SigmaOS is a high-performance, modular operating environment designed for absolu
 
 ## 🚀 Competitive USPs (Why SigmaOS?)
 
-| Feature | SigmaOS Sovereign | Competitors |
+By extracting the best unified selling propositions (USPs) from mainstream and niche competitors, SigmaOS synthesizes a new architectural standard.
+
+| Architecture Paradigm | Source Competitor USP | SigmaOS Sovereign Implementation |
 | :--- | :--- | :--- |
-| **Local Intelligence** | **Sovereign Lab.** Vector RAG, Big-O Auditor, Forensic Timeline. | OpenAI/Perplexity. Cloud-bound. |
-| **Legal & Academy** | **Bharat Law GPS.** BNS/BNSS procedural mapping + Spaced Repetition. | Fragmented web tools (Anki, Kanoon). |
-| **Productivity** | **Sovereign Scheduler.** AI Focus Protection & Adaptive Habits. | Reclaim.ai. Paid & Cloud-first. |
-| **Automation** | **Agentic Claw.** Self-healing missions across all apps. | MultiOn AI. High cost/latency. |
-| **Privacy** | **Ring-0 Shield.** Zero-telemetry browser + forensic scrubbing. | Brave/Windows. Partial privacy. |
+| **Privacy & Amnesia** | **Tails/QubesOS:** Security by default, compartmentalization. | **Ring-0 Shield & Micro-VM Sandboxing.** Zero-telemetry + process/network isolation. |
+| **Fluid Ecosystem** | **macOS:** Seamless hardware-software integration, fluid UI. | **Morphic UI & Aura Sync.** Adaptive, hardware-accelerated fluid aesthetics with context awareness. |
+| **Cloud-Free Recovery** | **ChromeOS:** Immutable root, lightweight instant recovery. | **Immutable Core Shards.** Cryptographically verified, read-only system images preventing tampering. |
+| **Reproducibility** | **NixOS:** Declarative, reproducible system states. | **Atomic State Sync.** Single-file YAML configuration for perfect workspace recreation anywhere. |
+| **AI Intelligence** | **Windows Copilot/OpenAI:** Deeply integrated AI agents. | **Sovereign Lab & Agentic Claw.** 100% local, vector-RAG AI without cloud dependency. |
 
 ## 🛠️ Key Components
 
