@@ -7,8 +7,11 @@ USP: Automated fix routines for the SigmaOS ecosystem.
 
 import os
 import sys
+import json
 import shutil
+import importlib
 import subprocess
+import datetime
 
 class SigmaFixOrchestrator:
     def __init__(self, root_dir):
@@ -21,7 +24,6 @@ class SigmaFixOrchestrator:
         print(f"[*] {msg}")
 
     def _timestamp(self):
-        import datetime
         return datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
 
     def run_routine_1_display_reset(self):
@@ -118,10 +120,13 @@ class SigmaFixOrchestrator:
         self.log("--- SYSTEM PURIFIED & FULLY FUNCTIONAL ---")
 
 if __name__ == "__main__":
-    root = os.path.dirname(os.path.abspath(__file__))
-    # Adjust root to parent if run from kernel/
-    if "kernel" in root:
-        root = os.path.dirname(root)
+    _file_path = os.path.abspath(__file__)
+    root = os.path.dirname(_file_path)
+    # Traverse up until we find sigma_core or reach the system root
+    while root and not os.path.exists(os.path.join(root, "sigma_core")):
+        parent = os.path.dirname(root)
+        if parent == root: break
+        root = parent
         
     fixer = SigmaFixOrchestrator(root)
     if "--audit" in sys.argv:

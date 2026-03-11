@@ -1,17 +1,7 @@
-"""
-SigmaOS Core Interfaces & SOLID Contracts
-==========================================
-Enforces SRP, OCP, LSP, ISP, and DIP across the Sovereign ecosystem.
-"""
-
 from abc import ABC, abstractmethod
 from typing import Dict, Any, Optional
 
 class ISigmaModule(ABC):
-    """
-    Interface Segregation: Modules only implement what they need.
-    Dependency Inversion: Kernel depends on this abstraction, not concrete modules.
-    """
     @abstractmethod
     def get_module_id(self) -> str:
         pass
@@ -21,9 +11,8 @@ class ISigmaModule(ABC):
         pass
 
 class ISigmaService(ISigmaModule):
-    """Extended Interface for long-running background services."""
     @abstractmethod
-    def start_service(self) -> None:
+    def start_service(self) -> str:
         pass
 
     @abstractmethod
@@ -31,10 +20,6 @@ class ISigmaService(ISigmaModule):
         pass
 
 class SigmaModuleBase(ISigmaModule):
-    """
-    Base class providing common functionality for Liskov Substitution Principle.
-    All modules can be substituted for this base class in the Registry.
-    """
     def __init__(self, kernel):
         self.kernel = kernel
 

@@ -275,6 +275,9 @@ class SigmaKernel:
             ("neural_fabric",                "SigmaNeuralFabric",         "fabric"),
             ("performance_boost",            "SigmaPerformanceBoost",     "perf"),
             ("self_repair_engine",           "SigmaSelfRepairEngine",     "repair_engine"),
+            ("energy_hub",                    "AdaptiveEnergyController", "energy"),
+            ("app_prewarmer",                "SigmaAppPrewarmer",        "prewarmer"),
+            ("app_sandbox",                  "SigmaAppSandbox",          "sandbox"),
             
             # OS Services (GUI requirements)
             ("omni_automator",               "SigmaOmniAutomator",        "automator"),
@@ -481,6 +484,14 @@ class SigmaKernel:
     @property
     def energy(self):             return self.registry.get("energy")
     @property
+    def prewarmer(self):           return self.registry.get("prewarmer")
+    @property
+    def sandbox(self):            return self.registry.get("sandbox")
+    @property
+    def aura(self):               return self.registry.get("shield")
+    @property
+    def shield(self):             return self.registry.get("shield")
+    @property
     def qa_auditor(self):         return self.registry.get("qa_auditor")
     @property
     def games(self):              return self.registry.get("games")
@@ -566,7 +577,7 @@ class SigmaKernel:
             print(f"   ✓ Mesh Fabric: {steps['mesh']}")
         
         t_end = time.perf_counter()
-        steps["boot_time_ms"] = f"{round((t_end - t_start) * 1000, 2):.2f}"
+        steps["boot_time_ms"] = f"{(t_end - t_start) * 1000:.2f}"
         
         print("="*60)
         print(f"  SYSTEM STATUS: [APEX_ONLINE] in {steps['boot_time_ms']}ms")
