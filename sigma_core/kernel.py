@@ -348,6 +348,8 @@ class SigmaKernel:
             ("userland.system_api.antigravity_core", "AntigravityLayer", "antigravity"),
             ("userland.system_api.antigravity_core", "AntigravityGhostMode", "ghost_mode"),
             ("userland.system_api.antigravity_core", "AntigravityDeveloperTools", "ide_tools"),
+            ("userland.system_api.antigravity_core", "AntigravityDataScience", "antigravity_ds"),
+            ("userland.system_api.antigravity_core", "AntigravityMachineLearning", "antigravity_ml"),
         ]
         _em = [
             ("aether_orchestrator",  "AetherOrchestrator",        "aether_orch"),
