@@ -72,7 +72,10 @@ class SigmaKernel:
             if self.shadow:
                 self.shadow.start_periodic_sync()
             if self.vanguard:
-                self.vanguard.start_monitoring()
+                if hasattr(self.vanguard, "start_service"):
+                    self.vanguard.start_service()
+                elif hasattr(self.vanguard, "start_monitoring"):
+                    self.vanguard.start_monitoring()
             if self.crusher:
                 self.crusher.start_crusher_engine()
                 self.crusher.defeat_telemetry()
