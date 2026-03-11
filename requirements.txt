@@ -1,23 +1,20 @@
 # SigmaOS Sovereign v2.0 Dependency Manifest
 # Fulfills 'Professional Application' status across Windows/Linux/macOS.
 # ----------------------------------------------------------------------
-
-# Required for GUI logic
-# (Usually built-in, but pip 'tk' is an alias for 'tkinter')
-# tkinter (via python install)
+# 100% Zero-Dependency Core. All logic is shimmed by sigma_std.py
 
 # Core Networking & Agentic Protocols
-requests >= 2.25.1
-aiohttp >= 3.8.0
-urllib3 >= 1.26.0
+# requests >= 2.25.1    --> REPLACED BY SigmaNetwork (sigma_std.py)
+# aiohttp >= 3.8.0      --> REPLACED BY SigmaNetwork (sigma_std.py)
+# urllib3 >= 1.26.0     --> UNNECESSARY (using urllib.request natively)
 
 # IO & File-System Mesh
-psutil >= 5.8.0
-pycryptodome >= 3.10.1
-watchdog >= 2.1.0
+# psutil >= 5.8.0       --> REPLACED BY SigmaSys (sigma_std.py)
+# pycryptodome >= 3.10.1--> REPLACED BY SigmaCrypto (sigma_std.py)
+# watchdog >= 2.1.0     --> PLANNED NATIVE REPLACEMENT
 
 # AI/ML Tools (Sovereign Lab)
-numpy >= 1.20.0
+# numpy >= 1.20.0       --> REPLACED BY SigmaMath (sigma_std.py)
 # scikit-learn >= 0.24.0 # Optional: High-Performance ML
 # pandas >= 1.2.0        # Optional: Data Studio Logic
 
@@ -27,8 +24,8 @@ numpy >= 1.20.0
 
 # Performance & Analytics
 # setuptools-scm
-typing-extensions >= 3.10.0
-importlib-metadata >= 4.0.0
+# typing-extensions >= 3.10.0
+# importlib-metadata >= 4.0.0
 
 # Git Mesh Sync
 # GitPython >= 3.1.18 # Optional: if sync.ps1 is converted to python

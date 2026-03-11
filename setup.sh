@@ -15,8 +15,7 @@ fi
 echo "[+] Found Python: $(python3 --version)"
 
 # 2. Dependency Injection
-echo "[*] Injecting Core Dependencies: psutil, requests..."
-python3 -m pip install psutil requests --quiet || echo "[!] Pip installation failed. Check internet connection."
+echo "[*] Zero-Dependency Mode: No 3rd Party Packages Required via Pip."
 
 # 3. Running Sigma Setup Engine
 echo "[*] Handing over to Sigma Setup Hub (Hydration Sequence)..."

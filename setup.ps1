@@ -14,11 +14,8 @@ if ($LASTEXITCODE -ne 0) {
 Write-Host "[+] Found Python: $python_version"
 
 # 2. Dependency Injection
-Write-Host "[*] Injecting Core Dependencies: psutil, requests..."
-py -m pip install psutil requests --quiet
-if ($LASTEXITCODE -ne 0) {
-    Write-Host "[!] Pip installation failed. Check internet connection for first-time setup." -ForegroundColor Yellow
-}
+Write-Host "[*] Zero-Dependency Mode: No 3rd Party Packages Required via Pip."
+
 
 # 3. Running Sigma Setup Engine
 Write-Host "[*] Handing over to Sigma Setup Hub (Hydration Sequence)..."
