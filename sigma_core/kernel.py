@@ -37,6 +37,7 @@ from .loader import SigmaModuleLoader
 from .intelligence_studio import IntelligenceStudio
 from .gurukul_engine import GurukulEngine
 from .compliance_guard import ComplianceGuard
+from .sovereign_shell import SovereignShell
 
 # Late imports (avoid circular at package level)
 def _import_kernel_module(name):
@@ -106,6 +107,10 @@ class SigmaKernel:
             # Start HEALER (Apex Automation)
             if hasattr(self, "healer") and self.healer:
                 self.healer.start_service()
+            
+            # Start SHEAL (User Interaction Interface)
+            if hasattr(self, "shell") and self.shell:
+                self.shell.start_service()
                 
             self.start_sentinel()
             self._start_github_sentinel()
@@ -263,6 +268,7 @@ class SigmaKernel:
             ("sigma_core.network_guardian",  "SigmaNetworkGuardian",      "net_guard"),
             ("sigma_core.window_manager",     "SigmaWindowManager",        "wms"),
             ("sigma_core.sovereign_log",      "SovereignLog",              "sul"),
+            ("sigma_core.sovereign_shell",    "SovereignShell",            "shell"),
             
             # Performance & AI
             ("predictive_scheduler",          "SigmaPredictiveScheduler",  "pbs"),
@@ -460,6 +466,8 @@ class SigmaKernel:
     def compliance(self):         return self.registry.get("compliance")
     @property
     def healer(self):             return self.registry.get("healer")
+    @property
+    def shell(self):              return self.registry.get("shell")
     @property
     def sync(self):               return self.registry.get("sync")
     @property
