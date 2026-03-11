@@ -5,9 +5,9 @@ Professional generative graphics and neural-canvas orchestration.
 USP: Deep-Synthesis Brushes & Vector-Sovereign Layering.
 """
 import tkinter as tk
-from tkinter import colorchooser, messagebox, ttk, simpledialog
-import PIL.Image, PIL.ImageDraw
+from tkinter import colorchooser, messagebox, ttk, simpledialog, filedialog
 import random
+import os
 
 PAL = {
     "bg": "#0A0A0B",
@@ -26,12 +26,24 @@ class AuraPaint(tk.Toplevel):
         self.title("AuraPaint Apex Pro v4.0")
         self.geometry("1200x900")
         self.configure(bg=PAL["bg"])
-        
-        self.curr_color = PAL["accent"]
-        self.brush_size = 5
-        self.tool = "pen"
-        self.last_x, self.last_y = None, None
-        
+
+        self.curr_color: str = PAL["accent"]
+        self.brush_size: int = 5
+        self.tool: str = "pen"
+        self.last_x: int | None = None
+        self.last_y: int | None = None
+
+        # Widget attributes (set inside _setup_ui)
+        self.top_bar: tk.Frame
+        self.workspace: tk.Frame
+        self.side_fr: tk.Frame
+        self.canvas_fr: tk.Frame
+        self.canvas: tk.Canvas
+        self.prop_fr: tk.Frame
+        self.color_box: tk.Button
+        self.size_scale: ttk.Scale
+        self.status: tk.Label
+
         self._setup_ui()
         self._set_status("READY | NEURAL-SYNTHESIS ENGINE: ONLINE")
 

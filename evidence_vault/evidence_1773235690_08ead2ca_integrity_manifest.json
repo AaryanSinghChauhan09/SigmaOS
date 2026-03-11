@@ -1,0 +1,20 @@
+{
+    "boost_engine.py": "29751586f029e207bcfdce0af39b211357ee23384fbd832430c1367a79eaaccb",
+    "cache.py": "8a624e2a7e09b2998f469d7e0edd10597744cdaa88c9b24dd9d6a7964ccb35e9",
+    "competitor_crusher.py": "276ea2c1a61debe2160ce79416b1b72d65ceb6c40637609333821ab13389d05a",
+    "config.py": "171f3f16bdfe8306163a7f6aa244a8d3f0af3dd4a3fe5cf0f6ab8a11c8c576f6",
+    "customizer.py": "5d0277b8be9f520c8f9f666dca4e78545d53d2b8e83046f965c708e36629424a",
+    "event_bus.py": "39cc971ec2670b7f8ba05d6eb060eeccbe9e2f3cffa05df487af5c21b33e7f04",
+    "hal.py": "22435842e8bffab88759338b892a3d50c2d67b8069ae21d2fe970ddfc2d3c6cc",
+    "integrity.py": "0bc72f5054c80448d123e6adf0568d37d46e644aa0817f65843d6fd715c06211",
+    "integrity_manifest.json": "3cc6c6ee45f39c541479810d9175c6520f6ba8f927df9255288c6a8f9307361d",
+    "kernel.py": "abbfc7e80592356f7cf8c12738034c648ec7b7fbdfe267458ee8fee4e60faf8b",
+    "ledger.py": "573181e717dad6af6aa0feca78fec3a1a75bbf5dea56ebc921262d7b28a3b282",
+    "memory_manager.py": "528e696e8377abbb31923d4f7d614dbb49f2fa9caabded3402fb2122a4221051",
+    "merkle.py": "66cf02cde96033b5c886f9f343bfe7c0af871b7929f649c19e319dd2c7ae832d",
+    "network_guardian.py": "c1e44b9ce75bdeab5350634e8bcea9813f95dfc2831e63b520a3b7af36869aef",
+    "quick_settings.py": "4dd381f43adee97be99cdf0901da4a34443f75fd6e298a119089f3120991e448",
+    "registry.py": "70a96c9394e9b606b523f04eecb50bea294a95d76ef2c51eafdda27cf34b8d2c",
+    "sovereign_app.py": "c562baa49ffc614307f059f2f19594d725da615a04c8ff5cb4d98fc3119b5f09",
+    "__init__.py": "92cf9fa7edcb85bc8cfe8730f8d1e337838c7e261bb212e13e437868075343c4"
+}

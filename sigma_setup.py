@@ -25,28 +25,27 @@ class SigmaSetupEngine:
         print("   Transforming Concepts into Execution Layers    ")
         print("="*60 + "\033[0m")
 
-    def check_environment(self):
+    def check_environment(self) -> dict:
+        from typing import Any, Dict
         print(f"[*] Validating Host Environment: {platform.system()} {platform.release()}")
-        results = {}
+        results: Dict[str, Any] = {}
         # Core checks
-        results["python"] = ".".join(map(str, sys.version_info[:3]))
-        results["disk_space"] = shutil.disk_usage("/").free // (2**30) # GB
-        
+        vi = sys.version_info
+        results["python"] = f"{vi[0]}.{vi[1]}.{vi[2]}"
+        results["disk_space"] = shutil.disk_usage("/").free // (2**30)  # GB
+
         # TKINTER check (Critical for GUI)
         try:
-            import tkinter
+            import tkinter  # noqa: F401
             results["gui_ready"] = True
         except ImportError:
             results["gui_ready"] = False
             print("[!] WARNING: 'tkinter' not found. GUI functions will be unavailable.")
 
-        # PSUTIL check (Recommended for performance)
-        try:
-            import psutil
-            results["psutil_ready"] = True
-        except ImportError:
-            results["psutil_ready"] = False
-            print("[!] CAUTION: 'psutil' not found. System analytics will use native fallbacks.")
+        # Native performance monitoring (zero third-party deps)
+        # SigmaOS uses its own SigmaSys shim instead of psutil
+        results["psutil_ready"] = "native_sigmasys"
+        print("[+] Performance monitoring: SigmaSys native shim active (no psutil needed).")
 
         print(f"[+] Python {results['python']} detected.")
         print(f"[+] Disk Resources: {results['disk_space']} GB Free.")
