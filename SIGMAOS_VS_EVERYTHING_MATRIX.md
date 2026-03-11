@@ -6,6 +6,10 @@ This matrix provides a granular, feature-by-feature benchmark of SigmaOS Soverei
 
 | Feature Category | Windows 11 | macOS Sonoma | Android/iOS | **SigmaOS Sovereign** | Sigma Status |
 | :--- | :--- | :--- | :--- | :--- | :--- |
+| **Multi-tenancy** | Disjointed | Multi-user / Spaces | Profiles | **Ephemeral Sessions (Memory-Only)** | ✅ APEX |
+| **IPC Speed** | Named Pipes/Sockets | XPC / Mach Ports | Intent Filters | **Shared Memory (Zero-Copy)** | ✅ SILICON |
+| **Windowing** | Taskbar / Snap | Menu Bar / Dock | One-by-One | **Morphic WMS (Predictive Tiling)** | ✅ MORPHIC |
+| **Logging** | Event Viewer (XML) | Unified Log (Text) | Logcat | **Sovereign Unified Log (Binary)** | ✅ FORENSIC |
 | **Networking** | Advanced Stack | AirDrop/Continuity | Wi-Fi Direct | **Sovereign-Beam (P2P Mesh)** | ✅ NATIVE |
 | **Kernel Updates** | Disruptive | Manual/Annual | Fragmented | **Atomic A/B (Background)** | ✅ IMPLEMENTED |
 | **Multi-tasking** | Snap Layouts | Stage Manager | Split Screen | **LayoutDirector (Morph)** | ✅ APEX |

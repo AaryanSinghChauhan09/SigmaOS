@@ -215,26 +215,30 @@ class SigmaKernel:
         """
         _km = [
             # Core System & Security
-            ("security_warden",      "SecurityWarden",            "security"),
-            ("user_supremacy",       "SigmaUserSupremacy",        "user_supremacy"),
-            ("zero_trust",           "SigmaZeroTrust",            "zero_trust"),
+            ("security_warden",              "SecurityWarden",            "security"),
+            ("user_supremacy",               "SigmaUserSupremacy",        "user_supremacy"),
+            ("zero_trust",                   "SigmaZeroTrust",            "zero_trust"),
+            ("sigma_core.session_manager",    "SigmaSessionManager",       "sessions"),
             
             # Management & Drivers
-            ("sigma_core.hal",        "SigmaHAL",                  "hal"),
-            ("bootloader",           "SigmaBootloader",           "bootloader"),
-            ("package_manager",      "SigmaPackageManager",       "package_manager"),
+            ("sigma_core.hal",                "SigmaHAL",                  "hal"),
+            ("bootloader",                   "SigmaBootloader",           "bootloader"),
+            ("package_manager",              "SigmaPackageManager",       "package_manager"),
+            ("sigma_core.ipc_manager",        "SigmaIPC",                  "ipc"),
             
             # Subsystems
-            ("sigma_fs",             "SigmaFS",                   "fs"),
-            ("sigma_core.memory_manager","SigmaMemoryManager",        "memory"),
-            ("process_manager",      "SigmaProcessManager",       "process"),
-            ("sigma_core.network_guardian", "SigmaNetworkGuardian",  "net_guard"),
+            ("sigma_fs",                     "SigmaFS",                   "fs"),
+            ("sigma_core.memory_manager",    "SigmaMemoryManager",        "memory"),
+            ("process_manager",              "SigmaProcessManager",       "process"),
+            ("sigma_core.network_guardian",  "SigmaNetworkGuardian",      "net_guard"),
+            ("sigma_core.window_manager",     "SigmaWindowManager",        "wms"),
+            ("sigma_core.sovereign_log",      "SovereignLog",              "sul"),
             
             # Performance & AI
-            ("predictive_scheduler",  "SigmaPredictiveScheduler",  "pbs"),
-            ("neural_fabric",        "SigmaNeuralFabric",         "fabric"),
-            ("performance_boost",    "SigmaPerformanceBoost",     "perf"),
-            ("self_repair_engine",   "SigmaSelfRepairEngine",     "repair_engine"),
+            ("predictive_scheduler",          "SigmaPredictiveScheduler",  "pbs"),
+            ("neural_fabric",                "SigmaNeuralFabric",         "fabric"),
+            ("performance_boost",            "SigmaPerformanceBoost",     "perf"),
+            ("self_repair_engine",           "SigmaSelfRepairEngine",     "repair_engine"),
             
             # Specialized Extensions (Sovereign)
             ("sigma_core.intelligence_studio", "IntelligenceStudio",    "intelligence"),
