@@ -18,14 +18,21 @@ class MissionNode:
     params: Dict[str, Any] = field(default_factory=dict)
     next_node_id: str = None
 
-class SigmaOmniAutomator:
+try:
+    from sigma_core.interfaces import ISigmaModule, SigmaModuleBase
+except ImportError:
+    class ISigmaModule: pass
+    class SigmaModuleBase:
+        def __init__(self, kernel): self.kernel = kernel
+
+class SigmaOmniAutomator(SigmaModuleBase):
     """
     The Unified Agentic Core Pro. 
     Synthesizes Mission-Planning, Trigger-Routines, and Autonomous Problem Solving.
     """
 
     def __init__(self, kernel=None):
-        self.kernel = kernel
+        super().__init__(kernel)
         self.active_missions: Dict[str, List[MissionNode]] = {}
         self.stats = {
             "workflows_executed": 0,
