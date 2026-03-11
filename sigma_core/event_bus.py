@@ -17,28 +17,24 @@ class EventBus:
     """
     
     def __init__(self):
-        """Initialize the event bus"""
+        """Initialize the event bus with a high-performance circular buffer."""
         self._subscribers: Dict[str, List[Callable]] = {}
-        self._event_history: List[Dict[str, Any]] = []
-        self._lock = threading.Lock()
+        # USP: Zero-Allocation Circular Buffer for low-level performance
         self._max_history = 1000
-        self._executor = ThreadPoolExecutor(max_workers=16)
+        self._event_history = [None] * self._max_history
+        self._history_ptr = 0
+        self._lock = threading.Lock()
+        self._executor = ThreadPoolExecutor(max_workers=24) # Increased for Apex load
     
     def subscribe(self, event_name: str, callback: Callable) -> None:
-        """
-        Subscribe to an event
-        
-        Args:
-            event_name: Name of the event to subscribe to
-            callback: Callable to invoke when event is emitted
-        """
+        """Subscribe to an event (O(1) write)."""
         with self._lock:
             if event_name not in self._subscribers:
                 self._subscribers[event_name] = []
             self._subscribers[event_name].append(callback)
     
     def unsubscribe(self, event_name: str, callback: Callable) -> None:
-        """Unsubscribe from an event"""
+        """Unsubscribe from an event."""
         with self._lock:
             if event_name in self._subscribers:
                 if callback in self._subscribers[event_name]:
@@ -46,64 +42,49 @@ class EventBus:
     
     def emit(self, event_name: str, data: Any = None, synchronous: bool = False, priority: int = 2) -> None:
         """
-        Emit an event to all subscribers.
-        
-        Args:
-            event_name: Name of the event
-            data: Event payload data
-            synchronous: If True, waits for callback completion.
-            priority: Lower value = Higher priority (0-5 scale).
+        Emit an event via the FAST-PATH or the WORKER-PATH.
         """
-        is_critical = "critical" in event_name or priority <= 1
+        is_critical = priority <= 1 or "fault" in event_name or "kernel" in event_name
+        
         with self._lock:
-            # Record event in history
-            self._event_history.append({
+            # USP: Circular Ring Buffer prevents O(N) list shifts
+            self._event_history[self._history_ptr] = {
                 "event": event_name,
                 "data": data,
-                "timestamp": __import__('time').time()
-            })
+                "ts": time.time()
+            }
+            self._history_ptr = (self._history_ptr + 1) % self._max_history
             
-            # Trim history if needed
-            if len(self._event_history) > self._max_history:
-                self._event_history.pop(0)
-            
-            # Get subscribers for this event
-            subscribers = self._subscribers.get(event_name, []).copy()
+            subscribers = self._subscribers.get(event_name, [])
+            if not subscribers: return
+            subscribers = subscribers.copy()
         
-        # Invoke subscribers outside lock
-        for callback in subscribers:
-            if synchronous or is_critical:
-                try:
-                    callback(data)
-                except Exception as e:
-                    print(f"[EventBus] Error in priority/sync callback for '{event_name}': {e}")
-            else:
-                # Use executor with simulated priority context
-                self._executor.submit(self._safe_invoke, callback, event_name, data)
+        # FAST-PATH: Direct execution for critical/sync events
+        if synchronous or is_critical:
+            for cb in subscribers:
+                try: cb(data)
+                except Exception as e: print(f"[BUS] Fault in FastPath: {e}")
+        else:
+            # WORKER-PATH: Offload to apex thread pool
+            for cb in subscribers:
+                self._executor.submit(self._safe_invoke, cb, event_name, data)
 
     def _safe_invoke(self, callback: Callable, event_name: str, data: Any):
-        """Internal helper for safe asynchronous callback execution."""
         try:
             callback(data)
         except Exception as e:
-            print(f"[EventBus] Error in async callback for '{event_name}': {e}")
+            print(f"[BUS] Fault in WorkerPath ({event_name}): {e}")
     
     def get_history(self, event_name: str = None) -> List[Dict]:
-        """
-        Get event history
-        
-        Args:
-            event_name: Optional filter by event name
-            
-        Returns:
-            List of historical events
-        """
+        """Returns the event history; filters results to exclude 'None' slots."""
         with self._lock:
+            h = [e for e in self._event_history if e is not None]
             if event_name:
-                return [e for e in self._event_history if e["event"] == event_name]
-            return self._event_history.copy()
+                return [e for e in h if e["event"] == event_name]
+            return h
     
     def clear_history(self) -> None:
-        """Clear event history"""
+        """Resets the history pointer and purges the ring buffer."""
         with self._lock:
-            self._event_history.clear()
+            self._event_history = [None] * self._max_history
+            self._history_ptr = 0
