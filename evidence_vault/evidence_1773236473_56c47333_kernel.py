@@ -282,12 +282,6 @@ class SigmaKernel:
             ("userland.system_api.sigma_silo_manager","SigmaSiloManager", "silos"),
             ("userland.system_api.omni_automator",   "SigmaOmniAutomator", "automator"),
             ("userland.system_api.privacy_engine",   "PrivacyScrubber",    "scrubber"),
-            ("userland.system_api.continuity_engine","SigmaContinuityEngine", "continuity"),
-            ("userland.system_api.accessibility",    "SigmaAccessibilityHub", "accessibility"),
-            ("userland.system_api.agentic_runtime",  "SigmaAgenticRuntime",   "agentic_runtime"),
-            ("userland.system_api.identity_vault",   "SigmaIdentityVault",     "identity_vault"),
-            ("userland.system_api.shared_processor", "SigmaSharedProcessor",   "shared_proc"),
-            ("userland.system_api.universal_bridge", "SigmaUniversalBridge",   "bridge"),
         ]
         
         # Parallel Load: All core services
@@ -403,16 +397,6 @@ class SigmaKernel:
     @property
     def universal_bridge(self):   return self.registry.get("bridge")
     @property
-    def bridge(self):             return self.registry.get("bridge")
-    @property
-    def continuity(self):         return self.registry.get("continuity")
-    @property
-    def accessibility(self):      return self.registry.get("accessibility")
-    @property
-    def agentic_runtime(self):    return self.registry.get("agentic_runtime")
-    @property
-    def identity_vault(self):     return self.registry.get("identity_vault")
-    @property
     def browser(self):            return self.registry.get("browser")
     @property
     def automator(self):          return self.registry.get("automator")
@@ -484,7 +468,7 @@ class SigmaKernel:
         print("  Σ SIGMAOS SOVEREIGN BOOT SEQUENCE INITIALIZED")
         print("="*60)
         
-        steps: Dict[str, Any] = {}
+        steps = {}
         t_start = time.perf_counter()
 
         # --- STAGE 1: HARDWARE ABSTRACTION & VALIDATION ---
@@ -526,7 +510,7 @@ class SigmaKernel:
             print(f"   ✓ Mesh Fabric: {steps['mesh']}")
         
         t_end = time.perf_counter()
-        steps["boot_time_ms"] = float(round((t_end - t_start) * 1000, 2))
+        steps["boot_time_ms"] = round((t_end - t_start) * 1000, 2)
         
         print("="*60)
         print(f"  SYSTEM STATUS: [APEX_ONLINE] in {steps['boot_time_ms']}ms")
@@ -775,9 +759,8 @@ class SigmaKernel:
     def _start_watchdog(self):
         """Monitors system health in a background thread."""
         self._watchdog_active = True
-        t = threading.Thread(target=self.watchdog_monitor, daemon=True)
-        self._watchdog_thread = t
-        t.start()
+        self._watchdog_thread = threading.Thread(target=self.watchdog_monitor, daemon=True)
+        self._watchdog_thread.start()
 
     def watchdog_monitor(self):
         """Watchdog loop to detect module hangs or memory leaks."""

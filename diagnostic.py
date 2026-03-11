@@ -44,8 +44,13 @@ def run_professional_diagnostic():
     print("\n[UI] CUSTOMIZATION & UI STATUS")
     custom = get_mod("customizer")
     if custom:
-        print(f"- Active Theme: {custom.active_theme}")
-        print(f"- Premium Templates: {', '.join(custom.get_premium_templates())}")
+        # Use active_vibe (USP: Morphological Aesthetics)
+        vibe = getattr(custom, "active_vibe", "Standard")
+        print(f"- Active Vibe: {vibe}")
+        if hasattr(custom, "get_premium_templates"):
+            print(f"- Premium Templates: {', '.join(custom.get_premium_templates())}")
+        else:
+            print("- Premium Templates: DEFAULT [Sovereign-Base]")
     
     # 4. Cross-Device & Continuity
     print("\n[NET] CROSS-DEVICE CONTINUITY AUDIT")

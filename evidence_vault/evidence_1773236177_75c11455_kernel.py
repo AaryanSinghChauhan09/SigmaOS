@@ -9,7 +9,6 @@ import threading
 import time
 import hashlib
 import subprocess
-from typing import Dict, List, Any, Optional, Callable, Union
 
 # Bootstrap path so kernel/ and ecosystem/ are importable
 _ROOT = os.path.abspath(os.path.join(os.path.dirname(__file__), ".."))
@@ -63,10 +62,6 @@ class SigmaKernel:
         self.registry.register("customizer", self.customizer)
         self.registry.register("vanguard", self.vanguard_engine)
         self._file_hashes = {}
-        
-        # --- Internal States ---
-        self._watchdog_active: bool = False
-        self._watchdog_thread: Optional[threading.Thread] = None
         
         # --- Observability ---
         self.bus.subscribe("*", self._audit_event)
@@ -276,18 +271,6 @@ class SigmaKernel:
             ("sigma_core.compliance_guard",    "ComplianceGuard",       "compliance"),
             ("sigma_core.vanguard",            "NetworkVanguard",       "vanguard"),
             ("userland.system_api.antigravity_core", "AntigravityLayer", "antigravity"),
-            ("userland.system_api.sigma_auditor",    "SigmaAuditor",      "qa_auditor"),
-            ("userland.system_api.sigma_games_engine","SigmaGamesEngine", "games"),
-            ("userland.system_api.edge_case_silo",   "EdgeCaseSilo",      "stress_silo"),
-            ("userland.system_api.sigma_silo_manager","SigmaSiloManager", "silos"),
-            ("userland.system_api.omni_automator",   "SigmaOmniAutomator", "automator"),
-            ("userland.system_api.privacy_engine",   "PrivacyScrubber",    "scrubber"),
-            ("userland.system_api.continuity_engine","SigmaContinuityEngine", "continuity"),
-            ("userland.system_api.accessibility",    "SigmaAccessibilityHub", "accessibility"),
-            ("userland.system_api.agentic_runtime",  "SigmaAgenticRuntime",   "agentic_runtime"),
-            ("userland.system_api.identity_vault",   "SigmaIdentityVault",     "identity_vault"),
-            ("userland.system_api.shared_processor", "SigmaSharedProcessor",   "shared_proc"),
-            ("userland.system_api.universal_bridge", "SigmaUniversalBridge",   "bridge"),
         ]
         
         # Parallel Load: All core services
@@ -397,24 +380,6 @@ class SigmaKernel:
     
     # OS Service Mappings
     @property
-    def offline_guard(self):      return self.registry.get("offline")
-    @property
-    def shared_processor(self):   return self.registry.get("shared_proc")
-    @property
-    def universal_bridge(self):   return self.registry.get("bridge")
-    @property
-    def bridge(self):             return self.registry.get("bridge")
-    @property
-    def continuity(self):         return self.registry.get("continuity")
-    @property
-    def accessibility(self):      return self.registry.get("accessibility")
-    @property
-    def agentic_runtime(self):    return self.registry.get("agentic_runtime")
-    @property
-    def identity_vault(self):     return self.registry.get("identity_vault")
-    @property
-    def browser(self):            return self.registry.get("browser")
-    @property
     def automator(self):          return self.registry.get("automator")
     @property
     def modes(self):              return self.registry.get("modes")
@@ -423,13 +388,13 @@ class SigmaKernel:
     @property
     def crusher(self):            return self.registry.get("crusher")
     @property
+    def offline_guard(self):      return self.registry.get("offline")
+    @property
     def pulse(self):              return self.registry.get("pulse")
     @property
     def shadow(self):             return self.registry.get("shadow")
     @property
     def update_manager(self):     return self.registry.get("update_manager")
-    @property
-    def updates(self):            return self.registry.get("update_manager")
     @property
     def kad(self):                return self.registry.get("kad")
     @property
@@ -452,20 +417,12 @@ class SigmaKernel:
     def watchdog(self):           return self.registry.get("watchdog")
     @property
     def energy_hub(self):         return self.registry.get("energy")
-    @property
-    def energy(self):             return self.registry.get("energy")
-    @property
-    def qa_auditor(self):         return self.registry.get("qa_auditor")
-    @property
-    def games(self):              return self.registry.get("games")
-    @property
-    def stress_silo(self):        return self.registry.get("stress_silo")
-    @property
-    def silos(self):              return self.registry.get("silos")
-    @property
-    def scrubber(self):           return self.registry.get("scrubber")
+
+    # Legacy fallbacks for internal stability
     @property
     def warden(self):             return self.registry.get("security")
+    @property
+    def updates(self):            return self.registry.get("update_manager")
     @property
     def intel(self):              return self.registry.get("intelligence")
     @property
@@ -484,7 +441,7 @@ class SigmaKernel:
         print("  Σ SIGMAOS SOVEREIGN BOOT SEQUENCE INITIALIZED")
         print("="*60)
         
-        steps: Dict[str, Any] = {}
+        steps = {}
         t_start = time.perf_counter()
 
         # --- STAGE 1: HARDWARE ABSTRACTION & VALIDATION ---
@@ -526,7 +483,7 @@ class SigmaKernel:
             print(f"   ✓ Mesh Fabric: {steps['mesh']}")
         
         t_end = time.perf_counter()
-        steps["boot_time_ms"] = float(round((t_end - t_start) * 1000, 2))
+        steps["boot_time_ms"] = round((t_end - t_start) * 1000, 2)
         
         print("="*60)
         print(f"  SYSTEM STATUS: [APEX_ONLINE] in {steps['boot_time_ms']}ms")
@@ -774,13 +731,14 @@ class SigmaKernel:
 
     def _start_watchdog(self):
         """Monitors system health in a background thread."""
+        import threading
         self._watchdog_active = True
-        t = threading.Thread(target=self.watchdog_monitor, daemon=True)
-        self._watchdog_thread = t
-        t.start()
+        self._watchdog_thread = threading.Thread(target=self.watchdog_monitor, daemon=True)
+        self._watchdog_thread.start()
 
     def watchdog_monitor(self):
         """Watchdog loop to detect module hangs or memory leaks."""
+        import time
         while self._watchdog_active:
             m = self.registry.get("monitor")
             if m:
