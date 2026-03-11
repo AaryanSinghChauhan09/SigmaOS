@@ -320,6 +320,23 @@ def cmd_customize(kernel: SigmaKernel, args):
         info("Usage: python -m sigma_cli customize <ThemeName>")
         info("Available Built-in Themes: Midnight, Cyber, Snow, Rose")
 
+def cmd_apex(kernel: SigmaKernel, args):
+    hdr("APEX SEQUENCE — SYSTEM SINGULARITY")
+    info("Engaging multi-layer optimization and security shields...")
+    results = kernel.execute_apex_sequence()
+    for k, v in results.items():
+        ok(f"{k.upper()}: {v}")
+    ok("System is now in a state of absolute supremacy.")
+
+def cmd_crush(kernel: SigmaKernel, args):
+    hdr("COMPETITOR CRUSH — DOMINANCE INITIATED")
+    auto = kernel.registry.get("automator")
+    if auto:
+        res = auto.launch_preset("Competitor_Crush")
+        print(res)
+    else:
+        err("Automator offline.")
+
 
 # ─── Interactive REPL Shell ───────────────────────────────────────────────────
 
@@ -343,6 +360,8 @@ REPL_HELP = """
   customize <theme> — Repaint universal UI Theme
   ai <subcmd>       — AI/ML/DS Unified Lifecycle Engine (Start/Step/Share)
   repair            — Trigger advanced Merkle-Tree scrubbing
+  apex              — Engage System Singularity (Ultimate Performance)
+  crush             — Run Competitor Crush automation
   help              — Show this help
   exit / quit       — Exit the shell
 """.format(C=C)
@@ -483,6 +502,14 @@ def interactive_shell(kernel: SigmaKernel):
             class _A: pass
             cmd_repair(kernel, _A())
 
+        elif cmd == "apex":
+            class _A: pass
+            cmd_apex(kernel, _A())
+
+        elif cmd == "crush":
+            class _A: pass
+            cmd_crush(kernel, _A())
+
         else:
             warn(f"Unknown command: '{cmd}'. Type 'help' for usage.")
 
@@ -579,6 +606,12 @@ def build_parser():
     c_p = sub.add_parser("customize", help="Deep UI Customization")
     c_p.add_argument("theme", nargs="?", help="Name of theme to apply natively")
 
+    # apex
+    sub.add_parser("apex", help="Engage System Singularity (Ultimate Performance)")
+
+    # crush
+    sub.add_parser("crush", help="Run Competitor Crush automation")
+
     # ai (AI/ML/DS Lifecycle)
     ai_p = sub.add_parser("ai", help="AI/ML/DS Unified Lifecycle Engine")
     ai_sub = ai_p.add_subparsers(dest="subcommand")
@@ -634,6 +667,8 @@ def main():
     elif cmd == "automate": cmd_automate(kernel, args)
     elif cmd == "customize":cmd_customize(kernel, args)
     elif cmd == "ai":        cmd_ai(kernel, args)
+    elif cmd == "apex":      cmd_apex(kernel, args)
+    elif cmd == "crush":     cmd_crush(kernel, args)
     else:
         # No subcommand: drop into interactive shell
         interactive_shell(kernel)

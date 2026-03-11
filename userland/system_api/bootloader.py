@@ -42,7 +42,8 @@ class BootProfile:
 class SigmaBootloader:
     """Instant-On Bootloader & Startup Services."""
 
-    def __init__(self):
+    def __init__(self, kernel=None):
+        self.kernel = kernel
         self._profiles: dict[str, BootProfile] = {}
         self._current_session: dict = {}
         self._snapshot_hash: str = ""

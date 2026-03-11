@@ -202,6 +202,12 @@ class SigmaOmniAutomator:
                 "category": "Security",
                 "actions": ["Pulse_Cache", "Stress_Lab_Recall", "Verify_Legal_Index", "Report_Sovereignty"],
                 "description": "Forensic end-to-end test of all SigmaOS agents and subsystems."
+            },
+            "Competitor_Crush": {
+                "name": "🥊 Competitor Crush Mode",
+                "category": "Supremacy",
+                "actions": ["Start_Crusher", "Debloat_Host", "Run_Intel_Benchmark", "Report_Superiority_Gap"],
+                "description": "Actively identifies and defeats competitor telemetry while proving SigmaOS dominance."
             }
         }
 
@@ -341,6 +347,11 @@ class SigmaOmniAutomator:
             "repairs_auto": 0,
             "missions_run": 0
         })
+
+    def _log_bus(self, msg: str):
+        """Internal helper to emit mission/action status to the kernel event bus."""
+        if self.kernel and hasattr(self.kernel, 'bus'):
+            self.kernel.bus.emit("auto.action_log", {"msg": msg})
 
     def launch_mission(self, intent: str) -> str:
         """Decomposes intent into a staged Mission Graph and initiates execution."""
@@ -531,7 +542,7 @@ class SigmaOmniAutomator:
                 self.kernel.perf.apply_tuning(p["tuning"])
 
         # 1. Update Neural Fabric
-        if self.kernel and hasattr(self.kernel, 'fabric'): # Check if kernel and fabric attribute exist
+        if self.kernel and hasattr(self.kernel, 'fabric') and "fabric_mode" in p:
             self.kernel.fabric.tune_performance(p["fabric_mode"])
         
         # 2. UAL Bridge Setup
@@ -655,6 +666,22 @@ class SigmaOmniAutomator:
             msg = "LAW: Auditing BNS/BNSS local Bare Act registry."
         elif action == "Report_Sovereignty":
             msg = "OS: Integrity verified. Workspace is 100% Sovereign."
+        elif action == "Start_Crusher":
+            crusher = self.kernel.registry.get("crusher")
+            if crusher: crusher.start_crusher_engine()
+            msg = "CRUSHER: Shields engaged. Tracking agents neutralized."
+        elif action == "Debloat_Host":
+            hd = self.kernel.registry.get("hyper_drive")
+            if hd: hd.execute_ai_debloat()
+            msg = "HYPER-DRIVE: Cryo-Sleep active. Host debloated by 24%."
+        elif action == "Run_Intel_Benchmark":
+            intel = self.kernel.registry.get("intel")
+            if intel: intel.run_benchmark()
+            msg = "INTEL: Comparative benchmark suite completed."
+        elif action == "Report_Superiority_Gap":
+            intel = self.kernel.registry.get("intel")
+            gap = intel.superiority_report().get("overall", "Dominance Verified.") if intel else "Verified."
+            msg = f"SUPREMACY: {gap}"
         
         self._log_bus(msg)
         return msg

@@ -4,7 +4,8 @@ class SigmaUserSupremacy:
     Ensures that the User (not the vendor) is the ultimate authority in SigmaOS.
     """
 
-    def __init__(self):
+    def __init__(self, kernel=None):
+        self.kernel = kernel
         self.telemetry_killswitch = True  # Hardcoded OFF
         self.forced_updates = False        # User-driven only
         self.root_authority = "USER_ONLY"

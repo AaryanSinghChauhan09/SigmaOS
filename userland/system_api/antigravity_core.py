@@ -7,9 +7,15 @@ Zero-Dependency components rendering MX Linux/Alpine obsolete for legal tech.
 import os
 import hashlib
 import time
-from .interfaces import ISigmaModule
+try:
+    from sigma_core.interfaces import ISigmaModule, SigmaModuleBase
+except ImportError:
+    # Fallback for direct execution
+    class ISigmaModule: pass
+    class SigmaModuleBase:
+        def __init__(self, kernel): self.kernel = kernel
 
-class AntigravityForensicCore(ISigmaModule):
+class AntigravityForensicCore(SigmaModuleBase):
     """
     The 'Forensic-First' Immutable Core & Offensive/Defensive CS
     """
@@ -43,7 +49,7 @@ class AntigravityForensicCore(ISigmaModule):
         """Dynamic Autopsy-parity timeline construction without bloating OS tools."""
         return f"[CS FORENSICS] Dynamically indexing artifact timeline for {target}. No pre-installed bloat required."
 
-class JurisprudenceEngine(ISigmaModule):
+class JurisprudenceEngine(SigmaModuleBase):
     """
     Statutory-Aware Shell Engine Integration
     """
@@ -70,7 +76,7 @@ class JurisprudenceEngine(ISigmaModule):
             return "KERNEL PANIC: Document violates Limitation Act. File save blocked."
         return "Draft validated against Indian legal procedure."
 
-class AntigravityLayer(ISigmaModule):
+class AntigravityLayer(SigmaModuleBase):
     """
     Agentic "Mission Control"
     """
@@ -94,7 +100,7 @@ class AntigravityLayer(ISigmaModule):
             return "Throttling background GUI. Boosting network IO for agent scrape."
         return "Standard execution."
 
-class AntigravityGhostMode(ISigmaModule):
+class AntigravityGhostMode(SigmaModuleBase):
     """
     Hardware-Level Privacy Integration
     """
@@ -115,7 +121,7 @@ class AntigravityGhostMode(ISigmaModule):
             return "Legal Vault Unlocked via Samsung hardware proximity."
         return "Access denied."
 
-class AntigravityDeveloperTools(ISigmaModule):
+class AntigravityDeveloperTools(SigmaModuleBase):
     """
     Antigravity IDE & Statute Diffing
     """
@@ -130,7 +136,7 @@ class AntigravityDeveloperTools(ISigmaModule):
         """Git-style diffing for Jurisprudence evolution."""
         return f"DIFF RESULT: Comparing {old_ver} to {new_ver} -> Identified 4 statutory amendments."
 
-class AntigravityDataScience(ISigmaModule):
+class AntigravityDataScience(SigmaModuleBase):
     """
     Zero-Copy Analytical Shell (DuckDB/Polars parity)
     """
@@ -141,7 +147,7 @@ class AntigravityDataScience(ISigmaModule):
         """Executes zero-copy analytical queries natively at OS-shell level."""
         return f"[DS ENGINE] Executing '{sql_query}' directly on {dataset_path} with zero RAM overhead."
 
-class AntigravityMachineLearning(ISigmaModule):
+class AntigravityMachineLearning(SigmaModuleBase):
     """
     Invisible Local MLOps & Explainer Shell
     """

@@ -56,7 +56,7 @@ class ModuleBaseline:
         if s < 1e-9: return 0.0
         return abs(value - self.mean) / s
 
-class SigmaKernelAnomalyDetector:
+class SigmaAnomalyDetector:
     def __init__(self, kernel=None):
         self.kernel = kernel
         self._baselines: Dict[str, Dict[str, ModuleBaseline]] = {}

@@ -9,7 +9,7 @@ from typing import Dict, Any
 import time
 import threading
 
-class SigmaPulse:
+class SigmaPulseEngine:
     def __init__(self, kernel):
         self.kernel = kernel
         self._is_pulsing = False

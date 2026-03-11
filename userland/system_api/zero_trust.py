@@ -104,7 +104,8 @@ class SigmaZeroTrust:
         "DROP TABLE": "SQL injection attempt",
     }
 
-    def __init__(self):
+    def __init__(self, kernel=None):
+        self.kernel = kernel
         self._identities:  dict[str, Identity]       = {}
         self._policies:    dict[str, PolicyRule]      = {}
         self._ledger:      list[PermissionGrant]      = []
