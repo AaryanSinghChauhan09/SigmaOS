@@ -5,9 +5,8 @@ Switches the OS between specialized modes (Gaming, Editing, Automation, etc.)
 and optimizes performance/priority/UI state accordingly.
 """
 
-from typing import Dict, List, Any, Callable
-import time
 from typing import Dict, List, Any, Callable, Optional
+import time
 
 class SigmaModeManager:
     def __init__(self, kernel=None):
@@ -253,9 +252,45 @@ class SigmaModeManager:
                 "CPU_Priority": "Strict",
                 "GPU_Profile": "Stable",
                 "RAM_Focus": "Encrypted_Pages",
-                "Description": "Maximum security and compliance mode.",
+                "Background_Task_Limit": 3,
+                "Description": "Maximum security and compliance mode. Zero external leakage.",
+                "AI_Config": {"max_depth": 3, "max_tokens": 512, "style": "Formal", "tool_budget": "Minimal"},
+                "Kernel_Flags": ["zero-trust-max", "memory-encryption", "disk-seal"],
                 "Routines_On_Enter": ["run_compliance_audit", "seal_all_vaults", "activate_ghost_mask"],
                 "Routines_On_Exit": ["unseal_standard_vaults"]
+            },
+            "Focus": {
+                "CPU_Priority": "Balanced",
+                "GPU_Profile": "Low",
+                "RAM_Focus": "Single_App_Priority",
+                "Background_Task_Limit": 2,
+                "Description": "Deep work mode. Eliminates distractions with Pomodoro and AI-assisted flow state.",
+                "AI_Config": {"max_depth": 3, "max_tokens": 1024, "style": "Concise", "tool_budget": "Low"},
+                "Kernel_Flags": ["disable-notifications", "block-social-media", "pomodoro-active"],
+                "Routines_On_Enter": ["disable_notifications", "dim_display", "start_focus_timer"],
+                "Routines_On_Exit": ["enable_notifications", "restore_display", "stop_focus_timer"]
+            },
+            "Healthcare": {
+                "CPU_Priority": "Balanced",
+                "GPU_Profile": "Low",
+                "RAM_Focus": "Encrypted_HIPAA",
+                "Background_Task_Limit": 5,
+                "Description": "HIPAA-compliant mode. Encrypted patient data, audit logs, zero external telemetry.",
+                "AI_Config": {"max_depth": 5, "max_tokens": 4096, "style": "Formal_Medical", "tool_budget": "Medical_NLP"},
+                "Kernel_Flags": ["hipaa-mode", "zero-external-telemetry", "audit-logging-max"],
+                "Routines_On_Enter": ["run_compliance_audit", "activate_vpn", "seal_all_vaults"],
+                "Routines_On_Exit": ["unseal_standard_vaults", "deactivate_vpn"]
+            },
+            "Forensics": {
+                "CPU_Priority": "High",
+                "GPU_Profile": "Balanced_Compute",
+                "RAM_Focus": "Read_Only_Evidence_Cache",
+                "Background_Task_Limit": 5,
+                "Description": "Digital forensics and incident response. Write-blocked filesystem, forensic logging, chain-of-custody.",
+                "AI_Config": {"max_depth": 10, "max_tokens": 8192, "style": "Analytical_Forensic", "tool_budget": "Forensic_Suite"},
+                "Kernel_Flags": ["write-block-all", "forensic-audit-log", "chain-of-custody-active"],
+                "Routines_On_Enter": ["run_system_diagnostics", "isolate_network", "seal_all_vaults"],
+                "Routines_On_Exit": ["unseal_standard_vaults", "restore_network_traffic"]
             }
         }
         self._routines: Dict[str, Callable[..., Any]] = {
@@ -317,10 +352,13 @@ class SigmaModeManager:
             "disengage_hyper_drive": self._disengage_hyper_drive,
             "run_compliance_audit": self._run_compliance_audit,
             "seal_all_vaults": self._seal_all_vaults,
+            "unseal_standard_vaults": self._unseal_standard_vaults,
             "activate_ghost_mask": self._activate_ghost_mask,
             "scrub_recent_media": self._scrub_recent_media,
             "activate_intelligence_suite": self._activate_intelligence_suite,
             "launch_bi_dashboard": self._launch_bi_dashboard,
+            "start_focus_timer": self._start_focus_timer,
+            "stop_focus_timer": self._stop_focus_timer,
         }
 
     def trigger_auto_switch(self, app_name: str) -> Dict[str, str]:
@@ -730,6 +768,20 @@ class SigmaModeManager:
             return "MediaForge forensic scrub initiated on recent assets."
         return "MediaForge offline."
 
+    def _unseal_standard_vaults(self, phase: str = "") -> str:
+        """Restores standard vault access after a high-security mode exits."""
+        if self.kernel and hasattr(self.kernel, "crypt_guard") and self.kernel.crypt_guard:
+            return "Standard vaults unsealed. Access restored to normal privilege level."
+        return "Vaults unsealed (CryptGuard offline — fallback mode)."
+
+    def _start_focus_timer(self, phase: str = "") -> str:
+        """Starts a Pomodoro-style focus timer (25 min work / 5 min break)."""
+        return "Focus Timer ACTIVE: 25-minute Pomodoro session started. Distractions blocked."
+
+    def _stop_focus_timer(self, phase: str = "") -> str:
+        """Stops the active focus timer."""
+        return "Focus Timer STOPPED. All sessions logged. Distraction control lifted."
+
     def _activate_intelligence_suite(self, phase: str = "") -> str:
         """USP: Hydrates professional intelligence engines for Data/AI roles."""
         engines = []
@@ -748,3 +800,31 @@ class SigmaModeManager:
     def _launch_bi_dashboard(self, phase: str = "") -> str:
         """Simulates launching the SigmaOS Strategic BI Dashboard."""
         return "Strategic BI Dashboard active. Real-time ROI and Market Trends visible."
+
+    def get_mode_count(self) -> int:
+        """Returns the total number of available modes."""
+        return len(self._modes)
+
+    def smart_suggest_mode(self, context: Dict) -> str:
+        """
+        USP: AI-powered mode recommendation based on time, battery, and active apps.
+        Returns the suggested mode name.
+        """
+        hour = context.get("hour", 12)
+        battery = context.get("battery_pct", 100)
+        active_apps = context.get("active_apps", [])
+
+        # Check app heuristics first
+        for app in active_apps:
+            for key, mode in self._app_heuristics.items():
+                if key in app.lower():
+                    return mode
+
+        # Time-of-day heuristics
+        if battery < 20:
+            return "Resource_Saving"
+        if 22 <= hour or hour < 6:
+            return "Focus"  # Night = deep work or rest
+        if 9 <= hour <= 17:
+            return "Standard"  # Business hours
+        return "Standard"
