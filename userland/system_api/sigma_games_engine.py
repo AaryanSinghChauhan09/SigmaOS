@@ -60,6 +60,9 @@ class SigmaGame:
             "score": self.score, "moves": self.moves
         }
 
+    def health_check(self) -> str:
+        return f"OK — {self.GAME_NAME} (Logic Ready)"
+
 
 # ─── G01: STRATEGIC SOVEREIGNTY (Chess-like) ─────────────────────────────────
 class StrategicSovereignty(SigmaGame):
