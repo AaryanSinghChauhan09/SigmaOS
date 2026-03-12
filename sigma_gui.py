@@ -28,39 +28,24 @@ from userland.system_api.sigma_std import SigmaSys, SigmaNetwork
 from userland.system_api.sigma_games_engine import SigmaGamesEngine
 
 
-# ─── Palette ─────────────────────────────────────────────────────────────────
-PAL = {
-    "bg":         "#0A0A12",
-    "bg2":        "#11111E",
-    "bg3":        "#16162D",
-    "accent":     "#5856D6", # San Francisco/Blue
-    "accent2":    "#AF52DE", # Apple Purple
-    "cyan":       "#5AC8FA",
-    "teal":       "#4CD964", # Emerald
-    "gold":       "#FFCC00",
-    "red":        "#FF3B30",
-    "green":      "#34C759",
-    "text":       "#F2F2F7",
-    "dim":        "#8E8E93",
-    "card":       "#1C1C1E",
-    "card_hover": "#2C2C2E",
-    "border":     "#38383A",
-    "blue":       "#007AFF",
-    "purple":     "#BF5AF2",
-    "orange":     "#FF9F0A",
-    "pink":       "#FF375F",
-    "silver":     "#8E8E93",
-    "nav_bg":     "#1C1C1E",
-    "glass":      "#252529",
-}
+from gui_pkg.styles import PAL, FONT_MONO, FONT_SMALL, FONT_MED, FONT_BOLD, FONT_TITLE, FONT_LOGO
+from gui_pkg.mixins import UIMixin
+from gui_pkg.war_room import WarRoomPage
+from gui_pkg.mission_control import MissionControlPage
+from gui_pkg.cosmos_dash import CosmosDashPage
+from gui_pkg.fabric import FabricPage
+from gui_pkg.brain import BrainPage
+from gui_pkg.zenith import ZenithPage
+from gui_pkg.sovereign_lab import SovereignLabPage
+from gui_pkg.kernel_debug import KernelDebugPage
+from gui_pkg.automation_hub import AutomationHubPage
+from gui_pkg.routines_dash import RoutinesDashPage
+from gui_pkg.ag_physics import AGPhysicsPage
+from gui_pkg.advanced_calculator import AdvancedCalculatorPage
+from gui_pkg.unit_converter import UnitConverterPage
+from gui_pkg.data_analyzer import DataAnalyzerPage
 
-FONT_MONO  = ("Consolas", 10)
-FONT_SMALL = ("Segoe UI", 9)
-FONT_MED   = ("Segoe UI", 10)
-FONT_BOLD  = ("Segoe UI", 11, "bold")
-FONT_TITLE = ("Segoe UI", 13, "bold")
-FONT_LOGO  = ("Segoe UI", 18, "bold")
-class SigmaGUI(tk.Tk):
+class SigmaGUI(tk.Tk, UIMixin):
     """Main SigmaOS GUI application window."""
 
     def __init__(self, kernel: SigmaKernel, intent: str = None):
@@ -224,320 +209,26 @@ class SigmaGUI(tk.Tk):
         self.after(1000, self._update_pulse)
 
     def _build_gmail_ai_page(self):
-        """Gmail AI Bridge: One-click Google AI Integration via Workspace Auth."""
-        p = tk.Frame(self._content, bg=PAL["bg"])
+        p = GmailAIPage(self._content, self)
         self._pages["gmail_ai"] = p
-        self._build_page_header(p, "GMAIL AI BRIDGE", "Seamlessly Connect Sovereign OS with Google Workspace AI")
-
-        main_panel = tk.Frame(p, bg=PAL["bg"])
-        main_panel.pack(fill="both", expand=True, padx=20, pady=10)
-        
-        # Left Panel (Authentication)
-        auth_panel = self._card(main_panel, "Workspace Credentials")
-        auth_panel.master.pack(side="left", fill="y", expand=False, padx=(0,10))
-        auth_panel.master.configure(width=300)
-        auth_panel.master.pack_propagate(False)
-        
-        tk.Label(auth_panel, text="Email Address", font=FONT_SMALL, fg=PAL["dim"], bg=PAL["card"]).pack(anchor="w", pady=(10, 0))
-        email_entry = ttk.Entry(auth_panel, width=30)
-        email_entry.pack(fill="x", pady=5)
-        
-        tk.Label(auth_panel, text="App Password / Token", font=FONT_SMALL, fg=PAL["dim"], bg=PAL["card"]).pack(anchor="w", pady=(5, 0))
-        pass_entry = ttk.Entry(auth_panel, show="*", width=30)
-        pass_entry.pack(fill="x", pady=5)
-        
-        status_lbl = tk.Label(auth_panel, text="Not Authenticated", fg=PAL["red"], bg=PAL["card"])
-        status_lbl.pack(pady=10)
-        
-        def _login():
-            email = email_entry.get()
-            pwd = pass_entry.get()
-            if not email or not pwd: return
-            
-            # Simulated backend logic
-            if not hasattr(self.kernel, 'gmail_ai'):
-                from gmail_ai_bridge import GmailAIBridge
-                self.kernel.gmail_ai = GmailAIBridge(self.kernel)
-                
-            res = self.kernel.gmail_ai.login(email, pwd)
-            status_lbl.configure(text=f"Logged in as: {res['profile']['email']}", fg=PAL["green"])
-            email_entry.delete(0, tk.END)
-            pass_entry.delete(0, tk.END)
-            self._notify("GMAIL AI", f"Connected to {email}!", "OK")
-            _update_status()
-            
-        ttk.Button(auth_panel, text="Authenticate Session", command=_login).pack(fill="x", pady=5)
-        
-        tk.Label(auth_panel, text="Connected Services:\n• Gemini 1.5 Pro\n• Gemini Flash\n• Workspace Assistants", 
-                 font=FONT_SMALL, fg=PAL["cyan"], bg=PAL["card"], justify="left").pack(anchor="w", pady=20)
-        
-        # Right Panel (AI Interaction)
-        chat_panel = self._card(main_panel, "Sovereign AI Terminal")
-        chat_panel.master.pack(side="right", fill="both", expand=True)
-        
-        chat_log = self._console(chat_panel, height=20)
-        chat_log.pack(fill="both", expand=True, pady=10)
-        self._log(chat_log, "SYSTEM: Awaiting Gmail Authentication to initialize AI pipeline...", "INFO")
-        
-        input_fr = tk.Frame(chat_panel, bg=PAL["card"])
-        input_fr.pack(fill="x")
-        
-        prompt_var = tk.StringVar()
-        prompt_entry = ttk.Entry(input_fr, textvariable=prompt_var)
-        prompt_entry.pack(side="left", fill="x", expand=True, padx=(0,5))
-        
-        def _query_ai(e=None):
-            if not hasattr(self.kernel, 'gmail_ai') or not self.kernel.gmail_ai.active_profile:
-                self._notify("ERROR", "Please connect a Gmail account first.", "ERR")
-                return
-                
-            prompt = prompt_var.get()
-            if not prompt: return
-            
-            self._log(chat_log, f"You: {prompt}", "OK")
-            prompt_var.set("")
-            
-            status_lbl.update()
-            res = self.kernel.gmail_ai.query_gemini(prompt)
-            if res.get("status") == "SUCCESS":
-                self._log(chat_log, f"AI [{res['model']}]:\n{res['response']}\n(Latency: {res['latency_ms']}ms)", "TRACE")
-            else:
-                self._log(chat_log, f"AI Error: {res.get('response')}", "ERR")
-                
-        prompt_entry.bind("<Return>", _query_ai)
-        ttk.Button(input_fr, text="Send to Cloud AI", command=_query_ai).pack(side="right")
-        
-        def _update_status():
-            if hasattr(self.kernel, 'gmail_ai') and self.kernel.gmail_ai.active_profile:
-                status_lbl.configure(text=f"Logged in as: {self.kernel.gmail_ai.active_profile}", fg=PAL["green"])
-                self._log(chat_log, f"SYSTEM: Connection established with {self.kernel.gmail_ai.active_profile}!", "OK")
-        
-        _update_status()
-        # End of Gmail AI Bridge
         
     def _build_visual_customizer_page(self):
-        """Visual Customization Tool: Unifying Linux Automation, Security, and UI/UX Theming."""
-        p = tk.Frame(self._content, bg=PAL["bg"])
+        p = CustomizerPage(self._content, self)
         self._pages["visual_customizer"] = p
-        self._build_page_header(p, "VISUAL CUSTOMIZER", "Enterprise OS Layer Configurator (Automation, Security, Theming)")
+    def _build_dashboard(self):
+        p = DashboardPage(self._content, self)
+        self._pages["dashboard"] = p
 
-        main_panel = tk.Frame(p, bg=PAL["bg"])
-        main_panel.pack(fill="both", expand=True, padx=20, pady=10)
-        
-        # Instantiate kernel modules dynamically if not present
-        if not hasattr(self.kernel, 'linux_automation'):
-            try:
-                from linux_automation import SigmaAutomationLayer
-                self.kernel.linux_automation = SigmaAutomationLayer(self.kernel)
-            except Exception as e:
-                print(f"Error loading automation: {e}")
-                
-        if not hasattr(self.kernel, 'linux_security'):
-            try:
-                from linux_security_layer import SigmaSecurityLayer
-                self.kernel.linux_security = SigmaSecurityLayer(self.kernel)
-            except Exception as e:
-                print(f"Error loading security: {e}")
-                
-        # 1. Automation Module
-        auto_panel = self._card(main_panel, "Server Automation Layer")
-        auto_panel.master.pack(side="top", fill="x", pady=(0,10))
-        
-        auto_opt = tk.Frame(auto_panel, bg=PAL["card"])
-        auto_opt.pack(fill="x", pady=5)
-        
-        cron_var = tk.StringVar(value="0 3 * * *")
-        tk.Label(auto_opt, text="Full System Backup CRON:", font=FONT_SMALL, fg="white", bg=PAL["card"]).pack(side="left", padx=(0,10))
-        ttk.Entry(auto_opt, textvariable=cron_var, width=15).pack(side="left")
-        
-        def _set_backup():
-            if hasattr(self.kernel, 'linux_automation'):
-                res = self.kernel.linux_automation.schedule_backup("/mnt/sigma_sec_storage", cron_var.get(), 30)
-                self._notify("Sigma Automation", res, "OK")
-                
-        ttk.Button(auto_opt, text="Commit CRON Job", command=_set_backup).pack(side="right", padx=10)
-        
-        # Provisioning
-        prov_opt = tk.Frame(auto_panel, bg=PAL["card"])
-        prov_opt.pack(fill="x", pady=5)
-        usr_var = tk.StringVar(value="")
-        tk.Label(prov_opt, text="Provision LDAP User:", font=FONT_SMALL, fg="white", bg=PAL["card"]).pack(side="left", padx=(0,10))
-        ttk.Entry(prov_opt, textvariable=usr_var, width=20).pack(side="left")
-        
-        def _prov():
-            if hasattr(self.kernel, 'linux_automation') and usr_var.get():
-                res = self.kernel.linux_automation.provision_user(usr_var.get(), ["wheel", "sovereign_ring"])
-                self._notify("Identity Service", res['msg'], "OK" if res['status'] == 'OK' else "ERR")
-                usr_var.set("")
-                
-        ttk.Button(prov_opt, text="Create User", command=_prov).pack(side="right", padx=10)
-        
-        # 2. Security Module
-        sec_panel = self._card(main_panel, "SELinux & UFW Defense")
-        sec_panel.master.pack(side="top", fill="x", pady=(0,10))
-        
-        sec_opt = tk.Frame(sec_panel, bg=PAL["card"])
-        sec_opt.pack(fill="x", pady=5)
-        
-        ufw_status = tk.StringVar(value="UFW: Disabled")
-        sel_status = tk.StringVar(value="SELinux: Permissive")
-        
-        def _upd_sec():
-            if hasattr(self.kernel, 'linux_security'):
-                st = self.kernel.linux_security.state
-                ufw_status.set(f"UFW: {st['ufw']['status'].upper()}")
-                sel_status.set(f"SELinux: {st['selinux']['mode'].capitalize()}")
-                
-        _upd_sec()
-        
-        tk.Label(sec_opt, textvariable=ufw_status, font=FONT_BOLD, fg=PAL["red"], bg=PAL["card"]).pack(side="left", padx=10)
-        tk.Label(sec_opt, textvariable=sel_status, font=FONT_BOLD, fg=PAL["cyan"], bg=PAL["card"]).pack(side="left", padx=10)
-        
-        def _lockdown():
-            if hasattr(self.kernel, 'linux_security'):
-                self.kernel.linux_security.ufw_enable()
-                self.kernel.linux_security.selinux_setenforce(1)
-                _upd_sec()
-                self._notify("SIGMA DEFENSE", "System Locked Down. Enforcing SELinux policies.", "OK")
-                
-        ttk.Button(sec_opt, text="Enable Lockdown Mode", command=_lockdown).pack(side="right", padx=10)
-        
-        # 3. Deep Morphological Customizer (Apex v2.0)
-        morphic_panel = self._card(main_panel, "Sovereign Morphic Engine")
-        morphic_panel.master.pack(side="top", fill="x", pady=(0,10))
-        
-        m_fr = tk.Frame(morphic_panel, bg=PAL["card"])
-        m_fr.pack(fill="x", pady=5)
-        
-        def _apply_morphic(vibe):
-            cust = self.kernel.registry.get("customizer")
-            if cust:
-                cust.apply_morphic_preset(vibe)
-                self._notify("MORPHIC SHIFT", f"Visual DNA morphed to {vibe}. Opacity: {cust.glass_opacity}", "OK")
-                self._morphic_island(f"MORPHIC: {vibe.upper()} ACTIVE", PAL["cyan"])
+    def _build_prompt_o_matic_page(self):
+        p = PromptOMaticPage(self._content, self)
+        self._pages["prompt_o_matic"] = p
 
-        vibes = ["Brutalist", "Glass", "Classic", "Aura"]
-        for v in vibes:
-            tk.Button(m_fr, text=v.upper(), font=FONT_SMALL, bg=PAL["bg2"], fg=PAL["text"],
-                      padx=10, relief="flat", command=lambda x=v: _apply_morphic(x)).pack(side="left", padx=5)
-
-        # 4. Glyph Set & Soundscape
-        extra_panel = tk.Frame(main_panel, bg=PAL["bg"])
-        extra_panel.pack(fill="x", pady=(0,10))
-
-        glyph_card = self._card(extra_panel, "Icon Glyph Set")
-        glyph_card.master.pack(side="left", fill="both", expand=True, padx=(0,5))
-        
-        glyph_cb = ttk.Combobox(glyph_card, values=["Sovereign", "Retro", "Fluency", "Monolith"], state="readonly")
-        glyph_cb.pack(fill="x", pady=5)
-        glyph_cb.set("Sovereign")
-        
-        def _set_glyphs(e=None):
-            self._notify("GLYPH SYSTEM", f"Icons re-mapped to {glyph_cb.get()} set.", "INFO")
-            # In a real app, this would refresh all icon variables
-            
-        glyph_cb.bind("<<ComboboxSelected>>", _set_glyphs)
-
-        sound_card = self._card(extra_panel, "Aural Soundscape")
-        sound_card.master.pack(side="left", fill="both", expand=True, padx=(5,0))
-        
-        sound_cb = ttk.Combobox(sound_card, values=["Zen", "Cyber", "Silent"], state="readonly")
-        sound_cb.pack(fill="x", pady=5)
-        sound_cb.set("Zen")
-        
-        def _set_sound(e=None):
-            self._notify("AUDIO ENGINE", f"Acoustic feedback: {sound_cb.get()} mode.", "OK")
-            
-        sound_cb.bind("<<ComboboxSelected>>", _set_sound)
-
-        # 5. Personalization & Identity
-        id_panel = self._card(main_panel, "Identity & Appearance Controls")
-        id_panel.master.pack(side="top", fill="x", pady=(10,10))
-        
-        id_opt = tk.Frame(id_panel, bg=PAL["card"])
-        id_opt.pack(fill="x", pady=5)
-        
-        tk.Label(id_opt, text="Dashboard Alias:", font=FONT_SMALL, fg="white", bg=PAL["card"]).pack(side="left", padx=(0,5))
-        ttk.Entry(id_opt, textvariable=self._dashboard_title, width=15).pack(side="left")
-        
-        tk.Label(id_opt, text=" Font:", font=FONT_SMALL, fg="white", bg=PAL["card"]).pack(side="left", padx=(10,5))
-        font_cb = ttk.Combobox(id_opt, values=["Inter", "Consolas", "Roboto", "Segoe UI"], width=10)
-        font_cb.pack(side="left")
-        font_cb.set("Inter")
-        
-        def _apply_fnt():
-            global FONT_MED, FONT_SMALL
-            fnt = font_cb.get()
-            FONT_MED = (fnt, 10); FONT_SMALL = (fnt, 9)
-            self._apply_style()
-            self._notify("TYPOGRAPHY", f"Global font paired with {fnt}.", "OK")
-            
-        ttk.Button(id_opt, text="Pair", command=_apply_fnt).pack(side="left", padx=5)
-
-        ttk.Button(id_opt, text="Pick Accent Color", command=lambda: self._pick_accent()).pack(side="right", padx=5)
-        
-        # 6. AI Theme Weaver
-        weaver_panel = self._card(main_panel, "Neural Theme Weaver (AI-Driven)")
-        weaver_panel.master.pack(side="top", fill="x", pady=(10,0))
-        
-        w_fr = tk.Frame(weaver_panel, bg=PAL["card"])
-        w_fr.pack(fill="x", pady=5)
-        
-        tk.Label(w_fr, text="Describe your Vibe:", font=FONT_SMALL, fg=PAL["dim"], bg=PAL["card"]).pack(side="left")
-        vibe_e = ttk.Entry(w_fr)
-        vibe_e.pack(side="left", fill="x", expand=True, padx=10)
-        vibe_e.insert(0, "Deep oceanic night with neon highlights...")
-        
-        def _weave():
-            p = vibe_e.get()
-            cust = self.kernel.registry.get("customizer")
-            if cust:
-                res = cust.generate_ai_theme(p)
-                pal = res["applied_styles"]
-                PAL["accent"] = pal["accent_color"]
-                PAL["bg"] = pal["background_color"]
-                self.configure(bg=PAL["bg"])
-                self._apply_style()
-                self._notify("NEURAL WEAVE", res["message"], "OK")
-
-        ttk.Button(w_fr, text="WEAVE THEME", command=_weave).pack(side="right")
-        # Build UI components
-        self._apply_style()
-        self._build_ui()
-        self._bind_shortcuts()
-        self.bind("<Control-space>", lambda e: self._show_spotlight())
-        self._start_live_stats()
-        
-        # Stability Monitoring (Dynamic Island Feedback)
-        if self.kernel.bus:
-            self.kernel.bus.subscribe("auto.proactive_exec", 
-                lambda p: self._morphic_island(p["msg"], PAL["gold"], 5000) if p else None)
-            self.kernel.bus.subscribe("kernel.booted", 
-                lambda p: self._notify("KERNEL BOOT", f"SigmaOS Core {p['version']} Online.", "OK") if p else None)
-            # Lambda helper for log_voice with current app context
-            def _st_log(msg): self.after(0, lambda: self._log_voice(msg))
-            self.kernel.bus.subscribe("stability.shadow_swap_success", 
-                                      lambda p: _st_log(f"🛡️ Shadow Recovery: {p['module']} HOT-SWAPPED."))
-            self.kernel.bus.subscribe("stability.circuit_tripped", 
-                                      lambda p: _st_log(f"⚠️ Stability Alert: {p['module']} ISOLATED."))
-
-        if intent:
-            self.after(1000, lambda: self._handle_startup_intent(intent))
-        
-        # Competitor Dominance Initialization
-        crusher = self.kernel.registry.get("crusher")
-        if crusher:
-            crusher.start_crusher_engine()
-            self._morphic_island("COMPETITOR CRUSHER: ONLINE", PAL["gold"])
-
-        # Auto-Repair Initialization
-        sre = self.kernel.registry.get("self_repair")
-        if sre:
-            sre.start_scrubber()
-        # Error Interceptor (Professional Stability)
-        self.report_callback_exception = self._on_kernel_fault
-        
-        self.after(600000, self._wellness_loop) # First check after 10 mins
+    def _pick_accent(self):
+        """Sovereign Color Picker for UI Theming."""
+        color = colorchooser.askcolor(title="SigmaOS Accent Selector")[1]
+        if color:
+            PAL["accent"] = color
+            self._notify("THEME", f"Accent color updated to {color}", "OK")
 
     def _on_kernel_fault(self, exc_type, exc_val, exc_tb):
         """Standard Kernel Fault Interceptor."""
@@ -977,6 +668,9 @@ class SigmaGUI(tk.Tk):
             "gurukul_academy": self._build_gurukul_academy_page,
             "compliance_center": self._build_compliance_center_page,
             "mission_control":  self._build_mission_control_page,
+            "advanced_calculator": self._build_advanced_calculator_page,
+            "unit_converter":   self._build_unit_converter_page,
+            "data_analyzer":    self._build_data_analyzer_page,
         }
         
         # Oracle VM Discovery (Professional Integration)
@@ -2178,45 +1872,13 @@ class SigmaGUI(tk.Tk):
 
     # ─── Helper Widgets ───────────────────────────────────────────────────────
 
-    def _card(self, parent, title="", padx=16, pady=12, glass=False) -> tk.Frame:
-        """Premium Card with rounded feel and high-fidelity border."""
-        bg_col = PAL["bg2"] if glass else PAL["card"]
-        bord = PAL["accent"] if glass else PAL["border"]
-        
-        outer = tk.Frame(parent, bg=bord, padx=1, pady=1)
-        container = tk.Frame(outer, bg=bg_col, padx=padx, pady=pady)
-        container.pack(fill="both", expand=True)
-        container.master = outer 
-        
-        if title:
-            hdr = tk.Frame(container, bg=bg_col)
-            hdr.pack(fill="x", pady=(0, 10))
-            tk.Label(hdr, text=title.upper(), font=("Inter Bold", 8),
-                     fg=PAL["dim"] if not glass else PAL["cyan"], bg=bg_col).pack(side="left")
-            tk.Frame(container, bg=PAL["bg3"], height=1).pack(fill="x", pady=(0, 15))
-            
-        return container
-
-    def _console(self, parent, height=8) -> scrolledtext.ScrolledText:
-        st = scrolledtext.ScrolledText(
-            parent, bg="#0A0A14", fg=PAL["green"], insertbackground=PAL["cyan"],
-            font=FONT_MONO, height=height, relief="flat",
-            selectbackground=PAL["accent"])
-        st.tag_configure("OK",    foreground=PAL["green"])
-        st.tag_configure("WARN",  foreground=PAL["gold"])
-        st.tag_configure("ERR",   foreground=PAL["red"])
-        st.tag_configure("INFO",  foreground=PAL["cyan"])
-        st.tag_configure("HEAD",  foreground=PAL["accent2"], font=("Consolas",10,"bold"))
-        return st
-
-    def _log(self, console: scrolledtext.ScrolledText, text: str, tag="OK"):
-        def _inner():
-            if not console.winfo_exists(): return
-            console.configure(state="normal")
-            console.insert("end", text + "\n", tag)
-            console.see("end")
-            console.configure(state="disabled")
-        self.after(0, _inner)
+    def _pick_accent(self):
+        """Sovereign Color Picker for UI Theming."""
+        color = colorchooser.askcolor(title="SigmaOS Accent Selector")[1]
+        if color:
+            PAL["accent"] = color
+            self._notify("THEME", f"Accent color updated to {color}", "OK")
+            # In a real app, this would refresh all canvases/widgets
 
     # ─── Dashboard ───────────────────────────────────────────────────────────
 
@@ -2449,355 +2111,16 @@ class SigmaGUI(tk.Tk):
             self._notify("Routine Engine", "Routine Failed.", "ERR")
 
     def _build_aether_orch_page(self):
-        """Sovereign Aether Orchestrator: Multi-Model AI Hub."""
-        p = tk.Frame(self._content, bg=PAL["bg"])
+        p = AetherOrchPage(self._content, self)
         self._pages["aether_orch"] = p
-        self._build_page_header(p, "AETHER ORCHESTRATOR", "Unified AI Coordination & Cross-Model Intent Routing")
-
-        body = tk.Frame(p, bg=PAL["bg"])
-        body.pack(fill="both", expand=True)
-
-        # 1. AI Command Center (Left)
-        l_fr = tk.Frame(body, bg=PAL["bg2"], width=400)
-        l_fr.pack(side="left", fill="both", padx=10, pady=10)
-        l_fr.pack_propagate(False)
-
-        aether = self.kernel.registry.get("aether_orch")
-        
-        c_card = self._card(l_fr, "AI Orchestration Panel")
-        c_card.master.pack(fill="x", pady=10)
-        
-        tk.Label(c_card, text="Direct Aether Prompt:", font=FONT_SMALL, fg=PAL["dim"], bg=PAL["card"]).pack(anchor="w")
-        a_ent = ttk.Entry(c_card)
-        a_ent.pack(fill="x", pady=5)
-        a_ent.insert(0, "Analyze recent security emails and suggest routines.")
-        
-        def _exec_aether():
-            if not aether: return
-            res = aether.collaborative_inference(a_ent.get())
-            self._log(a_log, f"\n[AETHER] Collaborative Response:", "HEAD")
-            self._log(a_log, res["collaborative_summary"], "OK")
-            self._log(a_log, f"  → Suggested Routine: {res['proposed_routine']}", "INFO")
-            btn_rout.config(text=f"LAUNCH: {res['proposed_routine']}", command=lambda: self._run_routine(res["proposed_routine"].lower()))
-
-        ttk.Button(c_card, text="EXECUTE COLLABORATIVE AI", style="Teal.TButton", command=_exec_aether).pack(fill="x", pady=5)
-        
-        btn_rout = ttk.Button(c_card, text="PROPOSED ROUTINE (N/A)", state="disabled")
-        btn_rout.pack(fill="x", pady=5)
-
-        # Integration status
-        i_card = self._card(l_fr, "Integrated Agents")
-        i_card.master.pack(fill="x", pady=10)
-        
-        for agent in [("Email Discovery Agent", "sigma.ai.email_disco"), 
-                      ("Excel AI Filler", "sigma.prod.excel_ai"), 
-                      ("Aether Mesh Node", "sigma.mesh")]:
-            fr = tk.Frame(i_card, bg=PAL["card"])
-            fr.pack(fill="x", pady=2)
-            tk.Label(fr, text=agent[0], font=FONT_SMALL, fg=PAL["text"], bg=PAL["card"]).pack(side="left")
-            tk.Label(fr, text=" [ACTIVE]", font=FONT_SMALL, fg=PAL["green"], bg=PAL["card"]).pack(side="right")
-
-        # 2. Aether Output & Log (Right)
-        r_fr = tk.Frame(body, bg=PAL["bg"])
-        r_fr.pack(side="left", fill="both", expand=True, padx=10, pady=10)
-
-        a_log = self._console(r_fr, height=30)
-        a_log.pack(fill="both", expand=True)
-        self._log(a_log, "Aether core online. Quantum intent routing ready for collaborative analysis.", "INFO")
 
     def _build_gaming_hub(self):
-        """Sovereign Arcade: Master Logic & Strategic Command Center."""
-        p = tk.Frame(self._content, bg=PAL["bg"])
+        p = ArcadePage(self._content, self)
         self._pages["gaming_hub"] = p
-        self._build_page_header(p, "SOVEREIGN ARCADE", "Zero-Telemetry Clean-Room Game Engine (64+ Logic Modules)")
-
-        # Control Bar: Search & Categories
-        ctrl = tk.Frame(p, bg=PAL["nav_bg"], pady=10)
-        ctrl.pack(fill="x", padx=10)
-
-        tk.Label(ctrl, text="🔎 SEARCH:", font=FONT_SMALL, fg=PAL["dim"], bg=PAL["nav_bg"]).pack(side="left", padx=(20, 10))
-        self._game_query = tk.StringVar()
-        self._game_query.trace_add("write", lambda *args: self._refresh_game_grid())
-        search_ent = tk.Entry(ctrl, textvariable=self._game_query, bg=PAL["bg"], fg=PAL["text"], insertbackground=PAL["accent"], 
-                              font=FONT_SMALL, relief="flat", width=30)
-        search_ent.pack(side="left", padx=5)
-
-        tk.Label(ctrl, text="MODE:", font=FONT_SMALL, fg=PAL["dim"], bg=PAL["nav_bg"]).pack(side="left", padx=(30, 10))
-        self._game_cat_filter = tk.StringVar(value="All")
-        cat_cb = ttk.Combobox(ctrl, textvariable=self._game_cat_filter, values=["All", "Board Strategy", "Puzzle / Logic", "Brain Training", "Action / Retro"], state="readonly", width=15)
-        cat_cb.pack(side="left", padx=5)
-        cat_cb.bind("<<ComboboxSelected>>", lambda e: self._refresh_game_grid())
-
-        # Main Scrolling Grid
-        self._game_scroll = tk.ScrollableFrame(p, bg=PAL["bg"]) if hasattr(tk, 'ScrollableFrame') else tk.Frame(p, bg=PAL["bg"])
-        self._game_scroll.pack(fill="both", expand=True, padx=10, pady=10)
-        
-        self._game_grid_inner = tk.Frame(self._game_scroll, bg=PAL["bg"])
-        self._game_grid_inner.pack(fill="both", expand=True)
-
-        self._refresh_game_grid()
-
-    def _refresh_game_grid(self):
-        """Dynamic grid re-hydration based on filters."""
-        for child in self._game_grid_inner.winfo_children(): child.destroy()
-
-        engine = self.kernel.registry.get("games")
-        if not engine: return
-
-        query = self._game_query.get().lower()
-        cat_filter = self._game_cat_filter.get()
-        
-        metadata = engine.get_catalog_metadata()
-        filtered = [g for g in metadata if (query in g["name"].lower() or query in g["id"].lower()) and 
-                    (cat_filter == "All" or cat_filter in g["category"])]
-
-        for i, g in enumerate(filtered):
-            r, c = divmod(i, 4)
-            card = self._card(self._game_grid_inner, f"{g['icon']} {g['name']}")
-            card.master.grid(row=r, column=c, padx=8, pady=8, sticky="nsew")
-            
-            # Card Styling
-            tk.Label(card, text=f"ENGINE: {g['id']} v{g['version']}", font=("Segoe UI", 7, "bold"), fg=PAL["accent"], bg=PAL["card"]).pack(anchor="w")
-            tk.Label(card, text=g['desc'], font=("Segoe UI", 8), fg=PAL["dim"], bg=PAL["card"], wraplength=180, justify="left").pack(anchor="w", pady=5)
-            
-            status_txt = f"READY TO PLAY | {g['size_kb']} KB"
-            tk.Label(card, text=status_txt, font=("Segoe UI", 7), fg=PAL["teal"], bg=PAL["card"]).pack(anchor="w")
-
-            def _play(gid=g['id'], name=g['name']):
-                self._morphic_island(f"Hydrating {name}...", PAL["teal"])
-                engine.play_game(gid)
-                # If specialized app exists, launch it
-                app_id = f"sigma.game.{gid.lower()}"
-                self._launch_app(app_id)
-                
-            ttk.Button(card, text="🎮 PLAY NATIVE", command=_play).pack(fill="x", pady=10)
 
     def _build_war_room_page(self):
-        """Competitor War Room: Real-time superiority metrics."""
-        p = tk.Frame(self._content, bg=PAL["bg"])
+        p = WarRoomPage(self._content, self)
         self._pages["war_room"] = p
-        self._build_page_header(p, "COMPETITOR WAR ROOM", "Live Performance Superiority vs. n8n, OpenClaw, Windows & macOS")
-
-        body = tk.Frame(p, bg=PAL["bg"])
-        body.pack(fill="both", expand=True, padx=20, pady=10)
-        
-        # Dominance Stats (Top Bar)
-        stat_bar = tk.Frame(body, bg=PAL["bg2"])
-        stat_bar.pack(fill="x", pady=(0, 20))
-        
-        intel = self.kernel.intel
-        report = intel.run_benchmark()
-        
-        for i, (label, val) in enumerate([("Total Wins", report["wins"]), ("Dominance", report["dominance"]), ("Status", "GLOBAL LEAD")]):
-            f = tk.Frame(stat_bar, bg=PAL["bg2"], padx=20, pady=10)
-            f.pack(side="left", expand=True)
-            tk.Label(f, text=label, font=FONT_SMALL, fg=PAL["dim"], bg=PAL["bg2"]).pack()
-            tk.Label(f, text=str(val), font=("Segoe UI", 16, "bold"), fg=PAL["gold"], bg=PAL["bg2"]).pack()
-
-        # Comparison Grid
-        grid = tk.Frame(body, bg=PAL["bg"])
-        grid.pack(fill="both", expand=True)
-        
-        comps = ["Windows 11", "macOS Sequoia", "n8n (Workflow)", "OpenClaw (Agent)"]
-        for i, comp in enumerate(comps):
-            r, c = divmod(i, 2)
-            card = self._card(grid, f"Target: {comp}")
-            card.master.grid(row=r, column=c, padx=10, pady=10, sticky="nsew")
-            
-            deltas = intel.get_live_delta(comp)
-            # Show top 3 deltas
-            for d in deltas[:4]:
-                f = tk.Frame(card, bg=PAL["card"])
-                f.pack(fill="x", pady=2)
-                tk.Label(f, text=d["metric"], font=FONT_SMALL, fg=PAL["text"], bg=PAL["card"]).pack(side="left")
-                tk.Label(f, text=f"Sigma: {d['sigma']} | {comp}: {d['competitor']}", font=FONT_XSMALL, fg=PAL["dim"], bg=PAL["card"]).pack(side="left", padx=10)
-                tk.Label(f, text=d["advantage"], font=FONT_SMALL, fg=PAL["green"], bg=PAL["card"]).pack(side="right")
-                
-            tk.Label(card, text="-"*40, fg=PAL["dim"], bg=PAL["card"]).pack()
-            tk.Label(card, text="USP CRUSH:", font=FONT_XSMALL, fg=PAL["gold"], bg=PAL["card"]).pack(anchor="w")
-            
-            crush_msg = "Dominating kernel throughput."
-            if "n8n" in comp: crush_msg = "2s Auto-Plan vs 120s Manual Node Sync."
-            if "OpenClaw" in comp: crush_msg = "Ring-0 Token Guard vs Plaintext Key Memory."
-            if "Windows" in comp: crush_msg = "290MB Idle vs 4.2GB Blob."
-            
-            tk.Label(card, text=crush_msg, font=FONT_XSMALL, fg=PAL["text"], bg=PAL["card"]).pack(anchor="w")
-
-        grid.grid_columnconfigure(0, weight=1)
-        grid.grid_columnconfigure(1, weight=1)
-
-        def _refresh():
-            self._show_page("war_room") # Simple re-build
-        ttk.Button(body, text="🔄 RE-RUN LIVE BENCHMARKS", command=_refresh).pack(pady=10)
-
-    def _build_ag_hub_page(self):
-        """Antigravity Zenith: Ultimate Tool Portal."""
-        p = tk.Frame(self._content, bg=PAL["bg"])
-        self._pages["ag_hub"] = p
-        self._build_page_header(p, "ANTIGRAVITY ZENITH", "Core Antigravity AI-OS Integration Tools")
-
-        body = tk.Frame(p, bg=PAL["bg"])
-        body.pack(fill="both", expand=True, padx=20, pady=10)
-
-        # Left: AI Tools Finder
-        l_fr = tk.Frame(body, bg=PAL["bg2"], width=400)
-        l_fr.pack(side="left", fill="both", padx=10)
-        
-        f_card = self._card(l_fr, "🔭 Antigravity Tools Finder")
-        f_card.master.pack(fill="x", pady=10)
-        
-        self._ag_search_var = tk.StringVar()
-        ttk.Entry(f_card, textvariable=self._ag_search_var).pack(fill="x", pady=5)
-        
-        def _find():
-            q = self._ag_search_var.get().lower()
-            res = [n for n in ["Titan Capture", "IndentFlow", "PDF Forge", "Excel AI Filler", "Email Discovery", "Pure Text"] if q in n.lower()]
-            self._log(f_res_log, f"Search results for '{q}': {', '.join(res) if res else 'None'}", "INFO")
-
-        ttk.Button(f_card, text="SEARCH TOOLS", command=_find).pack(fill="x")
-        f_res_log = self._console(l_fr, height=15)
-        f_res_log.pack(fill="both", expand=True, pady=5)
-
-        # Right: Specialized Tool Launchers
-        r_fr = tk.Frame(body, bg=PAL["bg"])
-        r_fr.pack(side="left", fill="both", expand=True)
-
-        tools = [
-            ("Titan Capture", "High-fidelity screen & state recording.", "titan_capture"),
-            ("IndentFlow", "Code structure visualizer.", "indent_flow"),
-            ("Email Discovery", "AI agent for proactive email sorting.", "email_disco"),
-            ("Excel AI Filler", "Predictive spreadsheet completion.", "excel_ai"),
-            ("Pure Text / Cleaner", "Universal text normalization.", "text_cleaner"),
-            ("PDF Forge", "High-perf PDF generation.", "pdf_forge")
-        ]
-
-        for name, desc, tid in tools:
-            fr = self._card(r_fr, name)
-            fr.master.pack(fill="x", pady=5)
-            tk.Label(fr, text=desc, font=FONT_SMALL, fg=PAL["dim"], bg=PAL["card"]).pack(side="left", padx=10)
-            ttk.Button(fr, text="🚀 LAUNCH", width=12, command=lambda t=tid: self._show_page(t)).pack(side="right")
-
-    def _draw_heatmap(self):
-        if not hasattr(self, "_heatmap_canvas") or not self._heatmap_canvas.winfo_exists(): return
-        self._heatmap_canvas.delete("all")
-        W = self._heatmap_canvas.winfo_width()
-        if W < 10: W = 200
-        
-        # Draw 10 heat blocks
-        for i in range(10):
-            x1 = (W/10) * i
-            x2 = x1 + (W/10) - 2
-            # Intensity based on simulated load
-            intensity = random.randint(30, 100)
-            color = f"#{intensity:02x}20{180-intensity:02x}"
-            if i % 3 == 0: color = PAL["accent"] if random.random() > 0.8 else PAL["bg3"]
-            self._heatmap_canvas.create_rectangle(x1, 5, x2, 35, fill=color, outline="")
-        
-        self.after(1000, self._draw_heatmap)
-
-        # Crusher Card
-        crusher_fr = tk.Frame(p, bg=PAL["bg"])
-        crusher_fr.pack(fill="x", pady=(0, 20))
-        cr_c = self._card(crusher_fr, "🛡️ Competitor Crusher: Apex Dominance")
-        cr_c.master.pack(fill="x")
-        
-        crusher = self.kernel.registry.get("crusher")
-        curr_cr = tk.Label(cr_c, text=crusher.health_check() if crusher else "Crusher Offline", 
-                           bg=PAL["card"], fg=PAL["gold"], font=FONT_BOLD)
-        curr_cr.pack(side="left", padx=10)
-        
-        ttk.Button(cr_c, text="Defeat Telemetry", command=lambda: self._notify("Crusher", crusher.defeat_telemetry() if crusher else "N/A", "OK")).pack(side="right", padx=10)
-        ttk.Button(cr_c, text="Dominance Check", command=lambda: self._notify("Apex", str(crusher.trigger_ecosystem_domination()) if crusher else "N/A", "INFO")).pack(side="right")
-
-        # Warden Card below main stats
-        warden_fr = tk.Frame(p, bg=PAL["bg"])
-        warden_fr.pack(fill="x", pady=(0, 20))
-        w_card = self._card(warden_fr, "Sovereign Security Warden (v2.0)")
-        w_card.master.pack(fill="both", expand=True)
-        # Pulsing Health Indicator
-        health_fr = tk.Frame(w_card, bg=PAL["card"])
-        health_fr.pack(side="left")
-        dot = tk.Label(health_fr, text="●", font=("Inter", 14), fg=PAL["teal"], bg=PAL["card"])
-        dot.pack(side="left", padx=(0, 10))
-        
-        def pulse(alpha=1.0, dir=-0.05):
-            if not dot.winfo_exists(): return
-            new_a = alpha + dir
-            if new_a <= 0.3 or new_a >= 1.0: dir *= -1
-            # Simulate pulse with color dimming
-            val = int(255 * new_a)
-            color = f"#00{val:02x}{val//2:02x}"
-            dot.config(fg=color)
-            self.after(50, lambda: pulse(new_a, dir))
-            
-        pulse()
-        tk.Label(health_fr, text="SYSTEM STATUS: PROTECTED", font=FONT_BOLD, fg=PAL["teal"], bg=PAL["card"]).pack(side="left")
-        tk.Label(w_card, text="| Sycalls Vetted: 4.2k | Anomaly Delta: 0.02σ", font=FONT_SMALL, fg=PAL["dim"], bg=PAL["card"]).pack(side="left", padx=10)
-        ttk.Button(w_card, text="Lockdown Mode", command=lambda: self.kernel.warden.toggle_lockdown()).pack(side="right")
-
-        # Main body: left = quick actions, middle = live log, right = system status
-        body = tk.Frame(p, bg=PAL["bg"])
-        body.pack(fill="both", expand=True)
-
-        # 1. Quick actions
-        qa = self._card(body, "Global Commands")
-        qa.master.pack(side="left", fill="both", expand=False, padx=(0,10))
-        
-        def _btn(lbl, cmd, color=PAL["accent"]):
-             b = tk.Button(qa, text=lbl, command=cmd, font=FONT_SMALL,
-                           bg=PAL["bg3"], fg=PAL["text"], activebackground=color,
-                           relief="flat", bd=0, pady=8)
-             b.pack(fill="x", pady=4)
-             b.bind("<Enter>", lambda e: b.config(bg=color))
-             b.bind("<Leave>", lambda e: b.config(bg=PAL["bg3"]))
-
-        _btn("Run Boot Sequence",   self._do_boot, PAL["blue"])
-        _btn("Fabric Synchronization", self._do_fabric, PAL["purple"])
-        _btn("Deep Security Audit",   self._do_forge, PAL["red"])
-        _btn("AI Performance Tune",   self._do_health, PAL["teal"])
-        _btn("Open Mission Control",  self._show_mission_control, PAL["accent"])
-        _btn("Launch Zenith AI Hub",  lambda: self._show_page("zenith"), PAL["cyan"])
-        _btn("Sovereign Help Guide",  self._show_novice_guide, PAL["dim"])
-
-        # 2. Live log (Central focus)
-        log_card = self._card(body, "Sovereign Event Telemetry")
-        log_card.master.pack(side="left", fill="both", expand=True)
-        self._dash_log = self._console(log_card, height=20)
-        self._dash_log.pack(fill="both", expand=True, pady=(0, 10))
-        self._log(self._dash_log, "SigmaOS Pro Dashboard Online. Monitoring Kernel Bus...", "HEAD")
-
-        # 3. System Status / Metrics
-        met_card = self._card(body, "Competitor Blame")
-        met_card.master.pack(side="left", fill="both", expand=False, padx=(10,0))
-        met_card.master.configure(width=280)
-        met_card.master.pack_propagate(False)
-        
-        def _refresh_blame():
-            for child in self._blame_scroll.winfo_children(): child.destroy()
-            if hasattr(self.kernel, "perf"):
-                blame_list = self.kernel.perf.get_competitor_blame()
-                if not blame_list:
-                    tk.Label(self._blame_scroll, text="✔ No Shims Detected.", font=FONT_SMALL, fg=PAL["green"], bg=PAL["card"]).pack()
-                for b in blame_list:
-                     f = tk.Frame(self._blame_scroll, bg=PAL["card"])
-                     f.pack(fill="x", pady=2)
-                     tk.Label(f, text=f"✖ {b['name']}", font=FONT_MONO, fg=PAL["dim"], bg=PAL["card"]).pack(side="left")
-                     tk.Label(f, text=b['usage'], font=FONT_MONO, fg=PAL["red"], bg=PAL["card"]).pack(side="right")
-            self.after(5000, _refresh_blame)
-
-        self._blame_scroll = tk.Frame(met_card, bg=PAL["card"])
-        self._blame_scroll.pack(fill="both", expand=True, pady=5)
-        _refresh_blame()
-        
-        def _purge_blame():
-            self._log(self._dash_log, "⚡ PURGING SHIM DEBT: Cycle reclamation engaged.", "WARN")
-            if hasattr(self.kernel, "perf"):
-                 res = self.kernel.perf.steal_cycle_from_shims()
-                 self._log(self._dash_log, f"✔ Reclaimed {res['reclaimed_tflops']} TFLOPS from {len(res['targeted'])} shims.", "OK")
-            self._log_voice("Legacy cycle debt purged. Sovereign flow restored.")
-            _refresh_blame()
-            
-        tk.Button(met_card, text="PURGE BLAME", font=("Inter Bold", 8), bg=PAL["red"], fg="white", bd=0, command=_purge_blame).pack(side="bottom", fill="x", pady=5)
 
     def _build_live_chart(self, parent, data_key, color, height=120):
         """High-fidelity Live Chart using Tkinter Canvas."""
@@ -9798,35 +9121,8 @@ class SigmaGUI(tk.Tk):
                   command=lambda: self._show_page("terminal")).pack(pady=10)
 
     def _build_cosmos_dashboard(self):
-        """Cosmos AI-OS Compute Dashboard — Live neural and fabric stats."""
-        p = tk.Frame(self._content, bg=PAL["bg"])
+        p = CosmosDashPage(self._content, self)
         self._pages["cosmos_dash"] = p
-        self._build_page_header(p, "Cosmos AI-OS", "Neural-Native Compute & Fabric Dashboard")
-
-        body = tk.Frame(p, bg=PAL["bg"])
-        body.pack(fill="both", expand=True, padx=20)
-
-        # Local & Mesh Stats
-        card = self._card(body, "📡 Mesh Compute Stats")
-        card.master.pack(fill="x", pady=10)
-        
-        try:
-            self._fabric_label
-        except AttributeError:
-            self._fabric_label = tk.Label(card, text="Fabric: IDLE | Compute: 0 TFLOPS",
-                                           font=FONT_BOLD, fg=PAL["accent"], bg=PAL["card"])
-        self._fabric_label.pack(pady=10)
-
-        def _refresh_fabric():
-            try:
-                if hasattr(self.kernel, "fabric") and self.kernel.fabric:
-                    res = self.kernel.fabric.health_check()
-                    self._fabric_label.config(text=str(res))
-                else:
-                    self._fabric_label.config(text="Fabric: OFFLINE | Bare Metal Mode")
-            except Exception as e:
-                self._fabric_label.config(text=f"Fabric: ERROR — {str(e)[:50]}")
-            self.after(5000, _refresh_fabric)
 
         _refresh_fabric()
         ttk.Button(card, text="Join Hybrid Fabric",
@@ -9882,41 +9178,12 @@ class SigmaGUI(tk.Tk):
 
 
     def _build_fabric_page(self):
-        """Hyper-Compute Fabric Dashboard."""
-        p = tk.Frame(self._content, bg=PAL["bg"])
+        p = FabricPage(self._content, self)
         self._pages["fabric"] = p
-        self._build_page_header(p, "Mesh Compute Fabric", "Distributed Sovereign Power")
-        
-        mon_fr = tk.Frame(p, bg=PAL["bg"])
-        mon_fr.pack(fill="x", pady=10)
-        
-        card = self._card(mon_fr, "Local & Mesh Stats")
-        self._fabric_label = tk.Label(card, text="Fabric: IDLE | Compute: 0 TFLOPS", font=FONT_BOLD, fg=PAL["accent"], bg=PAL["card"])
-        self._fabric_label.pack(pady=10)
-        
-        def refresh():
-            res = self.kernel.fabric.health_check()
-            self._fabric_label.config(text=res)
-            
-        tk.Button(card, text="Join Hybrid Fabric", bg=PAL["accent"], fg="white", 
-                  command=lambda: [self.kernel.fabric.join_compute_fabric(), refresh()]).pack(pady=5)
 
     def _build_brain_page(self):
-        """Cognitive Intent Fabric (Brain)."""
-        p = tk.Frame(self._content, bg=PAL["bg"])
+        p = BrainPage(self._content, self)
         self._pages["brain"] = p
-        self._build_page_header(p, "Cognitive Fabric", "Intent-Aware OS Synchronization")
-        
-        self._brain_log = self._console(p, height=15)
-        self._brain_log.pack(fill="both", expand=True, pady=10)
-        
-        def sync():
-            res = self.kernel.brain.synchronize_intent()
-            self._log(self._brain_log, res, "OK")
-            rec = self.kernel.brain.predict_next_command()
-            self._log(self._brain_log, f"Recommendation: {rec}", "INFO")
-
-        tk.Button(p, text="⚡ Synchronize Intent", bg=PAL["purple"], fg="white", command=sync).pack(pady=10)
 
     # Consolidated into line 6250+ implementation.
 
@@ -9959,294 +9226,20 @@ class SigmaGUI(tk.Tk):
 
 
     def _build_zenith_page(self):
-        """Unified Sovereign Zenith Orchestration (Internalized)."""
-        p = tk.Frame(self._content, bg=PAL["bg"])
+        p = ZenithPage(self._content, self)
         self._pages["zenith"] = p
-        self._build_page_header(p, "Sovereign Zenith", "Integrated AI Control & Account Vault")
-
-        body = tk.Frame(p, bg=PAL["bg"])
-        body.pack(fill="both", expand=True, pady=10)
-
-        zen = self.kernel.registry.get("zenith")
-        nodes = zen.nodes if zen else []
-        quotas = zen.get_quotas() if zen else {}
-
-        # ── Dashboard Stats ──
-        stats_fr = tk.Frame(body, bg=PAL["bg"])
-        stats_fr.pack(fill="x", pady=10)
-        
-        for label, val, color in [("ACTIVE NODES", str(len(nodes)), PAL["cyan"]), 
-                                   ("VAULT STATUS", "ENCRYPTED ✅", PAL["gold"]), 
-                                   ("MISSIONS", "248 (SYNCED)", PAL["purple"])]:
-            card = self._card(stats_fr, label)
-            card.master.pack(side="left", fill="both", expand=True, padx=5)
-            tk.Label(card, text=val, font=("Outfit", 20, "bold"), fg=color, bg=PAL["card"]).pack(pady=5)
-
-        # ── Main Control Console ──
-        console_fr = tk.Frame(body, bg=PAL["bg"])
-        console_fr.pack(fill="both", expand=True, pady=10)
-
-        # Left: Quick Dispatch
-        l_fr = self._card(console_fr, "⚡ Rapid Mission Dispatch")
-        l_fr.master.pack(side="left", fill="both", expand=True, padx=5)
-        
-        prompt_ta = scrolledtext.ScrolledText(l_fr, height=8, font=FONT_MONO, bg=PAL["bg"], fg=PAL["text"], 
-                                               insertbackground=PAL["cyan"], bd=0, highlightthickness=1)
-        prompt_ta.pack(fill="both", expand=True, pady=10)
-        prompt_ta.insert("1.0", "Analyze SigmaOS kernel for security loops and optimize...")
-
-        def _dispatch():
-            txt = prompt_ta.get("1.0", "end").strip()
-            res = zen.dispatch_mission(txt, [n['name'] for n in nodes]) if zen else "Kernel Error"
-            self._log_voice(res)
-            self._notify("Zenith", "AI Mission Dispatched successfully.", "OK")
-
-        ttk.Button(l_fr, text="↑ Launch Sovereign Mission", command=_dispatch).pack(side="right")
-        ttk.Button(l_fr, text="🔐 Manage Vault", command=lambda: self._notify("Vault", "Credential Manager (AES-256) Locked.", "INFO")).pack(side="right", padx=5)
-
-        # Right: Node Telemetry
-        r_fr = self._card(console_fr, "📡 Orchestrator Telemetry")
-        r_fr.master.pack(side="right", fill="both", width=450, padx=5)
-        
-        for n in nodes:
-            name = n['name']
-            q = quotas.get(name, {'percent': 50})
-            color = PAL["green"] if q['percent'] < 50 else (PAL["gold"] if q['percent'] < 80 else PAL["red"])
-            
-            n_row = tk.Frame(r_fr, bg=PAL["card"], pady=5)
-            n_row.pack(fill="x")
-            tk.Label(n_row, text=name, font=FONT_BOLD, fg=PAL["text"], bg=PAL["card"]).pack(side="left")
-            tk.Label(n_row, text=f"{q['percent']}%", font=FONT_MONO, fg=color, bg=PAL["card"]).pack(side="right")
-            
-            pb = ttk.Progressbar(r_fr, maximum=100)
-            pb.pack(fill="x", pady=(0, 10))
-            pb["value"] = q['percent']
-
-        # Sovereign Snap Grid (USP Integration)
-        snap_f = tk.Frame(p, bg=PAL["bg2"], height=60)
-        snap_f.pack(fill="x", pady=10)
-        tk.Label(snap_f, text="📐 Sovereign Snap Grid Pro", font=FONT_BOLD, fg=PAL["teal"], bg=PAL["bg2"]).pack(side="left", padx=20)
-        ttk.Button(snap_f, text="Enable 2x2 Logic Grid", command=lambda: self._log_voice("Snap Grid: 2x2 Balanced Layout Enforced.")).pack(side="right", padx=10)
-        ttk.Button(snap_f, text="Enable Golden Ratio Layout", command=lambda: self._log_voice("Snap Grid: Cinematic Golden Ratio Layout Enforced.")).pack(side="right")
 
     def _build_sovereign_lab_page(self):
-        """Sovereign Lab: Google Antigravity Integration (v3.0)."""
-        p = tk.Frame(self._content, bg=PAL["bg"])
+        p = SovereignLabPage(self._content, self)
         self._pages["sovereign_lab"] = p
-        self._build_page_header(p, "Sovereign Lab", "Architect-to-Agent Workflow Control")
-
-        lab = self.kernel.registry.get("lab")
-        agents = lab.list_agents() if lab else []
-
-        body = tk.Frame(p, bg=PAL["bg"])
-        body.pack(fill="both", expand=True, pady=10)
-
-        # ── Agent Swarm Matrix ──
-        up = tk.Frame(body, bg=PAL["bg"])
-        up.pack(fill="x", pady=10)
-        
-        for agent in agents:
-            c = self._card(up, agent['name'])
-            c.master.pack(side="left", fill="both", expand=True, padx=5)
-            tk.Label(c, text=agent['focus'], font=FONT_SMALL, fg=PAL["dim"], bg=PAL["card"]).pack()
-            tk.Label(c, text=f"Status: {agent['status']}", font=FONT_BOLD, fg=PAL["green"], bg=PAL["card"]).pack(pady=5)
-            ttk.Button(c, text="RECONFIGURE").pack()
-
-        # ── Mission Dispatch & Toolchain ──
-        low = tk.Frame(body, bg=PAL["bg"])
-        low.pack(fill="both", expand=True)
-
-        l_fr = self._card(low, "🚀 Rapid OS-Module Dispatch")
-        l_fr.master.pack(side="left", fill="both", expand=True, padx=5)
-        
-        ta = scrolledtext.ScrolledText(l_fr, height=10, font=FONT_MONO, bg=PAL["bg"], fg=PAL["text"], bd=0)
-        ta.pack(fill="both", expand=True, pady=10)
-        ta.insert("1.0", "I want to build a simple x86_64 hobby operating system... [Stage 1: Boot]")
-
-        def _launch():
-            txt = ta.get("1.0", "end").strip()
-            self._log_voice("Architect: Mission Dispatched to Multiboot Agent Swarm.")
-            self._notify("Lab", "Implementation Plan Artifact Generated.", "OK")
-
-        ttk.Button(l_fr, text="↑ Launch Agent Swarm", command=_launch).pack(side="right")
-        ttk.Button(l_fr, text="⚙️ Settings", command=lambda: self._notify("Lab", "Toolchain: i686-elf-gcc Cross-Compiler Active.", "INFO")).pack(side="right", padx=5)
-
-        r_fr = self._card(low, "🛠️ Low-Level Toolchain")
-        r_fr.master.pack(side="right", fill="both", width=350, padx=5)
-        
-        tools = lab.toolchain_status if lab else {}
-        for k, v in tools.items():
-            f = tk.Frame(r_fr, bg=PAL["card"])
-            f.pack(fill="x", pady=4)
-            tk.Label(f, text=k.upper(), font=FONT_SMALL, fg=PAL["dim"], bg=PAL["card"]).pack(side="left")
-            tk.Label(f, text=v, font=FONT_BOLD, fg=PAL["teal"] if "READY" in v else PAL["gold"], bg=PAL["card"]).pack(side="right")
-
-        ttk.Button(r_fr, text="INIT TOOLCHAIN", command=lambda: self._notify("Lab", lab.initialize_toolchain() if lab else "Kernel Link Fail", "OK")).pack(fill="x", pady=10)
 
     def _build_kernel_debug_page(self):
-        """Kernel Debugger: Ring-0 Logic Visualization."""
-        p = tk.Frame(self._content, bg=PAL["bg"])
+        p = KernelDebugPage(self._content, self)
         self._pages["kernel_debug"] = p
-        self._build_page_header(p, "Sovereign Kernel Debugger", "Ring-0 Hardware & Resource Telemetry")
-
-        body = tk.Frame(p, bg=PAL["bg"])
-        body.pack(fill="both", expand=True, pady=10)
-
-        # ── Low-Level Tables (GDT / IDT / Sched) ──
-        up = tk.Frame(body, bg=PAL["bg"])
-        up.pack(fill="x", pady=10)
-        
-        gdt_c = self._card(up, "📜 GDT (Segments)")
-        gdt_c.master.pack(side="left", fill="both", expand=True, padx=5)
-        gdt_tree = ttk.Treeview(gdt_c, columns=("Selector", "Base", "Limit", "Access"), show="headings", height=5)
-        for c in ("Selector", "Base", "Limit", "Access"): gdt_tree.heading(c, text=c)
-        gdt_tree.pack(fill="both")
-        
-        irq_c = self._card(up, "⚡ IDT (Interrupts)")
-        irq_c.master.pack(side="left", fill="both", expand=True, padx=5)
-        irq_tree = ttk.Treeview(irq_c, columns=("Vector", "Mnemonic", "Handler"), show="headings", height=5)
-        for c in ("Vector", "Mnemonic", "Handler"): irq_tree.heading(c, text=c)
-        irq_tree.pack(fill="both")
-
-        # ── Memory & Multitasking ──
-        low = tk.Frame(body, bg=PAL["bg"])
-        low.pack(fill="both", expand=True)
-        
-        pmm_c = self._card(low, "🧱 PMM (Physical Memory Bitmap)")
-        pmm_c.master.pack(side="left", fill="both", expand=True, padx=5)
-        self._pmm_canvas = tk.Canvas(pmm_c, height=150, bg=PAL["bg"], bd=0, highlightthickness=0)
-        self._pmm_canvas.pack(fill="both", pady=10)
-
-        sched_c = self._card(low, "🧠 Scheduler (Task Queue)")
-        sched_c.master.pack(side="right", fill="both", width=400, padx=5)
-        sched_tree = ttk.Treeview(sched_c, columns=("PID", "Name", "State", "Quota"), show="headings", height=8)
-        for c in ("PID", "Name", "State", "Quota"): sched_tree.heading(c, text=c)
-        sched_tree.pack(fill="both")
-
-        def _refresh():
-            for i in gdt_tree.get_children(): gdt_tree.delete(i)
-            for i in irq_tree.get_children(): irq_tree.delete(i)
-            for i in sched_tree.get_children(): sched_tree.delete(i)
-            
-            # Populate GDT
-            gdt = self.kernel.registry.get("interrupts").gdt if self.kernel.registry.get("interrupts") else {}
-            for sel, d in gdt.items():
-                gdt_tree.insert("", "end", values=(hex(sel), hex(d.base), hex(d.limit), hex(d.access)))
-            
-            # Populate IDT (Selective)
-            idt = {0x00: "DIV0", 0x0D: "GPF", 0x0E: "PF", 0x20: "TIMER", 0x80: "SYSCALL"}
-            for vec, mnem in idt.items():
-                irq_tree.insert("", "end", values=(hex(vec), mnem, "Native-ISR"))
-                
-            # Populate Scheduler
-            sched = self.kernel.registry.get("scheduler")
-            if sched:
-                for t in sched.tasks:
-                    sched_tree.insert("", "end", values=(t.id, t.name, t.state, f"{t.priority}%"))
-
-            # Draw Bitmap (Partial)
-            self._pmm_canvas.delete("all")
-            for i in range(20):
-                for j in range(40):
-                    color = PAL["teal"] if (i*j) % 7 != 0 else PAL["dim"]
-                    self._pmm_canvas.create_rectangle(j*10, i*10, j*10+8, i*10+8, fill=color, outline="")
-
-        ttk.Button(body, text="🔄 REFRESH TELEMETRY", command=_refresh).pack(pady=10)
-        self.after(500, _refresh)
 
     def _build_automation_hub_page(self):
-        """Sovereign Automation Hub (The 'God Mode' Control Center)."""
-        p = tk.Frame(self._content, bg=PAL["bg"])
+        p = AutomationHubPage(self._content, self)
         self._pages["automation_hub"] = p
-        self._build_page_header(p, "Cosmos AI-OS Automation", "Programmable Interfaces & Neuro-Top (v1.0)")
-        
-        body = tk.Frame(p, bg=PAL["bg"], padx=20, pady=10)
-        body.pack(fill="both", expand=True)
-        
-        # Connect to Kernel Logic
-        def _sync_9p():
-            v9 = self.kernel.registry.get("virtio_9p")
-            if v9:
-                res = v9.mount_host_folder()
-                self._log_voice(res["message"])
-
-        def _run_gc():
-            lisp = self.kernel.registry.get("lisp")
-            if lisp:
-                res = lisp.collect_garbage()
-                self._log_voice(res)
-        
-        # Top Row
-        top = tk.Frame(body, bg=PAL["bg"])
-        top.pack(fill="x", pady=5)
-        
-        # Serial Card
-        ser_fr = self._card(top, "Serial Console (COM1)")
-        ser_fr.master.pack(side="left", fill="both", expand=True, padx=5)
-        ser_log = tk.Text(ser_fr, bg="black", fg=PAL["green"], font=("Consolas", 9), height=10, bd=0)
-        ser_log.pack(fill="both", expand=True)
-        
-        # Neuro-Top Card
-        neuro_fr = self._card(top, "Neuro-Top (AI Heatmap)")
-        neuro_fr.master.pack(side="left", fill="both", expand=True, padx=5)
-        n_canv = tk.Canvas(neuro_fr, bg="black", height=150, bd=0, highlightthickness=0)
-        n_canv.pack(fill="both", expand=True)
-        
-        def _draw_heatmap():
-            if not p.winfo_exists(): return
-            n_canv.delete("all")
-            import random
-            for y in range(0, 150, 15):
-                for x in range(0, 200, 15):
-                    alpha = random.randint(50, 255)
-                    color = f"#{0:02x}{alpha:02x}{alpha:02x}" # Teal-ish activation
-                    n_canv.create_rectangle(x, y, x+14, y+14, fill=color, outline="")
-            self.after(1500, _draw_heatmap)
-        _draw_heatmap()
-
-        # 9P Status Card
-        v9_fr = self._card(top, "Virtio-9P (Host Sync)")
-        v9_fr.master.pack(side="left", fill="both", expand=True, padx=5)
-        tk.Label(v9_fr, text="Status: SYNCED", fg=PAL["green"], bg=PAL["bg2"], font=FONT_BOLD).pack(pady=10)
-        ttk.Button(v9_fr, text="RE-SYNC HOST", command=_sync_9p).pack(pady=5)
-
-        # Bottom Row
-        bot = tk.Frame(body, bg=PAL["bg"])
-        bot.pack(fill="both", expand=True, pady=10)
-        
-        # Lisp REPL
-        lisp_fr = self._card(bot, "Sovereign Lisp REPL (Live-Patching)")
-        lisp_fr.master.pack(side="left", fill="both", expand=True, padx=5)
-        lisp_out = tk.Text(lisp_fr, bg=PAL["bg3"], fg=PAL["teal"], font=("JetBrains Mono", 10), height=10, bd=0)
-        lisp_out.pack(fill="both", expand=True)
-        lisp_out.insert("1.0", ";; Sovereign Lisp v1.0\n> ")
-        
-        ent = tk.Entry(lisp_fr, bg=PAL["bg"], fg="white", bd=0, insertbackground="white", font=("JetBrains Mono", 10))
-        ent.pack(fill="x", pady=5)
-        
-        def _eval_lisp(e=None):
-            cmd = ent.get()
-            lisp = self.kernel.registry.get("lisp")
-            if lisp:
-                res = lisp.eval(cmd)
-                lisp_out.insert("end", f"\n{cmd}\n=> {res}\n> ")
-                ent.delete(0, "end")
-                lisp_out.see("end")
-
-        ent.bind("<Return>", _eval_lisp)
-        ttk.Button(lisp_fr, text="TRIGGER GC", command=_run_gc).pack(side="right")
-        
-        # Refresh Logic
-        def _refresh_automation():
-            if not p.winfo_exists(): return
-            ser = self.kernel.registry.get("serial")
-            if ser:
-                ser_log.delete("1.0", "end")
-                ser_log.insert("1.0", ser.get_serial_logs())
-                ser_log.see("end")
-            self.after(2000, _refresh_automation)
-
-        _refresh_automation()
 
     def _build_aether_orch_page(self):
         """Aether Orchestrator: Cross-model AI Intent Coordination."""
@@ -10287,169 +9280,21 @@ class SigmaGUI(tk.Tk):
         ttk.Button(main_panel, text="\u25b6 Run Test Orchestration", command=_test_route).pack(pady=5)
 
     def _build_routines_dash_page(self):
-        """OpenRoutines Dashboard: Visual control for OS routines."""
-        p = tk.Frame(self._content, bg=PAL["bg"])
+        p = RoutinesDashPage(self._content, self)
         self._pages["routines_dash"] = p
-        self._build_page_header(p, "OPENROUTINES DASHBOARD", "Visual Automation \u0026 OS Scheduling Control")
-        
-        main_panel = tk.Frame(p, bg=PAL["bg"])
-        main_panel.pack(fill="both", expand=True, padx=20, pady=10)
-        
-        routines = [
-            ("Midnight Optimization", "00:00 AM", "Dedupe FS, Thermal Baseline recalibration"),
-            ("Shadow Backup", "03:00 AM", "Rsync to Sovereign Ledger"),
-            ("Performance Warmup", "07:50 AM", "Pre-heat Aether and Browser cache"),
-            ("Security Scan", "Every 2hrs", "Registry anomaly detection (KAD)"),
-        ]
-        
-        for name, time_str, desc in routines:
-            c = self._card(main_panel, f"\ud83d\udd52 {name}")
-            c.master.pack(fill="x", pady=5)
-            tk.Label(c, text=f"Scheduled: {time_str}", font=FONT_SMALL, fg=PAL["cyan"], bg=PAL["card"]).pack(anchor="w")
-            tk.Label(c, text=desc, font=("Segoe UI", 8), fg=PAL["dim"], bg=PAL["card"]).pack(anchor="w")
-            ttk.Button(c, text="Run Manually", command=lambda n=name: self._notify("Routines", f"Executing {n} now.", "OK")).pack(side="right", pady=(0,10))
 
     def _build_ag_physics_page(self):
-        """Antigravity Physics Control: Managing Zero-G Drift."""
-        p = tk.Frame(self._content, bg=PAL["bg"])
+        p = AGPhysicsPage(self._content, self)
         self._pages["ag_physics"] = p
-        self._build_page_header(p, "ANTIGRAVITY ENGINE", "Zero-G Physics & Verlet UI Interaction Control")
-        
-        main_panel = tk.Frame(p, bg=PAL["bg"])
-        main_panel.pack(fill="both", expand=True, padx=20, pady=10)
-        
-        # Instantiate kernel module dynamically
-        if not hasattr(self.kernel, 'ag_physics'):
-            try:
-                from antigravity_engine import SigmaAntigravityEngine
-                self.kernel.ag_physics = SigmaAntigravityEngine(self.kernel)
-            except Exception: pass
-            
-        c = self._card(main_panel, "Zero-G Drift Engine Status")
-        c.master.pack(fill="x", pady=5)
-        
-        def _toggle_ag():
-            if hasattr(self.kernel, 'ag_physics'):
-                new_state = not self.kernel.ag_physics.is_active
-                self.kernel.ag_physics.toggle_drift(new_state)
-                ag_btn.configure(text=f"Physics Engine: {'ACTIVE \ud83e\ude90' if new_state else 'STABLE/GRAVITY'}")
-                self._notify("Physics Engine", "Drift Protocol updated.", "OK")
-
-        ag_btn = ttk.Button(c, text="Physics Engine: STABLE/GRAVITY", command=_toggle_ag)
-        ag_btn.pack(pady=10)
-        
-        def _gather():
-            if hasattr(self, 'trigger_action'):
-                self.trigger_action("ag.gather")
-
-        ttk.Button(main_panel, text="\u2b07\ufe0f Trigger Gravity Gather (Pulse)", command=_gather).pack(pady=10)
-        
-        tk.Label(main_panel, text="Mass Projection: Heavier apps (Store, Enterprise) drift slower than lightweight ones (Aether).",
-                 font=("Segoe UI", 8), fg=PAL["dim"], bg=PAL["bg"], wraplength=500).pack(pady=20)
 
     def _build_ag_hub_page(self):
-        """Antigravity Enterprise Hub: One-stop access to all integrated productivity tools."""
-        p = tk.Frame(self._content, bg=PAL["bg"])
+        p = EnterpriseHubPage(self._content, self)
         self._pages["ag_hub"] = p
-        self._build_page_header(p, "ANTIGRAVITY ENTERPRISE HUB", "Unified Access to Sovereign Productivity Suite")
-        
-        main_panel = tk.Frame(p, bg=PAL["bg"])
-        main_panel.pack(fill="both", expand=True, padx=20, pady=10)
-        
-        # Tools Grid
-        tools = [
-            ("\ud83d\udcc1 Tools Finder", "ag_finder", "sigma.sys.ag_finder"),
-            ("\ud83d\udce7 Email Discovery", "email_disco", "sigma.ai.email_disco"),
-            ("\ud83d\udcca Excel AI Filler", "excel_ai", "sigma.prod.excel_ai"),
-            ("\ud83e\uddea Excel Preproc", "excel_preproc", "sigma.prod.excel_preproc"),
-            ("\ud83d\udcd1 PDF Forge", "pdf_forge", "sigma.prod.pdf_forge"),
-            ("\ud83d\udd21 Pure Text", "pure_text", "sigma.prod.pure_text"),
-            ("\u2728 Text Cleaner", "text_cleaner", "sigma.prod.text_cleaner"),
-            ("\ud83d\udcfd Titan Capture", "titan_capture", "sigma.sys.titan_capture"),
-            ("\ud83d\uddec IndentFlow", "indent_flow", "sigma.dev.indent_flow"),
-            ("\ud83e\ude90 AG Zenith", "ag_zenith", "sigma.ai.ag_zenith"),
-            ("\ud83c\udf10 Mesh Monitor", "mesh_monitor", "sigma.ai.mesh_monitor"),
-            ("\u26a1 Sovereign De-bloater", "debloater", "sigma.sys.debloater"),
-            ("\ud83c\udf2a\ufe0f AG Shuffler", "shuffler", "sigma.sys.shuffler"),
-            ("\ud83d\udcd6 Software Guide", "guide", "sigma.doc.ag_guide"),
-            ("\ud83d\udccb Scrum Board", "scrum", "sigma.prod.scrum"),
-            ("\ud83d\udcca Gantt Chart", "gantt", "sigma.prod.gantt"),
-            ("\u23f2\ufe0f Time Tracker", "tracker", "sigma.prod.tracker"),
-        ]
-
-        def _debloat():
-            if hasattr(self.kernel, 'ag_ent'):
-                res = self.kernel.ag_ent.debloater.perform_debloat()
-                self._notify("Performance", res, "OK")
-                self._ultra_perf.set(True)
-
-        def _shuffle():
-            if hasattr(self.kernel, 'ag_ent'):
-                # Using home directory as default to prevent hardcoded leaks
-                import os
-                home_path = os.environ.get("USERPROFILE", "C:/")
-                res = self.kernel.ag_ent.shuffler.shuffle_organize(os.path.join(home_path, "Desktop"))
-                self._notify("Antigravity Shuffler", res, "OK")
-
-        def _sync_scrum():
-            if hasattr(self.kernel, 'ag_ent'):
-                msg = self.kernel.ag_ent.scrum.add_task("Initial OS Optimization", "High")
-                self._notify("Project Management", msg, "OK")
-
-        btn_fr = tk.Frame(main_panel, bg=PAL["bg"])
-        btn_fr.pack(fill="x", pady=5)
-        ttk.Button(btn_fr, text="\ud83d\ude80 SOVEREIGN DE-BLOAT", command=_debloat).pack(side="left", padx=5)
-        ttk.Button(btn_fr, text="\ud83c\udf2a\ufe0f SHUFFLE WORKSPACE", command=_shuffle).pack(side="left", padx=5)
-        ttk.Button(btn_fr, text="\ud83d\udccb SYNC SCRUM", command=_sync_scrum).pack(side="left", padx=5)
-        
-        grid_fr = tk.Frame(main_panel, bg=PAL["bg"])
-        grid_fr.pack(fill="both", expand=True)
-        
-        for i, (name, lid, app_id) in enumerate(tools):
-            row, col = i // 3, i % 3
-            card = tk.Frame(grid_fr, bg=PAL["card"], padx=10, pady=10, width=280, height=120)
-            card.grid(row=row, column=col, padx=10, pady=10)
-            card.pack_propagate(False)
-            
-            tk.Label(card, text=name, font=FONT_BOLD, fg=PAL["text"], bg=PAL["card"]).pack(anchor="w")
-            
-            def _launch(aid=app_id):
-                self._notify("Enterprise Hub", f"Hydrating {aid}... Running in verified partition.", "OK")
-                if hasattr(self, '_launch_app'):
-                    self._launch_app(aid)
-                elif "pdf_forge" in aid:
-                    self._generate_demo_pdf()
-            
-            ttk.Button(card, text="Launch Tool", command=_launch).pack(side="bottom", fill="x")
-
-        ttk.Button(main_panel, text="\ud83d\udcd6 Open Antigravity Software Guide", command=lambda: self._show_page("ag_guide")).pack(pady=20)
 
     def _build_ag_guide_page(self):
-        """Antigravity Software Guide: Native viewer for ecosystem docs."""
-        p = tk.Frame(self._content, bg=PAL["bg"])
+        p = AGGuidePage(self._content, self)
         self._pages["ag_guide"] = p
-        self._build_page_header(p, "ANTIGRAVITY TOOLS GUIDE", "Comprehensive Manual \u0026 Feature Index")
-        
-        main_panel = tk.Frame(p, bg=PAL["bg"])
-        main_panel.pack(fill="both", expand=True, padx=20, pady=10)
-        
-        txt = tk.Text(main_panel, bg=PAL["card"], fg=PAL["text"], font=("Consolas", 10), wrap="word", padx=10, pady=10)
-        txt.pack(fill="both", expand=True)
-        
-        # Load the markdown content
-        try:
-             import os
-             guide_path = os.path.join(os.environ.get("USERPROFILE", "."), ".gemini", "antigravity", "scratch", "SigmaOS", "docs", "ANTIGRAVITY_TOOLS_GUIDE.md")
-             if os.path.exists(guide_path):
-                 with open(guide_path, "r", encoding="utf-8") as f:
-                     content = f.read()
-                     txt.insert("1.0", content)
-             else:
-                 txt.insert("1.0", "Antigravity Software Guide\n\nGuide file not found. All tools are accessible from the Enterprise Hub.")
-        except Exception as e:
-             txt.insert("1.0", f"Error loading guide: {e}")
-        
-        txt.configure(state="disabled")
+
 
     def _generate_demo_pdf(self):
         try:
@@ -10463,62 +9308,21 @@ class SigmaGUI(tk.Tk):
             messagebox.showerror("Error", str(e))
 
 
-    def _build_mission_control_page(self, parent: tk.Frame):
-        """
-        SigmaOS Mission Control (Apex v5).
-        USP: Bridge to AgenticClaw Mission Execution.
-        """
-        container = tk.Frame(parent, bg=PAL["bg"])
-        container.pack(fill="both", expand=True, padx=40, pady=30)
+    def _build_mission_control_page(self):
+        p = MissionControlPage(self._content, self)
+        self._pages["mission_control"] = p
 
-        # --- Header ---
-        hdr = tk.Frame(container, bg=PAL["bg"])
-        hdr.pack(fill="x", pady=(0, 30))
-        tk.Label(hdr, text="MISSION CONTROL", font=("Outfit", 28, "bold"), fg=PAL["cyan"], bg=PAL["bg"]).pack(side="left")
-        
-        status_fr = tk.Frame(hdr, bg=PAL["glass"], padx=15, pady=5)
-        status_fr.pack(side="right")
-        self._mc_status_lbl = tk.Label(status_fr, text="AGENTIC CLAW: ARMED", font=("Consolas", 10), fg=PAL["green"], bg=PAL["glass"])
-        self._mc_status_lbl.pack()
+    def _build_advanced_calculator_page(self):
+        p = AdvancedCalculatorPage(self._content, self)
+        self._pages["advanced_calculator"] = p
 
-        # --- Dashboard ---
-        dash = tk.Frame(container, bg=PAL["bg"])
-        dash.pack(fill="both", expand=True)
-        
-        # Left Panel: Active Missions
-        left = tk.Frame(dash, bg=PAL["bg"], width=400)
-        left.pack(side="left", fill="both", pady=5)
-        left.pack_propagate(False)
-        
-        tk.Label(left, text="NEURAL THREADS", font=("Outfit", 14, "bold"), fg=PAL["fg"], bg=PAL["bg"]).pack(anchor="w", pady=(0,15))
-        
-        self._mc_list_fr = tk.Frame(left, bg=PAL["bg"])
-        self._mc_list_fr.pack(fill="both", expand=True)
+    def _build_unit_converter_page(self):
+        p = UnitConverterPage(self._content, self)
+        self._pages["unit_converter"] = p
 
-        # Right Panel: Mission Terminal
-        right = tk.Frame(dash, bg=PAL["card"], bd=1, relief="flat")
-        right.pack(side="right", fill="both", expand=True, padx=(20, 0))
-        
-        tk.Label(right, text="MISSION LOGS", font=("Consolas", 11), fg=PAL["cyan"], bg=PAL["card"], padx=15, pady=10).pack(anchor="w")
-        self._mc_log = scrolledtext.ScrolledText(right, bg=PAL["bg"], fg=PAL["text_dim"], font=("Consolas", 10), borderwidth=0, highlightthickness=0)
-        self._mc_log.pack(fill="both", expand=True, padx=1, pady=1)
-
-        # --- Controls ---
-        ctrl = tk.Frame(container, bg=PAL["card"], pady=20, padx=20)
-        ctrl.pack(fill="x", pady=(30, 0))
-        
-        missions = [
-            ("GitHub Sync", "claw.git_sync", PAL["blue"]),
-            ("Security Audit", "claw.sec_audit", PAL["red"]),
-            ("System Heal", "claw.self_heal", PAL["green"]),
-            ("Performance Apex", "claw.perf_tune", PAL["gold"])
-        ]
-        
-        for name, mid, color in missions:
-            btn = tk.Button(ctrl, text=name.upper(), font=("Outfit", 10, "bold"), 
-                            fg="white", bg=color, relief="flat", padx=20, pady=8,
-                            command=lambda m=mid, n=name: self._launch_mission(m, n))
-            btn.pack(side="left", padx=10)
+    def _build_data_analyzer_page(self):
+        p = DataAnalyzerPage(self._content, self)
+        self._pages["data_analyzer"] = p
 
     def _launch_mission(self, mission_id: str, name: str):
         """Hand-off to OmniAutomator for mission execution."""
