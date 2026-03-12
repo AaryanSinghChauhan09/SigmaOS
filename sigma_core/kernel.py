@@ -564,6 +564,8 @@ class SigmaKernel:
     @property
     def shadow(self):              return self.registry.get("shadow")
     @property
+    def pulse(self):               return self.registry.get("pulse")
+    @property
     def watchdog(self):            return self.registry.get("watchdog")
 
     @property
