@@ -46,6 +46,9 @@ from gui_pkg.unit_converter import UnitConverterPage
 from gui_pkg.data_analyzer import DataAnalyzerPage
 from gui_pkg.arcade import ArcadePage
 from gui_pkg.aether_orch import AetherOrchPage
+from gui_pkg.chemistry_lab import ChemistryLabPage
+from gui_pkg.cipher_studio import CipherStudioPage
+from gui_pkg.ncert_simulator import NcertSimulatorPage
 
 class SigmaGUI(tk.Tk, UIMixin):
     """Main SigmaOS GUI application window."""
@@ -673,6 +676,9 @@ class SigmaGUI(tk.Tk, UIMixin):
             "advanced_calculator": self._build_advanced_calculator_page,
             "unit_converter":   self._build_unit_converter_page,
             "data_analyzer":    self._build_data_analyzer_page,
+            "chemistry_lab":    self._build_chemistry_lab_page,
+            "cipher_studio":    self._build_cipher_studio_page,
+            "ncert_simulator":  self._build_ncert_simulator_page,
         }
         
         # Oracle VM Discovery (Professional Integration)
@@ -9325,6 +9331,18 @@ class SigmaGUI(tk.Tk, UIMixin):
     def _build_data_analyzer_page(self):
         p = DataAnalyzerPage(self._content, self)
         self._pages["data_analyzer"] = p
+
+    def _build_chemistry_lab_page(self):
+        p = ChemistryLabPage(self._content, self)
+        self._pages["chemistry_lab"] = p
+
+    def _build_cipher_studio_page(self):
+        p = CipherStudioPage(self._content, self)
+        self._pages["cipher_studio"] = p
+
+    def _build_ncert_simulator_page(self):
+        p = NcertSimulatorPage(self._content, self)
+        self._pages["ncert_simulator"] = p
 
     def _launch_mission(self, mission_id: str, name: str):
         """Hand-off to OmniAutomator for mission execution."""
