@@ -92,7 +92,11 @@ class SigmaKernel:
         if auto_load:
             self._load_core_modules()
             if self.watchdog:
-                self.watchdog.start_monitoring()
+                # Guard: different watchdog implementations may use start_monitoring or start_service
+                if hasattr(self.watchdog, "start_monitoring"):
+                    self.watchdog.start_monitoring()
+                elif hasattr(self.watchdog, "start_service"):
+                    self.watchdog.start_service()
             if self.shadow:
                 self.shadow.start_periodic_sync()
             if self.vanguard:
@@ -338,7 +342,7 @@ class SigmaKernel:
             ("userland.system_api.forensic_scanner",  "SigmaForensicScanner",    "forensic"),
             ("userland.system_api.circuit_breaker",   "SigmaCircuitBreaker",     "breaker"),
             ("userland.system_api.bio_lock",         "SigmaBioLock",            "bio_lock"),
-            ("userland.system_api.sovereign_watchdog", "SigmaSovereignWatchdog", "watchdog"),
+            ("userland.system_api.sovereign_watchdog", "SigmaSovereignWatchdog", "sovereign_watchdog"),
             ("userland.system_api.omni_search_v2",     "SigmaOmniSearch",        "omni_search"),
             ("userland.system_api.sovereign_clipboard_v2", "SigmaSovereignClipboardV2", "clipboard"),
         ]
@@ -353,6 +357,12 @@ class SigmaKernel:
             ("sigma_ai_nexus",       "SigmaAINexus",              "nexus"),
             ("sigma_studio",         "SigmaStudioPlus",           "studio"),
             ("aura_assistant",       "SigmaAuraAssistant",        "assistant"),
+            ("userland.intelligence_suite.sigma_data_viz", "SigmaDataViz", "viz_engine"),
+            ("userland.intelligence_suite.sigma_ml_engine", "SigmaMLEngine", "ml_engine"),
+            ("userland.intelligence_suite.sigma_genai_lab", "SigmaGenAILab", "genai_lab"),
+            ("userland.intelligence_suite.sigma_insights", "SigmaInsightsEngine", "insights_engine"),
+            ("userland.intelligence_suite.sigma_sql_forge", "SigmaSQLForge", "sql_forge"),
+            ("userland.intelligence_suite.sigma_hypertune", "SigmaHyperTune", "hypertune"),
         ]
         
         # Secondary Load: Ecosystem Apps
@@ -437,6 +447,12 @@ class SigmaKernel:
     def gurukul(self):             return self.registry.get("gurukul")
     @property
     def antigravity(self):         return self.registry.get("antigravity")
+    @property
+    def qa_auditor(self):          return self.registry.get("qa_auditor")
+    @property
+    def stress_silo(self):         return self.registry.get("stress_silo")
+    @property
+    def updates(self):             return self.registry.get("update_manager")
     @property
     def aura(self):                return self.registry.get("aura")
     @property

@@ -16,8 +16,9 @@ class SigmaModeManager:
         self._app_heuristics = {
             "steam.exe": "Gaming", "epicgames.exe": "Gaming", "valorant.exe": "Gaming", "csgo.exe": "Gaming",
             "photoshop.exe": "Editing", "premiere.exe": "Editing", "aftereffects.exe": "Editing", "davinci": "Editing",
-            "vscode.exe": "Programmer", "idea64.exe": "Programmer", "pycharm64.exe": "Programmer", "docker": "Programmer",
-            "jupyter": "Data_Scientist", "python": "Data_Scientist",
+            "docker": "Programmer",
+            "jupyter": "Data_Scientist", "python": "Data_Scientist", "rstudio": "Data_Scientist",
+            "excel.exe": "Business_Analyst", "powerbi.exe": "Business_Analyst", "tableau.exe": "Business_Analyst",
             "chrome.exe": "Standard", "firefox.exe": "Standard",
             "spotify.exe": "Standard", "discord.exe": "Gaming",
             "autoloader": "Automation", "script.py": "Automation"
@@ -146,7 +147,7 @@ class SigmaModeManager:
                 "Description": "Optimized for model training and local LLM prototyping.",
                 "AI_Config": {"max_depth": 50, "max_tokens": 16384, "style": "Technical", "tool_budget": "Supreme"},
                 "Kernel_Flags": ["gpu-exclusive-mode", "pci-passthrough-enabled"],
-                "Routines_On_Enter": ["load_ai_frameworks", "allocate_vram"],
+                "Routines_On_Enter": ["load_ai_frameworks", "allocate_vram", "activate_intelligence_suite"],
                 "Routines_On_Exit": ["unload_ai_frameworks", "deallocate_vram"]
             },
             "Data_Scientist": {
@@ -157,8 +158,19 @@ class SigmaModeManager:
                 "Description": "Optimized for multi-terabyte data manipulation and EDA.",
                 "AI_Config": {"max_depth": 10, "max_tokens": 4096, "style": "Analytical", "tool_budget": "High"},
                 "Kernel_Flags": ["huge-pages-enabled", "vector-extensions-active"],
-                "Routines_On_Enter": ["mount_data_lakes", "start_jupyter_lab"],
+                "Routines_On_Enter": ["mount_data_lakes", "start_jupyter_lab", "activate_intelligence_suite"],
                 "Routines_On_Exit": ["unmount_data_lakes"]
+            },
+            "Business_Analyst": {
+                "CPU_Priority": "Balanced",
+                "GPU_Profile": "Low",
+                "RAM_Focus": "Index_Cache / Office_Bloom",
+                "Background_Task_Limit": 15,
+                "Description": "Strategic analysis and BI reporting suite.",
+                "AI_Config": {"max_depth": 5, "max_tokens": 2048, "style": "Strategic", "tool_budget": "Medium"},
+                "Kernel_Flags": ["font-smoothing-high", "high-dpi-scaling"],
+                "Routines_On_Enter": ["activate_intelligence_suite", "launch_bi_dashboard"],
+                "Routines_On_Exit": []
             },
             "Lawyer": {
                 "CPU_Priority": "Balanced",
@@ -307,6 +319,8 @@ class SigmaModeManager:
             "seal_all_vaults": self._seal_all_vaults,
             "activate_ghost_mask": self._activate_ghost_mask,
             "scrub_recent_media": self._scrub_recent_media,
+            "activate_intelligence_suite": self._activate_intelligence_suite,
+            "launch_bi_dashboard": self._launch_bi_dashboard,
         }
 
     def trigger_auto_switch(self, app_name: str) -> Dict[str, str]:
@@ -715,3 +729,22 @@ class SigmaModeManager:
         if self.kernel and self.kernel.media_forge:
             return "MediaForge forensic scrub initiated on recent assets."
         return "MediaForge offline."
+
+    def _activate_intelligence_suite(self, phase: str = "") -> str:
+        """USP: Hydrates professional intelligence engines for Data/AI roles."""
+        engines = []
+        if self.kernel:
+            if hasattr(self.kernel, "viz_engine") and self.kernel.viz_engine: engines.append("DataViz")
+            if hasattr(self.kernel, "ml_engine") and self.kernel.ml_engine: engines.append("MLEngine")
+            if hasattr(self.kernel, "genai_lab") and self.kernel.genai_lab: engines.append("GenAILab")
+            if hasattr(self.kernel, "insights_engine") and self.kernel.insights_engine: engines.append("InsightsEngine")
+            if hasattr(self.kernel, "sql_forge") and self.kernel.sql_forge: engines.append("SQLForge")
+            if hasattr(self.kernel, "hypertune") and self.kernel.hypertune: engines.append("HyperTune")
+        
+        if engines:
+            return f"Intelligence Suite Active: {', '.join(engines)} hydrated."
+        return "Intelligence Suite: Engines offline or not found in registry."
+
+    def _launch_bi_dashboard(self, phase: str = "") -> str:
+        """Simulates launching the SigmaOS Strategic BI Dashboard."""
+        return "Strategic BI Dashboard active. Real-time ROI and Market Trends visible."
