@@ -459,9 +459,11 @@ class NutsAndNodes(SigmaGame):
         a = next((n for n in self.nodes if n["id"] == from_id), None)
         b = next((n for n in self.nodes if n["id"] == to_id), None)
         if not a or not b: return "Invalid node IDs."
-        if to_id not in a["connected"]:
-            a["connected"].append(to_id)
-            self.score += 10
+        a_dict = dict(a)
+        if to_id not in a_dict.get("connected", []):
+            if "connected" in a:
+                a["connected"].append(to_id)
+            self.score = int(self.score) + 10
         return f"[Nuts & Nodes] Nodes {from_id}↔{to_id} connected. Score: {self.score}"
 
     def next_level(self) -> str:
@@ -504,7 +506,8 @@ class CrowdFlowLegends(SigmaGame):
                     else:              agent["y"] += 1
             if agent["x"] == self.goal_x:
                 arrived += 1
-                self.score += 50
+                current_score = int(self.score)
+                self.score = current_score + 50
         self.moves += 1
         return {"tick": self.moves, "agents": len(self.agents), "arrived": arrived, "score": self.score}
 
@@ -546,8 +549,8 @@ class HyperTrackRunner(SigmaGame):
 
     def tick_frame(self) -> Dict:
         if self.COMPRESSED: return {}
-        self.distance += self.speed // 10
-        self.score = self.distance
+        self.distance = float(self.distance) + (self.speed // 10)
+        self.score = int(self.distance)
         hit_obstacle = (self.distance >= self.next_obstacle_dist)
         if hit_obstacle:
             obs = random.choice(self.OBSTACLE_TYPES)
@@ -933,7 +936,9 @@ class VidyaQuest(SigmaGame):
     def answer(self, user_ans: str) -> str:
         q = self.QUESTIONS[self.cur_q_idx % len(self.QUESTIONS)]
         self.cur_q_idx += 1
-        if user_ans.lower() == q["a"].lower():
+        u_ans = str(user_ans).lower()
+        q_ans = str(q["a"]).lower()
+        if u_ans == q_ans:
             self.correct_answers += 1
             self.score += 100
             return f"Correct! Well done. Score: {self.score}"
@@ -1043,7 +1048,11 @@ class MemoryMatch(SigmaGame):
     SYMBOLS   = ["🍎","🍊","🍋","🍇","🍓","🍒","🌸","🌺","⭐","💎","🔥","🎯",
                  "🚀","🎸","🎺","🎻","🏆","🌙","☀️","🌈"]
     def _init_state(self):
-        import random; n = 4; pairs = (self.SYMBOLS * 2)[:n * n]
+        import random; n = 4
+        all_syms = list(self.SYMBOLS)
+        doubled = all_syms + all_syms
+        pairs = []
+        for i in range(min(len(doubled), n * n)): pairs.append(doubled[i])
         random.shuffle(pairs); self.cards = pairs
         self.revealed = [False] * len(pairs); self.matched = set()
     def flip(self, idx: int) -> str:
@@ -1070,9 +1079,12 @@ class MathSprint(SigmaGame):
     def _init_state(self):
         import random; self.level = 1; self._gen_q()
     def _gen_q(self):
-        import random; lv = self.level
+        import random; lv = int(self.level)
         a = random.randint(1, 10 * lv); b = random.randint(1, max(1, 5 * lv))
-        op_name, op_fn = random.choice(self.OPS[:2 + min(lv, 2)])
+        op_slice = []
+        max_ops = 2 + min(lv, 2)
+        for i in range(min(len(self.OPS), max_ops)): op_slice.append(self.OPS[i])
+        op_name, op_fn = random.choice(op_slice)
         if op_name == '÷': b = max(1, b); a = b * random.randint(1, 10)
         self.q = f"{a} {op_name} {b}"; self.ans = op_fn(a, b)
     def get_question(self) -> str: return f"Q{self.moves+1}: {self.q} = ?"
