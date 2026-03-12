@@ -114,6 +114,62 @@ class SigmaGUI(tk.Tk):
         self._island_fr = None
         self._island_lbl = None
         self._island_var = tk.StringVar(value="SIGMA KERNEL: NOMINAL")
+        self._mc_status_lbl = None
+        self._mc_list_fr = None
+        self._mc_log = None
+        self._mc_popup = None
+        self._spotlight_win = None
+        self._spotlight_var = tk.StringVar()
+        self._prof_taskbar = None
+        self._task_tray = None
+        self._apexb = None
+        self._mode_var = tk.StringVar(value="Performance")
+        self._mode_combo = None
+        self._tb_clock = None
+        self._executor = None
+        self._intent_entry = None
+        self._intent_var = tk.StringVar()
+        self._clock_lbl = None
+        self._dash_log = None
+        self._brain_log = None
+        self._term_log = None
+        self._legal_pro_log = None
+        self._task_intent_var = tk.StringVar()
+        self._suggest_pop = None
+        self._island_active = tk.BooleanVar(value=False)
+        self._perf_const = None
+        self._privacy_dot = None
+        self._handoff_btn = None
+        self._cont_var = tk.StringVar()
+        self._form_var = tk.StringVar()
+        self._meters = {}
+        self._sec_status_var = tk.StringVar()
+        self._sec_status_lbl = None
+        self._rollback_var = tk.StringVar()
+        self._blame_scroll = None
+        self._routine_log = None
+        self._game_query = tk.StringVar()
+        self._game_cat_filter = tk.StringVar(value="All")
+        self._game_scroll = None
+        self._game_grid_inner = None
+        self._ag_search_var = tk.StringVar()
+        self._heatmap_canvas = None
+        self._flow_view = None
+        self._flow_audit = None
+        self._nexus_auth_lbl = None
+        self._active_model_var = tk.StringVar()
+        self._nexus_log = None
+        self._stat_widgets = {}
+        self._logo_lbl = None
+        self._write_txt = None
+        self._write_res = None
+        self._write_slog = None
+        self._start_popup = None
+        self._cc_popup = None
+        self._spot = None
+        self._page_defs = {}
+        self._cur_page = None
+        self._active_btn = None
         
         # --- UI Juiciness & Morphology ---
         self._build_morphic_island()
@@ -920,6 +976,7 @@ class SigmaGUI(tk.Tk):
             "intelligence_studio": self._build_intelligence_studio_page,
             "gurukul_academy": self._build_gurukul_academy_page,
             "compliance_center": self._build_compliance_center_page,
+            "mission_control":  self._build_mission_control_page,
         }
         
         # Oracle VM Discovery (Professional Integration)
@@ -10405,6 +10462,75 @@ class SigmaGUI(tk.Tk):
         except Exception as e:
             messagebox.showerror("Error", str(e))
 
+
+    def _build_mission_control_page(self, parent: tk.Frame):
+        """
+        SigmaOS Mission Control (Apex v5).
+        USP: Bridge to AgenticClaw Mission Execution.
+        """
+        container = tk.Frame(parent, bg=PAL["bg"])
+        container.pack(fill="both", expand=True, padx=40, pady=30)
+
+        # --- Header ---
+        hdr = tk.Frame(container, bg=PAL["bg"])
+        hdr.pack(fill="x", pady=(0, 30))
+        tk.Label(hdr, text="MISSION CONTROL", font=("Outfit", 28, "bold"), fg=PAL["cyan"], bg=PAL["bg"]).pack(side="left")
+        
+        status_fr = tk.Frame(hdr, bg=PAL["glass"], padx=15, pady=5)
+        status_fr.pack(side="right")
+        self._mc_status_lbl = tk.Label(status_fr, text="AGENTIC CLAW: ARMED", font=("Consolas", 10), fg=PAL["green"], bg=PAL["glass"])
+        self._mc_status_lbl.pack()
+
+        # --- Dashboard ---
+        dash = tk.Frame(container, bg=PAL["bg"])
+        dash.pack(fill="both", expand=True)
+        
+        # Left Panel: Active Missions
+        left = tk.Frame(dash, bg=PAL["bg"], width=400)
+        left.pack(side="left", fill="both", pady=5)
+        left.pack_propagate(False)
+        
+        tk.Label(left, text="NEURAL THREADS", font=("Outfit", 14, "bold"), fg=PAL["fg"], bg=PAL["bg"]).pack(anchor="w", pady=(0,15))
+        
+        self._mc_list_fr = tk.Frame(left, bg=PAL["bg"])
+        self._mc_list_fr.pack(fill="both", expand=True)
+
+        # Right Panel: Mission Terminal
+        right = tk.Frame(dash, bg=PAL["card"], bd=1, relief="flat")
+        right.pack(side="right", fill="both", expand=True, padx=(20, 0))
+        
+        tk.Label(right, text="MISSION LOGS", font=("Consolas", 11), fg=PAL["cyan"], bg=PAL["card"], padx=15, pady=10).pack(anchor="w")
+        self._mc_log = scrolledtext.ScrolledText(right, bg=PAL["bg"], fg=PAL["text_dim"], font=("Consolas", 10), borderwidth=0, highlightthickness=0)
+        self._mc_log.pack(fill="both", expand=True, padx=1, pady=1)
+
+        # --- Controls ---
+        ctrl = tk.Frame(container, bg=PAL["card"], pady=20, padx=20)
+        ctrl.pack(fill="x", pady=(30, 0))
+        
+        missions = [
+            ("GitHub Sync", "claw.git_sync", PAL["blue"]),
+            ("Security Audit", "claw.sec_audit", PAL["red"]),
+            ("System Heal", "claw.self_heal", PAL["green"]),
+            ("Performance Apex", "claw.perf_tune", PAL["gold"])
+        ]
+        
+        for name, mid, color in missions:
+            btn = tk.Button(ctrl, text=name.upper(), font=("Outfit", 10, "bold"), 
+                            fg="white", bg=color, relief="flat", padx=20, pady=8,
+                            command=lambda m=mid, n=name: self._launch_mission(m, n))
+            btn.pack(side="left", padx=10)
+
+    def _launch_mission(self, mission_id: str, name: str):
+        """Hand-off to OmniAutomator for mission execution."""
+        self._mc_log.insert("end", f"\n[LAUNCH] Starting Mission: {name}...\n", "launch")
+        self._mc_log.see("end")
+        
+        if self.kernel and hasattr(self.kernel, "automator") and self.kernel.automator:
+            # Note: In real world, we'd trigger the mission here
+            self.kernel.bus.emit("claw.mission.launch", {"id": mission_id, "mission": name})
+            self._update_morphic_status("MISSION", f"Launching {name}", PAL["cyan"])
+        else:
+            self._mc_log.insert("end", "[ERROR] Agentic Subsystems Offline.\n", "err")
 
     def _on_unhandled_exception(self, exc_type, exc_value, exc_traceback):
         """SOVEREIGN RECOVERY PROTOCOL: Caught a global exception."""

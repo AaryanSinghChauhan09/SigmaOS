@@ -11,10 +11,10 @@ class SigmaConfig:
     
     # OS Metadata
     OS_NAME = "SigmaOS Sovereign"
-    VERSION = "2.0.0 (Apex)"
-    BUILD = "2026.03.10-APEX-ULTRA"
+    VERSION = "4.5.3 (Ultra Apex)"
+    BUILD = "2026.03.11-ULTRA-APEX"
     BASE_KERNEL = "Modular Event-Driven Kernel"
-    RELEASE_DATE = "2026-03-10"
+    RELEASE_DATE = "2026-03-11"
     
     # Feature Flags
     ENABLE_GUI = True

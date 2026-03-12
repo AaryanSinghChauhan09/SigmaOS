@@ -72,10 +72,11 @@ SigmaOS is built on the principle of **Third-Party Immunity**.
 - **OmniAutomator Pro**: Orchestrate complex missions like "Morning Briefing" or "Dev Audit."
 - **DevLiaison Agent**: An autonomous Devin-style agent that keeps your OS codebase healthy.
 
-## ⚡ Performance & Security (Apex Boot)
+## ⚡ Performance, Gaming & Security (Apex v4.5)
 
-SigmaOS v2.0 introduces the **Apex Boot Pipeline**, crushing the startup times of traditional OSs like Windows and macOS.
+SigmaOS v4.5.3 introduces the **Apex Gaming Hub** and **Ultra-Performance Pipeline**, crushing the versatility of traditional systems.
 
+- **Apex Gaming Hub**: 72+ Native arcade games (G-Series) optimized for zero-latency execution. Includes search, filter, and predictive health checking.
 - **Parallel Apex Hydration**: Concurrent module initialization (C-Parity) results in a **10x speedup** in kernel-to-userland handoff.
 - **Predictive Pre-warming**: The kernel anticipates your 50 most-used agents and pre-caches them in VRAM using **SigmaCache**, ensuring zero-wait interaction post-boot.
 - **Direct Silicon Telemetry**: The HAL bypasses high-level shell overhead, polling CPU/RAM directly via **Win32/POSIX syscalls** for sub-millisecond status awareness.

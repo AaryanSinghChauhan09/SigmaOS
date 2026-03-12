@@ -13,13 +13,7 @@ import threading
 import os
 import sys
 
-# Dummy definitions for missing sub-agents to bypass linter
-SigmaMeshSyncAgent = None
-GmailAIBridge = None
-SigmaAgenticClaw = None
-ActionNode = None
-SigmaGatewayAgent = None
-SigmaDevLiaison = None
+from userland.system_api.agentic_claw import SigmaAgenticClaw, ActionNode
 
 @dataclass
 class MissionNode:
@@ -38,11 +32,16 @@ class SigmaOmniAutomator(SigmaModuleBase):
     def __init__(self, kernel=None):
         SigmaModuleBase.__init__(self, kernel)
         self.kernel = kernel # Explicit for linter
-        self.mesh = SigmaMeshSyncAgent(kernel) if SigmaMeshSyncAgent else None
-        self.gmail = GmailAIBridge(kernel) if GmailAIBridge else None
-        self.claw = SigmaAgenticClaw(kernel) if SigmaAgenticClaw else None
-        self.gateway = SigmaGatewayAgent(kernel) if SigmaGatewayAgent else None
-        self.liaison = SigmaDevLiaison(kernel) if SigmaDevLiaison else None
+        
+        # Proper Module Linkage (USP: Unified Backplane)
+        self.claw = SigmaAgenticClaw(kernel)
+        
+        # Dynamic Resolution for optional modules
+        self.mesh = None
+        self.gmail = None
+        self.gateway = None
+        self.liaison = None
+        
         self.active_missions: Dict[str, List[MissionNode]] = {}
         self.variables: Dict[str, Any] = {}
         self._sentinel_running = False
