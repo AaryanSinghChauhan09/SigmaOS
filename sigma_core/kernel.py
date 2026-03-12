@@ -327,6 +327,13 @@ class SigmaKernel:
             ("userland.system_api.sovereign_optimizer", "SigmaSovereignOptimizer", "optimizer"),
             ("userland.system_api.net_vantage",      "SigmaNetVantage",        "net_vantage"),
             ("userland.system_api.crypt_guard",      "SigmaCryptGuard",        "crypt_guard"),
+            ("userland.system_api.compliance_auditor", "SigmaComplianceAuditor", "compliance"),
+            ("userland.system_api.media_forge",       "SigmaMediaForge",       "media_forge"),
+            ("userland.system_api.mesh_sync_agent",   "SigmaMeshSyncAgent",     "mesh_sync"),
+            ("userland.system_api.ghost_chat",       "SigmaGhostChat",         "ghost_chat"),
+            ("userland.system_api.titan_capture",    "SigmaTitanCapture",      "titan_capture"),
+            ("userland.system_api.aura_sound_engine", "SigmaAuraSoundEngine",  "sound_engine"),
+            ("userland.system_api.task_scheduler",   "SigmaSovereignTaskScheduler", "scheduler"),
         ]
         
         # Parallel Load: All core services
@@ -497,6 +504,20 @@ class SigmaKernel:
     def net_vantage(self):        return self.registry.get("net_vantage")
     @property
     def crypt_guard(self):        return self.registry.get("crypt_guard")
+    @property
+    def compliance(self):         return self.registry.get("compliance")
+    @property
+    def media_forge(self):        return self.registry.get("media_forge")
+    @property
+    def mesh_sync(self):          return self.registry.get("mesh_sync")
+    @property
+    def ghost_chat(self):         return self.registry.get("ghost_chat")
+    @property
+    def titan_capture(self):      return self.registry.get("titan_capture")
+    @property
+    def sound_engine(self):       return self.registry.get("sound_engine")
+    @property
+    def scheduler(self):          return self.registry.get("scheduler")
     @property
     def offline_guard(self):      return self.registry.get("offline")
     @property
