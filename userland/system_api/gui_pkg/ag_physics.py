@@ -40,6 +40,5 @@ class AGPhysicsPage(SigmaPage):
 
         ttk.Button(main_panel, text="⬇️ Trigger Gravity Gather (Pulse)", command=_gather).pack(pady=10)
         
-        tk.Label(main_panel, text="Mass Projection: Heavier apps (Store, Enterprise) drift slower than lightweight ones (Aether).",
+        tk.Label(main_panel, text="Mass Projection: Heavier apps (Store, Enterprise) drift slower than lightweight ones (Aether). Paradox: Higher RAM usage increases 'mass' for the drift engine.",
                  font=("Segoe UI", 8), fg=PAL["dim"], bg=PAL["bg"], wraplength=500).pack(pady=20)
- Paradox: Higher RAM usage increases 'mass' for the drift engine. 
