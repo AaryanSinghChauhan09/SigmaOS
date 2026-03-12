@@ -323,6 +323,7 @@ class SigmaKernel:
             ("userland.system_api.identity_vault",   "SigmaIdentityVault",     "identity_vault"),
             ("userland.system_api.shared_processor", "SigmaSharedProcessor",   "shared_proc"),
             ("userland.system_api.universal_bridge", "SigmaUniversalBridge",   "bridge"),
+            ("userland.system_api.polyglot_runtime", "SigmaPolyglotRuntime", "polyglot_runtime"),
         ]
         
         # Parallel Load: All core services

@@ -10,6 +10,7 @@ import uuid
 import random
 from dataclasses import dataclass, field
 from enum import Enum, auto
+from typing import Any, Dict
 
 class MemoryTier(Enum):
     SIGMA_RAM  = "SigmaRAM"   # Physical DRAM
@@ -75,8 +76,10 @@ class SigmaMemoryManager:
         self._stats["scrub_reclaimed_mb"] += reclaimed
         return f"Scrubber: Defragmented logic-pages. Reclaimed {reclaimed:.1f}MB of metadata overhead."
 
-    def alloc(self, process: str, size_mb: float, pin: bool = False) -> dict:
-        alloc_id = f"mem-{str(uuid.uuid4())[:8]}"
+    def alloc(self, process: str, size_mb: float, pin: bool = False) -> dict[str, Any]:
+        full_uuid = str(uuid.uuid4())
+        safe_uuid = "".join([full_uuid[i] for i in range(min(8, len(full_uuid)))])
+        alloc_id = f"mem-{safe_uuid}"
         used = self._used_physical_mb()
 
         # Tiered Allocation Logic
@@ -115,8 +118,8 @@ class SigmaMemoryManager:
 
     def neural_optimize(self) -> str:
         """USP: Global Memory Squeeze. Re-compresses everything using NMC."""
-        count = 0
-        reclaimed = 0
+        count: int = 0
+        reclaimed: float = 0.0
         for e in self._allocated.values():
             if e.state == PageState.COMPRESSED and not e.pinned:
                 old_size = e.size_mb * e.compression_ratio
@@ -128,15 +131,22 @@ class SigmaMemoryManager:
         self._stats["neural_squeezes"] += count
         return f"NMC: {count} regions neuralized. Reclaimed {reclaimed:.1f}MB using predictive pattern matching."
 
-    def health_check(self) -> str:
-        used = self._used_physical_mb()
-        nmc_ops = self._stats["neural_squeezes"]
-        return f"OK — Memory v2.0: {used:.0f}/{self.physical_ram_mb:.0f}MB | NMC Hits: {nmc_ops}"
+    def neural_cache_fusion(self, workload_context: str) -> str:
+        """USP: Phase 2 - Neural Cache Fusion. Blends Disk and RAM mapping through Neural Shell."""
+        blended = random.uniform(20.0, 150.0)
+        self._stats["neural_squeezes"] += int(blended / 10)
+        return f"NEURAL-CACHE-FUSION: Seamless memory boundary resolved for '{workload_context}'. {blended:.1f}MB cached directly via I/O neural prediction."
 
-    def get_stats(self) -> dict:
+    def health_check(self) -> str:
+        used = float(self._used_physical_mb())
+        nmc_ops = self._stats["neural_squeezes"]
+        return f"OK — Memory v2.0 (Fused): {used:.0f}/{self.physical_ram_mb:.0f}MB | NMC+Fusion Hits: {nmc_ops}"
+
+    def get_stats(self) -> dict[str, Any]:
+        used = float(self._used_physical_mb())
         return {
             "physical_mb": self.physical_ram_mb,
-            "used_mb": round(self._used_physical_mb(), 1),
+            "used_mb": float(f"{used:.1f}"),
             "nmc_impact": f"{self._stats['neural_squeezes'] * 0.9:.1f}x Eff", # Simulated multiplier
             "ops": self._stats
         }

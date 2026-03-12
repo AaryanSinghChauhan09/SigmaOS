@@ -60,6 +60,21 @@ class SigmaFluidUI:
             "message": f"UI Nexus: Now anchoring {len(self.active_widgets)} live widgets to the desktop plane."
         }
 
+    def instant_cognitive_metamorphosis(self, stress_level: float, task_type: str) -> str:
+        """USP: Phase 3 Singularity - Instant Cognitive UI. The desktop shell organically changes shape based on biometric/task inputs."""
+        if stress_level > 7.5:
+            self.layout_mode = "Absolute_Minimalism (High-Stress Override)"
+            self.configure_widgets(remove=self.active_widgets)
+            self.apply_window_transparency(1.0) # Solid, no distractions
+            return f"COGNITIVE-UI: Stress spike detected ({stress_level}). Liquidating distractions. Shell morphing into pure text-focus layout."
+            
+        if "creative" in task_type.lower():
+            self.layout_mode = "Holographic_Canvas"
+            self.apply_window_transparency(0.4)
+            return "COGNITIVE-UI: Creative intent sensed. Shell borders dissolved. Glassmorphism maximized to 60%."
+            
+        return "COGNITIVE-UI: Biological steady-state. Standard morphological boundaries maintained."
+
     def set_adaptive_theme(self, context: str) -> str:
         """Personalization: Autonomously shift UI based on environmental context (e.g. Night, Focus, Gaming)."""
         if context.lower() == "night":
@@ -78,7 +93,7 @@ class SigmaFluidUI:
         return f"Adaptive Theme Engine: Metamorphosis to '{self.layout_mode}' complete."
 
     def health_check(self) -> str:
-        return f"OK — Fluid UI | Mode: {self.layout_mode} | Widgets: {len(self.active_widgets)}"
+        return f"OK — Fluid UI | Mode: {self.layout_mode} | Cognitive Morphing Active."
 
     @staticmethod
     def get_accessibility_suite() -> Dict[str, str]:

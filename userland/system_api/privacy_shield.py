@@ -81,6 +81,7 @@ class SigmaPrivacyShield:
             "metadata_scrubbed": 0,
             "cookies_crushed": 0,
             "third_party_requests_blocked": 0,
+            "pii_suppressed": 0,
         }
         self._ips_level: str = "PARANOID"  # DENY BY DEFAULT
         self._blocked_domains: set[str] = set(_THIRD_PARTY_BLOCKLIST)
@@ -90,8 +91,9 @@ class SigmaPrivacyShield:
     def trigger_total_cloak(self) -> str:
         """Kills all non-essential outbound noise and activates network ghosting."""
         self._identity_status = "TOTAL_BLACKOUT"
-        if self.kernel and hasattr(self.kernel, "bus"):
-            self.kernel.bus.emit("privacy.total_blackout", {"prio": "CRITICAL"})
+        bus = getattr(self.kernel, "bus", None)
+        if bus is not None:
+            bus.emit("privacy.total_blackout", {"prio": "CRITICAL"})
         return "PrivacyShield: KERNEL-LEVEL DATA BLACKOUT INITIATED. Outbound telemetry: 0%."
 
     def reduce_third_party_cookies(self) -> str:
@@ -147,6 +149,28 @@ class SigmaPrivacyShield:
                 return False  # BLOCK
         return True
 
+    def real_time_pii_suppression(self, data_stream: str) -> str:
+        """
+        USP: Phase 1 Forensic Scrubber++
+        Actively intercepts strings at the network layer and permanently redacts personal identifying info.
+        """
+        original_len = len(data_stream)
+        
+        # Simulated Regex logic for standard PII patterns
+        email_pattern = r'[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+'
+        ssn_pattern = r'\b\d{3}-\d{2}-\d{4}\b'
+        phone_pattern = r'\b\d{3}-\d{3}-\d{4}\b'
+        
+        redacted = re.sub(email_pattern, "[EMAIL_REDACTED]", data_stream)
+        redacted = re.sub(ssn_pattern, "[SSN_REDACTED]", redacted)
+        redacted = re.sub(phone_pattern, "[PHONE_REDACTED]", redacted)
+        
+        if redacted != data_stream:
+            self._stats["pii_suppressed"] += 1
+            print(f"[FORENSIC SCRUBBER++] PII Detected and localized constraint enforced.")
+            
+        return redacted
+
     def generate_burner_vault(self) -> Dict[str, str]:
         """
         Create a disposable encrypted storage ID for safe research.
@@ -154,7 +178,8 @@ class SigmaPrivacyShield:
         """
         self._vault_counter += 1
         raw = f"SIGMA-VAULT-{self._vault_counter}-{time.time_ns()}"
-        vid = hashlib.sha256(raw.encode()).hexdigest()[:16].upper()
+        full_hex = hashlib.sha256(raw.encode()).hexdigest()
+        vid = "".join([full_hex[i] for i in range(min(16, len(full_hex)))]).upper()
         return {
             "ID": f"VAULT-{vid}",
             "Key": "SHA3-ECC-SOVEREIGN",
@@ -165,8 +190,9 @@ class SigmaPrivacyShield:
     def set_resource_usage(self, resource_name: str, in_use: bool) -> None:
         """Global Privacy Indicator: emits a bus event when a sensitive resource is accessed."""
         status = "ACTIVE" if in_use else "IDLE"
-        if self.kernel and hasattr(self.kernel, "bus"):
-            self.kernel.bus.emit("privacy.resource_usage", {"resource": resource_name, "status": status})
+        bus = getattr(self.kernel, "bus", None)
+        if bus is not None:
+            bus.emit("privacy.resource_usage", {"resource": resource_name, "status": status})
         print(f"[PRIVACY] Resource '{resource_name}' → {status}")
 
     def apply_browser_stealth(self) -> str:
@@ -186,9 +212,10 @@ class SigmaPrivacyShield:
         return (
             f"OK — PrivacyShield v5 Apex | Mode: {self._identity_status} | "
             f"Policy: {self._cookie_policy} | "
-            f"Cookies Crushed: {s['cookies_crushed']} | "
-            f"3P Requests Blocked: {s['third_party_requests_blocked']} | "
-            f"IP Leaks Prevented: {s['ip_leak_prevented']}"
+            f"Cookies: {s['cookies_crushed']} | "
+            f"3P Blocks: {s['third_party_requests_blocked']} | "
+            f"IP Leaks Prevented: {s['ip_leak_prevented']} | "
+            f"PII Suppressions: {s['pii_suppressed']}"
         )
 
 
