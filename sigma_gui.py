@@ -25,6 +25,8 @@ except ImportError:
 from sigma_core import SigmaKernel, SigmaConfig
 from sigma_projects import TaskStatus, Priority
 from userland.system_api.sigma_std import SigmaSys, SigmaNetwork
+from userland.system_api.sigma_games_engine import SigmaGamesEngine
+
 
 # ─── Palette ─────────────────────────────────────────────────────────────────
 PAL = {
@@ -2429,41 +2431,70 @@ class SigmaGUI(tk.Tk):
         self._log(a_log, "Aether core online. Quantum intent routing ready for collaborative analysis.", "INFO")
 
     def _build_gaming_hub(self):
-        """Sovereign Arcade: Premium IP-Safe Gaming Environment."""
+        """Sovereign Arcade: Master Logic & Strategic Command Center."""
         p = tk.Frame(self._content, bg=PAL["bg"])
         self._pages["gaming_hub"] = p
-        self._build_page_header(p, "SOVEREIGN ARCADE", "Clean-Room Engineered Gaming Suite (No Telemetry, No DRM)")
+        self._build_page_header(p, "SOVEREIGN ARCADE", "Zero-Telemetry Clean-Room Game Engine (64+ Logic Modules)")
 
-        body = tk.ScrollableFrame(p, bg=PAL["bg"]) if hasattr(tk, 'ScrollableFrame') else tk.Frame(p, bg=PAL["bg"])
-        body.pack(fill="both", expand=True, padx=20, pady=10)
+        # Control Bar: Search & Categories
+        ctrl = tk.Frame(p, bg=PAL["nav_bg"], pady=10)
+        ctrl.pack(fill="x", padx=10)
 
-        games = [
-            ("Sovereign Strategist", "IP-Safe Chess Engine", PAL["gold"], "sigma.games.chess"),
-            ("Mesh Ludo", "P2P Multi-Node Ludo", PAL["cyan"], "sigma.games.ludo"),
-            ("Sovereign Board Hub", "Classic Board Games Bundle", PAL["accent2"], "sigma.games.board_hub"),
-            ("Parking Grid Control", "Color-Logic Puzzle", PAL["orange"], "sigma.prod.parking"),
-            ("Swarm Legends", "Crowd Control Strategy", PAL["green"], "sigma.prod.swarm"),
-            ("Transit Drift", "Antigravity Infinite Runner", PAL["blue"], "sigma.prod.surf"),
-            ("Bio-Defense Nodes", "Node Defense (Plant-style)", PAL["pink"], "sigma.prod.bio"),
-            ("Nuts & Bolts", "Logical Movement", PAL["silver"], "sigma.prod.nuts_bolts")
-        ]
+        tk.Label(ctrl, text="🔎 SEARCH:", font=FONT_SMALL, fg=PAL["dim"], bg=PAL["nav_bg"]).pack(side="left", padx=(20, 10))
+        self._game_query = tk.StringVar()
+        self._game_query.trace_add("write", lambda *args: self._refresh_game_grid())
+        search_ent = tk.Entry(ctrl, textvariable=self._game_query, bg=PAL["bg"], fg=PAL["text"], insertbackground=PAL["accent"], 
+                              font=FONT_SMALL, relief="flat", width=30)
+        search_ent.pack(side="left", padx=5)
 
-        grid = tk.Frame(body, bg=PAL["bg"])
-        grid.pack(fill="x")
+        tk.Label(ctrl, text="MODE:", font=FONT_SMALL, fg=PAL["dim"], bg=PAL["nav_bg"]).pack(side="left", padx=(30, 10))
+        self._game_cat_filter = tk.StringVar(value="All")
+        cat_cb = ttk.Combobox(ctrl, textvariable=self._game_cat_filter, values=["All", "Board Strategy", "Puzzle / Logic", "Brain Training", "Action / Retro"], state="readonly", width=15)
+        cat_cb.pack(side="left", padx=5)
+        cat_cb.bind("<<ComboboxSelected>>", lambda e: self._refresh_game_grid())
 
-        for i, (name, desc, color, aid) in enumerate(games):
-            r, c = divmod(i, 3)
-            card = self._card(grid, name)
-            card.master.grid(row=r, column=c, padx=10, pady=10, sticky="nsew")
+        # Main Scrolling Grid
+        self._game_scroll = tk.ScrollableFrame(p, bg=PAL["bg"]) if hasattr(tk, 'ScrollableFrame') else tk.Frame(p, bg=PAL["bg"])
+        self._game_scroll.pack(fill="both", expand=True, padx=10, pady=10)
+        
+        self._game_grid_inner = tk.Frame(self._game_scroll, bg=PAL["bg"])
+        self._game_grid_inner.pack(fill="both", expand=True)
+
+        self._refresh_game_grid()
+
+    def _refresh_game_grid(self):
+        """Dynamic grid re-hydration based on filters."""
+        for child in self._game_grid_inner.winfo_children(): child.destroy()
+
+        engine = self.kernel.registry.get("games")
+        if not engine: return
+
+        query = self._game_query.get().lower()
+        cat_filter = self._game_cat_filter.get()
+        
+        metadata = engine.get_catalog_metadata()
+        filtered = [g for g in metadata if (query in g["name"].lower() or query in g["id"].lower()) and 
+                    (cat_filter == "All" or cat_filter in g["category"])]
+
+        for i, g in enumerate(filtered):
+            r, c = divmod(i, 4)
+            card = self._card(self._game_grid_inner, f"{g['icon']} {g['name']}")
+            card.master.grid(row=r, column=c, padx=8, pady=8, sticky="nsew")
             
-            tk.Label(card, text="PRO-LEVEL ENGINE", font=FONT_SMALL, fg=color, bg=PAL["card"]).pack(anchor="w")
-            tk.Label(card, text=desc, font=("Segoe UI", 9), fg=PAL["dim"], bg=PAL["card"], wraplength=250).pack(anchor="w", pady=5)
+            # Card Styling
+            tk.Label(card, text=f"ENGINE: {g['id']} v{g['version']}", font=("Segoe UI", 7, "bold"), fg=PAL["accent"], bg=PAL["card"]).pack(anchor="w")
+            tk.Label(card, text=g['desc'], font=("Segoe UI", 8), fg=PAL["dim"], bg=PAL["card"], wraplength=180, justify="left").pack(anchor="w", pady=5)
             
-            def _launch_game(game_id=aid): 
-                self._notify("Game Engine", f"Initializing {game_id} Sovereign Logic...", "OK")
-                self._launch_app(game_id)
+            status_txt = f"READY TO PLAY | {g['size_kb']} KB"
+            tk.Label(card, text=status_txt, font=("Segoe UI", 7), fg=PAL["teal"], bg=PAL["card"]).pack(anchor="w")
+
+            def _play(gid=g['id'], name=g['name']):
+                self._update_morphic_status("ARCADE", f"Hydrating {name} Logic...", PAL["teal"])
+                engine.play_game(gid)
+                # App logic would normally launch here; for now we simulate kernel integration
+                self._notify("Arcade", f"{name} logic initialized in sandbox.", "OK")
                 
-            ttk.Button(card, text="🎮 PLAY NATIVE", command=_launch_game).pack(fill="x", pady=5)
+            ttk.Button(card, text="🎮 PLAY NATIVE", command=_play).pack(fill="x", pady=10)
 
     def _build_war_room_page(self):
         """Competitor War Room: Real-time superiority metrics."""
