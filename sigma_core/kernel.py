@@ -334,6 +334,10 @@ class SigmaKernel:
             ("userland.system_api.titan_capture",    "SigmaTitanCapture",      "titan_capture"),
             ("userland.system_api.aura_sound_engine", "SigmaAuraSoundEngine",  "sound_engine"),
             ("userland.system_api.task_scheduler",   "SigmaSovereignTaskScheduler", "scheduler"),
+            ("userland.system_api.sovereign_registry", "SigmaSovereignRegistry", "sovereign_registry"),
+            ("userland.system_api.forensic_scanner",  "SigmaForensicScanner",    "forensic"),
+            ("userland.system_api.circuit_breaker",   "SigmaCircuitBreaker",     "breaker"),
+            ("userland.system_api.bio_lock",         "SigmaBioLock",            "bio_lock"),
         ]
         
         # Parallel Load: All core services
@@ -518,6 +522,14 @@ class SigmaKernel:
     def sound_engine(self):       return self.registry.get("sound_engine")
     @property
     def scheduler(self):          return self.registry.get("scheduler")
+    @property
+    def sovereign_registry(self): return self.registry.get("sovereign_registry")
+    @property
+    def forensic(self):           return self.registry.get("forensic")
+    @property
+    def breaker(self):            return self.registry.get("breaker")
+    @property
+    def bio_lock(self):           return self.registry.get("bio_lock")
     @property
     def offline_guard(self):      return self.registry.get("offline")
     @property

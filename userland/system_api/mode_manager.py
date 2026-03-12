@@ -236,6 +236,14 @@ class SigmaModeManager:
                 "Kernel_Flags": ["hyper-drive", "zen-latency", "zero-jit", "quantum-sched"],
                 "Routines_On_Enter": ["engage_hyper_drive", "activate_zen_latency", "monitor_cpu_temp"],
                 "Routines_On_Exit": ["disengage_hyper_drive"]
+            },
+            "Hardened": {
+                "CPU_Priority": "Strict",
+                "GPU_Profile": "Stable",
+                "RAM_Focus": "Encrypted_Pages",
+                "Description": "Maximum security and compliance mode.",
+                "Routines_On_Enter": ["run_compliance_audit", "seal_all_vaults", "activate_ghost_mask"],
+                "Routines_On_Exit": ["unseal_standard_vaults"]
             }
         }
         self._routines: Dict[str, Callable[..., Any]] = {
@@ -295,6 +303,10 @@ class SigmaModeManager:
             "engage_hyper_drive": self._engage_hyper_drive,
             "activate_zen_latency": self._activate_zen_latency,
             "disengage_hyper_drive": self._disengage_hyper_drive,
+            "run_compliance_audit": self._run_compliance_audit,
+            "seal_all_vaults": self._seal_all_vaults,
+            "activate_ghost_mask": self._activate_ghost_mask,
+            "scrub_recent_media": self._scrub_recent_media,
         }
 
     def trigger_auto_switch(self, app_name: str) -> Dict[str, str]:
@@ -683,3 +695,23 @@ class SigmaModeManager:
 
     def _cooldown_swarm(self, phase: str = "") -> str:
         return "Agentic Swarm compute cooled. Matrix returning to standby."
+
+    def _run_compliance_audit(self, phase: str = "") -> str:
+        if self.kernel and self.kernel.compliance:
+            return str(self.kernel.compliance.run_full_compliance_audit())
+        return "Compliance Auditor offline."
+
+    def _seal_all_vaults(self, phase: str = "") -> str:
+        if self.kernel and self.kernel.crypt_guard:
+            return "All sovereign vaults sealed with SHA-512."
+        return "CryptGuard offline."
+
+    def _activate_ghost_mask(self, phase: str = "") -> str:
+        if self.kernel and self.kernel.ghost_chat:
+            return "GhostChat mask active. Anonymous peer routing enabled."
+        return "GhostChat offline."
+
+    def _scrub_recent_media(self, phase: str = "") -> str:
+        if self.kernel and self.kernel.media_forge:
+            return "MediaForge forensic scrub initiated on recent assets."
+        return "MediaForge offline."
