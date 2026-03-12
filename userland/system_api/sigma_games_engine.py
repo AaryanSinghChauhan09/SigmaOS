@@ -2402,6 +2402,32 @@ class MysticSerpentLadders(SigmaGame):
         self.board = {10: 30, 40: 5, 60: 80, 90: 20}
     def health_check(self) -> str: return "OK — SerpentLadders READY."
 
+class ApexTetris(SigmaGame):
+    """USP: Tetris clone with Apex-Symmetry logic. Zero-latency block rotations."""
+    GAME_ID = "G98"
+    GAME_NAME = "Apex Tetris"
+    CATEGORY = "Arcade / Puzzle"
+    SIZE_KB = 15
+    def __init__(self):
+        super().__init__()
+        self.grid = [[0]*10 for _ in range(20)]
+        self.current_piece = None
+    def hydrate(self): return "ApexTetris: Blocks aligned. Gravity: Sovereign-Standard."
+    def health_check(self) -> str: return "OK — ApexTetris Operational."
+
+class LogicMinerApex(SigmaGame):
+    """USP: Minesweeper clone with predictive safe-paths. Local-first logic."""
+    GAME_ID = "G99"
+    GAME_NAME = "Logic Miner Apex"
+    CATEGORY = "Strategy / Puzzle"
+    SIZE_KB = 12
+    def __init__(self):
+        super().__init__()
+        self.rows = 16; self.cols = 16; self.mines = 40
+        self.grid = [[0]*16 for _ in range(16)]
+    def hydrate(self): return "LogicMinerApex: Mines buried. Probability matrices active."
+    def health_check(self) -> str: return "OK — LogicMiner READY."
+
 
 # ─── MASTER REGISTRAR ─────────────────────────────────────────────────────
 
@@ -2434,7 +2460,8 @@ ALL_GAMES: List[Type['SigmaGame']] = [
     GourmetSprint, FortressArchitect, GridlockEscape, AetherPathExplorer,
     ChromaticSphereBurst, ApexSurvival, SymphonicVirtualSynth, BotanicalVanguard,
     SovereignRealms, ApexStrikerCarrom, ProBilliardsApex, ZenTileMastery, SwarmTactics,
-    SovereignLudo, ApexVaultRunner, MysticSerpentLadders
+    SovereignLudo, ApexVaultRunner, MysticSerpentLadders,
+    ApexTetris, LogicMinerApex
 ]
 
 

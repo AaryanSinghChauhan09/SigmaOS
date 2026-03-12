@@ -89,7 +89,7 @@ class SigmaFixOrchestrator:
         self.log("Routine 7: Verifying Kernel Dependencies...")
         # Check for presence of core modules
         missing = []
-        for mod in ["sigma_core", "kernel.sigma_data_matrix", "sigma_gui"]:
+        for mod in ["sigma_core", "sigma_gui", "sigma_data_matrix"]:
             try:
                 importlib.import_module(mod)
             except ImportError:
