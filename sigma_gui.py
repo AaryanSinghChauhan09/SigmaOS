@@ -49,6 +49,7 @@ from gui_pkg.aether_orch import AetherOrchPage
 from gui_pkg.chemistry_lab import ChemistryLabPage
 from gui_pkg.cipher_studio import CipherStudioPage
 from gui_pkg.ncert_simulator import NcertSimulatorPage
+from gui_pkg.ncert_calc import NcertCalcPage
 
 class SigmaGUI(tk.Tk, UIMixin):
     """Main SigmaOS GUI application window."""
@@ -679,6 +680,7 @@ class SigmaGUI(tk.Tk, UIMixin):
             "chemistry_lab":    self._build_chemistry_lab_page,
             "cipher_studio":    self._build_cipher_studio_page,
             "ncert_simulator":  self._build_ncert_simulator_page,
+            "ncert_calc":       self._build_ncert_calc_page,
         }
         
         # Oracle VM Discovery (Professional Integration)
@@ -9343,6 +9345,10 @@ class SigmaGUI(tk.Tk, UIMixin):
     def _build_ncert_simulator_page(self):
         p = NcertSimulatorPage(self._content, self)
         self._pages["ncert_simulator"] = p
+
+    def _build_ncert_calc_page(self):
+        p = NcertCalcPage(self._content, self)
+        self._pages["ncert_calc"] = p
 
     def _launch_mission(self, mission_id: str, name: str):
         """Hand-off to OmniAutomator for mission execution."""
