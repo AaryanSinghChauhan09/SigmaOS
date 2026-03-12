@@ -345,6 +345,8 @@ class SigmaKernel:
             ("userland.system_api.sovereign_watchdog", "SigmaSovereignWatchdog", "sovereign_watchdog"),
             ("userland.system_api.omni_search_v2",     "SigmaOmniSearch",        "omni_search"),
             ("userland.system_api.sovereign_clipboard_v2", "SigmaSovereignClipboardV2", "clipboard"),
+            # NCERT Virtual Lab — Classes 1–12 (Physics/Chemistry/Bio/Maths)
+            ("userland.system_api.ncert_lab_engine",  "NCERTLabEngine",          "ncert_lab"),
         ]
         
         # Parallel Load: All core services
@@ -528,15 +530,11 @@ class SigmaKernel:
     @property
     def crypt_guard(self):        return self.registry.get("crypt_guard")
     @property
-    def compliance(self):         return self.registry.get("compliance")
-    @property
     def media_forge(self):        return self.registry.get("media_forge")
     @property
     def mesh_sync(self):          return self.registry.get("mesh_sync")
     @property
     def ghost_chat(self):         return self.registry.get("ghost_chat")
-    @property
-    def titan_capture(self):      return self.registry.get("titan_capture")
     @property
     def sound_engine(self):       return self.registry.get("sound_engine")
     @property
@@ -550,8 +548,6 @@ class SigmaKernel:
     @property
     def bio_lock(self):           return self.registry.get("bio_lock")
     @property
-    def offline_guard(self):      return self.registry.get("offline")
-    @property
     def crusher(self):            return self.registry.get("crusher")
     @property
     def intel(self):              return self.registry.get("intelligence")
@@ -562,11 +558,11 @@ class SigmaKernel:
     @property
     def update_manager(self):      return self.registry.get("update_manager")
     @property
-    def shadow(self):              return self.registry.get("shadow")
-    @property
     def pulse(self):               return self.registry.get("pulse")
     @property
-    def watchdog(self):            return self.registry.get("watchdog")
+    def offline_guard(self):       return self.registry.get("offline")
+    @property
+    def ncert_lab(self):           return self.registry.get("ncert_lab")
 
     @property
     def is_sovereign(self) -> bool:
