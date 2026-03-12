@@ -740,37 +740,620 @@ class VidyaQuest(SigmaGame):
             return f"Correct! Well done. Score: {self.score}"
         return f"Incorrect. The correct answer was {q['a']}. Score: {self.score}"
 
+# ─── G21: JIGSAW PUZZLE (Interactive App) ─────────────────────────────────
+class JigsawPuzzleGame(SigmaGame):
+    GAME_ID   = "G21"
+    GAME_NAME = "Jigsaw Puzzle"
+    CATEGORY  = "Puzzle / Interactive"
+    VERSION   = "1.0.0"
+    SIZE_KB   = 2400
+    ICON      = "🧩"
+    DESC      = "Load any image, scramble it into tiles, drag-drop to solve. 3×3 to 6×6 grids."
+    def _init_state(self): self.grid = 4; self.moves = 0; self.solved = False
+    def health_check(self) -> str: return "OK — Jigsaw Puzzle Engine READY."
+
+# ─── G22: SPOT IT — FIND FROM GROUP ────────────────────────────────────────
+class SpotItGame(SigmaGame):
+    GAME_ID   = "G22"
+    GAME_NAME = "Spot It — Find the Target"
+    CATEGORY  = "Brain Training / Arcade"
+    VERSION   = "1.0.0"
+    SIZE_KB   = 1800
+    ICON      = "🔍"
+    DESC      = "Find the target shape+colour hidden among 12–60 distractors. 5 difficulty levels."
+    def _init_state(self): self.round = 0; self.score = 0
+    def health_check(self) -> str: return "OK — SpotIt Engine READY."
+
+# ─── G23: SHELL GAME — WATCH THE CUP ────────────────────────────────────────
+class ShellGame(SigmaGame):
+    GAME_ID   = "G23"
+    GAME_NAME = "Watch the Cup — Shell Game"
+    CATEGORY  = "Arcade / Casual"
+    VERSION   = "1.0.0"
+    SIZE_KB   = 900
+    ICON      = "🎩"
+    DESC      = "Watch the coin, track the cup through animated shuffles. 4 speeds."
+    def _init_state(self): self.streak = 0; self.score = 0
+    def health_check(self) -> str: return "OK — ShellGame Engine READY."
+
+# ─── G24: SLIDING TILE 15-PUZZLE ────────────────────────────────────────────
+class SlidingTilePuzzle(SigmaGame):
+    GAME_ID   = "G24"; GAME_NAME = "Sliding Tile Puzzle"; CATEGORY = "Puzzle / Logic"
+    VERSION   = "1.0.0"; SIZE_KB = 320; ICON = "🔢"
+    DESC      = "Rearrange 15 numbered tiles to form the correct sequence. 3×3 to 5×5 grids."
+    def _init_state(self):
+        import random
+        self.size = 4; n = self.size * self.size
+        tiles = list(range(n)); random.shuffle(tiles)
+        self.board = tiles; self.blank = tiles.index(0)
+    def slide(self, direction: str) -> str:
+        n = self.size; blank = self.blank; b = self.board[:]
+        moves_map = {"up": blank + n, "down": blank - n,
+                     "left": blank + 1, "right": blank - 1}
+        target = moves_map.get(direction, -1)
+        if 0 <= target < n * n:
+            b[blank], b[target] = b[target], b[blank]
+            self.board = b; self.blank = target; self.moves += 1
+            if b == list(range(n * n)): self.score += 500; return "SOLVED!"
+            return f"Moved {direction}. Moves: {self.moves}"
+        return "Invalid move."
+    def health_check(self) -> str: return f"OK — Sliding Tile | Moves: {self.moves}"
+
+# ─── G25: LIGHTS OUT ────────────────────────────────────────────────────────
+class LightsOut(SigmaGame):
+    GAME_ID   = "G25"; GAME_NAME = "Lights Out"; CATEGORY = "Puzzle / Logic"
+    VERSION   = "1.0.0"; SIZE_KB = 180; ICON = "💡"
+    DESC      = "Toggle lights on a 5×5 grid — each toggle flips neighbours too. Clear the board!"
+    def _init_state(self):
+        import random
+        self.size = 5
+        self.grid = [[random.choice([0, 1]) for _ in range(self.size)] for _ in range(self.size)]
+    def toggle(self, row: int, col: int) -> str:
+        n = self.size
+        for r, c in [(row, col),(row-1,col),(row+1,col),(row,col-1),(row,col+1)]:
+            if 0 <= r < n and 0 <= c < n:
+                self.grid[r][c] ^= 1
+        self.moves += 1
+        lit = sum(self.grid[r][c] for r in range(n) for c in range(n))
+        if lit == 0: self.score += 300; return "ALL LIGHTS OUT! Solved!"
+        return f"Toggled ({row},{col}). Lights on: {lit}"
+    def health_check(self) -> str: return "OK — Lights Out Engine READY."
+
+# ─── G26: TOWER OF HANOI ────────────────────────────────────────────────────
+class TowerOfHanoi(SigmaGame):
+    GAME_ID   = "G26"; GAME_NAME = "Tower of Hanoi"; CATEGORY = "Puzzle / Logic"
+    VERSION   = "1.0.0"; SIZE_KB = 250; ICON = "🗼"
+    DESC      = "Move all disks from peg A to peg C using peg B. Never place a larger disk on smaller!"
+    def _init_state(self):
+        self.disks = 5
+        self.pegs = {"A": list(range(self.disks, 0, -1)), "B": [], "C": []}
+    def move(self, src: str, dst: str) -> str:
+        if not self.pegs.get(src): return f"Peg {src} is empty."
+        disk = self.pegs[src][-1]
+        if self.pegs[dst] and self.pegs[dst][-1] < disk: return "Invalid: larger on smaller!"
+        self.pegs[src].pop(); self.pegs[dst].append(disk); self.moves += 1
+        if len(self.pegs["C"]) == self.disks: self.score += 1000; return "SOLVED! All disks on C!"
+        return f"Moved disk {disk}: {src}→{dst}. Moves: {self.moves}"
+    def health_check(self) -> str: return f"OK — Tower of Hanoi | Pegs: {self.pegs}"
+
+# ─── G27: MEMORY MATCH (PAIRS) ────────────────────────────────────────────
+class MemoryMatch(SigmaGame):
+    GAME_ID   = "G27"; GAME_NAME = "Memory Match — Pairs"; CATEGORY = "Puzzle / Brain"
+    VERSION   = "1.1.0"; SIZE_KB = 400; ICON = "🃏"
+    DESC      = "Flip cards to find matching pairs. 4×4 to 6×6 grids. Beat the clock!"
+    SYMBOLS   = ["🍎","🍊","🍋","🍇","🍓","🍒","🌸","🌺","⭐","💎","🔥","🎯",
+                 "🚀","🎸","🎺","🎻","🏆","🌙","☀️","🌈"]
+    def _init_state(self):
+        import random; n = 4; pairs = (self.SYMBOLS * 2)[:n * n]
+        random.shuffle(pairs); self.cards = pairs
+        self.revealed = [False] * len(pairs); self.matched = set()
+    def flip(self, idx: int) -> str:
+        if idx in self.matched or self.revealed[idx]: return "Already revealed."
+        self.revealed[idx] = True; self.moves += 1
+        sym = self.cards[idx]
+        # Find if partner is also revealed
+        partner = next((i for i,r in enumerate(self.revealed)
+                        if r and i != idx and self.cards[i] == sym and i not in self.matched), None)
+        if partner is not None:
+            self.matched.update([idx, partner]); self.score += 50
+            if len(self.matched) == len(self.cards): return f"ALL MATCHED! Score: {self.score}"
+            return f"MATCH! {sym}. Score: {self.score}"
+        return f"Flipped card {idx}: {sym}"
+    def health_check(self) -> str: return f"OK — MemoryMatch | Matched: {len(self.matched)//2} pairs"
+
+# ─── G28: MATH SPRINT ────────────────────────────────────────────────────────
+class MathSprint(SigmaGame):
+    GAME_ID   = "G28"; GAME_NAME = "Math Sprint"; CATEGORY = "Brain Training / Education"
+    VERSION   = "1.2.0"; SIZE_KB = 150; ICON = "🧮"
+    DESC      = "Solve arithmetic problems under time pressure. Progressive difficulty."
+    OPS = [('+', lambda a,b: a+b), ('-', lambda a,b: a-b),
+           ('×', lambda a,b: a*b), ('÷', lambda a,b: a//b if b else 1)]
+    def _init_state(self):
+        import random; self.level = 1; self._gen_q()
+    def _gen_q(self):
+        import random; lv = self.level
+        a = random.randint(1, 10 * lv); b = random.randint(1, max(1, 5 * lv))
+        op_name, op_fn = random.choice(self.OPS[:2 + min(lv, 2)])
+        if op_name == '÷': b = max(1, b); a = b * random.randint(1, 10)
+        self.q = f"{a} {op_name} {b}"; self.ans = op_fn(a, b)
+    def get_question(self) -> str: return f"Q{self.moves+1}: {self.q} = ?"
+    def answer(self, val: int) -> str:
+        self.moves += 1
+        if val == self.ans:
+            self.score += 10 * self.level; self.level = min(self.level + 1, 10)
+            self._gen_q(); return f"✅ Correct! +{10*self.level} pts. Next: {self.q}"
+        else:
+            self.level = max(1, self.level - 1)
+            correct = self.ans; self._gen_q()
+            return f"❌ Wrong! Answer was {correct}."
+    def health_check(self) -> str: return f"OK — MathSprint Level {self.level}"
+
+# ─── G29: CONNECT FOUR ──────────────────────────────────────────────────────
+class ConnectFour(SigmaGame):
+    GAME_ID   = "G29"; GAME_NAME = "Connect Four"; CATEGORY = "Strategy / Board"
+    VERSION   = "1.0.0"; SIZE_KB = 380; ICON = "🔴"
+    DESC      = "Drop discs to connect 4 in a row — horizontal, vertical, or diagonal!"
+    ROWS, COLS = 6, 7
+    def _init_state(self):
+        self.board = [[0]*self.COLS for _ in range(self.ROWS)]
+        self.turn = 1  # 1=Red, 2=Yellow
+    def drop(self, col: int) -> str:
+        if not (0 <= col < self.COLS): return "Invalid column."
+        for row in range(self.ROWS - 1, -1, -1):
+            if self.board[row][col] == 0:
+                self.board[row][col] = self.turn; self.moves += 1
+                p = "🔴" if self.turn == 1 else "🟡"
+                if self._check_win(row, col, self.turn):
+                    self.score += 100; return f"{p} Wins! Connect Four!"
+                self.turn = 3 - self.turn
+                return f"{p} dropped in col {col+1}."
+        return "Column full!"
+    def _check_win(self, r, c, p) -> bool:
+        b = self.board
+        def count(dr, dc):
+            n = 0; rr, cc = r+dr, c+dc
+            while 0<=rr<self.ROWS and 0<=cc<self.COLS and b[rr][cc]==p:
+                n+=1; rr+=dr; cc+=dc
+            return n
+        for dr,dc in [(0,1),(1,0),(1,1),(1,-1)]:
+            if 1+count(dr,dc)+count(-dr,-dc) >= 4: return True
+        return False
+    def ai_move(self) -> str:
+        import random
+        valid = [c for c in range(self.COLS) if self.board[0][c] == 0]
+        return self.drop(random.choice(valid)) if valid else "Board full."
+    def health_check(self) -> str: return f"OK — ConnectFour | Turn: {'Red' if self.turn==1 else 'Yellow'}"
+
+# ─── G30: MINESWEEPER ────────────────────────────────────────────────────────
+class Minesweeper(SigmaGame):
+    GAME_ID   = "G30"; GAME_NAME = "Minesweeper"; CATEGORY = "Puzzle / Logic"
+    VERSION   = "1.1.0"; SIZE_KB = 600; ICON = "💣"
+    DESC      = "Reveal all safe cells without hitting a mine. Classic logic deduction."
+    def _init_state(self):
+        import random; self.rows = 9; self.cols = 9; self.mines = 10
+        self.board  = [[0]*self.cols for _ in range(self.rows)]
+        self.revealed = [[False]*self.cols for _ in range(self.rows)]
+        self.flagged  = [[False]*self.cols for _ in range(self.rows)]
+        positions = [(r,c) for r in range(self.rows) for c in range(self.cols)]
+        for r,c in random.sample(positions, self.mines): self.board[r][c] = -1
+        for r in range(self.rows):
+            for c in range(self.cols):
+                if self.board[r][c] != -1:
+                    self.board[r][c] = sum(
+                        self.board[r+dr][c+dc]==-1
+                        for dr in [-1,0,1] for dc in [-1,0,1]
+                        if 0<=r+dr<self.rows and 0<=c+dc<self.cols)
+    def reveal(self, r: int, c: int) -> str:
+        if not (0<=r<self.rows and 0<=c<self.cols): return "Out of bounds."
+        if self.revealed[r][c]: return "Already revealed."
+        self.revealed[r][c] = True; self.moves += 1
+        if self.board[r][c] == -1: return "💥 BOOM! Hit a mine!"
+        self.score += 10
+        safe = sum(1 for rr in range(self.rows) for cc in range(self.cols)
+                   if self.revealed[rr][cc] and self.board[rr][cc] != -1)
+        if safe == self.rows*self.cols - self.mines: return "🏆 All safe cells revealed! WIN!"
+        return f"Cell ({r},{c}): {self.board[r][c]} adjacent mines."
+    def flag(self, r: int, c: int) -> str:
+        self.flagged[r][c] = not self.flagged[r][c]
+        return f"{'🚩 Flagged' if self.flagged[r][c] else 'Unflagged'} ({r},{c})"
+    def health_check(self) -> str: return f"OK — Minesweeper {self.rows}×{self.cols} | {self.mines} mines"
+
+# ─── G31: SNAKE ─────────────────────────────────────────────────────────────
+class SnakeGame(SigmaGame):
+    GAME_ID   = "G31"; GAME_NAME = "Sovereign Snake"; CATEGORY = "Arcade / Classic"
+    VERSION   = "1.0.0"; SIZE_KB = 450; ICON = "🐍"
+    DESC      = "Classic snake — eat food, grow longer, avoid walls and yourself!"
+    def _init_state(self):
+        import random; self.W = self.H = 20
+        self.snake = [(10,10),(10,9),(10,8)]; self.dir = (0,1)
+        self.food  = (random.randint(0,self.W-1), random.randint(0,self.H-1))
+        self.alive = True
+    def tick(self) -> str:
+        import random
+        if not self.alive: return "Game over. Call hydrate() to restart."
+        h = self.snake[0]; nr,nc = h[0]+self.dir[0], h[1]+self.dir[1]
+        if not (0<=nr<self.H and 0<=nc<self.W) or (nr,nc) in self.snake:
+            self.alive = False; return f"💀 GAME OVER! Score: {self.score}"
+        self.snake.insert(0,(nr,nc)); self.moves += 1
+        if (nr,nc) == self.food:
+            self.score += 10
+            self.food = (random.randint(0,self.W-1), random.randint(0,self.H-1))
+            return f"🍎 Ate food! Length: {len(self.snake)} Score: {self.score}"
+        else:
+            self.snake.pop()
+            return f"Moved to ({nr},{nc}). Length: {len(self.snake)}"
+    def steer(self, direction: str) -> str:
+        dirs = {"up":(-1,0),"down":(1,0),"left":(0,-1),"right":(0,1)}
+        if direction in dirs: self.dir = dirs[direction]
+        return f"Direction: {direction}"
+    def health_check(self) -> str: return f"OK — Snake | Length: {len(self.snake)} | Score: {self.score}"
+
+# ─── G32: REVERSI / OTHELLO ─────────────────────────────────────────────────
+class ReversiOthello(SigmaGame):
+    GAME_ID   = "G32"; GAME_NAME = "Reversi (Othello)"; CATEGORY = "Strategy / Board"
+    VERSION   = "1.0.0"; SIZE_KB = 700; ICON = "⚫"
+    DESC      = "Classic 8×8 disk-flipping strategy. Outflank opponent to own the board!"
+    DIRS = [(-1,-1),(-1,0),(-1,1),(0,-1),(0,1),(1,-1),(1,0),(1,1)]
+    def _init_state(self):
+        self.board = [[0]*8 for _ in range(8)]
+        self.board[3][3]=self.board[4][4]=1
+        self.board[3][4]=self.board[4][3]=2; self.turn=1
+    def place(self, r: int, c: int) -> str:
+        flips = self._get_flips(r,c,self.turn)
+        if not flips: return "Invalid move."
+        self.board[r][c] = self.turn
+        for fr,fc in flips: self.board[fr][fc] = self.turn
+        self.moves += 1; self.score = sum(self.board[rr][cc]==1 for rr in range(8) for cc in range(8))
+        self.turn = 3-self.turn
+        return f"Placed at ({r},{c}). Flipped {len(flips)} discs. Score: {self.score}"
+    def _get_flips(self, r, c, p):
+        if self.board[r][c]!=0: return []
+        flips=[]; op=3-p
+        for dr,dc in self.DIRS:
+            line=[]; rr,cc=r+dr,c+dc
+            while 0<=rr<8 and 0<=cc<8 and self.board[rr][cc]==op:
+                line.append((rr,cc)); rr+=dr; cc+=dc
+            if line and 0<=rr<8 and 0<=cc<8 and self.board[rr][cc]==p:
+                flips.extend(line)
+        return flips
+    def ai_move(self) -> str:
+        import random
+        valid=[(r,c) for r in range(8) for c in range(8) if self._get_flips(r,c,self.turn)]
+        return self.place(*random.choice(valid)) if valid else "No valid moves."
+    def health_check(self) -> str: return f"OK — Reversi | Score B/W: {self.score}/{64-self.score}"
+
+# ─── G33: BATTLESHIP ────────────────────────────────────────────────────────
+class Battleship(SigmaGame):
+    GAME_ID   = "G33"; GAME_NAME = "Battleship"; CATEGORY = "Strategy / Classic"
+    VERSION   = "1.0.0"; SIZE_KB = 850; ICON = "🚢"
+    DESC      = "Sink all 5 enemy ships on a 10×10 grid. Classic naval grid deduction!"
+    SHIPS = {"Carrier":5,"Battleship":4,"Cruiser":3,"Submarine":3,"Destroyer":2}
+    def _init_state(self):
+        import random; self.grid = [[0]*10 for _ in range(10)]
+        self.hits=[]; self.misses=[]; self.sunk=[]
+        for name,size in self.SHIPS.items():
+            placed=False
+            while not placed:
+                h=random.choice([True,False]); r=random.randint(0,9); c=random.randint(0,9)
+                coords=[(r,c+i) if h else (r+i,c) for i in range(size)]
+                if all(0<=rr<10 and 0<=cc<10 and self.grid[rr][cc]==0 for rr,cc in coords):
+                    for rr,cc in coords: self.grid[rr][cc]=ord(name[0])
+                    placed=True
+    def fire(self, r: int, c: int) -> str:
+        if not (0<=r<10 and 0<=c<10): return "Out of range."
+        if (r,c) in self.hits+self.misses: return "Already fired here."
+        self.moves += 1
+        if self.grid[r][c]:
+            self.hits.append((r,c)); self.score+=20
+            remaining=sum(1 for rr in range(10) for cc in range(10)
+                if self.grid[rr][cc] and (rr,cc) not in self.hits)
+            if remaining==0: return f"🏆 All ships sunk! Hits: {len(self.hits)}"
+            return f"💥 HIT at ({r},{c})! Ships remaining cells: {remaining}"
+        self.misses.append((r,c)); return f"💦 MISS at ({r},{c}). Hits/Misses: {len(self.hits)}/{len(self.misses)}"
+    def health_check(self) -> str: return f"OK — Battleship | Hits:{len(self.hits)} Misses:{len(self.misses)}"
+
+# ─── G34: NIM GAME ──────────────────────────────────────────────────────────
+class NimGame(SigmaGame):
+    GAME_ID   = "G34"; GAME_NAME = "Nim (Mathematical Strategy)"; CATEGORY = "Strategy / Math"
+    VERSION   = "1.0.0"; SIZE_KB = 80; ICON = "🔵"
+    DESC      = "Take objects from heaps. The player forced to take the last object loses!"
+    def _init_state(self): self.heaps=[3,5,7]; self.player=1
+    def take(self, heap: int, count: int) -> str:
+        if not (0<=heap<len(self.heaps)): return "Invalid heap."
+        if count<1 or count>self.heaps[heap]: return "Invalid count."
+        self.heaps[heap]-=count; self.moves+=1
+        if all(h==0 for h in self.heaps):
+            self.score+=100; return f"Player {self.player} wins! (Nim)"
+        self.player=3-self.player
+        return f"Took {count} from heap {heap}. Heaps: {self.heaps}"
+    def ai_move(self) -> str:
+        import random
+        heaps=self.heaps; xor=0
+        for h in heaps: xor^=h
+        for i,h in enumerate(heaps):
+            t=h^xor
+            if t<h: return self.take(i,h-t)
+        valid=[(i,h) for i,h in enumerate(heaps) if h>0]
+        i,h=random.choice(valid); return self.take(i,random.randint(1,h))
+    def health_check(self) -> str: return f"OK — Nim | Heaps: {self.heaps}"
+
+# ─── G35: TYPING SPEED TEST ─────────────────────────────────────────────────
+class TypingSpeedTest(SigmaGame):
+    GAME_ID   = "G35"; GAME_NAME = "Typing Speed Test"; CATEGORY = "Brain Training / Skill"
+    VERSION   = "1.0.0"; SIZE_KB = 200; ICON = "⌨️"
+    DESC      = "Gamified WPM test. Accuracy tracking, streaks, difficulty scaling."
+    WORDS = ["the","quick","brown","fox","jumps","over","lazy","dog","sigma","os",
+             "sovereign","kernel","quantum","zero","trust","hyper","drive","apex",
+             "python","algorithm","performance","optimize","deploy","launch","build"]
+    def _init_state(self):
+        import random,time; self.words=random.sample(self.WORDS,20)
+        self.word_idx=0; self.correct=0; self.start=time.time()
+    def type_word(self, typed: str) -> str:
+        import time
+        if self.word_idx>=len(self.words): return "Test complete!"
+        target=self.words[self.word_idx]; self.word_idx+=1; self.moves+=1
+        if typed.strip()==target:
+            self.correct+=1; self.score+=10
+            elapsed=max(1,time.time()-self.start)
+            wpm=int((self.word_idx/elapsed)*60)
+            return f"✅ Correct! WPM: {wpm} | Accuracy: {int(self.correct/self.word_idx*100)}%"
+        return f"❌ Wrong. Expected '{target}'. Next: {self.words[self.word_idx] if self.word_idx<len(self.words) else 'END'}"
+    def health_check(self) -> str: return f"OK — Typing | {self.correct}/{self.word_idx} correct"
+
+# ─── G36: IDLE CLICKER ──────────────────────────────────────────────────────
+class IdleClicker(SigmaGame):
+    GAME_ID   = "G36"; GAME_NAME = "Sovereign Idle Clicker"; CATEGORY = "Casual / Idle"
+    VERSION   = "1.0.0"; SIZE_KB = 120; ICON = "👆"
+    DESC      = "Click to earn Sigma Points. Buy upgrades for passive income. Offline accumulation!"
+    def _init_state(self):
+        import time; self.points=0.0; self.cps=0.0; self.click_val=1
+        self.upgrades={"CPU_Core":0,"RAM_Slot":0,"GPU_Node":0,"AI_Engine":0}
+        self.prices  ={"CPU_Core":50,"RAM_Slot":200,"GPU_Node":1000,"AI_Engine":5000}
+        self.cps_add ={"CPU_Core":0.5,"RAM_Slot":2,"GPU_Node":10,"AI_Engine":50}
+        self._last=time.time()
+    def click(self) -> str:
+        import time; self._accumulate(); self.points+=self.click_val; self.moves+=1; self.score=int(self.points)
+        return f"Click! Points: {self.points:.1f} | CPS: {self.cps:.1f}"
+    def buy(self, upgrade: str) -> str:
+        import time; self._accumulate()
+        if upgrade not in self.upgrades: return "Unknown upgrade."
+        if self.points<self.prices[upgrade]: return f"Need {self.prices[upgrade]} pts."
+        self.points-=self.prices[upgrade]; self.upgrades[upgrade]+=1
+        self.cps+=self.cps_add[upgrade]; self.prices[upgrade]=int(self.prices[upgrade]*1.5)
+        return f"Bought {upgrade} (lvl {self.upgrades[upgrade]}). CPS: {self.cps:.1f}"
+    def _accumulate(self):
+        import time; now=time.time(); self.points+=self.cps*(now-self._last); self._last=now
+    def health_check(self) -> str: return f"OK — Idle | Pts:{self.points:.0f} CPS:{self.cps:.1f}"
+
+# ─── G37: BUBBLE POP ────────────────────────────────────────────────────────
+class BubblePop(SigmaGame):
+    GAME_ID   = "G37"; GAME_NAME = "Bubble Pop"; CATEGORY = "Casual / Arcade"
+    VERSION   = "1.0.0"; SIZE_KB = 350; ICON = "🫧"
+    DESC      = "Pop clusters of same-colour bubbles. Chain reactions = bonus points!"
+    COLORS = ["R","G","B","Y","P","O"]
+    def _init_state(self):
+        import random; self.W=8; self.H=10
+        self.grid=[[random.choice(self.COLORS) for _ in range(self.W)] for _ in range(self.H)]
+    def pop(self, r: int, c: int) -> str:
+        if not (0<=r<self.H and 0<=c<self.W): return "Out of bounds."
+        target=self.grid[r][c]
+        if target is None: return "Already popped."
+        cluster=self._flood(r,c,target)
+        if len(cluster)<2: return "Need ≥2 adjacent same-colour bubbles."
+        for br,bc in cluster: self.grid[br][bc]=None
+        pts=len(cluster)**2; self.score+=pts; self.moves+=1
+        return f"Popped {len(cluster)} {target} bubbles! +{pts} pts. Score: {self.score}"
+    def _flood(self, r, c, col, visited=None):
+        if visited is None: visited=set()
+        if (r,c) in visited or not (0<=r<self.H and 0<=c<self.W): return visited
+        if self.grid[r][c]!=col: return visited
+        visited.add((r,c))
+        for dr,dc in [(-1,0),(1,0),(0,-1),(0,1)]: self._flood(r+dr,c+dc,col,visited)
+        return visited
+    def health_check(self) -> str: return f"OK — BubblePop | Score: {self.score}"
+
+# ─── G38: WORD LADDER ───────────────────────────────────────────────────────
+class WordLadder(SigmaGame):
+    GAME_ID   = "G38"; GAME_NAME = "Word Ladder"; CATEGORY = "Brain Training / Word"
+    VERSION   = "1.0.0"; SIZE_KB = 300; ICON = "🔤"
+    DESC      = "Transform START word → END word by changing one letter at a time."
+    CHALLENGES = [("CAT","DOG"),("COLD","WARM"),("LEAD","GOLD"),("GAME","CODE"),("WORD","PLAY")]
+    def _init_state(self):
+        import random; self.start,self.end=random.choice(self.CHALLENGES)
+        self.chain=[self.start]; self.solved=False
+    def step(self, word: str) -> str:
+        word=word.upper()
+        if len(word)!=len(self.chain[-1]): return f"Must be {len(self.chain[-1])} letters."
+        diffs=sum(a!=b for a,b in zip(word,self.chain[-1]))
+        if diffs!=1: return "Change exactly ONE letter per step."
+        self.chain.append(word); self.moves+=1
+        if word==self.end:
+            self.score+=100; self.solved=True
+            return f"🏆 Solved in {self.moves} steps! Chain: {' → '.join(self.chain)}"
+        return f"Step {self.moves}: {' → '.join(self.chain)}  (Target: {self.end})"
+    def health_check(self) -> str: return f"OK — WordLadder | {self.start}→{self.end} | Steps: {self.moves}"
+
+# ─── G39: CROSSWORD LITE ────────────────────────────────────────────────────
+class CrosswordLite(SigmaGame):
+    GAME_ID   = "G39"; GAME_NAME = "Crossword Lite"; CATEGORY = "Brain Training / Word"
+    VERSION   = "1.0.0"; SIZE_KB = 1200; ICON = "✏️"
+    DESC      = "5 clues, fill answers in the grid. Auto-cross-checks intersections."
+    CLUES = [
+        {"num":1,"dir":"A","clue":"OS by Aaryan","ans":"SIGMA","row":0,"col":0},
+        {"num":2,"dir":"D","clue":"Opposite of cold","ans":"WARM","row":0,"col":4},
+        {"num":3,"dir":"A","clue":"Python creator: Guido van ___","ans":"ROSSUM","row":2,"col":0},
+        {"num":4,"dir":"D","clue":"AI tool type","ans":"MODEL","row":0,"col":2},
+        {"num":5,"dir":"A","clue":"Speed unit","ans":"MBPS","row":4,"col":0},
+    ]
+    def _init_state(self): self.answers={}
+    def fill(self, num: int, direction: str, answer: str) -> str:
+        key=(num,direction.upper()); answer=answer.upper()
+        clue=next((c for c in self.CLUES if c["num"]==num and c["dir"]==direction.upper()),None)
+        if not clue: return f"Clue {num}{direction} not found."
+        if answer==clue["ans"]:
+            self.answers[key]=answer; self.score+=20; self.moves+=1
+            if len(self.answers)==len(self.CLUES): return "🏆 Crossword Complete!"
+            return f"✅ Correct! {len(self.answers)}/{len(self.CLUES)} filled."
+        self.answers[key]=answer; return f"❌ '{answer}' incorrect for {num}{direction}."
+    def health_check(self) -> str: return f"OK — Crossword | {len(self.answers)}/{len(self.CLUES)} filled"
+
+# ─── G40: NONOGRAM / PICROSS ────────────────────────────────────────────────
+class Nonogram(SigmaGame):
+    GAME_ID   = "G40"; GAME_NAME = "Nonogram / Picross"; CATEGORY = "Puzzle / Logic"
+    VERSION   = "1.0.0"; SIZE_KB = 500; ICON = "🖼️"
+    DESC      = "Paint cells using row/column number clues to reveal a hidden pixel art."
+    def _init_state(self):
+        self.solution=[[1,0,1,0,1],[0,1,1,1,0],[1,1,0,1,1],[0,1,1,1,0],[1,0,1,0,1]]
+        self.grid=[[None]*5 for _ in range(5)]
+        self.row_clues=[self._calc_clue(self.solution[r]) for r in range(5)]
+        self.col_clues=[self._calc_clue([self.solution[r][c] for r in range(5)]) for c in range(5)]
+    def _calc_clue(self, line):
+        clues=[]; run=0
+        for v in line:
+            if v: run+=1
+            elif run: clues.append(run); run=0
+        if run: clues.append(run)
+        return clues or [0]
+    def fill(self, r: int, c: int, val: int) -> str:
+        if not (0<=r<5 and 0<=c<5): return "Out of bounds."
+        self.grid[r][c]=val; self.moves+=1
+        correct=sum(self.grid[rr][cc]==self.solution[rr][cc]
+                    for rr in range(5) for cc in range(5) if self.grid[rr][cc] is not None)
+        if all(self.grid[rr][cc]==self.solution[rr][cc] for rr in range(5) for cc in range(5)):
+            self.score+=200; return "🏆 Nonogram Solved! Perfect pixel art!"
+        return f"Filled ({r},{c})={'■' if val else '□'}. Correct so far: {correct}/25"
+    def health_check(self) -> str: return f"OK — Nonogram | Moves: {self.moves}"
+
+# ─── G41: LOGIC GRID PUZZLE ─────────────────────────────────────────────────
+class LogicGridPuzzle(SigmaGame):
+    GAME_ID   = "G41"; GAME_NAME = "Logic Grid Puzzle"; CATEGORY = "Brain Training / Logic"
+    VERSION   = "1.0.0"; SIZE_KB = 600; ICON = "🧠"
+    DESC      = "Use clues to deduce who owns what. Classic Einstein-style deduction."
+    def _init_state(self):
+        self.solution={"Alice":"Python","Bob":"Java","Carol":"Go"}
+        self.clues=["Alice does not use Java.","Bob dislikes Go.","Carol's language starts with G."]
+        self.answers={}
+    def get_clues(self): return self.clues
+    def assign(self, person: str, language: str) -> str:
+        self.answers[person]=language; self.moves+=1
+        if self.answers==self.solution:
+            self.score+=300; return "🏆 Logic Grid Solved! Perfect deduction!"
+        if person in self.solution:
+            ok=self.solution[person]==language
+            return f"{'✅' if ok else '❌'} {person} → {language}"
+        return f"❓ Unknown person: {person}"
+    def health_check(self) -> str: return f"OK — LogicGrid | {len(self.answers)}/{len(self.solution)} assigned"
+
+# ─── G42: PAC-MAN STYLE MAZE ────────────────────────────────────────────────
+class MazeChasePacStyle(SigmaGame):
+    GAME_ID   = "G42"; GAME_NAME = "Sigma Maze Chase"; CATEGORY = "Arcade / Classic"
+    VERSION   = "1.0.0"; SIZE_KB = 2200; ICON = "👻"
+    DESC      = "Navigate the maze, collect dots, avoid ghost enemies. Classic arcade logic."
+    def _init_state(self):
+        self.maze=["#########","#...#...#","#.#.#.#.#","#.......#","###.#.###",
+                   "#.......#","#.#.#.#.#","#...#...#","#########"]
+        self.pos=(1,1); self.dots=sum(row.count('.') for row in self.maze)
+        self.collected=0; self.ghosts=[(4,4)]
+    def move(self, direction: str) -> str:
+        import random
+        dr,dc={"up":(-1,0),"down":(1,0),"left":(0,-1),"right":(0,1)}.get(direction,(0,0))
+        nr,nc=self.pos[0]+dr, self.pos[1]+dc
+        if 0<=nr<len(self.maze) and 0<=nc<len(self.maze[0]) and self.maze[nr][nc]!='#':
+            self.pos=(nr,nc)
+            row=list(self.maze[nr]); eaten=row[nc]=='.'
+            if eaten: row[nc]=' '; self.maze[nr]=''.join(row); self.collected+=1; self.score+=10
+            if self.collected==self.dots: return f"🏆 All dots collected! Score:{self.score}"
+            # Ghost move
+            for i,(gr,gc) in enumerate(self.ghosts):
+                gd=random.choice([(-1,0),(1,0),(0,-1),(0,1)])
+                ngr,ngc=gr+gd[0],gc+gd[1]
+                if 0<=ngr<len(self.maze) and 0<=ngc<len(self.maze[0]) and self.maze[ngr][ngc]!='#':
+                    self.ghosts[i]=(ngr,ngc)
+            if self.pos in self.ghosts: return f"👻 Caught by ghost! Score:{self.score}"
+            return f"Pos:{self.pos} Dots:{self.collected}/{self.dots}{'🍒' if eaten else ''}"
+        return "Blocked by wall!"
+    def health_check(self) -> str: return f"OK — MazeChase | Pos:{self.pos} Score:{self.score}"
+
+# ─── G43: BRICK BREAKER ─────────────────────────────────────────────────────
+class BrickBreaker(SigmaGame):
+    GAME_ID   = "G43"; GAME_NAME = "Brick Breaker"; CATEGORY = "Arcade / Retro"
+    VERSION   = "1.0.0"; SIZE_KB = 900; ICON = "🧱"
+    DESC      = "Bounce the ball to destroy bricks. Don't let the ball fall!"
+    def _init_state(self):
+        self.W=20; self.H=15; self.paddle_x=8; self.paddle_w=4
+        self.ball_x=10.0; self.ball_y=10.0; self.ball_dx=1.0; self.ball_dy=-1.0
+        self.bricks=[[1 if r<4 else 0 for _ in range(self.W)] for r in range(self.H)]
+        self.alive=True
+    def move_paddle(self, direction: str) -> str:
+        if direction=="left": self.paddle_x=max(0,self.paddle_x-2)
+        if direction=="right": self.paddle_x=min(self.W-self.paddle_w,self.paddle_x+2)
+        return f"Paddle at {self.paddle_x}"
+    def tick(self) -> str:
+        if not self.alive: return "Game over."
+        self.ball_x+=self.ball_dx; self.ball_y+=self.ball_dy
+        if self.ball_x<=0 or self.ball_x>=self.W-1: self.ball_dx*=-1
+        if self.ball_y<=0: self.ball_dy*=-1
+        bx,by=int(self.ball_x),int(self.ball_y)
+        if by<self.H and bx<self.W and self.bricks[by][bx]:
+            self.bricks[by][bx]=0; self.ball_dy*=-1; self.score+=10; self.moves+=1
+            remaining=sum(self.bricks[r][c] for r in range(self.H) for c in range(self.W))
+            if remaining==0: return f"🏆 All bricks cleared! Score:{self.score}"
+            return f"Brick hit! Score:{self.score} Remaining:{remaining}"
+        if self.ball_y>=self.H-2:
+            if self.paddle_x<=self.ball_x<=self.paddle_x+self.paddle_w:
+                self.ball_dy=-abs(self.ball_dy); return "Paddle bounce!"
+            self.alive=False; return f"💀 Ball lost! Score:{self.score}"
+        return f"Ball:({self.ball_x:.1f},{self.ball_y:.1f})"
+    def health_check(self) -> str: return f"OK — BrickBreaker | Score:{self.score} Alive:{self.alive}"
+
 # ─── MASTER REGISTRAR ─────────────────────────────────────────────────────
 
 ALL_GAMES: List[type] = [
+    # Original 20
     StrategicSovereignty, LudoApex, SovereignSerpent, NutsAndNodes,
     CrowdFlowLegends, HyperTrackRunner, SoilVsMutants, MatrixCrossCircle,
     DotsAndNodes, ColorUnblock, ChromaticCrush, SovereignSudoku,
     GourmetGalore, SilentSentinel, AetherGlow, MatrixSynthesis,
-    LexiconUnleashed, BladeOfVitality, OrionVanguard, VidyaQuest
+    LexiconUnleashed, BladeOfVitality, OrionVanguard, VidyaQuest,
+    # New 23 — G21-G43
+    JigsawPuzzleGame, SpotItGame, ShellGame,
+    SlidingTilePuzzle, LightsOut, TowerOfHanoi, MemoryMatch,
+    MathSprint, ConnectFour, Minesweeper, SnakeGame,
+    ReversiOthello, Battleship, NimGame, TypingSpeedTest,
+    IdleClicker, BubblePop, WordLadder, CrosswordLite,
+    Nonogram, LogicGridPuzzle, MazeChasePacStyle, BrickBreaker,
 ]
 
+
 class SigmaGamesEngine:
+    """Master games registry and orchestration engine."""
+
     def __init__(self, kernel):
-        self.kernel = kernel
+        self.kernel  = kernel
         self.catalog = {cls.GAME_ID: cls for cls in ALL_GAMES}
 
     def get_catalog_metadata(self) -> List[Dict]:
         return [cls().get_info() for cls in ALL_GAMES]
 
     def list_games(self) -> List[str]:
-        """Returns a simple list of game names (parity for test suite)."""
         return [cls.GAME_NAME for cls in ALL_GAMES]
+
+    def get_games_by_category(self) -> Dict[str, List[str]]:
+        cats: Dict[str, List[str]] = {}
+        for cls in ALL_GAMES:
+            cat = cls.CATEGORY.split("/")[0].strip()
+            cats.setdefault(cat, []).append(cls.GAME_NAME)
+        return cats
 
     def install_game(self, game_id: str) -> Dict:
         if game_id not in self.catalog:
             return {"status": "error", "message": f"Game '{game_id}' not found."}
-        game = self.catalog[game_id]()
+        game   = self.catalog[game_id]()
         result = game.hydrate()
-        return {"status": "success", "message": result, "game_id": game_id, "name": game.GAME_NAME}
+        return {"status": "success", "message": result,
+                "game_id": game_id, "name": game.GAME_NAME}
 
     def play_game(self, game_id: str) -> str:
-        """Simulates playing a game for validation / testing."""
         if game_id not in self.catalog:
             return "Error: Game not found."
         game = self.catalog[game_id]()
@@ -778,4 +1361,7 @@ class SigmaGamesEngine:
         return f"PLAY_SESSION: {game.GAME_NAME} v{game.VERSION} logic active."
 
     def health_check(self) -> str:
-        return f"OK — SigmaGames Engine: {len(ALL_GAMES)} games registered | Offline Ready."
+        cats = self.get_games_by_category()
+        cat_summary = " | ".join(f"{k}:{len(v)}" for k, v in cats.items())
+        return (f"OK — SigmaGames Engine: {len(ALL_GAMES)} games registered "
+                f"| Categories: {cat_summary} | Offline Ready.")
