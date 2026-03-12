@@ -41,13 +41,19 @@ class SigmaForensicScanner(SigmaModuleBase):
                 fp = os.path.join(root, file)
                 try:
                     with open(fp, "rb") as f:
-                        file_hash = hashlib.sha512(f.read()).hexdigest()
-                        results[file] = file_hash[:16]
-                        file_count += 1
+                        raw_hash = hashlib.sha512(f.read()).hexdigest()
+                        # Cast to str explicitly and use a temporary variable for the slice
+                        file_hash_str = str(raw_hash)
+                        results[file] = file_hash_str[0:16]
+                        # Fix arithmetic binding lint
+                        count_snapshot = int(file_count)
+                        file_count = count_snapshot + 1
                 except:
                     pass
         
-        self.stats["scans_performed"] += 1
+        # Consistent stats update
+        current_scans = int(self.stats["scans_performed"])
+        self.stats["scans_performed"] = current_scans + 1
         return {"status": "SUCCESS", "files_audited": file_count, "integrity_map": results}
 
     def simulate_shadow_recovery(self) -> List[str]:

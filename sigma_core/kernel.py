@@ -338,6 +338,9 @@ class SigmaKernel:
             ("userland.system_api.forensic_scanner",  "SigmaForensicScanner",    "forensic"),
             ("userland.system_api.circuit_breaker",   "SigmaCircuitBreaker",     "breaker"),
             ("userland.system_api.bio_lock",         "SigmaBioLock",            "bio_lock"),
+            ("userland.system_api.sovereign_watchdog", "SigmaSovereignWatchdog", "watchdog"),
+            ("userland.system_api.omni_search_v2",     "SigmaOmniSearch",        "omni_search"),
+            ("userland.system_api.sovereign_clipboard_v2", "SigmaSovereignClipboardV2", "clipboard"),
         ]
         
         # Parallel Load: All core services
