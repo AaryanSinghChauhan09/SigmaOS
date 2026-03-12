@@ -324,6 +324,9 @@ class SigmaKernel:
             ("userland.system_api.shared_processor", "SigmaSharedProcessor",   "shared_proc"),
             ("userland.system_api.universal_bridge", "SigmaUniversalBridge",   "bridge"),
             ("userland.system_api.polyglot_runtime", "SigmaPolyglotRuntime", "polyglot_runtime"),
+            ("userland.system_api.sovereign_optimizer", "SigmaSovereignOptimizer", "optimizer"),
+            ("userland.system_api.net_vantage",      "SigmaNetVantage",        "net_vantage"),
+            ("userland.system_api.crypt_guard",      "SigmaCryptGuard",        "crypt_guard"),
         ]
         
         # Parallel Load: All core services
@@ -488,6 +491,12 @@ class SigmaKernel:
     def universal_bridge(self):   return self.registry.get("bridge")
     @property
     def shared_processor(self):   return self.registry.get("shared_proc")
+    @property
+    def optimizer(self):          return self.registry.get("optimizer")
+    @property
+    def net_vantage(self):        return self.registry.get("net_vantage")
+    @property
+    def crypt_guard(self):        return self.registry.get("crypt_guard")
     @property
     def offline_guard(self):      return self.registry.get("offline")
     @property
