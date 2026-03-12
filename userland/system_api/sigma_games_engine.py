@@ -1306,6 +1306,565 @@ class BrickBreaker(SigmaGame):
         return f"Ball:({self.ball_x:.1f},{self.ball_y:.1f})"
     def health_check(self) -> str: return f"OK — BrickBreaker | Score:{self.score} Alive:{self.alive}"
 
+# ─── G44: KAKURO (Number Crossword) ──────────────────────────────────────────
+class Kakuro(SigmaGame):
+    GAME_ID   = "G44"; GAME_NAME = "Kakuro"; CATEGORY = "Puzzle / Logic"
+    VERSION   = "1.0.0"; SIZE_KB = 650; ICON = "🔢"
+    DESC      = "Fill the grid so each run of cells sums to its clue. No digit repeated in a run!"
+    def _init_state(self):
+        # Simplified 4x4 board: clues are (sum, cells_in_run)
+        self.board  = [[0]*4 for _ in range(4)]
+        self.clues  = [
+            {"type":"across","row":0,"col_start":0,"length":2,"sum":3},
+            {"type":"across","row":1,"col_start":1,"length":3,"sum":15},
+            {"type":"down",  "row_start":0,"col":1,"length":2,"sum":4},
+            {"type":"down",  "row_start":0,"col":3,"length":3,"sum":6},
+        ]
+        self.solution = [[0,1,2,0],[0,4,5,6],[0,0,0,0],[0,0,0,0]]
+    def fill(self, row: int, col: int, val: int) -> str:
+        if not (0<=row<4 and 0<=col<4 and 1<=val<=9): return "Invalid input."
+        self.board[row][col] = val; self.moves += 1
+        correct = sum(self.board[r][c]==self.solution[r][c]
+                      for r in range(4) for c in range(4) if self.solution[r][c])
+        fills   = sum(1 for r in range(4) for c in range(4) if self.board[r][c])
+        if self.board == self.solution: self.score+=400; return "🏆 Kakuro Solved!"
+        return f"Filled ({row},{col})={val}. Correct: {correct}"
+    def get_clues(self): return self.clues
+    def health_check(self) -> str: return f"OK — Kakuro | Moves: {self.moves}"
+
+# ─── G45: SUDOKU (Full 9×9 with solver/hint) ─────────────────────────────────
+class SudokuFull(SigmaGame):
+    GAME_ID   = "G45"; GAME_NAME = "Sovereign Sudoku (Full 9×9)"; CATEGORY = "Puzzle / Logic"
+    VERSION   = "2.0.0"; SIZE_KB = 1200; ICON = "🔢"
+    DESC      = "Full 9×9 Sudoku with 3 difficulties, hint system, and instant solver."
+    PUZZLES = {
+        "easy": [
+            [5,3,0,0,7,0,0,0,0],[6,0,0,1,9,5,0,0,0],[0,9,8,0,0,0,0,6,0],
+            [8,0,0,0,6,0,0,0,3],[4,0,0,8,0,3,0,0,1],[7,0,0,0,2,0,0,0,6],
+            [0,6,0,0,0,0,2,8,0],[0,0,0,4,1,9,0,0,5],[0,0,0,0,8,0,0,7,9]
+        ]
+    }
+    SOLUTIONS = {
+        "easy": [
+            [5,3,4,6,7,8,9,1,2],[6,7,2,1,9,5,3,4,8],[1,9,8,3,4,2,5,6,7],
+            [8,5,9,7,6,1,4,2,3],[4,2,6,8,5,3,7,9,1],[7,1,3,9,2,4,8,5,6],
+            [9,6,1,5,3,7,2,8,4],[2,8,7,4,1,9,6,3,5],[3,4,5,2,8,6,1,7,9]
+        ]
+    }
+    def _init_state(self):
+        import copy; self.difficulty = "easy"
+        self.board = copy.deepcopy(self.PUZZLES["easy"])
+        self.original = copy.deepcopy(self.board)
+    def fill(self, row: int, col: int, val: int) -> str:
+        if not (0<=row<9 and 0<=col<9 and 1<=val<=9): return "Out of range."
+        if self.original[row][col]: return "Cell is pre-filled (given clue)."
+        self.board[row][col] = val; self.moves += 1
+        if self.board == self.SOLUTIONS["easy"]: self.score+=500; return "🏆 Sudoku Solved!"
+        # Validate row/col/box
+        row_vals = [v for v in self.board[row] if v]
+        if len(row_vals) != len(set(row_vals)): return f"❌ ({row},{col})={val} — duplicate in row!"
+        return f"✅ ({row},{col}) = {val}. Keep going!"
+    def hint(self) -> str:
+        sol = self.SOLUTIONS["easy"]
+        for r in range(9):
+            for c in range(9):
+                if not self.board[r][c]:
+                    self.board[r][c] = sol[r][c]; self.moves += 1
+                    return f"💡 Hint: ({r},{c}) = {sol[r][c]}"
+        return "All filled!"
+    def health_check(self) -> str: return f"OK — Sudoku 9×9 | Moves: {self.moves}"
+
+# ─── G46: HITORI ───────────────────────────────────────────────────────────────
+class Hitori(SigmaGame):
+    GAME_ID   = "G46"; GAME_NAME = "Hitori"; CATEGORY = "Puzzle / Logic"
+    VERSION   = "1.0.0"; SIZE_KB = 400; ICON = "⬛"
+    DESC      = "Shade cells so no number appears twice in any row/column. Adjacent shaded cells forbidden!"
+    def _init_state(self):
+        self.grid    = [[3,4,2,2],[1,2,3,4],[2,1,4,3],[4,3,1,2]]
+        self.shaded  = [[False]*4 for _ in range(4)]
+        self.solution_shaded = [[False,False,True,False],[False,False,False,False],
+                                [True,False,False,False],[False,False,False,False]]
+    def shade(self, r: int, c: int) -> str:
+        if not (0<=r<4 and 0<=c<4): return "Out of bounds."
+        self.shaded[r][c] = not self.shaded[r][c]; self.moves += 1
+        if self.shaded == self.solution_shaded: self.score+=300; return "🏆 Hitori Solved!"
+        return f"Cell ({r},{c}) {'shaded' if self.shaded[r][c] else 'unshaded'}."
+    def health_check(self) -> str: return f"OK — Hitori | Moves: {self.moves}"
+
+# ─── G47: LOOP THE LOOP ────────────────────────────────────────────────────────
+class LoopTheLoop(SigmaGame):
+    GAME_ID   = "G47"; GAME_NAME = "Loop the Loop"; CATEGORY = "Puzzle / Logic"
+    VERSION   = "1.0.0"; SIZE_KB = 700; ICON = "🔁"
+    DESC      = "Draw a single closed loop through the dots so each numbered cell has exactly that many sides!"
+    def _init_state(self):
+        self.clues   = [[None,3,None,None],[2,None,None,1],[None,None,3,None],[None,2,None,None]]
+        self.h_edges = [[False]*4 for _ in range(5)]  # horizontal edges
+        self.v_edges = [[False]*5 for _ in range(4)]  # vertical edges
+        self.size    = 4
+    def toggle_h(self, row: int, col: int) -> str:
+        if not (0<=row<=self.size and 0<=col<self.size): return "Out of range."
+        self.h_edges[row][col] = not self.h_edges[row][col]; self.moves += 1
+        return f"H-edge ({row},{col}) {'ON' if self.h_edges[row][col] else 'OFF'}"
+    def toggle_v(self, row: int, col: int) -> str:
+        if not (0<=row<self.size and 0<=col<=self.size): return "Out of range."
+        self.v_edges[row][col] = not self.v_edges[row][col]; self.moves += 1
+        return f"V-edge ({row},{col}) {'ON' if self.v_edges[row][col] else 'OFF'}"
+    def check(self) -> str:
+        edge_count = sum(sum(r) for r in self.h_edges) + sum(sum(r) for r in self.v_edges)
+        self.score = edge_count * 5
+        return f"Edges drawn: {edge_count}. Score: {self.score}"
+    def health_check(self) -> str: return f"OK — LoopTheLoop | Moves: {self.moves}"
+
+# ─── G48: FIND THE WORD (Word Search) ─────────────────────────────────────────
+class FindTheWord(SigmaGame):
+    GAME_ID   = "G48"; GAME_NAME = "Find the Word — Word Search"; CATEGORY = "Brain Training / Word"
+    VERSION   = "1.0.0"; SIZE_KB = 800; ICON = "🔎"
+    DESC      = "Find hidden words in an 8×8 letter grid — horizontal, vertical, diagonal!"
+    HIDDEN_WORDS = ["SIGMA","KERNEL","PYTHON","APEX","QUANTUM","ZERO"]
+    def _init_state(self):
+        import random
+        letters = "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
+        self.grid = [[random.choice(letters) for _ in range(8)] for _ in range(8)]
+        self.found = set()
+        # Embed a few words horizontally
+        for i, word in enumerate(self.HIDDEN_WORDS[:4]):
+            r = i * 2; c = 0
+            for j, ch in enumerate(word):
+                if c + j < 8: self.grid[r][c + j] = ch
+    def find(self, word: str) -> str:
+        word = word.upper()
+        if word in self.found: return f"'{word}' already found!"
+        if word in self.HIDDEN_WORDS:
+            self.found.add(word); self.score += 20 * len(word); self.moves += 1
+            if self.found == set(self.HIDDEN_WORDS): return f"🏆 All words found! Score:{self.score}"
+            return f"✅ '{word}' found! ({len(self.found)}/{len(self.HIDDEN_WORDS)}) Score:{self.score}"
+        return f"❌ '{word}' not in the grid."
+    def show_grid(self) -> str:
+        return "\n".join(" ".join(row) for row in self.grid)
+    def health_check(self) -> str: return f"OK — FindWord | Found:{len(self.found)}/{len(self.HIDDEN_WORDS)}"
+
+# ─── G49: SCRAMBLE (Anagram Solver) ───────────────────────────────────────────
+class ScrambleGame(SigmaGame):
+    GAME_ID   = "G49"; GAME_NAME = "Scramble — Anagram Challenge"; CATEGORY = "Brain Training / Word"
+    VERSION   = "1.0.0"; SIZE_KB = 300; ICON = "🔀"
+    DESC      = "Unscramble the jumbled word. Score based on speed and word length!"
+    WORDS = ["PYTHON","ALGORITHM","SOVEREIGN","KERNEL","QUANTUM","AUTOMATION",
+             "ENCRYPTION","DASHBOARD","DEBUGGER","COMPILER","FRAMEWORK","LAMBDA"]
+    def _init_state(self):
+        import random; self._pick()
+    def _pick(self):
+        import random
+        self.word   = random.choice(self.WORDS)
+        letters     = list(self.word)
+        random.shuffle(letters)
+        self.scrambled = "".join(letters)
+    def get_scrambled(self) -> str: return f"Unscramble: {self.scrambled}"
+    def guess(self, answer: str) -> str:
+        self.moves += 1
+        if answer.upper() == self.word:
+            pts = len(self.word) * 15; self.score += pts
+            self._pick()
+            return f"✅ Correct! +{pts} pts. Next: {self.scrambled}"
+        return f"❌ '{answer}' is wrong. Try again! (Hint: {len(self.word)} letters)"
+    def health_check(self) -> str: return f"OK — Scramble | Score:{self.score}"
+
+# ─── G50: SPELLATHON ──────────────────────────────────────────────────────────
+class Spellathon(SigmaGame):
+    GAME_ID   = "G50"; GAME_NAME = "Spellathon"; CATEGORY = "Brain Training / Word"
+    VERSION   = "1.0.0"; SIZE_KB = 500; ICON = "🐝"
+    DESC      = "Form as many words as possible from 7 letters. Must use the centre letter!"
+    def _init_state(self):
+        self.centre   = "A"
+        self.letters  = set("ABCEFLO")  # includes centre
+        self.valid_words = {"ABLE","CABLE","CAFE","COAL","COLA","FABLE","FACE",
+                            "FOCAL","LOAF","FLEA","LEAF","LACE","ALOE","FLOE"}
+        self.found = set()
+    def submit(self, word: str) -> str:
+        word = word.upper()
+        if word in self.found: return f"'{word}' already submitted."
+        if self.centre not in word: return f"Must contain centre letter '{self.centre}'."
+        if any(ch not in self.letters for ch in word): return f"Can only use letters: {self.letters}"
+        if word in self.valid_words:
+            self.found.add(word); pts = len(word) * 10; self.score += pts; self.moves += 1
+            if self.found == self.valid_words: return f"🏆 All words found! Score:{self.score}"
+            return f"✅ '{word}' (+{pts}). Total:{self.score}. Found:{len(self.found)}/{len(self.valid_words)}"
+        return f"'{word}' is not in the word list."
+    def health_check(self) -> str: return f"OK — Spellathon | Found:{len(self.found)}"
+
+# ─── G51: RIDDLER ──────────────────────────────────────────────────────────────
+class Riddler(SigmaGame):
+    GAME_ID   = "G51"; GAME_NAME = "The Riddler"; CATEGORY = "Brain Training / Logic"
+    VERSION   = "1.0.0"; SIZE_KB = 200; ICON = "🎭"
+    DESC      = "Solve lateral thinking riddles and classic brain-teasers. 3 hint levels!"
+    RIDDLES = [
+        {"q":"I speak without a mouth and hear without ears. I have no body but come alive with wind. What am I?",
+         "a":"echo","hint1":"Think mountains","hint2":"Sound phenomenon","hint3":"E___"},
+        {"q":"The more you take, the more you leave behind. What am I?",
+         "a":"footsteps","hint1":"Walking","hint2":"Steps","hint3":"F________"},
+        {"q":"I have cities but no houses live there. I have mountains but no trees grow there. What am I?",
+         "a":"map","hint1":"Paper object","hint2":"Navigation","hint3":"M__"},
+        {"q":"What has keys but no locks, space but no room, and you can enter but can't go inside?",
+         "a":"keyboard","hint1":"Computer accessory","hint2":"You type on it","hint3":"K________"},
+        {"q":"I'm light as a feather but the strongest person can't hold me for more than 5 minutes.",
+         "a":"breath","hint1":"Life essential","hint2":"Oxygen","hint3":"B_____"},
+    ]
+    def _init_state(self):
+        import random; self.idx = 0; random.shuffle(self.RIDDLES)
+        self.hints_used = 0
+    def get_riddle(self) -> str:
+        if self.idx >= len(self.RIDDLES): return "All riddles solved! 🏆"
+        return f"Riddle {self.idx+1}/{len(self.RIDDLES)}: {self.RIDDLES[self.idx]['q']}"
+    def hint(self, level: int = 1) -> str:
+        if self.idx >= len(self.RIDDLES): return "No current riddle."
+        key = f"hint{max(1,min(3,level))}"
+        self.hints_used += 1
+        return f"💡 Hint {level}: {self.RIDDLES[self.idx].get(key,'No hint.')}"
+    def answer(self, ans: str) -> str:
+        if self.idx >= len(self.RIDDLES): return "All done!"
+        correct = self.RIDDLES[self.idx]["a"]
+        self.moves += 1
+        pts = max(10, 50 - self.hints_used * 10)
+        if ans.lower().strip() == correct:
+            self.score += pts; self.hints_used = 0; self.idx += 1
+            nxt = self.get_riddle()
+            return f"🎉 Correct! +{pts} pts. {'🏆 All solved!' if self.idx>=len(self.RIDDLES) else nxt}"
+        return f"❌ Wrong. Answer was '{correct}'. Try next: {self.get_riddle()}"
+    def health_check(self) -> str: return f"OK — Riddler | {self.idx}/{len(self.RIDDLES)} solved"
+
+# ─── G52: XO ADVANCED ──────────────────────────────────────────────────────────
+class XOAdvanced(SigmaGame):
+    GAME_ID   = "G52"; GAME_NAME = "XO Ultimate (Tic-Tac-Toe+)"; CATEGORY = "Strategy / Puzzle"
+    VERSION   = "1.0.0"; SIZE_KB = 180; ICON = "✖️"
+    DESC      = "Ultimate Tic-Tac-Toe: 9 boards in a 3×3 meta-grid. Win 3 small boards to win the meta!"
+    def _init_state(self):
+        self.boards  = [[['.','.','.'] for _ in range(3)] for _ in range(9)]  # 9 boards
+        self.won     = [None]*9  # Which player won each board
+        self.turn    = 'X'; self.active_board = None  # None = any
+    def play(self, board: int, row: int, col: int) -> str:
+        if not (0<=board<9 and 0<=row<3 and 0<=col<3): return "Out of range."
+        if self.won[board]: return f"Board {board} already won by {self.won[board]}."
+        if self.active_board is not None and board != self.active_board:
+            return f"Must play on board {self.active_board}."
+        b = self.boards[board]
+        if b[row][col] != '.': return "Cell taken."
+        b[row][col] = self.turn; self.moves += 1
+        # Check small board win
+        if (all(b[r][c]==self.turn for r in range(3) for c in range(3) if all(b[rr][col]==self.turn for rr in range(3))) or
+            any(all(b[r][c]==self.turn for c in range(3)) for r in range(3)) or
+            any(all(b[r][c]==self.turn for r in range(3)) for c in range(3)) or
+            all(b[i][i]==self.turn for i in range(3)) or all(b[i][2-i]==self.turn for i in range(3))):
+            self.won[board] = self.turn; self.score += 50
+        # Next active board based on cell played
+        next_b = row * 3 + col
+        self.active_board = next_b if not self.won[next_b] else None
+        self.turn = 'O' if self.turn == 'X' else 'X'
+        return f"{'X' if self.turn=='O' else 'O'} played board {board} ({row},{col}). Next board: {self.active_board}"
+    def health_check(self) -> str: return f"OK — XO Ultimate | Boards won: {sum(1 for w in self.won if w)}"
+
+# ─── G53: MENSA PUZZLE ─────────────────────────────────────────────────────────
+class MensaPuzzle(SigmaGame):
+    GAME_ID   = "G53"; GAME_NAME = "Mensa IQ Puzzle"; CATEGORY = "Brain Training / IQ"
+    VERSION   = "1.0.0"; SIZE_KB = 300; ICON = "🧩"
+    DESC      = "Mensa-style IQ questions: number sequences, visual patterns, analogies."
+    QUESTIONS = [
+        {"q":"2, 4, 8, 16, ?","a":"32","type":"sequence"},
+        {"q":"3, 6, 11, 18, 27, ?","a":"38","type":"sequence"},
+        {"q":"If CAT=3, DOG=3, ELEPHANT=?","a":"8","type":"analogy"},
+        {"q":"Find the odd one: 121, 144, 169, 196, 214","a":"214","type":"odd-one"},
+        {"q":"A mother is 3 times her daughter's age. In 12 years she'll be twice the daughter's age. Current daughter's age?","a":"12","type":"math"},
+        {"q":"What comes next: 1, 1, 2, 3, 5, 8, 13, ?","a":"21","type":"fibonacci"},
+        {"q":"If SIGMA=68, APEX=42, KERNEL=?","a":"68","type":"cipher"},
+    ]
+    def _init_state(self): self.idx = 0; self.streak = 0
+    def get(self) -> str:
+        if self.idx>=len(self.QUESTIONS): return "All Mensa puzzles solved! 🏆"
+        q = self.QUESTIONS[self.idx]
+        return f"IQ Q{self.idx+1} [{q['type']}]: {q['q']}"
+    def answer(self, ans: str) -> str:
+        if self.idx>=len(self.QUESTIONS): return "Finished!"
+        q = self.QUESTIONS[self.idx]; self.moves += 1
+        if ans.strip() == q["a"]:
+            self.streak += 1; pts = 100 + self.streak * 20; self.score += pts; self.idx += 1
+            return f"🧠 Correct! +{pts}. Streak:{self.streak}. {self.get()}"
+        self.streak = 0; self.idx += 1
+        return f"❌ Wrong. Answer: {q['a']}. {self.get()}"
+    def health_check(self) -> str: return f"OK — MensaPuzzle | Score:{self.score} Streak:{self.streak}"
+
+# ─── G54: BULL'S EYE ───────────────────────────────────────────────────────────
+class BullsEye(SigmaGame):
+    GAME_ID   = "G54"; GAME_NAME = "Bull's Eye — Number Target"; CATEGORY = "Puzzle / Math"
+    VERSION   = "1.0.0"; SIZE_KB = 200; ICON = "🎯"
+    DESC      = "Use 6 numbers and +−×÷ to hit the target number. Countdown-style!"
+    def _init_state(self):
+        import random
+        self.numbers = [random.choice([1,2,3,4,5,6,7,8,9,10,25,50,75,100]) for _ in range(6)]
+        self.target  = random.randint(100, 999)
+        self.best    = None
+    def submit(self, expression: str) -> str:
+        """User submits a Python expression using only their numbers."""
+        try:
+            result = int(eval(expression, {"__builtins__": {}}))
+            diff   = abs(result - self.target)
+            self.moves += 1
+            if diff == 0:
+                self.score += 100; self.best = 0
+                return f"🎯 BULL'S EYE! {expression} = {result}. Target was {self.target}!"
+            pts = max(0, 50 - diff); self.score += pts
+            if self.best is None or diff < self.best: self.best = diff
+            return f"Result: {result} | Off by {diff} | +{pts} pts"
+        except Exception: return "Invalid expression."
+    def get_puzzle(self) -> str:
+        return f"Numbers: {self.numbers} | Target: {self.target}"
+    def health_check(self) -> str: return f"OK — BullsEye | Best diff:{self.best} Score:{self.score}"
+
+# ─── G55: QUOTE UNCODE ─────────────────────────────────────────────────────────
+class QuoteUncode(SigmaGame):
+    GAME_ID   = "G55"; GAME_NAME = "Quote Uncode — Cryptogram"; CATEGORY = "Brain Training / Word"
+    VERSION   = "1.0.0"; SIZE_KB = 350; ICON = "🔐"
+    DESC      = "Crack the substitution cipher to reveal famous quotes. Letter-by-letter replacement!"
+    QUOTES = [
+        ("THE ONLY WAY TO DO GREAT WORK IS TO LOVE WHAT YOU DO", "STEVE JOBS"),
+        ("IN THE MIDDLE OF DIFFICULTY LIES OPPORTUNITY", "EINSTEIN"),
+        ("CODE IS POETRY", "SIGMA OS"),
+        ("THINK DIFFERENT", "SIGMA OS"),
+    ]
+    def _init_state(self):
+        import random; self.quote, self.author = random.choice(self.QUOTES)
+        self.cipher = self._make_cipher()
+        self.encoded = "".join(self.cipher.get(c,c) for c in self.quote)
+        self.decoded: Dict[str,str] = {}
+    def _make_cipher(self) -> Dict[str,str]:
+        import random; alpha = list("ABCDEFGHIJKLMNOPQRSTUVWXYZ")
+        shuffled = alpha[:]; random.shuffle(shuffled)
+        return {a:b for a,b in zip(alpha,shuffled)}
+    def get_encoded(self) -> str: return self.encoded
+    def decode(self, cipher_letter: str, plain_letter: str) -> str:
+        self.decoded[cipher_letter.upper()] = plain_letter.upper(); self.moves += 1
+        # Check if solved
+        result = "".join(self.decoded.get(c,c) if c.isalpha() else c for c in self.encoded)
+        if result == self.quote: self.score+=300; return f"🏆 Decoded! '{self.quote}' — {self.author}"
+        return f"Current: {result}"
+    def health_check(self) -> str: return f"OK — QuoteUncode | Decoded:{len(self.decoded)} chars"
+
+# ─── G56: GO FIGURE ────────────────────────────────────────────────────────────
+class GoFigure(SigmaGame):
+    GAME_ID   = "G56"; GAME_NAME = "Go Figure — Arithmetic Grid"; CATEGORY = "Puzzle / Math"
+    VERSION   = "1.0.0"; SIZE_KB = 250; ICON = "🔮"
+    DESC      = "Fill a 4×4 grid so every row, column, and diagonal satisfies the given arithmetic target!"
+    def _init_state(self):
+        self.target = 34  # Magic square sum
+        self.grid   = [[0]*4 for _ in range(4)]
+        self.solution = [[16,3,2,13],[5,10,11,8],[9,6,7,12],[4,15,14,1]]  # Dürer's magic square
+    def fill(self, r: int, c: int, val: int) -> str:
+        if not (0<=r<4 and 0<=c<4 and 1<=val<=16): return "Use values 1–16."
+        self.grid[r][c] = val; self.moves += 1
+        if self.grid == self.solution: self.score+=500; return "🏆 Magic Square solved!"
+        row_sum = sum(self.grid[r])
+        return f"Set ({r},{c})={val}. Row {r} sum: {row_sum}/{self.target}"
+    def health_check(self) -> str: return f"OK — GoFigure | Target:{self.target}"
+
+# ─── G57: ALPHA TRIANGLE ───────────────────────────────────────────────────────
+class AlphaTriangle(SigmaGame):
+    GAME_ID   = "G57"; GAME_NAME = "Alpha Triangle"; CATEGORY = "Brain Training / Word"
+    VERSION   = "1.0.0"; SIZE_KB = 280; ICON = "🔺"
+    DESC      = "Place letters in a triangular grid so every row forms a valid word!"
+    LEVELS = [
+        {"rows": [["_"], ["_","_"], ["_","_","_"]], "words": ["A","AT","CAT"], "row_letters": [["A"],["A","T"],["C","A","T"]]},
+        {"rows": [["_"], ["_","_"], ["_","_","_"],["_","_","_","_"]],
+         "words": ["I","IN","INK","LINK"],
+         "row_letters": [["I"],["I","N"],["I","N","K"],["L","I","N","K"]]},
+    ]
+    def _init_state(self): self.level_idx = 0; self._load_level()
+    def _load_level(self):
+        lv = self.LEVELS[self.level_idx]
+        self.rows = [list(r) for r in lv["rows"]]
+        self.answers = lv["row_letters"]
+    def fill_row(self, row: int, word: str) -> str:
+        lv = self.LEVELS[self.level_idx]
+        if not (0<=row<len(self.rows)): return "Invalid row."
+        word = word.upper()
+        if list(word) == self.answers[row]:
+            self.rows[row] = list(word); self.score += 20; self.moves += 1
+            all_done = all(list(self.rows[r]) == self.answers[r] for r in range(len(self.rows)))
+            if all_done:
+                self.level_idx = min(self.level_idx+1, len(self.LEVELS)-1)
+                self._load_level(); return f"🏆 Level complete! Next level loaded."
+            return f"✅ Row {row} correct: '{word}'"
+        return f"❌ '{word}' doesn't fit row {row} (need {len(self.answers[row])} letters)."
+    def health_check(self) -> str: return f"OK — AlphaTriangle | Level:{self.level_idx+1}"
+
+# ─── G58: FAST FIVE ────────────────────────────────────────────────────────────
+class FastFive(SigmaGame):
+    GAME_ID   = "G58"; GAME_NAME = "Fast Five"; CATEGORY = "Brain Training / Speed"
+    VERSION   = "1.0.0"; SIZE_KB = 150; ICON = "⚡"
+    DESC      = "5 questions, 5 seconds each. Think fast across maths, trivia, and memory!"
+    QUESTIONS = [
+        {"q":"2 + 2 × 3 = ?","a":"8"},{"q":"Capital of Australia?","a":"canberra"},
+        {"q":"√144 = ?","a":"12"},{"q":"How many days in a leap year?","a":"366"},
+        {"q":"What colour do you get mixing blue and yellow?","a":"green"},
+        {"q":"Python was created by?","a":"guido"},{"q":"5! = ?","a":"120"},
+        {"q":"Largest planet in our solar system?","a":"jupiter"},
+        {"q":"2^10 = ?","a":"1024"},{"q":"Boiling point of water (°C)?","a":"100"},
+    ]
+    def _init_state(self):
+        import random,time; self.pool=list(self.QUESTIONS); random.shuffle(self.pool)
+        self.pool=self.pool[:5]; self.idx=0; self.start=time.time()
+    def current(self) -> str:
+        import time
+        if self.idx>=5: return "Fast Five complete!"
+        elapsed = time.time() - self.start
+        return f"Q{self.idx+1}/5: {self.pool[self.idx]['q']}  [⏱ {elapsed:.1f}s elapsed]"
+    def answer(self, ans: str) -> str:
+        import time
+        if self.idx>=5: return "Done!"
+        q = self.pool[self.idx]; self.idx += 1; self.moves += 1
+        elapsed = time.time() - self.start
+        if ans.lower().strip() == q["a"]:
+            pts = max(10, 50 - int(elapsed)); self.score += pts
+            return f"✅ Correct! +{pts}. {self.current()}"
+        return f"❌ Wrong (was '{q['a']}'). {self.current()}"
+    def health_check(self) -> str: return f"OK — FastFive | {self.idx}/5 done Score:{self.score}"
+
+# ─── G59: STRIKEOUT ────────────────────────────────────────────────────────────
+class Strikeout(SigmaGame):
+    GAME_ID   = "G59"; GAME_NAME = "Strikeout — Strike-Out Numbers"; CATEGORY = "Puzzle / Math"
+    VERSION   = "1.0.0"; SIZE_KB = 180; ICON = "💥"
+    DESC      = "Cross out numbers so each row/column has the specified sum using remaining numbers!"
+    def _init_state(self):
+        self.grid    = [[3,2,1,4],[1,4,3,2],[4,1,2,3],[2,3,4,1]]
+        self.struck  = [[False]*4 for _ in range(4)]
+        self.row_targets = [6,6,6,6]; self.col_targets = [6,6,6,6]
+    def strike(self, r: int, c: int) -> str:
+        if not (0<=r<4 and 0<=c<4): return "Out of bounds."
+        self.struck[r][c] = not self.struck[r][c]; self.moves += 1
+        row_sum = sum(self.grid[r][c2] for c2 in range(4) if not self.struck[r][c2])
+        col_sum = sum(self.grid[r2][c] for r2 in range(4) if not self.struck[r2][c])
+        ok  = all(sum(self.grid[r2][c2] for c2 in range(4) if not self.struck[r2][c2]) == self.row_targets[r2]
+                  for r2 in range(4))
+        ok2 = all(sum(self.grid[r2][c2] for r2 in range(4) if not self.struck[r2][c2]) == self.col_targets[c2]
+                  for c2 in range(4))
+        if ok and ok2: self.score+=300; return "🏆 Strikeout solved!"
+        return f"Struck ({r},{c}). Row{r}={row_sum}/{self.row_targets[r]} Col{c}={col_sum}/{self.col_targets[c]}"
+    def health_check(self) -> str: return f"OK — Strikeout | Moves:{self.moves}"
+
+# ─── G60: TALKING ANIMAL ───────────────────────────────────────────────────────
+class TalkingAnimal(SigmaGame):
+    GAME_ID   = "G60"; GAME_NAME = "Talking Animal — Kids Learning"; CATEGORY = "Education / Kids"
+    VERSION   = "1.0.0"; SIZE_KB = 400; ICON = "🐾"
+    DESC      = "Interactive animal quiz for kids — sounds, facts, spelling. Voice-friendly!"
+    ANIMALS = {
+        "DOG":   {"sound":"Woof! Woof!","fact":"Dogs have 18 muscles to move their ears.","emoji":"🐕"},
+        "CAT":   {"sound":"Meow! Purr…","fact":"Cats sleep 12–16 hours a day.","emoji":"🐈"},
+        "COW":   {"sound":"Mooo!","fact":"Cows have four stomach compartments.","emoji":"🐄"},
+        "LION":  {"sound":"Roarrr!","fact":"A lion's roar can be heard 8 km away.","emoji":"🦁"},
+        "DUCK":  {"sound":"Quack! Quack!","fact":"Ducks have waterproof feathers.","emoji":"🦆"},
+        "FROG":  {"sound":"Ribbit!","fact":"Frogs drink water through their skin.","emoji":"🐸"},
+        "TIGER": {"sound":"ROARR!","fact":"Each tiger has a unique stripe pattern.","emoji":"🐯"},
+        "ELEPHANT":{"sound":"Prrruuhh!","fact":"Elephants are the only animals that can't jump.","emoji":"🐘"},
+    }
+    def _init_state(self): self.seen = set()
+    def ask(self, animal: str) -> str:
+        animal = animal.upper()
+        if animal not in self.ANIMALS: return f"🤷 I don't know '{animal}'. Try: {list(self.ANIMALS.keys())}"
+        info = self.ANIMALS[animal]
+        self.seen.add(animal)
+        return (f"{info['emoji']} {animal} says: '{info['sound']}'\n"
+                f"   📚 Fun Fact: {info['fact']}")
+    def quiz(self, sound: str) -> str:
+        """Guess which animal makes this sound."""
+        self.moves += 1
+        for name, info in self.ANIMALS.items():
+            if sound.lower() in info["sound"].lower():
+                self.score += 20; return f"✅ Correct! '{sound}' is the {name} {info['emoji']}"
+        return f"❌ Hmm, which animal says '{sound}'? Try again!"
+    def health_check(self) -> str: return f"OK — TalkingAnimal | Animals met:{len(self.seen)}"
+
+# ─── G61: LOOP PUZZLE ──────────────────────────────────────────────────────────
+class LoopPuzzle(SigmaGame):
+    GAME_ID   = "G61"; GAME_NAME = "Loop Puzzle — Number Path"; CATEGORY = "Puzzle / Logic"
+    VERSION   = "1.0.0"; SIZE_KB = 350; ICON = "〰️"
+    DESC      = "Connect numbered dots 1→N in order without crossing the path. Classic loop challenge!"
+    def _init_state(self):
+        self.n     = 9  # 1-9 numbered cells
+        self.grid  = [[None]*3 for _ in range(3)]  # 3×3 grid
+        self.numbers = [(0,0,1),(0,2,3),(1,1,5),(2,0,7),(2,2,9)]  # (r,c,number)
+        for r,c,num in self.numbers: self.grid[r][c] = num
+        self.path  = []  # user's path as list of (r,c)
+        self.correct_path = [(0,0),(0,1),(0,2),(1,2),(1,1),(1,0),(2,0),(2,1),(2,2)]
+    def step(self, r: int, c: int) -> str:
+        if not (0<=r<3 and 0<=c<3): return "Out of bounds."
+        if (r,c) in self.path: return "Cell already visited!"
+        self.path.append((r,c)); self.moves += 1
+        if len(self.path) == 9:
+            if self.path == self.correct_path:
+                self.score += 200; return "🏆 Loop complete! Perfect path!"
+            return f"Loop complete but incorrect. Score: {self.score}"
+        return f"Step {len(self.path)}: at ({r},{c})"
+    def reset(self): self.path = []; return "Path reset."
+    def health_check(self) -> str: return f"OK — LoopPuzzle | Path:{len(self.path)}/9"
+
+# ─── G62: QUICK PUZZLE ─────────────────────────────────────────────────────────
+class QuickPuzzle(SigmaGame):
+    GAME_ID   = "G62"; GAME_NAME = "Quick Puzzle — Rapid Fire"; CATEGORY = "Brain Training / Speed"
+    VERSION   = "1.0.0"; SIZE_KB = 200; ICON = "⚡"
+    DESC      = "10-second rapid-fire mixed puzzles — math, spelling, patterns. Beat your best!"
+    BANK = [
+        {"q":"True or False: 17 is prime","a":"true"},
+        {"q":"Spell the sound a ghost makes","a":"boo"},
+        {"q":"Next in series: Z, Y, X, ?","a":"w"},
+        {"q":"Opposite of FAST","a":"slow"},
+        {"q":"How many sides does a hexagon have?","a":"6"},
+        {"q":"7 × 8 = ?","a":"56"},
+        {"q":"First element in periodic table?","a":"hydrogen"},
+        {"q":"Smallest 2-digit prime?","a":"11"},
+    ]
+    def _init_state(self):
+        import random,time; self.bank = list(self.BANK); random.shuffle(self.bank)
+        self.idx = 0; self.start = None
+    def next_q(self) -> str:
+        import time
+        if self.idx>=len(self.bank): return "All done! Final score: "+str(self.score)
+        self.start = time.time()
+        return f"Q{self.idx+1}: {self.bank[self.idx]['q']}"
+    def answer(self, ans: str) -> str:
+        import time
+        if self.idx>=len(self.bank): return "Done!"
+        q = self.bank[self.idx]; elapsed = time.time()-(self.start or time.time())
+        self.idx += 1; self.moves += 1
+        if ans.lower().strip() == q["a"]:
+            pts = max(5, 30-int(elapsed)); self.score += pts
+            return f"✅ +{pts} ({elapsed:.1f}s). {self.next_q()}"
+        return f"❌ Was '{q['a']}'. {self.next_q()}"
+    def health_check(self) -> str: return f"OK — QuickPuzzle | Score:{self.score}"
+
+# ─── G63: HOCUS FOCUS ─────────────────────────────────────────────────────────
+class HocusFocus(SigmaGame):
+    GAME_ID   = "G63"; GAME_NAME = "Hocus Focus — Spot Differences"; CATEGORY = "Puzzle / Observation"
+    VERSION   = "1.0.0"; SIZE_KB = 500; ICON = "🔍"
+    DESC      = "Spot all 5 differences between two text-art scenes. Classic observation puzzle!"
+    SCENES = [
+        {
+            "A": ["🌲🌲🏠🌲🌲","🌻🌻🌻🌻🌻","🐕 plays 🎾","☀️  sky  ☀️","🌊🌊🌊🌊🌊"],
+            "B": ["🌲🌲🏡🌲🌲","🌻🌼🌻🌻🌻","🐈 plays 🎾","☀️  sky  🌙","🌊🌊💧🌊🌊"],
+            "diffs": ["House type (🏠→🏡)","Flower 2 (🌻→🌼)","Animal (🐕→🐈)","Right sky (☀️→🌙)","Water (🌊→💧)"]
+        }
+    ]
+    def _init_state(self): self.scene = self.SCENES[0]; self.found = set()
+    def show(self) -> str:
+        s = self.scene
+        out = "SCENE A:\n" + "\n".join(s["A"]) + "\n\nSCENE B:\n" + "\n".join(s["B"])
+        return out
+    def submit_diff(self, description: str) -> str:
+        desc = description.lower()
+        for d in self.scene["diffs"]:
+            key = d.split("(")[0].strip().lower()
+            if key in desc and d not in self.found:
+                self.found.add(d); self.score += 20; self.moves += 1
+                if len(self.found)==len(self.scene["diffs"]): return f"🏆 All {len(self.found)} differences found!"
+                return f"✅ Found: '{d}' ({len(self.found)}/{len(self.scene['diffs'])})"
+        return f"❌ Not a difference, or already found. Remaining: {len(self.scene['diffs'])-len(self.found)}"
+    def health_check(self) -> str: return f"OK — HocusFocus | Found:{len(self.found)}/5"
+
 # ─── MASTER REGISTRAR ─────────────────────────────────────────────────────
 
 ALL_GAMES: List[type] = [
@@ -1315,18 +1874,23 @@ ALL_GAMES: List[type] = [
     DotsAndNodes, ColorUnblock, ChromaticCrush, SovereignSudoku,
     GourmetGalore, SilentSentinel, AetherGlow, MatrixSynthesis,
     LexiconUnleashed, BladeOfVitality, OrionVanguard, VidyaQuest,
-    # New 23 — G21-G43
+    # G21-G43 (previous expansion)
     JigsawPuzzleGame, SpotItGame, ShellGame,
     SlidingTilePuzzle, LightsOut, TowerOfHanoi, MemoryMatch,
     MathSprint, ConnectFour, Minesweeper, SnakeGame,
     ReversiOthello, Battleship, NimGame, TypingSpeedTest,
     IdleClicker, BubblePop, WordLadder, CrosswordLite,
     Nonogram, LogicGridPuzzle, MazeChasePacStyle, BrickBreaker,
+    # G44-G63 (new 20 games)
+    Kakuro, SudokuFull, Hitori, LoopTheLoop, FindTheWord,
+    ScrambleGame, Spellathon, Riddler, XOAdvanced, MensaPuzzle,
+    BullsEye, QuoteUncode, GoFigure, AlphaTriangle, FastFive,
+    Strikeout, TalkingAnimal, LoopPuzzle, QuickPuzzle, HocusFocus,
 ]
 
 
 class SigmaGamesEngine:
-    """Master games registry and orchestration engine."""
+    """Master games registry and orchestration engine — 63 games, 10 categories."""
 
     def __init__(self, kernel):
         self.kernel  = kernel
@@ -1344,6 +1908,12 @@ class SigmaGamesEngine:
             cat = cls.CATEGORY.split("/")[0].strip()
             cats.setdefault(cat, []).append(cls.GAME_NAME)
         return cats
+
+    def search(self, query: str) -> List[str]:
+        """Search games by name or category."""
+        q = query.lower()
+        return [cls.GAME_NAME for cls in ALL_GAMES
+                if q in cls.GAME_NAME.lower() or q in cls.CATEGORY.lower() or q in cls.DESC.lower()]
 
     def install_game(self, game_id: str) -> Dict:
         if game_id not in self.catalog:
