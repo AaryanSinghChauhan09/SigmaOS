@@ -50,6 +50,8 @@ from gui_pkg.chemistry_lab import ChemistryLabPage
 from gui_pkg.cipher_studio import CipherStudioPage
 from gui_pkg.ncert_simulator import NcertSimulatorPage
 from gui_pkg.ncert_calc import NcertCalcPage
+from gui_pkg.diksha_vlab import DikshaVLabPage
+from gui_pkg.katbook_reader import KatbookReaderPage
 
 class SigmaGUI(tk.Tk, UIMixin):
     """Main SigmaOS GUI application window."""
@@ -681,6 +683,8 @@ class SigmaGUI(tk.Tk, UIMixin):
             "cipher_studio":    self._build_cipher_studio_page,
             "ncert_simulator":  self._build_ncert_simulator_page,
             "ncert_calc":       self._build_ncert_calc_page,
+            "diksha_vlab":      self._build_diksha_vlab_page,
+            "katbook_reader":   self._build_katbook_reader_page,
         }
         
         # Oracle VM Discovery (Professional Integration)
@@ -9349,6 +9353,14 @@ class SigmaGUI(tk.Tk, UIMixin):
     def _build_ncert_calc_page(self):
         p = NcertCalcPage(self._content, self)
         self._pages["ncert_calc"] = p
+
+    def _build_diksha_vlab_page(self):
+        p = DikshaVLabPage(self._content, self)
+        self._pages["diksha_vlab"] = p
+
+    def _build_katbook_reader_page(self):
+        p = KatbookReaderPage(self._content, self)
+        self._pages["katbook_reader"] = p
 
     def _launch_mission(self, mission_id: str, name: str):
         """Hand-off to OmniAutomator for mission execution."""
