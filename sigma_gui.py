@@ -44,6 +44,8 @@ from gui_pkg.ag_physics import AGPhysicsPage
 from gui_pkg.advanced_calculator import AdvancedCalculatorPage
 from gui_pkg.unit_converter import UnitConverterPage
 from gui_pkg.data_analyzer import DataAnalyzerPage
+from gui_pkg.arcade import ArcadePage
+from gui_pkg.aether_orch import AetherOrchPage
 
 class SigmaGUI(tk.Tk, UIMixin):
     """Main SigmaOS GUI application window."""
