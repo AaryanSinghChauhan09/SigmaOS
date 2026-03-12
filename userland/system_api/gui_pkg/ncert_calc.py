@@ -12,7 +12,7 @@ class NcertCalcPage(SigmaPage):
         self.build()
 
     def build(self):
-        self.controller._build_page_header(self, "NCERT MASTER CALCULATOR", "Physics, Chemistry, Math & Bio Equation Solver")
+        self.controller._build_page_header(self, "NCERT MASTER CALCULATOR (CLASS 1-12)", "Physics, Chem, Math & Bio Omni-Solver")
         
         main_panel = tk.Frame(self, bg=PAL["bg"])
         main_panel.pack(fill="both", expand=True, padx=20, pady=10)
@@ -20,12 +20,12 @@ class NcertCalcPage(SigmaPage):
         card = self.controller._card(main_panel, "NCERT Omni-Calculator")
         card.master.pack(pady=50)
         
-        tk.Label(card, text="The NCERT Master Calculator provides pre-built formulas for the 11th and 12th grade syllabus.",
+        tk.Label(card, text="The NCERT Master Calculator provides comprehensive pre-built formulas for Class 1 to 12.",
                  font=FONT_MED, bg=PAL["card"], fg=PAL["dim"], wraplength=400).pack(pady=20, padx=20)
         
         def _launch():
             self._generate_and_launch_html()
-            self.controller._notify("NCERT Calc", "Browser-based calculator launched.", "OK")
+            self.controller._notify("NCERT Calc", "Class 1-12 Calculator launched.", "OK")
 
         ttk.Button(card, text="🧮 Launch NCERT Master Calculator", command=_launch, style="Teal.TButton").pack(pady=20)
 
@@ -35,210 +35,464 @@ class NcertCalcPage(SigmaPage):
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>SigmaOS NCERT Master Calculator</title>
+    <title>SigmaOS NCERT Master Calculator (Class 1-12)</title>
     <style>
         body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-color: #0A0A12; color: #F2F2F7; margin: 0; padding: 20px; }
-        .container { max-width: 900px; margin: 0 auto; background-color: #11111E; padding: 20px; border-radius: 10px; box-shadow: 0 4px 15px rgba(0,0,0,0.5); }
+        .container { max-width: 1200px; margin: 0 auto; background-color: #11111E; padding: 20px; border-radius: 10px; box-shadow: 0 4px 15px rgba(0,0,0,0.5); }
         h1 { color: #5AC8FA; font-size: 26px; text-align: center; }
-        h2 { color: #FFCC00; font-size: 20px; border-bottom: 1px solid #38383A; padding-bottom: 10px; margin-top: 30px; }
-        .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-top: 15px; }
+        .nav { display: flex; justify-content: center; gap: 10px; margin-bottom: 20px; flex-wrap: wrap; }
+        .nav button { background-color: #1C1C1E; color: white; border: 1px solid #38383A; padding: 8px 15px; border-radius: 5px; cursor: pointer; font-weight: bold; margin-bottom: 5px;}
+        .nav button.active { background-color: #5856D6; border-color: #5856D6; }
+        .nav button:hover { background-color: #2C2C2E; }
+        .nav button.active:hover { background-color: #AF52DE; }
+        
+        .tab-content { display: none; }
+        .tab-content.active { display: block; }
+        
+        h2 { color: #FFCC00; font-size: 20px; border-bottom: 1px solid #38383A; padding-bottom: 10px; margin-top: 20px; }
+        .grid-3 { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 15px; margin-top: 15px; }
         .card { background-color: #1C1C1E; padding: 15px; border-radius: 8px; border: 1px solid #38383A; }
-        label { display: block; font-size: 14px; color: #8E8E93; margin-bottom: 5px; }
-        input, select { width: 100%; box-sizing: border-box; padding: 10px; margin-bottom: 15px; background-color: #252529; color: white; border: 1px solid #5AC8FA; border-radius: 4px; font-family: monospace; }
+        label { display: block; font-size: 13px; color: #8E8E93; margin-bottom: 4px; mt-2}
+        input, select { width: 100%; box-sizing: border-box; padding: 8px; margin-bottom: 10px; background-color: #252529; color: white; border: 1px solid #5AC8FA; border-radius: 4px; font-family: monospace; }
         .btn { background-color: #5AC8FA; color: #0A0A12; padding: 10px; width: 100%; border: none; border-radius: 4px; cursor: pointer; font-weight: bold; font-size: 14px; transition: 0.2s; }
         .btn:hover { background-color: #4CD964; }
-        .output-box { background-color: #0A0A12; padding: 15px; border-radius: 4px; font-family: 'Consolas', monospace; color: #4CD964; margin-top: 15px; border: 1px solid #4CD964; white-space: pre-wrap; font-size: 16px;}
-        .formula { font-style: italic; color: #FF3B30; font-size: 12px; margin-top: -10px; margin-bottom: 10px;}
+        
+        /* Category specific button colors */
+        .btn-math { background-color: #FF9F0A; color: white;}
+        .btn-phys { background-color: #5AC8FA; color: black; }
+        .btn-chem { background-color: #4CD964; color: black; }
+        .btn-bio { background-color: #BF5AF2; color: white; }
+        
+        .output-box { background-color: #0A0A12; padding: 15px; border-radius: 4px; font-family: 'Consolas', monospace; color: #4CD964; margin-top: 15px; border: 1px solid #4CD964; white-space: pre-wrap; font-size: 15px; height: 150px; overflow-y: auto;}
+        .formula { font-style: italic; color: #FF3B30; font-size: 12px; margin-top: -5px; margin-bottom: 10px;}
     </style>
 </head>
 <body>
     <div class="container">
-        <h1>🧮 NCERT Master Formula Calculator</h1>
-        <p style="text-align: center; color: #8E8E93;">Instant syllabus calculations for Physics, Chemistry, Math & Biology</p>
+        <h1>🧮 NCERT Master Omni-Calculator (Class 1-12)</h1>
         
-        <!-- PHYSICS SECTION -->
-        <h2>🔭 Physics (Class 11 & 12)</h2>
-        <div class="grid-2">
-            <!-- Kinematics -->
-            <div class="card">
-                <h3 style="color: #5AC8FA; margin-top: 0;">Kinematics: Final Velocity</h3>
-                <div class="formula">Formula: v = u + at</div>
-                <label>Initial Velocity (u) [m/s]</label>
-                <input type="number" id="phys-u" value="0">
-                <label>Acceleration (a) [m/s²]</label>
-                <input type="number" id="phys-a" value="9.8">
-                <label>Time (t) [s]</label>
-                <input type="number" id="phys-t" value="5">
-                <button class="btn" onclick="calcKinematics()">Calculate v</button>
-            </div>
-            
-            <!-- Optics -->
-            <div class="card">
-                <h3 style="color: #5AC8FA; margin-top: 0;">Optics: Lens Formula</h3>
-                <div class="formula">Formula: 1/f = 1/v - 1/u</div>
-                <label>Image Distance (v) [cm]</label>
-                <input type="number" id="phys-v" value="20">
-                <label>Object Distance (u) [cm]</label>
-                <input type="number" id="phys-obj-u" value="-30">
-                <button class="btn" onclick="calcOptics()">Calculate f</button>
+        <div class="nav">
+            <button class="active" onclick="switchTab('primary')">🎒 Primary (Class 1-5)</button>
+            <button onclick="switchTab('middle')">📘 Middle (Class 6-8)</button>
+            <button onclick="switchTab('secondary')">📗 Secondary (Class 9-10)</button>
+            <button onclick="switchTab('senior')">🎓 Senior Sec (Class 11-12)</button>
+        </div>
+        
+        <!-- PRIMARY (1-5) -->
+        <div id="primary" class="tab-content active">
+            <h2>🎒 Primary Math (Class 1-5)</h2>
+            <div class="grid-3">
+                <div class="card">
+                    <h3 style="color: #FF9F0A; margin-top: 0;">Basic Arithmetic</h3>
+                    <div class="formula">+, -, ×, ÷</div>
+                    <label>Number A</label>
+                    <input type="number" id="prim-a" value="10">
+                    <label>Operation</label>
+                    <select id="prim-op">
+                        <option value="+">Addition (+)</option>
+                        <option value="-">Subtraction (-)</option>
+                        <option value="*">Multiplication (×)</option>
+                        <option value="/">Division (÷)</option>
+                    </select>
+                    <label>Number B</label>
+                    <input type="number" id="prim-b" value="5">
+                    <button class="btn btn-math" onclick="calcArith()">Calculate</button>
+                </div>
+                
+                <div class="card">
+                    <h3 style="color: #FF9F0A; margin-top: 0;">Perimeter & Area (Rectangle/Square)</h3>
+                    <div class="formula">P=2(l+w), A=l*w</div>
+                    <label>Length (l)</label>
+                    <input type="number" id="prim-l" value="10">
+                    <label>Width (w) [Use same as length for Square]</label>
+                    <input type="number" id="prim-w" value="5">
+                    <button class="btn btn-math" onclick="calcRect()">Calculate P & A</button>
+                </div>
+                
+                <div class="card">
+                    <h3 style="color: #FF9F0A; margin-top: 0;">Fractions to Decimals</h3>
+                    <div class="formula">Numerator / Denominator</div>
+                    <label>Numerator</label>
+                    <input type="number" id="prim-num" value="3">
+                    <label>Denominator</label>
+                    <input type="number" id="prim-den" value="4">
+                    <button class="btn btn-math" onclick="calcFraction()">Convert to % & Decimal</button>
+                </div>
             </div>
         </div>
 
-        <!-- CHEMISTRY SECTION -->
-        <h2>🧪 Chemistry (Class 11 & 12)</h2>
-        <div class="grid-2">
-            <!-- Molarity -->
-            <div class="card">
-                <h3 style="color: #4CD964; margin-top: 0;">Solutions: Molarity</h3>
-                <div class="formula">Formula: M = (m / MW) / V(L)</div>
-                <label>Mass of Solute (g)</label>
-                <input type="number" id="chem-m" value="5.85">
-                <label>Molar Mass of Solute (g/mol)</label>
-                <input type="number" id="chem-mw" value="58.5">
-                <label>Volume of Solution (L)</label>
-                <input type="number" id="chem-vol" value="0.5">
-                <button class="btn" style="background-color: #4CD964;" onclick="calcMolarity()">Calculate Molarity (M)</button>
-            </div>
-            
-            <!-- Ideal Gas -->
-            <div class="card">
-                <h3 style="color: #4CD964; margin-top: 0;">States of Matter: Ideal Gas</h3>
-                <div class="formula">Formula: PV = nRT</div>
-                <label>Pressure (P) [atm]</label>
-                <input type="number" id="chem-p" value="1">
-                <label>Moles of Gas (n)</label>
-                <input type="number" id="chem-n" value="2">
-                <label>Temperature (T) [K]</label>
-                <input type="number" id="chem-t" value="298">
-                <button class="btn" style="background-color: #4CD964;" onclick="calcGasLaw()">Calculate Volume (V)</button>
+        <!-- MIDDLE (6-8) -->
+        <div id="middle" class="tab-content">
+            <h2>📘 Middle School Data (Class 6-8)</h2>
+            <div class="grid-3">
+                <div class="card">
+                    <h3 style="color: #FF9F0A; margin-top: 0;">Percentages</h3>
+                    <div class="formula">Value / Total × 100</div>
+                    <label>Value Obtained</label>
+                    <input type="number" id="mid-val" value="40">
+                    <label>Total Value</label>
+                    <input type="number" id="mid-tot" value="50">
+                    <button class="btn btn-math" onclick="calcPercent()">Find Percentage</button>
+                </div>
+                
+                <div class="card">
+                    <h3 style="color: #FF9F0A; margin-top: 0;">Simple Interest</h3>
+                    <div class="formula">SI = (P × R × T) / 100</div>
+                    <label>Principal (P)</label>
+                    <input type="number" id="mid-p" value="1000">
+                    <label>Rate % (R)</label>
+                    <input type="number" id="mid-r" value="5">
+                    <label>Time in years (T)</label>
+                    <input type="number" id="mid-t" value="2">
+                    <button class="btn btn-math" onclick="calcSI()">Calculate Interest</button>
+                </div>
+                
+                <div class="card">
+                    <h3 style="color: #5AC8FA; margin-top: 0;">Speed, Distance & Time</h3>
+                    <div class="formula">S = D / T</div>
+                    <label>Distance (m/km)</label>
+                    <input type="number" id="mid-dist" value="100">
+                    <label>Time (s/hr)</label>
+                    <input type="number" id="mid-time" value="10">
+                    <button class="btn btn-phys" onclick="calcSpeed()">Calculate Speed</button>
+                </div>
+                
+                <div class="card">
+                    <h3 style="color: #4CD964; margin-top: 0;">Density</h3>
+                    <div class="formula">Density = Mass / Volume</div>
+                    <label>Mass (g or kg)</label>
+                    <input type="number" id="mid-mass" value="50">
+                    <label>Volume (cm³ or L)</label>
+                    <input type="number" id="mid-vol" value="10">
+                    <button class="btn btn-chem" onclick="calcDensity()">Calculate Density</button>
+                </div>
             </div>
         </div>
 
-        <!-- MATH SECTION -->
-        <h2>📐 Mathematics (Class 11 & 12)</h2>
-        <div class="grid-2">
-            <!-- Quadratic -->
-            <div class="card">
-                <h3 style="color: #FF9F0A; margin-top: 0;">Algebra: Quadratic Formula</h3>
-                <div class="formula">Formula: x = [-b ± √(b² - 4ac)] / 2a</div>
-                <label>Coefficient a</label>
-                <input type="number" id="math-a" value="1">
-                <label>Coefficient b</label>
-                <input type="number" id="math-b" value="-5">
-                <label>Coefficient c</label>
-                <input type="number" id="math-c" value="6">
-                <button class="btn" style="background-color: #FF9F0A; color: white;" onclick="calcQuadratic()">Solve for x</button>
-            </div>
-            
-            <!-- Prob/Stats -->
-            <div class="card">
-                <h3 style="color: #FF9F0A; margin-top: 0;">Statistics: Binomial Probability</h3>
-                <div class="formula">Formula: P(x) = C(n,x) * p^x * q^(n-x)</div>
-                <label>Number of trials (n)</label>
-                <input type="number" id="math-n" value="10">
-                <label>Success prob (p)</label>
-                <input type="number" id="math-p" value="0.5">
-                <label>Number of successes (x)</label>
-                <input type="number" id="math-x" value="5">
-                <button class="btn" style="background-color: #FF9F0A; color: white;" onclick="calcBinomial()">Calculate P(x)</button>
+        <!-- SECONDARY (9-10) -->
+        <div id="secondary" class="tab-content">
+            <h2>📗 Secondary Sciences & Math (Class 9-10)</h2>
+            <div class="grid-3">
+                <div class="card">
+                    <h3 style="color: #FF9F0A; margin-top: 0;">Pythagoras Theorem</h3>
+                    <div class="formula">c² = a² + b²</div>
+                    <label>Base (a)</label>
+                    <input type="number" id="sec-a" value="3">
+                    <label>Perpendicular (b)</label>
+                    <input type="number" id="sec-b" value="4">
+                    <button class="btn btn-math" onclick="calcPyth()">Find Hypotenuse (c)</button>
+                </div>
+                
+                <div class="card">
+                    <h3 style="color: #FF9F0A; margin-top: 0;">Compound Interest</h3>
+                    <div class="formula">A = P(1 + R/100)^nt</div>
+                    <label>Principal (P)</label>
+                    <input type="number" id="sec-p" value="1000">
+                    <label>Rate (R)</label>
+                    <input type="number" id="sec-r" value="5">
+                    <label>Time (T)</label>
+                    <input type="number" id="sec-t" value="2">
+                    <button class="btn btn-math" onclick="calcCI()">Calculate Amt</button>
+                </div>
+                
+                <div class="card">
+                    <h3 style="color: #5AC8FA; margin-top: 0;">Newton's 2nd Law</h3>
+                    <div class="formula">F = ma</div>
+                    <label>Mass (kg)</label>
+                    <input type="number" id="sec-m" value="10">
+                    <label>Acceleration (m/s²)</label>
+                    <input type="number" id="sec-acc" value="9.8">
+                    <button class="btn btn-phys" onclick="calcForce()">Calculate Force (N)</button>
+                </div>
+                
+                <div class="card">
+                    <h3 style="color: #5AC8FA; margin-top: 0;">Work, Energy & Power</h3>
+                    <div class="formula">W = Fd, P = W/t, K.E.=½mv², P.E.=mgh</div>
+                    <label>Mass (kg)</label>
+                    <input type="number" id="sec-we-m" value="10">
+                    <label>Velocity (m/s) or Height (m)</label>
+                    <input type="number" id="sec-we-v" value="5">
+                    <button class="btn btn-phys" onclick="calcEnergy()">Calculate KE/PE</button>
+                </div>
+                
+                <div class="card">
+                    <h3 style="color: #BF5AF2; margin-top: 0;">BMI Calculator</h3>
+                    <div class="formula">BMI = Weight(kg) / Height(m)²</div>
+                    <label>Weight (kg)</label>
+                    <input type="number" id="sec-w" value="70">
+                    <label>Height (meters)</label>
+                    <input type="number" id="sec-h" value="1.75">
+                    <button class="btn btn-bio" onclick="calcBMI()">Calculate BMI</button>
+                </div>
+                
+                <div class="card">
+                    <h3 style="color: #4CD964; margin-top: 0;">Mole Concept</h3>
+                    <div class="formula">Moles = Given Mass / Molar Mass</div>
+                    <label>Given Mass (g)</label>
+                    <input type="number" id="sec-gm" value="18">
+                    <label>Molar Mass (g/mol) [e.g., H2O=18]</label>
+                    <input type="number" id="sec-mm" value="18">
+                    <button class="btn btn-chem" onclick="calcMole()">Calculate Moles</button>
+                </div>
             </div>
         </div>
-        
-        <!-- BIO SECTION -->
-        <h2>🧬 Biology (Class 11 & 12)</h2>
-        <div class="grid-2">
-            <!-- Genetics -->
-            <div class="card">
-                <h3 style="color: #BF5AF2; margin-top: 0;">Genetics: Hardy-Weinberg Eq</h3>
-                <div class="formula">Formula: p² + 2pq + q² = 1</div>
-                <label>Frequency of recessive allele (q)</label>
-                <input type="number" id="bio-q" value="0.4" step="0.01" max="1" min="0">
-                <button class="btn" style="background-color: #BF5AF2; color: white;" onclick="calcHardyWeinberg()">Calculate Frequencies</button>
-            </div>
-            
-            <!-- Respiration -->
-            <div class="card">
-                <h3 style="color: #BF5AF2; margin-top: 0;">Physiology: Cardiac Output</h3>
-                <div class="formula">Formula: CO = Heart Rate × Stroke Volume</div>
-                <label>Heart Rate (bpm)</label>
-                <input type="number" id="bio-hr" value="72">
-                <label>Stroke Volume (mL/beat)</label>
-                <input type="number" id="bio-sv" value="70">
-                <button class="btn" style="background-color: #BF5AF2; color: white;" onclick="calcCardiacOutput()">Calculate CO</button>
+
+        <!-- SENIOR (11-12) -->
+        <div id="senior" class="tab-content">
+            <h2>🎓 Senior Secondary Advanced (Class 11-12)</h2>
+            <div class="grid-3">
+                <!-- Physics: Kinematics -->
+                <div class="card">
+                    <h3 style="color: #5AC8FA; margin-top: 0;">Kinematics: Equations of Motion</h3>
+                    <div class="formula">v = u+at | s = ut+½at² | v² = u²+2as</div>
+                    <label>Initial Velocity (u) [m/s]</label>
+                    <input type="number" id="sen-u" value="0">
+                    <label>Acceleration (a) [m/s²]</label>
+                    <input type="number" id="sen-a" value="9.8">
+                    <label>Time (t) [s]</label>
+                    <input type="number" id="sen-t" value="5">
+                    <button class="btn btn-phys" onclick="calcSeniorKinematics()">Calculate v & s</button>
+                </div>
+                
+                <!-- Physics: Optics -->
+                <div class="card">
+                    <h3 style="color: #5AC8FA; margin-top: 0;">Optics: Lens Maker’s Formula</h3>
+                    <div class="formula">1/f = (μ-1)(1/R1 - 1/R2)</div>
+                    <label>Refractive Index (μ)</label>
+                    <input type="number" id="sen-mu" value="1.5">
+                    <label>R1 (cm)</label>
+                    <input type="number" id="sen-r1" value="10">
+                    <label>R2 (cm)</label>
+                    <input type="number" id="sen-r2" value="-10">
+                    <button class="btn btn-phys" onclick="calcLens()">Calculate Focal Length</button>
+                </div>
+
+                <!-- Chemistry: Molarity -->
+                <div class="card">
+                    <h3 style="color: #4CD964; margin-top: 0;">Solutions: Molarity & pH</h3>
+                    <div class="formula">M=n/V | pH = -log[H+]</div>
+                    <label>[H+] Concentration (M)</label>
+                    <input type="number" id="sen-h" value="0.001">
+                    <button class="btn btn-chem" onclick="calcPh()">Calculate pH</button>
+                </div>
+                
+                <!-- Chemistry: Ideal Gas -->
+                <div class="card">
+                    <h3 style="color: #4CD964; margin-top: 0;">States of Matter: Ideal Gas</h3>
+                    <div class="formula">PV = nRT (R=0.0821)</div>
+                    <label>Pressure (atm)</label>
+                    <input type="number" id="sen-p" value="1">
+                    <label>Moles (n)</label>
+                    <input type="number" id="sen-n" value="2">
+                    <label>Temperature (K)</label>
+                    <input type="number" id="sen-temp" value="298">
+                    <button class="btn btn-chem" onclick="calcGasLaw()">Calculate V</button>
+                </div>
+
+                <!-- Math: Quadratic -->
+                <div class="card">
+                    <h3 style="color: #FF9F0A; margin-top: 0;">Algebra: Quadratic Engine</h3>
+                    <div class="formula">Complex Roots: ax² + bx + c = 0</div>
+                    <label>a</label>
+                    <input type="number" id="sen-qa" value="1">
+                    <label>b</label>
+                    <input type="number" id="sen-qb" value="-5">
+                    <label>c</label>
+                    <input type="number" id="sen-qc" value="6">
+                    <button class="btn btn-math" onclick="calcQuadratic()">Solve Roots</button>
+                </div>
+                
+                <!-- Math: Binomial -->
+                <div class="card">
+                    <h3 style="color: #FF9F0A; margin-top: 0;">Statistics: Binomial Dist</h3>
+                    <div class="formula">P(x) = nCx * p^x * q^(n-x)</div>
+                    <label>n (trials)</label>
+                    <input type="number" id="sen-bn" value="10">
+                    <label>x (successes)</label>
+                    <input type="number" id="sen-bx" value="5">
+                    <label>p (prob success)</label>
+                    <input type="number" id="sen-bp" value="0.5">
+                    <button class="btn btn-math" onclick="calcBinomial()">Calculate P(X)</button>
+                </div>
+                
+                <!-- Bio: Hardy -->
+                <div class="card">
+                    <h3 style="color: #BF5AF2; margin-top: 0;">Genetics: Hardy-Weinberg Eq</h3>
+                    <div class="formula">p² + 2pq + q² = 1</div>
+                    <label>Freq of recessive allele (q)</label>
+                    <input type="number" id="sen-bq" value="0.4" step="0.01" max="1" min="0">
+                    <button class="btn btn-bio" onclick="calcHardyWeinberg()">Calc Frequencies</button>
+                </div>
             </div>
         </div>
 
         <div class="card" style="margin-top: 20px;">
-            <h2>Master Result Output</h2>
+            <div style="display: flex; justify-content: space-between; align-items: center;">
+                <h2 style="margin: 0; border: none; padding: 0;">Master Computation Yield</h2>
+                <button onclick="document.getElementById('master-out').innerText='Cleared.'" style="background: transparent; color: #FF3B30; border: 1px solid #FF3B30; padding: 5px 10px; cursor:pointer;">Clear Log</button>
+            </div>
             <div class="output-box" id="master-out">Awaiting input...</div>
         </div>
     </div>
 
     <script>
         const out = document.getElementById('master-out');
+        
+        function logMsg(msg) {
+            out.innerText = msg + "\\n\\n---\\n" + out.innerText;
+        }
 
-        // Physics
-        function calcKinematics() {
-            const u = parseFloat(document.getElementById('phys-u').value);
-            const a = parseFloat(document.getElementById('phys-a').value);
-            const t = parseFloat(document.getElementById('phys-t').value);
+        function switchTab(tabId) {
+            document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
+            document.querySelectorAll('.nav button').forEach(el => el.classList.remove('active'));
+            document.getElementById(tabId).classList.add('active');
+            event.target.classList.add('active');
+        }
+
+        // Primaey Methods
+        function calcArith() {
+            const a = parseFloat(document.getElementById('prim-a').value);
+            const b = parseFloat(document.getElementById('prim-b').value);
+            const op = document.getElementById('prim-op').value;
+            let res = 0;
+            if(op === '+') res = a + b;
+            if(op === '-') res = a - b;
+            if(op === '*') res = a * b;
+            if(op === '/') {
+                if(b===0) { logMsg(`Error: Division by Zero`); return;}
+                res = a / b;
+            }
+            logMsg(`[MATH: Primary] ${a} ${op} ${b} = ${res}`);
+        }
+        function calcRect() {
+            const l = parseFloat(document.getElementById('prim-l').value);
+            const w = parseFloat(document.getElementById('prim-w').value);
+            logMsg(`[MATH: Geometry] Perimeter = 2*(${l}+${w}) = ${2*(l+w)}\\nArea = ${l} * ${w} = ${l*w}`);
+        }
+        function calcFraction() {
+            const n = parseFloat(document.getElementById('prim-num').value);
+            const d = parseFloat(document.getElementById('prim-den').value);
+            if(d===0) {logMsg('Error: Zero Denominator'); return;}
+            logMsg(`[MATH: Fractions] ${n}/${d} = ${(n/d).toFixed(4)} = ${((n/d)*100).toFixed(2)}%`);
+        }
+
+        // Middle Methods
+        function calcPercent() {
+            const v = parseFloat(document.getElementById('mid-val').value);
+            const t = parseFloat(document.getElementById('mid-tot').value);
+            logMsg(`[MATH: Middle] Percentage = (${v} / ${t}) * 100 = ${((v/t)*100).toFixed(2)}%`);
+        }
+        function calcSI() {
+            const p = parseFloat(document.getElementById('mid-p').value);
+            const r = parseFloat(document.getElementById('mid-r').value);
+            const t = parseFloat(document.getElementById('mid-t').value);
+            const si = (p*r*t)/100;
+            logMsg(`[MATH: Finance] Simple Interest = (${p} × ${r} × ${t}) / 100 = ${si}\\nTotal Amount = ${p+si}`);
+        }
+        function calcSpeed() {
+            const d = parseFloat(document.getElementById('mid-dist').value);
+            const t = parseFloat(document.getElementById('mid-time').value);
+            if(t===0) return;
+            logMsg(`[PHYS: Kinematics] Speed = ${d} / ${t} = ${(d/t).toFixed(2)} units`);
+        }
+        function calcDensity() {
+            const m = parseFloat(document.getElementById('mid-mass').value);
+            const v = parseFloat(document.getElementById('mid-vol').value);
+            if(v===0) return;
+            logMsg(`[CHEM: Matter] Density = Mass / Vol = ${m} / ${v} = ${(m/v).toFixed(4)}`);
+        }
+
+        // Secondary Methods
+        function calcPyth() {
+            const a = parseFloat(document.getElementById('sec-a').value);
+            const b = parseFloat(document.getElementById('sec-b').value);
+            const c = Math.sqrt(a*a + b*b);
+            logMsg(`[MATH: Geometry] c² = a² + b²\\nHypotenuse = √(${a*a} + ${b*b}) = ${c.toFixed(4)}`);
+        }
+        function calcCI() {
+            const p = parseFloat(document.getElementById('sec-p').value);
+            const r = parseFloat(document.getElementById('sec-r').value);
+            const t = parseFloat(document.getElementById('sec-t').value);
+            const a = p * Math.pow((1 + r/100), t);
+            logMsg(`[MATH: Finance] Compound Interest Amount = ${p} * (1 + ${r}/100)^${t} = ${a.toFixed(2)}`);
+        }
+        function calcForce() {
+            const m = parseFloat(document.getElementById('sec-m').value);
+            const a = parseFloat(document.getElementById('sec-acc').value);
+            logMsg(`[PHYS: Dynamics] Force = m*a\\nF = ${m} × ${a} = ${(m*a).toFixed(2)} N`);
+        }
+        function calcEnergy() {
+            const m = parseFloat(document.getElementById('sec-we-m').value);
+            const v = parseFloat(document.getElementById('sec-we-v').value); // Using v as height for PE
+            const ke = 0.5 * m * v * v;
+            const pe = m * 9.8 * v;
+            logMsg(`[PHYS: Energy] If v is velocity: K.E. = ½*${m}*${v}² = ${ke.toFixed(2)} Joules\\nIf v is height: P.E. = ${m}*9.8*${v} = ${pe.toFixed(2)} Joules`);
+        }
+        function calcBMI() {
+            const w = parseFloat(document.getElementById('sec-w').value);
+            const h = parseFloat(document.getElementById('sec-h').value);
+            const bmi = w / (h*h);
+            logMsg(`[BIO: Health] BMI = ${w} / (${h}²) = ${bmi.toFixed(2)} kg/m²`);
+        }
+        function calcMole() {
+            const gm = parseFloat(document.getElementById('sec-gm').value);
+            const mm = parseFloat(document.getElementById('sec-mm').value);
+            logMsg(`[CHEM: Moles] Moles = ${gm} / ${mm} = ${(gm/mm).toFixed(4)} mol`);
+        }
+
+        // Senior Methods
+        function calcSeniorKinematics() {
+            const u = parseFloat(document.getElementById('sen-u').value);
+            const a = parseFloat(document.getElementById('sen-a').value);
+            const t = parseFloat(document.getElementById('sen-t').value);
             const v = u + (a * t);
-            out.innerText = `[PHYSICS] Final Velocity calculated.\\nv = ${u} + (${a} × ${t})\\nv = ${v} m/s`;
+            const s = (u*t) + (0.5 * a * t * t);
+            logMsg(`[PHYSICS] 3 Eq of Motion evaluated.\\nv = ${u} + (${a}×${t}) = ${v} m/s\\ns = (${u}×${t}) + ½(${a}×${t}²) = ${s} m\\nv² = u² + 2as => ${v*v} = ${u*u} + ${2*a*s}`);
         }
-
-        function calcOptics() {
-            const v = parseFloat(document.getElementById('phys-v').value);
-            const u = parseFloat(document.getElementById('phys-obj-u').value);
-            if(v===0 || u===0) { out.innerText = "Error: Division by zero."; return; }
-            const invF = (1/v) - (1/u);
+        
+        function calcLens() {
+            const mu = parseFloat(document.getElementById('sen-mu').value);
+            const r1 = parseFloat(document.getElementById('sen-r1').value);
+            const r2 = parseFloat(document.getElementById('sen-r2').value);
+            if(r1===0 || r2===0) { logMsg("Error"); return;}
+            const invF = (mu - 1) * ((1/r1) - (1/r2));
             const f = 1/invF;
-            out.innerText = `[PHYSICS] Lens Focal Length calculated.\\n1/f = 1/${v} - 1/(${u})\\nf = ${f.toFixed(2)} cm`;
+            logMsg(`[PHYSICS] Lens Maker's Formula.\\nf = 1 / [(${mu}-1)*(1/${r1} - 1/${r2})]\\nf = ${f.toFixed(4)} cm`);
         }
-
-        // Chemistry
-        function calcMolarity() {
-            const m = parseFloat(document.getElementById('chem-m').value);
-            const mw = parseFloat(document.getElementById('chem-mw').value);
-            const vol = parseFloat(document.getElementById('chem-vol').value);
-            if(mw===0 || vol===0) { out.innerText = "Error: Division by zero."; return; }
-            const moles = m / mw;
-            const mol = moles / vol;
-            out.innerText = `[CHEMISTRY] Molarity calculated.\\nMoles = ${m} / ${mw} = ${moles.toFixed(4)} mol\\nM = ${moles.toFixed(4)} / ${vol} L\\nMolarity = ${mol.toFixed(4)} M`;
+        
+        function calcPh() {
+            const h = parseFloat(document.getElementById('sen-h').value);
+            if(h<=0) return;
+            const ph = -Math.log10(h);
+            logMsg(`[CHEMISTRY] pH = -log10(${h}) = ${ph.toFixed(4)}`);
         }
 
         function calcGasLaw() {
-            const p = parseFloat(document.getElementById('chem-p').value);
-            const n = parseFloat(document.getElementById('chem-n').value);
-            const t = parseFloat(document.getElementById('chem-t').value);
-            const r = 0.0821; // L atm K-1 mol-1
-            if(p===0) { out.innerText = "Error: Pressure cannot be zero."; return; }
+            const p = parseFloat(document.getElementById('sen-p').value);
+            const n = parseFloat(document.getElementById('sen-n').value);
+            const t = parseFloat(document.getElementById('sen-temp').value);
+            const r = 0.0821; 
+            if(p===0) return;
             const v = (n * r * t) / p;
-            out.innerText = `[CHEMISTRY] Ideal Gas Volume calculated.\\nV = (${n} × ${r} × ${t}) / ${p}\\nV = ${v.toFixed(3)} L`;
+            logMsg(`[CHEMISTRY] Ideal Gas Volume calculated.\\nV = (${n} × ${r} × ${t}) / ${p} = ${v.toFixed(3)} L`);
         }
 
-        // Math
         function calcQuadratic() {
-            const a = parseFloat(document.getElementById('math-a').value);
-            const b = parseFloat(document.getElementById('math-b').value);
-            const c = parseFloat(document.getElementById('math-c').value);
-            if(a === 0) { out.innerText = "Error: 'a' cannot be zero in a quadratic equation."; return; }
-            
+            const a = parseFloat(document.getElementById('sen-qa').value);
+            const b = parseFloat(document.getElementById('sen-qb').value);
+            const c = parseFloat(document.getElementById('sen-qc').value);
             const D = (b*b) - (4*a*c);
-            let res = `[MATHEMATICS] Quadratic Roots calculated.\\nDiscriminant (D) = ${D}\\n`;
-            
+            let res = `[MATHEMATICS] Discriminant (D) = ${D}\\n`;
             if(D > 0) {
-                const x1 = (-b + Math.sqrt(D)) / (2*a);
-                const x2 = (-b - Math.sqrt(D)) / (2*a);
-                res += `Two distinct real roots:\\nx1 = ${x1.toFixed(4)}\\nx2 = ${x2.toFixed(4)}`;
+                res += `x1 = ${((-b + Math.sqrt(D)) / (2*a)).toFixed(4)}\nx2 = ${((-b - Math.sqrt(D)) / (2*a)).toFixed(4)}`;
             } else if (D === 0) {
-                const x = -b / (2*a);
-                res += `One repeated real root:\\nx = ${x.toFixed(4)}`;
+                res += `Repeated Root x = ${(-b / (2*a)).toFixed(4)}`;
             } else {
                 const real = (-b / (2*a)).toFixed(4);
                 const imag = (Math.sqrt(-D) / (2*a)).toFixed(4);
-                res += `Complex roots:\\nx1 = ${real} + ${imag}i\\nx2 = ${real} - ${imag}i`;
+                res += `Complex roots: ${real} ± ${imag}i`;
             }
-            out.innerText = res;
+            logMsg(res);
         }
 
         function factorial(n) {
@@ -248,41 +502,19 @@ class NcertCalcPage(SigmaPage):
         }
 
         function calcBinomial() {
-            const n = parseInt(document.getElementById('math-n').value);
-            const x = parseInt(document.getElementById('math-x').value);
-            const p = parseFloat(document.getElementById('math-p').value);
-            
-            if(x > n || x < 0) { out.innerText = "Error: Invalid x for given n."; return; }
-            if(p < 0 || p > 1) { out.innerText = "Error: Probability p must be between 0 and 1."; return; }
-            
+            const n = parseInt(document.getElementById('sen-bn').value);
+            const x = parseInt(document.getElementById('sen-bx').value);
+            const p = parseFloat(document.getElementById('sen-bp').value);
             const q = 1 - p;
             const comb = factorial(n) / (factorial(x) * factorial(n - x));
             const prob = comb * Math.pow(p, x) * Math.pow(q, n-x);
-            
-            out.innerText = `[MATHEMATICS] Binomial Probability calculated.\\nC(${n},${x}) = ${comb}\\nP(X = ${x}) = ${comb} × (${p}^${x}) × (${q}^${n-x})\\nResult = ${prob.toFixed(6)}`;
+            logMsg(`[MATHEMATICS] P(X=${x}) = C(${n},${x}) × (${p}^${x}) × (${q}^${n-x}) = ${prob.toFixed(6)}`);
         }
 
-        // Biology
         function calcHardyWeinberg() {
-            const q = parseFloat(document.getElementById('bio-q').value);
-            if(q < 0 || q > 1) { out.innerText = "Error: Frequency must be between 0 and 1."; return; }
-            
+            const q = parseFloat(document.getElementById('sen-bq').value);
             const p = 1 - q;
-            const p2 = p * p;
-            const two_pq = 2 * p * q;
-            const q2 = q * q;
-            
-            out.innerText = `[BIOLOGY] Hardy-Weinberg Equilibrium calculated.\\np (Dominant allele freq) = ${p.toFixed(2)}\\nq (Recessive allele freq) = ${q.toFixed(2)}\\n\\nGenotype Frequencies:\\nHomozygous Dominant (p²) = ${p2.toFixed(4)}\\nHeterozygous (2pq) = ${two_pq.toFixed(4)}\\nHomozygous Recessive (q²) = ${q2.toFixed(4)}`;
-        }
-
-        function calcCardiacOutput() {
-            const hr = parseFloat(document.getElementById('bio-hr').value);
-            const sv = parseFloat(document.getElementById('bio-sv').value);
-            
-            const co_ml = hr * sv;
-            const co_l = co_ml / 1000;
-            
-            out.innerText = `[BIOLOGY] Cardiac Output calculated.\\nCO = ${hr} bpm × ${sv} mL/beat\\nCO = ${co_ml} mL/min\\nCO = ${co_l.toFixed(2)} L/min`;
+            logMsg(`[BIOLOGY] Hardy-Weinberg Equilibrium\\np = ${p.toFixed(2)}, q = ${q.toFixed(2)}\\nHomozygous Dominant (p²) = ${(p*p).toFixed(4)}\\nHeterozygous (2pq) = ${(2*p*q).toFixed(4)}\\nHomozygous Recessive (q²) = ${(q*q).toFixed(4)}`);
         }
     </script>
 </body>
