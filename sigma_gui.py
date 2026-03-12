@@ -105,6 +105,16 @@ class SigmaGUI(tk.Tk):
         # Sub-Pages registry
         self._pages = {}
         
+        # UI State Attributes (Initialized for Linter)
+        self._main = None
+        self._sidebar = None
+        self._content = None
+        self._perf_frame = None
+        self._topbar = None
+        self._island_fr = None
+        self._island_lbl = None
+        self._island_var = tk.StringVar(value="SIGMA KERNEL: NOMINAL")
+        
         # --- UI Juiciness & Morphology ---
         self._build_morphic_island()
         
@@ -126,19 +136,27 @@ class SigmaGUI(tk.Tk):
         
     def _build_morphic_island(self):
         """Builds the morphic island for dynamic system status updates."""
-        self._morphic_island_frame = tk.Frame(self, bg=PAL["glass"], bd=0, relief="flat")
+        # Unify with the existing island frame if needed, but here we create the primary floating one
+        self._morphic_island_frame = tk.Frame(self, bg=PAL["glass"], bd=1, relief="flat", highlightthickness=1, highlightbackground=PAL["border"])
         self._morphic_island_frame.place(relx=0.5, rely=0.01, anchor="n") # Top center
         
-        self._morphic_status_label = tk.Label(self._morphic_island_frame, text="SYSTEM: OK", font=FONT_SMALL, fg=PAL["text"], bg=PAL["glass"])
-        self._morphic_status_label.pack(padx=10, pady=5)
+        self._morphic_status_label = tk.Label(self._morphic_island_frame, text="SYSTEM: NOMINAL", font=FONT_SMALL, fg=PAL["cyan"], bg=PAL["glass"])
+        self._morphic_status_label.pack(padx=15, pady=5)
         
         self._morphic_island_frame.bind("<Enter>", lambda e: self._morphic_island_frame.config(bg=PAL["card_hover"]))
         self._morphic_island_frame.bind("<Leave>", lambda e: self._morphic_island_frame.config(bg=PAL["glass"]))
 
-    def _update_morphic_status(self, category: str, message: str, color: str = PAL["text"]):
+    def _update_morphic_status(self, category: str, message: str, color: str = PAL["cyan"], duration: int = 5000):
         """Updates the morphic island with new status."""
-        self._morphic_status_label.config(text=f"{category}: {message}", fg=color)
-        self._morphic_island_frame.after(5000, lambda: self._morphic_status_label.config(text="SYSTEM: OK", fg=PAL["text"])) # Reset after 5 seconds
+        self._morphic_status_label.config(text=f"{category}: {message.upper()}", fg=color)
+        self._morphic_island_frame.config(highlightbackground=color)
+        # Restore after duration
+        self.after(duration, lambda: self._morphic_status_label.config(text="SYSTEM: NOMINAL", fg=PAL["cyan"]))
+        self.after(duration, lambda: self._morphic_island_frame.config(highlightbackground=PAL["border"]))
+
+    def _morphic_island(self, message, color=None, duration=5000):
+        """Wrapper for morphic island status updates."""
+        self._update_morphic_status("SIGMA", message, color or PAL["text"], duration)
 
     def _update_pulse(self):
         """Standard System Pulse (Clock & Health)."""
@@ -2489,10 +2507,11 @@ class SigmaGUI(tk.Tk):
             tk.Label(card, text=status_txt, font=("Segoe UI", 7), fg=PAL["teal"], bg=PAL["card"]).pack(anchor="w")
 
             def _play(gid=g['id'], name=g['name']):
-                self._update_morphic_status("ARCADE", f"Hydrating {name} Logic...", PAL["teal"])
+                self._morphic_island(f"Hydrating {name}...", PAL["teal"])
                 engine.play_game(gid)
-                # App logic would normally launch here; for now we simulate kernel integration
-                self._notify("Arcade", f"{name} logic initialized in sandbox.", "OK")
+                # If specialized app exists, launch it
+                app_id = f"sigma.game.{gid.lower()}"
+                self._launch_app(app_id)
                 
             ttk.Button(card, text="🎮 PLAY NATIVE", command=_play).pack(fill="x", pady=10)
 
@@ -6199,37 +6218,42 @@ class SigmaGUI(tk.Tk):
         import subprocess as _sp
         app_map = {
             # Developer Tools
-            "sigma.dev.codeforge":     "apps/codeforge.py",
-            "sigma.dev.indent_flow":   "apps/indent_flow.py",
-            "sigma.dev.bash":          "apps/bash.py",
+            "sigma.dev.codeforge":     "userland/apps/codeforge.py",
+            "sigma.dev.indent_flow":   "userland/apps/indent_flow.py",
+            "sigma.dev.bash":          "userland/apps/bash.py",
             # Media & Creative
-            "sigma.media.aurapaint":   "apps/aurapaint.py",
-            "sigma.media.pulseplay":   "apps/pulseplayer.py",
+            "sigma.media.aurapaint":   "userland/apps/aurapaint.py",
+            "sigma.media.pulseplay":   "userland/apps/pulseplayer.py",
             # Security & System
-            "sigma.sys.sentinel":      "apps/sentinel.py",
-            "sigma.sys.shield":        "apps/shield.py",
-            "sigma.sys.titan_capture": "apps/titan_capture.py",
+            "sigma.sys.sentinel":      "userland/apps/sentinel.py",
+            "sigma.sys.shield":        "userland/apps/shield.py",
+            "sigma.sys.titan_capture": "userland/apps/titan_capture.py",
             # Productivity
-            "sigma.prod.writer":       "apps/writer.py",
-            "sigma.prod.pdf_forge":    "apps/pdf_forge.py",
-            "sigma.prod.text_cleaner": "apps/text_cleaner.py",
-            "sigma.prod.pure_text":    "apps/text_cleaner.py",
-            "sigma.prod.excel_ai":     "apps/excel_hub.py",
-            "sigma.prod.project_flow": "apps/project_flow.py",
-            "sigma.prod.board_hub":    "apps/board_hub.py",
-            "sigma.sys.welcome":       "apps/welcome_guide.py",
+            "sigma.prod.writer":       "userland/apps/writer.py",
+            "sigma.prod.pdf_forge":    "userland/apps/pdf_forge.py",
+            "sigma.prod.text_cleaner": "userland/apps/text_cleaner.py",
+            "sigma.prod.pure_text":    "userland/apps/text_cleaner.py",
+            "sigma.prod.excel_ai":     "userland/apps/excel_hub.py",
+            "sigma.prod.project_flow": "userland/apps/project_flow.py",
+            "sigma.prod.board_hub":    "userland/apps/board_hub.py",
+            "sigma.sys.welcome":       "userland/apps/welcome_guide.py",
             # Communication
-            "sigma.comm.omnibrowser":  "apps/omnibrowser.py",
-            "sigma.comm.meshtalk":     "apps/meshtalk.py",
+            "sigma.comm.omnibrowser":  "userland/apps/omnibrowser.py",
+            "sigma.comm.meshtalk":     "userland/apps/meshtalk.py",
             # AI & Orchestration
-            "sigma.ai.antigravity":    "apps/sigma_antigravity.py",
-            "sigma.ai.nexus_ai":       "apps/nexus_ai.py",
-            "sigma.ai.prompt_o_matic": "apps/prompt_o_matic.py",
-            "sigma.ai.ag_finder":      "apps/ag_finder.py",
-            "sigma.ai.email_disco":    "apps/email_disco.py",
-            # Games
-            "sigma.game.chess":        "apps/chess.py",
-            "sigma.game.ludo":         "apps/ludo.py",
+            "sigma.ai.antigravity":    "userland/apps/sigma_antigravity.py",
+            "sigma.ai.nexus_ai":       "userland/apps/nexus_ai.py",
+            "sigma.ai.prompt_o_matic": "userland/apps/prompt_o_matic.py",
+            "sigma.ai.ag_finder":      "userland/apps/ag_finder.py",
+            "sigma.ai.email_disco":    "userland/apps/email_disco.py",
+            # Games (Native Arcade)
+            "sigma.game.g01":          "userland/apps/chess.py",
+            "sigma.game.g02":          "userland/apps/ludo.py",
+            "sigma.game.g21":          "userland/apps/jigsaw_puzzle.py",
+            "sigma.game.g22":          "userland/apps/spot_it.py",
+            "sigma.game.g23":          "userland/apps/shell_game.py",
+            "sigma.game.chess":        "userland/apps/chess.py",
+            "sigma.game.ludo":         "userland/apps/ludo.py",
         }
 
         self._notify("Sigma Launcher", f"Launching {app_id}…", "OK")

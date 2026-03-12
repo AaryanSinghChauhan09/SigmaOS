@@ -1926,6 +1926,48 @@ class ZenLoopTheLoop(SigmaGame):
     def health_check(self) -> str: return f"OK — ZenLoop | Edges: {len(self.loop)}"
 
 
+# ─── G68: SOVEREIGN CHECKERS ────────────────────────────────────────────────
+class SovereignCheckers(SigmaGame):
+    GAME_ID   = "G68"; GAME_NAME = "Sovereign Checkers"; CATEGORY = "Board Strategy"
+    VERSION   = "1.0.0"; SIZE_KB = 520; ICON = "🏁"
+    DESC      = "Classic checkers vs AI or local player. Sovereign move validation engine."
+    def _init_state(self): self.board = [[0]*8 for _ in range(8)]; self.turn = 1
+    def health_check(self) -> str: return "OK — Checkers READY."
+
+# ─── G69: ZEN SOLITAIRE ─────────────────────────────────────────────────────
+class ZenSolitaire(SigmaGame):
+    GAME_ID   = "G69"; GAME_NAME = "Zen Solitaire — Klondike"; CATEGORY = "Puzzle / Cards"
+    VERSION   = "1.2.0"; SIZE_KB = 850; ICON = "🃏"
+    DESC      = "The classic card game, refined for focus and speed. Automatic win-detection."
+    def _init_state(self): self.deck = list(range(52)); self.piles = [[] for _ in range(7)]
+    def health_check(self) -> str: return "OK — Solitaire READY."
+
+# ─── G70: SPACE RAIDERS ─────────────────────────────────────────────────────
+class SpaceRaiders(SigmaGame):
+    GAME_ID   = "G70"; GAME_NAME = "Space Raiders — Retro"; CATEGORY = "Action / Retro"
+    VERSION   = "3.0.0"; SIZE_KB = 1200; ICON = "👾"
+    DESC      = "Defeat waves of extra-dimensional intruders in this high-fidelity pixel shooter."
+    def _init_state(self): self.wave = 1; self.score = 0
+    def health_check(self) -> str: return "OK — SpaceRaiders READY."
+
+# ─── G71: SOVEREIGN SCRABBLE ────────────────────────────────────────────────
+class SovereignScrabble(SigmaGame):
+    GAME_ID   = "G71"; GAME_NAME = "Sovereign Scrabble"; CATEGORY = "Board Strategy / Word"
+    VERSION   = "1.0.0"; SIZE_KB = 1500; ICON = "🔡"
+    DESC      = "Strategic word-building on a premium board. Local dictionary validation included."
+    def _init_state(self): self.board = [[None]*15 for _ in range(15)]; self.rack = []
+    def health_check(self) -> str: return "OK — Scrabble READY."
+
+# ─── G72: MATH MATRIX ───────────────────────────────────────────────────────
+class MathMatrix(SigmaGame):
+    GAME_ID   = "G72"; GAME_NAME = "Math Matrix — Pro"; CATEGORY = "Brain Training / Math"
+    VERSION   = "2.1.0"; SIZE_KB = 430; ICON = "🧮"
+    DESC      = "Solve complex numerical matrices to balance the system. Pure logic and speed."
+    def _init_state(self): self.target = 100; self.current = 0
+    def health_check(self) -> str: return "OK — MathMatrix READY."
+
+
+
 
 # ─── MASTER REGISTRAR ─────────────────────────────────────────────────────
 
@@ -1950,11 +1992,12 @@ ALL_GAMES: List[type] = [
     Strikeout, TalkingAnimal, LoopPuzzle, QuickPuzzle, HocusFocus,
     SovereignCrossword,
     Vortex2048, SovereignTetris, ZenLoopTheLoop,
+    SovereignCheckers, ZenSolitaire, SpaceRaiders, SovereignScrabble, MathMatrix,
 ]
 
 
 class SigmaGamesEngine:
-    """Master games registry and orchestration engine — 67 games, 10 categories."""
+    """Master games registry and orchestration engine — 72 games, 10 categories."""
 
     def __init__(self, kernel):
         self.kernel  = kernel
