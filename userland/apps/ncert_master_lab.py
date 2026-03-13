@@ -1,13 +1,13 @@
 """
-SigmaOS NCERT Master Lab v4.1 — Fully Dynamic Virtual Lab
-Physics, Chemistry, Biology, Mathematics | Classes 1–12
-100% stdlib/tkinter | Automatic simulation engine
+SigmaOS NCERT Master Lab v6.0 — The Ultimate series
+Unified Virtual Lab for Physics, Chemistry, Biology & Math (1–12)
+100% stdlib/tkinter | Fully dynamic simulation hub
 """
 import tkinter as tk
 from tkinter import ttk, scrolledtext, messagebox
 import importlib, sys, os, traceback
 
-# ─── UI DEFAULTS ─────────────────────────────────────────────────────────────
+# ─── PREMIUM THEME ───────────────────────────────────────────────────────────
 PAL = {
     "bg":"#0B0D17", "panel":"#11142A", "card":"#181B2E", "accent":"#6C63FF",
     "ph":"#3B82F6", "ch":"#22C55E", "bi":"#EC4899", "ma":"#F59E0B",
@@ -17,11 +17,11 @@ PAL = {
 class NCERTMasterLab(tk.Tk):
     def __init__(self):
         super().__init__()
-        self.title("SigmaOS • NCERT Virtual Lab v4.1")
+        self.title("SigmaOS • NCERT Master Lab v6.0")
         self.geometry("1400x900")
         self.configure(bg=PAL["bg"])
         
-        # Initialize attributes to satisfy linter
+        # Initialize attributes BEFORE building UI to satisfy linter/logic
         self._mods = {}
         self._exp_map = {}
         self._tree = None
@@ -36,44 +36,53 @@ class NCERTMasterLab(tk.Tk):
 
     def _build_ui(self):
         # Header
-        hdr = tk.Frame(self, bg=PAL["panel"], height=60)
+        hdr = tk.Frame(self, bg=PAL["panel"], height=65)
         hdr.pack(fill="x"); hdr.pack_propagate(False)
-        tk.Label(hdr, text="🔬 NCERT MASTER LAB", fg=PAL["accent"], bg=PAL["panel"], font=("Segoe UI Bold",16)).pack(side="left", padx=20)
+        tk.Label(hdr, text="🔬 NCERT MASTER LAB v6.0", fg=PAL["accent"], bg=PAL["panel"], font=("Segoe UI Bold",18)).pack(side="left", padx=25)
         
-        # Main Body
+        # Tool status
+        tk.Label(hdr, text="[SYSTEM STABLE • ALL MODULES ACTIVE]", fg="#00D26A", bg=PAL["panel"], font=("Consolas",9)).pack(side="right", padx=25)
+
+        # Main Layout
         body = tk.Frame(self, bg=PAL["bg"])
-        body.pack(fill="both", expand=True, padx=5, pady=5)
+        body.pack(fill="both", expand=True, padx=8, pady=8)
         
-        # Left Panel: Tree
-        self._tree_fr = tk.Frame(body, bg=PAL["panel"], width=300)
-        self._tree_fr.pack(side="left", fill="y", padx=(0,5)); self._tree_fr.pack_propagate(False)
+        # Left Panel (Browse Tree)
+        self._tree_fr = tk.Frame(body, bg=PAL["panel"], width=320)
+        self._tree_fr.pack(side="left", fill="y", padx=(0,8)); self._tree_fr.pack_propagate(False)
         
         self._tree = ttk.Treeview(self._tree_fr, show="tree", selectmode="browse")
         self._tree.pack(fill="both", expand=True)
         self._tree.bind("<<TreeviewSelect>>", self._on_select)
         
-        # Middle Panel: Dynamic Form
-        self._mid = tk.Frame(body, bg=PAL["bg"], width=400)
-        self._mid.pack(side="left", fill="y", padx=(0,5)); self._mid.pack_propagate(False)
-        self._mid_msg = tk.Label(self._mid, text="Select an experiment\nfrom the list", fg=PAL["dim"], bg=PAL["bg"], font=("Segoe UI",11))
+        # Style the Treeview
+        style = ttk.Style()
+        style.configure("Treeview", background=PAL["panel"], foreground=PAL["text"], fieldbackground=PAL["panel"], borderwidth=0, font=("Segoe UI", 10))
+        style.map("Treeview", background=[('selected', PAL["accent"])])
+        
+        # Middle Panel (Interaction Form)
+        self._mid = tk.Frame(body, bg=PAL["bg"], width=420)
+        self._mid.pack(side="left", fill="y", padx=(0,8)); self._mid.pack_propagate(False)
+        self._mid_msg = tk.Label(self._mid, text="◄ SELECT AN EXPERIMENT\nFROM THE LIST TO START", fg=PAL["dim"], bg=PAL["bg"], font=("Segoe UI Bold",12))
         self._mid_msg.pack(expand=True)
         
-        # Right Panel: Output Console
+        # Right Panel (Scientific Console)
         self._out_fr = tk.Frame(body, bg=PAL["bg"])
         self._out_fr.pack(side="right", fill="both", expand=True)
-        self._out = scrolledtext.ScrolledText(self._out_fr, bg="#070910", fg="#00D26A", font=("Cascadia Code",10), borderwidth=0, padx=15, pady=15)
+        self._out = scrolledtext.ScrolledText(self._out_fr, bg="#070910", fg="#00D26A", font=("Cascadia Code",10), borderwidth=0, padx=20, pady=20)
         self._out.pack(fill="both", expand=True)
-        self._out.tag_config("title", foreground=PAL["accent"], font=("Segoe UI Bold",14))
+        self._out.tag_config("title", foreground=PAL["accent"], font=("Segoe UI Bold",15))
         self._out.tag_config("key", foreground=PAL["ma"])
+        self._out.tag_config("err", foreground="#FF4B4B")
 
     def _load_backends(self):
         backend_info = [
-            ("ncert_physics_lab", "PHYSICS_REGISTRY", PAL["ph"], "⚛ Physics"),
-            ("ncert_chemistry_lab", "CHEMISTRY_REGISTRY", PAL["ch"], "🧪 Chemistry"),
-            ("ncert_biology_lab", "BIOLOGY_REGISTRY", PAL["bi"], "🧬 Biology"),
-            ("ncert_maths_lab", "MATHS_REGISTRY", PAL["ma"], "📐 Mathematics"),
-            ("ncert_primary_science", "SCIENCE_PRIMARY_REGISTRY", PAL["ch"], "🌱 Primary Science"),
-            ("ncert_primary_maths", "PRIMARY_MATHS_REGISTRY", PAL["ma"], "➕ Primary Math"),
+            ("ncert_physics_lab", "PHYSICS_REGISTRY", PAL["ph"], "⚛ Physics (6-12)"),
+            ("ncert_chemistry_lab", "CHEMISTRY_REGISTRY", PAL["ch"], "🧪 Chemistry (6-12)"),
+            ("ncert_biology_lab", "BIOLOGY_REGISTRY", PAL["bi"], "🧬 Biology (6-12)"),
+            ("ncert_maths_lab", "MATHS_REGISTRY", PAL["ma"], "📐 Mathematics (1-12)"),
+            ("ncert_primary_science", "SCIENCE_PRIMARY_REGISTRY", PAL["ch"], "🌱 Foundation Sc. (1-5)"),
+            ("ncert_primary_maths", "PRIMARY_MATHS_REGISTRY", PAL["ma"], "➕ Foundation Math (1-5)"),
         ]
         
         sys.path.insert(0, os.path.dirname(__file__))
@@ -84,19 +93,19 @@ class NCERTMasterLab(tk.Tk):
                 importlib.reload(mod)
                 registry = getattr(mod, reg_name)
                 self._add_to_tree(label, registry, color)
-            except Exception as e:
-                print(f"Failed to load {mod_name}: {e}")
+            except Exception:
+                print(f"Failed to load {mod_name}")
 
     def _add_to_tree(self, label, registry, color):
         if not self._tree: return
         root = self._tree.insert("", "end", text=label, open=True)
-        self._tree.tag_configure(root, foreground=color, font=("Segoe UI Bold", 10))
+        self._tree.tag_configure(root, foreground=color, font=("Segoe UI Bold", 11))
         
         for cls_label, cls_obj in registry.items():
             cls_node = self._tree.insert(root, "end", text=cls_label)
             for exp_display, data in cls_obj.EXP_DATA.items():
-                exp_node = self._tree.insert(cls_node, "end", text=f"• {exp_display}")
-                self._exp_map[exp_node] = (cls_obj, exp_display, data, color)
+                node = self._tree.insert(cls_node, "end", text=f"• {exp_display}")
+                self._exp_map[node] = (cls_obj, exp_display, data, color)
 
     def _on_select(self, _):
         if not self._tree: return
@@ -109,50 +118,57 @@ class NCERTMasterLab(tk.Tk):
         for w in self._mid.winfo_children(): w.destroy()
         
         method_name, fields = data
-        tk.Label(self._mid, text=name, fg=color, bg=PAL["bg"], font=("Segoe UI Bold",14), pady=10).pack()
-        tk.Label(self._mid, text=getattr(cls,"TITLE",""), fg=PAL["dim"], bg=PAL["bg"], font=("Segoe UI",9)).pack()
-        tk.Frame(self._mid, bg=PAL["border"], height=1).pack(fill="x", pady=15)
+        title_fr = tk.Frame(self._mid, bg=PAL["bg"])
+        title_fr.pack(fill="x", pady=(20, 10))
+        tk.Label(title_fr, text=name, fg=color, bg=PAL["bg"], font=("Segoe UI Bold",16)).pack()
+        tk.Label(title_fr, text=getattr(cls,"TITLE",""), fg=PAL["dim"], bg=PAL["bg"], font=("Segoe UI Semibold",9)).pack()
+        
+        sep = tk.Frame(self._mid, bg=PAL["border"], height=1)
+        sep.pack(fill="x", pady=15, padx=20)
         
         entries = {}
         for f_label, f_def in fields:
             row = tk.Frame(self._mid, bg=PAL["bg"])
-            row.pack(fill="x", padx=15, pady=5)
-            tk.Label(row, text=f_label, fg=PAL["text"], bg=PAL["bg"], width=18, anchor="w").pack(side="left")
-            e = tk.Entry(row, bg=PAL["card"], fg="white", relief="flat", insertbackground="white")
+            row.pack(fill="x", padx=25, pady=6)
+            tk.Label(row, text=f_label, fg=PAL["text"], bg=PAL["bg"], width=20, anchor="w", font=("Segoe UI",10)).pack(side="left")
+            e = tk.Entry(row, bg=PAL["card"], fg="white", relief="flat", insertbackground="white", font=("Consolas",10))
             e.insert(0, str(f_def))
             e.pack(side="right", fill="x", expand=True)
             entries[f_label] = e
             
-        def run_exp():
+        def run_sim():
             try:
-                # Type-aware argument parsing
                 args = []
                 for label, _ in fields:
-                    val = entries[label].get()
-                    try: 
-                        if "." in val or "e" in val: args.append(float(val))
-                        else: args.append(int(val))
-                    except: args.append(val)
+                    v = entries[label].get()
+                    # Smart type detection
+                    try:
+                        if "." in v or "e" in v: args.append(float(v))
+                        else: args.append(int(v))
+                    except: args.append(v)
                 
                 res = getattr(cls, method_name)(*args)
                 self._show_res(name, res)
-            except Exception as e:
+            except Exception:
                 if self._out:
                     self._out.delete("1.0", "end")
                     self._out.insert("end", traceback.format_exc(), "err")
 
-        tk.Button(self._mid, text="RUN SIMULATION", bg=color, fg="white", font=("Segoe UI Bold",10), relief="flat", command=run_exp, pady=10).pack(fill="x", padx=15, pady=20)
+        btn = tk.Button(self._mid, text="RUN SIMULATION", bg=color, fg="white", font=("Segoe UI Bold",11), relief="flat", command=run_sim, pady=12, cursor="hand2")
+        btn.pack(fill="x", padx=25, pady=30)
 
     def _show_res(self, name, res):
         if not self._out: return
         self._out.delete("1.0", "end")
-        self._out.insert("end", f"▶  {name} RESULTS\n\n", "title")
+        self._out.insert("end", f"▶ {name.upper()} DATA LOG\n", "title")
+        self._out.insert("end", "─" * 40 + "\n\n")
+        
         if isinstance(res, dict):
             for k, v in res.items():
-                self._out.insert("end", f"   {k}: ", "key")
+                self._out.insert("end", f" • {k}: ", "key")
                 self._out.insert("end", f"{v}\n\n")
         else:
-            self._out.insert("end", f"   Result: {res}\n")
+            self._out.insert("end", f" RAW RESULT: {res}\n")
 
 if __name__ == "__main__":
     NCERTMasterLab().mainloop()

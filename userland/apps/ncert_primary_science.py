@@ -1,24 +1,26 @@
 """
-SigmaOS NCERT Primary Science Lab v3.0
-Classes 1–5 | EVS & Science Foundations
+SigmaOS NCERT Primary Science (EVS) v6.0 — The Ultimate Series
+Classes 1–5 | Foundational Environmental Studies & Science
 100% stdlib, zero 3rd-party deps
 """
 class Science_Primary_Classes:
-    TITLE = "Classes 1–5 – EVS, Science Foundations & Environment"
+    TITLE = "Primary EVS: Nature, Body, Food & Shelter"
     EXP_DATA = {
-        "Sense Organs": ("senses", [("Organ", "eyes")]),
+        "Sense Organs": ("senses", [("Organ (eyes/ears/nose/tongue/skin)", "eyes")]),
         "Living vs Non-living": ("living", [("Does it grow? (1/0)", "1"), ("Does it breathe? (1/0)", "1")]),
-        "Water Cycle": ("water_cycle", [("Step", "Evaporation")]),
+        "Water Cycle Basics": ("water_cycle", [("Process (Evaporation/Rain)", "Evaporation")]),
         "Food Groups": ("food", [("Item", "Rice")]),
-        "Simple Machines": ("machines", [("Tool", "Scissors")]),
-        "Animal Lifecycles": ("lifecycle", [("Animal (Frog/Butterfly)", "Frog")]),
-        "States of Matter": ("matter", [("Example", "Ice")]),
+        "Shelter Types": ("shelter", [("Area (Cold/Hot/Water)", "Cold")]),
+        "Animal Habitats": ("habitats", [("Animal", "Fish")]),
+        "Plant Parts": ("plant", [("Part (Root/Steam/Leaf)", "Leaf")]),
+        "Types of Families": ("family", [("Type (Joint/Nuclear)", "Nuclear")]),
+        "States of Matter": ("matter", [("Example (Ice/Water/Steam)", "Ice")]),
     }
 
     @staticmethod
-    def senses(organ):
-        d = {"eyes":"See", "ears":"Hear", "nose":"Smell", "tongue":"Taste", "skin":"Touch"}
-        return {"Function": d.get(organ.lower(), "Refer Class 3 EVS")}
+    def senses(o):
+        d = {"eyes":"Vision/Colors", "ears":"Hearing", "nose":"Smell", "tongue":"Taste", "skin":"Touch/Heat"}
+        return {"Used for": d.get(o.lower(), "Refer Class 3 EVS")}
 
     @staticmethod
     def living(g, b):
@@ -26,47 +28,44 @@ class Science_Primary_Classes:
         return {"Result": "Non-living Object"}
 
     @staticmethod
-    def water_cycle(step):
-        d = {
-            "evaporation": "Water turns to vapor due to Sun's heat",
-            "condensation": "Vapor cools down to form clouds",
-            "precipitation": "Water falls back as rain or snow",
-            "collection": "Water gathers in rivers, lakes, and oceans"
-        }
-        return {"Description": d.get(step.lower(), "Refer Class 4 EVS")}
+    def water_cycle(p):
+        d = {"evaporation": "Sun turns water to vapor", "rain": "Clouds release water drops"}
+        return {"Step": d.get(p.lower(), "Refer Class 4 EVS")}
 
     @staticmethod
-    def food(item):
-        i = item.lower()
-        if i in ["rice", "wheat", "potato"]: return {"Group": "Energy-giving (Carbohydrates)"}
-        if i in ["dal", "egg", "meat", "milk"]: return {"Group": "Body-building (Proteins)"}
-        if i in ["fruits", "vegetables"]: return {"Group": "Protective (Vitamins/Minerals)"}
-        return {"Group": "Refer Class 3-5 Food sections"}
+    def food(i):
+        i = i.lower()
+        if i in ["rice", "wheat", "potato"]: return {"Category": "Energy-giving (Carbs)"}
+        if i in ["milk", "egg", "dal"]: return {"Category": "Body-building (Proteins)"}
+        return {"Category": "Protective (Vitamins)"}
 
     @staticmethod
-    def machines(tool):
-        t = tool.lower()
-        if "scissor" in t or "see-saw" in t: return {"Type": "Lever"}
-        if "flagpole" in t: return {"Type": "Pulley"}
-        if "slide" in t: return {"Type": "Inclined Plane"}
-        return {"Type": "Simple Machine (Refer Class 5 Science)"}
+    def shelter(a):
+        d = {"cold": "Igloos / Sloping roofs", "hot": "Thick Mud walls", "water": "Houseboats"}
+        return {"Shelter Style": d.get(a.lower(), "Refer Class 5 Shelter section")}
 
     @staticmethod
-    def lifecycle(animal):
-        a = animal.lower()
-        if "frog" in a: return {"Stages": "Egg -> Tadpole -> Froglet -> Adult Frog"}
-        if "butterfly" in a: return {"Stages": "Egg -> Larva (Caterpillar) -> Pupa (Chrysalis) -> Adult Butterfly"}
-        return {"Info": "Refer Class 4-5 EVS"}
+    def habitats(a):
+        d = {"fish": "Water (Aquatic)", "lion": "Forest (Terrestrial)", "monkey": "Trees (Arboreal)"}
+        return {"Habitat": d.get(a.lower(), "Refer Class 4 Habitats")}
 
     @staticmethod
-    def matter(ex):
-        ex = ex.lower()
-        if "ice" in ex: return {"State": "Solid"}
-        if "water" in ex: return {"State": "Liquid"}
-        if "steam" in ex: return {"State": "Gas"}
-        return {"State": "Refer Ch-3 Matter"}
+    def plant(p):
+        d = {"root": "Absorbs water", "leaf": "Makes food", "stem": "Support"}
+        return {"Function": d.get(p.lower(), "Refer Class 3-5 Plant Fairy")}
 
-# Registry
+    @staticmethod
+    def family(t):
+        if "joint" in t.lower(): return {"Details": "Grandparents, parents, children live together"}
+        return {"Details": "Parents and children only"}
+
+    @staticmethod
+    def matter(e):
+        e = e.lower()
+        if "ice" in e: return {"State": "Solid"}
+        if "water" in e: return {"State": "Liquid"}
+        return {"State": "Gas"}
+
 SCIENCE_PRIMARY_REGISTRY = {
-    "Classes 1-5": Science_Primary_Classes
+    "EVS (Classes 1-5)": Science_Primary_Classes
 }

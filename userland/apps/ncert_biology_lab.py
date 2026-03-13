@@ -1,6 +1,7 @@
 """
-SigmaOS NCERT Biology Lab v5.0 — The Complete Series
-Classes 6–12 | Comprehensive Bio labs & ecology simulations
+SigmaOS NCERT Biology Lab v6.0 — The Ultimate Series
+Classes 6–12 | Every Core NCERT Experiment & Ecosystem Simulation
+100% stdlib, zero 3rd-party deps
 """
 import math, random
 from collections import Counter
@@ -10,98 +11,125 @@ def _r(x, d=4):
     except: return x
 
 class Biology_Classes_6_10:
-    TITLE = "Classes 6–10: Cell Biology, Life Processes & Genetics"
+    TITLE = "Secondary Biology: Life Processes, Control & Genetics"
     EXP_DATA = {
-        "Starch Test (Photosynthesis)": ("starch", [("Iodine (1/0)", "1")]),
-        "Cell Size Ratio": ("cell_size", [("Radius (um)", "10")]),
-        "Mendel Monohybrid": ("mendel_m", [("P1 (TT/Tt/tt)", "Tt"), ("P2 (TT/Tt/tt)", "Tt")]),
-        "Mendel Dihybrid": ("mendel_d", [("P1 (RRYY)", "RRYY"), ("P2 (rryy)", "rryy")]),
-        "Blood Grouping": ("blood", [("Donor", "A+"), ("Recipient", "O+")]),
-        "Digestive Enzymes": ("digest", [("Organ", "Stomach")]),
-        "Reflex Action Path": ("reflex", [("Stimulus", "Heat")]),
+        "Starch Test": ("starch", [("Iodine (1=Yes, 0=No)", "1")]),
+        "Cell Organelles": ("cell", [("Organelle", "Nucleus")]),
+        "Mendel's Law": ("mendel", [("P1 (TT/Tt/tt)", "Tt"), ("P2 (TT/Tt/tt)", "Tt")]),
+        "Human Digestion": ("digest", [("Enzyme (Amylase/Pepsin/Lipase)", "Amylase")]),
+        "Pulse Rate": ("heart", [("Age", "15"), ("Post-exercise (1/0)", "0")]),
+        "Blood Donor Match": ("blood", [("Donor", "O-"), ("Recipient", "A+")]),
+        "Tropism (Plants)": ("tropism", [("Type (Hydro/Photo/Geo)", "Photo")]),
+        "Ecosystem Roles": ("eco", [("Organism", "Lion")]),
+        "Sex Determination": ("gender", [("Inherited from Father (X/Y)", "Y")]),
     }
 
     @staticmethod
     def starch(i):
-        if int(i): return {"Result": "Blue-black", "Note": "Starch found"}
-        return {"Result": "Brown", "Note": "Starch absent"}
+        if int(i): return {"Result": "Blue-black Color", "Inference": "Starch Present (Photosynthesis verified)"}
+        return {"Result": "No color change", "Inference": "No Starch found"}
 
     @staticmethod
-    def cell_size(r):
-        area = 4 * math.pi * r**2
-        vol = (4/3) * math.pi * r**3
-        return {"S.Area": _r(area, 1), "Volume": _r(vol, 1), "S/V Ratio": _r(area/vol, 3)}
+    def cell(n):
+        data = {"nucleus": "Control center, contains DNA", "mitochondria": "Powerhouse, ATP production", "ribosome": "Protein synthesis"}
+        return {"Function": data.get(n.lower(), "Refer NCERT Science Class 9")}
 
     @staticmethod
-    def mendel_m(p1, p2):
+    def mendel(p1, p2):
         g = [a+b for a in p1 for b in p2]
         g = ["".join(sorted(x)) for x in g]
-        return {"Genotypes": g, "Phenotype Ratio": "3 Dominant : 1 Recessive (Approx)"}
+        return {"Offspring Genotypes": g, "Phenotype Ratio": "Approx 3:1 (Dominant:Recessive)"}
 
     @staticmethod
-    def mendel_d(p1, p2):
-        # Very simplified representation
-        return {"F1 Generation": "RrYy (All)", "F2 Pheno Ratio": "9:3:3:1"}
+    def digest(e):
+        data = {"amylase": "Starch -> Sugar", "pepsin": "Proteins -> Peptides", "lipase": "Emulsified Fats -> Fatty acids"}
+        return {"Catalysis": data.get(e.lower(), "Refer Class 10 Biology")}
+
+    @staticmethod
+    def heart(age, ex):
+        age, ex = float(age), int(ex)
+        base = 72
+        if ex: base += 35
+        return {"Pulse (bpm)": base, "Note": "Standard average is 72 bpm"}
 
     @staticmethod
     def blood(d, r):
-        # Simplified
-        if "O-" in d or d == r: return {"Status": "COMPATIBLE"}
-        return {"Status": "RISKY / INCOMPATIBLE"}
+        d, r = d.upper(), r.upper()
+        if "O-" in d or d == r or "AB+" in r: return {"Outcome": "COMPATIBLE"}
+        return {"Outcome": "INCOMPATIBLE / RISKY"}
 
     @staticmethod
-    def digest(org):
-        d = {"mouth": "Amylase", "stomach": "Pepsin, HCl", "pancreas": "Lipase, Trypsin"}
-        return {"Active Agents": d.get(org.lower(), "Refer NCERT")}
+    def tropism(t):
+        data = {"photo": "Growth towards light", "hydro": "Growth towards water", "geo": "Growth towards gravity"}
+        return {"Response": data.get(t.lower(), "General Plant Motion")}
 
     @staticmethod
-    def reflex(s):
-        return {"Path": "Receptor -> Sensory Nerve -> Spinal Cord -> Motor Nerve -> Muscle"}
+    def eco(o):
+        data = {"lion": "Carnivore / Top Predator", "cow": "Herbivore / Primary Consumer", "plant": "Producer"}
+        return {"Niche": data.get(o.lower(), "Consumer")}
+
+    @staticmethod
+    def gender(chr):
+        if "Y" in chr.upper(): return {"Offspring": "Male (XY)"}
+        return {"Offspring": "Female (XX)"}
 
 class Biology_Classes_11_12:
-    TITLE = "Classes 11–12: Physiology, Biotechnology & Ecology"
+    TITLE = "Senior Biology: Physiology, Ecology, Biotech & Evolution"
     EXP_DATA = {
         "Species Area Curves": ("species", [("Area (sq km)", "1000")]),
-        "Hardy-Weinberg Freq": ("hardy", [("p freq", "0.6")]),
-        "PCR Copies yield": ("pcr", [("Init mols", "1"), ("Cycles", "30")]),
-        "RQ (Respiration)": ("rq", [("CO2 vol", "1"), ("O2 vol", "1")]),
-        "DNA base pairing": ("dna", [("Strand", "ATGC")]),
-        "Population growth": ("pop", [("No", "100"), ("r rate", "0.1"), ("t time", "10")]),
-        "Transpiration Rate": ("transpire", [("Air Speed (m/s)", "2"), ("Humidity (%)", "50")]),
+        "Hardy-Weinberg": ("hardy", [("p freq", "0.6")]),
+        "PCR Yield": ("pcr", [("Initial mols", "1"), ("Cycles", "30")]),
+        "Respiratory Quotient": ("rq", [("CO2 vol", "102"), ("O2 vol", "145")]),
+        "Trophic Efficiency": ("trophic", [("Producer Energy (J)", "10000")]),
+        "DNA Conversion": ("dna", [("Strand (ATGC)", "ATGC")]),
+        "Osmosis (Turgidity)": ("osmosis", [("Soln (Hypo/Hyper/Iso)", "Hyper")]),
+        "Diversity Index": ("diversity", [("Counts (comma-sep)", "10,20,5,5")]),
     }
 
     @staticmethod
     def species(a):
-        s = 0.5 * (a**0.3)
-        return {"Richness S": _r(s, 2)}
+        # S = CA^Z (C=0.5, Z=0.3)
+        s = 0.5 * (float(a)**0.3)
+        return {"Species Richness S": _r(s, 2)}
 
     @staticmethod
     def hardy(p):
-        q = 1-p
-        return {"p2 (AA)": _r(p**2, 4), "2pq (Aa)": _r(2*p*q, 4), "q2 (aa)": _r(q**2, 4)}
+        p = float(p); q = 1.0 - p
+        return {"AA (p²)": _r(p**2, 4), "Aa (2pq)": _r(2*p*q, 4), "aa (q²)": _r(q**2, 4)}
 
     @staticmethod
     def pcr(n, c):
-        return {"Yield": int(n * (2**c))}
+        return {"Resulting Copies": int(float(n) * (2**float(c)))}
 
     @staticmethod
     def rq(co2, o2):
-        return {"RQ": _r(co2/o2, 2)}
+        res = float(co2)/float(o2)
+        return {"RQ": _r(res, 2), "Substrate": "Fat/Protein" if res < 1 else "Carbohydrate"}
+
+    @staticmethod
+    def trophic(e):
+        e = float(e)
+        return {"Primary Consumer": e*0.1, "Secondary": e*0.01, "Tertiary": e*0.001}
 
     @staticmethod
     def dna(s):
         comp = {"A":"T", "T":"A", "G":"C", "C":"G"}
-        return {"Complementary": "".join(comp.get(x.upper(), "?") for x in s)}
+        return {"Complementary DNA": "".join(comp.get(x.upper(), "?") for x in s)}
 
     @staticmethod
-    def pop(n0, r, t):
-        nt = n0 * math.exp(r*t)
-        return {"Pop at T": _r(nt, 0)}
+    def osmosis(type):
+        t = type.lower()
+        if "hyper" in t: return {"Effect": "Exosmosis", "Result": "Plasmolysis / Cell shrinks"}
+        if "hypo" in t: return {"Effect": "Endosmosis", "Result": "Turgidity / Cell swells"}
+        return {"Effect": "Equilibrium", "Result": "Flaccid"}
 
     @staticmethod
-    def transpire(v, h):
-        rate = (v * 10) / (h / 10)
-        return {"Relative Rate": _r(rate, 2), "Observation": "Increases with Wind, Decreases with Humidity"}
+    def diversity(c_str):
+        counts = [float(x.strip()) for x in c_str.split(",")]
+        total = sum(counts)
+        # Simplified Simpson-like: D = sum( (n/N)^2 )
+        d = sum((n/total)**2 for n in counts)
+        return {"Index D": _r(d, 3), "Note": "Lower D = Higher Diversity"}
 
 BIOLOGY_REGISTRY = {
     "Classes 6-10": Biology_Classes_6_10,
