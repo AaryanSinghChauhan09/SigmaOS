@@ -1,5 +1,5 @@
 """
-SigmaOS NCERT Physics Lab v6.0 — The Ultimate Series
+SigmaOS NCERT Physics Lab v7.0 — The Ultimate Lab Manual
 Classes 6–12 | Every Core NCERT Experiment & Calculator
 100% stdlib, zero 3rd-party deps
 """
@@ -10,7 +10,7 @@ def _r(x, d=4):
     except: return x
 
 class Physics_Classes_6_10:
-    TITLE = "Secondary Physics: Light, Motion, Energy & Magnetism"
+    TITLE = "Secondary Physics: Foundations of Science"
     EXP_DATA = {
         "Ohm's Law": ("ohms_law", [("Voltage (V)", "10"), ("Resistance (Ω)", "5")]),
         "Mirror/Lens Formula": ("optics", [("Type (Mirror/Lens)", "Mirror"), ("Object dist u (cm)", "-20"), ("Focal length f (cm)", "10")]),
@@ -19,8 +19,8 @@ class Physics_Classes_6_10:
         "Archimedes Principle": ("buoyancy", [("Object Vol (m³)", "0.001"), ("Fluid Density (kg/m³)", "1000")]),
         "Magnetic Field (Wire)": ("mag_field", [("Current (A)", "5"), ("Distance (m)", "0.02")]),
         "Work & Energy": ("energy", [("Mass (kg)", "2"), ("Velocity (m/s)", "10"), ("Height (m)", "5")]),
-        "Sound Waves": ("sound", [("Frequency (Hz)", "440"), ("Wavelength (m)", "0.78")]),
-        "Heat Capacity": ("heat", [("Mass (kg)", "0.5"), ("Sp. Heat (J/kgK)", "4184"), ("dT (K)", "10")]),
+        "Atmospheric Pressure": ("atm_p", [("Altitude (m)", "0")]),
+        "Law of Flotation": ("float", [("Object Density", "800"), ("Fluid Density", "1000")]),
     }
 
     @staticmethod
@@ -50,7 +50,7 @@ class Physics_Classes_6_10:
 
     @staticmethod
     def gravity_weight(m, p):
-        gs = {"earth": 9.8, "moon": 1.62, "mars": 3.71}
+        gs = {"earth": 9.8, "moon": 1.62, "mars": 3.71, "jupiter": 24.79}
         g = gs.get(p.lower(), 9.8)
         return {"Weight (N)": _r(float(m)*g, 1), "g (m/s²)": g}
 
@@ -58,7 +58,7 @@ class Physics_Classes_6_10:
     def buoyancy(v, d):
         v, d = float(v), float(d)
         f = v * d * 9.8
-        return {"Upthrust (N)": _r(f, 2), "Note": "Object will float if Density < Fluid Density"}
+        return {"Upthrust (N)": _r(f, 2), "Note": "Buoyant force acts upwards"}
 
     @staticmethod
     def mag_field(i, r):
@@ -74,28 +74,31 @@ class Physics_Classes_6_10:
         return {"Kinetic (J)": _r(ke, 2), "Potential (J)": _r(pe, 2)}
 
     @staticmethod
-    def sound(f, l):
-        f, l = float(f), float(l)
-        return {"Velocity (m/s)": _r(f*l, 1), "Observation": "Normal air speed ~340m/s"}
+    def atm_p(h):
+        h = float(h)
+        p = 101325 * (1 - 2.25577e-5 * h)**5.25588
+        return {"Pressure (Pa)": _r(p, 0), "In atm": _r(p/101325, 3)}
 
     @staticmethod
-    def heat(m, c, dt):
-        m, c, dt = float(m), float(c), float(dt)
-        return {"Heat Q (J)": _r(m * c * dt, 1)}
+    def float(od, fd):
+        od, fd = float(od), float(fd)
+        if od < fd: return {"Result": "FLOTATION", "Note": "Object will float (Density < Fluid)"}
+        return {"Result": "SINKING", "Note": "Object will sink (Density >= Fluid)"}
 
 class Physics_Classes_11_12:
-    TITLE = "Senior Physics: Advanced Mechanics, E-Mag, Waves & Modern Physics"
+    TITLE = "Senior Physics: Advanced Laboratory"
     EXP_DATA = {
-        "Vernier/Screw Gauge": ("precision", [("Tool (Vernier/Screw)", "Vernier"), ("Main Scale", "10"), ("Circular/VSD", "5"), ("LC", "0.01")]),
-        "Young's Modulus": ("young", [("Load (kg)", "5"), ("Length (m)", "2"), ("Radius (mm)", "0.5"), ("dl (mm)", "1")]),
-        "Surface Tension": ("stension", [("Force (N)", "0.07"), ("Length (m)", "1")]),
-        "Projectile Motion": ("projectile", [("Vel (m/s)", "20"), ("Angle (deg)", "45")]),
-        "Capillary Rise": ("capillary", [("Surface Tension", "0.07"), ("Radius (mm)", "0.5"), ("Density", "1000")]),
-        "AC Filter (LCR)": ("lcr", [("R (Ω)", "10"), ("L (mH)", "50"), ("C (µF)", "100"), ("Freq (Hz)", "50")]),
+        "Screw Gauge/Vernier": ("precision", [("Tool (Vernier/Screw)", "Vernier"), ("Main Scale", "10"), ("VSD/Circular", "5"), ("LC", "0.01")]),
+        "Viscosity (Stoke's Law)": ("viscosity", [("Ball Radius (mm)", "1"), ("Density (kg/m³)", "7800"), ("Fluid Density", "1260"), ("Term. Vel (m/s)", "0.5")]),
+        "Newton's Cooling": ("cooling", [("Ambient Temp", "25"), ("Initial Temp", "100"), ("Time (mins)", "10"), ("k constant", "0.1")]),
+        "Parallelogram Law": ("parallel_forces", [("Force P (N)", "3"), ("Force Q (N)", "4"), ("Angle (deg)", "90")]),
+        "Meter Bridge (Resistivity)": ("meter_bridge", [("Standard R", "10"), ("Balancing Length l (cm)", "40")]),
+        "Potentiometer (EMF)": ("potentiometer", [("Standard E1 (V)", "1.5"), ("l1 (cm)", "60"), ("l2 (cm)", "80")]),
+        "Zener Diode": ("zener", [("Input V (V)", "10"), ("Zener Vz (V)", "5"), ("Resistor Rs (Ω)", "100")]),
+        "PN Junction (Forward)": ("pn_junction", [("Voltage V (V)", "0.7"), ("Temp (K)", "300")]),
+        "Brewster's Angle": ("brewster", [("Refractive Index n", "1.5")]),
+        "Refractive Index (Prism)": ("prism", [("Angle A", "60"), ("Angle of Min Dev Dm", "30")]),
         "Photoelectric Theory": ("photo", [("Work Function (eV)", "2.1"), ("Wavelength (nm)", "400")]),
-        "Radioactive Decay": ("decay", [("Initial N0", "100"), ("Half-life (s)", "60"), ("Time (s)", "120")]),
-        "Wheatstone Bridge": ("wheatstone", [("P (Ω)", "10"), ("Q (Ω)", "20"), ("R (Ω)", "30")]),
-        "Logic Gates": ("logic", [("Gate (AND/OR/XOR/NAND)", "AND"), ("A (1/0)", "1"), ("B (1/0)", "0")]),
     }
 
     @staticmethod
@@ -104,40 +107,66 @@ class Physics_Classes_11_12:
         return {"Total Reading": _r(ms + (sd * lc), 3)}
 
     @staticmethod
-    def young(m, l, r, dl):
-        m, l, r, dl = float(m), float(l), float(r)/1000, float(dl)/1000
-        stress = (m * 9.8) / (math.pi * r**2)
-        strain = dl / l
-        return {"Y (N/m²)": f"{stress/strain:.4e}"}
+    def viscosity(r, ds, df, v):
+        r, ds, df, v = float(r)/1000, float(ds), float(df), float(v)
+        # eta = 2r^2(ds-df)g / 9v
+        eta = (2 * r**2 * (ds - df) * 9.8) / (9 * v)
+        return {"Viscosity (Pa·s)": _r(eta, 4)}
 
     @staticmethod
-    def stension(f, l):
-        f, l = float(f), float(l)
-        return {"T (N/m)": _r(f/l, 4)}
+    def cooling(ta, t0, t, k):
+        ta, t0, t, k = float(ta), float(t0), float(t), float(k)
+        # T(t) = Ta + (T0-Ta)e^-kt
+        tf = ta + (t0 - ta) * math.exp(-k * t)
+        return {"Final Temp (C)": _r(tf, 2)}
 
     @staticmethod
-    def projectile(v, theta):
-        v, theta = float(v), float(theta)
-        rad = math.radians(theta)
-        g = 9.8
-        rng = (v**2 * math.sin(2*rad)) / g
-        hmax = (v**2 * math.sin(rad)**2) / (2*g)
-        t_f = (2*v*math.sin(rad))/g
-        return {"Range (m)": _r(rng, 2), "Height (m)": _r(hmax, 2), "Time (s)": _r(t_f, 2)}
+    def parallel_forces(p, q, theta):
+        p, q, theta = float(p), float(q), math.radians(float(theta))
+        r = math.sqrt(p**2 + q**2 + 2*p*q*math.cos(theta))
+        return {"Resultant Force (N)": _r(r, 2)}
 
     @staticmethod
-    def capillary(s, r, d):
-        s, r, d = float(s), float(r)/1000, float(d)
-        h = (2 * s) / (r * d * 9.8)
-        return {"Height (m)": _r(h, 4)}
+    def meter_bridge(r, l):
+        r, l = float(r), float(l)
+        # X = R * (100-l)/l
+        x = r * (100 - l) / l
+        return {"Unknown Resistance X (Ω)": _r(x, 2)}
 
     @staticmethod
-    def lcr(r, l, c, f):
-        r, l, c, f = float(r), float(l), float(c), float(f)
-        xl = 2 * math.pi * f * (l/1000)
-        xc = 1 / (2 * math.pi * f * (c/1e6))
-        z = math.sqrt(r**2 + (xl-xc)**2)
-        return {"Impedance Z (Ω)": _r(z, 2), "Resonant Freq (Hz)": _r(1/(2*math.pi*math.sqrt(l/1000 * c/1e6)), 1)}
+    def potentiometer(e1, l1, l2):
+        e1, l1, l2 = float(e1), float(l1), float(l2)
+        # E2 = E1 * (l2/l1)
+        e2 = e1 * (l2 / l1)
+        return {"Unknown EMF E2 (V)": _r(e2, 3)}
+
+    @staticmethod
+    def zener(vi, vz, rs):
+        vi, vz, rs = float(vi), float(vz), float(rs)
+        if vi < vz: return {"Status": "Regulator NOT Active", "Output V": vi}
+        is_val = (vi - vz) / rs
+        return {"Status": "Regulator ACTIVE", "Output V": vz, "Current Is (A)": _r(is_val, 3)}
+
+    @staticmethod
+    def pn_junction(v, t):
+        v, t = float(v), float(t)
+        # I = Is(e^V/nkT - 1) simplified
+        k = 1.38e-23; q = 1.6e-19
+        i_ratio = math.exp((q * v) / (k * t))
+        return {"Current Factor (e^V/Vt)": f"{i_ratio:.4e}", "Note": "Current rises exponentially in Forward Bias"}
+
+    @staticmethod
+    def brewster(n):
+        n = float(n)
+        angle = math.degrees(math.atan(n))
+        return {"Polarizing Angle (deg)": _r(angle, 2)}
+
+    @staticmethod
+    def prism(a, dm):
+        a, dm = math.radians(float(a)), math.radians(float(dm))
+        # n = sin((A+Dm)/2) / sin(A/2)
+        n = math.sin((a + dm) / 2) / math.sin(a / 2)
+        return {"Refractive Index n": _r(n, 3)}
 
     @staticmethod
     def photo(phi, lam):
@@ -146,29 +175,6 @@ class Physics_Classes_11_12:
         e_in = (h * c) / (lam * 1e-9 * ev)
         kmax = e_in - phi
         return {"Photon Energy (eV)": _r(e_in, 2), "K-max (eV)": _r(max(0, kmax), 2), "Emitted": "YES" if kmax > 0 else "NO"}
-
-    @staticmethod
-    def decay(n0, th, t):
-        n0, th, t = float(n0), float(th), float(t)
-        nt = n0 * (0.5 ** (t / th))
-        return {"Remaining N(t)": _r(nt, 2), "Decayed": _r(n0-nt, 2)}
-
-    @staticmethod
-    def wheatstone(p, q, r):
-        p, q, r = float(p), float(q), float(r)
-        # P/Q = R/S => S = Q*R / P
-        return {"Unknown S (Ω)": _r((q*r)/p, 2)}
-
-    @staticmethod
-    def logic(g, a, b):
-        a, b = int(a), int(b)
-        mode = g.upper()
-        if mode == "AND": res = a and b
-        elif mode == "OR": res = a or b
-        elif mode == "XOR": res = a != b
-        elif mode == "NAND": res = not (a and b)
-        else: res = 0
-        return {"Output": int(res)}
 
 PHYSICS_REGISTRY = {
     "Classes 6-10": Physics_Classes_6_10,

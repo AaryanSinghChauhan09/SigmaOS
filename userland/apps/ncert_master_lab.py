@@ -1,5 +1,5 @@
 """
-SigmaOS NCERT Master Lab v6.0 — The Ultimate series
+SigmaOS NCERT Master Lab v7.0 — The Ultimate Virtual Suite
 Unified Virtual Lab for Physics, Chemistry, Biology & Math (1–12)
 100% stdlib/tkinter | Fully dynamic simulation hub
 """
@@ -17,11 +17,11 @@ PAL = {
 class NCERTMasterLab(tk.Tk):
     def __init__(self):
         super().__init__()
-        self.title("SigmaOS • NCERT Master Lab v6.0")
+        self.title("SigmaOS • NCERT Master Lab v7.0")
         self.geometry("1400x900")
         self.configure(bg=PAL["bg"])
         
-        # Initialize attributes BEFORE building UI to satisfy linter/logic
+        # Initialize attributes
         self._mods = {}
         self._exp_map = {}
         self._tree = None
@@ -38,10 +38,10 @@ class NCERTMasterLab(tk.Tk):
         # Header
         hdr = tk.Frame(self, bg=PAL["panel"], height=65)
         hdr.pack(fill="x"); hdr.pack_propagate(False)
-        tk.Label(hdr, text="🔬 NCERT MASTER LAB v6.0", fg=PAL["accent"], bg=PAL["panel"], font=("Segoe UI Bold",18)).pack(side="left", padx=25)
+        tk.Label(hdr, text="🔬 NCERT MASTER LAB v7.0", fg=PAL["accent"], bg=PAL["panel"], font=("Segoe UI Bold",18)).pack(side="left", padx=25)
         
         # Tool status
-        tk.Label(hdr, text="[SYSTEM STABLE • ALL MODULES ACTIVE]", fg="#00D26A", bg=PAL["panel"], font=("Consolas",9)).pack(side="right", padx=25)
+        tk.Label(hdr, text="[SYSTEM ALPHA-STABLE • EXHAUSTIVE COVERAGE]", fg="#00D26A", bg=PAL["panel"], font=("Consolas",9)).pack(side="right", padx=25)
 
         # Main Layout
         body = tk.Frame(self, bg=PAL["bg"])
@@ -81,11 +81,13 @@ class NCERTMasterLab(tk.Tk):
             ("ncert_chemistry_lab", "CHEMISTRY_REGISTRY", PAL["ch"], "🧪 Chemistry (6-12)"),
             ("ncert_biology_lab", "BIOLOGY_REGISTRY", PAL["bi"], "🧬 Biology (6-12)"),
             ("ncert_maths_lab", "MATHS_REGISTRY", PAL["ma"], "📐 Mathematics (1-12)"),
-            ("ncert_primary_science", "SCIENCE_PRIMARY_REGISTRY", PAL["ch"], "🌱 Foundation Sc. (1-5)"),
-            ("ncert_primary_maths", "PRIMARY_MATHS_REGISTRY", PAL["ma"], "➕ Foundation Math (1-5)"),
+            ("ncert_primary_science", "SCIENCE_PRIMARY_REGISTRY", PAL["ch"], "🌱 Primary Science (1-5)"),
+            ("ncert_primary_maths", "PRIMARY_MATHS_REGISTRY", PAL["ma"], "➕ Primary Math (1-5)"),
         ]
         
-        sys.path.insert(0, os.path.dirname(__file__))
+        # Ensure current directory is in path
+        curr = os.path.dirname(os.path.abspath(__file__))
+        if curr not in sys.path: sys.path.insert(0, curr)
         
         for mod_name, reg_name, color, label in backend_info:
             try:
@@ -103,7 +105,9 @@ class NCERTMasterLab(tk.Tk):
         
         for cls_label, cls_obj in registry.items():
             cls_node = self._tree.insert(root, "end", text=cls_label)
-            for exp_display, data in cls_obj.EXP_DATA.items():
+            # Sort experiments alphabetically for better UX
+            sorted_exps = sorted(cls_obj.EXP_DATA.items())
+            for exp_display, data in sorted_exps:
                 node = self._tree.insert(cls_node, "end", text=f"• {exp_display}")
                 self._exp_map[node] = (cls_obj, exp_display, data, color)
 
@@ -154,7 +158,7 @@ class NCERTMasterLab(tk.Tk):
                     self._out.delete("1.0", "end")
                     self._out.insert("end", traceback.format_exc(), "err")
 
-        btn = tk.Button(self._mid, text="RUN SIMULATION", bg=color, fg="white", font=("Segoe UI Bold",11), relief="flat", command=run_sim, pady=12, cursor="hand2")
+        btn = tk.Button(self._mid, text="RUN SIMULATION ", bg=color, fg="white", font=("Segoe UI Bold",11), relief="flat", command=run_sim, pady=12, cursor="hand2")
         btn.pack(fill="x", padx=25, pady=30)
 
     def _show_res(self, name, res):

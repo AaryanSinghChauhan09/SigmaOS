@@ -1,18 +1,19 @@
 """
-SigmaOS NCERT Primary Mathematics Lab v6.0 — The Ultimate Series
+SigmaOS NCERT Primary Mathematics Lab v7.0 — The Ultimate Lab Manual
 Classes 1–5 | Foundational Arithmetic, Shapes & Patterns
 100% stdlib, zero 3rd-party deps
 """
 class Maths_Primary:
-    TITLE = "Primary Math Foundations: Counting, Patterns & Geometry"
+    TITLE = "Primary Math Foundations: Early Logic"
     EXP_DATA = {
         "Number Names (Class 1)": ("words", [("Number", "7")]),
+        "Addition carry/sum": ("add", [("A", "45"), ("B", "56")]),
         "Multiplication (Class 3)": ("mul", [("A", "5"), ("B", "6")]),
-        "Area (Grid Count)": ("area", [("Length", "4"), ("Width", "3")]),
-        "Money Math": ("money", [("Item A Cost", "15.50"), ("Item B Cost", "20.25")]),
-        "Pattern Completion": ("pattern", [("Sequence (comma)", "2,4,6")]),
-        "Fraction Shading": ("fraction", [("Shaded", "1"), ("Total", "4")]),
-        "Measurement (Weight)": ("weight", [("A (kg)", "2"), ("B (g)", "500")]),
+        "Sharing Fractions": ("sharing", [("Pieces Shaded", "1"), ("Total Pieces", "4")]),
+        "Pattern Hunter": ("pattern", [("Sequence (comma)", "2,4,6")]),
+        "Measurement Weight": ("weight", [("A (kg)", "2"), ("B (g)", "500")]),
+        "Clock Time": ("clock", [("Hours", "3"), ("Minutes", "30")]),
+        "Shapes Corners": ("shapes", [("Shape", "Square")]),
     }
 
     @staticmethod
@@ -21,31 +22,36 @@ class Maths_Primary:
         return {"Word": d.get(int(n), str(n))}
 
     @staticmethod
+    def add(a, b):
+        return {"Sum": int(a)+int(b), "Carry Logic": "Tens place shifted" if (int(a)%10 + int(b)%10) >= 10 else "No carry"}
+
+    @staticmethod
     def mul(a, b):
-        return {"Result": int(a)*int(b), "Repeated Addition": "+".join([str(a)]*int(b))}
+        return {"Result": int(a)*int(b), "Multiplication type": "Repeated Addition"}
 
     @staticmethod
-    def area(l, w):
-        return {"Area (Total Squares)": int(l)*int(w)}
-
-    @staticmethod
-    def money(a, b):
-        return {"Total": f"₹ {float(a)+float(b)}"}
+    def sharing(s, t):
+        return {"Expression": f"{s}/{t}", "Percentage": f"{(int(s)/int(t))*100}%", "Note": "1/2=Half, 1/4=Quarter"}
 
     @staticmethod
     def pattern(s):
         nums = [int(x.strip()) for x in s.split(",")]
         diff = nums[1]-nums[0]
-        return {"Next": nums[-1]+diff, "Rule": "+"+str(diff)}
-
-    @staticmethod
-    def fraction(s, t):
-        return {"Text": f"{int(s)} out of {int(t)}", "Percent": f"{(int(s)/int(t))*100}%"}
+        return {"Next": nums[-1]+diff, "Rule": "Add "+str(diff)}
 
     @staticmethod
     def weight(kg, g):
-        return {"Total (grams)": int(kg)*1000 + int(g)}
+        return {"Total grams": int(kg)*1000 + int(g), "Visual": f"{kg}kg and {g}g"}
+
+    @staticmethod
+    def clock(h, m):
+        return {"Time Display": f"{int(h)}:{int(m):02d}", "Angle": f"{abs(30*int(h)-5.5*int(m))} deg"}
+
+    @staticmethod
+    def shapes(s):
+        d = {"square": 4, "triangle": 3, "pentagon": 5}
+        return {"Corners": d.get(s.lower(), "Refer Class 2"), "Sides": d.get(s.lower(), "Refer Class 2")}
 
 PRIMARY_MATHS_REGISTRY = {
-    "Foundation (Classes 1-5)": Maths_Primary
+    "Primary Math (1-5)": Maths_Primary
 }
