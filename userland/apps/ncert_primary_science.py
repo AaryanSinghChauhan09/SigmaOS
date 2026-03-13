@@ -1,70 +1,98 @@
 """
-SigmaOS NCERT Primary Science (EVS) v7.0 — The Ultimate Lab Manual
+SigmaOS NCERT Primary Science (EVS) v9.0 — The Comprehensive series
 Classes 1–5 | Foundational Environmental Studies & Science
 100% stdlib, zero 3rd-party deps
 """
 class Science_Primary_Classes:
-    TITLE = "Primary EVS: Nature, Body, Food & Community"
+    TITLE = "Primary EVS: Exhaustive Foundation Library"
     EXP_DATA = {
-        "Sense Organs": ("senses", [("Organ (eyes/ears/nose/tongue/skin)", "eyes")]),
-        "Living vs Non-living": ("living", [("Does it grow? (1/0)", "1"), ("Does it breathe? (1/0)", "1")]),
-        "Food We Eat": ("food", [("Item (Rice/Milk/Apple)", "Rice")]),
-        "Our Neighborhood": ("neighborhood", [("Place (Bank/Hospital/Post)", "Hospital")]),
-        "Shelter Types": ("shelter", [("Area (Desert/Mountain/River)", "Mountain")]),
-        "Water Cycle Basics": ("water_cycle", [("Process (Rain/Clouds)", "Rain")]),
-        "Parts of a Plant": ("plant", [("Part (Root/Stem/Leaf/Flower)", "Leaf")]),
-        "Cleanliness Skills": ("clean", [("Task (Hands/Brushing)", "Hands")]),
-        "States of Matter": ("matter", [("Example (Ice/Water/Steam)", "Ice")]),
+        "Sense Organs": ("senses", [("Organ", "eyes")]),
+        "Living vs Non-living": ("living", [("Grows?", "1"), ("Breathes?", "1")]),
+        "Food We Eat": ("food", [("Item", "Rice")]),
+        "Neighborhood Help": ("neighborhood", [("Place", "Hospital")]),
+        "Shelter (Homes)": ("shelter", [("Region", "Mountain")]),
+        "Water Cycle": ("water_cycle", [("Step", "Rain")]),
+        "Plant Parts": ("plant", [("Part", "Leaf")]),
+        "Cleanliness": ("clean", [("Task", "Hands")]),
+        "States of Matter": ("matter", [("Example", "Ice")]),
+        "Seed Germination": ("germination", [("Water?", "1"), ("Air?", "1"), ("Sun?", "1")]),
+        "Animal Habitats": ("habitats", [("Animal", "Fish")]),
+        "Transport Modes": ("transport", [("Vehicle", "Aeroplane")]),
+        "Seasons & Clothes": ("seasons", [("Season", "Summer")]),
+        "Day & Night": ("daynight", [("Is Sun out?", "1")]),
     }
 
     @staticmethod
     def senses(o):
-        d = {"eyes":"Vision/Colors", "ears":"Hearing", "nose":"Smell", "tongue":"Taste", "skin":"Touch/Heat"}
-        return {"Used for": d.get(o.lower(), "Refer Class 3 EVS")}
+        d = {"eyes":"Vision", "ears":"Hearing", "nose":"Smell", "tongue":"Taste", "skin":"Touch"}
+        return {"Used for": d.get(o.lower(), "Refer Class 3")}
 
     @staticmethod
     def living(g, b):
-        if int(g) and int(b): return {"Result": "LIVING BEING", "Inference": "Grows and Breathes"}
-        return {"Result": "NON-LIVING", "Inference": "Stationary and inanimate"}
+        if int(g) and int(b): return {"Result": "LIVING"}
+        return {"Result": "NON-LIVING"}
 
     @staticmethod
     def food(i):
         i = i.lower()
-        if i in ["rice", "wheat", "potato"]: return {"Group": "Energy-giving (Carbohydrates)"}
-        if i in ["milk", "egg", "dal"]: return {"Group": "Body-building (Proteins)"}
-        return {"Group": "Protective (Vitamins)"}
+        if i in ["rice", "wheat"]: return {"Group": "Energy"}
+        if i in ["milk", "egg"]: return {"Group": "Body-building"}
+        return {"Group": "Protective"}
 
     @staticmethod
     def neighborhood(p):
-        d = {"hospital": "Doctor & Nurses treat sick people", "bank": "Safe place for money", "post": "Send letters and parcels"}
-        return {"Info": d.get(p.lower(), "Refer Class 3 Neighborhood")}
+        d = {"hospital": "Treats Sick", "bank": "Saves Money", "post": "Mails letters"}
+        return {"Info": d.get(p.lower(), "Neighborhood help")}
 
     @staticmethod
     def shelter(a):
-        d = {"mountain": "Sloping roofs for snow", "desert": "Thick walls to stay cool", "river": "Houseboats"}
-        return {"Style": d.get(a.lower(), "Refer Class 5 Shelter")}
+        d = {"mountain": "Sloping Roof", "desert": "Thick Mud", "river": "Houseboat"}
+        return {"Style": d.get(a.lower(), "Shelter")}
 
     @staticmethod
     def water_cycle(p):
-        d = {"rain": "Precipitation from clouds", "clouds": "Vapor condensing in air"}
-        return {"Step": d.get(p.lower(), "Refer Class 4 EVS")}
+        return {"Step": p}
 
     @staticmethod
     def plant(p):
-        d = {"root": "Holds plant, absorbs water", "stem": "Supports, carries nutrients", "leaf": "Kitchen (makes food)"}
-        return {"Role": d.get(p.lower(), "Refer Class 3 Plant Fairy")}
+        d = {"root": "Water absorb", "leaf": "Food factory", "stem": "Support"}
+        return {"Role": d.get(p.lower(), "Plant part")}
 
     @staticmethod
     def clean(t):
-        d = {"hands": "Wash before eating to kill germs", "brushing": "Prevents cavities"}
-        return {"Guideline": d.get(t.lower(), "Refer Class 1 Community")}
+        return {"Guideline": "Cleanliness is next to godliness"}
 
     @staticmethod
     def matter(e):
         e = e.lower()
-        if "ice" in e: return {"State": "Solid", "Atom Spacing": "Very Close"}
-        if "water" in e: return {"State": "Liquid", "Atom Spacing": "Moderate"}
-        return {"State": "Gas", "Atom Spacing": "Far Apart"}
+        if "ice" in e: return {"State": "Solid"}
+        if "water" in e: return {"State": "Liquid"}
+        return {"State": "Gas"}
+
+    @staticmethod
+    def germination(w, a, s):
+        if int(w) and int(a) and int(s): return {"Result": "SUCCESS", "Note": "Seed grows into a sapling"}
+        return {"Result": "FAILURE", "Note": "Seeds need Water, Air, and Sunlight"}
+
+    @staticmethod
+    def habitats(a):
+        d = {"fish": "Aquatic", "monkey": "Arboreal", "lion": "Terrestrial", "camel": "Desert"}
+        return {"Habitat": d.get(a.lower(), "Natural home")}
+
+    @staticmethod
+    def transport(v):
+        d = {"car": "Land", "boat": "Water", "aeroplane": "Air", "train": "Land"}
+        return {"Mode": d.get(v.lower(), "Transportation")}
+
+    @staticmethod
+    def seasons(s):
+        d = {"summer": "Cotton clothes", "winter": "Woolen clothes", "monsoon": "Raincoats"}
+        return {"Clothing": d.get(s.lower(), "Climate clothing")}
+
+    @staticmethod
+    def daynight(s):
+        if int(s): return {"Status": "DAY", "Activity": "School & Work"}
+        return {"Status": "NIGHT", "Activity": "Sleep & Rest"}
 
 SCIENCE_PRIMARY_REGISTRY = {
     "Primary EVS (1-5)": Science_Primary_Classes

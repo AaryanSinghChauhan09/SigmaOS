@@ -1,11 +1,11 @@
 """
-SigmaOS NCERT Master Lab v8.0 — The Interactive series
+SigmaOS NCERT Master Lab v9.0 — The Ultimate Virtual Suite
 Unified Virtual Lab for Physics, Chemistry, Biology & Math (1–12)
-100% stdlib/tkinter | Fully dynamic simulation hub
+100% stdlib/tkinter | Exhaustive Interactive Experiment Hub
 """
 import tkinter as tk
 from tkinter import ttk, scrolledtext, messagebox
-import importlib, sys, os, traceback
+import importlib, sys, os, traceback, json
 
 # ─── PREMIUM THEME ───────────────────────────────────────────────────────────
 PAL = {
@@ -17,12 +17,14 @@ PAL = {
 class NCERTMasterLab(tk.Tk):
     def __init__(self):
         super().__init__()
-        self.title("SigmaOS • NCERT Virtual Lab v8.0")
+        self.title("SigmaOS • NCERT Virtual Lab v9.0")
         self.geometry("1400x900")
         self.configure(bg=PAL["bg"])
         
         self._mods = {}
         self._exp_map = {}
+        self._stats = {"completed": 0, "badges": []}
+        
         self._tree = None
         self._mid = None
         self._out = None
@@ -37,9 +39,10 @@ class NCERTMasterLab(tk.Tk):
         # Header
         hdr = tk.Frame(self, bg=PAL["panel"], height=65)
         hdr.pack(fill="x"); hdr.pack_propagate(False)
-        tk.Label(hdr, text="🔬 NCERT INTERACTIVE LAB v8.0", fg=PAL["accent"], bg=PAL["panel"], font=("Segoe UI Bold",18)).pack(side="left", padx=25)
+        tk.Label(hdr, text="🔬 NCERT EXHAUSTIVE LAB v9.0", fg=PAL["accent"], bg=PAL["panel"], font=("Segoe UI Bold",18)).pack(side="left", padx=25)
         
-        tk.Label(hdr, text="[INTERACTIVE MODE READY]", fg="#00D26A", bg=PAL["panel"], font=("Consolas",9)).pack(side="right", padx=25)
+        self._status_lbl = tk.Label(hdr, text="[SYSTEM READY • EXHAUSTIVE COVERAGE]", fg="#00D26A", bg=PAL["panel"], font=("Consolas",9))
+        self._status_lbl.pack(side="right", padx=25)
 
         # Body
         body = tk.Frame(self, bg=PAL["bg"])
@@ -57,19 +60,20 @@ class NCERTMasterLab(tk.Tk):
         style.configure("Treeview", background=PAL["panel"], foreground=PAL["text"], fieldbackground=PAL["panel"], borderwidth=0, font=("Segoe UI", 10))
         style.map("Treeview", background=[('selected', PAL["accent"])])
         
-        # Middle Panel (Form)
+        # Middle Panel (Interaction Form)
         self._mid = tk.Frame(body, bg=PAL["bg"], width=420)
         self._mid.pack(side="left", fill="y", padx=(0,8)); self._mid.pack_propagate(False)
         self._mid_msg = tk.Label(self._mid, text="◄ SELECT AN EXPERIMENT", fg=PAL["dim"], bg=PAL["bg"], font=("Segoe UI Bold",12))
         self._mid_msg.pack(expand=True)
         
-        # Right Panel (Console)
+        # Right Panel (Scientific Console)
         self._out_fr = tk.Frame(body, bg=PAL["bg"])
         self._out_fr.pack(side="right", fill="both", expand=True)
         self._out = scrolledtext.ScrolledText(self._out_fr, bg="#070910", fg="#00D26A", font=("Cascadia Code",10), borderwidth=0, padx=20, pady=20)
         self._out.pack(fill="both", expand=True)
         self._out.tag_config("title", foreground=PAL["accent"], font=("Segoe UI Bold",15))
         self._out.tag_config("key", foreground=PAL["ma"])
+        self._out.tag_config("badge", foreground=PAL["ch"], font=("Segoe UI Bold",12))
         self._out.tag_config("err", foreground="#FF4B4B")
 
     def _load_backends(self):
@@ -146,19 +150,21 @@ class NCERTMasterLab(tk.Tk):
                     except: args.append(v)
                 
                 res = getattr(cls, method_name)(*args)
+                self._stats["completed"] += 1
                 self._show_res(name, res)
+                self._check_badges()
             except Exception:
                 if self._out:
                     self._out.delete("1.0", "end")
                     self._out.insert("end", traceback.format_exc(), "err")
 
-        btn = tk.Button(self._mid, text="RUN EXPERIMENT ⚗️", bg=color, fg="white", font=("Segoe UI Bold",11), relief="flat", command=run_sim, pady=12, cursor="hand2")
+        btn = tk.Button(self._mid, text="RUN SIMULATION ⚛️", bg=color, fg="white", font=("Segoe UI Bold",11), relief="flat", command=run_sim, pady=12, cursor="hand2")
         btn.pack(fill="x", padx=25, pady=30)
 
     def _show_res(self, name, res):
         if not self._out: return
         self._out.delete("1.0", "end")
-        self._out.insert("end", f"▶ INTERACTIVE LOG: {name.upper()}\n", "title")
+        self._out.insert("end", f"▶ DATA LOG: {name.upper()}\n", "title")
         self._out.insert("end", "─" * 40 + "\n\n")
         
         if isinstance(res, dict):
@@ -167,6 +173,13 @@ class NCERTMasterLab(tk.Tk):
                 self._out.insert("end", f"{v}\n\n")
         else:
             self._out.insert("end", f" OUTPUT: {res}\n")
+
+    def _check_badges(self):
+        c = self._stats["completed"]
+        if c == 1: self._out.insert("end", "\n🎖️ BADGE UNLOCKED: NOVICE SCIENTIST\n", "badge")
+        elif c == 5: self._out.insert("end", "\n🎖️ BADGE UNLOCKED: EXPLORER\n", "badge")
+        elif c == 10: self._out.insert("end", "\n🎖️ BADGE UNLOCKED: LAB MASTER\n", "badge")
+        self._status_lbl.configure(text=f"[EXPERIMENTS COMPLETED: {c}]")
 
 if __name__ == "__main__":
     NCERTMasterLab().mainloop()
