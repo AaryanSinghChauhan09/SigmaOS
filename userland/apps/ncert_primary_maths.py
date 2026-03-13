@@ -1,56 +1,81 @@
 """
-SigmaOS NCERT Primary Mathematics Lab v7.0 — The Ultimate Lab Manual
+SigmaOS NCERT Primary Mathematics Lab v10.0 — The Ultimate Series
 Classes 1–5 | Foundational Arithmetic, Shapes & Patterns
 100% stdlib, zero 3rd-party deps
 """
 class Maths_Primary:
-    TITLE = "Primary Math Foundations: Early Logic"
+    TITLE = "Primary Math Foundations: Exhaustive Logic"
     EXP_DATA = {
-        "Number Names (Class 1)": ("words", [("Number", "7")]),
-        "Addition carry/sum": ("add", [("A", "45"), ("B", "56")]),
-        "Multiplication (Class 3)": ("mul", [("A", "5"), ("B", "6")]),
-        "Sharing Fractions": ("sharing", [("Pieces Shaded", "1"), ("Total Pieces", "4")]),
-        "Pattern Hunter": ("pattern", [("Sequence (comma)", "2,4,6")]),
-        "Measurement Weight": ("weight", [("A (kg)", "2"), ("B (g)", "500")]),
-        "Clock Time": ("clock", [("Hours", "3"), ("Minutes", "30")]),
-        "Shapes Corners": ("shapes", [("Shape", "Square")]),
+        "Number Express": ("words", [("Number", "7")]),
+        "Addition carry": ("add", [("A", "45"), ("B", "56")]),
+        "Multiplication (Repeated)": ("mul", [("A", "5"), ("B", "6")]),
+        "Fraction Sharing": ("sharing", [("Shaded", "1"), ("Total", "4")]),
+        "Pattern Sequence": ("pattern", [("Seq", "2,4,6")]),
+        "Weight Logic": ("weight", [("kg", "2"), ("g", "500")]),
+        "Handy Clock": ("clock", [("H", "3"), ("M", "30")]),
+        "Pointy Shapes": ("shapes", [("Shape", "Square")]),
+        "Greater/Lesser": ("compare", [("X", "25"), ("Y", "18")]),
+        "Money Calc": ("money", [("Rs", "10"), ("Paise", "50"), ("Count", "3")]),
+        "Sorting Order": ("sort", [("Data", "5,2,9,1,7")]),
+        "Equal Sharing": ("divide", [("Total", "20"), ("Friends", "4")]),
     }
 
     @staticmethod
     def words(n):
         d = {0:"Zero", 1:"One", 2:"Two", 3:"Three", 4:"Four", 5:"Five", 6:"Six", 7:"Seven", 8:"Eight", 9:"Nine"}
-        return {"Word": d.get(int(n), str(n))}
+        return {"Word": d.get(int(n), "Big Number")}
 
     @staticmethod
     def add(a, b):
-        return {"Sum": int(a)+int(b), "Carry Logic": "Tens place shifted" if (int(a)%10 + int(b)%10) >= 10 else "No carry"}
+        return {"Sum": int(a)+int(b), "Carry": (int(a)%10 + int(b)%10) >= 10}
 
     @staticmethod
     def mul(a, b):
-        return {"Result": int(a)*int(b), "Multiplication type": "Repeated Addition"}
+        return {"Product": int(a)*int(b)}
 
     @staticmethod
     def sharing(s, t):
-        return {"Expression": f"{s}/{t}", "Percentage": f"{(int(s)/int(t))*100}%", "Note": "1/2=Half, 1/4=Quarter"}
+        return {"Fraction": f"{s}/{t}", "Note": "Quarter" if s/t==0.25 else "Half" if s/t==0.5 else "Part"}
 
     @staticmethod
     def pattern(s):
-        nums = [int(x.strip()) for x in s.split(",")]
-        diff = nums[1]-nums[0]
-        return {"Next": nums[-1]+diff, "Rule": "Add "+str(diff)}
+        n = [int(x.strip()) for x in s.split(",")]
+        return {"Next": n[-1] + (n[1]-n[0])}
 
     @staticmethod
     def weight(kg, g):
-        return {"Total grams": int(kg)*1000 + int(g), "Visual": f"{kg}kg and {g}g"}
+        return {"Total (g)": int(kg)*1000 + int(g)}
 
     @staticmethod
     def clock(h, m):
-        return {"Time Display": f"{int(h)}:{int(m):02d}", "Angle": f"{abs(30*int(h)-5.5*int(m))} deg"}
+        return {"Display": f"{int(h)}:{int(m):02d}"}
 
     @staticmethod
     def shapes(s):
-        d = {"square": 4, "triangle": 3, "pentagon": 5}
-        return {"Corners": d.get(s.lower(), "Refer Class 2"), "Sides": d.get(s.lower(), "Refer Class 2")}
+        d = {"square":4, "triangle":3, "circle":0}
+        return {"Sides": d.get(s.lower(), "?")}
+
+    @staticmethod
+    def compare(x, y):
+        x, y = int(x), int(y)
+        if x > y: return {"Sign": ">", "Result": f"{x} is GREATER than {y}"}
+        if x < y: return {"Sign": "<", "Result": f"{x} is LESS than {y}"}
+        return {"Sign": "=", "Result": "EQUAL"}
+
+    @staticmethod
+    def money(rs, ps, c):
+        total = (int(rs)*100 + int(ps)) * int(c)
+        return {"Total Rs": total/100, "Notes/Coins": f"Total {c} items cost Rs {total/100}"}
+
+    @staticmethod
+    def sort(s):
+        n = [int(x.strip()) for x in s.split(",")]
+        return {"Ascending": sorted(n), "Descending": sorted(n, reverse=True)}
+
+    @staticmethod
+    def divide(t, f):
+        t, f = int(t), int(f)
+        return {"Each child gets": t//f, "Leftover": t%f}
 
 PRIMARY_MATHS_REGISTRY = {
     "Primary Math (1-5)": Maths_Primary

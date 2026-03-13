@@ -1,5 +1,5 @@
 """
-SigmaOS NCERT Primary Science (EVS) v9.0 — The Comprehensive series
+SigmaOS NCERT Primary Science (EVS) v10.0 — The Ultimate Series
 Classes 1–5 | Foundational Environmental Studies & Science
 100% stdlib, zero 3rd-party deps
 """
@@ -7,60 +7,62 @@ class Science_Primary_Classes:
     TITLE = "Primary EVS: Exhaustive Foundation Library"
     EXP_DATA = {
         "Sense Organs": ("senses", [("Organ", "eyes")]),
-        "Living vs Non-living": ("living", [("Grows?", "1"), ("Breathes?", "1")]),
-        "Food We Eat": ("food", [("Item", "Rice")]),
+        "Living/Non-living": ("living", [("Grows?", "1"), ("Breathes?", "1")]),
+        "Food Groups": ("food", [("Item", "Rice")]),
         "Neighborhood Help": ("neighborhood", [("Place", "Hospital")]),
-        "Shelter (Homes)": ("shelter", [("Region", "Mountain")]),
+        "Home Styles": ("shelter", [("Region", "Mountain")]),
         "Water Cycle": ("water_cycle", [("Step", "Rain")]),
-        "Plant Parts": ("plant", [("Part", "Leaf")]),
-        "Cleanliness": ("clean", [("Task", "Hands")]),
-        "States of Matter": ("matter", [("Example", "Ice")]),
-        "Seed Germination": ("germination", [("Water?", "1"), ("Air?", "1"), ("Sun?", "1")]),
-        "Animal Habitats": ("habitats", [("Animal", "Fish")]),
+        "Plant Anatomy": ("plant", [("Part", "Leaf")]),
+        "Cleanliness Skills": ("clean", [("Task", "Hands")]),
+        "Matter States": ("matter", [("Example", "Ice")]),
+        "Germination": ("germination", [("Water?", "1"), ("Air?", "1"), ("Sun?", "1")]),
+        "Animal Habitat": ("habitats", [("Animal", "Fish")]),
         "Transport Modes": ("transport", [("Vehicle", "Aeroplane")]),
-        "Seasons & Clothes": ("seasons", [("Season", "Summer")]),
-        "Day & Night": ("daynight", [("Is Sun out?", "1")]),
+        "Season Clothing": ("seasons", [("Season", "Summer")]),
+        "Cycle of Day": ("daynight", [("Sun visible?", "1")]),
+        "Family Roles": ("family", [("Role", "Father")]),
+        "Animal Sounds": ("voices", [("Animal", "Dog")]),
+        "Habit Checker": ("habits", [("Action", "Brushing teeth")]),
     }
 
     @staticmethod
     def senses(o):
         d = {"eyes":"Vision", "ears":"Hearing", "nose":"Smell", "tongue":"Taste", "skin":"Touch"}
-        return {"Used for": d.get(o.lower(), "Refer Class 3")}
+        return {"Role": d.get(o.lower(), "Sensing")}
 
     @staticmethod
     def living(g, b):
-        if int(g) and int(b): return {"Result": "LIVING"}
-        return {"Result": "NON-LIVING"}
+        return {"Result": "LIVING" if int(g) and int(b) else "NON-LIVING"}
 
     @staticmethod
     def food(i):
         i = i.lower()
         if i in ["rice", "wheat"]: return {"Group": "Energy"}
-        if i in ["milk", "egg"]: return {"Group": "Body-building"}
+        if i in ["milk", "egg"]: return {"Group": "Body"}
         return {"Group": "Protective"}
 
     @staticmethod
     def neighborhood(p):
-        d = {"hospital": "Treats Sick", "bank": "Saves Money", "post": "Mails letters"}
-        return {"Info": d.get(p.lower(), "Neighborhood help")}
+        d = {"hospital": "Treat", "bank": "Safe", "post": "Letters"}
+        return {"Duty": d.get(p.lower(), "Help")}
 
     @staticmethod
     def shelter(a):
-        d = {"mountain": "Sloping Roof", "desert": "Thick Mud", "river": "Houseboat"}
-        return {"Style": d.get(a.lower(), "Shelter")}
+        d = {"mountain": "Sloping", "desert": "Mud", "river": "Boat"}
+        return {"Roof": d.get(a.lower(), "Flat")}
 
     @staticmethod
     def water_cycle(p):
-        return {"Step": p}
+        return {"Process": p}
 
     @staticmethod
     def plant(p):
-        d = {"root": "Water absorb", "leaf": "Food factory", "stem": "Support"}
-        return {"Role": d.get(p.lower(), "Plant part")}
+        d = {"root": "Water", "leaf": "Food", "stem": "Support"}
+        return {"Duty": d.get(p.lower(), "Growth")}
 
     @staticmethod
     def clean(t):
-        return {"Guideline": "Cleanliness is next to godliness"}
+        return {"Guideline": "Cleanliness leads to health"}
 
     @staticmethod
     def matter(e):
@@ -71,28 +73,42 @@ class Science_Primary_Classes:
 
     @staticmethod
     def germination(w, a, s):
-        if int(w) and int(a) and int(s): return {"Result": "SUCCESS", "Note": "Seed grows into a sapling"}
-        return {"Result": "FAILURE", "Note": "Seeds need Water, Air, and Sunlight"}
+        if int(w) and int(a) and int(s): return {"Result": "Grows!"}
+        return {"Result": "Fails"}
 
     @staticmethod
     def habitats(a):
-        d = {"fish": "Aquatic", "monkey": "Arboreal", "lion": "Terrestrial", "camel": "Desert"}
-        return {"Habitat": d.get(a.lower(), "Natural home")}
+        d = {"fish": "Water", "monkey": "Tree", "lion": "Land", "camel": "Desert"}
+        return {"Home": d.get(a.lower(), "Forest")}
 
     @staticmethod
     def transport(v):
-        d = {"car": "Land", "boat": "Water", "aeroplane": "Air", "train": "Land"}
-        return {"Mode": d.get(v.lower(), "Transportation")}
+        d = {"car": "Land", "boat": "Water", "plane": "Air"}
+        return {"Path": d.get(v.lower(), "Land")}
 
     @staticmethod
     def seasons(s):
-        d = {"summer": "Cotton clothes", "winter": "Woolen clothes", "monsoon": "Raincoats"}
-        return {"Clothing": d.get(s.lower(), "Climate clothing")}
+        d = {"summer": "Cotton", "winter": "Woolen", "monsoon": "Rubber"}
+        return {"Cloth": d.get(s.lower(), "Cloth")}
 
     @staticmethod
     def daynight(s):
-        if int(s): return {"Status": "DAY", "Activity": "School & Work"}
-        return {"Status": "NIGHT", "Activity": "Sleep & Rest"}
+        return {"Active": "Day" if int(s) else "Night"}
+
+    @staticmethod
+    def family(r):
+        d = {"father":"Parent", "mother":"Parent", "brother":"Sibling", "sister":"Sibling"}
+        return {"Relationship": d.get(r.lower(), "Relative")}
+
+    @staticmethod
+    def voices(a):
+        d = {"dog":"Bark", "cat":"Meow", "lion":"Roar", "cow":"Moo"}
+        return {"Sound": d.get(a.lower(), "Noise")}
+
+    @staticmethod
+    def habits(a):
+        good = ["brushing", "bathing", "washing", "studying"]
+        return {"Quality": "GOOD" if any(x in a.lower() for x in good) else "NEEDS IMPROVEMENT"}
 
 SCIENCE_PRIMARY_REGISTRY = {
     "Primary EVS (1-5)": Science_Primary_Classes
