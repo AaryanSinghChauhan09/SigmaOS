@@ -1,7 +1,6 @@
 """
-SigmaOS NCERT Chemistry Lab v4.0
-Classes 6–12 | Every NCERT Chemistry experiment & calculation
-100% stdlib, zero 3rd-party deps
+SigmaOS NCERT Chemistry Lab v5.0 — The Complete Series
+Classes 6–12 | Comprehensive Chemical Lab simulations
 """
 import math, random
 
@@ -10,123 +9,105 @@ def _r(x, d=4):
     except: return x
 
 class Chemistry_Classes_6_10:
-    TITLE = "Classes 6–10 – Matter, Atoms, pH & Reactions"
+    TITLE = "Classes 6–10: Matter, Atoms, Acids & Organic Basics"
     EXP_DATA = {
-        "pH Calculator": ("calc_ph", [("H+ Concentration (M)", "0.001")]),
-        "Atomic Data": ("atom_data", [("Electrons/Z", "11"), ("Atomic Mass", "23")]),
-        "Mole Calculator": ("moles", [("Given Mass (g)", "44"), ("Molar Mass (g/mol)", "44")]),
-        "Titration": ("titration", [("M1 (Acid)", "0.1"), ("V1 (Acid)", "20"), ("V2 (Base)", "25")]),
-        "Reactivity Series": ("reactivity", [("Metal 1", "Iron"), ("Metal 2", "Copper")]),
-        "Separation Tech": ("separation", [("Mixture", "Salt and Water")]),
+        "pH & Indicators": ("ph_logic", [("H+ Conc (M)", "0.001")]),
+        "Atomic Structure": ("atom_build", [("Protons", "6"), ("Mass Number", "12")]),
+        "Chemical Formula": ("formula", [("Valency 1", "1"), ("Valency 2", "2")]),
+        "Balanced Eq Check": ("balance", [("Reactant H2", "2"), ("Reactant O2", "1"), ("Product H2O", "2")]),
+        "Metals Reactivity": ("displacement", [("Fe into CuSO4 (1/0)", "1")]),
+        "Brownian Motion": ("particles", [("Temperature (C)", "25")]),
+        "Hydrocarbon Type": ("carbon", [("C count", "2"), ("Double Bond (1/0)", "1")]),
     }
 
     @staticmethod
-    def calc_ph(h):
-        h = float(h)
-        p = -math.log10(h)
-        return {"pH": _r(p, 2), "Nature": "Acidic" if p < 7 else ("Basic" if p > 7 else "Neutral")}
+    def ph_logic(h):
+        ph = -math.log10(h)
+        return {"pH": _r(ph, 2), "Litmus": "Red" if ph < 7 else "Blue", "Type": "Acid" if ph < 7 else "Base"}
 
     @staticmethod
-    def atom_data(z, mass):
-        z, mass = int(z), int(mass)
-        return {"Protons": z, "Neutrons": mass - z, "Electrons": z}
+    def atom_build(p, a):
+        return {"Electrons": p, "Neutrons": a-p, "Element": "Check Periodic Table Z="+str(int(p))}
 
     @staticmethod
-    def moles(m, mm):
-        m, mm = float(m), float(mm)
-        return {"Amount (mol)": _r(m/mm, 4)}
+    def formula(v1, v2):
+        return {"Ratio": f"A{int(v2)}B{int(v1)}", "Rule": "Criss-cross valencies"}
 
     @staticmethod
-    def titration(m1, v1, v2):
-        m1, v1, v2 = float(m1), float(v1), float(v2)
-        m2 = (m1 * v1) / v2
-        return {"Molarity M2": _r(m2, 4)}
+    def balance(h2, o2, h2o):
+        # 2H2 + O2 = 2H2O
+        if h2/2 == o2/1 == h2o/2: return {"Status": "BALANCED"}
+        return {"Status": "UNBALANCED", "Correct Ratio": "2:1:2"}
 
     @staticmethod
-    def reactivity(m1, m2):
-        series = ["Potassium", "Sodium", "Calcium", "Magnesium", "Aluminium", "Zinc", "Iron", "Lead", "Hydrogen", "Copper", "Mercury", "Silver", "Gold"]
-        try:
-            i1 = series.index(m1.capitalize())
-            i2 = series.index(m2.capitalize())
-            return {"More Reactive": m1 if i1 < i2 else m2, "Displacement": "Yes" if i1 < i2 else "No"}
-        except: return {"Error": "Metal not in series"}
+    def displacement(react):
+        if int(react): return {"Result": "Blue solution turns Green", "Solid": "Brown Red Copper deposited"}
+        return {"Result": "No color change"}
 
     @staticmethod
-    def separation(mix):
-        data = {
-            "salt and water": "Evaporation / Distillation",
-            "oil and water": "Separating Funnel",
-            "iron and sand": "Magnetic Separation",
-            "chalk and water": "Filtration",
-            "dye": "Chromatography"
-        }
-        return {"Method": data.get(mix.lower(), "Refer NCERT Science Class 9 Ch-2")}
+    def particles(t):
+        speed = math.sqrt(t + 273) * 1.5
+        return {"Relative Motion": _r(speed, 2), "Observation": "Particles move faster as Temp rises"}
+
+    @staticmethod
+    def carbon(c, db):
+        if db: return {"Name": "Alkene (e.g. Ethene)", "Formula": f"C{int(c)}H{int(2*c)}"}
+        return {"Name": "Alkane (e.g. Ethane)", "Formula": f"C{int(c)}H{int(2*c+2)}"}
 
 class Chemistry_Classes_11_12:
-    TITLE = "Classes 11–12 – Physical, Organic, Inorganic & Analytical"
+    TITLE = "Classes 11–12: Thermodynamics, Kinetics, Solutions & Coordination"
     EXP_DATA = {
-        "Ideal Gas Law": ("ideal_gas", [("P (atm)", "1"), ("V (L)", "22.4"), ("n", "1")]),
-        "Packing Efficiency": ("packing", [("Type (SCC/BCC/FCC)", "FCC")]),
-        "EAN Rule": ("ean", [("Atomic Num Z", "26"), ("Oxidation State", "2"), ("Coordination Num", "6")]),
-        "Buffer pH": ("buffer", [("pKa/pKb", "4.74"), ("Salt Conc", "0.1"), ("Acid/Base Conc", "0.1")]),
-        "Nernst Equation": ("nernst", [("E0 Cell (V)", "1.1"), ("n", "2"), ("Q (Quotient)", "0.01")]),
-        "Rate Constant (1st Order)": ("rate_1st", [("Initial [A]0", "1.0"), ("Final [A]t", "0.5"), ("Time (s)", "600")]),
-        "Faraday's Law": ("faraday", [("Current (A)", "2"), ("Time (s)", "965"), ("Eq Weight", "31.75")]),
-        "Colloid Tyndall": ("tyndall", [("Solution Type", "Milk")]),
+        "Ideal Gas State": ("gas_law", [("P (atm)", "1"), ("V (L)", "22.4"), ("Moles", "1")]),
+        "Thermodynamics (Gibbs)": ("gibbs", [("dH (kJ)", "-50"), ("dS (J/K)", "50"), ("Temp (K)", "298")]),
+        "Kinetics (Half-life)": ("kinetic", [("k rate", "0.005"), ("Initial [A]", "1.0")]),
+        "Osmotic Pressure": ("osmosis", [("Molarity", "0.5"), ("Temp (K)", "298")]),
+        "Nernst Cell": ("nernst", [("E0 (V)", "1.1"), ("n elec", "2"), ("[Prod]/[React]", "0.1")]),
+        "Faraday Yield": ("faraday", [("Current (A)", "2"), ("Time (s)", "965"), ("Eq Wt", "31.75")]),
+        "EAN Coordination": ("ean", [("Z", "26"), ("Ox State", "3")]),
+        "Ebullioscopy": ("boil", [("Kb", "0.52"), ("Molality", "1")]),
     }
 
     @staticmethod
-    def ideal_gas(p, v, n):
-        p, v, n = float(p), float(v), float(n)
+    def gas_law(p, v, n):
         r = 0.0821
-        t = (p * v) / (n * r)
-        return {"Temp (K)": _r(t, 2)}
+        temp = (p*v)/(n*r)
+        return {"Temp (K)": _r(temp, 2)}
 
     @staticmethod
-    def packing(style):
-        data = {"scc": "52.4%", "bcc": "68%", "fcc": "74%"}
-        return {"Efficiency": data.get(style.lower(), "Unknown")}
+    def gibbs(dh, ds, t):
+        dg = dh - (t * ds / 1000)
+        return {"dG (kJ)": _r(dg, 2), "Spontaneous": "YES" if dg < 0 else "NO"}
 
     @staticmethod
-    def ean(z, ox, coord):
-        z, ox, coord = int(z), int(ox), int(coord)
-        # EAN = Z - Ox + 2*Coord
-        res = z - ox + 2*coord
-        return {"EAN": res, "Note": "Compare with nearest Noble Gas (36, 54, 86)"}
+    def kinetic(k, a0):
+        t12 = 0.693/k
+        return {"Half-life (s/min)": _r(t12, 2)}
 
     @staticmethod
-    def buffer(pka, salt, acid):
-        pka, salt, acid = float(pka), float(salt), float(acid)
-        # pH = pKa + log([Salt]/[Acid])
-        ph = pka + math.log10(salt / acid)
-        return {"pH": _r(ph, 3)}
+    def osmosis(m, t):
+        r = 0.0821
+        pi = m * r * t
+        return {"Pressure (atm)": _r(pi, 3)}
 
     @staticmethod
     def nernst(e0, n, q):
-        e0, n, q = float(e0), float(n), float(q)
-        e = e0 - (0.0591 / n) * math.log10(q)
-        return {"Cell Potential E (V)": _r(e, 4)}
-
-    @staticmethod
-    def rate_1st(a0, at, t):
-        a0, at, t = float(a0), float(at), float(t)
-        # k = (2.303/t) * log(a0/at)
-        k = (2.303 / t) * math.log10(a0 / at)
-        return {"Rate Constant k": f"{k:.4e}"}
+        e = e0 - (0.0591/n) * math.log10(q)
+        return {"E Cell (V)": _r(e, 4)}
 
     @staticmethod
     def faraday(i, t, w_eq):
-        i, t, w_eq = float(i), float(t), float(w_eq)
-        f = 96500
-        w = (w_eq / f) * i * t
-        return {"Mass (g)": _r(w, 5)}
+        w = (i*t*w_eq)/96500
+        return {"Mass deposited (g)": _r(w, 5)}
 
     @staticmethod
-    def tyndall(sol):
-        colloids = ["milk", "smoke", "fog", "solution of soap", "starch solution"]
-        if sol.lower() in colloids:
-            return {"Tyndall Effect": "Visible", "Nature": "Colloidal"}
-        return {"Tyndall Effect": "Not Visible", "Nature": "True Solution or Suspension"}
+    def ean(z, ox):
+        # EAN = Z - Ox + 2*Coord (assumed 6)
+        res = z - ox + 12
+        return {"EAN": res}
+
+    @staticmethod
+    def boil(kb, m):
+        return {"Elevation dTb (K)": _r(kb*m, 3)}
 
 CHEMISTRY_REGISTRY = {
     "Classes 6-10": Chemistry_Classes_6_10,

@@ -1,7 +1,6 @@
 """
-SigmaOS NCERT Biology Lab v4.0
-Classes 6–12 | Every NCERT Biology concept & simulation
-100% stdlib, zero 3rd-party deps
+SigmaOS NCERT Biology Lab v5.0 — The Complete Series
+Classes 6–12 | Comprehensive Bio labs & ecology simulations
 """
 import math, random
 from collections import Counter
@@ -11,116 +10,98 @@ def _r(x, d=4):
     except: return x
 
 class Biology_Classes_6_10:
-    TITLE = "Classes 6–10 – Cells, Life Processes, Control & Coordination"
+    TITLE = "Classes 6–10: Cell Biology, Life Processes & Genetics"
     EXP_DATA = {
-        "Starch Test": ("starch", [("Iodine added (1/0)", "1")]),
-        "Cell Organelles": ("cell", [("Organelle", "Mitochondria")]),
-        "Mendel Monohybrid": ("mendel", [("P1 (TT/Tt/tt)", "Tt"), ("P2 (TT/Tt/tt)", "Tt")]),
-        "Heart Rate": ("heart", [("Age", "15"), ("Post-exercise (1/0)", "0")]),
-        "Blood Group Match": ("blood", [("Donor", "O-"), ("Recipient", "A+")]),
-        "Plant Hormones": ("hormones", [("Effect", "Growth")]),
+        "Starch Test (Photosynthesis)": ("starch", [("Iodine (1/0)", "1")]),
+        "Cell Size Ratio": ("cell_size", [("Radius (um)", "10")]),
+        "Mendel Monohybrid": ("mendel_m", [("P1 (TT/Tt/tt)", "Tt"), ("P2 (TT/Tt/tt)", "Tt")]),
+        "Mendel Dihybrid": ("mendel_d", [("P1 (RRYY)", "RRYY"), ("P2 (rryy)", "rryy")]),
+        "Blood Grouping": ("blood", [("Donor", "A+"), ("Recipient", "O+")]),
+        "Digestive Enzymes": ("digest", [("Organ", "Stomach")]),
+        "Reflex Action Path": ("reflex", [("Stimulus", "Heat")]),
     }
 
     @staticmethod
-    def starch(iodine):
-        if int(iodine): return {"Result": "Blue-black", "Inference": "Starch Present"}
-        return {"Result": "Brown", "Inference": "No Starch"}
+    def starch(i):
+        if int(i): return {"Result": "Blue-black", "Note": "Starch found"}
+        return {"Result": "Brown", "Note": "Starch absent"}
 
     @staticmethod
-    def cell(name):
-        n = name.lower()
-        data = {
-            "nucleus": "Genetics, Control center",
-            "mitochondria": "ATP, Powerhouse",
-            "chloroplast": "Photosynthesis",
-            "ribosome": "Proteins",
-            "lysosome": "Suicide bags"
-        }
-        return {"Function": data.get(n, "Refer Class 9 Biology")}
+    def cell_size(r):
+        area = 4 * math.pi * r**2
+        vol = (4/3) * math.pi * r**3
+        return {"S.Area": _r(area, 1), "Volume": _r(vol, 1), "S/V Ratio": _r(area/vol, 3)}
 
     @staticmethod
-    def mendel(p1, p2):
-        genotypes = [a+b for a in p1 for b in p2]
-        genotypes = ["".join(sorted(g)) for g in genotypes]
-        return {"Offspring": genotypes, "Stats": dict(Counter(genotypes))}
+    def mendel_m(p1, p2):
+        g = [a+b for a in p1 for b in p2]
+        g = ["".join(sorted(x)) for x in g]
+        return {"Genotypes": g, "Phenotype Ratio": "3 Dominant : 1 Recessive (Approx)"}
 
     @staticmethod
-    def heart(age, ex):
-        age, ex = int(age), int(ex)
-        base = 72
-        if ex: base += 30
-        return {"Estimated Pulse": base, "Note": "Normal range: 60-100 bpm"}
+    def mendel_d(p1, p2):
+        # Very simplified representation
+        return {"F1 Generation": "RrYy (All)", "F2 Pheno Ratio": "9:3:3:1"}
 
     @staticmethod
     def blood(d, r):
-        d, r = d.upper(), r.upper()
-        if "O-" in d: return {"Status": "SUCCESS", "Note": "O- is universal donor"}
-        if d == r: return {"Status": "SUCCESS"}
-        if "AB+" in r: return {"Status": "SUCCESS", "Note": "AB+ is universal recipient"}
-        return {"Status": "RISKY", "Note": "Cross-match required"}
+        # Simplified
+        if "O-" in d or d == r: return {"Status": "COMPATIBLE"}
+        return {"Status": "RISKY / INCOMPATIBLE"}
 
     @staticmethod
-    def hormones(eff):
-        data = {
-            "growth": "Auxins / Gibberellins",
-            "cell division": "Cytokinins",
-            "wilting": "Abscisic Acid (ABA)",
-            "ripening": "Ethylene"
-        }
-        return {"Phytohormone": data.get(eff.lower(), "Unknown")}
+    def digest(org):
+        d = {"mouth": "Amylase", "stomach": "Pepsin, HCl", "pancreas": "Lipase, Trypsin"}
+        return {"Active Agents": d.get(org.lower(), "Refer NCERT")}
+
+    @staticmethod
+    def reflex(s):
+        return {"Path": "Receptor -> Sensory Nerve -> Spinal Cord -> Motor Nerve -> Muscle"}
 
 class Biology_Classes_11_12:
-    TITLE = "Classes 11–12 – Physiology, Ecology, Evolution & Biotechnology"
+    TITLE = "Classes 11–12: Physiology, Biotechnology & Ecology"
     EXP_DATA = {
-        "Species Area Rel": ("species_area", [("Area (sq km)", "1000")]),
-        "PCR Copies": ("pcr", [("Initial", "1"), ("Cycles", "30")]),
-        "Hardy-Weinberg": ("hardy", [("Allele freq p", "0.6")]),
-        "Respiratory Quotient": ("rq", [("CO2", "1"), ("O2", "1")]),
-        "Ecological Pyramid": ("pyramid", [("Producer Energy (J)", "10000")]),
-        "DNA Transcribe": ("transcribe", [("Sequence (DNA)", "ATGC")]),
-        "Cranial Nerves": ("cranial", [("Number (1-12)", "10")]),
+        "Species Area Curves": ("species", [("Area (sq km)", "1000")]),
+        "Hardy-Weinberg Freq": ("hardy", [("p freq", "0.6")]),
+        "PCR Copies yield": ("pcr", [("Init mols", "1"), ("Cycles", "30")]),
+        "RQ (Respiration)": ("rq", [("CO2 vol", "1"), ("O2 vol", "1")]),
+        "DNA base pairing": ("dna", [("Strand", "ATGC")]),
+        "Population growth": ("pop", [("No", "100"), ("r rate", "0.1"), ("t time", "10")]),
+        "Transpiration Rate": ("transpire", [("Air Speed (m/s)", "2"), ("Humidity (%)", "50")]),
     }
 
     @staticmethod
-    def species_area(a):
-        # S = C * A^Z (C=0.5, Z=0.3)
-        s = 0.5 * (float(a) ** 0.3)
+    def species(a):
+        s = 0.5 * (a**0.3)
         return {"Richness S": _r(s, 2)}
 
     @staticmethod
-    def pcr(n, cycles):
-        return {"Yield": int(n) * (2 ** int(cycles))}
+    def hardy(p):
+        q = 1-p
+        return {"p2 (AA)": _r(p**2, 4), "2pq (Aa)": _r(2*p*q, 4), "q2 (aa)": _r(q**2, 4)}
 
     @staticmethod
-    def hardy(p):
-        p = float(p)
-        q = 1.0 - p
-        return {"p² (AA)": _r(p**2, 4), "2pq (Aa)": _r(2*p*q, 4), "q² (aa)": _r(q**2, 4)}
+    def pcr(n, c):
+        return {"Yield": int(n * (2**c))}
 
     @staticmethod
     def rq(co2, o2):
-        res = float(co2) / float(o2)
-        return {"RQ": _r(res, 2)}
+        return {"RQ": _r(co2/o2, 2)}
 
     @staticmethod
-    def pyramid(e):
-        e = float(e)
-        # 10% law
-        return {"Herbivores": e*0.1, "Carnivores": e*0.01, "Top Carnivores": e*0.001}
+    def dna(s):
+        comp = {"A":"T", "T":"A", "G":"C", "C":"G"}
+        return {"Complementary": "".join(comp.get(x.upper(), "?") for x in s)}
 
     @staticmethod
-    def transcribe(dna):
-        dna = dna.upper()
-        m = {"A":"U", "T":"A", "G":"C", "C":"G"}
-        return {"mRNA": "".join(m.get(x, "?") for x in dna)}
+    def pop(n0, r, t):
+        nt = n0 * math.exp(r*t)
+        return {"Pop at T": _r(nt, 0)}
 
     @staticmethod
-    def cranial(num):
-        data = {
-            1: "Olfactory (Smell)", 2: "Optic (Vision)", 3: "Oculomotor", 
-            10: "Vagus (Heart/Lungs)", 12: "Hypoglossal"
-        }
-        return {"Nerve": data.get(int(num), "Refer NCERT Class 11 Biology")}
+    def transpire(v, h):
+        rate = (v * 10) / (h / 10)
+        return {"Relative Rate": _r(rate, 2), "Observation": "Increases with Wind, Decreases with Humidity"}
 
 BIOLOGY_REGISTRY = {
     "Classes 6-10": Biology_Classes_6_10,

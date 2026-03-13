@@ -1,7 +1,6 @@
 """
-SigmaOS NCERT Physics Lab v4.0
-Classes 6–12 | Every NCERT Physics experiment & calculation
-100% stdlib, zero 3rd-party deps
+SigmaOS NCERT Physics Lab v5.0 — The Complete Series
+Classes 6–12 | Comprehensive Experiment Repository
 """
 import math, random
 
@@ -10,161 +9,131 @@ def _r(x, d=4):
     except: return x
 
 class Physics_Classes_6_10:
-    TITLE = "Classes 6–10 – Light, Motion, Electricity & Gravitation"
+    TITLE = "Classes 6–10: Mechanics, Light, Electricity & Magnetism"
     EXP_DATA = {
-        "Ohm's Law": ("ohms_law", [("Voltage V (V)", "10"), ("Resistance R (Ω)", "5")]),
-        "Law of Reflection": ("reflection", [("Angle of Incidence (°)", "45")]),
-        "Acceleration": ("accel", [("Final Vel (m/s)", "20"), ("Initial Vel (m/s)", "0"), ("Time (s)", "5")]),
-        "Force (F=ma)": ("force", [("Mass (kg)", "10"), ("Accel (m/s²)", "2")]),
-        "Work Done": ("work", [("Force (N)", "50"), ("Distance (m)", "10")]),
-        "Lens Formula": ("lens", [("Object dist u (cm)", "-20"), ("Focal length f (cm)", "10")]),
-        "Mirror Formula": ("mirror", [("Object dist u (cm)", "-30"), ("Focal length f (cm)", "-15")]),
-        "Resistance Combinations": ("res_comb", [("R1 (Ω)", "10"), ("R2 (Ω)", "20"), ("Type (s/p)", "p")]),
-        "Universal Gravitation": ("gravity", [("Mass 1 (kg)", "5.97e24"), ("Mass 2 (kg)", "7.35e22"), ("Distance (m)", "3.84e8")]),
-        "Sound Velocity": ("sound", [("Frequency (Hz)", "440"), ("Wavelength (m)", "0.78")]),
-        "Density Calculator": ("density", [("Mass (kg)", "10"), ("Volume (m³)", "0.002")]),
+        "Ohm's Law": ("ohms_law", [("Voltage (V)", "10"), ("Resistance (Ohm)", "5")]),
+        "Mirror/Lens Formula": ("optics", [("Type (Mirror/Lens)", "Mirror"), ("Object dist u (cm)", "-20"), ("Focal length f (cm)", "10")]),
+        "Resistance Combinations": ("resistors", [("R1", "10"), ("R2", "20"), ("R3", "30"), ("Type (Series/Para)", "Series")]),
+        "Atmospheric Pressure": ("pressure", [("Height above sea (m)", "1000")]),
+        "Archimedes Principle": ("buoyancy", [("Object Vol (m3)", "0.001"), ("Fluid Density (kg/m3)", "1000")]),
+        "Magnetic Field (Wire)": ("mag_field", [("Current (A)", "5"), ("Distance (m)", "0.02")]),
+        "Kinetic/Potential Energy": ("energy", [("Mass (kg)", "2"), ("Velocity (m/s)", "10"), ("Height (m)", "5")]),
+        "Simple Pendulum (Time)": ("pendulum", [("Length (m)", "1"), ("Gravity (m/s2)", "9.8")]),
     }
 
     @staticmethod
-    def ohms_law(V, R):
-        return {"Current I (A)": _r(V/R, 4), "Power P (W)": _r(V**2/R, 2)}
+    def ohms_law(v, r):
+        return {"Current I (A)": _r(v/r), "Power P (W)": _r(v**2/r)}
 
     @staticmethod
-    def reflection(angle_i):
-        return {"Angle of Reflection": angle_i, "Note": "Incident ray, reflected ray and normal lie in same plane"}
-
-    @staticmethod
-    def accel(v, u, t):
-        return {"Acceleration (m/s²)": _r((v-u)/t, 2)}
-
-    @staticmethod
-    def force(m, a):
-        return {"Force (N)": m * a}
-
-    @staticmethod
-    def work(f, d):
-        return {"Work (Joules)": f * d}
-
-    @staticmethod
-    def lens(u, f):
-        v_inv = 1/f + 1/u
-        v = 1/v_inv
-        m = v / u
+    def optics(t, u, f):
+        u, f = float(u), float(f)
+        if "mirror" in t.lower():
+            v = 1 / (1/f - 1/u)
+            m = -v/u
+        else:
+            v = 1 / (1/f + 1/u)
+            m = v/u
         return {"Image dist v (cm)": _r(v, 2), "Magnification m": _r(m, 2)}
 
     @staticmethod
-    def mirror(u, f):
-        v_inv = 1/f - 1/u
-        v = 1/v_inv
-        m = -v / u
-        return {"Image dist v (cm)": _r(v, 2), "Magnification m": _r(m, 2)}
+    def resistors(r1, r2, r3, mode):
+        if "series" in mode.lower(): 
+            req = r1 + r2 + r3
+        else: 
+            req = 1 / (1/r1 + 1/r2 + 1/r3)
+        return {"Req (Total)": _r(req, 2)}
 
     @staticmethod
-    def res_comb(r1, r2, mode):
-        if mode.lower() == "s": return {"Req (Series)": r1 + r2}
-        return {"Req (Parallel)": _r((r1*r2)/(r1+r2), 2)}
+    def pressure(h):
+        # P = P0 * exp(-mgh/kT) simplified
+        p = 101325 * math.exp(-0.00012 * h)
+        return {"Pressure (Pa)": _r(p, 0), "In atm": _r(p/101325, 3)}
 
     @staticmethod
-    def gravity(m1, m2, r):
-        G = 6.674e-11
-        f = G * m1 * m2 / (r**2)
+    def buoyancy(v, d):
+        f = v * d * 9.8
+        return {"Upthrust (N)": _r(f, 2)}
+
+    @staticmethod
+    def mag_field(i, r):
+        # B = mu0 * I / 2pi*r
+        b = (4 * math.pi * 1e-7 * i) / (2 * math.pi * r)
+        return {"B Field (Tesla)": f"{b:.4e}"}
+
+    @staticmethod
+    def energy(m, v, h):
+        ke = 0.5 * m * v**2
+        pe = m * 9.8 * h
+        return {"Kinetic (J)": _r(ke, 2), "Potential (J)": _r(pe, 2), "Total (J)": _r(ke+pe, 2)}
+
+    @staticmethod
+    def pendulum(l, g):
+        t = 2 * math.pi * math.sqrt(l/g)
+        return {"Time Period (s)": _r(t, 2)}
+
+class Physics_Classes_11_12:
+    TITLE = "Classes 11–12: Advanced Mechanics, Waves, E-Mag & Modern Physics"
+    EXP_DATA = {
+        "Projectile Motion": ("projectile", [("Vel (m/s)", "20"), ("Angle (deg)", "45")]),
+        "Young's Double Slit": ("ydse", [("Wave (nm)", "600"), ("Slit d (mm)", "0.5"), ("Dist D (m)", "1")]),
+        "Bohr's Atom (Hydrogen)": ("bohr", [("Orbit n", "1")]),
+        "AC Impedance (LCR)": ("lcr", [("R (ohm)", "10"), ("L (mH)", "50"), ("C (uF)", "100"), ("Freq (Hz)", "50")]),
+        "Velocity of Sound (Resinence)": ("sound_vel", [("Freq (Hz)", "512"), ("L1 (cm)", "16.1"), ("L2 (cm)", "49.5")]),
+        "Photoelectric Equation": ("photo", [("Work Function (eV)", "2.1"), ("Light Wave (nm)", "400")]),
+        "Coulomb's Law": ("coulomb", [("q1 (C)", "1e-6"), ("q2 (C)", "1e-6"), ("r (m)", "0.1")]),
+        "Einstein Mass-Energy": ("einstein", [("Mass (kg)", "0.001")]),
+    }
+
+    @staticmethod
+    def projectile(v, theta):
+        rad = math.radians(theta)
+        g = 9.8
+        rng = (v**2 * math.sin(2*rad)) / g
+        hmax = (v**2 * math.sin(rad)**2) / (2*g)
+        return {"Range (m)": _r(rng, 2), "Max Height (m)": _r(hmax, 2)}
+
+    @staticmethod
+    def ydse(lam, d, big_d):
+        beta = (lam*1e-9 * big_d) / (d*1e-3)
+        return {"Fringe Width (m)": f"{beta:.4e}"}
+
+    @staticmethod
+    def bohr(n):
+        e = -13.6 / (n**2)
+        r = 0.529 * (n**2)
+        return {"Energy (eV)": _r(e, 2), "Radius (A)": _r(r, 3)}
+
+    @staticmethod
+    def lcr(r, l, c, f):
+        xl = 2 * math.pi * f * (l/1000)
+        xc = 1 / (2 * math.pi * f * (c/1e6))
+        z = math.sqrt(r**2 + (xl-xc)**2)
+        phi = math.degrees(math.atan((xl-xc)/r))
+        return {"Impedance Z (ohm)": _r(z, 2), "Phase Angle": _r(phi, 2)}
+
+    @staticmethod
+    def sound_vel(f, l1, l2):
+        v = 2 * f * ((l2-l1)/100)
+        return {"Velocity (m/s)": _r(v, 2)}
+
+    @staticmethod
+    def photo(phi_ev, lam_nm):
+        h = 6.626e-34; c = 3e8; ev = 1.6e-19
+        e_in = (h * c) / (lam_nm * 1e-9 * ev)
+        kmax = e_in - phi_ev
+        return {"Input Energy (eV)": _r(e_in, 2), "K-Max (eV)": _r(max(0, kmax), 2)}
+
+    @staticmethod
+    def coulomb(q1, q2, r):
+        k = 8.987e9
+        f = k * q1 * q2 / r**2
         return {"Force (N)": f"{f:.4e}"}
 
     @staticmethod
-    def sound(freq, lam):
-        return {"Velocity (m/s)": freq * lam}
-
-    @staticmethod
-    def density(m, v):
-        return {"Density (kg/m³)": m / v}
-
-class Physics_Classes_11_12:
-    TITLE = "Classes 11–12 – Mechanics, Thermodynamics, Electromagnetism & Modern Physics"
-    EXP_DATA = {
-        "Vernier Caliper": ("vernier", [("Main Scale (cm)", "2.5"), ("Vernier Div", "4"), ("LC (cm)", "0.01")]),
-        "Screw Gauge": ("screw", [("Pitch Scale (mm)", "5"), ("Head Div", "32"), ("LC (mm)", "0.01")]),
-        "Moment of Inertia": ("moi", [("Shape (Ring/Disc/Sphere)", "Ring"), ("Mass (kg)", "2"), ("Radius (m)", "0.5")]),
-        "Escape Velocity": ("escape_vel", [("Planet Mass (kg)", "5.97e24"), ("Radius (m)", "6.37e6")]),
-        "Carnot Efficiency": ("carnot", [("Source Temp (K)", "600"), ("Sink Temp (K)", "300")]),
-        "Projectile Motion": ("projectile", [("Velocity (m/s)", "20"), ("Angle (deg)", "45")]),
-        "Young's Double Slit": ("ydse", [("Wavelength (nm)", "600"), ("Slit dist d (mm)", "0.5"), ("Screen dist D (m)", "1")]),
-        "Wheatstone Bridge": ("wheatstone", [("P (Ω)", "10"), ("Q (Ω)", "20"), ("R (Ω)", "30")]),
-        "Lorentz Force": ("lorentz", [("Charge (C)", "1.6e-19"), ("Velocity (m/s)", "1e5"), ("B Field (T)", "0.5")]),
-        "Half Life Decay": ("halflife", [("Initial Amt", "100"), ("Half-life (s)", "60"), ("Elapsed (s)", "120")]),
-        "Logic Gates": ("logic", [("Gate (AND/OR/XOR/NAND/NOR)", "AND"), ("A (1/0)", "1"), ("B (1/0)", "0")]),
-    }
-
-    @staticmethod
-    def vernier(msr, vsd, lc):
-        return {"Total Reading (cm)": _r(msr + (vsd * lc), 3)}
-
-    @staticmethod
-    def screw(psr, hsd, lc):
-        return {"Total Reading (mm)": _r(psr + (hsd * lc), 3)}
-
-    @staticmethod
-    def moi(shape, m, r):
-        s = shape.lower()
-        if "ring" in s: i = m * r**2
-        elif "disc" in s: i = 0.5 * m * r**2
-        elif "sphere" in s: i = 0.4 * m * r**2 # Solid
-        else: return {"Error": "Shape unknown"}
-        return {"MOI (kg·m²)": _r(i, 4)}
-
-    @staticmethod
-    def escape_vel(m, r):
-        G = 6.674e-11
-        v = math.sqrt(2 * G * m / r)
-        return {"Escape Velocity (m/s)": _r(v, 2)}
-
-    @staticmethod
-    def carnot(th, tc):
-        eff = 1 - (tc / th)
-        return {"Efficiency": _r(eff, 4), "Percentage": f"{_r(eff*100, 2)}%"}
-
-    @staticmethod
-    def projectile(v, theta_deg):
-        g = 9.8
-        tr = math.radians(theta_deg)
-        r = (v**2 * math.sin(2 * tr)) / g
-        h = (v**2 * (math.sin(tr)**2)) / (2 * g)
-        t = (2 * v * math.sin(tr)) / g
-        return {"Range (m)": _r(r, 2), "Max Height (m)": _r(h, 2), "Time (s)": _r(t, 2)}
-
-    @staticmethod
-    def ydse(lam_nm, d_mm, big_d):
-        lam = lam_nm * 1e-9
-        small_d = d_mm * 1e-3
-        width = (lam * big_d) / small_d
-        return {"Fringe Width (m)": f"{width:.4e}"}
-
-    @staticmethod
-    def wheatstone(p, q, r):
-        # S = (Q/P) * R
-        s = (q / p) * r
-        return {"Unknown Resistance S (Ω)": _r(s, 2)}
-
-    @staticmethod
-    def lorentz(q, v, b):
-        # F = qvB (max)
-        f = q * v * b
-        return {"Magnetic Force (N)": f"{f:.4e}"}
-
-    @staticmethod
-    def logic(gate, a, b):
-        g = gate.upper()
-        if g == "AND": out = 1 if a and b else 0
-        elif g == "OR": out = 1 if a or b else 0
-        elif g == "XOR": out = 1 if a != b else 0
-        elif g == "NAND": out = 0 if a and b else 1
-        elif g == "NOR": out = 1 if not (a or b) else 0
-        else: return {"Error": "Invalid"}
-        return {"Result": out}
-
-    @staticmethod
-    def halflife(n0, th, t):
-        nt = n0 * (0.5 ** (t / th))
-        return {"Remaining": _r(nt, 4)}
+    def einstein(m):
+        e = m * (3e8)**2
+        return {"Energy (Joules)": f"{e:.4e}"}
 
 PHYSICS_REGISTRY = {
     "Classes 6-10": Physics_Classes_6_10,
