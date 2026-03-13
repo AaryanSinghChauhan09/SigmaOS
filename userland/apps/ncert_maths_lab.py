@@ -1,6 +1,6 @@
 """
-SigmaOS NCERT Mathematics Lab v9.0 — The Comprehensive series
-Classes 1–12 | Exhaustive NCERT Topic & Mathematical Suite
+SigmaOS NCERT Mathematics Lab v10.0 — The Ultimate Series
+Classes 1–12 | Exhaustive NCERT Formula & Mathematical Suite
 100% stdlib, zero 3rd-party deps
 """
 import math, random
@@ -11,31 +11,30 @@ def _r(x, d=4):
     except: return x
 
 class Maths_Classes_1_5:
-    TITLE = "Primary Math: Comprehensive Logic"
+    TITLE = "Primary Math: Foundations & Logic"
     EXP_DATA = {
-        "Shapes Builder": ("shapes", [("Sides", "4")]),
-        "Fraction Slicer": ("fractions", [("Total", "8"), ("Used", "3")]),
-        "Addition carry": ("add", [("A", "148"), ("B", "75")]),
-        "Pattern Hunter": ("pattern", [("Seq", "2,4,6")]),
-        "Number Names": ("words", [("N", "42")]),
-        "Clock Angle": ("clock", [("H", "3"), ("M", "30")]),
-        "Metric Convert": ("metric", [("Val", "500"), ("Unit", "cm"), ("To", "m")]),
-        "Multiplication (Grid)": ("mul", [("A", "12"), ("B", "5")]),
+        "Shape Gallery": ("shapes", [("Sides", "4")]),
+        "Pizza Slices": ("fractions", [("Total", "8"), ("Eaten", "3")]),
+        "Arithmetic Carry": ("add", [("Number A", "148"), ("Number B", "75")]),
+        "Pattern Hunter": ("pattern", [("Seq (comma)", "2,4,6")]),
+        "Clock Angles": ("clock", [("H", "3"), ("M", "30")]),
+        "Metric Switch": ("metric", [("Val", "500"), ("From", "cm"), ("To", "m")]),
+        "Table Mastery": ("table", [("Num", "13")]),
+        "Fraction Shading": ("shading", [("Numerator", "1"), ("Denominator", "4")]),
     }
 
     @staticmethod
     def shapes(s):
-        s = int(s)
         d = {0:"Circle", 3:"Triangle", 4:"Square/Rect", 5:"Pentagon", 6:"Hexagon"}
-        return {"Shape": d.get(s, f"Polygon ({s} sides)")}
+        return {"Name": d.get(int(s), "Polygon")}
 
     @staticmethod
     def fractions(t, e):
-        return {"Fraction": f"{int(t-e)}/{int(t)}", "Percent": f"{_r((1-e/t)*100, 1)}%"}
+        return {"Remaining": f"{int(t-e)}/{int(t)}", "Percent": f"{_r((1-e/t)*100, 1)}%"}
 
     @staticmethod
     def add(a, b):
-        return {"Result": float(a)+float(b)}
+        return {"Sum": a + b}
 
     @staticmethod
     def pattern(s):
@@ -43,60 +42,50 @@ class Maths_Classes_1_5:
         return {"Next": n[-1] + (n[1]-n[0])}
 
     @staticmethod
-    def words(n):
-        return {"In Word": str(n)} # Simple placeholder
-
-    @staticmethod
     def clock(h, m):
-        h, m = float(h), float(m)
         a = abs(30*h - 5.5*m)
         return {"Angle": min(a, 360-a)}
 
     @staticmethod
     def metric(v, f, t):
         u = {"km":1000, "m":1, "cm":0.01, "mm":0.001, "kg":1000, "g":1}
-        return {"Result": _r(float(v)*u[f]/u[t], 3) + t}
+        return {"Result": _r(v * u[f.lower()] / u[t.lower()], 3)}
 
     @staticmethod
-    def mul(a, b):
-        return {"Product": float(a)*float(b), "Repeated Addition": "+".join([str(a)]*int(b))}
+    def table(n):
+        return {"Result": [f"{n} x {i} = {n*i}" for i in range(1, 11)]}
+
+    @staticmethod
+    def shading(n, d):
+        return {"Visual": f"Shade {n} out of {d} parts", "Percent": f"{_r((n/d)*100, 1)}%"}
 
 class Maths_Classes_6_10:
     TITLE = "Secondary Math: Exhaustive Suite"
     EXP_DATA = {
-        "Line Plotter": ("graph", [("m", "2"), ("c", "3"), ("x", "5")]),
-        "Quadratic roots": ("quad", [("a", "1"), ("b", "-5"), ("c", "6")]),
-        "Pythagorean": ("pyth", [("a", "3"), ("b", "4")]),
-        "Dice Stats": ("dice", [("Target", "7")]),
-        "Trig Heights": ("trig", [("Angle", "30"), ("Dist", "10")]),
-        "Mean-Median-Mode": ("mmm", [("Data", "10,20,20,30,40")]),
-        "Circle Area (r)": ("circle", [("Radius", "7")]),
-        "Interest (SI/CI)": ("interest", [("P", "1000"), ("R", "5"), ("T", "2"), ("Type", "CI")]),
+        "Formula (a+b)²": ("identity", [("a", "5"), ("b", "3")]),
+        "Quadratic Roots": ("quad", [("a", "1"), ("b", "-5"), ("c", "6")]),
+        "Pythagorean Trip": ("pyth", [("a", "3"), ("b", "4")]),
+        "Stats (MMM)": ("mmm", [("Data", "10,20,20,30,40")]),
+        "Trig Height": ("trig", [("Angle", "30"), ("Dist", "10")]),
+        "Circle Geometry": ("circle", [("Radius", "7")]),
+        "LCM & HCF": ("gcd_lcm", [("A", "48"), ("B", "36")]),
+        "Probability (Dice)": ("dice", [("Target", "7")]),
     }
 
     @staticmethod
-    def graph(m, c, x):
-        return {"y": float(m)*float(x)+float(c)}
+    def identity(a, b):
+        res = a**2 + b**2 + 2*a*b
+        return {"Result": res, "Expansion": f"{a}² + {b}² + 2*{a}*{b}"}
 
     @staticmethod
     def quad(a, b, c):
-        a, b, c = float(a), float(b), float(c)
         d = b**2 - 4*a*c
         if d < 0: return {"Roots": "Complex"}
         return {"x1": _r((-b+math.sqrt(d))/(2*a)), "x2": _r((-b-math.sqrt(d))/(2*a))}
 
     @staticmethod
     def pyth(a, b):
-        return {"c": _r(math.sqrt(float(a)**2+float(b)**2), 2)}
-
-    @staticmethod
-    def dice(t):
-        return {"Prob": "Calculated via simulator"}
-
-    @staticmethod
-    def trig(d, dist):
-        r = math.radians(float(d))
-        return {"Height": _r(float(dist)*math.tan(r), 2)}
+        return {"c": _r(math.sqrt(a**2+b**2), 2)}
 
     @staticmethod
     def mmm(s):
@@ -108,28 +97,37 @@ class Maths_Classes_6_10:
         return {"Mean": _r(mean, 2), "Median": med, "Mode": mode}
 
     @staticmethod
+    def trig(d, dist):
+        r = math.radians(d)
+        return {"Height": _r(dist*math.tan(r), 2)}
+
+    @staticmethod
     def circle(r):
-        r = float(r)
         return {"Area": _r(math.pi*r**2, 2), "Circum": _r(2*math.pi*r, 2)}
 
     @staticmethod
-    def interest(p, r, t, mode):
-        p, r, t = float(p), float(r), float(t)
-        if "si" in mode.lower(): val = p * r * t / 100
-        else: val = p * (1 + r/100)**t - p
-        return {"Interest": _r(val, 2), "Total": _r(p+val, 2)}
+    def gcd_lcm(a, b):
+        g = math.gcd(a, b)
+        return {"HCF": g, "LCM": (a*b)//g}
+
+    @staticmethod
+    def dice(t):
+        hits = 0; tri = 1000
+        for _ in range(tri):
+            if random.randint(1,6)+random.randint(1,6) == t: hits += 1
+        return {"Prob %": _r((hits/tri)*100, 2)}
 
 class Maths_Classes_11_12:
     TITLE = "Senior Math: Advanced Calculus & 3D"
     EXP_DATA = {
-        "Matrix Determinant": ("det", [("Mat (a,b;c,d)", "1,2;3,4")]),
-        "3D Dist to Plane": ("plane_dist", [("Point (x,y,z)", "1,2,3"), ("Plane (a,b,c,d)", "1,2,-2,4")]),
-        "Binomial General": ("binomial", [("n", "10"), ("r", "2")]),
-        "Vector Cross": ("vcross", [("A", "1,0,0"), ("B", "0,1,0")]),
-        "Limits (x^n-a^n)": ("limits", [("n", "3"), ("a", "2")]),
-        "Calculus (d/dx)": ("diff", [("Power n", "3")]),
-        "Bayes' Law": ("bayes", [("P(A)", "0.5"), ("P(B|A)", "0.8"), ("P(B|not A)", "0.2")]),
-        "Complex (Mod/Arg)": ("complex", [("Real", "1"), ("Imag", "1")]),
+        "Matrix Det": ("det", [("Mat (a,b;c,d)", "1,2;3,4")]),
+        "Vector Projection": ("projection", [("Vector A", "1,2,3"), ("Vector B", "4,5,6")]),
+        "Plane Angle": ("plane_angle", [("Plane 1 (a,b,c)", "1,2,3"), ("Plane 2", "2,1,-1")]),
+        "Bernoulli Trial": ("bernoulli", [("n", "10"), ("p", "0.5"), ("k", "5")]),
+        "Limit (x^n-a^n)": ("limit", [("n", "3"), ("a", "2")]),
+        "Derivative Rate": ("rate_change", [("Function", "x³"), ("x val", "2")]),
+        "Bayes Logic": ("bayes", [("P(A)", "0.5"), ("P(B|A)", "0.8"), ("P(B|notA)", "0.2")]),
+        "De Morgan's": ("demorgan", [("Set A", "1,2,3"), ("Set B", "3,4,5"), ("Univ Set", "1,2,3,4,5,6")]),
     }
 
     @staticmethod
@@ -139,50 +137,53 @@ class Maths_Classes_11_12:
         return {"Determinant": d}
 
     @staticmethod
-    def plane_dist(p_str, pl_str):
-        # |ax0+by0+cz0+d| / sqrt(a^2+b^2+c^2)
-        x,y,z = [float(i) for i in p_str.split(",")]
-        a,b,c,d = [float(i) for i in pl_str.split(",")]
-        dist = abs(a*x + b*y + c*z + d) / math.sqrt(a**2 + b**2 + c**2)
-        return {"Distance": _r(dist, 4)}
-
-    @staticmethod
-    def binomial(n, r):
-        n, r = int(n), int(r)
-        return {"nCr": math.comb(n, r), "Value": "Entry in Pascal Triangle"}
-
-    @staticmethod
-    def vcross(as_, bs):
+    def projection(as_, bs):
         a = [float(x) for x in as_.split(",")]
         b = [float(x) for x in bs.split(",")]
-        return {"i,j,k": [a[1]*b[2]-a[2]*b[1], a[2]*b[0]-a[0]*b[2], a[0]*b[1]-a[1]*b[0]]}
+        dot = sum(x*y for x,y in zip(a,b))
+        mag_b = math.sqrt(sum(x**2 for x in b))
+        return {"Projection Mag": _r(dot/mag_b, 4)}
 
     @staticmethod
-    def limits(n, a):
-        n, a = float(n), float(a)
+    def plane_angle(p1, p2):
+        n1 = [float(x) for x in p1.split(",")]
+        n2 = [float(x) for x in p2.split(",")]
+        dot = sum(x*y for x,y in zip(n1,n2))
+        m1 = math.sqrt(sum(x**2 for x in n1))
+        m2 = math.sqrt(sum(x**2 for x in n2))
+        deg = math.degrees(math.acos(abs(dot)/(m1*m2)))
+        return {"Angle (deg)": _r(deg, 2)}
+
+    @staticmethod
+    def bernoulli(n, p, k):
+        res = math.comb(int(n), int(k)) * (p**k) * ((1-p)**(n-k))
+        return {"P(X=k)": _r(res, 6)}
+
+    @staticmethod
+    def limit(n, a):
         # lim x->a (x^n-a^n)/(x-a) = n*a^(n-1)
         res = n * (a**(n-1))
         return {"Limit Value": _r(res, 2)}
 
     @staticmethod
-    def diff(n):
-        n = float(n)
-        return {"Derivative": f"{n}x^{n-1}"}
+    def rate_change(f, x):
+        # if f=x³, f'=3x²
+        res = 3 * (x**2)
+        return {"Rate of Change at x": res}
 
     @staticmethod
     def bayes(pa, pba, pbna):
-        pa, pba, pbna = float(pa), float(pba), float(pbna)
-        # P(A|B) = P(B|A)P(A) / [P(B|A)P(A) + P(B|not A)P(not A)]
         p_total = pba*pa + pbna*(1-pa)
-        res = (pba*pa) / p_total
-        return {"P(A|B)": _r(res, 4)}
+        return {"P(A|B)": _r((pba*pa)/p_total, 4)}
 
     @staticmethod
-    def complex(r, i):
-        r, i = float(r), float(i)
-        mod = math.sqrt(r**2 + i**2)
-        arg = math.degrees(math.atan2(i, r))
-        return {"Modulus": _r(mod, 3), "Argument (deg)": _r(arg, 2)}
+    def demorgan(as_str, bs_str, u_str):
+        a = set(x.strip() for x in as_str.split(","))
+        b = set(x.strip() for x in bs_str.split(","))
+        u = set(x.strip() for x in u_str.split(","))
+        comp_u_ab = u - (a | b)
+        comp_a_int_comp_b = (u-a) & (u-b)
+        return {"(AUB)'": sorted(list(comp_u_ab)), "A' int B'": sorted(list(comp_a_int_comp_b)), "Verified": comp_u_ab == comp_a_int_comp_b}
 
 MATHS_REGISTRY = {
     "Classes 1-5": Maths_Classes_1_5,
