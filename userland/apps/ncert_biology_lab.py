@@ -11,127 +11,120 @@ def _r(x, d=4):
     except: return x
 
 class Biology_Classes_6_10:
-    TITLE = "Secondary Biology: Anatomy & Physiology"
+    TITLE = "Secondary Biology: Living Systems"
     EXP_DATA = {
-        "Starch Test": ("starch", [("Iodine Presence", "1")]),
-        "Plant Growth": ("growth", [("Sun (1-10)", "8"), ("Water (1-10)", "7")]),
-        "Heart Rate": ("heart", [("Age", "15"), ("Post-Ex (1/0)", "0")]),
-        "Mendel Cross": ("mendel", [("P1 (TT/tt)", "Tt"), ("P2", "Tt")]),
-        "Osmosis Logic": ("osmosis", [("In", "Sugar"), ("Out", "Water")]),
-        "Sex Determination": ("gender", [("Inherited (X/Y)", "Y")]),
-        "Digestion (Salivary)": ("amylase", [("pH", "7"), ("Temp (C)", "37")]),
-        "Pulse Recovery": ("recovery", [("Max Pulse", "150"), ("Time_min", "5")]),
+        "Starch/Iodine": ("starch", [("Iodine", "1")]),
+        "BMI Calculator": ("bmi", [("Weight (kg)", "70"), ("Height (m)", "1.75")]),
+        "Microscope Mag": ("micro", [("Obj (X)", "10"), ("Eye (X)", "10")]),
+        "Heart Zones": ("heart", [("Age", "15"), ("Post-Ex (1/0)", "0")]),
+        "Photosynthesis": ("photo", [("Light (1-10)", "8"), ("CO2 (1-10)", "7")]),
+        "Osmosis Flow": ("osmosis", [("Cell_C (M)", "0.1"), ("Sol_C (M)", "0.5")]),
+        "Blood Group Type": ("blood", [("Antigen A (1/0)", "1"), ("Antigen B", "0"), ("Rh Factor", "1")]),
+        "Plant Type": ("plant", [("Leaves", "Dicot"), ("Root", "Tap")]),
     }
 
     @staticmethod
     def starch(i):
-        if int(i): return {"Result": "Blue-black", "Note": "Positive"}
-        return {"Result": "Brown", "Note": "Negative"}
+        return {"Status": "Blue-Black (PRESENT)" if int(i) else "Brown (ABSENT)"}
 
     @staticmethod
-    def growth(s, w):
-        score = (s + w) / 2
-        return {"Health": "Optimal" if score > 7 else "Stress"}
+    def bmi(w, h):
+        b = w / h**2
+        cat = "Underweight" if b<18.5 else "Normal" if b<25 else "Overweight"
+        return {"BMI": _r(b, 1), "Category": cat}
+
+    @staticmethod
+    def micro(obj, eye):
+        return {"Total Mag": obj * eye}
 
     @staticmethod
     def heart(age, ex):
-        base = 72 + (20-age)*0.5
-        if int(ex): base += 40
-        return {"Pulse": int(base)}
+        m = 220 - age
+        rate = 72; range_ = "60-100"
+        if ex: rate = 110; range_ = f"{int(m*0.6)}-{int(m*0.8)}"
+        return {"Current bpm": rate, "Safety Range": range_}
 
     @staticmethod
-    def mendel(p1, p2):
-        g = [a+b for a in p1 for b in p2]
-        return {"Genotype": g, "Counts": dict(Counter(g))}
+    def photo(l, c):
+        rate = (l * c) / 2
+        return {"O2 Evolution": _r(rate, 1), "Efficiency": "High" if rate > 30 else "Normal"}
 
     @staticmethod
-    def osmosis(ins, outs):
-        if "sugar" in ins.lower() and "water" in outs.lower(): return {"Result": "Endosmosis (Swell)"}
-        return {"Result": "Exosmosis (Shrink)"}
+    def osmosis(cc, sc):
+        if sc > cc: return {"Process": "Exosmosis", "Result": "Plasmolysis / Shrink"}
+        if sc < cc: return {"Process": "Endosmosis", "Result": "Turgidity / Swell"}
+        return {"Process": "Equilibrium", "Result": "No Change"}
 
     @staticmethod
-    def gender(chr):
-        if "Y" in chr.upper(): return {"Offspring": "Male (XY)"}
-        return {"Offspring": "Female (XX)"}
+    def blood(a, b, rh):
+        g = "O"
+        if a and b: g = "AB"
+        elif a: g = "A"
+        elif b: g = "B"
+        return {"Group": g + ("+" if rh else "-")}
 
     @staticmethod
-    def amylase(ph, t):
-        if 6.8 <= ph <= 7.2 and 35 <= t <= 40: return {"Activity": "Optimal (Colorless after Iodine)"}
-        return {"Activity": "Slow (Starch remains)"}
-
-    @staticmethod
-    def recovery(max_p, t):
-        res = max_p - (t * 15)
-        return {"Pulse": int(max(72, res))}
+    def plant(l, r):
+        if "dicot" in l.lower() or "tap" in r.lower(): return {"Type": "DICOT", "Seeds": "2 Cotyledons"}
+        return {"Type": "MONOCOT", "Seeds": "1 Cotyledon"}
 
 class Biology_Classes_11_12:
-    TITLE = "Senior Biology: Exhaustive Lab Manual"
+    TITLE = "Senior Biology: Research & Genetics"
     EXP_DATA = {
-        "Meiosis Stages": ("meiosis", [("Stage", "Anaphase I")]),
-        "Transpiration Rate": ("transpire", [("Wind", "5"), ("Humidity", "20")]),
-        "Respiratory Quotient": ("rq", [("CO2 Vol", "1"), ("O2 Vol", "1")]),
-        "Hardy-Weinberg": ("hardy", [("p-allele", "0.6"), ("Pop Total", "1000")]),
-        "DNA Sequence": ("dna_comp", [("Seq", "ATGCGTA")]),
-        "Trophic 10% Law": ("trophic", [("Producer Energy", "10000")]),
-        "Pedigree Probability": ("pedigree", [("Affected Dad (1/0)", "1"), ("Carrier Mom", "1")]),
-        "Quadrat Density": ("quadrat", [("Area (m²)", "1"), ("Counts", "10,12,8,15")]),
-        "Pollen Germination": ("pollen", [("Sugar %", "10"), ("Time (min)", "60")]),
-        "Onion Mitosis": ("mitosis", [("Phase", "Metaphase")]),
+        "Mendel Dihybrid": ("mendel", [("P1 (RRYY)", "RrYy"), ("P2 (RRYY)", "RrYy")]),
+        "Hardy-Weinberg": ("hardy", [("p-freq", "0.6"), ("Pop Total", "1000")]),
+        "Trophic 10%": ("trophic", [("Producer (kcal)", "1000")]),
+        "RQ Substrate": ("rq", [("CO2 Vol", "1"), ("O2 Vol", "1")]),
+        "Peptide/DNA Comp": ("dna", [("Seq", "ATGCGTA")]),
+        "Population Nt": ("pop", [("N0", "100"), ("r", "0.1"), ("t", "10")]),
+        "Quadrat Density": ("quadrat", [("Counts (cm separated)", "5,8,4,12"), ("Area (sq m)", "1")]),
+        "Transpire Rate": ("transpire", [("Wind", "5"), ("Humidity", "2")]),
+        "Mitosis Phases": ("mitosis", [("Phase", "Metaphase")]),
     }
 
     @staticmethod
-    def meiosis(s):
-        s = s.lower()
-        if "meta" in s: return {"Obs": "Align at equator"}
-        if "ana" in s: return {"Obs": "Chromosomes separate"}
-        return {"Obs": "Reduction division active"}
-
-    @staticmethod
-    def transpire(v, h):
-        rate = (v * 10) / (h / 10) if h > 0 else v * 10
-        return {"Rate": _r(rate, 2), "Inference": "High V, Low H = High Rate"}
-
-    @staticmethod
-    def rq(co2, o2):
-        res = float(co2)/float(o2)
-        return {"RQ": _r(res, 2), "Type": "Carb=1.0, Fats<1.0"}
+    def mendel(p1, p2):
+        # simplified 9:3:3:1
+        return {"Phenotype Ratio": "9:3:3:1 (RoundYellow, RoundGreen, WrinkledYellow, WrinkledGreen)"}
 
     @staticmethod
     def hardy(p, n):
         q = 1 - p
-        return {"AA (p²)": int(n*p**2), "Aa (2pq)": int(n*2*p*q), "aa (q²)": int(n*q**2)}
-
-    @staticmethod
-    def dna_comp(s):
-        d = {"A":"T", "T":"A", "C":"G", "G":"C"}
-        return {"Complementary": "".join(d.get(b.upper(), b) for b in s)}
+        return {"AA": int(n*p**2), "Aa": int(n*2*p*q), "aa": int(n*q**2)}
 
     @staticmethod
     def trophic(e):
-        return {"P_Consumer": _r(e*0.1), "S_Consumer": _r(e*0.01), "T_Consumer": _r(e*0.001)}
+        return {"Herbivore": e*0.1, "Carnivore": e*0.01, "TopPredator": e*0.001}
 
     @staticmethod
-    def pedigree(ad, cm):
-        if int(ad) and int(cm): return {"Risk": "50% Affected, 50% Carrier"}
-        return {"Risk": "Refer Punnett Logic"}
+    def rq(c, o):
+        r = c/o
+        return {"RQ": _r(r, 2), "Sub": "Carb" if 0.95<r<1.05 else "Fat/Protein"}
 
     @staticmethod
-    def quadrat(a, c_str):
-        n = [float(x.strip()) for x in c_str.split(",")]
-        avg = sum(n) / (a * len(n))
-        return {"Density (org/m²)": _r(avg, 2)}
+    def dna(s):
+        d = {"A":"T", "T":"A", "C":"G", "G":"C"}
+        return {"Complement": "".join(d.get(b.upper(), b) for b in s)}
 
     @staticmethod
-    def pollen(s, t):
-        if 5 <= s <= 15: return {"Status": "Pollen Tube Growing"}
-        return {"Status": "Stunted"}
+    def pop(n0, r, t):
+        nt = n0 * math.exp(r*t)
+        return {"Final Pop": _r(nt, 0)}
+
+    @staticmethod
+    def quadrat(c, a):
+        v = [int(x) for x in c.split(",")]
+        return {"Avg Density": _r(sum(v)/(len(v)*a), 2)}
+
+    @staticmethod
+    def transpire(w, h):
+        rate = (w * 5) / h
+        return {"Rate": _r(rate, 2), "Status": "Intense" if rate > 20 else "Mild"}
 
     @staticmethod
     def mitosis(p):
-        p = p.lower()
-        if "meta" in p: return {"Obs": "Chromatids align at equator, Spindle fibers visible"}
-        if "ana" in p: return {"Obs": "Sister chromatids pull apart"}
-        return {"Obs": "Division of Nucleus"}
+        d = {"prophase": "Nucleus thickens, membrane fades", "metaphase": "Chromosomes line up at center", "anaphase": "Chromatids separate"}
+        return {"Observation": d.get(p.lower(), "Nuclear division stage")}
 
 BIOLOGY_REGISTRY = {
     "Classes 6-10": Biology_Classes_6_10,

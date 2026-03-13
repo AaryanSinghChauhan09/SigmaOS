@@ -3,7 +3,7 @@ SigmaOS NCERT Chemistry Lab v10.0 — The Ultimate Series
 Classes 6–12 | Exhaustive NCERT Experiment & Simulation Hub
 100% stdlib, zero 3rd-party deps
 """
-import math, random
+import math, random, re
 
 def _r(x, d=4):
     try: return float(("{:." + str(int(d)) + "f}").format(float(x)))
@@ -12,92 +12,76 @@ def _r(x, d=4):
 class Chemistry_Classes_6_10:
     TITLE = "Secondary Chemistry: Advanced Micro-labs"
     EXP_DATA = {
-        "Litmus Interaction": ("litmus", [("Solution", "Lemon")]),
-        "Separation Logic": ("separation", [("Mixture", "Sand+Salt")]),
-        "Atom Config": ("atom", [("Z", "11")]),
-        "pH Analysis": ("ph", [("H+ Conc (M)", "0.001")]),
-        "Gas Evolution": ("gas", [("Test", "Lime Water")]),
-        "Mole Logic": ("mole", [("Mass (g)", "44"), ("Molar Mass", "44")]),
-        "Reaction Equilibrium": ("equilibrium", [("Temp (C)", "25"), ("Pressure (atm)", "1")]),
-        "Solution Molarity": ("molarity", [("Solute (g)", "4"), ("Molar Mass", "40"), ("Volume (ml)", "250")]),
+        "Atom ID (Z)": ("atom", [("Z", "11")]),
+        "pH Tester": ("ph", [("Conc (M)", "0.001"), ("Is Acid (1/0)", "1")]),
+        "Molar Mass": ("molar_mass", [("Formula", "H2SO4")]),
+        "Titration (V1M1=V2M2)": ("titration", [("M1", "0.1"), ("V1", "20"), ("V2", "22.5")]),
+        "Gas Law (Ideal)": ("gas", [("P (atm)", "1"), ("V (L)", "22.4")]),
+        "Stoichiometry": ("stoich", [("Reactant Mass", "10"), ("Molar Mass R", "40"), ("Molar Mass P", "60")]),
+        "Separation flow": ("separation", [("Mixture", "Oil+Water")]),
+        "Salt Indicators": ("indicator", [("Sol", "Lemon"), ("Ind (Litmus/Phenol)", "Litmus")]),
     }
 
-    @staticmethod
-    def litmus(s):
-        s = s.lower()
-        if any(x in s for x in ["lemon", "acid", "vinegar"]): return {"Paper": "RED", "Nature": "Acid"}
-        if any(x in s for x in ["soap", "base", "lime"]): return {"Paper": "BLUE", "Nature": "Base"}
-        return {"Paper": "NO CHANGE", "Nature": "Neutral"}
-
-    @staticmethod
-    def separation(m):
-        m = m.lower()
-        if "sand" in m and "salt" in m: return {"Flow": "Filter -> Evaporate"}
-        if "oil" in m and "water" in m: return {"Flow": "Separating Funnel"}
-        return {"Flow": "Refer NCERT Ch-2"}
+    ELEMENTS = {"H":1.008, "He":4.003, "Li":6.941, "C":12.01, "N":14.01, "O":16.0, "Na":22.99, "S":32.06, "Cl":35.45, "K":39.1, "Ca":40.1, "Fe":55.8}
 
     @staticmethod
     def atom(z):
-        z = int(z)
-        cfg = "2," + str(min(8, z-2)) if z > 2 else str(z)
-        if z > 10: cfg += "," + str(z-10)
-        return {"Symbol": "Na" if z==11 else "H" if z==1 else "?", "Config": cfg}
+        return {"Symbol": "Na" if z==11 else "H" if z==1 else "?", "Z":z}
 
     @staticmethod
-    def ph(h):
-        p = -math.log10(h)
-        return {"pH": _r(p, 2), "Inference": "Strong Acid" if p < 3 else "Neutral" if 6.5<p<7.5 else "Base"}
+    def ph(c, isa):
+        p = -math.log10(c) if int(isa) else 14 + math.log10(c)
+        return {"pH": _r(p, 2), "Nature": "Acid" if p < 7 else "Base"}
 
     @staticmethod
-    def gas(t):
-        t = t.lower()
-        if "lime" in t: return {"Gas": "CO2", "Obs": "Milky"}
-        if "pop" in t: return {"Gas": "H2", "Obs": "Pop sound"}
-        return {"Gas": "O2", "Obs": "Rekindle splinter"}
+    def molar_mass(f):
+        mats = re.findall(r'([A-Z][a-z]?)(\d*)', f)
+        total = 0
+        for s, c in mats:
+            n = int(c) if c else 1
+            total += Chemistry_Classes_6_10.ELEMENTS.get(s, 0) * n
+        return {"Molar Mass": _r(total, 3)}
 
     @staticmethod
-    def mole(m, mm):
-        return {"Moles": _r(m/mm, 3), "Count": f"{_r((m/mm)*6.022e23, 2):.2e}"}
+    def titration(m1, v1, v2):
+        return {"M2": _r(m1*v1/v2, 4)}
 
     @staticmethod
-    def equilibrium(t, p):
-        return {"Shift": "Le Chatelier predicts Forward if Exothermic/Low Temp"}
+    def gas(p, v):
+        # T = PV/nR (n=1)
+        t = (p*v)/0.0821
+        return {"Temp (K)": _r(t, 1)}
 
     @staticmethod
-    def molarity(m, mm, v):
-        mol = m / mm
-        res = mol / (v/1000)
-        return {"Molarity (M)": _r(res, 3)}
+    def stoich(m, mmr, mmp):
+        mol = m / mmr
+        return {"Product Mass (g)": _r(mol * mmp, 2)}
+
+    @staticmethod
+    def separation(m):
+        if "+" in m or "and" in m.lower(): return {"Methods": "Mechanical/Phase separation"}
+        return {"Methods": "Refer Class 6 Ch-5"}
+
+    @staticmethod
+    def indicator(s, i):
+        s = s.lower()
+        if "litmus" in i.lower():
+            return {"Color": "RED" if "lemon" in s else "BLUE" if "soap" in s else "NC"}
+        return {"Color": "PINK" if "soap" in s else "Colorless"}
 
 class Chemistry_Classes_11_12:
-    TITLE = "Senior Chemistry: Exhaustive Lab Manual"
+    TITLE = "Senior Chemistry: Exhaustive Lab Suite"
     EXP_DATA = {
-        "Redox Titration": ("redox", [("M_permanganate", "0.02"), ("V_fas", "20"), ("V_perm", "20")]),
-        "Kinetics (Order)": ("kinetics", [("Initial [A]", "1.0"), ("k_rate", "0.005"), ("Time (s)", "100")]),
-        "Buffer pH": ("buffer", [("pKa", "4.74"), ("[Salt]", "0.1"), ("[Acid]", "0.1")]),
-        "Nernst Potential": ("nernst", [("E0_Cell", "1.1"), ("n", "2"), ("Q_Quotient", "0.01")]),
-        "Chromatography": ("chromato", [("Dist_Spot", "6"), ("Dist_Solvent", "10")]),
-        "Functional Tester": ("functional", [("Reagent", "Tollen's")]),
-        "Hardness of Water": ("hardness", [("EDTA_ml", "15"), ("Sample_ml", "50")]),
-        "Osmotic Pressure": ("osmosis", [("Molarity", "0.1"), ("Temp (C)", "27"), ("i_factor", "1")]),
-        "Rate Law (Thio+HCl)": ("thio_rate", [("Conc_Thiosulphate", "0.1"), ("Temp (C)", "25")]),
-        "Enthalpy Change": ("enthalpy", [("dT (C)", "5"), ("Mass_Water (g)", "100")]),
+        "Nernst Equation": ("nernst", [("E0 Cell", "1.1"), ("n", "2"), ("Q", "0.01")]),
+        "Reaction Equilibrium": ("keq", [("Kc", "40"), ("Qc", "60")]),
+        "Bond Energy": ("bond", [("B_react (kJ)", "500"), ("B_prod (kJ)", "650")]),
+        "Rate (Arrhenius)": ("arrhenius", [("A", "1e11"), ("Ea (kJ)", "50"), ("T (K)", "300")]),
+        "Osmosis (Pi)": ("osmosis", [("M", "0.1"), ("T (C)", "27"), ("i", "1")]),
+        "Electrolysis (Yield)": ("faraday", [("I (A)", "2"), ("t (s)", "965"), ("EqWt", "31.7")]),
+        "EAN Finder": ("ean", [("Z", "26"), ("OxState", "2"), ("CN", "6")]),
+        "Functional Class": ("organic", [("Reagent", "Tollen's")]),
+        "Solubility Product": ("ksp", [("Solubility (M)", "1e-5"), ("Type (AB/AB2)", "AB2")]),
     }
-
-    @staticmethod
-    def redox(mp, vf, vp):
-        mf = (5 * mp * vp) / vf
-        return {"Molarity FAS": _r(mf, 4), "Strength (g/L)": _r(mf * 392, 2)}
-
-    @staticmethod
-    def kinetics(a0, k, t):
-        at = a0 * math.exp(-k * t)
-        return {"Final [A]t": _r(at, 4), "Conversion %": _r((1-at/a0)*100, 2)}
-
-    @staticmethod
-    def buffer(pka, s, a):
-        ph = pka + math.log10(s/a)
-        return {"Buffer pH": _r(ph, 2)}
 
     @staticmethod
     def nernst(e0, n, q):
@@ -105,37 +89,50 @@ class Chemistry_Classes_11_12:
         return {"E_Cell (V)": _r(e, 4)}
 
     @staticmethod
-    def chromato(ds, dr):
-        return {"Rf Value": _r(ds/dr, 3)}
+    def keq(kc, qc):
+        if qc < kc: return {"Shift": "FORWARD / Product favored"}
+        if qc > kc: return {"Shift": "BACKWARD / Reactant favored"}
+        return {"Shift": "EQUILIBRIUM"}
 
     @staticmethod
-    def functional(r):
-        r = r.lower()
-        if "tollen" in r: return {"Result": "Silver Mirror", "Group": "Aldehyde"}
-        if "fecl3" in r: return {"Result": "Violet", "Group": "Phenol"}
-        return {"Result": "No specific match"}
+    def bond(br, bp):
+        dH = br - bp
+        return {"delta_H (kJ)": dH, "Type": "EXO" if dH<0 else "ENDO"}
 
     @staticmethod
-    def hardness(edta, s):
-        h = (edta * 1000) / s
-        return {"Hardness (ppm)": _r(h, 2)}
+    def arrhenius(a, ea, t):
+        r = 0.008314 # kJ/mol.K
+        k = a * math.exp(-ea/(r*t))
+        return {"k rate": f"{k:.4e}"}
 
     @staticmethod
-    def osmosis(m, t_c, i):
-        t = t_c + 273.15
+    def osmosis(m, tc, i):
+        t = tc + 273.15
         pi = i * m * 0.0821 * t
-        return {"Osmotic P (atm)": _r(pi, 2)}
+        return {"Pi (atm)": _r(pi, 2)}
 
     @staticmethod
-    def thio_rate(c, t):
-        # r = k[c] exp(-Ea/RT)
-        rate = c * 0.1 * (t/10) # simplified
-        return {"Rate (1/s)": _r(rate, 4)}
+    def faraday(i, t, w):
+        mass = (i * t * w) / 96500
+        return {"Yield (g)": _r(mass, 5)}
 
     @staticmethod
-    def enthalpy(dt, m):
-        q = m * 4.184 * dt
-        return {"Heat (J)": _r(q, 1)}
+    def ean(z, ox, cn):
+        res = z - ox + 2*cn
+        return {"EAN": int(res), "Stable": res in [36, 54, 86]}
+
+    @staticmethod
+    def organic(r):
+        r = r.lower()
+        if "tollen" in r: return {"Test": "Aldehyde", "Obs": "Silver Mirror"}
+        if "fecl3" in r: return {"Test": "Phenol", "Obs": "Violet"}
+        return {"Test": "Carboxyl", "Obs": "Effervescence"}
+
+    @staticmethod
+    def ksp(s, t):
+        if t == "AB": k = s**2
+        else: k = 4 * s**3
+        return {"Ksp": f"{k:.4e}"}
 
 CHEMISTRY_REGISTRY = {
     "Classes 6-10": Chemistry_Classes_6_10,

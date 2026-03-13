@@ -10,143 +10,133 @@ def _r(x, d=4):
     except: return x
 
 class Physics_Classes_6_10:
-    TITLE = "Secondary Physics: Advanced Simulations"
+    TITLE = "Secondary Physics: Comprehensive Foundations"
     EXP_DATA = {
-        "Magnetism (Interaction)": ("magnet", [("Pole 1 (N/S)", "N"), ("Pole 2 (N/S)", "S")]),
-        "Light & Shadows": ("shadow", [("Object Distance (cm)", "20"), ("Lamp Height (cm)", "50")]),
-        "Electric Circuit (V=IR)": ("ohms_law", [("Voltage (V)", "10"), ("Resistance (Ω)", "5")]),
-        "Mirror/Lens Formula": ("optics", [("Type (Mirror/Lens)", "Mirror"), ("u (cm)", "-20"), ("f (cm)", "10")]),
-        "Gravity & Weight": ("gravity_weight", [("Mass (kg)", "60"), ("Planet", "Earth")]),
-        "Archimedes Principle": ("buoyancy", [("Object Vol (m³)", "0.001"), ("Fluid Density (kg/m³)", "1000")]),
-        "Work & Energy": ("energy", [("Mass (kg)", "2"), ("Velocity (m/s)", "10"), ("Height (m)", "5")]),
-        "Sound Velocity": ("sound_vel", [("Freq (Hz)", "440"), ("Lambda (m)", "0.78")]),
-        "Heat Capacity": ("heat_cap", [("Mass (kg)", "0.5"), ("dT (K)", "10")]),
-        "Hooke's Law": ("hookes", [("Mass (g)", "100"), ("Extension (cm)", "2")]),
-        "Simple Pendulum": ("pendulum", [("Length (m)", "0.5"), ("Angle (deg)", "10")]),
+        "Magnet Interaction": ("magnet", [("P1 (N/S)", "N"), ("P2 (N/S)", "S")]),
+        "Light & Shadow": ("shadow", [("Dist (cm)", "20"), ("Height (cm)", "50")]),
+        "Ohm's Law (V=IR)": ("ohms", [("V (V)", "10"), ("R (Ω)", "5")]),
+        "Mirror/Lens Calc": ("optics", [("Type (M/L)", "Mirror"), ("u (cm)", "-20"), ("f (cm)", "10")]),
+        "Archimedes/Density": ("buoyancy", [("Vol (m³)", "0.001"), ("Rho (kg/m³)", "1000")]),
+        "Joule's Heating": ("joules", [("I (A)", "2"), ("R (Ω)", "10"), ("Time (s)", "60")]),
+        "Snell's Law": ("snell", [("n1", "1"), ("Angle1 (deg)", "30"), ("n2", "1.5")]),
+        "Gravity Logic": ("gravity", [("Mass (kg)", "60"), ("Body", "Earth")]),
+        "Pendulum Clock": ("pendulum", [("Length (m)", "1")]),
+        "Sound Speed (fλ)": ("sound", [("Freq (Hz)", "440"), ("Lambda (m)", "0.78")]),
     }
 
     @staticmethod
     def magnet(p1, p2):
-        if p1.upper() == p2.upper(): return {"Result": "REPEL"}
-        return {"Result": "ATTRACT"}
+        return {"Result": "REPEL" if p1.upper()==p2.upper() else "ATTRACT"}
 
     @staticmethod
     def shadow(d, h):
-        return {"Scale Factor": _r(h / d, 2)}
+        return {"Scale": _r(h/d, 2)}
 
     @staticmethod
-    def ohms_law(v, r):
-        return {"Current (A)": _r(v/r), "Power (W)": _r(v**2/r)}
+    def ohms(v, r):
+        return {"I (A)": _r(v/r), "P (W)": _r(v**2/r)}
 
     @staticmethod
     def optics(t, u, f):
         if "mirror" in t.lower(): v = 1/(1/f - 1/u)
         else: v = 1/(1/f + 1/u)
-        return {"Image dist (cm)": _r(v, 2), "Mag": _r(-v/u if "mirror" in t.lower() else v/u, 2)}
-
-    @staticmethod
-    def gravity_weight(m, p):
-        g = {"earth":9.81, "moon":1.62, "mars":3.71, "jupiter":24.79}.get(p.lower(), 9.81)
-        return {"Weight (N)": _r(m*g, 2)}
+        return {"v (cm)": _r(v, 2), "Mag": _r(-v/u if "mirror" in t.lower() else v/u, 2)}
 
     @staticmethod
     def buoyancy(v, d):
         return {"Upthrust (N)": _r(v*d*9.81, 2)}
 
     @staticmethod
-    def energy(m, v, h):
-        return {"KE (J)": _r(0.5*m*v**2, 2), "PE (J)": _r(m*9.81*h, 2)}
+    def joules(i, r, t):
+        h = i**2 * r * t
+        return {"Heat (J)": _r(h, 1), "In Cal": _r(h/4.184, 1)}
 
     @staticmethod
-    def sound_vel(f, l):
-        return {"Velocity (m/s)": _r(f*l, 1)}
+    def snell(n1, th, n2):
+        r1 = math.radians(th)
+        s2 = (n1 * math.sin(r1)) / n2
+        if s2 > 1: return {"Result": "TIR (Total Internal Ref)"}
+        return {"r Angle (deg)": _r(math.degrees(math.asin(s2)), 2)}
 
     @staticmethod
-    def heat_cap(m, dt):
-        return {"Heat (J)": _r(m*4184*dt, 1)}
+    def gravity(m, b):
+        g = {"earth":9.81, "moon":1.62, "mars":3.71, "jupiter":24.79}.get(b.lower(), 9.81)
+        return {"Weight (N)": _r(m*g, 2)}
 
     @staticmethod
-    def hookes(m_g, x_cm):
-        f = (m_g/1000)*9.81
-        k = f / (x_cm/100)
-        return {"Spring Constant k (N/m)": _r(k, 2)}
+    def pendulum(l):
+        return {"Period T (s)": _r(2 * math.pi * math.sqrt(l/9.81), 3)}
 
     @staticmethod
-    def pendulum(l, a):
-        t = 2 * math.pi * math.sqrt(l/9.81)
-        return {"Time Period (s)": _r(t, 2)}
+    def sound(f, l):
+        return {"v (m/s)": _r(f*l, 1)}
 
 class Physics_Classes_11_12:
-    TITLE = "Senior Physics: Exhaustive Lab Manual"
+    TITLE = "Senior Physics: Advanced Laboratory Suite"
     EXP_DATA = {
-        "Vector Resultant": ("vector", [("P (N)", "3"), ("Q (N)", "4"), ("Angle", "90")]),
-        "Viscosity (Stokes)": ("viscosity", [("r (mm)", "1"), ("rho_s (kg/m³)", "7800"), ("rho_f", "1260"), ("v (m/s)", "0.5")]),
-        "Prism (Ref Index)": ("prism", [("A", "60"), ("Dm", "30")]),
-        "Zener Regulator": ("zener", [("Vin", "12"), ("Vz", "10"), ("Rs", "100")]),
-        "Photoelectric": ("photo", [("Wavelength (nm)", "400"), ("Work Fn (eV)", "2.1")]),
-        "Young's Modulus": ("youngs", [("Load (kg)", "5"), ("Length (m)", "2"), ("Radius (mm)", "0.25"), ("dl (mm)", "0.5")]),
-        "Capillary Rise": ("capillary", [("Radius (mm)", "0.5"), ("Surface T (N/m)", "0.072")]),
-        "Transistor (CE)": ("transistor", [("Ib (uA)", "20"), ("Ic (mA)", "2"), ("Vce (V)", "5")]),
-        "Resonance Tube": ("resonance", [("Freq (Hz)", "512"), ("L1 (cm)", "16")]),
-        "Newton's Cooling": ("cooling", [("T0 (C)", "80"), ("Ta (C)", "25"), ("k", "0.05"), ("Time (t)", "10")]),
+        "Coulomb Force": ("coulomb", [("q1 (uC)", "10"), ("q2 (uC)", "-5"), ("r (cm)", "3")]),
+        "Doppler Shift": ("doppler", [("Freq (Hz)", "500"), ("Vs (m/s)", "20"), ("Vo (m/s)", "10")]),
+        "Kirchhoff's Node": ("kirch_node", [("I1 (A)", "5"), ("I2 (A)", "-2"), ("I3 (A)", "-1")]),
+        "Boyle's Law": ("boyle", [("P1 (atm)", "1"), ("V1 (L)", "22.4"), ("V2 (L)", "11.2")]),
+        "YDSE (Fringe)": ("ydse", [("Lambda (nm)", "589"), ("d (mm)", "0.1"), ("D (m)", "1")]),
+        "Photoelectric": ("photo", [("Wavelength (nm)", "400"), ("WorkFn (eV)", "2.3")]),
+        "Viscosity (Stokes)": ("visco", [("Radius (mm)", "1"), ("Density_s", "7800"), ("Density_f", "1260"), ("vTerm", "0.5")]),
+        "Specific Heat": ("spec_heat", [("Mass (kg)", "1"), ("dT (K)", "10")]),
+        "Biot-Savart (Loop)": ("biot_loop", [("Current (A)", "5"), ("Radius (cm)", "10"), ("Dist z (cm)", "0")]),
+        "Radioactive Half": ("decay", [("N0", "1000"), ("T_half (s)", "60"), ("Time (s)", "180")]),
     }
 
     @staticmethod
-    def vector(p, q, th):
-        r = math.sqrt(p**2 + q**2 + 2*p*q*math.cos(math.radians(th)))
-        return {"Resultant (N)": _r(r, 2)}
+    def coulomb(q1, q2, r):
+        k = 9e9; q1 *= 1e-6; q2 *= 1e-6; r /= 100
+        f = k * (q1 * q2) / r**2
+        return {"Force (N)": _r(f, 3), "Nature": "ATTR" if f<0 else "REPEL"}
 
     @staticmethod
-    def viscosity(r_mm, rs, rf, v):
-        r = r_mm/1000
+    def doppler(f, vs, vo):
+        v = 343
+        fd = f * (v + vo) / (v - vs)
+        return {"Observed F (Hz)": _r(fd, 2)}
+
+    @staticmethod
+    def kirch_node(i1, i2, i3):
+        res = i1 + i2 + i3
+        return {"Sum outgoing": res, "Valid": _r(res)==0}
+
+    @staticmethod
+    def boyle(p1, v1, v2):
+        return {"P2 (atm)": _r(p1*v1/v2, 3)}
+
+    @staticmethod
+    def ydse(lam, d, big_d):
+        w = (lam*1e-9 * big_d) / (d*1e-3)
+        return {"Width (mm)": _r(w*1000, 3)}
+
+    @staticmethod
+    def photo(lam, phi):
+        e = 1240/lam
+        return {"E_ph (eV)": _r(e, 2), "Emission": e > phi}
+
+    @staticmethod
+    def visco(r, rs, rf, v):
+        r /= 1000
         eta = (2 * r**2 * (rs-rf) * 9.81) / (9 * v)
         return {"Viscosity (Pa.s)": _r(eta, 4)}
 
     @staticmethod
-    def prism(a, dm):
-        ar, dmr = math.radians(a), math.radians(dm)
-        n = math.sin((ar+dmr)/2) / math.sin(ar/2)
-        return {"Ref Index n": _r(n, 3)}
+    def spec_heat(m, dt):
+        return {"Energy (J)": _r(m * 4184 * dt, 1)}
 
     @staticmethod
-    def zener(vin, vz, rs):
-        if vin < vz: return {"Status": "Off", "Vout": vin}
-        iz = (vin - vz) / rs
-        return {"Status": "Regulating", "Vout": vz, "Iz (A)": _r(iz, 4)}
+    def biot_loop(i, r, z):
+        mu0 = 4 * math.pi * 1e-7; r /= 100; z /= 100
+        bz = (mu0 * i * r**2) / (2 * (r**2 + z**2)**1.5)
+        return {"B (Tesla)": f"{bz:.4e}"}
 
     @staticmethod
-    def photo(lam, phi):
-        e_ev = (1240/lam)
-        if e_ev < phi: return {"Status": "No Emission"}
-        return {"KE_max (eV)": _r(e_ev - phi, 2), "Stopping V": _r(e_ev - phi, 2)}
-
-    @staticmethod
-    def youngs(m, l, r_mm, dl_mm):
-        f = m * 9.81
-        a = math.pi * (r_mm/1000)**2
-        y = (f * l) / (a * (dl_mm/1000))
-        return {"Young's Modulus (Pa)": f"{y:.4e}"}
-
-    @staticmethod
-    def capillary(r_mm, t):
-        r = r_mm/1000
-        h = (2*t)/(r*1000*9.81)
-        return {"Rise (cm)": _r(h*100, 2)}
-
-    @staticmethod
-    def transistor(ib, ic, vce):
-        beta = (ic*1e-3) / (ib*1e-6)
-        return {"Current Gain Beta": _r(beta, 1)}
-
-    @staticmethod
-    def resonance(f, l1):
-        v = 4 * f * (l1/100)
-        return {"Sound Vel (m/s)": _r(v, 1)}
-
-    @staticmethod
-    def cooling(t0, ta, k, t):
-        tt = ta + (t0 - ta)*math.exp(-k*t)
-        return {"Temp at t (C)": _r(tt, 2)}
+    def decay(n0, th, t):
+        nt = n0 * (0.5**(t/th))
+        return {"Remaining": _r(nt, 2), "Decayed": _r(n0-nt, 2)}
 
 PHYSICS_REGISTRY = {
     "Classes 6-10": Physics_Classes_6_10,
