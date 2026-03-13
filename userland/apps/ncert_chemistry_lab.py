@@ -1,5 +1,5 @@
 """
-SigmaOS NCERT Chemistry Lab v7.0 — The Ultimate Lab Manual
+SigmaOS NCERT Chemistry Lab v8.0 — The Interactive series
 Classes 6–12 | Every Core NCERT Experiment & Calculator
 100% stdlib, zero 3rd-party deps
 """
@@ -10,103 +10,118 @@ def _r(x, d=4):
     except: return x
 
 class Chemistry_Classes_6_10:
-    TITLE = "Secondary Chemistry: Atomic, Acidic & Reaction basics"
+    TITLE = "Secondary Chemistry: Interactive Micro-labs"
     EXP_DATA = {
-        "pH & Indicators": ("ph_logic", [("H+ Conc (M)", "0.001")]),
-        "Atomic Structure": ("atom_build", [("Protons", "6"), ("Mass Number", "12")]),
-        "Mole Calculator": ("moles", [("Given Mass (g)", "44"), ("Molar Mass (g/mol)", "44")]),
-        "Displacement Reactivity": ("displacement", [("Metal (Fe/Cu/Zn)", "Fe"), ("Solution (CuSO4/ZnSO4)", "CuSO4")]),
-        "Salt Distillation": ("distill", [("Salt Weight (g)", "50"), ("Water (ml)", "500")]),
-        "Combustion Logic": ("combustion", [("Fuel", "Magnesium")]),
-        "Saturated Solutions": ("solubility", [("Solute (g)", "36"), ("Water (ml)", "100"), ("Temp (C)", "25")]),
-        "Acid-Base Neutralization": ("neutral", [("Acid Molarity", "0.1"), ("Acid Vol (ml)", "20"), ("Base Molarity", "0.1")]),
+        "Virtual Litmus Test": ("litmus", [("Solution (Lemon/Soap/Water)", "Lemon")]),
+        "Separation Simulator": ("separation", [("Mixture (Sand+Salt/Oil+Water)", "Sand+Salt")]),
+        "Physical/Chemical Change": ("change", [("Activity (Burning Wood/Melting Ice)", "Burning Wood")]),
+        "Atomic Structure": ("atom", [("Z (Atomic Number)", "11")]),
+        "Reactivity Series": ("reactivity", [("Metal 1", "Iron"), ("Metal 2", "Copper")]),
+        "pH Calculator": ("ph", [("H+ Concentration (M)", "0.001")]),
+        "Gas Identification": ("gas", [("Test (Lime Water/Pop Sound)", "Lime Water")]),
+        "Soap Preparation": ("soap", [("Oil (g)", "50"), ("NaOH (g)", "15")]),
     }
 
     @staticmethod
-    def ph_logic(h):
-        h = float(h)
-        ph = -math.log10(h)
-        return {"pH": _r(ph, 2), "Litmus": "Red" if ph < 7 else "Blue", "Universal": "Orange/Red" if ph < 4 else ("Purple/Blue" if ph > 10 else "Green")}
+    def litmus(sol):
+        sol = sol.lower()
+        if "lemon" in sol or "vinegar" in sol or "acid" in sol: return {"Paper Color": "RED", "Nature": "Acidic"}
+        if "soap" in sol or "lime" in sol or "base" in sol: return {"Paper Color": "BLUE", "Nature": "Basic"}
+        return {"Paper Color": "NO CHANGE", "Nature": "Neutral"}
 
     @staticmethod
-    def atom_build(p, a):
-        p, a = float(p), float(a)
-        return {"Protons": int(p), "Electrons": int(p), "Neutrons": int(a-p)}
+    def separation(mix):
+        m = mix.lower()
+        if "sand" in m and "salt" in m: return {"Methods": "Filtration followed by Evaporation"}
+        if "oil" in m and "water" in m: return {"Methods": "Separating Funnel"}
+        return {"Methods": "Refer NCERT Class 6 Ch-5"}
 
     @staticmethod
-    def moles(m, mm):
-        m, mm = float(m), float(mm)
-        return {"Amt (mol)": _r(m/mm, 4), "Molecules": f"{_r(m/mm * 6.022e23):.3e}"}
+    def change(act):
+        act = act.lower()
+        if "burn" in act or "rust" in act or "cook" in act: return {"Type": "CHEMICAL CHANGE", "Note": "Irreversible, New substances formed"}
+        return {"Type": "PHYSICAL CHANGE", "Note": "Reversible, No new substances"}
 
     @staticmethod
-    def displacement(m, s):
-        m, s = m.lower(), s.lower()
-        series = ["potassium", "sodium", "calcium", "magnesium", "aluminium", "zinc", "iron", "lead", "hydrogen", "copper", "mercury", "silver", "gold"]
+    def atom(z):
+        z = int(z)
+        elements = {1:"H", 2:"He", 6:"C", 7:"N", 8:"O", 11:"Na", 17:"Cl", 26:"Fe"}
+        sym = elements.get(z, "?")
+        return {"Symbol": sym, "Electrons": z, "Config": "Refer Bohr-Bury Rule"}
+
+    @staticmethod
+    def reactivity(m1, m2):
+        series = ["Potassium", "Sodium", "Calcium", "Magnesium", "Aluminium", "Zinc", "Iron", "Lead", "Hydrogen", "Copper", "Mercury", "Silver", "Gold"]
         try:
-            m_idx = series.index(m)
-            # detect metal in solution
-            s_metal = s.replace("so4","").replace("cl2","").replace("no3","").strip()
-            s_idx = series.index(s_metal)
-            if m_idx < s_idx: return {"Status": "REACTION OCCURS", "Note": f"{m.capitalize()} displaces {s_metal.capitalize()}"}
-            return {"Status": "NO REACTION", "Note": f"{m.capitalize()} is less reactive"}
-        except: return {"Error": "Metal not in reactivity series"}
+            i1 = series.index(m1.capitalize())
+            i2 = series.index(m2.capitalize())
+            return {"More Reactive": m1 if i1 < i2 else m2, "Displacement": "Possible" if i1 < i2 else "Impossible"}
+        except: return {"Error": "Metal not in series"}
 
     @staticmethod
-    def distill(s, w):
-        return {"Result": "Pure water recovered", "Residue": f"{s}g of Salt", "Process": "Evaporation followed by Condensation"}
+    def ph(h):
+        h = float(h)
+        p = -math.log10(h)
+        return {"pH": _r(p, 2), "Nature": "Acid" if p < 7 else "Base"}
 
     @staticmethod
-    def combustion(f):
-        f = f.lower()
-        if "magnesium" in f: return {"Note": "Burns with Dazzling White Flame", "Product": "Magnesium Oxide (Basic)"}
-        return {"Note": "Reacts with Oxygen to release Heat/Light"}
+    def gas(t):
+        t = t.lower()
+        if "lime" in t: return {"Inference": "CO2 present (Turns milky)"}
+        if "pop" in t: return {"Inference": "H2 present (Burns with pop sound)"}
+        return {"Inference": "Unknown gas test"}
 
     @staticmethod
-    def solubility(s, w, t):
-        s, w, t = float(s), float(w), float(t)
-        # NaCl solubility is approx 36g/100ml at 25C
-        limit = (36 + (t-25)*0.1) * (w/100)
-        if s >= limit: return {"State": "Saturated", "Un-dissolved": _r(s-limit, 2)}
-        return {"State": "Unsaturated", "Capacity left": _r(limit-s, 2)}
-
-    @staticmethod
-    def neutral(ma, va, mb):
-        ma, va, mb = float(ma), float(va), float(mb)
-        vb = (ma * va) / mb
-        return {"Base Vol needed (ml)": _r(vb, 2), "Product": "Salt + Water", "Thermicity": "Exothermic"}
+    def soap(oil, naoh):
+        oil, naoh = float(oil), float(naoh)
+        # Saponification simplified
+        soap_yield = oil * 0.9 + naoh * 0.5
+        return {"Soap Yield (g)": _r(soap_yield, 2), "Process": "Saponification (Hydrolysis of Fats)"}
 
 class Chemistry_Classes_11_12:
-    TITLE = "Senior Chemistry: Analytical & Physical Labs"
+    TITLE = "Senior Chemistry: Precise Lab Work"
     EXP_DATA = {
-        "Preparation of Std Soln": ("std_soln", [("Solute (Na2CO3/Oxalic)", "Na2CO3"), ("Target M", "0.1"), ("Vol (ml)", "250")]),
-        "Thermochemical Calorie": ("enthalpy", [("Mass of Water", "100"), ("dT (C)", "5")]),
-        "Equilibrium Shift": ("equilibrium", [("Add Fe3+ (1/0)", "1"), ("Add SCN- (1/0)", "0")]),
-        "Nernst Cell Potential": ("nernst", [("E0 Cell (V)", "1.1"), ("n (electrons)", "2"), ("Q (Quotient)", "0.01")]),
-        "Rate of Reaction": ("rate", [("k rate", "0.01"), ("[A]0", "1.0"), ("Time (s)", "100")]),
-        "Functional Group Test": ("functional", [("Compound (A/B/C)", "A"), ("Result", "Red Litmus turns Blue")]),
-        "EAN for Complexes": ("ean", [("Z", "26"), ("Ox State", "2"), ("Coord Number", "6")]),
-        "Paper Chromatography": ("chromato", [("Dist of Solvent (cm)", "10"), ("Dist of Spot (cm)", "6")]),
+        "Titration Calculator": ("titration", [("M1 (Acid)", "0.1"), ("V1 (Acid)", "20"), ("V2 (Base)", "22.5")]),
+        "Redox (KMnO4)": ("redox", [("M_kmno4", "0.02"), ("V_fas", "20")]),
+        "Salt Analysis (Anion)": ("anion", [("Observation (Effervescence/White PPT)", "Effervescence")]),
+        "Electrolysis Yield": ("faraday", [("Current (A)", "2"), ("Time (s)", "965"), ("Eq Wt", "31.75")]),
+        "Coordination (EAN)": ("ean", [("Z", "26"), ("Ox State", "2"), ("Coord Number", "6")]),
+        "Nernst Cell Potential": ("nernst", [("E0 Cell", "1.1"), ("n", "2"), ("Q", "0.01")]),
+        "Packing Efficiency": ("packing", [("Crystal (SCC/BCC/FCC)", "FCC")]),
+        "Functional Group ID": ("functional", [("Test (Tollen's/FeCl3)", "Tollen's")]),
     }
 
     @staticmethod
-    def std_soln(s, m, v):
-        m, v = float(m), float(v)
-        weights = {"na2co3": 106, "oxalic": 126} # Oxalic Dihydrate
-        mm = weights.get(s.lower(), 100)
-        mass = m * mm * (v/1000)
-        return {"Mass needed (g)": _r(mass, 4), "Protocol": f"Dissolve in {v}ml distilled water"}
+    def titration(m1, v1, v2):
+        m1, v1, v2 = float(m1), float(v1), float(v2)
+        m2 = (m1 * v1) / v2
+        return {"Concentration M2": _r(m2, 4)}
 
     @staticmethod
-    def enthalpy(m, dt):
-        m, dt = float(m), float(dt)
-        q = m * 4.184 * dt # Joules
-        return {"Heat Absorbed Q (J)": _r(q, 1), "Note": "Assumed water specific heat = 4.184"}
+    def redox(m_k, v_f):
+        m_k, v_f = float(m_k), float(v_f)
+        # 5 moles FAS : 1 mole KMnO4
+        m_f = (5 * m_k * 20) / v_f # simplified model
+        return {"Molarity of FAS": _r(m_f, 4)}
 
     @staticmethod
-    def equilibrium(fe, scn):
-        if int(fe): return {"Shift": "FORWARD", "Color": "Darker Blood Red", "Reason": "Added reactant"}
-        if int(scn): return {"Shift": "FORWARD", "Color": "Darker Blood Red"}
-        return {"Status": "Dynamic Equilibrium"}
+    def anion(obs):
+        obs = obs.lower()
+        if "effer" in obs: return {"Inference": "Carbonate (CO3 2-) or Bicarbonate"}
+        if "white ppt" in obs: return {"Inference": "Chloride (Cl-) or Sulphate (SO4 2-)"}
+        return {"Inference": "Requires specific group reagent"}
+
+    @staticmethod
+    def faraday(i, t, w):
+        i, t, w = float(i), float(t), float(w)
+        mass = (i * t * w) / 96500
+        return {"Mass Yield (g)": _r(mass, 5)}
+
+    @staticmethod
+    def ean(z, ox, cn):
+        z, ox, cn = float(z), float(ox), float(cn)
+        res = z - ox + 2*cn
+        return {"EAN": int(res), "Stability": "Stable Noble Gas Config" if res in [36, 54, 86] else "Less Stable"}
 
     @staticmethod
     def nernst(e0, n, q):
@@ -115,31 +130,16 @@ class Chemistry_Classes_11_12:
         return {"E Cell (V)": _r(e, 4)}
 
     @staticmethod
-    def rate(k, a0, t):
-        k, a0, t = float(k), float(a0), float(t)
-        # 1st order: [A] = [A]0 * e^-kt
-        at = a0 * math.exp(-k * t)
-        return {"Final [A]t": _r(at, 4), "Conversion %": _r((a0-at)/a0 * 100, 2)}
+    def packing(style):
+        d = {"scc": "52.4%", "bcc": "68%", "fcc": "74%"}
+        return {"Efficiency": d.get(style.lower(), "Unknown")}
 
     @staticmethod
-    def functional(c, r):
-        r = r.lower()
-        if "red litmus turns blue" in r: return {"Inference": "Amine or Basic group present"}
-        if "effervescence" in r: return {"Inference": "Carboxylic Acid Group (-COOH) present"}
-        return {"Inference": "Requires further Specific Test (e.g. Tollen's)"}
-
-    @staticmethod
-    def ean(z, ox, cn):
-        z, ox, cn = float(z), float(ox), float(cn)
-        res = z - ox + 2*cn
-        return {"EAN": int(res), "Stability": "Electronic configuration of Noble Gas" if res in [36, 54, 86] else "Less Stable"}
-
-    @staticmethod
-    def chromato(ds, dr):
-        ds, dr = float(ds), float(dr)
-        # Rf = distance travelled by solute / distance travelled by solvent
-        rf = dr / ds
-        return {"Rf Value": _r(rf, 3)}
+    def functional(t):
+        t = t.lower()
+        if "tollen" in t: return {"Result": "Silver Mirror", "Group": "Aldehyde (-CHO)"}
+        if "fecl3" in t: return {"Result": "Violet Color", "Group": "Phenolic (-OH)"}
+        return {"Result": "Specific observation needed"}
 
 CHEMISTRY_REGISTRY = {
     "Classes 6-10": Chemistry_Classes_6_10,

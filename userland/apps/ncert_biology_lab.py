@@ -1,5 +1,5 @@
 """
-SigmaOS NCERT Biology Lab v7.0 — The Ultimate Lab Manual
+SigmaOS NCERT Biology Lab v8.0 — The Interactive series
 Classes 6–12 | Every Core NCERT Biological study & Ecology
 100% stdlib, zero 3rd-party deps
 """
@@ -11,124 +11,123 @@ def _r(x, d=4):
     except: return x
 
 class Biology_Classes_6_10:
-    TITLE = "Secondary Biology: Life processes & Natural World"
+    TITLE = "Secondary Biology: Anatomy & Functions"
     EXP_DATA = {
         "Starch Test": ("starch", [("Iodine Presence (1/0)", "1")]),
-        "Food Component Tests": ("food_test", [("Substance", "Sugar"), ("Reagent", "Benedict's")]),
-        "Cell Size Analysis": ("cell_size", [("Diameter (µm)", "20")]),
-        "Heart Rate Sim": ("heart", [("Resting bpm", "72"), ("Exercise Level (1-10)", "5")]),
-        "Mendel Monohybrid": ("mendel_m", [("P1 (TT/Tt/tt)", "Tt"), ("P2", "Tt")]),
-        "Osmosis (Potato Osmometer)": ("osmosis_p", [("Inside Solution", "Sugar"), ("Outside", "Water")]),
-        "Photosynthesis Rate": ("photo_rate", [("Light Distance (cm)", "20"), ("CO2 bubbles", "10")]),
-        "Sex Determination": ("gender", [("Father's Gamete (X/Y)", "Y")]),
+        "Plant Growth (Variable)": ("growth", [("Sun (1-10)", "8"), ("Water (1-10)", "7"), ("Soil (1-10)", "9")]),
+        "Cheek Cell Study": ("cheek", [("Stain (Methylene Blue)", "1")]),
+        "Human Heart Rate": ("heart", [("Age", "15"), ("Post-exercise (1/0)", "0")]),
+        "Mendel Monohybrid": ("mendel_m", [("P1 (TT/Tt/tt)", "Tt"), ("P2 (TT/Tt/tt)", "Tt")]),
+        "Osmosis (Potato/Raisins)": ("osmosis", [("Inside", "Sugar"), ("Outside", "Water")]),
+        "Dicot vs Monocot": ("plant_type", [("Venation (Reticulate/Parallel)", "Reticulate")]),
+        "Sex Determination": ("gender", [("Inherited (X/Y)", "Y")]),
     }
 
     @staticmethod
     def starch(i):
-        if int(i): return {"Result": "Blue-Black", "Note": "Starch Present"}
-        return {"Result": "Brown", "Note": "Starch Absent"}
+        if int(i): return {"Result": "Blue-black", "Note": "Photosynthesis products detected"}
+        return {"Result": "Brown", "Note": "No starch detected"}
 
     @staticmethod
-    def food_test(s, r):
-        s, r = s.lower(), r.lower()
-        if "benedict" in r and "sugar" in s: return {"Result": "Orange/Red precipitate", "Inference": "Reducing Sugar found"}
-        if "biuret" in r and "protein" in s: return {"Result": "Violet/Purple", "Inference": "Protein found"}
-        return {"Result": "No specific reaction"}
+    def growth(s, w, f):
+        s, w, f = float(s), float(w), float(f)
+        score = (s + w + f) / 3
+        if score > 8: return {"Rate": "OPTIMAL", "Observation": "Large healthy leaves, strong stem"}
+        if score > 5: return {"Rate": "AVERAGE", "Observation": "Slow growth, pale green color"}
+        return {"Rate": "STUNTED", "Observation": "Wilting, low biomass"}
 
     @staticmethod
-    def cell_size(d):
-        d = float(d)
-        v = (4/3) * math.pi * (d/2)**3
-        return {"Volume (µm³)": _r(v, 2), "Inference": "Prokaryotic cells are usually < 10µm"}
+    def cheek(stain):
+        if int(stain): return {"Visual": "Blue nucleus visible", "Type": "Eukaryotic Animal Cell"}
+        return {"Visual": "Unclear transparent blobs"}
 
     @staticmethod
-    def heart(b, e):
-        b, e = float(b), float(e)
-        final = b + (e * 12)
-        return {"Exercised Pulse": int(final), "Inference": "Heart rate increases with demand"}
+    def heart(age, ex):
+        age, ex = float(age), int(ex)
+        base = 72
+        if ex: base += 35
+        return {"Estimated Pulse (bpm)": int(base), "Range": "60-110 bpm"}
 
     @staticmethod
     def mendel_m(p1, p2):
         g = [a+b for a in p1 for b in p2]
         g = ["".join(sorted(x)) for x in g]
-        return {"Genotype List": g, "Counts": dict(Counter(g)), "Phenotype": "3 Dominant : 1 Recessive (Approx)"}
+        return {"Offspring": g, "Phenotype": "3 Tall : 1 Dwarf (Approx)"}
 
     @staticmethod
-    def osmosis_p(ins, outs):
+    def osmosis(ins, outs):
         ins, outs = ins.lower(), outs.lower()
-        if "sugar" in ins and "water" in outs: return {"Note": "Endosmosis occurs", "Water Level": "Rises inside the potato"}
-        return {"Note": "Requires concentration gradient"}
+        if "sugar" in ins and "water" in outs: return {"Process": "ENDOSMOSIS", "Result": "Cell Swells / Level Rises"}
+        if "water" in ins and "sugar" in outs: return {"Process": "EXOSMOSIS", "Result": "Cell Shrinks / Level Drops"}
+        return {"Process": "EQUILIBRIUM", "Result": "No Change"}
 
     @staticmethod
-    def photo_rate(d, b):
-        d, b = float(d), float(b)
-        rate = b / d # simplified
-        return {"Relative Rate": _r(rate, 2), "Observation": "Rate increases as Light source moves closer"}
+    def plant_type(v):
+        if "retic" in v.lower(): return {"Type": "DICOT", "Root": "Tap Root", "Example": "Gram, Pea"}
+        return {"Type": "MONOCOT", "Root": "Fibrous Root", "Example": "Wheat, Maize"}
 
     @staticmethod
-    def gender(g):
-        if "Y" in g.upper(): return {"Offspring": "Male (XY)", "Note": "Father determines the sex"}
-        return {"Offspring": "Female (XX)"}
+    def gender(chr):
+        if "Y" in chr.upper(): return {"Offspring": "MALE (XY)", "Determiner": "Paternal"}
+        return {"Offspring": "FEMALE (XX)", "Determiner": "Maternal inheritance"}
 
 class Biology_Classes_11_12:
-    TITLE = "Senior Biology: Physiology & Biotechnology"
+    TITLE = "Senior Biology: Advanced Physiology"
     EXP_DATA = {
-        "Pollen Germination": ("pollen", [("Sugar %", "10"), ("Time (mins)", "60")]),
-        "Plasmolysis (Rhoeo)": ("plasmolysis", [("Solution (Sugar/Water)", "Sugar")]),
-        "Transpiration (Potometer)": ("transpiration", [("Wind Speed (m/s)", "2"), ("Humidity (%)", "50")]),
-        "Meiosis Stages": ("cell_div", [("Stage", "Metaphase I")]),
-        "DNA Extraction logic": ("dna_iso", [("Sample", "Banana"), ("Reagent", "Cold Ethanol")]),
-        "Respiratory Quotient": ("rq", [("CO2 Vol", "1"), ("O2 Vol", "1")]),
-        "Hardy-Weinberg Freq": ("hardy", [("Allele p", "0.6")]),
-        "Population Density": ("pop_dens", [("Total Sample Area", "100"), ("Organism Counts", "15,20,5")]),
+        "Meiosis Stages": ("meiosis", [("Stage (Pro/Meta/Ana/Telo)", "Metaphase I")]),
+        "Mitosis Simulation": ("mitosis", [("Tissue", "Onion Root Tip")]),
+        "Transpiration (Potometer)": ("transpire", [("Fan Speed (1-10)", "5"), ("Humidity (1-10)", "3")]),
+        "RQ Calculation": ("rq", [("CO2 Vol", "1"), ("O2 Vol", "1")]),
+        "Species Area Richness": ("species", [("Area (sq km)", "1000")]),
+        "Hardy-Weinberg Freq": ("hardy", [("p allele", "0.6")]),
+        "Population Growth": ("growth", [("N0 (Initial)", "100"), ("r rate", "0.1"), ("t time", "10")]),
+        "DNA Extraction logic": ("dna", [("Reagent", "Cold Ethanol")]),
     }
 
     @staticmethod
-    def pollen(s, t):
-        s, t = float(s), float(t)
-        if 5 <= s <= 15: return {"Status": "POLLEN TUBE GROWS", "Observation": "Length increases over time"}
-        return {"Status": "NO GROWTH", "Reason": "Inappropriate sugar concentration"}
-
-    @staticmethod
-    def plasmolysis(sol):
-        if "sugar" in sol.lower(): return {"Process": "Exosmosis", "Cell Status": "Plasmolysed (Shrunken Protoplast)"}
-        return {"Process": "Endosmosis/Equilibrium", "Cell Status": "Turgid/Flaccid"}
-
-    @staticmethod
-    def transpiration(v, h):
-        v, h = float(v), float(h)
-        rate = (v * 10) / (h / 10) # arbitrary model
-        return {"Relative Rate": _r(rate, 2), "Note": "Rate ∝ Wind Speed, 1/Humidity"}
-
-    @staticmethod
-    def cell_div(s):
+    def meiosis(s):
         s = s.lower()
-        if "meta" in s: return {"Observation": "Chromosomes align at Equatorial Plate"}
-        if "ana" in s: return {"Observation": "Homologous chromosomes / chromatids move to opposite poles"}
-        return {"Note": "Refer NCERT Class 11 Biology Ch-10"}
+        if "meta" in s: return {"Occurrence": "Bivalent chromosomes align at equator"}
+        if "ana" in s: return {"Occurrence": "Homologous chromosomes move to opposite poles"}
+        return {"Note": "Reductional division occurring"}
 
     @staticmethod
-    def dna_iso(s, r):
-        if "ethanol" in r.lower(): return {"Result": "DNA precipitates as white fibers", "Observation": "Spooling of DNA can be performed"}
-        return {"Result": "Incomplete separation"}
+    def mitosis(t):
+        return {"Note": "Equational division. Separation of sister chromatids into daughter cells."}
+
+    @staticmethod
+    def transpire(v, h):
+        v, h = float(v), float(h)
+        rate = (v * 2) - (h / 2) + 5
+        return {"Relative Rate": _r(rate, 2), "Inference": "Highest in Windy, Low Humidity environments"}
 
     @staticmethod
     def rq(co2, o2):
-        co2, o2 = float(co2), float(o2)
-        res = co2 / o2
-        return {"RQ": _r(res, 2), "Inference": "Carbohydrate=1.0, Fats < 1.0, Proteins ~0.9"}
+        res = float(co2) / float(o2)
+        substrate = "Carbohydrate" if 0.95 < res <= 1.0 else ("Fat/Protein" if res < 1 else "Organic Acid")
+        return {"RQ": _r(res, 2), "Likely Substrate": substrate}
+
+    @staticmethod
+    def species(a):
+        s = 0.5 * (float(a)**0.3)
+        return {"Richness S": _r(s, 2)}
 
     @staticmethod
     def hardy(p):
         p = float(p); q = 1.0 - p
-        return {"p² (AA)": _r(p**2, 4), "2pq (Aa)": _r(2*p*q, 4), "q² (aa)": _r(q**2, 4)}
+        return {"AA (p²)": _r(p**2, 3), "Aa (2pq)": _r(2*p*q, 3), "aa (q²)": _r(q**2, 3)}
 
     @staticmethod
-    def pop_dens(a, counts):
-        a = float(a)
-        nums = [float(x.strip()) for x in counts.split(",")]
-        avg = sum(nums) / (a * len(nums))
-        return {"Density (org/sq.unit)": _r(avg, 3)}
+    def growth(n0, r, t):
+        n0, r, t = float(n0), float(r), float(t)
+        # Exponential growth: Nt = N0 * e^rt
+        nt = n0 * math.exp(r * t)
+        return {"Final Population Nt": _r(nt, 0)}
+
+    @staticmethod
+    def dna(r):
+        if "ethanol" in r.lower(): return {"Observation": "DNA threads precipitate and become visible (Spooling possible)"}
+        return {"Observation": "DNA remains in solution"}
 
 BIOLOGY_REGISTRY = {
     "Classes 6-10": Biology_Classes_6_10,

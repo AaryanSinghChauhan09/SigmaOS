@@ -1,5 +1,5 @@
 """
-SigmaOS NCERT Master Lab v7.0 — The Ultimate Virtual Suite
+SigmaOS NCERT Master Lab v8.0 — The Interactive series
 Unified Virtual Lab for Physics, Chemistry, Biology & Math (1–12)
 100% stdlib/tkinter | Fully dynamic simulation hub
 """
@@ -17,11 +17,10 @@ PAL = {
 class NCERTMasterLab(tk.Tk):
     def __init__(self):
         super().__init__()
-        self.title("SigmaOS • NCERT Master Lab v7.0")
+        self.title("SigmaOS • NCERT Virtual Lab v8.0")
         self.geometry("1400x900")
         self.configure(bg=PAL["bg"])
         
-        # Initialize attributes
         self._mods = {}
         self._exp_map = {}
         self._tree = None
@@ -38,12 +37,11 @@ class NCERTMasterLab(tk.Tk):
         # Header
         hdr = tk.Frame(self, bg=PAL["panel"], height=65)
         hdr.pack(fill="x"); hdr.pack_propagate(False)
-        tk.Label(hdr, text="🔬 NCERT MASTER LAB v7.0", fg=PAL["accent"], bg=PAL["panel"], font=("Segoe UI Bold",18)).pack(side="left", padx=25)
+        tk.Label(hdr, text="🔬 NCERT INTERACTIVE LAB v8.0", fg=PAL["accent"], bg=PAL["panel"], font=("Segoe UI Bold",18)).pack(side="left", padx=25)
         
-        # Tool status
-        tk.Label(hdr, text="[SYSTEM ALPHA-STABLE • EXHAUSTIVE COVERAGE]", fg="#00D26A", bg=PAL["panel"], font=("Consolas",9)).pack(side="right", padx=25)
+        tk.Label(hdr, text="[INTERACTIVE MODE READY]", fg="#00D26A", bg=PAL["panel"], font=("Consolas",9)).pack(side="right", padx=25)
 
-        # Main Layout
+        # Body
         body = tk.Frame(self, bg=PAL["bg"])
         body.pack(fill="both", expand=True, padx=8, pady=8)
         
@@ -55,18 +53,17 @@ class NCERTMasterLab(tk.Tk):
         self._tree.pack(fill="both", expand=True)
         self._tree.bind("<<TreeviewSelect>>", self._on_select)
         
-        # Style the Treeview
         style = ttk.Style()
         style.configure("Treeview", background=PAL["panel"], foreground=PAL["text"], fieldbackground=PAL["panel"], borderwidth=0, font=("Segoe UI", 10))
         style.map("Treeview", background=[('selected', PAL["accent"])])
         
-        # Middle Panel (Interaction Form)
+        # Middle Panel (Form)
         self._mid = tk.Frame(body, bg=PAL["bg"], width=420)
         self._mid.pack(side="left", fill="y", padx=(0,8)); self._mid.pack_propagate(False)
-        self._mid_msg = tk.Label(self._mid, text="◄ SELECT AN EXPERIMENT\nFROM THE LIST TO START", fg=PAL["dim"], bg=PAL["bg"], font=("Segoe UI Bold",12))
+        self._mid_msg = tk.Label(self._mid, text="◄ SELECT AN EXPERIMENT", fg=PAL["dim"], bg=PAL["bg"], font=("Segoe UI Bold",12))
         self._mid_msg.pack(expand=True)
         
-        # Right Panel (Scientific Console)
+        # Right Panel (Console)
         self._out_fr = tk.Frame(body, bg=PAL["bg"])
         self._out_fr.pack(side="right", fill="both", expand=True)
         self._out = scrolledtext.ScrolledText(self._out_fr, bg="#070910", fg="#00D26A", font=("Cascadia Code",10), borderwidth=0, padx=20, pady=20)
@@ -85,7 +82,6 @@ class NCERTMasterLab(tk.Tk):
             ("ncert_primary_maths", "PRIMARY_MATHS_REGISTRY", PAL["ma"], "➕ Primary Math (1-5)"),
         ]
         
-        # Ensure current directory is in path
         curr = os.path.dirname(os.path.abspath(__file__))
         if curr not in sys.path: sys.path.insert(0, curr)
         
@@ -105,7 +101,6 @@ class NCERTMasterLab(tk.Tk):
         
         for cls_label, cls_obj in registry.items():
             cls_node = self._tree.insert(root, "end", text=cls_label)
-            # Sort experiments alphabetically for better UX
             sorted_exps = sorted(cls_obj.EXP_DATA.items())
             for exp_display, data in sorted_exps:
                 node = self._tree.insert(cls_node, "end", text=f"• {exp_display}")
@@ -145,7 +140,6 @@ class NCERTMasterLab(tk.Tk):
                 args = []
                 for label, _ in fields:
                     v = entries[label].get()
-                    # Smart type detection
                     try:
                         if "." in v or "e" in v: args.append(float(v))
                         else: args.append(int(v))
@@ -158,13 +152,13 @@ class NCERTMasterLab(tk.Tk):
                     self._out.delete("1.0", "end")
                     self._out.insert("end", traceback.format_exc(), "err")
 
-        btn = tk.Button(self._mid, text="RUN SIMULATION ", bg=color, fg="white", font=("Segoe UI Bold",11), relief="flat", command=run_sim, pady=12, cursor="hand2")
+        btn = tk.Button(self._mid, text="RUN EXPERIMENT ⚗️", bg=color, fg="white", font=("Segoe UI Bold",11), relief="flat", command=run_sim, pady=12, cursor="hand2")
         btn.pack(fill="x", padx=25, pady=30)
 
     def _show_res(self, name, res):
         if not self._out: return
         self._out.delete("1.0", "end")
-        self._out.insert("end", f"▶ {name.upper()} DATA LOG\n", "title")
+        self._out.insert("end", f"▶ INTERACTIVE LOG: {name.upper()}\n", "title")
         self._out.insert("end", "─" * 40 + "\n\n")
         
         if isinstance(res, dict):
@@ -172,7 +166,7 @@ class NCERTMasterLab(tk.Tk):
                 self._out.insert("end", f" • {k}: ", "key")
                 self._out.insert("end", f"{v}\n\n")
         else:
-            self._out.insert("end", f" RAW RESULT: {res}\n")
+            self._out.insert("end", f" OUTPUT: {res}\n")
 
 if __name__ == "__main__":
     NCERTMasterLab().mainloop()

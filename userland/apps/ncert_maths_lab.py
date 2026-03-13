@@ -1,6 +1,6 @@
 """
-SigmaOS NCERT Mathematics Lab v7.0 — The Ultimate Lab Manual
-Classes 1–12 | Every Core NCERT Formula & Calculator
+SigmaOS NCERT Mathematics Lab v8.0 — The Interactive series
+Classes 1–12 | Every Core NCERT Topic & Interactive Calculator
 100% stdlib, zero 3rd-party deps
 """
 import math, random
@@ -11,26 +11,37 @@ def _r(x, d=4):
     except: return x
 
 class Maths_Classes_1_5:
-    TITLE = "Primary Mathematics Foundations"
+    TITLE = "Primary Math: Interactive Learning"
     EXP_DATA = {
-        "Addition (carrying)": ("add", [("Number 1", "48"), ("Number 2", "75")]),
-        "Place Value Logic": ("place", [("Number", "4563")]),
-        "Number Names": ("words", [("Number (0-1000)", "42")]),
-        "Tables Generator": ("table", [("Num", "13")]),
-        "Clock Angle": ("clock", [("Hours", "10"), ("Minutes", "10")]),
-        "Geometry Shapes": ("shapes", [("Shape", "Circle")]),
-        "Money Arithmetic": ("money", [("Price 1 (Rs)", "45.50"), ("Price 2 (Rs)", "20.25")]),
+        "Shapes Builder": ("shapes", [("Sides", "4")]),
+        "Pizza Fraction Slicer": ("fractions", [("Total Slices", "8"), ("Eaten Slices", "3")]),
+        "Addition carry/sum": ("add", [("Number A", "148"), ("Number B", "75")]),
+        "Pattern Hunter": ("pattern", [("Sequence (comma)", "2,4,6")]),
+        "Number Names": ("words", [("N (0-1000)", "42")]),
+        "Clock Angle": ("clock_angle", [("Hour", "3"), ("Min", "15")]),
+        "Measurement Convert": ("metric", [("Value", "500"), ("Unit (cm/m/km/g/kg)", "cm"), ("To", "m")]),
     }
 
     @staticmethod
-    def add(a, b):
-        return {"Sum": int(a)+int(b), "Visual": f"{a} + {b} = {int(a)+int(b)}"}
+    def shapes(s):
+        s = int(s)
+        d = {0:"Circle (No sides)", 1: "Line", 3: "Triangle", 4: "Square/Rectangle", 5:"Pentagon", 6:"Hexagon"}
+        return {"Shape": d.get(s, "Polygon with " + str(s) + " sides")}
 
     @staticmethod
-    def place(n):
-        s = "".join(reversed(str(int(n))))
-        lbl = ["Ones", "Tens", "Hundreds", "Thousands", "Ten Thousands"]
-        return {lbl[i]: s[i] for i in range(len(s)) if i < len(lbl)}
+    def fractions(t, e):
+        t, e = float(t), float(e)
+        return {"Fraction Remaining": f"{int(t-e)}/{int(t)}", "Percentage Left": f"{_r((1-e/t)*100, 1)}%"}
+
+    @staticmethod
+    def add(a, b):
+        return {"Sum": float(a)+float(b)}
+
+    @staticmethod
+    def pattern(s):
+        nums = [int(x.strip()) for x in s.split(",")]
+        diff = nums[1]-nums[0]
+        return {"Next": nums[-1] + diff}
 
     @staticmethod
     def words(n):
@@ -44,36 +55,36 @@ class Maths_Classes_1_5:
         return {"Word": str(v)}
 
     @staticmethod
-    def table(n):
-        n = int(n)
-        return {"Table": [f"{n} x {i} = {n*i}" for i in range(1, 11)]}
-
-    @staticmethod
-    def clock(h, m):
+    def clock_angle(h, m):
         h, m = float(h), float(m)
         a = abs(30*h - 5.5*m)
-        return {"Angle (deg)": min(a, 360-a)}
+        return {"Small Angle": min(a, 360-a)}
 
     @staticmethod
-    def shapes(s):
-        d = {"circle": "No corners, 1 curved side", "square": "4 equal sides, 4 corners", "triangle": "3 sides, 3 corners"}
-        return {"Key Property": d.get(s.lower(), "Refer Class 2 Math-Magic")}
-
-    @staticmethod
-    def money(p1, p2):
-        return {"Total Cost": f"₹ {_r(float(p1)+float(p2), 2)}"}
+    def metric(v, f, t):
+        u = {"km":1000, "m":1, "cm":0.01, "mm":0.001, "kg":1000, "g":1}
+        f, t = f.lower(), t.lower()
+        if f in u and t in u:
+            return {"Result": _r(float(v) * u[f] / u[t], 3) + " " + t}
+        return {"Error": "Invalid Units"}
 
 class Maths_Classes_6_10:
-    TITLE = "Secondary Mathematics Lab"
+    TITLE = "Secondary Math: Functions & Logic"
     EXP_DATA = {
-        "Quadratic Formula": ("quad", [("a", "1"), ("b", "-5"), ("c", "6")]),
-        "Arithmetic Progression": ("ap", [("a", "2"), ("d", "3"), ("n", "10")]),
-        "LCM & HCF": ("gcd_lcm", [("Num A", "48"), ("Num B", "36")]),
-        "Coordinate Geometry": ("coord", [("P1 (x,y)", "0,0"), ("P2 (x,y)", "3,4")]),
-        "Surface Area/Vol": ("mensuration", [("Shape (Cone/Cyl/Sphere)", "Sphere"), ("Radius", "7"), ("Height", "10")]),
-        "Trigonometric Solver": ("trig", [("Angle (deg)", "30")]),
-        "Probability Statistics": ("stats", [("Data (comma)", "10,20,30,40"), ("Dice Target", "7")]),
+        "Graph Plotting (Line)": ("graph", [("Slope m", "2"), ("Constant c", "3"), ("x value", "5")]),
+        "Quadratic Solver": ("quad", [("a", "1"), ("b", "-5"), ("c", "6")]),
+        "Pythagoras Verification": ("pyth", [("a", "3"), ("b", "4")]),
+        "Tessellation Checker": ("tessell", [("Sides of regular polygon", "4")]),
+        "Dice Probability": ("dice", [("Target Sum", "7"), ("Trials", "2000")]),
+        "Trigonometry (Height)": ("trig_h", [("Angle (deg)", "30"), ("Distance from base", "10")]),
+        "HCF & LCM": ("gcd_lcm", [("A", "48"), ("B", "36")]),
+        "Coordinate Dist": ("dist", [("x1,y1", "0,0"), ("x2,y2", "3,4")]),
     }
+
+    @staticmethod
+    def graph(m, c, x):
+        y = float(m)*float(x) + float(c)
+        return {"Resulting y": y, "Eq": f"y = {m}x + {c}"}
 
     @staticmethod
     def quad(a, b, c):
@@ -83,11 +94,29 @@ class Maths_Classes_6_10:
         return {"x1": _r((-b + math.sqrt(d))/(2*a)), "x2": _r((-b - math.sqrt(d))/(2*a))}
 
     @staticmethod
-    def ap(a, d, n):
-        a, d, n = float(a), float(d), float(n)
-        an = a + (n-1)*d
-        sn = (n/2) * (2*a + (n-1)*d)
-        return {"n-th Term (an)": an, "Sum (sn)": sn}
+    def pyth(a, b):
+        c = math.sqrt(float(a)**2 + float(b)**2)
+        return {"Hypotenuse c": _r(c, 2)}
+
+    @staticmethod
+    def tessell(n):
+        n = int(n)
+        angle = (n - 2) * 180 / n
+        if 360 % angle == 0: return {"Status": "YES", "Interior Angle": angle}
+        return {"Status": "NO", "Interior Angle": angle}
+
+    @staticmethod
+    def dice(t, tri):
+        hits = 0; n = int(tri)
+        for _ in range(n):
+            if random.randint(1,6)+random.randint(1,6) == int(t): hits += 1
+        return {"Prob %": _r((hits/n)*100, 2), "Frequency": f"{hits}/{n}"}
+
+    @staticmethod
+    def trig_h(deg, d):
+        r = math.radians(float(deg))
+        h = float(d) * math.tan(r)
+        return {"Height of Object": _r(h, 2)}
 
     @staticmethod
     def gcd_lcm(a, b):
@@ -96,96 +125,68 @@ class Maths_Classes_6_10:
         return {"HCF": g, "LCM": (a*b)//g}
 
     @staticmethod
-    def coord(p1, p2):
+    def dist(p1, p2):
         x1, y1 = [float(x) for x in p1.split(",")]
         x2, y2 = [float(x) for x in p2.split(",")]
-        dist = math.sqrt((x2-x1)**2 + (y2-y1)**2)
-        mid = [(x1+x2)/2, (y1+y2)/2]
-        return {"Distance": _r(dist, 3), "Midpoint": mid}
-
-    @staticmethod
-    def mensuration(s, r, h):
-        s, r, h = s.lower(), float(r), float(h)
-        if "sphere" in s: return {"Area": _r(4*math.pi*r**2), "Vol": _r((4/3)*math.pi*r**3)}
-        if "cyl" in s: return {"Vol": _r(math.pi*r**2*h), "CSA": _r(2*math.pi*r*h)}
-        if "cone" in s: return {"Vol": _r((1/3)*math.pi*r**2*h)}
-        return {"Error": "Shape unknown"}
-
-    @staticmethod
-    def trig(d):
-        r = math.radians(float(d))
-        return {"sin": _r(math.sin(r)), "cos": _r(math.cos(r)), "tan": _r(math.tan(r))}
-
-    @staticmethod
-    def stats(c_str, d):
-        nums = [float(x.strip()) for x in c_str.split(",")]
-        mean = sum(nums)/len(nums)
-        # Prob
-        hits = 0; tri = 2000
-        for _ in range(tri):
-            if random.randint(1,6)+random.randint(1,6) == int(d): hits += 1
-        return {"Mean": _r(mean, 2), "Dice Prob %": _r((hits/tri)*100, 2)}
+        return {"Distance": _r(math.sqrt((x2-x1)**2 + (y2-y1)**2), 3)}
 
 class Maths_Classes_11_12:
-    TITLE = "Senior Mathematics & Advanced Calculus"
+    TITLE = "Senior Math: Advanced Calculus & Probability"
     EXP_DATA = {
-        "Matrix Operations": ("matrix", [("Mat A (a,b;c,d)", "1,2;3,4"), ("Mat B", "5,6;7,8")]),
-        "Vector Dot/Cross": ("vectors", [("A (i,j,k)", "1,2,3"), ("B", "4,5,6")]),
-        "Limits (x->a for x^n)": ("limits", [("Function (x^n)", "3"), ("Approaching a", "2")]),
-        "Calculus (Diff/Integ)": ("calculus", [("Power n", "3"), ("Lower Bound", "0"), ("Upper Bound", "1")]),
-        "Conditional Prob": ("prob_cond", [("PA", "0.5"), ("PB", "0.3"), ("PA_and_B", "0.15")]),
-        "Sets Logic": ("sets", [("Set A", "1,2,3"), ("Set B", "3,4,5")]),
-        "LPP Optimization": ("lpp", [("W1", "10"), ("W2", "15"), ("Constraint Sum", "100")]),
+        "Matrix Mult (2x2)": ("mmul", [("Mat A (a,b;c,d)", "1,2;3,4"), ("Mat B", "5,6;7,8")]),
+        "Vector Cross Product": ("vcross", [("A (i,j,k)", "1,0,0"), ("B", "0,1,0")]),
+        "Definite Integral x^n": ("integ", [("n", "2"), ("Limit lower", "0"), ("Upper", "1")]),
+        "Binomial Dist": ("binomial", [("n trials", "10"), ("p prob", "0.5"), ("k successes", "5")]),
+        "Normal Curve Logic": ("normal", [("Mean", "50"), ("Std Dev", "5"), ("x val", "55")]),
+        "Set Union/Int": ("sets", [("Set A", "1,2,3"), ("Set B", "3,4,5")]),
+        "LPP Optimization": ("lpp", [("W1", "10"), ("W2", "15"), ("Lim", "100")]),
     }
 
     @staticmethod
-    def matrix(m1, m2):
+    def mmul(m1, m2):
         def p(s): return [[float(x) for x in row.split(",")] for row in s.split(";")]
         a, b = p(m1), p(m2)
-        det_a = a[0][0]*a[1][1] - a[0][1]*a[1][0]
-        mult = [[sum(a[i][k]*b[k][j] for k in range(2)) for j in range(2)] for i in range(2)]
-        return {"Det(A)": det_a, "A x B": mult}
+        res = [[sum(a[i][k]*b[k][j] for k in range(2)) for j in range(2)] for i in range(2)]
+        return {"Result": res}
 
     @staticmethod
-    def vectors(a_str, b_str):
+    def vcross(a_str, b_str):
         a = [float(x) for x in a_str.split(",")]
         b = [float(x) for x in b_str.split(",")]
-        dot = sum(x*y for x,y in zip(a, b))
         cross = [a[1]*b[2]-a[2]*b[1], a[2]*b[0]-a[0]*b[2], a[0]*b[1]-a[1]*b[0]]
-        return {"Dot Product": dot, "Cross Product": cross}
+        return {"i,j,k": cross}
 
     @staticmethod
-    def limits(n, a):
-        n, a = float(n), float(a)
-        # lim x->a (x^n) = a^n
-        return {"Limit result": _r(a**n, 4)}
-
-    @staticmethod
-    def calculus(n, l, u):
+    def integ(n, l, u):
         n, l, u = float(n), float(l), float(u)
-        diff = f"{int(n)}x^{int(n-1)}"
-        integ = (u**(n+1)/(n+1)) - (l**(n+1)/(n+1))
-        return {"Derivative d/dx": diff, "Definite Integral": _r(integ, 4)}
+        val = (u**(n+1)/(n+1)) - (l**(n+1)/(n+1))
+        return {"Value": _r(val, 4)}
 
     @staticmethod
-    def prob_cond(pa, pb, pab):
-        pa, pb, pab = float(pa), float(pb), float(pab)
-        p_a_given_b = pab / pb if pb > 0 else 0
-        return {"P(A|B)": _r(p_a_given_b, 4)}
+    def binomial(n, p, k):
+        n, p, k = int(n), float(p), int(k)
+        c = math.comb(n, k)
+        res = c * (p**k) * ((1-p)**(n-k))
+        return {"P(X=k)": _r(res, 6)}
 
     @staticmethod
-    def sets(a_str, b_str):
-        s1 = set(x.strip() for x in a_str.split(","))
-        s2 = set(x.strip() for x in b_str.split(","))
-        return {"Union": sorted(list(s1|s2)), "Intersection": sorted(list(s1&s2)), "A-B": sorted(list(s1-s2))}
+    def normal(m, s, x):
+        m, s, x = float(m), float(s), float(x)
+        z = (x - m) / s
+        p = 0.5 * (1 + math.erf(z / math.sqrt(2)))
+        return {"Z-score": _r(z, 2), "Percentile Approx": f"{_r(p*100, 1)}%"}
 
     @staticmethod
-    def lpp(w1, w2, c):
-        w1, w2, c = float(w1), float(w2), float(c)
-        # Maximize w1*x + w2*y where x+y <= c
-        # Vertex test: (0,c) or (c,0)
-        v1, v2 = w1*c, w2*c
-        return {"Max val": max(v1, v2), "At": "(c,0)" if v1 > v2 else "(0,c)"}
+    def sets(a, b):
+        s1 = set(x.strip() for x in a.split(","))
+        s2 = set(x.strip() for x in b.split(","))
+        return {"Union": sorted(list(s1|s2)), "Int": sorted(list(s1&s2))}
+
+    @staticmethod
+    def lpp(w1, w2, l):
+        w1, w2, l = float(w1), float(w2), float(l)
+        v1, v2 = w1*l, w2*l
+        return {"Max val": max(v1, v2), "At": "(l,0)" if v1>v2 else "(0,l)"}
 
 MATHS_REGISTRY = {
     "Classes 1-5": Maths_Classes_1_5,
