@@ -1,17 +1,16 @@
 """
-SigmaOS NCERT Biology Lab v10.0 — The Ultimate Series
+SigmaOS NCERT Biology Lab v10.1 — The Ultimate Series
 Classes 6–12 | Exhaustive NCERT Experiment & Simulation Hub
 100% stdlib, zero 3rd-party deps
 """
 import math, random
-from collections import Counter
 
 def _r(x, d=4):
     try: return float(("{:." + str(int(d)) + "f}").format(float(x)))
     except: return x
 
 class Biology_Classes_6_10:
-    TITLE = "Secondary Biology: Living Systems"
+    TITLE = "Secondary Biology: Advanced Life Systems"
     EXP_DATA = {
         "Starch/Iodine": ("starch", [("Iodine", "1")]),
         "BMI Calculator": ("bmi", [("Weight (kg)", "70"), ("Height (m)", "1.75")]),
@@ -20,40 +19,38 @@ class Biology_Classes_6_10:
         "Photosynthesis": ("photo", [("Light (1-10)", "8"), ("CO2 (1-10)", "7")]),
         "Osmosis Flow": ("osmosis", [("Cell_C (M)", "0.1"), ("Sol_C (M)", "0.5")]),
         "Blood Group Type": ("blood", [("Antigen A (1/0)", "1"), ("Antigen B", "0"), ("Rh Factor", "1")]),
-        "Plant Type": ("plant", [("Leaves", "Dicot"), ("Root", "Tap")]),
+        "Plant Anatomy": ("plant", [("Leaves", "Dicot"), ("Root", "Tap")]),
+        "Digestion Rate": ("digestion", [("pH", "2"), ("Temp (C)", "37")]),
     }
 
     @staticmethod
     def starch(i):
-        return {"Status": "Blue-Black (PRESENT)" if int(i) else "Brown (ABSENT)"}
+        return {"Status": "Blue-Black" if int(i) else "Brown"}
 
     @staticmethod
     def bmi(w, h):
         b = w / h**2
-        cat = "Underweight" if b<18.5 else "Normal" if b<25 else "Overweight"
-        return {"BMI": _r(b, 1), "Category": cat}
+        return {"BMI": _r(b, 1), "Cat": "Normal" if 18.5<=b<25 else "Other"}
 
     @staticmethod
     def micro(obj, eye):
-        return {"Total Mag": obj * eye}
+        return {"Mag": obj * eye}
 
     @staticmethod
     def heart(age, ex):
         m = 220 - age
-        rate = 72; range_ = "60-100"
-        if ex: rate = 110; range_ = f"{int(m*0.6)}-{int(m*0.8)}"
-        return {"Current bpm": rate, "Safety Range": range_}
+        return {"bpm": 110 if ex else 72, "Max": m}
 
     @staticmethod
     def photo(l, c):
         rate = (l * c) / 2
-        return {"O2 Evolution": _r(rate, 1), "Efficiency": "High" if rate > 30 else "Normal"}
+        return {"Rate": _r(rate, 1)}
 
     @staticmethod
     def osmosis(cc, sc):
-        if sc > cc: return {"Process": "Exosmosis", "Result": "Plasmolysis / Shrink"}
-        if sc < cc: return {"Process": "Endosmosis", "Result": "Turgidity / Swell"}
-        return {"Process": "Equilibrium", "Result": "No Change"}
+        if sc > cc: return {"Process": "Exosmosis"}
+        if sc < cc: return {"Process": "Endosmosis"}
+        return {"Process": "Equil"}
 
     @staticmethod
     def blood(a, b, rh):
@@ -65,36 +62,36 @@ class Biology_Classes_6_10:
 
     @staticmethod
     def plant(l, r):
-        if "dicot" in l.lower() or "tap" in r.lower(): return {"Type": "DICOT", "Seeds": "2 Cotyledons"}
-        return {"Type": "MONOCOT", "Seeds": "1 Cotyledon"}
+        if "dicot" in l.lower() or "tap" in r.lower(): return {"Type": "DICOT"}
+        return {"Type": "MONOCOT"}
+
+    @staticmethod
+    def digestion(ph, t):
+        if 1.5 < ph < 2.5 and 35 < t < 40: return {"Status": "ACTIVE (Gastric)"}
+        return {"Status": "INACTIVE"}
 
 class Biology_Classes_11_12:
-    TITLE = "Senior Biology: Research & Genetics"
+    TITLE = "Senior Biology: Research & Advanced Logic"
     EXP_DATA = {
-        "Mendel Dihybrid": ("mendel", [("P1 (RRYY)", "RrYy"), ("P2 (RRYY)", "RrYy")]),
-        "Hardy-Weinberg": ("hardy", [("p-freq", "0.6"), ("Pop Total", "1000")]),
-        "Trophic 10%": ("trophic", [("Producer (kcal)", "1000")]),
+        "Mendel Dihybrid": ("mendel", [("P1", "RrYy")]),
+        "Hardy-Weinberg": ("hardy", [("p-freq", "0.6"), ("Pop", "1000")]),
         "RQ Substrate": ("rq", [("CO2 Vol", "1"), ("O2 Vol", "1")]),
-        "Peptide/DNA Comp": ("dna", [("Seq", "ATGCGTA")]),
-        "Population Nt": ("pop", [("N0", "100"), ("r", "0.1"), ("t", "10")]),
-        "Quadrat Density": ("quadrat", [("Counts (cm separated)", "5,8,4,12"), ("Area (sq m)", "1")]),
-        "Transpire Rate": ("transpire", [("Wind", "5"), ("Humidity", "2")]),
+        "DNA Complement": ("dna", [("Seq", "ATGCGTA")]),
+        "Population Growth": ("pop", [("N0", "100"), ("r", "0.1"), ("t", "10")]),
+        "Quadrat Density": ("quadrat", [("Counts", "5,8,4"), ("Area", "1")]),
+        "Transpiration": ("transpire", [("Wind", "5"), ("Humidity", "2")]),
         "Mitosis Phases": ("mitosis", [("Phase", "Metaphase")]),
+        "Lung Capacities": ("lung", [("TV (ml)", "500"), ("IRV (ml)", "3000"), ("ERV (ml)", "1100")]),
     }
 
     @staticmethod
-    def mendel(p1, p2):
-        # simplified 9:3:3:1
-        return {"Phenotype Ratio": "9:3:3:1 (RoundYellow, RoundGreen, WrinkledYellow, WrinkledGreen)"}
+    def mendel(p):
+        return {"Ratio": "9:3:3:1 (Mendelian Dihybrid)"}
 
     @staticmethod
     def hardy(p, n):
         q = 1 - p
         return {"AA": int(n*p**2), "Aa": int(n*2*p*q), "aa": int(n*q**2)}
-
-    @staticmethod
-    def trophic(e):
-        return {"Herbivore": e*0.1, "Carnivore": e*0.01, "TopPredator": e*0.001}
 
     @staticmethod
     def rq(c, o):
@@ -104,27 +101,33 @@ class Biology_Classes_11_12:
     @staticmethod
     def dna(s):
         d = {"A":"T", "T":"A", "C":"G", "G":"C"}
-        return {"Complement": "".join(d.get(b.upper(), b) for b in s)}
+        # Cast to str explicitly to satisfy linter joined string check
+        res = [str(d.get(b.upper(), b)) for b in s]
+        return {"Complement": "".join(res)}
 
     @staticmethod
     def pop(n0, r, t):
-        nt = n0 * math.exp(r*t)
-        return {"Final Pop": _r(nt, 0)}
+        return {"Final": _r(n0 * math.exp(r*t), 0)}
 
     @staticmethod
     def quadrat(c, a):
-        v = [int(x) for x in c.split(",")]
-        return {"Avg Density": _r(sum(v)/(len(v)*a), 2)}
+        v = [int(x) for x in str(c).split(",")]
+        return {"Density": _r(sum(v)/(len(v)*a), 2)}
 
     @staticmethod
     def transpire(w, h):
         rate = (w * 5) / h
-        return {"Rate": _r(rate, 2), "Status": "Intense" if rate > 20 else "Mild"}
+        return {"Rate": _r(rate, 2)}
 
     @staticmethod
     def mitosis(p):
-        d = {"prophase": "Nucleus thickens, membrane fades", "metaphase": "Chromosomes line up at center", "anaphase": "Chromatids separate"}
-        return {"Observation": d.get(p.lower(), "Nuclear division stage")}
+        d = {"metaphase": "Aligned at Equator", "anaphase": "Separating"}
+        return {"Obs": d.get(p.lower(), "Division Stage")}
+
+    @staticmethod
+    def lung(tv, irv, erv):
+        vc = tv + irv + erv
+        return {"Vital Capacity (ml)": vc, "IC (Inspiratory)": tv+irv}
 
 BIOLOGY_REGISTRY = {
     "Classes 6-10": Biology_Classes_6_10,

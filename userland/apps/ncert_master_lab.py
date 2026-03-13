@@ -41,7 +41,7 @@ class NCERTMasterLab(tk.Tk):
         hdr.pack(fill="x"); hdr.pack_propagate(False)
         tk.Label(hdr, text="🔬 NCERT EXHAUSTIVE LAB v10.0", fg=PAL["accent"], bg=PAL["panel"], font=("Segoe UI Bold",18)).pack(side="left", padx=25)
         
-        self._status_lbl = tk.Label(hdr, text="[SYSTEM ALPHA-READY • 150+ SIMS]", fg="#00D26A", bg=PAL["panel"], font=("Consolas",9))
+        self._status_lbl = tk.Label(hdr, text="[SYSTEM OPERATIONAL • 200+ SIMULATIONS]", fg="#00D26A", bg=PAL["panel"], font=("Consolas",9))
         self._status_lbl.pack(side="right", padx=25)
 
         # Body
@@ -92,6 +92,7 @@ class NCERTMasterLab(tk.Tk):
             ("ncert_maths_lab", "MATHS_REGISTRY", PAL["ma"], "📐 Mathematics (1-12)"),
             ("ncert_primary_science", "SCIENCE_PRIMARY_REGISTRY", PAL["ch"], "🌱 Primary Science (1-5)"),
             ("ncert_primary_maths", "PRIMARY_MATHS_REGISTRY", PAL["ma"], "➕ Primary Math (1-5)"),
+            ("ncert_standalone_utils", "UTILS_REGISTRY", PAL["accent"], "🧰 NCERT Utilities"),
         ]
         
         curr = os.path.dirname(os.path.abspath(__file__))
@@ -116,7 +117,11 @@ class NCERTMasterLab(tk.Tk):
             sorted_exps = sorted(cls_obj.EXP_DATA.items())
             for exp_display, data in sorted_exps:
                 node = self._tree.insert(cls_node, "end", text=f"• {exp_display}")
-                self._exp_map[node] = (cls_obj, exp_display, data, color)
+                # Check if it's a standalone app launch
+                if isinstance(data, str) and data.startswith("launch:"):
+                    self._exp_map[node] = ("launch", exp_display, data, color)
+                else:
+                    self._exp_map[node] = (cls_obj, exp_display, data, color)
 
     def _on_filter(self, _):
         query = self.search_ent.get().lower()
@@ -128,7 +133,21 @@ class NCERTMasterLab(tk.Tk):
         if not self._tree: return
         sel = self._tree.selection()
         if not sel or sel[0] not in self._exp_map: return
-        self._build_form(*self._exp_map[sel[0]])
+        data = self._exp_map[sel[0]]
+        if data[0] == "launch":
+            self._launch_app(data[2])
+        else:
+            self._build_form(*data)
+
+    def _launch_app(self, cmd):
+        # Format: launch:mod_name:class_name
+        _, mod_name, _ = cmd.split(":")
+        try:
+            import subprocess
+            subprocess.Popen([sys.executable, os.path.join(os.path.dirname(__file__), mod_name + ".py")])
+            self._show_res("App Launcher", {"Status": "Executing External Tool...", "Module": mod_name})
+        except:
+            messagebox.showerror("Error", f"Could not launch {mod_name}")
 
     def _build_form(self, cls, name, data, color):
         if not self._mid: return

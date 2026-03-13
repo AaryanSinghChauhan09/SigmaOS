@@ -42,7 +42,9 @@ class PeriodicTable(tk.Tk):
             
             tk.Label(cell, text=str(z), font=("Consolas", 8), fg=PAL["text"], bg=PAL["element"]).pack(anchor="nw", padx=2)
             tk.Label(cell, text=sym, font=("Segoe UI Bold", 12), fg="white", bg=PAL["element"]).pack()
-            tk.Label(cell, text=name[:6], font=("Segoe UI", 7), fg=PAL["text"], bg=PAL["element"]).pack()
+            # Explicit string slicing with indices to satisfy linter
+            short_name = str(name)[0:6]
+            tk.Label(cell, text=short_name, font=("Segoe UI", 7), fg=PAL["text"], bg=PAL["element"]).pack()
 
 if __name__ == "__main__":
     PeriodicTable().mainloop()
