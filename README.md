@@ -85,7 +85,7 @@ SigmaOS v4.5.3 introduces the **Apex Gaming Hub** and **Ultra-Performance Pipeli
 
 ## 📦 Getting Started (Any Device)
 
-1. **Clone & Mesh**: `git clone https://github.com/AaryanSinghChauhan09/SigmaOS.git`
+1. **Clone & Mesh**: `git clone https://github.com/SovereignResearcher/SigmaOS.git`
 2. **One-Click Setup**: Run `setup.ps1` (Windows) or `setup.sh` (POSIX).
 3. **Boot Apex**: `py boot.py`
 

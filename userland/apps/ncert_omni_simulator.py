@@ -122,9 +122,14 @@ class NCERTOmniSimulator(tk.Tk):
         self.health_lbl.pack(fill="x", padx=10)
 
         # 3. Dynamic Display Area
-        self.main_area = tk.Frame(self.content_frame, bg=PAL["bg"])
-        self.main_area.pack(side="right", fill="both", expand=True)
-        
+        # Adaptive Stealth UI (Minimalist & Resource Saving)
+        if self.settings.get("stealth_mode", False):
+            self.status_tray.pack_forget()
+            self.health_lbl.pack_forget()
+        else:
+            self.status_tray.pack(fill="x", padx=10, pady=10)
+            self.health_lbl.pack(fill="x", padx=10)
+            
         self._show_welcome()
 
     def _show_welcome(self):
@@ -214,6 +219,16 @@ class NCERTOmniSimulator(tk.Tk):
                 messagebox.showwarning("Privacy Audit", f"Security Warning: {len(leaks)} potential PII leaks detected.")
                 
         tk.Button(pane, text="RUN PRIVACY AUDIT", bg=PAL["dim"], fg="white", relief="flat", command=run_audit).pack(pady=5)
+        
+        # Stealth / Minimalist Toggle
+        stealth_var = tk.BooleanVar(value=self.settings.get("stealth_mode", False))
+        def toggle_stealth():
+            SettingsManager.update_key("stealth_mode", stealth_var.get())
+            messagebox.showinfo("Stealth", "OS Visual Footprint Adjusted.")
+            self._show_welcome()
+            
+        tk.Checkbutton(pane, text="Minimilist Mode (Stealth UI)", variable=stealth_var, command=toggle_stealth,
+                       bg=PAL["card"], fg="white", selectcolor="#000").pack(pady=10)
 
     def _show_analytics(self):
         self._clear_area()
@@ -247,9 +262,11 @@ class NCERTOmniSimulator(tk.Tk):
                 btn.pack(fill="x", pady=5)
 
     def _update_loop(self):
-        """Adaptive System Pulse."""
-        self._refresh_health()
-        self.after(5000, self._update_loop)
+        """Adaptive System Pulse & Eco-Throttling."""
+        report = self._refresh_health()
+        # Resilient Throttling: adjust frequency based on system state
+        throttle = report.get("Throttle", 5000)
+        self.after(throttle, self._update_loop)
 
     def _refresh_health(self):
         # Transparency: System health in footer
@@ -259,6 +276,7 @@ class NCERTOmniSimulator(tk.Tk):
             self.health_lbl.config(fg="#F87171") # Alert red
         else:
             self.health_lbl.config(fg=PAL["chem"])
+        return report
 
     def _launch_sublab(self, mod_name):
         # Gamified Reward

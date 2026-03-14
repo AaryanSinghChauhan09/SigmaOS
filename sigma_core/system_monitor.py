@@ -15,6 +15,9 @@ if root not in sys.path: sys.path.insert(0, root)
 from userland.system_api.sigma_std import SigmaSys
 
 class SystemMonitor:
+    # Eco-Awareness Tuning
+    ECO_THROTTLE_MS = 15000  # 15s when CPU > 20% or Battery Low
+    STATIC_THROTTLE_MS = 5000 # 5s nominal
     @staticmethod
     def get_health_report():
         """Aggregates system vitals for transparency."""
@@ -23,6 +26,7 @@ class SystemMonitor:
         
         # Environmental/Compliance Logic
         eco_mode = "ECO-ACTIVE" if cpu < 20 else "PERFORMANCE"
+        throttle = SystemMonitor.STATIC_THROTTLE_MS if eco_mode == "ECO-ACTIVE" else SystemMonitor.ECO_THROTTLE_MS
         
         return {
             "CPU": f"{cpu}%",
@@ -30,7 +34,8 @@ class SystemMonitor:
             "PowerState": eco_mode,
             "Integrity": "VERIFIED",
             "Uptime": f"{int(time.process_time())}s",
-            "Arch": sys.platform.upper()
+            "Arch": sys.platform.upper(),
+            "Throttle": throttle
         }
 
     @staticmethod
