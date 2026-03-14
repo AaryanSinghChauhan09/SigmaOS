@@ -42,6 +42,8 @@ class NCERTOmniSimulator(tk.Tk):
         self.geometry("1400x900")
         self.configure(bg=PAL["bg"])
         
+        self.search_var = tk.StringVar()
+        self.main_area = None
         self._build_ui()
 
     def _build_ui(self):
@@ -109,17 +111,20 @@ class NCERTOmniSimulator(tk.Tk):
         grid.pack(pady=40)
         
         cards = [
-            ("Periodic Table", "Explore elements and atomic data", PAL["chem"]),
-            ("Logic Circuits", "Build digital logic gates", PAL["accent"]),
-            ("Math Identities", "Visual proof of algebra", PAL["math"])
+            ("Periodic Table", "Explore elements and atomic data", PAL["chem"], "ncert_periodic_table"),
+            ("Logic Lab", "Interactive Gate Simulations", PAL["accent"], "ncert_logic_circuit"),
+            ("Optics Bench", "Mirror & Lens Formula Bench", PAL["phys"], "ncert_ray_optics"),
+            ("Titration", "Acid-Base colorimetry lab", PAL["chem"], "ncert_titration_sim"),
+            ("Physio Master", "Cardiac & Neural telemetry", PAL["bio"], "ncert_physio_hub")
         ]
         
-        for name, desc, color in cards:
+        for name, desc, color, mod in cards:
             c = tk.Frame(grid, bg=PAL["card"], width=200, height=200, padx=20, pady=20)
             c.pack(side="left", padx=15)
             c.pack_propagate(False)
             tk.Label(c, text=name, font=("Segoe UI Bold", 14), fg=color, bg=PAL["card"]).pack(pady=10)
             tk.Label(c, text=desc, font=("Segoe UI", 9), fg=PAL["dim"], bg=PAL["card"], wraplength=160).pack()
+            tk.Button(c, text="LAUNCH", font=("Segoe UI Bold", 8), bg=color, fg="black", relief="flat", command=lambda m=mod: self._launch_sublab(m)).pack(side="bottom", pady=5)
 
     def _clear_area(self):
         for w in self.main_area.winfo_children(): w.destroy()
@@ -131,13 +136,12 @@ class NCERTOmniSimulator(tk.Tk):
     def _show_primary(self): self._launch_sublab("ncert_primary_maths")
 
     def _launch_sublab(self, mod_name):
-        # Open the Master Lab and pre-select the category
+        # Open the specific lab or hub
         try:
-            import importlib
-            mod = importlib.import_module("userland.apps.ncert_master_lab")
-            app = mod.NCERTMasterLab()
-            # Note: We just launch it for now as a standalone for modularity
-            messagebox.showinfo("Omni-Sync", f"Initializing {mod_name} Sub-Atomic Lab...")
+            import importlib, subprocess
+            # Try to launch as subprocess to keep main UI responsive
+            subprocess.Popen([sys.executable, f"userland/apps/{mod_name}.py"])
+            # messagebox.showinfo("Omni-Sync", f"Initializing {mod_name} Sub-Atomic Lab...")
         except Exception as e:
             messagebox.showerror("Error", f"Failed to link module: {e}")
 
