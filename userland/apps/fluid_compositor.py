@@ -109,13 +109,16 @@ class FluidCompositor(tk.Tk):
             self.canvas.create_text(x1+10, y1+15, text=txt, fill=PAL["text"], font=("Inter", 9, "bold"), anchor="w")
 
         # Status
-        self.status = tk.Label(self, text=f"COMPOSITOR ACTIVE | V-SYNC: {'ON' if self.vsync else 'OFF'} | TARGET FRAME-TIME: 6.94ms (144Hz)", 
+        self.status_bar = tk.Label(self, text=f"COMPOSITOR ACTIVE | V-SYNC: {'ON' if self.vsync else 'OFF'} | TARGET FRAME-TIME: 6.94ms (144Hz)", 
                                bg=PAL["accent_dim"], fg="white", font=("Inter", 8, "bold"), pady=6)
-        self.status.pack(side="bottom", fill="x")
+        self.status_bar.pack(side="bottom", fill="x")
 
     def _flush_buffer(self):
-        self.status.config(text="FLUSHING BACKBUFFER TO DISPLAY (POINTER SWAP)...", bg=PAL["warning"], fg="black")
-        self.after(50, lambda: self.status.config(text=f"SCREEN REFRESHED | FRAME RENDERED IN {random.uniform(2.1, 4.3):.2f}ms", bg=PAL["success"], fg="black"))
+        self.status_bar.config(text="FLUSHING BACKBUFFER TO DISPLAY (POINTER SWAP)...", bg=PAL["warning"], fg="black")
+        self.after(50, self._render_complete)
+
+    def _render_complete(self):
+        self.status_bar.config(text=f"SCREEN REFRESHED | FRAME RENDERED IN {random.uniform(2.1, 4.3):.2f}ms", bg=PAL["success"], fg="black")
 
     def _toggle_vsync(self):
         self.vsync = not self.vsync
@@ -128,7 +131,7 @@ class FluidCompositor(tk.Tk):
             msg = "V-Sync Disabled. Rendering engine fully unthrottled.\nFPS unlocked. Potential screen tearing introduced."
             
         messagebox.showinfo("Hardware Compositor", msg)
-        self.status.config(text=f"COMPOSITOR ACTIVE | V-SYNC: {stat} | GPU UNLOCKED", bg=col, fg="black" if self.vsync else "white")
+        self.status_bar.config(text=f"COMPOSITOR ACTIVE | V-SYNC: {stat} | GPU UNLOCKED", bg=col, fg="black" if self.vsync else "white")
 
     def react_to_vibe(self, vibe_mode: str):
         """USP: Dynamic UI Personalization. Reacts to OS level profile shifts."""
@@ -142,7 +145,7 @@ class FluidCompositor(tk.Tk):
         scheme = schemes.get(vibe_mode, schemes["NEURAL_RESEARCH"])
         self.configure(bg=str(scheme["bg"]))
         self.fps = int(scheme["fps"])
-        self.status.config(text=f"VIBE SHIFTED: {vibe_mode} | TARGET: {self.fps}Hz", bg=str(scheme["accent"]), fg="black")
+        self.status_bar.config(text=f"VIBE SHIFTED: {vibe_mode} | TARGET: {self.fps}Hz", bg=str(scheme["accent"]), fg="black")
         
         self.log_event("ui_vibe_shift", {"mode": vibe_mode, "fps": self.fps})
         return f"UI Re-Composited for {vibe_mode} profile."
