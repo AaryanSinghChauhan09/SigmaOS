@@ -75,6 +75,15 @@ class AetherOrchPage(SigmaPage):
             self.gui._log(a_log, "[AI] Neural Sanitizer threshold adjusted for peak cognitive flow.", "OK")
             
         ttk.Button(san_c, text="Re-Calibrate Sanitizer", command=toggle_san).pack(side="left", padx=5, pady=5)
+        
+        # SOVEREIGN THOUGHT-MAP (USP)
+        def show_map():
+            self.gui._log(a_log, "\n[AI] GENERATING SOVEREIGN THOUGHT-MAP...", "HEAD")
+            res = self.gui.kernel.registry.get("aether_orch").generate_thought_map()
+            self.gui._log(a_log, res, "OK")
+            self._notify("Aether Mind-Map", "Collaborative visualization rendered.", "OK")
+
+        ttk.Button(san_c, text="📊 Render Thought-Map", command=show_map).pack(side="left", padx=5, pady=5)
 
         a_log = self.gui._console(r_fr, height=20)
         a_log.pack(fill="both", expand=True)

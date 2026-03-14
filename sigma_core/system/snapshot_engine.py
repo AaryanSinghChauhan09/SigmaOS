@@ -25,7 +25,8 @@ class SnapshotEngine(SigmaModuleBase, ISigmaService):
     def _hash_payload(self, data: bytes) -> str:
         """CS: Probabilistic Collision-Resistant ID (SHA1/256 mix)."""
         import hashlib
-        return hashlib.sha256(data).hexdigest()[:16]
+        h: str = hashlib.sha256(data).hexdigest()
+        return h[:16]
 
     def capture_point(self, label: str) -> str:
         """

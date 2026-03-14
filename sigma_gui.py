@@ -801,40 +801,40 @@ class SigmaGUI(tk.Tk, UIMixin):
             "explorer":         self._build_explorer_page,
             "projects":         self._build_project_center_page,
             "software_matrix":  lambda: self._set_modular_page("software_matrix", SoftwareMatrixPage),
-            "nexus_ai":         self._build_nexus_ai_page,
-            "antigravity_hub":  self._build_antigravity_hub_page,
-            "brain":            self._build_brain_page,
+            "nexus_ai":         lambda: self._set_modular_page("nexus_ai", NexusPage),
+            "antigravity_hub":  lambda: self._set_modular_page("antigravity_hub", AGGuidePage),
+            "brain":            lambda: self._set_modular_page("brain", BrainPage),
             "identity":        lambda: self._set_modular_page("identity", IdentityPage),
             "access":          lambda: self._set_modular_page("access", AccessPage),
             "network_warden":   lambda: self._set_modular_page("network_warden", WardenPage),
             "silo":            lambda: self._set_modular_page("silo", SiloPage),
             "intelligence_hub": lambda: self._set_modular_page("intelligence_hub", IntelligenceHubPage),
             "terminal":         lambda: self._set_modular_page("terminal", TerminalPage),
-            "automation_hub":   self._build_automation_hub_page,
+            "automation_hub":   lambda: self._set_modular_page("automation_hub", AutomationHubPage),
             "ai_lifecycle":     self._build_ai_lifecycle_page,
-            "zenith":           self._build_zenith_page,
+            "zenith":           lambda: self._set_modular_page("zenith", ZenithPage),
             "config_hub":       lambda: self._set_modular_page("config_hub", ConfigHubPage),
             "gaming_hub":       lambda: self._set_modular_page("gaming_hub", ArcadePage),
             "system_audit":     lambda: self._set_modular_page("system_audit", AuditViewPage),
             "virtualbox":       self._build_virtualbox_page,
-            "ag_physics":       self._build_ag_physics_page,
-            "visual_customizer": self._build_visual_customizer_page,
-            "gmail_ai":         self._build_gmail_ai_page,
-            "sovereign_suite":  self._build_sovereign_suite_page,
-            "network_vanguard": self._build_network_vanguard_page,
-            "intelligence_studio": self._build_intelligence_studio_page,
-            "gurukul_academy": self._build_gurukul_academy_page,
+            "ag_physics":       lambda: self._set_modular_page("ag_physics", AGPhysicsPage),
+            "visual_customizer": lambda: self._set_modular_page("visual_customizer", CustomizerPage),
+            "gmail_ai":         lambda: self._set_modular_page("gmail_ai", GmailAIPage),
+            "sovereign_suite":  lambda: self._set_modular_page("sovereign_suite", SovereignLabPage),
+            "network_vanguard": self._build_vanguard_page,
+            "intelligence_studio": lambda: self._set_modular_page("intelligence_studio", IntelligenceHubPage),
+            "gurukul_academy": lambda: self._set_modular_page("gurukul_academy", UnivHubPage),
             "compliance_center": self._build_compliance_center_page,
-            "mission_control":  self._build_mission_control_page,
-            "advanced_calculator": self._build_advanced_calculator_page,
-            "unit_converter":   self._build_unit_converter_page,
-            "data_analyzer":    self._build_data_analyzer_page,
-            "chemistry_lab":    self._build_chemistry_lab_page,
-            "cipher_studio":    self._build_cipher_studio_page,
-            "ncert_simulator":  self._build_ncert_simulator_page,
-            "ncert_calc":       self._build_ncert_calc_page,
-            "diksha_vlab":      self._build_diksha_vlab_page,
-            "katbook_reader":   self._build_katbook_reader_page,
+            "mission_control":  lambda: self._set_modular_page("mission_control", MissionControlPage),
+            "advanced_calculator": lambda: self._set_modular_page("advanced_calculator", AdvancedCalculatorPage),
+            "unit_converter":   lambda: self._set_modular_page("unit_converter", UnitConverterPage),
+            "data_analyzer":    lambda: self._set_modular_page("data_analyzer", DataAnalyzerPage),
+            "chemistry_lab":    lambda: self._set_modular_page("chemistry_lab", ChemistryLabPage),
+            "cipher_studio":    lambda: self._set_modular_page("cipher_studio", CipherStudioPage),
+            "ncert_simulator":  lambda: self._set_modular_page("ncert_simulator", NcertSimulatorPage),
+            "ncert_calc":       lambda: self._set_modular_page("ncert_calc", NcertCalcPage),
+            "diksha_vlab":      lambda: self._set_modular_page("diksha_vlab", DikshaVLabPage),
+            "katbook_reader":   lambda: self._set_modular_page("katbook_reader", KatbookReaderPage),
             "time_tracker":     lambda: self._set_modular_page("time_tracker", TimeTrackerPage),
             "univ_hub":        lambda: self._set_modular_page("univ_hub", UnivHubPage),
             "reports":          lambda: self._set_modular_page("reports", AnalyticsPage),
@@ -3187,306 +3187,12 @@ class SigmaGUI(tk.Tk, UIMixin):
 
     # ─── SigmaWriteSense: Editorial Intelligence Studio ────────────────────
 
-    def _build_writesense_page(self):
-        p = tk.Frame(self._content, bg=PAL["bg"])
-        self._pages["writesense"] = p
-        
-        tk.Label(p, text="✍️  SigmaWriteSense: Sovereign Editorial Intel", font=FONT_LOGO,
-                 fg=PAL["cyan"], bg=PAL["bg"]).pack(anchor="w", pady=(0,8))
-        
-        body = tk.Frame(p, bg=PAL["bg"])
-        body.pack(fill="both", expand=True)
-        
-        # 1. Editor (Left)
-        l_fr = tk.Frame(body, bg=PAL["bg2"], width=500)
-        l_fr.pack(side="left", fill="both", padx=5)
-        l_fr.pack_propagate(False)
-        
-        tk.Label(l_fr, text="Editorial Workbench", font=FONT_MED, fg=PAL["cyan"], bg=PAL["bg2"]).pack(pady=5)
-        self._write_txt = tk.Text(l_fr, font=("Georgia", 11), bg=PAL["bg"], fg=PAL["text"], 
-                                  insertbackground="white", padx=10, pady=10, wrap="word")
-        self._write_txt.pack(fill="both", expand=True, padx=10, pady=5)
-        self._write_txt.insert("1.0", "I think that technology is very good for everyone. It is important to be confident.")
-
-        # 2. Intel Panel (Right)
-        r_fr = tk.Frame(body, bg=PAL["bg"])
-        r_fr.pack(side="left", fill="both", expand=True, padx=5)
-        
-        # Readiness/Analytics
-        info_c = self._card(r_fr, "📊 Writing Analytics")
-        info_c.master.pack(fill="x", pady=(0,8))
-        self._write_res = tk.Label(info_c, text="Score: -- | Grade: --", font=FONT_BOLD, fg=PAL["teal"], bg=PAL["card"])
-        self._write_res.pack(pady=10)
-        
-        # Suggestions Console
-        s_card = self._card(r_fr, "💡 Intelligence Suggestions")
-        s_card.master.pack(fill="both", expand=True)
-        self._write_slog = self._console(s_card, height=15)
-        self._write_slog.pack(fill="both", expand=True)
-        
-        # Actions
-        act_fr = tk.Frame(r_fr, bg=PAL["bg"])
-        act_fr.pack(fill="x", pady=10)
-        
-        def run_audit():
-            txt = self._write_txt.get("1.0", "end-1c") if self._write_txt else ""
-            if not txt: return
-            res_r = self.kernel.writesense.analyze_readability(txt)
-            res_g = self.kernel.writesense.check_grammar_and_tone(txt)
-            
-            if self._write_res:
-                self._write_res.config(text=f"Score: {res_g['Score']} | Grade: {res_r['Grade_Level']} | Tone: {res_g['Tone']}")
-            
-            if self._write_slog:
-                self._write_slog.configure(state="normal")
-                self._write_slog.delete("1.0", "end")
-                self._log(self._write_slog, "READABILITY AUDIT", "HEAD")
-                for k, v in res_r.items(): self._log(self._write_slog, f"{k}: {v}", "OK")
-                
-                self._log(self._write_slog, "\nGRAMMAR & TONE", "HEAD")
-                for sug in res_g["Suggestions"]:
-                    self._log(self._write_slog, f"Change '{sug['Original']}' -> '{sug['Suggested']}'", "WARN")
-                    self._log(self._write_slog, f"Reason: {sug['Reason']}", "INFO")
-                    
-                self._log(self._write_slog, "\nDEEP STYLE REPORT (ProWritingAid USP)", "HEAD")
-                for r in self.kernel.writesense.deep_style_report(txt):
-                    self._log(self._write_slog, f"• {r}", "INFO")
-
-        ttk.Button(act_fr, text="🚀 Run Deep Audit", command=run_audit, style="Teal.TButton").pack(side="left", padx=5)
-
-        def do_para():
-            txt = self._write_txt.get("1.0", "end-1c")
-            res = self.kernel.writesense.paraphrase_text(txt, "Formal")
-            self._write_txt.delete("1.0", "end")
-            self._write_txt.insert("1.0", res)
-            self._log(self._write_slog, "\n[QuillBot] Text Formalized", "OK")
-
-        ttk.Button(act_fr, text="🔄 Formalize (QuillBot)", command=do_para).pack(side="left", padx=5)
-
-        def run_cultural():
-            txt = self._write_txt.get("1.0", "end-1c")
-            res = self.kernel.writesense.emotional_intelligence_audit(txt)
-            self._log(self._write_slog, "\n[APEX] CULTURAL & EMOTIONAL AUDIT\n", "HEAD")
-            for k, v in res.items(): self._log(self._write_slog, f"{k}: {v}", "OK")
-
-        ttk.Button(act_fr, text="🧠 Cultural Intel Audit", command=run_cultural, style="Teal.TButton").pack(side="left", padx=5)
-
-        def do_cite():
-            txt = self._write_txt.get("1.0", "end-1c")
-            refs = self.kernel.writesense.sync_citations("Zotero")
-            self._log(self._write_slog, "\n[EDI] SYNCING CITATIONS (Zotero Link)\n", "HEAD")
-            for r in refs: self._log(self._write_slog, f"• {r}", "OK")
-
-        ttk.Button(act_fr, text="📚 Sync Citations (Zotero)", command=do_cite).pack(side="left", padx=5)
 
     # ─── SigmaFlowAI: Procedural Logic Studio ──────────────────────────────
 
-    def _build_flow_page(self):
-        p = tk.Frame(self._content, bg=PAL["bg"])
-        self._pages["flow"] = p
-        
-        tk.Label(p, text="🌿  SigmaFlowAI: Procedural Logic Architect", font=FONT_LOGO,
-                 fg=PAL["gold"], bg=PAL["bg"]).pack(anchor="w", pady=(0,8))
-        
-        body = tk.Frame(p, bg=PAL["bg"])
-        body.pack(fill="both", expand=True)
-        
-        # 1. Inputs (Left)
-        l_fr = tk.Frame(body, bg=PAL["bg2"], width=350)
-        l_fr.pack(side="left", fill="both", padx=5)
-        l_fr.pack_propagate(False)
-        
-        tk.Label(l_fr, text="Define Procedure", font=FONT_MED, fg=PAL["gold"], bg=PAL["bg2"]).pack(pady=10)
-        
-        name_ent = ttk.Entry(l_fr); name_ent.pack(fill="x", padx=10); name_ent.insert(0, "Legal Filing Workflow")
-        
-        tk.Label(l_fr, text="Raw Text / Steps", font=FONT_SMALL, fg=PAL["text"], bg=PAL["bg2"]).pack(pady=(10,0))
-        raw_txt = tk.Text(l_fr, font=FONT_SMALL, bg=PAL["bg"], fg=PAL["text"], height=15)
-        raw_txt.pack(fill="both", expand=True, padx=10, pady=5)
-        raw_txt.insert("1.0", "First we draft the petition, then we check for compliance. If valid, we file. Else, we redo.")
-
-        # 2. Output (Right)
-        r_fr = tk.Frame(body, bg=PAL["bg"])
-        r_fr.pack(side="left", fill="both", expand=True, padx=5)
-        
-        # Mermaid Display
-        m_card = self._card(r_fr, "🗺️ Logical Process Map (Mermaid)")
-        m_card.master.pack(fill="both", expand=True)
-        self._flow_view = self._console(m_card, height=20)
-        self._flow_view.pack(fill="both", expand=True)
-        
-        # Audit Console
-        a_card = self._card(r_fr, "⚖️ Procedural Audit")
-        a_card.master.pack(fill="x", pady=10)
-        self._flow_audit = tk.Label(a_card, text="Logic Efficiency: N/A", font=FONT_BOLD, fg=PAL["cyan"], bg=PAL["card"])
-        self._flow_audit.pack(pady=5)
-
-        def generate_flow():
-            title = name_ent.get()
-            raw = raw_txt.get("1.0", "end-1c")
-            res = self.kernel.flow_ai.generate_flow_logic(title, raw)
-            
-            self._flow_view.configure(state="normal")
-            self._flow_view.delete("1.0", "end")
-            self._log(self._flow_view, f"FLOW: {res['Procedure']}\n" + "─"*30 + "\n", "HEAD")
-            self._flow_view.insert("end", res["Mermaid"])
-            
-            audit = self.kernel.flow_ai.audit_procedural_efficiency(res)
-            self._flow_audit.config(text=f"Logic: {res['Logic_Verdict']}")
-            self._log(self._flow_view, "\n\nEFFICIENCY AUDIT:\n", "HEAD")
-            for a in audit: self._log(self._flow_view, f"• {a}\n", "OK")
-
-        ttk.Button(l_fr, text="🧬 Generate Logic Flow", command=generate_flow, style="Teal.TButton").pack(pady=10)
 
     # ─── SigmaAINexus: Multi-Model Intelligence Gateway ────────────────────
 
-    def _build_nexus_page(self):
-        p = tk.Frame(self._content, bg=PAL["bg"])
-        self._pages["nexus"] = p
-        
-        tk.Label(p, text="🧬  Sigma AI Nexus: Universal Intelligence Gateway", font=FONT_LOGO,
-                 fg=PAL["cyan"], bg=PAL["bg"]).pack(anchor="w", pady=(0,8))
-        
-        body = tk.Frame(p, bg=PAL["bg"])
-        body.pack(fill="both", expand=True)
-        
-        # 1. Auth & Model Selection (Left)
-        l_fr = tk.Frame(body, bg=PAL["bg2"], width=400)
-        l_fr.pack(side="left", fill="both", padx=5)
-        l_fr.pack_propagate(False)
-        
-        # Gmail Auth Section
-        auth_c = self._card(l_fr, "🔐 Integrated Authentication")
-        auth_c.master.pack(fill="x", pady=5)
-        
-        tk.Label(auth_c, text="Gmail Address:", font=FONT_SMALL, fg=PAL["text"], bg=PAL["card"]).pack(anchor="w")
-        email_ent = ttk.Entry(auth_c); email_ent.pack(fill="x", pady=5); email_ent.insert(0, SigmaConfig.DEFAULT_USER_EMAIL)
-        
-        self._nexus_auth_lbl = tk.Label(auth_c, text="Status: Disconnected", font=FONT_BOLD, fg=PAL["gold"], bg=PAL["card"])
-        self._nexus_auth_lbl.pack(pady=5)
-        
-        def run_login():
-            res = self.kernel.ai.gmail_login(email_ent.get())
-            self._nexus_auth_lbl.config(text=f"Status: Connected ({email_ent.get()})", fg=PAL["teal"])
-            self._log_voice(res)
-
-        ttk.Button(auth_c, text="Login with Gmail (Free Tiers)", command=run_login).pack(fill="x", pady=5)
-        
-        # Model Selection (sovereign local-first model map)
-        model_c = self._card(l_fr, "⚡ Active Model Orchestrator")
-        model_c.master.pack(fill="x", pady=5)
-        
-        self._active_model_var = tk.StringVar(value="Llama-3-Sovereign")
-        
-        _models = {
-            "Llama-3-Sovereign":       {"provider": "Meta (local)",      "region": "USA"},
-            "Phi-3-Mini":              {"provider": "Microsoft (local)",  "region": "USA"},
-            "DeepSeek-V3":             {"provider": "DeepSeek (local)",   "region": "India"},
-            "Krutrim-Bharat":          {"provider": "Ola AI (local)",     "region": "India"},
-            "Sarvam-1":                {"provider": "Sarvam AI (local)",  "region": "India"},
-        }
-        
-        usa_models = [k for k, v in _models.items() if v["region"] == "USA"]
-        ind_models = [k for k, v in _models.items() if v["region"] == "India"]
-
-        tk.Label(model_c, text="🇺🇸 USA Based Models", font=FONT_SMALL, fg=PAL["gold"], bg=PAL["card"]).pack(anchor="w", pady=(5,0))
-        for m in usa_models:
-            rb = tk.Radiobutton(model_c, text=f"{m} ({_models[m]['provider']})", variable=self._active_model_var, value=m,
-                                font=FONT_SMALL, fg=PAL["text"], bg=PAL["card"], selectcolor=PAL["bg"])
-            rb.pack(anchor="w", padx=10)
-
-        tk.Label(model_c, text="🇮🇳 India Based Models", font=FONT_SMALL, fg=PAL["teal"], bg=PAL["card"]).pack(anchor="w", pady=(10,0))
-        for m in ind_models:
-            rb = tk.Radiobutton(model_c, text=f"{m} ({_models[m]['provider']})", variable=self._active_model_var, value=m,
-                                font=FONT_SMALL, fg=PAL["text"], bg=PAL["card"], selectcolor=PAL["bg"])
-            rb.pack(anchor="w", padx=10)
-        # AI Theme
-        ai_c = self._card(l_fr, "🎨 AI Theme Engine")
-        ai_c.master.pack(fill="x", pady=5)
-        
-        m_var = tk.StringVar(value="Focus")
-        for m in ["Focus", "Creative", "Night", "Neon"]:
-            tk.Radiobutton(ai_c, text=m, variable=m_var, value=m, bg=PAL["card"], fg=PAL["text"],
-                           command=lambda m=m: self._log_voice(self.kernel.registry.get("customizer").generate_ai_theme(m)["message"])).pack(side="left", padx=5)
-
-        # OS Physicality (Layout/Physics)
-        phys_c = self._card(l_fr, "⚛️ OS Physicality & Layout")
-        phys_c.master.pack(fill="x", pady=5)
-        
-        tk.Label(phys_c, text="Sidebar Position:", bg=PAL["card"], fg=PAL["text"]).pack(anchor="w")
-        s_var = tk.StringVar(value="Left")
-        for s in ["Left", "Right", "Floating"]:
-            tk.Radiobutton(phys_c, text=s, variable=s_var, value=s, bg=PAL["card"], fg=PAL["text"],
-                           command=lambda s=s: self._log_voice(self.kernel.registry.get("customizer").switch_layout(s, "Comfortable"))).pack(side="left", padx=5)
-
-        # Icon Pack Studio
-        ico_c = self._card(l_fr, "🖼️ Icon Pack Studio")
-        ico_c.master.pack(fill="x", pady=10)
-        
-        packs = ["Sovereign_3D", "Material", "Fluent", "Retro_8Bit"]
-        p_var = tk.StringVar(value="Sovereign_3D")
-        for p in packs:
-            tk.Radiobutton(ico_c, text=p, variable=p_var, value=p, bg=PAL["card"], fg=PAL["text"],
-                           command=lambda p=p: self._log_voice(self.kernel.registry.get("customizer").swap_icon_pack(p))).pack(anchor="w")
-
-        # 2. Intelligence Console (Right)
-        r_fr = tk.Frame(body, bg=PAL["bg"])
-        r_fr.pack(side="left", fill="both", expand=True, padx=5)
-        
-        # Soundscape & Animation
-        sound_c = self._card(r_fr, "🔉 Global Soundscape")
-        sound_c.master.pack(fill="x", pady=5)
-        
-        v_var = tk.StringVar(value="Calm_Ethereal")
-        for v in ["Calm", "Mechanical", "Cyber", "Silent"]:
-            tk.Radiobutton(sound_c, text=v, variable=v_var, value=v, bg=PAL["card"], fg=PAL["text"],
-                           command=lambda v=v: self._log_voice(self.kernel.registry.get("customizer").apply_soundscape(v))).pack(side="left", padx=5)
-
-        anim_c = self._card(r_fr, "🎞️ Animation Physics Studio")
-        anim_c.master.pack(fill="x", pady=5)
-        
-        tk.Label(anim_c, text="Transition Curve:", bg=PAL["card"], fg=PAL["text"]).pack(anchor="w")
-        c_var = tk.StringVar(value="Ease-InOut-Quartic")
-        for c in ["Linear", "Bouncy", "Elastic", "Quartic"]:
-            tk.Radiobutton(anim_c, text=c, variable=c_var, value=c, bg=PAL["card"], fg=PAL["text"],
-                           command=lambda c=c: self._log_voice(self.kernel.registry.get("customizer").adjust_animation_studio(c, 300))).pack(side="left", padx=5)
-
-        # Morphic UI & Kernel Branding
-        morphic_c = self._card(r_fr, "🎭 Morphic UI & Kernel Branding")
-        morphic_c.master.pack(fill="x", pady=5)
-        ttk.Button(morphic_c, text="AI-Generate Boot Splash", command=lambda: self._log_voice("Customizer: Generating AI-Native Boot Splash...")).pack(side="left", padx=5)
-        ttk.Button(morphic_c, text="Morphic Layout: 'Professional'", command=lambda: self._log_voice("Customizer: Morphing entire UI to 'Professional' state.")).pack(side="left", padx=5)
-
-        # Molecular Widget Forge
-        w_c = self._card(r_fr, "🔨 Molecular Widget Forge")
-        c_card = self._card(r_fr, "🖥️ Multi-Model Intelligence Console")
-        c_card.master.pack(fill="both", expand=True)
-        self._nexus_log = self._console(c_card, height=25)
-        self._nexus_log.pack(fill="both", expand=True)
-        
-        # Quick Prompt
-        p_fr = tk.Frame(r_fr, bg=PAL["bg"])
-        p_fr.pack(fill="x", pady=10)
-        p_ent = ttk.Entry(p_fr); p_ent.pack(side="left", fill="x", expand=True, padx=5)
-        p_ent.insert(0, "Explain sovereign AI vs Cloud AI")
-        
-        def run_prompt():
-            q = p_ent.get()
-            res = self.kernel.ai.prompt(q)
-            self._log(self._nexus_log, f"\n▶ PROMPT: {q}", "HEAD")
-            self._log(self._nexus_log, f"Model: {res['Model']} | Latency: {res['Latency']}", "INFO")
-            self._log(self._nexus_log, res["Response"], "OK")
-
-        def run_consensus():
-            res = self.kernel.ai.multi_model_consensus(p_ent.get())
-            self._log(self._nexus_log, f"\n💎 MULTI-MODEL CONSENSUS", "HEAD")
-            for k, v in res.items():
-                tag = "INFO" if k != "Master_Consensus" else "OK"
-                m = f"{k}: {v}" if k != "Master_Consensus" else f"➜ {v}"
-                self._log(self._nexus_log, m, tag)
-
-        ttk.Button(p_fr, text="🚀 Prompt", command=run_prompt).pack(side="left", padx=2)
-        ttk.Button(p_fr, text="💎 Consensus", command=run_consensus).pack(side="left", padx=2)
 
     # ─── Customization Studio: The Living Canvas ───────────────────────────────
 
