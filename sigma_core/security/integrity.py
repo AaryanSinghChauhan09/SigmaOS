@@ -1,15 +1,18 @@
-"""
-SigmaOS Bit-Level Integrity Guard (v1.0 Apex)
-==============================================
-USP: Cryptographic Shard Verification + Tamper Detection + Rollback Recovery.
-Ensures the Kernel and System APIs remain in a signed, "Pure" state.
-"""
-
 import hashlib
 import os
+import sys
 import json
 from typing import Dict, List, Any
-from .interfaces import SigmaModuleBase
+
+# Robust System Path Injection
+_p = os.path.abspath(__file__)
+while _p and not os.path.exists(os.path.join(os.path.dirname(_p), "sigma_core")):
+    _p = os.path.dirname(_p)
+    if _p == os.path.dirname(_p): break
+root = str(os.path.dirname(_p))
+if root and root not in sys.path: sys.path.insert(0, root)
+
+from sigma_core.system.interfaces import SigmaModuleBase
 
 class IntegrityGuard(SigmaModuleBase):
     def __init__(self, kernel=None):
@@ -102,7 +105,7 @@ class IntegrityGuard(SigmaModuleBase):
         import time
         timestamp = int(time.time())
         filename = os.path.basename(path)
-        vault_name = f"evidence_{timestamp}_{current_hash[:8]}_{filename}"
+        vault_name = f"evidence_{timestamp}_{current_hash}_{filename}"
         target = os.path.join(self.vault_path, vault_name)
         
         try:

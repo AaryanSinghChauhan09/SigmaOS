@@ -9,12 +9,14 @@ import socket
 import threading
 import time
 import random
-from .interfaces import SigmaModuleBase, ISigmaService
-from userland.system_api.sigma_std import SigmaSys, SigmaCrypto
+import os
+import sys
+
+from sigma_core.system.interfaces import SigmaModuleBase, ISigmaService
 
 class NetworkVanguard(SigmaModuleBase, ISigmaService):
     def __init__(self, kernel=None):
-        super().__init__(kernel)
+        SigmaModuleBase.__init__(self, kernel)
         self.active_blocks = set()
         self.process_blocks = set() # USP: Process-Level Isolation
         self.traffic_log = []
