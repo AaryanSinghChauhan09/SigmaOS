@@ -31,4 +31,4 @@ SigmaOS is not just an interface; it's a **Cognitive Mesh**. It aggressively man
 - **Vanguard Sandbox**: Quarantines erratic programs in custom memory-hardened silos to prevent system contamination.
 
 ---
-Created by Aaryan Singh Chauhan | SigmaOS Singularity Branch
+Created by The Sovereign Architect | SigmaOS Singularity Branch

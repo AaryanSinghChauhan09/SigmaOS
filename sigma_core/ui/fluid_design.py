@@ -52,11 +52,18 @@ class FluidTheme:
 
     @staticmethod
     def get_font(token: str) -> Tuple[str, int, str]:
-        # Ensured type safety for font delivery
+        """Provides type-safe font tuples derived from design tokens."""
         font_data = TYPOGRAPHY.get(token, ("Arial", 10, "normal"))
-        if len(font_data) == 2:
-            return (str(font_data[0]), int(font_data[1]), "normal")
-        return (str(font_data[0]), int(font_data[1]), str(font_data[2]))
+        
+        # Robust parsing for 2 or 3 element font tuples
+        family = str(font_data[0])
+        size   = int(font_data[1])
+        weight = "normal"
+        
+        if len(font_data) >= 3:
+            weight = str(font_data[2])
+            
+        return (family, size, weight)
 
     @staticmethod
     def apply_to_widget(widget, theme_type: str = "surface"):

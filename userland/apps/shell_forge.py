@@ -33,6 +33,20 @@ class ShellForge(tk.Tk):
         self.geometry("1100x750")
         self.configure(bg=PAL["bg"])
         self.cmd_history = []
+        
+        # Explicit attribute initialization for linter compliance
+        self.header = tk.Frame(self)
+        self.workspace = tk.Frame(self)
+        self.tabs = ttk.Notebook(self)
+        self.tab_term = tk.Frame(self)
+        self.tab_prompt = tk.Frame(self)
+        self.tab_plugins = tk.Frame(self)
+        self.tab_alias = tk.Frame(self)
+        self.status = tk.Label(self)
+        self.term_output = tk.Text(self)
+        self.cmd_entry = tk.Entry(self)
+        self.alias_text = tk.Text(self)
+        
         self._setup_styles()
         self._build_ui()
 
@@ -97,7 +111,7 @@ class ShellForge(tk.Tk):
         entry_fr = tk.Frame(self.tab_term, bg="#060608")
         entry_fr.pack(fill="x", pady=5)
 
-        prompt_lbl = tk.Label(entry_fr, text="aaryan@sovereign ❯", fg=PAL["prompt"],
+        prompt_lbl = tk.Label(entry_fr, text="sovereign@apex ❯", fg=PAL["prompt"],
                               bg="#060608", font=("JetBrains Mono", 11, "bold"))
         prompt_lbl.pack(side="left", padx=(5, 8))
 
@@ -115,7 +129,7 @@ class ShellForge(tk.Tk):
         self.cmd_entry.delete(0, tk.END)
 
         self.term_output.config(state=tk.NORMAL)
-        self.term_output.insert(tk.END, f"\naaryan@sovereign ❯ {cmd}\n")
+        self.term_output.insert(tk.END, f"\nsovereign@apex ❯ {cmd}\n")
 
         # Simulate responses
         if cmd.startswith("ls"):
@@ -174,7 +188,7 @@ class ShellForge(tk.Tk):
         preview = tk.Frame(self.tab_prompt, bg="#060608", padx=10, pady=10)
         preview.pack(fill="x")
         
-        segments_preview = [("  ", "#BD00FF"), ("aaryan ", "#007AFF"), ("~/SigmaOS/userland ", "#00FF88"),
+        segments_preview = [("  ", "#BD00FF"), ("sovereign ", "#007AFF"), ("~/SigmaOS/userland ", "#00FF88"),
                             ("git:master ", "#FFD60A"), ("0.42s ", "#FF3B30"), ("❯ ", "#F2F2F7")]
         for seg, col in segments_preview:
             tk.Label(preview, text=seg, bg="#060608", fg=col, font=("JetBrains Mono", 12, "bold")).pack(side="left")

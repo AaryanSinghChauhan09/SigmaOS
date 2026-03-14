@@ -9,9 +9,8 @@ import re
 
 class PrivacySentinel:
     BLACKLIST = [
-        r"\bAaryan\b",
-        r"\bChauhan\b",
-        r"\b[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Z|a-z]{2,}\b", # Email
+        r"\b[A-Z][a-z]+ [A-Z][a-z]+\b", # Generic Name Pattern
+        r"\b[A-Za-z0-9._%+-]+@\b",      # Email Start
     ]
 
     @staticmethod

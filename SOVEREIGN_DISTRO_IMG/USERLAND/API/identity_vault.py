@@ -143,7 +143,7 @@ if __name__ == "__main__":
 if __name__ == "__main__":
     iv = SigmaIdentityVault()
     print(iv.link_account("Google", SigmaConfig.DEFAULT_USER_EMAIL, SigmaConfig.DEFAULT_VAULT_SECRET))
-    print(iv.link_account("OpenAI", "aaryan_dev", "secret-key-xyz"))
+    print(iv.link_account("OpenAI", "sovereign_dev", "secret-key-xyz"))
     print(f"Is Google Authorized for 'Email-Read'? {iv.request_model_access('Llama-Aether', 'Email-Read')}")
     print(iv.grant_permission("Llama-Aether", "Email-Read"))
     print(iv.health_check())

@@ -51,6 +51,7 @@ CORE_SYSTEM_MODULES = [
     ("sigma_core.system.anomaly_detector",      "SigmaAnomalyDetector",      "kad"),
     ("sigma_core.system.crash_reporter",        "SigmaCrashReporter",        "crash_reporter"),
     ("sigma_core.system.system_monitor",        "SystemMonitor",             "monitor"),
+    ("sigma_core.system.adaptive_governor",     "AdaptiveGovernor",          "governor"),
 
     # Specialized Extensions (Sovereign)
     ("sigma_core.ai.intelligence_studio", "IntelligenceStudio",    "intelligence"),

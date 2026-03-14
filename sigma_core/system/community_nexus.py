@@ -42,7 +42,7 @@ class SovereignNexus(SigmaModuleBase, ISigmaService):
         self.audit_buffer.append(app_id)
         
         # 1. Privacy Check (Personalized/Privacy)
-        sensitive_patterns = ["Aaryan", "User", "Password", "CreditCard"]
+        sensitive_patterns = ["Sovereign_Identity", "User", "Password", "CreditCard"]
         for pattern in sensitive_patterns:
             if pattern in code_content:
                 self.log_event("audit_failure", {"id": app_id, "reason": f"PII_LEAK_DETECTED: {pattern}"})

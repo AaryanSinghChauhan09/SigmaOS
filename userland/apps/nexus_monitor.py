@@ -41,16 +41,18 @@ class NexusMonitor(tk.Tk):
         self.configure(bg=PAL["bg"])
         self.procs: List[Dict[str, Any]] = []
         
-        # Initialize attributes to satisfy strict linters
-        self.dash: Optional[tk.Frame] = None
-        self.cpu_f: Optional[tk.Frame] = None
-        self.cpu_bar: Optional[ttk.Progressbar] = None
-        self.cpu_lbl: Optional[tk.Label] = None
-        self.mem_f: Optional[tk.Frame] = None
-        self.mem_bar: Optional[ttk.Progressbar] = None
-        self.mem_lbl: Optional[tk.Label] = None
-        self.workspace: Optional[tk.Frame] = None
-        self.tree: Optional[ttk.Treeview] = None
+        # Initialize attributes with dummy values to prevent NoneType attribute errors
+        # This satisfies strict linters and ensures the UI structure is predictable
+        _root = self
+        self.dash = tk.Frame(_root)
+        self.cpu_f = tk.Frame(_root)
+        self.cpu_bar = ttk.Progressbar(_root)
+        self.cpu_lbl = tk.Label(_root)
+        self.mem_f = tk.Frame(_root)
+        self.mem_bar = ttk.Progressbar(_root)
+        self.mem_lbl = tk.Label(_root)
+        self.workspace = tk.Frame(_root)
+        self.tree = ttk.Treeview(_root)
         
         self._setup_ui()
         self._update_metrics()
