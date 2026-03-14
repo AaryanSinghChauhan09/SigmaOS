@@ -60,6 +60,9 @@ from gui_pkg.audit_view import AuditViewPage
 from gui_pkg.analytics_page import AnalyticsPage
 from gui_pkg.terminal_page import TerminalPage
 from gui_pkg.univ_hub_page import UnivHubPage
+from gui_pkg.shopping_wizard import ShoppingWizardPage
+from gui_pkg.mail_orchestrator import MailOrchestratorPage
+from gui_pkg.sovereign_comms import SovereignCommsPage
 
 class SigmaGUI(tk.Tk, UIMixin):
     """Main SigmaOS GUI application window."""
@@ -735,6 +738,9 @@ class SigmaGUI(tk.Tk, UIMixin):
             "time_tracker":     lambda: self._set_modular_page("time_tracker", TimeTrackerPage),
             "univ_hub":        lambda: self._set_modular_page("univ_hub", UnivHubPage),
             "reports":          lambda: self._set_modular_page("reports", AnalyticsPage),
+            "shopping_wizard":  lambda: self._set_modular_page("shopping_wizard", ShoppingWizardPage),
+            "mail_orchestrator": lambda: self._set_modular_page("mail_orchestrator", MailOrchestratorPage),
+            "sovereign_comms":  lambda: self._set_modular_page("sovereign_comms", SovereignCommsPage),
         }
         
         # Oracle VM Discovery (Professional Integration)
@@ -792,6 +798,7 @@ class SigmaGUI(tk.Tk, UIMixin):
         pins = [
             ("🌐", "browser"), ("📁", "explorer"), ("📦", "store"),
             ("🧪", "sovereign_suite"), ("📡", "network_vanguard"), ("📊", "intelligence_studio"), 
+            ("🛒", "shopping_wizard"), ("📧", "mail_orchestrator"), ("🛰️", "sovereign_comms"),
             ("🎓", "gurukul_academy"), ("⚖️", "compliance_center"), ("🧠", "brain"), 
             ("⚡", "zenith"), ("📧", "gmail_ai"), ("🎨", "visual_customizer"), ("💠", "ag_hub")
         ]
@@ -1433,7 +1440,9 @@ class SigmaGUI(tk.Tk, UIMixin):
         aura_map = {
             "dashboard": PAL["cyan"], "network_vanguard": PAL["red"], "sovereign_suite": PAL["teal"],
             "visual_customizer": PAL["purple"], "brain": PAL["accent2"], "gmail_ai": PAL["orange"],
-            "intelligence_studio": PAL["accent"], "gurukul_academy": PAL["gold"]
+            "intelligence_studio": PAL["accent"], "gurukul_academy": PAL["gold"],
+            "shopping_wizard": PAL["green"], "mail_orchestrator": PAL["blue"],
+            "sovereign_comms": PAL["teal"]
         }
         active_aura = aura_map.get(key, PAL["accent"])
         self._morphic_island(f"SPACE: {key.upper()}", active_aura, 1000)
