@@ -11,16 +11,17 @@ class SigmaConfig:
     
     # OS Metadata
     OS_NAME = "SigmaOS Sovereign"
-    VERSION = "5.2.0 (Polyglot Sovereign)"
-    BUILD = "2026.03.11-ULTRA-APEX"
-    BASE_KERNEL = "Modular Event-Driven Kernel"
-    RELEASE_DATE = "2026-03-11"
+    VERSION = "5.3.0 (Apex Sovereign)"
+    BUILD = "2026.03.14-ULTRA-APEX"
+    BASE_KERNEL = "Modular Event-Driven Apex Kernel"
+    RELEASE_DATE = "2026-03-14"
     
     # Feature Flags
     ENABLE_GUI = True
     ENABLE_CLI = True
     ENABLE_AGENTIC = True
     ENABLE_MESH = True
+    ENABLE_NEURAL_CORTEX = True # USP: AI-Driven Kernel
     SILENT = False
     
     # Paths
