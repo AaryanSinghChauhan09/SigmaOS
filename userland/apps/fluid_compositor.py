@@ -9,7 +9,13 @@ import tkinter as tk
 from tkinter import ttk, messagebox
 import random
 import time
+import sys
+import os
 from typing import Dict, Any, List
+
+# Add parent to path for independent execution
+sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "..")))
+
 from sigma_core.ui.zbuffer_engine import ZBufferEngine
 from sigma_core.ui.rendering_pipeline import RenderingPipeline
 
