@@ -77,6 +77,9 @@ class Chemistry_Classes_11_12:
         "Chromatography": ("chromatog", [("Dist Solv (cm)", "10"), ("Dist Spot (cm)", "4.5")]),
         "Rate of Reaction": ("reaction_rate", [("Conc1 (M)", "0.5"), ("Conc2 (M)", "0.2"), ("Time (s)", "40")]),
         "Equilibrium (Kc)": ("equilibrium", [("ConcA (M)", "0.1"), ("ConcB (M)", "0.1"), ("ConcC (M)", "0.4")]),
+        "Iodine Clock": ("iodine_clock", [("Conc (M)", "0.1"), ("Temp (C)", "25")]),
+        "Sol Preparation": ("sol_prep", [("Type", "Gold Sol")]),
+        "Neut-Enthalpy": ("enthalpy", [("Neutral (H+ moles)", "0.05"), ("Temp Change (K)", "2")]),
     }
 
     @staticmethod
@@ -156,6 +159,23 @@ class Chemistry_Classes_11_12:
         # A + B <=> C
         kc = c / (a * b)
         return {"Kc": _r(kc, 2), "Prediction": "Stable" if kc > 1 else "Reactants Favored"}
+
+    @staticmethod
+    def iodine_clock(c, t):
+        rate = c * (t/10)
+        return {"Time to Blue (s)": _r(50/rate, 1), "Observation": "Clear -> Dark Blue"}
+
+    @staticmethod
+    def sol_prep(t):
+        if "gold" in t.lower(): return {"Method": "Bredig's Arc", "Status": "Purple Sol"}
+        if "ferric" in t.lower(): return {"Method": "Hydrolysis", "Result": "Reddish Brown Sol"}
+        return {"Method": "Peptization", "Info": "Add electrolyte to precipitate"}
+
+    @staticmethod
+    def enthalpy(n, dt):
+        # Simplified dH = -(m*c*dt)/n
+        dh = -(100 * 4.184 * dt) / n # Assuming 100g water
+        return {"delta_H (kJ/mol)": _r(dh/1000, 2), "Note": "Exothermic Neutralization"}
 
 CHEMISTRY_REGISTRY = {
     "Classes 6-10": Chemistry_Classes_6_10,

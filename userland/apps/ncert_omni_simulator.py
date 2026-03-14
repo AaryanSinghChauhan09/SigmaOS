@@ -42,8 +42,8 @@ class NCERTOmniSimulator(tk.Tk):
         self.geometry("1400x900")
         self.configure(bg=PAL["bg"])
         
-        self.search_var = tk.StringVar()
-        self.main_area = None
+        self.search_var: tk.StringVar = tk.StringVar()
+        self.main_area: tk.Frame = tk.Frame()
         self._build_ui()
 
     def _build_ui(self):
@@ -53,7 +53,6 @@ class NCERTOmniSimulator(tk.Tk):
         
         tk.Label(head, text="⚛ NCERT OMNI-SIMULATOR", font=("Segoe UI", 24, "bold"), fg=PAL["accent"], bg=PAL["panel"]).pack(side="left", padx=30)
         
-        self.search_var = tk.StringVar()
         search_ent = tk.Entry(head, textvariable=self.search_var, bg=PAL["bg"], fg="white", 
                               font=("Segoe UI", 11), relief="flat", width=40, insertbackground="white")
         search_ent.pack(side="right", padx=30, pady=25)
@@ -124,7 +123,10 @@ class NCERTOmniSimulator(tk.Tk):
             c.pack_propagate(False)
             tk.Label(c, text=name, font=("Segoe UI Bold", 14), fg=color, bg=PAL["card"]).pack(pady=10)
             tk.Label(c, text=desc, font=("Segoe UI", 9), fg=PAL["dim"], bg=PAL["card"], wraplength=160).pack()
-            tk.Button(c, text="LAUNCH", font=("Segoe UI Bold", 8), bg=color, fg="black", relief="flat", command=lambda m=mod: self._launch_sublab(m)).pack(side="bottom", pady=5)
+            tk.Button(c, text="LAUNCH", font=("Segoe UI Bold", 8), bg=color, fg="black", relief="flat", command=self._mk_cmd(str(mod))).pack(side="bottom", pady=5)
+
+    def _mk_cmd(self, m):
+        return lambda: self._launch_sublab(m)
 
     def _clear_area(self):
         for w in self.main_area.winfo_children(): w.destroy()

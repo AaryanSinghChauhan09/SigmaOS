@@ -32,6 +32,9 @@ class TitrationSim(tk.Tk):
         self.vol_added = 0.0
         self.is_done = False
         
+        self.vol_lbl: tk.Label = tk.Label()
+        self.canvas: tk.Canvas = tk.Canvas()
+        
         self._build_ui()
 
     def _build_ui(self):

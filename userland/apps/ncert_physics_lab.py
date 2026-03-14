@@ -125,6 +125,9 @@ class Physics_Classes_11_12:
         "Surface Tension": ("capillary", [("r (mm)", "0.5"), ("h (cm)", "3")]),
         "Resonance Tube": ("resonance", [("Freq (Hz)", "512"), ("l1 (cm)", "16")]),
         "Potentiometer (r)": ("pot_internal", [("l1 (cm)", "200"), ("l2 (cm)", "130"), ("R (Ω)", "10")]),
+        "Newton's Cooling": ("cooling", [("T_env (C)", "25"), ("T_obj (C)", "80"), ("k", "0.05")]),
+        "Specific Heat": ("specific_heat", [("Mass (kg)", "0.5"), ("Q (J)", "4200"), ("dT (K)", "2")]),
+        "Zener Diode": ("zener", [("V_in (V)", "15"), ("V_z (V)", "10")]),
     }
 
     @staticmethod
@@ -228,6 +231,21 @@ class Physics_Classes_11_12:
         # Internal resistance r = R * (l1 - l2) / l2
         int_r = r * (l1 - l2) / l2
         return {"Internal r (Ω)": _r(int_r, 2)}
+
+    @staticmethod
+    def cooling(te, to, k):
+        t_seq = [0, 5, 10, 20, 30]
+        res = {f"T at {t}m": _r(te + (to-te)*math.exp(-k*t), 1) for t in t_seq}
+        return res
+
+    @staticmethod
+    def specific_heat(m, q, dt):
+        return {"c (J/kg.K)": _r(q / (m * dt), 1)}
+
+    @staticmethod
+    def zener(vin, vz):
+        if vin < vz: return {"V_out (V)": vin, "Status": "Normal Forward/Reverse"}
+        return {"V_out (V)": vz, "Status": "Breakdown/Regulated"}
 
 PHYSICS_REGISTRY = {
     "Classes 6-10": Physics_Classes_6_10,

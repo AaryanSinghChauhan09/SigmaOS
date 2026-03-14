@@ -117,6 +117,9 @@ class Maths_Classes_11_12:
         "Diff Equation": ("differential", [("k", "0.1"), ("y0", "100"), ("x", "5")]),
         "Line distance": ("line_dist", [("P1 (x,y,z)", "1,2,3"), ("P2 (x,y,z)", "4,5,6")]),
         "Binomial Dist": ("binomial", [("n", "10"), ("p", "0.5"), ("r", "3")]),
+        "Normal Curve": ("normal", [("x", "70"), ("mu", "50"), ("sigma", "10")]),
+        "LPP Solver": ("lpp", [("Objective (3,2)", "30,20"), ("Limit", "100")]),
+        "Correlation": ("corr", [("X", "1,2,3,4"), ("Y", "2,4,6,8")]),
     }
 
     @staticmethod
@@ -133,8 +136,9 @@ class Maths_Classes_11_12:
 
     @staticmethod
     def bernoulli(n, p, k):
-        p = float(p)
-        res = math.comb(int(n), int(k)) * (p**k) * ((1.0-p)**(n-k))
+        ni, ki = int(n), int(k)
+        pf = float(p)
+        res = math.comb(ni, ki) * (pf**ki) * ((1.0-pf)**(ni-ki))
         return {"P(X=k)": _r(res, 6)}
 
     @staticmethod
@@ -206,6 +210,26 @@ class Maths_Classes_11_12:
         comb = math.comb(n, r)
         prob = comb * (p**r) * ((1.0-p)**(n-r))
         return {"P(X=r)": _r(prob, 6)}
+
+    @staticmethod
+    def normal(x, mu, s):
+        z = (x - mu) / s
+        return {"Z-score": _r(z, 2), "Status": "Outlier" if abs(z)>3 else "Within Normal Range"}
+
+    @staticmethod
+    def lpp(obj, lim):
+        # z = 30x + 20y subject to x+y <= lim
+        # Max at (lim, 0) or (0, lim)
+        res = max(obj[0]*lim, obj[1]*lim)
+        return {"Max Z": res, "Optimal Point": f"({lim} or 0)"}
+
+    @staticmethod
+    def corr(xs, ys):
+        x = [float(i) for i in xs.split(",")]; y = [float(i) for i in ys.split(",")]
+        mx = sum(x)/len(x); my = sum(y)/len(y)
+        num = sum((i-mx)*(j-my) for i,j in zip(x,y))
+        den = math.sqrt(sum((i-mx)**2 for i in x) * sum((j-my)**2 for j in y))
+        return {"Correlation r": _r(num/den, 4) if den else 0}
 
 MATHS_REGISTRY = {
     "Classes 1-5": Maths_Classes_1_5,

@@ -88,6 +88,8 @@ class Biology_Classes_11_12:
         "Respiration Seeds": ("respiration", [("Time (hr)", "24"), ("CO2 Vol", "5")]),
         "Plasmolysis": ("plasmolysis", [("Sugar (%)", "20"), ("Cell Type", "Rhoeo")]),
         "DNA Isolation": ("dna_iso", [("Ethanol (C)", "-20"), ("Sample", "Papaya")]),
+        "Soil Moisture": ("soil", [("Wt_wet", "100"), ("Wt_dry", "85")]),
+        "Urine Test": ("urine", [("Sugar (1/0)", "1"), ("Albumin", "0")]),
     }
 
     @staticmethod
@@ -166,6 +168,18 @@ class Biology_Classes_11_12:
     def dna_iso(temp, s):
         if temp < 0: return {"Step": "Chilled Ethanol Added", "Result": "DNA Threads Precipitate"}
         return {"Step": "Ethanol Too Warm", "Result": "Degradation"}
+
+    @staticmethod
+    def soil(w1, w2):
+        moisture = ((w1-w2)/w1)*100
+        return {"Moisture %": _r(moisture, 2), "Type": "Loamy" if 10<moisture<20 else "Sandy/Clay"}
+
+    @staticmethod
+    def urine(s, a):
+        res = []
+        if s: res.append("Glycosuria (+)")
+        if a: res.append("Albuminuria (+)")
+        return {"Clinical Note": ", ".join(res) if res else "Normal Findings"}
 
 BIOLOGY_REGISTRY = {
     "Classes 6-10": Biology_Classes_6_10,

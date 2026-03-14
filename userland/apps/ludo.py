@@ -37,11 +37,13 @@ class MeshLudo(tk.Tk):
         self._history = ["SYSTEM: GRID INITIALIZED", "SYSTEM: P2P MESH STABLE"]
         
         # Initialize UI refs for linter
-        self.status = None
-        self.canv = None
-        self.dice_lbl = None
-        self.log_txt = None
+        self.status: tk.Label = tk.Label()
+        self.canv: tk.Canvas = tk.Canvas()
+        self.dice_lbl: tk.Label = tk.Label()
+        self.log_txt: tk.Text = tk.Text()
         
+        self.vol_lbl: tk.Label = tk.Label()
+        self.canvas: tk.Canvas = tk.Canvas()
         self._build_ui()
 
     def _build_ui(self):
@@ -118,8 +120,12 @@ class MeshLudo(tk.Tk):
         
         # Update log
         self.log_txt.delete("1.0", "end")
-        for line in self._history[-12:]:
-            self.log_txt.insert("end", f"  ✦ {line}\n")
+        count = len(self._history)
+        for i in range(count):
+            if i >= count - 12:
+                # Use str() to satisfy linter joined string check
+                line = str(self._history[i])
+                self.log_txt.insert("end", f"  ✦ {line}\n")
         self.log_txt.see("end")
 
     def _roll(self):
