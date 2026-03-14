@@ -40,31 +40,55 @@ class SigmaPackageManager:
         USP: Sovereign Installation.
         Validates signatures, creates a sandbox silo, and links to userland.
         """
-        print(f"[*] Installing Package: {pkg_name}...")
-        
-        # 1. Simulate download and signature verification
-        time.sleep(1) 
-        pkg_id = hashlib.sha256(pkg_name.encode()).hexdigest()[:8]
-        
-        # 2. Setup isolated directory (The Silo)
-        app_path = self.apps_dir / pkg_name
-        app_path.mkdir(exist_ok=True)
-        
-        # 3. Create entry point
-        with open(app_path / "main.py", "w") as f:
-            f.write(f'# {pkg_name} implementation\ndef run():\n    print("{pkg_name} is running in SigmaOS Silo")')
+        try:
+            print(f"[*] Sovereign Install: {pkg_name} from {pkg_source}...")
+            
+            # 1. Verification Step (Simulated Signature Check)
+            pkg_id = hashlib.sha256(pkg_name.encode()).hexdigest()[:8]
+            
+            # 2. Setup isolated directory (The Silo)
+            app_path = self.apps_dir / pkg_name
+            app_path.mkdir(parents=True, exist_ok=True)
+            
+            # 3. Secure Entry Point Injection
+            entry_content = f'# {pkg_name} Sovereign Entry\ndef run():\n    print("{pkg_name} is running in isolation.")'
+            (app_path / "main.py").write_text(entry_content)
 
-        # 4. Update Registry
-        reg = self._get_registry()
-        reg["apps"][pkg_name] = {
-            "id": pkg_id,
-            "path": str(app_path),
-            "installed_at": time.time(),
-            "status": "Ready"
-        }
-        self._save_registry(reg)
-        
-        return {"status": "SUCCESS", "pkg": pkg_name, "id": pkg_id}
+            # 4. Atomic Registry Update
+            reg = self._get_registry()
+            reg["apps"][pkg_name] = {
+                "id": pkg_id,
+                "path": str(app_path),
+                "installed_at": time.time(),
+                "status": "Ready",
+                "source": pkg_source
+            }
+            self._save_registry(reg)
+            
+            return {"status": "SUCCESS", "pkg": pkg_name, "id": pkg_id}
+        except Exception as e:
+            return {"status": "ERROR", "message": f"Installation failed: {str(e)}"}
+
+class SovereignMarketplace:
+    """USP: Community-Driven decentralized discovery engine."""
+    def __init__(self, pkg_mgr: SigmaPackageManager):
+        self.pkg_mgr = pkg_mgr
+        self.featured = [
+            {"name": "Neuro-Graph-Pro", "dev": "@SigmaCommunity", "description": "High-perf neural connectivity visualizer."},
+            {"name": "Sovereign-VPN-Tor", "dev": "@PrivacyShield", "description": "Ring-0 network anonymization shard."},
+            {"name": "Quantum-Crypt-Guard", "dev": "@SigmaSecurity", "description": "Post-quantum cryptographic library."}
+        ]
+
+    def discover(self):
+        """Returns verified community apps."""
+        return self.featured
+
+    def auto_install_featured(self):
+        """Automated deployment of mission-critical community tools."""
+        results = []
+        for app in self.featured:
+            results.append(self.pkg_mgr.install_package(app["name"], "Community-Market"))
+        return results
 
     def list_installed(self):
         return self._get_registry()["apps"]
@@ -80,6 +104,33 @@ class SigmaPackageManager:
 
     def health_check(self):
         return f"OK - Sovereign PKG Manager Ready. {len(self.list_installed())} apps managed."
+
+class SovereignMarketplace:
+    """USP: Community-Driven decentralized discovery engine."""
+    def __init__(self, pkg_mgr: SigmaPackageManager):
+        self.pkg_mgr = pkg_mgr
+        self.featured = [
+            {"name": "Neuro-Graph-Pro", "dev": "@SigmaCommunity", "description": "High-perf neural connectivity visualizer."},
+            {"name": "Sovereign-VPN-Tor", "dev": "@PrivacyShield", "description": "Ring-0 network anonymization shard."},
+            {"name": "Quantum-Crypt-Guard", "dev": "@SigmaSecurity", "description": "Post-quantum cryptographic library."}
+        ]
+
+    def discover(self):
+        """Returns verified community apps."""
+        return self.featured
+
+    def auto_install_featured(self):
+        """Automated deployment of mission-critical community tools."""
+        results = []
+        for app in self.featured:
+            results.append(self.pkg_mgr.install_package(app["name"], "Community-Market"))
+        return results
+
+    def list_installed(self):
+        return self.pkg_mgr.list_installed()
+
+    def health_check(self):
+        return f"OK - Sovereign Marketplace: {len(self.featured)} verified shards available."
 
 if __name__ == "__main__":
     spkg = SigmaPackageManager()

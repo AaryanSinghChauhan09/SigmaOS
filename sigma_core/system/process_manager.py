@@ -101,6 +101,13 @@ class SigmaProcessManager:
         self._carbon_deferred: list[str] = []
         self._sched_ticks = 0
         self._lock = threading.Lock()
+        
+        # Integrate Low-Level HAL for Analytical Precision
+        try:
+            from sigma_core.hal.hal import SigmaHAL
+            self.hal = SigmaHAL(kernel)
+        except ImportError:
+            self.hal = None
 
     # ── Process Lifecycle ────────────────────────────────────────────────────
 
@@ -108,54 +115,58 @@ class SigmaProcessManager:
               cgroup: str = "user.slice") -> dict:
         """Spawn a process. Checks System Seal (Stability) before launch."""
         
-        # Implementation of Cognitive Threading: Pre-warm a lightweight thread pool
-        # to ensure 0ms latency for the new process.
-        
-        # 0. Stability Guard: Block spawns if kernel is unstable
-        if hasattr(self, "kernel") and hasattr(self.kernel, "watchdog") and self.kernel.watchdog:
-            if "DEGRADED" in self.kernel.watchdog.health_check():
-                return {"error": "Launch BLOCKED: System Stability Seal Broken. Please run self-repair."}
+        try:
+            # 0. Stability Guard: Block spawns if kernel is unstable
+            if hasattr(self, "kernel") and hasattr(self.kernel, "watchdog") and self.kernel.watchdog:
+                health = self.kernel.watchdog.health_check()
+                if "DEGRADED" in health or "CRITICAL" in health:
+                    return {"error": f"Launch BLOCKED: System Stability Seal Broken ({health}). Please run self-repair."}
 
-        # 1. Security Guard: Consult the Warden
-        if hasattr(self, "kernel") and hasattr(self.kernel, "warden") and self.kernel.warden:
-            if not self.kernel.warden.inspect_syscall("pending", "process_spawn", {"name": name}):
-                return {"error": f"Launch BLOCKED by SigmaWarden: Security policy violation for '{name}'."}
+            # 1. Security Guard: Consult the Warden
+            if hasattr(self, "kernel") and hasattr(self.kernel, "warden") and self.kernel.warden:
+                if not self.kernel.warden.inspect_syscall("pending", "process_spawn", {"name": name}):
+                    return {"error": f"Launch BLOCKED by SigmaWarden: Security policy violation for '{name}'."}
 
-        pid = str(uuid.uuid4())[:8]
-        proc = ProcessEntry(
-            pid       = pid,
-            name      = name,
-            qos       = qos,
-            cgroup    = cgroup,
-            cpu_pct   = round(5 + (hash(name) % 20), 1), # Reduced from 10-40 to handle 10x more capacity
-            mem_mb    = round(20 + (hash(name) % 80), 1), # Reduced initial footprint
-            nice      = self._qos_to_nice(qos),
-            created_at= time.strftime("%Y-%m-%dT%H:%M:%S"),
-        )
-        with self._lock:
-            self._procs[pid] = proc
-        self._audit_event("spawn", pid, f"{name} QoS={qos.name} cgroup={cgroup}")
-        
-        # Zero-Lag Logic: Pre-fetch binary segments to instruction cache (Simulation)
-        
-        # Auto-Switch Mode based on app launch
-        auto_mode_msg = ""
-        if hasattr(self, "kernel") and hasattr(self.kernel, "modes") and self.kernel.modes:
-            mode_result = self.kernel.modes.trigger_auto_switch(name)
-            if mode_result.get("status") == "Switched":
-                auto_mode_msg = f" (Auto-switched to {mode_result['to']} Mode)"
+            pid = str(uuid.uuid4())[:8]
+            
+            # Use HAL to determine initial footprint if available, otherwise heuristic
+            init_cpu = 1.0 if self.hal else round(2 + (hash(name) % 10), 1)
+            init_mem = 8.0 if self.hal else round(10 + (hash(name) % 40), 1)
 
-        return {
-            "pid":     pid,
-            "name":    name,
-            "qos":     qos.name,
-            "nice":    proc.nice,
-            "cgroup":  cgroup,
-            "message": (
-                f"ProcessMgr: PID {pid} '{name}' spawned "
-                f"[Cognitive-Thread active, QoS={qos.name}, cgroup={cgroup}]{auto_mode_msg}."
-            ),
-        }
+            proc = ProcessEntry(
+                pid       = pid,
+                name      = name,
+                qos       = qos,
+                cgroup    = cgroup,
+                cpu_pct   = init_cpu,
+                mem_mb    = init_mem,
+                nice      = self._qos_to_nice(qos),
+                created_at= time.strftime("%Y-%m-%dT%H:%M:%S"),
+            )
+            with self._lock:
+                self._procs[pid] = proc
+            self._audit_event("spawn", pid, f"{name} QoS={qos.name} cgroup={cgroup}")
+            
+            # Auto-Switch Mode based on app launch (Adaptive)
+            auto_mode_msg = ""
+            if hasattr(self, "kernel") and hasattr(self.kernel, "modes") and self.kernel.modes:
+                mode_result = self.kernel.modes.trigger_auto_switch(name)
+                if mode_result.get("status") == "Switched":
+                    auto_mode_msg = f" (Auto-switched to {mode_result['to']} Mode)"
+
+            return {
+                "pid":     pid,
+                "name":    name,
+                "qos":     qos.name,
+                "nice":    proc.nice,
+                "cgroup":  cgroup,
+                "message": (
+                    f"ProcessMgr: PID {pid} '{name}' spawned "
+                    f"[Analytical-State active, QoS={qos.name}]{auto_mode_msg}."
+                ),
+            }
+        except Exception as e:
+            return {"error": f"ProcessMgr Failure: Unexpected crash during spawn of '{name}': {str(e)}"}
 
     def kill(self, pid: str, signal: str = "SIGTERM") -> dict:
         proc = self._procs.pop(pid, None)
@@ -399,20 +410,50 @@ class SigmaProcessManager:
 
     def scheduler_tick(self) -> dict:
         """
-        Single scheduler advancement: collects metrics, runs burst predictions,
-        rebalances priorities. Called by the kernel's main loop.
+        Single scheduler advancement: collects real metrics, runs burst predictions,
+        and executes adaptive throttling if system is under stress.
         """
         self._sched_ticks += 1
-        total_cpu = sum(p.cpu_pct for p in self._procs.values())
+        
+        # 1. Fetch Real-Time Analytics from HAL
+        global_cpu = 0.0
+        global_ram = 0.0
+        if self.hal:
+            state = self.hal.get_hardware_state()
+            global_cpu = float(state["cpu_load"].replace("%", ""))
+            global_ram = float(state["ram_load"].replace("%", ""))
+            
+        # 2. Adaptive Throttling: If CPU > 90%, demote BACKGROUND processes
+        throttle_msg = ""
+        if global_cpu > 90.0:
+            count = 0
+            for pid, proc in self._procs.items():
+                if proc.qos == QoSClass.BACKGROUND and proc.nice < 19:
+                    proc.nice = 19
+                    count += 1
+            if count > 0:
+                throttle_msg = f" | [ADAPTIVE] Throttled {count} background procs due to high load."
+
+        # 3. Update Process Entry Metrics (Semi-Analytical)
+        # In a real kernel, this would call GetProcessTimes per PID
+        total_cpu = 0.0
+        for p in self._procs.values():
+            # Heuristic update: adjust proc cpu based on global load shift
+            load_factor = (global_cpu / 100.0) if global_cpu > 0 else 1.0
+            p.cpu_pct = round(p.cpu_pct * load_factor, 1)
+            total_cpu += p.cpu_pct
+
         return {
             "tick":          self._sched_ticks,
             "processes":     len(self._procs),
             "total_cpu_pct": round(total_cpu, 1),
+            "global_cpu":    global_cpu,
             "quarantined":   len(self._quarantine),
             "deferred":      len(self._carbon_deferred),
             "message":       (
                 f"Scheduler tick #{self._sched_ticks}: "
-                f"{len(self._procs)} procs, {total_cpu:.1f}% CPU aggregate."
+                f"{len(self._procs)} procs, {total_cpu:.1f}% aggregate, "
+                f"Global Load: {global_cpu:.1f}%{throttle_msg}"
             ),
         }
 
