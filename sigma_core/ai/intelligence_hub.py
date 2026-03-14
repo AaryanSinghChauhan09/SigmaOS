@@ -26,12 +26,15 @@ class MLEngine(IntelligenceComponent):
     def __init__(self, kernel):
         super().__init__(kernel)
         self.terminology = {
-            "Supervised": "Learning with a teacher.",
-            "Unsupervised": "Finding patterns alone.",
-            "Reinforcement": "Learning from rewards."
+            "ML Intro": "Computers learning without being explicitly programmed.",
+            "ML and AI": "AI is the broad concept; ML is the data-driven subset.",
+            "ML Languages": "Python, R, Julia, and JavaScript (TFJS).",
+            "Supervised": "Learning with a teacher using labeled data.",
+            "Unsupervised": "Finding hidden patterns in unlabeled data.",
+            "Deep Learning": "Neural networks with many layers (Brain.js).",
+            "Perceptrons": "The simplest form of a neural network.",
+            "Testing/Training": "Split data to learn then evaluate."
         }
-        if self.is_child:
-            self.terminology = {k: "Magic learning with friends!" for k in self.terminology}
 
     def train_perceptron(self, data: List[tuple], weights: List[float]):
         """Simulates Perceptron Training Logic."""
@@ -39,28 +42,57 @@ class MLEngine(IntelligenceComponent):
         # Mock training
         return [w + random.uniform(-0.1, 0.1) for w in weights]
 
-    def cluster_data(self, points: List[tuple], k: int = 3) -> Dict[str, List[tuple]]:
-        """K-Means Clustering Simulation."""
-        self.log_activity(f"Clustering into {k} groups...")
-        clusters: Dict[str, List[tuple]] = {f"Cluster_{i}": [] for i in range(k)}
-        for i, p in enumerate(points):
-            clusters[f"Cluster_{i % k}"].append(p)
-        return clusters
+    def get_regression_data(self, n=50):
+        """Generates mock data for Linear Graphs and Scatter Plots."""
+        x = [i for i in range(n)]
+        y = [2*i + 5 + random.uniform(-5, 5) for i in x]
+        return x, y
 
 class DeepLearningEngine(MLEngine):
-    """Deep Learning Expansion using Neural Networks principles (Principles of TFJS/Brain.js)."""
+    """Deep Learning Expansion using Neural Networks principles (TFJS/Brain.js)."""
     def __init__(self, kernel):
         super().__init__(kernel)
         self.layers: List[Dict[str, Any]] = []
+        self.tfjs_ops = ["tf.tensor", "tf.add", "tf.matMul", "tf.sequential", "tf.layers.dense"]
+        self.tfjs_models = ["MobileNet", "PoseNet", "CocoSsd", "Toxicity"]
 
     def add_layer(self, units: int, activation: str = "relu"):
         self.layers.append({"units": units, "activation": activation})
         self.log_activity(f"Added layer: {units} units, {activation}")
 
-    def simulate_tfjs_model(self):
-        """Mock behavior of TensorFlow.js / Brain.js workflows."""
-        self.log_activity("Loading TFJS-compatible architecture...")
-        return {"backend": "WASM/WebGL", "status": "Optimized"}
+    def get_example_1(self):
+        """Ex1: Simple Linear Prediction."""
+        return {
+            "name": "Linear Predictor",
+            "intro": "Predicts y based on x (y = 2x + 1).",
+            "data": "Pairs like (1, 3), (2, 5), (3, 7).",
+            "model": "Single Dense Layer (1 unit).",
+            "training": "SGD optimizer, MSE loss."
+        }
+
+    def get_example_2(self):
+        """Ex2: Image Recognition Intro."""
+        return {
+            "name": "Scribble Recognizer",
+            "intro": "Categorizes black & white digits.",
+            "data": "MNIST Dataset - 60,000 images.",
+            "model": "CNN (Conv2D -> MaxPooling -> Dense).",
+            "training": "Adam optimizer, Categorical Crossentropy."
+        }
+
+# --- GRAPHICS ENGINE SUBSET ---
+
+class GraphicsEngine(IntelligenceComponent):
+    """Sovereign JS Graphics Hub: Plotly, Chart.js, D3.js."""
+    def __init__(self, kernel):
+        super().__init__(kernel)
+        self.libraries = {
+            "Canvas": "Native HTML5 drawing surface.",
+            "Plotly.js": "Complex scientific plotting.",
+            "Chart.js": "Simple and beautiful charts.",
+            "D3.js": "Data-Driven Documents (DOM manipulation).",
+            "Google Charts": "Cloud-based visual data tools."
+        }
 
 # --- MATHEMATICS & STATISTICS SUBSET ---
 
@@ -99,12 +131,18 @@ class IntelligenceHistory(IntelligenceComponent):
     def __init__(self, kernel):
         super().__init__(kernel)
         self.timeline = [
+            {"year": "History of Numbers", "event": "Sumerian counting to Indian Zero (Shunya)."},
+            {"year": "History of Languages", "event": "From Sanskrit to binary machine code."},
             {"year": "1950", "event": "Alan Turing - Computing Machinery and Intelligence"},
+            {"year": "History of Computing", "event": "Analytical Engine (Ada Lovelace) to Personal Computers."},
             {"year": "1956", "event": "Dartmouth Workshop (Birth of AI)"},
             {"year": "1969", "event": "Perceptrons (Minsky/Papert)"},
+            {"year": "History of Robots", "event": "Unimate (1961) to Boston Dynamics."},
             {"year": "1997", "event": "Deep Blue beats Kasparov"},
             {"year": "2012", "event": "AlexNet (Deep Learning Explosion)"},
+            {"year": "Job Replacements", "event": "Evolution of labor from manual to cognitive augmentation."},
             {"year": "2023", "event": "Theory of Mind in Large Models"},
+            {"year": "Theory of Mind", "event": "The capability of AI to attribute mental states to others."},
             {"year": "2026", "event": "SigmaOS Apex Kernel Release"}
         ]
 
@@ -119,6 +157,7 @@ class SigmaIntelligenceHub:
         self.kernel = kernel
         self.ml = MLEngine(kernel)
         self.deep_ml = DeepLearningEngine(kernel)
+        self.graphics = GraphicsEngine(kernel)
         self.math = Mathematics(kernel)
         self.stats = Statistics(kernel)
         self.history = IntelligenceHistory(kernel)
