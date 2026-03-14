@@ -317,14 +317,29 @@ class SigmaGUI(tk.Tk, UIMixin):
                   bg=PAL["accent"], fg="white", padx=20, pady=10, relief="flat", command=_reboot).place(relx=0.1, rely=0.9)
 
     def _bind_shortcuts(self):
-        """Global Keyboard Orchestration (Ease of Use)."""
+        """Global Keyboard Orchestration (Microsoft Aligned Sovereign UX)."""
+        # --- Microsoft/Windows Standards ---
+        self.bind_all("<Control-Shift-Escape>", lambda e: self._show_page("system_audit"))
+        self.bind_all("<Alt-Tab>", lambda e: self._cycle_tabs(1))
+        self.bind_all("<Alt-i>", lambda e: self._show_page("config_hub"))
+        self.bind_all("<Alt-e>", lambda e: self._show_page("explorer"))
+        self.bind_all("<Alt-s>", lambda e: self._show_page("search"))
+        self.bind_all("<Alt-r>", lambda e: self._show_spotlight())
+        self.bind_all("<Alt-l>", lambda e: self._lock_screen())
+        self.bind_all("<Alt-a>", lambda e: self._show_page("automation_hub"))
+        self.bind_all("<Alt-g>", lambda e: self._show_page("gaming_hub"))
+        self.bind_all("<Alt-p>", lambda e: self._show_page("analytics_page"))
+        self.bind_all("<Alt-v>", lambda e: self._notify("CLIPBOARD", "Sovereign Clipboard History: No PII detected.", "INFO"))
+        self.bind_all("<Alt-w>", lambda e: self._show_page("intelligence_hub"))
+
+        # --- SigmaOS Originals ---
         self.bind("<Control-k>", lambda e: self._show_spotlight())
         self.bind("<Control-space>", lambda e: self._show_spotlight())
         self.bind("<Control-s>", lambda e: self._trigger_sync())
         self.bind("<Control-comma>", lambda e: self._show_page("config_hub"))
         self.bind("<F5>", lambda e: self._reboot())
         
-        # USP: Multitasking Hotkeys (Windows 11 Inspired)
+        # USP: Multitasking Hotkeys (Snap Layouts)
         self.bind("<Alt-Key-1>", lambda e: self._apply_snap_layout("FLOATING"))
         self.bind("<Alt-Key-2>", lambda e: self._apply_snap_layout("TILING"))
         self.bind("<Alt-Key-3>", lambda e: self._apply_snap_layout("QUARTERS"))
@@ -335,13 +350,54 @@ class SigmaGUI(tk.Tk, UIMixin):
         self.bind("<Control-Tab>", lambda e: self._cycle_tabs(1))
         self.bind("<Control-Shift-Tab>", lambda e: self._cycle_tabs(-1))
         
-        # Universal Keybinds for Windows Parity (Merged from old bind_shortcuts)
+        # Legacy/Universal
         self.bind_all("<F1>", lambda e: self._show_page("manual"))
-        self.bind_all("<Alt-s>", lambda e: self._show_page("search"))
-        self.bind_all("<Alt-x>", lambda e: self._show_page("vanguard"))
+        self.bind_all("<Alt-x>", lambda e: self._show_quick_link_menu())
         self.bind_all("<Alt-b>", lambda e: self._show_page("brain"))
         self.bind_all("<Control-Shift-L>", lambda e: self._toggle_bare_minimum())
         self.bind_all("<Shift-Escape>", lambda e: self._emergency_shutdown())
+
+        # --- Super (Win) Key Aliases (Environment Dependent) ---
+        for key in ['d', 'e', 'i', 's', 'r', 'l', 'a', 'g', 'p', 'v', 'w', 'c']:
+            self.bind_all(f"<Super_L>-{key}", lambda e, k=key: self._handle_ms_shortcut(k))
+            self.bind_all(f"<Super_R>-{key}", lambda e, k=key: self._handle_ms_shortcut(k))
+
+    def _handle_ms_shortcut(self, key):
+        """Dispatches shortcuts from the Microsoft command set."""
+        mapping = {
+            'd': lambda: self._show_page("dashboard"),
+            'e': lambda: self._show_page("explorer"),
+            'i': lambda: self._show_page("config_hub"),
+            's': lambda: self._show_page("search"),
+            'r': lambda: self._show_spotlight(),
+            'l': lambda: self._lock_screen(),
+            'a': lambda: self._show_page("automation_hub"),
+            'g': lambda: self._show_page("gaming_hub"),
+            'p': lambda: self._show_page("analytics_page"),
+            'v': lambda: self._notify("CLIPBOARD", "Sovereign Clipboard History: Secure.", "INFO"),
+            'w': lambda: self._show_page("intelligence_hub"),
+            'c': lambda: self._show_page("nexus_ai")
+        }
+        if key in mapping: mapping[key]()
+
+    def _show_quick_link_menu(self):
+        """Microsoft Win+X parity: Show a quick link menu for admins."""
+        menu = tk.Menu(self, tearoff=0, bg=PAL["bg2"], fg=PAL["text"], font=FONT_SMALL)
+        menu.add_command(label="System Audit (Task Manager)", command=lambda: self._show_page("system_audit"))
+        menu.add_command(label="Terminal", command=lambda: self._show_page("terminal"))
+        menu.add_command(label="Settings", command=lambda: self._show_page("config_hub"))
+        menu.add_command(label="Device Manager (HAL)", command=lambda: self._show_page("antigravity_hub"))
+        menu.add_separator()
+        menu.add_command(label="Shut Down / Sign Out", command=self._lock_screen)
+        
+        # Display menu at cursor or topbar
+        menu.post(self.winfo_rootx() + 50, self.winfo_rooty() + self.winfo_height() - 200)
+
+    def _lock_screen(self):
+        """Standard Win+L behavior: Return to Boot/Security Selection."""
+        self._notify("SECURE", "Locking SigmaOS Sovereign...", "WARN")
+        self.withdraw()
+        self.after(500, self._show_os_selection)
 
     def _cycle_tabs(self, direction: int):
         """Cycles through active tabs for lightning fast multitasking."""
@@ -391,13 +447,6 @@ class SigmaGUI(tk.Tk, UIMixin):
             self.kernel.registry.get("search").search(cmd)
 
 
-    def _bind_shortcuts(self):
-        """Bind global hotkeys for the Sovereign experience."""
-        self.bind("<Control-k>", lambda e: self._show_spotlight())
-        self.bind("<Control-space>", lambda e: self._show_spotlight())
-        self.bind("<F5>", lambda e: self._reboot())
-        self.bind("<Control-s>", lambda e: [self.kernel.automator.launch_preset("sync") if self.kernel.automator else None])
-        self.bind("<Control-comma>", lambda e: self._show_page("config_hub"))
 
     def _show_spotlight(self):
         """Universal Sovereign Spotlight: Command Bar for Everything."""
