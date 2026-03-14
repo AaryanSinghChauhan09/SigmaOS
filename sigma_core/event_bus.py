@@ -21,10 +21,11 @@ class EventBus:
         self._subscribers: Dict[str, List[Callable]] = {}
         # USP: Zero-Allocation Circular Buffer for low-level performance
         self._max_history = 1000
-        self._event_history = [None] * self._max_history
+        self._event_history: List[Any] = [None] * self._max_history
         self._history_ptr = 0
         self._lock = threading.Lock()
         self._executor = ThreadPoolExecutor(max_workers=24) # Increased for Apex load
+        self._interaction_weights: Dict[str, float] = {}   # ML Personalization weights
     
     def subscribe(self, event_name: str, callback: Callable) -> None:
         """Subscribe to an event (O(1) write)."""
@@ -44,7 +45,14 @@ class EventBus:
         """
         Emit an event via the FAST-PATH or the WORKER-PATH.
         """
-        is_critical = priority <= 1 or "fault" in event_name or "kernel" in event_name
+        # ML Personalization: Elevate priority for high-interaction event types
+        interaction_boost = self._interaction_weights.get(event_name, 1.0)
+        is_critical = priority <= 1 or "fault" in event_name or "kernel" in event_name or interaction_boost > 2.0
+        
+        if interaction_boost > 1.0:
+            self._interaction_weights[event_name] = min(interaction_boost + 0.1, 5.0)
+        else:
+            self._interaction_weights[event_name] = 1.1 # Seed weight
         
         with self._lock:
             # USP: Circular Ring Buffer prevents O(N) list shifts
@@ -67,6 +75,7 @@ class EventBus:
         else:
             # WORKER-PATH: Offload to apex thread pool
             for cb in subscribers:
+                # Standard execution path via worker pool
                 self._executor.submit(self._safe_invoke, cb, event_name, data)
 
     def _safe_invoke(self, callback: Callable, event_name: str, data: Any):
@@ -75,7 +84,7 @@ class EventBus:
         except Exception as e:
             print(f"[BUS] Fault in WorkerPath ({event_name}): {e}")
     
-    def get_history(self, event_name: str = None) -> List[Dict]:
+    def get_history(self, event_name: str | None = None) -> List[Any]:
         """Returns the event history; filters results to exclude 'None' slots."""
         with self._lock:
             h = [e for e in self._event_history if e is not None]

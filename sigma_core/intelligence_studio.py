@@ -8,7 +8,17 @@ Absorbs USP of: PowerBI (local), Tableau (private), and Jupyter (sovereign).
 import time
 import random
 import os
-from .interfaces import SigmaModuleBase, ISigmaService
+import sys
+
+# Robust System Path Injection
+_p = os.path.abspath(__file__)
+while _p and not os.path.exists(os.path.join(os.path.dirname(_p), "sigma_core")):
+    _p = os.path.dirname(_p)
+    if _p == os.path.dirname(_p): break
+root = str(os.path.dirname(_p))
+if root and root not in sys.path: sys.path.insert(0, root)
+
+from sigma_core.interfaces import SigmaModuleBase, ISigmaService
 from userland.system_api.sigma_std import SigmaMath
 
 class IntelligenceStudio(SigmaModuleBase, ISigmaService):
@@ -70,19 +80,22 @@ class IntelligenceStudio(SigmaModuleBase, ISigmaService):
                  best_match = name
         return {"file": best_match, "score": best_score}
 
-    def autonomous_refactoring_sentinel(self, file_path: str):
-        """USP: Proactive Code-Quality Audit (Devin-parity)."""
-        # Checks for common anti-patterns like broad try/except, nested loops over 3 deep.
-        if os.path.exists(file_path):
-             with open(file_path, 'r') as f:
-                 content = f.read()
-             if "except:" in content:
-                 return "ADVISORY: Broad Exception found. Recommend: Specific Error Handling."
-        return "ADVISORY: Clean Code verified."
+    def get_recommendations(self, user_stats: dict):
+        """USP: Adaptive Personalization Engine (Layer 7)."""
+        xp = user_stats.get("Total XP", 0)
+        labs = user_stats.get("Labs Done", 0)
+        
+        # Simple Logic: Recommend harder labs as XP increases
+        if xp < 100:
+            return ["Intro to Physics", "Basic Chemistry", "Math Identity Visualizer"]
+        elif labs < 10:
+            return ["Optics Bench", "Titration Master", "Periodic Table Pro"]
+        else:
+            return ["Quantum Benchmarking", "Organic Synthesis Lab", "Advanced Logic Gates"]
 
     def health_check(self) -> str:
         s = self.stats
-        return f"OK - Insights: {s['insights_generated']} | Semantic Shards: {len(self.datasets)}"
+        return f"OK - Insights: {s['insights_generated']} | Shards: {len(self.datasets)} | ML-Load: {s['cognitive_load']}"
 
 if __name__ == "__main__":
     intel = IntelligenceStudio()
