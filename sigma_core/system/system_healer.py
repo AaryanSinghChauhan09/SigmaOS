@@ -13,10 +13,7 @@ import platform
 import subprocess
 from typing import Dict, Any, List, Optional
 
-try:
-    from .interfaces import SigmaModuleBase, ISigmaService
-except ImportError:
-    from sigma_core.interfaces import SigmaModuleBase, ISigmaService
+from sigma_core.system.interfaces import SigmaModuleBase, ISigmaService
 
 def _os_trim_working_set() -> bool:
     """Trim current process working set using Win32 API."""
@@ -35,7 +32,7 @@ def _os_trim_working_set() -> bool:
 
 def _os_remove_stale_locks(root_dir: str) -> int:
     """Remove all *.lock files under root_dir. Returns number removed."""
-    count: int = 0
+    removed_count: int = 0
     try:
         if not os.path.exists(root_dir):
             return 0
@@ -43,12 +40,12 @@ def _os_remove_stale_locks(root_dir: str) -> int:
             if fname.endswith(".lock"):
                 try:
                     os.remove(os.path.join(root_dir, fname))
-                    count = count + 1
+                    removed_count = removed_count + 1
                 except (OSError, PermissionError):
                     pass
     except OSError:
         pass
-    return count
+    return removed_count
 
 def _os_native_set_high_priority() -> None:
     """Sets current process to HIGH priority."""
@@ -67,18 +64,29 @@ class SigmaSystemHealer(SigmaModuleBase, ISigmaService):
         self.running = False
         self._thread: Optional[threading.Thread] = None
         self._lock = threading.Lock()
-        self.stats = {"heals": 0, "scrubs": 0}
+        self.stats: Dict[str, Any] = {"heals": 0, "scrubs": 0, "predicted_faults": 0}
+
+    def predict_and_heal(self):
+        """USP: Predictive Resilience Engine."""
+        if self.kernel and hasattr(self.kernel, "hal"):
+            load_str = self.kernel.hal.get_hardware_state().get("cpu_load", "0%")
+            load = float(load_str.replace("%", ""))
+            if load > 85.0:
+                self.stats["predicted_faults"] += 1
+                return self.trigger_full_resilver()
+        return "Healer: Vitals within nominal bounds. No prediction of near-term fault."
 
     def start_service(self) -> str:
         with self._lock:
             if not self.running:
                 self.running = True
-                self._thread = threading.Thread(
+                _t = threading.Thread(
                     target=self._healer_loop, 
                     daemon=True, 
                     name="SigmaHealer"
                 )
-                self._thread.start()
+                self._thread = _t
+                _t.start()
                 _os_native_set_high_priority()
                 self.log_event("healer_start", {"status": "ACTIVE"})
         return "System Healer: Sentinel Active — layers online."
@@ -101,9 +109,11 @@ class SigmaSystemHealer(SigmaModuleBase, ISigmaService):
                 _os_trim_working_set()
                 # 2. Lock Cleanup
                 if self.kernel:
-                    _os_remove_stale_locks(getattr(self.kernel, "_ROOT", "."))
+                    root_dir = str(getattr(self.kernel, "_ROOT", "."))
+                    _os_remove_stale_locks(root_dir)
                 
-                self.stats["heals"] = self.stats["heals"] + 1
+                h_count = int(self.stats["heals"])
+                self.stats["heals"] = h_count + 1
                 time.sleep(60) # Deep heal every minute
             except Exception as e:
                 print(f"[HEALER] Fault: {e}")

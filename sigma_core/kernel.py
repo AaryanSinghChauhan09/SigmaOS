@@ -321,6 +321,8 @@ class SigmaKernel:
             ("sigma_core.security.compliance_guard", "ComplianceGuard",     "compliance"),
             ("sigma_core.security.vanguard",       "NetworkVanguard",       "vanguard"),
             ("sigma_core.ui.morphic_dashboard",    "MorphicDashboard",      "dashboard"),
+            ("sigma_core.ui.transparency_portal",  "TransparencyPortal",     "portal"),
+            ("sigma_core.system.community_nexus",  "CommunityNexus",        "nexus"),
             ("sigma_core.system.personalization",  "PersonalizationEngine", "personalization"),
             ("sigma_core.system.gamification_engine", "GamificationEngine",  "gamification"),
             ("userland.system_api.antigravity_core", "AntigravityLayer", "antigravity"),

@@ -33,11 +33,11 @@ SigmaOS implements a **Deeply Modular Hybrid Layer** that partitions OS responsi
 SigmaOS is now structured for maximum resilience:
 
 | Module Group | Primary Files | Language |
-| :--- | :--- | :--- |
+| :----------- | :------------ | :------- |
 | **`security/`** | Integrity, Compliance, Privacy, Vanguard | Python / C (HAL) |
 | **`ai/`** | IntelligenceStudio, Gurukul, AgentOrchestrator| Python |
-| **`system/`** | Config, Registry, EventBus, Ledger, Cache | Python |
-| **`ui/`** | Shell, WindowManager, DataVisualizer | Python |
+| **`system/`** | Config, CommunityNexus, EventBus, Ledger, Personalization | Python |
+| **`ui/`** | Shell, transparency_portal, MorphicDashboard | Python |
 | **`hal/`** | KernelHAL, PolyglotLoader | Python / C / Rust |
 
 ---

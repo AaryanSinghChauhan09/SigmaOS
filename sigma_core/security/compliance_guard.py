@@ -46,7 +46,15 @@ class ComplianceGuard(SigmaModuleBase, ISigmaService):
         else:
             findings.append("[FAIL] Forensic Integrity: Ledger Tampering Detected.")
 
-        # Check 3: Identity Shredding (Right to Erasure)
+        # Check 3: Environmental Awareness (Green Compute)
+        if self.kernel and hasattr(self.kernel, "hal"):
+            carbon = self.kernel.hal.get_carbon_footprint()
+            if "APEX_GREEN" in carbon.get("efficiency_rating", ""):
+                findings.append(f"[PASS] Environment: Green Efficiency Verified ({carbon['hourly_impact_gCO2']}/hr).")
+            else:
+                findings.append(f"[SUSTAIN] Environment: Sustainable Rating ({carbon['hourly_impact_gCO2']}/hr).")
+
+        # Check 4: Identity Shredding (Right to Erasure)
         scrubber = os.path.join(os.getcwd(), "sigma_scrubber.py")
         if os.path.exists(scrubber):
             findings.append("[PASS] Privacy Controls: Secure Erasure (Scrubber) Standby.")

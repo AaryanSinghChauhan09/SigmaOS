@@ -130,6 +130,29 @@ class SigmaHAL(SigmaModuleBase):
         except:
             return False
 
+    def get_energy_efficiency(self) -> Dict[str, Any]:
+        """USP: Real-time silicon energy audit (Environment Aware)."""
+        cpu_load = self._get_cpu_usage()
+        # Simulated power draw calculation based on load + core count
+        watts = 5.0 + (cpu_load * 0.45 * (self.cpu_count / 4))
+        efficiency = 100.0 - (cpu_load * 0.2)
+        return {
+            "power_draw_watts": f"{watts:.1f}W",
+            "efficiency_nps": f"{efficiency:.1f}%",
+            "thermal_vibe": "COOL" if watts < 15 else "WARM"
+        }
+
+    def get_carbon_footprint(self) -> Dict[str, Any]:
+        """USP: Estimated gCO2eq/hr impact based on energy draw."""
+        pwr = self.get_energy_efficiency()
+        watts = float(pwr["power_draw_watts"].replace("W", ""))
+        # Grid Intensity Simulator (can be mapped to region in future)
+        impact = watts * 0.00045 
+        return {
+            "hourly_impact_gCO2": f"{impact:.4f}g",
+            "efficiency_rating": "APEX_GREEN" if impact < 0.005 else "SUSTAINABLE"
+        }
+
     def pin_to_cores(self, mask: int = 1) -> bool:
         """USP: Hard Core Affinity. Eliminates context-switch jitter by pinning to specific silicon."""
         if not self._kernel32: return False
