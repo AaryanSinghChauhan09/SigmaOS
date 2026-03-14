@@ -1,5 +1,5 @@
 import random
-from sigma_core.sovereign_app import SovereignApp
+from sigma_core.system.sovereign_app import SovereignApp
 
 class SigmaOmniBrowser(SovereignApp):
     """

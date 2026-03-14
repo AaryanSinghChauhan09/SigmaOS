@@ -323,7 +323,7 @@ class SigmaKernel:
             ("sigma_core.security.neuro_identity", "NeuroIdentityVault",     "neuro_identity"),
             ("sigma_core.ui.morphic_dashboard",    "MorphicDashboard",      "dashboard"),
             ("sigma_core.ui.transparency_portal",  "TransparencyPortal",     "portal"),
-            ("sigma_core.system.community_nexus",  "CommunityNexus",        "nexus"),
+            ("sigma_core.system.community_nexus",  "SovereignNexus",        "nexus"),
             ("sigma_core.system.mesh_dispatcher",   "MeshDispatcher",        "mesh"),
             ("sigma_core.system.sync_engine_v2",    "SovereignSync",         "sync_v2"),
             ("sigma_core.security.compliance_architect", "ComplianceArchitect", "architect"),
