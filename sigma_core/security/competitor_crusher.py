@@ -54,12 +54,24 @@ class SovereignCompetitorCrusher:
         """Low-level Windows API optimization to supersede competitors."""
         if platform.system() == "Windows":
             try:
-                # Attempting to set thread execution state to prevent sleep
-                windll = getattr(ctypes, "windll", None)
-                if windll:
-                    windll.kernel32.SetThreadExecutionState(0x80000000 | 0x00000001)
-                self.defeat_status["stealth_score"] = 100.0
-            except: pass
+                import ctypes
+                from ctypes import wintypes
+                
+                # Enforce Strict Type Safety for Low-Level Calls
+                SetThreadExecutionState = ctypes.windll.kernel32.SetThreadExecutionState
+                SetThreadExecutionState.argtypes = [wintypes.DWORD]
+                SetThreadExecutionState.restype = wintypes.DWORD
+                
+                # ES_CONTINUOUS = 0x80000000 | ES_SYSTEM_REQUIRED = 0x00000001
+                EXECUTION_STATE_FLAGS = 0x80000000 | 0x00000001
+                
+                result = SetThreadExecutionState(EXECUTION_STATE_FLAGS)
+                if result != 0:
+                    self.defeat_status["stealth_score"] = 100.0
+                else:
+                    print("[CRUSHER] Warning: Failed to assert hardware execution state.")
+            except Exception as e:
+                print(f"[CRUSHER] Low-level optimization failed: {e}")
 
     def run_stealth_check(self):
         """Forensic-grade audit of the host environment's privacy leaks."""
