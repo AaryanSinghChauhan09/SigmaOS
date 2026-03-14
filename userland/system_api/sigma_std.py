@@ -33,26 +33,69 @@ class SigmaNetwork:
 
 class SigmaSys:
     """Replaces 'psutil'."""
+    _last_idle = 0
+    _last_kernel = 0
+    _last_user = 0
+
     @staticmethod
     def cpu_usage():
-        # Universal CPU mock/fallback
         if sys.platform == "win32":
             try:
-                out = subprocess.check_output("wmic cpu get loadpercentage", shell=True).decode()
-                return float(out.split('\n')[1].strip())
-            except: return 15.0
+                import ctypes
+                from ctypes import wintypes
+                
+                class FILETIME(ctypes.Structure):
+                    _fields_ = [("dwLowDateTime", wintypes.DWORD),
+                                ("dwHighDateTime", wintypes.DWORD)]
+                
+                idleTime = FILETIME()
+                kernelTime = FILETIME()
+                userTime = FILETIME()
+                
+                if ctypes.windll.kernel32.GetSystemTimes(ctypes.byref(idleTime), ctypes.byref(kernelTime), ctypes.byref(userTime)):
+                    def to_int(ft):
+                        return (ft.dwHighDateTime << 32) + ft.dwLowDateTime
+                    
+                    idle = to_int(idleTime)
+                    kernel = to_int(kernelTime)
+                    user = to_int(userTime)
+                    
+                    total_sys = (kernel - SigmaSys._last_kernel) + (user - SigmaSys._last_user)
+                    idle_diff = idle - SigmaSys._last_idle
+                    
+                    SigmaSys._last_idle = idle
+                    SigmaSys._last_kernel = kernel
+                    SigmaSys._last_user = user
+                    
+                    if total_sys > 0:
+                        return float((total_sys - idle_diff) * 100.0 / total_sys)
+            except Exception: pass
         return 10.0 # Linux/macOS stub
 
     @staticmethod
     def ram_usage():
         if sys.platform == "win32":
             try:
-                out = subprocess.check_output("wmic OS get FreePhysicalMemory,TotalVisibleMemorySize /Value", shell=True).decode()
-                lines = out.strip().split('\n')
-                free = int(lines[0].split('=')[1])
-                total = int(lines[1].split('=')[1])
-                return ((total - free) / total) * 100
-            except: return 40.0
+                import ctypes
+                from ctypes import wintypes
+                class MEMORYSTATUSEX(ctypes.Structure):
+                    _fields_ = [
+                        ("dwLength", wintypes.DWORD),
+                        ("dwMemoryLoad", wintypes.DWORD),
+                        ("ullTotalPhys", ctypes.c_ulonglong),
+                        ("ullAvailPhys", ctypes.c_ulonglong),
+                        ("ullTotalPageFile", ctypes.c_ulonglong),
+                        ("ullAvailPageFile", ctypes.c_ulonglong),
+                        ("ullTotalVirtual", ctypes.c_ulonglong),
+                        ("ullAvailVirtual", ctypes.c_ulonglong),
+                        ("ullAvailExtendedVirtual", ctypes.c_ulonglong),
+                    ]
+                
+                stat = MEMORYSTATUSEX()
+                stat.dwLength = ctypes.sizeof(MEMORYSTATUSEX)
+                if ctypes.windll.kernel32.GlobalMemoryStatusEx(ctypes.byref(stat)):
+                    return float(stat.dwMemoryLoad)
+            except Exception: pass
         return 35.0
 
     @staticmethod
@@ -65,15 +108,33 @@ class SigmaSys:
 
         if sys.platform == "win32":
             try:
-                out = subprocess.check_output("WMIC PATH Win32_Battery Get EstimatedChargeRemaining, BatteryStatus", shell=True).decode()
-                lines = out.strip().split('\n')
-                if len(lines) > 1:
-                    parts = lines[1].split()
-                    status = int(parts[0])
-                    percent = float(parts[1])
-                    plugged = status == 2
-                    return BatteryStatus(percent, -2 if plugged else -1, plugged)
-            except: pass
+                import ctypes
+                from ctypes import wintypes
+                class SYSTEM_POWER_STATUS(ctypes.Structure):
+                    _fields_ = [
+                        ('ACLineStatus', wintypes.BYTE),
+                        ('BatteryFlag', wintypes.BYTE),
+                        ('BatteryLifePercent', wintypes.BYTE),
+                        ('SystemStatusFlag', wintypes.BYTE),
+                        ('BatteryLifeTime', wintypes.DWORD),
+                        ('BatteryFullLifeTime', wintypes.DWORD),
+                    ]
+                
+                power_status = SYSTEM_POWER_STATUS()
+                if ctypes.windll.kernel32.GetSystemPowerStatus(ctypes.byref(power_status)):
+                    percent = power_status.BatteryLifePercent
+                    plugged = bool(power_status.ACLineStatus == 1)
+                    secsleft = power_status.BatteryLifeTime
+                    
+                    if percent == 255: # Unknown
+                        return None
+                        
+                    # Power time unlimited or unknown
+                    if secsleft == 4294967295 or plugged:
+                        secsleft = -2 if plugged else -1
+                        
+                    return BatteryStatus(float(percent), int(secsleft), plugged)
+            except Exception: pass
         return None
 
 class SigmaCrypto:
