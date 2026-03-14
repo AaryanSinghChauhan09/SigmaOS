@@ -42,12 +42,15 @@ class NCERTMasterLab(tk.Tk):
         if self.kernel and hasattr(self.kernel, "bus"):
             self.kernel.bus.subscribe("governor.vibe_switch", self._on_vibe_switch)
 
-        self._tree = None
-        self._mid = None
-        self._out = None
-        self._tree_fr = None
-        self._out_fr = None
-        self._mid_msg = None
+        # Tactical UI Proxies (Explicitly initialized)
+        self._tree = ttk.Treeview(self)
+        self._mid = tk.Frame(self)
+        self._out = scrolledtext.ScrolledText(self)
+        self._tree_fr = tk.Frame(self)
+        self._out_fr = tk.Frame(self)
+        self._mid_msg = tk.Label(self)
+        self._status_lbl = tk.Label(self)
+        self.search_ent = tk.Entry(self)
 
         self._build_ui()
         self._load_backends()
@@ -245,10 +248,19 @@ class NCERTMasterLab(tk.Tk):
 
     def _check_badges(self):
         c = self._stats["completed"]
-        if c == 1: self._out.insert("end", "\n🎖️ NOVICE SCIENTIST UNLOCKED\n", "badge")
-        elif c == 5: self._out.insert("end", "\n🎖️ EXPERIENCED RESEARCHER UNLOCKED\n", "badge")
-        elif c == 15: self._out.insert("end", "\n🎖️ NCERT MASTER UNLOCKED\n", "badge")
-        self._status_lbl.configure(text=f"[EXPERIMENTS: {c} | SESSION ACTIVE]")
+        # XP Calculation (USP: Scientific Gamification)
+        xp = c * 150
+        self._out.insert("end", f"\n◈ XP EARNED: +150 | TOTAL SCIENTIFIC XP: {xp}\n", "badge")
+        
+        if c == 1: self._out.insert("end", "🎖️ NOVICE SCIENTIST UNLOCKED\n", "badge")
+        elif c == 5: self._out.insert("end", "🎖️ EXPERIENCED RESEARCHER UNLOCKED\n", "badge")
+        elif c == 15: self._out.insert("end", "🎖️ NCERT MASTER UNLOCKED\n", "badge")
+        
+        self._status_lbl.configure(text=f"[XP: {xp} | EXPERIMENTS: {c} | SESSION ACTIVE]")
+        
+        # Adaptive UI Sync (USP: Dynamic Scaling)
+        if self.kernel and hasattr(self.kernel, "bus"):
+             self.kernel.bus.emit("lab.milestone", {"xp": xp, "count": c})
 
 if __name__ == "__main__":
     NCERTMasterLab().mainloop()

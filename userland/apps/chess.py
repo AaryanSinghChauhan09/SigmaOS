@@ -143,7 +143,7 @@ class SovereignStrategist(tk.Tk):
 
     def _draw_board(self):
         b = self.engine.board
-        lm = self.engine.last_move
+        lm = cast(Optional[Tuple[Tuple[int, int], Tuple[int, int]]], self.engine.last_move)
         for r in range(8):
             for c in range(8):
                 p = b[r][c]
@@ -200,7 +200,8 @@ class SovereignStrategist(tk.Tk):
         self.score_lbl.config(text=f"{'+' if s > 0 else ''}{s:.2f}")
         self.analysis_bar['value'] = 50 + (s * 10)
         self.hist_txt.delete("1.0", "end")
-        for m in self.engine.history[-10:]:
+        history = cast(List[str], self.engine.history)
+        for m in history[-10:]:
             self.hist_txt.insert("end", f"{m}\n")
 
     def _reset(self):
