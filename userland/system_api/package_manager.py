@@ -24,6 +24,7 @@ class SigmaPackageManager:
 
     def _init_registry(self):
         data = {"apps": {}, "repositories": ["https://repo.sigmaos.sovereign"]}
+        self.registry_path.parent.mkdir(parents=True, exist_ok=True)
         with open(self.registry_path, "w") as f:
             json.dump(data, f, indent=4)
 
@@ -44,7 +45,9 @@ class SigmaPackageManager:
             print(f"[*] Sovereign Install: {pkg_name} from {pkg_source}...")
             
             # 1. Verification Step (Simulated Signature Check)
-            pkg_id = hashlib.sha256(pkg_name.encode()).hexdigest()[:8]
+            pk_hash = hashlib.sha256(pkg_name.encode()).hexdigest()
+            # Explicitly cast to string to appease hyper-strict linters
+            pkg_id = str(pk_hash)[:8]
             
             # 2. Setup isolated directory (The Silo)
             app_path = self.apps_dir / pkg_name
@@ -69,34 +72,14 @@ class SigmaPackageManager:
         except Exception as e:
             return {"status": "ERROR", "message": f"Installation failed: {str(e)}"}
 
-class SovereignMarketplace:
-    """USP: Community-Driven decentralized discovery engine."""
-    def __init__(self, pkg_mgr: SigmaPackageManager):
-        self.pkg_mgr = pkg_mgr
-        self.featured = [
-            {"name": "Neuro-Graph-Pro", "dev": "@SigmaCommunity", "description": "High-perf neural connectivity visualizer."},
-            {"name": "Sovereign-VPN-Tor", "dev": "@PrivacyShield", "description": "Ring-0 network anonymization shard."},
-            {"name": "Quantum-Crypt-Guard", "dev": "@SigmaSecurity", "description": "Post-quantum cryptographic library."}
-        ]
-
-    def discover(self):
-        """Returns verified community apps."""
-        return self.featured
-
-    def auto_install_featured(self):
-        """Automated deployment of mission-critical community tools."""
-        results = []
-        for app in self.featured:
-            results.append(self.pkg_mgr.install_package(app["name"], "Community-Market"))
-        return results
-
     def list_installed(self):
         return self._get_registry()["apps"]
 
     def uninstall_package(self, pkg_name: str):
         reg = self._get_registry()
         if pkg_name in reg["apps"]:
-            shutil.rmtree(reg["apps"][pkg_name]["path"], ignore_errors=True)
+            app_data = reg["apps"][pkg_name]
+            shutil.rmtree(app_data["path"], ignore_errors=True)
             del reg["apps"][pkg_name]
             self._save_registry(reg)
             return True

@@ -23,7 +23,7 @@ class PrivacyScrubber(SigmaModuleBase):
             r'\b[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Z|a-z]{2,}\b', # Emails
             r'\b[0-9]{4}-[0-9]{4}-[0-9]{4}-[0-9]{4}\b', # Credit Cards
             r'\b\+?\d{1,3}[-.\s]?\(?\d{1,4}\)?[-.\s]?\d{1,4}[-.\s]?\d{1,9}\b', # Phone Numbers
-            r'\b(Aaryan|Chauhan)\b', # Personal Names (Example bounds)
+            r'\b(PROPRIETARY_NAME|PROPRIETARY_SURNAME)\b', # Personal Names (Example bounds)
         ]
         self.mode = "Strict_Amnesia"
         print("[PRIVACY] Scrubber Initialized: Data Amnesia Enforced. No PII written to disk.")

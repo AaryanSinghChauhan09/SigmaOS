@@ -19,7 +19,7 @@ try:
 except ImportError:
     # Fallback zero-dependency styling if core is not available
     PAL = {"background": "#F5F5F7", "surface": "#FFFFFF", "surface_variant": "#E5E5EA", 
-           "primary": "#007AFF", "success": "#34C759", "warning": "#FF9500", 
+           "primary": "#007AFF", "success": "#34C759", "warning": "#FF9500", "danger": "#FF3B30",
            "text_primary": "#1C1C1E", "text_secondary": "#8E8E93", "text_tertiary": "#C7C7CC"}
     FONT = {"h1": ("Arial", 16, "bold"), "body_bold": ("Arial", 10, "bold"), "caption": ("Arial", 8)}
 
@@ -93,9 +93,18 @@ class LegalTracker(tk.Tk):
             self.canvas.create_text(1050, y, text=f"[{stage['status']}] (CLICK FOR STATUTORY NOTE)", anchor="w", font=FONT["caption"], fill=color, tags=tag)
             
             # Event Bindings for Interaction
-            self.canvas.tag_bind(tag, "<Button-1>", lambda e, s=stage: self._show_statutory_note(s))
-            self.canvas.tag_bind(tag, "<Enter>", lambda e, c=self.canvas, t=tag: c.itemconfig(c.find_withtag(t)[-1], font=("Arial", 8, "underline", "bold")))
-            self.canvas.tag_bind(tag, "<Leave>", lambda e, c=self.canvas, t=tag: c.itemconfig(c.find_withtag(t)[-1], font=FONT["caption"]))
+            def show_note(event, s=stage):
+                self._show_statutory_note(s)
+
+            def highlight(event, t=tag):
+                self.canvas.itemconfig(self.canvas.find_withtag(t)[-1], font=("Arial", 8, "underline", "bold"))
+
+            def unhighlight(event, t=tag):
+                self.canvas.itemconfig(self.canvas.find_withtag(t)[-1], font=FONT["caption"])
+
+            self.canvas.tag_bind(tag, "<Button-1>", show_note)
+            self.canvas.tag_bind(tag, "<Enter>", highlight)
+            self.canvas.tag_bind(tag, "<Leave>", unhighlight)
             
             y += 80
 

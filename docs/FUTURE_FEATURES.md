@@ -1,45 +1,43 @@
-# SigmaOS: Features Yet To Be Defined (Future Roadmap)
+# SigmaOS Future Feature Roadmap — The Sovereign Apex
 
-In accordance with the principles of SigmaOS (adaptive, automated, community-driven, stealth, lightweight, Gamified, Environmentally Aware, and low-level prioritized), the following features represent the next frontier of operating system evolution. These features are conceptually outlined but need algorithmic implementation.
+This document outlines the visionary trajectory of SigmaOS, aiming for total decoupling from 3rd party infrastructure and the creation of an autonomous, high-performance computing environment.
 
-## 1. Zero-Friction Cross-Device Handoff Protocol
-- **Concept:** Seamless state migration between mobile, web, and desktop instances of SigmaOS.
-- **Problem:** Currently, the `MeshHandoff` shard can broadcast to peers but lacks web-socket or BLE hooks for non-desktop clients. 
-- **Requirement:** A low-level C-struct synchronized mesh network that allows taking a `ProcessEntry` memory map and serializing it flawlessly over encrypted local P2P to a totally different instruction-set architecture (e.g., x86 to ARM).
+## 1. Zero-Friction Cross-Device Handoff
+- **Concept:** Instant state synchronization between mobile, desktop, and embedded SigmaOS nodes via P2P encrypted tunnels (no cloud intermediary).
+- **Requirement:** Implementation of a "Sovereign Mesh" protocol in the network stack.
 
 ## 2. Community-Driven Sovereign Marketplace
-- **Concept:** A fully decentralized, P2P app marketplace built inside the OS.
-- **Problem:** Needs an engine to verify cryptographic signatures of community apps without relying on a centralized server or standard web certificates.
-- **Requirement:** Integration with the `SovereignLedger`. User modules should be shared over the `MeshDispatcher` utilizing a web-of-trust reputation scoring system to filter out malware, thus removing external app store reliance.
+- **Concept:** A decentralized app store where every 'shard' is community-audited and cryptographically signed.
+- **Requirement:** Evolution of the current `SigmaPackageManager` into a distributed ledger-based discovery system.
 
-## 3. Advanced Gamification & Progression Engine
-- **Concept:** Applying RPG-style progression to OS usage and software proficiency.
-- **Problem:** The basic infrastructure exists, but it is not hooked into low-level APIs.
-- **Requirement:** `sigma_core/telemetry` must track keystroke efficiency, API utilization, and carbon savings, rewarding the user with "Apex Points" or unlocking higher system permissions/themes as they learn to use the system efficiently.
+## 3. Advanced Gamification (SigmaLevels)
+- **Concept:** Incentivize system optimization and security audits through an interactive XP system.
+- **Requirement:** Integration of the `SigmaWatchdog` with a gamified UI dashboard that rewards users for maintaining "Apex Stability."
 
 ## 4. Environment-Aware Carbon Intelligence
-- **Concept:** The OS scales performance not just on thermal limits, but live global carbon intensity APIs.
-- **Problem:** The `SigmaProcessManager` can defer to "green windows", but it currently uses hard-coded approximations rather than live geospatial carbon grid data.
-- **Requirement:** A zero-dependency API hook that safely polls grid carbon intensity encrypted via the Tor network, completely sandboxing location data to protect user privacy while throttling heavy matrix computations when the grid relies on fossil fuels.
+- **Concept:** Scaling kernel performance and batching `BACKGROUND` tasks based on real-time grid carbon intensity.
+- **Requirement:** Low-level API hooks into global energy nodes to adjust the scheduler's 'Green Window' dynamically.
 
-## 5. Stealth Matrix (Absolute Anti-Forensics)
-- **Concept:** "Burn" protocols that make the OS completely invisible to forensics.
-- **Problem:** The current `ZeroTrust` and `CompetitorCrusher` block telemetry and standard OS logging, but RAM cold-boot attacks are still a risk.
-- **Requirement:** Implementation of a ring-0 encrypt-on-sleep protocol. The RAM must be actively scrubbed using military-grade DoD wiping standards the millisecond a physical intrusion switch is triggered.
+## 5. Stealth Matrix (Anti-Forensics)
+- **Concept:** A Ring-0 module that can instantly wipe sensitive cache shards in volatile memory if a "Threat Vector" is detected (e.g., unauthorized physical access).
+- **Requirement:** Deep integration between `SigmaWarden` and the hardware BIOS/UEFI level.
 
-## 6. Dynamic Self-Modifying Codebase (Adaptive AI)
-- **Concept:** The OS rewrites its own Python/C extensions based on the user's specific workflows.
-- **Problem:** It violates traditional POSIX security models.
-- **Requirement:** An LLM-orchestrated JIT (Just-In-Time) compiler that monitors bottlenecks in the user's daily workflows, rewrites optimal C-extensions on the fly, tests them in a restricted namespace sandbox, and hot-swaps them into the live `PolyglotLoader` without restarting the kernel.
+## 6. Dynamic Self-Modifying Codebase
+- **Concept:** An LLM-orchestrated JIT compiler that monitors bottlenecks in daily workflows and rewrites C-extensions on the fly for optimal performance.
+- **Requirement:** Restricted namespace sandbox for testing self-generated shards before hot-swapping into the `PolyglotLoader`.
+
+## 7. Next-Generation Compliance Auditor
+- **Concept:** Automated GDPR / HIPAA local runtime verification. Instant flagging if any local app writes PII to plain-text caches instead of the `SovereignVault`.
+- **Requirement:** Static analyzer hooked into the Ring-0 filesystem I/O.
 
 ## 8. Evanescent Memory Sharding (Ultra-Stealth)
 - **Concept:** Critical system shards only exist in volatile RAM and are encrypted/decrypted on-the-fly.
-- **Requirement:** Ring-0 kernel hook that detects physical chassis intrusion or UWB distance breach, instantly zeroing out the sharded keys and terminating all process handles before power-off.
+- **Requirement:** Ring-0 kernel hook that detects physical chassis intrusion or UWB distance breach, instantly zeroing out keys.
 
 ## 9. Bio-Sovereign Identity Protocol
-- **Concept:** Zero-trust authentication using local-only biometric hashing (Fingerprint/Face/Hand-Geometry) without ever storing the raw image or sending it to a 3rd party cloud.
-- **Requirement:** A direct silicon interface (HAL) for biometric sensors that performs the hash-comparison in a TEE (Trusted Execution Environment) and only returns a "Verified" token to the kernel.
+- **Concept:** Zero-trust authentication using local-only biometric hashing without ever storing raw images or cloud-syncing.
+- **Requirement:** Direct silicon interface (HAL) for biometric sensors performing hash-comparison in a TEE.
 
 ## 10. Autonomous Fault-Tolerance Swarm
-- **Concept:** If one core component fails, the OS automatically "buds" a micro-VM clone of the healthy component and hot-swaps it into the live pipeline.
-- **Requirement:** Integration between `SigmaWatchdog` and `PolyglotLoader`. The watchdog detects a crash, and the loader instantly re-initializes the native binary equivalent in a sequestered memory space.
+- **Concept:** System automatically "buds" micro-VM clones of healthy components if a crash is detected, hot-swapping into the live pipeline.
+- **Requirement:** Integration between `SigmaWatchdog` and `PolyglotLoader` for native binary re-initialization.
