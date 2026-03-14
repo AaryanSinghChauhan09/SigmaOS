@@ -7,6 +7,11 @@ Transparent logging and resource optimization.
 import os
 import sys
 import time
+
+# Ensure project root in path for cross-layer imports
+root = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+if root not in sys.path: sys.path.insert(0, root)
+
 from userland.system_api.sigma_std import SigmaSys
 
 class SystemMonitor:

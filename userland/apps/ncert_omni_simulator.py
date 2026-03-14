@@ -7,10 +7,21 @@ The Ultimate Academic Suite for Physics, Chemistry, Biology & Math (1–12)
 import tkinter as tk
 from tkinter import ttk, messagebox, scrolledtext
 import math, json, os, sys
+# Robust System Path Injection for Sovereign Interop
+_p = os.path.abspath(__file__)
+while _p and not os.path.exists(os.path.join(os.path.dirname(_p), "sigma_core")):
+    _p = os.path.dirname(_p)
+    if _p == os.path.dirname(_p): break # Root reached
+root = str(os.path.dirname(_p))
+if root and root not in sys.path: sys.path.insert(0, root)
+
 from sigma_core.app_discovery import AppDiscovery
 from userland.system_api.settings_manager import SettingsManager
 from sigma_core.gamification_engine import GamificationEngine
 from sigma_core.system_monitor import SystemMonitor
+from sigma_core.data_visualizer import DataVisualizer
+from sigma_core.plugin_hub import PluginHub
+from sigma_core.privacy_sentinel import PrivacySentinel
 
 PAL = {
     "bg": "#050608",
@@ -48,6 +59,7 @@ class NCERTOmniSimulator(tk.Tk):
         
         self.settings = SettingsManager.load()
         self.game = GamificationEngine()
+        PluginHub.initialize()
         self.search_var: tk.StringVar = tk.StringVar()
         self.main_area: tk.Frame = tk.Frame()
         self.status_tray: tk.Frame = tk.Frame()
@@ -93,6 +105,8 @@ class NCERTOmniSimulator(tk.Tk):
             ("BIOLOGY MAPS", PAL["bio"], self._show_bio),
             ("MATHEMATICA", PAL["math"], self._show_math),
             ("PRIMARY HUB", PAL["accent"], self._show_primary),
+            ("ANALYTICS HUB", PAL["success"], self._show_analytics),
+            ("COMMUNITY PLUGINS", PAL["dim"], self._show_plugins),
             ("OS SETTINGS", PAL["dim"], self._show_settings)
         ]
         
@@ -151,7 +165,13 @@ class NCERTOmniSimulator(tk.Tk):
     def _show_chem(self): self._launch_sublab("ncert_chemistry_lab")
     def _show_bio(self): self._launch_sublab("ncert_biology_lab")
     def _show_math(self): self._launch_sublab("ncert_maths_lab")
-    def _show_primary(self): self._launch_sublab("ncert_primary_maths")
+    def _show_primary(self):
+        self._clear_area()
+        pane = tk.Frame(self.main_area, bg=PAL["card"], padx=20, pady=20)
+        pane.pack(expand=True)
+        tk.Label(pane, text="PRIMARY KNOWLEDGE HUB", font=("Segoe UI Bold", 16), fg=PAL["accent"], bg=PAL["card"]).pack(pady=20)
+        tk.Button(pane, text="MATHEMATICS (1-5)", bg=PAL["math"], fg="black", relief="flat", command=lambda: self._launch_sublab("ncert_primary_maths"), width=30, pady=10).pack(pady=5)
+        tk.Button(pane, text="SCIENCE (1-5)", bg=PAL["phys"], fg="black", relief="flat", command=lambda: self._launch_sublab("ncert_primary_science"), width=30, pady=10).pack(pady=5)
 
     def _render_game_status(self):
         for w in self.status_tray.winfo_children(): w.destroy()
@@ -184,7 +204,47 @@ class NCERTOmniSimulator(tk.Tk):
             messagebox.showinfo("Sync", "Sovereign Profile Updated.")
             self._show_welcome()
             
-        tk.Button(pane, text="SAVE PROFILE", bg=PAL["accent"], fg="white", relief="flat", command=save).pack(pady=20)
+        tk.Button(pane, text="SAVE PROFILE", bg=PAL["accent"], fg="white", relief="flat", command=save).pack(pady=10)
+        
+        def run_audit():
+            leaks = PrivacySentinel.audit_directory()
+            if not leaks:
+                messagebox.showinfo("Privacy Audit", "Compliance Verified: 0 PII Leaks Detected.")
+            else:
+                messagebox.showwarning("Privacy Audit", f"Security Warning: {len(leaks)} potential PII leaks detected.")
+                
+        tk.Button(pane, text="RUN PRIVACY AUDIT", bg=PAL["dim"], fg="white", relief="flat", command=run_audit).pack(pady=5)
+
+    def _show_analytics(self):
+        self._clear_area()
+        pane = tk.Frame(self.main_area, bg=PAL["card"], padx=20, pady=20)
+        pane.pack(fill="both", expand=True)
+        
+        tk.Label(pane, text="RESEARCH PERFORMANCE ANALYTICS", font=("Segoe UI Bold", 16), fg=PAL["success"], bg=PAL["card"]).pack(pady=10)
+        
+        canv = tk.Canvas(pane, bg=PAL["bg"], height=300, highlightthickness=0)
+        canv.pack(fill="x", pady=20)
+        
+        # Simulate experimental data for visualization
+        sim_data = [10, 25, 15, 45, 30, 60, 50, 85, 70, 100]
+        DataVisualizer.draw_line_graph(canv, sim_data, 1000, 300)
+        
+        tk.Label(pane, text="Lab Proficiency Trends (Historical Sync)", font=("Segoe UI", 9), fg=PAL["dim"], bg=PAL["card"]).pack()
+
+    def _show_plugins(self):
+        self._clear_area()
+        pane = tk.Frame(self.main_area, bg=PAL["card"], padx=40, pady=40)
+        pane.pack(expand=True)
+        
+        tk.Label(pane, text="COMMUNITY PLUGIN VAULT", font=("Segoe UI Bold", 16), fg=PAL["dim"], bg=PAL["card"]).pack(pady=20)
+        
+        plugins = PluginHub.list_plugins()
+        if not plugins:
+            tk.Label(pane, text="No Community Plugins Found.", fg=PAL["dim"], bg=PAL["card"]).pack()
+        else:
+            for p in plugins:
+                btn = tk.Button(pane, text=f"LOAD {p.upper()}", bg=PAL["bg"], fg="white", relief="flat", padx=20, pady=10)
+                btn.pack(fill="x", pady=5)
 
     def _update_loop(self):
         """Adaptive System Pulse."""

@@ -36,9 +36,17 @@ class EmailAgentPro(tk.Tk):
         self.inbox = [
             {"from": "SigmaOS Council", "subject": "Apex 2.0 Deployment Ready", "summary": "Final kernel integrity verified. Ready for push.", "time": "2m ago"},
             {"from": "Gurukul Engine", "subject": "Daily Research Sprint", "summary": "Found 5 new precedents relevant to current writ petition.", "time": "15m ago"},
-            {"from": "GitHub Notifications", "subject": "Action: Merge Sovereign Shard", "summary": "Aaryan requested a merge into master branch.", "time": "1h ago"},
+            {"from": "GitHub Notifications", "subject": "Action: Merge Sovereign Shard", "summary": "Researcher requested a merge into master branch.", "time": "1h ago"},
             {"from": "Notion AI", "subject": "Workspace Optimized", "summary": "Intent detected; folder actions established.", "time": "2h ago"}
         ]
+        self.stats: tk.Label = tk.Label()
+        self.side_fr: tk.Frame = tk.Frame()
+        self.list_fr: tk.Frame = tk.Frame()
+        self.read_fr: tk.Frame = tk.Frame()
+        self.read_txt: scrolledtext.ScrolledText = scrolledtext.ScrolledText()
+        self.comp_inp: tk.Entry = tk.Entry()
+        self.status: tk.Label = tk.Label()
+        
         self._build_ui()
 
     def _build_ui(self):

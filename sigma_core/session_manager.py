@@ -18,7 +18,7 @@ class UserSession:
     expiry:     float
     is_root:    bool = False
     vibe:       str  = "Enterprise"
-    workspace_id: str = field(default_factory=lambda: str(uuid.uuid4())[:8])
+    workspace_id: str = field(default_factory=lambda: str(uuid.uuid4()).split("-")[0])
 
 class SigmaSessionManager:
     """
@@ -36,11 +36,11 @@ class SigmaSessionManager:
         USP: If ephemeral is True, no trace of this session hits the disk.
         """
         # In a real OS, verify against IdentityVault or /etc/shadow
-        user_id = str(uuid.uuid4())[:8]
+        user_id = str(uuid.uuid4()).split("-")[0]
         is_root = (username == "sovereign" or username == "root")
         
         session = UserSession(
-            session_id = f"SES_{uuid.uuid4().hex[:8]}",
+            session_id = f"SES_{str(uuid.uuid4().hex).split('-')[0]}",
             user_id    = user_id,
             username   = username,
             login_time = time.time(),
@@ -85,9 +85,10 @@ class SigmaSessionManager:
         return {"status": "SUCCESS", "message": f"Session {sid} purged. Memory returned to host hardware."}
 
     def get_current_user(self) -> UserSession | None:
-        if not self._current_session_id:
-            return None
-        return self._active_sessions.get(self._current_session_id)
+        sid = self._current_session_id
+        if sid and isinstance(sid, str):
+            return self._active_sessions.get(sid)
+        return None
 
     def switch_user(self, session_id: str) -> bool:
         """USP: Instant-Context-Switch. No process suspension required for parallel users."""
@@ -101,7 +102,7 @@ class SigmaSessionManager:
 
 if __name__ == "__main__":
     sm = SigmaSessionManager()
-    res = sm.login("Aaryan", "hash_abc", ephemeral=True)
+    res = sm.login("Researcher", "hash_abc", ephemeral=True)
     print(res["message"])
     print(sm.health_check())
     sm.logout()
