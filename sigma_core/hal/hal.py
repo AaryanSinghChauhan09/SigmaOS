@@ -35,14 +35,45 @@ class SigmaHAL(SigmaModuleBase):
     def __init__(self, kernel=None):
         SigmaModuleBase.__init__(self, kernel)
         self.host_os = platform.system()
-        self.cpu_count = os.cpu_count() or 4
         if self.host_os == "Windows":
             try:
                 self._kernel32 = ctypes.windll.kernel32
-                # Pre-map functions for Speed
+                
+                # Retrieve Core Count via strict C-Struct
+                class SYSTEM_INFO(ctypes.Structure):
+                    _fields_ = [
+                        ("wProcessorArchitecture", wintypes.WORD),
+                        ("wReserved", wintypes.WORD),
+                        ("dwPageSize", wintypes.DWORD),
+                        ("lpMinimumApplicationAddress", wintypes.LPVOID),
+                        ("lpMaximumApplicationAddress", wintypes.LPVOID),
+                        ("dwActiveProcessorMask", wintypes.LPVOID), # uintptr_t
+                        ("dwNumberOfProcessors", wintypes.DWORD),
+                        ("dwProcessorType", wintypes.DWORD),
+                        ("dwAllocationGranularity", wintypes.DWORD),
+                        ("wProcessorLevel", wintypes.WORD),
+                        ("wProcessorRevision", wintypes.WORD),
+                    ]
+                sys_info = SYSTEM_INFO()
+                self._kernel32.GetSystemInfo(ctypes.byref(sys_info))
+                self.cpu_count = sys_info.dwNumberOfProcessors or self.cpu_count
+
+                # Pre-map functions + Enforce Type Safety for Stability
                 self._set_affinity = self._kernel32.SetProcessAffinityMask
+                self._set_affinity.argtypes = [wintypes.HANDLE, ctypes.c_void_p]
+                self._set_affinity.restype = wintypes.BOOL
+
                 self._virt_lock = self._kernel32.VirtualLock
+                self._virt_lock.argtypes = [ctypes.c_void_p, ctypes.c_size_t]
+                self._virt_lock.restype = wintypes.BOOL
+
                 self._virt_unlock = self._kernel32.VirtualUnlock
+                self._virt_unlock.argtypes = [ctypes.c_void_p, ctypes.c_size_t]
+                self._virt_unlock.restype = wintypes.BOOL
+                
+                self._set_working_set_size = self._kernel32.SetProcessWorkingSetSize
+                self._set_working_set_size.argtypes = [wintypes.HANDLE, ctypes.c_size_t, ctypes.c_size_t]
+                self._set_working_set_size.restype = wintypes.BOOL
             except:
                 pass
         

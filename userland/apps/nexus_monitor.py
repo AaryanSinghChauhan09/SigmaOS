@@ -39,6 +39,19 @@ class NexusMonitor(tk.Tk):
         
         self.procs = []
         
+        # Explicit UI Component Declarations for Type Safety
+        self.header = tk.Frame(self)
+        self.dash_fr = tk.Frame(self)
+        self.cpu_f = tk.Frame(self)
+        self.cpu_bar = ttk.Progressbar()
+        self.cpu_lbl = tk.Label(self)
+        self.mem_f = tk.Frame(self)
+        self.mem_bar = ttk.Progressbar()
+        self.mem_lbl = tk.Label(self)
+        self.workspace = tk.Frame(self)
+        self.tree = ttk.Treeview()
+        self.status = tk.Label(self)
+        
         self._setup_styles()
         self._build_ui()
         self._update_metrics()

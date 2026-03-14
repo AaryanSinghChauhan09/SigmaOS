@@ -7,8 +7,21 @@ Modularized: Using Fluid Design System for aesthetic consistency.
 """
 import tkinter as tk
 from tkinter import ttk, messagebox
+import sys
+import os
 from typing import Dict, Any, List, Optional
-from sigma_core.ui.fluid_design import PALETTE as PAL, TYPOGRAPHY as FONT
+
+# Decouple via absolute path injection for zero-friction launch
+sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "..")))
+
+try:
+    from sigma_core.ui.fluid_design import PALETTE as PAL, TYPOGRAPHY as FONT
+except ImportError:
+    # Fallback zero-dependency styling if core is not available
+    PAL = {"background": "#F5F5F7", "surface": "#FFFFFF", "surface_variant": "#E5E5EA", 
+           "primary": "#007AFF", "success": "#34C759", "warning": "#FF9500", 
+           "text_primary": "#1C1C1E", "text_secondary": "#8E8E93", "text_tertiary": "#C7C7CC"}
+    FONT = {"h1": ("Arial", 16, "bold"), "body_bold": ("Arial", 10, "bold"), "caption": ("Arial", 8)}
 
 class LegalTracker(tk.Tk):
     def __init__(self, kernel=None):
@@ -61,22 +74,28 @@ class LegalTracker(tk.Tk):
 
     def _draw_gantt(self):
         y = 50
-        for stage in self.stages:
+        for i, stage in enumerate(self.stages):
             color = PAL["success"] if stage["status"] == "COMPLETED" else (PAL["warning"] if stage["status"] == "ONGOING" else PAL["text_tertiary"])
+            tag = f"stage_{i}"
             
             # Label
-            self.canvas.create_text(50, y, text=stage["name"], anchor="w", font=FONT["body_bold"], fill=PAL["text_primary"])
-            self.canvas.create_text(50, y+20, text=stage["act"], anchor="w", font=FONT["caption"], fill=PAL["text_secondary"])
+            self.canvas.create_text(50, y, text=stage["name"], anchor="w", font=FONT["body_bold"], fill=PAL["text_primary"], tags=tag)
+            self.canvas.create_text(50, y+20, text=stage["act"], anchor="w", font=FONT["caption"], fill=PAL["text_secondary"], tags=tag)
             
             # Bar Background
-            self.canvas.create_rectangle(300, y-10, 1000, y+10, fill=PAL["surface_variant"], outline="")
+            self.canvas.create_rectangle(300, y-10, 1000, y+10, fill=PAL["surface_variant"], outline="", tags=tag)
             
             # Progress Bar
             progress_width = 700 if stage["status"] == "COMPLETED" else (350 if stage["status"] == "ONGOING" else 0)
-            self.canvas.create_rectangle(300, y-10, 300+progress_width, y+10, fill=color, outline="")
+            self.canvas.create_rectangle(300, y-10, 300+progress_width, y+10, fill=color, outline="", tags=tag)
             
             # Clickable Interaction
-            self.canvas.create_text(1050, y, text=f"[{stage['status']}]", anchor="w", font=FONT["caption"], fill=color)
+            self.canvas.create_text(1050, y, text=f"[{stage['status']}] (CLICK FOR STATUTORY NOTE)", anchor="w", font=FONT["caption"], fill=color, tags=tag)
+            
+            # Event Bindings for Interaction
+            self.canvas.tag_bind(tag, "<Button-1>", lambda e, s=stage: self._show_statutory_note(s))
+            self.canvas.tag_bind(tag, "<Enter>", lambda e, c=self.canvas, t=tag: c.itemconfig(c.find_withtag(t)[-1], font=("Arial", 8, "underline", "bold")))
+            self.canvas.tag_bind(tag, "<Leave>", lambda e, c=self.canvas, t=tag: c.itemconfig(c.find_withtag(t)[-1], font=FONT["caption"]))
             
             y += 80
 
