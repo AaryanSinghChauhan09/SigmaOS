@@ -141,6 +141,8 @@ CORE_SYSTEM_MODULES = [
     ("sigma_core.system.sync_sentinel",        "SigmaSyncSentinel",       "repo_sentinel"),
     ("sigma_core.system.forensic_sentinel",    "ForensicSentinel",        "forensic_sentinel"),
     ("sigma_core.system.mind_sync",            "MindSyncEngine",          "mind_sync"),
+    ("sigma_core.ai.aeryn_search",            "AerynSearch",             "aeryn_search"),
+    ("sigma_core.system.silo_fs",              "SiloFS",                  "silo_fs"),
 ]
 
 ECOSYSTEM_APPS = [
