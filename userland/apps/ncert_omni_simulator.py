@@ -7,6 +7,8 @@ The Ultimate Academic Suite for Physics, Chemistry, Biology & Math (1–12)
 import tkinter as tk
 from tkinter import ttk, messagebox, scrolledtext
 import math, json, os, sys
+from sigma_core.app_discovery import AppDiscovery
+from userland.system_api.settings_manager import SettingsManager
 
 PAL = {
     "bg": "#050608",
@@ -42,6 +44,7 @@ class NCERTOmniSimulator(tk.Tk):
         self.geometry("1400x900")
         self.configure(bg=PAL["bg"])
         
+        self.settings = SettingsManager.load()
         self.search_var: tk.StringVar = tk.StringVar()
         self.main_area: tk.Frame = tk.Frame()
         self._build_ui()
@@ -51,7 +54,8 @@ class NCERTOmniSimulator(tk.Tk):
         head = tk.Frame(self, bg=PAL["panel"], height=80)
         head.pack(fill="x"); head.pack_propagate(False)
         
-        tk.Label(head, text="⚛ NCERT OMNI-SIMULATOR", font=("Segoe UI", 24, "bold"), fg=PAL["accent"], bg=PAL["panel"]).pack(side="left", padx=30)
+        user = self.settings.get("user_name", "Researcher")
+        tk.Label(head, text=f"⚛ OMNI-LAB • Welcome, {user}", font=("Segoe UI", 24, "bold"), fg=PAL["accent"], bg=PAL["panel"]).pack(side="left", padx=30)
         
         search_ent = tk.Entry(head, textvariable=self.search_var, bg=PAL["bg"], fg="white", 
                               font=("Segoe UI", 11), relief="flat", width=40, insertbackground="white")
@@ -75,7 +79,8 @@ class NCERTOmniSimulator(tk.Tk):
             ("CHEMISTRY SUITE", PAL["chem"], self._show_chem),
             ("BIOLOGY MAPS", PAL["bio"], self._show_bio),
             ("MATHEMATICA", PAL["math"], self._show_math),
-            ("PRIMARY HUB", PAL["accent"], self._show_primary)
+            ("PRIMARY HUB", PAL["accent"], self._show_primary),
+            ("OS SETTINGS", PAL["dim"], self._show_settings)
         ]
         
         for name, color, cmd in subjects:
@@ -109,21 +114,22 @@ class NCERTOmniSimulator(tk.Tk):
         grid = tk.Frame(welcome, bg=PAL["bg"])
         grid.pack(pady=40)
         
-        cards = [
-            ("Periodic Table", "Explore elements and atomic data", PAL["chem"], "ncert_periodic_table"),
-            ("Logic Lab", "Interactive Gate Simulations", PAL["accent"], "ncert_logic_circuit"),
-            ("Optics Bench", "Mirror & Lens Formula Bench", PAL["phys"], "ncert_ray_optics"),
-            ("Titration", "Acid-Base colorimetry lab", PAL["chem"], "ncert_titration_sim"),
-            ("Physio Master", "Cardiac & Neural telemetry", PAL["bio"], "ncert_physio_hub")
-        ]
+        discovered = AppDiscovery.find_apps()
         
-        for name, desc, color, mod in cards:
-            c = tk.Frame(grid, bg=PAL["card"], width=200, height=200, padx=20, pady=20)
-            c.pack(side="left", padx=15)
-            c.pack_propagate(False)
-            tk.Label(c, text=name, font=("Segoe UI Bold", 14), fg=color, bg=PAL["card"]).pack(pady=10)
-            tk.Label(c, text=desc, font=("Segoe UI", 9), fg=PAL["dim"], bg=PAL["card"], wraplength=160).pack()
-            tk.Button(c, text="LAUNCH", font=("Segoe UI Bold", 8), bg=color, fg="black", relief="flat", command=self._mk_cmd(str(mod))).pack(side="bottom", pady=5)
+        for name_obj, mod_obj in discovered.items():
+            name = str(name_obj)
+            mod = str(mod_obj)
+            if name in ["Periodic Table", "Logic Lab", "Optics Bench", "Titration", "Physio Master"]:
+                # High-priority specialized apps
+                color = PAL["chem"] if "Table" in name else PAL["phys"]
+                desc = "Specialized Research Simulation"
+                
+                c = tk.Frame(grid, bg=PAL["card"], width=200, height=200, padx=20, pady=20)
+                c.pack(side="left", padx=15)
+                c.pack_propagate(False)
+                tk.Label(c, text=str(name), font=("Segoe UI Bold", 12), fg=color, bg=PAL["card"]).pack(pady=10)
+                tk.Label(c, text=desc, font=("Segoe UI", 8), fg=PAL["dim"], bg=PAL["card"], wraplength=160).pack()
+                tk.Button(c, text="LAUNCH", font=("Segoe UI Bold", 8), bg=color, fg="black", relief="flat", command=self._mk_cmd(str(mod))).pack(side="bottom", pady=5)
 
     def _mk_cmd(self, m):
         return lambda: self._launch_sublab(m)
@@ -137,13 +143,33 @@ class NCERTOmniSimulator(tk.Tk):
     def _show_math(self): self._launch_sublab("ncert_maths_lab")
     def _show_primary(self): self._launch_sublab("ncert_primary_maths")
 
+    def _show_settings(self):
+        self._clear_area()
+        pane = tk.Frame(self.main_area, bg=PAL["card"], padx=40, pady=40)
+        pane.pack(expand=True)
+        
+        tk.Label(pane, text="OS PERSONALIZATION", font=("Segoe UI Bold", 16), fg=PAL["accent"], bg=PAL["card"]).pack(pady=(0, 20))
+        
+        tk.Label(pane, text="User Identity:", fg="white", bg=PAL["card"]).pack(anchor="w")
+        name_ent = tk.Entry(pane, bg=PAL["bg"], fg="white", relief="flat")
+        name_ent.pack(fill="x", pady=5)
+        name_ent.insert(0, self.settings.get("user_name", ""))
+        
+        def save():
+            SettingsManager.update_key("user_name", name_ent.get())
+            messagebox.showinfo("Sync", "Sovereign Profile Updated.")
+            self._show_welcome()
+            
+        tk.Button(pane, text="SAVE PROFILE", bg=PAL["accent"], fg="white", relief="flat", command=save).pack(pady=20)
+
     def _launch_sublab(self, mod_name):
         # Open the specific lab or hub
         try:
-            import importlib, subprocess
-            # Try to launch as subprocess to keep main UI responsive
-            subprocess.Popen([sys.executable, f"userland/apps/{mod_name}.py"])
-            # messagebox.showinfo("Omni-Sync", f"Initializing {mod_name} Sub-Atomic Lab...")
+            import subprocess
+            # Path normalization for Windows/Unix sovereign interop
+            path = os.path.join("userland", "apps", f"{mod_name}.py")
+            if os.path.exists(path):
+                subprocess.Popen([sys.executable, path])
         except Exception as e:
             messagebox.showerror("Error", f"Failed to link module: {e}")
 

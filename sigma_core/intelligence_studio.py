@@ -13,7 +13,8 @@ from userland.system_api.sigma_std import SigmaMath
 
 class IntelligenceStudio(SigmaModuleBase, ISigmaService):
     def __init__(self, kernel=None):
-        super().__init__(kernel)
+        # Explicit initialization of base components
+        SigmaModuleBase.__init__(self, kernel)
         self._running = False
         self.datasets = {}
         self.stats = {
@@ -42,8 +43,8 @@ class IntelligenceStudio(SigmaModuleBase, ISigmaService):
         self.stats["insights_generated"] += 1
         
         return {
-            "average": round(avg, 2),
-            "momentum": round(growth * 100, 2),
+            "average": float(f"{avg:.2f}"),
+            "momentum": float(f"{(growth * 100):.2f}"),
             "prediction": insight,
             "confidence": 0.92
         }
