@@ -4,16 +4,15 @@ SigmaOS Gurukul Learning Engine (v1.0 Apex)
 USP: Integrated Spaced Repetition (SRS) + Bharat Law Knowledge Mapping.
 Absorbs USP of: Anki (integrated), Duolingo (gamified), and Notion (educational).
 """
-
 import time
 import json
 import os
-from .interfaces import SigmaModuleBase
+from sigma_core.system.interfaces import SigmaModuleBase
 
 class GurukulEngine(SigmaModuleBase):
     def __init__(self, kernel):
         super().__init__(kernel)
-        self.cards_path = os.path.join(os.path.dirname(__file__), "..", "userland", "gurukul_cards.json")
+        self.cards_path = os.path.join(os.path.dirname(__file__), "..", "..", "userland", "gurukul_cards.json")
         self.knowledge_base = self._load_cards()
         self.stats = {
             "retention_rate": 0.85,
@@ -37,17 +36,19 @@ class GurukulEngine(SigmaModuleBase):
         card = self.knowledge_base[card_id]
         if success:
             card["level"] += 1
-            interval = (2 ** card["level"]) * 86400 # Exponential backoff in seconds
+            interval = (2 ** card["level"]) * 86400 
             self.stats["concepts_mastered"] += 1
         else:
             card["level"] = 0
-            interval = 3600 # 1 hour review
+            interval = 3600
             
         card["next_review"] = time.time() + interval
         self._save_cards()
         return f"Concept {card_id} scheduled for review."
 
     def _save_cards(self):
+        if not os.path.exists(os.path.dirname(self.cards_path)):
+             os.makedirs(os.path.dirname(self.cards_path), exist_ok=True)
         with open(self.cards_path, "w") as f:
             json.dump(self.knowledge_base, f, indent=4)
 

@@ -1,65 +1,42 @@
 """
-SigmaOS Personalization Engine (v2.0 Apex)
-================================================
-USP: Adaptive system vibes and personalized resource allocation.
-Learns from user interactions to automate 'Ghost Mode' and 'Apex Mode' shifts.
+SigmaOS Personalization Engine (v4.0 Apex)
+===========================================
+USP: Cognitive Intent Mapping & Neural Pre-Loading.
+Modular Architecture: Delegating to ProfileManager, IntentEngine, and EcoGamification.
 """
-import os
-import sys
-import json
-import time
-from typing import Dict, Any, Optional
+from typing import Dict, Any, List
+from .profile_manager import ProfileManager
+from .intent_engine import IntentEngine
+from .eco_gamification import EcoGamification
 
-try:
-    from sigma_core.system.interfaces import SigmaModuleBase
-except ImportError:
-    class SigmaModuleBase:
-        def __init__(self, kernel): self.kernel = kernel
-        def log_event(self, a, c): pass
+class SigmaModuleBase:
+    def __init__(self, kernel): self.kernel = kernel
+    def log_event(self, a, c):
+        if self.kernel and hasattr(self.kernel, "bus"):
+             self.kernel.bus.emit(f"personalization.{a}", c)
 
 class PersonalizationEngine(SigmaModuleBase):
     def __init__(self, kernel=None):
         SigmaModuleBase.__init__(self, kernel)
-        self.profile_path = "userland/system_api/user_profile.sigma"
-        self.user_preferences: Dict[str, Any] = self._load_profile()
-        self.adaptive_threshold = 0.85
-
-    def _load_profile(self) -> Dict[str, Any]:
-        if os.path.exists(self.profile_path):
-            try:
-                with open(self.profile_path, "r") as f:
-                    data = json.load(f)
-                    return data if isinstance(data, dict) else {}
-            except: pass
-        return {"preferred_mode": "NEUTRAL", "vibe": "CYBERPUNK", "auto_stealth": True}
-
-    def learn_vibe_pattern(self, event_type: str, intensity: float):
-        """USP: Automated Interaction Learning. Maps user pulses to OS vibes."""
-        if event_type == "KEYBOARD_HIGH_VELOCITY" and intensity > 0.8:
-            self.user_preferences["preferred_mode"] = "APEX_GAMING"
-            self.log_event("cognitive_learn", {"shift": "APEX_FOCUS"})
-        elif event_type == "LOW_ACTIVITY" and intensity < 0.2:
-            self.user_preferences["preferred_mode"] = "SUSTAINABLE"
-            
-        self._save_profile(self.user_preferences)
-
-    def _save_profile(self, data: Dict[str, Any]):
-        try:
-            os.makedirs(os.path.dirname(self.profile_path), exist_ok=True)
-            with open(self.profile_path, "w") as f:
-                json.dump(data, f, indent=4)
-        except: pass
-
-    def adapt_system(self) -> str:
-        """USP: Resilient & Adaptive Environment Awareness."""
-        mode = self.user_preferences.get("preferred_mode", "NEUTRAL")
+        self.profiles = ProfileManager(kernel)
+        self.intent = IntentEngine(kernel)
+        self.eco = EcoGamification(kernel)
         
-        # Proactively inform the Resource Alchemist
-        if self.kernel and hasattr(self.kernel, "resource_alchemist"):
-            self.kernel.resource_alchemist.shift_profile(str(mode))
-            
-        return f"Sovereign: Environment automated for {mode} mode."
+    def record_interaction(self, action: str):
+        """Unified interaction logging via modular delegation."""
+        self.intent.record_action(action)
+        prediction = self.intent.predict_intent()
+        
+        if prediction["confidence"] > 0.8:
+            self.log_event("predictive_warmup", {"target": prediction["intent"]})
+
+    def award_carbon_credits(self, amount: float):
+        """Sovereign eco-incentives via modular delegation."""
+        current = float(self.profiles.get_preference("carbon_credits", 0.0))
+        self.profiles.set_preference("carbon_credits", current + amount)
+        self.eco.process_contribution(amount)
+        self.log_event("eco_boost", {"credits": amount})
 
     def health_check(self) -> str:
-        mode = self.user_preferences.get("preferred_mode", "NEUTRAL")
-        return f"OK — Mode: {mode} | Adaptive: ACTIVE"
+        mode = self.profiles.get_preference("preferred_mode", "NEUTRAL")
+        return f"OK — Profile: {mode} | Modular Intelligence: ACTIVE"

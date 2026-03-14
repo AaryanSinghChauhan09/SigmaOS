@@ -16,6 +16,7 @@ from .kernel import SigmaKernel
 from .system.config import SigmaConfig
 from .system.event_bus import EventBus
 from .system.registry import ModuleRegistry
+from .system.interfaces import SigmaModuleBase
 
-__all__ = ["SigmaKernel", "SigmaConfig", "EventBus", "ModuleRegistry"]
+__all__ = ["SigmaKernel", "SigmaConfig", "EventBus", "ModuleRegistry", "SigmaModuleBase"]
 __version__ = "5.2.0"

@@ -9,7 +9,12 @@ import sys
 import os
 import time
 from typing import List, Optional, Any
-from sigma_core.interfaces import SigmaModuleBase, ISigmaService
+
+try:
+    from sigma_core.system.interfaces import SigmaModuleBase, ISigmaService
+except ImportError:
+    # Fallback for local development or older versions
+    from .interfaces import SigmaModuleBase, ISigmaService
 
 class SovereignShell(SigmaModuleBase, ISigmaService):
     def __init__(self, kernel=None):

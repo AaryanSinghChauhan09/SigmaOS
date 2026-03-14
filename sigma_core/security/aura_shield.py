@@ -4,11 +4,10 @@ SigmaOS Aura Shield (v1.0 Apex)
 USP: Context-Aware Anti-Ransomware + Behavioral Anomaly Detection.
 Monitors SigmaFS for high-entropy write bursts + mass encryption signatures.
 """
-
 import time
 import math
 import hashlib
-from .interfaces import SigmaModuleBase, ISigmaService
+from sigma_core.system.interfaces import SigmaModuleBase, ISigmaService
 
 class SigmaAuraShield(SigmaModuleBase, ISigmaService):
     def __init__(self, kernel=None):
@@ -84,13 +83,3 @@ class SigmaAuraShield(SigmaModuleBase, ISigmaService):
     def health_check(self) -> str:
         s = self.stats
         return f"OK — Aura Shield: {s['ransomware_threat_level']} | Anomaly Blocked: {s['anomalies_blocked']} | Snaps: {s['auto_snapshots_taken']}"
-
-if __name__ == "__main__":
-    shield = SigmaAuraShield()
-    print(shield.start_service())
-    # Mock suspicious high-entropy write
-    suspicious_content = b"\x00\xFF\x1A\x2B" * 256 # Low entropy
-    print(f"Entropy Low: {shield._calculate_entropy(suspicious_content)}")
-    random_content = bytes([abs(hash(str(i))) % 256 for i in range(1024)]) # Higher entropy
-    print(f"Entropy High: {shield._calculate_entropy(random_content)}")
-    shield.stop_service()

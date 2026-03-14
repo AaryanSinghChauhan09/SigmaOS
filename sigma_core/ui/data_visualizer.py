@@ -1,13 +1,13 @@
 """
-SigmaOS Sovereign Data Visualizer (v1.0)
-=========================================
+SigmaOS Sovereign Data Visualizer (v1.0 Apex)
+=============================================
 USP: Zero-Dependency Charting & Experimental Analytics.
 100% Native Tkinter Canvas | Hardware-Accelerated Analytics.
 """
 import tkinter as tk
 import math
 
-class DataVisualizer:
+class SigmaDataVisualizer:
     @staticmethod
     def draw_bar_chart(canvas, data, width, height, color="#6C63FF"):
         """USP: Adaptive scaling for experimental results."""
@@ -49,3 +49,6 @@ class DataVisualizer:
             canvas.create_oval(x-3, y-3, x+3, y+3, fill=color, outline="white", tags="plot")
             
         canvas.create_line(points, fill=color, width=2, smooth=True, tags="plot")
+
+    def health_check(self) -> str:
+        return "OK — SigmaDataVisualizer: Responsive"

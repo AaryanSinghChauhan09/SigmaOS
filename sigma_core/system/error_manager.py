@@ -8,13 +8,14 @@ import sys
 import traceback
 from typing import Dict, Any, List, Optional, Callable
 
-try:
-    from sigma_core.system.interfaces import SigmaModuleBase, ISigmaService
-except (ImportError, ValueError):
-    class SigmaModuleBase:
-        def __init__(self, kernel): self.kernel = kernel
-        def log_event(self, a, c): pass
-    class ISigmaService: pass
+class SigmaModuleBase:
+    def __init__(self, kernel):
+        self.kernel = kernel
+    def log_event(self, action: str, context: Dict[str, Any]):
+        if self.kernel and hasattr(self.kernel, "bus"):
+             self.kernel.bus.emit(f"error.{action}", context)
+
+class ISigmaService: pass
 
 class SovereignErrorManager(SigmaModuleBase, ISigmaService):
     def __init__(self, kernel=None):
@@ -52,6 +53,10 @@ class SovereignErrorManager(SigmaModuleBase, ISigmaService):
         # Log to Sovereign Scribe if available
         if self.kernel is not None and hasattr(self.kernel, "scribe") and self.kernel.scribe:
             self.kernel.scribe.scribe_event("ERROR_MGR", "INTERCEPT", error_blob)
+            
+        # USP: Automated Bug Justice. File a complaint in the Triage Docket.
+        if self.kernel is not None and hasattr(self.kernel, "triage") and self.kernel.triage:
+            self.kernel.triage.file_complaint(shard_id, f"{error_blob['type']}: {error_blob['msg']}", "FATAL" if fatal else "MAJOR")
         
         if fatal:
             return self._isolate_and_restart(shard_id)

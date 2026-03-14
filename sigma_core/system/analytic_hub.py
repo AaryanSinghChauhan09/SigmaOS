@@ -7,13 +7,14 @@ Transforms raw OS telemetry into actionable sovereign insights.
 import time
 from typing import Dict, Any, List, Optional
 
-try:
-    from sigma_core.system.interfaces import SigmaModuleBase, ISigmaService
-except (ImportError, ValueError):
-    class SigmaModuleBase:
-        def __init__(self, kernel): self.kernel = kernel
-        def log_event(self, a, c): pass
-    class ISigmaService: pass
+class SigmaModuleBase:
+    def __init__(self, kernel):
+        self.kernel = kernel
+    def log_event(self, action: str, context: Dict[str, Any]):
+        if self.kernel and hasattr(self.kernel, "bus"):
+             self.kernel.bus.emit(f"analytic.{action}", context)
+
+class ISigmaService: pass
 
 class SovereignAnalyticHub(SigmaModuleBase, ISigmaService):
     def __init__(self, kernel=None):
@@ -52,7 +53,6 @@ class SovereignAnalyticHub(SigmaModuleBase, ISigmaService):
             "timestamp": time.time()
         }
         
-        # Calculate OS efficiency score
         cpu_load = 0.0
         if isinstance(perf, dict):
             cpu_data = perf.get("cpu", {})
@@ -63,7 +63,7 @@ class SovereignAnalyticHub(SigmaModuleBase, ISigmaService):
         if isinstance(compl, dict):
             violations = int(compl.get("violations_prevented", 0))
         
-        insights["sovereignty_score"] = 100.0 - (cpu_load / 10.0) + (violations * 2)
+        insights["sovereignty_score"] = float(100.0 - (cpu_load / 10.0) + (violations * 2))
         return insights
 
     def generate_visual_report(self) -> str:
@@ -74,7 +74,8 @@ class SovereignAnalyticHub(SigmaModuleBase, ISigmaService):
         gami = data.get("gamification", {})
         karma = 0.0
         if isinstance(gami, dict):
-            karma = float(gami.get("Environmental Karma", 0.0))
+            karma_val = gami.get("Environmental Karma", 0.0)
+            karma = float(karma_val) if karma_val is not None else 0.0
         
         report = f"--- SOVEREIGN ANALYTIC REPORT ---\n"
         report += f"Global Sovereignty Score: {score:.2f}%\n"

@@ -12,7 +12,7 @@ import json
 import uuid
 import hashlib
 from typing import Dict, List, Any, Optional
-from .interfaces import SigmaModuleBase, ISigmaService
+from sigma_core.system.interfaces import SigmaModuleBase, ISigmaService
 from userland.system_api.sigma_std import SigmaCrypto
 
 class SigmaGhostChat(SigmaModuleBase, ISigmaService):
@@ -134,8 +134,6 @@ class SigmaGhostChat(SigmaModuleBase, ISigmaService):
 
     def _peer_discovery(self):
         """USP: Passive Peer Discovery via Local Broadcast."""
-        # In a real P2P app, we'd use UDP broadcast or a DHT shim. 
-        # Here we simulate local discovery.
         while self._running:
             payload = {"type": "HELLO", "sender": self.username}
             packet = {"payload": payload, "signature": SigmaCrypto.sign(json.dumps(payload))}
@@ -159,10 +157,3 @@ class SigmaGhostChat(SigmaModuleBase, ISigmaService):
     def health_check(self) -> str:
         s = self.stats
         return f"OK — GhostChat: {s['peers_connected']} Peers | Msg R/S: {s['messages_received']}/{s['messages_sent']} | Shredded: {s['shredded_metadata_kb']:.1f}KB"
-
-if __name__ == "__main__":
-    chat = SigmaGhostChat()
-    print(chat.start_service())
-    time.sleep(1)
-    print(chat.health_check())
-    chat.stop_service()

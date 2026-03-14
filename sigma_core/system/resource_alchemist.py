@@ -1,64 +1,48 @@
 """
-SigmaOS Resource Alchemist (v1.0 Sovereign)
-===========================================
-USP: Dynamic silicon re-tuning based on active Shard workloads.
-Bridges HAL and System layers to ensure no other OS can match our efficiency.
+SigmaOS Resource Alchemist (v2.0 Apex)
+=======================================
+USP: Dynamic silicon orchestration through Monitoring and Tuning.
+Modular Architecture: Delegating to ResourceMonitor and SiliconTuner.
 """
-import time
 from typing import Dict, Any, List
 from sigma_core.system.interfaces import SigmaModuleBase, ISigmaService
+from .resource_monitor import ResourceMonitor
+from .silicon_tuner import SiliconTuner
 
 class ResourceAlchemist(SigmaModuleBase, ISigmaService):
     def __init__(self, kernel=None):
         SigmaModuleBase.__init__(self, kernel)
-        self._running = False
+        self.monitor = ResourceMonitor(kernel)
+        self.tuner = SiliconTuner(kernel)
         self.current_profile = "SUSTAINABLE"
-        self.stats = {"profile_shifts": 0, "energy_saved_estimated": 0.0}
+        self.stats = {"profile_shifts": 0}
 
     def start_service(self) -> str:
-        self._running = True
         self.log_event("service_start", {"profile": self.current_profile})
-        return "Resource Alchemist: Silicon Transmutation Online."
+        return "Resource Alchemist v2: Orchestration Active."
 
     def stop_service(self) -> None:
-        self._running = False
+        pass
 
     def shift_profile(self, profile: str) -> str:
-        """USP: Global OS re-tuning. Adjusts thread priorities and HAL polling."""
-        valid_profiles = ["APEX_GAMING", "NEURAL_RESEARCH", "STEALTH_GHOST", "SUSTAINABLE"]
-        if profile not in valid_profiles:
-            return f"Invalid Profile: {profile}"
-        
+        """Sovereign re-tuning via modular delegation."""
+        self.tuner.apply_profile(profile)
         self.current_profile = profile
         self.stats["profile_shifts"] += 1
-        
-        # Integration with HAL for Core Pinning & Priority
-        if self.kernel and hasattr(self.kernel, "hal"):
-            hal = self.kernel.hal
-            if profile == "APEX_GAMING":
-                hal.set_process_priority("Realtime")
-                hal.pin_to_cores(0x0F)
-                # Pulse the Polyglot Hot-Swap
-                if hasattr(self.kernel, "polyglot"):
-                    self.kernel.polyglot.hot_swap_core("memory", "APEX_GAMING")
-            elif profile == "STEALTH_GHOST":
-                hal.set_process_priority("Below")
-                hal.trim_working_set()
-            elif profile == "NEURAL_RESEARCH":
-                if hasattr(self.kernel, "polyglot"):
-                    self.kernel.polyglot.hot_swap_core("ipc", "NEURAL_RESEARCH")
-                
         self.log_event("profile_shift", {"new_profile": profile})
         return f"OS Profile Transmuted to: {profile}"
 
+    def auto_tune(self):
+        """Intelligent self-optimization based on telemetry."""
+        metrics = self.monitor.capture_telemetry()
+        if self.monitor.predict_bottleneck() == "MEMORY_CRITICAL":
+            self.shift_profile("STEALTH_GHOST") # Save RAM
+
     def get_dynamic_tuning_report(self) -> Dict[str, Any]:
-        """USP: Comparative Analytics vs 'Legacy OS' performance."""
-        # Simulated performance delta vs Windows/Linux
         return {
-            "latency_reduction_ms": 12.4,
-            "ram_efficiency_gain": "34.2%",
-            "sovereignty_score": 99.8,
-            "legacy_match_probability": "0.001%" 
+            "profile": self.current_profile,
+            "metrics": self.monitor.metrics,
+            "shifts": self.stats["profile_shifts"]
         }
 
     def health_check(self) -> str:
