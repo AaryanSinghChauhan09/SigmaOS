@@ -36,11 +36,16 @@ class NCERTMasterLab(tk.Tk):
         
         self._mods = {}
         self._exp_map = {}
-        self._stats = {"completed": 0, "streak": 0}
+        self._stats = {"completed": 0, "streak": 0, "xp": 0}
+        self._user_identity = "SOVEREIGN_RESEARCHER"
         
         # Vibe Sync
         if self.kernel and hasattr(self.kernel, "bus"):
             self.kernel.bus.subscribe("governor.vibe_switch", self._on_vibe_switch)
+            # Fetch Identity from OS if available
+            if hasattr(self.kernel, "personalization"):
+                p = self.kernel.personalization.get_profile()
+                self._user_identity = p.get("name", "SOVEREIGN_RESEARCHER").upper()
 
         # Tactical UI Proxies (Explicitly initialized)
         self._tree = ttk.Treeview(self)
@@ -75,7 +80,7 @@ class NCERTMasterLab(tk.Tk):
         # Header
         hdr = tk.Frame(self, bg=PAL["panel"], height=65)
         hdr.pack(fill="x"); hdr.pack_propagate(False)
-        tk.Label(hdr, text="🔬 NCERT EXHAUSTIVE LAB v10.0", fg=PAL["accent"], bg=PAL["panel"], font=("Segoe UI Bold",18)).pack(side="left", padx=25)
+        tk.Label(hdr, text=f"🔬 {self._user_identity} LAB v10.0", fg=PAL["accent"], bg=PAL["panel"], font=("Segoe UI Bold",18)).pack(side="left", padx=25)
         
         self._status_lbl = tk.Label(hdr, text="[SYSTEM OPERATIONAL • 200+ SIMULATIONS]", fg="#00D26A", bg=PAL["panel"], font=("Consolas",9))
         self._status_lbl.pack(side="right", padx=25)
