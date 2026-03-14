@@ -1,46 +1,45 @@
-# Σ SIGMAOS: SOVEREIGN HYBRID ARCHITECTURE
+# Σ SIGMAOS: SOVEREIGN HYBRID ARCHITECTURE (v5.2)
 
-## 🏛️ The 7-Layer Blueprint (Apex Edition)
+## 🏛️ The 7-Layer Blueprint (Polyglot Edition)
 
-SigmaOS implements a **Hybrid Sovereign Layer** that absorbs the strengths of low-level systems (C/Rust) while providing a high-level Agentic Brain (Python). This architecture resolves the performance and hardware bottlenecks through a simulated **Hardware Abstraction Layer (HAL)**.
+SigmaOS implements a **Deeply Modular Hybrid Layer** that partitions OS responsibilities by language suitability. Low-level components (C/Rust) operate at maximum priority, while high-level intelligence (Python) orchestrates the "Sovereign Brain."
 
-| Layer | Language Role | SigmaOS Component | Description |
+| Layer | Language Role | SigmaOS Directory | Description |
 | :--- | :--- | :--- | :--- |
-| **1. Bootloader** | Assembly / C | `bootloader/` | Direct hardware init & runtime hydration. |
-| **2. Kernel Core** | C / Rust (Shims) | `sigma_core/kernel.py` | Resource scheduling & thread priority locking. |
-| **3. System Services** | C / Rust / Go | `sigma_std` | Deterministic file I/O & memory management. |
-| **4. HAL (Hardware)** | `ctypes` / Syscalls | `SovereignHAL` | Sub-millisecond silicon status via Win32/POSIX. |
-| **5. User-Space Brain** | Python / Go | `IntelligenceStudio` | The intelligent control layer & automation. |
-| **6. Community Hub** | Python / JS | `Sovereign Plugin Hub` | Peer-to-peer sharing & adaptive routines. |
-| **7. Analytics Hub** | Python (Plotly) | `Morphic Analytics` | Real-time visual metrics & compliance audits. |
+| **1. Bootloader** | Assembly / C | `native_src/bootloader` | Direct hardware init & runtime hydration. |
+| **2. Kernel Core** | C / Rust (Shims) | `native_src/kernel_native` | Resource scheduling & thread priority locking. |
+| **3. System Services** | C / Rust / Go | `native_src/services_native` | Deterministic file I/O & memory management. |
+| **4. HAL (Hardware)** | `ctypes` / Syscalls | `hal/` | Sub-millisecond silicon status via Win32/POSIX. |
+| **5. User-Space Brain** | Python / Go | `ai/` | The intelligent control layer & automation. |
+| **6. Community Hub** | Python / JS | `system/plugin_hub` | Peer-to-peer sharing & adaptive routines. |
+| **7. Analytics Hub** | Python (Plotly) | `ui/data_visualizer` | Real-time visual metrics & compliance audits. |
 
-## ⚡ Performance Optimization (Zero-Throttling)
+## ⚡ Performance Optimization (Priority First)
 
-- **Eco-Throttle**: Dynamically adjusts polling rates (5s to 15s) based on hardware thermal states (Simulated).
-- **Apex Hydration**: Parallel module loading for 10x kernel initialization speeds.
-- **MicroVM Sandboxing**: Isolated execution environments for community plugins to prevent kernel panics.
+- **Polyglot Loader**: A dedicated service in `hal/` that prioritizes Native (C/Rust) binaries over Python fallbacks during system boot.
+- **Zero-Allocation Bus**: The event bus in `system/` uses circular buffers to prevent expensive memory reallocations during high-frequency IPC.
+- **Sovereign Sharding**: OS components are logically isolated into `security/`, `ai/`, `system/`, and `ui/` namespaces.
 
 ## 🛡️ Privacy & Sovereignty
 
-- **Privacy Sentinel**: Automated PII detection and neutralization at the commit level.
-- **Stealth Guardian**: Minimalist UI triggers that reduce the OS footprint to <1% CPU load.
-- **Ephemeral Sessions**: RAM-only sessions that evaporate on logout, leaving no forensic trace.
+- **Sovereign Ledger**: A forensic-grade audit trail in `system/` that uses cryptographic chaining to secure all OS events.
+- **MicroVM Sandboxing**: Isolated execution environments for community plugins to prevent kernel panics.
+- **Ephemeral Sessions**: RAM-only sessions managed via `system/session_manager.py`.
 
 ---
 
-## 🧩 Global Component Blueprint (Hybrid Mastery)
+## 🧩 Structural Blueprint (The Modular Map)
 
-To achieve maximum resilience and performance, SigmaOS adopts a polyglot strategy for its sub-components:
+SigmaOS is now structured for maximum resilience:
 
-| Component | Best Language | SigmaOS Implementation Status |
+| Module Group | Primary Files | Language |
 | :--- | :--- | :--- |
-| **Interrupt Handlers** | Assembly / C | Integrated via Kernel Syscall Hooks. |
-| **Memory Manager** | Rust | Simluated via RAM-FS with memory safety. |
-| **IPC Infrastructure** | Go | Lightweight messaging via Internal Bus. |
-| **Update System** | Rust / Python | Secure patching with cryptographic signing. |
-| **AI Personalization** | Python | Native ML-Intelligence Suite. |
-| **Visual Analytics** | Python / JS | Morphic UI & Sovereign Data Visualizer. |
+| **`security/`** | Integrity, Compliance, Privacy, Vanguard | Python / C (HAL) |
+| **`ai/`** | IntelligenceStudio, Gurukul, AgentOrchestrator| Python |
+| **`system/`** | Config, Registry, EventBus, Ledger, Cache | Python |
+| **`ui/`** | Shell, WindowManager, DataVisualizer | Python |
+| **`hal/`** | KernelHAL, PolyglotLoader | Python / C / Rust |
 
 ---
 
-**SigmaOS: Your Identity. Your Machine. Your Sovereignty.**
+**SigmaOS: Modular. Native. Sovereign.**

@@ -25,19 +25,20 @@ for _sub in ("userland/system_api", "ecosystem"):
     if _p not in sys.path:
         sys.path.insert(0, _p)
 
-from .config import SigmaConfig
-from .event_bus import EventBus
-from .registry import ModuleRegistry
-from .ledger import SovereignLedger
-from .cache import SigmaCache
-from .integrity import IntegrityGuard
-from .customizer import SovereignCustomizer
-from .vanguard import NetworkVanguard
-from .loader import SigmaModuleLoader
-from .intelligence_studio import IntelligenceStudio
-from .gurukul_engine import GurukulEngine
-from .compliance_guard import ComplianceGuard
-from .sovereign_shell import SovereignShell
+from .system.config import SigmaConfig
+from .system.event_bus import EventBus
+from .system.registry import ModuleRegistry
+from .system.ledger import SovereignLedger
+from .system.cache import SigmaCache
+from .security.integrity import IntegrityGuard
+from .ui.customizer import SovereignCustomizer
+from .security.vanguard import NetworkVanguard
+from .system.loader import SigmaModuleLoader
+from .ai.intelligence_studio import IntelligenceStudio
+from .ai.gurukul_engine import GurukulEngine
+from .security.compliance_guard import ComplianceGuard
+from .ui.sovereign_shell import SovereignShell
+from .hal.polyglot_loader import SigmaPolyglot
 
 # Late imports (avoid circular at package level)
 def _import_kernel_module(name):
@@ -142,6 +143,11 @@ class SigmaKernel:
                     current_proc = kernel32.kernel32.GetCurrentProcess()
                     kernel32.kernel32.SetPriorityClass(current_proc, 0x00000080) # HIGH
                     kernel32.kernel32.SetProcessWorkingSetSize(current_proc, -1, -1)
+                
+                # USP: Run Polyglot Sequence (Native Priority)
+                SigmaPolyglot.run_priority_layer("BOOTLOADER", "boot")
+                SigmaPolyglot.run_priority_layer("MEMORY_MANAGER", "mem")
+                SigmaPolyglot.run_priority_layer("IPC_DAEMON", "ipc")
             except Exception: pass
         elif platform.system() == "Linux":
             try: os.nice(-20) # Max priority
@@ -261,59 +267,59 @@ class SigmaKernel:
         """
         _km = [
             # Core System & Security
-            ("security_warden",              "SecurityWarden",            "security"),
-            ("user_supremacy",               "SigmaUserSupremacy",        "user_supremacy"),
-            ("zero_trust",                   "SigmaZeroTrust",            "zero_trust"),
-            ("sigma_core.session_manager",    "SigmaSessionManager",       "sessions"),
+            ("sigma_core.security.warden",              "SecurityWarden",            "security"),
+            ("sigma_core.system.user_supremacy",       "SigmaUserSupremacy",        "user_supremacy"),
+            ("sigma_core.security.zero_trust",         "SigmaZeroTrust",            "zero_trust"),
+            ("sigma_core.system.session_manager",      "SigmaSessionManager",       "sessions"),
             
             # Management & Drivers
-            ("sigma_core.hal",                "SigmaHAL",                  "hal"),
-            ("bootloader",                   "SigmaBootloader",           "bootloader"),
-            ("package_manager",              "SigmaPackageManager",       "package_manager"),
-            ("sigma_core.ipc_manager",        "SigmaIPC",                  "ipc"),
+            ("sigma_core.hal.hal",                     "SigmaHAL",                  "hal"),
+            ("sigma_core.hal.bootloader",              "SigmaBootloader",           "bootloader"),
+            ("sigma_core.system.package_manager",      "SigmaPackageManager",       "package_manager"),
+            ("sigma_core.system.ipc_manager",          "SigmaIPC",                  "ipc"),
             
             # Subsystems
-            ("sigma_fs",                     "SigmaFS",                   "fs"),
-            ("sigma_core.memory_manager",    "SigmaMemoryManager",        "memory"),
-            ("process_manager",              "SigmaProcessManager",       "process"),
-            ("sigma_core.network_guardian",  "SigmaNetworkGuardian",      "net_guard"),
-            ("sigma_core.window_manager",     "SigmaWindowManager",        "wms"),
-            ("sigma_core.sovereign_log",      "SovereignLog",              "sul"),
-            ("sigma_core.sovereign_shell",    "SovereignShell",            "shell"),
+            ("sigma_fs",                              "SigmaFS",                   "fs"),
+            ("sigma_core.system.memory_manager",       "SigmaMemoryManager",        "memory"),
+            ("sigma_core.system.process_manager",       "SigmaProcessManager",       "process"),
+            ("sigma_core.security.network_guardian",   "SigmaNetworkGuardian",      "net_guard"),
+            ("sigma_core.ui.window_manager",           "SigmaWindowManager",        "wms"),
+            ("sigma_core.system.sovereign_log",        "SovereignLog",              "sul"),
+            ("sigma_core.ui.sovereign_shell",          "SovereignShell",            "shell"),
             
             # Performance & AI
-            ("predictive_scheduler",          "SigmaPredictiveScheduler",  "pbs"),
-            ("neural_fabric",                "SigmaNeuralFabric",         "fabric"),
-            ("performance_boost",            "SigmaPerformanceBoost",     "perf"),
-            ("self_repair_engine",           "SigmaSelfRepairEngine",     "repair_engine"),
-            ("energy_hub",                    "AdaptiveEnergyController", "energy"),
-            ("app_prewarmer",                "SigmaAppPrewarmer",        "prewarmer"),
-            ("app_sandbox",                  "SigmaAppSandbox",          "sandbox"),
+            ("sigma_core.system.predictive_scheduler", "SigmaPredictiveScheduler",  "pbs"),
+            ("sigma_core.system.neural_fabric",        "SigmaNeuralFabric",         "fabric"),
+            ("sigma_core.system.boost_engine",         "SigmaPerformanceBoost",     "perf"),
+            ("sigma_core.system.self_repair_engine",   "SigmaSelfRepairEngine",     "repair_engine"),
+            ("sigma_core.system.energy_hub",           "AdaptiveEnergyController",  "energy"),
+            ("sigma_core.system.app_prewarmer",        "SigmaAppPrewarmer",         "prewarmer"),
+            ("sigma_core.system.app_sandbox",          "SigmaAppSandbox",           "sandbox"),
             
             # OS Services (GUI requirements)
-            ("omni_automator",               "SigmaOmniAutomator",        "automator"),
-            ("mode_manager",                 "SigmaModeManager",          "modes"),
-            ("omni_search",                  "SigmaOmniSearch",           "search"),
-            ("userland.system_api.theme_engine", "SigmaThemeEngine",         "aura"),
-            ("sigma_core.competitor_crusher", "SovereignCompetitorCrusher", "crusher"),
-            ("offline_guard",                "SigmaOfflineGuard",         "offline"),
-            ("stability_watchdog",           "SigmaStabilityWatchdog",    "watchdog"),
-            ("pulse_engine",                 "SigmaPulseEngine",          "pulse"),
-            ("shadow_state",                 "SigmaShadowState",          "shadow"),
-            ("sigma_core.system_healer",      "SigmaSystemHealer",         "healer"),
-            ("update_manager",               "SigmaUpdateManager",        "update_manager"),
-            ("anomaly_detector",             "SigmaAnomalyDetector",      "kad"),
-            ("crash_reporter",               "SigmaCrashReporter",        "crash_reporter"),
-            ("monitor",                      "SigmaMonitor",              "monitor"),
+            ("sigma_core.system.omni_automator",       "SigmaOmniAutomator",        "automator"),
+            ("sigma_core.system.mode_manager",         "SigmaModeManager",          "modes"),
+            ("sigma_core.system.omni_search",          "SigmaOmniSearch",           "search"),
+            ("userland.system_api.theme_engine",       "SigmaThemeEngine",          "aura"),
+            ("sigma_core.security.competitor_crusher", "SovereignCompetitorCrusher", "crusher"),
+            ("sigma_core.security.offline_guard",      "SigmaOfflineGuard",         "offline"),
+            ("sigma_core.system.stability_watchdog",    "SigmaStabilityWatchdog",    "watchdog"),
+            ("sigma_core.system.pulse_engine",          "SigmaPulseEngine",          "pulse"),
+            ("sigma_core.system.shadow_state",          "SigmaShadowState",          "shadow"),
+            ("sigma_core.system.system_healer",         "SigmaSystemHealer",         "healer"),
+            ("sigma_core.system.update_manager",        "SigmaUpdateManager",        "update_manager"),
+            ("sigma_core.system.anomaly_detector",      "SigmaAnomalyDetector",      "kad"),
+            ("sigma_core.system.crash_reporter",        "SigmaCrashReporter",        "crash_reporter"),
+            ("sigma_core.system.system_monitor",        "SystemMonitor",             "monitor"),
 
             # Specialized Extensions (Sovereign)
-            ("sigma_core.intelligence_studio", "IntelligenceStudio",    "intelligence"),
-            ("sigma_core.sync_engine",         "SigmaSyncEngine",       "sync"),
-            ("sigma_core.aura_shield",         "SigmaAuraShield",       "shield"),
-            ("sigma_core.gurukul_engine",      "GurukulEngine",         "gurukul"),
-            ("sigma_core.ghostchat",           "SigmaGhostChat",        "ghostchat"),
-            ("sigma_core.compliance_guard",    "ComplianceGuard",       "compliance"),
-            ("sigma_core.vanguard",            "NetworkVanguard",       "vanguard"),
+            ("sigma_core.ai.intelligence_studio", "IntelligenceStudio",    "intelligence"),
+            ("sigma_core.system.sync_engine",      "SigmaSyncEngine",       "sync"),
+            ("sigma_core.security.aura_shield",    "SigmaAuraShield",       "shield"),
+            ("sigma_core.ai.gurukul_engine",       "GurukulEngine",         "gurukul"),
+            ("sigma_core.ui.ghostchat",            "SigmaGhostChat",        "ghostchat"),
+            ("sigma_core.security.compliance_guard", "ComplianceGuard",     "compliance"),
+            ("sigma_core.security.vanguard",       "NetworkVanguard",       "vanguard"),
             ("userland.system_api.antigravity_core", "AntigravityLayer", "antigravity"),
             ("userland.system_api.sigma_auditor",    "SigmaAuditor",      "qa_auditor"),
             ("userland.system_api.sigma_games_engine","SigmaGamesEngine", "games"),

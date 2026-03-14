@@ -11,7 +11,7 @@ class SigmaConfig:
     
     # OS Metadata
     OS_NAME = "SigmaOS Sovereign"
-    VERSION = "4.5.3 (Ultra Apex)"
+    VERSION = "5.2.0 (Polyglot Sovereign)"
     BUILD = "2026.03.11-ULTRA-APEX"
     BASE_KERNEL = "Modular Event-Driven Kernel"
     RELEASE_DATE = "2026-03-11"
