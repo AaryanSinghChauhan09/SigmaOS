@@ -30,3 +30,16 @@ OK - Search Shard: OK - Index Size: 0 entries
 
 --- APEX VERIFICATION COMPLETE: ALL USPs HYDRATED ---
 --- SIGMAOS SYNC INITIATED ---
+warning: in the working copy of 'userland/system_api/ncert_lab_engine.py', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'sigma_core/system/sovereign_app.py', LF will be replaced by CRLF the next time Git touches it
+[master f4749bc] Apex Sync: 2026-03-14 14:33:47 [Ledger Signed]
+ 20 files changed, 203 insertions(+), 182 deletions(-)
+ create mode 100644 apex_results_final.txt
+ create mode 100644 apex_verification_status.txt
+ rename {userland/system_api => sigma_core/system}/self_repair_engine.py (100%)
+ create mode 100644 sigma_core/system/sovereign_app.py
+ delete mode 100644 tmp_fix_imports.py
+ delete mode 100644 tmp_move_shards.py
+To https://github.com/AaryanSinghChauhan09/SigmaOS.git
+   75728b7..f4749bc  master -> master
+[OK] Workspace Synced with GitHub (APEX MASTER)
