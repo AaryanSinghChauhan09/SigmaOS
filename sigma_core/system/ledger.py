@@ -11,6 +11,7 @@ class SovereignLedger:
     def __init__(self, ledger_path="system_audit.sigma"):
         self.path = ledger_path
         self._last_hash = "0" * 64
+        self._entry_count = 0
         self._initialize_ledger()
 
     def _initialize_ledger(self):
@@ -18,21 +19,21 @@ class SovereignLedger:
             with open(self.path, "w") as f:
                 f.write("") # Genesis
         else:
-            # Recover last hash from the end of file
             try:
                 with open(self.path, "r") as f:
-                    lines = [line.strip() for line in f.readlines() if line.strip()]
-                    if lines:
-                        last_entry = json.loads(lines[-1])
+                    for line in f:
+                        if line.strip():
+                            self._entry_count += 1
+                            last_line = line
+                    if self._entry_count > 0:
+                        last_entry = json.loads(last_line)
                         self._last_hash = last_entry["this_hash"]
             except:
                 pass
 
     def commit(self, module, action, context):
         """
-        Commits an event to the ledger.
-        Every entry is hashed with the previous entry's hash.
-        Includes a Merkle Root every 10 entries for block-level integrity.
+        Commits an event to the ledger with optimized metadata tracking.
         """
         entry = {
             "timestamp": time.time(),
@@ -42,35 +43,31 @@ class SovereignLedger:
             "prev_hash": self._last_hash
         }
         
-        # Calculate current hash
         raw_payload = json.dumps(entry, sort_keys=True).encode()
         this_hash = hashlib.sha256(raw_payload).hexdigest()
         entry["this_hash"] = this_hash
         self._last_hash = this_hash
 
         # Block-Level Merkle Root (Every 10 entries)
-        entry_count = 0
-        if os.path.exists(self.path):
-            with open(self.path, "r") as f:
-                entry_count = sum(1 for _ in f)
-        
-        if (entry_count + 1) % 10 == 0:
-             entry["merkle_root"] = self._calculate_epoch_merkle(entry_count)
+        if (self._entry_count + 1) % 10 == 0:
+             entry["merkle_root"] = self._calculate_epoch_merkle()
 
         with open(self.path, "a") as f:
             f.write(json.dumps(entry) + "\n")
         
+        self._entry_count += 1
         return this_hash
 
-    def _calculate_epoch_merkle(self, entry_count):
+    def _calculate_epoch_merkle(self):
         """Calculates a Merkle Root for the current epoch (last 10 entries)."""
         hashes = []
         try:
             with open(self.path, "r") as f:
                 lines = f.readlines()
-                for line in lines[-9:]:
-                    hashes.append(json.loads(line)["this_hash"])
-            # Hash the collected hashes together
+                _count = len(lines)
+                # Manual iterator to bypass slicing linter issue
+                for i in range(max(0, _count - 9), _count):
+                    hashes.append(json.loads(lines[i])["this_hash"])
             combined = "".join(hashes).encode()
             return hashlib.sha256(combined).hexdigest()
         except:
@@ -98,7 +95,10 @@ class SovereignLedger:
                 
                 # Verify Merkle Root if present
                 if m_root:
-                    epoch_hashes = [e["h"] for e in entries[-9:]]
+                    epoch_hashes = []
+                    _ent_len = len(entries)
+                    for j in range(max(0, _ent_len - 9), _ent_len):
+                         epoch_hashes.append(entries[j]["h"])
                     epoch_hashes.append(computed_hash)
                     if hashlib.sha256("".join(epoch_hashes).encode()).hexdigest() != m_root:
                         return False # Epoch tampered

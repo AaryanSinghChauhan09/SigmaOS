@@ -8,23 +8,35 @@ Reference: Sigma Vision Design Guidelines (Glassmorphism & Neon-Vibrancy).
 from typing import Dict, Any, Tuple
 
 # Design Tokens: Palette (Atomic Colors - Enhanced High-Contrast)
-PALETTE = {
-    "background": "#050505",    # Deep Infinite Black
-    "surface": "#0F1012",       # Frosted Steel
+# Design Tokens: Palettes (Chromatic Vibe Support)
+THEMES = {
+    "DEEP_SPACE": {
+        "background": "#050505", "surface": "#0F1012", "primary": "#00D4FF",
+        "secondary": "#FFD60A", "accent": "#FF375F", "text_primary": "#F2F2F7",
+        "border": "#2C2C2E"
+    },
+    "APEX_GOLD": {
+        "background": "#0A0905", "surface": "#1A1810", "primary": "#FFD700",
+        "secondary": "#FFFFFF", "accent": "#FF8C00", "text_primary": "#FFFDEF",
+        "border": "#3A3420"
+    },
+    "FOREST_ECO": {
+        "background": "#050A05", "surface": "#101A10", "primary": "#32D74B",
+        "secondary": "#8E8E93", "accent": "#FF9F0A", "text_primary": "#F0FFF0",
+        "border": "#203A20"
+    }
+}
+
+ACTIVE_VIBE = "DEEP_SPACE"
+PALETTE = THEMES[ACTIVE_VIBE].copy()
+# Re-add common tokens
+PALETTE.update({
     "surface_variant": "#1A1C1E",
-    "primary": "#00D4FF",       # Sovereign Blue (Electric)
-    "secondary": "#FFD60A",     # Advocate Gold
-    "accent": "#FF375F",        # Stealth Red (Laser)
-    "success": "#32D74B",       # Resilient Green (Matrix)
-    "warning": "#FF9F0A",       # Warning Orange
-    "error": "#FF453A",         # Critical Red
-    "text_primary": "#F2F2F7",
-    "text_secondary": "#8E8E93",
-    "text_tertiary": "#48484A",
-    "border": "#2C2C2E",        # Sub-pixel Border
+    "success": "#32D74B", "warning": "#FF9F0A", "error": "#FF453A",
+    "text_secondary": "#8E8E93", "text_tertiary": "#48484A",
     "glass": "rgba(255, 255, 255, 0.05)",
     "neon_glow": "rgba(0, 212, 255, 0.4)"
-}
+})
 
 # Design Tokens: Typography (Modern & Clean)
 TYPOGRAPHY = {
@@ -46,6 +58,16 @@ ANIMATION = {
 
 class FluidTheme:
     """Orchestrates themed assets and logic for Sigma shards with Aesthetic Intelligence."""
+    @staticmethod
+    def set_vibe(vibe_name: str):
+        """USP: Dynamic Aesthetic Transformation. Swaps the active design palette."""
+        global ACTIVE_VIBE, PALETTE
+        if vibe_name in THEMES:
+            ACTIVE_VIBE = vibe_name
+            PALETTE.update(THEMES[vibe_name])
+            return True
+        return False
+
     @staticmethod
     def get_color(token: str) -> str:
         return PALETTE.get(token, "#FF00FF")

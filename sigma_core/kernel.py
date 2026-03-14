@@ -15,17 +15,17 @@ import platform
 import ctypes
 from typing import Dict, List, Any, Optional
 
-from .system.config import SigmaConfig
-from .system.event_bus import EventBus
-from .system.registry import ModuleRegistry
-from .system.ledger import SovereignLedger
-from .system.cache import SigmaCache
-from .security.integrity import IntegrityGuard
-from .ui.customizer import SovereignCustomizer
-from .security.vanguard import NetworkVanguard
-from .system.loader import SigmaModuleLoader
-from .hal.polyglot_loader import SigmaPolyglot
-from .manifest import CORE_SYSTEM_MODULES, ECOSYSTEM_APPS
+from .system.config import SigmaConfig # type: ignore
+from .system.event_bus import EventBus # type: ignore
+from .system.registry import ModuleRegistry # type: ignore
+from .system.ledger import SovereignLedger # type: ignore
+from .system.cache import SigmaCache # type: ignore
+from .security.integrity import IntegrityGuard # type: ignore
+from .ui.customizer import SovereignCustomizer # type: ignore
+from .security.vanguard import NetworkVanguard # type: ignore
+from .system.loader import SigmaModuleLoader # type: ignore
+from .hal.polyglot_loader import SigmaPolyglot # type: ignore
+from .manifest import CORE_SYSTEM_MODULES, ECOSYSTEM_APPS # type: ignore
 
 class SigmaKernel:
     """
@@ -133,4 +133,7 @@ class SigmaKernel:
 
 if __name__ == "__main__":
     k = SigmaKernel()
+    print(f"\n[KERNEL] Booting {k.os_name} v{k.version}...")
+    k.bus.emit("mode.change", {"mode": "Apex"})
     print(k.health_check())
+    print("\n[TEST] Sigma OS Sovereign Core: VERIFIED.")

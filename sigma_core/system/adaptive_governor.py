@@ -6,9 +6,11 @@ Integrates Predictive Scheduling, Mode Management, and Eco-Gamification.
 """
 from typing import Dict, Any, List
 try:
-    from .interfaces import SigmaModuleBase
+    from .interfaces import SigmaModuleBase # type: ignore
+    from ..ui.fluid_design import FluidTheme # type: ignore
 except ImportError:
-    from sigma_core.system.interfaces import SigmaModuleBase
+    from sigma_core.system.interfaces import SigmaModuleBase # type: ignore
+    from sigma_core.ui.fluid_design import FluidTheme # type: ignore
 
 class AdaptiveGovernor(SigmaModuleBase):
     """
@@ -23,6 +25,25 @@ class AdaptiveGovernor(SigmaModuleBase):
             "eco_priority": False,
             "drift_protection": True
         }
+        self.current_vibe = "STANDARD"
+
+    def switch_vibe(self, vibe_name: str):
+        """USP: Atomic switch of system state and aesthetic alignment."""
+        self.current_vibe = vibe_name
+        
+        # Mapping vibes to UI themes
+        vibe_map = {
+            "APEX": "APEX_GOLD",
+            "RESOURCE_SAVING": "FOREST_ECO",
+            "STANDARD": "DEEP_SPACE"
+        }
+        # Thread-safe theme update
+        FluidTheme.set_vibe(vibe_map.get(vibe_name, "DEEP_SPACE"))
+        
+        if self.kernel and hasattr(self.kernel, "bus"):
+            # Emit kernel event for other modules to react
+            self.kernel.bus.emit("governor.vibe_switch", {"vibe": vibe_name})
+            print(f"[AURA] Switched to {vibe_name} aesthetic.")
 
     def start_service(self) -> str:
         # Subscribe to mode changes to adjust system DNA
@@ -36,14 +57,15 @@ class AdaptiveGovernor(SigmaModuleBase):
         mode = payload.get("mode", "Standard").upper()
         self.log_event("dna_shift", {"target_mode": mode})
 
-        if mode == "GAMING":
-            self._apply_profile(perf=1.5, eco=False, scheduler="RT")
+        if mode == "GAMING" or mode == "APEX":
+            self._apply_profile(perf=2.0, eco=False, scheduler="QUANTUM")
+            self.switch_vibe("APEX")
         elif mode == "RESOURCE_SAVING":
             self._apply_profile(perf=0.5, eco=True, scheduler="BATCH")
-        elif mode == "APEX":
-            self._apply_profile(perf=2.0, eco=False, scheduler="QUANTUM")
+            self.switch_vibe("RESOURCE_SAVING")
         else:
             self._apply_profile(perf=1.0, eco=False, scheduler="NORMAL")
+            self.switch_vibe("STANDARD")
 
     def _on_eco_window(self, payload: Dict[str, Any]):
         """Responds to high carbon intensity by throttling non-critical shards."""

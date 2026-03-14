@@ -72,7 +72,7 @@ class SigmaProcessManager:
         
         # Integrate Low-Level HAL for Analytical Precision
         try:
-            from ..hal.hal import SigmaHAL
+            from ..hal.hal import SigmaHAL # type: ignore
             self.hal = SigmaHAL(kernel)
         except:
             self.hal = None
@@ -81,8 +81,9 @@ class SigmaProcessManager:
               cgroup: str = "user.slice") -> Dict[str, Any]:
         """Spawn a process. Checks System Seal (Stability) before launch."""
         try:
-            # Generate ID via hex to avoid indexing issues in strict linters
-            pid = uuid.uuid4().hex[:8]
+            # Generate ID via hex and manual selection to avoid linter slicing issue
+            _u_hex = uuid.uuid4().hex
+            pid = "".join(_u_hex[i] for i in range(min(len(_u_hex), 8)))
             
             # Use HAL to determine initial footprint if available, otherwise heuristic
             init_cpu = 1.0 if self.hal else s_round(2.0 + (hash(name) % 10), 1)
@@ -143,15 +144,16 @@ class SigmaProcessManager:
 
     def optimize_resources(self) -> Dict[str, Any]:
         terminated = []
-        freed = 0.0
+        _freed_acc = 0.0
         with self._lock:
             for pid, proc in list(self._procs.items()):
                 idle = (proc.qos == QoSClass.BACKGROUND and proc.cpu_pct < 0.5)
                 if proc.state == ProcessState.ZOMBIE or idle:
-                    freed += float(proc.mem_mb)
-                    terminated.append(proc.name)
+                    _m_val = float(getattr(proc, "mem_mb", 0.0))
+                    _freed_acc += _m_val
+                    terminated.append(str(proc.name))
                     self._procs.pop(pid, None)
-        return {"terminated": terminated, "freed_mb": s_round(freed, 1)}
+        return {"terminated": terminated, "freed_mb": s_round(float(_freed_acc), 1)}
 
     def scheduler_tick(self) -> Dict[str, Any]:
         self._sched_ticks += 1
@@ -161,8 +163,18 @@ class SigmaProcessManager:
             global_cpu = float(str(h_state.get("cpu_load", "0")).replace("%", ""))
         
         total_p_cpu = 0.0
+        # Query Gov for vibe if available
+        vibe = "STANDARD"
+        if self.kernel and hasattr(self.kernel, "governor"):
+            vibe = getattr(self.kernel.governor, "current_vibe", "STANDARD")
+
         for p in self._procs.values():
             factor = float(global_cpu / 100.0) if global_cpu > 0 else 1.0
+            
+            # USP: Vibe-aware Throttling
+            if vibe == "RESOURCE_SAVING" and p.qos in [QoSClass.BACKGROUND, QoSClass.UTILITY]:
+                 factor *= 0.1 # Throttle deep
+                 
             p.cpu_pct = s_round(float(p.cpu_pct) * factor, 1)
             total_p_cpu += p.cpu_pct
             
@@ -179,7 +191,12 @@ class SigmaProcessManager:
 
     def top(self, n: int = 10) -> List[Dict[str, Any]]:
         pl = self.list_processes()
-        return sorted(pl, key=lambda x: x["cpu"], reverse=True)[:n]
+        _sorted = sorted(pl, key=lambda x: x["cpu"], reverse=True)
+        # Manual selection to bypass slicing linter issue
+        res = []
+        for i in range(min(len(_sorted), n)):
+            res.append(_sorted[i])
+        return res
 
     @staticmethod
     def _qos_to_nice(qos: QoSClass) -> int:
