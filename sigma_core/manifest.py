@@ -140,6 +140,7 @@ CORE_SYSTEM_MODULES = [
     # Internal Sentinels (Autonomous)
     ("sigma_core.system.sync_sentinel",        "SigmaSyncSentinel",       "repo_sentinel"),
     ("sigma_core.system.forensic_sentinel",    "ForensicSentinel",        "forensic_sentinel"),
+    ("sigma_core.system.mind_sync",            "MindSyncEngine",          "mind_sync"),
 ]
 
 ECOSYSTEM_APPS = [

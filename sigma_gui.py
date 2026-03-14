@@ -81,6 +81,9 @@ from gui_pkg.apex_page import ApexPage
 from gui_pkg.nexus_page import NexusPage
 from gui_pkg.writesense_page import WritesensePage
 from gui_pkg.flow_page import FlowPage
+from gui_pkg.vanguard_page import VanguardPage
+from gui_pkg.ai_lifecycle_page import AILifecyclePage
+from gui_pkg.governor_page import GovernorPage
 
 class SigmaGUI(tk.Tk, UIMixin):
     """Main SigmaOS GUI application window."""
@@ -811,17 +814,17 @@ class SigmaGUI(tk.Tk, UIMixin):
             "intelligence_hub": lambda: self._set_modular_page("intelligence_hub", IntelligenceHubPage),
             "terminal":         lambda: self._set_modular_page("terminal", TerminalPage),
             "automation_hub":   lambda: self._set_modular_page("automation_hub", AutomationHubPage),
-            "ai_lifecycle":     self._build_ai_lifecycle_page,
+            "ai_lifecycle":     lambda: self._set_modular_page("ai_lifecycle", AILifecyclePage),
             "zenith":           lambda: self._set_modular_page("zenith", ZenithPage),
             "config_hub":       lambda: self._set_modular_page("config_hub", ConfigHubPage),
             "gaming_hub":       lambda: self._set_modular_page("gaming_hub", ArcadePage),
             "system_audit":     lambda: self._set_modular_page("system_audit", AuditViewPage),
-            "virtualbox":       self._build_virtualbox_page,
+            "governor":         lambda: self._set_modular_page("governor", GovernorPage), 
             "ag_physics":       lambda: self._set_modular_page("ag_physics", AGPhysicsPage),
             "visual_customizer": lambda: self._set_modular_page("visual_customizer", CustomizerPage),
             "gmail_ai":         lambda: self._set_modular_page("gmail_ai", GmailAIPage),
             "sovereign_suite":  lambda: self._set_modular_page("sovereign_suite", SovereignLabPage),
-            "network_vanguard": self._build_vanguard_page,
+            "network_vanguard": lambda: self._set_modular_page("network_vanguard", VanguardPage),
             "intelligence_studio": lambda: self._set_modular_page("intelligence_studio", IntelligenceHubPage),
             "gurukul_academy": lambda: self._set_modular_page("gurukul_academy", UnivHubPage),
             "compliance_center": self._build_compliance_center_page,
@@ -3423,197 +3426,14 @@ class SigmaGUI(tk.Tk, UIMixin):
             self._notify("Lisp REPL", "Logic patched.", "OK")
 
         ttk.Button(lisp_log, text="EVAL", command=_eval_lisp).pack(side="right")
-        goal_entry = ttk.Entry(agent_card)
-        goal_entry.pack(fill="x", pady=5)
-        goal_entry.insert(0, "Summarize unread emails and sync to Notes")
-
-        def _launch_pipe():
-            if not hasattr(self.kernel, "omni_automator"): return
-            res = self.kernel.omni_automator.launch_agentic_pipeline(goal_entry.get())
-            self._log(self._auto_log, res, "TRACE")
-            self._notify("Pipeline Live", "Agent dispatched to cross-app workflow.", "INFO")
-
-        ttk.Button(agent_card, text="Deploy Pipeline", command=_launch_pipe).pack(fill="x", pady=5)
-
-        # Right Column - Hub Console & Monitor
-        term_card = self._card(right_col, "📟 Omni Automator Console")
-        term_card.master.pack(fill="both", expand=True)
-        self._auto_log = self._console(term_card, height=25)
-        self._auto_log.pack(fill="both", expand=True, pady=(5,0))
-        self._log(self._auto_log, "SYSTEM: Omni Automator Initialized. Awaiting workflows...", "INFO")
         
-        def _health_chk():
-            if not hasattr(self.kernel, "omni_automator"): return
-            res = self.kernel.omni_automator.health_check()
-            self._log(self._auto_log, f"Health Check: {res}", "WARN")
-            
-        ttk.Button(term_card, text="Poll Engine Health", command=_health_chk).pack(anchor="e", pady=5)
-
-        # Optional integration
-        if hasattr(self, '_build_scheduler_page'):
-            self._build_scheduler_page()
-
-    # ─── AI/ML/DS Unified Lifecycle Mission Control ──────────────────────────────────
-    
+    def _build_vanguard_page(self):
+        p = VanguardPage(self._content, self)
+        self._pages["vanguard"] = p
+        
     def _build_ai_lifecycle_page(self):
-        """Sovereign AI/ML/DS Mission Control: Professional Lifecycle Dashboard."""
-        p = tk.Frame(self._content, bg=PAL["bg"])
+        p = AILifecyclePage(self._content, self)
         self._pages["ai_lifecycle"] = p
-        self._build_page_header(p, "AI MISSION CONTROL", "Unified Alpha-Zero Lifecycle Engineering Studio")
-
-        # Top Section: New Mission Form
-        form_fr = self._card(p, "🚀 INITIATE NEW MISSION")
-        form_fr.master.pack(fill="x", padx=20, pady=10)
-        
-        row1 = tk.Frame(form_fr, bg=PAL["card"])
-        row1.pack(fill="x", pady=5)
-        
-        tk.Label(row1, text="PROJECT NAME:", font=FONT_SMALL, fg=PAL["dim"], bg=PAL["card"]).pack(side="left")
-        self._ai_proj_name = ttk.Entry(row1, width=30)
-        self._ai_proj_name.pack(side="left", padx=10)
-        self._ai_proj_name.insert(0, "Sigma_V3_Core")
-        
-        tk.Label(row1, text="DISCIPLINE:", font=FONT_SMALL, fg=PAL["dim"], bg=PAL["card"]).pack(side="left", padx=(20, 0))
-        self._ai_disc_cb = ttk.Combobox(row1, values=["AI (Artificial Intelligence)", "ML (Machine Learning)", "DS (Data Science)"], width=25)
-        self._ai_disc_cb.pack(side="left", padx=10)
-        self._ai_disc_cb.set("ML (Machine Learning)")
-
-        row2 = tk.Frame(form_fr, bg=PAL["card"])
-        row2.pack(fill="x", pady=10)
-        tk.Label(row2, text="MISSION OBJECTIVE:", font=FONT_SMALL, fg=PAL["dim"], bg=PAL["card"]).pack(side="left")
-        self._ai_obj_ent = ttk.Entry(row2)
-        self._ai_obj_ent.pack(side="left", fill="x", expand=True, padx=10)
-        self._ai_obj_ent.insert(0, "Achieve 99% accuracy in local resource orchestration.")
-        
-        def _start_mission():
-            name = self._ai_proj_name.get()
-            obj = self._ai_obj_ent.get()
-            disc = self._ai_disc_cb.get().split(" ")[0]
-            mid = self.kernel.ai_lifecycle.start_unified_mission(name, obj, disc)
-            self._notify("Mission Initiated", f"ID: {mid} - Status: ACTIVE", "OK")
-            self._update_ai_missions()
-            
-        ttk.Button(row2, text="Launch Mission", command=_start_mission, width=15).pack(side="right")
-
-        # Main Workspace: Active Missions & Details
-        ws = tk.Frame(p, bg=PAL["bg"])
-        ws.pack(fill="both", expand=True, padx=20)
-        
-        # Left: Mission List
-        self._ai_list_fr = self._card(ws, "📜 ACTIVE MISSIONS")
-        self._ai_list_fr.master.pack(side="left", fill="both", expand=True, padx=(0, 10))
-        
-        self._ai_scroll = tk.Frame(self._ai_list_fr, bg=PAL["card"])
-        self._ai_scroll.pack(fill="both", expand=True)
-
-        # Right: Detail & Execution View
-        self._ai_detail_fr = self._card(ws, "🔍 MISSION DETAILS & EXECUTION")
-        self._ai_detail_fr.master.pack(side="left", fill="both", width=500)
-        
-        self._ai_active_mid = tk.StringVar(value="N/A")
-        tk.Label(self._ai_detail_fr, text="SELECTED MISSION:", font=FONT_SMALL, fg=PAL["dim"], bg=PAL["card"]).pack(anchor="w")
-        tk.Label(self._ai_detail_fr, textvariable=self._ai_active_mid, font=FONT_BOLD, fg=PAL["cyan"], bg=PAL["card"]).pack(anchor="w", pady=(0, 15))
-        
-        self._ai_step_lbl = tk.Label(self._ai_detail_fr, text="Current Phase: NONE", font=FONT_MED, fg=PAL["text"], bg=PAL["card"])
-        self._ai_step_lbl.pack(anchor="w")
-        
-        self._ai_prog = ttk.Progressbar(self._ai_detail_fr, mode="determinate")
-        self._ai_prog.pack(fill="x", pady=10)
-
-        self._ai_guidance = tk.Text(self._ai_detail_fr, height=8, bg=PAL["bg3"], fg=PAL["dim"], font=FONT_SMALL, bd=0, relief="flat", padx=10, pady=10)
-        self._ai_guidance.pack(fill="x", pady=10)
-        self._ai_guidance.insert("1.0", "Select a mission to view professional guidance based on CRISP-DM paradigms.")
-        
-        # Action Buttons
-        btn_fr = tk.Frame(self._ai_detail_fr, bg=PAL["card"])
-        btn_fr.pack(fill="x", pady=10)
-        
-        self._next_btn = ttk.Button(btn_fr, text="▶ EXECUTE NEXT PHASE", state="disabled", command=self._execute_ai_next)
-        self._next_btn.pack(side="left", fill="x", expand=True, padx=5)
-        
-        self._share_btn = ttk.Button(btn_fr, text="📲 SHARE TO WHATSAPP", state="disabled", command=self._share_ai_wa)
-        self._share_btn.pack(side="left", fill="x", expand=True, padx=5)
-
-        # Bottom Section: Mesh Lattice Visualization
-        self._mesh_canvas = tk.Canvas(self._ai_detail_fr, height=120, bg=PAL["bg2"], highlightthickness=1, highlightbackground=PAL["bg4"])
-        self._mesh_canvas.pack(fill="x", pady=10)
-        self._mesh_nodes = []
-        self._draw_mesh_lattice()
-
-        self._update_ai_missions()
-
-    def _draw_mesh_lattice(self):
-        """Simulates a neural mesh network pulse."""
-        if not self._mesh_canvas.winfo_exists(): return
-        self._mesh_canvas.delete("all")
-        w, h = 480, 120
-        
-        # Draw background nodes
-        if not self._mesh_nodes:
-            for _ in range(15):
-                self._mesh_nodes.append([random.randint(20, w-20), random.randint(20, h-20), random.choice([PAL["cyan"], PAL["accent2"], PAL["dim"]])])
-        
-        for i, (x, y, color) in enumerate(self._mesh_nodes):
-            # Pulse effect
-            r = 3 + (time.time() * 2 % 3)
-            self._mesh_canvas.create_oval(x-r, y-r, x+r, y+r, fill=color, outline="")
-            
-            # Draw links
-            if i > 0:
-                px, py, _ = self._mesh_nodes[i-1]
-                self._mesh_canvas.create_line(x, y, px, py, fill=PAL["bg4"], width=1)
-
-        self.after(100, self._draw_mesh_lattice)
-
-    def _update_ai_missions(self):
-        """Refreshes the scrollable active missions list from the kernel."""
-        for w in self._ai_scroll.winfo_children(): w.destroy()
-        
-        projects = self.kernel.ai_lifecycle.active_projects
-        if not projects:
-            tk.Label(self._ai_scroll, text="No missions currently tracked.", font=FONT_SMALL, fg=PAL["dim"], bg=PAL["card"]).pack(pady=20)
-            return
-
-        for mid, data in projects.items():
-            f = tk.Frame(self._ai_scroll, bg=PAL["bg3"], pady=8, padx=10, cursor="hand2")
-            f.pack(fill="x", pady=2)
-            
-            tk.Label(f, text=f"{data['name']} [{mid}]", font=FONT_BOLD, fg=PAL["text"], bg=PAL["bg3"]).pack(anchor="w")
-            tk.Label(f, text=f"{data['type'].value} • Phase: {data['status']}", font=FONT_SMALL, fg=PAL["dim"], bg=PAL["bg3"]).pack(anchor="w")
-            
-            def _select(m=mid): self._select_ai_mission(m)
-            f.bind("<Button-1>", lambda e, m=mid: self._select_ai_mission(m))
-            for child in f.winfo_children(): child.bind("<Button-1>", lambda e, m=mid: self._select_ai_mission(m))
-
-    def _select_ai_mission(self, mid):
-        """Loads mission data into the detail view."""
-        self._ai_active_mid.set(mid)
-        data = self.kernel.ai_lifecycle.active_projects[mid]
-        
-        self._ai_step_lbl.config(text=f"Current Phase: {data['status']}", fg=PAL["teal"])
-        
-        # Calculate Progress
-        total = len(data["lifecycle"])
-        curr = data["current_step_idx"]
-        prog = (curr / total) * 100
-        self._ai_prog["value"] = prog
-        
-        # Update Buttons
-        self._next_btn.config(state="normal" if curr < total else "disabled")
-        self._share_btn.config(state="normal")
-        
-        # Update Guidance
-        self._ai_guidance.delete("1.0", tk.END)
-        if curr < total:
-            next_step = data["lifecycle"][curr]
-            instr = self.kernel.ai_lifecycle._get_guidance(next_step, data["type"])
-            self._ai_guidance.insert("1.0", f"NEXT PHASE: {next_step}\n\n{instr}")
-        else:
-            self._ai_guidance.insert("1.0", "MISSION COMPLETE: Model deployed and monitoring active.")
-
-        self._update_ai_missions() # Refresh selection visuals
-
-    def _execute_ai_next(self):
         mid = self._ai_active_mid.get()
         if mid == "N/A": return
         
@@ -3810,41 +3630,6 @@ class SigmaGUI(tk.Tk, UIMixin):
         self._lab_log = self._console(console_c, height=25)
         self._lab_log.pack(fill="both", expand=True)
 
-    # ─── Vanguard Security Hub: McAfee/VirusTotal/Defender USP ────────────────
-    def _build_vanguard_page(self):
-        p = tk.Frame(self._content, bg=PAL["bg"])
-        self._pages["vanguard"] = p
-        self._build_page_header(p, "Vanguard Security Hub", "Silo-Isolation & Zero-Persistence Engine")
-        
-        body = tk.Frame(p, bg=PAL["bg"])
-        body.pack(fill="both", expand=True)
-
-        # 1. Active Silos (Left)
-        l_fr = tk.Frame(body, bg=PAL["bg2"], width=450)
-        l_fr.pack(side="left", fill="both", padx=5)
-        l_fr.pack_propagate(False)
-
-        inner = self._card(l_fr, "App Isolation: Active Silos")
-        inner.pack(fill="both", expand=True)
-        
-        # Simulated app list for isolation
-        apps = ["Browser_Core", "Untrusted_Game", "Legacy_Win32", "P2P_Mesh_Node"]
-        for app in apps:
-             fr = tk.Frame(inner, bg=PAL["card"], pady=8)
-             fr.pack(fill="x", pady=2)
-             tk.Label(fr, text=f"📦 {app}", font=FONT_BOLD, fg=PAL["cyan"], bg=PAL["card"]).pack(side="left")
-             tk.Label(fr, text=" Isolated", font=FONT_SMALL, fg=PAL["dim"], bg=PAL["card"]).pack(side="left", padx=5)
-             ttk.Button(fr, text="Re-Silo", width=8).pack(side="right")
-
-        # 2. Forensic Log (Right)
-        r_fr = tk.Frame(body, bg=PAL["bg"], padx=10)
-        r_fr.pack(side="right", fill="both", expand=True)
-        
-        audit_c = self._card(r_fr, "Vanguard Audit Trail")
-        audit_c.master.pack(fill="both", expand=True)
-        self._vanguard_log = self._console(audit_c, height=25)
-        self._vanguard_log.pack(fill="both", expand=True)
-        self._log(self._vanguard_log, "Vanguard Silo Engine ACTIVE. Pro-Persistence disabled.", "HEAD")
 
     def _build_sentinel_page(self):
         """Forensic Sentinel (KAD v2.0 Dashboard)."""
