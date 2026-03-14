@@ -20,10 +20,12 @@ except ImportError:
     class LudoEngine:
         def __init__(self):
             self.turn = "RED"; self.dice_val = 1
-            self.pieces = {"RED": [(60,60)], "GREEN": [(440,60)], "BLUE": [(60,440)], "YELLOW": [(440,440)]}
+            self.piece_states = {"RED": [0,0,0,0], "GREEN": [0,0,0,0], "BLUE": [0,0,0,0], "YELLOW": [0,0,0,0]}
+            self.yard_coords = {"RED": [(60,60)], "GREEN": [(440,60)], "BLUE": [(60,440)], "YELLOW": [(440,440)]}
             self.history = []
         def roll_dice(self): return random.randint(1,6)
         def move_piece(self, c, i): return True
+        def get_piece_coord(self, c, i): return (60,60)
 
 PAL = {
     "bg": "#0B0C0F", "red": "#FF3B30", "green": "#32D74B", "blue": "#007AFF",

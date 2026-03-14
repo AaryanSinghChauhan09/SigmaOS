@@ -16,17 +16,22 @@ sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), "..",
 
 try:
     from sigma_core.ui.fluid_design import PALETTE as PAL, TYPOGRAPHY as FONT # type: ignore
+    from sigma_core.legal.legal_engine import LegalEngine # type: ignore
 except ImportError:
     # Fallback zero-dependency styling if core is not available
     PAL = {"background": "#F5F5F7", "surface": "#FFFFFF", "surface_variant": "#E5E5EA", 
            "primary": "#007AFF", "success": "#34C759", "warning": "#FF9500", "danger": "#FF3B30",
            "text_primary": "#1C1C1E", "text_secondary": "#8E8E93", "text_tertiary": "#C7C7CC"}
     FONT = {"h1": ("Arial", 16, "bold"), "body_bold": ("Arial", 10, "bold"), "caption": ("Arial", 8)}
+    class LegalEngine:
+        def __init__(self): self.stages = []
+        def get_stages(self): return []
 
 class LegalTracker(tk.Tk):
     def __init__(self, kernel=None):
         super().__init__()
         self.kernel = kernel
+        self.engine = LegalEngine()
         self.title("Sovereign Legal Tracker — Litigation Gantt")
         self.geometry("1400x800")
         self.configure(bg=PAL["background"])
@@ -37,16 +42,8 @@ class LegalTracker(tk.Tk):
         self.canvas = tk.Canvas(self)
         self.info_panel = tk.Frame(self)
         
-        # Litigation Stages (BNSS/CPC based)
-        self.stages = [
-            {"id": 1, "name": "FILING OF PLAINT/FIR", "act": "BNSS Sec 173 / CPC Order VII", "days": "0", "status": "COMPLETED", "note": "Mandatory first step of litigation record."},
-            {"id": 2, "name": "SUMMONS TO DEFENDANT", "act": "BNSS Sec 63 / CPC Order V", "days": "30", "status": "COMPLETED", "note": "Court issues notice for appearance."},
-            {"id": 3, "name": "WRITTEN STATEMENT", "act": "CPC Order VIII", "days": "90", "status": "ONGOING", "note": "Defendant files response to the plaint."},
-            {"id": 4, "name": "FRAMING OF ISSUES", "act": "CPC Order XIV", "days": "120", "status": "PENDING", "note": "Court identifies core points of conflict."},
-            {"id": 5, "name": "EVIDENCE (EXAMINATION)", "act": "BSA 2023 Sec 135-140", "days": "200", "status": "PENDING", "note": "Recording of witness testimonies."},
-            {"id": 6, "name": "FINAL ARGUMENTS", "act": "BNSS Sec 350", "days": "300", "status": "PENDING", "note": "Conclusion of legal pleadings."},
-            {"id": 7, "name": "JUDGMENT", "act": "BNSS Sec 392", "days": "330", "status": "PENDING", "note": "Final court verdict and decree."}
-        ]
+        # Litigation Stages (Now fetched from engine)
+        self.stages = self.engine.get_stages()
         
         self._build_ui()
 

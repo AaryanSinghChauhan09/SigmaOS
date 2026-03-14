@@ -24,6 +24,7 @@ import platform
 import threading
 import subprocess
 import shutil
+from typing import Dict, Any, List, Callable, Optional
 from concurrent.futures import ThreadPoolExecutor, as_completed
 
 # Try to resolve SigmaOS interfaces
@@ -32,7 +33,7 @@ try:
 except ImportError:
     class SigmaModuleBase: # type: ignore
         def __init__(self, kernel=None): self.kernel = kernel
-        def log_event(self, *args): pass
+        def log_event(self, action: str, context: Dict[str, Any]): pass
     class ISigmaService: # type: ignore
         def start_service(self): pass
         def stop_service(self): pass
@@ -146,7 +147,7 @@ def _agent_rebalance() -> str:
     return "rebalanced"
 
 
-from sigma_core.system.interfaces import SigmaModuleBase, ISigmaService
+# Redundant import removed to prevent shadowing
 
 class SigmaPerformanceBoost(SigmaModuleBase, ISigmaService):
     """
@@ -157,12 +158,12 @@ class SigmaPerformanceBoost(SigmaModuleBase, ISigmaService):
     def __init__(self, kernel=None):
         SigmaModuleBase.__init__(self, kernel)
 
-    def start_service(self):
-        self.log_event("service_start", {"id": "TurboBoost"})
+    def start_service(self) -> str:
+        self.log_event("service_start", {"id": "TurboBoost"}) # type: ignore
         return "Turbo Boost: ACTIVE"
 
-    def stop_service(self):
-         self.log_event("service_stop", {"id": "TurboBoost"})
+    def stop_service(self) -> None:
+         self.log_event("service_stop", {"id": "TurboBoost"}) # type: ignore
 
     def health_check(self) -> str:
         return "OK - Performance: Optimized"
@@ -174,7 +175,7 @@ class SigmaPerformanceBoost(SigmaModuleBase, ISigmaService):
         print("--- [SIGMAOS TURBO BOOST v2.0 APEX] ---")
         start_cpu = _native_cpu_usage()
 
-        tasks = [
+        tasks: list[Callable[[], str]] = [
             _flush_cache,
             _verify_integrity,
             _scrub_identity,
@@ -184,8 +185,10 @@ class SigmaPerformanceBoost(SigmaModuleBase, ISigmaService):
         ]
 
         results: list[str] = []
-        with ThreadPoolExecutor(max_workers=len(tasks)) as pool:
-            futures = {pool.submit(fn): fn.__name__ for fn in tasks}
+        # Use Any cast to bypass executor signature drifts in static analysis
+        executor: Any = ThreadPoolExecutor(max_workers=len(tasks))
+        with executor as pool:
+            futures = {pool.submit(fn): fn.__name__ for fn in tasks} # type: ignore
             for future in as_completed(futures):
                 try:
                     results.append(future.result())
@@ -210,7 +213,8 @@ class SigmaPerformanceBoost(SigmaModuleBase, ISigmaService):
                      if windll:
                          handle = windll.kernel32.OpenProcess(0x1F0FFF, False, os.getpid())
                          windll.kernel32.SetPriorityClass(handle, 0x00004000) # BELOW_NORMAL
-             except: pass
+             except Exception: # Catch any exceptions during priority setting
+                 pass
         else: # Medium/Normal
              try:
                  if sys.platform == "win32":
