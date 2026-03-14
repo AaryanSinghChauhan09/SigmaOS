@@ -82,6 +82,9 @@ class Biology_Classes_11_12:
         "Transpiration": ("transpire", [("Wind", "5"), ("Humidity", "2")]),
         "Mitosis Phases": ("mitosis", [("Phase", "Metaphase")]),
         "Lung Capacities": ("lung", [("TV (ml)", "500"), ("IRV (ml)", "3000"), ("ERV (ml)", "1100")]),
+        "Pollen Lab": ("pollen", [("Sugar (%)", "10"), ("Time (min)", "30")]),
+        "Pedigree Chart": ("pedigree", [("Father", "Affected"), ("Mother", "Carrier")]),
+        "Water BOD": ("bod", [("DO Day 0", "9"), ("DO Day 5", "4")]),
     }
 
     @staticmethod
@@ -128,6 +131,23 @@ class Biology_Classes_11_12:
     def lung(tv, irv, erv):
         vc = tv + irv + erv
         return {"Vital Capacity (ml)": vc, "IC (Inspiratory)": tv+irv}
+
+    @staticmethod
+    def pollen(s, t):
+        if 5 < s < 15 and t > 20: return {"Status": "SUCCESSFUL GERMINATION", "Tube Length": "Long"}
+        return {"Status": "FAILED", "Reason": "Sugar Mismatch"}
+
+    @staticmethod
+    def pedigree(f, m):
+        f, m = f.lower(), m.lower()
+        if "affected" in f and "carrier" in m: return {"Risk": "50% Affected", "Type": "Sex-Linked Possible"}
+        if "affected" in f and "affected" in m: return {"Risk": "100% Affected", "Status": "Homozygous"}
+        return {"Risk": "Calculating...", "Action": "Check Gen2"}
+
+    @staticmethod
+    def bod(do0, do5):
+        bod_val = do0 - do5
+        return {"BOD (mg/L)": bod_val, "Quality": "Clean" if bod_val < 3 else "Polluted"}
 
 BIOLOGY_REGISTRY = {
     "Classes 6-10": Biology_Classes_6_10,

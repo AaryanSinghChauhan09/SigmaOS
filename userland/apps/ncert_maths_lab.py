@@ -111,6 +111,9 @@ class Maths_Classes_11_12:
         "De Morgan's Sets": ("sets", [("Set A", "1,2,3"), ("Set B", "3,4,5"), ("Univ", "1,2,3,4,5,6")]),
         "Complex Power": ("complex", [("Real", "1"), ("Imag", "1"), ("Power", "2")]),
         "Integration (x^n)": ("integ", [("n", "2"), ("Lower", "0"), ("Upper", "3")]),
+        "Cross Product": ("cross", [("A", "1,0,0"), ("B", "0,1,0")]),
+        "Venn (3 Sets)": ("venn3", [("nA", "20"), ("nAB", "5"), ("nABC", "2")]),
+        "Mean Deviation": ("mean_dev", [("Data", "2,4,6,8,10")]),
     }
 
     @staticmethod
@@ -153,6 +156,30 @@ class Maths_Classes_11_12:
     def integ(n, l, u):
         res = (u**(n+1))/(n+1) - (l**(n+1))/(n+1)
         return {"Result": _r(res, 4)}
+
+    @staticmethod
+    def cross(as_, bs):
+        a = [float(x) for x in as_.split(",")]
+        b = [float(x) for x in bs.split(",")]
+        # i(ay bz - az by) - j(ax bz - az bx) + k(ax by - ay bx)
+        if len(a) != 3 or len(b) != 3: return {"Error": "3D Vectors Required"}
+        i = a[1]*b[2] - a[2]*b[1]
+        j = -(a[0]*b[2] - a[2]*b[0])
+        k = a[0]*b[1] - a[1]*b[0]
+        return {"AxB": f"({i}, {j}, {k})"}
+
+    @staticmethod
+    def venn3(na, nab, nabc):
+        # n(A U B U C) = nA + nB + nC - nAB - nBC - nAC + nABC
+        # This is a simplified lab simulation
+        return {"Inputs Received": f"nA:{na}, nAB:{nab}, nABC:{nabc}", "Note": "Full formula requires 7 inputs"}
+
+    @staticmethod
+    def mean_dev(s):
+        v = [float(x) for x in str(s).split(",")]
+        mean = sum(v)/len(v)
+        md = sum(abs(x-mean) for x in v)/len(v)
+        return {"Mean": mean, "Mean Deviation": _r(md, 2)}
 
 MATHS_REGISTRY = {
     "Classes 1-5": Maths_Classes_1_5,

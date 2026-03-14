@@ -138,7 +138,3 @@ class MeshLudo(tk.Tk):
 if __name__ == "__main__":
     app = MeshLudo()
     app.mainloop()
-
-if __name__ == "__main__":
-    app = MeshLudo()
-    app.mainloop()

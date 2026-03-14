@@ -71,6 +71,9 @@ class Chemistry_Classes_11_12:
         "EAN Finder": ("ean", [("Z", "26"), ("OxState", "2"), ("CN", "6")]),
         "Free Energy (G)": ("gibbs", [("H (kJ)", "100"), ("S (J/K)", "50"), ("T (K)", "298")]),
         "Boiling Elevation": ("boiling", [("Kb", "0.52"), ("m (molal)", "1"), ("i", "1")]),
+        "Functional Groups": ("functional", [("Sample", "Vinegar")]),
+        "Salt Analysis": ("salt_anal", [("Color", "Blue"), ("Flame", "Green")]),
+        "Molarity Lab": ("molarity", [("Mass (g)", "4"), ("MW", "40"), ("Vol (L)", "1")]),
     }
 
     @staticmethod
@@ -113,6 +116,27 @@ class Chemistry_Classes_11_12:
     def boiling(kb, m, i):
         dt = i * kb * m
         return {"Delta Tb": _r(dt, 3)}
+
+    @staticmethod
+    def functional(s):
+        s = s.lower()
+        if "vinegar" in s or "acetic" in s: return {"Group": "-COOH (Carboxylic Acid)", "Test": "Effervescence with NaHCO3"}
+        if "alcohol" in s or "ethanol" in s: return {"Group": "-OH (Alcohol)", "Test": "Ester formation with Acid"}
+        if "acetone" in s: return {"Group": ">C=O (Ketone)", "Test": "Sodium Nitroprusside"}
+        return {"Group": "Unknown", "Action": "Perform Lucas Test"}
+
+    @staticmethod
+    def salt_anal(c, f):
+        c, f = c.lower(), f.lower()
+        if "blue" in c or "green" in f: return {"Cation": "Cu2+", "Confirmation": "Deep blue with Ammonia"}
+        if "brick red" in f: return {"Cation": "Ca2+", "Confirmation": "White ppt with Ammonium Oxalate"}
+        if "white" in c and "apple green" in f: return {"Cation": "Ba2+", "Confirmation": "Yellow ppt with K2CrO4"}
+        return {"Cation": "Needs Wet Test", "Action": "Add NaOH"}
+
+    @staticmethod
+    def molarity(m, mw, v):
+        mol = m/mw
+        return {"Molarity (M)": _r(mol/v, 3)}
 
 CHEMISTRY_REGISTRY = {
     "Classes 6-10": Chemistry_Classes_6_10,

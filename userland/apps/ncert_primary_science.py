@@ -23,6 +23,9 @@ class Science_Primary_Classes:
         "Family Roles": ("family", [("Role", "Father")]),
         "Animal Sounds": ("voices", [("Animal", "Dog")]),
         "Habit Checker": ("habits", [("Action", "Brushing teeth")]),
+        "Body Parts": ("organs", [("Part", "Heart")]),
+        "Pollution": ("pollution", [("Source", "Smoke")]),
+        "Safety Rule": ("safety", [("Status", "Red Light")]),
     }
 
     @staticmethod
@@ -109,6 +112,27 @@ class Science_Primary_Classes:
     def habits(a):
         good = ["brushing", "bathing", "washing", "studying"]
         return {"Quality": "GOOD" if any(x in a.lower() for x in good) else "NEEDS IMPROVEMENT"}
+
+    @staticmethod
+    def organs(p):
+        d = {"heart": "Pumps Blood", "lungs": "Breathe", "stomach": "Digests"}
+        return {"Function": d.get(p.lower(), "Supports Life")}
+
+    @staticmethod
+    def pollution(s):
+        s = s.lower()
+        if "smoke" in s: return {"Type": "Air Pollution"}
+        if "garbage" in s: return {"Type": "Land Pollution"}
+        if "noise" in s: return {"Type": "Noise Pollution"}
+        return {"Type": "Environmental Harm"}
+
+    @staticmethod
+    def safety(s):
+        s = s.lower()
+        if "red" in s: return {"Action": "STOP"}
+        if "green" in s: return {"Action": "GO"}
+        if "yellow" in s: return {"Action": "WAIT"}
+        return {"Action": "Be Careful"}
 
 SCIENCE_PRIMARY_REGISTRY = {
     "Primary EVS (1-5)": Science_Primary_Classes

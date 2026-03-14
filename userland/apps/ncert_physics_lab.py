@@ -96,8 +96,12 @@ class Physics_Classes_11_12:
         "Viscosity (Stokes)": ("visco", [("Radius (mm)", "1"), ("Density_s", "7800"), ("Density_f", "1260"), ("vTerm", "0.5")]),
         "Biot-Savart (Loop)": ("biot_loop", [("Current (A)", "5"), ("Radius (cm)", "10"), ("Dist z (cm)", "0")]),
         "Torque on Loop": ("torque", [("B (T)", "0.5"), ("Area (m²)", "0.02"), ("Current (A)", "2"), ("Angle", "30")]),
-        "Escape Velocity": ("escape", [("Planet Mass (kg)", "5.97e24"), ("Radius (km)", "6371")]),
-        "Carnot Efficiency": ("carnot", [("Th (K)", "600"), ("Tc (K)", "300")]),
+        "Esc Velocity": ("escape", [("Planet Mass (kg)", "5.97e24"), ("Radius (km)", "6371")]),
+        "Carnot Eff %": ("carnot", [("Th (K)", "600"), ("Tc (K)", "300")]),
+        "Vernier Callipers": ("vernier", [("MS Reading (cm)", "1.2"), ("VS Division", "4"), ("LC (cm)", "0.01")]),
+        "Screw Gauge": ("screw_gauge", [("PSR (mm)", "5"), ("HSD", "32"), ("LC (mm)", "0.01")]),
+        "Meter Bridge": ("meter_bridge", [("Known R (Ω)", "2"), ("Balancing l (cm)", "40")]),
+        "Potentiometer": ("potentiometer", [("E1 (V)", "2.0"), ("l1 (cm)", "150"), ("l2 (cm)", "220")]),
     }
 
     @staticmethod
@@ -155,6 +159,27 @@ class Physics_Classes_11_12:
     def carnot(th, tc):
         eff = 1 - (tc/th)
         return {"Efficiency %": _r(eff*100, 2)}
+
+    @staticmethod
+    def vernier(msr, vsd, lc):
+        total = msr + (vsd * lc)
+        return {"Thickness (cm)": _r(total, 3)}
+
+    @staticmethod
+    def screw_gauge(psr, hsd, lc):
+        total = psr + (hsd * lc)
+        return {"Diameter (mm)": _r(total, 3)}
+
+    @staticmethod
+    def meter_bridge(r, l):
+        x = (r * (100 - l)) / l
+        return {"Unknown X (Ω)": _r(x, 2)}
+
+    @staticmethod
+    def potentiometer(e1, l1, l2):
+        # Comparison of EMF: E2 = E1 * (l2/l1)
+        e2 = e1 * (l2 / l1)
+        return {"EMF E2 (V)": _r(e2, 3)}
 
 PHYSICS_REGISTRY = {
     "Classes 6-10": Physics_Classes_6_10,

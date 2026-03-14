@@ -7,6 +7,7 @@ Absorbs USP of: PowerBI (local), Tableau (private), and Jupyter (sovereign).
 
 import time
 import random
+import os
 from .interfaces import SigmaModuleBase, ISigmaService
 from userland.system_api.sigma_std import SigmaMath
 

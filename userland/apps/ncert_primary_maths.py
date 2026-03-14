@@ -18,6 +18,9 @@ class Maths_Primary:
         "Money Calc": ("money", [("Rs", "10"), ("Paise", "50"), ("Count", "3")]),
         "Sorting Order": ("sort", [("Data", "5,2,9,1,7")]),
         "Equal Sharing": ("divide", [("Total", "20"), ("Friends", "4")]),
+        "Skip Count": ("skip", [("Start", "2"), ("Step", "3"), ("Count", "5")]),
+        "Roman Digit": ("roman", [("N", "9")]),
+        "Perimeter": ("perimeter", [("Shape", "Square"), ("Side", "5")]),
     }
 
     @staticmethod
@@ -76,6 +79,23 @@ class Maths_Primary:
     def divide(t, f):
         t, f = int(t), int(f)
         return {"Each child gets": t//f, "Leftover": t%f}
+
+    @staticmethod
+    def skip(s, step, c):
+        res = [int(s) + i*int(step) for i in range(int(c))]
+        return {"Sequence": ", ".join(map(str, res))}
+
+    @staticmethod
+    def roman(n):
+        d = {1:"I", 2:"II", 3:"III", 4:"IV", 5:"V", 6:"VI", 7:"VII", 8:"VIII", 9:"IX", 10:"X"}
+        return {"Roman": d.get(int(n), "Out of Range")}
+
+    @staticmethod
+    def perimeter(sh, s):
+        sh = sh.lower(); s = int(s)
+        if "square" in sh: return {"Perimeter": 4*s}
+        if "triangle" in sh: return {"Perimeter": 3*s}
+        return {"Perimeter": "Unknown Shape"}
 
 PRIMARY_MATHS_REGISTRY = {
     "Primary Math (1-5)": Maths_Primary
