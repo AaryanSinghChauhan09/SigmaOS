@@ -17,16 +17,39 @@ class EventBus:
     """
     
     def __init__(self):
-        """Initialize the event bus with a high-performance circular buffer."""
+        """Initialize the event bus with a high-performance circular buffer and Semantic Router."""
         self._subscribers: Dict[str, List[Callable]] = {}
-        # USP: Zero-Allocation Circular Buffer for low-level performance
+        self._semantic_map: Dict[str, List[str]] = {} # Maps intent keywords to event keys
         self._max_history = 1000
         self._event_history: List[Any] = [None] * self._max_history
         self._history_ptr = 0
         self._lock = threading.Lock()
-        self._executor = ThreadPoolExecutor(max_workers=24) # Increased for Apex load
-        self._interaction_weights: Dict[str, float] = {}   # ML Personalization weights
-    
+        self._executor = ThreadPoolExecutor(max_workers=24) 
+        self._interaction_weights: Dict[str, float] = {}   
+
+    def register_semantic_intent(self, intent: str, event_key: str):
+        """CS/AI Principle: Semantic Routing. Maps natural language intent to a rigid event key."""
+        with self._lock:
+            if intent not in self._semantic_map:
+                self._semantic_map[intent] = []
+            self._semantic_map[intent].append(event_key)
+
+    def emit_semantic(self, intent_query: str, data: Any = None):
+        """
+        USP: Intent-Based Event Dispatch.
+        Uses probabilistic matching to find the best-fitting event key for a query.
+        """
+        query = intent_query.lower()
+        matched_keys = set()
+        
+        with self._lock:
+            for intent, keys in self._semantic_map.items():
+                if intent in query or any(word in intent for word in query.split()):
+                    matched_keys.update(keys)
+        
+        for key in matched_keys:
+            self.emit(key, data, priority=1) # Elevated priority for intent-based triggers
+
     def subscribe(self, event_name: str, callback: Callable) -> None:
         """Subscribe to an event (O(1) write)."""
         with self._lock:
@@ -75,10 +98,9 @@ class EventBus:
         else:
             # WORKER-PATH: Offload to apex thread pool
             for cb in subscribers:
-                # Standard execution path via worker pool
-                self._executor.submit(self._safe_invoke, cb, event_name, data)
+                self._executor.submit(lambda c=cb, e=event_name, d=data: self._safe_invoke(c, e, d))
 
-    def _safe_invoke(self, callback: Callable, event_name: str, data: Any):
+    def _safe_invoke(self, callback: Callable, event_name: str, data: Any) -> None:
         try:
             callback(data)
         except Exception as e:

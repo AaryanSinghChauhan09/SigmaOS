@@ -77,6 +77,10 @@ from gui_pkg.warden_page import WardenPage
 from gui_pkg.linux_parity_page import LinuxParityPage
 from gui_pkg.silo_page import SiloPage
 from gui_pkg.intelligence_hub_page import IntelligenceHubPage
+from gui_pkg.apex_page import ApexPage
+from gui_pkg.nexus_page import NexusPage
+from gui_pkg.writesense_page import WritesensePage
+from gui_pkg.flow_page import FlowPage
 
 class SigmaGUI(tk.Tk, UIMixin):
     """Main SigmaOS GUI application window."""
@@ -809,7 +813,6 @@ class SigmaGUI(tk.Tk, UIMixin):
             "automation_hub":   self._build_automation_hub_page,
             "ai_lifecycle":     self._build_ai_lifecycle_page,
             "zenith":           self._build_zenith_page,
-            "apex":            self._build_apex_page,
             "config_hub":       lambda: self._set_modular_page("config_hub", ConfigHubPage),
             "gaming_hub":       lambda: self._set_modular_page("gaming_hub", ArcadePage),
             "system_audit":     lambda: self._set_modular_page("system_audit", AuditViewPage),
@@ -844,6 +847,10 @@ class SigmaGUI(tk.Tk, UIMixin):
             "store":           lambda: self._set_modular_page("store", StorePage),
             "ag_guide":        lambda: self._set_modular_page("ag_guide", AGGuidePage),
             "aether":          lambda: self._set_modular_page("aether", AetherOrchPage),
+            "apex":            lambda: self._set_modular_page("apex", ApexPage),
+            "nexus":           lambda: self._set_modular_page("nexus", NexusPage),
+            "writesense":      lambda: self._set_modular_page("writesense", WritesensePage),
+            "flow":            lambda: self._set_modular_page("flow", FlowPage),
         }
         
         # Oracle VM Discovery (Professional Integration)

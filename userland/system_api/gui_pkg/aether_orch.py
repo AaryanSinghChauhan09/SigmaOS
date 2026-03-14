@@ -57,6 +57,25 @@ class AetherOrchPage(SigmaPage):
         r_fr = tk.Frame(body, bg=PAL["bg"])
         r_fr.pack(side="left", fill="both", expand=True, padx=10, pady=10)
 
-        a_log = self.gui._console(r_fr, height=30)
+        # COMPETITOR CRUSHER (USP)
+        crush_c = self.gui._card(r_fr, "🛸 Sovereign Competitor Crusher (AI USP)")
+        crush_c.master.pack(fill="x", pady=(0, 10))
+        
+        tk.Label(crush_c, text="Target OS Models: Windows 11 Copilot, macOS Sequoia", font=FONT_SMALL, fg=PAL["dim"], bg=PAL["card"]).pack(anchor="w")
+        ttk.Button(crush_c, text="Launch Benchmark War-Room", 
+                   command=lambda: self.gui._show_page("war_room")).pack(side="left", padx=5, pady=5)
+        
+        # NEURAL CONTENT SANITIZER (USP)
+        san_c = self.gui._card(r_fr, "🧠 Neural Content Sanitizer (ML USP)")
+        san_c.master.pack(fill="x", pady=10)
+        tk.Label(san_c, text="Sanitization Mode: ADAPTIVE (Child-Safe + Professional)", font=FONT_SMALL, fg=PAL["teal"], bg=PAL["card"]).pack(anchor="w")
+        
+        def toggle_san():
+            self.gui.kernel.registry.get("aether_orch").toggle_sanitization()
+            self.gui._log(a_log, "[AI] Neural Sanitizer threshold adjusted for peak cognitive flow.", "OK")
+            
+        ttk.Button(san_c, text="Re-Calibrate Sanitizer", command=toggle_san).pack(side="left", padx=5, pady=5)
+
+        a_log = self.gui._console(r_fr, height=20)
         a_log.pack(fill="both", expand=True)
         self.gui._log(a_log, "Aether core online. Quantum intent routing ready for collaborative analysis.", "INFO")
