@@ -48,7 +48,6 @@ def main():
     
     t.join()
     print("[STRESS] Test sequence complete.")
-    kernel.shutdown()
 
 if __name__ == "__main__":
     main()
