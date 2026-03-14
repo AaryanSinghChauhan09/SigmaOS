@@ -106,15 +106,40 @@ class SigmaModeManager:
                 "Routines_On_Exit": ["deactivate_ad_blocker"]
             },
             "Performance": {
-                "CPU_Priority": "High",
-                "GPU_Profile": "Performance",
-                "RAM_Focus": "Low_Latency",
-                "Background_Task_Limit": 20,
-                "Description": "Maximum throughput for compute‑heavy workloads.",
-                "AI_Config": {"max_depth": 5, "max_tokens": 1024, "style": "Direct", "tool_budget": "Efficient"},
-                "Kernel_Flags": ["turbo-boost-max", "disable-power-saving"],
-                "Routines_On_Enter": ["monitor_cpu_temp"],
-                "Routines_On_Exit": []
+                "CPU_Priority": "High", "GPU_Profile": "Performance", "RAM_Focus": "Low_Latency",
+                "Background_Task_Limit": 20, "Description": "Maximum throughput for work."
+            },
+            "Battery_Saver": {
+                "CPU_Priority": "Ultra-Low", "GPU_Profile": "Minimal", "RAM_Focus": "Essential",
+                "Background_Task_Limit": 2, "Description": "Aggressive energy saving."
+            },
+            "Cinema": {
+                "CPU_Priority": "Low", "GPU_Profile": "Video", "RAM_Focus": "Buffer",
+                "Background_Task_Limit": 2, "Description": "Media immersion profile."
+            },
+            "Sleep": {
+                "CPU_Priority": "Idle", "GPU_Profile": "Off", "RAM_Focus": "Compressed",
+                "Background_Task_Limit": 0, "Description": "Deep rest orchestration."
+            },
+            "Driving": {
+                "CPU_Priority": "Balanced", "GPU_Profile": "Standard", "RAM_Focus": "Nav",
+                "Background_Task_Limit": 5, "Description": "Safe travel assistance."
+            },
+            "Meeting": {
+                "CPU_Priority": "Balanced", "GPU_Profile": "Low", "RAM_Focus": "VoIP",
+                "Background_Task_Limit": 3, "Description": "Conferencing stability."
+            },
+            "Relax": {
+                "CPU_Priority": "Low", "GPU_Profile": "Low", "RAM_Focus": "Audio",
+                "Background_Task_Limit": 5, "Description": "Ambient environment."
+            },
+            "Meditation": {
+                "CPU_Priority": "Zen", "GPU_Profile": "Off", "RAM_Focus": "Locked",
+                "Background_Task_Limit": 0, "Description": "Absolute mindfulness."
+            },
+            "Work": {
+                "CPU_Priority": "Balanced", "GPU_Profile": "Standard", "RAM_Focus": "App_Speed",
+                "Background_Task_Limit": 15, "Description": "Productivity focus."
             },
             "Resource_Saving": {
                 "CPU_Priority": "Low",
@@ -126,6 +151,34 @@ class SigmaModeManager:
                 "Kernel_Flags": ["power-save-aggressive", "cpu-throttle"],
                 "Routines_On_Enter": ["dim_display", "disable_animations"],
                 "Routines_On_Exit": ["restore_display", "enable_animations"]
+            },
+            "Cooking": {
+                "CPU_Priority": "Balanced", "GPU_Profile": "Low", "RAM_Focus": "Web",
+                "Background_Task_Limit": 10, "Description": "Kitchen assistant mode."
+            },
+            "Health": {
+                "CPU_Priority": "Balanced", "GPU_Profile": "Low", "RAM_Focus": "Sensors",
+                "Background_Task_Limit": 5, "Description": "Wellness tracking focus."
+            },
+            "Outdoor": {
+                "CPU_Priority": "Balanced", "GPU_Profile": "High_Contrast", "RAM_Focus": "Gps",
+                "Background_Task_Limit": 5, "Description": "Outdoor visibility profile."
+            },
+            "Family": {
+                "CPU_Priority": "Balanced", "GPU_Profile": "Standard", "RAM_Focus": "Shared",
+                "Background_Task_Limit": 20, "Description": "Multi-user safe environment."
+            },
+            "Event": {
+                "CPU_Priority": "Balanced", "GPU_Profile": "Standard", "RAM_Focus": "Streaming",
+                "Background_Task_Limit": 10, "Description": "Live orchestration."
+            },
+            "Study": {
+                "CPU_Priority": "Balanced", "GPU_Profile": "Low", "RAM_Focus": "Document",
+                "Background_Task_Limit": 2, "Description": "Academic immersion."
+            },
+            "Custom": {
+                "CPU_Priority": "User", "GPU_Profile": "User", "RAM_Focus": "User",
+                "Background_Task_Limit": 15, "Description": "User-defined profile."
             },
             "Bare_Minimum": {
                 "CPU_Priority": "Idle_Only",
@@ -394,6 +447,10 @@ class SigmaModeManager:
             self.kernel.prewarmer.purge_cold_apps()
         self._current_mode = mode_name
         
+        # Emit Global Bus Event for DNA Recalibration
+        if self.kernel and hasattr(self.kernel, "bus"):
+            self.kernel.bus.emit("mode.change", {"mode": mode_name})
+
         # Link to Global Config (Apex Feature Sync)
         if self.kernel and hasattr(self.kernel, "registry"):
             config = self.kernel.registry.get("config")

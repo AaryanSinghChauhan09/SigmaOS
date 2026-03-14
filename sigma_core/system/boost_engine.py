@@ -85,7 +85,7 @@ def _flush_cache() -> str:
 def _verify_integrity() -> str:
     print("      [2/6] AUDITING: Bit-Level System Integrity...")
     try:
-        from sigma_core.integrity import IntegrityGuard
+        from sigma_core.security.integrity import IntegrityGuard
         guard = IntegrityGuard()
         res = guard.verify_system_integrity()
         print(f"      [2/6] SUCCESS: Status={res.get('status', 'UNKNOWN')}")
@@ -184,6 +184,30 @@ class SigmaPerformanceBoost(SigmaModuleBase, ISigmaService):
         end_cpu = _native_cpu_usage()
         print(f"\n--- [BOOST COMPLETE] ---")
         print(f"    Tasks finished: {len(results)}/6 | CPU Δ: {abs(end_cpu - start_cpu):.2f}% | Stability: PURE")
+
+    def apply_tuning(self, intensity: str):
+        """USP: Intensity-Aware Real-time Scaling."""
+        print(f"    [BOOST] Applying {intensity} intensity tuning...")
+        if intensity == "High":
+             _native_set_high_priority()
+             _native_trim_working_set()
+        elif intensity == "Eco":
+             # Decrease priority on Windows
+             try:
+                 if sys.platform == "win32":
+                     windll = getattr(ctypes, "windll", None)
+                     if windll:
+                         handle = windll.kernel32.OpenProcess(0x1F0FFF, False, os.getpid())
+                         windll.kernel32.SetPriorityClass(handle, 0x00004000) # BELOW_NORMAL
+             except: pass
+        else: # Medium/Normal
+             try:
+                 if sys.platform == "win32":
+                     windll = getattr(ctypes, "windll", None)
+                     if windll:
+                         handle = windll.kernel32.OpenProcess(0x1F0FFF, False, os.getpid())
+                         windll.kernel32.SetPriorityClass(handle, 0x00000020) # NORMAL
+             except: pass
 
 if __name__ == "__main__":
     eng = SigmaPerformanceBoost()

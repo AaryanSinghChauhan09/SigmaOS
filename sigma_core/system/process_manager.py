@@ -171,10 +171,26 @@ class SigmaProcessManager:
         for p in self._procs.values():
             factor = float(global_cpu / 100.0) if global_cpu > 0 else 1.0
             
-            # USP: Vibe-aware Throttling
-            if vibe == "RESOURCE_SAVING" and p.qos in [QoSClass.BACKGROUND, QoSClass.UTILITY]:
-                 factor *= 0.1 # Throttle deep
-                 
+            # USP: Vibe-aware Throttling (DNA Recalibration)
+            if vibe in ["RESOURCE_SAVING", "BATTERY", "SLEEP"]:
+                 if p.qos in [QoSClass.BACKGROUND, QoSClass.UTILITY]:
+                      factor *= 0.1 # Deep Throttle
+                 else:
+                      factor *= 0.5 # Conservative
+            elif vibe == "FOCUS" or vibe == "ZEN":
+                 if p.qos != QoSClass.USER_INTERACTIVE:
+                      factor *= 0.3 # Quiet background
+            elif vibe == "CINEMA":
+                 if p.qos != QoSClass.REALTIME: # Keep audio/video smooth
+                      factor *= 0.4
+            elif vibe == "EMERGENCY":
+                 factor = 2.0 if p.qos == QoSClass.REALTIME else 0.1
+            elif vibe == "GAMING":
+                 if p.qos == QoSClass.USER_INTERACTIVE:
+                      factor *= 1.5 
+                 else:
+                      factor *= 0.2
+            
             p.cpu_pct = s_round(float(p.cpu_pct) * factor, 1)
             total_p_cpu += p.cpu_pct
             

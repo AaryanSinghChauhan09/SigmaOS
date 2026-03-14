@@ -24,6 +24,51 @@ THEMES = {
         "background": "#050A05", "surface": "#101A10", "primary": "#32D74B",
         "secondary": "#8E8E93", "accent": "#FF9F0A", "text_primary": "#F0FFF0",
         "border": "#203A20"
+    },
+    "ZEN_FOCUS": {
+        "background": "#05050A", "surface": "#0E0E1A", "primary": "#5E5CE6",
+        "secondary": "#AF52DE", "accent": "#007AFF", "text_primary": "#E5E5EA",
+        "border": "#1C1C2E"
+    },
+    "CINEMA_NIGHT": {
+        "background": "#000000", "surface": "#120A05", "primary": "#FF9F0A",
+        "secondary": "#FF3B30", "accent": "#FFD60A", "text_primary": "#FFDDA1",
+        "border": "#2A1808"
+    },
+    "STUDY_MINT": {
+        "background": "#050A08", "surface": "#101F18", "primary": "#66FFB2",
+        "secondary": "#30D158", "accent": "#BF5AF2", "text_primary": "#E0FFE0",
+        "border": "#153025"
+    },
+    "WORK_STEEL": {
+        "background": "#08090A", "surface": "#14171A", "primary": "#64D2FF",
+        "secondary": "#A2ADB9", "accent": "#0A84FF", "text_primary": "#E1E8ED",
+        "border": "#2C343B"
+    },
+    "CRIMSON_ALIVE": {
+        "background": "#0A0505", "surface": "#1F1010", "primary": "#FF3B30",
+        "secondary": "#FF453A", "accent": "#FF9F0A", "text_primary": "#FFE0E0",
+        "border": "#401515"
+    },
+    "VITAL_WARM": {
+        "background": "#0A0805", "surface": "#1F1810", "primary": "#FF9500",
+        "secondary": "#FFCC00", "accent": "#FF3B30", "text_primary": "#FFF4E0",
+        "border": "#402515"
+    },
+    "TRAVEL_HORIZON": {
+        "background": "#05080A", "surface": "#101820", "primary": "#5AC8FA",
+        "secondary": "#007AFF", "accent": "#32D74B", "text_primary": "#E0F5FF",
+        "border": "#152535"
+    },
+    "GAMING_NEON": {
+        "background": "#05000A", "surface": "#110022", "primary": "#BF5AF2",
+        "secondary": "#FF375F", "accent": "#00D4FF", "text_primary": "#F5E0FF",
+        "border": "#330066"
+    },
+    "BATTERY_OLIVE": {
+        "background": "#080805", "surface": "#12120A", "primary": "#AABB66",
+        "secondary": "#8E8E93", "accent": "#FFCC00", "text_primary": "#DDEEAA",
+        "border": "#222215"
     }
 }
 

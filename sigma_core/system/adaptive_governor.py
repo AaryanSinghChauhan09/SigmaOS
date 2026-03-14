@@ -35,35 +35,81 @@ class AdaptiveGovernor(SigmaModuleBase):
         vibe_map = {
             "APEX": "APEX_GOLD",
             "RESOURCE_SAVING": "FOREST_ECO",
-            "STANDARD": "DEEP_SPACE"
+            "STANDARD": "DEEP_SPACE",
+            "FOCUS": "ZEN_FOCUS",
+            "CINEMA": "CINEMA_NIGHT",
+            "STUDY": "STUDY_MINT",
+            "WORK": "WORK_STEEL",
+            "EMERGENCY": "CRIMSON_ALIVE",
+            "WARM": "VITAL_WARM",
+            "TRAVEL": "TRAVEL_HORIZON",
+            "GAMING": "GAMING_NEON",
+            "BATTERY": "BATTERY_OLIVE"
         }
         # Thread-safe theme update
         FluidTheme.set_vibe(vibe_map.get(vibe_name, "DEEP_SPACE"))
         
         if self.kernel and hasattr(self.kernel, "bus"):
-            # Emit kernel event for other modules to react
             self.kernel.bus.emit("governor.vibe_switch", {"vibe": vibe_name})
             print(f"[AURA] Switched to {vibe_name} aesthetic.")
 
     def start_service(self) -> str:
-        # Subscribe to mode changes to adjust system DNA
         if self.kernel and hasattr(self.kernel, "bus"):
             self.kernel.bus.subscribe("mode.change", self._on_mode_change)
             self.kernel.bus.subscribe("eco.green_window", self._on_eco_window)
         return "Adaptive Governor: Orchestration Mesh Online."
 
     def _on_mode_change(self, payload: Dict[str, Any]):
-        """USP: Dynamic DNA Shift. Recalibrates all shards when OS mode changes."""
-        mode = payload.get("mode", "Standard").upper()
+        """USP: Global DNA Orchestration. 20+ Modes Supported."""
+        mode = payload.get("mode", "Standard").upper().replace(" ", "_")
         self.log_event("dna_shift", {"target_mode": mode})
 
-        if mode == "GAMING" or mode == "APEX":
+        # Performance & Power
+        if mode in ["PERFORMANCE", "APEX"]:
             self._apply_profile(perf=2.0, eco=False, scheduler="QUANTUM")
             self.switch_vibe("APEX")
-        elif mode == "RESOURCE_SAVING":
-            self._apply_profile(perf=0.5, eco=True, scheduler="BATCH")
+        elif mode in ["BATTERY_SAVER", "RESOURCE_SAVING", "SLEEP"]:
+            self._apply_profile(perf=0.4, eco=True, scheduler="BATCH")
+            self.switch_vibe("BATTERY" if "BATTERY" in mode else "RESOURCE_SAVING")
+        
+        # Focus & Zen
+        elif mode in ["DO_NOT_DISTURB", "FOCUS", "MEDITATION", "RELAX"]:
+            self._apply_profile(perf=0.8, eco=False, scheduler="SILENT")
+            self.switch_vibe("FOCUS")
+        
+        # Educational & Professionals
+        elif mode == "STUDY":
+            self._apply_profile(perf=1.1, eco=False, scheduler="NORMAL")
+            self.switch_vibe("STUDY")
+        elif mode in ["WORK", "MEETING", "DRIVING"]:
+            self._apply_profile(perf=1.2, eco=False, scheduler="NORMAL")
+            self.switch_vibe("WORK")
+        
+        # Entertainment & Lifestyle
+        elif mode == "GAMING":
+            self._apply_profile(perf=2.0, eco=False, scheduler="QUANTUM")
+            self.switch_vibe("GAMING")
+        elif mode == "CINEMA":
+            self._apply_profile(perf=0.6, eco=False, scheduler="BATCH")
+            self.switch_vibe("CINEMA")
+        elif mode == "TRAVEL":
+            self._apply_profile(perf=0.7, eco=True, scheduler="BATCH")
+            self.switch_vibe("TRAVEL")
+        elif mode in ["FAMILY", "COOKING", "EVENT"]:
+            self._apply_profile(perf=1.0, eco=False, scheduler="NORMAL")
+            self.switch_vibe("WARM")
+            
+        # Health & Environment
+        elif mode in ["HEALTH", "OUTDOOR"]:
+            self._apply_profile(perf=0.9, eco=True, scheduler="NORMAL")
             self.switch_vibe("RESOURCE_SAVING")
-        else:
+            
+        # Critical
+        elif mode == "EMERGENCY":
+            self._apply_profile(perf=3.0, eco=False, scheduler="QUANTUM")
+            self.switch_vibe("EMERGENCY")
+            
+        else: # CUSTOM or STANDARD
             self._apply_profile(perf=1.0, eco=False, scheduler="NORMAL")
             self.switch_vibe("STANDARD")
 
