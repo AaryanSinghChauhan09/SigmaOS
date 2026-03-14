@@ -26,6 +26,9 @@ class Science_Primary_Classes:
         "Body Parts": ("organs", [("Part", "Heart")]),
         "Pollution": ("pollution", [("Source", "Smoke")]),
         "Safety Rule": ("safety", [("Status", "Red Light")]),
+        "Shadow Length": ("shadow", [("Time (hr 1-12)", "12")]),
+        "Magnet Fun": ("magnet", [("Pole A", "North"), ("Pole B", "North")]),
+        "Planets": ("planets", [("Pos (1-8)", "3")]),
     }
 
     @staticmethod
@@ -133,6 +136,22 @@ class Science_Primary_Classes:
         if "green" in s: return {"Action": "GO"}
         if "yellow" in s: return {"Action": "WAIT"}
         return {"Action": "Be Careful"}
+
+    @staticmethod
+    def shadow(t):
+        t = int(t)
+        if t == 12: return {"Length": "Shortest", "Reason": "Sun Overhead"}
+        return {"Length": "Long", "Reason": "Sun at Angle"}
+
+    @staticmethod
+    def magnet(a, b):
+        if a.lower() == b.lower(): return {"Action": "REPEL", "Status": "Same Poles"}
+        return {"Action": "ATTRACT", "Status": "Opposite Poles"}
+
+    @staticmethod
+    def planets(p):
+        d = {1:"Mercury", 2:"Venus", 3:"Earth", 4:"Mars", 5:"Jupiter", 6:"Saturn", 7:"Uranus", 8:"Neptune"}
+        return {"Planet": d.get(int(p), "Pluto (Dwarf)")}
 
 SCIENCE_PRIMARY_REGISTRY = {
     "Primary EVS (1-5)": Science_Primary_Classes

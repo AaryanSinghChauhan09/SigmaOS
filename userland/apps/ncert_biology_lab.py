@@ -74,6 +74,7 @@ class Biology_Classes_11_12:
     TITLE = "Senior Biology: Research & Advanced Logic"
     EXP_DATA = {
         "Mendel Dihybrid": ("mendel", [("P1", "RrYy")]),
+        "Mendel Monohybrid": ("monohybrid", [("P1", "Tt")]),
         "Hardy-Weinberg": ("hardy", [("p-freq", "0.6"), ("Pop", "1000")]),
         "RQ Substrate": ("rq", [("CO2 Vol", "1"), ("O2 Vol", "1")]),
         "DNA Complement": ("dna", [("Seq", "ATGCGTA")]),
@@ -90,11 +91,19 @@ class Biology_Classes_11_12:
         "DNA Isolation": ("dna_iso", [("Ethanol (C)", "-20"), ("Sample", "Papaya")]),
         "Soil Moisture": ("soil", [("Wt_wet", "100"), ("Wt_dry", "85")]),
         "Urine Test": ("urine", [("Sugar (1/0)", "1"), ("Albumin", "0")]),
+        "Potometer Rate": ("potometer", [("Air Bubble Dist (cm)", "5"), ("Time (min)", "10")]),
+        "Pollen Growth": ("pollen_grow", [("Sucrose (%)", "10"), ("Incubation (hr)", "2")]),
+        "Onion Peel Slide": ("onion_slide", [("Stain", "Safranin")]),
+        "Hydrilla Experiment": ("hydrilla", [("Light", "Strong"), ("Time (min)", "60")]),
     }
 
     @staticmethod
     def mendel(p):
         return {"Ratio": "9:3:3:1 (Mendelian Dihybrid)"}
+
+    @staticmethod
+    def monohybrid(p):
+        return {"Genotype Ratio": "1:2:1 (TT:Tt:tt)", "Phenotype Ratio": "3:1 (Tall:Dwarf)"}
 
     @staticmethod
     def hardy(p, n):
@@ -180,6 +189,27 @@ class Biology_Classes_11_12:
         if s: res.append("Glycosuria (+)")
         if a: res.append("Albuminuria (+)")
         return {"Clinical Note": ", ".join(res) if res else "Normal Findings"}
+
+    @staticmethod
+    def potometer(d, t):
+        rate = d / t
+        return {"Transpiration Rate": _r(rate, 2), "Unit": "cm/min"}
+
+    @staticmethod
+    def pollen_grow(s, h):
+        if 8 < s < 12 and h >= 1: return {"Status": "TUBE FORMATION OBSERVED", "Length": "Significant"}
+        return {"Status": "No Growth", "Reason": "Sugar/Time Mismatch"}
+
+    @staticmethod
+    def onion_slide(s):
+        if "saf" in s.lower(): return {"Observation": "Cell Wall & Nucleus visible", "Result": "Success"}
+        return {"Observation": "Faint structure", "Result": "Need proper stain"}
+
+    @staticmethod
+    def hydrilla(l, t):
+        bubbles = 10 if "strong" in l.lower() else 2
+        total = bubbles * (t/10)
+        return {"Oxygen Bubbles": int(total), "Observation": "Evolution of Gas"}
 
 BIOLOGY_REGISTRY = {
     "Classes 6-10": Biology_Classes_6_10,

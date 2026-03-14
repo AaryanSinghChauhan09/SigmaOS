@@ -80,6 +80,10 @@ class Chemistry_Classes_11_12:
         "Iodine Clock": ("iodine_clock", [("Conc (M)", "0.1"), ("Temp (C)", "25")]),
         "Sol Preparation": ("sol_prep", [("Type", "Gold Sol")]),
         "Neut-Enthalpy": ("enthalpy", [("Neutral (H+ moles)", "0.05"), ("Temp Change (K)", "2")]),
+        "Anion Analysis": ("anion", [("Group", "1 (Dil. H2SO4)"), ("Substance", "Salt X")]),
+        "Oxalic vs KMnO4": ("kmno4", [("Vol KMnO4", "18.5"), ("M_Oxalic", "0.05"), ("Vol_Oxalic", "20")]),
+        "Tollen's Test": ("tollen", [("Sample", "Glucose")]),
+        "Concentration Rate": ("conc_rate", [("Initial Conc", "1.0"), ("Final Conc", "0.8"), ("Time (s)", "100")]),
     }
 
     @staticmethod
@@ -176,6 +180,29 @@ class Chemistry_Classes_11_12:
         # Simplified dH = -(m*c*dt)/n
         dh = -(100 * 4.184 * dt) / n # Assuming 100g water
         return {"delta_H (kJ/mol)": _r(dh/1000, 2), "Note": "Exothermic Neutralization"}
+
+    @staticmethod
+    def anion(g, s):
+        if "1" in g: return {"Observation": "Brisk Effervescence", "Result": "CO3 2- (Carbonate)"}
+        if "2" in g: return {"Observation": "Brown Fumes", "Result": "NO3 - (Nitrate)"}
+        return {"Step": "Perform Confirmatory Test"}
+
+    @staticmethod
+    def kmno4(v1, m2, v2):
+        # n1M1V1 = n2M2V2; n_kmno4=5, n_oxalic=2
+        m1 = (2 * m2 * v2) / (5 * v1)
+        return {"Molarity KMnO4": _r(m1, 4), "Endpoint": "Permanent Light Pink"}
+
+    @staticmethod
+    def tollen(s):
+        if "aldehyde" in s.lower() or "glucose" in s.lower(): 
+            return {"Observation": "Silver Mirror formed", "Result": "Aldehyde PRESENT"}
+        return {"Observation": "No Mirror", "Result": "Ketone/Other"}
+
+    @staticmethod
+    def conc_rate(c1, c2, t):
+        rate = abs(c2 - c1) / t
+        return {"Rate (M/s)": f"{rate:.4e}", "Order": "Assumed First Order"}
 
 CHEMISTRY_REGISTRY = {
     "Classes 6-10": Chemistry_Classes_6_10,

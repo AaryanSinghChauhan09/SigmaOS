@@ -120,6 +120,10 @@ class Maths_Classes_11_12:
         "Normal Curve": ("normal", [("x", "70"), ("mu", "50"), ("sigma", "10")]),
         "LPP Solver": ("lpp", [("Objective (3,2)", "30,20"), ("Limit", "100")]),
         "Correlation": ("corr", [("X", "1,2,3,4"), ("Y", "2,4,6,8")]),
+        "Progression AP/GP": ("progression", [("Type", "AP"), ("a", "2"), ("d/r", "3"), ("n", "10")]),
+        "Tangent Line": ("tangent", [("Slope (m)", "2"), ("At x", "3")]),
+        "Inverse Trig": ("inv_trig", [("Val (0-1)", "0.5"), ("Func", "sin-1")]),
+        "P & C": ("p_and_c", [("n", "5"), ("r", "2")]),
     }
 
     @staticmethod
@@ -143,7 +147,8 @@ class Maths_Classes_11_12:
 
     @staticmethod
     def limit(n, a):
-        return {"Val": n * (a**(n-1))}
+        nf, af = float(n), float(a)
+        return {"Val": nf * (af**(nf-1))}
 
     @staticmethod
     def sets(as_, bs, us):
@@ -230,6 +235,37 @@ class Maths_Classes_11_12:
         num = sum((i-mx)*(j-my) for i,j in zip(x,y))
         den = math.sqrt(sum((i-mx)**2 for i in x) * sum((j-my)**2 for j in y))
         return {"Correlation r": _r(num/den, 4) if den else 0}
+
+    @staticmethod
+    def progression(t, a, dr, n):
+        n = int(n)
+        if "AP" in t.upper():
+            tn = a + (n-1)*dr
+            sn = (n/2)*(2*a + (n-1)*dr)
+            return {"n-th term": tn, "Sum of n": sn}
+        else: # GP
+            tn = a * (dr**(n-1))
+            sn = a * (dr**n - 1) / (dr - 1) if dr != 1 else a*n
+            return {"n-th term": _r(tn, 2), "Sum of n": _r(sn, 2)}
+
+    @staticmethod
+    def tangent(m, x):
+        # f(x) = x^2 approx, y = x^2
+        y = x**2
+        return {"Slope m": m, "Equation": f"y - {y} = {m}(x - {x})"}
+
+    @staticmethod
+    def inv_trig(v, f):
+        v = float(v)
+        if "sin" in f.lower(): res = math.degrees(math.asin(v))
+        elif "cos" in f.lower(): res = math.degrees(math.acos(v))
+        else: res = 0
+        return {"Principal Val (deg)": _r(res, 2)}
+
+    @staticmethod
+    def p_and_c(n, r):
+        n, r = int(n), int(r)
+        return {"nPr": math.perm(n, r), "nCr": math.comb(n, r)}
 
 MATHS_REGISTRY = {
     "Classes 1-5": Maths_Classes_1_5,

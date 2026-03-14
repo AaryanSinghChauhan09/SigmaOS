@@ -128,6 +128,10 @@ class Physics_Classes_11_12:
         "Newton's Cooling": ("cooling", [("T_env (C)", "25"), ("T_obj (C)", "80"), ("k", "0.05")]),
         "Specific Heat": ("specific_heat", [("Mass (kg)", "0.5"), ("Q (J)", "4200"), ("dT (K)", "2")]),
         "Zener Diode": ("zener", [("V_in (V)", "15"), ("V_z (V)", "10")]),
+        "Tangent Galvano": ("tangent_gal", [("Deflection (theta)", "45"), ("Turns (n)", "50"), ("Radius (cm)", "10")]),
+        "Friction Lab": ("friction", [("Mass (kg)", "1"), ("Angle (deg)", "20")]),
+        "Transistor Char": ("transistor", [("V_be (V)", "0.7"), ("I_b (uA)", "20"), ("beta", "100")]),
+        "Prism Refraction": ("prism", [("Angle A (deg)", "60"), ("Angle D (deg)", "40")]),
     }
 
     @staticmethod
@@ -246,6 +250,33 @@ class Physics_Classes_11_12:
     def zener(vin, vz):
         if vin < vz: return {"V_out (V)": vin, "Status": "Normal Forward/Reverse"}
         return {"V_out (V)": vz, "Status": "Breakdown/Regulated"}
+
+    @staticmethod
+    def tangent_gal(th, n, r):
+        # Bh = (mu0 * n * I) / (2 * r * tan(theta))
+        # Let's find I for a given Bh (standard Bh ~ 3.5e-5 T)
+        mu0 = 4*math.pi*1e-7; r_m = r/100; bh = 3.5e-5
+        i = (2 * r_m * bh * math.tan(math.radians(th))) / (mu0 * n)
+        return {"Current I (A)": _r(i, 4), "Bh Used (T)": bh}
+
+    @staticmethod
+    def friction(m, a):
+        # f = mu * N; At limit, tan(angle of repose) = mu
+        mu = math.tan(math.radians(a))
+        force = m * 9.81 * math.sin(math.radians(a))
+        return {"Coeff mu": _r(mu, 3), "Status": "Impending Motion" if a > 15 else "Static"}
+
+    @staticmethod
+    def transistor(vbe, ib, beta):
+        # Ic = beta * Ib
+        ic = (ib * 1e-6) * beta
+        return {"I_c (mA)": _r(ic*1000, 2), "Status": "Active" if vbe > 0.6 else "Cut-off"}
+
+    @staticmethod
+    def prism(a, d):
+        # n = sin((A+Dm)/2) / sin(A/2)
+        n = math.sin(math.radians((a+d)/2)) / math.sin(math.radians(a/2))
+        return {"Refr. Index n": _r(n, 3)}
 
 PHYSICS_REGISTRY = {
     "Classes 6-10": Physics_Classes_6_10,

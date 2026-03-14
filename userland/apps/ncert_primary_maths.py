@@ -21,6 +21,9 @@ class Maths_Primary:
         "Skip Count": ("skip", [("Start", "2"), ("Step", "3"), ("Count", "5")]),
         "Roman Digit": ("roman", [("N", "9")]),
         "Perimeter": ("perimeter", [("Shape", "Square"), ("Side", "5")]),
+        "Abacus Logic": ("abacus", [("Number", "24")]),
+        "Calendar Math": ("calendar", [("Month", "February"), ("Year", "2024")]),
+        "Measure Conv": ("convert", [("cm", "150")]),
     }
 
     @staticmethod
@@ -96,6 +99,22 @@ class Maths_Primary:
         if "square" in sh: return {"Perimeter": 4*s}
         if "triangle" in sh: return {"Perimeter": 3*s}
         return {"Perimeter": "Unknown Shape"}
+
+    @staticmethod
+    def abacus(n):
+        n = int(n)
+        return {"Tens": n//10, "Ones": n%10}
+
+    @staticmethod
+    def calendar(m, y):
+        m, y = m.lower(), int(y)
+        if "feb" in m: return {"Days": 29 if (y%4==0 and y%100!=0 or y%400==0) else 28}
+        if m in ["april", "june", "sept", "nov"]: return {"Days": 30}
+        return {"Days": 31}
+
+    @staticmethod
+    def convert(c):
+        return {"Meters": int(c)/100, "Note": f"{c} cm is {int(c)/100} m"}
 
 PRIMARY_MATHS_REGISTRY = {
     "Primary Math (1-5)": Maths_Primary

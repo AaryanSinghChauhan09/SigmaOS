@@ -84,7 +84,6 @@ class IntelligenceStudio(SigmaModuleBase, ISigmaService):
         return f"OK - Insights: {s['insights_generated']} | Semantic Shards: {len(self.datasets)}"
 
 if __name__ == "__main__":
-    import os
     intel = IntelligenceStudio()
     # Mock some data
     intel.datasets["kernel.py"] = [1.0, 0.0, 0.5] + [0]*61
