@@ -62,6 +62,8 @@ CORE_SYSTEM_MODULES = [
     ("sigma_core.system.sync_engine",        "SigmaSyncEngine",       "sync"),
     ("sigma_core.security.aura_shield",    "SigmaAuraShield",       "shield"),
     ("sigma_core.ai.gurukul_engine",       "GurukulEngine",         "gurukul"),
+    ("sigma_core.ai.intelligence_hub",     "SigmaIntelligenceHub",   "intelligence_hub"),
+    ("sigma_core.system.web_syncer",       "WebSyncer",             "web_syncer"),
     ("sigma_core.ui.ghostchat",            "SigmaGhostChat",        "ghostchat"),
     ("sigma_core.security.compliance_guard", "ComplianceGuard",     "compliance"),
     ("sigma_core.security.vanguard",       "NetworkVanguard",       "vanguard"),

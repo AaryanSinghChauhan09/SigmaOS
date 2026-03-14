@@ -5,15 +5,18 @@ from .styles import PAL, FONT_LOGO, FONT_MED, FONT_BOLD, FONT_TITLE, FONT_SMALL
 
 class ConfigHubPage(SigmaPage):
     def __init__(self, parent, gui):
-        super().__init__(parent, gui, "Sovereign Configuration Hub", "System-Wide Unity & Identity")
+        is_child = gui.kernel.registry.get("guardian").is_child_mode()
+        title = "Kiddie Safety Hub" if is_child else "Sovereign Configuration Hub"
+        super().__init__(parent, gui, title, "Making SigmaOS Happy & Safe")
         self.cfg = gui.cfg
         self._build_ui()
 
     def _build_ui(self):
+        is_child = self.controller._is_child_mode()
         body = tk.Frame(self, bg=PAL["bg"])
         body.pack(fill="both", expand=True)
 
-        # Tabbed Sidebar for Settings Categories
+        # Tabbed Sidebar
         s_fr = tk.Frame(body, bg=PAL["bg2"], width=200)
         s_fr.pack(side="left", fill="both", padx=(0, 10))
         s_fr.pack_propagate(False)
@@ -21,13 +24,19 @@ class ConfigHubPage(SigmaPage):
         self.c_fr = tk.Frame(body, bg=PAL["bg"])
         self.c_fr.pack(side="left", fill="both", expand=True)
         
-        cats = ["System", "Display", "Network", "Security", "Safety", "Sovereignty", "About"]
+        if is_child:
+            cats = ["Safety", "Info"]
+        else:
+            cats = ["System", "Display", "Network", "Security", "Safety", "Sovereignty", "About"]
+
         for cat in cats:
-            tk.Button(s_fr, text=cat, font=FONT_MED, bg=PAL["bg2"], fg=PAL["text"], 
+            btn_text = cat
+            tk.Button(s_fr, text=btn_text, font=FONT_MED, bg=PAL["bg2"], fg=PAL["text"], 
                       relief="flat", anchor="w", padx=15, 
                       command=lambda c=cat: self._show_cfg(c)).pack(fill="x", pady=2)
 
-        self._show_cfg("About")
+        start_cat = "Safety" if is_child else "About"
+        self._show_cfg(start_cat)
 
     def _show_cfg(self, cat):
         for w in self.c_fr.winfo_children(): w.destroy()
@@ -37,43 +46,55 @@ class ConfigHubPage(SigmaPage):
         elif cat == "Security": self._cfg_security(self.c_fr)
         elif cat == "Safety": self._cfg_safety(self.c_fr)
         elif cat == "Sovereignty": self._cfg_sovereignty(self.c_fr)
-        elif cat == "About": self._cfg_about(self.c_fr)
+        elif cat == "About" or cat == "Info": self._cfg_about(self.c_fr)
 
     def _cfg_safety(self, parent):
-        tk.Label(parent, text="Compliance & Child Safety (Guardian)", font=FONT_TITLE, fg="white", bg=PAL["bg"]).pack(anchor="w", pady=10)
+        is_child = self.controller._is_child_mode()
+        title = "Kiddie Safety Shield" if is_child else "Compliance & Child Safety (Guardian)"
+        tk.Label(parent, text=title, font=FONT_TITLE, fg="white", bg=PAL["bg"]).pack(anchor="w", pady=10)
         
-        info = self._card(parent, "International Age Rating Compliance")
+        info_title = "Always Safe for You!" if is_child else "International Age Rating Compliance"
+        info = self._card(parent, info_title)
         info.master.pack(fill="x", pady=5)
         
-        tk.Label(info, text="SigmaGuardian enforces U/G ratings for 5-year-old safety.", font=FONT_SMALL, fg=PAL["dim"], bg=PAL["card"]).pack(anchor="w", pady=5)
+        desc = "SigmaGuardian keeps you happy and safe while you learn!" if is_child else "SigmaGuardian enforces U/G ratings for 5-year-old safety."
+        tk.Label(info, text=desc, font=FONT_SMALL, fg=PAL["dim"], bg=PAL["card"]).pack(anchor="w", pady=5)
         
-        def toggle_guardian():
-            mode = self.gui._child_mode.get()
-            guardian = self.kernel.registry.get("guardian")
-            if guardian:
-                guardian.set_child_mode(mode, age=5)
-                self.gui._notify("Guardian", f"Child Safety Mode {'Enabled' if mode else 'Disabled'}", "OK")
-
-        ttk.Checkbutton(parent, text="Enable Child Safety Mode (Universal/G Ratings Only)", 
-                        variable=self.gui._child_mode, command=toggle_guardian).pack(anchor="w", pady=10)
+        status_fr = tk.Frame(parent, bg=PAL["bg3"], padx=15, pady=10, highlightthickness=1, highlightbackground=PAL["green"])
+        status_fr.pack(fill="x", pady=20)
         
-        tk.Label(parent, text="Compliance Standards: NIST, COPPA, Multi-Region Rating Sync", font=FONT_SMALL, fg=PAL["dim"], bg=PAL["bg"]).pack(anchor="w", pady=20)
+        tk.Label(status_fr, text="🌈 SAFETY MODE: ON FOREVER", font=("Inter Bold", 10), fg=PAL["green"], bg=PAL["bg3"]).pack(side="left")
+        tk.Label(status_fr, text="Safe & Happy", font=("Inter Italic", 9), fg=PAL["dim"], bg=PAL["bg3"]).pack(side="right")
+        
+        footer = "Everything in SigmaOS is hand-picked for kids. No scary things allowed!" if is_child else "Compliance Standards: NIST, COPPA, Multi-Region Rating Sync."
+        tk.Label(parent, text=footer, font=FONT_SMALL, fg=PAL["dim"], bg=PAL["bg"], wraplength=500, justify="left").pack(anchor="w", pady=20)
 
     def _cfg_about(self, parent):
-        tk.Label(parent, text="SigmaOS Sovereign", font=FONT_LOGO, fg=PAL["cyan"], bg=PAL["bg"]).pack(pady=20)
-        tk.Label(parent, text=f"Version {self.cfg.VERSION} - Apex Dynamic Release", font=FONT_MED, fg=PAL["dim"], bg=PAL["bg"]).pack()
+        is_child = self.controller._is_child_mode()
+        head = "SigmaOS for Kids" if is_child else "SigmaOS Sovereign"
+        tk.Label(parent, text=head, font=FONT_LOGO, fg=PAL["cyan"], bg=PAL["bg"]).pack(pady=20)
+        tk.Label(parent, text=f"Version {self.cfg.VERSION}", font=FONT_MED, fg=PAL["dim"], bg=PAL["bg"]).pack()
         
-        info = self._card(parent, "OS Status & Parity Dashboard")
+        info_title = "Fun Details" if is_child else "OS Status & Parity Dashboard"
+        info = self._card(parent, info_title)
         info.master.pack(fill="x", pady=20)
         grid = tk.Frame(info, bg=PAL["card"])
         grid.pack(fill="x")
         
-        metrics = [
-            ("Kernel Type", "Neural-Predictive"),
-            ("Subsystem", "Sovereign-Core-v3"),
-            ("Parity Status", "🟢 TITAN LEVEL REACHED"),
-            ("Bridges Active", "4 (Win32, Cocoa, APK, WASM)")
-        ]
+        if is_child:
+            metrics = [
+                ("OS Heart", "Happy Beats"),
+                ("Fun Level", "Maximum!"),
+                ("Safety Shield", "🟢 100% SECURE"),
+                ("Learning Points", "Ready to Grow")
+            ]
+        else:
+            metrics = [
+                ("Kernel Type", "Neural-Predictive"),
+                ("Subsystem", "Sovereign-Core-v3"),
+                ("Parity Status", "🟢 TITAN LEVEL REACHED"),
+                ("Bridges Active", "4 (Win32, Cocoa, APK, WASM)")
+            ]
         for i, (k, v) in enumerate(metrics):
             tk.Label(grid, text=k+":", font=FONT_BOLD, fg=PAL["dim"], bg=PAL["card"]).grid(row=i, column=0, sticky="w", pady=5)
             tk.Label(grid, text=v, font=FONT_BOLD, fg="white", bg=PAL["card"]).grid(row=i, column=1, sticky="w", padx=20)

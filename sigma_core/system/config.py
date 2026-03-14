@@ -22,6 +22,7 @@ class SigmaConfig:
     ENABLE_AGENTIC = True
     ENABLE_MESH = True
     ENABLE_NEURAL_CORTEX = True # USP: AI-Driven Kernel
+    ENFORCE_CHILD_MODE = True # PERMANENT CHILD SAFETY MANDATE
     SILENT = False
     
     # Paths

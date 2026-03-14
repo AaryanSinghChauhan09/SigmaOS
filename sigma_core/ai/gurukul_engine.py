@@ -21,6 +21,15 @@ class GurukulEngine(SigmaModuleBase):
         }
 
     def _load_cards(self):
+        guardian = self.kernel.registry.get("guardian")
+        if guardian and guardian.is_child_mode():
+            return {
+                "A": {"q": "What is the 1st letter of alphabet?", "a": "A for Apple 🍎", "level": 0, "next_review": 0},
+                "Color_Red": {"q": "What color is an apple?", "a": "RED ❤️", "level": 0, "next_review": 0},
+                "Animal_Dog": {"q": "Which animal says 'Woof'?", "a": "DOG 🐶", "level": 0, "next_review": 0},
+                "Number_1": {"q": "How many suns are in the sky?", "a": "ONE (1) ☀️", "level": 0, "next_review": 0}
+            }
+
         if os.path.exists(self.cards_path):
             with open(self.cards_path, "r") as f:
                 return json.load(f)
