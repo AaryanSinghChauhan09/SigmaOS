@@ -380,7 +380,7 @@ class SigmaGUI(tk.Tk, UIMixin):
             'u': lambda: self._show_page("ag_guide"),
             'q': lambda: self._show_page("search"),
             'x': lambda: self._show_quick_link_menu(),
-            'k': lambda: self._show_page("network_warden"),
+            'k': lambda: self._show_page("aether"),
             'z': lambda: self._notify("SNAP", "Snap Layouts: AI Optimized for Focus.", "OK")
         }
         if key in mapping: mapping[key]()
@@ -809,8 +809,9 @@ class SigmaGUI(tk.Tk, UIMixin):
             "automation_hub":   self._build_automation_hub_page,
             "ai_lifecycle":     self._build_ai_lifecycle_page,
             "zenith":           self._build_zenith_page,
+            "apex":            self._build_apex_page,
             "config_hub":       lambda: self._set_modular_page("config_hub", ConfigHubPage),
-            "gaming_hub":       self._build_gaming_hub,
+            "gaming_hub":       lambda: self._set_modular_page("gaming_hub", ArcadePage),
             "system_audit":     lambda: self._set_modular_page("system_audit", AuditViewPage),
             "virtualbox":       self._build_virtualbox_page,
             "ag_physics":       self._build_ag_physics_page,
@@ -842,7 +843,7 @@ class SigmaGUI(tk.Tk, UIMixin):
             "linux_parity":     lambda: self._set_modular_page("linux_parity", LinuxParityPage),
             "store":           lambda: self._set_modular_page("store", StorePage),
             "ag_guide":        lambda: self._set_modular_page("ag_guide", AGGuidePage),
-            "aether":          self._build_aether_page,
+            "aether":          lambda: self._set_modular_page("aether", AetherOrchPage),
         }
         
         # Oracle VM Discovery (Professional Integration)
@@ -900,9 +901,9 @@ class SigmaGUI(tk.Tk, UIMixin):
             ("🌐", "browser"), ("📁", "explorer"), ("📦", "store"),
             ("🧪", "sovereign_suite"), ("📡", "network_vanguard"), ("📊", "intelligence_studio"), 
             ("🛒", "shopping_wizard"), ("📧", "mail_orchestrator"), ("🛰️", "sovereign_comms"),
-            ("🧘", "wellness"), ("🚀", "enterprise"), ("📦", "store"),
+            ("🧘", "wellness"), ("🚀", "enterprise"), ("🌌", "aether"), ("🎮", "gaming_hub"),
             ("🎓", "gurukul_academy"), ("⚖️", "compliance_center"), ("🧠", "brain"), 
-            ("⚡", "zenith"), ("📧", "gmail_ai"), ("🎨", "visual_customizer"), ("💠", "ag_hub")
+            ("⚡", "zenith"), ("📧", "gmail_ai"), ("🎨", "visual_customizer"), ("💠", "ag_guide")
         ]
         for icon, page in pins:
             b = tk.Button(self._task_tray, text=icon, font=("Segoe UI Symbol", 14),
@@ -3922,6 +3923,7 @@ class SigmaGUI(tk.Tk, UIMixin):
     # ─── Sovereign Apex: Multi-OS Master Hub ──────────────────────────────────
 
     def _build_apex_page(self):
+        p = tk.Frame(self._content, bg=PAL["bg"])
         self._pages["apex"] = p
         
         tk.Label(p, text="🏔️  Sovereign Apex: Multi-OS Fusion Hub", font=FONT_LOGO,

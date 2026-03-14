@@ -1,93 +1,108 @@
 import tkinter as tk
 from tkinter import ttk
 import random
+import webbrowser
 from gui_pkg.base_page import SigmaPage
-from gui_pkg.styles import PAL, FONT_BOLD, FONT_SMALL, FONT_MED
+from gui_pkg.styles import PAL, FONT_BOLD, FONT_SMALL, FONT_MED, FONT_TITLE
 
 class ShoppingWizardPage(SigmaPage):
     def __init__(self, parent, gui):
-        SigmaPage.__init__(self, parent, gui, "Shopping Wizard", "Omnichannel Price Tracking & Coupon Parity Engine")
-        self._tracked_items = [
-            {"name": "RTX 5090 FE", "price": "$1599", "target": "$1499", "status": "Steady", "store": "BestBuy"},
-            {"name": "MacBook Pro M4 Max", "price": "$3499", "target": "$3100", "status": "Dropping", "store": "Amazon"},
-            {"name": "Herman Miller Embody", "price": "$1895", "target": "$1500", "status": "Steady", "store": "DesignWithinReach"},
-        ]
+        SigmaPage.__init__(self, parent, gui, "🛒 BuyingHatke Wizard", "Sovereign Price Intelligence & Enterprise Commerce Hub")
         self._build_ui()
 
     def _build_ui(self):
-        body = tk.Frame(self, bg=PAL["bg"])
-        body.pack(fill="both", expand=True, padx=20, pady=10)
+        # Master Container
+        container = tk.Frame(self, bg=PAL["bg"])
+        container.pack(fill="both", expand=True, padx=20, pady=20)
 
-        # Search & Add Bar
-        search_fr = self._card(body, "Track New Product")
-        search_fr.master.pack(fill="x", pady=(0, 10))
-        
-        entry_fr = tk.Frame(search_fr, bg=PAL["card"])
-        entry_fr.pack(fill="x")
-        
-        self._prod_url = tk.StringVar(value="https://store.example.com/product/...")
-        ent = ttk.Entry(entry_fr, textvariable=self._prod_url, font=("Inter", 10))
-        ent.pack(side="left", fill="x", expand=True, padx=(0, 10))
-        
-        ttk.Button(entry_fr, text="🔍 Analyze & Track", command=self._add_track).pack(side="right")
+        # ─── Navigation Header ───
+        header = tk.Frame(container, bg=PAL["card"], height=60)
+        header.pack(fill="x", pady=(0, 20))
+        header.pack_propagate(False)
 
-        # Main Workspace
-        panes = tk.Frame(body, bg=PAL["bg"])
-        panes.pack(fill="both", expand=True)
+        tk.Label(header, text="Product Analyzer:", font=FONT_MED, fg=PAL["cyan"], bg=PAL["card"]).pack(side="left", padx=20)
+        self.prod_var = tk.StringVar(value="iPhone 15 Pro")
+        ent = ttk.Entry(header, textvariable=self.prod_var, width=40)
+        ent.pack(side="left", padx=10, ipady=5)
 
-        # Left: Tracked Items & Price Comparison
-        left_fr = tk.Frame(panes, bg=PAL["bg"])
-        left_fr.pack(side="left", fill="both", expand=True, padx=(0, 10))
-        
-        track_card = self._card(left_fr, "Active Price Monitor")
-        track_card.master.pack(fill="both", expand=True)
-        
-        self.tree = ttk.Treeview(track_card, columns=("price", "target", "store", "status"), show="headings", height=8)
-        self.tree.heading("price", text="Current Price")
-        self.tree.heading("target", text="Alert Threshold")
-        self.tree.heading("store", text="Best Store")
-        self.tree.heading("status", text="Trend")
-        self.tree.pack(fill="both", expand=True)
-        
-        for item in self._tracked_items:
-            self.tree.insert("", "end", text=item["name"], values=(item["price"], item["target"], item["store"], item["status"]))
+        ttk.Button(header, text="🔍 Analyze Market", command=self._analyze).pack(side="left", padx=10)
+        ttk.Button(header, text="🎟️ Auto-Discover Coupons", command=self._coupons).pack(side="left", padx=10)
 
-        # Right: Coupon Parity & Deals
-        right_fr = tk.Frame(panes, bg=PAL["bg"], width=300)
-        right_fr.pack(side="right", fill="both")
-        right_fr.pack_propagate(False)
+        # ─── Main Content Grid ───
+        main = tk.Frame(container, bg=PAL["bg"])
+        main.pack(fill="both", expand=True)
 
-        coupon_card = self._card(right_fr, "⚡ Coupon Parity")
-        coupon_card.master.pack(fill="both", expand=True)
-        
-        coupons = [
-            ("AMZ_SAVE20", "20% Off Electronics", "VERIFIED"),
-            ("BB_GAMER", "$50 Off GPU", "EXPIRED"),
-            ("FREESHIP", "Free Shipping", "VERIFIED"),
-        ]
-        for code, desc, stat in coupons:
-            c = tk.Frame(coupon_card, bg=PAL["bg2"], pady=5, padx=5)
-            c.pack(fill="x", pady=2)
-            tk.Label(c, text=code, font=FONT_BOLD, fg=PAL["cyan"], bg=PAL["bg2"]).pack(anchor="w")
-            tk.Label(c, text=desc, font=FONT_SMALL, fg=PAL["text"], bg=PAL["bg2"]).pack(anchor="w")
-            col = PAL["green"] if stat=="VERIFIED" else PAL["red"]
-            tk.Label(c, text=stat, font=("Inter", 7, "bold"), fg=col, bg=PAL["bg2"]).pack(anchor="e")
+        # Left: Live Intel & Forecast
+        left = tk.Frame(main, bg=PAL["bg"])
+        left.pack(side="left", fill="both", expand=True, padx=(0, 10))
 
-        ttk.Button(right_fr, text="🍯 Auto-Apply Best Coupon (Honey)", 
-                   command=lambda: self.gui._log_voice("Honey: Testing 42 codes... Found VERIFIED 'AMZ_SAVE20'. Saving $319.")).pack(fill="x", pady=10)
+        # Price Intel
+        intel_fr = self._card(left, "Live Product Intel (BuyHatke Engine)")
+        intel_fr.master.pack(fill="x", pady=(0, 10))
+        self.intel_txt = tk.Text(intel_fr, height=10, bg=PAL["bg"], fg=PAL["text"], font=FONT_SMALL, bd=0)
+        self.intel_txt.pack(fill="x", padx=10, pady=10)
 
-        # Price History Mock (CamelCamelCamel USP)
-        hist_card = self._card(right_fr, "📈 Price History (90d)")
-        hist_card.master.pack(fill="both", expand=True, pady=(10, 0))
-        tk.Label(hist_card, text="LOWER THAN 98% OF YEAR", font=FONT_BOLD, fg=PAL["green"], bg=PAL["card"]).pack(pady=5)
-        
-        canvas = tk.Canvas(hist_card, height=60, bg=PAL["bg2"], highlightthickness=0)
-        canvas.pack(fill="x")
-        points = [10, 50, 20, 40, 30, 10, 50, 0]
-        for i in range(len(points)-1):
-            canvas.create_line(i*30, 50-points[i], (i+1)*30, 50-points[i+1], fill=PAL["cyan"], width=2)
+        # Forecast
+        fore_fr = self._card(left, "Quantum Price Forecasting")
+        fore_fr.master.pack(fill="x")
+        self.fore_txt = tk.Text(fore_fr, height=8, bg=PAL["bg2"], fg=PAL["gold"], font=FONT_SMALL, bd=0)
+        self.fore_txt.pack(fill="x", padx=10, pady=10)
 
-    def _add_track(self):
-        url = self._prod_url.get()
-        self.gui._log_voice(f"Sovereign Crawler dispatched to: {url}")
-        self.after(1000, lambda: self.gui._log_voice("Analysis complete. Found parity at 4 stores. Tracking activated."))
+        # Right: Commercial Strategy & B2B
+        right = tk.Frame(main, bg=PAL["bg"], width=350)
+        right.pack(side="right", fill="both")
+        right.pack_propagate(False)
+
+        # USP Analysis
+        usp_fr = self._card(right, "AI Strategy Matrix (Praxie)")
+        usp_fr.master.pack(fill="x", pady=(0, 10))
+        self.usp_txt = tk.Text(usp_fr, height=12, bg=PAL["card"], fg=PAL["cyan"], font=FONT_SMALL, bd=0)
+        self.usp_txt.pack(fill="x", padx=5, pady=5)
+
+        # B2B & CRM
+        crm_fr = self._card(right, "Sovereign CRM Pipeline")
+        crm_fr.master.pack(fill="x")
+        self.crm_txt = tk.Text(crm_fr, height=10, bg=PAL["bg3"], fg=PAL["text"], font=FONT_SMALL, bd=0)
+        self.crm_txt.pack(fill="x", padx=5, pady=5)
+
+        self.gui.after(500, self._analyze) # Initial run deferred for hydration
+
+    def _analyze(self):
+        prod = self.prod_var.get()
+        engine = self.kernel.registry.get("buyhatke")
+        if not engine:
+            self._notify("Error", "BuyHatke Engine not found in registry.", "ERR")
+            return
+
+        res = engine.analyze_deal(prod, 69900)
+        self.intel_txt.delete("1.0", tk.END)
+        self.intel_txt.insert(tk.END, f"ANALYSIS FOR: {res['Product']}\n" + "─"*30 + "\n")
+        self.intel_txt.insert(tk.END, f"Verdict: {res['Verdict']}\n")
+        self.intel_txt.insert(tk.END, f"Lowest Ever: ₹{res['Lowest_Ever']}\n")
+        self.intel_txt.insert(tk.END, f"Average: ₹{res['Average']}\n")
+        self.intel_txt.insert(tk.END, f"Savings Potential: ₹{res['Savings_Potential']}\n")
+
+        # Forecast
+        f_res = engine.quantum_price_forecast(prod)
+        self.fore_txt.delete("1.0", tk.END)
+        self.fore_txt.insert(tk.END, "PREDICTIVE TRENDS:\n" + "─"*30 + "\n")
+        for k, v in f_res.items():
+            self.fore_txt.insert(tk.END, f"{k}: {v}\n")
+
+        # Strategy
+        s_res = engine.analyze_usp_matrix("Retail")
+        self.usp_txt.delete("1.0", tk.END)
+        for k, v in s_res.items():
+            self.usp_txt.insert(tk.END, f"▶ {k}:\n  {v}\n\n")
+
+        # CRM
+        leads = engine.crm_lead_pipeline()
+        self.crm_txt.delete("1.0", tk.END)
+        for l in leads:
+            self.crm_txt.insert(tk.END, f"👤 {l['Lead']} | Score: {l['Score']} | {l['Status']}\n")
+
+    def _coupons(self):
+        engine = self.kernel.registry.get("buyhatke")
+        if engine:
+            cs = engine.find_coupons("Global")
+            self._notify("Coupon Discovery", f"Verified Coupons Found: {', '.join(cs)}", "OK")

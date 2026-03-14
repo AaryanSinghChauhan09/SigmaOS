@@ -28,6 +28,7 @@ from .system.loader import SigmaModuleLoader # type: ignore
 from .hal.polyglot_loader import SigmaPolyglot # type: ignore
 from .manifest import CORE_SYSTEM_MODULES, ECOSYSTEM_APPS # type: ignore
 from .security.competitor_crusher import SovereignCompetitorCrusher # type: ignore
+from userland.system_api.sigma_games_engine import SigmaGamesEngine # type: ignore
 
 class SigmaKernel:
     """
@@ -52,6 +53,8 @@ class SigmaKernel:
         self.vanguard_engine = NetworkVanguard(self)
         self.guardian = SigmaGuardian(self)
         self.crusher = SovereignCompetitorCrusher(self)
+        from .system.web_syncer import WebSyncer
+        self.syncer = WebSyncer(self)
         
         # Register Core
         self.registry.register("cache", self.cache)
@@ -60,6 +63,10 @@ class SigmaKernel:
         self.registry.register("vanguard", self.vanguard_engine)
         self.registry.register("guardian", self.guardian)
         self.registry.register("crusher", self.crusher)
+        self.registry.register("syncer", self.syncer)
+        self.registry.register("web_syncer", self.syncer)
+        self.games = SigmaGamesEngine(self)
+        self.registry.register("games", self.games)
         
         self.os_name = self.cfg.OS_NAME
         self.version = self.cfg.VERSION
@@ -242,3 +249,11 @@ if __name__ == "__main__":
     k.bus.emit("mode.change", {"mode": "Apex"})
     print(k.health_check())
     print("\n[TEST] Sigma OS Sovereign Core: VERIFIED.")
+    def get_performance_deep_dive(self) -> Dict[str, str]:
+        """USP: Tactical OS/CS/AI Insight Generator."""
+        return {
+            "OS_Principle": "Microkernel Orchestration - Minimum logic in Ring 0, all features in Ring 3 shards.",
+            "CS_Pattern": "Dependency Injection & Event-Driven Bus Architecture (Sovereign Pub/Sub).",
+            "AI_Core": "Local Federated Distillation - Private training without external GPU leakage.",
+            "Security_Model": "Capability-Based Security - ZRAM-locked memory segments for each module."
+        }

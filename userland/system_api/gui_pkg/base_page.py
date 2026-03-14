@@ -7,6 +7,7 @@ class SigmaPage(tk.Frame, UIMixin):
     def __init__(self, parent, gui, title, subtitle):
         super().__init__(parent, bg=PAL["bg"])
         self.gui = gui
+        self.controller = gui # Legacy/Alias for various pages
         self.kernel = gui.kernel
         self.title = title
         self.subtitle = subtitle
