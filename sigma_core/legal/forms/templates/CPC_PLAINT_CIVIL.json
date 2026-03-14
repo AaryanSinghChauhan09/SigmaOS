@@ -1,0 +1,22 @@
+{
+    "act": "CPC 1908",
+    "section": "Order VII",
+    "title": "Civil Plaint (Suit Recovery)",
+    "fields": [
+        {
+            "id": "court",
+            "label": "Civil Judge (Sr/Jr Div)",
+            "type": "text"
+        },
+        {
+            "id": "valuation",
+            "label": "Suit Valuation (INR)",
+            "type": "text"
+        },
+        {
+            "id": "cause",
+            "label": "Specific Cause of Action",
+            "type": "textarea"
+        }
+    ]
+}

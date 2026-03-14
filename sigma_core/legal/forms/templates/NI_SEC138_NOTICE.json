@@ -1,0 +1,27 @@
+{
+    "act": "Negotiable Instruments Act",
+    "section": "138",
+    "title": "Legal Notice for Cheque Bounce",
+    "fields": [
+        {
+            "id": "cheque_no",
+            "label": "Cheque Number",
+            "type": "text"
+        },
+        {
+            "id": "bank",
+            "label": "Drawee Bank",
+            "type": "text"
+        },
+        {
+            "id": "amount",
+            "label": "Cheque Amount",
+            "type": "text"
+        },
+        {
+            "id": "demand_days",
+            "label": "Demand Period (15 days)",
+            "type": "text"
+        }
+    ]
+}

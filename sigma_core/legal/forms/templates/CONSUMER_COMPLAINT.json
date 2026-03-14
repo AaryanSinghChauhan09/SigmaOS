@@ -1,0 +1,22 @@
+{
+    "act": "Consumer Protection Act 2019",
+    "section": "Sec 35",
+    "title": "Consumer Commission Complaint",
+    "fields": [
+        {
+            "id": "commission",
+            "label": "District/State Commission",
+            "type": "text"
+        },
+        {
+            "id": "deficiency",
+            "label": "Deficiency in Service",
+            "type": "textarea"
+        },
+        {
+            "id": "compensation",
+            "label": "Compensation Claimed",
+            "type": "text"
+        }
+    ]
+}

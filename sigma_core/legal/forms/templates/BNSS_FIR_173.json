@@ -1,0 +1,27 @@
+{
+    "act": "BNSS 2023",
+    "section": "173",
+    "title": "Criminal Complaint / FIR",
+    "fields": [
+        {
+            "id": "station",
+            "label": "Police Station",
+            "type": "text"
+        },
+        {
+            "id": "offense",
+            "label": "Nature of Offense",
+            "type": "text"
+        },
+        {
+            "id": "accused",
+            "label": "Accused Details",
+            "type": "textarea"
+        },
+        {
+            "id": "incident",
+            "label": "Incident Narrative",
+            "type": "textarea"
+        }
+    ]
+}

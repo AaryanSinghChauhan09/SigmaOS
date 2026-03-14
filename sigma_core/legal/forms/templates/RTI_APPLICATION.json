@@ -1,0 +1,22 @@
+{
+    "act": "Right to Information Act 2005",
+    "section": "6(1)",
+    "title": "RTI Information Request",
+    "fields": [
+        {
+            "id": "pio",
+            "label": "Public Information Officer",
+            "type": "text"
+        },
+        {
+            "id": "dept",
+            "label": "Public Authority",
+            "type": "text"
+        },
+        {
+            "id": "info",
+            "label": "Information Required",
+            "type": "textarea"
+        }
+    ]
+}

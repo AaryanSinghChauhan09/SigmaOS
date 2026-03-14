@@ -1,0 +1,22 @@
+{
+    "act": "Motor Vehicles Act 1988",
+    "section": "166",
+    "title": "MACT Claim Petition",
+    "fields": [
+        {
+            "id": "mact",
+            "label": "MACT Tribunal Name",
+            "type": "text"
+        },
+        {
+            "id": "vehicle_no",
+            "label": "Vehicle Number",
+            "type": "text"
+        },
+        {
+            "id": "injury",
+            "label": "Nature of Injury",
+            "type": "textarea"
+        }
+    ]
+}
