@@ -18,6 +18,7 @@ try:
     from userland.system_api.privacy_engine import PrivacyScrubber # type: ignore
     from userland.system_api.sigma_std import SigmaSys # type: ignore
     from sigma_core.ui.fluid_design import PALETTE as PAL, TYPOGRAPHY as FONT # type: ignore
+    from sigma_core.kernel import SigmaKernel # type: ignore
 except ImportError:
     class PrivacyScrubber: 
         def scrub(self, x): return x
@@ -32,10 +33,12 @@ except ImportError:
         "danger": "#FF3B30", "warning": "#FF9500"
     }
     FONT = {"h3": ("Inter", 12, "bold"), "body": ("Inter", 10), "caption": ("Inter", 8, "bold"), "mono": ("Consolas", 10, "bold")}
+    SigmaKernel = None
 
 class NexusMonitor(tk.Tk):
-    def __init__(self):
+    def __init__(self, kernel=None):
         super().__init__()
+        self.kernel = kernel or (SigmaKernel() if SigmaKernel else None)
         self.title("SigmaOS Nexus Matrix [KERNEL_LEVEL_MONITOR]")
         self.geometry("1100x700")
         self.configure(bg=PAL["bg"])

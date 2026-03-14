@@ -26,6 +26,17 @@ import subprocess
 import shutil
 from concurrent.futures import ThreadPoolExecutor, as_completed
 
+# Try to resolve SigmaOS interfaces
+try:
+    from sigma_core.system.interfaces import SigmaModuleBase, ISigmaService # type: ignore
+except ImportError:
+    class SigmaModuleBase: # type: ignore
+        def __init__(self, kernel=None): self.kernel = kernel
+        def log_event(self, *args): pass
+    class ISigmaService: # type: ignore
+        def start_service(self): pass
+        def stop_service(self): pass
+
 # ── Path bootstrap (all imports resolved relative to SigmaOS root) ────────────
 _ROOT = os.path.abspath(os.path.join(os.path.dirname(__file__), ".."))
 for _p in [_ROOT, os.path.join(_ROOT, "sigma_core"), os.path.join(_ROOT, "userland", "system_api")]:
