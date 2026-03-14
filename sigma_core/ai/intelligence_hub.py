@@ -35,6 +35,17 @@ class MLEngine(IntelligenceComponent):
             "Perceptrons": "The simplest form of a neural network.",
             "Testing/Training": "Split data to learn then evaluate."
         }
+        if self.is_child:
+            self.terminology = {
+                "Learning Meta": "How magic boxes learn stuff!",
+                "Smart Friends": "AI and ML are like little thinkers.",
+                "Magic Talk": "Special words for magic boxes.",
+                "Happy Teacher": "Learning with a nice grown-up.",
+                "Hide and Seek": "Finding patterns all by yourself!",
+                "Deep Thinking": "Very big brain networks!",
+                "Small Steps": "The tiniest bit of thinking.",
+                "Fun Practice": "Practice makes perfect magic!"
+            }
 
     def train_perceptron(self, data: List[tuple], weights: List[float]):
         """Simulates Perceptron Training Logic."""
@@ -55,6 +66,8 @@ class DeepLearningEngine(MLEngine):
         self.layers: List[Dict[str, Any]] = []
         self.tfjs_ops = ["tf.tensor", "tf.add", "tf.matMul", "tf.sequential", "tf.layers.dense"]
         self.tfjs_models = ["MobileNet", "PoseNet", "CocoSsd", "Toxicity"]
+        if self.is_child:
+            self.tfjs_models = ["FlowerNet", "DanceNet", "ToyNet", "KindnessMeter"]
 
     def add_layer(self, units: int, activation: str = "relu"):
         self.layers.append({"units": units, "activation": activation})
@@ -145,6 +158,13 @@ class IntelligenceHistory(IntelligenceComponent):
             {"year": "Theory of Mind", "event": "The capability of AI to attribute mental states to others."},
             {"year": "2026", "event": "SigmaOS Apex Kernel Release"}
         ]
+        if self.is_child:
+            self.timeline = [
+                {"year": "Once Upon a Time", "event": "People learned to count with fingers."},
+                {"year": "Way Back", "event": "Magic boxes called computers were born."},
+                {"year": "Growing Up", "event": "Computers started learning to play games."},
+                {"year": "Today", "event": "SigmaOS makes everyone happy and safe!"}
+            ]
 
     def get_summary(self):
         if self.is_child:

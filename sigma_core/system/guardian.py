@@ -76,7 +76,21 @@ class SigmaGuardian:
             "ABSORPTION": "HUGGING",
             "ZERO-TRUST": "HUG-READY",
             "COMPLIANCE": "GOLD STAR",
-            "CYCLES": "HAPPY BEATS"
+            "CYCLES": "HAPPY BEATS",
+            "ERROR": "BOO-BOO",
+            "WARNING": "HINT",
+            "CRASH": "NAP TIME",
+            "DEBUG": "KIND FIND",
+            "VERBOSE": "CHIPPY CHAT",
+            "LATENCY": "NAP SPEED",
+            "THROTTLED": "SLOW WALKING",
+            "VULNERABILITY": "TINY OWIE",
+            "EXPLOIT": "SNEAKY TRICK",
+            "REGRESSION": "OLDER STEPS",
+            "ALGORITHM": "MAGIC RULES",
+            "DATABASE": "TOY CHEST",
+            "SERVER": "MAGIC TOWER",
+            "CLIENT": "FRIENDLY BOX"
         }
         
         upper_text = text.upper()

@@ -1,14 +1,14 @@
 import tkinter as tk
 from tkinter import ttk
 import random
-from gui_pkg.base_page import SigmaPage
-from gui_pkg.styles import PAL, FONT_BOLD, FONT_MED, FONT_SMALL
+from .base_page import SigmaPage
+from .styles import PAL, FONT_BOLD, FONT_MED, FONT_SMALL
 
 class IntelligenceHubPage(SigmaPage):
     """Sovereign Intelligence Suite: AI, ML, Math, Stats & History."""
     
     def __init__(self, parent, gui):
-        super().__init__(parent, gui, "Intelligence Hub", "Apex Knowledge & Predictive Engine")
+        SigmaPage.__init__(self, parent, gui, "Intelligence Hub", "Apex Knowledge & Predictive Engine")
         self.hub = self.kernel.registry.get("intelligence_hub")
         self._build_ui()
 
@@ -17,24 +17,26 @@ class IntelligenceHubPage(SigmaPage):
         tabs = ttk.Notebook(self)
         tabs.pack(fill="both", expand=True, padx=20, pady=10)
 
+        guardian = self.kernel.guardian
+
         # 1. ML & Deep Learning
-        ml_frame = self._create_tab(tabs, "🧠 AI & ML")
+        ml_frame = self._create_tab(tabs, guardian.sanitize_text("🧠 AI & ML"))
         self._build_ml_section(ml_frame)
 
         # 2. Mathematics
-        math_frame = self._create_tab(tabs, "📐 Mathematics")
+        math_frame = self._create_tab(tabs, guardian.sanitize_text("📐 Mathematics"))
         self._build_math_section(math_frame)
 
         # 3. Statistics
-        stats_frame = self._create_tab(tabs, "📊 Statistics")
+        stats_frame = self._create_tab(tabs, guardian.sanitize_text("📊 Statistics"))
         self._build_stats_section(stats_frame)
 
         # 4. Graphics Engine
-        gfx_frame = self._create_tab(tabs, "🎨 Graphics")
+        gfx_frame = self._create_tab(tabs, guardian.sanitize_text("🎨 Graphics"))
         self._build_graphics_section(gfx_frame)
 
         # 5. History
-        hist_frame = self._create_tab(tabs, "📜 History")
+        hist_frame = self._create_tab(tabs, guardian.sanitize_text("📜 History"))
         self._build_history_section(hist_frame)
 
     def _create_tab(self, notebook, title):
