@@ -9,6 +9,8 @@ from tkinter import ttk, messagebox, scrolledtext
 import math, json, os, sys
 from sigma_core.app_discovery import AppDiscovery
 from userland.system_api.settings_manager import SettingsManager
+from sigma_core.gamification_engine import GamificationEngine
+from sigma_core.system_monitor import SystemMonitor
 
 PAL = {
     "bg": "#050608",
@@ -45,9 +47,15 @@ class NCERTOmniSimulator(tk.Tk):
         self.configure(bg=PAL["bg"])
         
         self.settings = SettingsManager.load()
+        self.game = GamificationEngine()
         self.search_var: tk.StringVar = tk.StringVar()
         self.main_area: tk.Frame = tk.Frame()
+        self.status_tray: tk.Frame = tk.Frame()
+        self.content_frame: tk.Frame = tk.Frame()
+        self.health_lbl: tk.Label = tk.Label()
+        
         self._build_ui()
+        self._update_loop()
 
     def _build_ui(self):
         # 1. Dashboard Header
@@ -63,16 +71,21 @@ class NCERTOmniSimulator(tk.Tk):
         search_ent.insert(0, "Search NCERT Concepts (e.g. Optics, Titration)...")
         search_ent.bind("<FocusIn>", lambda e: search_ent.delete(0, tk.END))
 
-        # 2. Main Layout (Sidebar + Grid)
-        content = tk.Frame(self, bg=PAL["bg"])
-        content.pack(fill="both", expand=True, padx=20, pady=20)
+        # 2. Main Layout (Sidebar + Context)
+        self.content_frame = tk.Frame(self, bg=PAL["bg"])
+        self.content_frame.pack(fill="both", expand=True, padx=20, pady=20)
         
-        # Sidebar: Subject Hubs
-        side = tk.Frame(content, bg=PAL["panel"], width=280)
+        # Sidebar: Subject Hubs + Gamification
+        side = tk.Frame(self.content_frame, bg=PAL["panel"], width=280)
         side.pack(side="left", fill="y", padx=(0, 20))
         side.pack_propagate(False)
-        
-        tk.Label(side, text="SUBJECT VAULT", font=("Segoe UI Bold", 10), fg=PAL["dim"], bg=PAL["panel"]).pack(pady=(20, 10), anchor="w", padx=20)
+
+        # Gamified Status Bar
+        self.status_tray = tk.Frame(side, bg=PAL["card"], height=120)
+        self.status_tray.pack(fill="x", padx=10, pady=10)
+        self._render_game_status()
+
+        tk.Label(side, text="CENTRAL COMMAND", font=("Segoe UI Bold", 10), fg=PAL["dim"], bg=PAL["panel"]).pack(pady=(20, 10), anchor="w", padx=20)
         
         subjects = [
             ("PHYSICS LAB", PAL["phys"], self._show_phys),
@@ -89,16 +102,13 @@ class NCERTOmniSimulator(tk.Tk):
                             cursor="hand2", command=cmd)
             btn.pack(fill="x", pady=5, padx=10)
 
-        # Bottom Sidebar: Quick Stats
-        tk.Label(side, text="SCIENTIFIC CONSTANTS", font=("Segoe UI Bold", 10), fg=PAL["dim"], bg=PAL["panel"]).pack(pady=(30, 10), anchor="w", padx=20)
-        const_box = scrolledtext.ScrolledText(side, bg=PAL["bg"], fg=PAL["text"], font=("Consolas", 9), height=15, borderwidth=0)
-        const_box.pack(fill="both", padx=10)
-        for k, v in CONSTANTS.items():
-            const_box.insert(tk.END, f"{k}:\n{v}\n\n")
-        const_box.config(state=tk.DISABLED)
+        # Bottom Sidebar: System Health (Resilience & Transparency)
+        tk.Label(side, text="SYSTEM INTEG", font=("Segoe UI Bold", 10), fg=PAL["dim"], bg=PAL["panel"]).pack(pady=(30, 5), anchor="w", padx=20)
+        self.health_lbl = tk.Label(side, text="CPU: -- | RAM: --", font=("Consolas", 8), fg=PAL["chem"], bg=PAL["bg"], pady=10)
+        self.health_lbl.pack(fill="x", padx=10)
 
         # 3. Dynamic Display Area
-        self.main_area = tk.Frame(content, bg=PAL["bg"])
+        self.main_area = tk.Frame(self.content_frame, bg=PAL["bg"])
         self.main_area.pack(side="right", fill="both", expand=True)
         
         self._show_welcome()
@@ -143,6 +153,20 @@ class NCERTOmniSimulator(tk.Tk):
     def _show_math(self): self._launch_sublab("ncert_maths_lab")
     def _show_primary(self): self._launch_sublab("ncert_primary_maths")
 
+    def _render_game_status(self):
+        for w in self.status_tray.winfo_children(): w.destroy()
+        st = self.game.get_status()
+        tk.Label(self.status_tray, text=f"RANK: {self.settings.get('user_name', 'Researcher')}", fg=PAL["accent"], bg=PAL["card"], font=("Segoe UI Bold", 10)).pack(pady=5)
+        tk.Label(self.status_tray, text=f"Level {st['Level']} Scientific Pioneer", fg="white", bg=PAL["card"], font=("Segoe UI", 9)).pack()
+        
+        # Micro Progress Bar (XP)
+        prog = tk.Frame(self.status_tray, bg="#1A1E30", height=4)
+        prog.pack(fill="x", padx=20, pady=10)
+        fill_w = int((st["Total XP"] % 500) / 500 * 160)
+        tk.Frame(prog, bg=PAL["accent"], width=fill_w, height=4).pack(side="left")
+        
+        tk.Label(self.status_tray, text=f"XP: {st['Total XP']} | Labs: {st['Labs Done']}", fg=PAL["dim"], bg=PAL["card"], font=("Segoe UI", 8)).pack()
+
     def _show_settings(self):
         self._clear_area()
         pane = tk.Frame(self.main_area, bg=PAL["card"], padx=40, pady=40)
@@ -162,16 +186,36 @@ class NCERTOmniSimulator(tk.Tk):
             
         tk.Button(pane, text="SAVE PROFILE", bg=PAL["accent"], fg="white", relief="flat", command=save).pack(pady=20)
 
+    def _update_loop(self):
+        """Adaptive System Pulse."""
+        self._refresh_health()
+        self.after(5000, self._update_loop)
+
+    def _refresh_health(self):
+        # Transparency: System health in footer
+        report = SystemMonitor.get_health_report()
+        self.health_lbl.config(text=f"CPU: {report['CPU']} | RAM: {report['RAM']}")
+        if "PERFORMANCE" in report["PowerState"]:
+            self.health_lbl.config(fg="#F87171") # Alert red
+        else:
+            self.health_lbl.config(fg=PAL["chem"])
+
     def _launch_sublab(self, mod_name):
+        # Gamified Reward
+        self.game.record_experiment(mod_name)
+        self._render_game_status()
+        
         # Open the specific lab or hub
         try:
             import subprocess
-            # Path normalization for Windows/Unix sovereign interop
             path = os.path.join("userland", "apps", f"{mod_name}.py")
             if os.path.exists(path):
                 subprocess.Popen([sys.executable, path])
+            else:
+                SystemMonitor.log_incident("SublabLauncher", f"Module {mod_name} not found at {path}")
         except Exception as e:
-            messagebox.showerror("Error", f"Failed to link module: {e}")
+            SystemMonitor.log_incident("SublabLauncher", str(e))
+            messagebox.showerror("Error", f"Link failure: {e}")
 
 if __name__ == "__main__":
     app = NCERTOmniSimulator()
