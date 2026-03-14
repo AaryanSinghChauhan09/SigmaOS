@@ -1,5 +1,5 @@
 """
-SigmaOS Personalization Engine (v1.0 Sovereign)
+SigmaOS Personalization Engine (v2.0 Apex)
 ================================================
 USP: Adaptive system vibes and personalized resource allocation.
 Learns from user interactions to automate 'Ghost Mode' and 'Apex Mode' shifts.
@@ -8,48 +8,58 @@ import os
 import sys
 import json
 import time
+from typing import Dict, Any, Optional
 
-# Robust System Path Injection
-_p = os.path.abspath(__file__)
-while _p and not os.path.exists(os.path.join(os.path.dirname(_p), "sigma_core")):
-    _p = os.path.dirname(_p)
-    if _p == os.path.dirname(_p): break
-root = os.path.dirname(_p)
-if root and root not in sys.path: sys.path.insert(0, root)
-
-from sigma_core.system.interfaces import SigmaModuleBase
+try:
+    from sigma_core.system.interfaces import SigmaModuleBase
+except ImportError:
+    class SigmaModuleBase:
+        def __init__(self, kernel): self.kernel = kernel
+        def log_event(self, a, c): pass
 
 class PersonalizationEngine(SigmaModuleBase):
     def __init__(self, kernel=None):
         SigmaModuleBase.__init__(self, kernel)
         self.profile_path = "userland/system_api/user_profile.sigma"
-        self.user_preferences = self._load_profile()
+        self.user_preferences: Dict[str, Any] = self._load_profile()
         self.adaptive_threshold = 0.85
 
-    def _load_profile(self):
+    def _load_profile(self) -> Dict[str, Any]:
         if os.path.exists(self.profile_path):
             try:
                 with open(self.profile_path, "r") as f:
-                    return json.load(f)
+                    data = json.load(f)
+                    return data if isinstance(data, dict) else {}
             except: pass
         return {"preferred_mode": "NEUTRAL", "vibe": "CYBERPUNK", "auto_stealth": True}
 
-    def adapt_system(self):
-        """USP: Resilient & Adaptive Environment Awareness."""
-        vibe = self.user_preferences.get("vibe", "DEFAULT")
-        if self.kernel and hasattr(self.kernel, "config"):
-            self.kernel.config.apply_vibe(vibe)
+    def learn_vibe_pattern(self, event_type: str, intensity: float):
+        """USP: Automated Interaction Learning. Maps user pulses to OS vibes."""
+        if event_type == "KEYBOARD_HIGH_VELOCITY" and intensity > 0.8:
+            self.user_preferences["preferred_mode"] = "APEX_GAMING"
+            self.log_event("cognitive_learn", {"shift": "APEX_FOCUS"})
+        elif event_type == "LOW_ACTIVITY" and intensity < 0.2:
+            self.user_preferences["preferred_mode"] = "SUSTAINABLE"
             
-        # If CPU load is low, enable resource-saving
-        if self.kernel and self.kernel.hal.get_cpu_load() == "Adaptive Logic: [STABLE]":
-             self.kernel.bus.emit("power.conserve", {"level": "MAX"})
-        
-        return f"Sovereign: Environment adapted to {vibe}."
+        self._save_profile(self.user_preferences)
 
-    def set_stealth_priority(self, enabled: bool):
-        self.user_preferences["auto_stealth"] = enabled
-        if enabled and self.kernel:
-            self.kernel.registry.get("security").stats["anonymity_score"] = 99.9
+    def _save_profile(self, data: Dict[str, Any]):
+        try:
+            os.makedirs(os.path.dirname(self.profile_path), exist_ok=True)
+            with open(self.profile_path, "w") as f:
+                json.dump(data, f, indent=4)
+        except: pass
+
+    def adapt_system(self) -> str:
+        """USP: Resilient & Adaptive Environment Awareness."""
+        mode = self.user_preferences.get("preferred_mode", "NEUTRAL")
         
+        # Proactively inform the Resource Alchemist
+        if self.kernel and hasattr(self.kernel, "resource_alchemist"):
+            self.kernel.resource_alchemist.shift_profile(str(mode))
+            
+        return f"Sovereign: Environment automated for {mode} mode."
+
     def health_check(self) -> str:
-        return f"OK — Profile Ready | Vibe: {self.user_preferences['preferred_mode']}"
+        mode = self.user_preferences.get("preferred_mode", "NEUTRAL")
+        return f"OK — Mode: {mode} | Adaptive: ACTIVE"

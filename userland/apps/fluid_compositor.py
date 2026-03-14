@@ -1,5 +1,5 @@
 """
-SigmaOS Fluid UI Compositor (v1.0)
+SigmaOS Fluid UI Compositor (v1.2 Apex)
 ==================================
 Hardware-accelerated desktop rendering engine.
 USP: Z-buffered window sorting and quantum double-buffering.
@@ -9,6 +9,7 @@ import tkinter as tk
 from tkinter import ttk, messagebox
 import random
 import time
+from typing import Dict, Any
 
 PAL = {
     "bg": "#0B0C0E",
@@ -129,6 +130,26 @@ class FluidCompositor(tk.Tk):
         messagebox.showinfo("Hardware Compositor", msg)
         self.status.config(text=f"COMPOSITOR ACTIVE | V-SYNC: {stat} | GPU UNLOCKED", bg=col, fg="black" if self.vsync else "white")
 
+    def react_to_vibe(self, vibe_mode: str):
+        """USP: Dynamic UI Personalization. Reacts to OS level profile shifts."""
+        schemes = {
+            "APEX_GAMING": {"accent": "#FF3B30", "bg": "#050505", "fps": 240},
+            "STEALTH_GHOST": {"accent": "#8E8E93", "bg": "#000000", "fps": 30},
+            "NEURAL_RESEARCH": {"accent": "#00D4FF", "bg": "#0B0C0E", "fps": 144},
+            "SUSTAINABLE": {"accent": "#32D74B", "bg": "#0B0C0E", "fps": 60}
+        }
+        
+        scheme = schemes.get(vibe_mode, schemes["NEURAL_RESEARCH"])
+        self.configure(bg=str(scheme["bg"]))
+        self.fps = int(scheme["fps"])
+        self.status.config(text=f"VIBE SHIFTED: {vibe_mode} | TARGET: {self.fps}Hz", bg=str(scheme["accent"]), fg="black")
+        
+        self.log_event("ui_vibe_shift", {"mode": vibe_mode, "fps": self.fps})
+        return f"UI Re-Composited for {vibe_mode} profile."
+
+    def log_event(self, action: str, data: Dict[str, Any]):
+        if self.kernel and hasattr(self.kernel, "bus"):
+             self.kernel.bus.emit(f"ui.{action}", data)
 
 if __name__ == "__main__":
     app = FluidCompositor()

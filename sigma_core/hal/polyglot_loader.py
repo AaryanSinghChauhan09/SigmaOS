@@ -32,6 +32,15 @@ class PolyglotLoader:
             return self.run_priority_layer(layer, target_bin)
         return False
 
+    def hot_unload_core(self, layer: str):
+        """USP: Minimalist operation. Unloads native cores to free system resources."""
+        if layer in self.active_cores:
+            bin_name = self.active_cores.pop(layer)
+            print(f"[POLYGLOT] Hot-Unload: Layer '{layer}' core '{bin_name}' removed from memory.")
+            self.status[layer] = "UNLOADED"
+            return True
+        return False
+
     def run_priority_layer(self, layer_name: str, bin_name: str):
         """Attempts to run the native binary; falls back to simulated logic."""
         ext = ".exe" if self.os_type == "Windows" else ""
