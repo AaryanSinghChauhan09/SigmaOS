@@ -8,7 +8,7 @@ import os
 import hashlib
 import time
 try:
-    from sigma_core.interfaces import ISigmaModule, SigmaModuleBase
+    from sigma_core.system.interfaces import ISigmaModule, SigmaModuleBase
 except ImportError:
     # Fallback for direct execution
     class ISigmaModule: pass

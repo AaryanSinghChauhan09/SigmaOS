@@ -279,7 +279,7 @@ class SigmaKernel:
             ("sigma_core.system.ipc_manager",          "SigmaIPC",                  "ipc"),
             
             # Subsystems
-            ("sigma_fs",                              "SigmaFS",                   "fs"),
+            ("sigma_core.system.sigma_fs",             "SigmaFS",                   "fs"),
             ("sigma_core.system.memory_manager",       "SigmaMemoryManager",        "memory"),
             ("sigma_core.system.process_manager",       "SigmaProcessManager",       "process"),
             ("sigma_core.security.network_guardian",   "SigmaNetworkGuardian",      "net_guard"),

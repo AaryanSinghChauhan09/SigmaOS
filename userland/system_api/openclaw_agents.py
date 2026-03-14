@@ -6,7 +6,7 @@ and Sandboxed Execution. Eliminates reliance on 3rd party bloated frameworks.
 """
 
 try:
-    from sigma_core.interfaces import ISigmaModule, SigmaModuleBase
+    from sigma_core.system.interfaces import ISigmaModule, SigmaModuleBase
 except ImportError:
     class ISigmaModule: pass
     class SigmaModuleBase:

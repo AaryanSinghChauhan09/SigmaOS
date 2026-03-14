@@ -16,7 +16,7 @@ root = str(os.path.dirname(_p))
 if root and root not in sys.path: sys.path.insert(0, root)
 
 from userland.system_api.sigma_std import SigmaSys
-from sigma_core.kernel_hal import SovereignHAL
+from sigma_core.hal.kernel_hal import SovereignHAL
 
 class SystemMonitor:
     hal = SovereignHAL()

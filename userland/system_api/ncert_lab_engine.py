@@ -7,7 +7,7 @@ single SigmaModuleBase so the kernel can register it as "ncert_lab".
 import sys, os
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), "..", "userland", "apps"))
 
-from sigma_core.interfaces import SigmaModuleBase, ISigmaService  # type: ignore
+from sigma_core.system.interfaces import SigmaModuleBase, ISigmaService  # type: ignore
 
 
 class NCERTLabEngine(SigmaModuleBase, ISigmaService):

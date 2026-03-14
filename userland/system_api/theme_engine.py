@@ -8,7 +8,7 @@ Customizes UI, Terminal, and System Notifications based on active Mode.
 from typing import Dict, Any
 
 try:
-    from sigma_core.interfaces import SigmaModuleBase
+    from sigma_core.system.interfaces import SigmaModuleBase
 except ImportError:
     class SigmaModuleBase:
         def __init__(self, kernel): self.kernel = kernel

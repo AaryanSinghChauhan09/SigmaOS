@@ -11,7 +11,7 @@ from typing import Dict, List, Any, Optional
 try:
     from .interfaces import SigmaModuleBase
 except ImportError:
-    from sigma_core.interfaces import SigmaModuleBase
+    from sigma_core.system.interfaces import SigmaModuleBase
 
 class RepairJob:
     def __init__(self, module: str, reason: str, tier: str):

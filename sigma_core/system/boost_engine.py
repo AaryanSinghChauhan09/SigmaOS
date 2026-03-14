@@ -135,39 +135,56 @@ def _agent_rebalance() -> str:
     return "rebalanced"
 
 
-# ── Public API ────────────────────────────────────────────────────────────────
+from sigma_core.system.interfaces import SigmaModuleBase, ISigmaService
 
-def boost_system() -> None:
+class SigmaPerformanceBoost(SigmaModuleBase, ISigmaService):
     """
-    Execute all 6 boost sub-tasks in parallel on the ThreadPoolExecutor.
-    Returns only after every future resolves or raises.
+    SigmaOS Turbo Boost Engine (v2.0 Apex)
+    =======================================
+    USP: Native Multi-Core Event Flushing + Zero-Dependency Cache Optimization.
     """
-    print("--- [SIGMAOS TURBO BOOST v2.0 APEX] ---")
-    print("    Bypassing framework bottlenecks (Langchain, AutoGen, n8n, BabyAGI…)")
-    start_cpu = _native_cpu_usage()
+    def __init__(self, kernel=None):
+        SigmaModuleBase.__init__(self, kernel)
 
-    tasks = [
-        _flush_cache,
-        _verify_integrity,
-        _scrub_identity,
-        _overclock_bus,
-        _predictive_preheat,
-        _agent_rebalance,
-    ]
+    def start_service(self):
+        self.log_event("service_start", {"id": "TurboBoost"})
+        return "Turbo Boost: ACTIVE"
 
-    results: list[str] = []
-    with ThreadPoolExecutor(max_workers=len(tasks)) as pool:
-        futures = {pool.submit(fn): fn.__name__ for fn in tasks}
-        for future in as_completed(futures):
-            try:
-                results.append(future.result())
-            except Exception as exc:
-                print(f"      [WARN] {futures[future]} raised: {exc}")
+    def stop_service(self):
+         self.log_event("service_stop", {"id": "TurboBoost"})
 
-    end_cpu = _native_cpu_usage()
-    print(f"\n--- [BOOST COMPLETE] ---")
-    print(f"    Tasks finished: {len(results)}/6 | CPU Δ: {abs(end_cpu - start_cpu):.2f}% | Stability: PURE")
+    def health_check(self) -> str:
+        return "OK - Performance: Optimized"
 
+    def boost_system(self) -> None:
+        """
+        Execute all 6 boost sub-tasks in parallel.
+        """
+        print("--- [SIGMAOS TURBO BOOST v2.0 APEX] ---")
+        start_cpu = _native_cpu_usage()
+
+        tasks = [
+            _flush_cache,
+            _verify_integrity,
+            _scrub_identity,
+            _overclock_bus,
+            _predictive_preheat,
+            _agent_rebalance,
+        ]
+
+        results: list[str] = []
+        with ThreadPoolExecutor(max_workers=len(tasks)) as pool:
+            futures = {pool.submit(fn): fn.__name__ for fn in tasks}
+            for future in as_completed(futures):
+                try:
+                    results.append(future.result())
+                except Exception as exc:
+                    print(f"      [WARN] {futures[future]} raised: {exc}")
+
+        end_cpu = _native_cpu_usage()
+        print(f"\n--- [BOOST COMPLETE] ---")
+        print(f"    Tasks finished: {len(results)}/6 | CPU Δ: {abs(end_cpu - start_cpu):.2f}% | Stability: PURE")
 
 if __name__ == "__main__":
-    boost_system()
+    eng = SigmaPerformanceBoost()
+    eng.boost_system()

@@ -22,7 +22,7 @@ class SigmaForge:
             content = f'''"""
 {name} Application for SigmaOS
 """
-from sigma_core.interfaces import SigmaModuleBase
+from sigma_core.system.interfaces import SigmaModuleBase
 
 class {class_name}(SigmaModuleBase):
     def __init__(self, kernel=None):
@@ -54,7 +54,7 @@ class {class_name}(SigmaAgentIsolate):
             content = f'''"""
 {name} Background Service for SigmaOS
 """
-from sigma_core.interfaces import SigmaModuleBase, ISigmaService
+from sigma_core.system.interfaces import SigmaModuleBase, ISigmaService
 
 class {class_name}(SigmaModuleBase, ISigmaService):
     def __init__(self, kernel=None):

@@ -6,7 +6,7 @@ Links directly to KAD and HAL for surgical system control.
 """
 
 try:
-    from sigma_core.interfaces import SigmaModuleBase
+    from sigma_core.system.interfaces import SigmaModuleBase
 except ImportError:
     class SigmaModuleBase:
         def __init__(self, kernel): self.kernel = kernel
