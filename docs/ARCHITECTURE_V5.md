@@ -34,10 +34,10 @@ SigmaOS is now structured for maximum resilience:
 
 | Module Group | Primary Files | Language |
 | :----------- | :------------ | :------- |
-| **`security/`** | NeuroIdentity, Integrity, Compliance, Vanguard | Python / C (HAL) |
-| **`ai/`** | CortexEngine, IntelligenceStudio, AgentOrchestrator| Python / Go |
-| **`system/`** | ResourceAlchemist, CommunityNexus, Gamification, Sync | Python |
-| **`ui/`** | Shell, transparency_portal, MorphicDashboard | Python |
+| **`security/`** | NeuroIdentity, Stealth, Compliance, Vanguard | Python / C (HAL) |
+| **`ai/`** | CortexEngine, IntelligenceStudio, Orchestrator| Python / Go |
+| **`system/`** | ResourceAlchemist, MeshDispatcher, Gamification | Python |
+| **`ui/`** | Shell, transparency_portal, SovereignVision | Python |
 | **`hal/`** | KernelHAL, PolyglotLoader | Python / C / Rust |
 
 ---

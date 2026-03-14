@@ -324,6 +324,7 @@ class SigmaKernel:
             ("sigma_core.ui.morphic_dashboard",    "MorphicDashboard",      "dashboard"),
             ("sigma_core.ui.transparency_portal",  "TransparencyPortal",     "portal"),
             ("sigma_core.system.community_nexus",  "CommunityNexus",        "nexus"),
+            ("sigma_core.system.mesh_dispatcher",   "MeshDispatcher",        "mesh"),
             ("sigma_core.system.resource_alchemist", "ResourceAlchemist",    "resource_alchemist"),
             ("sigma_core.ai.cortex_engine",        "CortexEngine",          "cortex"),
             ("sigma_core.system.personalization",  "PersonalizationEngine", "personalization"),

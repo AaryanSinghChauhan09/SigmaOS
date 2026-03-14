@@ -34,12 +34,19 @@ class ResourceAlchemist(SigmaModuleBase, ISigmaService):
         
         # Integration with HAL for Core Pinning & Priority
         if self.kernel and hasattr(self.kernel, "hal"):
+            hal = self.kernel.hal
             if profile == "APEX_GAMING":
-                self.kernel.hal.set_process_priority("Realtime")
-                self.kernel.hal.pin_to_cores(0x0F) # Use performance cores
+                hal.set_process_priority("Realtime")
+                hal.pin_to_cores(0x0F)
+                # Pulse the Polyglot Hot-Swap
+                if hasattr(self.kernel, "polyglot"):
+                    self.kernel.polyglot.hot_swap_core("memory", "APEX_GAMING")
             elif profile == "STEALTH_GHOST":
-                self.kernel.hal.set_process_priority("Below")
-                self.kernel.hal.trim_working_set()
+                hal.set_process_priority("Below")
+                hal.trim_working_set()
+            elif profile == "NEURAL_RESEARCH":
+                if hasattr(self.kernel, "polyglot"):
+                    self.kernel.polyglot.hot_swap_core("ipc", "NEURAL_RESEARCH")
                 
         self.log_event("profile_shift", {"new_profile": profile})
         return f"OS Profile Transmuted to: {profile}"
