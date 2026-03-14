@@ -136,12 +136,12 @@ CORE_SYSTEM_MODULES = [
 ]
 
 ECOSYSTEM_APPS = [
-    ("aether_orchestrator",  "AetherOrchestrator",        "aether_orch"),
-    ("pdf_forge",            "SigmaPDFForge",             "pdf_forge"),
-    ("titan_capture",        "SigmaTitanCapture",         "titan_capture"),
-    ("sigma_ai_nexus",       "SigmaAINexus",              "nexus"),
-    ("sigma_studio",         "SigmaStudioPlus",           "studio"),
-    ("aura_assistant",       "SigmaAuraAssistant",        "assistant"),
+    ("ecosystem.aether_orchestrator",  "AetherOrchestrator",        "aether_orch"),
+    ("ecosystem.pdf_forge",            "SigmaPDFForge",             "pdf_forge"),
+    ("ecosystem.titan_capture",        "SigmaTitanCapture",         "titan_capture"),
+    ("ecosystem.sigma_ai_nexus",       "SigmaAINexus",              "nexus"),
+    ("ecosystem.sigma_studio",         "SigmaStudioPlus",           "studio"),
+    ("ecosystem.aura_assistant",       "SigmaAuraAssistant",        "assistant"),
     ("userland.intelligence_suite.sigma_data_viz", "SigmaDataViz", "viz_engine"),
     ("userland.intelligence_suite.sigma_ml_engine", "SigmaMLEngine", "ml_engine"),
     ("userland.intelligence_suite.sigma_genai_lab", "SigmaGenAILab", "genai_lab"),
