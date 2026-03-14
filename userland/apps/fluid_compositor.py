@@ -84,7 +84,8 @@ class FluidCompositor(tk.Tk):
         
         if clicked_win is not None:
             max_z = max(w["z"] for w in self.windows.values())
-            clicked_win["z"] = max_z + 1
+            clicked_win["z"] = max_z + 1 # type: ignore
+ # type: ignore
 
     def _render_loop(self):
         self.canvas.delete("ui")

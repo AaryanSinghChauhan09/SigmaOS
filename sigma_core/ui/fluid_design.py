@@ -94,6 +94,51 @@ TYPOGRAPHY = {
     "mono": ("JetBrains Mono", 9)
 }
 
+# Design Tokens: Icons (Sovereign Symbol Manifest)
+ICONS = {
+    # Core & Security
+    "security": "🛡️", "warden": "👮", "zero_trust": "🔐", "net_guard": "🌐", 
+    "crusher": "🔨", "vanguard": "⚔️", "neuro_identity": "🧠", "compliance": "⚖️", 
+    "shield": "🔰", "offline": "📵", "kad": "🕵️",
+    
+    # System & Kernel
+    "hal": "⚙️", "bootloader": "🚀", "fs": "📁", "memory": "📟", "process": "🔄", 
+    "ipc": "🔌", "sessions": "👥", "package_manager": "📦", "perf": "⚡", 
+    "repair_engine": "🔧", "energy": "🔋", "governor": "⚖️", "automator": "🤖", 
+    "modes": "🌓", "sync": "🔄", "snapshots": "📸", "telemetry": "📊", 
+    "resource_alchemist": "⚗️", "tuner": "🎸", "stabilizer": "⚖️", "watchdog": "🐕",
+    
+    # AI & Intelligence
+    "intelligence": "🧠", "antigravity": "🛸", "cortex": "🔮", "mapper": "🗺️", 
+    "vibe_orch": "🎭", "gurukul": "🏛️", "fabric": "🕸️",
+    
+    # UI & Experience
+    "wms": "🗔", "shell": "🐚", "aura": "🌈", "dashboard": "📊", 
+    "portal": "🌀", "ghostchat": "👻", "minimalist": "➖",
+    
+    # Ecosystem & Apps
+    "ncert": "📚", "legal": "📜", "nexus": "📡", "mesh": "🕸️", 
+    "viz_engine": "📈", "ml_engine": "🧪", "genai_lab": "🧬", 
+    "studio": "🎨", "assistant": "🎙️", "arcade": "🕹️", "board_hub": "🎲",
+    
+    # User Productivity
+    "calculator": "🧮", "timer": "⏱️", "browser": "🌐", "paint": "🎨", 
+    "writer": "✍️", "code": "💻", "music": "🎵", "video": "🎥", 
+    "vault": "🔐", "clipboard": "📋", "search": "🔍", "terminal": "🐚"
+}
+
+# Design Tokens: Animated Sequences (Sovereign Motion Manifest)
+SPINNERS = {
+    "pulse": ["🌑", "🌘", "🌗", "🌖", "🌕", "🌔", "🌓", "🌒"],
+    "radar": ["📡", "🛰️", "🛸", "📡"],
+    "orbit": ["⠋", "⠙", "⠹", "⠸", "⠼", "⠴", "⠦", "⠧", "⠇", "⠏"],
+    "dots": ["󠁏", "󠁏", "󠁏", "󠁏"], # Custom spacing or dots
+    "signal": ["📶", "🛜", "🌐"],
+    "neural": ["🧠", "🧬", "🧪", "🧬"],
+    "energy": ["🔋", "🪫", "⚡", "🔋"],
+    "gear": ["⚙️", "🛠️", "🔧", "⚙️"],
+}
+
 # Design Tokens: Animation & Transitions (Ultra-Smooth)
 ANIMATION = {
     "fast": 150,      # Elastic In

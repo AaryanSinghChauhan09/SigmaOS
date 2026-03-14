@@ -8,6 +8,12 @@ import tkinter as tk
 from tkinter import ttk, messagebox, simpledialog
 import random
 import time
+from typing import Any, List
+
+try:
+    from sigma_core.ui.fluid_design import ICONS # type: ignore
+except ImportError:
+    ICONS = {}
 
 PAL = {
     "bg": "#0B0C0F",
@@ -27,9 +33,19 @@ class OmniBrowser(tk.Toplevel):
         self.geometry("1200x850")
         self.config(bg=PAL["bg"])
         
-        self.tabs = ["omni.sigma://home", "sovereign.vault/auth", "github.com/sigmaos"]
+        self.tabs: List[str] = ["omni.sigma://home", "sovereign.vault/auth", "github.com/sigmaos"]
         self.active_tab_idx = 0
         
+        # UI Proxies
+        self.tab_container: Any = None
+        self.tab_nb: Any = None
+        self.addr_fr: Any = None
+        self.url_entry: Any = None
+        self.shield_btn: Any = None
+        self.viewport: Any = None
+        self.render_lbl: Any = None
+        self.status: Any = None
+
         self._setup_styles()
         self._build_ui()
 
@@ -50,7 +66,8 @@ class OmniBrowser(tk.Toplevel):
         self.tab_nb.pack(side="left", fill="x", expand=True)
         
         for t in self.tabs:
-            self.tab_nb.add(tk.Frame(self.tab_nb), text=f" {t.split('//')[-1]} ")
+            name = t.split('//')[-1] if '//' in t else t
+            self.tab_nb.add(tk.Frame(self.tab_nb), text=f" {ICONS.get('browser', '🌐')} {name} ")
             
         tk.Button(self.tab_container, text=" + ", bg=PAL["bg"], fg=PAL["accent"], relief="flat", font=("Inter", 12, "bold")).pack(side="left", padx=10)
 
@@ -61,8 +78,11 @@ class OmniBrowser(tk.Toplevel):
         # Nav Buttons
         nav_fr = tk.Frame(self.addr_fr, bg=PAL["toolbar"])
         nav_fr.pack(side="left")
-        for icon in ["⏮", "⏭", "🔄"]:
-            tk.Button(nav_fr, text=icon, font=("Inter", 14), bg=PAL["toolbar"], fg="white", relief="flat", padx=10).pack(side="left")
+        
+        nav_controls = [("minimalist", "⏮"), ("code", "⏭"), ("perf", "🔄")]
+        for icon_key, fallback in nav_controls:
+            tk.Button(nav_fr, text=ICONS.get(icon_key, fallback), font=("Inter", 14), 
+                      bg=PAL["toolbar"], fg="white", relief="flat", padx=10).pack(side="left")
 
         # URL Input
         self.url_entry = tk.Entry(self.addr_fr, bg="#000000", fg=PAL["text"], font=("Inter", 11), 
@@ -73,12 +93,12 @@ class OmniBrowser(tk.Toplevel):
         self.url_entry.bind("<Return>", self.navigate)
 
         # Security Status
-        self.shield_btn = tk.Button(self.addr_fr, text="🛡️ SAFE", font=("Inter", 9, "bold"), 
+        self.shield_btn = tk.Button(self.addr_fr, text=f"{ICONS.get('warden', '🛡️')} SAFE", font=("Inter", 9, "bold"), 
                                    bg=PAL["success"], fg="white", relief="flat", padx=15, 
                                    command=self._show_security_panel)
         self.shield_btn.pack(side="left", padx=5)
         
-        tk.Button(self.addr_fr, text="📤 BEAM", font=("Inter", 9, "bold"), bg=PAL["accent"], 
+        tk.Button(self.addr_fr, text=f"{ICONS.get('intelligence', '📤')} BEAM", font=("Inter", 9, "bold"), bg=PAL["accent"], 
                   fg="white", relief="flat", padx=15, command=self._trigger_handoff).pack(side="left", padx=5)
 
         # 3. Main Viewport (Simulated Render Area)

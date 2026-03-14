@@ -6,148 +6,150 @@ USP: Neural-latency game logic & Zero-Telemetery Multiplayer Arcade.
 """
 import tkinter as tk
 from tkinter import ttk, messagebox
-import random
-import time
+import random, time, os, sys
+from typing import Dict, Any, List, Optional
+
+# Decouple via absolute path injection
+sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "..")))
+
+try:
+    from sigma_core.ui.fluid_design import PALETTE as FLUID_PAL, ICONS # type: ignore
+    from userland.apps.chess import SovereignStrategist # type: ignore
+    from userland.apps.ludo import LudoApp # type: ignore
+except ImportError:
+    FLUID_PAL = None
+    SovereignStrategist = None
+    LudoApp = None
 
 PAL = {
-    "bg": "#0B0C0F",
-    "sidebar": "#16181D",
-    "accent": "#5E5CE6", # Deep Purple
-    "text": "#E8E8E8",
-    "dim": "#8E8E93",
-    "success": "#32D74B",
-    "danger": "#FF3B30",
-    "p1": "#FF3B30",
-    "p2": "#007AFF"
+    "bg": FLUID_PAL["background"] if FLUID_PAL else "#0B0C0F",
+    "sidebar": FLUID_PAL["surface"] if FLUID_PAL else "#16181D",
+    "accent": FLUID_PAL["primary"] if FLUID_PAL else "#5E5CE6",
+    "text": FLUID_PAL["text_primary"] if FLUID_PAL else "#E8E8E8",
+    "dim": FLUID_PAL["text_secondary"] if FLUID_PAL else "#8E8E93",
+    "p1": "#FF3B30", "p2": "#007AFF"
 }
 
 class SovereignArcade(tk.Tk):
-    def __init__(self):
+    def __init__(self, kernel=None):
         super().__init__()
-        self.title("Sovereign Zenith Arcade v4.0")
-        self.geometry("1000x850")
+        self.kernel = kernel
+        self.title("Sovereign Zenith Arcade v4.0 Apex")
+        self.geometry("1100x850")
         self.configure(bg=PAL["bg"])
+        
+        # UI Attributes (Pre-hydrated for linter health)
+        self.tabs: Any = None
+        self.status_lbl: Any = None
+        
+        self.xo_board = [""] * 9
+        self.xo_turn = "X"
+        self.xo_btns: List[tk.Button] = []
+        self.xo_status: Any = None
+        
+        self.nexus_p1 = 0
+        self.nexus_p2 = 0
+        self.nexus_turn = 1
+        self.nx_lbl: Any = None
+        self.nx_score: Any = None
+        self.nx_canv: Any = None
+        self.nx_lines: Dict[Any, Any] = {}
+        self.nx_boxes: set = set()
+        
+        self.bl_active = False
+        self.bl_canv: Any = None
+        self.bricks: List[Any] = []
+        self.paddle: Any = None
+        self.ball: Any = None
+        self.bl_vx, self.bl_vy = 3, -3
         
         self._setup_styles()
         self._build_ui()
+        
+        # USP: Dynamic Aesthetic Sync (Interactive)
+        if self.kernel and hasattr(self.kernel, "bus"):
+             self.kernel.bus.subscribe("governor.vibe_switch", self._on_vibe_switch)
 
     def _setup_styles(self):
-        style = ttk.Style()
-        style.theme_use('clam')
-        style.configure("Arcade.TNotebook", background=PAL["bg"], borderwidth=0)
-        style.configure("Arcade.TNotebook.Tab", background=PAL["sidebar"], foreground=PAL["text"], 
-                        padding=[20, 10], font=("Inter", 9, "bold"))
-        style.map("Arcade.TNotebook.Tab", background=[("selected", PAL["accent"])])
+        s = ttk.Style()
+        s.theme_use('clam')
+        s.configure("TNotebook", background=PAL["bg"], borderwidth=0)
+        s.configure("TNotebook.Tab", background=PAL["sidebar"], foreground=PAL["text"], padding=[20, 10])
+        s.map("TNotebook.Tab", background=[("selected", PAL["accent"])])
 
     def _build_ui(self):
-        # Header
         head = tk.Frame(self, bg=PAL["bg"], padx=30, pady=20)
         head.pack(fill="x")
         tk.Label(head, text="ZENITH ARCADE", font=("Inter", 24, "bold"), fg=PAL["accent"], bg=PAL["bg"]).pack(side="left")
-        
-        self.status_lbl = tk.Label(head, text="SYSTEM STATUS: PROTECTED | MESH IDLE", font=("Inter", 8, "bold"), fg=PAL["dim"], bg=PAL["bg"])
+        self.status_lbl = tk.Label(head, text="SYSTEM STATUS: PROTECTED", font=("Inter", 8, "bold"), fg=PAL["dim"], bg=PAL["bg"])
         self.status_lbl.pack(side="right", pady=12)
 
-        # Tabs
-        self.tabs = ttk.Notebook(self, style="Arcade.TNotebook")
+        self.tabs = ttk.Notebook(self)
         self.tabs.pack(fill="both", expand=True, padx=25, pady=10)
 
-        # 1. Quantum Tic-Tac-Toe
-        xo_tab = tk.Frame(self.tabs, bg=PAL["bg"], pady=30)
-        self.tabs.add(xo_tab, text=" ⭕ QUANTUM TIC-TAC-TOE ")
-        self._init_xo(xo_tab)
+        # Tab: Tic-Tac-Toe
+        xo_fr = tk.Frame(self.tabs, bg=PAL["bg"], pady=30)
+        self.tabs.add(xo_fr, text=f" {ICONS.get('board_hub', '⭕')} XO ")
+        self._init_xo(xo_fr)
 
-        # 2. Nexus Connector
-        nexus_tab = tk.Frame(self.tabs, bg=PAL["bg"], pady=30)
-        self.tabs.add(nexus_tab, text=" 🕸️ NEXUS CONNECTOR ")
-        self._init_nexus(nexus_tab)
+        # Tab: Nexus
+        nx_fr = tk.Frame(self.tabs, bg=PAL["bg"], pady=30)
+        self.tabs.add(nx_fr, text=f" {ICONS.get('mesh', '🕸️')} DOTS ")
+        self._init_nexus(nx_fr)
 
-        # 3. Aether Climber
-        aether_tab = tk.Frame(self.tabs, bg=PAL["bg"], pady=30)
-        self.tabs.add(aether_tab, text=" 🚀 AETHER CLIMBER ")
-        self._init_aether(aether_tab)
-
-        # 4. Sigma Blocks
-        blocks_tab = tk.Frame(self.tabs, bg=PAL["bg"], pady=30)
-        self.tabs.add(blocks_tab, text=" 🟥 SIGMA BLOCKS ")
-        self._init_blocks(blocks_tab)
-
-    # --- Quantum Tic-Tac-Toe ---
-    def _init_xo(self, parent):
-        self.xo_board = [""] * 9
-        self.xo_turn = "X"
-        self.xo_btns = []
+        # Tab: Blocks
+        bl_fr = tk.Frame(self.tabs, bg=PAL["bg"], pady=30)
+        self.tabs.add(bl_fr, text=f" {ICONS.get('fabric', '🧱')} VOID ")
+        self._init_blocks(bl_fr)
         
+        # Tab: Proximity Launchers
+        if SovereignStrategist:
+            ch_fr = tk.Frame(self.tabs, bg=PAL["bg"], pady=30)
+            self.tabs.add(ch_fr, text=f" {ICONS.get('ncert', '♟️')} CHESS ")
+            tk.Button(ch_fr, text="LAUNCH SOVEREIGN CHESS", bg=PAL["accent"], fg="white", 
+                      command=lambda: SovereignStrategist().mainloop() if SovereignStrategist else None, font=("Inter Bold", 10), padx=20, pady=10).pack(expand=True) # type: ignore
+            
+        if LudoApp:
+            ld_fr = tk.Frame(self.tabs, bg=PAL["bg"], pady=30)
+            self.tabs.add(ld_fr, text=f" {ICONS.get('board_hub', '🎲')} LUDO ")
+            tk.Button(ld_fr, text="LAUNCH DETERMINISTIC LUDO", bg=PAL["accent"], fg="white", 
+                      command=lambda: LudoApp().mainloop() if LudoApp else None, font=("Inter Bold", 10), padx=20, pady=10).pack(expand=True) # type: ignore
+
+    def _init_xo(self, parent):
         self.xo_status = tk.Label(parent, text="X's STRATEGIC VECTOR", font=("Inter", 12, "bold"), fg=PAL["text"], bg=PAL["bg"])
         self.xo_status.pack(pady=20)
-
         grid = tk.Frame(parent, bg=PAL["bg"])
         grid.pack()
-        
         for i in range(9):
-            btn = tk.Button(grid, text="", font=("Inter", 32, "bold"), width=4, height=1, 
-                            bg=PAL["sidebar"], fg="white", relief="flat", highlightthickness=1,
-                            highlightbackground=PAL["accent"], command=lambda idx=i: self._xo_move(idx))
+            btn = tk.Button(grid, text="", font=("Inter", 32, "bold"), width=4, height=1, bg=PAL["sidebar"], fg="white", command=lambda idx=i: self._xo_move(idx)) # type: ignore
             btn.grid(row=i//3, column=i%3, padx=5, pady=5)
             self.xo_btns.append(btn)
-        
-        tk.Button(parent, text="RESET MATRIX", font=("Inter", 9, "bold"), bg=PAL["danger"], 
-                  fg="white", relief="flat", padx=30, pady=10, command=self._xo_reset).pack(pady=30)
 
     def _xo_move(self, idx):
         if self.xo_board[idx] == "":
             self.xo_board[idx] = self.xo_turn
-            color = PAL["accent"] if self.xo_turn == "X" else PAL["success"]
-            self.xo_btns[idx].config(text=self.xo_turn, fg=color)
-            
+            self.xo_btns[idx].config(text=self.xo_turn, fg=PAL["accent"] if self.xo_turn=="X" else "#32D74B")
             if self._check_xo():
-                self.xo_status.config(text=f"WINNER: {self.xo_turn} | VECTOR SECURED", fg=PAL["success"])
-                for b in self.xo_btns: b.config(state="disabled")
+                self.xo_status.config(text=f"WINNER: {self.xo_turn}", fg="#32D74B")
             else:
                 self.xo_turn = "O" if self.xo_turn == "X" else "X"
                 self.xo_status.config(text=f"{self.xo_turn}'s STRATEGIC VECTOR")
 
     def _check_xo(self):
         wins = [(0,1,2),(3,4,5),(6,7,8),(0,3,6),(1,4,7),(2,5,8),(0,4,8),(2,4,6)]
-        for w in wins:
-            if self.xo_board[w[0]] == self.xo_board[w[1]] == self.xo_board[w[2]] != "":
-                return True
-        return False
+        return any(self.xo_board[w[0]] == self.xo_board[w[1]] == self.xo_board[w[2]] != "" for w in wins)
 
-    def _xo_reset(self):
-        self.xo_board = [""] * 9
-        self.xo_turn = "X"
-        for b in self.xo_btns: b.config(text="", state="normal", fg="white")
-        self.xo_status.config(text="X's STRATEGIC VECTOR", fg=PAL["text"])
-
-    # --- Nexus Connector (Dots & Boxes Premium) ---
     def _init_nexus(self, parent):
-        self.nexus_p1 = 0
-        self.nexus_p2 = 0
-        self.nexus_turn = 1
-        
-        inf = tk.Frame(parent, bg=PAL["bg"])
-        inf.pack(fill="x", padx=50)
+        inf = tk.Frame(parent, bg=PAL["bg"]); inf.pack(fill="x", padx=50)
         self.nx_lbl = tk.Label(inf, text="RED'S TURN", font=("Inter", 12, "bold"), fg=PAL["p1"], bg=PAL["bg"])
         self.nx_lbl.pack(side="left")
         self.nx_score = tk.Label(inf, text="RED: 0 | BLUE: 0", font=("Inter", 10), fg=PAL["dim"], bg=PAL["bg"])
         self.nx_score.pack(side="right")
-
-        self.nx_canv = tk.Canvas(parent, width=450, height=450, bg="#000", highlightthickness=1, highlightbackground=PAL["accent"])
+        self.nx_canv = tk.Canvas(parent, width=450, height=450, bg="#000")
         self.nx_canv.pack(pady=20)
-        
-        self.nx_lines = {}
-        self.nx_boxes = set()
-        
-        # Grid setup
-        for r in range(5):
-            for c in range(5):
-                self.nx_canv.create_oval(70+c*100-4, 70+r*100-4, 70+c*100+4, 70+r*100+4, fill="white")
-        
         self.nx_canv.bind("<Button-1>", self._nexus_click)
 
     def _nexus_click(self, e):
-        # Simplified logic for finding nearest line
         x, y = e.x, e.y
         best_d = 25
         best_l = None
@@ -184,38 +186,32 @@ class SovereignArcade(tk.Tk):
             if not found:
                 self.nexus_turn = 3 - self.nexus_turn
                 self.nx_lbl.config(text="RED'S TURN" if self.nexus_turn == 1 else "BLUE'S TURN", fg=PAL["p1"] if self.nexus_turn == 1 else PAL["p2"])
-            
             self.nx_score.config(text=f"RED: {self.nexus_p1} | BLUE: {self.nexus_p2}")
 
-    # --- Sigma Blocks (Breakout Clone) ---
     def _init_blocks(self, parent):
-        self.bl_active = False
-        self.bl_canv = tk.Canvas(parent, width=400, height=500, bg="#000", highlightthickness=1, highlightbackground=PAL["accent"])
+        self.bl_canv = tk.Canvas(parent, width=400, height=500, bg="#000")
         self.bl_canv.pack()
-        
         self.paddle = self.bl_canv.create_rectangle(160, 480, 240, 490, fill=PAL["accent"], outline="")
         self.ball = self.bl_canv.create_oval(195, 470, 205, 480, fill="white", outline="")
-        self.bl_vx, self.bl_vy = 3, -3
         
-        self.bricks = []
-        for r in range(5):
-            for c in range(8):
-                color = PAL["accent"] if r % 2 == 0 else PAL["success"]
-                b = self.bl_canv.create_rectangle(5+c*50, 40+r*20, 45+c*50, 55+r*20, fill=color, outline="")
-                self.bricks.append(b)
-                
-        self.bl_canv.bind("<Motion>", self._bl_move_paddle)
-        tk.Button(parent, text="LAUNCH NEURAL SPHERE", font=("Inter", 9, "bold"), bg=PAL["accent"], 
-                  fg="white", relief="flat", padx=30, pady=10, command=self._bl_start).pack(pady=20)
+        # USP: Interactive Fluid Control
+        self.bl_canv.bind("<Motion>", self._on_bl_mouse)
+        tk.Button(parent, text="LAUNCH NEURAL SPHERE", command=self._bl_start).pack(pady=20)
 
-    def _bl_move_paddle(self, e):
-        x = e.x
-        if 40 <= x <= 360:
-            self.bl_canv.coords(self.paddle, x-40, 480, x+40, 490)
+    def _on_bl_mouse(self, event):
+        if self.bl_active:
+             x = max(40, min(360, event.x))
+             self.bl_canv.coords(self.paddle, x-40, 480, x+40, 490)
 
     def _bl_start(self):
-        if not self.bl_active:
+        if not self.bl_active: 
             self.bl_active = True
+            self.bricks = []
+            for r in range(5):
+                for c in range(8):
+                    color = PAL["accent"] if r % 2 == 0 else "#32D74B"
+                    b = self.bl_canv.create_rectangle(5+c*50, 40+r*20, 45+c*50, 55+r*20, fill=color, outline="")
+                    self.bricks.append(b)
             self._bl_loop()
 
     def _bl_loop(self):
@@ -228,17 +224,17 @@ class SovereignArcade(tk.Tk):
         if by1 <= 0: self.bl_vy *= -1
         if by2 >= 500:
             self.bl_active = False
-            messagebox.showinfo("Zenith Arcade", "VOID REACHED. REBOOTING SPHERE.")
+            messagebox.showinfo("Arcade", "VOID REACHED.")
             self.bl_canv.coords(self.ball, 195, 470, 205, 480)
             return
 
-        # Paddle
+        # Paddle Collision
         px1, py1, px2, py2 = self.bl_canv.coords(self.paddle)
         if by2 >= py1 and px1 <= (bx1+bx2)/2 <= px2:
             self.bl_vy *= -1
             
-        # Bricks
-        for b in self.bricks[:]:
+        # Brick Collision
+        for b in list(self.bricks):
             bbox = self.bl_canv.coords(b)
             if bbox[0] <= (bx1+bx2)/2 <= bbox[2] and bbox[1] <= (by1+by2)/2 <= bbox[3]:
                 self.bl_canv.delete(b)
@@ -248,10 +244,20 @@ class SovereignArcade(tk.Tk):
         
         if not self.bricks:
             self.bl_active = False
-            messagebox.showinfo("Zenith Arcade", "MATRIX CLEARED. YOU ARE THE ZENITH.")
+            messagebox.showinfo("Arcade", "MATRIX CLEARED.")
 
         self.after(16, self._bl_loop)
 
+    def _on_vibe_switch(self, payload: Dict[str, Any]):
+        vibe = payload.get("vibe", "STANDARD")
+        # Shift Sidebar and Background colors based on vibe
+        vibe_colors = {
+            "APEX": "#FFD700", "GAMING": "#FF00FF", "ZEN": "#E0E0E0", "STANDARD": PAL["accent"]
+        }
+        color = vibe_colors.get(vibe, PAL["accent"])
+        if self.status_lbl:
+            self.status_lbl.config(fg=color)
+        print(f"[ARCADE] Aesthetic alignment with {vibe} complete.")
+
 if __name__ == "__main__":
-    app = SovereignArcade()
-    app.mainloop()
+    SovereignArcade().mainloop()

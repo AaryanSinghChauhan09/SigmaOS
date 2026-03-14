@@ -54,8 +54,11 @@ CORE_SYSTEM_MODULES = [
     ("sigma_core.system.adaptive_governor",     "AdaptiveGovernor",          "governor"),
 
     # Specialized Extensions (Sovereign)
-    ("sigma_core.ai.intelligence_studio", "IntelligenceStudio",    "intelligence"),
-    ("sigma_core.system.sync_engine",      "SigmaSyncEngine",       "sync"),
+    ("sigma_core.ai.intelligence_studio",    "IntelligenceStudio",    "intelligence"),
+    ("sigma_core.ai.antigravity_engine",     "AntigravityEngine",     "antigravity_engine"),
+    ("sigma_core.legal.legal_engine",        "LegalEngine",           "legal_engine"),
+    ("sigma_core.education.ncert_engine",    "NCERTEducationEngine",  "ncert_engine"),
+    ("sigma_core.system.sync_engine",        "SigmaSyncEngine",       "sync"),
     ("sigma_core.security.aura_shield",    "SigmaAuraShield",       "shield"),
     ("sigma_core.ai.gurukul_engine",       "GurukulEngine",         "gurukul"),
     ("sigma_core.ui.ghostchat",            "SigmaGhostChat",        "ghostchat"),

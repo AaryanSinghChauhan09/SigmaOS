@@ -7,6 +7,12 @@ USP: Neural Writing Flow & Encrypted Local-Only Persistence.
 import tkinter as tk
 from tkinter import ttk, scrolledtext, filedialog, messagebox
 import random
+import os
+
+try:
+    from sigma_core.ui.fluid_design import ICONS # type: ignore
+except ImportError:
+    ICONS = {}
 
 PAL = {
     "bg": "#0B0C0F",
@@ -42,21 +48,21 @@ class SovereignWriter(tk.Toplevel):
         self.toolbar = tk.Frame(self, bg=PAL["bg"], height=60, padx=20)
         self.toolbar.pack(side="top", fill="x")
         
-        tk.Label(self.toolbar, text="WRITER PRO", font=("Inter", 12, "bold"), fg=PAL["accent"], bg=PAL["bg"]).pack(side="left")
+        tk.Label(self.toolbar, text=f"{ICONS.get('writer', '🖋️')} WRITER PRO", font=("Inter", 12, "bold"), fg=PAL["accent"], bg=PAL["bg"]).pack(side="left")
         
         # Tools
         btn_fr = tk.Frame(self.toolbar, bg=PAL["bg"])
         btn_fr.pack(side="left", padx=30)
         
-        tool_btns = [("B", "bold"), ("I", "italic"), ("U", "underline"), ("✨ AI", "ai")]
+        tool_btns = [("B", "bold"), ("I", "italic"), ("U", "underline"), (f"{ICONS.get('intelligence', '✨')} AI", "ai")]
         for txt, tag in tool_btns:
             bg = PAL["sidebar"] if tag != "ai" else PAL["accent"]
             tk.Button(btn_fr, text=txt, font=("Inter", 9, "bold"), bg=bg, fg="white", 
                       relief="flat", padx=15, pady=8).pack(side="left", padx=2)
 
-        tk.Button(self.toolbar, text="💾 SAVE", font=("Inter", 8, "bold"), bg=PAL["success"], fg="white", 
+        tk.Button(self.toolbar, text=f"{ICONS.get('snapshots', '💾')} SAVE", font=("Inter", 8, "bold"), bg=PAL["success"], fg="white", 
                   relief="flat", padx=20, pady=8, command=self.save).pack(side="right", padx=5)
-        tk.Button(self.toolbar, text="ZEN MODE", font=("Inter", 8, "bold"), bg=PAL["sidebar"], fg="white", 
+        tk.Button(self.toolbar, text=f"{ICONS.get('minimalist', '🧘')} ZEN MODE", font=("Inter", 8, "bold"), bg=PAL["sidebar"], fg="white", 
                   relief="flat", padx=20, pady=8, command=self.toggle_zen).pack(side="right", padx=5)
 
         # 2. Main Layout
@@ -68,7 +74,7 @@ class SovereignWriter(tk.Toplevel):
         self.sidebar.pack(side="left", fill="y")
         self.sidebar.pack_propagate(False)
         
-        tk.Label(self.sidebar, text="DOCUMENT OUTLINE", font=("Inter", 8, "bold"), fg=PAL["dim"], bg=PAL["sidebar"]).pack(anchor="w")
+        tk.Label(self.sidebar, text=f"{ICONS.get('search', '📑')} OUTLINE", font=("Inter", 8, "bold"), fg=PAL["dim"], bg=PAL["sidebar"]).pack(anchor="w")
         
         sections = ["Introduction", "Strategic Overview", "Quantum Mesh Specs", "Conclusion"]
         for s in sections:
@@ -80,7 +86,7 @@ class SovereignWriter(tk.Toplevel):
         self.ai_side.pack(side="right", fill="y")
         self.ai_side.pack_propagate(False)
         
-        tk.Label(self.ai_side, text="AI COMPOSITION", font=("Inter", 8, "bold"), fg=PAL["accent"], bg=PAL["sidebar"]).pack(anchor="w")
+        tk.Label(self.ai_side, text=f"{ICONS.get('intelligence', '🧠')} AI ASSISTANT", font=("Inter", 8, "bold"), fg=PAL["accent"], bg=PAL["sidebar"]).pack(anchor="w")
         
         self.ai_box = tk.Text(self.ai_side, bg="#000", fg=PAL["success"], font=("Consolas", 9), 
                              height=15, borderwidth=0, padx=10, pady=10)

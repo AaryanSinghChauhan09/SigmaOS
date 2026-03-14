@@ -8,6 +8,13 @@ USP: Neural Audio Upsampling & Zero-telemetry playback path.
 import tkinter as tk
 from tkinter import messagebox, ttk, filedialog
 import time, random, threading, os
+from typing import Any, List, Dict
+
+try:
+    from sigma_core.ui.fluid_design import ICONS, SPINNERS # type: ignore
+except ImportError:
+    ICONS = {}
+    SPINNERS = {"signal": ["📶", "🛜", "🌐"]}
 
 PAL = {
     "bg": "#060608", "header": "#111116", "accent": "#5AC8FA",
@@ -22,21 +29,42 @@ class PulsePlayer(tk.Tk):
         self.title("PulsePlayer Apex Pro v5.0")
         self.geometry("1150x820")
         self.configure(bg=PAL["bg"])
+        
         self.playing = False
         self.current_idx = 0
         self._progress = 0.0
         self._viz_data = [4] * 60
-        self.tracks = [
+        self.tracks: List[Dict[str, Any]] = [
             {"title": "Sovereign Beat Alpha", "artist": "Sigma_Originals", "dur": "05:12", "dur_s": 312},
             {"title": "Aether Harmony",       "artist": "Luna_Strings",    "dur": "03:45", "dur_s": 225},
             {"title": "Sigma Core Pulse",     "artist": "Hyper_Drive",     "dur": "04:20", "dur_s": 260},
             {"title": "Quantum Drift OST",    "artist": "Zenith_Nodes",    "dur": "06:01", "dur_s": 361},
             {"title": "Neural Network Sonata","artist": "AI_Composer_7",   "dur": "02:55", "dur_s": 175},
         ]
+
+        # UI Proxies
+        self.srch: Any = None
+        self.art_lbl: Any = None
+        self.title_lbl: Any = None
+        self.artist_lbl: Any = None
+        self.viz: Any = None
+        self._eq_vars: List[tk.DoubleVar] = []
+        self.queue_tree: Any = None
+        self.time_lbl: Any = None
+        self.prog_var: Any = None
+        self.prog_bar: Any = None
+        self.dur_lbl: Any = None
+        self.play_btn: Any = None
+        self._vol: Any = None
+        self._sovereign_mode: Any = None
+        self._spatial_audio: Any = None
+        self.status: Any = None
+
         self._setup_styles()
         self._build_ui()
         self._update_track_display()
         self._set_status("BIT-PERFECT MASTER ACTIVE | NEURAL UPSAMPLING: 384KHz | ZERO TELEMETRY")
+        self._anim_idx = 0
         self._tick_timer()
 
     def _setup_styles(self):
@@ -52,14 +80,14 @@ class PulsePlayer(tk.Tk):
         head = tk.Frame(self, bg=PAL["header"], height=65, padx=30)
         head.pack(side="top", fill="x")
         head.pack_propagate(False)
-        tk.Label(head, text="♫ PULSEPLAYER PRO", font=("Segoe UI", 14, "bold"),
+        tk.Label(head, text=f"{ICONS.get('media', '♫')} PULSEPLAYER PRO", font=("Segoe UI", 14, "bold"),
                  fg=PAL["accent"], bg=PAL["header"]).pack(side="left", pady=15)
         
         search_fr = tk.Frame(head, bg="#1A1A24", padx=10, pady=6)
         search_fr.pack(side="right", padx=10, pady=12)
-        tk.Label(search_fr, text="🔍", fg=PAL["dim"], bg="#1A1A24").pack(side="left")
+        tk.Label(search_fr, text=ICONS.get('search', '🔍'), fg=PAL["dim"], bg="#1A1A24").pack(side="left")
         self.srch = tk.Entry(search_fr, bg="#1A1A24", fg="white", borderwidth=0,
-                              font=("Segoe UI", 10), insertbackground="white", width=22)
+                               font=("Segoe UI", 10), insertbackground="white", width=22)
         self.srch.pack(side="left", padx=5)
         self.srch.bind("<KeyRelease>", self._filter_tracks)
 
@@ -96,7 +124,7 @@ class PulsePlayer(tk.Tk):
         eq_fr = tk.Frame(left_col, bg=PAL["bg"])
         eq_fr.pack(fill="x", padx=20, pady=10)
         tk.Label(eq_fr, text="EQ", font=("Segoe UI", 8, "bold"), fg=PAL["dim"], bg=PAL["bg"]).pack(anchor="w")
-        self._eq_vars = []
+        
         for band in ["Bass", "Mid", "High", "Air"]:
             row = tk.Frame(eq_fr, bg=PAL["bg"])
             row.pack(fill="x", pady=2)
@@ -114,9 +142,9 @@ class PulsePlayer(tk.Tk):
         r_head.pack(fill="x", pady=(0, 10))
         tk.Label(r_head, text="SOVEREIGN QUEUE", font=("Segoe UI", 8, "bold"),
                  fg=PAL["dim"], bg=PAL["player_bg"]).pack(side="left")
-        tk.Button(r_head, text="＋ ADD FILES", font=("Segoe UI", 7, "bold"),
-                  bg=PAL["secondary"], fg="white", relief="flat", padx=8,
-                  command=self._add_files).pack(side="right")
+        tk.Button(r_head, text=f"{ICONS.get('snapshots', '＋')} ADD FILES", font=("Segoe UI", 7, "bold"),
+                   bg=PAL["secondary"], fg="white", relief="flat", padx=8,
+                   command=self._add_files).pack(side="right")
 
         self.queue_tree = ttk.Treeview(right_col, columns=("T", "D"), show="headings", height=18)
         self.queue_tree.heading("T", text="TRACK")
@@ -151,29 +179,30 @@ class PulsePlayer(tk.Tk):
         btn_fr.pack()
         
         controls = [
-            ("⏮", 18, self._prev), ("⏪", 15, None),
-            ("▶", 36, self.toggle),
-            ("⏩", 15, None), ("⏭", 18, self._next),
+            (ICONS.get("minimalist", "⏮"), 18, self._prev), 
+            ("⏪", 15, None),
+            (ICONS.get("perf", "▶"), 36, self.toggle),
+            ("⏩", 15, None), 
+            (ICONS.get("code", "⏭"), 18, self._next),
         ]
-        for txt, size, cmd in controls:
+        for i, (txt, size, cmd) in enumerate(controls):
             b = tk.Button(btn_fr, text=txt, font=("Segoe UI Symbol", size), bg=PAL["header"],
                            fg=PAL["accent"] if size == 36 else "white",
                            relief="flat", borderwidth=0, command=cmd or (lambda: None))
             b.pack(side="left", padx=14)
-            
-        self.play_btn = btn_fr.winfo_children()[2]  # reference to play button
+            if i == 2: self.play_btn = b
 
         # Volume
         vol_fr = tk.Frame(dock, bg=PAL["header"])
         vol_fr.place(relx=0.87, rely=0.5, anchor="center")
-        tk.Label(vol_fr, text="🔊", fg="white", bg=PAL["header"]).pack(side="left")
+        tk.Label(vol_fr, text=ICONS.get('media', '🔊'), fg="white", bg=PAL["header"]).pack(side="left")
         self._vol = tk.DoubleVar(value=80)
         ttk.Scale(vol_fr, from_=0, to=100, variable=self._vol, orient="horizontal").pack(side="left")
 
         self._sovereign_mode = tk.BooleanVar(value=True)
         self._spatial_audio = tk.BooleanVar(value=False)
 
-        tk.Button(dock, text="✨ NEURAL", font=("Segoe UI", 8, "bold"), bg="#252529",
+        tk.Button(dock, text=f"{ICONS.get('intelligence', '✨')} NEURAL", font=("Segoe UI", 8, "bold"), bg="#252529",
                   fg=PAL["secondary"], relief="flat", padx=10, command=self._neural).place(relx=0.12, rely=0.5, anchor="center")
 
         sov_fr = tk.Frame(dock, bg=PAL["header"])
@@ -186,7 +215,7 @@ class PulsePlayer(tk.Tk):
         spat_fr = tk.Frame(dock, bg=PAL["header"])
         spat_fr.place(relx=0.25, rely=0.75, anchor="center")
         tk.Checkbutton(spat_fr, text="SPATIAL AUDIO", variable=self._spatial_audio, 
-                       bg=PAL["header"], fg=PAL["cyan"], selectcolor=PAL["bg"],
+                       bg=PAL["header"], fg=PAL["accent"], selectcolor=PAL["bg"],
                        activebackground=PAL["header"], activeforeground="white",
                        font=("Segoe UI", 7, "bold"), command=self._toggle_spatial).pack()
 
@@ -207,7 +236,6 @@ class PulsePlayer(tk.Tk):
     def _populate_queue(self):
         self.queue_tree.delete(*self.queue_tree.get_children())
         for t in self.tracks:
-            tag = "sel" if self.tracks.index(t) == self.current_idx else ""
             self.queue_tree.insert("", "end", values=(t["title"], t["dur"]))
         # Highlight current
         children = self.queue_tree.get_children()
@@ -229,7 +257,9 @@ class PulsePlayer(tk.Tk):
         q = self.srch.get().lower()
         self.queue_tree.delete(*self.queue_tree.get_children())
         for t in self.tracks:
-            if q in t["title"].lower() or q in t["artist"].lower():
+            title = str(t.get("title", "")).lower()
+            artist = str(t.get("artist", "")).lower()
+            if q in title or q in artist:
                 self.queue_tree.insert("", "end", values=(t["title"], t["dur"]))
 
     def _on_select(self, event):
@@ -247,7 +277,6 @@ class PulsePlayer(tk.Tk):
         t = self.tracks[self.current_idx]
         self.title_lbl.config(text=t["title"])
         self.artist_lbl.config(text=t["artist"])
-        dur = t.get("dur_s", 0)
         self.dur_lbl.config(text=t["dur"])
         self.title(f"PulsePlayer — {t['title']}")
         icons = ["💿", "🎵", "🎸", "🎹", "🎻"]
@@ -273,21 +302,29 @@ class PulsePlayer(tk.Tk):
 
     def _on_seek(self, val):
         t = self.tracks[self.current_idx]
-        dur_s = t.get("dur_s", 300)
+        dur_s = float(t.get("dur_s", 300))
         self._progress = (float(val) / 100.0) * dur_s
 
     def _tick_timer(self):
         if self.playing:
             t = self.tracks[self.current_idx]
-            dur_s = t.get("dur_s", 300)
+            dur_s = float(t.get("dur_s", 300))
             if dur_s > 0:
-                self._progress = min(self._progress + 1, dur_s)
+                self._progress = min(self._progress + 1.0, dur_s)
                 pct = (self._progress / dur_s) * 100
                 self.prog_var.set(pct)
                 elapsed = int(self._progress)
                 self.time_lbl.config(text=f"{elapsed//60}:{elapsed%60:02d}")
                 if self._progress >= dur_s:
                     self._next()
+        
+        # Animated signal in status
+        if self.playing:
+            seq = SPINNERS.get("signal", ["📶", "🛜", "🌐"])
+            icon = seq[self._anim_idx % len(seq)]
+            self._set_status(f"{icon} BIT-PERFECT MASTER ACTIVE | NEURAL UPSAMPLING: 384KHz")
+            self._anim_idx += 1
+
         self.after(1000, self._tick_timer)
 
     def _start_viz(self):
@@ -297,15 +334,16 @@ class PulsePlayer(tk.Tk):
 
     def _draw_viz(self):
         self.viz.delete("all")
-        w = self.viz.winfo_width() or 700
-        h = self.viz.winfo_height() or 100
+        w = int(self.viz.winfo_width()) or 700
+        h = int(self.viz.winfo_height()) or 100
         n = 60
-        bw = w / n
+        bw = float(w) / n
         for i in range(n):
             if self.playing:
-                self._viz_data[i] = max(4, min(h-4, self._viz_data[i] + random.randint(-15, 15)))
-            bh = self._viz_data[i]
-            x = i * bw
+                v_data = int(self._viz_data[i])
+                self._viz_data[i] = max(4, min(h-4, v_data + random.randint(-15, 15)))
+            bh = int(self._viz_data[i])
+            x = float(i) * bw
             r_val = int(90 + 165 * (i / n))
             g_val = int(140 + 88 * (1 - i/n))
             color = f"#{r_val:02x}{g_val:02x}fa"

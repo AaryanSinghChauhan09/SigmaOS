@@ -8,6 +8,12 @@ import tkinter as tk
 from tkinter import colorchooser, messagebox, ttk, simpledialog, filedialog
 import random
 import os
+from typing import Any
+
+try:
+    from sigma_core.ui.fluid_design import ICONS # type: ignore
+except ImportError:
+    ICONS = {}
 
 PAL = {
     "bg": "#0A0A0B",
@@ -30,19 +36,19 @@ class AuraPaint(tk.Toplevel):
         self.curr_color: str = PAL["accent"]
         self.brush_size: int = 5
         self.tool: str = "pen"
-        self.last_x: int | None = None
-        self.last_y: int | None = None
+        self.last_x: Any = None
+        self.last_y: Any = None
 
-        # Widget attributes (set inside _setup_ui)
-        self.top_bar: tk.Frame
-        self.workspace: tk.Frame
-        self.side_fr: tk.Frame
-        self.canvas_fr: tk.Frame
-        self.canvas: tk.Canvas
-        self.prop_fr: tk.Frame
-        self.color_box: tk.Button
-        self.size_scale: ttk.Scale
-        self.status: tk.Label
+        # UI Proxies
+        self.top_bar: Any = None
+        self.workspace: Any = None
+        self.side_fr: Any = None
+        self.canvas_fr: Any = None
+        self.canvas: Any = None
+        self.prop_fr: Any = None
+        self.color_box: Any = None
+        self.size_scale: Any = None
+        self.status: Any = None
 
         self._setup_ui()
         self._set_status("READY | NEURAL-SYNTHESIS ENGINE: ONLINE")
@@ -52,12 +58,14 @@ class AuraPaint(tk.Toplevel):
         self.top_bar = tk.Frame(self, bg=PAL["toolbar"], height=60, padx=20)
         self.top_bar.pack(side="top", fill="x")
         
-        tk.Label(self.top_bar, text="AURAPAINT PRO", font=("Inter", 18, "bold"), fg=PAL["accent"], bg=PAL["toolbar"]).pack(side="left")
+        tk.Label(self.top_bar, text=f"{ICONS.get('paint', '🎨')} AURAPAINT PRO", font=("Inter", 18, "bold"), fg=PAL["accent"], bg=PAL["toolbar"]).pack(side="left")
         
         btn_fr = tk.Frame(self.top_bar, bg=PAL["toolbar"])
         btn_fr.pack(side="right")
         
-        tools = [("📁 NEW", self.clear), ("💾 EXPORT", self.save), ("✨ AI-GEN", self._ai_gen)]
+        tools = [(f"{ICONS.get('fs', '📁')} NEW", self.clear), 
+                 (f"{ICONS.get('snapshots', '💾')} EXPORT", self.save), 
+                 (f"{ICONS.get('intelligence', '✨')} AI-GEN", self._ai_gen)]
         for txt, cmd in tools:
             tk.Button(btn_fr, text=txt, font=("Inter", 8, "bold"), bg="#252529", fg="white", 
                       relief="flat", padx=15, pady=8, command=cmd).pack(side="left", padx=5)
@@ -72,7 +80,7 @@ class AuraPaint(tk.Toplevel):
         self.side_fr.pack_propagate(False)
         
         tools_list = [
-            ("✍️", "pen"), ("🖌️", "brush"), ("📐", "line"), 
+            ("✍️", "pen"), ("🖌️", "brush"), (ICONS.get('governor', '📐'), "line"), 
             ("⬛", "rect"), ("⚪", "circle"), ("🧽", "eraser")
         ]
         for icon, name in tools_list:
@@ -93,7 +101,7 @@ class AuraPaint(tk.Toplevel):
         self.prop_fr.pack(side="right", fill="y", padx=(10, 0))
         self.prop_fr.pack_propagate(False)
         
-        tk.Label(self.prop_fr, text="PROPERTIES", font=("Inter", 8, "bold"), fg=PAL["dim"], bg=PAL["toolbar"]).pack(anchor="w")
+        tk.Label(self.prop_fr, text=f"{ICONS.get('hal', '⚙️')} PROPERTIES", font=("Inter", 8, "bold"), fg=PAL["dim"], bg=PAL["toolbar"]).pack(anchor="w")
         
         self.color_box = tk.Button(self.prop_fr, bg=self.curr_color, width=15, height=2, relief="flat", command=self.pick_color)
         self.color_box.pack(pady=20)
@@ -103,7 +111,7 @@ class AuraPaint(tk.Toplevel):
         self.size_scale.set(self.brush_size)
         self.size_scale.pack(fill="x", pady=10)
 
-        tk.Label(self.prop_fr, text="LAYERS", font=("Inter", 8, "bold"), fg=PAL["dim"], bg=PAL["toolbar"], pady=20).pack(anchor="w")
+        tk.Label(self.prop_fr, text=f"{ICONS.get('fabric', '🕸️')} LAYERS", font=("Inter", 8, "bold"), fg=PAL["dim"], bg=PAL["toolbar"], pady=20).pack(anchor="w")
         layers = ["Background", "Neural_Overlay", "Vector_Mask"]
         for l in layers:
             f = tk.Frame(self.prop_fr, bg="#252529", pady=5, padx=10)
@@ -127,15 +135,15 @@ class AuraPaint(tk.Toplevel):
     def pick_color(self):
         c = colorchooser.askcolor(initialcolor=self.curr_color)[1]
         if c: 
-            self.curr_color = c
-            self.color_box.config(bg=c)
+            self.curr_color = str(c)
+            self.color_box.config(bg=str(c))
 
     def start_draw(self, event):
         self.last_x, self.last_y = event.x, event.y
 
     def draw(self, event):
         color = self.curr_color if self.tool != "eraser" else PAL["canvas"]
-        if self.last_x and self.last_y:
+        if self.last_x is not None and self.last_y is not None:
             self.canvas.create_line(self.last_x, self.last_y, event.x, event.y, 
                                    fill=color, width=self.brush_size, capstyle="round", smooth=True)
         self.last_x, self.last_y = event.x, event.y

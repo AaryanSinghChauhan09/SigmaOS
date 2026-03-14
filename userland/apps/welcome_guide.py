@@ -8,6 +8,12 @@ Guides users through Zero-Trust concepts and UI navigation.
 import tkinter as tk
 from tkinter import ttk
 import time
+from typing import Any, List, Dict
+
+try:
+    from sigma_core.ui.fluid_design import ICONS # type: ignore
+except ImportError:
+    ICONS = {}
 
 PAL = {
     "bg": "#0A0B10",
@@ -28,33 +34,44 @@ class WelcomeAssistant(tk.Tk):
         self._center_window()
         
         self.step = -1
-        self.content = [
+        self.content: List[Dict[str, str]] = [
             {
                 "title": "Welcome to the Future of Privacy.",
                 "desc": "SigmaOS is a Zero-Trust, Neuro-Native environment. \nYour data never leaves this machine without your explicit cryptographic consent.",
-                "icon": "🛡️",
+                "icon": ICONS.get("warden", "🛡️"),
                 "color": "#5AC8FA"
             },
             {
                 "title": "Meet the AI Nexus.",
                 "desc": "A dedicated Sovereign AI Agent (🧬) is available in your sidebar. \nIt guides you through the OS, automates tasks, and audits your security.",
-                "icon": "🧬",
+                "icon": ICONS.get("genai_lab", "🧬"),
                 "color": "#AF52DE"
             },
             {
                 "title": "The Antigravity Fleet.",
                 "desc": "Orchestrate 13+ AI platforms from a single hub (⚡). \nManage quotas, presets, and high-speed prompt distribution.",
-                "icon": "⚡",
+                "icon": ICONS.get("perf", "⚡"),
                 "color": "#FFCC00"
             },
             {
                 "title": "Sovereign App Store.",
                 "desc": "Every app is an OCI-compliant isolated sandbox. \nExplore industry-standard tools for Dev, Media, and Security.",
-                "icon": "📦",
+                "icon": ICONS.get("package_manager", "📦"),
                 "color": "#32D74B"
             }
         ]
         
+        # UI Proxies
+        self.main_fr: Any = None
+        self.icon_lbl: Any = None
+        self.title_lbl: Any = None
+        self.desc_lbl: Any = None
+        self.prog_var: Any = None
+        self.prog: Any = None
+        self.btn_fr: Any = None
+        self.skip_btn: Any = None
+        self.next_btn: Any = None
+
         self._setup_styles()
         self._build_ui()
         self._next()
@@ -76,7 +93,7 @@ class WelcomeAssistant(tk.Tk):
         self.main_fr = tk.Frame(self, bg=PAL["bg"], padx=60, pady=50)
         self.main_fr.pack(fill="both", expand=True)
         
-        self.icon_lbl = tk.Label(self.main_fr, text="🚀", font=("Segoe UI Symbol", 82), bg=PAL["bg"], fg=PAL["accent"])
+        self.icon_lbl = tk.Label(self.main_fr, text=ICONS.get("bootloader", "🚀"), font=("Segoe UI Symbol", 82), bg=PAL["bg"], fg=PAL["accent"])
         self.icon_lbl.pack(pady=(20, 10))
         
         self.title_lbl = tk.Label(self.main_fr, text="Initializing SigmaOS...", font=("Inter Bold", 26), fg="white", bg=PAL["bg"])
@@ -93,7 +110,7 @@ class WelcomeAssistant(tk.Tk):
         self.btn_fr = tk.Frame(self, bg=PAL["bg"], pady=40)
         self.btn_fr.pack(side="bottom", fill="x", padx=60)
         
-        self.skip_btn = tk.Button(self.btn_fr, text="SKIP SETUP", font=("Inter Bold", 8), bg=PAL["bg"], 
+        self.skip_btn = tk.Button(self.btn_fr, text=f"{ICONS.get('minimalist', '✖')} SKIP SETUP", font=("Inter Bold", 8), bg=PAL["bg"], 
                                   fg=PAL["dim"], relief="flat", command=self.destroy)
         self.skip_btn.pack(side="left")
         
@@ -114,11 +131,11 @@ class WelcomeAssistant(tk.Tk):
             self._animate_progress(target)
             
             if self.step == len(self.content) - 1:
-                self.next_btn.config(text="ENTER SIGMAOS 🚀")
+                self.next_btn.config(text=f"ENTER SIGMAOS {ICONS.get('bootloader', '🚀')}")
         else:
             self._finalize()
 
-    def _animate_progress(self, target):
+    def _animate_progress(self, target: float):
         curr = self.prog_var.get()
         if curr < target:
             self.prog_var.set(curr + 5)
@@ -127,16 +144,12 @@ class WelcomeAssistant(tk.Tk):
     def _finalize(self):
         self.title_lbl.config(text="Sovereignty Established.", fg=PAL["accent"])
         self.desc_lbl.config(text="All systems operational. Zero-Trust policy enforced.\nWelcome home, Sovereign-User. Your workspace is ready.")
-        self.icon_lbl.config(text="✓", fg="#32D74B")
+        self.icon_lbl.config(text=f"{ICONS.get('minimalist', '✓')}", fg="#32D74B")
         self.next_btn.config(state="disabled", text="ESTABLISHING...")
         self.update()
         
         # Simulated establishment delay
         self.after(2000, self.destroy)
-        
-    def _poll_establishment(self):
-        # Additional logic for setup completion if needed
-        pass
 
 if __name__ == "__main__":
     app = WelcomeAssistant()

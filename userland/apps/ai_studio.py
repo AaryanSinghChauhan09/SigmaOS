@@ -10,6 +10,12 @@ from tkinter import ttk, messagebox
 import random
 import time
 import threading
+import sys
+import os
+from typing import Dict, Any, List, Optional
+
+# Decouple via absolute path injection
+sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "..")))
 
 PAL = {
     "bg": "#0B0C0E",
@@ -24,6 +30,12 @@ PAL = {
     "panel": "#1C1E24"
 }
 
+try:
+    from sigma_core.ui.fluid_design import PALETTE as FLUID_PAL, ICONS # type: ignore
+    if FLUID_PAL: PAL.update(FLUID_PAL)
+except ImportError:
+    ICONS = {}
+
 class AIStudio(tk.Tk):
     def __init__(self, kernel=None):
         super().__init__()
@@ -33,6 +45,11 @@ class AIStudio(tk.Tk):
         self.configure(bg=PAL["bg"])
         
         self.training = False
+        
+        # UI Proxies for stability
+        self.pbar: Any = None
+        self.status: Any = None
+        self.tabs: Any = None
         
         self._setup_styles()
         self._build_ui()
@@ -49,140 +66,103 @@ class AIStudio(tk.Tk):
 
     def _build_ui(self):
         # Premium Header
-        self.header = tk.Frame(self, bg=PAL["bg"], height=70, padx=25)
-        self.header.pack(side="top", fill="x", pady=15)
+        header = tk.Frame(self, bg=PAL["bg"], height=70, padx=25)
+        header.pack(side="top", fill="x", pady=15)
         
-        tk.Label(self.header, text="OMNI AI & DATA SCIENCE STUDIO", font=("Inter", 20, "bold"), fg=PAL["accent"], bg=PAL["bg"]).pack(side="left")
+        tk.Label(header, text=f"{ICONS.get('intelligence', '🧠')} OMNI AI STUDIO", font=("Inter", 20, "bold"), fg=PAL["accent"], bg=PAL["bg"]).pack(side="left")
         
-        btn_fr = tk.Frame(self.header, bg=PAL["bg"])
+        btn_fr = tk.Frame(header, bg=PAL["bg"])
         btn_fr.pack(side="right")
         
         nav_btns = [
-            ("🧬 XAI EXPLAINER", self._explain_model),
-            ("🚀 DISTRIBUTED TRAIN", self._train_model)
+            (f"{ICONS.get('viz_engine', '🧬')} XAI EXPLAINER", self._explain_model),
+            (f"{ICONS.get('bootloader', '🚀')} TRAIN", self._train_model)
         ]
         for txt, cmd in nav_btns:
              tk.Button(btn_fr, text=txt, font=("Inter", 9, "bold"), bg=PAL["sidebar"], fg="white", 
                        relief="flat", padx=15, pady=8, command=cmd).pack(side="left", padx=5)
 
         # Workspace
-        self.workspace = tk.Frame(self, bg=PAL["bg"], padx=25, pady=10)
-        self.workspace.pack(fill="both", expand=True)
+        ws = tk.Frame(self, bg=PAL["bg"], padx=25, pady=10)
+        ws.pack(fill="both", expand=True)
 
-        self.tabs = ttk.Notebook(self.workspace, style="Studio.TNotebook")
+        self.tabs = ttk.Notebook(ws, style="Studio.TNotebook")
         self.tabs.pack(fill="both", expand=True)
 
-        # Tab 1: Data Science Principles
-        self.tab_ds = tk.Frame(self.tabs, bg=PAL["bg"], padx=15, pady=15)
-        self.tabs.add(self.tab_ds, text="DATA SCIENCE VECTORS")
-        
-        self._build_ds_tab()
-
-        # Tab 2: Machine Learning Params
-        self.tab_ml = tk.Frame(self.tabs, bg=PAL["bg"], padx=15, pady=15)
-        self.tabs.add(self.tab_ml, text="MACHINE LEARNING ALGORITHMS")
-        
-        self._build_ml_tab()
-
-        # Tab 3: Deep Neural Networks
-        self.tab_dl = tk.Frame(self.tabs, bg=PAL["bg"], padx=15, pady=15)
-        self.tabs.add(self.tab_dl, text="DEEP LEARNING / TRANSFORMERS")
-        
-        self._build_dl_tab()
+        # Tabs
+        self._build_ds_tab(tk.Frame(self.tabs, bg=PAL["bg"], padx=15, pady=15))
+        self._build_ml_tab(tk.Frame(self.tabs, bg=PAL["bg"], padx=15, pady=15))
+        self._build_dl_tab(tk.Frame(self.tabs, bg=PAL["bg"], padx=15, pady=15))
 
         # Status & Progress
-        self.prog_fr = tk.Frame(self, bg=PAL["bg"])
-        self.prog_fr.pack(side="bottom", fill="x")
+        prog_fr = tk.Frame(self, bg=PAL["bg"])
+        prog_fr.pack(side="bottom", fill="x")
         
-        self.pbar = ttk.Progressbar(self.prog_fr, style="Studio.Horizontal.TProgressbar", length=100, mode='determinate')
+        self.pbar = ttk.Progressbar(prog_fr, style="Studio.Horizontal.TProgressbar", length=100, mode='determinate')
         
-        self.status = tk.Label(self.prog_fr, text="GPU TENSOR CORES: IDLE | OMNI-AUTOML READY", 
-                               bg=PAL["accent_dim"], fg="white", font=("Inter", 8, "bold"), pady=6)
+        self.status = tk.Label(prog_fr, text="GPU TENSOR CORES: IDLE | OMNI-AUTOML READY", 
+                                bg=PAL["accent"], fg="white", font=("Inter", 8, "bold"), pady=6)
         self.status.pack(fill="x")
 
-    def _build_ds_tab(self):
-        tk.Label(self.tab_ds, text="FEATURE ENGINEERING & EDA", font=("Inter", 14, "bold"), fg=PAL["accent"], bg=PAL["bg"]).pack(anchor="w", pady=(0, 10))
+    def _build_ds_tab(self, parent):
+        self.tabs.add(parent, text=f" {ICONS.get('viz_engine', '📊')} VECTORS ")
+        tk.Label(parent, text="FEATURE ENGINEERING & EDA", font=("Inter", 14, "bold"), fg=PAL["accent"], bg=PAL["bg"]).pack(anchor="w", pady=(0, 10))
         
-        cols_fr = tk.Frame(self.tab_ds, bg=PAL["bg"])
+        cols_fr = tk.Frame(parent, bg=PAL["bg"])
         cols_fr.pack(fill="both", expand=True)
         
         ops = [
-            ("Dimensionality Reduction", "PCA, t-SNE, UMAP computed natively on GPU. Zero metadata loss.", PAL["chart1"] if "chart1" in PAL else "#00E0FF"),
-            ("Automated Imputation", "Missing values interpolated via recurrent neural guessing. Matrix rank preserved.", PAL["chart2"] if "chart2" in PAL else "#9D4EDD"),
-            ("Statistical Outlier Purge", "Z-Score & IQR bounded isolation forests removing anomalies.", "#FFD60A"),
-            ("Temporal Encoding", "Extracting cyclical sin/cos embeddings automatically from DateTime vectors.", PAL["success"])
+            ("Dimensionality Reduction", "PCA, t-SNE, UMAP computed natively on GPU.", "#00E0FF"),
+            ("Automated Imputation", "Missing values interpolated via recurrent neural guessing.", "#9D4EDD"),
+            ("Statistical Outlier Purge", "Z-Score & IQR bounded isolation forests.", "#FFD60A")
         ]
-        
         for name, desc, col in ops:
             f = tk.Frame(cols_fr, bg=PAL["panel"], pady=15, padx=20)
             f.pack(fill="x", pady=5)
             tk.Label(f, text=name, font=("Inter", 11, "bold"), fg=col, bg=PAL["panel"]).pack(anchor="w")
             tk.Label(f, text=desc, font=("Inter", 9), fg=PAL["dim"], bg=PAL["panel"]).pack(anchor="w", pady=(5, 0))
-            tk.Button(f, text="APPLY VECTOR", bg=PAL["sidebar"], fg="white", font=("Inter", 8, "bold"), relief="flat", command=lambda n=name: self._apply_ds(n)).pack(side="right", pady=5)
+            tk.Button(f, text="APPLY", bg=PAL["sidebar"], fg="white", font=("Inter", 8, "bold"), relief="flat", command=lambda n=name: self._apply_ds(n)).pack(side="right", pady=5) # type: ignore
 
     def _apply_ds(self, name):
-        messagebox.showinfo("Data Pipeline", f"Executing [ {name} ] across 1.4 Billion Rows...\n\nProcess completed in 0.03s via Sovereign Accelerated Cores.")
+        messagebox.showinfo("Data Pipeline", f"Executing [ {name} ] across Sovereign Data Lake.")
 
-    def _build_ml_tab(self):
-        tf = tk.Frame(self.tab_ml, bg=PAL["bg"])
-        tf.pack(fill="both", expand=True)
-        
-        tk.Label(tf, text="CLASSIFICATION / REGRESSION / CLUSTERING", font=("Inter", 14, "bold"), fg=PAL["accent"], bg=PAL["bg"]).pack(anchor="w", pady=(0, 10))
-        
-        algos = ["XGBoost (Extreme Gradient Boosting)", "Random Forest Ensembles", "Support Vector Machines (RBF Kernel)", "K-Means++ Quantum Array"]
-        
+    def _build_ml_tab(self, parent):
+        self.tabs.add(parent, text=f" {ICONS.get('ml_engine', '🧪')} ALGORITHMS ")
+        tk.Label(parent, text="CLASSIFICATION / REGRESSION", font=("Inter", 14, "bold"), fg=PAL["accent"], bg=PAL["bg"]).pack(anchor="w", pady=(0, 10))
+        algos = ["XGBoost", "Random Forest", "SVM (RBF Kernel)", "K-Means++"]
         for act in algos:
-            cb = tk.Checkbutton(tf, text=act, bg=PAL["bg"], fg=PAL["text"], selectcolor=PAL["panel"], font=("Inter", 10), activebackground=PAL["bg"], activeforeground=PAL["accent"])
-            cb.pack(anchor="w", pady=6)
-            cb.select()
+            cb = tk.Checkbutton(parent, text=act, bg=PAL["bg"], fg=PAL["text"], selectcolor=PAL["panel"], font=("Inter", 10), activebackground=PAL["bg"])
+            cb.pack(anchor="w", pady=6); cb.select()
 
-        tk.Label(tf, text="HYPER-PARAMETER OPTIMIZATION", font=("Inter", 12, "bold"), fg=PAL["dim"], bg=PAL["bg"]).pack(anchor="w", pady=(20, 10))
-        tk.Label(tf, text="Bayesian Search Grid | Metric: F1-Score | K-Fold: 10", font=("Inter", 9, "italic"), fg=PAL["dim"], bg=PAL["bg"]).pack(anchor="w")
-
-    def _build_dl_tab(self):
-        df = tk.Frame(self.tab_dl, bg=PAL["bg"])
-        df.pack(fill="both", expand=True)
-        
-        tk.Label(df, text="SOVEREIGN DEEP LEARNING TOPOLOGY", font=("Inter", 14, "bold"), fg=PAL["accent"], bg=PAL["bg"]).pack(anchor="w", pady=(0, 10))
-        
+    def _build_dl_tab(self, parent):
+        self.tabs.add(parent, text=f" {ICONS.get('fabric', '🕸️')} NEURAL ")
+        tk.Label(parent, text="DEEP LEARNING TOPOLOGY", font=("Inter", 14, "bold"), fg=PAL["accent"], bg=PAL["bg"]).pack(anchor="w", pady=(0, 10))
         archs = [
-            ("Transformer (LLM) - Attention Mechanisms", "175B Parameters. Mixed Precision FP8."),
-            ("Convolutional (CNN) - Vision Protocols", "ResNet/EffNet Fusion. Tensor Cores Active."),
-            ("Recurrent (LSTM/GRU) - Seq-to-Seq", "Bidirectional Long-Short Term Memory."),
-            ("Generative Adversarial (GAN)", "Zero-Sum Game theory matrix. Discriminator vs Gen.")
+            ("Transformer (LLM)", "Attention Mechanisms. Mixed Precision FP8."),
+            ("Convolutional (CNN)", "Vision Protocols. Tensor Cores Active."),
+            ("Generative Adversarial (GAN)", "Zero-Sum Game theory matrix.")
         ]
-        
         for name, d in archs:
-            lbl = tk.Label(df, text=f"💠 {name}", font=("Inter", 10, "bold"), fg=PAL["text"], bg=PAL["panel"], padx=15, pady=10, anchor="w")
+            lbl = tk.Label(parent, text=f"💠 {name}", font=("Inter", 10, "bold"), fg=PAL["text"], bg=PAL["panel"], padx=15, pady=10, anchor="w")
             lbl.pack(fill="x", pady=4)
             tk.Label(lbl, text=d, fg=PAL["dim"], bg=PAL["panel"], font=("Inter", 8)).pack(side="right", padx=10)
 
     def _explain_model(self):
-        messagebox.showinfo("Explainable AI (XAI)", "Generating SHAP (Shapley Additive Explanations) and LIME metrics...\n\nGLOBAL EXPLANATION:\nFeature 'Recency' pushes model +14%.\nFeature 'Geospatial_Tag' acts as bias vector (-4%).\n\nBias Mitigation Auto-Applied.")
+        messagebox.showinfo("XAI", "Generating SHAP and LIME metrics...")
 
     def _train_model(self):
         if self.training: return
         self.training = True
-        
         self.pbar.pack(side="top", fill="x", before=self.status)
-        self.pbar["value"] = 0
-        self.status.config(text="INITIALIZING DISTRIBUTED TENSORS... BATCH SIZE 4096", bg=PAL["danger"], fg="white")
-        
-        def mock_train():
-            for epoch in range(1, 11):
-                self.pbar["value"] = epoch * 10
-                loss = random.uniform(0.01, 1.0) / epoch
-                auc = 100 - (100 - 85) / epoch
-                self.status.config(text=f"EPOCH {epoch}/10 | LOSS: {loss:.4f} | VAL_AUC: {auc:.2f}% | BACKPROPAGATING...", bg=PAL["warning"], fg="black")
-                time.sleep(0.4)
-                
+        self.status.config(text="TRAINING... BATCH SIZE 4096", bg="#FF3B30")
+        def mock():
+            for i in range(1, 11):
+                self.pbar["value"] = i * 10
+                time.sleep(0.3)
             self.pbar.pack_forget()
-            self.status.config(text="OMNI TRAINING COMPLETE | WEIGHTS FROZEN TO NVME | 0.8s ELAPSED", bg=PAL["success"], fg="black")
-            messagebox.showinfo("Training Complete", "Global Minimum Reached. Gradient Descent successfully usurped local minima.\nModel quantized to int8.")
+            self.status.config(text="TRAINING COMPLETE", bg="#32D74B")
             self.training = False
-
-        threading.Thread(target=mock_train, daemon=True).start()
+        threading.Thread(target=mock, daemon=True).start()
 
 if __name__ == "__main__":
-    app = AIStudio()
-    app.mainloop()
+    AIStudio().mainloop()

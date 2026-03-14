@@ -7,6 +7,13 @@ USP: Zero-Trust Sandboxed Runtime with Neural Lint & Cross-Language Support.
 import tkinter as tk
 from tkinter import ttk, filedialog, messagebox, scrolledtext
 import os, re, sys, subprocess, threading
+from typing import Any, Optional
+
+try:
+    from sigma_core.ui.fluid_design import PALETTE as FLUID_PAL, ICONS # type: ignore
+except ImportError:
+    ICONS = {}
+    FLUID_PAL = {}
 
 PAL = {
     "bg": "#0B0C0F", "editor": "#12131A", "sidebar": "#181A21",
@@ -14,6 +21,7 @@ PAL = {
     "success": "#32D74B", "warning": "#FFD60A", "error": "#FF3B30",
     "border": "#2C2F38", "line_num": "#4a4a55", "gutter": "#141419"
 }
+if FLUID_PAL: PAL.update(FLUID_PAL)
 
 KEYWORDS = {
     "kw":  (r'\b(def|class|import|from|if|elif|else|for|while|return|True|False|None|self|lambda|try|except|finally|with|as|pass|break|continue|yield|async|await|and|or|not|in|is)\b', "#FF79C6"),
@@ -31,9 +39,26 @@ class SovereignCodeForge(tk.Tk):
         self.title("Sovereign CodeForge Apex Pro v5.0")
         self.geometry("1400x950")
         self.config(bg=PAL["bg"])
-        self.current_file = None
-        self._proc = None
-        self._unsaved = False
+        
+        self.current_file: Optional[str] = None
+        self._proc: Optional[subprocess.Popen] = None
+        self._unsaved: bool = False
+        
+        # UI Attributes (Initialized in _build_ui)
+        self.toolbar: Any = None
+        self.file_lbl: Any = None
+        self.tab_bar: Any = None
+        self._active_tab: Any = None
+        self.panes: Any = None
+        self.sidebar: Any = None
+        self._tree: Any = None
+        self.v_panes: Any = None
+        self.num_bar: Any = None
+        self.txt: Any = None
+        self.term: Any = None
+        self.ac_popup: Any = None
+        self.status: Any = None
+
         self._setup_styles()
         self._build_ui()
         self._setup_tags()
@@ -57,14 +82,14 @@ class SovereignCodeForge(tk.Tk):
         self.toolbar.pack(side="top", fill="x")
         self.toolbar.pack_propagate(False)
 
-        tk.Label(self.toolbar, text="⚙ CODEFORGE PRO", font=("Segoe UI", 11, "bold"), fg=PAL["accent"], bg=PAL["gutter"]).pack(side="left", padx=(0, 20))
+        tk.Label(self.toolbar, text=f"{ICONS.get('code', '⚙')} CODEFORGE PRO", font=("Segoe UI", 11, "bold"), fg=PAL["accent"], bg=PAL["gutter"]).pack(side="left", padx=(0, 20))
 
         btns = [
-            ("📁 OPEN", self.load_file, None),
-            ("💾 SAVE", self.save_file, None),
-            ("▶ RUN", self.run_code, PAL["success"]),
-            ("■ STOP", self.stop_exec, PAL["error"]),
-            ("✨ LINT", self._trigger_lint, None),
+            (f"{ICONS.get('fs', '📁')} OPEN", self.load_file, None),
+            (f"{ICONS.get('snapshots', '💾')} SAVE", self.save_file, None),
+            (f"{ICONS.get('perf', '▶')} RUN", self.run_code, PAL["success"]),
+            (f"{ICONS.get('minimalist', '■')} STOP", self.stop_exec, PAL["error"]),
+            (f"{ICONS.get('warden', '✨')} LINT", self._trigger_lint, None),
         ]
         for txt, cmd, col in btns:
             b = tk.Button(self.toolbar, text=txt, font=("Segoe UI", 8, "bold"),
@@ -83,7 +108,7 @@ class SovereignCodeForge(tk.Tk):
         # TAB BAR
         self.tab_bar = tk.Frame(self, bg=PAL["gutter"], height=32)
         self.tab_bar.pack(fill="x")
-        self._active_tab = tk.Label(self.tab_bar, text="  untitled.py  ×",
+        self._active_tab = tk.Label(self.tab_bar, text=f"  {ICONS.get('code', '🐍')} untitled.py  ×",
                                      font=("Segoe UI", 9), fg="white", bg=PAL["accent"],
                                      padx=3, pady=3)
         self._active_tab.pack(side="left")
@@ -95,7 +120,7 @@ class SovereignCodeForge(tk.Tk):
         # SIDEBAR
         self.sidebar = tk.Frame(self.panes, bg=PAL["sidebar"], width=220)
         self.panes.add(self.sidebar, weight=1)
-        tk.Label(self.sidebar, text="EXPLORER", font=("Segoe UI", 7, "bold"),
+        tk.Label(self.sidebar, text=f"{ICONS.get('search', '🔎')} EXPLORER", font=("Segoe UI", 7, "bold"),
                  fg=PAL["dim"], bg=PAL["sidebar"], pady=8, padx=10).pack(anchor="w")
         self._tree = ttk.Treeview(self.sidebar, selectmode="browse", show="tree")
         self._tree.pack(fill="both", expand=True)
@@ -132,7 +157,7 @@ class SovereignCodeForge(tk.Tk):
         # TERMINAL
         term_fr = tk.Frame(self.v_panes, bg="#000")
         self.v_panes.add(term_fr, weight=1)
-        tk.Label(term_fr, text="SIGMA RUNTIME", font=("Segoe UI", 7, "bold"),
+        tk.Label(term_fr, text=f"{ICONS.get('terminal', '🐚')} SIGMA RUNTIME", font=("Segoe UI", 7, "bold"),
                  fg=PAL["dim"], bg="#1a1a1a", pady=4, padx=10).pack(fill="x", anchor="w")
         self.term = scrolledtext.ScrolledText(term_fr, bg="#0d0d0d", fg=PAL["success"],
                                               font=("Cascadia Code", 10), borderwidth=0,
@@ -235,7 +260,8 @@ class SovereignCodeForge(tk.Tk):
     def _populate_tree(self):
         self._tree.delete(*self._tree.get_children())
         cwd = os.path.dirname(os.path.abspath(__file__))
-        root_id = self._tree.insert("", "end", text=f"📁 {os.path.basename(os.path.dirname(cwd))}", open=True)
+        root_dir = os.path.dirname(cwd)
+        root_id = self._tree.insert("", "end", text=f"📁 {os.path.basename(root_dir)}", open=True)
         try:
             for f in sorted(os.listdir(cwd)):
                 if f.endswith(".py"):
@@ -307,12 +333,14 @@ class SovereignCodeForge(tk.Tk):
                     stdout=subprocess.PIPE, stderr=subprocess.PIPE,
                     text=True, cwd=os.path.dirname(self.current_file)
                 )
-                for line in self._proc.stdout:
-                    self.term.insert("end", line)
-                    self.term.see("end")
-                for line in self._proc.stderr:
-                    self.term.insert("end", line, "err")
-                    self.term.see("end")
+                if self._proc.stdout:
+                    for line in self._proc.stdout:
+                        self.term.insert("end", line)
+                        self.term.see("end")
+                if self._proc.stderr:
+                    for line in self._proc.stderr:
+                        self.term.insert("end", line, "err")
+                        self.term.see("end")
                 exit_code = self._proc.wait()
                 msg = f"\n[RUNTIME] Process exited with code {exit_code}"
                 self.term.insert("end", msg + "\n", "sys" if exit_code == 0 else "err")

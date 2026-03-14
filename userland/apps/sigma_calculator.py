@@ -5,6 +5,12 @@ SigmaOS Scientific Calculator v1.0
 import tkinter as tk
 from tkinter import ttk
 import math, cmath, re, json, os
+from typing import Any, List
+
+try:
+    from sigma_core.ui.fluid_design import ICONS # type: ignore
+except ImportError:
+    ICONS = {}
 
 PAL = {"bg":"#0D0F18","panel":"#13162A","card":"#1A1E30","accent":"#6C63FF",
        "success":"#00D26A","danger":"#FF4D4D","text":"#E8E8F0","dim":"#9090A0",
@@ -19,8 +25,15 @@ class SigmaCalculator(tk.Tk):
         self.title("SigmaOS Scientific Calculator")
         self.geometry("540x720"); self.resizable(False, False)
         self.configure(bg=PAL["bg"])
-        self._expr = ""; self._memory = 0.0; self._history = []
+        self._expr = ""; self._memory = 0.0; self._history: List[str] = []
         self._mode = tk.StringVar(value="DEC")
+        
+        # UI Proxies
+        self._hist_lbl: Any = None
+        self._disp: Any = None
+        self._mem_lbl: Any = None
+        self._hist_box: Any = None
+
         self._load_history()
         self._build()
 
@@ -42,7 +55,7 @@ class SigmaCalculator(tk.Tk):
         # Title bar
         hdr = tk.Frame(self, bg=PAL["panel"], height=50)
         hdr.pack(fill="x"); hdr.pack_propagate(False)
-        tk.Label(hdr, text="🧮 SIGMA CALCULATOR", fg=PAL["accent"],
+        tk.Label(hdr, text=f"{ICONS.get('calculator', '🧮')} SIGMA CALCULATOR", fg=PAL["accent"],
                  bg=PAL["panel"], font=("Segoe UI Bold", 13)).pack(side="left", padx=18, pady=10)
         for m in ("DEC","HEX","BIN","OCT"):
             rb = tk.Radiobutton(hdr, text=m, variable=self._mode, value=m,
@@ -84,8 +97,8 @@ class SigmaCalculator(tk.Tk):
             for c,( label, typ) in enumerate(row):
                 bg=COLOR_MAP.get(typ,PAL["btn"])
                 btn=tk.Button(grid,text=label,bg=bg,fg=PAL["text"],
-                              font=("Segoe UI",12),relief="flat",
-                              command=lambda l=label:self._press(l))
+                               font=("Segoe UI",12),relief="flat",
+                               command=lambda l=label:self._press(l))
                 btn.grid(row=r,column=c,padx=3,pady=3,sticky="nsew",ipady=10)
                 btn.bind("<Enter>",lambda e,b=btn:b.config(bg=PAL["btnH"]))
                 btn.bind("<Leave>",lambda e,b=btn,c=bg:b.config(bg=c))
@@ -98,7 +111,7 @@ class SigmaCalculator(tk.Tk):
         tk.Label(hpanel,text="HISTORY",fg=PAL["dim"],bg=PAL["panel"],
                  font=("Segoe UI",8,"bold")).pack(anchor="w",padx=10,pady=(6,2))
         self._hist_box=tk.Text(hpanel,bg=PAL["panel"],fg=PAL["dim"],
-                               font=("Cascadia Code",8),borderwidth=0,height=3)
+                                font=("Cascadia Code",8),borderwidth=0,height=3)
         self._hist_box.pack(fill="x",padx=10); self._refresh_history()
 
     def _press(self,label):
