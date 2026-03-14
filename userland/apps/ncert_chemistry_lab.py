@@ -74,6 +74,9 @@ class Chemistry_Classes_11_12:
         "Functional Groups": ("functional", [("Sample", "Vinegar")]),
         "Salt Analysis": ("salt_anal", [("Color", "Blue"), ("Flame", "Green")]),
         "Molarity Lab": ("molarity", [("Mass (g)", "4"), ("MW", "40"), ("Vol (L)", "1")]),
+        "Chromatography": ("chromatog", [("Dist Solv (cm)", "10"), ("Dist Spot (cm)", "4.5")]),
+        "Rate of Reaction": ("reaction_rate", [("Conc1 (M)", "0.5"), ("Conc2 (M)", "0.2"), ("Time (s)", "40")]),
+        "Equilibrium (Kc)": ("equilibrium", [("ConcA (M)", "0.1"), ("ConcB (M)", "0.1"), ("ConcC (M)", "0.4")]),
     }
 
     @staticmethod
@@ -137,6 +140,22 @@ class Chemistry_Classes_11_12:
     def molarity(m, mw, v):
         mol = m/mw
         return {"Molarity (M)": _r(mol/v, 3)}
+
+    @staticmethod
+    def chromatog(ds, dsp):
+        rf = dsp / ds
+        return {"Rf Value": _r(rf, 3), "Status": "Success" if rf < 1 else "Error"}
+
+    @staticmethod
+    def reaction_rate(c1, c2, t):
+        rate = abs(c2 - c1) / t
+        return {"Avg Rate (M/s)": f"{rate:.4e}"}
+
+    @staticmethod
+    def equilibrium(a, b, c):
+        # A + B <=> C
+        kc = c / (a * b)
+        return {"Kc": _r(kc, 2), "Prediction": "Stable" if kc > 1 else "Reactants Favored"}
 
 CHEMISTRY_REGISTRY = {
     "Classes 6-10": Chemistry_Classes_6_10,

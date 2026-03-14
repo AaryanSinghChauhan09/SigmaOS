@@ -85,6 +85,9 @@ class Biology_Classes_11_12:
         "Pollen Lab": ("pollen", [("Sugar (%)", "10"), ("Time (min)", "30")]),
         "Pedigree Chart": ("pedigree", [("Father", "Affected"), ("Mother", "Carrier")]),
         "Water BOD": ("bod", [("DO Day 0", "9"), ("DO Day 5", "4")]),
+        "Respiration Seeds": ("respiration", [("Time (hr)", "24"), ("CO2 Vol", "5")]),
+        "Plasmolysis": ("plasmolysis", [("Sugar (%)", "20"), ("Cell Type", "Rhoeo")]),
+        "DNA Isolation": ("dna_iso", [("Ethanol (C)", "-20"), ("Sample", "Papaya")]),
     }
 
     @staticmethod
@@ -148,6 +151,21 @@ class Biology_Classes_11_12:
     def bod(do0, do5):
         bod_val = do0 - do5
         return {"BOD (mg/L)": bod_val, "Quality": "Clean" if bod_val < 3 else "Polluted"}
+
+    @staticmethod
+    def respiration(t, v):
+        rq = v / t
+        return {"Status": "CO2 Detected", "Rate": _r(rq, 2)}
+
+    @staticmethod
+    def plasmolysis(s, c):
+        if s > 10: return {"Observation": "Hypertonic -> Plasmolysis", "Status": "Shrunken Protoplast"}
+        return {"Observation": "Isotonic/Hypotonic", "Status": "Turgid"}
+
+    @staticmethod
+    def dna_iso(temp, s):
+        if temp < 0: return {"Step": "Chilled Ethanol Added", "Result": "DNA Threads Precipitate"}
+        return {"Step": "Ethanol Too Warm", "Result": "Degradation"}
 
 BIOLOGY_REGISTRY = {
     "Classes 6-10": Biology_Classes_6_10,

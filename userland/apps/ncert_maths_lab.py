@@ -114,6 +114,9 @@ class Maths_Classes_11_12:
         "Cross Product": ("cross", [("A", "1,0,0"), ("B", "0,1,0")]),
         "Venn (3 Sets)": ("venn3", [("nA", "20"), ("nAB", "5"), ("nABC", "2")]),
         "Mean Deviation": ("mean_dev", [("Data", "2,4,6,8,10")]),
+        "Diff Equation": ("differential", [("k", "0.1"), ("y0", "100"), ("x", "5")]),
+        "Line distance": ("line_dist", [("P1 (x,y,z)", "1,2,3"), ("P2 (x,y,z)", "4,5,6")]),
+        "Binomial Dist": ("binomial", [("n", "10"), ("p", "0.5"), ("r", "3")]),
     }
 
     @staticmethod
@@ -130,7 +133,8 @@ class Maths_Classes_11_12:
 
     @staticmethod
     def bernoulli(n, p, k):
-        res = math.comb(int(n), int(k)) * (p**k) * ((1-p)**(n-k))
+        p = float(p)
+        res = math.comb(int(n), int(k)) * (p**k) * ((1.0-p)**(n-k))
         return {"P(X=k)": _r(res, 6)}
 
     @staticmethod
@@ -182,6 +186,26 @@ class Maths_Classes_11_12:
         mean = sum(v)/len(v)
         md = sum(abs(x-mean) for x in v)/len(v)
         return {"Mean": mean, "Mean Deviation": _r(md, 2)}
+
+    @staticmethod
+    def differential(k, y0, x):
+        # y = y0 * e^(kx)
+        res = float(y0) * math.exp(float(k) * float(x))
+        return {"Solution y(x)": _r(res, 2), "Type": "Exponential Growth/Decay"}
+
+    @staticmethod
+    def line_dist(p1_s, p2_s):
+        p1 = [float(x) for x in p1_s.split(",")]
+        p2 = [float(x) for x in p2_s.split(",")]
+        dist = math.sqrt(sum((a-b)**2 for a,b in zip(p1, p2)))
+        return {"Distance": _r(dist, 4)}
+
+    @staticmethod
+    def binomial(n, p, r):
+        n, p, r = int(n), float(p), int(r)
+        comb = math.comb(n, r)
+        prob = comb * (p**r) * ((1.0-p)**(n-r))
+        return {"P(X=r)": _r(prob, 6)}
 
 MATHS_REGISTRY = {
     "Classes 1-5": Maths_Classes_1_5,

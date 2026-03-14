@@ -121,6 +121,10 @@ class Physics_Classes_11_12:
         "Screw Gauge": ("screw_gauge", [("PSR (mm)", "5"), ("HSD", "32"), ("LC (mm)", "0.01")]),
         "Meter Bridge": ("meter_bridge", [("Known R (Ω)", "2"), ("Balancing l (cm)", "40")]),
         "Potentiometer": ("potentiometer", [("E1 (V)", "2.0"), ("l1 (cm)", "150"), ("l2 (cm)", "220")]),
+        "Hooke's Law (Y)": ("hookes", [("Load (kg)", "1"), ("Area (m²)", "1e-6"), ("L (m)", "2"), ("dL (mm)", "0.5")]),
+        "Surface Tension": ("capillary", [("r (mm)", "0.5"), ("h (cm)", "3")]),
+        "Resonance Tube": ("resonance", [("Freq (Hz)", "512"), ("l1 (cm)", "16")]),
+        "Potentiometer (r)": ("pot_internal", [("l1 (cm)", "200"), ("l2 (cm)", "130"), ("R (Ω)", "10")]),
     }
 
     @staticmethod
@@ -199,6 +203,31 @@ class Physics_Classes_11_12:
         # Comparison of EMF: E2 = E1 * (l2/l1)
         e2 = e1 * (l2 / l1)
         return {"EMF E2 (V)": _r(e2, 3)}
+
+    @staticmethod
+    def hookes(m, a, l, dl):
+        stress = (m * 9.81) / a
+        strain = (dl * 1e-3) / l
+        y = stress / strain
+        return {"Young's Modulus (Pa)": f"{y:.4e}", "Result": "Elastic" if strain < 0.01 else "Plastic"}
+
+    @staticmethod
+    def capillary(r_mm, h_cm):
+        r = r_mm / 1000; h = h_cm / 100; rho = 1000; g = 9.81
+        t = (rho * g * r * h) / 2
+        return {"Surface Tension (N/m)": _r(t, 4)}
+
+    @staticmethod
+    def resonance(f, l1_cm):
+        l1 = l1_cm / 100
+        v = 4 * f * (l1 + 0.3 * (2 * 0.02)) # Approx with end correction
+        return {"Speed of Sound (m/s)": _r(v, 2)}
+
+    @staticmethod
+    def pot_internal(l1, l2, r):
+        # Internal resistance r = R * (l1 - l2) / l2
+        int_r = r * (l1 - l2) / l2
+        return {"Internal r (Ω)": _r(int_r, 2)}
 
 PHYSICS_REGISTRY = {
     "Classes 6-10": Physics_Classes_6_10,

@@ -35,6 +35,13 @@ class MeshLudo(tk.Tk):
             "YELLOW": [(440, 440), (440, 540), (540, 440), (540, 540)]
         }
         self._history = ["SYSTEM: GRID INITIALIZED", "SYSTEM: P2P MESH STABLE"]
+        
+        # Initialize UI refs for linter
+        self.status = None
+        self.canv = None
+        self.dice_lbl = None
+        self.log_txt = None
+        
         self._build_ui()
 
     def _build_ui(self):
