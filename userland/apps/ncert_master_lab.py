@@ -8,15 +8,28 @@ from tkinter import ttk, scrolledtext, messagebox
 import importlib, sys, os, traceback, json
 
 # ─── PREMIUM THEME ───────────────────────────────────────────────────────────
+try:
+    from sigma_core.ui.fluid_design import PALETTE as FLUID_PAL, FluidTheme # type: ignore
+except ImportError:
+    FLUID_PAL = None
+    FluidTheme = None
+
+# Adaptive Palette mapped to Fluid Design if available
 PAL = {
-    "bg":"#0B0D17", "panel":"#11142A", "card":"#181B2E", "accent":"#6C63FF",
-    "ph":"#3B82F6", "ch":"#22C55E", "bi":"#EC4899", "ma":"#F59E0B",
-    "text":"#E8E8F0", "dim":"#8888A0", "border":"#252840",
+    "bg": FLUID_PAL["background"] if FLUID_PAL else "#0B0D17",
+    "panel": FLUID_PAL["surface"] if FLUID_PAL else "#11142A",
+    "card": "#181B2E",
+    "accent": FLUID_PAL["primary"] if FLUID_PAL else "#6C63FF",
+    "ph": "#3B82F6", "ch": "#22C55E", "bi": "#EC4899", "ma": "#F59E0B",
+    "text": FLUID_PAL["text_primary"] if FLUID_PAL else "#E8E8F0",
+    "dim": FLUID_PAL["text_secondary"] if FLUID_PAL else "#8888A0",
+    "border": FLUID_PAL["border"] if FLUID_PAL else "#252840",
 }
 
 class NCERTMasterLab(tk.Tk):
-    def __init__(self):
+    def __init__(self, kernel=None):
         super().__init__()
+        self.kernel = kernel
         self.title("SigmaOS • NCERT Virtual Lab v10.0")
         self.geometry("1400x900")
         self.configure(bg=PAL["bg"])
@@ -25,6 +38,10 @@ class NCERTMasterLab(tk.Tk):
         self._exp_map = {}
         self._stats = {"completed": 0, "streak": 0}
         
+        # Vibe Sync
+        if self.kernel and hasattr(self.kernel, "bus"):
+            self.kernel.bus.subscribe("governor.vibe_switch", self._on_vibe_switch)
+
         self._tree = None
         self._mid = None
         self._out = None
@@ -34,6 +51,22 @@ class NCERTMasterLab(tk.Tk):
 
         self._build_ui()
         self._load_backends()
+
+    def _on_vibe_switch(self, payload):
+        """USP: Global Aesthetic Sync for Scientific Lab."""
+        if FLUID_PAL:
+            PAL["bg"] = FLUID_PAL["background"]
+            PAL["panel"] = FLUID_PAL["surface"]
+            PAL["accent"] = FLUID_PAL["primary"]
+            PAL["text"] = FLUID_PAL["text_primary"]
+            PAL["border"] = FLUID_PAL["border"]
+            
+            self.configure(bg=PAL["bg"])
+            # In production, we'd recursively update all widget styles
+            if self._tree:
+                style = ttk.Style()
+                style.configure("Treeview", background=PAL["panel"], foreground=PAL["text"])
+            self._out.insert("end", f"\n[SYSTEM] Chromatic Vibe Shifted to: {payload.get('vibe')}\n", "badge")
 
     def _build_ui(self):
         # Header
