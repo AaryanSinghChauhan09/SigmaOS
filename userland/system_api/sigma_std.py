@@ -55,6 +55,27 @@ class SigmaSys:
             except: return 40.0
         return 35.0
 
+    @staticmethod
+    def sensors_battery():
+        class BatteryStatus:
+            def __init__(self, percent, secsleft, power_plugged):
+                self.percent = percent
+                self.secsleft = secsleft
+                self.power_plugged = power_plugged
+
+        if sys.platform == "win32":
+            try:
+                out = subprocess.check_output("WMIC PATH Win32_Battery Get EstimatedChargeRemaining, BatteryStatus", shell=True).decode()
+                lines = out.strip().split('\n')
+                if len(lines) > 1:
+                    parts = lines[1].split()
+                    status = int(parts[0])
+                    percent = float(parts[1])
+                    plugged = status == 2
+                    return BatteryStatus(percent, -2 if plugged else -1, plugged)
+            except: pass
+        return None
+
 class SigmaCrypto:
     """Replaces 'pycryptodome'."""
     @staticmethod

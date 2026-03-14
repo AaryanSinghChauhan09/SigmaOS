@@ -7,9 +7,14 @@ Equivalent to: Windows Resource Monitor / htop / Activity Monitor.
 """
 import tkinter as tk
 from tkinter import ttk, messagebox
-import psutil
+import sys
+import os
 import time
 import random
+
+# Add parent path to allow importing sigma_std
+sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "..")))
+from userland.system_api.sigma_std import SigmaSys
 
 PAL = {
     "bg": "#0B0C0E",
@@ -108,8 +113,8 @@ class NexusMonitor(tk.Tk):
     def _update_metrics(self):
         # Update Dashboard
         try:
-            c = psutil.cpu_percent()
-            m = psutil.virtual_memory().percent
+            c = SigmaSys.cpu_usage()
+            m = SigmaSys.ram_usage()
             
             self.cpu_bar["value"] = c
             self.cpu_lbl.config(text=f"{c:.1f}%")
