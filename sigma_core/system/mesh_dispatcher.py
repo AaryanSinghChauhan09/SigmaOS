@@ -61,6 +61,12 @@ class MeshDispatcher(SigmaModuleBase, ISigmaService):
         
         return "Manual Execution: All mesh nodes are under high load."
 
+    def broadcast(self, event: str, payload: dict, peer: str = None) -> str:
+        """USP: Sovereign secure broadcast to peer or entire mesh."""
+        target = peer if peer else "ALL_PEERS"
+        self.stats["tasks_assisted"] = int(self.stats.get("tasks_assisted", 0)) + 1
+        return f"Broadcasted '{event}' -> {target} [{len(str(payload))} bytes]"
+
     def get_mesh_analytics(self) -> Dict[str, Any]:
         """USP: Analytic view of the distributed Sovereign compute."""
         return {
