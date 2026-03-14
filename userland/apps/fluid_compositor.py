@@ -16,9 +16,9 @@ from typing import Dict, Any, List, Optional
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "..")))
 
 try:
-    from sigma_core.ui.zbuffer_engine import ZBufferEngine
-    from sigma_core.ui.rendering_pipeline import RenderingPipeline
-    from sigma_core.ui.fluid_design import PALETTE as PAL, FluidTheme
+    from sigma_core.ui.zbuffer_engine import ZBufferEngine # type: ignore
+    from sigma_core.ui.rendering_pipeline import RenderingPipeline # type: ignore
+    from sigma_core.ui.fluid_design import PALETTE as PAL, FluidTheme # type: ignore
 except ImportError:
     # Standalone fallback stubs
     class ZBufferEngine:

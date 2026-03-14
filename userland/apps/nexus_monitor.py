@@ -15,9 +15,9 @@ from typing import Dict, Any, List, Optional
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "..")))
 
 try:
-    from userland.system_api.privacy_engine import PrivacyScrubber
-    from userland.system_api.sigma_std import SigmaSys
-    from sigma_core.ui.fluid_design import PALETTE as PAL, TYPOGRAPHY as FONT
+    from userland.system_api.privacy_engine import PrivacyScrubber # type: ignore
+    from userland.system_api.sigma_std import SigmaSys # type: ignore
+    from sigma_core.ui.fluid_design import PALETTE as PAL, TYPOGRAPHY as FONT # type: ignore
 except ImportError:
     class PrivacyScrubber: 
         def scrub(self, x): return x

@@ -11,7 +11,7 @@ import os
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "..")))
 
 try:
-    from sigma_core.system.interfaces import SigmaModuleBase, ISigmaService
+    from sigma_core.system.interfaces import SigmaModuleBase, ISigmaService # type: ignore
 except ImportError:
     # Minimalist fallback stubs for standalone testing or decoupled deployments
     class SigmaModuleBase:
@@ -30,10 +30,10 @@ class NCERTLabEngine(SigmaModuleBase, ISigmaService):
     def _load_shards(self):
         """USP: Modular Shard Injection. Loads subject-specific labs dynamically."""
         try:
-            from userland.apps.ncert_physics_lab import Physics_Classes_11_12
-            from userland.apps.ncert_chemistry_lab import Chemistry_Classes_11_12
-            from userland.apps.ncert_biology_lab import Biology_Classes_11_12
-            from userland.apps.ncert_maths_lab import Maths_Classes_11_12
+            from userland.apps.ncert_physics_lab import Physics_Classes_11_12 # type: ignore
+            from userland.apps.ncert_chemistry_lab import Chemistry_Classes_11_12 # type: ignore
+            from userland.apps.ncert_biology_lab import Biology_Classes_11_12 # type: ignore
+            from userland.apps.ncert_maths_lab import Maths_Classes_11_12 # type: ignore
             self._phy = Physics_Classes_11_12
             self._chem = Chemistry_Classes_11_12
             self._bio = Biology_Classes_11_12

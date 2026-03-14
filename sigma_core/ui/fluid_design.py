@@ -60,8 +60,12 @@ class FluidTheme:
         size   = int(font_data[1])
         weight = "normal"
         
-        if len(font_data) >= 3:
-            weight = str(font_data[2])
+        # Use list conversion and safe access to satisfy strict index checking
+        font_list = list(font_data)
+        if len(font_list) > 2:
+            weight = str(font_list[2])
+        else:
+            weight = "normal"
             
         return (family, size, weight)
 

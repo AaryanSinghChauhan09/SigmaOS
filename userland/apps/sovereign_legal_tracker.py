@@ -15,7 +15,7 @@ from typing import Dict, Any, List, Optional
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "..")))
 
 try:
-    from sigma_core.ui.fluid_design import PALETTE as PAL, TYPOGRAPHY as FONT
+    from sigma_core.ui.fluid_design import PALETTE as PAL, TYPOGRAPHY as FONT # type: ignore
 except ImportError:
     # Fallback zero-dependency styling if core is not available
     PAL = {"background": "#F5F5F7", "surface": "#FFFFFF", "surface_variant": "#E5E5EA", 

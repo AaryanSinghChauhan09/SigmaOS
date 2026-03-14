@@ -5,7 +5,10 @@ USP: Multi-stage orchestration of System Performance, Energy, and UX.
 Integrates Predictive Scheduling, Mode Management, and Eco-Gamification.
 """
 from typing import Dict, Any, List
-from sigma_core.system.interfaces import SigmaModuleBase
+try:
+    from .interfaces import SigmaModuleBase
+except ImportError:
+    from sigma_core.system.interfaces import SigmaModuleBase
 
 class AdaptiveGovernor(SigmaModuleBase):
     """
