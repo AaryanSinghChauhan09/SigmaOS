@@ -8,13 +8,18 @@ import os
 import sys
 import time
 
-# Ensure project root in path for cross-layer imports
-root = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-if root not in sys.path: sys.path.insert(0, root)
+# Robust System Path Injection for Sovereign Interop
+_p = os.path.abspath(__file__)
+while _p and not os.path.exists(os.path.join(os.path.dirname(_p), "sigma_core")):
+    _p = os.path.dirname(_p)
+root = str(os.path.dirname(_p))
+if root and root not in sys.path: sys.path.insert(0, root)
 
 from userland.system_api.sigma_std import SigmaSys
+from sigma_core.kernel_hal import SovereignHAL
 
 class SystemMonitor:
+    hal = SovereignHAL()
     # Eco-Awareness Tuning
     ECO_THROTTLE_MS = 15000  # 15s when CPU > 20% or Battery Low
     STATIC_THROTTLE_MS = 5000 # 5s nominal
