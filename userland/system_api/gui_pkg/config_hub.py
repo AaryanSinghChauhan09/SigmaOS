@@ -20,8 +20,9 @@ class ConfigHubPage(SigmaPage):
 
         self.c_fr = tk.Frame(body, bg=PAL["bg"])
         self.c_fr.pack(side="left", fill="both", expand=True)
-
-        for cat in ["System", "Display", "Network", "Security", "Sovereignty", "About"]:
+        
+        cats = ["System", "Display", "Network", "Security", "Safety", "Sovereignty", "About"]
+        for cat in cats:
             tk.Button(s_fr, text=cat, font=FONT_MED, bg=PAL["bg2"], fg=PAL["text"], 
                       relief="flat", anchor="w", padx=15, 
                       command=lambda c=cat: self._show_cfg(c)).pack(fill="x", pady=2)
@@ -34,8 +35,29 @@ class ConfigHubPage(SigmaPage):
         elif cat == "Display": self._cfg_display(self.c_fr)
         elif cat == "Network": self._cfg_network(self.c_fr)
         elif cat == "Security": self._cfg_security(self.c_fr)
+        elif cat == "Safety": self._cfg_safety(self.c_fr)
         elif cat == "Sovereignty": self._cfg_sovereignty(self.c_fr)
         elif cat == "About": self._cfg_about(self.c_fr)
+
+    def _cfg_safety(self, parent):
+        tk.Label(parent, text="Compliance & Child Safety (Guardian)", font=FONT_TITLE, fg="white", bg=PAL["bg"]).pack(anchor="w", pady=10)
+        
+        info = self._card(parent, "International Age Rating Compliance")
+        info.master.pack(fill="x", pady=5)
+        
+        tk.Label(info, text="SigmaGuardian enforces U/G ratings for 5-year-old safety.", font=FONT_SMALL, fg=PAL["dim"], bg=PAL["card"]).pack(anchor="w", pady=5)
+        
+        def toggle_guardian():
+            mode = self.gui._child_mode.get()
+            guardian = self.kernel.registry.get("guardian")
+            if guardian:
+                guardian.set_child_mode(mode, age=5)
+                self.gui._notify("Guardian", f"Child Safety Mode {'Enabled' if mode else 'Disabled'}", "OK")
+
+        ttk.Checkbutton(parent, text="Enable Child Safety Mode (Universal/G Ratings Only)", 
+                        variable=self.gui._child_mode, command=toggle_guardian).pack(anchor="w", pady=10)
+        
+        tk.Label(parent, text="Compliance Standards: NIST, COPPA, Multi-Region Rating Sync", font=FONT_SMALL, fg=PAL["dim"], bg=PAL["bg"]).pack(anchor="w", pady=20)
 
     def _cfg_about(self, parent):
         tk.Label(parent, text="SigmaOS Sovereign", font=FONT_LOGO, fg=PAL["cyan"], bg=PAL["bg"]).pack(pady=20)

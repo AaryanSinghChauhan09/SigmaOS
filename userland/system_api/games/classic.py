@@ -10,6 +10,7 @@ class StrategicSovereignty(SigmaGame):
     SIZE_KB = 1240
     ICON = "♟️"
     DESC = "Two-player strategy on an 8×8 board. Move pieces to capture the opponent's King."
+    AGE_RATING = "G"
     PIECES = {
         'K': '♔', 'Q': '♕', 'R': '♖', 'B': '♗', 'N': '♘', 'P': '♙',
         'k': '♚', 'q': '♛', 'r': '♜', 'b': '♝', 'n': '♞', 'p': '♟',
@@ -47,6 +48,7 @@ class LudoApex(SigmaGame):
     SIZE_KB = 820
     ICON = "🎲"
     DESC = "Race 4 tokens home on a cross-shaped board. Roll dice, block opponents!"
+    AGE_RATING = "G"
     COLORS = ["Red", "Blue", "Green", "Yellow"]
     def _init_state(self):
         self.tokens: Dict[str, List[int]] = {c: [-1, -1, -1, -1] for c in self.COLORS}
@@ -80,6 +82,7 @@ class SovereignSerpent(SigmaGame):
     SIZE_KB = 380
     ICON = "🐍"
     DESC = "Roll dice, climb ladders, avoid snakes! First to reach 100 wins."
+    AGE_RATING = "G"
     SNAKES = {99:5, 87:24, 62:19, 54:34, 17:7}
     LADDERS = {4:25, 13:46, 33:49, 42:63, 50:69, 80:99}
     def _init_state(self):

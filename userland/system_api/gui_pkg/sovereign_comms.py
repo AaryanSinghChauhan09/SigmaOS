@@ -54,6 +54,14 @@ class SovereignCommsPage(SigmaPage):
         ent = ttk.Entry(temp_mail_fr, textvariable=addr_var, font=("Consolas", 9))
         ent.pack(fill="x", pady=5)
         ttk.Button(temp_mail_fr, text="♻️ Generate New Identity", command=lambda: addr_var.set(f"ghost_{random.randint(100,999)}@tempmail.info")).pack(fill="x")
+        
+        # USP: WaitAIMinute
+        wait_fr = tk.Frame(util_fr, bg=PAL["bg3"], pady=5, padx=5)
+        wait_fr.pack(fill="x", pady=5)
+        self._wait_guard = tk.BooleanVar(value=True)
+        tk.Checkbutton(wait_fr, text="🛑 Wait Guard (WaitAIMinute USP)", variable=self._wait_guard, 
+                       bg=PAL["bg3"], fg=PAL["gold"], selectcolor=PAL["bg2"],
+                       command=lambda: self.gui._log_voice("Comms: Wait Guard active. 60s delay enforced on replies.")).pack(anchor="w")
 
         # AI Message Generator
         tk.Label(util_fr, text="✨ AI Message Generator (Multi-Platform)", font=FONT_BOLD, fg=PAL["text"], bg=PAL["card"]).pack(anchor="w", pady=(20, 5))

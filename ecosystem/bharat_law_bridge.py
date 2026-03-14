@@ -57,9 +57,9 @@ class SigmaBharatLawBridge:
                 "Sec_122": "Gift defined and how transfer is effected."
             },
             "Family_Law": {
-                "HMA_Sec_5": "Conditions for a Hindu Marriage.",
-                "HMA_Sec_13": "Divorce (Grounds for dissolution of marriage).",
-                "Muslim_Law": "Nikah (Nature of contract), Mehr (Dower), and Talaq (Divorce)."
+                "CMA_Sec_5": "Conditions for a Civil Marriage.",
+                "CMA_Sec_13": "Divorce (Grounds for dissolution of marriage).",
+                "Sovereign_Family_Regulation": "Family Union (Nature of agreement), Settlement (Dower), and Termination (Divorce)."
             },
             "Consumer_Protection_2019": {
                 "Sec_2_7": "Definition of Consumer.",
@@ -162,7 +162,7 @@ class SigmaBharatLawBridge:
         }
         self._legislative_bills = {
             "Data_Protection_2023": "Status: PASSED. Key: Consent-based processing, Data Fiduciaries.",
-            "Waqf_Amendment_2024": "Status: PENDING (JPC). Key: Composition of Central Waqf Council.",
+            "Endowment_Amendment_2024": "Status: PENDING (JPC). Key: Composition of Central Endowment Council.",
             "Broadcasting_Bill": "Status: WITHDRAWN (Redrallying). Key: Regulation of Digital Content."
         }
         self._public_law_briefs = {
@@ -179,7 +179,7 @@ class SigmaBharatLawBridge:
         }
         self._jurisprudence_views = {
             "Analytical": "Law is the 'Command of the Sovereign' (John Austin). Focus on rule of recognition (Hart).",
-            "Natural": "Law must conform to 'Universal Reason' or 'Divine Justice' (Aquinas/Fuller).",
+            "Natural": "Law must conform to 'Universal Reason' or 'Universal Justice' (Aquinas/Fuller).",
             "Sociological": "Law as 'Social Engineering' to balance competing interests (Roscoe Pound).",
             "Historical": "Law is the 'Spirit of the Volk' (Savigny); it evolves with the people."
         }

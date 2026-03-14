@@ -51,6 +51,10 @@ class MailOrchestratorPage(SigmaPage):
         self.analysis_lbl = tk.Label(ai_fr, text="Readability: High\nSentiment: Neutral\nSpam Risk: Low", bg=PAL["card"], fg=PAL["green"], justify="left", font=FONT_SMALL)
         self.analysis_lbl.pack(fill="x")
 
+        tk.Label(ai_fr, text="Magic Draft Tools (MailMagic USP)", font=FONT_BOLD, bg=PAL["card"], fg=PAL["accent2"]).pack(pady=(20, 5))
+        ttk.Button(ai_fr, text="✨ AI Summarize Thread", command=lambda: self.gui._log_voice("MailMagic: Distilling 12 emails into 3 bullet points...")).pack(fill="x", pady=2)
+        ttk.Button(ai_fr, text="🖋️ Professional AI Rewrite", command=lambda: self.gui._log_voice("Duet: Optimizing draft for executive clarity...")).pack(fill="x", pady=2)
+
         ttk.Button(body, text="🚀 Dispatch Campaign (Mail Merge)", style="Teal.TButton", command=self._dispatch).pack(fill="x", pady=10)
 
     def _apply_tone(self, tone):

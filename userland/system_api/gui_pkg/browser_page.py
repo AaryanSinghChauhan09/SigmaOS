@@ -1,11 +1,11 @@
 import tkinter as tk
 from tkinter import ttk
-from .base_page import SigmaPage
-from .styles import PAL, FONT_MED, FONT_SMALL
+from gui_pkg.base_page import SigmaPage
+from gui_pkg.styles import PAL, FONT_MED, FONT_SMALL
 
 class BrowserPage(SigmaPage):
     def __init__(self, parent, gui):
-        super().__init__(parent, gui, "Sovereign Browser Pro", "Absorption of Chrome/Arc/Safari — Zero-Trust Rendering")
+        SigmaPage.__init__(self, parent, gui, "Sovereign Browser Pro", "Absorption of Chrome/Arc/Safari — Zero-Trust Rendering")
         self.browser = self.kernel.registry.get("browser")
         self._build_ui()
 
@@ -24,6 +24,14 @@ class BrowserPage(SigmaPage):
         initial_url = self.browser.tabs[0]["url"] if self.browser and self.browser.tabs else "https://sigma.search"
         self.url_e.insert(0, initial_url)
         
+        # USP: Privacy Shield Controls
+        shield_fr = tk.Frame(nav, bg=PAL["bg2"])
+        shield_fr.pack(side="left", padx=10)
+        for icon, tooltip in [("🎭", "WebGL Fake Values"), ("🖼️", "Canvas Noise"), ("📍", "Geo-Spoof")]:
+            btn = tk.Button(shield_fr, text=icon, font=("Segoe UI Symbol", 10), bg=PAL["bg2"], fg=PAL["green"], 
+                            relief="flat", bd=0, command=lambda t=tooltip: self.gui._log_voice(f"Shield: {t} active."))
+            btn.pack(side="left")
+        
         # Web Canvas
         view = tk.Frame(self, bg="white")
         view.pack(fill="both", expand=True)
@@ -41,4 +49,22 @@ class BrowserPage(SigmaPage):
         self.url_e.bind("<Return>", _go)
         ttk.Button(nav, text="GO", command=_go).pack(side="right", padx=10)
         
+        # USP: Wappalyzer / Tech Stack detector
+        self.tech_lbl = tk.Label(nav, text="React • Python • Nginx", font=("Inter Bold", 8), fg=PAL["cyan"], bg=PAL["bg2"])
+        self.tech_lbl.pack(side="right", padx=5)
+        
+        # USP: Word Replacer Max - Content Surgeon
+        tk.Button(nav, text="✂️ Surgeon", font=FONT_SMALL, bg=PAL["bg2"], fg=PAL["gold"], relief="flat",
+                  command=self._text_surgeon).pack(side="right", padx=5)
+
         tk.Label(nav, text="⚡ AI Lens", font=FONT_SMALL, fg=PAL["accent"], bg=PAL["bg2"]).pack(side="right", padx=5)
+
+    def _text_surgeon(self):
+        """USP: Word Replacer Max simulation."""
+        current = self.content_lbl.cget("text")
+        if "SOVEREIGN" in current:
+            new_text = current.replace("SOVEREIGN", "ULTRA-SYNCED")
+            self.content_lbl.config(text=new_text)
+            self.gui._log_voice("Surgeon: Content dynamically transformed via WordReplacer node.")
+        else:
+            self.gui._log_voice("Surgeon: No target patterns found on page.")

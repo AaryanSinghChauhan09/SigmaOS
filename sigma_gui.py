@@ -63,6 +63,9 @@ from gui_pkg.univ_hub_page import UnivHubPage
 from gui_pkg.shopping_wizard import ShoppingWizardPage
 from gui_pkg.mail_orchestrator import MailOrchestratorPage
 from gui_pkg.sovereign_comms import SovereignCommsPage
+from gui_pkg.sovereign_wellness import SovereignWellnessPage
+from gui_pkg.enterprise_hub import EnterpriseHubPage
+from gui_pkg.ag_guide import AGGuidePage
 
 class SigmaGUI(tk.Tk, UIMixin):
     """Main SigmaOS GUI application window."""
@@ -85,6 +88,7 @@ class SigmaGUI(tk.Tk, UIMixin):
         self._ultra_perf   = tk.BooleanVar(value=True) # Default to True for User's performance focus
         self._game_mode    = tk.BooleanVar(value=False)
         self._sandbox_mode = tk.BooleanVar(value=True)
+        self._child_mode   = tk.BooleanVar(value=False) # USP: Child Safety Mode
         
         # OS RECOVERY PROTOCOL
         self.report_callback_exception = self._on_unhandled_exception
@@ -741,6 +745,10 @@ class SigmaGUI(tk.Tk, UIMixin):
             "shopping_wizard":  lambda: self._set_modular_page("shopping_wizard", ShoppingWizardPage),
             "mail_orchestrator": lambda: self._set_modular_page("mail_orchestrator", MailOrchestratorPage),
             "sovereign_comms":  lambda: self._set_modular_page("sovereign_comms", SovereignCommsPage),
+            "wellness":         lambda: self._set_modular_page("wellness", SovereignWellnessPage),
+            "enterprise":       lambda: self._set_modular_page("enterprise", EnterpriseHubPage),
+            "store":           lambda: self._set_modular_page("store", SoftwareMatrixPage),
+            "ag_guide":        lambda: self._set_modular_page("ag_guide", AGGuidePage),
         }
         
         # Oracle VM Discovery (Professional Integration)
@@ -799,6 +807,7 @@ class SigmaGUI(tk.Tk, UIMixin):
             ("🌐", "browser"), ("📁", "explorer"), ("📦", "store"),
             ("🧪", "sovereign_suite"), ("📡", "network_vanguard"), ("📊", "intelligence_studio"), 
             ("🛒", "shopping_wizard"), ("📧", "mail_orchestrator"), ("🛰️", "sovereign_comms"),
+            ("🧘", "wellness"), ("🚀", "enterprise"), ("📦", "store"),
             ("🎓", "gurukul_academy"), ("⚖️", "compliance_center"), ("🧠", "brain"), 
             ("⚡", "zenith"), ("📧", "gmail_ai"), ("🎨", "visual_customizer"), ("💠", "ag_hub")
         ]
@@ -1312,6 +1321,12 @@ class SigmaGUI(tk.Tk, UIMixin):
             ("system_audit",   "⚖️",  "Audit"),
             ("virtualbox",     "🖥️",  "Virtual"),
             ("war_room",       "⚔️",  "War Room"),
+            ("shopping_wizard", "🛒", "Shopping"),
+            ("mail_orchestrator", "📧", "MailMerge"),
+            ("sovereign_comms", "📡", "Comms"),
+            ("wellness",        "🧘", "Wellness"),
+            ("enterprise",      "🚀", "Business"),
+            ("store",           "📦", "Store")
         ]
 
     def _build_sidebar(self, parent):
@@ -1442,7 +1457,7 @@ class SigmaGUI(tk.Tk, UIMixin):
             "visual_customizer": PAL["purple"], "brain": PAL["accent2"], "gmail_ai": PAL["orange"],
             "intelligence_studio": PAL["accent"], "gurukul_academy": PAL["gold"],
             "shopping_wizard": PAL["green"], "mail_orchestrator": PAL["blue"],
-            "sovereign_comms": PAL["teal"]
+            "sovereign_comms": PAL["teal"], "wellness": PAL["gold"]
         }
         active_aura = aura_map.get(key, PAL["accent"])
         self._morphic_island(f"SPACE: {key.upper()}", active_aura, 1000)
@@ -6261,7 +6276,7 @@ class SigmaGUI(tk.Tk, UIMixin):
         
         def _a_act(action):
             if not auditor: return
-            if action == "audit_gdpr": res = auditor.audit_intent("Sync Data PII", {"email:": "user@test.com"})
+            if action == "audit_gdpr": res = auditor.audit_intent("Sync Data PII", {"email:": "sovereign_user@sigmaos.internal"})
             elif action == "audit_dma": res = auditor.audit_intent("In-App Purchase", {"action": "force_proprietary_payment"})
             elif action == "audit_ethics": res = auditor.audit_intent("Generate Prompt", {"description": "deploy malware exploit"})
             elif action == "audit_ip": res = auditor.audit_intent("Run Binary", {"description": "gpl_violation"})

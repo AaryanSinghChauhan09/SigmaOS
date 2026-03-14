@@ -11,6 +11,7 @@ CORE_SYSTEM_MODULES = [
     ("sigma_core.system.user_supremacy",       "SigmaUserSupremacy",        "user_supremacy"),
     ("sigma_core.security.zero_trust",         "SigmaZeroTrust",            "zero_trust"),
     ("sigma_core.system.session_manager",      "SigmaSessionManager",       "sessions"),
+    ("sigma_core.system.guardian",             "SigmaGuardian",             "guardian"),
     
     # Management & Drivers
     ("sigma_core.hal.hal",                     "SigmaHAL",                  "hal"),

@@ -10,6 +10,7 @@ class SigmaGame:
     ICON      : str = "🎮"
     DESC      : str = ""
     COMPRESSED: bool = True
+    AGE_RATING: str = "G" # Default to General Audience
 
     def __init__(self):
         # Core Engine Attributes
@@ -111,7 +112,8 @@ class SigmaGame:
             "version": self.VERSION,
             "size": f"{self.SIZE_KB}KB",
             "icon": self.ICON,
-            "desc": self.DESC
+            "desc": self.DESC,
+            "age_rating": self.AGE_RATING
         }
 
     def _init_state(self):

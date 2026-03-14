@@ -44,7 +44,7 @@ class UniversalBridge(SigmaModuleBase, ISigmaService):
         return True
 
     def _spawn_android_bridge(self, path: str):
-        """Mock: Hooks into Android Subsystem for Sigma (ASS)."""
+        """Mock: Hooks into Android Subsystem for Sigma (AS-Sigma)."""
         self.log_event("android_bridge_spawn", {"target": path})
         print(f"[BRIDGE] Virtualizing APK {path} in Ring-0 Sandbox.")
         return True

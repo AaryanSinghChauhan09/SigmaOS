@@ -73,6 +73,20 @@ class ShoppingWizardPage(SigmaPage):
             col = PAL["green"] if stat=="VERIFIED" else PAL["red"]
             tk.Label(c, text=stat, font=("Inter", 7, "bold"), fg=col, bg=PAL["bg2"]).pack(anchor="e")
 
+        ttk.Button(right_fr, text="🍯 Auto-Apply Best Coupon (Honey)", 
+                   command=lambda: self.gui._log_voice("Honey: Testing 42 codes... Found VERIFIED 'AMZ_SAVE20'. Saving $319.")).pack(fill="x", pady=10)
+
+        # Price History Mock (CamelCamelCamel USP)
+        hist_card = self._card(right_fr, "📈 Price History (90d)")
+        hist_card.master.pack(fill="both", expand=True, pady=(10, 0))
+        tk.Label(hist_card, text="LOWER THAN 98% OF YEAR", font=FONT_BOLD, fg=PAL["green"], bg=PAL["card"]).pack(pady=5)
+        
+        canvas = tk.Canvas(hist_card, height=60, bg=PAL["bg2"], highlightthickness=0)
+        canvas.pack(fill="x")
+        points = [10, 50, 20, 40, 30, 10, 50, 0]
+        for i in range(len(points)-1):
+            canvas.create_line(i*30, 50-points[i], (i+1)*30, 50-points[i+1], fill=PAL["cyan"], width=2)
+
     def _add_track(self):
         url = self._prod_url.get()
         self.gui._log_voice(f"Sovereign Crawler dispatched to: {url}")

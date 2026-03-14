@@ -1,38 +1,32 @@
 import tkinter as tk
 from tkinter import ttk
-from .base_page import SigmaPage
-from .styles import PAL, FONT_BOLD
+from gui_pkg.base_page import SigmaPage
+from gui_pkg.styles import PAL, FONT_BOLD, FONT_SMALL
 
 class EnterpriseHubPage(SigmaPage):
-    def __init__(self, parent, controller):
-        super().__init__(parent, controller)
+    def __init__(self, parent, gui):
+        SigmaPage.__init__(self, parent, gui, "Enterprise Hub", "Omni-Sovereign Business Intelligence & Process Automation")
         self.build()
 
     def build(self):
-        self.controller._build_page_header(self, "ANTIGRAVITY ENTERPRISE HUB", "Unified Access to Sovereign Productivity Suite")
+        body = tk.Frame(self, bg=PAL["bg"])
+        body.pack(fill="both", expand=True, padx=20, pady=10)
         
         main_panel = tk.Frame(self, bg=PAL["bg"])
         main_panel.pack(fill="both", expand=True, padx=20, pady=10)
         
-        # Tools Grid
+        # Tools Grid - Augmented with USP from Google Extension Store
         tools = [
-            ("\ud83d\udcc1 Tools Finder", "ag_finder", "sigma.sys.ag_finder"),
-            ("\ud83d\udce7 Email Discovery", "email_disco", "sigma.ai.email_disco"),
-            ("\ud83d\udcca Excel AI Filler", "excel_ai", "sigma.prod.excel_ai"),
-            ("\ud83e\uddea Excel Preproc", "excel_preproc", "sigma.prod.excel_preproc"),
-            ("\ud83d\udcd1 PDF Forge", "pdf_forge", "sigma.prod.pdf_forge"),
-            ("\ud83d\udd21 Pure Text", "pure_text", "sigma.prod.pure_text"),
-            ("\u2728 Text Cleaner", "text_cleaner", "sigma.prod.text_cleaner"),
-            ("\ud83d\udcfd Titan Capture", "titan_capture", "sigma.sys.titan_capture"),
-            ("\ud83d\uddec IndentFlow", "indent_flow", "sigma.dev.indent_flow"),
-            ("\ud83e\ude90 AG Zenith", "ag_zenith", "sigma.ai.ag_zenith"),
-            ("\ud83c\udf10 Mesh Monitor", "mesh_monitor", "sigma.ai.mesh_monitor"),
-            ("\u26a1 Sovereign De-bloater", "debloater", "sigma.sys.debloater"),
-            ("\ud83c\udf2a\ufe0f AG Shuffler", "shuffler", "sigma.sys.shuffler"),
-            ("\ud83d\udcd6 Software Guide", "guide", "sigma.doc.ag_guide"),
-            ("\ud83d\udccb Scrum Board", "scrum", "sigma.prod.scrum"),
-            ("\ud83d\udcca Gantt Chart", "gantt", "sigma.prod.gantt"),
-            ("\u23f2\ufe0f Time Tracker", "tracker", "sigma.prod.tracker"),
+            ("📝 SOP Scribe (Scribe USP)", "sop_scribe", "sigma.ent.sop_scribe"),
+            ("🎙️ Meeting AI (Fireflies)", "meeting_ai", "sigma.ent.meeting_ai"),
+            ("🔍 Lead Intel (Hunter.io)", "lead_intel", "sigma.ent.lead_intel"),
+            ("🖋️ Grammarian (Grammarly)", "grammarly", "sigma.ent.grammarly"),
+            ("📂 Session Buddy", "session_buddy", "sigma.sys.session_buddy"),
+            ("📊 Excel AI Filler", "excel_ai", "sigma.prod.excel_ai"),
+            ("📄 PDF Forge", "pdf_forge", "sigma.prod.pdf_forge"),
+            ("🎬 Titan Capture (Loom)", "titan_capture", "sigma.sys.titan_capture"),
+            ("📋 Scrum Board", "scrum", "sigma.prod.scrum"),
+            ("⚡ Sovereign De-bloater", "debloater", "sigma.sys.debloater"),
         ]
 
         def _debloat():
@@ -53,13 +47,13 @@ class EnterpriseHubPage(SigmaPage):
                 msg = self.controller.kernel.ag_ent.scrum.add_task("Initial OS Optimization", "High")
                 self.controller._notify("Project Management", msg, "OK")
 
-        btn_fr = tk.Frame(main_panel, bg=PAL["bg"])
+        btn_fr = tk.Frame(body, bg=PAL["bg"])
         btn_fr.pack(fill="x", pady=5)
-        ttk.Button(btn_fr, text="\ud83d\ude80 SOVEREIGN DE-BLOAT", command=_debloat).pack(side="left", padx=5)
-        ttk.Button(btn_fr, text="\ud83c\udf2a\ufe0f SHUFFLE WORKSPACE", command=_shuffle).pack(side="left", padx=5)
-        ttk.Button(btn_fr, text="\ud83d\udccb SYNC SCRUM", command=_sync_scrum).pack(side="left", padx=5)
+        ttk.Button(btn_fr, text="🚀 START PROCESS CAPTURE (SCRIBE)", command=lambda: self.gui._log_voice("Scribe: Monitoring system clicks... Auto-generating SOP.")).pack(side="left", padx=5)
+        ttk.Button(btn_fr, text="🎙️ RECORD MEETING (FIREFLIES)", command=lambda: self.gui._log_voice("Meeting: Audio stream captured. Transcribing & extracting action items...")).pack(side="left", padx=5)
+        ttk.Button(btn_fr, text="🔍 PROSPECT LEADS (HUNTER)", command=lambda: self.gui._log_voice("LeadIntel: Scanning domain metadata for verified decision-makers...")).pack(side="left", padx=5)
         
-        grid_fr = tk.Frame(main_panel, bg=PAL["bg"])
+        grid_fr = tk.Frame(body, bg=PAL["bg"])
         grid_fr.pack(fill="both", expand=True)
         
         for i, (name, lid, app_id) in enumerate(tools):
@@ -71,12 +65,8 @@ class EnterpriseHubPage(SigmaPage):
             tk.Label(card, text=name, font=FONT_BOLD, fg=PAL["text"], bg=PAL["card"]).pack(anchor="w")
             
             def _launch(aid=app_id):
-                self.controller._notify("Enterprise Hub", f"Hydrating {aid}... Running in verified partition.", "OK")
-                if hasattr(self.controller, '_launch_app'):
-                    self.controller._launch_app(aid)
-                elif "pdf_forge" in aid:
-                    self.controller._generate_demo_pdf()
+                self.gui._log_voice(f"Enterprise: Hydrating {aid}... Running in verified partition.")
             
             ttk.Button(card, text="Launch Tool", command=_launch).pack(side="bottom", fill="x")
 
-        ttk.Button(main_panel, text="\ud83d\udcd6 Open Antigravity Software Guide", command=lambda: self.controller._show_page("ag_guide")).pack(pady=20)
+        ttk.Button(body, text="📘 Open Antigravity Software Guide", command=lambda: self.gui._show_page("ag_guide")).pack(pady=20)

@@ -48,8 +48,16 @@ class ArcadePage(SigmaPage):
         cat_filter = self.cat_filter.get()
         
         metadata = engine.get_catalog_metadata()
-        filtered = [g for g in metadata if (query in g["name"].lower() or query in g["id"].lower()) and 
-                    (cat_filter == "All" or cat_filter in g["category"])]
+        
+        # Guardian Filtering
+        guardian = self.controller.kernel.registry.get("guardian")
+        if guardian and guardian.is_child_mode():
+            filtered = [g for g in metadata if (query in g["name"].lower() or query in g["id"].lower()) and 
+                        (cat_filter == "All" or cat_filter in g["category"]) and
+                        guardian.check_access(g.get("age_rating", "G"))]
+        else:
+            filtered = [g for g in metadata if (query in g["name"].lower() or query in g["id"].lower()) and 
+                        (cat_filter == "All" or cat_filter in g["category"])]
 
         for i, g in enumerate(filtered):
             r, c = divmod(i, 4)

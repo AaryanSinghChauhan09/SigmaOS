@@ -23,6 +23,7 @@ from .system.cache import SigmaCache # type: ignore
 from .security.integrity import IntegrityGuard # type: ignore
 from .ui.customizer import SovereignCustomizer # type: ignore
 from .security.vanguard import NetworkVanguard # type: ignore
+from .system.guardian import SigmaGuardian # type: ignore
 from .system.loader import SigmaModuleLoader # type: ignore
 from .hal.polyglot_loader import SigmaPolyglot # type: ignore
 from .manifest import CORE_SYSTEM_MODULES, ECOSYSTEM_APPS # type: ignore
@@ -44,12 +45,14 @@ class SigmaKernel:
         self.integrity = IntegrityGuard(self)
         self.customizer = SovereignCustomizer(self)
         self.vanguard_engine = NetworkVanguard(self)
+        self.guardian = SigmaGuardian(self)
         
         # Register Core
         self.registry.register("cache", self.cache)
         self.registry.register("integrity", self.integrity)
         self.registry.register("customizer", self.customizer)
         self.registry.register("vanguard", self.vanguard_engine)
+        self.registry.register("guardian", self.guardian)
         
         self.os_name = self.cfg.OS_NAME
         self.version = self.cfg.VERSION
