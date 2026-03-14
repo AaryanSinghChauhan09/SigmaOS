@@ -52,6 +52,14 @@ from gui_pkg.ncert_simulator import NcertSimulatorPage
 from gui_pkg.ncert_calc import NcertCalcPage
 from gui_pkg.diksha_vlab import DikshaVLabPage
 from gui_pkg.katbook_reader import KatbookReaderPage
+from gui_pkg.time_tracker import TimeTrackerPage
+from gui_pkg.browser_page import BrowserPage
+from gui_pkg.software_matrix import SoftwareMatrixPage
+from gui_pkg.config_hub import ConfigHubPage
+from gui_pkg.audit_view import AuditViewPage
+from gui_pkg.analytics_page import AnalyticsPage
+from gui_pkg.terminal_page import TerminalPage
+from gui_pkg.univ_hub_page import UnivHubPage
 
 class SigmaGUI(tk.Tk, UIMixin):
     """Main SigmaOS GUI application window."""
@@ -62,7 +70,9 @@ class SigmaGUI(tk.Tk, UIMixin):
         self.cfg    = SigmaConfig()
         self._boot_steps = 0
         self._active_tab = tk.StringVar(value="dashboard")
-        self._nav_btns: dict[str, tk.Button] = {} # Fix: initialize nav_btns dict
+        self._active_tabs: list[str] = ["dashboard"] # USP: Multi-Tab Tasking
+        self._tab_btns: dict[str, tk.Frame] = {}
+        self._nav_btns: dict[str, tk.Button] = {} 
         self._simple_mode = tk.BooleanVar(value=False)
         self._clock_var = tk.StringVar()
         self._history = []
@@ -274,6 +284,35 @@ class SigmaGUI(tk.Tk, UIMixin):
         self.bind("<Control-s>", lambda e: self._trigger_sync())
         self.bind("<Control-comma>", lambda e: self._show_page("config_hub"))
         self.bind("<F5>", lambda e: self._reboot())
+        
+        # USP: Multitasking Hotkeys (Windows 11 Inspired)
+        self.bind("<Alt-Key-1>", lambda e: self._apply_snap_layout("FLOATING"))
+        self.bind("<Alt-Key-2>", lambda e: self._apply_snap_layout("TILING"))
+        self.bind("<Alt-Key-3>", lambda e: self._apply_snap_layout("QUARTERS"))
+        self.bind("<Alt-Key-4>", lambda e: self._apply_snap_layout("SIDEBAR"))
+        self.bind("<Alt-Key-5>", lambda e: self._apply_snap_layout("PILLAR"))
+        
+        # USP: Tab Switching
+        self.bind("<Control-Tab>", lambda e: self._cycle_tabs(1))
+        self.bind("<Control-Shift-Tab>", lambda e: self._cycle_tabs(-1))
+        
+        # Universal Keybinds for Windows Parity (Merged from old bind_shortcuts)
+        self.bind_all("<F1>", lambda e: self._show_page("manual"))
+        self.bind_all("<Alt-s>", lambda e: self._show_page("search"))
+        self.bind_all("<Alt-x>", lambda e: self._show_page("vanguard"))
+        self.bind_all("<Alt-b>", lambda e: self._show_page("brain"))
+        self.bind_all("<Control-Shift-L>", lambda e: self._toggle_bare_minimum())
+        self.bind_all("<Shift-Escape>", lambda e: self._emergency_shutdown())
+
+    def _cycle_tabs(self, direction: int):
+        """Cycles through active tabs for lightning fast multitasking."""
+        if not self._active_tabs: return
+        try:
+            current_idx = self._active_tabs.index(self._active_tab.get())
+            next_idx = (current_idx + direction) % len(self._active_tabs)
+            self._show_page(self._active_tabs[next_idx])
+        except ValueError:
+            self._show_page(self._active_tabs[0])
 
     def _trigger_sync(self):
         """Trigger the Git Workspace Sync manually."""
@@ -623,8 +662,16 @@ class SigmaGUI(tk.Tk, UIMixin):
 
         self._sidebar = self._build_sidebar(self._main)
         self._perf_frame = self._build_perf_status(self._main) # Performance Sidebar
-        self._content = tk.Frame(self._main, bg=PAL["bg"])
-        self._content.pack(side="left", fill="both", expand=True, padx=(0,8), pady=8)
+        self._content_container = tk.Frame(self._main, bg=PAL["bg"])
+        self._content_container.pack(side="left", fill="both", expand=True, padx=(0,8), pady=8)
+        
+        # 📂 Tab Ribbon (USP: Multi-Tab Workspace)
+        self._tab_ribbon = tk.Frame(self._content_container, bg=PAL["bg"], height=35)
+        self._tab_ribbon.pack(fill="x", pady=(0, 5))
+        self._tab_ribbon.pack_propagate(False)
+
+        self._content = tk.Frame(self._content_container, bg=PAL["bg"])
+        self._content.pack(fill="both", expand=True)
         
         # 🏝️ Morphic Island (Dynamic Center Status)
         self._island_var = tk.StringVar(value="SIGMA KERNEL: NOMINAL")
@@ -651,21 +698,21 @@ class SigmaGUI(tk.Tk, UIMixin):
         # Lazy Build Orchestrator (Modern Competitor Pattern)
         self._page_defs = {
             "dashboard":        self._build_dashboard,
-            "browser":          self._build_browser_page,
+            "browser":          lambda: self._set_modular_page("browser", BrowserPage),
             "explorer":         self._build_explorer_page,
             "projects":         self._build_project_center_page,
-            "store":            self._build_store_page,
+            "software_matrix":  lambda: self._set_modular_page("software_matrix", SoftwareMatrixPage),
             "nexus_ai":         self._build_nexus_ai_page,
             "antigravity_hub":  self._build_antigravity_hub_page,
             "brain":            self._build_brain_page,
             "network_warden":   self._build_warden_page,
-            "terminal":         self._build_terminal_page,
+            "terminal":         lambda: self._set_modular_page("terminal", TerminalPage),
             "automation_hub":   self._build_automation_hub_page,
             "ai_lifecycle":     self._build_ai_lifecycle_page,
             "zenith":           self._build_zenith_page,
-            "config_hub":       self._build_config_page,
+            "config_hub":       lambda: self._set_modular_page("config_hub", ConfigHubPage),
             "gaming_hub":       self._build_gaming_hub,
-            "system_audit":     self._build_audit_page,
+            "system_audit":     lambda: self._set_modular_page("system_audit", AuditViewPage),
             "virtualbox":       self._build_virtualbox_page,
             "ag_physics":       self._build_ag_physics_page,
             "visual_customizer": self._build_visual_customizer_page,
@@ -685,6 +732,9 @@ class SigmaGUI(tk.Tk, UIMixin):
             "ncert_calc":       self._build_ncert_calc_page,
             "diksha_vlab":      self._build_diksha_vlab_page,
             "katbook_reader":   self._build_katbook_reader_page,
+            "time_tracker":     lambda: self._set_modular_page("time_tracker", TimeTrackerPage),
+            "univ_hub":        lambda: self._set_modular_page("univ_hub", UnivHubPage),
+            "reports":          lambda: self._set_modular_page("reports", AnalyticsPage),
         }
         
         # Oracle VM Discovery (Professional Integration)
@@ -725,12 +775,15 @@ class SigmaGUI(tk.Tk, UIMixin):
         bar.pack(fill="x", padx=12, pady=8)
         bar.pack_propagate(False)
         
-        # Left Area: Start + Search
+        # Left Area: Start + Search + Task View
         l_fr = tk.Frame(bar, bg=PAL["bg3"])
         l_fr.pack(side="left", padx=10)
         
         tk.Button(l_fr, text="⌘", font=("Inter", 16), bg=PAL["bg3"], fg=PAL["cyan"], 
                   relief="flat", bd=0, command=self._show_start_menu).pack(side="left", padx=5)
+        
+        tk.Button(l_fr, text="❐", font=("Inter", 14), bg=PAL["bg3"], fg=PAL["text"],
+                  relief="flat", bd=0, command=self._show_task_view).pack(side="left", padx=5)
         
         # Centered Task Tray (Pins)
         self._task_tray = tk.Frame(bar, bg=PAL["bg3"])
@@ -748,6 +801,12 @@ class SigmaGUI(tk.Tk, UIMixin):
                           relief="flat", bd=0, padx=8, pady=4,
                           command=lambda p=page: self._show_page(p))
             b.pack(side="left", padx=2)
+            
+        # USP: Snap Assist Button
+        tk.Button(self._task_tray, text="⊞", font=("Segoe UI Symbol", 14),
+                  bg=PAL["bg3"], fg=PAL["cyan"], activebackground=PAL["bg4"],
+                  relief="flat", bd=0, padx=8, pady=4,
+                  command=self._show_snap_menu).pack(side="left", padx=10)
 
         # Right Area: System Status / Control Center Trigger
         r_fr = tk.Frame(bar, bg=PAL["bg3"])
@@ -1362,56 +1421,183 @@ class SigmaGUI(tk.Tk, UIMixin):
             # In Pro/Windows Mode, we might want to refresh the pin tray instead
             self._apply_windows_11_layout()
 
+    def _set_modular_page(self, key, cls):
+        """Standardized modular page instantiation."""
+        p = cls(self._content, self)
+        self._pages[key] = p
+        return p
+
     def _show_page(self, key: str):
-        """Intelligent Page Switcher with Lazy-Loading + Dynamic Aura Sync."""
-        # 🟢 Aura Sync: Adapt visual atmosphere to context (Competitor Absorption: Immersive UX)
+        """USP: Sovereign Multi-Tab Page Orchestrator (Apex v4)."""
+        # 1. Aura & Morphic Update
         aura_map = {
-            "dashboard": PAL["cyan"],
-            "network_vanguard": PAL["red"],
-            "sovereign_suite": PAL["teal"],
-            "visual_customizer": PAL["purple"],
-            "brain": PAL["accent2"],
-            "gmail_ai": PAL["orange"],
-            "intelligence_studio": PAL["accent"],
-            "gurukul_academy": PAL["gold"],
-            "compliance_center": PAL["teal"]
+            "dashboard": PAL["cyan"], "network_vanguard": PAL["red"], "sovereign_suite": PAL["teal"],
+            "visual_customizer": PAL["purple"], "brain": PAL["accent2"], "gmail_ai": PAL["orange"],
+            "intelligence_studio": PAL["accent"], "gurukul_academy": PAL["gold"]
         }
         active_aura = aura_map.get(key, PAL["accent"])
-        self._morphic_island(f"FOCUS: {key.upper()}", active_aura, 1000)
+        self._morphic_island(f"SPACE: {key.upper()}", active_aura, 1000)
         
-        # 1. Clean up suggestions if open
-        if hasattr(self, '_suggest_pop') and self._suggest_pop and self._suggest_pop.winfo_exists():
-            self._suggest_pop.destroy()
+        # 2. Tab Management
+        if key not in self._active_tabs:
+            self._active_tabs.append(key)
+            self._refresh_tab_ribbon()
             
-        # 2. Build if not exists (Lazy Load)
+        # 3. Build if not exists
         if key not in self._pages:
             if key in self._page_defs:
-                try:
-                    self._page_defs[key]()
-                except Exception as e:
-                    self._log(self._dash_log, f"⚠️ GUI Gap: Space '{key}' failed. {e}", "ERR")
-                    self._build_placeholder_page(key)
+                try: self._page_defs[key]()
+                except Exception as e: self._build_placeholder_page(key)
             else: self._build_placeholder_page(key)
 
-        prev = self._active_tab.get()
-        if prev in self._nav_btns and self._nav_btns[prev].winfo_exists():
-            self._nav_btns[prev].configure(bg=PAL["bg2"], fg=PAL["dim"])
-            
+        # 4. Tab Highlight & Switching
         self._active_tab.set(key)
-        if key in self._nav_btns and self._nav_btns[key].winfo_exists():
-            self._nav_btns[key].configure(bg=active_aura, fg="white")
+        self._refresh_tab_ribbon()
             
-        # 3. Geometric Handoff
+        # 5. Page Handoff
         target = self._pages[key]
         for k, p in self._pages.items():
             if p.winfo_exists() and k != key: p.pack_forget()
         target.pack(fill="both", expand=True)
     
-        # 🔵 Stage Manager Logic (Sidebar of Recents)
         if hasattr(self, '_stage_manager') and self._stage_manager.winfo_exists():
             self._update_stage_manager(key)
 
         self._history.append(key)
+
+    def _show_task_view(self):
+        """USP: Sovereign Task View (Windows 11 / macOS Mission Control)."""
+        if hasattr(self, '_task_view_pop') and self._task_view_pop.winfo_exists():
+            self._task_view_pop.destroy(); return
+
+        self._task_view_pop = tk.Toplevel(self)
+        self._task_view_pop.attributes("-fullscreen", True)
+        self._task_view_pop.attributes("-topmost", True)
+        self._task_view_pop.configure(bg="#0A0E14") # Ultra Dark
+        self._task_view_pop.attributes("-alpha", 0.95)
+
+        container = tk.Frame(self._task_view_pop, bg="#0A0E14")
+        container.pack(expand=True, fill="both", padx=100, pady=100)
+
+        tk.Label(container, text="ACTIVE WORKSPACES", font=("Outfit", 32, "bold"), fg=PAL["cyan"], bg="#0A0E14").pack(pady=(0, 50))
+
+        grid = tk.Frame(container, bg="#0A0E14")
+        grid.pack(expand=True, fill="both")
+
+        # Create cards for each active tab
+        cols = 3
+        for i, key in enumerate(self._active_tabs):
+            card = tk.Frame(grid, bg=PAL["bg2"], bd=1, relief="flat", highlightthickness=1, highlightbackground=PAL["bg4"])
+            card.grid(row=i // cols, column=i % cols, padx=20, pady=20, sticky="nsew")
+            
+            icon_map = {"dashboard": "🏠", "browser": "🌐", "explorer": "📁", "brain": "🧠", "zenith": "⚡"}
+            icon = icon_map.get(key, "💠")
+            
+            tk.Label(card, text=icon, font=("Segoe UI Symbol", 48), fg=PAL["cyan"], bg=PAL["bg2"]).pack(pady=(20, 10))
+            tk.Label(card, text=key.upper(), font=("Inter Bold", 12), fg="white", bg=PAL["bg2"]).pack(pady=5)
+            
+            btn = tk.Button(card, text="SWITCH TO SPACE", font=("Inter Bold", 8), bg=PAL["accent"], fg="white",
+                           relief="flat", padx=20, pady=10, command=lambda k=key: [self._show_page(k), self._task_view_pop.destroy()])
+            btn.pack(pady=20)
+            
+            # Hover effect
+            card.bind("<Enter>", lambda e, c=card: c.config(highlightbackground=PAL["accent"]))
+            card.bind("<Leave>", lambda e, c=card: c.config(highlightbackground=PAL["bg4"]))
+
+        self._task_view_pop.bind("<Escape>", lambda e: self._task_view_pop.destroy())
+
+    def _refresh_tab_ribbon(self):
+        """Redraws the tab ribbon with current active workspaces."""
+        if not hasattr(self, '_tab_ribbon') or not self._tab_ribbon.winfo_exists(): return
+        for w in self._tab_ribbon.winfo_children(): w.destroy()
+        
+        cur = self._active_tab.get()
+        for key in self._active_tabs:
+            is_active = (key == cur)
+            
+            t_fr = tk.Frame(self._tab_ribbon, bg=PAL["bg3"] if is_active else PAL["bg2"], padx=10, 
+                            highlightthickness=1, highlightbackground=PAL["accent"] if is_active else PAL["bg4"])
+            t_fr.pack(side="left", padx=1, fill="y")
+            
+            icon_map = {"dashboard": "🏠", "browser": "🌐", "explorer": "📁", "brain": "🧠", "projects": "📊"}
+            icon = icon_map.get(key, "💠")
+            
+            lbl = tk.Label(t_fr, text=f"{icon} {key.title()}", font=("Inter Bold" if is_active else "Inter", 8),
+                      fg="white" if is_active else PAL["dim"], bg=PAL["bg3"] if is_active else PAL["bg2"])
+            lbl.pack(side="left", pady=5)
+            
+            # Click to Switch
+            t_fr.bind("<Button-1>", lambda e, k=key: self._show_page(k))
+            lbl.bind("<Button-1>", lambda e, k=key: self._show_page(k))
+            
+            if key != "dashboard": # Close button for tabs
+                c_btn = tk.Label(t_fr, text="×", font=("Inter Bold", 10), fg=PAL["dim"], bg=PAL["bg3"] if is_active else PAL["bg2"])
+                c_btn.pack(side="left", padx=(8, 0))
+                c_btn.bind("<Button-1>", lambda e, k=key: self._close_tab(k))
+                c_btn.bind("<Enter>", lambda e, b=c_btn: b.config(fg=PAL["red"]))
+                c_btn.bind("<Leave>", lambda e, b=c_btn: b.config(fg=PAL["dim"]))
+            
+            # Active indicator
+            if is_active:
+                tk.Frame(t_fr, bg=PAL["accent"], height=2).place(relx=0, rely=0.95, relwidth=1)
+
+    def _close_tab(self, key: str):
+        """Closes a workspace tab and switches to the last active one."""
+        if key in self._active_tabs and key != "dashboard":
+            self._active_tabs.remove(key)
+            if self._active_tab.get() == key:
+                self._show_page(self._active_tabs[-1])
+            else:
+                self._refresh_tab_ribbon()
+
+    def _show_snap_menu(self):
+        """USP: Pro Snap-Layout Assist (Windows 11 Parity)."""
+        if hasattr(self, '_snap_pop') and self._snap_pop.winfo_exists():
+            self._snap_pop.destroy(); return
+
+        self._snap_pop = tk.Toplevel(self)
+        self._snap_pop.overrideredirect(True)
+        self._snap_pop.attributes("-topmost", True)
+        self._snap_pop.configure(bg=PAL["bg3"])
+        
+        # Position above the Snap Button
+        w, h = 240, 180
+        x = self.winfo_pointerx() - (w // 2)
+        y = self.winfo_pointery() - h - 10
+        self._snap_pop.geometry(f"{w}x{h}+{x}+{y}")
+        
+        fr = tk.Frame(self._snap_pop, bg=PAL["bg3"], highlightthickness=1, highlightbackground=PAL["accent"], padx=10, pady=10)
+        fr.pack(fill="both", expand=True)
+        
+        tk.Label(fr, text="SNAP LAYOUTS", font=("Inter Bold", 8), fg=PAL["cyan"], bg=PAL["bg3"]).pack(pady=(0, 10))
+        
+        layouts = [
+            ("Tiling (50/50)", "TILING"),
+            ("Quarters (2x2)", "QUARTERS"),
+            ("Pillar (1/3rd)", "PILLAR"),
+            ("Sidebar (70/30)", "SIDEBAR"),
+            ("Floating", "FLOATING")
+        ]
+        
+        for name, lid in layouts:
+            btn = tk.Button(fr, text=name, font=FONT_SMALL, bg=PAL["bg3"], fg=PAL["text"],
+                            activebackground=PAL["accent"], relief="flat", anchor="w",
+                            command=lambda l=lid: self._apply_snap_layout(l))
+            btn.pack(fill="x", pady=2)
+
+    def _apply_snap_layout(self, layout_id: str):
+        """Triggers the Morphic Layout Engine with the selected snap profile."""
+        self._snap_pop.destroy()
+        self._notify("SNAP ASSIST", f"Applying {layout_id} layout...", "OK")
+        
+        # Morphic Layout Engine Handoff
+        morphic = self.kernel.registry.get("morphic_layout")
+        if morphic:
+            morphic.switch_layout(layout_id)
+            self._morphic_island(f"LAYOUT: {layout_id}", PAL["cyan"], 3000)
+            # In a real windowing environment, we'd trigger a redraw of all windows here.
+            # In this GUI, we simulate it.
+            self.update_idletasks()
 
     def _update_stage_manager(self, active_key):
         """Competitor UX: Stage Manager sidebar with visual 'recent' stacks."""
@@ -1637,6 +1823,25 @@ class SigmaGUI(tk.Tk, UIMixin):
         if hasattr(zen_c.winfo_children()[1], 'winfo_children'):
             for w in zen_c.winfo_children()[1].winfo_children(): w.bind("<Button-1>", _zen_click)
         
+        # Multitasking & Productivity SECTION
+        tk.Label(main, text="Multitasking", font=("Inter Bold", 11), fg=PAL["text"], bg=PAL["bg2"]).pack(anchor="w", pady=(20,10))
+        
+        multigrid = tk.Frame(main, bg=PAL["bg2"])
+        multigrid.pack(fill="x")
+        
+        sm_c = _cc_card(multigrid, "🖼️", "Stage Manager", "Active Stacks")
+        sm_c.pack(fill="x", pady=4)
+        def _toggle_sm(e): 
+            state = not getattr(self, '_sm_enabled', False)
+            self._sm_enabled = state
+            self._morphic_island(f"STAGE MANAGER: {'ON' if state else 'OFF'}", PAL["accent"] if state else PAL["dim"])
+            if state: self._update_stage_manager(self._active_tab.get())
+            else: self._stage_manager.pack_forget()
+        sm_c.bind("<Button-1>", _toggle_sm)
+        
+        focus_c = _cc_card(multigrid, "🌙", "Focus Mode", "Deep Work")
+        focus_c.pack(fill="x", pady=4)
+        
         # Sliders (Visual mockup)
         tk.Label(main, text="Display", font=("Inter Bold", 8), fg=PAL["dim"], bg=PAL["bg2"]).pack(anchor="w", pady=(15, 5))
         s1 = tk.Scale(main, orient="horizontal", bg=PAL["bg2"], fg=PAL["cyan"], troughcolor=PAL["bg3"], 
@@ -1813,30 +2018,6 @@ class SigmaGUI(tk.Tk, UIMixin):
         sched_log = self._console(p, height=12)
         self._log(sched_log, "Scheduler Active. Linux Crontab bridge initialized.", "INFO")
 
-    def _bind_shortcuts(self):
-        """Universal Keybinds for Windows Parity."""
-        # Function Keys
-        self.bind_all("<F1>", lambda e: self._show_page("manual"))
-        self.bind_all("<F5>", lambda e: self._log(self._dash_log, "Refreshed Mesh Stats.", "OK"))
-
-        # Alt combinations (Simulating Win-key behaviors for reliability)
-        self.bind_all("<Alt-s>", lambda e: self._show_page("search"))
-        self.bind_all("<Alt-x>", lambda e: self._show_page("vanguard"))
-        self.bind_all("<Alt-b>", lambda e: self._show_page("brain"))
-        
-        # Resource Optimization Shortcut (Bare Minimum)
-        self.bind_all("<Control-Shift-L>", lambda e: self._toggle_bare_minimum())
-        self.bind_all("<Control-Shift-Z>", lambda e: self._show_page("zenith"))
-        self.bind_all("<Alt-c>", lambda e: self._show_page("commerce"))
-        self.bind_all("<Alt-i>", lambda e: self._show_page("dashboard"))
-
-        # Productivity Standards
-        # Note: Control-c/v/x work natively on Entry widgets.
-        self.bind_all("<Control-n>", lambda e: self._log(self._dash_log, "New Mission node created.", "INFO"))
-        self.bind_all("<Control-s>", lambda e: self._log(self._dash_log, "Mission state COMMITTED (Save).", "OK"))
-        
-        # PANIC EXIT (For Native/Fullscreen Mode)
-        self.bind_all("<Shift-Escape>", lambda e: self._emergency_shutdown())
 
     def _emergency_shutdown(self):
         """Restores host and exits immediately."""
@@ -9134,9 +9315,6 @@ class SigmaGUI(tk.Tk, UIMixin):
         tk.Button(card, text="Execute via CLI", bg=PAL["bg3"], fg=PAL["cyan"], 
                   command=lambda: self._show_page("terminal")).pack(pady=10)
 
-    def _build_cosmos_dashboard(self):
-        p = CosmosDashPage(self._content, self)
-        self._pages["cosmos_dash"] = p
 
         _refresh_fabric()
         ttk.Button(card, text="Join Hybrid Fabric",
