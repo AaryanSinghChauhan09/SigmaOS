@@ -140,8 +140,10 @@ class Maths_Classes_11_12:
     @staticmethod
     def sets(as_, bs, us):
         a = set(as_.split(",")); b = set(bs.split(",")); u = set(us.split(","))
-        v = (u-(a|b)) == ((u-a)&(u-b))
-        return {"Verified": v}
+        # Verified: (A U B)' = A' ∩ B'
+        lhs = u.difference(a.union(b))
+        rhs = u.difference(a).intersection(u.difference(b))
+        return {"Verified": lhs == rhs}
 
     @staticmethod
     def complex(r, i, p):

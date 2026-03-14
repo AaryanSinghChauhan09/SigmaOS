@@ -24,6 +24,9 @@ class Physics_Classes_6_10:
         "Sound Speed (fλ)": ("sound", [("Freq (Hz)", "440"), ("Lambda (m)", "0.78")]),
         "Friction Lab": ("friction", [("Mass (kg)", "5"), ("Surface (Ice/Wood/Rubber)", "Wood")]),
         "Work Done": ("work", [("Force (N)", "50"), ("Disp (m)", "10"), ("Angle (deg)", "0")]),
+        "Newton's 2nd (F=ma)": ("f_ma", [("Mass (kg)", "10"), ("Acc (m/s²)", "5")]),
+        "Sound Echo": ("echo", [("Time (s)", "2"), ("Temp (C)", "20")]),
+        "Eye Lens Power": ("eye", [("Object Dist (m)", "2")]),
     }
 
     @staticmethod
@@ -83,6 +86,22 @@ class Physics_Classes_6_10:
     def work(f, d, a):
         w = f * d * math.cos(math.radians(a))
         return {"Work (J)": _r(w, 2)}
+
+    @staticmethod
+    def f_ma(m, a):
+        return {"Force (N)": _r(m * a, 2)}
+
+    @staticmethod
+    def echo(t, temp):
+        v = 331 + 0.6 * temp
+        d = (v * t) / 2
+        return {"Distance to Obstacle (m)": _r(d, 2), "Min Distance for Echo": "17.2m (at 20C)"}
+
+    @staticmethod
+    def eye(d):
+        if d < 0.25: return {"Status": "Blurry", "Reason": "Near point limit (25cm)"}
+        p = 1/d
+        return {"Lens Power (D)": _r(p, 2), "Acommodation": "Active"}
 
 class Physics_Classes_11_12:
     TITLE = "Senior Physics: Exhaustive Lab Manual"
