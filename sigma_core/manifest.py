@@ -143,6 +143,7 @@ CORE_SYSTEM_MODULES = [
 ]
 
 ECOSYSTEM_APPS = [
+    ("ecosystem.sigma_buyhatke",       "SigmaBuyHatke",            "buyhatke"),
     ("ecosystem.aether_orchestrator",  "AetherOrchestrator",        "aether_orch"),
     ("ecosystem.pdf_forge",            "SigmaPDFForge",             "pdf_forge"),
     ("ecosystem.titan_capture",        "SigmaTitanCapture",         "titan_capture"),
