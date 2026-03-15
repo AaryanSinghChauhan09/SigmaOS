@@ -121,7 +121,9 @@ def process_file(filepath):
 if __name__ == "__main__":
     print("SigmaOS Zenith Refactor v12.0 - OMNI-OOP...")
     for root, dirs, files in os.walk(ROOT):
-        dirs[:] = [d for d in dirs if not d.endswith('_shards') and d not in SKIP_DIRS]
+        actual_dirs = [d for d in dirs if not d.endswith('_shards') and d not in SKIP_DIRS]
+        dirs.clear()
+        dirs.extend(actual_dirs)
         for file in files:
             if file.endswith('.py'):
                 process_file(os.path.join(root, file))

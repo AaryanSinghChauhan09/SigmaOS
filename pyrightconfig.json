@@ -1,0 +1,11 @@
+{
+    "include": ["."],
+    "executionEnvironments": [
+        {
+            "root": "."
+        }
+    ],
+    "pythonVersion": "3.10",
+    "pythonPlatform": "Windows",
+    "typeCheckingMode": "basic"
+}
