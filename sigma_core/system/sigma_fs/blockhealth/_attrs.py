@@ -1,5 +1,0 @@
-HEALTHY = 'healthy'
-SUSPECT = 'suspect'
-DEGRADED = 'degraded'
-FAILED = 'failed'
-REMAPPED = 'remapped'
