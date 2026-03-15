@@ -168,5 +168,44 @@ To achieve 100% compliance when using **Google Stitch** to generate your screens
 
 ---
 
+## 🏎️ 8. Performance Guidelines (144Hz Target/Zero-Jitter)
+
+The user experience in SigmaOS must never feel sluggish. Google Stitch code must adhere to strict render guidelines.
+
+* **Transition Limitations:** Limit transitions to `opacity` and `transform` properties only. NEVER animate `height`, `width`, `margin`, `padding`, or `box-shadow` across layout shifts (doing so triggers slow GPU repaints).
+* **Timing Functions:** Default timing curve should be a sharp, mechanical ease: `transition: all 150ms cubic-bezier(0.2, 0.8, 0.2, 1)`. Nothing should feel "floaty".
+* **State Changes:** When clicking a button or checkbox, the background-color change should be close to instantaneous (`50ms`). 
+
+### Performance Stitch Prompt Addendum:
+*"Ensure all CSS transitions strictly target 'opacity' and 'transform' to avoid layout thrashing. Set default transition times to 100ms-150ms using a sharp cubic-bezier curve. Interactions must feel instant and mechanical, with zero floatiness."*
+
+---
+
+## ♿ 9. Accessibility & Machine Readability
+
+For a UI to be truly "Automation Friendly" for Antigravity or AI Assistants, it must also be highly accessible. The AI crawler is effectively a screen reader on steroids.
+
+* **Mandatory ARIA:** Every non-text visual element (like the taskbar SVGs) MUST have an `aria-label` describing it (e.g., `aria-label="System Clock"` or `aria-label="Battery Status"`).
+* **Tab Navigability:** `tabindex="0"` should be explicitly managed. The user (or the AI) should be able to tab through an entire application sequentially without using a mouse. 
+* **Focus States:** The `:focus-visible` pseudo-class should throw a prominent (2px to 3px) solid cyan outline around the currently focused node. 
+
+### Accessibility Stitch Prompt Addendum:
+*"All interactive elements must be fully keyboard accessible using logical tab indices. Include descriptive 'aria-label' attributes for all SVG icons. Ensure focused states use a prominent 2px solid #00FFD2 outline across all input components."*
+
+---
+
+## 📐 10. Iconography & SVG Directives
+
+There are no PNG or JPG assets in SigmaOS. 
+
+* **Inline SVG ONLY:** Stitch must generate raw `<svg>` tags directly in the React or HTML return statement. 
+* **Stroke over Fill:** Cyberpunk icons should primarily use `stroke="currentColor"` rather than filled shapes. Stroke-width should default to `1.5` or `2`.
+* **Crisp Geometry:** Avoid overly complex organic curves. Stick to geometric shapes, sharp angles, and tech-like intersecting lines.
+
+### SVG Stitch Prompt Addendum:
+*"Do not use external image URLs. Generate all icons as crisp, minimalist inline SVGs using geometric shapes. Apply 'stroke=\"currentColor\"' with a stroke-width of 1.5, avoiding filled organic shapes or heavy solid blocks."*
+
+---
+
 **Summary Master Prompt for Google Stitch:**
-*"Create a highly responsive, zero-image, CSS-grid-based web interface for an operating system tool. Use a dark 'Sovereign Cyberpunk' theme with an obsidian background, frosted glass panels, and quantum cyan (#00FFD2) glowing borders. Use strictly monospaced fonts (Geist Mono). Ensure all buttons and inputs have semantic IDs and data attributes for AI automation. The design must be extremely lightweight, utilizing only CSS for styling and animations. Build a Shard Grid layout populated with Sovereign Buttons and Data Terminal Inputs."*
+*"Create a highly responsive, zero-image, CSS-grid-based web interface for an operating system tool. Use a dark 'Sovereign Cyberpunk' theme with an obsidian background, frosted glass panels, and quantum cyan (#00FFD2) glowing borders. Use strictly monospaced fonts (Geist Mono). Ensure all buttons and inputs have semantic IDs and data attributes for AI automation. The design must be extremely lightweight, utilizing only CSS for styling and animations (animate only transform/opacity). Include ARIA labels and inline geometric SVGs. Build a Shard Grid layout populated with Sovereign Buttons and Data Terminal Inputs."*
