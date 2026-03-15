@@ -1,6 +1,6 @@
 # 🌌 SigmaOS: Comprehensive UI/UX Design Plan & Specification
 
-This document serves as the **Master Blueprint for SigmaOS UI/UX design**. It is engineered specifically for use with **Google Stitch** (or similar gen-AI UI tools) to rapidly create, iterate, and deploy interfaces. 
+This document serves as the **Master Blueprint for SigmaOS UI/UX design**. It is engineered specifically for use with **Google Stitch** (or similar gen-AI UI tools) to rapidly create, iterate, and deploy interfaces.
 
 The core philosophy is **Sovereign Cyberpunk**: an aesthetic that is aggressively futuristic, undeniably high-tech, yet ruthlessly optimized to consume absolute minimal system resources. It is entirely customizable and automation-friendly.
 
@@ -50,36 +50,43 @@ When feeding this document to Google Stitch to generate UI components, enforce t
 Each category requires a meticulously standardized view that prioritizes performance. These define the "Everything Required" for SigmaOS.
 
 ### A. The Core Desktop/Workspace (Aura Shell)
+
 * **Taskbar (Bottom/Right edge):** Ultra-thin 32px height/width. No text, only pure cyan SVGs. Displays localized time, battery node, and active Shards.
 * **Start/Nexus Menu:** A fullscreen, glassmorphic grid overlay. Applications aren't "icons"; they are live-streaming ASCII widgets or real-time data visualizers (like CPU load or network graph).
 
 ### B. System Configuration & Personalization (`Sigma Theme Customizer`)
+
 * **Layout:** Dual-pane split screen.
 * **Left Pane (Controls):** Sliders for `border-radius` (sharp vs rounded cyberpunk), Dropdowns for Preset Themes (Midnight, NCERT Academic), and Color Pickers for CSS Variables.
 * **Right Pane (Live Preview):** A sandbox component demonstrating the OS style changes in real-time. Since styles are injected via CSS variables, no redraw logic is required—instant performance.
 * *Note: The `sigma_theme_customizer.py` backend dynamically generates the `sigma_theme_bundle.css` when changes are saved.*
 
 ### C. Intelligence Suite (Omni-Prompt, Auto-Agents)
+
 * **Layout:** Split-pane multiplexer.
 * **Input Zone (Bottom/Center):** A glowing, expanding textarea (`#00FFD2` border on focus). Resembles a command prompt (`> [Type command or prompt here...]`).
 * **Target Selector:** Inline SVG checkboxes shaped like hex-nodes to select AI targets (Local Llama, ChatGPT, Claude).
 * **Output Zone:** Streamed text responses in monospace. Each AI's response is housed in a distinct frosted card.
 
 ### D. System Orchestration & Dashboard (Sentinel, Task Manager)
+
 * **Layout:** Masonry or strict Grid of "Shards" (Widgets).
 * **Data Visualization:** ASCII-style bar charts instead of heavy canvas libraries. CSS-based progress bars for CPU/RAM usage.
 * **Ledger Log:** A continuously scrolling terminal block on the right side of the screen displaying system events and verified Proofs in green monospaced text.
 
 ### E. File Explorer (OmniSearch)
+
 * **List View Only:** Tree structures built entirely with `<ul>` and `<li>`. Folders are `[+] DIR_NAME`. Files are `- FILE_NAME.EXT`.
 * **Keyboard First:** VIM-like navigation is heavily encouraged. Every element must be tabbable and highlight securely via CSS `:focus-visible` with a heavy solid `#00FFD2` outline.
 
 ### F. Terminal & Developer IDE (CodeForge)
+
 * **Editor:** Borderless `textarea` or CodeMirror instance initialized on an empty black void.
 * **Gutter:** Line numbers in muted gunmetal `#606060`. Active line highlighted with a very faint `#00FFD2` background (`rgba(0, 255, 210, 0.05)`).
 * **Output Scaffold:** A bottom docking terminal that uses WebGL text rendering strictly to avoid DOM node bloat when pumping thousands of lines of logs.
 
 ### G. NCERT Virtual Labs (Education & Simulation)
+
 * **Concept:** "Holographic Blueprint."
 * **Palette Override:** While maintaining the dark theme, labs use high-contrast cyan grids on the background.
 * **Interactive Elements:** Skeuomorphic-but-flat vectors. For a physics lab, a pendulum is a simple white SVG line.
@@ -91,16 +98,19 @@ Each category requires a meticulously standardized view that prioritizes perform
 To construct these screens, prompt Stitch to build these exact CSS/React components:
 
 ### 1. The 'Sovereign Button'
+
 * **Idle:** Dark transparent background `rgba(0, 255, 210, 0.05)`, text `#00FFD2`, 1px solid border `#00FFD2`. Sharp corners (0px border-radius) or precisely angled (clip-path).
 * **Hover:** Background `#00FFD2`, text `#030303`. Fast transition (100ms) on `background-color`.
 * **Attributes:** `data-sigma-intent="click"`.
 
 ### 2. The 'Data Terminal Input'
+
 * **Idle:** Background absolute black `#000000`, bottom border only `2px solid #333333`.
 * **Focus:** Bottom border transitions to `#00FFD2` with a subtle glow. Text color `#E0E0E0`, caret color `#00FFD2`. Prefix with a non-editable `>` symbol.
 * **Attributes:** `data-sigma-intent="input"`.
 
 ### 3. The 'Shard Grid Panel'
+
 * **Structure:** `display: grid; gap: 1px; background: #333333;`. The 1px gap forms natural, ultra-thin borders between frosted child panels.
 * **Child Panels:** `background: #0A0F14; padding: 1.5rem;`
 * **Attributes:** `data-sigma-shard-container="true"`.
