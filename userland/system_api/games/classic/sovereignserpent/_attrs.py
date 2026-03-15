@@ -1,0 +1,10 @@
+GAME_ID = 'G03'
+GAME_NAME = 'Sovereign Serpent'
+CATEGORY = 'Board Classic'
+VERSION = '1.0.0'
+SIZE_KB = 380
+ICON = '🐍'
+DESC = 'Roll dice, climb ladders, avoid snakes! First to reach 100 wins.'
+AGE_RATING = 'G'
+SNAKES = {99: 5, 87: 24, 62: 19, 54: 34, 17: 7}
+LADDERS = {4: 25, 13: 46, 33: 49, 42: 63, 50: 69, 80: 99}

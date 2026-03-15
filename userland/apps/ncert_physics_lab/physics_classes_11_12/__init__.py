@@ -1,0 +1,27 @@
+"""Auto-generated package __init__.py"""
+from .coulomb import *  # noqa: F401, F403
+from .doppler import *  # noqa: F401, F403
+from .kirch_node import *  # noqa: F401, F403
+from .boyle import *  # noqa: F401, F403
+from .ydse import *  # noqa: F401, F403
+from .photo import *  # noqa: F401, F403
+from .visco import *  # noqa: F401, F403
+from .biot_loop import *  # noqa: F401, F403
+from .torque import *  # noqa: F401, F403
+from .escape import *  # noqa: F401, F403
+from .carnot import *  # noqa: F401, F403
+from .vernier import *  # noqa: F401, F403
+from .screw_gauge import *  # noqa: F401, F403
+from .meter_bridge import *  # noqa: F401, F403
+from .potentiometer import *  # noqa: F401, F403
+from .hookes import *  # noqa: F401, F403
+from .capillary import *  # noqa: F401, F403
+from .resonance import *  # noqa: F401, F403
+from .pot_internal import *  # noqa: F401, F403
+from .cooling import *  # noqa: F401, F403
+from .specific_heat import *  # noqa: F401, F403
+from .zener import *  # noqa: F401, F403
+from .tangent_gal import *  # noqa: F401, F403
+from .friction import *  # noqa: F401, F403
+from .transistor import *  # noqa: F401, F403
+from .prism import *  # noqa: F401, F403

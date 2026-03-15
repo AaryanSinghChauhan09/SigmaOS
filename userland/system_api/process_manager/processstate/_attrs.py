@@ -1,0 +1,5 @@
+RUNNING = 'running'
+SLEEPING = 'sleeping'
+STOPPED = 'stopped'
+ZOMBIE = 'zombie'
+DEFERRED = 'deferred'

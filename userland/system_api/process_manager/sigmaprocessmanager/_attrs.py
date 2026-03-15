@@ -1,0 +1,1 @@
+DEFAULT_CGROUPS = {'system.slice': CGroup('system.slice', 15.0, 512, 100), 'user.slice': CGroup('user.slice', 70.0, 6144, 800), 'gaming.slice': CGroup('gaming.slice', 85.0, 8192, 1000), 'ai.slice': CGroup('ai.slice', 90.0, 16384, 900)}

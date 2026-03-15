@@ -1,0 +1,19 @@
+"""Auto-generated package __init__.py"""
+from .__init__ import *  # noqa: F401, F403
+from ._build_ui import *  # noqa: F401, F403
+from ._show_welcome import *  # noqa: F401, F403
+from ._mk_cmd import *  # noqa: F401, F403
+from ._clear_area import *  # noqa: F401, F403
+from ._show_phys import *  # noqa: F401, F403
+from ._show_chem import *  # noqa: F401, F403
+from ._show_bio import *  # noqa: F401, F403
+from ._show_math import *  # noqa: F401, F403
+from ._show_diksha import *  # noqa: F401, F403
+from ._show_primary import *  # noqa: F401, F403
+from ._render_game_status import *  # noqa: F401, F403
+from ._show_settings import *  # noqa: F401, F403
+from ._show_analytics import *  # noqa: F401, F403
+from ._show_plugins import *  # noqa: F401, F403
+from ._update_loop import *  # noqa: F401, F403
+from ._refresh_health import *  # noqa: F401, F403
+from ._launch_sublab import *  # noqa: F401, F403

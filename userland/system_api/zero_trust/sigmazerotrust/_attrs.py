@@ -1,0 +1,1 @@
+_IOC_LIST = {'d41d8cd98f00b204e9800998ecf8427e': 'Empty-file hash (suspicious)', 'eicar': 'EICAR test virus string', 'eval(base64': 'Obfuscated JavaScript injection', 'cmd.exe /c': 'Windows shell injection attempt', 'DROP TABLE': 'SQL injection attempt'}

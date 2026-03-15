@@ -1,0 +1,5 @@
+DESKTOP = 'desktop'
+MOBILE = 'mobile'
+CLOUD = 'cloud'
+WASM = 'wasm'
+EMBEDDED = 'embedded'
