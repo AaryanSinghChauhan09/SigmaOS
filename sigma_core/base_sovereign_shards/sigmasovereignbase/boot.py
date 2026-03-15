@@ -1,10 +1,4 @@
-# Part of SigmaOS Omega - (High Cohesion, Loose Coupling)
-# Principle: Single Responsibility per File
-
-from abc import ABC, abstractmethod
-import gc
-
-class SigmaSovereignBase:
-    @abstractmethod
-    def boot(self, *args, **kwargs):
-        pass
+"""
+SigmaOS Modular Shim
+"""
+from ._shards.sigmasovereignbase._base import SigmaSovereignBase

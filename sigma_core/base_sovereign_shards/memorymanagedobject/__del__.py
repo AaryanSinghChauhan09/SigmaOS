@@ -1,9 +1,4 @@
-# Part of SigmaOS Omega - (High Cohesion, Loose Coupling)
-# Principle: Single Responsibility per File
-
-from abc import ABC, abstractmethod
-import gc
-
-class MemoryManagedObject:
-    def __del__(self):
-        self.deallocate()
+"""
+SigmaOS Modular Shim
+"""
+from ._shards.memorymanagedobject._base import MemoryManagedObject
