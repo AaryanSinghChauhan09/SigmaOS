@@ -1,5 +1,5 @@
 from .interfaces.base_sovereign import ISovereign
-from .system.decorators import LoggingDecorator, ResilienceDecorator
+from .system.decorators import LoggingDecorator, ResilienceDecorator, MetricsDecorator
 import threading
 
 class SystemFactory:
@@ -18,13 +18,15 @@ class SystemFactory:
                 cls._instance._registry = {}
         return cls._instance
 
-    def register(self, name: str, component: ISovereign, resilient: bool = True, logged: bool = True):
+    def register(self, name: str, component: ISovereign, resilient: bool = True, logged: bool = True, metrics: bool = True):
         """
         Registers and provides a decorated Sovereign Unit.
         """
         wrapped = component
         if resilient:
             wrapped = ResilienceDecorator(wrapped)
+        if metrics:
+            wrapped = MetricsDecorator(wrapped)
         if logged:
             wrapped = LoggingDecorator(wrapped)
             

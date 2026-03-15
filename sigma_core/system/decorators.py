@@ -44,3 +44,24 @@ class ResilienceDecorator(ShardDecorator):
         except Exception as e:
             print(f"[ZENITH-FAULT] Exception in {self.metadata.get('name')}: {e}")
             return {"error": "AUTO_REMEDY_ACTIVE"}
+
+class MetricsDecorator(ShardDecorator):
+    """
+    Analytics & Performance Collector.
+    Tracks execution counts and latencies.
+    """
+    def __init__(self, component):
+        super().__init__(component)
+        self._exec_count = 0
+        self._total_latency = 0.0
+
+    def execute(self, *args, **kwargs):
+        start = time.time()
+        res = super().execute(*args, **kwargs)
+        latency = time.time() - start
+        
+        self._exec_count += 1
+        self._total_latency += latency
+        
+        print(f"[METRICS] {self.metadata.get('name')} | Total Execs: {self._exec_count} | Latency: {latency:.6f}s")
+        return res
