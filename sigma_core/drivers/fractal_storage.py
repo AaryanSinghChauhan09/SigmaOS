@@ -24,6 +24,13 @@ class FractalRedundancyController(SovereignModule, IRedundancyController):
         super().__init__("FRACTAL_STORAGE")
         self._nodes = {} # NodeID -> {ShardHash -> Shard}
 
+    def execute(self, action, payload=None):
+        if action == "STORE":
+            return self.store_shard(payload['shard'], payload['nodes'])
+        elif action == "RETRIEVE":
+            return self.retrieve_shard(payload)
+        return "FRACTAL_ACTIVE"
+
     def store_shard(self, shard: IDataShard, node_ids: list):
         print(f"[FRACTAL] Mirroring shard {str(shard.shard_hash)[0:8]} to {len(node_ids)} nodes.")
         for nid in node_ids:
