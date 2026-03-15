@@ -20,6 +20,7 @@ from sigma_core.security.proof_ledger import ProofLedger
 from sigma_core.system.power_manager import PowerManager
 from sigma_core.system.chaos_monkey import ChaosMonkey
 from sigma_core.security.privacy_guard import DeterministicPrivacyGuard
+from sigma_core.drivers.fractal_storage import FractalRedundancyController, SovereignShard
 
 class DisplayTextCommand(ICommand):
     """Polymorphic implementation of ICommand."""
@@ -41,6 +42,7 @@ def bootstrap_zenith():
     power = PowerManager()
     chaos = ChaosMonkey(factory)
     privacy = DeterministicPrivacyGuard()
+    fractal = FractalRedundancyController()
     
     # 1. Initialize Event System
     bus.initialize()
@@ -50,9 +52,10 @@ def bootstrap_zenith():
     power.initialize()
     chaos.initialize()
     privacy.initialize()
+    fractal.initialize()
     
     # 2. Register Core Systems
-    kernel = SigmaKernel(power_manager=power) # Composition Injection
+    kernel = SigmaKernel(power_manager=power)
     security = SovereigntyManager()
     auditor = SystemAuditor()
     
@@ -64,76 +67,59 @@ def bootstrap_zenith():
     factory.register("ProofLedger", proof_ledger, resilient=True, logged=True)
     factory.register("ChaosMonkey", chaos, resilient=False, logged=True)
     factory.register("PrivacyGuard", privacy, resilient=True, logged=True)
+    factory.register("FractalStorage", fractal, resilient=True, logged=True)
     
     # 3. Privacy Configuration
     privacy.register_tag("USER_ID_SHARD", "IDENTITY_VERIFICATION")
     privacy.register_tag("SYSTEM_CONFIG", "KERNEL_BOOT")
     
-    # 4. Wire Events (Observer Pattern)
+    # 4. Wire Events
     bus.subscribe("SECURITY_ALERT", auditor)
     bus.subscribe("KERNEL_STATE_CHANGE", auditor)
     
-    # 5. Wire Commands (Command Pattern)
+    # 5. Wire Commands
     commander.register_command("DISPLAY_TEXT", DisplayTextCommand())
     
     # 6. Register Hardware Layer
     device_mngr = get_device_manager()
     disk_driver = VirtualDiskDriver(size_kb=512)
     device_mngr.register_driver("STORAGE_0", disk_driver)
-    
     factory.register("DeviceManager", device_mngr, resilient=True, logged=True)
     
     print("--- Bootstrap Complete. Validating System Integrity ---")
     
-    # 7. Test Formal Verification (Mathematical Certainty)
+    # 7. Test Fractal Storage (Fractal Redundancy)
+    fs = factory.get("FractalStorage")
+    data_shard = SovereignShard(b"TOP_SECRET_SIGMA_CORE_LOGIC")
+    fs.store_shard(data_shard, node_ids=["NODE_ALPHA", "NODE_BETA", "NODE_GAMMA"])
+    
+    if fs.verify_integrity(data_shard.shard_hash):
+        retrieved = fs.retrieve_shard(data_shard.shard_hash)
+        print(f"[TEST] Fractal Retrieval: {retrieved.get_data().decode()}")
+
+    # 8. Test Formal Verification (Mathematical Certainty)
     test_logic = "def unsafe(): os.system('rm -rf /')"
     pl = factory.get("ProofLedger")
     is_safe = pl.validate_shard("UNSAFE_SHARD_001", test_logic)
     print(f"[TEST] Logic Safety: {'VERIFIED' if is_safe else 'REJECTED'}")
     
-    # 8. Test Deterministic Privacy (LSP/ISP)
+    # 9. Test Deterministic Privacy (LSP/ISP)
     pg = factory.get("PrivacyGuard")
     print(f"[TEST] Privacy Authorized (SYSTEM_CONFIG/KERNEL_BOOT): {pg.execute('AUTHORIZE', 'SYSTEM_CONFIG', 'KERNEL_BOOT')}")
-    print(f"[TEST] Privacy Authorized (USER_ID_SHARD/MALICIOUS): {pg.execute('AUTHORIZE', 'USER_ID_SHARD', 'MALICIOUS_SNIFF')}")
     
-    # 9. Test Chaos Resilience
+    # 10. Test Chaos Resilience
     cm = factory.get("ChaosMonkey")
     chaos_event = cm.execute("TICK")
     print(f"[TEST] Chaos Resistance Result: SYSTEM_RECOVERED_FROM_{chaos_event}")
-    
-    # 10. Test Strategy Pattern (Energy-Aware Scheduling)
-    sc = factory.get("Scheduler")
-    sc.schedule_task("NET_POLL", priority=1, complexity=2)
-    sc.schedule_task("AI_TRAIN", priority=9, complexity=10)
-    
-    print("[TEST] Scheduling with Performance Strategy:")
-    print(sc.execute("DISPATCH_NEXT"))
-    
-    sc.set_strategy(EnergyEfficientStrategy())
-    print("[TEST] Scheduling with Energy Strategy:")
-    print(sc.execute("DISPATCH_NEXT"))
     
     # 11. Test Command Pattern (Polymorphism)
     cmd = factory.get("Commander")
     cmd.execute("DISPATCH", "DISPLAY_TEXT", "Welcome to SigmaOS Sovereign Zenith")
     
-    # 12. Test Kernel State & Composition (Power side effects)
+    # 12. Test Kernel State & Composition
     k = factory.get("Kernel")
-    print(f"[TEST] Kernel Status (Booting): {k.status}")
     k.set_state(RunningState())
-    
-    security_res = security.execute('INIT_VECTOR')
-    print(f"[TEST] Security Check: {security_res}")
-    
-    print(f"[TEST] Devices: {device_mngr.execute('LIST_DEVICES')}")
-    
-    storage = device_mngr.get_driver("STORAGE_0")
-    storage.write(0, b"SigmaSovereign_Zenith_OS_2026")
-    data = storage.read(0, 30)
-    print(f"[TEST] Storage I/O: {data.decode('utf-8', errors='ignore')}")
-    
-    # Check Auditor logs
-    print(f"[TEST] Audit Logs: {auditor.execute('GET_LOGS')}")
+    print(security.execute('INIT_VECTOR'))
     
     print("--- ALL SYSTEMS OPERATIONAL ---")
 

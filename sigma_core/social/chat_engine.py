@@ -1,5 +1,5 @@
-from ..interfaces.base_sovereign import SovereignModule
-from ..interfaces.event_interfaces import IEventObserver
+from sigma_core.interfaces.base_sovereign import SovereignModule
+from sigma_core.interfaces.event_interfaces import IEventObserver
 import time
 
 class ChatEngine(SovereignModule, IEventObserver):

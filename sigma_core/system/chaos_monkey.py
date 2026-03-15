@@ -1,5 +1,5 @@
-from ..interfaces.base_sovereign import SovereignModule
-from ..interfaces.resilience_interfaces import IChaosResilience
+from sigma_core.interfaces.base_sovereign import SovereignModule
+from sigma_core.interfaces.resilience_interfaces import IChaosResilience
 import random
 
 class ChaosMonkey(SovereignModule, IChaosResilience):
