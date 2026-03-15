@@ -10,8 +10,8 @@ REPLACEMENTS = {
     # Full paths
     "C:\\Users\\Sovereign-User": os.environ.get("USERPROFILE", "C:\\Users\\User"),
     "c:\\Users\\Sovereign-User": os.environ.get("USERPROFILE", "C:\\Users\\User"),
-    "SIGMA_VIRTUAL_ROOT": os.environ.get("USERPROFILE", "SIGMA_VIRTUAL_ROOT").replace("\\", "/"),
-    "SIGMA_VIRTUAL_ROOT": os.environ.get("USERPROFILE", "SIGMA_VIRTUAL_ROOT").replace("\\", "/"),
+    "C:/Users/Aaryan": os.environ.get("USERPROFILE", "C:/Users/Aaryan").replace("\\", "/"),
+    "C:/Users/Aaryan": os.environ.get("USERPROFILE", "C:/Users/Aaryan").replace("\\", "/"),
     
     # Identifiers
     "O-Sovereign": "O-Sovereign",

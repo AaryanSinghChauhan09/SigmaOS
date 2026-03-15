@@ -1060,9 +1060,9 @@ class SigmaGUI(tk.Tk, UIMixin):
         # 1. Windows Style: Start Button & Logo
         start_fr = tk.Frame(bar, bg=PAL["bg2"])
         start_fr.pack(side="left", padx=(12,0))
-        ttk.Button(start_fr, text="σ", width=3, command=self._show_start_menu).pack(side="left")
+        ttk.Button(start_fr, text="σ", width=3, command=self._show_start_menu, name="start_btn").pack(side="left")
         ttk.Button(start_fr, text="🌐 Web OS", width=12, 
-                   command=self._launch_web_os).pack(side="left", padx=(5,0))
+                   command=self._launch_web_os, name="webos_btn").pack(side="left", padx=(5,0))
         self._logo_lbl = tk.Label(start_fr, textvariable=self._dashboard_title, font=FONT_LOGO, fg=PAL["cyan"], bg=PAL["bg2"])
         self._logo_lbl.pack(side="left", padx=8)
 
@@ -1070,13 +1070,13 @@ class SigmaGUI(tk.Tk, UIMixin):
         intent_fr = tk.Frame(bar, bg=PAL["bg2"])
         intent_fr.pack(side="left", padx=12, fill="x", expand=True)
         self._intent_var = tk.StringVar(value="🔮 Type Intent (e.g., 'Setup Lawyer Workspace' or 'Audit Security')")
-        self._intent_entry = ttk.Entry(intent_fr, textvariable=self._intent_var)
+        self._intent_entry = ttk.Entry(intent_fr, textvariable=self._intent_var, name="intent_input")
         self._intent_entry.pack(side="left", fill="x", expand=True, padx=(0,6))
         self._intent_entry.bind("<FocusIn>", lambda e: self._intent_var.set("") if "Type Intent" in self._intent_var.get() else None)
         self._intent_entry.bind("<Return>", self._intent_exec)
         self._intent_entry.bind("<KeyRelease>", self._show_omni_suggest)
         
-        ttk.Button(intent_fr, text="🚀 Execute", command=self._intent_exec).pack(side="left")
+        ttk.Button(intent_fr, text="🚀 Execute", command=self._intent_exec, name="intent_exec_btn").pack(side="left")
 
         # 2.5 Omni-Suggest Dropdown (Local Autocomplete)
         self._suggest_pop = None
@@ -5238,7 +5238,7 @@ class SigmaGUI(tk.Tk, UIMixin):
                 self._log(self._m_log, res["message"], "OK")
                 self._log(self._m_log, f"Sync Speed: {res['speed_mbps']} Mbps", "INFO")
             elif action == "vault":
-                res = mesh.encrypt_and_vault("SIGMA_VIRTUAL_ROOT/Documents/Work.docx")
+                res = mesh.encrypt_and_vault("C:/Users/Aaryan/Documents/Work.docx")
                 self._log(self._m_log, res["message"], "OK")
 
         ttk.Button(cat_c, text="Trigger P2P Sync (Mesh-wide)", command=lambda: _m_act("sync")).pack(fill="x", pady=5)

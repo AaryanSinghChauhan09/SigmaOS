@@ -83,6 +83,9 @@ class SigmaKernel:
         from .hal.universal_subsystem import UniversalSubsystem
         from .system.aether_grid import AetherGrid
         from .system.troubleshooter import ProActiveTroubleshooter
+        from .security.hypervisor import SovereignHypervisor
+        from .system.latency_engine import LatencyCompensator
+        from .system.agent_bridge import AgenticBridge
 
         self.vector_memory = VectorMemory()
         self.governance = NeuralGovernance(self)
@@ -94,6 +97,9 @@ class SigmaKernel:
         self.universal = UniversalSubsystem(self)
         self.aether_grid = AetherGrid(self)
         self.troubleshooter = ProActiveTroubleshooter(self)
+        self.hypervisor = SovereignHypervisor(self)
+        self.latency_engine = LatencyCompensator(self)
+        self.agent_bridge = AgenticBridge(self)
         
         self.registry.register("vector_memory", self.vector_memory)
         self.registry.register("governance", self.governance)
@@ -105,6 +111,9 @@ class SigmaKernel:
         self.registry.register("universal", self.universal)
         self.registry.register("aether_grid", self.aether_grid)
         self.registry.register("troubleshooter", self.troubleshooter)
+        self.registry.register("hypervisor", self.hypervisor)
+        self.registry.register("latency_engine", self.latency_engine)
+        self.registry.register("agent_bridge", self.agent_bridge)
 
         # Bootstrap: Run native priority layers
         self._low_level_init()

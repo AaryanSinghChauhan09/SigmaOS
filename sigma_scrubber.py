@@ -5,14 +5,14 @@ from pathlib import Path
 class SigmaScrubber:
     """
     Forensic Identity Scrubbing Engine for SigmaOS.
-    Ensures no personal paths (SIGMA_VIRTUAL_ROOT) or dev-keys leak to GitHub.
+    Ensures no personal paths (C:/Users/Aaryan) or dev-keys leak to GitHub.
     """
     def __init__(self):
         self.root = Path(os.getcwd())
         # Patterns to scrub
         self.sensitive_patterns = [
-            (r"C:[\\/]Users[\\/][a-zA-Z0-9\-_]+", "SIGMA_VIRTUAL_ROOT"),
-            (r"c:[\\/]Users[\\/][a-zA-Z0-9\-_]+", "SIGMA_VIRTUAL_ROOT"),
+            (r"C:[\\/]Users[\\/][a-zA-Z0-9\-_]+", "C:/Users/Aaryan"),
+            (r"c:[\\/]Users[\\/][a-zA-Z0-9\-_]+", "C:/Users/Aaryan"),
             (r"Sovereign-User", "Sovereign-User"), # Keep this for generic identity
             (r"api_key\s*=\s*['\"][a-zA-Z0-9_\-]+['\"]", "api_key = 'REDACTED_BY_SOVEREIGN'"),
         ]

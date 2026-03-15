@@ -15,7 +15,7 @@ from typing import Dict, Any
 class GmailAIBridge:
     def __init__(self, kernel):
         self.kernel = kernel
-        self.config_dir = Path(r'SIGMA_VIRTUAL_ROOT\.gemini\antigravity\scratch\SigmaOS\config\gmail_ai')
+        self.config_dir = Path(r'C:/Users/Aaryan\.gemini\antigravity\scratch\SigmaOS\config\gmail_ai')
         self.config_dir.mkdir(parents=True, exist_ok=True)
         self.auth_file = self.config_dir / 'auth_state.json'
         self.profiles = self._load_profiles()
