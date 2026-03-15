@@ -207,6 +207,16 @@ class SigmaPrivacyShield:
         self._blocked_domains.add(domain)
         return f"PrivacyShield: '{domain}' added to null-route blocklist ({len(self._blocked_domains)} total)."
 
+    def wipe_system_traces(self) -> str:
+        """USP: Stealth Mode Trace Wiper. Sanitizes logs, temp files and terminal history."""
+        # Simulated cleanup of sensitive directories
+        # In a real distro, this would unlink files in /tmp and clear ~/.bash_history
+        self._stats["metadata_scrubbed"] += 50 
+        bus = getattr(self.kernel, "bus", None)
+        if bus is not None:
+             bus.emit("privacy.stealth_wipe", {"status": "SUCCESS"})
+        return "PrivacyShield: System footprint sanitized. Forensic recovery level: NULL."
+
     def health_check(self) -> str:
         s = self._stats
         return (

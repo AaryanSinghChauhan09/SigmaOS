@@ -22,6 +22,8 @@ from sigma_core.system_monitor import SystemMonitor
 from sigma_core.data_visualizer import DataVisualizer
 from sigma_core.plugin_hub import PluginHub
 from sigma_core.privacy_sentinel import PrivacySentinel
+from userland.system_api.sigma_analytics import SovereignAnalytics
+from userland.apps.diksha_portal import DikshaPortal
 
 PAL = {
     "bg": "#050608",
@@ -65,6 +67,7 @@ class NCERTOmniSimulator(tk.Tk):
         self.status_tray: tk.Frame = tk.Frame()
         self.content_frame: tk.Frame = tk.Frame()
         self.health_lbl: tk.Label = tk.Label()
+        self.analytics = SovereignAnalytics()
         
         self._build_ui()
         self._update_loop()
@@ -104,8 +107,9 @@ class NCERTOmniSimulator(tk.Tk):
             ("CHEMISTRY SUITE", PAL["chem"], self._show_chem),
             ("BIOLOGY MAPS", PAL["bio"], self._show_bio),
             ("MATHEMATICA", PAL["math"], self._show_math),
+            ("DIKSHA PORTAL", "#FFD700", self._show_diksha),
             ("PRIMARY HUB", PAL["accent"], self._show_primary),
-            ("ANALYTICS HUB", PAL["success"], self._show_analytics),
+            ("ANALYTICS HUB", "#10B981", self._show_analytics),
             ("COMMUNITY PLUGINS", PAL["dim"], self._show_plugins),
             ("OS SETTINGS", PAL["dim"], self._show_settings)
         ]
@@ -170,6 +174,10 @@ class NCERTOmniSimulator(tk.Tk):
     def _show_chem(self): self._launch_sublab("ncert_chemistry_lab")
     def _show_bio(self): self._launch_sublab("ncert_biology_lab")
     def _show_math(self): self._launch_sublab("ncert_maths_lab")
+    def _show_diksha(self):
+        self.analytics.record_adaptation("diksha_portal", "open")
+        DikshaPortal(self)
+
     def _show_primary(self):
         self._clear_area()
         pane = tk.Frame(self.main_area, bg=PAL["card"], padx=20, pady=20)
@@ -271,8 +279,9 @@ class NCERTOmniSimulator(tk.Tk):
     def _refresh_health(self):
         # Transparency: System health in footer
         report = SystemMonitor.get_health_report()
-        self.health_lbl.config(text=f"CPU: {report['CPU']} | RAM: {report['RAM']}")
-        if "PERFORMANCE" in report["PowerState"]:
+        sa_report = self.analytics.capture_metrics()
+        self.health_lbl.config(text=f"CPU: {sa_report['cpu_usage']}% | RAM: {sa_report['ram_usage']}% | Status: {sa_report['system_state']}")
+        if sa_report['cpu_usage'] > 80:
             self.health_lbl.config(fg="#F87171") # Alert red
         else:
             self.health_lbl.config(fg=PAL["chem"])
