@@ -4,18 +4,17 @@ import textwrap
 import re
 import sys
 
-# --- SIGMA OMNI-SOVEREIGN ENGINE v4.8.2 ---
-# Stable Logic Sharding.
+# --- SIGMA OMNI-SOVEREIGN ENGINE v4.9 ---
+# Stable Atomic Sharding | Resilient Class Method Extraction | Zero-Dependency.
 
 ROOT = os.getcwd()
 SKIP_DIRS = {'.git', '__pycache__', 'node_modules', 'artifacts', '.gemini', 'tests', 'docs'}
 PROTECTED_FILES = {
     'sigma_apex_optimizer.py', 'sigma_pack.py', 'sigma_sovereign_audit.py',
-    'import_test.py', 'omni_prompt_demo.py', '__init__.py', 
-    'setup.py', 'requirements.txt'
+    'import_test.py', 'omni_prompt_demo.py', 'sigma_integrity_audit.py',
+    '__init__.py', 'setup.py', 'requirements.txt'
 }
 
-# Sanitizer
 REX_PII = re.compile(r'\baaryan\b|\bchauhan\b', re.I)
 
 def sanitize(text):
@@ -25,7 +24,7 @@ def get_abs_pkg(path):
     rel = os.path.relpath(path, ROOT)
     if rel == '.': return "sigma_core"
     parts = rel.split(os.sep)
-    return ".".join(parts[:-1])
+    return ".".join(list(parts)[:-1])  # type: ignore
 
 def resolve_imports(tree, pkg):
     imports = []
@@ -48,7 +47,7 @@ def shard_file(filepath):
     try:
         with open(filepath, 'r', encoding='utf-8', errors='replace') as f:
             src = f.read()
-            if "SigmaOS Apex Optimized Shim (v4.8.2)" in src: return
+            if "SigmaOS Apex Optimized Shim (v4.9)" in src: return
             tree = ast.parse(src)
     except: return
 
@@ -60,9 +59,11 @@ def shard_file(filepath):
         if isinstance(node, (ast.ClassDef, ast.FunctionDef, ast.AsyncFunctionDef)):
             sisters[node.name] = node
         elif isinstance(node, ast.Assign):
-            if all(isinstance(t, ast.Name) and t.id.isupper() for t in node.targets):
+            if all(isinstance(t, ast.Name) and getattr(t, 'id', '').isupper() for t in node.targets):
                 constants.append(node)
-                for t in node.targets: sisters[t.id] = node
+                for t in node.targets:
+                    if isinstance(t, ast.Name):
+                        sisters[t.id] = node
 
     print(f"[SHARDING] {rel}")
     shard_root = os.path.splitext(filepath)[0] + "_shards"
@@ -79,7 +80,7 @@ def shard_file(filepath):
             if isinstance(sub, ast.Name) and isinstance(sub.ctx, ast.Load):
                 if sub.id in sisters and sub.id != cname: needed.add(sub.id)
         dots = "." * level
-        lines = []
+        lines = []  # type: ignore
         for n in sorted(list(needed)):
             t = sisters[n]
             if isinstance(t, ast.Assign): lines.append(f"from {dots}constants import {n}")
@@ -91,7 +92,9 @@ def shard_file(filepath):
         c_src = f"{import_header}\n\n" + "\n".join(ast.unparse(c) for c in constants)
         with open(os.path.join(shard_root, "constants.py"), 'w', encoding='utf-8') as f: f.write(sanitize(c_src))
         for c in constants:
-            for t in c.targets: shims.append(f"from .{shard_dir_name}.constants import {t.id}")
+            for t in c.targets:
+                if isinstance(t, ast.Name):
+                    shims.append(f"from .{shard_dir_name}.constants import {t.id}")
 
     for node in tree.body:
         if isinstance(node, (ast.FunctionDef, ast.AsyncFunctionDef)):
@@ -114,7 +117,7 @@ def shard_file(filepath):
                     bb.append(ast.parse(shim).body[0])
                 else: bb.append(sub)
             
-            core = ast.ClassDef(name=n, bases=node.bases, keywords=node.keywords, body=bb or [ast.Pass()], decorator_list=node.decorator_list)
+            core = ast.ClassDef(name=n, bases=node.bases, keywords=node.keywords, body=bb if bb else [ast.Pass()], decorator_list=node.decorator_list)  # type: ignore
             with open(os.path.join(cd, "_base.py"), 'w', encoding='utf-8') as f:
                 f.write(sanitize(f"{import_header}\n{get_sibs(node, n, 2)}\n\n{ast.unparse(core)}"))
             
@@ -126,10 +129,10 @@ def shard_file(filepath):
 
     if shims:
         with open(filepath, 'w', encoding='utf-8') as f:
-            f.write(f"\"\"\"\nSigmaOS Apex Optimized Shim (v4.8.2)\n\"\"\"\n" + "\n".join(shims) + "\n")
+            f.write(f"\"\"\"\nSigmaOS Apex Optimized Shim (v4.9)\n\"\"\"\n" + "\n".join(shims) + "\n")
 
 def main():
-    print("--- SigmaOS Omni-Sovereign Engine v4.8.2 ---")
+    print("--- SigmaOS Omni-Sovereign Engine v4.9 ---")
     for r, ds, fs in os.walk(ROOT):
         if any(d.endswith("_shards") for d in r.split(os.sep)): continue
         for f in fs:

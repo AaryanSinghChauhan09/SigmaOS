@@ -1,5 +1,5 @@
 """
-SigmaOS Apex Optimized Shim (v4.8.2)
+SigmaOS Apex Optimized Shim (v4.9)
 """
 def get_system_api(*args, **kwargs):
     import importlib

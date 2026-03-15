@@ -1,5 +1,5 @@
 """
-SigmaOS Apex Optimized Shim (v4.8.2)
+SigmaOS Apex Optimized Shim (v4.9)
 """
 def bootstrap_zenith(*args, **kwargs):
     import importlib
