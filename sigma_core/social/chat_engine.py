@@ -17,6 +17,8 @@ from sigma_core.system.interfaces import SigmaModuleBase, ISigmaService
 from userland.system_api.sigma_std import SigmaCrypto
 from .identity import ChatIdentity
 from .protocol import SecurePacket
+from .peers import PeerDirectory
+from .network import MeshSocket
 
 class SovereignChatEngine(SigmaModuleBase, ISigmaService):
     """
@@ -26,10 +28,14 @@ class SovereignChatEngine(SigmaModuleBase, ISigmaService):
         super().__init__(kernel)
         self.port = 20910
         self.identity = ChatIdentity()
-        self.peers: Dict[str, Dict] = {}
+        self.peer_dir = PeerDirectory()
+        self.net = MeshSocket(self.port)
         self.inbox: List[Dict] = []
         self._running = False
-        self.network_hash = hashlib.sha256(b"SIGMA_PROTO_V3").hexdigest()[:8]
+        
+        # Fixing slicing lint by explicit casting
+        raw_hash = str(hashlib.sha256(b"SIGMA_PROTO_V3").hexdigest())
+        self.network_hash = raw_hash[:8]
         
         self.stats = {
             "packets_encrypted": 0,
@@ -101,22 +107,18 @@ class SovereignChatEngine(SigmaModuleBase, ISigmaService):
         # Calculate Shared Secret (Shim)
         shared_secret = SigmaCrypto.generate_shared_secret(self.identity.keys, peer_pub.encode() if isinstance(peer_pub, str) else peer_pub)
         
-        self.peers[peer_sid] = {
-            "ip": ip,
-            "shared_secret": shared_secret,
-            "last_seen": time.time()
-        }
-        self.stats["active_tunnels"] = len(self.peers)
+        self.peer_dir.add_peer(peer_sid, ip, shared_secret)
+        self.stats["active_tunnels"] = self.peer_dir.count_peers()
         self.log_event("PEER_SYNC", {"sid": peer_sid, "status": "TUNNEL_ESTABLISHED"})
 
     def _process_encrypted_message(self, packet: Dict):
         """USP: Decrypting with Authenticated Integrity Check (GCM)."""
         sender_sid = packet.get("from")
-        if sender_sid not in self.peers:
+        peer_info = self.peer_dir.get_peer(sender_sid)
+        if not peer_info:
             return # Drop packets from unknown/unverified SIDs
             
-        peer_info = self.peers[sender_sid]
-        enc_payload = bytes.fromhex(packet.get("payload"))
+        enc_payload = bytes.fromhex(str(packet.get("payload", "")))
         
         decrypted_text = SigmaCrypto.decrypt_payload(enc_payload, peer_info["shared_secret"])
         
@@ -132,35 +134,8 @@ class SovereignChatEngine(SigmaModuleBase, ISigmaService):
             if self.kernel:
                 self.kernel.bus.publish("social.chat.msg", msg_obj)
 
-    def send_broadcast(self, text: str):
-        """Broadcasts across the mesh with individual tunnel encryption."""
-        count = 0
-        for peer_sid, info in self.peers.items():
-            self._dispatch_encrypted(peer_sid, text)
-            count += 1
-        return f"Broadcasted to {count} verified peers."
-
-    def _dispatch_encrypted(self, target_sid: str, text: str):
-        """Core Encryption Wrapper."""
-        peer_info = self.peers.get(target_sid)
-        if not peer_info: return
-        
-        encrypted = SigmaCrypto.encrypt_payload(text, peer_info["shared_secret"])
-        
-        packet = SecurePacket.construct(
-            "SECURE_MSG", 
-            self.identity.sid, 
-            text.encode(), 
-            peer_info["shared_secret"]
-        )
-        
-        # USP: Ratchet Rotation (Forward Secrecy Step)
-        peer_info["shared_secret"] = SigmaCrypto.ratchet_step(peer_info["shared_secret"])
-        
-        self._socket_send(peer_info["ip"], packet)
-        self.stats["packets_encrypted"] += 1
-
-    def _socket_send(self, ip: str, data: Dict):
+    def _socket_send(self, ip: str, packet: Dict):
+        """Dispatches a Sovereign Packet via the Mesh Socket."""
         try:
             with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
                 s.settimeout(3)
