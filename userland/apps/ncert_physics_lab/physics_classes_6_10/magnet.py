@@ -1,14 +1,4 @@
 """
-Auto-split from userland\apps\ncert_physics_lab.py — Physics_Classes_6_10.magnet
+SigmaOS Modular Shim for magnet.py
 """
-
-import math, random
-
-
-
-class Physics_Classes_6_10:
-    @staticmethod
-    def magnet(p1, p2):
-        if p1.upper() == p2.upper():
-            return {'Result': 'REPEL'}
-        return {'Result': 'ATTRACT'}
+from .magnet._Physics_Classes_6_10_core import Physics_Classes_6_10 # noqa

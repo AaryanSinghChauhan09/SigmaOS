@@ -1,14 +1,4 @@
 """
-Auto-split from sigma_core\system\automation_engine.py — AutomationEngine._verify_kernel_integrity
+SigmaOS Modular Shim for _verify_kernel_integrity.py
 """
-
-import time
-import threading
-from typing import Dict, Any, List, Callable, Optional
-
-
-
-class AutomationEngine:
-    def _verify_kernel_integrity(self):
-        if hasattr(self.kernel, 'integrity'):
-            self.kernel.integrity.verify_system_integrity()
+from ._verify_kernel_integrity._AutomationEngine_core import AutomationEngine # noqa

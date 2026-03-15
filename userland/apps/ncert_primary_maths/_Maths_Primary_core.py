@@ -1,0 +1,6 @@
+# Generated class core: Maths_Primary
+
+
+class Maths_Primary:
+    TITLE = 'Primary Math Foundations: Exhaustive Logic'
+    EXP_DATA = {'Number Express': ('words', [('Number', '7')]), 'Addition carry': ('add', [('A', '45'), ('B', '56')]), 'Multiplication (Repeated)': ('mul', [('A', '5'), ('B', '6')]), 'Fraction Sharing': ('sharing', [('Shaded', '1'), ('Total', '4')]), 'Pattern Sequence': ('pattern', [('Seq', '2,4,6')]), 'Weight Logic': ('weight', [('kg', '2'), ('g', '500')]), 'Handy Clock': ('clock', [('H', '3'), ('M', '30')]), 'Pointy Shapes': ('shapes', [('Shape', 'Square')]), 'Greater/Lesser': ('compare', [('X', '25'), ('Y', '18')]), 'Money Calc': ('money', [('Rs', '10'), ('Paise', '50'), ('Count', '3')]), 'Sorting Order': ('sort', [('Data', '5,2,9,1,7')]), 'Equal Sharing': ('divide', [('Total', '20'), ('Friends', '4')]), 'Skip Count': ('skip', [('Start', '2'), ('Step', '3'), ('Count', '5')]), 'Roman Digit': ('roman', [('N', '9')]), 'Perimeter': ('perimeter', [('Shape', 'Square'), ('Side', '5')]), 'Abacus Logic': ('abacus', [('Number', '24')]), 'Calendar Math': ('calendar', [('Month', 'February'), ('Year', '2024')]), 'Measure Conv': ('convert', [('cm', '150')])}

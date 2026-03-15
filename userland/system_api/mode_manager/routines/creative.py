@@ -1,16 +1,6 @@
-"""mode_manager.routines.creative — Creative mode routines."""
-
-
-def launch_creative_suite(phase: str = "") -> str:
-    """Simulates launching creative software suite."""
-    return "Creative suite launched."
-
-
-def optimize_disk_cache(phase: str = "") -> str:
-    """Simulates optimizing disk cache for media editing."""
-    return "Disk cache optimized."
-
-
-def flush_disk_cache(phase: str = "") -> str:
-    """Simulates flushing disk cache."""
-    return "Disk cache flushed."
+"""
+SigmaOS Modular Shim for creative.py
+"""
+from .creative.launch_creative_suite import launch_creative_suite # noqa
+from .creative.optimize_disk_cache import optimize_disk_cache # noqa
+from .creative.flush_disk_cache import flush_disk_cache # noqa

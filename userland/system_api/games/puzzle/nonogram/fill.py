@@ -1,15 +1,4 @@
 """
-Auto-split from userland\system_api\games\puzzle.py — Nonogram.fill
+SigmaOS Modular Shim for fill.py
 """
-
-import random
-import time
-from typing import List, Tuple, Dict, Any, Optional, Set
-from .base import SigmaGame
-
-
-
-class Nonogram:
-    def fill(self, r, c, val):
-        self.grid[r][c] = val
-        self.moves = int(self.moves) + 1
+from .fill._Nonogram_core import Nonogram # noqa

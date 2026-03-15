@@ -1,13 +1,4 @@
 """
-Auto-split from userland\system_api\sigma_browser.py — SigmaOmniBrowser.activate_command_bar
+SigmaOS Modular Shim for activate_command_bar.py
 """
-
-import random
-from sigma_core.system.sovereign_app import SovereignApp
-
-
-
-class SigmaOmniBrowser:
-    def activate_command_bar(self):
-        """Arc/Edge Command Bar: A central hub for commands, search, and quick OS actions."""
-        return "Command Bar: [OPEN] Waiting for intent (e.g., 'Move tab to Work', 'Summarize Page')."
+from .activate_command_bar._SigmaOmniBrowser_core import SigmaOmniBrowser # noqa

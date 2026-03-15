@@ -1,10 +1,4 @@
 """
-Auto-split from userland\system_api\sigma_creative_studio.py — SigmaBlockCoder.get_block_palette
+SigmaOS Modular Shim for get_block_palette.py
 """
-
-
-
-class SigmaBlockCoder:
-    def get_block_palette(self):
-        """Returns the full library of visual blocks available."""
-        return self.BLOCK_PALETTE
+from .get_block_palette._SigmaBlockCoder_core import SigmaBlockCoder # noqa

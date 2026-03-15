@@ -1,17 +1,4 @@
 """
-Auto-split from userland\system_api\privacy_shield.py — SigmaPrivacyShield.apply_browser_stealth
+SigmaOS Modular Shim for apply_browser_stealth.py
 """
-
-from __future__ import annotations
-import os
-import re
-import time
-import hashlib
-from typing import Any, Dict, List, Optional
-
-
-
-class SigmaPrivacyShield:
-    def apply_browser_stealth(self) -> str:
-        """Anti-Fingerprinting: blurs canvas API, audio API & user-agent string."""
-        return 'PrivacyShield: Browser-Stealth ENABLED. Canvas entropy randomized. Audio API blocked. UA string spoofed.'
+from .apply_browser_stealth._SigmaPrivacyShield_core import SigmaPrivacyShield # noqa

@@ -1,13 +1,4 @@
 """
-Auto-split from ecosystem\bharat_law_bridge.py — SigmaBharatLawBridge.audit_compliance
+SigmaOS Modular Shim for audit_compliance.py
 """
-
-from typing import Dict, List, Any, Optional
-import datetime
-
-
-
-class SigmaBharatLawBridge:
-    def audit_compliance(self, entity_type: str) -> List[str]:
-        """Returns compliance checklist for GST/MCA/SEBI."""
-        return self._compliance_checks.get(entity_type, ['Standard Corporate Compliance'])
+from .audit_compliance._SigmaBharatLawBridge_core import SigmaBharatLawBridge # noqa

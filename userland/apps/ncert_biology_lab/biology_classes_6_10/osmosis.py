@@ -1,16 +1,4 @@
 """
-Auto-split from userland\apps\ncert_biology_lab.py — Biology_Classes_6_10.osmosis
+SigmaOS Modular Shim for osmosis.py
 """
-
-import math, random
-
-
-
-class Biology_Classes_6_10:
-    @staticmethod
-    def osmosis(cc, sc):
-        if sc > cc:
-            return {'Process': 'Exosmosis'}
-        if sc < cc:
-            return {'Process': 'Endosmosis'}
-        return {'Process': 'Equil'}
+from .osmosis._Biology_Classes_6_10_core import Biology_Classes_6_10 # noqa

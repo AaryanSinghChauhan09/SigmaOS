@@ -1,19 +1,4 @@
 """
-Auto-split from userland\system_api\process_manager.py — SigmaProcessManager.list_processes
+SigmaOS Modular Shim for list_processes.py
 """
-
-import time
-import uuid
-import threading
-from dataclasses import dataclass, field
-from enum import Enum, auto
-
-
-
-class SigmaProcessManager:
-    def list_processes(self, state: ProcessState | None=None) -> list[dict]:
-        result = []
-        for pid, proc in self._procs.items():
-            if state is None or proc.state == state:
-                result.append({'pid': pid, 'name': proc.name, 'qos': proc.qos.name, 'state': proc.state.value, 'cpu': proc.cpu_pct, 'mem': proc.mem_mb, 'nice': proc.nice, 'cgroup': proc.cgroup})
-        return result
+from .list_processes._SigmaProcessManager_core import SigmaProcessManager # noqa

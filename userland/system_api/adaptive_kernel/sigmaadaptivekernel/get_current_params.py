@@ -1,14 +1,4 @@
 """
-Auto-split from userland\system_api\adaptive_kernel.py — SigmaAdaptiveKernel.get_current_params
+SigmaOS Modular Shim for get_current_params.py
 """
-
-import time
-import threading
-from enum import Enum, auto
-
-
-
-class SigmaAdaptiveKernel:
-    def get_current_params(self) -> dict:
-        """Returns the currently active kernel parameter set."""
-        return _PROFILE_PARAMS[self.current_profile]
+from .get_current_params._SigmaAdaptiveKernel_core import SigmaAdaptiveKernel # noqa

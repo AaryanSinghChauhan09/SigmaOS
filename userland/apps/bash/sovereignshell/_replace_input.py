@@ -1,17 +1,4 @@
 """
-Auto-split from userland\apps\bash.py — SovereignShell._replace_input
+SigmaOS Modular Shim for _replace_input.py
 """
-
-import tkinter as tk
-from tkinter import scrolledtext, messagebox, ttk
-import subprocess
-import os
-import sys
-import random
-
-
-
-class SovereignShell:
-    def _replace_input(self, text):
-        self.terminal.delete('input_start', tk.END)
-        self.terminal.insert('input_start', text)
+from ._replace_input._SovereignShell_core import SovereignShell # noqa

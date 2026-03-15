@@ -1,15 +1,4 @@
 """
-Auto-split from userland\system_api\process_manager.py — SigmaProcessManager.health_check
+SigmaOS Modular Shim for health_check.py
 """
-
-import time
-import uuid
-import threading
-from dataclasses import dataclass, field
-from enum import Enum, auto
-
-
-
-class SigmaProcessManager:
-    def health_check(self) -> str:
-        return f'OK — Processes: {len(self._procs)}, cgroups: {len(self._cgroups)}, Quarantined: {len(self._quarantine)}, Ticks: {self._sched_ticks}'
+from .health_check._SigmaProcessManager_core import SigmaProcessManager # noqa

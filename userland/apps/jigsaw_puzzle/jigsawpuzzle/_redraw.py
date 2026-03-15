@@ -1,15 +1,4 @@
 """
-Auto-split from userland\apps\jigsaw_puzzle.py — JigsawPuzzle._redraw
+SigmaOS Modular Shim for _redraw.py
 """
-
-import tkinter as tk
-from tkinter import ttk, filedialog, messagebox
-import random
-import time
-import os
-
-
-
-class JigsawPuzzle:
-    def _redraw(self):
-        self.canvas.after(10, self._render_tiles)
+from ._redraw._JigsawPuzzle_core import JigsawPuzzle # noqa

@@ -1,15 +1,4 @@
 """
-Auto-split from userland\system_api\games\classic.py — VidyaQuest.answer
+SigmaOS Modular Shim for answer.py
 """
-
-import random
-from typing import List, Tuple, Dict, Any, Optional
-from .base import SigmaGame
-
-
-
-class VidyaQuest:
-    def answer(self, ans):
-        if ans == self.QUESTIONS[0]['a']:
-            self.correct = int(self.correct) + 1
-            self.score = int(self.score) + 100
+from .answer._VidyaQuest_core import VidyaQuest # noqa

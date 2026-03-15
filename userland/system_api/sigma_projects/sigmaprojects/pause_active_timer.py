@@ -1,22 +1,4 @@
 """
-Auto-split from userland\system_api\sigma_projects.py — SigmaProjects.pause_active_timer
+SigmaOS Modular Shim for pause_active_timer.py
 """
-
-import time
-import uuid
-import random
-from dataclasses import dataclass, field
-from enum import Enum, auto
-from typing import Dict, List, Any
-
-
-
-class SigmaProjects:
-    def pause_active_timer(self):
-        """Pauses the timer (e.g., during lunch or idle)."""
-        if self._active_timer_task and (not self._active_timer_paused_at):
-            self._active_timer_paused_at = time.time()
-            if self.kernel:
-                self.kernel.bus.emit('projects.timer_paused', {'tid': self._active_timer_task})
-            return True
-        return False
+from .pause_active_timer._SigmaProjects_core import SigmaProjects # noqa

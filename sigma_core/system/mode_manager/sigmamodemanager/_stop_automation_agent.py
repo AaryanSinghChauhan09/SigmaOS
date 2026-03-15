@@ -1,13 +1,4 @@
 """
-Auto-split from sigma_core\system\mode_manager.py — SigmaModeManager._stop_automation_agent
+SigmaOS Modular Shim for _stop_automation_agent.py
 """
-
-from typing import Dict, List, Any, Callable, Optional
-import time
-
-
-
-class SigmaModeManager:
-    def _stop_automation_agent(self, phase: str='') -> str:
-        """Simulates stopping an automation agent."""
-        return 'Automation agent stopped.'
+from ._stop_automation_agent._SigmaModeManager_core import SigmaModeManager # noqa

@@ -1,12 +1,4 @@
 """
-Auto-split from userland\apps\ncert_maths_lab.py — Maths_Classes_11_12.venn3
+SigmaOS Modular Shim for venn3.py
 """
-
-import math, random
-
-
-
-class Maths_Classes_11_12:
-    @staticmethod
-    def venn3(na, nab, nabc):
-        return {'Inputs Received': f'nA:{na}, nAB:{nab}, nABC:{nabc}', 'Note': 'Full formula requires 7 inputs'}
+from .venn3._Maths_Classes_11_12_core import Maths_Classes_11_12 # noqa

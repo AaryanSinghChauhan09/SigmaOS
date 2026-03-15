@@ -1,10 +1,4 @@
 """
-Auto-split from ecosystem\aether_orchestrator.py — AetherOrchestrator.generate_thought_map
+SigmaOS Modular Shim for generate_thought_map.py
 """
-
-
-
-class AetherOrchestrator:
-    def generate_thought_map(self) -> str:
-        """USP: Sovereign Thought-Map (AI Collaboration Visualization)."""
-        return '\ngraph TD\n    User((User)) --> Aether[Aether Orchestrator]\n    Aether --> Crusher[Competitor Crusher]\n    Aether --> Sanitizer[Neural Sanitizer]\n    Crusher --> Llama[Llama-3-Sigma]\n    Sanitizer --> Safe[Child-Safe Guard]\n    Llama --> Result{Consensus}\n    Result --> User\n'
+from .generate_thought_map._AetherOrchestrator_core import AetherOrchestrator # noqa

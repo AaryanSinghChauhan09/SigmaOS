@@ -1,12 +1,4 @@
 """
-Auto-split from ecosystem\pdf_forge.py — SigmaPDFForge.repair_pdf
+SigmaOS Modular Shim for repair_pdf.py
 """
-
-from sigma_core.system.sovereign_app import SovereignApp
-
-
-
-class SigmaPDFForge:
-    def repair_pdf(self):
-        """Reconstructs corrupted PDF structures (PDF2Go USP)."""
-        return 'PDF Forge (Repair): Scanned for broken cross-references. Structure restored.'
+from .repair_pdf._SigmaPDFForge_core import SigmaPDFForge # noqa

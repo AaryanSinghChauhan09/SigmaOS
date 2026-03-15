@@ -1,16 +1,4 @@
 """
-Auto-split from sigma_cli.py — warn
+SigmaOS Modular Shim for warn.py
 """
-
-import sys
-import os
-import argparse
-import json
-import textwrap
-import time
-from sigma_core import SigmaKernel, SigmaConfig
-
-
-
-def warn(msg):
-    print(f"  {_ansi(C.YELLOW, '⚠')}  {msg}")
+from .warn.warn import warn # noqa

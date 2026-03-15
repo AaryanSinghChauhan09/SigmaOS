@@ -1,23 +1,4 @@
 """
-Auto-split from sigma_cli.py — cmd_boot
+SigmaOS Modular Shim for cmd_boot.py
 """
-
-import sys
-import os
-import argparse
-import json
-import textwrap
-import time
-from sigma_core import SigmaKernel, SigmaConfig
-
-
-
-def cmd_boot(kernel: SigmaKernel, args):
-    hdr('BOOT SEQUENCE')
-    steps = kernel.boot()
-    for step, result in steps.items():
-        ok(f'[{step.upper()}] {result}')
-    hdr('KERNEL STATS')
-    stats = kernel.get_leadership_stats()
-    for k, v in stats.items():
-        info(f'{k}: {_ansi(C.GREEN, v)}')
+from .cmd_boot.cmd_boot import cmd_boot # noqa

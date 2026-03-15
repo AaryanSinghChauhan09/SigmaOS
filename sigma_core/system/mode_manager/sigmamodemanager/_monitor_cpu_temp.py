@@ -1,13 +1,4 @@
 """
-Auto-split from sigma_core\system\mode_manager.py — SigmaModeManager._monitor_cpu_temp
+SigmaOS Modular Shim for _monitor_cpu_temp.py
 """
-
-from typing import Dict, List, Any, Callable, Optional
-import time
-
-
-
-class SigmaModeManager:
-    def _monitor_cpu_temp(self, phase: str='') -> str:
-        """Simulates starting CPU temperature monitoring."""
-        return 'CPU temperature monitoring started.'
+from ._monitor_cpu_temp._SigmaModeManager_core import SigmaModeManager # noqa

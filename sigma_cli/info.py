@@ -1,16 +1,4 @@
 """
-Auto-split from sigma_cli.py — info
+SigmaOS Modular Shim for info.py
 """
-
-import sys
-import os
-import argparse
-import json
-import textwrap
-import time
-from sigma_core import SigmaKernel, SigmaConfig
-
-
-
-def info(msg):
-    print(f"  {_ansi(C.CYAN, 'ℹ')}  {msg}")
+from .info.info import info # noqa

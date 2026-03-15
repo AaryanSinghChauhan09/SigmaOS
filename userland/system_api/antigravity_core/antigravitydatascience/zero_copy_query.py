@@ -1,14 +1,4 @@
 """
-Auto-split from userland\system_api\antigravity_core.py — AntigravityDataScience.zero_copy_query
+SigmaOS Modular Shim for zero_copy_query.py
 """
-
-import os
-import hashlib
-import time
-
-
-
-class AntigravityDataScience:
-    def zero_copy_query(self, dataset_path: str, sql_query: str):
-        """Executes zero-copy analytical queries natively at OS-shell level."""
-        return f"[DS ENGINE] Executing '{sql_query}' directly on {dataset_path} with zero RAM overhead."
+from .zero_copy_query._AntigravityDataScience_core import AntigravityDataScience # noqa

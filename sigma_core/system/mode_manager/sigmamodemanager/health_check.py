@@ -1,12 +1,4 @@
 """
-Auto-split from sigma_core\system\mode_manager.py — SigmaModeManager.health_check
+SigmaOS Modular Shim for health_check.py
 """
-
-from typing import Dict, List, Any, Callable, Optional
-import time
-
-
-
-class SigmaModeManager:
-    def health_check(self) -> str:
-        return f'OK — Mode: {self._current_mode}.'
+from .health_check._SigmaModeManager_core import SigmaModeManager # noqa

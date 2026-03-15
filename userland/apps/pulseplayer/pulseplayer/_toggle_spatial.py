@@ -1,15 +1,4 @@
 """
-Auto-split from userland\apps\pulseplayer.py — PulsePlayer._toggle_spatial
+SigmaOS Modular Shim for _toggle_spatial.py
 """
-
-import tkinter as tk
-from tkinter import messagebox, ttk, filedialog
-import time, random, threading, os
-from typing import Any, List, Dict
-
-
-
-class PulsePlayer:
-    def _toggle_spatial(self):
-        msg = 'SPATIAL AUDIO: ENGAGED | Virtual 7.1 Orbit active' if self._spatial_audio.get() else 'SPATIAL AUDIO: DISENGAGED'
-        self._notify_status(msg)
+from ._toggle_spatial._PulsePlayer_core import PulsePlayer # noqa

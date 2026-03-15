@@ -1,15 +1,4 @@
 """
-Auto-split from userland\apps\ncert_physics_lab.py — Physics_Classes_11_12.escape
+SigmaOS Modular Shim for escape.py
 """
-
-import math, random
-
-
-
-class Physics_Classes_11_12:
-    @staticmethod
-    def escape(m, r_km):
-        g = 6.67e-11
-        r = r_km * 1000
-        v = math.sqrt(2 * g * m / r)
-        return {'v_esc (m/s)': _r(v, 1)}
+from .escape._Physics_Classes_11_12_core import Physics_Classes_11_12 # noqa

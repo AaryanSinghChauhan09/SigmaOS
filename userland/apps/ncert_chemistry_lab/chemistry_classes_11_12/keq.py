@@ -1,16 +1,4 @@
 """
-Auto-split from userland\apps\ncert_chemistry_lab.py — Chemistry_Classes_11_12.keq
+SigmaOS Modular Shim for keq.py
 """
-
-import math, re
-
-
-
-class Chemistry_Classes_11_12:
-    @staticmethod
-    def keq(kc, qc):
-        if qc < kc:
-            return {'Shift': 'FORWARD'}
-        if qc > kc:
-            return {'Shift': 'BACKWARD'}
-        return {'Shift': 'EQUILIBRIUM'}
+from .keq._Chemistry_Classes_11_12_core import Chemistry_Classes_11_12 # noqa

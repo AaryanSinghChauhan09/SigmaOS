@@ -1,13 +1,4 @@
 """
-Auto-split from ecosystem\bharat_law_bridge.py — SigmaBharatLawBridge.get_procedural_roadmap
+SigmaOS Modular Shim for get_procedural_roadmap.py
 """
-
-from typing import Dict, List, Any, Optional
-import datetime
-
-
-
-class SigmaBharatLawBridge:
-    def get_procedural_roadmap(self, scenario: str) -> List[str]:
-        """Returns a step-by-step 'Legal GPS' guide for a specific scenario."""
-        return self._workflows.get(scenario, ['Scenario roadmap not found. Please consult the Sovereign Manual.'])
+from .get_procedural_roadmap._SigmaBharatLawBridge_core import SigmaBharatLawBridge # noqa

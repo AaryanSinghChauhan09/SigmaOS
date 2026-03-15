@@ -1,13 +1,4 @@
 """
-Auto-split from ecosystem\bharat_law_bridge.py — SigmaBharatLawBridge.get_public_law_brief
+SigmaOS Modular Shim for get_public_law_brief.py
 """
-
-from typing import Dict, List, Any, Optional
-import datetime
-
-
-
-class SigmaBharatLawBridge:
-    def get_public_law_brief(self, topic: str) -> str:
-        """USP: Plain-language legal explanations for citizens."""
-        return self._public_law_briefs.get(topic, 'Generating sovereign simplified brief for public awareness...')
+from .get_public_law_brief._SigmaBharatLawBridge_core import SigmaBharatLawBridge # noqa

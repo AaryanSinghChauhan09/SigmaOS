@@ -1,16 +1,4 @@
 """
-Auto-split from userland\apps\net_mapper.py — AetherNetMapper._rogue_scan
+SigmaOS Modular Shim for _rogue_scan.py
 """
-
-import tkinter as tk
-from tkinter import ttk, messagebox
-import socket
-import threading
-import random
-
-
-
-class AetherNetMapper:
-    def _rogue_scan(self):
-        self._log('SWEEPING LOCAL SUBNET FOR ROGUE NODES...', PAL['warning'])
-        self.after(1500, lambda: self._log('SUBNET SECURE. ZERO UNAUTHORIZED SHADOW DEVICES DETECTED.'))
+from ._rogue_scan._AetherNetMapper_core import AetherNetMapper # noqa

@@ -1,12 +1,4 @@
 """
-Auto-split from ecosystem\pdf_forge.py — SigmaPDFForge.load_document
+SigmaOS Modular Shim for load_document.py
 """
-
-from sigma_core.system.sovereign_app import SovereignApp
-
-
-
-class SigmaPDFForge:
-    def load_document(self, path):
-        self.active_document = path
-        return f"PDF Forge: Loaded '{path}' into high-speed rendering buffer."
+from .load_document._SigmaPDFForge_core import SigmaPDFForge # noqa

@@ -1,22 +1,4 @@
 """
-Auto-split from userland\system_api\sovereign_utility_suite.py — SovereignUtilitySuite.keyboard_tester_logic
+SigmaOS Modular Shim for keyboard_tester_logic.py
 """
-
-import os
-import random
-import time
-import json
-import hashlib
-import re
-import difflib
-import base64
-import statistics
-from typing import Dict, Any, List, Optional
-from datetime import datetime
-
-
-
-class SovereignUtilitySuite:
-    def keyboard_tester_logic(self, key_event: str) -> str:
-        """USP: KeyboardTester.com Parity. Validating HID health."""
-        return f'HID_EVENT_CAPTURED: {key_event}. Input latency: 0.12ms. Status: OPTIMAL.'
+from .keyboard_tester_logic._SovereignUtilitySuite_core import SovereignUtilitySuite # noqa

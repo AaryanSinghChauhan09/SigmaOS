@@ -1,13 +1,4 @@
 """
-Auto-split from sigma_core\system\mode_manager.py — SigmaModeManager._connect_wifi
+SigmaOS Modular Shim for _connect_wifi.py
 """
-
-from typing import Dict, List, Any, Callable, Optional
-import time
-
-
-
-class SigmaModeManager:
-    def _connect_wifi(self, phase: str='') -> str:
-        """Simulates connecting to Wi-Fi."""
-        return 'Wi-Fi connected.'
+from ._connect_wifi._SigmaModeManager_core import SigmaModeManager # noqa

@@ -1,16 +1,4 @@
 """
-Auto-split from sigma_core\system\automation_engine.py — AutomationEngine._check_thermal_envelope
+SigmaOS Modular Shim for _check_thermal_envelope.py
 """
-
-import time
-import threading
-from typing import Dict, Any, List, Callable, Optional
-
-
-
-class AutomationEngine:
-    def _check_thermal_envelope(self):
-        if hasattr(self.kernel, 'energy'):
-            metrics = self.kernel.energy.get_realtime_metrics()
-            if metrics.get('thermal_status') == 'CRITICAL':
-                self.execute_workflow('power.save')
+from ._check_thermal_envelope._AutomationEngine_core import AutomationEngine # noqa

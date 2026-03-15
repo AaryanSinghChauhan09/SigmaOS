@@ -1,13 +1,4 @@
 """
-Auto-split from userland\apps\ncert_physics_lab.py — Physics_Classes_6_10.joules
+SigmaOS Modular Shim for joules.py
 """
-
-import math, random
-
-
-
-class Physics_Classes_6_10:
-    @staticmethod
-    def joules(i, r, t):
-        h = i ** 2 * r * t
-        return {'Heat (J)': _r(h, 1)}
+from .joules._Physics_Classes_6_10_core import Physics_Classes_6_10 # noqa

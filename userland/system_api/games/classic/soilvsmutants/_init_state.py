@@ -1,16 +1,4 @@
 """
-Auto-split from userland\system_api\games\classic.py — SoilVsMutants._init_state
+SigmaOS Modular Shim for _init_state.py
 """
-
-import random
-from typing import List, Tuple, Dict, Any, Optional
-from .base import SigmaGame
-
-
-
-class SoilVsMutants:
-    def _init_state(self):
-        self.grid = [[None] * 9 for _ in range(5)]
-        self.energy = 200
-        self.wave = 0
-        self.lives = 5
+from ._init_state._SoilVsMutants_core import SoilVsMutants # noqa

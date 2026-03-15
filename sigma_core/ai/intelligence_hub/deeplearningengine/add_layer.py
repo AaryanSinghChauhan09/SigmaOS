@@ -1,15 +1,4 @@
 """
-Auto-split from sigma_core\ai\intelligence_hub.py — DeepLearningEngine.add_layer
+SigmaOS Modular Shim for add_layer.py
 """
-
-import math
-import random
-import time
-from typing import List, Dict, Any, Optional
-
-
-
-class DeepLearningEngine:
-    def add_layer(self, units: int, activation: str='relu'):
-        self.layers.append({'units': units, 'activation': activation})
-        self.log_activity(f'Added layer: {units} units, {activation}')
+from .add_layer._DeepLearningEngine_core import DeepLearningEngine # noqa

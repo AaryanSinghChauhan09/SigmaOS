@@ -1,15 +1,4 @@
 """
-Auto-split from userland\apps\aurapaint.py — AuraPaint.set_size
+SigmaOS Modular Shim for set_size.py
 """
-
-import tkinter as tk
-from tkinter import colorchooser, messagebox, ttk, simpledialog, filedialog
-import random
-import os
-from typing import Any
-
-
-
-class AuraPaint:
-    def set_size(self, val):
-        self.brush_size = int(float(val))
+from .set_size._AuraPaint_core import AuraPaint # noqa

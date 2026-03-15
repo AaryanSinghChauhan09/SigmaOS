@@ -1,15 +1,4 @@
 """
-Auto-split from userland\apps\omni_tweak_daemon.py — OmniTweakDaemon._sys_reload
+SigmaOS Modular Shim for _sys_reload.py
 """
-
-import tkinter as tk
-from tkinter import ttk, messagebox
-import random
-import time
-
-
-
-class OmniTweakDaemon:
-    def _sys_reload(self):
-        self.status.config(text='RELOADING DAEMON SYMLINKS...', bg=PAL['accent'], fg='white')
-        self.after(500, lambda: self.status.config(text='UNIT FILES PARSED AND LOADED TO MEMORY', bg=PAL['success'], fg='black'))
+from ._sys_reload._OmniTweakDaemon_core import OmniTweakDaemon # noqa

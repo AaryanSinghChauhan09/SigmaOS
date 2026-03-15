@@ -1,14 +1,4 @@
 """
-Auto-split from userland\system_api\monitor.py — SigmaWorkstationMonitor.hardware_thermal_guard
+SigmaOS Modular Shim for hardware_thermal_guard.py
 """
-
-import os
-import random
-import time
-
-
-
-class SigmaWorkstationMonitor:
-    def hardware_thermal_guard(self):
-        """Ensures hardware longevity during heavy compute (AI Training/Gaming)."""
-        return {'Core_Temp': '42°C', 'Fan_Speed': 'Silent (1200 RPM)', 'Throttling_Status': 'Inactive [MAX_PERFORMANCE]'}
+from .hardware_thermal_guard._SigmaWorkstationMonitor_core import SigmaWorkstationMonitor # noqa

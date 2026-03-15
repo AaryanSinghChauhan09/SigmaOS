@@ -1,12 +1,4 @@
 """
-Auto-split from userland\apps\ncert_physics_lab.py — Physics_Classes_6_10.ohms
+SigmaOS Modular Shim for ohms.py
 """
-
-import math, random
-
-
-
-class Physics_Classes_6_10:
-    @staticmethod
-    def ohms(v, r):
-        return {'I (A)': _r(v / r), 'P (W)': _r(v ** 2 / r)}
+from .ohms._Physics_Classes_6_10_core import Physics_Classes_6_10 # noqa

@@ -1,17 +1,4 @@
 """
-Auto-split from userland\system_api\network_stack.py — SigmaNetworkStack.dns_block
+SigmaOS Modular Shim for dns_block.py
 """
-
-import time
-import uuid
-import hashlib
-from dataclasses import dataclass, field
-from enum import Enum, auto
-
-
-
-class SigmaNetworkStack:
-    def dns_block(self, domain: str) -> dict:
-        """Block a domain at the DNS level (ad/tracker/malware lists)."""
-        self._dns_cache[domain] = DNSRecord(domain, '0.0.0.0', sovereign=True)
-        return {'domain': domain, 'ip': '0.0.0.0', 'blocked': True, 'message': f"SovereignDNS: '{domain}' blocked at DNS layer."}
+from .dns_block._SigmaNetworkStack_core import SigmaNetworkStack # noqa

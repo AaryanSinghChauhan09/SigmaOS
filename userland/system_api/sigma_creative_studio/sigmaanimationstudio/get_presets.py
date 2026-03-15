@@ -1,9 +1,4 @@
 """
-Auto-split from userland\system_api\sigma_creative_studio.py — SigmaAnimationStudio.get_presets
+SigmaOS Modular Shim for get_presets.py
 """
-
-
-
-class SigmaAnimationStudio:
-    def get_presets(self):
-        return self.ANIMATION_PRESETS
+from .get_presets._SigmaAnimationStudio_core import SigmaAnimationStudio # noqa

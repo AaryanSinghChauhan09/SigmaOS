@@ -1,13 +1,4 @@
 """
-Auto-split from userland\apps\stopwatch_timer.py — launch
+SigmaOS Modular Shim for launch.py
 """
-
-import tkinter as tk
-from tkinter import ttk
-import time, threading
-from typing import Any
-
-
-
-def launch(kernel=None):
-    SigmaStopwatch(kernel).mainloop()
+from .launch.launch import launch # noqa

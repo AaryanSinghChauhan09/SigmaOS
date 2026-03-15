@@ -1,13 +1,4 @@
 """
-Auto-split from sigma_core\system\mode_manager.py — SigmaModeManager._disconnect_wifi
+SigmaOS Modular Shim for _disconnect_wifi.py
 """
-
-from typing import Dict, List, Any, Callable, Optional
-import time
-
-
-
-class SigmaModeManager:
-    def _disconnect_wifi(self, phase: str='') -> str:
-        """Simulates disconnecting from Wi-Fi."""
-        return 'Wi-Fi disconnected.'
+from ._disconnect_wifi._SigmaModeManager_core import SigmaModeManager # noqa

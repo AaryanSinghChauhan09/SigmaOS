@@ -1,13 +1,4 @@
 """
-Auto-split from userland\apps\ncert_biology_lab.py — Biology_Classes_6_10.heart
+SigmaOS Modular Shim for heart.py
 """
-
-import math, random
-
-
-
-class Biology_Classes_6_10:
-    @staticmethod
-    def heart(age, ex):
-        m = 220 - age
-        return {'bpm': 110 if ex else 72, 'Max': m}
+from .heart._Biology_Classes_6_10_core import Biology_Classes_6_10 # noqa

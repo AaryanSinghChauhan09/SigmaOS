@@ -1,15 +1,4 @@
 """
-Auto-split from userland\system_api\sigma_auditor.py — SigmaAuditor.test_energy_efficiency
+SigmaOS Modular Shim for test_energy_efficiency.py
 """
-
-import time
-import random
-import os
-from typing import Dict, List, Any
-
-
-
-class SigmaAuditor:
-    def test_energy_efficiency(self) -> Dict:
-        """TC-PWR-001: Energy consumption and thermal management."""
-        return {'name': 'Efficiency & Energy', 'score': 96, 'details': ['Idle Battery Drain (0.2%/hr): OPTIMAL', 'Thermal Throttling (Target < 75C): PASSED', 'Adaptive Brightness/Energy: ACTIVE', 'ZRAM Power Impact: NEUTRAL']}
+from .test_energy_efficiency._SigmaAuditor_core import SigmaAuditor # noqa

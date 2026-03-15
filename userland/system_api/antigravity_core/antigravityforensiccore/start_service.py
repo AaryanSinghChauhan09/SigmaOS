@@ -1,13 +1,4 @@
 """
-Auto-split from userland\system_api\antigravity_core.py — AntigravityForensicCore.start_service
+SigmaOS Modular Shim for start_service.py
 """
-
-import os
-import hashlib
-import time
-
-
-
-class AntigravityForensicCore:
-    def start_service(self):
-        return 'Forensic Snapshot overlay engaged. Write-protecting root filesystems.'
+from .start_service._AntigravityForensicCore_core import AntigravityForensicCore # noqa

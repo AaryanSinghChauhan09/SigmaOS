@@ -1,15 +1,4 @@
 """
-Auto-split from userland\apps\text_cleaner.py — TextCleaner._set_status
+SigmaOS Modular Shim for _set_status.py
 """
-
-import tkinter as tk
-from tkinter import ttk, scrolledtext, messagebox
-import re
-import string
-import random
-
-
-
-class TextCleaner:
-    def _set_status(self, msg, color=PAL['accent']):
-        self.status.config(text=msg.upper(), bg=color)
+from ._set_status._TextCleaner_core import TextCleaner # noqa

@@ -1,16 +1,4 @@
 """
-Auto-split from sigma_core\ai\intelligence_hub.py — MLEngine.train_perceptron
+SigmaOS Modular Shim for train_perceptron.py
 """
-
-import math
-import random
-import time
-from typing import List, Dict, Any, Optional
-
-
-
-class MLEngine:
-    def train_perceptron(self, data: List[tuple], weights: List[float]):
-        """Simulates Perceptron Training Logic."""
-        self.log_activity('Training Perceptron...')
-        return [w + random.uniform(-0.1, 0.1) for w in weights]
+from .train_perceptron._MLEngine_core import MLEngine # noqa

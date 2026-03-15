@@ -1,16 +1,4 @@
 """
-Auto-split from sigma_cli.py — _ansi
+SigmaOS Modular Shim for _ansi.py
 """
-
-import sys
-import os
-import argparse
-import json
-import textwrap
-import time
-from sigma_core import SigmaKernel, SigmaConfig
-
-
-
-def _ansi(code, text):
-    return f'{code}{text}{C.RESET}'
+from ._ansi._ansi import _ansi # noqa

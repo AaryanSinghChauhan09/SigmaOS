@@ -1,15 +1,4 @@
 """
-Auto-split from userland\system_api\media_studio.py — SigmaMediaStudio._log_consent
+SigmaOS Modular Shim for _log_consent.py
 """
-
-import time
-import os
-import uuid
-
-
-
-class SigmaMediaStudio:
-    def _log_consent(self, action: str, details: str):
-        """Immutable consent ledger for transparency."""
-        entry = {'timestamp': time.time(), 'action': action, 'details': details, 'revoked': False}
-        self.consent_ledger.append(entry)
+from ._log_consent._SigmaMediaStudio_core import SigmaMediaStudio # noqa

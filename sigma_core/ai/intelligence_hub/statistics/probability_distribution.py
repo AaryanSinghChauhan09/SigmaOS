@@ -1,15 +1,4 @@
 """
-Auto-split from sigma_core\ai\intelligence_hub.py — Statistics.probability_distribution
+SigmaOS Modular Shim for probability_distribution.py
 """
-
-import math
-import random
-import time
-from typing import List, Dict, Any, Optional
-
-
-
-class Statistics:
-    def probability_distribution(self, data: List[float]) -> Dict[float, float]:
-        total = float(len(data))
-        return {x: float(data.count(x)) / total for x in set(data)}
+from .probability_distribution._Statistics_core import Statistics # noqa

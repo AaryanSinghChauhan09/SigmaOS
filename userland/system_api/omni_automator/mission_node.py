@@ -1,13 +1,4 @@
-"""omni_automator.mission_node — MissionNode dataclass definition."""
-from dataclasses import dataclass, field
-from typing import Dict, Any, Optional
-
-
-@dataclass
-class MissionNode:
-    id: str
-    name: str
-    node_type: str
-    params: Dict[str, Any] = field(default_factory=dict)
-    next_node_id: Optional[str] = None
-    execution_time_ms: float = 0.0
+"""
+SigmaOS Modular Shim for mission_node.py
+"""
+from .mission_node._MissionNode_core import MissionNode # noqa

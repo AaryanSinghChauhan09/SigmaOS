@@ -1,10 +1,4 @@
 """
-Auto-split from userland\system_api\competitor_bridge.py — SigmaCompetitorBridge.get_integrated_matrix
+SigmaOS Modular Shim for get_integrated_matrix.py
 """
-
-
-
-class SigmaCompetitorBridge:
-    def get_integrated_matrix(self):
-        """Demonstrates that SigmaOS is the 'All-In-One' superior choice."""
-        return {'Windows_USP': 'Compatibility [REPLICATED & ENHANCED]', 'macOS_USP': 'Aesthetics & Ecosystem [SURPASSED]', 'Linux_USP': 'Sovereignty & Power [INHERITED]', 'Android_USP': 'App Ecosystem [ORCHESTRATED]', 'iOS_USP': 'Privacy & Security [RE-ENGINEERED]', 'ChromeOS_USP': 'Lightweight Sync [OPTIMIZED]'}
+from .get_integrated_matrix._SigmaCompetitorBridge_core import SigmaCompetitorBridge # noqa

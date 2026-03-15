@@ -1,16 +1,6 @@
-"""mode_manager.routines.diagnostics — System diagnostic routines."""
-
-
-def run_system_diagnostics(phase: str = "") -> str:
-    """Simulates running system diagnostics."""
-    return "System diagnostics running."
-
-
-def isolate_network(phase: str = "") -> str:
-    """Simulates isolating the network for security."""
-    return "Network isolated."
-
-
-def reboot_system(phase: str = "") -> str:
-    """Simulates initiating a system reboot."""
-    return "System reboot initiated."
+"""
+SigmaOS Modular Shim for diagnostics.py
+"""
+from .diagnostics.run_system_diagnostics import run_system_diagnostics # noqa
+from .diagnostics.isolate_network import isolate_network # noqa
+from .diagnostics.reboot_system import reboot_system # noqa

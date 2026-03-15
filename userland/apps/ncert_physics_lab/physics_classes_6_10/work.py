@@ -1,13 +1,4 @@
 """
-Auto-split from userland\apps\ncert_physics_lab.py — Physics_Classes_6_10.work
+SigmaOS Modular Shim for work.py
 """
-
-import math, random
-
-
-
-class Physics_Classes_6_10:
-    @staticmethod
-    def work(f, d, a):
-        w = f * d * math.cos(math.radians(a))
-        return {'Work (J)': _r(w, 2)}
+from .work._Physics_Classes_6_10_core import Physics_Classes_6_10 # noqa

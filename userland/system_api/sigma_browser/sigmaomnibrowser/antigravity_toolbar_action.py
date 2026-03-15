@@ -1,15 +1,4 @@
 """
-Auto-split from userland\system_api\sigma_browser.py — SigmaOmniBrowser.antigravity_toolbar_action
+SigmaOS Modular Shim for antigravity_toolbar_action.py
 """
-
-import random
-from sigma_core.system.sovereign_app import SovereignApp
-
-
-
-class SigmaOmniBrowser:
-    def antigravity_toolbar_action(self, prompt):
-        """Native prompt distribution across all browser instances."""
-        from aether_orchestrator import AetherOrchestrator
-        orchestrator = AetherOrchestrator()
-        return orchestrator.distribute_prompt(prompt, 'Global_Browser_Lattice')
+from .antigravity_toolbar_action._SigmaOmniBrowser_core import SigmaOmniBrowser # noqa

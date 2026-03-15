@@ -1,13 +1,4 @@
 """
-Auto-split from userland\apps\ncert_physics_lab.py — Physics_Classes_11_12.meter_bridge
+SigmaOS Modular Shim for meter_bridge.py
 """
-
-import math, random
-
-
-
-class Physics_Classes_11_12:
-    @staticmethod
-    def meter_bridge(r, l):
-        x = r * (100 - l) / l
-        return {'Unknown X (Ω)': _r(x, 2)}
+from .meter_bridge._Physics_Classes_11_12_core import Physics_Classes_11_12 # noqa

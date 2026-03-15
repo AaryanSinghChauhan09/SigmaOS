@@ -1,16 +1,4 @@
 """
-Auto-split from userland\apps\aurapaint.py — AuraPaint.set_tool
+SigmaOS Modular Shim for set_tool.py
 """
-
-import tkinter as tk
-from tkinter import colorchooser, messagebox, ttk, simpledialog, filedialog
-import random
-import os
-from typing import Any
-
-
-
-class AuraPaint:
-    def set_tool(self, tool):
-        self.tool = tool
-        self._set_status(f'TOOL: {tool}')
+from .set_tool._AuraPaint_core import AuraPaint # noqa

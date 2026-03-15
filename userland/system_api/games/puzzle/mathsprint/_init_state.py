@@ -1,15 +1,4 @@
 """
-Auto-split from userland\system_api\games\puzzle.py — MathSprint._init_state
+SigmaOS Modular Shim for _init_state.py
 """
-
-import random
-import time
-from typing import List, Tuple, Dict, Any, Optional, Set
-from .base import SigmaGame
-
-
-
-class MathSprint:
-    def _init_state(self):
-        self.level = 1
-        self._gen_q()
+from ._init_state._MathSprint_core import MathSprint # noqa

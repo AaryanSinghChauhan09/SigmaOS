@@ -1,13 +1,4 @@
 """
-Auto-split from sigma_core\system\mode_manager.py — SigmaModeManager._enable_offline_sync
+SigmaOS Modular Shim for _enable_offline_sync.py
 """
-
-from typing import Dict, List, Any, Callable, Optional
-import time
-
-
-
-class SigmaModeManager:
-    def _enable_offline_sync(self, phase: str='') -> str:
-        """Simulates enabling offline file synchronization."""
-        return 'Offline sync enabled.'
+from ._enable_offline_sync._SigmaModeManager_core import SigmaModeManager # noqa

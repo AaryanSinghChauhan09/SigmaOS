@@ -1,13 +1,4 @@
 """
-Auto-split from sigma_core\system\mode_manager.py — SigmaModeManager._deactivate_vpn
+SigmaOS Modular Shim for _deactivate_vpn.py
 """
-
-from typing import Dict, List, Any, Callable, Optional
-import time
-
-
-
-class SigmaModeManager:
-    def _deactivate_vpn(self, phase: str='') -> str:
-        """Simulates deactivating VPN."""
-        return 'VPN deactivated.'
+from ._deactivate_vpn._SigmaModeManager_core import SigmaModeManager # noqa

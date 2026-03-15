@@ -1,12 +1,4 @@
 """
-Auto-split from ecosystem\pdf_forge.py — SigmaPDFForge.compress_optimized
+SigmaOS Modular Shim for compress_optimized.py
 """
-
-from sigma_core.system.sovereign_app import SovereignApp
-
-
-
-class SigmaPDFForge:
-    def compress_optimized(self, quality='Professional'):
-        """Intelligent compression: Reducing file size via local sharding."""
-        return f'PDF Forge (Compress): Optimized for {quality}. 4.5x reduction via local Mesh-Alloc.'
+from .compress_optimized._SigmaPDFForge_core import SigmaPDFForge # noqa

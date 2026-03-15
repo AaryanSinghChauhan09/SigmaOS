@@ -1,15 +1,4 @@
 """
-Auto-split from userland\system_api\network_stack.py — SigmaNetworkStack.mesh_status
+SigmaOS Modular Shim for mesh_status.py
 """
-
-import time
-import uuid
-import hashlib
-from dataclasses import dataclass, field
-from enum import Enum, auto
-
-
-
-class SigmaNetworkStack:
-    def mesh_status(self) -> dict:
-        return {'nodes': len(self._mesh_nodes), 'topology': 'multi-hop Wi-Fi Direct + BLE', 'peers': [{'host': n.hostname, 'rssi': n.rssi} for n in self._mesh_nodes.values()]}
+from .mesh_status._SigmaNetworkStack_core import SigmaNetworkStack # noqa

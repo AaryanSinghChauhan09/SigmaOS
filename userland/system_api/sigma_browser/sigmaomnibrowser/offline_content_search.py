@@ -1,13 +1,4 @@
 """
-Auto-split from userland\system_api\sigma_browser.py — SigmaOmniBrowser.offline_content_search
+SigmaOS Modular Shim for offline_content_search.py
 """
-
-import random
-from sigma_core.system.sovereign_app import SovereignApp
-
-
-
-class SigmaOmniBrowser:
-    def offline_content_search(self, query):
-        """Searches the local Sovereign Web Archive without pinging any search engine."""
-        return f"Offline Search: Found 12 matches for '{query}' in local storage."
+from .offline_content_search._SigmaOmniBrowser_core import SigmaOmniBrowser # noqa

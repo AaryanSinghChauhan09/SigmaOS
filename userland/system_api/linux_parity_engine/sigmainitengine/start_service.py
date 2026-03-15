@@ -1,20 +1,4 @@
 """
-Auto-split from userland\system_api\linux_parity_engine.py — SigmaInitEngine.start_service
+SigmaOS Modular Shim for start_service.py
 """
-
-import time
-import uuid
-import random
-from typing import Dict, List, Any
-
-
-
-class SigmaInitEngine:
-    def start_service(self, name: str) -> Dict:
-        if name not in self._services:
-            self._services[name] = {'status': 'running', 'restart': 'no', 'type': 'user', 'pid': random.randint(1000, 9999)}
-            return {'status': 'OK', 'message': f"[init] Service '{name}' registered and started."}
-        svc = self._services[name]
-        svc['status'] = 'running'
-        svc['pid'] = random.randint(1000, 9999)
-        return {'status': 'OK', 'message': f"[init] Service '{name}' started (PID {svc['pid']})."}
+from .start_service._SigmaInitEngine_core import SigmaInitEngine # noqa

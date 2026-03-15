@@ -1,16 +1,4 @@
 """
-Auto-split from userland\system_api\sigma_projects.py — SigmaProjects.health_check
+SigmaOS Modular Shim for health_check.py
 """
-
-import time
-import uuid
-import random
-from dataclasses import dataclass, field
-from enum import Enum, auto
-from typing import Dict, List, Any
-
-
-
-class SigmaProjects:
-    def health_check(self) -> str:
-        return f'OK — SigmaProjects v2.4 | {len(self._tasks)} tasks | {len(self._sprints)} sprints ACTIVE.'
+from .health_check._SigmaProjects_core import SigmaProjects # noqa

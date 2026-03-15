@@ -1,18 +1,4 @@
 """
-Auto-split from userland\apps\codeforge.py — SovereignCodeForge._insert_tab
+SigmaOS Modular Shim for _insert_tab.py
 """
-
-import tkinter as tk
-from tkinter import ttk, filedialog, messagebox, scrolledtext
-import os, re, sys, subprocess, threading
-from typing import Any, Optional
-
-
-
-class SovereignCodeForge:
-    def _insert_tab(self, event):
-        if self.ac_popup.winfo_viewable():
-            self._apply_ac()
-            return 'break'
-        self.txt.insert('insert', '    ')
-        return 'break'
+from ._insert_tab._SovereignCodeForge_core import SovereignCodeForge # noqa

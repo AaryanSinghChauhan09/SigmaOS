@@ -1,21 +1,4 @@
 """
-Auto-split from userland\apps\chess.py — SovereignStrategist._on_vibe_switch
+SigmaOS Modular Shim for _on_vibe_switch.py
 """
-
-import tkinter as tk
-from tkinter import messagebox, ttk
-import random
-import time
-from typing import Dict, Any, List, Optional, Tuple, cast
-import os
-import sys
-
-
-
-class SovereignStrategist:
-    def _on_vibe_switch(self, payload):
-        if FLUID_PAL:
-            PAL['bg'] = FLUID_PAL['background']
-            PAL['accent'] = FLUID_PAL['primary']
-            self.configure(bg=PAL['bg'])
-            self._draw_board()
+from ._on_vibe_switch._SovereignStrategist_core import SovereignStrategist # noqa

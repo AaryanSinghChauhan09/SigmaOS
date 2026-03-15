@@ -1,13 +1,4 @@
 """
-Auto-split from userland\system_api\games\pro.py — SymphonicVirtualSynth._init_state
+SigmaOS Modular Shim for _init_state.py
 """
-
-import random
-from typing import List, Tuple, Dict, Any, Optional
-from .base import SigmaGame
-
-
-
-class SymphonicVirtualSynth:
-    def _init_state(self):
-        self.current = 'Piano'
+from ._init_state._SymphonicVirtualSynth_core import SymphonicVirtualSynth # noqa

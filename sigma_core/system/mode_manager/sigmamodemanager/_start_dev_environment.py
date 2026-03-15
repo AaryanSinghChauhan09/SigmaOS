@@ -1,13 +1,4 @@
 """
-Auto-split from sigma_core\system\mode_manager.py — SigmaModeManager._start_dev_environment
+SigmaOS Modular Shim for _start_dev_environment.py
 """
-
-from typing import Dict, List, Any, Callable, Optional
-import time
-
-
-
-class SigmaModeManager:
-    def _start_dev_environment(self, phase: str='') -> str:
-        """Simulates starting development environment (IDE, Docker)."""
-        return 'Development environment started.'
+from ._start_dev_environment._SigmaModeManager_core import SigmaModeManager # noqa

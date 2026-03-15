@@ -1,15 +1,4 @@
 """
-Auto-split from userland\apps\codeforge.py — SovereignCodeForge._setup_tags
+SigmaOS Modular Shim for _setup_tags.py
 """
-
-import tkinter as tk
-from tkinter import ttk, filedialog, messagebox, scrolledtext
-import os, re, sys, subprocess, threading
-from typing import Any, Optional
-
-
-
-class SovereignCodeForge:
-    def _setup_tags(self):
-        for name, (_, color) in KEYWORDS.items():
-            self.txt.tag_config(name, foreground=color)
+from ._setup_tags._SovereignCodeForge_core import SovereignCodeForge # noqa

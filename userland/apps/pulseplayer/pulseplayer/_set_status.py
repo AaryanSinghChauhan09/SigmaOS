@@ -1,14 +1,4 @@
 """
-Auto-split from userland\apps\pulseplayer.py — PulsePlayer._set_status
+SigmaOS Modular Shim for _set_status.py
 """
-
-import tkinter as tk
-from tkinter import messagebox, ttk, filedialog
-import time, random, threading, os
-from typing import Any, List, Dict
-
-
-
-class PulsePlayer:
-    def _set_status(self, msg):
-        self.status.config(text=msg.upper())
+from ._set_status._PulsePlayer_core import PulsePlayer # noqa

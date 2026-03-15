@@ -1,17 +1,4 @@
 """
-Auto-split from ecosystem\sigma_app_store.py — SigmaAppStore.list_userland_apps
+SigmaOS Modular Shim for list_userland_apps.py
 """
-
-import time
-from typing import List, Dict
-from app_sandbox import SigmaAppSandbox
-
-
-
-class SigmaAppStore:
-    def list_userland_apps(self, category: str=None) -> Dict:
-        """Returns the current catalog (can filter by category)."""
-        self._load_catalog()
-        if category:
-            return {category: self.catalog.get(category, [])}
-        return self.catalog
+from .list_userland_apps._SigmaAppStore_core import SigmaAppStore # noqa

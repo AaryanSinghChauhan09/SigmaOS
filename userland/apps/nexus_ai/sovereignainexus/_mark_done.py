@@ -1,15 +1,4 @@
 """
-Auto-split from userland\apps\nexus_ai.py — SovereignAINexus._mark_done
+SigmaOS Modular Shim for _mark_done.py
 """
-
-import tkinter as tk
-from tkinter import ttk, scrolledtext, messagebox
-import time, threading, random, os, sys, json
-
-
-
-class SovereignAINexus:
-    def _mark_done(self):
-        sel = self.task_tree.selection()
-        if sel:
-            self.task_tree.item(sel[0], values=(self.task_tree.item(sel[0], 'values')[0], self.task_tree.item(sel[0], 'values')[1], self.task_tree.item(sel[0], 'values')[2], 'Completed', 'Nexus'))
+from ._mark_done._SovereignAINexus_core import SovereignAINexus # noqa

@@ -1,14 +1,4 @@
 """
-Auto-split from userland\apps\quantum_bi.py — QuantumBIEngine._kiosk_mode
+SigmaOS Modular Shim for _kiosk_mode.py
 """
-
-import tkinter as tk
-from tkinter import ttk, messagebox, filedialog
-import random
-import math
-
-
-
-class QuantumBIEngine:
-    def _kiosk_mode(self):
-        messagebox.showinfo('Geckoboard Kiosk', 'Initiating Full-Screen Real-Time Polling Mode (60Hz).\nConnect to external display for Command Center view.')
+from ._kiosk_mode._QuantumBIEngine_core import QuantumBIEngine # noqa

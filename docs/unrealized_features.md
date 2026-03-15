@@ -1,22 +1,23 @@
-# SigmaOS: Unrealized & Yet-to-be-Defined Features
+# SigmaOS Unrealized Features & Strategic Roadmap
 
-This roadmap lists high-potential features derived from competitor models and sovereign engineering goals.
+This document outlines the high-level vision for SigmaOS's future evolution. These are "yet to be defined" features that will push the boundaries of what an OS can be.
 
-## 1. Sovereign Mesh Networking (Phase 5)
-*   **Concept**: P2P localized OS synchronization without internet reliance.
-*   **USP**: "Ghost Sync" - nodes discover each other via ultrasonic or Bluetooth shims to share intelligence updates.
+## 1. Intelligence & Automation
+- **Neural-Native Kernel**: A scheduler that uses reinforcement learning to optimize process priority based on user behavior.
+- **Omni-Automator v3**: A purely community-driven mission node marketplace where anyone can contribute automation scripts.
 
-## 2. Neural Overlay (SigmaVision v2)
-*   **Concept**: AR-style OS interface that highlights actionable UI elements on screen.
-*   **USP**: "Actionable Sight" - AI automatically identifies buttons, forms, and data points in any 3rd party application for one-click automation.
+## 2. Security & Resilience
+- **Zero-Trust Lattice**: Moving from simple namespaces to lattice-based cryptographic isolation for every micro-service.
+- **Volatile-Only Mode**: A "Stealth Mode" where the entire OS runs in RAM, leaving zero traces on persistent storage.
 
-## 3. Polymorphic Security Shifter
-*   **Concept**: Real-time code re-obfuscation while running.
-*   **USP**: "Hydra Logic" - The kernel periodically reshapes its memory map and internal function offsets to invalidate any potential memory-based exploits.
+## 3. User Experience
+- **Adaptive Glassmorphism**: A GUI that dynamically adjusts its visual weight based on retinal tracking or focus state.
+- **Universal Semantic Search**: A search engine that doesn't just find files but understands the *content* and *context* of data across all apps.
 
-## 4. Quantum-Resistant Encrypted Registry
-*   **Concept**: Moving configuration to a lattice-based encryption model.
-*   **USP**: "Unbreakable State" - ensuring OS configuration remains secure even against future quantum computing threats.
+## 4. Connectivity
+- **Sigma Mesh**: A native, peer-to-peer network stack that allows SigmaOS devices to communicate directly without a central ISP.
+- **Cloud-Shadowing**: Transparently mirroring the OS state to private cloud nodes for instant recovery.
 
-*   **Concept**: Casting the OS UI into 3D environments via spatial computing.
-*   **USP**: "Dimensional Overlay" - The OS becomes a spatial agent, projecting widgets and tools onto the physical environment via AR/VR shims.
+## 5. Community & Ethics
+- **Automated Compliance Auditor**: An OS-level filter that ensures all dynamic content remains professional and child-safe.
+- **Open-Forge API**: A unified system for 3rd party developers to hook into the core Sigma architecture without breaking modularity.

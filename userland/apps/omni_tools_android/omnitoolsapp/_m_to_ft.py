@@ -1,21 +1,4 @@
 """
-Auto-split from userland\apps\omni_tools_android.py — OmniToolsApp._m_to_ft
+SigmaOS Modular Shim for _m_to_ft.py
 """
-
-import tkinter as tk
-from tkinter import ttk, messagebox, colorchooser, filedialog
-import math
-import random
-import string
-import secrets
-import datetime
-
-
-
-class OmniToolsApp:
-    def _m_to_ft(self) -> None:
-        try:
-            self.feet_entry.delete(0, tk.END)
-            self.feet_entry.insert(0, fmt(float(self.meter_entry.get()) * 3.28084))
-        except ValueError:
-            messagebox.showinfo('Converter', 'Enter a valid number.')
+from ._m_to_ft._OmniToolsApp_core import OmniToolsApp # noqa

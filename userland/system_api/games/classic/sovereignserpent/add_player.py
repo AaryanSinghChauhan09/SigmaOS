@@ -1,15 +1,4 @@
 """
-Auto-split from userland\system_api\games\classic.py — SovereignSerpent.add_player
+SigmaOS Modular Shim for add_player.py
 """
-
-import random
-from typing import List, Tuple, Dict, Any, Optional
-from .base import SigmaGame
-
-
-
-class SovereignSerpent:
-    def add_player(self, name: str) -> str:
-        self.players.append(name)
-        self.positions[name] = 0
-        return f"Player '{name}' joined."
+from .add_player._SovereignSerpent_core import SovereignSerpent # noqa

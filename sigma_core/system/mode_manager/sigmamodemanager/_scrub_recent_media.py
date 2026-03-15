@@ -1,14 +1,4 @@
 """
-Auto-split from sigma_core\system\mode_manager.py — SigmaModeManager._scrub_recent_media
+SigmaOS Modular Shim for _scrub_recent_media.py
 """
-
-from typing import Dict, List, Any, Callable, Optional
-import time
-
-
-
-class SigmaModeManager:
-    def _scrub_recent_media(self, phase: str='') -> str:
-        if self.kernel and self.kernel.media_forge:
-            return 'MediaForge forensic scrub initiated on recent assets.'
-        return 'MediaForge offline.'
+from ._scrub_recent_media._SigmaModeManager_core import SigmaModeManager # noqa

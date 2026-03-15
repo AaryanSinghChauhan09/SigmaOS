@@ -1,13 +1,4 @@
 """
-Auto-split from sigma_core\system\mode_manager.py — SigmaModeManager._log_mode_change
+SigmaOS Modular Shim for _log_mode_change.py
 """
-
-from typing import Dict, List, Any, Callable, Optional
-import time
-
-
-
-class SigmaModeManager:
-    def _log_mode_change(self, phase: str='') -> str:
-        """Logs the mode change event."""
-        return f'System log: Mode change {phase} for {self._current_mode} at {time.time()}.'
+from ._log_mode_change._SigmaModeManager_core import SigmaModeManager # noqa

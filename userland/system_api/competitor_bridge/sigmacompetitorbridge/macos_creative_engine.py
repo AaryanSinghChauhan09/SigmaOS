@@ -1,10 +1,4 @@
 """
-Auto-split from userland\system_api\competitor_bridge.py — SigmaCompetitorBridge.macos_creative_engine
+SigmaOS Modular Shim for macos_creative_engine.py
 """
-
-
-
-class SigmaCompetitorBridge:
-    def macos_creative_engine(self):
-        """USP: Retina-ready compositor."""
-        return {'Feature': 'Sigma-Retina-Proxy (Color-accurate 10-bit rendering)'}
+from .macos_creative_engine._SigmaCompetitorBridge_core import SigmaCompetitorBridge # noqa

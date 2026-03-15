@@ -1,6 +1,4 @@
-"""fluid_ui.universal_search — OmniSearch nexus launcher."""
-
-
-def launch_universal_search() -> str:
-    """USP: Spotlight/Raycast analog, integrated natively into the kernel bus."""
-    return "Search Index: 1M+ Local Nodes synchronized. OmniSearch Nexus Ready."
+"""
+SigmaOS Modular Shim for universal_search.py
+"""
+from .universal_search.launch_universal_search import launch_universal_search # noqa

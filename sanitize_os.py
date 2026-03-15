@@ -1,53 +1,5 @@
-import os
-import sys
-from pathlib import Path
-
-# Paths to sanitize
-SIGMA_ROOT = Path(os.getcwd())
-
-# Replacement logic (Personal Data Sanitization)
-# Priority: Remove 'SigmaUser' and hardcoded g_antigravity paths.
-REPLACEMENTS = {
-    "C:/Users/SigmaUser": os.environ.get("USERPROFILE", "C:/Users/SigmaUser").replace("\\", "/"),
-    "C:\\Users\\SigmaUser": os.environ.get("USERPROFILE", "C:\\Users\\SigmaUser"),
-    "SigmaUser": "SigmaUser",
-    "SigmaUserSinghChauhan09": "SigmaOpenSource",
-}
-
-def sanitize_file(file_path):
-    try:
-        # Open with explicit UTF-8 and errors ignore to avoid codec crashes
-        with open(file_path, 'r', encoding='utf-8', errors='ignore') as f:
-            content = f.read()
-            
-        modified = content
-        for find_str, replace_str in REPLACEMENTS.items():
-            if find_str in modified:
-                modified = modified.replace(find_str, replace_str)
-            
-        if modified != content:
-            with open(file_path, 'w', encoding='utf-8') as f:
-                f.write(modified)
-            print(f"[RECOVER] Sanitized: {os.path.basename(file_path)}")
-            return True
-    except Exception as e:
-        pass
-    return False
-
-def main():
-    # Use ascii fallback for progress bars/symbols to avoid Windows terminal issues
-    print(f"[*] Starting OS Sanitization loop in {SIGMA_ROOT}...")
-    count = 0
-    for root, dirs, files in os.walk(SIGMA_ROOT):
-        # Skip git and cache
-        if any(x in root for x in ('.git', '__pycache__', '.pytest_cache')):
-            continue
-            
-        for file in files:
-            if file.endswith(('.py', '.md', '.txt', '.ps1', '.bat', '.json', '.xml')):
-                if sanitize_file(os.path.join(root, file)):
-                    count += 1
-    print(f"DONE - Sanitization complete. {count} files processed.")
-
-if __name__ == "__main__":
-    main()
+"""
+SigmaOS Modular Shim for sanitize_os.py
+"""
+from .sanitize_os.sanitize_file import sanitize_file # noqa
+from .sanitize_os.main import main # noqa

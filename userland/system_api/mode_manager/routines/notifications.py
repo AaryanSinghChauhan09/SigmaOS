@@ -1,11 +1,5 @@
-"""mode_manager.routines.notifications — Notification control routines."""
-
-
-def disable_notifications(phase: str = "") -> str:
-    """Simulates disabling system notifications."""
-    return "Notifications disabled."
-
-
-def enable_notifications(phase: str = "") -> str:
-    """Simulates enabling system notifications."""
-    return "Notifications enabled."
+"""
+SigmaOS Modular Shim for notifications.py
+"""
+from .notifications.disable_notifications import disable_notifications # noqa
+from .notifications.enable_notifications import enable_notifications # noqa

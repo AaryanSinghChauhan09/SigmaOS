@@ -1,16 +1,4 @@
 """
-Auto-split from sigma_core\system\adaptive_governor.py — AdaptiveGovernor.trigger_morphic_resharding
+SigmaOS Modular Shim for trigger_morphic_resharding.py
 """
-
-from typing import Dict, Any, List
-
-
-
-class AdaptiveGovernor:
-    def trigger_morphic_resharding(self):
-        """
-            OS Principle: Dynamic Resource Relocation.
-            Redistributes kernel threads and shard afinities to counter entropy.
-            """
-        self.log_event('morphic_reshard', {'status': 'INITIATED'})
-        return 'Morphic Sharding Complete: Shard affinity re-balanced across 12 logical cores.'
+from .trigger_morphic_resharding._AdaptiveGovernor_core import AdaptiveGovernor # noqa

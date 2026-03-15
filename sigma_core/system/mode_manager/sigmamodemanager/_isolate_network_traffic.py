@@ -1,13 +1,4 @@
 """
-Auto-split from sigma_core\system\mode_manager.py — SigmaModeManager._isolate_network_traffic
+SigmaOS Modular Shim for _isolate_network_traffic.py
 """
-
-from typing import Dict, List, Any, Callable, Optional
-import time
-
-
-
-class SigmaModeManager:
-    def _isolate_network_traffic(self, phase: str='') -> str:
-        """Simulates isolating network traffic for automation processes."""
-        return 'Network traffic isolated.'
+from ._isolate_network_traffic._SigmaModeManager_core import SigmaModeManager # noqa

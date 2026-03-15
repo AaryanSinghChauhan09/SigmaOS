@@ -1,13 +1,4 @@
 """
-Auto-split from userland\system_api\games\pro.py — SovereignRealms._init_state
+SigmaOS Modular Shim for _init_state.py
 """
-
-import random
-from typing import List, Tuple, Dict, Any, Optional
-from .base import SigmaGame
-
-
-
-class SovereignRealms:
-    def _init_state(self):
-        self.score = 1000
+from ._init_state._SovereignRealms_core import SovereignRealms # noqa

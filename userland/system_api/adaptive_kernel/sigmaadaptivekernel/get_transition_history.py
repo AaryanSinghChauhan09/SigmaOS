@@ -1,14 +1,4 @@
 """
-Auto-split from userland\system_api\adaptive_kernel.py — SigmaAdaptiveKernel.get_transition_history
+SigmaOS Modular Shim for get_transition_history.py
 """
-
-import time
-import threading
-from enum import Enum, auto
-
-
-
-class SigmaAdaptiveKernel:
-    def get_transition_history(self, limit: int=20) -> list[dict]:
-        """Returns the last N profile transitions for audit purposes."""
-        return self._history[-limit:]
+from .get_transition_history._SigmaAdaptiveKernel_core import SigmaAdaptiveKernel # noqa

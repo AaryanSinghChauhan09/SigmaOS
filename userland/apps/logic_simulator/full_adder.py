@@ -1,13 +1,4 @@
 """
-Auto-split from userland\apps\logic_simulator.py — full_adder
+SigmaOS Modular Shim for full_adder.py
 """
-
-import tkinter as tk
-from tkinter import ttk
-
-
-
-def full_adder(A, B, Cin):
-    S = A ^ B ^ Cin
-    Cout = A & B | B & Cin | A & Cin
-    return (S, Cout)
+from .full_adder.full_adder import full_adder # noqa

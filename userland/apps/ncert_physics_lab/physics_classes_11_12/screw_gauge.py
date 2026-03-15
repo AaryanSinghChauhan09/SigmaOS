@@ -1,13 +1,4 @@
 """
-Auto-split from userland\apps\ncert_physics_lab.py — Physics_Classes_11_12.screw_gauge
+SigmaOS Modular Shim for screw_gauge.py
 """
-
-import math, random
-
-
-
-class Physics_Classes_11_12:
-    @staticmethod
-    def screw_gauge(psr, hsd, lc):
-        total = psr + hsd * lc
-        return {'Diameter (mm)': _r(total, 3)}
+from .screw_gauge._Physics_Classes_11_12_core import Physics_Classes_11_12 # noqa

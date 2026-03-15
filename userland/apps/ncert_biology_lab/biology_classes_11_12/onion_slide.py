@@ -1,14 +1,4 @@
 """
-Auto-split from userland\apps\ncert_biology_lab.py — Biology_Classes_11_12.onion_slide
+SigmaOS Modular Shim for onion_slide.py
 """
-
-import math, random
-
-
-
-class Biology_Classes_11_12:
-    @staticmethod
-    def onion_slide(s):
-        if 'saf' in s.lower():
-            return {'Observation': 'Cell Wall & Nucleus visible', 'Result': 'Success'}
-        return {'Observation': 'Faint structure', 'Result': 'Need proper stain'}
+from .onion_slide._Biology_Classes_11_12_core import Biology_Classes_11_12 # noqa

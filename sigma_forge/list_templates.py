@@ -1,6 +1,4 @@
-"""sigma_forge.list_templates — Lists available forge templates."""
-
-
-def list_templates() -> list:
-    """Returns all available scaffold template types."""
-    return ["app", "agent", "service"]
+"""
+SigmaOS Modular Shim for list_templates.py
+"""
+from .list_templates.list_templates import list_templates # noqa

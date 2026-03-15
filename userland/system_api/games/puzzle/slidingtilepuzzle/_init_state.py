@@ -1,19 +1,4 @@
 """
-Auto-split from userland\system_api\games\puzzle.py — SlidingTilePuzzle._init_state
+SigmaOS Modular Shim for _init_state.py
 """
-
-import random
-import time
-from typing import List, Tuple, Dict, Any, Optional, Set
-from .base import SigmaGame
-
-
-
-class SlidingTilePuzzle:
-    def _init_state(self):
-        self.size = 4
-        n = 16
-        tiles = list(range(n))
-        random.shuffle(tiles)
-        self.board = tiles
-        self.idx = tiles.index(0)
+from ._init_state._SlidingTilePuzzle_core import SlidingTilePuzzle # noqa

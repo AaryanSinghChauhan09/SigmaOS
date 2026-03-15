@@ -1,15 +1,4 @@
 """
-Auto-split from userland\apps\ncert_maths_lab.py — Maths_Classes_11_12.binomial
+SigmaOS Modular Shim for binomial.py
 """
-
-import math, random
-
-
-
-class Maths_Classes_11_12:
-    @staticmethod
-    def binomial(n, p, r):
-        n, p, r = (int(n), float(p), int(r))
-        comb = math.comb(n, r)
-        prob = comb * p ** r * (1.0 - p) ** (n - r)
-        return {'P(X=r)': _r(prob, 6)}
+from .binomial._Maths_Classes_11_12_core import Maths_Classes_11_12 # noqa

@@ -1,15 +1,4 @@
 """
-Auto-split from userland\system_api\ag_enterprise.py — PureText.strip
+SigmaOS Modular Shim for strip.py
 """
-
-import os
-import re
-import json
-import time
-from typing import List, Dict, Any, Optional
-
-
-
-class PureText:
-    def strip(self, rich_text: str) -> str:
-        return re.sub('<[^>]+>', '', rich_text)
+from .strip._PureText_core import PureText # noqa

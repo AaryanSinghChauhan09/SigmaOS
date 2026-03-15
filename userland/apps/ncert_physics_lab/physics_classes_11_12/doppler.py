@@ -1,13 +1,4 @@
 """
-Auto-split from userland\apps\ncert_physics_lab.py — Physics_Classes_11_12.doppler
+SigmaOS Modular Shim for doppler.py
 """
-
-import math, random
-
-
-
-class Physics_Classes_11_12:
-    @staticmethod
-    def doppler(f, vs, vo):
-        v = 343
-        return {'Observed F (Hz)': _r(f * (v + vo) / (v - vs), 2)}
+from .doppler._Physics_Classes_11_12_core import Physics_Classes_11_12 # noqa

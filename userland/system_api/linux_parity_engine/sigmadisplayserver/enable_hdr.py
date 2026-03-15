@@ -1,15 +1,4 @@
 """
-Auto-split from userland\system_api\linux_parity_engine.py — SigmaDisplayServer.enable_hdr
+SigmaOS Modular Shim for enable_hdr.py
 """
-
-import time
-import uuid
-import random
-from typing import Dict, List, Any
-
-
-
-class SigmaDisplayServer:
-    def enable_hdr(self) -> str:
-        self._hdr_enabled = True
-        return '[display] HDR enabled (10-bit, BT.2020 color space).'
+from .enable_hdr._SigmaDisplayServer_core import SigmaDisplayServer # noqa

@@ -1,15 +1,4 @@
 """
-Auto-split from userland\apps\context_engine.py — ContextEngine._auto_shift
+SigmaOS Modular Shim for _auto_shift.py
 """
-
-import tkinter as tk
-from tkinter import ttk, messagebox
-import time
-import random
-
-
-
-class ContextEngine:
-    def _auto_shift(self):
-        self._log('>>> CONCLUSION: User is traversing via vehicle. Auto-engaging Velocity module.')
-        self._activate_mode('🚗 VELOCITY (DRIVING)', PAL['accent'])
+from ._auto_shift._ContextEngine_core import ContextEngine # noqa

@@ -1,13 +1,4 @@
 """
-Auto-split from userland\apps\ncert_physics_lab.py — Physics_Classes_11_12.torque
+SigmaOS Modular Shim for torque.py
 """
-
-import math, random
-
-
-
-class Physics_Classes_11_12:
-    @staticmethod
-    def torque(b, a, i, th):
-        t = i * a * b * math.sin(math.radians(th))
-        return {'Torque (Nm)': _r(t, 4)}
+from .torque._Physics_Classes_11_12_core import Physics_Classes_11_12 # noqa

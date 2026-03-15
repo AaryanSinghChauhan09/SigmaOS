@@ -1,15 +1,4 @@
 """
-Auto-split from userland\apps\spot_it.py — draw_triangle
+SigmaOS Modular Shim for draw_triangle.py
 """
-
-import tkinter as tk
-from tkinter import messagebox
-import random
-import time
-import math
-
-
-
-def draw_triangle(c, cx, cy, s, col, outline='#FFFFFF'):
-    pts = [cx, cy - s, cx + s, cy + s, cx - s, cy + s]
-    c.create_polygon(pts, fill=col, outline=outline, width=2)
+from .draw_triangle.draw_triangle import draw_triangle # noqa

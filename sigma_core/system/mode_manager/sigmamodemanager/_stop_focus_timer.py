@@ -1,13 +1,4 @@
 """
-Auto-split from sigma_core\system\mode_manager.py — SigmaModeManager._stop_focus_timer
+SigmaOS Modular Shim for _stop_focus_timer.py
 """
-
-from typing import Dict, List, Any, Callable, Optional
-import time
-
-
-
-class SigmaModeManager:
-    def _stop_focus_timer(self, phase: str='') -> str:
-        """Stops the active focus timer."""
-        return 'Focus Timer STOPPED. All sessions logged. Distraction control lifted.'
+from ._stop_focus_timer._SigmaModeManager_core import SigmaModeManager # noqa

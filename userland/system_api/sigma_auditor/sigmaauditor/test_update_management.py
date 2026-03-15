@@ -1,15 +1,4 @@
 """
-Auto-split from userland\system_api\sigma_auditor.py — SigmaAuditor.test_update_management
+SigmaOS Modular Shim for test_update_management.py
 """
-
-import time
-import random
-import os
-from typing import Dict, List, Any
-
-
-
-class SigmaAuditor:
-    def test_update_management(self) -> Dict:
-        """TC-UPD-005: Verify rollback after failed update."""
-        return {'name': 'Update & Patching', 'score': 97, 'details': ['Incremental Update: SUCCESS', 'Hotfix Install (No Reboot): PASSED', 'Fail-Safe Rollback (v4.1.2): VERIFIED', 'Corrupted Patch Shield: ACTIVE']}
+from .test_update_management._SigmaAuditor_core import SigmaAuditor # noqa

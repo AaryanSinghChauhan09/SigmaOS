@@ -1,14 +1,4 @@
 """
-Auto-split from userland\apps\spot_it.py — draw_square
+SigmaOS Modular Shim for draw_square.py
 """
-
-import tkinter as tk
-from tkinter import messagebox
-import random
-import time
-import math
-
-
-
-def draw_square(c, cx, cy, s, col, outline='#FFFFFF'):
-    c.create_rectangle(cx - s, cy - s, cx + s, cy + s, fill=col, outline=outline, width=2)
+from .draw_square.draw_square import draw_square # noqa

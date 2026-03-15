@@ -1,16 +1,6 @@
-"""mode_manager.routines.ads — Ad blocker & shopping routines."""
-
-
-def activate_ad_blocker(phase: str = "") -> str:
-    """Simulates activating a system-wide ad blocker."""
-    return "Ad blocker activated."
-
-
-def open_shopping_browser(phase: str = "") -> str:
-    """Simulates opening a specialized shopping browser."""
-    return "Shopping browser opened."
-
-
-def deactivate_ad_blocker(phase: str = "") -> str:
-    """Simulates deactivating a system-wide ad blocker."""
-    return "Ad blocker deactivated."
+"""
+SigmaOS Modular Shim for ads.py
+"""
+from .ads.activate_ad_blocker import activate_ad_blocker # noqa
+from .ads.open_shopping_browser import open_shopping_browser # noqa
+from .ads.deactivate_ad_blocker import deactivate_ad_blocker # noqa

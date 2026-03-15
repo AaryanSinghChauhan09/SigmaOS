@@ -1,18 +1,4 @@
 """
-Auto-split from ecosystem\bharat_law_bridge.py — SigmaBharatLawBridge.ai_case_iq
+SigmaOS Modular Shim for ai_case_iq.py
 """
-
-from typing import Dict, List, Any, Optional
-import datetime
-
-
-
-class SigmaBharatLawBridge:
-    def ai_case_iq(self, facts: str) -> List[Dict]:
-        """USP: Casemine-style CaseIQ. Analyzes facts and suggests precedents."""
-        suggestions = []
-        words = facts.lower().split()
-        for key, val in self._precedents.items():
-            if any((w in key.lower() or w in val.lower() for w in words)):
-                suggestions.append({'Reference': key, 'Meaning': val})
-        return suggestions if suggestions else [{'Default': 'Analyzing facts... Consult Supreme Court Digest.'}]
+from .ai_case_iq._SigmaBharatLawBridge_core import SigmaBharatLawBridge # noqa

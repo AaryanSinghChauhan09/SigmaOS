@@ -1,15 +1,4 @@
 """
-Auto-split from userland\system_api\adaptive_kernel.py — SigmaAdaptiveKernel.inject_workload_signal
+SigmaOS Modular Shim for inject_workload_signal.py
 """
-
-import time
-import threading
-from enum import Enum, auto
-
-
-
-class SigmaAdaptiveKernel:
-    def inject_workload_signal(self, signal: str) -> str:
-        """Feed a process name / keyword into the sensor list."""
-        self._sensors.append(signal)
-        return f"AdaptiveKernel: Signal '{signal}' injected into workload sensor."
+from .inject_workload_signal._SigmaAdaptiveKernel_core import SigmaAdaptiveKernel # noqa

@@ -1,15 +1,4 @@
 """
-Auto-split from userland\system_api\games\puzzle.py — LogicGridPuzzle.assign
+SigmaOS Modular Shim for assign.py
 """
-
-import random
-import time
-from typing import List, Tuple, Dict, Any, Optional, Set
-from .base import SigmaGame
-
-
-
-class LogicGridPuzzle:
-    def assign(self, person, language):
-        self.answers[person] = language
-        self.moves = int(self.moves) + 1
+from .assign._LogicGridPuzzle_core import LogicGridPuzzle # noqa

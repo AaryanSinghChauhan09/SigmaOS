@@ -1,21 +1,4 @@
 """
-Auto-split from sigma_cli.py — cmd_apex
+SigmaOS Modular Shim for cmd_apex.py
 """
-
-import sys
-import os
-import argparse
-import json
-import textwrap
-import time
-from sigma_core import SigmaKernel, SigmaConfig
-
-
-
-def cmd_apex(kernel: SigmaKernel, args):
-    hdr('APEX SEQUENCE — SYSTEM SINGULARITY')
-    info('Engaging multi-layer optimization and security shields...')
-    results = kernel.execute_apex_sequence()
-    for k, v in results.items():
-        ok(f'{k.upper()}: {v}')
-    ok('System is now in a state of absolute supremacy.')
+from .cmd_apex.cmd_apex import cmd_apex # noqa

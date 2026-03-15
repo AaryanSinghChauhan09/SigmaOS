@@ -1,12 +1,4 @@
 """
-Auto-split from sigma_core\system\mode_manager.py — SigmaModeManager.get_all_modes
+SigmaOS Modular Shim for get_all_modes.py
 """
-
-from typing import Dict, List, Any, Callable, Optional
-import time
-
-
-
-class SigmaModeManager:
-    def get_all_modes(self) -> List[str]:
-        return list(self._modes.keys())
+from .get_all_modes._SigmaModeManager_core import SigmaModeManager # noqa

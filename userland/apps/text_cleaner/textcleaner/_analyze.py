@@ -1,15 +1,4 @@
 """
-Auto-split from userland\apps\text_cleaner.py — TextCleaner._analyze
+SigmaOS Modular Shim for _analyze.py
 """
-
-import tkinter as tk
-from tkinter import ttk, scrolledtext, messagebox
-import re
-import string
-import random
-
-
-
-class TextCleaner:
-    def _analyze(self):
-        messagebox.showinfo('Neural Analysis', 'Detected Intent: INFORMATIONAL\nSensitivity: LOW\nSentiment: NEUTRAL (0.00)\nArtifact Integrity: 100%')
+from ._analyze._TextCleaner_core import TextCleaner # noqa

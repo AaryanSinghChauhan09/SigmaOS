@@ -1,17 +1,4 @@
 """
-Auto-split from userland\system_api\linux_parity_engine.py — SigmaSnapshotEngine.rollback
+SigmaOS Modular Shim for rollback.py
 """
-
-import time
-import uuid
-import random
-from typing import Dict, List, Any
-
-
-
-class SigmaSnapshotEngine:
-    def rollback(self, snap_id: str) -> Dict:
-        snap = next((s for s in self._snapshots if s['id'] == snap_id), None)
-        if not snap:
-            return {'status': 'ERR', 'message': f"Snapshot '{snap_id}' not found."}
-        return {'status': 'OK', 'message': f"[snapshot] ROLLBACK to '{snap_id}' ({snap['label']}) initiated. System will restore on next reboot.", 'requires_reboot': True}
+from .rollback._SigmaSnapshotEngine_core import SigmaSnapshotEngine # noqa

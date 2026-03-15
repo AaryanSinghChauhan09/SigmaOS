@@ -1,18 +1,4 @@
 """
-Auto-split from userland\apps\omni_tools_android.py — OmniToolsApp._date_diff
+SigmaOS Modular Shim for _date_diff.py
 """
-
-import tkinter as tk
-from tkinter import ttk, messagebox, colorchooser, filedialog
-import math
-import random
-import string
-import secrets
-import datetime
-
-
-
-class OmniToolsApp:
-    def _date_diff(self) -> None:
-        today = datetime.date.today()
-        messagebox.showinfo('Date', f'Today: {today}\nDay of year: {today.timetuple().tm_yday}\nWeek: {today.isocalendar()[1]}')
+from ._date_diff._OmniToolsApp_core import OmniToolsApp # noqa

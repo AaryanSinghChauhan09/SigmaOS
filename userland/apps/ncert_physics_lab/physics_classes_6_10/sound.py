@@ -1,12 +1,4 @@
 """
-Auto-split from userland\apps\ncert_physics_lab.py — Physics_Classes_6_10.sound
+SigmaOS Modular Shim for sound.py
 """
-
-import math, random
-
-
-
-class Physics_Classes_6_10:
-    @staticmethod
-    def sound(f, l):
-        return {'v (m/s)': _r(f * l, 1)}
+from .sound._Physics_Classes_6_10_core import Physics_Classes_6_10 # noqa

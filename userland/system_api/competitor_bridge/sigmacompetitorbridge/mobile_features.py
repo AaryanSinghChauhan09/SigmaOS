@@ -1,10 +1,4 @@
 """
-Auto-split from userland\system_api\competitor_bridge.py — SigmaCompetitorBridge.mobile_features
+SigmaOS Modular Shim for mobile_features.py
 """
-
-
-
-class SigmaCompetitorBridge:
-    def mobile_features(self):
-        """Implements Android/iOS features (Mobile Bridge & Privacy App Sandboxing)."""
-        return {'Android_APK_Runtime': 'Sovereign-Android-Runtime (Native Android app support)', 'iOS_App_Sandboxing': 'Ring-0 Kernel Sandboxing (Strict per-app data isolation)', 'Granular_Permissions': 'Sigma-Privacy-Guard (Revoke mic/cam/location per app)', 'Digital_Wellbeing': 'Sigma-Focus-Mode (App timers and notification suppression)', 'Doze_Battery_Saver': 'Adaptive Energy Engine (AI-driven background process suspension)', 'FaceID_Privacy': 'Sigma-Neural-Identity (On-device IR-depth facial authentication)'}
+from .mobile_features._SigmaCompetitorBridge_core import SigmaCompetitorBridge # noqa

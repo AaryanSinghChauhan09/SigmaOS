@@ -1,12 +1,4 @@
 """
-Auto-split from ecosystem\pdf_forge.py — SigmaPDFForge.rotate_pages
+SigmaOS Modular Shim for rotate_pages.py
 """
-
-from sigma_core.system.sovereign_app import SovereignApp
-
-
-
-class SigmaPDFForge:
-    def rotate_pages(self, angle=90):
-        """Rotates all pages by the specified angle."""
-        return f'PDF Forge (Rotate): All pages shifted by {angle} degrees.'
+from .rotate_pages._SigmaPDFForge_core import SigmaPDFForge # noqa

@@ -1,19 +1,4 @@
 """
-Auto-split from userland\system_api\sigma_std.py — SigmaMath.l2_norm
+SigmaOS Modular Shim for l2_norm.py
 """
-
-import sys
-import os
-import time
-import json
-import hashlib
-import hmac
-import urllib.request
-import subprocess
-
-
-
-class SigmaMath:
-    @staticmethod
-    def l2_norm(vector: list):
-        return sum((x * x for x in vector)) ** 0.5
+from .l2_norm._SigmaMath_core import SigmaMath # noqa

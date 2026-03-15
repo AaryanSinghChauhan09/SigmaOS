@@ -1,12 +1,4 @@
 """
-Auto-split from userland\apps\ncert_maths_lab.py — Maths_Classes_6_10.trig
+SigmaOS Modular Shim for trig.py
 """
-
-import math, random
-
-
-
-class Maths_Classes_6_10:
-    @staticmethod
-    def trig(a, d):
-        return {'Height': _r(d * math.tan(math.radians(a)), 2)}
+from .trig._Maths_Classes_6_10_core import Maths_Classes_6_10 # noqa

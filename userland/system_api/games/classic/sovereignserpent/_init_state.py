@@ -1,14 +1,4 @@
 """
-Auto-split from userland\system_api\games\classic.py — SovereignSerpent._init_state
+SigmaOS Modular Shim for _init_state.py
 """
-
-import random
-from typing import List, Tuple, Dict, Any, Optional
-from .base import SigmaGame
-
-
-
-class SovereignSerpent:
-    def _init_state(self):
-        self.positions: Dict[str, int] = {}
-        self.players: List[str] = []
+from ._init_state._SovereignSerpent_core import SovereignSerpent # noqa

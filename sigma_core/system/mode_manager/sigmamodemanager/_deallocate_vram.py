@@ -1,13 +1,4 @@
 """
-Auto-split from sigma_core\system\mode_manager.py — SigmaModeManager._deallocate_vram
+SigmaOS Modular Shim for _deallocate_vram.py
 """
-
-from typing import Dict, List, Any, Callable, Optional
-import time
-
-
-
-class SigmaModeManager:
-    def _deallocate_vram(self, phase: str='') -> str:
-        """Simulates deallocating VRAM."""
-        return 'VRAM deallocated.'
+from ._deallocate_vram._SigmaModeManager_core import SigmaModeManager # noqa

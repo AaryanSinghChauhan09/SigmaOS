@@ -1,10 +1,4 @@
 """
-Auto-split from userland\system_api\competitor_bridge.py — SigmaCompetitorBridge.windows_compatibility_layer
+SigmaOS Modular Shim for windows_compatibility_layer.py
 """
-
-
-
-class SigmaCompetitorBridge:
-    def windows_compatibility_layer(self):
-        """USP: Sovereign-Bridge v2."""
-        return {'Feature': 'Sovereign-Bridge v2 (Native-speed .exe & .msi execution)'}
+from .windows_compatibility_layer._SigmaCompetitorBridge_core import SigmaCompetitorBridge # noqa

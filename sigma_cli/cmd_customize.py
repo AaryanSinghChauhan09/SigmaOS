@@ -1,21 +1,4 @@
 """
-Auto-split from sigma_cli.py — cmd_customize
+SigmaOS Modular Shim for cmd_customize.py
 """
-
-import sys
-import os
-import argparse
-import json
-import textwrap
-import time
-from sigma_core import SigmaKernel, SigmaConfig
-
-
-
-def cmd_customize(kernel: SigmaKernel, args):
-    hdr('UI/UX CUSTOMIZATION ENGINE')
-    if hasattr(args, 'theme') and args.theme:
-        ok(f'Render Engine: Overridden system theme to [{args.theme.upper()}] natively via CLI.')
-    else:
-        info('Usage: python -m sigma_cli customize <ThemeName>')
-        info('Available Built-in Themes: Midnight, Cyber, Snow, Rose')
+from .cmd_customize.cmd_customize import cmd_customize # noqa

@@ -1,13 +1,4 @@
 """
-Auto-split from sigma_core\system\mode_manager.py — SigmaModeManager._flush_disk_cache
+SigmaOS Modular Shim for _flush_disk_cache.py
 """
-
-from typing import Dict, List, Any, Callable, Optional
-import time
-
-
-
-class SigmaModeManager:
-    def _flush_disk_cache(self, phase: str='') -> str:
-        """Simulates flushing disk cache."""
-        return 'Disk cache flushed.'
+from ._flush_disk_cache._SigmaModeManager_core import SigmaModeManager # noqa

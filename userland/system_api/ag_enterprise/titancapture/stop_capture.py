@@ -1,16 +1,4 @@
 """
-Auto-split from userland\system_api\ag_enterprise.py — TitanCapture.stop_capture
+SigmaOS Modular Shim for stop_capture.py
 """
-
-import os
-import re
-import json
-import time
-from typing import List, Dict, Any, Optional
-
-
-
-class TitanCapture:
-    def stop_capture(self) -> str:
-        self.is_recording = False
-        return 'Capture finalized. Logged to Sovereign Ledger.'
+from .stop_capture._TitanCapture_core import TitanCapture # noqa

@@ -1,14 +1,4 @@
 """
-Auto-split from userland\apps\ncert_physics_lab.py — Physics_Classes_11_12.resonance
+SigmaOS Modular Shim for resonance.py
 """
-
-import math, random
-
-
-
-class Physics_Classes_11_12:
-    @staticmethod
-    def resonance(f, l1_cm):
-        l1 = l1_cm / 100
-        v = 4 * f * (l1 + 0.3 * (2 * 0.02))
-        return {'Speed of Sound (m/s)': _r(v, 2)}
+from .resonance._Physics_Classes_11_12_core import Physics_Classes_11_12 # noqa

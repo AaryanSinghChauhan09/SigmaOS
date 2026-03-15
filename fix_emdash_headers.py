@@ -1,7 +1,7 @@
 """Rewrite the 24 files with bad em-dash on line 1 of their docstring."""
 import ast, os
 
-ROOT = r'c:\Users\Aaryan\Downloads\SigmaOS'
+ROOT = r'C:\Users\SigmaUser\Downloads\SigmaOS'
 BADS = [
     r'sigma_core\system\update_manager\sigmaupdatemanager\check_for_updates.py',
     r'sigma_core\system\update_manager\sigmaupdatemanager\hot_patch_module.py',

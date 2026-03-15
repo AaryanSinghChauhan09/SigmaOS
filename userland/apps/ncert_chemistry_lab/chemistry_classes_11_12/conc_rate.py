@@ -1,13 +1,4 @@
 """
-Auto-split from userland\apps\ncert_chemistry_lab.py — Chemistry_Classes_11_12.conc_rate
+SigmaOS Modular Shim for conc_rate.py
 """
-
-import math, re
-
-
-
-class Chemistry_Classes_11_12:
-    @staticmethod
-    def conc_rate(c1, c2, t):
-        rate = abs(c2 - c1) / t
-        return {'Rate (M/s)': f'{rate:.4e}', 'Order': 'Assumed First Order'}
+from .conc_rate._Chemistry_Classes_11_12_core import Chemistry_Classes_11_12 # noqa

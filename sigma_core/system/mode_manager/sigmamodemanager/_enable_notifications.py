@@ -1,13 +1,4 @@
 """
-Auto-split from sigma_core\system\mode_manager.py — SigmaModeManager._enable_notifications
+SigmaOS Modular Shim for _enable_notifications.py
 """
-
-from typing import Dict, List, Any, Callable, Optional
-import time
-
-
-
-class SigmaModeManager:
-    def _enable_notifications(self, phase: str='') -> str:
-        """Simulates enabling system notifications."""
-        return 'Notifications enabled.'
+from ._enable_notifications._SigmaModeManager_core import SigmaModeManager # noqa

@@ -1,14 +1,4 @@
 """
-Auto-split from sigma_core\system\mode_manager.py — SigmaModeManager._run_compliance_audit
+SigmaOS Modular Shim for _run_compliance_audit.py
 """
-
-from typing import Dict, List, Any, Callable, Optional
-import time
-
-
-
-class SigmaModeManager:
-    def _run_compliance_audit(self, phase: str='') -> str:
-        if self.kernel and self.kernel.compliance:
-            return str(self.kernel.compliance.run_full_compliance_audit())
-        return 'Compliance Auditor offline.'
+from ._run_compliance_audit._SigmaModeManager_core import SigmaModeManager # noqa

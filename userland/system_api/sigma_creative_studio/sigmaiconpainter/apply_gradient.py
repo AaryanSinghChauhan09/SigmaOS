@@ -1,10 +1,4 @@
 """
-Auto-split from userland\system_api\sigma_creative_studio.py — SigmaIconPainter.apply_gradient
+SigmaOS Modular Shim for apply_gradient.py
 """
-
-
-
-class SigmaIconPainter:
-    def apply_gradient(self, color_start, color_end, direction='vertical'):
-        """Applies a stunning CSS-style gradient to the icon background."""
-        return f'IconPainter (Gradient): {direction} gradient [{color_start} -> {color_end}] applied.'
+from .apply_gradient._SigmaIconPainter_core import SigmaIconPainter # noqa

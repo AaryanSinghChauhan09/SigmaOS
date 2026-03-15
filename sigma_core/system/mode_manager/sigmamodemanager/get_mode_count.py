@@ -1,13 +1,4 @@
 """
-Auto-split from sigma_core\system\mode_manager.py — SigmaModeManager.get_mode_count
+SigmaOS Modular Shim for get_mode_count.py
 """
-
-from typing import Dict, List, Any, Callable, Optional
-import time
-
-
-
-class SigmaModeManager:
-    def get_mode_count(self) -> int:
-        """Returns the total number of available modes."""
-        return len(self._modes)
+from .get_mode_count._SigmaModeManager_core import SigmaModeManager # noqa

@@ -1,17 +1,4 @@
 """
-Auto-split from userland\system_api\app_prewarmer.py — SigmaAppPrewarmer._predict_and_warm
+SigmaOS Modular Shim for _predict_and_warm.py
 """
-
-import time
-import uuid
-import threading
-from typing import Dict, List, Any, Optional
-
-
-
-class SigmaAppPrewarmer:
-    def _predict_and_warm(self, current_app: str):
-        """Neural heuristic: if I launched X, I will probably launch Y."""
-        predictions = self._transition_matrix.get(current_app.lower(), [])
-        for p in predictions:
-            self.prewarm(p)
+from ._predict_and_warm._SigmaAppPrewarmer_core import SigmaAppPrewarmer # noqa

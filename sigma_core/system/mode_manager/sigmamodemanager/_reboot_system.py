@@ -1,13 +1,4 @@
 """
-Auto-split from sigma_core\system\mode_manager.py — SigmaModeManager._reboot_system
+SigmaOS Modular Shim for _reboot_system.py
 """
-
-from typing import Dict, List, Any, Callable, Optional
-import time
-
-
-
-class SigmaModeManager:
-    def _reboot_system(self, phase: str='') -> str:
-        """Simulates initiating a system reboot."""
-        return 'System reboot initiated.'
+from ._reboot_system._SigmaModeManager_core import SigmaModeManager # noqa

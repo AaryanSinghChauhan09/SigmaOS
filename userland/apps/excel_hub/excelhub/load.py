@@ -1,15 +1,4 @@
 """
-Auto-split from userland\apps\excel_hub.py — ExcelHub.load
+SigmaOS Modular Shim for load.py
 """
-
-import tkinter as tk
-from tkinter import ttk, scrolledtext, filedialog, messagebox
-import random
-import time
-
-
-
-class ExcelHub:
-    def load(self):
-        filedialog.askopenfilename()
-        self._add_log('SYSTEM', 'DATASET HYDRATED INTO MEMORY.', PAL['accent'])
+from .load._ExcelHub_core import ExcelHub # noqa

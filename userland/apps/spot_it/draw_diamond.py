@@ -1,15 +1,4 @@
 """
-Auto-split from userland\apps\spot_it.py — draw_diamond
+SigmaOS Modular Shim for draw_diamond.py
 """
-
-import tkinter as tk
-from tkinter import messagebox
-import random
-import time
-import math
-
-
-
-def draw_diamond(c, cx, cy, s, col, outline='#FFFFFF'):
-    pts = [cx, cy - s, cx + s, cy, cx, cy + s, cx - s, cy]
-    c.create_polygon(pts, fill=col, outline=outline, width=2)
+from .draw_diamond.draw_diamond import draw_diamond # noqa

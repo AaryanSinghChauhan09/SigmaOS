@@ -1,13 +1,4 @@
 """
-Auto-split from ecosystem\bharat_law_bridge.py — SigmaBharatLawBridge.generate_trial_visuals
+SigmaOS Modular Shim for generate_trial_visuals.py
 """
-
-from typing import Dict, List, Any, Optional
-import datetime
-
-
-
-class SigmaBharatLawBridge:
-    def generate_trial_visuals(self, fact_summary: str) -> str:
-        """USP: Automated generation of courtroom exhibits and timelines."""
-        return f'Trial-Exhibit-Gen: Timeline of Events and Cross-Link Mapping generated for: {fact_summary}'
+from .generate_trial_visuals._SigmaBharatLawBridge_core import SigmaBharatLawBridge # noqa

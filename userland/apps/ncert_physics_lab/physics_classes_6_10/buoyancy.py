@@ -1,12 +1,4 @@
 """
-Auto-split from userland\apps\ncert_physics_lab.py — Physics_Classes_6_10.buoyancy
+SigmaOS Modular Shim for buoyancy.py
 """
-
-import math, random
-
-
-
-class Physics_Classes_6_10:
-    @staticmethod
-    def buoyancy(v, d):
-        return {'Upthrust (N)': _r(v * d * 9.81, 2)}
+from .buoyancy._Physics_Classes_6_10_core import Physics_Classes_6_10 # noqa

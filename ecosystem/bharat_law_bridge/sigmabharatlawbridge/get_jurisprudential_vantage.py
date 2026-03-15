@@ -1,13 +1,4 @@
 """
-Auto-split from ecosystem\bharat_law_bridge.py — SigmaBharatLawBridge.get_jurisprudential_vantage
+SigmaOS Modular Shim for get_jurisprudential_vantage.py
 """
-
-from typing import Dict, List, Any, Optional
-import datetime
-
-
-
-class SigmaBharatLawBridge:
-    def get_jurisprudential_vantage(self, school: str) -> str:
-        """Returns the legal philosophical view points."""
-        return self._jurisprudence_views.get(school, 'Vantage point not found.')
+from .get_jurisprudential_vantage._SigmaBharatLawBridge_core import SigmaBharatLawBridge # noqa

@@ -1,14 +1,4 @@
 """
-Auto-split from userland\apps\macro_forge.py — MacroForge._new_macro
+SigmaOS Modular Shim for _new_macro.py
 """
-
-import tkinter as tk
-from tkinter import ttk, messagebox
-import random
-
-
-
-class MacroForge:
-    def _new_macro(self):
-        self.tree.delete(*self.tree.get_children())
-        self.status.config(text='NEW SEQUENCE INITIATED. AWAITING TRIGGERS.', bg=PAL['panel'], fg='white')
+from ._new_macro._MacroForge_core import MacroForge # noqa

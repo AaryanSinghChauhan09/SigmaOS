@@ -1,12 +1,4 @@
 """
-Auto-split from userland\apps\ncert_physics_lab.py — Physics_Classes_11_12.boyle
+SigmaOS Modular Shim for boyle.py
 """
-
-import math, random
-
-
-
-class Physics_Classes_11_12:
-    @staticmethod
-    def boyle(p1, v1, v2):
-        return {'P2 (atm)': _r(p1 * v1 / v2, 3)}
+from .boyle._Physics_Classes_11_12_core import Physics_Classes_11_12 # noqa

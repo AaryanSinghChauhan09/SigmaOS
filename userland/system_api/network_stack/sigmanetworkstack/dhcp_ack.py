@@ -1,19 +1,4 @@
 """
-Auto-split from userland\system_api\network_stack.py — SigmaNetworkStack.dhcp_ack
+SigmaOS Modular Shim for dhcp_ack.py
 """
-
-import time
-import uuid
-import hashlib
-from dataclasses import dataclass, field
-from enum import Enum, auto
-
-
-
-class SigmaNetworkStack:
-    def dhcp_ack(self, ip: str) -> dict:
-        self._stats['dhcp_lease'] = ip
-        iface = self._interfaces.get('eth0')
-        if iface:
-            iface.ip4 = ip
-        return {'status': 'ACK', 'assigned_ip': ip, 'lease_time': 3600, 'message': f'DHCP: Acknowledge received. SigmaOS IP set to {ip}.'}
+from .dhcp_ack._SigmaNetworkStack_core import SigmaNetworkStack # noqa

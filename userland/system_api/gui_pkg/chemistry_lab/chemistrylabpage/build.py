@@ -1,27 +1,4 @@
 """
-Auto-split from userland\system_api\gui_pkg\chemistry_lab.py — ChemistryLabPage.build
+SigmaOS Modular Shim for build.py
 """
-
-import tkinter as tk
-from tkinter import ttk
-import os
-import webbrowser
-import tempfile
-from .base_page import SigmaPage
-from .styles import PAL, FONT_SMALL, FONT_MED
-
-
-
-class ChemistryLabPage:
-    def build(self):
-        self.controller._build_page_header(self, 'QUANTUM CHEMISTRY LAB', 'Browser-based Periodic Table & Equation Balancer')
-        main_panel = tk.Frame(self, bg=PAL['bg'])
-        main_panel.pack(fill='both', expand=True, padx=20, pady=10)
-        card = self.controller._card(main_panel, 'Chemistry Launch Core')
-        card.master.pack(pady=50)
-        tk.Label(card, text='The Quantum Chemistry Lab is a high-performance Browser-Based Utility.', font=FONT_MED, bg=PAL['card'], fg=PAL['dim']).pack(pady=20, padx=20)
-
-        def _launch():
-            self._generate_and_launch_html()
-            self.controller._notify('Chemistry Lab', 'Browser-based lab launched.', 'OK')
-        ttk.Button(card, text='🧪 Launch Chemistry Lab in Browser', command=_launch, style='Teal.TButton').pack(pady=20)
+from .build._ChemistryLabPage_core import ChemistryLabPage # noqa

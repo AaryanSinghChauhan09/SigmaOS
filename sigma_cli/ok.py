@@ -1,16 +1,4 @@
 """
-Auto-split from sigma_cli.py — ok
+SigmaOS Modular Shim for ok.py
 """
-
-import sys
-import os
-import argparse
-import json
-import textwrap
-import time
-from sigma_core import SigmaKernel, SigmaConfig
-
-
-
-def ok(msg):
-    print(f"  {_ansi(C.GREEN, '✔')}  {msg}")
+from .ok.ok import ok # noqa

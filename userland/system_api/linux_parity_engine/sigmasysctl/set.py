@@ -1,15 +1,4 @@
 """
-Auto-split from userland\system_api\linux_parity_engine.py — SigmaSysctl.set
+SigmaOS Modular Shim for set.py
 """
-
-import time
-import uuid
-import random
-from typing import Dict, List, Any
-
-
-
-class SigmaSysctl:
-    def set(self, key: str, value: Any) -> str:
-        self._params[key] = value
-        return f'[sysctl] {key} = {value}'
+from .set._SigmaSysctl_core import SigmaSysctl # noqa

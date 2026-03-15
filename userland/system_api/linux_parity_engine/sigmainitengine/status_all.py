@@ -1,19 +1,4 @@
 """
-Auto-split from userland\system_api\linux_parity_engine.py — SigmaInitEngine.status_all
+SigmaOS Modular Shim for status_all.py
 """
-
-import time
-import uuid
-import random
-from typing import Dict, List, Any
-
-
-
-class SigmaInitEngine:
-    def status_all(self) -> List[str]:
-        lines = []
-        for name, svc in self._services.items():
-            icon = '●' if svc['status'] == 'running' else '○'
-            pid_str = f"PID={svc['pid']}" if svc['pid'] else 'inactive'
-            lines.append(f"  {icon} {name:<22} [{svc['status']:<8}] {pid_str}")
-        return lines
+from .status_all._SigmaInitEngine_core import SigmaInitEngine # noqa

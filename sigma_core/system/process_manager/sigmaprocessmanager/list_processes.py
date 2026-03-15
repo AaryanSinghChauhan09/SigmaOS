@@ -1,17 +1,4 @@
 """
-Auto-split from sigma_core\system\process_manager.py — SigmaProcessManager.list_processes
+SigmaOS Modular Shim for list_processes.py
 """
-
-import time
-import uuid
-import random
-import threading
-from typing import Dict, List, Any, Optional
-from enum import Enum
-from dataclasses import dataclass, field
-
-
-
-class SigmaProcessManager:
-    def list_processes(self) -> List[Dict[str, Any]]:
-        return [{'pid': p.pid, 'name': p.name, 'cpu': p.cpu_pct, 'mem': p.mem_mb} for p in self._procs.values()]
+from .list_processes._SigmaProcessManager_core import SigmaProcessManager # noqa

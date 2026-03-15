@@ -1,15 +1,4 @@
 """
-Auto-split from userland\apps\aurapaint.py — AuraPaint.clear
+SigmaOS Modular Shim for clear.py
 """
-
-import tkinter as tk
-from tkinter import colorchooser, messagebox, ttk, simpledialog, filedialog
-import random
-import os
-from typing import Any
-
-
-
-class AuraPaint:
-    def clear(self):
-        self.canvas.delete('all')
+from .clear._AuraPaint_core import AuraPaint # noqa

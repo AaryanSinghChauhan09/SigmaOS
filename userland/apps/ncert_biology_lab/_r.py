@@ -1,13 +1,4 @@
 """
-Auto-split from userland\apps\ncert_biology_lab.py — _r
+SigmaOS Modular Shim for _r.py
 """
-
-import math, random
-
-
-
-def _r(x, d=4):
-    try:
-        return float(('{:.' + str(int(d)) + 'f}').format(float(x)))
-    except:
-        return x
+from ._r._r import _r # noqa

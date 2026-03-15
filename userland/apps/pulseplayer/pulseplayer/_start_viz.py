@@ -1,16 +1,4 @@
 """
-Auto-split from userland\apps\pulseplayer.py — PulsePlayer._start_viz
+SigmaOS Modular Shim for _start_viz.py
 """
-
-import tkinter as tk
-from tkinter import messagebox, ttk, filedialog
-import time, random, threading, os
-from typing import Any, List, Dict
-
-
-
-class PulsePlayer:
-    def _start_viz(self):
-        self._draw_viz()
-        if self.playing:
-            self.after(80, self._start_viz)
+from ._start_viz._PulsePlayer_core import PulsePlayer # noqa

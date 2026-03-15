@@ -1,13 +1,4 @@
 """
-Auto-split from sigma_core\system\mode_manager.py — SigmaModeManager._mute_system_sounds
+SigmaOS Modular Shim for _mute_system_sounds.py
 """
-
-from typing import Dict, List, Any, Callable, Optional
-import time
-
-
-
-class SigmaModeManager:
-    def _mute_system_sounds(self, phase: str='') -> str:
-        """Simulates muting system sounds."""
-        return 'System sounds muted.'
+from ._mute_system_sounds._SigmaModeManager_core import SigmaModeManager # noqa

@@ -1,13 +1,4 @@
 """
-Auto-split from userland\system_api\aether_assistant.py — AetherAssistant.health_check
+SigmaOS Modular Shim for health_check.py
 """
-
-import re
-import time
-from typing import Dict, List, Any
-
-
-
-class AetherAssistant:
-    def health_check(self) -> str:
-        return f'OK — Aether Core NLP Engine Active. Vocabulary constraint: {len(self._intents)} intents.'
+from .health_check._AetherAssistant_core import AetherAssistant # noqa

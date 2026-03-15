@@ -1,13 +1,4 @@
 """
-Auto-split from ecosystem\pdf_forge.py — SigmaPDFForge.log_to_forensic_ledger
+SigmaOS Modular Shim for log_to_forensic_ledger.py
 """
-
-from sigma_core.system.sovereign_app import SovereignApp
-
-
-
-class SigmaPDFForge:
-    def log_to_forensic_ledger(self, action):
-        """SigmaOS Integration: Every professional action is logged to the immutable OS ledger."""
-        print(f'[FORENSIC-LOG] PDF_FORGE_ACTION: {action} [HASH: 0xSigmaDoc_{hash(action)}]')
-        return True
+from .log_to_forensic_ledger._SigmaPDFForge_core import SigmaPDFForge # noqa

@@ -1,16 +1,4 @@
 """
-Auto-split from sigma_cli.py — hdr
+SigmaOS Modular Shim for hdr.py
 """
-
-import sys
-import os
-import argparse
-import json
-import textwrap
-import time
-from sigma_core import SigmaKernel, SigmaConfig
-
-
-
-def hdr(msg):
-    print(f"\n{_ansi(C.BOLD + C.MAGENTA, '━━━ ' + msg + ' ━━━')}")
+from .hdr.hdr import hdr # noqa

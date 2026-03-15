@@ -1,14 +1,4 @@
 """
-Auto-split from userland\system_api\games\puzzle.py — CrosswordLite._init_state
+SigmaOS Modular Shim for _init_state.py
 """
-
-import random
-import time
-from typing import List, Tuple, Dict, Any, Optional, Set
-from .base import SigmaGame
-
-
-
-class CrosswordLite:
-    def _init_state(self):
-        self.answers = {}
+from ._init_state._CrosswordLite_core import CrosswordLite # noqa

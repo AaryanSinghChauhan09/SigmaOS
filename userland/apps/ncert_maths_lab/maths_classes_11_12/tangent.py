@@ -1,13 +1,4 @@
 """
-Auto-split from userland\apps\ncert_maths_lab.py — Maths_Classes_11_12.tangent
+SigmaOS Modular Shim for tangent.py
 """
-
-import math, random
-
-
-
-class Maths_Classes_11_12:
-    @staticmethod
-    def tangent(m, x):
-        y = x ** 2
-        return {'Slope m': m, 'Equation': f'y - {y} = {m}(x - {x})'}
+from .tangent._Maths_Classes_11_12_core import Maths_Classes_11_12 # noqa

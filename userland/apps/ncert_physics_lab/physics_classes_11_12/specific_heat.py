@@ -1,12 +1,4 @@
 """
-Auto-split from userland\apps\ncert_physics_lab.py — Physics_Classes_11_12.specific_heat
+SigmaOS Modular Shim for specific_heat.py
 """
-
-import math, random
-
-
-
-class Physics_Classes_11_12:
-    @staticmethod
-    def specific_heat(m, q, dt):
-        return {'c (J/kg.K)': _r(q / (m * dt), 1)}
+from .specific_heat._Physics_Classes_11_12_core import Physics_Classes_11_12 # noqa

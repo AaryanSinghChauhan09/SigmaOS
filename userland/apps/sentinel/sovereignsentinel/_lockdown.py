@@ -1,14 +1,4 @@
 """
-Auto-split from userland\apps\sentinel.py — SovereignSentinel._lockdown
+SigmaOS Modular Shim for _lockdown.py
 """
-
-import tkinter as tk
-from tkinter import ttk, scrolledtext, messagebox
-import random, time, os, sys, threading, subprocess
-
-
-
-class SovereignSentinel:
-    def _lockdown(self):
-        messagebox.showinfo('LOCKDOWN', 'Zero-Trust Lockdown ENGAGED.\n• All inbound connections: BLOCKED\n• Outbound: Whitelist only\n• SELinux: Enforcing\n• Process signing: MANDATORY')
-        self.global_status.config(text='● LOCKDOWN ACTIVE', fg=PAL['danger'])
+from ._lockdown._SovereignSentinel_core import SovereignSentinel # noqa

@@ -1,14 +1,4 @@
 """
-Auto-split from userland\apps\excel_hub.py — ExcelHub.save
+SigmaOS Modular Shim for save.py
 """
-
-import tkinter as tk
-from tkinter import ttk, scrolledtext, filedialog, messagebox
-import random
-import time
-
-
-
-class ExcelHub:
-    def save(self):
-        messagebox.showinfo('Excel Pro', 'Workbook serialized and committed to Sovereign Vault.')
+from .save._ExcelHub_core import ExcelHub # noqa

@@ -1,15 +1,4 @@
 """
-Auto-split from userland\apps\aurapaint.py — AuraPaint.save
+SigmaOS Modular Shim for save.py
 """
-
-import tkinter as tk
-from tkinter import colorchooser, messagebox, ttk, simpledialog, filedialog
-import random
-import os
-from typing import Any
-
-
-
-class AuraPaint:
-    def save(self):
-        messagebox.showinfo('Export', 'Artifact committed to Sovereign Ledger (PNG/Vector).')
+from .save._AuraPaint_core import AuraPaint # noqa

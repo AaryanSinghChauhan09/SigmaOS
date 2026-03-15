@@ -1,15 +1,4 @@
 """
-Auto-split from userland\apps\ncert_physics_lab.py — Physics_Classes_6_10.eye
+SigmaOS Modular Shim for eye.py
 """
-
-import math, random
-
-
-
-class Physics_Classes_6_10:
-    @staticmethod
-    def eye(d):
-        if d < 0.25:
-            return {'Status': 'Blurry', 'Reason': 'Near point limit (25cm)'}
-        p = 1 / d
-        return {'Lens Power (D)': _r(p, 2), 'Acommodation': 'Active'}
+from .eye._Physics_Classes_6_10_core import Physics_Classes_6_10 # noqa

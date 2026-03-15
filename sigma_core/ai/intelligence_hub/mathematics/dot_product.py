@@ -1,14 +1,4 @@
 """
-Auto-split from sigma_core\ai\intelligence_hub.py — Mathematics.dot_product
+SigmaOS Modular Shim for dot_product.py
 """
-
-import math
-import random
-import time
-from typing import List, Dict, Any, Optional
-
-
-
-class Mathematics:
-    def dot_product(self, v1: List[float], v2: List[float]) -> float:
-        return sum((a * b for a, b in zip(v1, v2)))
+from .dot_product._Mathematics_core import Mathematics # noqa

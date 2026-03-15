@@ -1,13 +1,4 @@
 """
-Auto-split from userland\apps\ncert_physics_lab.py — Physics_Classes_11_12.photo
+SigmaOS Modular Shim for photo.py
 """
-
-import math, random
-
-
-
-class Physics_Classes_11_12:
-    @staticmethod
-    def photo(lam, phi):
-        e = 1240 / lam
-        return {'E_ph (eV)': _r(e, 2), 'Emission': e > phi}
+from .photo._Physics_Classes_11_12_core import Physics_Classes_11_12 # noqa

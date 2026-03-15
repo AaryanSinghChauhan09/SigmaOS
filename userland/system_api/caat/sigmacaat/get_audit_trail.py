@@ -1,15 +1,4 @@
 """
-Auto-split from userland\system_api\caat.py — SigmaCAAT.get_audit_trail
+SigmaOS Modular Shim for get_audit_trail.py
 """
-
-from enum import Enum
-import time
-import random
-from dataclasses import dataclass, field
-
-
-
-class SigmaCAAT:
-    def get_audit_trail(self) -> list[dict]:
-        """The 'Explain' phase for the user empowerment dashboard."""
-        return self._audit_log[-10:]
+from .get_audit_trail._SigmaCAAT_core import SigmaCAAT # noqa

@@ -1,14 +1,4 @@
 """
-Auto-split from userland\apps\ncert_physics_lab.py — Physics_Classes_11_12.cooling
+SigmaOS Modular Shim for cooling.py
 """
-
-import math, random
-
-
-
-class Physics_Classes_11_12:
-    @staticmethod
-    def cooling(te, to, k):
-        t_seq = [0, 5, 10, 20, 30]
-        res = {f'T at {t}m': _r(te + (to - te) * math.exp(-k * t), 1) for t in t_seq}
-        return res
+from .cooling._Physics_Classes_11_12_core import Physics_Classes_11_12 # noqa

@@ -1,12 +1,4 @@
 """
-Auto-split from userland\apps\ncert_chemistry_lab.py — Chemistry_Classes_6_10.stoich
+SigmaOS Modular Shim for stoich.py
 """
-
-import math, re
-
-
-
-class Chemistry_Classes_6_10:
-    @staticmethod
-    def stoich(m, mmr, mmp):
-        return {'Product Mass': _r(m / mmr * mmp, 2)}
+from .stoich._Chemistry_Classes_6_10_core import Chemistry_Classes_6_10 # noqa

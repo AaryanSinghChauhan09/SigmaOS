@@ -1,13 +1,4 @@
 """
-Auto-split from sigma_core\system\mode_manager.py — SigmaModeManager._run_system_diagnostics
+SigmaOS Modular Shim for _run_system_diagnostics.py
 """
-
-from typing import Dict, List, Any, Callable, Optional
-import time
-
-
-
-class SigmaModeManager:
-    def _run_system_diagnostics(self, phase: str='') -> str:
-        """Simulates running system diagnostics."""
-        return 'System diagnostics running.'
+from ._run_system_diagnostics._SigmaModeManager_core import SigmaModeManager # noqa

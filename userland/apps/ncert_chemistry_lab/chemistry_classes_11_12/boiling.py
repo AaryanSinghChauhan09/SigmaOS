@@ -1,13 +1,4 @@
 """
-Auto-split from userland\apps\ncert_chemistry_lab.py — Chemistry_Classes_11_12.boiling
+SigmaOS Modular Shim for boiling.py
 """
-
-import math, re
-
-
-
-class Chemistry_Classes_11_12:
-    @staticmethod
-    def boiling(kb, m, i):
-        dt = i * kb * m
-        return {'Delta Tb': _r(dt, 3)}
+from .boiling._Chemistry_Classes_11_12_core import Chemistry_Classes_11_12 # noqa

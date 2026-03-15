@@ -1,15 +1,4 @@
 """
-Auto-split from userland\apps\package_weaver.py — PackageWeaver._sync_repos
+SigmaOS Modular Shim for _sync_repos.py
 """
-
-import tkinter as tk
-from tkinter import ttk, messagebox
-import random
-import time
-
-
-
-class PackageWeaver:
-    def _sync_repos(self):
-        self.status.config(text='FETCHING LEDGERS FROM MIRROR NODES...', bg=PAL['warning'], fg='black')
-        self.after(2000, lambda: self.status.config(text='14,092 PACKAGES INDEXED | DEPENDENCIES RESOLVED', bg=PAL['success'], fg='black'))
+from ._sync_repos._PackageWeaver_core import PackageWeaver # noqa

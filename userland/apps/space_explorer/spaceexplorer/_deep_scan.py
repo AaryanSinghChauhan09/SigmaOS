@@ -1,15 +1,4 @@
 """
-Auto-split from userland\apps\space_explorer.py — SpaceExplorer._deep_scan
+SigmaOS Modular Shim for _deep_scan.py
 """
-
-import tkinter as tk
-from tkinter import ttk, messagebox, filedialog
-import os
-import random
-
-
-
-class SpaceExplorer:
-    def _deep_scan(self):
-        self.status.config(text='DEEP NEURAL SCAN ENGAGED. ANALYZING QUANTUM CLUSTERS...', bg=PAL['danger'])
-        self.after(2000, lambda: self._complete_scan('DEEP NEURAL'))
+from ._deep_scan._SpaceExplorer_core import SpaceExplorer # noqa

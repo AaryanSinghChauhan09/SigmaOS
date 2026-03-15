@@ -1,17 +1,4 @@
 """
-Auto-split from userland\system_api\gui_pkg\intelligence_hub_page.py — IntelligenceHubPage._plot_linear
+SigmaOS Modular Shim for _plot_linear.py
 """
-
-import tkinter as tk
-from tkinter import ttk
-import random
-from .base_page import SigmaPage
-from .styles import PAL, FONT_BOLD, FONT_MED, FONT_SMALL
-
-
-
-class IntelligenceHubPage:
-    def _plot_linear(self):
-        self.plot_canvas.delete('all')
-        self.plot_canvas.create_line(10, 170, 380, 20, fill=PAL['accent'], width=2, smooth=True)
-        self.gui._notify('Plotly.js', 'Linear regression trend-line projected.', 'OK')
+from ._plot_linear._IntelligenceHubPage_core import IntelligenceHubPage # noqa

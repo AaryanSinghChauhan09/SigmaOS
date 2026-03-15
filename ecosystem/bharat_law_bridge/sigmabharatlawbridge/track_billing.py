@@ -1,14 +1,4 @@
 """
-Auto-split from ecosystem\bharat_law_bridge.py — SigmaBharatLawBridge.track_billing
+SigmaOS Modular Shim for track_billing.py
 """
-
-from typing import Dict, List, Any, Optional
-import datetime
-
-
-
-class SigmaBharatLawBridge:
-    def track_billing(self, client_id: str, hours: float, rate: float, activity: str):
-        entry = {'id': client_id, 'amount': hours * rate, 'act': activity, 'date': str(datetime.date.today())}
-        self._billing_entries.append(entry)
-        return f"Billing Log: ₹{entry['amount']} for {activity} recorded."
+from .track_billing._SigmaBharatLawBridge_core import SigmaBharatLawBridge # noqa

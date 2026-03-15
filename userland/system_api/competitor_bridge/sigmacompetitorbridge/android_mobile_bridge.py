@@ -1,10 +1,4 @@
 """
-Auto-split from userland\system_api\competitor_bridge.py — SigmaCompetitorBridge.android_mobile_bridge
+SigmaOS Modular Shim for android_mobile_bridge.py
 """
-
-
-
-class SigmaCompetitorBridge:
-    def android_mobile_bridge(self):
-        """USP: Sovereign-Android-Runtime."""
-        return {'Feature': 'Sovereign-Android-Runtime (Native Android app support)'}
+from .android_mobile_bridge._SigmaCompetitorBridge_core import SigmaCompetitorBridge # noqa

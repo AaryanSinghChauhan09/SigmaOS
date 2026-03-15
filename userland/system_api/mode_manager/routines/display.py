@@ -1,26 +1,8 @@
-"""mode_manager.routines.display — Display control routines."""
-
-
-def monitor_cpu_temp(phase: str = "") -> str:
-    """Simulates starting CPU temperature monitoring."""
-    return "CPU temperature monitoring started."
-
-
-def dim_display(phase: str = "") -> str:
-    """Simulates dimming the display."""
-    return "Display dimmed."
-
-
-def restore_display(phase: str = "") -> str:
-    """Simulates restoring display brightness."""
-    return "Display brightness restored."
-
-
-def calibrate_display(phase: str = "") -> str:
-    """Simulates display calibration."""
-    return "Display calibrated."
-
-
-def reset_display_calibration(phase: str = "") -> str:
-    """Simulates resetting display calibration."""
-    return "Display calibration reset."
+"""
+SigmaOS Modular Shim for display.py
+"""
+from .display.monitor_cpu_temp import monitor_cpu_temp # noqa
+from .display.dim_display import dim_display # noqa
+from .display.restore_display import restore_display # noqa
+from .display.calibrate_display import calibrate_display # noqa
+from .display.reset_display_calibration import reset_display_calibration # noqa

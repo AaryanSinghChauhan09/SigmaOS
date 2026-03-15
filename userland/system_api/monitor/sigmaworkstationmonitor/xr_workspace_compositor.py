@@ -1,14 +1,4 @@
 """
-Auto-split from userland\system_api\monitor.py — SigmaWorkstationMonitor.xr_workspace_compositor
+SigmaOS Modular Shim for xr_workspace_compositor.py
 """
-
-import os
-import random
-import time
-
-
-
-class SigmaWorkstationMonitor:
-    def xr_workspace_compositor(self):
-        """Native XR compositor for spatial computing (AR/VR) environments."""
-        return 'SigmaXR: [READY] Initializing spatial coordinate mapping for Mixed-Reality Workspace.'
+from .xr_workspace_compositor._SigmaWorkstationMonitor_core import SigmaWorkstationMonitor # noqa

@@ -1,18 +1,4 @@
 """
-Auto-split from sigma_core\system\sigma_fs.py — SigmaFS.flush_intent_log
+SigmaOS Modular Shim for flush_intent_log.py
 """
-
-import time
-import hashlib
-import uuid
-import random
-from dataclasses import dataclass, field
-from enum import Enum, auto
-from pathlib import PurePosixPath
-
-
-
-class SigmaFS:
-    def flush_intent_log(self):
-        """Clears the intent log once CoW tree is finalized."""
-        self._intent_log.clear()
+from .flush_intent_log._SigmaFS_core import SigmaFS # noqa

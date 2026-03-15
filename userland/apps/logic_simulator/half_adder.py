@@ -1,11 +1,4 @@
 """
-Auto-split from userland\apps\logic_simulator.py — half_adder
+SigmaOS Modular Shim for half_adder.py
 """
-
-import tkinter as tk
-from tkinter import ttk
-
-
-
-def half_adder(A, B):
-    return (A ^ B, A & B)
+from .half_adder.half_adder import half_adder # noqa

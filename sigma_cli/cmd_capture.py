@@ -1,18 +1,4 @@
 """
-Auto-split from sigma_cli.py — cmd_capture
+SigmaOS Modular Shim for cmd_capture.py
 """
-
-import sys
-import os
-import argparse
-import json
-import textwrap
-import time
-from sigma_core import SigmaKernel, SigmaConfig
-
-
-
-def cmd_capture(kernel: SigmaKernel, args):
-    mode = getattr(args, 'mode', 'Standard')
-    hdr(f'TITAN CAPTURE — {mode}')
-    ok(kernel.capture_visual(mode))
+from .cmd_capture.cmd_capture import cmd_capture # noqa

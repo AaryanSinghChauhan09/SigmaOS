@@ -1,13 +1,4 @@
 """
-Auto-split from userland\system_api\games\pro.py — MysticSerpentLadders._init_state
+SigmaOS Modular Shim for _init_state.py
 """
-
-import random
-from typing import List, Tuple, Dict, Any, Optional
-from .base import SigmaGame
-
-
-
-class MysticSerpentLadders:
-    def _init_state(self):
-        self.positions = [0] * 4
+from ._init_state._MysticSerpentLadders_core import MysticSerpentLadders # noqa

@@ -1,10 +1,4 @@
 """
-Auto-split from userland\system_api\sigma_creative_studio.py — SigmaLiveCodeEditor.format_code
+SigmaOS Modular Shim for format_code.py
 """
-
-
-
-class SigmaLiveCodeEditor:
-    def format_code(self, pane='all'):
-        """Prettier-style auto-formatting for any pane."""
-        return f'LiveEditor (Format): {pane.upper()} pane beautified with Sovereign Prettier engine.'
+from .format_code._SigmaLiveCodeEditor_core import SigmaLiveCodeEditor # noqa

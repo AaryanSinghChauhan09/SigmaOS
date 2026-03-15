@@ -1,17 +1,4 @@
 """
-Auto-split from userland\apps\omni_savant.py — OmniSavant._inspect_concept
+SigmaOS Modular Shim for _inspect_concept.py
 """
-
-import tkinter as tk
-from tkinter import ttk, messagebox
-import random
-import time
-
-
-
-class OmniSavant:
-    def _inspect_concept(self, event):
-        item = self.tree.selection()
-        if item:
-            val = self.tree.item(item, 'values')
-            messagebox.showinfo('Neural Concept Mapping', f'CONCEPT: {val[0]}\nTHEOREMS: {val[1]}\n\nSOVEREIGN USAGE:\n{val[2]}\n\n[Theoretical execution traces are rendered in O(1) time.]')
+from ._inspect_concept._OmniSavant_core import OmniSavant # noqa

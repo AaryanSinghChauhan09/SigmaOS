@@ -1,13 +1,4 @@
 """
-Auto-split from userland\apps\ncert_chemistry_lab.py — Chemistry_Classes_11_12.ean
+SigmaOS Modular Shim for ean.py
 """
-
-import math, re
-
-
-
-class Chemistry_Classes_11_12:
-    @staticmethod
-    def ean(z, ox, cn):
-        res = z - ox + 2 * cn
-        return {'EAN': int(res)}
+from .ean._Chemistry_Classes_11_12_core import Chemistry_Classes_11_12 # noqa

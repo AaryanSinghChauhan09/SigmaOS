@@ -1,14 +1,4 @@
 """
-Auto-split from ecosystem\sigma_buyhatke.py — SigmaBuyHatke.sync_external_inventory
+SigmaOS Modular Shim for sync_external_inventory.py
 """
-
-import datetime
-import random
-from typing import Dict, List, Any
-
-
-
-class SigmaBuyHatke:
-    def sync_external_inventory(self, platform: str) -> str:
-        """USP: Pulls real-time inventory from Shopify/Flipkart/Amazon."""
-        return f'Inventory Sync: 1,240 SKUs updated from {platform} Hub.'
+from .sync_external_inventory._SigmaBuyHatke_core import SigmaBuyHatke # noqa

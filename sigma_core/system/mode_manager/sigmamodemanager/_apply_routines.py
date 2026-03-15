@@ -1,16 +1,4 @@
 """
-Auto-split from sigma_core\system\mode_manager.py — SigmaModeManager._apply_routines
+SigmaOS Modular Shim for _apply_routines.py
 """
-
-from typing import Dict, List, Any, Callable, Optional
-import time
-
-
-
-class SigmaModeManager:
-    def _apply_routines(self, routine_names: List[str], phase: str) -> Dict[str, str]:
-        """Executes a list of routines."""
-        results = {}
-        for routine_name in routine_names:
-            results[routine_name] = self._execute_routine(routine_name, phase)
-        return results
+from ._apply_routines._SigmaModeManager_core import SigmaModeManager # noqa

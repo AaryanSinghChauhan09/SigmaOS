@@ -1,13 +1,4 @@
 """
-Auto-split from userland\system_api\media_studio.py — SigmaMediaStudio.health_check
+SigmaOS Modular Shim for health_check.py
 """
-
-import time
-import os
-import uuid
-
-
-
-class SigmaMediaStudio:
-    def health_check(self) -> str:
-        return f'OK — Media Studio (IP-Compliant Sandbox). {len(self.consent_ledger)} Audit Entries saved.'
+from .health_check._SigmaMediaStudio_core import SigmaMediaStudio # noqa

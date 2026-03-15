@@ -1,16 +1,4 @@
 """
-Auto-split from sigma_cli.py — err
+SigmaOS Modular Shim for err.py
 """
-
-import sys
-import os
-import argparse
-import json
-import textwrap
-import time
-from sigma_core import SigmaKernel, SigmaConfig
-
-
-
-def err(msg):
-    print(f"  {_ansi(C.RED, '✖')}  {msg}")
+from .err.err import err # noqa

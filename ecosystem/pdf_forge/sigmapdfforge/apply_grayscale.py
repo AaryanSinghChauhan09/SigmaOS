@@ -1,12 +1,4 @@
 """
-Auto-split from ecosystem\pdf_forge.py — SigmaPDFForge.apply_grayscale
+SigmaOS Modular Shim for apply_grayscale.py
 """
-
-from sigma_core.system.sovereign_app import SovereignApp
-
-
-
-class SigmaPDFForge:
-    def apply_grayscale(self):
-        """Converts document to B&W to reduce ink and file size (iLovePDF USP)."""
-        return 'PDF Forge (Grayscale): Colors desaturated. Resource consumption optimized.'
+from .apply_grayscale._SigmaPDFForge_core import SigmaPDFForge # noqa

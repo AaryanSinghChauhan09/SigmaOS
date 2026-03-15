@@ -1,14 +1,4 @@
 """
-Auto-split from sigma_core\ai\intelligence_hub.py — Mathematics.get_tensor_ops
+SigmaOS Modular Shim for get_tensor_ops.py
 """
-
-import math
-import random
-import time
-from typing import List, Dict, Any, Optional
-
-
-
-class Mathematics:
-    def get_tensor_ops(self):
-        return ['Add', 'Sub', 'Mul', 'Div', 'MatMul', 'Transpose', 'Squeeze']
+from .get_tensor_ops._Mathematics_core import Mathematics # noqa

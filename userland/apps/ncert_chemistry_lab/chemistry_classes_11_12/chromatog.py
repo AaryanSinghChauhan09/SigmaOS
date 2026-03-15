@@ -1,13 +1,4 @@
 """
-Auto-split from userland\apps\ncert_chemistry_lab.py — Chemistry_Classes_11_12.chromatog
+SigmaOS Modular Shim for chromatog.py
 """
-
-import math, re
-
-
-
-class Chemistry_Classes_11_12:
-    @staticmethod
-    def chromatog(ds, dsp):
-        rf = dsp / ds
-        return {'Rf Value': _r(rf, 3), 'Status': 'Success' if rf < 1 else 'Error'}
+from .chromatog._Chemistry_Classes_11_12_core import Chemistry_Classes_11_12 # noqa

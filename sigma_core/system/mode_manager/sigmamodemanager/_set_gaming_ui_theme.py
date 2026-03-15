@@ -1,13 +1,4 @@
 """
-Auto-split from sigma_core\system\mode_manager.py — SigmaModeManager._set_gaming_ui_theme
+SigmaOS Modular Shim for _set_gaming_ui_theme.py
 """
-
-from typing import Dict, List, Any, Callable, Optional
-import time
-
-
-
-class SigmaModeManager:
-    def _set_gaming_ui_theme(self, phase: str='') -> str:
-        """Simulates applying a gaming UI theme."""
-        return 'Gaming UI theme applied.'
+from ._set_gaming_ui_theme._SigmaModeManager_core import SigmaModeManager # noqa

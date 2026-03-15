@@ -1,13 +1,4 @@
 """
-Auto-split from userland\system_api\games\pro.py — ApexVaultRunner._init_state
+SigmaOS Modular Shim for _init_state.py
 """
-
-import random
-from typing import List, Tuple, Dict, Any, Optional
-from .base import SigmaGame
-
-
-
-class ApexVaultRunner:
-    def _init_state(self):
-        self.pos_x = 0.0
+from ._init_state._ApexVaultRunner_core import ApexVaultRunner # noqa

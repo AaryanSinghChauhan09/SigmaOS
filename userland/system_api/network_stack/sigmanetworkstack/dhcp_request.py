@@ -1,16 +1,4 @@
 """
-Auto-split from userland\system_api\network_stack.py — SigmaNetworkStack.dhcp_request
+SigmaOS Modular Shim for dhcp_request.py
 """
-
-import time
-import uuid
-import hashlib
-from dataclasses import dataclass, field
-from enum import Enum, auto
-
-
-
-class SigmaNetworkStack:
-    def dhcp_request(self, requested_ip: str) -> dict:
-        self._audit_event('dhcp_request', requested_ip)
-        return self.dhcp_ack(requested_ip)
+from .dhcp_request._SigmaNetworkStack_core import SigmaNetworkStack # noqa

@@ -1,16 +1,4 @@
 """
-Auto-split from userland\system_api\gui_pkg\chat_page.py — SigmaChatPage._on_msg_received
+SigmaOS Modular Shim for _on_msg_received.py
 """
-
-import tkinter as tk
-from tkinter import ttk
-from .base_page import SigmaPage
-from .styles import PAL, FONT_BOLD, FONT_SMALL
-
-
-
-class SigmaChatPage:
-    def _on_msg_received(self, msg):
-        sender = msg.get('sid', 'UNKNOWN')
-        text = msg.get('text', '')
-        self._insert_log(sender, text)
+from ._on_msg_received._SigmaChatPage_core import SigmaChatPage # noqa

@@ -1,17 +1,4 @@
 """
-Auto-split from userland\apps\ag_finder.py — ToolsFinder._setup_styles
+SigmaOS Modular Shim for _setup_styles.py
 """
-
-import tkinter as tk
-from tkinter import ttk, scrolledtext, filedialog, messagebox
-import os
-import time
-
-
-
-class ToolsFinder:
-    def _setup_styles(self):
-        style = ttk.Style()
-        style.theme_use('clam')
-        style.configure('Treeview', background=PAL['sidebar'], foreground=PAL['text'], fieldbackground=PAL['sidebar'], borderwidth=0, font=('Inter', 9))
-        style.map('Treeview', background=[('selected', PAL['accent'])])
+from ._setup_styles._ToolsFinder_core import ToolsFinder # noqa

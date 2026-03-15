@@ -1,13 +1,4 @@
 """
-Auto-split from userland\apps\ncert_maths_lab.py — Maths_Classes_11_12.matrix
+SigmaOS Modular Shim for matrix.py
 """
-
-import math, random
-
-
-
-class Maths_Classes_11_12:
-    @staticmethod
-    def matrix(m):
-        r = [[float(x) for x in row.split(',')] for row in m.split(';')]
-        return {'Det': r[0][0] * r[1][1] - r[0][1] * r[1][0]}
+from .matrix._Maths_Classes_11_12_core import Maths_Classes_11_12 # noqa

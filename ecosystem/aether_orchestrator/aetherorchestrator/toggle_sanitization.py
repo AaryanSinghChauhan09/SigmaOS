@@ -1,11 +1,4 @@
 """
-Auto-split from ecosystem\aether_orchestrator.py — AetherOrchestrator.toggle_sanitization
+SigmaOS Modular Shim for toggle_sanitization.py
 """
-
-
-
-class AetherOrchestrator:
-    def toggle_sanitization(self):
-        """USP: Neural Content Sanitizer Toggle."""
-        print('[AETHER] Adjusting Neural Sanitizer weights for Peak Cognitive Flow...')
-        return True
+from .toggle_sanitization._AetherOrchestrator_core import AetherOrchestrator # noqa

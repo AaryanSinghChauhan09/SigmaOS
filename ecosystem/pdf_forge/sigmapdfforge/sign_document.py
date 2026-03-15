@@ -1,13 +1,4 @@
 """
-Auto-split from ecosystem\pdf_forge.py — SigmaPDFForge.sign_document
+SigmaOS Modular Shim for sign_document.py
 """
-
-from sigma_core.system.sovereign_app import SovereignApp
-
-
-
-class SigmaPDFForge:
-    def sign_document(self, signature_path):
-        """SovereignSign: Cryptographically-secure e-signatures (NIST-Compliant)."""
-        self.signatures.append(signature_path)
-        return 'PDF Forge (Sign): Signature applied and cryptographically sealed.'
+from .sign_document._SigmaPDFForge_core import SigmaPDFForge # noqa

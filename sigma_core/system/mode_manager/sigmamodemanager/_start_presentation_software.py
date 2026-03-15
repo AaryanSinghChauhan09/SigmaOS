@@ -1,13 +1,4 @@
 """
-Auto-split from sigma_core\system\mode_manager.py — SigmaModeManager._start_presentation_software
+SigmaOS Modular Shim for _start_presentation_software.py
 """
-
-from typing import Dict, List, Any, Callable, Optional
-import time
-
-
-
-class SigmaModeManager:
-    def _start_presentation_software(self, phase: str='') -> str:
-        """Simulates starting presentation software."""
-        return 'Presentation software started.'
+from ._start_presentation_software._SigmaModeManager_core import SigmaModeManager # noqa

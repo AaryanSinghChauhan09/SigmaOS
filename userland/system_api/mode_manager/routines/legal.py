@@ -1,6 +1,4 @@
-"""mode_manager.routines.legal — Legal suite routines."""
-
-
-def launch_legal_suite(phase: str = "") -> str:
-    """Simulates launching legal research software."""
-    return "Legal suite launched."
+"""
+SigmaOS Modular Shim for legal.py
+"""
+from .legal.launch_legal_suite import launch_legal_suite # noqa

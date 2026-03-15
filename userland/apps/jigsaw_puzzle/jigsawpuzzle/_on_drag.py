@@ -1,15 +1,4 @@
 """
-Auto-split from userland\apps\jigsaw_puzzle.py — JigsawPuzzle._on_drag
+SigmaOS Modular Shim for _on_drag.py
 """
-
-import tkinter as tk
-from tkinter import ttk, filedialog, messagebox
-import random
-import time
-import os
-
-
-
-class JigsawPuzzle:
-    def _on_drag(self, event):
-        pass
+from ._on_drag._JigsawPuzzle_core import JigsawPuzzle # noqa

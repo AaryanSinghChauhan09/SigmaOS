@@ -1,7 +1,4 @@
-"""omni_automator.get_transparent_ledger — Execution log accessor."""
-from typing import List, Dict, Any
-
-
-def get_transparent_ledger(transparent_ledger: List[Dict[str, Any]]) -> List[Dict[str, Any]]:
-    """USP: Human-readable execution log that traces every single action taken by the AI swarm."""
-    return transparent_ledger
+"""
+SigmaOS Modular Shim for get_transparent_ledger.py
+"""
+from .get_transparent_ledger.get_transparent_ledger import get_transparent_ledger # noqa

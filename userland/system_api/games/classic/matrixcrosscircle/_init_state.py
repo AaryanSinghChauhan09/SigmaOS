@@ -1,15 +1,4 @@
 """
-Auto-split from userland\system_api\games\classic.py — MatrixCrossCircle._init_state
+SigmaOS Modular Shim for _init_state.py
 """
-
-import random
-from typing import List, Tuple, Dict, Any, Optional
-from .base import SigmaGame
-
-
-
-class MatrixCrossCircle:
-    def _init_state(self, size=3):
-        self.size = size
-        self.board = [['.' for _ in range(size)] for _ in range(size)]
-        self.turn = 'X'
+from ._init_state._MatrixCrossCircle_core import MatrixCrossCircle # noqa

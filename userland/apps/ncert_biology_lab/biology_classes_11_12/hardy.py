@@ -1,13 +1,4 @@
 """
-Auto-split from userland\apps\ncert_biology_lab.py — Biology_Classes_11_12.hardy
+SigmaOS Modular Shim for hardy.py
 """
-
-import math, random
-
-
-
-class Biology_Classes_11_12:
-    @staticmethod
-    def hardy(p, n):
-        q = 1 - p
-        return {'AA': int(n * p ** 2), 'Aa': int(n * 2 * p * q), 'aa': int(n * q ** 2)}
+from .hardy._Biology_Classes_11_12_core import Biology_Classes_11_12 # noqa

@@ -1,15 +1,4 @@
 """
-Auto-split from userland\apps\aurapaint.py — AuraPaint._set_status
+SigmaOS Modular Shim for _set_status.py
 """
-
-import tkinter as tk
-from tkinter import colorchooser, messagebox, ttk, simpledialog, filedialog
-import random
-import os
-from typing import Any
-
-
-
-class AuraPaint:
-    def _set_status(self, msg):
-        self.status.config(text=msg.upper())
+from ._set_status._AuraPaint_core import AuraPaint # noqa

@@ -1,16 +1,6 @@
-"""mode_manager.routines.presentation — Presentation mode routines."""
-
-
-def mute_system_sounds(phase: str = "") -> str:
-    """Simulates muting system sounds."""
-    return "System sounds muted."
-
-
-def start_presentation_software(phase: str = "") -> str:
-    """Simulates starting presentation software."""
-    return "Presentation software started."
-
-
-def unmute_system_sounds(phase: str = "") -> str:
-    """Simulates unmuting system sounds."""
-    return "System sounds unmuted."
+"""
+SigmaOS Modular Shim for presentation.py
+"""
+from .presentation.mute_system_sounds import mute_system_sounds # noqa
+from .presentation.start_presentation_software import start_presentation_software # noqa
+from .presentation.unmute_system_sounds import unmute_system_sounds # noqa

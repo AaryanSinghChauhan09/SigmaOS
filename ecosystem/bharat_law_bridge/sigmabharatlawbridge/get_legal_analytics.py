@@ -1,13 +1,4 @@
 """
-Auto-split from ecosystem\bharat_law_bridge.py — SigmaBharatLawBridge.get_legal_analytics
+SigmaOS Modular Shim for get_legal_analytics.py
 """
-
-from typing import Dict, List, Any, Optional
-import datetime
-
-
-
-class SigmaBharatLawBridge:
-    def get_legal_analytics(self, provision: str) -> str:
-        """USP: LegalMind-style judicial trend analysis."""
-        return self._judicial_trends.get(provision, 'Trend: Moderate litigation; follow standard procedural precedents.')
+from .get_legal_analytics._SigmaBharatLawBridge_core import SigmaBharatLawBridge # noqa

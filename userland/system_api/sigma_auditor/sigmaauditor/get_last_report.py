@@ -1,14 +1,4 @@
 """
-Auto-split from userland\system_api\sigma_auditor.py — SigmaAuditor.get_last_report
+SigmaOS Modular Shim for get_last_report.py
 """
-
-import time
-import random
-import os
-from typing import Dict, List, Any
-
-
-
-class SigmaAuditor:
-    def get_last_report(self) -> Dict:
-        return self._last_report
+from .get_last_report._SigmaAuditor_core import SigmaAuditor # noqa

@@ -1,13 +1,4 @@
 """
-Auto-split from userland\apps\ncert_biology_lab.py — Biology_Classes_11_12.potometer
+SigmaOS Modular Shim for potometer.py
 """
-
-import math, random
-
-
-
-class Biology_Classes_11_12:
-    @staticmethod
-    def potometer(d, t):
-        rate = d / t
-        return {'Transpiration Rate': _r(rate, 2), 'Unit': 'cm/min'}
+from .potometer._Biology_Classes_11_12_core import Biology_Classes_11_12 # noqa

@@ -1,0 +1,14 @@
+# Generated method: SigmaModuleBase.__init__
+import os
+import sys
+import hashlib
+import json
+import time
+import socket
+import threading
+from typing import Dict, List, Any, Optional
+from sigma_core.system.interfaces import SigmaModuleBase
+
+class SigmaModuleBase:
+    def __init__(self, kernel):
+        self.kernel = kernel

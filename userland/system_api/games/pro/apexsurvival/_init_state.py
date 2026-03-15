@@ -1,13 +1,4 @@
 """
-Auto-split from userland\system_api\games\pro.py — ApexSurvival._init_state
+SigmaOS Modular Shim for _init_state.py
 """
-
-import random
-from typing import List, Tuple, Dict, Any, Optional
-from .base import SigmaGame
-
-
-
-class ApexSurvival:
-    def _init_state(self):
-        self.health = 100
+from ._init_state._ApexSurvival_core import ApexSurvival # noqa

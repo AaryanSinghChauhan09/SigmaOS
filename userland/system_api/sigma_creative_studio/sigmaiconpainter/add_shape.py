@@ -1,12 +1,4 @@
 """
-Auto-split from userland\system_api\sigma_creative_studio.py — SigmaIconPainter.add_shape
+SigmaOS Modular Shim for add_shape.py
 """
-
-
-
-class SigmaIconPainter:
-    def add_shape(self, shape, color, x, y, size):
-        """Adds a vector shape (circle, rect, star, polygon) to the canvas."""
-        layer = {'shape': shape, 'color': color, 'x': x, 'y': y, 'size': size}
-        self.layers.append(layer)
-        return f'IconPainter: Added {shape} [{color}] at ({x},{y}).'
+from .add_shape._SigmaIconPainter_core import SigmaIconPainter # noqa

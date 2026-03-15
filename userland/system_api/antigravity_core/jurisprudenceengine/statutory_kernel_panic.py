@@ -1,16 +1,4 @@
 """
-Auto-split from userland\system_api\antigravity_core.py — JurisprudenceEngine.statutory_kernel_panic
+SigmaOS Modular Shim for statutory_kernel_panic.py
 """
-
-import os
-import hashlib
-import time
-
-
-
-class JurisprudenceEngine:
-    def statutory_kernel_panic(self, document_content: str):
-        """Checks for procedural violations (e.g. CPC deadlines) and blocks saving."""
-        if 'limitation expired' in document_content.lower():
-            return 'KERNEL PANIC: Document violates Limitation Act. File save blocked.'
-        return 'Draft validated against Indian legal procedure.'
+from .statutory_kernel_panic._JurisprudenceEngine_core import JurisprudenceEngine # noqa

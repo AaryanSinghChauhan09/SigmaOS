@@ -1,13 +1,4 @@
 """
-Auto-split from sigma_core\system\mode_manager.py — SigmaModeManager._optimize_disk_cache
+SigmaOS Modular Shim for _optimize_disk_cache.py
 """
-
-from typing import Dict, List, Any, Callable, Optional
-import time
-
-
-
-class SigmaModeManager:
-    def _optimize_disk_cache(self, phase: str='') -> str:
-        """Simulates optimizing disk cache for media editing."""
-        return 'Disk cache optimized.'
+from ._optimize_disk_cache._SigmaModeManager_core import SigmaModeManager # noqa

@@ -1,13 +1,4 @@
 """
-Auto-split from userland\apps\ncert_chemistry_lab.py — Chemistry_Classes_11_12.gibbs
+SigmaOS Modular Shim for gibbs.py
 """
-
-import math, re
-
-
-
-class Chemistry_Classes_11_12:
-    @staticmethod
-    def gibbs(h, s, t):
-        g = h - t * (s / 1000)
-        return {'Delta G (kJ)': _r(g, 2), 'Spontaneous': g < 0}
+from .gibbs._Chemistry_Classes_11_12_core import Chemistry_Classes_11_12 # noqa

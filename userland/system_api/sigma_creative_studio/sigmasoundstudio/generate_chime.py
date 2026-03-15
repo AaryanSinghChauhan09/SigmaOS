@@ -1,10 +1,4 @@
 """
-Auto-split from userland\system_api\sigma_creative_studio.py — SigmaSoundStudio.generate_chime
+SigmaOS Modular Shim for generate_chime.py
 """
-
-
-
-class SigmaSoundStudio:
-    def generate_chime(self, style='Ethereal_Sigma'):
-        """AI-generates a unique OS boot chime from a style descriptor."""
-        return f"SoundStudio (AI): Generated '{style}' boot chime using local TTS synthesis. Applied."
+from .generate_chime._SigmaSoundStudio_core import SigmaSoundStudio # noqa

@@ -1,13 +1,4 @@
 """
-Auto-split from sigma_core\system\mode_manager.py — SigmaModeManager._restore_display
+SigmaOS Modular Shim for _restore_display.py
 """
-
-from typing import Dict, List, Any, Callable, Optional
-import time
-
-
-
-class SigmaModeManager:
-    def _restore_display(self, phase: str='') -> str:
-        """Simulates restoring display brightness."""
-        return 'Display brightness restored.'
+from ._restore_display._SigmaModeManager_core import SigmaModeManager # noqa

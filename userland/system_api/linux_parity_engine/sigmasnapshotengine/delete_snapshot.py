@@ -1,18 +1,4 @@
 """
-Auto-split from userland\system_api\linux_parity_engine.py — SigmaSnapshotEngine.delete_snapshot
+SigmaOS Modular Shim for delete_snapshot.py
 """
-
-import time
-import uuid
-import random
-from typing import Dict, List, Any
-
-
-
-class SigmaSnapshotEngine:
-    def delete_snapshot(self, snap_id: str) -> str:
-        before = len(self._snapshots)
-        self._snapshots = [s for s in self._snapshots if s['id'] != snap_id]
-        if len(self._snapshots) < before:
-            return f"[snapshot] Deleted '{snap_id}'."
-        return f"[snapshot] Snapshot '{snap_id}' not found."
+from .delete_snapshot._SigmaSnapshotEngine_core import SigmaSnapshotEngine # noqa

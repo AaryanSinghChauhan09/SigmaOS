@@ -1,25 +1,4 @@
 """
-Auto-split from userland\system_api\sigma_projects.py — SigmaProjects.update_task_status
+SigmaOS Modular Shim for update_task_status.py
 """
-
-import time
-import uuid
-import random
-from dataclasses import dataclass, field
-from enum import Enum, auto
-from typing import Dict, List, Any
-
-
-
-class SigmaProjects:
-    def update_task_status(self, tid, status: TaskStatus):
-        if tid in self._tasks:
-            prev = self._tasks[tid].status
-            self._tasks[tid].status = status
-            if status == TaskStatus.DONE and prev != TaskStatus.DONE:
-                if self.kernel and hasattr(self.kernel, 'routine_manager'):
-                    self.kernel.routine_manager.process_trigger('task.done')
-                elif self.kernel and hasattr(self.kernel, 'registry') and self.kernel.registry.get('routines'):
-                    self.kernel.registry.get('routines').process_trigger('task.done')
-            return True
-        return False
+from .update_task_status._SigmaProjects_core import SigmaProjects # noqa

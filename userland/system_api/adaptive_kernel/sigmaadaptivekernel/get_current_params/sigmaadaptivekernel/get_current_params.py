@@ -1,0 +1,9 @@
+# Generated method: SigmaAdaptiveKernel.get_current_params
+import time
+import threading
+from enum import Enum, auto
+
+class SigmaAdaptiveKernel:
+    def get_current_params(self) -> dict:
+        """Returns the currently active kernel parameter set."""
+        return _PROFILE_PARAMS[self.current_profile]

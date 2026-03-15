@@ -1,14 +1,4 @@
 """
-Auto-split from userland\system_api\antigravity_core.py — JurisprudenceEngine.legal_rag_search
+SigmaOS Modular Shim for legal_rag_search.py
 """
-
-import os
-import hashlib
-import time
-
-
-
-class JurisprudenceEngine:
-    def legal_rag_search(self, prompt: str):
-        """Finds cases directly indexing research paper snippets using SLM semantics."""
-        return f"[LEGAL RAG] Analyzing '{prompt}' against locally indexed Indian Jurisprudence papers..."
+from .legal_rag_search._JurisprudenceEngine_core import JurisprudenceEngine # noqa

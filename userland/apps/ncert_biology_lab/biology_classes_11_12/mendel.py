@@ -1,12 +1,4 @@
 """
-Auto-split from userland\apps\ncert_biology_lab.py — Biology_Classes_11_12.mendel
+SigmaOS Modular Shim for mendel.py
 """
-
-import math, random
-
-
-
-class Biology_Classes_11_12:
-    @staticmethod
-    def mendel(p):
-        return {'Ratio': '9:3:3:1 (Mendelian Dihybrid)'}
+from .mendel._Biology_Classes_11_12_core import Biology_Classes_11_12 # noqa

@@ -1,17 +1,4 @@
 """
-Auto-split from userland\apps\omni_tools_android.py — OmniToolsApp._db_ready
+SigmaOS Modular Shim for _db_ready.py
 """
-
-import tkinter as tk
-from tkinter import ttk, messagebox, colorchooser, filedialog
-import math
-import random
-import string
-import secrets
-import datetime
-
-
-
-class OmniToolsApp:
-    def _db_ready(self) -> None:
-        self.status.config(text='Offline DB up-to-date  |  No network access required', bg=PAL['success'], fg='black')
+from ._db_ready._OmniToolsApp_core import OmniToolsApp # noqa

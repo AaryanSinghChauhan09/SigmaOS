@@ -1,7 +1,4 @@
-"""omni_automator.get_benchmarks — Benchmark ledger accessor."""
-from typing import Dict
-
-
-def get_benchmarks(benchmark_ledger: Dict[str, float]) -> Dict[str, float]:
-    """USP: Benchmark and compare the efficiency of different automations directly in the OS."""
-    return benchmark_ledger
+"""
+SigmaOS Modular Shim for get_benchmarks.py
+"""
+from .get_benchmarks.get_benchmarks import get_benchmarks # noqa

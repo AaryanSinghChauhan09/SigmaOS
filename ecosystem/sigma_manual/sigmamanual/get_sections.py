@@ -1,11 +1,4 @@
 """
-Auto-split from ecosystem\sigma_manual.py — SigmaManual.get_sections
+SigmaOS Modular Shim for get_sections.py
 """
-
-from typing import Dict, List, Any
-
-
-
-class SigmaManual:
-    def get_sections(self) -> List[str]:
-        return list(self.MANUAL_DATA.keys())
+from .get_sections._SigmaManual_core import SigmaManual # noqa

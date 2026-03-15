@@ -1,11 +1,4 @@
 """
-Auto-split from userland\apps\logic_simulator.py — launch
+SigmaOS Modular Shim for launch.py
 """
-
-import tkinter as tk
-from tkinter import ttk
-
-
-
-def launch(kernel=None):
-    LogicSimulator(kernel).mainloop()
+from .launch.launch import launch # noqa

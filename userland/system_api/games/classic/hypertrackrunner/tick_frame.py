@@ -1,14 +1,4 @@
 """
-Auto-split from userland\system_api\games\classic.py — HyperTrackRunner.tick_frame
+SigmaOS Modular Shim for tick_frame.py
 """
-
-import random
-from typing import List, Tuple, Dict, Any, Optional
-from .base import SigmaGame
-
-
-
-class HyperTrackRunner:
-    def tick_frame(self):
-        self.distance = float(self.distance) + float(self.speed) / 10.0
-        self.score = int(self.distance)
+from .tick_frame._HyperTrackRunner_core import HyperTrackRunner # noqa

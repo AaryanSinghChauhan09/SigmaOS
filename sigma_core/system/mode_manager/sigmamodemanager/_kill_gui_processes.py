@@ -1,13 +1,4 @@
 """
-Auto-split from sigma_core\system\mode_manager.py — SigmaModeManager._kill_gui_processes
+SigmaOS Modular Shim for _kill_gui_processes.py
 """
-
-from typing import Dict, List, Any, Callable, Optional
-import time
-
-
-
-class SigmaModeManager:
-    def _kill_gui_processes(self, phase: str='') -> str:
-        """Simulates killing GUI-related processes."""
-        return 'GUI processes terminated.'
+from ._kill_gui_processes._SigmaModeManager_core import SigmaModeManager # noqa

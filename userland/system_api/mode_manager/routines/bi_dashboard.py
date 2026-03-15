@@ -1,6 +1,4 @@
-"""mode_manager.routines.bi_dashboard — Business Intelligence dashboard routine."""
-
-
-def launch_bi_dashboard(phase: str = "") -> str:
-    """Simulates launching the SigmaOS Strategic BI Dashboard."""
-    return "Strategic BI Dashboard active. Real-time ROI and Market Trends visible."
+"""
+SigmaOS Modular Shim for bi_dashboard.py
+"""
+from .bi_dashboard.launch_bi_dashboard import launch_bi_dashboard # noqa

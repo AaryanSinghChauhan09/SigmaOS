@@ -1,13 +1,4 @@
 """
-Auto-split from userland\system_api\games\pro.py — AetherPathExplorer._init_state
+SigmaOS Modular Shim for _init_state.py
 """
-
-import random
-from typing import List, Tuple, Dict, Any, Optional
-from .base import SigmaGame
-
-
-
-class AetherPathExplorer:
-    def _init_state(self):
-        self.target = 'D'
+from ._init_state._AetherPathExplorer_core import AetherPathExplorer # noqa

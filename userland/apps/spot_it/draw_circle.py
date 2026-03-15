@@ -1,14 +1,4 @@
 """
-Auto-split from userland\apps\spot_it.py — draw_circle
+SigmaOS Modular Shim for draw_circle.py
 """
-
-import tkinter as tk
-from tkinter import messagebox
-import random
-import time
-import math
-
-
-
-def draw_circle(c, cx, cy, s, col, outline='#FFFFFF'):
-    c.create_oval(cx - s, cy - s, cx + s, cy + s, fill=col, outline=outline, width=2)
+from .draw_circle.draw_circle import draw_circle # noqa

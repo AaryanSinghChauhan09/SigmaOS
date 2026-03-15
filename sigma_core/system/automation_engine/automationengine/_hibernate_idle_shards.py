@@ -1,14 +1,4 @@
 """
-Auto-split from sigma_core\system\automation_engine.py — AutomationEngine._hibernate_idle_shards
+SigmaOS Modular Shim for _hibernate_idle_shards.py
 """
-
-import time
-import threading
-from typing import Dict, Any, List, Callable, Optional
-
-
-
-class AutomationEngine:
-    def _hibernate_idle_shards(self):
-        if hasattr(self.kernel, 'process'):
-            self.kernel.process.optimize_resources()
+from ._hibernate_idle_shards._AutomationEngine_core import AutomationEngine # noqa

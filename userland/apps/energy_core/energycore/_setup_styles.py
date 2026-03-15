@@ -1,19 +1,4 @@
 """
-Auto-split from userland\apps\energy_core.py — EnergyCore._setup_styles
+SigmaOS Modular Shim for _setup_styles.py
 """
-
-import tkinter as tk
-from tkinter import ttk, messagebox
-import sys
-import os
-import time
-import random
-from userland.system_api.sigma_std import SigmaSys
-
-
-
-class EnergyCore:
-    def _setup_styles(self):
-        style = ttk.Style()
-        style.theme_use('clam')
-        style.configure('Energy.Horizontal.TProgressbar', background=PAL['accent'], troughcolor=PAL['sidebar'], borderwidth=0)
+from ._setup_styles._EnergyCore_core import EnergyCore # noqa

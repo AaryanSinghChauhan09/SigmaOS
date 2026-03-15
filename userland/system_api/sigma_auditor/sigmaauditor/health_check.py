@@ -1,14 +1,4 @@
 """
-Auto-split from userland\system_api\sigma_auditor.py — SigmaAuditor.health_check
+SigmaOS Modular Shim for health_check.py
 """
-
-import time
-import random
-import os
-from typing import Dict, List, Any
-
-
-
-class SigmaAuditor:
-    def health_check(self) -> str:
-        return 'OK — SigmaAuditor: Expert-level testing suite operational.'
+from .health_check._SigmaAuditor_core import SigmaAuditor # noqa

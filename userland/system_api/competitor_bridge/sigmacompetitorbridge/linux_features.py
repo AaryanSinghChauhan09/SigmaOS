@@ -1,10 +1,4 @@
 """
-Auto-split from userland\system_api\competitor_bridge.py — SigmaCompetitorBridge.linux_features
+SigmaOS Modular Shim for linux_features.py
 """
-
-
-
-class SigmaCompetitorBridge:
-    def linux_features(self):
-        """Implements Linux freedom and developer-first mentality."""
-        return {'Package_Manager': 'Sigma-Aptitude (Decentralized, cryptographically-signed repo)', 'Kernel_Customization': 'Sigma-Modular-Kernel (Hot-swappable kernel modules)', 'Terminal_Emulation': 'Sigma-Term (GPU-accelerated, ZSH/Fish compatible)', 'Tiling_Manager': 'Sigma-WM (i3/Sway inspired workflow integration)', 'eBPF_Observability': 'Sigma-Deep-Pulse (Real-time kernel tracing and anomaly blocking)'}
+from .linux_features._SigmaCompetitorBridge_core import SigmaCompetitorBridge # noqa

@@ -1,12 +1,4 @@
 """
-Auto-split from ecosystem\pdf_forge.py — SigmaPDFForge.geospatial_mapping
+SigmaOS Modular Shim for geospatial_mapping.py
 """
-
-from sigma_core.system.sovereign_app import SovereignApp
-
-
-
-class SigmaPDFForge:
-    def geospatial_mapping(self, coordinates):
-        """Bluebeam Style: High-precision geospatial PDF data embedding."""
-        return f'PDF Forge (Geo): Embedded data for {len(coordinates)} map points. Lat/Long precision verified.'
+from .geospatial_mapping._SigmaPDFForge_core import SigmaPDFForge # noqa

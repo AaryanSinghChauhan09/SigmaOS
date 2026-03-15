@@ -1,12 +1,4 @@
 """
-Auto-split from userland\apps\ncert_biology_lab.py — Biology_Classes_6_10.micro
+SigmaOS Modular Shim for micro.py
 """
-
-import math, random
-
-
-
-class Biology_Classes_6_10:
-    @staticmethod
-    def micro(obj, eye):
-        return {'Mag': obj * eye}
+from .micro._Biology_Classes_6_10_core import Biology_Classes_6_10 # noqa

@@ -1,13 +1,4 @@
 """
-Auto-split from sigma_core\system\mode_manager.py — SigmaModeManager._launch_bi_dashboard
+SigmaOS Modular Shim for _launch_bi_dashboard.py
 """
-
-from typing import Dict, List, Any, Callable, Optional
-import time
-
-
-
-class SigmaModeManager:
-    def _launch_bi_dashboard(self, phase: str='') -> str:
-        """Simulates launching the SigmaOS Strategic BI Dashboard."""
-        return 'Strategic BI Dashboard active. Real-time ROI and Market Trends visible.'
+from ._launch_bi_dashboard._SigmaModeManager_core import SigmaModeManager # noqa
