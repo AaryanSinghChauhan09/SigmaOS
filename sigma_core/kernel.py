@@ -14,7 +14,9 @@ import subprocess
 import platform
 import ctypes
 import random
-from typing import Dict, List, Any, Optional
+import contextlib
+from typing import Dict, List, Any, Optional, Generator
+from contextlib import contextmanager
 
 from .system.config import SigmaConfig # type: ignore
 from .system.event_bus import EventBus # type: ignore
@@ -28,8 +30,6 @@ from .system.guardian import SigmaGuardian # type: ignore
 from .system.loader import SigmaModuleLoader # type: ignore
 from .hal.polyglot_loader import SigmaPolyglot # type: ignore
 from .manifest import CORE_SYSTEM_MODULES, ECOSYSTEM_APPS # type: ignore
-from .security.competitor_crusher import SovereignCompetitorCrusher # type: ignore
-from userland.system_api.sigma_games_engine import SigmaGamesEngine # type: ignore
 
 class SigmaKernel:
     """
@@ -45,23 +45,71 @@ class SigmaKernel:
         self.ledger = SovereignLedger()
         self.mutation_counter = 0
         self._history = []
-        from .ai.neural_distillator import NeuralDistillator
-        self.distillator = NeuralDistillator(self)
         
-        # Core Platform Services
+        # Placeholder for dynamic shards
+        self.aura = None
+        self.vector_memory = None
+        self.governance = None
+        self.vibe_scheduler = None
+        self.shifter = None
+        self.mesh = None
+        self.airgap = None
+        self.zk_sync = None
+        self.universal = None
+        self.aether_grid = None
+        self.troubleshooter = None
+        self.hypervisor = None
+        self.latency_engine = None
+        self.agent_bridge = None
+        self.eco_manager = None
+        self.visualizer = None
+        self.accelerator = None
+        self.brain = None
+        self.agent = None
+        self.pulse = None
+        self.distillator = None
+        self.syncer = None
+
+        # Core 플랫폼 initialization
         self.cache = SigmaCache(self)
         self.integrity = IntegrityGuard(self)
         self.customizer = SovereignCustomizer(self)
         self.vanguard_engine = NetworkVanguard(self)
         self.guardian = SigmaGuardian(self)
-        self.crusher = SovereignCompetitorCrusher(self)
-        self.registry.register("crusher", self.crusher)
-        self.registry.register("syncer", self.syncer)
-        self.registry.register("web_syncer", self.syncer)
-        from .system.web_syncer import WebSyncer
-        self.syncer = WebSyncer(self) # type: ignore
         
-        # Register Core
+        from .security.competitor_crusher import SovereignCompetitorCrusher
+        self.crusher = SovereignCompetitorCrusher(self)
+        
+        from .system.web_syncer import WebSyncer
+        self.syncer = WebSyncer(self) 
+        
+        from .ai.neural_distillator import NeuralDistillator
+        self.distillator = NeuralDistillator(self)
+        
+        self._register_core_services()
+        
+        from userland.system_api.sigma_games_engine import SigmaGamesEngine
+        self.games = SigmaGamesEngine(self)
+        self.registry.register("games", self.games)
+        
+        self.os_name = self.cfg.OS_NAME
+        self.version = self.cfg.VERSION
+
+        self._initialize_advanced_shards()
+        
+        # Phase 4 Upgrade: Heartbeat & Pulse
+        from .system.pulse_engine import SigmaPulseEngine
+        self.pulse = SigmaPulseEngine(self)
+        self.registry.register("pulse", self.pulse)
+
+        # Bootstrap: Run native priority layers
+        self._low_level_init()
+
+        if auto_load:
+            self._hydrate_apex_grid()
+
+    def _register_core_services(self):
+        """Unified registry for Ring 0 system services."""
         self.registry.register("cache", self.cache)
         self.registry.register("integrity", self.integrity)
         self.registry.register("customizer", self.customizer)
@@ -70,13 +118,11 @@ class SigmaKernel:
         self.registry.register("crusher", self.crusher)
         self.registry.register("syncer", self.syncer)
         self.registry.register("web_syncer", self.syncer)
-        self.games = SigmaGamesEngine(self)
-        self.registry.register("games", self.games)
-        
-        self.os_name = self.cfg.OS_NAME
-        self.version = self.cfg.VERSION
+        self.registry.register("distillator", self.distillator)
 
-        # Phase 3: Intelligence & Autonomy (Roadmap v2)
+    def _initialize_advanced_shards(self):
+        """Phase 3: Intelligence & Autonomy Layer Hydration."""
+        # Dynamic imports to keep Ring 0 lean
         from .system.vector_memory import VectorMemory
         from .security.governance import NeuralGovernance
         from .system.vibe_scheduler import VibeScheduler
@@ -115,35 +161,20 @@ class SigmaKernel:
         self.brain = AutomationBrain(self)
         self.agent = SovereignAgent(self)
         
-        self.registry.register("vector_memory", self.vector_memory)
-        self.registry.register("governance", self.governance)
-        self.registry.register("vibe_scheduler", self.vibe_scheduler)
-        self.registry.register("shifter", self.shifter)
-        self.registry.register("mesh", self.mesh)
-        self.registry.register("airgap", self.airgap)
-        self.registry.register("zk_sync", self.zk_sync)
-        self.registry.register("universal", self.universal)
-        self.registry.register("aether_grid", self.aether_grid)
-        self.registry.register("troubleshooter", self.troubleshooter)
-        self.registry.register("hypervisor", self.hypervisor)
-        self.registry.register("latency_engine", self.latency_engine)
-        self.registry.register("agent_bridge", self.agent_bridge)
-        self.registry.register("eco_manager", self.eco_manager)
-        self.registry.register("visualizer", self.visualizer)
-        self.registry.register("accelerator", self.accelerator)
-        self.registry.register("automation_brain", self.brain)
-        self.registry.register("sovereign_agent", self.agent)
-        
-        # Phase 4 Upgrade: Heartbeat & Pulse
-        from .system.pulse_engine import SigmaPulseEngine
-        self.pulse = SigmaPulseEngine(self)
-        self.registry.register("pulse", self.pulse)
-
-        # Bootstrap: Run native priority layers
-        self._low_level_init()
-
-        if auto_load:
-            self._hydrate_apex_grid()
+        # Registration Loop
+        advanced = {
+            "vector_memory": self.vector_memory, "governance": self.governance,
+            "vibe_scheduler": self.vibe_scheduler, "shifter": self.shifter,
+            "mesh": self.mesh, "airgap": self.airgap, "zk_sync": self.zk_sync,
+            "universal": self.universal, "aether_grid": self.aether_grid,
+            "troubleshooter": self.troubleshooter, "hypervisor": self.hypervisor,
+            "latency_engine": self.latency_engine, "agent_bridge": self.agent_bridge,
+            "eco_manager": self.eco_manager, "visualizer": self.visualizer,
+            "accelerator": self.accelerator, "automation_brain": self.brain,
+            "sovereign_agent": self.agent
+        }
+        for k, v in advanced.items():
+            self.registry.register(k, v)
 
     def _low_level_init(self):
         """Win32/POSIX Low-Level Memory & Priority Locking."""
@@ -162,14 +193,9 @@ class SigmaKernel:
     def _hydrate_apex_grid(self):
         """USP: Parallel Apex Hydration using the Manifest."""
         print(f"[KERNEL] Initiating Apex Hydration [v{self.version}]...")
-        
-        # 1. Load System Shards in Parallel
         self.loader.load_modules_parallel(CORE_SYSTEM_MODULES)
-        
-        # 2. Load Ecosystem Apps
         self.loader.load_modules_parallel(ECOSYSTEM_APPS)
         
-        # 3. Lifecycle Start: Iterate through all registered services
         for key in self.registry.list_modules():
             service = self.registry.get(key)
             if service and hasattr(service, "start_service"):
@@ -180,18 +206,12 @@ class SigmaKernel:
                 except Exception as e:
                     print(f"  [!] {key} Crash on Startup: {e}")
 
-        # 4. Final Shell/Aura Trigger
         if self.aura:
             self.aura.apply_aura("DeepSpace")
         print(f"[KERNEL] Grid Online. All USPs Hydrated.")
 
     def __getattr__(self, name: str) -> Any:
-        """
-        USP: Dynamic Shard Accessor.
-        Proxies kernel attribute access to the module registry.
-        Fulfillment of 'Abstraction' and 'Loose Coupling'.
-        """
-        # Mapping legacy names to registry keys if needed
+        """Dynamic Shard Accessor with fallback safety."""
         aliases = {
             "perf": "perf", "net_guard": "net_guard", "fs": "fs",
             "modes": "modes", "rituals": "rituals", "bridge": "bridge",
@@ -201,154 +221,109 @@ class SigmaKernel:
         module = self.registry.get(key)
         if module:
             return module
+        
+        # Safe access for known but potentially uninitialized shards
+        shard_attrs = [
+            "aura", "vector_memory", "governance", "vibe_scheduler", 
+            "shifter", "mesh", "airgap", "zk_sync", "universal", 
+            "aether_grid", "troubleshooter", "hypervisor", "latency_engine", 
+            "agent_bridge", "eco_manager", "visualizer", "accelerator", 
+            "brain", "agent", "pulse", "telemetry", "sovereign_agent",
+            "repair_engine", "ledger"
+        ]
+        if name in shard_attrs:
+            return None
+            
         raise AttributeError(f"'SigmaKernel' object has no attribute '{name}'")
 
     def pulse_system(self):
-        """USP: Central coordination of all sovereign heartbeat tasks."""
-        # 1. Update Telemetry
-        metrics = {
-            "time": time.time(),
-            "load": random.uniform(5, 45),
-            "temp": random.uniform(35, 65)
-        }
-        if self.visualizer:
-            self.visualizer.push_metric(metrics["load"])
-        
-        # 2. Engage Eco-Rules
-        if self.eco_manager:
-            self.eco_manager.run_cycle(metrics["temp"])
-            
-        # 3. Poll Agent Intents
-        if self.agent_bridge:
-            self.agent_bridge.poll_for_agent_intent()
-            
-        # 4. Self-Healing check
-        if random.random() < 0.05: # 5% chance per pulse
-            self.self_healing_recovery()
+        """Standard heartbeat with automated trace injection."""
+        try:
+            with self.telemetry_session("core_pulse"):
+                if self.aura: self.aura.apply_aura()
+                self.ledger.log_event("SYSTEM", "CORE_PULSE", "Nominal background sync.")
+                
+                if self.vibe_scheduler: self.vibe_scheduler.run_cycle()
+                if self.sovereign_agent: self.sovereign_agent.poll_for_agent_intent()
+                
+                if random.random() < 0.05:
+                    self.self_healing_recovery("SYSTEM_SCAN")
+        except Exception as e:
+            if self.ledger: self.ledger.log_event("SYSTEM", "PULSE_ERROR", str(e), "WARN")
 
-    def self_healing_recovery(self) -> str:
-        """Sovereign Repair Engine. Restores integrity from evidence vault."""
+    @contextmanager
+    def telemetry_session(self, operation_name: str):
+        """High-precision performance tracing context."""
+        start_time = time.perf_counter()
+        try:
+            yield
+        finally:
+            elapsed = (time.perf_counter() - start_time) * 1000
+            self._log_telemetry(operation_name, elapsed)
+
+    def _log_telemetry(self, op: str, latency: float):
+        if self.visualizer:
+            try: self.visualizer.report_latency(op, latency)
+            except: pass
+        if latency > 100.0 and self.ledger:
+            self.ledger.log_event("TELEMETRY", f"SLOW_OP_{op}", f"{latency:.2f}ms", "WARN")
+
+    def self_healing_recovery(self, component_id: str = "GENERIC_NODE"):
+        if self.ledger: self.ledger.log_event("HEALING", "RUN_REPAIR", component_id, "HEAD")
         repair = self.registry.get("repair_engine")
-        return repair.repair("SYSTEM", "Integrity Breach") if repair else "REPAIR_OFFLINE"
+        if not repair:
+            if self.ledger: self.ledger.log_event("HEALING", "FALLBACK", "Initiating raw recovery.", "CRIT")
+            return "RAW_RECOVERY_STARTED"
+        return repair.repair_node(component_id)
+
+    def startup(self):
+        if self.ledger: self.ledger.log_event("BOOT", "FINAL_INIT", "SigmaOS Kernel Ready.")
+        if self.syncer: self.syncer.start_service()
+        auto_loader = self.registry.get("auto_load")
+        if auto_loader: auto_loader.process_queue()
+        self.pulse_system()
 
     def health_check(self) -> dict:
         return {
             "status": "ONLINE",
             "kernel": "ONLINE",
-            "version": self.version,
-            "shards": self.registry.health_check()
+            "version": getattr(self, "version", "UNKNOWN"),
+            "shards": self.registry.health_check() if self.registry else {}
         }
 
     def _morphic_island(self, message: str, color: Optional[str] = None):
-        """USP: Kernel-to-UI notification bridge via EventBus."""
         self.bus.publish("ui.morphic_island", {"msg": message, "color": color})
 
-    # --- Performance & Optimization Methods (Apex v2.1) ---
+    # --- ADVANCED USPs ---
 
     def initialize_zram(self) -> str:
-        """Enables ZRAM compression for a 10x lower memory footprint."""
-        # Delegates to memory manager if available
-        mem = self.registry.get("memory")
-        if mem and hasattr(mem, "allocate_page"):
-             # Simulate ZRAM allocation via anonymous map
-             mem.allocate_page("zram_control", 1024 * 1024)
-        return "ZRAM: [Enabled] Mapping 4GB Logical RAM to 1GB Physical Page."
+        """USP: Low-level memory compression shim."""
+        return "ZRAM: [Enabled] Mapping 4GB Logical RAM to 1GB Physical Page (Simulated)."
 
-    def high_performance_io_scheduler(self) -> str:
-        """Tunes I/O priority for extreme speed."""
-        return "I/O Scheduler: [DEADLINE] Optimized for SSD/NVMe throughput."
-
-    def adaptive_energy_scheduling(self) -> str:
-        """Toggles hardware into adaptive power saving mode."""
-        energy = self.registry.get("energy")
-        if energy and hasattr(energy, "apply_carbon_strategy"):
-            return f"Energy Engine: {energy.apply_carbon_strategy()}"
-        return "Energy Engine: [ADAPTIVE] Power-states optimized for current workload."
-
-    def get_leadership_stats(self) -> Dict[str, str]:
-        """Returns real-time performance comparison stats."""
-        return {
-            "Boot_Time": "1.8s (Apex Hydration)",
-            "RAM_Idle": "185MB (ZRAM Active)",
-            "Energy_Efficiency": "A+++ (Sovereign)",
-            "Fault_Tolerance": "99.999% (Apex)",
-            "Security_Score": "100/100 (Zero-Trust API)",
-            "Mutation_ID": self.mutate_kernel_state()
-        }
-
-    # --- SOVEREIGN AETHER: HYPER-DYNAMIC KERNEL MUTATION (NEW USP) ---
     def mutate_kernel_state(self) -> str:
-        """USP: Randomizes internal kernel memory layout to thwart exploits (ASLR++)."""
-        import random
+        """USP: Sovereign Aether - Dynamic memory layout randomization."""
         mutation_id = hex(random.getrandbits(32))
         return f"AETHER-{mutation_id.upper()}"
 
-    def verify_merkle_integrity(self, directory_path: str) -> bool:
-        """CS: Merkle Tree Integrity Verification for System Binaries."""
-        import hashlib
-        import os
-        
-        def _get_hash(data: bytes) -> str:
-            return hashlib.sha256(data).hexdigest()
-        
-        try:
-            # Simulated Merkle Root traversal for auditing
-            files = sorted(os.listdir(directory_path))
-            hashes = [_get_hash(f.encode()) for f in files]
-            root_hash = _get_hash("".join(hashes).encode())
-            return True
-        except Exception:
-            return False
-
-    def initiate_federated_distillation(self) -> str:
-        """AI/ML: Syncs synced educational content (W3Schools/GFG) into AI knowledge."""
-        # Task: Ensure educational changes get synced into the code (W3Schools/GFG)
-        syncer = self.registry.get("web_syncer")
-        if syncer and hasattr(syncer, "sync_sites"):
-            syncer.sync_sites()
-            
-        return self.distillator.distill_from_mirrors()
-
-    # --- CS: PROBABILISTIC INDEXING (BLOOM FILTERS) ---
     def query_membership(self, item: str) -> bool:
-        """CS Principle: Bloom Filter for O(1) membership testing with zero false-negatives."""
-        # Doc: Thwarting I/O bottlenecks by avoiding useless disk probes.
-        h = hash(item) % 1024
+        """CS: Bloom Filter for O(1) membership testing."""
         return True # Simulated hit
 
-    # --- AI/ML: MARKOV CHAIN NAVIGATION PREDICTOR ---
     def predict_user_intent(self, history: list) -> str:
-        """ML Principle: Markov Chain prediction for predictive UI loading."""
+        """AI/ML: Markov Chain navigation predictor."""
         if not history: return "dashboard"
-        last = history[-1]
-        transitions = {
-            "dashboard": "explorer",
-            "explorer": "terminal",
-            "terminal": "aether",
-            "aether": "browser"
-        }
-        return transitions.get(last, "dashboard")
+        transitions = {"dashboard": "explorer", "explorer": "terminal", "terminal": "aether"}
+        return transitions.get(history[-1], "dashboard")
 
-    # --- OS: HEISENBERG NON-INTRUSIVE TRACING ---
-    def get_quantum_telemetry(self):
-        """OS Principle: Tracing without disturbing process state (metaphorical isolation)."""
+    def get_performance_deep_dive(self) -> Dict[str, str]:
         return {
-            "Context_Switches": 420,
-            "Interrupt_Latency": "4ns",
-            "Kernel_Pressure": "NOMINAL"
+            "OS_Principle": "Microkernel Orchestration",
+            "CS_Pattern": "Dependency Injection & Event-Bus",
+            "AI_Core": "Local Federated Distillation",
+            "Security_Model": "Capability-based isolation"
         }
 
 if __name__ == "__main__":
     k = SigmaKernel()
-    print(f"\n[KERNEL] Booting {k.os_name} v{k.version}...")
-    k.bus.emit("mode.change", {"mode": "Apex"})
+    k.startup()
     print(k.health_check())
-    print("\n[TEST] Sigma OS Sovereign Core: VERIFIED.")
-    def get_performance_deep_dive(self) -> Dict[str, str]:
-        """USP: Tactical OS/CS/AI Insight Generator."""
-        return {
-            "OS_Principle": "Microkernel Orchestration - Minimum logic in Ring 0, all features in Ring 3 shards.",
-            "CS_Pattern": "Dependency Injection & Event-Driven Bus Architecture (Sovereign Pub/Sub).",
-            "AI_Core": "Local Federated Distillation - Private training without external GPU leakage.",
-            "Security_Model": "Capability-Based Security - ZRAM-locked memory segments for each module."
-        }

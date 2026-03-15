@@ -31,6 +31,7 @@ from userland.system_api.sigma_games_engine import SigmaGamesEngine
 
 from gui_pkg.styles import PAL, FONT_MONO, FONT_SMALL, FONT_MED, FONT_BOLD, FONT_TITLE, FONT_LOGO
 from gui_pkg.mixins import UIMixin
+from gui_pkg.premium_ui import PremiumUIMixin
 from gui_pkg.war_room import WarRoomPage
 from gui_pkg.mission_control import MissionControlPage
 from gui_pkg.cosmos_dash import CosmosDashPage
@@ -94,8 +95,8 @@ from gui_pkg.aether_page import AetherPage
 from gui_pkg.claw_page import ClawPage
 from gui_pkg.openroutines_page import OpenRoutinesPage
 
-class SigmaGUI(tk.Tk, UIMixin):
-    """Main SigmaOS GUI application window."""
+class SigmaGUI(tk.Tk, UIMixin, PremiumUIMixin):
+    """Main SigmaOS GUI application window with Premium UI extensions."""
 
     def __init__(self, kernel: SigmaKernel, intent: str = None):
         super().__init__()

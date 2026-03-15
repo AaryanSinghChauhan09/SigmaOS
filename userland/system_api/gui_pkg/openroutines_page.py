@@ -18,7 +18,7 @@ class OpenRoutinesPage(SigmaPage):
         l_fr.pack_propagate(False)
 
         # Multi AI Orchestrator
-        ai_card = self._card(l_fr, "🤖 Multi-AI Orchestrator")
+        ai_card = self.gui._premium_card(l_fr, "🤖 Multi-AI Orchestrator")
         ai_card.master.pack(fill="x", pady=(0, 10))
         tk.Label(ai_card, text="Cross-Model Consensus Engine.", font=FONT_SMALL, fg=PAL["dim"], bg=PAL["card"]).pack(anchor="w")
         
@@ -26,7 +26,7 @@ class OpenRoutinesPage(SigmaPage):
             self._notify("OpenRoutines", "Multi-AI Orchestrator Initialized.", "OK")
             self._log(self.log, "[OR] Syncing Llama-3, Phi-3, and Mistral consensus shims...", "INFO")
         
-        ttk.Button(ai_card, text="Engage AI Consensus", command=_launch_multi_ai).pack(fill="x", pady=5)
+        self.gui._pulsing_button(ai_card, "Engage AI Consensus", _launch_multi_ai).pack(fill="x", pady=5)
 
         # Discovery Agents
         discovery_card = self._card(l_fr, "🔍 Discovery & Extraction")
@@ -40,8 +40,8 @@ class OpenRoutinesPage(SigmaPage):
             self._notify("Agent", "IP Extraction System Active", "OK")
             self._log(self.log, "[AGENT] Sanitizing network headers. Extracting sovereign egress points...", "INFO")
 
-        ttk.Button(discovery_card, text="Email Discovery Agent", command=_email_discover).pack(fill="x", pady=2)
-        ttk.Button(discovery_card, text="IP Extraction System", command=_ip_extract).pack(fill="x", pady=2)
+        self.gui._pulsing_button(discovery_card, "Email Discovery Agent", _email_discover).pack(fill="x", pady=2)
+        self.gui._pulsing_button(discovery_card, "IP Extraction System", _ip_extract).pack(fill="x", pady=2)
 
         # Creative & Dev
         creative_card = self._card(l_fr, "🎨 Creative & Dev Shards")
@@ -55,8 +55,8 @@ class OpenRoutinesPage(SigmaPage):
             self._notify("Vision", "Text-to-Flowchart Active", "OK")
             self._log(self.log, "[VISION] Drawing GraphViz schema from natural intent...", "INFO")
 
-        ttk.Button(creative_card, text="PDF Forge Pro", command=_forge_pdf).pack(fill="x", pady=2)
-        ttk.Button(creative_card, text="Text-to-Flowchart", command=_flowchart).pack(fill="x", pady=2)
+        self.gui._pulsing_button(creative_card, "PDF Forge Pro", _forge_pdf).pack(fill="x", pady=2)
+        self.gui._pulsing_button(creative_card, "Text-to-Flowchart", _flowchart).pack(fill="x", pady=2)
 
         # Right Column: Execution Log & Ultra Control
         r_fr = tk.Frame(body, bg=PAL["bg"])

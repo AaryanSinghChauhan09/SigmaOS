@@ -28,7 +28,8 @@ class DashboardPage(SigmaPage):
         for i, (key, label, val, color) in enumerate(stat_defs):
             var = tk.StringVar(value=val)
             self.gui._stat_widgets[key] = var
-            card = self.gui._card(stats_row, label, padx=20, pady=15)
+            # USP: Premium Glassmorphism Card
+            card = self.gui._premium_card(stats_row, label)
             card.master.pack(side="left", fill="both", expand=True, padx=5)
             
             tk.Label(card, textvariable=var, font=("Inter Bold", 22),
@@ -58,7 +59,7 @@ class DashboardPage(SigmaPage):
         nexus_row = tk.Frame(self, bg=PAL["bg"])
         nexus_row.pack(fill="x", pady=10)
         
-        nexus_card = self.gui._card(nexus_row, "🧬 Sovereign AI Nexus: Task Agent & Guide")
+        nexus_card = self.gui._premium_card(nexus_row, "🧬 Sovereign AI Nexus: Task Agent & Guide")
         nexus_card.master.pack(side="left", fill="both", expand=True, padx=(0, 10))
         
         tk.Label(nexus_card, text="OS Status: Quantum-Secured | Telemetry: 0 | Anonymity: 100%", 
@@ -77,7 +78,7 @@ class DashboardPage(SigmaPage):
             b.bind("<Leave>", lambda e, bt=b: bt.config(bg=PAL["bg2"]))
 
         # --- Performance & Fabric Insight ---
-        mission_card = self.gui._card(nexus_row, "🧠 Fabric Orchestration")
+        mission_card = self.gui._premium_card(nexus_row, "🧠 Fabric Orchestration")
         mission_card.master.pack(side="left", fill="both", expand=True)
         
         self.gui._mission_summary = tk.StringVar(value="Agentic Swarm: Idle | Fabric: 98% Perf")
