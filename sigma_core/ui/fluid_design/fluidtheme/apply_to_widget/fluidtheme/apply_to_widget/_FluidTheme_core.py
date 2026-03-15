@@ -1,4 +1,4 @@
-# Generated class core: FluidTheme
-from typing import Dict, Any, Tuple
-
-class FluidTheme:
+"""
+SigmaOS Modular Shim
+"""
+from ._FluidTheme_core.fluidtheme._core import FluidTheme # noqa

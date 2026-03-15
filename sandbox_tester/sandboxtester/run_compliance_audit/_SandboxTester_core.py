@@ -1,7 +1,4 @@
-# Generated class core: SandboxTester
-import sys
-import os
-import time
-from sigma_core.kernel import SigmaKernel
-
-class SandboxTester:
+"""
+SigmaOS Modular Shim
+"""
+from ._SandboxTester_core.sandboxtester._core import SandboxTester # noqa

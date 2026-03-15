@@ -1,7 +1,4 @@
-# Generated class core: MensaPuzzle
-import random
-import time
-from typing import List, Tuple, Dict, Any, Optional, Set
-from .base import SigmaGame
-
-class MensaPuzzle:
+"""
+SigmaOS Modular Shim
+"""
+from ._MensaPuzzle_core.mensapuzzle._core import MensaPuzzle # noqa

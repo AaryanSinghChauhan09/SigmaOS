@@ -1,8 +1,4 @@
-# Generated class core: _DeltaShard
-import time
-import random
-import hashlib
-import threading
-from typing import Dict, List, Any
-
-class _DeltaShard:
+"""
+SigmaOS Modular Shim
+"""
+from .__DeltaShard_core._deltashard._core import _DeltaShard # noqa

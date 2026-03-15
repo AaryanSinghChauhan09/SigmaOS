@@ -1,7 +1,4 @@
-# Generated class core: SigmaSessionManager
-import time
-import uuid
-import threading
-from dataclasses import dataclass, field
-
-class SigmaSessionManager:
+"""
+SigmaOS Modular Shim
+"""
+from ._SigmaSessionManager_core.sigmasessionmanager._core import SigmaSessionManager # noqa

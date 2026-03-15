@@ -1,5 +1,4 @@
-# Generated class core: SigmaContextEngine
-from typing import Dict, List, Any
-import time
-
-class SigmaContextEngine:
+"""
+SigmaOS Modular Shim
+"""
+from ._SigmaContextEngine_core.sigmacontextengine._core import SigmaContextEngine # noqa

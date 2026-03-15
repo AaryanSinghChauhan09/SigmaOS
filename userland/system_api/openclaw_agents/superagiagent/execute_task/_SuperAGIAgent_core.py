@@ -1,4 +1,4 @@
-# Generated class core: SuperAGIAgent
-from sigma_core.system.interfaces import ISigmaModule, SigmaModuleBase
-
-class SuperAGIAgent:
+"""
+SigmaOS Modular Shim
+"""
+from ._SuperAGIAgent_core.superagiagent._core import SuperAGIAgent # noqa

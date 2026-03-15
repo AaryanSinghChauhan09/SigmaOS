@@ -1,7 +1,4 @@
-# Generated class core: SovereignSync
-import json
-import os
-import time
-from typing import Dict, Any, List, Optional
-
-class SovereignSync:
+"""
+SigmaOS Modular Shim
+"""
+from ._SovereignSync_core.sovereignsync._core import SovereignSync # noqa

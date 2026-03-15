@@ -1,7 +1,4 @@
-# Generated class core: SearchPage
-import tkinter as tk
-from tkinter import ttk
-from .base_page import SigmaPage
-from .styles import PAL, FONT_BOLD, FONT_SMALL, FONT_MED
-
-class SearchPage:
+"""
+SigmaOS Modular Shim
+"""
+from ._SearchPage_core.searchpage._core import SearchPage # noqa

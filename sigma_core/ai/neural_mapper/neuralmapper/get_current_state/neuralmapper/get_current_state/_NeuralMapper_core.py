@@ -1,5 +1,4 @@
-# Generated class core: NeuralMapper
-from typing import Dict, Any, List
-from sigma_core.system.interfaces import SigmaModuleBase
-
-class NeuralMapper:
+"""
+SigmaOS Modular Shim
+"""
+from ._NeuralMapper_core.neuralmapper._core import NeuralMapper # noqa

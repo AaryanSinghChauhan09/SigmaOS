@@ -1,6 +1,4 @@
-# Generated class core: SigmaModuleBase
-import sys
-import traceback
-from typing import Dict, Any, List, Optional, Callable
-
-class SigmaModuleBase:
+"""
+SigmaOS Modular Shim
+"""
+from ._SigmaModuleBase_core.sigmamodulebase._core import SigmaModuleBase # noqa

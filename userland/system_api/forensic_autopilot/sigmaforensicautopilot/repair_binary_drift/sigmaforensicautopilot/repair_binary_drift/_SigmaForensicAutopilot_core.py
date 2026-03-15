@@ -1,5 +1,4 @@
-# Generated class core: SigmaForensicAutopilot
-import time
-import hashlib
-
-class SigmaForensicAutopilot:
+"""
+SigmaOS Modular Shim
+"""
+from ._SigmaForensicAutopilot_core.sigmaforensicautopilot._core import SigmaForensicAutopilot # noqa

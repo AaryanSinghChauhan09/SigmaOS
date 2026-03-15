@@ -1,8 +1,4 @@
-# Generated class core: ZKSync
-import os
-import base64
-import hashlib
-import json
-from typing import Dict
-
-class ZKSync:
+"""
+SigmaOS Modular Shim
+"""
+from ._ZKSync_core.zksync._core import ZKSync # noqa

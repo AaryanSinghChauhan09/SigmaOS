@@ -1,7 +1,4 @@
-# Generated class core: WelcomeAssistant
-import tkinter as tk
-from tkinter import ttk
-import time
-from typing import Any, List, Dict
-
-class WelcomeAssistant:
+"""
+SigmaOS Modular Shim
+"""
+from ._WelcomeAssistant_core.welcomeassistant._core import WelcomeAssistant # noqa

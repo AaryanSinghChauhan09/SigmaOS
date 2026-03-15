@@ -1,7 +1,4 @@
-# Generated class core: SigmaModuleBase
-import hashlib
-import json
-import re
-from sigma_core.system.interfaces import ISigmaModule, SigmaModuleBase
-
-class SigmaModuleBase:
+"""
+SigmaOS Modular Shim
+"""
+from ._SigmaModuleBase_core.sigmamodulebase._core import SigmaModuleBase # noqa

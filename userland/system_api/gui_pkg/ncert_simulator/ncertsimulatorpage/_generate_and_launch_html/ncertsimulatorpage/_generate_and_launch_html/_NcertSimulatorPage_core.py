@@ -1,10 +1,4 @@
-# Generated class core: NcertSimulatorPage
-import tkinter as tk
-from tkinter import ttk
-import os
-import webbrowser
-import tempfile
-from .base_page import SigmaPage
-from .styles import PAL, FONT_SMALL, FONT_MED
-
-class NcertSimulatorPage:
+"""
+SigmaOS Modular Shim
+"""
+from ._NcertSimulatorPage_core.ncertsimulatorpage._core import NcertSimulatorPage # noqa

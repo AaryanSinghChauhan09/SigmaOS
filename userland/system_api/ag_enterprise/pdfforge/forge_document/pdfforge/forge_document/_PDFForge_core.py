@@ -1,8 +1,4 @@
-# Generated class core: PDFForge
-import os
-import re
-import json
-import time
-from typing import List, Dict, Any, Optional
-
-class PDFForge:
+"""
+SigmaOS Modular Shim
+"""
+from ._PDFForge_core.pdfforge._core import PDFForge # noqa

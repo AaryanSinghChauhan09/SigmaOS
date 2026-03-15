@@ -1,5 +1,4 @@
-# Generated class core: SigmaContinuityEngine
-from typing import Dict, List, Any
-import time
-
-class SigmaContinuityEngine:
+"""
+SigmaOS Modular Shim
+"""
+from ._SigmaContinuityEngine_core.sigmacontinuityengine._core import SigmaContinuityEngine # noqa

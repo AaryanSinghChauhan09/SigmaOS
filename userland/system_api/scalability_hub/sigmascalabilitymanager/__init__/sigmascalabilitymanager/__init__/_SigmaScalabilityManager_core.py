@@ -1,6 +1,4 @@
-# Generated class core: SigmaScalabilityManager
-import time
-import random
-from typing import Dict, List, Any
-
-class SigmaScalabilityManager:
+"""
+SigmaOS Modular Shim
+"""
+from ._SigmaScalabilityManager_core.sigmascalabilitymanager._core import SigmaScalabilityManager # noqa

@@ -1,8 +1,4 @@
-# Generated file: verify_system_state
-import hashlib
-import os
-
-def verify_system_state():
-    validator = MerkleIntegrityValidator('.')
-    root_hash = validator.audit_entire_fleet()
-    return root_hash
+"""
+SigmaOS Modular Shim
+"""
+from ._shards.verify_system_state import verify_system_state

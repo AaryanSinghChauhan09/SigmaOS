@@ -1,7 +1,4 @@
-# Generated class core: SigmaDeviceManager
-import time
-import uuid
-from typing import Dict, List, Any
-from .interfaces import SigmaModuleBase, ISigmaService
-
-class SigmaDeviceManager:
+"""
+SigmaOS Modular Shim
+"""
+from ._SigmaDeviceManager_core.sigmadevicemanager._core import SigmaDeviceManager # noqa

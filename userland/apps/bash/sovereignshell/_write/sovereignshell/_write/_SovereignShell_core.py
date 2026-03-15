@@ -1,9 +1,4 @@
-# Generated class core: SovereignShell
-import tkinter as tk
-from tkinter import scrolledtext, messagebox, ttk
-import subprocess
-import os
-import sys
-import random
-
-class SovereignShell:
+"""
+SigmaOS Modular Shim
+"""
+from ._SovereignShell_core.sovereignshell._core import SovereignShell # noqa

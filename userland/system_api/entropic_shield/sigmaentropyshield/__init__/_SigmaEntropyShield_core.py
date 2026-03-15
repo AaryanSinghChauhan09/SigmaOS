@@ -1,7 +1,4 @@
-# Generated class core: SigmaEntropyShield
-from typing import Dict, Any, List
-import time
-import uuid
-import random
-
-class SigmaEntropyShield:
+"""
+SigmaOS Modular Shim
+"""
+from ._SigmaEntropyShield_core.sigmaentropyshield._core import SigmaEntropyShield # noqa

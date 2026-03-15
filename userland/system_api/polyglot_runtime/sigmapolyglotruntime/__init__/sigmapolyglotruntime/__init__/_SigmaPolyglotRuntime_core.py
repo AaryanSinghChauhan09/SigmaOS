@@ -1,5 +1,4 @@
-# Generated class core: SigmaPolyglotRuntime
-import time
-from typing import Dict, Any
-
-class SigmaPolyglotRuntime:
+"""
+SigmaOS Modular Shim
+"""
+from ._SigmaPolyglotRuntime_core.sigmapolyglotruntime._core import SigmaPolyglotRuntime # noqa

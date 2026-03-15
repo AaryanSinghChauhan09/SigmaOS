@@ -1,8 +1,4 @@
-# Generated class core: SovereignHAL
-import ctypes
-import platform
-import os
-import sys
-from typing import Any
-
-class SovereignHAL:
+"""
+SigmaOS Modular Shim
+"""
+from ._SovereignHAL_core.sovereignhal._core import SovereignHAL # noqa

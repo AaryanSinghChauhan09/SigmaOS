@@ -3,6 +3,7 @@ SigmaAILab: The Professional AI Engineer's Workbench.
 ===================================================
 USP: Sovereign ML Lifecycle Management.
 Competitor Killers:
+    pass
 - Weights & Biases / MLflow: Offline, local-first experiment tracking.
 - TensorBoard: Real-time model architecture visualization.
 - NVIDIA-SMI: Direct HardwareWarden feedback on VRAM/CUDA intensity.

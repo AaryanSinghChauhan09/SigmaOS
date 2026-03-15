@@ -1,6 +1,4 @@
-# Generated class core: SnakeGame
-import random
-from typing import List, Tuple, Dict, Any, Optional
-from .base import SigmaGame
-
-class SnakeGame:
+"""
+SigmaOS Modular Shim
+"""
+from ._SnakeGame_core.snakegame._core import SnakeGame # noqa

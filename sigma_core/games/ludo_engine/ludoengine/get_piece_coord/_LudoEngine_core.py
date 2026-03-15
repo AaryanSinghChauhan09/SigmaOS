@@ -1,5 +1,4 @@
-# Generated class core: LudoEngine
-import random
-from typing import Dict, Any, List, Optional, Tuple
-
-class LudoEngine:
+"""
+SigmaOS Modular Shim
+"""
+from ._LudoEngine_core.ludoengine._core import LudoEngine # noqa

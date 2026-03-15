@@ -1,6 +1,4 @@
-# Generated class core: SigmaAppStore
-import time
-from typing import List, Dict
-from app_sandbox import SigmaAppSandbox
-
-class SigmaAppStore:
+"""
+SigmaOS Modular Shim
+"""
+from ._SigmaAppStore_core.sigmaappstore._core import SigmaAppStore # noqa

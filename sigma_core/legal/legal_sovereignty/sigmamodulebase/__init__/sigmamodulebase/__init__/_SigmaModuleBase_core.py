@@ -1,6 +1,4 @@
-# Generated class core: SigmaModuleBase
-import time
-from typing import Dict, Any, List, Optional
-from sigma_core.system.interfaces import SigmaModuleBase
-
-class SigmaModuleBase:
+"""
+SigmaOS Modular Shim
+"""
+from ._SigmaModuleBase_core.sigmamodulebase._core import SigmaModuleBase # noqa

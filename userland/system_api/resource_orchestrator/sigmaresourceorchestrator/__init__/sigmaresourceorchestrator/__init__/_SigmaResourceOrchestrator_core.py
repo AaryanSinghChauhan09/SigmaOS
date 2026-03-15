@@ -1,6 +1,4 @@
-# Generated class core: SigmaResourceOrchestrator
-from typing import Dict, List, Any
-import time
-import random
-
-class SigmaResourceOrchestrator:
+"""
+SigmaOS Modular Shim
+"""
+from ._SigmaResourceOrchestrator_core.sigmaresourceorchestrator._core import SigmaResourceOrchestrator # noqa

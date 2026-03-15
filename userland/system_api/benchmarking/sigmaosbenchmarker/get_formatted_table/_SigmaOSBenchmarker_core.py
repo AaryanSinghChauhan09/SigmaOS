@@ -1,5 +1,4 @@
-# Generated class core: SigmaOSBenchmarker
-from __future__ import annotations
-from typing import Dict, List, Any
-
-class SigmaOSBenchmarker:
+"""
+SigmaOS Modular Shim
+"""
+from ._SigmaOSBenchmarker_core.sigmaosbenchmarker._core import SigmaOSBenchmarker # noqa

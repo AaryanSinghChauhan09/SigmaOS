@@ -1,6 +1,4 @@
-# Generated class core: SovereignAnalyticHub
-import time
-from typing import Dict, Any, List, Optional
-from sigma_core.system.interfaces import SigmaModuleBase, ISigmaService
-
-class SovereignAnalyticHub:
+"""
+SigmaOS Modular Shim
+"""
+from ._SovereignAnalyticHub_core.sovereignanalytichub._core import SovereignAnalyticHub # noqa

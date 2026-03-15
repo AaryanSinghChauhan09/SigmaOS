@@ -1,7 +1,4 @@
-# Generated class core: NativeAccelerator
-import ctypes
-import os
-import platform
-from typing import Optional, Any
-
-class NativeAccelerator:
+"""
+SigmaOS Modular Shim
+"""
+from ._NativeAccelerator_core.nativeaccelerator._core import NativeAccelerator # noqa

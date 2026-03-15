@@ -1,5 +1,4 @@
-# Generated class core: SigmaQuickSettings
-import tkinter as tk
-from tkinter import ttk
-
-class SigmaQuickSettings:
+"""
+SigmaOS Modular Shim
+"""
+from ._SigmaQuickSettings_core.sigmaquicksettings._core import SigmaQuickSettings # noqa

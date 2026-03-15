@@ -1,5 +1,4 @@
-# Generated class core: SovereignScheduler
-from dataclasses import dataclass, field
-import time
-
-class SovereignScheduler:
+"""
+SigmaOS Modular Shim
+"""
+from ._SovereignScheduler_core.sovereignscheduler._core import SovereignScheduler # noqa

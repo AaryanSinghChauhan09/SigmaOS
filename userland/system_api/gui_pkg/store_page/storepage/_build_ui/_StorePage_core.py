@@ -1,7 +1,4 @@
-# Generated class core: StorePage
-import tkinter as tk
-from tkinter import ttk
-from .base_page import SigmaPage
-from .styles import PAL, FONT_BOLD, FONT_SMALL
-
-class StorePage:
+"""
+SigmaOS Modular Shim
+"""
+from ._StorePage_core.storepage._core import StorePage # noqa

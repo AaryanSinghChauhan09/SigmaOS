@@ -1,7 +1,4 @@
-# Generated class core: IntelligenceComponent
-import math
-import random
-import time
-from typing import List, Dict, Any, Optional
-
-class IntelligenceComponent:
+"""
+SigmaOS Modular Shim
+"""
+from ._IntelligenceComponent_core.intelligencecomponent._core import IntelligenceComponent # noqa

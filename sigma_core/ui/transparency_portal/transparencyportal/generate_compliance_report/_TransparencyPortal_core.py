@@ -1,8 +1,4 @@
-# Generated class core: TransparencyPortal
-import os
-import sys
-import time
-from typing import Dict, Any, List
-from sigma_core.system.interfaces import SigmaModuleBase
-
-class TransparencyPortal:
+"""
+SigmaOS Modular Shim
+"""
+from ._TransparencyPortal_core.transparencyportal._core import TransparencyPortal # noqa

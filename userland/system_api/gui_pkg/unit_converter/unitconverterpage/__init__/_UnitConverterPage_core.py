@@ -1,7 +1,4 @@
-# Generated class core: UnitConverterPage
-import tkinter as tk
-from tkinter import ttk
-from .base_page import SigmaPage
-from .styles import PAL, FONT_SMALL, FONT_BOLD, FONT_MED
-
-class UnitConverterPage:
+"""
+SigmaOS Modular Shim
+"""
+from ._UnitConverterPage_core.unitconverterpage._core import UnitConverterPage # noqa

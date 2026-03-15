@@ -1,7 +1,4 @@
-# Generated class core: Handler
-import http.server
-import socketserver
-import os
-import webbrowser
-
-class Handler:
+"""
+SigmaOS Modular Shim
+"""
+from ._Handler_core.handler._core import Handler # noqa

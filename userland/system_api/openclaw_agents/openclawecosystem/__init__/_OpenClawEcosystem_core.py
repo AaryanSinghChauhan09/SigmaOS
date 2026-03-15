@@ -1,4 +1,4 @@
-# Generated class core: OpenClawEcosystem
-from sigma_core.system.interfaces import ISigmaModule, SigmaModuleBase
-
-class OpenClawEcosystem:
+"""
+SigmaOS Modular Shim
+"""
+from ._OpenClawEcosystem_core.openclawecosystem._core import OpenClawEcosystem # noqa

@@ -1,7 +1,4 @@
-# Generated class core: FastFive
-import random
-import time
-from typing import List, Tuple, Dict, Any, Optional, Set
-from .base import SigmaGame
-
-class FastFive:
+"""
+SigmaOS Modular Shim
+"""
+from ._FastFive_core.fastfive._core import FastFive # noqa

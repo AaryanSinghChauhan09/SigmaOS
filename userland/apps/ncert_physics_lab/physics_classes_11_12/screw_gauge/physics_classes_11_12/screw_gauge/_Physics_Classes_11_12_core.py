@@ -1,4 +1,4 @@
-# Generated class core: Physics_Classes_11_12
-import math, random
-
-class Physics_Classes_11_12:
+"""
+SigmaOS Modular Shim
+"""
+from ._Physics_Classes_11_12_core.physics_classes_11_12._core import Physics_Classes_11_12 # noqa

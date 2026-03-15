@@ -1,6 +1,4 @@
-# Generated class core: ComplianceGuard
-import os
-import time
-from sigma_core.system.interfaces import SigmaModuleBase, ISigmaService
-
-class ComplianceGuard:
+"""
+SigmaOS Modular Shim
+"""
+from ._ComplianceGuard_core.complianceguard._core import ComplianceGuard # noqa

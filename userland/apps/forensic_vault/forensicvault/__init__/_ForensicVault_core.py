@@ -1,6 +1,4 @@
-# Generated class core: ForensicVault
-import tkinter as tk
-from tkinter import ttk, scrolledtext, messagebox
-import os, hashlib, time, threading
-
-class ForensicVault:
+"""
+SigmaOS Modular Shim
+"""
+from ._ForensicVault_core.forensicvault._core import ForensicVault # noqa

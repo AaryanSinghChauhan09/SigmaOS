@@ -7,6 +7,7 @@ USP: Next-gen built-in media editor combining the power of timeline video (Premi
      ensure absolute compliance with IP laws and humanity-first principles.
 
 Features & Compliance:
+    pass
 1. Zero-Trust Enforcement: Explicit consent for cloud sync, auto-revoked on exit.
 2. Open Standards Only: FFmpeg and ImageMagick based logic.
 3. Code Hygiene: Sandboxing & Immutable Consent Ledgers included.

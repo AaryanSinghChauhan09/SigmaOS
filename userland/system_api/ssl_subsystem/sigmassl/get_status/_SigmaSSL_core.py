@@ -1,4 +1,4 @@
-# Generated class core: SigmaSSL
-from typing import Dict, List, Any
-
-class SigmaSSL:
+"""
+SigmaOS Modular Shim
+"""
+from ._SigmaSSL_core.sigmassl._core import SigmaSSL # noqa

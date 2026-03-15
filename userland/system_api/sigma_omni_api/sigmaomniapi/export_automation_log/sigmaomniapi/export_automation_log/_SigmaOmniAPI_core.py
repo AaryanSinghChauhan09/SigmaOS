@@ -1,7 +1,4 @@
-# Generated class core: SigmaOmniAPI
-import os
-import json
-import subprocess
-import sys
-
-class SigmaOmniAPI:
+"""
+SigmaOS Modular Shim
+"""
+from ._SigmaOmniAPI_core.sigmaomniapi._core import SigmaOmniAPI # noqa

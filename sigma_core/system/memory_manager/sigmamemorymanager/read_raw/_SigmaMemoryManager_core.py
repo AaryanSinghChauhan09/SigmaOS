@@ -1,7 +1,4 @@
-# Generated class core: SigmaMemoryManager
-import ctypes
-import mmap
-import os
-import time
-
-class SigmaMemoryManager:
+"""
+SigmaOS Modular Shim
+"""
+from ._SigmaMemoryManager_core.sigmamemorymanager._core import SigmaMemoryManager # noqa

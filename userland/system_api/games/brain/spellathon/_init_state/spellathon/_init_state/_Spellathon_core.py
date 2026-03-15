@@ -1,7 +1,4 @@
-# Generated class core: Spellathon
-import random
-import time
-from typing import List, Tuple, Dict, Any, Optional, Set
-from .base import SigmaGame
-
-class Spellathon:
+"""
+SigmaOS Modular Shim
+"""
+from ._Spellathon_core.spellathon._core import Spellathon # noqa

@@ -1,5 +1,4 @@
-# Generated class core: MerkleNode
-import hashlib
-from typing import List, Optional
-
-class MerkleNode:
+"""
+SigmaOS Modular Shim
+"""
+from ._MerkleNode_core.merklenode._core import MerkleNode # noqa

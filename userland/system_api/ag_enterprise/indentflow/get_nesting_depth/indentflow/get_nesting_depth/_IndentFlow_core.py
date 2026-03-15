@@ -1,8 +1,4 @@
-# Generated class core: IndentFlow
-import os
-import re
-import json
-import time
-from typing import List, Dict, Any, Optional
-
-class IndentFlow:
+"""
+SigmaOS Modular Shim
+"""
+from ._IndentFlow_core.indentflow._core import IndentFlow # noqa

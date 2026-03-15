@@ -1,7 +1,4 @@
-# Generated class core: TowerOfHanoi
-import random
-import time
-from typing import List, Tuple, Dict, Any, Optional, Set
-from .base import SigmaGame
-
-class TowerOfHanoi:
+"""
+SigmaOS Modular Shim
+"""
+from ._TowerOfHanoi_core.towerofhanoi._core import TowerOfHanoi # noqa

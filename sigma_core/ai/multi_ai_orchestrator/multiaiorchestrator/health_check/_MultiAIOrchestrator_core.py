@@ -1,7 +1,4 @@
-# Generated class core: MultiAIOrchestrator
-from typing import List, Dict, Any
-import threading
-import time
-import random
-
-class MultiAIOrchestrator:
+"""
+SigmaOS Modular Shim
+"""
+from ._MultiAIOrchestrator_core.multiaiorchestrator._core import MultiAIOrchestrator # noqa

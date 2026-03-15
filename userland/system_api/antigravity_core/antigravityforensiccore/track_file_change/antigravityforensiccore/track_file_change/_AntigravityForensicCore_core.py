@@ -1,6 +1,4 @@
-# Generated class core: AntigravityForensicCore
-import os
-import hashlib
-import time
-
-class AntigravityForensicCore:
+"""
+SigmaOS Modular Shim
+"""
+from ._AntigravityForensicCore_core.antigravityforensiccore._core import AntigravityForensicCore # noqa

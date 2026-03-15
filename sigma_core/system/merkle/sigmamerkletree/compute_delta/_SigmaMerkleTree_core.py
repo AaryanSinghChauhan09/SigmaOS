@@ -1,5 +1,4 @@
-# Generated class core: SigmaMerkleTree
-import hashlib
-from typing import List, Optional
-
-class SigmaMerkleTree:
+"""
+SigmaOS Modular Shim
+"""
+from ._SigmaMerkleTree_core.sigmamerkletree._core import SigmaMerkleTree # noqa

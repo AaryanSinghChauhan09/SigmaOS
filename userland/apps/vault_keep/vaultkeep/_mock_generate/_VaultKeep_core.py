@@ -1,6 +1,4 @@
-# Generated class core: VaultKeep
-import tkinter as tk
-from tkinter import ttk, messagebox
-import random
-
-class VaultKeep:
+"""
+SigmaOS Modular Shim
+"""
+from ._VaultKeep_core.vaultkeep._core import VaultKeep # noqa

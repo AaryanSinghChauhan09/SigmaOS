@@ -1,5 +1,4 @@
-# Generated class core: SovereignInterruptManager
-from enum import Enum, auto
-import secrets
-
-class SovereignInterruptManager:
+"""
+SigmaOS Modular Shim
+"""
+from ._SovereignInterruptManager_core.sovereigninterruptmanager._core import SovereignInterruptManager # noqa

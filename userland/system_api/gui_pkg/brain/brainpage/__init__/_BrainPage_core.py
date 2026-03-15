@@ -1,6 +1,4 @@
-# Generated class core: BrainPage
-import tkinter as tk
-from .base_page import SigmaPage
-from .styles import PAL
-
-class BrainPage:
+"""
+SigmaOS Modular Shim
+"""
+from ._BrainPage_core.brainpage._core import BrainPage # noqa

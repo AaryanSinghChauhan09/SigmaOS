@@ -1,7 +1,4 @@
-# Generated class core: Minesweeper
-import random
-import time
-from typing import List, Tuple, Dict, Any, Optional, Set
-from .base import SigmaGame
-
-class Minesweeper:
+"""
+SigmaOS Modular Shim
+"""
+from ._Minesweeper_core.minesweeper._core import Minesweeper # noqa

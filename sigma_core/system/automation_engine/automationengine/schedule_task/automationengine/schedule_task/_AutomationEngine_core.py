@@ -1,6 +1,4 @@
-# Generated class core: AutomationEngine
-import time
-import threading
-from typing import Dict, Any, List, Callable, Optional
-
-class AutomationEngine:
+"""
+SigmaOS Modular Shim
+"""
+from ._AutomationEngine_core.automationengine._core import AutomationEngine # noqa

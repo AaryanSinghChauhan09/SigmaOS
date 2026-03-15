@@ -1,6 +1,4 @@
-# Generated class core: TaskAgent
-import time
-import random
-from typing import List, Dict
-
-class TaskAgent:
+"""
+SigmaOS Modular Shim
+"""
+from ._TaskAgent_core.taskagent._core import TaskAgent # noqa

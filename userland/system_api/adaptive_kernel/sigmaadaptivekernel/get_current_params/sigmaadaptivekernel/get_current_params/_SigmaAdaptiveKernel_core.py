@@ -1,6 +1,4 @@
-# Generated class core: SigmaAdaptiveKernel
-import time
-import threading
-from enum import Enum, auto
-
-class SigmaAdaptiveKernel:
+"""
+SigmaOS Modular Shim
+"""
+from ._SigmaAdaptiveKernel_core.sigmaadaptivekernel._core import SigmaAdaptiveKernel # noqa

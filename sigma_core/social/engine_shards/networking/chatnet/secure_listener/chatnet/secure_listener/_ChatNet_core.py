@@ -1,7 +1,4 @@
-# Generated class core: ChatNet
-import socket
-import threading
-import json
-from userland.system_api.sigma_std import SigmaCrypto
-
-class ChatNet:
+"""
+SigmaOS Modular Shim
+"""
+from ._ChatNet_core.chatnet._core import ChatNet # noqa

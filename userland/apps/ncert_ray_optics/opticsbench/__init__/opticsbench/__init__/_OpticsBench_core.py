@@ -1,5 +1,4 @@
-# Generated class core: OpticsBench
-import tkinter as tk
-from tkinter import ttk
-
-class OpticsBench:
+"""
+SigmaOS Modular Shim
+"""
+from ._OpticsBench_core.opticsbench._core import OpticsBench # noqa

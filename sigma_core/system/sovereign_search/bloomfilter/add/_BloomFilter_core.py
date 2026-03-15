@@ -1,5 +1,4 @@
-# Generated class core: BloomFilter
-from typing import List, Dict, Any, Optional
-from sigma_core.system.interfaces import SigmaModuleBase, ISigmaService
-
-class BloomFilter:
+"""
+SigmaOS Modular Shim
+"""
+from ._BloomFilter_core.bloomfilter._core import BloomFilter # noqa

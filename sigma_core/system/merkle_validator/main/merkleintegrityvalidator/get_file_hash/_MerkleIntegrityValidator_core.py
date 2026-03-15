@@ -1,5 +1,4 @@
-# Generated class core: MerkleIntegrityValidator
-import hashlib
-import os
-
-class MerkleIntegrityValidator:
+"""
+SigmaOS Modular Shim
+"""
+from ._MerkleIntegrityValidator_core.merkleintegrityvalidator._core import MerkleIntegrityValidator # noqa

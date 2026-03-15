@@ -1,7 +1,4 @@
-# Generated class core: SigmaSilo
-import time
-import uuid
-import random
-from typing import Dict, List, Any
-
-class SigmaSilo:
+"""
+SigmaOS Modular Shim
+"""
+from ._SigmaSilo_core.sigmasilo._core import SigmaSilo # noqa

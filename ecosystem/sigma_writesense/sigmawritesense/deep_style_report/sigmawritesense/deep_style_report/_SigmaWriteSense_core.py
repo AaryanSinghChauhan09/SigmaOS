@@ -1,5 +1,4 @@
-# Generated class core: SigmaWriteSense
-from typing import Dict, List, Any
-import re
-
-class SigmaWriteSense:
+"""
+SigmaOS Modular Shim
+"""
+from ._SigmaWriteSense_core.sigmawritesense._core import SigmaWriteSense # noqa

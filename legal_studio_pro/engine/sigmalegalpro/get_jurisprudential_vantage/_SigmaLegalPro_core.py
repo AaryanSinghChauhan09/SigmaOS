@@ -1,7 +1,4 @@
-# Generated class core: SigmaLegalPro
-from typing import Dict, List, Any, Optional
-import datetime
-import json
-import os
-
-class SigmaLegalPro:
+"""
+SigmaOS Modular Shim
+"""
+from ._SigmaLegalPro_core.sigmalegalpro._core import SigmaLegalPro # noqa

@@ -1,6 +1,4 @@
-# Generated class core: NCERTGrapher
-import tkinter as tk
-from tkinter import ttk
-import math
-
-class NCERTGrapher:
+"""
+SigmaOS Modular Shim
+"""
+from ._NCERTGrapher_core.ncertgrapher._core import NCERTGrapher # noqa

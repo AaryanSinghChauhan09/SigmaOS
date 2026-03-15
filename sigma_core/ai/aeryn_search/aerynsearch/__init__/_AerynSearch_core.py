@@ -1,6 +1,4 @@
-# Generated class core: AerynSearch
-import os
-from typing import List, Dict, Any
-from sigma_core.system.interfaces import SigmaModuleBase
-
-class AerynSearch:
+"""
+SigmaOS Modular Shim
+"""
+from ._AerynSearch_core.aerynsearch._core import AerynSearch # noqa

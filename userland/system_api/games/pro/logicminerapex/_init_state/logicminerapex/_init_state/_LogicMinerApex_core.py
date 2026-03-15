@@ -1,6 +1,4 @@
-# Generated class core: LogicMinerApex
-import random
-from typing import List, Tuple, Dict, Any, Optional
-from .base import SigmaGame
-
-class LogicMinerApex:
+"""
+SigmaOS Modular Shim
+"""
+from ._LogicMinerApex_core.logicminerapex._core import LogicMinerApex # noqa

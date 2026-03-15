@@ -1,5 +1,4 @@
-# Generated class core: ChatIdentity
-import uuid
-import os
-
-class ChatIdentity:
+"""
+SigmaOS Modular Shim
+"""
+from ._ChatIdentity_core.chatidentity._core import ChatIdentity # noqa

@@ -1,8 +1,4 @@
-# Generated class core: SigmaProcessManager
-import time
-import uuid
-import threading
-from dataclasses import dataclass, field
-from enum import Enum, auto
-
-class SigmaProcessManager:
+"""
+SigmaOS Modular Shim
+"""
+from ._SigmaProcessManager_core.sigmaprocessmanager._core import SigmaProcessManager # noqa

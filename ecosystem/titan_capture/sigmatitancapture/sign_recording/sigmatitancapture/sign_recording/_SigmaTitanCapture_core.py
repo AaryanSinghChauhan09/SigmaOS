@@ -1,4 +1,4 @@
-# Generated class core: SigmaTitanCapture
-from sigma_core.system.sovereign_app import SovereignApp
-
-class SigmaTitanCapture:
+"""
+SigmaOS Modular Shim
+"""
+from ._SigmaTitanCapture_core.sigmatitancapture._core import SigmaTitanCapture # noqa

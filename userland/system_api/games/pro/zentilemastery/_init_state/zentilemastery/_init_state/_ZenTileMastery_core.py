@@ -1,6 +1,4 @@
-# Generated class core: ZenTileMastery
-import random
-from typing import List, Tuple, Dict, Any, Optional
-from .base import SigmaGame
-
-class ZenTileMastery:
+"""
+SigmaOS Modular Shim
+"""
+from ._ZenTileMastery_core.zentilemastery._core import ZenTileMastery # noqa

@@ -1,7 +1,4 @@
-# Generated class core: SovereignDeviceManager
-import tkinter as tk
-from tkinter import ttk, messagebox
-import random
-import time
-
-class SovereignDeviceManager:
+"""
+SigmaOS Modular Shim
+"""
+from ._SovereignDeviceManager_core.sovereigndevicemanager._core import SovereignDeviceManager # noqa

@@ -1,5 +1,4 @@
-# Generated class core: SigmaOmniStudio
-from typing import Dict
-import time
-
-class SigmaOmniStudio:
+"""
+SigmaOS Modular Shim
+"""
+from ._SigmaOmniStudio_core.sigmaomnistudio._core import SigmaOmniStudio # noqa

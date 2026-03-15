@@ -1,5 +1,4 @@
-# Generated class core: SegmentDescriptor
-from enum import Enum, auto
-import secrets
-
-class SegmentDescriptor:
+"""
+SigmaOS Modular Shim
+"""
+from ._SegmentDescriptor_core.segmentdescriptor._core import SegmentDescriptor # noqa

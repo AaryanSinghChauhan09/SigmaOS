@@ -1,6 +1,4 @@
-# Generated class core: SigmaWindowManager
-from dataclasses import dataclass, field
-import uuid
-from sigma_core.system.interfaces import SigmaModuleBase
-
-class SigmaWindowManager:
+"""
+SigmaOS Modular Shim
+"""
+from ._SigmaWindowManager_core.sigmawindowmanager._core import SigmaWindowManager # noqa

@@ -1,7 +1,4 @@
-# Generated class core: WritesensePage
-import tkinter as tk
-from tkinter import ttk
-from .base_page import SigmaPage
-from .styles import PAL, FONT_BOLD, FONT_SMALL, FONT_MED
-
-class WritesensePage:
+"""
+SigmaOS Modular Shim
+"""
+from ._WritesensePage_core.writesensepage._core import WritesensePage # noqa

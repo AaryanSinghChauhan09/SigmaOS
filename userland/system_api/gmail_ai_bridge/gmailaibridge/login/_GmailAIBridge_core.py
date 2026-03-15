@@ -1,6 +1,4 @@
-# Generated class core: GmailAIBridge
-import os
-import json
-import time
-
-class GmailAIBridge:
+"""
+SigmaOS Modular Shim
+"""
+from ._GmailAIBridge_core.gmailaibridge._core import GmailAIBridge # noqa

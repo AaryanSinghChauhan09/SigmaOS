@@ -1,6 +1,4 @@
-# Generated class core: ProActiveTroubleshooter
-import random
-import time
-from typing import Dict
-
-class ProActiveTroubleshooter:
+"""
+SigmaOS Modular Shim
+"""
+from ._ProActiveTroubleshooter_core.proactivetroubleshooter._core import ProActiveTroubleshooter # noqa

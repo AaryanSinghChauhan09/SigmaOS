@@ -1,5 +1,4 @@
-# Generated class core: _DummyMod
-import sys, os, time
-from sigma_core import SigmaKernel, SigmaConfig, EventBus, ModuleRegistry
-
-class _DummyMod:
+"""
+SigmaOS Modular Shim
+"""
+from .__DummyMod_core._dummymod._core import _DummyMod # noqa

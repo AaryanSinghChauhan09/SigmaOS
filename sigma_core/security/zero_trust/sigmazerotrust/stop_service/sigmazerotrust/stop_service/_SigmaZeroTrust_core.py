@@ -1,4 +1,4 @@
-# Generated class core: SigmaZeroTrust
-from sigma_core.system.interfaces import SigmaModuleBase, ISigmaService
-
-class SigmaZeroTrust:
+"""
+SigmaOS Modular Shim
+"""
+from ._SigmaZeroTrust_core.sigmazerotrust._core import SigmaZeroTrust # noqa

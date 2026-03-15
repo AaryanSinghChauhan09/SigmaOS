@@ -1,6 +1,4 @@
-# Generated class core: SigmaInsightsEngine
-import math
-import time
-from typing import List, Dict, Any, Optional
-
-class SigmaInsightsEngine:
+"""
+SigmaOS Modular Shim
+"""
+from ._SigmaInsightsEngine_core.sigmainsightsengine._core import SigmaInsightsEngine # noqa

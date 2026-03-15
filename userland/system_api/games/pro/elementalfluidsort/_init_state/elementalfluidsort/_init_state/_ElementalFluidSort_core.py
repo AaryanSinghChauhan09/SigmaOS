@@ -1,6 +1,4 @@
-# Generated class core: ElementalFluidSort
-import random
-from typing import List, Tuple, Dict, Any, Optional
-from .base import SigmaGame
-
-class ElementalFluidSort:
+"""
+SigmaOS Modular Shim
+"""
+from ._ElementalFluidSort_core.elementalfluidsort._core import ElementalFluidSort # noqa

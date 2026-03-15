@@ -1,5 +1,4 @@
-# Generated class core: MinimalistController
-from typing import List, Dict, Any
-from sigma_core.system.interfaces import SigmaModuleBase
-
-class MinimalistController:
+"""
+SigmaOS Modular Shim
+"""
+from ._MinimalistController_core.minimalistcontroller._core import MinimalistController # noqa

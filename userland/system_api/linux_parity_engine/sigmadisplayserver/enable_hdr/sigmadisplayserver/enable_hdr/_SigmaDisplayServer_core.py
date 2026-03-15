@@ -1,7 +1,4 @@
-# Generated class core: SigmaDisplayServer
-import time
-import uuid
-import random
-from typing import Dict, List, Any
-
-class SigmaDisplayServer:
+"""
+SigmaOS Modular Shim
+"""
+from ._SigmaDisplayServer_core.sigmadisplayserver._core import SigmaDisplayServer # noqa

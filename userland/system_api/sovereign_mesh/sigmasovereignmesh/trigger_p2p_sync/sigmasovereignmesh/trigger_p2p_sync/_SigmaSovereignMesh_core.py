@@ -1,4 +1,4 @@
-# Generated class core: SigmaSovereignMesh
-from .sovereign_mesh_drive import SigmaSovereignMeshDrive
-
-class SigmaSovereignMesh:
+"""
+SigmaOS Modular Shim
+"""
+from ._SigmaSovereignMesh_core.sigmasovereignmesh._core import SigmaSovereignMesh # noqa

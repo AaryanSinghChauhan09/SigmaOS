@@ -1,5 +1,4 @@
-# Generated class core: SovereignHypervisor
-import time
-from typing import Dict, Any, Optional
-
-class SovereignHypervisor:
+"""
+SigmaOS Modular Shim
+"""
+from ._SovereignHypervisor_core.sovereignhypervisor._core import SovereignHypervisor # noqa

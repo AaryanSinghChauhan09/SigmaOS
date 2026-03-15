@@ -1,7 +1,4 @@
-# Generated class core: PolyglotLoader
-import os
-import subprocess
-import platform
-from typing import Dict
-
-class PolyglotLoader:
+"""
+SigmaOS Modular Shim
+"""
+from ._PolyglotLoader_core.polyglotloader._core import PolyglotLoader # noqa

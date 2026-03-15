@@ -1,6 +1,4 @@
-# Generated class core: SigmaTemporalLoop
-from typing import Dict, Any, Callable
-import time
-import random
-
-class SigmaTemporalLoop:
+"""
+SigmaOS Modular Shim
+"""
+from ._SigmaTemporalLoop_core.sigmatemporalloop._core import SigmaTemporalLoop # noqa

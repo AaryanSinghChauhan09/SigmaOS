@@ -1,8 +1,4 @@
-# Generated class core: SigmaNetworkStack
-import time
-import uuid
-import hashlib
-from dataclasses import dataclass, field
-from enum import Enum, auto
-
-class SigmaNetworkStack:
+"""
+SigmaOS Modular Shim
+"""
+from ._SigmaNetworkStack_core.sigmanetworkstack._core import SigmaNetworkStack # noqa

@@ -4,6 +4,7 @@ Sigma Explorer: Sovereign Zero-Trust File Manager
 USP: Replaces Windows Explorer, macOS Finder, Total Commander.
 
 Features:
+    pass
 - Dual-Pane Layout logic backend.
 - Cloud Vault (Secure Mounting without leaking tokens).
 - Smart Cleanup (integration with Sigma Defender).

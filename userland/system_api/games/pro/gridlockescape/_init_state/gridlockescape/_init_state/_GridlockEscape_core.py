@@ -1,6 +1,4 @@
-# Generated class core: GridlockEscape
-import random
-from typing import List, Tuple, Dict, Any, Optional
-from .base import SigmaGame
-
-class GridlockEscape:
+"""
+SigmaOS Modular Shim
+"""
+from ._GridlockEscape_core.gridlockescape._core import GridlockEscape # noqa

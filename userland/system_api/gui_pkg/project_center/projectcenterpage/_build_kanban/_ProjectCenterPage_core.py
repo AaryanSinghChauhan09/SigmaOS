@@ -1,7 +1,4 @@
-# Generated class core: ProjectCenterPage
-import tkinter as tk
-from tkinter import ttk
-from .base_page import SigmaPage
-from .styles import PAL, FONT_BOLD, FONT_SMALL, FONT_MED
-
-class ProjectCenterPage:
+"""
+SigmaOS Modular Shim
+"""
+from ._ProjectCenterPage_core.projectcenterpage._core import ProjectCenterPage # noqa

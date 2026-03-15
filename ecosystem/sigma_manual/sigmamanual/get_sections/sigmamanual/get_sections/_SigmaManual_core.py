@@ -1,4 +1,4 @@
-# Generated class core: SigmaManual
-from typing import Dict, List, Any
-
-class SigmaManual:
+"""
+SigmaOS Modular Shim
+"""
+from ._SigmaManual_core.sigmamanual._core import SigmaManual # noqa

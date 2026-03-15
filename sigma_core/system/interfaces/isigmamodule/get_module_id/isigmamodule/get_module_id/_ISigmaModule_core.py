@@ -1,5 +1,4 @@
-# Generated class core: ISigmaModule
-from abc import ABC, abstractmethod
-from typing import Dict, Any, Optional
-
-class ISigmaModule:
+"""
+SigmaOS Modular Shim
+"""
+from ._ISigmaModule_core.isigmamodule._core import ISigmaModule # noqa

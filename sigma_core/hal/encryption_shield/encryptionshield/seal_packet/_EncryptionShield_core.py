@@ -1,5 +1,4 @@
-# Generated class core: EncryptionShield
-import hashlib
-from typing import Dict, Any
-
-class EncryptionShield:
+"""
+SigmaOS Modular Shim
+"""
+from ._EncryptionShield_core.encryptionshield._core import EncryptionShield # noqa

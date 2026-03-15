@@ -1,4 +1,4 @@
-# Generated class core: PicoClawAgent
-from sigma_core.system.interfaces import ISigmaModule, SigmaModuleBase
-
-class PicoClawAgent:
+"""
+SigmaOS Modular Shim
+"""
+from ._PicoClawAgent_core.picoclawagent._core import PicoClawAgent # noqa

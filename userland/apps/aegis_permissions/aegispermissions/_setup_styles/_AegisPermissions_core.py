@@ -1,5 +1,4 @@
-# Generated class core: AegisPermissions
-import tkinter as tk
-from tkinter import ttk, messagebox
-
-class AegisPermissions:
+"""
+SigmaOS Modular Shim
+"""
+from ._AegisPermissions_core.aegispermissions._core import AegisPermissions # noqa

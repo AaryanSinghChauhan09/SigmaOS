@@ -1,6 +1,4 @@
-# Generated class core: WardenPage
-import tkinter as tk
-from .base_page import SigmaPage
-from .styles import PAL
-
-class WardenPage:
+"""
+SigmaOS Modular Shim
+"""
+from ._WardenPage_core.wardenpage._core import WardenPage # noqa

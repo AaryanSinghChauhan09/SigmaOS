@@ -1,6 +1,4 @@
-# Generated class core: StartupOrchestrator
-import tkinter as tk
-from tkinter import ttk, messagebox
-import random
-
-class StartupOrchestrator:
+"""
+SigmaOS Modular Shim
+"""
+from ._StartupOrchestrator_core.startuporchestrator._core import StartupOrchestrator # noqa

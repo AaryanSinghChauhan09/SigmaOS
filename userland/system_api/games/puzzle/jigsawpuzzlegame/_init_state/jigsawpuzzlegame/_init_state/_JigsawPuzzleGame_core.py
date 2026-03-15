@@ -1,7 +1,4 @@
-# Generated class core: JigsawPuzzleGame
-import random
-import time
-from typing import List, Tuple, Dict, Any, Optional, Set
-from .base import SigmaGame
-
-class JigsawPuzzleGame:
+"""
+SigmaOS Modular Shim
+"""
+from ._JigsawPuzzleGame_core.jigsawpuzzlegame._core import JigsawPuzzleGame # noqa

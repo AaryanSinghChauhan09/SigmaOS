@@ -1,5 +1,4 @@
-# Generated class core: SigmaNeuralShell
-from typing import Dict, List, Any
-import time
-
-class SigmaNeuralShell:
+"""
+SigmaOS Modular Shim
+"""
+from ._SigmaNeuralShell_core.sigmaneuralshell._core import SigmaNeuralShell # noqa

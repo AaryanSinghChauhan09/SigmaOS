@@ -1,4 +1,4 @@
-# Generated class core: SigmaFamiliarityEngine
-
-
-class SigmaFamiliarityEngine:
+"""
+SigmaOS Modular Shim
+"""
+from ._SigmaFamiliarityEngine_core.sigmafamiliarityengine._core import SigmaFamiliarityEngine # noqa

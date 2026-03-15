@@ -1,5 +1,4 @@
-# Generated class core: AuraDisplay
-import tkinter as tk
-from tkinter import ttk, messagebox
-
-class AuraDisplay:
+"""
+SigmaOS Modular Shim
+"""
+from ._AuraDisplay_core.auradisplay._core import AuraDisplay # noqa

@@ -1,6 +1,4 @@
-# Generated class core: SigmaMLEngine
-import time
-import random
-from typing import List, Dict, Any, Tuple
-
-class SigmaMLEngine:
+"""
+SigmaOS Modular Shim
+"""
+from ._SigmaMLEngine_core.sigmamlengine._core import SigmaMLEngine # noqa

@@ -1,7 +1,4 @@
-# Generated class core: GmailAIPage
-import tkinter as tk
-from tkinter import ttk
-from .base_page import SigmaPage
-from .styles import PAL, FONT_SMALL, FONT_BOLD
-
-class GmailAIPage:
+"""
+SigmaOS Modular Shim
+"""
+from ._GmailAIPage_core.gmailaipage._core import GmailAIPage # noqa

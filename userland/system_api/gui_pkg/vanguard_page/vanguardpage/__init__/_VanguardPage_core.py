@@ -1,7 +1,4 @@
-# Generated class core: VanguardPage
-import tkinter as tk
-from tkinter import ttk
-from .base_page import SigmaPage
-from .styles import PAL, FONT_BOLD, FONT_SMALL
-
-class VanguardPage:
+"""
+SigmaOS Modular Shim
+"""
+from ._VanguardPage_core.vanguardpage._core import VanguardPage # noqa

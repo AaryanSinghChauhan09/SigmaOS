@@ -1,4 +1,4 @@
-# Generated class core: MorphicEngine
-from typing import Dict, Any
-
-class MorphicEngine:
+"""
+SigmaOS Modular Shim
+"""
+from ._MorphicEngine_core.morphicengine._core import MorphicEngine # noqa

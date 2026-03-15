@@ -1,4 +1,4 @@
-# Generated class core: NeuralProcessPredictor
-import collections
-
-class NeuralProcessPredictor:
+"""
+SigmaOS Modular Shim
+"""
+from ._NeuralProcessPredictor_core.neuralprocesspredictor._core import NeuralProcessPredictor # noqa

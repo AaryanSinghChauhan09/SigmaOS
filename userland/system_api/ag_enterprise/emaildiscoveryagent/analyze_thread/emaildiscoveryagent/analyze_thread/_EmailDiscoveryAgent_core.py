@@ -1,8 +1,4 @@
-# Generated class core: EmailDiscoveryAgent
-import os
-import re
-import json
-import time
-from typing import List, Dict, Any, Optional
-
-class EmailDiscoveryAgent:
+"""
+SigmaOS Modular Shim
+"""
+from ._EmailDiscoveryAgent_core.emaildiscoveryagent._core import EmailDiscoveryAgent # noqa

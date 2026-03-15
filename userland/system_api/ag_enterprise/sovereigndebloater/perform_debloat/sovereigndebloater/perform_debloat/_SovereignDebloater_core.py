@@ -1,8 +1,4 @@
-# Generated class core: SovereignDebloater
-import os
-import re
-import json
-import time
-from typing import List, Dict, Any, Optional
-
-class SovereignDebloater:
+"""
+SigmaOS Modular Shim
+"""
+from ._SovereignDebloater_core.sovereigndebloater._core import SovereignDebloater # noqa

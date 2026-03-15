@@ -1,6 +1,4 @@
-# Generated class core: SigmaAILab
-from typing import Dict, List, Any
-import time
-import random
-
-class SigmaAILab:
+"""
+SigmaOS Modular Shim
+"""
+from ._SigmaAILab_core.sigmaailab._core import SigmaAILab # noqa

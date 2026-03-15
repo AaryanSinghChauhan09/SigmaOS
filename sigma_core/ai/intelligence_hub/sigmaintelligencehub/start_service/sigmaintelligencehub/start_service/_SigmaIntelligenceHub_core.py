@@ -1,7 +1,4 @@
-# Generated class core: SigmaIntelligenceHub
-import math
-import random
-import time
-from typing import List, Dict, Any, Optional
-
-class SigmaIntelligenceHub:
+"""
+SigmaOS Modular Shim
+"""
+from ._SigmaIntelligenceHub_core.sigmaintelligencehub._core import SigmaIntelligenceHub # noqa

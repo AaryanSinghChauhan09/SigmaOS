@@ -1,5 +1,4 @@
-# Generated class core: SovereignPageTable
-from dataclasses import dataclass
-from enum import Enum
-
-class SovereignPageTable:
+"""
+SigmaOS Modular Shim
+"""
+from ._SovereignPageTable_core.sovereignpagetable._core import SovereignPageTable # noqa

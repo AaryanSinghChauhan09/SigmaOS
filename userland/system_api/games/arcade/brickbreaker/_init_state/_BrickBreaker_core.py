@@ -1,6 +1,4 @@
-# Generated class core: BrickBreaker
-import random
-from typing import List, Tuple, Dict, Any, Optional
-from .base import SigmaGame
-
-class BrickBreaker:
+"""
+SigmaOS Modular Shim
+"""
+from ._BrickBreaker_core.brickbreaker._core import BrickBreaker # noqa

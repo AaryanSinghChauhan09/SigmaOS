@@ -1,5 +1,4 @@
-# Generated class core: SigmaCommerce
-from typing import Dict, List, Any
-import time
-
-class SigmaCommerce:
+"""
+SigmaOS Modular Shim
+"""
+from ._SigmaCommerce_core.sigmacommerce._core import SigmaCommerce # noqa

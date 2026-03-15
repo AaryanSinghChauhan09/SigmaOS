@@ -1,10 +1,4 @@
-# Generated class core: SigmaAgentSandbox
-import os
-import shutil
-import uuid
-import time
-import subprocess
-import threading
-from typing import Dict, Any, List
-
-class SigmaAgentSandbox:
+"""
+SigmaOS Modular Shim
+"""
+from ._SigmaAgentSandbox_core.sigmaagentsandbox._core import SigmaAgentSandbox # noqa

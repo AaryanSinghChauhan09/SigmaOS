@@ -1,9 +1,4 @@
-# Generated class core: SovereignShield
-import tkinter as tk
-from tkinter import ttk, messagebox
-import random
-import time
-from typing import Any
-from sigma_core.ui.fluid_design import ICONS, SPINNERS
-
-class SovereignShield:
+"""
+SigmaOS Modular Shim
+"""
+from ._SovereignShield_core.sovereignshield._core import SovereignShield # noqa

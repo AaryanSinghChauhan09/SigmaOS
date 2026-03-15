@@ -1,7 +1,4 @@
-# Generated class core: SigmaPerformanceBoost
-import time
-import random
-from typing import Dict, Any, List
-from sigma_core.system.interfaces import SigmaModuleBase
-
-class SigmaPerformanceBoost:
+"""
+SigmaOS Modular Shim
+"""
+from ._SigmaPerformanceBoost_core.sigmaperformanceboost._core import SigmaPerformanceBoost # noqa

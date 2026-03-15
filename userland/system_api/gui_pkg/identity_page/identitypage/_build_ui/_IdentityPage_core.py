@@ -1,6 +1,4 @@
-# Generated class core: IdentityPage
-import tkinter as tk
-from .base_page import SigmaPage
-from .styles import PAL
-
-class IdentityPage:
+"""
+SigmaOS Modular Shim
+"""
+from ._IdentityPage_core.identitypage._core import IdentityPage # noqa

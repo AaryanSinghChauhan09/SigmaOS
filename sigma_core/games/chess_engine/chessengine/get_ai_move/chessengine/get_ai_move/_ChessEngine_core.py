@@ -1,5 +1,4 @@
-# Generated class core: ChessEngine
-import random
-from typing import Dict, Any, List, Optional, Tuple, cast
-
-class ChessEngine:
+"""
+SigmaOS Modular Shim
+"""
+from ._ChessEngine_core.chessengine._core import ChessEngine # noqa

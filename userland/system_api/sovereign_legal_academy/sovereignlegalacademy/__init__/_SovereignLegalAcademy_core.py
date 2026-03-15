@@ -1,7 +1,4 @@
-# Generated class core: SovereignLegalAcademy
-import time
-import json
-import random
-from typing import List, Dict, Any, Optional
-
-class SovereignLegalAcademy:
+"""
+SigmaOS Modular Shim
+"""
+from ._SovereignLegalAcademy_core.sovereignlegalacademy._core import SovereignLegalAcademy # noqa

@@ -1,6 +1,4 @@
-# Generated class core: UniversalSubsystem
-import os
-import struct
-from typing import Optional
-
-class UniversalSubsystem:
+"""
+SigmaOS Modular Shim
+"""
+from ._UniversalSubsystem_core.universalsubsystem._core import UniversalSubsystem # noqa

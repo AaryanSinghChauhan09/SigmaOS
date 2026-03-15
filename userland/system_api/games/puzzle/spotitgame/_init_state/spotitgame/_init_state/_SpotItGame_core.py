@@ -1,7 +1,4 @@
-# Generated class core: SpotItGame
-import random
-import time
-from typing import List, Tuple, Dict, Any, Optional, Set
-from .base import SigmaGame
-
-class SpotItGame:
+"""
+SigmaOS Modular Shim
+"""
+from ._SpotItGame_core.spotitgame._core import SpotItGame # noqa

@@ -1,4 +1,4 @@
-# Generated class core: NanobotAgent
-from sigma_core.system.interfaces import ISigmaModule, SigmaModuleBase
-
-class NanobotAgent:
+"""
+SigmaOS Modular Shim
+"""
+from ._NanobotAgent_core.nanobotagent._core import NanobotAgent # noqa

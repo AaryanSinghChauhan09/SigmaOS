@@ -1,6 +1,4 @@
-# Generated class core: SigmaPulseEngine
-from typing import Dict, Any
-import time
-import threading
-
-class SigmaPulseEngine:
+"""
+SigmaOS Modular Shim
+"""
+from ._SigmaPulseEngine_core.sigmapulseengine._core import SigmaPulseEngine # noqa

@@ -1,7 +1,4 @@
-# Generated class core: NCERTMasterLab
-import tkinter as tk
-from tkinter import ttk, scrolledtext, messagebox
-import importlib, sys, os, traceback, json, time
-from typing import Dict, Any, List, Optional
-
-class NCERTMasterLab:
+"""
+SigmaOS Modular Shim
+"""
+from ._NCERTMasterLab_core.ncertmasterlab._core import NCERTMasterLab # noqa

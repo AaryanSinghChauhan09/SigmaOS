@@ -1,5 +1,4 @@
-# Generated class core: RecoveryEngine
-from typing import Dict, Any
-from sigma_core.system.interfaces import SigmaModuleBase
-
-class RecoveryEngine:
+"""
+SigmaOS Modular Shim
+"""
+from ._RecoveryEngine_core.recoveryengine._core import RecoveryEngine # noqa

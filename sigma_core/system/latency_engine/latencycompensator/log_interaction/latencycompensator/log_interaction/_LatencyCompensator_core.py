@@ -1,5 +1,4 @@
-# Generated class core: LatencyCompensator
-import time
-from typing import List, Tuple
-
-class LatencyCompensator:
+"""
+SigmaOS Modular Shim
+"""
+from ._LatencyCompensator_core.latencycompensator._core import LatencyCompensator # noqa

@@ -1,5 +1,4 @@
-# Generated class core: BiometricEngine
-import hashlib
-import random
-
-class BiometricEngine:
+"""
+SigmaOS Modular Shim
+"""
+from ._BiometricEngine_core.biometricengine._core import BiometricEngine # noqa

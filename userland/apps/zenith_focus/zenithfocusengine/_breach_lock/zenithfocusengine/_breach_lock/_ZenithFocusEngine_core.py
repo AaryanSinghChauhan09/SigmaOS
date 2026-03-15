@@ -1,7 +1,4 @@
-# Generated class core: ZenithFocusEngine
-import tkinter as tk
-from tkinter import ttk, messagebox
-import time
-import threading
-
-class ZenithFocusEngine:
+"""
+SigmaOS Modular Shim
+"""
+from ._ZenithFocusEngine_core.zenithfocusengine._core import ZenithFocusEngine # noqa

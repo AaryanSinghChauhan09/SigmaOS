@@ -4,6 +4,7 @@ Sigma Hyper-Drive (Quantum Scheduler & Optimizer)
 USP: Unprecedented OS performance through predictive caching, debloat AI, and hardware latency erasure.
 
 Features:
+    pass
 - Pre-cognitive RAM Caching: Loads applications into ZRAM seconds before the user clicks on them by predicting mouse trajectories and habits.
 - AI De-Bloat Engine (Cryo-Sleep): Actively freezes and unloads any background tasks not relevant to the current user paradigm, effectively creating zero-distraction processing.
 - Zero-Latency UI Pipeline: Renders GUI events directly at the hardware V-Sync boundary, making OS navigation feel instant.

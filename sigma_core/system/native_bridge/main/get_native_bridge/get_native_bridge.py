@@ -1,6 +1,4 @@
-# Generated file: get_native_bridge
-import ctypes
-import os
-
-def get_native_bridge():
-    return NativePerformanceBridge()
+"""
+SigmaOS Modular Shim
+"""
+from ._shards.get_native_bridge import get_native_bridge

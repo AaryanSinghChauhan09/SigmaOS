@@ -1,9 +1,4 @@
-# Generated class core: MeshRelay
-import hashlib
-import random
-
-class MeshRelay:
-    """
-    Experimental USP: Peer-to-peer relay for OS state synchronization.
-    Bypasses standard cloud providers for a community-driven mesh.
-    """
+"""
+SigmaOS Modular Shim
+"""
+from ._MeshRelay_core.meshrelay._core import MeshRelay # noqa

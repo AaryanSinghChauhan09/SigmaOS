@@ -1,6 +1,4 @@
-# Generated class core: OmniSearch
-import tkinter as tk
-from tkinter import ttk, messagebox
-import time
-
-class OmniSearch:
+"""
+SigmaOS Modular Shim
+"""
+from ._OmniSearch_core.omnisearch._core import OmniSearch # noqa

@@ -1,6 +1,4 @@
-# Generated class core: GDI32Driver
-import ctypes
-from ctypes import wintypes
-import struct
-
-class GDI32Driver:
+"""
+SigmaOS Modular Shim
+"""
+from ._GDI32Driver_core.gdi32driver._core import GDI32Driver # noqa

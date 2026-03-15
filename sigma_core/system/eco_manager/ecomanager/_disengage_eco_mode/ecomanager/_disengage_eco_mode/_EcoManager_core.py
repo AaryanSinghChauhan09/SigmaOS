@@ -1,6 +1,4 @@
-# Generated class core: EcoManager
-import time
-import random
-from typing import Dict, Any
-
-class EcoManager:
+"""
+SigmaOS Modular Shim
+"""
+from ._EcoManager_core.ecomanager._core import EcoManager # noqa

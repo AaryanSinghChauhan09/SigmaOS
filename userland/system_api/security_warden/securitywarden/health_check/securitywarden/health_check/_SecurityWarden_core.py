@@ -1,9 +1,4 @@
-# Generated class core: SecurityWarden
-import time
-import threading
-import secrets
-import hashlib
-import random
-from typing import Dict, List, Any
-
-class SecurityWarden:
+"""
+SigmaOS Modular Shim
+"""
+from ._SecurityWarden_core.securitywarden._core import SecurityWarden # noqa

@@ -1,6 +1,4 @@
-# Generated class core: SovereignSudokuPro
-import random
-from typing import List, Tuple, Dict, Any, Optional
-from .base import SigmaGame
-
-class SovereignSudokuPro:
+"""
+SigmaOS Modular Shim
+"""
+from ._SovereignSudokuPro_core.sovereignsudokupro._core import SovereignSudokuPro # noqa

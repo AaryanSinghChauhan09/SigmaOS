@@ -1,9 +1,4 @@
-# Generated class core: SigmaAnomalyDetector
-import time
-import math
-import threading
-import collections
-import random
-from typing import Dict, List, Any, Optional
-
-class SigmaAnomalyDetector:
+"""
+SigmaOS Modular Shim
+"""
+from ._SigmaAnomalyDetector_core.sigmaanomalydetector._core import SigmaAnomalyDetector # noqa

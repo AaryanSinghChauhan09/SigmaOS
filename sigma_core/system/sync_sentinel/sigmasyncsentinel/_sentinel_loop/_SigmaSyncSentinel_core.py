@@ -1,10 +1,4 @@
-# Generated class core: SigmaSyncSentinel
-import os
-import sys
-import time
-import threading
-import subprocess
-from typing import Dict, List, Any
-from sigma_core.system.interfaces import SigmaModuleBase, ISigmaService
-
-class SigmaSyncSentinel:
+"""
+SigmaOS Modular Shim
+"""
+from ._SigmaSyncSentinel_core.sigmasyncsentinel._core import SigmaSyncSentinel # noqa

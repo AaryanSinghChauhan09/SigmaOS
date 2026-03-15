@@ -3,6 +3,7 @@ SigmaLinuxBridge: The Universal Linux Parity Engine.
 ===================================================
 USP: Fuses the flagship features of EVERY major Linux Distro into SigmaOS.
 Competitor Killers:
+    pass
 - Kali/Parrot: Already mapped via SPT.
 - Tails/Whonix: Integrated Anonymity & Amnesic logic.
 - Qubes OS: Security via Compartmentalization (Lattice-Cubes).

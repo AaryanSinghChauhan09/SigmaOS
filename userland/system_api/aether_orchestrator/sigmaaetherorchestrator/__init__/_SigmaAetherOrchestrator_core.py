@@ -1,6 +1,4 @@
-# Generated class core: SigmaAetherOrchestrator
-import json
-from dataclasses import dataclass
-from typing import Dict, List, Any, Optional
-
-class SigmaAetherOrchestrator:
+"""
+SigmaOS Modular Shim
+"""
+from ._SigmaAetherOrchestrator_core.sigmaaetherorchestrator._core import SigmaAetherOrchestrator # noqa

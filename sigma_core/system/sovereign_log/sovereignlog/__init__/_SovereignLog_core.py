@@ -1,9 +1,4 @@
-# Generated class core: SovereignLog
-import time
-import threading
-import json
-import hashlib
-from typing import Dict, Any, List
-from sigma_core.system.interfaces import SigmaModuleBase
-
-class SovereignLog:
+"""
+SigmaOS Modular Shim
+"""
+from ._SovereignLog_core.sovereignlog._core import SovereignLog # noqa

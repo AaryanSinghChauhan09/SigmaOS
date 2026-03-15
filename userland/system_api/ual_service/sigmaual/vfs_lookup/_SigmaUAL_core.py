@@ -1,6 +1,4 @@
-# Generated class core: SigmaUAL
-from enum import Enum
-from dataclasses import dataclass
-import uuid
-
-class SigmaUAL:
+"""
+SigmaOS Modular Shim
+"""
+from ._SigmaUAL_core.sigmaual._core import SigmaUAL # noqa

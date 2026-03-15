@@ -1,6 +1,4 @@
-# Generated class core: EdgeCaseSilo
-import time
-import random
-from typing import Dict, Any
-
-class EdgeCaseSilo:
+"""
+SigmaOS Modular Shim
+"""
+from ._EdgeCaseSilo_core.edgecasesilo._core import EdgeCaseSilo # noqa

@@ -1,8 +1,4 @@
-# Generated class core: SigmaDiagnostics
-import time
-import uuid
-import random
-from dataclasses import dataclass
-from enum import Enum, auto
-
-class SigmaDiagnostics:
+"""
+SigmaOS Modular Shim
+"""
+from ._SigmaDiagnostics_core.sigmadiagnostics._core import SigmaDiagnostics # noqa

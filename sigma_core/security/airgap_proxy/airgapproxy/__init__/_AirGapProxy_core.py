@@ -1,5 +1,4 @@
-# Generated class core: AirGapProxy
-import json
-from typing import Dict, Any
-
-class AirGapProxy:
+"""
+SigmaOS Modular Shim
+"""
+from ._AirGapProxy_core.airgapproxy._core import AirGapProxy # noqa

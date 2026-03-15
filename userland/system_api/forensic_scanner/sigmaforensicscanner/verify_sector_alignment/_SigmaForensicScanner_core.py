@@ -1,9 +1,4 @@
-# Generated class core: SigmaForensicScanner
-import os
-import sys
-import hashlib
-import time
-from typing import Dict, List, Any, Optional
-from sigma_core.system.interfaces import SigmaModuleBase
-
-class SigmaForensicScanner:
+"""
+SigmaOS Modular Shim
+"""
+from ._SigmaForensicScanner_core.sigmaforensicscanner._core import SigmaForensicScanner # noqa

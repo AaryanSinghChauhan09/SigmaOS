@@ -1,6 +1,4 @@
-# Generated class core: SigmaAccessibilityHub
-from dataclasses import dataclass
-from enum import Enum, auto
-import threading
-
-class SigmaAccessibilityHub:
+"""
+SigmaOS Modular Shim
+"""
+from ._SigmaAccessibilityHub_core.sigmaaccessibilityhub._core import SigmaAccessibilityHub # noqa

@@ -1,5 +1,4 @@
-# Generated class core: RenderingPipeline
-import time
-from typing import Dict, Any, List
-
-class RenderingPipeline:
+"""
+SigmaOS Modular Shim
+"""
+from ._RenderingPipeline_core.renderingpipeline._core import RenderingPipeline # noqa

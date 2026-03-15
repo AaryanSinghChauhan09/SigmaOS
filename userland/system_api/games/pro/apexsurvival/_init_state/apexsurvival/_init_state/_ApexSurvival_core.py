@@ -1,6 +1,4 @@
-# Generated class core: ApexSurvival
-import random
-from typing import List, Tuple, Dict, Any, Optional
-from .base import SigmaGame
-
-class ApexSurvival:
+"""
+SigmaOS Modular Shim
+"""
+from ._ApexSurvival_core.apexsurvival._core import ApexSurvival # noqa

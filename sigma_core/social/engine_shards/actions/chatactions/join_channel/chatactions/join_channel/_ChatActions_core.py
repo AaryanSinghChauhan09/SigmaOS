@@ -1,4 +1,4 @@
-# Generated class core: ChatActions
-from ..protocol import SecurePacket
-
-class ChatActions:
+"""
+SigmaOS Modular Shim
+"""
+from ._ChatActions_core.chatactions._core import ChatActions # noqa

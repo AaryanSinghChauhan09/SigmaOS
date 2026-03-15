@@ -1,4 +1,4 @@
-# Generated class core: SigmaUserSupremacy
-from sigma_core.system.interfaces import SigmaModuleBase, ISigmaService
-
-class SigmaUserSupremacy:
+"""
+SigmaOS Modular Shim
+"""
+from ._SigmaUserSupremacy_core.sigmausersupremacy._core import SigmaUserSupremacy # noqa

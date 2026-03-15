@@ -1,7 +1,4 @@
-# Generated class core: SystemProfiler
-import tkinter as tk
-from tkinter import ttk, messagebox
-import platform
-import random
-
-class SystemProfiler:
+"""
+SigmaOS Modular Shim
+"""
+from ._SystemProfiler_core.systemprofiler._core import SystemProfiler # noqa

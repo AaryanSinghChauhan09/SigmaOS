@@ -1,5 +1,4 @@
-# Generated class core: SigmaISOAssembler
-import os
-import json
-
-class SigmaISOAssembler:
+"""
+SigmaOS Modular Shim
+"""
+from ._SigmaISOAssembler_core.sigmaisoassembler._core import SigmaISOAssembler # noqa

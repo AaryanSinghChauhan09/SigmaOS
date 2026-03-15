@@ -1,6 +1,4 @@
-# Generated class core: UIMixin
-import tkinter as tk
-from tkinter import scrolledtext, messagebox
-from .styles import PAL, FONT_MONO, FONT_SMALL, FONT_BOLD
-
-class UIMixin:
+"""
+SigmaOS Modular Shim
+"""
+from ._UIMixin_core.uimixin._core import UIMixin # noqa

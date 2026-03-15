@@ -1,5 +1,4 @@
-# Generated class core: SigmaPortableEdition
-import os
-import sys
-
-class SigmaPortableEdition:
+"""
+SigmaOS Modular Shim
+"""
+from ._SigmaPortableEdition_core.sigmaportableedition._core import SigmaPortableEdition # noqa

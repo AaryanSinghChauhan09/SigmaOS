@@ -1,6 +1,4 @@
-# Generated class core: NCERTLabEngine
-import sys
-import os
-from sigma_core.system.interfaces import SigmaModuleBase, ISigmaService
-
-class NCERTLabEngine:
+"""
+SigmaOS Modular Shim
+"""
+from ._NCERTLabEngine_core.ncertlabengine._core import NCERTLabEngine # noqa

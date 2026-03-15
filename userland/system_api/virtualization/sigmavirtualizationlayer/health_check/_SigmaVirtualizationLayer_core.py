@@ -1,7 +1,4 @@
-# Generated class core: SigmaVirtualizationLayer
-import time
-import uuid
-from dataclasses import dataclass
-from enum import Enum, auto
-
-class SigmaVirtualizationLayer:
+"""
+SigmaOS Modular Shim
+"""
+from ._SigmaVirtualizationLayer_core.sigmavirtualizationlayer._core import SigmaVirtualizationLayer # noqa

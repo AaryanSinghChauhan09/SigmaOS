@@ -1,6 +1,4 @@
-# Generated class core: SigmaNetworkGuardian
-import time
-import threading
-from typing import Dict, List, Any
-
-class SigmaNetworkGuardian:
+"""
+SigmaOS Modular Shim
+"""
+from ._SigmaNetworkGuardian_core.sigmanetworkguardian._core import SigmaNetworkGuardian # noqa

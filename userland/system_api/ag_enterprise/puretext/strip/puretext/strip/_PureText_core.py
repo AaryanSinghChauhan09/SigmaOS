@@ -1,8 +1,4 @@
-# Generated class core: PureText
-import os
-import re
-import json
-import time
-from typing import List, Dict, Any, Optional
-
-class PureText:
+"""
+SigmaOS Modular Shim
+"""
+from ._PureText_core.puretext._core import PureText # noqa

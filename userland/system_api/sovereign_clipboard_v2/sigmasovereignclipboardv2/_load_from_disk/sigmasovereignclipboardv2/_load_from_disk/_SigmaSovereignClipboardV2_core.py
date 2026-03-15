@@ -1,10 +1,4 @@
-# Generated class core: SigmaSovereignClipboardV2
-import os
-import sys
-import json
-import time
-import hashlib
-from typing import Dict, List, Any, Optional
-from sigma_core.system.interfaces import SigmaModuleBase
-
-class SigmaSovereignClipboardV2:
+"""
+SigmaOS Modular Shim
+"""
+from ._SigmaSovereignClipboardV2_core.sigmasovereignclipboardv2._core import SigmaSovereignClipboardV2 # noqa

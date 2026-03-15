@@ -1,4 +1,4 @@
-# Generated class core: SigmaUniversalTranslator
-from typing import Dict, List, Any
-
-class SigmaUniversalTranslator:
+"""
+SigmaOS Modular Shim
+"""
+from ._SigmaUniversalTranslator_core.sigmauniversaltranslator._core import SigmaUniversalTranslator # noqa

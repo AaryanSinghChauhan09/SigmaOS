@@ -1,7 +1,4 @@
-# Generated class core: ShellGame
-import random
-import time
-from typing import List, Tuple, Dict, Any, Optional, Set
-from .base import SigmaGame
-
-class ShellGame:
+"""
+SigmaOS Modular Shim
+"""
+from ._ShellGame_core.shellgame._core import ShellGame # noqa

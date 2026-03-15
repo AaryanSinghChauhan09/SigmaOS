@@ -1,7 +1,4 @@
-# Generated class core: AdvocateCMS
-import os
-import json
-import time
-from typing import Dict, Any, List, Optional
-
-class AdvocateCMS:
+"""
+SigmaOS Modular Shim
+"""
+from ._AdvocateCMS_core.advocatecms._core import AdvocateCMS # noqa

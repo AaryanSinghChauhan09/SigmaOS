@@ -1,6 +1,4 @@
-# Generated class core: SovereignVision
-import time
-import random
-from typing import Dict, Any, List
-
-class SovereignVision:
+"""
+SigmaOS Modular Shim
+"""
+from ._SovereignVision_core.sovereignvision._core import SovereignVision # noqa

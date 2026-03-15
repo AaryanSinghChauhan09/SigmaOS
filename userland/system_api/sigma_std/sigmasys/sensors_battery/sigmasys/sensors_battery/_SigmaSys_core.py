@@ -1,11 +1,4 @@
-# Generated class core: SigmaSys
-import sys
-import os
-import time
-import json
-import hashlib
-import hmac
-import urllib.request
-import subprocess
-
-class SigmaSys:
+"""
+SigmaOS Modular Shim
+"""
+from ._SigmaSys_core.sigmasys._core import SigmaSys # noqa

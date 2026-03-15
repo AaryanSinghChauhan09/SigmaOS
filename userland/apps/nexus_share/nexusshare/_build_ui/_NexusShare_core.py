@@ -1,8 +1,4 @@
-# Generated class core: NexusShare
-import tkinter as tk
-from tkinter import ttk, messagebox
-import random
-import time
-import threading
-
-class NexusShare:
+"""
+SigmaOS Modular Shim
+"""
+from ._NexusShare_core.nexusshare._core import NexusShare # noqa

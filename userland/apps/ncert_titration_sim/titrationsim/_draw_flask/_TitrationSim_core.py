@@ -1,6 +1,4 @@
-# Generated class core: TitrationSim
-import tkinter as tk
-from tkinter import messagebox
-import random
-
-class TitrationSim:
+"""
+SigmaOS Modular Shim
+"""
+from ._TitrationSim_core.titrationsim._core import TitrationSim # noqa

@@ -1,5 +1,4 @@
-# Generated class core: LatticeKeyExchange
-import hashlib
-import time
-
-class LatticeKeyExchange:
+"""
+SigmaOS Modular Shim
+"""
+from ._LatticeKeyExchange_core.latticekeyexchange._core import LatticeKeyExchange # noqa

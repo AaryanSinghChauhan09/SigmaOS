@@ -1,6 +1,4 @@
-# Generated class core: MacroForge
-import tkinter as tk
-from tkinter import ttk, messagebox
-import random
-
-class MacroForge:
+"""
+SigmaOS Modular Shim
+"""
+from ._MacroForge_core.macroforge._core import MacroForge # noqa

@@ -1,8 +1,4 @@
-# Generated class core: SovereignMeshSync
-import os
-import shutil
-import hashlib
-from pathlib import Path
-from typing import List, Dict
-
-class SovereignMeshSync:
+"""
+SigmaOS Modular Shim
+"""
+from ._SovereignMeshSync_core.sovereignmeshsync._core import SovereignMeshSync # noqa

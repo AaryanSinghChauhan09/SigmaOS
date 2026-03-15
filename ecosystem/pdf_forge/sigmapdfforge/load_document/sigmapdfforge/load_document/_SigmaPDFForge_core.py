@@ -1,4 +1,4 @@
-# Generated class core: SigmaPDFForge
-from sigma_core.system.sovereign_app import SovereignApp
-
-class SigmaPDFForge:
+"""
+SigmaOS Modular Shim
+"""
+from ._SigmaPDFForge_core.sigmapdfforge._core import SigmaPDFForge # noqa

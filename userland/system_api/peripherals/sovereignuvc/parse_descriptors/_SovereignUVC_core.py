@@ -1,5 +1,4 @@
-# Generated class core: SovereignUVC
-import hashlib
-import random
-
-class SovereignUVC:
+"""
+SigmaOS Modular Shim
+"""
+from ._SovereignUVC_core.sovereignuvc._core import SovereignUVC # noqa

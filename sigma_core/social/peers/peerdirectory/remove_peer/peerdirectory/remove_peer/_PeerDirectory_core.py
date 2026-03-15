@@ -1,4 +1,4 @@
-# Generated class core: PeerDirectory
-from typing import Dict, Any
-
-class PeerDirectory:
+"""
+SigmaOS Modular Shim
+"""
+from ._PeerDirectory_core.peerdirectory._core import PeerDirectory # noqa

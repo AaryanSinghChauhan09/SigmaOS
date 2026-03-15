@@ -1,0 +1,4 @@
+"""
+SigmaOS Omega Modular Shim
+"""
+from ._core.sovereignledger._core import SovereignLedger # noqa

@@ -1,7 +1,4 @@
-# Generated class core: Riddler
-import random
-import time
-from typing import List, Tuple, Dict, Any, Optional, Set
-from .base import SigmaGame
-
-class Riddler:
+"""
+SigmaOS Modular Shim
+"""
+from ._Riddler_core.riddler._core import Riddler # noqa

@@ -1,5 +1,4 @@
-# Generated class core: SigmaThemeEngine
-from typing import Dict, Any
-from sigma_core.system.interfaces import SigmaModuleBase
-
-class SigmaThemeEngine:
+"""
+SigmaOS Modular Shim
+"""
+from ._SigmaThemeEngine_core.sigmathemeengine._core import SigmaThemeEngine # noqa

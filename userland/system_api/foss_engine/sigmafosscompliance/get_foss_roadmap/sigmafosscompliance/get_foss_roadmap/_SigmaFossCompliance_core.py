@@ -1,4 +1,4 @@
-# Generated class core: SigmaFossCompliance
-
-
-class SigmaFossCompliance:
+"""
+SigmaOS Modular Shim
+"""
+from ._SigmaFossCompliance_core.sigmafosscompliance._core import SigmaFossCompliance # noqa

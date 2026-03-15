@@ -1,7 +1,4 @@
-# Generated class core: LinuxParityEngine
-import time
-import uuid
-import random
-from typing import Dict, List, Any
-
-class LinuxParityEngine:
+"""
+SigmaOS Modular Shim
+"""
+from ._LinuxParityEngine_core.linuxparityengine._core import LinuxParityEngine # noqa

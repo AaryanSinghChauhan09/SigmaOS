@@ -1,5 +1,4 @@
-# Generated class core: IntegrityScanner
-from typing import Dict, Any
-from sigma_core.system.interfaces import SigmaModuleBase
-
-class IntegrityScanner:
+"""
+SigmaOS Modular Shim
+"""
+from ._IntegrityScanner_core.integrityscanner._core import IntegrityScanner # noqa

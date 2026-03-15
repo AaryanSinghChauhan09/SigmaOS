@@ -1,7 +1,4 @@
-# Generated class core: ArcadePage
-import tkinter as tk
-from tkinter import ttk
-from .base_page import SigmaPage
-from .styles import PAL, FONT_SMALL
-
-class ArcadePage:
+"""
+SigmaOS Modular Shim
+"""
+from ._ArcadePage_core.arcadepage._core import ArcadePage # noqa

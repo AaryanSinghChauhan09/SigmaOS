@@ -1,9 +1,4 @@
-# Generated class core: VectorMemory
-import array
-import math
-import json
-import os
-import time
-from typing import List, Tuple, Dict, Any
-
-class VectorMemory:
+"""
+SigmaOS Modular Shim
+"""
+from ._VectorMemory_core.vectormemory._core import VectorMemory # noqa

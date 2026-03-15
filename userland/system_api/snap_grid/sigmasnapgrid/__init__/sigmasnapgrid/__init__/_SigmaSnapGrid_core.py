@@ -1,4 +1,4 @@
-# Generated class core: SigmaSnapGrid
-from typing import Dict, List, Any
-
-class SigmaSnapGrid:
+"""
+SigmaOS Modular Shim
+"""
+from ._SigmaSnapGrid_core.sigmasnapgrid._core import SigmaSnapGrid # noqa

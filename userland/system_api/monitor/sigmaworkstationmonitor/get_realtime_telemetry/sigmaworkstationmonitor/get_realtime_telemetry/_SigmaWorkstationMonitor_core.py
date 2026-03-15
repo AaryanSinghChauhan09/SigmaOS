@@ -1,6 +1,4 @@
-# Generated class core: SigmaWorkstationMonitor
-import os
-import random
-import time
-
-class SigmaWorkstationMonitor:
+"""
+SigmaOS Modular Shim
+"""
+from ._SigmaWorkstationMonitor_core.sigmaworkstationmonitor._core import SigmaWorkstationMonitor # noqa

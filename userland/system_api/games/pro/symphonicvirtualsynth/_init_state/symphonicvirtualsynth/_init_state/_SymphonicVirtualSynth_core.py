@@ -1,6 +1,4 @@
-# Generated class core: SymphonicVirtualSynth
-import random
-from typing import List, Tuple, Dict, Any, Optional
-from .base import SigmaGame
-
-class SymphonicVirtualSynth:
+"""
+SigmaOS Modular Shim
+"""
+from ._SymphonicVirtualSynth_core.symphonicvirtualsynth._core import SymphonicVirtualSynth # noqa

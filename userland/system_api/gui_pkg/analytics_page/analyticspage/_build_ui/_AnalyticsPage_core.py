@@ -1,7 +1,4 @@
-# Generated class core: AnalyticsPage
-import tkinter as tk
-from tkinter import ttk
-from .base_page import SigmaPage
-from .styles import PAL, FONT_TITLE, FONT_SMALL, FONT_BOLD, FONT_MED
-
-class AnalyticsPage:
+"""
+SigmaOS Modular Shim
+"""
+from ._AnalyticsPage_core.analyticspage._core import AnalyticsPage # noqa

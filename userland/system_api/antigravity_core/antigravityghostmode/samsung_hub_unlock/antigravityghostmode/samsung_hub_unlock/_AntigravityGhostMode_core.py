@@ -1,6 +1,4 @@
-# Generated class core: AntigravityGhostMode
-import os
-import hashlib
-import time
-
-class AntigravityGhostMode:
+"""
+SigmaOS Modular Shim
+"""
+from ._AntigravityGhostMode_core.antigravityghostmode._core import AntigravityGhostMode # noqa

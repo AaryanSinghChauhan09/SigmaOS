@@ -1,7 +1,4 @@
-# Generated class core: SigmaNomad
-import os
-import sys
-import subprocess
-import json
-
-class SigmaNomad:
+"""
+SigmaOS Modular Shim
+"""
+from ._SigmaNomad_core.sigmanomad._core import SigmaNomad # noqa

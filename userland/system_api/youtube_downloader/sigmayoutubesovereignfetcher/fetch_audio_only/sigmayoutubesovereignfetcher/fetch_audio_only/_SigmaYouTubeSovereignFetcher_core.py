@@ -1,7 +1,4 @@
-# Generated class core: SigmaYouTubeSovereignFetcher
-import os
-import time
-import json
-import random
-
-class SigmaYouTubeSovereignFetcher:
+"""
+SigmaOS Modular Shim
+"""
+from ._SigmaYouTubeSovereignFetcher_core.sigmayoutubesovereignfetcher._core import SigmaYouTubeSovereignFetcher # noqa

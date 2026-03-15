@@ -1,6 +1,4 @@
-# Generated class core: BMPEncoder
-import ctypes
-from ctypes import wintypes
-import struct
-
-class BMPEncoder:
+"""
+SigmaOS Modular Shim
+"""
+from ._BMPEncoder_core.bmpencoder._core import BMPEncoder # noqa

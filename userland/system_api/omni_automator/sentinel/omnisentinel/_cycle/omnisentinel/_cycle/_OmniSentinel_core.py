@@ -1,6 +1,4 @@
-# Generated class core: OmniSentinel
-import time
-import threading
-from typing import Dict, Any
-
-class OmniSentinel:
+"""
+SigmaOS Modular Shim
+"""
+from ._OmniSentinel_core.omnisentinel._core import OmniSentinel # noqa

@@ -1,8 +1,4 @@
-# Generated class core: EventBus
-from typing import Dict, Callable, List, Any, Tuple
-import threading
-import time
-import queue
-from concurrent.futures import ThreadPoolExecutor
-
-class EventBus:
+"""
+SigmaOS Modular Shim
+"""
+from ._EventBus_core.eventbus._core import EventBus # noqa

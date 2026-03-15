@@ -1,4 +1,4 @@
-# Generated class core: SigmaOmniConverter
-from sigma_core.system.sovereign_app import SovereignApp
-
-class SigmaOmniConverter:
+"""
+SigmaOS Modular Shim
+"""
+from ._SigmaOmniConverter_core.sigmaomniconverter._core import SigmaOmniConverter # noqa

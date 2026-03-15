@@ -1,4 +1,4 @@
-# Generated class core: IronClawAgent
-from sigma_core.system.interfaces import ISigmaModule, SigmaModuleBase
-
-class IronClawAgent:
+"""
+SigmaOS Modular Shim
+"""
+from ._IronClawAgent_core.ironclawagent._core import IronClawAgent # noqa

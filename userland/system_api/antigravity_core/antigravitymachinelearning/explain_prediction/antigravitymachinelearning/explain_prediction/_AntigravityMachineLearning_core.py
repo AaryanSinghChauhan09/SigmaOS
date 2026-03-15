@@ -1,6 +1,4 @@
-# Generated class core: AntigravityMachineLearning
-import os
-import hashlib
-import time
-
-class AntigravityMachineLearning:
+"""
+SigmaOS Modular Shim
+"""
+from ._AntigravityMachineLearning_core.antigravitymachinelearning._core import AntigravityMachineLearning # noqa

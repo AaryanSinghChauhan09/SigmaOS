@@ -1,6 +1,4 @@
-# Generated class core: ChronosVault
-import tkinter as tk
-from tkinter import ttk, messagebox
-import time
-
-class ChronosVault:
+"""
+SigmaOS Modular Shim
+"""
+from ._ChronosVault_core.chronosvault._core import ChronosVault # noqa

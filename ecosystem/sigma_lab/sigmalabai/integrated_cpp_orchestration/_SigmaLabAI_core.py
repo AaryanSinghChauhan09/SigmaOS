@@ -1,4 +1,4 @@
-# Generated class core: SigmaLabAI
-from sigma_core.system.sovereign_app import SovereignApp
-
-class SigmaLabAI:
+"""
+SigmaOS Modular Shim
+"""
+from ._SigmaLabAI_core.sigmalabai._core import SigmaLabAI # noqa

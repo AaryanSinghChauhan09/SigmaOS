@@ -1,7 +1,4 @@
-# Generated class core: AgenticBridge
-import json
-import os
-import time
-from typing import Dict, Any
-
-class AgenticBridge:
+"""
+SigmaOS Modular Shim
+"""
+from ._AgenticBridge_core.agenticbridge._core import AgenticBridge # noqa

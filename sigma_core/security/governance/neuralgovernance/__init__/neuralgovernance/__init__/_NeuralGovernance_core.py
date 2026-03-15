@@ -1,6 +1,4 @@
-# Generated class core: NeuralGovernance
-import time
-import random
-from typing import List, Dict
-
-class NeuralGovernance:
+"""
+SigmaOS Modular Shim
+"""
+from ._NeuralGovernance_core.neuralgovernance._core import NeuralGovernance # noqa

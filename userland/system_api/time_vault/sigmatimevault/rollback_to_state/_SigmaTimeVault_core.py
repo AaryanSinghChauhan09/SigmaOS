@@ -1,7 +1,4 @@
-# Generated class core: SigmaTimeVault
-import time
-import uuid
-import random
-from typing import List, Dict, Any
-
-class SigmaTimeVault:
+"""
+SigmaOS Modular Shim
+"""
+from ._SigmaTimeVault_core.sigmatimevault._core import SigmaTimeVault # noqa

@@ -1,7 +1,4 @@
-# Generated class core: OpenRoutinesPage
-import tkinter as tk
-from tkinter import ttk
-from .base_page import SigmaPage
-from .styles import PAL, FONT_BOLD, FONT_SMALL, FONT_MED
-
-class OpenRoutinesPage:
+"""
+SigmaOS Modular Shim
+"""
+from ._OpenRoutinesPage_core.openroutinespage._core import OpenRoutinesPage # noqa

@@ -1,8 +1,4 @@
-# Generated class core: SigmaAILifecycle
-import time
-import uuid
-import random
-from typing import Dict, List, Any, Optional
-from enum import Enum
-
-class SigmaAILifecycle:
+"""
+SigmaOS Modular Shim
+"""
+from ._SigmaAILifecycle_core.sigmaailifecycle._core import SigmaAILifecycle # noqa

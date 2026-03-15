@@ -1,6 +1,4 @@
-# Generated class core: SovereignRealms
-import random
-from typing import List, Tuple, Dict, Any, Optional
-from .base import SigmaGame
-
-class SovereignRealms:
+"""
+SigmaOS Modular Shim
+"""
+from ._SovereignRealms_core.sovereignrealms._core import SovereignRealms # noqa

@@ -1,6 +1,4 @@
-# Generated class core: SigmaContentForge
-from dataclasses import dataclass, field
-from typing import List, Dict, Any, Union
-import time
-
-class SigmaContentForge:
+"""
+SigmaOS Modular Shim
+"""
+from ._SigmaContentForge_core.sigmacontentforge._core import SigmaContentForge # noqa

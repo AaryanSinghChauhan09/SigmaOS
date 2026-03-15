@@ -1,7 +1,4 @@
-# Generated class core: LogicGridPuzzle
-import random
-import time
-from typing import List, Tuple, Dict, Any, Optional, Set
-from .base import SigmaGame
-
-class LogicGridPuzzle:
+"""
+SigmaOS Modular Shim
+"""
+from ._LogicGridPuzzle_core.logicgridpuzzle._core import LogicGridPuzzle # noqa

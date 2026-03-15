@@ -1,4 +1,4 @@
-# Generated class core: SigmaBootSelector
-import os
-
-class SigmaBootSelector:
+"""
+SigmaOS Modular Shim
+"""
+from ._SigmaBootSelector_core.sigmabootselector._core import SigmaBootSelector # noqa

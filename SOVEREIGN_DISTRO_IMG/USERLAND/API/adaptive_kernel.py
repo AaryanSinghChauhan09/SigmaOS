@@ -5,6 +5,7 @@ USP: A single kernel that self-optimizes for Gaming, AI/ML, Cloud, Creative,
 or Developer workloads — eliminating the need for separate OS flavors.
 
 Killer feature vs. competition:
+    pass
 - Windows: static kernel profile selected at install time
 - macOS: kernel tuned for Apple silicon only
 - Linux: kernel flags set at compile time

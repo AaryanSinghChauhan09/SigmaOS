@@ -1,6 +1,4 @@
-# Generated class core: SigmaNeuralLab
-import time
-import random
-from typing import List, Dict, Any, Optional
-
-class SigmaNeuralLab:
+"""
+SigmaOS Modular Shim
+"""
+from ._SigmaNeuralLab_core.sigmaneurallab._core import SigmaNeuralLab # noqa

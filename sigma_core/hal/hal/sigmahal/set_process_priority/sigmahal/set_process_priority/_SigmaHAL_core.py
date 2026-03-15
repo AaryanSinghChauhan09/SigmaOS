@@ -1,9 +1,4 @@
-# Generated class core: SigmaHAL
-import platform
-import os
-import ctypes
-import time
-from ctypes import wintypes
-from typing import Dict, Any
-
-class SigmaHAL:
+"""
+SigmaOS Modular Shim
+"""
+from ._SigmaHAL_core.sigmahal._core import SigmaHAL # noqa

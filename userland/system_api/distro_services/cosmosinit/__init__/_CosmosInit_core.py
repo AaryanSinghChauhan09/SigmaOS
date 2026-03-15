@@ -1,6 +1,4 @@
-# Generated class core: CosmosInit
-import hashlib
-import time
-from .privacy_engine import ZeroTrustValidator
-
-class CosmosInit:
+"""
+SigmaOS Modular Shim
+"""
+from ._CosmosInit_core.cosmosinit._core import CosmosInit # noqa

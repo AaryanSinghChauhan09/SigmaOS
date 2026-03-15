@@ -1,7 +1,4 @@
-# Generated class core: SigmaIPC
-import mmap
-import os
-import threading
-from typing import Dict, List, Any
-
-class SigmaIPC:
+"""
+SigmaOS Modular Shim
+"""
+from ._SigmaIPC_core.sigmaipc._core import SigmaIPC # noqa

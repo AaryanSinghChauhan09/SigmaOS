@@ -1,9 +1,4 @@
-# Generated class core: SigmaComplianceAuditor
-import os
-import sys
-import platform
-import subprocess
-from typing import Dict, List, Any
-from sigma_core.system.interfaces import SigmaModuleBase
-
-class SigmaComplianceAuditor:
+"""
+SigmaOS Modular Shim
+"""
+from ._SigmaComplianceAuditor_core.sigmacomplianceauditor._core import SigmaComplianceAuditor # noqa

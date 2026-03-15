@@ -1,5 +1,4 @@
-# Generated class core: FlowchartVision
-import json
-import re
-
-class FlowchartVision:
+"""
+SigmaOS Modular Shim
+"""
+from ._FlowchartVision_core.flowchartvision._core import FlowchartVision # noqa

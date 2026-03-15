@@ -1,5 +1,4 @@
-# Generated class core: SigmaModuleLoader
-import importlib
-from .interfaces import ISigmaModule, ISigmaService
-
-class SigmaModuleLoader:
+"""
+SigmaOS Modular Shim
+"""
+from ._SigmaModuleLoader_core.sigmamoduleloader._core import SigmaModuleLoader # noqa

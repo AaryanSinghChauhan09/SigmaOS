@@ -1,4 +1,4 @@
-# Generated class core: SigmaVanguardSecurity
-import hashlib
-
-class SigmaVanguardSecurity:
+"""
+SigmaOS Modular Shim
+"""
+from ._SigmaVanguardSecurity_core.sigmavanguardsecurity._core import SigmaVanguardSecurity # noqa

@@ -1,9 +1,4 @@
-# Generated class core: SigmaQuantumShield
-import hashlib
-import hmac
-import os
-import time
-import secrets
-from dataclasses import dataclass
-
-class SigmaQuantumShield:
+"""
+SigmaOS Modular Shim
+"""
+from ._SigmaQuantumShield_core.sigmaquantumshield._core import SigmaQuantumShield # noqa

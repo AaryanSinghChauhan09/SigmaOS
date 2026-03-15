@@ -1,9 +1,4 @@
-# Generated class core: SigmaCache
-import time
-import hashlib
-import zlib
-import sys
-from typing import Any, Dict, Optional
-from .interfaces import SigmaModuleBase
-
-class SigmaCache:
+"""
+SigmaOS Modular Shim
+"""
+from ._SigmaCache_core.sigmacache._core import SigmaCache # noqa

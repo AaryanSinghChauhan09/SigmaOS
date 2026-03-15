@@ -1,8 +1,4 @@
-# Generated class core: JigsawPuzzle
-import tkinter as tk
-from tkinter import ttk, filedialog, messagebox
-import random
-import time
-import os
-
-class JigsawPuzzle:
+"""
+SigmaOS Modular Shim
+"""
+from ._JigsawPuzzle_core.jigsawpuzzle._core import JigsawPuzzle # noqa

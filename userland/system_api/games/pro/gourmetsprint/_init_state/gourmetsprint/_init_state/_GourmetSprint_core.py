@@ -1,6 +1,4 @@
-# Generated class core: GourmetSprint
-import random
-from typing import List, Tuple, Dict, Any, Optional
-from .base import SigmaGame
-
-class GourmetSprint:
+"""
+SigmaOS Modular Shim
+"""
+from ._GourmetSprint_core.gourmetsprint._core import GourmetSprint # noqa

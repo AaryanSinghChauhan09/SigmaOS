@@ -1,5 +1,4 @@
-# Generated class core: SigmaOmniSearch
-import time
-from typing import Dict, Any, List
-
-class SigmaOmniSearch:
+"""
+SigmaOS Modular Shim
+"""
+from ._SigmaOmniSearch_core.sigmaomnisearch._core import SigmaOmniSearch # noqa

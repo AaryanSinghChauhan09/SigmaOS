@@ -1,7 +1,4 @@
-# Generated class core: SovereignBridge
-import os
-import sys
-import ctypes
-from pathlib import Path
-
-class SovereignBridge:
+"""
+SigmaOS Modular Shim
+"""
+from ._SovereignBridge_core.sovereignbridge._core import SovereignBridge # noqa

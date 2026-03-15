@@ -1,11 +1,4 @@
-# Generated class core: SigmaMath
-import sys
-import os
-import time
-import json
-import hashlib
-import hmac
-import urllib.request
-import subprocess
-
-class SigmaMath:
+"""
+SigmaOS Modular Shim
+"""
+from ._SigmaMath_core.sigmamath._core import SigmaMath # noqa

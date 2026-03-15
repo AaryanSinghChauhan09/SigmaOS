@@ -1,7 +1,4 @@
-# Generated class core: AGGuidePage
-import tkinter as tk
-from tkinter import scrolledtext
-from .base_page import SigmaPage
-from .styles import PAL
-
-class AGGuidePage:
+"""
+SigmaOS Modular Shim
+"""
+from ._AGGuidePage_core.agguidepage._core import AGGuidePage # noqa

@@ -1,8 +1,4 @@
-# Generated class core: OmniLensPro
-import tkinter as tk
-from tkinter import ttk, messagebox, filedialog
-import random
-import time
-import threading
-
-class OmniLensPro:
+"""
+SigmaOS Modular Shim
+"""
+from ._OmniLensPro_core.omnilenspro._core import OmniLensPro # noqa

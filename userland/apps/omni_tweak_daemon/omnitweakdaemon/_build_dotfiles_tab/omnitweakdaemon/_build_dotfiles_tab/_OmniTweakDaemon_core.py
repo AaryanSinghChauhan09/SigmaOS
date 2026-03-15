@@ -1,7 +1,4 @@
-# Generated class core: OmniTweakDaemon
-import tkinter as tk
-from tkinter import ttk, messagebox
-import random
-import time
-
-class OmniTweakDaemon:
+"""
+SigmaOS Modular Shim
+"""
+from ._OmniTweakDaemon_core.omnitweakdaemon._core import OmniTweakDaemon # noqa

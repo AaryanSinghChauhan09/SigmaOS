@@ -1,4 +1,4 @@
-# Generated class core: MissionPlanner
-from typing import List, Dict, Any
-
-class MissionPlanner:
+"""
+SigmaOS Modular Shim
+"""
+from ._MissionPlanner_core.missionplanner._core import MissionPlanner # noqa

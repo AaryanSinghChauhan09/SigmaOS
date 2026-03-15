@@ -1,4 +1,4 @@
-# Generated class core: SigmaCoreBoost
-from typing import Dict, List, Any
-
-class SigmaCoreBoost:
+"""
+SigmaOS Modular Shim
+"""
+from ._SigmaCoreBoost_core.sigmacoreboost._core import SigmaCoreBoost # noqa

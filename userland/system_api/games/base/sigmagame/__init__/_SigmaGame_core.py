@@ -1,4 +1,4 @@
-# Generated class core: SigmaGame
-from typing import List, Tuple, Dict, Optional, Any, Type, Set
-
-class SigmaGame:
+"""
+SigmaOS Modular Shim
+"""
+from ._SigmaGame_core.sigmagame._core import SigmaGame # noqa

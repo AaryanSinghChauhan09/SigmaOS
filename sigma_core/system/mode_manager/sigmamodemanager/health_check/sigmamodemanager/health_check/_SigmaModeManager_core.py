@@ -1,5 +1,4 @@
-# Generated class core: SigmaModeManager
-from typing import Dict, List, Any, Callable, Optional
-import time
-
-class SigmaModeManager:
+"""
+SigmaOS Modular Shim
+"""
+from ._SigmaModeManager_core.sigmamodemanager._core import SigmaModeManager # noqa

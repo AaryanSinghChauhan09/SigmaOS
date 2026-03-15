@@ -1,7 +1,4 @@
-# Generated class core: GurukulEngine
-import time
-import json
-import os
-from sigma_core.system.interfaces import SigmaModuleBase
-
-class GurukulEngine:
+"""
+SigmaOS Modular Shim
+"""
+from ._GurukulEngine_core.gurukulengine._core import GurukulEngine # noqa

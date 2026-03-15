@@ -1,8 +1,4 @@
-# Generated class core: AutonomicHealer
-import threading
-import time
-import random
-from typing import Dict, Any, Optional, List
-from sigma_core.system.interfaces import SigmaModuleBase, ISigmaService
-
-class AutonomicHealer:
+"""
+SigmaOS Modular Shim
+"""
+from ._AutonomicHealer_core.autonomichealer._core import AutonomicHealer # noqa

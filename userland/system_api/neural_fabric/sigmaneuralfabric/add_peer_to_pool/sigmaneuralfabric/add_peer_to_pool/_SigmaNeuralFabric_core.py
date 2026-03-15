@@ -1,6 +1,4 @@
-# Generated class core: SigmaNeuralFabric
-from dataclasses import dataclass, field
-from typing import List, Dict, Any, Union
-import time
-
-class SigmaNeuralFabric:
+"""
+SigmaOS Modular Shim
+"""
+from ._SigmaNeuralFabric_core.sigmaneuralfabric._core import SigmaNeuralFabric # noqa

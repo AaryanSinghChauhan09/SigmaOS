@@ -1,4 +1,4 @@
-# Generated class core: ZeroClawAgent
-from sigma_core.system.interfaces import ISigmaModule, SigmaModuleBase
-
-class ZeroClawAgent:
+"""
+SigmaOS Modular Shim
+"""
+from ._ZeroClawAgent_core.zeroclawagent._core import ZeroClawAgent # noqa

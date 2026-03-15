@@ -1,4 +1,4 @@
-# Generated class core: ZBufferEngine
-from typing import List, Dict, Any
-
-class ZBufferEngine:
+"""
+SigmaOS Modular Shim
+"""
+from ._ZBufferEngine_core.zbufferengine._core import ZBufferEngine # noqa

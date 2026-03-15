@@ -1,4 +1,4 @@
-# Generated class core: SigmaAuraProject
-from typing import Dict, List, Any
-
-class SigmaAuraProject:
+"""
+SigmaOS Modular Shim
+"""
+from ._SigmaAuraProject_core.sigmaauraproject._core import SigmaAuraProject # noqa

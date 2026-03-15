@@ -1,6 +1,4 @@
-# Generated class core: AetherPathExplorer
-import random
-from typing import List, Tuple, Dict, Any, Optional
-from .base import SigmaGame
-
-class AetherPathExplorer:
+"""
+SigmaOS Modular Shim
+"""
+from ._AetherPathExplorer_core.aetherpathexplorer._core import AetherPathExplorer # noqa

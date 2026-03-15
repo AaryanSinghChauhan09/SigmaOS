@@ -1,5 +1,4 @@
-# Generated class core: SigmaOmniBrowser
-import random
-from sigma_core.system.sovereign_app import SovereignApp
-
-class SigmaOmniBrowser:
+"""
+SigmaOS Modular Shim
+"""
+from ._SigmaOmniBrowser_core.sigmaomnibrowser._core import SigmaOmniBrowser # noqa

@@ -1,5 +1,4 @@
-# Generated class core: SovereignLisp
-from dataclasses import dataclass
-from typing import List, Any
-
-class SovereignLisp:
+"""
+SigmaOS Modular Shim
+"""
+from ._SovereignLisp_core.sovereignlisp._core import SovereignLisp # noqa

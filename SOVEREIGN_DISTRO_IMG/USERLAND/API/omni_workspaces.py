@@ -6,6 +6,7 @@ USP: Unlike Windows/macOS where the OS is static, Sigma Omni-Workspaces dynamica
      to physically transform into a bespoke machine for specific professions.
 
 Professions:
+    pass
 - Programmer (Replaces: Windows + WSL + VSCode + Docker)
 - Editor (Replaces: macOS + Premiere Pro + Final Cut)
 - Designer (Replaces: macOS + Adobe Creative Cloud)

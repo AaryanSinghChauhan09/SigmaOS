@@ -1,6 +1,4 @@
-# Generated class core: SigmaVanguard
-from typing import Dict, List, Any
-import hashlib
-import time
-
-class SigmaVanguard:
+"""
+SigmaOS Modular Shim
+"""
+from ._SigmaVanguard_core.sigmavanguard._core import SigmaVanguard # noqa

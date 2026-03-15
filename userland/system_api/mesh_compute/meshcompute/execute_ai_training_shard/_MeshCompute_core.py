@@ -1,8 +1,4 @@
-# Generated class core: MeshCompute
-import time
-import random
-import uuid
-import threading
-from typing import Dict, List, Any
-
-class MeshCompute:
+"""
+SigmaOS Modular Shim
+"""
+from ._MeshCompute_core.meshcompute._core import MeshCompute # noqa

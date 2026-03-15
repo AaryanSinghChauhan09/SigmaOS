@@ -1,7 +1,4 @@
-# Generated class core: EventMatrix
-import tkinter as tk
-from tkinter import ttk, messagebox
-import random
-import time
-
-class EventMatrix:
+"""
+SigmaOS Modular Shim
+"""
+from ._EventMatrix_core.eventmatrix._core import EventMatrix # noqa

@@ -1,7 +1,4 @@
-# Generated class core: SovereignDriver
-import time
-import uuid
-from typing import Dict, List, Any
-from .interfaces import SigmaModuleBase, ISigmaService
-
-class SovereignDriver:
+"""
+SigmaOS Modular Shim
+"""
+from ._SovereignDriver_core.sovereigndriver._core import SovereignDriver # noqa

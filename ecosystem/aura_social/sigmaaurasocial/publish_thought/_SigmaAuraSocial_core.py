@@ -1,7 +1,4 @@
-# Generated class core: SigmaAuraSocial
-import hashlib
-import time
-import uuid
-from dataclasses import dataclass
-
-class SigmaAuraSocial:
+"""
+SigmaOS Modular Shim
+"""
+from ._SigmaAuraSocial_core.sigmaaurasocial._core import SigmaAuraSocial # noqa

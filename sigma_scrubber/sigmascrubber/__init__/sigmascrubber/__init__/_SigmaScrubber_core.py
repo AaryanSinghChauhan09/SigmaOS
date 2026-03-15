@@ -1,6 +1,4 @@
-# Generated class core: SigmaScrubber
-import os
-import re
-from pathlib import Path
-
-class SigmaScrubber:
+"""
+SigmaOS Modular Shim
+"""
+from ._SigmaScrubber_core.sigmascrubber._core import SigmaScrubber # noqa

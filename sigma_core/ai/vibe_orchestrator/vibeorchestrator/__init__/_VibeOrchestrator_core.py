@@ -1,5 +1,4 @@
-# Generated class core: VibeOrchestrator
-from typing import Dict, Any
-from sigma_core.system.interfaces import SigmaModuleBase
-
-class VibeOrchestrator:
+"""
+SigmaOS Modular Shim
+"""
+from ._VibeOrchestrator_core.vibeorchestrator._core import VibeOrchestrator # noqa

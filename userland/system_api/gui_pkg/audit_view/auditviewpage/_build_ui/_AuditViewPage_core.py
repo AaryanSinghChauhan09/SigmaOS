@@ -1,7 +1,4 @@
-# Generated class core: AuditViewPage
-import tkinter as tk
-from tkinter import ttk
-from .base_page import SigmaPage
-from .styles import PAL
-
-class AuditViewPage:
+"""
+SigmaOS Modular Shim
+"""
+from ._AuditViewPage_core.auditviewpage._core import AuditViewPage # noqa

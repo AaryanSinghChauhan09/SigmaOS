@@ -1,5 +1,4 @@
-# Generated class core: SovereignAgent
-import time
-from typing import Dict, List, Any, Optional
-
-class SovereignAgent:
+"""
+SigmaOS Modular Shim
+"""
+from ._SovereignAgent_core.sovereignagent._core import SovereignAgent # noqa

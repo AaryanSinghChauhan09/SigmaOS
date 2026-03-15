@@ -1,6 +1,4 @@
-# Generated class core: VidyaQuest
-import random
-from typing import List, Tuple, Dict, Any, Optional
-from .base import SigmaGame
-
-class VidyaQuest:
+"""
+SigmaOS Modular Shim
+"""
+from ._VidyaQuest_core.vidyaquest._core import VidyaQuest # noqa

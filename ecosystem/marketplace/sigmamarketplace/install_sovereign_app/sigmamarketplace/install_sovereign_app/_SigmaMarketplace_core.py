@@ -1,4 +1,4 @@
-# Generated class core: SigmaMarketplace
-import hashlib
-
-class SigmaMarketplace:
+"""
+SigmaOS Modular Shim
+"""
+from ._SigmaMarketplace_core.sigmamarketplace._core import SigmaMarketplace # noqa

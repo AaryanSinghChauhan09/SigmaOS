@@ -1,5 +1,4 @@
-# Generated class core: SovereignSearch
-from typing import List, Dict, Any, Optional
-from sigma_core.system.interfaces import SigmaModuleBase, ISigmaService
-
-class SovereignSearch:
+"""
+SigmaOS Modular Shim
+"""
+from ._SovereignSearch_core.sovereignsearch._core import SovereignSearch # noqa

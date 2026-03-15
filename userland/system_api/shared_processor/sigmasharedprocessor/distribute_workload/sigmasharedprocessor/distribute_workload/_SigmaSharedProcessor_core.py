@@ -1,5 +1,4 @@
-# Generated class core: SigmaSharedProcessor
-import time
-import hashlib
-
-class SigmaSharedProcessor:
+"""
+SigmaOS Modular Shim
+"""
+from ._SigmaSharedProcessor_core.sigmasharedprocessor._core import SigmaSharedProcessor # noqa

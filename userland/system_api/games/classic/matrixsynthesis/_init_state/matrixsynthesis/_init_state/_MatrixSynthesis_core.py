@@ -1,6 +1,4 @@
-# Generated class core: MatrixSynthesis
-import random
-from typing import List, Tuple, Dict, Any, Optional
-from .base import SigmaGame
-
-class MatrixSynthesis:
+"""
+SigmaOS Modular Shim
+"""
+from ._MatrixSynthesis_core.matrixsynthesis._core import MatrixSynthesis # noqa

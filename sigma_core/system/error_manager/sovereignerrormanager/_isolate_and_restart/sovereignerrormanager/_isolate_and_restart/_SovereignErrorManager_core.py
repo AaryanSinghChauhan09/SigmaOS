@@ -1,6 +1,4 @@
-# Generated class core: SovereignErrorManager
-import sys
-import traceback
-from typing import Dict, Any, List, Optional, Callable
-
-class SovereignErrorManager:
+"""
+SigmaOS Modular Shim
+"""
+from ._SovereignErrorManager_core.sovereignerrormanager._core import SovereignErrorManager # noqa

@@ -1,5 +1,4 @@
-# Generated class core: UnitConverter
-import tkinter as tk
-from tkinter import ttk
-
-class UnitConverter:
+"""
+SigmaOS Modular Shim
+"""
+from ._UnitConverter_core.unitconverter._core import UnitConverter # noqa

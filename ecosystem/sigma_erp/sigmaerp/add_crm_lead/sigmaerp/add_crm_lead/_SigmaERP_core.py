@@ -1,5 +1,4 @@
-# Generated class core: SigmaERP
-from typing import Dict, List, Any
-import uuid
-
-class SigmaERP:
+"""
+SigmaOS Modular Shim
+"""
+from ._SigmaERP_core.sigmaerp._core import SigmaERP # noqa

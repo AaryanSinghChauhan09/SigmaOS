@@ -1,7 +1,4 @@
-# Generated class core: TaskExecutor
-import os
-import subprocess
-import time
-from typing import Dict, Any, List, Optional
-
-class TaskExecutor:
+"""
+SigmaOS Modular Shim
+"""
+from ._TaskExecutor_core.taskexecutor._core import TaskExecutor # noqa

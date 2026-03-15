@@ -1,5 +1,4 @@
-# Generated class core: SigmaExplorer
-import os
-import time
-
-class SigmaExplorer:
+"""
+SigmaOS Modular Shim
+"""
+from ._SigmaExplorer_core.sigmaexplorer._core import SigmaExplorer # noqa

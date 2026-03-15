@@ -1,4 +1,4 @@
-# Generated class core: TrafficPolicer
-from typing import Set, Dict, Any
-
-class TrafficPolicer:
+"""
+SigmaOS Modular Shim
+"""
+from ._TrafficPolicer_core.trafficpolicer._core import TrafficPolicer # noqa

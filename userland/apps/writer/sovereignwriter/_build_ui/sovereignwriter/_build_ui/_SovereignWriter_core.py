@@ -1,7 +1,4 @@
-# Generated class core: SovereignWriter
-import tkinter as tk
-from tkinter import ttk, scrolledtext, filedialog, messagebox
-import random
-import os
-
-class SovereignWriter:
+"""
+SigmaOS Modular Shim
+"""
+from ._SovereignWriter_core.sovereignwriter._core import SovereignWriter # noqa

@@ -1,6 +1,4 @@
-# Generated class core: SigmaOfflineGuard
-import socket
-import hashlib
-import time
-
-class SigmaOfflineGuard:
+"""
+SigmaOS Modular Shim
+"""
+from ._SigmaOfflineGuard_core.sigmaofflineguard._core import SigmaOfflineGuard # noqa

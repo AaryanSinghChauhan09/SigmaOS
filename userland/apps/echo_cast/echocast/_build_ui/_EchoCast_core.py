@@ -1,8 +1,4 @@
-# Generated class core: EchoCast
-import tkinter as tk
-from tkinter import ttk, messagebox
-import threading
-import time
-import random
-
-class EchoCast:
+"""
+SigmaOS Modular Shim
+"""
+from ._EchoCast_core.echocast._core import EchoCast # noqa

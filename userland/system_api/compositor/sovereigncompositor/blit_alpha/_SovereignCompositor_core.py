@@ -1,5 +1,4 @@
-# Generated class core: SovereignCompositor
-from dataclasses import dataclass, field
-from typing import List
-
-class SovereignCompositor:
+"""
+SigmaOS Modular Shim
+"""
+from ._SovereignCompositor_core.sovereigncompositor._core import SovereignCompositor # noqa

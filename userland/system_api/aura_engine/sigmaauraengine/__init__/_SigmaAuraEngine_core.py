@@ -1,5 +1,4 @@
-# Generated class core: SigmaAuraEngine
-import time
-from typing import Dict, Any
-
-class SigmaAuraEngine:
+"""
+SigmaOS Modular Shim
+"""
+from ._SigmaAuraEngine_core.sigmaauraengine._core import SigmaAuraEngine # noqa

@@ -1,7 +1,4 @@
-# Generated class core: SovereignLedger
-import hashlib
-import time
-import json
-import os
-
-class SovereignLedger:
+"""
+SigmaOS Modular Shim
+"""
+from ._SovereignLedger_core.sovereignledger._core import SovereignLedger # noqa

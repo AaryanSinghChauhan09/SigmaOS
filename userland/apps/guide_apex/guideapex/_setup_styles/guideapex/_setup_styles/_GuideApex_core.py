@@ -1,6 +1,4 @@
-# Generated class core: GuideApex
-import tkinter as tk
-from tkinter import ttk, scrolledtext
-import time
-
-class GuideApex:
+"""
+SigmaOS Modular Shim
+"""
+from ._GuideApex_core.guideapex._core import GuideApex # noqa

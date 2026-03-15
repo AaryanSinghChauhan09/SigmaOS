@@ -1,4 +1,4 @@
-# Generated class core: NanoClawAgent
-from sigma_core.system.interfaces import ISigmaModule, SigmaModuleBase
-
-class NanoClawAgent:
+"""
+SigmaOS Modular Shim
+"""
+from ._NanoClawAgent_core.nanoclawagent._core import NanoClawAgent # noqa

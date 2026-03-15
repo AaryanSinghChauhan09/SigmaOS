@@ -1,9 +1,4 @@
-# Generated class core: SigmaPackageManager
-import os
-import json
-import shutil
-import hashlib
-import time
-from pathlib import Path
-
-class SigmaPackageManager:
+"""
+SigmaOS Modular Shim
+"""
+from ._SigmaPackageManager_core.sigmapackagemanager._core import SigmaPackageManager # noqa

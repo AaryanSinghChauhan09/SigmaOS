@@ -1,6 +1,4 @@
-# Generated class core: ResourceMonitor
-import time
-from typing import Dict, Any
-from sigma_core.system.interfaces import SigmaModuleBase
-
-class ResourceMonitor:
+"""
+SigmaOS Modular Shim
+"""
+from ._ResourceMonitor_core.resourcemonitor._core import ResourceMonitor # noqa

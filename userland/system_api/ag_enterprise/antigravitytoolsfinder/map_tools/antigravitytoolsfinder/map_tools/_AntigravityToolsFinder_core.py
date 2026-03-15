@@ -1,8 +1,4 @@
-# Generated class core: AntigravityToolsFinder
-import os
-import re
-import json
-import time
-from typing import List, Dict, Any, Optional
-
-class AntigravityToolsFinder:
+"""
+SigmaOS Modular Shim
+"""
+from ._AntigravityToolsFinder_core.antigravitytoolsfinder._core import AntigravityToolsFinder # noqa

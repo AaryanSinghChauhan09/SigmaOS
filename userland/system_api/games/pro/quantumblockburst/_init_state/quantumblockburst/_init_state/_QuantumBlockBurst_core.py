@@ -1,6 +1,4 @@
-# Generated class core: QuantumBlockBurst
-import random
-from typing import List, Tuple, Dict, Any, Optional
-from .base import SigmaGame
-
-class QuantumBlockBurst:
+"""
+SigmaOS Modular Shim
+"""
+from ._QuantumBlockBurst_core.quantumblockburst._core import QuantumBlockBurst # noqa

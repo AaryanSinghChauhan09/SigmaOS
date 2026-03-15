@@ -1,7 +1,4 @@
-# Generated class core: MorphicDashboard
-import tkinter as tk
-from tkinter import ttk, messagebox
-import sys, os, time, random
-from typing import Dict, Any, List, Optional
-
-class MorphicDashboard:
+"""
+SigmaOS Modular Shim
+"""
+from ._MorphicDashboard_core.morphicdashboard._core import MorphicDashboard # noqa

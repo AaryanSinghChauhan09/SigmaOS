@@ -1,10 +1,4 @@
-# Generated class core: SigmaAuralis
-import os
-import sys
-import threading
-import time
-import json
-import subprocess
-from pathlib import Path
-
-class SigmaAuralis:
+"""
+SigmaOS Modular Shim
+"""
+from ._SigmaAuralis_core.sigmaauralis._core import SigmaAuralis # noqa

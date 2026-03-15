@@ -1,8 +1,4 @@
-# Generated class core: SigmaBootloader
-import time
-import uuid
-import hashlib
-from dataclasses import dataclass
-from enum import Enum, auto
-
-class SigmaBootloader:
+"""
+SigmaOS Modular Shim
+"""
+from ._SigmaBootloader_core.sigmabootloader._core import SigmaBootloader # noqa

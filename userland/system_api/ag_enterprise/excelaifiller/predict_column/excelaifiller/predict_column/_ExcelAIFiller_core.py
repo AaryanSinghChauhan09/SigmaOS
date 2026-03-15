@@ -1,8 +1,4 @@
-# Generated class core: ExcelAIFiller
-import os
-import re
-import json
-import time
-from typing import List, Dict, Any, Optional
-
-class ExcelAIFiller:
+"""
+SigmaOS Modular Shim
+"""
+from ._ExcelAIFiller_core.excelaifiller._core import ExcelAIFiller # noqa

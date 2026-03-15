@@ -1,6 +1,4 @@
-# Generated class core: SigmaHyperTune
-import time
-import random
-from typing import List, Dict, Any, Tuple
-
-class SigmaHyperTune:
+"""
+SigmaOS Modular Shim
+"""
+from ._SigmaHyperTune_core.sigmahypertune._core import SigmaHyperTune # noqa

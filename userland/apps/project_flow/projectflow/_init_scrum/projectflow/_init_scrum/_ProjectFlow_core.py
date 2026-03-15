@@ -1,7 +1,4 @@
-# Generated class core: ProjectFlow
-import tkinter as tk
-from tkinter import ttk, messagebox
-import random
-import time
-
-class ProjectFlow:
+"""
+SigmaOS Modular Shim
+"""
+from ._ProjectFlow_core.projectflow._core import ProjectFlow # noqa

@@ -1,8 +1,4 @@
-# Generated class core: SigmaConversionEngine
-import os
-import time
-import json
-import hashlib
-from typing import Dict, Any, Optional, Union
-
-class SigmaConversionEngine:
+"""
+SigmaOS Modular Shim
+"""
+from ._SigmaConversionEngine_core.sigmaconversionengine._core import SigmaConversionEngine # noqa

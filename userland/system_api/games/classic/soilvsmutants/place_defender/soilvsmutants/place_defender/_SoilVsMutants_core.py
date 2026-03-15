@@ -1,6 +1,4 @@
-# Generated class core: SoilVsMutants
-import random
-from typing import List, Tuple, Dict, Any, Optional
-from .base import SigmaGame
-
-class SoilVsMutants:
+"""
+SigmaOS Modular Shim
+"""
+from ._SoilVsMutants_core.soilvsmutants._core import SoilVsMutants # noqa

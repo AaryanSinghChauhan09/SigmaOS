@@ -1,6 +1,4 @@
-# Generated class core: SigmaMediaStudio
-import time
-import os
-import uuid
-
-class SigmaMediaStudio:
+"""
+SigmaOS Modular Shim
+"""
+from ._SigmaMediaStudio_core.sigmamediastudio._core import SigmaMediaStudio # noqa

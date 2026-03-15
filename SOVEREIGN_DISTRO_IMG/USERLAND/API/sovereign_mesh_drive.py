@@ -4,6 +4,7 @@ Sigma Sovereign Mesh Drive (OneDrive/Google Drive Replacement)
 USP: P2P encrypted file synchronization across user-owned devices.
 Completely replaces third-party cloud intervention.
 Features:
+    pass
 - ZKP (Zero-Knowledge Proof) Auth: SigmaOS never knows your passphrases.
 - Delta Sync: Only syncs the changed bits over P2P mesh.
 - Offline-First: Works in air-gapped bunkers; syncs the moment local mesh peers connect.

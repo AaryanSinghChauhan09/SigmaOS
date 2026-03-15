@@ -1,5 +1,4 @@
-# Generated class core: SigmaAuraVoice
-from typing import Dict, List, Any
-import time
-
-class SigmaAuraVoice:
+"""
+SigmaOS Modular Shim
+"""
+from ._SigmaAuraVoice_core.sigmaauravoice._core import SigmaAuraVoice # noqa

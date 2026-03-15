@@ -1,10 +1,4 @@
-# Generated class core: SigmaSetupEngine
-import os
-import sys
-import platform
-import shutil
-import time
-import subprocess
-from pathlib import Path
-
-class SigmaSetupEngine:
+"""
+SigmaOS Modular Shim
+"""
+from ._SigmaSetupEngine_core.sigmasetupengine._core import SigmaSetupEngine # noqa

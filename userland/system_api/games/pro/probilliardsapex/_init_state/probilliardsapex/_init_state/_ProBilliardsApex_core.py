@@ -1,6 +1,4 @@
-# Generated class core: ProBilliardsApex
-import random
-from typing import List, Tuple, Dict, Any, Optional
-from .base import SigmaGame
-
-class ProBilliardsApex:
+"""
+SigmaOS Modular Shim
+"""
+from ._ProBilliardsApex_core.probilliardsapex._core import ProBilliardsApex # noqa

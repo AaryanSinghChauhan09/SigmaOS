@@ -1,9 +1,4 @@
-# Generated class core: SigmaSovereignRegistry
-import os
-import sys
-import json
-import hashlib
-from typing import Dict, Any, Optional
-from sigma_core.system.interfaces import SigmaModuleBase
-
-class SigmaSovereignRegistry:
+"""
+SigmaOS Modular Shim
+"""
+from ._SigmaSovereignRegistry_core.sigmasovereignregistry._core import SigmaSovereignRegistry # noqa

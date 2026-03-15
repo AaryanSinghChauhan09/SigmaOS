@@ -1,22 +1,19 @@
-# SigmaOS Unrealized Features & Advanced Roadmap (v6.0)
+# SigmaOS Unrealized Features & Strategic Roadmap
 
-This document represents the ultimate visionary goals for SigmaOS. These are features that are technically planned but awaiting the next generation of hardware.
+This document outlines the high-level visionary features that are currently in the conceptual phase and awaiting future implementation cycles.
 
-## 1. Zero-Latency Neural Interop
-- **Direct Thought-to-CLI**: Integration with non-invasive BCI (Brain-Computer Interface) sensors for futuristic system control.
-- **Predictive Intent Shards**: OS will pre-execute commands it predicts the user will need, reducing human latency to zero.
+## 1. Core Architecture Evolution
+- **Neural-Quantum Hybrid Scheduler**: A task manager that utilizes simulated quantum annealing to optimize process priority in real-time.
+- **Autonomous Kernel Repair (AKR)**: Self-healing kernel shards that can dynamically rewrite their own byte-code if they detect a semantic bottleneck or security anomaly.
 
-## 2. Post-Quantum Sovereignty
-- **Lattice-Encrypted Registry**: Every system setting is encrypted with lattice-based crypto to resist future quantum attacks. (Initial module implemented).
-- **Decentralized Kernel Mesh**: The kernel state is distributed across a community of trusted nodes, making it impossible to "shut down" the OS.
+## 2. Interface & Visualization
+- **Holographic File System (HFS)**: A spatial, three-dimensional representation of data clusters, allowing for gestural data navigation. 
+- **Self-Assembling UI Shards**: Interface elements that reconfigure their layout and complexity based on biometric focus and user expertise level.
 
-## 3. Autonomous Performance
-- **Self-Healing Native Bridge**: The OS automatically recompiles its bottlenecked functions into optimized Rust/ASM on-the-fly.
-- **Fluid-UI Holographic Layer**: A UI that shifts from 2D glassmorphism to 3D spatial environments when VR/AR hardware is detected.
+## 3. Security & Networking
+- **Zero-Trust Lattice Mesh**: A decentralized networking layer where every packet is encrypted using lattice-based post-quantum cryptography.
+- **Biometric Purity Wall**: A hardware-level isolation layer that ensures biometric data never touches the primary memory space.
 
-## 4. Ethical & Environment Aware
-- **Bio-Metric Security Purity**: Zero-telemetry, offline-first biometric processing that never touches a cloud.
-- **Eco-Priority Scheduler**: Dynamically clocks down the CPU to minimalist levels when ambient light or battery suggests the user is in a "resource-saving" environment.
-
-## 5. Community Driven Forge
-- **Universal Mission Hub**: A global marketplace for "Refactor Proposals" where the community votes on the next architectural evolution.
+## 4. Ecosystem & Analytics
+- **Universal Adaptation Engine**: The OS learns from every interacting user globally (anonymously) to improve general system defaults.
+- **Entropy-Aware Resource Management**: Predicting hardware failure by analyzing micro-fluctuations in CPU voltage and disk latency.

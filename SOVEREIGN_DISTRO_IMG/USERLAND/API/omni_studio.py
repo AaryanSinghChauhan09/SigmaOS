@@ -8,6 +8,7 @@ USP: A singular, dynamically morphing application that serves as the ultimate
      running entirely offline with zero telemetry.
 
 Modes & Competitor USPs:
+    pass
 - Programmer (Replaces VS Code & IntelliJ): Offline AI Pair Programming, MeshGit.
 - Editor (Replaces Premiere & Resolve): Magnetic timeline, Node-based Offline VFX.
 - Designer (Replaces Figma & Illustrator): P2P Real-Time Collaboration (No Cloud), Vector-fluid engine.

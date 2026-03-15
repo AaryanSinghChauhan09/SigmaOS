@@ -1,4 +1,4 @@
-# Generated class core: AdaptiveGovernor
-from typing import Dict, Any, List
-
-class AdaptiveGovernor:
+"""
+SigmaOS Modular Shim
+"""
+from ._AdaptiveGovernor_core.adaptivegovernor._core import AdaptiveGovernor # noqa

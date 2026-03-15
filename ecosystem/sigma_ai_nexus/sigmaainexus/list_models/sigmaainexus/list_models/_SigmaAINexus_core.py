@@ -1,6 +1,4 @@
-# Generated class core: SigmaAINexus
-import time
-import random
-from typing import Dict, List, Any
-
-class SigmaAINexus:
+"""
+SigmaOS Modular Shim
+"""
+from ._SigmaAINexus_core.sigmaainexus._core import SigmaAINexus # noqa

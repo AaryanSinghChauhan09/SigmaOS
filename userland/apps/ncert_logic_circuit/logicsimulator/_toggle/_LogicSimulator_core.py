@@ -1,5 +1,4 @@
-# Generated class core: LogicSimulator
-import tkinter as tk
-from tkinter import ttk, messagebox
-
-class LogicSimulator:
+"""
+SigmaOS Modular Shim
+"""
+from ._LogicSimulator_core.logicsimulator._core import LogicSimulator # noqa

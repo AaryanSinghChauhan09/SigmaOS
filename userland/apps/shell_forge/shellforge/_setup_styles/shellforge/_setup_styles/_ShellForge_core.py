@@ -1,7 +1,4 @@
-# Generated class core: ShellForge
-import tkinter as tk
-from tkinter import ttk, messagebox
-import random
-import time
-
-class ShellForge:
+"""
+SigmaOS Modular Shim
+"""
+from ._ShellForge_core.shellforge._core import ShellForge # noqa

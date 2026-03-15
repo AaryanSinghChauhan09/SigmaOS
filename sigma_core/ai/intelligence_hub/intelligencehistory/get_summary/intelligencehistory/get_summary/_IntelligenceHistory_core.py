@@ -1,7 +1,4 @@
-# Generated class core: IntelligenceHistory
-import math
-import random
-import time
-from typing import List, Dict, Any, Optional
-
-class IntelligenceHistory:
+"""
+SigmaOS Modular Shim
+"""
+from ._IntelligenceHistory_core.intelligencehistory._core import IntelligenceHistory # noqa

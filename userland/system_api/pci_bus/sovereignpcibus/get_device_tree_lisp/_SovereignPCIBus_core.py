@@ -1,5 +1,4 @@
-# Generated class core: SovereignPCIBus
-from dataclasses import dataclass, field
-from typing import List, Optional
-
-class SovereignPCIBus:
+"""
+SigmaOS Modular Shim
+"""
+from ._SovereignPCIBus_core.sovereignpcibus._core import SovereignPCIBus # noqa

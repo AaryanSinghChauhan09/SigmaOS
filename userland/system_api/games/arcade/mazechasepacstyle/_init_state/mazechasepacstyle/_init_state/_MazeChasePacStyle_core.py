@@ -1,6 +1,4 @@
-# Generated class core: MazeChasePacStyle
-import random
-from typing import List, Tuple, Dict, Any, Optional
-from .base import SigmaGame
-
-class MazeChasePacStyle:
+"""
+SigmaOS Modular Shim
+"""
+from ._MazeChasePacStyle_core.mazechasepacstyle._core import MazeChasePacStyle # noqa

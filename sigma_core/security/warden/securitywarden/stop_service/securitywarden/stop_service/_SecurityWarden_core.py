@@ -1,8 +1,4 @@
-# Generated class core: SecurityWarden
-import time
-import threading
-import hashlib
-from typing import Dict, List, Any
-from sigma_core.system.interfaces import SigmaModuleBase, ISigmaService
-
-class SecurityWarden:
+"""
+SigmaOS Modular Shim
+"""
+from ._SecurityWarden_core.securitywarden._core import SecurityWarden # noqa

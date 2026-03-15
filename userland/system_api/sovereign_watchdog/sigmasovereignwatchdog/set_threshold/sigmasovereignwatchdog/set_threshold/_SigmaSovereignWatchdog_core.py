@@ -1,11 +1,4 @@
-# Generated class core: SigmaSovereignWatchdog
-import os
-import sys
-import time
-import threading
-import platform
-import subprocess
-from typing import Dict, List, Any, Optional
-from sigma_core.system.interfaces import SigmaModuleBase
-
-class SigmaSovereignWatchdog:
+"""
+SigmaOS Modular Shim
+"""
+from ._SigmaSovereignWatchdog_core.sigmasovereignwatchdog._core import SigmaSovereignWatchdog # noqa

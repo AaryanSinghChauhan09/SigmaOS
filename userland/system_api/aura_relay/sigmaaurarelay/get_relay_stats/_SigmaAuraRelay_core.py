@@ -1,5 +1,4 @@
-# Generated class core: SigmaAuraRelay
-from typing import Dict, List, Any
-import time
-
-class SigmaAuraRelay:
+"""
+SigmaOS Modular Shim
+"""
+from ._SigmaAuraRelay_core.sigmaaurarelay._core import SigmaAuraRelay # noqa

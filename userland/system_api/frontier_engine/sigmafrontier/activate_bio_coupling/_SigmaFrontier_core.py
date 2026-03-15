@@ -1,5 +1,4 @@
-# Generated class core: SigmaFrontier
-from typing import Dict, Any
-import random
-
-class SigmaFrontier:
+"""
+SigmaOS Modular Shim
+"""
+from ._SigmaFrontier_core.sigmafrontier._core import SigmaFrontier # noqa

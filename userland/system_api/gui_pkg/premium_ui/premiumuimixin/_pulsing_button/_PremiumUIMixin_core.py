@@ -1,5 +1,4 @@
-# Generated class core: PremiumUIMixin
-import tkinter as tk
-from .styles import PAL, FONT_BOLD, FONT_SMALL
-
-class PremiumUIMixin:
+"""
+SigmaOS Modular Shim
+"""
+from ._PremiumUIMixin_core.premiumuimixin._core import PremiumUIMixin # noqa

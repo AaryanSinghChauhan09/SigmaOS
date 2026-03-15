@@ -1,7 +1,4 @@
-# Generated class core: LawPage
-import tkinter as tk
-from tkinter import ttk
-from .base_page import SigmaPage
-from .styles import PAL, FONT_BOLD, FONT_SMALL, FONT_MED
-
-class LawPage:
+"""
+SigmaOS Modular Shim
+"""
+from ._LawPage_core.lawpage._core import LawPage # noqa

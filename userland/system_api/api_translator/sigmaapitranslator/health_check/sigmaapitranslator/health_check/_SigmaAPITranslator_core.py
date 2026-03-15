@@ -1,6 +1,4 @@
-# Generated class core: SigmaAPITranslator
-from enum import Enum
-import time
-import uuid
-
-class SigmaAPITranslator:
+"""
+SigmaOS Modular Shim
+"""
+from ._SigmaAPITranslator_core.sigmaapitranslator._core import SigmaAPITranslator # noqa

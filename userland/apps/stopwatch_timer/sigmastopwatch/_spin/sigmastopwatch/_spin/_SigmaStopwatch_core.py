@@ -1,7 +1,4 @@
-# Generated class core: SigmaStopwatch
-import tkinter as tk
-from tkinter import ttk
-import time, threading
-from typing import Any
-
-class SigmaStopwatch:
+"""
+SigmaOS Modular Shim
+"""
+from ._SigmaStopwatch_core.sigmastopwatch._core import SigmaStopwatch # noqa

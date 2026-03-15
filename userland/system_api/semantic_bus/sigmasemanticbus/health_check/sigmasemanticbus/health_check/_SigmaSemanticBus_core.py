@@ -1,5 +1,4 @@
-# Generated class core: SigmaSemanticBus
-from typing import Dict, Any, Callable
-import json
-
-class SigmaSemanticBus:
+"""
+SigmaOS Modular Shim
+"""
+from ._SigmaSemanticBus_core.sigmasemanticbus._core import SigmaSemanticBus # noqa

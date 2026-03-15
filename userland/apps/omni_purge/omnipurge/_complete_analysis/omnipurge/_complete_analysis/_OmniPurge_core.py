@@ -1,7 +1,4 @@
-# Generated class core: OmniPurge
-import tkinter as tk
-from tkinter import ttk, messagebox
-import random
-import time
-
-class OmniPurge:
+"""
+SigmaOS Modular Shim
+"""
+from ._OmniPurge_core.omnipurge._core import OmniPurge # noqa

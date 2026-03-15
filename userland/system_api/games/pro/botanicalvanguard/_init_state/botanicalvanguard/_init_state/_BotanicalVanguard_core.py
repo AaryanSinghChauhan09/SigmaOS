@@ -1,6 +1,4 @@
-# Generated class core: BotanicalVanguard
-import random
-from typing import List, Tuple, Dict, Any, Optional
-from .base import SigmaGame
-
-class BotanicalVanguard:
+"""
+SigmaOS Modular Shim
+"""
+from ._BotanicalVanguard_core.botanicalvanguard._core import BotanicalVanguard # noqa

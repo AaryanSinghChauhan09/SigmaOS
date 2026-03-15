@@ -1,6 +1,4 @@
-# Generated class core: ShadowStalker
-import random
-from typing import List, Tuple, Dict, Any, Optional
-from .base import SigmaGame
-
-class ShadowStalker:
+"""
+SigmaOS Modular Shim
+"""
+from ._ShadowStalker_core.shadowstalker._core import ShadowStalker # noqa

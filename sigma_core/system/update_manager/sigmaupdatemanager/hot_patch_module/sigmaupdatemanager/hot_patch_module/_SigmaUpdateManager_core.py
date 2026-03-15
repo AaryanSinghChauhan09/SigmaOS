@@ -1,8 +1,4 @@
-# Generated class core: SigmaUpdateManager
-import time
-import random
-import hashlib
-import threading
-from typing import Dict, List, Any
-
-class SigmaUpdateManager:
+"""
+SigmaOS Modular Shim
+"""
+from ._SigmaUpdateManager_core.sigmaupdatemanager._core import SigmaUpdateManager # noqa

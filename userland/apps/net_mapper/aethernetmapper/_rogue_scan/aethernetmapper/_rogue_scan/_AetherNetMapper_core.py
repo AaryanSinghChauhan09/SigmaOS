@@ -1,8 +1,4 @@
-# Generated class core: AetherNetMapper
-import tkinter as tk
-from tkinter import ttk, messagebox
-import socket
-import threading
-import random
-
-class AetherNetMapper:
+"""
+SigmaOS Modular Shim
+"""
+from ._AetherNetMapper_core.aethernetmapper._core import AetherNetMapper # noqa

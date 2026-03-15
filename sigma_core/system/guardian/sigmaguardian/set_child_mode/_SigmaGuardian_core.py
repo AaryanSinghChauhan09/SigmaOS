@@ -1,5 +1,4 @@
-# Generated class core: SigmaGuardian
-import os
-from sigma_core.system.config import SigmaConfig
-
-class SigmaGuardian:
+"""
+SigmaOS Modular Shim
+"""
+from ._SigmaGuardian_core.sigmaguardian._core import SigmaGuardian # noqa

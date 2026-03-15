@@ -1,5 +1,4 @@
-# Generated class core: AppDiscovery
-import os
-import importlib.util
-
-class AppDiscovery:
+"""
+SigmaOS Modular Shim
+"""
+from ._AppDiscovery_core.appdiscovery._core import AppDiscovery # noqa

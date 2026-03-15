@@ -1,4 +1,4 @@
-# Generated class core: IdentityVisualizer
-import tkinter as tk
-
-class IdentityVisualizer:
+"""
+SigmaOS Modular Shim
+"""
+from ._IdentityVisualizer_core.identityvisualizer._core import IdentityVisualizer # noqa

@@ -1,8 +1,4 @@
-# Generated class core: MorphicDashboard
-import os
-import sys
-import time
-import random
-from sigma_core.system.interfaces import SigmaModuleBase
-
-class MorphicDashboard:
+"""
+SigmaOS Modular Shim
+"""
+from ._MorphicDashboard_core.morphicdashboard._core import MorphicDashboard # noqa

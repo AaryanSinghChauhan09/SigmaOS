@@ -1,5 +1,4 @@
-# Generated class core: ISigmaService
-from abc import ABC, abstractmethod
-from typing import Dict, Any, Optional
-
-class ISigmaService:
+"""
+SigmaOS Modular Shim
+"""
+from ._ISigmaService_core.isigmaservice._core import ISigmaService # noqa

@@ -1,6 +1,4 @@
-# Generated class core: SovereignLudo
-import random
-from typing import List, Tuple, Dict, Any, Optional
-from .base import SigmaGame
-
-class SovereignLudo:
+"""
+SigmaOS Modular Shim
+"""
+from ._SovereignLudo_core.sovereignludo._core import SovereignLudo # noqa

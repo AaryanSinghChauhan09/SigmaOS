@@ -3,6 +3,7 @@ SigmaUniversalBridge: The Cross-Plat Parity Engine.
 ===================================================
 USP: Fuses the flagship features of EVERY major OS (macOS, Windows, Android, BSD, QNX).
 Competitor Killers:
+    pass
 - macOS: Time Machine -> Temporal Snapshot; Universal Control -> Aura Hub.
 - Windows: PowerToys -> Apex Studio; Snap Layouts -> Grid Orchestrator.
 - Android: Material You -> Neural Theme; App Sandboxing -> Lattice Cells.

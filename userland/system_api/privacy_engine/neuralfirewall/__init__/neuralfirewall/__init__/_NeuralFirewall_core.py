@@ -1,7 +1,4 @@
-# Generated class core: NeuralFirewall
-import hashlib
-import json
-import re
-from sigma_core.system.interfaces import ISigmaModule, SigmaModuleBase
-
-class NeuralFirewall:
+"""
+SigmaOS Modular Shim
+"""
+from ._NeuralFirewall_core.neuralfirewall._core import NeuralFirewall # noqa

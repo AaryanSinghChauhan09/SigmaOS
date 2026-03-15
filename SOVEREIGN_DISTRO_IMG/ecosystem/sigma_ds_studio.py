@@ -3,6 +3,7 @@ SigmaDSStudio: High-Performance Data Engineering & Science Workspace.
 ===================================================================
 USP: Sovereign Data Pipelining & Vectorized EDA.
 Competitor Killers:
+    pass
 - Jupyter: Integrated, safe execution blocks with forensic audit logs.
 - Snowflake / Databricks: Distributed local data warehouse (SovereignLake).
 - Power BI / Tableau: Interactive, AI-driven visual EDA in the GUI.

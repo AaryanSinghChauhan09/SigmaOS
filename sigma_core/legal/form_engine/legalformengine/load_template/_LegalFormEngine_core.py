@@ -1,8 +1,4 @@
-# Generated class core: LegalFormEngine
-import json
-import os
-import time
-from typing import Dict, Any, List, Optional
-from .statutory_data import GRAND_LIBRARY
-
-class LegalFormEngine:
+"""
+SigmaOS Modular Shim
+"""
+from ._LegalFormEngine_core.legalformengine._core import LegalFormEngine # noqa

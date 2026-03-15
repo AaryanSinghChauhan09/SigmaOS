@@ -1,6 +1,4 @@
-# Generated class core: SigmaSQLForge
-import time
-import re
-from typing import List, Dict, Any, Optional
-
-class SigmaSQLForge:
+"""
+SigmaOS Modular Shim
+"""
+from ._SigmaSQLForge_core.sigmasqlforge._core import SigmaSQLForge # noqa

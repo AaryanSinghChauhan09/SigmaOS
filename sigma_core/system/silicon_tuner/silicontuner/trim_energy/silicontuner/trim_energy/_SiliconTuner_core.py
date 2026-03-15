@@ -1,5 +1,4 @@
-# Generated class core: SiliconTuner
-from typing import Dict, Any
-from sigma_core.system.interfaces import SigmaModuleBase
-
-class SiliconTuner:
+"""
+SigmaOS Modular Shim
+"""
+from ._SiliconTuner_core.silicontuner._core import SiliconTuner # noqa

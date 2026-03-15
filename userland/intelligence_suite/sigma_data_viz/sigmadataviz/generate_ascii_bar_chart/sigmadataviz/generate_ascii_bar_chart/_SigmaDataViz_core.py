@@ -1,6 +1,4 @@
-# Generated class core: SigmaDataViz
-import math
-import time
-from typing import List, Dict, Any, Optional
-
-class SigmaDataViz:
+"""
+SigmaOS Modular Shim
+"""
+from ._SigmaDataViz_core.sigmadataviz._core import SigmaDataViz # noqa

@@ -1,7 +1,4 @@
-# Generated class core: StealthGuardian
-import os
-import random
-import time
-from typing import Dict, Any, List, Optional
-
-class StealthGuardian:
+"""
+SigmaOS Modular Shim
+"""
+from ._StealthGuardian_core.stealthguardian._core import StealthGuardian # noqa

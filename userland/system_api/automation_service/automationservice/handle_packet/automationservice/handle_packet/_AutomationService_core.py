@@ -1,6 +1,4 @@
-# Generated class core: AutomationService
-import json
-import time
-from typing import Dict, Any, Optional
-
-class AutomationService:
+"""
+SigmaOS Modular Shim
+"""
+from ._AutomationService_core.automationservice._core import AutomationService # noqa

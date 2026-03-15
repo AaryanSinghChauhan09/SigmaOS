@@ -1,5 +1,4 @@
-# Generated class core: SigmaSovereignVault
-from typing import Dict, List, Any
-import random
-
-class SigmaSovereignVault:
+"""
+SigmaOS Modular Shim
+"""
+from ._SigmaSovereignVault_core.sigmasovereignvault._core import SigmaSovereignVault # noqa

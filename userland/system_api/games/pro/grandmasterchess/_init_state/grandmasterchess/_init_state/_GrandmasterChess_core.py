@@ -1,6 +1,4 @@
-# Generated class core: GrandmasterChess
-import random
-from typing import List, Tuple, Dict, Any, Optional
-from .base import SigmaGame
-
-class GrandmasterChess:
+"""
+SigmaOS Modular Shim
+"""
+from ._GrandmasterChess_core.grandmasterchess._core import GrandmasterChess # noqa

@@ -1,6 +1,4 @@
-# Generated class core: SigmaAuditor
-import os
-import sys
-import importlib
-
-class SigmaAuditor:
+"""
+SigmaOS Modular Shim
+"""
+from ._SigmaAuditor_core.sigmaauditor._core import SigmaAuditor # noqa

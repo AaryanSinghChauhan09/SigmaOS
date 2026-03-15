@@ -1,4 +1,4 @@
-# Generated class core: SigmaHardwareWarden
-from typing import Dict, List, Any
-
-class SigmaHardwareWarden:
+"""
+SigmaOS Modular Shim
+"""
+from ._SigmaHardwareWarden_core.sigmahardwarewarden._core import SigmaHardwareWarden # noqa

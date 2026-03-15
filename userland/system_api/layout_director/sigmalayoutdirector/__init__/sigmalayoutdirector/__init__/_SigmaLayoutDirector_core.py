@@ -1,5 +1,4 @@
-# Generated class core: SigmaLayoutDirector
-from enum import Enum
-from dataclasses import dataclass
-
-class SigmaLayoutDirector:
+"""
+SigmaOS Modular Shim
+"""
+from ._SigmaLayoutDirector_core.sigmalayoutdirector._core import SigmaLayoutDirector # noqa

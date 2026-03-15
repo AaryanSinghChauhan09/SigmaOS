@@ -1,5 +1,4 @@
-# Generated class core: SovereignUAC
-import hashlib
-import random
-
-class SovereignUAC:
+"""
+SigmaOS Modular Shim
+"""
+from ._SovereignUAC_core.sovereignuac._core import SovereignUAC # noqa

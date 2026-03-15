@@ -1,11 +1,4 @@
-# Generated class core: SigmaCrypto
-import sys
-import os
-import time
-import json
-import hashlib
-import hmac
-import urllib.request
-import subprocess
-
-class SigmaCrypto:
+"""
+SigmaOS Modular Shim
+"""
+from ._SigmaCrypto_core.sigmacrypto._core import SigmaCrypto # noqa

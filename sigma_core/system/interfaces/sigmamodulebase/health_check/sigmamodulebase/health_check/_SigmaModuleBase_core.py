@@ -1,5 +1,4 @@
-# Generated class core: SigmaModuleBase
-from abc import ABC, abstractmethod
-from typing import Dict, Any, Optional
-
-class SigmaModuleBase:
+"""
+SigmaOS Modular Shim
+"""
+from ._SigmaModuleBase_core.sigmamodulebase._core import SigmaModuleBase # noqa

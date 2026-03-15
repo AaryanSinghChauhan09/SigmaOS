@@ -1,7 +1,4 @@
-# Generated class core: SlidingTilePuzzle
-import random
-import time
-from typing import List, Tuple, Dict, Any, Optional, Set
-from .base import SigmaGame
-
-class SlidingTilePuzzle:
+"""
+SigmaOS Modular Shim
+"""
+from ._SlidingTilePuzzle_core.slidingtilepuzzle._core import SlidingTilePuzzle # noqa

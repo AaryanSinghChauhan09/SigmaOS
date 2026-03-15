@@ -1,9 +1,4 @@
-# Generated class core: SigmaAutomationLayer
-import time
-import json
-import uuid
-import threading
-from pathlib import Path
-from typing import Dict, List, Any
-
-class SigmaAutomationLayer:
+"""
+SigmaOS Modular Shim
+"""
+from ._SigmaAutomationLayer_core.sigmaautomationlayer._core import SigmaAutomationLayer # noqa

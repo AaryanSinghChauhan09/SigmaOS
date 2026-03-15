@@ -1,5 +1,4 @@
-# Generated class core: SigmaVisionForge
-from typing import Dict, List, Any
-import random
-
-class SigmaVisionForge:
+"""
+SigmaOS Modular Shim
+"""
+from ._SigmaVisionForge_core.sigmavisionforge._core import SigmaVisionForge # noqa

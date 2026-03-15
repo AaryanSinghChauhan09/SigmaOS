@@ -1,7 +1,4 @@
-# Generated class core: SovereignAnalytics
-import time
-import psutil
-import json
-import os
-
-class SovereignAnalytics:
+"""
+SigmaOS Modular Shim
+"""
+from ._SovereignAnalytics_core.sovereignanalytics._core import SovereignAnalytics # noqa

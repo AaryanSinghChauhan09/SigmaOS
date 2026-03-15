@@ -1,10 +1,4 @@
-# Generated class core: SigmaAgentIsolate
-import uuid
-import threading
-from typing import Dict, List, Any, Optional
-from concurrent.futures import ThreadPoolExecutor
-from sigma_core.system.interfaces import SigmaModuleBase, ISigmaService
-from .mission_planner import MissionPlanner
-from .swarm_consensus import SwarmConsensus
-
-class SigmaAgentIsolate:
+"""
+SigmaOS Modular Shim
+"""
+from ._SigmaAgentIsolate_core.sigmaagentisolate._core import SigmaAgentIsolate # noqa

@@ -1,6 +1,4 @@
-# Generated class core: ApexTetris
-import random
-from typing import List, Tuple, Dict, Any, Optional
-from .base import SigmaGame
-
-class ApexTetris:
+"""
+SigmaOS Modular Shim
+"""
+from ._ApexTetris_core.apextetris._core import ApexTetris # noqa

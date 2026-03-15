@@ -1,5 +1,4 @@
-# Generated class core: MockKernel
-import time
-from typing import Dict, List, Any, Optional
-
-class MockKernel:
+"""
+SigmaOS Modular Shim
+"""
+from ._MockKernel_core.mockkernel._core import MockKernel # noqa

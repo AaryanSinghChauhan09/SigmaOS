@@ -1,6 +1,4 @@
-# Generated class core: SigmaGenAILab
-import hashlib
-import time
-from typing import List, Dict, Any, Optional
-
-class SigmaGenAILab:
+"""
+SigmaOS Modular Shim
+"""
+from ._SigmaGenAILab_core.sigmagenailab._core import SigmaGenAILab # noqa

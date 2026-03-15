@@ -1,7 +1,4 @@
-# Generated class core: AnonymityShield
-import random
-import time
-from typing import Dict, Any, List, Optional
-from sigma_core.system.interfaces import SigmaModuleBase
-
-class AnonymityShield:
+"""
+SigmaOS Modular Shim
+"""
+from ._AnonymityShield_core.anonymityshield._core import AnonymityShield # noqa

@@ -1,6 +1,4 @@
-# Generated class core: LegalSovereignty
-import time
-from typing import Dict, Any, List, Optional
-from sigma_core.system.interfaces import SigmaModuleBase
-
-class LegalSovereignty:
+"""
+SigmaOS Modular Shim
+"""
+from ._LegalSovereignty_core.legalsovereignty._core import LegalSovereignty # noqa

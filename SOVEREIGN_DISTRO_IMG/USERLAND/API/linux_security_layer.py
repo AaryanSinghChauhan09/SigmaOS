@@ -2,6 +2,7 @@
 SigmaOS Professional Security Layer
 ===================================
 Focuses on enterprise-grade Linux security:
+    pass
 - ufw (Uncomplicated Firewall) parity
 - SELinux (Security-Enhanced Linux) Mandatory Access Control
 - fail2ban (Intrusion prevention / brute force mitigation)

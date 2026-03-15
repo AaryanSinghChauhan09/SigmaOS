@@ -1,6 +1,4 @@
-# Generated class core: SovereignSuggest
-import time
-import json
-import os
-
-class SovereignSuggest:
+"""
+SigmaOS Modular Shim
+"""
+from ._SovereignSuggest_core.sovereignsuggest._core import SovereignSuggest # noqa

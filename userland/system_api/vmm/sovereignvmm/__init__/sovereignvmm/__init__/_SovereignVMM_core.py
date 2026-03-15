@@ -1,4 +1,4 @@
-# Generated class core: SovereignVMM
-
-
-class SovereignVMM:
+"""
+SigmaOS Modular Shim
+"""
+from ._SovereignVMM_core.sovereignvmm._core import SovereignVMM # noqa

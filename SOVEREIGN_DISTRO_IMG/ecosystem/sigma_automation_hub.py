@@ -4,6 +4,7 @@ SigmaOmniAutomator: The Universal Automation Hub.
 USP: Fuses the flagship automation features of macOS (Shortcuts), Windows (Power Automate), 
 Linux (Systemd/Ansible), and Android (Tasker) into a single agentic engine.
 Competitor Killers:
+    pass
 - macOS Shortcuts: Native system integration & visual logic.
 - Windows Power Automate: Cross-app agentic pipelines.
 - Android Tasker: Context-aware triggers (Geo, Bio, Hardware).

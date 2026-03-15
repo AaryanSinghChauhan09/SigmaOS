@@ -5,6 +5,7 @@ USP: Real-time, logic-layer auditor enforcing Digital Rights, Apple ATT,
      GDPR, EU DMA (Anti-Monopoly), and Asimov's AI Ethics at the Kernel level.
 
 Features & Compliance:
+    pass
 1. Omni-Tracking Ban: Beyond Apple's ATT, blocks telemetry at the kernel VFS/Network layer.
 2. Anti-Monopoly Engine (EU DMA): Prevents apps from forcing proprietary payment gateways or locking data.
 3. IP-Law Enforcer: Warns users executing non-compliant GPL/Proprietary binaries without uploading data.

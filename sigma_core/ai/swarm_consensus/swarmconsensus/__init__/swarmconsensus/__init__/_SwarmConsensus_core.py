@@ -1,4 +1,4 @@
-# Generated class core: SwarmConsensus
-from typing import List, Dict, Any
-
-class SwarmConsensus:
+"""
+SigmaOS Modular Shim
+"""
+from ._SwarmConsensus_core.swarmconsensus._core import SwarmConsensus # noqa

@@ -1,6 +1,4 @@
-# Generated class core: NirvanaEngine
-import tkinter as tk
-from tkinter import ttk, messagebox
-import time
-
-class NirvanaEngine:
+"""
+SigmaOS Modular Shim
+"""
+from ._NirvanaEngine_core.nirvanaengine._core import NirvanaEngine # noqa

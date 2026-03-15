@@ -1,6 +1,4 @@
-# Generated class core: SigmaUniversalBridge
-from typing import Dict, List, Any
-import time
-import random
-
-class SigmaUniversalBridge:
+"""
+SigmaOS Modular Shim
+"""
+from ._SigmaUniversalBridge_core.sigmauniversalbridge._core import SigmaUniversalBridge # noqa

@@ -1,7 +1,4 @@
-# Generated class core: ToolsFinder
-import tkinter as tk
-from tkinter import ttk, scrolledtext, filedialog, messagebox
-import os
-import time
-
-class ToolsFinder:
+"""
+SigmaOS Modular Shim
+"""
+from ._ToolsFinder_core.toolsfinder._core import ToolsFinder # noqa

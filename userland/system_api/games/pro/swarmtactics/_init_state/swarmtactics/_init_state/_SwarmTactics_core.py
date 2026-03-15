@@ -1,6 +1,4 @@
-# Generated class core: SwarmTactics
-import random
-from typing import List, Tuple, Dict, Any, Optional
-from .base import SigmaGame
-
-class SwarmTactics:
+"""
+SigmaOS Modular Shim
+"""
+from ._SwarmTactics_core.swarmtactics._core import SwarmTactics # noqa

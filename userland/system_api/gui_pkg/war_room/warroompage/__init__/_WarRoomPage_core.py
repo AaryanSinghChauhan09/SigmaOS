@@ -1,7 +1,4 @@
-# Generated class core: WarRoomPage
-import tkinter as tk
-from tkinter import ttk
-from .base_page import SigmaPage
-from .styles import PAL, FONT_SMALL
-
-class WarRoomPage:
+"""
+SigmaOS Modular Shim
+"""
+from ._WarRoomPage_core.warroompage._core import WarRoomPage # noqa

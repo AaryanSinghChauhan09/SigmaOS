@@ -1,7 +1,4 @@
-# Generated class core: SovereignCustomizer
-from typing import Dict, Any, List
-from .morphic_engine import MorphicEngine
-from .sensory_assets import SensoryAssets
-from .neural_themer import NeuralThemer
-
-class SovereignCustomizer:
+"""
+SigmaOS Modular Shim
+"""
+from ._SovereignCustomizer_core.sovereigncustomizer._core import SovereignCustomizer # noqa

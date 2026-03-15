@@ -1,6 +1,4 @@
-# Generated class core: StrategicSovereignty
-import random
-from typing import List, Tuple, Dict, Any, Optional
-from .base import SigmaGame
-
-class StrategicSovereignty:
+"""
+SigmaOS Modular Shim
+"""
+from ._StrategicSovereignty_core.strategicsovereignty._core import StrategicSovereignty # noqa

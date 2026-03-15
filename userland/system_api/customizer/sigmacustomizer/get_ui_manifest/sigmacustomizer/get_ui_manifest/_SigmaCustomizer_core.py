@@ -1,6 +1,4 @@
-# Generated class core: SigmaCustomizer
-import json
-import random
-import os
-
-class SigmaCustomizer:
+"""
+SigmaOS Modular Shim
+"""
+from ._SigmaCustomizer_core.sigmacustomizer._core import SigmaCustomizer # noqa

@@ -1,8 +1,4 @@
-# Generated class core: SigmaAuditor
-import time
-import random
-import sys
-import os
-from typing import Dict, List
-
-class SigmaAuditor:
+"""
+SigmaOS Modular Shim
+"""
+from ._SigmaAuditor_core.sigmaauditor._core import SigmaAuditor # noqa

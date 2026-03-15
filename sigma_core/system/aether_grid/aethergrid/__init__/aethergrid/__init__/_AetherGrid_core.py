@@ -1,6 +1,4 @@
-# Generated class core: AetherGrid
-import time
-import uuid
-from typing import List, Dict, Callable
-
-class AetherGrid:
+"""
+SigmaOS Modular Shim
+"""
+from ._AetherGrid_core.aethergrid._core import AetherGrid # noqa

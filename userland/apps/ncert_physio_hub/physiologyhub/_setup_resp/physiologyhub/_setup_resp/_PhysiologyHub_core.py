@@ -1,6 +1,4 @@
-# Generated class core: PhysiologyHub
-import tkinter as tk
-from tkinter import ttk, messagebox
-import math, random
-
-class PhysiologyHub:
+"""
+SigmaOS Modular Shim
+"""
+from ._PhysiologyHub_core.physiologyhub._core import PhysiologyHub # noqa

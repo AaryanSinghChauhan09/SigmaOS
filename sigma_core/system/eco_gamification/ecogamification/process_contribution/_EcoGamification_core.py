@@ -1,7 +1,4 @@
-# Generated class core: EcoGamification
-import random
-import time
-from typing import Dict, Any, List
-from sigma_core.system.interfaces import SigmaModuleBase
-
-class EcoGamification:
+"""
+SigmaOS Modular Shim
+"""
+from ._EcoGamification_core.ecogamification._core import EcoGamification # noqa

@@ -1,6 +1,4 @@
-# Generated class core: SovereignThemeEngine
-import tkinter as tk
-from tkinter import ttk, messagebox, colorchooser
-import random
-
-class SovereignThemeEngine:
+"""
+SigmaOS Modular Shim
+"""
+from ._SovereignThemeEngine_core.sovereignthemeengine._core import SovereignThemeEngine # noqa

@@ -1,7 +1,4 @@
-# Generated class core: ConnectFour
-import random
-import time
-from typing import List, Tuple, Dict, Any, Optional, Set
-from .base import SigmaGame
-
-class ConnectFour:
+"""
+SigmaOS Modular Shim
+"""
+from ._ConnectFour_core.connectfour._core import ConnectFour # noqa

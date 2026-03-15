@@ -1,8 +1,4 @@
-# Generated class core: RepoSyncPro
-import tkinter as tk
-from tkinter import ttk, messagebox
-import subprocess
-import threading
-import os
-
-class RepoSyncPro:
+"""
+SigmaOS Modular Shim
+"""
+from ._RepoSyncPro_core.reposyncpro._core import RepoSyncPro # noqa

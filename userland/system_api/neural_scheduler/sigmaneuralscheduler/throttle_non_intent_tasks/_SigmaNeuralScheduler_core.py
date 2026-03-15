@@ -1,6 +1,4 @@
-# Generated class core: SigmaNeuralScheduler
-import time
-import random
-import hashlib
-
-class SigmaNeuralScheduler:
+"""
+SigmaOS Modular Shim
+"""
+from ._SigmaNeuralScheduler_core.sigmaneuralscheduler._core import SigmaNeuralScheduler # noqa

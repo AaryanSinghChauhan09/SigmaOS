@@ -1,6 +1,4 @@
-# Generated class core: PluginHub
-import os
-import shutil
-import importlib.util
-
-class PluginHub:
+"""
+SigmaOS Modular Shim
+"""
+from ._PluginHub_core.pluginhub._core import PluginHub # noqa

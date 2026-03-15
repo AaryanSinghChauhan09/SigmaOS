@@ -1,8 +1,4 @@
-# Generated class core: ScrumBoard
-import os
-import re
-import json
-import time
-from typing import List, Dict, Any, Optional
-
-class ScrumBoard:
+"""
+SigmaOS Modular Shim
+"""
+from ._ScrumBoard_core.scrumboard._core import ScrumBoard # noqa

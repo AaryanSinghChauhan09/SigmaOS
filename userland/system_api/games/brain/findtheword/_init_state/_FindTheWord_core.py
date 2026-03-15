@@ -1,7 +1,4 @@
-# Generated class core: FindTheWord
-import random
-import time
-from typing import List, Tuple, Dict, Any, Optional, Set
-from .base import SigmaGame
-
-class FindTheWord:
+"""
+SigmaOS Modular Shim
+"""
+from ._FindTheWord_core.findtheword._core import FindTheWord # noqa

@@ -1,6 +1,4 @@
-# Generated class core: SigmaVisualLogic
-from dataclasses import dataclass, field
-from typing import List, Dict, Any, Union
-import json
-
-class SigmaVisualLogic:
+"""
+SigmaOS Modular Shim
+"""
+from ._SigmaVisualLogic_core.sigmavisuallogic._core import SigmaVisualLogic # noqa

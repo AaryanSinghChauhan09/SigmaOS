@@ -1,6 +1,4 @@
-# Generated class core: SigmaCognitiveFabric
-import time
-import random
-from typing import Dict, List, Any
-
-class SigmaCognitiveFabric:
+"""
+SigmaOS Modular Shim
+"""
+from ._SigmaCognitiveFabric_core.sigmacognitivefabric._core import SigmaCognitiveFabric # noqa

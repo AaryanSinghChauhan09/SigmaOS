@@ -2,6 +2,7 @@
 SigmaOS Professional Automation Layer
 =====================================
 Focuses on enterprise-grade Linux automation:
+    pass
 - System updates (OTA/CRON parity)
 - User provisioning (LDAP/Local user management)
 - Scheduled backups (Rsync/Borg/Timeshift equivalent)

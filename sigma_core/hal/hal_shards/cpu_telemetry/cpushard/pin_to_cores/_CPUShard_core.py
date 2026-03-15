@@ -1,6 +1,4 @@
-# Generated class core: CPUShard
-import time
-import ctypes
-from ctypes import wintypes
-
-class CPUShard:
+"""
+SigmaOS Modular Shim
+"""
+from ._CPUShard_core.cpushard._core import CPUShard # noqa

@@ -1,5 +1,4 @@
-# Generated class core: SigmaCoreBrain
-from typing import Dict, List, Any
-import json
-
-class SigmaCoreBrain:
+"""
+SigmaOS Modular Shim
+"""
+from ._SigmaCoreBrain_core.sigmacorebrain._core import SigmaCoreBrain # noqa

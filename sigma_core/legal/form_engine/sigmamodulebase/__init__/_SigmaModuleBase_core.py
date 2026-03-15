@@ -1,8 +1,4 @@
-# Generated class core: SigmaModuleBase
-import json
-import os
-import time
-from typing import Dict, Any, List, Optional
-from .statutory_data import GRAND_LIBRARY
-
-class SigmaModuleBase:
+"""
+SigmaOS Modular Shim
+"""
+from ._SigmaModuleBase_core.sigmamodulebase._core import SigmaModuleBase # noqa

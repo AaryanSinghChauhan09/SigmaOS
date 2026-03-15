@@ -1,7 +1,4 @@
-# Generated class core: ExcelHub
-import tkinter as tk
-from tkinter import ttk, scrolledtext, filedialog, messagebox
-import random
-import time
-
-class ExcelHub:
+"""
+SigmaOS Modular Shim
+"""
+from ._ExcelHub_core.excelhub._core import ExcelHub # noqa

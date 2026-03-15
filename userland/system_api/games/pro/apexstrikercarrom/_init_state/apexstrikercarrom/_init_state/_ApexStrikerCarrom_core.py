@@ -1,6 +1,4 @@
-# Generated class core: ApexStrikerCarrom
-import random
-from typing import List, Tuple, Dict, Any, Optional
-from .base import SigmaGame
-
-class ApexStrikerCarrom:
+"""
+SigmaOS Modular Shim
+"""
+from ._ApexStrikerCarrom_core.apexstrikercarrom._core import ApexStrikerCarrom # noqa

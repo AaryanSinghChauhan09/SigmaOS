@@ -5,6 +5,7 @@ USP: Natively integrated developer ecosystem replacing Docker, VS Code, and stan
      Built purely on open-source protocols, eliminating telemetry and vendor lock-in.
 
 Features:
+    pass
 1. SigmaContainers: Native, daemon-less zero-trust containerization (Podman/Docker alternative).
 2. Sovereign IDE: Native IDE with localized AI Pair Programming (Cursor/Copilot alternative).
 3. MeshGit: P2P Version Control running over SigmaMesh, no GitHub/GitLab required.

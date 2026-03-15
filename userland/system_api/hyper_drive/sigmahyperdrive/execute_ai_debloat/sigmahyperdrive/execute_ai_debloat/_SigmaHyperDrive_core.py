@@ -1,5 +1,4 @@
-# Generated class core: SigmaHyperDrive
-import time
-import uuid
-
-class SigmaHyperDrive:
+"""
+SigmaOS Modular Shim
+"""
+from ._SigmaHyperDrive_core.sigmahyperdrive._core import SigmaHyperDrive # noqa

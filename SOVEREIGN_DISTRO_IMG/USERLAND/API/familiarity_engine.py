@@ -6,6 +6,7 @@ USP: To make SigmaOS instantly accessible to billions of users, this engine
      familiar Windows or macOS styles instantly. It acts as a cognitive bridge.
 
 Features:
+    pass
 - Terminology Translation: Connects 'Sovereign Sanctuary' -> 'Windows Defender / Security'.
 - UX Layout Shift: Morphs the central HUD into a left-aligned Start Menu (Windows Mode) or bottom dock (macOS Mode).
 - Shortcut Mapping: Automatically maps standard 'Ctrl+C / Ctrl+V / Alt+Tab' to their sovereign equivalents.

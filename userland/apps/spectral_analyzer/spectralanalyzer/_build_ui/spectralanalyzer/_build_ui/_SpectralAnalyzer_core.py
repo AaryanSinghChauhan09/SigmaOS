@@ -1,6 +1,4 @@
-# Generated class core: SpectralAnalyzer
-import tkinter as tk
-from tkinter import ttk, messagebox
-import random
-
-class SpectralAnalyzer:
+"""
+SigmaOS Modular Shim
+"""
+from ._SpectralAnalyzer_core.spectralanalyzer._core import SpectralAnalyzer # noqa

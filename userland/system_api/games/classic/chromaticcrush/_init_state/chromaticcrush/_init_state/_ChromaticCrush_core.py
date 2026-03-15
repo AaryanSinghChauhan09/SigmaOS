@@ -1,6 +1,4 @@
-# Generated class core: ChromaticCrush
-import random
-from typing import List, Tuple, Dict, Any, Optional
-from .base import SigmaGame
-
-class ChromaticCrush:
+"""
+SigmaOS Modular Shim
+"""
+from ._ChromaticCrush_core.chromaticcrush._core import ChromaticCrush # noqa

@@ -2,6 +2,7 @@
 SigmaOS Security Sentinel — v2.0 (Hardened Apex)
 ==============================================
 Implements simulated professional Linux hardening layers:
+    pass
 - Firewall: UFW-grade ingress/egress filtering.
 - Intrusion: Fail2Ban-style log monitoring and IP dropping.
 - Mandatory Access Control: SELinux/AppArmor parity for process isolation.

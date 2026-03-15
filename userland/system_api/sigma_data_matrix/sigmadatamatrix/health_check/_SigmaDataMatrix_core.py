@@ -1,4 +1,4 @@
-# Generated class core: SigmaDataMatrix
-
-
-class SigmaDataMatrix:
+"""
+SigmaOS Modular Shim
+"""
+from ._SigmaDataMatrix_core.sigmadatamatrix._core import SigmaDataMatrix # noqa

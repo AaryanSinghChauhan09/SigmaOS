@@ -1,8 +1,4 @@
-# Generated class core: ZeroGFileShuffler
-import os
-import re
-import json
-import time
-from typing import List, Dict, Any, Optional
-
-class ZeroGFileShuffler:
+"""
+SigmaOS Modular Shim
+"""
+from ._ZeroGFileShuffler_core.zerogfileshuffler._core import ZeroGFileShuffler # noqa

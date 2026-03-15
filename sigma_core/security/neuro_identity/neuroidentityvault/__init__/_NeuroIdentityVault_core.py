@@ -1,6 +1,4 @@
-# Generated class core: NeuroIdentityVault
-import time
-from typing import Dict, Any, List
-from sigma_core.system.interfaces import SigmaModuleBase
-
-class NeuroIdentityVault:
+"""
+SigmaOS Modular Shim
+"""
+from ._NeuroIdentityVault_core.neuroidentityvault._core import NeuroIdentityVault # noqa

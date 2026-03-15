@@ -1,4 +1,4 @@
-# Generated class core: SensoryAssets
-from typing import Dict, Any, Optional
-
-class SensoryAssets:
+"""
+SigmaOS Modular Shim
+"""
+from ._SensoryAssets_core.sensoryassets._core import SensoryAssets # noqa
