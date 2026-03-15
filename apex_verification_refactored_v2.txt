@@ -40,6 +40,6 @@ warning: in the working copy of 'sigma_core/system/sync_sentinel.py', LF will be
  create mode 100644 sigma_core/manifest.py
  create mode 100644 sigma_core/system/forensic_sentinel.py
  create mode 100644 sigma_core/system/sync_sentinel.py
-To https://github.com/AaryanSinghChauhan09/SigmaOS.git
+To https://github.com/SigmaUserSinghChauhan09/SigmaOS.git
    f4749bc..675b5db  master -> master
 [OK] Workspace Synced with GitHub (APEX MASTER)

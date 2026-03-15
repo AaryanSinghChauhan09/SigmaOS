@@ -15,7 +15,7 @@ class AntigravityToolsFinder:
     """Discovers and maps all Antigravity-branded assets in SigmaOS."""
     def __init__(self, kernel):
         self.kernel = kernel
-        self.base_path = r"C:/Users/Aaryan\.gemini\antigravity\scratch\SigmaOS"
+        self.base_path = r"C:/Users/SigmaUser\.gemini\antigravity\scratch\SigmaOS"
 
     def map_tools(self) -> List[Dict]:
         tools = []

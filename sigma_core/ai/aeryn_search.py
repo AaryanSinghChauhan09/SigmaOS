@@ -20,7 +20,7 @@ class AerynSearch(SigmaModuleBase):
         # Mocking sophisticated semantic retrieval
         results = [
             {"path": "C:\\SigmaOS\\Manifesto.md", "relevance": 0.98, "snippet": "The sovereign kernel remains the bedrock..."},
-            {"path": "C:\\User\\Aaryan\\Notes\\AI_Strategy.docx", "relevance": 0.85, "snippet": "Mesh collaboration is key to agentic autonomy."},
+            {"path": "C:\\User\\SigmaUser\\Notes\\AI_Strategy.docx", "relevance": 0.85, "snippet": "Mesh collaboration is key to agentic autonomy."},
             {"path": "C:\\SigmaOS\\sigma_core\\kernel.py", "relevance": 0.72, "snippet": "class SigmaKernel: Orchestrating the Apex Shard grid."}
         ]
         return results

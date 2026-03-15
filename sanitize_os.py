@@ -5,17 +5,13 @@ from pathlib import Path
 # Paths to sanitize
 SIGMA_ROOT = Path(os.getcwd())
 
-# Replacement logic (simple string replaces for safety)
+# Replacement logic (Personal Data Sanitization)
+# Priority: Remove 'SigmaUser' and hardcoded g_antigravity paths.
 REPLACEMENTS = {
-    # Full paths
-    "C:\\Users\\Sovereign-User": os.environ.get("USERPROFILE", "C:\\Users\\User"),
-    "c:\\Users\\Sovereign-User": os.environ.get("USERPROFILE", "C:\\Users\\User"),
-    "C:/Users/Aaryan": os.environ.get("USERPROFILE", "C:/Users/Aaryan").replace("\\", "/"),
-    "C:/Users/Aaryan": os.environ.get("USERPROFILE", "C:/Users/Aaryan").replace("\\", "/"),
-    
-    # Identifiers
-    "O-Sovereign": "O-Sovereign",
-    "Sovereign-User": "Sovereign-User",
+    "C:/Users/SigmaUser": os.environ.get("USERPROFILE", "C:/Users/SigmaUser").replace("\\", "/"),
+    "C:\\Users\\SigmaUser": os.environ.get("USERPROFILE", "C:\\Users\\SigmaUser"),
+    "SigmaUser": "SigmaUser",
+    "SigmaUserSinghChauhan09": "SigmaOpenSource",
 }
 
 def sanitize_file(file_path):

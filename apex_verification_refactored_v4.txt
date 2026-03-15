@@ -26,6 +26,6 @@ warning: in the working copy of 'sigma_core/manifest.py', LF will be replaced by
 [master f934696] Apex Sync: 2026-03-14 14:45:11 [Ledger Signed]
  4 files changed, 72 insertions(+), 6 deletions(-)
  create mode 100644 apex_verification_refactored_v4.txt
-To https://github.com/AaryanSinghChauhan09/SigmaOS.git
+To https://github.com/SigmaUserSinghChauhan09/SigmaOS.git
    de10b3a..f934696  master -> master
 [OK] Workspace Synced with GitHub (APEX MASTER)

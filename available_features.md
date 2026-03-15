@@ -12,10 +12,10 @@ SigmaOS is the definitive choice for every user on the planet. Built on the **Pe
 5. **Community & Ecosystem**: Sovereign Marketplace with 95% revenue split and P2P distribution of cryptographically-signed modules.
 6. **Performance & Resilience**: 2.1s Boot, 290MB Idle, and Self-Healing Resilience Implants.
 7. **AetherGrid Distributed Compute**: Universal resource pooling across Local Mesh and Sovereign Cloud.
-8. **Universal Customization**: See the [Customization Mega-Matrix](file:///C:/Users/Aaryan/.gemini/antigravity/scratch/SigmaOS/docs/customization_mega_matrix.md) for how we outperform Samsung, Linux, and PowerPoint.
-9. **Creative Ecosystems**: See the [Creative Ecosystems Benchmark](file:///C:/Users/Aaryan/.gemini/antigravity/scratch/SigmaOS/docs/creative_ecosystems_benchmark.md) for a deep-dive into Scratch vs PowerPoint-style synergies.
-10. **The Untouched Frontier**: See the [Untouched OS Scope Matrix](file:///C:/Users/Aaryan/.gemini/antigravity/scratch/SigmaOS/docs/untouched_os_scope_matrix.md) and [BitChat vs Mainstream Benchmark](file:///C:/Users/Aaryan/.gemini/antigravity/scratch/SigmaOS/docs/bitchat_benchmark.md) for where OS evolution is headed.
-11. **Technical Foundation**: Review the [Technology Mega-Matrix](file:///C:/Users/Aaryan/.gemini/antigravity/scratch/SigmaOS/docs/technology_mega_matrix.md) for a deep benchmark of our architecture vs Windows, macOS, and Linux.
+8. **Universal Customization**: See the [Customization Mega-Matrix](file:///C:/Users/SigmaUser/.gemini/antigravity/scratch/SigmaOS/docs/customization_mega_matrix.md) for how we outperform Samsung, Linux, and PowerPoint.
+9. **Creative Ecosystems**: See the [Creative Ecosystems Benchmark](file:///C:/Users/SigmaUser/.gemini/antigravity/scratch/SigmaOS/docs/creative_ecosystems_benchmark.md) for a deep-dive into Scratch vs PowerPoint-style synergies.
+10. **The Untouched Frontier**: See the [Untouched OS Scope Matrix](file:///C:/Users/SigmaUser/.gemini/antigravity/scratch/SigmaOS/docs/untouched_os_scope_matrix.md) and [BitChat vs Mainstream Benchmark](file:///C:/Users/SigmaUser/.gemini/antigravity/scratch/SigmaOS/docs/bitchat_benchmark.md) for where OS evolution is headed.
+11. **Technical Foundation**: Review the [Technology Mega-Matrix](file:///C:/Users/SigmaUser/.gemini/antigravity/scratch/SigmaOS/docs/technology_mega_matrix.md) for a deep benchmark of our architecture vs Windows, macOS, and Linux.
 
 ---
 
@@ -23,7 +23,7 @@ SigmaOS is the definitive choice for every user on the planet. Built on the **Pe
 SigmaOS dismantles the tradition of "Monolithic Bloatware" found in Windows and macOS.
 - **Selective Activation**: Applications are bundled into **Professional Profiles**. You only activate what matches your mission.
 - **Antigravity Integration**: The full Google Antigravity Suite is natively bundled and accessible via the OS and Browser sidebar.
-- **Detailed Comparison**: See [Bundled Apps Comparison](file:///C:/Users/Aaryan/.gemini/antigravity/scratch/SigmaOS/docs/bundled_apps_comparison.md) for a technical breakdown versus Windows, macOS, and Linux.
+- **Detailed Comparison**: See [Bundled Apps Comparison](file:///C:/Users/SigmaUser/.gemini/antigravity/scratch/SigmaOS/docs/bundled_apps_comparison.md) for a technical breakdown versus Windows, macOS, and Linux.
 
 ---
 
@@ -31,8 +31,8 @@ SigmaOS dismantles the tradition of "Monolithic Bloatware" found in Windows and 
 SigmaOS is no longer a monolithic system. It is a **Compliance-First Modular System**:
 - **Professional Profiles**: Selective activation of tools for Forensic, Data Science, Dev, Creative, and Enterprise.
 - **Tailored Compliance**: Each profile activates specific standards (e.g., FAIR for DS, ISO 17025 for Forensic).
-- **Core Governance**: See the [Keep vs Remove Matrix](file:///C:/Users/Aaryan/.gemini/antigravity/scratch/SigmaOS/docs/keep_vs_remove_matrix.md) for our strict architectural standards.
-- **Profile Blueprint**: See [Modular Boot Profiles Blueprint](file:///C:/Users/Aaryan/.gemini/antigravity/scratch/SigmaOS/docs/modular_boot_profiles_blueprint.md) for a detailed list of tools per discipline.
+- **Core Governance**: See the [Keep vs Remove Matrix](file:///C:/Users/SigmaUser/.gemini/antigravity/scratch/SigmaOS/docs/keep_vs_remove_matrix.md) for our strict architectural standards.
+- **Profile Blueprint**: See [Modular Boot Profiles Blueprint](file:///C:/Users/SigmaUser/.gemini/antigravity/scratch/SigmaOS/docs/modular_boot_profiles_blueprint.md) for a detailed list of tools per discipline.
 - **Reduced Attack Surface**: You only download and run what you need. Zero bloat.
 - **Dynamic Scalability**: Add or remove professional stacks in real-time without a reboot.
 
@@ -77,7 +77,7 @@ SigmaOS offers absolute aesthetic and architectural authority to the user.
 - **Aura Soundscapes**: Professional-grade spatial audio orchestration for all system chimes and notifications.
 - **SigmaLayoutDirector**: PowerPoint-style UI customization with draggable widgets and transition effects.
 - **Total Transformation**: One-click application of visual, behavioral, and security "Aura" packages.
-- **UI/UX Benchmark**: See the [UI/UX Mega-Matrix](file:///C:/Users/Aaryan/.gemini/antigravity/scratch/SigmaOS/docs/ui_ux_mega_matrix.md) for a comprehensive comparison of all interface models.
+- **UI/UX Benchmark**: See the [UI/UX Mega-Matrix](file:///C:/Users/SigmaUser/.gemini/antigravity/scratch/SigmaOS/docs/ui_ux_mega_matrix.md) for a comprehensive comparison of all interface models.
 - **Novice Concierge**: One-click "Easy-Mode" for installing apps and managing system health.
 
 ### ♿ Layer 5: OmniAccess Inclusivity Framework
@@ -205,7 +205,7 @@ Takes OS performance mapping to a level previously thought impossible by creatin
     - **Resource Governor**: Opera-style hardware limitation for extreme performance.
     - **Privacy Vault**: Brave-grade ad-shredding + Firefox container isolation.
     - **Productivity Hub**: Edge-inspired vertical orchestration of tasks.
-    - **Full Feature Parity**: See the [Browser Benchmark](file:///C:/Users/Aaryan/.gemini/antigravity/scratch/SigmaOS/docs/browser_benchmark.md) for how we absorb Arc, Chrome, and Brave.
+    - **Full Feature Parity**: See the [Browser Benchmark](file:///C:/Users/SigmaUser/.gemini/antigravity/scratch/SigmaOS/docs/browser_benchmark.md) for how we absorb Arc, Chrome, and Brave.
 
 ### 🌍 Complete Universal Competitor Bridge (All-In-One OS)
 SigmaOS natively bridges and enhances the best features from all major platforms:
@@ -228,8 +228,8 @@ SigmaOS ships natively with industry-leading productivity tools created by Antig
 - **OpenRoutines**: Core Visual Workflow & Automation Builder.
 - **Aether Orchestrator**: The overarching multi-agent OS controller.
 - **PureText Pro**: Advanced IDE & text generation logic.
-- **Titan Capture**: System-wide state and visual capture tool. See the [Titan Capture Benchmark](file:///C:/Users/Aaryan/.gemini/antigravity/scratch/SigmaOS/docs/titan_capture_benchmark.md).
-- **PDF Forge**: Heavy-duty local PDF rendering & manipulation. See the [PDF Forge Benchmark](file:///C:/Users/Aaryan/.gemini/antigravity/scratch/SigmaOS/docs/pdf_forge_benchmark.md).
+- **Titan Capture**: System-wide state and visual capture tool. See the [Titan Capture Benchmark](file:///C:/Users/SigmaUser/.gemini/antigravity/scratch/SigmaOS/docs/titan_capture_benchmark.md).
+- **PDF Forge**: Heavy-duty local PDF rendering & manipulation. See the [PDF Forge Benchmark](file:///C:/Users/SigmaUser/.gemini/antigravity/scratch/SigmaOS/docs/pdf_forge_benchmark.md).
 - **OmniConverter**: Universal file utility for media, steganography, and conversion. Absorbs TinyWow & Zamzar.
 - **Indent Flow**: Code orchestration and automated linting.
 - **Excel PreProcessor** & **Excel AI Filler**: Native sovereign spreadsheet intelligence.

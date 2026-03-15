@@ -9,7 +9,7 @@
 [POLYGLOT] Initiating Layer: IPC_DAEMON (Priority: HIGH)
 [POLYGLOT] Warning: Native ipc not found. Using Python-Safe Fallback.
 [PRIVACY] Scrubber Initialized: Data Amnesia Enforced. No PII written to disk.
-[NCERT] Engine import error: cannot import name 'PhysicsLab' from 'userland.apps.ncert_master_lab' (C:\Users\Aaryan\Downloads\SigmaOS\userland\apps\ncert_master_lab.py)
+[NCERT] Engine import error: cannot import name 'PhysicsLab' from 'userland.apps.ncert_master_lab' (C:\Users\SigmaUser\Downloads\SigmaOS\userland\apps\ncert_master_lab.py)
 [LOADER_ERR] Fallback failed for pdf_forge: SovereignApp.__init__() takes from 1 to 2 positional arguments but 3 were given
 [LOADER_ERR] Fallback failed for titan_capture: SovereignApp.__init__() takes from 1 to 2 positional arguments but 3 were given
 [CRUSHER] Competitor-Defeat Engine [ONLINE]

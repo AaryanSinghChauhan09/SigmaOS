@@ -40,7 +40,7 @@ class SigmaNomad:
         """Launches the SigmaOS Kernel in Nomad/Containerized mode."""
         print(f"--- [SIGMAOS NOMAD BOOTING ON {sys.platform.upper()}] ---")
         # In Nomad mode, we point the kernel to the portable drive for all logic
-        os.environ["C:/Users/Aaryan"] = self.portable_drive
+        os.environ["C:/Users/SigmaUser"] = self.portable_drive
         
         # Start the kernel as a subprocess to maintain host independence
         try:

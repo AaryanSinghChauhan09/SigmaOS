@@ -40,6 +40,6 @@ warning: in the working copy of 'sigma_core/system/sovereign_app.py', LF will be
  create mode 100644 sigma_core/system/sovereign_app.py
  delete mode 100644 tmp_fix_imports.py
  delete mode 100644 tmp_move_shards.py
-To https://github.com/AaryanSinghChauhan09/SigmaOS.git
+To https://github.com/SigmaUserSinghChauhan09/SigmaOS.git
    75728b7..f4749bc  master -> master
 [OK] Workspace Synced with GitHub (APEX MASTER)

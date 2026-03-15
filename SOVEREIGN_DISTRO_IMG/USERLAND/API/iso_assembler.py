@@ -56,6 +56,6 @@ class SigmaISOAssembler:
             f.write("Sovereignty is yours.")
 
 if __name__ == "__main__":
-    root = "C:/Users/Aaryan/.gemini/antigravity/scratch/SigmaOS"
+    root = "C:/Users/SigmaUser/.gemini/antigravity/scratch/SigmaOS"
     assembler = SigmaISOAssembler(root)
     assembler.assemble_distro()

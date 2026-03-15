@@ -5241,7 +5241,7 @@ class SigmaGUI(tk.Tk, UIMixin, PremiumUIMixin):
                 self._log(self._m_log, res["message"], "OK")
                 self._log(self._m_log, f"Sync Speed: {res['speed_mbps']} Mbps", "INFO")
             elif action == "vault":
-                res = mesh.encrypt_and_vault("C:/Users/Aaryan/Documents/Work.docx")
+                res = mesh.encrypt_and_vault("C:/Users/SigmaUser/Documents/Work.docx")
                 self._log(self._m_log, res["message"], "OK")
 
         ttk.Button(cat_c, text="Trigger P2P Sync (Mesh-wide)", command=lambda: _m_act("sync")).pack(fill="x", pady=5)
