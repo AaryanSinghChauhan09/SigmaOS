@@ -1,0 +1,10 @@
+# Part of SigmaOS Omega - (High Cohesion, Loose Coupling)
+# Principle: Single Responsibility per File
+
+from abc import ABC, abstractmethod
+import gc
+
+class SigmaSovereignBase:
+    @property
+    def access_level(self):
+        return 'APEX_SYSTEM'
