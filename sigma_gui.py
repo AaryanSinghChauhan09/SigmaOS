@@ -218,6 +218,7 @@ class SigmaGUI(tk.Tk, UIMixin):
         self.kernel.bus.subscribe("kernel.throttled", lambda p: self._update_morphic_status("THROTTLED", f"Slowing {p['task']}", PAL["gold"]))
         self.kernel.bus.subscribe("system.heal", lambda p: self._update_morphic_status("REPAIR", "Kernel Self-Healed", PAL["green"]))
         self.kernel.bus.subscribe("system.guardian_mode_changed", self._on_guardian_change)
+        self.kernel.bus.subscribe("ui.morphic_island", lambda p: self._morphic_island(p["msg"], p["color"]))
         
         # Notification System
         self._notifs = []
@@ -1030,6 +1031,25 @@ class SigmaGUI(tk.Tk, UIMixin):
             self._intent_entry.pack(side="left", fill="x", expand=True, padx=(0,6))
             self._clock_lbl.config(font=FONT_BOLD, fg=PAL["cyan"])
             self._log(self._dash_log, "✔ SOVEREIGN UI RESTORED.", "OK")
+
+    def set_morph_mode(self, mode: str = "balanced"):
+        """USP: Fluidic Morph UI. Adjusts layout based on user context."""
+        if mode == "code":
+            # Focus mode: hide sidebars and status info
+            if self._sidebar: self._sidebar.pack_forget()
+            if self._topbar: self._topbar.pack_forget()
+            self._morphic_island("MORPH: Code Mode Active (Focus Unlocked)", PAL["accent"])
+        elif mode == "cinema":
+            # Entertainment mode: minimal UI
+            if self._sidebar: self._sidebar.pack_forget()
+            if self._prof_taskbar: self._prof_taskbar.pack_forget()
+            self._morphic_island("MORPH: Cinema Mode Active", PAL["teal"])
+        else:
+            # Balanced: restore standard grid
+            if self._sidebar: self._sidebar.pack(side="left", fill="y")
+            if self._topbar: self._topbar.pack(side="top", fill="x")
+            if self._prof_taskbar: self._prof_taskbar.pack(side="bottom", fill="x")
+            self._morphic_island("MORPH: Balanced Layout Restored", PAL["cyan"])
 
     def _build_topbar(self):
         self._topbar = tk.Frame(self, bg=PAL["bg2"], height=56)

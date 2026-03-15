@@ -72,6 +72,40 @@ class SigmaKernel:
         self.os_name = self.cfg.OS_NAME
         self.version = self.cfg.VERSION
 
+        # Phase 3: Intelligence & Autonomy (Roadmap v2)
+        from .system.vector_memory import VectorMemory
+        from .security.governance import NeuralGovernance
+        from .system.vibe_scheduler import VibeScheduler
+        from .security.polymorphic_shifter import PolymorphicShifter
+        from .system.mesh import SovereignMesh
+        from .security.airgap_proxy import AirGapProxy
+        from .system.zk_sync import ZKSync
+        from .hal.universal_subsystem import UniversalSubsystem
+        from .system.aether_grid import AetherGrid
+        from .system.troubleshooter import ProActiveTroubleshooter
+
+        self.vector_memory = VectorMemory()
+        self.governance = NeuralGovernance(self)
+        self.vibe_scheduler = VibeScheduler(self)
+        self.shifter = PolymorphicShifter(self)
+        self.mesh = SovereignMesh(self)
+        self.airgap = AirGapProxy(self)
+        self.zk_sync = ZKSync(self)
+        self.universal = UniversalSubsystem(self)
+        self.aether_grid = AetherGrid(self)
+        self.troubleshooter = ProActiveTroubleshooter(self)
+        
+        self.registry.register("vector_memory", self.vector_memory)
+        self.registry.register("governance", self.governance)
+        self.registry.register("vibe_scheduler", self.vibe_scheduler)
+        self.registry.register("shifter", self.shifter)
+        self.registry.register("mesh", self.mesh)
+        self.registry.register("airgap", self.airgap)
+        self.registry.register("zk_sync", self.zk_sync)
+        self.registry.register("universal", self.universal)
+        self.registry.register("aether_grid", self.aether_grid)
+        self.registry.register("troubleshooter", self.troubleshooter)
+
         # Bootstrap: Run native priority layers
         self._low_level_init()
 
@@ -148,6 +182,10 @@ class SigmaKernel:
             "version": self.version,
             "shards": self.registry.health_check()
         }
+
+    def _morphic_island(self, message: str, color: str = None):
+        """USP: Kernel-to-UI notification bridge via EventBus."""
+        self.bus.publish("ui.morphic_island", {"msg": message, "color": color})
 
     # --- Performance & Optimization Methods (Apex v2.1) ---
 
