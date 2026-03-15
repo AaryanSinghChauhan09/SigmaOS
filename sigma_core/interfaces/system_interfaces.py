@@ -16,7 +16,20 @@ class ISystemComponent(ABC):
     def health_check(self) -> bool:
         raise NotImplementedError
 
+class ISchedulingStrategy(ABC):
+    """
+    Strategy Pattern for task execution.
+    Demonstrates Polymorphism.
+    """
+    @abstractmethod
+    def select_next(self, queue: list) -> str:
+        raise NotImplementedError
+
 class IScheduler(ISystemComponent):
+    @abstractmethod
+    def set_strategy(self, strategy: ISchedulingStrategy):
+        raise NotImplementedError
+
     @abstractmethod
     def schedule_task(self, task_id, priority):
         raise NotImplementedError

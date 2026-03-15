@@ -14,6 +14,10 @@ from sigma_core.system.event_bus import get_event_bus
 from sigma_core.analytics.system_auditor import SystemAuditor
 from sigma_core.system.commander import get_commander
 from sigma_core.interfaces.command_interfaces import ICommand
+from sigma_core.system.scheduler import get_scheduler
+from sigma_core.system.scheduler_strategies import EnergyEfficientStrategy
+from sigma_core.security.proof_ledger import ProofLedger
+from sigma_core.system.power_manager import PowerManager
 
 class DisplayTextCommand(ICommand):
     """Polymorphic implementation of ICommand."""
@@ -30,13 +34,19 @@ def bootstrap_zenith():
     factory = get_factory()
     bus = get_event_bus()
     commander = get_commander()
+    scheduler = get_scheduler()
+    proof_ledger = ProofLedger()
+    power = PowerManager()
     
     # 1. Initialize Event System
     bus.initialize()
     commander.initialize()
+    scheduler.initialize()
+    proof_ledger.initialize()
+    power.initialize()
     
     # 2. Register Core Systems
-    kernel = SigmaKernel()
+    kernel = SigmaKernel(power_manager=power) # Composition Injection
     security = SovereigntyManager()
     auditor = SystemAuditor()
     
@@ -44,6 +54,8 @@ def bootstrap_zenith():
     factory.register("Security", security, resilient=True, logged=True)
     factory.register("Auditor", auditor, resilient=True, logged=True)
     factory.register("Commander", commander, resilient=True, logged=True)
+    factory.register("Scheduler", scheduler, resilient=True, logged=True)
+    factory.register("ProofLedger", proof_ledger, resilient=True, logged=True)
     
     # 3. Wire Events (Observer Pattern)
     bus.subscribe("SECURITY_ALERT", auditor)
@@ -61,28 +73,39 @@ def bootstrap_zenith():
     
     print("--- Bootstrap Complete. Validating System Integrity ---")
     
-    # 6. Test Integration
-    k = factory.get("Kernel")
-    s = factory.get("Security")
-    d = factory.get("DeviceManager")
+    # 6. Test Formal Verification (Mathematical Certainty)
+    test_logic = "def unsafe(): os.system('rm -rf /')"
+    pl = factory.get("ProofLedger")
+    is_safe = pl.validate_shard("UNSAFE_SHARD_001", test_logic)
+    print(f"[TEST] Logic Safety: {'VERIFIED' if is_safe else 'REJECTED'}")
+    
+    # 7. Test Strategy Pattern (Energy-Aware Scheduling)
+    sc = factory.get("Scheduler")
+    sc.schedule_task("NET_POLL", priority=1, complexity=2)
+    sc.schedule_task("AI_TRAIN", priority=9, complexity=10)
+    
+    print("[TEST] Scheduling with Performance Strategy:")
+    print(sc.execute("DISPATCH_NEXT"))
+    
+    sc.set_strategy(EnergyEfficientStrategy())
+    print("[TEST] Scheduling with Energy Strategy:")
+    print(sc.execute("DISPATCH_NEXT"))
+    
+    # 8. Test Command Pattern (Polymorphism)
     cmd = factory.get("Commander")
-    
-    print(f"[TEST] Kernel Status (Booting): {k.status}")
-    bus.publish("KERNEL_STATE_CHANGE", {"from": "INITIALIZING", "to": "BOOTING"})
-    
-    # Transition to Running
-    k.set_state(RunningState())
-    bus.publish("KERNEL_STATE_CHANGE", {"from": "BOOTING", "to": "RUNNING"})
-    
-    # Test Command Pattern (Polymorphism)
     cmd.execute("DISPATCH", "DISPLAY_TEXT", "Welcome to SigmaOS Sovereign Zenith")
     
-    print(f"[TEST] Security Check: {s.execute('INIT_VECTOR')}")
-    bus.publish("SECURITY_ALERT", {"severity": "CRITICAL", "source": "INIT_VECTOR_SCAN"})
+    # 9. Test Kernel State & Composition (Power side effects)
+    k = factory.get("Kernel")
+    print(f"[TEST] Kernel Status (Booting): {k.status}")
+    k.set_state(RunningState())
     
-    print(f"[TEST] Devices: {d.execute('LIST_DEVICES')}")
+    security_res = security.execute('INIT_VECTOR')
+    print(f"[TEST] Security Check: {security_res}")
     
-    storage = d.get_driver("STORAGE_0")
+    print(f"[TEST] Devices: {device_mngr.execute('LIST_DEVICES')}")
+    
+    storage = device_mngr.get_driver("STORAGE_0")
     storage.write(0, b"SigmaSovereign_Zenith_OS_2026")
     data = storage.read(0, 30)
     print(f"[TEST] Storage I/O: {data.decode('utf-8', errors='ignore')}")
