@@ -1,7 +1,4 @@
-# Generated method: SigmaCompetitorBridge.macos_creative_engine
-
-
-class SigmaCompetitorBridge:
-    def macos_creative_engine(self):
-        """USP: Retina-ready compositor."""
-        return {'Feature': 'Sigma-Retina-Proxy (Color-accurate 10-bit rendering)'}
+"""
+SigmaOS Modular Shim for macos_creative_engine.py
+"""
+from .macos_creative_engine._SigmaCompetitorBridge_core import SigmaCompetitorBridge # noqa

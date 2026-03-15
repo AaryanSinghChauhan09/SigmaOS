@@ -1,8 +1,4 @@
-# Generated class core: ReversiOthello
-import random
-import time
-from typing import List, Tuple, Dict, Any, Optional, Set
-from .base import SigmaGame
-
-class ReversiOthello:
-    pass
+"""
+SigmaOS Modular Shim for _ReversiOthello_core.py
+"""
+from ._ReversiOthello_core._ReversiOthello_core import ReversiOthello # noqa

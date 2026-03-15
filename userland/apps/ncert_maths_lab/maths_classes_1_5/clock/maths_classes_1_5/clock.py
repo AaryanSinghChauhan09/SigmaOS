@@ -1,8 +1,4 @@
-# Generated method: Maths_Classes_1_5.clock
-import math, random
-
-class Maths_Classes_1_5:
-    @staticmethod
-    def clock(h, m):
-        a = abs(30 * h - 5.5 * m)
-        return {'Angle': min(a, 360 - a)}
+"""
+SigmaOS Modular Shim for clock.py
+"""
+from .clock._Maths_Classes_1_5_core import Maths_Classes_1_5 # noqa

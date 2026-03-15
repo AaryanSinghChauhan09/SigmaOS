@@ -1,9 +1,4 @@
-# Generated method: SigmaAuditor.health_check
-import time
-import random
-import os
-from typing import Dict, List, Any
-
-class SigmaAuditor:
-    def health_check(self) -> str:
-        return 'OK — SigmaAuditor: Expert-level testing suite operational.'
+"""
+SigmaOS Modular Shim for health_check.py
+"""
+from .health_check._SigmaAuditor_core import SigmaAuditor # noqa

@@ -1,7 +1,4 @@
-# Generated method: SigmaModeManager.health_check
-from typing import Dict, List, Any, Callable, Optional
-import time
-
-class SigmaModeManager:
-    def health_check(self) -> str:
-        return f'OK — Mode: {self._current_mode}.'
+"""
+SigmaOS Modular Shim for health_check.py
+"""
+from .health_check._SigmaModeManager_core import SigmaModeManager # noqa

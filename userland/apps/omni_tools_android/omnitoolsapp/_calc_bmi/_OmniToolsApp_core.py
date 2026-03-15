@@ -1,11 +1,4 @@
-# Generated class core: OmniToolsApp
-import tkinter as tk
-from tkinter import ttk, messagebox, colorchooser, filedialog
-import math
-import random
-import string
-import secrets
-import datetime
-
-class OmniToolsApp:
-    pass
+"""
+SigmaOS Modular Shim for _OmniToolsApp_core.py
+"""
+from ._OmniToolsApp_core._OmniToolsApp_core import OmniToolsApp # noqa

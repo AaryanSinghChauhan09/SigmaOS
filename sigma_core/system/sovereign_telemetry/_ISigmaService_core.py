@@ -1,8 +1,4 @@
-# Generated class core: ISigmaService
-import time
-import random
-from typing import Dict, Any, List
-from sigma_core.system.interfaces import SigmaModuleBase, ISigmaService
-
-class ISigmaService:
-    pass
+"""
+SigmaOS Modular Shim for _ISigmaService_core.py
+"""
+from ._ISigmaService_core._ISigmaService_core import ISigmaService # noqa

@@ -1,8 +1,4 @@
-# Generated method: Maths_Classes_1_5.sort
-import math, random
-
-class Maths_Classes_1_5:
-    @staticmethod
-    def sort(s):
-        n = [int(x) for x in str(s).split(',')]
-        return {'Sorted': sorted(n)}
+"""
+SigmaOS Modular Shim for sort.py
+"""
+from .sort._Maths_Classes_1_5_core import Maths_Classes_1_5 # noqa

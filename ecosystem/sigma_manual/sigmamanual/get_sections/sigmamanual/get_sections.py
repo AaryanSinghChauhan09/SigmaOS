@@ -1,6 +1,4 @@
-# Generated method: SigmaManual.get_sections
-from typing import Dict, List, Any
-
-class SigmaManual:
-    def get_sections(self) -> List[str]:
-        return list(self.MANUAL_DATA.keys())
+"""
+SigmaOS Modular Shim for get_sections.py
+"""
+from .get_sections._SigmaManual_core import SigmaManual # noqa

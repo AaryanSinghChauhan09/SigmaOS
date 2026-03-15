@@ -1,8 +1,4 @@
-# Generated class core: SigmaSecurityAudit
-import time
-import uuid
-import random
-from typing import Dict, List, Any
-
-class SigmaSecurityAudit:
-    pass
+"""
+SigmaOS Modular Shim for _SigmaSecurityAudit_core.py
+"""
+from ._SigmaSecurityAudit_core._SigmaSecurityAudit_core import SigmaSecurityAudit # noqa

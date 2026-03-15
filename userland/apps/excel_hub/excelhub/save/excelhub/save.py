@@ -1,9 +1,4 @@
-# Generated method: ExcelHub.save
-import tkinter as tk
-from tkinter import ttk, scrolledtext, filedialog, messagebox
-import random
-import time
-
-class ExcelHub:
-    def save(self):
-        messagebox.showinfo('Excel Pro', 'Workbook serialized and committed to Sovereign Vault.')
+"""
+SigmaOS Modular Shim for save.py
+"""
+from .save._ExcelHub_core import ExcelHub # noqa

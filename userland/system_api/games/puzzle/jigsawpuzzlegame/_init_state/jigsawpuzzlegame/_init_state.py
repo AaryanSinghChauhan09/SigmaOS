@@ -1,11 +1,4 @@
-# Generated method: JigsawPuzzleGame._init_state
-import random
-import time
-from typing import List, Tuple, Dict, Any, Optional, Set
-from .base import SigmaGame
-
-class JigsawPuzzleGame:
-    def _init_state(self):
-        self.grid = 4
-        self.moves = 0
-        self.solved = False
+"""
+SigmaOS Modular Shim for _init_state.py
+"""
+from ._init_state._JigsawPuzzleGame_core import JigsawPuzzleGame # noqa

@@ -1,8 +1,4 @@
-# Generated class core: WatchTheCup
-import tkinter as tk
-from tkinter import messagebox
-import random
-import time
-
-class WatchTheCup:
-    pass
+"""
+SigmaOS Modular Shim for _WatchTheCup_core.py
+"""
+from ._WatchTheCup_core._WatchTheCup_core import WatchTheCup # noqa

@@ -1,7 +1,4 @@
-# Generated method: SigmaBharatLawBridge.get_capabilities
-from typing import Dict, List, Any, Optional
-import datetime
-
-class SigmaBharatLawBridge:
-    def get_capabilities(self):
-        return {'Statutes': list(self._statute_db.keys()), 'Modules': ['Provision Navigator', 'Precedent Engine', 'Procedural Roadmap', 'Compliance Alerts'], 'AI_Laws': ['BNSS 2023', 'BNS 2023', 'BSA 2023', 'IT Act', 'Constitutional Law']}
+"""
+SigmaOS Modular Shim for get_capabilities.py
+"""
+from .get_capabilities._SigmaBharatLawBridge_core import SigmaBharatLawBridge # noqa

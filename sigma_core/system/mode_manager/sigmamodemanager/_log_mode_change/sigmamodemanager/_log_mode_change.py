@@ -1,8 +1,4 @@
-# Generated method: SigmaModeManager._log_mode_change
-from typing import Dict, List, Any, Callable, Optional
-import time
-
-class SigmaModeManager:
-    def _log_mode_change(self, phase: str='') -> str:
-        """Logs the mode change event."""
-        return f'System log: Mode change {phase} for {self._current_mode} at {time.time()}.'
+"""
+SigmaOS Modular Shim for _log_mode_change.py
+"""
+from ._log_mode_change._SigmaModeManager_core import SigmaModeManager # noqa

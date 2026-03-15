@@ -1,10 +1,4 @@
-# Generated class core: ModuleBaseline
-import time
-import math
-import threading
-import collections
-import random
-from typing import Dict, List, Any, Optional
-
-class ModuleBaseline:
-    pass
+"""
+SigmaOS Modular Shim for _ModuleBaseline_core.py
+"""
+from ._ModuleBaseline_core._ModuleBaseline_core import ModuleBaseline # noqa

@@ -1,7 +1,4 @@
-# Generated method: SigmaModeManager._cooldown_swarm
-from typing import Dict, List, Any, Callable, Optional
-import time
-
-class SigmaModeManager:
-    def _cooldown_swarm(self, phase: str='') -> str:
-        return 'Agentic Swarm compute cooled. Matrix returning to standby.'
+"""
+SigmaOS Modular Shim for _cooldown_swarm.py
+"""
+from ._cooldown_swarm._SigmaModeManager_core import SigmaModeManager # noqa

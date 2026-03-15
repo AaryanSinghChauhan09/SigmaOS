@@ -1,8 +1,4 @@
-# Generated class core: SigmaDriverLayer
-import time
-import uuid
-from dataclasses import dataclass, field
-from enum import Enum, auto
-
-class SigmaDriverLayer:
-    pass
+"""
+SigmaOS Modular Shim for _SigmaDriverLayer_core.py
+"""
+from ._SigmaDriverLayer_core._SigmaDriverLayer_core import SigmaDriverLayer # noqa

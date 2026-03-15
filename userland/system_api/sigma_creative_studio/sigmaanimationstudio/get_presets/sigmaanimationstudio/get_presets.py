@@ -1,6 +1,4 @@
-# Generated method: SigmaAnimationStudio.get_presets
-
-
-class SigmaAnimationStudio:
-    def get_presets(self):
-        return self.ANIMATION_PRESETS
+"""
+SigmaOS Modular Shim for get_presets.py
+"""
+from .get_presets._SigmaAnimationStudio_core import SigmaAnimationStudio # noqa

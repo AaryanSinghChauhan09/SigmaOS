@@ -1,14 +1,4 @@
-# Generated method: OmniToolsApp._pick_color
-import tkinter as tk
-from tkinter import ttk, messagebox, colorchooser, filedialog
-import math
-import random
-import string
-import secrets
-import datetime
-
-class OmniToolsApp:
-    def _pick_color(self) -> None:
-        col = colorchooser.askcolor(title='Pick a colour')
-        if col[1]:
-            messagebox.showinfo('Colour Picker', f'Selected: {col[1]}')
+"""
+SigmaOS Modular Shim for _pick_color.py
+"""
+from ._pick_color._OmniToolsApp_core import OmniToolsApp # noqa

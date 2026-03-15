@@ -1,7 +1,4 @@
-# Generated method: SigmaSoundStudio.generate_chime
-
-
-class SigmaSoundStudio:
-    def generate_chime(self, style='Ethereal_Sigma'):
-        """AI-generates a unique OS boot chime from a style descriptor."""
-        return f"SoundStudio (AI): Generated '{style}' boot chime using local TTS synthesis. Applied."
+"""
+SigmaOS Modular Shim for generate_chime.py
+"""
+from .generate_chime._SigmaSoundStudio_core import SigmaSoundStudio # noqa

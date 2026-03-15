@@ -1,8 +1,4 @@
-# Generated class core: SigmaChatPage
-import tkinter as tk
-from tkinter import ttk
-from .base_page import SigmaPage
-from .styles import PAL, FONT_BOLD, FONT_SMALL
-
-class SigmaChatPage:
-    pass
+"""
+SigmaOS Modular Shim for _SigmaChatPage_core.py
+"""
+from ._SigmaChatPage_core._SigmaChatPage_core import SigmaChatPage # noqa

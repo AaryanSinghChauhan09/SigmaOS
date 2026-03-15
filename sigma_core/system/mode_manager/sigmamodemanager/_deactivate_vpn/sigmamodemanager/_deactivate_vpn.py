@@ -1,8 +1,4 @@
-# Generated method: SigmaModeManager._deactivate_vpn
-from typing import Dict, List, Any, Callable, Optional
-import time
-
-class SigmaModeManager:
-    def _deactivate_vpn(self, phase: str='') -> str:
-        """Simulates deactivating VPN."""
-        return 'VPN deactivated.'
+"""
+SigmaOS Modular Shim for _deactivate_vpn.py
+"""
+from ._deactivate_vpn._SigmaModeManager_core import SigmaModeManager # noqa

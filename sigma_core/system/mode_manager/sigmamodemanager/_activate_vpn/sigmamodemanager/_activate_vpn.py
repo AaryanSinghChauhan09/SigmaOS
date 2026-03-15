@@ -1,8 +1,4 @@
-# Generated method: SigmaModeManager._activate_vpn
-from typing import Dict, List, Any, Callable, Optional
-import time
-
-class SigmaModeManager:
-    def _activate_vpn(self, phase: str='') -> str:
-        """Simulates activating VPN."""
-        return 'VPN activated.'
+"""
+SigmaOS Modular Shim for _activate_vpn.py
+"""
+from ._activate_vpn._SigmaModeManager_core import SigmaModeManager # noqa

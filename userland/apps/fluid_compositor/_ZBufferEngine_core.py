@@ -1,14 +1,4 @@
-# Generated class core: ZBufferEngine
-import tkinter as tk
-from tkinter import ttk, messagebox
-import random
-import time
-import sys
-import os
-from typing import Dict, Any, List, Optional
-from sigma_core.ui.zbuffer_engine import ZBufferEngine
-from sigma_core.ui.rendering_pipeline import RenderingPipeline
-from sigma_core.ui.fluid_design import PALETTE as PAL, FluidTheme
-
-class ZBufferEngine:
-    pass
+"""
+SigmaOS Modular Shim for _ZBufferEngine_core.py
+"""
+from ._ZBufferEngine_core._ZBufferEngine_core import ZBufferEngine # noqa

@@ -1,11 +1,4 @@
-# Generated method: SovereignWellnessPage._tasbeeh_popup
-import tkinter as tk
-from tkinter import ttk, messagebox
-import time
-import random
-from gui_pkg.base_page import SigmaPage
-from gui_pkg.styles import PAL, FONT_BOLD, FONT_SMALL, FONT_MED, FONT_MONO
-
-class SovereignWellnessPage:
-    def _tasbeeh_popup(self):
-        pass
+"""
+SigmaOS Modular Shim for _tasbeeh_popup.py
+"""
+from ._tasbeeh_popup._SovereignWellnessPage_core import SovereignWellnessPage # noqa

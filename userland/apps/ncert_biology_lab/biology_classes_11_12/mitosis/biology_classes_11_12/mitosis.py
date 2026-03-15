@@ -1,8 +1,4 @@
-# Generated method: Biology_Classes_11_12.mitosis
-import math, random
-
-class Biology_Classes_11_12:
-    @staticmethod
-    def mitosis(p):
-        d = {'metaphase': 'Aligned at Equator', 'anaphase': 'Separating'}
-        return {'Obs': d.get(p.lower(), 'Division Stage')}
+"""
+SigmaOS Modular Shim for mitosis.py
+"""
+from .mitosis._Biology_Classes_11_12_core import Biology_Classes_11_12 # noqa

@@ -1,7 +1,4 @@
-# Generated method: SigmaLiveCodeEditor.format_code
-
-
-class SigmaLiveCodeEditor:
-    def format_code(self, pane='all'):
-        """Prettier-style auto-formatting for any pane."""
-        return f'LiveEditor (Format): {pane.upper()} pane beautified with Sovereign Prettier engine.'
+"""
+SigmaOS Modular Shim for format_code.py
+"""
+from .format_code._SigmaLiveCodeEditor_core import SigmaLiveCodeEditor # noqa

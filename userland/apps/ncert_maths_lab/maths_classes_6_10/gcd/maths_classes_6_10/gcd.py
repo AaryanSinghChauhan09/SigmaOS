@@ -1,7 +1,4 @@
-# Generated method: Maths_Classes_6_10.gcd
-import math, random
-
-class Maths_Classes_6_10:
-    @staticmethod
-    def gcd(a, b):
-        return {'HCF': math.gcd(a, b)}
+"""
+SigmaOS Modular Shim for gcd.py
+"""
+from .gcd._Maths_Classes_6_10_core import Maths_Classes_6_10 # noqa

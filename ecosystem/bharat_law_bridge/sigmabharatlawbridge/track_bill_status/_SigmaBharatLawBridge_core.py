@@ -1,6 +1,4 @@
-# Generated class core: SigmaBharatLawBridge
-from typing import Dict, List, Any, Optional
-import datetime
-
-class SigmaBharatLawBridge:
-    pass
+"""
+SigmaOS Modular Shim for _SigmaBharatLawBridge_core.py
+"""
+from ._SigmaBharatLawBridge_core._SigmaBharatLawBridge_core import SigmaBharatLawBridge # noqa

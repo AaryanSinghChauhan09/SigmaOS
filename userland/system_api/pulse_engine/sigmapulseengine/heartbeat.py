@@ -1,9 +1,4 @@
-# Generated method: SigmaPulseEngine.heartbeat
-from typing import Dict, Any
-import time
-import threading
-
-class SigmaPulseEngine:
-    def heartbeat(self) -> bool:
-        """USP: Verifies the sentinel health for boot-up validation."""
-        return True
+"""
+SigmaOS Modular Shim for heartbeat.py
+"""
+from .heartbeat._SigmaPulseEngine_core import SigmaPulseEngine # noqa

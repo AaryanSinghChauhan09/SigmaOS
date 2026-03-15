@@ -1,8 +1,4 @@
-# Generated method: AntigravityForensicCore.start_service
-import os
-import hashlib
-import time
-
-class AntigravityForensicCore:
-    def start_service(self):
-        return 'Forensic Snapshot overlay engaged. Write-protecting root filesystems.'
+"""
+SigmaOS Modular Shim for start_service.py
+"""
+from .start_service._AntigravityForensicCore_core import AntigravityForensicCore # noqa

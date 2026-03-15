@@ -1,9 +1,4 @@
-# Generated method: SigmaPackageManager.health_check
-import time
-import uuid
-import random
-from typing import Dict, List, Any
-
-class SigmaPackageManager:
-    def health_check(self) -> str:
-        return f'OK — SigmaPM: {len(self._installed)} packages installed | Repo: {len(self.SIGMA_REPO)} packages available'
+"""
+SigmaOS Modular Shim for health_check.py
+"""
+from .health_check._SigmaPackageManager_core import SigmaPackageManager # noqa

@@ -1,7 +1,4 @@
-# Generated method: Biology_Classes_6_10.starch
-import math, random
-
-class Biology_Classes_6_10:
-    @staticmethod
-    def starch(i):
-        return {'Status': 'Blue-Black' if int(i) else 'Brown'}
+"""
+SigmaOS Modular Shim for starch.py
+"""
+from .starch._Biology_Classes_6_10_core import Biology_Classes_6_10 # noqa

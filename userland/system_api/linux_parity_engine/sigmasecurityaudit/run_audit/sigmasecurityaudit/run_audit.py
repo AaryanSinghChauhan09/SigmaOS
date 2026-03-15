@@ -1,16 +1,4 @@
-# Generated method: SigmaSecurityAudit.run_audit
-import time
-import uuid
-import random
-from typing import Dict, List, Any
-
-class SigmaSecurityAudit:
-    def run_audit(self) -> Dict:
-        """USP: Rapid enterprise security scan."""
-        results = {}
-        for rule, enabled in self.rules.items():
-            status = 'PASS' if enabled else 'FAIL'
-            if rule == 'fips_mode':
-                status = 'WARNING (Compliance only)'
-            results[rule] = status
-        return results
+"""
+SigmaOS Modular Shim for run_audit.py
+"""
+from .run_audit._SigmaSecurityAudit_core import SigmaSecurityAudit # noqa

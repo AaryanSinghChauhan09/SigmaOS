@@ -1,7 +1,4 @@
-# Generated class core: NetworkConnection
-import time
-import threading
-from typing import Dict, List, Any
-
-class NetworkConnection:
-    pass
+"""
+SigmaOS Modular Shim for _NetworkConnection_core.py
+"""
+from ._NetworkConnection_core._NetworkConnection_core import NetworkConnection # noqa

@@ -1,7 +1,4 @@
-# Generated class core: HyperTrackRunner
-import random
-from typing import List, Tuple, Dict, Any, Optional
-from .base import SigmaGame
-
-class HyperTrackRunner:
-    pass
+"""
+SigmaOS Modular Shim for _HyperTrackRunner_core.py
+"""
+from ._HyperTrackRunner_core._HyperTrackRunner_core import HyperTrackRunner # noqa

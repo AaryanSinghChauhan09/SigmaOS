@@ -1,7 +1,4 @@
-# Generated method: Physics_Classes_6_10.shadow
-import math, random
-
-class Physics_Classes_6_10:
-    @staticmethod
-    def shadow(d, h):
-        return {'Scale': _r(h / d, 2)}
+"""
+SigmaOS Modular Shim for shadow.py
+"""
+from .shadow._Physics_Classes_6_10_core import Physics_Classes_6_10 # noqa

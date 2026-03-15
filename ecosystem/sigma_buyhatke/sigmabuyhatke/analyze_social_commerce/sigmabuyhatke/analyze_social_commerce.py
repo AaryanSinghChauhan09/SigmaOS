@@ -1,9 +1,4 @@
-# Generated method: SigmaBuyHatke.analyze_social_commerce
-import datetime
-import random
-from typing import Dict, List, Any
-
-class SigmaBuyHatke:
-    def analyze_social_commerce(self) -> List[Dict]:
-        """USP: Meesho-style reseller network analytics."""
-        return [{'Reseller': 'Amit_V', 'Network': 'WhatsApp_Biz', 'Orders': 142, 'Commission': 2400}, {'Reseller': 'Priya_K', 'Network': 'Facebook_Market', 'Orders': 89, 'Commission': 1200}]
+"""
+SigmaOS Modular Shim for analyze_social_commerce.py
+"""
+from .analyze_social_commerce._SigmaBuyHatke_core import SigmaBuyHatke # noqa

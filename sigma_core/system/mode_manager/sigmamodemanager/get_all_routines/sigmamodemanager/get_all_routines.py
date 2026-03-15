@@ -1,7 +1,4 @@
-# Generated method: SigmaModeManager.get_all_routines
-from typing import Dict, List, Any, Callable, Optional
-import time
-
-class SigmaModeManager:
-    def get_all_routines(self) -> List[str]:
-        return list(self._routines.keys())
+"""
+SigmaOS Modular Shim for get_all_routines.py
+"""
+from .get_all_routines._SigmaModeManager_core import SigmaModeManager # noqa

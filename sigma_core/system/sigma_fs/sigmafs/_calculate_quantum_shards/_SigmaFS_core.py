@@ -1,11 +1,4 @@
-# Generated class core: SigmaFS
-import time
-import hashlib
-import uuid
-import random
-from dataclasses import dataclass, field
-from enum import Enum, auto
-from pathlib import PurePosixPath
-
-class SigmaFS:
-    pass
+"""
+SigmaOS Modular Shim for _SigmaFS_core.py
+"""
+from ._SigmaFS_core._SigmaFS_core import SigmaFS # noqa

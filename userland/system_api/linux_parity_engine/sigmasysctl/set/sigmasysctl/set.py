@@ -1,10 +1,4 @@
-# Generated method: SigmaSysctl.set
-import time
-import uuid
-import random
-from typing import Dict, List, Any
-
-class SigmaSysctl:
-    def set(self, key: str, value: Any) -> str:
-        self._params[key] = value
-        return f'[sysctl] {key} = {value}'
+"""
+SigmaOS Modular Shim for set.py
+"""
+from .set._SigmaSysctl_core import SigmaSysctl # noqa

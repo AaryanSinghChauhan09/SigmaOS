@@ -1,8 +1,4 @@
-# Generated class core: PackageWeaver
-import tkinter as tk
-from tkinter import ttk, messagebox
-import random
-import time
-
-class PackageWeaver:
-    pass
+"""
+SigmaOS Modular Shim for _PackageWeaver_core.py
+"""
+from ._PackageWeaver_core._PackageWeaver_core import PackageWeaver # noqa

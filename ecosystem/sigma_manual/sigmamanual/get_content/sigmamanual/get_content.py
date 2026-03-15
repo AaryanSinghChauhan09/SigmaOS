@@ -1,6 +1,4 @@
-# Generated method: SigmaManual.get_content
-from typing import Dict, List, Any
-
-class SigmaManual:
-    def get_content(self, section: str) -> Dict[str, str]:
-        return self.MANUAL_DATA.get(section, {})
+"""
+SigmaOS Modular Shim for get_content.py
+"""
+from .get_content._SigmaManual_core import SigmaManual # noqa

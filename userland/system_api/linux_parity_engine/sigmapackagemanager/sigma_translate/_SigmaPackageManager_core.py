@@ -1,8 +1,4 @@
-# Generated class core: SigmaPackageManager
-import time
-import uuid
-import random
-from typing import Dict, List, Any
-
-class SigmaPackageManager:
-    pass
+"""
+SigmaOS Modular Shim for _SigmaPackageManager_core.py
+"""
+from ._SigmaPackageManager_core._SigmaPackageManager_core import SigmaPackageManager # noqa

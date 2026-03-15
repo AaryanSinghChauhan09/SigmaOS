@@ -1,8 +1,4 @@
-# Generated method: SigmaPulseEngine._listen_ambient_aura
-from typing import Dict, Any
-import time
-import threading
-
-class SigmaPulseEngine:
-    def _listen_ambient_aura(self):
-        pass
+"""
+SigmaOS Modular Shim for _listen_ambient_aura.py
+"""
+from ._listen_ambient_aura._SigmaPulseEngine_core import SigmaPulseEngine # noqa

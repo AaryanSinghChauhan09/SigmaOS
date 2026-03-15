@@ -1,7 +1,4 @@
-# Generated class core: JurisprudenceEngine
-import os
-import hashlib
-import time
-
-class JurisprudenceEngine:
-    pass
+"""
+SigmaOS Modular Shim for _JurisprudenceEngine_core.py
+"""
+from ._JurisprudenceEngine_core._JurisprudenceEngine_core import JurisprudenceEngine # noqa

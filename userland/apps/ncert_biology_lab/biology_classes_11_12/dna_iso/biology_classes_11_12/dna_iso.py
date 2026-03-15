@@ -1,9 +1,4 @@
-# Generated method: Biology_Classes_11_12.dna_iso
-import math, random
-
-class Biology_Classes_11_12:
-    @staticmethod
-    def dna_iso(temp, s):
-        if temp < 0:
-            return {'Step': 'Chilled Ethanol Added', 'Result': 'DNA Threads Precipitate'}
-        return {'Step': 'Ethanol Too Warm', 'Result': 'Degradation'}
+"""
+SigmaOS Modular Shim for dna_iso.py
+"""
+from .dna_iso._Biology_Classes_11_12_core import Biology_Classes_11_12 # noqa

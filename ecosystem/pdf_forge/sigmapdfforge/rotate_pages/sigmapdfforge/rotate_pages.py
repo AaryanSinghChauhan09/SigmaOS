@@ -1,7 +1,4 @@
-# Generated method: SigmaPDFForge.rotate_pages
-from sigma_core.system.sovereign_app import SovereignApp
-
-class SigmaPDFForge:
-    def rotate_pages(self, angle=90):
-        """Rotates all pages by the specified angle."""
-        return f'PDF Forge (Rotate): All pages shifted by {angle} degrees.'
+"""
+SigmaOS Modular Shim for rotate_pages.py
+"""
+from .rotate_pages._SigmaPDFForge_core import SigmaPDFForge # noqa

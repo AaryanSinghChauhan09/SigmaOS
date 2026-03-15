@@ -1,11 +1,4 @@
-# Generated class core: SovereignStrategist
-import tkinter as tk
-from tkinter import messagebox, ttk
-import random
-import time
-from typing import Dict, Any, List, Optional, Tuple, cast
-import os
-import sys
-
-class SovereignStrategist:
-    pass
+"""
+SigmaOS Modular Shim for _SovereignStrategist_core.py
+"""
+from ._SovereignStrategist_core._SovereignStrategist_core import SovereignStrategist # noqa

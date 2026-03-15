@@ -1,8 +1,4 @@
-# Generated method: SigmaModeManager._calibrate_display
-from typing import Dict, List, Any, Callable, Optional
-import time
-
-class SigmaModeManager:
-    def _calibrate_display(self, phase: str='') -> str:
-        """Simulates display calibration."""
-        return 'Display calibrated.'
+"""
+SigmaOS Modular Shim for _calibrate_display.py
+"""
+from ._calibrate_display._SigmaModeManager_core import SigmaModeManager # noqa

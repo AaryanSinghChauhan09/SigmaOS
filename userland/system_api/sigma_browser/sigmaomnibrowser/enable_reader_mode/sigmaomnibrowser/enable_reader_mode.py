@@ -1,8 +1,4 @@
-# Generated method: SigmaOmniBrowser.enable_reader_mode
-import random
-from sigma_core.system.sovereign_app import SovereignApp
-
-class SigmaOmniBrowser:
-    def enable_reader_mode(self):
-        """Safari-style decluttered Reader Mode for distraction-free reading."""
-        return 'Reader Mode: [ON] Stripping ads, menus, and sidebars.'
+"""
+SigmaOS Modular Shim for enable_reader_mode.py
+"""
+from .enable_reader_mode._SigmaOmniBrowser_core import SigmaOmniBrowser # noqa

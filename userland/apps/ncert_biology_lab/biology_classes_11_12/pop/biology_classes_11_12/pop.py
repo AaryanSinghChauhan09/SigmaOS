@@ -1,7 +1,4 @@
-# Generated method: Biology_Classes_11_12.pop
-import math, random
-
-class Biology_Classes_11_12:
-    @staticmethod
-    def pop(n0, r, t):
-        return {'Final': _r(n0 * math.exp(r * t), 0)}
+"""
+SigmaOS Modular Shim for pop.py
+"""
+from .pop._Biology_Classes_11_12_core import Biology_Classes_11_12 # noqa

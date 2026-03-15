@@ -1,8 +1,4 @@
-# Generated method: SigmaModeManager._kill_gui_processes
-from typing import Dict, List, Any, Callable, Optional
-import time
-
-class SigmaModeManager:
-    def _kill_gui_processes(self, phase: str='') -> str:
-        """Simulates killing GUI-related processes."""
-        return 'GUI processes terminated.'
+"""
+SigmaOS Modular Shim for _kill_gui_processes.py
+"""
+from ._kill_gui_processes._SigmaModeManager_core import SigmaModeManager # noqa

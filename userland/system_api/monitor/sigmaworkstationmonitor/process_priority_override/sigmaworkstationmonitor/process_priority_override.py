@@ -1,9 +1,4 @@
-# Generated method: SigmaWorkstationMonitor.process_priority_override
-import os
-import random
-import time
-
-class SigmaWorkstationMonitor:
-    def process_priority_override(self, pid, level='Real-time'):
-        """Professional Process Control: Manually tune scheduling priority."""
-        return f'Process Management: PID {pid} now running with {level} privileges.'
+"""
+SigmaOS Modular Shim for process_priority_override.py
+"""
+from .process_priority_override._SigmaWorkstationMonitor_core import SigmaWorkstationMonitor # noqa

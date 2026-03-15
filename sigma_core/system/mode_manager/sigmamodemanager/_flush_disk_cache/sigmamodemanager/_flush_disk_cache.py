@@ -1,8 +1,4 @@
-# Generated method: SigmaModeManager._flush_disk_cache
-from typing import Dict, List, Any, Callable, Optional
-import time
-
-class SigmaModeManager:
-    def _flush_disk_cache(self, phase: str='') -> str:
-        """Simulates flushing disk cache."""
-        return 'Disk cache flushed.'
+"""
+SigmaOS Modular Shim for _flush_disk_cache.py
+"""
+from ._flush_disk_cache._SigmaModeManager_core import SigmaModeManager # noqa

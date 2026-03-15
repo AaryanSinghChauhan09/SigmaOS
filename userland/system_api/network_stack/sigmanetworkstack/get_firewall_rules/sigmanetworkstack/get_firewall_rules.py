@@ -1,10 +1,4 @@
-# Generated method: SigmaNetworkStack.get_firewall_rules
-import time
-import uuid
-import hashlib
-from dataclasses import dataclass, field
-from enum import Enum, auto
-
-class SigmaNetworkStack:
-    def get_firewall_rules(self) -> list[dict]:
-        return self._firewall_rules
+"""
+SigmaOS Modular Shim for get_firewall_rules.py
+"""
+from .get_firewall_rules._SigmaNetworkStack_core import SigmaNetworkStack # noqa

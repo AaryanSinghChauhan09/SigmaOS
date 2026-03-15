@@ -1,7 +1,4 @@
-# Generated class core: CrowdFlowLegends
-import random
-from typing import List, Tuple, Dict, Any, Optional
-from .base import SigmaGame
-
-class CrowdFlowLegends:
-    pass
+"""
+SigmaOS Modular Shim for _CrowdFlowLegends_core.py
+"""
+from ._CrowdFlowLegends_core._CrowdFlowLegends_core import CrowdFlowLegends # noqa

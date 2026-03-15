@@ -1,12 +1,4 @@
-# Generated method: AetherNetMapper._sonar_ping
-import tkinter as tk
-from tkinter import ttk, messagebox
-import socket
-import threading
-import random
-
-class AetherNetMapper:
-    def _sonar_ping(self):
-        self._log('LAUNCHING AETHER SONAR PING...')
-        target = self.ip_entry.get().strip()
-        self.after(800, lambda: self._log(f'REPLY FROM TARGET: 0.14ms | TTL: 64 | NO PACKET LOSS'))
+"""
+SigmaOS Modular Shim for _sonar_ping.py
+"""
+from ._sonar_ping._AetherNetMapper_core import AetherNetMapper # noqa

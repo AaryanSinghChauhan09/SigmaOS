@@ -1,16 +1,4 @@
-# Generated class core: SigmaPerformanceBoost
-from __future__ import annotations
-import os
-import sys
-import gc
-import time
-import ctypes
-import platform
-import threading
-import subprocess
-import shutil
-from typing import Dict, Any, List, Callable, Optional
-from concurrent.futures import ThreadPoolExecutor, as_completed
-
-class SigmaPerformanceBoost:
-    pass
+"""
+SigmaOS Modular Shim for _SigmaPerformanceBoost_core.py
+"""
+from ._SigmaPerformanceBoost_core._SigmaPerformanceBoost_core import SigmaPerformanceBoost # noqa

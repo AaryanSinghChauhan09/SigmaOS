@@ -1,9 +1,4 @@
-# Generated method: VidyaQuest._init_state
-import random
-from typing import List, Tuple, Dict, Any, Optional
-from .base import SigmaGame
-
-class VidyaQuest:
-    def _init_state(self):
-        self.word_idx = 0
-        self.correct = 0
+"""
+SigmaOS Modular Shim for _init_state.py
+"""
+from ._init_state._VidyaQuest_core import VidyaQuest # noqa

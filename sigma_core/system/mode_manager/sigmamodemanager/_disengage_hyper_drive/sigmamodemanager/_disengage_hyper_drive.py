@@ -1,8 +1,4 @@
-# Generated method: SigmaModeManager._disengage_hyper_drive
-from typing import Dict, List, Any, Callable, Optional
-import time
-
-class SigmaModeManager:
-    def _disengage_hyper_drive(self, phase: str='') -> str:
-        """Disengages Hyper-Drive optimizations."""
-        return 'Hyper-Drive disengaged. Reverting to standard scheduling.'
+"""
+SigmaOS Modular Shim for _disengage_hyper_drive.py
+"""
+from ._disengage_hyper_drive._SigmaModeManager_core import SigmaModeManager # noqa

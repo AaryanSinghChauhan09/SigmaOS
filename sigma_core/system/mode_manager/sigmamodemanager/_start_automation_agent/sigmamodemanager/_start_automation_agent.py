@@ -1,8 +1,4 @@
-# Generated method: SigmaModeManager._start_automation_agent
-from typing import Dict, List, Any, Callable, Optional
-import time
-
-class SigmaModeManager:
-    def _start_automation_agent(self, phase: str='') -> str:
-        """Simulates starting an automation agent."""
-        return 'Automation agent started.'
+"""
+SigmaOS Modular Shim for _start_automation_agent.py
+"""
+from ._start_automation_agent._SigmaModeManager_core import SigmaModeManager # noqa

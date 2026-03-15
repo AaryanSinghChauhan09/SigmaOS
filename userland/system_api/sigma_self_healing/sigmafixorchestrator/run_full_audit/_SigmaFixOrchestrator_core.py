@@ -1,12 +1,4 @@
-# Generated class core: SigmaFixOrchestrator
-import os
-import sys
-import json
-import shutil
-import importlib
-import subprocess
-import datetime
-from typing import List, Dict, Any, Optional
-
-class SigmaFixOrchestrator:
-    pass
+"""
+SigmaOS Modular Shim for _SigmaFixOrchestrator_core.py
+"""
+from ._SigmaFixOrchestrator_core._SigmaFixOrchestrator_core import SigmaFixOrchestrator # noqa

@@ -1,9 +1,4 @@
-# Generated class core: AuraPaint
-import tkinter as tk
-from tkinter import colorchooser, messagebox, ttk, simpledialog, filedialog
-import random
-import os
-from typing import Any
-
-class AuraPaint:
-    pass
+"""
+SigmaOS Modular Shim for _AuraPaint_core.py
+"""
+from ._AuraPaint_core._AuraPaint_core import AuraPaint # noqa

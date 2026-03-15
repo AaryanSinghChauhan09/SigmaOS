@@ -1,8 +1,4 @@
-# Generated class core: CrosswordLite
-import random
-import time
-from typing import List, Tuple, Dict, Any, Optional, Set
-from .base import SigmaGame
-
-class CrosswordLite:
-    pass
+"""
+SigmaOS Modular Shim for _CrosswordLite_core.py
+"""
+from ._CrosswordLite_core._CrosswordLite_core import CrosswordLite # noqa

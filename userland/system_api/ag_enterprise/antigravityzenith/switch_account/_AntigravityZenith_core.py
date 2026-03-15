@@ -1,9 +1,4 @@
-# Generated class core: AntigravityZenith
-import os
-import re
-import json
-import time
-from typing import List, Dict, Any, Optional
-
-class AntigravityZenith:
-    pass
+"""
+SigmaOS Modular Shim for _AntigravityZenith_core.py
+"""
+from ._AntigravityZenith_core._AntigravityZenith_core import AntigravityZenith # noqa

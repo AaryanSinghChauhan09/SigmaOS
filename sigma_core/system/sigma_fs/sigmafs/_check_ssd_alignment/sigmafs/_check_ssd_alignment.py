@@ -1,13 +1,4 @@
-# Generated method: SigmaFS._check_ssd_alignment
-import time
-import hashlib
-import uuid
-import random
-from dataclasses import dataclass, field
-from enum import Enum, auto
-from pathlib import PurePosixPath
-
-class SigmaFS:
-    def _check_ssd_alignment(self, device: str) -> str:
-        """USP: Ensures IO operations align with physical NAND pages (4KB/16KB)."""
-        return 'OPTIMIZED (4KB Boundary)'
+"""
+SigmaOS Modular Shim for _check_ssd_alignment.py
+"""
+from ._check_ssd_alignment._SigmaFS_core import SigmaFS # noqa

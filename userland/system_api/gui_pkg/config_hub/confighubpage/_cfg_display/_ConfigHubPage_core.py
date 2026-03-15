@@ -1,8 +1,4 @@
-# Generated class core: ConfigHubPage
-import tkinter as tk
-from tkinter import ttk
-from .base_page import SigmaPage
-from .styles import PAL, FONT_LOGO, FONT_MED, FONT_BOLD, FONT_TITLE, FONT_SMALL
-
-class ConfigHubPage:
-    pass
+"""
+SigmaOS Modular Shim for _ConfigHubPage_core.py
+"""
+from ._ConfigHubPage_core._ConfigHubPage_core import ConfigHubPage # noqa

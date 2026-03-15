@@ -1,7 +1,4 @@
-# Generated method: SigmaCompetitorBridge.chromeos_cloud_sovereignty
-
-
-class SigmaCompetitorBridge:
-    def chromeos_cloud_sovereignty(self):
-        """USP: P2P-Encrypted-Sync."""
-        return {'Feature': 'P2P-Encrypted-Sync (Instant state recovery across devices)'}
+"""
+SigmaOS Modular Shim for chromeos_cloud_sovereignty.py
+"""
+from .chromeos_cloud_sovereignty._SigmaCompetitorBridge_core import SigmaCompetitorBridge # noqa

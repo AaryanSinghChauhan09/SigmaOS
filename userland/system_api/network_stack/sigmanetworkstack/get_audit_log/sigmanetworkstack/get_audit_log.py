@@ -1,10 +1,4 @@
-# Generated method: SigmaNetworkStack.get_audit_log
-import time
-import uuid
-import hashlib
-from dataclasses import dataclass, field
-from enum import Enum, auto
-
-class SigmaNetworkStack:
-    def get_audit_log(self, limit: int=30) -> list[dict]:
-        return self._audit[-limit:]
+"""
+SigmaOS Modular Shim for get_audit_log.py
+"""
+from .get_audit_log._SigmaNetworkStack_core import SigmaNetworkStack # noqa

@@ -1,12 +1,4 @@
-# Generated method: AntigravityZenith.dispatch_ai_pulse
-import os
-import re
-import json
-import time
-from typing import List, Dict, Any, Optional
-
-class AntigravityZenith:
-    def dispatch_ai_pulse(self, prompt: str) -> str:
-        if hasattr(self.kernel, 'aether_orch'):
-            return f"Aether Pulse: {self.kernel.aether_orch.route_intent(prompt)['orchestrated_intent']}"
-        return 'Aether Orchestrator offline. Local compute only.'
+"""
+SigmaOS Modular Shim for dispatch_ai_pulse.py
+"""
+from .dispatch_ai_pulse._AntigravityZenith_core import AntigravityZenith # noqa

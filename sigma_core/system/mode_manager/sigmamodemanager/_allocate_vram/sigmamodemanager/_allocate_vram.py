@@ -1,8 +1,4 @@
-# Generated method: SigmaModeManager._allocate_vram
-from typing import Dict, List, Any, Callable, Optional
-import time
-
-class SigmaModeManager:
-    def _allocate_vram(self, phase: str='') -> str:
-        """Simulates allocating dedicated VRAM."""
-        return 'VRAM allocated.'
+"""
+SigmaOS Modular Shim for _allocate_vram.py
+"""
+from ._allocate_vram._SigmaModeManager_core import SigmaModeManager # noqa

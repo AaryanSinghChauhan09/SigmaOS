@@ -1,10 +1,4 @@
-# Generated method: SigmaBharatLawBridge.calculate_gst
-from typing import Dict, List, Any, Optional
-import datetime
-
-class SigmaBharatLawBridge:
-    def calculate_gst(self, amount: float, rate: float=18.0) -> str:
-        """GST calculation (CGST + SGST or IGST)."""
-        gst = amount * rate / 100
-        total = amount + gst
-        return f'GST Calculation ({rate}%): Tax: ₹{gst:,.2f}, Total: ₹{total:,.2f}.'
+"""
+SigmaOS Modular Shim for calculate_gst.py
+"""
+from .calculate_gst._SigmaBharatLawBridge_core import SigmaBharatLawBridge # noqa

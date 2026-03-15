@@ -1,13 +1,4 @@
-# Generated method: AIStudio._explain_model
-import tkinter as tk
-from tkinter import ttk, messagebox
-import random
-import time
-import threading
-import sys
-import os
-from typing import Dict, Any, List, Optional
-
-class AIStudio:
-    def _explain_model(self):
-        messagebox.showinfo('XAI', 'Generating SHAP and LIME metrics...')
+"""
+SigmaOS Modular Shim for _explain_model.py
+"""
+from ._explain_model._AIStudio_core import AIStudio # noqa

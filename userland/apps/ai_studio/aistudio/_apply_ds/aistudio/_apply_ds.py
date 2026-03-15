@@ -1,13 +1,4 @@
-# Generated method: AIStudio._apply_ds
-import tkinter as tk
-from tkinter import ttk, messagebox
-import random
-import time
-import threading
-import sys
-import os
-from typing import Dict, Any, List, Optional
-
-class AIStudio:
-    def _apply_ds(self, name):
-        messagebox.showinfo('Data Pipeline', f'Executing [ {name} ] across Sovereign Data Lake.')
+"""
+SigmaOS Modular Shim for _apply_ds.py
+"""
+from ._apply_ds._AIStudio_core import AIStudio # noqa

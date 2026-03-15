@@ -1,23 +1,22 @@
-# SigmaOS Unrealized Features & Strategic Roadmap
+# SigmaOS Unrealized Features & Advanced Roadmap (v6.0)
 
-This document outlines the high-level vision for SigmaOS's future evolution. These are "yet to be defined" features that will push the boundaries of what an OS can be.
+This document represents the ultimate visionary goals for SigmaOS. These are features that are technically planned but awaiting the next generation of hardware.
 
-## 1. Intelligence & Automation
-- **Neural-Native Kernel**: A scheduler that uses reinforcement learning to optimize process priority based on user behavior.
-- **Omni-Automator v3**: A purely community-driven mission node marketplace where anyone can contribute automation scripts.
+## 1. Zero-Latency Neural Interop
+- **Direct Thought-to-CLI**: Integration with non-invasive BCI (Brain-Computer Interface) sensors for futuristic system control.
+- **Predictive Intent Shards**: OS will pre-execute commands it predicts the user will need, reducing human latency to zero.
 
-## 2. Security & Resilience
-- **Zero-Trust Lattice**: Moving from simple namespaces to lattice-based cryptographic isolation for every micro-service.
-- **Volatile-Only Mode**: A "Stealth Mode" where the entire OS runs in RAM, leaving zero traces on persistent storage.
+## 2. Post-Quantum Sovereignty
+- **Lattice-Encrypted Registry**: Every system setting is encrypted with lattice-based crypto to resist future quantum attacks. (Initial module implemented).
+- **Decentralized Kernel Mesh**: The kernel state is distributed across a community of trusted nodes, making it impossible to "shut down" the OS.
 
-## 3. User Experience
-- **Adaptive Glassmorphism**: A GUI that dynamically adjusts its visual weight based on retinal tracking or focus state.
-- **Universal Semantic Search**: A search engine that doesn't just find files but understands the *content* and *context* of data across all apps.
+## 3. Autonomous Performance
+- **Self-Healing Native Bridge**: The OS automatically recompiles its bottlenecked functions into optimized Rust/ASM on-the-fly.
+- **Fluid-UI Holographic Layer**: A UI that shifts from 2D glassmorphism to 3D spatial environments when VR/AR hardware is detected.
 
-## 4. Connectivity
-- **Sigma Mesh**: A native, peer-to-peer network stack that allows SigmaOS devices to communicate directly without a central ISP.
-- **Cloud-Shadowing**: Transparently mirroring the OS state to private cloud nodes for instant recovery.
+## 4. Ethical & Environment Aware
+- **Bio-Metric Security Purity**: Zero-telemetry, offline-first biometric processing that never touches a cloud.
+- **Eco-Priority Scheduler**: Dynamically clocks down the CPU to minimalist levels when ambient light or battery suggests the user is in a "resource-saving" environment.
 
-## 5. Community & Ethics
-- **Automated Compliance Auditor**: An OS-level filter that ensures all dynamic content remains professional and child-safe.
-- **Open-Forge API**: A unified system for 3rd party developers to hook into the core Sigma architecture without breaking modularity.
+## 5. Community Driven Forge
+- **Universal Mission Hub**: A global marketplace for "Refactor Proposals" where the community votes on the next architectural evolution.

@@ -1,9 +1,4 @@
-# Generated class core: SovereignPDFEditor
-import tkinter as tk
-from tkinter import ttk, filedialog, messagebox
-import os
-import time
-import random
-
-class SovereignPDFEditor:
-    pass
+"""
+SigmaOS Modular Shim for _SovereignPDFEditor_core.py
+"""
+from ._SovereignPDFEditor_core._SovereignPDFEditor_core import SovereignPDFEditor # noqa

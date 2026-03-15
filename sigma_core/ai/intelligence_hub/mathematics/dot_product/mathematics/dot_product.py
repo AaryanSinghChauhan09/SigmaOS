@@ -1,9 +1,4 @@
-# Generated method: Mathematics.dot_product
-import math
-import random
-import time
-from typing import List, Dict, Any, Optional
-
-class Mathematics:
-    def dot_product(self, v1: List[float], v2: List[float]) -> float:
-        return sum((a * b for a, b in zip(v1, v2)))
+"""
+SigmaOS Modular Shim for dot_product.py
+"""
+from .dot_product._Mathematics_core import Mathematics # noqa

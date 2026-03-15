@@ -1,8 +1,4 @@
-# Generated class core: PulsePlayer
-import tkinter as tk
-from tkinter import messagebox, ttk, filedialog
-import time, random, threading, os
-from typing import Any, List, Dict
-
-class PulsePlayer:
-    pass
+"""
+SigmaOS Modular Shim for _PulsePlayer_core.py
+"""
+from ._PulsePlayer_core._PulsePlayer_core import PulsePlayer # noqa

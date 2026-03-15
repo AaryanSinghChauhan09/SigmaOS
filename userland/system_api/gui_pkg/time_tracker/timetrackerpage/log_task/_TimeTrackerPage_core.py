@@ -1,8 +1,4 @@
-# Generated class core: TimeTrackerPage
-import tkinter as tk
-from tkinter import ttk
-from gui_pkg.base_page import SigmaPage
-from gui_pkg.styles import PAL, FONT_LOGO, FONT_SMALL, FONT_BOLD
-
-class TimeTrackerPage:
-    pass
+"""
+SigmaOS Modular Shim for _TimeTrackerPage_core.py
+"""
+from ._TimeTrackerPage_core._TimeTrackerPage_core import TimeTrackerPage # noqa

@@ -1,7 +1,4 @@
-# Generated class core: SovereignSerpent
-import random
-from typing import List, Tuple, Dict, Any, Optional
-from .base import SigmaGame
-
-class SovereignSerpent:
-    pass
+"""
+SigmaOS Modular Shim for _SovereignSerpent_core.py
+"""
+from ._SovereignSerpent_core._SovereignSerpent_core import SovereignSerpent # noqa

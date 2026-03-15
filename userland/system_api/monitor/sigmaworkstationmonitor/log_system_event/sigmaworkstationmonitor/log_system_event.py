@@ -1,10 +1,4 @@
-# Generated method: SigmaWorkstationMonitor.log_system_event
-import os
-import random
-import time
-
-class SigmaWorkstationMonitor:
-    @staticmethod
-    def log_system_event(event_msg):
-        """Append to the Sovereign Journal for professional auditing."""
-        return f'Journal: [ENTRY] {event_msg}'
+"""
+SigmaOS Modular Shim for log_system_event.py
+"""
+from .log_system_event._SigmaWorkstationMonitor_core import SigmaWorkstationMonitor # noqa

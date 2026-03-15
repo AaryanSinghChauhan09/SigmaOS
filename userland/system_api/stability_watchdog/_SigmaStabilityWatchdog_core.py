@@ -1,8 +1,4 @@
-# Generated class core: SigmaStabilityWatchdog
-import time
-import threading
-import collections
-from typing import Dict, List, Any
-
-class SigmaStabilityWatchdog:
-    pass
+"""
+SigmaOS Modular Shim for _SigmaStabilityWatchdog_core.py
+"""
+from ._SigmaStabilityWatchdog_core._SigmaStabilityWatchdog_core import SigmaStabilityWatchdog # noqa

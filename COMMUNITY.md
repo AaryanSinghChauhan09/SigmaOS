@@ -6,7 +6,7 @@ Welcome to the SigmaOS Community! We are a community of developers, designers, a
 Every contribution must be modular. If you add a feature, it must reside in its own subdirectory with a clear API.
 
 ## 2. Professionalism
-All code and communication must be professional. Avoid religious, vulgar, or spiritual terms. Stick to secular, technical terminology.
+All code and communication must be professional. Avoid religious, Universal, or spiritual terms. Stick to secular, technical terminology.
 
 ## 3. Privacy First
 Never include personal data or hardcoded paths in your contributions. Use environment-relative paths.

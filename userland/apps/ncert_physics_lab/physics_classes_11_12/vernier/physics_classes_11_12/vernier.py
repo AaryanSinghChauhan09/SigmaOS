@@ -1,8 +1,4 @@
-# Generated method: Physics_Classes_11_12.vernier
-import math, random
-
-class Physics_Classes_11_12:
-    @staticmethod
-    def vernier(msr, vsd, lc):
-        total = msr + vsd * lc
-        return {'Thickness (cm)': _r(total, 3)}
+"""
+SigmaOS Modular Shim for vernier.py
+"""
+from .vernier._Physics_Classes_11_12_core import Physics_Classes_11_12 # noqa

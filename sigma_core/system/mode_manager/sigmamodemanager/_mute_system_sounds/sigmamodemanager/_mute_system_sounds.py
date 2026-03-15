@@ -1,8 +1,4 @@
-# Generated method: SigmaModeManager._mute_system_sounds
-from typing import Dict, List, Any, Callable, Optional
-import time
-
-class SigmaModeManager:
-    def _mute_system_sounds(self, phase: str='') -> str:
-        """Simulates muting system sounds."""
-        return 'System sounds muted.'
+"""
+SigmaOS Modular Shim for _mute_system_sounds.py
+"""
+from ._mute_system_sounds._SigmaModeManager_core import SigmaModeManager # noqa

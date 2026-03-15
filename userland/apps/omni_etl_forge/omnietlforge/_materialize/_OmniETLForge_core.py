@@ -1,9 +1,4 @@
-# Generated class core: OmniETLForge
-import tkinter as tk
-from tkinter import ttk, messagebox
-import random
-import time
-import threading
-
-class OmniETLForge:
-    pass
+"""
+SigmaOS Modular Shim for _OmniETLForge_core.py
+"""
+from ._OmniETLForge_core._OmniETLForge_core import OmniETLForge # noqa

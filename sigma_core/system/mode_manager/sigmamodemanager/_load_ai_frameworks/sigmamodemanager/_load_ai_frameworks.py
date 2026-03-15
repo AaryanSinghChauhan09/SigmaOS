@@ -1,8 +1,4 @@
-# Generated method: SigmaModeManager._load_ai_frameworks
-from typing import Dict, List, Any, Callable, Optional
-import time
-
-class SigmaModeManager:
-    def _load_ai_frameworks(self, phase: str='') -> str:
-        """Simulates loading AI/ML frameworks."""
-        return 'AI frameworks loaded.'
+"""
+SigmaOS Modular Shim for _load_ai_frameworks.py
+"""
+from ._load_ai_frameworks._SigmaModeManager_core import SigmaModeManager # noqa

@@ -1,14 +1,4 @@
-# Generated method: MemoryMatch._init_state
-import random
-import time
-from typing import List, Tuple, Dict, Any, Optional, Set
-from .base import SigmaGame
-
-class MemoryMatch:
-    def _init_state(self):
-        n = 4
-        syms = ['🍎', '🍊', '🍋', '🍇', '🍓', '🍒', '🌸', '🌺'] * 2
-        random.shuffle(syms)
-        self.cards = syms
-        self.revealed = [False] * 16
-        self.matched = set()
+"""
+SigmaOS Modular Shim for _init_state.py
+"""
+from ._init_state._MemoryMatch_core import MemoryMatch # noqa

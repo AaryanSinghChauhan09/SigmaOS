@@ -1,10 +1,4 @@
-# Generated class core: SigmaSovereignSync
-import socket
-import json
-import uuid
-import random
-import time
-from dataclasses import dataclass, field
-
-class SigmaSovereignSync:
-    pass
+"""
+SigmaOS Modular Shim for _SigmaSovereignSync_core.py
+"""
+from ._SigmaSovereignSync_core._SigmaSovereignSync_core import SigmaSovereignSync # noqa

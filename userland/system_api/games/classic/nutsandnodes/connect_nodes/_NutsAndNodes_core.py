@@ -1,7 +1,4 @@
-# Generated class core: NutsAndNodes
-import random
-from typing import List, Tuple, Dict, Any, Optional
-from .base import SigmaGame
-
-class NutsAndNodes:
-    pass
+"""
+SigmaOS Modular Shim for _NutsAndNodes_core.py
+"""
+from ._NutsAndNodes_core._NutsAndNodes_core import NutsAndNodes # noqa

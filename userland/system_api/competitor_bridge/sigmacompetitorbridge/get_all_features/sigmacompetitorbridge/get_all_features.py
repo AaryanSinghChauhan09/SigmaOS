@@ -1,7 +1,4 @@
-# Generated method: SigmaCompetitorBridge.get_all_features
-
-
-class SigmaCompetitorBridge:
-    def get_all_features(self):
-        """Aggregates all competitor-equivalent features available in SigmaOS."""
-        return {'Windows': self.windows_features(), 'macOS': self.macos_features(), 'Linux': self.linux_features(), 'ChromeOS': self.chromeos_features(), 'Mobile': self.mobile_features()}
+"""
+SigmaOS Modular Shim for get_all_features.py
+"""
+from .get_all_features._SigmaCompetitorBridge_core import SigmaCompetitorBridge # noqa

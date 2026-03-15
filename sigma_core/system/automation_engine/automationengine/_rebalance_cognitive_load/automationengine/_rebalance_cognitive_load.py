@@ -1,9 +1,4 @@
-# Generated method: AutomationEngine._rebalance_cognitive_load
-import time
-import threading
-from typing import Dict, Any, List, Callable, Optional
-
-class AutomationEngine:
-    def _rebalance_cognitive_load(self):
-        if hasattr(self.kernel, 'process'):
-            self.kernel.process.optimize_resources()
+"""
+SigmaOS Modular Shim for _rebalance_cognitive_load.py
+"""
+from ._rebalance_cognitive_load._AutomationEngine_core import AutomationEngine # noqa

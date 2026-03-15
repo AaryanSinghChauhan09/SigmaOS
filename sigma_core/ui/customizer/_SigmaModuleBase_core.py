@@ -1,8 +1,4 @@
-# Generated class core: SigmaModuleBase
-from typing import Dict, Any, List
-from .morphic_engine import MorphicEngine
-from .sensory_assets import SensoryAssets
-from .neural_themer import NeuralThemer
-
-class SigmaModuleBase:
-    pass
+"""
+SigmaOS Modular Shim for _SigmaModuleBase_core.py
+"""
+from ._SigmaModuleBase_core._SigmaModuleBase_core import SigmaModuleBase # noqa

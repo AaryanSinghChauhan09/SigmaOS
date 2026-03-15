@@ -1,8 +1,4 @@
-# Generated class core: SovereignArcade
-import tkinter as tk
-from tkinter import ttk, messagebox
-import random, time, os, sys
-from typing import Dict, Any, List, Optional
-
-class SovereignArcade:
-    pass
+"""
+SigmaOS Modular Shim for _SovereignArcade_core.py
+"""
+from ._SovereignArcade_core._SovereignArcade_core import SovereignArcade # noqa

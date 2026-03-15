@@ -1,8 +1,4 @@
-# Generated class core: MemoryMatch
-import random
-import time
-from typing import List, Tuple, Dict, Any, Optional, Set
-from .base import SigmaGame
-
-class MemoryMatch:
-    pass
+"""
+SigmaOS Modular Shim for _MemoryMatch_core.py
+"""
+from ._MemoryMatch_core._MemoryMatch_core import MemoryMatch # noqa

@@ -1,8 +1,4 @@
-# Generated method: Physics_Classes_11_12.photo
-import math, random
-
-class Physics_Classes_11_12:
-    @staticmethod
-    def photo(lam, phi):
-        e = 1240 / lam
-        return {'E_ph (eV)': _r(e, 2), 'Emission': e > phi}
+"""
+SigmaOS Modular Shim for photo.py
+"""
+from .photo._Physics_Classes_11_12_core import Physics_Classes_11_12 # noqa

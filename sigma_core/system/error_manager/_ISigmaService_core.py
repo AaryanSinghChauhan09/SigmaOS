@@ -1,7 +1,4 @@
-# Generated class core: ISigmaService
-import sys
-import traceback
-from typing import Dict, Any, List, Optional, Callable
-
-class ISigmaService:
-    pass
+"""
+SigmaOS Modular Shim for _ISigmaService_core.py
+"""
+from ._ISigmaService_core._ISigmaService_core import ISigmaService # noqa

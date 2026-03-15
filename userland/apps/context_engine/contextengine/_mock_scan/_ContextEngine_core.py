@@ -1,8 +1,4 @@
-# Generated class core: ContextEngine
-import tkinter as tk
-from tkinter import ttk, messagebox
-import time
-import random
-
-class ContextEngine:
-    pass
+"""
+SigmaOS Modular Shim for _ContextEngine_core.py
+"""
+from ._ContextEngine_core._ContextEngine_core import ContextEngine # noqa

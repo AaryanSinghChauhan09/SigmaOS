@@ -1,14 +1,4 @@
-# Generated method: JigsawPuzzle._tick_clock
-import tkinter as tk
-from tkinter import ttk, filedialog, messagebox
-import random
-import time
-import os
-
-class JigsawPuzzle:
-    def _tick_clock(self):
-        if self.start_time and (not self.solved):
-            elapsed = int(time.time() - self.start_time)
-            m, s = divmod(elapsed, 60)
-            self.lbl_time.config(text=f'{m:02}:{s:02}')
-        self.after(1000, self._tick_clock)
+"""
+SigmaOS Modular Shim for _tick_clock.py
+"""
+from ._tick_clock._JigsawPuzzle_core import JigsawPuzzle # noqa

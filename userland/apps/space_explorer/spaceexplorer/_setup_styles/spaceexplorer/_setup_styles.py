@@ -1,11 +1,4 @@
-# Generated method: SpaceExplorer._setup_styles
-import tkinter as tk
-from tkinter import ttk, messagebox, filedialog
-import os
-import random
-
-class SpaceExplorer:
-    def _setup_styles(self):
-        style = ttk.Style()
-        style.theme_use('clam')
-        style.configure('TProgressbar', background=PAL['accent'], troughcolor=PAL['border'], borderwidth=0)
+"""
+SigmaOS Modular Shim for _setup_styles.py
+"""
+from ._setup_styles._SpaceExplorer_core import SpaceExplorer # noqa

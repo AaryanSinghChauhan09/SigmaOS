@@ -1,6 +1,4 @@
-# Generated method: SigmaPDFForge.get_capabilities
-from sigma_core.system.sovereign_app import SovereignApp
-
-class SigmaPDFForge:
-    def get_capabilities(self):
-        return {'Editor': 'Adobe-Parity', 'Markup': 'Bluebeam-Parity', 'Speed': 'Foxit-Parity', 'Batch': 'iLovePDF-Parity', 'Acceleration': 'AetherGrid-Integrated', 'Compliance': 'Forensic-Standard'}
+"""
+SigmaOS Modular Shim for get_capabilities.py
+"""
+from .get_capabilities._SigmaPDFForge_core import SigmaPDFForge # noqa

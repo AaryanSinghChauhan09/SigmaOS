@@ -1,9 +1,4 @@
-# Generated method: SigmaSnapshotEngine.health_check
-import time
-import uuid
-import random
-from typing import Dict, List, Any
-
-class SigmaSnapshotEngine:
-    def health_check(self) -> str:
-        return f'OK — SnapEngine: {len(self._snapshots)} snapshots | FS: {self._fs_type}'
+"""
+SigmaOS Modular Shim for health_check.py
+"""
+from .health_check._SigmaSnapshotEngine_core import SigmaSnapshotEngine # noqa

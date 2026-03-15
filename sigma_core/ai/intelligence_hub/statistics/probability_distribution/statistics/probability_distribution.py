@@ -1,10 +1,4 @@
-# Generated method: Statistics.probability_distribution
-import math
-import random
-import time
-from typing import List, Dict, Any, Optional
-
-class Statistics:
-    def probability_distribution(self, data: List[float]) -> Dict[float, float]:
-        total = float(len(data))
-        return {x: float(data.count(x)) / total for x in set(data)}
+"""
+SigmaOS Modular Shim for probability_distribution.py
+"""
+from .probability_distribution._Statistics_core import Statistics # noqa

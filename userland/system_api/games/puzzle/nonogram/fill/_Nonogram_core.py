@@ -1,8 +1,4 @@
-# Generated class core: Nonogram
-import random
-import time
-from typing import List, Tuple, Dict, Any, Optional, Set
-from .base import SigmaGame
-
-class Nonogram:
-    pass
+"""
+SigmaOS Modular Shim for _Nonogram_core.py
+"""
+from ._Nonogram_core._Nonogram_core import Nonogram # noqa

@@ -1,10 +1,4 @@
-# Generated method: ConnectFour._init_state
-import random
-import time
-from typing import List, Tuple, Dict, Any, Optional, Set
-from .base import SigmaGame
-
-class ConnectFour:
-    def _init_state(self):
-        self.board = [[0] * 7 for _ in range(6)]
-        self.turn = 1
+"""
+SigmaOS Modular Shim for _init_state.py
+"""
+from ._init_state._ConnectFour_core import ConnectFour # noqa

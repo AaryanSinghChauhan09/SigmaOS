@@ -1,5 +1,4 @@
-# Generated class core: Chemistry_Classes_11_12
-import math, re
-
-class Chemistry_Classes_11_12:
-    pass
+"""
+SigmaOS Modular Shim for _Chemistry_Classes_11_12_core.py
+"""
+from ._Chemistry_Classes_11_12_core._Chemistry_Classes_11_12_core import Chemistry_Classes_11_12 # noqa

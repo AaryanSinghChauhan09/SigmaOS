@@ -1,9 +1,4 @@
-# Generated method: SigmaSnapshotEngine.list_snapshots
-import time
-import uuid
-import random
-from typing import Dict, List, Any
-
-class SigmaSnapshotEngine:
-    def list_snapshots(self) -> List[Dict]:
-        return self._snapshots
+"""
+SigmaOS Modular Shim for list_snapshots.py
+"""
+from .list_snapshots._SigmaSnapshotEngine_core import SigmaSnapshotEngine # noqa

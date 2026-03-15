@@ -1,8 +1,4 @@
-# Generated class core: DeepLearningEngine
-import math
-import random
-import time
-from typing import List, Dict, Any, Optional
-
-class DeepLearningEngine:
-    pass
+"""
+SigmaOS Modular Shim for _DeepLearningEngine_core.py
+"""
+from ._DeepLearningEngine_core._DeepLearningEngine_core import DeepLearningEngine # noqa

@@ -1,8 +1,4 @@
-# Generated class core: Battleship
-import random
-import time
-from typing import List, Tuple, Dict, Any, Optional, Set
-from .base import SigmaGame
-
-class Battleship:
-    pass
+"""
+SigmaOS Modular Shim for _Battleship_core.py
+"""
+from ._Battleship_core._Battleship_core import Battleship # noqa

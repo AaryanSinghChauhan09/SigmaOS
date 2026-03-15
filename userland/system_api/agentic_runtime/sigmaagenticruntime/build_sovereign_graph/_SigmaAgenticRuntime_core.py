@@ -1,8 +1,4 @@
-# Generated class core: SigmaAgenticRuntime
-import time
-import uuid
-import threading
-from typing import List, Dict, Any, Optional
-
-class SigmaAgenticRuntime:
-    pass
+"""
+SigmaOS Modular Shim for _SigmaAgenticRuntime_core.py
+"""
+from ._SigmaAgenticRuntime_core._SigmaAgenticRuntime_core import SigmaAgenticRuntime # noqa

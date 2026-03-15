@@ -1,7 +1,4 @@
-# Generated method: SigmaModeManager.get_all_modes
-from typing import Dict, List, Any, Callable, Optional
-import time
-
-class SigmaModeManager:
-    def get_all_modes(self) -> List[str]:
-        return list(self._modes.keys())
+"""
+SigmaOS Modular Shim for get_all_modes.py
+"""
+from .get_all_modes._SigmaModeManager_core import SigmaModeManager # noqa

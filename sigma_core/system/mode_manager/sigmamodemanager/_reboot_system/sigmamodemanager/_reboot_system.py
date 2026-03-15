@@ -1,8 +1,4 @@
-# Generated method: SigmaModeManager._reboot_system
-from typing import Dict, List, Any, Callable, Optional
-import time
-
-class SigmaModeManager:
-    def _reboot_system(self, phase: str='') -> str:
-        """Simulates initiating a system reboot."""
-        return 'System reboot initiated.'
+"""
+SigmaOS Modular Shim for _reboot_system.py
+"""
+from ._reboot_system._SigmaModeManager_core import SigmaModeManager # noqa

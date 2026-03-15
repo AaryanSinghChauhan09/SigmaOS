@@ -1,8 +1,4 @@
-# Generated method: SyntheticEvolution._init_state
-import random
-from typing import List, Tuple, Dict, Any, Optional
-from .base import SigmaGame
-
-class SyntheticEvolution:
-    def _init_state(self):
-        self.score = 0
+"""
+SigmaOS Modular Shim for _init_state.py
+"""
+from ._init_state._SyntheticEvolution_core import SyntheticEvolution # noqa

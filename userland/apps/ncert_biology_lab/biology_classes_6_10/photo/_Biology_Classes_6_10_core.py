@@ -1,5 +1,4 @@
-# Generated class core: Biology_Classes_6_10
-import math, random
-
-class Biology_Classes_6_10:
-    pass
+"""
+SigmaOS Modular Shim for _Biology_Classes_6_10_core.py
+"""
+from ._Biology_Classes_6_10_core._Biology_Classes_6_10_core import Biology_Classes_6_10 # noqa

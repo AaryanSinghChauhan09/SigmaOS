@@ -1,9 +1,4 @@
-# Generated class core: SigmaCrashReporter
-import time
-import uuid
-import threading
-import json
-from typing import Dict, List, Any
-
-class SigmaCrashReporter:
-    pass
+"""
+SigmaOS Modular Shim for _SigmaCrashReporter_core.py
+"""
+from ._SigmaCrashReporter_core._SigmaCrashReporter_core import SigmaCrashReporter # noqa

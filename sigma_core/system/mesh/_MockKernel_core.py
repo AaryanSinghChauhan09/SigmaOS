@@ -1,8 +1,4 @@
-# Generated class core: MockKernel
-import hashlib
-import json
-import time
-from typing import List, Dict
-
-class MockKernel:
-    pass
+"""
+SigmaOS Modular Shim for _MockKernel_core.py
+"""
+from ._MockKernel_core._MockKernel_core import MockKernel # noqa

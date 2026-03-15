@@ -1,7 +1,4 @@
-# Generated method: SigmaIconPainter.export_icon
-
-
-class SigmaIconPainter:
-    def export_icon(self, formats=('svg', 'png', 'ico')):
-        """Exports the designed icon in all required formats for desktop, browser, and taskbar."""
-        return f"IconPainter (Export): Icon exported in {', '.join(formats).upper()} formats. All resolutions generated."
+"""
+SigmaOS Modular Shim for export_icon.py
+"""
+from .export_icon._SigmaIconPainter_core import SigmaIconPainter # noqa

@@ -1,7 +1,4 @@
-# Generated method: SigmaPDFForge.calibrate_measure
-from sigma_core.system.sovereign_app import SovereignApp
-
-class SigmaPDFForge:
-    def calibrate_measure(self, scale):
-        """Precision measurement tools for architectural and engineering workflows."""
-        return f'PDF Forge (Measure): Scale set to {scale}. Distance/Area calculations ACTIVE.'
+"""
+SigmaOS Modular Shim for calibrate_measure.py
+"""
+from .calibrate_measure._SigmaPDFForge_core import SigmaPDFForge # noqa

@@ -1,9 +1,4 @@
-# Generated class core: TerminalPage
-import tkinter as tk
-from tkinter import ttk
-import threading
-from .base_page import SigmaPage
-from .styles import PAL, FONT_MONO
-
-class TerminalPage:
-    pass
+"""
+SigmaOS Modular Shim for _TerminalPage_core.py
+"""
+from ._TerminalPage_core._TerminalPage_core import TerminalPage # noqa

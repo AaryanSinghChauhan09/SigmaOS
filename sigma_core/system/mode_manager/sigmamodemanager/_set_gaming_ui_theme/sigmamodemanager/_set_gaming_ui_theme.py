@@ -1,8 +1,4 @@
-# Generated method: SigmaModeManager._set_gaming_ui_theme
-from typing import Dict, List, Any, Callable, Optional
-import time
-
-class SigmaModeManager:
-    def _set_gaming_ui_theme(self, phase: str='') -> str:
-        """Simulates applying a gaming UI theme."""
-        return 'Gaming UI theme applied.'
+"""
+SigmaOS Modular Shim for _set_gaming_ui_theme.py
+"""
+from ._set_gaming_ui_theme._SigmaModeManager_core import SigmaModeManager # noqa

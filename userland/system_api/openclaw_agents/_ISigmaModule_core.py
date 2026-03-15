@@ -1,5 +1,4 @@
-# Generated class core: ISigmaModule
-from sigma_core.system.interfaces import ISigmaModule, SigmaModuleBase
-
-class ISigmaModule:
-    pass
+"""
+SigmaOS Modular Shim for _ISigmaModule_core.py
+"""
+from ._ISigmaModule_core._ISigmaModule_core import ISigmaModule # noqa

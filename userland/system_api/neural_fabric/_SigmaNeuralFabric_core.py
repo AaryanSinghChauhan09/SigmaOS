@@ -1,10 +1,4 @@
-# Generated class core: SigmaNeuralFabric
-from dataclasses import dataclass, field
-from typing import List, Dict, Any, Union
-import time
-
-class SigmaNeuralFabric:
-    """
-    The Unified Predictive Fabric.
-    Merges performance scheduling, P2P resource pooling, and live telemetry.
-    """
+"""
+SigmaOS Modular Shim for _SigmaNeuralFabric_core.py
+"""
+from ._SigmaNeuralFabric_core._SigmaNeuralFabric_core import SigmaNeuralFabric # noqa

@@ -1,9 +1,4 @@
-# Generated method: Maths_Classes_6_10.stats
-import math, random
-
-class Maths_Classes_6_10:
-    @staticmethod
-    def stats(s):
-        v = [float(x) for x in str(s).split(',')]
-        m = sum(v) / len(v)
-        return {'Mean': _r(m, 2), 'SD': _r(math.sqrt(sum(((x - m) ** 2 for x in v)) / len(v)), 2)}
+"""
+SigmaOS Modular Shim for stats.py
+"""
+from .stats._Maths_Classes_6_10_core import Maths_Classes_6_10 # noqa

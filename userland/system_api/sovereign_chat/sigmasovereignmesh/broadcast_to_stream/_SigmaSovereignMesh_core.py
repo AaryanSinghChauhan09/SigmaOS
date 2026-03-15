@@ -1,10 +1,4 @@
-# Generated class core: SigmaSovereignMesh
-from dataclasses import dataclass, field
-from enum import Enum
-import time
-import hashlib
-import json
-import random
-
-class SigmaSovereignMesh:
-    pass
+"""
+SigmaOS Modular Shim for _SigmaSovereignMesh_core.py
+"""
+from ._SigmaSovereignMesh_core._SigmaSovereignMesh_core import SigmaSovereignMesh # noqa

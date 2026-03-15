@@ -1,8 +1,4 @@
-# Generated method: PrecisionBladeToss._init_state
-import random
-from typing import List, Tuple, Dict, Any, Optional
-from .base import SigmaGame
-
-class PrecisionBladeToss:
-    def _init_state(self):
-        self.level = 1
+"""
+SigmaOS Modular Shim for _init_state.py
+"""
+from ._init_state._PrecisionBladeToss_core import PrecisionBladeToss # noqa

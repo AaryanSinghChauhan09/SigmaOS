@@ -1,10 +1,4 @@
-# Generated class core: SigmaModuleBase
-import os
-import sys
-import hashlib
-import binascii
-from typing import Dict, Any
-from sigma_core.system.interfaces import SigmaModuleBase
-
-class SigmaModuleBase:
-    pass
+"""
+SigmaOS Modular Shim for _SigmaModuleBase_core.py
+"""
+from ._SigmaModuleBase_core._SigmaModuleBase_core import SigmaModuleBase # noqa

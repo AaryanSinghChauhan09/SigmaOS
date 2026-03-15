@@ -1,7 +1,4 @@
-# Generated class core: AntigravityDeveloperTools
-import os
-import hashlib
-import time
-
-class AntigravityDeveloperTools:
-    pass
+"""
+SigmaOS Modular Shim for _AntigravityDeveloperTools_core.py
+"""
+from ._AntigravityDeveloperTools_core._AntigravityDeveloperTools_core import AntigravityDeveloperTools # noqa

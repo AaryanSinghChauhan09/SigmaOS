@@ -1,8 +1,4 @@
-# Generated method: SigmaModeManager._disable_notifications
-from typing import Dict, List, Any, Callable, Optional
-import time
-
-class SigmaModeManager:
-    def _disable_notifications(self, phase: str='') -> str:
-        """Simulates disabling system notifications."""
-        return 'Notifications disabled.'
+"""
+SigmaOS Modular Shim for _disable_notifications.py
+"""
+from ._disable_notifications._SigmaModeManager_core import SigmaModeManager # noqa

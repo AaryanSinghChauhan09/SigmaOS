@@ -1,8 +1,4 @@
-# Generated method: GrandmasterChess._init_state
-import random
-from typing import List, Tuple, Dict, Any, Optional
-from .base import SigmaGame
-
-class GrandmasterChess:
-    def _init_state(self):
-        self.board = [[None] * 8 for _ in range(8)]
+"""
+SigmaOS Modular Shim for _init_state.py
+"""
+from ._init_state._GrandmasterChess_core import GrandmasterChess # noqa

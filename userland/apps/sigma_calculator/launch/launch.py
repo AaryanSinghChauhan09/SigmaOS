@@ -1,8 +1,4 @@
-# Generated file: launch
-import tkinter as tk
-from tkinter import ttk
-import math, cmath, re, json, os
-from typing import Any, List
-
-def launch(kernel=None):
-    SigmaCalculator(kernel).mainloop()
+"""
+SigmaOS Modular Shim for launch.py
+"""
+from .launch.launch import launch # noqa

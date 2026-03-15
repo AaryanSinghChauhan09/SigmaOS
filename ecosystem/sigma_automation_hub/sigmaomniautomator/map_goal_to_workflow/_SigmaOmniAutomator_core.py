@@ -1,9 +1,4 @@
-# Generated class core: SigmaOmniAutomator
-from typing import Callable, Dict, List, Any, Optional
-import threading
-import time
-import random
-import uuid
-
-class SigmaOmniAutomator:
-    pass
+"""
+SigmaOS Modular Shim for _SigmaOmniAutomator_core.py
+"""
+from ._SigmaOmniAutomator_core._SigmaOmniAutomator_core import SigmaOmniAutomator # noqa

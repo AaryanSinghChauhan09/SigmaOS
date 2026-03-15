@@ -1,9 +1,4 @@
-# Generated class core: TextCleaner
-import tkinter as tk
-from tkinter import ttk, scrolledtext, messagebox
-import re
-import string
-import random
-
-class TextCleaner:
-    pass
+"""
+SigmaOS Modular Shim for _TextCleaner_core.py
+"""
+from ._TextCleaner_core._TextCleaner_core import TextCleaner # noqa

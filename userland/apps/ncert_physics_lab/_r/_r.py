@@ -1,8 +1,4 @@
-# Generated file: _r
-import math, random
-
-def _r(x, d=4):
-    try:
-        return float(('{:.' + str(int(d)) + 'f}').format(float(x)))
-    except:
-        return x
+"""
+SigmaOS Modular Shim for _r.py
+"""
+from ._r._r import _r # noqa

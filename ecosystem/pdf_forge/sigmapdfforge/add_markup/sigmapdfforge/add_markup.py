@@ -1,7 +1,4 @@
-# Generated method: SigmaPDFForge.add_markup
-from sigma_core.system.sovereign_app import SovereignApp
-
-class SigmaPDFForge:
-    def add_markup(self, annotation, tool='Cloud'):
-        """Bluebeam-style professional markup and clouding."""
-        return f"PDF Forge (Markup): Added '{annotation}' using the {tool} tool. Syncing to mesh lattice."
+"""
+SigmaOS Modular Shim for add_markup.py
+"""
+from .add_markup._SigmaPDFForge_core import SigmaPDFForge # noqa

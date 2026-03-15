@@ -1,7 +1,4 @@
-# Generated method: Maths_Classes_6_10.interest
-import math, random
-
-class Maths_Classes_6_10:
-    @staticmethod
-    def interest(p, r, t):
-        return {'SI': p * r * t / 100, 'CI': _r(p * (1 + r / 100) ** t - p, 2)}
+"""
+SigmaOS Modular Shim for interest.py
+"""
+from .interest._Maths_Classes_6_10_core import Maths_Classes_6_10 # noqa

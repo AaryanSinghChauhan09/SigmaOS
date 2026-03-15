@@ -1,9 +1,4 @@
-# Generated class core: TimeTracker
-import os
-import re
-import json
-import time
-from typing import List, Dict, Any, Optional
-
-class TimeTracker:
-    pass
+"""
+SigmaOS Modular Shim for _TimeTracker_core.py
+"""
+from ._TimeTracker_core._TimeTracker_core import TimeTracker # noqa

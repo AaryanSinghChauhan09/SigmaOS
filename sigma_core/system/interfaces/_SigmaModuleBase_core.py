@@ -1,6 +1,4 @@
-# Generated class core: SigmaModuleBase
-from abc import ABC, abstractmethod
-from typing import Dict, Any, Optional
-
-class SigmaModuleBase(ISigmaModule):
-    pass
+"""
+SigmaOS Modular Shim for _SigmaModuleBase_core.py
+"""
+from ._SigmaModuleBase_core._SigmaModuleBase_core import SigmaModuleBase # noqa

@@ -1,8 +1,4 @@
-# Generated method: Physics_Classes_11_12.potentiometer
-import math, random
-
-class Physics_Classes_11_12:
-    @staticmethod
-    def potentiometer(e1, l1, l2):
-        e2 = e1 * (l2 / l1)
-        return {'EMF E2 (V)': _r(e2, 3)}
+"""
+SigmaOS Modular Shim for potentiometer.py
+"""
+from .potentiometer._Physics_Classes_11_12_core import Physics_Classes_11_12 # noqa

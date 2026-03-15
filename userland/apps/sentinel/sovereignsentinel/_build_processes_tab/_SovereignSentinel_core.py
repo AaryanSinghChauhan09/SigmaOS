@@ -1,7 +1,4 @@
-# Generated class core: SovereignSentinel
-import tkinter as tk
-from tkinter import ttk, scrolledtext, messagebox
-import random, time, os, sys, threading, subprocess
-
-class SovereignSentinel:
-    pass
+"""
+SigmaOS Modular Shim for _SovereignSentinel_core.py
+"""
+from ._SovereignSentinel_core._SovereignSentinel_core import SovereignSentinel # noqa

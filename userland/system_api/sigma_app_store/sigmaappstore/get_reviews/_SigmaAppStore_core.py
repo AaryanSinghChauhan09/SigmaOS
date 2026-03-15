@@ -1,9 +1,4 @@
-# Generated class core: SigmaAppStore
-from dataclasses import dataclass, field
-from typing import List, Dict, Optional, Any
-import time
-import hashlib
-import json
-
-class SigmaAppStore:
-    pass
+"""
+SigmaOS Modular Shim for _SigmaAppStore_core.py
+"""
+from ._SigmaAppStore_core._SigmaAppStore_core import SigmaAppStore # noqa

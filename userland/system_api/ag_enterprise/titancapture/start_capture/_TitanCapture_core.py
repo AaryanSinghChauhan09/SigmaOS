@@ -1,9 +1,4 @@
-# Generated class core: TitanCapture
-import os
-import re
-import json
-import time
-from typing import List, Dict, Any, Optional
-
-class TitanCapture:
-    pass
+"""
+SigmaOS Modular Shim for _TitanCapture_core.py
+"""
+from ._TitanCapture_core._TitanCapture_core import TitanCapture # noqa

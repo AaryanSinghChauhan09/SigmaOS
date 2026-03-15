@@ -1,8 +1,4 @@
-# Generated method: Physics_Classes_11_12.doppler
-import math, random
-
-class Physics_Classes_11_12:
-    @staticmethod
-    def doppler(f, vs, vo):
-        v = 343
-        return {'Observed F (Hz)': _r(f * (v + vo) / (v - vs), 2)}
+"""
+SigmaOS Modular Shim for doppler.py
+"""
+from .doppler._Physics_Classes_11_12_core import Physics_Classes_11_12 # noqa

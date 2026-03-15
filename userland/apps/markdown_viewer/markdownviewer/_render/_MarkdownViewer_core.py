@@ -1,7 +1,4 @@
-# Generated class core: MarkdownViewer
-import tkinter as tk
-from tkinter import ttk, filedialog, scrolledtext
-import re, os
-
-class MarkdownViewer:
-    pass
+"""
+SigmaOS Modular Shim for _MarkdownViewer_core.py
+"""
+from ._MarkdownViewer_core._MarkdownViewer_core import MarkdownViewer # noqa

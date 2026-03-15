@@ -1,8 +1,4 @@
-# Generated class core: SigmaUniversalBridge
-
-
-class SigmaUniversalBridge:
-    """
-    Universal App Bridge: The 'Everything-Execute' Engine.
-    Enables native-speed execution of applications designed for other OS segments.
-    """
+"""
+SigmaOS Modular Shim for _SigmaUniversalBridge_core.py
+"""
+from ._SigmaUniversalBridge_core._SigmaUniversalBridge_core import SigmaUniversalBridge # noqa

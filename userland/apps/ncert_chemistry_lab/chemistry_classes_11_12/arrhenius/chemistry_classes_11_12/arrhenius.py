@@ -1,8 +1,4 @@
-# Generated method: Chemistry_Classes_11_12.arrhenius
-import math, re
-
-class Chemistry_Classes_11_12:
-    @staticmethod
-    def arrhenius(a, ea, t):
-        k = a * math.exp(-ea / (0.00831 * t))
-        return {'k': f'{k:.4e}'}
+"""
+SigmaOS Modular Shim for arrhenius.py
+"""
+from .arrhenius._Chemistry_Classes_11_12_core import Chemistry_Classes_11_12 # noqa

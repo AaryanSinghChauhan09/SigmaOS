@@ -1,9 +1,4 @@
-# Generated class core: EmailAgentPro
-import tkinter as tk
-from tkinter import ttk, messagebox, scrolledtext
-import os
-import time
-import random
-
-class EmailAgentPro:
-    pass
+"""
+SigmaOS Modular Shim for _EmailAgentPro_core.py
+"""
+from ._EmailAgentPro_core._EmailAgentPro_core import EmailAgentPro # noqa

@@ -1,13 +1,4 @@
-# Generated method: SovereignSentinel._sandbox_proc
-import tkinter as tk
-from tkinter import ttk, scrolledtext, messagebox
-import random, time, os, sys, threading, subprocess
-
-class SovereignSentinel:
-    def _sandbox_proc(self):
-        sel = self.proc_tree.selection()
-        if not sel:
-            return
-        item = self.proc_tree.item(sel[0])
-        name = item['values'][1]
-        messagebox.showinfo('Sandbox', f"Process '{name}' isolated in Level-3 UAL container.\nAll network access: SEVERED.")
+"""
+SigmaOS Modular Shim for _sandbox_proc.py
+"""
+from ._sandbox_proc._SovereignSentinel_core import SovereignSentinel # noqa

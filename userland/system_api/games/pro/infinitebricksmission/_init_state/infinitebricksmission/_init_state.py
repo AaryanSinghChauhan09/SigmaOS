@@ -1,8 +1,4 @@
-# Generated method: InfiniteBricksMission._init_state
-import random
-from typing import List, Tuple, Dict, Any, Optional
-from .base import SigmaGame
-
-class InfiniteBricksMission:
-    def _init_state(self):
-        self.grid = [[10] * 10 for _ in range(20)]
+"""
+SigmaOS Modular Shim for _init_state.py
+"""
+from ._init_state._InfiniteBricksMission_core import InfiniteBricksMission # noqa

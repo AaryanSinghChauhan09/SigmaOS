@@ -1,8 +1,4 @@
-# Generated class core: SigmaInitEngine
-import time
-import uuid
-import random
-from typing import Dict, List, Any
-
-class SigmaInitEngine:
-    pass
+"""
+SigmaOS Modular Shim for _SigmaInitEngine_core.py
+"""
+from ._SigmaInitEngine_core._SigmaInitEngine_core import SigmaInitEngine # noqa

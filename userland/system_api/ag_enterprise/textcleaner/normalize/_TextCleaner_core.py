@@ -1,9 +1,4 @@
-# Generated class core: TextCleaner
-import os
-import re
-import json
-import time
-from typing import List, Dict, Any, Optional
-
-class TextCleaner:
-    pass
+"""
+SigmaOS Modular Shim for _TextCleaner_core.py
+"""
+from ._TextCleaner_core._TextCleaner_core import TextCleaner # noqa

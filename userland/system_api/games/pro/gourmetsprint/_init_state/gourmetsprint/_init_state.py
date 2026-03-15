@@ -1,9 +1,4 @@
-# Generated method: GourmetSprint._init_state
-import random
-from typing import List, Tuple, Dict, Any, Optional
-from .base import SigmaGame
-
-class GourmetSprint:
-    def _init_state(self):
-        self.pos_x = 0
-        self.velocity = 5.0
+"""
+SigmaOS Modular Shim for _init_state.py
+"""
+from ._init_state._GourmetSprint_core import GourmetSprint # noqa

@@ -1,8 +1,4 @@
-# Generated method: Maths_Classes_1_5.words
-import math, random
-
-class Maths_Classes_1_5:
-    @staticmethod
-    def words(n):
-        d = {1: 'One', 2: 'Two', 3: 'Three', 5: 'Five', 7: 'Seven'}
-        return {'Word': d.get(int(n), '?')}
+"""
+SigmaOS Modular Shim for words.py
+"""
+from .words._Maths_Classes_1_5_core import Maths_Classes_1_5 # noqa

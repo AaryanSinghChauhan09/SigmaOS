@@ -1,9 +1,4 @@
-# Generated method: MockKernel._morphic_island
-import json
-import os
-import time
-from typing import Dict, Any
-
-class MockKernel:
-    def _morphic_island(self, m, c):
-        print(f'UI Island: [{c}] {m}')
+"""
+SigmaOS Modular Shim for _morphic_island.py
+"""
+from ._morphic_island._MockKernel_core import MockKernel # noqa

@@ -1,13 +1,4 @@
-# Generated class core: SecurityWarden
-import time
-import threading
-import secrets
-import hashlib
-import random
-from typing import Dict, List, Any
-
-class SecurityWarden:
-    """
-    Advanced Sovereign Security Engine Pro.
-    Integrates EDR (Endpoint Detection & Response) + Behavioral Shield.
-    """
+"""
+SigmaOS Modular Shim for _SecurityWarden_core.py
+"""
+from ._SecurityWarden_core._SecurityWarden_core import SecurityWarden # noqa

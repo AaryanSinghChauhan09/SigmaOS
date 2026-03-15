@@ -1,8 +1,4 @@
-# Generated method: SigmaModeManager._isolate_network
-from typing import Dict, List, Any, Callable, Optional
-import time
-
-class SigmaModeManager:
-    def _isolate_network(self, phase: str='') -> str:
-        """Simulates isolating the network for security."""
-        return 'Network isolated.'
+"""
+SigmaOS Modular Shim for _isolate_network.py
+"""
+from ._isolate_network._SigmaModeManager_core import SigmaModeManager # noqa

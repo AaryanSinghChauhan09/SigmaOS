@@ -1,12 +1,4 @@
-# Generated method: SigmaCAAT._log_action
-from enum import Enum
-import time
-import random
-from dataclasses import dataclass, field
-
-class SigmaCAAT:
-    def _log_action(self, reason: str, action: str):
-        self._stats['automations_triggered'] += 1
-        entry = {'timestamp': time.strftime('%H:%M:%S'), 'reason': reason, 'action': action}
-        self._audit_log.append(entry)
-        return entry
+"""
+SigmaOS Modular Shim for _log_action.py
+"""
+from ._log_action._SigmaCAAT_core import SigmaCAAT # noqa

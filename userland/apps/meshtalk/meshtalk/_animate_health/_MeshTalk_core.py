@@ -1,8 +1,4 @@
-# Generated class core: MeshTalk
-import tkinter as tk
-from tkinter import ttk, scrolledtext, messagebox
-import random
-import time
-
-class MeshTalk:
-    pass
+"""
+SigmaOS Modular Shim for _MeshTalk_core.py
+"""
+from ._MeshTalk_core._MeshTalk_core import MeshTalk # noqa

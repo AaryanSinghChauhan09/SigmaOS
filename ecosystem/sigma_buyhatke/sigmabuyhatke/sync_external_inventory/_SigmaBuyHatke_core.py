@@ -1,7 +1,4 @@
-# Generated class core: SigmaBuyHatke
-import datetime
-import random
-from typing import Dict, List, Any
-
-class SigmaBuyHatke:
-    pass
+"""
+SigmaOS Modular Shim for _SigmaBuyHatke_core.py
+"""
+from ._SigmaBuyHatke_core._SigmaBuyHatke_core import SigmaBuyHatke # noqa

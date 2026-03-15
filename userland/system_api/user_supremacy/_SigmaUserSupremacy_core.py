@@ -1,5 +1,4 @@
-# Generated class core: SigmaUserSupremacy
-from sigma_core.system.interfaces import SigmaModuleBase
-
-class SigmaUserSupremacy(SigmaModuleBase):
-    pass
+"""
+SigmaOS Modular Shim for _SigmaUserSupremacy_core.py
+"""
+from ._SigmaUserSupremacy_core._SigmaUserSupremacy_core import SigmaUserSupremacy # noqa

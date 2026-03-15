@@ -1,7 +1,4 @@
-# Generated method: Physics_Classes_6_10.f_ma
-import math, random
-
-class Physics_Classes_6_10:
-    @staticmethod
-    def f_ma(m, a):
-        return {'Force (N)': _r(m * a, 2)}
+"""
+SigmaOS Modular Shim for f_ma.py
+"""
+from .f_ma._Physics_Classes_6_10_core import Physics_Classes_6_10 # noqa

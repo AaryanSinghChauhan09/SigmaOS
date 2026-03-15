@@ -1,10 +1,4 @@
-# Generated method: SpotItGame._init_state
-import random
-import time
-from typing import List, Tuple, Dict, Any, Optional, Set
-from .base import SigmaGame
-
-class SpotItGame:
-    def _init_state(self):
-        self.idx = 0
-        self.score = 0
+"""
+SigmaOS Modular Shim for _init_state.py
+"""
+from ._init_state._SpotItGame_core import SpotItGame # noqa

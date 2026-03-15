@@ -1,7 +1,4 @@
-# Generated class core: ISigmaService
-import sys
-import os
-from sigma_core.system.interfaces import SigmaModuleBase, ISigmaService
-
-class ISigmaService:
-    pass
+"""
+SigmaOS Modular Shim for _ISigmaService_core.py
+"""
+from ._ISigmaService_core._ISigmaService_core import ISigmaService # noqa

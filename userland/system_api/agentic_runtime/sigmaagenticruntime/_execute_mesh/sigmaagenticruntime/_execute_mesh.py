@@ -1,10 +1,4 @@
-# Generated method: SigmaAgenticRuntime._execute_mesh
-import time
-import uuid
-import threading
-from typing import List, Dict, Any, Optional
-
-class SigmaAgenticRuntime:
-    def _execute_mesh(self, mesh_id: str, payload: Any):
-        if mesh_id in self._automation_mesh:
-            self._automation_mesh[mesh_id]['executions'] += 1
+"""
+SigmaOS Modular Shim for _execute_mesh.py
+"""
+from ._execute_mesh._SigmaAgenticRuntime_core import SigmaAgenticRuntime # noqa

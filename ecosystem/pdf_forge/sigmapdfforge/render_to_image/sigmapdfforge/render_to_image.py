@@ -1,7 +1,4 @@
-# Generated method: SigmaPDFForge.render_to_image
-from sigma_core.system.sovereign_app import SovereignApp
-
-class SigmaPDFForge:
-    def render_to_image(self, dpi=300):
-        """Renders PDF pages to high-resolution PNG/JPG assets."""
-        return f'PDF Forge (Render): Document pages exported as images at {dpi} DPI.'
+"""
+SigmaOS Modular Shim for render_to_image.py
+"""
+from .render_to_image._SigmaPDFForge_core import SigmaPDFForge # noqa

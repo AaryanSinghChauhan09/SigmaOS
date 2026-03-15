@@ -1,8 +1,4 @@
-# Generated class core: SigmaSysctl
-import time
-import uuid
-import random
-from typing import Dict, List, Any
-
-class SigmaSysctl:
-    pass
+"""
+SigmaOS Modular Shim for _SigmaSysctl_core.py
+"""
+from ._SigmaSysctl_core._SigmaSysctl_core import SigmaSysctl # noqa

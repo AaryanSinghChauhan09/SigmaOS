@@ -1,8 +1,4 @@
-# Generated class core: Statistics
-import math
-import random
-import time
-from typing import List, Dict, Any, Optional
-
-class Statistics:
-    pass
+"""
+SigmaOS Modular Shim for _Statistics_core.py
+"""
+from ._Statistics_core._Statistics_core import Statistics # noqa

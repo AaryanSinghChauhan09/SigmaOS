@@ -1,7 +1,4 @@
-# Generated class core: ISigmaService
-import time
-import uuid
-from typing import Dict, Any, List, Optional
-
-class ISigmaService:
-    pass
+"""
+SigmaOS Modular Shim for _ISigmaService_core.py
+"""
+from ._ISigmaService_core._ISigmaService_core import ISigmaService # noqa

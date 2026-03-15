@@ -1,8 +1,4 @@
-# Generated class core: OmniSavant
-import tkinter as tk
-from tkinter import ttk, messagebox
-import random
-import time
-
-class OmniSavant:
-    pass
+"""
+SigmaOS Modular Shim for _OmniSavant_core.py
+"""
+from ._OmniSavant_core._OmniSavant_core import OmniSavant # noqa

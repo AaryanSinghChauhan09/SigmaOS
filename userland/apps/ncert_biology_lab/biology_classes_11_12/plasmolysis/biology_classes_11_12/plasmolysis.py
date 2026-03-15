@@ -1,9 +1,4 @@
-# Generated method: Biology_Classes_11_12.plasmolysis
-import math, random
-
-class Biology_Classes_11_12:
-    @staticmethod
-    def plasmolysis(s, c):
-        if s > 10:
-            return {'Observation': 'Hypertonic -> Plasmolysis', 'Status': 'Shrunken Protoplast'}
-        return {'Observation': 'Isotonic/Hypotonic', 'Status': 'Turgid'}
+"""
+SigmaOS Modular Shim for plasmolysis.py
+"""
+from .plasmolysis._Biology_Classes_11_12_core import Biology_Classes_11_12 # noqa

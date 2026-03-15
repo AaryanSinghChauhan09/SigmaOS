@@ -1,11 +1,4 @@
-# Generated method: SigmaOmniBrowser.execute_stealth_rpa
-import random
-from sigma_core.system.sovereign_app import SovereignApp
-
-class SigmaOmniBrowser:
-    def execute_stealth_rpa(self, macro_name: str):
-        """
-                Runs browser automations in 'Shadow-Overlaid' mode. 
-                User sees a ghost-trace of what is happening without losing focus.
-                """
-        return f"Shadow RPA: Running '{macro_name}' in background layer. High-speed DOM pulse active."
+"""
+SigmaOS Modular Shim for execute_stealth_rpa.py
+"""
+from .execute_stealth_rpa._SigmaOmniBrowser_core import SigmaOmniBrowser # noqa

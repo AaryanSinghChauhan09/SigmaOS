@@ -1,8 +1,4 @@
-# Generated method: SigmaModeManager._run_system_diagnostics
-from typing import Dict, List, Any, Callable, Optional
-import time
-
-class SigmaModeManager:
-    def _run_system_diagnostics(self, phase: str='') -> str:
-        """Simulates running system diagnostics."""
-        return 'System diagnostics running.'
+"""
+SigmaOS Modular Shim for _run_system_diagnostics.py
+"""
+from ._run_system_diagnostics._SigmaModeManager_core import SigmaModeManager # noqa

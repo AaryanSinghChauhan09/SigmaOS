@@ -1,8 +1,4 @@
-# Generated class core: SigmaAppSandbox
-import time
-import uuid
-import random
-from typing import Dict, List, Any
-
-class SigmaAppSandbox:
-    pass
+"""
+SigmaOS Modular Shim for _SigmaAppSandbox_core.py
+"""
+from ._SigmaAppSandbox_core._SigmaAppSandbox_core import SigmaAppSandbox # noqa

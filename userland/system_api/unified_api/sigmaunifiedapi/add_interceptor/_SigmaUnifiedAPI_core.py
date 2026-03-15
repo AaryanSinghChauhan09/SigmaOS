@@ -1,9 +1,4 @@
-# Generated class core: SigmaUnifiedAPI
-import time
-import uuid
-import sys
-from dataclasses import dataclass, field
-from enum import Enum, auto
-
-class SigmaUnifiedAPI:
-    pass
+"""
+SigmaOS Modular Shim for _SigmaUnifiedAPI_core.py
+"""
+from ._SigmaUnifiedAPI_core._SigmaUnifiedAPI_core import SigmaUnifiedAPI # noqa

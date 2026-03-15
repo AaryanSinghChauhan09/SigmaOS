@@ -1,6 +1,4 @@
-# Generated method: SigmaUserSupremacy.health_check
-from sigma_core.system.interfaces import SigmaModuleBase
-
-class SigmaUserSupremacy:
-    def health_check(self) -> str:
-        return 'OK — User Supremacy: Active | Root Authority: USER_ONLY'
+"""
+SigmaOS Modular Shim for health_check.py
+"""
+from .health_check._SigmaUserSupremacy_core import SigmaUserSupremacy # noqa

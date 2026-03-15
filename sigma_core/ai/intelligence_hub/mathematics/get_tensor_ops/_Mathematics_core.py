@@ -1,8 +1,4 @@
-# Generated class core: Mathematics
-import math
-import random
-import time
-from typing import List, Dict, Any, Optional
-
-class Mathematics:
-    pass
+"""
+SigmaOS Modular Shim for _Mathematics_core.py
+"""
+from ._Mathematics_core._Mathematics_core import Mathematics # noqa

@@ -1,16 +1,4 @@
-# Generated method: SigmaMemoryManager.set_perf_profile
-import time
-import uuid
-import random
-from dataclasses import dataclass, field
-from enum import Enum, auto
-from typing import Any, Dict
-
-class SigmaMemoryManager:
-    def set_perf_profile(self, profile: str):
-        self._perf_profile = profile
-        if profile == 'MAX_CAPACITY':
-            self._nmc_active = True
-            self.neural_optimize()
-        elif profile == 'LOW_LATENCY':
-            self._nmc_active = False
+"""
+SigmaOS Modular Shim for set_perf_profile.py
+"""
+from .set_perf_profile._SigmaMemoryManager_core import SigmaMemoryManager # noqa

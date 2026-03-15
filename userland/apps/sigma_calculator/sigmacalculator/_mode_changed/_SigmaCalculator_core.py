@@ -1,8 +1,4 @@
-# Generated class core: SigmaCalculator
-import tkinter as tk
-from tkinter import ttk
-import math, cmath, re, json, os
-from typing import Any, List
-
-class SigmaCalculator:
-    pass
+"""
+SigmaOS Modular Shim for _SigmaCalculator_core.py
+"""
+from ._SigmaCalculator_core._SigmaCalculator_core import SigmaCalculator # noqa

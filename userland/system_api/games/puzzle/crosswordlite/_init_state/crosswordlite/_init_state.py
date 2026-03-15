@@ -1,9 +1,4 @@
-# Generated method: CrosswordLite._init_state
-import random
-import time
-from typing import List, Tuple, Dict, Any, Optional, Set
-from .base import SigmaGame
-
-class CrosswordLite:
-    def _init_state(self):
-        self.answers = {}
+"""
+SigmaOS Modular Shim for _init_state.py
+"""
+from ._init_state._CrosswordLite_core import CrosswordLite # noqa

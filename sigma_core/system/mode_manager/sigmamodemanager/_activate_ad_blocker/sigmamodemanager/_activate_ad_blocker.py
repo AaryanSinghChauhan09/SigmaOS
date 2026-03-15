@@ -1,8 +1,4 @@
-# Generated method: SigmaModeManager._activate_ad_blocker
-from typing import Dict, List, Any, Callable, Optional
-import time
-
-class SigmaModeManager:
-    def _activate_ad_blocker(self, phase: str='') -> str:
-        """Simulates activating a system-wide ad blocker."""
-        return 'Ad blocker activated.'
+"""
+SigmaOS Modular Shim for _activate_ad_blocker.py
+"""
+from ._activate_ad_blocker._SigmaModeManager_core import SigmaModeManager # noqa

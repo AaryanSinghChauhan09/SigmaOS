@@ -1,7 +1,4 @@
-# Generated method: SigmaCompetitorBridge.windows_compatibility_layer
-
-
-class SigmaCompetitorBridge:
-    def windows_compatibility_layer(self):
-        """USP: Sovereign-Bridge v2."""
-        return {'Feature': 'Sovereign-Bridge v2 (Native-speed .exe & .msi execution)'}
+"""
+SigmaOS Modular Shim for windows_compatibility_layer.py
+"""
+from .windows_compatibility_layer._SigmaCompetitorBridge_core import SigmaCompetitorBridge # noqa

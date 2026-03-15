@@ -1,7 +1,4 @@
-# Generated class core: AntigravityLayer
-import os
-import hashlib
-import time
-
-class AntigravityLayer:
-    pass
+"""
+SigmaOS Modular Shim for _AntigravityLayer_core.py
+"""
+from ._AntigravityLayer_core._AntigravityLayer_core import AntigravityLayer # noqa

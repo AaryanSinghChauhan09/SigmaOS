@@ -1,11 +1,4 @@
-# Generated method: LudoEngine.move_piece
-import tkinter as tk
-from tkinter import ttk, messagebox
-import random
-import os
-import sys
-from sigma_core.games.ludo_engine import LudoEngine
-
-class LudoEngine:
-    def move_piece(self, c, i):
-        return True
+"""
+SigmaOS Modular Shim for move_piece.py
+"""
+from .move_piece._LudoEngine_core import LudoEngine # noqa

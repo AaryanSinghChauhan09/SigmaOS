@@ -1,8 +1,4 @@
-# Generated method: Chemistry_Classes_11_12.chromatog
-import math, re
-
-class Chemistry_Classes_11_12:
-    @staticmethod
-    def chromatog(ds, dsp):
-        rf = dsp / ds
-        return {'Rf Value': _r(rf, 3), 'Status': 'Success' if rf < 1 else 'Error'}
+"""
+SigmaOS Modular Shim for chromatog.py
+"""
+from .chromatog._Chemistry_Classes_11_12_core import Chemistry_Classes_11_12 # noqa

@@ -1,12 +1,4 @@
-# Generated method: AdaptiveEnergyController.trigger_thermal_stress_test
-import time
-import random
-import threading
-from typing import Dict, Any
-
-class AdaptiveEnergyController:
-    def trigger_thermal_stress_test(self) -> str:
-        self.temp_cpu = 86.0
-        self.kernel.bus.emit('thermal.critical', {'temp': self.temp_cpu})
-        self._thermal_feedback('CRITICAL')
-        return f'Thermal Stress Test ACTIVE: CPU={self.temp_cpu}°C → Throttle applied, Watchdog notified.'
+"""
+SigmaOS Modular Shim for trigger_thermal_stress_test.py
+"""
+from .trigger_thermal_stress_test._AdaptiveEnergyController_core import AdaptiveEnergyController # noqa

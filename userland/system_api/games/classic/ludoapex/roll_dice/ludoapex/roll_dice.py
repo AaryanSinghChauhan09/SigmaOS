@@ -1,9 +1,4 @@
-# Generated method: LudoApex.roll_dice
-import random
-from typing import List, Tuple, Dict, Any, Optional
-from .base import SigmaGame
-
-class LudoApex:
-    def roll_dice(self) -> int:
-        self.dice = random.randint(1, 6)
-        return self.dice
+"""
+SigmaOS Modular Shim for roll_dice.py
+"""
+from .roll_dice._LudoApex_core import LudoApex # noqa

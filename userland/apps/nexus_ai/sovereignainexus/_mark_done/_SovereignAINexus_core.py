@@ -1,7 +1,4 @@
-# Generated class core: SovereignAINexus
-import tkinter as tk
-from tkinter import ttk, scrolledtext, messagebox
-import time, threading, random, os, sys, json
-
-class SovereignAINexus:
-    pass
+"""
+SigmaOS Modular Shim for _SovereignAINexus_core.py
+"""
+from ._SovereignAINexus_core._SovereignAINexus_core import SovereignAINexus # noqa

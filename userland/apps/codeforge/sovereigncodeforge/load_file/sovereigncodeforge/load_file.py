@@ -1,11 +1,4 @@
-# Generated method: SovereignCodeForge.load_file
-import tkinter as tk
-from tkinter import ttk, filedialog, messagebox, scrolledtext
-import os, re, sys, subprocess, threading
-from typing import Any, Optional
-
-class SovereignCodeForge:
-    def load_file(self):
-        f = filedialog.askopenfilename(filetypes=[('Python', '*.py'), ('All Files', '*.*')])
-        if f:
-            self._open_path(f)
+"""
+SigmaOS Modular Shim for load_file.py
+"""
+from .load_file._SovereignCodeForge_core import SovereignCodeForge # noqa

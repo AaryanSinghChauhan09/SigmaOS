@@ -1,8 +1,4 @@
-# Generated class core: SigmaSnapshotEngine
-import time
-import uuid
-import random
-from typing import Dict, List, Any
-
-class SigmaSnapshotEngine:
-    pass
+"""
+SigmaOS Modular Shim for _SigmaSnapshotEngine_core.py
+"""
+from ._SigmaSnapshotEngine_core._SigmaSnapshotEngine_core import SigmaSnapshotEngine # noqa

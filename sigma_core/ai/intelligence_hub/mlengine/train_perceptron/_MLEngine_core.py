@@ -1,8 +1,4 @@
-# Generated class core: MLEngine
-import math
-import random
-import time
-from typing import List, Dict, Any, Optional
-
-class MLEngine:
-    pass
+"""
+SigmaOS Modular Shim for _MLEngine_core.py
+"""
+from ._MLEngine_core._MLEngine_core import MLEngine # noqa

@@ -1,8 +1,4 @@
-# Generated method: Biology_Classes_11_12.potometer
-import math, random
-
-class Biology_Classes_11_12:
-    @staticmethod
-    def potometer(d, t):
-        rate = d / t
-        return {'Transpiration Rate': _r(rate, 2), 'Unit': 'cm/min'}
+"""
+SigmaOS Modular Shim for potometer.py
+"""
+from .potometer._Biology_Classes_11_12_core import Biology_Classes_11_12 # noqa

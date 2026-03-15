@@ -1,10 +1,4 @@
-# Generated method: TextCleaner._analyze
-import tkinter as tk
-from tkinter import ttk, scrolledtext, messagebox
-import re
-import string
-import random
-
-class TextCleaner:
-    def _analyze(self):
-        messagebox.showinfo('Neural Analysis', 'Detected Intent: INFORMATIONAL\nSensitivity: LOW\nSentiment: NEUTRAL (0.00)\nArtifact Integrity: 100%')
+"""
+SigmaOS Modular Shim for _analyze.py
+"""
+from ._analyze._TextCleaner_core import TextCleaner # noqa

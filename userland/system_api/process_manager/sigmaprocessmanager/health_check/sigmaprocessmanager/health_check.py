@@ -1,10 +1,4 @@
-# Generated method: SigmaProcessManager.health_check
-import time
-import uuid
-import threading
-from dataclasses import dataclass, field
-from enum import Enum, auto
-
-class SigmaProcessManager:
-    def health_check(self) -> str:
-        return f'OK — Processes: {len(self._procs)}, cgroups: {len(self._cgroups)}, Quarantined: {len(self._quarantine)}, Ticks: {self._sched_ticks}'
+"""
+SigmaOS Modular Shim for health_check.py
+"""
+from .health_check._SigmaProcessManager_core import SigmaProcessManager # noqa

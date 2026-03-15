@@ -1,8 +1,4 @@
-# Generated class core: LightsOut
-import random
-import time
-from typing import List, Tuple, Dict, Any, Optional, Set
-from .base import SigmaGame
-
-class LightsOut:
-    pass
+"""
+SigmaOS Modular Shim for _LightsOut_core.py
+"""
+from ._LightsOut_core._LightsOut_core import LightsOut # noqa

@@ -1,10 +1,4 @@
-# Generated class core: IntegrityGuard
-import hashlib
-import os
-import sys
-import json
-from typing import Dict, List, Any
-from sigma_core.system.interfaces import SigmaModuleBase
-
-class IntegrityGuard:
-    pass
+"""
+SigmaOS Modular Shim for _IntegrityGuard_core.py
+"""
+from ._IntegrityGuard_core._IntegrityGuard_core import IntegrityGuard # noqa

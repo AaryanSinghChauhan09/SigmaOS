@@ -1,8 +1,4 @@
-# Generated class core: SigmaAppPrewarmer
-import time
-import uuid
-import threading
-from typing import Dict, List, Any, Optional
-
-class SigmaAppPrewarmer:
-    pass
+"""
+SigmaOS Modular Shim for _SigmaAppPrewarmer_core.py
+"""
+from ._SigmaAppPrewarmer_core._SigmaAppPrewarmer_core import SigmaAppPrewarmer # noqa

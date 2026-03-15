@@ -1,8 +1,4 @@
-# Generated file: launch
-import tkinter as tk
-from tkinter import ttk
-import time, threading
-from typing import Any
-
-def launch(kernel=None):
-    SigmaStopwatch(kernel).mainloop()
+"""
+SigmaOS Modular Shim for launch.py
+"""
+from .launch.launch import launch # noqa

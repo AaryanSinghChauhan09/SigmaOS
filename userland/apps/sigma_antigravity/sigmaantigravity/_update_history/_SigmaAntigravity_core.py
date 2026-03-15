@@ -1,8 +1,4 @@
-# Generated class core: SigmaAntigravity
-import tkinter as tk
-from tkinter import ttk, scrolledtext, messagebox
-import threading, webbrowser, urllib.parse, json, os, time, sys
-from typing import Dict, Any, List, Optional
-
-class SigmaAntigravity:
-    pass
+"""
+SigmaOS Modular Shim for _SigmaAntigravity_core.py
+"""
+from ._SigmaAntigravity_core._SigmaAntigravity_core import SigmaAntigravity # noqa

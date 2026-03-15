@@ -1,8 +1,4 @@
-# Generated class core: AdaptiveEnergyController
-import time
-import random
-import threading
-from typing import Dict, Any
-
-class AdaptiveEnergyController:
-    pass
+"""
+SigmaOS Modular Shim for _AdaptiveEnergyController_core.py
+"""
+from ._AdaptiveEnergyController_core._AdaptiveEnergyController_core import AdaptiveEnergyController # noqa

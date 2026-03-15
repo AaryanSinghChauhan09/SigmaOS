@@ -1,8 +1,4 @@
-# Generated class core: SigmaCAAT
-from enum import Enum
-import time
-import random
-from dataclasses import dataclass, field
-
-class SigmaCAAT:
-    pass
+"""
+SigmaOS Modular Shim for _SigmaCAAT_core.py
+"""
+from ._SigmaCAAT_core._SigmaCAAT_core import SigmaCAAT # noqa

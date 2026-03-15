@@ -1,10 +1,4 @@
-# Generated class core: DuplicateFinder
-import tkinter as tk
-from tkinter import ttk, filedialog, messagebox
-import os
-import time
-import hashlib
-from pathlib import Path
-
-class DuplicateFinder:
-    pass
+"""
+SigmaOS Modular Shim for _DuplicateFinder_core.py
+"""
+from ._DuplicateFinder_core._DuplicateFinder_core import DuplicateFinder # noqa

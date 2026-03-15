@@ -1,7 +1,4 @@
-# Generated class core: SigmaCompetitorIntelligence
-import time
-import random
-from typing import Dict, List, Any
-
-class SigmaCompetitorIntelligence:
-    pass
+"""
+SigmaOS Modular Shim for _SigmaCompetitorIntelligence_core.py
+"""
+from ._SigmaCompetitorIntelligence_core._SigmaCompetitorIntelligence_core import SigmaCompetitorIntelligence # noqa

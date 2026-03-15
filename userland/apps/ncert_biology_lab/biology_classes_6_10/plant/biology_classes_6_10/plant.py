@@ -1,9 +1,4 @@
-# Generated method: Biology_Classes_6_10.plant
-import math, random
-
-class Biology_Classes_6_10:
-    @staticmethod
-    def plant(l, r):
-        if 'dicot' in l.lower() or 'tap' in r.lower():
-            return {'Type': 'DICOT'}
-        return {'Type': 'MONOCOT'}
+"""
+SigmaOS Modular Shim for plant.py
+"""
+from .plant._Biology_Classes_6_10_core import Biology_Classes_6_10 # noqa

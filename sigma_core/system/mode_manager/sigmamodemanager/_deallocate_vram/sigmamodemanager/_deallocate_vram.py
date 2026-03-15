@@ -1,8 +1,4 @@
-# Generated method: SigmaModeManager._deallocate_vram
-from typing import Dict, List, Any, Callable, Optional
-import time
-
-class SigmaModeManager:
-    def _deallocate_vram(self, phase: str='') -> str:
-        """Simulates deallocating VRAM."""
-        return 'VRAM deallocated.'
+"""
+SigmaOS Modular Shim for _deallocate_vram.py
+"""
+from ._deallocate_vram._SigmaModeManager_core import SigmaModeManager # noqa

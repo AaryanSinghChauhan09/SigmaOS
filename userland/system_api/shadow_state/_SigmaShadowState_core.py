@@ -1,8 +1,4 @@
-# Generated class core: SigmaShadowState
-import time
-import copy
-import threading
-from typing import Dict, Any
-
-class SigmaShadowState:
-    pass
+"""
+SigmaOS Modular Shim for _SigmaShadowState_core.py
+"""
+from ._SigmaShadowState_core._SigmaShadowState_core import SigmaShadowState # noqa
