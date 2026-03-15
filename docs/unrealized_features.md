@@ -18,10 +18,5 @@ This roadmap lists high-potential features derived from competitor models and so
 *   **Concept**: Moving configuration to a lattice-based encryption model.
 *   **USP**: "Unbreakable State" - ensuring OS configuration remains secure even against future quantum computing threats.
 
-## 5. Federated Intelligence Distillation
-*   **Concept**: Training local AI models on user behavior data without data leaving the machine.
-*   **USP**: "Personalized Growth" - The OS becomes smarter the more the user interacts, learning complex workflows through silent observation (Markov++).
-
-## 6. BIOS-Level Apex Integration
-*   **Concept**: Moving the SigmaCore closer to hardware.
-*   **USP**: "Immutable Boot" - A tiny Rust-based shim that verifies the entire kernel integrity before the main boot sequence.
+*   **Concept**: Casting the OS UI into 3D environments via spatial computing.
+*   **USP**: "Dimensional Overlay" - The OS becomes a spatial agent, projecting widgets and tools onto the physical environment via AR/VR shims.

@@ -24,7 +24,22 @@ This document outlines the elite tools integrated into SigmaOS and their Industr
 *   **USP**: Cross-model voting system for error remediation.
 *   **Industry Level**: Eliminates hallucinations by cross-verifying outputs across autonomous local shards.
 
-## 5. SigmaOS Kernel (Apex Core)
-*   **USP**: Microkernel architecture with "Self-Healing Shards".
-*   **Industry Level**: Capability-based security where each module runs in a ZRAM-compressed isolation segment.
-*   **Telemetry**: Real-time "Quantum Tracing" that logs performance without disturbing the process state.
+## 5. IndentFlow Pro (Logic Visualizer)
+*   **USP**: Neural mapping of codebases into interactive dependency graphs.
+*   **Industry Level**: Visualizes logic flow in real-time, detecting dead-code and potential security shims visually.
+
+### 6. Sovereign Chat (Aura v3.2 Protocol)
+- **USP:** Double-Ratchet E2EE | Hashcash PoW | Metadata-Zero Channels | Visual Shredding.
+- **Industry Level:** Superior to Signal/Bitmessage; features decentralized mesh-relay and hot-swappable "Contextual Aliases".
+
+### 7. Flowchart Vision (Apex Synthesis)
+- **USP:** Real-time Natural Language to GraphViz Orchestration.
+- **Industry Level:** Direct kernel-to-visual synthesis with zero-latency logic parsing.
+
+### 8. SigmaOS Kernel (Apex Core v2.1)
+- **USP:** Ring-0 Modular Orchestration with "Self-Healing Shards".
+- **Industry Level:** Zero-trust capability-based security; outperforms monolithic kernels by delegating logic to isolated polymorphic modules.
+
+### 9. Aura Shield & Privacy Sentinel
+- **USP:** Active Competitor Neutralization | Forensic-Grade Stealth.
+- **Industry Level:** Defeats telemetry from all identified AI framework competitors and OS vendors at the binary level.

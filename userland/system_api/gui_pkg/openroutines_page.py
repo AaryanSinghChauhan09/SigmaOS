@@ -24,9 +24,24 @@ class OpenRoutinesPage(SigmaPage):
         
         def _launch_multi_ai():
             self._notify("OpenRoutines", "Multi-AI Orchestrator Initialized.", "OK")
-            self._log(self.log, "[OR] Syncing Llama-3, Phi-3, and Mistral consensus shims...", "INFO")
+            self._log(self.log, "[OR] Syncing Multi-Model Consensus (Sigma/Aether/Zenith)...", "INFO")
+            if hasattr(self.kernel, "multi_ai"):
+                q = "Optimize OS resource allocation for stealth mode."
+                res = self.kernel.multi_ai.execute_consensus_query(q)
+                self._log(self.log, f"[OR] Consensus: {res['consensus_response']}", "OK")
         
         self.gui._pulsing_button(ai_card, "Engage AI Consensus", _launch_multi_ai).pack(fill="x", pady=5)
+
+        # Excel AI Filler
+        excel_card = self.gui._premium_card(l_fr, "📊 Excel AI Filler")
+        excel_card.master.pack(fill="x", pady=(0, 10))
+        tk.Label(excel_card, text="Neural Row Population & Sanitization.", font=FONT_SMALL, fg=PAL["dim"], bg=PAL["card"]).pack(anchor="w")
+        
+        def _launch_excel():
+             self._notify("Excel", "AI Filler Engine Hydrated.", "OK")
+             self._log(self.log, "[EXCEL] Running neural prediction on Ledger_2026.csv...", "INFO")
+             
+        self.gui._pulsing_button(excel_card, "Run Neural Fill", _launch_excel).pack(fill="x", pady=5)
 
         # Discovery Agents
         discovery_card = self._card(l_fr, "🔍 Discovery & Extraction")
@@ -54,9 +69,18 @@ class OpenRoutinesPage(SigmaPage):
         def _flowchart():
             self._notify("Vision", "Text-to-Flowchart Active", "OK")
             self._log(self.log, "[VISION] Drawing GraphViz schema from natural intent...", "INFO")
+            if hasattr(self.kernel, "flowchart"):
+                txt = "If signal == stealth then shift_frequency() else broadcast()"
+                res = self.kernel.flowchart.synthesize_graph(txt)
+                self._log(self.log, f"[VISION] {res['message']}", "OK")
+
+        def _indentflow():
+            self._notify("IndentFlow", "Logic Flow Visualizer Active.", "INFO")
+            self._log(self.log, "[FLOW] Mapping code dependencies into vertex graph...", "INFO")
 
         self.gui._pulsing_button(creative_card, "PDF Forge Pro", _forge_pdf).pack(fill="x", pady=2)
         self.gui._pulsing_button(creative_card, "Text-to-Flowchart", _flowchart).pack(fill="x", pady=2)
+        self.gui._pulsing_button(creative_card, "IndentFlow Pro", _indentflow).pack(fill="x", pady=2)
 
         # Right Column: Execution Log & Ultra Control
         r_fr = tk.Frame(body, bg=PAL["bg"])

@@ -94,6 +94,7 @@ from gui_pkg.dashboard_page import DashboardPage
 from gui_pkg.aether_page import AetherPage
 from gui_pkg.claw_page import ClawPage
 from gui_pkg.openroutines_page import OpenRoutinesPage
+from gui_pkg.chat_page import SigmaChatPage
 
 class SigmaGUI(tk.Tk, UIMixin, PremiumUIMixin):
     """Main SigmaOS GUI application window with Premium UI extensions."""
@@ -314,6 +315,7 @@ class SigmaGUI(tk.Tk, UIMixin, PremiumUIMixin):
         self.bind_all("<Alt-p>", lambda e: self._show_page("analytics_page"))
         self.bind_all("<Alt-v>", lambda e: self._notify("CLIPBOARD", "Sovereign Clipboard History: No PII detected.", "INFO"))
         self.bind_all("<Alt-w>", lambda e: self._show_page("intelligence_hub"))
+        self.bind_all("<Alt-c>", lambda e: self._show_page("sovereign_chat"))
 
         # --- SigmaOS Originals ---
         self.bind("<Control-k>", lambda e: self._show_spotlight())
@@ -838,6 +840,7 @@ class SigmaGUI(tk.Tk, UIMixin, PremiumUIMixin):
             "writesense":      lambda: self._set_modular_page("writesense", WritesensePage),
             "flow":            lambda: self._set_modular_page("flow", FlowPage),
             "sovereign_claw":  lambda: self._set_modular_page("sovereign_claw", ClawPage),
+            "sovereign_chat":  lambda: self._set_modular_page("sovereign_chat", SigmaChatPage),
         }
         
         # Oracle VM Discovery (Professional Integration)
@@ -898,7 +901,7 @@ class SigmaGUI(tk.Tk, UIMixin, PremiumUIMixin):
             ("🧘", "wellness"), ("🚀", "enterprise"), ("🌌", "aether"), ("🎮", "gaming_hub"),
             ("🎓", "gurukul_academy"), ("⚖️", "compliance_center"), ("🧠", "brain"), 
             ("⚡", "zenith"), ("📧", "gmail_ai"), ("🎨", "visual_customizer"), ("💠", "ag_guide"),
-            ("🦅", "sovereign_claw")
+            ("🦅", "sovereign_claw"), ("🔒", "sovereign_chat")
         ]
         for icon, page in pins:
             b = tk.Button(self._task_tray, text=icon, font=("Segoe UI Symbol", 14),
