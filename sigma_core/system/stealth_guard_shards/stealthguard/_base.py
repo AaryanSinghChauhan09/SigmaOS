@@ -1,13 +1,4 @@
-# Part of SigmaOS Omega - (High Cohesion, Loose Coupling)
-# Principle: Single Responsibility per File
-
-from abc import ABC, abstractmethod
-from .base_sovereign import SigmaModule
-
-class StealthGuard(SigmaModule):
-    """
-    Stealth Mode for Privacy-Focused Users (USP)
-    -------------------------------------------
-    Disables all telemetry, randomizes shard execution order,
-    and enables encrypted memory padding.
-    """
+"""
+SigmaOS Apex Shim (v9.0)
+"""
+from ._shards.stealthguard._base import StealthGuard

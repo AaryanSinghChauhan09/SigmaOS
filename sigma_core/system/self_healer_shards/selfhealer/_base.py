@@ -1,13 +1,4 @@
-# Part of SigmaOS Omega - (High Cohesion, Loose Coupling)
-# Principle: Single Responsibility per File
-
-from abc import ABC, abstractmethod
-import importlib
-from .base_sovereign import SigmaModule
-
-class SelfHealer(SigmaModule):
-    """
-    SigmaOS Self-Healing Engine
-    --------------------------
-    Detects shard failures and attempts to re-initialize or reload them.
-    """
+"""
+SigmaOS Apex Shim (v9.0)
+"""
+from ._shards.selfhealer._base import SelfHealer

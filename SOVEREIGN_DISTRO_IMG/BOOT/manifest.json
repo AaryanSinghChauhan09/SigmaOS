@@ -1,9 +1,0 @@
-{
-    "OS_NAME": "SigmaOS Sovereign",
-    "VERSION": "2.0.0-APEX",
-    "ARCHITECTURE": "x86_64 / ARM64 Hybrid",
-    "BOOT_ENTRY": "sigma.py",
-    "KERNEL_LINK": "NATIVE_LINKED",
-    "USERLAND_MODEL": "DISTRIBUTED_API",
-    "SECURITY_GRADE": "TITAN_ZERO_TRUST"
-}

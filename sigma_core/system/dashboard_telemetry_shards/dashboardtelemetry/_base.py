@@ -1,13 +1,4 @@
-# Part of SigmaOS Omega - (High Cohesion, Loose Coupling)
-# Principle: Single Responsibility per File
-
-from abc import ABC, abstractmethod
-from .base_sovereign import SigmaModule
-import json
-
-class DashboardTelemetry(SigmaModule):
-    """
-    Visualized System Analytics Dashboard (USP)
-    -------------------------------------------
-    Aggregates realtime metrics from all shards into a visualized JSON stream.
-    """
+"""
+SigmaOS Apex Shim (v9.0)
+"""
+from ._shards.dashboardtelemetry._base import DashboardTelemetry
