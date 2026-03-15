@@ -36,6 +36,7 @@ class SigmaKernel:
     """
 
     def __init__(self, auto_load: bool = True):
+        self._root = os.path.abspath(os.path.join(os.path.dirname(__file__), ".."))
         self.cfg = SigmaConfig()
         self.bus = EventBus()
         self.registry = ModuleRegistry()
@@ -70,7 +71,6 @@ class SigmaKernel:
         
         self.os_name = self.cfg.OS_NAME
         self.version = self.cfg.VERSION
-        self._root = os.path.abspath(os.path.join(os.path.dirname(__file__), ".."))
 
         # Bootstrap: Run native priority layers
         self._low_level_init()
@@ -144,6 +144,7 @@ class SigmaKernel:
     def health_check(self) -> dict:
         return {
             "status": "ONLINE",
+            "kernel": "ONLINE",
             "version": self.version,
             "shards": self.registry.health_check()
         }

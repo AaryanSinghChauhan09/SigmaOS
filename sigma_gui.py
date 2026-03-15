@@ -89,6 +89,7 @@ from gui_pkg.project_center import ProjectCenterPage
 from gui_pkg.law_page import LawPage
 from gui_pkg.buyhatke_page import BuyhatkePage
 from gui_pkg.dashboard_page import DashboardPage
+from gui_pkg.aether_page import AetherPage
 
 class SigmaGUI(tk.Tk, UIMixin):
     """Main SigmaOS GUI application window."""
@@ -833,6 +834,7 @@ class SigmaGUI(tk.Tk, UIMixin):
             "ag_physics":       lambda: self._set_modular_page("ag_physics", AGPhysicsPage),
             "visual_customizer": lambda: self._set_modular_page("visual_customizer", CustomizerPage),
             "gmail_ai":         lambda: self._set_modular_page("gmail_ai", GmailAIPage),
+            "aether":           lambda: self._set_modular_page("aether", AetherPage),
             "sovereign_suite":  lambda: self._set_modular_page("sovereign_suite", SovereignLabPage),
             "network_vanguard": lambda: self._set_modular_page("network_vanguard", VanguardPage),
             "intelligence_studio": lambda: self._set_modular_page("intelligence_studio", IntelligenceHubPage),
@@ -1456,6 +1458,9 @@ class SigmaGUI(tk.Tk, UIMixin):
             ("zenith",         "🚀",  "Zenith AI"),
             ("terminal",       "💻",  "Terminal"),
             ("system_audit",   "⚖️",  "Audit"),
+            ("search",         "🔍",  "Search"),
+            ("law_pro",        "⚖️",  "Lawyer"),
+            ("buyhatke",       "🛒",  "BuyHatke"),
             ("virtualbox",     "🖥️",  "Virtual"),
             ("war_room",       "⚔️",  "War Room"),
             ("mail_orchestrator", "📧", "MailMerge"),
@@ -6952,114 +6957,6 @@ class SigmaGUI(tk.Tk, UIMixin):
 
 
 
-    def _build_aether_page(self):
-        """USP: Sovereign Aether - Intelligence Mutation & Federated Knowledge Distillation."""
-        p = self._create_page("aether")
-        self._set_header(p, "Sovereign Aether", "Hyper-Dynamic Kernel Mutation & Federated AI Mesh")
-        
-        main = tk.Frame(p, bg=PAL["bg"])
-        main.pack(fill="both", expand=True, padx=40, pady=20)
-        
-        # Grid layout
-        left = tk.Frame(main, bg=PAL["bg"])
-        left.pack(side="left", fill="both", expand=True, padx=(0, 20))
-        
-        right = tk.Frame(main, bg=PAL["bg"])
-        right.pack(side="right", fill="both", expand=True)
-
-        # 1. Kernel Mutation Control
-        mut_card = self._create_card(left, "CORE MUTATION (ASLR++)")
-        stats = self.kernel.get_leadership_stats()
-        mut_id = stats.get("Mutation_ID", "STABLE")
-        
-        tk.Label(mut_card, text=f"Active Mutation ID: {mut_id}", font=FONT_MONO, fg=PAL["cyan"], bg=PAL["bg2"]).pack(pady=10)
-        
-        def _mutate():
-            new_id = self.kernel.mutate_kernel_state()
-            self._notify("AETHER", f"Kernel layout mutated: {new_id}", "OK")
-            self._show_page("aether") 
-            
-        tk.Button(mut_card, text="FORCE KERNEL MUTATION", bg=PAL["accent"], fg="white", 
-                  relief="flat", padx=20, pady=10, command=_mutate).pack(pady=10)
-
-        # 2. Merkle Integrity Audit
-        audit_card = self._create_card(left, "MERKLE TREE INTEGRITY SHIELD")
-        tk.Label(audit_card, text="Validating Ring-0 binaries against Merkle root...", 
-                 font=FONT_SMALL, fg=PAL["text"], bg=PAL["bg2"]).pack(pady=5)
-        
-        def _run_audit():
-            res = self.kernel.verify_merkle_integrity(_ROOT)
-            status = "VERIFIED" if res else "INTEGRITY_COMPROMISED"
-            self._notify("SECURITY", f"Merkle Audit: {status}", "OK" if res else "ERR")
-            
-        tk.Button(audit_card, text="SCAN KERNEL INTEGRITY", bg=PAL["bg3"], fg=PAL["cyan"], 
-                  relief="flat", padx=20, pady=10, command=_run_audit).pack(pady=10)
-
-        # 3. Federated Intelligence (New USP principle)
-        intel_card = self._create_card(right, "FEDERATED KNOWLEDGE DISTILLATION")
-        tk.Label(intel_card, text="Distilling intelligence from local mirrors (W3Schools/GFG) securely.", 
-                 font=FONT_SMALL, fg=PAL["text"], bg=PAL["bg2"]).pack(pady=5)
-        
-        def _distill():
-            self.kernel.initiate_federated_distillation()
-            self._notify("AI MESH", "Distillation protocol initialized at Edge.", "INFO")
-            
-        tk.Button(intel_card, text="START LOCAL DISTILLATION", bg=PAL["green"], fg="white", 
-                  relief="flat", padx=20, pady=10, command=_distill).pack(pady=10)
-
-        # 4. OS Principle: Capability-Based Security
-        cap_card = self._create_card(right, "CAPABILITY-BASED TOKENS")
-        tk.Label(cap_card, text="Process Isolation Level: STRATOSPHERE (Ring -1 Equivalent)", 
-                 font=FONT_SMALL, fg=PAL["dim"], bg=PAL["bg2"]).pack(pady=5)
-        
-        # 5. AI Principle: Predictive Navigation (Markov Chain)
-        pred_card = self._create_card(right, "AI PREDICTIVE NAVIGATION")
-        pred_next = self.kernel.predict_user_intent(self._history)
-        tk.Label(pred_card, text=f"Predicted Next Destination: {pred_next.upper()}", 
-                 font=FONT_BOLD, fg=PAL["accent"], bg=PAL["bg2"]).pack(pady=10)
-        
-        # 6. OS Principle: Heisenberg Resource Tracer
-        h_card = self._create_card(left, "HEISENBERG RESOURCE TRACER")
-        tel = self.kernel.get_quantum_telemetry()
-        for k, v in tel.items():
-            tk.Label(h_card, text=f"{k}: {v}", font=FONT_MONO, fg=PAL["gold"], bg=PAL["bg2"]).pack(anchor="w")
-
-        # 7. Mirror Enrichment (Syncing W3Schools/GFG into AI)
-        sync_card = self._create_card(left, "MIRROR KNOWLEDGE ENRICHMENT")
-        tk.Label(sync_card, text="Syncing W3Schools/GFG mirrors into local AI weights...", 
-                 font=FONT_SMALL, fg=PAL["text"], bg=PAL["bg2"]).pack(pady=5)
-        
-        def _enrich():
-            res = self.kernel.initiate_federated_distillation()
-            self._notify("ENRICHMENT", f"Knowledge Distillation: {res}", "OK")
-            
-        tk.Button(sync_card, text="ENRICH INTELLIGENCE HUB", bg=PAL["cyan"], fg="black", 
-                  relief="flat", padx=20, pady=5, command=_enrich).pack(pady=10)
-
-        # 8. USP: Sovereign Competitor Crusher (v2.0 Apex)
-        crush_card = self._create_card(right, "COMPETITOR CRUSHER ENGINE")
-        c_stats = self.kernel.crusher.defeat_status
-        tk.Label(crush_card, text=f"Telemetery Blocked: {c_stats['telemetry_blocked']}", font=FONT_SMALL, fg=PAL["text"], bg=PAL["bg2"]).pack(anchor="w")
-        tk.Label(crush_card, text=f"Stealth Grade: {c_stats['stealth_score']}%", font=FONT_BOLD, fg=PAL["green"], bg=PAL["bg2"]).pack(anchor="w")
-        
-        def _run_crush():
-            res = self.kernel.crusher.start_crusher_engine()
-            self._notify("CRUSHER", res, "OK")
-            self._show_page("aether")
-            
-        tk.Button(crush_card, text="ENGAGE CRUSHER SHIELDS", bg="#440000", fg="white", 
-                  relief="flat", padx=20, pady=10, command=_run_crush).pack(pady=10)
-
-        # 9. USP: Neural Content Sanitizer (Child-Safe Mode)
-        safe_card = self._create_card(left, "NEURAL CONTENT SANITIZER")
-        tk.Label(safe_card, text="Permanently enforces child-safe mode across all modules.", 
-                 font=FONT_SMALL, fg=PAL["dim"], bg=PAL["bg2"]).pack(pady=5)
-        
-        def _scan_nlp():
-            self._notify("SANITIZER", "NLP Integrity Scan: 100% SECURE", "OK")
-            
-        tk.Button(safe_card, text="RUN NLP INTEGRITY SCAN", bg=PAL["teal"], fg="white", 
-                  relief="flat", padx=20, pady=5, command=_scan_nlp).pack(pady=10)
 
     def _build_linux_parity_page(self):
         """USP: Linux Parity (Kali/Arch/Debian) — Direct process-level comparison."""

@@ -17,8 +17,11 @@ import time
 # ── Windows: enable UTF-8 output and VT100 ANSI colors ──────────────────────
 if sys.platform == "win32":
     import io
-    sys.stdout = io.TextIOWrapper(sys.stdout.buffer, encoding="utf-8", errors="replace")
-    sys.stderr = io.TextIOWrapper(sys.stderr.buffer, encoding="utf-8", errors="replace")
+    # Only wrap if not already wrapped to avoid 'I/O operation on closed file'
+    if not isinstance(sys.stdout, io.TextIOWrapper):
+        sys.stdout = io.TextIOWrapper(sys.stdout.buffer, encoding="utf-8", errors="replace")
+    if not isinstance(sys.stderr, io.TextIOWrapper):
+        sys.stderr = io.TextIOWrapper(sys.stderr.buffer, encoding="utf-8", errors="replace")
     import ctypes
     try:
         kernel32 = ctypes.windll.kernel32

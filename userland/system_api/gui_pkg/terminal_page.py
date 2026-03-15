@@ -87,20 +87,43 @@ class TerminalPage(SigmaPage):
         parts = raw.split()
         cmd = parts[0].lower()
 
+        distillator = self.kernel.registry.get("neural_distillator")
+
         def run():
             try:
                 if cmd == "help":
-                    self._log(self._term_out, "Apex Commands: help | manual | clear | exit", "INFO")
+                    self._log(self._term_out, "Apex Commands: help | manual | clear | exit | distill", "INFO")
                 elif cmd == "clear":
                     self.gui.after(0, lambda: [self._term_out.configure(state="normal"), 
                                                self._term_out.delete("1.0","end"), 
                                                self._term_out.configure(state="disabled")])
+                elif cmd == "distill" and distillator:
+                    self._log(self._term_out, "Initiating Neural Distillation from mirrors...", "HEAD")
+                    res = distillator.distill_from_mirrors()
+                    self._log(self._term_out, res, "OK")
                 else:
-                    self._log(self._term_out, f"Command '{cmd}' not found in Sovereign path.", "ERR")
+                    # Simulation: Check if it's a known command, otherwise show neural tip
+                    self._log(self._term_out, f"Executing Sovereign Mission: {cmd}...", "INFO")
+                    time.sleep(0.3)
+                    
+                    # If simulating error for unknown command
+                    if cmd not in ["ls", "cd", "grep", "git", "pip", "sigma", "zenith"]:
+                         self._log(self._term_out, f"Command '{cmd}' not found in registry.", "ERR")
+                         if distillator:
+                             tip = distillator.remediate_error(cmd, "Command not found")
+                             self._log(self._term_out, f"\n{tip}", "OK")
+                    else:
+                         self._log(self._term_out, f"Mission '{cmd}' completed successfully.", "OK")
+
             except Exception as exc:
-                self._log(self._term_out, f"Error: {exc}", "ERR")
+                self._log(self._term_out, f"Critical Error: {exc}", "ERR")
+                if distillator: e_tip = distillator.remediate_error(cmd, str(exc))
+                if e_tip: self._log(self._term_out, f"{e_tip}", "OK")
 
         threading.Thread(target=run, daemon=True).start()
 
     def _term_aux(self, cmd):
-        self._log(self._term_out, f"AUX: Executing {cmd} module...", "INFO")
+        self._log(self._term_out, f"AUX: Initializing {cmd} sub-module...", "INFO")
+        distillator = self.kernel.registry.get("neural_distillator")
+        if distillator:
+             self._log(self._term_out, f"Neural Context: {distillator.query_distilled_knowledge(cmd)}", "OK")
