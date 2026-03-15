@@ -168,44 +168,234 @@ To achieve 100% compliance when using **Google Stitch** to generate your screens
 
 ---
 
-## 🏎️ 8. Performance Guidelines (144Hz Target/Zero-Jitter)
+## 🏎️ 8. Performance Guidelines (144Hz Target / Zero-Jitter)
 
 The user experience in SigmaOS must never feel sluggish. Google Stitch code must adhere to strict render guidelines.
 
-* **Transition Limitations:** Limit transitions to `opacity` and `transform` properties only. NEVER animate `height`, `width`, `margin`, `padding`, or `box-shadow` across layout shifts (doing so triggers slow GPU repaints).
+* **Transition Limitations:** Limit transitions to `opacity` and `transform` properties only. NEVER animate `height`, `width`, `margin`, `padding`, or `box-shadow` across layout shifts.
 * **Timing Functions:** Default timing curve should be a sharp, mechanical ease: `transition: all 150ms cubic-bezier(0.2, 0.8, 0.2, 1)`. Nothing should feel "floaty".
-* **State Changes:** When clicking a button or checkbox, the background-color change should be close to instantaneous (`50ms`). 
+* **State Changes:** When clicking a button or checkbox, the background-color change should be instantaneous (`50ms`).
 
-### Performance Stitch Prompt Addendum:
-*"Ensure all CSS transitions strictly target 'opacity' and 'transform' to avoid layout thrashing. Set default transition times to 100ms-150ms using a sharp cubic-bezier curve. Interactions must feel instant and mechanical, with zero floatiness."*
+**Stitch Prompt Addendum:** *"Ensure all CSS transitions strictly target 'opacity' and 'transform' to avoid layout thrashing. Set default transition times to 100ms-150ms using a sharp cubic-bezier curve. Interactions must feel instant and mechanical, with zero floatiness."*
 
 ---
 
 ## ♿ 9. Accessibility & Machine Readability
 
-For a UI to be truly "Automation Friendly" for Antigravity or AI Assistants, it must also be highly accessible. The AI crawler is effectively a screen reader on steroids.
+For a UI to be truly "Automation Friendly" for Antigravity or AI Assistants, it must also be highly accessible.
 
-* **Mandatory ARIA:** Every non-text visual element (like the taskbar SVGs) MUST have an `aria-label` describing it (e.g., `aria-label="System Clock"` or `aria-label="Battery Status"`).
-* **Tab Navigability:** `tabindex="0"` should be explicitly managed. The user (or the AI) should be able to tab through an entire application sequentially without using a mouse. 
-* **Focus States:** The `:focus-visible` pseudo-class should throw a prominent (2px to 3px) solid cyan outline around the currently focused node. 
+* **Mandatory ARIA:** Every non-text visual element MUST have an `aria-label` (e.g., `aria-label="System Clock"` or `aria-label="Battery Status"`).
+* **Tab Navigability:** `tabindex="0"` should be explicitly managed. The user (or the AI) should be able to tab through an entire application sequentially without a mouse.
+* **Focus States:** The `:focus-visible` pseudo-class should throw a prominent (2px to 3px) solid cyan outline around the currently focused node.
 
-### Accessibility Stitch Prompt Addendum:
-*"All interactive elements must be fully keyboard accessible using logical tab indices. Include descriptive 'aria-label' attributes for all SVG icons. Ensure focused states use a prominent 2px solid #00FFD2 outline across all input components."*
+**Stitch Prompt Addendum:** *"All interactive elements must be fully keyboard accessible using logical tab indices. Include descriptive 'aria-label' attributes for all SVG icons. Ensure focused states use a prominent 2px solid #00FFD2 outline across all input components."*
 
 ---
 
 ## 📐 10. Iconography & SVG Directives
 
-There are no PNG or JPG assets in SigmaOS. 
+There are no PNG or JPG assets in SigmaOS.
 
-* **Inline SVG ONLY:** Stitch must generate raw `<svg>` tags directly in the React or HTML return statement. 
+* **Inline SVG ONLY:** Stitch must generate raw `<svg>` tags directly in the React or HTML return statement.
 * **Stroke over Fill:** Cyberpunk icons should primarily use `stroke="currentColor"` rather than filled shapes. Stroke-width should default to `1.5` or `2`.
 * **Crisp Geometry:** Avoid overly complex organic curves. Stick to geometric shapes, sharp angles, and tech-like intersecting lines.
 
-### SVG Stitch Prompt Addendum:
-*"Do not use external image URLs. Generate all icons as crisp, minimalist inline SVGs using geometric shapes. Apply 'stroke=\"currentColor\"' with a stroke-width of 1.5, avoiding filled organic shapes or heavy solid blocks."*
+**Stitch Prompt Addendum:** *"Do not use external image URLs. Generate all icons as crisp, minimalist inline SVGs using geometric shapes. Apply stroke='currentColor' with a stroke-width of 1.5, avoiding filled organic shapes or heavy solid blocks."*
+
+---
+
+## 🏗️ 11. Layout & Workspace Customization Modes
+
+SigmaOS supports multiple workspace layout presets, each fully swappable via CSS class assignment on the root `<body>` element.
+
+### Preset Layout Tokens
+
+| Layout Token | Description | Ideal Use Case |
+| --- | --- | --- |
+| `sigma-layout-default` | Shard Grid — equal-weight panels | General productivity |
+| `sigma-layout-focus` | Single maximized panel, no sidebar | Deep work / coding |
+| `sigma-layout-split` | 50/50 horizontal dual pane | Side-by-side comparing |
+| `sigma-layout-terminal` | Full-screen terminal, minimal chrome | Developer / SSH sessions |
+| `sigma-layout-dashboard` | Masonry grid of live-data shards | System monitoring |
+| `sigma-layout-edu` | Large content area, nav on left | NCERT Virtual Labs |
+| `sigma-layout-gaming` | Fullscreen canvas, zero taskbar | Gaming Mode |
+| `sigma-layout-minimal` | Borderless, no decorations | Presentation / stealth |
+
+### Layout Customization Variables
+
+```css
+:root {
+  --sigma-layout-cols: 12;           /* Number of grid columns (3-24) */
+  --sigma-layout-rows: auto;         /* Grid row sizing */
+  --sigma-sidebar-width: 240px;      /* Left sidebar width (collapsible) */
+  --sigma-taskbar-size: 32px;        /* Taskbar height/width */
+  --sigma-panel-gap: 1px;            /* Gap between Shard Grid panels */
+  --sigma-shard-padding: 1.5rem;     /* Inner padding of all panels */
+  --sigma-content-max-width: 1800px; /* Max content container width */
+}
+```
+
+**Stitch Prompt:** *"Generate a workspace layout engine that reads `data-sigma-layout` from the `<body>` tag and applies the appropriate CSS grid configuration. The layout must be GPU-composited, using only CSS Grid, with no JavaScript layout recalculation."*
+
+---
+
+## 🔔 12. Notification & Alert System Design
+
+Notifications in SigmaOS are sovereign — non-intrusive, ephemeral, and never spawn a full DOM modal unless the action is critical.
+
+### Notification Variants
+
+| Variant | Color | Duration | Trigger |
+| --- | --- | --- | --- |
+| `info` | `#00FFD2` (Cyan) | 3s auto-dismiss | Routine system events |
+| `success` | `#00FF00` (Green) | 2s auto-dismiss | Task completion |
+| `warning` | `#FFB800` (Amber) | 5s, requires dismiss | Anomaly detection |
+| `critical` | `#FF0055` (Red) | Persistent until ACK | System integrity failure |
+| `agent` | `#8A2BE2` (Violet) | 4s auto-dismiss | AI agent activity |
+
+### Notification Anatomy
+
+* **Position:** Anchored to the **bottom-right** corner. Stacks vertically upward.
+* **Width:** Fixed `320px`. Never expands.
+* **Structure:** Icon (inline SVG) + short title (`font-weight: 700`) + optional muted body text (2-line max).
+* **Entry animation:** Slides in from right via `translateX` over `200ms ease-out`.
+* **Exit animation:** Fades out with `opacity: 0` over `150ms`.
+
+```css
+.sigma-toast {
+  position: fixed;
+  bottom: calc(var(--sigma-taskbar-size) + 1rem);
+  right: 1rem;
+  width: 320px;
+  background: var(--sigma-surface);
+  border-left: 3px solid var(--sigma-accent-primary);
+  padding: 0.75rem 1rem;
+  font-family: var(--sigma-font-mono);
+  animation: sigma-toast-in 200ms ease-out forwards;
+}
+
+@keyframes sigma-toast-in {
+  from { transform: translateX(calc(100% + 1rem)); opacity: 0; }
+  to   { transform: translateX(0); opacity: 1; }
+}
+```
+
+**Stitch Prompt:** *"Create a lightweight toast notification system with 5 severity variants. Notifications must be bottom-right anchored, 320px wide, and animate in via translateX. Each variant uses a distinct left-border accent color. Include a data-sigma-toast-type attribute on each."*
+
+---
+
+## 🎮 13. Gaming Mode UI Overlay
+
+When `sigma-layout-gaming` is active, the interface collapses to an ultra-thin HUD overlay.
+
+### HUD Layout Rules
+
+* **Taskbar:** Collapses from 32px to `0px`. A micro-HUD strip (18px tall) anchors to the top-right.
+* **Notifications:** Completely suppressed. All alerts are queued to a post-session review log.
+* **FPS Counter:** A live-streaming text node. Muted `#606060` unless FPS drops below 30, then flashes `#FF0055`.
+* **Resource Meter:** A 2px CSS progress bar. Color interpolates from `#00FF00` (low) to `#FF0055` (high load).
+
+```css
+body.sigma-layout-gaming .sigma-taskbar { height: 0; overflow: hidden; }
+
+body.sigma-layout-gaming .sigma-hud {
+  position: fixed;
+  top: 8px;
+  right: 8px;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-family: var(--sigma-font-mono);
+  font-size: 10px;
+  color: var(--sigma-text-muted);
+  pointer-events: none;
+  z-index: 9999;
+}
+```
+
+---
+
+## 🖥️ 14. Multi-Display & Responsive Breakpoints
+
+Every breakpoint is handled entirely via CSS custom properties and media queries — no JavaScript layout engine.
+
+### Breakpoint Map
+
+```css
+/* Small (Mobile/Tablet) - NCERT Educational Device Target */
+@media (max-width: 768px) {
+  :root {
+    --sigma-sidebar-width: 0px;
+    --sigma-shard-padding: 0.75rem;
+    --sigma-layout-cols: 4;
+    --sigma-font-size-base: 13px;
+  }
+}
+
+/* Medium (Standard Laptop) */
+@media (min-width: 769px) and (max-width: 1440px) {
+  :root {
+    --sigma-sidebar-width: 200px;
+    --sigma-layout-cols: 8;
+    --sigma-font-size-base: 14px;
+  }
+}
+
+/* Large (Desktop / 1440p) */
+@media (min-width: 1441px) and (max-width: 2560px) {
+  :root {
+    --sigma-sidebar-width: 260px;
+    --sigma-layout-cols: 12;
+    --sigma-font-size-base: 15px;
+  }
+}
+
+/* Ultrawide / 4K+ */
+@media (min-width: 2561px) {
+  :root {
+    --sigma-sidebar-width: 340px;
+    --sigma-layout-cols: 24;
+    --sigma-shard-padding: 2.5rem;
+    --sigma-font-size-base: 17px;
+  }
+}
+```
+
+**Stitch Prompt:** *"Implement the SigmaOS responsive breakpoint map using only CSS custom properties inside media queries. Do not use JavaScript resize events. On mobile viewports, hide the sidebar and reduce grid columns to 4. On ultrawide viewports, expand to 24-column grid with increased padding."*
+
+---
+
+## 🎨 15. Full System-Wide Design Token Map
+
+Master reference for every CSS variable in SigmaOS. All tokens must be overrideable at `:root` scope.
+
+| Token | Default Value | Description |
+| --- | --- | --- |
+| `--sigma-bg` | `#030303` | Primary background |
+| `--sigma-surface` | `rgba(10,15,20,0.4)` | Panel / card base |
+| `--sigma-border` | `#333333` | Default border color |
+| `--sigma-accent-primary` | `#00FFD2` | Quantum Cyan — primary actions |
+| `--sigma-accent-secondary` | `#8A2BE2` | Electric Violet — AI actions |
+| `--sigma-alert` | `#FF0055` | Neural Red — errors |
+| `--sigma-success` | `#00FF00` | Terminal Green — success |
+| `--sigma-warning` | `#FFB800` | Amber — warnings |
+| `--sigma-text-main` | `#E0E0E0` | Primary text |
+| `--sigma-text-muted` | `#606060` | Secondary / hint text |
+| `--sigma-font-mono` | `'JetBrains Mono', monospace` | Monospaced font stack |
+| `--sigma-font-sans` | `'Inter', sans-serif` | Sans-serif for headings |
+| `--sigma-glass-blur` | `4px` | Glassmorphism blur radius |
+| `--sigma-border-radius` | `0px` | Corner rounding (0 = sharp) |
+| `--sigma-transition-speed` | `150ms` | Default animation speed |
+| `--sigma-taskbar-size` | `32px` | Taskbar height or width |
+| `--sigma-sidebar-width` | `240px` | Left sidebar width |
+| `--sigma-panel-gap` | `1px` | Shard grid gap width |
+| `--sigma-shard-padding` | `1.5rem` | Inner padding of panels |
+| `--sigma-layout-cols` | `12` | Number of CSS grid columns |
+| `--sigma-font-size-base` | `14px` | Body text size |
+| `--sigma-scrollbar-width` | `4px` | Custom scrollbar thickness |
+| `--sigma-scrollbar-color` | `#333333` | Scrollbar track/thumb color |
 
 ---
 
 **Summary Master Prompt for Google Stitch:**
-*"Create a highly responsive, zero-image, CSS-grid-based web interface for an operating system tool. Use a dark 'Sovereign Cyberpunk' theme with an obsidian background, frosted glass panels, and quantum cyan (#00FFD2) glowing borders. Use strictly monospaced fonts (Geist Mono). Ensure all buttons and inputs have semantic IDs and data attributes for AI automation. The design must be extremely lightweight, utilizing only CSS for styling and animations (animate only transform/opacity). Include ARIA labels and inline geometric SVGs. Build a Shard Grid layout populated with Sovereign Buttons and Data Terminal Inputs."*
+*"Create a highly responsive, zero-image, CSS-grid-based web interface for an operating system tool. Use a dark 'Sovereign Cyberpunk' theme with an obsidian background, frosted glass panels, and quantum cyan (#00FFD2) glowing borders. Use strictly monospaced fonts (Geist Mono). Ensure all buttons and inputs have semantic IDs and data attributes for AI automation. The design must be extremely lightweight, utilizing only CSS for styling and animations (animate only transform/opacity). Include ARIA labels and inline geometric SVGs. Support all 24 CSS custom property tokens from the Sigma Design Token Map. Build a Shard Grid layout with configurable column count, responsive breakpoints for mobile to 8K, a notification toast system, gaming HUD overlay mode, and Sovereign Buttons and Data Terminal Inputs throughout."*
