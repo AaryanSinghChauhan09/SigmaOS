@@ -1,5 +1,4 @@
 """
-SigmaOS Apex Optimized Shim (v4.4)
+SigmaOS Apex Optimized Shim (v4.8.2)
 """
-from .proof_ledger_shards.logicintegrityproof._base import LogicIntegrityProof
 from .proof_ledger_shards.proofledger._base import ProofLedger

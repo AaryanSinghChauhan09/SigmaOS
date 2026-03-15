@@ -1,12 +1,10 @@
-from functools import lru_cache
-from sigma_core.interfaces.base_sovereign import SovereignModule
-from sigma_core.interfaces.verification_interfaces import IIntegrityGuard, ISafetyInvariant
 import hashlib
+import time
+from sigma_core.interfaces.base_sovereign import SovereignModule
+from sigma_core.interfaces.verification_interfaces import IIntegrityGuard
 
-from ._base import ProofLedger
 
-class ProofLedger:
-    def execute(self, action, *args, **kwargs):
-        if action == 'COUNT':
-            return len(self._verified_hashes)
-        return None
+def execute(self, action, *args, **kwargs):
+    if action == 'VALIDATE':
+        return self.validate_shard(kwargs.get('name'), kwargs.get('content', ''))
+    return None
