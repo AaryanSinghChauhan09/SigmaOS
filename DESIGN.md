@@ -393,9 +393,3 @@ Master reference for every CSS variable in SigmaOS. All tokens must be overridea
 | `--sigma-layout-cols` | `12` | Number of CSS grid columns |
 | `--sigma-font-size-base` | `14px` | Body text size |
 | `--sigma-scrollbar-width` | `4px` | Custom scrollbar thickness |
-| `--sigma-scrollbar-color` | `#333333` | Scrollbar track/thumb color |
-
----
-
-**Summary Master Prompt for Google Stitch:**
-*"Create a highly responsive, zero-image, CSS-grid-based web interface for an operating system tool. Use a dark 'Sovereign Cyberpunk' theme with an obsidian background, frosted glass panels, and quantum cyan (#00FFD2) glowing borders. Use strictly monospaced fonts (Geist Mono). Ensure all buttons and inputs have semantic IDs and data attributes for AI automation. The design must be extremely lightweight, utilizing only CSS for styling and animations (animate only transform/opacity). Include ARIA labels and inline geometric SVGs. Support all 24 CSS custom property tokens from the Sigma Design Token Map. Build a Shard Grid layout with configurable column count, responsive breakpoints for mobile to 8K, a notification toast system, gaming HUD overlay mode, and Sovereign Buttons and Data Terminal Inputs throughout."*
