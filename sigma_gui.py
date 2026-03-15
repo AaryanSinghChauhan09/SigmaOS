@@ -92,6 +92,7 @@ from gui_pkg.buyhatke_page import BuyhatkePage
 from gui_pkg.dashboard_page import DashboardPage
 from gui_pkg.aether_page import AetherPage
 from gui_pkg.claw_page import ClawPage
+from gui_pkg.openroutines_page import OpenRoutinesPage
 
 class SigmaGUI(tk.Tk, UIMixin):
     """Main SigmaOS GUI application window."""
@@ -798,6 +799,7 @@ class SigmaGUI(tk.Tk, UIMixin):
             "config_hub":       lambda: self._set_modular_page("config_hub", ConfigHubPage),
             "gaming_hub":       lambda: self._set_modular_page("gaming_hub", ArcadePage),
             "system_audit":     lambda: self._set_modular_page("system_audit", AuditViewPage),
+            "openroutines_hub": lambda: self._set_modular_page("openroutines_hub", OpenRoutinesPage),
             "governor":         lambda: self._set_modular_page("governor", GovernorPage), 
             "ag_physics":       lambda: self._set_modular_page("ag_physics", AGPhysicsPage),
             "visual_customizer": lambda: self._set_modular_page("visual_customizer", CustomizerPage),
