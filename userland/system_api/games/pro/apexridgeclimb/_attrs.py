@@ -1,3 +1,6 @@
-GAME_ID = 'G81'
-GAME_NAME = 'Apex Ridge Climb'
-CATEGORY = 'Racing / Physics'
+"""
+SigmaOS Apex Optimized Shim (v4.4)
+"""
+from ._attrs_shards.constants import GAME_ID
+from ._attrs_shards.constants import GAME_NAME
+from ._attrs_shards.constants import CATEGORY

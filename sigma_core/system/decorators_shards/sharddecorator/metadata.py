@@ -1,0 +1,10 @@
+from sigma_core.interfaces.base_sovereign import ISovereign
+import time
+import traceback
+
+from ._base import ShardDecorator
+
+class ShardDecorator:
+    @property
+    def metadata(self) -> dict:
+        return self._component.metadata

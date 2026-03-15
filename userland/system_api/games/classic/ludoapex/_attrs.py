@@ -1,9 +1,12 @@
-GAME_ID = 'G02'
-GAME_NAME = 'Ludo Apex'
-CATEGORY = 'Board Classic'
-VERSION = '2.0.0'
-SIZE_KB = 820
-ICON = '🎲'
-DESC = 'Race 4 tokens home on a cross-shaped board. Roll dice, block opponents!'
-AGE_RATING = 'G'
-COLORS = ['Red', 'Blue', 'Green', 'Yellow']
+"""
+SigmaOS Apex Optimized Shim (v4.4)
+"""
+from ._attrs_shards.constants import GAME_ID
+from ._attrs_shards.constants import GAME_NAME
+from ._attrs_shards.constants import CATEGORY
+from ._attrs_shards.constants import VERSION
+from ._attrs_shards.constants import SIZE_KB
+from ._attrs_shards.constants import ICON
+from ._attrs_shards.constants import DESC
+from ._attrs_shards.constants import AGE_RATING
+from ._attrs_shards.constants import COLORS

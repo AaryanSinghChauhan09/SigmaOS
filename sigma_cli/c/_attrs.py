@@ -1,10 +1,13 @@
-RESET = '\x1b[0m'
-BOLD = '\x1b[1m'
-CYAN = '\x1b[96m'
-GREEN = '\x1b[92m'
-YELLOW = '\x1b[93m'
-RED = '\x1b[91m'
-MAGENTA = '\x1b[95m'
-BLUE = '\x1b[94m'
-DIM = '\x1b[2m'
-WHITE = '\x1b[97m'
+"""
+SigmaOS Apex Optimized Shim (v4.4)
+"""
+from ._attrs_shards.constants import RESET
+from ._attrs_shards.constants import BOLD
+from ._attrs_shards.constants import CYAN
+from ._attrs_shards.constants import GREEN
+from ._attrs_shards.constants import YELLOW
+from ._attrs_shards.constants import RED
+from ._attrs_shards.constants import MAGENTA
+from ._attrs_shards.constants import BLUE
+from ._attrs_shards.constants import DIM
+from ._attrs_shards.constants import WHITE

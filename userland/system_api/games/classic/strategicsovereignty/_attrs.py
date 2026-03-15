@@ -1,9 +1,12 @@
-GAME_ID = 'G01'
-GAME_NAME = 'Strategic Sovereignty'
-CATEGORY = 'Board Strategy'
-VERSION = '1.3.0'
-SIZE_KB = 1240
-ICON = '♟️'
-DESC = "Two-player strategy on an 8×8 board. Move pieces to capture the opponent's King."
-AGE_RATING = 'G'
-PIECES = {'K': '♔', 'Q': '♕', 'R': '♖', 'B': '♗', 'N': '♘', 'P': '♙', 'k': '♚', 'q': '♛', 'r': '♜', 'b': '♝', 'n': '♞', 'p': '♟'}
+"""
+SigmaOS Apex Optimized Shim (v4.4)
+"""
+from ._attrs_shards.constants import GAME_ID
+from ._attrs_shards.constants import GAME_NAME
+from ._attrs_shards.constants import CATEGORY
+from ._attrs_shards.constants import VERSION
+from ._attrs_shards.constants import SIZE_KB
+from ._attrs_shards.constants import ICON
+from ._attrs_shards.constants import DESC
+from ._attrs_shards.constants import AGE_RATING
+from ._attrs_shards.constants import PIECES

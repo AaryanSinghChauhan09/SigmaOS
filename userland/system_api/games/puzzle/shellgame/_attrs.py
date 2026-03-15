@@ -1,2 +1,5 @@
-GAME_ID = 'G23'
-GAME_NAME = 'Watch the Cup — Shell Game'
+"""
+SigmaOS Apex Optimized Shim (v4.4)
+"""
+from ._attrs_shards.constants import GAME_ID
+from ._attrs_shards.constants import GAME_NAME

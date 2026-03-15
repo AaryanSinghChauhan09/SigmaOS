@@ -1,2 +1,5 @@
-GAME_ID = 'G33'
-GAME_NAME = 'Battleship'
+"""
+SigmaOS Apex Optimized Shim (v4.4)
+"""
+from ._attrs_shards.constants import GAME_ID
+from ._attrs_shards.constants import GAME_NAME

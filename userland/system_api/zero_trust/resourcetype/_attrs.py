@@ -1,7 +1,10 @@
-FILE = 'file'
-NETWORK = 'network'
-DEVICE = 'device'
-MEMORY = 'memory'
-PROCESS = 'process'
-SECRET = 'secret'
-UI = 'ui'
+"""
+SigmaOS Apex Optimized Shim (v4.4)
+"""
+from ._attrs_shards.constants import FILE
+from ._attrs_shards.constants import NETWORK
+from ._attrs_shards.constants import DEVICE
+from ._attrs_shards.constants import MEMORY
+from ._attrs_shards.constants import PROCESS
+from ._attrs_shards.constants import SECRET
+from ._attrs_shards.constants import UI

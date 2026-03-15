@@ -1,2 +1,5 @@
-GAME_ID = 'G22'
-GAME_NAME = 'Spot It — Find the Target'
+"""
+SigmaOS Apex Optimized Shim (v4.4)
+"""
+from ._attrs_shards.constants import GAME_ID
+from ._attrs_shards.constants import GAME_NAME

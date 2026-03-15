@@ -1,3 +1,6 @@
-GAME_ID = 'G84'
-GAME_NAME = 'Nexus Hidden Artifacts'
-CATEGORY = 'Puzzle / Search'
+"""
+SigmaOS Apex Optimized Shim (v4.4)
+"""
+from ._attrs_shards.constants import GAME_ID
+from ._attrs_shards.constants import GAME_NAME
+from ._attrs_shards.constants import CATEGORY

@@ -1,2 +1,5 @@
-VERIFIED_PUBLIC = 'Public Verified (KYC-Zero-Knowledge Proof)'
-STEALTH_ANON = 'Ephemeral Stealth (No Metadata)'
+"""
+SigmaOS Apex Optimized Shim (v4.4)
+"""
+from ._attrs_shards.constants import VERIFIED_PUBLIC
+from ._attrs_shards.constants import STEALTH_ANON

@@ -1,5 +1,8 @@
-NONE = 'none'
-TLS13 = 'TLS 1.3'
-QUANTUM_TLS = 'QuantumTLS (Kyber-1024+X25519)'
-ONION = 'Tor Onion'
-MESH_AES = 'MeshAES-256-GCM'
+"""
+SigmaOS Apex Optimized Shim (v4.4)
+"""
+from ._attrs_shards.constants import NONE
+from ._attrs_shards.constants import TLS13
+from ._attrs_shards.constants import QUANTUM_TLS
+from ._attrs_shards.constants import ONION
+from ._attrs_shards.constants import MESH_AES

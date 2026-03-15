@@ -1,21 +1,7 @@
-from abc import ABC, abstractmethod
-
-class IKernelState(ABC):
-    @abstractmethod
-    def handle_task(self, kernel, task_desc):
-        pass
-
-class BootingState(IKernelState):
-    def handle_task(self, kernel, task_desc):
-        print(f"[KERNEL-STATE] Booting. Deferring task: {task_desc}")
-        return "DEFERRED_BOOTING"
-
-class RunningState(IKernelState):
-    def handle_task(self, kernel, task_desc):
-        print(f"[KERNEL-STATE] Running. Executing task: {task_desc}")
-        return f"EXECUTED_{task_desc}"
-
-class HaltedState(IKernelState):
-    def handle_task(self, kernel, task_desc):
-        print(f"[KERNEL-STATE] Halted. Dropping task: {task_desc}")
-        return "DROPPED_HALTED"
+"""
+SigmaOS Apex Optimized Shim (v4.4)
+"""
+from .kernel_states_shards.ikernelstate._base import IKernelState
+from .kernel_states_shards.bootingstate._base import BootingState
+from .kernel_states_shards.runningstate._base import RunningState
+from .kernel_states_shards.haltedstate._base import HaltedState

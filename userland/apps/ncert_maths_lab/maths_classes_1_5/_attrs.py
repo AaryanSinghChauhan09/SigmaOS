@@ -1,2 +1,5 @@
-TITLE = 'Primary Math: Foundations & Early Logic'
-EXP_DATA = {'Word Express': ('words', [('N', '7')]), 'Addition Carry': ('add', [('A', '45'), ('B', '56')]), 'Multiplication': ('mul', [('A', '5'), ('B', '6')]), 'Fraction Sharing': ('share', [('Shaded', '1'), ('Total', '4')]), 'Sorting Order': ('sort', [('Data', '5,2,9,1')]), 'Clock Angle': ('clock', [('H', '3'), ('M', '30')]), 'Place Value': ('place', [('Number', '456'), ('Digit', '5')])}
+"""
+SigmaOS Apex Optimized Shim (v4.4)
+"""
+from ._attrs_shards.constants import TITLE
+from ._attrs_shards.constants import EXP_DATA

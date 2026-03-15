@@ -1,10 +1,31 @@
 import sys
 import os
+
+# --- SIGMA-OS SMOKE TEST v4.4 ---
+
 sys.path.insert(0, os.path.abspath("."))
-try:
-    from sigma_core.security.integrity import IntegrityGuard
-    print("SUCCESS: IntegrityGuard imported.")
-except Exception as e:
-    print(f"FAILED: {e}")
-    import traceback
-    traceback.print_exc()
+
+def test():
+    print("[TEST] Verifying Omni-Sovereign Modularity...")
+    try:
+        from sigma_core.security.proof_ledger import ProofLedger
+        pl = ProofLedger()
+        print("✅ ProofLedger: SUCCESS")
+    except Exception as e:
+        print(f"❌ ProofLedger: FAILED ({e})")
+        return False
+
+    try:
+        from sigma_core.interfaces.base_sovereign import SovereignModule
+        print("✅ SovereignModule: SUCCESS")
+    except Exception as e:
+        print(f"❌ SovereignModule: FAILED ({e})")
+        return False
+
+    return True
+
+if __name__ == "__main__":
+    if test():
+        print("\n🏆 SYSTEM STABLE: Sibling dependencies resolved.")
+    else:
+        sys.exit(1)

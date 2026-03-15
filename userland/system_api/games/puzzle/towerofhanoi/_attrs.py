@@ -1,2 +1,5 @@
-GAME_ID = 'G26'
-GAME_NAME = 'Tower of Hanoi'
+"""
+SigmaOS Apex Optimized Shim (v4.4)
+"""
+from ._attrs_shards.constants import GAME_ID
+from ._attrs_shards.constants import GAME_NAME

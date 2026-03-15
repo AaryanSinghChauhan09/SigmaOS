@@ -1,23 +1,5 @@
-from .system_interfaces import ISystemComponent
-from abc import ABC, abstractmethod
-
-class ICommand(ABC):
-    """
-    Command Pattern Interface.
-    Encapsulates a request as an object.
-    """
-    @abstractmethod
-    def execute(self, *args, **kwargs):
-        raise NotImplementedError
-
-class ICommander(ISystemComponent):
-    """
-    Commander Interface for SigmaOS logic routing.
-    """
-    @abstractmethod
-    def register_command(self, name: str, command: ICommand):
-        raise NotImplementedError
-
-    @abstractmethod
-    def dispatch(self, name: str, *args, **kwargs):
-        raise NotImplementedError
+"""
+SigmaOS Apex Optimized Shim (v4.4)
+"""
+from .command_interfaces_shards.icommand._base import ICommand
+from .command_interfaces_shards.icommander._base import ICommander

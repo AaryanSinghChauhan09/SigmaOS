@@ -1,3 +1,6 @@
-GAME_ID = 'G74'
-GAME_NAME = 'Chromatic Crush Ultra'
-CATEGORY = 'Match-3 / Puzzle'
+"""
+SigmaOS Apex Optimized Shim (v4.4)
+"""
+from ._attrs_shards.constants import GAME_ID
+from ._attrs_shards.constants import GAME_NAME
+from ._attrs_shards.constants import CATEGORY

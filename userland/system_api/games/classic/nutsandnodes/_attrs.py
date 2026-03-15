@@ -1,7 +1,10 @@
-GAME_ID = 'G04'
-GAME_NAME = 'Nuts & Nodes'
-CATEGORY = 'Puzzle'
-VERSION = '1.1.0'
-SIZE_KB = 2100
-ICON = '🔧'
-DESC = 'Connect rotating gear nodes from source to target. Physics-based puzzle.'
+"""
+SigmaOS Apex Optimized Shim (v4.4)
+"""
+from ._attrs_shards.constants import GAME_ID
+from ._attrs_shards.constants import GAME_NAME
+from ._attrs_shards.constants import CATEGORY
+from ._attrs_shards.constants import VERSION
+from ._attrs_shards.constants import SIZE_KB
+from ._attrs_shards.constants import ICON
+from ._attrs_shards.constants import DESC

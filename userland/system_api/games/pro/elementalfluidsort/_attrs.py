@@ -1,3 +1,6 @@
-GAME_ID = 'G79'
-GAME_NAME = 'Elemental Fluid Sort'
-CATEGORY = 'Puzzle / Logic'
+"""
+SigmaOS Apex Optimized Shim (v4.4)
+"""
+from ._attrs_shards.constants import GAME_ID
+from ._attrs_shards.constants import GAME_NAME
+from ._attrs_shards.constants import CATEGORY

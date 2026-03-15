@@ -1,0 +1,4 @@
+
+
+TITLE = 'Secondary Math: Exhaustive Suite'
+EXP_DATA = {'Identity (a+b)²': ('identity', [('a', '5'), ('b', '3')]), 'Quadratic Solver': ('quad', [('a', '1'), ('b', '-5'), ('c', '6')]), 'Mean/Median/SD': ('stats', [('Data', '10,20,20,30')]), 'Trig Heights': ('trig', [('Angle', '30'), ('Dist', '10')]), '3D Frustum Vol': ('frustum', [('R', '10'), ('r', '5'), ('h', '12')]), 'Interest Calc': ('interest', [('P', '1000'), ('R', '5'), ('T', '2')]), 'Euclid GCD': ('gcd', [('A', '48'), ('B', '36')])}

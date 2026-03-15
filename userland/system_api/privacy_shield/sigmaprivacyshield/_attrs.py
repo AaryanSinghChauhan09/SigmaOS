@@ -1,3 +1,6 @@
-POLICY_PARANOID = 'REJECT_ALL_THIRD_PARTY'
-POLICY_BALANCED = 'FIRST_PARTY_ONLY'
-POLICY_PERMISSIVE = 'ESSENTIAL_ONLY'
+"""
+SigmaOS Apex Optimized Shim (v4.4)
+"""
+from ._attrs_shards.constants import POLICY_PARANOID
+from ._attrs_shards.constants import POLICY_BALANCED
+from ._attrs_shards.constants import POLICY_PERMISSIVE

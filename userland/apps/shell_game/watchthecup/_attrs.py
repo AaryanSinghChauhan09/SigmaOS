@@ -1,5 +1,7 @@
-CUP_W, CUP_H = (110, 140)
-CUP_RIM = 18
-COIN_R = 22
-CUP_Y = 200
-CUP_XS = [160, 380, 600]
+"""
+SigmaOS Apex Optimized Shim (v4.4)
+"""
+from ._attrs_shards.constants import CUP_RIM
+from ._attrs_shards.constants import COIN_R
+from ._attrs_shards.constants import CUP_Y
+from ._attrs_shards.constants import CUP_XS

@@ -1,18 +1,5 @@
-from abc import ABC, abstractmethod
-
-class ISafetyInvariant(ABC):
-    """
-    Formal Verification Contract.
-    Ensures mathematical certainty of shard execution.
-    """
-    @abstractmethod
-    def verify(self, shard_logic: str) -> bool:
-        raise NotImplementedError
-
-class IIntegrityGuard(ABC):
-    """
-    Enforces safety proofs on the system.
-    """
-    @abstractmethod
-    def validate_shard(self, shard_id, logic: str):
-        raise NotImplementedError
+"""
+SigmaOS Apex Optimized Shim (v4.4)
+"""
+from .verification_interfaces_shards.isafetyinvariant._base import ISafetyInvariant
+from .verification_interfaces_shards.iintegrityguard._base import IIntegrityGuard
