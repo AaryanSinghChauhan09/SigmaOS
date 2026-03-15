@@ -1,4 +1,4 @@
-from ...interfaces.base_sovereign import SovereignModule
+from sigma_core.interfaces.base_sovereign import SovereignModule
 from abc import abstractmethod
 
 class BaseSovereignPage(SovereignModule):

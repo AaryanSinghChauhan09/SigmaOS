@@ -1,5 +1,5 @@
-from ...system_api.gui_pkg.base_sovereign_page import BaseSovereignPage
-from ....sigma_core.system_factory import get_factory
+from userland.system_api.gui_pkg.base_sovereign_page import BaseSovereignPage
+from sigma_core.system_factory import get_factory
 
 class ChatAppPage(BaseSovereignPage):
     """
