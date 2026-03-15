@@ -1,13 +1,6 @@
 """
-SigmaOS Apex Optimized Shim (v4.4)
+SigmaOS Apex Optimized Shim (v4.8.2)
 """
-from .sigma_refactor_v12_shards.constants import ROOT
-from .sigma_refactor_v12_shards.constants import SKIP_DIRS
-from .sigma_refactor_v12_shards.constants import PROTECTED_FILES
-from .sigma_refactor_v12_shards.constants import PROTECTED_DIRS
-from .sigma_refactor_v12_shards.constants import PERSONAL
-from .sigma_refactor_v12_shards.constants import RELIGIOUS
-from .sigma_refactor_v12_shards.constants import VULGAR
 def sanitize(*args, **kwargs):
     import importlib
     mod = importlib.import_module('.sigma_refactor_v12_shards.sanitize')

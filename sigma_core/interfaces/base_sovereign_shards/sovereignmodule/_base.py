@@ -5,4 +5,8 @@ from ..sigmaobject._base import SigmaObject
 
 class SovereignModule(SigmaObject, ISovereign):
     __slots__ = ('name', 'status')
-    '\n    Sovereign Module Base.\n    Inherits Lifecycle behaviors and Sovereign contracts.\n    '
+
+    def __init__(self, name):
+        super().__init__()
+        self.name = name
+        self.status = 'ACTIVE'

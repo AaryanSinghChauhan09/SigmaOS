@@ -1,7 +1,6 @@
 """
-SigmaOS Apex Optimized Shim (v4.4)
+SigmaOS Apex Optimized Shim (v4.8.2)
 """
-from .commander_shards.sovereigncommander._base import SovereignCommander
 def get_commander(*args, **kwargs):
     import importlib
     mod = importlib.import_module('sigma_core.system.commander_shards.get_commander')

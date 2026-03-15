@@ -1,5 +1,3 @@
 """
-SigmaOS Modular Shim for ai_integration.py
+SigmaOS AI Integration Package.
 """
-from .ai_integration._SigmaAIIntegrator_core import SigmaAIIntegrator # noqa
-

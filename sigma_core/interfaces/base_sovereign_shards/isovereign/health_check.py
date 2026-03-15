@@ -3,5 +3,5 @@ import time
 
 
 @abstractmethod
-def execute(self, action, *args, **kwargs):
+def health_check(self) -> bool:
     pass

@@ -1,7 +1,7 @@
-from sigma_core.interfaces.base_sovereign import ISovereign
-from sigma_core.system.decorators import LoggingDecorator, ResilienceDecorator, MetricsDecorator, PrivacyDecorator
-import threading
-from ..systemfactory._base import SystemFactory
 
-def get_factory() -> SystemFactory:
-    return SystemFactory()
+
+
+def get_factory(*args, **kwargs):
+    import importlib
+    mod = importlib.import_module('sigma_core.system_factory_shards.get_factory')
+    return getattr(mod, 'get_factory')(*args, **kwargs)

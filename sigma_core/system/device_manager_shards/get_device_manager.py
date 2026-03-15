@@ -1,7 +1,7 @@
-from sigma_core.interfaces.base_sovereign import SovereignModule
-from sigma_core.interfaces.driver_interfaces import IDeviceDriver
-import threading
-from ..devicemanager._base import DeviceManager
 
-def get_device_manager():
-    return DeviceManager()
+
+
+def get_device_manager(*args, **kwargs):
+    import importlib
+    mod = importlib.import_module('sigma_core.system.device_manager_shards.get_device_manager')
+    return getattr(mod, 'get_device_manager')(*args, **kwargs)
