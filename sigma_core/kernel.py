@@ -86,6 +86,9 @@ class SigmaKernel:
         from .security.hypervisor import SovereignHypervisor
         from .system.latency_engine import LatencyCompensator
         from .system.agent_bridge import AgenticBridge
+        from .system.eco_manager import EcoManager
+        from .system.telemetry_visualizer import TelemetryVisualizer
+        from .hal.native_accelerator import NativeAccelerator
 
         self.vector_memory = VectorMemory()
         self.governance = NeuralGovernance(self)
@@ -100,6 +103,9 @@ class SigmaKernel:
         self.hypervisor = SovereignHypervisor(self)
         self.latency_engine = LatencyCompensator(self)
         self.agent_bridge = AgenticBridge(self)
+        self.eco_manager = EcoManager(self)
+        self.visualizer = TelemetryVisualizer(self)
+        self.accelerator = NativeAccelerator(self)
         
         self.registry.register("vector_memory", self.vector_memory)
         self.registry.register("governance", self.governance)
@@ -114,6 +120,9 @@ class SigmaKernel:
         self.registry.register("hypervisor", self.hypervisor)
         self.registry.register("latency_engine", self.latency_engine)
         self.registry.register("agent_bridge", self.agent_bridge)
+        self.registry.register("eco_manager", self.eco_manager)
+        self.registry.register("visualizer", self.visualizer)
+        self.registry.register("accelerator", self.accelerator)
 
         # Bootstrap: Run native priority layers
         self._low_level_init()
