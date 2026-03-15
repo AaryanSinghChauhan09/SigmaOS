@@ -1,8 +1,8 @@
 # 🌌 SigmaOS: Comprehensive UI/UX Design Plan & Specification
 
-This document serves as the **Master Blueprint for SigmaOS UI/UX design**. It is engineered specifically for use with **Google Stitch** (or similar gen-AI UI tools) to rapidly create, iterate, and deploy interfaces.
+This document serves as the **Master Blueprint for SigmaOS UI/UX design**. It is engineered specifically for use with **Google Stitch** (or similar gen-AI UI tools) to rapidly create, iterate, and deploy interfaces. 
 
-The core philosophy is **Sovereign Cyberpunk**: an aesthetic that is aggressively futuristic, undeniably high-tech, yet ruthlessly optimized to consume absolute minimal system resources.
+The core philosophy is **Sovereign Cyberpunk**: an aesthetic that is aggressively futuristic, undeniably high-tech, yet ruthlessly optimized to consume absolute minimal system resources. It is entirely customizable and automation-friendly.
 
 ---
 
@@ -45,35 +45,44 @@ When feeding this document to Google Stitch to generate UI components, enforce t
 
 ---
 
-## 🛠️ 3. Application-Specific UI/UX Architectures
+## 🛠️ 3. Absolute OS Component Architectures
 
-SigmaOS contains over 100+ sharded modules. Here is the design blueprint for the major categories:
+Each category requires a meticulously standardized view that prioritizes performance. These define the "Everything Required" for SigmaOS.
 
-### A. Intelligence Suite & AI Interfacing (e.g., Omni-Prompt Distributor)
+### A. The Core Desktop/Workspace (Aura Shell)
+* **Taskbar (Bottom/Right edge):** Ultra-thin 32px height/width. No text, only pure cyan SVGs. Displays localized time, battery node, and active Shards.
+* **Start/Nexus Menu:** A fullscreen, glassmorphic grid overlay. Applications aren't "icons"; they are live-streaming ASCII widgets or real-time data visualizers (like CPU load or network graph).
 
+### B. System Configuration & Personalization (`Sigma Theme Customizer`)
+* **Layout:** Dual-pane split screen.
+* **Left Pane (Controls):** Sliders for `border-radius` (sharp vs rounded cyberpunk), Dropdowns for Preset Themes (Midnight, NCERT Academic), and Color Pickers for CSS Variables.
+* **Right Pane (Live Preview):** A sandbox component demonstrating the OS style changes in real-time. Since styles are injected via CSS variables, no redraw logic is required—instant performance.
+* *Note: The `sigma_theme_customizer.py` backend dynamically generates the `sigma_theme_bundle.css` when changes are saved.*
+
+### C. Intelligence Suite (Omni-Prompt, Auto-Agents)
 * **Layout:** Split-pane multiplexer.
 * **Input Zone (Bottom/Center):** A glowing, expanding textarea (`#00FFD2` border on focus). Resembles a command prompt (`> [Type command or prompt here...]`).
 * **Target Selector:** Inline SVG checkboxes shaped like hex-nodes to select AI targets (Local Llama, ChatGPT, Claude).
 * **Output Zone:** Streamed text responses in monospace. Each AI's response is housed in a distinct frosted card.
 
-### B. NCERT Virtual Labs (Education & Simulation)
-
-* **Concept:** "Holographic Blueprint."
-* **Palette Override:** While maintaining the dark theme, labs use high-contrast cyan grids on the background.
-* **Interactive Elements:** Skeuomorphic-but-flat vectors. For a physics lab, a pendulum is a simple white SVG line glowing cyan; for chemistry, beakers are outlined shapes with CSS-animated fluid heights.
-* **Controls:** Slider inputs that look like mixing desk faders. Numeric inputs with up/down micro-buttons.
-
-### C. System Orchestration & Dashboard (e.g., Sentinel, Task Manager)
-
+### D. System Orchestration & Dashboard (Sentinel, Task Manager)
 * **Layout:** Masonry or strict Grid of "Shards" (Widgets).
 * **Data Visualization:** ASCII-style bar charts instead of heavy canvas libraries. CSS-based progress bars for CPU/RAM usage.
 * **Ledger Log:** A continuously scrolling terminal block on the right side of the screen displaying system events and verified Proofs in green monospaced text.
 
-### D. Productivity Suite (CodeForge, Writer)
+### E. File Explorer (OmniSearch)
+* **List View Only:** Tree structures built entirely with `<ul>` and `<li>`. Folders are `[+] DIR_NAME`. Files are `- FILE_NAME.EXT`.
+* **Keyboard First:** VIM-like navigation is heavily encouraged. Every element must be tabbable and highlight securely via CSS `:focus-visible` with a heavy solid `#00FFD2` outline.
 
-* **Layout:** Zen-mode maximized.
-* **Sidebar:** Collapsible, ultra-thin left sidebar for file trees. Folders are represented by simple bracketing `[+] folder_name`.
-* **Editor:** Borderless text area. Line numbers in muted gunmetal `#606060`. Active line highlighted with a very faint `#00FFD2` background (`rgba(0, 255, 210, 0.05)`).
+### F. Terminal & Developer IDE (CodeForge)
+* **Editor:** Borderless `textarea` or CodeMirror instance initialized on an empty black void.
+* **Gutter:** Line numbers in muted gunmetal `#606060`. Active line highlighted with a very faint `#00FFD2` background (`rgba(0, 255, 210, 0.05)`).
+* **Output Scaffold:** A bottom docking terminal that uses WebGL text rendering strictly to avoid DOM node bloat when pumping thousands of lines of logs.
+
+### G. NCERT Virtual Labs (Education & Simulation)
+* **Concept:** "Holographic Blueprint."
+* **Palette Override:** While maintaining the dark theme, labs use high-contrast cyan grids on the background.
+* **Interactive Elements:** Skeuomorphic-but-flat vectors. For a physics lab, a pendulum is a simple white SVG line.
 
 ---
 
@@ -100,7 +109,7 @@ To construct these screens, prompt Stitch to build these exact CSS/React compone
 
 ## ⚡ 5. Customization & Future-Proofing (Theme Engine)
 
-SigmaOS uses CSS Variables (`--var-name`) globally. The UI must be fully driven by these variables to allow instant theme swapping.
+SigmaOS uses CSS Variables (`--var-name`) globally. The UI must be fully driven by these variables to allow instant theme swapping. See `sigma_theme_customizer.py`.
 
 ```css
 :root {
@@ -112,10 +121,12 @@ SigmaOS uses CSS Variables (`--var-name`) globally. The UI must be fully driven 
   --sigma-text-main: #E0E0E0;
   --sigma-text-muted: #606060;
   --sigma-font-mono: 'JetBrains Mono', monospace;
+  --sigma-glass-blur: 4px;
+  --sigma-border-radius: 0px;
 }
 ```
 
-By keeping the styling strictly decoupled from the DOM (meaning no inline styles, no complex utility classes unless cleanly abstracted), the UI is future-proof. If the user wants a "Light Academic Mode" for studying, simply swapping the CSS variables instantly changes the entire OS aesthetic.
+By keeping the styling strictly decoupled from the DOM (meaning no inline styles, no complex utility classes unless cleanly abstracted), the UI is future-proof. If the user wants a "Light Academic Mode" for studying, simply swapping the CSS variables instantly changes the entire OS aesthetic. A Python script controls this OS-wide via dynamic file replacement.
 
 ---
 
@@ -123,8 +134,8 @@ By keeping the styling strictly decoupled from the DOM (meaning no inline styles
 
 The UI is built to be piloted by an AI or a script.
 
-* **Invisible Hooks:** Elements have `aria-labels` and `data-sigma-intent` attributes describing their function.
-* An automation crawler can read: `<button data-sigma-intent="execute_prompt" id="btn-exec">Run</button>` and instantly know its purpose without relying on fragile XPath selectors.
+* **Invisible Hooks:** Elements have `aria-labels` and `data-sigma-intent` attributes describing their function. This completely eliminates UI brittleness.
+* An automation crawler can read: `<button data-sigma-intent="execute_prompt" id="btn-exec">Run</button>` and instantly know its purpose without relying on fragile XPath selectors, nested generic `div`s, or dynamic React classes.
 * **Feedback Loops:** Every action triggers a visual pulse (a quick CSS `box-shadow` flash) AND dispatches a secure system event to the `Sovereign Interface Layer`, allowing local AI agents to visually and programmatically confirm task success.
 
 ---

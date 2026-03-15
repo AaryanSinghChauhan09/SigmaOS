@@ -1,0 +1,12 @@
+{
+    "sigma-bg": "#FFFFFF",
+    "sigma-surface": "#F0F0F0",
+    "sigma-border": "#CCCCCC",
+    "sigma-accent-primary": "#0055FF",
+    "sigma-accent-secondary": "#8A2BE2",
+    "sigma-text-main": "#111111",
+    "sigma-text-muted": "#555555",
+    "sigma-font-mono": "'JetBrains Mono', monospace",
+    "sigma-glass-blur": "4px",
+    "sigma-border-radius": "0px"
+}
