@@ -11,9 +11,11 @@ class ChatEngine(SovereignModule, IEventObserver):
         super().__init__("CHAT_ENGINE")
         self.__history = [] # Private Encapsulation
         self._max_history = 500
+        self.privacy_tag = "SOCIAL_MESH" # Used by PrivacyDecorator
 
-    def execute(self, action, payload=None):
+    def execute(self, action, *args, **kwargs):
         """Standard ISovereign contract."""
+        payload = kwargs.get('payload')
         if action == "SEND_MESSAGE":
             return self._handle_send(payload)
         elif action == "GET_HISTORY":

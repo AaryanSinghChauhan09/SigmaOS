@@ -21,6 +21,7 @@ from sigma_core.system.power_manager import PowerManager
 from sigma_core.system.chaos_monkey import ChaosMonkey
 from sigma_core.security.privacy_guard import DeterministicPrivacyGuard
 from sigma_core.drivers.fractal_storage import FractalRedundancyController, SovereignShard
+from sigma_core.social.chat_engine import ChatEngine
 
 class DisplayTextCommand(ICommand):
     """Polymorphic implementation of ICommand."""
@@ -72,6 +73,11 @@ def bootstrap_zenith():
     # 3. Privacy Configuration
     privacy.register_tag("USER_ID_SHARD", "IDENTITY_VERIFICATION")
     privacy.register_tag("SYSTEM_CONFIG", "KERNEL_BOOT")
+    privacy.register_tag("SOCIAL_MESH", "CHAT_ACCESS") # Tag used by ChatEngine
+    
+    # Register ChatEngine AFTER PrivacyGuard so it gets decorated
+    chat_engine = ChatEngine()
+    factory.register("ChatEngine", chat_engine, metrics=True)
     
     # 4. Wire Events
     bus.subscribe("SECURITY_ALERT", auditor)
@@ -105,7 +111,15 @@ def bootstrap_zenith():
     
     # 9. Test Deterministic Privacy (LSP/ISP)
     pg = factory.get("PrivacyGuard")
-    print(f"[TEST] Privacy Authorized (SYSTEM_CONFIG/KERNEL_BOOT): {pg.execute('AUTHORIZE', 'SYSTEM_CONFIG', 'KERNEL_BOOT')}")
+    print(f"[TEST] Privacy Authorized (SYSTEM_CONFIG/KERNEL_BOOT): {pg.execute('AUTHORIZE', tag='SYSTEM_CONFIG', purpose='KERNEL_BOOT')}")
+    
+    # 9. Test Privacy Decorator (AOP Enforcement)
+    chat = factory.get("ChatEngine")
+    print("[TEST] Chat Access with VALID purpose:")
+    chat.execute("SEND_MESSAGE", payload="Hello Zenith", purpose="CHAT_ACCESS")
+    
+    print("[TEST] Chat Access with INVALID purpose:")
+    chat.execute("SEND_MESSAGE", payload="I am a hacker", purpose="MALICIOUS_SNIFF")
     
     # 10. Test Chaos Resilience
     cm = factory.get("ChaosMonkey")

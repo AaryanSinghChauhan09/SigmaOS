@@ -1,5 +1,5 @@
-from .interfaces.base_sovereign import ISovereign
-from .system.decorators import LoggingDecorator, ResilienceDecorator, MetricsDecorator
+from sigma_core.interfaces.base_sovereign import ISovereign
+from sigma_core.system.decorators import LoggingDecorator, ResilienceDecorator, MetricsDecorator, PrivacyDecorator
 import threading
 
 class SystemFactory:
@@ -29,6 +29,13 @@ class SystemFactory:
             wrapped = MetricsDecorator(wrapped)
         if logged:
             wrapped = LoggingDecorator(wrapped)
+            
+        # Mandatory Privacy Proxy for Shards (Zero Trust)
+        privacy_guard = self._registry.get("PrivacyGuard")
+        if privacy_guard and name != "PrivacyGuard":
+            # Extract required tag from component metadata if available, else default to name
+            tag = getattr(component, 'privacy_tag', name)
+            wrapped = PrivacyDecorator(wrapped, privacy_guard, tag)
             
         print(f"[FACTORY] Assembling Sovereign Unit: {name}")
         self._registry[name] = wrapped
