@@ -1,281 +1,100 @@
 """
-SigmaOS OmniAutomator (v5.0 Apex Singularity)
-=============================================
-Unified Agentic Backplane for SigmaOS. Orchestrates complex multi-agent missions.
-USP: Zero-trust mission execution with autonomous path-finding.
+omni_automator — SigmaOS OmniAutomator (v5.0 Apex Singularity)
+================================================================
+Backward-compat shim.  Real implementation lives in omni_automator/ package.
 """
-
 from dataclasses import dataclass, field
-from typing import List, Dict, Any, Union, Optional
+from typing import List, Dict, Any, Optional
 import time
 import uuid
 import threading
-import os
-import sys
 
 from userland.system_api.agentic_claw import SigmaAgenticClaw, ActionNode
+from userland.system_api.omni_automator.mission_node import MissionNode
+from userland.system_api.omni_automator.constants import MISSION_LIBRARY, PRESETS
+from userland.system_api.omni_automator.get_preview_card import get_preview_card
+from userland.system_api.omni_automator.decompose_intent import decompose_intent
+from userland.system_api.omni_automator.execute_action_logic import execute_action_logic
+from userland.system_api.omni_automator.launch_mission import launch_mission as _launch_mission
+from userland.system_api.omni_automator.launch_preset import launch_preset as _launch_preset
+from userland.system_api.omni_automator.genome import extract_workflow_genome, synthesize_from_genome
+from userland.system_api.omni_automator.sentinel import OmniSentinel
+from userland.system_api.omni_automator.health_check import health_check as _health_check
+from userland.system_api.omni_automator.healing_cycle import execute_healing_cycle as _healing_cycle
+from userland.system_api.omni_automator.register_folder_action import register_folder_action as _reg_folder
+from userland.system_api.omni_automator.get_benchmarks import get_benchmarks as _get_benchmarks
+from userland.system_api.omni_automator.get_transparent_ledger import get_transparent_ledger as _get_ledger
 
-@dataclass
-class MissionNode:
-    id: str
-    name: str
-    node_type: str  
-    params: Dict[str, Any] = field(default_factory=dict)
-    next_node_id: Optional[str] = None
-    execution_time_ms: float = 0.0
 
 class ISigmaModule: pass
 class SigmaModuleBase:
     def __init__(self, kernel=None): self.kernel = kernel
 
+
 class SigmaOmniAutomator(SigmaModuleBase):
+    """Unified Agentic Backplane. Thin facade over the modular omni_automator package."""
+
     def __init__(self, kernel=None):
-        SigmaModuleBase.__init__(self, kernel)
-        self.kernel = kernel # Explicit for linter
-        
-        # Proper Module Linkage (USP: Unified Backplane)
+        super().__init__(kernel)
         self.claw = SigmaAgenticClaw(kernel)
-        
-        # Dynamic Resolution for optional modules
-        self.mesh = None
-        self.gmail = None
-        self.gateway = None
-        self.liaison = None
-        
         self.active_missions: Dict[str, List[MissionNode]] = {}
         self.variables: Dict[str, Any] = {}
-        self._sentinel_running = False
-        self._sentinel_thread: Optional[threading.Thread] = None
         self.stats = {
-            "workflows_executed": 0,
-            "actions_automated": 0,
-            "proactive_interventions": 0,
-            "time_saved_min": 0.0,
-            "missions_run": 0,
-            "blocks_compiled": 0,
-            "repairs_auto": 0
+            "workflows_executed": 0, "actions_automated": 0,
+            "proactive_interventions": 0, "time_saved_min": 0.0,
+            "missions_run": 0, "blocks_compiled": 0, "repairs_auto": 0,
         }
         self.benchmark_ledger: Dict[str, float] = {}
         self.routine_evolution_memory: Dict[str, int] = {}
         self.transparent_ledger: List[Dict[str, Any]] = []
         self.workflow_genome_db: Dict[str, str] = {}
-        
-        self.MISSION_LIBRARY: Dict[str, List[str]] = {
-            "Hardening": ["Kill_Legacy_Shims", "Update_Sovereign_Policies", "Seal_Shadow_Vault"],
-            "Optimization": ["Flush_VRAM", "Steer_IRQs", "Trigger_Prewarmer"],
-            "Sync": ["Mesh_Merkle_Verify", "Push_to_Origin_Master"]
-        }
-
-        self.PRESETS = {
-            "Gaming_Apex": {
-                "name": "🎮 Gaming Apex Mode",
-                "tuning": "Gaming",
-                "actions": ["Hyper_Drive_Engage", "Starve_Background", "Apply_Aura:CyberPunk"],
-                "description": "Unlocks maximum silicon potential for zero-latency gameplay."
-            },
-            "Nightly_Purge": {
-                "name": "🧹 Nightly System Purge",
-                "actions": ["Flush_VRAM", "Mesh_Sync_Critical", "Scrub_Temp_Files", "Apply_Aura:DeepSpace"],
-                "description": "Optimizes storage and security while the user rests."
-            },
-            "Deep_Focus": {
-                "name": "🧠 Deep Focus Protocol",
-                "tuning": "Efficiency",
-                "actions": ["Mute_Notifications", "Block_Distractions", "Apply_Aura:Monolith", "Starve_Background"],
-                "description": "Engages zero-interruption hyper-focus state."
-            },
-            "Creative_Flow": {
-                "name": "🎨 Creative Flow State",
-                "tuning": "Performance",
-                "actions": ["Boost_GPU_Priority", "Enable_Spatial_Audio", "Apply_Aura:Fluency"],
-                "description": "Allocates maximum media/render power and fluid aesthetics."
-            }
-        }
+        self.MISSION_LIBRARY = MISSION_LIBRARY
+        self.PRESETS = PRESETS
+        self._sentinel = OmniSentinel(self.stats, kernel, self.launch_preset)
 
     def get_preview_card(self, preset_key: str) -> Dict[str, Any]:
-        """USP: Transparent Execution Log Previews before committing to ring-0 hardware routines."""
-        p = self.PRESETS.get(preset_key)
-        if not p: return {"Error": "Preset Not Found"}
-        return {
-            "Card_Title": f"🔍 Preview: {p['name']}",
-            "Expected_Resource_Shift": f"CPU/GPU will pivot to '{p.get('tuning', 'Balanced')}' mode.",
-            "Execution_DAG": p.get("actions", []),
-            "Impact_Rating": "High (Kernel Modifications)" if "tuning" in p else "Low (Userland Only)",
-            "Trust_Level": "VERIFIED_0xAPEX"
-        }
+        return get_preview_card(preset_key)
 
     def launch_mission(self, intent: str) -> str:
-        uid_str = str(uuid.uuid4().hex)
-        u_chars = [uid_str[i] for i in range(8)]
-        mid = f"mission-{''.join(u_chars)}"
-        self.active_missions[mid] = self._decompose_intent(intent)
-        self.stats["workflows_executed"] = self.stats["workflows_executed"] + 1
-        return f"OmniAutomator Apex: Mission '{mid}' launched for intent: '{intent}'."
+        return _launch_mission(intent, self.active_missions, self.stats)
 
     def _decompose_intent(self, intent: str) -> List[MissionNode]:
-        nodes = []
-        low_intent = intent.lower()
-        nodes.append(MissionNode("n0", "Ingest_Context", "action", {"intent": intent}))
-        
-        if "security" in low_intent or "harden" in low_intent:
-            nodes.extend([
-                MissionNode("n1", "Seal_Vaults", "action"),
-                MissionNode("n2", "Audit_Syscalls", "decision")
-            ])
-            nodes[0].next_node_id = "n1"
-            nodes[1].next_node_id = "n2"
-        else:
-            nodes.append(MissionNode("n1", "Autonomous_Execution", "action"))
-            nodes[0].next_node_id = "n1"
-            
-        return nodes
+        return decompose_intent(intent)
 
     def launch_preset(self, preset_key: str) -> str:
-        p = self.PRESETS.get(preset_key)
-        if not p: return f"Error: Preset {preset_key} not found."
-
-        if "tuning" in p and self.kernel and hasattr(self.kernel, "perf"):
-            self.kernel.perf.apply_tuning(p["tuning"])
-
-        start_time = time.time()
-        results = []
-        
-        # Routine Evolution Heuristic
-        self.routine_evolution_memory[preset_key] = self.routine_evolution_memory.get(preset_key, 0) + 1
-        evolved_str = ""
-        if self.routine_evolution_memory[preset_key] > 5:
-            evolved_str = " [EVOLVED: Trimming redundant context sync based on history]"
-            # In a real engine, we'd dynamically slice the DAG here.
-
-        for action in p.get("actions", []):
-            results.append(self._execute_action_logic(action))
-        
-        elapsed = (time.time() - start_time) * 1000.0
-        self.benchmark_ledger[preset_key] = elapsed
-        self.stats["time_saved_min"] += 2.5 # Arbitrary value saved per routine
-        
-        res_summary = " -> ".join(results)
-        return f"🚀 APEX EXECUTION: {p['name']}{evolved_str} initialized in {elapsed:.2f}ms.\nStatus: {res_summary}"
+        return _launch_preset(
+            preset_key, self.stats, self.benchmark_ledger,
+            self.routine_evolution_memory, self.transparent_ledger, self.kernel,
+        )
 
     def get_benchmarks(self) -> Dict[str, float]:
-        """USP: Benchmark and compare the efficiency of different automations directly in the OS."""
-        return self.benchmark_ledger
+        return _get_benchmarks(self.benchmark_ledger)
 
     def get_transparent_ledger(self) -> List[Dict[str, Any]]:
-        """USP: Human-readable execution log that traces every single action taken by the AI swarm."""
-        return self.transparent_ledger
+        return _get_ledger(self.transparent_ledger)
 
     def extract_workflow_genome(self, preset_key: str) -> str:
-        """USP: Phase 2 - Synthesize workflows into reusable DNA mapped structurally via DAG."""
-        p = self.PRESETS.get(preset_key)
-        if not p: return "ERROR: NO_GENOME"
-        
-        actions = p.get("actions", [])
-        genome_sig = f"SGM-{hash('|'.join(actions))}-v1"
-        self.workflow_genome_db[genome_sig] = "|".join(actions)
-        return genome_sig
-        
+        return extract_workflow_genome(preset_key, self.workflow_genome_db)
+
     def synthesize_from_genome(self, genome_sig: str) -> str:
-        """USP: Recombine and execute a workflow directly from its DNA string."""
-        if genome_sig not in self.workflow_genome_db:
-            return f"Genome {genome_sig} not found in sequence library."
-            
-        actions_str = self.workflow_genome_db[genome_sig]
-        actions = actions_str.split("|")
-        
-        results = []
-        for action in actions:
-            results.append(self._execute_action_logic(action))
-            
-        self.stats["workflows_executed"] += 1
-        return f"GENOME RE-SEQUENCED: Executed {len(actions)} nodes seamlessly."
+        return synthesize_from_genome(
+            genome_sig, self.workflow_genome_db, self.transparent_ledger, self.stats, self.kernel
+        )
 
     def _execute_action_logic(self, action: str) -> str:
-        msg = f"Executed: {action}"
-        
-        if "Apply_Aura:" in action:
-            aura_name = action.split(":")[1]
-            if self.kernel and hasattr(self.kernel, "aura"):
-                self.kernel.aura.apply_aura(aura_name)
-                msg = f"AURA: Shifted to {aura_name}"
-        elif action == "Hyper_Drive_Engage":
-            if self.kernel and hasattr(self.kernel, "perf"):
-                self.kernel.perf.apply_tuning("Performance")
-                msg = "PERF: Hyper-Drive Engaged."
-        elif action == "Flush_VRAM":
-            if self.kernel and hasattr(self.kernel, "perf"):
-                self.kernel.perf._flush_vram_buffers()
-                msg = "MEM: VRAM Flushed."
-        elif action == "Mute_Notifications":
-            msg = "FOCUS: Hardware interrupt silencing active."
-        elif action == "Block_Distractions":
-            msg = "FOCUS: Network Guardian enforcing packet drop on non-critical sites."
-        elif action == "Starve_Background":
-            msg = "PERF: Background threads starved of CPU cycles."
-        elif action == "Boost_GPU_Priority":
-            msg = "PERF: CUDA/Vulkan scheduling pinned to REALTIME."
-        elif action == "Enable_Spatial_Audio":
-            msg = "AUDIO: Sovereign Spatial acoustic dampening enabled."
-        elif action == "Scrub_Temp_Files":
-            msg = "FS: SigmaFS swept temp sectors securely."
-        elif action == "Mesh_Sync_Critical":
-            msg = "SYNC: Off-site Merkle synchronization completed."
-        
-        if self.kernel and hasattr(self.kernel, "bus"):
-            self.kernel.bus.emit("auto.action_log", {"msg": msg})
-            
-        self.transparent_ledger.append({
-            "timestamp": time.ctime(),
-            "action": action,
-            "result_status": msg,
-            "trust_verifier": "Sigma_Swarm_Audit_0x0"
-        })
-        return msg
+        return execute_action_logic(action, self.transparent_ledger, self.kernel)
 
     def register_folder_action(self, folder: str, action: str):
-        return f"Folder Action '{action}' firmly bound to '{folder}'."
+        return _reg_folder(folder, action)
 
     def health_check(self) -> str:
-        return f"OK — OmniAutomator v5.0 | Missions Executed: {self.stats['workflows_executed']}"
+        return _health_check(self.stats)
 
     def execute_healing_cycle(self):
-        """Unified self-healing orchestration."""
-        if self.kernel and hasattr(self.kernel, "repair_engine"):
-            self.kernel.repair_engine.repair("UAL_Shim", "Bit-drift auto-detection")
-        return "Forensic-Autopilot: Restoration cycle COMPLETE."
+        return _healing_cycle(self.kernel)
 
     def start_sentinel(self):
-        """USP: Proactive OS Intelligence. Decides when to shift modes based on telemetry."""
-        if not self._sentinel_running:
-            self._sentinel_running = True
-            th = threading.Thread(target=self._sentinel_cycle, daemon=True)
-            self._sentinel_thread = th
-            th.start()
-            print("[OMNI] Proactive Sentinel [ONLINE].")
-
-    def _sentinel_cycle(self):
-        """Autonomous Decision Loop."""
-        while self._sentinel_running:
-            try:
-                time.sleep(15)
-                # 1. Check for resource saturation
-                if self.kernel and self.kernel.perf:
-                    metrics = self.kernel.perf.get_telemetry()
-                    cpu = float(metrics.get("cpu_load", "0%").replace("%", ""))
-                    vram = float(metrics.get("vram_usage", "0MB").replace("MB", ""))
-                    
-                    if cpu > 80.0:
-                        # Auto-Trigger Optimization
-                        self.launch_preset("Nightly_Purge")
-                        self.stats["proactive_interventions"] += 1
-                        self.kernel.bus.emit("auto.sentinel_trigger", {"res": "CPU_HIGH", "action": "PURGE"})
-
-                # 2. Check for drift (Mock logic)
-                self.stats["actions_automated"] += 2
-                
-            except Exception as e:
-                print(f"[SENTINEL_ERR] {e}")
+        self._sentinel.start()
 
     def stop_sentinel(self):
-        self._sentinel_running = False
-
+        self._sentinel.stop()
