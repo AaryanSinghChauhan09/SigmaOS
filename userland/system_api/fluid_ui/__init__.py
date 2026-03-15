@@ -1,3 +1,8 @@
+"""
+SigmaOS Modular Shim for fluid_ui.py
+"""
+from .fluid_ui._SigmaFluidUI_core import SigmaFluidUI # noqa
+
 """Auto-generated __init__.py — SigmaOS deep modularizer."""
 
 from .render_taskbar import *  # noqa: F401,F403

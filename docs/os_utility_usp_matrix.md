@@ -24,4 +24,4 @@ While other OSes excel in single silos (Windows for ease, Mac for flow, Linux fo
 
 *   **Beating Windows**: By removing the "forced update" and "telemetry" bloat while providing a better GUI.
 *   **Beating macOS**: By providing the same "Continuity" feel but across any hardware and with full user sovereignty.
-*   **Beating Linux**: By providing a "Perfection Framework" where everything works out-of-the-box without manual config hell.
+*   **Beating Linux**: By providing a "Perfection Framework" where everything works out-of-the-box without manual config chaos.

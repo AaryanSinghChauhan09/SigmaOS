@@ -5,7 +5,7 @@ SigmaOS is the definitive choice for every user on the planet. Built on the **Pe
 ---
 
 ## 🏛️ The 6 Pillars of Perfection
-1. **Absolute User Autonomy**: Default Zero-Telemetry, Update Sovereignty, and **Morphic UI Architecture** with 'God-Mode' pixel control.
+1. **Absolute User Autonomy**: Default Zero-Telemetry, Update Sovereignty, and **Morphic UI Architecture** with 'Apex-Mode' pixel control.
 2. **Universal Compatibility**: Native-speed bridges for Windows, macOS, Android, and Linux.
 3. **AI-Native Intelligence**: Orchestrated by Aether & SigmaAI with Federated Learning privacy and an **AI-Driven Boot Selector**.
 4. **Security & Compliance**: **Sovereign-Native Kernel (Linux-Plus)** that intercept syscalls for zero-trust protection.
@@ -130,7 +130,7 @@ Replaces Windows Explorer, macOS Finder, and Total Commander with a secure, zero
 
 ### 📦 Layer 12: Sigma App Matrix (Sovereign Package Manager)
 Replaces Windows Store, apt, flatpak, and brew with a zero-trust, immutable application deployment engine.
-- **Immutable Installs**: Every app is installed into its own isolated, containerized hierarchy to prevent "DLL Hell".
+- **Immutable Installs**: Every app is installed into its own isolated, containerized hierarchy to prevent "DLL chaos".
 - **Bit-Level Delta Updates**: Rather than redownloading full applications, the Matrix calculates the cryptographic hash delta, downloading only modified bytes (saving up to 90% bandwidth).
 - **Auto-Rollback Snapshots**: If an application update crashes, SigmaFS immediately restores the prior working snapshot.
 

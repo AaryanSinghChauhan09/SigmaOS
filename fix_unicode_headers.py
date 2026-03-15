@@ -1,7 +1,7 @@
 """Fix unicode-escape errors in auto-split docstring headers."""
 import ast, os
 
-ROOT = r'C:\Users\SigmaUser\Downloads\SigmaOS'
+ROOT = r'.'
 SKIP = {'.git', '__pycache__', 'node_modules', 'evidence_vault', 'SOVEREIGN_DISTRO_IMG'}
 
 fixed = 0

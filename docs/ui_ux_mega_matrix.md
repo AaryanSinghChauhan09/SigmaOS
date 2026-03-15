@@ -32,7 +32,7 @@ This document synthesizes the world's leading UI/UX paradigms, benchmarking Sigm
 
 ## 🔱 3. Super-Customization Ecosystems
 
-| **Platform** | **Customization Level** | **Automation Mechanism** | **SigmaOS "God-Mode" implementation** |
+| **Platform** | **Customization Level** | **Automation Mechanism** | **SigmaOS "Apex-Mode" implementation** |
 | :--- | :--- | :--- | :--- |
 | **Samsung Modes** | High (Contextual) | Modes & Routines | **Morphic Logic** (Auto-reconfigures on profile) |
 | **Linux (Arch/i3)** | **Infinite (DIY)** | Scripting/Dotfiles | **Sigma-Hijack** (Replace ANY kernel function) |

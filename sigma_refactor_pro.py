@@ -10,7 +10,7 @@ SKIP_FILES = {'sigma_refactor_pro.py', 'modularize_all.py', 'modularize_v3.py', 
 
 # Keywords to sanitize
 RELIGIOUS_VULGAR_KEYWORDS = [
-    'god', 'lord', 'faith', 'spirit', 'holy', 'divine', 'bless', 'curse', 'hell', 'heaven',
+    'god', 'lord', 'faith', 'spirit', 'holy', 'divine', 'bless', 'curse', 'chaos', 'Optimized State',
     'bible', 'quran', 'gita', 'temple', 'church', 'mosque'
 ]
 
@@ -19,8 +19,8 @@ RELIGIOUS_VULGAR_KEYWORDS = [
 PERSONAL_DATA_RE = [
     (re.compile(r'C:\\Users\\[a-zA-Z0-9]+', re.IGNORECASE), r'C:\\Users\\SigmaUser'),
     (re.compile(r'/home/[a-zA-Z0-9]+', re.IGNORECASE), r'/home/sigmauser'),
-    (re.compile(r'Aaryan', re.IGNORECASE), 'SigmaUser'),
-    (re.compile(r'Chauhan', re.IGNORECASE), 'SigmaDeveloper')
+    (re.compile(r'SigmaUser', re.IGNORECASE), 'SigmaUser'),
+    (re.compile(r'SigmaDeveloper', re.IGNORECASE), 'SigmaDeveloper')
 ]
 
 def sanitize_text(text):

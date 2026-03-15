@@ -16,7 +16,7 @@ This dashboard benchmarks **SigmaOS** against global operating systems, automati
 | **Android (Tasker)** | 4 | 3 | 3 | 3 | 13/20 |
 
 ### 🚀 Why SigmaOS Wins:
-- **Flexibility**: We offer **God-Mode Pixel Control** and **Syscall Hijacking**—features locked by vendors in Windows and macOS.
+- **Flexibility**: We offer **Apex-Mode Pixel Control** and **Syscall Hijacking**—features locked by vendors in Windows and macOS.
 - **Sovereignty**: Unlike Samsung or Apple, SigmaOS is **100% Offline-First**. No mandatory cloud accounts or telemetry.
 - **Ease of Use**: We combine Linux power with an **AI Concierge** that handles complex configurations for you.
 

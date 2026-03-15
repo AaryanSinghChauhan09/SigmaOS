@@ -23,7 +23,7 @@ auto.schedule_backup(target_dir="/etc/sigma", cron_expr="0 2 * * *", retention_d
 ```
 
 ## 2. Hardened Security Layer
-We've integrated the Holy Trinity of Linux security: `ufw` (firewall), `SELinux` (access control), and `fail2ban` (intrusion prevention).
+We've integrated the Standard Triad of Linux security: `ufw` (firewall), `SELinux` (access control), and `fail2ban` (intrusion prevention).
 
 ### UFW Enforcement
 ```python

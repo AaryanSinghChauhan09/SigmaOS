@@ -112,7 +112,7 @@ SigmaOS offers the world's most hyper-customizable interface, moving beyond simp
 | **Layout** | Fixed Desktop/Taskbar | **Morphic Grid**: UI elements rearrange based on task (Dev, Creative, Data). |
 | **Icons** | Static PNGs/SVGs | **Live-Preview Tokens**: Icons show real-time content thumbnails. |
 | **Environment** | OS-Bound | **Physical-Sync**: OS colors sync to your smart-bulbs/peripherals. |
-| **God-Mode** | Registry/System Prefs | **Pixel-Logic**: Every pixel's color & behavior can be scripted. |
+| **Apex-Mode** | Registry/System Prefs | **Pixel-Logic**: Every pixel's color & behavior can be scripted. |
 
 ---
 

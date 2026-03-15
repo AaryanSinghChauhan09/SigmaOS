@@ -10,7 +10,7 @@ import ast
 import sys
 import textwrap
 
-ROOT = r"c:\Users\Aaryan\Downloads\SigmaOS"
+ROOT = r"."
 
 # ─────────────────────────────────────────────────────────────
 # Helper: safely write a file without overwriting if exists
