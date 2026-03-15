@@ -60,6 +60,6 @@ OK - Search Shard: OK - Index Size: 0 entries
 --- SIGMAOS SYNC INITIATED ---
 [master 308c286] Apex Sync: 2026-03-14 14:02:19 [Ledger Signed]
  2 files changed, 76 insertions(+), 8 deletions(-)
-To https://github.com/SigmaUserSinghChauhan09/SigmaOS.git
+To https://github.com/SovereignResearcher/SigmaOS.git
    8785fb8..308c286  master -> master
 [OK] Workspace Synced with GitHub (APEX MASTER)
