@@ -90,6 +90,7 @@ class SigmaKernel:
         from .system.telemetry_visualizer import TelemetryVisualizer
         from .hal.native_accelerator import NativeAccelerator
         from .ai.automation_brain import AutomationBrain
+        from .ai.sovereign_agent import SovereignAgent
 
         self.vector_memory = VectorMemory()
         self.governance = NeuralGovernance(self)
@@ -108,6 +109,7 @@ class SigmaKernel:
         self.visualizer = TelemetryVisualizer(self)
         self.accelerator = NativeAccelerator(self)
         self.brain = AutomationBrain(self)
+        self.agent = SovereignAgent(self)
         
         self.registry.register("vector_memory", self.vector_memory)
         self.registry.register("governance", self.governance)
@@ -126,6 +128,7 @@ class SigmaKernel:
         self.registry.register("visualizer", self.visualizer)
         self.registry.register("accelerator", self.accelerator)
         self.registry.register("automation_brain", self.brain)
+        self.registry.register("sovereign_agent", self.agent)
 
         # Bootstrap: Run native priority layers
         self._low_level_init()
