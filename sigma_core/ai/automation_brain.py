@@ -19,10 +19,12 @@ class AutomationBrain:
         os.makedirs(os.path.dirname(self.model_path), exist_ok=True)
         self.weights: Dict[str, List[float]] = {}
         self.intent_map = {
-            "security": ["shifter", "hypervisor", "governance"],
-            "performance": ["vibe_scheduler", "accelerator"],
-            "maintenance": ["troubleshooter", "eco_manager"],
-            "connectivity": ["mesh", "aether_grid", "zk_sync"]
+            "security": ["shifter", "hypervisor", "governance", "airgap", "zk_sync"],
+            "performance": ["vibe_scheduler", "accelerator", "latency_engine"],
+            "maintenance": ["troubleshooter", "eco_manager", "vector_memory"],
+            "connectivity": ["mesh", "aether_grid"],
+            "system_io": ["universal", "troubleshooter"],
+            "creative": ["vibe_orchestrator", "aether_grid"]
         }
         self._initialize_weights()
 
