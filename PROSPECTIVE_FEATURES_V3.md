@@ -17,4 +17,6 @@ This document is the historical roadmap for SigmaOS v3.
 * Modular Interfaces
 * Immutable Ledger
 
-*This document is kept for historical relevance and backward compatibility.*
+## Historical Relevance
+
+This document is kept for historical relevance and backward compatibility.
