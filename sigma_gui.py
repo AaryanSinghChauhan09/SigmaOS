@@ -91,6 +91,7 @@ from gui_pkg.law_page import LawPage
 from gui_pkg.buyhatke_page import BuyhatkePage
 from gui_pkg.dashboard_page import DashboardPage
 from gui_pkg.aether_page import AetherPage
+from gui_pkg.claw_page import ClawPage
 
 class SigmaGUI(tk.Tk, UIMixin):
     """Main SigmaOS GUI application window."""
@@ -832,6 +833,7 @@ class SigmaGUI(tk.Tk, UIMixin):
             "nexus":           lambda: self._set_modular_page("nexus", NexusPage),
             "writesense":      lambda: self._set_modular_page("writesense", WritesensePage),
             "flow":            lambda: self._set_modular_page("flow", FlowPage),
+            "sovereign_claw":  lambda: self._set_modular_page("sovereign_claw", ClawPage),
         }
         
         # Oracle VM Discovery (Professional Integration)
@@ -891,7 +893,8 @@ class SigmaGUI(tk.Tk, UIMixin):
             ("🛒", "shopping_wizard"), ("📧", "mail_orchestrator"), ("🛰️", "sovereign_comms"),
             ("🧘", "wellness"), ("🚀", "enterprise"), ("🌌", "aether"), ("🎮", "gaming_hub"),
             ("🎓", "gurukul_academy"), ("⚖️", "compliance_center"), ("🧠", "brain"), 
-            ("⚡", "zenith"), ("📧", "gmail_ai"), ("🎨", "visual_customizer"), ("💠", "ag_guide")
+            ("⚡", "zenith"), ("📧", "gmail_ai"), ("🎨", "visual_customizer"), ("💠", "ag_guide"),
+            ("🦅", "sovereign_claw")
         ]
         for icon, page in pins:
             b = tk.Button(self._task_tray, text=icon, font=("Segoe UI Symbol", 14),

@@ -11,7 +11,7 @@ Welcome to **Cosmos AI-OS**, a system designed from the first instruction to bri
 | Pillar | Technology | Purpose |
 | --- | --- | --- |
 | **The Skeleton** | x86_64, GDT/TSS, Multiboot2 | Providing a stable, 64-bit protected memory environment. |
-| **The Spirit** | Custom Lisp Interpreter | Enabling live-coding, hot-swapping, and semantic scripting. |
+| **The Neural Core** | Custom Lisp Interpreter | Enabling live-coding, hot-swapping, and semantic scripting. |
 | **The Immune System** | Neural Firewall & AC97 Voice | Protecting the stack via local AI and giving the OS a persona. |
 
 ---

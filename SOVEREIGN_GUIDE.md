@@ -131,7 +131,7 @@ Experts can modify `/etc/sigma/kernel.json` to adjust the **Predictive Scheduler
 - `jitter_buffer`: Lower for ultra-low latency, higher for energy efficiency.
 - `zram_compression_ratio`: Defaults to 4:1. Can be pushed to 6:1 for extreme multitasking on legacy hardware.
 
-## 🎨 8. Absolute Autonomy & Visual Mastery (The 'God-Mode')
+## 🎨 8. Absolute Autonomy & Visual Mastery (The 'Apex-Sovereign Mode')
 
 SigmaOS grants you absolute authority over the system's logic and aesthetics.
 - **Logic Hijacking**: Through the **Autonomy Hub** (`kernel/autonomy_hub.py`), you can replace any kernel function with your own scripts.

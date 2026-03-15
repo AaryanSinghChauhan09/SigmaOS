@@ -73,7 +73,7 @@ class SigmaBharatLawBridge:
                 "Ignorantia_Juris_Non_Excusat": "Ignorance of law is no excuse."
             },
             "Legal_Jurisprudence": {
-                "Natural_Law": "Law based on morality/reason (Divine or Universal).",
+                "Natural_Law": "Law based on morality/reason (Universal or Objective).",
                 "Analytical_Positivism": "Law is the command of the sovereign (Bentham, Austin, Hart).",
                 "Historical_School": "Law is a product of history/spirit of people (Savigny).",
                 "Sociological_School": "Law as an instrument of social engineering (Roscoe Pound).",
@@ -162,7 +162,7 @@ class SigmaBharatLawBridge:
         }
         self._legislative_bills = {
             "Data_Protection_2023": "Status: PASSED. Key: Consent-based processing, Data Fiduciaries.",
-            "Endowment_Amendment_2024": "Status: PENDING (JPC). Key: Composition of Central Endowment Council.",
+            "Public_Registry_Amendment_2024": "Status: PENDING (JPC). Key: Composition of Central Trust Council.",
             "Broadcasting_Bill": "Status: WITHDRAWN (Redrallying). Key: Regulation of Digital Content."
         }
         self._public_law_briefs = {
