@@ -23,24 +23,25 @@ class TelemetryVisualizer:
         """Generates a sparkline-style ASCII graph from history."""
         if not self.history: return "[ No Data ]"
         
-        mx = max(self.history) if self.history else 1
-        mn = min(self.history) if self.history else 0
-        span = mx - mn if mx != mn else 1
+        mx = float(max(self.history))
+        mn = float(min(self.history))
+        span = mx - mn if mx != mn else 1.0
         
-        graph = ""
+        graph_lines = []
         for h in range(height, 0, -1):
-            line = ""
-            threshold = mn + (span * (h / height))
+            line_chars = []
+            rel_h = float(h) / float(height)
+            threshold = mn + (span * rel_h)
             for val in self.history:
-                if val >= threshold:
-                    line += "█"
-                elif val >= threshold - (span / height * 0.5):
-                    line += "▄"
+                if float(val) >= threshold:
+                    line_chars.append("█")
+                elif float(val) >= threshold - (span / float(height) * 0.5):
+                    line_chars.append("▄")
                 else:
-                    line += " "
-            graph += line + "\n"
+                    line_chars.append(" ")
+            graph_lines.append("".join(line_chars))
         
-        return graph
+        return "\n".join(graph_lines) + "\n"
 
     def get_realtime_stream(self):
         """Mock stream of CPU/Memory usage."""

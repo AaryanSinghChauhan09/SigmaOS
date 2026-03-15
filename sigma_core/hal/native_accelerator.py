@@ -8,7 +8,7 @@ extensions to minimize Python overhead.
 import ctypes
 import os
 import platform
-from typing import Optional
+from typing import Optional, Any
 
 class NativeAccelerator:
     def __init__(self, kernel):

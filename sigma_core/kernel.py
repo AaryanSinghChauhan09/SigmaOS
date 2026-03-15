@@ -89,6 +89,7 @@ class SigmaKernel:
         from .system.eco_manager import EcoManager
         from .system.telemetry_visualizer import TelemetryVisualizer
         from .hal.native_accelerator import NativeAccelerator
+        from .ai.automation_brain import AutomationBrain
 
         self.vector_memory = VectorMemory()
         self.governance = NeuralGovernance(self)
@@ -106,6 +107,7 @@ class SigmaKernel:
         self.eco_manager = EcoManager(self)
         self.visualizer = TelemetryVisualizer(self)
         self.accelerator = NativeAccelerator(self)
+        self.brain = AutomationBrain(self)
         
         self.registry.register("vector_memory", self.vector_memory)
         self.registry.register("governance", self.governance)
@@ -123,6 +125,7 @@ class SigmaKernel:
         self.registry.register("eco_manager", self.eco_manager)
         self.registry.register("visualizer", self.visualizer)
         self.registry.register("accelerator", self.accelerator)
+        self.registry.register("automation_brain", self.brain)
 
         # Bootstrap: Run native priority layers
         self._low_level_init()
@@ -201,7 +204,7 @@ class SigmaKernel:
             "shards": self.registry.health_check()
         }
 
-    def _morphic_island(self, message: str, color: str = None):
+    def _morphic_island(self, message: str, color: Optional[str] = None):
         """USP: Kernel-to-UI notification bridge via EventBus."""
         self.bus.publish("ui.morphic_island", {"msg": message, "color": color})
 

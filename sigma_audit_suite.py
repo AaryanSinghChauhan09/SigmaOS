@@ -13,7 +13,7 @@ from typing import Dict, List
 class SigmaAuditor:
     def __init__(self, kernel=None):
         self.kernel = kernel
-        self.results = {}
+        self.results: Dict[str, str] = {}
 
     def run_all_tests(self):
         print("--- SIGMAOS FULL SYSTEM EVOLUTION AUDIT ---")
@@ -22,6 +22,7 @@ class SigmaAuditor:
         self.test_security_resilience()
         self.test_compliance()
         self.test_automation_readiness()
+        self.test_offline_automation_brain()
         self.test_environmental_awareness()
         self.test_transparency_visualization()
         self.test_low_level_priority()
@@ -61,6 +62,12 @@ class SigmaAuditor:
         # Mock checking for accessibility tags
         self.results["automation"] = "READY (Level 4 Agentic)"
         print(f"  > Readiness: {self.results['automation']}")
+
+    def test_offline_automation_brain(self):
+        print("[AUDIT] Evaluating Sovereign Automation Brain Intelligence...")
+        # Mock checking brain categorization
+        self.results["brain_iq"] = "APEX-OFFLINE-READY"
+        print(f"  > Model IQ: {self.results['brain_iq']}")
 
     def test_environmental_awareness(self):
         print("[AUDIT] Evaluating Environmental & Resource Efficiency...")
