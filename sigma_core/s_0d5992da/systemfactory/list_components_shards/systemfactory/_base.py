@@ -1,5 +1,4 @@
-from .interfaces.system_interfaces import ISystemComponent
-import threading
-
-class SystemFactory:
-    pass
+"""
+SigmaOS Apex Shim (v9.0)
+"""
+from ._shards.systemfactory._base import SystemFactory

@@ -1,4 +1,4 @@
-from abc import ABC, abstractmethod
-
-class SystemBus:
-    pass
+"""
+SigmaOS Apex Shim (v9.0)
+"""
+from ._shards.systembus._base import SystemBus

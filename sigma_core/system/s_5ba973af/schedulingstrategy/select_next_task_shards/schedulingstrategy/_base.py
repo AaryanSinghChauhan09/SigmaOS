@@ -1,4 +1,4 @@
-from abc import ABC, abstractmethod
-
-class SchedulingStrategy:
-    pass
+"""
+SigmaOS Apex Shim (v9.0)
+"""
+from ._shards.schedulingstrategy._base import SchedulingStrategy

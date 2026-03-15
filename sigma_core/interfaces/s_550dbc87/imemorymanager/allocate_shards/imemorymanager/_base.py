@@ -1,4 +1,4 @@
-from abc import ABC, abstractmethod
-
-class IMemoryManager:
-    pass
+"""
+SigmaOS Apex Shim (v9.0)
+"""
+from ._shards.imemorymanager._base import IMemoryManager

@@ -1,5 +1,4 @@
-from abc import ABC, abstractmethod
-from .base_sovereign import SigmaModule
-
-class EnergyWarden:
-    pass
+"""
+SigmaOS Apex Shim (v9.0)
+"""
+from ._shards.energywarden._base import EnergyWarden

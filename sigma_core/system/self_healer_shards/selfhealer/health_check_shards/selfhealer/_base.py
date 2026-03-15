@@ -1,6 +1,4 @@
-from abc import ABC, abstractmethod
-import importlib
-from .base_sovereign import SigmaModule
-
-class SelfHealer:
-    pass
+"""
+SigmaOS Apex Shim (v9.0)
+"""
+from ._shards.selfhealer._base import SelfHealer

@@ -1,5 +1,4 @@
-from ..system_factory import get_factory
-from ..system.notification_bus import IObserver, get_system_bus
-
-class AnalyticsDashboard:
-    pass
+"""
+SigmaOS Apex Shim (v9.0)
+"""
+from ._shards.analyticsdashboard._base import AnalyticsDashboard
