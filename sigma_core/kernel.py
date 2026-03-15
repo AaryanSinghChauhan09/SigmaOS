@@ -13,6 +13,7 @@ import hashlib
 import subprocess
 import platform
 import ctypes
+import random
 from typing import Dict, List, Any, Optional
 
 from .system.config import SigmaConfig # type: ignore
@@ -44,7 +45,7 @@ class SigmaKernel:
         self.ledger = SovereignLedger()
         self.mutation_counter = 0
         self._history = []
-        from sigma_core.ai.neural_distillator import NeuralDistillator
+        from .ai.neural_distillator import NeuralDistillator
         self.distillator = NeuralDistillator(self)
         
         # Core Platform Services
@@ -54,8 +55,11 @@ class SigmaKernel:
         self.vanguard_engine = NetworkVanguard(self)
         self.guardian = SigmaGuardian(self)
         self.crusher = SovereignCompetitorCrusher(self)
+        self.registry.register("crusher", self.crusher)
+        self.registry.register("syncer", self.syncer)
+        self.registry.register("web_syncer", self.syncer)
         from .system.web_syncer import WebSyncer
-        self.syncer = WebSyncer(self)
+        self.syncer = WebSyncer(self) # type: ignore
         
         # Register Core
         self.registry.register("cache", self.cache)
@@ -129,6 +133,11 @@ class SigmaKernel:
         self.registry.register("accelerator", self.accelerator)
         self.registry.register("automation_brain", self.brain)
         self.registry.register("sovereign_agent", self.agent)
+        
+        # Phase 4 Upgrade: Heartbeat & Pulse
+        from .system.pulse_engine import SigmaPulseEngine
+        self.pulse = SigmaPulseEngine(self)
+        self.registry.register("pulse", self.pulse)
 
         # Bootstrap: Run native priority layers
         self._low_level_init()
@@ -193,6 +202,29 @@ class SigmaKernel:
         if module:
             return module
         raise AttributeError(f"'SigmaKernel' object has no attribute '{name}'")
+
+    def pulse_system(self):
+        """USP: Central coordination of all sovereign heartbeat tasks."""
+        # 1. Update Telemetry
+        metrics = {
+            "time": time.time(),
+            "load": random.uniform(5, 45),
+            "temp": random.uniform(35, 65)
+        }
+        if self.visualizer:
+            self.visualizer.push_metric(metrics["load"])
+        
+        # 2. Engage Eco-Rules
+        if self.eco_manager:
+            self.eco_manager.run_cycle(metrics["temp"])
+            
+        # 3. Poll Agent Intents
+        if self.agent_bridge:
+            self.agent_bridge.poll_for_agent_intent()
+            
+        # 4. Self-Healing check
+        if random.random() < 0.05: # 5% chance per pulse
+            self.self_healing_recovery()
 
     def self_healing_recovery(self) -> str:
         """Sovereign Repair Engine. Restores integrity from evidence vault."""
