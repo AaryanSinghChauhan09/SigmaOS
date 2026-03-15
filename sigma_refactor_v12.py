@@ -3,13 +3,12 @@ import ast
 import textwrap
 import re
 
-# --- SIGMA OMEGA APEX v11.0 (ULTIMATE OOP) ---
+# --- SIGMA ZENITH v12.0 (OMNI-OOP) ---
 ROOT = os.getcwd()
 SKIP_DIRS = {'.git', '__pycache__', 'node_modules', 'artifacts', '.gemini'}
 PROTECTED_FILES = {
     '__init__.py', 
-    'sigma_refactor_v10.py', 
-    'sigma_refactor_v11.py', 
+    'sigma_refactor_v12.py', 
     'bulletproof_healer.py', 
     'nuclear_flatten.py',
     'base_sovereign.py', 
@@ -26,9 +25,11 @@ PROTECTED_FILES = {
     'event_bus.py',
     'system_auditor.py',
     'kernel_states.py',
+    'chat_engine.py',
+    'base_sovereign_page.py',
     'bootstrap.py'
 }
-PROTECTED_DIRS = {'interfaces', 'kernel', 'security', 'drivers', 'analytics'}
+PROTECTED_DIRS = {'interfaces', 'kernel', 'security', 'drivers', 'analytics', 'social'}
 
 # Sanitization
 PERSONAL = re.compile(r'\baaryan\b|\bchauhan\b', re.I)
@@ -45,7 +46,6 @@ def process_file(filepath):
     filename = os.path.basename(filepath)
     rel = os.path.relpath(filepath, ROOT)
     
-    # Layered Protection
     if filename in PROTECTED_FILES: return
     if any(p in rel.split(os.sep) for p in PROTECTED_DIRS): return
     if any(s in rel for s in SKIP_DIRS): return
@@ -62,7 +62,7 @@ def process_file(filepath):
     items = [n for n in tree.body if isinstance(n, (ast.FunctionDef, ast.AsyncFunctionDef, ast.ClassDef))]
     if not items: return
 
-    print(f"Propagating Sovereignty (v11): {rel}")
+    print(f"Propagating Sovereignty (v12): {rel}")
     shard_dir = os.path.splitext(filepath)[0] + "_shards"
     os.makedirs(shard_dir, exist_ok=True)
     
@@ -85,7 +85,6 @@ def process_file(filepath):
             cls_dir = os.path.join(shard_dir, cls_name.lower())
             os.makedirs(cls_dir, exist_ok=True)
             
-            # Base/Core Shard
             core_node = ast.ClassDef(name=cls_name, bases=node.bases, keywords=node.keywords, body=[], decorator_list=node.decorator_list)
             core_node.body = [n for n in node.body if not isinstance(n, (ast.FunctionDef, ast.AsyncFunctionDef))]
             if not core_node.body: core_node.body = [ast.Pass()]
@@ -93,7 +92,6 @@ def process_file(filepath):
             with open(os.path.join(cls_dir, "_base.py"), 'w', encoding='utf-8') as f:
                 f.write(sanitize(f"{import_src}\n\n{ast.unparse(core_node)}"))
             
-            # Methods
             for sub in node.body:
                 if isinstance(sub, (ast.FunctionDef, ast.AsyncFunctionDef)):
                     m_name = sub.name
@@ -106,12 +104,11 @@ def process_file(filepath):
 
     if shims:
         with open(filepath, 'w', encoding='utf-8') as f:
-            f.write(f'"""\nSigmaOS Apex Shim (v11.0)\n"""\n' + "\n".join(shims) + "\n")
+            f.write(f'"""\nSigmaOS Apex Shim (v12.0)\n"""\n' + "\n".join(shims) + "\n")
 
 if __name__ == "__main__":
-    print("SigmaOS Zenith Refactor v11.0 - Initializing...")
+    print("SigmaOS Zenith Refactor v12.0 - OMNI-OOP...")
     for root, dirs, files in os.walk(ROOT):
-        # Exclude shard directories early
         dirs[:] = [d for d in dirs if not d.endswith('_shards') and d not in SKIP_DIRS]
         for file in files:
             if file.endswith('.py'):
