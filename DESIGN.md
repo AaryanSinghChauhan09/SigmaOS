@@ -150,5 +150,23 @@ The UI is built to be piloted by an AI or a script.
 
 ---
 
-**Summary for Google Stitch Prompting:**
+## 🔮 7. Advanced Google Stitch Directives (Meta-Prompts)
+
+To achieve 100% compliance when using **Google Stitch** to generate your screens, use the following expanded directives depending on the component type:
+
+### A. The Core Desktop Wrapper
+
+**Stitch Prompt:** *"Create a fullscreen web interface matching the 'Sovereign Cyberpunk' theme. The background is `#030303`. Create an ultra-thin 32px taskbar anchored to the bottom using `display: flex`. Ensure the taskbar contains only SVGs (no text). The main screen area should support a glassmorphic dashboard overlay (`rgba(10, 15, 20, 0.4)` with `backdrop-filter: blur(4px)`). Add semantic IDs and `data-sigma-intent` attributes."*
+
+### B. The Terminal / Log Viewer
+
+**Stitch Prompt:** *"Create a developer terminal UI panel. The background must be strictly `#000000` with no borders, except for a 1px solid `#333333` top boundary. The left margin should act as a gutter containing muted `#606060` line numbers. All text must use `Geist Mono` or monospace, colored `#E0E0E0`, and overflowing content must scroll natively seamlessly. Ensure no GPU-heavy layout recalculations occur on log append."*
+
+### C. The Configuration / Settings Panel
+
+**Stitch Prompt:** *"Create a dual-pane split screen configuration menu. The left pane should contain HTML5 range sliders and select dropdowns styled entirely via CSS to match the Sovereign Cyberpunk theme (Cyan `#00FFD2` active tracks). The right pane must be a live-preview module matching the Shard Grid specs. Ensure zero external dependencies. Use semantic data attributes on all sliders like `data-sigma-var='border-radius'`."*
+
+---
+
+**Summary Master Prompt for Google Stitch:**
 *"Create a highly responsive, zero-image, CSS-grid-based web interface for an operating system tool. Use a dark 'Sovereign Cyberpunk' theme with an obsidian background, frosted glass panels, and quantum cyan (#00FFD2) glowing borders. Use strictly monospaced fonts (Geist Mono). Ensure all buttons and inputs have semantic IDs and data attributes for AI automation. The design must be extremely lightweight, utilizing only CSS for styling and animations. Build a Shard Grid layout populated with Sovereign Buttons and Data Terminal Inputs."*
