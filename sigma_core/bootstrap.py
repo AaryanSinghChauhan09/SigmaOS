@@ -10,6 +10,8 @@ from sigma_core.security.sovereignty_manager import SovereigntyManager
 from sigma_core.system.device_manager import get_device_manager
 from sigma_core.drivers.disk_driver import VirtualDiskDriver
 from sigma_core.kernel.kernel_states import RunningState
+from sigma_core.system.event_bus import get_event_bus
+from sigma_core.analytics.system_auditor import SystemAuditor
 
 def bootstrap_zenith():
     """
@@ -18,14 +20,25 @@ def bootstrap_zenith():
     print("--- SigmaOS Zenith Phase: Sovereign Bootstrap Sequence ---")
     
     factory = get_factory()
+    bus = get_event_bus()
     
-    # 1. Register Core Systems
+    # 1. Initialize Event System
+    bus.initialize()
+    
+    # 2. Register Core Systems
     kernel = SigmaKernel()
     security = SovereigntyManager()
+    auditor = SystemAuditor()
+    
     factory.register("Kernel", kernel, resilient=True, logged=True)
     factory.register("Security", security, resilient=True, logged=True)
+    factory.register("Auditor", auditor, resilient=True, logged=True)
     
-    # 2. Register Hardware Layer
+    # 3. Wire Events (Observer Pattern)
+    bus.subscribe("SECURITY_ALERT", auditor)
+    bus.subscribe("KERNEL_STATE_CHANGE", auditor)
+    
+    # 4. Register Hardware Layer
     device_mngr = get_device_manager()
     disk_driver = VirtualDiskDriver(size_kb=512)
     device_mngr.register_driver("STORAGE_0", disk_driver)
@@ -34,25 +47,36 @@ def bootstrap_zenith():
     
     print("--- Bootstrap Complete. Validating System Integrity ---")
     
-    # 3. Test Integration
+    # 5. Test Integration
     k = factory.get("Kernel")
     s = factory.get("Security")
     d = factory.get("DeviceManager")
     
     print(f"[TEST] Kernel Status (Booting): {k.status}")
+    bus.publish("KERNEL_STATE_CHANGE", {"from": "INITIALIZING", "to": "BOOTING"})
+    
     print(f"[TEST] Kernel Exec (Booting): {k.execute('SYNC_SHARDS')}")
     
     # Transition to Running
     k.set_state(RunningState())
+    bus.publish("KERNEL_STATE_CHANGE", {"from": "BOOTING", "to": "RUNNING"})
+    
     print(f"[TEST] Kernel Exec (Running): {k.execute('SYNC_SHARDS')}")
     
     print(f"[TEST] Security Check: {s.execute('INIT_VECTOR')}")
+    
+    # Simulate Security Event
+    bus.publish("SECURITY_ALERT", {"severity": "CRITICAL", "source": "INIT_VECTOR_SCAN"})
+    
     print(f"[TEST] Devices: {d.execute('LIST_DEVICES')}")
     
     storage = d.get_driver("STORAGE_0")
     storage.write(0, b"SigmaSovereign_Zenith_OS_2026")
     data = storage.read(0, 30)
     print(f"[TEST] Storage I/O: {data.decode('utf-8', errors='ignore')}")
+    
+    # Check Auditor logs
+    print(f"[TEST] Audit Logs: {auditor.execute('GET_LOGS')}")
     
     print("--- ALL SYSTEMS OPERATIONAL ---")
 

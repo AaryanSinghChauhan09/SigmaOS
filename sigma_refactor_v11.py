@@ -18,14 +18,17 @@ PROTECTED_FILES = {
     'system_interfaces.py',
     'driver_interfaces.py',
     'security_interfaces.py',
+    'event_interfaces.py',
     'kernel_core.py',
     'memory_manager.py',
     'sovereignty_manager.py',
     'device_manager.py',
+    'event_bus.py',
+    'system_auditor.py',
     'kernel_states.py',
     'bootstrap.py'
 }
-PROTECTED_DIRS = {'interfaces', 'kernel', 'security', 'drivers'}
+PROTECTED_DIRS = {'interfaces', 'kernel', 'security', 'drivers', 'analytics'}
 
 # Sanitization
 PERSONAL = re.compile(r'\baaryan\b|\bchauhan\b', re.I)
