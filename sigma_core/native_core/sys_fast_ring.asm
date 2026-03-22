@@ -70,3 +70,47 @@ sigma_mem_copy_xmm:
 
 .done:
     ret
+
+; -----------------------------------------------------------------------------
+; Hardware IOPort Interfaces (x86_64) Replacement of <sys/io.h>
+; -----------------------------------------------------------------------------
+global sigma_asm_inb
+global sigma_asm_outb
+global sigma_asm_inw
+global sigma_asm_outw
+global sigma_asm_ind
+global sigma_asm_outd
+
+sigma_asm_inb:
+    mov dx, di ; Port
+    in al, dx
+    ret
+
+sigma_asm_outb:
+    mov dx, di ; Port
+    mov al, sil ; Data
+    out dx, al
+    ret
+
+sigma_asm_inw:
+    mov dx, di ; Port
+    in ax, dx
+    ret
+
+sigma_asm_outw:
+    mov dx, di ; Port
+    mov ax, si ; Data
+    out dx, ax
+    ret
+
+sigma_asm_ind:
+    mov dx, di ; Port
+    in eax, dx
+    ret
+
+sigma_asm_outd:
+    mov dx, di ; Port
+    mov eax, esi ; Data
+    out dx, eax
+    ret
+
