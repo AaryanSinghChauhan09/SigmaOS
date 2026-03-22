@@ -1,38 +1,22 @@
-# 🔐 SigmaOS Sovereign: Zero-Trust Integration Framework
+# SigmaOS Zero Trust Architecture & Sovereignty
 
-SigmaOS operates on a strict **Zero-Trust Architecture** at the kernel level. Every module, 3rd-party integration, and AI model operates under the **Principle of Least Privilege**.
+> **Core Tenet:** Implicit Denial combined with 100% Core Transparency. True security mandates zero external dependency logic.
 
-## 1. Ephemeral Identity & Authentication
-- **Multi-Login Federated Hub**: Users can link accounts via OAuth 2.0 (Google, Microsoft, GitHub) securely.
-- **TPM-Native Storage**: Long-term credentials (like refresh tokens) are bound to the hardware via a simulated Trusted Platform Module (TPM) wrapping process. Tokens never leave the physical silicon in plaintext.
-- **Just-In-Time (JIT) Sessions**: When an integration is invoked, a temporary, short-lived session token (e.g., valid for 5 minutes) is generated. 
+To guarantee that the systems running Automation, Customization, and Personalization inside SigmaOS cannot be injected or compromised by flawed high-level or intermediate dependencies, we've natively enforced a Bare-Metal ring.
 
-## 2. The Sovereign Consent Model
-- **Granular, Scope-Bound Approval**: SigmaOS rejects "blanket permissions." Every 3rd-party call triggers an explicit user prompt detailing exactly what action will be performed (e.g., "Read strictly this email thread").
-- **Data Minimization & Redaction**: Before the user even approves the prompt, the system automatically detects and redacts Personally Identifiable Information (PII), such as email addresses, from the payload.
-- **Context-Aware Prompts**: If an AI model requests sensitive data, the system forces a secondary Multi-Factor Authentication (MFA) or biometric challenge.
+## 1. Zero-Library Policy Enforced
+SigmaOS unequivocally bans standard implementations of low-level dependencies (`libc`, `<stdlib.h>`, `glibc`, `<win32api>`, etc.) and high-level wrappers (OpenSSL). Instead, we utilize:
 
-## 3. Session Exit Hygiene & Revocation Cascade
-- **Automatic Rollback**: The moment the user exits an app, terminates a workflow, or a session times out, the `Identity Vault` triggers a **Revocation Cascade**, invalidating all related ephemeral tokens simultaneously.
-- **Secure File Wipe**: Local temporary caches generated during the session are overwritten and destroyed.
+- **Custom Hardware Cryptography (`SigmaCrypto.hpp`)**: Secure Hashes (SHA-256) are calculated purely in Object-Oriented C++ using custom Math primitives without `<math.h>` dependencies.
+- **Hardware Entropy Enforcement**: Instead of reading ambiguous pseudo-random `/dev/urandom` buffers mapped via standard `C` calls, our `SecureEntropy` class targets the Linux `sys_getrandom` (Syscall 318) strictly forcing a block if the hardware entropy pool hasn't perfectly initialized. No predictability.
 
-## 4. Immutable Consent Ledger
-- Every request, approval, and revocation is recorded using a cryptographically hashed log.
-- This creates an **append-only forensic ledger**, allowing users to audit exactly which external services accessed what data, and precisely when the access was revoked.
+## 2. Advanced Native Integration
+- We map **Network Sockets** directly via machine memory structures, refusing `<sys/socket.h>` or `<arpa/inet.h>` networking stacks which inherently bloat network execution vectors.
+- We map **Display and Framebuffers** via raw `/dev/fb0` hardware rendering. No vulnerable X11 packages, no Qt or GTK logic that could hide display manipulation. 
 
-## 5. Transparent AI Broker (Aether-Nexus)
-- All external AI models (like Anthropic Claude or Google Gemini) are accessed exclusively through the `Aether` broker.
-- **Sandbox Execution**: External integrations run in isolated Ring-0 micro-segments, preventing lateral movement or credential theft (e.g., rendering vulnerabilities like OpenClaw's CVE-2026-25253 completely useless).
+## 3. Object-Oriented Segregation
+SigmaOS secures the operating space utilizing class boundaries without the heavy memory overhead of `<vector>` or typical `new()` wrappers. 
+- Memory allocations strictly route through `MemoryAllocator` overrides.
+- Linux Distros (Arch, Alpine, Debian) are sandboxed and Absorbed natively within `AbstractDistroAbsorber` subclasses. Nothing operates unless explicitly granted permission by Native automation parameters running natively unyielding memory protocols.
 
----
-## 🛡️ Example Workflow execution
-
-1. **Invoke**: User asks the OS to summarize a financial document using an external Cloud AI.
-2. **Redact**: The Identity Vault strips SSNs and financial markers from the document buffer.
-3. **Prompt**: The Sovereign Consent Prompt appears, showing the user the *redacted* preview.
-4. **Tokenize**: A 5-minute ephemeral token is issued to the AI Integration Broker.
-5. **Execute**: The Cloud AI processes the payload and returns the summary.
-6. **Revoke**: The workflow concludes, immediately triggering the Revocation Cascade and destroying the token.
-
----
-*Generated by the SigmaOS Security Council | 2026.03.01*
+Every aspect of this ecosystem operates solely via custom machine-instruction mapping, securing all processing capabilities unconditionally.

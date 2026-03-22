@@ -20,7 +20,9 @@ def build_native_ring():
         "SigmaString.hpp",
         "LinuxAbsorber.hpp",
         "sys_fast_ring.asm",
-        "SigmaAutomation.rs"
+        "SigmaAutomation.rs",
+        "SigmaCrypto.hpp",
+        "SigmaIPC.hpp"
     ]
     
     for c in components:
