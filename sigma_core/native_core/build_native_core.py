@@ -25,7 +25,8 @@ def build_native_ring():
         "SigmaIPC.hpp",
         "SigmaProcess.hpp",
         "SigmaTime.hpp",
-        "SigmaHardware.hpp"
+        "SigmaHardware.hpp",
+        "SigmaExceptions.hpp"
     ]
     
     for c in components:
