@@ -22,7 +22,9 @@ def build_native_ring():
         "sys_fast_ring.asm",
         "SigmaAutomation.rs",
         "SigmaCrypto.hpp",
-        "SigmaIPC.hpp"
+        "SigmaIPC.hpp",
+        "SigmaProcess.hpp",
+        "SigmaTime.hpp"
     ]
     
     for c in components:
