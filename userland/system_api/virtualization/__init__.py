@@ -1,4 +1,9 @@
 """
-SigmaOS Modular Shim for virtualization.py
+SigmaOS Virtualization Engine
+=============================
+Advanced virtualization and containerization system
 """
-__all__: list[str] = []
+
+from ._SigmaVirtualization_core import SigmaVirtualizationEngine
+
+__all__: list[str] = ["SigmaVirtualizationEngine"]
