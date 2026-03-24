@@ -23,3 +23,6 @@ jobs:
 
       - name: Run SigmaOS health gate
         run: python sigma_health_check.py
+
+      - name: Run launch readiness check
+        run: python tools/launch_readiness_check.py

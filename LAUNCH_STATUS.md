@@ -114,7 +114,7 @@ PDF Forge, Titan Capture, OmniConverter, Aether Orchestrator, Shell Forge, Pulse
 
 ## 📡 GitHub Sync
 
-- **Repository:** [SovereignResearcher/SigmaOS](https://github.com/SovereignResearcher/SigmaOS)
+- **Repository:** [AaryanSinghChauhan09/SigmaOS](https://github.com/AaryanSinghChauhan09/SigmaOS)
 - **Auto-sync Sentinel:** Active (detects file changes within 2s)
 - **Branch:** `master` — up to date
 
