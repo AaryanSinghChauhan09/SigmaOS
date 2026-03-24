@@ -1,11 +1,4 @@
 """
-competitor_bridge.py — backward-compat shim.
-Real implementation lives in competitor_bridge/ package.
+SigmaOS Modular Shim for competitor_bridge.py
 """
-
-from .competitor_bridge.SigmaCompetitorBridge import *  # noqa
-
-__all__ = ['SigmaCompetitorBridge']
-
-"""Auto-generated package __init__.py"""
-from .sigmacompetitorbridge import *  # noqa: F401, F403
+__all__: list[str] = []

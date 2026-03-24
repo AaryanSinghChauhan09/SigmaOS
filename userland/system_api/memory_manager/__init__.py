@@ -1,11 +1,4 @@
 """
-memory_manager.py — backward-compat shim.
-Real implementation lives in memory_manager/ package.
+SigmaOS Modular Shim for memory_manager.py
 """
-
-from .memory_manager.SigmaMemoryManager import *  # noqa
-
-__all__ = ['SigmaMemoryManager']
-
-"""Auto-generated package __init__.py"""
-from .sigmamemorymanager import *  # noqa: F401, F403
+__all__: list[str] = []

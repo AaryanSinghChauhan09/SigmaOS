@@ -1,11 +1,4 @@
 """
-competitor_intel.py — backward-compat shim.
-Real implementation lives in competitor_intel/ package.
+SigmaOS Modular Shim for competitor_intel.py
 """
-
-from .competitor_intel.SigmaCompetitorIntelligence import *  # noqa
-
-__all__ = ['SigmaCompetitorIntelligence']
-
-"""Auto-generated package __init__.py"""
-from .sigmacompetitorintelligence import *  # noqa: F401, F403
+__all__: list[str] = []

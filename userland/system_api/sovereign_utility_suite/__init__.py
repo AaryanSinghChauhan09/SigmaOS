@@ -1,11 +1,4 @@
 """
-sovereign_utility_suite.py — backward-compat shim.
-Real implementation lives in sovereign_utility_suite/ package.
+SigmaOS Modular Shim for sovereign_utility_suite.py
 """
-
-from .sovereign_utility_suite.SovereignUtilitySuite import *  # noqa
-
-__all__ = ['SovereignUtilitySuite']
-
-"""Auto-generated package __init__.py"""
-from .sovereignutilitysuite import *  # noqa: F401, F403
+__all__: list[str] = []

@@ -1,11 +1,4 @@
 """
-sovereign_sync.py — backward-compat shim.
-Real implementation lives in sovereign_sync/ package.
+SigmaOS Modular Shim for sovereign_sync.py
 """
-
-from .sovereign_sync.SigmaSovereignSync import *  # noqa
-
-__all__ = ['SigmaSovereignSync']
-
-"""Auto-generated package __init__.py"""
-from .sigmasovereignsync import *  # noqa: F401, F403
+__all__: list[str] = []

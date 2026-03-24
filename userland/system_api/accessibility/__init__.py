@@ -1,11 +1,4 @@
 """
-accessibility.py — backward-compat shim.
-Real implementation lives in accessibility/ package.
+SigmaOS Modular Shim for accessibility.py
 """
-
-from .accessibility.SigmaAccessibilityHub import *  # noqa
-
-__all__ = ['SigmaAccessibilityHub']
-
-"""Auto-generated package __init__.py"""
-from .sigmaaccessibilityhub import *  # noqa: F401, F403
+__all__: list[str] = []

@@ -1,11 +1,4 @@
 """
-energy_hub.py — backward-compat shim.
-Real implementation lives in energy_hub/ package.
+SigmaOS Modular Shim for energy_hub.py
 """
-
-from .energy_hub.AdaptiveEnergyController import *  # noqa
-
-__all__ = ['AdaptiveEnergyController']
-
-"""Auto-generated package __init__.py"""
-from .adaptiveenergycontroller import *  # noqa: F401, F403
+__all__: list[str] = []

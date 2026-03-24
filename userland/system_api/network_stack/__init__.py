@@ -1,11 +1,4 @@
 """
-network_stack.py — backward-compat shim.
-Real implementation lives in network_stack/ package.
+SigmaOS Modular Shim for network_stack.py
 """
-
-from .network_stack.SigmaNetworkStack import *  # noqa
-
-__all__ = ['SigmaNetworkStack']
-
-"""Auto-generated package __init__.py"""
-from .sigmanetworkstack import *  # noqa: F401, F403
+__all__: list[str] = []

@@ -1,11 +1,4 @@
 """
-monitor.py — backward-compat shim.
-Real implementation lives in monitor/ package.
+SigmaOS Modular Shim for monitor.py
 """
-
-from .monitor.SigmaWorkstationMonitor import *  # noqa
-
-__all__ = ['SigmaWorkstationMonitor']
-
-"""Auto-generated package __init__.py"""
-from .sigmaworkstationmonitor import *  # noqa: F401, F403
+__all__: list[str] = []

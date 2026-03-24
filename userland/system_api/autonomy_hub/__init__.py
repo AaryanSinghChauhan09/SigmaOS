@@ -1,5 +1,4 @@
 """
 SigmaOS Modular Shim for autonomy_hub.py
 """
-from .autonomy_hub._SigmaAutonomyHub_core import SigmaAutonomyHub # noqa
-
+__all__: list[str] = []

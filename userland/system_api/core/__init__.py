@@ -1,11 +1,4 @@
 """
-core.py — backward-compat shim.
-Real implementation lives in core/ package.
+SigmaOS Modular Shim for core.py
 """
-
-from .core.SigmaOSKernel import *  # noqa
-
-__all__ = ['SigmaOSKernel']
-
-"""Auto-generated package __init__.py"""
-from .sigmaoskernel import *  # noqa: F401, F403
+__all__: list[str] = []

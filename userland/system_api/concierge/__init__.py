@@ -1,5 +1,4 @@
 """
 SigmaOS Modular Shim for concierge.py
 """
-from .concierge._SigmaNoviceConcierge_core import SigmaNoviceConcierge # noqa
-
+__all__: list[str] = []
