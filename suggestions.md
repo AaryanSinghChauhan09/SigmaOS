@@ -53,3 +53,17 @@
 - `py -m pytest tests -q`
 - lint/type checks for touched files
 - release checklist generated from Markdown docs and manifests
+
+## Phase 2 Improvements Added
+
+- Added repo-level health automation script: `sigma_health_check.py`.
+- Added GitHub Actions pipeline at `.github/workflows/sigma-health.yml` to run health checks on push/PR.
+- Expanded critical import contract coverage to core roadmap modules:
+  - aether orchestrator
+  - agentic claw
+  - task scheduler
+  - vanguard
+  - security warden
+  - resource orchestrator
+  - sigma omni api
+  - package manager

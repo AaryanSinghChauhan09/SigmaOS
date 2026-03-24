@@ -1,5 +1,5 @@
 """
 SigmaOS Modular Shim for vanguard.py
 """
-from .vanguard._SigmaVanguard_core import SigmaVanguard # noqa
+__all__: list[str] = []
 
