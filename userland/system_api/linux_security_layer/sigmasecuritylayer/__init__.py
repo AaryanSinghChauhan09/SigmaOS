@@ -54,7 +54,7 @@ from typing import Dict, List, Any
 class SigmaSecurityLayer:
     def __init__(self, kernel):
         self.kernel = kernel
-        self.config_dir = Path('C:/Users/SigmaUser\\.gemini\\antigravity\\scratch\\SigmaOS\\config\\security_layer')
+        self.config_dir = Path(_os.path.join(_sigma_root, 'config', 'security_layer'))
         self.config_dir.mkdir(parents=True, exist_ok=True)
         self.state_file = self.config_dir / 'security_state.json'
         self.state = self._load_state()

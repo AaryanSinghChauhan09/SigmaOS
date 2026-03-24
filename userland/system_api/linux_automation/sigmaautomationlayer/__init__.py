@@ -68,7 +68,7 @@ from typing import Dict, List, Any
 class SigmaAutomationLayer:
     def __init__(self, kernel):
         self.kernel = kernel
-        self.config_dir = Path('C:/Users/SigmaUser\\.gemini\\antigravity\\scratch\\SigmaOS\\config\\automation')
+        self.config_dir = Path(_os.path.join(_sigma_root, 'config', 'automation'))
         self.config_dir.mkdir(parents=True, exist_ok=True)
         self.backups_file = self.config_dir / 'scheduled_backups.json'
         self.users_file = self.config_dir / 'users.json'

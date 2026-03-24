@@ -26,5 +26,5 @@ This workflow ensures SigmaOS maintains its lead over competitors like Kali, Arc
 
 5. **Full Integration Suite**
    // turbo
-   - Run `py C:/Users/SigmaUser\.gemini\antigravity\scratch\SigmaOS\_integration_v2_test.py`
+   - Run `py _integration_v2_test.py`
    - All tests MUST pass with Sovereign-Grade efficiency.

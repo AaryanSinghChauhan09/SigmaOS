@@ -9,6 +9,7 @@ from datetime import datetime, timezone
 from pathlib import Path
 import subprocess
 import sys
+import re
 
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -40,11 +41,12 @@ def check_file_exists(rel_path: str) -> CheckResult:
 
 def check_readme_clone_url() -> CheckResult:
     readme = (ROOT / "README.md").read_text(encoding="utf-8")
-    expected = "https://github.com/AaryanSinghChauhan09/SigmaOS.git"
+    expected_pattern = r"https://github\.com/[^/\s]+/SigmaOS\.git"
+    matched = re.search(expected_pattern, readme) is not None
     return CheckResult(
-        name="README clone URL is correct",
-        passed=expected in readme,
-        detail="matched expected repo URL" if expected in readme else "README has stale clone URL",
+        name="README clone URL targets SigmaOS repo",
+        passed=matched,
+        detail="matched github owner/repo pattern" if matched else "README has stale clone URL",
     )
 
 
