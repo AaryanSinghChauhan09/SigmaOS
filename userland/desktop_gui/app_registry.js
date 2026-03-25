@@ -5,7 +5,7 @@
  */
 
 export const AppRegistry = [
-    { id: 'dashboard', name: 'Dashboard', icon: '📊', isCore: true, status: 'idle' },
+    { id: 'dashboard', name: 'Dashboard', icon: '📈', isCore: true, status: 'idle' },
     { id: 'terminal', name: 'TensorShell', icon: '💻', isCore: true, status: 'idle' },
     { id: 'store', name: 'Store', icon: '📦', isCore: true, status: 'idle' },
     { id: 'text_cleaner', name: 'Text Cleaner', icon: '🧹', module: './apps.js', status: 'idle' },
@@ -17,7 +17,7 @@ export const AppRegistry = [
     { id: 'pdf', name: 'PDF Forge', icon: '📄', module: './apps.js', status: 'idle' },
     { id: 'notes', name: 'Notes', icon: '📝', module: './apps.js', status: 'idle' },
     { id: 'paint', name: 'Neural Paint', icon: '🎨', module: './games.js', status: 'idle' },
-    { id: 'code', name: 'Code Lab', icon: '💻', module: './apps.js', status: 'idle' },
+    { id: 'code', name: 'Code Lab', icon: '🖥️', module: './apps.js', status: 'idle' },
     { id: 'pong', name: 'Pong AI', icon: '🏓', module: './games.js', status: 'idle' },
     { id: 'chess', name: 'Chess AI', icon: '♟️', module: './games.js', status: 'idle' },
     { id: 'calc', name: 'Sovereign Calc', icon: '🧮', module: './apps.js', status: 'idle' },
@@ -26,7 +26,12 @@ export const AppRegistry = [
     { id: 'vault', name: 'Sovereign Vault', icon: '🔐', module: './apps.js', status: 'idle' },
     { id: 'type', name: 'Sovereign Type', icon: '⌨️', module: './apps.js', status: 'idle' },
     { id: 'email', name: 'Sovereign Email', icon: '📧', isCore: true, status: 'idle' },
-    { id: 'excel', name: 'Sovereign Excel', icon: '📊', isCore: true, status: 'idle' }
+    { id: 'excel', name: 'Sovereign Excel', icon: '📊', isCore: true, status: 'idle' },
+    // Previously missing — caused Store install buttons to silently fail
+    { id: 'audit', name: 'Security Audit', icon: '🛡️', module: './apps.js', status: 'idle' },
+    { id: 'browser', name: 'Ghost Browser', icon: '🌐', isCore: true, status: 'idle' },
+    { id: 'sweep', name: 'Sovereign Sweep', icon: '💣', module: './games.js', status: 'idle' },
+    { id: 'snake', name: 'Sovereign Snake', icon: '🎮', module: './games.js', status: 'idle' },
 ];
 
 export const AppLoader = {
