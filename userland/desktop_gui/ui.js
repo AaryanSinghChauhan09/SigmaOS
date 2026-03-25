@@ -23,7 +23,25 @@ export const UIEngine = {
         this.setupStageManager();
         this.startClock();
         this.updateStats();
+        this.startDynamicWallpaper();
         SigmaKernel.notify("UI_ENGINE: Logic stream synchronized for Infinity v3.0.", "success");
+    },
+
+    startDynamicWallpaper() {
+        // Auto-change wallpaper orb colors every 1 hour to simulate time passage
+        setInterval(() => {
+            const h = new Date().getHours();
+            if (h >= 6 && h < 12) {
+                document.documentElement.style.setProperty('--bg', '#0B132B');
+                document.documentElement.style.setProperty('--accent', '#F5A623');
+            } else if (h >= 12 && h < 18) {
+                document.documentElement.style.setProperty('--bg', '#0f172a');
+                document.documentElement.style.setProperty('--accent', '#5AC8FA');
+            } else {
+                document.documentElement.style.setProperty('--bg', '#050505');
+                document.documentElement.style.setProperty('--accent', '#34d399');
+            }
+        }, 3600000); // 1 hour
     },
 
     switchWS(num) {
@@ -143,6 +161,9 @@ export const UIEngine = {
         this.windowZIndex++;
         win.style.zIndex = this.windowZIndex;
         this.activeWindow = id;
+
+        // Wake up specifically this window and immediately apply styling if Auto-Suspend had dimmed it
+        win.style.filter = 'brightness(1) grayscale(0)';
     },
 
     drag(e, id) {

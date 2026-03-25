@@ -194,6 +194,23 @@ export const SigmaKernel = {
                 this.notify("KERNEL: Detecting UI jitter. Optimizing stage manager for performance.", "info");
                 if (window.UIEngine) window.UIEngine.updateStageManager();
             }
+
+            // [NEW] Sovereign Auto-Suspend Automation
+            if (window.UIEngine && window.UIEngine.openApps) {
+                const active = window.UIEngine.activeWindow;
+                window.UIEngine.openApps.forEach(id => {
+                    const win = document.getElementById(`win-${id}`);
+                    if (win && id !== active && !win.classList.contains('display-none')) {
+                        // Sleep non-focused windows
+                        win.style.filter = 'brightness(0.7) grayscale(0.5)';
+                        win.style.transition = 'filter 0.5s';
+                    } else if (win) {
+                        // Wake up focused window
+                        win.style.filter = 'brightness(1) grayscale(0)';
+                    }
+                });
+            }
+
             this.enforcePrivacyProtocols();
         }, 10000);
     },
