@@ -67,6 +67,8 @@ export const SigmaKernel = {
             const mesh = await import('./mesh.js');
             const infinity = await import('./infinity_search.js');
             const predictor = await import('./neural_predictor.js'); // [NEW ML CORE]
+            const behavior = await import('./ml_behavior_engine.js');
+            const recs = await import('./ml_recommendation_engine.js');
 
             this.modules.set('ui', ui.UIEngine);
             this.modules.set('themes', themes.ThemeEngine);
@@ -77,6 +79,8 @@ export const SigmaKernel = {
             this.modules.set('mesh', mesh.MeshNetwork);
             this.modules.set('infinity', infinity.InfinitySearch);
             this.modules.set('predictor', predictor.NeuralPredictor);
+            this.modules.set('behavior', behavior.BehaviorEngine);
+            this.modules.set('recs', recs.RecommendationEngine);
 
             // Initialize core services
             ui.UIEngine.init();
@@ -86,6 +90,18 @@ export const SigmaKernel = {
             mesh.MeshNetwork.init();
             infinity.InfinitySearch.init();
             predictor.NeuralPredictor.init();
+            behavior.BehaviorEngine.init();
+            recs.RecommendationEngine.init();
+
+            // Hook recommendations into UIEngine.launch
+            if (window.UIEngine) {
+                const _origLaunch = window.UIEngine.launch.bind(window.UIEngine);
+                window.UIEngine.launch = async function(id) {
+                    const result = await _origLaunch(id);
+                    recs.RecommendationEngine.renderSuggestionsHUD(id);
+                    return result;
+                };
+            }
 
         } catch (error) {
             console.error("KERNEL_PANIC: Core logical components missing or corrupted.", error);
