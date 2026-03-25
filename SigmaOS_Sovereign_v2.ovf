@@ -1,0 +1,56 @@
+<?xml version="1.0"?>
+<Envelope ovf:version="1.0" xml:lang="en-US" xmlns="http://schemas.dmtf.org/ovf/envelope/1" xmlns:ovf="http://schemas.dmtf.org/ovf/envelope/1" xmlns:rasd="http://schemas.dmtf.org/wbem/wscim/1/cim-schema/2/common-device-reflection-over-v2-0" xmlns:vbox="http://www.virtualbox.org/ovf/machine">
+  <References/>
+  <DiskSection>
+    <Info>List of the virtual disks used in the package</Info>
+  </DiskSection>
+  <NetworkSection>
+    <Info>Logical networks used in the package</Info>
+    <Network ovf:name="NAT">
+      <Description>Logical network used by this appliance.</Description>
+    </Network>
+  </NetworkSection>
+  <VirtualSystem ovf:id="SigmaOS_Sovereign_Silo">
+    <Info>SigmaOS Sovereign v2.0 - Zero-Trust Silo</Info>
+    <Name>SigmaOS_Sovereign_Silo</Name>
+    <OperatingSystemSection ovf:id="94">
+      <Info>The kind of installed guest operating system</Info>
+      <Description>Ubuntu_64</Description>
+      <vbox:OSType ovf:required="false">Ubuntu_64</vbox:OSType>
+    </OperatingSystemSection>
+    <VirtualHardwareSection>
+      <Info>Virtual hardware requirements for a virtual machine</Info>
+      <System>
+        <vbox:Machine ovf:required="false" name="SigmaOS_Sovereign_Silo" ostype="Ubuntu_64" snapshotFolder="Snapshots" lastStateChange="2026-03-01T16:00:00Z">
+          <Configuration>
+            <Hardware>
+              <CPU count="2">
+                <PAE enabled="false"/>
+                <LongMode enabled="true"/>
+                <X2APIC enabled="true"/>
+                <HardwareVirtExLargePages enabled="true"/>
+              </CPU>
+              <Memory RAMSize="4096"/>
+              <Display VRAMSize="128"/>
+              <BIOS>
+                <IOAPIC enabled="true"/>
+                <SmbiosUuidLittleEndian enabled="true"/>
+              </BIOS>
+              <Network>
+                <Adapter slot="0" enabled="true" type="82540EM">
+                  <NAT/>
+                </Adapter>
+              </Network>
+              <GuestProperties>
+                <GuestProperty name="/VirtualBox/GuestAdd/VBoxService/version" value="6.1.32" timestamp="0" flags=""/>
+              </GuestProperties>
+            </Hardware>
+            <StorageControllers>
+              <StorageController name="SATA" type="AHCI" PortCount="1" useHostIOCache="false" Bootable="true" IDE0MasterEmulationPort="0" IDE0SlaveEmulationPort="1" IDE1MasterEmulationPort="2" IDE1SlaveEmulationPort="3"/>
+            </StorageControllers>
+          </Configuration>
+        </vbox:Machine>
+      </System>
+    </VirtualHardwareSection>
+  </VirtualSystem>
+</Envelope>

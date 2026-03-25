@@ -1,0 +1,831 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Sigma Accounting — Sovereign TallyPrime Core</title>
+<style>
+:root{
+  --bg:#fffde7;--sidebar:#004d40;--sidebar2:#00695c;--header:#ffeb3b;
+  --text:#1a1a1a;--text2:#424242;--brd:#b2b2b2;--accent:#004d40;
+  --dr:#2e7d32;--cr:#c62828;--highlight:#fff176;--hover:#e8f5e9;
+  --infobar:#e0f7fa;--infobrd:#00acc1;
+}
+*{box-sizing:border-box;margin:0;padding:0;font-family:'Courier New',Courier,monospace;font-size:13px;font-weight:600;}
+body{background:var(--bg);color:var(--text);display:flex;flex-direction:column;height:100vh;overflow:hidden;}
+/* TOP INFO BAR */
+.infobar{background:var(--infobar);border-bottom:2px solid var(--infobrd);
+  padding:6px 18px;display:flex;gap:24px;align-items:center;font-size:11px;flex-shrink:0;}
+.info-chip{background:#fff;border:1px solid var(--infobrd);border-radius:3px;padding:2px 10px;color:#006064;}
+/* HEADER */
+.topbar{background:var(--header);border-bottom:3px solid #f9a825;padding:0 0;flex-shrink:0;}
+.menu-row{display:flex;border-bottom:1px solid #f9a825;}
+.menu-row button{background:transparent;border:none;border-right:1px solid #f9a825;
+  padding:8px 14px;cursor:pointer;color:#333;font-weight:700;font-size:12px;
+  font-family:'Courier New',monospace;}
+.menu-row button:hover{background:#fff176;}
+.menu-row button.active{background:#fff;color:var(--accent);}
+/* SHORT KEYS STRIP */
+.shortkeys{background:#fffbcc;border-bottom:1px solid #f9a825;padding:4px 12px;
+  font-size:10px;color:#555;letter-spacing:.2px;}
+/* MAIN */
+.main-layout{flex:1;display:flex;overflow:hidden;}
+/* SIDEBAR */
+.sidebar{width:200px;background:var(--sidebar);color:#b2dfdb;display:flex;flex-direction:column;flex-shrink:0;}
+.sidebar-title{padding:12px 16px;font-size:14px;color:#80cbc4;border-bottom:1px solid #00695c;letter-spacing:1px;}
+.nav-item{padding:10px 16px;cursor:pointer;border-bottom:1px solid #355e5a;font-size:12px;}
+.nav-item:hover{background:var(--sidebar2);color:#fff;}
+.nav-item.active{background:#00796b;color:#fff;}
+.nav-sub{padding:7px 24px;cursor:pointer;border-bottom:1px solid #355e5a;font-size:11px;color:#80cbc4;}
+.nav-sub:hover{background:#00695c;color:#fff;}
+/* CONTENT */
+.content-area{flex:1;overflow-y:auto;display:flex;flex-direction:column;}
+.section{padding:16px 20px;display:none;}
+.section.active{display:block;}
+.section-title{font-size:13px;font-weight:700;color:var(--accent);border-bottom:2px solid var(--accent);
+  padding-bottom:6px;margin-bottom:14px;letter-spacing:.5px;text-transform:uppercase;}
+/* GATEWAY */
+.gateway-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-top:6px;}
+.gw-card{background:#fff;border:1px solid var(--brd);border-radius:4px;padding:14px;cursor:pointer;text-align:center;}
+.gw-card:hover{background:var(--hover);border-color:var(--accent);}
+.gw-card .icon{font-size:1.6rem;margin-bottom:5px;}
+.gw-card .label{font-size:11px;color:var(--text2);}
+/* FORM */
+.form-group{display:flex;gap:10px;align-items:center;margin-bottom:12px;flex-wrap:wrap;}
+.form-group label{width:120px;color:var(--text2);font-size:11px;}
+.form-input{border:1px solid var(--brd);padding:5px 8px;background:#fff;
+  color:var(--text);border-radius:2px;font-family:'Courier New',monospace;font-weight:600;}
+.form-input:focus{outline:none;border-color:var(--accent);background:var(--highlight);}
+.form-select{border:1px solid var(--brd);padding:5px 8px;background:#fff;
+  color:var(--text);border-radius:2px;font-family:'Courier New',monospace;font-weight:600;cursor:pointer;}
+.btn{background:var(--sidebar);color:#e0f2f1;border:none;padding:7px 18px;cursor:pointer;border-radius:2px;font-family:'Courier New',monospace;font-weight:700;font-size:12px;}
+.btn:hover{background:#00695c;}
+.btn.danger{background:#b71c1c;}
+.btn.danger:hover{background:#c62828;}
+.btn.info{background:#0277bd;}
+.btn.info:hover{background:#0288d1;}
+/* TABLE */
+.tally-table{width:100%;border-collapse:collapse;font-size:12px;}
+.tally-table th{background:#e0f7fa;border:1px solid #80deea;padding:7px 10px;text-align:left;color:#006064;font-size:11px;text-transform:uppercase;}
+.tally-table td{border:1px solid #e0e0e0;padding:6px 10px;background:#fff;}
+.tally-table tr:nth-child(even) td{background:#f9f9f9;}
+.tally-table tr:hover td{background:var(--hover);}
+.tally-table .dr{color:var(--dr);text-align:right;font-weight:700;}
+.tally-table .cr{color:var(--cr);text-align:right;font-weight:700;}
+.tally-table .total-row td{background:#e8f5e9;font-weight:700;border-top:2px solid var(--accent);}
+/* P&L and BS */
+.report-col{display:grid;grid-template-columns:1fr 1fr;gap:0;border:1px solid var(--brd);}
+.report-side{padding:14px;}
+.report-side:first-child{border-right:1px solid var(--brd);}
+.report-side h3{font-size:12px;text-transform:uppercase;color:var(--accent);border-bottom:1px solid var(--brd);padding-bottom:5px;margin-bottom:8px;}
+.report-line{display:flex;justify-content:space-between;padding:4px 0;border-bottom:1px solid #f5f5f5;font-size:12px;}
+.report-total{display:flex;justify-content:space-between;padding:6px 0;border-top:2px double var(--accent);font-weight:700;font-size:12px;color:var(--accent);}
+/* LEDGER */
+.ledger-name{font-size:14px;color:var(--accent);font-weight:700;margin-bottom:10px;border-bottom:2px solid var(--accent);padding-bottom:6px;}
+/* RATIOS */
+.ratio-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:10px;}
+.ratio-card{background:#fff;border:1px solid var(--brd);border-radius:4px;padding:12px;text-align:center;}
+.ratio-val{font-size:1.4rem;font-weight:700;color:var(--accent);margin:4px 0;}
+.ratio-label{font-size:10px;color:var(--text2);text-transform:uppercase;letter-spacing:.5px;}
+/* STATUS */
+.statusbar{background:#263238;color:#80cbc4;padding:4px 14px;font-size:10px;flex-shrink:0;letter-spacing:.3px;}
+
+        .sigma-style-sigma_tally-1 { font-weight:700;font-size:12px;color:#006064; }
+        .sigma-style-sigma_tally-2 { flex:1; }
+        .sigma-style-sigma_tally-3 { background:var(--accent);color:#e0f2f1;border:none;padding:4px 12px;cursor:pointer;font-family:'Courier New';font-weight:700;border-radius:2px; }
+        .sigma-style-sigma_tally-4 { width:200px; }
+        .sigma-style-sigma_tally-5 { width:100px; }
+        .sigma-style-sigma_tally-6 { text-align:center; }
+        .sigma-style-sigma_tally-7 { width:80px;background:#f5f5f5; }
+        .sigma-style-sigma_tally-8 { width:180px; }
+        .sigma-style-sigma_tally-9 { width:120px; }
+        .sigma-style-sigma_tally-10 { width:180px; }
+        .sigma-style-sigma_tally-11 { width:120px; }
+        .sigma-style-sigma_tally-12 { width:400px; }
+        .sigma-style-sigma_tally-13 { width:120px; }
+        .sigma-style-sigma_tally-14 { margin-left:12px;color:#b71c1c;font-size:11px; }
+        .sigma-style-sigma_tally-15 { margin-top:12px;font-size:11px;color:#6d4c41;background:#fff3e0;padding:8px 12px;border-radius:2px;border-left:3px solid #f9a825; }
+        .sigma-style-sigma_tally-16 { margin-bottom:10px; }
+        .sigma-style-sigma_tally-17 { text-align:right; }
+        .sigma-style-sigma_tally-18 { width:220px; }
+        .sigma-style-sigma_tally-19 { text-align:right; }
+        .sigma-style-sigma_tally-20 { flex-wrap:wrap;gap:10px; }
+        .sigma-style-sigma_tally-21 { display:none; }
+        .sigma-style-sigma_tally-22 { margin-top:12px;font-size:11px;color:#555;background:#f5f5f5;padding:12px;border-radius:2px;border:1px solid #ddd;min-height:60px; }
+        .sigma-style-sigma_tally-23 { text-align:right; }
+        .sigma-style-sigma_tally-24 { text-align:center; }
+        .sigma-style-sigma_tally-25 { padding:2px 8px;font-size:10px; }
+        .sigma-style-sigma_tally-26 { max-width:150px;overflow:hidden;text-overflow:ellipsis; }
+        .sigma-style-sigma_tally-27 { color:${color}; }
+        .sigma-style-sigma_tally-28 { color:var(--dr) }
+        .sigma-style-sigma_tally-29 { color:var(--cr) }
+        .sigma-style-sigma_tally-30 { color:${color}; }
+        .sigma-style-sigma_tally-31 { font-size:9px;color:#9e9e9e;margin-top:2px; }
+        .sigma-style-sigma_tally-32 { text-align:right; }
+        .sigma-style-sigma_tally-33 { text-align:right; }
+        .sigma-style-sigma_tally-34 { text-align:right; }
+        .sigma-style-sigma_tally-35 { text-align:right; }
+        .sigma-style-sigma_tally-36 { text-align:right; }
+        .sigma-style-sigma_tally-37 { text-align:right;font-weight:700; }
+        .sigma-style-sigma_tally-38 { text-align:right; }
+        .sigma-style-sigma_tally-39 { text-align:right; }
+        .sigma-style-sigma_tally-40 { text-align:right; }
+    </style>
+
+<script>
+// Sovereign OS Inline Style Manager
+document.addEventListener('DOMContentLoaded', () => {
+    const applyTo = (el) => { if(el.getAttribute('data-style')) { el.setAttribute('style', el.getAttribute('data-style')); el.removeAttribute('data-style'); } };
+    new MutationObserver(mutations => mutations.forEach(m => {
+        if(m.type === 'childList') m.addedNodes.forEach(n => { if(n.nodeType === 1) { applyTo(n); n.querySelectorAll('[data-style]').forEach(applyTo); } });
+    })).observe(document.body, {childList: true, subtree: true});
+    document.querySelectorAll('[data-style]').forEach(applyTo);
+});
+</script>
+</head>
+<body>
+
+<!-- INFO BAR -->
+<div class="infobar">
+  <span data- class="sigma-style-sigma_tally-1">Σ SIGMA ACCOUNTING</span>
+  <span class="info-chip" id="company-chip">Company: SIGMA CORP</span>
+  <span class="info-chip" id="fy-chip">FY: 2025–26</span>
+  <span class="info-chip" id="gst-chip">GSTIN: 27AADCS0472N1Z1</span>
+  <span data- class="sigma-style-sigma_tally-2"></span>
+  <button data- onclick="showGateway()" class="sigma-style-sigma_tally-3">Gateway of Sigma (G)</button>
+</div>
+
+<!-- TOP MENU -->
+<div class="topbar">
+  <div class="menu-row">
+    <button onclick="showSection('gateway')" id="mb-gw" class="active">🏠 Gateway</button>
+    <button onclick="showSection('voucher')" id="mb-vch">📝 Voucher (V)</button>
+    <button onclick="showSection('masters')" id="mb-mas">📚 Masters (M)</button>
+    <button onclick="showSection('daybook')" id="mb-db">📖 Day Book (D)</button>
+    <button onclick="showSection('ledger')" id="mb-ldg">📊 Ledger (L)</button>
+    <button onclick="showSection('pl')" id="mb-pl">💹 P&L (P)</button>
+    <button onclick="showSection('bs')" id="mb-bs">⚖️ Balance Sheet (B)</button>
+    <button onclick="showSection('ratios')" id="mb-rat">📐 Ratios (R)</button>
+    <button onclick="showSection('gst')" id="mb-gst">🪙 GST (U)</button>
+    <button onclick="showSection('export')" id="mb-exp">📤 Export (E)</button>
+  </div>
+</div>
+<div class="shortkeys">
+  F1=Help &nbsp;|&nbsp; F2=Date &nbsp;|&nbsp; F5=Payment Voucher &nbsp;|&nbsp; F6=Receipt &nbsp;|&nbsp; F7=Journal &nbsp;|&nbsp; F8=Sales &nbsp;|&nbsp; F9=Purchase &nbsp;|&nbsp; Ctrl+A=Accept &nbsp;|&nbsp; Esc=Back
+</div>
+
+<!-- MAIN LAYOUT -->
+<div class="main-layout">
+  <div class="sidebar">
+    <div class="sidebar-title">Σ Accounting</div>
+    <div class="nav-item active" onclick="showSection('gateway')">🏠 Gateway</div>
+    <div class="nav-item" onclick="showSection('voucher')">📝 Voucher Entry</div>
+    <div class="nav-sub" onclick="setVchType('Payment'); showSection('voucher')">↳ Payment (F5)</div>
+    <div class="nav-sub" onclick="setVchType('Receipt'); showSection('voucher')">↳ Receipt (F6)</div>
+    <div class="nav-sub" onclick="setVchType('Journal'); showSection('voucher')">↳ Journal (F7)</div>
+    <div class="nav-sub" onclick="setVchType('Sales'); showSection('voucher')">↳ Sales (F8)</div>
+    <div class="nav-sub" onclick="setVchType('Purchase'); showSection('voucher')">↳ Purchase (F9)</div>
+    <div class="nav-item" onclick="showSection('masters')">📚 Masters</div>
+    <div class="nav-item" onclick="showSection('daybook')">📖 Day Book</div>
+    <div class="nav-item" onclick="showSection('ledger')">📊 Ledger</div>
+    <div class="nav-item" onclick="showSection('pl')">💹 P&L Report</div>
+    <div class="nav-item" onclick="showSection('bs')">⚖️ Balance Sheet</div>
+    <div class="nav-item" onclick="showSection('ratios')">📐 Financial Ratios</div>
+    <div class="nav-item" onclick="showSection('gst')">🪙 GST Reports</div>
+    <div class="nav-item" onclick="showSection('export')">📤 Export</div>
+  </div>
+
+  <div class="content-area">
+
+    <!-- GATEWAY -->
+    <div class="section active" id="sec-gateway">
+      <div class="section-title">Gateway of Sigma</div>
+      <div class="gateway-grid">
+        <div class="gw-card" onclick="showSection('voucher')"><div class="icon">📝</div><div class="label">Voucher Entry</div></div>
+        <div class="gw-card" onclick="showSection('masters')"><div class="icon">📚</div><div class="label">Ledger Masters</div></div>
+        <div class="gw-card" onclick="showSection('daybook')"><div class="icon">📖</div><div class="label">Day Book</div></div>
+        <div class="gw-card" onclick="showSection('pl')"><div class="icon">💹</div><div class="label">Profit & Loss</div></div>
+        <div class="gw-card" onclick="showSection('bs')"><div class="icon">⚖️</div><div class="label">Balance Sheet</div></div>
+        <div class="gw-card" onclick="showSection('ledger')"><div class="icon">📊</div><div class="label">Ledger Report</div></div>
+        <div class="gw-card" onclick="showSection('ratios')"><div class="icon">📐</div><div class="label">Financial Ratios</div></div>
+        <div class="gw-card" onclick="showSection('gst')"><div class="icon">🪙</div><div class="label">GST Reports</div></div>
+        <div class="gw-card" onclick="showSection('export')"><div class="icon">📤</div><div class="label">Export Data</div></div>
+      </div>
+    </div>
+
+    <!-- MASTERS -->
+    <div class="section" id="sec-masters">
+      <div class="section-title">Ledger Masters</div>
+      <div class="form-group">
+        <label>Ledger Name</label>
+        <input aria-label="input" class="form-input sigma-style-sigma_tally-4" id="mas-name" placeholder="e.g. Cash Account" data- title="input">
+        <label>Group</label>
+        <select aria-label="Selection" class="form-select" id="mas-group" title="input">
+          <option>Capital Account</option><option>Current Assets</option><option>Fixed Assets</option>
+          <option>Current Liabilities</option><option>Loans (Liabilities)</option>
+          <option>Sales Accounts</option><option>Purchase Accounts</option>
+          <option>Direct Expenses</option><option>Indirect Expenses</option>
+          <option>Direct Income</option><option>Indirect Income</option>
+          <option>Bank Accounts</option><option>Cash-in-Hand</option>
+          <option>Sundry Debtors</option><option>Sundry Creditors</option>
+          <option>Duties &amp; Taxes</option>
+        </select>
+        <label>Opening Bal (₹)</label>
+        <input aria-label="input" class="form-input sigma-style-sigma_tally-5" id="mas-ob" type="number" placeholder="0" data- title="input">
+        <select aria-label="Selection" class="form-select" id="mas-obtype" title="input"><option>Dr</option><option>Cr</option></select>
+        <button class="btn" onclick="addLedger()">Create</button>
+      </div>
+      <table class="tally-table" id="ledger-master-table">
+        <thead><tr><th>#</th><th>Ledger Name</th><th>Group</th><th>Opening Bal</th><th>Type</th><th data- class="sigma-style-sigma_tally-6">Action</th></tr></thead>
+        <tbody id="ledger-master-body"></tbody>
+      </table>
+    </div>
+
+    <!-- VOUCHER -->
+    <div class="section" id="sec-voucher">
+      <div class="section-title" id="vch-sec-title">Voucher Entry</div>
+      <div class="form-group">
+        <label>Date</label>
+        <input aria-label="input" class="form-input" type="date" id="vch-date" title="input">
+        <label>Type</label>
+        <select aria-label="Selection" class="form-select" id="vch-type" title="input">
+          <option>Payment</option><option>Receipt</option><option>Journal</option>
+          <option>Sales</option><option>Purchase</option><option>Contra</option>
+          <option>Credit Note</option><option>Debit Note</option>
+        </select>
+        <label>Voucher #</label>
+        <input aria-label="input" class="form-input sigma-style-sigma_tally-7" id="vch-num" readonly data- title="input">
+      </div>
+      <div class="form-group">
+        <label>Dr Ledger</label>
+        <select aria-label="Selection" class="form-select sigma-style-sigma_tally-8" id="vch-dr" data- title="input"></select>
+        <label>Dr Amount (₹)</label>
+        <input aria-label="input" class="form-input sigma-style-sigma_tally-9" id="vch-dr-amt" type="number" placeholder="0.00" data- title="input">
+      </div>
+      <div class="form-group">
+        <label>Cr Ledger</label>
+        <select aria-label="Selection" class="form-select sigma-style-sigma_tally-10" id="vch-cr" data- title="input"></select>
+        <label>Cr Amount (₹)</label>
+        <input aria-label="input" class="form-input sigma-style-sigma_tally-11" id="vch-cr-amt" type="number" placeholder="0.00" data- title="input">
+      </div>
+      <div class="form-group">
+        <label>Narration</label>
+        <input aria-label="input" class="form-input sigma-style-sigma_tally-12" id="vch-narr" placeholder="Being …" data- title="input">
+        <label>Ref #</label>
+        <input aria-label="input" class="form-input sigma-style-sigma_tally-13" id="vch-ref" placeholder="Inv/Bill No." data- title="input">
+      </div>
+      <div class="form-group">
+        <button class="btn" onclick="saveVoucher()">✅ Accept (Ctrl+A)</button>
+        <button class="btn danger" onclick="clearVoucher()">✕ Cancel</button>
+        <span id="vch-balance-hint" data- class="sigma-style-sigma_tally-14"></span>
+      </div>
+      <div data- class="sigma-style-sigma_tally-15">
+        💡 Tip: F5=Payment, F6=Receipt, F7=Journal, F8=Sales, F9=Purchase | Ctrl+A to save
+      </div>
+    </div>
+
+    <!-- DAY BOOK -->
+    <div class="section" id="sec-daybook">
+      <div class="section-title">Day Book</div>
+      <div class="form-group sigma-style-sigma_tally-16" data->
+        <label>Filter date from</label>
+        <input aria-label="input" class="form-input" type="date" id="db-from" title="input">
+        <label>to</label>
+        <input aria-label="input" class="form-input" type="date" id="db-to" title="input">
+        <button class="btn info" onclick="renderDayBook()">Filter</button>
+        <button class="btn" onclick="clearDB()">All</button>
+      </div>
+      <table class="tally-table">
+        <thead><tr><th>#</th><th>Date</th><th>Type</th><th>Vch#</th><th>Dr Ledger</th><th>Cr Ledger</th><th>Narration</th><th>Ref</th><th class="dr">Dr (₹)</th><th class="cr">Cr (₹)</th></tr></thead>
+        <tbody id="daybook-body"></tbody>
+        <tfoot><tr class="total-row"><td colspan="8" data- class="sigma-style-sigma_tally-17">TOTAL</td><td class="dr" id="db-tdr">0</td><td class="cr" id="db-tcr">0</td></tr></tfoot>
+      </table>
+    </div>
+
+    <!-- LEDGER REPORT -->
+    <div class="section" id="sec-ledger">
+      <div class="section-title">Ledger Report</div>
+      <div class="form-group">
+        <label>Select Ledger</label>
+        <select aria-label="Selection" class="form-select sigma-style-sigma_tally-18" id="ldg-sel" data- onchange="renderLedger()" title="input"></select>
+      </div>
+      <div class="ledger-name" id="ldg-name">—</div>
+      <table class="tally-table">
+        <thead><tr><th>Date</th><th>Type</th><th>Narration</th><th class="dr">Dr (₹)</th><th class="cr">Cr (₹)</th><th>Balance</th></tr></thead>
+        <tbody id="ldg-body"></tbody>
+        <tfoot><tr class="total-row"><td colspan="3" data- class="sigma-style-sigma_tally-19">CLOSING BALANCE</td><td class="dr" id="ldg-tdr">0</td><td class="cr" id="ldg-tcr">0</td><td id="ldg-bal">—</td></tr></tfoot>
+      </table>
+    </div>
+
+    <!-- P&L -->
+    <div class="section" id="sec-pl">
+      <div class="section-title">Profit & Loss Report</div>
+      <div class="report-col" id="pl-report"></div>
+    </div>
+
+    <!-- BALANCE SHEET -->
+    <div class="section" id="sec-bs">
+      <div class="section-title">Balance Sheet</div>
+      <div class="report-col" id="bs-report"></div>
+    </div>
+
+    <!-- RATIOS -->
+    <div class="section" id="sec-ratios">
+      <div class="section-title">Financial Ratios</div>
+      <div class="ratio-grid" id="ratio-grid"></div>
+    </div>
+
+    <!-- GST -->
+    <div class="section" id="sec-gst">
+      <div class="section-title">GST Reports</div>
+      <div class="form-group">
+        <label>GST Rate %</label>
+        <select aria-label="Selection" class="form-select" id="gst-rate" title="input">
+          <option value="0">0% (Exempt)</option><option value="5">5%</option>
+          <option value="12">12%</option><option value="18" selected>18%</option>
+          <option value="28">28%</option>
+        </select>
+        <button class="btn info" onclick="generateGSTReport()">Generate GSTR-1</button>
+      </div>
+      <div id="gst-report"></div>
+    </div>
+
+    <!-- EXPORT -->
+    <div class="section" id="sec-export">
+      <div class="section-title">Export Data</div>
+      <div class="form-group sigma-style-sigma_tally-20" data->
+        <button class="btn" onclick="exportDaybookCSV()">📄 Day Book CSV</button>
+        <button class="btn info" onclick="exportLedgersCSV()">📊 All Ledgers CSV</button>
+        <button class="btn" onclick="exportJSON()">🔧 Full JSON Backup</button>
+        <button class="btn danger" onclick="importJSON()">📥 Import Backup</button>
+        <input aria-label="input" type="file" id="import-file" accept=".json" data- onchange="loadBackup(event)" title="input" class="sigma-style-sigma_tally-21">
+      </div>
+      <div id="export-preview" data- class="sigma-style-sigma_tally-22">Export preview appears here…</div>
+    </div>
+
+  </div>
+</div>
+
+<div class="statusbar" id="statusbar">🟢 Sigma Accounting ready — Gateway of Sigma</div>
+
+<script>
+'use strict';
+/**
+ * SIGMA ACCOUNTING — Sovereign TallyPrime Core
+ * Zero-dependency. Full double-entry bookkeeping.
+ * OOP architecture. No external libraries.
+ */
+
+class SigmaLedgerMaster {
+  constructor(id, name, group, openingBal=0, obType='Dr') {
+    this.id = id;
+    this.name = name;
+    this.group = group;
+    this.openingBal = openingBal;
+    this.obType = obType; // 'Dr' or 'Cr'
+  }
+}
+
+class SigmaVoucher {
+  constructor(id, date, type, drLedger, crLedger, drAmt, crAmt, narr, ref) {
+    this.id = id;
+    this.date = date;
+    this.type = type;
+    this.drLedger = drLedger;
+    this.crLedger = crLedger;
+    this.drAmt = parseFloat(drAmt) || 0;
+    this.crAmt = parseFloat(crAmt) || 0;
+    this.narr = narr;
+    this.ref = ref;
+  }
+}
+
+class SigmaAccountingEngine {
+  constructor() {
+    this.ledgers = [];
+    this.vouchers = [];
+    this.vchSeq = 0;
+    this.ldgSeq = 0;
+    this._initDefaultLedgers();
+    this._initSampleVouchers();
+  }
+
+  _initDefaultLedgers() {
+    const defaults = [
+      ['Cash','Cash-in-Hand',100000,'Dr'],
+      ['Bank (HDFC)','Bank Accounts',500000,'Dr'],
+      ['Capital','Capital Account',600000,'Cr'],
+      ['Sales','Sales Accounts',0,'Cr'],
+      ['Purchase','Purchase Accounts',0,'Dr'],
+      ['Salary Expenses','Indirect Expenses',0,'Dr'],
+      ['Rent Expenses','Indirect Expenses',0,'Dr'],
+      ['CGST (9%)','Duties & Taxes',0,'Cr'],
+      ['SGST (9%)','Duties & Taxes',0,'Cr'],
+      ['Accounts Receivable','Sundry Debtors',0,'Dr'],
+      ['Accounts Payable','Sundry Creditors',0,'Cr'],
+    ];
+    defaults.forEach(d => { this.ldgSeq++; this.ledgers.push(new SigmaLedgerMaster(this.ldgSeq,...d)); });
+  }
+
+  _initSampleVouchers() {
+    const samples = [
+      ['2025-04-01','Receipt','Accounts Receivable','Cash',50000,50000,'Being receipt from customer ABC','INV-001'],
+      ['2025-04-02','Payment','Salary Expenses','Cash',42000,42000,'April salary payment','SAL-001'],
+      ['2025-04-03','Sales','Accounts Receivable','Sales',120000,120000,'Sales to XYZ Pvt Ltd','SO-001'],
+      ['2025-04-05','Purchase','Purchase','Accounts Payable',80000,80000,'Purchase from supplier','PO-001'],
+      ['2025-04-10','Payment','Rent Expenses','Cash',25000,25000,'Monthly office rent','RENT-01'],
+      ['2025-04-15','Journal','CGST (9%)','Accounts Payable',7200,7200,'CGST adjustment','GST-01'],
+    ];
+    samples.forEach(s => { this.vchSeq++; this.vouchers.push(new SigmaVoucher(this.vchSeq,...s)); });
+  }
+
+  addLedger(name, group, ob, obType) {
+    if (!name) return null;
+    if (this.ledgers.find(l=>l.name.toLowerCase()===name.toLowerCase())) return null;
+    this.ldgSeq++;
+    const l = new SigmaLedgerMaster(this.ldgSeq, name, group, ob, obType);
+    this.ledgers.push(l);
+    return l;
+  }
+
+  deleteLedger(id) {
+    this.ledgers = this.ledgers.filter(l=>l.id!==id);
+    this.vouchers = this.vouchers.filter(v=>v.drLedger!==this._name(id)&&v.crLedger!==this._name(id));
+  }
+
+  _name(id) { const l=this.ledgers.find(l=>l.id===id); return l?l.name:''; }
+
+  addVoucher(date,type,drL,crL,drAmt,crAmt,narr,ref) {
+    if (!drL||!crL||(!drAmt&&!crAmt)) return null;
+    this.vchSeq++;
+    const v = new SigmaVoucher(this.vchSeq,date,type,drL,crL,drAmt,crAmt,narr,ref);
+    this.vouchers.push(v);
+    return v;
+  }
+
+  deleteVoucher(id) { this.vouchers = this.vouchers.filter(v=>v.id!==id); }
+
+  getLedgerBalance(name) {
+    const master = this.ledgers.find(l=>l.name===name);
+    let dr = master ? (master.obType==='Dr' ? master.openingBal : 0) : 0;
+    let cr = master ? (master.obType==='Cr' ? master.openingBal : 0) : 0;
+    this.vouchers.forEach(v=>{
+      if(v.drLedger===name) dr+=v.drAmt;
+      if(v.crLedger===name) cr+=v.crAmt;
+    });
+    return {dr, cr, net: dr-cr};
+  }
+
+  // Group-based totals for P&L and BS
+  getGroupTotal(groups) {
+    let total = 0;
+    this.ledgers.filter(l=>groups.includes(l.group)).forEach(l=>{
+      const bal = this.getLedgerBalance(l.name);
+      total += Math.abs(bal.net);
+    });
+    return total;
+  }
+
+  getPL() {
+    const income = ['Sales Accounts','Direct Income','Indirect Income'];
+    const expense = ['Purchase Accounts','Direct Expenses','Indirect Expenses'];
+    const incItems = []; const expItems = [];
+    this.ledgers.filter(l=>income.includes(l.group)).forEach(l=>{
+      const b=this.getLedgerBalance(l.name); if(Math.abs(b.cr-b.dr)>0) incItems.push({name:l.name,amt:Math.abs(b.cr-b.dr>0?b.cr-b.dr:b.dr-b.cr)});
+    });
+    this.ledgers.filter(l=>expense.includes(l.group)).forEach(l=>{
+      const b=this.getLedgerBalance(l.name); if(b.dr>0) expItems.push({name:l.name,amt:b.dr});
+    });
+    const totalInc=incItems.reduce((a,i)=>a+i.amt,0);
+    const totalExp=expItems.reduce((a,i)=>a+i.amt,0);
+    return {incItems,expItems,totalInc,totalExp,profit:totalInc-totalExp};
+  }
+
+  getBS() {
+    const assets = ['Current Assets','Fixed Assets','Bank Accounts','Cash-in-Hand','Sundry Debtors'];
+    const liab = ['Capital Account','Current Liabilities','Sundry Creditors','Loans (Liabilities)','Duties & Taxes'];
+    const assetItems=[]; const liabItems=[];
+    this.ledgers.filter(l=>assets.includes(l.group)).forEach(l=>{
+      const b=this.getLedgerBalance(l.name); if(b.dr>0) assetItems.push({name:l.name,amt:b.dr});
+    });
+    this.ledgers.filter(l=>liab.includes(l.group)).forEach(l=>{
+      const b=this.getLedgerBalance(l.name); const amt=b.cr>b.dr?b.cr-b.dr:b.dr-b.cr; if(amt>0) liabItems.push({name:l.name,amt});
+    });
+    const {profit} = this.getPL();
+    if(profit>0) liabItems.push({name:'Net Profit (P&L)',amt:profit});
+    return {assetItems,liabItems,
+      totalA:assetItems.reduce((a,i)=>a+i.amt,0),
+      totalL:liabItems.reduce((a,i)=>a+i.amt,0)};
+  }
+
+  getVouchers(from, to) {
+    return this.vouchers.filter(v=>{
+      if(from && v.date < from) return false;
+      if(to && v.date > to) return false;
+      return true;
+    });
+  }
+
+  exportJSON() { return JSON.stringify({ledgers:this.ledgers, vouchers:this.vouchers, vchSeq:this.vchSeq, ldgSeq:this.ldgSeq}, null, 2); }
+  importJSON(json) {
+    try { const d=JSON.parse(json); this.ledgers=d.ledgers||[]; this.vouchers=d.vouchers||[]; this.vchSeq=d.vchSeq||0; this.ldgSeq=d.ldgSeq||0; return true; } catch { return false; }
+  }
+}
+
+/* ── APP CONTROLLER ─────────────────────────────────────── */
+class SigmaAccountingApp {
+  constructor() {
+    this.engine = new SigmaAccountingEngine();
+    this.currentSection = 'gateway';
+    this._init();
+  }
+
+  _init() {
+    document.getElementById('vch-date').value = new Date().toISOString().slice(0,10);
+    this._refreshLedgerDropdowns();
+    this._refreshMasterTable();
+    this._setNextVchNum();
+    this._bindKeys();
+    this.setStatus('🟢 Ready — Gateway of Sigma');
+  }
+
+  _bindKeys() {
+    document.addEventListener('keydown', e => {
+      if (e.ctrlKey && e.key==='a') { e.preventDefault(); this.saveVoucher(); }
+      if (e.key==='F5') { e.preventDefault(); this.setVchType('Payment'); this.showSection('voucher'); }
+      if (e.key==='F6') { e.preventDefault(); this.setVchType('Receipt'); this.showSection('voucher'); }
+      if (e.key==='F7') { e.preventDefault(); this.setVchType('Journal'); this.showSection('voucher'); }
+      if (e.key==='F8') { e.preventDefault(); this.setVchType('Sales'); this.showSection('voucher'); }
+      if (e.key==='F9') { e.preventDefault(); this.setVchType('Purchase'); this.showSection('voucher'); }
+    });
+  }
+
+  showSection(id) {
+    document.querySelectorAll('.section').forEach(s=>s.classList.remove('active'));
+    document.querySelectorAll('.menu-row button').forEach(b=>b.classList.remove('active'));
+    document.getElementById('sec-'+id).classList.add('active');
+    const mb = document.getElementById('mb-'+id.slice(0,2));
+    if(mb) mb.classList.add('active');
+    this.currentSection = id;
+    // Render dynamic content
+    if(id==='daybook') this.renderDayBook();
+    if(id==='ledger') this._populateLedgerSel();
+    if(id==='pl') this.renderPL();
+    if(id==='bs') this.renderBS();
+    if(id==='ratios') this.renderRatios();
+    if(id==='gst') this.generateGSTReport();
+    this.setStatus(`📋 ${id.toUpperCase()} section`);
+  }
+
+  addLedger() {
+    const name=document.getElementById('mas-name').value.trim();
+    const grp=document.getElementById('mas-group').value;
+    const ob=parseFloat(document.getElementById('mas-ob').value)||0;
+    const obt=document.getElementById('mas-obtype').value;
+    const l=this.engine.addLedger(name,grp,ob,obt);
+    if(!l){this.setStatus('❌ Ledger exists or name empty.');return;}
+    this._refreshMasterTable();
+    this._refreshLedgerDropdowns();
+    document.getElementById('mas-name').value='';
+    document.getElementById('mas-ob').value='';
+    this.setStatus(`✅ Ledger created: ${name}`);
+  }
+
+  _refreshMasterTable() {
+    const tbody=document.getElementById('ledger-master-body');
+    tbody.innerHTML = this.engine.ledgers.map((l,i)=>
+      `<tr><td>${i+1}</td><td>${l.name}</td><td>${l.group}</td>
+       <td data- class="sigma-style-sigma_tally-23">${this._fmt(l.openingBal)}</td>
+       <td class="${l.obType==='Dr'?'dr':'cr'}">${l.obType}</td>
+       <td data- class="sigma-style-sigma_tally-24"><button class="btn danger sigma-style-sigma_tally-25" data- onclick="app.delLedger(${l.id})">Delete</button></td></tr>`
+    ).join('');
+  }
+
+  delLedger(id) {
+    this.engine.deleteLedger(id);
+    this._refreshMasterTable();
+    this._refreshLedgerDropdowns();
+    this.setStatus('✅ Ledger deleted.');
+  }
+
+  _refreshLedgerDropdowns() {
+    const names = this.engine.ledgers.map(l=>`<option>${l.name}</option>`).join('');
+    ['vch-dr','vch-cr','ldg-sel'].forEach(id=>{
+      const el=document.getElementById(id);
+      if(el) el.innerHTML=names;
+    });
+  }
+
+  setVchType(type) {
+    document.getElementById('vch-type').value=type;
+    document.getElementById('vch-sec-title').textContent=type+' Voucher Entry';
+  }
+
+  _setNextVchNum() {
+    document.getElementById('vch-num').value='VCH-'+(this.engine.vchSeq+1).toString().padStart(4,'0');
+  }
+
+  saveVoucher() {
+    const date=document.getElementById('vch-date').value;
+    const type=document.getElementById('vch-type').value;
+    const drL=document.getElementById('vch-dr').value;
+    const crL=document.getElementById('vch-cr').value;
+    const drA=parseFloat(document.getElementById('vch-dr-amt').value)||0;
+    const crA=parseFloat(document.getElementById('vch-cr-amt').value)||0;
+    const narr=document.getElementById('vch-narr').value;
+    const ref=document.getElementById('vch-ref').value;
+    const hint=document.getElementById('vch-balance-hint');
+    if(!date||!drL||!crL){this.setStatus('❌ Fill date, Dr and Cr ledgers.');return;}
+    if(drA!==crA&&drA>0&&crA>0){hint.textContent='⚠️ Dr ≠ Cr! Auto-balancing Cr.';} else hint.textContent='';
+    const finalAmt=Math.max(drA,crA)||0;
+    const v=this.engine.addVoucher(date,type,drL,crL,finalAmt,finalAmt,narr,ref);
+    this.clearVoucher();
+    this._setNextVchNum();
+    this.setStatus(`✅ ${type} Voucher #VCH-${v.id.toString().padStart(4,'0')} saved — Dr: ${drL} | Cr: ${crL} | ₹${this._fmt(finalAmt)}`);
+  }
+
+  clearVoucher() {
+    ['vch-dr-amt','vch-cr-amt','vch-narr','vch-ref'].forEach(id=>{ const el=document.getElementById(id); if(el) el.value=''; });
+    document.getElementById('vch-balance-hint').textContent='';
+  }
+
+  renderDayBook(from, to) {
+    const f=from||document.getElementById('db-from').value;
+    const t=to||document.getElementById('db-to').value;
+    const vchs=this.engine.getVouchers(f,t);
+    let tDr=0,tCr=0;
+    document.getElementById('daybook-body').innerHTML=vchs.map((v,i)=>{
+      tDr+=v.drAmt;tCr+=v.crAmt;
+      return `<tr><td>${i+1}</td><td>${v.date}</td><td>${v.type}</td><td>VCH-${v.id.toString().padStart(4,'0')}</td>
+        <td>${v.drLedger}</td><td>${v.crLedger}</td><td data- class="sigma-style-sigma_tally-26">${v.narr}</td><td>${v.ref}</td>
+        <td class="dr">${this._fmt(v.drAmt)}</td><td class="cr">${this._fmt(v.crAmt)}</td></tr>`;
+    }).join('');
+    document.getElementById('db-tdr').textContent=this._fmt(tDr);
+    document.getElementById('db-tcr').textContent=this._fmt(tCr);
+    this.setStatus(`📖 Day Book: ${vchs.length} vouchers | Total Dr: ₹${this._fmt(tDr)} | Cr: ₹${this._fmt(tCr)}`);
+  }
+
+  clearDB() { document.getElementById('db-from').value=''; document.getElementById('db-to').value=''; this.renderDayBook(); }
+
+  _populateLedgerSel() {
+    this._refreshLedgerDropdowns();
+    this.renderLedger();
+  }
+
+  renderLedger() {
+    const name=document.getElementById('ldg-sel').value;
+    if(!name) return;
+    document.getElementById('ldg-name').textContent=name;
+    const vchs=this.engine.vouchers.filter(v=>v.drLedger===name||v.crLedger===name);
+    const master=this.engine.ledgers.find(l=>l.name===name);
+    let runDr=master&&master.obType==='Dr'?master.openingBal:0;
+    let runCr=master&&master.obType==='Cr'?master.openingBal:0;
+    let tDr=runDr,tCr=runCr;
+    document.getElementById('ldg-body').innerHTML=vchs.map(v=>{
+      const isDr=v.drLedger===name;
+      if(isDr) { runDr+=v.drAmt; tDr+=v.drAmt; }
+      else { runCr+=v.crAmt; tCr+=v.crAmt; }
+      const bal=runDr-runCr;
+      return `<tr><td>${v.date}</td><td>${v.type}</td><td>${v.narr||'—'}</td>
+        <td class="dr">${isDr?this._fmt(v.drAmt):''}</td>
+        <td class="cr">${!isDr?this._fmt(v.crAmt):''}</td>
+        <td data-style="font-weight:700;color:${bal>=0?'var(--dr)':'var(--cr)'};">${this._fmt(Math.abs(bal))} ${bal>=0?'Dr':'Cr'}</td></tr>`;
+    }).join('');
+    const net=tDr-tCr;
+    document.getElementById('ldg-tdr').textContent=this._fmt(tDr);
+    document.getElementById('ldg-tcr').textContent=this._fmt(tCr);
+    document.getElementById('ldg-bal').textContent=this._fmt(Math.abs(net))+(net>=0?' Dr':' Cr');
+    this.setStatus(`📊 Ledger: ${name} | Dr: ₹${this._fmt(tDr)} | Cr: ₹${this._fmt(tCr)} | Balance: ₹${this._fmt(Math.abs(net))} ${net>=0?'Dr':'Cr'}`);
+  }
+
+  renderPL() {
+    const {incItems,expItems,totalInc,totalExp,profit}=this.engine.getPL();
+    const el=document.getElementById('pl-report');
+    const side=(title,items,total,color)=>`
+      <div class="report-side">
+        <h3 data- class="sigma-style-sigma_tally-27">${title}</h3>
+        ${items.map(i=>`<div class="report-line"><span>${i.name}</span><span>₹${this._fmt(i.amt)}</span></div>`).join('')}
+        <div class="report-total"><span>Total ${title}</span><span>₹${this._fmt(total)}</span></div>
+        ${profit>0&&title==='Income'?`<div class="report-total sigma-style-sigma_tally-28" data-><span>Net Profit</span><span>₹${this._fmt(profit)}</span></div>`:''}
+        ${profit<0&&title==='Expenditure'?`<div class="report-total sigma-style-sigma_tally-29" data-><span>Net Loss</span><span>₹${this._fmt(Math.abs(profit))}</span></div>`:''}
+      </div>`;
+    el.innerHTML=side('Income',incItems,totalInc,'#1b5e20')+side('Expenditure',expItems,totalExp,'#b71c1c');
+    this.setStatus(`💹 P&L: Income ₹${this._fmt(totalInc)} | Expenses ₹${this._fmt(totalExp)} | ${profit>=0?'Profit':'Loss'} ₹${this._fmt(Math.abs(profit))}`);
+  }
+
+  renderBS() {
+    const {assetItems,liabItems,totalA,totalL}=this.engine.getBS();
+    const el=document.getElementById('bs-report');
+    const side=(title,items,total,color)=>`
+      <div class="report-side">
+        <h3 data- class="sigma-style-sigma_tally-30">${title}</h3>
+        ${items.map(i=>`<div class="report-line"><span>${i.name}</span><span>₹${this._fmt(i.amt)}</span></div>`).join('')}
+        <div class="report-total"><span>Total ${title}</span><span>₹${this._fmt(total)}</span></div>
+      </div>`;
+    el.innerHTML=side('Liabilities & Capital',liabItems,totalL,'#1a237e')+side('Assets',assetItems,totalA,'#4a148c');
+    const diff=Math.abs(totalA-totalL);
+    this.setStatus(`⚖️ Balance Sheet: Assets ₹${this._fmt(totalA)} | Liabilities ₹${this._fmt(totalL)} | ${diff<0.01?'✅ Balanced':'⚠️ Difference ₹'+this._fmt(diff)}`);
+  }
+
+  renderRatios() {
+    const bs=this.engine.getBS();
+    const pl=this.engine.getPL();
+    const ca=this.engine.ledgers.filter(l=>['Current Assets','Bank Accounts','Cash-in-Hand','Sundry Debtors'].includes(l.group)).reduce((a,l)=>{const b=this.engine.getLedgerBalance(l.name);return a+b.dr;},0);
+    const cl=this.engine.ledgers.filter(l=>['Current Liabilities','Sundry Creditors'].includes(l.group)).reduce((a,l)=>{const b=this.engine.getLedgerBalance(l.name);return a+b.cr;},0)||1;
+    const ratios=[
+      {label:'Current Ratio',val:(ca/cl).toFixed(2),desc:'Current Assets/Liabilities'},
+      {label:'Net Profit %',val:pl.totalInc?((pl.profit/pl.totalInc)*100).toFixed(1)+'%':'N/A',desc:'Profit/Revenue'},
+      {label:'Gross Margin',val:pl.totalInc?((1-(pl.totalExp/pl.totalInc))*100).toFixed(1)+'%':'N/A',desc:'(Rev-Exp)/Rev'},
+      {label:'Total Revenue',val:'₹'+this._fmt(pl.totalInc),desc:'All Income'},
+      {label:'Total Expenses',val:'₹'+this._fmt(pl.totalExp),desc:'All Expenses'},
+      {label:'Net Profit/Loss',val:(pl.profit>=0?'₹':'–₹')+this._fmt(Math.abs(pl.profit)),desc:pl.profit>=0?'Profit':'Loss'},
+    ];
+    document.getElementById('ratio-grid').innerHTML=ratios.map(r=>
+      `<div class="ratio-card"><div class="ratio-val">${r.val}</div><div class="ratio-label">${r.label}</div><div data- class="sigma-style-sigma_tally-31">${r.desc}</div></div>`
+    ).join('');
+  }
+
+  generateGSTReport() {
+    const rate=parseFloat(document.getElementById('gst-rate').value);
+    const salesVchs=this.engine.vouchers.filter(v=>v.type==='Sales');
+    const total=salesVchs.reduce((a,v)=>a+v.drAmt,0);
+    const taxable=total/(1+rate/100);
+    const gst=total-taxable;
+    const cgst=gst/2, sgst=gst/2;
+    document.getElementById('gst-report').innerHTML=`
+      <table class="tally-table"><thead><tr><th>Date</th><th>Narration</th><th>Ref</th><th>Invoice Value</th><th>Taxable</th><th>CGST ${rate/2}%</th><th>SGST ${rate/2}%</th></tr></thead>
+      <tbody>${salesVchs.map(v=>`<tr><td>${v.date}</td><td>${v.narr}</td><td>${v.ref}</td>
+        <td data- class="sigma-style-sigma_tally-32">₹${this._fmt(v.drAmt)}</td>
+        <td data- class="sigma-style-sigma_tally-33">₹${this._fmt(v.drAmt/(1+rate/100))}</td>
+        <td data- class="sigma-style-sigma_tally-34">₹${this._fmt(v.drAmt/(1+rate/100)*rate/200)}</td>
+        <td data- class="sigma-style-sigma_tally-35">₹${this._fmt(v.drAmt/(1+rate/100)*rate/200)}</td>
+        </tr>`).join('')}
+      </tbody>
+      <tfoot><tr class="total-row"><td colspan="3" data- class="sigma-style-sigma_tally-36">GSTR-1 Total</td><td data- class="sigma-style-sigma_tally-37">₹${this._fmt(total)}</td><td data- class="sigma-style-sigma_tally-38">₹${this._fmt(taxable)}</td><td data- class="sigma-style-sigma_tally-39">₹${this._fmt(cgst)}</td><td data- class="sigma-style-sigma_tally-40">₹${this._fmt(sgst)}</td></tr></tfoot>
+      </table>`;
+    this.setStatus(`🪙 GSTR-1 generated: ${salesVchs.length} invoices | Taxable Value: ₹${this._fmt(taxable)} | GST: ₹${this._fmt(gst)}`);
+  }
+
+  exportDaybookCSV() {
+    const rows=[['Date','Type','Vch#','Dr Ledger','Cr Ledger','Narration','Ref','Dr (₹)','Cr (₹)']];
+    this.engine.vouchers.forEach(v=>rows.push([v.date,v.type,'VCH-'+v.id.toString().padStart(4,'0'),v.drLedger,v.crLedger,v.narr,v.ref,v.drAmt,v.crAmt]));
+    this._downloadCSV(rows,'sigma_daybook.csv');
+    this.setStatus('📄 Day Book exported.');
+  }
+
+  exportLedgersCSV() {
+    const rows=[['Ledger','Group','Dr Balance','Cr Balance','Net']];
+    this.engine.ledgers.forEach(l=>{ const b=this.engine.getLedgerBalance(l.name); rows.push([l.name,l.group,b.dr,b.cr,b.net]); });
+    this._downloadCSV(rows,'sigma_ledgers.csv');
+    this.setStatus('📊 Ledger balances exported.');
+  }
+
+  _downloadCSV(rows, fname) {
+    const csv=rows.map(r=>r.map(v=>'"'+String(v).replace(/"/g,'""')+'"').join(',')).join('\n');
+    const blob=new Blob([csv],{type:'text/csv'});
+    const a=document.createElement('a'); a.href=URL.createObjectURL(blob); a.download=fname; a.click();
+    document.getElementById('export-preview').textContent=csv.slice(0,400)+'…';
+  }
+
+  exportJSON() {
+    const blob=new Blob([this.engine.exportJSON()],{type:'application/json'});
+    const a=document.createElement('a'); a.href=URL.createObjectURL(blob); a.download='sigma_accounting_backup.json'; a.click();
+    this.setStatus('🔧 Full backup exported.');
+  }
+
+  importJSON() { document.getElementById('import-file').click(); }
+
+  loadBackup(event) {
+    const file=event.target.files[0]; if(!file) return;
+    const reader=new FileReader();
+    reader.onload=e=>{
+      if(this.engine.importJSON(e.target.result)){ this._refreshMasterTable(); this._refreshLedgerDropdowns(); this.setStatus('✅ Backup imported successfully.'); }
+      else this.setStatus('❌ Failed to import backup.');
+    };
+    reader.readAsText(file);
+  }
+
+  _fmt(n) { return Number(n).toLocaleString('en-IN',{maximumFractionDigits:2}); }
+
+  setStatus(msg) { document.getElementById('statusbar').textContent=msg; }
+}
+
+// Global bindings
+const app = new SigmaAccountingApp();
+function showSection(id) { app.showSection(id); }
+function showGateway() { app.showSection('gateway'); }
+function addLedger() { app.addLedger(); }
+function saveVoucher() { app.saveVoucher(); }
+function clearVoucher() { app.clearVoucher(); }
+function setVchType(t) { app.setVchType(t); document.getElementById('vch-type').value=t; }
+function renderDayBook() { app.renderDayBook(); }
+function clearDB() { app.clearDB(); }
+function renderLedger() { app.renderLedger(); }
+function generateGSTReport() { app.generateGSTReport(); }
+function exportCSV() { app.exportDaybookCSV(); }
+function exportJSON() { app.exportJSON(); }
+function importJSON() { app.importJSON(); }
+function loadBackup(e) { app.loadBackup(e); }
+</script>
+</body>
+</html>

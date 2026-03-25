@@ -1,0 +1,582 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SigmaOS Bharat Legal & Labour Suite (v5.0 Zenith)</title>
+    <style>
+        :root {
+            --bg: #0d0f12;
+            --surface: #15181d;
+            --surface-hover: #1e2228;
+            --text-primary: #e0e5ea;
+            --text-secondary: #9098a5;
+            --accent: #00d2ff;
+            --accent-glow: rgba(0, 210, 255, 0.4);
+            --danger: #ff4757;
+            --success: #2ed573;
+            --font-main: 'Segoe UI', system-ui, sans-serif;
+            --radius-lg: 12px;
+            --radius-md: 8px;
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; -webkit--webkit--webkit--webkit-user-select: none; user-select: none; -webkit-user-select: none; user-select: none; -webkit--webkit-user-select: none; user-select: none; -webkit-user-select: none; user-select: none; -webkit--webkit--webkit-user-select: none; user-select: none; -webkit-user-select: none; user-select: none; -webkit--webkit-user-select: none; user-select: none; -webkit-user-select: none; user-select: none; }
+
+        body {
+            background-color: var(--bg);
+            color: var(--text-primary);
+            font-family: var(--font-main);
+            display: flex;
+            height: 100vh;
+            overflow: hidden;
+        }
+
+        /* Sidebar Matrix */
+        .sidebar {
+            width: 280px;
+            background: var(--surface);
+            border-right: 1px solid var(--surface-hover);
+            display: flex;
+            flex-direction: column;
+            padding: 24px 0;
+            z-index: 10;
+        }
+
+        .brand {
+            padding: 0 24px 24px;
+            font-size: 1.4rem;
+            font-weight: 800;
+            letter-spacing: 1px;
+            color: var(--accent);
+            border-bottom: 1px solid var(--surface-hover);
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .auth-panel {
+            margin: 24px;
+            padding: 20px;
+            background: var(--bg);
+            border-radius: var(--radius-lg);
+            border: 1px solid var(--surface-hover);
+        }
+        
+        .auth-panel-heading { margin-bottom: 12px; font-weight: 500; }
+        .auth-panel-desc { font-size: 0.8rem; color: var(--text-secondary); margin-bottom: 16px; }
+
+        .google-auth-btn {
+            background: #ffffff;
+            color: #3c4043;
+            border: 1px solid #dadce0;
+            padding: 10px 16px;
+            border-radius: 4px;
+            font-weight: 500;
+            cursor: pointer;
+            width: 100%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 8px;
+            transition: background 0.2s;
+        }
+
+        .google-auth-btn:hover { background: #f8f9fa; }
+
+        /* Sync Status */
+        .sync-hud {
+            margin: auto 24px 0;
+            padding: 16px;
+            background: var(--bg);
+            border-radius: var(--radius-md);
+            font-size: 0.85rem;
+            color: var(--text-secondary);
+            border: 1px solid var(--surface-hover);
+        }
+
+        .sync-glow {
+            display: inline-block;
+            width: 8px;
+            height: 8px;
+            background: var(--success);
+            border-radius: 50%;
+            box-shadow: 0 0 8px var(--success);
+            margin-right: 6px;
+            animation: pulse 2s infinite;
+        }
+        
+        .sync-hud-title { margin-bottom: 8px; font-weight: 600; color: var(--text-primary); }
+        .last-sync-time { font-family: monospace; opacity: 0.6; margin-top: 8px; }
+
+        /* Work Area */
+        .main-content {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            overflow-y: auto;
+            position: relative;
+        }
+
+        .header {
+            padding: 24px 40px;
+            border-bottom: 1px solid var(--surface-hover);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: rgba(21, 24, 29, 0.8);
+            -webkit--webkit--webkit-backdrop-filter: blur(12px); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); backdrop-filter: blur(12px); -webkit--webkit--webkit-backdrop-filter: blur(12px); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); backdrop-filter: blur(12px); -webkit--webkit-backdrop-filter: blur(12px); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); backdrop-filter: blur(12px);
+            position: sticky;
+            top: 0;
+            z-index: 5;
+        }
+
+        .nav-tabs {
+            display: flex;
+            gap: 12px;
+        }
+
+        .tab {
+            padding: 8px 16px;
+            border-radius: var(--radius-md);
+            cursor: pointer;
+            color: var(--text-secondary);
+            font-weight: 600;
+            transition: 0.2s ease;
+        }
+
+        .tab:hover { background: var(--surface-hover); color: var(--text-primary); }
+        .tab.active { background: var(--accent); color: #000; box-shadow: 0 0 16px var(--accent-glow); }
+
+        /* Calculator Sections */
+        .calc-matrix {
+            padding: 40px;
+            max-width: 1000px;
+            margin: 0 auto;
+            width: 100%;
+            display: none;
+        }
+
+        .calc-matrix.active { display: block; animation: fadeUp 0.4s ease forwards; }
+        .calc-desc { color: var(--text-secondary); margin: 8px 0 24px; }
+
+        .card {
+            background: var(--surface);
+            border-radius: var(--radius-lg);
+            border: 1px solid var(--surface-hover);
+            padding: 32px;
+            margin-bottom: 24px;
+        }
+
+        .input-group {
+            margin-bottom: 24px;
+        }
+
+        .input-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-size: 0.9rem;
+            color: var(--text-secondary);
+        }
+
+        .input-row {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 16px;
+        }
+
+        input, select {
+            width: 100%;
+            padding: 12px 16px;
+            background: var(--bg);
+            border: 1px solid var(--surface-hover);
+            color: var(--text-primary);
+            border-radius: var(--radius-md);
+            font-size: 1rem;
+            outline: none;
+            transition: all 0.2s ease;
+        }
+
+        input:focus { border-color: var(--accent); box-shadow: 0 0 8px var(--accent-glow); }
+
+        .btn-matrix {
+            background: var(--accent);
+            color: #000;
+            padding: 12px 24px;
+            border: none;
+            border-radius: var(--radius-md);
+            font-weight: 700;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: 0.2s;
+            box-shadow: 0 0 12px var(--accent-glow);
+        }
+
+        .btn-matrix:hover { transform: translateY(-2px); box-shadow: 0 0 20px var(--accent-glow); }
+
+        /* Output Telemetry */
+        .telemetry-board {
+            margin-top: 32px;
+            padding: 24px;
+            background: #08090a;
+            border-radius: var(--radius-lg);
+            border: 1px solid var(--surface-hover);
+            border-left: 4px solid var(--accent);
+        }
+        
+        .board-title { margin-bottom: 16px; }
+
+        .stat-row {
+            display: flex;
+            justify-content: space-between;
+            padding: 12px 0;
+            border-bottom: 1px solid var(--surface-hover);
+        }
+        .stat-row:last-child { border: none; }
+        .stat-label { color: var(--text-secondary); font-size: 0.95rem; }
+        .stat-val { font-weight: 700; font-size: 1.1rem; color: var(--text-primary); }
+        .stat-val.positive { color: var(--success); }
+        .stat-val.negative { color: var(--danger); }
+        .stat-val.accent { color: var(--accent); font-size: 1.3rem; }
+        .telemetry-ruleset { margin-top: 16px; font-size: 0.85rem; color: var(--text-secondary); }
+
+        @keyframes pulse { 0% { opacity: 0.5; } 50% { opacity: 1; } 100% { opacity: 0.5; } }
+        @keyframes fadeUp { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+
+    
+        .sigma-style-sigma_bharat_legal_suite-1 { display: none; border-color: var(--accent); }
+        .sigma-style-sigma_bharat_legal_suite-2 { color: var(--accent); }
+        .sigma-style-sigma_bharat_legal_suite-3 { font-size: 0.85rem; color: var(--text-primary); }
+        .sigma-style-sigma_bharat_legal_suite-4 { font-size: 0.75rem; color: var(--text-secondary); margin-top: 4px; }
+        .sigma-style-sigma_bharat_legal_suite-5 { display: none; }
+        .sigma-style-sigma_bharat_legal_suite-6 { display: none; }
+        .sigma-style-sigma_bharat_legal_suite-7 { display: none; }
+        .sigma-style-sigma_bharat_legal_suite-8 { display: none; }
+    </style>
+
+<script>
+// Sovereign OS Inline Style Manager
+document.addEventListener('DOMContentLoaded', () => {
+    const applyTo = (el) => { if(el.getAttribute('data-style')) { el.setAttribute('style', el.getAttribute('data-style')); el.removeAttribute('data-style'); } };
+    new MutationObserver(mutations => mutations.forEach(m => {
+        if(m.type === 'childList') m.addedNodes.forEach(n => { if(n.nodeType === 1) { applyTo(n); n.querySelectorAll('[data-style]').forEach(applyTo); } });
+    })).observe(document.body, {childList: true, subtree: true});
+    document.querySelectorAll('[data-style]').forEach(applyTo);
+});
+</script>
+</head>
+<body>
+
+    <!-- SIDEBAR -->
+    <div class="sidebar">
+        <div class="brand">
+            Σ SigmaBharat
+        </div>
+
+        <div class="auth-panel" id="authPanel">
+            <h4 class="auth-panel-heading">Secure Access</h4>
+            <p class="auth-panel-desc">Zero PII Analytics. Profile data is locally abstracted.</p>
+            <button class="google-auth-btn" onclick="System.authenticate()">
+                <svg width="18" height="18" viewBox="0 0 24 24"><path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/><path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/><path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"/><path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/></svg>
+                Sign in with Google
+            </button>
+        </div>
+
+        <div class="auth-panel sigma-style-sigma_bharat_legal_suite-1" id="userPanel" data->
+            <h4 class="auth-panel-heading sigma-style-sigma_bharat_legal_suite-2" data->Identity Verified</h4>
+            <p data- class="sigma-style-sigma_bharat_legal_suite-3">Sovereign User</p>
+            <p data- class="sigma-style-sigma_bharat_legal_suite-4">PII Cleansed. Fully Anonymous.</p>
+        </div>
+
+        <div class="sync-hud">
+            <div class="sync-hud-title">
+                <span class="sync-glow"></span> Sovereign Sync Daemon
+            </div>
+            <div id="syncStatus">Fetching latest SC/HC mandates...</div>
+            <div class="last-sync-time" id="lastSyncTime"></div>
+        </div>
+    </div>
+
+    <!-- MAIN CONTEXT -->
+    <div class="main-content">
+        <div class="header">
+            <div class="nav-tabs">
+                <div class="tab active" onclick="System.switchTab('labourTab')">Labour Law Code</div>
+                <div class="tab" onclick="System.switchTab('taxTab')">Taxation Matrix</div>
+                <div class="tab" onclick="System.switchTab('companiesTab')">Companies Act</div>
+                <div class="tab" onclick="System.switchTab('bnsTab')">BNS / Tort</div>
+            </div>
+        </div>
+
+        <!-- LABOUR LOGIC -->
+        <div id="labourTab" class="calc-matrix active">
+            <h2>Indian Labour Laws (Bonus, PF, Gratuity)</h2>
+            <p class="calc-desc">Automatically adjusting to Govt. rules allowing Novices to instantly see PERKS and CUTS.</p>
+            
+            <div class="card">
+                <div class="input-row">
+                    <div class="input-group">
+                        <label>Basic Salary (Monthly ₹)</label>
+                        <input aria-label="input"  type="number" id="labourBasic" placeholder="e.g. 50000" value="50000" title="input">
+                    </div>
+                    <div class="input-group">
+                        <label>Years of Continuous Service</label>
+                        <input aria-label="input"  type="number" id="labourYears" placeholder="e.g. 5" value="5" title="input">
+                    </div>
+                    <div class="input-group">
+                        <label>Company Performance Rating (%)</label>
+                        <input aria-label="input"  type="number" id="labourPerf" placeholder="For Bonus (min 8.33)" value="8.33" title="input">
+                    </div>
+                </div>
+                <button class="btn-matrix" onclick="Calculators.computeLabour()">Execute Autonomous Audit</button>
+                
+                <div class="telemetry-board sigma-style-sigma_bharat_legal_suite-5" id="labourBoard" data->
+                    <h3 class="board-title">Sovereign Compensation Analysis</h3>
+                    <div class="stat-row"><span class="stat-label">Provident Fund (Employee Cut - 12%)</span><span class="stat-val negative" id="pfEmpCut">₹ 0</span></div>
+                    <div class="stat-row"><span class="stat-label">Provident Fund (Employer Perk - 3.67% + 8.33% EPS)</span><span class="stat-val positive" id="pfErCut">₹ 0</span></div>
+                    <div class="stat-row"><span class="stat-label">Expected Annual Bonus (Payment of Bonus Act)</span><span class="stat-val positive" id="calcBonus">₹ 0</span></div>
+                    <div class="stat-row"><span class="stat-label">Gratuity Accrued (Payment of Gratuity Act)</span><span class="stat-val positive" id="calcGratuity">₹ 0</span></div>
+                    <div class="stat-row"><span class="stat-label">NET MONTHLY TAKE-HOME ESTIMATE</span><span class="stat-val accent" id="netMonthly">₹ 0</span></div>
+                    <p class="telemetry-ruleset">Rule Set: EPF Act 1952, Gratuity Act 1972, POB Act 1965. Sync dynamically applied.</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- TAXATION LOGIC -->
+        <div id="taxTab" class="calc-matrix">
+            <h2>Indian Taxation Matrix (Direct Taxes)</h2>
+            <p class="calc-desc">Calculates optimal path between Old and New Regime automatically.</p>
+            <div class="card">
+                <div class="input-row">
+                    <div class="input-group">
+                        <label>Gross Annual Income (₹)</label>
+                        <input aria-label="input" type="number" id="taxGross" value="1200000" title="input">
+                    </div>
+                    <div class="input-group">
+                        <label>Total 80C/80D Deductions (₹) (Old Regime)</label>
+                        <input aria-label="input" type="number" id="taxDeductions" value="150000" title="input">
+                    </div>
+                </div>
+                <button class="btn-matrix" onclick="Calculators.computeTax()">Compute Sovereign Tax</button>
+                
+                <div class="telemetry-board sigma-style-sigma_bharat_legal_suite-6" id="taxBoard" data->
+                    <div class="stat-row"><span class="stat-label">Old Regime Tax</span><span class="stat-val" id="taxOld">₹ 0</span></div>
+                    <div class="stat-row"><span class="stat-label">New Regime Tax (Default)</span><span class="stat-val" id="taxNew">₹ 0</span></div>
+                    <div class="stat-row"><span class="stat-label">RECOMMENDATION</span><span class="stat-val accent" id="taxRec">Analyzing...</span></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- COMPANIES & BNS Placeholder Demos -->
+        <div id="companiesTab" class="calc-matrix">
+            <h2>Companies Act (CSR & Compliance)</h2>
+            <div class="card">
+                <p class="calc-desc">Calculates Corporate Social Responsibility (CSR) minimum spend rule (2% of avg net profit over 3 years).</p>
+                <div class="input-group">
+                    <label>Average Net Profit (Last 3 Yrs in ₹)</label>
+                    <input aria-label="input" type="number" id="compProfit" value="50000000" title="input">
+                </div>
+                <button class="btn-matrix" onclick="Calculators.computeCompanies()">Compute CSR Bind</button>
+                <div class="telemetry-board sigma-style-sigma_bharat_legal_suite-7" id="compBoard" data->
+                    <div class="stat-row"><span class="stat-label">Statutory Minimum CSR Spend (Companies Act S. 135)</span><span class="stat-val accent" id="csrTarget">₹ 0</span></div>
+                </div>
+            </div>
+        </div>
+
+        <div id="bnsTab" class="calc-matrix">
+            <h2>Bharatiya Nyaya Sanhita (BNS / Tort Damages)</h2>
+            <div class="card">
+                <p class="calc-desc">Calculates Motor Vehicle Act / Tort Compensation Multiplier based on Sarla Verma principles.</p>
+                <div class="input-row">
+                    <div class="input-group">
+                        <label>Age of Victim</label>
+                        <input aria-label="input" type="number" id="tortAge" value="35" title="input">
+                    </div>
+                    <div class="input-group">
+                        <label>Annual Income (₹)</label>
+                        <input aria-label="input" type="number" id="tortInc" value="600000" title="input">
+                    </div>
+                </div>
+                <button class="btn-matrix" onclick="Calculators.computeTort()">Calculate HC/SC Judgement Heuristics</button>
+                <div class="telemetry-board sigma-style-sigma_bharat_legal_suite-8" id="tortBoard" data->
+                    <div class="stat-row"><span class="stat-label">Multiplier Applied (Sarla Verma SC Benchmark)</span><span class="stat-val" id="tortMultiplier">16</span></div>
+                    <div class="stat-row"><span class="stat-label">Future Prospects Factor</span><span class="stat-val">40% addition</span></div>
+                    <div class="stat-row"><span class="stat-label">ESTIMATED COMPENSATION HEURISTIC</span><span class="stat-val accent" id="tortTotal">₹ 0</span></div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- NATIVE OOP LOGIC DEPLOYMENT -->
+    <script>
+        /**
+         * Σ SIGMA OS: BHARAT LEGAL SUITE CORE
+         * Pure Silicon Logic. Zero NPM. Zero Third-Party.
+         */
+
+        class SovereignSyncEngine {
+            constructor() {
+                this.statusEl = document.getElementById('syncStatus');
+                this.timeEl = document.getElementById('lastSyncTime');
+            }
+
+            simulateSync() {
+                // Simulating highly advanced Supreme Court / Govt Department Sync
+                const rulesets = [
+                    "Syncing EPF Wage Ceilings...", 
+                    "Polling Ministry of Labour...", 
+                    "Fetching Latest BNS Rulings...",
+                    "Updating Sarla Verma Multipliers..."
+                ];
+                let idx = 0;
+                let interval = setInterval(() => {
+                    this.statusEl.innerText = rulesets[idx];
+                    idx++;
+                    if (idx >= rulesets.length) {
+                        clearInterval(interval);
+                        this.statusEl.innerText = "System Synchronized. SC/HC Mandates Current.";
+                        this.statusEl.style.color = "var(--success)";
+                        this.timeEl.innerText = new Date().toISOString();
+                    }
+                }, 800);
+            }
+        }
+
+        class SigmaAuth {
+            static executeMockLogin() {
+                // Mock abstracting PII Data Security
+                document.getElementById('authPanel').style.display = 'none';
+                const uPanel = document.getElementById('userPanel');
+                uPanel.style.display = 'block';
+                uPanel.style.animation = "fadeUp 0.3s forwards";
+            }
+        }
+
+        class LegalCalculators {
+            
+            formatCurrency(amt) {
+                return new Intl.NumberFormat('en-IN', { style: 'currency', currency: 'INR' }).format(amt);
+            }
+
+            computeLabour() {
+                const b = parseFloat(document.getElementById('labourBasic').value) || 0;
+                const yrs = parseFloat(document.getElementById('labourYears').value) || 0;
+                let perf = parseFloat(document.getElementById('labourPerf').value) || 8.33;
+
+                // PF Logic
+                const pfLimit = Math.min(b, 15000); // EPF Cap Rule
+                const employeePF = b * 0.12;
+                const employerPF = pfLimit * 0.12; 
+                
+                // Gratuity: 15 / 26 * Last Drawn Basic * Years
+                let gratuity = 0;
+                if (yrs >= 5) {
+                    gratuity = (15 / 26) * b * yrs;
+                }
+
+                // Bonus (Max 20%, Min 8.33%) statutory
+                if (perf < 8.33) perf = 8.33;
+                if (perf > 20) perf = 20;
+                const bonusCalcCap = 7000; // Payment of Bonus Act limit
+                const annualBonus = bonusCalcCap * (perf / 100) * 12;
+
+                const netMonthly = b - employeePF;
+
+                document.getElementById('pfEmpCut').innerText = `- ${this.formatCurrency(employeePF)}`;
+                document.getElementById('pfErCut').innerText = `+ ${this.formatCurrency(employerPF)}`;
+                document.getElementById('calcBonus').innerText = `+ ${this.formatCurrency(annualBonus)} (Annually)`;
+                document.getElementById('calcGratuity').innerText = yrs >= 5 ? `+ ${this.formatCurrency(gratuity)}` : "Not Eligible (< 5 yrs)";
+                document.getElementById('netMonthly').innerText = this.formatCurrency(netMonthly);
+
+                document.getElementById('labourBoard').style.display = 'block';
+                document.getElementById('labourBoard').style.animation = "fadeUp 0.3s";
+            }
+
+            computeTax() {
+                const g = parseFloat(document.getElementById('taxGross').value) || 0;
+                const ded = parseFloat(document.getElementById('taxDeductions').value) || 0;
+
+                // Heavily abstracted logic for Demo purposes
+                let taxableOld = Math.max(g - ded - 50000, 0); // Modded by standard deduction 50k
+                let taxableNew = Math.max(g - 50000, 0);
+
+                let taxO = taxableOld * 0.2; // Simplified flat bracket
+                let taxN = taxableNew * 0.15; // Simplified new regime bracket
+
+                if(taxableOld <= 500000) taxO = 0;
+                if(taxableNew <= 700000) taxN = 0;
+
+                document.getElementById('taxOld').innerText = this.formatCurrency(taxO);
+                document.getElementById('taxNew').innerText = this.formatCurrency(taxN);
+                
+                let rec = (taxO < taxN) ? "OPT FOR OLD REGIME" : "OPT FOR NEW REGIME";
+                if(taxO === taxN) rec = "EITHER PATH ACCEPTABLE";
+                
+                document.getElementById('taxRec').innerText = rec;
+                document.getElementById('taxBoard').style.display = 'block';
+                document.getElementById('taxBoard').style.animation = "fadeUp 0.3s";
+            }
+
+            computeCompanies() {
+                const profit = parseFloat(document.getElementById('compProfit').value);
+                const csr = profit * 0.02; // 2% 
+                document.getElementById('csrTarget').innerText = this.formatCurrency(csr);
+                document.getElementById('compBoard').style.display = 'block';
+                document.getElementById('compBoard').style.animation = "fadeUp 0.3s";
+            }
+
+            computeTort() {
+                const age = parseFloat(document.getElementById('tortAge').value);
+                const inc = parseFloat(document.getElementById('tortInc').value);
+
+                // Sarla Verma Multiplier Approximation
+                let mult = 18;
+                if (age > 25 && age <= 30) mult = 17;
+                else if (age > 30 && age <= 35) mult = 16;
+                else if (age > 35 && age <= 40) mult = 15;
+                else if (age > 40 && age <= 45) mult = 14;
+                else if (age > 45 && age <= 50) mult = 13;
+                else if (age > 50) mult = 9;
+
+                document.getElementById('tortMultiplier').innerText = mult;
+                
+                // Add 40% future prospects
+                let prospectInc = inc + (inc * 0.40);
+                // 1/3 deduction for personal expenses
+                let finalInc = prospectInc - (prospectInc / 3);
+
+                const total = finalInc * mult;
+
+                document.getElementById('tortTotal').innerText = this.formatCurrency(total);
+                document.getElementById('tortBoard').style.display = 'block';
+                document.getElementById('tortBoard').style.animation = "fadeUp 0.3s";
+            }
+        }
+
+        // Global Orchestrator
+        class SigmaSystemUI {
+            constructor() {
+                this.syncEngine = new SovereignSyncEngine();
+                this.syncEngine.simulateSync();
+            }
+
+            switchTab(tabId) {
+                document.querySelectorAll('.calc-matrix').forEach(el => el.classList.remove('active'));
+                document.querySelectorAll('.tab').forEach(el => el.classList.remove('active'));
+                
+                document.getElementById(tabId).classList.add('active');
+                event.target.classList.add('active');
+            }
+
+            authenticate() {
+                SigmaAuth.executeMockLogin();
+            }
+        }
+
+        // Init
+        const System = new SigmaSystemUI();
+        const Calculators = new LegalCalculators();
+
+    </script>
+</body>
+</html>

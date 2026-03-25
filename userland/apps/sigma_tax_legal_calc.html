@@ -1,0 +1,322 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"><meta charset="UTF-8"><title>Sigma Tax & Legal Calculator</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#070b10;--s1:#0c1220;--s2:#111826;--border:rgba(255,255,255,.08);--accent:#f59e0b;--as:rgba(245,158,11,.1);--text:#e2e8f0;--dim:#4b5563;--success:#34d399;--danger:#f87171;--r:10px;}
+*{box-sizing:border-box;margin:0;padding:0;}body{background:var(--bg);color:var(--text);font-family:'Inter',sans-serif;height:100vh;display:flex;flex-direction:column;overflow:hidden;}
+.app-header{background:var(--s1);border-bottom:1px solid var(--border);padding:11px 18px;display:flex;align-items:center;gap:10px;flex-shrink:0;}
+.logo{font-weight:800;font-size:.95rem;color:var(--accent);}
+.tabs{display:flex;gap:4px;overflow-x:auto;flex:1;}
+.tab{padding:6px 14px;border-radius:7px;cursor:pointer;font-size:.78rem;font-weight:600;color:var(--dim);transition:all .14s;white-space:nowrap;flex-shrink:0;}
+.tab.active{background:var(--as);color:var(--accent);}
+.content{flex:1;overflow-y:auto;padding:24px;display:none;}
+.content.active{display:block;}
+.content::-webkit-scrollbar{width:4px}.content::-webkit-scrollbar-thumb{background:#1e2434;border-radius:2px}
+.card{background:var(--s2);border:1px solid var(--border);border-radius:14px;padding:22px;margin-bottom:18px;}
+.card-title{font-weight:700;font-size:1rem;margin-bottom:16px;color:#fff;display:flex;align-items:center;gap:8px;}
+.form-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px;}
+.fg-full{grid-column:span 2;}
+label{display:block;font-size:.75rem;font-weight:600;color:var(--dim);margin-bottom:5px;text-transform:uppercase;letter-spacing:.4px;}
+input,select{width:100%;padding:10px 14px;background:rgba(0,0,0,.3);border:1px solid var(--border);border-radius:8px;color:var(--text);font-family:'Inter',sans-serif;font-size:.9rem;outline:none;-webkit--webkit--webkit-user-select: text; user-select: text; -webkit-user-select: text; user-select: text; -webkit--webkit-user-select: text; user-select: text; -webkit-user-select: text; user-select: text;transition:border .15s;}
+input:focus,select:focus{border-color:var(--accent);}
+.calc-btn{width:100%;padding:12px;border-radius:8px;background:var(--accent);color:#000;border:none;font-weight:800;font-size:.9rem;cursor:pointer;font-family:'Inter',sans-serif;margin-top:16px;transition:opacity .14s;}
+.calc-btn:hover{opacity:.85;}
+.result-box{background:rgba(0,0,0,.3);border:1px solid var(--border);border-radius:10px;padding:18px;margin-top:16px;display:none;}
+.result-box.show{display:block;}
+.result-row{display:flex;justify-content:space-between;align-items:center;padding:7px 0;border-bottom:1px solid rgba(255,255,255,.04);}
+.result-row:last-child{border-bottom:none;margin-top:8px;padding-top:12px;}
+.result-label{font-size:.82rem;color:var(--dim);}
+.result-value{font-weight:600;font-size:.88rem;color:var(--text);}
+.result-total .result-label{color:var(--accent);font-weight:700;}
+.result-total .result-value{color:var(--accent);font-size:1.1rem;font-weight:800;}
+.result-tax .result-value{color:var(--danger);}
+.info-badge{display:inline-block;padding:3px 10px;border-radius:5px;font-size:.7rem;font-weight:700;background:var(--as);color:var(--accent);margin-left:8px;}
+.note{font-size:.75rem;color:var(--dim);margin-top:10px;line-height:1.5;padding:10px;background:rgba(255,255,255,.02);border-radius:6px;border-left:3px solid var(--accent);}
+</style>
+<script>
+// Sovereign OS Inline Style Manager
+document.addEventListener('DOMContentLoaded', () => {
+    const applyTo = (el) => { if(el.getAttribute('data-style')) { el.setAttribute('style', el.getAttribute('data-style')); el.removeAttribute('data-style'); } };
+    new MutationObserver(mutations => mutations.forEach(m => {
+        if(m.type === 'childList') m.addedNodes.forEach(n => { if(n.nodeType === 1) { applyTo(n); n.querySelectorAll('[data-style]').forEach(applyTo); } });
+    })).observe(document.body, {childList: true, subtree: true});
+    document.querySelectorAll('[data-style]').forEach(applyTo);
+});
+</script>
+</head>
+<body>
+<div class="app-header">
+    <span class="logo">⚖️ Legal & Tax Calculator</span>
+    <div class="tabs">
+        <div class="tab active" onclick="switchTab('itr',this)">💰 Income Tax</div>
+        <div class="tab" onclick="switchTab('gst',this)">🧾 GST</div>
+        <div class="tab" onclick="switchTab('tds',this)">📋 TDS</div>
+        <div class="tab" onclick="switchTab('gratuity',this)">🏦 Gratuity</div>
+        <div class="tab" onclick="switchTab('courtfee',this)">🏛️ Court Fee</div>
+        <div class="tab" onclick="switchTab('stamp',this)">📜 Stamp Duty</div>
+        <div class="tab" onclick="switchTab('emi',this)">🏠 EMI</div>
+    </div>
+</div>
+
+<!-- INCOME TAX (New Regime 2024-25) -->
+<div class="content active" id="c-itr">
+<div class="card">
+    <div class="card-title">💰 Income Tax Calculator <span class="info-badge">FY 2024–25</span></div>
+    <div class="form-grid">
+        <div><label>Annual Income (₹)</label><input aria-label="input"  type="number" id="itr-income" value="1200000" placeholder="e.g. 1200000" title="input"></div>
+        <div><label>Regime</label><select aria-label="Selection"  id="itr-regime" title="input"><option value="new">New Tax Regime</option><option value="old">Old Tax Regime</option></select></div>
+        <div><label>Standard Deduction (₹)</label><input aria-label="input"  type="number" id="itr-std" value="75000" placeholder="75000" title="input"></div>
+        <div><label>Other Deductions 80C etc (₹)</label><input aria-label="input"  type="number" id="itr-80c" value="0" placeholder="Old regime only" title="input"></div>
+    </div>
+    <button class="calc-btn" onclick="calcITR()">Calculate Tax →</button>
+    <div class="result-box" id="itr-result"></div>
+    <div class="note"><strong>Under Section 115BAC, Income Tax Act, 1961</strong> (New Tax Regime): 0–3L @0%, 3–7L @5%, 7–10L @10%, 10–12L @15%, 12–15L @20%, above 15L @30%. Standard deduction ₹75,000 u/s 16(ia). Rebate u/s 87A for income ≤ ₹7L.</div>
+</div>
+</div>
+
+<!-- GST -->
+<div class="content" id="c-gst">
+<div class="card">
+    <div class="card-title">🧾 GST Calculator</div>
+    <div class="form-grid">
+        <div><label>Amount (₹)</label><input aria-label="input" type="number" id="gst-amt" value="10000" title="input"></div>
+        <div><label>GST Rate (%)</label><select aria-label="Selection"  id="gst-rate" title="input"><option value="5">5%</option><option value="12">12%</option><option value="18" selected>18%</option><option value="28">28%</option></select></div>
+        <div><label>Calculation Mode</label><select aria-label="Selection"  id="gst-mode" title="input"><option value="excl">Exclusive (Add GST)</option><option value="incl">Inclusive (Extract GST)</option></select></div>
+    </div>
+    <button class="calc-btn" onclick="calcGST()">Calculate →</button>
+    <div class="result-box" id="gst-result"></div>
+    <div class="note"><strong>Under Central Goods and Services Tax (CGST) Act, 2017</strong> (Section 9): CGST = SGST = GST Rate ÷ 2 (for intra-state supply). For inter-state supply, full IGST applies under Section 5 of the IGST Act, 2017.</div>
+</div>
+</div>
+
+<!-- TDS -->
+<div class="content" id="c-tds">
+<div class="card">
+    <div class="card-title">📋 TDS Calculator</div>
+    <div class="form-grid">
+        <div><label>Payment Amount (₹)</label><input aria-label="input" type="number" id="tds-amt" value="100000" title="input"></div>
+        <div><label>Payment Type</label><select aria-label="Selection"  id="tds-type" title="input">
+            <option value="salary">Salary (Slab)</option>
+            <option value="contractor" data-rate="1">Contractor (1%)</option>
+            <option value="professional" data-rate="10">Professional Fees (10%)</option>
+            <option value="rent" data-rate="10">Rent Plant/Machinery (10%)</option>
+            <option value="interest" data-rate="10">Interest (10%)</option>
+            <option value="commission" data-rate="5">Commission (5%)</option>
+        </select></div>
+        <div><label>PAN Status</label><select aria-label="Selection"  id="tds-pan" title="input"><option value="valid">PAN Valid</option><option value="invalid">PAN Invalid / Not Furnished (+20%)</option></select></div>
+    </div>
+    <button class="calc-btn" onclick="calcTDS()">Calculate TDS →</button>
+    <div class="result-box" id="tds-result"></div>
+    <div class="note"><strong>As per Income Tax Act, 1961</strong>: Sec 192 (Salary), Sec 194C (Contractor), Sec 194J (Professional fees), Sec 194I (Rent), Sec 194A (Interest), Sec 194H (Commission). Sec 206AA demands 20% or higher rate if PAN is not furnished.</div>
+</div>
+</div>
+
+<!-- GRATUITY -->
+<div class="content" id="c-gratuity">
+<div class="card">
+    <div class="card-title">🏦 Gratuity Calculator</div>
+    <div class="form-grid">
+        <div><label>Basic Salary + DA (₹/month)</label><input aria-label="input" type="number" id="grat-salary" value="50000" title="input"></div>
+        <div><label>Years of Service</label><input aria-label="input" type="number" id="grat-years" value="10" title="input"></div>
+        <div><label>Employee Type</label><select aria-label="Selection"  id="grat-type" title="input"><option value="act">Covered under Gratuity Act</option><option value="nonact">Not covered</option></select></div>
+    </div>
+    <button class="calc-btn" onclick="calcGratuity()">Calculate →</button>
+    <div class="result-box" id="grat-result"></div>
+    <div class="note"><strong>Under Section 4(2) of the Payment of Gratuity Act, 1972</strong>: Salary × 15/26 × Completed years of service. Maximum tax-free exemption limit is ₹20,00,000 as per Section 10(10) of the Income Tax Act, 1961.</div>
+</div>
+</div>
+
+<!-- COURT FEE -->
+<div class="content" id="c-courtfee">
+<div class="card">
+    <div class="card-title">🏛️ Court Fee Calculator</div>
+    <div class="form-grid">
+        <div><label>Suit Value / Claim Amount (₹)</label><input aria-label="input" type="number" id="cf-val" value="500000" title="input"></div>
+        <div><label>Court Type</label><select aria-label="Selection"  id="cf-court" title="input"><option value="district">District Court</option><option value="high">High Court</option><option value="consumer">Consumer Forum</option><option value="sc">Supreme Court</option></select></div>
+        <div class="fg-full"><label>Nature of Suit</label><select aria-label="Selection"  id="cf-nature" title="input">
+            <option value="money">Money Recovery Suit</option>
+            <option value="property">Property Dispute</option>
+            <option value="divorce">Matrimonial (Fixed)</option>
+            <option value="writ">Writ Petition</option>
+        </select></div>
+    </div>
+    <button class="calc-btn" onclick="calcCourtFee()">Calculate Court Fee →</button>
+    <div class="result-box" id="cf-result"></div>
+    <div class="note"><strong>As per the Court-fees Act, 1870 (Section 7 & Schedule I/II)</strong>. Court fees vary across State amendments. This uses standard general estimates; always verify with respective High Court rules.</div>
+</div>
+</div>
+
+<!-- STAMP DUTY -->
+<div class="content" id="c-stamp">
+<div class="card">
+    <div class="card-title">📜 Stamp Duty Calculator</div>
+    <div class="form-grid">
+        <div><label>Property / Agreement Value (₹)</label><input aria-label="input" type="number" id="sd-val" value="5000000" title="input"></div>
+        <div><label>State</label><select aria-label="Selection"  id="sd-state" title="input">
+            <option value="mh">Maharashtra (6%)</option><option value="ka">Karnataka (5%)</option>
+            <option value="dl">Delhi (6% M / 4% F)</option><option value="up">Uttar Pradesh (7%)</option>
+            <option value="tn">Tamil Nadu (7%)</option><option value="gj">Gujarat (4.9%)</option>
+        </select></div>
+        <div><label>Buyer Gender</label><select aria-label="Selection"  id="sd-gender" title="input"><option value="m">Male</option><option value="f">Female (Concessional)</option></select></div>
+    </div>
+    <button class="calc-btn" onclick="calcStamp()">Calculate →</button>
+    <div class="result-box" id="sd-result"></div>
+    <div class="note"><strong>As per the Indian Stamp Act, 1899</strong> (and respective State amendments). Rates vary strictly by state, nature of document, and municipal limits. Female buyer concessions apply in several states (e.g., Delhi, Haryana).</div>
+</div>
+</div>
+
+<!-- EMI -->
+<div class="content" id="c-emi">
+<div class="card">
+    <div class="card-title">🏠 EMI / Loan Calculator</div>
+    <div class="form-grid">
+        <div><label>Loan Amount (₹)</label><input aria-label="input" type="number" id="emi-amt" value="5000000" title="input"></div>
+        <div><label>Annual Interest Rate (%)</label><input aria-label="input" type="number" id="emi-rate" value="8.5" step="0.1" title="input"></div>
+        <div><label>Loan Tenure (Years)</label><input aria-label="input" type="number" id="emi-tenure" value="20" title="input"></div>
+    </div>
+    <button class="calc-btn" onclick="calcEMI()">Calculate EMI →</button>
+    <div class="result-box" id="emi-result"></div>
+</div>
+</div>
+
+<script>
+function switchTab(id,el){
+    document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));
+    document.querySelectorAll('.content').forEach(c=>c.classList.remove('active'));
+    el.classList.add('active');document.getElementById('c-'+id).classList.add('active');
+}
+
+function fmt(n){return '₹'+Math.round(n).toLocaleString('en-IN');}
+
+function showResult(id,rows){
+    const b=document.getElementById(id);b.classList.add('show');
+    b.innerHTML=rows.map(r=>`<div class="result-row${r.total?' result-total':''}${r.tax?' result-tax':''}"><span class="result-label">${r.l}</span><span class="result-value">${r.v}</span></div>`).join('');
+}
+
+// ITR
+function calcITR(){
+    let income=+document.getElementById('itr-income').value;
+    const regime=document.getElementById('itr-regime').value;
+    const stdDed=Math.min(+document.getElementById('itr-std').value,75000);
+    const ded80c=regime==='old'?Math.min(+document.getElementById('itr-80c').value,150000):0;
+    const taxable=Math.max(0,income-stdDed-ded80c);
+    let tax=0;
+    if(regime==='new'){
+        const slabs=[[300000,0],[400000,.05],[300000,.10],[200000,.15],[300000,.20],[Infinity,.30]];
+        let rem=taxable;
+        for(const [limit,rate] of slabs){const chunk=Math.min(rem,limit);tax+=chunk*rate;rem-=chunk;if(rem<=0)break;}
+        if(taxable<=700000)tax=0; // 87A rebate
+    }else{
+        if(taxable>250000)tax+=(Math.min(taxable,500000)-250000)*.05;
+        if(taxable>500000)tax+=(Math.min(taxable,1000000)-500000)*.2;
+        if(taxable>1000000)tax+=(taxable-1000000)*.3;
+        if(taxable<=500000)tax=0; // 87A old
+    }
+    const cess=tax*.04;const total=tax+cess;
+    showResult('itr-result',[
+        {l:'Gross Income',v:fmt(income)},{l:'Standard Deduction',v:'-'+fmt(stdDed)},
+        ded80c?{l:'80C / Deductions',v:'-'+fmt(ded80c)}:null,
+        {l:'Taxable Income',v:fmt(taxable)},{l:'Income Tax',v:fmt(tax),tax:true},
+        {l:'Health & Education Cess (4%)',v:fmt(cess),tax:true},
+        {l:'Total Tax Liability',v:fmt(total),total:true},
+        {l:'Effective Tax Rate',v:((total/income)*100).toFixed(2)+'%',total:true},
+    ].filter(Boolean));
+}
+
+// GST
+function calcGST(){
+    const amt=+document.getElementById('gst-amt').value;
+    const rate=+document.getElementById('gst-rate').value/100;
+    const mode=document.getElementById('gst-mode').value;
+    let base,gst,total;
+    if(mode==='excl'){base=amt;gst=amt*rate;total=amt+gst;}
+    else{total=amt;base=amt/(1+rate);gst=total-base;}
+    const cgst=gst/2;
+    showResult('gst-result',[
+        {l:'Base Amount',v:fmt(base)},{l:'GST Amount',v:fmt(gst),tax:true},
+        {l:'CGST',v:fmt(cgst)},{l:'SGST',v:fmt(cgst)},
+        {l:'Total Amount',v:fmt(total),total:true},
+    ]);
+}
+
+// TDS
+function calcTDS(){
+    const amt=+document.getElementById('tds-amt').value;
+    const type=document.getElementById('tds-type').value;
+    const pan=document.getElementById('tds-pan').value;
+    const rates={salary:0,contractor:.01,professional:.10,rent:.10,interest:.10,commission:.05};
+    let rate=rates[type]||.10;
+    if(pan==='invalid')rate=Math.max(rate,.20);
+    const tds=amt*rate;const net=amt-tds;
+    showResult('tds-result',[
+        {l:'Gross Payment',v:fmt(amt)},{l:'TDS Rate',v:(rate*100).toFixed(0)+'%'},
+        {l:'TDS Amount',v:fmt(tds),tax:true},{l:'Net Payment',v:fmt(net),total:true},
+    ]);
+}
+
+// Gratuity
+function calcGratuity(){
+    const sal=+document.getElementById('grat-salary').value;
+    const yrs=+document.getElementById('grat-years').value;
+    const type=document.getElementById('grat-type').value;
+    const grat=type==='act'?(sal*15/26*yrs):(sal*15/30*yrs);
+    const taxFree=Math.min(grat,2000000);const taxable=Math.max(0,grat-taxFree);
+    showResult('grat-result',[
+        {l:'Gratuity Amount',v:fmt(grat)},{l:'Tax-Free Limit',v:fmt(taxFree)},
+        {l:'Taxable Portion',v:fmt(taxable),tax:taxable>0},
+        {l:'Net Gratuity (Tax-Free)',v:fmt(taxFree),total:true},
+    ]);
+}
+
+// Court Fee
+function calcCourtFee(){
+    const val=+document.getElementById('cf-val').value;
+    const court=document.getElementById('cf-court').value;
+    const nature=document.getElementById('cf-nature').value;
+    let fee;
+    if(nature==='divorce')fee=200;
+    else if(nature==='writ')fee=court==='sc'?50000:2000;
+    else{
+        const rates={district:.02,high:.025,consumer:.01,sc:.018};
+        fee=val*(rates[court]||.02);
+        fee=Math.max(100,Math.min(fee,court==='sc'?2000000:500000));
+    }
+    showResult('cf-result',[
+        {l:'Claim Value',v:fmt(val)},{l:'Court',v:court.charAt(0).toUpperCase()+court.slice(1)+' Court'},
+        {l:'Nature',v:nature},{l:'Court Fee Payable',v:fmt(fee),total:true},
+        {l:'Mode',v:'Judicial Stamp Paper / Online'},
+    ]);
+}
+
+// Stamp Duty
+function calcStamp(){
+    const val=+document.getElementById('sd-val').value;
+    const state=document.getElementById('sd-state').value;
+    const gender=document.getElementById('sd-gender').value;
+    const rates={mh:{m:.06,f:.05},ka:{m:.05,f:.05},dl:{m:.06,f:.04},up:{m:.07,f:.07},tn:{m:.07,f:.07},gj:{m:.049,f:.049}};
+    const stateRates=rates[state]||{m:.06,f:.05};
+    const rate=stateRates[gender];
+    const stamp=val*rate;const reg=Math.min(val*.01,30000);const total=stamp+reg;
+    showResult('sd-result',[
+        {l:'Property Value',v:fmt(val)},{l:'Stamp Duty Rate',v:(rate*100).toFixed(1)+'%'},
+        {l:'Stamp Duty',v:fmt(stamp),tax:true},{l:'Registration Fee',v:fmt(reg),tax:true},
+        {l:'Total Payable',v:fmt(total),total:true},
+    ]);
+}
+
+// EMI
+function calcEMI(){
+    const P=+document.getElementById('emi-amt').value;
+    const r=+document.getElementById('emi-rate').value/100/12;
+    const n=+document.getElementById('emi-tenure').value*12;
+    const emi=P*r*Math.pow(1+r,n)/(Math.pow(1+r,n)-1);
+    const totalAmt=emi*n;const totalInt=totalAmt-P;
+    showResult('emi-result',[
+        {l:'Principal Amount',v:fmt(P)},{l:'Monthly EMI',v:fmt(emi),total:true},
+        {l:'Total Interest',v:fmt(totalInt),tax:true},{l:'Total Amount',v:fmt(totalAmt)},
+        {l:'Interest-to-Principal Ratio',v:(totalInt/P*100).toFixed(1)+'%'},
+    ]);
+}
+</script>
+</body></html>

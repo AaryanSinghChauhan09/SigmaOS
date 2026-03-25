@@ -1,0 +1,15 @@
+Microsoft (R) Visual C# Compiler version 4.8.9221.0
+
+for C# 5
+Copyright (C) Microsoft Corporation. All rights reserved.
+
+
+
+This compiler is provided as part of the Microsoft (R) .NET Framework, but only supports language versions up to C# 5, which is no longer the latest version. For compilers that support newer versions of the C# programming language, see http://go.microsoft.com/fwlink/?LinkID=533240
+
+SovereignQRShare.cs(23,29): error CS0118: 'System.Windows.Forms.Form.Size' is a 'property' but is used like a 'type'
+SovereignQRShare.cs(30,124): error CS0103: The name 'Color' does not exist in the current context
+SovereignQRShare.cs(30,148): error CS0103: The name 'Color' does not exist in the current context
+SovereignQRShare.cs(33,107): error CS0103: The name 'Color' does not exist in the current context
+SovereignQRShare.cs(33,147): error CS0103: The name 'Color' does not exist in the current context
+SovereignQRShare.cs(33,172): error CS0118: 'System.Windows.Forms.Control.Font' is a 'property' but is used like a 'type'

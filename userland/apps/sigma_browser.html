@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"><meta charset="UTF-8"><title>OmniBrowser</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#060910;--s1:#0c1220;--s2:#111828;--border:rgba(255,255,255,.08);--accent:#00d2ff;--as:rgba(0,210,255,.12);--text:#e2e8f0;--dim:#64748b;--danger:#f87171;--success:#34d399;}
+*{box-sizing:border-box;margin:0;padding:0;}body{background:var(--bg);color:var(--text);font-family:'Inter',sans-serif;height:100vh;display:flex;flex-direction:column;overflow:hidden;}
+#navBar{background:var(--s1);border-bottom:1px solid var(--border);padding:8px 12px;display:flex;align-items:center;gap:8px;flex-shrink:0;}
+.nav-btn{width:32px;height:32px;border-radius:8px;border:1px solid var(--border);background:transparent;color:var(--dim);font-size:.95rem;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:background .14s,color .14s;}
+.nav-btn:hover{background:rgba(255,255,255,.06);color:var(--text);}
+.nav-btn:disabled{opacity:.3;cursor:default;}
+#urlBar{flex:1;display:flex;align-items:center;gap:8px;background:var(--s2);border:1px solid var(--border);border-radius:8px;padding:0 12px;height:34px;transition:border .15s;}
+#urlBar:focus-within{border-color:var(--accent);}
+.url-icon{font-size:1rem;color:var(--dim);}
+#urlInp{flex:1;background:transparent;border:none;color:var(--text);font-family:'Inter',sans-serif;font-size:.85rem;outline:none;-webkit--webkit--webkit-user-select: text; user-select: text; -webkit-user-select: text; user-select: text; -webkit--webkit-user-select: text; user-select: text; -webkit-user-select: text; user-select: text;}
+.go-btn{padding:4px 12px;border-radius:6px;background:var(--accent);color:#000;border:none;font-weight:700;font-size:.78rem;cursor:pointer;}
+.go-btn:hover{opacity:.85;}
+#tabs-bar{background:var(--s1);border-bottom:1px solid var(--border);display:flex;align-items:center;padding:0 8px;gap:4px;flex-shrink:0;overflow-x:auto;}
+#tabs-bar::-webkit-scrollbar{height:3px}
+.tab-item{display:flex;align-items:center;gap:6px;padding:8px 12px;border-radius:8px 8px 0 0;cursor:pointer;font-size:.78rem;white-space:nowrap;color:var(--dim);transition:background .14s,color .14s;position:relative;flex-shrink:0;}
+.tab-item:hover{color:var(--text);}
+.tab-item.active{background:var(--bg);color:var(--text);border:1px solid var(--border);border-bottom:none;}
+.tab-close{font-size:.7rem;opacity:.5;cursor:pointer;padding:2px 4px;border-radius:3px;}
+.tab-close:hover{opacity:1;color:var(--danger);}
+.new-tab-btn{padding:6px 10px;background:transparent;border:none;color:var(--dim);cursor:pointer;font-size:1rem;border-radius:6px;}
+.new-tab-btn:hover{color:var(--text);background:rgba(255,255,255,.05);}
+#browser-area{flex:1;position:relative;display:flex;flex-direction:column;background:var(--bg);}
+/* New tab page */
+#new-tab-page{display:flex;flex-direction:column;align-items:center;padding-top:12vh;flex:1;}
+.nt-logo{font-size:3rem;font-weight:900;color:var(--accent);letter-spacing:-1px;margin-bottom:8px;}
+.nt-sub{color:var(--dim);font-size:.88rem;margin-bottom:32px;}
+.nt-search{display:flex;align-items:center;gap:10px;background:var(--s2);border:1px solid var(--border);border-radius:12px;padding:12px 20px;width:min(540px,90%);margin-bottom:36px;}
+.nt-search input{flex:1;background:transparent;border:none;font-family:'Inter',sans-serif;font-size:1rem;color:var(--text);outline:none;-webkit--webkit--webkit-user-select: text; user-select: text; -webkit-user-select: text; user-select: text; -webkit--webkit-user-select: text; user-select: text; -webkit-user-select: text; user-select: text;}
+.nt-q-grid{display:grid;grid-template-columns:repeat(auto-fill,100px);gap:16px;justify-content:center;}
+.nt-q{display:flex;flex-direction:column;align-items:center;gap:6px;padding:14px;border-radius:12px;cursor:pointer;border:1px solid transparent;transition:background .15s;}
+.nt-q:hover{background:rgba(255,255,255,.06);border-color:var(--border);}
+.nt-q .ni{font-size:2rem;}
+.nt-q .nl{font-size:.72rem;color:var(--dim);}
+iframe#pageFr{flex:1;border:none;display:none;}
+.sb2{background:var(--s1);border-top:1px solid var(--border);padding:5px 14px;font-size:.72rem;color:var(--dim);flex-shrink:0;display:flex;justify-content:space-between;}
+
+        .sigma-style-sigma_browser-1 { font-size:1.1rem;opacity:.5 }
+    </style>
+<script>
+// Sovereign OS Inline Style Manager
+document.addEventListener('DOMContentLoaded', () => {
+    const applyTo = (el) => { if(el.getAttribute('data-style')) { el.setAttribute('style', el.getAttribute('data-style')); el.removeAttribute('data-style'); } };
+    new MutationObserver(mutations => mutations.forEach(m => {
+        if(m.type === 'childList') m.addedNodes.forEach(n => { if(n.nodeType === 1) { applyTo(n); n.querySelectorAll('[data-style]').forEach(applyTo); } });
+    })).observe(document.body, {childList: true, subtree: true});
+    document.querySelectorAll('[data-style]').forEach(applyTo);
+});
+</script>
+</head>
+<body>
+<div id="navBar">
+    <button class="nav-btn" id="btnBack" onclick="navBack()">←</button>
+    <button class="nav-btn" id="btnFwd" onclick="navFwd()" disabled>→</button>
+    <button class="nav-btn" id="btnRefresh" onclick="refresh()">↻</button>
+    <button class="nav-btn" onclick="goHome()">⌂</button>
+    <div id="urlBar">
+        <span class="url-icon" id="secIcon">🔒</span>
+        <input aria-label="input"  type="text" id="urlInp" placeholder="Search or enter URL..." onkeydown="if(event.key==='Enter')go()" title="input">
+        <button class="go-btn" onclick="go()">Go</button>
+    </div>
+    <button class="nav-btn" title="Bookmarks">☆</button>
+    <button class="nav-btn" title="Extensions">🧩</button>
+</div>
+<div id="tabs-bar">
+    <div class="tab-item active" id="tab-0">
+        <span>🏠</span><span>New Tab</span>
+        <span class="tab-close" onclick="closeTab(event,0)">✕</span>
+    </div>
+    <button class="new-tab-btn" onclick="addTab()" title="New Tab">+</button>
+</div>
+<div id="browser-area">
+    <div id="new-tab-page">
+        <div class="nt-logo">OmniBrowser</div>
+        <div class="nt-sub">Sovereign • Private • Zero-Telemetry</div>
+        <div class="nt-search">
+            <span data- class="sigma-style-sigma_browser-1">🔍</span>
+            <input aria-label="input"  type="text" id="ntSearch" placeholder="Search IndianKanoon, LawBhoomi, or any site…" onkeydown="if(event.key==='Enter')ntSearch()" title="input">
+        </div>
+        <div class="nt-q-grid">
+            <div class="nt-q" onclick="loadSite('https://indiankanoon.org')"><span class="ni">⚖️</span><span class="nl">IndianKanoon</span></div>
+            <div class="nt-q" onclick="loadSite('https://lawbhoomi.com')"><span class="ni">📖</span><span class="nl">LawBhoomi</span></div>
+            <div class="nt-q" onclick="loadSite('https://ipleaders.in')"><span class="ni">🎓</span><span class="nl">iPleaders</span></div>
+            <div class="nt-q" onclick="loadSite('https://incometax.gov.in')"><span class="ni">🏛️</span><span class="nl">Income Tax</span></div>
+            <div class="nt-q" onclick="loadSite('https://mca.gov.in')"><span class="ni">🏢</span><span class="nl">MCA Gov</span></div>
+            <div class="nt-q" onclick="loadSite('https://github.com/AaryanSinghChauhan09/SigmaOS')"><span class="ni">💻</span><span class="nl">SigmaOS GitHub</span></div>
+            <div class="nt-q" onclick="loadSite('https://google.com')"><span class="ni">🌐</span><span class="nl">Google</span></div>
+            <div class="nt-q" onclick="loadSite('https://wikipedia.org')"><span class="ni">📚</span><span class="nl">Wikipedia</span></div>
+        </div>
+    </div>
+    <iframe title="Embedded Content"  id="pageFr" sandbox="allow-scripts allow-same-origin allow-forms allow-popups"></iframe>
+</div>
+<div class="sb2"><span id="sbLeft">OmniBrowser v6.0 – Sovereign</span><span id="sbRight">Protected</span></div>
+
+<script>
+const urlInp=document.getElementById('urlInp');
+const ntSearchEl=document.getElementById('ntSearch');
+const page=document.getElementById('new-tab-page');
+const frame=document.getElementById('pageFr');
+let tabCount=1;
+
+function go(){
+  let url=urlInp.value.trim();
+  if(!url)return;
+  if(!url.startsWith('http')&&!url.includes('.')){url='https://www.google.com/search?q='+encodeURIComponent(url);}
+  else if(!url.startsWith('http'))url='https://'+url;
+  loadSite(url);
+}
+
+function ntSearch(){
+  const q=ntSearchEl.value.trim();
+  if(!q)return;
+  loadSite('https://www.google.com/search?q='+encodeURIComponent(q));
+}
+
+function loadSite(url){
+  page.style.display='none';
+  frame.style.display='flex';
+  frame.src=url;
+  urlInp.value=url;
+  document.getElementById('sbLeft').textContent='Loading: '+url;
+  document.getElementById('secIcon').textContent='🔒';
+  frame.onload=()=>{ document.getElementById('sbLeft').textContent=url; };
+}
+
+function goHome(){
+  frame.style.display='none';
+  page.style.display='flex';
+  urlInp.value='';
+  document.getElementById('sbLeft').textContent='OmniBrowser v6.0 – Sovereign';
+}
+
+function navBack(){ try{frame.contentWindow.history.back();}catch(e){} }
+function navFwd(){ try{frame.contentWindow.history.forward();}catch(e){} }
+function refresh(){ if(frame.style.display!=='none')frame.src=frame.src; }
+
+function addTab(){
+  const id='tab-'+tabCount++;
+  const tb=document.getElementById('tabs-bar');
+  const btn=document.querySelector('.new-tab-btn');
+  const t=document.createElement('div');
+  t.className='tab-item';t.id=id;
+  t.innerHTML=`<span>🌐</span><span>New Tab</span><span class="tab-close" onclick="closeTab(event,'${id}')">✕</span>`;
+  t.onclick=()=>activateTab(id);
+  tb.insertBefore(t,btn);
+  activateTab(id);goHome();
+}
+
+function activateTab(id){
+  document.querySelectorAll('.tab-item').forEach(t=>t.classList.remove('active'));
+  document.getElementById(id)?.classList.add('active');
+}
+
+function closeTab(e,id){
+  e.stopPropagation();
+  const t=document.getElementById('tab-'+id)||document.getElementById(id);
+  if(t)t.remove();
+  goHome();
+}
+</script>
+</body></html>

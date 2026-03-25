@@ -1,0 +1,795 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Sigma BI – Sovereign Business Intelligence Engine</title>
+<style>
+:root{
+  --bg:#0a0f1e;--panel:#0f1729;--surface:#141e35;--border:rgba(255,255,255,.08);
+  --accent:#00d2ff;--accent2:#7c3aed;--text:#e2e8f0;--text2:#94a3b8;
+  --success:#34d399;--warn:#fbbf24;--danger:#f87171;
+  --chart1:#00d2ff;--chart2:#7c3aed;--chart3:#34d399;--chart4:#fbbf24;
+  --chart5:#f87171;--chart6:#f472b6;--chart7:#818cf8;--chart8:#fb923c;
+}
+*{box-sizing:border-box;margin:0;padding:0;font-family:'Inter',system-ui,sans-serif;}
+body{background:var(--bg);color:var(--text);display:flex;flex-direction:column;height:100vh;overflow:hidden;font-size:13px;}
+
+/* TOP BAR */
+.topbar{height:44px;background:var(--panel);border-bottom:1px solid var(--border);
+  display:flex;align-items:center;gap:12px;padding:0 16px;flex-shrink:0;}
+.topbar h1{font-size:1rem;font-weight:700;background:linear-gradient(90deg,var(--accent),var(--accent2));
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;white-space:nowrap;}
+.tb-btn{background:rgba(255,255,255,.07);border:1px solid var(--border);border-radius:6px;
+  color:var(--text);padding:5px 12px;cursor:pointer;font-size:.78rem;font-weight:600;
+  transition:background .15s;}
+.tb-btn:hover{background:rgba(0,210,255,.15);border-color:var(--accent);}
+.tb-btn.active{background:rgba(0,210,255,.2);border-color:var(--accent);color:var(--accent);}
+.spacer{flex:1;}
+#file-input{display:none;}
+
+/* MAIN LAYOUT */
+.layout{flex:1;display:flex;overflow:hidden;}
+
+/* LEFT PANEL */
+.left-panel{width:220px;background:var(--panel);border-right:1px solid var(--border);
+  display:flex;flex-direction:column;overflow:hidden;flex-shrink:0;}
+.panel-section{padding:12px;border-bottom:1px solid var(--border);}
+.panel-title{font-size:.7rem;font-weight:700;text-transform:uppercase;letter-spacing:.8px;
+  color:var(--text2);margin-bottom:8px;}
+.field-chip{background:rgba(255,255,255,.06);border:1px solid var(--border);border-radius:5px;
+  padding:5px 8px;margin-bottom:4px;cursor:grab;-webkit--webkit--webkit-user-select: none; user-select: none; -webkit-user-select: none; user-select: none; -webkit--webkit-user-select: none; user-select: none; -webkit-user-select: none; user-select: none;
+  display:flex;align-items:center;gap:6px;font-size:.78rem;color:var(--text);
+  transition:background .1s;}
+.field-chip:hover{background:rgba(0,210,255,.12);border-color:var(--accent);}
+.field-chip .type{color:var(--accent);font-size:.7rem;font-weight:700;}
+
+/* CHART CONTROLS */
+.ctrl-row{display:flex;align-items:center;gap:8px;margin-bottom:8px;}
+.ctrl-label{font-size:.72rem;color:var(--text2);width:50px;}
+.ctrl-select{flex:1;background:rgba(255,255,255,.07);border:1px solid var(--border);
+  border-radius:5px;color:var(--text);padding:4px;font-size:.75rem;}
+.ctrl-select:focus{outline:none;border-color:var(--accent);}
+
+/* CENTER CANVAS */
+.center{flex:1;display:flex;flex-direction:column;overflow:hidden;}
+.canvas-area{flex:1;position:relative;overflow:auto;padding:16px;}
+
+/* KPI STRIP */
+.kpi-strip{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:14px;}
+.kpi{background:var(--surface);border:1px solid var(--border);border-radius:10px;
+  padding:10px 14px;min-width:120px;flex:1;}
+.kpi-label{font-size:.68rem;color:var(--text2);text-transform:uppercase;letter-spacing:.5px;}
+.kpi-value{font-size:1.3rem;font-weight:800;color:var(--accent);margin-top:2px;}
+.kpi-sub{font-size:.68rem;color:var(--success);margin-top:2px;}
+
+/* CHART CONTAINER */
+.chart-wrap{background:var(--surface);border:1px solid var(--border);border-radius:12px;
+  padding:14px;margin-bottom:12px;position:relative;}
+.chart-hdr{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;}
+.chart-title{font-weight:700;font-size:.88rem;color:var(--text);}
+.chart-type-badge{font-size:.68rem;background:rgba(0,210,255,.12);color:var(--accent);
+  padding:2px 8px;border-radius:3px;font-weight:700;}
+canvas{display:block;max-width:100%;}
+
+/* LEGEND */
+.legend{display:flex;flex-wrap:wrap;gap:8px;margin-top:8px;}
+.leg-item{display:flex;align-items:center;gap:5px;font-size:.72rem;color:var(--text2);}
+.leg-dot{width:10px;height:10px;border-radius:50%;}
+
+/* DATA TABLE */
+.data-table-wrap{background:var(--surface);border:1px solid var(--border);border-radius:12px;
+  overflow:auto;max-height:220px;margin-bottom:12px;}
+.data-table{width:100%;border-collapse:collapse;}
+.data-table th{background:rgba(0,210,255,.08);padding:8px 10px;font-size:.72rem;
+  text-transform:uppercase;letter-spacing:.5px;color:var(--accent);
+  border-bottom:1px solid var(--border);position:sticky;top:0;}
+.data-table td{padding:6px 10px;font-size:.78rem;color:var(--text2);
+  border-bottom:1px solid rgba(255,255,255,.03);}
+.data-table tr:hover td{background:rgba(255,255,255,.03);color:var(--text);}
+
+/* FILTER BAR */
+.filter-bar{background:var(--panel);border-top:1px solid var(--border);
+  padding:8px 16px;display:flex;gap:10px;align-items:center;flex-shrink:0;}
+.filter-inp{background:rgba(255,255,255,.06);border:1px solid var(--border);border-radius:6px;
+  color:var(--text);padding:5px 10px;font-size:.78rem;width:160px;}
+.filter-inp:focus{outline:none;border-color:var(--accent);}
+#status-bar{background:var(--panel);border-top:1px solid var(--border);
+  padding:4px 16px;font-size:.7rem;color:var(--text2);flex-shrink:0;}
+
+/* TOOLTIP */
+#tooltip{position:fixed;background:rgba(10,15,30,.95);border:1px solid var(--border);
+  border-radius:8px;padding:8px 12px;font-size:.78rem;color:var(--text);
+  pointer-events:none;z-index:9999;display:none;box-shadow:0 8px 24px rgba(0,0,0,.5);}
+
+        .sigma-style-sigma_bi-1 { color:var(--text2);font-size:.75rem; }
+        .sigma-style-sigma_bi-2 { font-size:.75rem; }
+        .sigma-style-sigma_bi-3 { flex:1;overflow-y:auto; }
+        .sigma-style-sigma_bi-4 { font-size:.75rem;color:var(--text2);line-height:1.8; }
+        .sigma-style-sigma_bi-5 { display:none }
+        .sigma-style-sigma_bi-6 { font-size:.75rem;color:var(--text2);font-weight:700; }
+        .sigma-style-sigma_bi-7 { color:var(--accent) }
+        .sigma-style-sigma_bi-8 { color:var(--accent) }
+        .sigma-style-sigma_bi-9 { color:var(--accent) }
+        .sigma-style-sigma_bi-10 { color:var(--accent) }
+        .sigma-style-sigma_bi-11 { display:flex;gap:8px;align-items:center }
+        .sigma-style-sigma_bi-12 { padding:3px 8px;font-size:.7rem; }
+        .sigma-style-sigma_bi-13 { background:${SigmaChartRenderer.COLORS[i%SigmaChartRenderer.COLORS.length]} }
+    </style>
+
+<script>
+// Sovereign OS Inline Style Manager
+document.addEventListener('DOMContentLoaded', () => {
+    const applyTo = (el) => { if(el.getAttribute('data-style')) { el.setAttribute('style', el.getAttribute('data-style')); el.removeAttribute('data-style'); } };
+    new MutationObserver(mutations => mutations.forEach(m => {
+        if(m.type === 'childList') m.addedNodes.forEach(n => { if(n.nodeType === 1) { applyTo(n); n.querySelectorAll('[data-style]').forEach(applyTo); } });
+    })).observe(document.body, {childList: true, subtree: true});
+    document.querySelectorAll('[data-style]').forEach(applyTo);
+});
+</script>
+</head>
+<body>
+
+<div class="topbar">
+  <h1>📊 Sigma BI — Sovereign Intelligence Engine</h1>
+  <button class="tb-btn" onclick="document.getElementById('file-input').click()">📂 Load CSV/JSON</button>
+  <input aria-label="input" type="file" id="file-input" accept=".csv,.json" onchange="loadFile(event)" title="input">
+  <button class="tb-btn" onclick="loadSample()">🔬 Sample Dataset</button>
+  <button class="tb-btn" onclick="addChart()">➕ Add Chart</button>
+  <div class="spacer"></div>
+  <button class="tb-btn" onclick="exportPNG()">🖼️ Export PNG</button>
+  <button class="tb-btn" onclick="exportCSV()">📄 Export CSV</button>
+</div>
+
+<div class="layout">
+  <!-- LEFT PANEL: Fields & Controls -->
+  <div class="left-panel">
+    <div class="panel-section">
+      <div class="panel-title">📋 Fields</div>
+      <div id="field-list"><div data- class="sigma-style-sigma_bi-1">Load data to see fields</div></div>
+    </div>
+    <div class="panel-section">
+      <div class="panel-title">⚙️ Chart Config</div>
+      <div class="ctrl-row">
+        <span class="ctrl-label">Type</span>
+        <select aria-label="Selection" class="ctrl-select" id="cfg-type" title="input">
+          <option value="bar">Bar Chart</option>
+          <option value="line">Line Chart</option>
+          <option value="area">Area Chart</option>
+          <option value="pie">Pie / Donut</option>
+          <option value="scatter">Scatter Plot</option>
+          <option value="hbar">Horiz. Bar</option>
+        </select>
+      </div>
+      <div class="ctrl-row">
+        <span class="ctrl-label">X Axis</span>
+        <select aria-label="Selection" class="ctrl-select" id="cfg-x" title="input"><option>—</option></select>
+      </div>
+      <div class="ctrl-row">
+        <span class="ctrl-label">Y Axis</span>
+        <select aria-label="Selection" class="ctrl-select" id="cfg-y" title="input"><option>—</option></select>
+      </div>
+      <div class="ctrl-row">
+        <span class="ctrl-label">Group</span>
+        <select aria-label="Selection" class="ctrl-select" id="cfg-grp" title="input"><option value="">None</option></select>
+      </div>
+      <div class="ctrl-row">
+        <span class="ctrl-label">Agg.</span>
+        <select aria-label="Selection" class="ctrl-select" id="cfg-agg" title="input">
+          <option value="sum">Sum</option>
+          <option value="avg">Average</option>
+          <option value="count">Count</option>
+          <option value="max">Max</option>
+          <option value="min">Min</option>
+        </select>
+      </div>
+      <div class="ctrl-row">
+        <span class="ctrl-label">Title</span>
+        <input aria-label="input" class="ctrl-select filter-inp sigma-style-sigma_bi-2" id="cfg-title" placeholder="Chart title" data- title="input">
+      </div>
+    </div>
+    <div class="panel-section sigma-style-sigma_bi-3" data->
+      <div class="panel-title">📊 Summary Stats</div>
+      <div id="stat-panel" data- class="sigma-style-sigma_bi-4"></div>
+    </div>
+  </div>
+
+  <!-- CENTER -->
+  <div class="center">
+    <div class="canvas-area" id="canvas-area">
+      <div class="kpi-strip" id="kpi-strip"></div>
+      <div id="chart-grid"></div>
+      <div class="data-table-wrap sigma-style-sigma_bi-5" id="table-wrap" data->
+        <table class="data-table" id="data-table"></table>
+      </div>
+    </div>
+
+    <div class="filter-bar">
+      <span data- class="sigma-style-sigma_bi-6">🔍 Filter:</span>
+      <input aria-label="input" class="filter-inp" id="filter-col" placeholder="Column name" title="input">
+      <input aria-label="input" class="filter-inp" id="filter-val" placeholder="Value contains" title="input">
+      <button class="tb-btn" onclick="applyFilter()">Apply</button>
+      <button class="tb-btn" onclick="clearFilter()">Clear</button>
+      <div class="spacer"></div>
+      <button class="tb-btn" onclick="toggleTable()">📋 Toggle Table</button>
+    </div>
+    <div id="status-bar">🟢 Sigma BI ready — Load a dataset or use Sample Data to begin</div>
+  </div>
+</div>
+
+<div id="tooltip"></div>
+
+<script>
+'use strict';
+/**
+ * SIGMA BI — Sovereign Business Intelligence Engine
+ * Zero-dependency. Pure OOP. Fully functional charts & analytics.
+ * No external libraries. Custom rendering via Canvas 2D API.
+ */
+
+class SigmaDataEngine {
+  constructor() {
+    this.raw = [];
+    this.filtered = [];
+    this.columns = [];
+    this.numericCols = [];
+    this.catCols = [];
+    this.charts = [];
+    this.chartIdSeq = 0;
+    this._tooltip = document.getElementById('tooltip');
+  }
+
+  loadCSV(text) {
+    const lines = text.trim().split('\n').map(l => l.trim()).filter(Boolean);
+    if (lines.length < 2) return false;
+    const headers = this._parseCSVRow(lines[0]);
+    this.columns = headers;
+    this.raw = lines.slice(1).map(l => {
+      const vals = this._parseCSVRow(l);
+      const row = {};
+      headers.forEach((h, i) => { row[h] = vals[i] !== undefined ? vals[i] : ''; });
+      return row;
+    });
+    this._inferTypes();
+    this.filtered = [...this.raw];
+    return true;
+  }
+
+  loadJSON(text) {
+    try {
+      const obj = JSON.parse(text);
+      const arr = Array.isArray(obj) ? obj : (obj.data || obj.records || Object.values(obj)[0] || []);
+      if (!arr.length) return false;
+      this.raw = arr;
+      this.columns = Object.keys(arr[0]);
+      this._inferTypes();
+      this.filtered = [...this.raw];
+      return true;
+    } catch { return false; }
+  }
+
+  _parseCSVRow(line) {
+    const res = []; let cur = ''; let inQ = false;
+    for (let i = 0; i < line.length; i++) {
+      const c = line[i];
+      if (c === '"') { inQ = !inQ; }
+      else if (c === ',' && !inQ) { res.push(cur.trim()); cur = ''; }
+      else cur += c;
+    }
+    res.push(cur.trim());
+    return res;
+  }
+
+  _inferTypes() {
+    this.numericCols = [];
+    this.catCols = [];
+    this.columns.forEach(col => {
+      const vals = this.raw.map(r => r[col]).filter(v => v !== '');
+      const numCount = vals.filter(v => !isNaN(parseFloat(v)) && isFinite(v)).length;
+      if (numCount / vals.length > 0.7) this.numericCols.push(col);
+      else this.catCols.push(col);
+    });
+  }
+
+  filter(col, val) {
+    if (!col || !val) { this.filtered = [...this.raw]; return; }
+    const v = val.toLowerCase();
+    this.filtered = this.raw.filter(r => String(r[col]).toLowerCase().includes(v));
+  }
+
+  aggregate(xCol, yCol, aggFunc, groupCol) {
+    const grouped = {};
+    this.filtered.forEach(row => {
+      const xKey = row[xCol];
+      const yVal = parseFloat(row[yCol]) || 0;
+      const gKey = groupCol ? row[groupCol] : '_';
+      const key = `${xKey}||${gKey}`;
+      if (!grouped[key]) grouped[key] = { x: xKey, g: gKey, vals: [] };
+      grouped[key].vals.push(yVal);
+    });
+    return Object.values(grouped).map(g => ({
+      x: g.x, g: g.g,
+      y: this._agg(g.vals, aggFunc)
+    }));
+  }
+
+  _agg(vals, fn) {
+    if (!vals.length) return 0;
+    switch(fn) {
+      case 'sum': return vals.reduce((a,b)=>a+b,0);
+      case 'avg': return vals.reduce((a,b)=>a+b,0)/vals.length;
+      case 'count': return vals.length;
+      case 'max': return Math.max(...vals);
+      case 'min': return Math.min(...vals);
+      default: return vals.reduce((a,b)=>a+b,0);
+    }
+  }
+
+  stats(col) {
+    const vals = this.filtered.map(r => parseFloat(r[col])).filter(v => !isNaN(v));
+    if (!vals.length) return null;
+    const sum = vals.reduce((a,b)=>a+b,0);
+    const mean = sum/vals.length;
+    const sorted = [...vals].sort((a,b)=>a-b);
+    const variance = vals.reduce((a,v)=>a+(v-mean)**2,0)/vals.length;
+    return {
+      count: vals.length, sum: this._fmt(sum), mean: this._fmt(mean),
+      min: this._fmt(sorted[0]), max: this._fmt(sorted[sorted.length-1]),
+      median: this._fmt(sorted[Math.floor(sorted.length/2)]),
+      stddev: this._fmt(Math.sqrt(variance))
+    };
+  }
+
+  _fmt(n) { return isNaN(n) ? '—' : Number(n).toLocaleString('en-IN', {maximumFractionDigits:2}); }
+}
+
+class SigmaChartRenderer {
+  static COLORS = ['#00d2ff','#7c3aed','#34d399','#fbbf24','#f87171','#f472b6','#818cf8','#fb923c','#4ade80','#38bdf8'];
+
+  static render(canvas, type, data, opts = {}) {
+    const ctx = canvas.getContext('2d');
+    const W = canvas.width, H = canvas.height;
+    ctx.clearRect(0,0,W,H);
+    switch(type) {
+      case 'bar':  this._bar(ctx, W, H, data, opts, false); break;
+      case 'hbar': this._hbar(ctx, W, H, data, opts); break;
+      case 'line': this._line(ctx, W, H, data, opts, false); break;
+      case 'area': this._line(ctx, W, H, data, opts, true); break;
+      case 'pie':  this._pie(ctx, W, H, data, opts); break;
+      case 'scatter': this._scatter(ctx, W, H, data, opts); break;
+    }
+  }
+
+  static _bar(ctx, W, H, data, opts, horiz) {
+    const pad = {t:20,r:20,b:50,l:55};
+    const cW = W - pad.l - pad.r;
+    const cH = H - pad.t - pad.b;
+    const groups = [...new Set(data.map(d=>d.x))];
+    const series = [...new Set(data.map(d=>d.g))];
+    const maxVal = Math.max(...data.map(d=>d.y), 0) * 1.15 || 1;
+    const barW = (cW / groups.length) * 0.7 / series.length;
+
+    // Grid & axes
+    ctx.strokeStyle = 'rgba(255,255,255,.06)'; ctx.lineWidth = 1;
+    const ticks = 5;
+    for (let i=0;i<=ticks;i++) {
+      const y = pad.t + cH - (i/ticks)*cH;
+      ctx.beginPath(); ctx.moveTo(pad.l, y); ctx.lineTo(W-pad.r, y); ctx.stroke();
+      ctx.fillStyle='rgba(255,255,255,.35)'; ctx.font='10px Inter,system-ui'; ctx.textAlign='right';
+      ctx.fillText(this._shortNum((i/ticks)*maxVal), pad.l-4, y+3);
+    }
+    ctx.strokeStyle='rgba(255,255,255,.15)'; ctx.lineWidth=1;
+    ctx.beginPath(); ctx.moveTo(pad.l,pad.t); ctx.lineTo(pad.l,pad.t+cH); ctx.lineTo(W-pad.r,pad.t+cH); ctx.stroke();
+
+    // Bars
+    groups.forEach((grp, gi) => {
+      const gX = pad.l + (gi+0.15) * (cW/groups.length);
+      series.forEach((ser, si) => {
+        const d = data.find(d=>d.x===grp&&d.g===ser);
+        const val = d ? d.y : 0;
+        const bX = gX + si*(barW+1);
+        const bH = (val/maxVal)*cH;
+        const bY = pad.t + cH - bH;
+        const color = this.COLORS[si % this.COLORS.length];
+        const grad = ctx.createLinearGradient(0,bY,0,bY+bH);
+        grad.addColorStop(0, color); grad.addColorStop(1, color+'44');
+        ctx.fillStyle = grad;
+        ctx.beginPath(); ctx.roundRect(bX, bY, barW, bH, [3,3,0,0]); ctx.fill();
+        // Value label
+        if (bH > 16) {
+          ctx.fillStyle='rgba(255,255,255,.7)'; ctx.font='bold 9px Inter,system-ui'; ctx.textAlign='center';
+          ctx.fillText(this._shortNum(val), bX+barW/2, bY+12);
+        }
+      });
+      // X label
+      ctx.fillStyle='rgba(255,255,255,.5)'; ctx.font='10px Inter,system-ui'; ctx.textAlign='center';
+      ctx.fillText(String(grp).slice(0,8), pad.l+(gi+0.5)*(cW/groups.length), pad.t+cH+14);
+    });
+  }
+
+  static _hbar(ctx, W, H, data, opts) {
+    const pad = {t:15,r:50,b:15,l:90};
+    const cW = W-pad.l-pad.r, cH = H-pad.t-pad.b;
+    const groups = [...new Set(data.map(d=>d.x))].slice(0,20);
+    const maxVal = Math.max(...data.map(d=>d.y),0)*1.1||1;
+    const bH = (cH/groups.length)*0.65;
+    ctx.strokeStyle='rgba(255,255,255,.06)'; ctx.lineWidth=1;
+    [0,.25,.5,.75,1].forEach(p=>{
+      const x=pad.l+p*cW;
+      ctx.beginPath();ctx.moveTo(x,pad.t);ctx.lineTo(x,H-pad.b);ctx.stroke();
+      ctx.fillStyle='rgba(255,255,255,.35)';ctx.font='9px Inter';ctx.textAlign='center';
+      ctx.fillText(this._shortNum(p*maxVal),x,H-pad.b+10);
+    });
+    groups.forEach((grp,i)=>{
+      const d=data.filter(r=>r.x===grp);
+      const val=d.length?d[0].y:0;
+      const bW=(val/maxVal)*cW;
+      const bY=pad.t+i*(cH/groups.length)+(cH/groups.length-bH)/2;
+      const grad=ctx.createLinearGradient(pad.l,0,pad.l+bW,0);
+      grad.addColorStop(0,this.COLORS[i%this.COLORS.length]);
+      grad.addColorStop(1,this.COLORS[i%this.COLORS.length]+'44');
+      ctx.fillStyle=grad;
+      ctx.beginPath();ctx.roundRect(pad.l,bY,bW,bH,[0,3,3,0]);ctx.fill();
+      ctx.fillStyle='rgba(255,255,255,.6)';ctx.font='10px Inter';ctx.textAlign='right';
+      ctx.fillText(String(grp).slice(0,12),pad.l-4,bY+bH/2+3);
+      if(bW>30){ctx.fillStyle='rgba(255,255,255,.8)';ctx.textAlign='left';ctx.fillText(this._shortNum(val),pad.l+bW+4,bY+bH/2+3);}
+    });
+  }
+
+  static _line(ctx, W, H, data, opts, fill) {
+    const pad={t:20,r:20,b:50,l:55};
+    const cW=W-pad.l-pad.r, cH=H-pad.t-pad.b;
+    const series=[...new Set(data.map(d=>d.g))];
+    const xVals=[...new Set(data.map(d=>d.x))];
+    const maxVal=Math.max(...data.map(d=>d.y),0)*1.15||1;
+    // Grid
+    ctx.strokeStyle='rgba(255,255,255,.06)';ctx.lineWidth=1;
+    [0,.25,.5,.75,1].forEach(p=>{
+      const y=pad.t+cH-p*cH;
+      ctx.beginPath();ctx.moveTo(pad.l,y);ctx.lineTo(W-pad.r,y);ctx.stroke();
+      ctx.fillStyle='rgba(255,255,255,.35)';ctx.font='10px Inter';ctx.textAlign='right';
+      ctx.fillText(this._shortNum(p*maxVal),pad.l-4,y+3);
+    });
+    ctx.strokeStyle='rgba(255,255,255,.15)';ctx.lineWidth=1;
+    ctx.beginPath();ctx.moveTo(pad.l,pad.t);ctx.lineTo(pad.l,pad.t+cH);ctx.lineTo(W-pad.r,pad.t+cH);ctx.stroke();
+    // X labels
+    xVals.forEach((x,i)=>{
+      const px=pad.l+i*(cW/(xVals.length-1||1));
+      ctx.fillStyle='rgba(255,255,255,.4)';ctx.font='10px Inter';ctx.textAlign='center';
+      ctx.fillText(String(x).slice(0,6),px,pad.t+cH+14);
+    });
+    // Lines
+    series.forEach((ser,si)=>{
+      const color=this.COLORS[si%this.COLORS.length];
+      const pts=xVals.map((x,i)=>{
+        const d=data.find(r=>r.x===x&&r.g===ser);
+        return {px:pad.l+i*(cW/(xVals.length-1||1)),py:pad.t+cH-(d?d.y:0)/maxVal*cH};
+      });
+      ctx.strokeStyle=color;ctx.lineWidth=2.5;ctx.lineJoin='round';ctx.lineCap='round';
+      if(fill){
+        const grad=ctx.createLinearGradient(0,pad.t,0,pad.t+cH);
+        grad.addColorStop(0,color+'55');grad.addColorStop(1,color+'00');
+        ctx.beginPath();ctx.moveTo(pts[0].px,pad.t+cH);
+        pts.forEach(p=>ctx.lineTo(p.px,p.py));
+        ctx.lineTo(pts[pts.length-1].px,pad.t+cH);ctx.closePath();ctx.fillStyle=grad;ctx.fill();
+      }
+      ctx.beginPath();pts.forEach((p,i)=>i?ctx.lineTo(p.px,p.py):ctx.moveTo(p.px,p.py));ctx.stroke();
+      pts.forEach(p=>{ctx.beginPath();ctx.arc(p.px,p.py,4,0,Math.PI*2);ctx.fillStyle=color;ctx.fill();ctx.strokeStyle=var_or('#0a0f1e');ctx.lineWidth=1.5;ctx.stroke();});
+    });
+  }
+
+  static _pie(ctx, W, H, data, opts) {
+    const cx=W/2-40,cy=H/2,R=Math.min(W-120,H-40)/2-10;
+    const total=data.reduce((a,d)=>a+d.y,0)||1;
+    let angle=-Math.PI/2;
+    data.slice(0,12).forEach((d,i)=>{
+      const slice=(d.y/total)*Math.PI*2;
+      const color=this.COLORS[i%this.COLORS.length];
+      ctx.beginPath();ctx.moveTo(cx,cy);ctx.arc(cx,cy,R,angle,angle+slice);ctx.closePath();
+      ctx.fillStyle=color;ctx.fill();ctx.strokeStyle='rgba(10,15,30,.5)';ctx.lineWidth=2;ctx.stroke();
+      // Label
+      const mid=angle+slice/2;
+      if(slice>0.2){
+        const lx=cx+Math.cos(mid)*(R*0.65),ly=cy+Math.sin(mid)*(R*0.65);
+        ctx.fillStyle='rgba(255,255,255,.9)';ctx.font='bold 10px Inter';ctx.textAlign='center';ctx.textBaseline='middle';
+        ctx.fillText(((d.y/total)*100).toFixed(1)+'%',lx,ly);
+      }
+      angle+=slice;
+    });
+    // Donut hole
+    ctx.beginPath();ctx.arc(cx,cy,R*0.45,0,Math.PI*2);
+    ctx.fillStyle='var(--surface,#141e35)';ctx.fill();
+    // Center text
+    ctx.fillStyle='rgba(255,255,255,.7)';ctx.font='bold 11px Inter';ctx.textAlign='center';ctx.textBaseline='middle';
+    ctx.fillText(data.length+' items',cx,cy);
+    // Legend right
+    data.slice(0,12).forEach((d,i)=>{
+      const ly=20+i*20;
+      ctx.fillStyle=this.COLORS[i%this.COLORS.length];
+      ctx.fillRect(W-100,ly,12,12);
+      ctx.fillStyle='rgba(255,255,255,.6)';ctx.font='10px Inter';ctx.textAlign='left';ctx.textBaseline='top';
+      ctx.fillText(String(d.x).slice(0,10),W-84,ly+1);
+    });
+  }
+
+  static _scatter(ctx, W, H, data, opts) {
+    const pad={t:20,r:20,b:50,l:55};
+    const cW=W-pad.l-pad.r,cH=H-pad.t-pad.b;
+    const xs=data.map(d=>parseFloat(d.x)||0),ys=data.map(d=>d.y);
+    const xMin=Math.min(...xs),xMax=Math.max(...xs)||1;
+    const yMin=0,yMax=Math.max(...ys)||1;
+    // Grid
+    ctx.strokeStyle='rgba(255,255,255,.06)';ctx.lineWidth=1;
+    [0,.25,.5,.75,1].forEach(p=>{
+      const y=pad.t+cH-p*cH;ctx.beginPath();ctx.moveTo(pad.l,y);ctx.lineTo(W-pad.r,y);ctx.stroke();
+      const x=pad.l+p*cW;ctx.beginPath();ctx.moveTo(x,pad.t);ctx.lineTo(x,pad.t+cH);ctx.stroke();
+    });
+    ctx.strokeStyle='rgba(255,255,255,.15)';ctx.lineWidth=1;
+    ctx.beginPath();ctx.moveTo(pad.l,pad.t);ctx.lineTo(pad.l,pad.t+cH);ctx.lineTo(W-pad.r,pad.t+cH);ctx.stroke();
+    const series=[...new Set(data.map(d=>d.g))];
+    data.forEach(d=>{
+      const si=series.indexOf(d.g);
+      const px=pad.l+((parseFloat(d.x)||0)-xMin)/(xMax-xMin||1)*cW;
+      const py=pad.t+cH-(d.y-yMin)/(yMax-yMin||1)*cH;
+      ctx.beginPath();ctx.arc(px,py,5,0,Math.PI*2);
+      ctx.fillStyle=this.COLORS[si%this.COLORS.length]+'bb';ctx.fill();
+      ctx.strokeStyle=this.COLORS[si%this.COLORS.length];ctx.lineWidth=1;ctx.stroke();
+    });
+  }
+
+  static _shortNum(n) {
+    if(n>=1e9) return (n/1e9).toFixed(1)+'B';
+    if(n>=1e7) return (n/1e7).toFixed(1)+'Cr';
+    if(n>=1e5) return (n/1e5).toFixed(1)+'L';
+    if(n>=1e3) return (n/1e3).toFixed(1)+'K';
+    return Number(n).toLocaleString('en-IN',{maximumFractionDigits:1});
+  }
+}
+
+// polyfill for canvas roundRect
+if(!CanvasRenderingContext2D.prototype.roundRect){
+  CanvasRenderingContext2D.prototype.roundRect=function(x,y,w,h,r){
+    const rad=Array.isArray(r)?r:[r,r,r,r];
+    this.beginPath();this.moveTo(x+rad[0],y);
+    this.lineTo(x+w-rad[1],y);this.arcTo(x+w,y,x+w,y+rad[1],rad[1]);
+    this.lineTo(x+w,y+h-rad[2]);this.arcTo(x+w,y+h,x+w-rad[2],y+h,rad[2]);
+    this.lineTo(x+rad[3],y+h);this.arcTo(x,y+h,x,y+h-rad[3],rad[3]);
+    this.lineTo(x,y+rad[0]);this.arcTo(x,y,x+rad[0],y,rad[0]);this.closePath();
+  };
+}
+function var_or(def){return def;}
+
+class SigmaBIApp {
+  constructor() {
+    this.engine = new SigmaDataEngine();
+    this.charts = {};
+    this.chartSeq = 0;
+    this._bindUI();
+  }
+
+  _bindUI() {
+    document.getElementById('filter-val').addEventListener('keydown', e => { if(e.key==='Enter') this.applyFilter(); });
+  }
+
+  loadFile(event) {
+    const file = event.target.files[0];
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = e => {
+      const text = e.target.result;
+      let ok = false;
+      if (file.name.endsWith('.json')) ok = this.engine.loadJSON(text);
+      else ok = this.engine.loadCSV(text);
+      if (ok) this._onDataLoad(file.name);
+      else this._status('❌ Failed to parse file. Check format.', true);
+    };
+    reader.readAsText(file);
+  }
+
+  loadSample() {
+    const csv = `Month,Revenue,Cost,Profit,Region,Units
+Jan,450000,300000,150000,North,1200
+Feb,520000,310000,210000,South,1450
+Mar,610000,290000,320000,East,1680
+Apr,580000,330000,250000,West,1500
+May,720000,300000,420000,North,1900
+Jun,810000,280000,530000,South,2100
+Jul,760000,320000,440000,East,1980
+Aug,890000,295000,595000,West,2300
+Sep,950000,310000,640000,North,2450
+Oct,870000,290000,580000,South,2200
+Nov,920000,305000,615000,East,2380
+Dec,1050000,320000,730000,West,2700`;
+    this.engine.loadCSV(csv);
+    this._onDataLoad('SampleSalesData.csv');
+  }
+
+  _onDataLoad(name) {
+    this._buildFieldList();
+    this._populateSelects();
+    this._buildKPIs();
+    this._renderStats();
+    this._renderTable();
+    this.addChart(); // auto-add first chart
+    this._status(`✅ Loaded: ${name} — ${this.engine.filtered.length} rows × ${this.engine.columns.length} cols`);
+  }
+
+  _buildFieldList() {
+    const el = document.getElementById('field-list');
+    el.innerHTML = '';
+    this.engine.columns.forEach(col => {
+      const isNum = this.engine.numericCols.includes(col);
+      const chip = document.createElement('div');
+      chip.className = 'field-chip';
+      chip.innerHTML = `<span class="type">${isNum?'#':''}</span>${col}`;
+      el.appendChild(chip);
+    });
+  }
+
+  _populateSelects() {
+    const ids = ['cfg-x','cfg-y','cfg-grp'];
+    ids.forEach(id => {
+      const sel = document.getElementById(id);
+      const hasNone = id === 'cfg-grp';
+      sel.innerHTML = hasNone ? '<option value="">None</option>' : '';
+      this.engine.columns.forEach(col => {
+        sel.innerHTML += `<option value="${col}">${col}</option>`;
+      });
+    });
+    // smart defaults
+    if (this.engine.catCols.length) document.getElementById('cfg-x').value = this.engine.catCols[0];
+    if (this.engine.numericCols.length) document.getElementById('cfg-y').value = this.engine.numericCols[0];
+  }
+
+  _buildKPIs() {
+    const strip = document.getElementById('kpi-strip');
+    strip.innerHTML = '';
+    this.engine.numericCols.slice(0,5).forEach(col => {
+      const s = this.engine.stats(col);
+      if (!s) return;
+      const kpi = document.createElement('div');
+      kpi.className = 'kpi';
+      kpi.innerHTML = `<div class="kpi-label">${col}</div>
+        <div class="kpi-value">₹${s.sum}</div>
+        <div class="kpi-sub">Avg: ${s.mean} | Max: ${s.max}</div>`;
+      strip.appendChild(kpi);
+    });
+  }
+
+  _renderStats() {
+    const el = document.getElementById('stat-panel');
+    el.innerHTML = `<b data- class="sigma-style-sigma_bi-7">Rows:</b> ${this.engine.filtered.length}<br>
+      <b data- class="sigma-style-sigma_bi-8">Cols:</b> ${this.engine.columns.length}<br>
+      <b data- class="sigma-style-sigma_bi-9">Numeric:</b> ${this.engine.numericCols.join(', ')}<br>
+      <b data- class="sigma-style-sigma_bi-10">Categorical:</b> ${this.engine.catCols.join(', ')>100?this.engine.catCols.join(', ').slice(0,100)+'...' :this.engine.catCols.join(', ')}`;
+  }
+
+  _renderTable() {
+    const table = document.getElementById('data-table');
+    if (!this.engine.columns.length) return;
+    const rows = this.engine.filtered.slice(0,200);
+    table.innerHTML = `<thead><tr>${this.engine.columns.map(c=>`<th>${c}</th>`).join('')}</tr></thead>
+      <tbody>${rows.map(r=>`<tr>${this.engine.columns.map(c=>`<td>${r[c]}</td>`).join('')}</tr>`).join('')}</tbody>`;
+  }
+
+  addChart() {
+    if (!this.engine.columns.length) { this._status('⚠️ Load data first.', false); return; }
+    const type = document.getElementById('cfg-type').value;
+    const xCol = document.getElementById('cfg-x').value;
+    const yCol = document.getElementById('cfg-y').value;
+    const grpCol = document.getElementById('cfg-grp').value;
+    const agg = document.getElementById('cfg-agg').value;
+    const title = document.getElementById('cfg-title').value || `${yCol} by ${xCol}`;
+    if (!xCol || !yCol) { this._status('⚠️ Select X and Y axis.', false); return; }
+
+    const id = 'chart_' + (++this.chartSeq);
+    const data = this.engine.aggregate(xCol, yCol, agg, grpCol || null);
+    if (!data.length) { this._status('⚠️ No data after aggregation.', false); return; }
+
+    const wrap = document.createElement('div'); wrap.className='chart-wrap'; wrap.id=id+'_wrap';
+    const hdr = document.createElement('div'); hdr.className='chart-hdr';
+    hdr.innerHTML = `<span class="chart-title">${title}</span>
+      <div data- class="sigma-style-sigma_bi-11">
+        <span class="chart-type-badge">${type.toUpperCase()}</span>
+        <button class="tb-btn sigma-style-sigma_bi-12" data- onclick="app.removeChart('${id}')">✕</button>
+      </div>`;
+    wrap.appendChild(hdr);
+    const canvas = document.createElement('canvas');
+    canvas.id = id; canvas.width=760; canvas.height=280;
+    canvas.style.width='100%'; canvas.style.height='280px';
+    wrap.appendChild(canvas);
+
+    // Legend
+    const series = [...new Set(data.map(d=>d.g))];
+    if (series.length > 1) {
+      const leg = document.createElement('div'); leg.className='legend';
+      series.forEach((s,i)=>{
+        leg.innerHTML+=`<div class="leg-item"><div class="leg-dot sigma-style-sigma_bi-13" data-></div>${s}</div>`;
+      });
+      wrap.appendChild(leg);
+    }
+
+    document.getElementById('chart-grid').appendChild(wrap);
+    SigmaChartRenderer.render(canvas, type, data, {});
+    this.charts[id] = { type, xCol, yCol, grpCol, agg, data, title };
+    this._status(`📊 Chart added: "${title}" (${data.length} data points)`);
+  }
+
+  removeChart(id) {
+    const el = document.getElementById(id+'_wrap');
+    if (el) el.remove();
+    delete this.charts[id];
+  }
+
+  applyFilter() {
+    const col = document.getElementById('filter-col').value.trim();
+    const val = document.getElementById('filter-val').value.trim();
+    this.engine.filter(col, val);
+    this._refreshAll();
+    this._status(`🔍 Filter applied: ${col} contains "${val}" — ${this.engine.filtered.length} rows`);
+  }
+
+  clearFilter() {
+    document.getElementById('filter-col').value='';
+    document.getElementById('filter-val').value='';
+    this.engine.filter('','');
+    this._refreshAll();
+    this._status(`✅ Filter cleared — ${this.engine.filtered.length} rows`);
+  }
+
+  _refreshAll() {
+    this._buildKPIs();
+    this._renderStats();
+    this._renderTable();
+    Object.entries(this.charts).forEach(([id, cfg]) => {
+      const canvas = document.getElementById(id);
+      if (!canvas) return;
+      const data = this.engine.aggregate(cfg.xCol, cfg.yCol, cfg.agg, cfg.grpCol||null);
+      SigmaChartRenderer.render(canvas, cfg.type, data, {});
+    });
+  }
+
+  toggleTable() {
+    const wrap = document.getElementById('table-wrap');
+    wrap.style.display = wrap.style.display==='none' ? 'block' : 'none';
+  }
+
+  exportPNG() {
+    const canvas = document.querySelector('canvas');
+    if (!canvas) { this._status('⚠️ No chart to export.'); return; }
+    const link = document.createElement('a');
+    link.download = 'sigma_bi_chart.png'; link.href = canvas.toDataURL();
+    link.click();
+    this._status('🖼️ Chart exported as PNG.');
+  }
+
+  exportCSV() {
+    if (!this.engine.columns.length) { this._status('⚠️ No data.'); return; }
+    const rows = [this.engine.columns.join(','), ...this.engine.filtered.map(r=>this.engine.columns.map(c=>r[c]).join(','))];
+    const blob = new Blob([rows.join('\n')], {type:'text/csv'});
+    const link = document.createElement('a');
+    link.download='sigma_bi_export.csv'; link.href=URL.createObjectURL(blob);
+    link.click();
+    this._status('📄 Data exported as CSV.');
+  }
+
+  _status(msg, warn=false) {
+    const el = document.getElementById('status-bar');
+    el.textContent = msg;
+    el.style.color = warn ? 'var(--danger)' : 'var(--text2)';
+  }
+}
+
+// Global bindings
+const app = new SigmaBIApp();
+function loadFile(e) { app.loadFile(e); }
+function loadSample() { app.loadSample(); }
+function addChart() { app.addChart(); }
+function applyFilter() { app.applyFilter(); }
+function clearFilter() { app.clearFilter(); }
+function toggleTable() { app.toggleTable(); }
+function exportPNG() { app.exportPNG(); }
+function exportCSV() { app.exportCSV(); }
+</script>
+</body>
+</html>

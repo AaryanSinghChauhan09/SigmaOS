@@ -1,0 +1,4 @@
+# SigmaOS Sovereign Rules
+ON time::22:00 DO vibe_set::DARK && mode_set::STEALTH
+ON proc_count::>100 DO mode_set::APEX && trim_memory::NOW
+ON battery::low DO mode_set::SAVER && vibe_set::MINIMAL

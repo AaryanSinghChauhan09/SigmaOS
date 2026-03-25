@@ -1,0 +1,265 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Sigma Writer — Sovereign Word Processor</title>
+<link href="https://fonts.googleapis.com/css2?family=Merriweather&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#f8fafc;--pnl:#ffffff;--toolbar:#f1f5f9;--brd:#cbd5e1;--accent:#3b82f6;--txt:#1e293b;--dim:#64748b;}
+*{box-sizing:border-box;margin:0;padding:0;font-family:'Inter',system-ui,sans-serif;}
+body{display:flex;flex-direction:column;height:100vh;background:var(--bg);color:var(--txt);}
+
+/* Menubar */
+.menubar{background:var(--pnl);border-bottom:1px solid var(--brd);padding:6px 16px;display:flex;align-items:center;gap:20px;font-size:0.85rem;}
+.mb-item{cursor:pointer;padding:4px 8px;border-radius:4px;}
+.mb-item:hover{background:var(--toolbar);}
+.spacer{flex:1;}
+.brand{font-weight:700;color:var(--accent);display:flex;align-items:center;gap:6px;}
+
+/* Toolbar */
+.toolbar{background:var(--toolbar);border-bottom:1px solid var(--brd);padding:8px 16px;display:flex;gap:6px;align-items:center;flex-wrap:wrap;}
+.tb-btn{border:1px solid transparent;background:transparent;padding:6px 10px;border-radius:4px;cursor:pointer;font-size:0.9rem;color:var(--txt);font-weight:600;}
+.tb-btn:hover{background:var(--pnl);border-color:var(--brd);box-shadow:0 1px 2px rgba(0,0,0,0.05);}
+.tb-sep{width:1px;height:24px;background:var(--brd);margin:0 4px;}
+.tb-select{padding:4px 8px;border-radius:4px;border:1px solid var(--brd);background:var(--pnl);font-size:0.85rem;}
+
+/* Editor Area - Page Layout */
+.editor-container{flex:1;overflow-y:auto;padding:30px 20px;display:flex;justify-content:center;background:#e2e8f0;position:relative;}
+.page-wrap{width:100%;max-width:850px;display:flex;flex-direction:column;}
+.doc-title-input{background:transparent;border:none;border-bottom:2px solid transparent;font-size:1.8rem;font-weight:700;margin-bottom:20px;color:var(--txt);outline:none;font-family:'Merriweather',serif;}
+.doc-title-input:focus{border-bottom-color:var(--accent);}
+.page{background:#fff;width:100%;min-height:1056px;box-shadow:0 10px 40px rgba(0,0,0,0.1);padding:96px;cursor:text;outline:none;font-size:1.1rem;line-height:1.7;color:#111;font-family:'Merriweather',serif;border:1px solid #cfd8dc;}
+
+/* Content Styling inside ContentEditable */
+.page h1{font-size:2rem;margin-bottom:16px;font-family:'Inter',sans-serif;font-weight:700;}
+.page h2{font-size:1.5rem;margin-bottom:12px;margin-top:24px;font-family:'Inter',sans-serif;}
+.page p{margin-bottom:16px;}
+.page ul,.page ol{margin-bottom:16px;padding-left:24px;}
+.page blockquote{border-left:4px solid var(--brd);padding-left:16px;color:var(--dim);font-style:italic;}
+
+/* Status Bar */
+.statusbar{background:var(--pnl);border-top:1px solid var(--brd);padding:6px 20px;font-size:0.75rem;color:var(--dim);display:flex;justify-content:space-between;align-items:center;flex-shrink:0;}
+.sb-right{display:flex;gap:16px;}
+
+.modal{position:fixed;inset:0;background:rgba(0,0,0,0.5);display:none;align-items:center;justify-content:center;z-index:100;}
+.modal.show{display:flex;}
+.mdl-box{background:#fff;padding:24px;border-radius:8px;width:400px;box-shadow:0 10px 30px rgba(0,0,0,0.2);}
+.mdl-title{font-size:1.1rem;font-weight:700;margin-bottom:16px;}
+.mdl-btn{padding:8px 16px;background:var(--accent);color:#fff;border:none;border-radius:4px;cursor:pointer;margin-top:16px;font-weight:600;}
+
+        .sigma-style-sigma_writer-1 { font-size:0.75rem;color:var(--dim) }
+        .sigma-style-sigma_writer-2 { color:#10b981;font-weight:700 }
+        .sigma-style-sigma_writer-3 { font-size:0.9rem;color:var(--dim);margin-bottom:16px; }
+        .sigma-style-sigma_writer-4 { display:flex;flex-direction:column;gap:10px; }
+        .sigma-style-sigma_writer-5 { border:1px solid var(--brd);text-align:left; }
+        .sigma-style-sigma_writer-6 { border:1px solid var(--brd);text-align:left; }
+        .sigma-style-sigma_writer-7 { border:1px solid var(--brd);text-align:left; }
+        .sigma-style-sigma_writer-8 { text-align:right }
+        .sigma-style-sigma_writer-9 { margin-top:16px; }
+    </style>
+
+<script>
+// Sovereign OS Inline Style Manager
+document.addEventListener('DOMContentLoaded', () => {
+    const applyTo = (el) => { if(el.getAttribute('data-style')) { el.setAttribute('style', el.getAttribute('data-style')); el.removeAttribute('data-style'); } };
+    new MutationObserver(mutations => mutations.forEach(m => {
+        if(m.type === 'childList') m.addedNodes.forEach(n => { if(n.nodeType === 1) { applyTo(n); n.querySelectorAll('[data-style]').forEach(applyTo); } });
+    })).observe(document.body, {childList: true, subtree: true});
+    document.querySelectorAll('[data-style]').forEach(applyTo);
+});
+</script>
+</head>
+<body>
+
+<div class="menubar">
+  <div class="brand">✎ SigmaWriter</div>
+  <div class="mb-item" onclick="openFile()">File</div>
+  <div class="mb-item" onclick="exec('undo')">Edit</div>
+  <div class="mb-item" onclick="document.getElementById('m-export').classList.add('show')">Export</div>
+  <div class="mb-item" onclick="window.print()">Print</div>
+  <div class="spacer"></div>
+  <div data- class="sigma-style-sigma_writer-1">Local OPFS Auto-Save: <span data- class="sigma-style-sigma_writer-2">ON</span></div>
+</div>
+
+<div class="toolbar">
+  <select aria-label="Selection" class="tb-select" id="font-family" onchange="exec('fontName', this.value)" title="input">
+    <option value="Merriweather">Merriweather (Serif)</option>
+    <option value="Inter">Inter (Sans)</option>
+    <option value="monospace">Monospace</option>
+  </select>
+  <select aria-label="Selection" class="tb-select" id="format-block" onchange="exec('formatBlock', this.value)" title="input">
+    <option value="P">Paragraph</option>
+    <option value="H1">Heading 1</option>
+    <option value="H2">Heading 2</option>
+    <option value="BLOCKQUOTE">Quote</option>
+  </select>
+  
+  <div class="tb-sep"></div>
+  
+  <button class="tb-btn" onclick="exec('bold')" title="Bold"><strong>B</strong></button>
+  <button class="tb-btn" onclick="exec('italic')" title="Italic"><em>I</em></button>
+  <button class="tb-btn" onclick="exec('underline')" title="Underline"><u>U</u></button>
+  <button class="tb-btn" onclick="exec('strikeThrough')" title="Strikethrough"><s>S</s></button>
+  
+  <div class="tb-sep"></div>
+  
+  <button class="tb-btn" onclick="exec('justifyLeft')">⬅️</button>
+  <button class="tb-btn" onclick="exec('justifyCenter')">⬆️</button>
+  <button class="tb-btn" onclick="exec('justifyRight')">➡️</button>
+  <button class="tb-btn" onclick="exec('justifyFull')">↔️</button>
+  
+  <div class="tb-sep"></div>
+  
+  <button class="tb-btn" onclick="exec('insertUnorderedList')">• List</button>
+  <button class="tb-btn" onclick="exec('insertOrderedList')">1. List</button>
+  
+  <div class="tb-sep"></div>
+  
+  <button class="tb-btn" onclick="insertLink()">🔗</button>
+  <button class="tb-btn" onclick="exec('removeFormat')" title="Clear Formatting">🧹</button>
+</div>
+
+<div class="editor-container" id="ec" onclick="document.getElementById('editor').focus()">
+  <div class="page-wrap" onclick="event.stopPropagation()">
+    <input aria-label="input" type="text" class="doc-title-input" id="doc-title" value="Untitled Document" placeholder="Document Title..." title="input">
+    <div class="page" id="editor" contenteditable="true" spellcheck="false" oninput="updateStats()">
+      <p>Start writing your sovereign document here. All data stays strictly on your machine.</p>
+    </div>
+  </div>
+</div>
+
+<div class="statusbar">
+  <div id="sb-status">Ready. OPFS Sync Active.</div>
+  <div class="sb-right">
+    <span id="char-count">0 Chars</span>
+    <span id="word-count">0 Words</span>
+    <span id="para-count">0 Paragraphs</span>
+    <span>Page 1 of 1</span>
+  </div>
+</div>
+
+<!-- Export Modal -->
+<div class="modal" id="m-export">
+  <div class="mdl-box">
+    <div class="mdl-title">Export Document</div>
+    <div data- class="sigma-style-sigma_writer-3">
+      Convert your document to a sovereign standard format.
+    </div>
+    <div data- class="sigma-style-sigma_writer-4">
+      <button class="tb-btn sigma-style-sigma_writer-5" data- onclick="exportMarkdown()">⬇️ Export as Markdown (.md)</button>
+      <button class="tb-btn sigma-style-sigma_writer-6" data- onclick="exportHTML()">⬇️ Export as HTML (.html)</button>
+      <button class="tb-btn sigma-style-sigma_writer-7" data- onclick="window.print()">🖨️ Print / Save as PDF</button>
+    </div>
+    <div data- class="sigma-style-sigma_writer-8">
+      <button class="tb-btn sigma-style-sigma_writer-9" data- onclick="document.getElementById('m-export').classList.remove('show')">Close</button>
+    </div>
+  </div>
+</div>
+
+<script>
+const editor = document.getElementById('editor');
+const titleInp = document.getElementById('doc-title');
+
+function exec(cmd, val=null) {
+  document.execCommand(cmd, false, val);
+  editor.focus();
+  updateStats();
+}
+
+function insertLink() {
+  const url = prompt("Enter URL:", "https://");
+  if(url) exec("createLink", url);
+}
+
+function updateStats() {
+  const text = editor.innerText || '';
+  const chars = text.length;
+  const words = text.trim() === '' ? 0 : text.trim().split(/\s+/).length;
+  
+  let paras = 0;
+  editor.childNodes.forEach(node => {
+    if (node.nodeName === 'P' || node.nodeName === 'DIV' || node.nodeName === 'H1' || node.nodeName === 'H2') {
+      if (node.innerText.trim().length > 0) paras++;
+    } else if (node.nodeType === 3 && node.nodeValue.trim().length > 0) {
+      paras++; // loose text
+    }
+  });
+
+  document.getElementById('char-count').textContent = chars + ' Chars';
+  document.getElementById('word-count').textContent = words + ' Words';
+  document.getElementById('para-count').textContent = paras + ' Paragraphs';
+  saveToOPFS_stub();
+}
+
+let saveTimer;
+function saveToOPFS_stub() {
+  document.getElementById('sb-status').textContent = 'Saving...';
+  document.getElementById('sb-status').style.color = '#f59e0b';
+  
+  clearTimeout(saveTimer);
+  saveTimer = setTimeout(() => {
+    // In a real implementation this hooks to navigator.storage OPFS
+    localStorage.setItem('sigmawriter_content', editor.innerHTML);
+    localStorage.setItem('sigmawriter_title', titleInp.value);
+    document.getElementById('sb-status').textContent = 'Saved to OPFS Store.';
+    document.getElementById('sb-status').style.color = 'var(--dim)';
+  }, 1000);
+}
+
+function loadFromOPFS_stub() {
+  const t = localStorage.getItem('sigmawriter_title');
+  const c = localStorage.getItem('sigmawriter_content');
+  if(t) titleInp.value = t;
+  if(c) editor.innerHTML = c;
+  updateStats();
+}
+
+// Very basic HTML to Markdown converter for simple documents
+function htmlToMarkdown(html) {
+  let md = html;
+  md = md.replace(/<h1>(.*?)<\/h1>/gi, '# $1\n\n');
+  md = md.replace(/<h2>(.*?)<\/h2>/gi, '## $1\n\n');
+  md = md.replace(/<p>(.*?)<\/p>/gi, '$1\n\n');
+  md = md.replace(/<strong>(.*?)<\/strong>|<b>(.*?)<\/b>/gi, '**$1$2**');
+  md = md.replace(/<em>(.*?)<\/em>|<i>(.*?)<\/i>/gi, '*$1$2*');
+  md = md.replace(/<br\s*\/?>/gi, '\n');
+  md = md.replace(/<li>(.*?)<\/li>/gi, '- $1\n');
+  md = md.replace(/<[^>]+>/g, ''); // strip remaining tags
+  
+  const temp = document.createElement('div');
+  temp.innerHTML = md;
+  return temp.textContent || temp.innerText || "";
+}
+
+function exportMarkdown() {
+  const md = "# " + titleInp.value + "\n\n" + htmlToMarkdown(editor.innerHTML);
+  downloadFile(titleInp.value + '.md', md, 'text/markdown');
+}
+
+function exportHTML() {
+  const html = `<html><head><title>${titleInp.value}</title></head><body><h1>${titleInp.value}</h1>${editor.innerHTML}</body></html>`;
+  downloadFile(titleInp.value + '.html', html, 'text/html');
+}
+
+function downloadFile(filename, content, type) {
+  const blob = new Blob([content], { type: type });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = filename;
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+  URL.revokeObjectURL(url);
+  document.getElementById('m-export').classList.remove('show');
+}
+
+window.onload = () => {
+  loadFromOPFS_stub();
+  document.execCommand('defaultParagraphSeparator', false, 'p');
+  editor.focus();
+};
+</script>
+</body>
+</html>

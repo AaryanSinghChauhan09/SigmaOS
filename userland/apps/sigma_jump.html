@@ -1,0 +1,495 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>Sigma Jump</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&family=JetBrains+Mono:wght@800&display=swap" rel="stylesheet">
+<style>
+:root {
+    --bg: #070B10;
+    --sky: linear-gradient(to bottom, #1E3A8A, #3B82F6, #60A5FA);
+    --ground: #166534;
+    --ground-dirt: #78350F;
+    --hero-color: #EF4444;       /* No plumber, just red block guy */
+    --accent: #F59E0B;           /* Coins */
+    --obstacle: #1F2937;         /* Pipes/Boxes */
+    --text: #F8FAFC;
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; -webkit--webkit--webkit-user-select: none; user-select: none; -webkit-user-select: none; user-select: none; -webkit--webkit-user-select: none; user-select: none; -webkit-user-select: none; user-select: none; }
+body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'Inter', sans-serif;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    height: 100vh;
+    overflow: hidden;
+    touch-action: none;
+}
+
+.game-container {
+    position: relative;
+    width: 100%;
+    max-width: 800px;
+    height: 400px;
+    background: var(--sky);
+    border-radius: 12px;
+    overflow: hidden;
+    box-shadow: 0 10px 40px rgba(0,0,0,0.6);
+    border: 2px solid rgba(255,255,255,0.1);
+}
+
+canvas {
+    display: block;
+    width: 100%;
+    height: 100%;
+}
+
+/* UI Overlay */
+.ui-layer {
+    position: absolute;
+    top: 0; left: 0; width: 100%; height: 100%;
+    pointer-events: none;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
+}
+
+.hud {
+    display: flex;
+    justify-content: space-between;
+    padding: 20px 30px;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 1.4rem;
+    font-weight: 800;
+    color: #fff;
+    text-shadow: 2px 2px 0 #000;
+}
+
+.score { color: #fff; }
+.coins { color: var(--accent); }
+
+/* Start / Game Over Screens */
+.screen {
+    position: absolute;
+    top: 0; left: 0; width: 100%; height: 100%;
+    background: rgba(0,0,0,0.7);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    pointer-events: auto;
+    -webkit--webkit--webkit-backdrop-filter: blur(4px); backdrop-filter: blur(4px); -webkit-backdrop-filter: blur(4px); backdrop-filter: blur(4px); -webkit--webkit-backdrop-filter: blur(4px); backdrop-filter: blur(4px); -webkit-backdrop-filter: blur(4px); backdrop-filter: blur(4px);
+    transition: opacity 0.2s;
+}
+
+.screen.hidden {
+    opacity: 0;
+    pointer-events: none;
+}
+
+h1 {
+    font-size: 3rem;
+    font-weight: 800;
+    text-transform: uppercase;
+    color: #fff;
+    text-shadow: 0 4px 10px rgba(0,0,0,0.8);
+    margin-bottom: 5px;
+}
+.subtitle {
+    font-size: 1.1rem;
+    color: #94A3B8;
+    margin-bottom: 25px;
+}
+
+button {
+    background: var(--hero-color);
+    color: #fff;
+    border: none;
+    padding: 14px 36px;
+    border-radius: 8px;
+    font-size: 1.2rem;
+    font-weight: 800;
+    cursor: pointer;
+    box-shadow: 0 4px 0 #991B1B, 0 8px 15px rgba(0,0,0,0.4);
+    transition: transform 0.1s;
+    font-family: 'JetBrains Mono', monospace;
+    text-transform: uppercase;
+}
+button:active {
+    transform: translateY(4px);
+    box-shadow: 0 0px 0 #991B1B, 0 4px 8px rgba(0,0,0,0.4);
+}
+
+.stats-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 15px;
+    margin-bottom: 25px;
+}
+.stat-box {
+    background: rgba(255,255,255,0.1);
+    padding: 15px 20px;
+    border-radius: 8px;
+    border: 1px solid rgba(255,255,255,0.2);
+}
+.stat-lbl { font-size: 0.8rem; color: #cbd5e1; text-transform: uppercase; letter-spacing: 1px; }
+.stat-val { font-size: 1.6rem; font-weight: 800; font-family: 'JetBrains Mono', monospace; color: #fff; }
+
+.controls-hint {
+    margin-top: 20px;
+    color: #94a3b8;
+    font-size: 0.85rem;
+}
+
+        .sigma-style-sigma_jump-1 { opacity:0; }
+        .sigma-style-sigma_jump-2 { color:var(--accent); }
+    </style>
+
+<script>
+// Sovereign OS Inline Style Manager
+document.addEventListener('DOMContentLoaded', () => {
+    const applyTo = (el) => { if(el.getAttribute('data-style')) { el.setAttribute('style', el.getAttribute('data-style')); el.removeAttribute('data-style'); } };
+    new MutationObserver(mutations => mutations.forEach(m => {
+        if(m.type === 'childList') m.addedNodes.forEach(n => { if(n.nodeType === 1) { applyTo(n); n.querySelectorAll('[data-style]').forEach(applyTo); } });
+    })).observe(document.body, {childList: true, subtree: true});
+    document.querySelectorAll('[data-style]').forEach(applyTo);
+});
+</script>
+</head>
+<body>
+
+<div class="game-container" id="gc">
+    <canvas id="gameCanvas"></canvas>
+    
+    <div class="ui-layer">
+        <div class="hud sigma-style-sigma_jump-1" id="hud" data->
+            <div class="score">SCORE: <span id="scoreVal">0</span></div>
+            <div class="coins">COINS: <span id="coinVal">0</span></div>
+        </div>
+
+        <!-- Start Screen -->
+        <div class="screen" id="startScreen">
+            <h1>Sigma Jump</h1>
+            <div class="subtitle">IP-Safe Endless Platformer</div>
+            <button onclick="startGame()">▶ Play Now</button>
+            <div class="controls-hint">Spacebar / Tap to Jump</div>
+        </div>
+
+        <!-- Game Over Screen -->
+        <div class="screen hidden" id="gameOverScreen">
+            <h1>GAME OVER</h1>
+            <div class="stats-grid">
+                <div class="stat-box">
+                    <div class="stat-lbl">Final Score</div>
+                    <div class="stat-val" id="goScore">0</div>
+                </div>
+                <div class="stat-box">
+                    <div class="stat-lbl">Coins</div>
+                    <div class="stat-val sigma-style-sigma_jump-2" data- id="goCoins">0</div>
+                </div>
+            </div>
+            <button onclick="startGame()">↺ Try Again</button>
+        </div>
+    </div>
+</div>
+
+<script>
+const canvas = document.getElementById('gameCanvas');
+const ctx = canvas.getContext('2d');
+const gc = document.getElementById('gc');
+
+let W = 800;
+let H = 400;
+
+// High-DPI Scaling for "Good Pixels"
+function adjustCanvasDPI() {
+    W = gc.clientWidth;
+    H = gc.clientHeight;
+    let dpr = window.devicePixelRatio || 1;
+    // Set actual size in memory (scaled to account for extra pixel density)
+    canvas.width = W * dpr;
+    canvas.height = H * dpr;
+    // Normalize coordinate system to use css pixels
+    ctx.scale(dpr, dpr);
+    // Ensure CSS displays it at the layout size
+    canvas.style.width = W + 'px';
+    canvas.style.height = H + 'px';
+    // Make pixels crisp (disable anti-aliasing if making pixel art, though we use standard shapes)
+    ctx.imageSmoothingEnabled = false; 
+}
+window.addEventListener('resize', adjustCanvasDPI);
+adjustCanvasDPI();
+
+// Game State
+let state = 'start'; // start, playing, dead
+let frames = 0;
+let score = 0;
+let coins = 0;
+let baseSpeed = 5;
+let speed = baseSpeed;
+
+// Floor
+const groundH = 60;
+const groundY = H - groundH;
+
+// Hero
+const hero = {
+    x: 100,
+    y: groundY - 40,
+    w: 40,
+    h: 40,
+    vy: 0,
+    gravity: 0.6,
+    jumpPower: -11,
+    grounded: true,
+    color: '#EF4444' // Red
+};
+
+// Entities
+let obstacles = [];
+let coinsArr = [];
+let particles = [];
+
+// Input
+let jumpPressed = false;
+window.addEventListener('keydown', e => { if((e.code === 'Space' || e.code === 'ArrowUp') && state === 'playing') jumpPressed = true; });
+window.addEventListener('keyup', e => { if(e.code === 'Space' || e.code === 'ArrowUp') jumpPressed = false; });
+canvas.addEventListener('mousedown', () => { if(state === 'playing') jumpPressed = true; });
+canvas.addEventListener('mouseup', () => { jumpPressed = false; });
+canvas.addEventListener('touchstart', e => { e.preventDefault(); if(state === 'playing') jumpPressed = true; }, {passive: false});
+canvas.addEventListener('touchend', e => { e.preventDefault(); jumpPressed = false; });
+
+function startGame() {
+    document.getElementById('startScreen').classList.add('hidden');
+    document.getElementById('gameOverScreen').classList.add('hidden');
+    document.getElementById('hud').style.opacity = '1';
+    
+    // Reset Data
+    state = 'playing';
+    frames = 0;
+    score = 0;
+    coins = 0;
+    speed = baseSpeed;
+    obstacles = [];
+    coinsArr = [];
+    particles = [];
+    
+    hero.y = groundY - hero.h;
+    hero.vy = 0;
+    
+    updateHUD();
+    gameLoop();
+}
+
+function gameOver() {
+    state = 'dead';
+    document.getElementById('hud').style.opacity = '0';
+    document.getElementById('gameOverScreen').classList.remove('hidden');
+    document.getElementById('goScore').textContent = Math.floor(score);
+    document.getElementById('goCoins').textContent = coins;
+    createExplosion(hero.x + hero.w/2, hero.y + hero.h/2, hero.color, 30);
+}
+
+// Spawners
+function spawnObstacle() {
+    // Basic rectangle pipe/box
+    let type = Math.random();
+    let width = 40 + Math.random() * 30;
+    let height = 30 + Math.random() * 50;
+    let yPos = groundY - height;
+    
+    // Sometimes floating block
+    if(type > 0.8) {
+        yPos = groundY - 110 - Math.random() * 40;
+        height = 30;
+    }
+
+    obstacles.push({ x: W, y: yPos, w: width, h: height });
+}
+
+function spawnCoin() {
+    coinsArr.push({
+        x: W + 20,
+        y: groundY - 60 - Math.random() * 80,
+        r: 12,
+        collected: false
+    });
+}
+
+function createExplosion(x, y, color, count) {
+    for(let i=0; i<count; i++) {
+        particles.push({
+            x: x, y: y,
+            vx: (Math.random() - 0.5) * 10,
+            vy: (Math.random() - 0.5) * 10,
+            life: 1,
+            color: color
+        });
+    }
+}
+
+// Logic
+function update() {
+    if(state !== 'playing') return;
+    
+    frames++;
+    score += 0.1;
+    speed = baseSpeed + (frames / 1000); // Gradual speedup
+    
+    // Hero Physics
+    hero.vy += hero.gravity;
+    hero.y += hero.vy;
+    
+    if(hero.y + hero.h >= groundY) {
+        hero.y = groundY - hero.h;
+        hero.vy = 0;
+        hero.grounded = true;
+    } else {
+        hero.grounded = false;
+    }
+    
+    // Jump
+    if(jumpPressed && hero.grounded) {
+        hero.vy = hero.jumpPower;
+        hero.grounded = false;
+        createExplosion(hero.x + 20, hero.y + 40, '#FFF', 5);
+        jumpPressed = false; // require re-press, or turn off for autofire
+    }
+
+    // Spawning logic (distance based)
+    if(frames % Math.floor(80 / (speed/baseSpeed)) === 0) {
+        if(Math.random() > 0.3) spawnObstacle();
+        else if(Math.random() > 0.5) spawnCoin();
+    }
+    if(frames % 110 === 0 && Math.random() > 0.5) spawnCoin(); // Extra coins
+    
+    // Obstacles
+    for(let i=0; i<obstacles.length; i++) {
+        let obs = obstacles[i];
+        obs.x -= speed;
+        
+        // AABB Collision
+        if (hero.x < obs.x + obs.w &&
+            hero.x + hero.w > obs.x &&
+            hero.y < obs.y + obs.h &&
+            hero.h + hero.y > obs.y) {
+            
+            // Hit obstacle = dead (unless landing on top, but let's make it instant death for simplicity)
+            gameOver();
+        }
+    }
+    // Cleanup
+    obstacles = obstacles.filter(o => o.x + o.w > 0);
+
+    // Coins
+    for(let i=0; i<coinsArr.length; i++) {
+        let c = coinsArr[i];
+        c.x -= speed;
+        
+        // Circle/Rect Collision approx
+        let cx = c.x, cy = c.y, r = c.r;
+        let testX = cx, testY = cy;
+        
+        if(cx < hero.x) testX = hero.x; else if (cx > hero.x + hero.w) testX = hero.x + hero.w;
+        if(cy < hero.y) testY = hero.y; else if (cy > hero.y + hero.h) testY = hero.y + hero.h;
+        
+        let dist = Math.sqrt((cx - testX)*(cx - testX) + (cy - testY)*(cy - testY));
+        if(dist <= r && !c.collected) {
+            c.collected = true;
+            coins++;
+            score += 10;
+            createExplosion(c.x, c.y, '#F59E0B', 10);
+        }
+    }
+    coinsArr = coinsArr.filter(c => c.x + c.r > 0 && !c.collected);
+
+    // Particles
+    for(let i=0; i<particles.length; i++) {
+        let p = particles[i];
+        p.x += p.vx - speed/2; // move left with world
+        p.y += p.vy;
+        p.life -= 0.03;
+    }
+    particles = particles.filter(p => p.life > 0);
+
+    if(frames % 5 === 0) updateHUD();
+}
+
+function updateHUD() {
+    document.getElementById('scoreVal').textContent = Math.floor(score);
+    document.getElementById('coinVal').textContent = coins;
+}
+
+// Drawing
+function draw() {
+    ctx.clearRect(0,0,W,H);
+    
+    // Ground
+    ctx.fillStyle = '#166534'; // Grass top
+    ctx.fillRect(0, groundY, W, 10);
+    ctx.fillStyle = '#78350F'; // Dirt
+    ctx.fillRect(0, groundY+10, W, groundH-10);
+
+    // Particles (Draw underneath if you want, or on top)
+    for(let p of particles) {
+        ctx.globalAlpha = p.life < 0 ? 0 : p.life;
+        ctx.fillStyle = p.color;
+        ctx.fillRect(p.x, p.y, 4, 4);
+    }
+    ctx.globalAlpha = 1.0;
+
+    if(state === 'playing' || state === 'dead') {
+        // Hero
+        if(state === 'playing') {
+            ctx.fillStyle = hero.color;
+            ctx.fillRect(hero.x, hero.y, hero.w, hero.h);
+            
+            // Eye block
+            ctx.fillStyle = 'rgba(0,0,0,0.4)';
+            ctx.fillRect(hero.x + 24, hero.y + 8, 8, 8);
+        }
+
+        // Obstacles
+        ctx.fillStyle = '#1F2937';
+        for(let obs of obstacles) {
+            ctx.fillRect(obs.x, obs.y, obs.w, obs.h);
+            // highlight
+            ctx.fillStyle = '#374151';
+            ctx.fillRect(obs.x, obs.y, obs.w, 4);
+            ctx.fillStyle = '#1F2937';
+        }
+
+        // Coins
+        for(let c of coinsArr) {
+            ctx.beginPath();
+            ctx.arc(c.x, c.y, c.r, 0, Math.PI*2);
+            ctx.fillStyle = '#F59E0B'; // Gold
+            ctx.fill();
+            
+            ctx.beginPath();
+            ctx.arc(c.x, c.y, c.r - 3, 0, Math.PI*2);
+            ctx.fillStyle = '#FDE68A'; // Lighter gold
+            ctx.fill();
+        }
+    }
+}
+
+function gameLoop() {
+    update();
+    draw();
+    if(state === 'playing') {
+        requestAnimationFrame(gameLoop);
+    }
+}
+
+// Initial draw
+draw();
+</script>
+</body>
+</html>

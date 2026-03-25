@@ -1,0 +1,22 @@
+{
+<<<<<<< HEAD
+  "include": ["sigma_core/**/*.py", "userland/**/*.py", "*.py"],
+  "exclude": ["**/__pycache__/**", "**/node_modules/**"],
+  "pythonVersion": "3.10",
+  "pythonPlatform": "Windows",
+  "reportMissingImports": false,
+  "reportMissingModuleSource": false,
+  "typeCheckingMode": "basic",
+  "useLibraryCodeForTypes": true
+=======
+    "include": ["."],
+    "executionEnvironments": [
+        {
+            "root": "."
+        }
+    ],
+    "pythonVersion": "3.10",
+    "pythonPlatform": "Windows",
+    "typeCheckingMode": "basic"
+>>>>>>> origin/master
+}

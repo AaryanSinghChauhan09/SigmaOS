@@ -1,0 +1,847 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SigmaOS Indian Salary & Labour Law Calculator 2025-26</title>
+    <script src="https://accounts.google.com/gsi/client" async defer></script>
+    <style>
+        :root {
+            --primary: #FF6B35;
+            --secondary: #004E89;
+            --success: #06A77D;
+            --warning: #F7931E;
+            --danger: #C73E1D;
+            --dark: #1A1A2E;
+            --light: #F5F5F5;
+            --border: #E0E0E0;
+            --shadow: 0 2px 10px rgba(0,0,0,0.1);
+            --radius: 8px;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            color: var(--dark);
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        .header {
+            background: white;
+            border-radius: var(--radius);
+            padding: 20px;
+            margin-bottom: 20px;
+            box-shadow: var(--shadow);
+            text-align: center;
+        }
+
+        .header h1 {
+            color: var(--primary);
+            font-size: 2rem;
+            margin-bottom: 10px;
+        }
+
+        .header p {
+            color: var(--secondary);
+            font-size: 1rem;
+        }
+
+        .auth-section {
+            background: white;
+            border-radius: var(--radius);
+            padding: 20px;
+            margin-bottom: 20px;
+            box-shadow: var(--shadow);
+            text-align: center;
+        }
+
+        .auth-button {
+            background: var(--primary);
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: var(--radius);
+            cursor: pointer;
+            font-size: 1rem;
+            margin: 10px;
+            transition: all 0.3s ease;
+        }
+
+        .auth-button:hover {
+            background: #E55A2B;
+            transform: translateY(-2px);
+        }
+
+        .main-content {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+        }
+
+        .card {
+            background: white;
+            border-radius: var(--radius);
+            padding: 20px;
+            box-shadow: var(--shadow);
+        }
+
+        .card h2 {
+            color: var(--secondary);
+            font-size: 1.5rem;
+            margin-bottom: 15px;
+            border-bottom: 2px solid var(--primary);
+            padding-bottom: 10px;
+        }
+
+        .form-group {
+            margin-bottom: 15px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: 600;
+            color: var(--dark);
+        }
+
+        .form-group input,
+        .form-group select {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            font-size: 1rem;
+        }
+
+        .form-group input:focus,
+        .form-group select:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 2px rgba(255, 107, 53, 0.2);
+        }
+
+        .toggle-group {
+            display: flex;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+
+        .toggle {
+            position: relative;
+            width: 50px;
+            height: 24px;
+            margin-right: 10px;
+        }
+
+        .toggle input {
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+
+        .toggle-slider {
+            position: absolute;
+            cursor: pointer;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: #ccc;
+            transition: .4s;
+            border-radius: 24px;
+        }
+
+        .toggle-slider:before {
+            position: absolute;
+            content: "";
+            height: 18px;
+            width: 18px;
+            left: 3px;
+            bottom: 3px;
+            background-color: white;
+            transition: .4s;
+            border-radius: 50%;
+        }
+
+        .toggle input:checked + .toggle-slider {
+            background-color: var(--success);
+        }
+
+        .toggle input:checked + .toggle-slider:before {
+            transform: translateX(26px);
+        }
+
+        .btn {
+            background: var(--primary);
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: var(--radius);
+            cursor: pointer;
+            font-size: 1rem;
+            margin: 10px 5px;
+            transition: all 0.3s ease;
+        }
+
+        .btn:hover {
+            background: #E55A2B;
+            transform: translateY(-2px);
+        }
+
+        .btn-secondary {
+            background: var(--secondary);
+        }
+
+        .btn-secondary:hover {
+            background: #003A6B;
+        }
+
+        .results {
+            background: var(--success);
+            color: white;
+            padding: 20px;
+            border-radius: var(--radius);
+            margin-top: 20px;
+        }
+
+        .results h3 {
+            font-size: 1.5rem;
+            margin-bottom: 10px;
+        }
+
+        .result-item {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 10px;
+            padding: 10px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: var(--radius);
+        }
+
+        .mode-selector {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+
+        .mode-btn {
+            flex: 1;
+            padding: 10px;
+            border: 2px solid var(--border);
+            background: white;
+            border-radius: var(--radius);
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .mode-btn.active {
+            background: var(--primary);
+            color: white;
+            border-color: var(--primary);
+        }
+
+        .explanation {
+            background: var(--light);
+            padding: 15px;
+            border-radius: var(--radius);
+            margin-top: 15px;
+            border-left: 4px solid var(--primary);
+        }
+
+        .explanation h4 {
+            color: var(--primary);
+            margin-bottom: 10px;
+        }
+
+        .error {
+            background: var(--danger);
+            color: white;
+            padding: 10px;
+            border-radius: var(--radius);
+            margin-top: 10px;
+        }
+
+        .warning {
+            background: var(--warning);
+            color: white;
+            padding: 10px;
+            border-radius: var(--radius);
+            margin-top: 10px;
+        }
+
+        .success {
+            background: var(--success);
+            color: white;
+            padding: 10px;
+            border-radius: var(--radius);
+            margin-top: 10px;
+        }
+
+        .loading {
+            text-align: center;
+            padding: 20px;
+        }
+
+        .spinner {
+            border: 4px solid var(--border);
+            border-top: 4px solid var(--primary);
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 10px;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        @media (max-width: 768px) {
+            .main-content {
+                grid-template-columns: 1fr;
+            }
+            
+            .container {
+                padding: 10px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🇮🇳 SigmaOS Indian Salary & Labour Law Calculator</h1>
+            <p>Advanced 2025-26 Labour Codes Compliant Calculator with AI Assistant</p>
+        </div>
+
+        <div class="auth-section">
+            <div id="auth-status">
+                <p>Sign in with Google to save your calculations and get personalized insights</p>
+                <div id="g_id_onload"
+                     data-client_id="YOUR_GOOGLE_CLIENT_ID"
+                     data-context="signin"
+                     data-ux_mode="popup"
+                     data-auto_select="true"
+                     data-itp_support="true">
+                </div>
+                <div class="g_id_signin"
+                     data-type="standard"
+                     data-shape="rectangular"
+                     data-theme="outline"
+                     data-textsize="large"
+                     data-width="300"
+                     data-logo_alignment="left">
+                </div>
+            </div>
+            <div id="user-info" style="display: none;">
+                <p id="user-name"></p>
+                <button class="btn btn-secondary" onclick="signOut()">Sign Out</button>
+            </div>
+        </div>
+
+        <div class="main-content">
+            <div class="card">
+                <h2>📊 Salary Calculator</h2>
+                
+                <div class="mode-selector">
+                    <button class="mode-btn active" onclick="setMode('ctc')">CTC Mode</button>
+                    <button class="mode-btn" onclick="setMode('manual')">Manual Mode</button>
+                </div>
+
+                <div id="ctc-mode">
+                    <div class="form-group">
+                        <label for="ctc">Annual CTC (₹)</label>
+                        <input type="number" id="ctc" placeholder="720000" min="0" oninput="calculateFromCTC()">
+                    </div>
+                    <div class="form-group">
+                        <label for="basic-percent">Basic % of CTC</label>
+                        <input type="number" id="basic-percent" value="50" min="50" max="100" oninput="calculateFromCTC()">
+                        <small>Must be ≥50% as per new Labour Code</small>
+                    </div>
+                    <div class="form-group">
+                        <label for="da-percent">DA % of Basic</label>
+                        <input type="number" id="da-percent" value="0" min="0" oninput="calculateFromCTC()">
+                    </div>
+                    <div class="form-group">
+                        <label for="hra-percent">HRA % of Basic</label>
+                        <input type="number" id="hra-percent" value="40" min="0" max="100" oninput="calculateFromCTC()">
+                    </div>
+                </div>
+
+                <div id="manual-mode" style="display: none;">
+                    <div class="form-group">
+                        <label for="basic">Basic Salary (Monthly ₹)</label>
+                        <input type="number" id="basic" placeholder="30000" min="0" oninput="calculateManual()">
+                    </div>
+                    <div class="form-group">
+                        <label for="da">DA (Monthly ₹)</label>
+                        <input type="number" id="da" placeholder="0" min="0" oninput="calculateManual()">
+                    </div>
+                    <div class="form-group">
+                        <label for="hra">HRA (Monthly ₹)</label>
+                        <input type="number" id="hra" placeholder="12000" min="0" oninput="calculateManual()">
+                    </div>
+                    <div class="form-group">
+                        <label for="special">Special Allowance (Monthly ₹)</label>
+                        <input type="number" id="special" placeholder="5000" min="0" oninput="calculateManual()">
+                    </div>
+                    <div class="form-group">
+                        <label for="other">Other Allowances (Monthly ₹)</label>
+                        <input type="number" id="other" placeholder="0" min="0" oninput="calculateManual()">
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="employment-type">Employment Type</label>
+                    <select id="employment-type" onchange="updateCalculations()">
+                        <option value="permanent">Permanent Employee</option>
+                        <option value="fixed-term">Fixed-Term Employee</option>
+                        <option value="contract">Contract Worker</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label for="years-of-service">Years of Service</label>
+                    <input type="number" id="years-of-service" value="0" min="0" step="0.5" onchange="updateCalculations()">
+                </div>
+
+                <div class="form-group">
+                    <label for="city-type">City Type</label>
+                    <select id="city-type" onchange="updateCalculations()">
+                        <option value="metro">Metro City</option>
+                        <option value="non-metro">Non-Metro City</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="card">
+                <h2>⚖️ Statutory Settings</h2>
+                
+                <div class="toggle-group">
+                    <label class="toggle">
+                        <input type="checkbox" id="pf-applicable" checked onchange="updateCalculations()">
+                        <span class="toggle-slider"></span>
+                    </label>
+                    <span>PF Applicable</span>
+                </div>
+
+                <div id="pf-settings">
+                    <div class="form-group">
+                        <label for="employee-pf">Employee PF %</label>
+                        <input type="number" id="employee-pf" value="12" min="0" max="100" onchange="updateCalculations()">
+                    </div>
+                    <div class="form-group">
+                        <label for="employer-pf">Employer PF %</label>
+                        <input type="number" id="employer-pf" value="12" min="0" max="100" onchange="updateCalculations()">
+                    </div>
+                    <div class="form-group">
+                        <label for="pf-ceiling">PF Wage Ceiling (₹)</label>
+                        <input type="number" id="pf-ceiling" value="15000" min="0" onchange="updateCalculations()">
+                    </div>
+                    <div class="toggle-group">
+                        <label class="toggle">
+                            <input type="checkbox" id="pf-above-ceiling" onchange="updateCalculations()">
+                            <span class="toggle-slider"></span>
+                        </label>
+                        <span>Contribute PF above ceiling</span>
+                    </div>
+                </div>
+
+                <div class="toggle-group">
+                    <label class="toggle">
+                        <input type="checkbox" id="esi-applicable" checked onchange="updateCalculations()">
+                        <span class="toggle-slider"></span>
+                    </label>
+                    <span>ESI Applicable</span>
+                </div>
+
+                <div id="esi-settings">
+                    <div class="form-group">
+                        <label for="employee-esi">Employee ESI %</label>
+                        <input type="number" id="employee-esi" value="0.75" min="0" max="100" onchange="updateCalculations()">
+                    </div>
+                    <div class="form-group">
+                        <label for="employer-esi">Employer ESI %</label>
+                        <input type="number" id="employer-esi" value="3.25" min="0" max="100" onchange="updateCalculations()">
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="professional-tax">Professional Tax (₹/month)</label>
+                    <input type="number" id="professional-tax" value="200" min="0" onchange="updateCalculations()">
+                </div>
+
+                <div class="form-group">
+                    <label for="working-days">Working Days/Month</label>
+                    <input type="number" id="working-days" value="26" min="1" max="31" onchange="updateCalculations()">
+                </div>
+
+                <button class="btn" onclick="calculateAll()">🧮 Calculate Everything</button>
+                <button class="btn btn-secondary" onclick="resetAll()">↺ Reset</button>
+            </div>
+        </div>
+
+        <div class="card">
+            <h2>📈 Results</h2>
+            <div id="results">
+                <div class="loading">
+                    <div class="spinner"></div>
+                    <p>Click "Calculate Everything" to see your detailed salary breakdown</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="card">
+            <h2>🤖 AI Assistant</h2>
+            <div class="form-group">
+                <label for="user-query">Ask me anything about your salary, taxes, or labour laws:</label>
+                <input type="text" id="user-query" placeholder="e.g., How much tax will I pay? What is my gratuity?">
+                <button class="btn" onclick="askAI()">Ask AI</button>
+            </div>
+            <div id="ai-response"></div>
+        </div>
+
+        <div class="card">
+            <h2>📖 Explanations</h2>
+            <div id="explanations">
+                <div class="explanation">
+                    <h4>💰 CTC vs Gross vs Net Take-Home</h4>
+                    <p><strong>CTC</strong> = Total cost to employer (includes your salary + employer's PF + bonus etc.)<br>
+                    <strong>Gross Salary</strong> = Your monthly salary before deductions<br>
+                    <strong>Net / Take-Home</strong> = Money actually credited to your bank account after all cuts</p>
+                </div>
+                <div class="explanation">
+                    <h4>⚖️ New 50% Wage Rule (Nov 2025)</h4>
+                    <p>India's new Labour Codes say your <strong>Basic + DA must be ≥ 50% of total salary</strong>. If your company was keeping Basic low (e.g., 30%) to reduce PF, they must now restructure. This means <strong>your PF, gratuity & bonus will go up</strong> — but take-home may slightly reduce.</p>
+                </div>
+                <div class="explanation">
+                    <h4>🏦 What is PF / EPF?</h4>
+                    <p><strong>Employee Provident Fund</strong> — you save 12% of Basic+DA every month, and your employer adds another 12%. This money earns <strong>8.25% interest</strong> (tax-free!) and you get it all when you retire or leave the job. It's your retirement savings.</p>
+                </div>
+                <div class="explanation">
+                    <h4>🎖️ What is Gratuity?</h4>
+                    <p>A <strong>thank-you payment</strong> from your employer after long service. Formula: <strong>Basic+DA × 15/26 × Years Served</strong>. Earlier you needed 5 years — now Fixed-Term employees get it after just <strong>1 year</strong> (new Labour Code, effective Nov 2025).</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Global variables
+        let currentUser = null;
+        let calculations = {};
+        let aiAssistant = {
+            responses: {
+                'tax': 'Based on your salary structure, your income tax will be calculated according to the new tax regime. The tax slabs for 2025-26 are: ₹0-2.5L (0%), ₹2.5-5L (5%), ₹5-7.5L (10%), ₹7.5-10L (15%), ₹10-12.5L (20%), ₹12.5-15L (25%), above ₹15L (30%).',
+                'gratuity': 'Your gratuity is calculated as: (Basic + DA) × 15/26 × Years of Service. With the new Labour Code, Fixed-Term employees get gratuity after just 1 year of service!',
+                'pf': 'Your PF contribution is 12% of Basic + DA. Your employer contributes an equal amount. This earns 8.25% interest tax-free and is available at retirement.',
+                'esi': 'ESI provides comprehensive medical coverage for you and your family. You contribute 0.75% and your employer contributes 3.25% of your gross salary.',
+                'bonus': 'If your Basic ≤ ₹21,000/month, you are entitled to a minimum bonus of 8.33% and maximum of 20% of your wages under the Payment of Bonus Act.',
+                'hra': 'HRA exemption depends on your city type. For metro cities: 40% of Basic or actual rent (whichever is lower). For non-metro cities: 40% of Basic or actual rent (whichever is lower).'
+            }
+        };
+
+        // Google Sign-In
+        function handleSignIn(response) {
+            const payload = response.credential;
+            const decoded = JSON.parse(atob(payload.split('.')[1]));
+            
+            currentUser = {
+                name: decoded.name,
+                email: decoded.email,
+                picture: decoded.picture
+            };
+            
+            document.getElementById('auth-status').style.display = 'none';
+            document.getElementById('user-info').style.display = 'block';
+            document.getElementById('user-name').textContent = `Welcome, ${currentUser.name}!`;
+            
+            // Load saved calculations
+            loadSavedCalculations();
+        }
+
+        function signOut() {
+            currentUser = null;
+            document.getElementById('auth-status').style.display = 'block';
+            document.getElementById('user-info').style.display = 'none';
+            
+            // Clear saved calculations
+            localStorage.removeItem('sigmaos_calculations');
+        }
+
+        // Mode switching
+        function setMode(mode) {
+            document.querySelectorAll('.mode-btn').forEach(btn => btn.classList.remove('active'));
+            
+            if (mode === 'ctc') {
+                document.querySelector('[onclick="setMode(\'ctc\')"]').classList.add('active');
+                document.getElementById('ctc-mode').style.display = 'block';
+                document.getElementById('manual-mode').style.display = 'none';
+            } else {
+                document.querySelector('[onclick="setMode(\'manual\')"]').classList.add('active');
+                document.getElementById('ctc-mode').style.display = 'none';
+                document.getElementById('manual-mode').style.display = 'block';
+            }
+        }
+
+        // Calculations
+        function calculateFromCTC() {
+            const ctc = parseFloat(document.getElementById('ctc').value) || 0;
+            const basicPercent = parseFloat(document.getElementById('basic-percent').value) || 50;
+            const daPercent = parseFloat(document.getElementById('da-percent').value) || 0;
+            const hraPercent = parseFloat(document.getElementById('hra-percent').value) || 40;
+            
+            const monthlyCTC = ctc / 12;
+            const basic = monthlyCTC * (basicPercent / 100);
+            const da = basic * (daPercent / 100);
+            const hra = basic * (hraPercent / 100);
+            const special = monthlyCTC - basic - da - hra;
+            
+            // Update manual fields
+            document.getElementById('basic').value = basic.toFixed(2);
+            document.getElementById('da').value = da.toFixed(2);
+            document.getElementById('hra').value = hra.toFixed(2);
+            document.getElementById('special').value = special.toFixed(2);
+            
+            calculateManual();
+        }
+
+        function calculateManual() {
+            const basic = parseFloat(document.getElementById('basic').value) || 0;
+            const da = parseFloat(document.getElementById('da').value) || 0;
+            const hra = parseFloat(document.getElementById('hra').value) || 0;
+            const special = parseFloat(document.getElementById('special').value) || 0;
+            const other = parseFloat(document.getElementById('other').value) || 0;
+            
+            calculations.gross = basic + da + hra + special + other;
+            updateCalculations();
+        }
+
+        function updateCalculations() {
+            const basic = parseFloat(document.getElementById('basic').value) || 0;
+            const da = parseFloat(document.getElementById('da').value) || 0;
+            const hra = parseFloat(document.getElementById('hra').value) || 0;
+            const special = parseFloat(document.getElementById('special').value) || 0;
+            const other = parseFloat(document.getElementById('other').value) || 0;
+            const years = parseFloat(document.getElementById('years-of-service').value) || 0;
+            const cityType = document.getElementById('city-type').value;
+            const employmentType = document.getElementById('employment-type').value;
+            
+            calculations.gross = basic + da + hra + special + other;
+            
+            // PF calculations
+            if (document.getElementById('pf-applicable').checked) {
+                const pfCeiling = parseFloat(document.getElementById('pf-ceiling').value) || 15000;
+                const pfBase = document.getElementById('pf-above-ceiling').checked ? basic + da : Math.min(basic + da, pfCeiling);
+                const employeePF = pfBase * 0.12;
+                const employerPF = pfBase * 0.12;
+                
+                calculations.employeePF = employeePF;
+                calculations.employerPF = employerPF;
+            } else {
+                calculations.employeePF = 0;
+                calculations.employerPF = 0;
+            }
+            
+            // ESI calculations
+            if (document.getElementById('esi-applicable').checked && calculations.gross <= 21000) {
+                calculations.employeeESI = calculations.gross * 0.0075;
+                calculations.employerESI = calculations.gross * 0.0325;
+            } else {
+                calculations.employeeESI = 0;
+                calculations.employerESI = 0;
+            }
+            
+            // Professional tax
+            calculations.professionalTax = parseFloat(document.getElementById('professional-tax').value) || 200;
+            
+            // Gratuity
+            if (years >= 1) {
+                calculations.gratuity = (basic + da) * 15 / 26 * years;
+            } else {
+                calculations.gratuity = 0;
+            }
+            
+            // Bonus
+            if (basic <= 21000) {
+                calculations.bonus = basic * 12 * 0.0833; // 8.33% minimum
+            } else {
+                calculations.bonus = 0;
+            }
+            
+            // HRA exemption
+            let hraExemption = 0;
+            if (cityType === 'metro') {
+                hraExemption = Math.min(hra, basic * 0.4);
+            } else {
+                hraExemption = Math.min(hra, basic * 0.4);
+            }
+            
+            calculations.hraExemption = hraExemption;
+            
+            // Take-home calculation
+            const totalDeductions = calculations.employeePF + calculations.employeeESI + calculations.professionalTax;
+            calculations.takeHome = calculations.gross - totalDeductions;
+            
+            // Save calculations if user is logged in
+            if (currentUser) {
+                saveCalculations();
+            }
+        }
+
+        function calculateAll() {
+            updateCalculations();
+            displayResults();
+        }
+
+        function displayResults() {
+            const resultsDiv = document.getElementById('results');
+            
+            resultsDiv.innerHTML = `
+                <div class="results">
+                    <h3>📊 Your Salary Breakdown</h3>
+                    <div class="result-item">
+                        <span>Gross Salary:</span>
+                        <span>₹${calculations.gross.toFixed(2)}</span>
+                    </div>
+                    <div class="result-item">
+                        <span>Employee PF:</span>
+                        <span>₹${calculations.employeePF.toFixed(2)}</span>
+                    </div>
+                    <div class="result-item">
+                        <span>Employee ESI:</span>
+                        <span>₹${calculations.employeeESI.toFixed(2)}</span>
+                    </div>
+                    <div class="result-item">
+                        <span>Professional Tax:</span>
+                        <span>₹${calculations.professionalTax.toFixed(2)}</span>
+                    </div>
+                    <div class="result-item">
+                        <span>Total Deductions:</span>
+                        <span>₹${(calculations.employeePF + calculations.employeeESI + calculations.professionalTax).toFixed(2)}</span>
+                    </div>
+                    <div class="result-item">
+                        <span><strong>Take-Home Salary:</strong></span>
+                        <span><strong>₹${calculations.takeHome.toFixed(2)}</strong></span>
+                    </div>
+                    <hr>
+                    <div class="result-item">
+                        <span>Employer PF:</span>
+                        <span>₹${calculations.employerPF.toFixed(2)}</span>
+                    </div>
+                    <div class="result-item">
+                        <span>Employer ESI:</span>
+                        <span>₹${calculations.employerESI.toFixed(2)}</span>
+                    </div>
+                    <div class="result-item">
+                        <span>Gratuity:</span>
+                        <span>₹${calculations.gratuity.toFixed(2)}</span>
+                    </div>
+                    <div class="result-item">
+                        <span>Bonus:</span>
+                        <span>₹${calculations.bonus.toFixed(2)}</span>
+                    </div>
+                    <div class="result-item">
+                        <span>HRA Exemption:</span>
+                        <span>₹${calculations.hraExemption.toFixed(2)}</span>
+                    </div>
+                </div>
+            `;
+        }
+
+        function resetAll() {
+            document.getElementById('ctc').value = '';
+            document.getElementById('basic-percent').value = '50';
+            document.getElementById('da-percent').value = '0';
+            document.getElementById('hra-percent').value = '40';
+            document.getElementById('basic').value = '';
+            document.getElementById('da').value = '';
+            document.getElementById('hra').value = '';
+            document.getElementById('special').value = '';
+            document.getElementById('other').value = '';
+            document.getElementById('years-of-service').value = '0';
+            document.getElementById('pf-applicable').checked = true;
+            document.getElementById('esi-applicable').checked = true;
+            document.getElementById('professional-tax').value = '200';
+            document.getElementById('working-days').value = '26';
+            
+            calculations = {};
+            document.getElementById('results').innerHTML = '<div class="loading"><div class="spinner"></div><p>Click "Calculate Everything" to see your detailed salary breakdown</p></div>';
+        }
+
+        // AI Assistant
+        function askAI() {
+            const query = document.getElementById('user-query').value.toLowerCase();
+            const responseDiv = document.getElementById('ai-response');
+            
+            let response = "I'm here to help! Ask me about your salary calculations, tax implications, or labour laws.";
+            
+            // Check for keywords in the query
+            for (const [key, value] of Object.entries(aiAssistant.responses)) {
+                if (query.includes(key)) {
+                    response = value;
+                    break;
+                }
+            }
+            
+            // Add context from calculations
+            if (query.includes('my') || query.includes('calculate')) {
+                response += `\n\nBased on your current inputs:\n- Gross Salary: ₹${calculations.gross?.toFixed(2) || '0'}\n- Take-Home: ₹${calculations.takeHome?.toFixed(2) || '0'}\n- PF: ₹${calculations.employeePF?.toFixed(2) || '0'}\n- Gratuity: ₹${calculations.gratuity?.toFixed(2) || '0'}`;
+            }
+            
+            responseDiv.innerHTML = `<div class="explanation"><h4>🤖 AI Assistant Response</h4><p>${response}</p></div>`;
+        }
+
+        // Storage functions
+        function saveCalculations() {
+            if (currentUser) {
+                const data = {
+                    user: currentUser.email,
+                    calculations: calculations,
+                    timestamp: new Date().toISOString()
+                };
+                localStorage.setItem('sigmaos_calculations', JSON.stringify(data));
+            }
+        }
+
+        function loadSavedCalculations() {
+            const saved = localStorage.getItem('sigmaos_calculations');
+            if (saved) {
+                const data = JSON.parse(saved);
+                if (data.user === currentUser.email) {
+                    calculations = data.calculations;
+                    // Restore form values
+                    document.getElementById('basic').value = calculations.gross || '';
+                    displayResults();
+                }
+            }
+        }
+
+        // Initialize
+        document.addEventListener('DOMContentLoaded', function() {
+            // Check if user is already signed in
+            const savedUser = localStorage.getItem('sigmaos_user');
+            if (savedUser) {
+                currentUser = JSON.parse(savedUser);
+                document.getElementById('auth-status').style.display = 'none';
+                document.getElementById('user-info').style.display = 'block';
+                document.getElementById('user-name').textContent = `Welcome, ${currentUser.name}!`;
+                loadSavedCalculations();
+            }
+        });
+    </script>
+</body>
+</html>

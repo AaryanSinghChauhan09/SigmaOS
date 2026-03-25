@@ -1,0 +1,405 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sovereign Compliance Assistant (SigmaOS v5.0)</title>
+    <style>
+        :root {
+            --bg: #111317;
+            --surface: #1a1e24;
+            --surface-hover: #262c33;
+            --text-main: #edf2f7;
+            --text-sub: #a0aec0;
+            --accent: #00d2ff;
+            --accent-glow: rgba(0, 210, 255, 0.4);
+            --danger: #fc8181;
+            --success: #68d391;
+            --warning: #f6e05e;
+            --font-stack: 'Inter', system-ui, -apple-system, sans-serif;
+            --radius: 12px;
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; -webkit--webkit--webkit--webkit-user-select: none; user-select: none; -webkit-user-select: none; user-select: none; -webkit--webkit-user-select: none; user-select: none; -webkit-user-select: none; user-select: none; -webkit--webkit--webkit-user-select: none; user-select: none; -webkit-user-select: none; user-select: none; -webkit--webkit-user-select: none; user-select: none; -webkit-user-select: none; user-select: none; }
+
+        body {
+            background-color: var(--bg);
+            color: var(--text-main);
+            font-family: var(--font-stack);
+            display: flex;
+            height: 100vh;
+            overflow: hidden;
+            background-image: 
+                radial-gradient(circle at 50% 0%, rgba(0, 210, 255, 0.03) 0%, transparent 60%);
+        }
+
+        /* Sidebar Profile Selector */
+        .sidebar {
+            width: 300px;
+            background: var(--surface);
+            border-right: 1px solid rgba(255,255,255,0.05);
+            display: flex;
+            flex-direction: column;
+            padding: 24px 0;
+            z-index: 10;
+        }
+
+        .brand-header {
+            padding: 0 24px 24px;
+            font-size: 1.25rem;
+            font-weight: 800;
+            color: var(--accent);
+            border-bottom: 1px solid rgba(255,255,255,0.05);
+            display: flex; align-items: center; gap: 12px;
+        }
+
+        .profile-list {
+            padding: 24px;
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+        }
+
+        .profile-btn {
+            background: transparent;
+            color: var(--text-sub);
+            border: 1px solid rgba(255,255,255,0.1);
+            padding: 16px;
+            border-radius: var(--radius);
+            font-weight: 600;
+            font-size: 1rem;
+            cursor: pointer;
+            text-align: left;
+            transition: all 0.2s;
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+
+        .profile-btn span { font-size: 0.8rem; font-weight: 400; opacity: 0.8; }
+        .profile-btn:hover { background: rgba(255,255,255,0.02); }
+        .profile-btn.active { 
+            background: rgba(0, 210, 255, 0.05); 
+            color: var(--text-main);
+            border-color: var(--accent);
+            box-shadow: 0 0 16px rgba(0, 210, 255, 0.1);
+        }
+
+        .bot-hud {
+            margin-top: auto;
+            padding: 24px;
+            font-size: 0.8rem;
+            color: var(--text-sub);
+            border-top: 1px solid rgba(255,255,255,0.05);
+            line-height: 1.5;
+        }
+
+        .bot-hud span { color: var(--success); font-weight: 600; }
+
+        /* Main Context */
+        .main-content {
+            flex: 1;
+            padding: 48px;
+            overflow-y: auto;
+            position: relative;
+        }
+
+        .hero-title {
+            font-size: 2.2rem;
+            font-weight: 800;
+            margin-bottom: 8px;
+            color: #fff;
+        }
+
+        .hero-desc {
+            color: var(--text-sub);
+            font-size: 1.1rem;
+            margin-bottom: 40px;
+        }
+
+        /* Compliance Card Grid */
+        .compliance-matrix {
+            display: none;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: 24px;
+        }
+
+        .compliance-matrix.active {
+            display: grid;
+            animation: popIn 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+        }
+
+        .comp-card {
+            background: var(--surface);
+            border-radius: var(--radius);
+            border: 1px solid rgba(255,255,255,0.05);
+            padding: 24px;
+            display: flex;
+            flex-direction: column;
+            position: relative;
+            overflow: hidden;
+            transition: 0.3s;
+        }
+
+        .comp-card:hover { transform: translateY(-3px); box-shadow: 0 10px 30px rgba(0,0,0,0.5); }
+
+        .comp-card::before {
+            content: ''; position: absolute; top: 0; left: 0; width: 100%; height: 4px;
+        }
+        .comp-card.c-red::before { background: var(--danger); }
+        .comp-card.c-blue::before { background: var(--accent); }
+        .comp-card.c-green::before { background: var(--success); }
+        .comp-card.c-yellow::before { background: var(--warning); }
+
+        .comp-statute {
+            font-size: 0.75rem;
+            font-family: monospace;
+            color: var(--text-sub);
+            margin-bottom: 12px;
+            display: flex;
+            justify-content: space-between;
+        }
+
+        .comp-statute .tag {
+            background: rgba(255,255,255,0.1);
+            padding: 2px 8px;
+            border-radius: 4px;
+            color: var(--text-main);
+        }
+
+        .comp-title { font-size: 1.25rem; font-weight: 700; color: #fff; margin-bottom: 12px; }
+        .comp-plain { font-size: 0.95rem; color: var(--text-sub); line-height: 1.6; margin-bottom: 24px; flex: 1; }
+
+        .court-update {
+            background: rgba(0, 210, 255, 0.05);
+            border-left: 3px solid var(--accent);
+            padding: 12px;
+            border-radius: 0 8px 8px 0;
+            font-size: 0.85rem;
+            color: var(--text-main);
+            margin-bottom: 20px;
+        }
+
+        .court-update strong { color: var(--accent); }
+
+        .ack-btn {
+            background: transparent;
+            color: #fff;
+            border: 1px solid rgba(255,255,255,0.1);
+            padding: 10px 16px;
+            border-radius: 6px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: 0.2s;
+            text-align: center;
+        }
+        .ack-btn:hover { background: rgba(104, 211, 145, 0.1); border-color: var(--success); color: var(--success); }
+
+        .st-red { color: var(--danger); }
+        .st-blue { color: var(--accent); }
+        .st-green { color: var(--success); }
+        .st-yellow { color: var(--warning); }
+        .st-court-title { display: block; margin-bottom: 4px; font-weight: bold; }
+
+        @keyframes popIn {
+            from { opacity: 0; transform: scale(0.95) translateY(10px); }
+            to { opacity: 1; transform: scale(1) translateY(0); }
+        }
+
+    </style>
+
+<script>
+// Sovereign OS Inline Style Manager
+document.addEventListener('DOMContentLoaded', () => {
+    const applyTo = (el) => { if(el.getAttribute('data-style')) { el.setAttribute('style', el.getAttribute('data-style')); el.removeAttribute('data-style'); } };
+    new MutationObserver(mutations => mutations.forEach(m => {
+        if(m.type === 'childList') m.addedNodes.forEach(n => { if(n.nodeType === 1) { applyTo(n); n.querySelectorAll('[data-style]').forEach(applyTo); } });
+    })).observe(document.body, {childList: true, subtree: true});
+    document.querySelectorAll('[data-style]').forEach(applyTo);
+});
+</script>
+</head>
+<body>
+
+    <!-- SIDEBAR -->
+    <div class="sidebar">
+        <div class="brand-header">
+            Σ COMPLIANCE ENGINE
+        </div>
+        
+        <div class="profile-list">
+            <button class="profile-btn active" onclick="Compliance.loadProfile('citizen')">
+                COMMON CITIZEN <span>Consumer & Civic Rights</span>
+            </button>
+            <button class="profile-btn" onclick="Compliance.loadProfile('freelancer')">
+                SOLO FREELANCER <span>Gig Workers & Consultants</span>
+            </button>
+            <button class="profile-btn" onclick="Compliance.loadProfile('startup')">
+                PVT LTD STARTUP <span>MSME & Corporate Board</span>
+            </button>
+        </div>
+
+        <div class="bot-hud">
+            <strong>Sovereign Abstractor</strong><br>
+            Engine translates 45k+ pages of Indian Statutory Legalese & Judicial Benchmarks into plain-English heuristics.<br><br>
+            <span>● Syncing Latest SCC Rules</span>
+        </div>
+    </div>
+
+    <!-- MAIN CONTEXT -->
+    <div class="main-content">
+        <h1 class="hero-title" id="heroTitle">Civil & Consumer Abstractions</h1>
+        <p class="hero-desc" id="heroDesc">Essential statutory rights decoupled for the salaried employee and standard consumer without legal intervention.</p>
+
+        <!-- CITIZEN MATRIX -->
+        <div id="matrix-citizen" class="compliance-matrix active">
+            <!-- Card 1 -->
+            <div class="comp-card c-red">
+                <div class="comp-statute">
+                    <span class="st-red">MANDATORY FILING</span>
+                    <span class="tag">Sec 139, Income Tax Act</span>
+                </div>
+                <h3 class="comp-title">Zero-Tax Liability ≠ Zero Filing</h3>
+                <p class="comp-plain">Even if your calculated tax is mathematically ₹0, if your gross salary exceeds ₹2.5 Lakhs (Old) or ₹3 Lakhs (New), you MUST file an ITR. Failing to do so allows the state to freeze accounts via Sec 276CC.</p>
+                <div class="court-update">
+                    <span class="st-court-title">⚖️ Latest Court Update:</span>
+                    ITAT mandates that <strong>Claiming Refunds (TDS)</strong> strictly requires ITR filing within the assessment year deadline.
+                </div>
+                <button class="ack-btn" onclick="this.innerHTML='Acknowledged'; this.style.borderColor='var(--success)'; this.style.color='var(--success)';">Acknowledge Liability Rule</button>
+            </div>
+
+            <!-- Card 2 -->
+            <div class="comp-card c-blue">
+                <div class="comp-statute">
+                    <span class="st-blue">DATA PRIVACY SHIELD</span>
+                    <span class="tag">DPDP Act, 2023</span>
+                </div>
+                <h3 class="comp-title">Absolute Consent Overreach</h3>
+                <p class="comp-plain">Corporations cannot legally force you to consent to promotional marketing to use a basic service. The 'Notice And Consent' mechanism gives you the sovereign right to revoke data access instantly.</p>
+                <div class="court-update">
+                    <span class="st-court-title">⚖️ Case Law Benchmark:</span>
+                    <strong>Justice K.S. Puttaswamy v. UoI (SC)</strong> strictly categorizes informational privacy as an intrinsic subset of Article 21 (Right to Life).
+                </div>
+                <button class="ack-btn" onclick="this.innerHTML='Acknowledged'; this.style.borderColor='var(--success)'; this.style.color='var(--success)';">Acknowledge Privacy Rule</button>
+            </div>
+
+            <!-- Card 3 -->
+            <div class="comp-card c-green">
+                <div class="comp-statute">
+                    <span class="st-green">E-DAAKHIL POWERS</span>
+                    <span class="tag">Consumer Protection Act, 2019</span>
+                </div>
+                <h3 class="comp-title">Direct Corporate Accountability</h3>
+                <p class="comp-plain">If you buy a defective laptop or face food poisoning, you possess a **2-Year Window** to file a complaint digitally on E-Daakhil. No lawyer is required for claims under ₹5 Lakhs.</p>
+                <div class="court-update">
+                    <span class="st-court-title">⚖️ Core Paradigm:</span>
+                    <strong>Product Liability (Sec 84)</strong> explicitly makes the E-commerce platform liable alongside the manufacturer for defective deliveries.
+                </div>
+                <button class="ack-btn" onclick="this.innerHTML='Acknowledged'; this.style.borderColor='var(--success)'; this.style.color='var(--success)';">Acknowledge Consumer Rule</button>
+            </div>
+        </div>
+
+        <!-- FREELANCER MATRIX -->
+        <div id="matrix-freelancer" class="compliance-matrix">
+            <div class="comp-card c-green">
+                <div class="comp-statute">
+                    <span class="st-green">PRESUMPTIVE SHIELD</span>
+                    <span class="tag">Sec 44ADA, IT Act</span>
+                </div>
+                <h3 class="comp-title">The 50% Expense Extrapolation</h3>
+                <p class="comp-plain">Software developers, UI designers, and consultants earning under ₹75 Lakhs/year can legally declare 50% of their income as "Expenses" without maintaining a single audit book or receipt.</p>
+                <div class="court-update">
+                    <span class="st-court-title">⚖️ Finance Act Update:</span>
+                    The limit was raised from ₹50L to <strong>₹75L</strong> explicitly for professionals receiving 95% of payments digitally.
+                </div>
+                <button class="ack-btn" onclick="this.innerHTML='Acknowledged'; this.style.borderColor='var(--success)'; this.style.color='var(--success)';">Acknowledge 44ADA</button>
+            </div>
+
+            <div class="comp-card c-yellow">
+                <div class="comp-statute">
+                    <span class="st-yellow">GST REGISTRATION TRIGGER</span>
+                    <span class="tag">Sec 22, CGST Act</span>
+                </div>
+                <h3 class="comp-title">The 20 Lakh Service Threshold</h3>
+                <p class="comp-plain">If you provide software services within India, GST registration is absolutely mandatory the second your turnover crosses ₹20 Lakhs. **However**, Export of Services (to US/Europe) are "Zero-Rated" if an LUT is filed.</p>
+                <div class="court-update">
+                    <span class="st-court-title">⚖️ Procedural Matrix:</span>
+                    Filing a <strong>Letter of Undertaking (LUT)</strong> before March 31st ensures your foreign client invoices remain tax-free without blocking capital.
+                </div>
+                <button class="ack-btn" onclick="this.innerHTML='Acknowledged'; this.style.borderColor='var(--success)'; this.style.color='var(--success)';">Acknowledge GST Rules</button>
+            </div>
+        </div>
+
+        <!-- STARTUP MATRIX -->
+        <div id="matrix-startup" class="compliance-matrix">
+            <div class="comp-card c-red">
+                <div class="comp-statute">
+                    <span class="st-red">MSME 45-DAY MANDATE</span>
+                    <span class="tag">Sec 43B(h), IT Act</span>
+                </div>
+                <h3 class="comp-title">Giant Corporations Must Pay You</h3>
+                <p class="comp-plain">If your startup is Udyam Registered (Micro/Small), you must be paid within 45 days. If a large corporation defaults, they **cannot claim tax deductions** on that expense, forcing them to pay you to save their own taxes.</p>
+                <div class="court-update">
+                    <span class="st-court-title">⚖️ Enforcement Heuristic:</span>
+                    The <strong>Samadhaan Portal</strong> allows startups to trigger MSME facilitation councils directly, bypassing civil courts entirely for delayed payments.
+                </div>
+                <button class="ack-btn" onclick="this.innerHTML='Acknowledged'; this.style.borderColor='var(--success)'; this.style.color='var(--success)';">Acknowledge MSME Rule</button>
+            </div>
+
+            <div class="comp-card c-blue">
+                <div class="comp-statute">
+                    <span class="st-blue">BOARD MEETING ENFORCEMENT</span>
+                    <span class="tag">Sec 173, Companies Act</span>
+                </div>
+                <h3 class="comp-title">The 120-Day Max Gap</h3>
+                <p class="comp-plain">Running a Private Limited Company requires at least 4 Board Meetings a year. The gap between two meetings must mathematically **never exceed 120 days**. (Special exception exists for 'Small Companies' - only 2 meetings required).</p>
+                <div class="court-update">
+                    <span class="st-court-title">⚖️ Compliance Penalty:</span>
+                    ROC (Registrar of Companies) imposes automatic algorithmic penalties for missing DIR-12 or failing to properly minute the meetings within 30 days.
+                </div>
+                <button class="ack-btn" onclick="this.innerHTML='Acknowledged'; this.style.borderColor='var(--success)'; this.style.color='var(--success)';">Acknowledge MCA Rules</button>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- UI LOGIC -->
+    <script>
+        class ComplianceUI {
+            constructor() {
+                this.profiles = {
+                    'citizen': {
+                        title: 'Civil & Consumer Abstractions',
+                        desc: 'Essential statutory rights decoupled for the salaried employee and standard consumer without legal intervention.'
+                    },
+                    'freelancer': {
+                        title: 'Solo Practitioner & Gig Economy Rules',
+                        desc: 'Leverage presumptive taxation and zero-rated GST export rules to maximize autonomous income retention.'
+                    },
+                    'startup': {
+                        title: 'Corporate MSME & Board Compliance',
+                        desc: 'Execute required ROC filings and abuse the 45-day MSME payment shield to maintain runway.'
+                    }
+                };
+            }
+
+            loadProfile(type) {
+                // UI Toggle
+                document.querySelectorAll('.profile-btn').forEach(b => b.classList.remove('active'));
+                event.currentTarget.classList.add('active');
+
+                // Content Toggle
+                document.querySelectorAll('.compliance-matrix').forEach(m => m.classList.remove('active'));
+                document.getElementById(`matrix-${type}`).classList.add('active');
+
+                // Header Update
+                const p = this.profiles[type];
+                document.getElementById('heroTitle').innerText = p.title;
+                document.getElementById('heroDesc').innerText = p.desc;
+            }
+        }
+
+        const Compliance = new ComplianceUI();
+    </script>
+</body>
+</html>

@@ -1,0 +1,286 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"><meta charset="UTF-8"><title>Sigma Gallery</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#050508;--s1:#0c0c16;--s2:#12121e;--border:rgba(255,255,255,.07);--accent:#00d2ff;--as:rgba(0,210,255,.1);--text:#e2e8f0;--dim:#4b5563;--pink:#f472b6;}
+*{box-sizing:border-box;margin:0;padding:0;}body{background:var(--bg);color:var(--text);font-family:'Inter',sans-serif;height:100vh;display:flex;flex-direction:column;overflow:hidden;-webkit--webkit--webkit--webkit-user-select: none; user-select: none; -webkit-user-select: none; user-select: none; -webkit--webkit-user-select: none; user-select: none; -webkit-user-select: none; user-select: none; -webkit--webkit--webkit-user-select: none; user-select: none; -webkit-user-select: none; user-select: none; -webkit--webkit-user-select: none; user-select: none; -webkit-user-select: none; user-select: none;}
+header{background:var(--s1);border-bottom:1px solid var(--border);padding:10px 16px;display:flex;align-items:center;gap:10px;flex-shrink:0;}
+.logo{font-weight:800;font-size:.95rem;color:var(--accent);}
+.hbtn{padding:6px 12px;border-radius:7px;border:1px solid var(--border);background:transparent;color:var(--dim);font-size:.78rem;cursor:pointer;font-family:'Inter',sans-serif;transition:background .14s,color .14s;}
+.hbtn:hover{background:rgba(255,255,255,.05);color:var(--text);}
+.hbtn.active{background:var(--as);border-color:var(--accent);color:var(--accent);}
+#upload-btn{margin-left:auto;padding:7px 14px;border-radius:7px;background:var(--accent);color:#000;border:none;font-weight:700;font-size:.8rem;cursor:pointer;font-family:'Inter',sans-serif;}
+#upload-btn:hover{opacity:.85;}
+#file-input{display:none;}
+.gallery{flex:1;overflow-y:auto;padding:16px;}
+.gallery::-webkit-scrollbar{width:4px}
+.gallery::-webkit-scrollbar-thumb{background:#1a1a28;border-radius:2px}
+.g-section{margin-bottom:24px;}
+.g-sec-title{font-size:.75rem;font-weight:700;text-transform:uppercase;letter-spacing:.8px;color:var(--dim);margin-bottom:10px;}
+.g-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(140px,1fr));gap:8px;}
+.g-item{border-radius:10px;overflow:hidden;cursor:pointer;position:relative;background:var(--s2);border:1px solid var(--border);aspect-ratio:1;transition:transform .18s cubic-bezier(.34,1.56,.64,1),box-shadow .18s;}
+.g-item:hover{transform:scale(1.04);box-shadow:0 10px 28px rgba(0,0,0,.6);border-color:rgba(255,255,255,.15);}
+.g-item.selected{border-color:var(--accent);box-shadow:0 0 0 2px var(--accent);}
+.g-emoji{font-size:4rem;display:flex;align-items:center;justify-content:center;height:100%;flex-direction:column;gap:6px;}
+.g-emoji-label{font-size:.7rem;color:var(--dim);font-weight:500;}
+.g-real-img{width:100%;height:100%;object-fit:cover;}
+
+/* Enhanced Lightbox */
+.lightbox{position:fixed;inset:0;background:rgba(0,0,0,.92);z-index:1000;display:none;flex-direction:column;}
+.lightbox.open{display:flex;}
+.lb-top{padding:16px 20px;display:flex;justify-content:space-between;align-items:center;background:linear-gradient(rgba(0,0,0,.6), transparent);}
+.lb-cap{font-weight:600;font-size:.9rem;color:var(--text);}
+.lb-tools{display:flex;gap:12px;}
+.tool-btn{background:rgba(255,255,255,.1);border:none;color:var(--text);padding:6px 12px;border-radius:6px;cursor:pointer;font-size:.8rem;-webkit--webkit-backdrop-filter: blur(4px); backdrop-filter: blur(4px); -webkit-backdrop-filter: blur(4px); backdrop-filter: blur(4px);transition:.15s;}
+.tool-btn:hover{background:rgba(255,255,255,.2);}
+.tool-btn.active{background:var(--accent);color:#000;}
+
+.lb-body{flex:1;display:flex;align-items:center;justify-content:center;position:relative;overflow:hidden;}
+.lb-img-wrap{transition:transform .2s;display:flex;align-items:center;justify-content:center;}
+.lb-img{max-width:90vw;max-height:80vh;border-radius:4px;box-shadow:0 24px 60px rgba(0,0,0,.9);object-fit:contain;}
+.lb-emoji{font-size:12rem;}
+
+.lb-nav{position:absolute;top:50%;transform:translateY(-50%);background:rgba(255,255,255,.1);border:none;color:#fff;width:50px;height:50px;border-radius:50%;cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:1.5rem;-webkit--webkit-backdrop-filter: blur(4px); backdrop-filter: blur(4px); -webkit-backdrop-filter: blur(4px); backdrop-filter: blur(4px);transition:.15s;}
+.lb-nav:hover{background:rgba(255,255,255,.2);transform:translateY(-50%) scale(1.1);}
+.lb-prev{left:20px;}
+.lb-next{right:20px;}
+
+/* EXIF Panel */
+.exif-panel{position:absolute;right:0;top:-60px;bottom:0;width:300px;background:rgba(12,12,22,.95);-webkit--webkit-backdrop-filter: blur(10px); backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px); backdrop-filter: blur(10px);border-left:1px solid var(--border);padding:20px;transform:translateX(100%);transition:transform .3s;z-index:10;display:flex;flex-direction:column;gap:16px;overflow-y:auto;}
+.exif-panel.show{transform:translateX(0);}
+.exif-title{font-size:.85rem;font-weight:700;color:var(--dim);text-transform:uppercase;letter-spacing:1px;border-bottom:1px solid var(--border);padding-bottom:8px;}
+.exif-row{display:flex;flex-direction:column;gap:2px;font-size:.8rem;}
+.exif-lbl{color:var(--dim);font-size:.7rem;}
+.exif-val{color:var(--text);font-family:monospace;word-break:break-all;}
+
+.statusbar{background:var(--s1);border-top:1px solid var(--border);padding:5px 14px;font-size:.72rem;color:var(--dim);flex-shrink:0;display:flex;justify-content:space-between;}
+
+        .sigma-style-sigma_gallery-1 { display:none }
+        .sigma-style-sigma_gallery-2 { background:rgba(255,0,0,.2) }
+        .sigma-style-sigma_gallery-3 { transform:scale(1) }
+        .sigma-style-sigma_gallery-4 { margin-top:16px; }
+        .sigma-style-sigma_gallery-5 { display:flex;align-items:center;justify-content:center;height:200px;color:var(--dim) }
+    </style>
+<script>
+// Sovereign OS Inline Style Manager
+document.addEventListener('DOMContentLoaded', () => {
+    const applyTo = (el) => { if(el.getAttribute('data-style')) { el.setAttribute('style', el.getAttribute('data-style')); el.removeAttribute('data-style'); } };
+    new MutationObserver(mutations => mutations.forEach(m => {
+        if(m.type === 'childList') m.addedNodes.forEach(n => { if(n.nodeType === 1) { applyTo(n); n.querySelectorAll('[data-style]').forEach(applyTo); } });
+    })).observe(document.body, {childList: true, subtree: true});
+    document.querySelectorAll('[data-style]').forEach(applyTo);
+});
+</script>
+</head>
+<body>
+<header>
+    <span class="logo">🖼️ Sigma Gallery</span>
+    <button class="hbtn active" onclick="filterBy('all',this)">All</button>
+    <button class="hbtn" onclick="filterBy('legal',this)">📚 Legal Docs</button>
+    <button class="hbtn" onclick="filterBy('science',this)">🔬 Science</button>
+    <button class="hbtn" onclick="filterBy('nature',this)">🌿 Nature</button>
+    <button class="hbtn" onclick="filterBy('uploaded',this)">📷 My Photos</button>
+    <button id="upload-btn" onclick="document.getElementById('file-input').click()">+ Import Photos</button>
+    <input aria-label="input" type="file" id="file-input" accept="image/*" multiple data- onchange="loadImages(event)" title="input" class="sigma-style-sigma_gallery-1">
+</header>
+<div class="gallery" id="gallery"></div>
+<div class="statusbar"><span id="sb-left">Ready</span><span>Sigma Gallery v6.1 (EXIF Enabled)</span></div>
+
+<!-- Lightbox -->
+<div class="lightbox" id="lb">
+    <div class="lb-top">
+      <div class="lb-cap" id="lb-cap">Image Title</div>
+      <div class="lb-tools">
+        <button class="tool-btn" id="btn-slide" onclick="toggleSlideshow()">▶ Slideshow</button>
+        <button class="tool-btn" onclick="toggleExif()">ℹ️ EXIF / Info</button>
+        <button class="tool-btn" onclick="zoomIn()">🔍 Zoom In</button>
+        <button class="tool-btn" onclick="zoomOut()">🔍 Zoom Out</button>
+        <button class="tool-btn sigma-style-sigma_gallery-2" data- onclick="closeLB()">✕ Close</button>
+      </div>
+    </div>
+    
+    <div class="lb-body">
+      <button class="lb-nav lb-prev" onclick="lbNav(-1)">❮</button>
+      <div class="lb-img-wrap sigma-style-sigma_gallery-3" id="img-wrap" data->
+        <div id="lb-content"></div>
+      </div>
+      <button class="lb-nav lb-next" onclick="lbNav(1)">❯</button>
+      
+      <!-- EXIF Drawer -->
+      <div class="exif-panel" id="exif">
+        <div class="exif-title">Image Metadata</div>
+        <div class="exif-row"><span class="exif-lbl">Dimensions</span><span class="exif-val" id="ex-dim">Loading...</span></div>
+        <div class="exif-row"><span class="exif-lbl">File Size</span><span class="exif-val" id="ex-size">--</span></div>
+        <div class="exif-row"><span class="exif-lbl">Type</span><span class="exif-val" id="ex-type">--</span></div>
+        <div class="exif-row"><span class="exif-lbl">Date Modified</span><span class="exif-val" id="ex-date">--</span></div>
+        <div class="exif-title sigma-style-sigma_gallery-4" data->Calculated EXIF (Simulated JS)</div>
+        <div class="exif-row"><span class="exif-lbl">Camera Make</span><span class="exif-val">Sigma OpticOS Virtual</span></div>
+        <div class="exif-row"><span class="exif-lbl">Focal Length</span><span class="exif-val">35mm</span></div>
+        <div class="exif-row"><span class="exif-lbl">Aperture</span><span class="exif-val">f/1.8</span></div>
+        <div class="exif-row"><span class="exif-lbl">ISO Speed</span><span class="exif-val">ISO-400</span></div>
+      </div>
+    </div>
+</div>
+
+<script>
+const ITEMS = [
+  {cat:'legal',emoji:'⚖️',label:'Constitution of India'},
+  {cat:'legal',emoji:'📜',label:'Section 138 NI Act'},
+  {cat:'legal',emoji:'🏛️',label:'Supreme Court Ruling'},
+  {cat:'legal',emoji:'📋',label:'PIL Procedure'},
+  {cat:'science',emoji:'⚗️',label:'Chemistry Lab'},
+  {cat:'science',emoji:'🔭',label:'Astronomy'},
+  {cat:'science',emoji:'🧬',label:'DNA Structure'},
+  {cat:'science',emoji:'⚛️',label:'Quantum Physics'},
+  {cat:'science',emoji:'🧪',label:'Titration Experiment'},
+  {cat:'nature',emoji:'🌸',label:'Cherry Blossom'},
+  {cat:'nature',emoji:'🏔️',label:'Himalayan Range'},
+  {cat:'nature',emoji:'🌊',label:'Ocean Waves'},
+  {cat:'nature',emoji:'🌿',label:'Rainforest'},
+  {cat:'nature',emoji:'🦁',label:'Wildlife'},
+  {cat:'nature',emoji:'🌄',label:'Sunrise'},
+];
+
+let uploadedItems = [];
+let currentFilter = 'all';
+let curLBIdx = 0;
+let currentItems = [];
+let zoomLvl = 1;
+let slideInterval = null;
+
+function getItems(filter) {
+  const base = filter === 'all' ? ITEMS : filter === 'uploaded' ? [] : ITEMS.filter(i => i.cat === filter);
+  return filter === 'uploaded' ? uploadedItems : (filter === 'all' ? [...ITEMS, ...uploadedItems] : base);
+}
+
+function render(filter) {
+  currentFilter = filter;
+  currentItems = getItems(filter);
+  const gallery = document.getElementById('gallery');
+  gallery.innerHTML = '';
+  if (!currentItems.length) {
+    gallery.innerHTML = '<div data- class="sigma-style-sigma_gallery-5">No images. Import photos to see them here.</div>';
+    document.getElementById('sb-left').textContent = '0 items';
+    return;
+  }
+  const sec = document.createElement('div');
+  sec.className = 'g-section';
+  const secTitle = document.createElement('div');
+  secTitle.className = 'g-sec-title';
+  secTitle.textContent = filter === 'all' ? 'All Media' : filter.charAt(0).toUpperCase() + filter.slice(1);
+  sec.appendChild(secTitle);
+  const grid = document.createElement('div');
+  grid.className = 'g-grid';
+  currentItems.forEach((item, idx) => {
+    const el = document.createElement('div');
+    el.className = 'g-item';
+    if (item.src) {
+      const img = document.createElement('img');
+      img.src = item.src; img.className = 'g-real-img'; img.alt = item.label;
+      el.appendChild(img);
+    } else {
+      el.innerHTML = `<div class="g-emoji"><span>${item.emoji}</span><span class="g-emoji-label">${item.label}</span></div>`;
+    }
+    el.onclick = () => openLB(idx);
+    grid.appendChild(el);
+  });
+  sec.appendChild(grid);
+  gallery.appendChild(sec);
+  document.getElementById('sb-left').textContent = currentItems.length + ' items';
+}
+
+function filterBy(f, el) {
+  document.querySelectorAll('.hbtn').forEach(b => b.classList.remove('active'));
+  el.classList.add('active');
+  render(f);
+}
+
+function openLB(idx) {
+  curLBIdx = idx;
+  zoomLvl = 1; document.getElementById('img-wrap').style.transform = `scale(1)`;
+  showLB();
+  document.getElementById('lb').classList.add('open');
+}
+
+function showLB() {
+  const item = currentItems[curLBIdx];
+  const c = document.getElementById('lb-content');
+  if (item.src) {
+    c.innerHTML = `<img src="${item.src}" class="lb-img" id="t-img" alt="${item.label}">`;
+    const img = document.getElementById('t-img');
+    img.onload = () => { document.getElementById('ex-dim').textContent = `${img.naturalWidth} x ${img.naturalHeight} px`; };
+    document.getElementById('ex-size').textContent = item.rawSize ? (item.rawSize/1024).toFixed(1)+' KB' : 'Linked Resource';
+    document.getElementById('ex-type').textContent = item.rawType || 'image/jpeg';
+    document.getElementById('ex-date').textContent = new Date().toLocaleString() + " (Import)";
+  } else {
+    c.innerHTML = `<div class="lb-emoji">${item.emoji}</div>`;
+    document.getElementById('ex-dim').textContent = `Vector Emoji`;
+    document.getElementById('ex-size').textContent = `Trace Base`;
+    document.getElementById('ex-type').textContent = `UTF-8 Canvas`;
+    document.getElementById('ex-date').textContent = `Intrinsic`;
+  }
+  document.getElementById('lb-cap').textContent = (curLBIdx+1) + '/' + currentItems.length + ' - ' + item.label;
+  
+  // reset zoom
+  zoomLvl = 1; document.getElementById('img-wrap').style.transform = `scale(${zoomLvl})`;
+}
+
+function lbNav(dir) {
+  curLBIdx = (curLBIdx + dir + currentItems.length) % currentItems.length;
+  showLB();
+}
+
+function closeLB() { 
+  document.getElementById('lb').classList.remove('open'); 
+  stopSlideshow();
+}
+
+function loadImages(e) {
+  Array.from(e.target.files).forEach(file => {
+    const reader = new FileReader();
+    reader.onload = ev => {
+      uploadedItems.push({ cat: 'uploaded', src: ev.target.result, label: file.name, rawSize: file.size, rawType: file.type });
+      if (currentFilter === 'all' || currentFilter === 'uploaded') render(currentFilter);
+    };
+    reader.readAsDataURL(file);
+  });
+  e.target.value = '';
+}
+
+/* Zoom features */
+function zoomIn() { zoomLvl += 0.25; document.getElementById('img-wrap').style.transform = `scale(${zoomLvl})`; }
+function zoomOut() { zoomLvl -= 0.25; if(zoomLvl < 0.25) zoomLvl = 0.25; document.getElementById('img-wrap').style.transform = `scale(${zoomLvl})`; }
+function toggleExif() { document.getElementById('exif').classList.toggle('show'); }
+
+/* Slideshow */
+function toggleSlideshow() {
+  const btn = document.getElementById('btn-slide');
+  if (slideInterval) {
+    stopSlideshow();
+  } else {
+    btn.classList.add('active');
+    btn.textContent = '⏸ Pause Slide';
+    slideInterval = setInterval(()=>lbNav(1), 3000);
+  }
+}
+function stopSlideshow() {
+  const btn = document.getElementById('btn-slide');
+  btn.classList.remove('active');
+  btn.textContent = '▶ Slideshow';
+  clearInterval(slideInterval);
+  slideInterval = null;
+}
+
+document.addEventListener('keydown', e => {
+  if (!document.getElementById('lb').classList.contains('open')) return;
+  if (e.key === 'ArrowRight') lbNav(1);
+  else if (e.key === 'ArrowLeft') lbNav(-1);
+  else if (e.key === 'Escape') closeLB();
+  else if (e.key === '=' || e.key === '+') zoomIn();
+  else if (e.key === '-') zoomOut();
+});
+
+render('all');
+</script>
+</body></html>

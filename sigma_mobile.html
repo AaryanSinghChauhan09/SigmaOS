@@ -1,0 +1,286 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>SigmaOS Mobile</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+:root {
+    --bg: #000;
+    --dock: rgba(255, 255, 255, 0.1);
+    --text: #fff;
+    --blur: blur(20px);
+}
+* { box-sizing: border-box; margin: 0; padding: 0; -webkit-user-select: none; user-select: none; }
+body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'Inter', sans-serif;
+    height: 100dvh;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    -webkit-user-select:none; -webkit-user-select: none; user-select: none;
+}
+/* Wallpaper background */
+.wallpaper {
+    position: absolute;
+    inset: 0;
+    background: radial-gradient(circle at 50% 120%, #818cf8 0%, #a855f7 30%, #000 70%);
+    z-index: -1;
+}
+
+/* Status Bar */
+.status-bar {
+    display: flex;
+    justify-content: space-between;
+    padding: 8px 16px;
+    font-size: 0.8rem;
+    font-weight: 600;
+    color: #fff;
+    z-index: 10;
+}
+
+/* Screen wrapper */
+.home-screen {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    padding: 20px;
+    transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1), opacity 0.3s;
+}
+
+/* App Grid */
+.app-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    grid-auto-rows: min-content;
+    gap: 20px 10px;
+    flex: 1;
+}
+.app-icon {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    cursor: pointer;
+    transition: transform 0.1s;
+}
+.app-icon:active { transform: scale(0.9); }
+.app-btn {
+    width: 60px;
+    height: 60px;
+    border-radius: 16px;
+    background: rgba(255, 255, 255, 0.15);
+    -webkit-backdrop-filter:var(--blur); backdrop-filter: var(--blur);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.8rem;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+    border: 1px solid rgba(255,255,255,0.1);
+}
+.app-label {
+    margin-top: 6px;
+    font-size: 0.65rem;
+    font-weight: 500;
+    text-align: center;
+    text-shadow: 0 1px 2px rgba(0,0,0,0.8);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-width: 70px;
+}
+
+/* Dock */
+.dock-area {
+    padding: 12px 16px 24px;
+}
+.dock {
+    background: rgba(255, 255, 255, 0.15);
+    -webkit-backdrop-filter:var(--blur); backdrop-filter: var(--blur);
+    border-radius: 28px;
+    padding: 14px;
+    display: flex;
+    justify-content: space-between;
+    border: 1px solid rgba(255,255,255,0.1);
+}
+.dock .app-label { display: none; }
+.dock .app-btn { background: transparent; box-shadow: none; border: none; }
+
+/* Active App View */
+.app-view {
+    position: fixed;
+    inset: 0;
+    background: #000;
+    z-index: 100;
+    display: flex;
+    flex-direction: column;
+    transform: translateY(100vh);
+    transition: transform 0.35s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+.app-view.open {
+    transform: translateY(0);
+}
+.app-frame {
+    flex: 1;
+    border: none;
+    width: 100%;
+    background: #000;
+}
+
+/* Home Indicator for swiping up/closing app */
+.home-indicator-area {
+    height: 24px;
+    background: #000;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+}
+.home-indicator {
+    width: 140px;
+    height: 5px;
+    background: #fff;
+    border-radius: 10px;
+}
+.c-tx { background: rgba(245,158,11,0.2) }
+.c-tr { background: #111 }
+.c-fl { background: rgba(0,210,255,0.2) }
+.c-nt { background: rgba(251,191,36,0.2) }
+.c-ck { background: rgba(129,140,248,0.2) }
+.c-mn { background: rgba(16,185,129,0.2) }
+.c-wt { background: rgba(99,102,241,0.2) }
+.c-gl { background: rgba(236,72,153,0.2) }
+.c-gm { background: rgba(255,214,10,0.2) }
+.c-jp { background: rgba(239,68,68,0.2) }
+.c-bi { background: rgba(59,130,246,0.2) }
+.c-id { background: rgba(16,185,129,0.2) }
+.c-dw { background: rgba(245,158,11,0.2) }
+.c-nc { background: rgba(239,68,68,0.2) }
+.c-dl { background: rgba(139,92,246,0.2) }
+.c-tl { background: rgba(20,184,166,0.2) }
+.c-vm { background: rgba(99,102,241,0.2) }
+</style>
+</head>
+<body>
+
+<div class="wallpaper"></div>
+
+<div class="status-bar">
+    <div id="sb-time">12:00</div>
+    <div>Σ Mobile</div>
+    <div>100% 🔋</div>
+</div>
+
+<div class="home-screen" id="home">
+    <div class="app-grid">
+        <div class="app-icon" onclick="launch('userland/apps/sigma_tax_legal_calc.html', 'Tax & Legal')">
+            <div class="app-btn c-tx">💰</div><div class="app-label">Tax & Legal</div>
+        </div>
+        <div class="app-icon" onclick="launch('userland/apps/sigma_terminal.html', 'Terminal')">
+            <div class="app-btn c-tr">💻</div><div class="app-label">Terminal</div>
+        </div>
+        <div class="app-icon" onclick="launch('userland/apps/sigma_files.html', 'Files')">
+            <div class="app-btn c-fl">📁</div><div class="app-label">Files</div>
+        </div>
+        <div class="app-icon" onclick="launch('userland/apps/sigma_notes.html', 'Notes')">
+            <div class="app-btn c-nt">📝</div><div class="app-label">Notes</div>
+        </div>
+        <div class="app-icon" onclick="launch('userland/apps/sigma_clock.html', 'Clock')">
+            <div class="app-btn c-ck">🕐</div><div class="app-label">Clock</div>
+        </div>
+        <div class="app-icon" onclick="launch('userland/apps/sigma_monitor.html', 'Monitor')">
+            <div class="app-btn c-mn">📊</div><div class="app-label">Monitor</div>
+        </div>
+        <div class="app-icon" onclick="launch('userland/apps/sigma_writer.html', 'Writer')">
+            <div class="app-btn c-wt">📄</div><div class="app-label">Writer</div>
+        </div>
+        <div class="app-icon" onclick="launch('userland/apps/sigma_gallery.html', 'Gallery')">
+            <div class="app-btn c-gl">🖼️</div><div class="app-label">Gallery</div>
+        </div>
+        <div class="app-icon" onclick="launch('userland/apps/sigma_game.html', 'Game')">
+            <div class="app-btn c-gm">🎩</div><div class="app-label">Game</div>
+        </div>
+        <div class="app-icon" onclick="launch('userland/apps/sigma_jump.html', 'Sigma Jump')">
+            <div class="app-btn c-jp">🏃</div><div class="app-label">Sigma Jump</div>
+        </div>
+        <div class="app-icon" onclick="launch('userland/apps/sigma_bi.html', 'Sigma BI')">
+            <div class="app-btn c-bi">📊</div><div class="app-label">Sigma BI</div>
+        </div>
+        <div class="app-icon" onclick="launch('userland/apps/sigma_ide.html', 'Sigma IDE')">
+            <div class="app-btn c-id">💻</div><div class="app-label">C++ IDE</div>
+        </div>
+        <div class="app-icon" onclick="launch('userland/apps/sigma_draw.html', 'Draw.io')">
+            <div class="app-btn c-dw">✏️</div><div class="app-label">Draw.io</div>
+        </div>
+        <div class="app-icon" onclick="launch('userland/apps/sigma_netcut.html', 'NetCut')">
+            <div class="app-btn c-nc">✂️</div><div class="app-label">NetCut</div>
+        </div>
+        <div class="app-icon" onclick="launch('userland/apps/sigma_data_lab.html', 'Data Lab')">
+            <div class="app-btn c-dl">🧬</div><div class="app-label">Data Lab</div>
+        </div>
+        <div class="app-icon" onclick="launch('userland/apps/sigma_tally.html', 'TallyPrime')">
+            <div class="app-btn c-tl">📈</div><div class="app-label">TallyPrime</div>
+        </div>
+        <div class="app-icon" onclick="launch('userland/apps/sigma_vm.html', 'VirtualBox')">
+            <div class="app-btn c-vm">🖥️</div><div class="app-label">VirtualBox</div>
+        </div>
+    </div>
+</div>
+
+<div class="dock-area">
+    <div class="dock">
+        <div class="app-icon" onclick="launch('userland/apps/sigma_calc.html', 'Calc')">
+            <div class="app-btn">🧮</div><div class="app-label">Calc</div>
+        </div>
+        <div class="app-icon" onclick="launch('userland/apps/sigma_music.html', 'Music')">
+            <div class="app-btn">🎵</div><div class="app-label">Music</div>
+        </div>
+        <div class="app-icon" onclick="launch('userland/apps/sigma_browser.html', 'Browser')">
+            <div class="app-btn">🌐</div><div class="app-label">Browser</div>
+        </div>
+        <div class="app-icon" onclick="launch('userland/apps/sigma_settings.html', 'Settings')">
+            <div class="app-btn">⚙️</div><div class="app-label">Settings</div>
+        </div>
+    </div>
+</div>
+
+<div class="app-view" id="appView">
+    <iframe title="Embedded Content"  class="app-frame" id="appFrame" sandbox="allow-scripts allow-same-origin allow-forms allow-popups"></iframe>
+    <div class="home-indicator-area" onclick="goHome()">
+        <div class="home-indicator"></div>
+    </div>
+</div>
+
+<script>
+function launch(url, name) {
+    document.getElementById('appFrame').src = url;
+    document.getElementById('appView').classList.add('open');
+    document.getElementById('home').style.transform = 'scale(0.92)';
+    document.getElementById('home').style.opacity = '0.5';
+}
+
+function goHome() {
+    document.getElementById('appView').classList.remove('open');
+    document.getElementById('home').style.transform = 'scale(1)';
+    document.getElementById('home').style.opacity = '1';
+    setTimeout(() => { document.getElementById('appFrame').src = ''; }, 350);
+}
+
+// Update clock
+setInterval(() => {
+    const now = new Date();
+    document.getElementById('sb-time').textContent = now.toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit', hour12: true });
+}, 1000);
+document.getElementById('sb-time').textContent = new Date().toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit', hour12: true });
+
+// Prevent bounce scroll on mobile Safari
+document.body.addEventListener('touchmove', function(e) {
+    if (!e.target.closest('#appFrame')) {
+        e.preventDefault();
+    }
+}, { passive: false });
+</script>
+</body>
+</html>

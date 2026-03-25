@@ -1,0 +1,1020 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SigmaOS v6.1 – Zenith Sovereign Desktop</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <style>
+        /* ── DESIGN TOKENS ─────────────────────────────────────────── */
+        :root {
+            --bg-deep:      #060910;
+            --surface:      rgba(12, 18, 36, 0.72);
+            --surface-solid:#0c1224;
+            --surface-2:    rgba(255,255,255,0.04);
+            --border:       rgba(255,255,255,0.10);
+            --border-focus: rgba(0,210,255,0.5);
+            --accent:       #00d2ff;
+            --accent2:      #7c3aed;
+            --accent-soft:  rgba(0,210,255,0.12);
+            --accent-glow:  rgba(0,210,255,0.3);
+            --pink:         #f472b6;
+            --violet:       #818cf8;
+            --success:      #34d399;
+            --warning:      #fbbf24;
+            --danger:       #f87171;
+            --text-100:     #ffffff;
+            --text-80:      rgba(255,255,255,0.85);
+            --text-50:      rgba(255,255,255,0.50);
+            --text-30:      rgba(255,255,255,0.30);
+            --radius-sm:    6px;
+            --radius-md:    12px;
+            --radius-lg:    18px;
+            --radius-xl:    24px;
+            --font:         'Inter', system-ui, sans-serif;
+            --dock-h:       72px;
+            --bar-h:        30px;
+            --zWin:         100;
+            --zDock:        900;
+            --zDrawer:      950;
+            --zNotif:       9000;
+            --zOmni:        9999;
+            --blur:         blur(10px);
+        }
+
+        * { 
+            box-sizing:border-box; margin:0; padding:0; 
+            -webkit--webkit--webkit-user-select: none; user-select: none; -webkit-user-select: none; user-select: none; -webkit--webkit-user-select: none; user-select: none; -webkit-user-select: none; user-select: none;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+            text-rendering: optimizeLegibility;
+        }
+        body { font-family:var(--font); background:var(--bg-deep); color:var(--text-80); height:100vh; width:100vw; overflow:hidden; position:relative; }
+
+        /* ── WALLPAPER ORBS ──────────────────────────────────────── */
+        .orb { position:absolute; border-radius:50%; filter:blur(100px); pointer-events:none; }
+        .o1 { width:700px; height:700px; background:rgba(99,102,241,.16); top:-200px; left:-150px; animation:floatOrb 20s ease-in-out infinite alternate; }
+        .o2 { width:550px; height:550px; background:rgba(0,210,255,.12); top:5%; right:-120px; animation:floatOrb 24s ease-in-out infinite alternate-reverse; }
+        .o3 { width:450px; height:450px; background:rgba(244,114,182,.10); bottom:-100px; left:35%; animation:floatOrb 18s ease-in-out infinite alternate; }
+        .o4 { width:300px; height:300px; background:rgba(124,58,237,.10); top:40%; left:15%; animation:floatOrb 22s ease-in-out infinite alternate-reverse; }
+        @keyframes floatOrb { from{transform:translate(0,0) scale(1)} to{transform:translate(50px,30px) scale(1.1)} }
+
+        /* ── STATUS BAR ──────────────────────────────────────────── */
+        #statusbar {
+            position:absolute; top:0; left:0; right:0; height:var(--bar-h);
+            background:rgba(6,9,16,0.75); -webkit--webkit-backdrop-filter: blur(14px); backdrop-filter: blur(14px); -webkit-backdrop-filter: blur(14px); backdrop-filter: blur(14px);
+            border-bottom:1px solid rgba(255,255,255,0.05);
+            display:flex; align-items:center; justify-content:space-between;
+            padding:0 18px; font-size:.73rem; font-weight:600; color:var(--text-50);
+            z-index:var(--zDock);
+        }
+        #statusbar .sl { display:flex; align-items:center; gap:18px; }
+        #statusbar .sr { display:flex; align-items:center; gap:14px; }
+        .sb-logo { color:var(--accent); font-weight:900; font-size:.88rem; letter-spacing:.3px; }
+        .sb-ver  { color:var(--text-30); font-size:.68rem; }
+        .sb-badge { background:linear-gradient(135deg,var(--accent2),var(--accent)); color:#fff; padding:1px 7px; border-radius:3px; font-size:.65rem; font-weight:700; }
+        .sb-sep  { width:1px; height:14px; background:var(--border); }
+        #sb-active-app { color:var(--accent); font-weight:700; }
+
+        /* ── DESKTOP ─────────────────────────────────────── */
+        #desktop {
+            position:absolute; top:var(--bar-h); left:0; right:0;
+            bottom:calc(var(--dock-h) + 20px);
+            padding:28px; display:grid;
+            grid-template-columns:repeat(auto-fill,100px); grid-auto-rows:108px;
+            gap:10px; align-content:start;
+        }
+        .di {
+            display: flex; flex-direction: column; align-items: center; justify-content: flex-start;
+            width: 80px; height: 95px; cursor: pointer; border-radius: 12px;
+            transition: all 0.2s cubic-bezier(0.34, 1.56, 0.64, 1);
+            padding: 10px 5px; box-sizing: border-box;
+        }
+        .di:hover { background: rgba(255,255,255,0.1); transform: scale(1.08); box-shadow: 0 5px 15px rgba(0,0,0,0.3); }
+        .di:active { transform: scale(0.95); opacity: 0.7; }
+        .di .g {
+            width: 48px; height: 48px; font-size: 26px; display: flex; align-items: center; justify-content: center;
+            background: rgba(255,255,255,0.15); border-radius: 14px;
+            -webkit--webkit-backdrop-filter: var(--blur); backdrop-filter: var(--blur); -webkit-backdrop-filter: var(--blur); backdrop-filter: var(--blur);
+            border: 1px solid rgba(255,255,255,0.2); margin-bottom: 6px;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+            transition: transform 0.2s;
+        }
+        .di:hover .g { border-color: rgba(255,255,255,0.4); }
+        .di .lbl { font-size: 11px; font-weight: 500; text-shadow: 0 1px 3px rgba(0,0,0,0.8); text-align: center; }
+
+        /* ── WINDOW MANAGER ──────────────────────────────────────── */
+        .win {
+            position:absolute; top:60px; left:110px;
+            width:min(1100px,88vw); height:min(760px,84vh);
+            background:var(--surface); -webkit--webkit-backdrop-filter: blur(44px) saturate(1.5); backdrop-filter: blur(44px) saturate(1.5); -webkit-backdrop-filter: blur(44px) saturate(1.5); backdrop-filter: blur(44px) saturate(1.5);
+            border:1px solid var(--border); border-radius:var(--radius-lg);
+            box-shadow:0 32px 80px rgba(0,0,0,.75), 0 0 0 .5px rgba(255,255,255,.04) inset, 0 1px 0 rgba(255,255,255,.1) inset;
+            display:flex; flex-direction:column; overflow:hidden;
+            z-index:var(--zWin); animation:wSpawn .32s cubic-bezier(.16,1,.3,1) forwards;
+        }
+        .win.focused { border-color:var(--border-focus); box-shadow:0 32px 80px rgba(0,0,0,.85), 0 0 0 1px var(--accent-glow), 0 0 0 .5px rgba(255,255,255,.06) inset; }
+        .win.minimized { display:none!important; }
+        .win.maximized { border-radius:0!important; }
+        @keyframes wSpawn { from{opacity:0;transform:scale(.88) translateY(20px)} to{opacity:1;transform:scale(1) translateY(0)} }
+
+        /* Title bar */
+        .wtbar {
+            height:42px; display:flex; align-items:center; justify-content:space-between;
+            padding:0 14px; background:rgba(255,255,255,.025); border-bottom:1px solid var(--border);
+            cursor:grab; flex-shrink:0;
+        }
+        .wtbar:active { cursor:grabbing; }
+        .wcontrols { display:flex; gap:7px; align-items:center; }
+        .wdot {
+            width:13px; height:13px; border-radius:50%; cursor:pointer; border:none;
+            transition:filter .14s, transform .14s;
+        }
+        .wdot:hover { filter:brightness(1.25); transform:scale(1.15); }
+        .wdot.cl { background:#ff5f57; box-shadow:0 0 0 1px rgba(255,95,87,.4); }
+        .wdot.mn { background:#febc2e; box-shadow:0 0 0 1px rgba(254,188,46,.4); }
+        .wdot.mx { background:#28c840; box-shadow:0 0 0 1px rgba(40,200,64,.4); }
+        .wtitle { font-size:.85rem; font-weight:600; color:var(--text-80); position:absolute; left:50%; transform:translateX(-50%); pointer-events:none; letter-spacing:.2px; }
+        .wbody { flex:1; position:relative; overflow:hidden; }
+        .wbody iframe { width:100%; height:100%; border:none; }
+
+        /* Resize handle */
+        .win-resize {
+            position:absolute; bottom:0; right:0; width:16px; height:16px;
+            cursor:se-resize; z-index:10;
+            background:linear-gradient(135deg, transparent 50%, rgba(255,255,255,.12) 50%);
+        }
+
+        /* ── TASKBAR (running apps) ───────────────────────────────── */
+        #taskbar {
+            position:absolute; bottom:calc(var(--dock-h) + 24px); left:50%; transform:translateX(-50%);
+            display:flex; gap:6px; z-index:calc(var(--zDock) - 1);
+            pointer-events:none;
+        }
+        .tb-item {
+            pointer-events:all;
+            display:flex; align-items:center; gap:7px; padding:5px 10px 5px 8px;
+            background:rgba(12,18,36,.8); -webkit--webkit-backdrop-filter: blur(16px); backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px); backdrop-filter: blur(16px);
+            border:1px solid var(--border); border-radius:8px; cursor:pointer;
+            font-size:.75rem; font-weight:600; color:var(--text-80);
+            transition:background .15s, border .15s, transform .15s;
+            animation:tbIn .25s cubic-bezier(.16,1,.3,1);
+        }
+        .tb-item:hover { background:rgba(0,210,255,.1); border-color:var(--accent-glow); transform:translateY(-2px); }
+        .tb-item.active { border-color:var(--accent); color:var(--accent); }
+        .tb-icon { font-size:1rem; }
+        @keyframes tbIn { from{opacity:0;transform:translateY(8px)} to{opacity:1;transform:translateY(0)} }
+
+        /* ── GLASS DOCK ───────────────────────────────────────────── */
+        #dock-wrap { position:absolute; bottom:10px; left:0; right:0; display:flex; justify-content:center; z-index:var(--zDock); pointer-events:none; }
+        #dock {
+            pointer-events:all; height:var(--dock-h);
+            background:rgba(12,18,36,.6); -webkit--webkit-backdrop-filter: blur(32px) saturate(1.7); backdrop-filter: blur(32px) saturate(1.7); -webkit-backdrop-filter: blur(32px) saturate(1.7); backdrop-filter: blur(32px) saturate(1.7);
+            border:1px solid var(--border); border-radius:22px; padding:0 16px;
+            display:flex; align-items:center; gap:4px;
+            box-shadow:0 10px 40px rgba(0,0,0,.6), 0 1px 0 rgba(255,255,255,.08) inset;
+        }
+        .dsep { width:1px; height:38px; background:var(--border); margin:0 6px; }
+        .ditem {
+            display:flex; flex-direction:column; align-items:center; gap:3px;
+            cursor:pointer; padding:5px; border-radius:var(--radius-md); position:relative;
+            transition:transform .18s cubic-bezier(.34,1.56,.64,1);
+        }
+        .ditem:hover { transform:scale(1.38) translateY(-8px); }
+        .ditem:hover .dtt { opacity:1; transform:translateX(-50%) translateY(0); }
+        .diw {
+            width:46px; height:46px; background:var(--surface-solid); border-radius:12px;
+            display:flex; align-items:center; justify-content:center; font-size:1.55rem;
+            border:1px solid rgba(255,255,255,.07); box-shadow:0 4px 14px rgba(0,0,0,.4); pointer-events:none;
+        }
+        .ditem:hover .diw {
+            transform: scale(1.15) translateY(-5px);
+            box-shadow: 0 15px 30px rgba(0,0,0,0.3);
+        }
+        .ddot { width:4px; height:4px; border-radius:50%; background:var(--accent); opacity:0; transition:opacity .2s; }
+        .ddot.on { opacity:1; }
+        .dtt {
+            position:absolute; bottom:calc(100% + 8px); left:50%; transform:translateX(-50%) translateY(4px);
+            background:var(--surface-solid); color:var(--text-100); font-size:.72rem; font-weight:700;
+            padding:4px 10px; border-radius:var(--radius-sm); white-space:nowrap;
+            border:1px solid var(--border); opacity:0; transition:opacity .14s, transform .14s; pointer-events:none;
+        }
+        /* Omni launcher button */
+        .dock-sigma {
+            width:46px; height:46px;
+            background:linear-gradient(135deg,var(--accent),var(--accent2));
+            border:none; border-radius:13px; font-size:1.4rem; font-weight:900; color:#fff;
+            cursor:pointer; box-shadow:0 4px 18px var(--accent-glow);
+            transition:transform .18s cubic-bezier(.34,1.56,.64,1), box-shadow .18s;
+            display:flex; align-items:center; justify-content:center;
+        }
+        .dock-sigma:hover { transform:scale(1.18) translateY(-5px); box-shadow:0 8px 28px var(--accent-glow); }
+        /* App drawer launch */
+        .dock-drawer-btn {
+            width:46px; height:46px; background:var(--surface-2); border:1px solid var(--border);
+            border-radius:13px; font-size:1.3rem; cursor:pointer; color:var(--text-80);
+            display:flex; align-items:center; justify-content:center;
+            transition:transform .18s cubic-bezier(.34,1.56,.64,1), background .15s;
+        }
+        .dock-drawer-btn:hover { transform:scale(1.18) translateY(-5px); background:rgba(255,255,255,.09); }
+
+        /* ── NOTIFICATIONS ────────────────────────────────────────── */
+        #notif-stack { position:absolute; top:38px; right:18px; display:flex; flex-direction:column; gap:10px; z-index:var(--zNotif); pointer-events:none; width:330px; }
+        .toast {
+            background:var(--surface); -webkit--webkit-backdrop-filter: blur(20px); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px); backdrop-filter: blur(20px);
+            border:1px solid var(--border); border-radius:var(--radius-md); padding:14px 16px;
+            box-shadow:0 12px 36px rgba(0,0,0,.55); display:flex; gap:12px; align-items:flex-start;
+            pointer-events:all; animation:tIn .38s cubic-bezier(.16,1,.3,1);
+        }
+        @keyframes tIn { from{opacity:0;transform:translateX(28px)} to{opacity:1;transform:translateX(0)} }
+        .t-icon { font-size:1.35rem; flex-shrink:0; margin-top:1px; }
+        .t-title { font-weight:700; font-size:.88rem; margin-bottom:2px; color:var(--text-100); }
+        .t-body  { font-size:.78rem; color:var(--text-50); line-height:1.4; }
+
+        /* ── CONTEXT MENU ─────────────────────────────────────────── */
+        #ctx {
+            position:fixed; background:rgba(10,14,28,.92); -webkit--webkit-backdrop-filter: blur(18px); backdrop-filter: blur(18px); -webkit-backdrop-filter: blur(18px); backdrop-filter: blur(18px);
+            border:1px solid var(--border); border-radius:var(--radius-md); padding:5px;
+            min-width:210px; z-index:var(--zOmni); display:none; box-shadow:0 18px 48px rgba(0,0,0,.7);
+            animation:ctxFade .13s ease;
+        }
+        @keyframes ctxFade { from{opacity:0;transform:scale(.94)} to{opacity:1;transform:scale(1)} }
+        .ctx-i { padding:8px 14px; border-radius:var(--radius-sm); cursor:pointer; font-size:.86rem; display:flex; align-items:center; gap:10px; color:var(--text-80); transition:background .1s; }
+        .ctx-i:hover { background:var(--accent-soft); color:var(--text-100); }
+        .ctx-sep { height:1px; background:var(--border); margin:4px 0; }
+        .ctx-i.danger { color:var(--danger); }
+        .ctx-i.danger:hover { background:rgba(248,113,113,.1); }
+
+        /* ── OMNI-SEARCH HUD ──────────────────────────────────────── */
+        #omni-overlay {
+            position:fixed; inset:0; background:rgba(0,0,0,.6); -webkit--webkit-backdrop-filter: blur(16px); backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px); backdrop-filter: blur(16px);
+            display:flex; justify-content:center; align-items:flex-start; padding-top:10vh;
+            z-index:var(--zOmni); opacity:0; pointer-events:none; transition:opacity .2s;
+        }
+        #omni-overlay.active { opacity:1; pointer-events:all; }
+        .omni-box {
+            background:var(--surface-solid); width:660px; max-width:92vw;
+            border-radius:var(--radius-xl); border:1px solid var(--border-focus);
+            box-shadow:0 0 80px var(--accent-glow), 0 28px 56px rgba(0,0,0,.7); overflow:hidden;
+            transform:translateY(-18px) scale(.96); transition:transform .28s cubic-bezier(.16,1,.3,1);
+        }
+        #omni-overlay.active .omni-box { transform:translateY(0) scale(1); }
+        .omni-top { display:flex; align-items:center; gap:12px; padding:16px 22px; border-bottom:1px solid var(--border); }
+        .omni-icon { font-size:1.35rem; opacity:.5; }
+        .omni-inp {
+            flex:1; background:transparent; border:none; color:var(--text-100); font-size:1.25rem;
+            font-family:var(--font); font-weight:500; outline:none; -webkit--webkit-user-select: text; user-select: text; -webkit-user-select: text; user-select: text;
+        }
+        .omni-hint { font-size:.72rem; color:var(--text-30); background:rgba(255,255,255,.05); padding:2px 8px; border-radius:4px; font-family:monospace; }
+        .omni-res { max-height:420px; overflow-y:auto; padding:6px; }
+        .omni-sec { font-size:.68rem; font-weight:700; text-transform:uppercase; letter-spacing:.8px; color:var(--text-30); padding:10px 16px 4px; }
+        .omni-r {
+            padding:11px 16px; cursor:pointer; display:flex; align-items:center; gap:14px;
+            border-radius:var(--radius-md); color:var(--text-50); transition:background .1s, color .1s;
+        }
+        .omni-r:hover { background:var(--accent-soft); color:var(--text-100); }
+        .omni-r-ico { font-size:1.35rem; flex-shrink:0; width:34px; text-align:center; }
+        .omni-r-title { font-weight:600; font-size:.93rem; color:var(--text-100); }
+        .omni-r-meta  { font-size:.76rem; color:var(--text-30); margin-top:1px; }
+
+        /* ── APP DRAWER ──────────────────────────────────────────── */
+        #drawer-overlay {
+            position:fixed; inset:0; background:rgba(0,0,0,.65); -webkit--webkit-backdrop-filter: blur(20px); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px); backdrop-filter: blur(20px);
+            z-index:var(--zDrawer); opacity:0; pointer-events:none; transition:opacity .25s;
+            display:flex; flex-direction:column; align-items:center; padding-top:8vh;
+        }
+        #drawer-overlay.active { opacity:1; pointer-events:all; }
+        .drawer-box {
+            width:min(900px,94vw); max-height:80vh; overflow:hidden;
+            display:flex; flex-direction:column;
+            transform:translateY(-20px) scale(.96); transition:transform .3s cubic-bezier(.16,1,.3,1);
+        }
+        #drawer-overlay.active .drawer-box { transform:translateY(0) scale(1); }
+        .drawer-search {
+            display:flex; align-items:center; gap:12px; padding:14px 20px;
+            background:rgba(255,255,255,.05); border-radius:var(--radius-lg); border:1px solid var(--border-focus);
+            margin-bottom:20px;
+        }
+        .drawer-search input {
+            flex:1; background:transparent; border:none; color:var(--text-100); font-size:1.05rem;
+            font-family:var(--font); outline:none; -webkit--webkit-user-select: text; user-select: text; -webkit-user-select: text; user-select: text;
+        }
+        .drawer-grid {
+            display:grid; grid-template-columns:repeat(auto-fill,100px); gap:12px;
+            justify-content:center; overflow-y:auto; padding:4px;
+            max-height:calc(80vh - 100px);
+        }
+        .drawer-grid::-webkit-scrollbar { width:3px; }
+        .drawer-grid::-webkit-scrollbar-thumb { background:var(--border); border-radius:2px; }
+        .draw-app {
+            display:flex; flex-direction:column; align-items:center; gap:8px; padding:14px 8px;
+            border-radius:var(--radius-md); cursor:pointer; border:1px solid transparent;
+            transition:background .15s, border .15s, transform .2s cubic-bezier(.34,1.56,.64,1);
+        }
+        .draw-app:hover { background:rgba(255,255,255,.07); border-color:rgba(255,255,255,.1); transform:translateY(-4px); }
+        .draw-app .dg { font-size:2.2rem; }
+        .draw-app .dl { font-size:.72rem; font-weight:500; color:var(--text-80); text-align:center; line-height:1.3; }
+
+        /* ── NOTIFICATION CENTER ─────────────────────────────────── */
+        #notif-center {
+            position:fixed; top:var(--bar-h); right:0; width:340px; height:calc(100vh - var(--bar-h));
+            background:rgba(8,12,24,.92); -webkit--webkit-backdrop-filter: blur(24px); backdrop-filter: blur(24px); -webkit-backdrop-filter: blur(24px); backdrop-filter: blur(24px);
+            border-left:1px solid var(--border); z-index:calc(var(--zDock) + 1);
+            transform:translateX(100%); transition:transform .28s cubic-bezier(.16,1,.3,1);
+            display:flex; flex-direction:column; overflow:hidden;
+        }
+        #notif-center.open { transform:translateX(0); }
+        .nc-header { padding:20px; border-bottom:1px solid var(--border); display:flex; justify-content:space-between; align-items:center; }
+        .nc-title  { font-weight:700; font-size:1rem; }
+        .nc-body   { flex:1; overflow-y:auto; padding:12px; display:flex; flex-direction:column; gap:8px; }
+        .nc-close  { background:none; border:none; color:var(--text-50); font-size:1.2rem; cursor:pointer; }
+        .nc-close:hover { color:var(--text-100); }
+        .nc-card {
+            background:var(--surface-2); border:1px solid var(--border); border-radius:var(--radius-md); padding:12px;
+        }
+        .nc-card-t { font-weight:600; font-size:.85rem; color:var(--text-100); margin-bottom:4px; }
+        .nc-card-b { font-size:.77rem; color:var(--text-50); line-height:1.4; }
+        .nc-empty  { display:flex; align-items:center; justify-content:center; flex:1; color:var(--text-30); font-size:.85rem; }
+
+        /* ========================================================================= */
+        /*                              BOOT SEQUENCE                                */
+        /* ========================================================================= */
+        #bootScreen {
+            position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
+            background: #000; z-index: 99999;
+            display: flex; flex-direction: column; align-items: center; justify-content: center;
+            transition: opacity 0.8s ease-in-out, visibility 0.8s;
+        }
+        .boot-logo {
+            font-size: 5rem; color: #fff; font-weight: 800; letter-spacing: -2px;
+            animation: bootPulse 2s infinite ease-in-out; margin-bottom: 20px;
+            text-shadow: 0 0 20px rgba(255,255,255,0.2);
+        }
+        @keyframes bootPulse { 0% { opacity:0.6; transform:scale(0.98); } 50% { opacity:1; transform:scale(1.02); } 100% { opacity:0.6; transform:scale(0.98); } }
+        .boot-progress-container { width: 300px; height: 4px; background: rgba(255,255,255,0.1); border-radius: 4px; overflow: hidden; margin-top: 20px; }
+        .boot-progress-bar { width: 0%; height: 100%; background: #fff; transition: width 0.1s; }
+        .boot-logs {
+            margin-top: 40px; width: 600px; height: 120px; font-family: monospace; font-size: 0.85rem;
+            color: #4ade80; text-align: left; overflow: hidden; opacity: 0.7;
+        }
+    
+        .sigma-style-index-1 { font-weight: 700; letter-spacing: 2px; font-size: 0.9rem; color: #a1a1aa; }
+        .sigma-style-index-2 { cursor:pointer;color:var(--text-50); }
+        .sigma-style-index-3 { cursor:pointer; }
+        .sigma-style-index-4 { margin-left:auto;opacity:.4;font-size:.7rem }
+        .sigma-style-index-5 { font-size:1.2rem;opacity:.5 }
+        .sigma-style-index-6 { margin-left:4px }
+        .sigma-style-index-7 { float:right;font-weight:400;color:var(--text-30);font-size:.72rem }
+    </style>
+
+<script>
+// Sovereign OS Inline Style Manager
+document.addEventListener('DOMContentLoaded', () => {
+    const applyTo = (el) => { if(el.getAttribute('data-style')) { el.setAttribute('style', el.getAttribute('data-style')); el.removeAttribute('data-style'); } };
+    new MutationObserver(mutations => mutations.forEach(m => {
+        if(m.type === 'childList') m.addedNodes.forEach(n => { if(n.nodeType === 1) { applyTo(n); n.querySelectorAll('[data-style]').forEach(applyTo); } });
+    })).observe(document.body, {childList: true, subtree: true});
+    document.querySelectorAll('[data-style]').forEach(applyTo);
+});
+</script>
+</head>
+<body>
+
+<!-- BOOT SCREEN -->
+<div id="bootScreen">
+    <div class="boot-logo">Σ</div>
+    <div data- class="sigma-style-index-1">SIGMAOS ZENITH v6.1 SOVEREIGN</div>
+    <div class="boot-progress-container">
+        <div class="boot-progress-bar" id="bootProgressBar"></div>
+    </div>
+    <div class="boot-logs" id="bootLogs"></div>
+</div>
+
+<!-- WALLPAPER ORBS -->
+<div class="orb o1"></div><div class="orb o2"></div><div class="orb o3"></div><div class="orb o4"></div>
+
+<!-- STATUS BAR -->
+<div id="statusbar">
+    <div class="sl">
+        <span class="sb-logo">Σ SIGMAOS</span>
+        <div class="sb-sep"></div>
+        <span class="sb-ver">v6.1 Zenith</span>
+        <span id="sb-active-app">Desktop</span>
+    </div>
+    <div class="sr">
+        <span>CPU: <strong id="sb-cpu">1.4%</strong></span>
+        <span>RAM: <strong id="sb-ram">3.9%</strong></span>
+        <div class="sb-sep"></div>
+        <span class="sb-badge">SOVEREIGN</span>
+        <div class="sb-sep"></div>
+        <span data- onclick="OS.toggleNC()" title="Notification Center" class="sigma-style-index-2">🔔</span>
+        <span class="fw600 sigma-style-index-3" id="sb-clock" data- onclick="OS.toggleNC()">00:00</span>
+    </div>
+</div>
+
+<!-- DESKTOP ICON GRID -->
+<div id="desktop">
+    <div class="di" onclick="OS.launch('⚖️ Legal Core','userland/apps/sigma_bharat_legal_suite.html')"><span class="g">⚖️</span><span class="lbl">Legal Core</span></div>
+    <div class="di" onclick="OS.launch('📋 Procedural LPMS','userland/apps/sigma_bharat_procedural_matrix.html')"><span class="g">📋</span><span class="lbl">Procedural Matrix</span></div>
+    <div class="di" onclick="OS.launch('🛡️ Compliance','userland/apps/sigma_bharat_compliance_assistant.html')"><span class="g">🛡️</span><span class="lbl">Compliance Suite</span></div>
+    <div class="di" onclick="OS.launch('🧠 AI Scraper','userland/apps/sigma_bharat_case_law_ai.html')"><span class="g">🧠</span><span class="lbl">AI Scraper</span></div>
+    <div class="di" onclick="OS.launch('💻 Terminal','userland/apps/sigma_terminal.html')"><span class="g">💻</span><span class="lbl">Terminal</span></div>
+    <div class="di" onclick="OS.launch('📁 Files','userland/apps/sigma_files.html')"><span class="g">📁</span><span class="lbl">File Manager</span></div>
+    <div class="di" onclick="OS.launch('📝 Writer','userland/apps/sigma_writer.html')"><span class="g">📝</span><span class="lbl">Sigma Writer</span></div>
+    <div class="di" onclick="OS.launch('🔢 Calculator','userland/apps/sigma_calc.html')"><span class="g">🔢</span><span class="lbl">Calculator</span></div>
+    <div class="di" onclick="OS.launch('🌐 Browser','userland/apps/sigma_browser.html')"><span class="g">🌐</span><span class="lbl">OmniBrowser</span></div>
+    <div class="di" onclick="OS.launch('🎵 PulsePlayer','userland/apps/sigma_music.html')"><span class="g">🎵</span><span class="lbl">PulsePlayer</span></div>
+    <div class="di" onclick="OS.launch('🖼️ Gallery','userland/apps/sigma_gallery.html')"><span class="g">🖼️</span><span class="lbl">Gallery</span></div>
+    <div class="di" onclick="OS.launch('🕐 Clock','userland/apps/sigma_clock.html')"><span class="g">🕐</span><span class="lbl">Clock</span></div>
+    <div class="di" onclick="OS.launch('📝 Notes','userland/apps/sigma_notes.html')"><span class="g">📝</span><span class="lbl">Notes</span></div>
+    <div class="di" onclick="OS.launch('📊 Monitor','userland/apps/sigma_monitor.html')"><span class="g">📊</span><span class="lbl">System Monitor</span></div>
+    <div class="di" onclick="OS.launch('💰 Tax Calc','userland/apps/sigma_tax_legal_calc.html')"><span class="g">💰</span><span class="lbl">Tax & Legal</span></div>
+    <div class="di" onclick="OS.launch('🎩 Shell Game','userland/apps/sigma_game.html')"><span class="g">🎩</span><span class="lbl">Shell Game</span></div>
+    <div class="di" onclick="OS.launch('🏃 Sigma Jump','userland/apps/sigma_jump.html')"><span class="g">🏃</span><span class="lbl">Sigma Jump</span></div>
+    <div class="di" onclick="OS.launch('📊 Sigma BI','userland/apps/sigma_bi.html')"><span class="g">📊</span><span class="lbl">Sigma BI</span></div>
+    <div class="di" onclick="OS.launch('💻 Sigma IDE','userland/apps/sigma_ide.html')"><span class="g">💻</span><span class="lbl">C++ IDE</span></div>
+    <div class="di" onclick="OS.launch('✏️ Draw','userland/apps/sigma_draw.html')"><span class="g">✏️</span><span class="lbl">Draw.io</span></div>
+    <div class="di" onclick="OS.launch('✂️ NetCut','userland/apps/sigma_netcut.html')"><span class="g">✂️</span><span class="lbl">NetCut</span></div>
+    <div class="di" onclick="OS.launch('🧬 Forensics','userland/apps/sigma_data_lab.html')"><span class="g">🧬</span><span class="lbl">Data Lab</span></div>
+    <div class="di" onclick="OS.launch('📈 Tally','userland/apps/sigma_tally.html')"><span class="g">📈</span><span class="lbl">TallyPrime</span></div>
+    <div class="di" onclick="OS.launch('🖥️ VM Node','userland/apps/sigma_vm.html')"><span class="g">🖥️</span><span class="lbl">VirtualBox</span></div>
+    <div class="di" onclick="OS.launch('⚙️ Settings','userland/apps/sigma_settings.html')"><span class="g">⚙️</span><span class="lbl">Settings</span></div>
+</div>
+
+<!-- NOTIFICATION STACK -->
+<div id="notif-stack"></div>
+
+<!-- NOTIFICATION CENTER -->
+<div id="notif-center">
+    <div class="nc-header">
+        <span class="nc-title">Notification Centre</span>
+        <button class="nc-close" onclick="OS.toggleNC()">✕</button>
+    </div>
+    <div class="nc-body" id="nc-body">
+        <div class="nc-empty">No notifications</div>
+    </div>
+</div>
+
+<!-- TASKBAR (running apps) -->
+<div id="taskbar"></div>
+
+<!-- CONTEXT MENU -->
+<div id="ctx">
+    <div class="ctx-i" onclick="OS.toggleOmni()">🔍&ensp;Omni-Search <span data- class="sigma-style-index-4">Ctrl+Space</span></div>
+    <div class="ctx-i" onclick="OS.toggleDrawer()">⊞&ensp;All Apps</div>
+    <div class="ctx-sep"></div>
+    <div class="ctx-i" onclick="OS.notify('🔄 Kernel','Desktop refreshed.',2500);OS.closeCtx()">🔄&ensp;Refresh Desktop</div>
+    <div class="ctx-i" onclick="OS.cycleWallpaper()">🎨&ensp;Change Wallpaper</div>
+    <div class="ctx-sep"></div>
+    <div class="ctx-i danger" onclick="OS.closeAllWindows()">✕&ensp;Close All Windows</div>
+</div>
+
+<!-- OMNI-SEARCH HUD -->
+<div id="omni-overlay">
+    <div class="omni-box">
+        <div class="omni-top">
+            <span class="omni-icon">🔍</span>
+            <input aria-label="input"  type="text" class="omni-inp" id="omniInp" placeholder="Search apps, laws, calculate…" autocomplete="off" title="input">
+            <span class="omni-hint">ESC</span>
+        </div>
+        <div class="omni-res" id="omniRes"></div>
+    </div>
+</div>
+
+<!-- APP DRAWER -->
+<div id="drawer-overlay">
+    <div class="drawer-box">
+        <div class="drawer-search">
+            <span data- class="sigma-style-index-5">⊞</span>
+            <input aria-label="input"  type="text" id="drawerInp" placeholder="Search all apps…" autocomplete="off" title="input">
+        </div>
+        <div class="drawer-grid" id="drawerGrid"></div>
+    </div>
+</div>
+
+<!-- DOCK -->
+<div id="dock-wrap">
+    <div id="dock">
+        <button class="dock-sigma" title="Omni-Search (Ctrl+Space)" onclick="OS.toggleOmni()">Σ</button>
+        <div class="dsep"></div>
+
+        <div class="ditem" onclick="OS.launch('⚖️ Legal Core','userland/apps/sigma_bharat_legal_suite.html')">
+            <div class="diw">⚖️</div><div class="ddot" id="dd-legal"></div><div class="dtt">Legal Core</div>
+        </div>
+        <div class="ditem" onclick="OS.launch('📋 Procedural LPMS','userland/apps/sigma_bharat_procedural_matrix.html')">
+            <div class="diw">📋</div><div class="ddot" id="dd-proc"></div><div class="dtt">Procedural LPMS</div>
+        </div>
+        <div class="ditem" onclick="OS.launch('🧠 AI Scraper','userland/apps/sigma_bharat_case_law_ai.html')">
+            <div class="diw">🧠</div><div class="ddot" id="dd-ai"></div><div class="dtt">AI Scraper</div>
+        </div>
+        <div class="ditem" onclick="OS.launch('💻 Terminal','userland/apps/sigma_terminal.html')">
+            <div class="diw">💻</div><div class="ddot" id="dd-term"></div><div class="dtt">Terminal</div>
+        </div>
+        <div class="ditem" onclick="OS.launch('📁 Files','userland/apps/sigma_files.html')">
+            <div class="diw">📁</div><div class="ddot" id="dd-files"></div><div class="dtt">File Manager</div>
+        </div>
+        <div class="ditem" onclick="OS.launch('🌐 Browser','userland/apps/sigma_browser.html')">
+            <div class="diw">🌐</div><div class="ddot" id="dd-browser"></div><div class="dtt">OmniBrowser</div>
+        </div>
+
+        <div class="dsep"></div>
+        <div class="ditem" onclick="OS.launch('⚙️ Settings','userland/apps/sigma_settings.html')">
+            <div class="diw">⚙️</div><div class="ddot" id="dd-settings"></div><div class="dtt">Settings</div>
+        </div>
+        <button class="dock-drawer-btn sigma-style-index-6" title="All Apps" onclick="OS.toggleDrawer()" data->⊞</button>
+    </div>
+</div>
+
+<!-- SIGMA WEB KERNEL v6.0 -->
+<script>
+'use strict';
+/**
+ * Σ SIGMA OS — SOVEREIGN WEB KERNEL v6.0 ZENITH
+ * Zero-dependency, pure browser-native OOP architecture.
+ */
+class SigmaWebKernel {
+    constructor() {
+        this.desktop   = document.getElementById('desktop');
+        this.notifStack= document.getElementById('notif-stack');
+        this.ctx       = document.getElementById('ctx');
+        this.omni      = document.getElementById('omni-overlay');
+        this.omniInp   = document.getElementById('omniInp');
+        this.omniRes   = document.getElementById('omniRes');
+        this.drawer    = document.getElementById('drawer-overlay');
+        this.drawerInp = document.getElementById('drawerInp');
+        this.drawerGrid= document.getElementById('drawerGrid');
+        this.taskbar   = document.getElementById('taskbar');
+        this.nc        = document.getElementById('notif-center');
+        this.ncBody    = document.getElementById('nc-body');
+
+        this.wins      = {};     // title → {el, icon}
+        this.zBase     = 100;
+        this.wallpaperIdx = 0;
+
+        this.wallpapers = [
+            ['rgba(99,102,241,.18)','rgba(0,210,255,.14)','rgba(236,72,153,.12)','rgba(124,58,237,.10)'],
+            ['rgba(16,185,129,.16)','rgba(0,210,255,.12)','rgba(245,158,11,.10)','rgba(52,211,153,.08)'],
+            ['rgba(239,68,68,.14)','rgba(251,191,36,.12)','rgba(249,115,22,.10)','rgba(220,38,38,.08)'],
+            ['rgba(139,92,246,.18)','rgba(236,72,153,.14)','rgba(99,102,241,.12)','rgba(168,85,247,.10)'],
+        ];
+
+        this.apps = [
+            { name:'⚖️ Legal Core',        path:'userland/apps/sigma_bharat_legal_suite.html',       icon:'⚖️', tags:['law','tax','epf','gratuity','legal','india'] },
+            { name:'📋 Procedural LPMS',    path:'userland/apps/sigma_bharat_procedural_matrix.html', icon:'📋', tags:['court','procedure','cpc','crpc','bnss','civil'] },
+            { name:'🛡️ Compliance',         path:'userland/apps/sigma_bharat_compliance_assistant.html',icon:'🛡️',tags:['startup','msme','privacy','consumer','corporate'] },
+            { name:'🧠 AI Scraper',          path:'userland/apps/sigma_bharat_case_law_ai.html',       icon:'🧠', tags:['ai','scrape','kanoon','extract','download','search'] },
+            { name:'💻 Terminal',            path:'userland/apps/sigma_terminal.html',                 icon:'💻', tags:['terminal','shell','bash','command','cli'] },
+            { name:'📁 Files',               path:'userland/apps/sigma_files.html',                   icon:'📁', tags:['files','folder','manager','vfs','documents'] },
+            { name:'📝 Writer',              path:'userland/apps/sigma_writer.html',                   icon:'📝', tags:['editor','text','write','notes','document'] },
+            { name:'🔢 Calculator',          path:'userland/apps/sigma_calc.html',                    icon:'🔢', tags:['calculator','math','calc','compute'] },
+            { name:'🌐 Browser',             path:'userland/apps/sigma_browser.html',                  icon:'🌐', tags:['browser','web','internet','surf','chromium'] },
+            { name:'🎵 PulsePlayer',         path:'userland/apps/sigma_music.html',                   icon:'🎵', tags:['music','audio','player','pulse','sound'] },
+            { name:'🖼️ Gallery',             path:'userland/apps/sigma_gallery.html',                 icon:'🖼️', tags:['images','photos','gallery','viewer','pictures'] },
+            { name:'⚙️ Settings',            path:'userland/apps/sigma_settings.html',                icon:'⚙️', tags:['settings','appearance','privacy','display'] },
+            { name:'🕐 Clock',               path:'userland/apps/sigma_clock.html',                  icon:'🕐', tags:['clock','alarm','timer','stopwatch','world'] },
+            { name:'📝 Notes',               path:'userland/apps/sigma_notes.html',                  icon:'📝', tags:['notes','sticky','memo','journal','write'] },
+            { name:'📊 Monitor',             path:'userland/apps/sigma_monitor.html',                icon:'📊', tags:['monitor','cpu','ram','process','network','system'] },
+            { name:'💰 Tax Calc',            path:'userland/apps/sigma_tax_legal_calc.html',         icon:'💰', tags:['tax','gst','itr','tds','income'] },
+            { name:'🎩 Shell Game',          path:'userland/apps/sigma_game.html',                   icon:'🎩', tags:['game','shell','guess','play','fun'] },
+            { name:'🏃 Sigma Jump',          path:'userland/apps/sigma_jump.html',                   icon:'🏃', tags:['game','jump','mario','run','play','fun'] },
+            { name:'📊 Sigma BI',            path:'userland/apps/sigma_bi.html',                     icon:'📊', tags:['bi','tableau','powerbi','data','chart','viz'] },
+            { name:'💻 Sigma IDE',           path:'userland/apps/sigma_ide.html',                    icon:'💻', tags:['code','ide','dev c++','turbo','c++','js'] },
+            { name:'✏️ Draw',               path:'userland/apps/sigma_draw.html',                   icon:'✏️', tags:['draw.io','diagram','whiteboard','paint','sketch'] },
+            { name:'✂️ NetCut',             path:'userland/apps/sigma_netcut.html',                 icon:'✂️', tags:['netcut','network','wifi','mac','ip','router'] },
+            { name:'🧬 Forensics',           path:'userland/apps/sigma_data_lab.html',               icon:'🧬', tags:['autopsy','rapidminer','hex','ml','pipeline','data'] },
+            { name:'📈 Tally',               path:'userland/apps/sigma_tally.html',                  icon:'📈', tags:['tally','accounting','ledger','finance','voucher'] },
+            { name:'🖥️ VM Node',            path:'userland/apps/sigma_vm.html',                     icon:'🖥️', tags:['virtualbox','vm','oracle','linux','guest','hypervisor'] },
+        ];
+
+        this._initTelemetry();
+        this._initContextMenu();
+        this._initOmni();
+        this._initDrawer();
+        this._initGlobalKeys();
+        this._boot();
+    }
+
+    /* ── BOOT ─────────────────────────────────────────────── */
+    _boot() {
+        const msgs = [
+            'Σ SigmaOS Sovereign UEFI Stub loading…',
+            'Initialising SigmaLibC — zero-dependency custom libc… OK',
+            'Mounting Sigma VFS (OPFS-backed) [sigma_vfs]… OK',
+            'Loading Sovereign Scheduler (Round-Robin + Priority)… Active',
+            'Probing Hardware via WebHID/WebSerial… Detected',
+            'Injecting Zero-Trust CSP Security Layer… Enforced',
+            'Initialising Sigma App Registry… 25 Apps Loaded',
+            'Sigma Automation Daemon… Active',
+            'Snap Zone Engine… Ready',
+            'Boot sequence complete. SigmaOS Zenith v6.1 is live.',
+        ];
+        msgs.forEach((m, i) => setTimeout(() => this.logLine(m), i * 240));
+
+        let pb = document.getElementById('bootProgressBar');
+        let bootDiv = document.getElementById('bootScreen');
+        let w = 0;
+        let pInt = setInterval(() => {
+            w += Math.random() * 12 + 3;
+            if(w > 100) w = 100;
+            if(pb) pb.style.width = w + '%';
+            if(w >= 100) {
+                clearInterval(pInt);
+                setTimeout(() => {
+                    bootDiv.style.opacity = '0';
+                    bootDiv.style.visibility = 'hidden';
+                    this.notify('🟢 SigmaOS v6.1 Online', 'Sovereign Desktop is ready. Press Ctrl+Space to search.');
+                }, 400);
+            }
+        }, 180);
+    }
+
+    /* ── TELEMETRY ─────────────────────────────────────────── */
+    _initTelemetry() {
+        const clock = document.getElementById('sb-clock');
+        const cpu   = document.getElementById('sb-cpu');
+        const ram   = document.getElementById('sb-ram');
+        // Use performance.memory when available for realistic RAM
+        let baseCPU = 1.2, baseRAM = 4.1;
+        setInterval(() => {
+            const n = new Date();
+            clock.textContent = n.toLocaleTimeString('en-IN',{hour12:false,hour:'2-digit',minute:'2-digit'});
+            // Simulate realistic CPU load: idle drift
+            baseCPU = Math.max(0.3, Math.min(18, baseCPU + (Math.random()-0.5)*1.2));
+            cpu.textContent = baseCPU.toFixed(1) + '%';
+            if(performance.memory) {
+                const pct = (performance.memory.usedJSHeapSize / performance.memory.jsHeapSizeLimit * 100);
+                ram.textContent = (isNaN(pct)?4.1:pct).toFixed(1) + '%';
+            } else {
+                baseRAM = Math.max(3.5, Math.min(12, baseRAM + (Math.random()-0.5)*0.4));
+                ram.textContent = baseRAM.toFixed(1) + '%';
+            }
+        }, 1000);
+    }
+
+    /* ── WINDOW MANAGER ────────────────────────────────────── */
+    launch(title, url) {
+        if (this.wins[title]) {
+            this._focus(this.wins[title].el);
+            this.wins[title].el.classList.remove('minimized');
+            return;
+        }
+
+        const win = document.createElement('div');
+        win.className = 'win focused';
+        win.id = 'w' + Date.now();
+
+        // Cascade offset
+        const n = Object.keys(this.wins).length;
+        win.style.top  = (60 + n * 28) + 'px';
+        win.style.left = (110 + n * 32) + 'px';
+
+        // Title bar
+        const icon = title.split(' ')[0];
+        const name = title.slice(icon.length + 1) || title;
+
+        const bar = document.createElement('div');
+        bar.className = 'wtbar';
+
+        const ctrls = document.createElement('div');
+        ctrls.className = 'wcontrols';
+        const mk = (cls, fn) => {
+            const b = document.createElement('button');
+            b.className = 'wdot ' + cls; b.onclick = fn; return b;
+        };
+
+        let isMax = false, prevGeo = {};
+        const ttl = document.createElement('div');
+        ttl.className = 'wtitle'; ttl.textContent = 'Σ ' + name;
+
+        ctrls.append(
+            mk('cl', () => this._close(title)),
+            mk('mn', () => this._minimize(title)),
+            mk('mx', () => {
+                if (!isMax) {
+                    const r = win.getBoundingClientRect();
+                    prevGeo = { w: win.style.width, h: win.style.height, t: win.style.top, l: win.style.left };
+                    win.style.cssText += ';width:100vw!important;height:calc(100vh - 30px)!important;top:30px!important;left:0!important;border-radius:0!important';
+                    win.classList.add('maximized'); isMax = true;
+                } else {
+                    win.style.width = prevGeo.w || ''; win.style.height = prevGeo.h || '';
+                    win.style.top   = prevGeo.t || '60px'; win.style.left = prevGeo.l || '110px';
+                    win.style.removeProperty('border-radius'); win.classList.remove('maximized'); isMax = false;
+                }
+            })
+        );
+
+        bar.append(ctrls, ttl);
+
+        // Body / iframe
+        const body = document.createElement('div');
+        body.className = 'wbody';
+        const iframe = document.createElement('iframe');
+        iframe.src = url; iframe.title = name;
+        body.appendChild(iframe);
+
+        // Resize handle
+        const rh = document.createElement('div');
+        rh.className = 'win-resize';
+        this._initResize(win, rh, () => isMax);
+
+        win.append(bar, body, rh);
+        this.desktop.appendChild(win);
+
+        this.wins[title] = { el: win, icon };
+        this._rebuild_taskbar();
+        this._focus(win);
+        this._initDrag(win, bar, () => isMax);
+        document.getElementById('sb-active-app').textContent = name;
+    }
+
+    _focus(win) {
+        document.querySelectorAll('.win').forEach(w => w.classList.remove('focused'));
+        win.style.zIndex = ++this.zBase;
+        win.classList.add('focused');
+        const t = Object.entries(this.wins).find(([,v]) => v.el === win);
+        if (t) document.getElementById('sb-active-app').textContent = t[0].slice(t[0].split(' ')[0].length + 1) || t[0];
+    }
+
+    _close(title) {
+        const rec = this.wins[title]; if (!rec) return;
+        const win = rec.el;
+        win.style.transition = 'opacity .2s, transform .2s';
+        win.style.opacity = '0'; win.style.transform = 'scale(.9) translateY(10px)';
+        setTimeout(() => win.remove(), 220);
+        delete this.wins[title];
+        this._rebuild_taskbar();
+        document.getElementById('sb-active-app').textContent = 'Desktop';
+    }
+
+    _minimize(title) { this.wins[title].el.classList.add('minimized'); this._rebuild_taskbar(); }
+
+    closeAllWindows() { Object.keys(this.wins).forEach(t => this._close(t)); this.closeCtx(); }
+
+    /* Taskbar */
+    _rebuild_taskbar() {
+        this.taskbar.innerHTML = '';
+        Object.entries(this.wins).forEach(([title, rec]) => {
+            const btn = document.createElement('div');
+            btn.className = 'tb-item' + (rec.el.classList.contains('focused') ? ' active' : '');
+            btn.innerHTML = `<span class="tb-icon">${rec.icon}</span><span>${title.slice(title.split(' ')[0].length + 1) || title}</span>`;
+            btn.onclick = () => {
+                if (rec.el.classList.contains('minimized')) { rec.el.classList.remove('minimized'); this._focus(rec.el); }
+                else if (rec.el.classList.contains('focused')) { this._minimize(title); }
+                else { this._focus(rec.el); }
+            };
+            this.taskbar.appendChild(btn);
+        });
+    }
+
+    /* Drag */
+    _initDrag(win, handle, isMxFn) {
+        let drag = false, ox, oy;
+        handle.addEventListener('mousedown', e => {
+            if (e.target.classList.contains('wdot') || isMxFn()) return;
+            drag = true;
+            const r = win.getBoundingClientRect();
+            ox = e.clientX - r.left; oy = e.clientY - r.top;
+            this._focus(win);
+        });
+        document.addEventListener('mousemove', e => {
+            if (!drag) return;
+            win.style.left = (e.clientX - ox) + 'px';
+            win.style.top  = (e.clientY - oy)  + 'px';
+        });
+        document.addEventListener('mouseup', () => drag = false);
+    }
+
+    /* Resize */
+    _initResize(win, handle, isMxFn) {
+        let resizing = false, startX, startY, startW, startH;
+        handle.addEventListener('mousedown', e => {
+            if (isMxFn()) return;
+            resizing = true; e.preventDefault();
+            const r = win.getBoundingClientRect();
+            startX = e.clientX; startY = e.clientY;
+            startW = r.width; startH = r.height;
+        });
+        document.addEventListener('mousemove', e => {
+            if (!resizing) return;
+            win.style.width  = Math.max(400, startW + e.clientX - startX) + 'px';
+            win.style.height = Math.max(300, startH + e.clientY - startY) + 'px';
+        });
+        document.addEventListener('mouseup', () => resizing = false);
+        win.addEventListener('mousedown', () => this._focus(win));
+    }
+
+    /* ── NOTIFICATIONS ─────────────────────────────────────── */
+    notify(title, body, duration = 4500) {
+        const t = document.createElement('div');
+        t.className = 'toast';
+        t.innerHTML = `<div class="t-icon">${title.split(' ')[0]}</div>
+            <div><div class="t-title">${title}</div><div class="t-body">${body}</div></div>`;
+        this.notifStack.appendChild(t);
+        setTimeout(() => { t.style.transition = '.3s'; t.style.opacity = '0'; t.style.transform = 'translateX(24px)'; setTimeout(() => t.remove(), 300); }, duration);
+        this._addNC(title, body);
+    }
+
+    _addNC(title, body) {
+        const empty = this.ncBody.querySelector('.nc-empty');
+        if (empty) empty.remove();
+        const card = document.createElement('div');
+        card.className = 'nc-card';
+        const t = new Date().toLocaleTimeString('en-IN',{hour12:false,hour:'2-digit',minute:'2-digit'});
+        card.innerHTML = `<div class="nc-card-t">${title} <span data- class="sigma-style-index-7">${t}</span></div><div class="nc-card-b">${body}</div>`;
+        this.ncBody.prepend(card);
+    }
+
+    toggleNC() { this.nc.classList.toggle('open'); }
+
+    /* ── CONTEXT MENU ──────────────────────────────────────── */
+    _initContextMenu() {
+        document.getElementById('desktop').addEventListener('contextmenu', e => {
+            e.preventDefault();
+            const x = Math.min(e.clientX, innerWidth - 230);
+            const y = Math.min(e.clientY, innerHeight - 180);
+            this.ctx.style.left = x + 'px'; this.ctx.style.top = y + 'px'; this.ctx.style.display = 'block';
+        });
+        document.addEventListener('click', e => { if (!this.ctx.contains(e.target)) this.closeCtx(); });
+    }
+    closeCtx() { this.ctx.style.display = 'none'; }
+
+    /* Wallpaper cycling */
+    cycleWallpaper() {
+        this.wallpaperIdx = (this.wallpaperIdx + 1) % this.wallpapers.length;
+        const pal = this.wallpapers[this.wallpaperIdx];
+        const orbs = document.querySelectorAll('.orb');
+        pal.forEach((c, i) => { if (orbs[i]) orbs[i].style.background = c; });
+        this.notify('🎨 Wallpaper', 'Palette synced to sovereign scheme ' + (this.wallpaperIdx + 1), 2500);
+        this.closeCtx();
+    }
+
+    /* ── OMNI-SEARCH ────────────────────────────────────────── */
+    _initOmni() {
+        this.omni.addEventListener('click', e => { if (e.target === this.omni) this.closeOmni(); });
+        this.omniInp.addEventListener('input', () => this._omniQuery());
+    }
+
+    toggleOmni() {
+        const open = this.omni.classList.toggle('active');
+        this.closeCtx();
+        if (open) { this.omniInp.value = ''; this._omniDefaults(); setTimeout(() => this.omniInp.focus(), 80); }
+    }
+    closeOmni() { this.omni.classList.remove('active'); }
+
+    _omniDefaults() {
+        this.omniRes.innerHTML = '<div class="omni-sec">Quick Launch</div>';
+        this.apps.forEach(a => this._omniItem(a.icon, a.name.slice(a.name.split(' ')[0].length + 1) || a.name, 'Application', () => { this.launch(a.name, a.path); this.closeOmni(); }));
+    }
+
+    _omniQuery() {
+        const q = this.omniInp.value.trim().toLowerCase();
+        this.omniRes.innerHTML = '';
+        if (!q) { this._omniDefaults(); return; }
+
+        // Calculator
+        try {
+            if (/^[\d+\-*/(). ]+$/.test(q)) {
+                const res = Function('return ' + q)();
+                if (!isNaN(res)) {
+                    this.omniRes.insertAdjacentHTML('beforeend', '<div class="omni-sec">Calculator</div>');
+                    this._omniItem('🧮', '= ' + res, q, () => this.notify('📋 Copied', 'Result = ' + res, 2000));
+                }
+            }
+        } catch(_) {}
+
+        // App search
+        const matched = this.apps.filter(a => a.name.toLowerCase().includes(q) || a.tags.some(t => t.includes(q)));
+        if (matched.length) {
+            this.omniRes.insertAdjacentHTML('beforeend', '<div class="omni-sec">Applications</div>');
+            matched.forEach(a => this._omniItem(a.icon, a.name.slice(a.name.split(' ')[0].length + 1) || a.name, a.tags.join(', '), () => { this.launch(a.name, a.path); this.closeOmni(); }));
+        }
+
+        // Legal ref — extended database
+        const legal = [
+            {q:['138','ni act','cheque','dishonour'], i:'📖', t:'S.138 – NI Act', d:'Dishonour of cheque for insufficient funds — 2 years imprisonment or fine.'},
+            {q:['139','itr','income tax','return'], i:'📖', t:'S.139 – IT Act', d:'Mandatory ITR filing obligation for individuals/companies.'},
+            {q:['44ada','presumptive'], i:'📖', t:'S.44ADA – IT Act', d:'50% expense presumptive scheme for professionals (>50L gross receipts).'},
+            {q:['44ab','audit','tax audit'], i:'📖', t:'S.44AB – IT Act', d:'Tax audit mandatory if turnover > ₹1Cr (business) / ₹50L (profession).'},
+            {q:['80c','deduction','ppf','elss'], i:'📖', t:'S.80C – IT Act', d:'Deductions up to ₹1.5L: PPF, ELSS, LIC, NSC, SCSS, home loan principal.'},
+            {q:['gst','gstin','itc','input tax'], i:'🪙', t:'GST – Input Tax Credit', d:'ITC claimable on tax paid on inputs used for taxable supply (S.16 CGST Act).'},
+            {q:['crpc','bnss','fir','arrest'], i:'⚖️', t:'BNSS 2023 (CRPC)', d:'Bharatiya Nagarik Suraksha Sanhita — 531 sections, replaces CrPC 1973.'},
+            {q:['ipc','bns','murder','theft','fraud'], i:'⚖️', t:'BNS 2023 (IPC)', d:'Bharatiya Nyaya Sanhita — 358 sections, replaces IPC 1860.'},
+            {q:['bsa','evidence','indian evidence'], i:'⚖️', t:'BSA 2023 (Evidence)', d:'Bharatiya Sakshya Adhiniyam — replaces Indian Evidence Act 1872.'},
+            {q:['consumer','cdp','complaint','deficiency'], i:'⚖️', t:'Consumer Protection Act 2019', d:'File complaint within 2 years; District Forum for claims <₹1Cr.'},
+            {q:['trademark','ip','brand','logo'], i:'🏷️', t:'Trade Marks Act 1999', d:'Registration valid 10 years, reneweable; opposition window 4 months.'},
+            {q:['copyright','creative','literary','music'], i:'🎵', t:'Copyright Act 1957', d:'Literary works: life + 60 years. Software is a literary work.'},
+            {q:['companies act','mca','director','board'], i:'🏢', t:'Companies Act 2013', d:'S.2(20): company; S.149: minimum directors; S.166: director duties.'},
+            {q:['startup','dpiit','tax exemption','80iac'], i:'🚀', t:'S.80-IAC – Startup Tax Exemption', d:'3-year tax holiday for eligible startups recognized by DPIIT.'},
+            {q:['gratuity','employee','15 days'], i:'💼', t:'Payment of Gratuity Act 1972', d:'Eligible after 5 years; formula: last salary × 15/26 × years served.'},
+            {q:['msme','udyam','priority sector'], i:'🏭', t:'MSMED Act 2006', d:'MSME: Micro <₹2.5Cr inv, Small <₹25Cr, Medium <₹125Cr turnover.'},
+        ];
+        const lr = legal.filter(r => r.q.some(k => q.includes(k)));
+        if (lr.length) {
+            this.omniRes.insertAdjacentHTML('beforeend', '<div class="omni-sec">Legal Quick Reference</div>');
+            lr.forEach(r => this._omniItem(r.i, r.t, r.d, () => {}));
+        }
+
+        if (!matched.length && !lr.length) {
+            this.omniRes.insertAdjacentHTML('beforeend', '<div class="omni-sec">Extract Case Law</div>');
+            this._omniItem('🔍', `Search: "${q}"`, 'Open AI Scraper', () => { this.launch('🧠 AI Scraper', 'userland/apps/sigma_bharat_case_law_ai.html'); this.closeOmni(); });
+        }
+    }
+
+    _omniItem(icon, title, meta, fn) {
+        const el = document.createElement('div');
+        el.className = 'omni-r';
+        el.innerHTML = `<div class="omni-r-ico">${icon}</div><div><div class="omni-r-title">${title}</div><div class="omni-r-meta">${meta}</div></div>`;
+        el.onclick = fn;
+        this.omniRes.appendChild(el);
+    }
+
+    /* ── APP DRAWER ─────────────────────────────────────────── */
+    _initDrawer() {
+        this.drawer.addEventListener('click', e => { if (e.target === this.drawer) this.closeDrawer(); });
+        this.drawerInp.addEventListener('input', () => this._renderDrawer(this.drawerInp.value.trim().toLowerCase()));
+        this._renderDrawer('');
+    }
+
+    toggleDrawer() {
+        const open = this.drawer.classList.toggle('active');
+        if (open) { this.drawerInp.value = ''; this._renderDrawer(''); setTimeout(() => this.drawerInp.focus(), 80); }
+        this.closeCtx();
+    }
+    closeDrawer() { this.drawer.classList.remove('active'); }
+
+    _renderDrawer(q) {
+        this.drawerGrid.innerHTML = '';
+        const list = q ? this.apps.filter(a => a.name.toLowerCase().includes(q) || a.tags.some(t => t.includes(q))) : this.apps;
+        list.forEach(a => {
+            const el = document.createElement('div');
+            el.className = 'draw-app';
+            const name = a.name.slice(a.name.split(' ')[0].length + 1) || a.name;
+            el.innerHTML = `<span class="dg">${a.icon}</span><span class="dl">${name}</span>`;
+            el.onclick = () => { this.launch(a.name, a.path); this.closeDrawer(); };
+            this.drawerGrid.appendChild(el);
+        });
+    }
+
+    /* ── GLOBAL KEYS ────────────────────────────────────────── */
+    _initGlobalKeys() {
+        document.addEventListener('keydown', e => {
+            if (e.ctrlKey && e.code === 'Space') { e.preventDefault(); this.toggleOmni(); }
+            if (e.key === 'Escape') { this.closeOmni(); this.closeDrawer(); }
+            if (e.ctrlKey && e.key === 'Tab') { e.preventDefault(); this.toggleDrawer(); }
+            // Win+Arrow snap
+            if (e.metaKey || e.key === 'Meta') return;
+            if (e.altKey && e.key === 'ArrowLeft')  { e.preventDefault(); this._snapFocused('left'); }
+            if (e.altKey && e.key === 'ArrowRight') { e.preventDefault(); this._snapFocused('right'); }
+            if (e.altKey && e.key === 'ArrowUp')    { e.preventDefault(); this._snapFocused('max'); }
+            if (e.altKey && e.key === 'ArrowDown')  { e.preventDefault(); this._snapFocused('restore'); }
+            // Ctrl+W close focused window
+            if (e.ctrlKey && e.key === 'w') {
+                const focused = document.querySelector('.win.focused');
+                if (focused) {
+                    const title = Object.entries(this.wins).find(([,v])=>v.el===focused)?.[0];
+                    if (title) this._close(title);
+                }
+            }
+        });
+    }
+
+    /* ── SNAP ZONES ─────────────────────────────────────────── */
+    _snapFocused(zone) {
+        const focused = document.querySelector('.win.focused');
+        if (!focused) return;
+        const dh = window.innerHeight - 30 - 92; // minus bar and dock
+        const dw = window.innerWidth;
+        const dt = 30;
+        switch(zone) {
+            case 'left':
+                focused.style.cssText += `;width:${dw/2}px!important;height:${dh}px!important;top:${dt}px!important;left:0!important;border-radius:0!important`;
+                break;
+            case 'right':
+                focused.style.cssText += `;width:${dw/2}px!important;height:${dh}px!important;top:${dt}px!important;left:${dw/2}px!important;border-radius:0!important`;
+                break;
+            case 'max':
+                focused.style.cssText += `;width:${dw}px!important;height:${dh}px!important;top:${dt}px!important;left:0!important;border-radius:0!important`;
+                break;
+            case 'restore':
+                focused.style.width=''; focused.style.height=''; focused.style.top='60px'; focused.style.left='110px'; focused.style.borderRadius='';
+                break;
+        }
+        this.notify('⊞ Snap', `Window snapped: ${zone}. Alt+↑ to maximise, Alt+↓ to restore.`, 1800);
+    }
+
+    logLine(msg) {
+        let el = document.getElementById('bootLogs');
+        if(!el) return;
+        el.innerHTML += `> ${msg}<br>`;
+        el.scrollTop = el.scrollHeight;
+    }
+
+} // End SigmaWebKernel class
+
+/* Bootstrap */
+const OS = new SigmaWebKernel();
+</script>
+</body>
+</html>

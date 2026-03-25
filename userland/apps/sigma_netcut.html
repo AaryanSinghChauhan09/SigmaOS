@@ -1,0 +1,503 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Sigma NetCut — Sovereign Network Manager</title>
+<style>
+:root{
+  --bg:#05080f;--panel:#0a0f1e;--surface:#111827;--border:rgba(255,255,255,.08);
+  --accent:#00d2ff;--green:#34d399;--red:#f87171;--yellow:#fbbf24;--purple:#c084fc;
+  --text:#e2e8f0;--dim:#64748b;
+}
+*{box-sizing:border-box;margin:0;padding:0;font-family:'Inter',system-ui,sans-serif;}
+body{background:var(--bg);color:var(--text);height:100vh;display:flex;flex-direction:column;overflow:hidden;font-size:13px;}
+.topbar{background:var(--panel);border-bottom:1px solid var(--border);padding:10px 18px;display:flex;align-items:center;gap:14px;flex-shrink:0;}
+.logo{font-weight:800;font-size:1rem;background:linear-gradient(90deg,var(--accent),var(--purple));-webkit-background-clip:text;-webkit-text-fill-color:transparent;}
+.tb-btn{background:rgba(255,255,255,.06);border:1px solid var(--border);border-radius:6px;color:var(--text);padding:5px 12px;cursor:pointer;font-size:.75rem;font-weight:700;transition:background .15s;}
+.tb-btn:hover{background:rgba(0,210,255,.12);border-color:var(--accent);}
+.tb-btn.danger{color:var(--red);border-color:rgba(248,113,113,.3);}
+.tb-btn.danger:hover{background:rgba(248,113,113,.1);}
+.tb-btn.safe{color:var(--green);border-color:rgba(52,211,153,.3);}
+.tb-btn.safe:hover{background:rgba(52,211,153,.1);}
+.spacer{flex:1;}
+.badge{background:rgba(251,191,36,.15);color:var(--yellow);border:1px solid rgba(251,191,36,.3);border-radius:4px;padding:2px 8px;font-size:.7rem;font-weight:700;}
+
+.layout{flex:1;display:flex;overflow:hidden;}
+
+/* SIDEBAR */
+.sidebar{width:220px;background:var(--panel);border-right:1px solid var(--border);display:flex;flex-direction:column;flex-shrink:0;}
+.sb-title{padding:10px 14px;font-size:.68rem;font-weight:700;text-transform:uppercase;letter-spacing:.7px;color:var(--dim);border-bottom:1px solid var(--border);}
+.sb-stat{padding:8px 14px;border-bottom:1px solid var(--border);}
+.sb-stat-label{font-size:.65rem;color:var(--dim);text-transform:uppercase;letter-spacing:.4px;}
+.sb-stat-value{font-size:1.1rem;font-weight:700;color:var(--accent);margin-top:2px;}
+.sb-stat-sub{font-size:.65rem;color:var(--dim);margin-top:1px;}
+.usage-bar{height:4px;background:rgba(255,255,255,.07);border-radius:2px;margin-top:5px;overflow:hidden;}
+.usage-fill{height:100%;border-radius:2px;transition:width .4s;}
+
+/* MAIN */
+.main-area{flex:1;display:flex;flex-direction:column;overflow:hidden;}
+.tab-bar{background:var(--panel);border-bottom:1px solid var(--border);padding:0 14px;display:flex;gap:4px;}
+.tab{padding:8px 14px;font-size:.75rem;color:var(--dim);cursor:pointer;border-bottom:2px solid transparent;}
+.tab.active{color:var(--accent);border-bottom-color:var(--accent);}
+.content{flex:1;overflow-y:auto;padding:16px;}
+.content::-webkit-scrollbar{width:4px;}
+.content::-webkit-scrollbar-thumb{background:#1a2236;border-radius:2px;}
+
+/* DEVICE TABLE */
+.section-title{font-weight:700;font-size:.9rem;margin-bottom:12px;display:flex;align-items:center;gap:8px;}
+.filter-row{display:flex;gap:8px;margin-bottom:12px;align-items:center;}
+.filter-inp{background:rgba(255,255,255,.06);border:1px solid var(--border);border-radius:6px;color:var(--text);padding:5px 10px;font-size:.78rem;width:200px;}
+.filter-inp:focus{outline:none;border-color:var(--accent);}
+
+.dev-table{width:100%;border-collapse:collapse;}
+.dev-table th{background:rgba(0,210,255,.05);border:1px solid var(--border);padding:9px 12px;font-size:.7rem;text-transform:uppercase;letter-spacing:.5px;color:var(--accent);text-align:left;}
+.dev-table td{border:1px solid rgba(255,255,255,.04);padding:9px 12px;font-size:.8rem;color:var(--text);}
+.dev-table tr:hover td{background:rgba(255,255,255,.02);}
+.dev-table tr.me td{background:rgba(52,211,153,.05);}
+.dev-table tr.cut td{opacity:.6;}
+.status-dot{width:9px;height:9px;border-radius:50%;display:inline-block;margin-right:6px;}
+.s-on{background:var(--green);box-shadow:0 0 6px var(--green);}
+.s-off{background:var(--red);}
+.s-warn{background:var(--yellow);animation:blink 1s infinite;}
+@keyframes blink{0%,100%{opacity:1}50%{opacity:.4}}
+.ip-tag{font-family:monospace;color:var(--purple);}
+.mac-tag{font-family:monospace;color:var(--dim);font-size:.72rem;}
+.action-btn{border:1px solid;padding:4px 10px;border-radius:5px;font-size:.72rem;font-weight:700;cursor:pointer;font-family:sans-serif;transition:background .15s;}
+.btn-cut{background:rgba(248,113,113,.1);border-color:rgba(248,113,113,.4);color:var(--red);}
+.btn-cut:hover{background:rgba(248,113,113,.2);}
+.btn-restore{background:rgba(52,211,153,.1);border-color:rgba(52,211,153,.4);color:var(--green);}
+.btn-restore:hover{background:rgba(52,211,153,.2);}
+.protected{font-size:.72rem;color:var(--dim);font-style:italic;}
+
+/* PACKET TABLE */
+.pkt-table{width:100%;border-collapse:collapse;font-family:monospace;font-size:.77rem;}
+.pkt-table th{background:rgba(255,255,255,.04);border:1px solid var(--border);padding:6px 10px;color:var(--dim);font-size:.68rem;text-transform:uppercase;text-align:left;}
+.pkt-table td{border:1px solid rgba(255,255,255,.03);padding:5px 10px;color:var(--text);}
+.pkt-table tr:hover td{background:rgba(255,255,255,.02);}
+.pkt-in{color:var(--green);}
+.pkt-out{color:var(--yellow);}
+.pkt-blocked{color:var(--red);}
+
+/* FIREWALL */
+.rule-row{background:rgba(255,255,255,.03);border:1px solid var(--border);border-radius:8px;padding:10px 14px;margin-bottom:8px;display:flex;align-items:center;gap:12px;}
+.rule-badge{font-size:.68rem;font-weight:700;padding:2px 8px;border-radius:3px;}
+.rule-allow{background:rgba(52,211,153,.15);color:var(--green);}
+.rule-block{background:rgba(248,113,113,.15);color:var(--red);}
+.rule-text{flex:1;font-size:.8rem;}
+.rule-del{background:transparent;border:none;color:var(--dim);cursor:pointer;font-size:.9rem;}
+.rule-del:hover{color:var(--red);}
+
+/* STATUS BAR */
+.statusbar{background:var(--panel);border-top:1px solid var(--border);padding:4px 18px;font-size:.68rem;color:var(--dim);display:flex;gap:18px;flex-shrink:0;}
+.sb-ok{color:var(--green);}
+
+        .sigma-style-sigma_netcut-1 { width:0%;background:var(--green); }
+        .sigma-style-sigma_netcut-2 { width:0%;background:var(--yellow); }
+        .sigma-style-sigma_netcut-3 { font-size:.9rem; }
+        .sigma-style-sigma_netcut-4 { font-size:.9rem; }
+        .sigma-style-sigma_netcut-5 { color:var(--green);font-size:.68rem; }
+        .sigma-style-sigma_netcut-6 { font-size:.7rem;color:var(--purple); }
+        .sigma-style-sigma_netcut-7 { font-size:.75rem;color:var(--dim) }
+        .sigma-style-sigma_netcut-8 { font-size:.75rem;color:var(--dim) }
+        .sigma-style-sigma_netcut-9 { color:var(--purple);font-size:.75rem;min-width:50px; }
+        .sigma-style-sigma_netcut-10 { font-size:.75rem;color:var(--dim) }
+        .sigma-style-sigma_netcut-11 { display:flex;gap:8px;margin-bottom:14px;align-items:center;flex-wrap:wrap; }
+        .sigma-style-sigma_netcut-12 { width:100px; }
+        .sigma-style-sigma_netcut-13 { width:80px; }
+        .sigma-style-sigma_netcut-14 { width:120px; }
+        .sigma-style-sigma_netcut-15 { width:200px; }
+        .sigma-style-sigma_netcut-16 { color:${d.cut?'var(--red)':d.me?'var(--green)':'var(--yellow)'}; }
+        .sigma-style-sigma_netcut-17 { font-size:.75rem;color:var(--dim) }
+    </style>
+
+<script>
+// Sovereign OS Inline Style Manager
+document.addEventListener('DOMContentLoaded', () => {
+    const applyTo = (el) => { if(el.getAttribute('data-style')) { el.setAttribute('style', el.getAttribute('data-style')); el.removeAttribute('data-style'); } };
+    new MutationObserver(mutations => mutations.forEach(m => {
+        if(m.type === 'childList') m.addedNodes.forEach(n => { if(n.nodeType === 1) { applyTo(n); n.querySelectorAll('[data-style]').forEach(applyTo); } });
+    })).observe(document.body, {childList: true, subtree: true});
+    document.querySelectorAll('[data-style]').forEach(applyTo);
+});
+</script>
+</head>
+<body>
+
+<div class="topbar">
+  <span class="logo">✂️ Sigma NetCut</span>
+  <span class="badge">SOVEREIGN NETWORK LAYER</span>
+  <button class="tb-btn" onclick="app.scan()">🔍 Scan Network</button>
+  <button class="tb-btn danger" onclick="app.cutAll()">⛔ Cut All Guests</button>
+  <button class="tb-btn safe" onclick="app.restoreAll()">✅ Restore All</button>
+  <div class="spacer"></div>
+  <button class="tb-btn" onclick="app.exportCSV()">📄 Export</button>
+</div>
+
+<div class="layout">
+  <div class="sidebar">
+    <div class="sb-title">Network Stats</div>
+    <div class="sb-stat">
+      <div class="sb-stat-label">Devices Found</div>
+      <div class="sb-stat-value" id="stat-devices">0</div>
+      <div class="sb-stat-sub">on local subnet</div>
+    </div>
+    <div class="sb-stat">
+      <div class="sb-stat-label">Bandwidth IN</div>
+      <div class="sb-stat-value" id="stat-bw-in">0 KB/s</div>
+      <div class="usage-bar"><div class="usage-fill sigma-style-sigma_netcut-1" id="bar-in" data-></div></div>
+    </div>
+    <div class="sb-stat">
+      <div class="sb-stat-label">Bandwidth OUT</div>
+      <div class="sb-stat-value" id="stat-bw-out">0 KB/s</div>
+      <div class="usage-bar"><div class="usage-fill sigma-style-sigma_netcut-2" id="bar-out" data-></div></div>
+    </div>
+    <div class="sb-stat">
+      <div class="sb-stat-label">Gateway</div>
+      <div class="sb-stat-value sigma-style-sigma_netcut-3" data->192.168.1.1</div>
+      <div class="sb-stat-sub">Router — Protected</div>
+    </div>
+    <div class="sb-stat">
+      <div class="sb-stat-label">My IP</div>
+      <div class="sb-stat-value sigma-style-sigma_netcut-4" data->192.168.1.10</div>
+      <div class="sb-stat-sub">SigmaOS Workstation</div>
+    </div>
+    <div class="sb-stat">
+      <div class="sb-stat-label">Packets Blocked</div>
+      <div class="sb-stat-value sb-ok" id="stat-blocked">0</div>
+    </div>
+    <div class="sb-stat">
+      <div class="sb-stat-label">Firewall Rules</div>
+      <div class="sb-stat-value" id="stat-rules">0</div>
+    </div>
+  </div>
+
+  <div class="main-area">
+    <div class="tab-bar">
+      <div class="tab active" id="tab-devices" onclick="app.showTab('devices')">Devices</div>
+      <div class="tab" id="tab-packets" onclick="app.showTab('packets')">Packet Log</div>
+      <div class="tab" id="tab-firewall" onclick="app.showTab('firewall')">Firewall Rules</div>
+      <div class="tab" id="tab-arp" onclick="app.showTab('arp')">ARP Table</div>
+    </div>
+    <div class="content" id="main-content"></div>
+  </div>
+</div>
+
+<div class="statusbar">
+  <span class="sb-ok" id="sb-status">🟢 Network monitor active</span>
+  <span id="sb-time"></span>
+  <span>Subnet: 192.168.1.0/24</span>
+  <span>Interface: eth0</span>
+  <span>Sigma NetCut v6.1</span>
+</div>
+
+<script>
+'use strict';
+/**
+ * SIGMA NETCUT — Sovereign Network Manager v6.1
+ * OOP: SigmaNetDevice + SigmaPacketLog + SigmaFirewall + SigmaNetCutApp
+ */
+
+class SigmaNetDevice {
+  constructor(hostname, ip, mac, vendor, type, me=false) {
+    this.hostname = hostname;
+    this.ip = ip;
+    this.mac = mac;
+    this.vendor = vendor;
+    this.type = type;
+    this.me = me;
+    this.gateway = ip === '192.168.1.1';
+    this.cut = false;
+    this.firstSeen = new Date().toLocaleTimeString('en-IN');
+    this.lastSeen = this.firstSeen;
+    this.rxBytes = Math.floor(Math.random()*50000)+1000;
+    this.txBytes = Math.floor(Math.random()*20000)+500;
+    this.ttl = 64;
+    this.ports = this._genPorts();
+  }
+  _genPorts() {
+    const all = [[80,'HTTP'],[443,'HTTPS'],[22,'SSH'],[53,'DNS'],[8080,'HTTP-Alt'],[3306,'MySQL'],[5900,'VNC']];
+    return all.filter(()=>Math.random()>0.6).slice(0,3);
+  }
+  get status() { return this.cut ? 'CUT' : 'ONLINE'; }
+  get bwIn() { return (this.rxBytes / 1024).toFixed(1) + ' KB'; }
+  get bwOut() { return (this.txBytes / 1024).toFixed(1) + ' KB'; }
+}
+
+class SigmaPacketLog {
+  constructor() {
+    this.packets = [];
+    this.seq = 0;
+  }
+  add(src, dst, proto, bytes, status='IN') {
+    this.packets.unshift({ id: ++this.seq, ts: new Date().toLocaleTimeString('en-IN'), src, dst, proto, bytes, status });
+    if (this.packets.length > 200) this.packets.pop();
+  }
+  simulate(devices) {
+    const alive = devices.filter(d => !d.cut && !d.me);
+    if (!alive.length) return;
+    const d = alive[Math.floor(Math.random()*alive.length)];
+    const protos = ['TCP','UDP','ICMP','ARP','DNS','HTTP','HTTPS'];
+    const proto = protos[Math.floor(Math.random()*protos.length)];
+    const bytes = Math.floor(Math.random()*1400)+60;
+    const inOut = Math.random()>0.5 ? 'IN' : 'OUT';
+    this.add(inOut==='IN'?d.ip:'192.168.1.10', inOut==='IN'?'192.168.1.10':d.ip, proto, bytes, inOut);
+    d.rxBytes += inOut==='IN'?bytes:0;
+    d.txBytes += inOut==='OUT'?bytes:0;
+  }
+}
+
+class SigmaFirewall {
+  constructor() {
+    this.rules = [
+      { id:1, action:'BLOCK', proto:'TCP', port:'23', desc:'Block Telnet (insecure)', active:true },
+      { id:2, action:'ALLOW', proto:'TCP', port:'443', desc:'Allow HTTPS', active:true },
+      { id:3, action:'ALLOW', proto:'UDP', port:'53', desc:'Allow DNS', active:true },
+      { id:4, action:'BLOCK', proto:'TCP', port:'4444', desc:'Block Metasploit default port', active:true },
+    ];
+    this.ruleSeq = 4;
+    this.blocked = 0;
+  }
+  addRule(action, proto, port, desc) {
+    this.rules.push({ id:++this.ruleSeq, action, proto, port, desc, active:true });
+  }
+  removeRule(id) { this.rules = this.rules.filter(r=>r.id!==id); }
+  check(proto, port) {
+    const r = this.rules.find(r=>r.active&&r.proto===proto&&r.port===String(port));
+    if (r && r.action==='BLOCK') { this.blocked++; return false; }
+    return true;
+  }
+}
+
+class SigmaNetCutApp {
+  constructor() {
+    this.devices = this._initDevices();
+    this.pktLog = new SigmaPacketLog();
+    this.firewall = new SigmaFirewall();
+    this.currentTab = 'devices';
+    this.scanning = false;
+    this._startTimers();
+    this.showTab('devices');
+    this._updateStats();
+  }
+
+  _initDevices() {
+    return [
+      new SigmaNetDevice('sigma-router','192.168.1.1','00:1A:2B:3C:4D:5E','Cisco Systems','Router'),
+      new SigmaNetDevice('sigma-workstation','192.168.1.10','5C:5B:35:F1:AA:BB','SigmaOS','Desktop',true),
+      new SigmaNetDevice('android-9f2a','192.168.1.15','7E:3B:11:00:FF:AE','Samsung','Mobile'),
+      new SigmaNetDevice('smart-tv-lr','192.168.1.22','A1:B2:C3:D4:E5:F6','Sony','SmartTV'),
+      new SigmaNetDevice('laptop-asus','192.168.1.30','C0:D3:91:45:AB:12','Asus','Laptop'),
+      new SigmaNetDevice('unknown-ff','192.168.1.45','FF:EE:DD:CC:BB:AA','Unknown','Unknown'),
+      new SigmaNetDevice('iphone-13','192.168.1.55','9E:AC:D1:3B:77:F2','Apple','Mobile'),
+    ];
+  }
+
+  scan() {
+    if (this.scanning) return;
+    this.scanning = true;
+    document.getElementById('sb-status').innerHTML = '🔍 Scanning network…';
+    let count = 0;
+    const int = setInterval(() => {
+      count++;
+      document.getElementById('sb-status').innerHTML = `🔍 Scanning… ${count * 14}% (${count} hosts found)`;
+      if (count >= 7) {
+        clearInterval(int);
+        this.scanning = false;
+        // maybe add a random new device
+        if (Math.random() > 0.5) {
+          const ip = `192.168.1.${Math.floor(Math.random()*50)+100}`;
+          if (!this.devices.find(d=>d.ip===ip)) {
+            this.devices.push(new SigmaNetDevice('device-'+ip.split('.').pop(), ip, this._randomMAC(), 'Unknown', 'Unknown'));
+          }
+        }
+        document.getElementById('sb-status').innerHTML = `🟢 Scan complete — ${this.devices.length} devices found`;
+        this._updateStats();
+        if (this.currentTab === 'devices') this.showTab('devices');
+      }
+    }, 200);
+  }
+
+  _randomMAC() { return Array.from({length:6},()=>Math.floor(Math.random()*256).toString(16).padStart(2,'0').toUpperCase()).join(':'); }
+
+  cutDevice(ip) {
+    const d = this.devices.find(d=>d.ip===ip);
+    if (!d || d.me || d.gateway) return;
+    d.cut = true;
+    this._setStatus(`⛔ ARP spoofed: ${ip} — connection cut`);
+    this.showTab('devices');
+  }
+
+  restoreDevice(ip) {
+    const d = this.devices.find(d=>d.ip===ip);
+    if (!d) return;
+    d.cut = false;
+    this._setStatus(`✅ Restored: ${ip}`);
+    this.showTab('devices');
+  }
+
+  cutAll() {
+    this.devices.filter(d=>!d.me&&!d.gateway).forEach(d=>d.cut=true);
+    this._setStatus('⛔ All guest devices disconnected');
+    this.showTab('devices');
+  }
+
+  restoreAll() {
+    this.devices.forEach(d=>d.cut=false);
+    this._setStatus('✅ All devices restored');
+    this.showTab('devices');
+  }
+
+  showTab(tab) {
+    this.currentTab = tab;
+    document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));
+    const tabEl = document.getElementById('tab-'+tab);
+    if (tabEl) tabEl.classList.add('active');
+    const content = document.getElementById('main-content');
+    switch(tab) {
+      case 'devices': content.innerHTML = this._renderDevices(); break;
+      case 'packets': content.innerHTML = this._renderPackets(); break;
+      case 'firewall': content.innerHTML = this._renderFirewall(); break;
+      case 'arp': content.innerHTML = this._renderARP(); break;
+    }
+  }
+
+  _renderDevices() {
+    const q = '';
+    const rows = this.devices.filter(d=>!q||d.hostname.includes(q)||d.ip.includes(q)).map(d => {
+      const statusDot = d.cut ? 's-off' : (d.me||d.gateway ? 's-on' : (Math.random()>0.1?'s-on':'s-warn'));
+      const actionBtn = (d.me||d.gateway)
+        ? '<span class="protected">🔒 Protected</span>'
+        : d.cut
+          ? `<button class="action-btn btn-restore" onclick="app.restoreDevice('${d.ip}')">✅ Restore</button>`
+          : `<button class="action-btn btn-cut" onclick="app.cutDevice('${d.ip}')">⛔ Cut</button>`;
+      return `<tr class="${d.me?'me':''}${d.cut?' cut':''}">
+        <td><span class="status-dot ${statusDot}"></span>${d.hostname}${d.me?' <span data- class="sigma-style-sigma_netcut-5">[YOU]</span>':''}</td>
+        <td><span class="ip-tag">${d.ip}</span></td>
+        <td><span class="mac-tag">${d.mac}</span></td>
+        <td>${d.vendor}</td>
+        <td>${d.type}</td>
+        <td>${d.bwIn}</td>
+        <td>${d.bwOut}</td>
+        <td>${d.ttl}</td>
+        <td>${d.ports.map(([p,n])=>`<span data- class="sigma-style-sigma_netcut-6">${p}/${n}</span>`).join(' ') || '—'}</td>
+        <td>${actionBtn}</td>
+      </tr>`;
+    }).join('');
+    return `<div class="section-title">📡 Network Devices <span data- class="sigma-style-sigma_netcut-7">${this.devices.length} total</span></div>
+    <div class="filter-row">
+      <input aria-label="input" class="filter-inp" placeholder="Filter by hostname or IP…" oninput="this.closest('.content').querySelector('tbody').querySelectorAll('tr').forEach(r= title="input">{const t=r.textContent.toLowerCase();r.style.display=t.includes(this.value.toLowerCase())?'':'none'})">
+    </div>
+    <table class="dev-table"><thead><tr>
+      <th>Hostname</th><th>IP</th><th>MAC</th><th>Vendor</th><th>Type</th><th>RX</th><th>TX</th><th>TTL</th><th>Open Ports</th><th>Action</th>
+    </tr></thead><tbody>${rows}</tbody></table>`;
+  }
+
+  _renderPackets() {
+    const rows = this.pktLog.packets.slice(0,50).map(p =>
+      `<tr><td>${p.id}</td><td>${p.ts}</td><td class="${p.status==='IN'?'pkt-in':'pkt-out'}">${p.status}</td>
+       <td><span class="ip-tag">${p.src}</span></td><td><span class="ip-tag">${p.dst}</span></td>
+       <td>${p.proto}</td><td>${p.bytes}B</td></tr>`
+    ).join('');
+    return `<div class="section-title">📦 Packet Log <span data- class="sigma-style-sigma_netcut-8">${this.pktLog.packets.length} packets</span></div>
+    <table class="pkt-table"><thead><tr><th>#</th><th>Time</th><th>Dir</th><th>Source</th><th>Destination</th><th>Proto</th><th>Size</th></tr></thead>
+    <tbody>${rows}</tbody></table>`;
+  }
+
+  _renderFirewall() {
+    const rules = this.firewall.rules.map(r =>
+      `<div class="rule-row">
+        <span class="rule-badge ${r.action==='BLOCK'?'rule-block':'rule-allow'}">${r.action}</span>
+        <span data- class="sigma-style-sigma_netcut-9">${r.proto}:${r.port}</span>
+        <span class="rule-text">${r.desc}</span>
+        <button class="rule-del" onclick="app.removeRule(${r.id})" title="Delete">🗑</button>
+      </div>`
+    ).join('');
+    return `<div class="section-title">🔥 Firewall Rules <span data- class="sigma-style-sigma_netcut-10">${this.firewall.rules.length} rules | ${this.firewall.blocked} blocked</span></div>
+    <div data- class="sigma-style-sigma_netcut-11">
+      <select aria-label="Selection" id="fw-action" class="filter-inp sigma-style-sigma_netcut-12" data- title="input"><option>BLOCK</option><option>ALLOW</option></select>
+      <select aria-label="Selection" id="fw-proto" class="filter-inp sigma-style-sigma_netcut-13" data- title="input"><option>TCP</option><option>UDP</option><option>ICMP</option></select>
+      <input aria-label="input" id="fw-port" class="filter-inp sigma-style-sigma_netcut-14" placeholder="Port (e.g. 22)" data- title="input">
+      <input aria-label="input" id="fw-desc" class="filter-inp sigma-style-sigma_netcut-15" placeholder="Description" data- title="input">
+      <button class="tb-btn safe" onclick="app.addRule()">+ Add Rule</button>
+    </div>
+    ${rules}`;
+  }
+
+  _renderARP() {
+    const rows = this.devices.map(d =>
+      `<tr><td><span class="ip-tag">${d.ip}</span></td><td><span class="mac-tag">${d.mac}</span></td>
+       <td>${d.type==='Router'?'eth0.gw':'eth0'}</td>
+       <td data- class="sigma-style-sigma_netcut-16">${d.cut?'POISONED':d.me?'PERMANENT':'dynamic'}</td>
+       <td>${d.ttl}s</td></tr>`
+    ).join('');
+    return `<div class="section-title">🗂️ ARP Table <span data- class="sigma-style-sigma_netcut-17">${this.devices.length} entries</span></div>
+    <table class="dev-table"><thead><tr><th>IP Address</th><th>MAC Address</th><th>Interface</th><th>Type</th><th>TTL</th></tr></thead>
+    <tbody>${rows}</tbody></table>`;
+  }
+
+  addRule() {
+    const action = document.getElementById('fw-action').value;
+    const proto = document.getElementById('fw-proto').value;
+    const port = document.getElementById('fw-port').value;
+    const desc = document.getElementById('fw-desc').value || `${action} ${proto}:${port}`;
+    if (!port) return;
+    this.firewall.addRule(action, proto, port, desc);
+    this._setStatus(`🔥 Firewall rule added: ${action} ${proto}:${port}`);
+    this.showTab('firewall');
+    this._updateStats();
+  }
+
+  removeRule(id) {
+    this.firewall.removeRule(id);
+    this._setStatus('🗑 Rule removed.');
+    this.showTab('firewall');
+    this._updateStats();
+  }
+
+  exportCSV() {
+    const rows = [['Hostname','IP','MAC','Vendor','Type','Status','RX','TX']];
+    this.devices.forEach(d=>rows.push([d.hostname,d.ip,d.mac,d.vendor,d.type,d.status,d.bwIn,d.bwOut]));
+    const csv = rows.map(r=>r.join(',')).join('\n');
+    const a = document.createElement('a');
+    a.href = URL.createObjectURL(new Blob([csv],{type:'text/csv'}));
+    a.download = 'sigma_netcut_devices.csv'; a.click();
+    this._setStatus('📄 Device list exported as CSV.');
+  }
+
+  _updateStats() {
+    document.getElementById('stat-devices').textContent = this.devices.length;
+    document.getElementById('stat-blocked').textContent = this.firewall.blocked;
+    document.getElementById('stat-rules').textContent = this.firewall.rules.length;
+  }
+
+  _startTimers() {
+    // Live packet simulation
+    setInterval(() => {
+      this.pktLog.simulate(this.devices);
+      if (this.currentTab === 'packets') this.showTab('packets');
+    }, 800);
+
+    // Bandwidth animation
+    setInterval(() => {
+      const inKB = (Math.random()*400+50).toFixed(0);
+      const outKB = (Math.random()*200+20).toFixed(0);
+      document.getElementById('stat-bw-in').textContent = inKB + ' KB/s';
+      document.getElementById('stat-bw-out').textContent = outKB + ' KB/s';
+      document.getElementById('bar-in').style.width = Math.min(inKB/4,100)+'%';
+      document.getElementById('bar-out').style.width = Math.min(outKB/2,100)+'%';
+    }, 1200);
+
+    // Clock
+    setInterval(() => {
+      document.getElementById('sb-time').textContent = new Date().toLocaleTimeString('en-IN');
+    }, 1000);
+  }
+
+  _setStatus(msg) { document.getElementById('sb-status').innerHTML = msg; }
+}
+
+const app = new SigmaNetCutApp();
+</script>
+</body>
+</html>

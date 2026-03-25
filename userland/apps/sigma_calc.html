@@ -1,0 +1,279 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"><meta charset="UTF-8"><title>Sigma Calculator & Plotter</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#070b14;--s1:#0e1424;--s2:#141d30;--border:rgba(255,255,255,.08);--accent:#00d2ff;--as:rgba(0,210,255,.12);--text:#fff;--dim:#64748b;--num-bg:#141d30;--op-bg:#1a2440;--eq-bg:linear-gradient(135deg,#00d2ff,#7c3aed);}
+*{box-sizing:border-box;margin:0;padding:0;}
+body{background:var(--bg);color:var(--text);font-family:'Inter',sans-serif;height:100vh;display:flex;align-items:center;justify-content:center;}
+.calc{width:380px;background:var(--s1);border-radius:22px;border:1px solid var(--border);box-shadow:0 24px 60px rgba(0,0,0,.7);overflow:hidden;display:flex;flex-direction:column;}
+.mode-tabs{display:flex;border-bottom:1px solid var(--border);flex-shrink:0;}
+.tab{flex:1;padding:12px 6px;text-align:center;font-size:.75rem;font-weight:600;cursor:pointer;color:var(--dim);transition:color .15s,background .15s;}
+.tab.active{color:var(--accent);background:var(--as);border-bottom:2px solid var(--accent);}
+.display{background:#050810;padding:24px 20px 16px;text-align:right;}
+.display .hist{font-size:.85rem;color:var(--dim);min-height:22px;margin-bottom:6px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+.display .main{font-size:2.8rem;font-weight:300;letter-spacing:-1px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;min-height:56px;}
+.display .main.small{font-size:1.8rem;}
+.btns{display:grid;grid-template-columns:repeat(4,1fr);gap:1px;background:rgba(0,0,0,.3);}
+button.k{padding:0;height:66px;font-size:1.2rem;cursor:pointer;border:none;font-family:'Inter',sans-serif;font-weight:600;color:var(--text);background:var(--num-bg);transition:background .12s,opacity .12s;}
+button.k:hover{opacity:.8;}
+button.k:active{opacity:.6;}
+button.k.op{background:var(--op-bg);color:var(--accent);}
+button.k.fn{background:#0e192e;color:var(--dim);font-size:.9rem;font-weight:500;}
+button.k.eq{background:var(--eq-bg);color:#fff;font-weight:800;}
+button.k.zero{grid-column:span 2;text-align:left;padding-left:26px;}
+
+.sci-panel{padding:12px;background:var(--s1);border-top:1px solid var(--border);display:none;flex-wrap:wrap;gap:6px;}
+.sci-panel.show{display:flex;}
+.sci-btn{flex:1;min-width:64px;padding:10px 8px;border-radius:7px;font-size:.8rem;font-weight:600;background:var(--op-bg);color:var(--dim);border:none;cursor:pointer;font-family:'Inter',sans-serif;transition:color .14s,background .14s;}
+.sci-btn:hover{color:var(--text);background:#1e2a40;}
+
+/* Panels */
+.panel{display:none;padding:20px;flex:1;flex-direction:column;}
+.panel.active{display:flex;}
+
+/* Input styles */
+.inp{width:100%;padding:10px 12px;background:#0e1424;border:1px solid var(--border);color:var(--text);border-radius:7px;margin-bottom:12px;font-family:'Inter',sans-serif;outline:none;}
+.inp:focus{border-color:var(--accent);}
+
+/* Plotter */
+#plot-canvas{width:100%;height:220px;background:#050810;border-radius:8px;border:1px solid var(--border);margin-bottom:12px;}
+.s-btn{padding:10px;background:var(--eq-bg);color:#fff;border:none;border-radius:7px;font-weight:700;cursor:pointer;}
+
+/* Matrix */
+.mat-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:6px;margin-bottom:16px;}
+.mat-inp{width:100%;padding:10px;text-align:center;background:#050810;border:1px solid var(--border);border-radius:6px;color:var(--accent);font-weight:bold;}
+.res-box{padding:12px;background:#050810;border-radius:8px;font-family:monospace;white-space:pre-wrap;color:var(--text);border:1px solid var(--border);min-height:80px;}
+
+
+        .sigma-style-sigma_calc-1 { padding:0; flex:none; }
+        .sigma-style-sigma_calc-2 { font-size:.8rem;color:var(--dim);margin-bottom:6px }
+        .sigma-style-sigma_calc-3 { font-size:.8rem;color:var(--dim);margin-bottom:12px }
+        .sigma-style-sigma_calc-4 { margin-bottom:12px }
+        .sigma-style-sigma_calc-5 { display:flex;align-items:center;gap:12px;margin-bottom:12px }
+        .sigma-style-sigma_calc-6 { margin:0;flex:1 }
+        .sigma-style-sigma_calc-7 { color:var(--accent);font-size:1.3rem }
+        .sigma-style-sigma_calc-8 { margin:0;flex:1;background:#050810;color:var(--accent) }
+        .sigma-style-sigma_calc-9 { display:flex;gap:12px; }
+        .sigma-style-sigma_calc-10 { color:var(--accent);font-size:1.4rem }
+    </style>
+<script>
+// Sovereign OS Inline Style Manager
+document.addEventListener('DOMContentLoaded', () => {
+    const applyTo = (el) => { if(el.getAttribute('data-style')) { el.setAttribute('style', el.getAttribute('data-style')); el.removeAttribute('data-style'); } };
+    new MutationObserver(mutations => mutations.forEach(m => {
+        if(m.type === 'childList') m.addedNodes.forEach(n => { if(n.nodeType === 1) { applyTo(n); n.querySelectorAll('[data-style]').forEach(applyTo); } });
+    })).observe(document.body, {childList: true, subtree: true});
+    document.querySelectorAll('[data-style]').forEach(applyTo);
+});
+</script>
+</head>
+<body>
+<div class="calc">
+    <div class="mode-tabs">
+        <div class="tab active" onclick="setMode('calc',this)">Calc</div>
+        <div class="tab" onclick="setMode('plot',this)">Plotter</div>
+        <div class="tab" onclick="setMode('mat',this)">Matrix</div>
+        <div class="tab" onclick="setMode('unit',this)">Convert</div>
+    </div>
+    
+    <!-- STANDARD CALCULATOR -->
+    <div class="panel active sigma-style-sigma_calc-1" id="p-calc" data->
+      <div class="display">
+          <div class="hist" id="hist">&nbsp;</div>
+          <div class="main" id="disp">0</div>
+      </div>
+      <div class="sci-panel" id="sci-panel"> <!-- Always show scientific for pro feel -->
+          <button class="sci-btn" onclick="sci('sin')">sin</button>
+          <button class="sci-btn" onclick="sci('cos')">cos</button>
+          <button class="sci-btn" onclick="sci('tan')">tan</button>
+          <button class="sci-btn" onclick="sci('sqrt')">√</button>
+          <button class="sci-btn" onclick="sci('log')">log</button>
+          <button class="sci-btn" onclick="sci('ln')">ln</button>
+          <button class="sci-btn" onclick="sci('pi')">π</button>
+          <button class="sci-btn" onclick="sci('sq')">x²</button>
+          <button class="sci-btn" onclick="sci('fact')">n!</button>
+      </div>
+      <div class="btns">
+          <button class="k fn" onclick="k('AC')">AC</button>
+          <button class="k fn" onclick="k('+/-')">+/−</button>
+          <button class="k fn" onclick="k('%')">%</button>
+          <button class="k op" onclick="k('/')">÷</button>
+          <button class="k" onclick="k('7')">7</button><button class="k" onclick="k('8')">8</button><button class="k" onclick="k('9')">9</button>
+          <button class="k op" onclick="k('*')">×</button>
+          <button class="k" onclick="k('4')">4</button><button class="k" onclick="k('5')">5</button><button class="k" onclick="k('6')">6</button>
+          <button class="k op" onclick="k('-')">−</button>
+          <button class="k" onclick="k('1')">1</button><button class="k" onclick="k('2')">2</button><button class="k" onclick="k('3')">3</button>
+          <button class="k op" onclick="k('+')">+</button>
+          <button class="k zero" onclick="k('0')">0</button>
+          <button class="k" onclick="k('.')">.</button>
+          <button class="k eq" onclick="k('=')">=</button>
+      </div>
+    </div>
+    
+    <!-- EQUATION PLOTTER -->
+    <div class="panel" id="p-plot">
+      <div data- class="sigma-style-sigma_calc-2">f(x) =</div>
+      <input aria-label="input" type="text" id="fn-inp" class="inp" value="Math.sin(x)" placeholder="Format: x*x or Math.sin(x)" title="input">
+      <canvas id="plot-canvas" width="340" height="220"></canvas>
+      <button class="s-btn" onclick="drawPlot()">Render Graph</button>
+    </div>
+    
+    <!-- MATRIX SOLVER -->
+    <div class="panel" id="p-mat">
+      <div data- class="sigma-style-sigma_calc-3">3x3 Matrix Determinant & Solver</div>
+      <div class="mat-grid" id="mat-grid">
+        <!-- 9 inputs -->
+      </div>
+      <button class="s-btn sigma-style-sigma_calc-4" onclick="solveMatrix()" data->Calculate Determinant</button>
+      <div class="res-box" id="mat-res">Result will appear here.</div>
+    </div>
+    
+    <!-- UNIT CONVERTER -->
+    <div class="panel" id="p-unit">
+      <select aria-label="Selection" class="inp" id="utype" onchange="renderUnit()" title="input">
+          <option value="len">Length</option><option value="wt">Weight</option><option value="temp">Temperature</option><option value="area">Area</option>
+      </select>
+      <div data- class="sigma-style-sigma_calc-5">
+          <input aria-label="input" class="inp sigma-style-sigma_calc-6" id="u-from-val" type="number" placeholder="Value" oninput="convertUnit()" data- title="input">
+          <span data- class="sigma-style-sigma_calc-7">→</span>
+          <input aria-label="input" class="inp sigma-style-sigma_calc-8" id="u-to-val" readonly data- title="input">
+      </div>
+      <div data- class="sigma-style-sigma_calc-9">
+          <select aria-label="Selection" class="inp" id="u-from" onchange="convertUnit()" title="input"></select>
+          <select aria-label="Selection" class="inp" id="u-to" onchange="convertUnit()" title="input"></select>
+      </div>
+    </div>
+    
+</div>
+
+<script>
+// CALCULATOR
+let cur='0', expr='', histStr='';
+const disp=document.getElementById('disp'), hist=document.getElementById('hist');
+function upd(){disp.textContent=cur;disp.className='main'+(cur.length>8?' small':'');hist.textContent=histStr||'\u00a0';}
+
+function k(v){
+  if(v==='AC'){cur='0';expr='';histStr='';upd();return;}
+  if(v==='+/-'){cur=cur.startsWith('-')?cur.slice(1):'-'+cur;upd();return;}
+  if(v==='%'){cur=String(parseFloat(cur)/100);upd();return;}
+  if(v==='='){
+    try{
+      const res=eval(expr+cur);
+      histStr=expr+cur+'=';
+      cur=String(+(res).toFixed(10));
+      expr='';upd();
+    }catch{cur='Error';expr='';upd();}
+    return;
+  }
+  if(['+','-','*','/'].includes(v)){
+    expr+=cur+v; histStr=expr; cur='0'; upd(); return;
+  }
+  if(v==='.'){if(!cur.includes('.'))cur+='.';upd();return;}
+  cur=cur==='0'?v:cur+v; upd();
+}
+
+function sci(fn){
+  const n=parseFloat(cur);
+  const fns={
+    sin:()=>Math.sin(n*Math.PI/180),cos:()=>Math.cos(n*Math.PI/180),tan:()=>Math.tan(n*Math.PI/180),
+    sqrt:()=>Math.sqrt(n),log:()=>Math.log10(n),ln:()=>Math.log(n),
+    pi:()=>Math.PI,sq:()=>n*n,
+    fact:()=>{let r=1;for(let i=2;i<=n;i++)r*=i;return r;}
+  };
+  if(fns[fn]){cur=String(+(fns[fn]().toFixed(10)));upd();}
+}
+
+function setMode(m,el){
+  document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));
+  document.querySelectorAll('.panel').forEach(p=>p.classList.remove('active'));
+  el.classList.add('active');
+  document.getElementById('p-'+m).classList.add('active');
+  if(m==='unit')renderUnit();
+  if(m==='plot')drawPlot();
+}
+
+// MATRIX
+const mgrid = document.getElementById('mat-grid');
+for(let i=0;i<9;i++){
+  mgrid.innerHTML += `<input aria-label="input" type="number" class="mat-inp" value="${i===0||i===4||i===8?1:0}" id="m${i}">`;
+}
+function solveMatrix(){
+  const m = [];
+  for(let i=0;i<9;i++) m.push(parseFloat(document.getElementById('m'+i).value)||0);
+  
+  // 3x3 Determinant: a(ei - fh) - b(di - fg) + c(dh - eg)
+  const det = m[0]*(m[4]*m[8] - m[5]*m[7]) - m[1]*(m[3]*m[8] - m[5]*m[6]) + m[2]*(m[3]*m[7] - m[4]*m[6]);
+  document.getElementById('mat-res').innerHTML = `Determinant: <span data- class="sigma-style-sigma_calc-10">${det}</span>\n\nA zero determinant implies the matrix is not invertible.`;
+}
+
+// PLOTTER
+const cvs = document.getElementById('plot-canvas');
+const ctx = cvs.getContext('2d');
+function drawPlot(){
+  ctx.clearRect(0,0,cvs.width,cvs.height);
+  
+  // Axes
+  ctx.strokeStyle = '#1e293b';
+  ctx.lineWidth = 1;
+  ctx.beginPath();
+  ctx.moveTo(0, cvs.height/2); ctx.lineTo(cvs.width, cvs.height/2);
+  ctx.moveTo(cvs.width/2, 0); ctx.lineTo(cvs.width/2, cvs.height);
+  ctx.stroke();
+  
+  const fnStr = document.getElementById('fn-inp').value;
+  ctx.strokeStyle = '#00d2ff';
+  ctx.lineWidth = 2;
+  ctx.beginPath();
+  
+  const scale = 20; // pixels per unit
+  try {
+    const f = new Function('x', `return ${fnStr};`);
+    for(let px=0; px<=cvs.width; px++){
+      const x = (px - cvs.width/2) / scale;
+      const y = f(x);
+      const py = cvs.height/2 - (y * scale);
+      
+      if(px===0) ctx.moveTo(px,py);
+      else ctx.lineTo(px,py);
+    }
+    ctx.stroke();
+  } catch(e) {
+    ctx.fillStyle = '#ef4444';
+    ctx.fillText("Invalid Equation", 10, 20);
+  }
+}
+
+// CONVERTER
+const UNITS={
+  len:{m:1,km:0.001,cm:100,mm:1000,inch:39.3701},
+  wt:{kg:1,g:1000,lb:2.20462,oz:35.274},
+  temp:{C:null},
+  area:{m2:1,km2:1e-6,ft2:10.7639}
+};
+function renderUnit(){
+  const t=document.getElementById('utype').value;
+  let keys=Object.keys(UNITS[t]); if(t==='temp')keys=['C','F','K'];
+  ['u-from','u-to'].forEach((id,i)=>{
+    const s=document.getElementById(id);s.innerHTML='';
+    keys.forEach(k=>{const o=document.createElement('option');o.value=k;o.textContent=k;if(i===1&&k==='km')o.selected=true;s.appendChild(o);});
+  });
+  convertUnit();
+}
+function convertUnit(){
+  const t=document.getElementById('utype').value;
+  const v=parseFloat(document.getElementById('u-from-val').value)||0;
+  const fr=document.getElementById('u-from').value;
+  const to=document.getElementById('u-to').value;
+  let res=0;
+  if(t==='temp'){
+    const toC={C:x=>x,F:x=>(x-32)/1.8,K:x=>x-273.15}; const fromC={C:x=>x,F:x=>x*1.8+32,K:x=>x+273.15};
+    res=fromC[to](toC[fr](v));
+  }else res=v/UNITS[t][fr]*UNITS[t][to];
+  document.getElementById('u-to-val').value=+res.toFixed(6);
+}
+
+document.getElementById('p-calc').classList.add('active'); // force calc mode initially
+document.getElementById('sci-panel').classList.add('show');
+</script>
+</body></html>

@@ -1,0 +1,1218 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Σ SigmaOS Infinity - Sovereign Core</title>
+    <link rel="icon"
+        href='data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAxMDAgMTAwIj48dGV4dCB4PSI1MCIgeT0iNzAiIGZvbnQtc2l6ZT0iNjAiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGZpbGw9IiM1QUM4RkEiPs+DPC90ZXh0Pjwvc3ZnPg=='>
+    <link rel="stylesheet" href="index.css">
+</head>
+
+<body>
+    <!-- Neural Grid Background Shader -->
+    <canvas id="sigma-bg-canvas" class="bg-shader-canvas"></canvas>
+
+    <div class="topbar">
+        <div class="logo topbar-logo" onclick="toggleLauncher()">Σ SIGMA WEB OS <span class="topbar-version">v3.0
+                Infinity Core</span></div>
+        <div class="topbar-right">
+            <div id="security-pulse" class="security-pulse-indicator" title="Neural Shield Active">
+                <div class="security-pulse-dot">
+                </div> Protected
+            </div>
+            <span id="ag-topbar-acct" class="topbar-account-badge" onclick="openWindow('antigrav')"
+                title="Click to manage accounts">● Primary</span>
+            <div class="time" id="clock">00:00 AM</div>
+        </div>
+    </div>
+
+    <!-- Infinity Command Palette (Meta+K / Ctrl+K) -->
+    <div id="infinity-search" class="search-palette-hidden">
+        <div class="search-palette-box">
+            <div class="search-palette-input-wrap">
+                <span class="search-icon">🔍</span>
+                <input type="text" id="infinity-search-input" placeholder="Execute command or search everything..."
+                    autocomplete="off" title="Infinity Search" aria-label="Universal Command Palette">
+                <span class="search-hint">ESC to close</span>
+            </div>
+            <div id="infinity-search-results" class="search-palette-results">
+                <!-- Dynamically populated -->
+            </div>
+        </div>
+    </div>
+
+    <!-- Launcher / Start Menu Overlay -->
+    <div class="launcher-overlay" id="launcher">
+        <div class="search-inner">
+            <span class="font-20">🔍</span>
+            <input type="text" id="launcher-search" placeholder="Search apps, files, or nodes..."
+                onkeyup="filterLauncher()">
+        </div>
+        <div class="launcher-grid" id="launcher-grid">
+            <!-- Dynamically populated -->
+        </div>
+        <div class="launcher-user">
+            <div class="launcher-user-info">
+                <div class="launcher-avatar">S</div>
+                <div class="font-13">Sigma Sovereign <br><span class="font-11 text-dim">Local
+                        Administrator</span></div>
+            </div>
+            <div class="flex gap-10">
+                <button onclick="logout()" class="launcher-logout" title="Sign Out">⏻</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="desktop" id="desktop">
+    </div>
+
+    <!-- Stage Manager (macOS inspired) -->
+    <div class="stage-manager" id="stage-manager"></div>
+
+    <!-- Taskbar -->
+    <div class="taskbar" id="taskbar"></div>
+
+    <!-- Windows Container -->
+    <div id="windows">
+
+        <!-- Dashboard Window -->
+        <div class="window win-dashboard" id="win-dashboard">
+            <div class="title-bar" onmousedown="startDrag(event, 'win-dashboard')">
+                <div class="title">📊 System Command Center</div>
+                <div class="controls">
+                    <div class="control-btn min"></div>
+                    <div class="control-btn max" onclick="toggleMaximize('dashboard')"></div>
+                    <div class="control-btn close" onclick="closeWindow('dashboard')"></div>
+                </div>
+            </div>
+            <div class="content p-0 flex flex-col">
+                <div class="ag-tabs p-0-15 mt-10">
+                    <div class="ag-tab active" id="tab-dash-sys" onclick="switchDashTab('sys')">📈 System</div>
+                    <div class="ag-tab" id="tab-dash-ps" onclick="switchDashTab('ps')">⚙️ Processes</div>
+                </div>
+                <div id="dash-sys-content" class="p-15 flex-1 overflow-y-auto">
+                    <div class="dashboard-card">
+                        <div class="sys-stat"><span>CPU Workload</span> <span id="dash-cpu" class="text-accent">—</span>
+                        </div>
+                        <div class="bar-bg">
+                            <div class="bar-fill" id="dash-cpu-bar"></div>
+                        </div>
+                    </div>
+                    <div class="dashboard-card">
+                        <div class="sys-stat"><span>RAM Allocation</span> <span id="dash-ram" class="text-red">—</span>
+                        </div>
+                        <div class="bar-bg">
+                            <div class="bar-fill bg-red" id="dash-ram-bar"></div>
+                        </div>
+                    </div>
+                    <div class="dashboard-card">
+                        <div class="sys-stat"><span>Net Bandwidth</span> <span id="dash-net"
+                                class="text-yellow">—</span></div>
+                        <div class="bar-bg">
+                            <div class="bar-fill bg-yellow" id="dash-net-bar"></div>
+                        </div>
+                    </div>
+                    <div class="dashboard-card">
+                        <div class="sys-stat"><span>Mesh Network Status</span> <span class="text-green">SECURE</span>
+                        </div>
+                        <div class="font-12 text-dim mt-5">P2P Nodes Active:
+                            1,024<br>Zero-Trust Routing: ENFORCED</div>
+                    </div>
+                </div>
+                <div id="dash-ps-content" class="p-15 flex-1 display-none overflow-y-auto">
+                    <table class="width-100 font-12 border-collapse">
+                        <thead>
+                            <tr class="text-left border-bottom text-dim">
+                                <th class="p-5">PID</th>
+                                <th class="p-5">NAME</th>
+                                <th class="p-5">CPU %</th>
+                                <th class="p-5">MEM %</th>
+                                <th class="p-5">ACTION</th>
+                            </tr>
+                        </thead>
+                        <tbody id="dash-ps-table">
+                            <!-- Populated by JS -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- Terminal Window -->
+        <div class="window win-terminal" id="win-terminal">
+            <div class="title-bar" onmousedown="startDrag(event, 'win-terminal')">
+                <div class="title">💻 TensorShell v2.0</div>
+                <div class="controls">
+                    <div class="control-btn min"></div>
+                    <div class="control-btn max" onclick="toggleMaximize('terminal')"></div>
+                    <div class="control-btn close" onclick="closeWindow('terminal')"></div>
+                </div>
+            </div>
+            <div class="content terminal bg-term" id="termCont" onclick="focusLastInput()">
+                SigmaOS Kernel Activated. Sovereign Runtime [Stable].<br>
+                Type 'help' for commands.<br><br>
+                <div><span class="prompt">sigma@sovereign:~$</span> <input type="text" id="cli" class="user-input"
+                        onkeydown="handleCli(event)" autocomplete="off" title="Terminal CLI Input"
+                        placeholder="Type a command..."></div>
+            </div>
+        </div>
+
+        <!-- Store Window -->
+        <div class="window win-store" id="win-store">
+            <div class="title-bar" onmousedown="startDrag(event, 'win-store')">
+                <div class="title">📦 Sovereign Forge Store</div>
+                <div class="controls">
+                    <div class="control-btn min"></div>
+                    <div class="control-btn max" onclick="toggleMaximize('store')"></div>
+                    <div class="control-btn close" onclick="closeWindow('store')"></div>
+                </div>
+            </div>
+            <div class="content">
+                <div class="p-20 br-8 mb-20 bg-accent-alpha-10">
+                    <h2 class="text-accent">Antigravity Enterprise Suite</h2>
+                    <p class="text-dim font-13 mt-5">IP-Safe, Telemetry-Free, Pure Logic
+                        Apps.</p>
+                </div>
+                <div class="grid-2">
+                    <div class="dashboard-card m-0">
+                        <h3 class="mb-5">🧹 Text Cleaner</h3>
+                        <p class="text-dim font-12 mb-10">Remove unwanted characters,
+                            unformat text, manage line breaks. A fully local alternative to textcleaner.net</p>
+                        <button onclick="openWindow('text_cleaner')" class="ag-btn ag-btn-primary br-4">Launch
+                            App</button>
+                    </div>
+                    <div class="dashboard-card m-0">
+                        <h3 class="mb-5">🤖 Aether Orchestrator</h3>
+                        <p class="text-dim font-12 mb-10">Cross-model AI intention
+                            coordination. Distribute workloads instantly.</p>
+                        <button id="btn-install-aether" onclick="installApp('aether', '🤖', 'Aether')"
+                            class="ag-btn ag-btn-primary br-4">Install</button>
+                    </div>
+                    <div class="dashboard-card m-0">
+                        <h3 class="mb-5">🚀 Antigravity Command Center</h3>
+                        <p class="text-dim font-12 mb-10">Unified Cockpit + Quota
+                            Monitor. Instant account switching synced with IDE.</p>
+                        <button onclick="openWindow('antigrav')" class="ag-btn ag-btn-primary br-4">🚀
+                            Launch</button>
+                    </div>
+                    <div class="dashboard-card m-0">
+                        <h3 class="mb-5">🎮 Sovereign Snake</h3>
+                        <p class="text-dim font-12 mb-10">A high-performance neural
+                            implementation of the classic game. Zero-latency.</p>
+                        <button id="btn-install-snake" onclick="installApp('snake', '🎮', 'Sovereign Snake')"
+                            class="ag-btn ag-btn-primary br-4">Install</button>
+                    </div>
+                    <div class="dashboard-card m-0">
+                        <h3 class="mb-5">🛡️ Security Audit</h3>
+                        <p class="text-dim font-12 mb-10">Deep bit-level scan of your
+                            VFS. Identifies hidden steganographic shims.</p>
+                        <button id="btn-install-audit" onclick="installApp('audit', '🛡️', 'Security Audit')"
+                            class="ag-btn ag-btn-primary br-4">Install</button>
+                    </div>
+                    <!-- New Apps -->
+                    <div class="dashboard-card m-0">
+                        <h3 class="mb-5">💣 Sovereign Sweep</h3>
+                        <p class="text-dim font-12 mb-10">Find the telemetry shims
+                            hidden in the grid. A high-stakes logic puzzle.</p>
+                        <button id="btn-install-sweep" onclick="installApp('sweep', '💣', 'Sovereign Sweep')"
+                            class="ag-btn ag-btn-primary br-4">Install</button>
+                    </div>
+                    <div class="dashboard-card m-0">
+                        <h3 class="mb-5">📄 PDF Forge</h3>
+                        <p class="text-dim font-12 mb-10">Forensic PDF editing &
+                            sanitization. Adobe/Bluebeam competitor.</p>
+                        <button id="btn-install-pdf" onclick="installApp('pdf', '📄', 'PDF Forge')"
+                            class="ag-btn ag-btn-primary br-4">Install</button>
+                    </div>
+                    <div class="dashboard-card m-0">
+                        <h3 class="mb-5">📝 Sovereign Notes</h3>
+                        <p class="text-dim font-12 mb-10">Markdown note-taking with
+                            P2P mesh sync. Privacy first Notion alternative.</p>
+                        <button id="btn-install-notes" onclick="installApp('notes', '📝', 'Sovereign Notes')"
+                            class="ag-btn ag-btn-primary br-4">Install</button>
+                    </div>
+                    <div class="dashboard-card m-0">
+                        <h3 class="mb-5">🎨 Neural Paint</h3>
+                        <p class="text-dim font-12 mb-10">Accelerated canvas drawing.
+                            Create art without trackers.</p>
+                        <button id="btn-install-paint" onclick="installApp('paint', '🎨', 'Neural Paint')"
+                            class="ag-btn ag-btn-primary br-44">Install</button>
+                    </div>
+                    <div class="dashboard-card m-0">
+                        <h3 class="mb-5">💻 Code Lab</h3>
+                        <p class="text-dim font-12 mb-10">Integrated IDE with syntax
+                            highlighting and VFS explorer.</p>
+                        <button id="btn-install-code" onclick="installApp('code', '💻', 'Code Lab')"
+                            class="ag-btn ag-btn-primary br-4">Install</button>
+                    </div>
+                    <div class="dashboard-card m-0">
+                        <h3 class="mb-5">🏓 Sovereign Pong</h3>
+                        <p class="text-dim font-12 mb-10">Neural AI vs Player.
+                            Zero-latency performance architecture.</p>
+                        <button id="btn-install-pong" onclick="installApp('pong', '🏓', 'Sovereign Pong')"
+                            class="ag-btn ag-btn-primary br-4">Install</button>
+                    </div>
+                    <div class="dashboard-card m-0">
+                        <h3 class="mb-5">♟️ Sovereign Chess</h3>
+                        <p class="text-dim font-12 mb-10">Strategic engine
+                            integration.
+                            Grandmaster-level training mode.</p>
+                        <button id="btn-install-chess" onclick="installApp('chess', '♟️', 'Sovereign Chess')"
+                            class="ag-btn ag-btn-primary br-4">Install</button>
+                    </div>
+                    <div class="dashboard-card m-0">
+                        <h3 class="mb-5">🧮 Sovereign Calc</h3>
+                        <p class="text-dim font-12 mb-10">Advanced mathematical engine
+                            with completely local execution. Absolute privacy.</p>
+                        <button id="btn-install-calc" onclick="installApp('calc', '🧮', 'Sovereign Calc')"
+                            class="ag-btn ag-btn-primary br-4">Install</button>
+                    </div>
+                    <div class="dashboard-card m-0">
+                        <h3 class="mb-5">🎹 Sovereign Synth</h3>
+                        <p class="text-dim font-12 mb-10">Browser-native AudioContext
+                            Synthesizer. Real-time parameter tweaking.</p>
+                        <button id="btn-install-synth" onclick="installApp('synth', '🎹', 'Sovereign Synth')"
+                            class="ag-btn ag-btn-primary br-4">Install</button>
+                    </div>
+                    <div class="dashboard-card m-0">
+                        <h3 class="mb-5">🔐 Sovereign Vault</h3>
+                        <p class="text-dim font-12 mb-10">Military-grade local
+                            password generator and secret store. No cloud sync.</p>
+                        <button id="btn-install-vault" onclick="installApp('vault', '🔐', 'Sovereign Vault')"
+                            class="ag-btn ag-btn-primary br-4">Install</button>
+                    </div>
+                    <div class="dashboard-card m-0">
+                        <h3 class="mb-5">⌨️ Sovereign Type</h3>
+                        <p class="text-dim font-12 mb-10">Hacker typing test. Measure
+                            your neural latency and muscle memory.</p>
+                        <button id="btn-install-type" onclick="installApp('type', '⌨️', 'Sovereign Type')"
+                            class="ag-btn ag-btn-primary br-4">Install</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Sovereign Calc Window -->
+        <div class="window win-calc display-none" id="win-calc">
+            <div class="title-bar" onmousedown="startDrag(event, 'win-calc')">
+                <div class="title">🧮 Sovereign Calc</div>
+                <div class="controls">
+                    <div class="control-btn min"></div>
+                    <div class="control-btn max" onclick="toggleMaximize('calc')"></div>
+                    <div class="control-btn close" onclick="closeWindow('calc')"></div>
+                </div>
+            </div>
+            <div class="content flex flex-col p-10 bg-black">
+                <input type="text" id="calc-display"
+                    class="bg-surface text-white p-10 mb-10 text-right font-24 border-333 br-8" readonly value="0"
+                    title="Calculator Display" aria-label="Calculator Result Display">
+                <div class="grid-4 flex-1 gap-8">
+                    <button class="ag-btn ag-btn-secondary" onclick="calcInput('C')">C</button>
+                    <button class="ag-btn ag-btn-secondary" onclick="calcInput('(')">(</button>
+                    <button class="ag-btn ag-btn-secondary" onclick="calcInput(')')">)</button>
+                    <button class="ag-btn ag-btn-secondary" onclick="calcInput('/')">/</button>
+
+                    <button class="ag-btn ag-btn-primary" onclick="calcInput('7')">7</button>
+                    <button class="ag-btn ag-btn-primary" onclick="calcInput('8')">8</button>
+                    <button class="ag-btn ag-btn-primary" onclick="calcInput('9')">9</button>
+                    <button class="ag-btn ag-btn-secondary" onclick="calcInput('*')">*</button>
+
+                    <button class="ag-btn ag-btn-primary" onclick="calcInput('4')">4</button>
+                    <button class="ag-btn ag-btn-primary" onclick="calcInput('5')">5</button>
+                    <button class="ag-btn ag-btn-primary" onclick="calcInput('6')">6</button>
+                    <button class="ag-btn ag-btn-secondary" onclick="calcInput('-')">-</button>
+
+                    <button class="ag-btn ag-btn-primary" onclick="calcInput('1')">1</button>
+                    <button class="ag-btn ag-btn-primary" onclick="calcInput('2')">2</button>
+                    <button class="ag-btn ag-btn-primary" onclick="calcInput('3')">3</button>
+                    <button class="ag-btn ag-btn-secondary" onclick="calcInput('+')">+</button>
+
+                    <button class="ag-btn ag-btn-primary span-2" onclick="calcInput('0')">0</button>
+                    <button class="ag-btn ag-btn-primary" onclick="calcInput('.')">.</button>
+                    <button class="ag-btn ag-btn-secondary bg-accent text-black" onclick="calcInput('=')">=</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Sovereign Synth Window -->
+        <div class="window win-synth display-none" id="win-synth">
+            <div class="title-bar" onmousedown="startDrag(event, 'win-synth')">
+                <div class="title">🎹 Sovereign Synth</div>
+                <div class="controls">
+                    <div class="control-btn min"></div>
+                    <div class="control-btn max" onclick="toggleMaximize('synth')"></div>
+                    <div class="control-btn close" onclick="closeWindow('synth')"></div>
+                </div>
+            </div>
+            <div class="content flex flex-col p-15">
+                <p class="text-dim font-12 mb-15">Native WebAudio API Synthesizer</p>
+                <div class="flex-1 flex flex-col gap-15">
+                    <div>
+                        <label class="text-accent font-13 display-flex mb-5">Frequency:
+                            <span id="synth-freq-val">440</span> Hz</label>
+                        <input type="range" id="synth-freq" min="50" max="2000" value="440" class="width-100"
+                            oninput="document.getElementById('synth-freq-val').textContent = this.value; updateSynth();"
+                            title="Frequency Control" aria-label="Adjust Synth Frequency">
+                    </div>
+                    <div>
+                        <label class="text-accent font-13 display-flex mb-5">Waveform:</label>
+                        <select id="synth-type" class="width-100 p-8 bg-black border-333 text-white"
+                            onchange="updateSynth()" title="Waveform Type" aria-label="Select Synth Waveform">
+                            <option value="sine">Sine</option>
+                            <option value="square">Square</option>
+                            <option value="sawtooth">Sawtooth</option>
+                            <option value="triangle">Triangle</option>
+                        </select>
+                    </div>
+                    <div class="flex justify-center align-center flex-1">
+                        <button id="synth-btn" class="ag-btn ag-btn-primary p-20 br-30 font-18 synth-trigger"
+                            onmousedown="playSynth()" onmouseup="stopSynth()" onmouseleave="stopSynth()">PLAY
+                            TONE</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Sovereign Vault Window -->
+        <div class="window win-vault display-none" id="win-vault">
+            <div class="title-bar" onmousedown="startDrag(event, 'win-vault')">
+                <div class="title">🔐 Sovereign Vault (Offline)</div>
+                <div class="controls">
+                    <div class="control-btn min"></div>
+                    <div class="control-btn max" onclick="toggleMaximize('vault')"></div>
+                    <div class="control-btn close" onclick="closeWindow('vault')"></div>
+                </div>
+            </div>
+            <div class="content flex flex-col p-15">
+                <p class="text-dim font-12 mb-15">Zero-Knowledge Password Generator</p>
+
+                <div class="dashboard-card pt-10 pb-10 mb-10">
+                    <h3 class="text-white mb-8">Generated Secret:</h3>
+                    <div class="flex justify-between align-center">
+                        <input type="text" id="vault-pwd"
+                            class="width-100 bg-surface text-accent p-10 font-mono border-333 br-8" readonly
+                            value="Click 'Generate'" title="Generated Secret"
+                            aria-label="Generated Cryptographic Key Display">
+                        <button class="ag-btn ag-btn-secondary ml-10" onclick="copyVaultPwd()">📋
+                            Copy</button>
+                    </div>
+                </div>
+
+                <div class="grid-2 mb-15">
+                    <label class="flex align-center gap-8 font-13"><input type="checkbox" id="v_ul" checked>
+                        Uppercase/Lowercase</label>
+                    <label class="flex align-center gap-8 font-13"><input type="checkbox" id="v_num" checked>
+                        Numbers</label>
+                    <label class="flex align-center gap-8 font-13"><input type="checkbox" id="v_sym" checked>
+                        Symbols</label>
+                    <label class="flex align-center gap-8 font-13">
+                        Length: <input type="number" id="v_len" value="24" min="8" max="128"
+                            class="width-50 bg-black text-white border-333 p-2">
+                    </label>
+                </div>
+
+                <div class="flex gap-10 flex-1 align-end">
+                    <button class="ag-btn ag-btn-primary flex-1 p-12 font-15" onclick="generateVaultPwd()">🛡️ Generate
+                        Cryptographic Key</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Sovereign Type Window -->
+        <div class="window win-type display-none" id="win-type">
+            <div class="title-bar" onmousedown="startDrag(event, 'win-type')">
+                <div class="title">⌨️ Sovereign Type</div>
+                <div class="controls">
+                    <div class="control-btn min"></div>
+                    <div class="control-btn max" onclick="toggleMaximize('type')"></div>
+                    <div class="control-btn close" onclick="closeWindow('type')"></div>
+                </div>
+            </div>
+            <div class="content flex flex-col p-20 bg-black">
+                <div class="flex justify-between mb-15 border-bottom pb-10">
+                    <div class="text-dim font-mono">WPM: <span id="type-wpm" class="text-white font-bold">0</span></div>
+                    <div class="text-dim font-mono">Accuracy: <span id="type-acc"
+                            class="text-green font-bold">100%</span></div>
+                    <div class="text-dim font-mono">Time: <span id="type-time" class="text-accent">30s</span></div>
+                </div>
+
+                <div id="type-text"
+                    class="flex-1 overflow-y-auto bg-black p-15 font-mono line-height-1-6 user-select-none">
+                    <!-- Populated by JS -->
+                </div>
+
+                <input type="text" id="type-input"
+                    class="width-100 bg-surface text-white p-12 font-mono border-accent br-8 outline-none"
+                    placeholder="Start typing to begin..." autocomplete="off" autocorrect="off" spellcheck="false"
+                    oninput="handleTypeInput()">
+
+                <button class="ag-btn ag-btn-secondary mt-10 align-self-center" onclick="resetTypeMatch()">Reset
+                    Matrix</button>
+            </div>
+        </div>
+
+        <!-- Text Cleaner App Window -->
+        <div class="window win-cleaner" id="win-text_cleaner">
+            <div class="title-bar" onmousedown="startDrag(event, 'win-text_cleaner')">
+                <div class="title">🧹 Text Cleaner & Formatter</div>
+                <div class="controls">
+                    <div class="control-btn min"></div>
+                    <div class="control-btn max" onclick="toggleMaximize('text_cleaner')"></div>
+                    <div class="control-btn close" onclick="closeWindow('text_cleaner')"></div>
+                </div>
+            </div>
+            <div class="content flex gap-15 p-0">
+                <div class="flex-1 bg-surface border-right p-15 overflow-y-auto font-13">
+                    <h3 class="text-accent mb-15">Options</h3>
+                    <div class="mb-15">
+                        <b class="text-ccc">Whitespace & Lines</b>
+                        <label class="display-flex mt-5"><input type="checkbox" id="tc_trim" checked> Trim
+                            spaces</label>
+                        <label class="display-flex"><input type="checkbox" id="tc_breaks"> Remove all line
+                            breaks</label>
+                        <label class="display-flex"><input type="checkbox" id="tc_breaks_para"> Remove single line
+                            breaks (Keep Paras)</label>
+                        <label class="display-flex"><input type="checkbox" id="tc_blank" checked> Remove blank
+                            lines</label>
+                        <label class="display-flex"><input type="checkbox" id="tc_s_space" checked> Multiple spaces to
+                            single</label>
+                    </div>
+                    <div class="mb-15">
+                        <b class="text-ccc">Characters</b>
+                        <label class="display-flex mt-5"><input type="checkbox" id="tc_punc"> Remove
+                            punctuation</label>
+                        <label class="display-flex"><input type="checkbox" id="tc_nonalnum"> Remove
+                            non-alphanumeric</label>
+                        <div class="mt-5">
+                            Remove specific characters:<br>
+                            <input type="text" id="tc_custom" class="width-100 bg-black border-333 text-white p-4 mt-4"
+                                placeholder="e.g. @#$%">
+                        </div>
+                    </div>
+                    <div class="mb-15">
+                        <b class="text-ccc">HTML & Tags</b>
+                        <label class="display-flex mt-5"><input type="checkbox" id="tc_html"> Strip HTML
+                            Tags</label>
+                        <label class="display-flex"><input type="checkbox" id="tc_url"> Remove web URLs</label>
+                    </div>
+                    <button onclick="cleanText()"
+                        class="width-100 bg-accent text-black font-bold border-none p-10 br-4 cursor-pointer mt-10">🧹
+                        CLEAN TEXT</button>
+                </div>
+                <div class="flex-2 flex flex-col">
+                    <textarea id="tc_input"
+                        class="flex-1 bg-black border-none text-white p-15 resize-none font-mono outline-none"
+                        placeholder="Paste text here..."></textarea>
+                    <div class="height-1 bg-white-alpha-05">
+                    </div>
+                    <div class="pos-relative">
+                        <textarea id="tc_output"
+                            class="width-100 flex-1 bg-black border-none text-green p-15 resize-none font-mono outline-none height-120"
+                            placeholder="Cleaned text will appear here..." readonly></textarea>
+                        <button id="tc_copy_btn" onclick="copyCleanedText()"
+                            class="pos-absolute top-8 right-10 bg-white-alpha-05 text-white border-none p-4-10 br-4 cursor-pointer font-11">📋
+                            Copy</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Automation Hub Window -->
+        <div class="window win-auto" id="win-automation">
+            <div class="title-bar" onmousedown="startDrag(event, 'win-automation')">
+                <div class="title">⚡ Automation Engine v1.0</div>
+                <div class="controls">
+                    <div class="control-btn min"></div>
+                    <div class="control-btn max" onclick="toggleMaximize('automation')"></div>
+                    <div class="control-btn close" onclick="closeWindow('automation')"></div>
+                </div>
+            </div>
+            <div class="content">
+                <p class="text-dim mb-15 font-12">Cron-based triggers, bash scripting,
+                    and native IoT integrations.</p>
+
+                <div class="dashboard-card pt-10 pb-10">
+                    <div class="sys-stat">
+                        <span>💡 Local IoT Lights Hub</span>
+                        <input type="checkbox" checked title="IoT Light Switch"
+                            aria-label="Toggle Local IoT Lights Hub">
+                    </div>
+                </div>
+
+                <div class="dashboard-card">
+                    <h3 class="mb-5 text-accent">Active Routines</h3>
+                    <div class="font-mono font-12 border-left-accent p-10">
+                        * * * * * clear_cache.sh<br>
+                        0 5 * * * sync_mesh.sh
+                    </div>
+                </div>
+                <textarea id="auto_script"
+                    class="bg-black text-white p-10 mt-10 width-100 height-60 border-333 font-mono resize-none outline-none"
+                    placeholder="# Write new script (Linux style syntax)&#10;echo 'Hello Sovereign'"></textarea>
+                <button onclick="injectScript()"
+                    class="mt-10 width-100 p-8 bg-accent text-black font-bold border-none br-4 cursor-pointer">Inject
+                    Script to Hub</button>
+                <div id="auto-log" class="mt-10 font-mono font-11 text-dim height-80 overflow-y-auto">
+                </div>
+            </div>
+        </div>
+
+        <!-- Filesystem (VFS) Window -->
+        <div class="window win-vfs" id="win-vfs">
+            <div class="title-bar" onmousedown="startDrag(event, 'win-vfs')">
+                <div class="title">📁 Root Filesystem (VFS)</div>
+                <div class="controls">
+                    <div class="control-btn min"></div>
+                    <div class="control-btn max" onclick="toggleMaximize('vfs')"></div>
+                    <div class="control-btn close" onclick="closeWindow('vfs')"></div>
+                </div>
+            </div>
+            <div class="content p-0 flex">
+                <div class="bg-surface border-right p-10 width-150p">
+                    <ul class="list-none line-height-2 font-13">
+                        <li class="text-accent font-bold cursor-pointer" onclick="vfsNavigate('root')">/ (root)</li>
+                        <li class="pl-10 cursor-pointer" onclick="vfsNavigate('bin')">├─ bin/</li>
+                        <li class="pl-10 cursor-pointer" onclick="vfsNavigate('etc')">├─ etc/</li>
+                        <li class="pl-10 cursor-pointer" onclick="vfsNavigate('home')">├─ home/</li>
+                        <li class="pl-20 cursor-pointer" onclick="vfsNavigate('sigma')">│ └─ sigma/</li>
+                        <li class="pl-10 cursor-pointer" onclick="vfsNavigate('var')">└─ var/</li>
+                    </ul>
+                </div>
+                <div class="flex-1 p-15 pos-relative">
+                    <div id="vfs-path-display" class="mb-10 text-dim font-12">Viewing /home/sigma/</div>
+                    <div id="vfs-files" class="flex gap-20 flex-wrap"></div>
+
+                    <!-- Sovereign Peek Overlay (Usurping Quick Look) -->
+                    <div id="sovereign-peek"
+                        class="display-none pos-absolute top-0 left-0 width-100 height-100 bg-black-alpha-90 p-20 flex-col br-4 z-10 backdrop-blur">
+                        <div class="flex justify-between items-center mb-10 border-bottom-5 pb-5">
+                            <span class="text-accent font-bold">👁️ Sovereign Peek</span>
+                            <button class="ag-btn-secondary p-5 px-10 border-none cursor-pointer"
+                                onclick="closePeek()">Close</button>
+                        </div>
+                        <div id="peek-content"
+                            class="flex-1 bg-surface text-white p-15 font-mono font-12 overflow-y-auto br-4 box-shadow">
+                            <!-- Preview Content Injected Here -->
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Mesh Collaboration Hub -->
+        <div class="window win-collab" id="win-collab">
+            <div class="title-bar" onmousedown="startDrag(event, 'win-collab')">
+                <div class="title">🤝 Sovereign Mesh Collab (Offline P2P)</div>
+                <div class="controls">
+                    <div class="control-btn min"></div>
+                    <div class="control-btn max" onclick="toggleMaximize('collab')"></div>
+                    <div class="control-btn close" onclick="closeWindow('collab')"></div>
+                </div>
+            </div>
+            <div class="content flex-col gap-10">
+                <p class="text-dim font-13">Securely coordinate, message, and share files with adjacent
+                    local nodes using zero-trust networking.</p>
+                <div class="dashboard-card flex-1 mt-10 overflow-y-auto bg-black">
+                    <div class="text-accent font-12">[SYSTEM]: Connection established to Local Node A.
+                    </div>
+                    <div class="text-white font-13 mt-5"><b>User12:</b> Can you drop the
+                        bashrc config here?</div>
+                    <div class="text-red font-13 mt-5"><b>sigma:</b> Sure, pushing to shared
+                        root...</div>
+                </div>
+                <div class="flex gap-15">
+                    <input type="text" class="flex-1 p-10 br-8 bg-surface text-white border-333"
+                        placeholder="Encrypted message...">
+                    <button class="bg-accent text-black font-bold border-none br-8 p-10 cursor-pointer"
+                        onclick="alert('Message encrypted and sent via Mesh Protocol')">Send via Mesh</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Antigravity Command Center (Cockpit + Quota Monitor Unified) -->
+        <div class="window win-antigrav" id="win-antigrav">
+            <div class="title-bar" onmousedown="startDrag(event, 'win-antigrav')">
+                <div class="title">🚀 Antigravity Command Center v2.0</div>
+                <div class="controls">
+                    <div class="control-btn min"></div>
+                    <div class="control-btn max" onclick="toggleMaximize('antigrav')"></div>
+                    <div class="control-btn close" onclick="closeWindow('antigrav')"></div>
+                </div>
+            </div>
+            <div class="content flex p-0 height-100-percent">
+                <!-- Left Sidebar: Accounts -->
+                <div class="ag-sidebar bg-surface">
+                    <div class="font-11 text-dim font-700 text-upper letter-spacing-1 mb-12">
+                        Accounts</div>
+                    <div id="ag-accounts-list"></div>
+                    <button class="ag-btn ag-btn-secondary mt-10 width-100" onclick="agAddAccount()">+ Add
+                        Account</button>
+                    <div class="mt-20 border-top pt-12">
+                        <div class="font-11 text-dim font-700 text-upper letter-spacing-1 mb-8">
+                            Active ID</div>
+                        <div id="ag-active-badge" class="font-13 text-accent font-700">—</div>
+                        <div id="ag-active-email" class="font-11 text-dim mt-2">No account
+                            selected</div>
+                    </div>
+                </div>
+                <!-- Main Panel -->
+                <div class="ag-main">
+                    <div class="ag-tabs">
+                        <div class="ag-tab active" onclick="agSwitchTab('quota', this)">📊 Quota Monitor</div>
+                        <div class="ag-tab" onclick="agSwitchTab('cockpit', this)">🎛️ Cockpit</div>
+                        <div class="ag-tab" onclick="agSwitchTab('dispatch', this)">📡 Dispatch</div>
+                    </div>
+                    <!-- Quota Tab -->
+                    <div id="ag-tab-quota">
+                        <div class="flex justify-between align-center mb-12">
+                            <h3 class="text-white font-15">Real-Time Quota Usage</h3>
+                            <button class="ag-btn ag-btn-secondary" onclick="agRefreshQuotas()">↻ Refresh</button>
+                        </div>
+                        <div id="ag-quota-cards"></div>
+                    </div>
+                    <!-- Cockpit Tab -->
+                    <div id="ag-tab-cockpit" class="display-none">
+                        <h3 class="text-white font-15 mb-12">AI Node Fleet</h3>
+                        <div id="ag-node-cards"></div>
+                    </div>
+                    <!-- Dispatch Tab -->
+                    <div id="ag-tab-dispatch" class="display-none">
+                        <h3 class="text-white font-15 mb-12">Prompt Distributor</h3>
+                        <p class="text-dim font-12 mb-10">Send a prompt to multiple AI
+                            models simultaneously. Uses currently active account.</p>
+                        <textarea class="ag-prompt-area" id="ag-prompt"
+                            placeholder="Type your sovereign prompt here..."></textarea>
+                        <div class="mt-10 flex gap-8 flex-wrap" id="ag-dispatch-targets">
+                        </div>
+                        <button class="ag-btn ag-btn-primary mt-10 width-100 p-10" onclick="agDispatchPrompt()">🚀
+                            Dispatch to Selected Nodes</button>
+                        <div id="ag-dispatch-log" class="mt-12 font-mono font-12 text-dim"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Customization / Settings -->
+        <div class="window win-settings width-400 height-300 left-200 top-150 z-12" id="win-settings">
+            <div class="title-bar" onmousedown="startDrag(event, 'win-settings')">
+                <div class="title">⚙️ Personalization</div>
+                <div class="controls">
+                    <div class="control-btn min"></div>
+                    <div class="control-btn max" onclick="toggleMaximize('settings')"></div>
+                    <div class="control-btn close" onclick="closeWindow('settings')"></div>
+                </div>
+            </div>
+            <div class="content">
+                <h3 class="mb-15 text-accent">Wallpaper & Theme</h3>
+                <p class="text-dim font-12 mb-12">Set a custom wallpaper URL for your
+                    Sovereign session.</p>
+                <input type="text" id="wallpaper-url" class="user-input bg-black border-333 width-100 p-8 br-4 mb-10"
+                    placeholder="https://example.com/image.jpg">
+                <button onclick="setWallpaper()"
+                    class="width-100 bg-accent text-black p-8 font-bold border-none br-4 cursor-pointer">Apply
+                    Background</button>
+                <div class="mt-15 flex gap-8">
+                    <button onclick="document.body.style.backgroundImage='none'"
+                        class="flex-1 bg-white-alpha-10 text-white p-7 border-none br-4 cursor-pointer">Clear</button>
+                    <button onclick="setTheme('midnight')"
+                        class="flex-1 bg-midnight-btn text-accent p-7 border-accent br-4 cursor-pointer">🌙
+                        Midnight</button>
+                    <button onclick="setTheme('forest')"
+                        class="flex-1 bg-forest-btn text-green p-7 border-green br-4 cursor-pointer">🌿
+                        Forest</button>
+                </div>
+                <div class="mt-8 flex gap-8">
+                    <button onclick="setTheme('rose')"
+                        class="flex-1 bg-rose-btn text-pink p-7 border-pink br-4 cursor-pointer">🌹
+                        Rose</button>
+                    <button onclick="setTheme('ocean')"
+                        class="flex-1 bg-ocean-btn text-accent p-7 border-accent br-4 cursor-pointer">🌊
+                        Ocean</button>
+                    <button onclick="setTheme('default')"
+                        class="flex-1 bg-white-alpha-05 text-white p-7 border-white-alpha-10 br-4 cursor-pointer">Default</button>
+                </div>
+                <!-- Performance Settings -->
+                <div class="mt-20 border-top pt-15">
+                    <h3 class="mb-10 text-accent">Performance Engine</h3>
+                    <div class="flex flex-col gap-10">
+                        <label class="flex align-center gap-10 font-13">
+                            <input type="checkbox" id="perf-high" onchange="togglePerf(this)"> ⚡ Sovereign Apex Mode
+                            (Maximum Performance)
+                        </label>
+                        <p class="font-11 text-dim">Throttles non-critical background shims to
+                            reclaim TFLOPS for the foreground process.</p>
+                    </div>
+                </div>
+                <!-- Custom Accent Picker -->
+                <div class="mt-20 border-top pt-15">
+                    <h3 class="mb-10 text-white">Accent Color</h3>
+                    <div class="flex gap-10 align-center">
+                        <input type="color" id="accent-picker" value="#5AC8FA" onchange="setAccent(this.value)"
+                            class="border-none bg-transparent width-40 height-40 cursor-pointer"
+                            title="Accent Color Picker" aria-label="Select System Palette Accent">
+                        <span class="font-12 text-dim">Override system palette accent.</span>
+                    </div>
+                </div>
+
+                <h3 class="mt-20 mb-10 text-accent">Typography Engine</h3>
+                <p class="text-dim font-12 mb-12">Override system-wide font renderer instantly using Sovereign
+                    Fallbacks.</p>
+                <select id="font-select" class="width-100 bg-black border-333 text-white p-8 br-4 outline-none"
+                    onchange="document.body.style.fontFamily = this.value; document.documentElement.style.setProperty('--font', this.value);"
+                    title="Typography Engine Select" aria-label="Override system-wide font renderer">
+                    <option
+                        value="'Inter Variable', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif">
+                        Default (Native Stack)</option>
+                    <option value="ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI'">System
+                        Sans-Serif</option>
+                    <option value="ui-serif, Georgia, Cambria, 'Times New Roman', Times, serif">System Serif</option>
+                    <option value="ui-monospace, Consolas, 'Courier New', monospace">System Monospace</option>
+                </select>
+            </div>
+            <div class="mt-20 border-top pt-15">
+                <h3 class="text-accent font-14 mb-10">🧬 Competitor DNA Morph</h3>
+                <p class="text-dim font-11 mb-12">Instantly shift SigmaOS DNA to absorb
+                    competitor USPs.</p>
+                <div class="grid-2 gap-8">
+                    <button class="ag-btn ag-btn-secondary font-10" onclick="morphDNA('Windows')">🪟
+                        Windows Logic</button>
+                    <button class="ag-btn ag-btn-secondary font-10" onclick="morphDNA('macOS')">🍎 macOS
+                        Creative</button>
+                    <button class="ag-btn ag-btn-secondary font-10" onclick="morphDNA('Linux')">🐧 Linux
+                        Freedom</button>
+                    <button class="ag-btn ag-btn-secondary font-10" onclick="morphDNA('Mobile')">📱
+                        Mobile Privacy</button>
+                </div>
+            </div>
+        </div>
+        <!-- PDF Forge Window -->
+        <div class="window win-pdf width-700 height-500 left-100 top-100" id="win-pdf">
+            <div class="title-bar" onmousedown="startDrag(event, 'win-pdf')">
+                <div class="title">📄 PDF Forge Forensic v1.0</div>
+                <div class="controls">
+                    <div class="control-btn min"></div>
+                    <div class="control-btn max" onclick="toggleMaximize('pdf')"></div>
+                    <div class="control-btn close" onclick="closeWindow('pdf')"></div>
+                </div>
+            </div>
+            <div class="content p-0 flex flex-col">
+                <div class="bg-accent-alpha-10 p-10 flex gap-10 border-bottom">
+                    <button class="ag-btn ag-btn-secondary" onclick="pdfAction('Sanitize')">🧹 Sanitization</button>
+                    <button class="ag-btn ag-btn-secondary" onclick="pdfAction('Redact')">👁️ Redact</button>
+                    <button class="ag-btn ag-btn-secondary" onclick="pdfAction('Metadata')">ℹ️ Metadata</button>
+                    <div class="flex-1"></div>
+                    <button class="ag-btn ag-btn-primary" onclick="alert('PDF Exported with Bit-Level Sealing')">💾
+                        Export</button>
+                </div>
+                <div class="flex-1 bg-black p-20 flex align-center justify-center pos-relative">
+                    <div id="pdf-container"
+                        class="width-400p height-500p bg-white text-black p-40 box-shadow-pdf pdf-document">
+                        <h2 class="text-center mb-20">Sovereign Protocol v2</h2>
+                        <p class="mb-10"><b class="font-bold">Subject:</b> Decentralized Asset Mesh</p>
+                        <p class="line-height-1-6">This document serves as the primary ledger for the local node
+                            cluster.
+                            All bit-level interactions are monitored by the Sigma Kernel. Unauthorized access is
+                            restricted
+                            by zero-trust encryption shims.</p>
+                        <hr class="mt-20 mb-20">
+                        <div class="bg-eee height-100p flex align-center justify-center border-dashed">
+                            [FIGURE 1: Neural Grid Map]</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Sovereign Notes Window -->
+        <div class="window win-notes width-600 height-450 left-150 top-120" id="win-notes">
+            <div class="title-bar" onmousedown="startDrag(event, 'win-notes')">
+                <div class="title">📝 Sovereign Notes</div>
+                <div class="controls">
+                    <div class="control-btn min"></div>
+                    <div class="control-btn max" onclick="toggleMaximize('notes')"></div>
+                    <div class="control-btn close" onclick="closeWindow('notes')"></div>
+                </div>
+            </div>
+            <div class="content p-0 flex">
+                <div class="ag-sidebar bg-surface width-180p">
+                    <div class="font-11 text-dim font-700 text-upper letter-spacing-1 mb-12">
+                        Notes</div>
+                    <div id="notes-list" class="font-13">
+                        <div class="ag-account active" onclick="loadNote(0)">📄 Project Alpha</div>
+                        <div class="ag-account" onclick="loadNote(1)">📄 Mesh Config</div>
+                        <div class="ag-account" onclick="loadNote(2)">📄 Personal Log</div>
+                    </div>
+                    <button class="ag-btn ag-btn-secondary mt-10 width-100" onclick="newNote()">+ New
+                        Note</button>
+                </div>
+                <div class="flex-1 flex flex-col">
+                    <textarea id="note-editor"
+                        class="flex-1 bg-transparent border-none p-20 text-white font-14 resize-none outline-none"
+                        placeholder="Start typing..."></textarea>
+                    <div class="bg-accent-alpha-10 p-5-15 font-11 text-dim border-top">
+                        Last synced to Mesh: <span id="note-sync-time">Just now</span></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Neural Paint Window -->
+        <div class="window win-paint width-600 height-500 left-200 top-140" id="win-paint">
+            <div class="title-bar" onmousedown="startDrag(event, 'win-paint')">
+                <div class="title">🎨 Neural Paint</div>
+                <div class="controls">
+                    <div class="control-btn min"></div>
+                    <div class="control-btn max" onclick="toggleMaximize('paint')"></div>
+                    <div class="control-btn close" onclick="closeWindow('paint')"></div>
+                </div>
+            </div>
+            <div class="content p-0 flex flex-col">
+                <div class="bg-accent-alpha-10 p-8 flex gap-10 align-center">
+                    <input type="color" id="paint-color" value="#5AC8FA"
+                        class="width-30 height-30 border-none bg-transparent cursor-pointer" title="Paint Color"
+                        aria-label="Select drawing color">
+                    <input type="range" id="paint-size" min="1" max="50" value="5" class="width-100p" title="Brush Size"
+                        aria-label="Adjust brush stroke size">
+                    <button class="ag-btn ag-btn-secondary" onclick="clearCanvas()">Clear</button>
+                    <div class="flex-1"></div>
+                    <button class="ag-btn ag-btn-primary" onclick="downloadArt()">Save to VFS</button>
+                </div>
+                <div class="flex-1 bg-black overflow-hidden">
+                    <canvas id="paint-canvas" width="600" height="400" class="cursor-crosshair display-block"></canvas>
+                </div>
+            </div>
+        </div>
+
+        <!-- Code Lab Window -->
+        <div class="window win-code width-800 height-550 left-250 top-160" id="win-code">
+            <div class="title-bar" onmousedown="startDrag(event, 'win-code')">
+                <div class="title">💻 Code Lab IDE</div>
+                <div class="controls">
+                    <div class="control-btn min"></div>
+                    <div class="control-btn max" onclick="toggleMaximize('code')"></div>
+                    <div class="control-btn close" onclick="closeWindow('code')"></div>
+                </div>
+            </div>
+            <div class="content p-0 flex">
+                <div class="ag-sidebar bg-surface font-mono font-12 width-200p">
+                    <div class="p-10 text-dim">PROJECT: SIGMA_CORE</div>
+                    <ul class="list-none line-height-2 font-13 pl-15">
+                        <li>📁 src/</li>
+                        <li class="text-accent cursor-pointer pl-10">📄 kernel.py</li>
+                        <li class="cursor-pointer pl-10">📄 mesh_router.c</li>
+                        <li>📁 tests/</li>
+                        <li class="cursor-pointer pl-10">📄 sandbox_test.js</li>
+                        <li class="text-dim">📄 README.md</li>
+                    </ul>
+                </div>
+                <div class="flex-1 flex flex-col bg-black">
+                    <div class="p-5-15 font-11 text-dim flex gap-20 bg-111">
+                        <span class="text-accent">kernel.py</span>
+                        <span>UTF-8</span>
+                        <span>Python 3.10</span>
+                    </div>
+                    <textarea id="code-editor"
+                        class="flex-1 bg-transparent border-none p-15 text-ccc font-mono font-13 resize-none outline-none white-space-pre"
+                        spellcheck="false" title="IDE Code Editor"
+                        aria-label="Integrated Code Lab editor for SIGMA_CORE files"># SigmaOS Kernel v2.0
+import os
+import mesh_network
+
+def boot():
+    print("Initiating Zero-Trust Shield...")
+    kernel = os.get_kernel()
+    kernel.enforce_privacy_pol(True)
+    mesh_network.sync_local_nodes()
+    
+boot()</textarea>
+                    <div id="code-output"
+                        class="height-100p bg-black border-top p-10 font-mono font-12 text-green overflow-y-auto">
+                        [CONSOLE] Ready.<br>
+                        > boot()<br>
+                        Initiating Zero-Trust Shield...<br>
+                        Node Sync Successful.
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Sovereign Pong Window -->
+        <div class="window win-pong width-500 height-350 left-350 top-150" id="win-pong">
+            <div class="title-bar" onmousedown="startDrag(event, 'win-pong')">
+                <div class="title">🏓 Sovereign Pong (Neural AI)</div>
+                <div class="controls">
+                    <div class="control-btn min"></div>
+                    <div class="control-btn max" onclick="toggleMaximize('pong')"></div>
+                    <div class="control-btn close" onclick="closeWindow('pong')"></div>
+                </div>
+            </div>
+            <div class="content flex flex-col align-center bg-black p-0 pos-relative overflow-hidden">
+                <canvas id="pong-canvas" width="500" height="320" class="display-block"></canvas>
+                <div id="pong-menu"
+                    class="pos-absolute inset-0 flex flex-col align-center justify-center bg-accent-alpha-10 z-5 pong-menu-overlay">
+                    <h2 class="text-accent mb-20 text-upper font-24 letter-spacing-2">
+                        Target: Neural Engine</h2>
+                    <button class="ag-btn ag-btn-primary p-10-30 font-16" onclick="startPongGame()">Engage</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Sovereign Chess Window -->
+        <div class="window win-chess width-550 height-600 left-400 top-100" id="win-chess">
+            <div class="title-bar" onmousedown="startDrag(event, 'win-chess')">
+                <div class="title">♟️ Sovereign Chess (Turing Engine)</div>
+                <div class="controls">
+                    <div class="control-btn min"></div>
+                    <div class="control-btn max" onclick="toggleMaximize('chess')"></div>
+                    <div class="control-btn close" onclick="closeWindow('chess')"></div>
+                </div>
+            </div>
+            <div class="content flex flex-col align-center bg-black p-0 pos-relative">
+                <canvas id="chess-canvas" width="480" height="480" class="mt-20 cursor-pointer"></canvas>
+                <div id="chess-msg" class="mt-10 text-accent font-mono font-12">
+                    Waiting for move...</div>
+                <div class="mt-10 flex gap-10">
+                    <button class="ag-btn ag-btn-secondary" onclick="startChessGame()">New Game</button>
+                    <button class="ag-btn ag-btn-secondary"
+                        onclick="alert('Engine Depth: 24 (Grandmaster)')">Analyze</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Security Audit Window -->
+        <div class="window win-audit width-500 height-400 left-100 top-150" id="win-audit">
+            <div class="title-bar" onmousedown="startDrag(event, 'win-audit')">
+                <div class="title">🛡️ Security Forensic Audit</div>
+                <div class="controls">
+                    <div class="control-btn min"></div>
+                    <div class="control-btn max" onclick="toggleMaximize('audit')"></div>
+                    <div class="control-btn close" onclick="closeWindow('audit')"></div>
+                </div>
+            </div>
+            <div class="content">
+                <div class="dashboard-card mb-20">
+                    <h3 class="text-accent mb-10">Forensic Scanner</h3>
+                    <p class="font-12 text-dim mb-15">Deep bit-level scan of the VFS to
+                        identify shims, trackers, and telemetry vectors.</p>
+                    <button id="audit-btn" class="ag-btn ag-btn-primary width-100" onclick="runSecurityAudit()">START
+                        SYSTEM
+                        SCAN</button>
+                </div>
+                <div id="audit-progress-container" class="display-none mb-15">
+                    <div class="sys-stat"><span>Scanning...</span> <span id="audit-percent">0%</span></div>
+                    <div class="bar-bg">
+                        <div id="audit-bar" class="bar-fill audit-fill-init"></div>
+                    </div>
+                </div>
+                <div id="audit-log"
+                    class="bg-black p-10 br-8 font-mono font-11 text-aaa height-120 overflow-y-auto border-222">
+                    [IDLE] Awaiting user authorization...
+                </div>
+            </div>
+        </div>
+
+        <!-- Ghost Browser Window -->
+        <div class="window win-browser width-700 height-500 left-300 top-110" id="win-browser">
+            <div class="title-bar" onmousedown="startDrag(event, 'win-browser')">
+                <div class="title">🌐 Sovereign Ghost Browser (Sovereign Gate)</div>
+                <div class="controls">
+                    <div class="control-btn min"></div>
+                    <div class="control-btn max" onclick="toggleMaximize('browser')"></div>
+                    <div class="control-btn close" onclick="closeWindow('browser')"></div>
+                </div>
+            </div>
+            <div class="content p-0 flex flex-col">
+                <div class="bg-surface p-10 flex gap-10 border-bottom">
+                    <input type="text" id="browser-url"
+                        class="flex-1 bg-black text-white p-8 br-4 border-333 outline-none font-13"
+                        value="sigma://sovereign_gate" onkeydown="if(event.key==='Enter') navigateBrowser()"
+                        title="URL Input" placeholder="sigma://port_node_id">
+                    <button class="ag-btn ag-btn-secondary" onclick="navigateBrowser()">Go</button>
+                </div>
+                <div id="browser-viewport" class="flex-1 bg-white text-black p-20 overflow-y-auto">
+                    <div class="flex flex-col align-center justify-center height-100p text-center">
+                        <div class="font-32 mb-10">🛡️</div>
+                        <h3>Sovereign Gate Activated</h3>
+                        <p class="text-dim font-12 mt-5">Connection through 10,240 Mesh Nodes.<br>External shims
+                            nullified by High-Entropry Isolation.</p>
+                        <button class="ag-btn mt-20" onclick="alert('Accessing Node...')">Proxy through Local
+                            Mesh</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Email DISCO Window -->
+        <div class="window win-email width-700 height-500 left-350 top-130" id="win-email">
+            <div class="title-bar" onmousedown="startDrag(event, 'win-email')">
+                <div class="title">📧 Sovereign Email DISCO</div>
+                <div class="controls">
+                    <div class="control-btn min"></div>
+                    <div class="control-btn max" onclick="toggleMaximize('email')"></div>
+                    <div class="control-btn close" onclick="closeWindow('email')"></div>
+                </div>
+            </div>
+            <div class="content p-0 flex">
+                <div class="ag-sidebar bg-surface width-180p">
+                    <div class="font-11 text-dim font-700 text-upper letter-spacing-1 mb-12">Inboxes</div>
+                    <div class="ag-account active">📥 Inbox (4)</div>
+                    <div class="ag-account">📤 Sent</div>
+                    <div class="ag-account">🗑️ Trash</div>
+                </div>
+                <div class="flex-1 flex flex-col bg-black">
+                    <div class="p-15 border-bottom flex-1 overflow-y-auto">
+                        <div class="p-10-30 border-bottom-5 mb-5 cursor-pointer bg-white-alpha-05 br-4">
+                            <div class="flex justify-between"><b>Sigma Kernel</b> <span class="text-dim">10:42 AM</span>
+                            </div>
+                            <div class="text-accent font-13">System Update: v2.1 Ready</div>
+                        </div>
+                        <div class="p-10-30 border-bottom-5 mb-5 cursor-pointer">
+                            <div class="flex justify-between"><b>VFS Daemon</b> <span class="text-dim">Yesterday</span>
+                            </div>
+                            <div class="text-white font-13">Audit: 0 trackers found.</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Excel Hub Window -->
+        <div class="window win-excel width-800 height-550 left-250 top-160" id="win-excel">
+            <div class="title-bar" onmousedown="startDrag(event, 'win-excel')">
+                <div class="title">📊 Sovereign Excel Hub</div>
+                <div class="controls">
+                    <div class="control-btn min"></div>
+                    <div class="control-btn max" onclick="toggleMaximize('excel')"></div>
+                    <div class="control-btn close" onclick="closeWindow('excel')"></div>
+                </div>
+            </div>
+            <div class="content p-0 flex flex-col">
+                <div class="bg-surface p-10 flex gap-10 border-bottom">
+                    <div class="flex-1 font-mono font-12 p-8 bg-black br-4 border-333">A1: =SUM(B1:B10)</div>
+                </div>
+                <div class="flex-1 overflow-auto bg-black p-1">
+                    <table class="border-collapse width-100 font-12 text-center">
+                        <thead>
+                            <tr class="bg-surface text-dim">
+                                <th class="p-5 border-222 excel-index-col"></th>
+                                <th class="p-5 border-222">A</th>
+                                <th class="p-5 border-222">B</th>
+                                <th class="p-5 border-222">C</th>
+                                <th class="p-5 border-222">D</th>
+                            </tr>
+                        </thead>
+                        <tbody id="excel-body">
+                            <!-- Rows will be injected -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+        <!-- Logic Analyzer Window -->
+        <div class="window win-analyzer width-600 height-400 left-100 top-150" id="win-analyzer">
+            <div class="title-bar" onmousedown="startDrag(event, 'win-analyzer')">
+                <div class="title">🔍 Neural Logic Analyzer</div>
+                <div class="controls">
+                    <div class="control-btn min"></div>
+                    <div class="control-btn max" onclick="toggleMaximize('analyzer')"></div>
+                    <div class="control-btn close" onclick="closeWindow('analyzer')"></div>
+                </div>
+            </div>
+            <div class="content p-15 flex flex-col gap-10 bg-black">
+                <div class="dashboard-card bg-black-alpha-50 mb-10">
+                    <div class="flex justify-between items-center mb-10">
+                        <span class="text-accent font-12">BIT_STREAM_OSCILLOSCOPE</span>
+                        <div class="flex gap-5">
+                            <button class="ag-btn ag-btn-secondary p-2-5 font-10"
+                                onclick="Apps.analyzerReset()">RESET</button>
+                            <button id="analyzer-toggle" class="ag-btn p-2-5 font-10"
+                                onclick="Apps.analyzerToggle()">START</button>
+                        </div>
+                    </div>
+                    <canvas id="analyzer-canvas" width="550" height="150" class="width-100 bg-term br-4"></canvas>
+                </div>
+                <div class="dashboard-card flex-1 overflow-y-auto">
+                    <div class="font-11 text-dim mb-5">DECODED_LOGIC_EVENTS:</div>
+                    <div id="analyzer-log" class="font-10 text-mono flex flex-col gap-2">
+                        <div class="text-dim">[INFO] Waiting for signal sync...</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Sovereign Vault Window -->
+        <div class="window win-vault width-500 height-300 left-200 top-200" id="win-vault">
+            <div class="title-bar" onmousedown="startDrag(event, 'win-vault')">
+                <div class="title">🔐 Sovereign Vault v2.0</div>
+                <div class="controls">
+                    <div class="control-btn min"></div>
+                    <div class="control-btn max" onclick="toggleMaximize('vault')"></div>
+                    <div class="control-btn close" onclick="closeWindow('vault')"></div>
+                </div>
+            </div>
+            <div class="content p-15">
+                <div class="dashboard-card mb-20">
+                    <div class="font-13 text-accent mb-10">Logic-Enforced Generator</div>
+                    <div class="flex gap-10">
+                        <input type="text" id="vault-pass" class="flex-1 bg-black p-10 br-4 border-accent text-white"
+                            readonly title="Generated Password" aria-label="Generated Password Output">
+                        <button class="ag-btn" onclick="Apps.vaultGenerate()">GENERATE</button>
+                    </div>
+                </div>
+                <div class="font-11 text-dim">Passwords are generated locally using high-entropy prime logic.</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- AI Task Assistant Interface -->
+    <div id="ai-assistant-hud" class="ai-hud-hidden">
+        <div class="ai-hud-header">
+            <span>Σ NEURAL CO-PILOT</span>
+            <button onclick="toggleAIAssistant()">×</button>
+        </div>
+        <div id="ai-messages" class="ai-msg-container"></div>
+        <div class="ai-input-bar">
+            <input type="text" id="ai-input" placeholder="Give a command..."
+                onkeydown="if(event.key==='Enter') aiDispatch()">
+        </div>
+    </div>
+
+    <!-- Status Bar HUD -->
+    <div class="status-bar-hud">
+        <div class="hud-left">
+            <span class="neural-insight-chip">NEURAL_INSIGHT</span>
+            <div class="ws-switcher" id="ws-switcher">
+                <div class="ws-btn active" onclick="switchWS(1)">1</div>
+                <div class="ws-btn" onclick="switchWS(2)">2</div>
+                <div class="ws-btn" onclick="switchWS(3)">3</div>
+                <div class="ws-btn" onclick="switchWS(4)">4</div>
+            </div>
+            <span id="hud-hint">Sovereign Protocol Active. Use Ctrl+K for Global Search.</span>
+        </div>
+        <div class="hud-right">
+            <div class="entropy-meter">
+                <span>SYSTEM_ENTROPY</span>
+                <div class="entropy-bar">
+                    <div id="entropy-fill" class="entropy-fill"></div>
+                </div>
+            </div>
+            <span id="hud-uptime">Uptime: 00:00:00</span>
+        </div>
+    </div>
+
+    <!-- Snap Prediction Layer -->
+    <div id="snap-visualizer"></div>
+
+    <!-- Modular Sovereign Engine -->
+    <script type="module" src="kernel.js"></script>
+    <script type="module" src="infinity_search.js"></script>
+    <script>
+        // Synchronous boot sequence trigger (Legacy compatibility check)
+        window.addEventListener('DOMContentLoaded', () => {
+            console.log("[SIGMA] Infinity Core synchronized.");
+        });
+    </script>
+</body>
+
+</html>
+```

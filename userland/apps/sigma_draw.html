@@ -1,0 +1,287 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Sigma Draw — Sovereign Diagram Engine</title>
+<style>
+:root{
+  --bg:#f5f7fa;--panel:#fff;--tool:#3b82f6;--tool-hover:#2563eb;
+  --text:#1e293b;--border:#cbd5e1;--canvas:#fff;
+}
+*{box-sizing:border-box;margin:0;padding:0;font-family:'Inter',system-ui,sans-serif;}
+body{display:flex;flex-direction:column;height:100vh;overflow:hidden;background:var(--bg);color:var(--text);}
+
+.topbar{background:var(--panel);border-bottom:1px solid var(--border);padding:10px 20px;display:flex;align-items:center;gap:15px;}
+.logo{font-weight:800;font-size:1.1rem;color:var(--tool);}
+.btn-group{display:flex;gap:4px;border:1px solid var(--border);border-radius:6px;padding:2px;background:#f8fafc;}
+.t-btn{background:transparent;border:none;padding:6px 12px;border-radius:4px;cursor:pointer;font-size:.85rem;color:var(--text);font-weight:600;}
+.t-btn:hover{background:#e2e8f0;}
+.t-btn.active{background:#dbeafe;color:var(--tool);}
+
+.main{display:flex;flex:1;overflow:hidden;}
+
+.sidebar{width:220px;background:var(--panel);border-right:1px solid var(--border);padding:16px;display:flex;flex-direction:column;gap:16px;}
+.sb-group{margin-bottom:12px;}
+.sb-title{font-size:.7rem;text-transform:uppercase;color:#64748b;font-weight:700;margin-bottom:8px;letter-spacing:1px;}
+.shape-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;}
+.shape-btn{aspect-ratio:1;border:1px solid var(--border);border-radius:6px;background:#f8fafc;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:.15s;}
+.shape-btn:hover{border-color:var(--tool);box-shadow:0 2px 4px rgba(0,0,0,.05);}
+.shape-btn.active{border-color:var(--tool);background:#dbeafe;}
+.s-rect{width:24px;height:18px;border:2px solid;border-radius:2px;}
+.s-circ{width:20px;height:20px;border:2px solid;border-radius:50%;}
+.s-diam{width:16px;height:16px;border:2px solid;transform:rotate(45deg);}
+.s-line{width:24px;border-bottom:2px solid;}
+
+.color-grid{display:grid;grid-template-columns:repeat(5,1fr);gap:6px;}
+.c-btn{aspect-ratio:1;border-radius:50%;cursor:pointer;border:2px solid transparent;}
+.c-btn:hover,.c-btn.active{border-color:#1e293b;}
+
+.canvas-area{flex:1;position:relative;background:#f8fafc;display:flex;justify-content:center;align-items:center;overflow:auto;}
+canvas{background:var(--canvas);box-shadow:0 8px 30px rgba(0,0,0,.1);border:1px solid #e2e8f0;}
+
+/* Custom cursors */
+canvas.cur-pointer{cursor:default;}
+canvas.cur-cross{cursor:crosshair;}
+canvas.cur-move{cursor:move;}
+
+.bottom-bar{background:var(--panel);border-top:1px solid var(--border);padding:6px 20px;font-size:.75rem;color:#64748b;display:flex;justify-content:space-between;flex-shrink:0;}
+
+        .sigma-style-sigma_draw-1 { margin-left:auto; }
+        .sigma-style-sigma_draw-2 { font-weight:700;font-size:1.1rem;font-family:serif; }
+        .sigma-style-sigma_draw-3 { background:#1e293b; }
+        .sigma-style-sigma_draw-4 { background:#ef4444; }
+        .sigma-style-sigma_draw-5 { background:#3b82f6; }
+        .sigma-style-sigma_draw-6 { background:#10b981; }
+        .sigma-style-sigma_draw-7 { background:#f59e0b; }
+        .sigma-style-sigma_draw-8 { background:#8b5cf6; }
+        .sigma-style-sigma_draw-9 { background:#ec4899; }
+        .sigma-style-sigma_draw-10 { background:#ffffff;border:1px solid #ccc }
+        .sigma-style-sigma_draw-11 { width:100% }
+        .sigma-style-sigma_draw-12 { font-size:.7rem;color:#64748b;text-align:right }
+        .sigma-style-sigma_draw-13 { margin-top:auto;font-size:.75rem;color:#94a3b8;line-height:1.5; }
+    </style>
+
+<script>
+// Sovereign OS Inline Style Manager
+document.addEventListener('DOMContentLoaded', () => {
+    const applyTo = (el) => { if(el.getAttribute('data-style')) { el.setAttribute('style', el.getAttribute('data-style')); el.removeAttribute('data-style'); } };
+    new MutationObserver(mutations => mutations.forEach(m => {
+        if(m.type === 'childList') m.addedNodes.forEach(n => { if(n.nodeType === 1) { applyTo(n); n.querySelectorAll('[data-style]').forEach(applyTo); } });
+    })).observe(document.body, {childList: true, subtree: true});
+    document.querySelectorAll('[data-style]').forEach(applyTo);
+});
+</script>
+</head>
+<body>
+
+<div class="topbar">
+  <div class="logo">🖍️ Sigma Draw</div>
+  
+  <div class="btn-group">
+    <button class="t-btn active" id="m-select" onclick="setMode('select')">Select (V)</button>
+    <button class="t-btn" id="m-draw" onclick="setMode('draw')">Pencil (P)</button>
+    <button class="t-btn" id="m-shape" onclick="setMode('shape')">Insert Shape (S)</button>
+  </div>
+  
+  <div class="btn-group sigma-style-sigma_draw-1" data->
+    <button class="t-btn" onclick="clearCanvas()">Clear All</button>
+    <button class="t-btn" onclick="downloadImage()">Export PNG</button>
+  </div>
+</div>
+
+<div class="main">
+  <div class="sidebar">
+    
+    <div class="sb-group" id="pg-shapes">
+      <div class="sb-title">Standard Shapes</div>
+      <div class="shape-grid">
+        <div class="shape-btn active" onclick="setShape('rect')"><div class="s-rect"></div></div>
+        <div class="shape-btn" onclick="setShape('circ')"><div class="s-circ"></div></div>
+        <div class="shape-btn" onclick="setShape('diam')"><div class="s-diam"></div></div>
+        <div class="shape-btn" onclick="setShape('line')"><div class="s-line"></div></div>
+        <div class="shape-btn sigma-style-sigma_draw-2" onclick="setShape('text')" data->T</div>
+      </div>
+    </div>
+    
+    <div class="sb-group">
+      <div class="sb-title">Stroke Color</div>
+      <div class="color-grid">
+        <div class="c-btn active sigma-style-sigma_draw-3" data- onclick="setColor('#1e293b')"></div>
+        <div class="c-btn sigma-style-sigma_draw-4" data- onclick="setColor('#ef4444')"></div>
+        <div class="c-btn sigma-style-sigma_draw-5" data- onclick="setColor('#3b82f6')"></div>
+        <div class="c-btn sigma-style-sigma_draw-6" data- onclick="setColor('#10b981')"></div>
+        <div class="c-btn sigma-style-sigma_draw-7" data- onclick="setColor('#f59e0b')"></div>
+        <div class="c-btn sigma-style-sigma_draw-8" data- onclick="setColor('#8b5cf6')"></div>
+        <div class="c-btn sigma-style-sigma_draw-9" data- onclick="setColor('#ec4899')"></div>
+        <div class="c-btn sigma-style-sigma_draw-10" data- onclick="setColor('#ffffff')"></div>
+      </div>
+    </div>
+    
+    <div class="sb-group">
+      <div class="sb-title">Stroke Width</div>
+      <input aria-label="input" type="range" id="lineWidth" min="1" max="12" value="2" data- oninput="document.getElementById('lw-val').textContent=this.value+'px'; ctx.lineWidth=this.value;" title="input" class="sigma-style-sigma_draw-11">
+      <div data- id="lw-val" class="sigma-style-sigma_draw-12">2px</div>
+    </div>
+    
+    <div data- class="sigma-style-sigma_draw-13">
+      Sigma Diagram Engine<br>Object Vector Mode (Simulated)
+    </div>
+  </div>
+  
+  <div class="canvas-area">
+    <canvas id="c" width="1200" height="800" class="cur-cross"></canvas>
+  </div>
+</div>
+
+<div class="bottom-bar">
+  <span>Zero-Dependency Canvas Rendering</span>
+  <span id="coord">X: 0, Y: 0</span>
+</div>
+
+<script>
+// Canvas Setup
+const cvs = document.getElementById('c');
+const ctx = cvs.getContext('2d', { willReadFrequently: true });
+ctx.lineCap = 'round';
+ctx.lineJoin = 'round';
+ctx.lineWidth = 2;
+
+// State
+let mode = 'select'; // select, draw, shape
+let currentShape = 'rect';
+let currentColor = '#1e293b';
+
+// Drawing state
+let isDown = false;
+let startX = 0, startY = 0;
+let snapshot;
+
+// Init background
+ctx.fillStyle = '#ffffff';
+ctx.fillRect(0, 0, cvs.width, cvs.height);
+
+// Tool selection
+function setMode(m) {
+  mode = m;
+  document.querySelectorAll('.t-btn').forEach(btn => btn.classList.remove('active'));
+  document.getElementById('m-'+m).classList.add('active');
+  
+  if (m === 'select') cvs.className = 'cur-pointer';
+  if (m === 'draw') cvs.className = 'cur-cross';
+  if (m === 'shape') cvs.className = 'cur-cross';
+}
+
+function setShape(s) {
+  currentShape = s;
+  setMode('shape');
+  document.querySelectorAll('.shape-btn').forEach(btn => btn.classList.remove('active'));
+  event.currentTarget.classList.add('active');
+}
+
+function setColor(c) {
+  currentColor = c;
+  ctx.strokeStyle = c;
+  ctx.fillStyle = c;
+  document.querySelectorAll('.c-btn').forEach(btn => btn.classList.remove('active'));
+  event.currentTarget.classList.add('active');
+}
+
+function clearCanvas() {
+  ctx.fillStyle = '#ffffff';
+  ctx.fillRect(0, 0, cvs.width, cvs.height);
+}
+
+function downloadImage() {
+  const link = document.createElement('a');
+  link.download = 'sigma_diagram.png';
+  link.href = cvs.toDataURL('image/png');
+  link.click();
+}
+
+// Mouse events
+cvs.addEventListener('mousedown', (e) => {
+  const rect = cvs.getBoundingClientRect();
+  startX = e.clientX - rect.left;
+  startY = e.clientY - rect.top;
+  isDown = true;
+  
+  if (mode === 'draw' || mode === 'shape') {
+    snapshot = ctx.getImageData(0, 0, cvs.width, cvs.height);
+    ctx.beginPath();
+    ctx.moveTo(startX, startY);
+  }
+});
+
+cvs.addEventListener('mousemove', (e) => {
+  const rect = cvs.getBoundingClientRect();
+  const x = e.clientX - rect.left;
+  const y = e.clientY - rect.top;
+  
+  document.getElementById('coord').textContent = `X: ${Math.round(x)}, Y: ${Math.round(y)}`;
+  
+  if (!isDown) return;
+  
+  if (mode === 'draw') {
+    ctx.lineTo(x, y);
+    ctx.stroke();
+  } else if (mode === 'shape') {
+    ctx.putImageData(snapshot, 0, 0);
+    ctx.beginPath();
+    
+    if (currentShape === 'rect') {
+      ctx.rect(startX, startY, x - startX, y - startY);
+    } 
+    else if (currentShape === 'circ') {
+      const radius = Math.hypot(x - startX, y - startY);
+      ctx.arc(startX, startY, radius, 0, 2 * Math.PI);
+    } 
+    else if (currentShape === 'diam') {
+      const cx = startX + (x - startX)/2;
+      const cy = startY + (y - startY)/2;
+      const hw = Math.abs(x - startX)/2;
+      const hh = Math.abs(y - startY)/2;
+      ctx.moveTo(cx, startY);
+      ctx.lineTo(x, cy);
+      ctx.lineTo(cx, y);
+      ctx.lineTo(startX, cy);
+      ctx.closePath();
+    } 
+    else if (currentShape === 'line') {
+      ctx.moveTo(startX, startY);
+      ctx.lineTo(x, y);
+    }
+    
+    ctx.stroke();
+  }
+});
+
+cvs.addEventListener('mouseup', (e) => {
+  isDown = false;
+  
+  if (mode === 'shape' && currentShape === 'text') {
+    const rect = cvs.getBoundingClientRect();
+    const x = e.clientX - rect.left;
+    const y = e.clientY - rect.top;
+    
+    const text = window.prompt('Enter text:');
+    if (text) {
+      ctx.font = '20px sans-serif';
+      ctx.fillText(text, x, y);
+    }
+  }
+});
+
+// Keyboard shortcuts
+document.addEventListener('keydown', (e) => {
+  if (e.key === 'v' || e.key === 'V') setMode('select');
+  if (e.key === 'p' || e.key === 'P') setMode('draw');
+  if (e.key === 's' || e.key === 'S') setMode('shape');
+});
+
+// Set default mode
+setMode('draw');
+setColor('#1e293b');
+</script>
+</body>
+</html>

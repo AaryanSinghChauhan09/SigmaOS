@@ -1,0 +1,351 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Sigma Files — OPFS Sovereign Storage</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#080b12;--surface:#0e1220;--s2:#141826;--border:rgba(255,255,255,.08);--accent:#00d2ff;--as:rgba(0,210,255,.12);--text:#e2e8f0;--dim:#64748b;--success:#34d399;--danger:#f87171;--r:10px;}
+*{box-sizing:border-box;margin:0;padding:0;}body{background:var(--bg);color:var(--text);font-family:'Inter',sans-serif;height:100vh;display:flex;flex-direction:column;overflow:hidden;}
+
+header{background:var(--surface);border-bottom:1px solid var(--border);padding:10px 16px;display:flex;align-items:center;gap:10px;flex-shrink:0;}
+.logo{font-weight:800;color:var(--accent);font-size:.95rem;}
+.breadcrumb{font-size:.8rem;color:var(--dim);cursor:pointer;transition:color .15s;display:flex;align-items:center;}
+.breadcrumb:hover{color:var(--text);}
+.breadcrumb.active{color:var(--text);font-weight:600;}
+.bcx{color:var(--dim);padding:0 4px;}
+.btn{padding:6px 14px;border-radius:6px;border:1px solid var(--border);background:var(--s2);color:var(--text);font-size:.8rem;cursor:pointer;font-family:'Inter',sans-serif;}
+.btn:hover{background:var(--as);border-color:var(--accent);}
+.btn.primary{background:var(--accent);color:#000;border-color:var(--accent);font-weight:700;}
+.btn.primary:hover{opacity:.9;}
+#search{margin-left:auto;background:var(--s2);border:1px solid var(--border);border-radius:6px;padding:6px 12px;color:var(--text);font-family:'Inter',sans-serif;font-size:.82rem;outline:none;-webkit--webkit--webkit-user-select: text; user-select: text; -webkit-user-select: text; user-select: text; -webkit--webkit-user-select: text; user-select: text; -webkit-user-select: text; user-select: text;width:200px;}
+#search:focus{border-color:var(--accent);}
+
+.main{display:flex;flex:1;overflow:hidden;}
+aside{width:200px;background:var(--surface);border-right:1px solid var(--border);padding:12px;display:flex;flex-direction:column;gap:4px;flex-shrink:0;}
+.aside-sec{font-size:.68rem;text-transform:uppercase;letter-spacing:.7px;color:var(--dim);padding:8px 8px 4px;font-weight:700;}
+.aside-item{display:flex;align-items:center;gap:8px;padding:8px 10px;border-radius:7px;cursor:pointer;font-size:.82rem;color:var(--dim);transition:background .14s,color .14s;}
+.aside-item:hover{background:rgba(255,255,255,.04);color:var(--text);}
+.aside-item.active{background:var(--as);color:var(--accent);}
+
+.files-panel{flex:1;overflow-y:auto;padding:20px;position:relative;}
+.files-panel::-webkit-scrollbar{width:4px}
+.files-panel::-webkit-scrollbar-thumb{background:#1e2434;border-radius:2px}
+.files-grid{display:grid;grid-template-columns:repeat(auto-fill,120px);gap:12px;}
+.fitem{display:flex;flex-direction:column;align-items:center;gap:8px;padding:16px 10px;border-radius:var(--r);cursor:pointer;border:1px solid transparent;position:relative;transition:.15s;}
+.fitem:hover{background:rgba(255,255,255,.05);border-color:var(--border);transform:translateY(-3px);}
+.fitem.sel{background:var(--as);border-color:var(--accent);}
+.fitem .fi{font-size:2.5rem;}
+.fitem .fn{font-size:.72rem;text-align:center;color:var(--text);word-break:break-word;font-weight:500;}
+.fitem .fs{font-size:.65rem;color:var(--dim);}
+.f-del{position:absolute;top:4px;right:4px;background:var(--danger);color:#fff;border-radius:50%;width:18px;height:18px;display:none;align-items:center;justify-content:center;font-size:.6rem;border:none;cursor:pointer;}
+.fitem:hover .f-del{display:flex;}
+
+.statusbar{background:var(--surface);border-top:1px solid var(--border);padding:6px 16px;font-size:.72rem;color:var(--dim);flex-shrink:0;display:flex;justify-content:space-between;}
+.empty{display:flex;flex-direction:column;align-items:center;justify-content:center;height:200px;color:var(--dim);font-size:.88rem;}
+
+.preview-modal{position:fixed;inset:0;background:rgba(0,0,0,.7);-webkit--webkit-backdrop-filter: blur(10px); backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px); backdrop-filter: blur(10px);z-index:100;display:none;align-items:center;justify-content:center;}
+.preview-modal.show{display:flex;}
+.preview-box{background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:28px;max-width:600px;width:90%;box-shadow:0 24px 60px rgba(0,0,0,.7);display:flex;flex-direction:column;}
+.pv-title{font-weight:700;font-size:1rem;margin-bottom:12px;display:flex;justify-content:space-between;align-items:center;}
+.pv-body{font-size:.85rem;color:var(--dim);line-height:1.6;white-space:pre-wrap;font-family:monospace;overflow-y:auto;max-height:50vh;padding:12px;background:var(--bg);border-radius:8px;}
+.pv-close{background:none;border:none;color:var(--dim);font-size:1.2rem;cursor:pointer;}
+.pv-close:hover{color:var(--danger);}
+
+#opfs-warn{background:rgba(251,191,36,.1);border:1px solid rgba(251,191,36,.3);color:var(--warn);padding:8px;font-size:.75rem;text-align:center;display:none;}
+
+        .sigma-style-sigma_files-1 { display:flex; }
+        .sigma-style-sigma_files-2 { display:none }
+        .sigma-style-sigma_files-3 { pointer-events:none }
+        .sigma-style-sigma_files-4 { width:100% }
+        .sigma-style-sigma_files-5 { display:flex;justify-content:space-between;font-size:.65rem;margin-bottom:4px }
+        .sigma-style-sigma_files-6 { height:4px;background:var(--bg);border-radius:2px;overflow:hidden }
+        .sigma-style-sigma_files-7 { height:100%;width:0;background:var(--accent) }
+        .sigma-style-sigma_files-8 { border:none;outline:none;color:var(--text);resize:vertical; }
+        .sigma-style-sigma_files-9 { display:flex;justify-content:flex-end;margin-top:12px;gap:8px }
+        .sigma-style-sigma_files-10 { font-size:3rem;margin-bottom:12px }
+        .sigma-style-sigma_files-11 { color:var(--danger) }
+    </style>
+
+<script>
+// Sovereign OS Inline Style Manager
+document.addEventListener('DOMContentLoaded', () => {
+    const applyTo = (el) => { if(el.getAttribute('data-style')) { el.setAttribute('style', el.getAttribute('data-style')); el.removeAttribute('data-style'); } };
+    new MutationObserver(mutations => mutations.forEach(m => {
+        if(m.type === 'childList') m.addedNodes.forEach(n => { if(n.nodeType === 1) { applyTo(n); n.querySelectorAll('[data-style]').forEach(applyTo); } });
+    })).observe(document.body, {childList: true, subtree: true});
+    document.querySelectorAll('[data-style]').forEach(applyTo);
+});
+</script>
+</head>
+<body>
+<div id="opfs-warn">OPFS (Origin Private File System) is not supported in this browser. Falling back to RAM virtual file system.</div>
+<header>
+  <span class="logo">📁 Sigma Files</span>
+  <div class="bcx">›</div>
+  <span class="breadcrumb active" id="bc-home" onclick="navTo('/')">Root</span>
+  <div id="bc-crumbs" data- class="sigma-style-sigma_files-1"></div>
+  
+  <input aria-label="input" type="text" id="search" placeholder="Search files…" title="input">
+  <button class="btn" onclick="toggleView()">☰ View</button>
+  <button class="btn primary" onclick="newFolder()">+ Folder</button>
+  <button class="btn primary" onclick="document.getElementById('sys-upload').click()">+ Upload</button>
+  <input aria-label="input" type="file" id="sys-upload" data- onchange="uploadFile(event)" title="input" class="sigma-style-sigma_files-2">
+</header>
+<div class="main">
+  <aside>
+    <div class="aside-sec">OPFS Storage</div>
+    <div class="aside-item active" onclick="navTo('/')">🏠 Root Directory</div>
+    <div class="aside-item" onclick="createSpecialDirs()">🔧 Init Subsystems</div>
+    <div class="aside-sec">System Status</div>
+    <div class="aside-item sigma-style-sigma_files-3" data->
+      <div data- class="sigma-style-sigma_files-4">
+        <div data- class="sigma-style-sigma_files-5"><span>Quota</span><span id="quota-txt">Calc...</span></div>
+        <div data- class="sigma-style-sigma_files-6"><div id="quota-bar" data- class="sigma-style-sigma_files-7"></div></div>
+      </div>
+    </div>
+  </aside>
+  <div class="files-panel">
+    <div class="files-grid" id="grid">
+      <div class="empty">Initializing OPFS Engine...</div>
+    </div>
+  </div>
+</div>
+<div class="statusbar">
+  <span id="status-left">Starting...</span>
+  <span id="status-right">SigmaOS BareMetal Storage (OPFS) 6.1</span>
+</div>
+
+<div class="preview-modal" id="preview">
+  <div class="preview-box">
+    <div class="pv-title"><span id="pv-title">File</span><button class="pv-close" onclick="closePreview()">✕</button></div>
+    <textarea class="pv-body sigma-style-sigma_files-8" id="pv-body" spellcheck="false" data- title="Input"></textarea>
+    <div data- class="sigma-style-sigma_files-9">
+      <button class="btn" onclick="closePreview()">Cancel</button>
+      <button class="btn primary" onclick="savePreview()">Save to OPFS</button>
+    </div>
+  </div>
+</div>
+
+<script>
+/**
+ * SIGMA VFS - Origin Private File System (OPFS) Integration
+ * 100% Persistent, Sandboxed, Native File System backend 
+ */
+
+let rootDir;
+let currDir;
+let pathStack = [];
+
+async function initOPFS() {
+  try {
+    rootDir = await navigator.storage.getDirectory();
+    currDir = rootDir;
+    updateQuota();
+    renderDir();
+  } catch (e) {
+    document.getElementById('opfs-warn').style.display='block';
+    console.error('OPFS Err:', e);
+  }
+}
+
+async function updateQuota() {
+  if (navigator.storage && navigator.storage.estimate) {
+    const est = await navigator.storage.estimate();
+    const used = (est.usage / 1024 / 1024).toFixed(2);
+    const total = (est.quota / 1024 / 1024).toFixed(0);
+    document.getElementById('quota-txt').textContent = `${used}MB / ${total}MB`;
+    document.getElementById('quota-bar').style.width = Math.min((est.usage/est.quota)*100, 100) + '%';
+  }
+}
+
+async function renderDir() {
+  const grid = document.getElementById('grid');
+  grid.innerHTML = '';
+  document.getElementById('status-left').textContent = 'Loading...';
+  
+  let count = 0;
+  
+  try {
+    for await (const [name, handle] of currDir.entries()) {
+      count++;
+      const isDir = handle.kind === 'directory';
+      const el = document.createElement('div');
+      el.className = 'fitem';
+      
+      const ext = name.split('.').pop().toLowerCase();
+      let icon = isDir ? '📂' : '📄';
+      if (!isDir) {
+        if (['png','jpg','jpeg','gif'].includes(ext)) icon = '🖼️';
+        else if (['mp3','wav','ogg'].includes(ext)) icon = '🎵';
+        else if (['js','json','html','css','c','rs'].includes(ext)) icon = '⚡';
+      }
+      
+      el.innerHTML = `
+        <button class="f-del" onclick="delEntry(event, '${name}', ${isDir})">✕</button>
+        <span class="fi">${icon}</span>
+        <span class="fn">${name}</span>
+        <span class="fs">${isDir ? 'Directory' : 'File'}</span>
+      `;
+      
+      el.ondblclick = () => {
+        if (isDir) goDown(name, handle);
+        else openFile(handle);
+      };
+      
+      grid.appendChild(el);
+    }
+    
+    if (count === 0) {
+      grid.innerHTML = `<div class="empty"><div data- class="sigma-style-sigma_files-10">🗄️</div><div>Directory is empty</div></div>`;
+    }
+  } catch (e) {
+    grid.innerHTML = `<div class="empty sigma-style-sigma_files-11" data->Error reading directory: ${e.message}</div>`;
+  }
+  
+  document.getElementById('status-left').textContent = `${count} items in ${pathStack.length ? '/' + pathStack.join('/') : 'Root'}`;
+  renderBreadcrumbs();
+}
+
+function renderBreadcrumbs() {
+  const bc = document.getElementById('bc-crumbs');
+  bc.innerHTML = '';
+  let fullPath = [];
+  
+  pathStack.forEach((p, idx) => {
+    fullPath.push(p);
+    bc.innerHTML += `<div class="bcx">›</div><span class="breadcrumb active" onclick="navIndex(${idx})">${p}</span>`;
+  });
+}
+
+function goDown(name, handle) {
+  pathStack.push(name);
+  currDir = handle;
+  renderDir();
+}
+
+async function navIndex(idx) {
+  let h = rootDir;
+  const newStack = [];
+  for(let i=0; i<=idx; i++) {
+    h = await h.getDirectoryHandle(pathStack[i]);
+    newStack.push(pathStack[i]);
+  }
+  pathStack = newStack;
+  currDir = h;
+  renderDir();
+}
+
+async function navTo(path) {
+  if (path === '/') {
+    pathStack = [];
+    currDir = rootDir;
+    renderDir();
+  }
+}
+
+async function newFolder() {
+  const name = prompt("Folder name:");
+  if (!name) return;
+  try {
+    await currDir.getDirectoryHandle(name, {create: true});
+    renderDir();
+  } catch(e) { alert("Error: " + e.message); }
+}
+
+async function uploadFile(e) {
+  const file = e.target.files[0];
+  if (!file) return;
+  
+  try {
+    const handle = await currDir.getFileHandle(file.name, {create: true});
+    const writable = await handle.createWritable();
+    await writable.write(file);
+    await writable.close();
+    
+    updateQuota();
+    renderDir();
+  } catch(err) {
+    alert("Upload failed: " + err.message);
+  }
+}
+
+async function delEntry(e, name, isDir) {
+  e.stopPropagation();
+  if(!confirm(`Delete ${name}?`)) return;
+  try {
+    await currDir.removeEntry(name, {recursive: isDir});
+    updateQuota();
+    renderDir();
+  } catch(err) { alert(err.message); }
+}
+
+/* File Editor logic */
+let currentFileHandle = null;
+
+async function openFile(handle) {
+  try {
+    const file = await handle.getFile();
+    if (file.size > 2 * 1024 * 1024) {
+      alert("File too large to edit in standard editor.");
+      return;
+    }
+    const text = await file.text();
+    
+    document.getElementById('pv-title').textContent = handle.name;
+    document.getElementById('pv-body').value = text;
+    currentFileHandle = handle;
+    
+    document.getElementById('preview').classList.add('show');
+  } catch(e) { alert(e.message); }
+}
+
+function closePreview() {
+  document.getElementById('preview').classList.remove('show');
+  currentFileHandle = null;
+}
+
+async function savePreview() {
+  if (!currentFileHandle) return;
+  const text = document.getElementById('pv-body').value;
+  try {
+    const writable = await currentFileHandle.createWritable();
+    await writable.write(text);
+    await writable.close();
+    updateQuota();
+    closePreview();
+    // Notify status
+    document.getElementById('status-left').textContent = `Saved ${currentFileHandle.name} successfully.`;
+  } catch(e) { alert("Save failed: " + e.message); }
+}
+
+async function createSpecialDirs() {
+  try {
+    await rootDir.getDirectoryHandle('Documents', {create:true});
+    await rootDir.getDirectoryHandle('Downloads', {create:true});
+    await rootDir.getDirectoryHandle('System_x86', {create:true});
+    renderDir();
+  } catch(e) { }
+}
+
+document.getElementById('search').addEventListener('input', function(e) {
+  const q = e.target.value.toLowerCase();
+  document.querySelectorAll('.fitem').forEach(el => {
+    const fn = el.querySelector('.fn').textContent.toLowerCase();
+    el.style.display = fn.includes(q) ? 'flex' : 'none';
+  });
+});
+
+let gridMode = 'grid';
+function toggleView() {
+  const g = document.getElementById('grid');
+  gridMode = gridMode === 'grid' ? 'list' : 'grid';
+  g.style.gridTemplateColumns = gridMode === 'list' ? '1fr' : 'repeat(auto-fill,120px)';
+}
+
+// Start
+initOPFS();
+</script>
+</body>
+</html>
