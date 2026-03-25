@@ -19,6 +19,7 @@ export const UIEngine = {
         this.setupLauncher();
         this.setupWindows();
         this.setupTaskbar();
+        this.setupContextMenu();
         this.setupStageManager();
         this.startClock();
         this.updateStats();
@@ -258,6 +259,36 @@ export const UIEngine = {
 
         sm.innerHTML = '';
         sm.appendChild(fragment);
+    },
+
+    setupContextMenu() {
+        const ctxMenu = document.getElementById('sigma-context-menu');
+        if (!ctxMenu) return;
+
+        document.addEventListener('contextmenu', (e) => {
+            e.preventDefault();
+            const posX = e.clientX;
+            const posY = e.clientY;
+
+            // Compute edges to avoid overflow
+            const menuWidth = 240;
+            const menuHeight = 180;
+            const adjustedX = (posX + menuWidth > window.innerWidth) ? posX - menuWidth : posX;
+            const adjustedY = (posY + menuHeight > window.innerHeight) ? posY - menuHeight : posY;
+
+            ctxMenu.style.left = adjustedX + 'px';
+            ctxMenu.style.top = adjustedY + 'px';
+            
+            ctxMenu.classList.remove('sovereign-context-hidden');
+            ctxMenu.classList.add('sovereign-context-visible');
+        });
+
+        document.addEventListener('click', () => {
+            if (ctxMenu.classList.contains('sovereign-context-visible')) {
+                ctxMenu.classList.remove('sovereign-context-visible');
+                ctxMenu.classList.add('sovereign-context-hidden');
+            }
+        });
     },
 
     getAppIcon(id) {

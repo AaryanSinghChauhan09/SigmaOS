@@ -1203,6 +1203,17 @@ boot()</textarea>
     <!-- Snap Prediction Layer -->
     <div id="snap-visualizer"></div>
 
+    <!-- Sovereign Context Menu -->
+    <div id="sigma-context-menu" class="sovereign-context-hidden">
+        <div class="ctx-title">Σ Sovereign Actions</div>
+        <div class="ctx-divider"></div>
+        <div class="ctx-item" onclick="openWindow('settings')">⚙️ Personalize Desktop</div>
+        <div class="ctx-item" onclick="openWindow('terminal')">💻 Open Terminal Here</div>
+        <div class="ctx-item" onclick="openWindow('store')">📦 Install Sovereign Apps</div>
+        <div class="ctx-divider"></div>
+        <div class="ctx-item ctx-danger" onclick="SigmaKernel.notify('UI Sub-System Reloaded. Memory Purged.', 'success')">🔄 Restart UI Compositor</div>
+    </div>
+
     <!-- Modular Sovereign Engine -->
     <script type="module" src="kernel.js"></script>
     <script type="module" src="infinity_search.js"></script>

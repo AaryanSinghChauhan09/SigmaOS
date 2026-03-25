@@ -807,6 +807,71 @@ body {
     background: rgba(0, 0, 0, 0.8) !important;
 }
 
+/* Global Context Menu */
+#sigma-context-menu {
+    position: fixed;
+    width: 240px;
+    background: rgba(18, 18, 18, 0.85);
+    -webkit-backdrop-filter: blur(20px);
+    backdrop-filter: blur(20px);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    box-shadow: 0 10px 40px rgba(0,0,0,0.8);
+    border-radius: 10px;
+    z-index: 9999;
+    padding: 6px 0;
+    display: flex;
+    flex-direction: column;
+    pointer-events: auto;
+    transform-origin: top left;
+    transition: opacity 0.15s var(--ease-out), transform 0.15s var(--ease-spring);
+}
+
+.sovereign-context-hidden {
+    opacity: 0;
+    transform: scale(0.9) translateZ(0);
+    pointer-events: none !important;
+}
+
+.sovereign-context-visible {
+    opacity: 1;
+    transform: scale(1) translateZ(0);
+}
+
+.ctx-title {
+    font-size: 10px;
+    text-transform: uppercase;
+    color: var(--dim);
+    letter-spacing: 1px;
+    padding: 6px 14px;
+    font-weight: 700;
+}
+
+.ctx-divider {
+    height: 1px;
+    background: rgba(255, 255, 255, 0.08);
+    margin: 4px 0;
+}
+
+.ctx-item {
+    font-size: 13px;
+    padding: 8px 14px;
+    color: var(--text);
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    transition: background 0.1s;
+}
+
+.ctx-item:hover {
+    background: var(--accent);
+    color: #000;
+}
+
+.ctx-danger:hover {
+    background: #FF5A5A;
+    color: #fff;
+}
+
 .audit-bar-initial {
     width: 0%;
 }
