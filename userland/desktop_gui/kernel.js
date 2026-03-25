@@ -66,6 +66,7 @@ export const SigmaKernel = {
             const sandbox = await import('./sandbox.js');
             const mesh = await import('./mesh.js');
             const infinity = await import('./infinity_search.js');
+            const predictor = await import('./neural_predictor.js'); // [NEW ML CORE]
 
             this.modules.set('ui', ui.UIEngine);
             this.modules.set('themes', themes.ThemeEngine);
@@ -75,6 +76,7 @@ export const SigmaKernel = {
             this.modules.set('sandbox', sandbox.BrowserSandbox);
             this.modules.set('mesh', mesh.MeshNetwork);
             this.modules.set('infinity', infinity.InfinitySearch);
+            this.modules.set('predictor', predictor.NeuralPredictor);
 
             // Initialize core services
             ui.UIEngine.init();
@@ -83,6 +85,7 @@ export const SigmaKernel = {
             assistant.AIAssistant.init();
             mesh.MeshNetwork.init();
             infinity.InfinitySearch.init();
+            predictor.NeuralPredictor.init();
 
         } catch (error) {
             console.error("KERNEL_PANIC: Core logical components missing or corrupted.", error);
@@ -209,6 +212,21 @@ export const SigmaKernel = {
                         win.style.filter = 'brightness(1) grayscale(0)';
                     }
                 });
+            }
+
+            // [NEW] ML Kernel Anomaly Detection Pipeline
+            const predictor = this.modules.get('predictor');
+            if (predictor) {
+                const ml_analysis = predictor.detectAnomaly(this.processes);
+                if (ml_analysis && ml_analysis.anomaly) {
+                    this.notify(`[ML ENGINE] Predictive Heuristics detect anomalous CPU/RAM vector. Z-Score: ${ml_analysis.zScore.toFixed(2)}. Modulating Process Schedulers...`, ml_analysis.severity === 'CRITICAL' ? 'error' : 'info');
+                    // AI Response: Randomly reduce CPU of non-essential processes to simulate ML autonomous response
+                    this.processes.forEach(p => {
+                        if (p.name !== 'k_worker') {
+                            p.cpu = Math.max(0, parseFloat(p.cpu) - 2.0).toFixed(1);
+                        }
+                    });
+                }
             }
 
             this.enforcePrivacyProtocols();
