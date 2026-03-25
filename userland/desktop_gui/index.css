@@ -13,6 +13,8 @@
     --shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.8);
     --font: 'Inter Variable', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji";
     --border: #222;
+    --ease-spring: cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    --ease-out: cubic-bezier(0.2, 0.8, 0.2, 1);
 }
 
 * {
@@ -38,6 +40,8 @@ textarea {
     z-index: 0;
     pointer-events: none;
     opacity: 0.4;
+    transform: translateZ(0); /* Force GPU Rasterization */
+    will-change: transform;
 }
 
 body {
@@ -188,9 +192,11 @@ body {
     border-radius: 12px;
     box-shadow: 0 20px 40px rgba(0, 0, 0, 0.6), 0 0 0 1px rgba(255, 255, 255, 0.02);
     display: none;
-    transform: scale(0.95);
+    transform: scale(0.95) translateZ(0);
     opacity: 0;
-    transition: transform 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275), opacity 0.2s;
+    transition: transform 0.25s var(--ease-spring), opacity 0.2s var(--ease-out);
+    will-change: transform, opacity, left, top;
+    backface-visibility: hidden;
 }
 
 .window.active {
@@ -205,6 +211,7 @@ body {
     backdrop-filter: blur(20px);
     background: var(--surface);
     border: 1px solid var(--glass-border);
+    transform: scale(1) translateZ(0);
 }
 
 .stage-manager {
