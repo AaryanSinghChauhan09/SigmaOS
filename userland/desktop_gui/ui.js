@@ -158,21 +158,34 @@ export const UIEngine = {
         let posX = e.clientX;
         let posY = e.clientY;
         const visualizer = document.getElementById('snap-visualizer');
+        let isMoving = false;
+        let nextClientX = e.clientX;
+        let nextClientY = e.clientY;
 
-        const moveHandler = (me) => {
-            const deltaX = me.clientX - posX;
-            const deltaY = me.clientY - posY;
-            posX = me.clientX;
-            posY = me.clientY;
+        const updateFrame = () => {
+            const deltaX = nextClientX - posX;
+            const deltaY = nextClientY - posY;
+            posX = nextClientX;
+            posY = nextClientY;
 
             win.style.top = (win.offsetTop + deltaY) + "px";
             win.style.left = (win.offsetLeft + deltaX) + "px";
 
             if (visualizer) {
-                if (me.clientX < 20) this.showSnap(visualizer, 0, 0, '50%', '100%');
-                else if (me.clientX > window.innerWidth - 20) this.showSnap(visualizer, '50%', 0, '50%', '100%');
-                else if (me.clientY < 50) this.showSnap(visualizer, 0, 0, '100%', '50%');
+                if (nextClientX < 20) this.showSnap(visualizer, 0, 0, '50%', '100%');
+                else if (nextClientX > window.innerWidth - 20) this.showSnap(visualizer, '50%', 0, '50%', '100%');
+                else if (nextClientY < 50) this.showSnap(visualizer, 0, 0, '100%', '50%');
                 else visualizer.style.display = 'none';
+            }
+            isMoving = false;
+        };
+
+        const moveHandler = (me) => {
+            nextClientX = me.clientX;
+            nextClientY = me.clientY;
+            if (!isMoving) {
+                isMoving = true;
+                requestAnimationFrame(updateFrame);
             }
         };
 
@@ -186,7 +199,7 @@ export const UIEngine = {
             }
         };
 
-        document.addEventListener('mousemove', moveHandler);
+        document.addEventListener('mousemove', moveHandler, { passive: true });
         document.addEventListener('mouseup', stopHandler);
     },
 
