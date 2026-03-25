@@ -69,6 +69,7 @@ export const SigmaKernel = {
             const predictor = await import('./neural_predictor.js'); // [NEW ML CORE]
             const behavior = await import('./ml_behavior_engine.js');
             const recs = await import('./ml_recommendation_engine.js');
+            const predictSearch = await import('./ml_predictive_search.js');
 
             this.modules.set('ui', ui.UIEngine);
             this.modules.set('themes', themes.ThemeEngine);
@@ -81,6 +82,7 @@ export const SigmaKernel = {
             this.modules.set('predictor', predictor.NeuralPredictor);
             this.modules.set('behavior', behavior.BehaviorEngine);
             this.modules.set('recs', recs.RecommendationEngine);
+            this.modules.set('predSearch', predictSearch.PredictiveSearch);
 
             // Initialize core services
             ui.UIEngine.init();
@@ -92,6 +94,8 @@ export const SigmaKernel = {
             predictor.NeuralPredictor.init();
             behavior.BehaviorEngine.init();
             recs.RecommendationEngine.init();
+            predictSearch.PredictiveSearch.init();
+            window.PredictiveSearch = predictSearch.PredictiveSearch; // expose globally for InfinitySearch
 
             // Hook recommendations into UIEngine.launch
             if (window.UIEngine) {

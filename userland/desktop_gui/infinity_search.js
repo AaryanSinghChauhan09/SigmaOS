@@ -5,6 +5,9 @@
 
 import { AppRegistry } from './app_registry.js';
 
+// Lazy-load ML engine – no hard import to avoid circular deps
+const getPredictor = () => window.PredictiveSearch;
+
 export const InfinitySearch = {
     active: false,
     selectedIndex: 0,
@@ -89,6 +92,29 @@ export const InfinitySearch = {
                     });
                 }
             });
+        }
+
+        // 4. ML TF-IDF Ranked Suggestions (fallback enrichment)
+        if (q.length >= 2) {
+            const predictor = getPredictor();
+            if (predictor) {
+                const mlResults = predictor.search(q, 4);
+                mlResults.forEach(appId => {
+                    // Only add if not already in results
+                    if (!this.results.find(r => r.id === appId)) {
+                        const app = AppRegistry.find(a => a.id === appId);
+                        if (app) {
+                            this.results.push({
+                                type: 'app',
+                                id: app.id,
+                                name: app.name,
+                                icon: app.icon,
+                                desc: '🧠 ML Ranked Result'
+                            });
+                        }
+                    }
+                });
+            }
         }
 
         this.selectedIndex = 0;
