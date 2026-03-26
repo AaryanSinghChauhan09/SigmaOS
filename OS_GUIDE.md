@@ -1956,3 +1956,188 @@ SigmaOS is not just an operating system - it's the **future of computing** with 
 **INFINITE PERFORMANCE: FUTURE GOAL** ♾️
 **ULTIMATE USER EXPERIENCE: FUTURE GOAL** 👤
 **GLOBAL LEADERSHIP: ACHIEVED** 🏆
+
+---
+
+## Appendix A: Architecture Principles
+
+### The Native vs. Userland Split
+
+Strict adherence to the **Native vs. Userland split** for performance, security, and developer agility.
+
+#### 1. The Native Core (Ring 0 Simulation)
+
+**Languages:** Assembly (x86_64), C, C++, Rust.  
+**Location:** `/kernel` and `/bootloader`.
+
+- **Bootloader:** Low-level entry points (`boot.asm`, `long_mode.asm`).
+- **Memory Management:** Slab allocators and MMU logic in C (`slab_allocator.c`, `mmu_core.c`).
+- **Security:** Vanguard Cryptography implemented in Rust (`vanguard_crypto.rs`).
+- **Drivers:** Native NIC and PCI scanning logic.
+
+#### 2. The Standard Library
+
+**Languages:** C.  
+**Location:** `/libc`.
+
+- Provides basic `string.h`, `stdlib.h`, and `stdio.h` implementations for the native kernel.
+
+#### 3. The Sovereign Userland (Ring 3)
+
+**Languages:** Python (System API), HTML5/CSS3/JavaScript (GUI).  
+**Location:** `/userland`.
+
+- **System API (`/userland/system_api`):** Python orchestration layer. Handles high-level logic and interfaces with the Native Core via the `FFI_Bridge`.
+- **Desktop GUI (`/userland/desktop_gui`):** High-fidelity Web interface rendered via Chromium/Blink engines.
+- **AI Apps (`/userland/apps`):** High-level multidisciplinary tools (Agentic AI, Legal Pros, Data Matrix).
+
+#### 4. The Bridge Layer (FFI)
+
+Uses `ctypes` (Python) to call native binary functions in `/kernel`.
+
+- **Principle:** Python "requests", C/Rust "executes".
+
+---
+
+## Appendix B: Extended Command Reference
+
+### Advanced Linux Distribution Commands
+
+#### Ubuntu Advanced Commands
+
+```bash
+# Advanced Package Operations
+apt-cache policy nginx              # Show package priority
+apt-mark showmanual                 # List manually installed
+apt-get autoremove -y               # Remove unused deps
+apt-get dist-upgrade                # Smart upgrade
+dpkg-reconfigure tzdata            # Reconfigure package
+snap info firefox                   # Snap info
+snap changes                        # List snap changes
+snap revert firefox                 # Revert snap
+
+# System Administration
+do-release-upgrade -d               # Upgrade Ubuntu
+ubuntu-drivers autoinstall          # Install drivers
+pro attach token                    # Ubuntu Pro
+
+# Network & Storage
+netplan try                         # Test config
+resolvectl status                   # DNS status
+lsblk -f                            # Block devices
+blkid /dev/sda1                     # Device UUID
+parted /dev/sda print               # Partition table
+fdisk -l                            # List partitions
+```
+
+#### Fedora/RHEL Advanced Commands
+
+```bash
+# Advanced DNF
+dnf autoremove -y                   # Remove unused
+dnf mark install nginx              # Mark manual
+dnf provides /bin/bash              # Find provider
+dnf download --source nginx         # Download SRPM
+dnf system-upgrade download         # System upgrade
+dnf debuginfo-install glibc         # Debug symbols
+dnf builddep nginx.spec             # Build deps
+rpmdev-setuptree                    # Setup build tree
+rpmbuild -ba package.spec           # Build RPM
+
+# SELinux & Security
+semodule -i mymodule.pp             # Load SELinux module
+checkmodule -M -m policy.te         # Compile module
+audit2allow -a -M mypol             # Generate policy
+ausearch -m avc -ts recent          # Search audit logs
+aureport --login --summary          # Audit report
+
+# Networking & Storage
+nmcli connection show               # NM connections
+nmcli device wifi list              # WiFi list
+teamd -c team0.json                 # Network teaming
+stratis pool list                   # Stratis storage
+vdo status                          # VDO status
+```
+
+#### Arch Linux Advanced Commands
+
+```bash
+# Advanced Pacman
+pacman -Fy                          # Update file db
+pacman -Fx libfoo.so                # Find file owner
+pacman -D --asexplicit pkg          # Mark explicit
+pacman -Qk                          # Check permissions
+pacman -Qdt                         # Find orphans
+pactree -d firefox                  # Dependency tree
+checkupdates                        # Check updates
+
+# AUR & Building
+asp export firefox                  # Export from ABS
+makepkg -g                          # Generate checksums
+namcap package.pkg.tar.zst          # Check package
+arch-audit -u                       # Security audit
+reflector -c US -f 10               # Generate mirrorlist
+pacdiff -o                          # Config diffs
+
+# System
+mkinitcpio -P                       # All initramfs
+kernel-install add 6.7.0            # Install kernel
+iwctl station wlan0 scan            # WiFi scan
+```
+
+#### Gentoo Advanced Commands
+
+```bash
+# Advanced Emerge
+emerge -pv www-servers/nginx        # Pretend install
+emerge --depclean -pv               # Clean orphans
+emerge @preserved-rebuild           # Rebuild preserved
+emerge --resume --skipfirst         # Resume build
+emerge --jobs 4 @world              # Parallel build
+emerge --keep-going @world          # Continue on fail
+
+# Portage Tools
+euse enable pulseaudio              # Enable USE flag
+eclean-dist -d                      # Clean distfiles
+eix-update                          # Update index
+quickpkg installed                  # Create binpkg
+glsa-check -l affected              # Security check
+```
+
+#### NixOS Advanced Commands
+
+```bash
+# Channels & Closures
+nix-channel --list                  # List channels
+nix-channel --add URL name          # Add channel
+nix-copy-closure --to host path     # Copy to remote
+nix-prefetch-url URL                # Prefetch file
+nix-prefetch-git URL                # Prefetch git
+
+# Containers & System
+nixos-container create test         # Create container
+nixos-enter test                    # Enter container
+nixos-option services.nginx.enable  # Query option
+nixos-version --json                # Show version
+```
+
+---
+
+## Appendix C: Future Roadmap
+
+### Vision 1.0 - 2.0
+
+1. **Zero-Friction Cross-Device Handoff**: Instant state sync via P2P encrypted tunnels (no cloud intermediary).
+2. **Community-Driven Sovereign Marketplace**: Decentralized app store with community-audited shards.
+3. **Advanced Gamification (SigmaLevels)**: XP system for system optimization and security audits.
+4. **Environment-Aware Carbon Intelligence**: Adjust scheduler based on grid carbon intensity.
+5. **Stealth Matrix (Anti-Forensics)**: Ring-0 module for instant cache wiping on threat detection.
+6. **Dynamic Self-Modifying Codebase**: LLM-orchestrated JIT compiler for hot-swapping optimizations.
+7. **Next-Generation Compliance Auditor**: Automated GDPR/HIPAA runtime verification.
+8. **Evanescent Memory Sharding**: Critical shards only in volatile RAM with on-the-fly encryption.
+9. **Bio-Sovereign Identity Protocol**: Zero-trust biometric auth without cloud storage.
+10. **Autonomous Fault-Tolerance Swarm**: Auto-bud micro-VM clones for hot-swapping.
+
+---
+
+*End of SigmaOS OS Guide*
