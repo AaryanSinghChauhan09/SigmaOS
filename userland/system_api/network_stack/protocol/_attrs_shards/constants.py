@@ -1,0 +1,10 @@
+
+
+TCP = 'TCP'
+UDP = 'UDP'
+ICMP = 'ICMP'
+DHCP = 'DHCP'
+QUIC = 'QUIC'
+MESH = 'SigmaMesh'
+TOR = 'TOR'
+P2P = 'P2P'

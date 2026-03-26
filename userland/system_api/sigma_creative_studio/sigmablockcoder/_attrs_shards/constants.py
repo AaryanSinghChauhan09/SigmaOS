@@ -1,0 +1,3 @@
+
+
+BLOCK_PALETTE = {'motion': ['move_steps', 'turn_degrees', 'go_to_position', 'glide_to'], 'looks': ['say_bubble', 'set_color', 'set_size', 'set_opacity'], 'sound': ['play_sound', 'stop_all_sounds', 'set_volume'], 'events': ['on_key_press', 'on_click', 'when_flag_clicked', 'broadcast'], 'control': ['repeat_loop', 'forever_loop', 'if_then_else', 'wait', 'stop'], 'sensing': ['touching_mouse', 'key_pressed', 'timer', 'ask_and_wait'], 'operators': ['add', 'subtract', 'multiply', 'divide', 'join_strings', 'random'], 'variables': ['set_variable', 'change_variable', 'show_variable', 'list_ops'], 'custom': ['define_block', 'call_block'], 'ai': ['ai_detect_sprite', 'ai_generate_speech', 'ai_route_to_kernel']}

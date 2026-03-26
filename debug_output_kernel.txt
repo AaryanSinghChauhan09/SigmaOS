@@ -1,0 +1,16 @@
+[PRIVACY] Scrubber Initialized: Data Amnesia Enforced. No PII written to disk.
+[CRUSHER] Competitor-Defeat Engine [ONLINE]
+[CRUSHER] Neutralized 14 competitor constraints at ring-0 level.
+[CRUSHER] Neutralized 14 competitor constraints at ring-0 level.
+[KERNEL] Forensic Sentinel started.
+[KERNEL] GitHub Sovereign Sentinel initialized.
+[DEBUG] Registry Key 'aura': <userland.system_api.theme_engine.SigmaThemeEngine object at 0x0000038E8E4C0610>
+[DEBUG] self.aura type: <class 'sigma_core.aura_shield.SigmaAuraShield'>
+[DEBUG] self.aura methods: ['__abstractmethods__', '__class__', '__delattr__', '__dict__', '__dir__', '__doc__', '__eq__', '__firstlineno__', '__format__', '__ge__', '__getattribute__', '__getstate__', '__gt__', '__hash__', '__init__', '__init_subclass__', '__le__', '__lt__', '__module__', '__ne__', '__new__', '__reduce__', '__reduce_ex__', '__repr__', '__setattr__', '__sizeof__', '__slots__', '__static_attributes__', '__str__', '__subclasshook__', '__weakref__', '_abc_impl', '_analyze_write_behavior', '_calculate_entropy', '_running', '_trigger_emergency_snapshot', 'entropy_threshold', 'get_module_id', 'health_check', 'kernel', 'log_event', 'mass_change_threshold', 'start_service', 'stats', 'stop_service']
+Traceback (most recent call last):
+  File ".\_apex_test.py", line 4, in <module>
+    k = SigmaKernel(auto_load=True)
+  File ".\sigma_core\kernel.py", line 128, in __init__
+    self.aura.apply_aura("DeepSpace")
+    ^^^^^^^^^^^^^^^^^^^^
+AttributeError: 'SigmaAuraShield' object has no attribute 'apply_aura'

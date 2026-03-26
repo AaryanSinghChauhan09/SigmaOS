@@ -1,0 +1,7 @@
+
+
+CRITICAL = 0
+HIGH = 1
+NORMAL = 2
+BULK = 3
+BACKGROUND = 4

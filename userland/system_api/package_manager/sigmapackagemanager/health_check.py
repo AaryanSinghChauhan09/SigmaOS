@@ -1,0 +1,4 @@
+"""
+SigmaOS Modular Shim for health_check.py
+"""
+from .health_check._SigmaPackageManager_core import SigmaPackageManager # noqa

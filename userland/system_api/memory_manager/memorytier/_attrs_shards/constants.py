@@ -1,0 +1,7 @@
+
+
+SIGMA_RAM = 'SigmaRAM'
+ZRAM_CACHE = 'ZramCache'
+NEURAL_NMC = 'NeuralNMC'
+SSD_SWAP = 'SSD-Swap'
+PEER_RAM = 'PeerRAM'

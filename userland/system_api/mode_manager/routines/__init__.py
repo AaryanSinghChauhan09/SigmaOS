@@ -1,0 +1,25 @@
+"""Auto-generated __init__.py — SigmaOS deep modularizer."""
+
+from .notifications import *  # noqa
+from .ui_theme import *  # noqa
+from .creative import *  # noqa
+from .automation import *  # noqa
+from .mesh import *  # noqa
+from .ads import *  # noqa
+from .display import *  # noqa
+from .animations import *  # noqa
+from .console import *  # noqa
+from .ai_frameworks import *  # noqa
+from .data_lakes import *  # noqa
+from .vpn import *  # noqa
+from .legal import *  # noqa
+from .dev_environment import *  # noqa
+from .presentation import *  # noqa
+from .wifi import *  # noqa
+from .diagnostics import *  # noqa
+from .hyper_drive import *  # noqa
+from .security import *  # noqa
+from .focus import *  # noqa
+from .design import *  # noqa
+from .bi_dashboard import *  # noqa
+from .log_mode_change import *  # noqa
