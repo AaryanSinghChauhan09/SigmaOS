@@ -2140,4 +2140,494 @@ nixos-version --json                # Show version
 
 ---
 
+## Appendix D: ML/AI Algorithms Reference
+
+### Machine Learning Algorithms
+
+#### Supervised Learning - Regression
+
+| Algorithm | Description | Command |
+|-----------|-------------|---------|
+| **Linear Regression** | Predict continuous values with linear relationship | `sigma_ml train linear_regression data.csv --target=y` |
+| **Polynomial Regression** | Non-linear regression with polynomial features | `sigma_ml train polynomial data.csv --degree=3` |
+| **Ridge Regression** | L2 regularized linear regression | `sigma_ml train ridge data.csv --alpha=1.0` |
+| **Lasso Regression** | L1 regularized linear regression | `sigma_ml train lasso data.csv --alpha=1.0` |
+| **Elastic Net** | Combined L1 and L2 regularization | `sigma_ml train elastic_net data.csv --l1_ratio=0.5` |
+| **Bayesian Regression** | Probabilistic regression with uncertainty | `sigma_ml train bayesian data.csv` |
+
+#### Supervised Learning - Classification
+
+| Algorithm | Description | Command |
+|-----------|-------------|---------|
+| **Logistic Regression** | Binary and multi-class classification | `sigma_ml train logistic data.csv --multi_class=ovr` |
+| **Naive Bayes** | Probabilistic classifier based on Bayes' theorem | `sigma_ml train naive_bayes data.csv --variant=gaussian` |
+| **K-Nearest Neighbors (KNN)** | Instance-based learning | `sigma_ml train knn data.csv --k=5 --metric=euclidean` |
+| **Support Vector Machine (SVM)** | Maximum margin classifier | `sigma_ml train svm data.csv --kernel=rbf --C=1.0` |
+| **Decision Tree** | Tree-based classifier | `sigma_ml train decision_tree data.csv --criterion=gini` |
+| **Random Forest** | Ensemble of decision trees | `sigma_ml train random_forest data.csv --n_estimators=100` |
+| **Gradient Boosting** | Sequential ensemble method | `sigma_ml train gradient_boosting data.csv --n_estimators=100` |
+| **XGBoost** | Extreme gradient boosting | `sigma_ml train xgboost data.csv --max_depth=6` |
+| **AdaBoost** | Adaptive boosting | `sigma_ml train adaboost data.csv --n_estimators=50` |
+| **Extra Trees** | Extremely randomized trees | `sigma_ml train extra_trees data.csv --n_estimators=100` |
+
+#### Unsupervised Learning - Clustering
+
+| Algorithm | Description | Command |
+|-----------|-------------|---------|
+| **K-Means** | Partition data into k clusters | `sigma_ml train kmeans data.csv --k=5` |
+| **DBSCAN** | Density-based clustering | `sigma_ml train dbscan data.csv --eps=0.5 --min_samples=5` |
+| **Hierarchical Clustering** | Agglomerative clustering | `sigma_ml train hierarchical data.csv --n_clusters=5` |
+| **Gaussian Mixture** | Probabilistic clustering | `sigma_ml train gaussian_mixture data.csv --n_components=3` |
+| **Mean Shift** | Mode-seeking clustering | `sigma_ml train mean_shift data.csv` |
+| **Spectral Clustering** | Graph-based clustering | `sigma_ml train spectral data.csv --n_clusters=5` |
+
+#### Dimensionality Reduction
+
+| Algorithm | Description | Command |
+|-----------|-------------|---------|
+| **PCA** | Principal Component Analysis | `sigma_ml train pca data.csv --n_components=10` |
+| **t-SNE** | t-Distributed Stochastic Neighbor Embedding | `sigma_ml train tsne data.csv --perplexity=30` |
+| **UMAP** | Uniform Manifold Approximation | `sigma_ml train umap data.csv --n_neighbors=15` |
+| **LDA** | Linear Discriminant Analysis | `sigma_ml train lda data.csv --n_components=5` |
+| **Factor Analysis** | Statistical factor analysis | `sigma_ml train factor_analysis data.csv --n_factors=10` |
+
+### Deep Learning - Neural Networks
+
+#### Multi-Layer Perceptron (MLP)
+
+```bash
+# Create and train MLP
+sigma_mlp create --input_dim=784 --hidden_layers="128,64,32" --output_dim=10
+sigma_mlp add_layer dense 128 relu 0.2
+sigma_mlp add_layer dense 64 relu 0.2
+sigma_mlp add_layer dense 10 softmax 0.0
+sigma_mlp compile optimizer=adam loss=categorical_crossentropy
+sigma_mlp fit train_data.csv val_data.csv --epochs=100 --batch_size=32
+sigma_mlp predict test_data.csv
+sigma_mlp save model.pkl
+```
+
+#### Convolutional Neural Networks (CNN)
+
+```bash
+# LeNet-5 Architecture
+sigma_cnn lenet5 --input_shape="28,28,1" --num_classes=10
+sigma_cnn fit mnist_train.csv --epochs=50 --batch_size=64
+
+# AlexNet Architecture
+sigma_cnn alexnet --input_shape="224,224,3" --num_classes=1000
+
+# VGG-16 Architecture
+sigma_cnn vgg16 --input_shape="224,224,3" --num_classes=1000
+
+# ResNet-18 Architecture
+sigma_cnn resnet18 --input_shape="224,224,3" --num_classes=1000
+
+# Custom CNN
+sigma_cnn create --input_shape="32,32,3" --num_classes=10
+sigma_cnn add_conv2d filters=32 kernel=3 stride=1 padding=same activation=relu
+sigma_cnn add_maxpool2d pool_size=2 stride=2
+sigma_cnn add_batchnorm
+sigma_cnn add_conv2d filters=64 kernel=3 stride=1 padding=same activation=relu
+sigma_cnn add_maxpool2d pool_size=2 stride=2
+sigma_cnn add_flatten
+sigma_cnn add_dense units=128 activation=relu dropout=0.5
+sigma_cnn add_dense units=10 activation=softmax
+sigma_cnn compile optimizer=adam loss=categorical_crossentropy
+sigma_cnn fit train_data.csv --epochs=100
+```
+
+#### Recurrent Neural Networks (RNN/LSTM/GRU)
+
+```bash
+# LSTM for sequence modeling
+sigma_rnn create --sequence_length=100 --input_dim=50 --cell_type=lstm --hidden_units=128
+sigma_rnn add_layer lstm 128 dropout=0.2 return_sequences=true
+sigma_rnn add_layer lstm 64 dropout=0.2 return_sequences=false
+sigma_rnn add_dense 10 softmax
+sigma_rnn compile optimizer=adam loss=categorical_crossentropy
+sigma_rnn fit train_sequences.csv val_sequences.csv --epochs=50
+
+# Bidirectional LSTM
+sigma_rnn create --sequence_length=100 --input_dim=50 --cell_type=lstm --hidden_units=128 --bidirectional=true
+
+# GRU (faster alternative to LSTM)
+sigma_rnn create --sequence_length=100 --input_dim=50 --cell_type=gru --hidden_units=128
+```
+
+#### Transformers
+
+```bash
+# Transformer for NLP tasks
+sigma_transformer create --vocab_size=30000 --d_model=512 --num_heads=8 --n_layers=6 --d_ff=2048
+sigma_transformer compile optimizer=adam
+sigma_transformer fit train_data.csv val_data.csv --epochs=10
+
+# BERT-style model
+sigma_transformer bert --vocab_size=30000 --hidden_size=768 --num_layers=12
+
+# GPT-style model
+sigma_transformer gpt --vocab_size=50000 --n_positions=1024 --n_layer=12
+```
+
+#### Autoencoders
+
+```bash
+# Standard Autoencoder
+sigma_autoencoder create --input_dim=784 --encoding_dim=32
+sigma_autoencoder add_encoder_layer 128 relu
+sigma_autoencoder add_encoder_layer 64 relu
+sigma_autoencoder add_decoder_layer 64 relu
+sigma_autoencoder add_decoder_layer 128 relu
+sigma_autoencoder compile optimizer=adam
+sigma_autoencoder fit data.csv --epochs=50
+sigma_autoencoder encode data.csv
+sigma_autoencoder reconstruct data.csv
+
+# Variational Autoencoder (VAE)
+sigma_vae create --input_dim=784 --latent_dim=32
+sigma_vae fit data.csv --epochs=100
+sigma_vae generate --n_samples=1000
+```
+
+#### Generative Adversarial Networks (GAN)
+
+```bash
+# Vanilla GAN
+sigma_gan create --latent_dim=100 --output_dim=784 --type=vanilla
+sigma_gan fit real_data.csv --epochs=100 --batch_size=64
+sigma_gan generate --n_samples=100
+
+# DCGAN for image generation
+sigma_dcgan create --latent_dim=100 --image_shape="64,64,3"
+sigma_dcgan fit image_data.csv --epochs=200
+sigma_dcgan generate --n_samples=100 --save_path=generated/
+
+# Conditional GAN
+sigma_cgan create --latent_dim=100 --output_dim=784 --num_classes=10
+```
+
+### MLOps Platform
+
+#### Experiment Tracking
+
+```bash
+# Initialize experiment tracking
+sigma_mlops experiment create --name="experiment_1" --description="Baseline model"
+sigma_mlops experiment start --run_name="run_1"
+
+# Log parameters
+sigma_mlops log_param learning_rate 0.001
+sigma_mlops log_param batch_size 32
+sigma_mlops log_param epochs 100
+
+# Log metrics
+sigma_mlops log_metric train_loss 0.5 --step=1
+sigma_mlops log_metric val_loss 0.6 --step=1
+sigma_mlops log_metric train_accuracy 0.85 --step=10
+sigma_mlops log_metric val_accuracy 0.82 --step=10
+
+# Log artifacts
+sigma_mlops log_artifact model.pkl --path=models/
+sigma_mlops log_artifact confusion_matrix.png --path=plots/
+
+# End experiment
+sigma_mlops experiment end --status=completed
+```
+
+#### Model Registry
+
+```bash
+# Register model
+sigma_mlops model register --name="sentiment_classifier" --version="1.0.0" --stage=staging
+sigma_mlops model transition --name="sentiment_classifier" --version="1.0.0" --stage=production
+
+# Get latest production model
+sigma_mlops model get --name="sentiment_classifier" --stage=production
+```
+
+#### Model Serving
+
+```bash
+# Deploy model endpoint
+sigma_mlops deploy --model_name="sentiment_classifier" --version="1.0.0" --endpoint="/predict"
+
+# Scale deployment
+sigma_mlops scale --endpoint="/predict" --replicas=5
+
+# Monitor endpoint
+sigma_mlops monitor --endpoint="/predict" --metrics=latency,error_rate,throughput
+```
+
+#### Feature Store
+
+```bash
+# Register features
+sigma_mlops feature register --name="user_age" --type=numeric --entity=user
+sigma_mlops feature register --name="purchase_history" --type=embedding --entity=user
+
+# Ingest feature values
+sigma_mlops feature ingest --entity_id="user_123" --feature_name="user_age" --value=25
+
+# Get online features
+sigma_mlops feature get_online --entity_id="user_123" --features="user_age,purchase_history"
+```
+
+---
+
+## Appendix E: CS & DSA Algorithms Reference
+
+### Sorting Algorithms
+
+| Algorithm | Time Complexity | Space Complexity | Stability | Command |
+|-----------|-----------------|------------------|-----------|---------|
+| **Bubble Sort** | O(n²) | O(1) | Stable | `sigma_sort bubble array` |
+| **Selection Sort** | O(n²) | O(1) | Unstable | `sigma_sort selection array` |
+| **Insertion Sort** | O(n²) | O(1) | Stable | `sigma_sort insertion array` |
+| **Merge Sort** | O(n log n) | O(n) | Stable | `sigma_sort merge array` |
+| **Quick Sort** | O(n log n) avg | O(log n) | Unstable | `sigma_sort quick array` |
+| **Heap Sort** | O(n log n) | O(1) | Unstable | `sigma_sort heap array` |
+| **Shell Sort** | O(n^(3/2)) | O(1) | Unstable | `sigma_sort shell array` |
+| **Tim Sort** | O(n log n) | O(n) | Stable | `sigma_sort tim array` |
+| **Counting Sort** | O(n + k) | O(k) | Stable | `sigma_sort counting array --max=100` |
+| **Radix Sort** | O(d × (n + k)) | O(n + k) | Stable | `sigma_sort radix array` |
+| **Bucket Sort** | O(n + k) | O(n + k) | Stable | `sigma_sort bucket array` |
+
+### Searching Algorithms
+
+| Algorithm | Time Complexity | Space Complexity | Use Case | Command |
+|-----------|-----------------|------------------|----------|---------|
+| **Linear Search** | O(n) | O(1) | Unsorted data | `sigma_search linear array target` |
+| **Binary Search** | O(log n) | O(1) | Sorted data | `sigma_search binary array target` |
+| **Jump Search** | O(√n) | O(1) | Sorted data | `sigma_search jump array target` |
+| **Interpolation Search** | O(log log n) | O(1) | Uniformly distributed | `sigma_search interpolation array target` |
+| **Exponential Search** | O(log n) | O(1) | Unbounded search | `sigma_search exponential array target` |
+| **Ternary Search** | O(log₃ n) | O(1) | Unimodal functions | `sigma_search ternary array target` |
+
+### Graph Algorithms
+
+#### Graph Traversal
+```bash
+# Depth First Search (DFS)
+sigma_graph dfs --graph=graph.json --start=0 --output=visited.txt
+
+# Breadth First Search (BFS)
+sigma_graph bfs --graph=graph.json --start=0 --output=visited.txt
+```
+
+#### Shortest Path
+```bash
+# Dijkstra's Algorithm
+sigma_graph shortest_path --algorithm=dijkstra --graph=graph.json --source=0 --dest=5
+
+# Bellman-Ford Algorithm (handles negative weights)
+sigma_graph shortest_path --algorithm=bellman_ford --graph=graph.json --source=0
+
+# Floyd-Warshall (all pairs)
+sigma_graph shortest_path --algorithm=floyd_warshall --graph=graph.json
+
+# A* Search (with heuristic)
+sigma_graph shortest_path --algorithm=a_star --graph=graph.json --source=0 --dest=5 --heuristic=euclidean
+```
+
+#### Minimum Spanning Tree
+```bash
+# Prim's Algorithm
+sigma_graph mst --algorithm=prim --graph=graph.json
+
+# Kruskal's Algorithm
+sigma_graph mst --algorithm=kruskal --graph=graph.json
+```
+
+#### Other Graph Algorithms
+```bash
+# Topological Sort
+sigma_graph topological_sort --graph=dag.json --method=dfs
+
+# Strongly Connected Components (Tarjan)
+sigma_graph scc --algorithm=tarjan --graph=graph.json
+
+# Maximum Flow (Edmonds-Karp)
+sigma_graph max_flow --algorithm=edmonds_karp --graph=flow_network.json --source=0 --sink=5
+
+# Bipartite Check
+sigma_graph is_bipartite --graph=graph.json
+```
+
+### Tree Algorithms
+
+#### Binary Search Tree Operations
+```bash
+# Create BST
+sigma_bst create --name=my_tree
+
+# Insert elements
+sigma_bst insert --tree=my_tree --values="50,30,70,20,40,60,80"
+
+# Search
+sigma_bst search --tree=my_tree --value=40
+
+# Delete
+sigma_bst delete --tree=my_tree --value=30
+
+# Get min/max
+sigma_bst min --tree=my_tree
+sigma_bst max --tree=my_tree
+
+# Traversals
+sigma_bst inorder --tree=my_tree
+sigma_bst preorder --tree=my_tree
+sigma_bst postorder --tree=my_tree
+sigma_bst levelorder --tree=my_tree
+```
+
+#### Advanced Trees
+```bash
+# AVL Tree (Self-balancing)
+sigma_avl create --name=avl_tree
+sigma_avl insert --tree=avl_tree --value=50
+sigma_avl delete --tree=avl_tree --value=30
+
+# Red-Black Tree
+sigma_rbtree create --name=rb_tree
+sigma_rbtree insert --tree=rb_tree --value=50
+
+# Trie (Prefix Tree)
+sigma_trie create --name=word_trie
+sigma_trie insert --trie=word_trie --word="hello"
+sigma_trie search --trie=word_trie --word="hello"
+sigma_trie autocomplete --trie=word_trie --prefix="hel"
+
+# Segment Tree (Range queries)
+sigma_segment_tree create --array="1,3,5,7,9,11"
+sigma_segment_tree query --tree=seg_tree --l=1 --r=4
+sigma_segment_tree update --tree=seg_tree --idx=2 --val=10
+
+# Fenwick Tree (Binary Indexed Tree)
+sigma_fenwick create --size=10
+sigma_fenwick update --tree=fenwick --idx=3 --val=5
+sigma_fenwick query --tree=fenwick --idx=5
+```
+
+### Dynamic Programming
+
+#### Classic DP Problems
+```bash
+# Fibonacci
+sigma_dp fibonacci --n=50
+
+# Longest Common Subsequence (LCS)
+sigma_dp lcs --string1=AGGTAB --string2=GXTXAYB
+
+# Longest Increasing Subsequence (LIS)
+sigma_dp lis --array="10,22,9,33,21,50,41,60"
+
+# Edit Distance (Levenshtein)
+sigma_dp edit_distance --s1=saturday --s2=sunday
+
+# 0/1 Knapsack
+sigma_dp knapsack_01 --weights="2,3,4,5" --values="3,4,5,6" --capacity=8
+
+# Coin Change
+sigma_dp coin_change --coins="1,2,5" --amount=11
+
+# Maximum Subarray Sum (Kadane's Algorithm)
+sigma_dp max_subarray --array="-2,1,-3,4,-1,2,1,-5,4"
+
+# Longest Palindromic Subsequence
+sigma_dp longest_palindromic_subseq --string=BBABCBCAB
+
+# Matrix Chain Multiplication
+sigma_dp matrix_chain --dimensions="10,30,5,60"
+```
+
+### String Algorithms
+
+```bash
+# KMP Pattern Matching
+sigma_string kmp_search --text=ABABDABACDABABCABAB --pattern=ABABCABAB
+
+# Rabin-Karp Pattern Matching
+sigma_string rabin_karp --text=GEEKSFORGEEKS --pattern=GEEK
+
+# Boyer-Moore Pattern Matching
+sigma_string boyer_moore --text=ABAAABCD --pattern=ABC
+
+# Z-Algorithm
+sigma_string z_algorithm --string=aabcaabxaaaz
+
+# Suffix Array Construction
+sigma_string suffix_array --text=banana
+
+# Longest Common Prefix Array
+sigma_string lcp_array --text=banana
+
+# Manacher's Algorithm (Longest Palindromic Substring)
+sigma_string manacher --string=abacdfgdcaba
+```
+
+### Mathematical Algorithms
+
+```bash
+# Prime Number Check
+sigma_math is_prime --n=97
+
+# Sieve of Eratosthenes
+sigma_math sieve --n=100
+
+# GCD and LCM
+sigma_math gcd --a=48 --b=18
+sigma_math lcm --a=4 --b=6
+
+# Modular Arithmetic
+sigma_math mod_exp --base=2 --exp=10 --mod=1000
+sigma_math mod_inverse --a=3 --m=11
+
+# Factorial
+sigma_math factorial --n=20
+
+# Binomial Coefficient
+sigma_math nCr --n=10 --r=5
+
+# Catalan Number
+sigma_math catalan --n=5
+
+# Fast Exponentiation
+sigma_math fast_exp --base=2 --exp=100
+```
+
+### Data Structures
+
+```bash
+# Stack
+sigma_stack create --name=my_stack --capacity=100
+sigma_stack push --stack=my_stack --value=10
+sigma_stack pop --stack=my_stack
+sigma_stack peek --stack=my_stack
+
+# Queue
+sigma_queue create --name=my_queue --capacity=100
+sigma_queue enqueue --queue=my_queue --value=10
+sigma_queue dequeue --queue=my_queue
+
+# Priority Queue (Min Heap)
+sigma_pq create --name=my_pq
+sigma_pq insert --pq=my_pq --value=10
+sigma_pq extract_min --pq=my_pq
+
+# Disjoint Set (Union-Find)
+sigma_disjoint_set create --size=10
+sigma_disjoint_set union --set=ds --x=1 --y=2
+sigma_disjoint_set find --set=ds --element=1
+sigma_disjoint_set connected --set=ds --x=1 --y=2
+
+# Hash Table
+sigma_hash_table create --capacity=100
+sigma_hash_table insert --table=ht --key=name --value=100
+sigma_hash_table get --table=ht --key=name
+sigma_hash_table remove --table=ht --key=name
+```
+
+---
+
 *End of SigmaOS OS Guide*
