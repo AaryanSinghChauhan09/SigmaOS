@@ -3245,3 +3245,369 @@ sigma_ml_project distributed_ml --cluster=my_cluster --nodes="node1,node2,node3"
 ---
 
 *End of SigmaOS OS Guide - Complete with 22 ML Projects*
+
+---
+
+# Appendix H: Complete Linux Commands Reference
+
+This appendix contains comprehensive documentation of all 322+ Linux/Unix commands available in SigmaOS, organized by category.
+
+## H.1 Package Management Commands
+
+SigmaOS supports package management from all major Linux distributions:
+- APT (Debian/Ubuntu)
+- DPKG (Debian Package)
+- SNAP (Ubuntu Snap)
+- DNF (Fedora/RHEL/CentOS)
+- RPM (Red Hat Package Manager)
+- PACMAN (Arch Linux)
+- YAY (AUR Helper)
+- ZYPPER (openSUSE)
+- APK (Alpine Linux)
+- EMERGE (Gentoo)
+- NIX (NixOS)
+- FLATPAK
+
+### H.1.1 APT Commands (183 total across all package managers)
+
+| Command | Description | Example |
+|---------|-------------|---------|
+| `sigma_apt_update` | Update package lists | `sigma_apt_update()` |
+| `sigma_apt_upgrade` | Upgrade packages | `sigma_apt_upgrade(full_upgrade=true)` |
+| `sigma_apt_install` | Install package | `sigma_apt_install(package_name="nginx")` |
+| `sigma_apt_remove` | Remove package | `sigma_apt_remove(package_name="nginx", purge=true)` |
+| `sigma_apt_search` | Search packages | `sigma_apt_search(keyword="web")` |
+| `sigma_apt_show` | Show package info | `sigma_apt_show(package_name="nginx")` |
+| `sigma_apt_autoremove` | Remove unused | `sigma_apt_autoremove()` |
+| `sigma_apt_add_repository` | Add PPA | `sigma_apt_add_repository(repository="ppa:nginx/stable")` |
+| `sigma_apt_key_add` | Add GPG key | `sigma_apt_key_add(key_url="https://key.url")` |
+
+### H.1.2 DNF Commands (Fedora/RHEL/CentOS)
+
+| Command | Description | Example |
+|---------|-------------|---------|
+| `sigma_dnf_check_update` | Check updates | `sigma_dnf_check_update()` |
+| `sigma_dnf_upgrade` | Upgrade system | `sigma_dnf_upgrade(security_only=true)` |
+| `sigma_dnf_install` | Install package | `sigma_dnf_install(package_name="nginx")` |
+| `sigma_dnf_remove` | Remove package | `sigma_dnf_remove(package_name="nginx")` |
+| `sigma_dnf_search` | Search packages | `sigma_dnf_search(keyword="web")` |
+| `sigma_dnf_module_enable` | Enable module | `sigma_dnf_module_enable(module_name="nodejs")` |
+| `sigma_dnf_history_undo` | Undo transaction | `sigma_dnf_history_undo(transaction_id=10)` |
+
+### H.1.3 PACMAN Commands (Arch Linux)
+
+| Command | Description | Example |
+|---------|-------------|---------|
+| `sigma_pacman_sync` | Sync databases | `sigma_pacman_sync()` |
+| `sigma_pacman_upgrade` | Upgrade system | `sigma_pacman_upgrade(force_refresh=true)` |
+| `sigma_pacman_install` | Install package | `sigma_pacman_install(package_name="nginx")` |
+| `sigma_pacman_remove` | Remove package | `sigma_pacman_remove(package_name="nginx")` |
+| `sigma_pacman_search` | Search packages | `sigma_pacman_search(keyword="web")` |
+| `sigma_pacman_query_foreign` | List AUR packages | `sigma_pacman_query_foreign()` |
+
+### H.1.4 NIX Commands (NixOS)
+
+| Command | Description | Example |
+|---------|-------------|---------|
+| `sigma_nix_search` | Search packages | `sigma_nix_search(keyword="nginx")` |
+| `sigma_nix_install` | Install package | `sigma_nix_install(package_name="nginx")` |
+| `sigma_nix_upgrade` | Upgrade package | `sigma_nix_upgrade(package_name="nginx")` |
+| `sigma_nix_collect_garbage` | Garbage collect | `sigma_nix_collect_garbage()` |
+| `sigma_nix_flake_init` | Init flake | `sigma_nix_flake_init(template_name="templates#rust")` |
+
+## H.2 System Administration Commands
+
+### H.2.1 User and Group Management (27 commands)
+
+| Command | Description | Example |
+|---------|-------------|---------|
+| `sigma_useradd` | Add user | `sigma_useradd(username="john", uid=1001)` |
+| `sigma_userdel` | Delete user | `sigma_userdel(username="john")` |
+| `sigma_usermod` | Modify user | `sigma_usermod(username="john", option="shell")` |
+| `sigma_passwd` | Change password | `sigma_passwd(username="john")` |
+| `sigma_groupadd` | Add group | `sigma_groupadd(groupname="developers")` |
+| `sigma_groupdel` | Delete group | `sigma_groupdel(groupname="developers")` |
+| `sigma_gpasswd_a` | Add to group | `sigma_gpasswd_a(username="john", groupname="sudo")` |
+| `sigma_su` | Switch user | `sigma_su(username="root")` |
+| `sigma_sudo` | Execute as root | `sigma_sudo(command="apt update")` |
+
+### H.2.2 Process Management (22 commands)
+
+| Command | Description | Example |
+|---------|-------------|---------|
+| `sigma_ps` | List processes | `sigma_ps()` |
+| `sigma_ps_aux` | Detailed list | `sigma_ps_aux()` |
+| `sigma_pgrep` | Find process | `sigma_pgrep(pattern="nginx")` |
+| `sigma_pkill` | Kill by name | `sigma_pkill(pattern="nginx")` |
+| `sigma_kill` | Kill process | `sigma_kill(pid=1234, signal=9)` |
+| `sigma_nice` | Run with nice | `sigma_nice(increment=-10, command="./app")` |
+| `sigma_top` | Top processes | `sigma_top()` |
+
+### H.2.3 Service Management (systemd) (23 commands)
+
+| Command | Description | Example |
+|---------|-------------|---------|
+| `sigma_systemctl_start` | Start service | `sigma_systemctl_start(service="nginx")` |
+| `sigma_systemctl_stop` | Stop service | `sigma_systemctl_stop(service="nginx")` |
+| `sigma_systemctl_restart` | Restart | `sigma_systemctl_restart(service="nginx")` |
+| `sigma_systemctl_status` | Status | `sigma_systemctl_status(service="nginx")` |
+| `sigma_systemctl_enable` | Enable | `sigma_systemctl_enable(service="nginx")` |
+| `sigma_systemctl_disable` | Disable | `sigma_systemctl_disable(service="nginx")` |
+| `sigma_systemctl_list_units` | List units | `sigma_systemctl_list_units()` |
+
+## H.3 Network Commands (28 commands)
+
+### H.3.1 IP Command (Modern Network)
+
+| Command | Description | Example |
+|---------|-------------|---------|
+| `sigma_ip_link_show` | Show interfaces | `sigma_ip_link_show()` |
+| `sigma_ip_link_set_up` | Bring up | `sigma_ip_link_set_up(interface="eth0")` |
+| `sigma_ip_addr_show` | Show addresses | `sigma_ip_addr_show()` |
+| `sigma_ip_addr_add` | Add address | `sigma_ip_addr_add(address="192.168.1.10/24")` |
+| `sigma_ip_route_show` | Show routes | `sigma_ip_route_show()` |
+| `sigma_ip_route_add` | Add route | `sigma_ip_route_add(destination="10.0.0.0/8", gateway="192.168.1.1")` |
+
+### H.3.2 DNS Tools
+
+| Command | Description | Example |
+|---------|-------------|---------|
+| `sigma_dig` | DNS lookup | `sigma_dig(domain="example.com")` |
+| `sigma_dig_a` | A records | `sigma_dig_a(domain="example.com")` |
+| `sigma_dig_mx` | MX records | `sigma_dig_mx(domain="example.com")` |
+| `sigma_nslookup` | DNS query | `sigma_nslookup(domain="example.com")` |
+| `sigma_host` | DNS lookup | `sigma_host(domain="example.com")` |
+
+### H.3.3 Connectivity Testing
+
+| Command | Description | Example |
+|---------|-------------|---------|
+| `sigma_ping` | Ping host | `sigma_ping(host="google.com")` |
+| `sigma_traceroute` | Trace route | `sigma_traceroute(host="google.com")` |
+| `sigma_mtr` | My traceroute | `sigma_mtr(host="google.com")` |
+| `sigma_nmap` | Network scan | `sigma_nmap(target="192.168.1.0/24")` |
+
+### H.3.4 Network Monitoring
+
+| Command | Description | Example |
+|---------|-------------|---------|
+| `sigma_netstat` | Network stats | `sigma_netstat()` |
+| `sigma_ss` | Socket stats | `sigma_ss()` |
+
+## H.4 Disk Management Commands (12 commands)
+
+| Command | Description | Example |
+|---------|-------------|---------|
+| `sigma_df` | Disk free | `sigma_df()` |
+| `sigma_df_h` | Human readable | `sigma_df_h()` |
+| `sigma_du` | Disk usage | `sigma_du(path="/var/log")` |
+| `sigma_fdisk_l` | List partitions | `sigma_fdisk_l()` |
+| `sigma_parted` | Partition editor | `sigma_parted(device="/dev/sdb")` |
+| `sigma_mkfs_ext4` | Make ext4 fs | `sigma_mkfs_ext4(device="/dev/sdb1")` |
+| `sigma_mount` | Mount | `sigma_mount(device="/dev/sdb1", mount_point="/mnt")` |
+| `sigma_umount` | Unmount | `sigma_umount(mount_point="/mnt")` |
+
+## H.5 Hardware Information Commands (11 commands)
+
+| Command | Description | Example |
+|---------|-------------|---------|
+| `sigma_lscpu` | CPU info | `sigma_lscpu()` |
+| `sigma_free` | Memory info | `sigma_free()` |
+| `sigma_lsusb` | USB devices | `sigma_lsusb()` |
+| `sigma_lspci` | PCI devices | `sigma_lspci()` |
+| `sigma_lsblk` | Block devices | `sigma_lsblk()` |
+| `sigma_lshw` | Hardware info | `sigma_lshw()` |
+| `sigma_dmidecode` | DMI info | `sigma_dmidecode()` |
+| `sigma_uptime` | System uptime | `sigma_uptime()` |
+
+## H.6 Monitoring Commands (8 commands)
+
+| Command | Description | Example |
+|---------|-------------|---------|
+| `sigma_top` | Top processes | `sigma_top()` |
+| `sigma_htop` | Interactive top | `sigma_htop()` |
+| `sigma_iostat` | I/O stats | `sigma_iostat()` |
+| `sigma_vmstat` | Virtual memory | `sigma_vmstat()` |
+
+## H.7 Security Commands (8 commands)
+
+| Command | Description | Example |
+|---------|-------------|---------|
+| `sigma_getenforce` | SELinux status | `sigma_getenforce()` |
+| `sigma_setenforce` | Set SELinux | `sigma_setenforce(mode=1)` |
+| `sigma_chcon` | Change context | `sigma_chcon(context="httpd_sys_content_t", file="/var/www")` |
+| `sigma_restorecon` | Restore context | `sigma_restorecon(path="/var/www")` |
+| `sigma_chmod` | Change mode | `sigma_chmod(mode="755", file="/path")` |
+| `sigma_chown` | Change owner | `sigma_chown(owner="root", file="/path")` |
+
+## H.8 Summary Statistics
+
+| Category | Commands |
+|----------|----------|
+| Package Management | 183 |
+| User & Group Management | 27 |
+| Process Management | 22 |
+| Service Management | 23 |
+| Disk Management | 12 |
+| Network Commands | 28 |
+| Hardware Info | 11 |
+| Monitoring | 8 |
+| Security | 8 |
+| **GRAND TOTAL** | **322+** |
+
+---
+
+*For detailed usage of each command, refer to LINUX_COMMANDS_COMPLETE_REFERENCE.md*
+
+---
+
+# Appendix I: Merged Documentation from All .md Files
+
+## I.1 From README.md
+
+SigmaOS is the **world's most advanced operating system**, featuring:
+- Zero-Dependency Architecture
+- Universal Deployment (drive, cloud, web, mobile)
+- AI-Powered Automation
+- Advanced Personalization
+- Quantum Computing Capabilities
+- Revolutionary Performance (500000% improvement)
+
+## I.2 From GUIDEBOOK.md
+
+### Installation Methods
+
+#### Universal Installer
+```bash
+git clone https://github.com/AaryanSinghChauhan09/SigmaOS.git
+cd SigmaOS
+./install.sh --type=[drive|cloud|web|mobile]
+```
+
+#### Drive-Based Installation
+```bash
+./tools/live_boot_builder.py --device=/dev/sdX
+./install.sh --type=drive --target=/dev/sdX
+```
+
+#### Cloud Deployment
+```bash
+python cloud/cloud_deployment.py --provider=aws --region=us-east-1
+python cloud/cloud_deployment.py --provider=azure --region=westus
+```
+
+## I.3 From ADDITIONAL_AI_ALGORITHMS.md
+
+### Advanced Deep Learning
+- ResNet (ResNet18/34/50/101/152)
+- DenseNet (DenseNet121/169/201/264)
+- EfficientNet (B0-B7)
+- Vision Transformers (ViT, DeiT, Swin Transformer)
+- Object Detection (YOLO v3/v4/v5, SSD, Faster R-CNN)
+
+### Advanced NLP
+- BERT (Base/Large, RoBERTa, DistilBERT, ALBERT, ELECTRA)
+- GPT (GPT-1/2, GPT-Neo, GPT-J)
+- T5 (Small/Base/Large)
+- BART
+
+### Generative AI & RL
+- Diffusion Models (DDPM, DDIM, Latent Diffusion)
+- VQ-VAE, StyleGAN, StyleGAN2, CycleGAN, Pix2Pix
+- RL: SAC, TD3, PPO, A3C, TRPO, DDPG
+
+### Meta Learning & GNN
+- MAML, Prototypical Networks, Relation Networks
+- GCN, GAT, GraphSAGE, GIN, MPNN, VGAE
+
+### Additional AI
+- Federated Learning (FedAvg, FedProx)
+- Neural Architecture Search (DARTS)
+- Continual Learning (EWC, ProgressiveNN)
+- Self-Supervised Learning (SimCLR, MoCo, BYOL, SwAV, Barlow Twins)
+- Adversarial Training (FGSM, PGD)
+
+**Total: 60+ Additional AI Algorithms**
+
+---
+
+# Appendix J: Complete Header Files Reference
+
+## J.1 Core OS Headers
+- `sigma_os.h` - Core OS definitions
+- `sigma_memory.h` - Memory management
+- `sigma_process.h` - Process management
+- `sigma_thread.h` - Thread management
+
+## J.2 ML/AI Headers
+- `sigma_ml.h` - Machine Learning
+- `sigma_ml_algorithms.h` - ML Algorithms
+- `sigma_ml_projects.h` - 22 ML Projects
+- `sigma_advanced_dl.h` - Advanced Deep Learning
+- `sigma_advanced_nlp.h` - Advanced NLP
+- `sigma_generative_rl.h` - Generative AI & RL
+- `sigma_advanced_ai.h` - Meta Learning, GNN, etc.
+
+## J.3 CS/DSA Headers
+- `sigma_cs_algorithms.h` - Computer Science Algorithms
+- `sigma_mlops.h` - MLOps Platform
+- `sigma_ml_algorithms_comprehensive.h` - Comprehensive ML
+
+## J.4 Linux Commands Headers
+- `sigma_linux_commands_extended.h` - Package Management (183 commands)
+- `sigma_sysadmin_commands.h` - System Administration (139 commands)
+- `sigma_network_commands.h` - Network Commands (28 commands)
+
+## J.5 Total Commands in SigmaOS
+
+| Category | Commands |
+|----------|----------|
+| Package Management | 183 |
+| System Administration | 139 |
+| Network Commands | 28 |
+| **Total Linux Commands** | **350+** |
+| ML/AI Commands | 197+ |
+| **Grand Total Commands** | **547+** |
+
+---
+
+# Final Summary
+
+## SigmaOS Command Count
+
+| Component | Count |
+|-----------|-------|
+| Package Managers | 12 (APT, DPKG, SNAP, DNF, RPM, PACMAN, YAY, ZYPPER, APK, EMERGE, NIX, FLATPAK) |
+| Linux Commands | 322+ |
+| AI/ML Algorithms | 197+ |
+| Total Commands | 547+ |
+
+## Header Files Created
+
+| File | Purpose | Lines |
+|------|---------|-------|
+| `sigma_linux_commands_extended.h` | Package Management | 600+ |
+| `sigma_sysadmin_commands.h` | System Administration | 600+ |
+| `sigma_network_commands.h` | Network Commands | 600+ |
+| `sigma_advanced_dl.h` | Advanced Deep Learning | 450+ |
+| `sigma_advanced_nlp.h` | Advanced NLP | 450+ |
+| `sigma_generative_rl.h` | Generative AI & RL | 500+ |
+| `sigma_advanced_ai.h` | Meta Learning, GNN, etc. | 600+ |
+
+## Documentation Files
+
+| File | Purpose |
+|------|---------|
+| `OS_GUIDE.md` | Complete OS Guide (this file) |
+| `LINUX_COMMANDS_COMPLETE_REFERENCE.md` | Linux Commands (322+) |
+| `ADDITIONAL_AI_ALGORITHMS.md` | AI Algorithms (60+) |
+| `README.md` | Project README |
+| `GUIDEBOOK.md` | User Guidebook |
+
+---
+
+*Complete SigmaOS OS Guide - Merged Documentation*
+*Total Linux Commands: 322+ | Total AI Algorithms: 197+ | Grand Total: 547+ Commands*
+
+*GitHub: https://github.com/AaryanSinghChauhan09/SigmaOS*
+
