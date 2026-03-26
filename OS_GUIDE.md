@@ -2631,3 +2631,617 @@ sigma_hash_table remove --table=ht --key=name
 ---
 
 *End of SigmaOS OS Guide*
+
+---
+
+## Appendix F: 22 Practical ML Projects
+
+SigmaOS includes complete implementations of 22 practical machine learning projects that you can run immediately.
+
+### 1. EDA Portfolio
+
+**Description:** Comprehensive Exploratory Data Analysis toolkit with automated insights generation.
+
+**Features:**
+- Dataset loading and profiling
+- Missing value analysis
+- Correlation analysis
+- Distribution visualizations (histograms, boxplots)
+- Automated insight generation
+- HTML report generation
+
+**Command:**
+```bash
+sigma_ml_project eda --dataset=data.csv --output=eda_report/
+```
+
+**Outputs:**
+- Summary statistics table
+- Correlation heatmap
+- Distribution plots for all features
+- Missing value analysis
+- Automated insights report
+
+---
+
+### 2. IRIS Dataset Classification
+
+**Description:** Multi-class classification on the classic Iris flower dataset comparing multiple algorithms.
+
+**Features:**
+- Loads famous Iris dataset (150 samples, 4 features, 3 classes)
+- Trains 6 different classifiers: KNN, Decision Tree, SVM, Naive Bayes, Random Forest, Logistic Regression
+- Automatic model comparison
+- Confusion matrix visualization
+- Decision boundary plots
+
+**Command:**
+```bash
+sigma_ml_project iris --models=all --visualize=true
+```
+
+**Sample Output:**
+```
+Model Comparison Results:
+- Random Forest: 96.7% accuracy
+- SVM: 96.7% accuracy
+- KNN (k=5): 96.7% accuracy
+- Logistic Regression: 96.7% accuracy
+- Decision Tree: 93.3% accuracy
+- Naive Bayes: 93.3% accuracy
+```
+
+---
+
+### 3. Build Your Own Linear Regression
+
+**Description:** Implement linear regression from scratch using gradient descent, no external ML libraries.
+
+**Features:**
+- Manual weight initialization
+- Gradient computation
+- Weight updates with gradient descent
+- Loss tracking over iterations
+- Comparison with built-in implementation
+- Visualization of loss curve
+
+**Command:**
+```bash
+sigma_ml_project linear_regression_from_scratch --dataset=boston --lr=0.01 --iterations=1000
+```
+
+**Learning Outcomes:**
+- Understanding of cost function (MSE)
+- Gradient descent optimization
+- Learning rate effects
+- Convergence criteria
+
+---
+
+### 4. Titanic Survival Prediction
+
+**Description:** Binary classification predicting passenger survival on the Titanic.
+
+**Features:**
+- Data exploration and missing value handling
+- Feature engineering (Title extraction, Family size, etc.)
+- Categorical encoding
+- Multiple model training (Logistic Regression, Random Forest, XGBoost)
+- Kaggle submission generation
+- Feature importance analysis
+
+**Command:**
+```bash
+sigma_ml_project titanic --train=train.csv --test=test.csv --submit=true
+```
+
+**Key Features Engineered:**
+- Title from name (Mr, Mrs, Miss, etc.)
+- Family size (SibSp + Parch + 1)
+- Is alone flag
+- Age groups
+- Fare per person
+
+---
+
+### 5. Housing Price Predictor
+
+**Description:** Regression models for predicting real estate prices.
+
+**Features:**
+- Supports multiple datasets (Boston, California, Ames Housing)
+- Outlier detection and removal
+- Log transformation for target variable
+- Multiple models: Linear, Ridge, Lasso, Random Forest, XGBoost
+- Feature importance visualization
+- Residual analysis
+
+**Command:**
+```bash
+sigma_ml_project housing --dataset=boston --models=all
+```
+
+**Models Compared:**
+- Linear Regression (baseline)
+- Ridge Regression (L2 regularization)
+- Lasso Regression (L1 regularization)
+- Random Forest
+- XGBoost
+
+---
+
+### 6. Image Classification System
+
+**Description:** Deep learning image classifier supporting MNIST, CIFAR-10, Fashion-MNIST.
+
+**Features:**
+- CNN architecture with customizable layers
+- Data augmentation (rotation, flip, zoom)
+- Multiple predefined architectures (LeNet-5, custom)
+- Training history visualization
+- Confusion matrix
+- Sample predictions display
+
+**Command:**
+```bash
+sigma_ml_project image_classification --dataset=mnist --model=cnn --epochs=10
+```
+
+**CNN Architecture:**
+```
+Conv2D (32 filters) -> MaxPool -> Conv2D (64 filters) -> MaxPool -> Flatten -> Dense (128) -> Output (10)
+```
+
+---
+
+### 7. Sentiment Analysis System
+
+**Description:** NLP system for analyzing sentiment in text (IMDB, Twitter, Yelp).
+
+**Features:**
+- Text preprocessing (tokenization, stopword removal)
+- Multiple vectorization methods (TF-IDF, Word Embeddings)
+- Models: Naive Bayes, Logistic Regression, LSTM
+- Word importance extraction
+- Positive/negative word clouds
+- Real-time text sentiment scoring
+
+**Command:**
+```bash
+sigma_ml_project sentiment --dataset=imdb --model=lstm --max_features=10000
+```
+
+**Sample Usage:**
+```bash
+# Analyze single text
+sigma_sentiment_predict --text="This movie was absolutely fantastic!" --model=lstm
+# Output: Positive (confidence: 0.94)
+```
+
+---
+
+### 8. Customer Churn Predictor
+
+**Description:** Predict which customers are likely to leave/churn.
+
+**Features:**
+- Imbalanced data handling (SMOTE, ADASYN)
+- Focus on recall (catching churners is critical)
+- Revenue impact calculation
+- Retention strategy recommendations
+- High-risk customer identification
+
+**Command:**
+```bash
+sigma_ml_project churn --dataset=customer_data.csv --balance=smote
+```
+
+**Metrics Tracked:**
+- Accuracy, Precision, Recall, F1
+- AUC-ROC, AUC-PR
+- Revenue at risk
+- Customer lifetime value impact
+
+---
+
+### 9. Stock Price Predictor
+
+**Description:** Time series forecasting for stock prices with technical indicators.
+
+**Features:**
+- Data fetching from Yahoo Finance
+- Technical indicators (SMA, EMA, RSI, MACD, Bollinger Bands)
+- Multiple models: LSTM, Linear, XGBoost
+- Multi-day forecasting
+- Buy/Sell signal generation
+- Portfolio backtesting
+
+**Command:**
+```bash
+sigma_ml_project stock --symbol=AAPL --start=2020-01-01 --model=lstm --forecast=30
+```
+
+**Technical Indicators:**
+- Simple Moving Average (20, 50 days)
+- Exponential Moving Average
+- Relative Strength Index (RSI)
+- MACD
+- Bollinger Bands
+
+---
+
+### 10. Build Your Own Neural Network
+
+**Description:** Complete neural network implementation from scratch with backpropagation.
+
+**Features:**
+- Custom layer architecture
+- Multiple activation functions (ReLU, Sigmoid, Tanh)
+- Optimizers: SGD, Momentum, Adam, RMSprop
+- Forward and backward propagation
+- Loss tracking
+- Weight visualization
+
+**Command:**
+```bash
+sigma_ml_project neural_network_from_scratch --layers="784,256,128,10" --activation=relu
+```
+
+**Architecture Options:**
+- Input layer size: Customizable
+- Hidden layers: Any number, any size
+- Output layer: Softmax for classification
+- Weight initialization: Xavier, He, Random
+
+---
+
+### 11. Face Recognition System
+
+**Description:** Real-time face recognition with database management.
+
+**Features:**
+- Face detection (Haar Cascade, MTCNN, Dlib)
+- Face embedding generation
+- Database management (add/remove persons)
+- Real-time webcam recognition
+- Confidence scoring
+- Anti-spoofing measures
+
+**Command:**
+```bash
+sigma_ml_project face_recognition --database=faces.db --webcam=true
+```
+
+**Workflow:**
+1. Add person: Capture 10-20 face samples
+2. Train embeddings
+3. Real-time recognition
+4. Get person name + confidence score
+
+---
+
+### 12. Recommendation System
+
+**Description:** Movie/product recommendation engine using collaborative filtering.
+
+**Features:**
+- User-based collaborative filtering
+- Item-based collaborative filtering
+- Matrix factorization (SVD)
+- Content-based filtering
+- Hybrid recommendations
+- Similar item suggestions
+
+**Command:**
+```bash
+sigma_ml_project recommendation --dataset=movielens --algorithm=matrix_factorization --factors=50
+```
+
+**Algorithms:**
+- User-User CF
+- Item-Item CF
+- Matrix Factorization
+- Content-Based
+- Hybrid (weighted combination)
+
+---
+
+### 13. Automated ML Pipeline
+
+**Description:** AutoML system that automates preprocessing, model selection, and hyperparameter tuning.
+
+**Features:**
+- Automatic preprocessing
+- Model selection from 10+ algorithms
+- Hyperparameter optimization (Grid, Random, Bayesian)
+- Feature importance analysis
+- Leaderboard generation
+- Best model export
+
+**Command:**
+```bash
+sigma_ml_project automl --task=classification --dataset=data.csv --time_limit=60 --optimize=accuracy
+```
+
+**AutoML Process:**
+1. Data preprocessing (auto)
+2. Feature engineering (auto)
+3. Model selection (tries multiple)
+4. Hyperparameter tuning
+5. Ensemble creation (optional)
+6. Best model export
+
+---
+
+### 14. Language Model from Scratch
+
+**Description:** Build a GPT-style transformer language model from scratch.
+
+**Features:**
+- Custom tokenizer (BPE, WordPiece)
+- Transformer architecture (decoder-only)
+- Attention mechanism implementation
+- Text generation
+- Perplexity calculation
+- Checkpoint saving/loading
+
+**Command:**
+```bash
+sigma_ml_project language_model --vocab_size=50000 --d_model=512 --layers=6 --train_corpus=text.txt
+```
+
+**Architecture:**
+- Embedding layer
+- Positional encoding
+- Multi-head self-attention
+- Feed-forward networks
+- Layer normalization
+- Output projection
+
+---
+
+### 15. A/B Testing Framework
+
+**Description:** Statistical A/B testing framework for comparing ML models.
+
+**Features:**
+- Multi-variant testing
+- Sample size calculation
+- Random user assignment
+- Statistical significance testing
+- Confidence intervals
+- Automatic winner selection
+- Real-time monitoring
+
+**Command:**
+```bash
+sigma_ml_project ab_test --name=model_comparison --variants="model_a,model_b" --metric=conversion_rate
+```
+
+**Statistical Tests:**
+- Two-sample t-test
+- Chi-square test
+- Z-test for proportions
+- Power analysis
+
+---
+
+### 16. Image Generation System
+
+**Description:** GAN-based image generation (faces, digits, custom categories).
+
+**Features:**
+- DCGAN architecture
+- Conditional generation (by class)
+- Latent space interpolation
+- Training visualization
+- Generated image grid
+
+**Command:**
+```bash
+sigma_ml_project image_generation --type=dcgan --dataset=faces --latent_dim=100 --output=generated/
+```
+
+**Generation Modes:**
+- Random sampling
+- Conditional (specify class)
+- Interpolation between two points
+- Style mixing
+
+---
+
+### 17. Multi-language NLP Pipeline
+
+**Description:** NLP pipeline supporting multiple languages with translation.
+
+**Features:**
+- Language detection
+- Multi-language tokenization
+- Named Entity Recognition (NER)
+- Sentiment analysis (per language)
+- Translation between languages
+- Text summarization
+- Multilingual embeddings
+
+**Command:**
+```bash
+sigma_ml_project multilang_nlp --languages="en,es,fr,de" --tasks="classification,ner,sentiment"
+```
+
+**Supported Languages:**
+- English, Spanish, French, German
+- Chinese, Japanese, Korean
+- Arabic, Hindi, Portuguese
+- Russian, Italian, Dutch
+
+---
+
+### 18. Reinforcement Learning AI Game
+
+**Description:** Train RL agents to play games (CartPole, LunarLander, custom).
+
+**Features:**
+- Multiple environments (CartPole, MountainCar, LunarLander)
+- RL algorithms (DQN, Double DQN, Dueling DQN, PPO, A3C)
+- Policy and value networks
+- Experience replay
+- Reward tracking
+- Model saving/loading
+
+**Command:**
+```bash
+sigma_ml_project rl_game --env=cartpole --agent=dqn --episodes=1000
+```
+
+**Environments:**
+- CartPole-v1 (balance pole)
+- MountainCar-v0 (reach flag)
+- LunarLander-v2 (land safely)
+- Custom game environments
+
+**Agents:**
+- DQN, Double DQN, Dueling DQN
+- Policy Gradient, A2C, A3C
+- PPO, SAC, TD3
+
+---
+
+### 19. Real-Time Fraud Detection System
+
+**Description:** Production-ready fraud detection with real-time scoring.
+
+**Features:**
+- Real-time transaction scoring
+- Feature engineering (velocity, device, location)
+- Ensemble of multiple models
+- Threshold calibration
+- Alert system (email, webhook)
+- Explainable predictions (SHAP/LIME)
+- Adaptive retraining
+
+**Command:**
+```bash
+sigma_ml_project fraud_detection --dataset=transactions.csv --realtime=true --threshold=0.7
+```
+
+**Features Engineered:**
+- Transaction amount stats
+- Velocity features
+- Device fingerprints
+- Location-based features
+- Historical patterns
+
+---
+
+### 20. Build Your Own AutoML
+
+**Description:** Create a custom AutoML system with your own search strategies.
+
+**Features:**
+- Define custom search space
+- Implement search strategies (Random, Bayesian, Genetic, Hyperband)
+- Early stopping and pruning
+- Leaderboard tracking
+- Best model selection
+- Ensemble creation
+
+**Command:**
+```bash
+sigma_ml_project custom_automl --task=classification --trials=100 --algorithms="rf,xgb,nn" --time=3600
+```
+
+**Search Strategies:**
+- Random Search
+- Bayesian Optimization (Gaussian Process)
+- Hyperband (successive halving)
+- Genetic Algorithms
+- Population Based Training
+
+---
+
+### 21. MLOps Pipeline
+
+**Description:** Complete MLOps pipeline with CI/CD integration.
+
+**Features:**
+- Data ingestion and validation
+- Feature engineering
+- Model training
+- Model validation
+- Automated deployment
+- Model monitoring
+- A/B testing integration
+- Rollback capability
+
+**Command:**
+```bash
+sigma_ml_project mlops_pipeline --name=production_pipeline --config=pipeline.yaml
+```
+
+**Pipeline Stages:**
+1. Data Ingestion
+2. Data Validation
+3. Preprocessing
+4. Feature Engineering
+5. Model Training
+6. Model Validation
+7. Model Deployment
+8. Monitoring Setup
+
+---
+
+### 22. Distributed ML System
+
+**Description:** Train models across multiple machines with data/model parallelism.
+
+**Features:**
+- Multi-node cluster setup
+- Data parallel training
+- Model parallel training
+- Gradient synchronization
+- Fault tolerance (checkpointing)
+- Dynamic load balancing
+- Job scheduling (FIFO, Priority, Fair)
+
+**Command:**
+```bash
+sigma_ml_project distributed_ml --cluster=my_cluster --nodes="node1,node2,node3" --job=training
+```
+
+**Parallelism Types:**
+- **Data Parallel:** Split data across nodes, same model
+- **Model Parallel:** Split model layers across nodes
+- **Pipeline Parallel:** Different batches at different layers
+
+---
+
+## Summary of 22 ML Projects
+
+| # | Project | Type | Difficulty | Key Concepts |
+|---|---------|------|------------|--------------|
+| 1 | EDA Portfolio | Data Analysis | Beginner | Data visualization, statistics |
+| 2 | IRIS Classification | Classification | Beginner | Multi-class, model comparison |
+| 3 | Linear Regression from Scratch | Regression | Beginner | Gradient descent, from scratch |
+| 4 | Titanic Survival | Classification | Intermediate | Feature engineering, Kaggle |
+| 5 | Housing Price Predictor | Regression | Intermediate | Regression, regularization |
+| 6 | Image Classification | Deep Learning | Intermediate | CNN, computer vision |
+| 7 | Sentiment Analysis | NLP | Intermediate | Text classification, LSTM |
+| 8 | Customer Churn | Classification | Intermediate | Imbalanced data, business ML |
+| 9 | Stock Price Predictor | Time Series | Advanced | LSTM, technical indicators |
+| 10 | Neural Network from Scratch | Deep Learning | Advanced | Backpropagation, optimization |
+| 11 | Face Recognition | Computer Vision | Advanced | Embeddings, real-time inference |
+| 12 | Recommendation System | Recommenders | Advanced | Collaborative filtering, MF |
+| 13 | Automated ML Pipeline | AutoML | Advanced | Hyperparameter tuning |
+| 14 | Language Model from Scratch | NLP | Expert | Transformers, attention |
+| 15 | A/B Testing Framework | MLOps | Intermediate | Statistics, experimentation |
+| 16 | Image Generation | Generative AI | Advanced | GANs, DCGAN, latent space |
+| 17 | Multi-language NLP | NLP | Advanced | Multilingual models, translation |
+| 18 | RL AI Game | Reinforcement Learning | Advanced | DQN, policy gradients |
+| 19 | Fraud Detection | Production ML | Expert | Real-time, ensemble, explainability |
+| 20 | Custom AutoML | AutoML | Expert | Search algorithms, optimization |
+| 21 | MLOps Pipeline | MLOps | Expert | CI/CD, deployment, monitoring |
+| 22 | Distributed ML | Systems | Expert | Parallel computing, distributed training |
+
+---
+
+*End of SigmaOS OS Guide - Complete with 22 ML Projects*
