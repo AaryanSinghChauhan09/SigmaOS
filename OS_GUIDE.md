@@ -1164,16 +1164,16 @@ Final verification and rollback snapshot creation.
 #### One-Click Full Migration
 ```bash
 # Migrate from Windows
-sigma_migrate --from=windows --one_click --user="John Doe"
+sigma_migrate --from=windows --one_click --user="User"
 
 # Migrate from macOS
-sigma_migrate --from=macos --one_click --user="John Doe"
+sigma_migrate --from=macos --one_click --user="User"
 
 # Migrate from Linux
-sigma_migrate --from=linux --one_click --user="John Doe"
+sigma_migrate --from=linux --one_click --user="User"
 
 # Migrate from specific Linux distro
-sigma_migrate --from=ubuntu --one_click --user="John Doe"
+sigma_migrate --from=ubuntu --one_click --user="User"
 ```
 
 #### Custom Migration
