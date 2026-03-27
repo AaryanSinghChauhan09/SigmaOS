@@ -226,6 +226,42 @@ SIGMA_INLINE char* sigma_strncat(char* SIGMA_RESTRICT dest, const char* SIGMA_RE
     return ret;
 }
 
+/*
+ * sigma_str_starts_with: Check if string begins with prefix.
+ */
+SIGMA_INLINE sigma_bool sigma_str_starts_with(const char* s, const char* prefix) {
+    if (!s || !prefix) return SIGMA_FALSE;
+    while (*prefix) {
+        if (*s++ != *prefix++) return SIGMA_FALSE;
+    }
+    return SIGMA_TRUE;
+}
+
+/*
+ * sigma_str_ends_with: Check if string ends with suffix.
+ */
+SIGMA_INLINE sigma_bool sigma_str_ends_with(const char* s, const char* suffix) {
+    if (!s || !suffix) return SIGMA_FALSE;
+    sigma_usize slen = sigma_strlen(s);
+    sigma_usize sublen = sigma_strlen(suffix);
+    if (sublen > slen) return SIGMA_FALSE;
+    return sigma_strcmp(s + slen - sublen, suffix) == 0;
+}
+
+/*
+ * sigma_str_contains: Check if string contains substring.
+ */
+SIGMA_INLINE sigma_bool sigma_str_contains(const char* s, const char* needle) {
+    if (!s || !needle) return SIGMA_FALSE;
+    if (!*needle) return SIGMA_TRUE;
+    for (; *s; s++) {
+        if (*s == *needle) {
+            if (sigma_str_starts_with(s, needle)) return SIGMA_TRUE;
+        }
+    }
+    return SIGMA_FALSE;
+}
+
 /* =========================================================================
  * SECTION 3: I/O OPERATIONS (Replacing <stdio.h> via raw syscalls)
  * ========================================================================= */

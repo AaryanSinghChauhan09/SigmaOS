@@ -1,37 +1,43 @@
-#include <stdio.h>
-#include <stdint.h>
+#include "libc/sigma_libc.h"
 
 /**
- * SigmaOS Enterprise Kernel Core v1.0 (Native C Shard)
+ * SigmaOS Enterprise Kernel Core v2.0 (Sovereign C Shard)
  * Inspiration: torvalds/linux (Kernel Entry Point)
  * USP: Silicon-Direct Execution & Syscall Management.
- * Principle: Absolute Performance & Enterprisety.
+ * Principle: Absolute Performance & Zero-Stdlib Sovereignty.
  */
 
 typedef struct {
-    uint32_t pid;
+    sigma_u32 pid;
     char name[32];
-    uint32_t priority;
+    sigma_u32 priority;
 } ShardControlBlock;
 
 void sigma_init_kernel() {
-    printf("[KERNEL]: Initiating Enterprise Kernel Boot Sequence (Native C Shard)...\n");
-    printf("[KERNEL]: Allocating System Inode Tables (VFS Inspiration)...\n");
+    sigma_printf("[KERNEL]: Initiating Enterprise Kernel Boot Sequence (Native C Shard)...\n");
+    sigma_printf("[KERNEL]: Allocating System Inode Tables (VFS Inspiration)...\n");
 }
 
 void sigma_dispatch_shard(ShardControlBlock* scb) {
-    printf("[KERNEL]: Dispatching Shard: %s (PID: %d, PRIO: %d)\n", scb->name, scb->pid, scb->priority);
+    sigma_printf("[KERNEL]: Dispatching Shard: %s (PID: %u, PRIO: %u)\n", scb->name, scb->pid, scb->priority);
 }
 
-int main() {
+extern "C" void _start(void) {
     sigma_init_kernel();
     
-    ShardControlBlock scb_justice = {101, "EnterpriseJustice", 1};
-    ShardControlBlock scb_ledger = {102, "EnterpriseLedger", 2};
+    ShardControlBlock scb_justice;
+    scb_justice.pid = 101;
+    sigma_strcpy(scb_justice.name, "EnterpriseJustice");
+    scb_justice.priority = 1;
+    
+    ShardControlBlock scb_ledger;
+    scb_ledger.pid = 102;
+    sigma_strcpy(scb_ledger.name, "EnterpriseLedger");
+    scb_ledger.priority = 2;
     
     sigma_dispatch_shard(&scb_justice);
     sigma_dispatch_shard(&scb_ledger);
     
-    printf("[KERNEL]: Kernel Core Operational. Entering Shard Loop.\n");
-    return 0;
+    sigma_printf("[KERNEL]: Kernel Core Operational. Entering Shard Loop.\n");
+    sigma_exit(0);
 }

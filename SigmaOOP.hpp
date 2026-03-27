@@ -369,6 +369,69 @@ public:
 };
 
 /* =========================================================================
+ * SIGMA MAP (Replacing std::map - no STL required)
+ * OOP: Simple linear-search key-value store (associative array).
+ * Note: For extreme performance, this should be a Red-Black Tree, but
+ *       for Sovereign compliance and minimalism, an array of Pairs is used.
+ * ========================================================================= */
+
+template<typename K, typename V>
+struct SigmaPair {
+    K first;
+    V second;
+    SigmaPair() : first(), second() {}
+    SigmaPair(const K& k, const V& v) : first(k), second(v) {}
+};
+
+template<typename K, typename V>
+class SigmaMap {
+private:
+    SigmaArray<SigmaPair<K, V>> _pairs;
+
+public:
+    SigmaMap() noexcept = default;
+
+    void insert(const K& key, const V& value) {
+        for (auto& pair : _pairs) {
+            if (pair.first == key) {
+                pair.second = value;
+                return;
+            }
+        }
+        _pairs.push(SigmaPair<K, V>(key, value));
+    }
+
+    V& operator[](const K& key) {
+        for (auto& pair : _pairs) {
+            if (pair.first == key) return pair.second;
+        }
+        _pairs.push(SigmaPair<K, V>(key, V()));
+        return _pairs.back().second;
+    }
+
+    const V& at(const K& key) const {
+        for (const auto& pair : _pairs) {
+            if (pair.first == key) return pair.second;
+        }
+        sigma_exit(SIGMA_ERR_NOTFOUND); /* Fatal in kernel context */
+        static V fallback{}; return fallback;
+    }
+
+    sigma_bool count(const K& key) const noexcept {
+        for (const auto& pair : _pairs) {
+            if (pair.first == key) return SIGMA_TRUE;
+        }
+        return SIGMA_FALSE;
+    }
+
+    sigma_usize size() const noexcept { return _pairs.size(); }
+    void clear() noexcept { _pairs.clear(); }
+
+    auto begin() noexcept { return _pairs.begin(); }
+    auto end() noexcept { return _pairs.end(); }
+};
+
+/* =========================================================================
  * ABSTRACT BASE CLASS: SigmaObject (The universal OOP base)
  * OOP: Base class providing identity, polymorphism, lifecycle hooks.
  * Absorbing: Fuchsia's zx_object, seL4's CNode principles.
