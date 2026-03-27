@@ -65,7 +65,7 @@ static sigma_i32 sigma_sys_close(sigma_i32 fd) {
     return ret;
 }
 
-void _start() {
+void _start(void) {
     sigma_print("[SIGMA_FB]: Bootstrapping Zero-Library Raw Graphics Compositor.\n");
     sigma_print("[SIGMA_FB]: Eradicating HTML/CSS/JS. Displaying directly to Silicon Framebuffer.\n");
 
@@ -80,7 +80,8 @@ void _start() {
         sigma_u64 screensize = 1920 * 1080 * 4;
         char* fbp = (char*)sigma_sys_mmap_fb(screensize, SIGMA_PROT_READ | SIGMA_PROT_WRITE, SIGMA_MAP_SHARED, fbfd);
 
-        if ((sigma_i64)fbp > 0) {
+        /* mmap returns MAP_FAILED (errno as negative) on error; valid addrs are never near ULONG_MAX */
+        if ((sigma_u64)(sigma_usize)fbp <= (sigma_u64)-4096ULL) {
             sigma_print("[SIGMA_FB]: Video Memory mapped successfully. Commencing hardware render.\n");
             
             // 3. Render raw pixel data perfectly. Pure C, NO LIBRARIES.
@@ -89,10 +90,10 @@ void _start() {
                 for (x = 0; x < 1920; x++) {
                     sigma_u64 location = (x + 1920 * y) * 4;
                     // Write "Sigma-Red" directly to the hardware pixel
-                    fbp[location + 0] = 0;     // Blue
-                    fbp[location + 1] = 0;     // Green
-                    fbp[location + 2] = 255;   // Red
-                    fbp[location + 3] = 0;     // Transparency
+                    fbp[location + 0] = 0;                // Blue
+                    fbp[location + 1] = 0;                // Green
+                    fbp[location + 2] = (unsigned char)255; // Red (explicit cast prevents sign warning)
+                    fbp[location + 3] = 0;                // Alpha/Transparency
                 }
             }
             sigma_print("[SIGMA_FB]: UI Rendered to physical screen.\n");

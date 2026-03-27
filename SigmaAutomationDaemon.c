@@ -37,7 +37,7 @@ static sigma_i32 sigma_sys_nanosleep(const struct sigma_timespec *req, struct si
     return ret;
 }
 
-void _start() {
+void _start(void) {
     sigma_print("[SIGMA_AUTO]: Bootstrapping Zero-Library Automation Matrix.\n");
     sigma_print("[SIGMA_AUTO]: Absorbing Puppy Linux RAM-State Loops & Cron Automation...\n");
 
@@ -57,7 +57,10 @@ void _start() {
         // e.g., sigma_intel_avx_sqrt(144);
         
         // Sleep using direct kernel syscalls instead of <time.h>
-        sigma_sys_nanosleep(&sleep_time, 0);
+        struct sigma_timespec remainder;
+        remainder.tv_sec  = 0;
+        remainder.tv_nsec = 0;
+        sigma_sys_nanosleep(&sleep_time, &remainder);
         
         automation_cycles--;
     }

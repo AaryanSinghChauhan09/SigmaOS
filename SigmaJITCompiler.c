@@ -39,7 +39,7 @@ static void* sigma_sys_mmap(void *addr, sigma_u64 length, sigma_i32 prot, sigma_
     return ret;
 }
 
-void _start() {
+void _start(void) {
     sigma_print("[SIGMA_JIT]: Bootstrapping Zero-Library 'Source-to-Silicon' Compiler.\n");
     sigma_print("[SIGMA_JIT]: Absorbing Gentoo USP for perfect architecture tuning...\n");
 
@@ -50,7 +50,8 @@ void _start() {
         SIGMA_MAP_PRIVATE | SIGMA_MAP_ANONYMOUS, -1, 0
     );
 
-    if ((sigma_i64)executable_shard > 0) {
+    /* mmap returns MAP_FAILED (a very large pointer near ULONG_MAX) on error */
+    if ((sigma_u64)(sigma_usize)executable_shard <= (sigma_u64)-4096ULL) {
         // 2. We compile a custom "Function" directly into Machine Language.
         // Logic: A simple C function that returns 42 (0x2A).
         // x86_64 Asm: mov eax, 42; ret

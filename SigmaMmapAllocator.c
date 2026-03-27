@@ -61,7 +61,7 @@ static sigma_i32 sigma_sys_munmap(void *addr, sigma_u64 length) {
     return (sigma_i32)ret;
 }
 
-void _start() {
+void _start(void) {
     sigma_print("[SIGMA_ALLOC]: Bootstrapping Zero-Library Virtual Page Allocator.\n");
     sigma_print("[SIGMA_ALLOC]: Bypassing <stdlib.h> `malloc`. Securing hardware pages...\n");
 
@@ -77,7 +77,8 @@ void _start() {
     );
 
     // Write-test the hardware page constraint.
-    if ((sigma_i64)hardware_page > 0) {
+    /* mmap error: kernel returns page-aligned errno near ULONG_MAX */
+    if ((sigma_u64)(sigma_usize)hardware_page <= (sigma_u64)-4096ULL) {
         sigma_print("[SIGMA_ALLOC]: Hardware Page Mapped Successfully at: 0x");
         sigma_print_int((sigma_i64)hardware_page);
         sigma_print("\n");
@@ -95,6 +96,6 @@ void _start() {
 
 // Exit
 #if defined(__x86_64__)
-    __asm__ volatile ("mov $60, %%rax\n xor %%rdi, %%rdi\n syscall\n" ::: "rax", "rdi");
+    __asm__ volatile ("mov $60, %%rax\n xor %%rdi, %%rdi\n syscall\n" ::: "%rax", "%rdi");
 #endif
 }
