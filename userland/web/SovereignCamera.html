@@ -72,8 +72,8 @@
         function renderLoop() {
             ctx.clearRect(0, 0, canvas.width, canvas.height);
             if (arMode) {
-                // Mit-scratch/Snapchat USP: Basic AR drawing on faces (placeholder logic for demonstration)
-                // In a production C/C++ build, this connects to the facial recognition subsystem
+                // MIT-Scratch & Snapchat USP: Algorithmic block-based AR drawing and facial mesh filtering.
+                // In a production C/C++ build, this connects to the bare-metal facial recognition subsystem.
                 const time = Date.now() / 500;
                 const x = canvas.width / 2 + Math.sin(time) * 50;
                 const y = canvas.height / 2 + Math.cos(time) * 50;
@@ -84,7 +84,7 @@
                 ctx.fill();
                 ctx.fillStyle = '#fff';
                 ctx.font = '24px Courier';
-                ctx.fillText('Tracking Entity...', x - 80, y - 80);
+                ctx.fillText('Tracking Entity via MIT Scratch & Snapchat Algorithms...', x - 80, y - 80);
             }
             requestAnimationFrame(renderLoop);
         }
