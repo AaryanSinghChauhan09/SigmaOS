@@ -149,7 +149,7 @@
         #ctx-menu {
             position: fixed; background: rgba(10,10,20,0.9); border: 1px solid var(--border);
             border-radius: 8px; padding: 6px 0; min-width: 160px; display: none; z-index: 9999;
-            backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); box-shadow: 0 10px 40px rgba(0,0,0,0.6);
+            -webkit-backdrop-filter: blur(12px); backdrop-filter: blur(12px); box-shadow: 0 10px 40px rgba(0,0,0,0.6);
         }
         .ctx-item { padding: 8px 16px; cursor: pointer; font-size: 13px; color: var(--text-80); transition: 0.2s; }
         .ctx-item:hover { background: var(--glass-3); color: var(--neon-primary); }
@@ -536,6 +536,9 @@ document.addEventListener('DOMContentLoaded', () => {
         </div>
 
         <div class="dsep"></div>
+        <div class="ditem" onclick="OS.launch('📊 Monitor','userland/apps/sigma_monitor.html')">
+            <div class="diw">📊</div><div class="ddot" id="dd-monitor"></div><div class="dtt">Task Manager</div>
+        </div>
         <div class="ditem" onclick="OS.launch('⚙️ Settings','userland/apps/sigma_settings.html')">
             <div class="diw">⚙️</div><div class="ddot" id="dd-settings"></div><div class="dtt">Settings</div>
         </div>
@@ -705,9 +708,9 @@ class SigmaWebKernel {
         ttl.className = 'wtitle'; ttl.textContent = 'Σ ' + name;
 
         ctrls.append(
-            mk('cl', 'Close', () => this._close(title)),
-            mk('mn', 'Minimize', () => this._minimize(title)),
-            mk('mx', 'Maximize', () => {
+            mk('mn', 'Minimize', (e) => { e.stopPropagation(); this._minimize(title); }),
+            mk('mx', 'Maximize', (e) => {
+                e.stopPropagation();
                 if (!isMax) {
                     prevGeo = { w: win.style.width, h: win.style.height, t: win.style.top, l: win.style.left };
                     win.style.cssText += ';width:100vw!important;height:calc(100vh - 30px)!important;top:30px!important;left:0!important;border-radius:0!important';
@@ -718,13 +721,11 @@ class SigmaWebKernel {
                     win.style.removeProperty('border-radius'); win.classList.remove('maximized'); isMax = false;
                 }
             }),
-            mk('pn', 'Pin', () => {
-                win.classList.toggle('pinned');
-                sigma_notify("Zenith", `${name} ${win.classList.contains('pinned') ? 'Pinned' : 'Unpinned'}`);
+            mk('at', 'Always on Top', (e) => {
+                e.stopPropagation();
+                win.classList.toggle('always-on-top'); win.style.zIndex = win.classList.contains('always-on-top') ? 9999 : this.zBase;
             }),
-            mk('tp', 'Always on Top', () => {
-                win.classList.toggle('always-on-top');
-            })
+            mk('cl', 'Close', (e) => { e.stopPropagation(); this._close(title); })
         );
 
         bar.append(ctrls, ttl);

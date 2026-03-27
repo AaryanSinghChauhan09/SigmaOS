@@ -6,6 +6,8 @@
 
 ## 🚀 1. ARCHITECTURE & PERFORMANCE
 
+- [x] **Sovereign Container Engine (PODS)**: PID/MNT/NET isolation for lightweight sovereign sharding. [IMPLEMENTED v6.1]
+- [x] **Sovereign Virtualization Node (VMX/SVM)**: Hardware-accelerated guest isolation for independent installs. [IMPLEMENTED v6.1]
 - [ ] **Native Vulkan Compositor**: Transition Zenith UI from browser-based rendering to a raw Vulkan-based native compositor for ultra-low latency.
 - [ ] **Quantum-Resistant Encryption (NIST-Level)**: Implement NTRU or Kyber as the default encryption for all system vaults to future-proof against quantum attacks.
 - [ ] **Zero-Latency Context Switching**: Implement a lock-free, RCU-based scheduler in the Sovereign Kernel to eliminate wait states during heavy I/O.

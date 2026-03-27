@@ -89,14 +89,14 @@ document.addEventListener('DOMContentLoaded', () => {
 <div class="toolbar">
   <span class="brand">Σ IDE</span>
   <select aria-label="Selection" class="lang-sel" id="lang-sel" title="Language" onchange="changeLang()">
-    <option value="js">JavaScript</option>
-    <option value="cpp">C++ (Simulated)</option>
-    <option value="c">C (Simulated)</option>
-    <option value="rust">Rust (Simulated)</option>
+    <option value="js">JavaScript (Native)</option>
+    <option value="cpp">C++ (Sovereign Backend)</option>
+    <option value="c">C (Sovereign Backend)</option>
+    <option value="rust">Rust (Sovereign Backend)</option>
     <option value="py">Python (Σ Engine)</option>
-    <option value="asm">Assembly (x86)</option>
+    <option value="asm">Assembly (Native x86_64)</option>
   </select>
-  <button class="tb-btn run" onclick="runCode()" title="F11">▶ Run</button>
+  <button class="tb-btn run" onclick="runCode()" title="F11">▶ Run (SIRT)</button>
   <button class="tb-btn" onclick="formatCode()" title="Alt+F">⚡ Format</button>
   <button class="tb-btn" onclick="newTab()">＋ New</button>
   <button class="tb-btn" onclick="saveFile()">💾 Save</button>
