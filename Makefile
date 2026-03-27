@@ -149,7 +149,9 @@ SIGMA_TOOLS_SRCS := SigmaGuideLinter.cpp \
                     SigmaLauncher.cpp \
                     SigmaThemeEngine.cpp \
                     SigmaSovereignPersonalizer.cpp \
-                    SigmaSiliconPulse.cpp
+                    SigmaSiliconPulse.cpp \
+                    SigmaHtmlLinter.cpp \
+                    SigmaBootstrapper.cpp
 SIGMA_TOOLS_OBJS := $(patsubst %.cpp, build/%.o, $(SIGMA_TOOLS_SRCS))
 
 # =============================================================================
