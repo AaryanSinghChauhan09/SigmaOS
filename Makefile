@@ -146,7 +146,10 @@ CPP_OBJS  := $(patsubst %.cpp, build/%.o, $(CPP_SRCS))
 SIGMA_TOOLS_SRCS := SigmaGuideLinter.cpp \
                     SigmaFileFabricator.cpp \
                     SigmaSovereignCI.cpp \
-                    SigmaLauncher.cpp
+                    SigmaLauncher.cpp \
+                    SigmaThemeEngine.cpp \
+                    SigmaSovereignPersonalizer.cpp \
+                    SigmaSiliconPulse.cpp
 SIGMA_TOOLS_OBJS := $(patsubst %.cpp, build/%.o, $(SIGMA_TOOLS_SRCS))
 
 # =============================================================================
