@@ -40,7 +40,7 @@ namespace SigmaOS::Legal {
     private:
         HWND m_hwnd;
         std::unique_ptr<IView> m_active_view;
-        std::string m_user_name = "ADVOCATE SOVEREIGN_USER SINGH CHAUHAN";
+        std::string m_user_name = "ADVOCATE SOVEREIGN_USER";
 
     public:
         AdvocateApp() : m_hwnd(nullptr) {

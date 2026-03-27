@@ -66,7 +66,7 @@ class AdvocateCommandCenter(tk.Tk):
         bot_tag = tk.Frame(self.sidebar_fr, bg=PAL["surface_variant"], padx=15, pady=15)
         bot_tag.pack(side="bottom", fill="x")
         tk.Label(bot_tag, text="ADVOCATE ON RECORD", font=FONT["caption"], fg=PAL["text_secondary"], bg=PAL["surface_variant"]).pack(anchor="w")
-        tk.Label(bot_tag, text="SOVEREIGN_USER SINGH CHAUHAN", font=FONT["body_bold"], fg=PAL["text_primary"], bg=PAL["surface_variant"]).pack(anchor="w")
+        tk.Label(bot_tag, text="SOVEREIGN_USER", font=FONT["body_bold"], fg=PAL["text_primary"], bg=PAL["surface_variant"]).pack(anchor="w")
 
     def _build_main_view(self):
         self.content_fr = tk.Frame(self, bg=PAL["background"], padx=50, pady=40)
