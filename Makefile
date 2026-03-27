@@ -128,7 +128,8 @@ CPP_SRCS  := SigmaOOP_Framework.cpp \
              SigmaConcurrencyZenith.cpp \
              sigma_system_pulse.cpp \
              sigma_browser_core.cpp \
-             sigma_terminal_sovereign.cpp
+             sigma_terminal_sovereign.cpp \
+             SigmaHealth_Native.cpp
 CPP_OBJS  := $(patsubst %.cpp, build/%.o, $(CPP_SRCS))
 
 # =============================================================================

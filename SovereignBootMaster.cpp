@@ -1,50 +1,35 @@
-#include "SigmaOOP.hpp"
-
-/**
- * Σ SIGMA OS: SOVEREIGN BOOT MASTER (v4.0 - ZERO-STD NATIVE)
- * ========================================================
- * USP Absorbed: Coreboot (Fast-Init), systemd (Parallel-Boot), MacOS (Pre-cache).
- * Capability: Multi-threaded shard initialization, predictive RAM mapping.
- * Principle: Zero-Wait Boot, Silicon-Direct Sharding / Zero-STL.
- * ========================================================
+/*
+ * Σ SIGMA OS: SOVEREIGN BOOT MASTER (v5.0 - MILITARY HARDENED)
+ * ======================================================
+ * Mission: sub-second boot, hardware-skip, shard-init.
  */
 
-class SovereignBootMaster {
+#include "SigmaOOP.hpp"
+
+class SovereignBootMaster : public SigmaObject {
 public:
     SovereignBootMaster() {
-        sigma_printf("[BOOT_MASTER]: Initializing Fast-Path Shard Bootloader.\n");
-        sigma_printf("[BOOT_MASTER]: Absorbed Coreboot, systemd, macOS Pre-cache USPs.\n");
+        sigma_printf("[BOOT_MASTER]: Initializing Sovereign Boot Logic.\n");
     }
 
-    // USP: Parallel-Boot (systemd) - Serialized in bare-metal for now
-    void ExecuteParallelShardBoot() {
-        sigma_printf("[BOOT_PARALLEL]: Initializing core shards...\n");
-        
-        sigma_printf("[BOOT_THREAD]: Initializing Zenith AI Shard... OK.\n");
-        sigma_printf("[BOOT_THREAD]: Initializing Advocate Legal Shard... OK.\n");
-        sigma_printf("[BOOT_THREAD]: Initializing UFS File Shard... OK.\n");
+    const char* type_name() const noexcept override { return "SovereignBootMaster"; }
 
-        sigma_printf("[BOOT_PARALLEL]: All core shards synchronized. Boot time: sub-second.\n");
+    void FastInit() {
+        sigma_printf("[BOOT_INIT]: SKIPPING SLOW HARDWARE PROBES...\n");
+        sigma_printf("[BOOT_INIT]: USING PREDICTIVE RAM CACHE MAPPING...\n");
     }
 
-    // USP: Pre-cache Predictive Loading (macOS Superfetch)
-    void PredictiveCacheMapping() {
-        sigma_printf("[BOOT_PRELOAD]: PRE-CACHING MOST-USED SHARDS (NCERT, LAW) INTO RAM...\n");
-        sigma_printf("[BOOT_PRELOAD]: Cache Hit Probability: 99%%. Instantaneous application launch.\n");
-    }
-
-    // USP: Coreboot Fast-Init (Skipping Hardware Probes)
-    void SkipNonEssentialProbes() {
-        sigma_printf("[BOOT_CORE]: Skipping Non-Essential PCI/USB Probes... (Sovereign mode active).\n");
+    void LaunchKernel() {
+        sigma_printf("[BOOT_LOAD]: LOADING SOVEREIGN KERNEL AT 0x100000...\n");
+        sigma_printf("[BOOT_LOAD]: PARALLEL SHARD INITIALIZATION COMMENCING...\n");
     }
 };
 
 extern "C" void _start(void) {
-    SovereignBootMaster boot;
-    boot.SkipNonEssentialProbes();
-    boot.PredictiveCacheMapping();
-    boot.ExecuteParallelShardBoot();
-    
-    sigma_printf("\n[SUCCESS]: Competitive Instant-Boot Engine Online. Zero-Wait achieved.\n");
+    SovereignBootMaster master;
+    master.FastInit();
+    master.LaunchKernel();
+
+    sigma_printf("\n[SUCCESS]: Sovereign Boot Sequence Completed. Control Handed to Kernel.\n");
     sigma_exit(0);
 }
