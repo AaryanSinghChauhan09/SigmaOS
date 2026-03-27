@@ -25,6 +25,19 @@ extern "C" {
 }
 
 /* =========================================================================
+ * SIGMA OS CORE TASK STRUCTURE
+ * ========================================================================= */
+
+struct SigmaTask {
+    sigma_u64 pid;
+    char name[32];
+    sigma_u64 stack_base;
+    sigma_u64 heap_base;
+    sigma_u32 priority;
+    sigma_bool active;
+};
+
+/* =========================================================================
  * CUSTOM GLOBAL new/delete (Replace heap allocation without <new>)
  * ========================================================================= */
 
@@ -388,7 +401,10 @@ public:
     virtual const char* type_name() const noexcept = 0;
 };
 
-sigma_u64 SigmaObject::_next_id = 1;
+#ifndef SIGMA_OBJECT_ID_DEF
+#define SIGMA_OBJECT_ID_DEF
+inline sigma_u64 SigmaObject::_next_id = 1;
+#endif
 
 class AbstractDistroAbsorber : public SigmaObject {
 public:
@@ -444,7 +460,7 @@ public:
  * IMPLEMENTATION BACKENDS
  * ========================================================================= */
 
-extern "C" void* sigma_slab_alloc_raw(sigma_usize size) {
+inline void* sigma_slab_alloc_raw(sigma_usize size) {
 #if defined(SIGMA_ARCH_X86_64)
     sigma_u64 res;
     __asm__ volatile ("syscall" : "=a"(res) : "0"(9ULL), "D"(0ULL), "S"((sigma_u64)size), "d"(3ULL), "r"(34ULL), "r"(-1LL), "r"(0ULL) : "rcx", "r11", "memory");
@@ -456,4 +472,4 @@ extern "C" void* sigma_slab_alloc_raw(sigma_usize size) {
 #endif
 }
 
-extern "C" void sigma_slab_free_raw(void* ptr) { (void)ptr; }
+inline void sigma_slab_free_raw(void* ptr) { (void)ptr; }

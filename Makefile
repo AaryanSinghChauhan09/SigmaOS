@@ -129,7 +129,8 @@ CPP_SRCS  := SigmaOOP_Framework.cpp \
              sigma_system_pulse.cpp \
              sigma_browser_core.cpp \
              sigma_terminal_sovereign.cpp \
-             SigmaHealth_Native.cpp
+             SigmaHealth_Native.cpp \
+             kernel/SovereignProcessManager.cpp
 CPP_OBJS  := $(patsubst %.cpp, build/%.o, $(CPP_SRCS))
 
 # =============================================================================
