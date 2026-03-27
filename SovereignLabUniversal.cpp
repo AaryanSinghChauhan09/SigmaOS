@@ -1,13 +1,12 @@
-#include <iostream>
-#include <vector>
-#include <memory>
+#include "SigmaOOP.hpp"
 
 /**
- * Σ SIGMA OS: SOVEREIGN LAB UNIVERSAL (v128.0 - UNIVERSAL ZENITH)
+ * Σ SIGMA OS: SOVEREIGN LAB UNIVERSAL (v128.0 - ZERO-STD NATIVE)
  * ==============================================================
  * USP: Universal "Small & Big" experiment coverage for NCERT (1-12).
  * Capability: Bernoulli, Kinetics, Venn, and Germination Shards.
- * Principle: OOPS, Polymorphism, Abstraction, SOLID.
+ * Principle: OOPS, Polymorphism, Abstraction, SOLID / Zero-STL.
+ * ==============================================================
  */
 
 class IUniversalExp {
@@ -20,8 +19,8 @@ public:
 class BernoulliShard : public IUniversalExp {
 public:
     void Deploy() override {
-        std::cout << "[PHYSICS/EXP]: Experiment: Verification of Bernoulli's Theorem." << std::endl;
-        std::cout << "[PHYSICS/EXP]: P + 0.5*rho*v^2 + rho*g*h = Constant [Verified]." << std::endl;
+        sigma_printf("[PHYSICS/EXP]: Experiment: Verification of Bernoulli's Theorem.\n");
+        sigma_printf("[PHYSICS/EXP]: P + 0.5*rho*v^2 + rho*g*h = Constant [Verified].\n");
     }
 };
 
@@ -29,8 +28,8 @@ public:
 class KineticsShard : public IUniversalExp {
 public:
     void Deploy() override {
-        std::cout << "[CHEMISTRY/EXP]: Experiment: Effect of Temp on Rate of Reaction." << std::endl;
-        std::cout << "[CHEMISTRY/EXP]: Arrhenius Shard: Rate doubles every 10K increase." << std::endl;
+        sigma_printf("[CHEMISTRY/EXP]: Experiment: Effect of Temp on Rate of Reaction.\n");
+        sigma_printf("[CHEMISTRY/EXP]: Arrhenius Shard: Rate doubles every 10K increase.\n");
     }
 };
 
@@ -38,8 +37,8 @@ public:
 class GerminationShard : public IUniversalExp {
 public:
     void Deploy() override {
-        std::cout << "[BIOLOGY/EXP]: Experiment: Germination of Gram Seeds." << std::endl;
-        std::cout << "[BIOLOGY/EXP]: Water absorption -> Radicle emergence synchronized." << std::endl;
+        sigma_printf("[BIOLOGY/EXP]: Experiment: Germination of Gram Seeds.\n");
+        sigma_printf("[BIOLOGY/EXP]: Water absorption -> Radicle emergence synchronized.\n");
     }
 };
 
@@ -47,8 +46,8 @@ public:
 class BloodGroupShard : public IUniversalExp {
 public:
     void Deploy() override {
-        std::cout << "[BIOLOGY/EXP]: Experiment: ABO Blood Grouping & Rh Factor." << std::endl;
-        std::cout << "[BIOLOGY/EXP]: Agglutination detected for Antigen-A. Result: A+." << std::endl;
+        sigma_printf("[BIOLOGY/EXP]: Experiment: ABO Blood Grouping & Rh Factor.\n");
+        sigma_printf("[BIOLOGY/EXP]: Agglutination detected for Antigen-A. Result: A+.\n");
     }
 };
 
@@ -56,37 +55,38 @@ public:
 class VennShard : public IUniversalExp {
 public:
     void Deploy() override {
-        std::cout << "[MATH/EXP]: Experiment: Verification of De Morgan's Laws." << std::endl;
-        std::cout << "[MATH/EXP]: (A U B)' = A' n B' Shard confirmed via Venn Projection." << std::endl;
+        sigma_printf("[MATH/EXP]: Experiment: Verification of De Morgan's Laws.\n");
+        sigma_printf("[MATH/EXP]: (A U B)' = A' n B' Shard confirmed via Venn Projection.\n");
     }
 };
 
 class SovereignLabUniversal {
 private:
-    std::vector<std::unique_ptr<IUniversalExp>> m_zenith;
+    SigmaUniquePtr<IUniversalExp> m_zenith[16];
+    sigma_usize m_count = 0;
 public:
     void Synthesize() {
-        m_zenith.push_back(std::make_unique<BernoulliShard>());
-        m_zenith.push_back(std::make_unique<KineticsShard>());
-        m_zenith.push_back(std::make_unique<GerminationShard>());
-        m_zenith.push_back(std::make_unique<BloodGroupShard>());
-        m_zenith.push_back(std::make_unique<VennShard>());
+        if (m_count < 16) m_zenith[m_count++] = sigma_make_unique<BernoulliShard>();
+        if (m_count < 16) m_zenith[m_count++] = sigma_make_unique<KineticsShard>();
+        if (m_count < 16) m_zenith[m_count++] = sigma_make_unique<GerminationShard>();
+        if (m_count < 16) m_zenith[m_count++] = sigma_make_unique<BloodGroupShard>();
+        if (m_count < 16) m_zenith[m_count++] = sigma_make_unique<VennShard>();
     }
 
     void ExecuteUniversalAudit() {
-        std::cout << "--- Σ SIGMA OS SOVEREIGN UNIVERSAL LABORATORY ---" << std::endl;
-        for (const auto& exp : m_zenith) {
-            std::cout << "\n------------------------------------------------" << std::endl;
-            exp->Deploy();
+        sigma_printf("--- Σ SIGMA OS SOVEREIGN UNIVERSAL LABORATORY ---\n");
+        for (sigma_usize i = 0; i < m_count; i++) {
+            sigma_printf("\n------------------------------------------------\n");
+            m_zenith[i]->Deploy();
         }
     }
 };
 
-int main() {
+extern "C" void _start(void) {
     SovereignLabUniversal lab;
     lab.Synthesize();
     lab.ExecuteUniversalAudit();
 
-    std::cout << "\n[SUCCESS]: Universal NCERT Experiment Cluster Active. 100% Curricular Sovereignty." << std::endl;
-    return 0;
+    sigma_printf("\n[SUCCESS]: Universal NCERT Experiment Cluster Active. 100%% Curricular Sovereignty.\n");
+    sigma_exit(0);
 }

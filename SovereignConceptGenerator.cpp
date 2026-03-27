@@ -1,107 +1,105 @@
-#include <iostream>
-#include <string>
-#include <memory>
-#include <map>
+#include "SigmaOOP.hpp"
 
 /**
- * Σ SIGMA OS: SOVEREIGN CONCEPT GENERATOR (v128.0 - KNOWLEDGE ZENITH)
+ * Σ SIGMA OS: SOVEREIGN CONCEPT GENERATOR (v128.0 - ZERO-STD NATIVE)
  * =================================================================
  * USP: Universal Sharding of every NCERT Concept (PCM+B).
  * Capability: Advanced simulations for Relativity, Enthalpy, and 3D Geometry.
- * Principle: OOPS, Polymorphism, Abstraction, SOLID.
+ * Principle: OOPS, Polymorphism, Abstraction, SOLID / Zero-STL.
+ * =================================================================
  */
 
 class IConceptShard {
 public:
     virtual ~IConceptShard() = default;
     virtual void Simulate() = 0;
-    virtual std::string GetTitle() = 0;
+    virtual SigmaString GetTitle() = 0;
 };
 
 // --- Physics: The Relativity Shard ---
 class RelativityShard : public IConceptShard {
 public:
     void Simulate() override {
-        std::cout << "[PHYSICS/RELATIVITY]: Concept: E = mc^2 (Mass-Energy Parity)." << std::endl;
-        std::cout << "[PHYSICS/RELATIVITY]: Mass Shard of 1kg = 8.98e16 Joules." << std::endl;
+        sigma_printf("[PHYSICS/RELATIVITY]: Concept: E = mc^2 (Mass-Energy Parity).\n");
+        sigma_printf("[PHYSICS/RELATIVITY]: Mass Shard of 1kg = 8.98e16 Joules.\n");
     }
-    std::string GetTitle() override { return "Relativity_Apex"; }
+    SigmaString GetTitle() override { return "Relativity_Apex"; }
 };
 
 // --- Physics: Electromagnetic Induction ---
 class InductionShard : public IConceptShard {
 public:
     void Simulate() override {
-        std::cout << "[PHYSICS/INDUCTION]: Concept: Faraday's Law (e = -dPhi/dt)." << std::endl;
-        std::cout << "[PHYSICS/INDUCTION]: Induced EMF Shard detected in Shard-Coil." << std::endl;
+        sigma_printf("[PHYSICS/INDUCTION]: Concept: Faraday's Law (e = -dPhi/dt).\n");
+        sigma_printf("[PHYSICS/INDUCTION]: Induced EMF Shard detected in Shard-Coil.\n");
     }
-    std::string GetTitle() override { return "Induction_Shard"; }
+    SigmaString GetTitle() override { return "Induction_Shard"; }
 };
 
 // --- Chemistry: Enthalpy & Entropy ---
 class ThermoDynamicsShard : public IConceptShard {
 public:
     void Simulate() override {
-        std::cout << "[CHEMISTRY/THERMO]: Concept: Enthalpy (dH) & Entropy (dS)." << std::endl;
-        std::cout << "[CHEMISTRY/THERMO]: Gibbs Free Energy: dG = dH - TdS [Verified]." << std::endl;
+        sigma_printf("[CHEMISTRY/THERMO]: Concept: Enthalpy (dH) & Entropy (dS).\n");
+        sigma_printf("[CHEMISTRY/THERMO]: Gibbs Free Energy: dG = dH - TdS [Verified].\n");
     }
-    std::string GetTitle() override { return "Enthalpy_Shard"; }
+    SigmaString GetTitle() override { return "Enthalpy_Shard"; }
 };
 
 // --- Biology: Ecology Shard ---
 class EcologyShard : public IConceptShard {
 public:
     void Simulate() override {
-        std::cout << "[BIOLOGY/ECOLOGY]: Concept: Energy Flow in Ecosystem (10% Law)." << std::endl;
-        std::cout << "[BIOLOGY/ECOLOGY]: 1000J Primary -> 100J Secondary -> 10J Tertiary." << std::endl;
+        sigma_printf("[BIOLOGY/ECOLOGY]: Concept: Energy Flow in Ecosystem (10%% Law).\n");
+        sigma_printf("[BIOLOGY/ECOLOGY]: 1000J Primary -> 100J Secondary -> 10J Tertiary.\n");
     }
-    std::string GetTitle() override { return "Ecology_Shard"; }
+    SigmaString GetTitle() override { return "Ecology_Shard"; }
 };
 
 // --- Math: 3D Geometry Shard ---
 class Geometry3DShard : public IConceptShard {
 public:
     void Simulate() override {
-        std::cout << "[MATH/3D]: Concept: Vectors & 3D Lines (Class 12)." << std::endl;
-        std::cout << "[MATH/3D]: Shortest Distance between Shard-Lines calculated." << std::endl;
+        sigma_printf("[MATH/3D]: Concept: Vectors & 3D Lines (Class 12).\n");
+        sigma_printf("[MATH/3D]: Shortest Distance between Shard-Lines calculated.\n");
     }
-    std::string GetTitle() override { return "3D_Geometry_Shard"; }
+    SigmaString GetTitle() override { return "3D_Geometry_Shard"; }
 };
 
 class SovereignConceptGenerator {
 private:
-    std::map<std::string, std::unique_ptr<IConceptShard>> m_registry;
+    SigmaMap<SigmaString, SigmaUniquePtr<IConceptShard>> m_registry;
 public:
     void GenerateAll() {
-        m_registry["RELATIVITY"] = std::make_unique<RelativityShard>();
-        m_registry["INDUCTION"] = std::make_unique<InductionShard>();
-        m_registry["ENTHALPY"] = std::make_unique<ThermoDynamicsShard>();
-        m_registry["ECOLOGY"] = std::make_unique<EcologyShard>();
-        m_registry["GEOMETRY3D"] = std::make_unique<Geometry3DShard>();
+        m_registry.insert("RELATIVITY", sigma_make_unique<RelativityShard>());
+        m_registry.insert("INDUCTION", sigma_make_unique<InductionShard>());
+        m_registry.insert("ENTHALPY", sigma_make_unique<ThermoDynamicsShard>());
+        m_registry.insert("ECOLOGY", sigma_make_unique<EcologyShard>());
+        m_registry.insert("GEOMETRY3D", sigma_make_unique<Geometry3DShard>());
     }
 
-    void ExecuteByTopic(const std::string& topic) {
-        if (m_registry.count(topic)) {
-            m_registry[topic]->Simulate();
+    void ExecuteByTopic(const SigmaString& topic) {
+        if (m_registry.contains(topic)) {
+            m_registry.at(topic)->Simulate();
         } else {
-            std::cout << "[!] ALERT: Topic Shard '" << topic << "' not yet synthesized." << std::endl;
+            sigma_printf("[!] ALERT: Topic Shard '%s' not yet synthesized.\n", topic.c_str());
         }
     }
 
     void RunFullScholasticAudit() {
-        std::cout << "--- Σ SIGMA OS SOVEREIGN KNOWLEDGE ZENITH ---" << std::endl;
-        for (auto& pair : m_registry) {
-            std::cout << "\n------------------------------------------------" << std::endl;
-            pair.second->Simulate();
+        sigma_printf("--- Σ SIGMA OS SOVEREIGN KNOWLEDGE ZENITH ---\n");
+        for (sigma_usize i = 0; i < m_registry.size(); i++) {
+            sigma_printf("\n------------------------------------------------\n");
+            m_registry.at_index(i)->Simulate();
         }
     }
 };
 
-int main() {
+extern "C" void _start(void) {
     SovereignConceptGenerator gen;
     gen.GenerateAll();
     gen.RunFullScholasticAudit();
 
-    std::cout << "\n[SUCCESS]: Universal NCERT Concept Generator Active. Mastery Verified." << std::endl;
-    return 0;
+    sigma_printf("\n[SUCCESS]: Universal NCERT Concept Generator Active. Mastery Verified.\n");
+    sigma_exit(0);
 }

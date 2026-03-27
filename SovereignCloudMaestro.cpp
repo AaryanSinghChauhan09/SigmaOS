@@ -1,28 +1,24 @@
-#include <iostream>
-#include <vector>
-#include <string>
-#include <map>
-#include <thread>
-#include <chrono>
+#include "SigmaOOP.hpp"
 
 /**
- * Σ SIGMA OS: SOVEREIGN CLOUD MAESTRO (v128.0 - CLOUD ZENITH)
+ * Σ SIGMA OS: SOVEREIGN CLOUD MAESTRO (v128.0 - ZERO-STD NATIVE)
  * ==========================================================
  * USP: Shard-to-Cloud Distributed Execution Logic.
  * Capability: Native C++ orchestrator for cross-region "Cloud-Shard Projection".
- * Principle: OOP, SOLID, Abstraction, Encapsulation.
+ * Principle: OOP, SOLID, Abstraction, Encapsulation / Zero-STL.
+ * ==========================================================
  */
 
 struct CloudShard {
-    std::string region;
-    std::string status;
-    std::string ip;
+    SigmaString region;
+    SigmaString status;
+    SigmaString ip;
 };
 
 // Interface for Cloud Operations (SOLID Abstraction)
 class ICloudOrchestrator {
 public:
-    virtual void DeployToCloud(const std::string& shardName) = 0;
+    virtual void DeployToCloud(const SigmaString& shardName) = 0;
     virtual void ShowCloudMatrix() const = 0;
     virtual ~ICloudOrchestrator() = default;
 };
@@ -30,48 +26,57 @@ public:
 // Concrete Implementation of Cloud Maestro (OOP Encapsulation & Composition)
 class CloudMaestro : public ICloudOrchestrator {
 private:
-    std::vector<std::string> regions;
-    std::map<std::string, CloudShard> activeShards;
+    SigmaString regions[3];
+    SigmaMap<SigmaString, CloudShard> activeShards;
 
 public:
     CloudMaestro() {
-        regions = {"US-EAST-1", "EU-WEST-1", "AP-SOUTH-1"};
+        regions[0] = "US-EAST-1";
+        regions[1] = "EU-WEST-1";
+        regions[2] = "AP-SOUTH-1";
     }
 
-    void DeployToCloud(const std::string& shardName) override {
-        std::cout << "[SOVEREIGN/CLOUD]: Initiating Native Cloud-Shard Projection for '" << shardName << "'..." << std::endl;
+    void DeployToCloud(const SigmaString& shardName) override {
+        sigma_printf("[SOVEREIGN/CLOUD]: Initiating Native Cloud-Shard Projection for '%s'...\n", shardName.c_str());
         
-        for (size_t i = 0; i < regions.size(); ++i) {
-            std::string shardId = shardName + "-" + regions[i] + "-ZENITH";
-            std::string nodeIp = "10.0." + std::to_string(i) + "." + std::to_string(activeShards.size() + 1);
+        for (sigma_usize i = 0; i < 3; ++i) {
+            SigmaString shardId = shardName;
+            shardId.append("-");
+            shardId.append(regions[i]);
+            shardId.append("-ZENITH");
+
+            char ip_buf[16];
+            sigma_snprintf(ip_buf, 16, "10.0.%d.%d", (int)i, (int)(activeShards.size() + 1));
             
-            activeShards[shardId] = {regions[i], "PROVISIONED", nodeIp};
+            CloudShard shard = {regions[i], "PROVISIONED", ip_buf};
+            activeShards.insert(shardId, shard);
             
-            // Simulating hardware-direct latency
-            std::this_thread::sleep_for(std::chrono::milliseconds(200));
-            std::cout << "[SOVEREIGN/CLOUD]: " << shardId << " -> [DEPLOYED] @ " << regions[i] 
-                      << " (Silicon Latency: <1ms via RDMA)" << std::endl;
+            sigma_printf("[SOVEREIGN/CLOUD]: %s -> [DEPLOYED] @ %s (Silicon Latency: <1ms via RDMA)\n", shardId.c_str(), regions[i].c_str());
         }
     }
 
     void ShowCloudMatrix() const override {
-        std::cout << "\n--- Σ SIGMA OS SOVEREIGN CLOUD SHARD MATRIX ---" << std::endl;
-        printf("%-30s | %-15s | %-15s | %s\n", "Shard ID", "Region", "Node IP", "Status");
-        std::cout << "---------------------------------------------------------------------------" << std::endl;
+        sigma_printf("\n--- Σ SIGMA OS SOVEREIGN CLOUD SHARD MATRIX ---\n");
+        sigma_printf("%-30s | %-15s | %-15s | %s\n", "Shard ID", "Region", "Node IP", "Status");
+        sigma_printf("---------------------------------------------------------------------------\n");
         
-        for (const auto& [sid, info] : activeShards) {
-            printf("%-30s | %-15s | %-15s | [ACTIVE]\n", sid.c_str(), info.region.c_str(), info.ip.c_str());
+        for (sigma_usize i = 0; i < activeShards.size(); i++) {
+            const SigmaString& sid = activeShards.key_at(i);
+            const CloudShard* info = activeShards.at_index(i);
+            sigma_printf("%-30s | %-15s | %-15s | [ACTIVE]\n", sid.c_str(), info->region.c_str(), info->ip.c_str());
         }
         
-        std::cout << "---------------------------------------------------------------------------" << std::endl;
-        std::cout << "Cloud Sovereignty: [ENABLED] | Redundancy: 3x | Protocol: Sovereign-RDMA\n" << std::endl;
+        sigma_printf("---------------------------------------------------------------------------\n");
+        sigma_printf("Cloud Sovereignty: [ENABLED] | Redundancy: 3x | Protocol: Sovereign-RDMA\n\n");
     }
 };
 
-int main() {
+extern "C" void _start(void) {
     CloudMaestro maestro;
     maestro.DeployToCloud("SOVEREIGN_KERNEL_ZENITH");
     maestro.DeployToCloud("APEX_AI_FUSION");
     maestro.ShowCloudMatrix();
-    return 0;
+    
+    sigma_printf("\n[SUCCESS]: Competitive Cloud Maestro Online. Zero-STL Sovereignty 100%%.\n");
+    sigma_exit(0);
 }

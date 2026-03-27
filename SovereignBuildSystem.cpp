@@ -1,21 +1,19 @@
-#include <iostream>
-#include <string>
-#include <vector>
-#include <intrin.h>
+#include "SigmaOOP.hpp"
 
 /**
- * Σ SIGMA OS: SOVEREIGN BUILD SYSTEM (v128.0 - BUILD ZENITH)
+ * Σ SIGMA OS: SOVEREIGN BUILD SYSTEM (v128.0 - ZERO-STD NATIVE)
  * =========================================================
  * USP: Silicon-Direct optimization (Gentoo-Style) for Apex Shards.
  * Capability: CPU Feature Detection (AVX-512, SSE4.2) & Hardware-Level Tuning.
- * Principle: OOPS, Abstraction, Hardware-Interfacing.
+ * Principle: OOPS, Abstraction, Hardware-Interfacing / Zero-STL.
+ * =========================================================
  */
 
 class ICPUDector {
 public:
     virtual ~ICPUDector() = default;
     virtual void DetectFeatures() = 0;
-    virtual std::string GetOptimizationFlags() = 0;
+    virtual SigmaString GetOptimizationFlags() = 0;
 };
 
 class SovereignSiliconAudit : public ICPUDector {
@@ -26,37 +24,45 @@ private:
 
 public:
     void DetectFeatures() override {
-        std::cout << "[BUILD/DETECTION]: Probing CPUID for instructions..." << std::endl;
+        sigma_printf("[BUILD/DETECTION]: Probing CPUID for instructions...\n");
         
-        int cpuInfo[4];
-        __cpuid(cpuInfo, 1);
-        m_has_sse42 = (cpuInfo[2] & (1 << 20)) != 0;
+#if defined(SIGMA_ARCH_X86_64)
+        unsigned int eax, ebx, ecx, edx;
         
-        __cpuid(cpuInfo, 7);
-        m_has_avx2 = (cpuInfo[1] & (1 << 5)) != 0;
-        m_has_avx512 = (cpuInfo[1] & (1 << 16)) != 0;
+        // Leaf 1 for SSE4.2
+        __asm__ volatile ("cpuid" : "=a"(eax), "=b"(ebx), "=c"(ecx), "=d"(edx) : "a"(1));
+        m_has_sse42 = (ecx & (1 << 20)) != 0;
+        
+        // Leaf 7 for AVX2/AVX512
+        __asm__ volatile ("cpuid" : "=a"(eax), "=b"(ebx), "=c"(ecx), "=d"(edx) : "a"(7), "c"(0));
+        m_has_avx2 = (ebx & (1 << 5)) != 0;
+        m_has_avx512 = (ebx & (1 << 16)) != 0;
+#else
+        // Fallback for non-x86
+        m_has_sse42 = false; m_has_avx2 = false; m_has_avx512 = false;
+#endif
 
-        std::cout << "[BUILD/CPU]: SSE4.2: " << (m_has_sse42 ? "[YES]" : "[NO]") << std::endl;
-        std::cout << "[BUILD/CPU]: AVX2: " << (m_has_avx2 ? "[YES]" : "[NO]") << std::endl;
-        std::cout << "[BUILD/CPU]: AVX-512: " << (m_has_avx512 ? "[YES]" : "[NO]") << std::endl;
+        sigma_printf("[BUILD/CPU]: SSE4.2: %s\n", (m_has_sse42 ? "[YES]" : "[NO]"));
+        sigma_printf("[BUILD/CPU]: AVX2: %s\n", (m_has_avx2 ? "[YES]" : "[NO]"));
+        sigma_printf("[BUILD/CPU]: AVX-512: %s\n", (m_has_avx512 ? "[YES]" : "[NO]"));
     }
 
-    std::string GetOptimizationFlags() override {
-        std::string flags = "-march=native -O3";
-        if (m_has_avx512) flags += " -mavx512f";
-        else if (m_has_avx2) flags += " -mavx2";
+    SigmaString GetOptimizationFlags() override {
+        SigmaString flags = "-march=native -O3";
+        if (m_has_avx512) flags.append(" -mavx512f");
+        else if (m_has_avx2) flags.append(" -mavx2");
         return flags;
     }
 };
 
-int main() {
-    std::cout << "--- Σ SIGMA OS SOVEREIGN BUILD SYSTEM (ZENITH) ---" << std::endl;
+extern "C" void _start(void) {
+    sigma_printf("--- Σ SIGMA OS SOVEREIGN BUILD SYSTEM (ZENITH) ---\n");
     SovereignSiliconAudit audit;
     audit.DetectFeatures();
     
-    std::string flags = audit.GetOptimizationFlags();
-    std::cout << "[BUILD/ZENITH]: Applied Apex-Optimization: " << flags << std::endl;
-    std::cout << "[SUCCESS]: Kernel Shards tuned for 100% Silicon Affinity." << std::endl;
+    SigmaString flags = audit.GetOptimizationFlags();
+    sigma_printf("[BUILD/ZENITH]: Applied Apex-Optimization: %s\n", flags.c_str());
+    sigma_printf("[SUCCESS]: Kernel Shards tuned for 100%% Silicon Affinity.\n");
 
-    return 0;
+    sigma_exit(0);
 }

@@ -1,12 +1,14 @@
+#include "SigmaOOP.hpp"
+#include "sigma_bus.hpp"
+
 /**
- * SigmaOS Enterprise Watchdog & Orchestration Shard v2.0 (Native C++ Zenith)
+ * Σ SIGMA OS: ENTERPRISE WATCHDOG & ORCHESTRATION SHARD (v2.0 - ZERO-STD NATIVE)
+ * ============================================================================
  * Principle: Automation, Event-Orchestration, Native-Bus.
  * USP: Lock-Free Shard-to-Shard Orchestration (Shell-Less).
+ * Principle: Zero-STL, Zero-Wait, Silicon-Direct.
+ * ============================================================================
  */
-
-#include <iostream>
-#include <string>
-#include "sigma_bus.hpp"
 
 namespace SigmaOS {
 
@@ -17,7 +19,7 @@ namespace SigmaOS {
         Watchdog() : m_breach_count(0) {}
 
         void ExecuteOrchestration() {
-            std::cout << "[WATCHDOG]: Resource Breach Detected (40%). Dispatching SILICON-BUS Triggers..." << std::endl;
+            sigma_printf("[WATCHDOG]: Resource Breach Detected (40%%). Dispatching SILICON-BUS Triggers...\n");
             
             // Native Dispatch via Enterprise Shard Bus (Replaces shell 'system()' calls)
             auto& bus = ShardBus::Instance();
@@ -28,26 +30,31 @@ namespace SigmaOS {
         }
 
         void RunLoop() {
-            std::cout << "[WATCHDOG]: Initiating High-Priority Monitoring Loop (V2)..." << std::endl;
+            sigma_printf("[WATCHDOG]: Initiating High-Priority Monitoring Loop (V2)...\n");
             ExecuteOrchestration();
         }
     };
 
 } // namespace SigmaOS
 
-int main() {
+// Global callbacks for the bus
+void janitor_cb() { sigma_printf("[BUS_CB]: Native Janitor Callback Executing...\n"); }
+void optimizer_cb() { sigma_printf("[BUS_CB]: Native Optimizer Callback Executing...\n"); }
+void provisioner_cb() { sigma_printf("[BUS_CB]: Native Provisioner Callback Executing...\n"); }
+
+extern "C" void _start(void) {
     using namespace SigmaOS;
-    std::cout << "[WATCHDOG]: Initiating Native-Bus Watchdog Nexus..." << std::endl;
+    sigma_printf("[WATCHDOG]: Initiating Native-Bus Watchdog Nexus...\n");
     
     // Initial Setup: Register Shards for Native Execution
     auto& bus = ShardBus::Instance();
-    bus.RegisterShard("JANITOR", [](){ std::cout << "[BUS_CB]: Native Janitor Callback Executing..." << std::endl; });
-    bus.RegisterShard("OPTIMIZER", [](){ std::cout << "[BUS_CB]: Native Optimizer Callback Executing..." << std::endl; });
-    bus.RegisterShard("PROVISIONER", [](){ std::cout << "[BUS_CB]: Native Provisioner Callback Executing..." << std::endl; });
+    bus.RegisterShard("JANITOR", janitor_cb);
+    bus.RegisterShard("OPTIMIZER", optimizer_cb);
+    bus.RegisterShard("PROVISIONER", provisioner_cb);
 
     Watchdog wd;
     wd.RunLoop();
     
-    std::cout << "[WATCHDOG]: Native Orchestration COMPLETE." << std::endl;
-    return 0;
+    sigma_printf("[WATCHDOG]: Native Orchestration COMPLETE.\n");
+    sigma_exit(0);
 }
