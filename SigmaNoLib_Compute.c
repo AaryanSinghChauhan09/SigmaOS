@@ -57,7 +57,7 @@ static uint64_t sigma_strlen(const char* s) {
  * Entry point overriding the standard C runtime 'main'.
  * Compiles with: gcc -nostdlib -fno-builtin 
  */
-void _start() {
+void _start(void) {
     const char* msg = "[PURE_C_ZEROLIB]: Bootstrapping Absolute Library-Free Logic Shard.\n";
     sigma_syscall_write(1, msg, sigma_strlen(msg));
 

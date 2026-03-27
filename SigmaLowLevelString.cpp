@@ -6,10 +6,10 @@
  * Principle: Zero-HLL Library dependency.
  */
 
-typedef unsigned long long size_t;
+typedef unsigned long long sigma_size_t;
 
 // ASM implementation of strlen (usp: Glibc Optimized)
-extern "C" size_t sigma_native_strlen(const char* s) {
+extern "C" sigma_size_t sigma_native_strlen(const char* s) {
     const char* p = s;
 #if defined(__x86_64__)
     __asm__ __volatile__ (
@@ -20,7 +20,7 @@ extern "C" size_t sigma_native_strlen(const char* s) {
     );
 #endif
     while (*p) p++;
-    return (size_t)(p - s);
+    return (sigma_size_t)(p - s);
 }
 
 // ASM implementation of strcpy (usp: musl)

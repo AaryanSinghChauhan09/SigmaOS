@@ -63,7 +63,7 @@ SIGMA_INLINE void* sigma_memset(void* dest, sigma_i32 c, sigma_usize n) {
  * sigma_memcpy: Copy memory regions (non-overlapping).
  * Implementation: x86_64 REP MOVSB with Direction Flag cleared.
  */
-SIGMA_INLINE void* sigma_memcpy(void* restrict dest, const void* restrict src, sigma_usize n) {
+SIGMA_INLINE void* sigma_memcpy(void* SIGMA_RESTRICT dest, const void* SIGMA_RESTRICT src, sigma_usize n) {
 #if defined(SIGMA_ARCH_X86_64)
     void* ret = dest;
     __asm__ volatile (
@@ -165,7 +165,7 @@ SIGMA_INLINE sigma_i32 sigma_strncmp(const char* a, const char* b, sigma_usize n
 /*
  * sigma_strcpy: Copy a string (dest must have sufficient space).
  */
-SIGMA_INLINE char* sigma_strcpy(char* restrict dest, const char* restrict src) {
+SIGMA_INLINE char* sigma_strcpy(char* SIGMA_RESTRICT dest, const char* SIGMA_RESTRICT src) {
     char* ret = dest;
     while ((*dest++ = *src++));
     return ret;
@@ -174,7 +174,7 @@ SIGMA_INLINE char* sigma_strcpy(char* restrict dest, const char* restrict src) {
 /*
  * sigma_strncpy: Bounded string copy.
  */
-SIGMA_INLINE char* sigma_strncpy(char* restrict dest, const char* restrict src, sigma_usize n) {
+SIGMA_INLINE char* sigma_strncpy(char* SIGMA_RESTRICT dest, const char* SIGMA_RESTRICT src, sigma_usize n) {
     char* ret = dest;
     while (n && (*dest++ = *src++)) n--;
     while (n--) *dest++ = 0;
@@ -208,7 +208,7 @@ SIGMA_INLINE char* sigma_strrchr(const char* s, sigma_i32 c) {
 /*
  * sigma_strcat: Append src to dest.
  */
-SIGMA_INLINE char* sigma_strcat(char* restrict dest, const char* restrict src) {
+SIGMA_INLINE char* sigma_strcat(char* SIGMA_RESTRICT dest, const char* SIGMA_RESTRICT src) {
     char* ret = dest;
     while (*dest) dest++;
     while ((*dest++ = *src++));
@@ -218,7 +218,7 @@ SIGMA_INLINE char* sigma_strcat(char* restrict dest, const char* restrict src) {
 /*
  * sigma_strncat: Bounded string append.
  */
-SIGMA_INLINE char* sigma_strncat(char* restrict dest, const char* restrict src, sigma_usize n) {
+SIGMA_INLINE char* sigma_strncat(char* SIGMA_RESTRICT dest, const char* SIGMA_RESTRICT src, sigma_usize n) {
     char* ret = dest;
     while (*dest) dest++;
     while (n-- && *src) *dest++ = *src++;
@@ -299,6 +299,13 @@ SIGMA_INLINE sigma_i64 sigma_puts(const char* s) {
     sigma_i64 r = sigma_write(SIGMA_FD_STDOUT, s, len);
     sigma_write(SIGMA_FD_STDOUT, "\n", 1);
     return r;
+}
+
+/*
+ * sigma_print: Write string to stdout without newline.
+ */
+SIGMA_INLINE sigma_i64 sigma_print(const char* s) {
+    return sigma_write(SIGMA_FD_STDOUT, s, sigma_strlen(s));
 }
 
 /*

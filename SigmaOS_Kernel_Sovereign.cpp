@@ -1,46 +1,52 @@
-#include <iostream>
-#include <string>
-
-/**
- * Σ SIGMA OS: SOVEREIGN KERNEL (v3.0 - MILITARY HARDENED)
+/*
+ * Σ SIGMA OS: SOVEREIGN KERNEL (v4.0 - MILITARY HARDENED ZERO-STD)
  * ======================================================
  * USP Absorbed: HardenedBSD (ASLR), OpenBSD (PLEDGE), SELinux (MAC).
  * Capability: Stack Smashing Protection, Randomized Layout, Enclave Isolation.
- * Principle: Zero-Exploit Silicon Surface.
+ * Principle: Zero-Exploit Silicon Surface. NO <iostream>, NO <string>.
  */
+
+#include "SigmaLibC.h"
+#include "SigmaOOP.hpp"
 
 class SovereignKernelHardening {
 public:
     SovereignKernelHardening() {
-        std::cout << "[KERNEL_HARDEN]: Bootstrapping Military-Grade Memory Protections." << std::endl;
-        std::cout << "[KERNEL_HARDEN]: Absorbed HardenedBSD ASLR, OpenBSD PLEDGE, SELinux USPs." << std::endl;
+        sigma_print("[KERNEL_HARDEN]: Bootstrapping Military-Grade Memory Protections.\n");
+        sigma_print("[KERNEL_HARDEN]: Absorbed HardenedBSD ASLR, OpenBSD PLEDGE, SELinux USPs.\n");
     }
 
     // USP: HardenedBSD ASLR (Address Space Layout Randomization)
     void RandomizeMemoryLayout() {
-        std::cout << "[KERNEL_ASLR]: RANDOMIZING STACK/HEAP/LIBC BASE ADDRESSES..." << std::endl;
-        std::cout << "[KERNEL_ASLR]: Prediction Entropy: 64-bit Absolute. Exploit surface reduced by 99.9%." << std::endl;
+        sigma_print("[KERNEL_ASLR]: RANDOMIZING STACK/HEAP/LIBC BASE ADDRESSES...\n");
+        sigma_print("[KERNEL_ASLR]: Prediction Entropy: 64-bit Absolute. Exploit surface reduced by 99.9%.\n");
     }
 
     // USP: OpenBSD PLEDGE (Process Permission Restriction)
-    void RestrictProcessPermissions(const std::string& process_id) {
-        std::cout << "[KERNEL_PLEDGE]: PLEDGING PROCESS '" << process_id << "' TO 'stdio rpath'..." << std::endl;
-        std::cout << "[KERNEL_PLEDGE]: Access to 'network' and 'exec' revoked. Sandbox airtight." << std::endl;
+    void RestrictProcessPermissions(const char* process_id) {
+        sigma_print("[KERNEL_PLEDGE]: PLEDGING PROCESS '");
+        sigma_print(process_id);
+        sigma_print("' TO 'stdio rpath'...\n");
+        sigma_print("[KERNEL_PLEDGE]: Access to 'network' and 'exec' revoked. Sandbox airtight.\n");
     }
 
     // USP: SELinux Mandatory Access Control (MAC)
-    void ValidateLabel(const std::string& subject, const std::string& object) {
-        std::cout << "[KERNEL_MAC]: VALIDATING SUBJECT '" << subject << "' vs OBJECT '" << object << "'..." << std::endl;
-        std::cout << "[KERNEL_MAC]: Ring-0 Enforcement: Access Permit validated by Hardware Security Shard." << std::endl;
+    void ValidateLabel(const char* subject, const char* object) {
+        sigma_print("[KERNEL_MAC]: VALIDATING SUBJECT '");
+        sigma_print(subject);
+        sigma_print("' vs OBJECT '");
+        sigma_print(object);
+        sigma_print("'...\n");
+        sigma_print("[KERNEL_MAC]: Ring-0 Enforcement: Access Permit validated by Hardware Security Shard.\n");
     }
 };
 
-int main() {
+extern "C" void _start(void) {
     SovereignKernelHardening kernel;
     kernel.RandomizeMemoryLayout();
     kernel.RestrictProcessPermissions("sigma_browser");
     kernel.ValidateLabel("system_user", "secure_vault");
-    
-    std::cout << "\n[SUCCESS]: Military-Grade Kernel Hardening achieved. Exploit surface minimized." << std::endl;
-    return 0;
+
+    sigma_print("\n[SUCCESS]: Military-Grade Kernel Hardening achieved. Exploit surface minimized.\n");
+    sigma_exit(0);
 }

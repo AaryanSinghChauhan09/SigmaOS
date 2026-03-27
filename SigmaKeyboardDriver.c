@@ -40,7 +40,7 @@ static void sigma_outb(unsigned short port, unsigned char val) {
 #endif
 }
 
-void _start() {
+void _start(void) {
     sigma_print("[SIGMA_DRIVER]: Bootstrapping Zero-Library Keyboard Hardware Map.\n");
     sigma_print("[SIGMA_DRIVER]: Bypassing 'evdev' and 'libinput'. Absorbing QNX Microkernel purity.\n");
 

@@ -8,8 +8,7 @@
 
 #include "SigmaLibC.h"
 
-// Custom Types Replacement
-typedef unsigned long long sigma_u64;
+// Types handled by SigmaLibC.h inclusion
 
 /*
  * USP: Bare-Metal RDTSC (Read Time-Stamp Counter)
@@ -23,6 +22,8 @@ static inline sigma_u64 sigma_read_hardware_clock() {
     __asm__ volatile (
         "rdtsc"
         : "=a" (lo), "=d" (hi)
+        :
+        : "memory"
     );
     return ((sigma_u64)hi << 32) | lo;
 #else
@@ -48,6 +49,6 @@ void _start() {
     sigma_print("[SUCCESS]: Real-Time Hardware Clock Online. Sub-nanosecond precision.\n");
 
 #if defined(__x86_64__)
-    __asm__ volatile ("mov $60, %%rax\n xor %%rdi, %%rdi\n syscall\n" ::: "rax", "rdi");
+    __asm__ volatile ("mov $60, %%rax\n xor %%rdi, %%rdi\n syscall\n" ::: "%rax", "%rdi");
 #endif
 }

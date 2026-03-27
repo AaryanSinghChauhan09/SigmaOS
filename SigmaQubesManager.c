@@ -53,7 +53,7 @@ sigma_i64 sigma_sys_execve(const char* filename, char* const argv[], char* const
     return ret;
 }
 
-void _start() {
+void _start(void) {
     sigma_print("[SIGMA_QUBES]: Bootstrapping Zero-Library Process Enclave Shell.\n");
     sigma_print("[SIGMA_QUBES]: Absorbing Qubes OS Compartmentalization USP...\n");
 

@@ -29,14 +29,19 @@ typedef int            i32;
 #define SIGMA_PROMISE_INET   (1UL << 3)
 #define SIGMA_PROMISE_PROC   (1UL << 4)
 
+/* Custom string length function */
+static u64 sigma_strlen(const char *s) {
+    u64 len = 0;
+    while (s[len]) ++len;
+    return len;
+}
+
 /* Direct syscall (no libc) */
 static inline long sigma_write_raw(const char *s) {
-    long len = 0;
-    while (s[len]) ++len;
     long ret;
     __asm__ volatile("syscall"
         : "=a"(ret)
-        : "0"(1L), "D"(1L), "S"(s), "d"(len)
+        : "0"(1L), "D"(1L), "S"(s), "d"(sigma_strlen(s))
         : "rcx", "r11", "memory");
     return ret;
 }

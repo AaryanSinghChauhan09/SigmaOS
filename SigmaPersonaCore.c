@@ -20,10 +20,10 @@ struct SigmaUserProfile {
     sigma_u32 security_clearance;
     enum SigmaThemeMode active_theme;
     sigma_u64 automation_interval_ms;
-    char user_id_shard[16];
+    char user_id_shard[32]; // Increased to prevent overflow
 };
 
-void _start() {
+void _start(void) {
     sigma_print("[SIGMA_PERSONA]: Bootstrapping Zero-Library Personalization Core.\n");
     sigma_print("[SIGMA_PERSONA]: Absorbing Garuda Linux Customization & Visual Overdrives...\n");
 

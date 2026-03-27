@@ -145,6 +145,11 @@ typedef sigma_i32 sigma_status;
     #define SIGMA_BARRIER()         __asm__ volatile("" ::: "memory")
     #define SIGMA_SECTION(s)        __attribute__((section(s)))
     #define SIGMA_PACKED_STRUCT     __attribute__((packed))
+    #ifdef __cplusplus
+        #define SIGMA_RESTRICT      __restrict
+    #else
+        #define SIGMA_RESTRICT      restrict
+    #endif
 #else
     #define SIGMA_ALIGN(n)
     #define SIGMA_PACKED
