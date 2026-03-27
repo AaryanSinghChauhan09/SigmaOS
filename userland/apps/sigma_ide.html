@@ -14,31 +14,17 @@
 *{box-sizing:border-box;margin:0;padding:0;}
 body{background:var(--bg);color:var(--text);font-family:'Consolas','JetBrains Mono','Courier New',monospace;display:flex;flex-direction:column;height:100vh;overflow:hidden;font-size:13px;}
 
-/* TOOLBAR */
-.toolbar{background:var(--bar);border-bottom:1px solid var(--border);padding:6px 12px;display:flex;align-items:center;gap:8px;flex-shrink:0;}
-.brand{color:var(--accent);font-weight:700;font-size:.88rem;margin-right:8px;font-family:sans-serif;}
-.tb-btn{background:rgba(255,255,255,.06);border:1px solid var(--border);border-radius:5px;color:var(--text);padding:4px 12px;cursor:pointer;font-size:.76rem;font-weight:700;font-family:sans-serif;transition:background .15s;}
-.tb-btn:hover{background:rgba(255,255,255,.12);}
-.tb-btn.run{background:rgba(166,227,161,.15);border-color:rgba(166,227,161,.3);color:var(--green);}
-.tb-btn.run:hover{background:rgba(166,227,161,.25);}
-.tb-btn.danger{background:rgba(243,139,168,.1);border-color:rgba(243,139,168,.3);color:var(--red);}
-.lang-sel{background:rgba(255,255,255,.06);border:1px solid var(--border);border-radius:5px;color:var(--text);padding:4px 8px;font-size:.76rem;font-family:sans-serif;cursor:pointer;}
-.spacer{flex:1;}
-.stats-bar{font-size:.7rem;color:var(--dim);}
-
-/* LAYOUT */
-.layout{flex:1;display:flex;overflow:hidden;}
-
-/* SIDEBAR */
-.sidebar{width:200px;background:var(--panel);border-right:1px solid var(--border);display:flex;flex-direction:column;flex-shrink:0;}
-.sidebar-title{padding:8px 12px;font-size:.7rem;font-weight:700;text-transform:uppercase;letter-spacing:.6px;color:var(--dim);border-bottom:1px solid var(--border);font-family:sans-serif;}
-.file-item{padding:6px 12px;cursor:pointer;font-size:.78rem;color:var(--dim);display:flex;align-items:center;gap:6px;border-radius:0;transition:background .1s;}
-.file-item:hover{background:rgba(255,255,255,.04);color:var(--text);}
-.file-item.active{background:rgba(137,180,250,.1);color:var(--accent);}
-.file-icon{flex-shrink:0;}
-
-/* EDITOR PANE */
-.editor-pane{flex:1;display:flex;flex-direction:column;overflow:hidden;}
+        /* Glassmorphism 2.0 */
+        .glass {
+            background: rgba(20, 20, 35, 0.45);
+            -webkit-backdrop-filter: blur(24px) saturate(180%);
+            backdrop-filter: blur(24px) saturate(180%);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
+        }
+        .toolbar { background: rgba(17, 17, 27, 0.85); -webkit-backdrop-filter: blur(12px); backdrop-filter: blur(12px); border-bottom: 1px solid var(--border); padding: 8px 16px; }
+        .sidebar { background: rgba(24, 24, 37, 0.8); -webkit-backdrop-filter: blur(8px); backdrop-filter: blur(8px); }
+        .editor-pane { background: var(--bg); }
 .tab-bar{background:var(--panel);border-bottom:1px solid var(--border);display:flex;align-items:stretch;flex-shrink:0;overflow-x:auto;}
 .tab{padding:7px 16px;font-size:.76rem;color:var(--dim);cursor:pointer;border-right:1px solid var(--border);white-space:nowrap;display:flex;align-items:center;gap:6px;font-family:sans-serif;}
 .tab.active{background:var(--bg);color:var(--text);border-bottom:2px solid var(--accent);}
@@ -83,6 +69,7 @@ document.addEventListener('DOMContentLoaded', () => {
     document.querySelectorAll('[data-style]').forEach(applyTo);
 });
 </script>
+    <script src="../libs/sovereign_api.js" defer></script>
 </head>
 <body>
 

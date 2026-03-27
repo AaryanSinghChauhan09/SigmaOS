@@ -95,8 +95,9 @@ KERNEL_C_SRCS := kernel/slab_allocator.c \
                  kernel/system_healer.c \
                  kernel/synch.c \
                  kernel/sovereign_bpf.c \
-                 kernel/sovereign_timer.c
-KERNEL_OBJS   := $(patsubst kernel/%.c, build/kernel_%.o, $(KERNEL_C_SRCS))
+                 kernel/sovereign_timer.c \
+                 libc/sigma_hal.c
+KERNEL_OBJS   := $(patsubst %, build/kernel_%.o, $(notdir $(KERNEL_C_SRCS)))
 
 # ASM sources
 BOOT_ASM_SRC     := kernel/boot.asm
@@ -134,7 +135,11 @@ CPP_SRCS  := SigmaOOP_Framework.cpp \
              kernel/SovereignContainer.cpp \
              kernel/SovereignVirtualizer.cpp \
              kernel/SovereignNetwork.cpp \
-             kernel/SovereignAgent.cpp
+             kernel/SovereignAgent.cpp \
+             kernel/SovereignPM.cpp \
+             kernel/SovereignSecurity.cpp \
+             kernel/sigma_sml.cpp \
+             kernel/SovereignVFS.cpp
 CPP_OBJS  := $(patsubst %.cpp, build/%.o, $(CPP_SRCS))
 
 # =============================================================================

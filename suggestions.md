@@ -1,42 +1,43 @@
-# Σ SIGMA OS: SOVEREIGN SUGGESTIONS & FUTURE ROADMAP (v6.0)
+# Σ SigmaOS: Sovereign Roadmap & Future Enhancements (v6.2.0 LAUNCH EDITION)
 
-==========================================================
+The current architecture provides absolute systemic sovereignty. These suggestions focus on the next level of industrial-grade refinement and "Unreachable Frontier" features.
 
-*A manifesto for absolute industry dominance and competitor obsolescence.*
+## 🚀 High-Priority Enhancements (v6.3+)
 
-## 🚀 1. ARCHITECTURE & PERFORMANCE
+### 1. Zero-Latency Vulkan Compositor (Metal-Nexus)
 
-- [x] **Sovereign Container Engine (PODS)**: PID/MNT/NET isolation for lightweight sovereign sharding. [IMPLEMENTED v6.1]
-- [x] **Sovereign Virtualization Node (VMX/SVM)**: Hardware-accelerated guest isolation for independent installs. [IMPLEMENTED v6.1]
-- [ ] **Native Vulkan Compositor**: Transition Zenith UI from browser-based rendering to a raw Vulkan-based native compositor for ultra-low latency.
-- [ ] **Quantum-Resistant Encryption (NIST-Level)**: Implement NTRU or Kyber as the default encryption for all system vaults to future-proof against quantum attacks.
-- [ ] **Zero-Latency Context Switching**: Implement a lock-free, RCU-based scheduler in the Sovereign Kernel to eliminate wait states during heavy I/O.
-- [ ] **Predictive Resource Pre-warming**: Use local AI to predict which aplikasi will be opened based on time of day and behavior, pre-loading shards into RAM.
-- [ ] **Hardware-Enforced Ring-0 Isolation**: Use Intel VT-x or AMD-V to run the kernel in a separate hardware ring even from the "independent install" layer.
+- **Current**: Zenith UI uses Browser-based CSS/Canvas rendering.
+- **Enhancement**: Migrate the entire desktop compositor to **Native Vulkan (C++)**. This will allow for raw GPU frame buffer access, eliminating the browser overhead and enabling 144Hz glassmorphism with 0.0ms compositing jitter.
 
-## 🎨 2. UI/UX & VERSATILITY
+### 2. Neural-Semantic Filesystem (NeuralFS)
 
-- [ ] **E-Ink Optimization**: Add a "Low-Energy Monochrome" mode that optimizes refresh rates and contrast for e-ink displays.
-- [ ] **VR/AR Headless Desktop**: A "Headless" mode that streams the Zenith desktop as a floating 3D window into VR headsets via WebXR or OpenXR.
-- [ ] **Fluid-Grid Window System**: Moving from absolute positioning to a dynamic, intent-based tiling system that responds to mouse velocity.
-- [ ] **Dynamic Color Shifting**: OS-wide theme that gradually shifts based on ambient light sensors and screen content.
-- [ ] **Native IDE (SigmaForge)**: Integrated C++/Rust IDE that runs directly on the kernel with zero electron/V8 overhead.
+- **Current**: Standard Hierarchical VFS.
+- **Enhancement**: A kernel-level filesystem where files are associated by **Neural Embedding Strings** rather than physical paths. Users can "search" for "Legal documents from 2023 with contract issues" using the SigmaAI Core, and the FS will instantly map the relevant shards as a virtual directory.
 
-## ⚔️ 3. COMPETITOR CRUSHING (USPs)
+### 3. P2P Resource Grid (Lattice Compute)
 
-- [ ] **Universal Linux Bridge**: Not just "Live Boot", but an "In-Place Absorption" where SigmaOS can boot from an existing Ubuntu/Arch partition and takeover kernel-level control while preserving user data.
-- [ ] **Sovereign Mesh Networking**: P2P file sharing and communication that doesn't rely on the Internet, utilizing only local WiFi and Bluetooth (Zero-Surveillance).
-- [ ] **Native Android App Layer**: Incorporate a specialized container for running .apk files without simulation, utilizing shared kernel resources.
-- [ ] **Independent Installer (Zero-Tooling)**: A standalone binary that can write the SigmaOS ISO to a USB and prepare UEFI partitions from within any existing OS.
+- **Current**: Sovereign Mesh handles data and messaging.
+- **Enhancement**: Enable **CPU/GPU workload offloading** across the mesh. If one SigmaOS node is rendering a video, it can "borrow" idle GPU shards from other authorized nodes in the mesh.
 
-## 🧠 4. AI & AUTOMATION
+### 4. Lattice-Based Post-Quantum Cryptography (PQC)
 
-- [ ] **Agentic Runtime (The Sovereign Assistant)**: A built-in LLM orchestrator that can execute commands across multiple apps (e.g., "Analyze my spreadsheet and create a visual report in the Forge").
-- [ ] **Autonomous Patching**: An AI-driven healer that detects code drifts and automatically applies patches during idle cycles.
-- [ ] **Neural Input Support**: Pre-emptive mapping for future BCI (Brain-Computer Interface) hardware.
+- [x] **DONE**: Initial Kyber-1024 implementation in `SovereignSecurity.cpp`.
+- **Enhancement**: Expand to **Dilithium** for digital signatures and **Sphincs+** for stateless hash-based signing to secure the boot sequence (Sovereign Secure Boot).
 
-## 🚢 5. DEPLOYMENT & VIRTUALIZATION
+### 5. Dynamic Resource Quotas (Auto-Sizing Shards)
 
-- [ ] **One-Click Cloud Spawning**: Automatically deploy the current OS state to AWS/Azure/GCP as a sovereign cloud instance.
-- [ ] **Containerized Apps (SigmaPods)**: Every app runs in its own lightweight, immutable container by default.
-- [ ] **Live-Boot Persistence**: Full session persistence for SigmaOS when running from a USB drive.
+- **Enhancement**: Implementing a **PID-Controlled Resource Allocator** that dynamically resizes container memory limits based on real-time neural prediction of the application's next 500ms of demand.
+
+---
+
+## 🛠️ Outstanding Refinements
+
+- [x] **Driver Expansion**: Native XHCI (USB 3.0) and NVMe block drivers integrated into Sovereign HAL.
+- [ ] **SIRT JIT**: The Sovereign Instruction Runtime (SIRT) needs a full JIT compiler for the `sigma_ide` to reach native execution speeds for C++/Rust simulations.
+- [ ] **Sovereign Browser (Chameleon)**: Finish the Blink/WebKit/Gecko hot-swappable engine wrapper for extreme privacy.
+
+---
+
+## 🏛️ Governance
+
+*Final Roadmap for the Sovereign User | SigmaOS Agentic Council*
