@@ -169,7 +169,8 @@ SIGMA_TOOLS_SRCS := SigmaGuideLinter.cpp \
                     SigmaOmniAutomator.cpp \
                     SigmaAutomatorExtensions.cpp \
                     SigmaOmniScripts.cpp \
-                    SigmaOmniPipeline.cpp
+                    SigmaOmniPipeline.cpp \
+                    SigmaOmniHypervisor.cpp
 SIGMA_TOOLS_OBJS := $(patsubst %.cpp, build/%.o, $(SIGMA_TOOLS_SRCS))
 
 # =============================================================================
