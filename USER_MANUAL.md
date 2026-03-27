@@ -24878,3 +24878,42 @@ This workflow ensures SigmaOS maintains its lead over competitors like Kali, Arc
 
 
 
+
+
+# Σ SIGMAOS: UNIVERSAL LINUX COMMAND MATRIX (SOVEREIGN PARITY)
+============================================================
+Mission: Full Parity with Industry standard Linux Distributions.
+
+| Action | Ubuntu/Debian (APT) | Fedora/RHEL/CentOS (DNF) | Arch Linux (PACMAN) | Alpine Linux (APK) | SigmaOS Native (OS-CMD) |
+| :--- | :--- | :--- | :--- | :--- | :--- |
+| **Update Sources** | pt update | dnf check-update | pacman -Sy | pk update | sigma_sync |
+| **Upgrade System** | pt upgrade | dnf upgrade | pacman -Syu | pk upgrade | sigma_upgrade |
+| **Install Pkg** | pt install <p> | dnf install <p> | pacman -S <p> | pk add <p> | sigma_fabric <p> |
+| **Remove Pkg** | pt remove <p> | dnf remove <p> | pacman -Rs <p> | pk del <p> | sigma_scrub <p> |
+| **Purge Pkg** | pt purge <p> | dnf erase <p> | pacman -Rn <p> | N/A | sigma_purge <p> |
+| **Search Pkg** | pt search <p> | dnf search <p> | pacman -Ss <p> | pk search <p> | sigma_query <p> |
+| **List Installed**| dpkg -l | dnf list installed | pacman -Q | pk info | sigma_audit |
+| **Clean Cache** | pt clean | dnf clean all | pacman -Sc | pk cache clean | sigma_clean |
+| **Show Info** | pt show <p> | dnf info <p> | pacman -Qi <p> | pk info -a <p> | sigma_inspect <p> |
+
+## Specialized Shards & Distro-Specific Syntax (Industrial Edition)
+
+### Gentoo (PORTAGE)
+- Sync tree: merge --sync
+- Install: merge --ask <p>
+- Cleanup: merge --depclean
+
+### Solus (EOPKG)
+- Install: opkg install <p>
+- Update: opkg upgrade
+
+### NixOS (NIX)
+- Shell: 
+ix-shell -p <p>
+- Garbage Collection: 
+ix-collect-garbage -d
+
+### Void Linux (XBPS)
+- Install: xbps-install -S <p>
+- Query: xbps-query -Rs <p>
+
