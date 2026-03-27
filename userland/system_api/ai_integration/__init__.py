@@ -1,3 +1,0 @@
-"""
-SigmaOS AI Integration Package.
-"""

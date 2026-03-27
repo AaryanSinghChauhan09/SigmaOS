@@ -1,1 +1,0 @@
-# SigmaOS GUI Package

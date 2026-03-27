@@ -1,7 +1,0 @@
-from sigma_core.interfaces.base_sovereign import SovereignModule
-
-from ._base import PowerManager
-
-class PowerManager:
-    def shutdown(self):
-        pass
