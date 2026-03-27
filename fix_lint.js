@@ -1,6 +1,6 @@
 const fs = require('fs');
 const path = require('path');
-const dirs = ['C:/Users/Aaryan/.gemini/antigravity/scratch/SigmaOS/userland/apps', 'C:/Users/Aaryan/.gemini/antigravity/scratch/SigmaOS'];
+const dirs = ['C:/Users/SOVEREIGN_USER/.gemini/antigravity/scratch/SigmaOS/userland/apps', 'C:/Users/SOVEREIGN_USER/.gemini/antigravity/scratch/SigmaOS'];
 
 dirs.forEach(dir => {
     fs.readdirSync(dir).forEach(file => {

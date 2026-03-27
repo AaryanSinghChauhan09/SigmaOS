@@ -2,9 +2,9 @@ import os
 import re
 
 files = [
-    'C:/Users/Aaryan/.gemini/antigravity/scratch/SigmaOS/userland/apps/sigma_bharat_legal_suite.html',
-    'C:/Users/Aaryan/.gemini/antigravity/scratch/SigmaOS/userland/apps/sigma_bharat_procedural_matrix.html',
-    'C:/Users/Aaryan/.gemini/antigravity/scratch/SigmaOS/userland/apps/sigma_bharat_compliance_assistant.html'
+    'C:/Users/SOVEREIGN_USER/.gemini/antigravity/scratch/SigmaOS/userland/apps/sigma_bharat_legal_suite.html',
+    'C:/Users/SOVEREIGN_USER/.gemini/antigravity/scratch/SigmaOS/userland/apps/sigma_bharat_procedural_matrix.html',
+    'C:/Users/SOVEREIGN_USER/.gemini/antigravity/scratch/SigmaOS/userland/apps/sigma_bharat_compliance_assistant.html'
 ]
 
 for f_path in files:

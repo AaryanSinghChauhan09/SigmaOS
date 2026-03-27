@@ -111,16 +111,16 @@ int main() {
     game_limit.hard_lock = true;
     wellbeing.RegisterAppLimit(game_limit);
 
-    WellbeingProfile aaryan_wellness;
-    aaryan_wellness.profile_name = "SovereignUser";
-    aaryan_wellness.downtime_enabled = true;
-    aaryan_wellness.downtime_start_hour = 23;
-    aaryan_wellness.downtime_end_hour = 7;
-    aaryan_wellness.grayscale_after_limit = true;
-    aaryan_wellness.eye_strain_reminders = true;
-    aaryan_wellness.eye_reminder_interval_min = 20;
-    aaryan_wellness.posture_reminders = true;
+    WellbeingProfile SOVEREIGN_USER_wellness;
+    SOVEREIGN_USER_wellness.profile_name = "SovereignUser";
+    SOVEREIGN_USER_wellness.downtime_enabled = true;
+    SOVEREIGN_USER_wellness.downtime_start_hour = 23;
+    SOVEREIGN_USER_wellness.downtime_end_hour = 7;
+    SOVEREIGN_USER_wellness.grayscale_after_limit = true;
+    SOVEREIGN_USER_wellness.eye_strain_reminders = true;
+    SOVEREIGN_USER_wellness.eye_reminder_interval_min = 20;
+    SOVEREIGN_USER_wellness.posture_reminders = true;
 
-    wellbeing.ValidateAndEngage("SIGMA_ZERO_TRUST_VALIDATED", &aaryan_wellness);
+    wellbeing.ValidateAndEngage("SIGMA_ZERO_TRUST_VALIDATED", &SOVEREIGN_USER_wellness);
     return 0;
 }

@@ -114,7 +114,7 @@ SigmaSystemIntegration* sigma_system_integration_init(void) {
     strcpy(integration->integration_summary, "");
     integration->is_initialized = false;
     integration->is_github_synced = false;
-    strcpy(integration->github_repo, "https://github.com/AaryanSinghChauhan09/SigmaOS");
+    strcpy(integration->github_repo, "https://github.com/SOVEREIGN_REPO_OWNER/SigmaOS");
     strcpy(integration->github_branch, "master");
     strcpy(integration->github_commit_hash, "");
     

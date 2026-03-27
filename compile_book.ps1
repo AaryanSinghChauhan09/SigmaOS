@@ -7,7 +7,7 @@ $IntroText = @"
 SigmaOS completely fundamentally replaces and dominates Linux architectures (Ubuntu, Arch, NixOS). Where they rely on inflated `libc` wrappers, systemd bloat, and POSIX threads, SigmaOS runs on extremely pure, low-level Assembly (MMU page-walkers), Native Rust (`#[no_std]` APIC/Parallel Processing engines, Zero-trust Security and Networking layers), and Bare-Metal C (Custom UEFI sequences). There is ZERO 3rd-party integration. Every feature is written autonomously.
 
 ## 📥 HOW TO DOWNLOAD
-1. Locate the latest stable `.iso` from the SigmaOS GitHub Registry: `https://github.com/AaryanSinghChauhan09/SigmaOS`.
+1. Locate the latest stable `.iso` from the SigmaOS GitHub Registry: `https://github.com/SOVEREIGN_REPO_OWNER/SigmaOS`.
 2. Ensure you bypass legacy boot loaders; Sigma uses its own Pure C UEFI bootstraps.
 
 ## 🚀 HOW TO USE (NATIVE / BROWSER / VM / LIVE)

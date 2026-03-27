@@ -55,9 +55,9 @@ public:
 
 int main() {
     SovereignPersonaManager manager;
-    manager.CreatePersona("Aaryan", "DARK_ZENITH_NEON");
-    manager.SetPerformanceMode("Aaryan", "ZENITH_POWER");
-    manager.ListActiveShards("Aaryan");
+    manager.CreatePersona("SOVEREIGN_USER", "DARK_ZENITH_NEON");
+    manager.SetPerformanceMode("SOVEREIGN_USER", "ZENITH_POWER");
+    manager.ListActiveShards("SOVEREIGN_USER");
     
     std::cout << "\n[SUCCESS]: Competitive Persona Zenith Online. Personalized for every user." << std::endl;
     return 0;

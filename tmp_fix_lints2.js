@@ -2,8 +2,8 @@ const fs = require('fs');
 const path = require('path');
 
 const dirs = [
-    'C:\\Users\\Aaryan\\.gemini\\antigravity\\scratch\\SigmaOS\\userland\\apps',
-    'C:\\Users\\Aaryan\\.gemini\\antigravity\\scratch\\SigmaOS'
+    'C:\\Users\\SOVEREIGN_USER\\.gemini\\antigravity\\scratch\\SigmaOS\\userland\\apps',
+    'C:\\Users\\SOVEREIGN_USER\\.gemini\\antigravity\\scratch\\SigmaOS'
 ];
 
 const observerScript = `
@@ -68,7 +68,7 @@ dirs.forEach(d => {
 });
 
 // Markdown fixes
-const mdPath = 'C:\\Users\\Aaryan\\.gemini\\antigravity\\scratch\\SigmaOS\\DOCS\\MISSING_COMPONENTS.md';
+const mdPath = 'C:\\Users\\SOVEREIGN_USER\\.gemini\\antigravity\\scratch\\SigmaOS\\DOCS\\MISSING_COMPONENTS.md';
 if (fs.existsSync(mdPath)) {
     let md = fs.readFileSync(mdPath, 'utf8');
     

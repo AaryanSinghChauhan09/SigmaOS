@@ -811,7 +811,7 @@ void sigma_init_universal_installer(void) {
             core_package.target_platform = SIGMA_PLATFORM_GENERIC;
             core_package.target_architecture = SIGMA_ARCH_GENERIC;
             core_package.package_size_mb = 2048;
-            strcpy(core_package.download_url, "https://github.com/AaryanSinghChauhan09/SigmaOS/releases/download/v1.0.0/sigmaos-core.zip");
+            strcpy(core_package.download_url, "https://github.com/SOVEREIGN_REPO_OWNER/SigmaOS/releases/download/v1.0.0/sigmaos-core.zip");
             strcpy(core_package.checksum_algorithm, "SHA256");
             strcpy(core_package.checksum_value, "abc123");
             strcpy(core_package.compression_method, "ZIP");

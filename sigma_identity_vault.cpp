@@ -84,14 +84,14 @@ int main() {
     SigmaIdentityVault vault;
 
     // Define a custom user identity profile (Deep Personalisation)
-    UserIdentityProfile aaryan_profile;
-    aaryan_profile.profile_name = "SovereignUser";
-    aaryan_profile.ui_accent_color = 0x7C3AED;  // Deep Violet
-    aaryan_profile.font_scale_percentage = 110;
-    aaryan_profile.dark_mode_enabled = true;
-    aaryan_profile.gesture_navigation = true;
-    aaryan_profile.predictive_app_loading = true;
+    UserIdentityProfile SOVEREIGN_USER_profile;
+    SOVEREIGN_USER_profile.profile_name = "SovereignUser";
+    SOVEREIGN_USER_profile.ui_accent_color = 0x7C3AED;  // Deep Violet
+    SOVEREIGN_USER_profile.font_scale_percentage = 110;
+    SOVEREIGN_USER_profile.dark_mode_enabled = true;
+    SOVEREIGN_USER_profile.gesture_navigation = true;
+    SOVEREIGN_USER_profile.predictive_app_loading = true;
 
-    vault.ValidateAndPersonalize("SIGMA_ZERO_TRUST_VALIDATED", &aaryan_profile);
+    vault.ValidateAndPersonalize("SIGMA_ZERO_TRUST_VALIDATED", &SOVEREIGN_USER_profile);
     return 0;
 }

@@ -668,7 +668,7 @@ bool sigma_test_deployment_compatibility(SigmaDeploymentConfig* config) {
 }
 
 void sigma_sync_github_repository(void) {
-    printf("[DEPLOYMENT] Syncing with GitHub repository: https://github.com/AaryanSinghChauhan09/SigmaOS\n");
+    printf("[DEPLOYMENT] Syncing with GitHub repository: https://github.com/SOVEREIGN_REPO_OWNER/SigmaOS\n");
     
     // GitHub sync logic
     printf("[DEPLOYMENT] GitHub repository synchronized\n");

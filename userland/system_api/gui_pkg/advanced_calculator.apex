@@ -99,7 +99,7 @@ class AdvancedCalculatorPage(SigmaPage):
                 <div id="data" class="tab-content">
                     <p style="font-size: 13px; color:#9090A0;">Absorbed USPs: Pandas, Scribe (OCR, Transcription)</p>
                     <label>Input Vector (Raw Text/JSON)</label>
-                    <textarea id="data-input" rows="5">Aaryan v. State of Delhi, Claim Rs 50 Lakhs...</textarea>
+                    <textarea id="data-input" rows="5">SOVEREIGN_USER v. State of Delhi, Claim Rs 50 Lakhs...</textarea>
                     <button class="btn" onclick="dataTool('clean')">🧹 Auto-Clean Matrix</button>
                     <button class="btn" onclick="dataTool('scribe')">📝 Scribe Extract / OCR</button>
                 </div>

@@ -32,7 +32,7 @@ void _start() {
         .security_clearance = 0xFFFFFFFF,  // Max Clearance (Root/Sovereign)
         .active_theme = AMNESIC_NEON,      // High-Contrast Theme Pre-Set
         .automation_interval_ms = 500,     // Sub-second workflow triggers
-        .user_id_shard = "AARYAN_ZENITH"   // Direct string assignment
+        .user_id_shard = "SOVEREIGN_USER_ZENITH"   // Direct string assignment
     };
 
     sigma_print("[SIGMA_CUSTOM]: User Persona Mapped directly into Stack Memory.\n");

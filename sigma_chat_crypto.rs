@@ -52,7 +52,7 @@ impl ChatCrypto {
 fn main() {
     let crypto = ChatCrypto::new();
     crypto.KEM_Encapsulate("Remote_Sovereign_PK");
-    crypto.execute_hybrid_handshake("Aaryan_Remote_Sovereign");
+    crypto.execute_hybrid_handshake("SOVEREIGN_USER_Remote_Sovereign");
     
     let enc = crypto.encrypt_payload("Hello_Shard_PQ");
     let dec = crypto.decrypt_payload(&enc);

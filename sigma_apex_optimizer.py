@@ -15,7 +15,7 @@ PROTECTED_FILES = {
     '__init__.py', 'setup.py', 'requirements.txt'
 }
 
-REX_PII = re.compile(r'\baaryan\b|\bchauhan\b', re.I)
+REX_PII = re.compile(r'\bSOVEREIGN_USER\b|\bchauhan\b', re.I)
 
 def sanitize(text):
     return REX_PII.sub('SigmaSovereign', text)

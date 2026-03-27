@@ -1,7 +1,7 @@
 const fs = require('fs');
 const path = require('path');
 
-const dir = 'C:\\Users\\Aaryan\\.gemini\\antigravity\\scratch\\SigmaOS\\userland\\apps';
+const dir = 'C:\\Users\\SOVEREIGN_USER\\.gemini\\antigravity\\scratch\\SigmaOS\\userland\\apps';
 const files = fs.readdirSync(dir);
 
 files.forEach(f => {
@@ -29,7 +29,7 @@ files.forEach(f => {
 });
 
 // Markdown fixes
-const mdFile = 'C:\\Users\\Aaryan\\.gemini\\antigravity\\scratch\\SigmaOS\\DOCS\\MISSING_COMPONENTS.md';
+const mdFile = 'C:\\Users\\SOVEREIGN_USER\\.gemini\\antigravity\\scratch\\SigmaOS\\DOCS\\MISSING_COMPONENTS.md';
 if (fs.existsSync(mdFile)) {
     let mc = fs.readFileSync(mdFile, 'utf8');
     // trailing spaces

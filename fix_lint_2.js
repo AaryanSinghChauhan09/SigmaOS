@@ -41,7 +41,7 @@ function fixAriaLabels(content) {
     return content;
 }
 
-const dirs = ['C:/Users/Aaryan/.gemini/antigravity/scratch/SigmaOS/userland/apps', 'C:/Users/Aaryan/.gemini/antigravity/scratch/SigmaOS'];
+const dirs = ['C:/Users/SOVEREIGN_USER/.gemini/antigravity/scratch/SigmaOS/userland/apps', 'C:/Users/SOVEREIGN_USER/.gemini/antigravity/scratch/SigmaOS'];
 dirs.forEach(dir => {
     fs.readdirSync(dir).forEach(file => {
         if (file.endsWith('.html')) {
@@ -53,6 +53,6 @@ dirs.forEach(dir => {
     });
 });
 
-fixMarkdown('C:/Users/Aaryan/.gemini/antigravity/scratch/SigmaOS/_GAPS_TO_IMPLEMENT.md');
+fixMarkdown('C:/Users/SOVEREIGN_USER/.gemini/antigravity/scratch/SigmaOS/_GAPS_TO_IMPLEMENT.md');
 
 console.log("Secondary Lint Pass Finished!");
