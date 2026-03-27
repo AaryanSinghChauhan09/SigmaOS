@@ -46,7 +46,7 @@
 
         * { 
             box-sizing:border-box; margin:0; padding:0; 
-            -webkit--webkit--webkit-user-select: none; user-select: none; -webkit-user-select: none; user-select: none; -webkit--webkit-user-select: none; user-select: none; -webkit-user-select: none; user-select: none;
+            -webkit-user-select: none; user-select: none;
             -webkit-font-smoothing: antialiased;
             -moz-osx-font-smoothing: grayscale;
             text-rendering: optimizeLegibility;
@@ -64,7 +64,7 @@
         /* ── STATUS BAR ──────────────────────────────────────────── */
         #statusbar {
             position:absolute; top:0; left:0; right:0; height:var(--bar-h);
-            background:rgba(6,9,16,0.75); -webkit--webkit-backdrop-filter: blur(14px); backdrop-filter: blur(14px); -webkit-backdrop-filter: blur(14px); backdrop-filter: blur(14px);
+            background:rgba(6,9,16,0.75); -webkit-backdrop-filter: blur(14px); backdrop-filter: blur(14px);
             border-bottom:1px solid rgba(255,255,255,0.05);
             display:flex; align-items:center; justify-content:space-between;
             padding:0 18px; font-size:.73rem; font-weight:600; color:var(--text-50);
@@ -97,7 +97,7 @@
         .di .g {
             width: 48px; height: 48px; font-size: 26px; display: flex; align-items: center; justify-content: center;
             background: rgba(255,255,255,0.15); border-radius: 14px;
-            -webkit--webkit-backdrop-filter: var(--blur); backdrop-filter: var(--blur); -webkit-backdrop-filter: var(--blur); backdrop-filter: var(--blur);
+            -webkit-backdrop-filter: var(--blur); backdrop-filter: var(--blur);
             border: 1px solid rgba(255,255,255,0.2); margin-bottom: 6px;
             box-shadow: 0 4px 10px rgba(0,0,0,0.2);
             transition: transform 0.2s;
@@ -109,7 +109,7 @@
         .win {
             position:absolute; top:60px; left:110px;
             width:min(1100px,88vw); height:min(760px,84vh);
-            background:var(--surface); -webkit--webkit-backdrop-filter: blur(44px) saturate(1.5); backdrop-filter: blur(44px) saturate(1.5); -webkit-backdrop-filter: blur(44px) saturate(1.5); backdrop-filter: blur(44px) saturate(1.5);
+            background:var(--surface); -webkit-backdrop-filter: blur(44px) saturate(1.5); backdrop-filter: blur(44px) saturate(1.5);
             border:1px solid var(--border); border-radius:var(--radius-lg);
             box-shadow:0 32px 80px rgba(0,0,0,.75), 0 0 0 .5px rgba(255,255,255,.04) inset, 0 1px 0 rgba(255,255,255,.1) inset;
             display:flex; flex-direction:column; overflow:hidden;
@@ -156,7 +156,7 @@
         .tb-item {
             pointer-events:all;
             display:flex; align-items:center; gap:7px; padding:5px 10px 5px 8px;
-            background:rgba(12,18,36,.8); -webkit--webkit-backdrop-filter: blur(16px); backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px); backdrop-filter: blur(16px);
+            background:rgba(12,18,36,.8); -webkit-backdrop-filter: blur(16px); backdrop-filter: blur(16px);
             border:1px solid var(--border); border-radius:8px; cursor:pointer;
             font-size:.75rem; font-weight:600; color:var(--text-80);
             transition:background .15s, border .15s, transform .15s;
@@ -171,7 +171,7 @@
         #dock-wrap { position:absolute; bottom:10px; left:0; right:0; display:flex; justify-content:center; z-index:var(--zDock); pointer-events:none; }
         #dock {
             pointer-events:all; height:var(--dock-h);
-            background:rgba(12,18,36,.6); -webkit--webkit-backdrop-filter: blur(32px) saturate(1.7); backdrop-filter: blur(32px) saturate(1.7); -webkit-backdrop-filter: blur(32px) saturate(1.7); backdrop-filter: blur(32px) saturate(1.7);
+            background:rgba(12,18,36,.6); -webkit-backdrop-filter: blur(32px) saturate(1.7); backdrop-filter: blur(32px) saturate(1.7);
             border:1px solid var(--border); border-radius:22px; padding:0 16px;
             display:flex; align-items:center; gap:4px;
             box-shadow:0 10px 40px rgba(0,0,0,.6), 0 1px 0 rgba(255,255,255,.08) inset;
@@ -223,7 +223,7 @@
         /* ── NOTIFICATIONS ────────────────────────────────────────── */
         #notif-stack { position:absolute; top:38px; right:18px; display:flex; flex-direction:column; gap:10px; z-index:var(--zNotif); pointer-events:none; width:330px; }
         .toast {
-            background:var(--surface); -webkit--webkit-backdrop-filter: blur(20px); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px); backdrop-filter: blur(20px);
+            background:var(--surface); -webkit-backdrop-filter: blur(20px); backdrop-filter: blur(20px);
             border:1px solid var(--border); border-radius:var(--radius-md); padding:14px 16px;
             box-shadow:0 12px 36px rgba(0,0,0,.55); display:flex; gap:12px; align-items:flex-start;
             pointer-events:all; animation:tIn .38s cubic-bezier(.16,1,.3,1);
@@ -235,7 +235,7 @@
 
         /* ── CONTEXT MENU ─────────────────────────────────────────── */
         #ctx {
-            position:fixed; background:rgba(10,14,28,.92); -webkit--webkit-backdrop-filter: blur(18px); backdrop-filter: blur(18px); -webkit-backdrop-filter: blur(18px); backdrop-filter: blur(18px);
+            position:fixed; background:rgba(10,14,28,.92); -webkit-backdrop-filter: blur(18px); backdrop-filter: blur(18px);
             border:1px solid var(--border); border-radius:var(--radius-md); padding:5px;
             min-width:210px; z-index:var(--zOmni); display:none; box-shadow:0 18px 48px rgba(0,0,0,.7);
             animation:ctxFade .13s ease;
@@ -249,7 +249,7 @@
 
         /* ── OMNI-SEARCH HUD ──────────────────────────────────────── */
         #omni-overlay {
-            position:fixed; inset:0; background:rgba(0,0,0,.6); -webkit--webkit-backdrop-filter: blur(16px); backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px); backdrop-filter: blur(16px);
+            position:fixed; inset:0; background:rgba(0,0,0,.6); -webkit-backdrop-filter: blur(16px); backdrop-filter: blur(16px);
             display:flex; justify-content:center; align-items:flex-start; padding-top:10vh;
             z-index:var(--zOmni); opacity:0; pointer-events:none; transition:opacity .2s;
         }
@@ -265,7 +265,7 @@
         .omni-icon { font-size:1.35rem; opacity:.5; }
         .omni-inp {
             flex:1; background:transparent; border:none; color:var(--text-100); font-size:1.25rem;
-            font-family:var(--font); font-weight:500; outline:none; -webkit--webkit-user-select: text; user-select: text; -webkit-user-select: text; user-select: text;
+            font-family:var(--font); font-weight:500; outline:none; -webkit-user-select: text; user-select: text;
         }
         .omni-hint { font-size:.72rem; color:var(--text-30); background:rgba(255,255,255,.05); padding:2px 8px; border-radius:4px; font-family:monospace; }
         .omni-res { max-height:420px; overflow-y:auto; padding:6px; }
@@ -281,7 +281,7 @@
 
         /* ── APP DRAWER ──────────────────────────────────────────── */
         #drawer-overlay {
-            position:fixed; inset:0; background:rgba(0,0,0,.65); -webkit--webkit-backdrop-filter: blur(20px); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px); backdrop-filter: blur(20px);
+            position:fixed; inset:0; background:rgba(0,0,0,.65); -webkit-backdrop-filter: blur(20px); backdrop-filter: blur(20px);
             z-index:var(--zDrawer); opacity:0; pointer-events:none; transition:opacity .25s;
             display:flex; flex-direction:column; align-items:center; padding-top:8vh;
         }
@@ -299,7 +299,7 @@
         }
         .drawer-search input {
             flex:1; background:transparent; border:none; color:var(--text-100); font-size:1.05rem;
-            font-family:var(--font); outline:none; -webkit--webkit-user-select: text; user-select: text; -webkit-user-select: text; user-select: text;
+            font-family:var(--font); outline:none; -webkit-user-select: text; user-select: text;
         }
         .drawer-grid {
             display:grid; grid-template-columns:repeat(auto-fill,100px); gap:12px;
@@ -320,7 +320,7 @@
         /* ── NOTIFICATION CENTER ─────────────────────────────────── */
         #notif-center {
             position:fixed; top:var(--bar-h); right:0; width:340px; height:calc(100vh - var(--bar-h));
-            background:rgba(8,12,24,.92); -webkit--webkit-backdrop-filter: blur(24px); backdrop-filter: blur(24px); -webkit-backdrop-filter: blur(24px); backdrop-filter: blur(24px);
+            background:rgba(8,12,24,.92); -webkit-backdrop-filter: blur(24px); backdrop-filter: blur(24px);
             border-left:1px solid var(--border); z-index:calc(var(--zDock) + 1);
             transform:translateX(100%); transition:transform .28s cubic-bezier(.16,1,.3,1);
             display:flex; flex-direction:column; overflow:hidden;
@@ -385,7 +385,7 @@ document.addEventListener('DOMContentLoaded', () => {
 <!-- BOOT SCREEN -->
 <div id="bootScreen">
     <div class="boot-logo">Σ</div>
-    <div data- class="sigma-style-index-1">SIGMAOS ZENITH v6.1 SOVEREIGN</div>
+    <div class="sigma-style-index-1">SIGMAOS ZENITH v6.1 SOVEREIGN</div>
     <div class="boot-progress-container">
         <div class="boot-progress-bar" id="bootProgressBar"></div>
     </div>
@@ -409,8 +409,8 @@ document.addEventListener('DOMContentLoaded', () => {
         <div class="sb-sep"></div>
         <span class="sb-badge">SOVEREIGN</span>
         <div class="sb-sep"></div>
-        <span data- onclick="OS.toggleNC()" title="Notification Center" class="sigma-style-index-2">🔔</span>
-        <span class="fw600 sigma-style-index-3" id="sb-clock" data- onclick="OS.toggleNC()">00:00</span>
+        <span onclick="OS.toggleNC()" title="Notification Center" class="sigma-style-index-2">🔔</span>
+        <span class="fw600 sigma-style-index-3" id="sb-clock" onclick="OS.toggleNC()">00:00</span>
     </div>
 </div>
 
@@ -462,7 +462,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
 <!-- CONTEXT MENU -->
 <div id="ctx">
-    <div class="ctx-i" onclick="OS.toggleOmni()">🔍&ensp;Omni-Search <span data- class="sigma-style-index-4">Ctrl+Space</span></div>
+    <div class="ctx-i" onclick="OS.toggleOmni()">🔍&ensp;Omni-Search <span class="sigma-style-index-4">Ctrl+Space</span></div>
     <div class="ctx-i" onclick="OS.toggleDrawer()">⊞&ensp;All Apps</div>
     <div class="ctx-sep"></div>
     <div class="ctx-i" onclick="OS.notify('🔄 Kernel','Desktop refreshed.',2500);OS.closeCtx()">🔄&ensp;Refresh Desktop</div>
@@ -487,7 +487,7 @@ document.addEventListener('DOMContentLoaded', () => {
 <div id="drawer-overlay">
     <div class="drawer-box">
         <div class="drawer-search">
-            <span data- class="sigma-style-index-5">⊞</span>
+            <span class="sigma-style-index-5">⊞</span>
             <input aria-label="input"  type="text" id="drawerInp" placeholder="Search all apps…" autocomplete="off" title="input">
         </div>
         <div class="drawer-grid" id="drawerGrid"></div>
@@ -523,7 +523,7 @@ document.addEventListener('DOMContentLoaded', () => {
         <div class="ditem" onclick="OS.launch('⚙️ Settings','userland/apps/sigma_settings.html')">
             <div class="diw">⚙️</div><div class="ddot" id="dd-settings"></div><div class="dtt">Settings</div>
         </div>
-        <button class="dock-drawer-btn sigma-style-index-6" title="All Apps" onclick="OS.toggleDrawer()" data->⊞</button>
+        <button class="dock-drawer-btn sigma-style-index-6" title="All Apps" onclick="OS.toggleDrawer()">⊞</button>
     </div>
 </div>
 

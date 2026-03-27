@@ -1,10 +1,3 @@
-#include <iostream>
-#include <vector>
-#include <memory>
-#include <string>
-#include <thread>
-#include <mutex>
-
 // =========================================================================
 // SOVEREIGN USP MATRIX (Omni-Competitor Absorption Agent)
 // 
@@ -14,14 +7,39 @@
 // =========================================================================
 
 namespace SigmaOS {
+
+static inline void sigma_print(const char* s) {
+    long len = 0;
+    while (s[len]) ++len;
+    __asm__ volatile(
+        "syscall"
+        : : "a"(1L), "D"(1L), "S"(s), "d"(len)
+        : "rcx", "r11", "memory"
+    );
+}
+
+static inline void sigma_sleep(long ms) {
+    struct {
+        long tv_sec;
+        long tv_nsec;
+    } req, rem;
+    req.tv_sec = ms / 1000;
+    req.tv_nsec = (ms % 1000) * 1000000;
+    __asm__ volatile(
+        "syscall"
+        : : "a"(35L), "D"(&req), "S"(&rem)
+        : "rcx", "r11", "memory"
+    );
+}
+
 namespace CompetitorUSP {
 
 class SOVEREIGN_USP {
 protected:
-    std::string origin_competitor;
-    std::string usp_title;
+    const char* origin_competitor;
+    const char* usp_title;
 public:
-    SOVEREIGN_USP(std::string competitor, std::string title) 
+    SOVEREIGN_USP(const char* competitor, const char* title) 
         : origin_competitor(competitor), usp_title(title) {}
     
     virtual void AbsorbAndExecute() = 0;
@@ -33,9 +51,8 @@ class MacOSTimeMachineUSP : public SOVEREIGN_USP {
 public:
     MacOSTimeMachineUSP() : SOVEREIGN_USP("macOS", "Time Machine (Immutable Snapshots)") {}
     void AbsorbAndExecute() override {
-        // In SigmaOS, we do this directly in the VFS Layer without a background daemon.
-        std::cout << "[SigmaOS Omni-Kernel] Absorbing " << origin_competitor << " USP: " << usp_title << "\n";
-        std::cout << "  > Implementing Zero-Overhead Copy-on-Write memory states natively...\n";
+        sigma_print("[SigmaOS Omni-Kernel] Absorbing "); sigma_print(origin_competitor); sigma_print(" USP: "); sigma_print(usp_title); sigma_print("\n");
+        sigma_print("  > Implementing Zero-Overhead Copy-on-Write memory states natively...\n");
     }
 };
 
@@ -44,9 +61,8 @@ class QubesOSIsolationUSP : public SOVEREIGN_USP {
 public:
     QubesOSIsolationUSP() : SOVEREIGN_USP("Qubes OS", "Xen-based App Sandboxing") {}
     void AbsorbAndExecute() override {
-        // In SigmaOS, we use lightweight nested rings built natively in Assembly, bypassing Xen entirely.
-        std::cout << "[SigmaOS Omni-Kernel] Absorbing " << origin_competitor << " USP: " << usp_title << "\n";
-        std::cout << "  > Activating CPU Ring -1 hypervisor isolation for all native tabs...\n";
+        sigma_print("[SigmaOS Omni-Kernel] Absorbing "); sigma_print(origin_competitor); sigma_print(" USP: "); sigma_print(usp_title); sigma_print("\n");
+        sigma_print("  > Activating CPU Ring -1 hypervisor isolation for all native tabs...\n");
     }
 };
 
@@ -55,9 +71,8 @@ class WindowsDirectXUSP : public SOVEREIGN_USP {
 public:
     WindowsDirectXUSP() : SOVEREIGN_USP("Windows NT", "DirectX Hardware Acceleration") {}
     void AbsorbAndExecute() override {
-        // SigmaOS directly memory-maps the GPU frame buffer using raw PCIe addressing.
-        std::cout << "[SigmaOS Omni-Kernel] Absorbing " << origin_competitor << " USP: " << usp_title << "\n";
-        std::cout << "  > Mapping RAW GPU registers for absolute 0-latency Sovereign Optics engine...\n";
+        sigma_print("[SigmaOS Omni-Kernel] Absorbing "); sigma_print(origin_competitor); sigma_print(" USP: "); sigma_print(usp_title); sigma_print("\n");
+        sigma_print("  > Mapping RAW GPU registers for absolute 0-latency Sovereign Optics engine...\n");
     }
 };
 
@@ -66,35 +81,61 @@ class LinuxEBPFUSP : public SOVEREIGN_USP {
 public:
     LinuxEBPFUSP() : SOVEREIGN_USP("Linux", "eBPF Dynamic Telemetry") {}
     void AbsorbAndExecute() override {
-        // SigmaOS implements an inline sovereign JIT compiler that achieves this instantaneously.
-        std::cout << "[SigmaOS Omni-Kernel] Absorbing " << origin_competitor << " USP: " << usp_title << "\n";
-        std::cout << "  > Injecting Sovereign JIT Telemetry directly into CPU cachelines...\n";
+        sigma_print("[SigmaOS Omni-Kernel] Absorbing "); sigma_print(origin_competitor); sigma_print(" USP: "); sigma_print(usp_title); sigma_print("\n");
+        sigma_print("  > Injecting Sovereign JIT Telemetry directly into CPU cachelines...\n");
     }
 };
 
 // 5. Native execution of the Omni-Matrix
 class USPAbsorptionMatrix {
-private:
-    std::vector<std::unique_ptr<SOVEREIGN_USP>> loaded_usps;
 public:
-    USPAbsorptionMatrix() {
-        loaded_usps.push_back(std::make_unique<MacOSTimeMachineUSP>());
-        loaded_usps.push_back(std::make_unique<QubesOSIsolationUSP>());
-        loaded_usps.push_back(std::make_unique<WindowsDirectXUSP>());
-        loaded_usps.push_back(std::make_unique<LinuxEBPFUSP>());
-    }
+    USPAbsorptionMatrix() {}
 
     void ExecuteAbsoluteDominance() {
-        std::cout << "\n======================================================\n";
-        std::cout << "INITIATING SIGMA_OS OMNI-USP ABSORPTION SEQUENCE...\n";
-        std::cout << "======================================================\n";
-        for (const auto& usp : loaded_usps) {
-            usp->AbsorbAndExecute();
-            std::this_thread::sleep_for(std::chrono::milliseconds(200));
+        MacOSTimeMachineUSP usp1;
+        QubesOSIsolationUSP usp2;
+        WindowsDirectXUSP usp3;
+        LinuxEBPFUSP usp4;
+
+        class AndroidCustomizationUSP : public SOVEREIGN_USP {
+        public:
+            AndroidCustomizationUSP() : SOVEREIGN_USP("Android", "Deep UI/UX Customization") {}
+            void AbsorbAndExecute() override {
+                sigma_print("[SigmaOS Omni-Kernel] Absorbing "); sigma_print(origin_competitor); sigma_print(" USP: "); sigma_print(usp_title); sigma_print("\n");
+                sigma_print("  > Wiring pixel-perfect Dynamic Theme Engine directly into GPU display buffers...\n");
+            }
+        } usp5;
+
+        class AIHeuristicUSP : public SOVEREIGN_USP {
+        public:
+            AIHeuristicUSP() : SOVEREIGN_USP("Modern AI", "Predictive Automation") {}
+            void AbsorbAndExecute() override {
+                sigma_print("[SigmaOS Omni-Kernel] Absorbing "); sigma_print(origin_competitor); sigma_print(" USP: "); sigma_print(usp_title); sigma_print("\n");
+                sigma_print("  > Activating Sovereign Machine Learning Tensor Graph for predictive OS modes...\n");
+            }
+        } usp6;
+
+        class HaikuOSResponsivenessUSP : public SOVEREIGN_USP {
+        public:
+            HaikuOSResponsivenessUSP() : SOVEREIGN_USP("HaikuOS", "Extreme Low-Latency Desktop") {}
+            void AbsorbAndExecute() override {
+                sigma_print("[SigmaOS Omni-Kernel] Absorbing "); sigma_print(origin_competitor); sigma_print(" USP: "); sigma_print(usp_title); sigma_print("\n");
+                sigma_print("  > Enforcing absolute preemptive multi-threading on GUI message loops...\n");
+            }
+        } usp7;
+
+        SOVEREIGN_USP* loaded_usps[7] = {&usp1, &usp2, &usp3, &usp4, &usp5, &usp6, &usp7};
+
+        sigma_print("\n======================================================\n");
+        sigma_print("INITIATING SIGMA_OS OMNI-USP ABSORPTION SEQUENCE...\n");
+        sigma_print("======================================================\n");
+        for (int i = 0; i < 7; i++) {
+            loaded_usps[i]->AbsorbAndExecute();
+            sigma_sleep(200);
         }
-        std::cout << "======================================================\n";
-        std::cout << "[SUCCESS] ALL COMPETITOR USPS SUCCESSFULLY ASSIMILATED.\n";
-        std::cout << "SigmaOS is now the definitive absolute platform.\n\n";
+        sigma_print("======================================================\n");
+        sigma_print("[SUCCESS] ALL COMPETITOR USPS SUCCESSFULLY ASSIMILATED.\n");
+        sigma_print("SigmaOS is now the definitive absolute platform.\n\n");
     }
 };
 

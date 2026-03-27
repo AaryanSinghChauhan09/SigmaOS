@@ -4,9 +4,18 @@
 // Integrates Snapchat-like AR filters using purely low-level operations
 // NO third-party libraries (OpenCV, etc.), fully sovereign implementation
 
-#include "SigmaOOP.hpp"
-#include "SigmaCppSTL.h"
-#include "sigma_integrator.hpp"
+typedef unsigned char uint8_t;
+typedef unsigned int uint32_t;
+
+static inline void sigma_log(const char* s) {
+    long len = 0;
+    while (s[len]) ++len;
+    __asm__ volatile(
+        "syscall"
+        : : "a"(1L), "D"(1L), "S"(s), "d"(len)
+        : "rcx", "r11", "memory"
+    );
+}
 
 // Forward declarations of sovereign hardware interfaces
 extern "C" void sigma_hal_camera_init();
@@ -16,7 +25,7 @@ extern "C" void sigma_hal_camera_apply_hardware_filter(uint32_t filter_id);
 namespace SigmaOS {
 namespace Media {
 
-class SovereignCameraApp : public SigmaObject {
+class SovereignCameraApp {
 private:
     bool is_initialized;
     uint32_t current_filter;
@@ -26,22 +35,20 @@ private:
         BlockLogicNode* next;
     };
     BlockLogicNode* macro_script;
+    BlockLogicNode node_pool[64]; // Static memory allocation avoiding 'new'
+    int node_count;
 
 public:
-    SovereignCameraApp() : is_initialized(false), current_filter(0), macro_script(nullptr) {}
+    SovereignCameraApp() : is_initialized(false), current_filter(0), macro_script(nullptr), node_count(0) {}
     ~SovereignCameraApp() {
-        // Clean up block logic
-        while(macro_script) {
-            auto temp = macro_script;
-            macro_script = macro_script->next;
-            delete temp;
-        }
+        macro_script = nullptr;
+        node_count = 0;
     }
 
-    void Initialize() override {
+    void Initialize() {
         sigma_hal_camera_init();
         is_initialized = true;
-        SigmaLog("SovereignCameraApp Initialized. Hardware direct access established.");
+        sigma_log("SovereignCameraApp Initialized. Hardware direct access established.\n");
     }
 
     void ApplyARFilter(uint32_t filter_id) {
@@ -69,11 +76,14 @@ public:
         if (!is_initialized) return;
         uint8_t* frame_ptr = sigma_hal_camera_capture_frame();
         // save to sovereign file system
-        SigmaLog("Photo captured directly from hardware buffer.");
+        sigma_log("Photo captured directly from hardware buffer.\n");
     }
 
     void AddVisualBlock(int action_id) {
-        BlockLogicNode* node = new BlockLogicNode{action_id, macro_script};
+        if (node_count >= 64) return; // Prevent overflow without exceptions
+        BlockLogicNode* node = &node_pool[node_count++];
+        node->action_id = action_id;
+        node->next = macro_script;
         macro_script = node;
     }
 };

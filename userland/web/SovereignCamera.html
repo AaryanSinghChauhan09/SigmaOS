@@ -4,39 +4,36 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>SigmaOS Sovereign Camera</title>
-    <style>
-        body { margin: 0; background: #000; color: #fff; font-family: 'Courier New', Courier, monospace; display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100vh; overflow: hidden; }
-        #video-container { position: relative; width: 80%; max-width: 800px; aspect-ratio: 16/9; background: #111; border: 2px solid cyan; border-radius: 10px; overflow: hidden; box-shadow: 0 0 20px cyan; }
-        video, canvas { position: absolute; top: 0; left: 0; width: 100%; height: 100%; object-fit: cover; }
-        canvas { pointer-events: none; }
-        .controls { margin-top: 20px; display: flex; gap: 15px; }
-        button { background: transparent; border: 1px solid cyan; color: cyan; padding: 10px 20px; font-family: inherit; font-size: 16px; cursor: pointer; text-transform: uppercase; transition: 0.3s; border-radius: 5px; }
-        button:hover { background: cyan; color: #000; box-shadow: 0 0 10px cyan; }
-        .filter-options { margin-top: 15px; display: flex; gap: 10px; }
-        .filter-btn { font-size: 14px; padding: 5px 10px; }
-        #snapshot-gallery { margin-top: 20px; display: flex; gap: 10px; overflow-x: auto; width: 80%; padding-bottom: 10px; }
-        .snapshot { width: 120px; border: 1px solid #fff; border-radius: 5px; cursor: pointer; transition: 0.3s; }
-        .snapshot:hover { transform: scale(1.1); border-color: cyan; }
-    </style>
+    <link rel="stylesheet" href="SovereignCamera.css">
 </head>
 <body>
-    <h2 style="text-shadow: 0 0 10px cyan;">SOVEREIGN OPTICS (Sovereign Camera)</h2>
+    <h2 class="sovereign-title">SOVEREIGN OPTICS (Sovereign Camera)</h2>
     <div id="video-container">
-        <video id="camera" autoplay playsinline></video>
+        <!-- Removed 'playsinline' for Firefox compatibility -->
+        <video id="camera" autoplay></video>
         <canvas id="ar-overlay"></canvas>
     </div>
     
     <div class="controls">
         <button id="capture-btn">Capture Reality</button>
-        <button id="download-btn" style="display:none;">Download Shard</button>
+        <button id="download-btn" class="btn-hidden">Download Shard</button>
     </div>
 
+    <!-- Added more modes for Sovereign operations -->
     <div class="filter-options">
         <button class="filter-btn" data-filter="none">Raw</button>
         <button class="filter-btn" data-filter="grayscale(100%)">Noir</button>
         <button class="filter-btn" data-filter="sepia(100%)">Relic</button>
         <button class="filter-btn" data-filter="invert(100%)">Inverted</button>
         <button class="filter-btn" data-filter="hue-rotate(90deg)">Neon</button>
+        
+        <!-- New Sovereign Modes -->
+        <button class="filter-btn" data-filter="brightness(150%) contrast(150%) hue-rotate(180deg)">Thermal</button>
+        <button class="filter-btn" data-filter="brightness(80%) contrast(200%) sepia(100%) hue-rotate(80deg) saturate(200%)">Night Vision</button>
+        <button class="filter-btn" data-filter="grayscale(100%) invert(100%) contrast(150%)">X-Ray</button>
+        <button class="filter-btn" data-filter="contrast(200%) saturate(200%) hue-rotate(45deg)">Cyberpunk</button>
+        <button class="filter-btn" data-filter="blur(3px) contrast(150%)">Cinematic Focus</button>
+
         <button class="filter-btn" data-filter="ar-snap">AR Mask (Snapchat USP)</button>
     </div>
 
@@ -65,7 +62,7 @@
                 };
             } catch (err) {
                 console.error("Camera access denied or unavailable: ", err);
-                document.getElementById('video-container').innerHTML = `<p style="padding: 20px; text-align: center; color: red;">Failed to access camera hardware directly. Ensure camera permissions are granted to the Sovereign Engine.</p>`;
+                document.getElementById('video-container').innerHTML = `<p class="error-msg">Failed to access camera hardware directly. Ensure camera permissions are granted to the Sovereign Engine.</p>`;
             }
         }
 

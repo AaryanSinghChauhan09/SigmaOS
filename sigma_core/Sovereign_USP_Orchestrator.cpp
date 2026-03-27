@@ -28,28 +28,70 @@ extern "C" {
 
 namespace SigmaOS {
 
+// ---------------------------------------------------------
+// OS Operational Modes & Customizations
+// Absorbs USPs from hypervisors and performance distros
+// ---------------------------------------------------------
+enum class SovereignMode {
+    STANDARD,
+    ULTRA_LOW_LATENCY_GAMING, // Direct hardware IO, bypassed scheduler
+    ABSOLUTE_PRIVACY_VAULT,   // Network disconnect, pure RAM execution
+    BATTERY_SAVER_NANO        // Under-clocked, minimal services
+};
+
+struct SovereignCustomizations {
+    bool enable_ar_optics;
+    bool enforce_strict_pledge;
+    bool enable_directx_mem_map;
+};
+
 class SovereignUSPOrchestrator {
+private:
+    static SovereignMode current_mode;
+    static SovereignCustomizations configs;
+
 public:
+    static void SetMode(SovereignMode new_mode) {
+        current_mode = new_mode;
+        // In bare metal: Triggers CPU ring changes, scheduler bypasses, or network drops
+    }
+
+    static void Customize(SovereignCustomizations new_configs) {
+        configs = new_configs;
+    }
+
     static void RunAll() {
+        // Apply Mode Rules
+        if (current_mode == SovereignMode::ABSOLUTE_PRIVACY_VAULT) {
+            _sigma_vault_lock(); // Auto-lock before any initialization
+        }
+
         // 1. ChromeOS: 2-second verified boot
         sigma_chromeos_usp_main();
 
         // 2. iOS: Hardware Secure Enclave key isolation
         _sigma_secure_enclave_init();
-        _sigma_vault_lock();
+        if (current_mode != SovereignMode::ABSOLUTE_PRIVACY_VAULT) {
+            _sigma_vault_lock(); // Standard locking
+        }
 
         // 3. NixOS: Atomic declarative system rollback
         sigma_nixos_usp_demo();
 
         // 4. Android + iOS + HaikuOS + Plan9: Sovereign IPC message bus
-        SigmaOS::Sovereign_IPC::RunUSPAbsorptionDemo();
+        if (current_mode != SovereignMode::BATTERY_SAVER_NANO) {
+            SigmaOS::Sovereign_IPC::RunUSPAbsorptionDemo();
+        }
 
         // 5. FreeBSD + OpenBSD: Capsicum capability sandbox + pledge
-        sigma_security_usp_demo();
+        if (configs.enforce_strict_pledge) {
+            sigma_security_usp_demo();
+        }
 
         // 6. MIT Scratch + Snapchat: Optic tensor facial telemetry AR processing ML hooks
-        // Implemented natively without Python libraries
-        RunMLOpticsHooks();
+        if (configs.enable_ar_optics && current_mode != SovereignMode::BATTERY_SAVER_NANO) {
+            RunMLOpticsHooks();
+        }
     }
 
 private:
@@ -59,6 +101,10 @@ private:
         init_tensor_graph();
     }
 };
+
+// Initialize static members
+SovereignMode SovereignUSPOrchestrator::current_mode = SovereignMode::STANDARD;
+SovereignCustomizations SovereignUSPOrchestrator::configs = {true, true, true};
 
 } // namespace SigmaOS
 
