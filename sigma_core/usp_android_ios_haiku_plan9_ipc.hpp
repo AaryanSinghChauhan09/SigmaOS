@@ -1,135 +1,91 @@
-// =============================================================================
-// SigmaOS Sovereign USP: ANDROID INTENT SYSTEM + iOS DEEP LINKING
-// Written in C++ (no STL, no libc — pure SigmaOS custom primitives)
-//
-// USPs Absorbed:
-//   1. Android: Intent-based inter-process app messaging
-//   2. iOS: Deep link URL scheme routing
-//   3. HaikuOS: Native message-passing API (BMessage)
-//   4. Plan 9: Everything-is-a-file IPC
-// =============================================================================
+#ifndef SOVEREIGN_IPC_HPP
+#define SOVEREIGN_IPC_HPP
 
-#pragma once
+#include "SigmaOOP.hpp"
+
+/**
+ * Σ SIGMA OS: SOVEREIGN USP: ANDROID INTENT SYSTEM + iOS DEEP LINKING
+ * ======================================================================
+ * USPs Absorbed:
+ *   1. Android: Intent-based inter-process app messaging
+ *   2. iOS: Deep link URL scheme routing
+ *   3. HaikuOS: Native message-passing API (BMessage)
+ *   4. Plan 9: Everything-is-a-file IPC
+ * Principle: Zero-STL, Zero-LibC, Total Sovereignty.
+ * ======================================================================
+ */
 
 namespace SigmaOS {
 namespace Sovereign_IPC {
 
-// -----------------------------------------------
-// Encapsulation: SigmaIntent (Android USP clone)
-// All fields private, exposed via controlled API.
-// -----------------------------------------------
 class SigmaIntent {
 private:
-    const char* action;
-    const char* target_app;
-    const char* data_key;
-    const char* data_value;
+    SigmaString action;
+    SigmaString target_app;
+    SigmaString data_key;
+    SigmaString data_value;
 
 public:
-    SigmaIntent(const char* act, const char* app, const char* key, const char* val)
+    SigmaIntent(SigmaString act, SigmaString app, SigmaString key, SigmaString val)
         : action(act), target_app(app), data_key(key), data_value(val) {}
 
-    // Polymorphic dispatch (like Android Intent resolution)
+    virtual ~SigmaIntent() = default;
+
     virtual void Dispatch() {
-        // In production: writes to /sigma/ipc/<target_app>/intent.fifo
-        // This is a bare-metal FIFO write avoiding pipes/sockets entirely
-        const char* msg = "[SigmaIntent] Dispatching intent to sovereign app bus...\n";
-        WriteDirectStdout(msg);
+        sigma_printf("[SigmaIntent] Dispatching intent to sovereign app bus: %s -> %s\n", 
+                     action.c_str(), target_app.c_str());
     }
 
-    const char* GetAction()  const { return action; }
-    const char* GetTarget()  const { return target_app; }
-    virtual ~SigmaIntent() {}
-
-private:
-    static void WriteDirectStdout(const char* s) {
-        long len = 0;
-        while (s[len]) ++len;
-        __asm__ volatile(
-            "syscall"
-            : : "a"(1L), "D"(1L), "S"(s), "d"(len)
-            : "rcx", "r11"
-        );
-    }
+    SigmaString GetAction() const { return action; }
+    SigmaString GetTarget() const { return target_app; }
 };
 
-// -----------------------------------------------
-// Inheritance: DeepLinkIntent (iOS USP absorbed)
-// SigmaOS URL scheme: sigma://app/action?key=val
-// -----------------------------------------------
 class DeepLinkIntent : public SigmaIntent {
 private:
-    const char* url_scheme;
+    SigmaString url_scheme;
 public:
-    DeepLinkIntent(const char* url, const char* app, const char* key, const char* val)
+    DeepLinkIntent(SigmaString url, SigmaString app, SigmaString key, SigmaString val)
         : SigmaIntent("DEEP_LINK", app, key, val), url_scheme(url) {}
 
     void Dispatch() override {
-        // Override: routes via sigma:// URL scheme parser
-        // In deployment: resolves app from /sigma/apps/registry.sdb
-        const char* msg = "[SigmaDeepLink] Resolving sigma:// URL scheme to sovereign app...\n";
-        long len = 0;
-        while (msg[len]) ++len;
-        __asm__ volatile(
-            "syscall"
-            : : "a"(1L), "D"(1L), "S"(msg), "d"(len)
-            : "rcx", "r11"
-        );
+        sigma_printf("[SigmaDeepLink] Resolving %s to sovereign app: %s\n", 
+                     url_scheme.c_str(), GetTarget().c_str());
     }
 };
 
-// -----------------------------------------------
-// Composition: SigmaMessageBus (HaikuOS BMessage + Plan 9 "everything is a file" IPC)
-// Manages a sovereign message queue without heap/malloc
-// -----------------------------------------------
 template<int CAPACITY>
 class SigmaMessageBus {
 private:
-    SigmaIntent* queue[CAPACITY];
-    int head = 0;
-    int tail = 0;
-    int count = 0;
+    SigmaArray<SigmaSharedPtr<SigmaIntent>> _queue;
 
 public:
-    bool Post(SigmaIntent* intent) {
-        if (count >= CAPACITY) return false;
-        queue[tail] = intent;
-        tail = (tail + 1) % CAPACITY;
-        ++count;
+    SigmaMessageBus() { _queue.reserve(CAPACITY); }
+
+    bool Post(SigmaSharedPtr<SigmaIntent> intent) {
+        if (_queue.size() >= CAPACITY) return false;
+        _queue.push(static_cast<SigmaSharedPtr<SigmaIntent>&&>(intent));
         return true;
     }
 
-    SigmaIntent* Consume() {
-        if (count == 0) return nullptr;
-        SigmaIntent* out = queue[head];
-        head = (head + 1) % CAPACITY;
-        --count;
-        return out;
-    }
-
     void DrainAll() {
-        while (count > 0) {
-            SigmaIntent* intent = Consume();
-            if (intent) intent->Dispatch();
+        sigma_printf("[IPC_MESH]: Draining Sovereign Message Bus...\n");
+        for (auto& intent : _queue) {
+            intent->Dispatch();
         }
+        _queue.clear();
     }
-
-    int Size() const { return count; }
 };
 
-// -----------------------------------------------
-// Demo: Proves all 4 competitor USPs absorbed
-// -----------------------------------------------
 inline void RunUSPAbsorptionDemo() {
-    SigmaMessageBus<8> bus;
+    SigmaMessageBus<16> bus;
 
-    SigmaIntent android_intent("VIEW", "SovereignBrowser", "url", "sigma://news/feed");
-    DeepLinkIntent ios_intent("sigma://photos/capture", "SovereignCamera", "mode", "ar");
+    bus.Post(sigma_make_shared<SigmaIntent>("VIEW", "SovereignBrowser", "url", "sigma://news/feed"));
+    bus.Post(sigma_make_shared<DeepLinkIntent>("sigma://photos/capture", "SovereignCamera", "mode", "ar"));
 
-    bus.Post(&android_intent);
-    bus.Post(&ios_intent);
     bus.DrainAll();
 }
 
 } // namespace Sovereign_IPC
 } // namespace SigmaOS
+
+#endif

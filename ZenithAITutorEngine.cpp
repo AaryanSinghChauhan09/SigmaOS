@@ -1,33 +1,31 @@
-#include <iostream>
-#include <string>
-#include <memory>
-#include <map>
+#include "SigmaOOP.hpp"
 
 /**
- * Σ SIGMA OS: ZENITH AI TUTOR ENGINE (v128.0 - MASTER SCHOLASTIC)
+ * Σ SIGMA OS: ZENITH AI TUTOR ENGINE (v128.0 - ZERO-STD NATIVE)
  * ==============================================================
  * USP: Absorb BYJU'S, YouTube, and ePathshala into Silicon Shards.
  * Capability: Hierarchical NCERT Line Simulations (1-12).
- * Principle: OOPS, SOLID, Zero-Simulated Analytics.
+ * Principle: OOPS, SOLID, Zero-Simulated Analytics / Zero-STL.
+ * ==============================================================
  */
 
 class IScholasticShard {
 public:
     virtual ~IScholasticShard() = default;
-    virtual void Execute(const std::map<std::string, double>& inputs) = 0;
-    virtual std::string GetExplanation() = 0;
+    virtual void Execute(const SigmaMap<SigmaString, double>& inputs) = 0;
+    virtual SigmaString GetExplanation() = 0;
 };
 
 // --- Senior Pillar: Quantum Physics (Absorb High-End YouTube Explanations) ---
 class QuantumShard : public IScholasticShard {
 public:
-    void Execute(const std::map<std::string, double>& inputs) override {
+    void Execute(const SigmaMap<SigmaString, double>& inputs) override {
         double wavelength = inputs.at("lambda");
         double energy = (6.626e-34 * 3e8) / wavelength;
-        std::cout << "[SENIOR/QUANTUM]: Photon Energy Shard (E = hc/lambda)." << std::endl;
-        std::cout << "[SENIOR/QUANTUM]: Energy: " << energy << " Joules." << std::endl;
+        sigma_printf("[SENIOR/QUANTUM]: Photon Energy Shard (E = hc/lambda).\n");
+        sigma_printf("[SENIOR/QUANTUM]: Energy: %e Joules.\n", energy);
     }
-    std::string GetExplanation() override {
+    SigmaString GetExplanation() override {
         return "Explanation: Light behaves as both wave and particle. Shard confirms E is inversely proportional to wavelength.";
     }
 };
@@ -35,12 +33,12 @@ public:
 // --- Secondary Pillar: Periodic Trends (Absorb BYJU'S Interactivity) ---
 class PeriodicTrendShard : public IScholasticShard {
 public:
-    void Execute(const std::map<std::string, double>& inputs) override {
+    void Execute(const SigmaMap<SigmaString, double>& inputs) override {
         double Z = inputs.at("Z");
-        std::cout << "[SECONDARY/CHEM]: Periodic Shard for Atomic Number " << Z << "." << std::endl;
-        std::cout << "[SECONDARY/CHEM]: Trend: Atomic Radius decreases across period." << std::endl;
+        sigma_printf("[SECONDARY/CHEM]: Periodic Shard for Atomic Number %f.\n", Z);
+        sigma_printf("[SECONDARY/CHEM]: Trend: Atomic Radius decreases across period.\n");
     }
-    std::string GetExplanation() override {
+    SigmaString GetExplanation() override {
         return "Explanation: Increased nuclear charge pulls electrons closer, reducing radius shard.";
     }
 };
@@ -48,47 +46,50 @@ public:
 // --- Middle Pillar: Circuit Shard (Absorb LabXchange) ---
 class CircuitShard : public IScholasticShard {
 public:
-    void Execute(const std::map<std::string, double>& inputs) override {
+    void Execute(const SigmaMap<SigmaString, double>& inputs) override {
         double V = inputs.at("V"), R = inputs.at("R");
-        std::cout << "[MIDDLE/PHYSICS]: Ohmic Shard Execution (I = V/R)." << std::endl;
-        std::cout << "[MIDDLE/PHYSICS]: Current (I): " << (V / R) << "A." << std::endl;
+        sigma_printf("[MIDDLE/PHYSICS]: Ohmic Shard Execution (I = V/R).\n");
+        sigma_printf("[MIDDLE/PHYSICS]: Current (I): %fA.\n", (V / R));
     }
-    std::string GetExplanation() override {
+    SigmaString GetExplanation() override {
         return "Explanation: Current flow is directly proportional to voltage and inversely to resistance.";
     }
 };
 
 class ZenithAITutorEngine {
 private:
-    std::map<std::string, std::unique_ptr<IScholasticShard>> m_tutor;
+    SigmaMap<SigmaString, SigmaUniquePtr<IScholasticShard>> m_tutor;
 public:
     void Synthesize() {
-        m_tutor["QUANTUM"] = std::make_unique<QuantumShard>();
-        m_tutor["PERIODIC"] = std::make_unique<PeriodicTrendShard>();
-        m_tutor["CIRCUIT"] = std::make_unique<CircuitShard>();
+        m_tutor.insert("QUANTUM", sigma_make_unique<QuantumShard>());
+        m_tutor.insert("PERIODIC", sigma_make_unique<PeriodicTrendShard>());
+        m_tutor.insert("CIRCUIT", sigma_make_unique<CircuitShard>());
     }
 
-    void QueryLine(const std::string& key, const std::map<std::string, double>& inputs) {
-        if (m_tutor.count(key)) {
-            std::cout << "\n[ZENITH-TUTOR]: Booting Shard Mastery for '" << key << "'..." << std::endl;
-            m_tutor[key]->Execute(inputs);
-            std::cout << "[ZENITH-TUTOR]: " << m_tutor[key]->GetExplanation() << std::endl;
+    void QueryLine(const SigmaString& key, const SigmaMap<SigmaString, double>& inputs) {
+        if (m_tutor.contains(key)) {
+            sigma_printf("\n[ZENITH-TUTOR]: Booting Shard Mastery for '%s'...\n", key.c_str());
+            m_tutor.at(key)->Execute(inputs);
+            sigma_printf("[ZENITH-TUTOR]: %s\n", m_tutor.at(key)->GetExplanation().c_str());
         } else {
-            std::cout << "[ERROR]: Knowledge Shard '" << key << "' not synthesized. Deep Repository Expanding..." << std::endl;
+            sigma_printf("[ERROR]: Knowledge Shard '%s' not synthesized. Deep Repository Expanding...\n", key.c_str());
         }
     }
 };
 
-int main() {
+extern "C" void _start(void) {
     ZenithAITutorEngine tutor;
     tutor.Synthesize();
 
-    std::map<std::string, double> q_in = {{"lambda", 500e-9}};
+    SigmaMap<SigmaString, double> q_in;
+    q_in.insert("lambda", 500e-9);
     tutor.QueryLine("QUANTUM", q_in);
 
-    std::map<std::string, double> c_in = {{"V", 12.0}, {"R", 4.0}};
+    SigmaMap<SigmaString, double> c_in;
+    c_in.insert("V", 12.0);
+    c_in.insert("R", 4.0);
     tutor.QueryLine("CIRCUIT", c_in);
 
-    std::cout << "\n[SUCCESS]: Competitive Zenith AI Tutor Online. Competitors Absorbed 100%." << std::endl;
-    return 0;
+    sigma_printf("\n[SUCCESS]: Competitive Zenith AI Tutor Online. Competitors Absorbed 100%%.\n");
+    sigma_exit(0);
 }

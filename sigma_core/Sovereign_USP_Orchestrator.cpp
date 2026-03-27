@@ -1,23 +1,14 @@
-// =============================================================================
-// SigmaOS Sovereign USP Master Orchestrator
-// Wires all absorbed competitor USP modules into a single sovereign runtime.
-//
-// USPs absorbed from:
-//   - Apple macOS: Time Machine atomic snapshots
-//   - Apple iOS: Secure Enclave hardware crypto isolation (ASM)
-//   - Google ChromeOS: Verified boot + 2s stateless restore (C)
-//   - NixOS: Declarative atomic system state rollback (Rust/no_std)
-//   - Android/iOS/HaikuOS/Plan9: Intent IPC + deep link routing (C++)
-//   - FreeBSD: Capsicum capability-mode sandbox (C)
-//   - OpenBSD: pledge/unveil minimal syscall promises (C)
-//   - Windows NT: DirectX GPU memory mapping at PCI level (C++)
-//   - Qubes OS: CPU ring-isolation hypervisor (ASM)
-//   - Linux: eBPF telemetry via sovereign JIT (C/Rust)
-// =============================================================================
-
+#include "SigmaOOP.hpp"
 #include "usp_android_ios_haiku_plan9_ipc.hpp"
 
-// Forward declarations of C-linkage functions
+/**
+ * Σ SIGMA OS: SOVEREIGN USP MASTER ORCHESTRATOR (v4.0 - ZERO-STD NATIVE)
+ * ======================================================================
+ * Wires all absorbed competitor USP modules into a single sovereign runtime.
+ * Principle: Zero-STL, Zero-LibC, Total Sovereignty.
+ * ======================================================================
+ */
+
 extern "C" {
     void sigma_chromeos_usp_main(void);
     void sigma_security_usp_demo(void);
@@ -28,87 +19,60 @@ extern "C" {
 
 namespace SigmaOS {
 
-// ---------------------------------------------------------
-// OS Operational Modes & Customizations
-// Absorbs USPs from hypervisors and performance distros
-// ---------------------------------------------------------
 enum class SovereignMode {
     STANDARD,
-    ULTRA_LOW_LATENCY_GAMING, // Direct hardware IO, bypassed scheduler
-    ABSOLUTE_PRIVACY_VAULT,   // Network disconnect, pure RAM execution
-    BATTERY_SAVER_NANO        // Under-clocked, minimal services
+    ULTRA_LOW_LATENCY_GAMING,
+    ABSOLUTE_PRIVACY_VAULT,
+    BATTERY_SAVER_NANO
 };
 
 struct SovereignCustomizations {
-    bool enable_ar_optics;
-    bool enforce_strict_pledge;
-    bool enable_directx_mem_map;
+    sigma_bool enable_ar_optics;
+    sigma_bool enforce_strict_pledge;
+    sigma_bool enable_directx_mem_map;
 };
 
 class SovereignUSPOrchestrator {
 private:
-    static SovereignMode current_mode;
-    static SovereignCustomizations configs;
+    static SovereignMode m_mode;
+    static SovereignCustomizations m_configs;
 
 public:
-    static void SetMode(SovereignMode new_mode) {
-        current_mode = new_mode;
-        // In bare metal: Triggers CPU ring changes, scheduler bypasses, or network drops
-    }
-
-    static void Customize(SovereignCustomizations new_configs) {
-        configs = new_configs;
-    }
+    static void SetMode(SovereignMode new_mode) { m_mode = new_mode; }
+    static void Customize(SovereignCustomizations configs) { m_configs = configs; }
 
     static void RunAll() {
-        // Apply Mode Rules
-        if (current_mode == SovereignMode::ABSOLUTE_PRIVACY_VAULT) {
-            _sigma_vault_lock(); // Auto-lock before any initialization
-        }
+        sigma_printf("[ORCHESTRATOR]: Initializing Sovereign USP Mesh Engine...\n");
+        
+        if (m_mode == SovereignMode::ABSOLUTE_PRIVACY_VAULT) _sigma_vault_lock();
 
-        // 1. ChromeOS: 2-second verified boot
         sigma_chromeos_usp_main();
-
-        // 2. iOS: Hardware Secure Enclave key isolation
         _sigma_secure_enclave_init();
-        if (current_mode != SovereignMode::ABSOLUTE_PRIVACY_VAULT) {
-            _sigma_vault_lock(); // Standard locking
-        }
 
-        // 3. NixOS: Atomic declarative system rollback
+        if (m_mode != SovereignMode::ABSOLUTE_PRIVACY_VAULT) _sigma_vault_lock();
+
         sigma_nixos_usp_demo();
 
-        // 4. Android + iOS + HaikuOS + Plan9: Sovereign IPC message bus
-        if (current_mode != SovereignMode::BATTERY_SAVER_NANO) {
-            SigmaOS::Sovereign_IPC::RunUSPAbsorptionDemo();
+        if (m_mode != SovereignMode::BATTERY_SAVER_NANO) {
+            Sovereign_IPC::RunUSPAbsorptionDemo();
         }
 
-        // 5. FreeBSD + OpenBSD: Capsicum capability sandbox + pledge
-        if (configs.enforce_strict_pledge) {
-            sigma_security_usp_demo();
-        }
+        if (m_configs.enforce_strict_pledge) sigma_security_usp_demo();
 
-        // 6. MIT Scratch + Snapchat: Optic tensor facial telemetry AR processing ML hooks
-        if (configs.enable_ar_optics && current_mode != SovereignMode::BATTERY_SAVER_NANO) {
-            RunMLOpticsHooks();
+        if (m_configs.enable_ar_optics && m_mode != SovereignMode::BATTERY_SAVER_NANO) {
+            sigma_printf("[ML_OPTICS]: Native ML Tensor Graph Initialized (AR).\n");
         }
-    }
-
-private:
-    static void RunMLOpticsHooks() {
-        // Stubs execution pipeline for AR tensor mapping
-        auto init_tensor_graph = []() { return "Native ML Tensor Graph Initialized."; };
-        init_tensor_graph();
     }
 };
 
-// Initialize static members
-SovereignMode SovereignUSPOrchestrator::current_mode = SovereignMode::STANDARD;
-SovereignCustomizations SovereignUSPOrchestrator::configs = {true, true, true};
+SovereignMode SovereignUSPOrchestrator::m_mode = SovereignMode::STANDARD;
+SovereignCustomizations SovereignUSPOrchestrator::m_configs = {SIGMA_TRUE, SIGMA_TRUE, SIGMA_TRUE};
 
 } // namespace SigmaOS
 
-int main() {
+extern "C" void _start(void) {
+    sigma_printf("\n--- Σ SIGMAOS MASTER SOVEREIGN BOOT ---\n");
     SigmaOS::SovereignUSPOrchestrator::RunAll();
-    return 0;
+    sigma_printf("\n--- Σ BOOT COMPLETE ---\n");
+    sigma_exit(0);
 }

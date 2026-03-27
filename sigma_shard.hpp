@@ -1,15 +1,13 @@
 #ifndef SOVEREIGN_SHARD_HPP
 #define SOVEREIGN_SHARD_HPP
 
-#include <iostream>
-#include <string>
-#include <vector>
+#include "SigmaOOP.hpp"
 
 /**
- * SigmaOS Sovereign Shard Base (Native C++ OOPS)
- * Principle: OOPS, SOLID, Data Encapsulation.
+ * SigmaOS Sovereign Shard Base v2.0 (Zero-STD Native)
+ * Principle: OOPS, SOLID, Data Encapsulation / Zero-STL.
  * USP: Polymorphic Hardware/Shard Interaction.
- * Inspiration: torvalds/linux/include/linux/fs.h (File Operations OOPS-like pointers).
+ * Philosophy: Total Sovereignty.
  */
 
 namespace SigmaOS {
@@ -17,24 +15,27 @@ namespace SigmaOS {
     class IShard {
     public:
         virtual ~IShard() {}
-        virtual uint32_t GetId() const = 0;
-        virtual std::string GetName() const = 0;
+        virtual sigma_u32 GetId() const = 0;
+        virtual SigmaString GetName() const = 0;
         virtual void Execute() = 0;
+        
         virtual void StatusReport() {
-            std::cout << "Σ [CPP_SHARD]: OK: Shard [" << GetName() << "] Operational." << std::endl;
+            sigma_printf("Σ [CPP_SHARD]: OK: Shard [%s] Operational.\n", GetName().c_str());
         }
     };
 
     class MemoryShard : public IShard {
     private:
-        uint32_t m_id;
-        std::string m_name;
+        sigma_u32 m_id;
+        SigmaString m_name;
     public:
-        MemoryShard(uint32_t id, std::string name) : m_id(id), m_name(name) {}
-        uint32_t GetId() const override { return m_id; }
-        std::string GetName() const override { return m_name; }
+        MemoryShard(sigma_u32 id, SigmaString name) : m_id(id), m_name(name) {}
+        
+        sigma_u32 GetId() const override { return m_id; }
+        SigmaString GetName() const override { return m_name; }
+        
         void Execute() override {
-            std::cout << "Σ [CPP_SHARD]: Memory Shard Dispatch: " << m_name << std::endl;
+            sigma_printf("Σ [CPP_SHARD]: Memory Shard Dispatch: %s\n", m_name.c_str());
         }
     };
 
