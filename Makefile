@@ -159,7 +159,9 @@ SIGMA_TOOLS_SRCS := SigmaGuideLinter.cpp \
                     SigmaSovereignMesh.cpp \
                     SigmaSovereignTypes.cpp \
                     userland/apps/SigmaSovereignDashboard.cpp \
-                    ecosystem/SigmaAetherOrchestrator.cpp
+                    ecosystem/SigmaAetherOrchestrator.cpp \
+                    SigmaSovereignAPI.cpp \
+                    SigmaControlCenter.cpp
 SIGMA_TOOLS_OBJS := $(patsubst %.cpp, build/%.o, $(SIGMA_TOOLS_SRCS))
 
 # =============================================================================
