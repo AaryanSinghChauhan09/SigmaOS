@@ -742,6 +742,16 @@ class SigmaWebKernel {
         const win = rec.el;
         win.style.transition = 'opacity .2s, transform .2s';
         win.style.opacity = '0'; win.style.transform = 'scale(.9) translateY(10px)';
+        
+        // Native System Context Emulation (SIGTERM/SIGKILL)
+        try {
+            const iframe = win.querySelector('iframe');
+            if(iframe && iframe.contentWindow) {
+                iframe.contentWindow.postMessage({ type: 'SIGTERM' }, '*');
+                setTimeout(() => { iframe.src = 'about:blank'; }, 50); // SIGKILL payload
+            }
+        } catch(e) {}
+
         setTimeout(() => win.remove(), 220);
         delete this.wins[title];
         this._rebuild_taskbar();
