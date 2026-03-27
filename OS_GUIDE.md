@@ -15566,3 +15566,57 @@ This workflow ensures SigmaOS maintains its lead over competitors like Kali, Arc
    - Run `py _integration_v2_test.py`
    - All tests MUST pass with Sovereign-Grade efficiency.
 
+
+
+# ======= FILE: missing_linux_components.md =======
+
+
+# Missing Components & OS Comparison Matrix
+## SigmaOS vs. Traditional Linux Architectures
+
+SigmaOS has achieved an unprecedented level of low-level bare-metal operational capacity without relying on typical high-level dependencies or third-party GNU utilities. However, compared to standard Linux distributions (Ubuntu, Fedora, Arch, NixOS, etc.), there are intentional gaps and upcoming scopes:
+
+### 1. Unified Package Manager
+- **Linux Distros:** Rely on APT, DNF, Pacman, or declarative state systems like Nix.
+- **SigmaOS Status:** Currently employs `SovereignAppStore` and `SovereignUniversalDeploy` relying on direct binary execution and raw compilation pipelines to ensure zero third-party telemetry.
+- **Future Scope:** Native dependency-graph resolving algorithmic package manager written purely in Assembly/C.
+
+### 2. Standardized Bootloader
+- **Linux Distros:** GRUB2 / systemd-boot.
+- **SigmaOS Status:** SigmaBootloader (Custom Assembly).
+- **Competitor USP Absorbed:** Emulates Coreboot's speed but maintains absolute sovereignty.
+
+### 3. Desktop Environment Tying
+- **Linux Distros:** X11/Wayland with GNOME/KDE (highly abstracted, Python/JS-centric).
+- **SigmaOS Status:** Sovereign Graphics Compositor built precisely over raw buffer streams in C++ rendering straight via browser DOM wrappers (Sigma Web Kernel).
+
+By systematically excising standard GNU bloat, SigmaOS dominates on boot times and runtime resource consumption.
+
+
+
+# ======= FILE: suggestions.md =======
+
+
+# Developer Suggestions & Pending Fixes
+
+## @current_problems & Architectural Scopes
+
+1. **Window Manager Close/Minimize States**
+   - **Current State:** The DOM manipulation functions correctly via `wtbar`.
+   - **Suggestion:** Introduce a proper SIGTERM and SIGKILL wrapper around closed app instances. The UI shouldn't merely `display:none` or `remove()` from the DOM without halting executing background processes. A formal system call to terminate a process context must be implemented.
+
+2. **Full Low-Level Integration Verification**
+   - **Current State:** Sigma Web Kernel runs through the JS engine.
+   - **Suggestion:** Port parsing logic into WASM compiled strictly from the Rust/C++ files.
+
+3. **Snapchat/MIT Scratch Integration refinement**
+   - **Current State:** AR overlay logic is stubbed out and textualized on canvas rendering.
+   - **Suggestion:** Establish the ML hooks in `Sovereign_USP_Orchestrator.cpp` to pipe raw webcam tensor feeds into a C++ model.
+
+4. **Third-Party Avoidance Checks**
+   - **Suggestion:** Continuous integration pipelines must block all high-level dependency injection, including Node binaries or Python data modules.
+
+5. **Ghost Tabs & UI Artefacts**
+   - **Current State:** Fast launching may occasionally strand window z-indexes.
+   - **Solution:** Force Z-index stacking validation upon `OS.launch()` logic loops.
+

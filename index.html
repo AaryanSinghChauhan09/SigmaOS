@@ -679,9 +679,9 @@ class SigmaWebKernel {
 
         const ctrls = document.createElement('div');
         ctrls.className = 'wcontrols';
-        const mk = (cls, fn) => {
+        const mk = (cls, hint, fn) => {
             const b = document.createElement('button');
-            b.className = 'wdot ' + cls; b.onclick = fn; return b;
+            b.className = 'wdot ' + cls; b.title = hint; b.onclick = fn; return b;
         };
 
         let isMax = false, prevGeo = {};
