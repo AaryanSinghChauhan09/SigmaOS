@@ -21,6 +21,7 @@ g++ -O3 -std=c++23 -I. -o SigmaKernel.bin \
     kernel/SovereignContainer.cpp \
     kernel/SovereignProcessManager.cpp \
     kernel/SovereignPM.cpp \
+    kernel/SovereignAlgorithms.cpp \
     -lpthread >build_log.txt 2>&1
 
 if [ $? -ne 0 ]; then

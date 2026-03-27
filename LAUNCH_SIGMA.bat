@@ -14,7 +14,11 @@ if %errorlevel% neq 0 (
 
 :: Step 2: Native C++ Build (Zenith Kernel)
 echo [2] Compiling Sovereign Zenith Dispatcher (Ring 0)...
-g++ -O3 -std=c++23 -I. -o SigmaKernel.exe SigmaFinalIntegration.cpp kernel/sigma_sml.cpp kernel/SovereignVFS.cpp kernel/SovereignNetwork.cpp kernel/SovereignSecurity.cpp kernel/SovereignVirtualizer.cpp kernel/SovereignContainer.cpp kernel/SovereignProcessManager.cpp kernel/SovereignPM.cpp -luser32 -lgdi32 >build_log.txt 2>&1
+:: Industrial Build Pipeline v6.2.0
+g++ -O3 -shared -fPIC kernel/SovereignAlgorithms.cpp kernel/SigmaProcessManager.cpp kernel/SigmaMemoryNexus.cpp -o SigmaSovereignKernel.dll
+g++ -O3 SigmaFinalIntegration.cpp -L. -lSigmaSovereignKernel -o SigmaOS_Sovereign.exe
+.\SigmaOS_Sovereign.exe
+g++ -O3 -std=c++23 -I. -o SigmaKernel.exe SigmaFinalIntegration.cpp kernel/sigma_sml.cpp kernel/SovereignVFS.cpp kernel/SovereignNetwork.cpp kernel/SovereignSecurity.cpp kernel/SovereignVirtualizer.cpp kernel/SovereignContainer.cpp kernel/SovereignProcessManager.cpp kernel/SovereignPM.cpp kernel/SovereignAlgorithms.cpp -luser32 -lgdi32 >build_log.txt 2>&1
 
 if %errorlevel% neq 0 (
     echo [!] FATAL: Build failed. Check build_log.txt for telemetry.

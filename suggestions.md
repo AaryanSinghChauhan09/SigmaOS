@@ -40,4 +40,4 @@ The current architecture provides absolute systemic sovereignty. These suggestio
 
 ## 🏛️ Governance
 
-*Final Roadmap for the Sovereign User | SigmaOS Agentic Council*
+Final Roadmap curated for the Sovereign User | SigmaOS Agentic Council
