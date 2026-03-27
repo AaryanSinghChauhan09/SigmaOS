@@ -167,7 +167,8 @@ SIGMA_TOOLS_SRCS := SigmaGuideLinter.cpp \
                     userland/apps/SigmaSovereignAdvocate.cpp \
                     SigmaAntigravitySubsystem.cpp \
                     SigmaOmniAutomator.cpp \
-                    SigmaAutomatorExtensions.cpp
+                    SigmaAutomatorExtensions.cpp \
+                    SigmaOmniScripts.cpp
 SIGMA_TOOLS_OBJS := $(patsubst %.cpp, build/%.o, $(SIGMA_TOOLS_SRCS))
 
 # =============================================================================
