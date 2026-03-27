@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SigmaOS Sovereign Control Center</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg: #060910;
+            --surface: rgba(255, 255, 255, 0.05);
+            --border: rgba(255, 255, 255, 0.1);
+            --accent: #00d2ff;
+            --font: 'Inter', sans-serif;
+        }
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body { background: var(--bg); color: #fff; font-family: var(--font); padding: 20px; }
+        
+        .header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px; }
+        .title { font-size: 1.5rem; font-weight: 800; letter-spacing: -0.5px; }
+        .version { font-size: 0.8rem; opacity: 0.5; }
+
+        .dashboard { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 20px; }
+        .card { background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 20px; transition: transform 0.2s; }
+        .card:hover { transform: translateY(-4px); border-color: var(--accent); }
+        .card-t { font-size: 0.9rem; font-weight: 700; margin-bottom: 15px; display: flex; align-items: center; gap: 8px; }
+        .card-v { font-size: 2rem; font-weight: 900; color: var(--accent); }
+        .card-s { font-size: 0.75rem; opacity: 0.5; margin-top: 5px; }
+
+        .proc-list { margin-top: 30px; background: var(--surface); border: 1px solid var(--border); border-radius: 12px; overflow: hidden; }
+        .proc-item { display: flex; justify-content: space-between; padding: 12px 20px; border-bottom: 1px solid var(--border); font-size: 0.85rem; }
+        .proc-header { font-weight: 800; background: rgba(255,255,255,0.02); }
+    </style>
+</head>
+<body>
+
+    <div class="header">
+        <h1 class="title">Σ SOVEREIGN CONTROL CENTER</h1>
+        <span class="version" id="sys-ver">v6.2.0 Zenith</span>
+    </div>
+
+    <div class="dashboard">
+        <div class="card">
+            <div class="card-t">🧠 MEMORY MATRIX</div>
+            <div class="card-v" id="mem-val">4.2 GB</div>
+            <div class="card-s">Sovereign Pages: 16,384 FREE</div>
+        </div>
+        <div class="card">
+            <div class="card-t">⚡ PROCESS SCHEDULER</div>
+            <div class="card-v" id="proc-val">128ms</div>
+            <div class="card-s">Jitter: 0.00ms | MLFQ Active</div>
+        </div>
+        <div class="card">
+            <div class="card-t">🌐 NETWORK WARDEN</div>
+            <div class="card-v">1.4 GB/s</div>
+            <div class="card-s">Active Guard: AES-256-GCM</div>
+        </div>
+    </div>
+
+    <div class="proc-list" id="proc-list">
+        <div class="proc-item proc-header">
+            <span>NAME</span><span>PID</span><span>PRIO</span><span>STATE</span>
+        </div>
+    </div>
+
+    <script src="../libs/sovereign_api.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', async () => {
+            // Fetch real-time telemetry from SigmaOS-SSA
+            const stats = await window.SigmaOS.getMemoryStats();
+            document.getElementById('mem-val').textContent = stats.free;
+            
+            const procs = await window.SigmaOS.getProcessList();
+            const root = document.getElementById('proc-list');
+            procs.forEach(p => {
+                const item = document.createElement('div');
+                item.className = 'proc-item';
+                item.innerHTML = `<span>${p.name}</span><span>${p.pid}</span><span>${p.prio}</span><span>${p.state}</span>`;
+                root.appendChild(item);
+            });
+        });
+    </script>
+</body>
+</html>

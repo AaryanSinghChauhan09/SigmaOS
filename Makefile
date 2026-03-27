@@ -142,6 +142,11 @@ CPP_SRCS  := SigmaOOP_Framework.cpp \
              kernel/SovereignVFS.cpp
 CPP_OBJS  := $(patsubst %.cpp, build/%.o, $(CPP_SRCS))
 
+# Sovereign Tools
+SIGMA_TOOLS_SRCS := SigmaGuideLinter.cpp \
+                    SigmaFileFabricator.cpp
+SIGMA_TOOLS_OBJS := $(patsubst %.cpp, build/%.o, $(SIGMA_TOOLS_SRCS))
+
 # =============================================================================
 # BUILD TARGETS
 # =============================================================================
@@ -149,7 +154,7 @@ CPP_OBJS  := $(patsubst %.cpp, build/%.o, $(CPP_SRCS))
 # Default: build everything
 .PHONY: all clean info test sigma_libc kernel rust_core hal verify
 
-all: dirs sigma_libc kernel rust_core hal info
+all: dirs sigma_libc kernel rust_core hal tools info
 	@echo ""
 	@echo "Σ ============================================================ Σ"
 	@echo "  SigmaOS SOVEREIGN BUILD v8.0 COMPLETE"
@@ -225,6 +230,14 @@ cpp_framework: dirs
 	@echo "[CXX] Building C++ OOP Framework (no STL, no RTTI)..."
 	@$(CXX) $(CXXFLAGS) -c sigma_native_core.cpp -o build/sigma_native_core.o 2>&1 | head -20
 	@echo "[CXX] C++ sovereign compile done."
+
+# --- SOVEREIGN TOOLS ---
+tools: dirs $(SIGMA_TOOLS_OBJS)
+	@echo "[TOOLS] Sovereign native utilities compiled."
+
+build/%.o: %.cpp libc/sigma_types.h libc/sigma_libc.h
+	@echo "[CXX] $*"
+	@$(CXX) $(CXXFLAGS) -c $< -o $@
 
 # =============================================================================
 # VERIFICATION (Check that no forbidden includes exist)

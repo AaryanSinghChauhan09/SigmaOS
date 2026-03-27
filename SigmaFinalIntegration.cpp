@@ -1,14 +1,17 @@
-#include <cstdint>
-#include "SigmaOOP.hpp"
 #include "kernel/SovereignAlgorithms.cpp"
 #include "kernel/SigmaProcessManager.cpp"
 #include "kernel/SigmaMemoryNexus.cpp"
+#include "kernel/SovereignGraphics.cpp"
+#include "kernel/SovereignVMM.cpp"
+#include "kernel/SovereignContainer.cpp"
 
 /**
  * @file SigmaFinalIntegration.cpp
  * @brief Monolithic Kernel Dispatcher for SigmaOS Sovereign Zenith
  * @version 6.2.0 (Launch Edition)
  */
+
+extern "C" void sigma_algorithms_init();
 
 namespace SigmaKernel {
 
@@ -18,7 +21,7 @@ namespace SigmaKernel {
 
         static void initialize_sovereign_subsystems() {
             // 1. Initialize Algorithmic Shards
-            SovereignAlgorithmMatrix::initialize();
+            ::sigma_algorithms_init();
 
             // 2. Initialize Process Management (O(1) Scheduler)
             GlobalScheduler.spawn("Kernel_Init", 0x1000, 10);
@@ -27,8 +30,17 @@ namespace SigmaKernel {
 
             // 3. Initialize Memory Nexus (Buddy/Slab)
             GlobalMemoryNexus.allocate_pages(512); // Reserve for Core Matrix
+
+            // 4. Initialize Graphics Nexus (FrameBuffer Matrix)
+            // GlobalGraphicsNexus.initialize(0xB8000, 1920, 1080); // Native mapping
+
+            // 5. Initialize VMM (Hypervisor Shard)
+            GlobalVMM.spawn_guest(0x8000000, 0x9000000); // Live-Boot Guest Shard
+
+            // 6. Initialize Container Engine (Sovereign Pods)
+            // GlobalContainerEngine.create_pod("Sigma_AI_Isolator");
             
-            sigma_printf("[KERNEL]: Sovereign Shards Active.\n");
+            sigma_printf("[KERNEL]: Sovereign Shards Active (v6.2.0 ZENITH).\n");
         }
 
         static void launch_production_sequence() {

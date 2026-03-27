@@ -12,21 +12,20 @@ if %errorlevel% neq 0 (
     echo [!] WARNING: Offline Mode. Sync shard failed.
 )
 
-:: Step 2: Native C++ Build (Zenith Kernel)
-echo [2] Compiling Sovereign Zenith Dispatcher (Ring 0)...
-:: Industrial Build Pipeline v6.2.0
-g++ -O3 -shared -fPIC kernel/SovereignAlgorithms.cpp kernel/SigmaProcessManager.cpp kernel/SigmaMemoryNexus.cpp -o SigmaSovereignKernel.dll
+:: Industrial Build Pipeline v6.2.0 (Zenith Launch Edition)
+echo [2] Compiling Sovereign Zenith Matrix (Ring 0)...
+:: Compile all Sovereign Kernel Shards into a monolithic Ring-0 Engine
+g++ -O3 -shared -fPIC kernel/SovereignAlgorithms.cpp kernel/SigmaProcessManager.cpp kernel/SigmaMemoryNexus.cpp kernel/SovereignGraphics.cpp kernel/SovereignVMM.cpp kernel/SovereignContainer.cpp -o SigmaSovereignKernel.dll
+
+:: Link the Final Dispatcher
 g++ -O3 SigmaFinalIntegration.cpp -L. -lSigmaSovereignKernel -o SigmaOS_Sovereign.exe
-.\SigmaOS_Sovereign.exe
-g++ -O3 -std=c++23 -I. -o SigmaKernel.exe SigmaFinalIntegration.cpp kernel/sigma_sml.cpp kernel/SovereignVFS.cpp kernel/SovereignNetwork.cpp kernel/SovereignSecurity.cpp kernel/SovereignVirtualizer.cpp kernel/SovereignContainer.cpp kernel/SovereignProcessManager.cpp kernel/SovereignPM.cpp kernel/SovereignAlgorithms.cpp -luser32 -lgdi32 >build_log.txt 2>&1
 
 if %errorlevel% neq 0 (
+    echo [ERROR] Kernel Compilation Failed.
     echo [!] FATAL: Build failed. Check build_log.txt for telemetry.
-    type build_log.txt
     pause
-    exit /b
+    exit /b %errorlevel%
 )
-echo [OK] Zenith Dispatcher Online: SigmaKernel.exe
 
 :: Step 3: Web-Context Pre-flight (index.html)
 echo [3] Validating Sovereign UI Matrix...
@@ -35,7 +34,6 @@ if %errorlevel% == 0 (
     echo [OK] Node.js Runtime detected for automation.
 )
 
-:: Step 4: Boot Execution
 echo.
 echo ============================================================
 echo  SIGMA OS ZENITH IS READY FOR LAUNCH.
@@ -45,4 +43,4 @@ echo ============================================================
 pause
 cls
 echo [BOOT]: Engaging Sovereign Kernel...
-.\SigmaKernel.exe
+.\SigmaOS_Sovereign.exe
