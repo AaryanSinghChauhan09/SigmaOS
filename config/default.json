@@ -1,0 +1,15 @@
+{
+    "kernel": {
+        "telemetry": false,
+        "debug_mode": false,
+        "max_threads": 256
+    },
+    "network": {
+        "mesh_enabled": true,
+        "default_port": 8080
+    },
+    "silo": {
+        "max_memory_mb": 1024,
+        "isolation_level": "high"
+    }
+}

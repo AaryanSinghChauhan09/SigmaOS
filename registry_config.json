@@ -1,0 +1,10 @@
+{
+    "modules": {
+        "ai_nexus": {"enabled": true, "priority": 1},
+        "games_engine": {"enabled": true, "priority": 2},
+        "gui_desktop": {"enabled": true, "priority": 3}
+    },
+    "system_policies": {
+        "allow_unsigned_executables": false
+    }
+}
