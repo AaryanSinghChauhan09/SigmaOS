@@ -163,7 +163,8 @@ SIGMA_TOOLS_SRCS := SigmaGuideLinter.cpp \
                     SigmaSovereignAPI.cpp \
                     SigmaControlCenter.cpp \
                     SigmaSovereignBEM.cpp \
-                    SigmaSovereignNet.cpp
+                    SigmaSovereignNet.cpp \
+                    userland/apps/SigmaSovereignAdvocate.cpp
 SIGMA_TOOLS_OBJS := $(patsubst %.cpp, build/%.o, $(SIGMA_TOOLS_SRCS))
 
 # =============================================================================
