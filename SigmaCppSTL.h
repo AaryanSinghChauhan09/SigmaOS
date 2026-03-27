@@ -34,7 +34,16 @@ private:
 public:
     SigmaVector() : m_data(nullptr), m_size(0), m_capacity(0) {}
     
-    ~SigmaVector() { /* Handled by amnesic wipe */ }
+    ~SigmaVector() {
+        if (m_data) {
+            /* Release pool memory back via sovereign allocator */
+            extern void sigma_slab_free_raw(void* ptr);
+            sigma_slab_free_raw((void*)m_data);
+            m_data = nullptr;
+        }
+        m_size = 0;
+        m_capacity = 0;
+    }
 
     void Push(const T& value) {
         if (m_size >= m_capacity) {
@@ -76,7 +85,7 @@ public:
     const char* CStr() const { return m_buffer; }
     
     void Print() const {
-        sigma_print(m_buffer);
+        sigma_write(SIGMA_FD_STDOUT, m_buffer, m_length);
     }
 };
 

@@ -1,9 +1,9 @@
-# SigmaOS .gitignore - Sovereign Distribution v2
+# SigmaOS .gitignore — Sovereign Distribution v3
 # =================================================
-# CRITICAL: Prevents multi-GB push failures on GitHub by excluding
-# generated binaries, OS images, and node_modules from tracking.
+# Prevents multi-GB push failures by excluding generated
+# binaries, OS images, secrets, and build intermediates.
 
-# ----- GENERATED BINARIES (LARGE) -----
+# ---- GENERATED BINARIES & IMAGES ----
 *.iso
 *.iso.tmp
 *.img
@@ -17,7 +17,7 @@
 *.a
 *.lib
 
-# ----- BUILD INTERMEDIATES -----
+# ---- BUILD INTERMEDIATES ----
 *.o
 *.obj
 __pycache__/
@@ -26,8 +26,11 @@ __pycache__/
 build/
 dist/
 *.spec
+bootloader/*.bin
+kernel/*.o
+kernel/*.obj
 
-# ----- NODE / WEB DEPENDENCIES (LARGEST OFFENDER) -----
+# ---- NODE / WEB DEPENDENCIES ----
 node_modules/
 **/node_modules/
 .npm/
@@ -36,91 +39,13 @@ yarn-debug.log*
 yarn-error.log*
 package-lock.json
 
-# ----- OS RUNTIME DATA -----
+# ---- OS RUNTIME / SECRETS ----
 .venv/
 venv/
 env/
 ENV/
 .vagrant/
-.sigma_keys/
-sessions/
-SIGMA_VAULT/
-identity_vault/
-*.key
-*.pem
-*.crt
-*.pub
-
-# ----- LOGS AND TEMP OUTPUTS -----
-*.log
-logs/
-debug.txt
-out.txt
-out_s.txt
-diag_output*.txt
-test_results.txt
-test_sigmaos_suite_output.txt
-boot_output.txt
-run_error.txt
-dupes.txt
-singularity_output.txt
-status*.json
-fix_log.txt
-
-# ----- EDITOR / IDE -----
-.vscode/
-.idea/
-*.swp
-*.swo
-.DS_Store
-Thumbs.db
-
-# ----- KEEP CRITICAL SOURCE DOCS -----
-!README.md
-!SIGMAPEDIA_THE_SOVEREIGN_BOOK.md
-!suggestions.md
-!DOCS/
-!DOCS/*.md
-!kernel/*.c
-!kernel/*.h
-!kernel/*.rs
-!kernel/*.asm
-!userland/
-
-
-# Byte-compiled / optimized / DLL files
-__pycache__/
-*.py[cod]
-*$py.class
-*.so
-*.dll
-*.dylib
-*.exe
-
-# C/C++ build artifacts (Kernel/Bootloader)
-*.o
-*.obj
-*.bin
-*.elf
-*.img
-*.iso
-*.iso.tmp
-bootloader/*.bin
-kernel/*.o
-kernel/*.obj
-
-# OS Environment / Virtualization
-.venv/
-env/
-venv/
-ENV/
 Vagrant/
-.vagrant/
-build/
-dist/
-*.spec
-
-# SigmaOS Specific Sovereign Data (PRIVATE)
 .sigma_keys/
 sessions/
 SIGMA_VAULT/
@@ -130,7 +55,7 @@ identity_vault/
 *.crt
 *.pub
 
-# Logs and temporary diagnostic outputs
+# ---- LOGS & TEMP OUTPUTS ----
 *.log
 logs/
 debug.txt
@@ -147,21 +72,40 @@ singularity_output.txt
 singularity_breaker_output.txt
 status*.json
 test_out.txt
+fix_log.txt
 
-# Editor / IDE
+# ---- EDITOR / IDE ----
 .vscode/
 .idea/
 *.swp
 *.swo
+.DS_Store
+Thumbs.db
 
-# Project documentation (Keep these)
+# ---- FORCE-KEEP CRITICAL DOCS & SOURCE ----
 !README.md
-!ARCHITECTURE_PRINCIPLES.md
-!COSMOS_MANIFESTO.md
-!HOW_TO_RUN_SIGMAOS.md
-!HOW_TO_SHARE_SIGMAOS.md
-!MARKET_COMPETITORS_ACCESSIBILITY.md
-!SOVEREIGN_GUIDE.md
-!ZERO_TRUST_ARCHITECTURE.md
-!available_features.md
+!OS_GUIDE.md
 !requirements.txt
+!*.c
+!*.h
+!*.cpp
+!*.hpp
+!*.rs
+!*.asm
+!*.html
+!*.css
+!*.js
+!*.ts
+!*.bat
+!*.sh
+!*.ps1
+!*.py
+!Makefile
+!Dockerfile
+!Vagrantfile
+!*.json
+!*.md
+!userland/
+!sigma_core/
+!kernel/
+!bootloader/
