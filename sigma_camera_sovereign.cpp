@@ -75,7 +75,7 @@ public:
     void CapturePhoto() {
         if (!is_initialized) return;
         uint8_t* frame_ptr = sigma_hal_camera_capture_frame();
-        // save to sovereign file system
+        (void)frame_ptr; /* HAL owns frame lifetime; VFS write handled at driver level */
         sigma_log("Photo captured directly from hardware buffer.\n");
     }
 

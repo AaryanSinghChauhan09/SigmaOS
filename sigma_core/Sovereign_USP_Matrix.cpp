@@ -9,22 +9,22 @@
 namespace SigmaOS {
 
 static inline void sigma_print(const char* s) {
-    long len = 0;
+    unsigned long len = 0;
     while (s[len]) ++len;
     __asm__ volatile(
         "syscall"
-        : : "a"(1L), "D"(1L), "S"(s), "d"(len)
+        : : "a"(1UL), "D"(1UL), "S"(s), "d"(len)
         : "rcx", "r11", "memory"
     );
 }
 
 static inline void sigma_sleep(long ms) {
-    struct {
-        long tv_sec;
-        long tv_nsec;
-    } req, rem;
-    req.tv_sec = ms / 1000;
-    req.tv_nsec = (ms % 1000) * 1000000;
+    struct SigmaTimespec { long tv_sec; long tv_nsec; };
+    struct SigmaTimespec req, rem;
+    req.tv_sec  = ms / 1000;
+    req.tv_nsec = (ms % 1000) * 1000000L;
+    rem.tv_sec  = 0;
+    rem.tv_nsec = 0;
     __asm__ volatile(
         "syscall"
         : : "a"(35L), "D"(&req), "S"(&rem)

@@ -832,7 +832,7 @@ class SigmaWebKernel {
         const card = document.createElement('div');
         card.className = 'nc-card';
         const t = new Date().toLocaleTimeString('en-IN',{hour12:false,hour:'2-digit',minute:'2-digit'});
-        card.innerHTML = `<div class="nc-card-t">${title} <span data- class="sigma-style-index-7">${t}</span></div><div class="nc-card-b">${body}</div>`;
+        card.innerHTML = `<div class="nc-card-t">${title} <span class="sigma-style-index-7">${t}</span></div><div class="nc-card-b">${body}</div>`;
         this.ncBody.prepend(card);
     }
 

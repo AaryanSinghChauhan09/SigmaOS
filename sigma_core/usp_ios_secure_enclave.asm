@@ -6,8 +6,11 @@
 ; =============================================================================
 
 section .data
-    msg_absorb  db  "SigmaOS: Absorbing iOS Secure Enclave USP...", 0x0A, 0
-    msg_done    db  "SigmaOS: SecureVault [LOCKED] — Ring-0 Hardware Isolation ACTIVE.", 0x0A, 0
+    msg_absorb  db  "SigmaOS: Absorbing iOS Secure Enclave USP...", 0x0A
+    msg_absorb_len equ $ - msg_absorb
+    
+    msg_done    db  "SigmaOS: SecureVault [LOCKED] - Ring-0 Hardware Isolation ACTIVE.", 0x0A
+    msg_done_len equ $ - msg_done
 
 section .bss
     vault_key   resb 32      ; 256-bit sovereign hardware key slot (in-register only)
@@ -29,7 +32,7 @@ _sigma_secure_enclave_init:
     mov     rax, 1
     mov     rdi, 1
     lea     rsi, [rel msg_absorb]
-    mov     rdx, 44
+    mov     rdx, msg_absorb_len
     syscall
 
     ; Enable hardware memory encryption flag via RDMSR/WRMSR (MSR_IA32_FEATURE_CONTROL)
@@ -70,7 +73,7 @@ _sigma_vault_lock:
     mov     rax, 1
     mov     rdi, 1
     lea     rsi, [rel msg_done]
-    mov     rdx, 58
+    mov     rdx, msg_done_len
     syscall
 
     pop     rbp

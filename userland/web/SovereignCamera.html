@@ -9,8 +9,8 @@
 <body>
     <h2 class="sovereign-title">SOVEREIGN OPTICS (Sovereign Camera)</h2>
     <div id="video-container">
-        <!-- Removed 'playsinline' for Firefox compatibility -->
-        <video id="camera" autoplay></video>
+        <!-- muted required for autoplay; playsinline needed for iOS Safari (Firefox ignores it safely) -->
+        <video id="camera" autoplay muted playsinline></video>
         <canvas id="ar-overlay"></canvas>
     </div>
     
@@ -67,6 +67,10 @@
         }
 
         function renderLoop() {
+            if (canvas.width === 0 || canvas.height === 0) {
+                requestAnimationFrame(renderLoop);
+                return;
+            }
             ctx.clearRect(0, 0, canvas.width, canvas.height);
             if (arMode) {
                 // MIT-Scratch & Snapchat USP: Algorithmic block-based AR drawing and facial mesh filtering.
@@ -126,6 +130,17 @@
             };
             
             gallery.prepend(img);
+        });
+
+        // Wire download button to last captured snapshot
+        const downloadBtn = document.getElementById('download-btn');
+        downloadBtn.addEventListener('click', () => {
+            const lastSnap = gallery.querySelector('img.snapshot');
+            if (!lastSnap) return;
+            const a = document.createElement('a');
+            a.href = lastSnap.src;
+            a.download = 'SigmaOS_Capture_' + Date.now() + '.png';
+            a.click();
         });
 
         initCamera();
