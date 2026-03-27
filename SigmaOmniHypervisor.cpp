@@ -13,7 +13,7 @@
  * =========================================================================
  */
 
-#include "SigmaLibC.h"
+
 #include "SigmaOOP.hpp"
 
 // --- Competitor OS Paradigms Implemented as Native Enclaves ---

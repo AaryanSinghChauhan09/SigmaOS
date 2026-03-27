@@ -12,7 +12,7 @@
  * =========================================================================
  */
 
-#include "SigmaLibC.h"
+
 #include "SigmaOOP.hpp"
 
 typedef void (*SigmaTaskCallback)();

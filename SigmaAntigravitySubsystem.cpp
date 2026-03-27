@@ -10,7 +10,7 @@
  * =========================================================================
  */
 
-#include "SigmaLibC.h"
+
 #include "SigmaOOP.hpp"
 
 class AntigravitySubsystem : public SigmaObject {

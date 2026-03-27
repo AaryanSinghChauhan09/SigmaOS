@@ -12,7 +12,7 @@
  * =========================================================================
  */
 
-#include "SigmaLibC.h"
+
 #include "SigmaOOP.hpp"
 
 // Type definition for an automation task callback
