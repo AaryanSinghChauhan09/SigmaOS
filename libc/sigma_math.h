@@ -86,6 +86,33 @@ SIGMA_INLINE sigma_f64 sigma_log10(sigma_f64 x) {
     return sigma_ln(x) / SIGMA_LN10;
 }
 
+/*
+ * sigma_sin: Sine function via Taylor series.
+ */
+SIGMA_INLINE sigma_f64 sigma_sin(sigma_f64 x) {
+    /* Normalize x to [-PI, PI] */
+    while (x > SIGMA_PI) x -= 2 * SIGMA_PI;
+    while (x < -SIGMA_PI) x += 2 * SIGMA_PI;
+    
+    sigma_f64 res = 0;
+    sigma_f64 term = x;
+    sigma_f64 x2 = x * x;
+    for (int i = 1; i < 15; i += 2) {
+        if ((i / 2) % 2 == 0) res += term;
+        else res -= term;
+        term *= (x2 / (sigma_f64)((i + 1) * (i + 2)));
+    }
+    return res;
+}
+
+/*
+ * sigma_cos: Cosine function via Taylor series.
+ */
+SIGMA_INLINE sigma_f64 sigma_cos(sigma_f64 x) {
+    /* cos(x) = sin(x + PI/2) */
+    return sigma_sin(x + SIGMA_PI / 2.0);
+}
+
 #ifdef __cplusplus
 }
 #endif

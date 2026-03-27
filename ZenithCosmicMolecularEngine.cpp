@@ -1,88 +1,87 @@
-#include <iostream>
-#include <string>
-#include <memory>
-#include <cmath>
-#include <map>
+#include "SigmaOOP.hpp"
+#include "libc/sigma_math.h"
 
 /**
- * Σ SIGMA OS: ZENITH COSMIC & MOLECULAR ENGINE (v128.0 - FINAL USURPATION)
+ * Σ SIGMA OS: ZENITH COSMIC & MOLECULAR ENGINE (v128.0 - ZERO-STD NATIVE)
  * =======================================================================
  * USP: Absorb Stellarium, Avogadro, and Doppler Simulators into Shards.
  * Capability: Kepler's Laws, VSEPR Shapes, Doppler Shift.
- * Principle: OOPS, SOLID, Zero-Simulated Analytics.
+ * Principle: OOPS, SOLID, Zero-Simulated Analytics, Zero-STL.
  */
 
 class ICosmicShard {
 public:
     virtual ~ICosmicShard() = default;
-    virtual void Execute(const std::map<std::string, double>& inputs) = 0;
+    virtual void Execute(const SigmaMap<SigmaString, double>& inputs) = 0;
 };
 
 // --- Physics: Kepler's 3rd Law (Class 11 - Absorb Stellarium) ---
 class KeplerShard : public ICosmicShard {
 public:
-    void Execute(const std::map<std::string, double>& inputs) override {
+    void Execute(const SigmaMap<SigmaString, double>& inputs) override {
         double r = inputs.at("r"); // Distance in AU
-        double T = std::sqrt(std::pow(r, 3));
-        std::cout << "[COSMIC/ZENITH]: Kepler's 3rd Law Shard: T^2 = r^3." << std::endl;
-        std::cout << "[COSMIC/ZENITH]: Orbital Period (T): " << T << " Earth Years." << std::endl;
+        double T = sigma_sqrt(sigma_pow(r, 3));
+        sigma_printf("[COSMIC/ZENITH]: Kepler's 3rd Law Shard: T^2 = r^3.\n");
+        sigma_printf("[COSMIC/ZENITH]: Orbital Period (T): %f Earth Years.\n", T);
     }
 };
 
 // --- Chemistry: VSEPR Shard (Class 11 - Absorb Avogadro) ---
 class VseprShard : public ICosmicShard {
 public:
-    void Execute(const std::map<std::string, double>& inputs) override {
+    void Execute(const SigmaMap<SigmaString, double>& inputs) override {
         int pairs = (int)inputs.at("pairs");
-        std::cout << "[MOLECULAR/ZENITH]: VSEPR Geometry Shard." << std::endl;
-        if (pairs == 2) std::cout << "[GEOM]: Linear (180 deg)." << std::endl;
-        else if (pairs == 3) std::cout << "[GEOM]: Trigonal Planar (120 deg)." << std::endl;
-        else if (pairs == 4) std::cout << "[GEOM]: Tetrahedral (109.5 deg)." << std::endl;
-        else std::cout << "[GEOM]: Complex Hybridization Shard Synced." << std::endl;
+        sigma_printf("[MOLECULAR/ZENITH]: VSEPR Geometry Shard.\n");
+        if (pairs == 2) sigma_printf("[GEOM]: Linear (180 deg).\n");
+        else if (pairs == 3) sigma_printf("[GEOM]: Trigonal Planar (120 deg).\n");
+        else if (pairs == 4) sigma_printf("[GEOM]: Tetrahedral (109.5 deg).\n");
+        else sigma_printf("[GEOM]: Complex Hybridization Shard Synced.\n");
     }
 };
 
 // --- Physics: Doppler Shard (Class 11 - Absorb Frequency Simulators) ---
 class DopplerShard : public ICosmicShard {
 public:
-    void Execute(const std::map<std::string, double>& inputs) override {
+    void Execute(const SigmaMap<SigmaString, double>& inputs) override {
         double f = inputs.at("f"), v = 340.0, vs = inputs.at("vs");
         double f_prime = f * (v / (v - vs));
-        std::cout << "[ACOUSTIC/ZENITH]: Doppler Effect Shard (f' = f * v / (v-vs))." << std::endl;
-        std::cout << "[ACOUSTIC/ZENITH]: Perceived Frequency: " << f_prime << " Hz." << std::endl;
+        sigma_printf("[ACOUSTIC/ZENITH]: Doppler Effect Shard (f' = f * v / (v-vs)).\n");
+        sigma_printf("[ACOUSTIC/ZENITH]: Perceived Frequency: %f Hz.\n", f_prime);
     }
 };
 
 class ZenithCosmicMolecularEngine {
 private:
-    std::map<std::string, std::unique_ptr<ICosmicShard>> m_cosmic;
+    SigmaMap<SigmaString, SigmaUniquePtr<ICosmicShard>> m_cosmic;
 public:
     void Synthesize() {
-        m_cosmic["KEPLER"] = std::make_unique<KeplerShard>();
-        m_cosmic["VSEPR"] = std::make_unique<VseprShard>();
-        m_cosmic["DOPPLER"] = std::make_unique<DopplerShard>();
+        m_cosmic.insert("KEPLER", sigma_make_unique<KeplerShard>());
+        m_cosmic.insert("VSEPR", sigma_make_unique<VseprShard>());
+        m_cosmic.insert("DOPPLER", sigma_make_unique<DopplerShard>());
     }
 
-    void ExecuteCosmicShard(const std::string& key, const std::map<std::string, double>& inputs) {
+    void ExecuteCosmicShard(const SigmaString& key, const SigmaMap<SigmaString, double>& inputs) {
         if (m_cosmic.count(key)) {
-            std::cout << "\n[ZENITH-COSMIC]: Executing Shard: " << key << std::endl;
+            sigma_printf("\n[ZENITH-COSMIC]: Executing Shard: %s\n", key.c_str());
             m_cosmic[key]->Execute(inputs);
         } else {
-            std::cout << "[ERROR]: Cosmic/Molecular Shard '" << key << "' not synthesized. Galaxy expansion in progress..." << std::endl;
+            sigma_printf("[ERROR]: Cosmic/Molecular Shard '%s' not synthesized. Galaxy expansion in progress...\n", key.c_str());
         }
     }
 };
 
-int main() {
+extern "C" void _start(void) {
     ZenithCosmicMolecularEngine zenith;
     zenith.Synthesize();
 
-    std::map<std::string, double> k_in = {{"r", 5.2}}; // Jupiter
+    SigmaMap<SigmaString, double> k_in;
+    k_in.insert("r", 5.2); // Jupiter
     zenith.ExecuteCosmicShard("KEPLER", k_in);
 
-    std::map<std::string, double> v_in = {{"pairs", 4.0}}; // Methane
+    SigmaMap<SigmaString, double> v_in;
+    v_in.insert("pairs", 4.0); // Methane
     zenith.ExecuteCosmicShard("VSEPR", v_in);
 
-    std::cout << "\n[SUCCESS]: Competitive Cosmic Mastery Online. Stellarium/Avogadro Absorbed 100%." << std::endl;
-    return 0;
+    sigma_printf("\n[SUCCESS]: Competitive Cosmic Mastery Online. Stellarium/Avogadro Absorbed 100%%.\n");
+    sigma_exit(0);
 }

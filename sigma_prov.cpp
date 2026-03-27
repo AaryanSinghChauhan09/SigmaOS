@@ -1,49 +1,49 @@
+#include "SigmaOOP.hpp"
+
 /**
- * SigmaOS Enterprise Provisioning Engine v1.0 (Native C++ Zenith)
+ * SigmaOS Enterprise Provisioning Engine v2.0 (Zero-STD Native)
  * Inspiration: Ansible, Puppet, Terraform.
  * USP: Silicon-Direct Declarative State Provisioning for Shards.
- * Principle: Desired-State, Automation, Enterprisety.
+ * Principle: Desired-State, Automation, Zero-STL Sovereignty.
  */
-
-#include <iostream>
-#include <string>
-#include <vector>
-#include <map>
 
 namespace SigmaOS {
 
     enum ShardState { ABSENT, PRESENT, ZENITH };
 
     struct ShardManifest {
-        std::string name;
+        SigmaString name;
         ShardState desired_state;
     };
 
     class ProvisioningEngine {
     private:
-        std::vector<ShardManifest> m_universe;
+        SigmaArray<ShardManifest> m_universe;
 
     public:
-        void DeclareShard(std::string name, ShardState state) {
-            m_universe.push_back({name, state});
-            std::cout << "[PROV]: Declared Desired State: " << name << " -> " << (state == ZENITH ? "ZENITH" : "PRESENT") << std::endl;
+        void DeclareShard(SigmaString name, ShardState state) {
+            ShardManifest manifest;
+            manifest.name = name;
+            manifest.desired_state = state;
+            m_universe.push(static_cast<ShardManifest&&>(manifest));
+            sigma_printf("[PROV]: Declared Desired State: %s -> %s\n", name.c_str(), (state == ZENITH ? "ZENITH" : "PRESENT"));
         }
 
         void ProvisionAll() {
-            std::cout << "[PROV]: Orchestrating Global Shard Convergence..." << std::endl;
+            sigma_printf("[PROV]: Orchestrating Global Shard Convergence...\n");
             for (auto& manifest : m_universe) {
-                std::cout << "[PROV]: Converging Shard -> " << manifest.name << " to DESIRED-STATE." << std::endl;
+                sigma_printf("[PROV]: Converging Shard -> %s to DESIRED-STATE.\n", manifest.name.c_str());
                 // In real impl, check actual state and apply diff
-                std::cout << "[PROV]: Shard [" << manifest.name << "] is now CONVERGED." << std::endl;
+                sigma_printf("[PROV]: Shard [%s] is now CONVERGED.\n", manifest.name.c_str());
             }
-            std::cout << "[PROV]: Provisioning Zenith ACHIEVED." << std::endl;
+            sigma_printf("[PROV]: Provisioning Zenith ACHIEVED.\n");
         }
     };
 
 } // namespace SigmaOS
 
-int main() {
-    std::cout << "[PROV]: Initiating Enterprise Infrastructure-as-a-Shard (IaaS) Sequence..." << std::endl;
+extern "C" void _start(void) {
+    sigma_printf("[PROV]: Initiating Enterprise Infrastructure-as-a-Shard (IaaS) Sequence...\n");
     SigmaOS::ProvisioningEngine engine;
     
     engine.DeclareShard("C_KERNEL", SigmaOS::ZENITH);
@@ -51,5 +51,5 @@ int main() {
     engine.DeclareShard("CPP_AUTOMATION", SigmaOS::ZENITH);
     
     engine.ProvisionAll();
-    return 0;
+    sigma_exit(0);
 }

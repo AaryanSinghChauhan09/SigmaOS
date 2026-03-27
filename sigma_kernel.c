@@ -22,7 +22,7 @@ void sigma_dispatch_shard(ShardControlBlock* scb) {
     sigma_printf("[KERNEL]: Dispatching Shard: %s (PID: %u, PRIO: %u)\n", scb->name, scb->pid, scb->priority);
 }
 
-extern "C" void _start(void) {
+void _start(void) {
     sigma_init_kernel();
     
     ShardControlBlock scb_justice;
