@@ -6,7 +6,7 @@ build-backend = "setuptools.build_meta"
 name = "sigmaos-core"
 version = "4.2.0"
 authors = [
-  { name="Aaryan Singh Chauhan", email="contact@aaryan.com" },
+  { name="SigmaSovereign", email="contact@sigmaos.sovereign" },
 ]
 description = "SigmaOS Kernel and Core userland ecosystem."
 readme = "README.md"
