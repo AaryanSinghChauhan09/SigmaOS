@@ -293,10 +293,28 @@ input:focus { outline: none; }
 }
 
 .system-status-level {
-    color: #00ff88;
+    color: var(--accent-glow);
     margin-right: 15px;
     font-weight: 900;
 }
+
+.color-grid { display: flex; gap: 20px; margin-top: 20px; }
+.color-swatch { width: 40px; height: 40px; border-radius: 50%; cursor: pointer; border: 2px solid rgba(255,255,255,0.2); }
+.color-swatch:hover { transform: scale(1.1); }
+.color-swatch.cyan { background: #00f2ff; }
+.color-swatch.purple { background: #7000ff; }
+.color-swatch.green { background: #00ff88; }
+.color-swatch.red { background: #ff003c; }
+
+.script-item {
+    padding: 12px;
+    margin: 8px 0;
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid var(--border);
+    cursor: pointer;
+    transition: 0.2s;
+}
+.script-item:hover { background: var(--border); color: var(--accent-primary); }
 
 .text-neon-green { color: #00ff88; }
 .text-neon-blue { color: #00f2ff; }

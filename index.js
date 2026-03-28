@@ -163,6 +163,22 @@ function globalSearch() {
     });
 }
 
+// Personalization & Automation
+function setAccent(color) {
+    document.documentElement.style.setProperty('--accent-primary', color);
+    document.documentElement.style.setProperty('--border', color + '33');
+    document.querySelector('.start-btn-zenith').style.background = color;
+    document.querySelector('.start-btn-zenith').style.boxShadow = `0 0 30px ${color}`;
+}
+
+function execScript(name) {
+    openWindow('omni-shell');
+    addLine(`Σ://automation> Running script: ${name}...`, 'text-neon-gold');
+    setTimeout(() => {
+        addLine(`[OK]: ${name} completed successfully. Shard integrity pinned.`, 'text-neon-green');
+    }, 1500);
+}
+
 // Absorption Logic
 function startAbsorption() {
     const out = document.getElementById('absorb-output');

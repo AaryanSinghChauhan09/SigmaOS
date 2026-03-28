@@ -81,6 +81,12 @@
                 <div class="icon" onclick="openWindow('crusher-shard')">
                     <div class="icon-glyph crusher">†</div><span>Competitor-Crush</span>
                 </div>
+                <div class="icon" onclick="openWindow('personalize-shard')">
+                    <div class="icon-glyph personal">🖌️</div><span>Personalize</span>
+                </div>
+                <div class="icon" onclick="openWindow('automation-shard')">
+                    <div class="icon-glyph auto">⚙️</div><span>Automation</span>
+                </div>
             </div>
 
             <!-- Draggable Windows -->
@@ -129,6 +135,34 @@
                         <input type="text" id="nexus-search" placeholder="Search master shards..." oninput="filterShards()">
                     </div>
                     <div id="catalog-content"></div>
+                </div>
+            </div>
+
+            <div id="personalize-shard" class="window glass-morphism win-ml hidden">
+                <div class="window-header" onmousedown="dragWindow(event, 'personalize-shard')">
+                    <div class="title">Σ SOVEREIGN PERSONALIZATION</div>
+                    <div class="close" onclick="closeWindow('personalize-shard')">×</div>
+                </div>
+                <div class="window-content">
+                    <p class="subtitle">SELECT SYSTEM ACCENT</p>
+                    <div class="color-grid">
+                        <div class="color-swatch cyan" onclick="setAccent('#00f2ff')"></div>
+                        <div class="color-swatch purple" onclick="setAccent('#7000ff')"></div>
+                        <div class="color-swatch green" onclick="setAccent('#00ff88')"></div>
+                        <div class="color-swatch red" onclick="setAccent('#ff003c')"></div>
+                    </div>
+                </div>
+            </div>
+
+            <div id="automation-shard" class="window glass-morphism win-ml hidden">
+                <div class="window-header" onmousedown="dragWindow(event, 'automation-shard')">
+                    <div class="title">Σ SOVEREIGN AUTOMATION SCRIPTS</div>
+                    <div class="close" onclick="closeWindow('automation-shard')">×</div>
+                </div>
+                <div class="window-content terminal-font">
+                    <div class="script-item" onclick="execScript('CLEAN_DROSS')">>> CLEAN_DROSS [O(1)]</div>
+                    <div class="script-item" onclick="execScript('SHARD_SYNC')">>> SHARD_SYNC [ZENITH]</div>
+                    <div class="script-item" onclick="execScript('THREAT_SCAN')">>> THREAT_SCAN [PQC]</div>
                 </div>
             </div>
 
