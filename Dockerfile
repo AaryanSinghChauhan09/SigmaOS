@@ -1,32 +1,26 @@
-# Σ SIGMAOS: SOVEREIGN ZENITH CONTAINER (v10.0)
-# ==========================================
-# Mission: Cross-Platform Shard Deployment.
-# Base: Minimal Sovereign Scratch (Alpine-based)
-# ==========================================
+# =============================================================================
+# Σ SIGMAOS: SOVEREIGN CONTAINER (v21.0 - ZERO-DEPENDENCY FINALITY)
+# =============================================================================
+# Mission: Absolute Sovereignty (No base OS, no libraries).
+# Strategy: MULTI-STAGE BUILD -> STATIC BINARY -> FROM SCRATCH
+# =============================================================================
 
-FROM alpine:latest AS builder
-
-RUN apk add --no-cache g++ make nasm rust cargo
-
-WORKDIR /sigmaos
+# -- STAGE 1: Forge Engine (Build) --
+FROM gcc:latest AS forge
+WORKDIR /forge
 COPY . .
+# Perform static build with direct syscall integration (Sigma v21.0)
+RUN g++ -static -nostdlib -O3 SovereignLauncherZenith.cpp SovereignLibC.asm -o sigma_os_master
 
-# Build Sovereign Kernel Shards
-RUN make kernel_zenith || true
-RUN make userland_zenith || true
+# -- STAGE 2: Sovereign Finality (Runtime) --
+FROM scratch
+LABEL maintainer="Sovereign-Zenith-Developer"
+LABEL architecture="x86_64"
+LABEL dependency="ZERO"
 
-# Production Image
-FROM alpine:latest
-WORKDIR /root/sigmaos
+# Pure machine code shard - No OS required
+COPY --from=forge /forge/sigma_os_master /sigma_os_master
+COPY --from=forge /forge/index.html /index.html
+COPY --from=forge /forge/os_guide.md /os_guide.md
 
-# Copy only native binaries (No Python, No interpreted bloat)
-COPY --from=builder /sigmaos/SigmaOS_Kernel.exe .
-COPY --from=builder /sigmaos/SovereignShell.exe .
-COPY --from=builder /sigmaos/index.html .
-COPY --from=builder /sigmaos/userland ./userland
-
-EXPOSE 80
-EXPOSE 2222
-
-# Launch the Metal-Nexus Web Bridge
-CMD ["./SigmaOS_Kernel.exe", "--web-bridge", "80"]
+ENTRYPOINT ["/sigma_os_master"]
