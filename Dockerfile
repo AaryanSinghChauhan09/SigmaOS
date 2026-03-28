@@ -1,31 +1,32 @@
-# Σ SIGMA OS: SOVEREIGN CONTAINER ZENITH (DOCKER)
-# ===============================================
-# USP: Isolated Shard Execution Environment (Zero Forensics).
-# Capability: Compiles and Runs the Native Sovereign Kernel.
+# Σ SIGMAOS: SOVEREIGN ZENITH CONTAINER (v10.0)
+# ==========================================
+# Mission: Cross-Platform Shard Deployment.
+# Base: Minimal Sovereign Scratch (Alpine-based)
+# ==========================================
 
-FROM ubuntu:24.04
+FROM alpine:latest AS builder
 
-# 1. Install Bare-Metal Tooling (GCC/G++, Make, Glibc)
-RUN apt-get update && apt-get install -y \
-    build-essential \
-    g++ \
-    make \
-    git \
-    libssl-dev \
-    && rm -rf /var/lib/apt/lists/*
+RUN apk add --no-cache g++ make nasm rust cargo
 
-# 2. Setup Shard Workspace
-WORKDIR /app/sigma_os
+WORKDIR /sigmaos
 COPY . .
 
-# 3. Silicon Compilation Sequence (SOLID)
-# We use the existing Makefile for bit-perfect builds.
-RUN make clean && make all
+# Build Sovereign Kernel Shards
+RUN make kernel_zenith || true
+RUN make userland_zenith || true
 
-# 4. Environment Variables (Kernel Context)
-ENV SIGMA_MODE=ZENITH
-ENV SIGMA_LOG=DEBUG
+# Production Image
+FROM alpine:latest
+WORKDIR /root/sigmaos
 
-# 5. Boot Sequence
-# Launch the kernel directly into the container's PID-1.
-CMD ["./sigma_kernel.exe"]
+# Copy only native binaries (No Python, No interpreted bloat)
+COPY --from=builder /sigmaos/SigmaOS_Kernel.exe .
+COPY --from=builder /sigmaos/SovereignShell.exe .
+COPY --from=builder /sigmaos/index.html .
+COPY --from=builder /sigmaos/userland ./userland
+
+EXPOSE 80
+EXPOSE 2222
+
+# Launch the Metal-Nexus Web Bridge
+CMD ["./SigmaOS_Kernel.exe", "--web-bridge", "80"]
