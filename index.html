@@ -132,6 +132,20 @@
                 </div>
             </div>
 
+            <div id="tutorial-shard" class="window glass-morphism win-ml hidden">
+                <div class="window-header" onmousedown="dragWindow(event, 'tutorial-shard')">
+                    <div class="title">Σ ZENITH TUTORIAL [EASY START]</div>
+                    <div class="close" onclick="closeWindow('tutorial-shard')">×</div>
+                </div>
+                <div class="window-content terminal-font">
+                    <p class="text-neon-green">WELCOME TO THE ULTIMATE OS.</p>
+                    <p>1. Use the <span class="text-neon-blue">Search Bar</span> below to find any of the 100+ shards.</p>
+                    <p>2. Open <span class="text-neon-gold">Shard-Audit</span> (≡) to see all repository files.</p>
+                    <p>3. Use <span class="text-neon-purple">Omni-Shell</span> for silicon-direct command mastery.</p>
+                    <p>4. Type <span class="text-neon-red">HELP</span> in the shell for a command list.</p>
+                </div>
+            </div>
+
             <!-- Merged-UI: Forensic Shard Viewer -->
             <div id="pqc-shard" class="window glass-morphism win-ml hidden">
                 <div class="window-header" onmousedown="dragWindow(event, 'pqc-shard')">
@@ -149,12 +163,17 @@
         <!-- Sovereign Taskbar -->
         <footer class="taskbar-supreme">
             <div class="start-btn-zenith" onclick="openWindow('absorb-shard')">Σ</div>
+            <div class="search-container">
+                <input type="text" id="global-search" placeholder="Search Zenith Shards..." oninput="globalSearch()">
+            </div>
             <div class="task-tabs" id="running-apps">
                 <div id="task-omni-shell" class="task-item hidden" onclick="focusWindow('omni-shell')">Shell</div>
                 <div id="task-catalog-shard" class="task-item hidden" onclick="focusWindow('catalog-shard')">Audit</div>
                 <div id="task-pqc-shard" class="task-item hidden" onclick="focusWindow('pqc-shard')">PQC</div>
+                <div id="task-tutorial-shard" class="task-item hidden" onclick="focusWindow('tutorial-shard')">Tutorial</div>
             </div>
             <div class="system-region">
+                <div class="help-btn" onclick="openWindow('tutorial-shard')">?</div>
                 <span class="supremacy-level">SUPREMACY ACTIVE</span>
                 <span id="clock" class="digital-time">14:40</span>
             </div>

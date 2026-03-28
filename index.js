@@ -154,6 +154,15 @@ function filterShards() {
     });
 }
 
+function globalSearch() {
+    const q = document.getElementById('global-search').value.toLowerCase();
+    const icons = document.querySelectorAll('.icon');
+    icons.forEach(icon => {
+        const text = icon.querySelector('span').textContent.toLowerCase();
+        icon.style.display = text.includes(q) ? 'flex' : 'none';
+    });
+}
+
 // Absorption Logic
 function startAbsorption() {
     const out = document.getElementById('absorb-output');

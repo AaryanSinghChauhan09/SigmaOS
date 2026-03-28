@@ -262,3 +262,44 @@ input:focus { outline: none; }
     50% { box-shadow: 0 0 40px var(--accent-secondary); opacity: 1; }
     100% { box-shadow: 0 0 10px var(--accent-secondary); opacity: 0.5; }
 }
+
+.search-container {
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid var(--border);
+    border-radius: 20px;
+    padding: 0 15px;
+    display: flex;
+    align-items: center;
+}
+
+.search-container input {
+    border: none !important;
+    background: transparent !important;
+    color: white !important;
+    width: 200px !important;
+}
+
+.help-btn {
+    width: 32px;
+    height: 32px;
+    background: var(--accent-secondary);
+    border-radius: 50%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-weight: 900;
+    cursor: pointer;
+    font-size: 1rem;
+}
+
+.system-status-level {
+    color: #00ff88;
+    margin-right: 15px;
+    font-weight: 900;
+}
+
+.text-neon-green { color: #00ff88; }
+.text-neon-blue { color: #00f2ff; }
+.text-neon-gold { color: #ffcc00; }
+.text-neon-purple { color: #7000ff; }
+.text-neon-red { color: #ff0000; }
