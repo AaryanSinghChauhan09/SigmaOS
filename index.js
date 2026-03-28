@@ -1,6 +1,3 @@
-const output = document.getElementById('output');
-const input = document.getElementById('command-input');
-
 const COMMAND_RESPONSES = {
     'HELP': [
         "AVAILABLE ZENITH SHARDS:",
@@ -9,8 +6,8 @@ const COMMAND_RESPONSES = {
         "- PETERSON: Coordinate Peterson's critical section.",
         "- SCHEDULER: Execute O(1) MLFQ balancing (MIT).",
         "- CLOUD_FORGE: Forge elastic VPC shard (AWS).",
-        "- SYSTEM_STATUS: Query silicon-direct registry.",
-        "- ABOUT: System philosophy and academic parity."
+        "- TOGGLE_GUI: Re-initialize Sovereign Workspace.",
+        "- SYSTEM_STATUS: Query silicon-direct registry."
     ],
     'FORK_TEST': [
         "[ZENITH-PIPE]: Forging native pipe shard...",
@@ -26,16 +23,6 @@ const COMMAND_RESPONSES = {
         "[ZENITH-PETERSON]: CRITICAL SECTION ENTRY (Thread 0).",
         "[ZENITH-SYNC]: Readers-Writers priority logic initiated (Zero-Starvation)."
     ],
-    'SCHEDULER': [
-        "[ZENITH-SCHED]: Balancing MLFQ Queues (MIT/IITB parity).",
-        "[OK]: All shards re-prioritized."
-    ],
-    'ABOUT': [
-        "Σ SIGMAOS ZENITH v93.0",
-        "A bit-perfect, zero-dependency environment for absolute system sovereignty.",
-        "Industrial Parity: Silberschatz, Tanenbaum, AWS, Cisco.",
-        "Academic Parity: MIT, Stanford, IIT Bombay, xv6, OSTEP."
-    ],
     'SYSTEM_STATUS': [
         "KERNEL: RING-0 (ZENITH)",
         "SYSCALLS: 256 DIRECT (SHARDED)",
@@ -43,6 +30,44 @@ const COMMAND_RESPONSES = {
         "SOVEREIGNTY: 100%"
     ]
 };
+
+// Window Management
+function openWindow(id) {
+    const win = document.getElementById(id);
+    const task = document.getElementById(`task-${id}`);
+    if (win) win.style.display = 'flex';
+    if (task) task.style.display = 'block';
+}
+
+function closeWindow(id) {
+    const win = document.getElementById(id);
+    const task = document.getElementById(`task-${id}`);
+    if (win) win.style.display = 'none';
+    if (task) task.style.display = 'none';
+}
+
+function dragWindow(e, id) {
+    const win = document.getElementById(id);
+    let offsetX = e.clientX - win.offsetLeft;
+    let offsetY = e.clientY - win.offsetTop;
+
+    function mouseMove(e) {
+        win.style.left = (e.clientX - offsetX) + 'px';
+        win.style.top = (e.clientY - offsetY) + 'px';
+    }
+
+    function mouseUp() {
+        document.removeEventListener('mousemove', mouseMove);
+        document.removeEventListener('mouseup', mouseUp);
+    }
+
+    document.addEventListener('mousemove', mouseMove);
+    document.addEventListener('mouseup', mouseUp);
+}
+
+// Terminal Logic
+const output = document.getElementById('output');
+const input = document.getElementById('command-input');
 
 function addLine(text, className = '') {
     const p = document.createElement('p');
@@ -68,5 +93,13 @@ input.addEventListener('keydown', (e) => {
     }
 });
 
-// Focus terminal on any click
-document.body.addEventListener('click', () => input.focus());
+// Clock Logic
+function updateClock() {
+    const now = new Date();
+    document.getElementById('clock').textContent = now.getHours().toString().padStart(2, '0') + ":" + now.getMinutes().toString().padStart(2, '0');
+}
+setInterval(updateClock, 1000);
+updateClock();
+
+// Default: Open the Shell
+openWindow('omni-shell');

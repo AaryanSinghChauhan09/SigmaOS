@@ -3,82 +3,68 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Σ SIGMAOS ZENITH | Sovereign Cloud Mirror</title>
+    <title>Σ SIGMAOS ZENITH | Sovereign Desktop Shard</title>
     <link rel="stylesheet" href="index.css">
     <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;400;700&family=Outfit:wght@300;600;900&display=swap" rel="stylesheet">
 </head>
-<body>
-    <div class="glass-container">
-        <header>
-            <div class="logo-area">
-                <span class="sigma-symbol">Σ</span>
-                <div class="title-stack">
-                    <h1>SIGMAOS <span class="accent">ZENITH</span></h1>
-                    <p class="subtitle">v93.0 SOVEREIGN SILICON SHARD</p>
-                </div>
-            </div>
-            <div class="status-badges">
-                <div class="badge pulse">CORE: RING-0</div>
-                <div class="badge green">SHARD: SYNCED</div>
-                <div class="badge blue">PARITY: SILBERSCHATZ/MIT</div>
-            </div>
-        </header>
+<body class="desktop-bg">
+    <div id="desktop" class="desktop-workspace">
+        <!-- Desktop Icons -->
+        <div class="icon" onclick="openWindow('omni-shell')">
+            <div class="icon-glyph terminal">Σ</div>
+            <span>Omni-Shell</span>
+        </div>
+        <div class="icon" onclick="openWindow('mem-shard')">
+            <div class="icon-glyph memory">M</div>
+            <span>Memory Shard</span>
+        </div>
+        <div class="icon" onclick="openWindow('cloud-forge')">
+            <div class="icon-glyph cloud">C</div>
+            <span>Cloud Forge</span>
+        </div>
+        <div class="icon" onclick="openWindow('net-zenith')">
+            <div class="icon-glyph network">N</div>
+            <span>Net-Zenith</span>
+        </div>
 
-        <main>
-            <section class="terminal-box">
-                <div class="terminal-header">
-                    <div class="dots">
-                        <span></span><span></span><span></span>
-                    </div>
-                    <div class="tab">omni_shell --zenith</div>
+        <!-- Window Container (Draggable Windows) -->
+        <div id="omni-shell" class="window glass-morphism" style="display: none;">
+            <div class="window-header" onmousedown="dragWindow(event, 'omni-shell')">
+                <div class="title">Σ OMNI-SHELL ZENITH</div>
+                <div class="controls">
+                    <span class="close" onclick="closeWindow('omni-shell')">×</span>
                 </div>
-                <div id="output" class="terminal-content">
-                    <p class="line">[SYSTEM]: Initializing Aether Orchestrator...</p>
-                    <p class="line">[SYSTEM]: Absorbing Shards: MIT, Stanford, IITB, AWS, Cisco...</p>
-                    <p class="line">[SYSTEM]: Zenith-LibC Handshake [SUCCESS].</p>
-                    <p class="line welcome">WELCOME TO THE SOVEREIGN ZENITH DASHBOARD.</p>
-                    <p class="line">Type 'HELP' to explore the academic/industrial mastery shards.</p>
-                </div>
-                <div class="input-area">
-                    <span class="prompt">Σ://zenith></span>
-                    <input type="text" id="command-input" placeholder="Execute Zenith Shard..." title="Zenith Shell Input" autofocus spellcheck="false">
-                </div>
-            </section>
-
-            <aside class="sidebar">
-                <div class="card">
-                    <h3>ELITE KNOWLEDGE PARITY</h3>
-                    <ul>
-                        <li><span class="dot"></span> MIT / Stanford / IITB</li>
-                        <li><span class="dot"></span> Silberschatz / Tanenbaum</li>
-                        <li><span class="dot"></span> AWS / Cisco Architecture</li>
-                        <li><span class="dot"></span> OSTEP / xv6 Core Logic</li>
-                    </ul>
-                </div>
-                <div class="card metrics">
-                    <h3>SYSTEM METRICS</h3>
-                    <div class="metric-item">
-                        <span>LATENCY</span>
-                        <div class="bar"><div id="metric-latency" class="fill"></div></div>
-                    </div>
-                    <div class="metric-item">
-                        <span>SOVEREIGNTY</span>
-                        <div class="bar"><div id="metric-sovereignty" class="fill"></div></div>
-                    </div>
-                    <div class="metric-item">
-                        <span>DEPENDENCIES</span>
-                        <div class="bar"><div id="metric-dependencies" class="fill"></div></div>
-                    </div>
-                </div>
-            </aside>
-        </main>
-        
-        <footer>
-            <div class="footer-links">
-                <span>© 2026 SIGMAOS FOUNDATION</span>
-                <span>CODE OF SECLUSION ACTIVE</span>
             </div>
-        </footer>
+            <div id="output" class="window-content terminal-font">
+                <p class="line welcome">[[ SIGMAOS ZENITH v93.0 -- SOVEREIGN CLI MODE ]]</p>
+                <p class="line">Ready for silicon-direct instructions.</p>
+            </div>
+            <div class="window-footer">
+                <span class="prompt">Σ://zenith></span>
+                <input type="text" id="command-input" placeholder="Execute shard..." autofocus spellcheck="false" title="Zenith Shell Input">
+            </div>
+        </div>
+
+        <div id="mem-shard" class="window glass-morphism" style="display: none; width: 400px; height: 300px;">
+            <div class="window-header" onmousedown="dragWindow(event, 'mem-shard')">
+                <div class="title">MEMORY SHARD REGISTRY</div>
+                <div class="controls"><span class="close" onclick="closeWindow('mem-shard')">×</span></div>
+            </div>
+            <div class="window-content">
+                <p>Status: HIERARCHICAL PAGING ACTIVE</p>
+                <p>Slab: 128MB SHARD [ALLOCATED]</p>
+                <div class="bar-container"><div class="bar-fill" style="width: 14%;"></div></div>
+            </div>
+        </div>
+
+        <!-- Taskbar -->
+        <div class="taskbar">
+            <div class="start-btn">Σ</div>
+            <div class="running-apps">
+                <div id="task-omni-shell" class="task-item active" style="display: none;">Omni-Shell</div>
+            </div>
+            <div class="system-time" id="clock">14:15</div>
+        </div>
     </div>
     <script src="index.js"></script>
 </body>
