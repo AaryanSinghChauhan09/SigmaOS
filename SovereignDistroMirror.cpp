@@ -21,27 +21,27 @@
 class SovereignDistroMirror {
 public:
     SovereignDistroMirror() {
-        std::cout << "[MIRROR_CORE]: Bootstrapping Shard Mirror & Sync Engine." << std::endl;
-        std::cout << "[MIRROR_CORE]: Absorbed APT, Pacman, LAN Cache USPs." << std::endl;
+        sigma_printf("[MIRROR_CORE]: Bootstrapping Shard Mirror & Sync Engine.\n");
+        sigma_printf("[MIRROR_CORE]: Absorbed APT, Pacman, LAN Cache USPs.\n");
     }
 
     // USP: Multi-homed Mirroring (Global Sync)
     void SyncWithGlobalMirrors() {
-        std::cout << "[MIRROR_GLOBAL]: CONNECTING TO SIGMA_PRIMARY_SHARD..." << std::endl;
-        std::cout << "[MIRROR_GLOBAL]: Mirror list: IN, US, EU, AU (Latency-based selection active)." << std::endl;
-        std::cout << "[MIRROR_GLOBAL]: Best mirror found: IN_BANGALORE_SHARD (8ms)." << std::endl;
+        sigma_printf("[MIRROR_GLOBAL]: CONNECTING TO SIGMA_PRIMARY_SHARD...\n");
+        sigma_printf("[MIRROR_GLOBAL]: Mirror list: IN, US, EU, AU (Latency-based selection active).\n");
+        sigma_printf("[MIRROR_GLOBAL]: Best mirror found: IN_BANGALORE_SHARD (8ms).\n");
     }
 
     // USP: LAN Cache (Local P2P Mirroring)
     void ScanLocalMeshForShards() {
-        std::cout << "[MIRROR_P2P]: SCANNIG LOCAL MESH FOR PEER SHARDS..." << std::endl;
-        std::cout << "[MIRROR_P2P]: Peer found! Transferring 'NCERT_PHYSICS_V4' shard via 10GbE LAN Cache." << std::endl;
+        sigma_printf("[MIRROR_P2P]: SCANNIG LOCAL MESH FOR PEER SHARDS...\n");
+        sigma_printf("[MIRROR_P2P]: Peer found! Transferring 'NCERT_PHYSICS_V4' shard via 10GbE LAN Cache.\n");
     }
 
     // USP: Checksum Validation (usp: Pacman)
-    void ValidateShardIntegrity(const std::string& shard_id) {
-        std::cout << "[MIRROR_VERIFY]: VALIDATING SHA-256 SUM FOR '" << shard_id << "'..." << std::endl;
-        std::cout << "[MIRROR_VERIFY]: 100% Match. Shard verified and secure." << std::endl;
+    void ValidateShardIntegrity(const const char*& shard_id) {
+        sigma_printf("[MIRROR_VERIFY]: VALIDATING SHA-256 SUM FOR '" << shard_id << "'...\n");
+        sigma_printf("[MIRROR_VERIFY]: 100% Match. Shard verified and secure.\n");
     }
 };
 
@@ -51,7 +51,7 @@ int main() {
     mirror.ScanLocalMeshForShards();
     mirror.ValidateShardIntegrity("ZENITH_AI_ENGINE_V128");
     
-    std::cout << "\n[SUCCESS]: Competitive Distro Mirror Online. Absolute Package Sovereignty." << std::endl;
+    sigma_printf("\n[SUCCESS]: Competitive Distro Mirror Online. Absolute Package Sovereignty.\n");
     return 0;
 }
 

@@ -34,8 +34,8 @@ public:
         double initial_atoms = 1000.0;
         double time = 20.0;
         double remaining = initial_atoms * std::pow(0.5, time / half_life);
-        std::cout << "[PHYSICS/NUCLEI]: Concept: Radioactivity (Law of Decay)." << std::endl;
-        std::cout << "[PHYSICS/NUCLEI]: Remaining Atoms after 2 Half-lives: " << remaining << " (Apex Parity)." << std::endl;
+        sigma_printf("[PHYSICS/NUCLEI]: Concept: Radioactivity (Law of Decay).\n");
+        sigma_printf("[PHYSICS/NUCLEI]: Remaining Atoms after 2 Half-lives: " << remaining << " (Apex Parity).\n");
     }
 };
 
@@ -43,8 +43,8 @@ public:
 class PolymerShard : public IScienceShard {
 public:
     void ProjectSimulation() override {
-        std::cout << "[CHEMISTRY/POLYMER]: Concept: Addition Polymerization (Ethene)." << std::endl;
-        std::cout << "[CHEMISTRY/POLYMER]: n(CH2=CH2) -> [-CH2-CH2-]n [Verified]." << std::endl;
+        sigma_printf("[CHEMISTRY/POLYMER]: Concept: Addition Polymerization (Ethene).\n");
+        sigma_printf("[CHEMISTRY/POLYMER]: n(CH2=CH2) -> [-CH2-CH2-]n [Verified].\n");
     }
 };
 
@@ -52,8 +52,8 @@ public:
 class CirculationShard : public IScienceShard {
 public:
     void ProjectSimulation() override {
-        std::cout << "[BIOLOGY/HEART]: Concept: Double Circulation Shard." << std::endl;
-        std::cout << "[BIOLOGY/HEART]: Pulmonary & Systemic Circuits synchronized." << std::endl;
+        sigma_printf("[BIOLOGY/HEART]: Concept: Double Circulation Shard.\n");
+        sigma_printf("[BIOLOGY/HEART]: Pulmonary & Systemic Circuits synchronized.\n");
     }
 };
 
@@ -61,14 +61,14 @@ public:
 class IntegrationShard : public IScienceShard {
 public:
     void ProjectSimulation() override {
-        std::cout << "[MATH/CALCULUS]: Concept: Definite Integrals (Area under Curve)." << std::endl;
-        std::cout << "[MATH/CALCULUS]: Integral of x^2 from 0 to 3 = 9.0 (Verified)." << std::endl;
+        sigma_printf("[MATH/CALCULUS]: Concept: Definite Integrals (Area under Curve).\n");
+        sigma_printf("[MATH/CALCULUS]: Integral of x^2 from 0 to 3 = 9.0 (Verified).\n");
     }
 };
 
 class SovereignScienceManager {
 private:
-    std::vector<std::unique_ptr<IScienceShard>> m_shards;
+    void*> m_shards;
 public:
     void Synthesize() {
         m_shards.push_back(std::make_unique<RadioactivityShard>());
@@ -78,9 +78,9 @@ public:
     }
 
     void ExecuteApexAudit() {
-        std::cout << "--- Σ SIGMA OS SOVEREIGN SCIENCE ZENITH ---" << std::endl;
+        sigma_printf("--- Σ SIGMA OS SOVEREIGN SCIENCE ZENITH ---\n");
         for (const auto& shard : m_shards) {
-            std::cout << "\n------------------------------------------------" << std::endl;
+            sigma_printf("\n------------------------------------------------\n");
             shard->ProjectSimulation();
         }
     }
@@ -91,7 +91,7 @@ int main() {
     sm.Synthesize();
     sm.ExecuteApexAudit();
 
-    std::cout << "\n[SUCCESS]: Competitive Science Zenith Cluster Active. Industry Sovereignty Secured." << std::endl;
+    sigma_printf("\n[SUCCESS]: Competitive Science Zenith Cluster Active. Industry Sovereignty Secured.\n");
     return 0;
 }
 

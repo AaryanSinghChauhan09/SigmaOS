@@ -30,8 +30,8 @@ public:
 class PhotoelectricShard : public IScholasticExp {
 public:
     void Execute() override {
-        std::cout << "[PHYSICS/EXP]: Experiment: Photoelectric Effect (Einstein's Law)." << std::endl;
-        std::cout << "[PHYSICS/EXP]: K_max = hf - Phi. Electron emission verified for f > f_0." << std::endl;
+        sigma_printf("[PHYSICS/EXP]: Experiment: Photoelectric Effect (Einstein's Law).\n");
+        sigma_printf("[PHYSICS/EXP]: K_max = hf - Phi. Electron emission verified for f > f_0.\n");
     }
 };
 
@@ -39,8 +39,8 @@ public:
 class LogicGateShard : public IScholasticExp {
 public:
     void Execute() override {
-        std::cout << "[PHYSICS/EXP]: Experiment: Verification of AND/OR/NOT Truth Tables." << std::endl;
-        std::cout << "[PHYSICS/EXP]: Input (1,0) -> AND (0), OR (1) Shard synchronized." << std::endl;
+        sigma_printf("[PHYSICS/EXP]: Experiment: Verification of AND/OR/NOT Truth Tables.\n");
+        sigma_printf("[PHYSICS/EXP]: Input (1,0) -> AND (0), OR (1) Shard synchronized.\n");
     }
 };
 
@@ -48,8 +48,8 @@ public:
 class DnaReplicationShard : public IScholasticExp {
 public:
     void Execute() override {
-        std::cout << "[BIOLOGY/EXP]: Experiment: Meselson-Stahl Semi-Conservative Replication." << std::endl;
-        std::cout << "[BIOLOGY/EXP]: 14N/15N Density gradients identified throughout Shard cycles." << std::endl;
+        sigma_printf("[BIOLOGY/EXP]: Experiment: Meselson-Stahl Semi-Conservative Replication.\n");
+        sigma_printf("[BIOLOGY/EXP]: 14N/15N Density gradients identified throughout Shard cycles.\n");
     }
 };
 
@@ -57,8 +57,8 @@ public:
 class ReflexShard : public IScholasticExp {
 public:
     void Execute() override {
-        std::cout << "[BIOLOGY/EXP]: Experiment: Reflex Arc (Stimulus to Response)." << std::endl;
-        std::cout << "[BIOLOGY/EXP]: Sensory -> Relay -> Motor Shard pulse: 0.05ms latency." << std::endl;
+        sigma_printf("[BIOLOGY/EXP]: Experiment: Reflex Arc (Stimulus to Response).\n");
+        sigma_printf("[BIOLOGY/EXP]: Sensory -> Relay -> Motor Shard pulse: 0.05ms latency.\n");
     }
 };
 
@@ -70,14 +70,14 @@ public:
         double D = b*b - 4*a*c;
         double x1 = (-b + std::sqrt(D)) / (2*a);
         double x2 = (-b - std::sqrt(D)) / (2*a);
-        std::cout << "[MATH/EXP]: Experiment: Finding Roots of a Quadratic Shard." << std::endl;
-        std::cout << "[MATH/EXP]: x^2 - 5x + 6 = 0 -> Roots: " << x1 << ", " << x2 << " [OK]." << std::endl;
+        sigma_printf("[MATH/EXP]: Experiment: Finding Roots of a Quadratic Shard.\n");
+        sigma_printf("[MATH/EXP]: x^2 - 5x + 6 = 0 -> Roots: " << x1 << ", " << x2 << " [OK].\n");
     }
 };
 
 class SovereignScholasticCluster {
 private:
-    std::vector<std::unique_ptr<IScholasticExp>> m_zenith;
+    void*> m_zenith;
 public:
     void Synthesize() {
         m_zenith.push_back(std::make_unique<PhotoelectricShard>());
@@ -88,9 +88,9 @@ public:
     }
 
     void ExecuteFinalAudit() {
-        std::cout << "--- Σ SIGMA OS SOVEREIGN SCHOLASTIC CLUSTER ---" << std::endl;
+        sigma_printf("--- Σ SIGMA OS SOVEREIGN SCHOLASTIC CLUSTER ---\n");
         for (const auto& exp : m_zenith) {
-            std::cout << "\n------------------------------------------------" << std::endl;
+            sigma_printf("\n------------------------------------------------\n");
             exp->Execute();
         }
     }
@@ -101,7 +101,7 @@ int main() {
     cluster.Synthesize();
     cluster.ExecuteFinalAudit();
 
-    std::cout << "\n[SUCCESS]: Competitive Scholastic Cluster Synthesized. 100% NCERT Mastery." << std::endl;
+    sigma_printf("\n[SUCCESS]: Competitive Scholastic Cluster Synthesized. 100% NCERT Mastery.\n");
     return 0;
 }
 

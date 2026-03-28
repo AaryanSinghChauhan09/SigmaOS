@@ -33,8 +33,8 @@ public:
     void Execute() override {
         double u = -20.0, f = 10.0;
         double v = (f * u) / (f + u);
-        std::cout << "[PHYSICS/OPTICS]: Lens Formula (u=-20, f=10)" << std::endl;
-        std::cout << "[PHYSICS/OPTICS]: Image Distance (v): " << v << " cm" << std::endl;
+        sigma_printf("[PHYSICS/OPTICS]: Lens Formula (u=-20, f=10)\n");
+        sigma_printf("[PHYSICS/OPTICS]: Image Distance (v): " << v << " cm\n");
     }
 };
 
@@ -44,8 +44,8 @@ public:
     void Execute() override {
         double h = 6.626e-34, v = 1e15, phi = 2.0 * 1.6e-19;
         double Kmax = (h * v) - phi;
-        std::cout << "[PHYSICS/PHOTO]: Photoelectric Effect (v=1e15, phi=2eV)" << std::endl;
-        std::cout << "[PHYSICS/PHOTO]: Kmax Shard: " << Kmax << " Joules" << std::endl;
+        sigma_printf("[PHYSICS/PHOTO]: Photoelectric Effect (v=1e15, phi=2eV)\n");
+        sigma_printf("[PHYSICS/PHOTO]: Kmax Shard: " << Kmax << " Joules\n");
     }
 };
 
@@ -55,8 +55,8 @@ public:
     void Execute() override {
         double H_plus = 1e-5;
         double pH = -std::log10(H_plus);
-        std::cout << "[CHEMISTRY/PH]: Concentration [H+] = 1e-5" << std::endl;
-        std::cout << "[CHEMISTRY/PH]: Result: pH = " << pH << " (Acidic)" << std::endl;
+        sigma_printf("[CHEMISTRY/PH]: Concentration [H+] = 1e-5\n");
+        sigma_printf("[CHEMISTRY/PH]: Result: pH = " << pH << " (Acidic)\n");
     }
 };
 
@@ -64,8 +64,8 @@ public:
 class BayesShard : public IMasterShard {
 public:
     void Execute() override {
-        std::cout << "[MATH/BAYES]: Theorem: P(A|B) = [P(B|A) * P(A)] / P(B)." << std::endl;
-        std::cout << "[MATH/BAYES]: Posterior Probability Shard Synced." << std::endl;
+        sigma_printf("[MATH/BAYES]: Theorem: P(A|B) = [P(B|A) * P(A)] / P(B).\n");
+        sigma_printf("[MATH/BAYES]: Posterior Probability Shard Synced.\n");
     }
 };
 
@@ -73,14 +73,14 @@ public:
 class DogmaShard : public IMasterShard {
 public:
     void Execute() override {
-        std::cout << "[BIOLOGY/DOGMA]: Process: DNA -> (Transcription) -> mRNA -> (Translation) -> Protein." << std::endl;
-        std::cout << "[BIOLOGY/DOGMA]: Information Flow Shard Active." << std::endl;
+        sigma_printf("[BIOLOGY/DOGMA]: Process: DNA -> (Transcription) -> mRNA -> (Translation) -> Protein.\n");
+        sigma_printf("[BIOLOGY/DOGMA]: Information Flow Shard Active.\n");
     }
 };
 
 class SovereignMasterpiece {
 private:
-    std::map<std::string, std::unique_ptr<IMasterShard>> m_mastery;
+    void* m_mastery;
 public:
     void Synthesize() {
         m_mastery["OPTICS"] = std::make_unique<OpticsShard>();
@@ -91,7 +91,7 @@ public:
     }
 
     void ExecuteMasterpieceAudit() {
-        std::cout << "--- Σ SIGMA OS MASTER SCHOLASTIC MASTERPIECE ---" << std::endl;
+        sigma_printf("--- Σ SIGMA OS MASTER SCHOLASTIC MASTERPIECE ---\n");
         for (auto it = m_mastery.begin(); it != m_mastery.end(); ++it) {
             std::cout << "\n[MASTER-SHADING]: Executing Mastery Shard: " << it->first << std::endl;
             it->second->Execute();
@@ -104,7 +104,7 @@ int main() {
     masterpiece.Synthesize();
     masterpiece.ExecuteMasterpieceAudit();
 
-    std::cout << "\n[SUCCESS]: Competitive Scholastic Masterpiece Online. NCERT Sovereignty 100%." << std::endl;
+    sigma_printf("\n[SUCCESS]: Competitive Scholastic Masterpiece Online. NCERT Sovereignty 100%.\n");
     return 0;
 }
 

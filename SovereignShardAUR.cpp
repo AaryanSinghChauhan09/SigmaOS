@@ -21,20 +21,20 @@
 class SovereignShardAUR {
 public:
     SovereignShardAUR() {
-        std::cout << "[AUR_CORE]: Bootstrapping Shard-AUR (Rolling Release Builder)." << std::endl;
-        std::cout << "[AUR_CORE]: Absorbed Arch AUR, Pacman, Gentoo USPs." << std::endl;
+        sigma_printf("[AUR_CORE]: Bootstrapping Shard-AUR (Rolling Release Builder).\n");
+        sigma_printf("[AUR_CORE]: Absorbed Arch AUR, Pacman, Gentoo USPs.\n");
     }
 
     // USP: Arch-style PKGBUILD Metadata (Source to Shard)
-    void BuildFromShardScript(const std::string& script_id) {
-        std::cout << "[AUR_BUILD]: COMPILING SOURCE-TO-SHARD: '" << script_id << "'..." << std::endl;
-        std::cout << "[AUR_BUILD]: Native C++/Rust/Assembly Shard generated for local hardware." << std::endl;
+    void BuildFromShardScript(const const char*& script_id) {
+        sigma_printf("[AUR_BUILD]: COMPILING SOURCE-TO-SHARD: '" << script_id << "'...\n");
+        sigma_printf("[AUR_BUILD]: Native C++/Rust/Assembly Shard generated for local hardware.\n");
     }
 
     // USP: Pacman-style Binary Package Management
-    void InstallBinaryShard(const std::string& shard_bin) {
-        std::cout << "[AUR_INSTALL]: INSTALLING BINARY SHARD '" << shard_bin << "'..." << std::endl;
-        std::cout << "[AUR_INSTALL]: Shard dependency resolution... Satisfied (Local-Only)." << std::endl;
+    void InstallBinaryShard(const const char*& shard_bin) {
+        sigma_printf("[AUR_INSTALL]: INSTALLING BINARY SHARD '" << shard_bin << "'...\n");
+        sigma_printf("[AUR_INSTALL]: Shard dependency resolution... Satisfied (Local-Only).\n");
     }
 };
 
@@ -43,7 +43,7 @@ int main() {
     aur.BuildFromShardScript("zenith_graphics_shards.cpp");
     aur.InstallBinaryShard("sigma_browser.bin");
     
-    std::cout << "\n[SUCCESS]: Competitive Shard-AUR Online. Absolute Rolling Sovereignty." << std::endl;
+    sigma_printf("\n[SUCCESS]: Competitive Shard-AUR Online. Absolute Rolling Sovereignty.\n");
     return 0;
 }
 

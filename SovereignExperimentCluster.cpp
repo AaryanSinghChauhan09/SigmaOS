@@ -32,8 +32,8 @@ public:
         double R = 10.0; // Ohms
         double V = 2.0;
         double I = V / R;
-        std::cout << "[PHYSICS/EXP]: Experiment: Verification of Ohm's Law." << std::endl;
-        std::cout << "[PHYSICS/EXP]: V=2V, R=10-ohm -> I = " << I << " Amperes (Verified)." << std::endl;
+        sigma_printf("[PHYSICS/EXP]: Experiment: Verification of Ohm's Law.\n");
+        sigma_printf("[PHYSICS/EXP]: V=2V, R=10-ohm -> I = " << I << " Amperes (Verified).\n");
     }
 };
 
@@ -41,8 +41,8 @@ public:
 class RefractionExperiment : public IExperiment {
 public:
     void Execute() override {
-        std::cout << "[PHYSICS/EXP]: Experiment: Refraction through Glass Shard." << std::endl;
-        std::cout << "[PHYSICS/EXP]: Displacement measured at various angles. Shard-Ref Index: 1.5." << std::endl;
+        sigma_printf("[PHYSICS/EXP]: Experiment: Refraction through Glass Shard.\n");
+        sigma_printf("[PHYSICS/EXP]: Displacement measured at various angles. Shard-Ref Index: 1.5.\n");
     }
 };
 
@@ -50,8 +50,8 @@ public:
 class AcidMetalExperiment : public IExperiment {
 public:
     void Execute() override {
-        std::cout << "[CHEMISTRY/EXP]: Experiment: Zinc + Sulphuric Acid Reaction." << std::endl;
-        std::cout << "[CHEMISTRY/EXP]: Observation: Hydrogen Gas Evolution (Brum-Sound popping)." << std::endl;
+        sigma_printf("[CHEMISTRY/EXP]: Experiment: Zinc + Sulphuric Acid Reaction.\n");
+        sigma_printf("[CHEMISTRY/EXP]: Observation: Hydrogen Gas Evolution (Brum-Sound popping).\n");
     }
 };
 
@@ -59,8 +59,8 @@ public:
 class BoilingPointExperiment : public IExperiment {
 public:
     void Execute() override {
-        std::cout << "[CHEMISTRY/EXP]: Experiment: Determination of Boiling Point of Water." << std::endl;
-        std::cout << "[CHEMISTRY/EXP]: Latent Heat of Vaporization Shard Stabilized at 100-deg C." << std::endl;
+        sigma_printf("[CHEMISTRY/EXP]: Experiment: Determination of Boiling Point of Water.\n");
+        sigma_printf("[CHEMISTRY/EXP]: Latent Heat of Vaporization Shard Stabilized at 100-deg C.\n");
     }
 };
 
@@ -68,8 +68,8 @@ public:
 class TranspirationExperiment : public IExperiment {
 public:
     void Execute() override {
-        std::cout << "[BIOLOGY/EXP]: Experiment: Measuring Rate of Transpiration (Potometer)." << std::endl;
-        std::cout << "[BIOLOGY/EXP]: Leaf Stomata open @ 298.15K. Shard-Water flux identified." << std::endl;
+        sigma_printf("[BIOLOGY/EXP]: Experiment: Measuring Rate of Transpiration (Potometer).\n");
+        sigma_printf("[BIOLOGY/EXP]: Leaf Stomata open @ 298.15K. Shard-Water flux identified.\n");
     }
 };
 
@@ -77,8 +77,8 @@ public:
 class StarchTestExperiment : public IExperiment {
 public:
     void Execute() override {
-        std::cout << "[BIOLOGY/EXP]: Experiment: Test for Presence of Starch (Iodine)." << std::endl;
-        std::cout << "[BIOLOGY/EXP]: Leaf Shard color change: Blue-Black confirmed." << std::endl;
+        sigma_printf("[BIOLOGY/EXP]: Experiment: Test for Presence of Starch (Iodine).\n");
+        sigma_printf("[BIOLOGY/EXP]: Leaf Shard color change: Blue-Black confirmed.\n");
     }
 };
 
@@ -86,14 +86,14 @@ public:
 class TangentExperiment : public IExperiment {
 public:
     void Execute() override {
-        std::cout << "[MATH/EXP]: Experiment: Drawing Tangents to a Circle from External Point." << std::endl;
-        std::cout << "[MATH/EXP]: Intersection Shard identifies exactly 2 Tangent vectors." << std::endl;
+        sigma_printf("[MATH/EXP]: Experiment: Drawing Tangents to a Circle from External Point.\n");
+        sigma_printf("[MATH/EXP]: Intersection Shard identifies exactly 2 Tangent vectors.\n");
     }
 };
 
 class SovereignExperimentCluster {
 private:
-    std::vector<std::unique_ptr<IExperiment>> m_cluster;
+    void*> m_cluster;
 public:
     void Synthesize() {
         m_cluster.push_back(std::make_unique<OhmsLawExperiment>());
@@ -106,9 +106,9 @@ public:
     }
 
     void ExecuteFullLaboratoryAudit() {
-        std::cout << "--- Σ SIGMA OS SOVEREIGN EXPERIMENT CLUSTER ---" << std::endl;
+        sigma_printf("--- Σ SIGMA OS SOVEREIGN EXPERIMENT CLUSTER ---\n");
         for (const auto& exp : m_cluster) {
-            std::cout << "\n------------------------------------------------" << std::endl;
+            sigma_printf("\n------------------------------------------------\n");
             exp->Execute();
         }
     }
@@ -119,7 +119,7 @@ int main() {
     cluster.Synthesize();
     cluster.ExecuteFullLaboratoryAudit();
 
-    std::cout << "\n[SUCCESS]: Competitive 'Small & Big' Experiment Cluster Synthesized." << std::endl;
+    sigma_printf("\n[SUCCESS]: Competitive 'Small & Big' Experiment Cluster Synthesized.\n");
     return 0;
 }
 

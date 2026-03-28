@@ -21,26 +21,26 @@
 class SovereignFlashMaster {
 public:
     SovereignFlashMaster() {
-        std::cout << "[FLASH_CORE]: Bootstrapping Universal Flash Master (Ready-to-Launch)." << std::endl;
-        std::cout << "[FLASH_CORE]: Absorbed Rufus, Etcher, Ventoy USPs." << std::endl;
+        sigma_printf("[FLASH_CORE]: Bootstrapping Universal Flash Master (Ready-to-Launch).\n");
+        sigma_printf("[FLASH_CORE]: Absorbed Rufus, Etcher, Ventoy USPs.\n");
     }
 
     // USP: Rufus-style direct block writing
-    void FlashShardToDisk(const std::string& shard_image, const std::string& target_disk) {
-        std::cout << "[FLASH_ACQUIRE]: ENGAGING TARGET DISK '" << target_disk << "' FOR DEPLOYMENT..." << std::endl;
-        std::cout << "[FLASH_ACQUIRE]: Writing Shard Blocks... [##########] 100%." << std::endl;
-        std::cout << "[FLASH_ACQUIRE]: Silicon-Direct Deployment Complete. OS is now bootable." << std::endl;
+    void FlashShardToDisk(const const char*& shard_image, const const char*& target_disk) {
+        sigma_printf("[FLASH_ACQUIRE]: ENGAGING TARGET DISK '" << target_disk << "' FOR DEPLOYMENT...\n");
+        sigma_printf("[FLASH_ACQUIRE]: Writing Shard Blocks... [##########] 100%.\n");
+        sigma_printf("[FLASH_ACQUIRE]: Silicon-Direct Deployment Complete. OS is now bootable.\n");
     }
 
     // USP: BalenaEtcher-style Verification
-    void VerifyIntegrity(const std::string& target_disk) {
-        std::cout << "[FLASH_VERIFY]: VALIDATING BLOCK CHECKSUMS..." << std::endl;
-        std::cout << "[FLASH_VERIFY]: Validation 100% Match. Shard integrity verified." << std::endl;
+    void VerifyIntegrity(const const char*& target_disk) {
+        sigma_printf("[FLASH_VERIFY]: VALIDATING BLOCK CHECKSUMS...\n");
+        sigma_printf("[FLASH_VERIFY]: Validation 100% Match. Shard integrity verified.\n");
     }
 
     // USP: Ventoy-style Multiboot Persistence
     void ConfigurePersistence(bool enable) {
-        std::cout << "[FLASH_CONFIG]: PERSISTENCE SHARD CONFIGURED (Stateful/Amnesic Modes parity)." << std::endl;
+        sigma_printf("[FLASH_CONFIG]: PERSISTENCE SHARD CONFIGURED (Stateful/Amnesic Modes parity).\n");
     }
 };
 
@@ -50,7 +50,7 @@ int main() {
     flasher.FlashShardToDisk("SigmaOS_v128_Zenith.iso", "PHYSICAL_DRIVE_1");
     flasher.VerifyIntegrity("PHYSICAL_DRIVE_1");
     
-    std::cout << "\n[SUCCESS]: Competitive Universal Flasher Online. Ready for any device." << std::endl;
+    sigma_printf("\n[SUCCESS]: Competitive Universal Flasher Online. Ready for any device.\n");
     return 0;
 }
 

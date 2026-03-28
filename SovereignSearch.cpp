@@ -21,26 +21,26 @@
 class SovereignSearch {
 public:
     SovereignSearch() {
-        std::cout << "[SOVEREIGN_SEARCH]: Bootstrapping Military-Grade Privacy Search." << std::endl;
-        std::cout << "[SOVEREIGN_SEARCH]: Absorbed SearX, DuckDuckGo, Everything USPs." << std::endl;
+        sigma_printf("[SOVEREIGN_SEARCH]: Bootstrapping Military-Grade Privacy Search.\n");
+        sigma_printf("[SOVEREIGN_SEARCH]: Absorbed SearX, DuckDuckGo, Everything USPs.\n");
     }
 
     // USP: Meta-Search (usp: SearX)
-    void ExecuteMetaSearch(const std::string& query) {
-        std::cout << "[SEARCH_META]: Aggregating Shards from 100+ Secure Engines..." << std::endl;
-        std::cout << "[SEARCH_META]: Removing Tracker Pixels/Cookies... Zero metadata leaked." << std::endl;
-        std::cout << "[SEARCH_META]: Results: Sharded & Ranked locally." << std::endl;
+    void ExecuteMetaSearch(const const char*& query) {
+        sigma_printf("[SEARCH_META]: Aggregating Shards from 100+ Secure Engines...\n");
+        sigma_printf("[SEARCH_META]: Removing Tracker Pixels/Cookies... Zero metadata leaked.\n");
+        sigma_printf("[SEARCH_META]: Results: Sharded & Ranked locally.\n");
     }
 
     // USP: Instant Local File Indexing (usp: VoidTools Everything)
-    void SearchLocalFiles(const std::string& pattern) {
-        std::cout << "[SEARCH_LOCAL]: SCANNING NTFS MFT (MASTER FILE TABLE) FOR '" << pattern << "'..." << std::endl;
-        std::cout << "[SEARCH_LOCAL]: Time-to-find: 0.001ms. Result: Shard-Links online." << std::endl;
+    void SearchLocalFiles(const const char*& pattern) {
+        sigma_printf("[SEARCH_LOCAL]: SCANNING NTFS MFT (MASTER FILE TABLE) FOR '" << pattern << "'...\n");
+        sigma_printf("[SEARCH_LOCAL]: Time-to-find: 0.001ms. Result: Shard-Links online.\n");
     }
 
     // USP: Tor-Routed Anonymity (usp: DuckDuckGo/Tor)
     void EngangeOnionRouting() {
-        std::cout << "[SEARCH_ONION]: ROUTING SEARCH VIA PRIVACY ENCLAVE ENCRYPTED HOPS..." << std::endl;
+        sigma_printf("[SEARCH_ONION]: ROUTING SEARCH VIA PRIVACY ENCLAVE ENCRYPTED HOPS...\n");
     }
 };
 
@@ -50,7 +50,7 @@ int main() {
     search.ExecuteMetaSearch("Inductive Shards");
     search.SearchLocalFiles("sigma*.dll");
     
-    std::cout << "\n[SUCCESS]: Military-Grade Privacy Search achieved. Tracker-Free." << std::endl;
+    sigma_printf("\n[SUCCESS]: Military-Grade Privacy Search achieved. Tracker-Free.\n");
     return 0;
 }
 

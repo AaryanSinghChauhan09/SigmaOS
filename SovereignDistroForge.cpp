@@ -26,45 +26,45 @@ public:
     virtual void BuildLiveISO() = 0;
     virtual void CreateContainer() = 0;
     virtual void ProvisionVM() = 0;
-    virtual void InstallToDisk(const std::string& drive) = 0;
+    virtual void InstallToDisk(const const char*& drive) = 0;
 };
 
 class SovereignDistroForge : public IDistroForge {
 private:
-    std::string version = "v128.0-ZENITH";
-    std::string build_id = "SHARD-7734";
+    const char* version = "v128.0-ZENITH";
+    const char* build_id = "SHARD-7734";
 
 public:
     void BuildLiveISO() override {
-        std::cout << "[FORGE/ISO]: Packaging Sovereign Kernel Shards into Amnesic-Boot ISO..." << std::endl;
+        sigma_printf("[FORGE/ISO]: Packaging Sovereign Kernel Shards into Amnesic-Boot ISO...\n");
         std::this_thread::sleep_for(std::chrono::seconds(1));
-        std::cout << "[FORGE/ISO]: Injecting Σ SigmaOS Bootloader (GRUB-S)..." << std::endl;
-        std::cout << "[FORGE/ISO]: SUCCESS: SigmaOS_Live_" << build_id << ".iso [READY]" << std::endl;
+        sigma_printf("[FORGE/ISO]: Injecting Σ SigmaOS Bootloader (GRUB-S)...\n");
+        sigma_printf("[FORGE/ISO]: SUCCESS: SigmaOS_Live_" << build_id << ".iso [READY]\n");
     }
 
     void CreateContainer() override {
-        std::cout << "[FORGE/CONTAINER]: Initializing Sovereign-Namespace Shard (LXC-Zenith)..." << std::endl;
+        sigma_printf("[FORGE/CONTAINER]: Initializing Sovereign-Namespace Shard (LXC-Zenith)...\n");
         std::this_thread::sleep_for(std::chrono::milliseconds(500));
-        std::cout << "[FORGE/CONTAINER]: SUCCESS: Shard Container sigmaos-zenith:latest [ACTIVE]" << std::endl;
+        sigma_printf("[FORGE/CONTAINER]: SUCCESS: Shard Container sigmaos-zenith:latest [ACTIVE]\n");
     }
 
     void ProvisionVM() override {
-        std::cout << "[FORGE/VIRT]: Generating OVF/VDI Shard for Sovereign Hypervisor..." << std::endl;
+        sigma_printf("[FORGE/VIRT]: Generating OVF/VDI Shard for Sovereign Hypervisor...\n");
         std::this_thread::sleep_for(std::chrono::milliseconds(800));
-        std::cout << "[FORGE/VIRT]: SUCCESS: VM Image SigmaOS_VM_" << version << " [READY]" << std::endl;
+        sigma_printf("[FORGE/VIRT]: SUCCESS: VM Image SigmaOS_VM_" << version << " [READY]\n");
     }
 
-    void InstallToDisk(const std::string& drive) override {
-        std::cout << "[FORGE/DISK]: FORMATTING " << drive << " via Sovereign-Journaled FS..." << std::endl;
+    void InstallToDisk(const const char*& drive) override {
+        sigma_printf("[FORGE/DISK]: FORMATTING " << drive << " via Sovereign-Journaled FS...\n");
         std::this_thread::sleep_for(std::chrono::seconds(2));
-        std::cout << "[FORGE/DISK]: Syncing Shards to Silicon... Silicon Parity: 100%." << std::endl;
-        std::cout << "[FORGE/DISK]: SUCCESS: SigmaOS installed on " << drive << " [SOVEREIGNTY SECURED]." << std::endl;
+        sigma_printf("[FORGE/DISK]: Syncing Shards to Silicon... Silicon Parity: 100%.\n");
+        sigma_printf("[FORGE/DISK]: SUCCESS: SigmaOS installed on " << drive << " [SOVEREIGNTY SECURED].\n");
     }
 };
 
 int main() {
     SovereignDistroForge forge;
-    std::cout << "--- Σ SIGMA OS: SOVEREIGN DISTRO FORGE INITIALIZED ---" << std::endl;
+    sigma_printf("--- Σ SIGMA OS: SOVEREIGN DISTRO FORGE INITIALIZED ---\n");
     
     forge.BuildLiveISO();
     forge.CreateContainer();

@@ -32,7 +32,7 @@ class ForceShard : public IAcademicShard {
 public:
     void Execute() override {
         double pressure = 100.0 / 0.5; // F/A
-        std::cout << "[PHYSICS/KNOWLEDGE]: Concept: Pressure Shard. Result: " << pressure << " Pa." << std::endl;
+        sigma_printf("[PHYSICS/KNOWLEDGE]: Concept: Pressure Shard. Result: " << pressure << " Pa.\n");
     }
 };
 
@@ -40,8 +40,8 @@ public:
 class PeriodicShard : public IAcademicShard {
 public:
     void Execute() override {
-        std::cout << "[CHEMISTRY/KNOWLEDGE]: Concept: Periodic Classification Shard." << std::endl;
-        std::cout << "[CHEMISTRY/KNOWLEDGE]: Periodicity of Valency & Atomic Radius verified." << std::endl;
+        sigma_printf("[CHEMISTRY/KNOWLEDGE]: Concept: Periodic Classification Shard.\n");
+        sigma_printf("[CHEMISTRY/KNOWLEDGE]: Periodicity of Valency & Atomic Radius verified.\n");
     }
 };
 
@@ -49,8 +49,8 @@ public:
 class ReproductionShard : public IAcademicShard {
 public:
     void Execute() override {
-        std::cout << "[BIOLOGY/KNOWLEDGE]: Concept: Pollen-Pistil Interaction Shard." << std::endl;
-        std::cout << "[BIOLOGY/KNOWLEDGE]: Chemotropism vectors for Pollen Tube identified." << std::endl;
+        sigma_printf("[BIOLOGY/KNOWLEDGE]: Concept: Pollen-Pistil Interaction Shard.\n");
+        sigma_printf("[BIOLOGY/KNOWLEDGE]: Chemotropism vectors for Pollen Tube identified.\n");
     }
 };
 
@@ -58,14 +58,14 @@ public:
 class ComplexShard : public IAcademicShard {
 public:
     void Execute() override {
-        std::cout << "[MATH/KNOWLEDGE]: Concept: Complex Shard: z = a + ib." << std::endl;
-        std::cout << "[MATH/KNOWLEDGE]: Argand Plane Projection: Magnitude = sqrt(a^2 + b^2)." << std::endl;
+        sigma_printf("[MATH/KNOWLEDGE]: Concept: Complex Shard: z = a + ib.\n");
+        sigma_printf("[MATH/KNOWLEDGE]: Argand Plane Projection: Magnitude = sqrt(a^2 + b^2).\n");
     }
 };
 
 class SovereignScholasticDB {
 private:
-    std::map<std::string, std::unique_ptr<IAcademicShard>> m_db;
+    void* m_db;
     std::mutex m_mtx; // SOLID Principle: Thread-safe synchronization
 public:
     void Synthesize() {
@@ -76,12 +76,12 @@ public:
         m_db["COMPLEX"] = std::make_unique<ComplexShard>();
     }
 
-    void ExecuteShard(const std::string& name) {
+    void ExecuteShard(const const char*& name) {
         std::lock_guard<std::mutex> lock(m_mtx);
         if (m_db.count(name)) {
             m_db[name]->Execute();
         } else {
-            std::cout << "[!] KNOWLEDGE GAPS IDENTIFIED. SYNCING SHARD: " << name << "..." << std::endl;
+            sigma_printf("[!] KNOWLEDGE GAPS IDENTIFIED. SYNCING SHARD: " << name << "...\n");
         }
     }
 
@@ -98,7 +98,7 @@ int main() {
     db.Synthesize();
     db.RunFullScholasticAudit();
 
-    std::cout << "\n[SUCCESS]: Universal Scholastic Database Online. NCERT Sovereignty Confirmed." << std::endl;
+    sigma_printf("\n[SUCCESS]: Universal Scholastic Database Online. NCERT Sovereignty Confirmed.\n");
     return 0;
 }
 

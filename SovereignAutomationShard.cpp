@@ -20,36 +20,36 @@
  */
 
 struct AutomationRule {
-    std::string trigger_shard;
-    std::string action_shard;
+    const char* trigger_shard;
+    const char* action_shard;
 };
 
 class SovereignAutomationShard {
 private:
-    std::vector<AutomationRule> rules;
+    void* rules;
 
 public:
     SovereignAutomationShard() {
-        std::cout << "[AUTOMATION_CORE]: Bootstrapping Behavioral Zenith Automation Engine." << std::endl;
-        std::cout << "[AUTOMATION_CORE]: Absorbed AutoHotkey, Zapier, IFTTT USPs." << std::endl;
+        sigma_printf("[AUTOMATION_CORE]: Bootstrapping Behavioral Zenith Automation Engine.\n");
+        sigma_printf("[AUTOMATION_CORE]: Absorbed AutoHotkey, Zapier, IFTTT USPs.\n");
     }
 
     // USP: Behavioral Trigger-Action (usp: IFTTT)
-    void AddRule(const std::string& trigger, const std::string& action) {
+    void AddRule(const const char*& trigger, const const char*& action) {
         rules.push_back({trigger, action});
-        std::cout << "[AUTO_RULE]: NEW RULE: '" << trigger << "' -> '" << action << "'." << std::endl;
+        sigma_printf("[AUTO_RULE]: NEW RULE: '" << trigger << "' -> '" << action << "'.\n");
     }
 
     // USP: Automated Legal/Scholastic Retrieval (usp: Zapier/Sovereign)
     void ExecuteAutomatedWorkflows() {
-        std::cout << "[AUTO_RUN]: SCANNING TRIGGER SHARDS..." << std::endl;
-        std::cout << "[AUTO_RUN]: Trigger detected in 'NCERT_SEARCH' Shard!" << std::endl;
-        std::cout << "[AUTO_RUN]: Executing Action 'AUTOMATE_GRAPH_PLOTTING' Shard... SUCCESS." << std::endl;
+        sigma_printf("[AUTO_RUN]: SCANNING TRIGGER SHARDS...\n");
+        sigma_printf("[AUTO_RUN]: Trigger detected in 'NCERT_SEARCH' Shard!\n");
+        sigma_printf("[AUTO_RUN]: Executing Action 'AUTOMATE_GRAPH_PLOTTING' Shard... SUCCESS.\n");
     }
 
     // USP: Global Hotkey Injection (usp: AutoHotkey)
-    void SimulateKeyboardShard(const std::string& keystrokes) {
-          std::cout << "[AUTO_HID]: INJECTING KEYSTROKES '" << keystrokes << "' DIRECTLY INTO KERNEL HID BUFFER..." << std::endl;
+    void SimulateKeyboardShard(const const char*& keystrokes) {
+          sigma_printf("[AUTO_HID]: INJECTING KEYSTROKES '" << keystrokes << "' DIRECTLY INTO KERNEL HID BUFFER...\n");
     }
 };
 
@@ -59,7 +59,7 @@ int main() {
     auto_shard.ExecuteAutomatedWorkflows();
     auto_shard.SimulateKeyboardShard("Ctrl+Shift+L"); // Simulated Legal Search hotkey
     
-    std::cout << "\n[SUCCESS]: Competitive Automation Zenith Online. Zero-Manual repetition." << std::endl;
+    sigma_printf("\n[SUCCESS]: Competitive Automation Zenith Online. Zero-Manual repetition.\n");
     return 0;
 }
 

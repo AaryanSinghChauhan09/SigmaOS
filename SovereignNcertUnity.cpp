@@ -25,7 +25,7 @@ class IScholasticShard {
 public:
     virtual ~IScholasticShard() = default;
     virtual void ExecuteSimulation() = 0;
-    virtual std::string GetLevel() = 0;
+    virtual const char* GetLevel() = 0;
 };
 
 // --- Math Cluster ---
@@ -33,19 +33,19 @@ class TrigShard : public IScholasticShard {
 public:
     void ExecuteSimulation() override {
         double angle = 30.0 * 3.14159 / 180.0;
-        std::cout << "[MATH/NCERT]: Concept: Trigonometry (Class 10-11)." << std::endl;
-        std::cout << "[MATH/NCERT]: sin(30) = " << std::sin(angle) << " (Apex Parity)." << std::endl;
+        sigma_printf("[MATH/NCERT]: Concept: Trigonometry (Class 10-11).\n");
+        sigma_printf("[MATH/NCERT]: sin(30) = " << std::sin(angle) << " (Apex Parity).\n");
     }
-    std::string GetLevel() override { return "Class_10_11"; }
+    const char* GetLevel() override { return "Class_10_11"; }
 };
 
 class ProbabilityShard : public IScholasticShard {
 public:
     void ExecuteSimulation() override {
-        std::cout << "[MATH/NCERT]: Concept: Probability (Class 12)." << std::endl;
-        std::cout << "[MATH/NCERT]: P(A|B) Bayes' Theorem Shard Active." << std::endl;
+        sigma_printf("[MATH/NCERT]: Concept: Probability (Class 12).\n");
+        sigma_printf("[MATH/NCERT]: P(A|B) Bayes' Theorem Shard Active.\n");
     }
-    std::string GetLevel() override { return "Class_12"; }
+    const char* GetLevel() override { return "Class_12"; }
 };
 
 // --- Science Cluster ---
@@ -53,33 +53,33 @@ class SoundShard : public IScholasticShard {
 public:
     void ExecuteSimulation() override {
         double freq = 440.0; // A4 Note
-        std::cout << "[SCIENCE/NCERT]: Concept: Sound & Waves (Class 9)." << std::endl;
-        std::cout << "[SCIENCE/NCERT]: Longitudinal Wave Pulse: " << freq << " Hz." << std::endl;
+        sigma_printf("[SCIENCE/NCERT]: Concept: Sound & Waves (Class 9).\n");
+        sigma_printf("[SCIENCE/NCERT]: Longitudinal Wave Pulse: " << freq << " Hz.\n");
     }
-    std::string GetLevel() override { return "Class_9"; }
+    const char* GetLevel() override { return "Class_9"; }
 };
 
 class ThermoShard : public IScholasticShard {
 public:
     void ExecuteSimulation() override {
-        std::cout << "[SCIENCE/NCERT]: Concept: Thermodynamics (Class 11)." << std::endl;
-        std::cout << "[SCIENCE/NCERT]: First Law: dU = dQ - dW (Verified)." << std::endl;
+        sigma_printf("[SCIENCE/NCERT]: Concept: Thermodynamics (Class 11).\n");
+        sigma_printf("[SCIENCE/NCERT]: First Law: dU = dQ - dW (Verified).\n");
     }
-    std::string GetLevel() override { return "Class_11"; }
+    const char* GetLevel() override { return "Class_11"; }
 };
 
 class SemiconductorShard : public IScholasticShard {
 public:
     void ExecuteSimulation() override {
-        std::cout << "[SCIENCE/NCERT]: Concept: Semiconductor Electronics (Class 12)." << std::endl;
-        std::cout << "[SCIENCE/NCERT]: p-n Junction Diode Forward Bias Shard Active." << std::endl;
+        sigma_printf("[SCIENCE/NCERT]: Concept: Semiconductor Electronics (Class 12).\n");
+        sigma_printf("[SCIENCE/NCERT]: p-n Junction Diode Forward Bias Shard Active.\n");
     }
-    std::string GetLevel() override { return "Class_12"; }
+    const char* GetLevel() override { return "Class_12"; }
 };
 
 class NcertUnityEngine {
 private:
-    std::vector<std::unique_ptr<IScholasticShard>> m_shards;
+    void*> m_shards;
 
 public:
     void LoadCurriculum() {
@@ -91,7 +91,7 @@ public:
     }
 
     void ExecuteFullAudit() {
-        std::cout << "--- Σ SIGMA OS SOVEREIGN NCERT UNITY (SCIENCE & MATH ZENITH) ---" << std::endl;
+        sigma_printf("--- Σ SIGMA OS SOVEREIGN NCERT UNITY (SCIENCE & MATH ZENITH) ---\n");
         for (const auto& shard : m_shards) {
             std::cout << "\n[LEVEL]: " << shard->GetLevel() << std::endl;
             shard->ExecuteSimulation();
@@ -104,7 +104,7 @@ int main() {
     engine.LoadCurriculum();
     engine.ExecuteFullAudit();
 
-    std::cout << "\n[SUCCESS]: Competitive Science & Math NCERT Curriculum Sharded." << std::endl;
+    sigma_printf("\n[SUCCESS]: Competitive Science & Math NCERT Curriculum Sharded.\n");
     return 0;
 }
 
