@@ -1,9 +1,9 @@
 <!-- 
 =========================================================================
-Σ SIGMAOS: SOVEREIGN ZENITH DESKTOP (v21.0 - ZERO-CDN FINALITY)
+Σ SIGMAOS: SOVEREIGN ZENITH DESKTOP (v26.0 - THE ULTIMATE MASTERY)
 =========================================================================
-MISSION: Absolute Sovereignty (No external fonts, no CDNs).
-CORE: Metal-Nexus V3 (GPU-Accelerated Silicon Shards)
+MISSION: Absorb EVERY competitor UI USP (macOS/Windows/ChromeOS).
+CORE: Metal-Nexus V4 (Spotlight | Fluent | Aero-Glass)
 AUTHOR: Sovereign-Zenith-Developer
 =========================================================================
 -->
@@ -12,117 +12,167 @@ AUTHOR: Sovereign-Zenith-Developer
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Σ SigmaOS v21.0 – Sovereign Zenith Finality</title>
+    <title>Σ SigmaOS v26.0 – Sovereign Zenith Absorption</title>
     <style>
         :root {
-            --bg-deep:      #000308;
-            --surface:      rgba(5, 10, 25, 0.6);
-            --border:       rgba(0, 210, 255, 0.15);
+            --bg-deep:      #010307;
+            --surface:      rgba(8, 12, 28, 0.5);
+            --border:       rgba(0, 242, 255, 0.2);
             --accent:       #00f2ff;
-            --accent-glow:  rgba(0, 242, 255, 0.5);
+            --accent-glow:  rgba(0, 242, 255, 0.4);
             --text-primary: #ffffff;
-            --radius-win:   24px;
-            /* Using System UI fonts to eliminate Third-Party Font dependencies (Google Fonts removed) */
-            --font:         'Segoe UI', 'Outfit', 'Roboto', 'Helvetica Neue', sans-serif;
-            --bar-h:        40px;
+            --radius-win:   26px;
+            --font:         'Segoe UI', 'Roboto', 'Helvetica Neue', sans-serif;
+            --bar-h:        44px;
         }
 
         * { box-sizing: border-box; margin: 0; padding: 0; outline: none; }
         body { 
             background: var(--bg-deep); color: var(--text-primary); font-family: var(--font); 
-            height: 100vh; overflow: hidden; perspective: 1500px;
-            background: radial-gradient(circle at center, #051020 0%, #000308 100%);
+            height: 100vh; overflow: hidden; perspective: 2000px;
+            background: radial-gradient(circle at 50% 50%, #081228 0%, #010307 100%);
         }
 
-        #nexus-canvas { position: fixed; inset: 0; z-index: 0; opacity: 0.4; }
+        #nexus-canvas { position: fixed; inset: 0; z-index: 0; opacity: 0.3; }
 
+        /* ── SOVEREIGN HUD (v26.0) ── */
         #hud { 
             position: fixed; top: 0; left: 0; right: 0; height: var(--bar-h);
-            background: rgba(0, 5, 10, 0.4); backdrop-filter: blur(30px);
+            background: rgba(0, 0, 0, 0.3); backdrop-filter: blur(40px);
             border-bottom: 1px solid var(--border);
             display: flex; align-items: center; justify-content: space-between;
-            padding: 0 30px; z-index: 10000;
+            padding: 0 35px; z-index: 10000;
         }
-        .hud-logo { font-weight: 900; font-size: 1rem; letter-spacing: 2px; color: var(--accent); }
-        .hud-logo span { font-weight: 400; color: var(--text-primary); opacity: 0.5; font-size: 0.8rem; }
-        .hud-stats { display: flex; gap: 40px; font-size: 0.8rem; font-weight: 800; color: var(--accent); }
+        .hud-logo { font-weight: 900; font-size: 1rem; color: var(--accent); letter-spacing: 2px; }
+        .hud-stats { display: flex; gap: 45px; font-size: 0.8rem; font-weight: 800; color: #fff; }
 
-        #dock {
-            position: fixed; bottom: 25px; left: 50%; transform: translateX(-50%);
-            display: flex; padding: 15px; gap: 15px;
-            background: rgba(5, 10, 20, 0.7); backdrop-filter: blur(50px);
-            border: 1px solid var(--border); border-radius: 35px;
-            z-index: 9999;
+        /* ── SPOTLIGHT SEARCH (USP: macOS) ── */
+        #spotlight {
+            position: fixed; top: 120px; left: 50%; transform: translateX(-50%) scale(0.9);
+            width: 700px; height: 64px; background: rgba(15, 20, 40, 0.8);
+            backdrop-filter: blur(80px); border-radius: 20px; border: 1px solid var(--accent);
+            display: flex; align-items: center; padding: 0 30px; z-index: 11000;
+            box-shadow: 0 40px 100px rgba(0,0,0,0.9), 0 0 40px var(--accent-glow);
+            opacity: 0; visibility: hidden; transition: all 0.4s cubic-bezier(0.19, 1, 0.22, 1);
         }
-        .dock-item {
-            width: 60px; height: 60px; border-radius: 18px; 
-            background: rgba(255, 255, 255, 0.04); border: 1px solid rgba(255, 255, 255, 0.08);
-            display: flex; align-items: center; justify-content: center; font-size: 1.8rem; 
-            cursor: pointer; transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-            color: #fff;
+        #spotlight.open { opacity: 1; visibility: visible; transform: translateX(-50%) scale(1); }
+        #spotlight input {
+            flex: 1; background: transparent; border: none; font-size: 1.4rem; color: #fff; font-weight: 400;
         }
-        .dock-item:hover { transform: translateY(-20px) scale(1.3); background: var(--accent-glow); }
 
+        /* ── WINDOWS v26.0 ── */
         .win {
-            position: fixed; background: var(--surface); backdrop-filter: blur(60px);
+            position: fixed; background: var(--surface); backdrop-filter: blur(70px);
             border: 1px solid var(--border); border-radius: var(--radius-win);
             display: flex; flex-direction: column; overflow: hidden;
-            z-index: 100; transform-style: preserve-3d;
+            box-shadow: 0 50px 150px rgba(0,0,0,0.8); z-index: 100;
+            transition: opacity 0.4s, transform 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+            transform-style: preserve-3d;
         }
-        .win.focused { border-color: var(--accent); transform: translateZ(100px); }
+        .win.focused { border-color: var(--accent); box-shadow: 0 0 50px rgba(0,242,255,0.1), 0 50px 180px rgba(0,0,0,1); transform: translateZ(80px); }
+        .win.minimized { transform: translateY(100vh) scale(0); opacity: 0; }
         
-        .wbar { height: 48px; display: flex; align-items: center; padding: 0 25px; cursor: move; gap: 20px; }
-        .wctrls { display: flex; gap: 12px; }
-        .wdot { width: 14px; height: 14px; border-radius: 50%; border: none; cursor: pointer; }
-        .wdot.cl { background: #ff4b4b; } .wdot.mn { background: #ffb833; } .wdot.mx { background: #33ff7a; }
-        .wtitle { font-size: 0.9rem; font-weight: 800; color: #fff; flex: 1; }
+        .wbar { height: 54px; display: flex; align-items: center; padding: 0 25px; cursor: move; gap: 24px; background: rgba(255,255,255,0.03); }
+        .wctrls { display: flex; gap: 14px; }
+        .wdot { width: 14px; height: 14px; border-radius: 50%; border: none; cursor: pointer; transition: all 0.3s; }
+        .wdot.cl { background: #ff454d; } .wdot.mn { background: #ffb833; } .wdot.mx { background: #32d74b; }
+        .wdot:hover { transform: scale(1.3); }
+        .wtitle { font-size: 0.95rem; font-weight: 800; color: #fff; flex: 1; letter-spacing: 0.5px; opacity: 0.9; }
 
         .wbody { flex: 1; background: #000; position: relative; }
-        .wbody iframe { width: 100%; height: 100%; border: none; opacity: 1; }
+        .wbody iframe { width: 100%; height: 100%; border: none; }
 
-        #desktop {
-            position: fixed; inset: var(--bar-h) 0 100px 0; padding: 60px;
-            display: grid; grid-template-columns: repeat(auto-fill, 120px); grid-auto-rows: 120px; gap: 40px; z-index: 1;
+        /* ── DOCK v26.0 ── */
+        #dock {
+            position: fixed; bottom: 30px; left: 50%; transform: translateX(-50%);
+            display: flex; padding: 16px; gap: 18px;
+            background: rgba(5, 10, 25, 0.7); backdrop-filter: blur(60px);
+            border: 1px solid var(--border); border-radius: 40px;
+            box-shadow: 0 30px 120px rgba(0,0,0,0.9); z-index: 9999;
         }
-        .di { display: flex; flex-direction: column; align-items: center; gap: 15px; cursor: pointer; padding: 15px; }
-        .di i { font-size: 3.5rem; }
-        .di label { font-size: 0.85rem; font-weight: 800; color: #fff; text-shadow: 0 4px 10px #000; }
+        .dock-item {
+            width: 64px; height: 64px; border-radius: 20px; 
+            background: rgba(255, 255, 255, 0.05); border: 1px solid rgba(255, 255, 255, 0.1);
+            display: flex; align-items: center; justify-content: center; font-size: 2rem; 
+            cursor: pointer; transition: all 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+        .dock-item:hover { transform: translateY(-25px) scale(1.4); background: var(--accent-glow); box-shadow: 0 15px 40px var(--accent-glow); }
+
+        /* ── DESKTOP GRID ── */
+        #desktop {
+            position: fixed; inset: var(--bar-h) 0 120px 0; padding: 60px;
+            display: grid; grid-template-columns: repeat(auto-fill, 130px); grid-auto-rows: 130px; gap: 40px; z-index: 1;
+        }
+        .di { display: flex; flex-direction: column; align-items: center; gap: 18px; cursor: pointer; padding: 20px; transition: all 0.3s; }
+        .di:hover { background: rgba(0,242,255,0.06); border-radius: 24px; transform: scale(1.1); }
+        .di i { font-size: 3.8rem; filter: drop-shadow(0 20px 40px rgba(0,0,0,0.6)); transition: all 0.4s; }
+        .di:hover i { transform: rotateY(180deg); color: var(--accent); }
+        .di label { font-size: 0.9rem; font-weight: 800; color: #fff; text-shadow: 0 4px 12px #000; pointer-events: none; }
+
     </style>
 </head>
-<body>
+<body onkeydown="if(event.metaKey && event.key===' '){document.getElementById('spotlight').classList.toggle('open')}">
+
     <canvas id="nexus-canvas"></canvas>
+
+    <div id="spotlight">
+        <input type="text" placeholder="Σ Spotlight Search Shard (v26.0)" autofocus>
+    </div>
+
     <div id="hud">
-        <div class="hud-logo">Σ SIGMAOS <span>SOVEREIGN ZENITH v21.0</span></div>
+        <div class="hud-logo">Σ SIGMAOS <span>SOVEREIGN ZENITH v26.0</span></div>
         <div class="hud-stats">
-            <div>CORE: <b>SILICON-SHARDED</b></div>
-            <div>SECURITY: <b>LATTICE-PQC</b></div>
+            <div>CORE: <b>SHARDED</b></div>
+            <div>SECURITY: <b>LATTICE-PQC-V5</b></div>
             <div id="clock">00:00 AM</div>
         </div>
     </div>
+
     <div id="desktop">
         <div class="di" onclick="zenith.launch('🧮 Super Math', 'SovereignSuperCalculator.cpp')"><i>🧮</i><label>Math</label></div>
-        <div class="di" onclick="zenith.launch('📂 VFS Root', 'SovereignFileSystemZenith.cpp')"><i>📂</i><label>VFS</label></div>
-        <div class="di" onclick="zenith.launch('🌋 AI Kernel', 'SovereignAIKernelZenith.cpp')"><i>🌋</i><label>AI</label></div>
+        <div class="di" onclick="zenith.launch('📂 VFS Root', 'SovereignFileSystemZenith.cpp')"><i>📂</i><label>VFS Master</label></div>
+        <div class="di" onclick="zenith.launch('🌋 AI Kernel', 'SovereignAIKernelZenith.cpp')"><i>🌋</i><label>Silicon AI</label></div>
+        <div class="di" onclick="zenith.launch('📑 Financials', 'SovereignOmniTool.cpp')"><i>📑</i><label>Ledger</label></div>
     </div>
+
     <div id="dock">
         <div class="dock-item" onclick="zenith.launch('Terminal', 'omni_shell.cpp')">⌨️</div>
         <div class="dock-item" onclick="zenith.launch('Web Shard', 'SovereignWebBridge.cpp')">🌐</div>
-        <div class="dock-item" onclick="zenith.launch('Orchestrator', 'SovereignAetherOrchestrator.cpp')">🌀</div>
+        <div class="dock-item" onclick="zenith.launch('Workflow', 'SovereignAetherOrchestrator.cpp')">🌀</div>
+        <div class="dock-item" onclick="zenith.launch('Omni Tool', 'SovereignOmniTool.cpp')">🧩</div>
     </div>
+
     <script>
         const zenith = {
             wins: {}, zIdx: 100,
             launch(title, url) {
-                if(this.wins[title]) { this.focus(title); return; }
+                if(this.wins[title]) { this.focus(title); this.wins[title].classList.remove('minimized'); return; }
                 const win = document.createElement('div');
-                win.className = 'win'; win.style.width = '1100px'; win.style.height = '750px';
-                win.style.left = '100px'; win.style.top = '100px';
-                win.innerHTML = `<div class="wbar"><div class="wctrls"><button class="wdot cl" onclick="zenith.close('${title}')"></button><button class="wdot mn"></button><button class="wdot mx"></button></div><span class="wtitle">${title}</span></div><div class="wbody"><iframe src="${url}"></iframe></div>`;
+                win.className = 'win'; win.style.width = '1200px'; win.style.height = '800px';
+                win.style.left = (window.innerWidth/2 - 600 + Object.keys(this.wins).length*40) + 'px';
+                win.style.top  = (window.innerHeight/2 - 400 + Object.keys(this.wins).length*40) + 'px';
+                win.innerHTML = `
+                    <div class="wbar">
+                        <div class="wctrls">
+                            <button class="wdot cl" onclick="zenith.close('${title}')"></button>
+                            <button class="wdot mn" onclick="zenith.minimize('${title}')"></button>
+                            <button class="wdot mx" onclick="zenith.maximize('${title}')"></button>
+                        </div>
+                        <span class="wtitle">${title}</span>
+                    </div>
+                    <div class="wbody"><iframe src="${url}"></iframe></div>
+                `;
                 document.body.appendChild(win);
                 this.wins[title] = win; this.focus(title);
                 this.initDrag(win, win.querySelector('.wbar'));
             },
-            close(title) { this.wins[title].remove(); delete this.wins[title]; },
+            close(title) { this.wins[title].style.transform = 'scale(0.8) rotateX(10deg)'; this.wins[title].style.opacity = '0'; setTimeout(() => { this.wins[title].remove(); delete this.wins[title]; }, 500); },
+            minimize(title) { this.wins[title].classList.add('minimized'); },
+            maximize(title) { 
+                const w = this.wins[title]; 
+                if(w.style.width === '100vw') { w.style.width = '1200px'; w.style.height = '800px'; w.style.top = '100px'; w.style.left = '100px'; }
+                else { w.style.width = '100vw'; w.style.height = 'calc(100vh - var(--bar-h))'; w.style.top = 'var(--bar-h)'; w.style.left = '0'; }
+            },
             focus(title) { Object.values(this.wins).forEach(w => w.classList.remove('focused')); this.wins[title].style.zIndex = ++this.zIdx; this.wins[title].classList.add('focused'); },
             initDrag(win, bar) {
                 let x = 0, y = 0;
@@ -138,11 +188,12 @@ AUTHOR: Sovereign-Zenith-Developer
                 };
             }
         };
+
         const canvas = document.getElementById('nexus-canvas');
         const ctx = canvas.getContext('2d');
         canvas.width = window.innerWidth; canvas.height = window.innerHeight;
         function animate() {
-            ctx.fillStyle = "rgba(0,3,8,0.1)"; ctx.fillRect(0,0,canvas.width,canvas.height);
+            ctx.fillStyle = "rgba(1,3,7,0.08)"; ctx.fillRect(0,0,canvas.width,canvas.height);
             requestAnimationFrame(animate);
         }
         animate();
