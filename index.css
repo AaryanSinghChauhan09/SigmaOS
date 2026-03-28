@@ -1,15 +1,15 @@
 :root {
-    --bg-dark: #000;
-    --bg-glass: rgba(10, 10, 12, 0.85);
-    --accent-primary: #00f2ff;
-    --accent-secondary: #7000ff;
-    --accent-glow: #00ff88;
-    --text-main: #e0e0e6;
-    --text-dim: #666;
-    --border: rgba(0, 242, 255, 0.2);
-    --neon-blue: 0 0 20px rgba(0, 242, 255, 0.5);
-    --neon-green: 0 0 20px rgba(0, 255, 136, 0.5);
-    --scan-line: rgba(0, 242, 255, 0.03);
+    --bg-dark: #020617;
+    --bg-glass: rgba(15, 23, 42, 0.95);
+    --accent-primary: #3b82f6;
+    --accent-secondary: #1d4ed8;
+    --accent-glow: #60a5fa;
+    --text-main: #f8fafc;
+    --text-dim: #94a3b8;
+    --border: rgba(59, 130, 246, 0.2);
+    --neon-blue: 0 0 20px rgba(59, 130, 246, 0.2);
+    --neon-green: 0 0 20px rgba(96, 165, 250, 0.2);
+    --scan-line: rgba(255, 255, 255, 0.01);
 }
 
 * { margin: 0; padding: 0; box-sizing: border-box; }
@@ -274,11 +274,31 @@ input:focus { outline: none; }
     animation: pulseSec 2s infinite;
 }
 
-@keyframes pulseSec {
-    0% { box-shadow: 0 0 10px var(--accent-secondary); opacity: 0.5; }
-    50% { box-shadow: 0 0 40px var(--accent-secondary); opacity: 1; }
-    100% { box-shadow: 0 0 10px var(--accent-secondary); opacity: 0.5; }
+.audit-header { font-size: 1.2rem; font-weight: 900; color: var(--accent-glow); margin-bottom: 20px; text-decoration: underline; }
+.audit-item { padding: 15px; border-bottom: 1px solid var(--border); font-size: 0.75rem; color: var(--text-dim); }
+
+#toast-container {
+    position: fixed;
+    bottom: 90px;
+    right: 40px;
+    z-index: 1000;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
 }
+
+.toast {
+    background: var(--bg-glass);
+    border-left: 4px solid var(--accent-primary);
+    padding: 15px 25px;
+    color: var(--text-main);
+    font-size: 0.75rem;
+    font-weight: 700;
+    animation: slideIn 0.3s ease-out;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+}
+
+@keyframes slideIn { from { transform: translateX(100%); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
 
 .search-container {
     background: rgba(255, 255, 255, 0.05);

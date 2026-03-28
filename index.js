@@ -236,6 +236,17 @@ function startAbsorption() {
 const linuxIn = $ZENITH('linux-input');
 const linuxOut = $ZENITH('linux-output');
 
+// Professional Toast Signaling
+function showToast(msg) {
+    const container = $ZENITH('toast-container');
+    if (!container) return;
+    const toast = document.createElement('div');
+    toast.className = 'toast holo-border';
+    toast.textContent = `Σ://ZENITH-SIGNAL> ${msg}`;
+    container.appendChild(toast);
+    setTimeout(() => toast.remove(), 4000);
+}
+
 if (linuxIn) {
     linuxIn.addEventListener('keydown', (e) => {
         if (e.key === 'Enter') {
@@ -249,6 +260,19 @@ if (linuxIn) {
                 const sp = document.createElement('p');
                 sp.textContent = "bin/  etc/  home/  root/  sigma_shards/";
                 linuxOut.appendChild(sp);
+            } else if (cmd === 'top') {
+                const sp = document.createElement('p');
+                sp.textContent = "[ZENITH-TOP]: 0.1% CPU | 4MB RAM | 100+ SHARDS IDLE [OPTIMAL]";
+                linuxOut.appendChild(sp);
+                showToast("Top Audit Performed.");
+            } else if (cmd === 'free') {
+                const sp = document.createElement('p');
+                sp.textContent = "total: 16GB, used: 2MB, free: 15.99GB [SOVEREIGN OVERHEAD: ZERO]";
+                linuxOut.appendChild(sp);
+            } else if (cmd === 'df') {
+                const sp = document.createElement('p');
+                sp.textContent = "/dev/silicon0: 2TB [SOVEREIGN SECTOR ACCESS]";
+                linuxOut.appendChild(sp);
             } else if (cmd.startsWith('apt')) {
                 const sp = document.createElement('p');
                 sp.textContent = `[ZENITH]: Resolving ${cmd}... 100% Shard-Parity Found.`;
@@ -257,6 +281,7 @@ if (linuxIn) {
                 const sp = document.createElement('p');
                 sp.textContent = "[ZENITH]: ACCESS GRANTED. PERSISTING MASTER RING-0.";
                 linuxOut.appendChild(sp);
+                showToast("Sudo Access Granted.");
             } else {
                 const sp = document.createElement('p');
                 sp.textContent = `bash: ${cmd}: command absorbed by Zenith core.`;

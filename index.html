@@ -10,6 +10,7 @@
 <body class="nasa-grade-bg">
     <!-- Sovereign Matrix Overlay -->
     <div id="matrix-overlay" class="matrix-grid"></div>
+    <div id="toast-container"></div>
 
     <div class="command-center">
         <!-- Dashboard Header -->
@@ -93,6 +94,9 @@
                 <div class="icon" onclick="openWindow('linux-shard')">
                     <div class="icon-glyph linux">L</div><span>Linux-Shell</span>
                 </div>
+                <div class="icon" onclick="openWindow('integrity-shard')">
+                    <div class="icon-glyph integrity">★</div><span>Integrity</span>
+                </div>
             </div>
 
             <!-- Draggable Windows -->
@@ -141,6 +145,19 @@
                         <input type="text" id="nexus-search" placeholder="Search master shards..." oninput="filterShards()">
                     </div>
                     <div id="catalog-content"></div>
+                </div>
+            </div>
+
+            <div id="integrity-shard" class="window glass-morphism win-shell hidden holo-border">
+                <div class="window-header" onmousedown="dragWindow(event, 'integrity-shard')">
+                    <div class="title">Σ SOVEREIGN INTEGRITY AUDIT [PROFESSIONAL CERTIFIED]</div>
+                    <div class="close" onclick="closeWindow('integrity-shard')">×</div>
+                </div>
+                <div class="window-content">
+                    <div class="audit-header">CERTIFICATE OF SOVEREIGNTY: PASS</div>
+                    <div class="audit-item">KERNEL: SHARDED_RING_0 (100% Verified)</div>
+                    <div class="audit-item">SECURITY: LATTICE_PQC_V5 (Optimal)</div>
+                    <div class="audit-item">DEPS: ZERO_NAL_INTERFERENCE (Passed)</div>
                 </div>
             </div>
 
