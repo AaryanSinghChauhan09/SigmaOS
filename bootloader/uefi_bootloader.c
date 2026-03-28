@@ -1,4 +1,13 @@
 /*
+ * =========================================================================
+ * Σ SIGMAOS: SOVEREIGN ZENITH (v15.0 - ABSOLUTE FINALITY)
+ * =========================================================================
+ * Author: Sovereign-Zenith-Developer
+ * Principles: Zero-Library, Bit-Perfect, Silicon-Integrity, USP-Absorbed.
+ * =========================================================================
+ */
+
+/*
  * Σ SIGMA OS: SOVEREIGN UEFI BOOTLOADER (v5.0)
  * ======================================================
  * Mission: Secure Boot, Multi-Shard Loading, 0-Simulation.
@@ -154,3 +163,4 @@ EFI_STATUS efi_main(EFI_HANDLE image_handle, EFI_SYSTEM_TABLE* system_table) {
 
     return EFI_SUCCESS;
 }
+

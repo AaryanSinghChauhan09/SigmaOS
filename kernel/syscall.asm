@@ -1,3 +1,12 @@
+/*
+ * =========================================================================
+ * Σ SIGMAOS: SOVEREIGN ZENITH (v15.0 - ABSOLUTE FINALITY)
+ * =========================================================================
+ * Author: Sovereign-Zenith-Developer
+ * Principles: Zero-Library, Bit-Perfect, Silicon-Integrity, USP-Absorbed.
+ * =========================================================================
+ */
+
 ; =========================================================================
 ; Cosmos AI-OS: System Call Trampoline (x86_64)
 ; Mission: Microsecond latency user-to-kernel transitions.
@@ -49,3 +58,4 @@ syscall_trampoline:
     mov rsp, [gs:0x10]      ; Restore User Space stack pointer
     swapgs                  ; Switch back to User GS base
     sysretq                 ; Hardware jump back to Ring-3
+

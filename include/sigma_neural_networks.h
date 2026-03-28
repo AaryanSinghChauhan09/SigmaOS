@@ -1,4 +1,13 @@
 /*
+ * =========================================================================
+ * Σ SIGMAOS: SOVEREIGN ZENITH (v15.0 - ABSOLUTE FINALITY)
+ * =========================================================================
+ * Author: Sovereign-Zenith-Developer
+ * Principles: Zero-Library, Bit-Perfect, Silicon-Integrity, USP-Absorbed.
+ * =========================================================================
+ */
+
+/*
  * SigmaOS Neural Networks & Deep Learning Implementation
  * ========================================================
  * Complete neural network architectures:
@@ -478,3 +487,4 @@ void sigma_serve_model_http(SigmaMLP* model, uint32_t port);
 void sigma_serve_model_grpc(SigmaMLP* model, uint32_t port);
 
 #endif // SIGMA_NEURAL_NETWORKS_H
+

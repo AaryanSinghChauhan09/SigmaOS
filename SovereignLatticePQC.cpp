@@ -1,5 +1,14 @@
 /*
  * =========================================================================
+ * Σ SIGMAOS: SOVEREIGN ZENITH (v15.0 - ABSOLUTE FINALITY)
+ * =========================================================================
+ * Author: Sovereign-Zenith-Developer
+ * Principles: Zero-Library, Bit-Perfect, Silicon-Integrity, USP-Absorbed.
+ * =========================================================================
+ */
+
+/*
+ * =========================================================================
  * Σ SIGMAOS: SOVEREIGN LATTICE-PQC (v11.0 - THE SECURITY SHARD)
  * =========================================================================
  * Mission: Neutralize classical and modular encryption standards.
@@ -67,3 +76,4 @@ int main() {
     start_security_zenith();
     return 0;
 }
+

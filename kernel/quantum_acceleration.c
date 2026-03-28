@@ -1,4 +1,13 @@
 /*
+ * =========================================================================
+ * Σ SIGMAOS: SOVEREIGN ZENITH (v15.0 - ABSOLUTE FINALITY)
+ * =========================================================================
+ * Author: Sovereign-Zenith-Developer
+ * Principles: Zero-Library, Bit-Perfect, Silicon-Integrity, USP-Absorbed.
+ * =========================================================================
+ */
+
+/*
  * SigmaOS Quantum Acceleration
  * ============================
  * Quantum computing integration and acceleration
@@ -599,3 +608,4 @@ void sigma_quantum_circuit_destroy(QuantumCircuit* circuit) {
     
     free(circuit);
 }
+

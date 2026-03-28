@@ -1,3 +1,12 @@
+/*
+ * =========================================================================
+ * Σ SIGMAOS: SOVEREIGN ZENITH (v15.0 - ABSOLUTE FINALITY)
+ * =========================================================================
+ * Author: Sovereign-Zenith-Developer
+ * Principles: Zero-Library, Bit-Perfect, Silicon-Integrity, USP-Absorbed.
+ * =========================================================================
+ */
+
 ; SigmaOS Native Enterprise Bootloader (x86_16 Real Mode)
 ; ========================================================
 ; USP: Direct hardware initialization from scratch, bypassing GRUB.
@@ -46,3 +55,4 @@ boot_msg db 'SigmaOS (Apex v6.7): Enterprise Execution Mode Active. Loading C-Ke
 ; 5. Boot Sector Padding
 times 510-($-$$) db 0
 dw 0xAA55               ; Boot Signature
+

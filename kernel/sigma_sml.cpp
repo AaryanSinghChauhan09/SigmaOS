@@ -1,5 +1,14 @@
 /*
  * =========================================================================
+ * Σ SIGMAOS: SOVEREIGN ZENITH (v15.0 - ABSOLUTE FINALITY)
+ * =========================================================================
+ * Author: Sovereign-Zenith-Developer
+ * Principles: Zero-Library, Bit-Perfect, Silicon-Integrity, USP-Absorbed.
+ * =========================================================================
+ */
+
+/*
+ * =========================================================================
  * Σ SIGMAOS: SOVEREIGN MACHINE LANGUAGE (SML) ENGINE (sigma_sml.cpp)
  * =========================================================================
  * Principle: Professional, industry-standard execution of custom instructions.
@@ -122,3 +131,4 @@ extern "C" void sigma_sml_init() {
     engine->LoadProgram(demo_code, sizeof(demo_code));
     engine->Run();
 }
+

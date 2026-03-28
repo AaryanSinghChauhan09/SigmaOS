@@ -1,5 +1,14 @@
 /*
  * =========================================================================
+ * Σ SIGMAOS: SOVEREIGN ZENITH (v15.0 - ABSOLUTE FINALITY)
+ * =========================================================================
+ * Author: Sovereign-Zenith-Developer
+ * Principles: Zero-Library, Bit-Perfect, Silicon-Integrity, USP-Absorbed.
+ * =========================================================================
+ */
+
+/*
+ * =========================================================================
  * Σ SIGMAOS: SOVEREIGN STANDARD LIBRARY - COMPLETE IMPLEMENTATION
  * =========================================================================
  * File: libc/sigma_libc.h
@@ -713,3 +722,4 @@ SIGMA_INLINE void sigma_barrier_store(void) {
 #endif
 
 #endif /* SIGMA_LIBC_H */
+

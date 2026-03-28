@@ -1,5 +1,14 @@
 /*
  * =========================================================================
+ * Σ SIGMAOS: SOVEREIGN ZENITH (v15.0 - ABSOLUTE FINALITY)
+ * =========================================================================
+ * Author: Sovereign-Zenith-Developer
+ * Principles: Zero-Library, Bit-Perfect, Silicon-Integrity, USP-Absorbed.
+ * =========================================================================
+ */
+
+/*
+ * =========================================================================
  * Σ SIGMAOS: SOVEREIGN DIAGNOSTICS ZENITH (v12.0 - ZERO-DEPENDENCY)
  * =========================================================================
  * Mission: Absolute Self-Healing & Silicon Integrity Validation.
@@ -59,3 +68,4 @@ int main() {
     start_diagnostic_zenith();
     return 0;
 }
+

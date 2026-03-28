@@ -1,3 +1,12 @@
+/*
+ * =========================================================================
+ * Σ SIGMAOS: SOVEREIGN ZENITH (v15.0 - ABSOLUTE FINALITY)
+ * =========================================================================
+ * Author: Sovereign-Zenith-Developer
+ * Principles: Zero-Library, Bit-Perfect, Silicon-Integrity, USP-Absorbed.
+ * =========================================================================
+ */
+
 // -----------------------------------------------------------------------------
 // SigmaOS Enterprise Engine Core (v5.0) - UX/UI Zenith
 // Pure C++ & AVX2 Vector SIMD Intrinsics.
@@ -61,3 +70,4 @@ int main() {
     
     return 0;
 }
+

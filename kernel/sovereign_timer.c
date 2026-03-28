@@ -1,4 +1,13 @@
 /*
+ * =========================================================================
+ * Σ SIGMAOS: SOVEREIGN ZENITH (v15.0 - ABSOLUTE FINALITY)
+ * =========================================================================
+ * Author: Sovereign-Zenith-Developer
+ * Principles: Zero-Library, Bit-Perfect, Silicon-Integrity, USP-Absorbed.
+ * =========================================================================
+ */
+
+/*
  * SigmaOS Enterprise Timer & Clock Subsystem (C Core)
  * ====================================================
  * Provides high-resolution timing using:
@@ -170,3 +179,4 @@ void sigma_apic_timer_init(uint64_t apic_base, uint32_t tick_ms,
   uint32_t initial = (uint32_t)((tsc_khz * tick_ms));
   mmio_write64(apic_base + 0x380, initial);
 }
+

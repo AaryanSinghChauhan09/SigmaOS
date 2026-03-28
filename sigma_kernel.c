@@ -1,3 +1,12 @@
+/*
+ * =========================================================================
+ * Σ SIGMAOS: SOVEREIGN ZENITH (v15.0 - ABSOLUTE FINALITY)
+ * =========================================================================
+ * Author: Sovereign-Zenith-Developer
+ * Principles: Zero-Library, Bit-Perfect, Silicon-Integrity, USP-Absorbed.
+ * =========================================================================
+ */
+
 #include "libc/sigma_libc.h"
 
 /**
@@ -41,3 +50,4 @@ void _start(void) {
     sigma_printf("[KERNEL]: Kernel Core Operational. Entering Shard Loop.\n");
     sigma_exit(0);
 }
+

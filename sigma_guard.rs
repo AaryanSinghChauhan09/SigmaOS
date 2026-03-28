@@ -1,3 +1,12 @@
+/*
+ * =========================================================================
+ * Σ SIGMAOS: SOVEREIGN ZENITH (v15.0 - ABSOLUTE FINALITY)
+ * =========================================================================
+ * Author: Sovereign-Zenith-Developer
+ * Principles: Zero-Library, Bit-Perfect, Silicon-Integrity, USP-Absorbed.
+ * =========================================================================
+ */
+
 // -----------------------------------------------------------------------------
 // SigmaOS Enterprise Security Guard v1.0 (Native Rust Shard)
 // Inspiration: Rust-for-Linux.
@@ -43,3 +52,4 @@ fn main() {
     let _ = guard.authorize();
     println!("[SECURITY_RUST]: Final Guard Status: [{}]", guard.status);
 }
+

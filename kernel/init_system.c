@@ -1,4 +1,13 @@
 /*
+ * =========================================================================
+ * Σ SIGMAOS: SOVEREIGN ZENITH (v15.0 - ABSOLUTE FINALITY)
+ * =========================================================================
+ * Author: Sovereign-Zenith-Developer
+ * Principles: Zero-Library, Bit-Perfect, Silicon-Integrity, USP-Absorbed.
+ * =========================================================================
+ */
+
+/*
  * SigmaOS Init System (Native Core)
  * =================================
  * Complete system initialization and service management
@@ -612,3 +621,4 @@ int sigma_init_get_service_status(service_status_t *status_array, int max_count)
     }
     return count;
 }
+

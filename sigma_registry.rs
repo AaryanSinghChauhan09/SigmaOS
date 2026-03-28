@@ -1,3 +1,12 @@
+/*
+ * =========================================================================
+ * Σ SIGMAOS: SOVEREIGN ZENITH (v15.0 - ABSOLUTE FINALITY)
+ * =========================================================================
+ * Author: Sovereign-Zenith-Developer
+ * Principles: Zero-Library, Bit-Perfect, Silicon-Integrity, USP-Absorbed.
+ * =========================================================================
+ */
+
 // -----------------------------------------------------------------------------
 // SigmaOS Enterprise Shard Registry v3.0 (Native Rust OOPS)
 // Principles: SOLID, Polymorphism, Memory Safety.
@@ -78,3 +87,4 @@ fn main() {
     registry.execute_all();
     println!("[REGISTRY_RUST]: OOPS-Zenith Complete.");
 }
+

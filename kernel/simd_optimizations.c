@@ -1,4 +1,13 @@
 /*
+ * =========================================================================
+ * Σ SIGMAOS: SOVEREIGN ZENITH (v15.0 - ABSOLUTE FINALITY)
+ * =========================================================================
+ * Author: Sovereign-Zenith-Developer
+ * Principles: Zero-Library, Bit-Perfect, Silicon-Integrity, USP-Absorbed.
+ * =========================================================================
+ */
+
+/*
  * SigmaOS SIMD Optimizations
  * ===========================
  * SIMD-accelerated functions for maximum performance
@@ -705,3 +714,4 @@ static inline void simd_matrix_multiply_sse2(const float* a, const float* b, flo
     }
 #endif
 }
+

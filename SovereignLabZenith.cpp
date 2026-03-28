@@ -1,3 +1,12 @@
+/*
+ * =========================================================================
+ * Σ SIGMAOS: SOVEREIGN ZENITH (v15.0 - ABSOLUTE FINALITY)
+ * =========================================================================
+ * Author: Sovereign-Zenith-Developer
+ * Principles: Zero-Library, Bit-Perfect, Silicon-Integrity, USP-Absorbed.
+ * =========================================================================
+ */
+
 #include <iostream>
 #include <vector>
 #include <memory>
@@ -93,3 +102,4 @@ int main() {
     std::cout << "\n[SUCCESS]: Competitive Laboratory Zenith Shards (with Animation parity) Active." << std::endl;
     return 0;
 }
+

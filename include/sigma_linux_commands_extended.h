@@ -1,4 +1,13 @@
 /*
+ * =========================================================================
+ * Σ SIGMAOS: SOVEREIGN ZENITH (v15.0 - ABSOLUTE FINALITY)
+ * =========================================================================
+ * Author: Sovereign-Zenith-Developer
+ * Principles: Zero-Library, Bit-Perfect, Silicon-Integrity, USP-Absorbed.
+ * =========================================================================
+ */
+
+/*
  * SigmaOS Additional Linux/Unix Commands Library
  * ==============================================
  * Extended command set inspired by all major Linux distributions:
@@ -521,3 +530,4 @@ int sigma_appstream_info(const char* app_id);
 int sigma_appstream_get(const char* app_id);
 
 #endif // SIGMA_LINUX_COMMANDS_EXTENDED_H
+

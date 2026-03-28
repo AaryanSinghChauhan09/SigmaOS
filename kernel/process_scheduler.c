@@ -1,4 +1,13 @@
 /*
+ * =========================================================================
+ * Σ SIGMAOS: SOVEREIGN ZENITH (v15.0 - ABSOLUTE FINALITY)
+ * =========================================================================
+ * Author: Sovereign-Zenith-Developer
+ * Principles: Zero-Library, Bit-Perfect, Silicon-Integrity, USP-Absorbed.
+ * =========================================================================
+ */
+
+/*
  * SigmaOS Advanced Process Scheduler
  * ================================
  * Object-Oriented Process Management with SOLID Principles
@@ -675,3 +684,4 @@ void sigma_process_manager_destroy(ProcessManager* pm) {
     
     free(pm);
 }
+

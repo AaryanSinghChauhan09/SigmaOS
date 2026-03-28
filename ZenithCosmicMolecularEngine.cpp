@@ -1,3 +1,12 @@
+/*
+ * =========================================================================
+ * Σ SIGMAOS: SOVEREIGN ZENITH (v15.0 - ABSOLUTE FINALITY)
+ * =========================================================================
+ * Author: Sovereign-Zenith-Developer
+ * Principles: Zero-Library, Bit-Perfect, Silicon-Integrity, USP-Absorbed.
+ * =========================================================================
+ */
+
 #include "SigmaOOP.hpp"
 #include "libc/sigma_math.h"
 
@@ -85,3 +94,4 @@ extern "C" void _start(void) {
     sigma_printf("\n[SUCCESS]: Competitive Cosmic Mastery Online. Stellarium/Avogadro Absorbed 100%%.\n");
     sigma_exit(0);
 }
+

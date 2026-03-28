@@ -1,5 +1,14 @@
 /*
  * =========================================================================
+ * Σ SIGMAOS: SOVEREIGN ZENITH (v15.0 - ABSOLUTE FINALITY)
+ * =========================================================================
+ * Author: Sovereign-Zenith-Developer
+ * Principles: Zero-Library, Bit-Perfect, Silicon-Integrity, USP-Absorbed.
+ * =========================================================================
+ */
+
+/*
+ * =========================================================================
  * Σ SIGMAOS: SOVEREIGN MEMORY MANAGEMENT UNIT (v2.0 - No Stdlib Deps)
  * =========================================================================
  * USP Absorbed:
@@ -513,3 +522,4 @@ void sigma_mmu_stats(const SigmaAddressSpace* aspace) {
         (unsigned long long)aspace->pml4_phys,
         aspace->is_kernel ? "[KERNEL]" : "[USER]");
 }
+

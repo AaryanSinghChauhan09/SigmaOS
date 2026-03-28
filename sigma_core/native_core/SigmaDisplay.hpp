@@ -1,3 +1,12 @@
+/*
+ * =========================================================================
+ * Σ SIGMAOS: SOVEREIGN ZENITH (v15.0 - ABSOLUTE FINALITY)
+ * =========================================================================
+ * Author: Sovereign-Zenith-Developer
+ * Principles: Zero-Library, Bit-Perfect, Silicon-Integrity, USP-Absorbed.
+ * =========================================================================
+ */
+
 // SigmaOS Native Framebuffer Engine (OOP Design)
 // ============================================
 // Zero dependency. Replaces <windows.h> GDI, X11, GTK, Qt.
@@ -143,3 +152,4 @@ public:
 } // namespace Sigma
 
 #endif // SIGMA_DISPLAY_FRAMEBUFFER_HPP
+

@@ -1,3 +1,12 @@
+/*
+ * =========================================================================
+ * Σ SIGMAOS: SOVEREIGN ZENITH (v15.0 - ABSOLUTE FINALITY)
+ * =========================================================================
+ * Author: Sovereign-Zenith-Developer
+ * Principles: Zero-Library, Bit-Perfect, Silicon-Integrity, USP-Absorbed.
+ * =========================================================================
+ */
+
 // SigmaOS Native Rust Automation Engine
 // =====================================
 // Uses #![no_std] and pure machine-level bindings for maximum customization.
@@ -74,3 +83,4 @@ pub extern "C" fn setup_sigma_personalisation(config_ptr: *const u8, _len: usize
 fn panic(_info: &PanicInfo) -> ! {
     loop {} // Safe hang if kernel triggers fault
 }
+

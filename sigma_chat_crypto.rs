@@ -1,3 +1,12 @@
+/*
+ * =========================================================================
+ * Σ SIGMAOS: SOVEREIGN ZENITH (v15.0 - ABSOLUTE FINALITY)
+ * =========================================================================
+ * Author: Sovereign-Zenith-Developer
+ * Principles: Zero-Library, Bit-Perfect, Silicon-Integrity, USP-Absorbed.
+ * =========================================================================
+ */
+
 // -----------------------------------------------------------------------------
 // SigmaOS Enterprise Chat Crypto Shard v3.0 (Native Rust Zenith)
 // Principle: Cryptography, Privacy, Sharding, Opaque Payloads.
@@ -62,3 +71,4 @@ fn main() {
     
     crypto.purge_secrets();
 }
+

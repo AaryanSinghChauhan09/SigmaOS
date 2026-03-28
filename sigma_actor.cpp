@@ -1,3 +1,12 @@
+/*
+ * =========================================================================
+ * Σ SIGMAOS: SOVEREIGN ZENITH (v15.0 - ABSOLUTE FINALITY)
+ * =========================================================================
+ * Author: Sovereign-Zenith-Developer
+ * Principles: Zero-Library, Bit-Perfect, Silicon-Integrity, USP-Absorbed.
+ * =========================================================================
+ */
+
 /**
  * SigmaOS Enterprise Actor Shard v1.0 (Native C++ OOPS Zenith)
  * Principle: Actor Model, SOLID, Design Patterns (Factory | Strategy).
@@ -85,3 +94,4 @@ int main() {
     std::cout << "[CPP_ACTOR]: Actor Messaging Zenith ACHIEVED." << std::endl;
     return 0;
 }
+

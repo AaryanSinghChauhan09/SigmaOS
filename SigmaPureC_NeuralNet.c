@@ -1,4 +1,13 @@
 /*
+ * =========================================================================
+ * Σ SIGMAOS: SOVEREIGN ZENITH (v15.0 - ABSOLUTE FINALITY)
+ * =========================================================================
+ * Author: Sovereign-Zenith-Developer
+ * Principles: Zero-Library, Bit-Perfect, Silicon-Integrity, USP-Absorbed.
+ * =========================================================================
+ */
+
+/*
  * Σ SIGMA OS: PURE C NEURAL NETWORK (v5.0 - ZERO DEPENDENCY SOVEREIGN)
  * ======================================================================
  * USP Absorbed: ggml/llama.cpp (Pure C inference), Tinygrad (Minimalism).
@@ -77,3 +86,4 @@ void _start(void) {
 
     sigma_exit(0);
 }
+

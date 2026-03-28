@@ -1,5 +1,14 @@
 /*
  * =========================================================================
+ * Σ SIGMAOS: SOVEREIGN ZENITH (v15.0 - ABSOLUTE FINALITY)
+ * =========================================================================
+ * Author: Sovereign-Zenith-Developer
+ * Principles: Zero-Library, Bit-Perfect, Silicon-Integrity, USP-Absorbed.
+ * =========================================================================
+ */
+
+/*
+ * =========================================================================
  * Σ SIGMAOS: SOVEREIGN SLAB MEMORY ALLOCATOR (v2.0 - Dependency-Free)
  * =========================================================================
  * USP Absorbed:
@@ -406,3 +415,4 @@ void sigma_slab_system_status(void) {
         sigma_slab_cache_info(&_sigma_caches[i]);
     }
 }
+

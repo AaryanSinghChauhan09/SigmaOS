@@ -1,5 +1,14 @@
 /*
  * =========================================================================
+ * Σ SIGMAOS: SOVEREIGN ZENITH (v15.0 - ABSOLUTE FINALITY)
+ * =========================================================================
+ * Author: Sovereign-Zenith-Developer
+ * Principles: Zero-Library, Bit-Perfect, Silicon-Integrity, USP-Absorbed.
+ * =========================================================================
+ */
+
+/*
+ * =========================================================================
  * Σ SIGMAOS: SOVEREIGN STRING LIBRARY HEADER (Replacing <string.h>)
  * =========================================================================
  * USP Absorbed: musl libc (clean minimal API), Diet libc (zero overhead)
@@ -201,3 +210,4 @@ static SIGMA_INLINE sigma_usize sigma_str_copy_safe(
 #endif
 
 #endif /* SIGMA_STRING_H */
+

@@ -1,4 +1,13 @@
 /*
+ * =========================================================================
+ * Σ SIGMAOS: SOVEREIGN ZENITH (v15.0 - ABSOLUTE FINALITY)
+ * =========================================================================
+ * Author: Sovereign-Zenith-Developer
+ * Principles: Zero-Library, Bit-Perfect, Silicon-Integrity, USP-Absorbed.
+ * =========================================================================
+ */
+
+/*
  * Cosmos AI-OS: Enterprise Packet Filter (S-BPF, C Layer)
  * ========================================================
  * Mission: Hardcore Ring-0 network filtering. Drops 3rd-party
@@ -79,3 +88,4 @@ int cosmos_bpf_filter(cosmos_packet_t *pkt) {
   // 3. All checks passed
   return 1;
 }
+

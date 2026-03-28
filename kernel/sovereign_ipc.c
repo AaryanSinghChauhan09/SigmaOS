@@ -1,4 +1,13 @@
 /*
+ * =========================================================================
+ * Σ SIGMAOS: SOVEREIGN ZENITH (v15.0 - ABSOLUTE FINALITY)
+ * =========================================================================
+ * Author: Sovereign-Zenith-Developer
+ * Principles: Zero-Library, Bit-Perfect, Silicon-Integrity, USP-Absorbed.
+ * =========================================================================
+ */
+
+/*
  * SigmaOS Enterprise IPC Subsystem (C Core)
  * =========================================
  * Fast, lock-free inter-process message passing via ring buffers.
@@ -181,3 +190,4 @@ void sigma_ipc_destroy_channel(uint32_t channel_id) {
   ch->tail = 0;
   _memory_barrier();
 }
+

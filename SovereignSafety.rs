@@ -1,3 +1,12 @@
+/*
+ * =========================================================================
+ * Σ SIGMAOS: SOVEREIGN ZENITH (v15.0 - ABSOLUTE FINALITY)
+ * =========================================================================
+ * Author: Sovereign-Zenith-Developer
+ * Principles: Zero-Library, Bit-Perfect, Silicon-Integrity, USP-Absorbed.
+ * =========================================================================
+ */
+
 // SigmaOS Enterprise Memory Safety v1.0 (Rust Shard)
 // Principle: Memory Management & Ownership Security.
 // USP: Fearless Concurrency & Zero-Cost Abstractions.
@@ -31,3 +40,4 @@ fn main() {
     shard.transfer_ownership("Enterprise_Kernel");
     // println!("{:?}", shard); // ERROR: borrow after move (The Enterprise Security advantage)
 }
+

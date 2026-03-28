@@ -1,3 +1,12 @@
+/*
+ * =========================================================================
+ * Σ SIGMAOS: SOVEREIGN ZENITH (v15.0 - ABSOLUTE FINALITY)
+ * =========================================================================
+ * Author: Sovereign-Zenith-Developer
+ * Principles: Zero-Library, Bit-Perfect, Silicon-Integrity, USP-Absorbed.
+ * =========================================================================
+ */
+
 // SigmaOS Native IPC (Inter-Process Communication)
 // ===============================================
 // Zero dependency. Replaces <sys/ipc.h>, <unistd.h> pipe/shm.
@@ -93,3 +102,4 @@ public:
 } // namespace Sigma
 
 #endif // SIGMA_IPC_HPP
+

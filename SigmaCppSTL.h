@@ -1,4 +1,13 @@
 /*
+ * =========================================================================
+ * Σ SIGMAOS: SOVEREIGN ZENITH (v15.0 - ABSOLUTE FINALITY)
+ * =========================================================================
+ * Author: Sovereign-Zenith-Developer
+ * Principles: Zero-Library, Bit-Perfect, Silicon-Integrity, USP-Absorbed.
+ * =========================================================================
+ */
+
+/*
  * Σ SIGMA OS: SOVEREIGN C++ STL COMPATIBILITY LAYER (v7.1)
  * ==========================================================
  * This file provides aliases for the core SigmaOOP types 
@@ -30,3 +39,4 @@ public:
 #define SigmaVector SigmaVectorLegacy
 
 #endif // SIGMACPPS_H
+

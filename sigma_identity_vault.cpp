@@ -1,3 +1,12 @@
+/*
+ * =========================================================================
+ * Σ SIGMAOS: SOVEREIGN ZENITH (v15.0 - ABSOLUTE FINALITY)
+ * =========================================================================
+ * Author: Sovereign-Zenith-Developer
+ * Principles: Zero-Library, Bit-Perfect, Silicon-Integrity, USP-Absorbed.
+ * =========================================================================
+ */
+
 // -----------------------------------------------------------------------------
 // SigmaOS Identity Vault Engine (v1.0) - C++ Native Deep Personalisation
 // Industry Leader Protocol: Encrypted User Identity & Preference Persistence.
@@ -95,3 +104,4 @@ int main() {
     vault.ValidateAndPersonalize("SIGMA_ZERO_TRUST_VALIDATED", &SOVEREIGN_USER_profile);
     return 0;
 }
+

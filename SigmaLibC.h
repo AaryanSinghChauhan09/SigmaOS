@@ -1,5 +1,14 @@
 /*
  * =========================================================================
+ * Σ SIGMAOS: SOVEREIGN ZENITH (v15.0 - ABSOLUTE FINALITY)
+ * =========================================================================
+ * Author: Sovereign-Zenith-Developer
+ * Principles: Zero-Library, Bit-Perfect, Silicon-Integrity, USP-Absorbed.
+ * =========================================================================
+ */
+
+/*
+ * =========================================================================
  * Σ SIGMAOS: SIGMA LIBC HEADER (v6.0 - Full Sovereign Edition)
  * =========================================================================
  * USP Absorbed: musl (minimalism), Clear Linux (AVX optimization),
@@ -32,3 +41,4 @@ extern "C" {
 #endif
 
 #endif /* SIGMALIBC_H */
+

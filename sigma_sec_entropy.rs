@@ -1,3 +1,12 @@
+/*
+ * =========================================================================
+ * Σ SIGMAOS: SOVEREIGN ZENITH (v15.0 - ABSOLUTE FINALITY)
+ * =========================================================================
+ * Author: Sovereign-Zenith-Developer
+ * Principles: Zero-Library, Bit-Perfect, Silicon-Integrity, USP-Absorbed.
+ * =========================================================================
+ */
+
 // -----------------------------------------------------------------------------
 // SigmaOS Enterprise Security Entropy Shard v1.0 (Native Rust Zenith)
 // Inspiration: Random-Password, AlchemistOS.
@@ -37,3 +46,4 @@ fn main() {
     println!("[SEC_ENTROPY]: Enterprise-Actual-Token: {}", token);
     println!("[SEC_ENTROPY]: Entropy Zenith SECURED.");
 }
+

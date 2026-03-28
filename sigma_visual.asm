@@ -1,3 +1,12 @@
+/*
+ * =========================================================================
+ * Σ SIGMAOS: SOVEREIGN ZENITH (v15.0 - ABSOLUTE FINALITY)
+ * =========================================================================
+ * Author: Sovereign-Zenith-Developer
+ * Principles: Zero-Library, Bit-Perfect, Silicon-Integrity, USP-Absorbed.
+ * =========================================================================
+ */
+
 ; -----------------------------------------------------------------------------
 ; SigmaOS Enterprise Aesthetic Engine v1.0 (Native x86_64 Assembly)
 ; Inspiration: KDE Plasma, GNOME Tweaks, Visual Personalization Tools.
@@ -37,3 +46,4 @@ main:
     add rsp, 40
     xor eax, eax
     ret
+

@@ -1,3 +1,12 @@
+/*
+ * =========================================================================
+ * Σ SIGMAOS: SOVEREIGN ZENITH (v15.0 - ABSOLUTE FINALITY)
+ * =========================================================================
+ * Author: Sovereign-Zenith-Developer
+ * Principles: Zero-Library, Bit-Perfect, Silicon-Integrity, USP-Absorbed.
+ * =========================================================================
+ */
+
 /**
  * Σ SIGMA OS: LOW-LEVEL STRING SHARD (v4.0 - ZERO-INCLUDE)
  * ======================================================
@@ -37,3 +46,4 @@ extern "C" int sigma_native_strcmp(const char* s1, const char* s2) {
     }
     return *(unsigned char*)s1 - *(unsigned char*)s2;
 }
+

@@ -1,4 +1,13 @@
 /*
+ * =========================================================================
+ * Σ SIGMAOS: SOVEREIGN ZENITH (v15.0 - ABSOLUTE FINALITY)
+ * =========================================================================
+ * Author: Sovereign-Zenith-Developer
+ * Principles: Zero-Library, Bit-Perfect, Silicon-Integrity, USP-Absorbed.
+ * =========================================================================
+ */
+
+/*
  * SigmaOS Virtual Box Manager
  * ========================
  * Simple virtual machine management interface
@@ -540,3 +549,4 @@ void sigma_quick_start_macos_vm(const char* vm_name) {
         sigma_virtual_box_manager_create_and_start(manager, 6, vm_name); // macOS Monterey template
     }
 }
+

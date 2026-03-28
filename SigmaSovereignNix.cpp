@@ -1,3 +1,12 @@
+/*
+ * =========================================================================
+ * Σ SIGMAOS: SOVEREIGN ZENITH (v15.0 - ABSOLUTE FINALITY)
+ * =========================================================================
+ * Author: Sovereign-Zenith-Developer
+ * Principles: Zero-Library, Bit-Perfect, Silicon-Integrity, USP-Absorbed.
+ * =========================================================================
+ */
+
 #include <iostream>
 #include <string>
 #include <vector>
@@ -52,3 +61,4 @@ int main() {
     std::cout << "\n[SUCCESS]: Competitive Nix Zenith Online. Absolute Functional Stability achieved." << std::endl;
     return 0;
 }
+

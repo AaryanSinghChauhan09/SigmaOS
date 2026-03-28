@@ -1,3 +1,12 @@
+/*
+ * =========================================================================
+ * Σ SIGMAOS: SOVEREIGN ZENITH (v15.0 - ABSOLUTE FINALITY)
+ * =========================================================================
+ * Author: Sovereign-Zenith-Developer
+ * Principles: Zero-Library, Bit-Perfect, Silicon-Integrity, USP-Absorbed.
+ * =========================================================================
+ */
+
 /**
  * SigmaOS Enterprise Distro Shard v1.0 (Native C++ OOPS Zenith)
  * Inspiration: ChooseYourDistro, AlpineOnAnyDistro, Junest.
@@ -75,3 +84,4 @@ int main() {
     std::cout << "[DISTRO]: Distro Persona Zenith ACHIEVED." << std::endl;
     return 0;
 }
+

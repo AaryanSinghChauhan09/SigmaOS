@@ -1,3 +1,12 @@
+/*
+ * =========================================================================
+ * Σ SIGMAOS: SOVEREIGN ZENITH (v15.0 - ABSOLUTE FINALITY)
+ * =========================================================================
+ * Author: Sovereign-Zenith-Developer
+ * Principles: Zero-Library, Bit-Perfect, Silicon-Integrity, USP-Absorbed.
+ * =========================================================================
+ */
+
 ; =========================================================================
 ; Cosmos AI-OS: Enterprise Context Switcher (x86_64)
 ; =========================================================================
@@ -62,3 +71,4 @@ cosmos_switch_tasks:
     
     ; 5. Jump into the new task
     ret
+

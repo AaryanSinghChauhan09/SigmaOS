@@ -1,5 +1,14 @@
 /*
  * =========================================================================
+ * Σ SIGMAOS: SOVEREIGN ZENITH (v15.0 - ABSOLUTE FINALITY)
+ * =========================================================================
+ * Author: Sovereign-Zenith-Developer
+ * Principles: Zero-Library, Bit-Perfect, Silicon-Integrity, USP-Absorbed.
+ * =========================================================================
+ */
+
+/*
+ * =========================================================================
  * Σ SIGMAOS: SOVEREIGN PACKAGE MANAGER (SovereignPM.cpp)
  * =========================================================================
  * USP Absorbed: Arch (pacman), Alpine (apk), Nix (nix-shell)
@@ -95,3 +104,4 @@ extern "C" void sigma_spm_init() {
     repo.sync_p2p("SIGMA_NODE_DELTA_9");
     repo.list_installed();
 }
+

@@ -1,3 +1,12 @@
+/*
+ * =========================================================================
+ * Σ SIGMAOS: SOVEREIGN ZENITH (v15.0 - ABSOLUTE FINALITY)
+ * =========================================================================
+ * Author: Sovereign-Zenith-Developer
+ * Principles: Zero-Library, Bit-Perfect, Silicon-Integrity, USP-Absorbed.
+ * =========================================================================
+ */
+
 /**
  * Σ SIGMA OS: LOW-LEVEL CORE (v4.0 - ZERO-LIBRARY NATIVE)
  * =====================================================
@@ -55,3 +64,4 @@ extern "C" void _start() {
     __asm__ ("mov x8, #93; xor x0, x0, x0; svc #0;");
 #endif
 }
+

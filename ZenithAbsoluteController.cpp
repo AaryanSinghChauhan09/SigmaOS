@@ -1,3 +1,12 @@
+/*
+ * =========================================================================
+ * Σ SIGMAOS: SOVEREIGN ZENITH (v15.0 - ABSOLUTE FINALITY)
+ * =========================================================================
+ * Author: Sovereign-Zenith-Developer
+ * Principles: Zero-Library, Bit-Perfect, Silicon-Integrity, USP-Absorbed.
+ * =========================================================================
+ */
+
 #include "SigmaOOP.hpp"
 
 /**
@@ -96,3 +105,4 @@ extern "C" void _start(void) {
     sigma_printf("\n[SUCCESS]: Competitive Absolute Variable Controller Online. Absolute NCERT Sovereignty 100%%.\n");
     sigma_exit(0);
 }
+

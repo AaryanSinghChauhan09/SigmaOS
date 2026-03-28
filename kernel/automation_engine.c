@@ -1,4 +1,13 @@
 /*
+ * =========================================================================
+ * Σ SIGMAOS: SOVEREIGN ZENITH (v15.0 - ABSOLUTE FINALITY)
+ * =========================================================================
+ * Author: Sovereign-Zenith-Developer
+ * Principles: Zero-Library, Bit-Perfect, Silicon-Integrity, USP-Absorbed.
+ * =========================================================================
+ */
+
+/*
  * SigmaOS Automation Engine
  * =========================
  * Advanced automation, customization, and personalization system
@@ -876,3 +885,4 @@ static uint32_t sigma_determine_data_type(const char* value) {
     // Default to string
     return 4; // String
 }
+

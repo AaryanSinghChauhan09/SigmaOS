@@ -1,3 +1,12 @@
+/*
+ * =========================================================================
+ * Σ SIGMAOS: SOVEREIGN ZENITH (v15.0 - ABSOLUTE FINALITY)
+ * =========================================================================
+ * Author: Sovereign-Zenith-Developer
+ * Principles: Zero-Library, Bit-Perfect, Silicon-Integrity, USP-Absorbed.
+ * =========================================================================
+ */
+
 #include "SigmaOOP.hpp"
 #include "usp_android_ios_haiku_plan9_ipc.hpp"
 
@@ -76,3 +85,4 @@ extern "C" void _start(void) {
     sigma_printf("\n--- Σ BOOT COMPLETE ---\n");
     sigma_exit(0);
 }
+

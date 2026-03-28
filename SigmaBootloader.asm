@@ -1,3 +1,12 @@
+/*
+ * =========================================================================
+ * Σ SIGMAOS: SOVEREIGN ZENITH (v15.0 - ABSOLUTE FINALITY)
+ * =========================================================================
+ * Author: Sovereign-Zenith-Developer
+ * Principles: Zero-Library, Bit-Perfect, Silicon-Integrity, USP-Absorbed.
+ * =========================================================================
+ */
+
 ; Σ SIGMA OS: SOVEREIGN BOOTLOADER (v12.0 - ZERO-GRUB BARE-METAL)
 ; ==============================================================
 ; USP Absorbed: GRUB/Coreboot (System Initialization), Syslinux.
@@ -44,3 +53,4 @@ boot_msg db '[SIGMA_BOOT]: Zero-GRUB Sovereign Sequence Initiated. Reading Secto
 ; Boot Sector Magic Number Padding
 times 510-($-$$) db 0   ; Pad rest of 512-byte sector with zeroes
 dw 0xAA55               ; Boot Signature required by BIOS to recognize bootable sector
+

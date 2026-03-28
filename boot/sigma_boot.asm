@@ -1,3 +1,12 @@
+/*
+ * =========================================================================
+ * Σ SIGMAOS: SOVEREIGN ZENITH (v15.0 - ABSOLUTE FINALITY)
+ * =========================================================================
+ * Author: Sovereign-Zenith-Developer
+ * Principles: Zero-Library, Bit-Perfect, Silicon-Integrity, USP-Absorbed.
+ * =========================================================================
+ */
+
 ; SigmaOS Apex Bootloader (v1.0)
 ; ==================================
 ; Target: x86_64 Bare Metal Entry
@@ -36,3 +45,4 @@ msg_boot db 'SIGMA_OS_APEX: INITIALIZING_Enterprise_GRID...', 0
 
 times 510-($-$$) db 0
 dw 0xAA55
+

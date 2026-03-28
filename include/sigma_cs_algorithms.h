@@ -1,4 +1,13 @@
 /*
+ * =========================================================================
+ * Σ SIGMAOS: SOVEREIGN ZENITH (v15.0 - ABSOLUTE FINALITY)
+ * =========================================================================
+ * Author: Sovereign-Zenith-Developer
+ * Principles: Zero-Library, Bit-Perfect, Silicon-Integrity, USP-Absorbed.
+ * =========================================================================
+ */
+
+/*
  * SigmaOS Computer Science & DSA Algorithms Implementation
  * ==========================================================
  * Complete implementation of fundamental CS algorithms:
@@ -634,3 +643,4 @@ void sigma_reverse_array(int* arr, uint32_t n);
 int* sigma_array_slice(int* arr, uint32_t start, uint32_t end);
 
 #endif // SIGMA_CS_ALGORITHMS_H
+

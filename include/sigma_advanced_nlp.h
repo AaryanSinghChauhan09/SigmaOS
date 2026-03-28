@@ -1,4 +1,13 @@
 /*
+ * =========================================================================
+ * Σ SIGMAOS: SOVEREIGN ZENITH (v15.0 - ABSOLUTE FINALITY)
+ * =========================================================================
+ * Author: Sovereign-Zenith-Developer
+ * Principles: Zero-Library, Bit-Perfect, Silicon-Integrity, USP-Absorbed.
+ * =========================================================================
+ */
+
+/*
  * SigmaOS Advanced NLP Architectures
  * ==================================
  * State-of-the-art NLP models:
@@ -558,3 +567,4 @@ char* sigma_bart_generate(SigmaBART* bart, const char* input_text,
 void sigma_bart_destroy(SigmaBART* bart);
 
 // Continue with more NLP models and utilities...
+

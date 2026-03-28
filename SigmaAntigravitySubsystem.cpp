@@ -1,5 +1,14 @@
 /*
  * =========================================================================
+ * Σ SIGMAOS: SOVEREIGN ZENITH (v15.0 - ABSOLUTE FINALITY)
+ * =========================================================================
+ * Author: Sovereign-Zenith-Developer
+ * Principles: Zero-Library, Bit-Perfect, Silicon-Integrity, USP-Absorbed.
+ * =========================================================================
+ */
+
+/*
+ * =========================================================================
  * Σ SIGMAOS: ANTIGRAVITY IDE SUBSYSTEM (v11.0 - ZERO FUNCTION PURE SILICON)
  * =========================================================================
  * Mission: Establish a native, zero-dependency environment capable of
@@ -74,3 +83,4 @@ int main() {
 
     return 0;
 }
+

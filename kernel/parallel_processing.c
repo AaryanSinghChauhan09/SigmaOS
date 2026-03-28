@@ -1,4 +1,13 @@
 /*
+ * =========================================================================
+ * Σ SIGMAOS: SOVEREIGN ZENITH (v15.0 - ABSOLUTE FINALITY)
+ * =========================================================================
+ * Author: Sovereign-Zenith-Developer
+ * Principles: Zero-Library, Bit-Perfect, Silicon-Integrity, USP-Absorbed.
+ * =========================================================================
+ */
+
+/*
  * SigmaOS Parallel Processing
  * ===========================
  * High-performance parallel processing and threading
@@ -786,3 +795,4 @@ void sigma_numa_memory_pool_destroy(NUMAMemoryPool* pool) {
     free(pool->nodes);
     free(pool);
 }
+

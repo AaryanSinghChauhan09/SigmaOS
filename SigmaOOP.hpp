@@ -1,5 +1,14 @@
 /*
  * =========================================================================
+ * Σ SIGMAOS: SOVEREIGN ZENITH (v15.0 - ABSOLUTE FINALITY)
+ * =========================================================================
+ * Author: Sovereign-Zenith-Developer
+ * Principles: Zero-Library, Bit-Perfect, Silicon-Integrity, USP-Absorbed.
+ * =========================================================================
+ */
+
+/*
+ * =========================================================================
  * Σ SIGMAOS: SOVEREIGN C++ OOP FRAMEWORK (SigmaOOP.hpp)
  * =========================================================================
  * USP Absorbed:
@@ -473,3 +482,4 @@ inline void* sigma_slab_alloc_raw(sigma_usize size) {
 }
 
 inline void sigma_slab_free_raw(void* ptr) { (void)ptr; }
+

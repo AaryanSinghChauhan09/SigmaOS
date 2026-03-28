@@ -1,3 +1,12 @@
+/*
+ * =========================================================================
+ * Σ SIGMAOS: SOVEREIGN ZENITH (v15.0 - ABSOLUTE FINALITY)
+ * =========================================================================
+ * Author: Sovereign-Zenith-Developer
+ * Principles: Zero-Library, Bit-Perfect, Silicon-Integrity, USP-Absorbed.
+ * =========================================================================
+ */
+
 // -----------------------------------------------------------------------------
 // SigmaOS IoT Sovereign Engine (v1.0) - C++ Native Smart Home Automation
 // Industry Leader Protocol: Deep-Silicon Device Mesh & Home Control.
@@ -138,3 +147,4 @@ int main() {
     iot.ValidateAndEngage("SIGMA_ZERO_TRUST_VALIDATED");
     return 0;
 }
+

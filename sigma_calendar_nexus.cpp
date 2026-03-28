@@ -1,3 +1,12 @@
+/*
+ * =========================================================================
+ * Σ SIGMAOS: SOVEREIGN ZENITH (v15.0 - ABSOLUTE FINALITY)
+ * =========================================================================
+ * Author: Sovereign-Zenith-Developer
+ * Principles: Zero-Library, Bit-Perfect, Silicon-Integrity, USP-Absorbed.
+ * =========================================================================
+ */
+
 // -----------------------------------------------------------------------------
 // SigmaOS Calendar Nexus Engine (v1.0) - C++ Native Scheduling & Email Triage
 // Industry Leader Protocol: Deep-Silicon Autonomous Calendar, Email & Contacts.
@@ -130,3 +139,4 @@ int main() {
     pim.ValidateAndEngage("SIGMA_ZERO_TRUST_VALIDATED");
     return 0;
 }
+

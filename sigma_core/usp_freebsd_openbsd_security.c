@@ -1,3 +1,12 @@
+/*
+ * =========================================================================
+ * Σ SIGMAOS: SOVEREIGN ZENITH (v15.0 - ABSOLUTE FINALITY)
+ * =========================================================================
+ * Author: Sovereign-Zenith-Developer
+ * Principles: Zero-Library, Bit-Perfect, Silicon-Integrity, USP-Absorbed.
+ * =========================================================================
+ */
+
 // =============================================================================
 // SigmaOS Sovereign USP: FreeBSD CAPSICUM + OpenBSD PLEDGE/UNVEIL
 // Written in C (pure SigmaLibC — no external deps)
@@ -123,3 +132,4 @@ void sigma_security_usp_demo(void) {
 
     sigma_write_raw("[SigmaOS] Security USP absorption COMPLETE. Zero OS can match this.\n");
 }
+

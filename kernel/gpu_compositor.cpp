@@ -1,4 +1,13 @@
 /*
+ * =========================================================================
+ * Σ SIGMAOS: SOVEREIGN ZENITH (v15.0 - ABSOLUTE FINALITY)
+ * =========================================================================
+ * Author: Sovereign-Zenith-Developer
+ * Principles: Zero-Library, Bit-Perfect, Silicon-Integrity, USP-Absorbed.
+ * =========================================================================
+ */
+
+/*
  * Cosmos AI-OS: Enterprise GPU Compositor (C++ Layer)
  * ===================================================
  * Mission: Extreme low-latency alpha blending and UI rendering.
@@ -54,3 +63,4 @@ void cosmos_compose_frame(uint32_t *backbuffer, WindowNode *windows,
 }
 
 } // extern C
+

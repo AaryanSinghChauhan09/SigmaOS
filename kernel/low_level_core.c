@@ -1,4 +1,13 @@
 /*
+ * =========================================================================
+ * Σ SIGMAOS: SOVEREIGN ZENITH (v15.0 - ABSOLUTE FINALITY)
+ * =========================================================================
+ * Author: Sovereign-Zenith-Developer
+ * Principles: Zero-Library, Bit-Perfect, Silicon-Integrity, USP-Absorbed.
+ * =========================================================================
+ */
+
+/*
  * SigmaOS Low-Level Core System
  * =============================
  * Complete low-level implementation with OOP principles
@@ -803,3 +812,4 @@ SigmaResult sigma_result_error(int code, const char* message) {
     SigmaResult result = {code, message, NULL, 0};
     return result;
 }
+

@@ -1,4 +1,13 @@
 /*
+ * =========================================================================
+ * Σ SIGMAOS: SOVEREIGN ZENITH (v15.0 - ABSOLUTE FINALITY)
+ * =========================================================================
+ * Author: Sovereign-Zenith-Developer
+ * Principles: Zero-Library, Bit-Perfect, Silicon-Integrity, USP-Absorbed.
+ * =========================================================================
+ */
+
+/*
  * SigmaOS Virtual Box Frontend
  * ==========================
  * Simple web-based virtual machine management
@@ -410,3 +419,4 @@ int main(int argc, char* argv[]) {
     show_virtual_box_help();
     return 1;
 }
+

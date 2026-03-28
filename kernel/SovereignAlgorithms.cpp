@@ -1,5 +1,14 @@
 /*
  * =========================================================================
+ * Σ SIGMAOS: SOVEREIGN ZENITH (v15.0 - ABSOLUTE FINALITY)
+ * =========================================================================
+ * Author: Sovereign-Zenith-Developer
+ * Principles: Zero-Library, Bit-Perfect, Silicon-Integrity, USP-Absorbed.
+ * =========================================================================
+ */
+
+/*
+ * =========================================================================
  * Σ SIGMAOS: SOVEREIGN ALGORITHM SHARD (SovereignAlgorithms.cpp)
  * =========================================================================
  * USP Absorbed: CUDA/MKL (Intel), TensorFlow (Google), PyTorch (Meta), 
@@ -110,3 +119,4 @@ extern "C" void sigma_algorithms_init() {
     sigma_printf("[KERNEL]: %s Online. CS/ML/DS Shards Loaded.\n", matrix.type_name());
     matrix.execute_demo();
 }
+

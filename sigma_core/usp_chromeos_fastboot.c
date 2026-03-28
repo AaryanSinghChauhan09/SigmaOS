@@ -1,3 +1,12 @@
+/*
+ * =========================================================================
+ * Σ SIGMAOS: SOVEREIGN ZENITH (v15.0 - ABSOLUTE FINALITY)
+ * =========================================================================
+ * Author: Sovereign-Zenith-Developer
+ * Principles: Zero-Library, Bit-Perfect, Silicon-Integrity, USP-Absorbed.
+ * =========================================================================
+ */
+
 /* =============================================================================
  * SigmaOS Sovereign USP: CHROME OS FAST BOOT (2-second stateless resumption)
  * Written in pure C (no stdlib, no libc — custom SigmaLibC only)
@@ -79,3 +88,4 @@ void _start(void) {
     sigma_chromeos_usp_main();
     sigma_exit(0);
 }
+

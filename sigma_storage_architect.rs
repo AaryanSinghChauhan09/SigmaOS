@@ -1,3 +1,12 @@
+/*
+ * =========================================================================
+ * Σ SIGMAOS: SOVEREIGN ZENITH (v15.0 - ABSOLUTE FINALITY)
+ * =========================================================================
+ * Author: Sovereign-Zenith-Developer
+ * Principles: Zero-Library, Bit-Perfect, Silicon-Integrity, USP-Absorbed.
+ * =========================================================================
+ */
+
 // -----------------------------------------------------------------------------
 // SigmaOS Storage Architect Engine (v1.0) - Rust Ring-3 Safe Execution
 // Industry Leader Protocol: Deep-Silicon Disk Optimisation & Space Automation.
@@ -132,3 +141,4 @@ fn main() {
 
     architect.validate_and_engage("SIGMA_ZERO_TRUST_VALIDATED", &profile);
 }
+

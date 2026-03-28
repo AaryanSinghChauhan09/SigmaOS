@@ -1,4 +1,13 @@
 /*
+ * =========================================================================
+ * Σ SIGMAOS: SOVEREIGN ZENITH (v15.0 - ABSOLUTE FINALITY)
+ * =========================================================================
+ * Author: Sovereign-Zenith-Developer
+ * Principles: Zero-Library, Bit-Perfect, Silicon-Integrity, USP-Absorbed.
+ * =========================================================================
+ */
+
+/*
  * Σ SIGMA OS: SOVEREIGN PERSONA & CUSTOMIZATION CORE (v10.0 - ZERO-LIBRARY)
  * =========================================================================
  * USP Absorbed: Garuda Linux (Out-of-the-Box Visuals), EndeavourOS (Workflow Customization).
@@ -57,3 +66,4 @@ void _start(void) {
     __asm__ volatile ("mov $60, %%rax\n xor %%rdi, %%rdi\n syscall\n" ::: "%rax", "%rdi");
 #endif
 }
+

@@ -1,3 +1,12 @@
+/*
+ * =========================================================================
+ * Σ SIGMAOS: SOVEREIGN ZENITH (v15.0 - ABSOLUTE FINALITY)
+ * =========================================================================
+ * Author: Sovereign-Zenith-Developer
+ * Principles: Zero-Library, Bit-Perfect, Silicon-Integrity, USP-Absorbed.
+ * =========================================================================
+ */
+
 ; -----------------------------------------------------------------------------
 ; SigmaOS Enterprise Paging Shard v1.0 (NASM 32-bit/64-bit)
 ; Inspiration: torvalds/linux/arch/x86/mm/init.c (Paging Setup)
@@ -45,3 +54,4 @@ sigma_init_paging:
     mov cr0, eax
 
     ret
+

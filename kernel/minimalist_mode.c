@@ -1,4 +1,13 @@
 /*
+ * =========================================================================
+ * Σ SIGMAOS: SOVEREIGN ZENITH (v15.0 - ABSOLUTE FINALITY)
+ * =========================================================================
+ * Author: Sovereign-Zenith-Developer
+ * Principles: Zero-Library, Bit-Perfect, Silicon-Integrity, USP-Absorbed.
+ * =========================================================================
+ */
+
+/*
  * SigmaOS Minimalist Mode
  * =======================
  * Ultra-lightweight mode for maximum performance and resource efficiency
@@ -769,3 +778,4 @@ void sigma_minimalist_destroy(MinimalistManager* manager) {
     free(manager);
     minimalist_manager = NULL;
 }
+

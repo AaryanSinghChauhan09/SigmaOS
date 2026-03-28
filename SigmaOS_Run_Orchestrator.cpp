@@ -1,3 +1,12 @@
+/*
+ * =========================================================================
+ * Σ SIGMAOS: SOVEREIGN ZENITH (v15.0 - ABSOLUTE FINALITY)
+ * =========================================================================
+ * Author: Sovereign-Zenith-Developer
+ * Principles: Zero-Library, Bit-Perfect, Silicon-Integrity, USP-Absorbed.
+ * =========================================================================
+ */
+
 #include "SigmaLibC.h"
 #include "kernel/SovereignVirtualizer.cpp"
 #include "kernel/SovereignContainer.cpp"
@@ -47,3 +56,4 @@ extern "C" void _start(void) {
     sigma_print("\n[SUCCESS]: Sovereign Orchestrator Apex. Host OS Sovereignty preserved.\n");
     sigma_exit(0);
 }
+

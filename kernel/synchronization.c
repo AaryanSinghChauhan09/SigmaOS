@@ -1,4 +1,13 @@
 /*
+ * =========================================================================
+ * Σ SIGMAOS: SOVEREIGN ZENITH (v15.0 - ABSOLUTE FINALITY)
+ * =========================================================================
+ * Author: Sovereign-Zenith-Developer
+ * Principles: Zero-Library, Bit-Perfect, Silicon-Integrity, USP-Absorbed.
+ * =========================================================================
+ */
+
+/*
  * SigmaOS Advanced Synchronization Primitives
  * ==========================================
  * Object-Oriented Synchronization with SOLID Principles
@@ -839,3 +848,4 @@ void sigma_sync_manager_destroy(SyncManager* manager) {
     
     free(manager);
 }
+

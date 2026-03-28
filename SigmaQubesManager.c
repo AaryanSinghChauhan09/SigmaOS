@@ -1,4 +1,13 @@
 /*
+ * =========================================================================
+ * Σ SIGMAOS: SOVEREIGN ZENITH (v15.0 - ABSOLUTE FINALITY)
+ * =========================================================================
+ * Author: Sovereign-Zenith-Developer
+ * Principles: Zero-Library, Bit-Perfect, Silicon-Integrity, USP-Absorbed.
+ * =========================================================================
+ */
+
+/*
  * Σ SIGMA OS: SOVEREIGN QUBES MANAGER (v8.0 - ZERO-LIBRARY PROCESS ISOLATION)
  * =========================================================================
  * USP Absorbed: Qubes OS (Xen-Virtualization Security), OpenBSD (Pledge).
@@ -81,3 +90,4 @@ void _start(void) {
     __asm__ volatile ("mov $60, %%rax\n xor %%rdi, %%rdi\n syscall\n" ::: "%rax", "%rdi");
 #endif
 }
+

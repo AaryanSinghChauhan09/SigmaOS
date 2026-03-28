@@ -1,4 +1,13 @@
 /*
+ * =========================================================================
+ * Σ SIGMAOS: SOVEREIGN ZENITH (v15.0 - ABSOLUTE FINALITY)
+ * =========================================================================
+ * Author: Sovereign-Zenith-Developer
+ * Principles: Zero-Library, Bit-Perfect, Silicon-Integrity, USP-Absorbed.
+ * =========================================================================
+ */
+
+/*
  * Σ SIGMA OS: ABSOLUTE ZENITH DIAGNOSTICS CORE (v15.0 - ZERO-LIB HEALER)
  * =========================================================================
  * USP Absorbed: MemTest86 (RAM Diagnostics), eBPF (Kernel Fault Tracing).
@@ -106,3 +115,4 @@ extern "C" void _start() {
     __asm__ volatile ("mov $60, %%rax\n xor %%rdi, %%rdi\n syscall\n" ::: "rax", "rdi");
 #endif
 }
+

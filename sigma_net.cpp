@@ -1,3 +1,12 @@
+/*
+ * =========================================================================
+ * Σ SIGMAOS: SOVEREIGN ZENITH (v15.0 - ABSOLUTE FINALITY)
+ * =========================================================================
+ * Author: Sovereign-Zenith-Developer
+ * Principles: Zero-Library, Bit-Perfect, Silicon-Integrity, USP-Absorbed.
+ * =========================================================================
+ */
+
 /**
  * SigmaOS Enterprise Net Shards v2.0 (Native C++ Low-Level Zenith)
  * Replaces C# Net Shards to Achieve Absolute Low-Level Mesh Performance.
@@ -46,3 +55,4 @@ int main() {
     std::cout << "[NET_CPP]: Net Zenith OPERATIONAL." << std::endl;
     return 0;
 }
+

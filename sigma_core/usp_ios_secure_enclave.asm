@@ -1,3 +1,12 @@
+/*
+ * =========================================================================
+ * Σ SIGMAOS: SOVEREIGN ZENITH (v15.0 - ABSOLUTE FINALITY)
+ * =========================================================================
+ * Author: Sovereign-Zenith-Developer
+ * Principles: Zero-Library, Bit-Perfect, Silicon-Integrity, USP-Absorbed.
+ * =========================================================================
+ */
+
 ; =============================================================================
 ; SigmaOS Sovereign USP: APPLE iOS SECURE ENCLAVE CLONE
 ; Written in x86-64 NASM Assembly (Platform: SigmaOS bare-metal ring-0)
@@ -78,3 +87,4 @@ _sigma_vault_lock:
 
     pop     rbp
     ret
+

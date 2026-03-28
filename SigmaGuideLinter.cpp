@@ -1,5 +1,14 @@
 /*
  * =========================================================================
+ * Σ SIGMAOS: SOVEREIGN ZENITH (v15.0 - ABSOLUTE FINALITY)
+ * =========================================================================
+ * Author: Sovereign-Zenith-Developer
+ * Principles: Zero-Library, Bit-Perfect, Silicon-Integrity, USP-Absorbed.
+ * =========================================================================
+ */
+
+/*
+ * =========================================================================
  * Σ SIGMAOS: SOVEREIGN GUIDE LINTER (v6.0 - NO-DEP EDITION)
  * =========================================================================
  * Mission: Refactor fix_guide_lints.js into a native C++ utility.
@@ -163,3 +172,4 @@ int main() {
 
     return 0;
 }
+

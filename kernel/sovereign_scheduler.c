@@ -1,4 +1,13 @@
 /*
+ * =========================================================================
+ * Σ SIGMAOS: SOVEREIGN ZENITH (v15.0 - ABSOLUTE FINALITY)
+ * =========================================================================
+ * Author: Sovereign-Zenith-Developer
+ * Principles: Zero-Library, Bit-Perfect, Silicon-Integrity, USP-Absorbed.
+ * =========================================================================
+ */
+
+/*
  * SigmaOS: Enterprise Predictive AI Scheduler (C Layer)
  * =====================================================
  * Mission: High-speed, ML-informed, preemptive CPU thread management.
@@ -407,3 +416,4 @@ uint32_t sigma_get_predicted_burst(uint32_t pid) {
     }
     return 0;
 }
+

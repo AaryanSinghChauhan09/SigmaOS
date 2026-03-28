@@ -1,3 +1,12 @@
+/*
+ * =========================================================================
+ * Σ SIGMAOS: SOVEREIGN ZENITH (v15.0 - ABSOLUTE FINALITY)
+ * =========================================================================
+ * Author: Sovereign-Zenith-Developer
+ * Principles: Zero-Library, Bit-Perfect, Silicon-Integrity, USP-Absorbed.
+ * =========================================================================
+ */
+
 // SigmaOS Native Linux Absorber (OOP Design)
 // ============================================
 // Zero dependency. Replaces external OS distros natively.
@@ -92,3 +101,4 @@ public:
 } // namespace Sigma
 
 #endif // SIGMA_LINUX_ABSORBER_HPP
+

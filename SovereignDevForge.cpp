@@ -1,5 +1,14 @@
 /*
  * =========================================================================
+ * Σ SIGMAOS: SOVEREIGN ZENITH (v15.0 - ABSOLUTE FINALITY)
+ * =========================================================================
+ * Author: Sovereign-Zenith-Developer
+ * Principles: Zero-Library, Bit-Perfect, Silicon-Integrity, USP-Absorbed.
+ * =========================================================================
+ */
+
+/*
+ * =========================================================================
  * Σ SIGMAOS: SOVEREIGN DEV FORGE (v11.0 - THE IDE SHARD)
  * =========================================================================
  * Mission: Neutralize external IDEs (VSCode/Neovim).
@@ -70,3 +79,4 @@ int main() {
     start_devforge_demo();
     return 0;
 }
+

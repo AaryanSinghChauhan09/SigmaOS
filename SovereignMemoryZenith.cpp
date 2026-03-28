@@ -1,5 +1,14 @@
 /*
  * =========================================================================
+ * Σ SIGMAOS: SOVEREIGN ZENITH (v15.0 - ABSOLUTE FINALITY)
+ * =========================================================================
+ * Author: Sovereign-Zenith-Developer
+ * Principles: Zero-Library, Bit-Perfect, Silicon-Integrity, USP-Absorbed.
+ * =========================================================================
+ */
+
+/*
+ * =========================================================================
  * Σ SIGMAOS: SOVEREIGN MEMORY ZENITH (v10.0 - ZERO-DEPENDENCY)
  * =========================================================================
  * Mission: Absolute Memory Sovereignty via Direct Hardware Control.
@@ -93,3 +102,4 @@ int main() {
     start_memory_zenith();
     return 0;
 }
+

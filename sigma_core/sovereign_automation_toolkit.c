@@ -1,3 +1,12 @@
+/*
+ * =========================================================================
+ * Σ SIGMAOS: SOVEREIGN ZENITH (v15.0 - ABSOLUTE FINALITY)
+ * =========================================================================
+ * Author: Sovereign-Zenith-Developer
+ * Principles: Zero-Library, Bit-Perfect, Silicon-Integrity, USP-Absorbed.
+ * =========================================================================
+ */
+
 // =============================================================================
 // SigmaOS Sovereign Automation Toolkit (SAT)
 // Low-level Machine Learning & Graph Plotting Engine — Zero dependency
@@ -77,3 +86,4 @@ void _start(int argc, char* argv[]) {
 
     sigma_exit(0);
 }
+

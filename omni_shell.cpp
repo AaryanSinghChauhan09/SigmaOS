@@ -1,3 +1,12 @@
+/*
+ * =========================================================================
+ * Σ SIGMAOS: SOVEREIGN ZENITH (v15.0 - ABSOLUTE FINALITY)
+ * =========================================================================
+ * Author: Sovereign-Zenith-Developer
+ * Principles: Zero-Library, Bit-Perfect, Silicon-Integrity, USP-Absorbed.
+ * =========================================================================
+ */
+
 // -----------------------------------------------------------------------------
 // SigmaOS Omni-Object Shell (OOS) - C++ Core
 // Architecture Model: PowerShell Object Pipelines & Fish Autocomplete.
@@ -70,3 +79,4 @@ int main() {
 
     return 0;
 }
+

@@ -1,4 +1,13 @@
 /*
+ * =========================================================================
+ * Σ SIGMAOS: SOVEREIGN ZENITH (v15.0 - ABSOLUTE FINALITY)
+ * =========================================================================
+ * Author: Sovereign-Zenith-Developer
+ * Principles: Zero-Library, Bit-Perfect, Silicon-Integrity, USP-Absorbed.
+ * =========================================================================
+ */
+
+/*
  * SigmaOS Advanced Algorithms
  * ===========================
  * High-performance algorithms for critical OS operations
@@ -793,3 +802,4 @@ void sigma_skip_list_destroy(SkipList* list) {
         free(list);
     }
 }
+

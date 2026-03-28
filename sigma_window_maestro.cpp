@@ -1,3 +1,12 @@
+/*
+ * =========================================================================
+ * Σ SIGMAOS: SOVEREIGN ZENITH (v15.0 - ABSOLUTE FINALITY)
+ * =========================================================================
+ * Author: Sovereign-Zenith-Developer
+ * Principles: Zero-Library, Bit-Perfect, Silicon-Integrity, USP-Absorbed.
+ * =========================================================================
+ */
+
 // -----------------------------------------------------------------------------
 // SigmaOS Window Maestro Engine (v1.0) - C++ Native Window Management
 // Industry Leader Protocol: Deep-Silicon Autonomous Tiling & Workspace Orchestration.
@@ -106,3 +115,4 @@ int main() {
     maestro.ValidateAndEngage("SIGMA_ZERO_TRUST_VALIDATED");
     return 0;
 }
+

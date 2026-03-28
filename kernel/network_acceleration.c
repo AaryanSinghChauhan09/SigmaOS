@@ -1,4 +1,13 @@
 /*
+ * =========================================================================
+ * Σ SIGMAOS: SOVEREIGN ZENITH (v15.0 - ABSOLUTE FINALITY)
+ * =========================================================================
+ * Author: Sovereign-Zenith-Developer
+ * Principles: Zero-Library, Bit-Perfect, Silicon-Integrity, USP-Absorbed.
+ * =========================================================================
+ */
+
+/*
  * SigmaOS Network Acceleration
  * ============================
  * Ultra-high-performance networking with hardware acceleration
@@ -758,3 +767,4 @@ void sigma_network_accelerator_destroy(NetworkAccelerator* accelerator) {
     
     free(accelerator);
 }
+

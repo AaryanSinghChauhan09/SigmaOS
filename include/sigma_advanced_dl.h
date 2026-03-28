@@ -1,4 +1,13 @@
 /*
+ * =========================================================================
+ * Σ SIGMAOS: SOVEREIGN ZENITH (v15.0 - ABSOLUTE FINALITY)
+ * =========================================================================
+ * Author: Sovereign-Zenith-Developer
+ * Principles: Zero-Library, Bit-Perfect, Silicon-Integrity, USP-Absorbed.
+ * =========================================================================
+ */
+
+/*
  * SigmaOS Advanced Deep Learning Architectures
  * ==============================================
  * State-of-the-art deep learning models:
@@ -610,3 +619,4 @@ SigmaMatrix* sigma_extract_features(void* model, SigmaMatrix* images,
                                    const char* layer_name);
 
 #endif // SIGMA_ADVANCED_DL_H
+

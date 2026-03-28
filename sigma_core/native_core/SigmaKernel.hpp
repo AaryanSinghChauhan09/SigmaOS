@@ -1,3 +1,12 @@
+/*
+ * =========================================================================
+ * Σ SIGMAOS: SOVEREIGN ZENITH (v15.0 - ABSOLUTE FINALITY)
+ * =========================================================================
+ * Author: Sovereign-Zenith-Developer
+ * Principles: Zero-Library, Bit-Perfect, Silicon-Integrity, USP-Absorbed.
+ * =========================================================================
+ */
+
 // SigmaOS Native Kernel Main (Pure C++ OOP)
 // ==========================================
 // 100% Zero-Dependency. No <iostream>, no <vector>, no <memory>.
@@ -145,3 +154,4 @@ public:
 } // namespace Sigma
 
 #endif // SIGMA_KERNEL_HPP
+

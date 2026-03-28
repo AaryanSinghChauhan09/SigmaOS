@@ -1,5 +1,14 @@
 /*
  * =========================================================================
+ * Σ SIGMAOS: SOVEREIGN ZENITH (v15.0 - ABSOLUTE FINALITY)
+ * =========================================================================
+ * Author: Sovereign-Zenith-Developer
+ * Principles: Zero-Library, Bit-Perfect, Silicon-Integrity, USP-Absorbed.
+ * =========================================================================
+ */
+
+/*
+ * =========================================================================
  * Σ SIGMAOS: SOVEREIGN SECURITY CORE (SovereignSecurity.cpp)
  * =========================================================================
  * USP Absorbed: Zircon Caps (Fuchsia), OpenBSD (Pledge/Unveil), Kyber PQC.
@@ -79,3 +88,4 @@ extern "C" void sigma_security_init() {
 }
 
 #endif
+

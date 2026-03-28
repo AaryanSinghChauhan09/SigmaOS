@@ -1,5 +1,14 @@
 /*
  * =========================================================================
+ * Σ SIGMAOS: SOVEREIGN ZENITH (v15.0 - ABSOLUTE FINALITY)
+ * =========================================================================
+ * Author: Sovereign-Zenith-Developer
+ * Principles: Zero-Library, Bit-Perfect, Silicon-Integrity, USP-Absorbed.
+ * =========================================================================
+ */
+
+/*
+ * =========================================================================
  * Σ SIGMAOS: AETHER ORCHESTRATOR ZENITH (v14.0 - THE AUTOMATOR)
  * =========================================================================
  * Mission: Neutralize all automation frameworks (Zapier, n8n, Selenium).
@@ -76,3 +85,4 @@ int main() {
     start_aether_zenith();
     return 0;
 }
+

@@ -1,4 +1,13 @@
 /*
+ * =========================================================================
+ * Σ SIGMAOS: SOVEREIGN ZENITH (v15.0 - ABSOLUTE FINALITY)
+ * =========================================================================
+ * Author: Sovereign-Zenith-Developer
+ * Principles: Zero-Library, Bit-Perfect, Silicon-Integrity, USP-Absorbed.
+ * =========================================================================
+ */
+
+/*
  * Cosmos AI-OS: Enterprise NIC Enforcer (C Layer)
  * ===============================================
  * Mission: Absolute Network Isolation. Speed and Security.
@@ -76,3 +85,4 @@ void cosmos_nic_configure(int strict_mode) {
     // Halt all unsolicited inbound ICMP
   }
 }
+

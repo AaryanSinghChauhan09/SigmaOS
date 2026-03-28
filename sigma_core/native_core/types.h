@@ -1,3 +1,12 @@
+/*
+ * =========================================================================
+ * Σ SIGMAOS: SOVEREIGN ZENITH (v15.0 - ABSOLUTE FINALITY)
+ * =========================================================================
+ * Author: Sovereign-Zenith-Developer
+ * Principles: Zero-Library, Bit-Perfect, Silicon-Integrity, USP-Absorbed.
+ * =========================================================================
+ */
+
 // SigmaOS Native Type Definitions
 // ==========================================
 // Replaces standard <stdint.h> and <stddef.h>
@@ -39,3 +48,4 @@ typedef i64 ssize_t;
 #endif
 
 #endif // SIGMA_TYPES_H
+

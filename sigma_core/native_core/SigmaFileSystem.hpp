@@ -1,3 +1,12 @@
+/*
+ * =========================================================================
+ * Σ SIGMAOS: SOVEREIGN ZENITH (v15.0 - ABSOLUTE FINALITY)
+ * =========================================================================
+ * Author: Sovereign-Zenith-Developer
+ * Principles: Zero-Library, Bit-Perfect, Silicon-Integrity, USP-Absorbed.
+ * =========================================================================
+ */
+
 // SigmaOS Native File System (OOP Design)
 // ===========================================
 // Zero dependency. Replaces <stdio.h>, <fstream>, <windows.h> file I/O.
@@ -108,3 +117,4 @@ public:
 } // namespace Sigma
 
 #endif // SIGMA_FILESYSTEM_HPP
+

@@ -1,5 +1,14 @@
 /*
  * =========================================================================
+ * Σ SIGMAOS: SOVEREIGN ZENITH (v15.0 - ABSOLUTE FINALITY)
+ * =========================================================================
+ * Author: Sovereign-Zenith-Developer
+ * Principles: Zero-Library, Bit-Perfect, Silicon-Integrity, USP-Absorbed.
+ * =========================================================================
+ */
+
+/*
+ * =========================================================================
  * Σ SIGMAOS: SOVEREIGN AGENTIC SCRIPTING ENGINE (SovereignAgent.cpp)
  * =========================================================================
  * USP Absorbed: Python (Flexibility), Lua (Speed), Bash (Automation)
@@ -100,3 +109,4 @@ extern "C" void sigma_automation_init() {
     daemon.register_agent(boot_guard);
     daemon.cycle();
 }
+

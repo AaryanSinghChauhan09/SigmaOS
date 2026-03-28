@@ -1,4 +1,13 @@
 /*
+ * =========================================================================
+ * Σ SIGMAOS: SOVEREIGN ZENITH (v15.0 - ABSOLUTE FINALITY)
+ * =========================================================================
+ * Author: Sovereign-Zenith-Developer
+ * Principles: Zero-Library, Bit-Perfect, Silicon-Integrity, USP-Absorbed.
+ * =========================================================================
+ */
+
+/*
  * SigmaOS Advanced Error Handling System
  * ====================================
  * Comprehensive error handling with automation and recovery
@@ -765,3 +774,4 @@ void sigma_cleanup_error_handling(void) {
 SigmaErrorHandler* sigma_get_error_handler(void) {
     return global_error_handler;
 }
+

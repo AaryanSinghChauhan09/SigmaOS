@@ -1,3 +1,12 @@
+/*
+ * =========================================================================
+ * Σ SIGMAOS: SOVEREIGN ZENITH (v15.0 - ABSOLUTE FINALITY)
+ * =========================================================================
+ * Author: Sovereign-Zenith-Developer
+ * Principles: Zero-Library, Bit-Perfect, Silicon-Integrity, USP-Absorbed.
+ * =========================================================================
+ */
+
 // SigmaOS Native Process & Execution Engine (OOP Design)
 // =======================================================
 // Zero dependency. Replaces <unistd.h> execve, fork, waitpid.
@@ -94,3 +103,4 @@ public:
 } // namespace Sigma
 
 #endif // SIGMA_PROCESS_HPP
+

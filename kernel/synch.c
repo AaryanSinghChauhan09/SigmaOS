@@ -1,4 +1,13 @@
 /*
+ * =========================================================================
+ * Σ SIGMAOS: SOVEREIGN ZENITH (v15.0 - ABSOLUTE FINALITY)
+ * =========================================================================
+ * Author: Sovereign-Zenith-Developer
+ * Principles: Zero-Library, Bit-Perfect, Silicon-Integrity, USP-Absorbed.
+ * =========================================================================
+ */
+
+/*
  * Cosmos AI-OS: Symmetric Multiprocessing Sync (C / Inline ASM Layer)
  * ====================================================================
  * Mission: True Hardware-Level Atomic Locks.
@@ -50,3 +59,4 @@ void cosmos_spin_unlock(spinlock_t *lock) {
   __asm__ volatile("sfence" ::: "memory");
   lock->lock_state = 0;
 }
+

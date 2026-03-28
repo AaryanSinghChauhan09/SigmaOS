@@ -1,3 +1,12 @@
+/*
+ * =========================================================================
+ * Σ SIGMAOS: SOVEREIGN ZENITH (v15.0 - ABSOLUTE FINALITY)
+ * =========================================================================
+ * Author: Sovereign-Zenith-Developer
+ * Principles: Zero-Library, Bit-Perfect, Silicon-Integrity, USP-Absorbed.
+ * =========================================================================
+ */
+
 // -----------------------------------------------------------------------------
 // SigmaOS Thermal Intelligence Engine (v1.0) - Rust Ring-3 Safe Execution
 // Industry Leader Protocol: Deep-Silicon Autonomous Power & Performance Tuning.
@@ -74,3 +83,4 @@ fn main() {
     let thermal_engine = SigmaThermalIntelligence::new(75); // Balanced-Perf
     thermal_engine.validate_and_engage("SIGMA_ZERO_TRUST_VALIDATED");
 }
+

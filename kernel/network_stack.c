@@ -1,4 +1,13 @@
 /*
+ * =========================================================================
+ * Σ SIGMAOS: SOVEREIGN ZENITH (v15.0 - ABSOLUTE FINALITY)
+ * =========================================================================
+ * Author: Sovereign-Zenith-Developer
+ * Principles: Zero-Library, Bit-Perfect, Silicon-Integrity, USP-Absorbed.
+ * =========================================================================
+ */
+
+/*
  * SigmaOS Network Stack (Native Core)
  * ===================================
  * Complete TCP/IP network implementation
@@ -583,3 +592,4 @@ void sigma_net_get_stats(net_stats_t *stats) {
     // This would track actual network statistics
     memset(stats, 0, sizeof(net_stats_t));
 }
+

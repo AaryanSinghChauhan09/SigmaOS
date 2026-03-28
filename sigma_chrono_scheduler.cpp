@@ -1,3 +1,12 @@
+/*
+ * =========================================================================
+ * Σ SIGMAOS: SOVEREIGN ZENITH (v15.0 - ABSOLUTE FINALITY)
+ * =========================================================================
+ * Author: Sovereign-Zenith-Developer
+ * Principles: Zero-Library, Bit-Perfect, Silicon-Integrity, USP-Absorbed.
+ * =========================================================================
+ */
+
 // -----------------------------------------------------------------------------
 // SigmaOS Chrono Scheduler Engine (v1.0) - C++ Native Task Scheduling
 // Industry Leader Protocol: Deep-Silicon Autonomous Cron & Time-Based Automation.
@@ -101,3 +110,4 @@ int main() {
     scheduler.ValidateAndEngage("SIGMA_ZERO_TRUST_VALIDATED");
     return 0;
 }
+

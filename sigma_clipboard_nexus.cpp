@@ -1,3 +1,12 @@
+/*
+ * =========================================================================
+ * Σ SIGMAOS: SOVEREIGN ZENITH (v15.0 - ABSOLUTE FINALITY)
+ * =========================================================================
+ * Author: Sovereign-Zenith-Developer
+ * Principles: Zero-Library, Bit-Perfect, Silicon-Integrity, USP-Absorbed.
+ * =========================================================================
+ */
+
 // -----------------------------------------------------------------------------
 // SigmaOS Clipboard Nexus Engine (v1.0) - C++ Native Clipboard Intelligence
 // Industry Leader Protocol: Deep-Silicon Persistent Clipboard & Cross-Device Sync.
@@ -79,3 +88,4 @@ int main() {
     nexus.ValidateAndEngage("SIGMA_ZERO_TRUST_VALIDATED");
     return 0;
 }
+

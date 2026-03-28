@@ -1,4 +1,13 @@
 /*
+ * =========================================================================
+ * Σ SIGMAOS: SOVEREIGN ZENITH (v15.0 - ABSOLUTE FINALITY)
+ * =========================================================================
+ * Author: Sovereign-Zenith-Developer
+ * Principles: Zero-Library, Bit-Perfect, Silicon-Integrity, USP-Absorbed.
+ * =========================================================================
+ */
+
+/*
  * SigmaOS System Administration Commands
  * =======================================
  * Extended system administration commands:
@@ -1096,3 +1105,4 @@ int sigma_aureport_u(void);
 int sigma_aureport_x(void);
 
 #endif // SIGMA_SYSADMIN_COMMANDS_H
+

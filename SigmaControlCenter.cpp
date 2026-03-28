@@ -1,5 +1,14 @@
 /*
  * =========================================================================
+ * Σ SIGMAOS: SOVEREIGN ZENITH (v15.0 - ABSOLUTE FINALITY)
+ * =========================================================================
+ * Author: Sovereign-Zenith-Developer
+ * Principles: Zero-Library, Bit-Perfect, Silicon-Integrity, USP-Absorbed.
+ * =========================================================================
+ */
+
+/*
+ * =========================================================================
  * Σ SIGMAOS: SOVEREIGN CONTROL CENTER (v6.0 - NATIVE C++ UI ENGINE)
  * =========================================================================
  * Mission: Refactor the HTML Control Center into a native C++ logic shard.
@@ -46,3 +55,4 @@ int main() {
 
     return 0;
 }
+

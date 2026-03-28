@@ -1,5 +1,14 @@
 /*
  * =========================================================================
+ * Σ SIGMAOS: SOVEREIGN ZENITH (v15.0 - ABSOLUTE FINALITY)
+ * =========================================================================
+ * Author: Sovereign-Zenith-Developer
+ * Principles: Zero-Library, Bit-Perfect, Silicon-Integrity, USP-Absorbed.
+ * =========================================================================
+ */
+
+/*
+ * =========================================================================
  * Σ SIGMAOS: SOVEREIGN HARDWARE ABSTRACTION LAYER (sigma_hal.c)
  * =========================================================================
  * USP Absorbed: Linux (Arch-specific bits), FreeBSD (HAL/PM), seL4 (Arch-HAL)
@@ -76,3 +85,4 @@ void sigma_hal_probe_features() {
 void sigma_hal_init() {
     sigma_hal_probe_features();
 }
+

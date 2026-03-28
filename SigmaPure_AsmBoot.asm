@@ -1,3 +1,12 @@
+/*
+ * =========================================================================
+ * Σ SIGMAOS: SOVEREIGN ZENITH (v15.0 - ABSOLUTE FINALITY)
+ * =========================================================================
+ * Author: Sovereign-Zenith-Developer
+ * Principles: Zero-Library, Bit-Perfect, Silicon-Integrity, USP-Absorbed.
+ * =========================================================================
+ */
+
 ; Σ SIGMA OS: ABSOLUTE ASM KERNEL SHARD (v5.0 - LFS BARE-METAL)
 ; ==============================================================
 ; USP Absorbed: Linux From Scratch (LFS), xv6, Coreboot (Bare Init).
@@ -38,3 +47,4 @@ _start:
     mov rax, 60         ; Syscall: sys_exit
     xor rdi, rdi        ; Return code: 0 (clearing register manually)
     syscall             ; Terminating Process cleanly
+

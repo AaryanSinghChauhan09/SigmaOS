@@ -1,3 +1,12 @@
+/*
+ * =========================================================================
+ * Σ SIGMAOS: SOVEREIGN ZENITH (v15.0 - ABSOLUTE FINALITY)
+ * =========================================================================
+ * Author: Sovereign-Zenith-Developer
+ * Principles: Zero-Library, Bit-Perfect, Silicon-Integrity, USP-Absorbed.
+ * =========================================================================
+ */
+
 ; -----------------------------------------------------------------------------
 ; SigmaOS Titan Capture (v2.0)
 ; Pure x86_64 NASM Assembly.
@@ -34,3 +43,4 @@ _start:
     mov eax, 1
     xor ebx, ebx
     int 0x80
+

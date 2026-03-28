@@ -1,4 +1,13 @@
 /*
+ * =========================================================================
+ * Σ SIGMAOS: SOVEREIGN ZENITH (v15.0 - ABSOLUTE FINALITY)
+ * =========================================================================
+ * Author: Sovereign-Zenith-Developer
+ * Principles: Zero-Library, Bit-Perfect, Silicon-Integrity, USP-Absorbed.
+ * =========================================================================
+ */
+
+/*
  * Σ SIGMA OS: NATIVE HEALTH CHECK (SigmaHealth_Native.cpp)
  * ======================================================
  * USP: Bare-Metal Diagnostic Engine (Zero-Python).
@@ -62,3 +71,4 @@ extern "C" void _start(void) {
     checker.RunAll();
     sigma_exit(0);
 }
+

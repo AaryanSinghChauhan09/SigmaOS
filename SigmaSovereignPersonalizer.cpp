@@ -1,5 +1,14 @@
 /*
  * =========================================================================
+ * Σ SIGMAOS: SOVEREIGN ZENITH (v15.0 - ABSOLUTE FINALITY)
+ * =========================================================================
+ * Author: Sovereign-Zenith-Developer
+ * Principles: Zero-Library, Bit-Perfect, Silicon-Integrity, USP-Absorbed.
+ * =========================================================================
+ */
+
+/*
+ * =========================================================================
  * Σ SIGMAOS: SOVEREIGN PERSONALIZER (v6.0 - NO-DEP EDITION)
  * =========================================================================
  * Mission: Refactor NativePersonalizer.ps1 into a native C++ utility.
@@ -43,3 +52,4 @@ int main(int argc, char** argv) {
 
     return 0;
 }
+

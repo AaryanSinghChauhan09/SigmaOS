@@ -1,3 +1,12 @@
+/*
+ * =========================================================================
+ * Σ SIGMAOS: SOVEREIGN ZENITH (v15.0 - ABSOLUTE FINALITY)
+ * =========================================================================
+ * Author: Sovereign-Zenith-Developer
+ * Principles: Zero-Library, Bit-Perfect, Silicon-Integrity, USP-Absorbed.
+ * =========================================================================
+ */
+
 ; =========================================================================
 ; SigmaOS Enterprise x86_64 Long-Mode Setup & GDT Initialization
 ; =========================================================================
@@ -142,3 +151,4 @@ long_mode_start:
     cli
     hlt
     jmp .halt
+

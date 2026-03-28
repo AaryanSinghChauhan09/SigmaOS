@@ -1,3 +1,12 @@
+/*
+ * =========================================================================
+ * Σ SIGMAOS: SOVEREIGN ZENITH (v15.0 - ABSOLUTE FINALITY)
+ * =========================================================================
+ * Author: Sovereign-Zenith-Developer
+ * Principles: Zero-Library, Bit-Perfect, Silicon-Integrity, USP-Absorbed.
+ * =========================================================================
+ */
+
 #ifndef SOVEREIGN_IPC_HPP
 #define SOVEREIGN_IPC_HPP
 
@@ -89,3 +98,4 @@ inline void RunUSPAbsorptionDemo() {
 } // namespace SigmaOS
 
 #endif
+

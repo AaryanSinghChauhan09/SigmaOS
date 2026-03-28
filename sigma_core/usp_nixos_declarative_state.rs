@@ -1,3 +1,12 @@
+/*
+ * =========================================================================
+ * Σ SIGMAOS: SOVEREIGN ZENITH (v15.0 - ABSOLUTE FINALITY)
+ * =========================================================================
+ * Author: Sovereign-Zenith-Developer
+ * Principles: Zero-Library, Bit-Perfect, Silicon-Integrity, USP-Absorbed.
+ * =========================================================================
+ */
+
 // =============================================================================
 // SigmaOS Sovereign USP: NixOS DECLARATIVE SYSTEM STATE
 // Written in Rust (zero external crates — pure core/alloc only)
@@ -136,3 +145,4 @@ pub extern "C" fn sigma_nixos_usp_demo() {
 fn sigma_panic(_info: &core::panic::PanicInfo) -> ! {
     loop {}
 }
+

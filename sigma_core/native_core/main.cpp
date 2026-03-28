@@ -1,3 +1,12 @@
+/*
+ * =========================================================================
+ * Σ SIGMAOS: SOVEREIGN ZENITH (v15.0 - ABSOLUTE FINALITY)
+ * =========================================================================
+ * Author: Sovereign-Zenith-Developer
+ * Principles: Zero-Library, Bit-Perfect, Silicon-Integrity, USP-Absorbed.
+ * =========================================================================
+ */
+
 // SigmaOS Native Main Entry Point (C++ / Assembly Bootloader)
 // ==========================================================
 // Bypasses python.exe startup natively. Links statically with zero external libs.
@@ -78,3 +87,4 @@ extern "C" {
 #endif
 
 } // extern "C"
+

@@ -1,3 +1,12 @@
+/*
+ * =========================================================================
+ * Σ SIGMAOS: SOVEREIGN ZENITH (v15.0 - ABSOLUTE FINALITY)
+ * =========================================================================
+ * Author: Sovereign-Zenith-Developer
+ * Principles: Zero-Library, Bit-Perfect, Silicon-Integrity, USP-Absorbed.
+ * =========================================================================
+ */
+
 #include <stdint.h>
 #include <stdio.h>
 
@@ -23,3 +32,4 @@ void sigma_execute_sbpf(uint8_t* shard_data) {
     printf("[SBPF]: Executing Instrumented Shard Logic via Native SBPF JIT...\n");
     // In a real impl, this would JIT the bytecode for AVX/x64
 }
+

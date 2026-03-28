@@ -1,4 +1,13 @@
 /*
+ * =========================================================================
+ * Σ SIGMAOS: SOVEREIGN ZENITH (v15.0 - ABSOLUTE FINALITY)
+ * =========================================================================
+ * Author: Sovereign-Zenith-Developer
+ * Principles: Zero-Library, Bit-Perfect, Silicon-Integrity, USP-Absorbed.
+ * =========================================================================
+ */
+
+/*
  * SigmaOS Network Commands Library
  * ================================
  * Comprehensive network management and diagnostics:
@@ -1044,3 +1053,4 @@ int sigma_wpa_supplicant_r(const char* var, const char* value);
 int sigma_wpa_supplicant_R(const char* reference_file);
 int sigma_wpa_supplicant_s(const char* set)
 ;
+

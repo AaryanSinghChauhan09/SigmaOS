@@ -1,3 +1,12 @@
+/*
+ * =========================================================================
+ * Σ SIGMAOS: SOVEREIGN ZENITH (v15.0 - ABSOLUTE FINALITY)
+ * =========================================================================
+ * Author: Sovereign-Zenith-Developer
+ * Principles: Zero-Library, Bit-Perfect, Silicon-Integrity, USP-Absorbed.
+ * =========================================================================
+ */
+
 /**
  * SigmaOS Enterprise Engine v2.0 (Native C++ Low-Level Zenith)
  * Replaces C# Engine to Achieve Absolute Low-Level Performance.
@@ -60,3 +69,4 @@ int main() {
     std::cout << "[ENGINE_CPP]: Engine Zenith SUCCESS." << std::endl;
     return 0;
 }
+

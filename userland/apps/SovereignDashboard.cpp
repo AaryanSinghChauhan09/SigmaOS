@@ -1,3 +1,12 @@
+/*
+ * =========================================================================
+ * Σ SIGMAOS: SOVEREIGN ZENITH (v15.0 - ABSOLUTE FINALITY)
+ * =========================================================================
+ * Author: Sovereign-Zenith-Developer
+ * Principles: Zero-Library, Bit-Perfect, Silicon-Integrity, USP-Absorbed.
+ * =========================================================================
+ */
+
 #include "SovereignDashboard.hpp"
 #include <iostream>
 #include <string>
@@ -42,3 +51,4 @@ int main() {
     std::cout << "[DASHBOARD]: Hibernating UI Shard..." << std::endl;
     return 0;
 }
+

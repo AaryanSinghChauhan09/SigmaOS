@@ -1,4 +1,13 @@
 /*
+ * =========================================================================
+ * Σ SIGMAOS: SOVEREIGN ZENITH (v15.0 - ABSOLUTE FINALITY)
+ * =========================================================================
+ * Author: Sovereign-Zenith-Developer
+ * Principles: Zero-Library, Bit-Perfect, Silicon-Integrity, USP-Absorbed.
+ * =========================================================================
+ */
+
+/*
  * SigmaOS Universal OS Migration System
  * ====================================
  * Revolutionary migration system for seamless transition from Windows, macOS, Linux
@@ -591,3 +600,4 @@ void sigma_migration_manager_cleanup(void) {
     free(g_migration_manager);
     g_migration_manager = NULL;
 }
+

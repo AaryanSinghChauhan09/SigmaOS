@@ -1,4 +1,13 @@
 /*
+ * =========================================================================
+ * Σ SIGMAOS: SOVEREIGN ZENITH (v15.0 - ABSOLUTE FINALITY)
+ * =========================================================================
+ * Author: Sovereign-Zenith-Developer
+ * Principles: Zero-Library, Bit-Perfect, Silicon-Integrity, USP-Absorbed.
+ * =========================================================================
+ */
+
+/*
  * SigmaOS Advanced I/O Management System
  * =====================================
  * Object-Oriented I/O with SOLID Principles and Linux Compatibility
@@ -799,3 +808,4 @@ void sigma_io_manager_destroy(IOManager* manager) {
     
     free(manager);
 }
+

@@ -1,3 +1,12 @@
+/*
+ * =========================================================================
+ * Σ SIGMAOS: SOVEREIGN ZENITH (v15.0 - ABSOLUTE FINALITY)
+ * =========================================================================
+ * Author: Sovereign-Zenith-Developer
+ * Principles: Zero-Library, Bit-Perfect, Silicon-Integrity, USP-Absorbed.
+ * =========================================================================
+ */
+
 #include <iostream>
 #include <vector>
 #include <memory>
@@ -113,3 +122,4 @@ int main() {
     std::cout << "\n[SUCCESS]: Competitive 'Small & Big' Experiment Cluster Synthesized." << std::endl;
     return 0;
 }
+

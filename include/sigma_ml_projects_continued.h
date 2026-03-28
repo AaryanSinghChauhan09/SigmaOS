@@ -1,3 +1,12 @@
+/*
+ * =========================================================================
+ * Σ SIGMAOS: SOVEREIGN ZENITH (v15.0 - ABSOLUTE FINALITY)
+ * =========================================================================
+ * Author: Sovereign-Zenith-Developer
+ * Principles: Zero-Library, Bit-Perfect, Silicon-Integrity, USP-Absorbed.
+ * =========================================================================
+ */
+
 // ==================== PROJECT 8: CUSTOMER CHURN PREDICTOR ====================
 
 typedef struct {
@@ -413,3 +422,4 @@ void sigma_recommendation_destroy(SigmaRecommendationSystem* rec);
 // Command: sigma_ml_project recommendation --dataset=movielens --algorithm=matrix_factorization --factors=50
 
 // Continue with remaining projects...
+

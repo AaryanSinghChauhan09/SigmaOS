@@ -1,3 +1,12 @@
+/*
+ * =========================================================================
+ * Σ SIGMAOS: SOVEREIGN ZENITH (v15.0 - ABSOLUTE FINALITY)
+ * =========================================================================
+ * Author: Sovereign-Zenith-Developer
+ * Principles: Zero-Library, Bit-Perfect, Silicon-Integrity, USP-Absorbed.
+ * =========================================================================
+ */
+
 // -----------------------------------------------------------------------------
 // SigmaOS Workflow Forge Engine (v1.0) - Rust Ring-3 Safe Execution
 // Industry Leader Protocol: Deep-Silicon User Workflow Automation & Learning.
@@ -74,3 +83,4 @@ fn main() {
 
     forge.validate_and_engage("SIGMA_ZERO_TRUST_VALIDATED");
 }
+

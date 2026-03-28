@@ -1,3 +1,12 @@
+/*
+ * =========================================================================
+ * Σ SIGMAOS: SOVEREIGN ZENITH (v15.0 - ABSOLUTE FINALITY)
+ * =========================================================================
+ * Author: Sovereign-Zenith-Developer
+ * Principles: Zero-Library, Bit-Perfect, Silicon-Integrity, USP-Absorbed.
+ * =========================================================================
+ */
+
 // -----------------------------------------------------------------------------
 // SigmaOS Capture Sovereign Engine (v1.0) - C++ Native Screenshot & Recording
 // Industry Leader Protocol: Deep-Silicon Screen Capture, Annotation & Sharing.
@@ -91,3 +100,4 @@ int main() {
     capture.ValidateAndEngage("SIGMA_ZERO_TRUST_VALIDATED", &user_capture);
     return 0;
 }
+

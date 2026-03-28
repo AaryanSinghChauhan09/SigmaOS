@@ -1,5 +1,14 @@
 /*
  * =========================================================================
+ * Σ SIGMAOS: SOVEREIGN ZENITH (v15.0 - ABSOLUTE FINALITY)
+ * =========================================================================
+ * Author: Sovereign-Zenith-Developer
+ * Principles: Zero-Library, Bit-Perfect, Silicon-Integrity, USP-Absorbed.
+ * =========================================================================
+ */
+
+/*
+ * =========================================================================
  * Σ SIGMAOS: AUTOMATOR EXTENSIONS (v12.0 - NATIVE C++ SUBSYSTEM)
  * =========================================================================
  * Mission: Expand the Omni Automator with industry-leading automation paradigms
@@ -91,3 +100,4 @@ int main() {
 
     return 0;
 }
+

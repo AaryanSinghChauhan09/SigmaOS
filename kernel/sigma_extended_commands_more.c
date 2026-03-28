@@ -1,3 +1,12 @@
+/*
+ * =========================================================================
+ * Σ SIGMAOS: SOVEREIGN ZENITH (v15.0 - ABSOLUTE FINALITY)
+ * =========================================================================
+ * Author: Sovereign-Zenith-Developer
+ * Principles: Zero-Library, Bit-Perfect, Silicon-Integrity, USP-Absorbed.
+ * =========================================================================
+ */
+
 // ============================================
 // OPENSUSE ADVANCED COMMANDS
 // ============================================
@@ -275,3 +284,4 @@ void sigma_load_centos_advanced(void) {
     
     printf("[Extended Commands] Loaded %d CentOS/RHEL advanced commands\n", 5);
 }
+

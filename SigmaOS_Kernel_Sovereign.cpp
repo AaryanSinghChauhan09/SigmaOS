@@ -1,4 +1,13 @@
 /*
+ * =========================================================================
+ * Σ SIGMAOS: SOVEREIGN ZENITH (v15.0 - ABSOLUTE FINALITY)
+ * =========================================================================
+ * Author: Sovereign-Zenith-Developer
+ * Principles: Zero-Library, Bit-Perfect, Silicon-Integrity, USP-Absorbed.
+ * =========================================================================
+ */
+
+/*
  * Σ SIGMA OS: SOVEREIGN KERNEL (v5.0 - MILITARY HARDENED ZERO-STD)
  * ======================================================
  * USP Absorbed: HardenedBSD (ASLR), OpenBSD (PLEDGE), SELinux (MAC).
@@ -81,3 +90,4 @@ extern "C" void _start(void) {
     sigma_printf("\n[SUCCESS]: Sovereign Kernel v5.0 Active. System Sovereignty Achieved.\n");
     sigma_exit(0);
 }
+

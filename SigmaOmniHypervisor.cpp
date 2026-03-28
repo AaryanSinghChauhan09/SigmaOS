@@ -1,5 +1,14 @@
 /*
  * =========================================================================
+ * Σ SIGMAOS: SOVEREIGN ZENITH (v15.0 - ABSOLUTE FINALITY)
+ * =========================================================================
+ * Author: Sovereign-Zenith-Developer
+ * Principles: Zero-Library, Bit-Perfect, Silicon-Integrity, USP-Absorbed.
+ * =========================================================================
+ */
+
+/*
+ * =========================================================================
  * Σ SIGMAOS: OMNI HYPERVISOR & VERIFIED BOOT (v15.0 - NATIVE C++ ENCLAVE)
  * =========================================================================
  * Mission: Establish absolute security boundaries and stateless boot verification
@@ -94,3 +103,4 @@ int main() {
 
     return 0;
 }
+

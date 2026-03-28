@@ -1,5 +1,14 @@
 /*
  * =========================================================================
+ * Σ SIGMAOS: SOVEREIGN ZENITH (v15.0 - ABSOLUTE FINALITY)
+ * =========================================================================
+ * Author: Sovereign-Zenith-Developer
+ * Principles: Zero-Library, Bit-Perfect, Silicon-Integrity, USP-Absorbed.
+ * =========================================================================
+ */
+
+/*
+ * =========================================================================
  * Σ SIGMAOS: SOVEREIGN THEME ENGINE (v6.0 - NO-DEP EDITION)
  * =========================================================================
  * Mission: Refactor sigma_theme_customizer.py into a native C++ utility.
@@ -102,3 +111,4 @@ int main() {
 
     return 0;
 }
+

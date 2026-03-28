@@ -1,3 +1,12 @@
+/*
+ * =========================================================================
+ * Σ SIGMAOS: SOVEREIGN ZENITH (v15.0 - ABSOLUTE FINALITY)
+ * =========================================================================
+ * Author: Sovereign-Zenith-Developer
+ * Principles: Zero-Library, Bit-Perfect, Silicon-Integrity, USP-Absorbed.
+ * =========================================================================
+ */
+
 #include <stdint.h>
 #include <stdio.h>
 
@@ -27,3 +36,4 @@ void sigma_ioctl_shard(uint32_t cmd, void* arg) {
 void sigma_irq_trigger(uint32_t irq) {
     printf("[DRIVER]: Received Interrupt Request (IRQ) on Shard: %d\n", irq);
 }
+

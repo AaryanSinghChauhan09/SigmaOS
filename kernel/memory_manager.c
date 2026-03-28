@@ -1,4 +1,13 @@
 /*
+ * =========================================================================
+ * Σ SIGMAOS: SOVEREIGN ZENITH (v15.0 - ABSOLUTE FINALITY)
+ * =========================================================================
+ * Author: Sovereign-Zenith-Developer
+ * Principles: Zero-Library, Bit-Perfect, Silicon-Integrity, USP-Absorbed.
+ * =========================================================================
+ */
+
+/*
  * SigmaOS Memory Manager (Native Core)
  * =====================================
  * Complete virtual memory management system
@@ -284,3 +293,4 @@ void sigma_mem_get_stats(mem_stats_t *stats) {
     stats->kernel_memory = kernel_space.used_pages * PAGE_SIZE;
     stats->user_memory = stats->used_memory - stats->kernel_memory;
 }
+

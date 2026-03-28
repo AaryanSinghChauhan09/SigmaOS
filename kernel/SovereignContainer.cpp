@@ -1,5 +1,14 @@
 /*
  * =========================================================================
+ * Σ SIGMAOS: SOVEREIGN ZENITH (v15.0 - ABSOLUTE FINALITY)
+ * =========================================================================
+ * Author: Sovereign-Zenith-Developer
+ * Principles: Zero-Library, Bit-Perfect, Silicon-Integrity, USP-Absorbed.
+ * =========================================================================
+ */
+
+/*
+ * =========================================================================
  * Σ SIGMAOS: SOVEREIGN CONTAINER ENGINE (SovereignContainer.cpp)
  * =========================================================================
  * USP Absorbed: Docker (cgroups/namespaces), Solaris Zones, FreeBSD Jails
@@ -128,3 +137,4 @@ extern "C" void sigma_container_init() {
 
     engine.list_pods();
 }
+

@@ -1,3 +1,12 @@
+/*
+ * =========================================================================
+ * Σ SIGMAOS: SOVEREIGN ZENITH (v15.0 - ABSOLUTE FINALITY)
+ * =========================================================================
+ * Author: Sovereign-Zenith-Developer
+ * Principles: Zero-Library, Bit-Perfect, Silicon-Integrity, USP-Absorbed.
+ * =========================================================================
+ */
+
 /**
  * Σ SIGMA OS: AI COMMAND SHELL (v8.0 - SOVEREIGN ZENITH)
  * ======================================================
@@ -51,3 +60,4 @@ int main() {
     sigma_printf("\n[SUCCESS]: Competitive AI Shell Online. High-Level libraries eliminated.\n");
     return 0;
 }
+

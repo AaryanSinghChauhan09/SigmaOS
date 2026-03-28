@@ -1,4 +1,13 @@
 /*
+ * =========================================================================
+ * Σ SIGMAOS: SOVEREIGN ZENITH (v15.0 - ABSOLUTE FINALITY)
+ * =========================================================================
+ * Author: Sovereign-Zenith-Developer
+ * Principles: Zero-Library, Bit-Perfect, Silicon-Integrity, USP-Absorbed.
+ * =========================================================================
+ */
+
+/*
  * SigmaOS Mobile OS Core
  * =======================
  * Mobile-optimized operating system for smartphones and tablets
@@ -771,3 +780,4 @@ SigmaResult sigma_result_error(int error_code, const char* error_message) {
     result.data_size = 0;
     return result;
 }
+

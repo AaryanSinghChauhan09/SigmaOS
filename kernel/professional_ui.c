@@ -1,4 +1,13 @@
 /*
+ * =========================================================================
+ * Σ SIGMAOS: SOVEREIGN ZENITH (v15.0 - ABSOLUTE FINALITY)
+ * =========================================================================
+ * Author: Sovereign-Zenith-Developer
+ * Principles: Zero-Library, Bit-Perfect, Silicon-Integrity, USP-Absorbed.
+ * =========================================================================
+ */
+
+/*
  * SigmaOS Professional UI System
  * ==========================
  * Complete professional user interface with perfect pixels, ease of use
@@ -685,3 +694,4 @@ bool sigma_is_night_time(void) {
     // Simple night time detection (6 PM to 6 AM)
     return true; // For demo purposes
 }
+

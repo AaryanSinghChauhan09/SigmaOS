@@ -1,3 +1,12 @@
+/*
+ * =========================================================================
+ * Σ SIGMAOS: SOVEREIGN ZENITH (v15.0 - ABSOLUTE FINALITY)
+ * =========================================================================
+ * Author: Sovereign-Zenith-Developer
+ * Principles: Zero-Library, Bit-Perfect, Silicon-Integrity, USP-Absorbed.
+ * =========================================================================
+ */
+
 // SigmaOS Native Networking (OOP Design)
 // ===========================================
 // Zero dependency. Replaces <sys/socket.h>, <arpa/inet.h>, <winsock2.h>.
@@ -164,3 +173,4 @@ public:
 } // namespace Sigma
 
 #endif // SIGMA_NETWORK_SOCKET_HPP
+

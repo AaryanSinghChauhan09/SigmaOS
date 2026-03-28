@@ -1,4 +1,13 @@
 /*
+ * =========================================================================
+ * Σ SIGMAOS: SOVEREIGN ZENITH (v15.0 - ABSOLUTE FINALITY)
+ * =========================================================================
+ * Author: Sovereign-Zenith-Developer
+ * Principles: Zero-Library, Bit-Perfect, Silicon-Integrity, USP-Absorbed.
+ * =========================================================================
+ */
+
+/*
  * Cosmos AI-OS: Low-Level PCI Scanner (C Layer)
  * ===============================================
  * Mission: Direct hardware interaction (Ring-0) for PCI enumeration.
@@ -72,3 +81,4 @@ int cosmos_scan_pci_bus() {
 }
 
 cosmos_pci_device_t *cosmos_get_pci_devices() { return found_devices; }
+

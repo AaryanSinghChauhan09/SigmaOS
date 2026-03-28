@@ -1,3 +1,12 @@
+/*
+ * =========================================================================
+ * Σ SIGMAOS: SOVEREIGN ZENITH (v15.0 - ABSOLUTE FINALITY)
+ * =========================================================================
+ * Author: Sovereign-Zenith-Developer
+ * Principles: Zero-Library, Bit-Perfect, Silicon-Integrity, USP-Absorbed.
+ * =========================================================================
+ */
+
 // -----------------------------------------------------------------------------
 // SigmaOS Enterprise Silicon Pipeline (SSP) - C++ Core
 // Architecture Model: Vulkan / macOS Metal Low-Overhead Explicit API.
@@ -50,3 +59,4 @@ int main() {
     std::cout << "[SSP_MAIN]: Zero-Overhead Graphics Paradigm Active." << std::endl;
     return 0;
 }
+

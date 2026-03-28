@@ -1,4 +1,13 @@
 /*
+ * =========================================================================
+ * Σ SIGMAOS: SOVEREIGN ZENITH (v15.0 - ABSOLUTE FINALITY)
+ * =========================================================================
+ * Author: Sovereign-Zenith-Developer
+ * Principles: Zero-Library, Bit-Perfect, Silicon-Integrity, USP-Absorbed.
+ * =========================================================================
+ */
+
+/*
  * SigmaOS Custom Functions Library
  * ==============================
  * Specialized custom functions replacing all external libraries
@@ -970,3 +979,4 @@ const char* sigma_error_message(SigmaError error_code) {
         default: return "Unknown error";
     }
 }
+

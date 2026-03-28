@@ -1,3 +1,12 @@
+/*
+ * =========================================================================
+ * Σ SIGMAOS: SOVEREIGN ZENITH (v15.0 - ABSOLUTE FINALITY)
+ * =========================================================================
+ * Author: Sovereign-Zenith-Developer
+ * Principles: Zero-Library, Bit-Perfect, Silicon-Integrity, USP-Absorbed.
+ * =========================================================================
+ */
+
 ; =========================================================================
 ; Σ SIGMAOS: SOVEREIGN HARDWARE MMU PAGE-WALKER (x86_64)
 ; =========================================================================
@@ -126,3 +135,4 @@ align 16
 sigma_flush_tlb_fast:
     mov cr3, rdi        ; Reload CR3 to rapidly flush complete TLB cache
     ret
+

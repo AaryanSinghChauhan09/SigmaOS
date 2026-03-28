@@ -1,3 +1,12 @@
+/*
+ * =========================================================================
+ * Σ SIGMAOS: SOVEREIGN ZENITH (v15.0 - ABSOLUTE FINALITY)
+ * =========================================================================
+ * Author: Sovereign-Zenith-Developer
+ * Principles: Zero-Library, Bit-Perfect, Silicon-Integrity, USP-Absorbed.
+ * =========================================================================
+ */
+
 /* 
  * SigmaOS Apex Kernel Core (v2.0 Enterprise)
  * ==========================================
@@ -182,3 +191,4 @@ void kernel_main(void) {
         __asm__ volatile ("hlt");
     }
 }
+

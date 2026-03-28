@@ -1,4 +1,13 @@
 /*
+ * =========================================================================
+ * Σ SIGMAOS: SOVEREIGN ZENITH (v15.0 - ABSOLUTE FINALITY)
+ * =========================================================================
+ * Author: Sovereign-Zenith-Developer
+ * Principles: Zero-Library, Bit-Perfect, Silicon-Integrity, USP-Absorbed.
+ * =========================================================================
+ */
+
+/*
  * Σ SIGMA OS: SOVEREIGN HARDWARE CLOCK (v9.0 - ZERO-LIBRARY <time.h> REPLACEMENT)
  * ===============================================================================
  * USP Absorbed: RHEL Real-Time (Sub-Microsecond Precision), High-Frequency Trading.
@@ -52,3 +61,4 @@ void _start() {
     __asm__ volatile ("mov $60, %%rax\n xor %%rdi, %%rdi\n syscall\n" ::: "%rax", "%rdi");
 #endif
 }
+

@@ -1,5 +1,14 @@
 /*
  * =========================================================================
+ * Σ SIGMAOS: SOVEREIGN ZENITH (v15.0 - ABSOLUTE FINALITY)
+ * =========================================================================
+ * Author: Sovereign-Zenith-Developer
+ * Principles: Zero-Library, Bit-Perfect, Silicon-Integrity, USP-Absorbed.
+ * =========================================================================
+ */
+
+/*
+ * =========================================================================
  * Σ SIGMAOS: SOVEREIGN NETWORK STACK (SovereignNetwork.cpp)
  * =========================================================================
  * USP Absorbed: Zero-Copy Networking (Solaris), BPF (Linux), WireGuard.
@@ -83,3 +92,4 @@ extern "C" void sigma_network_init() {
     stack.register_port(0, "00:AA:BB:CC:DD:EE");
     stack.register_port(1, "00:AA:BB:CC:DD:EF");
 }
+

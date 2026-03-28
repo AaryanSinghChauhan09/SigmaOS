@@ -1,3 +1,12 @@
+/*
+ * =========================================================================
+ * Σ SIGMAOS: SOVEREIGN ZENITH (v15.0 - ABSOLUTE FINALITY)
+ * =========================================================================
+ * Author: Sovereign-Zenith-Developer
+ * Principles: Zero-Library, Bit-Perfect, Silicon-Integrity, USP-Absorbed.
+ * =========================================================================
+ */
+
 /**
  * SigmaOS Enterprise Janitor Shard v1.0 (Native C Low-Level)
  * Principle: Atomic Buffering, Temp-File Scrubbing, Resource Optimization.
@@ -32,3 +41,4 @@ int main() {
     printf("[JANITOR]: Scrubbing Zenith ACHIEVED. Resources CONVERGED.\n");
     return 0;
 }
+

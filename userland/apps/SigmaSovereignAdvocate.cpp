@@ -1,5 +1,14 @@
 /*
  * =========================================================================
+ * Σ SIGMAOS: SOVEREIGN ZENITH (v15.0 - ABSOLUTE FINALITY)
+ * =========================================================================
+ * Author: Sovereign-Zenith-Developer
+ * Principles: Zero-Library, Bit-Perfect, Silicon-Integrity, USP-Absorbed.
+ * =========================================================================
+ */
+
+/*
+ * =========================================================================
  * Σ SIGMAOS: ADVOCATE COMMAND CENTER (v6.0 - NATIVE C++ UI ENGINE)
  * =========================================================================
  * Mission: Refactor the advocate_command_center (Python) into a native logic shard.
@@ -40,3 +49,4 @@ int main() {
 
     return 0;
 }
+

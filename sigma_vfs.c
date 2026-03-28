@@ -1,3 +1,12 @@
+/*
+ * =========================================================================
+ * Σ SIGMAOS: SOVEREIGN ZENITH (v15.0 - ABSOLUTE FINALITY)
+ * =========================================================================
+ * Author: Sovereign-Zenith-Developer
+ * Principles: Zero-Library, Bit-Perfect, Silicon-Integrity, USP-Absorbed.
+ * =========================================================================
+ */
+
 /**
  * SigmaOS Enterprise VFS v2.0 (Native C Low-Level Zenith)
  * Replaces C# VFS to Achieve Absolute Silicon-Direct File-System Performance.
@@ -52,3 +61,4 @@ int main() {
     vfs_audit(&vfs);
     return 0;
 }
+

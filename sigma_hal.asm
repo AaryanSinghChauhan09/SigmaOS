@@ -1,3 +1,12 @@
+/*
+ * =========================================================================
+ * Σ SIGMAOS: SOVEREIGN ZENITH (v15.0 - ABSOLUTE FINALITY)
+ * =========================================================================
+ * Author: Sovereign-Zenith-Developer
+ * Principles: Zero-Library, Bit-Perfect, Silicon-Integrity, USP-Absorbed.
+ * =========================================================================
+ */
+
 ; -----------------------------------------------------------------------------
 ; SigmaOS Enterprise Multi-Arch HAL v3.0 (Native Multi-Architecture & ISR/IDT)
 ; Principle: Universal Boot Sharding, Silicon-Direct Interrupt Logic.
@@ -38,3 +47,4 @@ main:
     add rsp, 40
     xor eax, eax
     ret
+

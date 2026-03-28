@@ -1,4 +1,13 @@
 /*
+ * =========================================================================
+ * Σ SIGMAOS: SOVEREIGN ZENITH (v15.0 - ABSOLUTE FINALITY)
+ * =========================================================================
+ * Author: Sovereign-Zenith-Developer
+ * Principles: Zero-Library, Bit-Perfect, Silicon-Integrity, USP-Absorbed.
+ * =========================================================================
+ */
+
+/*
  * Σ SIGMA OS: ABSOLUTE ZERO-LIBRARY C COMPUTATION (v5.0 - SLACKWARE PURITY)
  * =========================================================================
  * USP Absorbed: Slackware (No-Frills), LFS (Linux From Scratch)
@@ -66,3 +75,4 @@ void _start(void) {
 
     sigma_syscall_exit(0);
 }
+

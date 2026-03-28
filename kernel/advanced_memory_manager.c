@@ -1,4 +1,13 @@
 /*
+ * =========================================================================
+ * Σ SIGMAOS: SOVEREIGN ZENITH (v15.0 - ABSOLUTE FINALITY)
+ * =========================================================================
+ * Author: Sovereign-Zenith-Developer
+ * Principles: Zero-Library, Bit-Perfect, Silicon-Integrity, USP-Absorbed.
+ * =========================================================================
+ */
+
+/*
  * SigmaOS Advanced Memory Manager
  * ===============================
  * Ultra-high-performance memory management with NUMA awareness
@@ -717,3 +726,4 @@ void sigma_advanced_memory_manager_destroy(AdvancedMemoryManager* manager) {
     
     free(manager);
 }
+

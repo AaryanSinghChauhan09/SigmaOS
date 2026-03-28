@@ -1,5 +1,14 @@
 /*
  * =========================================================================
+ * Σ SIGMAOS: SOVEREIGN ZENITH (v15.0 - ABSOLUTE FINALITY)
+ * =========================================================================
+ * Author: Sovereign-Zenith-Developer
+ * Principles: Zero-Library, Bit-Perfect, Silicon-Integrity, USP-Absorbed.
+ * =========================================================================
+ */
+
+/*
+ * =========================================================================
  * Σ SIGMAOS: SOVEREIGN CALCULATION ENGINE (v9.0 - ZERO DEPENDENCY)
  * =========================================================================
  * USP Absorbed & Surpassed:
@@ -166,3 +175,4 @@ int main() {
     sigma_printf("[SUCCESS]: Calculator node completed math shard execution.\n");
     return 0;
 }
+

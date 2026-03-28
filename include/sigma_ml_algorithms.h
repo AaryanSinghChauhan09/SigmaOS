@@ -1,4 +1,13 @@
 /*
+ * =========================================================================
+ * Σ SIGMAOS: SOVEREIGN ZENITH (v15.0 - ABSOLUTE FINALITY)
+ * =========================================================================
+ * Author: Sovereign-Zenith-Developer
+ * Principles: Zero-Library, Bit-Perfect, Silicon-Integrity, USP-Absorbed.
+ * =========================================================================
+ */
+
+/*
  * SigmaOS Comprehensive ML/AI Algorithms Implementation
  * =========================================================
  * Complete implementation of machine learning algorithms:
@@ -391,3 +400,4 @@ void sigma_adam_update(SigmaVector* weights, SigmaVector* m, SigmaVector* v,
                        double epsilon, uint32_t t);
 
 #endif // SIGMA_ML_ALGORITHMS_H
+

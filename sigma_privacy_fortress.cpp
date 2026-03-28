@@ -1,3 +1,12 @@
+/*
+ * =========================================================================
+ * Σ SIGMAOS: SOVEREIGN ZENITH (v15.0 - ABSOLUTE FINALITY)
+ * =========================================================================
+ * Author: Sovereign-Zenith-Developer
+ * Principles: Zero-Library, Bit-Perfect, Silicon-Integrity, USP-Absorbed.
+ * =========================================================================
+ */
+
 // -----------------------------------------------------------------------------
 // SigmaOS Privacy Fortress Engine (v2.0) - C++ Native Privacy & Anonymity
 // Industry Leader Protocol: Deep-Silicon Total Privacy Control.
@@ -52,3 +61,4 @@ int main() {
     fortress.EngageFortress();
     return 0;
 }
+

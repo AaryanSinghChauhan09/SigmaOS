@@ -1,3 +1,12 @@
+/*
+ * =========================================================================
+ * Σ SIGMAOS: SOVEREIGN ZENITH (v15.0 - ABSOLUTE FINALITY)
+ * =========================================================================
+ * Author: Sovereign-Zenith-Developer
+ * Principles: Zero-Library, Bit-Perfect, Silicon-Integrity, USP-Absorbed.
+ * =========================================================================
+ */
+
 // -----------------------------------------------------------------------------
 // SigmaOS Enterprise Optimization Shard v1.0 (Native Rust Zenith)
 // Inspiration: Stacer, BleachBit, System Optimizer Shards.
@@ -39,3 +48,4 @@ fn main() {
     opt.execute_zenith_optimization();
     opt.audit_performance();
 }
+

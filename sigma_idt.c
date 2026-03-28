@@ -1,3 +1,12 @@
+/*
+ * =========================================================================
+ * Σ SIGMAOS: SOVEREIGN ZENITH (v15.0 - ABSOLUTE FINALITY)
+ * =========================================================================
+ * Author: Sovereign-Zenith-Developer
+ * Principles: Zero-Library, Bit-Perfect, Silicon-Integrity, USP-Absorbed.
+ * =========================================================================
+ */
+
 #include <stdint.h>
 #include <stdio.h>
 
@@ -43,3 +52,4 @@ void sigma_init_idt() {
 void sigma_isr_handler(uint32_t interrupt_shard_id) {
     printf("[KERNEL]: Handling Hardware Interrupt Shard: %d\n", interrupt_shard_id);
 }
+

@@ -1,4 +1,13 @@
 /*
+ * =========================================================================
+ * Σ SIGMAOS: SOVEREIGN ZENITH (v15.0 - ABSOLUTE FINALITY)
+ * =========================================================================
+ * Author: Sovereign-Zenith-Developer
+ * Principles: Zero-Library, Bit-Perfect, Silicon-Integrity, USP-Absorbed.
+ * =========================================================================
+ */
+
+/*
  * SigmaOS Advanced Generative AI & Reinforcement Learning
  * =========================================================
  * State-of-the-art generative and RL models:
@@ -799,3 +808,4 @@ void sigma_ddpg_train(SigmaDDPG* ddpg,
 void sigma_ddpg_destroy(SigmaDDPG* ddpg);
 
 #endif // SIGMA_GENERATIVE_RL_H
+

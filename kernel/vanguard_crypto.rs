@@ -1,3 +1,12 @@
+/*
+ * =========================================================================
+ * Σ SIGMAOS: SOVEREIGN ZENITH (v15.0 - ABSOLUTE FINALITY)
+ * =========================================================================
+ * Author: Sovereign-Zenith-Developer
+ * Principles: Zero-Library, Bit-Perfect, Silicon-Integrity, USP-Absorbed.
+ * =========================================================================
+ */
+
 // =========================================================================
 // SigmaOS Vanguard Quantum-Safe Cryptography (Rust Core)
 // =========================================================================
@@ -193,3 +202,4 @@ pub extern "C" fn vanguard_health_check() -> u8 {
     // 0xAC = 172 = "ALL CLEAR" sentinel value
     0xAC
 }
+

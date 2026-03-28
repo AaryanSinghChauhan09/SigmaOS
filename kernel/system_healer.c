@@ -1,4 +1,13 @@
 /*
+ * =========================================================================
+ * Σ SIGMAOS: SOVEREIGN ZENITH (v15.0 - ABSOLUTE FINALITY)
+ * =========================================================================
+ * Author: Sovereign-Zenith-Developer
+ * Principles: Zero-Library, Bit-Perfect, Silicon-Integrity, USP-Absorbed.
+ * =========================================================================
+ */
+
+/*
  * SigmaOS Apex: Hardware-Level System Healer (C Layer)
  * ====================================================
  * Mission: Monitor CPU/Bus health and trigger atomic restoration if bit-rot is detected.
@@ -69,3 +78,4 @@ void sigma_hw_sentinel_tick() {
 hardware_health_t sigma_get_hw_health() {
     return global_health;
 }
+

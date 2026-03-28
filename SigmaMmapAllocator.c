@@ -1,4 +1,13 @@
 /*
+ * =========================================================================
+ * Σ SIGMAOS: SOVEREIGN ZENITH (v15.0 - ABSOLUTE FINALITY)
+ * =========================================================================
+ * Author: Sovereign-Zenith-Developer
+ * Principles: Zero-Library, Bit-Perfect, Silicon-Integrity, USP-Absorbed.
+ * =========================================================================
+ */
+
+/*
  * Σ SIGMA OS: SOVEREIGN HARDWARE ALLOCATOR (v9.0 - ZERO-LIBRARY <stdlib.h> REPLACEMENT)
  * =====================================================================================
  * USP Absorbed: OpenBSD (Guard Pages / ASLR Security), Slax (Direct Memory Mapping).
@@ -99,3 +108,4 @@ void _start(void) {
     __asm__ volatile ("mov $60, %%rax\n xor %%rdi, %%rdi\n syscall\n" ::: "%rax", "%rdi");
 #endif
 }
+

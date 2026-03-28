@@ -1,5 +1,14 @@
 /*
  * =========================================================================
+ * Σ SIGMAOS: SOVEREIGN ZENITH (v15.0 - ABSOLUTE FINALITY)
+ * =========================================================================
+ * Author: Sovereign-Zenith-Developer
+ * Principles: Zero-Library, Bit-Perfect, Silicon-Integrity, USP-Absorbed.
+ * =========================================================================
+ */
+
+/*
+ * =========================================================================
  * Σ SIGMAOS: SOVEREIGN MATH LIBRARY (sigma_math.h)
  * =========================================================================
  * USP Absorbed:
@@ -118,3 +127,4 @@ SIGMA_INLINE sigma_f64 sigma_cos(sigma_f64 x) {
 #endif
 
 #endif /* SIGMA_MATH_H */
+

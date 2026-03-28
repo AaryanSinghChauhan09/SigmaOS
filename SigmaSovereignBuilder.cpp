@@ -1,5 +1,14 @@
 /*
  * =========================================================================
+ * Σ SIGMAOS: SOVEREIGN ZENITH (v15.0 - ABSOLUTE FINALITY)
+ * =========================================================================
+ * Author: Sovereign-Zenith-Developer
+ * Principles: Zero-Library, Bit-Perfect, Silicon-Integrity, USP-Absorbed.
+ * =========================================================================
+ */
+
+/*
+ * =========================================================================
  * Σ SIGMAOS: SOVEREIGN BUILD ENGINE (v6.0 - ONE-CLICK NATIVE)
  * =========================================================================
  * Mission: Refactor Build-SigmaOS.ps1 into a native C++ Sovereign Builder.
@@ -75,3 +84,4 @@ int main() {
 
     return 0;
 }
+

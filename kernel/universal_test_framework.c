@@ -1,4 +1,13 @@
 /*
+ * =========================================================================
+ * Σ SIGMAOS: SOVEREIGN ZENITH (v15.0 - ABSOLUTE FINALITY)
+ * =========================================================================
+ * Author: Sovereign-Zenith-Developer
+ * Principles: Zero-Library, Bit-Perfect, Silicon-Integrity, USP-Absorbed.
+ * =========================================================================
+ */
+
+/*
  * SigmaOS Universal Testing Framework
  * =================================
  * Complete testing system without simulations
@@ -712,3 +721,4 @@ uint64_t sigma_get_memory_usage(void) {
     static uint64_t memory_counter = 0;
     return memory_counter++;
 }
+

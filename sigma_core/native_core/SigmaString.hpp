@@ -1,3 +1,12 @@
+/*
+ * =========================================================================
+ * Σ SIGMAOS: SOVEREIGN ZENITH (v15.0 - ABSOLUTE FINALITY)
+ * =========================================================================
+ * Author: Sovereign-Zenith-Developer
+ * Principles: Zero-Library, Bit-Perfect, Silicon-Integrity, USP-Absorbed.
+ * =========================================================================
+ */
+
 // SigmaOS Native String Class (OOP Design)
 // ===========================================
 // Zero dependency. Replaces <string> and <string.h>.
@@ -111,3 +120,4 @@ public:
 } // namespace Sigma
 
 #endif // SIGMA_STRING_HPP
+

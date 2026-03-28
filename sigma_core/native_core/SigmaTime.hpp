@@ -1,3 +1,12 @@
+/*
+ * =========================================================================
+ * Σ SIGMAOS: SOVEREIGN ZENITH (v15.0 - ABSOLUTE FINALITY)
+ * =========================================================================
+ * Author: Sovereign-Zenith-Developer
+ * Principles: Zero-Library, Bit-Perfect, Silicon-Integrity, USP-Absorbed.
+ * =========================================================================
+ */
+
 // SigmaOS Native Time Engine (OOP Design)
 // ===========================================
 // Zero dependency. Replaces <time.h>, <sys/time.h>.
@@ -59,3 +68,4 @@ public:
 } // namespace Sigma
 
 #endif // SIGMA_TIME_HPP
+

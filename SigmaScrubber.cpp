@@ -1,3 +1,12 @@
+/*
+ * =========================================================================
+ * Σ SIGMAOS: SOVEREIGN ZENITH (v15.0 - ABSOLUTE FINALITY)
+ * =========================================================================
+ * Author: Sovereign-Zenith-Developer
+ * Principles: Zero-Library, Bit-Perfect, Silicon-Integrity, USP-Absorbed.
+ * =========================================================================
+ */
+
 #include <iostream>
 #include <string>
 
@@ -40,3 +49,4 @@ int main() {
     std::cout << "\n[SUCCESS]: Military-Grade Secure Erasure achieved. DoD-Compliant." << std::endl;
     return 0;
 }
+

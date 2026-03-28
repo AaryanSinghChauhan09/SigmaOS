@@ -1,3 +1,12 @@
+/*
+ * =========================================================================
+ * Σ SIGMAOS: SOVEREIGN ZENITH (v15.0 - ABSOLUTE FINALITY)
+ * =========================================================================
+ * Author: Sovereign-Zenith-Developer
+ * Principles: Zero-Library, Bit-Perfect, Silicon-Integrity, USP-Absorbed.
+ * =========================================================================
+ */
+
 /**
  * SigmaOS Enterprise GPGPU Shard v1.0 (Native C Zenith)
  * Inspiration: opencl_install_instructions, hasteh-kernel.
@@ -28,3 +37,4 @@ int main() {
     sigma_gpu_audit_performance();
     return 0;
 }
+

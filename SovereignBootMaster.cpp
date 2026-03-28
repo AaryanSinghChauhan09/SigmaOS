@@ -1,4 +1,13 @@
 /*
+ * =========================================================================
+ * Σ SIGMAOS: SOVEREIGN ZENITH (v15.0 - ABSOLUTE FINALITY)
+ * =========================================================================
+ * Author: Sovereign-Zenith-Developer
+ * Principles: Zero-Library, Bit-Perfect, Silicon-Integrity, USP-Absorbed.
+ * =========================================================================
+ */
+
+/*
  * Σ SIGMA OS: SOVEREIGN BOOT MASTER (v5.0 - MILITARY HARDENED)
  * ======================================================
  * Mission: sub-second boot, hardware-skip, shard-init.
@@ -33,3 +42,4 @@ extern "C" void _start(void) {
     sigma_printf("\n[SUCCESS]: Sovereign Boot Sequence Completed. Control Handed to Kernel.\n");
     sigma_exit(0);
 }
+

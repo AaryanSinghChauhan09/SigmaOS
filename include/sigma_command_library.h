@@ -1,4 +1,13 @@
 /*
+ * =========================================================================
+ * Σ SIGMAOS: SOVEREIGN ZENITH (v15.0 - ABSOLUTE FINALITY)
+ * =========================================================================
+ * Author: Sovereign-Zenith-Developer
+ * Principles: Zero-Library, Bit-Perfect, Silicon-Integrity, USP-Absorbed.
+ * =========================================================================
+ */
+
+/*
  * SigmaOS Comprehensive Command Library
  * ======================================
  * Complete collection of bash commands from all Linux distributions plus custom
@@ -106,3 +115,4 @@ void sigma_generate_command_documentation(char* output, size_t output_size);
 void sigma_command_library_cleanup(void);
 
 #endif // SIGMA_COMMAND_LIBRARY_H
+

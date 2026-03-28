@@ -1,3 +1,12 @@
+/*
+ * =========================================================================
+ * Σ SIGMAOS: SOVEREIGN ZENITH (v15.0 - ABSOLUTE FINALITY)
+ * =========================================================================
+ * Author: Sovereign-Zenith-Developer
+ * Principles: Zero-Library, Bit-Perfect, Silicon-Integrity, USP-Absorbed.
+ * =========================================================================
+ */
+
 // -----------------------------------------------------------------------------
 // SigmaOS Omni-Aether Indexer (Rust Shard)
 // Architecture Model: macOS Spotlight Real-Time Differential Indexing.
@@ -50,3 +59,4 @@ fn main() {
     
     spotlight_improvisation.query_mesh("matrix");
 }
+

@@ -1,4 +1,13 @@
 /*
+ * =========================================================================
+ * Σ SIGMAOS: SOVEREIGN ZENITH (v15.0 - ABSOLUTE FINALITY)
+ * =========================================================================
+ * Author: Sovereign-Zenith-Developer
+ * Principles: Zero-Library, Bit-Perfect, Silicon-Integrity, USP-Absorbed.
+ * =========================================================================
+ */
+
+/*
  * SigmaOS AI Acceleration
  * =========================
  * Hardware-accelerated AI and machine learning operations
@@ -631,3 +640,4 @@ static float sigma_fast_tanh(float x) {
     float exp_neg = sigma_fast_exp(-x);
     return (exp_val - exp_neg) / (exp_val + exp_neg);
 }
+

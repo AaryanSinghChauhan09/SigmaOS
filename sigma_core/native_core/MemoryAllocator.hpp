@@ -1,3 +1,12 @@
+/*
+ * =========================================================================
+ * Σ SIGMAOS: SOVEREIGN ZENITH (v15.0 - ABSOLUTE FINALITY)
+ * =========================================================================
+ * Author: Sovereign-Zenith-Developer
+ * Principles: Zero-Library, Bit-Perfect, Silicon-Integrity, USP-Absorbed.
+ * =========================================================================
+ */
+
 // SigmaOS Native Memory Allocator (OOP Design)
 // ============================================
 // Zero dependency. Replaces <stdlib.h> malloc/free.
@@ -117,3 +126,4 @@ inline void operator delete[](void* ptr, size_t size) {
 }
 
 #endif // SIGMA_MEMORY_ALLOCATOR_HPP
+

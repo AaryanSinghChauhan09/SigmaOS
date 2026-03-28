@@ -1,3 +1,12 @@
+/*
+ * =========================================================================
+ * Σ SIGMAOS: SOVEREIGN ZENITH (v15.0 - ABSOLUTE FINALITY)
+ * =========================================================================
+ * Author: Sovereign-Zenith-Developer
+ * Principles: Zero-Library, Bit-Perfect, Silicon-Integrity, USP-Absorbed.
+ * =========================================================================
+ */
+
 #include "SigmaOOP.hpp"
 #include "sigma_mesh.hpp"
 
@@ -61,3 +70,4 @@ extern "C" void _start(void) {
     sigma_printf("[STRATEGY]: OOPS-Zenith ACHIEVED.\n");
     sigma_exit(0);
 }
+

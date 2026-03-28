@@ -1,3 +1,12 @@
+/*
+ * =========================================================================
+ * Σ SIGMAOS: SOVEREIGN ZENITH (v15.0 - ABSOLUTE FINALITY)
+ * =========================================================================
+ * Author: Sovereign-Zenith-Developer
+ * Principles: Zero-Library, Bit-Perfect, Silicon-Integrity, USP-Absorbed.
+ * =========================================================================
+ */
+
 // -----------------------------------------------------------------------------
 // SigmaOS Accessibility Sovereign Engine (v1.0) - C++ Native Inclusivity
 // Industry Leader Protocol: Deep-Silicon Screen Reading, Magnification & Color Filters.
@@ -95,3 +104,4 @@ int main() {
     access_engine.ApplyProfile(&user_profile);
     return 0;
 }
+

@@ -1,3 +1,12 @@
+/*
+ * =========================================================================
+ * Σ SIGMAOS: SOVEREIGN ZENITH (v15.0 - ABSOLUTE FINALITY)
+ * =========================================================================
+ * Author: Sovereign-Zenith-Developer
+ * Principles: Zero-Library, Bit-Perfect, Silicon-Integrity, USP-Absorbed.
+ * =========================================================================
+ */
+
 ; -----------------------------------------------------------------------------
 ; SigmaOS Enterprise Bootloader v1.0 (NASM 16-bit)
 ; Inspiration: torvalds/linux/arch/x86/boot
@@ -41,3 +50,4 @@ boot_msg db ' Enterprise KERNEL DISCOVERED (BOOT-SHARD-ACTIVE)', 0
 
 times 510-($-$$) db 0
 dw 0xAA55               ; Boot signature
+

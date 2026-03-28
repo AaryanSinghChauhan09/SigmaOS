@@ -1,4 +1,13 @@
 /*
+ * =========================================================================
+ * Σ SIGMAOS: SOVEREIGN ZENITH (v15.0 - ABSOLUTE FINALITY)
+ * =========================================================================
+ * Author: Sovereign-Zenith-Developer
+ * Principles: Zero-Library, Bit-Perfect, Silicon-Integrity, USP-Absorbed.
+ * =========================================================================
+ */
+
+/*
  * Σ SIGMA OS: SOVEREIGN OOP FRAMEWORK (v13.0 - ZERO-LIBRARY C++)
  * ================================================================
  * USP Absorbed: SOLID Principles, UML Polymorphism, Pure Virtual Hardware Abstraction.
@@ -108,3 +117,4 @@ extern "C" void _start() {
     __asm__ volatile ("mov $60, %%rax\n xor %%rdi, %%rdi\n syscall\n" ::: "rax", "rdi");
 #endif
 }
+

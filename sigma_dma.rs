@@ -1,3 +1,12 @@
+/*
+ * =========================================================================
+ * Σ SIGMAOS: SOVEREIGN ZENITH (v15.0 - ABSOLUTE FINALITY)
+ * =========================================================================
+ * Author: Sovereign-Zenith-Developer
+ * Principles: Zero-Library, Bit-Perfect, Silicon-Integrity, USP-Absorbed.
+ * =========================================================================
+ */
+
 // -----------------------------------------------------------------------------
 // SigmaOS Enterprise DMA Guard v1.0 (Native Rust Shard)
 // Inspiration: Linux DMA-API & Rust-for-Linux
@@ -41,3 +50,4 @@ fn main() {
     let dma = DMAShard::new(0x1000, 4096);
     let _ = dma.dma_transfer(0x2000, 0x1000, 1024);
 }
+

@@ -1,4 +1,13 @@
 /*
+ * =========================================================================
+ * Σ SIGMAOS: SOVEREIGN ZENITH (v15.0 - ABSOLUTE FINALITY)
+ * =========================================================================
+ * Author: Sovereign-Zenith-Developer
+ * Principles: Zero-Library, Bit-Perfect, Silicon-Integrity, USP-Absorbed.
+ * =========================================================================
+ */
+
+/*
  * SigmaOS Performance Optimizer
  * ==============================
  * Advanced performance optimization algorithms and functions
@@ -710,3 +719,4 @@ void sigma_lockfree_queue_destroy(LockFreeQueue* queue) {
 void sigma_performance_monitor_destroy(PerformanceMetrics* metrics) {
     if (metrics) free(metrics);
 }
+

@@ -1,5 +1,14 @@
 /*
  * =========================================================================
+ * Σ SIGMAOS: SOVEREIGN ZENITH (v15.0 - ABSOLUTE FINALITY)
+ * =========================================================================
+ * Author: Sovereign-Zenith-Developer
+ * Principles: Zero-Library, Bit-Perfect, Silicon-Integrity, USP-Absorbed.
+ * =========================================================================
+ */
+
+/*
+ * =========================================================================
  * Σ SIGMAOS: SOVEREIGN TRANSPILER ZENITH (v11.0 - THE PYTHON KILLER)
  * =========================================================================
  * Mission: Neutralize high-level interpreted languages (Python/JS).
@@ -71,3 +80,4 @@ int main() {
     start_transpiler_demo();
     return 0;
 }
+

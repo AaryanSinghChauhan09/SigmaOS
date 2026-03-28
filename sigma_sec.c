@@ -1,3 +1,12 @@
+/*
+ * =========================================================================
+ * Σ SIGMAOS: SOVEREIGN ZENITH (v15.0 - ABSOLUTE FINALITY)
+ * =========================================================================
+ * Author: Sovereign-Zenith-Developer
+ * Principles: Zero-Library, Bit-Perfect, Silicon-Integrity, USP-Absorbed.
+ * =========================================================================
+ */
+
 #include <stdint.h>
 #include <stdio.h>
 
@@ -31,3 +40,4 @@ void sigma_unseal_secret(EnterpriseSecret* secret) {
         printf("[SEC_KERNEL]: [ALERT]: UNAUTHORIZED SEALS BREACHED. LOCKING ENCLAVE.\n");
     }
 }
+

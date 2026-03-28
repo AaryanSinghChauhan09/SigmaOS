@@ -1,3 +1,12 @@
+/*
+ * =========================================================================
+ * Σ SIGMAOS: SOVEREIGN ZENITH (v15.0 - ABSOLUTE FINALITY)
+ * =========================================================================
+ * Author: Sovereign-Zenith-Developer
+ * Principles: Zero-Library, Bit-Perfect, Silicon-Integrity, USP-Absorbed.
+ * =========================================================================
+ */
+
 // Σ SIGMA OS: SOVEREIGN INIT SHARD (v4.0 - MEMORY-SAFE PID 1)
 // ==========================================================
 // USP Absorbed: Void Linux (runit), Alpine (OpenRC), Rust Safety.
@@ -30,3 +39,4 @@ fn main() {
     println!("[INIT_SAFE]: Process ID 1 is Memory Safe. Zero Undefined Behavior.");
     println!("\n[SUCCESS]: Competitive Rust Init Online. Fearless Boot Sovereignty achieved.");
 }
+

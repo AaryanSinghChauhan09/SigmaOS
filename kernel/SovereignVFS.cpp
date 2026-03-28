@@ -1,5 +1,14 @@
 /*
  * =========================================================================
+ * Σ SIGMAOS: SOVEREIGN ZENITH (v15.0 - ABSOLUTE FINALITY)
+ * =========================================================================
+ * Author: Sovereign-Zenith-Developer
+ * Principles: Zero-Library, Bit-Perfect, Silicon-Integrity, USP-Absorbed.
+ * =========================================================================
+ */
+
+/*
+ * =========================================================================
  * Σ SIGMAOS: SOVEREIGN VIRTUAL FILE SYSTEM (SovereignVFS.cpp)
  * =========================================================================
  * Principle: Professional, industry-standard VFS with Shard-Mapping.
@@ -110,3 +119,4 @@ extern "C" void sigma_vfs_init() {
     
     vfs->List(sigma);
 }
+

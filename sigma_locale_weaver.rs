@@ -1,3 +1,12 @@
+/*
+ * =========================================================================
+ * Σ SIGMAOS: SOVEREIGN ZENITH (v15.0 - ABSOLUTE FINALITY)
+ * =========================================================================
+ * Author: Sovereign-Zenith-Developer
+ * Principles: Zero-Library, Bit-Perfect, Silicon-Integrity, USP-Absorbed.
+ * =========================================================================
+ */
+
 // -----------------------------------------------------------------------------
 // SigmaOS Locale Weaver Engine (v1.0) - Rust Ring-3 Safe Execution
 // Industry Leader Protocol: Deep-Silicon Multilingual, Locale & Input Automation.
@@ -119,3 +128,4 @@ fn main() {
 
     weaver.validate_and_engage("SIGMA_ZERO_TRUST_VALIDATED");
 }
+

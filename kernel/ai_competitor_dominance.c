@@ -1,4 +1,13 @@
 /*
+ * =========================================================================
+ * Σ SIGMAOS: SOVEREIGN ZENITH (v15.0 - ABSOLUTE FINALITY)
+ * =========================================================================
+ * Author: Sovereign-Zenith-Developer
+ * Principles: Zero-Library, Bit-Perfect, Silicon-Integrity, USP-Absorbed.
+ * =========================================================================
+ */
+
+/*
  * SigmaOS AI Competitor Dominance System
  * ====================================
  * Complete system to make SigmaOS useless for AI competitors
@@ -506,3 +515,4 @@ void sigma_ai_dominance_cleanup(void) {
 SigmaAIDominanceSystem* sigma_ai_dominance_get(void) {
     return g_ai_dominance;
 }
+

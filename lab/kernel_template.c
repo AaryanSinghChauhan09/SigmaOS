@@ -1,4 +1,13 @@
 /*
+ * =========================================================================
+ * Σ SIGMAOS: SOVEREIGN ZENITH (v15.0 - ABSOLUTE FINALITY)
+ * =========================================================================
+ * Author: Sovereign-Zenith-Developer
+ * Principles: Zero-Library, Bit-Perfect, Silicon-Integrity, USP-Absorbed.
+ * =========================================================================
+ */
+
+/*
  * Enterprise-Core v3.0: Minimal C Kernel
  * Targeting: i686-elf-gcc
  */
@@ -20,3 +29,4 @@ void kernel_main() {
     
     while(1); // Halt
 }
+

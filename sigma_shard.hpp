@@ -1,3 +1,12 @@
+/*
+ * =========================================================================
+ * Σ SIGMAOS: SOVEREIGN ZENITH (v15.0 - ABSOLUTE FINALITY)
+ * =========================================================================
+ * Author: Sovereign-Zenith-Developer
+ * Principles: Zero-Library, Bit-Perfect, Silicon-Integrity, USP-Absorbed.
+ * =========================================================================
+ */
+
 #ifndef SOVEREIGN_SHARD_HPP
 #define SOVEREIGN_SHARD_HPP
 
@@ -42,3 +51,4 @@ namespace SigmaOS {
 } // namespace SigmaOS
 
 #endif
+

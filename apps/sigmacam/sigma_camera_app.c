@@ -1,4 +1,13 @@
 /*
+ * =========================================================================
+ * Σ SIGMAOS: SOVEREIGN ZENITH (v15.0 - ABSOLUTE FINALITY)
+ * =========================================================================
+ * Author: Sovereign-Zenith-Developer
+ * Principles: Zero-Library, Bit-Perfect, Silicon-Integrity, USP-Absorbed.
+ * =========================================================================
+ */
+
+/*
  * SigmaOS SigmaCam - Advanced Camera Application
  * ==============================================
  * Camera app combining MIT Scratch visual programming with Snapchat-style
@@ -599,3 +608,4 @@ void sigmacam_cleanup(void) {
     
     printf("[SigmaCam] Camera resources cleaned up\n");
 }
+

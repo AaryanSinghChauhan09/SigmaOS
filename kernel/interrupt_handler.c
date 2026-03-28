@@ -1,4 +1,13 @@
 /*
+ * =========================================================================
+ * Σ SIGMAOS: SOVEREIGN ZENITH (v15.0 - ABSOLUTE FINALITY)
+ * =========================================================================
+ * Author: Sovereign-Zenith-Developer
+ * Principles: Zero-Library, Bit-Perfect, Silicon-Integrity, USP-Absorbed.
+ * =========================================================================
+ */
+
+/*
  * SigmaOS Advanced Interrupt Handler
  * ================================
  * Object-Oriented Interrupt Management with SOLID Principles
@@ -524,3 +533,4 @@ void sigma_interrupt_init_stubs(InterruptManager* manager) {
         sigma_interrupt_set_idt_entry(manager, i, handler_addr, type_attr);
     }
 }
+

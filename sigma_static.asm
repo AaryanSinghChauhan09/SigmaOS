@@ -1,3 +1,12 @@
+/*
+ * =========================================================================
+ * Σ SIGMAOS: SOVEREIGN ZENITH (v15.0 - ABSOLUTE FINALITY)
+ * =========================================================================
+ * Author: Sovereign-Zenith-Developer
+ * Principles: Zero-Library, Bit-Perfect, Silicon-Integrity, USP-Absorbed.
+ * =========================================================================
+ */
+
 ; -----------------------------------------------------------------------------
 ; SigmaOS Enterprise Static Shard v1.0 (x86_64 Assembly)
 ; Inspiration: snacklinux (Tiny, Static binaries).
@@ -23,3 +32,4 @@ _start:
 
 [SECTION .data]
 sigma_msg: db "[STATIC]: Static Zenith Operational.", 10
+

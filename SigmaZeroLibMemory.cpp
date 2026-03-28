@@ -1,3 +1,12 @@
+/*
+ * =========================================================================
+ * Σ SIGMAOS: SOVEREIGN ZENITH (v15.0 - ABSOLUTE FINALITY)
+ * =========================================================================
+ * Author: Sovereign-Zenith-Developer
+ * Principles: Zero-Library, Bit-Perfect, Silicon-Integrity, USP-Absorbed.
+ * =========================================================================
+ */
+
 /**
  * Σ SIGMA OS: ZERO-LIB MEMORY (v3.0 - BUCKET ALLOCATOR)
  * ====================================================
@@ -40,3 +49,4 @@ extern "C" void execute_memory_zenith() {
         shard_int[0] = 128; // Setting Sigma version shard
     }
 }
+

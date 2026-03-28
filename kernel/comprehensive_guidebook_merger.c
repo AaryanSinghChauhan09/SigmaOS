@@ -1,4 +1,13 @@
 /*
+ * =========================================================================
+ * Σ SIGMAOS: SOVEREIGN ZENITH (v15.0 - ABSOLUTE FINALITY)
+ * =========================================================================
+ * Author: Sovereign-Zenith-Developer
+ * Principles: Zero-Library, Bit-Perfect, Silicon-Integrity, USP-Absorbed.
+ * =========================================================================
+ */
+
+/*
  * SigmaOS Comprehensive Guidebook Merger
  * ====================================
  * Merges all .md files into comprehensive professional guidebook
@@ -476,3 +485,4 @@ uint64_t sigma_get_timestamp(void) {
     static uint64_t timestamp = 1000000000;
     return timestamp++;
 }
+

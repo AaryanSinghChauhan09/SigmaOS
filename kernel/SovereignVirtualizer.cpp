@@ -1,5 +1,14 @@
 /*
  * =========================================================================
+ * Σ SIGMAOS: SOVEREIGN ZENITH (v15.0 - ABSOLUTE FINALITY)
+ * =========================================================================
+ * Author: Sovereign-Zenith-Developer
+ * Principles: Zero-Library, Bit-Perfect, Silicon-Integrity, USP-Absorbed.
+ * =========================================================================
+ */
+
+/*
+ * =========================================================================
  * Σ SIGMAOS: SOVEREIGN VIRTUALIZATION ENGINE (SovereignVirtualizer.cpp)
  * =========================================================================
  * USP Absorbed: KVM (Kernel-based Virtual Machine), Xen (Hypervisor), VMware
@@ -122,3 +131,4 @@ extern "C" void sigma_virt_init() {
         // Guest spawning logic here
     }
 }
+

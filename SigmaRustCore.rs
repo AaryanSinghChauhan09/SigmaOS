@@ -1,3 +1,12 @@
+/*
+ * =========================================================================
+ * Σ SIGMAOS: SOVEREIGN ZENITH (v15.0 - ABSOLUTE FINALITY)
+ * =========================================================================
+ * Author: Sovereign-Zenith-Developer
+ * Principles: Zero-Library, Bit-Perfect, Silicon-Integrity, USP-Absorbed.
+ * =========================================================================
+ */
+
 /*! =========================================================================
  * Σ SIGMAOS: SOVEREIGN RUST CORE (v8.0 - Full No-Std Automation)
  * =========================================================================
@@ -600,3 +609,4 @@ pub extern "C" fn _start() -> ! {
 
     unsafe { sys_exit_group(0); }
 }
+

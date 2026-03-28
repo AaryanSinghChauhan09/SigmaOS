@@ -1,3 +1,12 @@
+/*
+ * =========================================================================
+ * Σ SIGMAOS: SOVEREIGN ZENITH (v15.0 - ABSOLUTE FINALITY)
+ * =========================================================================
+ * Author: Sovereign-Zenith-Developer
+ * Principles: Zero-Library, Bit-Perfect, Silicon-Integrity, USP-Absorbed.
+ * =========================================================================
+ */
+
 ; SigmaOS Custom Native Fast-Ring Syscalls (x86_64 Assembly)
 ; ==========================================================
 ; Provides pure machine-language access to Linux/Windows Kernel without libc!
@@ -113,4 +122,5 @@ sigma_asm_outd:
     mov eax, esi ; Data
     out dx, eax
     ret
+
 

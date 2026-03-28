@@ -1,5 +1,14 @@
 /*
  * =========================================================================
+ * Σ SIGMAOS: SOVEREIGN ZENITH (v15.0 - ABSOLUTE FINALITY)
+ * =========================================================================
+ * Author: Sovereign-Zenith-Developer
+ * Principles: Zero-Library, Bit-Perfect, Silicon-Integrity, USP-Absorbed.
+ * =========================================================================
+ */
+
+/*
+ * =========================================================================
  * Σ SIGMAOS: SOVEREIGN HYPERVISOR ZENITH (v13.0 - THE SWALLOWER)
  * =========================================================================
  * Mission: Neutralize all guest operating systems (Linux, Windows, macOS).
@@ -68,3 +77,4 @@ int main() {
     start_hypervisor_zenith();
     return 0;
 }
+

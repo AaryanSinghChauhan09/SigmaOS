@@ -1,4 +1,13 @@
 /*
+ * =========================================================================
+ * Σ SIGMAOS: SOVEREIGN ZENITH (v15.0 - ABSOLUTE FINALITY)
+ * =========================================================================
+ * Author: Sovereign-Zenith-Developer
+ * Principles: Zero-Library, Bit-Perfect, Silicon-Integrity, USP-Absorbed.
+ * =========================================================================
+ */
+
+/*
  * SigmaOS UEFI Bootloader Header
  * ==============================
  * UEFI bootloader definitions and declarations
@@ -407,3 +416,4 @@ extern const EFI_GUID EFI_FILE_INFO_GUID;
 EFI_STATUS EFIAPI efi_main(EFI_HANDLE image_handle, EFI_SYSTEM_TABLE *system_table);
 
 #endif // SIGMAOS_UEFI_BOOTLOADER_H
+

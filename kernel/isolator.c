@@ -1,4 +1,13 @@
 /*
+ * =========================================================================
+ * Σ SIGMAOS: SOVEREIGN ZENITH (v15.0 - ABSOLUTE FINALITY)
+ * =========================================================================
+ * Author: Sovereign-Zenith-Developer
+ * Principles: Zero-Library, Bit-Perfect, Silicon-Integrity, USP-Absorbed.
+ * =========================================================================
+ */
+
+/*
  * Cosmos AI-OS: Enterprise Enclave Isolator (C Layer)
  * ===================================================
  * Mission: Absolute isolation. Disconnected from 3rd party APIs.
@@ -44,3 +53,4 @@ int cosmos_enforce_isolation(const char *url_or_payload, int length) {
 
   return 1; // Safe
 }
+

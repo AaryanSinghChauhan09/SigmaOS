@@ -1,5 +1,14 @@
 /*
  * =========================================================================
+ * Σ SIGMAOS: SOVEREIGN ZENITH (v15.0 - ABSOLUTE FINALITY)
+ * =========================================================================
+ * Author: Sovereign-Zenith-Developer
+ * Principles: Zero-Library, Bit-Perfect, Silicon-Integrity, USP-Absorbed.
+ * =========================================================================
+ */
+
+/*
+ * =========================================================================
  * Σ SIGMAOS: SOVEREIGN TYPE SYSTEM (sigma_types.h)
  * =========================================================================
  * USP Absorbed: musl libc (exact-width types), Fuchsia Zircon (type safety)
@@ -212,3 +221,4 @@ SIGMA_STATIC_ASSERT(sizeof(sigma_u32) == 4, sigma_u32_must_be_4_bytes);
 #endif
 
 #endif /* SIGMA_TYPES_H */
+

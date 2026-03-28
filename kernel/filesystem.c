@@ -1,4 +1,13 @@
 /*
+ * =========================================================================
+ * Σ SIGMAOS: SOVEREIGN ZENITH (v15.0 - ABSOLUTE FINALITY)
+ * =========================================================================
+ * Author: Sovereign-Zenith-Developer
+ * Principles: Zero-Library, Bit-Perfect, Silicon-Integrity, USP-Absorbed.
+ * =========================================================================
+ */
+
+/*
  * SigmaOS Filesystem (Native Core)
  * ================================
  * Complete Virtual File System implementation
@@ -662,3 +671,4 @@ int sigma_vfs_statfs(const char *path, fs_stats_t *stats) {
     
     return 0;
 }
+

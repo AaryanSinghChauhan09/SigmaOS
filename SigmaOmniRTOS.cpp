@@ -1,5 +1,14 @@
 /*
  * =========================================================================
+ * Σ SIGMAOS: SOVEREIGN ZENITH (v15.0 - ABSOLUTE FINALITY)
+ * =========================================================================
+ * Author: Sovereign-Zenith-Developer
+ * Principles: Zero-Library, Bit-Perfect, Silicon-Integrity, USP-Absorbed.
+ * =========================================================================
+ */
+
+/*
+ * =========================================================================
  * Σ SIGMAOS: OMNI RTOS & ATOMIC ENGINE (v16.0 - NATIVE C++ SUBSYSTEM)
  * =========================================================================
  * Mission: Achieve absolute determinism and containerization natively within
@@ -81,3 +90,4 @@ int main() {
 
     return 0;
 }
+

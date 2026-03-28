@@ -1,5 +1,14 @@
 /*
  * =========================================================================
+ * Σ SIGMAOS: SOVEREIGN ZENITH (v15.0 - ABSOLUTE FINALITY)
+ * =========================================================================
+ * Author: Sovereign-Zenith-Developer
+ * Principles: Zero-Library, Bit-Perfect, Silicon-Integrity, USP-Absorbed.
+ * =========================================================================
+ */
+
+/*
+ * =========================================================================
  * Σ SIGMAOS: NATIVE PERSONALIZER ZENITH (v14.0 - THE CUSTOMIZER)
  * =========================================================================
  * Mission: Absolute Visual Sovereignty over all modern UI/UX paradigms.
@@ -70,3 +79,4 @@ int main() {
     start_personalizer_demo();
     return 0;
 }
+

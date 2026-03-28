@@ -1,4 +1,13 @@
 /*
+ * =========================================================================
+ * Σ SIGMAOS: SOVEREIGN ZENITH (v15.0 - ABSOLUTE FINALITY)
+ * =========================================================================
+ * Author: Sovereign-Zenith-Developer
+ * Principles: Zero-Library, Bit-Perfect, Silicon-Integrity, USP-Absorbed.
+ * =========================================================================
+ */
+
+/*
  * Σ SIGMA OS: SOVEREIGN PROCESS MANAGER (v5.0 - SOLID / OOP / MILITARY)
  * ==========================================================
  * Principle: Single Responsibility, Open/Closed, Liskov, Interface Segregation, Dependency Inversion.
@@ -101,3 +110,4 @@ extern "C" void _start(void) {
     sigma_printf("\n[SUCCESS]: Sovereign Process Manager v5.0 Operational.\n");
     sigma_exit(0);
 }
+

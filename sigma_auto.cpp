@@ -1,3 +1,12 @@
+/*
+ * =========================================================================
+ * Σ SIGMAOS: SOVEREIGN ZENITH (v15.0 - ABSOLUTE FINALITY)
+ * =========================================================================
+ * Author: Sovereign-Zenith-Developer
+ * Principles: Zero-Library, Bit-Perfect, Silicon-Integrity, USP-Absorbed.
+ * =========================================================================
+ */
+
 /**
  * SigmaOS Enterprise Automation Engine v1.0 (Native C++ Zenith)
  * Principle: Automation, Event-Driven, Low-Latency.
@@ -78,3 +87,4 @@ int main() {
     std::cout << "[AUTO]: Automation Zenith ACTIVE." << std::endl;
     return 0;
 }
+

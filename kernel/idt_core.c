@@ -1,4 +1,13 @@
 /*
+ * =========================================================================
+ * Σ SIGMAOS: SOVEREIGN ZENITH (v15.0 - ABSOLUTE FINALITY)
+ * =========================================================================
+ * Author: Sovereign-Zenith-Developer
+ * Principles: Zero-Library, Bit-Perfect, Silicon-Integrity, USP-Absorbed.
+ * =========================================================================
+ */
+
+/*
  * Cosmos AI-OS: Interrupt Descriptor Table (IDT, C Layer)
  * =======================================================
  * Mission: CPU Exception handling & Hardware IRQ routing.
@@ -59,3 +68,4 @@ void cosmos_page_fault_handler(uint64_t error_code, uint64_t faulting_addr) {
   // If accessing a 'Ghost Page', upgrade to read-write.
   // Otherwise, SEGFAULT the offending Ring-3 app.
 }
+

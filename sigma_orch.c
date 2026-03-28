@@ -1,3 +1,12 @@
+/*
+ * =========================================================================
+ * Σ SIGMAOS: SOVEREIGN ZENITH (v15.0 - ABSOLUTE FINALITY)
+ * =========================================================================
+ * Author: Sovereign-Zenith-Developer
+ * Principles: Zero-Library, Bit-Perfect, Silicon-Integrity, USP-Absorbed.
+ * =========================================================================
+ */
+
 #include <stdio.h>
 #include <unistd.h>
 #include <stdint.h>
@@ -39,3 +48,4 @@ int main(int argc, char* argv[]) {
     sigma_orch_audit();
     return 0;
 }
+

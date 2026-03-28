@@ -1,5 +1,14 @@
 /*
  * =========================================================================
+ * Σ SIGMAOS: SOVEREIGN ZENITH (v15.0 - ABSOLUTE FINALITY)
+ * =========================================================================
+ * Author: Sovereign-Zenith-Developer
+ * Principles: Zero-Library, Bit-Perfect, Silicon-Integrity, USP-Absorbed.
+ * =========================================================================
+ */
+
+/*
+ * =========================================================================
  * Σ SIGMAOS: SOVEREIGN SCRIPT DSL (v6.0 - NATIVE C++)
  * =========================================================================
  * Mission: Refactor SovereignScript.rb into a native C++ utility.
@@ -44,3 +53,4 @@ int main() {
 
     return 0;
 }
+

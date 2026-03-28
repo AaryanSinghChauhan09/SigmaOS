@@ -1,4 +1,13 @@
 /*
+ * =========================================================================
+ * Σ SIGMAOS: SOVEREIGN ZENITH (v15.0 - ABSOLUTE FINALITY)
+ * =========================================================================
+ * Author: Sovereign-Zenith-Developer
+ * Principles: Zero-Library, Bit-Perfect, Silicon-Integrity, USP-Absorbed.
+ * =========================================================================
+ */
+
+/*
  * SigmaOS Neuromorphic Computing
  * ==============================
  * Brain-inspired computing and spiking neural networks
@@ -733,3 +742,4 @@ void sigma_event_queue_destroy(EventQueue* queue) {
     
     free(queue);
 }
+

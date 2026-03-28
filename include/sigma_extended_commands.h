@@ -1,4 +1,13 @@
 /*
+ * =========================================================================
+ * Σ SIGMAOS: SOVEREIGN ZENITH (v15.0 - ABSOLUTE FINALITY)
+ * =========================================================================
+ * Author: Sovereign-Zenith-Developer
+ * Principles: Zero-Library, Bit-Perfect, Silicon-Integrity, USP-Absorbed.
+ * =========================================================================
+ */
+
+/*
  * SigmaOS Extended Kernel Command Library - Advanced Linux Commands
  * =================================================================
  * Advanced commands from all Linux distributions including:
@@ -62,3 +71,4 @@ void sigma_load_storage_admin_commands(void);
 void sigma_load_hardware_commands(void);
 
 #endif // SIGMA_EXTENDED_COMMANDS_H
+

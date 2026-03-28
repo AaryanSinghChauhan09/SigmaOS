@@ -1,5 +1,14 @@
 /*
  * =========================================================================
+ * Σ SIGMAOS: SOVEREIGN ZENITH (v15.0 - ABSOLUTE FINALITY)
+ * =========================================================================
+ * Author: Sovereign-Zenith-Developer
+ * Principles: Zero-Library, Bit-Perfect, Silicon-Integrity, USP-Absorbed.
+ * =========================================================================
+ */
+
+/*
+ * =========================================================================
  * Σ SIGMAOS: SOVEREIGN BUILD ZENITH (v13.0 - THE FORGE ENGINE)
  * =========================================================================
  * Mission: Neutralize all build systems (Make, CMake, Ninja, Bazel).
@@ -65,3 +74,4 @@ int main() {
     start_build_zenith();
     return 0;
 }
+

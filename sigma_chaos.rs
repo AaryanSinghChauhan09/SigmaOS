@@ -1,3 +1,12 @@
+/*
+ * =========================================================================
+ * Σ SIGMAOS: SOVEREIGN ZENITH (v15.0 - ABSOLUTE FINALITY)
+ * =========================================================================
+ * Author: Sovereign-Zenith-Developer
+ * Principles: Zero-Library, Bit-Perfect, Silicon-Integrity, USP-Absorbed.
+ * =========================================================================
+ */
+
 // -----------------------------------------------------------------------------
 // SigmaOS Enterprise Chaos Resilience v1.0 (Native Rust Shard)
 // Surpasses Linux: Self-Healing Memory Shards.
@@ -68,3 +77,4 @@ fn main() {
     let _ = shard.audit_shard();
     println!("[CHAOS_RUST]: Silicon-Direct Memory Resilience Active.");
 }
+

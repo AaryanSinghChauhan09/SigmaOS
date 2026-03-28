@@ -1,3 +1,12 @@
+/*
+ * =========================================================================
+ * Σ SIGMAOS: SOVEREIGN ZENITH (v15.0 - ABSOLUTE FINALITY)
+ * =========================================================================
+ * Author: Sovereign-Zenith-Developer
+ * Principles: Zero-Library, Bit-Perfect, Silicon-Integrity, USP-Absorbed.
+ * =========================================================================
+ */
+
 // -----------------------------------------------------------------------------
 // SigmaOS Enterprise Net Downloader v1.0 (Native Rust Zenith)
 // Inspiration: FreeDownloadManager-AppImage, DistributionHub.
@@ -37,3 +46,4 @@ fn main() {
     let job = DownloadJob { url: String::from("sigma://hub/shard-v61.bin"), threads: 4 };
     job.start();
 }
+

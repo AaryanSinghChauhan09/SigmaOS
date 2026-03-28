@@ -1,4 +1,13 @@
 /*
+ * =========================================================================
+ * Σ SIGMAOS: SOVEREIGN ZENITH (v15.0 - ABSOLUTE FINALITY)
+ * =========================================================================
+ * Author: Sovereign-Zenith-Developer
+ * Principles: Zero-Library, Bit-Perfect, Silicon-Integrity, USP-Absorbed.
+ * =========================================================================
+ */
+
+/*
  * SigmaOS Low-Level Library
  * =========================
  * Custom low-level library functions to eliminate third-party dependencies
@@ -1097,3 +1106,4 @@ unsigned char* sigma_base64_decode(const char* data, size_t input_length, size_t
     
     return decoded_data;
 }
+

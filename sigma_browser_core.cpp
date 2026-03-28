@@ -1,3 +1,12 @@
+/*
+ * =========================================================================
+ * Σ SIGMAOS: SOVEREIGN ZENITH (v15.0 - ABSOLUTE FINALITY)
+ * =========================================================================
+ * Author: Sovereign-Zenith-Developer
+ * Principles: Zero-Library, Bit-Perfect, Silicon-Integrity, USP-Absorbed.
+ * =========================================================================
+ */
+
 // -----------------------------------------------------------------------------
 // SigmaOS Sovereign Browser Engine (v4.0) - C++ & eBPF
 // Industry Leader Protocol: Deep-Silicon Web Rendering & Telemetry Eradication.
@@ -65,3 +74,4 @@ int main() {
     browser.RenderWeb("SIGMA_SOVEREIGN_SECURE_WEB");
     return 0;
 }
+

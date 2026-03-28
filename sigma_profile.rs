@@ -1,3 +1,12 @@
+/*
+ * =========================================================================
+ * Σ SIGMAOS: SOVEREIGN ZENITH (v15.0 - ABSOLUTE FINALITY)
+ * =========================================================================
+ * Author: Sovereign-Zenith-Developer
+ * Principles: Zero-Library, Bit-Perfect, Silicon-Integrity, USP-Absorbed.
+ * =========================================================================
+ */
+
 // -----------------------------------------------------------------------------
 // SigmaOS Enterprise Personalization Shard v1.0 (Native Rust Zenith)
 // Principle: Privacy, Customization, Profile Sharding.
@@ -39,3 +48,4 @@ fn main() {
     let profile = EnterpriseProfile::new("Enterprise_USER");
     profile.apply_personalization();
 }
+

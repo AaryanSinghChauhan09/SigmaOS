@@ -1,3 +1,12 @@
+/*
+ * =========================================================================
+ * Σ SIGMAOS: SOVEREIGN ZENITH (v15.0 - ABSOLUTE FINALITY)
+ * =========================================================================
+ * Author: Sovereign-Zenith-Developer
+ * Principles: Zero-Library, Bit-Perfect, Silicon-Integrity, USP-Absorbed.
+ * =========================================================================
+ */
+
 // ============================================
 // MACHINE LEARNING COMMANDS
 // ============================================
@@ -626,3 +635,4 @@ void sigma_print_command_summary(void) {
     printf("  - Arch, Gentoo, openSUSE, Alpine, Void, NixOS\n");
     printf("========================================\n\n");
 }
+

@@ -1,3 +1,12 @@
+/*
+ * =========================================================================
+ * Σ SIGMAOS: SOVEREIGN ZENITH (v15.0 - ABSOLUTE FINALITY)
+ * =========================================================================
+ * Author: Sovereign-Zenith-Developer
+ * Principles: Zero-Library, Bit-Perfect, Silicon-Integrity, USP-Absorbed.
+ * =========================================================================
+ */
+
 // -----------------------------------------------------------------------------
 // SigmaOS OpenClaw Automation Matrix (SigmaClaw v1.0)
 // Industry Leader Protocol: Extreme Low-Latency, Kernel-Secured Automation.
@@ -60,3 +69,4 @@ fn main() {
     
     println!("[OPENCLAW_MATRIX]: Absolute Automation Dominance Established. Zero-Interpreted Overhead.");
 }
+

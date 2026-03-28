@@ -1,3 +1,12 @@
+/*
+ * =========================================================================
+ * Σ SIGMAOS: SOVEREIGN ZENITH (v15.0 - ABSOLUTE FINALITY)
+ * =========================================================================
+ * Author: Sovereign-Zenith-Developer
+ * Principles: Zero-Library, Bit-Perfect, Silicon-Integrity, USP-Absorbed.
+ * =========================================================================
+ */
+
 // -----------------------------------------------------------------------------
 // SigmaOS Enterprise Resource Monitor v2.0 (Native Rust Zenith)
 // Principle: Monitoring, Entropy-Based Telemetry.
@@ -51,3 +60,4 @@ fn main() {
         println!("[MONITOR]: System Resources WITHIN ZENITH PARAMETERS.");
     }
 }
+

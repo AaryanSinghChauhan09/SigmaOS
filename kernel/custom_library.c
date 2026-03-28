@@ -1,4 +1,13 @@
 /*
+ * =========================================================================
+ * Σ SIGMAOS: SOVEREIGN ZENITH (v15.0 - ABSOLUTE FINALITY)
+ * =========================================================================
+ * Author: Sovereign-Zenith-Developer
+ * Principles: Zero-Library, Bit-Perfect, Silicon-Integrity, USP-Absorbed.
+ * =========================================================================
+ */
+
+/*
  * SigmaOS Custom Low-Level Library
  * ===============================
  * Complete replacement for all external libraries
@@ -573,3 +582,4 @@ bool sigma_custom_library_init(void) {
 void sigma_custom_library_cleanup(void) {
     sigma_memory_cleanup();
 }
+

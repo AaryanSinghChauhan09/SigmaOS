@@ -1,3 +1,12 @@
+/*
+ * =========================================================================
+ * Σ SIGMAOS: SOVEREIGN ZENITH (v15.0 - ABSOLUTE FINALITY)
+ * =========================================================================
+ * Author: Sovereign-Zenith-Developer
+ * Principles: Zero-Library, Bit-Perfect, Silicon-Integrity, USP-Absorbed.
+ * =========================================================================
+ */
+
 /**
  * Σ SIGMA OS: SOVEREIGN UI CORE (v4.0 - ZERO-JAVASCRIPT)
  * ====================================================
@@ -28,3 +37,4 @@ extern "C" {
         return 100; // 100% Integrity Shard
     }
 }
+
