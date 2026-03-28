@@ -20,6 +20,7 @@
 #include "SovereignHardwareIOZenith.h"
 #include "SovereignCoordinationZenith.h"
 #include "SovereignDesktopZenith.h"
+#include "SovereignAetherAbsorption.cpp"
 
 namespace SigmaOS {
 namespace Shell {
@@ -43,6 +44,7 @@ private:
     Hardware::SovereignDMAController m_dma;
     Coordination::SovereignPetersonSolution m_peterson;
     Desktop::SovereignZenithDesktop m_desktop;
+    SovereignAetherAbsorber m_absorber;
 
 public:
     OmniShellZenith() : m_commands_sharded(0) {
@@ -110,6 +112,9 @@ public:
              m_peterson.Entering(0);
              sigma_printf("[ZENITH-PETERSON]: CRITICAL SECTION ENTRY (Thread 0).\n");
              m_peterson.Leaving(0);
+        } else if (sigma_compare(cmd, "ABSORB_LEGACY")) {
+             sigma_printf("[ABSORB]: Initializing Ultra-Deep Legacy Feature Absorption (v1.0 -> v92.0)...\n");
+             m_absorber.DeploySovereignUnity();
         } else if (sigma_compare(cmd, "TOGGLE_GUI")) {
              m_desktop.ToggleGUI();
              if (m_desktop.IsGUIActive()) {

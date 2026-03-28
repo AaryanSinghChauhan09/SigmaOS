@@ -267,6 +267,24 @@ input:focus { outline: none; }
 .icon-glyph.voice { color: #8800ff; border-color: rgba(136, 0, 255, 0.3); }
 .icon-glyph.list { color: #bbbbbb; border-color: rgba(187, 187, 187, 0.3); }
 
+.absorb-btn {
+    background: linear-gradient(135deg, var(--accent-primary), var(--accent-secondary));
+    border: none;
+    color: white;
+    padding: 12px 24px;
+    border-radius: 8px;
+    margin-top: 20px;
+    font-weight: 900;
+    cursor: pointer;
+    box-shadow: var(--neon-blue);
+}
+
+.system-status-level {
+    color: #00ff88;
+    margin-right: 15px;
+    font-weight: 900;
+}
+
 .system-time {
     font-family: 'JetBrains Mono', monospace;
     font-size: 0.8rem;

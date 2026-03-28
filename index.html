@@ -121,6 +121,17 @@
             </div>
         </div>
 
+        <div id="absorb-shard" class="window glass-morphism win-ml hidden">
+            <div class="window-header" onmousedown="dragWindow(event, 'absorb-shard')">
+                <div class="title">Σ AETHER ABSORPTION ENGINE</div>
+                <div class="controls"><span class="close" onclick="closeWindow('absorb-shard')">×</span></div>
+            </div>
+            <div class="window-content terminal-font">
+                <div id="absorb-output">Ready to absorb legacy v1.0-v92.0 shards...</div>
+                <button class="absorb-btn" onclick="startAbsorption()">EXECUTE UNIFICATION</button>
+            </div>
+        </div>
+
         <div id="catalog-shard" class="window glass-morphism win-shell hidden">
             <div class="window-header" onmousedown="dragWindow(event, 'catalog-shard')">
                 <div class="title">Σ SHARD CATALOG [FULL AUDIT]</div>
@@ -133,14 +144,18 @@
 
         <!-- Taskbar -->
         <div class="taskbar">
-            <div class="start-btn">Σ</div>
+            <div class="start-btn" onclick="openWindow('absorb-shard')">Σ</div>
             <div class="running-apps" id="running-apps">
                 <div id="task-omni-shell" class="task-item active hidden" onclick="focusWindow('omni-shell')">Omni-Shell</div>
                 <div id="task-mem-shard" class="task-item hidden" onclick="focusWindow('mem-shard')">Memory Shard</div>
                 <div id="task-calc-shard" class="task-item hidden" onclick="focusWindow('calc-shard')">Calculator</div>
                 <div id="task-ml-shard" class="task-item hidden" onclick="focusWindow('ml-shard')">ML-Core</div>
+                <div id="task-absorb-shard" class="task-item hidden" onclick="focusWindow('absorb-shard')">Absorber</div>
             </div>
-            <div class="system-time" id="clock">14:15</div>
+            <div class="system-time">
+                <span id="merged-level" class="system-status-level">LEVEL: ZENITH</span>
+                <span id="clock">14:15</span>
+            </div>
         </div>
     </div>
     <script src="index.js"></script>

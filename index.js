@@ -133,6 +133,7 @@ openWindow('omni-shell');
 function initCatalog() {
     const catalog = document.getElementById('catalog-content');
     if (catalog) {
+        catalog.innerHTML = '';
         MASTER_SHARDS.forEach(shard => {
             const line = document.createElement('div');
             line.style.padding = '5px 0';
@@ -142,3 +143,18 @@ function initCatalog() {
     }
 }
 initCatalog();
+
+// Absorption Logic
+function startAbsorption() {
+    const out = document.getElementById('absorb-output');
+    if (!out) return;
+    out.innerHTML = "<p style='color:#00f2ff'>[INIT]: Absorbing Legacy VPC Shards...</p>";
+    setTimeout(() => {
+        out.innerHTML += "<p style='color:#7000ff'>[INIT]: Absorbing Quantum Lattice V5 Shards...</p>";
+        setTimeout(() => {
+            out.innerHTML += "<p style='color:#00ff88'>[OK]: ABSORPTION SUCCESSFUL. ALL VERSIONS MERGED.</p>";
+            const level = document.getElementById('merged-level');
+            if (level) level.textContent = "LEVEL: ULTIMATE SUPREMACY";
+        }, 1000);
+    }, 1000);
+}
