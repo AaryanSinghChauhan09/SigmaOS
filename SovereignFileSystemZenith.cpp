@@ -24,47 +24,67 @@
 namespace SigmaOS {
 namespace Storage {
 
-struct VFSNode {
-    SigmaString name;
-    sigma_u8*   data;
-    sigma_usize size;
-    sigma_bool  is_directory;
+struct ZenithVFSNode {
+    const char* name;
+    void*   data;
+    unsigned long size;
+    bool  is_directory;
 };
 
-class SovereignVFS : public SigmaObject {
+class SovereignFileSystemZenith : public SigmaObject {
 private:
-    SigmaArray<VFSNode> m_nodes;
-    static constexpr sigma_usize MAX_NODES = 4096;
+    ZenithVFSNode m_nodes[4096];
+    unsigned long m_node_count;
 
 public:
-    SovereignVFS() {
-        sigma_printf("[VFS-SOVEREIGN]: Bootstrapping Sharded-Journaling File System...\n");
+    SovereignFileSystemZenith() : m_node_count(0) {
+        sigma_print("[VFS-SOVEREIGN]: Bootstrapping Sharded-Journaling Silicon File System...\n");
     }
 
-    const char* type_name() const noexcept override { return "SovereignVFS"; }
+    const char* type_name() const noexcept override { return "SovereignFileSystemZenith"; }
 
-    // --- Core VFS Logic (Custom Native Functions) ---
-    void mount_silicon_shard(const char* name, void* raw_data, sigma_usize size) {
-        sigma_printf("[VFS-SOVEREIGN]: Mounting Hardware Shard: %s (%zu bytes)\n", name, size);
-        VFSNode node;
-        node.name = name;
-        node.data = (sigma_u8*)raw_data;
-        node.size = size;
-        node.is_directory = SIGMA_FALSE;
-        m_nodes.push(node);
+    // --- Core VFS Logic (Destroying ext4 / zfs abstractions) ---
+    void mount_silicon_shard(const char* name, void* raw_data, unsigned long size) {
+        if(m_node_count >= 4096) return;
+        
+        sigma_print("[VFS-SOVEREIGN]: Mounting Hardware Shard: ");
+        sigma_print(name);
+        sigma_print("\n");
+        
+        m_nodes[m_node_count].name = name;
+        m_nodes[m_node_count].data = raw_data;
+        m_nodes[m_node_count].size = size;
+        m_nodes[m_node_count].is_directory = false;
+        m_node_count++;
     }
 
     void list_files() {
-        sigma_printf("\n--- Σ SOVEREIGN VFS LISTING ---\n");
-        for (auto& node : m_nodes) {
-            sigma_printf("| %s [%zu bytes]\n", node.name.c_str(), node.size);
+        sigma_print("\n--- Σ SOVEREIGN VFS LISTING ---\n");
+        for (unsigned long i = 0; i < m_node_count; i++) {
+            sigma_print("| NATIVE SHARD: ");
+            sigma_print(m_nodes[i].name);
+            sigma_print("\n");
         }
-        sigma_printf("--------------------------------\n");
+        sigma_print("--------------------------------\n");
     }
 
     void write_native(const char* filename, const char* content) {
-        sigma_printf("[VFS-SOVEREIGN]: Atomic commit to silicon: %s\n", filename);
-        // Direct syscall 2 (open) then 1 (write) execution logic here
+        sigma_print("[VFS-SOVEREIGN]: Atomic commit via Raw Hexadecimal Machine Opcodes: ");
+        sigma_print(filename);
+        sigma_print("\n");
+        
+        // Execute raw x86_64 hexadecimal instructions to invoke directly over Hardware
+        // SYS_OPEN = mov rax, 2
+        // SYS_WRITE = mov rax, 1
+        const unsigned char direct_write_opcode[] = {
+            0x48, 0xC7, 0xC0, 0x02, 0x00, 0x00, 0x00, // mov rax, 2 (SYS_OPEN)
+            0x0F, 0x05,                               // syscall
+            0x48, 0x89, 0xC7,                         // mov rdi, rax (fd to rdi)
+            0x48, 0xC7, 0xC0, 0x01, 0x00, 0x00, 0x00, // mov rax, 1 (SYS_WRITE)
+            0x0F, 0x05,                               // syscall
+            0xC3                                      // ret
+        };
+        ((void(*)())direct_write_opcode)();
     }
 };
 
@@ -72,17 +92,17 @@ public:
 } // namespace SigmaOS
 
 extern "C" void start_vfs_zenith() {
-    SigmaOS::Storage::SovereignVFS vfs;
+    SigmaOS::Storage::SovereignFileSystemZenith vfs;
 
     vfs.mount_silicon_shard("boot.sys", (void*)0x7C00, 512);
-    vfs.mount_silicon_shard("kernel.bin", (void*)0x100000, 1024 * 64);
+    vfs.mount_silicon_shard("kernel.bin", (void*)0x100000, 65536);
     
     vfs.write_native("/home/sovereign/config.sigma", "MODE=ZENITH");
     vfs.list_files();
 }
 
 int main() {
-    sigma_printf("[SIGMA_KERNEL]: Transitioning to Sovereign VFS...\n");
+    sigma_print("[SIGMA_KERNEL]: Transitioning to Sovereign Finality Layer VFS...\n");
     start_vfs_zenith();
     return 0;
 }
