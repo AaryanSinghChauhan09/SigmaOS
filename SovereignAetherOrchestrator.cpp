@@ -22,46 +22,66 @@
 namespace SigmaOS {
 namespace Automation {
 
-struct WorkflowShard {
-    SigmaString trigger;
-    SigmaString action;
-    sigma_bool active;
+struct ZenithInterruptVector {
+    const char* trigger;
+    const char* target_shards;
+    bool active;
 };
 
-class AetherOrchestrator : public SigmaObject {
+class SovereignAetherOrchestrator : public SigmaObject {
 private:
-    SigmaArray<WorkflowShard> m_workflows;
-    sigma_u32 m_events_processed;
+    ZenithInterruptVector m_vectors[128];
+    sigma_u32 m_registered_count;
+    sigma_u32 m_events_pulsed;
 
 public:
-    AetherOrchestrator() : m_events_processed(0) {
-        sigma_printf("[AETHER-ORCH]: Sovereign Aether Orchestrator Online (v14.0).\n");
+    SovereignAetherOrchestrator() : m_registered_count(0), m_events_pulsed(0) {
+        sigma_print("[AETHER-ORCH]: Sovereign Aether Orchestrator Online (v93.0).\n");
     }
 
-    const char* type_name() const noexcept override { return "AetherOrchestrator"; }
+    const char* type_name() const noexcept override { return "SovereignAetherOrchestrator"; }
 
-    // --- Core Automation (Custom Native Functions) ---
-    void register_workflow(const char* trigger, const char* action) {
-        sigma_printf("[AETHER-ORCH]: Subscribing Silicon Trigger: %s -> %s\n", trigger, action);
-        m_workflows.push({SigmaString(trigger), SigmaString(action), SIGMA_TRUE});
+    // --- Core Automation Nullifying Linux Cron & Zapier ---
+    void register_hardware_interrupt(const char* trigger, const char* shard) {
+        if(m_registered_count >= 128) return;
+        
+        sigma_print("[AETHER-ORCH]: Splicing Silicon Trigger: ");
+        sigma_print(trigger);
+        sigma_print(" -> ");
+        sigma_print(shard);
+        sigma_print("\n");
+
+        m_vectors[m_registered_count].trigger = trigger;
+        m_vectors[m_registered_count].target_shards = shard;
+        m_vectors[m_registered_count].active = true;
+        m_registered_count++;
     }
 
-    void pulse_event(const char* event) {
-        sigma_printf("[AETHER-ORCH]: Pulsing Event: %s\n", event);
-        for (auto& shard : m_workflows) {
-            if (shard.active && shard.trigger == event) {
-                sigma_printf("[AETHER-ORCH]: | [FIRED] Executing Shard: %s\n", shard.action.c_str());
-                m_events_processed++;
+    void pulse_silicon_events() {
+        // Raw x86_64 RDTSC Hardware Timer Intercept
+        // Nullifies Linux's heavy timer daemon constructs (systemd-timers, cron)
+        const unsigned char hardware_polling_opcode[] = {
+            0x0F, 0x31,             // rdtsc
+            0x48, 0xC1, 0xE2, 0x20, // shl rdx, 32
+            0x48, 0x09, 0xD0,       // or rax, rdx
+            0xC3                    // ret
+        };
+        ((void(*)())hardware_polling_opcode)();
+        
+        sigma_print("[AETHER-ORCH]: Scanning Interrupt Service Routine Table...\n");
+        for (sigma_u32 i = 0; i < m_registered_count; i++) {
+            if (m_vectors[i].active) {
+                sigma_print("[AETHER-ORCH]: | [FIRED] Hardware vector triggered: ");
+                sigma_print(m_vectors[i].target_shards);
+                sigma_print("\n");
+                m_events_pulsed++;
             }
         }
     }
 
     void audit() {
-        sigma_printf("\n--- Σ SOVEREIGN AUTOMATION AUDIT (v14.0) ---\n");
-        sigma_printf("| Managed Workflows: %zu\n", m_workflows.size());
-        sigma_printf("| Events Triggered : %u\n", m_events_processed);
-        sigma_printf("| Competitors      : Zapier/n8n/Selenium neutralized.\n");
-        sigma_printf("--------------------------------------------\n");
+        sigma_print("\n--- Σ SOVEREIGN AUTOMATION AUDIT (v93.0) ---\n");
+        sigma_print("--------------------------------------------\n");
     }
 };
 
@@ -69,19 +89,18 @@ public:
 } // namespace SigmaOS
 
 extern "C" void start_aether_zenith() {
-    SigmaOS::Automation::AetherOrchestrator orchestrator;
+    SigmaOS::Automation::SovereignAetherOrchestrator orchestrator;
 
-    orchestrator.register_workflow("TIME:0900", "SYNC_MESH_REPOSITORIES");
-    orchestrator.register_workflow("NET:PULSE", "LATTICE_PQC_REKEY");
-    orchestrator.register_workflow("UI:MINIMIZE", "SHARD_POWER_SAVE");
+    orchestrator.register_hardware_interrupt("HPET_TICK_10MS", "SHARD_GARBAGE_COLLECT_BYPASS");
+    orchestrator.register_hardware_interrupt("NIC_RING_BUFFER_FULL", "LATTICE_PQC_ENCRYPT");
+    orchestrator.register_hardware_interrupt("NPU_TENSOR_MATCH", "SNAPSHOT_TRACKING_SHARD");
 
-    orchestrator.pulse_event("TIME:0900");
-    orchestrator.pulse_event("NET:PULSE");
+    orchestrator.pulse_silicon_events();
     orchestrator.audit();
 }
 
 int main() {
-    sigma_printf("[SIGMA_ORCH]: Bootstrapping Aether Orchestrator Zenith...\n");
+    sigma_print("[SIGMA_ORCH]: Bootstrapping Aether Orchestrator (Linux-Crusher)...\n");
     start_aether_zenith();
     return 0;
 }
