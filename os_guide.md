@@ -39,7 +39,29 @@ graph TD
 
 ---
 
-### 📂 IV. THE MASTER REPOSITORY (SHARD CATALOG)
+### 🏛️ IV. THE ZENITH SUPREME ACADEMIC MODULES (100% PARITY)
+
+#### MODULE-I: PROCESS & SYSTEM FOUNDATIONS
+- **INTRODUCTION**: Simple Batch, Multiprogramming, Time-Sharing, Real-Time. (Zenith-Core Absorbed).
+- **OS STRUCTURES**: System Calls, Protection, Services. (SovereignLibC / KernelFinality).
+- **PROCESS MANAGEMENT**: Scheduling Algorithms (FCFS, SJF, SJN, Priority, RR), IPC, Threading Issues. (Zenith-Scheduler Shard).
+
+#### MODULE-II: COORDINATION & DEADLOCKS
+- **SYNCHRONIZATION**: Peterson's Solution, Synchronization Hardware (Atomic TAS/Swap), Monitors, Semaphores (Counting/Binary). (SovereignCoordinationZenith.h).
+- **DEADLOCKS**: System Model, Characterization, Prevention, Avoidance (Banker's Shard), Detection, Recovery. (Zenith-Forensic-Matrix).
+
+#### MODULE-III: MEMORY & STORAGE HIERARCHY
+- **MEMORY MANAGEMENT**: Swapping, Paging (Hierarchical, Hashed, Inverted), Segmentation. (SovereignMemoryMaster).
+- **VIRTUAL MEMORY**: Demand Paging, Copy-on-Write, Page Replacement (FIFO, LRU, Optimal). (Zenith-Hypervisor).
+
+#### MODULE-IV: I/O, FILE SYSTEMS & SECURITY
+- **I/O SYSTEMS**: Hardware, Poll, Interrupts, DMA (Silberschatz parity). (SovereignHardwareIOZenith.h).
+- **FILE SYSTEM**: Allocation (Contiguous, Linked, Indexed), Free space management. (Zenith-Disk-Shard).
+- **PROTECTION & SECURITY**: Domain of protection, Access Matrix, Revocation. (Lattice-PQC-Supreme).
+
+---
+
+### 📂 V. THE MASTER REPOSITORY (SHARD CATALOG)
 
 1. `SovereignLibC.asm`: x86_64 Direct Syscalls (xv6/OSTEP targets).
 2. `SovereignKnowledgeAudit.cpp`: Hardware Interrupts, DMA, and Recovery logic.
@@ -62,7 +84,8 @@ graph TD
 1. **Zero External Libraries**: Only use types defined in `SovereignLibC.h`.
 2. **Scientific Parity**: Every shard must outperform MIT/Stanford theoretical limits.
 
-### 🌌 II. ABSORBED LEGACY SHARDS (TOTAL PARITY)
+### 🌌 VI. ABSORBED LEGACY SHARDS (TOTAL PARITY)
+
 The following features from v1.0 -> v92.0 have been fully absorbed and optimized for the Zenith Supreme kernel:
 
 | SHARD ID | DESCRIPTION | STATUS |

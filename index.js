@@ -120,6 +120,16 @@ function updateClock() {
 setInterval(updateClock, 1000);
 updateClock();
 
+function animateSiliconPulse() {
+    const eax = document.getElementById('reg-eax');
+    const ebx = document.getElementById('reg-ebx');
+    if (eax && ebx) {
+        eax.style.width = (Math.random() * 80 + 20) + '%';
+        ebx.style.width = (Math.random() * 80 + 20) + '%';
+    }
+}
+setInterval(animateSiliconPulse, 500);
+
 function initCatalog() {
     const catalog = document.getElementById('catalog-content');
     if (catalog) {
