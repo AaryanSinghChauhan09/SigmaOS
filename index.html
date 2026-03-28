@@ -189,6 +189,21 @@
                 </div>
             </div>
 
+            <div id="explorer-shard" class="window glass-morphism win-shell hidden holo-border">
+                <div class="window-header" onmousedown="dragWindow(event, 'explorer-shard')">
+                    <div class="title">Σ SOVEREIGN ZENITH EXPLORER [ZERO-DEPENDENCY FS]</div>
+                    <div class="close" onclick="closeWindow('explorer-shard')">×</div>
+                </div>
+                <div class="window-content">
+                    <div class="explorer-grid">
+                        <div class="explorer-item" onclick="openWindow('omni-shell')">🖥️ bin</div>
+                        <div class="explorer-item" onclick="openWindow('v-lab')">🔬 lab</div>
+                        <div class="explorer-item" onclick="openWindow('integrity-shard')">📡 sys</div>
+                        <div class="explorer-item-doc" onclick="openWindow('tutorial-shard')">📄 os_guide.md</div>
+                    </div>
+                </div>
+            </div>
+
             <div id="macro-shard" class="window glass-morphism win-ml hidden holo-border">
                 <div class="window-header" onmousedown="dragWindow(event, 'macro-shard')">
                     <div class="title">Σ SOVEREIGN MACRO EDITOR</div>
@@ -264,6 +279,7 @@
                 <div class="dock-item" onclick="openWindow('omni-shell')" title="Omni-Shell"><span class="dock-glyph">Σ</span></div>
                 <div class="dock-item" onclick="openWindow('v-lab')" title="Virtual-Lab"><span class="dock-glyph">V</span></div>
                 <div class="dock-item" onclick="openWindow('dev-forge')" title="Dev-Forge"><span class="dock-glyph">D</span></div>
+                <div class="dock-item" onclick="openWindow('explorer-shard')" title="Zenith-Explorer"><span class="dock-glyph">📁</span></div>
                 <div class="dock-item" onclick="openWindow('matrix-shard')" title="Forensic-Matrix"><span class="dock-glyph">M</span></div>
                 <div class="dock-item" onclick="openWindow('linux-shard')" title="Linux-Shell"><span class="dock-glyph">L</span></div>
                 <div class="dock-item" onclick="openWindow('integrity-shard')" title="Integrity-Cert"><span class="dock-glyph">★</span></div>
