@@ -1,3 +1,6 @@
+// $ZENITH Sovereign Wrapper (Zero-Dependency)
+const $ZENITH = (id) => document.getElementById(id);
+
 const COMMAND_RESPONSES = {
     'HELP': [
         "SUPREME ZENITH COMMANDS:",
@@ -227,6 +230,42 @@ function startAbsorption() {
             if (level) level.textContent = "LEVEL: ULTIMATE SUPREMACY";
         }, 1000);
     }, 1000);
+}
+
+// Linux Emulator Logic
+const linuxIn = $ZENITH('linux-input');
+const linuxOut = $ZENITH('linux-output');
+
+if (linuxIn) {
+    linuxIn.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter') {
+            const cmd = linuxIn.value.trim().toLowerCase();
+            const p = document.createElement('p');
+            p.className = 'text-neon-blue';
+            p.textContent = `root@sigmaos:~# ${cmd}`;
+            linuxOut.appendChild(p);
+
+            if (cmd === 'ls') {
+                const sp = document.createElement('p');
+                sp.textContent = "bin/  etc/  home/  root/  sigma_shards/";
+                linuxOut.appendChild(sp);
+            } else if (cmd.startsWith('apt')) {
+                const sp = document.createElement('p');
+                sp.textContent = `[ZENITH]: Resolving ${cmd}... 100% Shard-Parity Found.`;
+                linuxOut.appendChild(sp);
+            } else if (cmd === 'sudo') {
+                const sp = document.createElement('p');
+                sp.textContent = "[ZENITH]: ACCESS GRANTED. PERSISTING MASTER RING-0.";
+                linuxOut.appendChild(sp);
+            } else {
+                const sp = document.createElement('p');
+                sp.textContent = `bash: ${cmd}: command absorbed by Zenith core.`;
+                linuxOut.appendChild(sp);
+            }
+            linuxIn.value = '';
+            linuxOut.scrollTop = linuxOut.scrollHeight;
+        }
+    });
 }
 
 // Default: Open the Command Shell & Crusher

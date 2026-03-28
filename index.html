@@ -90,6 +90,9 @@
                 <div class="icon" onclick="openWindow('macro-shard')">
                     <div class="icon-glyph macro">M</div><span>Macros</span>
                 </div>
+                <div class="icon" onclick="openWindow('linux-shard')">
+                    <div class="icon-glyph linux">L</div><span>Linux-Shell</span>
+                </div>
             </div>
 
             <!-- Draggable Windows -->
@@ -141,7 +144,21 @@
                 </div>
             </div>
 
-            <div id="macro-shard" class="window glass-morphism win-ml hidden">
+            <div id="linux-shard" class="window glass-morphism win-shell hidden holo-border">
+                <div class="window-header" onmousedown="dragWindow(event, 'linux-shard')">
+                    <div class="title">Σ SOVEREIGN LINUX EMULATOR [ZENITH-KERNEL-TARGET]</div>
+                    <div class="close" onclick="closeWindow('linux-shard')">×</div>
+                </div>
+                <div class="window-content terminal-font" id="linux-output">
+                    <p class="text-neon-blue">root@sigmaos:~# _</p>
+                </div>
+                <div class="window-footer">
+                    <span class="prompt">linux@zenith:></span>
+                    <input type="text" id="linux-input" placeholder="Execute linux command..." spellcheck="false">
+                </div>
+            </div>
+
+            <div id="macro-shard" class="window glass-morphism win-ml hidden holo-border">
                 <div class="window-header" onmousedown="dragWindow(event, 'macro-shard')">
                     <div class="title">Σ SOVEREIGN MACRO EDITOR</div>
                     <div class="close" onclick="closeWindow('macro-shard')">×</div>
