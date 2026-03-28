@@ -126,6 +126,7 @@ h1 { letter-spacing: 12px; font-weight: 900; font-size: 1.5rem; }
 .icon-glyph.calc { color: #ff0070; }
 .icon-glyph.network { color: var(--accent-secondary); }
 .icon-glyph.absorb { color: #00ffff; }
+.icon-glyph.nexus { color: #ff00ff; border-color: rgba(255, 0, 255, 0.3); }
 
 .icon span { font-size: 0.6rem; letter-spacing: 2px; text-transform: uppercase; font-weight: 600; color: var(--text-dim); }
 

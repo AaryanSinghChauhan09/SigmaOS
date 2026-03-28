@@ -15,7 +15,7 @@ const COMMAND_RESPONSES = {
     'MASTER_AUDIT': ["[AUDIT]: Verifying 91+ legacy shards...", "[OK]: 100% integrity across all versions."]
 };
 
-const MASTER_SHARDS = [
+const ALL_REPO_FILES = [
     "SovereignSuperCalculator.cpp", "SovereignML.cpp", "SovereignTranspilerZenith.cpp",
     "SovereignNetMesh.cpp", "SovereignWebBridge.cpp", "SovereignOmniTool.cpp",
     "SovereignAppStore.cpp", "SovereignVoiceShard.cpp", "SovereignAutomationShard.cpp",
@@ -23,7 +23,8 @@ const MASTER_SHARDS = [
     "SovereignXV6Bridge.cpp", "SovereignKnowledgeAudit.cpp", "SovereignZenithComplete.cpp",
     "SovereignAetherAbsorption.cpp", "SovereignLatticePQC.cpp", "SovereignForensicMatrix.cpp",
     "SovereignGraphicsCompositor.cpp", "SovereignHardwareAudit.cpp", "SovereignLibC.asm", 
-    "SovereignStandardHAL.asm", "SigmaOOP.hpp", "SigmaRustCore.rs"
+    "SovereignStandardHAL.asm", "SovereignScholasticDB.cpp", "SovereignVoiceZenith.cpp",
+    "SovereignDistroForge.cpp", "SovereignPacketMaestro.cpp", "SigmaOOP.hpp", "SigmaRustCore.rs"
 ];
 
 // Supremacy State
@@ -123,8 +124,9 @@ function initCatalog() {
     const catalog = document.getElementById('catalog-content');
     if (catalog) {
         catalog.innerHTML = '';
-        MASTER_SHARDS.forEach(shard => {
+        ALL_REPO_FILES.forEach(shard => {
             const div = document.createElement('div');
+            div.className = 'shard-item';
             div.style.padding = '8px 0';
             div.innerHTML = `<span style="color:#00ff88">STATUS: MASTER</span> | <span style="color:#00f2ff">${shard}</span>`;
             catalog.appendChild(div);
@@ -132,6 +134,29 @@ function initCatalog() {
     }
 }
 initCatalog();
+
+function filterShards() {
+    const q = document.getElementById('nexus-search').value.toLowerCase();
+    const items = document.querySelectorAll('.shard-item');
+    items.forEach(item => {
+        item.style.display = item.textContent.toLowerCase().includes(q) ? 'block' : 'none';
+    });
+}
+
+// Absorption Logic
+function startAbsorption() {
+    const out = document.getElementById('absorb-output');
+    if (!out) return;
+    out.innerHTML = "<p style='color:#00f2ff'>[INIT]: Absorbing Legacy VPC Shards...</p>";
+    setTimeout(() => {
+        out.innerHTML += "<p style='color:#7000ff'>[INIT]: Absorbing Quantum Lattice V5 Shards...</p>";
+        setTimeout(() => {
+            out.innerHTML += "<p style='color:#00ff88'>[OK]: ABSORPTION SUCCESSFUL. ALL VERSIONS MERGED.</p>";
+            const level = document.getElementById('merged-level');
+            if (level) level.textContent = "LEVEL: ULTIMATE SUPREMACY";
+        }, 1000);
+    }, 1000);
+}
 
 // Default: Open the Command Shell
 openWindow('omni-shell');

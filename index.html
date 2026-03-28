@@ -56,6 +56,9 @@
                 <div class="icon" onclick="openWindow('ml-shard')">
                     <div class="icon-glyph ml">∀</div><span>ML-Core</span>
                 </div>
+                <div class="icon" onclick="openWindow('nexus-shard')">
+                    <div class="icon-glyph nexus">X</div><span>Zenith-Nexus</span>
+                </div>
                 <div class="icon" onclick="openWindow('net-zenith')">
                     <div class="icon-glyph network">N</div><span>Network</span>
                 </div>
@@ -90,10 +93,15 @@
 
             <div id="catalog-shard" class="window glass-morphism win-shell hidden">
                 <div class="window-header" onmousedown="dragWindow(event, 'catalog-shard')">
-                    <div class="title">Σ SHARD CATALOG [91+ MASTER SHARDS AUDITED]</div>
+                    <div class="title">Σ SOVEREIGN SHARD NEXUS [REAL-TIME AUDIT]</div>
                     <div class="close" onclick="closeWindow('catalog-shard')">×</div>
                 </div>
-                <div class="window-content terminal-font" id="catalog-content"></div>
+                <div class="window-content terminal-font">
+                    <div id="nexus-search-area">
+                        <input type="text" id="nexus-search" placeholder="Search master shards..." oninput="filterShards()">
+                    </div>
+                    <div id="catalog-content"></div>
+                </div>
             </div>
 
             <!-- Merged-UI: Forensic Shard Viewer -->
