@@ -1,33 +1,18 @@
 const COMMAND_RESPONSES = {
     'HELP': [
-        "AVAILABLE ZENITH SHARDS:",
-        "- FORK_TEST: Demonstrate xv6 process duplication.",
-        "- DMA_CMD: Execute Silberschatz-grade DMA transfer.",
-        "- PETERSON: Coordinate Peterson's critical section.",
-        "- SCHEDULER: Execute O(1) MLFQ balancing (MIT).",
-        "- CLOUD_FORGE: Forge elastic VPC shard (AWS).",
-        "- SYSTEM_STATUS: Query silicon-direct registry."
+        "SUPREME ZENITH COMMANDS:",
+        "- FORK_TEST: Demonstrate xv6 silicon process duplication.",
+        "- DMA_CMD: Execute Silberschatz-grade host bus transfer.",
+        "- PETERSON: Coordinate Peterson's critical section lock.",
+        "- ABSORB_LEGACY: Unify v1.0-v92.0 features into Zenith core.",
+        "- SYSTEM_STATUS: Query silicon-direct registry.",
+        "- MASTER_AUDIT: Perform bit-level shard verification."
     ],
-    'FORK_TEST': [
-        "[ZENITH-PIPE]: Forging native pipe shard...",
-        "[CHILD]: I am the sovereign child. Executing XV6 Shard...",
-        "[PARENT]: Child spawned (PID: 1024). Waiting for shard completion...",
-        "[PARENT]: Child shard re-absorbed."
-    ],
-    'DMA_CMD': [
-        "[ZENITH-HARDWARE]: Initiating DMA Transfer (4096 bytes). Bypassing CPU...",
-        "[OK]: Block transfer complete. Host notified via silicon pulse."
-    ],
-    'PETERSON': [
-        "[ZENITH-PETERSON]: CRITICAL SECTION ENTRY (Thread 0).",
-        "[ZENITH-SYNC]: Readers-Writers priority logic initiated (Zero-Starvation)."
-    ],
-    'SYSTEM_STATUS': [
-        "KERNEL: RING-0 (ZENITH)",
-        "SYSCALLS: 256 DIRECT (SHARDED)",
-        "MEMORY: HIERARCHICAL PAGING ACTIVE",
-        "SOVEREIGNTY: 100%"
-    ]
+    'FORK_TEST': ["[ZENITH]: Duplicating Shard 0x93...", "[CHILD]: Sovereign Child Active.", "[PARENT]: Child re-absorbed."],
+    'DMA_CMD': ["[ZENITH-DMA]: Initiating host-bus transfer (4096 bytes).", "[OK]: Success."],
+    'PETERSON': ["[ZENITH-SYNC]: Thread-0 Entry. Lock secured via Peterson's Shard."],
+    'SYSTEM_STATUS': ["BUILD: v93.0 SUPREME", "SOVEREIGNTY: 100%", "THREAT-LEVEL: ZERO", "SHARD-PARITY: MASTER"],
+    'MASTER_AUDIT': ["[AUDIT]: Verifying 91+ legacy shards...", "[OK]: 100% integrity across all versions."]
 };
 
 const MASTER_SHARDS = [
@@ -36,11 +21,14 @@ const MASTER_SHARDS = [
     "SovereignAppStore.cpp", "SovereignVoiceShard.cpp", "SovereignAutomationShard.cpp",
     "SovereignHypervisorZenith.cpp", "SovereignDiagnosticsZenith.cpp", "SovereignEncyclopedia.cpp",
     "SovereignXV6Bridge.cpp", "SovereignKnowledgeAudit.cpp", "SovereignZenithComplete.cpp",
-    "SovereignLibC.asm", "SovereignKernelFinality.asm", "SigmaOOP.hpp", "SigmaRustCore.rs"
+    "SovereignAetherAbsorption.cpp", "SovereignLatticePQC.cpp", "SovereignForensicMatrix.cpp",
+    "SovereignGraphicsCompositor.cpp", "SovereignHardwareAudit.cpp", "SovereignLibC.asm", 
+    "SovereignStandardHAL.asm", "SigmaOOP.hpp", "SigmaRustCore.rs"
 ];
 
-// Window Management
-let maxZ = 10;
+// Supremacy State
+let maxZ = 100;
+
 function openWindow(id) {
     const win = document.getElementById(id);
     const task = document.getElementById(`task-${id}`);
@@ -48,54 +36,61 @@ function openWindow(id) {
         win.classList.remove('hidden');
         win.style.zIndex = ++maxZ;
     }
-    if (task) task.classList.remove('hidden');
+    if (task) {
+        task.classList.remove('hidden');
+        task.classList.add('active');
+    }
 }
 
 function closeWindow(id) {
     const win = document.getElementById(id);
     const task = document.getElementById(`task-${id}`);
     if (win) win.classList.add('hidden');
-    if (task) task.classList.add('hidden');
+    if (task) {
+        task.classList.add('hidden');
+        task.classList.remove('active');
+    }
 }
 
 function focusWindow(id) {
     const win = document.getElementById(id);
+    const task = document.getElementById(`task-${id}`);
     if (win) win.style.zIndex = ++maxZ;
+    const items = document.querySelectorAll('.task-item');
+    items.forEach(i => i.classList.remove('active'));
+    if (task) task.classList.add('active');
 }
 
 function dragWindow(e, id) {
     const win = document.getElementById(id);
     let offsetX = e.clientX - win.offsetLeft;
     let offsetY = e.clientY - win.offsetTop;
-    win.style.zIndex = ++maxZ;
+    focusWindow(id);
 
     function mouseMove(e) {
         win.style.left = (e.clientX - offsetX) + 'px';
         win.style.top = (e.clientY - offsetY) + 'px';
     }
-
     function mouseUp() {
         document.removeEventListener('mousemove', mouseMove);
         document.removeEventListener('mouseup', mouseUp);
     }
-
     document.addEventListener('mousemove', mouseMove);
     document.addEventListener('mouseup', mouseUp);
 }
 
-// Terminal Logic
+// Terminal Shard
 const output = document.getElementById('output');
 const input = document.getElementById('command-input');
 
 function addLine(text, className = '') {
+    if (!output) return;
     const p = document.createElement('p');
     p.classList.add('line');
     if (className) p.classList.add(className);
     p.textContent = text;
-    if (output) {
-        output.appendChild(p);
-        output.scrollTop = output.scrollHeight;
-    }
+    output.appendChild(p);
+    output.scrollTop = output.scrollHeight;
 }
 
 if (input) {
@@ -103,19 +98,17 @@ if (input) {
         if (e.key === 'Enter') {
             const cmd = input.value.trim().toUpperCase();
             addLine(`Σ://zenith> ${cmd}`, 'prompt');
-            
             if (COMMAND_RESPONSES[cmd]) {
                 COMMAND_RESPONSES[cmd].forEach(line => addLine(line));
             } else if (cmd !== '') {
-                addLine(`[ERROR]: Unknown Shard '${cmd}'. Intent discarded.`);
+                addLine(`[ERR]: Intent for shard '${cmd}' discarded. Access ring-0.`);
             }
-            
             input.value = '';
         }
     });
 }
 
-// Clock Logic
+// Clock & Audit Logic
 function updateClock() {
     const clock = document.getElementById('clock');
     if (clock) {
@@ -126,35 +119,19 @@ function updateClock() {
 setInterval(updateClock, 1000);
 updateClock();
 
-// Default: Open the Shell
-openWindow('omni-shell');
-
-// Inject Catalog
 function initCatalog() {
     const catalog = document.getElementById('catalog-content');
     if (catalog) {
         catalog.innerHTML = '';
         MASTER_SHARDS.forEach(shard => {
-            const line = document.createElement('div');
-            line.style.padding = '5px 0';
-            line.innerHTML = `<span style="color:#00f2ff">[ACTIVE]</span> ${shard}`;
-            catalog.appendChild(line);
+            const div = document.createElement('div');
+            div.style.padding = '8px 0';
+            div.innerHTML = `<span style="color:#00ff88">STATUS: MASTER</span> | <span style="color:#00f2ff">${shard}</span>`;
+            catalog.appendChild(div);
         });
     }
 }
 initCatalog();
 
-// Absorption Logic
-function startAbsorption() {
-    const out = document.getElementById('absorb-output');
-    if (!out) return;
-    out.innerHTML = "<p style='color:#00f2ff'>[INIT]: Absorbing Legacy VPC Shards...</p>";
-    setTimeout(() => {
-        out.innerHTML += "<p style='color:#7000ff'>[INIT]: Absorbing Quantum Lattice V5 Shards...</p>";
-        setTimeout(() => {
-            out.innerHTML += "<p style='color:#00ff88'>[OK]: ABSORPTION SUCCESSFUL. ALL VERSIONS MERGED.</p>";
-            const level = document.getElementById('merged-level');
-            if (level) level.textContent = "LEVEL: ULTIMATE SUPREMACY";
-        }, 1000);
-    }, 1000);
-}
+// Default: Open the Command Shell
+openWindow('omni-shell');

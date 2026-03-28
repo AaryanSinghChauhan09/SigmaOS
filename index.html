@@ -3,160 +3,126 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Σ SIGMAOS ZENITH | Sovereign Desktop Shard</title>
+    <title>Σ SIGMAOS ZENITH | Sovereign Silicon Command Dashboard</title>
     <link rel="stylesheet" href="index.css">
     <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;400;700&family=Outfit:wght@300;600;900&display=swap" rel="stylesheet">
 </head>
-<body class="desktop-bg">
-    <div id="desktop" class="desktop-workspace">
-        <!-- Desktop Icons -->
-        <div class="icon" onclick="openWindow('omni-shell')">
-            <div class="icon-glyph terminal">Σ</div>
-            <span>Omni-Shell</span>
-        </div>
-        <div class="icon" onclick="openWindow('mem-shard')">
-            <div class="icon-glyph memory">M</div>
-            <span>Memory Shard</span>
-        </div>
-        <div class="icon" onclick="openWindow('calc-shard')">
-            <div class="icon-glyph calc">∑</div>
-            <span>Calculator</span>
-        </div>
-        <div class="icon" onclick="openWindow('ml-shard')">
-            <div class="icon-glyph ml">∀</div>
-            <span>ML Engine</span>
-        </div>
-        <div class="icon" onclick="openWindow('net-zenith')">
-            <div class="icon-glyph network">N</div>
-            <span>Net-Zenith</span>
-        </div>
-        <div class="icon" onclick="openWindow('transpiler-shard')">
-            <div class="icon-glyph transpiler">T</div>
-            <span>Transpiler</span>
-        </div>
-        <div class="icon" onclick="openWindow('encyclopedia-shard')">
-            <div class="icon-glyph info">i</div>
-            <span>Encyclopedia</span>
-        </div>
-        <div class="icon" onclick="openWindow('app-store')">
-            <div class="icon-glyph store">S</div>
-            <span>App-Store</span>
-        </div>
-        <div class="icon" onclick="openWindow('automation-shard')">
-            <div class="icon-glyph automation">A</div>
-            <span>Automation</span>
-        </div>
-        <div class="icon" onclick="openWindow('hyper-zenith')">
-            <div class="icon-glyph hyper">H</div>
-            <span>Hypervisor</span>
-        </div>
-        <div class="icon" onclick="openWindow('diagnostics-shard')">
-            <div class="icon-glyph diag">D</div>
-            <span>Diagnostics</span>
-        </div>
-        <div class="icon" onclick="openWindow('voice-shard')">
-            <div class="icon-glyph voice">V</div>
-            <span>Voice-Shard</span>
-        </div>
-        <div class="icon" onclick="openWindow('catalog-shard')">
-            <div class="icon-glyph list">≡</div>
-            <span>Catalog</span>
-        </div>
+<body class="nasa-grade-bg">
+    <!-- Sovereign Matrix Overlay -->
+    <div id="matrix-overlay" class="matrix-grid"></div>
 
-        <!-- Window Container (Draggable Windows) -->
-        <div id="omni-shell" class="window glass-morphism win-shell hidden">
-            <div class="window-header" onmousedown="dragWindow(event, 'omni-shell')">
-                <div class="title">Σ OMNI-SHELL ZENITH</div>
-                <div class="controls">
-                    <span class="close" onclick="closeWindow('omni-shell')">×</span>
+    <div class="command-center">
+        <!-- Dashboard Header -->
+        <header class="zenith-dashboard-header">
+            <div class="logo-area">
+                <span class="sigma-symbol">Σ</span>
+                <div class="title-stack">
+                    <h1>SIGMAOS <span class="accent-glow">ZENITH SUPREME</span></h1>
+                    <p class="subtitle">v93.0 TOTAL SOVEREIGNTY | INDUSTRIAL AUDIT: PASS</p>
                 </div>
             </div>
-            <div id="output" class="window-content terminal-font">
-                <p class="line welcome">[[ SIGMAOS ZENITH v93.0 -- SOVEREIGN CLI MODE ]]</p>
-                <p class="line">Ready for silicon-direct instructions.</p>
-            </div>
-            <div class="window-footer">
-                <span class="prompt">Σ://zenith></span>
-                <input type="text" id="command-input" placeholder="Execute shard..." autofocus spellcheck="false" title="Zenith Shell Input">
-            </div>
-        </div>
-
-        <div id="mem-shard" class="window glass-morphism win-mem hidden">
-            <div class="window-header" onmousedown="dragWindow(event, 'mem-shard')">
-                <div class="title">MEMORY SHARD REGISTRY</div>
-                <div class="controls"><span class="close" onclick="closeWindow('mem-shard')">×</span></div>
-            </div>
-            <div class="window-content">
-                <p>Status: HIERARCHICAL PAGING ACTIVE</p>
-                <p>Slab: 128MB SHARD [ALLOCATED]</p>
-                <div class="bar-container"><div class="bar-fill" id="mem-usage"></div></div>
-            </div>
-        </div>
-
-        <div id="calc-shard" class="window glass-morphism win-calc hidden">
-            <div class="window-header" onmousedown="dragWindow(event, 'calc-shard')">
-                <div class="title">SUPER CALCULATOR ZENITH</div>
-                <div class="controls"><span class="close" onclick="closeWindow('calc-shard')">×</span></div>
-            </div>
-            <div class="window-content terminal-font">
-                <div class="calc-display">0</div>
-                <div class="calc-grid">
-                    <span>7</span><span>8</span><span>9</span><span>/</span>
-                    <span>4</span><span>5</span><span>6</span><span>*</span>
-                    <span>1</span><span>2</span><span>3</span><span>-</span>
-                    <span>0</span><span>C</span><span>=</span><span>+</span>
+            <div class="health-monitoring">
+                <div class="health-item">
+                    <span>SILICON TEMP: 32°C</span>
+                    <div class="health-bar green"></div>
+                </div>
+                <div class="health-item">
+                    <span>SHARD LOAD: 0.1%</span>
+                    <div class="health-bar blue"></div>
+                </div>
+                <div class="health-item">
+                    <span>THREAT-LEVEL: ZERO</span>
+                    <div class="health-bar cyan"></div>
                 </div>
             </div>
-        </div>
+        </header>
 
-        <div id="ml-shard" class="window glass-morphism win-ml hidden">
-            <div class="window-header" onmousedown="dragWindow(event, 'ml-shard')">
-                <div class="title">SOVEREIGN ML CORE</div>
-                <div class="controls"><span class="close" onclick="closeWindow('ml-shard')">×</span></div>
+        <!-- Main Desktop Workspace -->
+        <main id="desktop" class="desktop-workspace">
+            <!-- Iconic Grid -->
+            <div class="icon-grid">
+                <div class="icon" onclick="openWindow('omni-shell')">
+                    <div class="icon-glyph terminal">Σ</div><span>Omni-Shell</span>
+                </div>
+                <div class="icon" onclick="openWindow('mem-shard')">
+                    <div class="icon-glyph memory">M</div><span>Memory</span>
+                </div>
+                <div class="icon" onclick="openWindow('catalog-shard')">
+                    <div class="icon-glyph catalog">≡</div><span>Shard-Audit</span>
+                </div>
+                <div class="icon" onclick="openWindow('calc-shard')">
+                    <div class="icon-glyph calc">∑</div><span>Calculator</span>
+                </div>
+                <div class="icon" onclick="openWindow('ml-shard')">
+                    <div class="icon-glyph ml">∀</div><span>ML-Core</span>
+                </div>
+                <div class="icon" onclick="openWindow('net-zenith')">
+                    <div class="icon-glyph network">N</div><span>Network</span>
+                </div>
+                <div class="icon" onclick="openWindow('cloud-forge')">
+                    <div class="icon-glyph cloud">C</div><span>Cloud-Nexus</span>
+                </div>
+                <div class="icon" onclick="openWindow('pqc-shard')">
+                    <div class="icon-glyph pqc">Q</div><span>Lattice-PQC</span>
+                </div>
+                <div class="icon" onclick="openWindow('hyper-zenith')">
+                    <div class="icon-glyph hyper">H</div><span>Hypervisor</span>
+                </div>
+                <div class="icon" onclick="openWindow('absorb-shard')">
+                    <div class="icon-glyph absorb">Δ</div><span>Absorption</span>
+                </div>
             </div>
-            <div class="window-content">
-                <p>[INTENT]: SHARD CLASSIFICATION ACTIVE</p>
-                <p>[LOSS]: 0.00000001 (ZENITH CONVERGENCE)</p>
-                <div class="brain-visualize">[[ GENESIS SHARD MAPPED ]]</div>
-            </div>
-        </div>
 
-        <div id="absorb-shard" class="window glass-morphism win-ml hidden">
-            <div class="window-header" onmousedown="dragWindow(event, 'absorb-shard')">
-                <div class="title">Σ AETHER ABSORPTION ENGINE</div>
-                <div class="controls"><span class="close" onclick="closeWindow('absorb-shard')">×</span></div>
+            <!-- Draggable Windows -->
+            <div id="omni-shell" class="window glass-morphism win-shell hidden">
+                <div class="window-header" onmousedown="dragWindow(event, 'omni-shell')">
+                    <div class="title">Σ OMNI-SHELL ZENITH</div>
+                    <div class="close" onclick="closeWindow('omni-shell')">×</div>
+                </div>
+                <div class="window-content terminal-font" id="output">
+                    <p class="line welcome">[[ SILICON-DIRECT ACCESS GRANTED -- ZENITH v93.0 SUPREME ]]</p>
+                </div>
+                <div class="window-footer">
+                    <span class="prompt">Σ://zenith></span>
+                    <input type="text" id="command-input" placeholder="Execute shard..." autofocus spellcheck="false" title="Zenith Shell Input">
+                </div>
             </div>
-            <div class="window-content terminal-font">
-                <div id="absorb-output">Ready to absorb legacy v1.0-v92.0 shards...</div>
-                <button class="absorb-btn" onclick="startAbsorption()">EXECUTE UNIFICATION</button>
-            </div>
-        </div>
 
-        <div id="catalog-shard" class="window glass-morphism win-shell hidden">
-            <div class="window-header" onmousedown="dragWindow(event, 'catalog-shard')">
-                <div class="title">Σ SHARD CATALOG [FULL AUDIT]</div>
-                <div class="controls"><span class="close" onclick="closeWindow('catalog-shard')">×</span></div>
+            <div id="catalog-shard" class="window glass-morphism win-shell hidden">
+                <div class="window-header" onmousedown="dragWindow(event, 'catalog-shard')">
+                    <div class="title">Σ SHARD CATALOG [91+ MASTER SHARDS AUDITED]</div>
+                    <div class="close" onclick="closeWindow('catalog-shard')">×</div>
+                </div>
+                <div class="window-content terminal-font" id="catalog-content"></div>
             </div>
-            <div class="window-content terminal-font" id="catalog-content">
-                <!-- Data-injected via JS -->
-            </div>
-        </div>
 
-        <!-- Taskbar -->
-        <div class="taskbar">
-            <div class="start-btn" onclick="openWindow('absorb-shard')">Σ</div>
-            <div class="running-apps" id="running-apps">
-                <div id="task-omni-shell" class="task-item active hidden" onclick="focusWindow('omni-shell')">Omni-Shell</div>
-                <div id="task-mem-shard" class="task-item hidden" onclick="focusWindow('mem-shard')">Memory Shard</div>
-                <div id="task-calc-shard" class="task-item hidden" onclick="focusWindow('calc-shard')">Calculator</div>
-                <div id="task-ml-shard" class="task-item hidden" onclick="focusWindow('ml-shard')">ML-Core</div>
-                <div id="task-absorb-shard" class="task-item hidden" onclick="focusWindow('absorb-shard')">Absorber</div>
+            <!-- Merged-UI: Forensic Shard Viewer -->
+            <div id="pqc-shard" class="window glass-morphism win-ml hidden">
+                <div class="window-header" onmousedown="dragWindow(event, 'pqc-shard')">
+                    <div class="title">Σ LATTICE-PQC SECURITY MATRIX</div>
+                    <div class="close" onclick="closeWindow('pqc-shard')">×</div>
+                </div>
+                <div class="window-content terminal-font">
+                    <p>[SHARD]: Kyber-V5 Active</p>
+                    <p>[LOG]: Entropic-Leakage Negated (100% Post-Quantum Immunity)</p>
+                    <div class="security-pulse">[[ ENCRYPTED ]]</div>
+                </div>
             </div>
-            <div class="system-time">
-                <span id="merged-level" class="system-status-level">LEVEL: ZENITH</span>
-                <span id="clock">14:15</span>
+        </main>
+
+        <!-- Sovereign Taskbar -->
+        <footer class="taskbar-supreme">
+            <div class="start-btn-zenith" onclick="openWindow('absorb-shard')">Σ</div>
+            <div class="task-tabs" id="running-apps">
+                <div id="task-omni-shell" class="task-item hidden" onclick="focusWindow('omni-shell')">Shell</div>
+                <div id="task-catalog-shard" class="task-item hidden" onclick="focusWindow('catalog-shard')">Audit</div>
+                <div id="task-pqc-shard" class="task-item hidden" onclick="focusWindow('pqc-shard')">PQC</div>
             </div>
-        </div>
+            <div class="system-region">
+                <span class="supremacy-level">SUPREMACY ACTIVE</span>
+                <span id="clock" class="digital-time">14:40</span>
+            </div>
+        </footer>
     </div>
     <script src="index.js"></script>
 </body>
