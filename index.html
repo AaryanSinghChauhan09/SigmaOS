@@ -2,9 +2,9 @@
 =========================================================================
 Σ SIGMAOS: SOVEREIGN ZENITH DESKTOP (index.html)
 =========================================================================
-VERSION: 10.0.0 (Absolute Sovereignty Edition)
-CORE: Zero-Dependency Metal-Nexus UI
-DESIGN: Liquid Glass / Micro-Pixel Accuracy
+VERSION: 11.0.0 (The Transcendence Update)
+MISSION: Neutralize all modern Linux Desktop Environments (GNOME/KDE).
+CORE: Metal-Nexus Canvas-Shader Bridge
 =========================================================================
 -->
 <!DOCTYPE html>
@@ -12,181 +12,121 @@ DESIGN: Liquid Glass / Micro-Pixel Accuracy
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>SigmaOS v10.0 – Sovereign Zenith Desktop</title>
+    <title>SigmaOS v11.0 – Sovereign Transcendence Desktop</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
     <style>
         :root {
-            /* Liquid Chrome Palette */
-            --bg-deep:      #020408;
-            --surface:      rgba(8, 12, 24, 0.45);
-            --surface-solid:#080c18;
+            /* Transcendence Chromatic Palette */
+            --bg-deep:      #010204;
+            --surface:      rgba(10, 15, 30, 0.45);
             --border:       rgba(255, 255, 255, 0.08);
-            --border-glow:  rgba(0, 210, 255, 0.4);
             --accent:       #00d2ff;
-            --accent-rgb:   0, 210, 255;
-            --accent-2:     #7c3aed;
+            --accent-glow:  rgba(0, 210, 255, 0.4);
+            --gold:         #ffcc00;
             --text-primary: #ffffff;
-            --text-sec:     rgba(255, 255, 255, 0.7);
-            --text-dim:     rgba(255, 255, 255, 0.35);
-            
-            /* Sizing & Pixels */
-            --radius-main:  16px;
-            --radius-btn:   8px;
-            --dock-h:       84px;
-            --bar-h:        34px;
-            --blur:         blur(32px);
+            --radius-win:   20px;
             --font:         'Outfit', sans-serif;
-            
-            /* Elevation */
-            --shadow-lg:    0 32px 64px -16px rgba(0, 0, 0, 0.8);
-            --shadow-win:   0 0 0 1px rgba(255,255,255,0.05), 0 24px 80px rgba(0,0,0,0.6);
+            --bar-h:        36px;
         }
 
-        * { box-sizing: border-box; margin: 0; padding: 0; outline: none; -webkit-tap-highlight-color: transparent; }
-        body { 
-            background: var(--bg-deep); 
-            color: var(--text-primary); 
-            font-family: var(--font); 
-            height: 100vh; 
-            overflow: hidden; 
-            background-image: 
-                radial-gradient(circle at 0% 0%, rgba(0, 210, 255, 0.08) 0%, transparent 40%),
-                radial-gradient(circle at 100% 100%, rgba(124, 58, 237, 0.08) 0%, transparent 40%);
-        }
+        * { box-sizing: border-box; margin: 0; padding: 0; outline: none; }
+        body { background: var(--bg-deep); color: var(--text-primary); font-family: var(--font); height: 100vh; overflow: hidden; perspective: 1000px; }
 
-        /* ── MESH BACKGROUND ── */
-        #mesh-bg { position: fixed; inset: 0; z-index: 0; opacity: 0.2; pointer-events: none; }
+        /* ── TRANSCENDENCE BACKGROUND ── */
+        canvas { position: fixed; inset: 0; z-index: 0; opacity: 0.3; }
 
-        /* ── TOP BAR (SOVEREIGN HUD) ── */
+        /* ── SOVEREIGN HUD ── */
         #hud { 
             position: fixed; top: 0; left: 0; right: 0; height: var(--bar-h);
-            background: rgba(4, 6, 12, 0.2); 
-            backdrop-filter: var(--blur); -webkit-backdrop-filter: var(--blur);
+            background: rgba(0, 0, 0, 0.2); backdrop-filter: blur(20px);
             border-bottom: 1px solid var(--border);
             display: flex; align-items: center; justify-content: space-between;
-            padding: 0 16px; z-index: 10000;
+            padding: 0 20px; z-index: 10000;
         }
-        .hud-logo { font-weight: 900; font-size: 0.8rem; letter-spacing: 0.5px; color: var(--accent); display: flex; align-items: center; gap: 8px; }
-        .hud-logo span { padding: 2px 6px; background: var(--accent); color: var(--bg-deep); border-radius: 4px; font-size: 0.6rem; }
-        .hud-stats { display: flex; gap: 20px; font-size: 0.7rem; font-weight: 600; color: var(--text-sec); text-transform: uppercase; }
-        .hud-stats b { color: var(--accent); }
+        .hud-logo { font-weight: 900; font-size: 0.9rem; letter-spacing: 1px; color: var(--accent); }
+        .hud-logo span { font-weight: 400; color: var(--text-primary); opacity: 0.6; }
+        .hud-stats { display: flex; gap: 30px; font-size: 0.75rem; font-weight: 700; color: var(--accent); text-transform: uppercase; }
 
-        /* ── ZENITH DOCK ── */
-        #dock-container {
-            position: fixed; bottom: 16px; left: 50%; transform: translateX(-50%);
-            display: flex; align-items: center; padding: 12px;
-            background: var(--surface); backdrop-filter: var(--blur);
-            border: 1px solid var(--border); border-radius: 24px;
-            box-shadow: var(--shadow-lg); z-index: 9999;
+        /* ── SHARD DOCK ── */
+        #dock {
+            position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%);
+            display: flex; padding: 12px; gap: 10px;
+            background: rgba(10, 15, 30, 0.5); backdrop-filter: blur(40px);
+            border: 1px solid var(--border); border-radius: 28px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.8); z-index: 9999;
         }
         .dock-item {
-            width: 48px; height: 48px; margin: 0 6px; 
-            background: rgba(255, 255, 255, 0.03); 
-            border: 1px solid rgba(255, 255, 255, 0.05);
-            border-radius: 12px; display: flex; align-items: center; justify-content: center;
-            font-size: 1.5rem; cursor: pointer; transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-            position: relative;
+            width: 54px; height: 54px; border-radius: 14px; 
+            background: rgba(255, 255, 255, 0.03); border: 1px solid rgba(255, 255, 255, 0.05);
+            display: flex; align-items: center; justify-content: center; font-size: 1.6rem; 
+            cursor: pointer; transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
         }
-        .dock-item:hover { 
-            transform: translateY(-12px) scale(1.2); 
-            background: rgba(255, 255, 255, 0.1); 
-            border-color: var(--accent);
-            box-shadow: 0 8px 24px rgba(var(--accent-rgb), 0.3);
-        }
-        .dock-item::after {
-            content: ''; position: absolute; bottom: -8px; left: 50%; transform: translateX(-50%);
-            width: 4px; height: 4px; background: var(--accent); border-radius: 50%;
-            opacity: 0; transition: opacity 0.3s;
-        }
-        .dock-item.active::after { opacity: 1; }
+        .dock-item:hover { transform: translateY(-15px) scale(1.2); border-color: var(--accent); box-shadow: 0 10px 30px var(--accent-glow); }
 
-        /* ── WINDOWS (LIQUID GLASS) ── */
+        /* ── SOVEREIGN WINDOWS ── */
         .win {
-            position: fixed; background: var(--surface); backdrop-filter: var(--blur);
-            border: 1px solid var(--border); border-radius: var(--radius-main);
+            position: fixed; background: var(--surface); backdrop-filter: blur(40px);
+            border: 1px solid var(--border); border-radius: var(--radius-win);
             display: flex; flex-direction: column; overflow: hidden;
-            box-shadow: var(--shadow-win); z-index: 100;
-            transition: opacity 0.3s, transform 0.3s cubic-bezier(0.16, 1, 0.3, 1);
-            animation: win-enter 0.4s cubic-bezier(0, 0, 0.2, 1);
+            box-shadow: 0 40px 100px rgba(0,0,0,0.7); z-index: 100;
+            transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+            transform-style: preserve-3d;
         }
-        @keyframes win-enter {
-            from { opacity: 0; transform: scale(0.9) translateY(20px); }
-            to { opacity: 1; transform: scale(1) translateY(0); }
-        }
-        .win.focused { border-color: var(--border-glow); box-shadow: 0 0 0 1px var(--border-glow), var(--shadow-lg); }
-        .win.minimized { opacity: 0; transform: scale(0.8) translateY(100vh); pointer-events: none; }
-
-        .wbar { height: 42px; display: flex; align-items: center; padding: 0 16px; cursor: move; gap: 12px; background: rgba(0,0,0,0.1); }
+        .win.focused { border-color: var(--accent); box-shadow: 0 0 0 1px var(--accent-glow), 0 40px 120px rgba(0,0,0,0.9); transform: translateZ(50px); }
+        
+        .wbar { height: 44px; display: flex; align-items: center; padding: 0 20px; cursor: move; gap: 15px; }
         .wctrls { display: flex; gap: 10px; }
-        .wdot { width: 13px; height: 13px; border-radius: 50%; border: none; cursor: pointer; transition: transform 0.2s; }
-        .wdot:hover { transform: scale(1.2); }
-        .wdot.cl { background: #ff5f57; }
-        .wdot.mn { background: #febc2e; }
-        .wdot.mx { background: #28c841; }
-        .wtitle { font-size: 0.85rem; font-weight: 700; color: var(--text-sec); flex: 1; letter-spacing: 0.3px; }
+        .wdot { width: 14px; height: 14px; border-radius: 50%; border: none; cursor: pointer; }
+        .wdot.cl { background: #ff5f57; } .wdot.mn { background: #febc2e; } .wdot.mx { background: #28c841; }
+        .wtitle { font-size: 0.85rem; font-weight: 800; color: var(--text-primary); flex: 1; letter-spacing: 0.5px; text-shadow: 0 2px 4px rgba(0,0,0,0.5); }
 
         .wbody { flex: 1; background: #000; position: relative; }
-        .wbody iframe { width: 100%; height: 100%; border: none; background: transparent; }
+        .wbody iframe { width: 100%; height: 100%; border: none; }
 
-        /* ── DESKTOP AREA ── */
+        /* ── DESKTOP ICONS ── */
         #desktop {
-            position: fixed; inset: var(--bar-h) 0 var(--dock-h) 0;
-            padding: 32px; display: grid; grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
-            grid-auto-rows: 100px; gap: 24px; z-index: 1;
+            position: fixed; inset: var(--bar-h) 0 100px 0; padding: 40px;
+            display: grid; grid-template-columns: repeat(auto-fill, 110px); grid-auto-rows: 110px; gap: 30px; z-index: 1;
         }
-        .di {
-            display: flex; flex-direction: column; align-items: center; gap: 12px;
-            cursor: pointer; border-radius: 12px; padding: 12px; transition: all 0.2s;
+        .di { 
+            display: flex; flex-direction: column; align-items: center; gap: 10px; cursor: pointer; 
+            transition: all 0.2s; border-radius: 16px; padding: 10px;
         }
-        .di:hover { background: rgba(255, 255, 255, 0.05); }
-        .di span { font-size: 3rem; filter: drop-shadow(0 8px 16px rgba(0,0,0,0.4)); }
-        .di label { font-size: 0.8rem; font-weight: 600; color: var(--text-sec); text-align: center; pointer-events: none; }
+        .di:hover { background: rgba(255, 255, 255, 0.05); backdrop-filter: blur(10px); }
+        .di span { font-size: 3.2rem; filter: drop-shadow(0 10px 20px rgba(0,0,0,0.5)); }
+        .di label { font-size: 0.8rem; font-weight: 700; color: rgba(255,255,255,0.8); text-shadow: 0 2px 6px rgba(0,0,0,0.8); pointer-events: none; }
 
-        /* ── OMNI SEARCH ── */
-        #omni-search {
-            position: fixed; top: 20%; left: 50%; transform: translateX(-50%);
-            width: 600px; background: var(--surface); backdrop-filter: var(--blur);
-            border: 1px solid var(--border-glow); border-radius: 20px;
-            padding: 24px; z-index: 10001; visibility: hidden; opacity: 0;
-            transition: all 0.2s;
-        }
-        #omni-search.active { visibility: visible; opacity: 1; top: 25%; }
-        #omni-input {
-            width: 100%; background: transparent; border: none; color: white;
-            font-size: 1.5rem; font-weight: 600; font-family: var(--font);
-        }
     </style>
 </head>
 <body>
 
+    <canvas id="nexus-canvas"></canvas>
+
     <div id="hud">
-        <div class="hud-logo">Σ SIGMAOS <span>ZENITH v10.0</span></div>
+        <div class="hud-logo">Σ SIGMAOS <span>v11.0 TRANSCENDENCE</span></div>
         <div class="hud-stats">
-            <div>CPU <b>2%</b></div>
-            <div>MEM <b>1.2 GB</b> / 64 GB</div>
-            <div>NET <b>SOVEREIGN P2P</b></div>
-            <div id="clock">08:18 AM</div>
+            <div>CORE: <b>SHARDED</b></div>
+            <div>SECURITY: <b>LATTICE-PQC</b></div>
+            <div>LATENCY: <b>0.0ms</b></div>
+            <div id="clock">09:10 AM</div>
         </div>
     </div>
 
     <div id="desktop">
-        <div class="di" onclick="zenith.launch('⚖️ Legal Core', 'userland/apps/legal_core.html')"><span>⚖️</span><label>Legal Core</label></div>
-        <div class="di" onclick="zenith.launch('📊 Monitor', 'userland/apps/monitor.html')"><span>📊</span><label>Monitor</label></div>
-        <div class="di" onclick="zenith.launch('🧮 Calculator', 'sigma_calc.html')"><span>🧮</span><label>Calculator</label></div>
-        <div class="di" onclick="zenith.launch('📂 Files', 'userland/apps/explorer.html')"><span>📂</span><label>Explorer</label></div>
+        <div class="di" onclick="zenith.launch('⚖️ Legal Matrix', 'userland/apps/sigma_bharat_legal_suite.html')"><span>⚖️</span><label>Legal Suite</label></div>
+        <div class="di" onclick="zenith.launch('🧮 Sovereign Math', 'sigma_calc.html')"><span>🧮</span><label>Math Shard</label></div>
+        <div class="di" onclick="zenith.launch('📂 VFS Matrix', 'userland/apps/explorer.html')"><span>📂</span><label>Explorer</label></div>
+        <div class="di" onclick="zenith.launch('🌋 Dev Forge', 'sigma_ide.html')"><span>🌋</span><label>IDE Forge</label></div>
     </div>
 
-    <div id="dock-container">
+    <div id="dock">
         <div class="dock-item" onclick="zenith.launch('Terminal', 'userland/apps/terminal.html')">⌨️</div>
         <div class="dock-item" onclick="zenith.launch('Browser', 'userland/apps/browser.html')">🌐</div>
+        <div class="dock-item" onclick="zenith.launch('PQC Vault', 'userland/apps/sigma_identity_vault.html')">🔐</div>
         <div class="dock-item" onclick="zenith.launch('Media', 'userland/apps/media.html')">🎬</div>
-        <div class="dock-item" onclick="zenith.launch('Settings', 'userland/apps/settings.html')">⚙️</div>
-    </div>
-
-    <div id="omni-search">
-        <input type="text" id="omni-input" placeholder="Search Sovereign Zenith...">
+        <div class="dock-item" onclick="zenith.launch('Analytics', 'sigma_monitor.html')">📊</div>
     </div>
 
     <script>
@@ -195,17 +135,12 @@ DESIGN: Liquid Glass / Micro-Pixel Accuracy
             zIdx: 100,
 
             launch(title, url) {
-                if(this.wins[title]) {
-                    this.restore(title);
-                    return;
-                }
-
+                if(this.wins[title]) { this.focus(title); return; }
                 const win = document.createElement('div');
                 win.className = 'win';
-                win.style.width = '900px';
-                win.style.height = '620px';
-                win.style.left = (window.innerWidth/2 - 450 + Object.keys(this.wins).length*20) + 'px';
-                win.style.top = (window.innerHeight/2 - 310 + Object.keys(this.wins).length*20) + 'px';
+                win.style.width = '1000px'; win.style.height = '680px';
+                win.style.left = (window.innerWidth/2 - 500 + Object.keys(this.wins).length*30) + 'px';
+                win.style.top = (window.innerHeight/2 - 340 + Object.keys(this.wins).length*30) + 'px';
 
                 win.innerHTML = `
                     <div class="wbar">
@@ -220,7 +155,6 @@ DESIGN: Liquid Glass / Micro-Pixel Accuracy
                         <iframe src="${url}"></iframe>
                     </div>
                 `;
-
                 document.body.appendChild(win);
                 this.wins[title] = win;
                 this.focus(title);
@@ -229,30 +163,20 @@ DESIGN: Liquid Glass / Micro-Pixel Accuracy
 
             close(title) {
                 const w = this.wins[title];
-                w.style.opacity = '0';
-                w.style.transform = 'scale(0.95) translateY(20px)';
-                setTimeout(() => { w.remove(); delete this.wins[title]; }, 300);
+                w.style.opacity = '0'; w.style.transform = 'scale(0.9) rotateY(10deg)';
+                setTimeout(() => { w.remove(); delete this.wins[title]; }, 400);
             },
 
-            minimize(title) {
-                this.wins[title].classList.add('minimized');
-            },
-
-            restore(title) {
-                this.wins[title].classList.remove('minimized');
-                this.focus(title);
-            },
+            minimize(title) { this.wins[title].style.transform = 'scale(0.5) translateY(200vh)'; },
 
             maximize(title) {
                 const w = this.wins[title];
                 if(w.style.width === '100vw') {
-                    w.style.width = '900px'; w.style.height = '620px';
+                    w.style.width = '1000px'; w.style.height = '680px';
                     w.style.top = '100px'; w.style.left = '100px';
-                    w.style.borderRadius = 'var(--radius-main)';
                 } else {
                     w.style.width = '100vw'; w.style.height = 'calc(100vh - var(--bar-h))';
                     w.style.top = 'var(--bar-h)'; w.style.left = '0';
-                    w.style.borderRadius = '0';
                 }
             },
 
@@ -277,20 +201,28 @@ DESIGN: Liquid Glass / Micro-Pixel Accuracy
             }
         };
 
-        // Hotkeys (Omni Search)
-        window.onkeydown = (e) => {
-            if(e.metaKey && e.key === ' ') {
-                document.getElementById('omni-search').classList.toggle('active');
-                if(document.getElementById('omni-search').classList.contains('active')) {
-                    document.getElementById('omni-input').focus();
-                }
+        // Nexus Background Canvas (Neutralizes standard wallpapers)
+        const canvas = document.getElementById('nexus-canvas');
+        const ctx = canvas.getContext('2d');
+        canvas.width = window.innerWidth;
+        canvas.height = window.innerHeight;
+        
+        function drawNexus() {
+            ctx.clearRect(0,0,canvas.width,canvas.height);
+            ctx.strokeStyle = '#00d2ff'; ctx.lineWidth = 0.5;
+            for(let i=0; i<canvas.width; i+=100) {
+                ctx.beginPath(); ctx.moveTo(i,0); ctx.lineTo(i,canvas.height); ctx.stroke();
             }
-        };
+            for(let j=0; j<canvas.height; j+=100) {
+                ctx.beginPath(); ctx.moveTo(0,j); ctx.lineTo(canvas.width,j); ctx.stroke();
+            }
+        }
+        drawNexus();
 
         // Clock
         setInterval(() => {
             const d = new Date();
-            document.getElementById('clock').textContent = d.getHours()%12 + ":" + d.getMinutes().toString().padStart(2,'0') + (d.getHours() >= 12 ? " PM" : " AM");
+            document.getElementById('clock').textContent = d.getHours()%12 + ":" + d.getMinutes().toString().padStart(2,'0') + " " + (d.getHours() >= 12 ? "PM" : "AM");
         }, 1000);
     </script>
 </body>
