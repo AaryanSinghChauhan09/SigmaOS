@@ -110,7 +110,18 @@ if (input) {
     });
 }
 
-// Clock & Audit Logic
+// Sovereign Master Pulse (SMP) - Monolithic Scheduler Tracker
+function SovereignMasterPulse() {
+    updateClock();
+    animateSiliconPulse();
+    
+    // Cycle every 500ms
+    window.requestAnimationFrame(() => {
+        setTimeout(SovereignMasterPulse, 500); 
+    });
+}
+SovereignMasterPulse();
+
 function updateClock() {
     const clock = document.getElementById('clock');
     if (clock) {
@@ -118,8 +129,6 @@ function updateClock() {
         clock.textContent = now.getHours().toString().padStart(2, '0') + ":" + now.getMinutes().toString().padStart(2, '0');
     }
 }
-setInterval(updateClock, 1000);
-updateClock();
 
 function animateSiliconPulse() {
     const eax = document.getElementById('reg-eax');
@@ -129,7 +138,33 @@ function animateSiliconPulse() {
         ebx.style.width = (Math.random() * 80 + 20) + '%';
     }
 }
-setInterval(animateSiliconPulse, 500);
+
+// Custom Macro Engine (Zero-Dependency)
+function execScript(name) {
+    const term = document.getElementById('output');
+    if (!term) return;
+    openWindow('omni-shell');
+    
+    const p = document.createElement('p');
+    p.className = 'line text-neon-gold';
+    p.textContent = `Σ://macro> Pushing Shard: ${name}...`;
+    term.appendChild(p);
+
+    // Simulated Silicon Latency
+    let i = 0;
+    const interval = setInterval(() => {
+        const dot = document.createElement('span');
+        dot.textContent = '.';
+        p.appendChild(dot);
+        if (++i > 5) {
+            clearInterval(interval);
+            const ok = document.createElement('p');
+            ok.className = 'line text-neon-green';
+            ok.textContent = `[OK]: ${name} merged into Zenith context.`;
+            term.appendChild(ok);
+        }
+    }, 100);
+}
 
 function initCatalog() {
     const catalog = document.getElementById('catalog-content');

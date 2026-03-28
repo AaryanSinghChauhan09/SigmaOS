@@ -87,6 +87,9 @@
                 <div class="icon" onclick="openWindow('automation-shard')">
                     <div class="icon-glyph auto">⚙️</div><span>Automation</span>
                 </div>
+                <div class="icon" onclick="openWindow('macro-shard')">
+                    <div class="icon-glyph macro">M</div><span>Macros</span>
+                </div>
             </div>
 
             <!-- Draggable Windows -->
@@ -135,6 +138,19 @@
                         <input type="text" id="nexus-search" placeholder="Search master shards..." oninput="filterShards()">
                     </div>
                     <div id="catalog-content"></div>
+                </div>
+            </div>
+
+            <div id="macro-shard" class="window glass-morphism win-ml hidden">
+                <div class="window-header" onmousedown="dragWindow(event, 'macro-shard')">
+                    <div class="title">Σ SOVEREIGN MACRO EDITOR</div>
+                    <div class="close" onclick="closeWindow('macro-shard')">×</div>
+                </div>
+                <div class="window-content">
+                    <div class="macro-list">
+                        <div class="script-item" onclick="execScript('MACRO: BOOT_ALL')">RUN: BOOT_ALL_SHARDS</div>
+                        <div class="script-item" onclick="execScript('MACRO: KILL_DROSS')">RUN: PURGE_LEGACY</div>
+                    </div>
                 </div>
             </div>
 
