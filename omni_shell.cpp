@@ -19,6 +19,7 @@
 #include "SovereignXV6Bridge.h"
 #include "SovereignHardwareIOZenith.h"
 #include "SovereignCoordinationZenith.h"
+#include "SovereignDesktopZenith.h"
 
 namespace SigmaOS {
 namespace Shell {
@@ -41,6 +42,7 @@ private:
     XV6Parity::SovereignTrapHandler m_trap;
     Hardware::SovereignDMAController m_dma;
     Coordination::SovereignPetersonSolution m_peterson;
+    Desktop::SovereignZenithDesktop m_desktop;
 
 public:
     OmniShellZenith() : m_commands_sharded(0) {
@@ -108,6 +110,14 @@ public:
              m_peterson.Entering(0);
              sigma_printf("[ZENITH-PETERSON]: CRITICAL SECTION ENTRY (Thread 0).\n");
              m_peterson.Leaving(0);
+        } else if (sigma_compare(cmd, "TOGGLE_GUI")) {
+             m_desktop.ToggleGUI();
+             if (m_desktop.IsGUIActive()) {
+                 sigma_printf("[SHIFT]: Transitioning CLI Shard to Native Desktop SHARD (v93.0)...\n");
+                 m_desktop.RenderDesktop();
+             } else {
+                 sigma_printf("[SHIFT]: Re-activating Omni-Shell Native Command Mode.\n");
+             }
         } else {
             sigma_printf("[OMNI-SHELL]: Dispatching Intent to AI-Kernel Zenith... [SUCCESS].\n");
         }
