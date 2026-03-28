@@ -38,6 +38,30 @@
             <div class="icon-glyph info">i</div>
             <span>Encyclopedia</span>
         </div>
+        <div class="icon" onclick="openWindow('app-store')">
+            <div class="icon-glyph store">S</div>
+            <span>App-Store</span>
+        </div>
+        <div class="icon" onclick="openWindow('automation-shard')">
+            <div class="icon-glyph automation">A</div>
+            <span>Automation</span>
+        </div>
+        <div class="icon" onclick="openWindow('hyper-zenith')">
+            <div class="icon-glyph hyper">H</div>
+            <span>Hypervisor</span>
+        </div>
+        <div class="icon" onclick="openWindow('diagnostics-shard')">
+            <div class="icon-glyph diag">D</div>
+            <span>Diagnostics</span>
+        </div>
+        <div class="icon" onclick="openWindow('voice-shard')">
+            <div class="icon-glyph voice">V</div>
+            <span>Voice-Shard</span>
+        </div>
+        <div class="icon" onclick="openWindow('catalog-shard')">
+            <div class="icon-glyph list">≡</div>
+            <span>Catalog</span>
+        </div>
 
         <!-- Window Container (Draggable Windows) -->
         <div id="omni-shell" class="window glass-morphism win-shell hidden">
@@ -94,6 +118,16 @@
                 <p>[INTENT]: SHARD CLASSIFICATION ACTIVE</p>
                 <p>[LOSS]: 0.00000001 (ZENITH CONVERGENCE)</p>
                 <div class="brain-visualize">[[ GENESIS SHARD MAPPED ]]</div>
+            </div>
+        </div>
+
+        <div id="catalog-shard" class="window glass-morphism win-shell hidden">
+            <div class="window-header" onmousedown="dragWindow(event, 'catalog-shard')">
+                <div class="title">Σ SHARD CATALOG [FULL AUDIT]</div>
+                <div class="controls"><span class="close" onclick="closeWindow('catalog-shard')">×</span></div>
+            </div>
+            <div class="window-content terminal-font" id="catalog-content">
+                <!-- Data-injected via JS -->
             </div>
         </div>
 

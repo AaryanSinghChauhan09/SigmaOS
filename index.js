@@ -30,6 +30,15 @@ const COMMAND_RESPONSES = {
     ]
 };
 
+const MASTER_SHARDS = [
+    "SovereignSuperCalculator.cpp", "SovereignML.cpp", "SovereignTranspilerZenith.cpp",
+    "SovereignNetMesh.cpp", "SovereignWebBridge.cpp", "SovereignOmniTool.cpp",
+    "SovereignAppStore.cpp", "SovereignVoiceShard.cpp", "SovereignAutomationShard.cpp",
+    "SovereignHypervisorZenith.cpp", "SovereignDiagnosticsZenith.cpp", "SovereignEncyclopedia.cpp",
+    "SovereignXV6Bridge.cpp", "SovereignKnowledgeAudit.cpp", "SovereignZenithComplete.cpp",
+    "SovereignLibC.asm", "SovereignKernelFinality.asm", "SigmaOOP.hpp", "SigmaRustCore.rs"
+];
+
 // Window Management
 let maxZ = 10;
 function openWindow(id) {
@@ -119,3 +128,17 @@ updateClock();
 
 // Default: Open the Shell
 openWindow('omni-shell');
+
+// Inject Catalog
+function initCatalog() {
+    const catalog = document.getElementById('catalog-content');
+    if (catalog) {
+        MASTER_SHARDS.forEach(shard => {
+            const line = document.createElement('div');
+            line.style.padding = '5px 0';
+            line.innerHTML = `<span style="color:#00f2ff">[ACTIVE]</span> ${shard}`;
+            catalog.appendChild(line);
+        });
+    }
+}
+initCatalog();

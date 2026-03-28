@@ -260,6 +260,12 @@ input:focus { outline: none; }
 .icon-glyph.ml { color: #ff00ff; border-color: rgba(255, 0, 255, 0.3); }
 .icon-glyph.transpiler { color: #00ffff; border-color: rgba(0, 255, 255, 0.3); }
 .icon-glyph.info { color: #ffffff; border-color: rgba(255, 255, 255, 0.3); }
+.icon-glyph.store { color: #ff8800; border-color: rgba(255, 136, 0, 0.3); }
+.icon-glyph.automation { color: #aaff00; border-color: rgba(170, 255, 0, 0.3); }
+.icon-glyph.hyper { color: #0088ff; border-color: rgba(0, 136, 255, 0.3); }
+.icon-glyph.diag { color: #ff0088; border-color: rgba(255, 0, 136, 0.3); }
+.icon-glyph.voice { color: #8800ff; border-color: rgba(136, 0, 255, 0.3); }
+.icon-glyph.list { color: #bbbbbb; border-color: rgba(187, 187, 187, 0.3); }
 
 .system-time {
     font-family: 'JetBrains Mono', monospace;
