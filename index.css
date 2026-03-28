@@ -10,6 +10,8 @@
     --neon-purple: 0 0 15px rgba(112, 0, 255, 0.4);
 }
 
+.hidden { display: none !important; }
+
 * {
     margin: 0;
     padding: 0;
@@ -84,10 +86,6 @@ body.desktop-bg {
 /* --- WINDOWING SYSTEM --- */
 .window {
     position: absolute;
-    width: 800px;
-    height: 600px;
-    left: 200px;
-    top: 100px;
     display: flex;
     flex-direction: column;
     min-width: 300px;
@@ -95,6 +93,11 @@ body.desktop-bg {
     z-index: 10;
     box-shadow: 0 40px 80px rgba(0, 0, 0, 0.6);
 }
+
+.win-shell { width: 800px; height: 600px; left: 100px; top: 50px; }
+.win-mem { width: 400px; height: 300px; left: 600px; top: 400px; }
+.win-calc { width: 350px; height: 450px; left: 150px; top: 150px; }
+.win-ml { width: 500px; height: 400px; left: 500px; top: 100px; }
 
 .glass-morphism {
     background: var(--bg-glass);
@@ -209,6 +212,54 @@ input:focus { outline: none; }
     border-color: var(--accent-primary);
     box-shadow: var(--neon-blue);
 }
+
+/* --- APP SPECIFIC STYLES --- */
+.calc-display {
+    background: rgba(0, 0, 0, 0.5);
+    padding: 20px;
+    font-size: 2rem;
+    text-align: right;
+    border-radius: 8px;
+    margin-bottom: 20px;
+    border: 1px solid var(--border);
+}
+
+.calc-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 10px;
+}
+
+.calc-grid span {
+    background: rgba(255, 255, 255, 0.05);
+    padding: 15px;
+    text-align: center;
+    border-radius: 8px;
+    cursor: pointer;
+    border: 1px solid var(--border);
+    transition: 0.2s;
+}
+
+.calc-grid span:hover { background: rgba(255, 255, 255, 0.1); }
+
+.bar-container { width: 100%; height: 6px; background: rgba(255, 255, 255, 0.1); border-radius: 3px; margin-top: 20px; }
+.bar-fill { height: 100%; background: #00ff88; border-radius: 3px; }
+#mem-usage { width: 14%; }
+
+.brain-visualize {
+    margin-top: 30px;
+    padding: 40px;
+    background: radial-gradient(circle, var(--accent-secondary) 0%, transparent 70%);
+    opacity: 0.3;
+    border-radius: 50%;
+    text-align: center;
+    font-weight: 900;
+}
+
+.icon-glyph.calc { color: #ffcc00; border-color: rgba(255, 204, 0, 0.3); }
+.icon-glyph.ml { color: #ff00ff; border-color: rgba(255, 0, 255, 0.3); }
+.icon-glyph.transpiler { color: #00ffff; border-color: rgba(0, 255, 255, 0.3); }
+.icon-glyph.info { color: #ffffff; border-color: rgba(255, 255, 255, 0.3); }
 
 .system-time {
     font-family: 'JetBrains Mono', monospace;

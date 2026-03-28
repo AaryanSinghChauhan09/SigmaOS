@@ -18,17 +18,29 @@
             <div class="icon-glyph memory">M</div>
             <span>Memory Shard</span>
         </div>
-        <div class="icon" onclick="openWindow('cloud-forge')">
-            <div class="icon-glyph cloud">C</div>
-            <span>Cloud Forge</span>
+        <div class="icon" onclick="openWindow('calc-shard')">
+            <div class="icon-glyph calc">∑</div>
+            <span>Calculator</span>
+        </div>
+        <div class="icon" onclick="openWindow('ml-shard')">
+            <div class="icon-glyph ml">∀</div>
+            <span>ML Engine</span>
         </div>
         <div class="icon" onclick="openWindow('net-zenith')">
             <div class="icon-glyph network">N</div>
             <span>Net-Zenith</span>
         </div>
+        <div class="icon" onclick="openWindow('transpiler-shard')">
+            <div class="icon-glyph transpiler">T</div>
+            <span>Transpiler</span>
+        </div>
+        <div class="icon" onclick="openWindow('encyclopedia-shard')">
+            <div class="icon-glyph info">i</div>
+            <span>Encyclopedia</span>
+        </div>
 
         <!-- Window Container (Draggable Windows) -->
-        <div id="omni-shell" class="window glass-morphism" style="display: none;">
+        <div id="omni-shell" class="window glass-morphism win-shell hidden">
             <div class="window-header" onmousedown="dragWindow(event, 'omni-shell')">
                 <div class="title">Σ OMNI-SHELL ZENITH</div>
                 <div class="controls">
@@ -45,7 +57,7 @@
             </div>
         </div>
 
-        <div id="mem-shard" class="window glass-morphism" style="display: none; width: 400px; height: 300px;">
+        <div id="mem-shard" class="window glass-morphism win-mem hidden">
             <div class="window-header" onmousedown="dragWindow(event, 'mem-shard')">
                 <div class="title">MEMORY SHARD REGISTRY</div>
                 <div class="controls"><span class="close" onclick="closeWindow('mem-shard')">×</span></div>
@@ -53,15 +65,46 @@
             <div class="window-content">
                 <p>Status: HIERARCHICAL PAGING ACTIVE</p>
                 <p>Slab: 128MB SHARD [ALLOCATED]</p>
-                <div class="bar-container"><div class="bar-fill" style="width: 14%;"></div></div>
+                <div class="bar-container"><div class="bar-fill" id="mem-usage"></div></div>
+            </div>
+        </div>
+
+        <div id="calc-shard" class="window glass-morphism win-calc hidden">
+            <div class="window-header" onmousedown="dragWindow(event, 'calc-shard')">
+                <div class="title">SUPER CALCULATOR ZENITH</div>
+                <div class="controls"><span class="close" onclick="closeWindow('calc-shard')">×</span></div>
+            </div>
+            <div class="window-content terminal-font">
+                <div class="calc-display">0</div>
+                <div class="calc-grid">
+                    <span>7</span><span>8</span><span>9</span><span>/</span>
+                    <span>4</span><span>5</span><span>6</span><span>*</span>
+                    <span>1</span><span>2</span><span>3</span><span>-</span>
+                    <span>0</span><span>C</span><span>=</span><span>+</span>
+                </div>
+            </div>
+        </div>
+
+        <div id="ml-shard" class="window glass-morphism win-ml hidden">
+            <div class="window-header" onmousedown="dragWindow(event, 'ml-shard')">
+                <div class="title">SOVEREIGN ML CORE</div>
+                <div class="controls"><span class="close" onclick="closeWindow('ml-shard')">×</span></div>
+            </div>
+            <div class="window-content">
+                <p>[INTENT]: SHARD CLASSIFICATION ACTIVE</p>
+                <p>[LOSS]: 0.00000001 (ZENITH CONVERGENCE)</p>
+                <div class="brain-visualize">[[ GENESIS SHARD MAPPED ]]</div>
             </div>
         </div>
 
         <!-- Taskbar -->
         <div class="taskbar">
             <div class="start-btn">Σ</div>
-            <div class="running-apps">
-                <div id="task-omni-shell" class="task-item active" style="display: none;">Omni-Shell</div>
+            <div class="running-apps" id="running-apps">
+                <div id="task-omni-shell" class="task-item active hidden" onclick="focusWindow('omni-shell')">Omni-Shell</div>
+                <div id="task-mem-shard" class="task-item hidden" onclick="focusWindow('mem-shard')">Memory Shard</div>
+                <div id="task-calc-shard" class="task-item hidden" onclick="focusWindow('calc-shard')">Calculator</div>
+                <div id="task-ml-shard" class="task-item hidden" onclick="focusWindow('ml-shard')">ML-Core</div>
             </div>
             <div class="system-time" id="clock">14:15</div>
         </div>

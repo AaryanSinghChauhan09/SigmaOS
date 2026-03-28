@@ -6,7 +6,6 @@ const COMMAND_RESPONSES = {
         "- PETERSON: Coordinate Peterson's critical section.",
         "- SCHEDULER: Execute O(1) MLFQ balancing (MIT).",
         "- CLOUD_FORGE: Forge elastic VPC shard (AWS).",
-        "- TOGGLE_GUI: Re-initialize Sovereign Workspace.",
         "- SYSTEM_STATUS: Query silicon-direct registry."
     ],
     'FORK_TEST': [
@@ -32,24 +31,34 @@ const COMMAND_RESPONSES = {
 };
 
 // Window Management
+let maxZ = 10;
 function openWindow(id) {
     const win = document.getElementById(id);
     const task = document.getElementById(`task-${id}`);
-    if (win) win.style.display = 'flex';
-    if (task) task.style.display = 'block';
+    if (win) {
+        win.classList.remove('hidden');
+        win.style.zIndex = ++maxZ;
+    }
+    if (task) task.classList.remove('hidden');
 }
 
 function closeWindow(id) {
     const win = document.getElementById(id);
     const task = document.getElementById(`task-${id}`);
-    if (win) win.style.display = 'none';
-    if (task) task.style.display = 'none';
+    if (win) win.classList.add('hidden');
+    if (task) task.classList.add('hidden');
+}
+
+function focusWindow(id) {
+    const win = document.getElementById(id);
+    if (win) win.style.zIndex = ++maxZ;
 }
 
 function dragWindow(e, id) {
     const win = document.getElementById(id);
     let offsetX = e.clientX - win.offsetLeft;
     let offsetY = e.clientY - win.offsetTop;
+    win.style.zIndex = ++maxZ;
 
     function mouseMove(e) {
         win.style.left = (e.clientX - offsetX) + 'px';
@@ -74,29 +83,36 @@ function addLine(text, className = '') {
     p.classList.add('line');
     if (className) p.classList.add(className);
     p.textContent = text;
-    output.appendChild(p);
-    output.scrollTop = output.scrollHeight;
+    if (output) {
+        output.appendChild(p);
+        output.scrollTop = output.scrollHeight;
+    }
 }
 
-input.addEventListener('keydown', (e) => {
-    if (e.key === 'Enter') {
-        const cmd = input.value.trim().toUpperCase();
-        addLine(`Σ://zenith> ${cmd}`, 'prompt');
-        
-        if (COMMAND_RESPONSES[cmd]) {
-            COMMAND_RESPONSES[cmd].forEach(line => addLine(line));
-        } else if (cmd !== '') {
-            addLine(`[ERROR]: Unknown Shard '${cmd}'. Intent discarded.`);
+if (input) {
+    input.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter') {
+            const cmd = input.value.trim().toUpperCase();
+            addLine(`Σ://zenith> ${cmd}`, 'prompt');
+            
+            if (COMMAND_RESPONSES[cmd]) {
+                COMMAND_RESPONSES[cmd].forEach(line => addLine(line));
+            } else if (cmd !== '') {
+                addLine(`[ERROR]: Unknown Shard '${cmd}'. Intent discarded.`);
+            }
+            
+            input.value = '';
         }
-        
-        input.value = '';
-    }
-});
+    });
+}
 
 // Clock Logic
 function updateClock() {
-    const now = new Date();
-    document.getElementById('clock').textContent = now.getHours().toString().padStart(2, '0') + ":" + now.getMinutes().toString().padStart(2, '0');
+    const clock = document.getElementById('clock');
+    if (clock) {
+        const now = new Date();
+        clock.textContent = now.getHours().toString().padStart(2, '0') + ":" + now.getMinutes().toString().padStart(2, '0');
+    }
 }
 setInterval(updateClock, 1000);
 updateClock();
