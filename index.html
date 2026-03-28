@@ -78,6 +78,9 @@
                 <div class="icon" onclick="openWindow('absorb-shard')">
                     <div class="icon-glyph absorb">Δ</div><span>Absorption</span>
                 </div>
+                <div class="icon" onclick="openWindow('crusher-shard')">
+                    <div class="icon-glyph crusher">†</div><span>Competitor-Crush</span>
+                </div>
             </div>
 
             <!-- Draggable Windows -->
@@ -92,6 +95,27 @@
                 <div class="window-footer">
                     <span class="prompt">Σ://zenith></span>
                     <input type="text" id="command-input" placeholder="Execute shard..." autofocus spellcheck="false" title="Zenith Shell Input">
+                </div>
+            </div>
+
+            <div id="crusher-shard" class="window glass-morphism win-shell hidden">
+                <div class="window-header" onmousedown="dragWindow(event, 'crusher-shard')">
+                    <div class="title">Σ COMPETITOR CRUSHER [INDUSTRIAL SUPERIORITY AUDIT]</div>
+                    <div class="close" onclick="closeWindow('crusher-shard')">×</div>
+                </div>
+                <div class="window-content">
+                    <table class="crush-table">
+                        <thead>
+                            <tr><th>FEATURE</th><th>LINUX / MAC</th><th>SIGMAOS ZENITH</th></tr>
+                        </thead>
+                        <tbody>
+                            <tr><td>Kernel</td><td>Monolithic/Hyb (Blob)</td><td>Sovereign Sharded (L-PQC)</td></tr>
+                            <tr><td>Scheduling</td><td>CFS / O(1)</td><td>O(Zero-Starvation) Aether</td></tr>
+                            <tr><td>Security</td><td>Legacy RSA/ECC</td><td>Lattice-PQC (Quantum Immune)</td></tr>
+                            <tr><td>Deps</td><td>1000+ Dynamic Libs</td><td>Zero-Dependency (Assembly)</td></tr>
+                        </tbody>
+                    </table>
+                    <p class="neutralized">STATUS: COMPETITION NEUTRALIZED</p>
                 </div>
             </div>
 

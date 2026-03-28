@@ -24,7 +24,8 @@ const ALL_REPO_FILES = [
     "SovereignAetherAbsorption.cpp", "SovereignLatticePQC.cpp", "SovereignForensicMatrix.cpp",
     "SovereignGraphicsCompositor.cpp", "SovereignHardwareAudit.cpp", "SovereignLibC.asm", 
     "SovereignStandardHAL.asm", "SovereignScholasticDB.cpp", "SovereignVoiceZenith.cpp",
-    "SovereignDistroForge.cpp", "SovereignPacketMaestro.cpp", "SigmaOOP.hpp", "SigmaRustCore.rs"
+    "SovereignDistroForge.cpp", "SovereignPacketMaestro.cpp", "SovereignRing0Finality.cpp",
+    "SovereignNcertUnity.cpp", "SovereignCognitiveSynth.cpp", "SigmaOOP.hpp", "SigmaRustCore.rs"
 ];
 
 // Supremacy State
@@ -168,5 +169,6 @@ function startAbsorption() {
     }, 1000);
 }
 
-// Default: Open the Command Shell
+// Default: Open the Command Shell & Crusher
 openWindow('omni-shell');
+openWindow('crusher-shard');
