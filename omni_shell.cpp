@@ -17,6 +17,8 @@
 #include "SovereignDiskZenith.h"
 #include "SovereignOSBasicsZenith.h"
 #include "SovereignXV6Bridge.h"
+#include "SovereignHardwareIOZenith.h"
+#include "SovereignCoordinationZenith.h"
 
 namespace SigmaOS {
 namespace Shell {
@@ -37,6 +39,8 @@ private:
     Basics::SovereignMemoryZenithAdv m_memAdv;
     XV6Parity::SovereignPipeNode m_pipe;
     XV6Parity::SovereignTrapHandler m_trap;
+    Hardware::SovereignDMAController m_dma;
+    Coordination::SovereignPetersonSolution m_peterson;
 
 public:
     OmniShellZenith() : m_commands_sharded(0) {
@@ -94,6 +98,16 @@ public:
             }
         } else if (sigma_compare(cmd, "PIPE_TEST")) {
             m_pipe.CreatePipe();
+        } else if (sigma_compare(cmd, "TEST_AND_SET")) {
+             volatile bool lock = false;
+             bool res = Coordination::SovereignAtomicOps::TestAndSet(&lock);
+             sigma_printf("[ZENITH-ATOMIC]: TestAndSet result: %d | New lock: %d\n", res, lock);
+        } else if (sigma_compare(cmd, "DMA_CMD")) {
+             m_dma.TransferBlock(nullptr, nullptr, 4096);
+        } else if (sigma_compare(cmd, "PETERSON")) {
+             m_peterson.Entering(0);
+             sigma_printf("[ZENITH-PETERSON]: CRITICAL SECTION ENTRY (Thread 0).\n");
+             m_peterson.Leaving(0);
         } else {
             sigma_printf("[OMNI-SHELL]: Dispatching Intent to AI-Kernel Zenith... [SUCCESS].\n");
         }

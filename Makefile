@@ -322,6 +322,7 @@ ZENITH_OBJS := $(ZENITH_OBJ_ASM) $(ZENITH_OBJ_CPP) \
                build/SovereignOmniShard.o \
                build/SovereignZenithComplete.o \
                build/SovereignXV6Bridge.o \
+               build/SovereignKnowledgeAudit.o \
                build/omni_shell.o
 
 build/SovereignCoreUtils.o: SovereignCoreUtils.cpp SovereignLibC.h SigmaOOP.hpp
@@ -339,7 +340,10 @@ build/SovereignZenithComplete.o: SovereignZenithComplete.cpp SovereignSyncZenith
 build/SovereignXV6Bridge.o: SovereignXV6Bridge.cpp SovereignXV6Bridge.h SovereignLibC.h SigmaOOP.hpp
 	@$(CXX) $(CXXFLAGS) -c $< -o $@
 
-build/omni_shell.o: omni_shell.cpp SovereignLibC.h SigmaOOP.hpp SovereignOmniShard.h SovereignSyncZenith.h SovereignDiskZenith.h SovereignOSBasicsZenith.h SovereignXV6Bridge.h
+build/SovereignKnowledgeAudit.o: SovereignKnowledgeAudit.cpp SovereignHardwareIOZenith.h SovereignCoordinationZenith.h SovereignLibC.h SigmaOOP.hpp
+	@$(CXX) $(CXXFLAGS) -c $< -o $@
+
+build/omni_shell.o: omni_shell.cpp SovereignLibC.h SigmaOOP.hpp SovereignOmniShard.h SovereignSyncZenith.h SovereignDiskZenith.h SovereignOSBasicsZenith.h SovereignXV6Bridge.h SovereignHardwareIOZenith.h SovereignCoordinationZenith.h
 	@$(CXX) $(CXXFLAGS) -c $< -o $@
 
 zenith: dirs $(ZENITH_OBJS)
