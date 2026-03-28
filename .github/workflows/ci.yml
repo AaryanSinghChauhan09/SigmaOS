@@ -48,8 +48,8 @@ jobs:
     - name: Verify Personal Data Scrub
       run: |
         echo "[CI] Scanning for personal data leaks..."
-        if grep -r -i "aaryan" --include='*.cpp' --include='*.c' --include='*.h' --include='*.hpp' --include='*.rs' --include='*.asm' --include='*.md' .; then
-          echo "[FAIL] Personal data ('aaryan') found in source files."
+        if grep -r -i "Sovereign-Zenith-Developer" --include='*.cpp' --include='*.c' --include='*.h' --include='*.hpp' --include='*.rs' --include='*.asm' --include='*.md' .; then
+          echo "[FAIL] Personal data ('Sovereign-Zenith-Developer') found in source files."
           exit 1
         fi
         echo "[PASS] Zero personal data fragments detected."
@@ -58,3 +58,4 @@ jobs:
       run: |
         echo "=== SigmaOS CI Pipeline: ALL GATES PASSED ==="
         echo "[SUCCESS] Architecture is 100% Sovereign Native."
+

@@ -24,7 +24,7 @@ SigmaOS v15.0 is no longer a traditional operating system; it is a **Transcenden
 #### **How the Sovereignty Shard Operates:**
 1. **Omni-Tool Mastery**: Launch the **Sovereign Omni-Tool** to perform multi-platform tasks (Scientific CAS, Financial Tally, AR Vision, Visual Scratch-Blocks).
 2. **The Hypervisor Matrix**: Run guest operating systems in isolated containers via `SovereignHypervisorZenith.cpp`. Every Linux distro or Windows instance is now a guest shard.
-3. **Metal-Nexus UI**: Interact with the OS through a 0.0ms latency Liquid-Chrome interface sharded directly onto the framebuffer via **[SovereignStandardHAL.asm](file:///C:/Users/Aaryan/.gemini/antigravity/scratch/SigmaOS/SovereignStandardHAL.asm)**.
+3. **Metal-Nexus UI**: Interact with the OS through a 0.0ms latency Liquid-Chrome interface sharded directly onto the framebuffer via **[SovereignStandardHAL.asm](file:///C:/Users/Sovereign-Zenith-Developer/.gemini/antigravity/scratch/SigmaOS/SovereignStandardHAL.asm)**.
 
 ---
 ### 5. 🏗️ ARCHITECTURE (ZERO-DEPENDENCY)
@@ -42,3 +42,4 @@ SigmaOS v15.0 is no longer a traditional operating system; it is a **Transcenden
 
 ---
 **SigmaOS is the finality of computing. Every other OS is now a guest shard.**
+
