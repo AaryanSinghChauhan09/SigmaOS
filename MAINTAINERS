@@ -1,0 +1,14 @@
+# Σ SIGMAOS MAINTENANCE PROTOCOL (MAINTAINERS)
+---
+### EXECUTIVE MAINTAINER
+- **Sovereign-Zenith-Developer** <zenith@sigmaos.sovereign>
+  Responsibility: All System Shards, Architecture, and Cross-Domain Finality.
+
+### SHARD MAINTAINERS
+- **Kernel-Maintainers**: Responsibility: `SovereignKernelFinality.asm`, `SovereignLibC.asm`.
+- **Security-Maintainers**: Responsibility: `SovereignLatticePQC.cpp`.
+- **Logic-Maintainers**: Responsibility: `SovereignAetherOrchestrator`, `SovereignOmniTool.cpp`.
+- **UI-Maintainers**: Responsibility: `index.html` (Metal-Nexus V5).
+
+---
+*Protocol: All changes must be verified through the Zenith Forge (SHARD_REBUILD --verify) before merge.*
