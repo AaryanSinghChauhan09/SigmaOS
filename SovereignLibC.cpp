@@ -41,6 +41,42 @@ void sigma_print_hex(sigma_u64 val) {
     sigma_print(&buf[i + 1]);
 }
 
+// --- sigma_atoi ---
+int sigma_atoi(const char* s) {
+    int res = 0;
+    for (int i = 0; s[i] != '\0'; ++i) {
+        if (s[i] < '0' || s[i] > '9') break;
+        res = res * 10 + s[i] - '0';
+    }
+    return res;
+}
+
+// --- sigma_streq / sigma_compare ---
+int sigma_streq(const char* s1, const char* s2) {
+    sigma_size_t i = 0;
+    while(s1[i] != '\0' && s2[i] != '\0') {
+        if(s1[i] != s2[i]) return SIGMA_FALSE;
+        i++;
+    }
+    return (s1[i] == s2[i]) ? SIGMA_TRUE : SIGMA_FALSE;
+}
+
+int sigma_compare(const char* s1, const char* s2) {
+    return sigma_streq(s1, s2);
+}
+
+// --- sigma_strcat ---
+void sigma_strcat(char* dest, const char* src) {
+    char* rd = dest;
+    while (*rd) rd++;
+    while (*src) {
+        *rd = *src;
+        rd++;
+        src++;
+    }
+    *rd = '\0';
+}
+
 // --- sigma_printf (v1.0 ZENITH) ---
 void sigma_printf(const char* format, ...) {
     va_list args;

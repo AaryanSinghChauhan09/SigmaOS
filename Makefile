@@ -318,9 +318,17 @@ $(ZENITH_OBJ_CPP): SovereignLibC.cpp SovereignLibC.h
 # --- ZENITH DEMONSTRATOR ---
 ZENITH_OBJS := $(ZENITH_OBJ_ASM) $(ZENITH_OBJ_CPP) \
                build/SovereignCoreUtils.o \
+               build/SovereignDistroForge.o \
+               build/SovereignOmniShard.o \
                build/omni_shell.o
 
 build/SovereignCoreUtils.o: SovereignCoreUtils.cpp SovereignLibC.h SigmaOOP.hpp
+	@$(CXX) $(CXXFLAGS) -c $< -o $@
+
+build/SovereignDistroForge.o: SovereignDistroForge.cpp SovereignDistroForge.h SigmaOOP.hpp
+	@$(CXX) $(CXXFLAGS) -c $< -o $@
+
+build/SovereignOmniShard.o: SovereignOmniShard.cpp SovereignOmniShard.h SigmaOOP.hpp
 	@$(CXX) $(CXXFLAGS) -c $< -o $@
 
 build/omni_shell.o: omni_shell.cpp SovereignLibC.h SigmaOOP.hpp

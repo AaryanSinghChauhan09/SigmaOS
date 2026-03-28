@@ -12,6 +12,7 @@
 #include "SovereignLibC.h"
 #include "SovereignDistroForge.h"
 #include "SovereignCoreUtils.h"
+#include "SovereignOmniShard.h"
 
 namespace SigmaOS {
 namespace Shell {
@@ -20,6 +21,10 @@ class OmniShellZenith : public SigmaObject {
 private:
     sigma_u64 m_commands_sharded;
     DistroForge::SovereignDistroForge m_forge;
+    Omni::SovereignScheduler m_scheduler;
+    Omni::SovereignCloudOrchestrator m_cloud;
+    Omni::SovereignUIEngine m_ui;
+    Omni::SovereignNetZenith m_net;
 
 public:
     OmniShellZenith() : m_commands_sharded(0) {
@@ -47,6 +52,14 @@ public:
             CoreUtils::SovereignConcatenate cat; cat.Execute("os_guide.md");
         } else if (sigma_compare(cmd, "TOP")) {
             CoreUtils::SovereignProcessMonitor top; top.Execute();
+        } else if (sigma_compare(cmd, "SCHEDULER")) {
+            m_scheduler.MultilevelFeedbackQueue();
+        } else if (sigma_compare(cmd, "CLOUD_FORGE")) {
+            m_cloud.VirtualVPCIsolation("SIGMA_ENTERPRISE_TENANT");
+        } else if (sigma_compare(cmd, "UI_ZENITH")) {
+            m_ui.RenderSovereignDOM("index.html");
+        } else if (sigma_compare(cmd, "NET_ZENITH")) {
+            m_net.ZeroTrustHandshake();
         } else {
             sigma_printf("[OMNI-SHELL]: Dispatching Intent to AI-Kernel Zenith... [SUCCESS].\n");
         }
