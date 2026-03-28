@@ -13,6 +13,10 @@
 #include "SovereignDistroForge.h"
 #include "SovereignCoreUtils.h"
 #include "SovereignOmniShard.h"
+#include "SovereignSyncZenith.h"
+#include "SovereignDiskZenith.h"
+#include "SovereignOSBasicsZenith.h"
+#include "SovereignXV6Bridge.h"
 
 namespace SigmaOS {
 namespace Shell {
@@ -25,6 +29,14 @@ private:
     Omni::SovereignCloudOrchestrator m_cloud;
     Omni::SovereignUIEngine m_ui;
     Omni::SovereignNetZenith m_net;
+    Sync::SovereignMutex m_mutex;
+    Sync::SovereignSyncProblems m_syncProblems;
+    Disk::SovereignDiskScheduler m_disk;
+    Disk::SovereignIOExpert m_io;
+    Basics::SovereignDeadlockAgent m_deadlock;
+    Basics::SovereignMemoryZenithAdv m_memAdv;
+    XV6Parity::SovereignPipeNode m_pipe;
+    XV6Parity::SovereignTrapHandler m_trap;
 
 public:
     OmniShellZenith() : m_commands_sharded(0) {
@@ -60,6 +72,28 @@ public:
             m_ui.RenderSovereignDOM("index.html");
         } else if (sigma_compare(cmd, "NET_ZENITH")) {
             m_net.ZeroTrustHandshake();
+        } else if (sigma_compare(cmd, "SYNC")) {
+            m_syncProblems.SolveDiningPhilosophers();
+        } else if (sigma_compare(cmd, "DISK")) {
+            m_disk.SSTF_Schedule(nullptr, 10, 50);
+        } else if (sigma_compare(cmd, "DEADLOCK")) {
+            m_deadlock.IsInSafeState();
+        } else if (sigma_compare(cmd, "MEM_ADV")) {
+            m_memAdv.PageFaultHandler(0xDEADBEEF);
+        } else if (sigma_compare(cmd, "FORK_TEST")) {
+            int pid = sigma_fork();
+            if (pid == 0) {
+                sigma_printf("[CHILD]: I am the sovereign child. Executing XV6 Shard...\n");
+                sigma_exit(0);
+            } else if (pid > 0) {
+                sigma_printf("[PARENT]: Child spawned (PID: %d). Waiting for shard completion...\n", pid);
+                sigma_wait((int*)SIGMA_NULL);
+                sigma_printf("[PARENT]: Child shard re-absorbed.\n");
+            } else {
+                sigma_printf("[ERROR]: Fork shard failed.\n");
+            }
+        } else if (sigma_compare(cmd, "PIPE_TEST")) {
+            m_pipe.CreatePipe();
         } else {
             sigma_printf("[OMNI-SHELL]: Dispatching Intent to AI-Kernel Zenith... [SUCCESS].\n");
         }

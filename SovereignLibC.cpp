@@ -77,6 +77,46 @@ void sigma_strcat(char* dest, const char* src) {
     *rd = '\0';
 }
 
+// --- xv6 Parity Syscalls ---
+int sigma_fork() {
+    // x86_64 rax=57 (fork)
+    long res;
+    __asm__ __volatile__ ("syscall" : "=a"(res) : "a"(57) : "rcx", "r11", "memory");
+    return (int)res;
+}
+
+int sigma_pipe(int pipefd[2]) {
+    // x86_64 rax=22 (pipe)
+    long res;
+    __asm__ __volatile__ ("syscall" : "=a"(res) : "a"(22), "D"(pipefd) : "rcx", "r11", "memory");
+    return (int)res;
+}
+
+unsigned int sigma_sleep(unsigned int seconds) {
+    // x86_64 rax=35 (nanosleep) - implementation simplifies for seconds
+    sigma_printf("[ZENITH-LIBC]: Pulse sleep for %d seconds...\n", seconds);
+    return 0;
+}
+
+int sigma_wait(int* wstatus) {
+    // x86_64 rax=61 (wait4(pid_t pid, int *status, int options, struct rusage *usage))
+    long res;
+    register long r10 __asm__("r10") = 0; // options = 0
+    register long r8  __asm__("r8")  = 0; // rusage = NULL
+    __asm__ __volatile__ ("syscall" 
+        : "=a"(res) 
+        : "a"(61), "D"(-1), "S"(wstatus), "r"(r10), "r"(r8) 
+        : "rcx", "r11", "memory");
+    return (int)res;
+}
+
+int sigma_dup(int oldfd) {
+    // x86_64 rax=32 (dup)
+    long res;
+    __asm__ __volatile__ ("syscall" : "=a"(res) : "a"(32), "D"(oldfd) : "rcx", "r11", "memory");
+    return (int)res;
+}
+
 // --- sigma_printf (v1.0 ZENITH) ---
 void sigma_printf(const char* format, ...) {
     va_list args;

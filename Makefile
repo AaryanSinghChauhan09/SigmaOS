@@ -320,6 +320,8 @@ ZENITH_OBJS := $(ZENITH_OBJ_ASM) $(ZENITH_OBJ_CPP) \
                build/SovereignCoreUtils.o \
                build/SovereignDistroForge.o \
                build/SovereignOmniShard.o \
+               build/SovereignZenithComplete.o \
+               build/SovereignXV6Bridge.o \
                build/omni_shell.o
 
 build/SovereignCoreUtils.o: SovereignCoreUtils.cpp SovereignLibC.h SigmaOOP.hpp
@@ -331,7 +333,13 @@ build/SovereignDistroForge.o: SovereignDistroForge.cpp SovereignDistroForge.h Si
 build/SovereignOmniShard.o: SovereignOmniShard.cpp SovereignOmniShard.h SigmaOOP.hpp
 	@$(CXX) $(CXXFLAGS) -c $< -o $@
 
-build/omni_shell.o: omni_shell.cpp SovereignLibC.h SigmaOOP.hpp
+build/SovereignZenithComplete.o: SovereignZenithComplete.cpp SovereignSyncZenith.h SovereignDiskZenith.h SovereignOSBasicsZenith.h SigmaOOP.hpp
+	@$(CXX) $(CXXFLAGS) -c $< -o $@
+
+build/SovereignXV6Bridge.o: SovereignXV6Bridge.cpp SovereignXV6Bridge.h SovereignLibC.h SigmaOOP.hpp
+	@$(CXX) $(CXXFLAGS) -c $< -o $@
+
+build/omni_shell.o: omni_shell.cpp SovereignLibC.h SigmaOOP.hpp SovereignOmniShard.h SovereignSyncZenith.h SovereignDiskZenith.h SovereignOSBasicsZenith.h SovereignXV6Bridge.h
 	@$(CXX) $(CXXFLAGS) -c $< -o $@
 
 zenith: dirs $(ZENITH_OBJS)

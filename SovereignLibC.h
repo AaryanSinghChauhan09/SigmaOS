@@ -32,6 +32,11 @@ extern "C" {
     void*         sigma_mmap(void* addr, sigma_size_t length, int prot, int flags, int fd, sigma_u64 offset);
     int           sigma_getdents64(unsigned int fd, void* dirp, unsigned int count);
     int           sigma_execve(const char* filename, char* const argv[], char* const envp[]);
+    int           sigma_fork();
+    int           sigma_pipe(int* pipefd);
+    unsigned int  sigma_sleep(unsigned int seconds);
+    int           sigma_wait(int* wstatus);
+    int           sigma_dup(int oldfd);
     
     sigma_size_t  sigma_strlen(const char* s);
     void*         sigma_memset(void* s, int c, sigma_size_t n);
