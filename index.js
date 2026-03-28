@@ -258,8 +258,18 @@ if (linuxIn) {
 
             if (cmd === 'ls') {
                 const sp = document.createElement('p');
-                sp.textContent = "bin/  etc/  home/  root/  sigma_shards/";
+                sp.textContent = "bin/  etc/  home/  root/  sigma_shards/  os_guide.md";
                 linuxOut.appendChild(sp);
+            } else if (cmd.startsWith('cat')) {
+                const sp = document.createElement('p');
+                sp.className = 'text-neon-dim';
+                sp.textContent = "[[ Σ SIGMAOS ZENITH SUPREME v93.0 MASTER MANUAL ABSORBED ]]";
+                linuxOut.appendChild(sp);
+            } else if (cmd.startsWith('nano')) {
+                const sp = document.createElement('p');
+                sp.textContent = "[ZENITH]: Integrated Nano-Shard Opened. (Ctrl+X to exit).";
+                linuxOut.appendChild(sp);
+                showToast("Nano Shard Persisted.");
             } else if (cmd === 'top') {
                 const sp = document.createElement('p');
                 sp.textContent = "[ZENITH-TOP]: 0.1% CPU | 4MB RAM | 100+ SHARDS IDLE [OPTIMAL]";

@@ -148,6 +148,20 @@
                 </div>
             </div>
 
+            <div id="v-lab" class="window glass-morphism win-shell hidden holo-border">
+                <div class="window-header" onmousedown="dragWindow(event, 'v-lab')">
+                    <div class="title">Σ SOVEREIGN VIRTUAL LABORATORY [ZENITH PARITY]</div>
+                    <div class="close" onclick="closeWindow('v-lab')">×</div>
+                </div>
+                <div class="window-content terminal-font">
+                    <p class="text-neon-gold">[[ VIRTUAL ASSET ABSTRACTION ACTIVE ]]</p>
+                    <p>SHARD-0: XV6_EMULATOR_INIT</p>
+                    <p>SHARD-1: OSTEP_VM_SIM</p>
+                    <p>SHARD-2: IITB_OS_LABS</p>
+                    <div class="security-pulse">[[ LAB SECURED ]]</div>
+                </div>
+            </div>
+
             <div id="integrity-shard" class="window glass-morphism win-shell hidden holo-border">
                 <div class="window-header" onmousedown="dragWindow(event, 'integrity-shard')">
                     <div class="title">Σ SOVEREIGN INTEGRITY AUDIT [PROFESSIONAL CERTIFIED]</div>
@@ -243,6 +257,18 @@
                 </div>
             </div>
         </main>
+
+        <!-- Sovereign Holographic Dock -->
+        <div class="sovereign-dock-container">
+            <div class="dock-surface glass-morphism holo-border">
+                <div class="dock-item" onclick="openWindow('omni-shell')" title="Omni-Shell"><span class="dock-glyph">Σ</span></div>
+                <div class="dock-item" onclick="openWindow('v-lab')" title="Virtual-Lab"><span class="dock-glyph">V</span></div>
+                <div class="dock-item" onclick="openWindow('dev-forge')" title="Dev-Forge"><span class="dock-glyph">D</span></div>
+                <div class="dock-item" onclick="openWindow('matrix-shard')" title="Forensic-Matrix"><span class="dock-glyph">M</span></div>
+                <div class="dock-item" onclick="openWindow('linux-shard')" title="Linux-Shell"><span class="dock-glyph">L</span></div>
+                <div class="dock-item" onclick="openWindow('integrity-shard')" title="Integrity-Cert"><span class="dock-glyph">★</span></div>
+            </div>
+        </div>
 
         <!-- Sovereign Taskbar -->
         <footer class="taskbar-supreme">
