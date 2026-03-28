@@ -301,6 +301,36 @@ test: sigma_libc_standalone
 		echo "[SKIP] Linux x86_64 only test."; \
 	fi
 
+# --- ZENITH SOVEREIGN LIBC ---
+ZENITH_OBJ_ASM := build/SovereignLibC_asm.o
+ZENITH_OBJ_CPP := build/SovereignLibC_cpp.o
+
+$(ZENITH_OBJ_ASM): SovereignLibC.asm
+	@mkdir -p build
+	@echo "[NASM] SovereignLibC.asm"
+	@$(NASM) $(ASMFLAGS) $< -o $@
+
+$(ZENITH_OBJ_CPP): SovereignLibC.cpp SovereignLibC.h
+	@mkdir -p build
+	@echo "[CXX]  SovereignLibC.cpp"
+	@$(CXX) $(CXXFLAGS) -c $< -o $@
+
+# --- ZENITH DEMONSTRATOR ---
+ZENITH_OBJS := $(ZENITH_OBJ_ASM) $(ZENITH_OBJ_CPP) \
+               build/SovereignCoreUtils.o \
+               build/omni_shell.o
+
+build/SovereignCoreUtils.o: SovereignCoreUtils.cpp SovereignLibC.h SigmaOOP.hpp
+	@$(CXX) $(CXXFLAGS) -c $< -o $@
+
+build/omni_shell.o: omni_shell.cpp SovereignLibC.h SigmaOOP.hpp
+	@$(CXX) $(CXXFLAGS) -c $< -o $@
+
+zenith: dirs $(ZENITH_OBJS)
+	@echo "[LD]   Linking Σ SIGMAOS ZENITH SHARD..."
+	@$(LD) $(LDFLAGS) $(ZENITH_OBJS) -e main -o build/sigmaos_zenith
+	@echo "[OK]   build/sigmaos_zenith is ready for direct silicon execution."
+
 # =============================================================================
 # CLEAN
 # =============================================================================
@@ -314,10 +344,7 @@ clean:
 # =============================================================================
 info:
 	@echo ""
-	@echo "Σ SigmaOS Sovereign Build System v8.0"
+	@echo "Σ SigmaOS Sovereign Build System v93.0 (ZENITH EDITION)"
 	@echo "  ARCH    = $(ARCH)"
-	@echo "  CC      = $(CC)"
-	@echo "  CXX     = $(CXX)"
-	@echo "  RUSTC   = $(RUSTC)"
-	@echo "  NASM    = $(NASM)"
-	@echo "  CFLAGS  = $(CFLAGS)"
+	@echo "  ZENITH_BINS = build/sigmaos_zenith"
+	@echo ""
