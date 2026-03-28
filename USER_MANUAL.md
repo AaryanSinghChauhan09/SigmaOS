@@ -1,9 +1,9 @@
-# Σ SIGMAOS: INDUSTRIAL ARCHITECT'S BIBLE (v31.0 - SOVEREIGN ZENITH)
+# Σ SIGMAOS: INDUSTRIAL ARCHITECT'S BIBLE (v32.0 - MASTER FINALITY)
 ## THE DEFINITIVE PROTOCOL FOR SYSTEM SOVEREIGNTY • ISO-9001 ZENITH COMPLIANT
 ---
 
 ### 🏛️ 1. EXECUTIVE SUMMARY: THE ZENITH PARADIGM
-**SigmaOS (v30+)** is an industrial-grade **Sovereign Zenith Shard** designed to achieve absolute architectural independence. It neutralizes all third-party software variables (Standard Libraries, Guest OS Kernels, External CDNs) to provide a bit-perfect, post-quantum secure environment for mission-critical sharding.
+**SigmaOS (v32+)** is an industrial-grade **Sovereign Zenith Shard** designed to achieve absolute architectural independence. It neutralizes all third-party software variables (Standard Libraries, Guest OS Kernels, External CDNs) to provide a bit-perfect, post-quantum secure environment for mission-critical sharding and industrial operations.
 
 #### CORE SPECIFICATIONS:
 - **Architecture**: x86_64 Metal-Native.
@@ -13,56 +13,63 @@
 
 ---
 
-### ⚙️ 2. SYSTEM SHARD REFERENCE (API & ARCHITECTURE)
-SigmaOS follows the **SOLID Architectural Principle** where every system component is an isolated, sharded entity.
+### ⚙️ 2. SYSTEM SHARD GLOSSARY (SOVEREIGNTY PRIMER)
+To master the SigmaOS architecture, the following industrial terms must be sharded:
 
-| Shard Identifier      | Responsibility                                     | Implementation Base          |
+- **Sharding**: The process of decomposing high-level logic into bit-perfect, isolated silicon instructions.
+- **Silicon Handshake**: The direct, low-level integration between the kernel and the CPU/GPU registers without library overhead.
+- **Lattice-PQC**: Post-Quantum Cryptography based on the shortest vector problem in a lattice, ensuring security against future quantum-intercepts.
+
+---
+
+### 📂 3. THE SHARD REPOSITORY REFERENCE
+The current SigmaOS v32.0 architecture consists of the following master shards:
+
+| Shard Path            | Responsibility                                     | Implementation Base          |
 | --------------------- | -------------------------------------------------- | ---------------------------- |
-| `KernelFinality`      | Ring-0 Hardware Handshake, IDT, Paging.           | [SovereignKernelFinality.asm]|
-| `ProcessManager`      | Preemptive Ring-3 Isolation, SCB Reactor.          | [SovereignProcessManager.cpp]|
-| `OmniTool`            | USP Absorption (Wolfram, Spotlight, Tally).        | [SovereignOmniTool.cpp]      |
-| `LatticePQC`          | Memory Entropy & Quantum-Resistant Sharding.       | [SovereignLatticePQC.cpp]    |
-| `AetherOrchestrator`  | Event-Driven Logic & Automation Pulses.            | [SovereignAetherOrchestrator]|
-| `MetalNexus`          | GPU-Accelerated Framebuffer Compositor.            | [index.html] / [UICore.cpp]  |
+| `SovereignKernelFinality.asm` | Ring-0 Hardware Handshake, IDT, Paging.           | 100% Assembly (x86_64)       |
+| `SovereignProcessManager.cpp` | Preemptive Ring-3 Isolation, SCB Reactor.          | Zenith C++ (SOLID)           |
+| `SovereignOmniTool.cpp`      | USP Absorption Matrix (Wolfram, Spotlight, Tally). | Zenith C++ (Omni-Sharding)   |
+| `SovereignLatticePQC.cpp`    | Memory Entropy & Quantum-Resistant Sharding.       | Zenith C++ (Security)        |
+| `SovereignAetherOrchestrator`| Event-Driven Logic & Automation Pulses.            | Zenith C++ (Automation)      |
+| `index.html`          | Metal-Nexus V4 Framebuffer Desktop (Zero-CDN).     | Metal-Nexus UI Shard         |
+| `SovereignLibC.asm`   | Direct x86_64 Syscall Sharding Engine.             | 100% Assembly (I/O & Life)   |
+| `SigmaOOP.hpp`        | Zero-Dependency OOP Sharding Framework.            | Custom Zenith C++ Header     |
 
 ---
 
-### 🛡️ 3. SECURITY & PROTECTION PROTOCOL
-#### A. LATTICE-PQC-V5 SHARDING
-SigmaOS implements post-quantum lattice-based cryptography for every memory address space. 
-- **Entropic Injection**: Refreshes security keys every 10^9 silicon cycles via `LATTICE_REKEY`.
-- **Silicon-Signatures**: Every module is bit-perfectly verified before it is sharded into the kernel address space.
-
-#### B. NATIVE ISOLATION (RING-3)
-All userland applications run in isolated shards with **Capability-Based Access Control (CBAC)**. A vulnerability in one shard cannot physically migrate to the sovereign core.
+### 🛡️ 4. INDUSTRIAL SECURITY & PROTECTION
+#### A. LATTICE-PQC-V5 REKEYING
+SigmaOS implements post-quantum lattice-based cryptography for every memory block. 
+- **Entropic Injection**: Execute `LATTICE_REKEY` in the Omni-Shell to refresh cryptographic entropy every 10^9 cycles.
+- **Silicon-Signatures**: All shards are verified against their bit-perfect origin hashes before execution.
 
 ---
 
-### ⌨️ 4. THE COMMAND ZENITH: SYSTEM OPERATIONS
-Operate the OS at the industrial level using the **Omni-Shell Zenith**.
-
+### ⌨️ 5. OMNI-SHELL ZENITH: SYSTEM OPERATIONS
 | Command             | Industrial description                                       |
 | ------------------- | ------------------------------------------------------------ |
-| `SHARD_REBUILD`     | Triggers a bit-perfect reconstruction of the OS shards.      |
-| `LATTICE_REKEY`     | Executes a quantum-resistant security refresh.               |
-| `SYS_CLEANSE`       | Purges all legacy logs and personal metadata from the root.  |
-| `USP_ABSORB`        | Synchronizes the competitive absorption matrix.              |
-| `OMNI_SOLVE <q>`    | Dispatches a symbolic math query to the Wolfram shard.       |
-| `SUB_IGNITE <os>`   | Initializes the Micro-Hypervisor to swallow a Guest OS.      |
+| `SHARD_REBUILD`     | Triggers a bit-perfect reconstruction of all system shards.  |
+| `LATTICE_REKEY`     | Executes a quantum-resistant security refresh protocol.      |
+| `SYS_CLEANSE`       | Purges legacy logs and personal metadata artifacts.          |
+| `USP_ABSORB`        | Synchronizes the global competitive absorption matrix.       |
+| `OMNI_SOLVE <q>`    | Dispatches queries to the internal Wolfram CAS shard.        |
+| `SUB_IGNITE <os>`   | Initializes the hypervisor to swallow a Guest OS shard.      |
 
 ---
 
-### 🛠️ 5. INDUSTRIAL INSTALLATION & DEPLOYMENT
-SigmaOS supports **Zero-Touch Sovereign Deployment**:
-
-1.  **Master-Forge**: Build an industrial ISO shard via `SovereignBuildZenith.cpp`.
-2.  **Independent Boot**: Flash the MBR using [SovereignKernelFinality.asm].
-3.  **Cloud-Shard**: Deploy a **FROM scratch** container using the [Dockerfile] for distributed sovereignty.
+### 🛠️ 6. TROUBLESHOOTING & RECOVERY SHARDS
+If bit-perfect integrity is compromised:
+1.  **Re-Forge**: Run `SHARD_REBUILD` to overwrite corrupted bit-blocks with the master machine code.
+2.  **Cleanse**: Run `SYS_CLEANSE` to remove any external traces or dependency leaks.
+3.  **Rekey**: Execute `LATTICE_REKEY` to isolate and neutralize quantum-interception attempts.
 
 ---
 
-### ⚖️ 6. COMPARISON VS. LINUX ENTERPRISE
-| Feature           | Linux Enterprise (RHEL)        | SigmaOS Sovereign (v31.0)       |
+### ⚖️ 7. COMPARISON VS. ENTERPRISE PEERS
+SigmaOS rendering is 100% local, neutralizing standard enterprise dependencies:
+
+| Feature           | Linux Enterprise (RHEL)        | SigmaOS Sovereign (v32.0)       |
 | ----------------- | ------------------------------ | ------------------------------- |
 | **Kernel Type**   | Monolithic (Heavily Dependent) | Sovereign Micro-Shard (Zero)    |
 | **Crypto**        | Legacy (RSA/ECC)               | Post-Quantum (Lattice-V5)       |
@@ -70,7 +77,7 @@ SigmaOS supports **Zero-Touch Sovereign Deployment**:
 | **I/O**           | POSIX (High-Level Wrappers)    | Bit-Perfect Silicon Handshake   |
 
 ---
-**Σ SIGMAOS: THE INDUSTRIAL FINALITY.**
+**Σ SIGMAOS: THE INDUSTRIAL MASTERPIECE.**
 *Absolute Sovereignty. Absolute Professionalism.*
 *Attribution: Sovereign-Zenith-Developer*
 *Compliance: SigmaOS-Master-Standard (v2026)*
