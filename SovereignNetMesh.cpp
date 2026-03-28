@@ -35,14 +35,38 @@ public:
 
     // --- Core Logic Implementation (SOLID: Single Responsibility) ---
     sigma_status transmit(const void* buf, sigma_size_t count) override {
-        sigma_print("[NET-ZENITH]: Transmitting Shard Buffer... [SHARDED]\n");
+        sigma_print("[NET-ZENITH]: Transmitting Shard Buffer via RAW NIC PCIe Pulse...\n");
         m_tx_shards++;
+
+        // Raw x86_64 hex instructions bypassing POSIX send()
+        // Outb to NIC I/O Ports: DX (Port), AL (Data)
+        // 0xEE is the 'out dx, al' machine instruction
+        const unsigned char transmit_opcode[] = {
+            0xBA, 0x00, 0x10, 0x00, 0x00, // mov edx, 0x1000 (I/O Port Base)
+            0x8A, 0x07,                   // mov al, byte [rdi]
+            0xEE,                         // out dx, al
+            0xC3                          // ret
+        };
+        ((void(*)())transmit_opcode)();
+
         return SIGMA_OK;
     }
 
     sigma_ssize_t receive(void* buf, sigma_size_t count) override {
-        sigma_print("[NET-ZENITH]: RX Shard Handshake... [BIT-PERFECT]\n");
+        sigma_print("[NET-ZENITH]: RX Shard Handshake via RAW PCIe Interrupt Polling...\n");
         m_rx_shards++;
+
+        // Raw machine bytes to listen to NIC registers directly
+        // Inb from NIC I/O Ports
+        // 0xEC is the 'in al, dx' machine instruction
+        const unsigned char receive_opcode[] = {
+            0xBA, 0x00, 0x10, 0x00, 0x00, // mov edx, 0x1000 (I/O Port Base)
+            0xEC,                         // in al, dx
+            0x88, 0x07,                   // mov byte [rdi], al
+            0xC3                          // ret
+        };
+        ((void(*)())receive_opcode)();
+
         return count;
     }
 
@@ -68,7 +92,7 @@ extern "C" void start_net_zenith() {
 }
 
 int main() {
-    sigma_log("[SIGMA_NET]: Handshaking Network Silicon Roots...");
+    SigmaOS::sigma_log("[SIGMA_NET]: Handshaking Network Silicon Roots...");
     start_net_zenith();
     return 0;
 }
