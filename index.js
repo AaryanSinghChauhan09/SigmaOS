@@ -33,13 +33,14 @@ const DISTROS = [
     { id: 'rocky', name: 'Rocky Linux 9', icon: '🛡️', info: 'RHEL-Compatible Master', url: 'https://copy.sh/v86/?profile=rocky' },
     { id: 'alpine', name: 'Alpine Linux', icon: '🏔️', info: 'Security-oriented Shard', url: 'https://copy.sh/v86/?profile=alpine' },
     { id: 'gentoo', name: 'Gentoo Linux', icon: '🟣', info: 'Source-based Sovereignty', url: 'https://copy.sh/v86/?profile=gentoo' },
-    { id: 'fedora', name: 'Fedora Workstation', icon: '🧢', info: 'Cutting-Edge Sharding', url: 'https://copy.sh/v86/?profile=fedora' }
+    { id: 'fedora', name: 'Fedora Workstation', icon: '🧢', info: 'Cutting-Edge Sharding', url: 'https://copy.sh/v86/?profile=fedora' },
+    { id: 'custom', name: 'Custom ISO/Disk', icon: '💿', info: 'Universal Shard Loader', url: '' }
 ];
 
 const MATRIX_TOOLS = [
     { id: 'xclicker', name: 'Sigma XClicker', desc: 'Sovereign Auto-Clicking logic.', icon: '🖱️', USP: 'robiot/xclicker' },
     { id: 'autokey', name: 'Sigma AutoKey', desc: 'Industrial Macro Automation.', icon: '⌨️', USP: 'famousshea/autokey' },
-    { id: 'merlin_ia', name: 'Merlin-IA Master', desc: 'AI-driven system balancing.', icon: '🤖', USP: 'N1ghthill/merlin-ia' },
+    { id: 'merlin_ia', name: 'Sovereign AI Shard', desc: 'Autonomous system balancing.', icon: '🤖', USP: 'N1ghthill/merlin-ia' },
     { id: 'cloud_provision', name: 'vSphere Provisioner', desc: 'Industrial Infrastructure Sharding.', icon: '☁️', USP: 'miladhzzzz/vsphere-infra' },
     { id: 'script_master', name: 'Automation Playbook', desc: 'Universal Bash/Python Matrix.', icon: '📜', USP: 'muhibarshad/Linux-Automation-Scripts' }
 ];
@@ -82,6 +83,11 @@ const termInput = document.getElementById('terminal-input');
 const matrixDashboard = document.getElementById('matrix-dashboard');
 const guiControls = document.getElementById('gui-controls');
 
+const academyList = document.getElementById('academy-list');
+const userList = document.getElementById('user-list');
+const backupControls = document.getElementById('backup-controls');
+const backupLog = document.getElementById('backup-log');
+
 // --- Core Initialization ---
 document.addEventListener('DOMContentLoaded', () => {
     initClock();
@@ -99,6 +105,9 @@ document.addEventListener('DOMContentLoaded', () => {
     initRemoteConsole();
     initMatrix();
     initGUIBuilder();
+    initAcademy();
+    initUserManagement();
+    initBackupShard();
     spawnToast('Σ SIGMAOS ZENITH SUPREME INITIALIZED');
     spawnToast('Industrial Shard Mastery Active', 1500);
 });
@@ -331,6 +340,63 @@ function updateAccent(val) {
     document.documentElement.style.setProperty('--accent-primary', val);
 }
 
+function initAcademy() {
+    if (!academyList) return;
+    const lessons = [
+        { id: 1, name: 'VFS Sharding', desc: 'Master ls, cd, mkdir logic.' },
+        { id: 2, name: 'Process Control', desc: 'Audit industrial tasks.' },
+        { id: 3, name: 'System AI', desc: 'Collaborate with Sovereign AI.' }
+    ];
+    academyList.innerHTML = '';
+    lessons.forEach(l => {
+        const el = document.createElement('div');
+        el.className = 'metric-card';
+        el.innerHTML = `
+            <div class="u-bold u-font-size-xs">${l.name}</div>
+            <div class="u-font-size-xxs u-muted-text u-margin-b-10">${l.desc}</div>
+            <button class="status-chip" onclick="startLesson(${l.id})">Start Sharding</button>
+        `;
+        academyList.appendChild(el);
+    });
+}
+
+function startLesson(id) {
+    spawnToast('Initializing Academy Lesson ' + id);
+    termPrint('[ACADEMY] Lesson ' + id + ' Active. Target: Sovereign Mastery.');
+}
+
+function initUserManagement() {
+    if (!userList) return;
+    const users = [
+        { name: 'root', role: 'MASTER', status: 'ACTIVE' },
+        { name: 'aaryan', role: 'SHARD_OWNER', status: 'ACTIVE' }
+    ];
+    userList.innerHTML = '';
+    users.forEach(u => {
+        const el = document.createElement('div');
+        el.className = 'metric-card u-margin-b-10';
+        el.innerHTML = `<div class="metric-header"><span>👤 ${u.name}</span> <span class="u-accent-text">${u.role}</span></div>`;
+        userList.appendChild(el);
+    });
+}
+
+function initBackupShard() {
+    if (!backupControls) return;
+    backupControls.innerHTML = `
+        <button class="status-chip" onclick="triggerBackup('SYSTEM')">System Snapshot</button>
+        <button class="status-chip" onclick="triggerBackup('MEDIA')">Media Scraper</button>
+    `;
+}
+
+function triggerBackup(type) {
+    spawnToast('Initiating ' + type + ' Backup...');
+    if (backupLog) {
+        backupLog.innerHTML += `<div>[${type}] Sharding stream initialized... OK</div>`;
+        backupLog.innerHTML += `<div>[${type}] Sovereign checksum verification... PASSED</div>`;
+        backupLog.scrollTop = backupLog.scrollHeight;
+    }
+}
+
 function initDistroRunner() {
     if (!distroSelector) return;
     distroSelector.innerHTML = '';
@@ -346,8 +412,16 @@ function initDistroRunner() {
 function startDistroStream(id) {
     const d = DISTROS.find(x => x.id === id);
     if (!d) return;
+
+    let targetUrl = d.url;
+    if (id === 'custom') {
+        const customUrl = prompt('Enter the Sovereign ISO/Disk Image URL (e.g. https://example.com/linux.iso):');
+        if (!customUrl) return;
+        targetUrl = 'https://copy.sh/v86/?iso=' + encodeURIComponent(customUrl);
+    }
+
     distroSelector.classList.add('hidden');
-    distroIframe.src = d.url;
+    distroIframe.src = targetUrl;
     distroIframe.classList.remove('hidden');
     spawnToast('Streaming Distribution Shard: ' + d.name);
 }
