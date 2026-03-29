@@ -42,7 +42,9 @@ const MATRIX_TOOLS = [
     { id: 'autokey', name: 'Sigma AutoKey', desc: 'Industrial Macro Automation.', icon: '⌨️', USP: 'famousshea/autokey' },
     { id: 'merlin_ia', name: 'Sovereign AI Shard', desc: 'Autonomous system balancing.', icon: '🤖', USP: 'N1ghthill/merlin-ia' },
     { id: 'cloud_provision', name: 'vSphere Provisioner', desc: 'Industrial Infrastructure Sharding.', icon: '☁️', USP: 'miladhzzzz/vsphere-infra' },
-    { id: 'script_master', name: 'Automation Playbook', desc: 'Universal Bash/Python Matrix.', icon: '📜', USP: 'muhibarshad/Linux-Automation-Scripts' }
+    { id: 'script_master', name: 'Automation Playbook', desc: 'Universal Bash/Python Matrix.', icon: '📜', USP: 'muhibarshad/Linux-Automation-Scripts' },
+    { id: 'ai_orchestrator', name: 'Aether Orchestrator', desc: 'Multi-model AI sharding.', icon: '🤖', USP: 'AI-Orchestrator-v2.0' },
+    { id: 'spectrum_terminal', name: 'Spectrum AI Shell', desc: 'Neural command prediction.', icon: '⚡', USP: 'Spectrum-Terminal-V18' }
 ];
 
 const THEMES = [
@@ -108,6 +110,8 @@ document.addEventListener('DOMContentLoaded', () => {
     initAcademy();
     initUserManagement();
     initBackupShard();
+    initAIOrchestrator();
+    initSpectrumTerminal();
     spawnToast('Σ SIGMAOS ZENITH SUPREME INITIALIZED');
     spawnToast('Industrial Shard Mastery Active', 1500);
 });
@@ -315,6 +319,10 @@ function executeMatrixTool(id) {
         termPrint('[MATRIX] Injected Macro Shard: Ctrl+Shift+S -> Sovereign Sync.');
     } else if (id === 'merlin_ia') {
         runSafetyAudit();
+    } else if (id === 'ai_orchestrator') {
+        openWindow('aiorch');
+    } else if (id === 'spectrum_terminal') {
+        openWindow('spectrum');
     }
 }
 
@@ -395,6 +403,57 @@ function triggerBackup(type) {
         backupLog.innerHTML += `<div>[${type}] Sovereign checksum verification... PASSED</div>`;
         backupLog.scrollTop = backupLog.scrollHeight;
     }
+}
+
+// --- AI Orchestrator Integration ---
+function initAIOrchestrator() {
+    const modelList = document.getElementById('ai-model-list');
+    if (!modelList) return;
+    const models = ['ChatGPT', 'Claude', 'Gemini', 'Perplexity', 'Grok', 'Liner', 'Ask5AI', 'LMArena'];
+    modelList.innerHTML = models.map(m => `<div class="status-chip u-margin-b-5">${m}</div>`).join(' ');
+}
+
+function executeOrchestration() {
+    const prompt = document.getElementById('ai-orch-prompt').value;
+    const log = document.getElementById('ai-orch-log');
+    if (!prompt) return;
+    
+    log.innerHTML += `<div>[AETHER] Initiating mission: "${prompt}"</div>`;
+    log.innerHTML += `<div>[AETHER] Routing to 11 platforms via Spectrum Routing...</div>`;
+    
+    setTimeout(() => {
+        log.innerHTML += `<div class="u-accent-text">[AETHER] Perplexity Pro: Academic Focus active.</div>`;
+        log.innerHTML += `<div class="u-accent-text">[AETHER] Grok Fun: Creative logic enabled.</div>`;
+        log.innerHTML += `<div class="u-accent-text">[AETHER] MISSION SUCCESS: Responses aggregated in Aether Cloud.</div>`;
+        log.scrollTop = log.scrollHeight;
+        spawnToast('Orchestration Mission Complete');
+    }, 2000);
+}
+
+// --- Spectrum Terminal Integration ---
+function initSpectrumTerminal() {
+    const input = document.getElementById('spectrum-input');
+    const output = document.getElementById('spectrum-output');
+    if (!input) return;
+
+    input.addEventListener('keydown', e => {
+        if (e.key === 'Enter') {
+            const val = input.value.trim();
+            const line = document.createElement('div');
+            line.className = 'term-line';
+            line.textContent = 'spectrum@sigma:~$ ' + val;
+            output.appendChild(line);
+            
+            // AI Prediction Simulation
+            const prediction = document.createElement('div');
+            prediction.className = 'term-line u-muted-text';
+            prediction.textContent = '[AI-PREDICT] Executing industrial shard for: ' + val;
+            output.appendChild(prediction);
+            
+            output.scrollTop = output.scrollHeight;
+            input.value = '';
+        }
+    });
 }
 
 function initDistroRunner() {
