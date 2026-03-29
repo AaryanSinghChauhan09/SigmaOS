@@ -3,553 +3,207 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Σ SIGMAOS ZENITH SUPREME (v94.0) | SOVEREIGN INDUSTRIAL KERNEL</title>
-    <meta name="description" content="The ultimate sovereign operating system. Zero-dependency, bit-perfect, and ultra-high performance. Built for industrial supremacy.">
-    <link rel="stylesheet" href="index.css">
+    <title>SigmaOS | The Definitive Industrial Sovereignty</title>
+    <meta name="description" content="SigmaOS is an industrial-grade, sovereign operating system for x86_64, engineered with C, Rust, and Assembly. Absolute performance, zero bloat.">
+    
+    <!-- Premium Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;800&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
+    
+    <link rel="stylesheet" href="site.css">
 </head>
-<body>
-    <!-- ═══════════════════════════════════════════════════════════
-         1. SOVEREIGN BACKGROUND
-         ═══════════════════════════════════════════════════════════ -->
-    <canvas id="bg-canvas"></canvas>
-    <div id="mesh-overlay"></div>
-
-    <!-- ═══════════════════════════════════════════════════════════
-         2. TOP BAR
-         ═══════════════════════════════════════════════════════════ -->
-    <header id="top-bar">
-        <div id="top-bar-left">
-            <span class="sigma-logo">Σ SIGMAOS <span class="u-muted-text u-font-size-xs">ZENITH v94.0</span></span>
-            <div class="top-item" data-window="sysinfo">
-                <div class="status-chip"><div class="pulse"></div> KERNEL: ACTIVE</div>
-            </div>
-            <div class="top-item u-muted-text u-font-size-xs">
-                CPU: <span id="cpu-val" class="u-accent-text">--%</span>
-                &nbsp;&nbsp;MEM: <span id="mem-val" class="u-accent-text">--%</span>
-            </div>
+<body class="dark-theme">
+    <div id="loader" class="loader-overlay">
+        <div class="loader-content">
+            <span class="sigma-symbol">Σ</span>
+            <div class="loader-line"></div>
         </div>
-        <div id="top-bar-right">
-            <span id="clock" title="Sovereign System Time">00:00:00</span>
-            <span id="power-icon" class="top-item" title="Kernel Power Integration">⚡</span>
-        </div>
-    </header>
+    </div>
 
-    <!-- ═══════════════════════════════════════════════════════════
-         3. WORKSPACE (WINDOW AREA)
-         ═══════════════════════════════════════════════════════════ -->
-    <main id="workspace">
-
-        <!-- TERMINAL WINDOW -->
-        <section id="win-terminal" class="window focused win-terminal-default">
-            <div class="win-header">
-                <div class="win-title">
-                    <span class="win-icon">🐚</span>
-                    <span>sigma_shell — root@sigmaos</span>
-                </div>
-                <div class="win-controls">
-                    <div class="win-btn win-min" data-action="minimize" data-win="terminal"></div>
-                    <div class="win-btn win-max" data-action="maximize" data-win="terminal"></div>
-                    <div class="win-btn win-close" data-action="close" data-win="terminal"></div>
-                </div>
+    <!-- Navigation -->
+    <nav id="main-nav">
+        <div class="nav-container">
+            <div class="logo">
+                <img src="assets/logo.png" alt="Σ">
+                <span>SIGMAOS</span>
             </div>
-            <div class="win-content terminal-bg">
-                <div id="terminal-output" class="term-container">
-                    <span class="term-line u-accent-text u-bold">Σ SIGMAOS ZENITH SUPREME [Version 94.0.0.1]</span>
-                    <span class="term-line u-muted-text u-margin-b-20">(c) 2026 Sovereign-Zenith-Developer. Absolute System Sovereignty Achieved.</span>
-                    <span class="term-line">Type 'help' to see available kernel commands.</span>
-                </div>
-                <div class="term-input-line">
-                    <span class="term-prompt">root@sigmaos:~#</span>
-                    <input type="text" id="terminal-input" class="term-field" autofocus spellcheck="false" autocomplete="off" title="Terminal Input" aria-label="Terminal Input field">
-                </div>
+            <ul class="nav-links">
+                <li><a href="#features">Features</a></li>
+                <li><a href="#editions">Editions</a></li>
+                <li><a href="https://github.com/AaryanSinghChauhan09/SigmaOS" target="_blank">GitHub</a></li>
+                <li><a href="dashboard/index.html" class="cta-nav">Launch Dashboard</a></li>
+            </ul>
+            <div class="menu-toggle">
+                <span></span>
+                <span></span>
+                <span></span>
             </div>
-        </section>
-
-        <!-- SYSTEM INFO WINDOW -->
-        <section id="win-sysinfo" class="window hidden win-sysinfo-default">
-            <div class="win-header">
-                <div class="win-title">📊 Sovereign Metrics</div>
-                <div class="win-controls">
-                    <div class="win-btn win-min" data-action="minimize" data-win="sysinfo"></div>
-                    <div class="win-btn win-close" data-action="close" data-win="sysinfo"></div>
-                </div>
-            </div>
-            <div class="win-content">
-                <div class="metrics-grid">
-                    <div class="metric-card">
-                        <div class="metric-header"><span>CPU LOAD</span> <span id="cpu-percent">0%</span></div>
-                        <div class="metric-value" id="cpu-val-display">--.0</div>
-                        <div class="progress-bar"><div id="cpu-bar" class="progress-fill"></div></div>
-                    </div>
-                    <div class="metric-card">
-                        <div class="metric-header"><span>MEMORY</span> <span id="mem-usage">0/1 PB</span></div>
-                        <div class="metric-value" id="mem-val-display">--.0</div>
-                        <div class="progress-bar"><div id="mem-bar" class="progress-fill"></div></div>
-                    </div>
-                </div>
-                <!-- Process table here via JS -->
-                <div id="process-monitor" class="u-margin-t-20">
-                     <h4 class="u-font-size-xs u-muted-text u-margin-b-10 u-letter-spacing-1">CORE PROCESSES</h4>
-                     <div id="proc-list" class="u-font-code u-font-size-xs"></div>
-                </div>
-            </div>
-        </section>
-
-        <!-- FILE BROWSER WINDOW -->
-        <section id="win-files" class="window hidden win-files-default">
-            <div class="win-header">
-                <div class="win-title">📂 Sovereign VFS</div>
-                <div class="win-controls">
-                    <div class="win-btn win-min" data-action="minimize" data-win="files"></div>
-                    <div class="win-btn win-close" data-action="close" data-win="files"></div>
-                </div>
-            </div>
-            <div class="win-content" id="file-grid"></div>
-        </section>
-
-        <!-- APP STORE / REPOSITORY WINDOW -->
-        <section id="win-pkg" class="window hidden win-pkg-default">
-            <div class="win-header">
-                <div class="win-title">📦 Sovereign App Repository</div>
-                <div class="win-controls">
-                    <div class="win-btn win-min" data-action="minimize" data-win="pkg"></div>
-                    <div class="win-btn win-close" data-action="close" data-win="pkg"></div>
-                </div>
-            </div>
-            <div class="win-content">
-                <div id="pkg-list" class="u-full-width"></div>
-            </div>
-        </section>
-
-        <!-- SYSTEM SERVICE MONITOR WINDOW -->
-        <section id="win-services" class="window hidden win-services-default">
-            <div class="win-header">
-                <div class="win-title">⚙️ Sovereign Init Shard</div>
-                <div class="win-controls">
-                    <div class="win-btn win-min" data-action="minimize" data-win="services"></div>
-                    <div class="win-btn win-close" data-action="close" data-win="services"></div>
-                </div>
-            </div>
-            <div class="win-content">
-                <div id="service-list" class="u-font-code u-font-size-xs"></div>
-            </div>
-        <!-- DISTRO RUNNER WINDOW (ZERO-DOWNLOAD LOCAL EXECUTION) -->
-        <section id="win-runner" class="window hidden win-distro-default">
-            <div class="win-header">
-                <div class="win-title">⚡ Sovereign Distro Runner (v86 Sharding)</div>
-                <div class="win-controls">
-                    <div class="win-btn win-min" data-action="minimize" data-win="runner"></div>
-                    <div class="win-btn win-close" data-action="close" data-win="runner"></div>
-                </div>
-            </div>
-            <div class="win-content distro-frame-container" id="distro-frame-container">
-                <div id="distro-selector" class="distro-selector"></div>
-                <iframe id="distro-iframe" class="hidden u-full-width u-full-height u-border-none" title="Sovereign Linux Shard"></iframe>
-            </div>
-        </section>
-
-        <!-- PLUGIN MANAGER WINDOW -->
-        <section id="win-plugins" class="window hidden win-services-default">
-            <div class="win-header">
-                <div class="win-title">🧩 Sovereign Plugin Shard</div>
-                <div class="win-controls">
-                    <div class="win-btn win-min" data-action="minimize" data-win="plugins"></div>
-                    <div class="win-btn win-close" data-action="close" data-win="plugins"></div>
-                </div>
-            </div>
-            <div class="win-content u-grid-1">
-                <div id="plugin-list"></div>
-            </div>
-        </section>
-
-        <!-- GUI BUILDER / CUSTOMIZER WINDOW -->
-        <section id="win-guibuilder" class="window hidden win-pkg-default">
-            <div class="win-header">
-                <div class="win-title">🎨 Sovereign GUI Architect</div>
-                <div class="win-controls">
-                    <div class="win-btn win-min" data-action="minimize" data-win="guibuilder"></div>
-                    <div class="win-btn win-close" data-action="close" data-win="guibuilder"></div>
-                </div>
-            </div>
-            <div class="win-content u-padding-16">
-                <div class="u-margin-b-20 u-accent-text u-bold">SOVEREIGN WORKSPACE ORCHESTRATION</div>
-                <div id="gui-controls" class="u-grid-2"></div>
-            </div>
-        </section>
-
-        <!-- INDUSTRIAL MASTER MATRIX WINDOW (30+ DISTRO FEATURES) -->
-        <section id="win-matrix" class="window hidden win-distro-default">
-            <div class="win-header">
-                <div class="win-title">💠 Sovereign Industrial Master Matrix</div>
-                <div class="win-controls">
-                    <div class="win-btn win-min" data-action="minimize" data-win="matrix"></div>
-                    <div class="win-btn win-close" data-action="close" data-win="matrix"></div>
-                </div>
-            </div>
-            <div class="win-content u-padding-16">
-                <div class="u-margin-b-20 u-accent-text u-bold">SOVEREIGN SYSTEM SHARDS (ABSORBED REPOSITORIES)</div>
-                <div id="matrix-dashboard" class="u-grid-2"></div>
-            </div>
-        </section>
-
-        <!-- THEME STORE WINDOW -->
-        <section id="win-themes" class="window hidden win-services-default">
-            <div class="win-header">
-                <div class="win-title">🎭 Sovereign Theme Shard</div>
-                <div class="win-controls">
-                    <div class="win-btn win-min" data-action="minimize" data-win="themes"></div>
-                    <div class="win-btn win-close" data-action="close" data-win="themes"></div>
-                </div>
-            </div>
-            <div class="win-content u-grid-1">
-                <div id="theme-list"></div>
-            </div>
-        </section>
-
-        <!-- NETWORK / VPN WINDOW -->
-        <section id="win-net" class="window hidden win-services-default">
-            <div class="win-header">
-                <div class="win-title">🌐 Sovereign Network Shard</div>
-                <div class="win-controls">
-                    <div class="win-btn win-min" data-action="minimize" data-win="net"></div>
-                    <div class="win-btn win-close" data-action="close" data-win="net"></div>
-                </div>
-            </div>
-            <div class="win-content u-grid-1">
-                <div id="vpn-list"></div>
-            </div>
-        </section>
-
-        <!-- CLOUD INFRASTRUCTURE / VM HUB -->
-        <section id="win-cloud" class="window hidden win-services-default">
-            <div class="win-header">
-                <div class="win-title">☁️ Sovereign Infrastructure Hub (vSphere)</div>
-                <div class="win-controls">
-                    <div class="win-btn win-min" data-action="minimize" data-win="cloud"></div>
-                    <div class="win-btn win-close" data-action="close" data-win="cloud"></div>
-                </div>
-            </div>
-            <div class="win-content u-padding-16">
-                <div class="u-margin-b-20 u-accent-text u-bold">SOVEREIGN CLOUD PROVISIONING (VMs)</div>
-                <div id="vm-list" class="u-grid-2"></div>
-            </div>
-        </section>
-
-        <!-- REMOTE CONSOLE / BOT MANAGER -->
-        <section id="win-remote" class="window hidden win-terminal-default">
-            <div class="win-header">
-                <div class="win-title">📡 Sovereign Remote Console (Bot Style)</div>
-                <div class="win-controls">
-                    <div class="win-btn win-min" data-action="minimize" data-win="remote"></div>
-                    <div class="win-btn win-close" data-action="close" data-win="remote"></div>
-                </div>
-            </div>
-            <div class="win-content u-flex-column">
-                <div id="remote-term" class="u-font-code u-full-width u-full-height u-padding-16 win-terminal-pre"></div>
-                <div class="u-padding-16 u-border-top-glass">
-                    <input type="text" id="remote-cmd" class="u-font-code u-full-width u-bg-transparent u-text-white u-border-none u-outline-none" placeholder="Enter remote bots command...">
-                </div>
-            </div>
-        </section>
-
-        <!-- CLI UTILS / SYSTOOLS WINDOW -->
-        <section id="win-utils" class="window hidden win-services-default">
-            <div class="win-header">
-                <div class="win-title">🛠️ Sovereign CLI Utils (Ubuntu style)</div>
-                <div class="win-controls">
-                    <div class="win-btn win-min" data-action="minimize" data-win="utils"></div>
-                    <div class="win-btn win-close" data-action="close" data-win="utils"></div>
-                </div>
-            </div>
-            <div class="win-content u-padding-16">
-                <div id="utils-list" class="u-grid-2"></div>
-            </div>
-        </section>
-
-        <!-- SCRIPTING PLAYGROUND WINDOW -->
-        <section id="win-playground" class="window hidden win-terminal-default">
-            <div class="win-header">
-                <div class="win-title">⚡ Sovereign Scripting Playground</div>
-                <div class="win-controls">
-                    <div class="win-btn win-min" data-action="minimize" data-win="playground"></div>
-                    <div class="win-btn win-close" data-action="close" data-win="playground"></div>
-                </div>
-            </div>
-            <div class="win-content u-flex-column">
-                <textarea id="playground-editor" class="u-font-code u-full-width u-full-height u-border-none u-outline-none u-padding-16 u-bg-transparent u-text-white u-resize-none" placeholder="// Test industrial logic here..."></textarea>
-                <div class="u-padding-16 u-border-top-glass u-flex-end">
-                     <button class="status-chip" onclick="executePlaygroundScript()">Run Logic</button>
-                </div>
-            </div>
-        </section>
-
-        <!-- SAFETY SHARD (RUST STYLE) WINDOW -->
-        <section id="win-safety" class="window hidden win-services-default">
-            <div class="win-header">
-                <div class="win-title">🛡️ Sovereign Safety Shard (Rust-Parity)</div>
-                <div class="win-controls">
-                    <div class="win-btn win-min" data-action="minimize" data-win="safety"></div>
-                    <div class="win-btn win-close" data-action="close" data-win="safety"></div>
-                </div>
-            </div>
-            <div class="win-content u-flex-column u-padding-16">
-                <div class="u-margin-b-20 u-accent-text u-bold">SAFETY-CRITICAL SYSTEM AUDIT (Industrial Hub)</div>
-                <div id="safety-log" class="win-terminal-pre u-font-code u-padding-16"></div>
-                <div class="u-padding-16 u-flex-end">
-                     <button class="status-chip" onclick="runSafetyAudit()">Execute Deep Scan</button>
-                </div>
-            </div>
-        </section>
-
-        <!-- ASSEMBLY CORE (LOW LEVEL) WINDOW -->
-        <section id="win-assembly" class="window hidden win-terminal-default">
-            <div class="win-header">
-                <div class="win-title">⚙️ Sovereign Assembly Core (x86_64)</div>
-                <div class="win-controls">
-                    <div class="win-btn win-min" data-action="minimize" data-win="assembly"></div>
-                    <div class="win-btn win-close" data-action="close" data-win="assembly"></div>
-                </div>
-            </div>
-            <div class="win-content u-font-code u-padding-16 win-terminal-pre">
-                <div class="u-accent-text">; Assembly Core Silicon Logic Shard</div>
-                <div>global _start</div>
-                <div>_start:</div>
-                <div class="u-text-muted">    ; Halt industrial silicon...</div>
-                <div>    cli</div>
-                <div>    hlt</div>
-            </div>
-        </section>
-
-        <!-- SOVEREIGN ACADEMY (EDUCATION SHARD) -->
-        <section id="win-academy" class="window hidden win-services-default">
-            <div class="win-header">
-                <div class="win-title">🎓 Sovereign Academy (Command Mastery)</div>
-                <div class="win-controls">
-                    <div class="win-btn win-min" data-action="minimize" data-win="academy"></div>
-                    <div class="win-btn win-close" data-action="close" data-win="academy"></div>
-                </div>
-            </div>
-            <div class="win-content u-padding-16">
-                <div class="u-margin-b-20 u-accent-text u-bold">COMMAND PRACTICE & INDUSTRIAL MASTERY</div>
-                <div id="academy-list" class="u-grid-2"></div>
-            </div>
-        </section>
-
-        <!-- USER PROVISIONING WINDOW -->
-        <section id="win-users" class="window hidden win-services-default">
-            <div class="win-header">
-                <div class="win-title">👥 Sovereign User Management</div>
-                <div class="win-controls">
-                    <div class="win-btn win-min" data-action="minimize" data-win="users"></div>
-                    <div class="win-btn win-close" data-action="close" data-win="users"></div>
-                </div>
-            </div>
-            <div class="win-content u-padding-16">
-                <div id="user-list" class="u-grid-1"></div>
-            </div>
-        </section>
-
-        <!-- BACKUP SHARD WINDOW -->
-        <section id="win-backup" class="window hidden win-services-default">
-            <div class="win-header">
-                <div class="win-title">💾 Sovereign Backup Shard</div>
-                <div class="win-controls">
-                    <div class="win-btn win-min" data-action="minimize" data-win="backup"></div>
-                    <div class="win-btn win-close" data-action="close" data-win="backup"></div>
-                </div>
-            </div>
-            <div class="win-content u-padding-16">
-                 <div id="backup-controls" class="u-grid-2"></div>
-                 <div id="backup-log" class="win-terminal-pre u-font-code u-margin-t-20 u-padding-8"></div>
-            </div>
-        </section>
-
-        <!-- AI ORCHESTRATOR SHARD -->
-        <section id="win-aiorch" class="window hidden win-distro-default">
-            <div class="win-header">
-                <div class="win-title">🤖 Aether AI Orchestrator (v2.0)</div>
-                <div class="win-controls">
-                    <div class="win-btn win-min" data-action="minimize" data-win="aiorch"></div>
-                    <div class="win-btn win-max" data-action="maximize" data-win="aiorch"></div>
-                    <div class="win-btn win-close" data-action="close" data-win="aiorch"></div>
-                </div>
-            </div>
-            <div class="win-content u-padding-16">
-                <div class="u-margin-b-20 u-accent-text u-bold">MULTI-MODEL ORCHESTRATION ENGINE</div>
-                <div class="u-grid-2">
-                    <div class="metric-card">
-                        <div class="u-font-size-xs u-muted-text">ACTIVE MODELS</div>
-                        <div id="ai-model-list" class="u-margin-t-10"></div>
-                    </div>
-                    <div class="metric-card">
-                        <div class="u-font-size-xs u-muted-text">ORCHESTRATION MODE</div>
-                        <select id="ai-mode-select" class="u-full-width u-bg-transparent u-text-white u-border-glass u-margin-t-10">
-                            <option value="quick">Quick Mode</option>
-                            <option value="pro">Pro Mode (Academic)</option>
-                            <option value="fun">Fun Mode (Creative)</option>
-                        </select>
-                    </div>
-                </div>
-                <div class="u-margin-t-20">
-                    <input type="text" id="ai-orch-prompt" class="u-full-width u-bg-transparent u-text-white u-border-glass u-padding-8" placeholder="Enter orchestration mission...">
-                    <button class="status-chip u-margin-t-10" onclick="executeOrchestration()">Launch Mission</button>
-                </div>
-                <div id="ai-orch-log" class="win-terminal-pre u-font-code u-margin-t-20 u-padding-8 u-full-height"></div>
-            </div>
-        </section>
-
-        <!-- SPECTRUM TERMINAL SHARD -->
-        <section id="win-spectrum" class="window hidden win-terminal-default">
-            <div class="win-header">
-                <div class="win-title">⚡ Spectrum AI Terminal (v18)</div>
-                <div class="win-controls">
-                    <div class="win-btn win-min" data-action="minimize" data-win="spectrum"></div>
-                    <div class="win-btn win-max" data-action="maximize" data-win="spectrum"></div>
-                    <div class="win-btn win-close" data-action="close" data-win="spectrum"></div>
-                </div>
-            </div>
-            <div class="win-content u-flex-column">
-                <div id="spectrum-output" class="term-container u-full-height">
-                    <div class="term-line u-accent-text">[SPECTRUM-V18] Neural Terminal Online.</div>
-                </div>
-                <div class="term-input-line">
-                    <span class="term-prompt">spectrum@sigma:~$</span>
-                    <input type="text" id="spectrum-input" class="term-field" spellcheck="false" autocomplete="off">
-                </div>
-            </div>
-        </section>
-
-        <!-- HELP / COMPLIANCE WIKI WINDOW -->
-        <section id="win-help" class="window hidden win-pkg-default">
-            <div class="win-header">
-                <div class="win-title">📖 Sovereignty Wiki & How-To</div>
-                <div class="win-controls">
-                    <div class="win-btn win-min" data-action="minimize" data-win="help"></div>
-                    <div class="win-btn win-close" data-action="close" data-win="help"></div>
-                </div>
-            </div>
-            <div class="win-content u-padding-16 u-font-size-xs u-scroll-y">
-                <div class="u-margin-b-20 u-accent-text u-bold">SOVEREIGNTY FEATURES & USPs ABSORBTION (Industrial Audit)</div>
-                <div id="wiki-content"></div>
-            </div>
-        </section>
-
-        <!-- SOVEREIGN SCRIPTING WINDOW -->
-        <section id="win-scripts" class="window hidden win-terminal-default">
-            <div class="win-header">
-                <div class="win-title">📜 Sovereign Logic Shard (Automation)</div>
-                <div class="win-controls">
-                    <div class="win-btn win-min" data-action="minimize" data-win="scripts"></div>
-                    <div class="win-btn win-close" data-action="close" data-win="scripts"></div>
-                </div>
-            </div>
-            <div class="win-content u-flex-column">
-                <textarea id="script-editor" class="u-font-code u-full-width u-full-height u-border-none u-outline-none u-padding-16 u-bg-transparent u-text-white u-resize-none" placeholder="// Define Sovereignty Playbook..."></textarea>
-                <div class="u-padding-16 u-border-top-glass u-flex-end">
-                     <button class="status-chip" onclick="executeLogicScript()">Execute Playbook</button>
-                </div>
-            </div>
-        </section>
-
-    </main>
-
-    <!-- ═══════════════════════════════════════════════════════════
-         4. DOCK
-         ═══════════════════════════════════════════════════════════ -->
-    <nav id="dock">
-        <div id="workspace-switcher">
-            <div class="ws-indicator active" data-ws="1">1</div>
-            <div class="ws-indicator" data-ws="2">2</div>
-            <div class="ws-indicator" data-ws="3">3</div>
-        </div>
-        <div class="u-divider"></div>
-        <div class="dock-item" data-window="terminal" data-label="Shell Shard">
-            <svg viewBox="0 0 24 24"><path d="M8 19l-7-7 7-7 1.41 1.41L3.83 12l5.58 5.59L8 19zm8 0l-1.41-1.41L20.17 12l-5.58-5.59L16 5l7 7-7 7z"/></svg>
-        </div>
-        <div class="dock-item" data-window="files" data-label="VFS Shard">
-            <svg viewBox="0 0 24 24"><path d="M10 4H4c-1.1 0-1.99.9-1.99 2L2 18c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V8c0-1.1-.9-2-2-2h-8l-2-2z"/></svg>
-        </div>
-        <div class="dock-item" data-window="pkg" data-label="App Repository">
-            <svg viewBox="0 0 24 24"><path d="M20 6h-8l-2-2H4c-1.1 0-1.99.9-1.99 2L2 18c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V8c0-1.1-.9-2-2-2zm-5 3h2v2h-2V9zm-2 0h2v2h-2V9zm-2 0h2v2h-2V9zm2 7H9v-2h4v2zm3-4H8v-2h8v2z"/></svg>
-        </div>
-        <div class="dock-item" data-window="services" data-label="Init & Services">
-            <svg viewBox="0 0 24 24"><path d="M19.14 12.94c.04-.3.06-.61.06-.94s-.02-.64-.06-.94l2.03-1.58c.18-.14.23-.41.12-.61l-1.92-3.32c-.12-.22-.37-.29-.59-.22l-2.39.96c-.5-.38-1.03-.7-1.62-.94l-.36-2.54c-.04-.24-.24-.41-.48-.41h-3.84c-.24 0-.43.17-.47.41l-.36 2.54c-.59.24-1.13.57-1.62.94l-2.39-.96c-.22-.08-.47 0-.59.22L2.74 8.87c-.12.21-.08.47.12.61l2.03 1.58c-.05.3-.09.63-.09.94s.02.64.06.94l-2.03 1.58c-.18.14-.23.41-.12.61l1.92 3.32c.12.22.37.29.59.22l2.39-.96c.5.38 1.03.7 1.62.94l.36 2.54c.05.24.24.41.48.41h3.84c.24 0 .44-.17.47-.41l.36-2.54c.59-.24 1.13-.56 1.62-.94l2.39.96c.22.08.47 0 .59-.22l1.92-3.32c.12-.22.07-.47-.12-.61l-2.01-1.58zM12 15.6c-1.98 0-3.6-1.62-3.6-3.6s1.62-3.6 3.6-3.6 3.6 1.62 3.6 3.6-1.62 3.6-3.6 3.6z"/></svg>
-        </div>
-        <div class="dock-item" data-window="runner" data-label="Distro Streamer">
-            <svg viewBox="0 0 24 24"><path d="M6 2v6h.01L6 8.01 10 12l-4 4 .01.01H6V22h12v-5.99h-.01L18 16l-4-4 4-3.99-.01-.01H18V2h-12zm10 14.5V20H8v-3.5l4-4 4 4zM12 11.5l-4-4V4h8v3.5l-4 4z"/></svg>
-        </div>
-        <div class="dock-item" data-window="plugins" data-label="Plugin Shards">
-            <svg viewBox="0 0 24 24"><path d="M19.35 10.04C18.67 6.59 15.64 4 12 4 9.11 4 6.6 5.64 5.35 8.04 2.34 8.36 0 10.91 0 14c0 3.31 2.69 6 6 6h13c2.76 0 5-2.24 5-5 0-2.64-2.05-4.78-4.65-4.96zM19 18H6c-2.21 0-4-1.79-4-4 0-2.05 1.53-3.76 3.56-3.97l1.07-.11.5-.95C8.08 7.14 9.94 6 12 6c2.62 0 4.88 1.86 5.39 4.43l.3 1.5 1.53.11c1.56.1 2.78 1.41 2.78 2.96 0 1.65-1.35 3-3 3z"/></svg>
-        </div>
-        <div class="dock-item" data-window="guibuilder" data-label="GUI Architect">
-            <svg viewBox="0 0 24 24"><path d="M12 3c-4.97 0-9 4.03-9 9s4.03 9 9 9c.83 0 1.5-.67 1.5-1.5 0-.39-.15-.74-.39-1.01-.23-.26-.38-.61-.38-.99 0-.83.67-1.5 1.5-1.5H16c2.76 0 5-2.24 5-5 0-4.42-4.03-8-9-8zm-5.5 9c-.83 0-1.5-.67-1.5-1.5S5.67 9 6.5 9 8 9.67 8 10.5 7.33 12 6.5 12zm3-4C8.67 8 8 7.33 8 6.5S8.67 5 9.5 5s1.5.67 1.5 1.5S10.33 8 9.5 8zm5 0c-.83 0-1.5-.67-1.5-1.5S13.67 5 14.5 5s1.5.67 1.5 1.5S15.33 8 14.5 8zm3 4c-.83 0-1.5-.67-1.5-1.5s.67-1.5 1.5-1.5 1.5.67 1.5 1.5-.67 1.5-1.5 1.5z"/></svg>
-        </div>
-        <div class="dock-item" data-window="scripts" data-label="Logic Scripts">
-            <svg viewBox="0 0 24 24"><path d="M14 2H6c-1.1 0-1.99.9-1.99 2L4 20c0 1.1.89 2 1.99 2H18c1.1 0 2-.9 2-2V8l-6-6zm2 16H8v-2h8v2zm0-4H8v-2h8v2zm-3-5V3.5L18.5 9H13z"/></svg>
-        </div>
-        <div class="dock-item" data-window="matrix" data-label="Industrial Matrix">
-            <svg viewBox="0 0 24 24"><path d="M4 8h4V4H4v4zm6 12h4v-4h-4v4zm-6 0h4v-4H4v4zm0-6h4v-4H4v4zm6 0h4v-4h-4v4zm6-10v4h4V4h-4zm-6 4h4V4h-4v4zm6 6h4v-4h-4v4zm0 6h4v-4h-4v4z"/></svg>
-        </div>
-        <div class="dock-item" data-window="themes" data-label="Theme Store">
-            <svg viewBox="0 0 24 24"><path d="M12 3c-4.97 0-9 4.03-9 9s4.03 9 9 9c.83 0 1.5-.67 1.5-1.5 0-.39-.15-.74-.39-1.01-.23-.26-.38-.61-.38-.99 0-.83.67-1.5 1.5-1.5H16c2.76 0 5-2.24 5-5 0-4.42-4.03-8-9-8zm-5.5 9c-.83 0-1.5-.67-1.5-1.5S5.67 9 6.5 9 8 9.67 8 10.5 7.33 12 6.5 12zm3-4C8.67 8 8 7.33 8 6.5S8.67 5 9.5 5s1.5.67 1.5 1.5S10.33 8 9.5 8zm5 0c-.83 0-1.5-.67-1.5-1.5S13.67 5 14.5 5s1.5.67 1.5 1.5S15.33 8 14.5 8zm3 4c-.83 0-1.5-.67-1.5-1.5s.67-1.5 1.5-1.5 1.5.67 1.5 1.5-.67 1.5-1.5 1.5z"/></svg>
-        </div>
-        <div class="dock-item" data-window="net" data-label="Network Shard">
-            <svg viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 17.93c-3.95-.49-7-3.85-7-7.93 0-.62.08-1.21.21-1.79L9 15v1c0 1.1.9 2 2 2v1.93zm6.9-2.54c-.26-.81-1-1.39-1.9-1.39h-1v-3c0-.55-.45-1-1-1H8v-2h2c.55 0 1-.45 1-1V7h2c1.1 0 2-.9 2-2v-.41c2.93 1.19 5 4.06 5 7.41 0 2.08-.8 3.97-2.1 5.39z"/></svg>
-        </div>
-        <div class="dock-item" data-window="help" data-label="Wiki Shard">
-            <svg viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 17h-2v-2h2v2zm2.07-7.75l-.9.92C13.45 12.9 13 13.5 13 15h-2v-.5c0-1.1.45-2.1 1.17-2.83l1.24-1.26c.37-.36.59-.86.59-1.41 0-1.1-.9-2-2-2s-2 .9-2 2H8c0-2.21 1.79-4 4-4s4 1.79 4 4c0 .88-.36 1.68-.93 2.25z"/></svg>
-        </div>
-        <div class="dock-item" data-window="cloud" data-label="Cloud Hub">
-            <svg viewBox="0 0 24 24"><path d="M19.35 10.04C18.67 6.59 15.64 4 12 4 9.11 4 6.6 5.64 5.35 8.04 2.34 8.36 0 10.91 0 14c0 3.31 2.69 6 6 6h13c2.76 0 5-2.24 5-5 0-2.64-2.05-4.78-4.65-4.96z"/></svg>
-        </div>
-        <div class="dock-item" data-window="remote" data-label="Remote Shard">
-            <svg viewBox="0 0 24 24"><path d="M21 3H3c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h18c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm0 16H3V5h18v14zm-10-7h2v2h-2v-2zm-4 0h2v2H7v-2zm8 0h2v2h-2v-2z"/></svg>
-        </div>
-        <div class="dock-item" data-window="utils" data-label="CLI Utils">
-            <svg viewBox="0 0 24 24"><path d="M22.7 19l-9.1-9.1c.9-2.3.4-5-1.5-6.9-2-2-5-2.4-7.4-1.3L9 7 7 9 1.7 3.7c-1.1 2.4-.7 5.4 1.3 7.4 1.9 1.9 4.7 2.4 6.9 1.5l9.1 9.1c.4.4 1 .4 1.4 0l2.3-2.3c.4-.4.4-1.1 0-1.5z"/></svg>
-        </div>
-        <div class="dock-item" data-window="playground" data-label="Script Shard">
-            <svg viewBox="0 0 24 24"><path d="M11 15h2v2h-2v-2zm0-8h2v6h-2V7zm.99-5C6.47 2 2 6.48 2 12s4.47 10 9.99 10C17.52 22 22 17.52 22 12S17.52 2 11.99 2zM12 20c-4.42 0-8-3.58-8-8s3.58-8 8-8 8 3.58 8 8-3.58 8-8 8z"/></svg>
-        </div>
-        <div class="dock-item" data-window="safety" data-label="Safety Shard">
-            <svg viewBox="0 0 24 24"><path d="M12 1L3 5v6c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V5l-9-4zm-2 16l-4-4 1.41-1.41L10 14.17l6.59-6.59L18 9l-8 8z"/></svg>
-        </div>
-        <div class="dock-item" data-window="academy" data-label="Academy Shard">
-            <svg viewBox="0 0 24 24"><path d="M5 13.18v4L12 21l7-3.82v-4L12 17l-7-3.82zM12 3L1 9l11 6 9-4.91V17h2V9L12 3z"/></svg>
-        </div>
-        <div class="dock-item" data-window="users" data-label="User Shard">
-            <svg viewBox="0 0 24 24"><path d="M16 11c1.66 0 2.99-1.34 2.99-3S17.66 5 16 5s-3 1.34-3 3 1.34 3 3 3zm-8 0c1.66 0 2.99-1.34 2.99-3S9.66 5 8 5 5 6.34 5 8s1.34 3 3 3zm0 2c-2.33 0-7 1.17-7 3.5V19h14v-2.5c0-2.33-4.67-3.5-7-3.5zm8 0c-.29 0-.62.02-.97.05 1.16.84 1.97 1.97 1.97 3.45V19h6v-2.5c0-2.33-4.67-3.5-7-3.5z"/></svg>
-        </div>
-        <div class="dock-item" data-window="backup" data-label="Backup Shard">
-            <svg viewBox="0 0 24 24"><path d="M17 3H5c-1.11 0-2 .9-2 2v14c0 1.1.89 2 2 2h14c1.1 0 2-.9 2-2V7l-4-4zm-5 16c-1.66 0-3-1.34-3-3s1.34-3 3-3 3 1.34 3 3-1.34 3-3 3zm3-10H5V5h10v4z"/></svg>
-        </div>
-        <div class="dock-item" data-window="aiorch" data-label="Aether Orchestrator">
-            <svg viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8zM11 7h2v2h-2V7zm0 4h2v6h-2v-6z"/></svg>
-        </div>
-        <div class="dock-item" data-window="spectrum" data-label="Spectrum Terminal">
-            <svg viewBox="0 0 24 24"><path d="M21 3H3c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h18c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm0 16H3V5h18v14zM12 8l4 4-4 4V8z"/></svg>
-        </div>
-        <div class="dock-item" data-window="assembly" data-label="Assembly Core">
-            <svg viewBox="0 0 24 24"><path d="M13 3h-2v10h2V3zm4.83 2.17l-1.42 1.42C17.99 7.86 19 9.81 19 12c0 3.87-3.13 7-7 7s-7-3.13-7-7c0-2.19 1.01-4.14 2.58-5.42L6.17 5.17C4.23 6.82 3 9.26 3 12c0 4.97 4.03 9 9 9s9-4.03 9-9c0-2.74-1.23-5.18-3.17-6.83z"/></svg>
-        </div>
-        <div class="dock-item" data-window="sysinfo" data-label="Zenith Pulse">
-            <svg viewBox="0 0 24 24"><path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-2 10h-4v4h-2v-4H7v-2h4V7h2v4h4v2z"/></svg>
         </div>
     </nav>
 
-    <!-- ═══════════════════════════════════════════════════════════
-         5. SPOTLIGHT (UNIVERSAL SEARCH SHARD)
-         ═══════════════════════════════════════════════════════════ -->
-    <section id="spotlight" class="hidden">
-        <div id="spotlight-box">
-             <input type="text" id="spotlight-input" placeholder="Σ Launch Shard / Search Knowledge / Customize..." autocomplete="off">
-             <div id="spotlight-results"></div>
+    <!-- Hero Section -->
+    <header class="hero">
+        <div class="hero-bg" style="background-image: url('assets/hero_bg.png');"></div>
+        <div class="hero-overlay"></div>
+        <div class="hero-content container">
+            <h1 class="fade-in">SOVEREIGNTY <br><span class="accent">DEFINED</span>.</h1>
+            <p class="hero-subtitle fade-in">The definitive industrial operating system for the next generation of computing. Zero-dependency, bare-metal, and absolute performance.</p>
+            <div class="hero-ctas fade-in">
+                <a href="#download" class="btn btn-primary">Get SigmaOS</a>
+                <a href="dashboard/index.html" class="btn btn-outline">Preview Zenith</a>
+            </div>
+            <div class="system-status fade-in">
+                <span class="status-item"><span class="pulse orange"></span> KERNEL: ACTIVE</span>
+                <span class="status-item"><span class="pulse green"></span> PARITY: UNIFIED</span>
+                <span class="status-item"><span class="pulse blue"></span> SHARDING: ZENITH</span>
+            </div>
+        </div>
+    </header>
+
+    <!-- Features Section -->
+    <section id="features" class="features container">
+        <div class="section-header">
+            <h2>INDUSTRIAL <span class="accent">POWER</span></h2>
+            <p>SigmaOS absorbs the intelligence of 30+ leading repositories into a single, unified shard.</p>
+        </div>
+        <div class="feature-grid">
+            <div class="feature-card reveal">
+                <div class="feature-icon">⚙️</div>
+                <h3>Kernel Master</h3>
+                <p>O(1) Slab Allocator and 4-level PML4 paging. Built on torvalds/linux parity for uncompromising stability.</p>
+            </div>
+            <div class="feature-card reveal">
+                <div class="feature-icon">⚡</div>
+                <h3>Distro Streamer</h3>
+                <p>Zero-download execution. Stream Ubuntu, Arch, or Debian locally with high-performance WASM sharding.</p>
+            </div>
+            <div class="feature-card reveal">
+                <div class="feature-icon">🛡️</div>
+                <h3>Safety Shard</h3>
+                <p>Rust-parity safety logic ensures memory isolation and security at the industrial level.</p>
+            </div>
+            <div class="feature-card reveal">
+                <div class="feature-icon">🤖</div>
+                <h3>Sovereign AI</h3>
+                <p>Autonomous system balancing and reasoning engine for predictive performance optimization.</p>
+            </div>
         </div>
     </section>
 
-    <!-- TOASTS -->
-    <div id="toast-container"></div>
+    <!-- Motivation Section -->
+    <section class="motivation">
+        <div class="container reveal">
+            <div class="motivation-content">
+                <div class="motivation-text">
+                    <h2>WHY <span class="accent">SIGMAOS</span>?</h2>
+                    <p>In a world of bloated distributions and fragmented ecosystems, SigmaOS stands as a beacon of absolute sovereignty. We don't just build an OS; we craft a bit-perfect environment for industrial supremacy.</p>
+                    <ul class="checklist">
+                        <li><span>✔</span> Zero-GLIBC Bare-Metal Architecture</li>
+                        <li><span>✔</span> Integrated Macro Automation</li>
+                        <li><span>✔</span> Multicloud VM Provisioning</li>
+                        <li><span>✔</span> Real-time Aesthetic Sharding</li>
+                    </ul>
+                </div>
+                <div class="motivation-visual">
+                    <!-- This will have a cool animated UI snippet -->
+                     <div class="code-preview">
+<pre><code><span class="comment">// Sovereign Init Logic</span>
+<span class="keyword">void</span> <span class="function">omega_core_init</span>() {
+    <span class="function">slab_alloc_shard</span>(SHARD_O1);
+    <span class="function">pml4_activate_sovereignty</span>();
+    <span class="function">printf</span>(<span class="string">"Σ SigmaOS: Zenith Online.\n"</span>);
+}</code></pre>
+                     </div>
+                </div>
+            </div>
+        </div>
+    </section>
 
-    <script src="index.js"></script>
+    <!-- Editions Section -->
+    <section id="editions" class="editions container">
+        <div class="section-header">
+            <h2>CHOOSE YOUR <span class="accent">EDITION</span></h2>
+            <p>Select the SigmaOS shard that matches your mission profile.</p>
+        </div>
+        <div class="edition-grid">
+            <div class="edition-card reveal">
+                <div class="edition-badge">Standard</div>
+                <h3>Zenith Basic</h3>
+                <p>Lightweight workstation for developers and enthusiasts. Pure SigmaOS core.</p>
+                <div class="price">Free</div>
+                <ul class="edition-features">
+                    <li>Kernel Master Core</li>
+                    <li>Basic Distro Streaming</li>
+                    <li>Spotlight Search</li>
+                </ul>
+                <a href="#download" class="btn btn-secondary">Download ISO</a>
+            </div>
+            <div class="edition-card feature-highlight reveal">
+                <div class="edition-badge badge-accent">Industrial</div>
+                <h3>Zenith Developer</h3>
+                <p>The complete industrial toolkit. Pre-configured for mass-scale automation.</p>
+                <div class="price">Enterprise</div>
+                <ul class="edition-features">
+                    <li>All Standard Features</li>
+                    <li>AI Orchestrator Shard</li>
+                    <li>Multi-cloud VM Hub</li>
+                    <li>Sovereign Audit Tools</li>
+                </ul>
+                <a href="#download" class="btn btn-primary">Get Industrial</a>
+            </div>
+            <div class="edition-card reveal">
+                <div class="edition-badge">Sovereign</div>
+                <h3>Zenith Enterprise</h3>
+                <p>Air-gapped security, custom sharding, and dedicated sovereignty support.</p>
+                <div class="price">Custom</div>
+                <ul class="edition-features">
+                    <li>Lattice PQC Encryption</li>
+                    <li>Hardware-level Isolation</li>
+                    <li>24/7 Sovereign Pulse</li>
+                </ul>
+                <a href="#contact" class="btn btn-secondary">Contact Sales</a>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="main-footer">
+        <div class="container footer-content">
+            <div class="footer-brand">
+                <div class="logo">
+                    <img src="assets/logo.png" alt="Σ">
+                    <span>SIGMAOS</span>
+                </div>
+                <p>Definitive industrial sovereignty for the x86_64 silicon era.</p>
+            </div>
+            <div class="footer-links">
+                <div class="link-group">
+                    <h4>Project</h4>
+                    <ul>
+                        <li><a href="#features">Features</a></li>
+                        <li><a href="#editions">Editions</a></li>
+                        <li><a href="https://github.com/AaryanSinghChauhan09/SigmaOS">GitHub</a></li>
+                    </ul>
+                </div>
+                <div class="link-group">
+                    <h4>Community</h4>
+                    <ul>
+                        <li><a href="#">Discussions</a></li>
+                        <li><a href="#">Documentation</a></li>
+                        <li><a href="#">Sovereign Hub</a></li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+        <div class="footer-bottom container">
+            <p>&copy; 2026 Sovereign-Zenith-Developer. All rights sharded.</p>
+            <div class="social-icons">
+                <!-- SVG icons would go here -->
+            </div>
+        </div>
+    </footer>
+
+    <script src="site.js"></script>
 </body>
 </html>

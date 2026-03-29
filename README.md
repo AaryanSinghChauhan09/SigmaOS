@@ -56,7 +56,7 @@ make zenith
 
 ### Access the Sovereignty Dashboard
 
-Open `index.html` in your industrial browser to access the **Zenith Supreme Dashboard**.
+Open `dashboard/index.html` in your industrial browser to access the **Zenith Supreme Dashboard**.
 
 ---
 
