@@ -4,13 +4,16 @@
 
 SigmaOS is not a software; it is a **Sovereign Sharding Logic**. Built with C, Assembly, and Rust, it absorbs the USPs of the entire Linux ecosystem while reducing 3rd-party interference to zero.
 
-### USPs ABSORBED
+### THE ZENITH COMPARISON (Sovereignty Audit)
 
-- **torvalds/linux**: O(1) Slab, 4-level Paging, IA32/AMD64 silicon control.
-- **Arch/Gentoo**: Rolling release sharding, source-based sovereignty.
-- **Ubuntu/Debian**: Professional stability and universal package mirroring.
-- **XClicker/AutoKey**: Industrial macro and input automation.
-- **Claude-Mint/Merlin-IA**: Autonomous system balance & AI reasoning.
+| FEATURE | WINDOWS 11 | MACOS / IOS | LINUX (KDE/GNOME) | Σ SIGMAOS ZENITH |
+| :--- | :--- | :--- | :--- | :--- |
+| **Kernel Type** | Monolithic (NT) | Hybrid (XNU) | Monolithic | **Universal Shard (Zenith)** |
+| **Dependencies** | High (DLL bloat) | High (Frameworks) | Medium (Glibc) | **ZERO (Silicon-Direct)** |
+| **AI Integration** | Copilot (Cloud) | Apple Intelligence | Plugins (Fragmented) | **Aether Orchestrator (11 Models)**|
+| **Legality** | TOS Managed | TOS Managed | GPL/Open | **Sovereign-Justice (BSA 2023)** |
+| **Automation** | Task Scheduler | Shortcuts | Cron / Systemd | **Aether Pulse (Silicon Triggers)** |
+| **Ease of Use** | User-Friendly | Premium-Simple | Highly Variable | **Master-Intuitive (Industrial)** |
 
 ---
 
@@ -70,7 +73,7 @@ The Sigma-Shell is designed so that the GUI feels worthless.
 ## 5. REPOSITORY GOVERNANCE
 
 - **License**: Industrial MIT Sovereignty.
-- **Maintenance**: Orchestrated by the Sovereign-Zenith-AI.
+- **Maintenance**: Orchestrated by the Sovereign-Zenith-Maintainer.
 - **Compliance**: All shards audited via the `SigmaAuditTool`.
 
 ---

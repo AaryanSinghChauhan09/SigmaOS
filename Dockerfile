@@ -1,26 +1,37 @@
 # =============================================================================
-# Σ SIGMAOS: SOVEREIGN CONTAINER (v21.0 - ZERO-DEPENDENCY FINALITY)
+# Σ SIGMAOS ZENITH SUPREME: INDUSTRIAL CONTAINER SHARD (v94.0)
 # =============================================================================
-# Mission: Absolute Sovereignty (No base OS, no libraries).
-# Strategy: MULTI-STAGE BUILD -> STATIC BINARY -> FROM SCRATCH
+# Mission: Sovereign, Zero-Dependency Container Runtime.
+# USP: Docker, Podman, and BuildKit parity in a single industrial shard.
 # =============================================================================
 
-# -- STAGE 1: Forge Engine (Build) --
-FROM gcc:latest AS forge
-WORKDIR /forge
+# --- 1. BUILD STAGE (Sovereign Toolchain) ---
+FROM fedora:39 AS builder
+
+# Install industrial dev tools (C, C++, ASM, Rust)
+RUN dnf groupinstall -y "Development Tools" "C Development Tools and Libraries" \
+    && dnf install -y nasm rustc lld make \
+    && dnf clean all
+
+# Sync the Zenith repository
+WORKDIR /sigmaos
 COPY . .
-# Perform static build with direct syscall integration (Sigma v21.0)
-RUN g++ -static -nostdlib -O3 SovereignLauncherZenith.cpp SovereignLibC.asm -o sigma_os_master
 
-# -- STAGE 2: Sovereign Finality (Runtime) --
+# Build the Sovereign Zenith binary (Direct silicon execution)
+RUN make zenith
+
+# --- 2. RUNTIME STAGE (Zero-Interference Shard) ---
 FROM scratch
-LABEL maintainer="SigmaOS-Project"
-LABEL architecture="x86_64"
-LABEL dependency="ZERO"
 
-# Pure machine code shard - No OS required
-COPY --from=forge /forge/sigma_os_master /sigma_os_master
-COPY --from=forge /forge/index.html /index.html
-COPY --from=forge /forge/os_guide.md /os_guide.md
+# Σ SIGMAOS: The container itself IS the OS sharding logic.
+# No base alpine/ubuntu - pure SigmaOS binary.
+COPY --from=builder /sigmaos/build/sigmaos_zenith /sigmaos_zenith
+COPY --from=builder /sigmaos/index.html /index.html
+COPY --from=builder /sigmaos/index.js /index.js
 
-ENTRYPOINT ["/sigma_os_master"]
+# Entrypoint logic for the Zenith Master
+ENTRYPOINT ["/sigmaos_zenith"]
+CMD ["--mode=industrial"]
+
+# EXPOSE industrial ports (Sovereign Network Mesh)
+EXPOSE 80 443 2222 5555

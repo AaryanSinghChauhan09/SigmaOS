@@ -382,7 +382,7 @@ function initUserManagement() {
     if (!userList) return;
     const users = [
         { name: 'root', role: 'MASTER', status: 'ACTIVE' },
-        { name: 'aaryan', role: 'SHARD_OWNER', status: 'ACTIVE' }
+        { name: 'Sovereign-Master', role: 'SHARD_OWNER', status: 'ACTIVE' }
     ];
     userList.innerHTML = '';
     users.forEach(u => {
