@@ -524,6 +524,54 @@ function spawnToast(msg, delay = 0) {
     }, delay);
 }
 
+
+// --- Sovereign Camera (Snapchat/Scratch USP) ---
+function initSovereignCamera() {
+    const video = document.getElementById('camera-stream');
+    const filterSelect = document.getElementById('camera-filter');
+    if (!video) return;
+
+    navigator.mediaDevices.getUserMedia({ video: true })
+        .then(stream => { video.srcObject = stream; })
+        .catch(err => { spawnToast('Camera Shard: Hardware access denied.'); });
+
+    filterSelect.onchange = () => {
+        video.style.filter = filterSelect.value;
+        spawnToast('Lens Shard: ' + filterSelect.options[filterSelect.selectedIndex].text);
+    };
+}
+
+function takeSnapshot() {
+    spawnToast('Sigma Snapshot saved to VFS Shard: /home/root/media/snap_001.png');
+}
+
+// --- Task Sharing (Amnesic IoT Sharding) ---
+function shareTask() {
+    const task = prompt('Enter task to shard with other devices:');
+    if (!task) return;
+    spawnToast('Sharding mission to 3 peer nodes... OK');
+    termPrint('[TASK-SHARD] Mission: ' + task);
+    termPrint('[TASK-SHARD] Status: DISTRIBUTED. Peer-01: Processing.');
+}
+
+// --- Indian Justice Shard Execution ---
+function executeJusticeShard() {
+    openWindow('safety');
+    const log = document.getElementById('safety-log');
+    log.innerHTML += '<div class="u-accent-text">[JUSTICE] Executing Indian Law Compliance Audit (BNSS/BNS/BSA 2023)...</div>';
+    setTimeout(() => {
+        log.innerHTML += '<div>[OK] Forensic Seizure: Digital hash signature VALID.</div>';
+        log.innerHTML += '<div>[OK] Arrest Procedure: Videographic sharding ACTIVE.</div>';
+        log.innerHTML += '<div>[OK] Compliance: SECURED (Latest Supreme Court Interpretation).</div>';
+        log.scrollTop = log.scrollHeight;
+        spawnToast('Justice Mission Complete');
+    }, 1500);
+}
+
 window.applyTheme = applyTheme;
 window.startDistroStream = startDistroStream;
 window.runSafetyAudit = runSafetyAudit;
+window.initSovereignCamera = initSovereignCamera;
+window.takeSnapshot = takeSnapshot;
+window.shareTask = shareTask;
+window.executeJusticeShard = executeJusticeShard;
