@@ -353,6 +353,17 @@ zenith: dirs $(ZENITH_OBJS)
 	@$(LD) $(LDFLAGS) $(ZENITH_OBJS) -e main -o build/sigmaos_zenith
 	@echo "[OK]   build/sigmaos_zenith is ready for direct silicon execution."
 
+
+# =============================================================================
+# REPOSITORY SYNC & DISTRO RUNNER
+# =============================================================================
+sync:
+	@chmod +x scripts/sync_github.sh
+	@./scripts/sync_github.sh
+
+run-distro:
+	@python3 scripts/launch_distro.py $(DISTRO)
+
 # =============================================================================
 # CLEAN
 # =============================================================================
@@ -366,7 +377,8 @@ clean:
 # =============================================================================
 info:
 	@echo ""
-	@echo "Σ SigmaOS Sovereign Build System v93.0 (ZENITH EDITION)"
-	@echo "  ARCH    = $(ARCH)"
+	@echo "Σ SigmaOS Sovereign Build System v94.0 (ZENITH EDITION)"
+	@echo "  ARCH        = $(ARCH)"
 	@echo "  ZENITH_BINS = build/sigmaos_zenith"
+	@echo "  SYMBOLS     = scripts/sync_github.sh, scripts/launch_distro.py"
 	@echo ""
