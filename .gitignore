@@ -1,0 +1,12 @@
+# Σ SIGMAOS: SOVEREIGN GITIGNORE
+build/
+*.o
+*.a
+*.bin
+*.iso
+.DS_Store
+.vscode/
+.idea/
+*.log
+tmp/
+*.tmp
