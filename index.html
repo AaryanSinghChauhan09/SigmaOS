@@ -383,7 +383,7 @@
                     </div>
                     <div class="metric-card">
                         <div class="u-font-size-xs u-muted-text">ORCHESTRATION MODE</div>
-                        <select id="ai-mode-select" class="u-full-width u-bg-transparent u-text-white u-border-glass u-margin-t-10">
+                        <select id="ai-mode-select" title="AI Orchestration Mode" class="u-full-width u-bg-transparent u-text-white u-border-glass u-margin-t-10">
                             <option value="quick">Quick Mode</option>
                             <option value="pro">Pro Mode (Academic)</option>
                             <option value="fun">Fun Mode (Creative)</option>
@@ -414,7 +414,36 @@
                 </div>
                 <div class="term-input-line">
                     <span class="term-prompt">spectrum@sigma:~$</span>
-                    <input type="text" id="spectrum-input" class="term-field" spellcheck="false" autocomplete="off">
+                    <input type="text" id="spectrum-input" title="Spectrum AI Input" class="term-field" spellcheck="false" autocomplete="off">
+                </div>
+            </div>
+        </section>
+
+
+        <!-- SOVEREIGN CAMERA SHARD (SNAPCHAT/SCRATCH USP) -->
+        <section id="win-camera" class="window hidden win-distro-default">
+            <div class="win-header">
+                <div class="win-title">📸 Sovereign Camera & Vision Shard</div>
+                <div class="win-controls">
+                    <div class="win-btn win-min" data-action="minimize" data-win="camera"></div>
+                    <div class="win-btn win-close" data-action="close" data-win="camera"></div>
+                </div>
+            </div>
+            <div class="win-content u-flex-column u-padding-16">
+                <div class="camera-container u-full-height u-bg-black u-margin-b-10">
+                    <video id="camera-stream" autoplay class="u-full-width u-full-height"></video>
+                </div>
+                <div class="u-flex-between">
+                    <select id="camera-filter" title="Sovereign Camera Lens" class="u-bg-transparent u-text-white u-border-glass u-padding-4">
+                        <option value="none">No Filter</option>
+                        <option value="grayscale(100%)">Sovereign B&W</option>
+                        <option value="sepia(100%)">Industrial Legacy</option>
+                        <option value="hue-rotate(90deg)">Neon Shard</option>
+                        <option value="blur(5px)">Privacy Blur</option>
+                    </select>
+                    <button class="status-chip" onclick="takeSnapshot()">Snap Shard</button>
+                    <button class="status-chip" onclick="shareTask()">Shard Task</button>
+                    <button class="status-chip u-accent-bg" onclick="executeJusticeShard()">Justice Audit</button>
                 </div>
             </div>
         </section>
@@ -534,6 +563,9 @@
         </div>
         <div class="dock-item" data-window="sysinfo" data-label="Zenith Pulse">
             <svg viewBox="0 0 24 24"><path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-2 10h-4v4h-2v-4H7v-2h4V7h2v4h4v2z"/></svg>
+        </div>
+        <div class="dock-item" data-window="camera" data-label="Camera Shard">
+            <svg viewBox="0 0 24 24"><path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/></svg>
         </div>
     </nav>
 

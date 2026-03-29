@@ -137,6 +137,8 @@ SIGMA_TOOLS_SRCS := userland/sigma_pkg.c \
                     userland/apps/SigmaRemoteManager.cpp \
                     userland/apps/SigmaAuditTool.cpp \
                     userland/apps/SigmaTerminalUtils.cpp \
+                    userland/apps/SovereignJusticeShard.cpp \
+                    userland/apps/SigmaAutomation.rs \
                     userland/sigma_rust_parity.c \
                     kernel/plugins.c \
                     kernel/SigmaAI.c \
