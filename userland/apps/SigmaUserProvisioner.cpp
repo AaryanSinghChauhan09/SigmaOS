@@ -31,7 +31,7 @@ void sigma_user_list() {
     sigma_printf("UID    USERNAME    ROLE    SHARD_ACTIVE\n");
     sigma_printf("-------------------------------------------\n");
     sigma_printf("0      root        MASTER  YES\n");
-    sigma_printf("1013   aaryan      USER    YES\n");
+    sigma_printf("1013   SigmaSovereign      USER    YES\n");
     sigma_printf("1024   guest       GUEST   NO\n");
     sigma_printf("-------------------------------------------\n");
 }

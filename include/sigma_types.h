@@ -1,6 +1,6 @@
 /*
  * SPDX-License-Identifier: MIT
- * SPDX-FileCopyrightText: 2026 Aaryan Singh Chauhan
+ * SPDX-FileCopyrightText: 2026 SigmaSovereign Singh SigmaSovereign
  *
  * sigmaos/include/sigma_types.h
  * ------------------------------------------------------------------

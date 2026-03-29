@@ -21,7 +21,12 @@ const PROCESSES = [
 const REPOSITORY = [
     { id: 'dev_tools', name: 'Industrial Dev Suite', version: '4.5.0', desc: 'Sovereign C/C++ Compiler & Debugger', icon: '🛠️', installed: true },
     { id: 'net_shield', name: 'Sigma Shield Firewall', version: '1.2.9', desc: 'Kernel-level packet inspection', icon: '🛡️', installed: false },
-    { id: 'office_matrix', name: 'Sigma Matrix Office', version: '3.0.2', desc: 'Distributed spreadsheet & docs', icon: '📊', installed: true }
+    { id: 'office_matrix', name: 'Sigma Matrix Office', version: '3.0.2', desc: 'Distributed spreadsheet & docs', icon: '📊', installed: true },
+    { id: 'bio_lab', name: 'NCERT Biology Lab', version: '1.0.0', desc: 'Sovereign biology simulations', icon: '🧬', installed: false },
+    { id: 'math_lab', name: 'NCERT Maths Lab', version: '1.0.0', desc: 'Advanced math sharding', icon: '📐', installed: false },
+    { id: 'android_tools', name: 'Omni Tools Android', version: '2.1.0', desc: 'Sovereign APK sharder', icon: '📱', installed: false },
+    { id: 'sentinel', name: 'Sigma Sentinel', version: '3.0.0', desc: 'Real-time threat detection', icon: '👁️', installed: true },
+    { id: 'theme_eng', name: 'Apex Theme Engine', version: '2.5.0', desc: 'Dynamic interface sharding', icon: '🎨', installed: true }
 ];
 
 const DISTROS = [
