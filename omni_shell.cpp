@@ -23,6 +23,9 @@
 #include "SovereignAetherAbsorption.cpp"
 #include "SovereignUEFIShard.cpp"
 #include "SovereignP2PShard.cpp"
+#include "SovereignDirectOffice.cpp"
+#include "SovereignGamingHypervisor.cpp"
+#include "SovereignJusticeAI.cpp"
 
 namespace SigmaOS {
 namespace Shell {
@@ -49,6 +52,9 @@ private:
     SovereignAetherAbsorber m_absorber;
     Hardware::SovereignUEFIShard m_uefi;
     Networking::SovereignP2PShard m_p2p;
+    Productivity::SovereignDirectOffice m_office;
+    Hardware::SovereignGamingHypervisor m_gaming;
+    LegalTech::SovereignJusticeAI m_justice;
 
 public:
     OmniShellZenith() : m_commands_sharded(0) {
@@ -56,7 +62,7 @@ public:
         SovereignCloud_init(&m_cloud);
         SovereignUI_init(&m_ui);
         SovereignNet_init(&m_net);
-        sigma_printf("[SIGMA_SHELL]: Omni-Shell Zenith Online (v98.0). System-Master [ACTIVE].\n");
+        sigma_printf("[SIGMA_SHELL]: Omni-Shell Zenith Online (v100.0 CENTURION). System-Master [ACTIVE].\n");
     }
 
     const char* type_name() const noexcept override { return "OmniShellZenith"; }
@@ -86,6 +92,16 @@ public:
             m_p2p.InitializeMesh();
         } else if (sigma_compare(cmd, "TASK_SHARD")) {
             m_p2p.DelegateTask("ZENITH-GEN-98");
+        } else if (sigma_compare(cmd, "LAUNCH_OFFICE")) {
+            m_office.LaunchSovereignWriter();
+            m_office.LaunchSovereignCalc();
+        } else if (sigma_compare(cmd, "GAME_BOOST")) {
+            m_gaming.ActivateGamingSovereignty();
+            m_gaming.ShardGPUDirect();
+            m_gaming.UnleashPerformanceMode();
+        } else if (sigma_compare(cmd, "JUSTICE_AI")) {
+            m_justice.ShardIndianLawv2023();
+            m_justice.AuditProceduralJustice();
         } else if (sigma_compare(cmd, "LS")) {
             CoreUtils::SovereignListDir ls; ls.Execute(".");
         } else if (sigma_compare(cmd, "CAT")) {

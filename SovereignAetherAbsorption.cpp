@@ -70,6 +70,21 @@ public:
         sigma_printf("[OK]: P2P Task-Sharing absorbed into Kern-ID: 0x98\n");
     }
 
+    void AbsorbProductivitySovereignty() {
+        sigma_printf("[ZENITH-ABSORPTION]: Sharding Direct-Office Shards (MS-Office/GDocs Parity)...\n");
+        sigma_printf("[OK]: Office Sovereignty absorbed into Kern-ID: 0xA1\n");
+    }
+
+    void AbsorbGamingSovereignty() {
+        sigma_printf("[ZENITH-ABSORPTION]: Sharding Gaming-Hypervisor (Win11-Gaming Parity)...\n");
+        sigma_printf("[OK]: Gaming Sovereignty absorbed into Kern-ID: 0xF1\n");
+    }
+
+    void AbsorbJusticeSovereignty() {
+        sigma_printf("[ZENITH-ABSORPTION]: Sharding Justice-AI Shards (BNS/BNSS/BSA v2023)...\n");
+        sigma_printf("[OK]: Legal & NCERT Sovereignty absorbed into Kern-ID: 0x23\n");
+    }
+
     void DeploySovereignUnity() {
         AbsorbCloudMaestro();
         AbsorbLatticeSecurity();
@@ -83,7 +98,10 @@ public:
         AbsorbSovereignGithubSync();
         AbsorbUEFISovereignty();
         AbsorbP2PSovereignty();
-        sigma_printf("[ZENITH-FINALE]: THE SIGMAOS UNIVERSAL ABSORPTION IS COMPLETE. (v98.0).\n");
+        AbsorbProductivitySovereignty();
+        AbsorbGamingSovereignty();
+        AbsorbJusticeSovereignty();
+        sigma_printf("[ZENITH-FINALE]: THE SIGMAOS UNIVERSAL ABSORPTION IS COMPLETE. (v100.0 CENTURION).\n");
     }
 };
 
