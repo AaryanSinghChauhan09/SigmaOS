@@ -100,6 +100,16 @@ public:
         sigma_printf("[OK]: Design Sovereignty absorbed into Kern-ID: 0xAD\n");
     }
 
+    void AbsorbSecuritySovereignty() {
+        sigma_printf("[ZENITH-ABSORPTION]: Sharding Amnesic-Privacy (Zero-Trace v1.0)...\n");
+        sigma_printf("[OK]: Security Sovereignty absorbed into Kern-ID: 0x41\n");
+    }
+
+    void AbsorbKernelSovereignty() {
+        sigma_printf("[ZENITH-ABSORPTION]: Sharding Post-Quantum Kernel (PQC-Scheduling v105.0)...\n");
+        sigma_printf("[OK]: Kernel Sovereignty absorbed into Kern-ID: 0xAA\n");
+    }
+
     void DeploySovereignUnity() {
         AbsorbCloudMaestro();
         AbsorbLatticeSecurity();
@@ -119,7 +129,9 @@ public:
         AbsorbAutomationSovereignty();
         AbsorbPersonalizationSovereignty();
         AbsorbDesignSovereignty();
-        sigma_printf("[ZENITH-FINALE]: THE SIGMAOS UNIVERSAL ABSORPTION IS COMPLETE. (v101.5 OMNI-PRESENCE).\n");
+        AbsorbSecuritySovereignty();
+        AbsorbKernelSovereignty();
+        sigma_printf("[ZENITH-FINALE]: THE SIGMAOS UNIVERSAL ABSORPTION IS COMPLETE. (v105.0 FINALITY).\n");
     }
 };
 
