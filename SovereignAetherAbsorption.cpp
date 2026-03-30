@@ -110,6 +110,16 @@ public:
         sigma_printf("[OK]: Kernel Sovereignty absorbed into Kern-ID: 0xAA\n");
     }
 
+    void AbsorbAutomatorSovereignty() {
+        sigma_printf("[ZENITH-ABSORPTION]: Sharding Atomic Silicon-Triggers (Automator-Zenith v106.0)...\n");
+        sigma_printf("[OK]: Automator Sovereignty absorbed into Kern-ID: 0xEF\n");
+    }
+
+    void AbsorbStyleSovereignty() {
+        sigma_printf("[ZENITH-ABSORPTION]: Sharding Fluent-Aqua Fusion (Style-Zenith v106.0)...\n");
+        sigma_printf("[OK]: Design Sovereignty absorbed into Kern-ID: 0xAF\n");
+    }
+
     void DeploySovereignUnity() {
         AbsorbCloudMaestro();
         AbsorbLatticeSecurity();
@@ -131,7 +141,9 @@ public:
         AbsorbDesignSovereignty();
         AbsorbSecuritySovereignty();
         AbsorbKernelSovereignty();
-        sigma_printf("[ZENITH-FINALE]: THE SIGMAOS UNIVERSAL ABSORPTION IS COMPLETE. (v105.0 FINALITY).\n");
+        AbsorbAutomatorSovereignty();
+        AbsorbStyleSovereignty();
+        sigma_printf("[ZENITH-FINALE]: THE SIGMAOS UNIVERSAL ABSORPTION IS COMPLETE. (v106.0 CENTURY).\n");
     }
 };
 

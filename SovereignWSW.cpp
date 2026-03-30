@@ -1,5 +1,4 @@
-#include <iostream>
-#include <string>
+#include "SovereignLibC.h"
 
 namespace SigmaOS {
 namespace WindowsShard {
@@ -10,23 +9,23 @@ namespace WindowsShard {
  */
 class SovereignWSW {
 public:
-    void ExecutePE(const std::string& path) {
-        std::cout << "[WSW] Attempting to load " << path << " (PE Header Parsing)..." << std::endl;
+    void ExecutePE(const char* path) {
+        sigma_printf("[WSW] Attempting to load %s (PE Header Parsing)...\n", path);
         // Mocking Windows binary execution
-        std::cout << "[WSW] MZ magic found. PE header validated." << std::endl;
-        std::cout << "[WSW] Setting up Win32 environment context (VirtualAlloc, CreateProcess mapping)." << std::endl;
-        std::cout << "[WSW] Transferring execution to entry point of Windows executable." << std::endl;
-        std::cout << "[WSW] System Call Redirected: NtCreateFile -> SovereignFileSystemZenith::OpenFile" << std::endl;
-        std::cout << "[WSW] System Call Redirected: NtTerminateProcess -> SovereignProcessManager::Terminate" << std::endl;
+        sigma_printf("[WSW] MZ magic found. PE header validated.\n");
+        sigma_printf("[WSW] Setting up Win32 environment context (VirtualAlloc, CreateProcess mapping).\n");
+        sigma_printf("[WSW] Transferring execution to entry point of Windows executable.\n");
+        sigma_printf("[WSW] System Call Redirected: NtCreateFile -> SovereignFileSystemZenith::OpenFile\n");
+        sigma_printf("[WSW] System Call Redirected: NtTerminateProcess -> SovereignProcessManager::Terminate\n");
     }
 
-    void NativeWin32API(const std::string& apiName) {
-        if (apiName == "MessageBoxA") {
-            std::cout << "[WSW] Emulating MessageBoxA: Displaying Sovereign-UI Modal." << std::endl;
-        } else if (apiName == "Kernel32.dll:Sleep") {
-            std::cout << "[WSW] Emulating Sleep: Calling SovereignCoreUtils::NanoSleep" << std::endl;
+    void NativeWin32API(const char* apiName) {
+        if (sigma_streq(apiName, "MessageBoxA")) {
+            sigma_printf("[WSW] Emulating MessageBoxA: Displaying Sovereign-UI Modal.\n");
+        } else if (sigma_streq(apiName, "Kernel32.dll:Sleep")) {
+            sigma_printf("[WSW] Emulating Sleep: Calling SovereignCoreUtils::NanoSleep\n");
         } else {
-            std::cout << "[WSW] Win32 Stub: API " << apiName << " intercepted. Not implemented yet." << std::endl;
+            sigma_printf("[WSW] Win32 Stub: API %s intercepted. Not implemented yet.\n", apiName);
         }
     }
 };

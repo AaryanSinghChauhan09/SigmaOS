@@ -31,6 +31,9 @@
 #include "SovereignZenithStylist.cpp"
 #include "SovereignAmnesicShard.cpp"
 #include "SovereignQuantumKernel.cpp"
+#include "SovereignRegistry.cpp"
+#include "SovereignAutomatorZenith.cpp"
+#include "SovereignStyleZenith.cpp"
 
 namespace SigmaOS {
 namespace Shell {
@@ -65,6 +68,9 @@ private:
     Design::SovereignZenithStylist m_stylist;
     Security::SovereignAmnesicShard m_amnesic;
     Kernel::SovereignQuantumKernel m_quantum;
+    WindowsShard::SovereignRegistry m_registry;
+    Automation::SovereignAutomatorZenith m_automator;
+    Design::SovereignStyleZenith m_style;
 
 public:
     OmniShellZenith() : m_commands_sharded(0) {
@@ -72,7 +78,7 @@ public:
         SovereignCloud_init(&m_cloud);
         SovereignUI_init(&m_ui);
         SovereignNet_init(&m_net);
-        sigma_printf("[SIGMA_SHELL]: Omni-Shell Zenith Online (v105.0 FINALITY). System-Master [ACTIVE].\n");
+        sigma_printf("[SIGMA_SHELL]: Omni-Shell Zenith Online (v106.0 CENTURY). System-Master [ACTIVE].\n");
     }
 
     const char* type_name() const noexcept override { return "OmniShellZenith"; }
@@ -129,6 +135,12 @@ public:
         } else if (sigma_compare(cmd, "QUANTUM_KRN")) {
             m_quantum.InitializeQuantumSync();
             m_quantum.ExecuteKyberTaskSlice();
+        } else if (sigma_compare(cmd, "AUTO_ZENITH")) {
+            m_automator.ShardAutomationPulse();
+            m_automator.ExecuteAtomicWorkflow("CENTURY_STABILITY");
+        } else if (sigma_compare(cmd, "STYLE_FUSION")) {
+            m_style.ApplyFluentAquaFusion();
+            m_style.ApplyCenturionGoldPalette();
         } else if (sigma_compare(cmd, "LS")) {
             CoreUtils::SovereignListDir ls; ls.Execute(".");
         } else if (sigma_compare(cmd, "CAT")) {
