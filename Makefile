@@ -396,8 +396,8 @@ build/omni_shell.o: omni_shell.cpp SovereignLibC.h SigmaOOP.hpp SovereignOmniSha
 
 zenith: dirs $(ZENITH_OBJS)
 	@echo "[LD]   Linking Σ SIGMAOS ZENITH SHARD..."
-	@$(LD) $(LDFLAGS) $(ZENITH_OBJS) -e main -o build/sigmaos_zenith
-	@echo "[OK]   build/sigmaos_zenith is ready for direct silicon execution."
+	@$(LD) $(LDFLAGS) $(ZENITH_OBJS) -o build/sigmaos_zenith
+	@echo "[OK]   build/sigmaos_zenith is ready for direct silicon execution (SHARDED _start)."
 
 
 # =============================================================================

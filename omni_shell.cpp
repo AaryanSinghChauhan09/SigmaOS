@@ -227,8 +227,8 @@ extern "C" void start_shell_zenith() {
     shell.audit();
 }
 
-int main() {
-    SigmaOS::sigma_log("[SIGMA_SHELL]: Bootstrapping Ultimate Omni-Shell Zenith...");
+extern "C" int sigma_main(int argc, char** argv) {
+    SigmaOS::sigma_log("[SIGMA_SHELL]: Bootstrapping Ultimate Omni-Shell Zenith (v150.0)...");
     start_shell_zenith();
     return 0;
 }
