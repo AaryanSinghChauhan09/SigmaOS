@@ -26,6 +26,9 @@
 #include "SovereignDirectOffice.cpp"
 #include "SovereignGamingHypervisor.cpp"
 #include "SovereignJusticeAI.cpp"
+#include "SovereignAetherPulse.cpp"
+#include "SovereignPersonaEngine.cpp"
+#include "SovereignZenithStylist.cpp"
 
 namespace SigmaOS {
 namespace Shell {
@@ -55,6 +58,9 @@ private:
     Productivity::SovereignDirectOffice m_office;
     Hardware::SovereignGamingHypervisor m_gaming;
     LegalTech::SovereignJusticeAI m_justice;
+    Automation::SovereignAetherPulse m_pulse;
+    Personalization::SovereignPersonaEngine m_persona;
+    Design::SovereignZenithStylist m_stylist;
 
 public:
     OmniShellZenith() : m_commands_sharded(0) {
@@ -62,7 +68,7 @@ public:
         SovereignCloud_init(&m_cloud);
         SovereignUI_init(&m_ui);
         SovereignNet_init(&m_net);
-        sigma_printf("[SIGMA_SHELL]: Omni-Shell Zenith Online (v100.0 CENTURION). System-Master [ACTIVE].\n");
+        sigma_printf("[SIGMA_SHELL]: Omni-Shell Zenith Online (v101.5 OMNI-PRESENCE). System-Master [ACTIVE].\n");
     }
 
     const char* type_name() const noexcept override { return "OmniShellZenith"; }
@@ -102,6 +108,15 @@ public:
         } else if (sigma_compare(cmd, "JUSTICE_AI")) {
             m_justice.ShardIndianLawv2023();
             m_justice.AuditProceduralJustice();
+        } else if (sigma_compare(cmd, "PULSE_AUTO")) {
+            m_pulse.RegisterSiliconTrigger("KBD_0x42", "OPEN_LEGAL_SHARD");
+            m_pulse.ExecutePulseWorkflow("DAILY_SOVEREIGN_AUDIT");
+        } else if (sigma_compare(cmd, "PERSONA_LEGAL")) {
+            m_persona.SwitchToLawyerPersona();
+            m_persona.SyncPersonalZenith();
+        } else if (sigma_compare(cmd, "THEME_GOLD")) {
+            m_stylist.ApplyGoldZenithTheme();
+            m_stylist.ApplyGlassmorphismShard();
         } else if (sigma_compare(cmd, "LS")) {
             CoreUtils::SovereignListDir ls; ls.Execute(".");
         } else if (sigma_compare(cmd, "CAT")) {

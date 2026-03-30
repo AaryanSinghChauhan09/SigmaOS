@@ -85,6 +85,21 @@ public:
         sigma_printf("[OK]: Legal & NCERT Sovereignty absorbed into Kern-ID: 0x23\n");
     }
 
+    void AbsorbAutomationSovereignty() {
+        sigma_printf("[ZENITH-ABSORPTION]: Sharding Silicon-Direct Automation (Aether-Pulse v1.0)...\n");
+        sigma_printf("[OK]: Automation Sovereignty absorbed into Kern-ID: 0xAC\n");
+    }
+
+    void AbsorbPersonalizationSovereignty() {
+        sigma_printf("[ZENITH-ABSORPTION]: Sharding Behavioral Personalization (Persona-Engine v1.0)...\n");
+        sigma_printf("[OK]: Behavioral Sovereignty absorbed into Kern-ID: 0xBE\n");
+    }
+
+    void AbsorbDesignSovereignty() {
+        sigma_printf("[ZENITH-ABSORPTION]: Sharding Silicon-Direct Aesthetics (Zenith-Stylist v1.0)...\n");
+        sigma_printf("[OK]: Design Sovereignty absorbed into Kern-ID: 0xAD\n");
+    }
+
     void DeploySovereignUnity() {
         AbsorbCloudMaestro();
         AbsorbLatticeSecurity();
@@ -101,7 +116,10 @@ public:
         AbsorbProductivitySovereignty();
         AbsorbGamingSovereignty();
         AbsorbJusticeSovereignty();
-        sigma_printf("[ZENITH-FINALE]: THE SIGMAOS UNIVERSAL ABSORPTION IS COMPLETE. (v100.0 CENTURION).\n");
+        AbsorbAutomationSovereignty();
+        AbsorbPersonalizationSovereignty();
+        AbsorbDesignSovereignty();
+        sigma_printf("[ZENITH-FINALE]: THE SIGMAOS UNIVERSAL ABSORPTION IS COMPLETE. (v101.5 OMNI-PRESENCE).\n");
     }
 };
 
