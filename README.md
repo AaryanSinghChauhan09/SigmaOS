@@ -1,30 +1,38 @@
 # Σ SIGMAOS: THE UNIVERSAL INDUSTRIAL MASTER SHARD (v150.0 AUTONOMOUS)
 
 [![GitHub license](https://img.shields.io/badge/license-MIT%20Sovereignty-blue.svg)](LICENSE)
-[![Commit Code](https://img.shields.io/badge/Commit--Code-Σ--ZENITH--AUTONOMOUS--v150.0-gold)](https://github.com/Sovereign-Master/SigmaOS/commits/master)
+[![Commit Code](https://img.shields.io/badge/Commit--Code-Σ--ZENITH--AUTONOMOUS--v150.0-gold)](https://github.com/Sovereign-Master/SigmaOS/commits/main)
 
-**SigmaOS** is an absolute scratch-made, zero-dependency, bare-metal sovereign operating system. Version 150.0 marks the **Autonomous Century**, introducing a fully self-healing silicon architecture with zero reliance on predefined libraries, functions, or compiler runtimes.
+**SigmaOS** is an absolute scratch-made, zero-dependency, bare-metal sovereign operating system. Version 150.0 marks the **Autonomous Century**, introducing a fully self-healing silicon architecture that has absorbed the Unique Selling Points (USPs) of the entire Linux distribution landscape—from the stability of Debian and the minimalism of Arch to the declarative perfection of NixOS and the amnesic privacy of Tails.
 
 ---
 
-## 🏛️ v150.0 AUTONOMOUS CENTURY (Key Features)
+## 🏛️ v150.0 AUTONOMOUS CENTURY (Universal Master Shards)
 
-- **Absolute Scratch Sovereignty**: 100% of the OS, tools, and libraries are built from raw C11 and x86_64 Assembly. Zero glibc, zero stdlib, zero predefined headers (even `<stdarg.h>` is purged).
-- **Sovereign Autonomous Sentinel**: A self-healing system that intercepts CPU traps and exceptions at the assembly level, automatically resolving errors and performing silicon-rollbacks to maintain 100% uptime.
-- **Zero-CRT0 Entry**: Bypassed standard compiler entry points with `SovereignEntry.asm`; the OS takes control from the very first instruction.
-- **Sovereign Security & Privacy**: Includes raw ASM scrubbing routines (`sigma_security_scrub_registers`) to ensure no personal information or sensitive states are leaked between tasks.
-- **Ubuntu-Elite UI/UX**: A premium, industrial-grade interface built with the **Yaru-Gold** design system, delivering 45px glass-blur dynamics and fluid motion sets that exceed the polish of Ubuntu 24.04.
-- **Raw ASM Math Shards**: Custom silicon-direct trigonometric and square root logic for peak performance and military-grade precision.
+-   **Universal Distro Absorption**: Integrated philosophies from **Debian** (Stability), **Arch** (Minimalism/Rolling), **RHEL** (Enterprise Security), **Gentoo** (ASM-level Optimization), **NixOS** (Declarative Immutability), **Alpine** (Size-Minimalism), **Kali** (Forensic Audit), **Tails** (Amnesic Privacy), and **Slackware** (Classic Unix Purity).
+-   **Sovereign-Unity Orchestrator**: A central coordination shard that maps hardware-direct ASM paths for peak architectural efficiency.
+-   **Sovereign Autonomous Sentinel**: A self-healing system that intercepts CPU traps and exceptions at the assembly level, automatically resolving errors and performing silicon-rollbacks to maintain 100% uptime.
+-   **Absolute Scratch Sovereignty**: 100% of the OS, tools, and libraries are built from raw C11 and x86_64 Assembly. Zero glibc, zero stdlib, zero predefined headers.
+-   **Sovereign Security & Privacy**: Mandatory silicon-scrubbing routines ensure no personal information or sensitive states persist in RAM or registers.
+-   **Ubuntu-Elite UI/UX**: A premium, industrial-grade vertical dashboard built with the **Yaru-Gold** design system, delivering 45px glass-blur dynamics and fluid motion sets that exceed the polish of Ubuntu 24.04.
+
+---
+
+## 🤖 SOVEREIGN AUTOMATION TOOLS
+-   **Sovereign-XClicker**: Integrated industrial autoclicker for automated tasks.
+-   **Sovereign-Backup-Manager**: Metadata-preserving, zero-dependency backup engine.
+-   **Sovereign-Remote-Bot**: PQC-encrypted remote command execution shard.
+-   **SigmaDistroRunner**: Launch any Linux distribution ISO locally on the Aether-WSW shard.
 
 ---
 
 ## 🚀 GETTING STARTED
-1. **Zenith Dashboard**: Open `index.html` to launch the premium **Ubuntu-Elite** interface.
-2. **Build Sovereign Binary**:
+1.  **Zenith Dashboard**: Open `index.html` to launch the premium **Ubuntu-Elite** interface.
+2.  **Build Sovereign Binary**:
 
-   ```bash
-   make zenith
-   ```
+    ```bash
+    make zenith
+    ```
 
 ---
 
@@ -33,4 +41,4 @@
 
 ---
 
-Σ SIGMAOS: THE DEFINITIVE SILICON ZENITH. AUTONOMOUS. SOVEREIGN. UNSTOPPABLE.
+Σ SIGMAOS: THE DEFINITIVE SILICON ZENITH. UNIVERSAL. SOVEREIGN. UNSTOPPABLE.
