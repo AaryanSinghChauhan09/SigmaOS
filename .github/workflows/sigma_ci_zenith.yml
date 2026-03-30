@@ -1,10 +1,10 @@
-name: Σ SigmaOS Sovereign CI Zenith (v3.0)
+name: Σ SigmaOS Sovereign CI Zenith (v150.8)
 
 on:
   push:
-    branches: [ master, main ]
+    branches: [ main ]
   pull_request:
-    branches: [ master, main ]
+    branches: [ main ]
 
 jobs:
   # ==========================================================================
@@ -195,7 +195,7 @@ jobs:
         run: |
           echo ""
           echo "Σ ══════════════════════════════════════════════════════════ Σ"
-          echo "  SIGMAOS SOVEREIGN ZENITH — CI PIPELINE v4.0 COMPLETE"
+          echo "  SIGMAOS SOVEREIGN ZENITH — CI PIPELINE v150.8 COMPLETE"
           echo "  Build:        PASS"
           echo "  Sovereignty:  100%%"
           echo "  Zero glibc:   VERIFIED"
@@ -207,7 +207,7 @@ jobs:
           echo "Σ ══════════════════════════════════════════════════════════ Σ"
 
   # ==========================================================================
-  # Stage 6: Sovereign Zenith Build (Industrial Sharding)
+  # Stage 6: Autonomous SigmaOS Zenith Supreme (v150.8): The absolute single-branch industrial master.
   # ==========================================================================
   sovereign_build:
     name: Alpha Zenith Build
