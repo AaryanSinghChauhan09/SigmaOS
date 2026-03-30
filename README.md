@@ -26,6 +26,7 @@
 - **Sovereign-XClicker**: Integrated industrial autoclicker for automated tasks.
 - **Sovereign-Backup-Manager**: Metadata-preserving, zero-dependency backup engine.
 - **Sovereign-Remote-Bot**: PQC-encrypted remote command execution shard.
+- **Sovereign-Automator**: New industrial CLI task automation via **`RUN_PLAYBOOK`**. Executes batch missions from `sovereign_tasks.ps` shards for ultimate performance.
 - **SigmaDistroRunner**: Launch any Linux distribution ISO locally on the Aether-WSW shard.
 
 ---
