@@ -1,9 +1,20 @@
-# Σ SIGMAOS: SOVEREIGN TASK PLAYBOOK (Industrial Automation Shard)
+# Σ SIGMAOS: ADVANCED INDUSTRIAL PLAYBOOK (v150.2)
+# Mission: Dynamic Orchestration Sharding.
+
 LS
 TOP
 PQC_AUDIT
-LATTICE_REKEY
-USP_ABSORB
-NET_ZENITH
-SHARD_REBUILD
-# Automation Complete.
+
+# Conditional Execution Test
+IF KERNEL_ACTIVE THEN LATTICE_REKEY
+IF KERNEL_ACTIVE THEN USP_ABSORB
+
+# Toggle state and verify skip
+TOGGLE_KERNEL
+IF KERNEL_ACTIVE THEN SHARD_REBUILD
+
+# Restore and finalize
+TOGGLE_KERNEL
+IF KERNEL_ACTIVE THEN NET_ZENITH
+
+# Mission Success.

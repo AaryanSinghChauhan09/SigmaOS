@@ -33,6 +33,7 @@ typedef struct OmniShellZenith {
     sigma_u64             commands_sharded;
     char                  history[SHELL_HISTORY_MAX][SHELL_CMD_MAXLEN];
     sigma_u32             history_count;
+    sigma_bool            kernel_active;      /* New state for automation logic */
     SovereignScheduler    scheduler;
     SovereignCloudOrchestrator cloud;
     SovereignUIEngine     ui;
@@ -142,11 +143,11 @@ static void cmd_net(void* ctx) {
 
 static void cmd_run_playbook(void* ctx) {
     OmniShellZenith* sh = (OmniShellZenith*)ctx;
-    sigma_printf("[OMNI-SHELL]: Initiating Sovereign Playbook Execution... [AUTOMATION ACTIVE]\n");
+    sigma_printf("[OMNI-SHELL]: Initiating Advanced Sovereign Playbook... [DYNAMIC AUTOMATION]\n");
     
-    int fd = sigma_open("sovereign_tasks.ps", 0, 0); /* O_RDONLY */
+    int fd = sigma_open("sovereign_tasks.ps", 0, 0);
     if (fd >= 0) {
-        char buf[1024];
+        char buf[2048];
         int n = sigma_read(fd, buf, sizeof(buf)-1);
         if (n > 0) {
             buf[n] = '\0';
@@ -156,8 +157,15 @@ static void cmd_run_playbook(void* ctx) {
                 next_line = (char*)sigma_strstr(line, "\n");
                 if (next_line) *next_line = '\0';
                 
-                /* Self-recursion prevention: omit RUN_PLAYBOOK from its own run */
-                if (!sigma_streq(line, "RUN_PLAYBOOK") && *line != '\0' && *line != '#') {
+                /* Process dynamic logic: IF condition THEN command */
+                if (sigma_strstr(line, "IF KERNEL_ACTIVE THEN")) {
+                    if (sh->kernel_active) {
+                        const char* sub_cmd = sigma_strstr(line, "THEN") + 5;
+                        shell_execute(sh, sub_cmd);
+                    } else {
+                        sigma_printf("[AUTOMATION]: Condition 'KERNEL_ACTIVE' FALSE. Skipping: %s\n", line);
+                    }
+                } else if (*line != '\0' && *line != '#' && !sigma_streq(line, "RUN_PLAYBOOK")) {
                     shell_execute(sh, line);
                 }
                 
@@ -169,6 +177,12 @@ static void cmd_run_playbook(void* ctx) {
     } else {
         sigma_printf("[ERROR]: Playbook shard 'sovereign_tasks.ps' NOT FOUND.\n");
     }
+}
+
+static void cmd_toggle_kernel(void* ctx) {
+    OmniShellZenith* sh = (OmniShellZenith*)ctx;
+    sh->kernel_active = !sh->kernel_active;
+    sigma_printf("[OMNI-SHELL]: KERNEL_ACTIVE = %s [SILICON SIGNAL UPDATED]\n", sh->kernel_active ? "TRUE" : "FALSE");
 }
 
 static void cmd_help(void* ctx);   /* forward decl */
@@ -189,7 +203,8 @@ static const SigmaCommand SIGMA_COMMANDS[] = {
     { "CLOUD_FORGE",    "Elastic cloud shard scaling",          cmd_cloud         },
     { "UI_ZENITH",      "Render DOM to GPU framebuffer",        cmd_ui            },
     { "NET_ZENITH",     "Zero-Trust handshake shard",           cmd_net           },
-    { "RUN_PLAYBOOK",   "Execute industrial automation script", cmd_run_playbook  },
+    { "RUN_PLAYBOOK",   "Execute dynamic industrial automation",  cmd_run_playbook  },
+    { "TOGGLE_KERNEL",  "Switch KERNEL_ACTIVE state shard",      cmd_toggle_kernel },
     { "HELP",           "List available commands",              cmd_help          },
 };
 
@@ -212,6 +227,7 @@ static void cmd_help(void* ctx) {
  * ========================================================================= */
 static void shell_init(OmniShellZenith* sh) {
     sigma_memset(sh, 0, sizeof(*sh));
+    sh->kernel_active = SIGMA_TRUE; /* Default for automation sharding */
     SovereignScheduler_init(&sh->scheduler);
     SovereignCloud_init(&sh->cloud);
     SovereignUI_init(&sh->ui);
