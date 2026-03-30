@@ -1,11 +1,10 @@
 /*
  * =========================================================================
- * Σ SIGMAOS: SOVEREIGN LIBC (v20.0 - PURE C11 ZERO-DEPENDENCY)
+ * Σ SIGMAOS: SOVEREIGN LIBC (v21.0 - INDUSTRIAL SCALING MATRIX)
  * =========================================================================
- * Mission: Neutralize all high-level language runtimes (glibc, msvcrt).
- * Capability: Direct x86_64 Syscall Integration via C11.
- * Principle: Absolute Low-Level. Zero External Symbols. 98% C Sovereign.
- * Standard: C11 (ISO/IEC 9899:2011) — no C++ dependencies.
+ * Mission: Universal Multi-Arch Sovereignty & Competitor Crushing.
+ * Capability: TCP/UDP Networking, Shared Memory Sharding, W^X Security.
+ * Principal: Scaling Everything with Proper Functional Sovereignty.
  * =========================================================================
  */
 
@@ -40,6 +39,9 @@ extern sigma_ssize_t _sigma_sys_write(int fd, const void* buf, sigma_size_t coun
 extern sigma_ssize_t _sigma_sys_read(int fd, void* buf, sigma_size_t count);
 extern void*         _sigma_sys_mmap(void* addr, sigma_size_t length, int prot, int flags, int fd, sigma_u64 offset);
 extern void          _sigma_sys_exit(int code);
+extern int           _sigma_sys_socket(int domain, int type, int protocol);
+extern int           _sigma_sys_bind(int sockfd, const void* addr, sigma_u32 addrlen);
+extern int           _sigma_sys_connect(int sockfd, const void* addr, sigma_u32 addrlen);
 
 /* =========================================================================
  * SOVEREIGN WRAPPERS (redirected to raw ASM)
@@ -48,12 +50,29 @@ extern void          _sigma_sys_exit(int code);
 #define sigma_write(fd, buf, count)    _sigma_sys_write(fd, buf, count)
 #define sigma_read(fd, buf, count)     _sigma_sys_read(fd, buf, count)
 #define sigma_mmap(addr, len, p, f, d, o) _sigma_sys_mmap(addr, len, p, f, d, o)
+#define sigma_socket(d, t, p)          _sigma_sys_socket(d, t, p)
+#define sigma_bind(f, a, l)            _sigma_sys_bind(f, a, l)
+#define sigma_connect(f, a, l)         _sigma_sys_connect(f, a, l)
 
 int           sigma_open(const char* filename, int flags, int mode);
 int           sigma_close(int fd);
+int           sigma_ioctl(int fd, unsigned long request, ...);
+int           sigma_mprotect(void* addr, sigma_size_t len, int prot);
 int           sigma_getdents64(unsigned int fd, void* dirp, unsigned int count);
-int           sigma_execve(const char* filename, char* const argv[],
-                            char* const envp[]);
+
+/* =========================================================================
+ * INDUSTRIAL IPC & SHARDING
+ * ========================================================================= */
+int           sigma_shm_open(const char* name, int oflag, int mode);
+int           sigma_shm_unlink(const char* name);
+int           sigma_sem_init(const char* name, sigma_u32 value);
+int           sigma_sem_wait(const char* name);
+int           sigma_sem_post(const char* name);
+
+/* =========================================================================
+ * CORE OS PRIMITIVES
+ * ========================================================================= */
+int           sigma_execve(const char* filename, char* const argv[], char* const envp[]);
 int           sigma_fork(void);
 int           sigma_pipe(int pipefd[2]);
 unsigned int  sigma_sleep(unsigned int seconds);

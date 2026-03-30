@@ -504,3 +504,64 @@ body {
 ::-webkit-scrollbar { width: 6px; }
 ::-webkit-scrollbar-thumb { background: rgba(255, 255, 255, 0.1); border-radius: 3px; }
 ::-webkit-scrollbar-thumb:hover { background: rgba(255, 255, 255, 0.2); }
+
+/* ═══════════════════════════════════════════════════════════
+   7. MARKET CRUSHING MATRIX (INDUSTRIAL STYLING)
+   ═══════════════════════════════════════════════════════════ */
+
+.win-matrix-default { width: 680px; height: 380px; left: 50%; top: 50%; transform: translate(-50%, -50%); }
+
+.matrix-header {
+  background: var(--gold-gradient) !important;
+  color: var(--amoled-dark);
+}
+
+.matrix-chip {
+  background: rgba(227, 176, 75, 0.1) !important;
+  border-color: rgba(227, 176, 75, 0.4) !important;
+  color: var(--yaru-gold) !important;
+  font-weight: 700;
+  letter-spacing: 0.5px;
+}
+
+.matrix-table {
+  border-collapse: separate;
+  border-spacing: 0 8px;
+  width: 100%;
+}
+
+.matrix-table th {
+  padding: 12px;
+  border-bottom: 2px solid var(--glass-border);
+  font-family: 'Orbitron', sans-serif;
+  font-size: 0.75rem;
+  letter-spacing: 1px;
+  color: var(--text-muted);
+}
+
+.matrix-table td {
+  padding: 12px;
+  background: rgba(255, 255, 255, 0.02);
+  border-top: 1px solid rgba(255, 255, 255, 0.05);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+  font-size: 0.85rem;
+  text-align: center;
+}
+
+.matrix-table td:first-child {
+  border-left: 1px solid rgba(255, 255, 255, 0.05);
+  border-radius: 8px 0 0 8px;
+  text-align: left;
+  font-weight: 600;
+}
+
+.matrix-table td:last-child {
+  border-right: 1px solid rgba(255, 255, 255, 0.05);
+  border-radius: 0 8px 8px 0;
+  background: rgba(0, 210, 255, 0.05);
+}
+
+.matrix-table tbody tr:hover td {
+  background: rgba(255, 255, 255, 0.08);
+  border-color: var(--glass-border);
+}
