@@ -79,7 +79,14 @@ void  sigma_print(const char* str);
 void  sigma_print_num(sigma_u64 val);
 void  sigma_print_hex(sigma_u64 val);
 void  sigma_printf(const char* format, ...);
+void  sigma_snprintf(char* buf, sigma_size_t n, const char* format, ...);
 void  sigma_log(const char* msg);
+
+/* =========================================================================
+ * ADVANCED STRING UTILITIES (Zero-Dependency)
+ * ========================================================================= */
+const char* sigma_strstr(const char* haystack, const char* needle);
+const char* sigma_strrchr(const char* s, int c);
 
 /* =========================================================================
  * SOVEREIGN MEMORY MANAGEMENT (bump-pointer slab, 128 MB shard)

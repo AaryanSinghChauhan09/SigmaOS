@@ -1,5 +1,4 @@
-#include <stdio.h>
-#include <string.h>
+#include "SovereignLibC.h"
 
 /**
  * @brief Sovereign-HTTP (Apache Industrial Shard)
@@ -19,28 +18,28 @@ void register_http_module(char* name, void (*on_req)(const char*, const char*)) 
         modules[module_count].name = name;
         modules[module_count].on_request = on_req;
         module_count++;
-        printf("[HTTP] Registered Module: %s\n", name);
+        sigma_printf("[HTTP] Registered Module: %s\n", name);
     }
 }
 
 void sovereign_http_start(int port) {
-    printf("[HTTP] Starting Sovereign-HTTP (Apache-Parity) on Port %d\n", port);
-    printf("[HTTP] Initializing Modular Shards...\n");
-    printf("[HTTP] Initializing Core Directives: KeepAlive=ON, MaxClients=5000\n");
+    sigma_printf("[HTTP] Starting Sovereign-HTTP (Apache-Parity) on Port %d\n", port);
+    sigma_printf("[HTTP] Initializing Modular Shards...\n");
+    sigma_printf("[HTTP] Initializing Core Directives: KeepAlive=ON, MaxClients=5000\n");
     // Main event loop (simulated)
     const char* v = "GET";
     const char* p = "/index.html";
-    printf("[HTTP] Inbound Request: %s %s\n", v, p);
+    sigma_printf("[HTTP] Inbound Request: %s %s\n", v, p);
     for (int i = 0; i < module_count; i++) {
         modules[i].on_request(v, p);
     }
 }
 
 void core_module_handler(const char* verb, const char* path) {
-    if (strcmp(path, "/index.html") == 0) {
-        printf("[HTTP] CoreModule: Serving SigmaOS Zenith Dashboard.\n");
+    if (sigma_streq(path, "/index.html")) {
+        sigma_printf("[HTTP] CoreModule: Serving SigmaOS Zenith Dashboard.\n");
     } else {
-        printf("[HTTP] CoreModule: Redirecting to SovereignCloudMaestro.\n");
+        sigma_printf("[HTTP] CoreModule: Redirecting to SovereignCloudMaestro.\n");
     }
 }
 

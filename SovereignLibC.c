@@ -217,6 +217,74 @@ void sigma_printf(const char* format, ...) {
 }
 
 /* =========================================================================
+ * sigma_vsnprintf / sigma_snprintf — bounded variadic formatter
+ * ========================================================================= */
+void sigma_vsnprintf(char* buf, sigma_size_t n, const char* format, sigma_va_list args) {
+    sigma_size_t pos = 0;
+    if (n == 0) return;
+
+    for (const char* p = format; *p != '\0' && pos < n - 1; p++) {
+        if (*p == '%' && *(p + 1) != '\0') {
+            p++;
+            switch (*p) {
+                case 's': {
+                    const char* s = sigma_va_arg(args, const char*);
+                    while (*s && pos < n - 1) buf[pos++] = *s++;
+                    break;
+                }
+                case 'd': {
+                    int v = sigma_va_arg(args, int);
+                    if (v < 0) { if (pos < n - 1) buf[pos++] = '-'; v = -v; }
+                    char tmp[32]; int i = 30; tmp[31] = '\0';
+                    if (v == 0) tmp[i--] = '0';
+                    else while (v > 0) { tmp[i--] = (char)((v % 10) + '0'); v /= 10; }
+                    const char* s = &tmp[i + 1];
+                    while (*s && pos < n - 1) buf[pos++] = *s++;
+                    break;
+                }
+                default:
+                    buf[pos++] = *p;
+                    break;
+            }
+        } else {
+            buf[pos++] = *p;
+        }
+    }
+    buf[pos] = '\0';
+}
+
+void sigma_snprintf(char* buf, sigma_size_t n, const char* format, ...) {
+    sigma_va_list args;
+    sigma_va_start(args, format);
+    sigma_vsnprintf(buf, n, format, args);
+    sigma_va_end(args);
+}
+
+/* =========================================================================
+ * sigma_strstr / sigma_strrchr
+ * ========================================================================= */
+const char* sigma_strstr(const char* haystack, const char* needle) {
+    if (!*needle) return haystack;
+    for (; *haystack; haystack++) {
+        if (*haystack == *needle) {
+            const char *h = haystack, *n = needle;
+            while (*h && *n && *h == *n) { h++; n++; }
+            if (!*n) return haystack;
+        }
+    }
+    return SIGMA_NULL;
+}
+
+const char* sigma_strrchr(const char* s, int c) {
+    const char* last = SIGMA_NULL;
+    while (*s) {
+        if (*s == (char)c) last = s;
+        s++;
+    }
+    return last;
+}
+
+/* =========================================================================
  * Sovereign Memory Management — bump-pointer slab (128 MB)
  * ========================================================================= */
 static void*       g_heap_start = SIGMA_NULL;
