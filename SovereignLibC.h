@@ -34,15 +34,23 @@ typedef int                 sigma_bool;
 typedef sigma_u32 sigma_status;
 
 /* =========================================================================
- * DIRECT SYSCALL DECLARATIONS (x86_64 Linux — no libc wrapper)
+ * ABSOLUTE RAW SYSCALLS (implemented in SovereignZeroLib.asm)
  * ========================================================================= */
-void          sigma_exit(int code);
-sigma_ssize_t sigma_write(int fd, const void* buf, sigma_size_t count);
-sigma_ssize_t sigma_read(int fd, void* buf, sigma_size_t count);
+extern sigma_ssize_t _sigma_sys_write(int fd, const void* buf, sigma_size_t count);
+extern sigma_ssize_t _sigma_sys_read(int fd, void* buf, sigma_size_t count);
+extern void*         _sigma_sys_mmap(void* addr, sigma_size_t length, int prot, int flags, int fd, sigma_u64 offset);
+extern void          _sigma_sys_exit(int code);
+
+/* =========================================================================
+ * SOVEREIGN WRAPPERS (redirected to raw ASM)
+ * ========================================================================= */
+#define sigma_exit(code)               _sigma_sys_exit(code)
+#define sigma_write(fd, buf, count)    _sigma_sys_write(fd, buf, count)
+#define sigma_read(fd, buf, count)     _sigma_sys_read(fd, buf, count)
+#define sigma_mmap(addr, len, p, f, d, o) _sigma_sys_mmap(addr, len, p, f, d, o)
+
 int           sigma_open(const char* filename, int flags, int mode);
 int           sigma_close(int fd);
-void*         sigma_mmap(void* addr, sigma_size_t length, int prot,
-                          int flags, int fd, sigma_u64 offset);
 int           sigma_getdents64(unsigned int fd, void* dirp, unsigned int count);
 int           sigma_execve(const char* filename, char* const argv[],
                             char* const envp[]);
