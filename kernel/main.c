@@ -8,12 +8,11 @@
  */
 
 #include "../libc/sigma_libc.h"
-#include "../libc/sigma_types.h"
 
-// --- Subsystem Initializers ---
+// --- Subsystem Initializers (Industrial Shards) ---
 extern void sigma_scheduler_init();
 extern void sigma_vfs_init();
-extern void sigma_slab_init(); // New Slab sharder init
+extern void sigma_slab_init(); 
 
 void sigma_kernel_main() {
     sigma_printf("\nΣ SIGMAOS ZENITH SUPREME (v94.0) BOOTING...\n");

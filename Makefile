@@ -1,5 +1,5 @@
 # =============================================================================
-# Σ SIGMAOS: SOVEREIGN UNIVERSAL MAKEFILE (v150.0 - AUTONOMOUS CENTURY)
+# Σ SIGMAOS: SOVEREIGN UNIVERSAL MAKEFILE (v150.7 - INDUSTRIAL MASTER)
 # =============================================================================
 # Inspiration: torvalds/linux/Makefile, seL4/CMakeLists.txt, Fuchsia GN
 # USP Absorbed: 
@@ -79,14 +79,19 @@ LDFLAGS   := -nostdlib -static
 SIGMA_LIBC_C   := libc/sigma_libc.c
 SIGMA_LIBC_OBJ := build/sigma_libc.o
 
-# Kernel C sources (refactored for Linux-parity)
-KERNEL_C_SRCS := kernel/main.c \
-                 kernel/slab.c \
+# Kernel C sources (refactored for industrial sovereignty)
+KERNEL_C_SRCS := kernel/sigma_kernel.c \
+                 kernel/pmm.c \
+                 kernel/vmm.c \
+                 kernel/idt.c \
+                 kernel/syscall.c \
                  kernel/scheduler.c \
-                 kernel/init.c \
-                 arch/x86_64/paging.c \
-                 fs/vfs.c \
-                 drivers/console.c \
+                 kernel/vfs.c \
+                 kernel/process.c \
+                 kernel/slab.c \
+                 kernel/main.c \
+                 kernel/omni_shell.c \
+                 kernel/SovereignOmniShard.c \
                  kernel/SovereignProcessManager.cpp \
                  kernel/SovereignMemoryZenith.cpp \
                  kernel/SovereignAIKernelZenith.cpp \
@@ -94,10 +99,10 @@ KERNEL_C_SRCS := kernel/main.c \
 KERNEL_OBJS   := $(patsubst %, build/kernel_%.o, $(notdir $(KERNEL_C_SRCS)))
 
 # ASM sources
-BOOT_ASM_SRC     := arch/SovereignStandardHAL.asm
+BOOT_ASM_SRC     := kernel/boot.asm
 SYSCALL_ASM      := libc/SovereignLibC.asm
 KERNEL_FINAL_ASM := kernel/SovereignKernelFinality.asm
-BOOT_OBJS        := build/hal.o build/syscall.o build/finality.o
+BOOT_OBJS        := build/boot.o build/syscall.o build/finality.o
 
 # Rust no_std modules (Industrial Safety)
 RUST_SRCS := kernel/rust/SigmaRustCore.rs \
@@ -186,7 +191,7 @@ SIGMA_TOOLS_OBJS := $(patsubst %.cpp, build/%.o, $(SIGMA_TOOLS_SRCS))
 all: dirs sigma_libc kernel rust_core hal tools info
 	@echo ""
 	@echo "Σ ============================================================ Σ"
-	@echo "  SigmaOS SOVEREIGN BUILD v8.0 COMPLETE"
+	@echo "  SigmaOS SOVEREIGN BUILD v150.7 COMPLETE"
 	@echo "  Zero stdlib. Zero glibc. Zero external deps."
 	@echo "  Arch + Alpine + Debian + Gentoo + NixOS USPs absorbed."
 	@echo "Σ ============================================================ Σ"
@@ -374,6 +379,7 @@ ZENITH_OBJS := $(ZENITH_OBJ_ENTRY) $(ZENITH_OBJ_ASM) $(ZENITH_OBJ_CPP) \
                build/omni_shell.o
 
 build/SovereignAetherSentinel_c.o: SovereignAetherSentinel.c SovereignLibC.h
+#include "libc/sigma_libc.h"
 	@$(CC) $(CFLAGS) -c $< -o $@
 
 # Update linker for custom entry
