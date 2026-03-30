@@ -1,0 +1,47 @@
+name: Feature Request
+description: Propose a new feature for SigmaOS.
+labels: ["enhancement"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        We want to hear your ideas for evolving the SigmaOS sovereign landscape. 
+
+  - type: textarea
+    id: feature-description
+    attributes:
+      label: Feature Description
+      description: What is the proposed feature?
+      placeholder: Describe the new feature...
+    validations:
+      required: true
+
+  - type: textarea
+    id: use-case
+    attributes:
+      label: Use Case
+      description: Why is this feature needed?
+      placeholder: Describe the scenario or benefit...
+    validations:
+      required: true
+
+  - type: textarea
+    id: implementation-ideas
+    attributes:
+      label: Implementation Ideas
+      description: How could this feature be implemented?
+      placeholder: |
+        Is it a new shard? 
+        Does it use existing syscalls?
+        ASM or C?
+    validations:
+      required: false
+
+  - type: textarea
+    id: additional-context
+    attributes:
+      label: Additional Context
+      description: Provide any further details, screenshots, or examples.
+      placeholder: Any more info...
+    validations:
+      required: false

@@ -1,0 +1,66 @@
+name: Bug Report
+description: Report a bug in SigmaOS to help us improve the system.
+labels: ["bug"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for reporting a bug in SigmaOS! Please provide as much detail as possible to help us resolve the issue.
+
+  - type: textarea
+    id: bug-description
+    attributes:
+      label: Bug Description
+      description: What is the issue?
+      placeholder: Describe the problem...
+    validations:
+      required: true
+
+  - type: textarea
+    id: steps-to-reproduce
+    attributes:
+      label: Steps to Reproduce
+      description: How can we reproduce this bug?
+      placeholder: |
+        1. Open SigmaOS...
+        2. Run command...
+        3. Observe...
+    validations:
+      required: true
+
+  - type: input
+    id: expected-behavior
+    attributes:
+      label: Expected Behavior
+      description: What should have happened?
+      placeholder: What was supposed to happen?
+    validations:
+      required: true
+
+  - type: input
+    id: actual-behavior
+    attributes:
+      label: Actual Behavior
+      description: What actually happened?
+      placeholder: What occurred instead?
+    validations:
+      required: true
+
+  - type: textarea
+    id: environment-info
+    attributes:
+      label: Environment Info
+      description: Operating System, Kernel version, Hardware...
+      placeholder: |
+        SigmaOS Version: 150.0
+        Architecture: x86_64
+        Hardware: ...
+    validations:
+      required: true
+
+  - type: textarea
+    id: logs
+    attributes:
+      label: Logs (if applicable)
+      description: Provide any terminal output or logs.
+      placeholder: Output from OmniShell or Sentinel...
