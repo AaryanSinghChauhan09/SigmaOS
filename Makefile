@@ -1,5 +1,5 @@
 # =============================================================================
-# Σ SIGMAOS: SOVEREIGN UNIVERSAL MAKEFILE (v8.0 - ZERO-DEPENDENCY EDITION)
+# Σ SIGMAOS: SOVEREIGN UNIVERSAL MAKEFILE (v150.0 - AUTONOMOUS CENTURY)
 # =============================================================================
 # Inspiration: torvalds/linux/Makefile, seL4/CMakeLists.txt, Fuchsia GN
 # USP Absorbed: 
@@ -423,8 +423,8 @@ clean:
 # =============================================================================
 info:
 	@echo ""
-	@echo "Σ SigmaOS Sovereign Build System v94.0 (ZENITH EDITION)"
+	@echo "Σ SigmaOS Sovereign Build System v150.0 (AUTONOMOUS CENTURY)"
 	@echo "  ARCH        = $(ARCH)"
 	@echo "  ZENITH_BINS = build/sigmaos_zenith"
-	@echo "  SYMBOLS     = scripts/sync_github.sh, scripts/launch_distro.py"
+	@echo "  SYMBOLS     = scripts/sync_github.sh, scripts/SigmaDistroRunner.ps1"
 	@echo ""
