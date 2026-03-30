@@ -20,7 +20,6 @@
 #include "SovereignHardwareIOZenith.h"
 #include "SovereignCoordinationZenith.h"
 #include "SovereignDesktopZenith.h"
-#include "SovereignAetherAbsorption.cpp"
 #include "SovereignUEFIShard.cpp"
 #include "SovereignP2PShard.cpp"
 #include "SovereignDirectOffice.cpp"
@@ -29,14 +28,13 @@
 #include "SovereignAetherPulse.cpp"
 #include "SovereignPersonaEngine.cpp"
 #include "SovereignZenithStylist.cpp"
-#include "SovereignAmnesicShard.cpp"
 #include "SovereignAetherAbsorption.c"
 #include "SovereignAmnesicShard.c"
 #include "SovereignQuantumKernel.c"
 #include "SovereignAetherOrchestrator.c"
+#include "SovereignStyleZenith.c"
 #include "SovereignRegistry.cpp"
 #include "SovereignAutomatorZenith.cpp"
-#include "SovereignStyleZenith.cpp"
 
 namespace SigmaOS {
 namespace Shell {
@@ -77,7 +75,7 @@ private:
     Design::SovereignZenithStylist m_stylist;
     WindowsShard::SovereignRegistry m_registry;
     Automation::SovereignAutomatorZenith m_automator;
-    Design::SovereignStyleZenith m_style;
+    SovereignStyleZenith m_style;
 
 public:
     OmniShellZenith() : m_commands_sharded(0) {
@@ -114,6 +112,8 @@ public:
         } else if (sigma_compare(cmd, "AMNESIC_MODE")) {
             SovereignAmnesicShard_StartAmnesicSession(&m_amnesic);
             SovereignAmnesicShard_KillMetadataShards(&m_amnesic);
+        } else if (sigma_compare(cmd, "SILICON_SCRUB")) {
+            SovereignAmnesicShard_SecureSiliconExit(&m_amnesic);
         } else if (sigma_compare(cmd, "SILICON_WIPE")) {
             SovereignAmnesicShard_PerformSiliconWipe(&m_amnesic);
         } else if (sigma_compare(cmd, "QUANTUM_KRN")) {
@@ -169,7 +169,7 @@ public:
              m_peterson.Leaving(0);
         } else if (sigma_compare(cmd, "ABSORB_LEGACY")) {
              sigma_printf("[ABSORB]: Initializing Ultra-Deep Legacy Feature Absorption (v1.0 -> v92.0)...\n");
-             m_absorber.DeploySovereignUnity();
+             SovereignAetherAbsorber_DeploySovereignUnity(&m_absorber);
         } else if (sigma_compare(cmd, "TOGGLE_GUI")) {
              m_desktop.ToggleGUI();
              if (m_desktop.IsGUIActive()) {
