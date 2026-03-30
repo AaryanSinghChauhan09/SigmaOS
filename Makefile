@@ -303,9 +303,11 @@ test: sigma_libc_standalone
 	fi
 
 # --- ZENITH SOVEREIGN LIBC ---
-ZENITH_OBJ_ASM := build/SovereignLibC_asm.o
-ZENITH_OBJ_CPP := build/SovereignLibC_cpp.o
+ZENITH_OBJ_ASM   := build/SovereignLibC_asm.o
+ZENITH_OBJ_CPP   := build/SovereignLibC_cpp.o
 ZENITH_OBJ_PULSE := build/SovereignSiliconPulse.o
+ZENITH_OBJ_ENTRY := build/SovereignEntry.o
+ZENITH_OBJ_MATH  := build/SovereignMath.o
 
 $(ZENITH_OBJ_ASM): SovereignLibC.asm
 	@mkdir -p build
@@ -317,13 +319,24 @@ $(ZENITH_OBJ_PULSE): SovereignSiliconPulse.asm
 	@echo "[NASM] SovereignSiliconPulse.asm"
 	@$(NASM) $(ASMFLAGS) $< -o $@
 
+$(ZENITH_OBJ_ENTRY): SovereignEntry.asm
+	@mkdir -p build
+	@echo "[NASM] SovereignEntry.asm"
+	@$(NASM) $(ASMFLAGS) $< -o $@
+
+$(ZENITH_OBJ_MATH): SovereignMath.asm
+	@mkdir -p build
+	@echo "[NASM] SovereignMath.asm"
+	@$(NASM) $(ASMFLAGS) $< -o $@
+
 $(ZENITH_OBJ_CPP): SovereignLibC.cpp SovereignLibC.h
 	@mkdir -p build
 	@echo "[CXX]  SovereignLibC.cpp"
 	@$(CXX) $(CXXFLAGS) -c $< -o $@
 
 # --- ZENITH DEMONSTRATOR ---
-ZENITH_OBJS := $(ZENITH_OBJ_ASM) $(ZENITH_OBJ_CPP) $(ZENITH_OBJ_PULSE) \
+ZENITH_OBJS := $(ZENITH_OBJ_ENTRY) $(ZENITH_OBJ_ASM) $(ZENITH_OBJ_CPP) \
+               $(ZENITH_OBJ_PULSE) $(ZENITH_OBJ_MATH) \
                build/SovereignAetherAbsorption_c.o \
                build/SovereignCoreUtils.o \
                build/SovereignDistroForge.o \
@@ -333,6 +346,9 @@ ZENITH_OBJS := $(ZENITH_OBJ_ASM) $(ZENITH_OBJ_CPP) $(ZENITH_OBJ_PULSE) \
                build/SovereignKnowledgeAudit.o \
                build/SovereignDesktopZenith.o \
                build/omni_shell.o
+
+# Update linker for custom entry
+LDFLAGS += -e _start
 
 build/SovereignAetherAbsorption_c.o: SovereignAetherAbsorption.c SovereignLibC.h
 	@$(CC) $(CFLAGS) -c $< -o $@
