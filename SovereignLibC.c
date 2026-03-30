@@ -1,14 +1,15 @@
-/*
- * =========================================================================
- * Σ SIGMAOS: SOVEREIGN LIBC IMPLEMENTATION (v20.0 - PURE C11)
- * =========================================================================
- * Refactored from C++ to ISO C11 for 98% C language sovereignty.
- * No stdlib. No glibc. No C++ runtime. Direct x86_64 syscalls via ASM.
- * =========================================================================
- */
-
 #include "SovereignLibC.h"
-#include <stdarg.h>   /* va_list — compiler built-in, not glibc */
+
+/* =========================================================================
+ * ABSOLUTE SCRATCH: COMPILER-NATIVE VARIADIC HANDLER (Zero-Header)
+ * =========================================================================
+ * No <stdarg.h>. Using compiler-intrinsic types for absolute sovereignty.
+ * ========================================================================= */
+typedef __builtin_va_list sigma_va_list;
+
+#define sigma_va_start(ap, last) __builtin_va_start(ap, last)
+#define sigma_va_arg(ap, type)   __builtin_va_arg(ap, type)
+#define sigma_va_end(ap)         __builtin_va_end(ap)
 
 /* =========================================================================
  * sigma_log — minimal labelled print (replaces SigmaOOP.hpp sigma_log)
@@ -150,35 +151,35 @@ int sigma_dup(int oldfd) {
 }
 
 /* =========================================================================
- * sigma_printf — sovereign variadic formatter (C11 va_list)
+ * sigma_printf — sovereign variadic formatter (Absolute Scratch)
  * ========================================================================= */
 void sigma_printf(const char* format, ...) {
-    va_list args;
-    va_start(args, format);
+    sigma_va_list args;
+    sigma_va_start(args, format);
 
     for (const char* p = format; *p != '\0'; p++) {
         if (*p == '%' && *(p + 1) != '\0') {
             p++;
             switch (*p) {
                 case 's':
-                    sigma_print(va_arg(args, const char*));
+                    sigma_print(sigma_va_arg(args, const char*));
                     break;
                 case 'd': {
-                    int v = va_arg(args, int);
+                    int v = sigma_va_arg(args, int);
                     if (v < 0) { sigma_write(1, "-", 1); v = -v; }
                     sigma_print_num((sigma_u64)v);
                     break;
                 }
                 case 'u':
-                    sigma_print_num((sigma_u64)va_arg(args, unsigned int));
+                    sigma_print_num((sigma_u64)sigma_va_arg(args, unsigned int));
                     break;
                 case 'l':
                     /* Handle %llu, %lld */
                     if (*(p+1) == 'l' && *(p+2) == 'u') {
-                        sigma_print_num(va_arg(args, sigma_u64));
+                        sigma_print_num(sigma_va_arg(args, sigma_u64));
                         p += 2;
                     } else if (*(p+1) == 'l' && *(p+2) == 'd') {
-                        sigma_i64 v = va_arg(args, sigma_i64);
+                        sigma_i64 v = sigma_va_arg(args, sigma_i64);
                         if (v < 0) { sigma_write(1, "-", 1); v = -v; }
                         sigma_print_num((sigma_u64)v);
                         p += 2;
@@ -186,16 +187,16 @@ void sigma_printf(const char* format, ...) {
                     break;
                 case 'x':
                 case 'p':
-                    sigma_print_hex((sigma_u64)va_arg(args, sigma_u64));
+                    sigma_print_hex((sigma_u64)sigma_va_arg(args, sigma_u64));
                     break;
                 case 'c': {
-                    char c = (char)va_arg(args, int);
+                    char c = (char)sigma_va_arg(args, int);
                     sigma_write(1, &c, 1);
                     break;
                 }
                 case 'f': {
                     /* Bare-metal float print: integer + 4 decimal places */
-                    sigma_f64 fv = va_arg(args, sigma_f64);
+                    sigma_f64 fv = sigma_va_arg(args, sigma_f64);
                     if (fv < 0.0) { sigma_write(1, "-", 1); fv = -fv; }
                     sigma_u64 intpart = (sigma_u64)fv;
                     sigma_print_num(intpart);
@@ -212,7 +213,7 @@ void sigma_printf(const char* format, ...) {
             sigma_write(1, p, 1);
         }
     }
-    va_end(args);
+    sigma_va_end(args);
 }
 
 /* =========================================================================
