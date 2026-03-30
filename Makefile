@@ -346,10 +346,22 @@ $(ZENITH_OBJ_CPP): SovereignLibC.cpp SovereignLibC.h
 	@echo "[CXX]  SovereignLibC.cpp"
 	@$(CXX) $(CXXFLAGS) -c $< -o $@
 
+build/SovereignAetherShardLoader_asm.o: SovereignAetherShardLoader.asm
+	@mkdir -p build
+	@echo "[NASM] SovereignAetherShardLoader.asm"
+	@$(NASM) $(ASMFLAGS) $< -o $@
+
+build/SigmaCore_asm.o: SigmaCore.asm
+	@mkdir -p build
+	@echo "[NASM] SigmaCore.asm"
+	@$(NASM) $(ASMFLAGS) $< -o $@
+
 # --- ZENITH DEMONSTRATOR ---
 ZENITH_OBJS := $(ZENITH_OBJ_ENTRY) $(ZENITH_OBJ_ASM) $(ZENITH_OBJ_CPP) \
                $(ZENITH_OBJ_PULSE) $(ZENITH_OBJ_MATH) $(ZENITH_OBJ_SEC) \
                $(ZENITH_OBJ_SENT) \
+               build/SovereignAetherShardLoader_asm.o \
+               build/SigmaCore_asm.o \
                build/SovereignAetherAbsorption_c.o \
                build/SovereignAetherSentinel_c.o \
                build/SovereignCoreUtils.o \

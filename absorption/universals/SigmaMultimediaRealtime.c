@@ -7,14 +7,14 @@
  */
 
 void sigma_shard_multimedia_init(void) {
-    sigma_printf("[MULTIMEDIA]: Locking silicon shards for REAL-TIME execution (low-latency)...\n");
-    sigma_printf("[MULTIMEDIA]: Prioritizing DMA/I2S bus traffic over non-required shards.\n");
+    _sigma_sys_write(1, "[MULTIMEDIA]: Locking silicon shards for REAL-TIME execution (low-latency)...\n", 79);
+    _sigma_sys_write(1, "[MULTIMEDIA]: Prioritizing DMA/I2S bus traffic over non-required shards.\n", 73);
     
     /* Mock Audio production tools (Ubuntu Studio Parity) */
-    sigma_printf("[OK]: Low-latency kernel-pulse ACTIVE.\n");
-    sigma_printf("[OK]: Sample rates locked to mission requirements.\n");
+    _sigma_sys_write(1, "[OK]: Low-latency kernel-pulse ACTIVE.\n", 40);
+    _sigma_sys_write(1, "[OK]: Sample rates locked to mission requirements.\n", 52);
 }
 
 void sigma_shard_audio_sharding(void) {
-    sigma_printf("[MULTIMEDIA]: Sharding audio data directly to hardware buffers...\n");
+    _sigma_sys_write(1, "[MULTIMEDIA]: Sharding audio data directly to hardware buffers...\n", 67);
 }

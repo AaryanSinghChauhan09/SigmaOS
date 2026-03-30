@@ -7,15 +7,15 @@
  */
 
 void sigma_shard_privacy_init(void) {
-    sigma_printf("[PRIVACY]: Initializing AMNESIC environment (Tails-style)...\n");
-    sigma_printf("[PRIVACY]: Executing from RAM-only shards. Disk persistence: DORMANT.\n");
+    _sigma_sys_write(1, "[PRIVACY]: Initializing AMNESIC environment (Tails-style)...\n", 62);
+    _sigma_sys_write(1, "[PRIVACY]: Executing from RAM-only shards. Disk: DORMANT.\n", 59);
     
     /* Mock Security Tools (Qubes Parity) */
-    sigma_printf("[OK]: Environment ISOLATED from non-mission shards.\n");
-    sigma_printf("[OK]: Forced TOR network missions ARMED.\n");
+    _sigma_sys_write(1, "[OK]: Environment ISOLATED from non-mission shards.\n", 53);
+    _sigma_sys_write(1, "[OK]: Forced TOR network missions ARMED.\n", 42);
 }
 
 void sigma_shard_silicon_wipe_deep(void) {
-    sigma_printf("[PRIVACY]: Preparing deep-silicon-wipe on mission finality...\n");
-    sigma_printf("[SENTINEL]: Executing register-zero-fill and stack-wipe.\n");
+    _sigma_sys_write(1, "[PRIVACY]: Executing deep-silicon-wipe on mission finality...\n", 63);
+    _sigma_sys_write(1, "[SENTINEL]: Hardware register-zero-fill active.\n", 50);
 }

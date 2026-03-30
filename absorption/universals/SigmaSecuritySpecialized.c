@@ -7,16 +7,16 @@
  */
 
 void sigma_shard_security_audit(void) {
-    sigma_printf("[SECURITY-AUDIT]: Initializing specialized forensic mission...\n");
-    sigma_printf("[SECURITY-AUDIT]: Loading PQC-lattice audit triggers...\n");
+    _sigma_sys_write(1, "[SECURITY-AUDIT]: Initializing specialized forensic mission...\n", 63);
+    _sigma_sys_write(1, "[SECURITY-AUDIT]: Loading PQC-lattice audit triggers...\n", 56);
     
     /* Mock Security Tools (Kali Parity) */
-    sigma_printf("[AUDIT]: Scanning network mission-shards... [PASSED]\n");
-    sigma_printf("[AUDIT]: Verifying zero-leak silicon-scrubbing integrity... [PASSED]\n");
+    _sigma_sys_write(1, "[AUDIT]: Scanning network mission-shards... [PASSED]\n", 53);
+    _sigma_sys_write(1, "[AUDIT]: Verifying zero-leak silicon-scrubbing integrity... [PASSED]\n", 68);
     
-    sigma_printf("[OK]: Forensic matrix stabilized. Security mission CLEAR.\n");
+    _sigma_sys_write(1, "[OK]: Forensic matrix stabilized. Security mission CLEAR.\n", 59);
 }
 
 void sigma_shard_forensic_wipe(void) {
-    sigma_printf("[FORENSIC]: Executing DEEP-SILICON-WIPE (Parrot-style)...\n");
+    _sigma_sys_write(1, "[FORENSIC]: Executing DEEP-SILICON-WIPE (Parrot-style)...\n", 59);
 }
