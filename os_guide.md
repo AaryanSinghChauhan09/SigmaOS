@@ -54,6 +54,15 @@ The definitive command-line interface for absolute system control. Use `AI_ORCHE
 - `SECURITY.md`: Detailed documentation on zero-leak protocols.
 - `AUTOMATION_ZENITH.md`: Guide to absorbed USPs and automation tools.
 
+## 5. 🏛️ LEGAL DOMAIN COVERAGE (Industrial Sovereignty)
+
+SigmaOS provides absolute procedural finality for the following legal frameworks:
+
+- **BNSS / BSA / BNS (2023)**: Integrated forensic sharding and digital seizure protocols.
+- **DPDP / RTI**: Automated data privacy scrubbing and transparency audits.
+- **PMLA / GST / RERA / IBC**: Industrial-financial tracing and insolvency sharding.
+- **POCSO / CONSUMER / LABOUR / ARBITRATION**: Safety-critical adjudication and worker-node management logic.
+
 ---
 
 Σ SIGMAOS: THE DEFINITIVE SILICON ZENITH. AUTONOMOUS. SOVEREIGN. UNSTOPPABLE.
