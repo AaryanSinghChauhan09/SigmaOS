@@ -1,7 +1,7 @@
 # Σ SIGMAOS: THE UNIVERSAL INDUSTRIAL MASTER SHARD (v150.0 AUTONOMOUS)
 
 [![GitHub license](https://img.shields.io/badge/license-MIT%20Sovereignty-blue.svg)](LICENSE)
-[![Commit Code](https://img.shields.io/badge/Commit--Code-Σ--ZENITH--AUTONOMOUS--v150.0-gold)](https://github.com/Sovereign-Master/SigmaOS/commits/main)
+[![Commit Code](https://img.shields.io/badge/Commit--Code-Σ--ZENITH--AUTONOMOUS--v150.0-gold)](https://github.com/AaryanSinghChauhan09/SigmaOS/commits/main)
 
 **SigmaOS** is an absolute scratch-made, zero-dependency, bare-metal sovereign operating system. Version 150.0 marks the **Autonomous Century**, introducing a fully self-healing silicon architecture that has absorbed the Unique Selling Points (USPs) of the entire Linux distribution landscape—from the stability of Debian and the minimalism of Arch to the declarative perfection of NixOS and the amnesic privacy of Tails.
 
@@ -33,11 +33,15 @@
 ## 🚀 GETTING STARTED
 
 1. **Zenith Dashboard**: Open `index.html` to launch the premium **Ubuntu-Elite** interface.
+
 2. **Build Sovereign Binary**:
 
-    ```bash
-    make zenith
-    ```
+   ```bash
+   make zenith
+   ```
+
+3. **Download Pre-built Shard**:
+   If you lack a local industrial toolchain, you can download the latest sovereign binary from the [**GitHub Actions Artifacts**](https://github.com/AaryanSinghChauhan09/SigmaOS/actions).
 
 ---
 
