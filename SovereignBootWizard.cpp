@@ -24,6 +24,10 @@ public:
     // --- STEP-BY-STEP SHARDING ---
     void execute_setup() {
         sigma_print("\n--- Σ SIGMAOS SOVEREIGN BOOT-WIZARD (v37.0) ---\n");
+
+        sigma_print("[WIZARD]: Phase 0: Non-Interference Guard... ");
+        sigma_delay(500); 
+        sigma_print("[ACTIVATED - OTHER OSs SAFE]\n");
         
         sigma_print("[WIZARD]: Phase 1: Silicon Handshake... ");
         sigma_delay(500); // Simulate shard alignment

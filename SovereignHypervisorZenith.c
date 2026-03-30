@@ -3,9 +3,9 @@
  * Σ SIGMAOS: SOVEREIGN HYPERVISOR ZENITH (v20.0 - PURE C11)
  * =========================================================================
  * Converted from C++ enum class/OOP/namespace to ISO C11 struct dispatch.
- * Mission: Neutralize all guest operating systems (Linux, Windows, macOS).
+ * Mission: Safely contain and host other guest operating systems (Linux, Windows, macOS).
  * Capability: Ring -1 Hardware-Accelerated Micro-Virtualization.
- * Principle: Guest OSs run as isolated, non-relevant shards within SigmaOS.
+ * Principle: Guest OSs run as isolated, non-interfering shards within SigmaOS.
  * Standard: C11 (ISO/IEC 9899:2011)
  * =========================================================================
  */
@@ -89,9 +89,9 @@ static void vmm_swallow_guest(SovereignHypervisor* vmm, GuestType type) {
         sigma_print("[HYPERVISOR-ZENITH]: Guest shard table full.\n");
         return;
     }
-    sigma_printf("[HYPERVISOR-ZENITH]: Swallowing %s Shard...\n",
+    sigma_printf("[HYPERVISOR-ZENITH]: Hosting %s Shard...\n",
                  guest_type_str(type));
-    sigma_printf("[HYPERVISOR-ZENITH]: | Guest Ring-0 -> Sigma-Ring-3 (Isolated).\n");
+    sigma_printf("[HYPERVISOR-ZENITH]: | Guest Ring-0/Ring-1 -> Sigma-Ring-3 (Safely Contained). No interference with Host OS.\n");
 
     GuestShard* gs = &vmm->guests[vmm->active_shards];
     vmm_init_vmcs(gs, type, vmm->active_shards);

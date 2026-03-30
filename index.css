@@ -22,9 +22,19 @@
   --glass-bg:      rgba(13, 17, 23, 0.75);
   --glass-border:  rgba(48, 54, 61, 0.8);
   --shadow-color:  rgba(0, 0, 0, 0.6);
-  --radius-lg:     12px;
-  --radius-md:     8px;
-  --transition:    all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  --radius-lg:     16px;
+  --radius-md:     10px;
+  --transition:    all 0.4s cubic-bezier(0.23, 1, 0.32, 1);
+
+  /* Zenith-Gold & Prism Aesthetic (Competitor Crushing) */
+  --fluent-acrylic: rgba(10, 10, 10, 0.85);
+  --fluent-border:  rgba(255, 215, 0, 0.15); /* Gold Tint */
+  --aqua-highlight: rgba(255, 255, 255, 0.2);
+  --aqua-shadow:    0 25px 80px rgba(0, 0, 0, 0.85);
+  --gold-gradient:  linear-gradient(135deg, rgba(255,215,0,0.1) 0%, rgba(255,215,0,0.05) 100%);
+  --diffraction:    linear-gradient(90deg, rgba(255,0,0,0.05), rgba(0,255,0,0.05), rgba(0,0,255,0.05));
+  --glass-bg:       rgba(13, 17, 23, 0.82);
+  --glass-blur:     30px;
 }
 
 * {
@@ -167,19 +177,23 @@ body, html {
 }
 
 .window {
-  position: absolute;
-  min-width: 320px;
-  min-height: 240px;
-  background: var(--glass-bg);
-  -webkit-backdrop-filter: blur(20px);
-  backdrop-filter: blur(20px);
-  border: 1px solid var(--glass-border);
+  background: var(--fluent-acrylic);
+  -webkit-backdrop-filter: blur(var(--glass-blur));
+  backdrop-filter: blur(var(--glass-blur));
+  border: 1px solid var(--fluent-border);
   border-radius: var(--radius-lg);
-  box-shadow: 0 10px 40px var(--shadow-color);
+  box-shadow: var(--aqua-shadow);
   display: flex;
   flex-direction: column;
   overflow: hidden;
-  transition: opacity 0.2s, transform 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+  transition: var(--transition);
+  animation: diffraction-shimmer 10s infinite linear;
+}
+
+@keyframes diffraction-shimmer {
+  0% { -webkit-backdrop-filter: blur(var(--glass-blur)) brightness(1); backdrop-filter: blur(var(--glass-blur)) brightness(1); }
+  50% { -webkit-backdrop-filter: blur(var(--glass-blur)) brightness(1.1); backdrop-filter: blur(var(--glass-blur)) brightness(1.1); }
+  100% { -webkit-backdrop-filter: blur(var(--glass-blur)) brightness(1); backdrop-filter: blur(var(--glass-blur)) brightness(1); }
 }
 
 .window.minimized {
@@ -196,12 +210,13 @@ body, html {
 /* Window Header */
 .win-header {
   height: 42px;
-  background: rgba(255, 255, 255, 0.05);
+  background: var(--aqua-gradient);
   display: flex;
   align-items: center;
   justify-content: space-between;
   padding: 0 12px;
   cursor: grab;
+  border-bottom: 1px solid var(--fluent-border);
 }
 
 .win-title {

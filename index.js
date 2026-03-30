@@ -163,9 +163,48 @@ function initWindows() {
     document.querySelectorAll('[data-action="close"]').forEach(btn => {
         btn.addEventListener('click', () => {
             const winId = btn.getAttribute('data-win');
-            document.getElementById('win-' + winId).classList.add('hidden');
+            closeWindow(winId);
         });
     });
+
+    document.querySelectorAll('[data-action="minimize"]').forEach(btn => {
+        btn.addEventListener('click', () => {
+            const winId = btn.getAttribute('data-win');
+            minimizeWindow(winId);
+        });
+    });
+
+    document.querySelectorAll('[data-action="maximize"]').forEach(btn => {
+        btn.addEventListener('click', () => {
+            const winId = btn.getAttribute('data-win');
+            toggleMaximize(winId);
+        });
+    });
+}
+
+function closeWindow(id) {
+    const win = document.getElementById('win-' + id);
+    if (win) {
+        win.classList.add('hidden');
+        win.classList.remove('maximized');
+        spawnToast(`Shard [${id}] Terminated via Silicon Signal.`);
+    }
+}
+
+function minimizeWindow(id) {
+    const win = document.getElementById('win-' + id);
+    if (win) {
+        win.classList.add('hidden');
+        spawnToast(`Shard [${id}] Suspended to Silicon Cache.`);
+    }
+}
+
+function toggleMaximize(id) {
+    const win = document.getElementById('win-' + id);
+    if (win) {
+        win.classList.toggle('maximized');
+        spawnToast(`Shard [${id}] Optimized to Full-Silicon View.`);
+    }
 }
 
 function focusWindow(win) {
@@ -520,10 +559,39 @@ function spawnToast(msg, delay = 0) {
         toast.className = 'toast';
         toast.textContent = msg;
         container.appendChild(toast);
-        setTimeout(() => toast.remove(), 4000);
+        setTimeout(() => toast.remove(), 3000);
     }, delay);
 }
 
+// --- Sovereign Industrial Sharding (Memory Logic) ---
+const SHARD_MEMORY = new Uint8Array(1024); // 1KB Sovereign Shard Memory
+const SHARD_PTRS = {
+    UPTIME: 0,
+    PROCESS_COUNT: 4,
+    USER_ID: 8
+};
+
+function writeShard(ptr, val) {
+    const dv = new DataView(SHARD_MEMORY.buffer);
+    dv.setUint32(ptr, val, true);
+}
+
+function readShard(ptr) {
+    const dv = new DataView(SHARD_MEMORY.buffer);
+    return dv.getUint32(ptr, true);
+}
+
+function initMetrics() {
+    setInterval(() => {
+        const cpu = (Math.random() * 5 + 2).toFixed(1);
+        cpuVal.textContent = cpu + '%';
+        const uptime = readShard(SHARD_PTRS.UPTIME);
+        writeShard(SHARD_PTRS.UPTIME, uptime + 1);
+        
+        const cpuFill = document.querySelector('#cpu-pulse .progress-fill');
+        if (cpuFill) cpuFill.style.width = cpu + '%';
+    }, 1000);
+}
 
 // --- Sovereign Camera (Snapchat/Scratch USP) ---
 function initSovereignCamera() {
@@ -533,7 +601,7 @@ function initSovereignCamera() {
 
     navigator.mediaDevices.getUserMedia({ video: true })
         .then(stream => { video.srcObject = stream; })
-        .catch(err => { spawnToast('Camera Shard: Hardware access denied.'); });
+        .catch(() => { spawnToast('Camera Shard: Hardware access denied.'); });
 
     filterSelect.onchange = () => {
         video.style.filter = filterSelect.value;

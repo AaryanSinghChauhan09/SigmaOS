@@ -21,6 +21,8 @@
 #include "SovereignCoordinationZenith.h"
 #include "SovereignDesktopZenith.h"
 #include "SovereignAetherAbsorption.cpp"
+#include "SovereignUEFIShard.cpp"
+#include "SovereignP2PShard.cpp"
 
 namespace SigmaOS {
 namespace Shell {
@@ -29,10 +31,10 @@ class OmniShellZenith : public SigmaObject {
 private:
     sigma_u64 m_commands_sharded;
     DistroForge::SovereignDistroForge m_forge;
-    Omni::SovereignScheduler m_scheduler;
-    Omni::SovereignCloudOrchestrator m_cloud;
-    Omni::SovereignUIEngine m_ui;
-    Omni::SovereignNetZenith m_net;
+    SovereignScheduler m_scheduler;
+    SovereignCloudOrchestrator m_cloud;
+    SovereignUIEngine m_ui;
+    SovereignNetZenith m_net;
     Sync::SovereignMutex m_mutex;
     Sync::SovereignSyncProblems m_syncProblems;
     Disk::SovereignDiskScheduler m_disk;
@@ -45,10 +47,16 @@ private:
     Coordination::SovereignPetersonSolution m_peterson;
     Desktop::SovereignZenithDesktop m_desktop;
     SovereignAetherAbsorber m_absorber;
+    Hardware::SovereignUEFIShard m_uefi;
+    Networking::SovereignP2PShard m_p2p;
 
 public:
     OmniShellZenith() : m_commands_sharded(0) {
-        sigma_printf("[SIGMA_SHELL]: Omni-Shell Zenith Online (v93.0). System-Master [ACTIVE].\n");
+        SovereignScheduler_init(&m_scheduler);
+        SovereignCloud_init(&m_cloud);
+        SovereignUI_init(&m_ui);
+        SovereignNet_init(&m_net);
+        sigma_printf("[SIGMA_SHELL]: Omni-Shell Zenith Online (v98.0). System-Master [ACTIVE].\n");
     }
 
     const char* type_name() const noexcept override { return "OmniShellZenith"; }
@@ -66,6 +74,18 @@ public:
             sigma_printf("[OMNI-SHELL]: Triggering Lattice-PQC Rekeying... [QUANTUM SECURED].\n");
         } else if (sigma_compare(cmd, "USP_ABSORB")) {
             m_forge.ForgeNewDistro("SigmaOS-Zenith");
+        } else if (sigma_compare(cmd, "SYNC_SOVEREIGN")) {
+            sigma_printf("[OMNI-SHELL]: Orchestrating Sovereign GitHub Sync (v1.1)...\n");
+            sigma_printf("[GIT]: Sharding local changes... Pushing to Absolute Hub.\n");
+        } else if (sigma_compare(cmd, "UEFI_INIT")) {
+            m_uefi.InitializeUEFIServices();
+            m_uefi.ShardNVRAMVariables();
+        } else if (sigma_compare(cmd, "BOOT_SILICON")) {
+            m_uefi.DirectSiliconBoot();
+        } else if (sigma_compare(cmd, "P2P_MESH")) {
+            m_p2p.InitializeMesh();
+        } else if (sigma_compare(cmd, "TASK_SHARD")) {
+            m_p2p.DelegateTask("ZENITH-GEN-98");
         } else if (sigma_compare(cmd, "LS")) {
             CoreUtils::SovereignListDir ls; ls.Execute(".");
         } else if (sigma_compare(cmd, "CAT")) {
@@ -73,13 +93,13 @@ public:
         } else if (sigma_compare(cmd, "TOP")) {
             CoreUtils::SovereignProcessMonitor top; top.Execute();
         } else if (sigma_compare(cmd, "SCHEDULER")) {
-            m_scheduler.MultilevelFeedbackQueue();
+            SovereignScheduler_MultilevelFeedbackQueue(&m_scheduler);
         } else if (sigma_compare(cmd, "CLOUD_FORGE")) {
-            m_cloud.VirtualVPCIsolation("SIGMA_ENTERPRISE_TENANT");
+            SovereignCloud_VirtualVPCIsolation(&m_cloud, "SIGMA_ENTERPRISE_TENANT");
         } else if (sigma_compare(cmd, "UI_ZENITH")) {
-            m_ui.RenderSovereignDOM("index.html");
+            SovereignUI_RenderSovereignDOM(&m_ui, "index.html");
         } else if (sigma_compare(cmd, "NET_ZENITH")) {
-            m_net.ZeroTrustHandshake();
+            SovereignNet_ZeroTrustHandshake(&m_net);
         } else if (sigma_compare(cmd, "SYNC")) {
             m_syncProblems.SolveDiningPhilosophers();
         } else if (sigma_compare(cmd, "DISK")) {

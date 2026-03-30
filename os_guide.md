@@ -8,16 +8,30 @@ SigmaOS is not a software; it is a **Sovereign Sharding Logic**. Built with C, A
 
 | FEATURE | WINDOWS 11 | MACOS / IOS | LINUX (KDE/GNOME) | Σ SIGMAOS ZENITH |
 | :--- | :--- | :--- | :--- | :--- |
-| **Kernel Type** | Monolithic (NT) | Hybrid (XNU) | Monolithic | **Universal Shard (Zenith)** |
-| **Dependencies** | High (DLL bloat) | High (Frameworks) | Medium (Glibc) | **ZERO (Silicon-Direct)** |
-| **AI Integration** | Copilot (Cloud) | Apple Intelligence | Plugins (Fragmented) | **Aether Orchestrator (11 Models)**|
+| **Kernel Type** | Monolithic (NT) | Hybrid (XNU) | Monolithic | **Universal Shard (Zenith + Mach IPC)** |
+| **Dependencies** | High (DLL bloat) | High (Frameworks) | Medium (Glibc) | **ZERO (Silicon-Direct + WSW Interop)** |
+| **AI Integration** | Copilot (Cloud) | Apple Intelligence | Plugins (Fragmented) | **Aether Orchestrator (11 Models)** |
 | **Legality** | TOS Managed | TOS Managed | GPL/Open | **Sovereign-Justice (BSA 2023)** |
 | **Automation** | Task Scheduler | Shortcuts | Cron / Systemd | **Aether Pulse (Silicon Triggers)** |
-| **Ease of Use** | User-Friendly | Premium-Simple | Highly Variable | **Master-Intuitive (Industrial)** |
+| **Ease of Use** | User-Friendly | Premium-Simple | Highly Variable | **Master-Intuitive (Fluent-Aqua UI)** |
+| **Server Core** | IIS (Integrated) | N/A | Apache/Nginx | **Sovereign-HTTP (Modular Apache-Parity)** |
+| **Config System** | Registry (Binary) | Plist (XML/Binary) | Dotfiles / Etc | **Sovereign-Registry (Unified Shard)** |
+| **Interference** | High (VBS/HVCI) | High (T2/M1 Lock) | Low (Config-heavy) | **ZERO (Isolation Guard Shard)** |
 
 ---
 
-## 2. USER MANUAL: THE SOVEREIGN EXPERIENCE
+## 2. NON-INTERFERENCE GUARANTEE
+
+SigmaOS is engineered with a **Silicon-Sovereignty Isolation Guard** that preserves the integrity and performance of other installed operating systems:
+
+- **Partition Lock**: SigmaOS core will NEVER mount or modify external OS partitions (NTFS, APFS, EXT4) without explicit user authorization.
+- **Resource Preservation**: SigmaOS background shards utilize adaptive CPU quotas to ensure that your host system performance (e.g., Windows Gaming or Linux Workstation) is untouched.
+- **Micro-Virtualization**: Guest OSs are hosted within VT-x/AMD-V hardware-accelerated silos, ensuring zero-interference with host processes.
+- **Safe Bootloader**: A non-destructive bootloader implementation that coexists with UEFI/ESP without overwriting BCD or GRUB records.
+
+---
+
+## 3. USER MANUAL: THE SOVEREIGN EXPERIENCE
 
 This manual is designed for novice users to industrial master researchers.
 
@@ -83,6 +97,9 @@ The Sigma-Shell is designed so that the GUI feels worthless.
 - [x] Universal Distro Mirroring.
 - [x] Indian Law Procedural Compliance.
 - [x] AI Orchestration (11+ models).
+- [x] Windows USP Absorption (SovereignRegistry, WSW Interop).
+- [x] macOS USP Absorption (SovereignMach IPC, Aqua-Fluent Fusion).
+- [x] Apache USP Absorption (Modular SovereignHTTP).
 - [ ] Direct Silicon UEFI Sharding.
 - [ ] P2P Task-Sharing Shard (Devices perform tasks collaboratively).
 
