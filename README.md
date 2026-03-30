@@ -9,26 +9,29 @@
 
 ## 🏛️ v150.0 AUTONOMOUS CENTURY (Universal Master Shards)
 
--   **Universal Distro Absorption**: Integrated philosophies from **Debian** (Stability), **Arch** (Minimalism/Rolling), **RHEL** (Enterprise Security), **Gentoo** (ASM-level Optimization), **NixOS** (Declarative Immutability), **Alpine** (Size-Minimalism), **Kali** (Forensic Audit), **Tails** (Amnesic Privacy), and **Slackware** (Classic Unix Purity).
--   **Sovereign-Unity Orchestrator**: A central coordination shard that maps hardware-direct ASM paths for peak architectural efficiency.
--   **Sovereign Autonomous Sentinel**: A self-healing system that intercepts CPU traps and exceptions at the assembly level, automatically resolving errors and performing silicon-rollbacks to maintain 100% uptime.
--   **Absolute Scratch Sovereignty**: 100% of the OS, tools, and libraries are built from raw C11 and x86_64 Assembly. Zero glibc, zero stdlib, zero predefined headers.
--   **Sovereign Security & Privacy**: Mandatory silicon-scrubbing routines ensure no personal information or sensitive states persist in RAM or registers.
--   **Ubuntu-Elite UI/UX**: A premium, industrial-grade vertical dashboard built with the **Yaru-Gold** design system, delivering 45px glass-blur dynamics and fluid motion sets that exceed the polish of Ubuntu 24.04.
+- **Sovereign Shard-On-Demand (SOD)**: Radical modular execution engine. Only the specific code required for a task is mapped into memory, while the rest of the OS remains dormant or unmapped, achieving 0% silicon waste and peak efficiency.
+- **Universal Distro Absorption**: Integrated philosophies and mission shards from **Debian**, **Arch**, **Gentoo**, **NixOS**, **Alpine**, **Kali**, and **Tails**.
+- **Sovereign-Unity Orchestrator**: A central coordination shard that maps hardware-direct ASM paths for peak architectural efficiency.
+- **Sovereign Autonomous Sentinel**: A self-healing system that intercepts CPU traps and exceptions at the assembly level, automatically resolving errors and performing silicon-rollbacks to maintain 100% uptime.
+- **Absolute Scratch Sovereignty**: 100% of the OS, tools, and libraries are built from raw C11 and x86_64 Assembly. Zero glibc, zero stdlib, zero predefined headers.
+- **Sovereign Security & Privacy**: Mandatory silicon-scrubbing routines ensure no personal information or sensitive states persist in RAM or registers.
+- **Ubuntu-Elite UI/UX**: A premium, industrial-grade vertical dashboard built with the **Yaru-Gold** design system, delivering 45px glass-blur dynamics and fluid motion sets that exceed the polish of Ubuntu 24.04.
 
 ---
 
 ## 🤖 SOVEREIGN AUTOMATION TOOLS
--   **Sovereign-XClicker**: Integrated industrial autoclicker for automated tasks.
--   **Sovereign-Backup-Manager**: Metadata-preserving, zero-dependency backup engine.
--   **Sovereign-Remote-Bot**: PQC-encrypted remote command execution shard.
--   **SigmaDistroRunner**: Launch any Linux distribution ISO locally on the Aether-WSW shard.
+
+- **Sovereign-XClicker**: Integrated industrial autoclicker for automated tasks.
+- **Sovereign-Backup-Manager**: Metadata-preserving, zero-dependency backup engine.
+- **Sovereign-Remote-Bot**: PQC-encrypted remote command execution shard.
+- **SigmaDistroRunner**: Launch any Linux distribution ISO locally on the Aether-WSW shard.
 
 ---
 
 ## 🚀 GETTING STARTED
-1.  **Zenith Dashboard**: Open `index.html` to launch the premium **Ubuntu-Elite** interface.
-2.  **Build Sovereign Binary**:
+
+1. **Zenith Dashboard**: Open `index.html` to launch the premium **Ubuntu-Elite** interface.
+2. **Build Sovereign Binary**:
 
     ```bash
     make zenith
@@ -37,6 +40,7 @@
 ---
 
 ## 📚 ARCHITECTURAL MASTER GUIDE
+
 👉 [**Σ SIGMAOS UNIVERSAL MASTER GUIDE (os_guide.md)**](os_guide.md)
 
 ---

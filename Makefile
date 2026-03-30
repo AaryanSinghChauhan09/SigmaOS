@@ -425,6 +425,7 @@ info:
 	@echo ""
 	@echo "Σ SigmaOS Sovereign Build System v150.0 (AUTONOMOUS CENTURY)"
 	@echo "  ARCH        = $(ARCH)"
-	@echo "  ZENITH_BINS = build/sigmaos_zenith"
+	@echo "  ZENITH_BINS = build/sigmaos_zenith [SOD ENABLED]"
+	@echo "  TOOLS       = xclicker, academy, studio, gaming"
 	@echo "  SYMBOLS     = scripts/sync_github.sh, scripts/SigmaDistroRunner.ps1"
 	@echo ""
