@@ -309,6 +309,7 @@ ZENITH_OBJ_PULSE := build/SovereignSiliconPulse.o
 ZENITH_OBJ_ENTRY := build/SovereignEntry.o
 ZENITH_OBJ_MATH  := build/SovereignMath.o
 ZENITH_OBJ_SEC   := build/SovereignSecurity.o
+ZENITH_OBJ_SENT  := build/SovereignSentinel.o
 
 $(ZENITH_OBJ_ASM): SovereignLibC.asm
 	@mkdir -p build
@@ -335,6 +336,11 @@ $(ZENITH_OBJ_SEC): SovereignSecurity.asm
 	@echo "[NASM] SovereignSecurity.asm"
 	@$(NASM) $(ASMFLAGS) $< -o $@
 
+$(ZENITH_OBJ_SENT): SovereignSentinel.asm
+	@mkdir -p build
+	@echo "[NASM] SovereignSentinel.asm"
+	@$(NASM) $(ASMFLAGS) $< -o $@
+
 $(ZENITH_OBJ_CPP): SovereignLibC.cpp SovereignLibC.h
 	@mkdir -p build
 	@echo "[CXX]  SovereignLibC.cpp"
@@ -343,7 +349,9 @@ $(ZENITH_OBJ_CPP): SovereignLibC.cpp SovereignLibC.h
 # --- ZENITH DEMONSTRATOR ---
 ZENITH_OBJS := $(ZENITH_OBJ_ENTRY) $(ZENITH_OBJ_ASM) $(ZENITH_OBJ_CPP) \
                $(ZENITH_OBJ_PULSE) $(ZENITH_OBJ_MATH) $(ZENITH_OBJ_SEC) \
+               $(ZENITH_OBJ_SENT) \
                build/SovereignAetherAbsorption_c.o \
+               build/SovereignAetherSentinel_c.o \
                build/SovereignCoreUtils.o \
                build/SovereignDistroForge.o \
                build/SovereignOmniShard.o \
@@ -352,6 +360,9 @@ ZENITH_OBJS := $(ZENITH_OBJ_ENTRY) $(ZENITH_OBJ_ASM) $(ZENITH_OBJ_CPP) \
                build/SovereignKnowledgeAudit.o \
                build/SovereignDesktopZenith.o \
                build/omni_shell.o
+
+build/SovereignAetherSentinel_c.o: SovereignAetherSentinel.c SovereignLibC.h
+	@$(CC) $(CFLAGS) -c $< -o $@
 
 # Update linker for custom entry
 LDFLAGS += -e _start

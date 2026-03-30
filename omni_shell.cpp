@@ -32,6 +32,7 @@
 #include "SovereignAmnesicShard.c"
 #include "SovereignQuantumKernel.c"
 #include "SovereignAetherOrchestrator.c"
+#include "SovereignAetherSentinel.c"
 #include "SovereignStyleZenith.c"
 #include "SovereignRegistry.cpp"
 #include "SovereignAutomatorZenith.cpp"
@@ -64,6 +65,7 @@ private:
     SovereignAmnesicShard m_amnesic;
     SovereignQuantumKernel m_quantum;
     SovereignAetherOrchestrator m_orchestrator;
+    SovereignAetherSentinel m_sentinel;
 
     Hardware::SovereignUEFIShard m_uefi;
     Networking::SovereignP2PShard m_p2p;
@@ -89,8 +91,9 @@ public:
         SovereignAmnesicShard_init(&m_amnesic);
         SovereignQuantumKernel_init(&m_quantum);
         SovereignAetherOrchestrator_init(&m_orchestrator);
+        SovereignAetherSentinel_init(&m_sentinel);
 
-        sigma_printf("[SIGMA_SHELL]: Omni-Shell Zenith Online (v110.0 PURITY). System-Master [ACTIVE].\n");
+        sigma_printf("[SIGMA_SHELL]: Omni-Shell Zenith Online (v150.0 AUTONOMOUS). System-Master [ACTIVE].\n");
     }
 
     const char* type_name() const noexcept override { return "OmniShellZenith"; }
