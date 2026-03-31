@@ -732,6 +732,33 @@
                     <iframe id="web-frame" title="Universal Web Shard - Industrial Browser Distro Stream" class="web-frame" src="https://distrosea.com"></iframe>
                 </div>
             </div>
+        <section id="win-cloud" class="window hidden">
+            <div class="win-title-bar">
+                <div class="win-title">☁️ Sovereign Cloud Hub (Jolicloud Parity)</div>
+                <div class="win-controls">
+                    <div class="win-btn win-min" data-action="minimize" data-win="cloud"></div>
+                    <div class="win-btn win-close" data-action="close" data-win="cloud"></div>
+                </div>
+            </div>
+            <div class="win-content u-flex-column u-padding-16">
+                <div class="u-grid-3 gap-16">
+                    <div class="metric-card u-text-center pointer" onclick="document.getElementById('web-url-input').value='https://github.com';loadWebShard();openWindow('web')">
+                        <div class="u-font-size-lg">📁</div>
+                        <div class="u-bold u-margin-t-5">GitHub</div>
+                    </div>
+                    <div class="metric-card u-text-center pointer" onclick="document.getElementById('web-url-input').value='https://docs.google.com';loadWebShard();openWindow('web')">
+                        <div class="u-font-size-lg">📝</div>
+                        <div class="u-bold u-margin-t-5">G-Docs</div>
+                    </div>
+                    <div class="metric-card u-text-center pointer" onclick="document.getElementById('web-url-input').value='https://vscode.dev';loadWebShard();openWindow('web')">
+                        <div class="u-font-size-lg">💻</div>
+                        <div class="u-bold u-margin-t-5">VSCode</div>
+                    </div>
+                </div>
+                <div class="u-margin-t-16 u-text-center">
+                    <button class="status-chip" onclick="shardSite()">+ Shard Custom Site (ICE)</button>
+                </div>
+            </div>
         </section>
 
     </main>
@@ -754,6 +781,9 @@
         </div>
         <div class="dock-item" data-window="industrialmatrix" data-label="Apps">
             <svg viewBox="0 0 24 24"><path d="M4 8h4V4H4v4zm6 12h4v-4h-4v4zm-6 0h4v-4H4v4zm0-6h4v-4H4v4zm6 0h4v-4h-4v4zm6-10v4h4V4h-4zm-6 4h4V4h-4v4zm6 6h4v-4h-4v4zm0 6h4v-4h-4v4z"/></svg>
+        </div>
+        <div class="dock-item" data-window="cloud" data-label="Cloud Hub">
+            <svg viewBox="0 0 24 24"><path d="M19.35 10.04C18.67 6.59 15.64 4 12 4 9.11 4 6.6 5.64 5.35 8.04 2.34 8.36 0 10.91 0 14c0 3.31 2.69 6 6 6h13c2.76 0 5-2.24 5-5 0-2.64-2.05-4.78-4.65-4.96z"/></svg>
         </div>
         <div class="dock-item" data-window="ai" data-label="AI Shard">
             <svg viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-2h2v2zm0-4h-2V7h2v6z"/></svg>

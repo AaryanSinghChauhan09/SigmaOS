@@ -663,6 +663,16 @@ body.mode-nix {
   border-radius: 4px;
 }
 
+.u-grid-3 {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 16px;
+}
+
+.pointer {
+  cursor: pointer;
+}
+
 #win-web {
   width: 850px;
   height: 550px;

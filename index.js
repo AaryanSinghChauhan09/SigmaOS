@@ -1207,6 +1207,38 @@ function loadWebShard() {
 
 window.loadWebShard = loadWebShard;
 
+function shardSite() {
+    const url = prompt('Enter URL to Shard (e.g. google.com):');
+    if (!url) return;
+    
+    const formattedUrl = url.startsWith('http') ? url : 'https://' + url;
+    const siteId = 'site-' + Date.now();
+    
+    // Dynamically create site window
+    const win = document.createElement('section');
+    win.id = 'win-' + siteId;
+    win.className = 'window';
+    win.style = 'width: 900px; height: 600px; left: 50px; top: 50px;';
+    win.innerHTML = `
+        <div class="win-title-bar">
+            <div class="win-title">🌐 Site Shard: ${url}</div>
+            <div class="win-controls">
+                <div class="win-btn win-min" onclick="minimizeWindow('${siteId}')"></div>
+                <div class="win-btn win-close" onclick="closeWindow('${siteId}')"></div>
+            </div>
+        </div>
+        <div class="win-content">
+            <iframe src="${formattedUrl}" title="${url} Shard" class="web-frame"></iframe>
+        </div>
+    `;
+    document.getElementById('workspace').appendChild(win);
+    WINDOW_WORKSPACES[siteId] = currentWorkspace;
+    openWindow(siteId);
+    spawnToast(`Sharded site: ${url} (Industrial ICE parity)`);
+}
+
+window.shardSite = shardSite;
+
 function initSovereignCamera() {
     const video = document.getElementById('camera-stream');
     const filterSelect = document.getElementById('camera-filter');
