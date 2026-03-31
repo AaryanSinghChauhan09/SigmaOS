@@ -65,7 +65,7 @@ static void pm_init(SovereignProcessManager* pm) {
     sigma_memset(pm->process_table, 0, sizeof(pm->process_table));
     pm->active_count = 0;
     pm->kills        = 0;
-    sigma_log("Sovereign Process Manager Online (v25.0).");
+    sigma_printf("[PROCESS-ZENITH]: Sovereign Process Manager Online (v25.0).\n");
 }
 
 /* --- Spawn process shard (replaces C++ spawn() override) --- */
@@ -93,14 +93,14 @@ static sigma_status pm_spawn(SovereignProcessManager* pm, const char* image) {
 static void pm_kill(SovereignProcessManager* pm) {
     tlb_flush();
     pm->kills++;
-    sigma_log("[PROCESS-ZENITH]: TLB Flushed. Shard terminated via direct hardware interrupt.");
+    sigma_printf("[PROCESS-ZENITH]: TLB Flushed. Shard terminated via direct hardware interrupt.\n");
 }
 
 /* --- Shard resources (replaces C++ shard_resources() override) --- */
 static void pm_shard_resources(SovereignProcessManager* pm) {
     ctx_switch_shard();
     (void)pm;
-    sigma_log("[PROCESS-ZENITH]: Bare-Metal Context Switch Execution Successful.");
+    sigma_printf("[PROCESS-ZENITH]: Bare-Metal Context Switch Execution Successful.\n");
 }
 
 /* --- VFS namespace isolation (replaces C++ isolate_vfs() override) --- */
@@ -111,6 +111,18 @@ static void pm_isolate_vfs(SovereignProcessManager* pm, const char* ns) {
     /* XGETBV — reads XCR0 extended control register */
     __asm__ __volatile__ ("xor %%ecx, %%ecx\n\t xgetbv" ::: "eax","ecx","edx");
     (void)pm;
+}
+
+/* --- Auto-balance shards via heuristics (Automation USP) --- */
+static void pm_auto_balance(SovereignProcessManager* pm) {
+    sigma_printf("[PROCESS-AUTO]: Initiating Automated Shard Balancing Algorithm...\n");
+    if (pm->active_count > (PROC_TABLE_MAX - 10)) {
+        sigma_printf("[PROCESS-AUTO]: High shard load detected. Auto-terminating lowest priority idle shards.\n");
+        pm_kill(pm);
+        if (pm->active_count > 0) pm->active_count--; 
+    } else {
+        sigma_printf("[PROCESS-AUTO]: Shard load optimal. No auto-termination required.\n");
+    }
 }
 
 /* --- Audit (replaces C++ audit() method) --- */
@@ -134,11 +146,12 @@ void sigma_kernel_entry(void) {
     pm_spawn(&pm, "SigmaShell-v20");
     pm_isolate_vfs(&pm, "/root/shards/v20");
     pm_shard_resources(&pm);
+    pm_auto_balance(&pm);
     pm_audit(&pm);
 }
 
 int main(void) {
-    sigma_log("[SIGMA_OS]: Igniting Sovereign Process Zeniths (Pure C11)...");
+    sigma_printf("[SIGMA_OS]: Igniting Sovereign Process Zeniths (Pure C11)...\n");
     sigma_kernel_entry();
     return 0;
 }

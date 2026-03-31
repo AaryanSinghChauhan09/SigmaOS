@@ -7,10 +7,13 @@
  * =========================================================================
  */
 
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&family=Orbitron:wght@400;700&family=Fira+Code:wght@400;500&display=swap');
-
+/* ZERO EXTERNAL DEPENDENCIES: Using Built-in System Fonts */
 :root {
   /* Dynamic Color Palette (Sovereign Zenith) */
+  --font-main:     system-ui, -apple-system, sans-serif;
+  --font-heading:  'Segoe UI', Roboto, sans-serif;
+  --font-mono:     'Courier New', Courier, monospace;
+  
   --bg-darker:     #080a0f;
   --bg-dark:       #0d1117;
   --bg-light:      #161b22;
@@ -50,7 +53,7 @@ html, body {
   height: 100%;
   overflow: hidden;
   background: var(--amoled-dark);
-  font-family: 'Inter', sans-serif;
+  font-family: var(--font-main);
   color: var(--text-main);
   -webkit-user-select: none;
   user-select: none;
@@ -74,10 +77,24 @@ html, body {
   width: 100%;
   height: 100%;
   z-index: -1;
-  background: url('https://www.transparenttextures.com/patterns/carbon-fibre.png'), 
-              linear-gradient(45deg, rgba(233, 84, 32, 0.03) 0%, transparent 100%);
-  opacity: 0.08;
+  background: 
+    linear-gradient(rgba(255, 255, 255, 0.03) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255, 255, 255, 0.03) 1px, transparent 1px);
+  background-size: 30px 30px;
+  opacity: 0.15;
   pointer-events: none;
+}
+
+/* ASCII WIDGETS */
+.widget-ascii {
+  font-family: var(--font-mono);
+  font-size: 0.75rem;
+  line-height: 1.2;
+  color: var(--accent-primary);
+  background: rgba(0,0,0,0.5);
+  padding: 8px;
+  border: 1px dashed var(--accent-primary);
+  border-radius: 4px;
 }
 
 /* ═══════════════════════════════════════════════════════════
@@ -130,7 +147,7 @@ html, body {
 }
 
 #clock {
-  font-family: 'Fira Code', monospace;
+  font-family: var(--font-mono);
   font-weight: 500;
   min-width: 80px;
   text-align: right;
@@ -147,6 +164,14 @@ html, body {
   display: flex;
   align-items: center;
   gap: 5px;
+  transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+  cursor: pointer;
+}
+
+.status-chip:hover {
+  background: rgba(0, 210, 255, 0.25);
+  box-shadow: 0 0 15px rgba(0, 210, 255, 0.4);
+  transform: translateY(-2px);
 }
 
 .pulse {
@@ -266,7 +291,7 @@ html, body {
    ═══════════════════════════════════════════════════════════ */
 
 .term-container {
-  font-family: 'Fira Code', monospace;
+  font-family: var(--font-mono);
   font-size: 0.9rem;
   line-height: 1.5;
   color: #c9d1d9;
@@ -389,6 +414,14 @@ html, body {
   border-radius: var(--radius-md);
   padding: 12px;
   border: 1px solid rgba(255, 255, 255, 0.05);
+  transition: all 0.3s ease;
+}
+
+.metric-card:hover {
+  background: rgba(255, 255, 255, 0.08);
+  border-color: var(--accent-primary);
+  transform: translateY(-4px);
+  box-shadow: 0 8px 20px rgba(0, 210, 255, 0.15), 0 4px 10px rgba(0, 0, 0, 0.5);
 }
 
 .metric-header {
@@ -400,7 +433,7 @@ html, body {
 }
 
 .metric-value {
-  font-family: 'Orbitron', sans-serif;
+  font-family: var(--font-heading);
   font-size: 1.2rem;
   font-weight: 700;
   color: var(--accent-primary);
@@ -568,7 +601,7 @@ html, body {
 .matrix-table th {
   padding: 12px;
   border-bottom: 2px solid var(--glass-border);
-  font-family: 'Orbitron', sans-serif;
+  font-family: var(--font-heading);
   font-size: 0.75rem;
   letter-spacing: 1px;
   color: var(--text-muted);

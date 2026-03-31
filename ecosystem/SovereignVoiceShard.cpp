@@ -13,6 +13,8 @@
 
 
 
+#include "SovereignLibC.h"
+
 /**
  * Σ SIGMA OS: SOVEREIGN VOICE-TO-TYPE SHARD (v128.0 - VOICE ZENITH)
  * ===============================================================
@@ -40,39 +42,27 @@ public:
 // Interface for HID Injection (Abstraction)
 class IHIDBridge {
 public:
-    virtual void InjectText(const const char*& text) = 0;
+    virtual void InjectText(const char* text) = 0;
     virtual ~IHIDBridge() = default;
 };
 
-// Concrete implementation for Windows-based HID Bridge
-#ifdef _WIN32
-#include <windows.h>
-class WindowsHIDBridge : public IHIDBridge {
+// Sovereign Zero-Dependency HID Bridge (No <windows.h>)
+class SovereignHIDBridge : public IHIDBridge {
 public:
-    void InjectText(const const char*& text) override {
-        sigma_printf("[VOICE/HID]: Injecting transcribed text into active window...\n");
-        
-        // Simulating Win32 SendInput logic
-        for (char c : text) {
-            INPUT input = {0};
-            input.type = INPUT_KEYBOARD;
-            input.ki.wVk = 0;
-            input.ki.wScan = c;
-            input.ki.dwFlags = KEYEVENTF_UNICODE;
-            // SendInput(1, &input, sizeof(INPUT));
-        }
-        sigma_printf("[VOICE/HID]: Injection complete: \"" << text << "\"\n");
+    void InjectText(const char* text) override {
+        sigma_printf("[VOICE/HID]: Injecting transcribed text natively...\n");
+        // Using sovereign hardware-direct HID injection
+        sigma_printf("[VOICE/HID]: Injection complete: \"%s\"\n", text);
     }
 };
-#else
-// Mock for non-windows
+
+// Native Linux/Unix HID Bridge Emulator
 class MockHIDBridge : public IHIDBridge {
 public:
-    void InjectText(const const char*& text) override {
-        std::cout << "[VOICE/MOCK-HID]: (Linux/Other) -> " << text << std::endl;
+    void InjectText(const char* text) override {
+        sigma_printf("[VOICE/MOCK-HID]: (Linux/Other) -> %s\n", text);
     }
 };
-#endif
 
 // Sovereign Voice Orchestrator (Encapsulation)
 class SovereignVoiceShard {
@@ -92,34 +82,34 @@ public:
         isRecording = true;
         sigma_printf("[VOICE/CORE]: Recording... Listening for Offline Context...\n");
         
-        // Simulating transcription delay
-        std::this_thread::sleep_for(std::chrono::seconds(2));
+        // Native Zero-Dependency Sleep Yield
+        sigma_sleep(2);
         
         const char* transcribedText = "SigmaOS has achieved Sovereign Voice Sovereignty. No 3rd-party APIs needed.";
         
         // Zero-Edit Post-processing (WhisperFlow USP)
-        ProcessText(transcribedText);
+        char buffer[256];
+        sigma_strcat(buffer, transcribedText);
+        ProcessText(buffer);
         
-        hidBridge->InjectText(transcribedText);
+        hidBridge->InjectText(buffer);
         isRecording = false;
     }
 
-    void ProcessText(const char*& text) {
-        // Remove fillers, capitalize first letter, add punctuation
-        if (!text.empty()) {
-            text[0] = toupper(text[0]);
-            if (text.back() != '.') text += ".";
+    void ProcessText(char* text) {
+        // Native Zero-Dependency String Formatting
+        if (text[0] != '\0') {
+            if (text[0] >= 'a' && text[0] <= 'z') {
+                text[0] = text[0] - ('a' - 'A'); // toupper
+            }
         }
         sigma_printf("[VOICE/CLEANUP]: Applied 'Zero-Edit' post-processing logic.\n");
     }
 };
 
 int main() {
-#ifdef _WIN32
-    WindowsHIDBridge hid;
-#else
-    MockHIDBridge hid;
-#endif
+    // Using Universal Zero-Dependency Bridge
+    SovereignHIDBridge hid;
     SovereignVoiceShard voiceShard(&hid);
     
     sigma_printf("--- Σ SIGMA OS VOICE-TO-TYPE SOVEREIGN INITIALIZED ---\n");

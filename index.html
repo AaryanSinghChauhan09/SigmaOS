@@ -13,6 +13,18 @@
          ═══════════════════════════════════════════════════════════ -->
     <canvas id="bg-canvas"></canvas>
     <div id="mesh-overlay"></div>
+    <!-- GPU Framebuffer (v280 Direct Rendering) -->
+    <canvas id="gpu-framebuffer" style="position:fixed; top:0; left:0; width:100%; height:100%; z-index:-2; opacity:0.3;"></canvas>
+
+    <!-- ASCII System Widgets -->
+    <div id="ascii-widget-cpu" class="widget-ascii" style="position:fixed; top:50px; left:20px; z-index:100;">
+        [Σ] CPU: --%<br>
+        [=---------]
+    </div>
+    <div id="ascii-widget-mem" class="widget-ascii" style="position:fixed; top:110px; left:20px; z-index:100;">
+        [Σ] MEM: --MB<br>
+        [==--------]
+    </div>
 
     <!-- ═══════════════════════════════════════════════════════════
          2. TOP BAR
@@ -748,6 +760,7 @@
                      <button class="status-chip" onclick="executeLogicScript()">Execute Playbook</button>
                 </div>
             </div>
+        </section>
         <!-- ═══════════════════════════════════════════════════════════
              UNIVERSAL WEB SHARD (BROWSER-IN-BROWSER)
              ═══════════════════════════════════════════════════════════ -->

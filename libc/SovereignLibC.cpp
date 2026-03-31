@@ -1,5 +1,9 @@
 #include "SovereignLibC.h"
-#include <stdarg.h>
+// Built-in Variadic Argument Mapping (Zero-Dependency Stdarg)
+#define sigma_va_list __builtin_va_list
+#define sigma_va_start(v, l) __builtin_va_start(v, l)
+#define sigma_va_end(v) __builtin_va_end(v)
+#define sigma_va_arg(v, l) __builtin_va_arg(v, l)
 
 // --- sigma_print ---
 void sigma_print(const char* str) {
@@ -41,6 +45,27 @@ void sigma_print_hex(sigma_u64 val) {
     sigma_print(&buf[i + 1]);
 }
 
+// --- sigma_print_float (Native V1.0) ---
+void sigma_print_float(double val, int precision) {
+    if (val < 0.0) {
+        sigma_print("-");
+        val = -val;
+    }
+    sigma_u64 int_part = (sigma_u64)val;
+    sigma_print_num(int_part);
+    sigma_print(".");
+    double frac_part = val - (double)int_part;
+    for (int i = 0; i < precision; i++) {
+        frac_part *= 10.0;
+        int digit = (int)frac_part;
+        char buf[2];
+        buf[0] = digit + '0';
+        buf[1] = '\0';
+        sigma_print(buf);
+        frac_part -= (double)digit;
+    }
+}
+
 // --- sigma_atoi ---
 int sigma_atoi(const char* s) {
     int res = 0;
@@ -75,6 +100,15 @@ void sigma_strcat(char* dest, const char* src) {
         src++;
     }
     *rd = '\0';
+}
+
+// --- sigma_memset (Native Hardware Mapping) ---
+void* sigma_memset(void* ptr, int value, sigma_size_t num) {
+    unsigned char* p = (unsigned char*)ptr;
+    for (sigma_size_t i = 0; i < num; i++) {
+        p[i] = (unsigned char)value;
+    }
+    return ptr;
 }
 
 // --- xv6 Parity Syscalls ---
@@ -119,26 +153,29 @@ int sigma_dup(int oldfd) {
 
 // --- sigma_printf (v1.0 ZENITH) ---
 void sigma_printf(const char* format, ...) {
-    va_list args;
-    va_start(args, format);
+    sigma_va_list args;
+    sigma_va_start(args, format);
     
     for (const char* p = format; *p != '\0'; p++) {
         if (*p == '%' && *(p + 1) != '\0') {
             p++;
             switch (*p) {
                 case 's':
-                    sigma_print(va_arg(args, const char*));
+                    sigma_print(sigma_va_arg(args, const char*));
                     break;
                 case 'd':
                 case 'u':
-                    sigma_print_num(va_arg(args, sigma_u64));
+                    sigma_print_num(sigma_va_arg(args, sigma_u64));
                     break;
                 case 'x':
                 case 'p':
-                    sigma_print_hex(va_arg(args, sigma_u64));
+                    sigma_print_hex(sigma_va_arg(args, sigma_u64));
+                    break;
+                case 'f':
+                    sigma_print_float(sigma_va_arg(args, double), 6);
                     break;
                 case 'c': {
-                    char c = (char)va_arg(args, int);
+                    char c = (char)sigma_va_arg(args, int);
                     sigma_write(1, &c, 1);
                     break;
                 }
@@ -149,7 +186,7 @@ void sigma_printf(const char* format, ...) {
             sigma_write(1, p, 1);
         }
     }
-    va_end(args);
+    sigma_va_end(args);
 }
 
 // --- Memory Management Shard ---

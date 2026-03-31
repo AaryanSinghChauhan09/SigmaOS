@@ -28,12 +28,14 @@
 #include "SovereignAetherPulse.cpp"
 #include "SovereignPersonaEngine.cpp"
 #include "SovereignZenithStylist.cpp"
+extern "C" {
 #include "SovereignAetherAbsorption.c"
 #include "SovereignAmnesicShard.c"
 #include "SovereignQuantumKernel.c"
 #include "SovereignAetherOrchestrator.c"
 #include "SovereignAetherSentinel.c"
 #include "SovereignStyleZenith.c"
+}
 #include "SovereignRegistry.cpp"
 #include "SovereignAutomatorZenith.cpp"
 

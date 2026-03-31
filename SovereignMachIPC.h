@@ -8,18 +8,17 @@
  */
 
 #include "SovereignLibC.h"
-#include <stdint.h>
 
-typedef uint32_t mach_port_t;
-typedef uint32_t mach_msg_size_t;
+typedef sigma_u32 mach_port_t;
+typedef sigma_u32 mach_msg_size_t;
 
 typedef struct {
-    uint32_t bits;
+    sigma_u32 bits;
     mach_msg_size_t size;
     mach_port_t remote_port;
     mach_port_t local_port;
-    uint32_t voucher_port;
-    int32_t id;
+    sigma_u32 voucher_port;
+    int id;
 } mach_msg_header_t;
 
 // Port Namespaces

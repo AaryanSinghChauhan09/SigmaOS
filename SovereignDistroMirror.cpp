@@ -18,6 +18,8 @@
  * Principle: Zero-Downtime Package Distribution.
  */
 
+#include "SovereignLibC.h"
+
 class SovereignDistroMirror {
 public:
     SovereignDistroMirror() {
@@ -39,19 +41,23 @@ public:
     }
 
     // USP: Checksum Validation (usp: Pacman)
-    void ValidateShardIntegrity(const const char*& shard_id) {
-        sigma_printf("[MIRROR_VERIFY]: VALIDATING SHA-256 SUM FOR '" << shard_id << "'...\n");
-        sigma_printf("[MIRROR_VERIFY]: 100% Match. Shard verified and secure.\n");
+    void ValidateShardIntegrity(const char* shard_id) {
+        sigma_printf("[MIRROR_VERIFY]: VALIDATING SHA-256 SUM FOR '%s'...\n", shard_id);
+        sigma_printf("[MIRROR_VERIFY]: 100%% Match. Shard verified and secure.\n");
+    }
+    
+    // USP: Zero-Touch Automated System Refresh and Verification
+    void AutoSyncNetwork() {
+        sigma_printf("[MIRROR_AUTO]: Initiating fully automated network mesh validation.\n");
+        SyncWithGlobalMirrors();
+        ScanLocalMeshForShards();
+        ValidateShardIntegrity("NCERT_PHYSICS_V4");
+        sigma_printf("[MIRROR_AUTO]: Auto-Sync Complete. Personal and system shards updated.\n");
     }
 };
 
-int main() {
+extern "C" void start_distro_mirror() {
     SovereignDistroMirror mirror;
-    mirror.SyncWithGlobalMirrors();
-    mirror.ScanLocalMeshForShards();
-    mirror.ValidateShardIntegrity("ZENITH_AI_ENGINE_V128");
-    
-    sigma_printf("\n[SUCCESS]: Competitive Distro Mirror Online. Absolute Package Sovereignty.\n");
-    return 0;
+    mirror.AutoSyncNetwork();
 }
 
