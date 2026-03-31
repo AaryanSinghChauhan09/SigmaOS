@@ -117,13 +117,19 @@ document.addEventListener('DOMContentLoaded', () => {
     initBackupShard();
     initAIOrchestrator();
     initSpectrumTerminal();
+    initServices();
+    initPlugins();
+    initUtils();
     spawnToast('Σ SIGMAOS ZENITH SUPREME INITIALIZED');
     spawnToast('Industrial Shard Mastery Active', 1500);
 });
 
 function initClock() {
+    if (!clockEl) return;
     setInterval(() => {
         clockEl.textContent = new Date().toTimeString().split(' ')[0];
+        const memVal = document.getElementById('mem-val');
+        if (memVal) memVal.textContent = (Math.random() * 2 + 18).toFixed(1) + '%';
         sysUptime++;
     }, 1000);
 }
@@ -131,10 +137,34 @@ function initClock() {
 function initMetrics() {
     setInterval(() => {
         const cpu = (Math.random() * 5 + 2).toFixed(1);
-        cpuVal.textContent = cpu + '%';
-        const cpuFill = document.querySelector('#cpu-pulse .progress-fill');
-        if (cpuFill) cpuFill.style.width = cpu + '%';
+        const mem = (Math.random() * 2 + 18).toFixed(1);
+        if (cpuVal) cpuVal.textContent = cpu + '%';
+        
+        const cpuBar = document.getElementById('cpu-bar');
+        const memBar = document.getElementById('mem-bar');
+        const cpuPercent = document.getElementById('cpu-percent');
+        const memUsage = document.getElementById('mem-usage');
+        const cpuValDisplay = document.getElementById('cpu-val-display');
+        const memValDisplay = document.getElementById('mem-val-display');
+
+        if (cpuBar) cpuBar.style.width = cpu + '%';
+        if (memBar) memBar.style.width = mem + '%';
+        if (cpuPercent) cpuPercent.textContent = cpu + '%';
+        if (cpuValDisplay) cpuValDisplay.textContent = cpu;
+        if (memValDisplay) memValDisplay.textContent = mem;
+        
+        updateProcessList();
     }, 2000);
+}
+
+function updateProcessList() {
+    const procList = document.getElementById('proc-list');
+    if (!procList) return;
+    procList.innerHTML = '<div class="u-flex-between u-muted-text u-margin-b-5"><span>PID</span><span>NAME</span><span>STATE</span><span>CPU</span></div>';
+    PROCESSES.forEach(p => {
+        const cpu = p.state === 'RUNNING' ? (p.cpu + Math.random() * 0.5).toFixed(1) : '0.0';
+        procList.innerHTML += `<div class="u-flex-between"><span>${p.pid}</span><span>${p.name}</span><span>${p.state}</span><span>${cpu}%</span></div>`;
+    });
 }
 
 // --- Window Orchestration ---
@@ -530,9 +560,94 @@ function startDistroStream(id) {
 }
 
 // --- Standard UI Helpers ---
-function initVFSView() { /* Simplified */ }
-function initRepoView() { /* Simplified */ }
-function initWorkspaces() { /* Simplified */ }
+function initVFSView() {
+    const grid = document.getElementById('file-grid');
+    if (!grid) return;
+    const files = [
+        { name: 'kernel', type: 'dir', icon: '📂' },
+        { name: 'drivers', type: 'dir', icon: '📂' },
+        { name: 'userland', type: 'dir', icon: '📂' },
+        { name: 'sigma_core.asm', type: 'file', icon: '📄' },
+        { name: 'boot_master.c', type: 'file', icon: '📄' },
+        { name: 'config.sys', type: 'file', icon: '⚙️' }
+    ];
+    grid.innerHTML = '';
+    files.forEach(f => {
+        const el = document.createElement('div');
+        el.className = 'distro-card';
+        el.style.padding = '10px';
+        el.innerHTML = `<div style="font-size: 2rem">${f.icon}</div><div class="u-font-size-xs">${f.name}</div>`;
+        grid.appendChild(el);
+    });
+}
+
+function initRepoView() {
+    const list = document.getElementById('pkg-list');
+    if (!list) return;
+    list.innerHTML = '';
+    REPOSITORY.forEach(p => {
+        const el = document.createElement('div');
+        el.className = 'metric-card u-margin-b-10 u-flex-between';
+        el.innerHTML = `
+            <div>
+                <div class="u-bold">${p.icon} ${p.name}</div>
+                <div class="u-font-size-xxs u-muted-text">${p.desc}</div>
+            </div>
+            <button class="status-chip">${p.installed ? 'INSTALLED' : 'GET'}</button>
+        `;
+        list.appendChild(el);
+    });
+}
+
+function initWorkspaces() {
+    document.querySelectorAll('.ws-indicator').forEach(ws => {
+        ws.onclick = () => {
+            document.querySelectorAll('.ws-indicator').forEach(w => w.classList.remove('active'));
+            ws.classList.add('active');
+            currentWorkspace = ws.getAttribute('data-ws');
+            spawnToast('Switched to Workspace ' + currentWorkspace);
+            // In a real app, we would hide/show windows based on workspace
+        };
+    });
+}
+
+function initServices() {
+    const list = document.getElementById('service-list');
+    if (!list) return;
+    const services = [
+        { name: 'sigma_netd', status: 'OK', desc: 'Sovereign Network Daemon' },
+        { name: 'sigma_fsd', status: 'OK', desc: 'VFS Sharding Engine' },
+        { name: 'sigma_aud', status: 'OK', desc: 'Aether Audio Shard' },
+        { name: 'sigma_sentinel', status: 'ARMD', desc: 'Autonomous Security' }
+    ];
+    list.innerHTML = '';
+    services.forEach(s => {
+        list.innerHTML += `<div class="u-flex-between u-margin-b-5"><span>${s.name}</span> <span class="u-accent-text">[${s.status}]</span></div>`;
+    });
+}
+
+function initPlugins() {
+    const list = document.getElementById('plugin-list');
+    if (!list) return;
+    const plugins = ['X11-Mirror', 'C-Transpiler', 'Python-Runtime', 'Rust-Safety-Core'];
+    list.innerHTML = plugins.map(p => `
+        <div class="metric-card u-margin-b-10 u-flex-between">
+            <span>🧩 ${p}</span> <button class="status-chip">ENABLE</button>
+        </div>
+    `).join('');
+}
+
+function initUtils() {
+    const list = document.getElementById('utils-list');
+    if (!list) return;
+    const utils = ['apt-sigma', 'ls-pure', 'cat-raw', 'top-zenith', 'grep-shard', 'chmod-asm'];
+    list.innerHTML = utils.map(u => `
+        <div class="metric-card u-text-center">
+            <div class="u-bold u-font-size-xs">${u}</div>
+            <button class="status-chip u-margin-t-5">RUN</button>
+        </div>
+    `).join('');
+}
 
 function termPrint(text, type = '') {
     const div = document.createElement('div');
@@ -542,11 +657,84 @@ function termPrint(text, type = '') {
     termOutput.scrollTop = termOutput.scrollHeight;
 }
 
+const COMMANDS = {
+    help: () => {
+        termPrint('AVAILABLE COMMANDS: help, clear, ls, neofetch, cpu, mem, matrix, scrub, shutdown, run_playbook');
+    },
+    clear: () => {
+        termOutput.innerHTML = '';
+    },
+    ls: () => {
+        termPrint('bin/  etc/  home/  kernel/  lib/  mnt/  proc/  root/  sbin/  sys/  usr/  var/');
+    },
+    neofetch: () => {
+        termPrint('            .-/+oossssoo+/-.               root@sigmaos');
+        termPrint('        `:+ssssssssssssssssss+:`           ------------');
+        termPrint('      -+ssssssssssssssssssyyssss+-         OS: SigmaOS Zenith Supreme v150.0');
+        termPrint('    .ossssssssssssssssssdMMMNysssso.       Kernel: 6.8.0-sigma-autonomous');
+        termPrint('   /ssssssssssshdmmNNmmyNMMMMhssssss/      Uptime: ' + sysUptime + 's');
+        termPrint('  +ssssssssshmydMMMMMMMNddddyssssssss+     Packages: 0 (Zero-Dependency)');
+        termPrint(' /sssssssshNMMMyhhyyyyhmNMMMNhssssssss/    Shell: sigma_shell v94.0');
+        termPrint('.ssssssssdMMMMN/        /mMMMMmssssssss.   Resolution: 1920x1080');
+        termPrint('+ssssssssHMMMMm`        `dMMMMNssssssss+   DE: Ubuntu-Elite Yaru-Gold');
+        termPrint(' sssssssshNMMMMmhhhhhhhdNMMMMNysssssss s   CPU: Silicon Shard x86_64');
+        termPrint(' .ssssssssdMMMMMMMMMMMMMMMMMNdssssssss.    GPU: Aether-GCM Industrial');
+        termPrint('  +ssssssssshNMMMMMMMMMMMMMdyssssssss+     Memory: 18.2% / 1PB');
+    },
+    cpu: () => {
+        termPrint('CPU LOAD: ' + cpuVal.textContent + ' [SHARD-DIRECT]');
+    },
+    mem: () => {
+        termPrint('MEMORY USAGE: 18.2% (186.4 TB / 1.0 PB)');
+    },
+    matrix: () => openWindow('industrialmatrix'),
+    scrub: () => {
+        termPrint('[SILICON] Initiating register scrubbing...');
+        setTimeout(() => termPrint('[SILICON] EAX-EDI zeroed. Stack frame scrubbed. Memory bounds secured.'), 500);
+    },
+    run_playbook: () => {
+        termPrint('[OMNI-SHELL]: Initiating Advanced Sovereign Playbook... [DYNAMIC AUTOMATION]');
+        const tasks = [
+            { cmd: 'LS', log: '[LS-ZENITH]: Directory shard read (simulated).' },
+            { cmd: 'TOP', log: '[TOP-ZENITH]: CPU TSC Tick = 18446744073709551615 (Simulated)' },
+            { cmd: 'PQC_AUDIT', log: '[PQC-AUDIT]: Verifying Lattice-PQC Sentinel integrity... OK' },
+            { cond: 'KERNEL_ACTIVE', cmd: 'LATTICE_REKEY', log: '[OMNI-SHELL]: Triggering Lattice-PQC Rekeying... [QUANTUM SECURED]' },
+            { cond: 'KERNEL_ACTIVE', cmd: 'USP_ABSORB', log: '[OMNI-SHELL]: Absorbing legacy OS USPs into Sigma Shard Matrix...' },
+            { cmd: 'TOGGLE_KERNEL', log: '[OMNI-SHELL]: KERNEL_ACTIVE = FALSE [SILICON SIGNAL UPDATED]' }
+        ];
+        
+        let i = 0;
+        let kernelActive = true;
+        const interval = setInterval(() => {
+            if (i >= tasks.length) {
+                clearInterval(interval);
+                termPrint('[OMNI-SHELL]: Playbook Mission Success.');
+                return;
+            }
+            const task = tasks[i++];
+            if (task.cond === 'KERNEL_ACTIVE' && !kernelActive) {
+                termPrint(`[AUTOMATION]: Condition 'KERNEL_ACTIVE' FALSE. Skipping: ${task.cmd}`);
+            } else {
+                termPrint(`Σ [OMNI-SHELL]: Executing '${task.cmd}'...`);
+                termPrint(task.log);
+                if (task.cmd === 'TOGGLE_KERNEL') kernelActive = !kernelActive;
+            }
+        }, 800);
+    },
+    shutdown: () => {
+        termPrint('Broadcast message from root@sigmaos (pts/0):');
+        termPrint('The system is going down for maintenance NOW!');
+        setTimeout(() => location.reload(), 2000);
+    }
+};
+
 if (termInput) {
     termInput.addEventListener('keydown', e => {
         if (e.key === 'Enter') {
-            const val = termInput.value.trim();
+            const val = termInput.value.trim().toLowerCase();
             termPrint('root@sigmaos:~# ' + val);
+            if (COMMANDS[val]) COMMANDS[val]();
+            else if (val) termPrint('sigma_shell: command not found: ' + val);
             termInput.value = '';
         }
     });
@@ -582,15 +770,7 @@ function readShard(ptr) {
 }
 
 function initMetrics() {
-    setInterval(() => {
-        const cpu = (Math.random() * 5 + 2).toFixed(1);
-        cpuVal.textContent = cpu + '%';
-        const uptime = readShard(SHARD_PTRS.UPTIME);
-        writeShard(SHARD_PTRS.UPTIME, uptime + 1);
-        
-        const cpuFill = document.querySelector('#cpu-pulse .progress-fill');
-        if (cpuFill) cpuFill.style.width = cpu + '%';
-    }, 1000);
+    // Overridden by the main implementation above to avoid duplication.
 }
 
 // --- Sovereign Camera (Snapchat/Scratch USP) ---

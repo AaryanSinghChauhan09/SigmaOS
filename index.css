@@ -39,6 +39,8 @@
   --glass-bg:       rgba(10, 10, 10, 0.85);
   --glass-blur:     45px;
   --transition-smooth: all 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+  --aqua-gradient: linear-gradient(135deg, rgba(233, 84, 32, 0.1) 0%, rgba(227, 176, 75, 0.05) 100%);
+  --accent-gradient: linear-gradient(90deg, var(--accent-secondary), var(--accent-primary));
 }
 
 body {
@@ -199,7 +201,7 @@ body {
 /* Window Header */
 .win-header {
   height: 42px;
-  background: var(--aqua-gradient);
+  background: rgba(255, 255, 255, 0.03);
   display: flex;
   align-items: center;
   justify-content: space-between;
