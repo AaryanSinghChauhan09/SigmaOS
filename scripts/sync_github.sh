@@ -21,8 +21,8 @@ COMMIT_MSG="Σ SigmaOS Zenith Supreme: Sovereign Sync v94.0 - Absorbing Industri
 echo "[GIT] Committing silicon shards: $COMMIT_MSG"
 git commit -m "$COMMIT_MSG"
 
-# push to master
+# push to main (sovereign branch)
 echo "[GIT] Orchestrating push to absolute origin..."
-git push origin master --force
+git push origin main
 
 echo "Σ SIGMAOS: System Sovereignty SYNCHRONIZED with Industrial Hub."

@@ -10,6 +10,7 @@
 // --- Global System State ---
 let sysUptime = 0;
 let currentWorkspace = 1;
+const WINDOW_WORKSPACES = {}; // Map winId -> workspaceNum
 
 const PROCESSES = [
     { pid: 0, name: 'sigma_kernel', state: 'RUNNING', cpu: 0.1 },
@@ -97,6 +98,7 @@ const backupLog = document.getElementById('backup-log');
 
 // --- Core Initialization ---
 document.addEventListener('DOMContentLoaded', () => {
+    initMatrixBackground();
     initClock();
     initMetrics();
     initWindows();
@@ -123,6 +125,47 @@ document.addEventListener('DOMContentLoaded', () => {
     spawnToast('Σ SIGMAOS ZENITH SUPREME INITIALIZED');
     spawnToast('Industrial Shard Mastery Active', 1500);
 });
+
+function initMatrixBackground() {
+    const canvas = document.getElementById('bg-canvas');
+    if (!canvas) return;
+    const ctx = canvas.getContext('2d');
+    
+    let width = canvas.width = window.innerWidth;
+    let height = canvas.height = window.innerHeight;
+    
+    const characters = 'Σ0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ';
+    const fontSize = 14;
+    const columns = width / fontSize;
+    const drops = [];
+    
+    for (let x = 0; x < columns; x++) drops[x] = 1;
+    
+    function draw() {
+        ctx.fillStyle = 'rgba(0, 0, 0, 0.05)';
+        ctx.fillRect(0, 0, width, height);
+        
+        ctx.fillStyle = '#00d2ff'; // Accent Primary
+        ctx.font = fontSize + 'px Orbitron';
+        
+        for (let i = 0; i < drops.length; i++) {
+            const text = characters.charAt(Math.floor(Math.random() * characters.length));
+            ctx.fillText(text, i * fontSize, drops[i] * fontSize);
+            
+            if (drops[i] * fontSize > height && Math.random() > 0.975) {
+                drops[i] = 0;
+            }
+            drops[i]++;
+        }
+    }
+    
+    window.addEventListener('resize', () => {
+        width = canvas.width = window.innerWidth;
+        height = canvas.height = window.innerHeight;
+    });
+    
+    setInterval(draw, 33);
+}
 
 function initClock() {
     if (!clockEl) return;
@@ -217,6 +260,7 @@ function closeWindow(id) {
     if (win) {
         win.classList.add('hidden');
         win.classList.remove('maximized');
+        renderWorkspaces();
         spawnToast(`Shard [${id}] Terminated via Silicon Signal.`);
     }
 }
@@ -225,6 +269,7 @@ function minimizeWindow(id) {
     const win = document.getElementById('win-' + id);
     if (win) {
         win.classList.add('hidden');
+        renderWorkspaces();
         spawnToast(`Shard [${id}] Suspended to Silicon Cache.`);
     }
 }
@@ -247,8 +292,22 @@ function openWindow(id) {
     const win = document.getElementById('win-' + id);
     if (win) {
         win.classList.remove('hidden');
+        WINDOW_WORKSPACES[id] = parseInt(currentWorkspace);
+        renderWorkspaces();
         focusWindow(win);
     }
+}
+
+function renderWorkspaces() {
+    document.querySelectorAll('.window').forEach(win => {
+        const id = win.id.replace('win-', '');
+        const ws = WINDOW_WORKSPACES[id] || 1;
+        if (ws == currentWorkspace && !win.classList.contains('hidden-by-ws')) {
+            win.style.display = '';
+        } else {
+            win.style.display = 'none';
+        }
+    });
 }
 
 function initDock() {
@@ -287,7 +346,9 @@ function initSpotlight() {
             res.className = 'search-result';
             res.innerHTML = `<div class="result-icon">${match.icon || '⚙️'}</div><div>${match.name}</div>`;
             res.onclick = () => {
-                if (match.type === 'Tool') openWindow(match.id);
+                if (match.type === 'App') openWindow('pkg'); // Just open repo for now
+                else if (match.id === 'matrix') openWindow('industrialmatrix');
+                else if (match.type === 'Tool') openWindow(match.id);
                 else if (match.type === 'Theme') { openWindow('themes'); applyTheme(match.id); }
                 else if (match.type === 'Distro') { openWindow('runner'); startDistroStream(match.id); }
                 spotlight.classList.add('hidden');
@@ -606,9 +667,12 @@ function initWorkspaces() {
             ws.classList.add('active');
             currentWorkspace = ws.getAttribute('data-ws');
             spawnToast('Switched to Workspace ' + currentWorkspace);
-            // In a real app, we would hide/show windows based on workspace
+            renderWorkspaces();
         };
     });
+    // Initial workspace state
+    WINDOW_WORKSPACES['terminal'] = 1;
+    renderWorkspaces();
 }
 
 function initServices() {
@@ -657,29 +721,54 @@ function termPrint(text, type = '') {
     termOutput.scrollTop = termOutput.scrollHeight;
 }
 
+let terminalCwd = '/root';
+const VFS = {
+    '/root': ['bin', 'etc', 'home', 'kernel', 'lib', 'mnt', 'proc', 'sys', 'usr', 'var', 'sigma_core.asm'],
+    '/root/bin': ['apt-sigma', 'ls-pure', 'cat-raw', 'top-zenith'],
+    '/root/kernel': ['sigma_kernel.c', 'pmm.c', 'vmm.c', 'scheduler.c'],
+    '/root/home': ['media']
+};
+
 const COMMANDS = {
     help: () => {
-        termPrint('AVAILABLE COMMANDS: help, clear, ls, neofetch, cpu, mem, matrix, scrub, shutdown, run_playbook');
+        termPrint('AVAILABLE COMMANDS: help, clear, ls, cd, neofetch, cpu, mem, matrix, scrub, shutdown, run_playbook');
     },
     clear: () => {
         termOutput.innerHTML = '';
     },
-    ls: () => {
-        termPrint('bin/  etc/  home/  kernel/  lib/  mnt/  proc/  root/  sbin/  sys/  usr/  var/');
+    ls: (args) => {
+        const path = args[0] || terminalCwd;
+        const target = VFS[path] || VFS[terminalCwd];
+        termPrint(target.join('  '));
+    },
+    cd: (args) => {
+        const path = args[0];
+        if (!path || path === '~' || path === '/') {
+            terminalCwd = '/root';
+        } else if (path === '..') {
+            const parts = terminalCwd.split('/');
+            parts.pop();
+            terminalCwd = parts.join('/') || '/root';
+        } else {
+            const newPath = terminalCwd + (terminalCwd.endsWith('/') ? '' : '/') + path;
+            if (VFS[newPath]) terminalCwd = newPath;
+            else termPrint('cd: no such file or directory: ' + path);
+        }
+        document.querySelector('.term-prompt').textContent = `root@sigmaos:${terminalCwd.replace('/root', '~')}#`;
     },
     neofetch: () => {
-        termPrint('            .-/+oossssoo+/-.               root@sigmaos');
-        termPrint('        `:+ssssssssssssssssss+:`           ------------');
-        termPrint('      -+ssssssssssssssssssyyssss+-         OS: SigmaOS Zenith Supreme v150.0');
-        termPrint('    .ossssssssssssssssssdMMMNysssso.       Kernel: 6.8.0-sigma-autonomous');
-        termPrint('   /ssssssssssshdmmNNmmyNMMMMhssssss/      Uptime: ' + sysUptime + 's');
-        termPrint('  +ssssssssshmydMMMMMMMNddddyssssssss+     Packages: 0 (Zero-Dependency)');
-        termPrint(' /sssssssshNMMMyhhyyyyhmNMMMNhssssssss/    Shell: sigma_shell v94.0');
-        termPrint('.ssssssssdMMMMN/        /mMMMMmssssssss.   Resolution: 1920x1080');
-        termPrint('+ssssssssHMMMMm`        `dMMMMNssssssss+   DE: Ubuntu-Elite Yaru-Gold');
-        termPrint(' sssssssshNMMMMmhhhhhhhdNMMMMNysssssss s   CPU: Silicon Shard x86_64');
-        termPrint(' .ssssssssdMMMMMMMMMMMMMMMMMNdssssssss.    GPU: Aether-GCM Industrial');
-        termPrint('  +ssssssssshNMMMMMMMMMMMMMdyssssssss+     Memory: 18.2% / 1PB');
+        termPrint('           .----------------.           ');
+        termPrint('          /  ____________  \\          root@sigmaos');
+        termPrint('         /  /            \\  \\         ------------');
+        termPrint('        /  /              \\  \\        OS: SigmaOS Zenith Supreme v150.8');
+        termPrint('       /  /                \\  \\       Kernel: Σ-Autonomous-6.8.9-zenith');
+        termPrint('      (  (        Σ         )  )      Uptime: ' + sysUptime + 's');
+        termPrint('       \\  \\                /  /       Packages: 0 (Zero-Dependency)');
+        termPrint('        \\  \\              /  /        Shell: sigma_shell v94.2');
+        termPrint('         \\  \\____________/  /         Resolution: 2560x1440 (Retina-Parity)');
+        termPrint('          \\________________/          DE: Ubuntu-Elite Gold Industrial');
+        termPrint('                                      CPU: x86_64 Sovereign ASM-Shard');
+        termPrint('                                      Memory: 18.2% / 1024.0 PB');
     },
     cpu: () => {
         termPrint('CPU LOAD: ' + cpuVal.textContent + ' [SHARD-DIRECT]');
@@ -731,10 +820,16 @@ const COMMANDS = {
 if (termInput) {
     termInput.addEventListener('keydown', e => {
         if (e.key === 'Enter') {
-            const val = termInput.value.trim().toLowerCase();
-            termPrint('root@sigmaos:~# ' + val);
-            if (COMMANDS[val]) COMMANDS[val]();
-            else if (val) termPrint('sigma_shell: command not found: ' + val);
+            const raw = termInput.value.trim();
+            const parts = raw.split(' ');
+            const cmd = parts[0].toLowerCase();
+            const args = parts.slice(1);
+            
+            const prompt = document.querySelector('.term-prompt').textContent;
+            termPrint(prompt + ' ' + raw);
+            
+            if (COMMANDS[cmd]) COMMANDS[cmd](args);
+            else if (cmd) termPrint('sigma_shell: command not found: ' + cmd);
             termInput.value = '';
         }
     });
