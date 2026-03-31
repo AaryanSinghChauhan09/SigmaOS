@@ -240,17 +240,18 @@ html, body {
 }
 
 .win-btn {
-  width: 14px;
-  height: 14px;
+  width: 12px;
+  height: 12px;
   border-radius: 50%;
   cursor: pointer;
-  transition: transform 0.2s;
+  transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1), background 0.3s;
+  opacity: 0.6;
 }
 
-.win-btn:hover { transform: scale(1.2); }
-.win-close { background: #ff5f57; }
-.win-min   { background: #ffbd2e; }
-.win-max   { background: #28c840; }
+.win-btn:hover { transform: scale(1.15); opacity: 1; }
+.win-close { background: rgba(255, 95, 87, 0.8); }
+.win-min   { background: rgba(255, 189, 46, 0.8); }
+.win-max   { background: rgba(40, 200, 64, 0.8); }
 
 /* Window Content */
 .win-content {
@@ -312,22 +313,37 @@ html, body {
 }
 
 .dock-item {
-  width: 48px;
-  height: 48px;
-  background: rgba(255, 255, 255, 0.05);
-  border-radius: var(--radius-md);
+  width: 42px;
+  height: 42px;
   display: flex;
   align-items: center;
   justify-content: center;
+  border-radius: 12px;
   cursor: pointer;
-  transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275), background 0.3s;
+  transition: all 0.4s cubic-bezier(0.19, 1, 0.22, 1);
   position: relative;
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(255, 255, 255, 0.05);
 }
 
 .dock-item:hover {
-  transform: translateY(-10px) scale(1.1);
-  background: rgba(255, 255, 255, 0.1);
-  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.4);
+  transform: translateY(-8px) scale(1.15);
+  background: rgba(255, 255, 255, 0.08);
+  border-color: rgba(227, 176, 75, 0.4);
+  box-shadow: 0 15px 35px rgba(0, 0, 0, 0.6), 0 0 20px rgba(227, 176, 75, 0.2);
+}
+
+.dock-item:hover::after {
+  content: '';
+  position: absolute;
+  top: 0; left: 0; width: 100%; height: 100%;
+  background: linear-gradient(135deg, transparent, rgba(255,255,255,0.1), transparent);
+  animation: shimmer-fx 1.5s infinite;
+}
+
+@keyframes shimmer-fx {
+  0% { transform: translateX(-100%) skewX(-30deg); }
+  100% { transform: translateX(100%) skewX(-30deg); }
 }
 
 .dock-item svg {

@@ -574,32 +574,39 @@ function executeOrchestration() {
 }
 
 // --- Spectrum Terminal Integration ---
+// Unified Terminal Logic (Spectrum Shard integration)
 function initSpectrumTerminal() {
-    const input = document.getElementById('spectrum-input');
     const output = document.getElementById('spectrum-output');
-    if (!input) return;
+    const input = document.getElementById('spectrum-input');
+    if (!input || !output) return;
 
-// AI-Predict Terminal Core (Industrial Intelligence)
-if (termInput) {
-    termInput.addEventListener('input', () => {
-        const val = termInput.value.trim().toLowerCase();
-        if (!val) return;
-        const suggestions = Object.keys(COMMANDS).filter(c => c.startsWith(val));
-        const predictEl = document.getElementById('ai-predict-hint');
-        if (predictEl) {
-            predictEl.textContent = suggestions.length > 0 ? ` [AI-PREDICT: ${suggestions[0]}]` : '';
+    input.addEventListener('keydown', e => {
+        if (e.key === 'Enter') {
+            const raw = input.value.trim();
+            if (!raw) return;
+            const parts = raw.split(' ');
+            const cmd = parts[0].toLowerCase();
+            const args = parts.slice(1);
+            
+            const line = document.createElement('div');
+            line.className = 'term-line';
+            line.innerHTML = `<span class="u-accent-text">spectrum@sigmaos</span>:~$ ${raw}`;
+            output.appendChild(line);
+            
+            if (COMMANDS[cmd]) {
+                // Route command to appropriate visual output if needed
+                COMMANDS[cmd](args);
+            } else {
+                const err = document.createElement('div');
+                err.className = 'term-line u-muted-text';
+                err.textContent = `spectrum: command not found: ${cmd}`;
+                output.appendChild(err);
+            }
+            
+            output.scrollTop = output.scrollHeight;
+            input.value = '';
         }
     });
-
-    termInput.addEventListener('keydown', e => {
-        if (e.key === 'Tab') {
-            e.preventDefault();
-            const val = termInput.value.trim().toLowerCase();
-            const suggestions = Object.keys(COMMANDS).filter(c => c.startsWith(val));
-            if (suggestions.length > 0) termInput.value = suggestions[0];
-        }
-    });
-}
 }
 
 function initDistroRunner() {
