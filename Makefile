@@ -93,10 +93,8 @@ KERNEL_C_SRCS := kernel/sigma_kernel.c \
                  kernel/main.c \
                  kernel/omni_shell.c \
                  kernel/SovereignOmniShard.c \
-                 kernel/SovereignProcessManager.cpp \
-                 kernel/SovereignMemoryZenith.cpp \
-                 kernel/SovereignAIKernelZenith.cpp \
-                 kernel/SovereignXV6Bridge.cpp
+                 kernel/SovereignProcessManager.c \
+                 kernel/SovereignKernelPrinciples.c
 KERNEL_OBJS   := $(patsubst %, build/kernel_%.o, $(notdir $(KERNEL_C_SRCS)))
 
 # ASM sources
