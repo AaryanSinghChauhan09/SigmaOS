@@ -1083,6 +1083,37 @@ const COMMANDS = {
             case 'net':
                 termPrint(`Σ NET-BRIDGE: Sockets Active: ${Object.keys(SigmaNetworkBridge.sockets).length}`);
                 break;
+            case 'mount':
+                termPrint('Σ RAW MOUNT TABLE:');
+                SigmaMountManager.list().forEach(m => termPrint(`- ${m}`));
+                break;
+            case 'services':
+                termPrint('Σ KERNEL DAEMONS:');
+                Object.entries(SigmaServiceManager.services).forEach(([n, s]) => termPrint(`- ${n} [PID: ${s.pid}] -> ${s.state}`));
+                break;
+            case 'sec':
+                if (args[1] === 'grant') {
+                    SigmaSecurityManager.grant(args[2], args[3]);
+                    return;
+                }
+                termPrint('Usage: sigmactl sec grant <SHARD> <CAP>');
+                break;
+            case 'pcb':
+                termPrint('Σ PROCESS CONTROL BLOCKS:');
+                Object.entries(SigmaPCB.processes).forEach(([pid, p]) => termPrint(`- PID ${pid} [${p.name}] -> ${p.state}`));
+                break;
+            case 'idt':
+                if (args[1] === 'trigger' && args[2]) {
+                    SigmaIDT.interrupt(parseInt(args[2]));
+                    return;
+                }
+                termPrint('Usage: sigmactl idt trigger <IRQ_NUM>');
+                break;
+            case 'hal':
+                termPrint('Σ HARDWARE ABSTRACTION LAYER:');
+                termPrint(`- CPU: ${SigmaHAL.cpu.cores} Cores [${SigmaHAL.cpu.arch}]`);
+                termPrint(`- MEM: ${SigmaHAL.mem.total} MB Static / ${SigmaHAL.mem.used} MB Used`);
+                break;
             default:
                 termPrint(`sigmactl: unknown command: ${sub}`);
         }
@@ -1249,6 +1280,85 @@ const SigmaNetworkBridge = {
         logAuditEvent(`NET_RAW_SEND: ${handle} -> ${data.length} bytes`);
     }
 };
+
+// SigmaOS v240.0: Sovereign Architectural Sovereignty (Mounts + Services + Security)
+const SigmaMountManager = {
+    mounts: {
+        '/dev': { type: 'SHM', status: 'MOUNTED' },
+        '/proc': { type: 'SYS', status: 'MOUNTED' },
+        '/etc': { type: 'VFS_STATIC', status: 'MOUNTED' }
+    },
+    list: () => Object.entries(SigmaMountManager.mounts).map(([p, m]) => `${p} [${m.type}] - ${m.status}`)
+};
+
+const SigmaServiceManager = {
+    services: {
+        'sigma_net_d': { pid: 105, state: 'RUNNING' },
+        'sigma_audit_d': { pid: 108, state: 'RUNNING' },
+        'sigma_pqc_d': { pid: 112, state: 'IDLE' }
+    },
+    start: (name) => {
+        if (SigmaServiceManager.services[name]) SigmaServiceManager.services[name].state = 'RUNNING';
+        spawnToast(`Service Manager: ${name} mission initiated.`);
+    }
+};
+
+const SigmaSecurityManager = {
+    tokens: {},
+    grant: (shard, cap) => {
+        if (!SigmaSecurityManager.tokens[shard]) SigmaSecurityManager.tokens[shard] = new Set();
+        SigmaSecurityManager.tokens[shard].add(cap);
+        logAuditEvent(`SEC_GRANT: ${shard} -> ${cap}`);
+    },
+    check: (shard, cap) => SigmaSecurityManager.tokens[shard]?.has(cap) || false
+};
+
+// SigmaOS v250.0: Core Kernel Architecture (PCB, IDT, HAL)
+const SigmaPCB = {
+    processes: {},
+    nextPid: 1000,
+    spawn: (name) => {
+        const pid = SigmaPCB.nextPid++;
+        SigmaPCB.processes[pid] = { name, state: 'READY', memory: 0 };
+        console.log(`Σ PCB: Instantiated Process Control Block for [${name}] at PID ${pid}`);
+        return pid;
+    },
+    kill: (pid) => {
+        if (SigmaPCB.processes[pid]) {
+            SigmaPCB.processes[pid].state = 'TERMINATED';
+            console.log(`Σ PCB: Terminated PID ${pid}`);
+            logAuditEvent(`PROCESS_KILL: ${pid}`);
+        }
+    }
+};
+
+const SigmaIDT = {
+    handlers: {
+        0x80: () => console.log('Σ IDT: Fast Syscall Trapped (0x80)'),
+        0x21: () => console.log('Σ IDT: Keyboard Hardware Interrupt Vector'),
+        0x14: () => console.log('Σ IDT: Page Fault Handler Triggered')
+    },
+    interrupt: (irq) => {
+        logAuditEvent(`IRQ_TRIGGER: 0x${irq.toString(16)}`);
+        if (SigmaIDT.handlers[irq]) {
+            SigmaIDT.handlers[irq]();
+            spawnToast(`Kernel: Hardware Interrupt 0x${irq.toString(16).toUpperCase()} Handled.`);
+        } else {
+            termPrint(`Kernel Warning: Unhandled IRQ 0x${irq.toString(16)}`);
+        }
+    }
+};
+
+const SigmaHAL = {
+    cpu: { arch: 'x86_64-Zenith', cores: navigator.hardwareConcurrency || 4 },
+    mem: { total: 16384, used: Math.floor(Math.random() * 2000) },
+    init: () => {
+        console.log(`Σ HAL: Probing silicon bridges... CPU: ${SigmaHAL.cpu.cores} cores.`);
+        logAuditEvent('HAL_INITIALIZATION_COMPLETE');
+    }
+};
+SigmaHAL.init();
+
 
 // v200.0 Benchmarking Engine
 function sigmaBenchmark() {
