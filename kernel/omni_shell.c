@@ -289,6 +289,11 @@ static void shell_audit(const OmniShellZenith* sh) {
     /* OS Principles Audit */
     SovereignKernel_AuditPrinciples();
     
+    /* Offensive Shard: Competitor Neutralization */
+    SovereignOffensive_CrushLinux();
+    SovereignOffensive_CrushWindows();
+    SovereignOffensive_NeutronAudit();
+    
     /* Amnesic scrubbing at end of audit */
     SovereignAmnesicShard_PerformSiliconWipe((SovereignAmnesicShard*)&sh->amnesic);
 

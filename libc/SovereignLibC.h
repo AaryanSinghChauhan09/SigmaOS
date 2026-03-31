@@ -24,6 +24,10 @@ typedef int               sigma_bool;
 #define SIGMA_FALSE 0
 #define SIGMA_NULL  ((void*)0)
 
+typedef sigma_u32 sigma_status;
+#define SIGMA_OK    0x00000000
+#define SIGMA_ERROR 0xFFFFFFFF
+
 // --- Direct Syscalls (Linux x64) ---
 #ifdef __cplusplus
 extern "C" {
@@ -54,6 +58,8 @@ extern "C" {
     int           sigma_shm_unlink(const char* name);
     int           sigma_ioctl(int fd, unsigned long request, ...);
     int           sigma_mprotect(void* addr, sigma_size_t len, int prot);
+    
+    void          sigma_log(const char* msg);
 #ifdef __cplusplus
 }
 #endif

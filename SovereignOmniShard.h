@@ -138,4 +138,11 @@ void SovereignKernel_ContextSwitch(SovereignTCB* next);
 void SovereignKernel_MapMemory(SovereignPagingMetadata* p, sigma_u64 va, sigma_u64 pa);
 void SovereignKernel_AuditPrinciples(void);
 
+/* =========================================================================
+ * DOMAIN: OFFENSIVE SUPREMACY & COMPETITOR NEUTRALIZATION
+ * ========================================================================= */
+void SovereignOffensive_CrushLinux(void);
+void SovereignOffensive_CrushWindows(void);
+void SovereignOffensive_NeutronAudit(void);
+
 #endif /* SOVEREIGN_OMNI_SHARD_H */

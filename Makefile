@@ -381,7 +381,8 @@ ZENITH_OBJS := $(ZENITH_OBJ_ENTRY) $(ZENITH_OBJ_ASM) $(ZENITH_OBJ_CPP) \
                build/SovereignDesktopZenith.o \
                build/SovereignHTTPServer.o \
                build/kernel_omni_shell.o \
-               build/SovereignKernelPrinciples.o
+               build/SovereignKernelPrinciples.o \
+               build/SovereignOffensiveShard.o
 
 build/SovereignHTTPServer.o: SovereignHTTPServer.c SovereignLibC.h
 	@$(CC) $(CFLAGS) -c $< -o $@
@@ -399,6 +400,9 @@ build/SovereignCoreUtils.o: SovereignCoreUtils.cpp SovereignLibC.h SigmaOOP.hpp
 	@$(CXX) $(CXXFLAGS) -c $< -o $@
 
 build/SovereignKernelPrinciples.o: SovereignKernelPrinciples.c SovereignLibC.h
+	@$(CC) $(CFLAGS) -c $< -o $@
+
+build/SovereignOffensiveShard.o: kernel/SovereignOffensiveShard.c libc/SovereignLibC.h SovereignOmniShard.h
 	@$(CC) $(CFLAGS) -c $< -o $@
 
 build/SovereignDistroForge.o: SovereignDistroForge.cpp SovereignDistroForge.h SigmaOOP.hpp
