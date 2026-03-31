@@ -1,4 +1,5 @@
-#include "SovereignLibC.h"
+#include "libc/SovereignLibC.h"
+#include "SovereignOmniShard.h"
 
 /*
  * =========================================================================
@@ -27,10 +28,6 @@ static void sigma_security_scrub_stack(sigma_u64 size) {
     sigma_memset((void*)buffer, 0, 128);
     (void)size;
 }
-
-typedef struct SovereignAmnesicShard {
-    sigma_bool session_active;
-} SovereignAmnesicShard;
 
 void SovereignAmnesicShard_init(SovereignAmnesicShard* self) {
     self->session_active = SIGMA_FALSE;

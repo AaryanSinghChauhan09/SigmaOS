@@ -12,7 +12,7 @@
 #ifndef SOVEREIGN_OMNI_SHARD_H
 #define SOVEREIGN_OMNI_SHARD_H
 
-#include "SovereignLibC.h"
+#include "libc/SovereignLibC.h"
 
 /* =========================================================================
  * DOMAIN: OS KERNEL & ADVANCED SCHEDULING (IITB / MIT / STANFORD)
@@ -68,5 +68,46 @@ void SovereignNet_init(SovereignNetZenith* n);
 void SovereignNet_ZeroTrustHandshake(SovereignNetZenith* n);
 void SovereignNet_RecursiveDNSNode(SovereignNetZenith* n, const char* domain);
 void SovereignNet_audit(const SovereignNetZenith* n);
+
+/* =========================================================================
+ * DOMAIN: AETHER SENTINEL & AUTONOMOUS ERROR SHARDING
+ * ========================================================================= */
+#define MAX_TRAP_HISTORY 128
+typedef struct SovereignAetherSentinel {
+    sigma_u32 global_errors_resolved;
+    sigma_bool autonomous_mode;
+    sigma_u64 last_fault_addr;
+    sigma_u64 trap_history[MAX_TRAP_HISTORY];
+    sigma_u32 trap_index;
+} SovereignAetherSentinel;
+
+void SovereignAetherSentinel_init(SovereignAetherSentinel* s);
+void SovereignAetherSentinel_HandleTrap(SovereignAetherSentinel* s, sigma_u64 trap_id, sigma_u64 rip);
+void SovereignAetherSentinel_ResolveLastError(SovereignAetherSentinel* s, const char* shard_id, sigma_u64 error_code);
+void SovereignAetherSentinel_AuditIntegrity(SovereignAetherSentinel* s);
+
+/* =========================================================================
+ * DOMAIN: AETHER ORCHESTRATOR & AI MISSION ROUTING
+ * ========================================================================= */
+typedef struct SovereignAetherOrchestrator {
+    sigma_u32 models_connected;
+    const char* active_model;
+} SovereignAetherOrchestrator;
+
+void SovereignAetherOrchestrator_init(SovereignAetherOrchestrator* o);
+void SovereignAetherOrchestrator_RouteMission(SovereignAetherOrchestrator* o, const char* mission);
+void SovereignAetherOrchestrator_DeepThinkMode(SovereignAetherOrchestrator* o);
+
+/* =========================================================================
+ * DOMAIN: AMNESIC SHARD & SILICON SCRUBBING
+ * ========================================================================= */
+typedef struct SovereignAmnesicShard {
+    sigma_bool session_active;
+} SovereignAmnesicShard;
+
+void SovereignAmnesicShard_init(SovereignAmnesicShard* s);
+void SovereignAmnesicShard_StartAmnesicSession(SovereignAmnesicShard* s);
+void SovereignAmnesicShard_SecureSiliconExit(SovereignAmnesicShard* s);
+void SovereignAmnesicShard_PerformSiliconWipe(SovereignAmnesicShard* s);
 
 #endif /* SOVEREIGN_OMNI_SHARD_H */

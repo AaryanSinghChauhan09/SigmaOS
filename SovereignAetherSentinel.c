@@ -1,4 +1,5 @@
-#include "SovereignLibC.h"
+#include "libc/SovereignLibC.h"
+#include "SovereignOmniShard.h"
 
 /*
  * =========================================================================
@@ -8,16 +9,6 @@
  * Capability: Automatic Error Sharding, Contextual Recovery, PQC Audit.
  * =========================================================================
  */
-
-#define MAX_TRAP_HISTORY 128
-
-typedef struct SovereignAetherSentinel {
-    sigma_u32 global_errors_resolved;
-    sigma_bool autonomous_mode;
-    sigma_u64 last_fault_addr;
-    sigma_u64 trap_history[MAX_TRAP_HISTORY];
-    sigma_u32 trap_index;
-} SovereignAetherSentinel;
 
 void SovereignAetherSentinel_init(SovereignAetherSentinel* self) {
     self->global_errors_resolved = 0;

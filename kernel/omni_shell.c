@@ -10,7 +10,7 @@
  */
 
 #include "../libc/sigma_libc.h"
-#include "SovereignOmniShard.h"   /* Industrial sharding structs (C11) */
+#include "../SovereignOmniShard.h"   /* Industrial sharding structs (C11) */
 
 /* =========================================================================
  * Command dispatch table entry (replaces C++ if-else chain with data table)
@@ -38,6 +38,9 @@ typedef struct OmniShellZenith {
     SovereignCloudOrchestrator cloud;
     SovereignUIEngine     ui;
     SovereignNetZenith    net;
+    SovereignAetherSentinel sentinel;
+    SovereignAetherOrchestrator orchestrator;
+    SovereignAmnesicShard amnesic;
 } OmniShellZenith;
 
 /* =========================================================================
@@ -232,6 +235,9 @@ static void shell_init(OmniShellZenith* sh) {
     SovereignCloud_init(&sh->cloud);
     SovereignUI_init(&sh->ui);
     SovereignNet_init(&sh->net);
+    SovereignAetherSentinel_init(&sh->sentinel);
+    SovereignAetherOrchestrator_init(&sh->orchestrator);
+    SovereignAmnesicShard_init(&sh->amnesic);
     sigma_printf("[SIGMA_SHELL]: Omni-Shell Zenith Online (v27.0). System-Master [ACTIVE].\n");
     sigma_printf("[SIGMA_SHELL]: %llu commands loaded.\n", (sigma_u64)SIGMA_CMD_COUNT);
 }
@@ -275,6 +281,14 @@ static void shell_audit(const OmniShellZenith* sh) {
     sigma_printf("| History Entries : %u\n",   sh->history_count);
     sigma_printf("| Prompt Status   : RING-0 SOVEREIGN\n");
     sigma_printf("| Mastery         : Total System Control Secured.\n");
+    
+    /* Industrial Peer Review: Sentinel Trap Simulation */
+    SovereignAetherSentinel_HandleTrap((SovereignAetherSentinel*)&sh->sentinel, 0xD, 0xFFFFFFFF);
+    SovereignAetherOrchestrator_RouteMission((SovereignAetherOrchestrator*)&sh->orchestrator, "CORE_SYNC");
+    
+    /* Amnesic scrubbing at end of audit */
+    SovereignAmnesicShard_PerformSiliconWipe((SovereignAmnesicShard*)&sh->amnesic);
+
     sigma_printf("----------------------------------------\n");
 }
 

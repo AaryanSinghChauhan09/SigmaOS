@@ -1,4 +1,5 @@
-#include "SovereignLibC.h"
+#include "libc/SovereignLibC.h"
+#include "SovereignOmniShard.h"
 
 /*
  * =========================================================================
@@ -8,11 +9,6 @@
  * Capability: Multi-Model AI Routing (11+ Models).
  * =========================================================================
  */
-
-typedef struct SovereignAetherOrchestrator {
-    sigma_u32 models_connected;
-    const char* active_model;
-} SovereignAetherOrchestrator;
 
 void SovereignAetherOrchestrator_init(SovereignAetherOrchestrator* self) {
     self->models_connected = 11;

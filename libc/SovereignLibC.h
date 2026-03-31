@@ -25,7 +25,9 @@ typedef int               sigma_bool;
 #define SIGMA_NULL  ((void*)0)
 
 // --- Direct Syscalls (Linux x64) ---
+#ifdef __cplusplus
 extern "C" {
+#endif
     void          sigma_exit(int code);
     sigma_ssize_t sigma_write(int fd, const void* buf, sigma_size_t count);
     sigma_ssize_t sigma_read(int fd, void* buf, sigma_size_t count);
@@ -52,7 +54,9 @@ extern "C" {
     int           sigma_shm_unlink(const char* name);
     int           sigma_ioctl(int fd, unsigned long request, ...);
     int           sigma_mprotect(void* addr, sigma_size_t len, int prot);
+#ifdef __cplusplus
 }
+#endif
 
 // --- High-Level primitives implemented at Low-Level ---
 void sigma_print(const char* str);

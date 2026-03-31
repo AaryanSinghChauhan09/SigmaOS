@@ -382,13 +382,12 @@ ZENITH_OBJS := $(ZENITH_OBJ_ENTRY) $(ZENITH_OBJ_ASM) $(ZENITH_OBJ_CPP) \
                build/SovereignKnowledgeAudit.o \
                build/SovereignDesktopZenith.o \
                build/SovereignHTTPServer.o \
-               build/omni_shell.o
+               build/kernel_omni_shell.o
 
 build/SovereignHTTPServer.o: SovereignHTTPServer.c SovereignLibC.h
 	@$(CC) $(CFLAGS) -c $< -o $@
 
 build/SovereignAetherSentinel_c.o: SovereignAetherSentinel.c SovereignLibC.h
-#include "libc/sigma_libc.h"
 	@$(CC) $(CFLAGS) -c $< -o $@
 
 # Update linker for custom entry
