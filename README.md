@@ -66,12 +66,12 @@ SigmaOS includes a built-in management utility. Open the terminal and use:
 
 ## 📝 Roadmap
 
-- [x] v152.0: Persistent VFS & Industrial Shell.
-- [x] v153.0: Site Sharding & Sovereign Cloud Hub.
-- [x] v154.0: Industrial Profiles & Automation Macros.
-- [x] v155.0: **Industrial Orchestration & Personas (Zenith Masterpiece)**.
-- [ ] v156.0: **Peer-to-Peer Shard Sharing** (Planned).
-- [ ] v155.0: **Sovereign VPN & Privacy Matrix** (Planned).
+- [x] v180.0: Performance & Algorithmic Efficiency.
+- [x] v190.0: Self-Healing & Sovereign Crypto.
+- [x] v200.0: Lattice-PQC & Sovereign Scheduler.
+- [x] v210.0: Sovereign Rollbacks & Macro Orchestration.
+- [x] v220.0: **Supreme App-Sovereignty & Emulation (Zenith Legacy Final Build)**.
+- [ ] v230.0: **Peer-to-Peer Shard Sharing** (Planned).
 
 ---
 

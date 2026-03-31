@@ -629,6 +629,45 @@
             </div>
         </section>
 
+        <!-- SIGMASTORE: SHARD MARKETPLACE (v220.0 Supreme) -->
+        <section id="win-store" class="window hidden win-services-default">
+            <div class="win-header">
+                <div class="win-title">🏪 SigmaStore (Industrial Shard Marketplace)</div>
+                <div class="win-controls">
+                    <div class="win-btn win-min" data-action="minimize" data-win="store"></div>
+                    <div class="win-btn win-close" data-action="close" data-win="store"></div>
+                </div>
+            </div>
+            <div class="win-content u-padding-16">
+                <div class="u-margin-b-20 u-accent-text u-bold">SOVEREIGN SHARD PACKAGES</div>
+                <div id="store-list" class="u-grid-1">
+                    <div class="metric-card u-flex-between u-margin-b-10">
+                        <div>
+                            <div class="u-bold">SigmaEmu Android</div>
+                            <div class="u-muted-text">v2.0.0 | EMULATOR SHARD</div>
+                        </div>
+                        <button class="status-chip" onclick="COMMANDS.sigmactl(['store', 'install', 'android_bridge'])">INSTALL</button>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- SIGMAEMU: VIRTUALIZATION SHARD -->
+        <section id="win-emulator" class="window hidden win-distro-default" style="width: 360px; height: 600px;">
+            <div class="win-header">
+                <div class="win-title">🤖 SigmaEmu (Virtual Android)</div>
+                <div class="win-controls">
+                    <div class="win-btn win-min" data-action="minimize" data-win="emulator"></div>
+                    <div class="win-btn win-close" data-action="close" data-win="emulator"></div>
+                </div>
+            </div>
+            <div class="win-content u-flex-column u-flex-center u-text-center">
+                <div style="font-size: 64px;">🤖</div>
+                <div class="u-accent-text u-bold u-font-size-md">SHARD_ID: EMU-882</div>
+                <div class="u-muted-text u-margin-t-10">VIRTUAL_SILICON_ACTIVE</div>
+            </div>
+        </section>
+
         <!-- SPECTRUM TERMINAL SHARD -->
         <section id="win-spectrum" class="window hidden win-terminal-default">
             <div class="win-header">

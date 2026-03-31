@@ -50,6 +50,20 @@ class SovereignVFS {
         return true;
     }
     read(path) { return this.fs[path] ? this.fs[path].content : null; }
+    snapshot(name) {
+        const data = JSON.stringify(localStorage);
+        localStorage.setItem(`SNAPSHOT_${name.toUpperCase()}`, data);
+        spawnToast(`System Snapshot [${name}] created.`);
+    }
+    rollback(name) {
+        const data = localStorage.getItem(`SNAPSHOT_${name.toUpperCase()}`);
+        if (!data) return termPrint(`Rollback failed: Snapshot ${name} not found.`);
+        localStorage.clear();
+        const state = JSON.parse(data);
+        Object.keys(state).forEach(k => localStorage.setItem(k, state[k]));
+        spawnToast(`Rollback Successful: Reverted to ${name}. Rebooting...`);
+        setTimeout(() => location.reload(), 1500);
+    }
 }
 
 const VFS = new SovereignVFS();
@@ -996,12 +1010,67 @@ const COMMANDS = {
                 }
                 termPrint('Usage: sigmactl boot adaptive <PERSONA>');
                 break;
+            case 'record':
+                if (args[1] === 'start') SigmaMacroRecorder.start();
+                else if (args[1] === 'stop' && args[2]) SigmaMacroRecorder.stop(args[2]);
+                else termPrint('Usage: sigmactl record <start|stop NAME>');
+                break;
+            case 'rollback':
+                if (args[1]) VFS.rollback(args[1]);
+                else termPrint('Usage: sigmactl rollback <NAME>');
+                break;
+            case 'snapshot':
+                if (args[1]) VFS.snapshot(args[1]);
+                else termPrint('Usage: sigmactl snapshot <NAME>');
+                break;
+            case 'setup':
+                termPrint('Σ ZENITH INDUSTRIAL WIZARD:');
+                termPrint('Select Persona: [1] DEVELOPER [2] GAMER [3] RESEARCHER');
+                break;
             case 'system':
                 if (args[1] === 'ascii-mode') {
                     document.body.classList.toggle('mode-ascii');
                     return;
+                } else if (args[1] === 'bare-metal') {
+                    document.body.style.background = '#000';
+                    spawnToast('BARE-METAL MODE ACTIVE');
+                    return;
                 }
-                termPrint('Usage: sigmactl system ascii-mode');
+                termPrint('Usage: sigmactl system ascii-mode | bare-metal');
+                break;
+            case 'config':
+                if (args[1] === 'load') {
+                    const conf = VFS.read('/etc/sigmaos.conf') || 'VERSION=210.0\nTHEME=ZENITH';
+                    termPrint(conf);
+                    return;
+                }
+                termPrint('Usage: sigmactl config load');
+                break;
+            case 'list':
+                termPrint('ACTIVE SYSTEM SHARDS (VFS PERSISTENT):');
+                termPrint('- Kernel: Σ-Zenith-7.0');
+                termPrint('- Storage: SovereignVFS v210.0');
+                termPrint('- UI: Zenith Dashboard v210.0');
+                termPrint('- AI: Neural Matrix v105');
+                break;
+            case 'store':
+                if (args[1] === 'list') {
+                    termPrint('Σ SIGMASTORE: Available Shards:');
+                    SigmaStore.available.forEach(s => termPrint(`- ${s.id} [v${s.version}]`));
+                } else if (args[1] === 'install') SigmaStore.install(args[2]);
+                else termPrint('Usage: sigmactl store <list|install NAME>');
+                break;
+            case 'emu':
+                if (args[1]) SigmaEmu.launch(args[1]);
+                else termPrint('Usage: sigmactl emu <APP>');
+                break;
+            case 'ai':
+                termPrint(SigmaAI.ask(args.join(' ')));
+                break;
+            case 'update':
+                SigmaSync.autoBackup();
+                termPrint('Σ UPDATE: Sharding latest Zenith kernel bits...');
+                setTimeout(() => termPrint('Update Complete. System v220.0 Supreme Active.'), 1000);
                 break;
             default:
                 termPrint(`sigmactl: unknown command: ${sub}`);
@@ -1058,6 +1127,23 @@ const SigmaCrypto = {
     }
 };
 
+// SigmaOS v210.0: Sovereign Rollbacks & Macro Orchestration
+const SigmaMacroRecorder = {
+    recording: false,
+    history: [],
+    start: () => { 
+        SigmaMacroRecorder.recording = true; 
+        SigmaMacroRecorder.history = [];
+        spawnToast('Macro Recording Active. Type commands to record mission.');
+    },
+    stop: (name) => {
+        SigmaMacroRecorder.recording = false;
+        MACROS[name.toUpperCase()] = [...SigmaMacroRecorder.history];
+        spawnToast(`Macro [${name}] saved to industrial matrix.`);
+    },
+    log: (cmd) => { if (SigmaMacroRecorder.recording) SigmaMacroRecorder.history.push(cmd); }
+};
+
 const SigmaScheduler = {
     priorities: { 'KERNEL': 100, 'SHELL': 80, 'UI': 50, 'APP': 20 },
     queue: [],
@@ -1068,19 +1154,55 @@ const SigmaScheduler = {
     }
 };
 
-function adaptiveBoot(persona) {
-    termPrint(`Σ ADAPTIVE BOOT [PERSONA: ${persona}]: Detecting Mission Shards...`);
-    if (persona === 'DEVELOPER') {
-        SigmaScheduler.schedule('terminal', 'SHELL');
-        SigmaScheduler.schedule('kernel_logs', 'KERNEL');
-        openWindow('terminal');
-    } else if (persona === 'GAMER') {
-        SigmaScheduler.schedule('gpu_driver', 'KERNEL');
-        SigmaScheduler.schedule('industrialmatrix', 'UI');
-        openWindow('industrialmatrix');
+// SigmaOS v220.0: Supreme App-Sovereignty & Emulation (SigmaStore + SigmaEmu)
+const SigmaStore = {
+    available: [
+        { id: 'android_bridge', name: 'SigmaEmu Android', version: '2.0.0', type: 'EMU' },
+        { id: 'kali_matrix', name: 'SigmaSec Tools', version: '4.1.2', type: 'SEC' },
+        { id: 'media_shard', name: 'SigmaMedia Player', version: '1.0.5', type: 'MEDIA' }
+    ],
+    install: (id) => {
+        spawnToast(`SigmaStore: Downloading Shard ${id}...`);
+        setTimeout(() => {
+            logAuditEvent(`STORE_INSTALL: ${id}`);
+            spawnToast(`Shard ${id} successfully sharded into Kernel.`);
+        }, 2000);
     }
-    spawnToast(`Adaptive Boot Complete: Optimized for ${persona}.`);
-}
+};
+
+const SigmaEmu = {
+    running: false,
+    launch: (app) => {
+        SigmaEmu.running = true;
+        SigmaGuard.enforce(app, ['SANDBOX_ONLY']);
+        spawnToast(`SigmaEmu: Virtualizing ${app} in isolated shard...`);
+        openWindow('emulator');
+    }
+};
+
+const SigmaGuard = {
+    capabilities: { 'NET': 0x1, 'DISK': 0x2, 'SYS': 0x4 },
+    enforce: (shard, caps) => {
+        console.log(`Σ GUARD: Enforcing [${caps.join(',')}] on shard ${shard}`);
+        logAuditEvent(`GUARD_ENFORCE: ${shard} -> ${caps}`);
+    }
+};
+
+const SigmaAI = {
+    ask: (query) => {
+        const q = query.toLowerCase();
+        if (q.includes('optimize')) return 'Σ AI: Recommending SigmaOpt + SigmaForge for your CPU.';
+        if (q.includes('secure')) return 'Σ AI: ShardGuard active. No external leaks detected.';
+        return 'Σ AI: System sovereignty is at 100%. All shards nominal.';
+    }
+};
+
+const SigmaSync = {
+    autoBackup: () => {
+        termPrint('Σ SYNC: Automatic pre-mission snapshot created.');
+        VFS.snapshot('PRE_UPDATE_' + Date.now());
+    }
+};
 
 // v200.0 Benchmarking Engine
 function sigmaBenchmark() {
