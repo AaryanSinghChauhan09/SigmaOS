@@ -286,6 +286,9 @@ static void shell_audit(const OmniShellZenith* sh) {
     SovereignAetherSentinel_HandleTrap((SovereignAetherSentinel*)&sh->sentinel, 0xD, 0xFFFFFFFF);
     SovereignAetherOrchestrator_RouteMission((SovereignAetherOrchestrator*)&sh->orchestrator, "CORE_SYNC");
     
+    /* OS Principles Audit */
+    SovereignKernel_AuditPrinciples();
+    
     /* Amnesic scrubbing at end of audit */
     SovereignAmnesicShard_PerformSiliconWipe((SovereignAmnesicShard*)&sh->amnesic);
 

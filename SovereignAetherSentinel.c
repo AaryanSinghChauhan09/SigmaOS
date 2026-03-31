@@ -15,7 +15,9 @@ void SovereignAetherSentinel_init(SovereignAetherSentinel* self) {
     self->autonomous_mode = SIGMA_TRUE;
     self->last_fault_addr = 0;
     self->trap_index = 0;
-    sigma_memset(self->trap_history, 0, sizeof(sigma_u64) * MAX_TRAP_HISTORY);
+    for (sigma_u32 i = 0; i < MAX_TRAP_HISTORY; i++) {
+        self->trap_history[i] = 0;
+    }
     sigma_printf("[SENTINEL]: Aether Sentinel Heuristics Engine Initialized Natively.\n");
 }
 

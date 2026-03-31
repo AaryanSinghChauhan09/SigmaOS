@@ -110,4 +110,32 @@ void SovereignAmnesicShard_StartAmnesicSession(SovereignAmnesicShard* s);
 void SovereignAmnesicShard_SecureSiliconExit(SovereignAmnesicShard* s);
 void SovereignAmnesicShard_PerformSiliconWipe(SovereignAmnesicShard* s);
 
+/* =========================================================================
+ * DOMAIN: KERNEL ARCHITECTURE & OS PRINCIPLES (PAGING / TCB / IPC)
+ * ========================================================================= */
+typedef enum SovereignTaskState {
+    TASK_RUNNING,
+    TASK_READY,
+    TASK_BLOCKED,
+    TASK_ZOMBIE
+} SovereignTaskState;
+
+typedef struct SovereignTCB {
+    sigma_u32          pid;
+    SovereignTaskState state;
+    sigma_u64          cpu_time_ns;
+    sigma_u64          stack_pointer;
+    sigma_u64          page_table_root;
+} SovereignTCB;
+
+typedef struct SovereignPagingMetadata {
+    sigma_u64 total_pages_mapped;
+    sigma_u64 tlb_flush_count;
+    sigma_bool nx_bit_protection;
+} SovereignPagingMetadata;
+
+void SovereignKernel_ContextSwitch(SovereignTCB* next);
+void SovereignKernel_MapMemory(SovereignPagingMetadata* p, sigma_u64 va, sigma_u64 pa);
+void SovereignKernel_AuditPrinciples(void);
+
 #endif /* SOVEREIGN_OMNI_SHARD_H */
