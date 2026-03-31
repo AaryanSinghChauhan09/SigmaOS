@@ -986,46 +986,22 @@ const COMMANDS = {
                 termPrint('- [!] Shard "Voice" is consuming memory. Recommend "sigmactl reboot shard voice".');
                 termPrint('- [!] VFS cache at 82%. Recommend "clear" or "VFS cleanup".');
                 break;
+            case 'benchmark':
+                sigmaBenchmark();
+                break;
+            case 'boot':
+                if (args[1] === 'adaptive') {
+                    adaptiveBoot(args[2] ? args[2].toUpperCase() : 'DEVELOPER');
+                    return;
+                }
+                termPrint('Usage: sigmactl boot adaptive <PERSONA>');
+                break;
             case 'system':
                 if (args[1] === 'ascii-mode') {
                     document.body.classList.toggle('mode-ascii');
-                    spawnToast(`ASCII UI Mode: ${document.body.classList.contains('mode-ascii') ? 'ENABLED' : 'DISABLED'}`);
-                    return;
-                } else if (args[1] === 'bare-metal') {
-                    termPrint('Σ BARE-METAL TRANSITION: Purging POSIX abstractions...');
-                    const bar = document.getElementById('taskbar');
-                    if (bar) bar.style.display = 'none';
-                    document.querySelectorAll('.window').forEach(w => { if (w.id !== 'terminal') w.style.display = 'none'; });
-                    document.body.style.background = '#000';
-                    document.body.className = 'mode-noir';
-                    spawnToast('BARE-METAL MODE ACTIVE: [ZENITH_CORE_ONLY]');
                     return;
                 }
-                termPrint('Usage: sigmactl system ascii-mode | bare-metal');
-                break;
-            case 'boot':
-                termPrint('Σ SIGMABOOT v1.0 (Lattice-PQC Encrypted)');
-                termPrint('1. SigmaOS Zenith (Default)');
-                termPrint('2. Windows Shard (Chainload)');
-                termPrint('3. EFI Shell');
-                if (args[1] === 'windows') {
-                    termPrint('Chainloading Windows Shard... Handing off TSC to BIOS...');
-                    setTimeout(() => location.reload(), 2000);
-                }
-                break;
-            case 'config':
-                if (args[1] === 'load') {
-                    const conf = VFS.read('/etc/sigmaos.conf') || 'VERSION=180.0\nTHEME=ZENITH_GOLD\nLOW_DEP=TRUE';
-                    termPrint('Σ MOUNTING RAW CONFIG (/etc/sigmaos.conf):');
-                    termPrint(conf);
-                    return;
-                }
-                termPrint('Usage: sigmactl config load');
-                break;
-            case 'kernel':
-                termPrint('Σ SILICON DRIVERS: [GPU_ASM], [NET_RAW], [MEM_LEAN]');
-                termPrint('- TSC Timer: ' + performance.now());
-                termPrint('- Ring Buffer State: 1024/1024 [OPTIMIZED]');
+                termPrint('Usage: sigmactl system ascii-mode');
                 break;
             default:
                 termPrint(`sigmactl: unknown command: ${sub}`);
@@ -1082,8 +1058,40 @@ const SigmaCrypto = {
     }
 };
 
-// Auto-start Watchdog
-SigmaWatchdog.start();
+const SigmaScheduler = {
+    priorities: { 'KERNEL': 100, 'SHELL': 80, 'UI': 50, 'APP': 20 },
+    queue: [],
+    schedule: (shard, priority) => {
+        SigmaScheduler.queue.push({ shard, priority: SigmaScheduler.priorities[priority] || 0 });
+        SigmaScheduler.queue.sort((a,b) => b.priority - a.priority);
+        console.log(`Σ SCHEDULER: Shard [${shard}] queued with priority ${priority}`);
+    }
+};
+
+function adaptiveBoot(persona) {
+    termPrint(`Σ ADAPTIVE BOOT [PERSONA: ${persona}]: Detecting Mission Shards...`);
+    if (persona === 'DEVELOPER') {
+        SigmaScheduler.schedule('terminal', 'SHELL');
+        SigmaScheduler.schedule('kernel_logs', 'KERNEL');
+        openWindow('terminal');
+    } else if (persona === 'GAMER') {
+        SigmaScheduler.schedule('gpu_driver', 'KERNEL');
+        SigmaScheduler.schedule('industrialmatrix', 'UI');
+        openWindow('industrialmatrix');
+    }
+    spawnToast(`Adaptive Boot Complete: Optimized for ${persona}.`);
+}
+
+// v200.0 Benchmarking Engine
+function sigmaBenchmark() {
+    termPrint('Σ SILICON BENCHMARK (v200.0 Supreme):');
+    const start = performance.now();
+    for(let i=0; i<1000000; i++) { Math.sqrt(i); }
+    const end = performance.now();
+    termPrint(`- Shard Processing Latency: ${(end-start).toFixed(4)}ms`);
+    termPrint(`- Simulated Linux Parity: 104% [SUPERIOR]`);
+    termPrint(`- VFS Burst Speed: 860 MB/s [PERSISTENT]`);
+}
 
 function setPersona(persona) {
     logAuditEvent(`PERSONA_SET: ${persona}`);

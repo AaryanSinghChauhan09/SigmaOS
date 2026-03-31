@@ -94,8 +94,17 @@ int sigma_streq(const char* s1, const char* s2) {
     return (s1[i] == s2[i]) ? SIGMA_TRUE : SIGMA_FALSE;
 }
 
-int sigma_compare(const char* s1, const char* s2) {
-    return sigma_streq(s1, s2);
+void *sigma_memset(void *s, int c, sigma_size_t n) {
+    unsigned char *p = (unsigned char *)s;
+    while (n--) *p++ = (unsigned char)c;
+    return s;
+}
+
+void *sigma_memcpy(void *dest, const void *src, sigma_size_t n) {
+    unsigned char *d = (unsigned char *)dest;
+    const unsigned char *s = (const unsigned char *)src;
+    while (n--) *d++ = *s++;
+    return dest;
 }
 
 /* =========================================================================
