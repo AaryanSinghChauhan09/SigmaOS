@@ -746,3 +746,25 @@ body.mode-nix {
   font-family: var(--font-mono);
   font-size: 13px;
 }
+
+/* v180.0 ASCII Fallback Mode */
+body.mode-ascii {
+    font-family: 'Courier New', Courier, monospace !important;
+    filter: sepia(1) grayscale(1) brightness(0.8) contrast(1.2);
+}
+body.mode-ascii * {
+    background: transparent !important;
+    border-radius: 0 !important;
+    box-shadow: none !important;
+    backdrop-filter: none !important;
+    -webkit-backdrop-filter: none !important;
+}
+body.mode-ascii .window {
+    border: 1px solid var(--accent-primary) !important;
+}
+body.mode-ascii #taskbar,
+body.mode-ascii #top-bar,
+body.mode-ascii #dock {
+    border-top: 1px dashed var(--accent-primary) !important;
+    background: #000 !important;
+}

@@ -987,7 +987,11 @@ const COMMANDS = {
                 termPrint('- [!] VFS cache at 82%. Recommend "clear" or "VFS cleanup".');
                 break;
             case 'system':
-                if (args[1] === 'bare-metal') {
+                if (args[1] === 'ascii-mode') {
+                    document.body.classList.toggle('mode-ascii');
+                    spawnToast(`ASCII UI Mode: ${document.body.classList.contains('mode-ascii') ? 'ENABLED' : 'DISABLED'}`);
+                    return;
+                } else if (args[1] === 'bare-metal') {
                     termPrint('Σ BARE-METAL TRANSITION: Purging POSIX abstractions...');
                     const bar = document.getElementById('taskbar');
                     if (bar) bar.style.display = 'none';
@@ -996,15 +1000,22 @@ const COMMANDS = {
                     document.body.className = 'mode-noir';
                     spawnToast('BARE-METAL MODE ACTIVE: [ZENITH_CORE_ONLY]');
                     return;
-                } else if (args[1] === 'power-save') {
-                    document.body.style.filter = args[2] === 'on' ? 'brightness(0.6)' : 'none';
-                    return;
                 }
-                termPrint('Usage: sigmactl system bare-metal | power-save <on|off>');
+                termPrint('Usage: sigmactl system ascii-mode | bare-metal');
+                break;
+            case 'boot':
+                termPrint('Σ SIGMABOOT v1.0 (Lattice-PQC Encrypted)');
+                termPrint('1. SigmaOS Zenith (Default)');
+                termPrint('2. Windows Shard (Chainload)');
+                termPrint('3. EFI Shell');
+                if (args[1] === 'windows') {
+                    termPrint('Chainloading Windows Shard... Handing off TSC to BIOS...');
+                    setTimeout(() => location.reload(), 2000);
+                }
                 break;
             case 'config':
                 if (args[1] === 'load') {
-                    const conf = VFS.read('/etc/sigmaos.conf') || 'VERSION=170.0\nTHEME=ZENITH_GOLD\nLOW_DEP=TRUE';
+                    const conf = VFS.read('/etc/sigmaos.conf') || 'VERSION=180.0\nTHEME=ZENITH_GOLD\nLOW_DEP=TRUE';
                     termPrint('Σ MOUNTING RAW CONFIG (/etc/sigmaos.conf):');
                     termPrint(conf);
                     return;
@@ -1014,27 +1025,28 @@ const COMMANDS = {
             case 'kernel':
                 termPrint('Σ SILICON DRIVERS: [GPU_ASM], [NET_RAW], [MEM_LEAN]');
                 termPrint('- TSC Timer: ' + performance.now());
-                termPrint('- Interrupts: OK | Paging: IDENTITY');
-                break;
-            case 'macro':
-                if (args[1] === 'run' && args[2]) {
-                    executeMacro(args[2].toUpperCase());
-                } else {
-                    termPrint('Usage: sigmactl macro run <NAME>');
-                }
-                break;
-            case 'remote':
-                termPrint(`Σ REMOTE BRIDGE: Connecting to ${args[1] || 'Sovereign-Node-1'}...`);
-                setTimeout(() => termPrint(`[SECURE]: Handshake Complete. P2P Tunnel Established.`), 1000);
-                break;
-            case 'trigger':
-                termPrint('EVENT TRIGGERS ACTIVE: [on_boot], [on_network_detection]');
+                termPrint('- Ring Buffer State: 1024/1024 [OPTIMIZED]');
                 break;
             default:
                 termPrint(`sigmactl: unknown command: ${sub}`);
         }
     }
 };
+
+class SigmaRingBuffer {
+    constructor(size) {
+        this.buffer = new Array(size);
+        this.pos = 0;
+        this.size = size;
+    }
+    push(item) {
+        this.buffer[this.pos] = item;
+        this.pos = (this.pos + 1) % this.size;
+    }
+    get() { return this.buffer; }
+}
+
+const termBuffer = new SigmaRingBuffer(100);
 
 function parseConf(data) {
     const lines = data.split('\n');
