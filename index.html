@@ -26,6 +26,9 @@
             <div class="top-item" title="Sovereign Sentinel Status">
                 <div class="status-chip" id="sentinel-status"><div class="pulse sentinel-pulse"></div> SENTINEL: ARMED</div>
             </div>
+            <div class="top-item" title="Universal Distro Sharding" onclick="openWindow('sharding')">
+                <div id="active-mode-chip" class="status-chip mode-chip">MODE: ZENITH</div>
+            </div>
             <div class="top-item" title="Market Crushing Matrix" onclick="openWindow('matrix')">
                 <div class="status-chip matrix-chip">📊 MARKET MATRIX</div>
             </div>
@@ -197,7 +200,7 @@
                 </div>
             </div>
             <div class="win-content u-text-center">
-                <div id="pqc-chart" style="height: 120px; background: rgba(0,210,255,0.05); border: 1px solid var(--accent-glow); margin-bottom: 10px; display: flex; align-items: flex-end; gap: 2px;"></div>
+                <div id="pqc-chart" class="pqc-monitor-shard"></div>
                 <div class="u-accent-text u-bold">ENTROPY LEVEL: <span id="pqc-entropy">94.8%</span></div>
                 <div class="u-muted-text u-font-size-xxs u-margin-t-5">ALGORITHM: Sovereign-Kyber-v2</div>
             </div>
@@ -212,7 +215,10 @@
                     <div class="win-btn win-close" data-action="close" data-win="files"></div>
                 </div>
             </div>
-            <div class="win-content" id="file-grid"></div>
+            <div class="win-content">
+                <div id="vfs-breadcrumbs" class="u-margin-b-10 u-font-size-xs u-accent-text u-bold">~ / root</div>
+                <div id="file-grid" class="distro-grid"></div>
+            </div>
         </section>
 
         <!-- APP STORE / REPOSITORY WINDOW -->
@@ -242,7 +248,46 @@
                 <div id="service-list" class="u-font-code u-font-size-xs"></div>
             </div>
         </section>
-        <!-- DISTRO RUNNER WINDOW (ZERO-DOWNLOAD LOCAL EXECUTION) -->
+        <!-- UNIVERSAL DISTRO SHARDING WINDOW -->
+        <section id="win-sharding" class="window hidden win-sysinfo-default">
+            <div class="win-header">
+                <div class="win-title">🌌 Universal Distro Sharding (USP Absorption)</div>
+                <div class="win-controls">
+                    <div class="win-btn win-min" data-action="minimize" data-win="sharding"></div>
+                    <div class="win-btn win-close" data-action="close" data-win="sharding"></div>
+                </div>
+            </div>
+            <div class="win-content">
+                <div class="distro-grid">
+                    <div class="distro-card" onclick="switchMode('ZENITH')">
+                        <div class="u-font-size-md">Σ ZENITH</div>
+                        <div class="u-font-size-xxs">Default Sovereign</div>
+                    </div>
+                    <div class="distro-card" onclick="switchMode('UBUNTU')">
+                        <div class="u-font-size-md">🟣 UBUNTU</div>
+                        <div class="u-font-size-xxs">Elite Dashboard</div>
+                    </div>
+                    <div class="distro-card" onclick="switchMode('KALI')">
+                        <div class="u-font-size-md">🐲 KALI</div>
+                        <div class="u-font-size-xxs">Penetration Shard</div>
+                    </div>
+                    <div class="distro-card" onclick="switchMode('ALPINE')">
+                        <div class="u-font-size-md">🏔️ ALPINE</div>
+                        <div class="u-font-size-xxs">Performance Shard</div>
+                    </div>
+                    <div class="distro-card" onclick="switchMode('ARCH')">
+                        <div class="u-font-size-md">🟦 ARCH</div>
+                        <div class="u-font-size-xxs">Sovereign Master</div>
+                    </div>
+                    <div class="distro-card" onclick="switchMode('NIX')">
+                        <div class="u-font-size-md">❄️ NIX</div>
+                        <div class="u-font-size-xxs">Declarative Shard</div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- DISTRO RUNNER WINDOW -->
         <section id="win-runner" class="window hidden win-distro-default">
             <div class="win-header">
                 <div class="win-title">⚡ Sovereign Distro Runner (v86 Sharding)</div>
@@ -690,6 +735,9 @@
         </div>
         <div class="dock-item" data-window="pqc-sentinel" data-label="PQC Sentinel">
             <svg viewBox="0 0 24 24"><path d="M12 1L3 5v6c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V5l-9-4zm-2 16l-4-4 1.41-1.41L10 14.17l6.59-6.59L18 9l-8 8z"/></svg>
+        </div>
+        <div class="dock-item" data-window="updates" data-label="Software Updater">
+            <svg viewBox="0 0 24 24"><path d="M12 4V1L8 5l4 4V6c3.31 0 6 2.69 6 6 0 1.01-.25 1.97-.7 2.8l1.46 1.46C19.54 15.03 20 13.57 20 12c0-4.42-3.58-8-8-8zm-1.46 6.1L9.08 8.64C8.41 9.61 8 10.76 8 12c0 4.42 3.58 8 8 8v3l4-4-4-4v3c-3.31 0-6-2.69-6-6 0-1.01.25-1.97.7-2.8z"/></svg>
         </div>
         <div class="dock-item" data-window="camera" data-label="Camera Shard">
             <svg viewBox="0 0 24 24"><path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/></svg>

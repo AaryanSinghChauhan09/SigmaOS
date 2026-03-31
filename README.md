@@ -42,6 +42,18 @@
 
 ---
 
+## 🌌 UNIVERSAL DISTRO ABSORPTION (v150.9)
+
+SigmaOS can now **absorb and shard** the characteristics of major Linux distributions, allowing the system to run in various operational modes:
+- **Σ ZENITH**: Default industrial sovereignty.
+- **🟣 UBUNTU**: Elite dashboard and Yaru-Gold aesthetics.
+- **🐲 KALI**: Penetration testing environment and high-stealth shards.
+- **🏔️ ALPINE**: Minimalist, high-performance execution.
+- **🟦 ARCH**: Sovereign package mastery and rolling-release sharding.
+- **❄️ NIX**: Declarative, immutable configuration shards.
+
+---
+
 ## 🚀 GETTING STARTED
 
 1. **Zenith Dashboard**: Open `index.html` to launch the premium **Ubuntu-Elite** interface.

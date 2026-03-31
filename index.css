@@ -567,3 +567,45 @@ body {
   background: rgba(255, 255, 255, 0.08);
   border-color: var(--glass-border);
 }
+
+
+.pqc-monitor-shard {
+  height: 120px;
+  background: rgba(0, 210, 255, 0.05);
+  border: 1px solid var(--accent-glow);
+  margin-bottom: 10px;
+  display: flex;
+  align-items: flex-end;
+  gap: 2px;
+}
+
+/* Distribution Sharding Modes */
+body.mode-ubuntu {
+  --accent-primary: #e95420;
+  --accent-glow: rgba(233, 84, 32, 0.5);
+  background: linear-gradient(135deg, #2c001e 0%, #5e2750 100%);
+}
+
+body.mode-kali {
+  --accent-primary: #2a3b4c;
+  --accent-glow: rgba(42, 59, 76, 0.5);
+  background: #111;
+}
+
+body.mode-alpine {
+  --accent-primary: #ffffff;
+  --accent-glow: rgba(255, 255, 255, 0.5);
+  background: #0d1821;
+}
+
+body.mode-arch {
+  --accent-primary: #1793d1;
+  --accent-glow: rgba(23, 147, 209, 0.5);
+}
+
+body.mode-nix {
+  --accent-primary: #7ebae4;
+  --accent-glow: rgba(126, 186, 228, 0.5);
+}
+
+.mode-transition { transition: all 0.5s ease; }

@@ -625,22 +625,32 @@ function startDistroStream(id) {
 function initVFSView() {
     const grid = document.getElementById('file-grid');
     if (!grid) return;
-    const files = [
-        { name: 'kernel', type: 'dir', icon: '📂' },
-        { name: 'drivers', type: 'dir', icon: '📂' },
-        { name: 'userland', type: 'dir', icon: '📂' },
-        { name: 'sigma_core.asm', type: 'file', icon: '📄' },
-        { name: 'boot_master.c', type: 'file', icon: '📄' },
-        { name: 'config.sys', type: 'file', icon: '⚙️' }
-    ];
+    const target = VFS[terminalCwd] || VFS['/root'];
     grid.innerHTML = '';
-    files.forEach(f => {
+    target.forEach(name => {
+        const isDir = !name.includes('.');
         const el = document.createElement('div');
         el.className = 'distro-card';
         el.style.padding = '10px';
-        el.innerHTML = `<div style="font-size: 2rem">${f.icon}</div><div class="u-font-size-xs">${f.name}</div>`;
+        el.innerHTML = `<div style="font-size: 2rem">${isDir ? '📂' : '📄'}</div><div class="u-font-size-xs">${name}</div>`;
+        el.onclick = () => {
+            if (isDir) {
+                const newPath = terminalCwd + (terminalCwd.endsWith('/') ? '' : '/') + name;
+                if (VFS[newPath]) {
+                    terminalCwd = newPath;
+                    initVFSView();
+                    updateBreadcrumbs();
+                    document.querySelector('.term-prompt').textContent = `root@sigmaos:${terminalCwd.replace('/root', '~')}#`;
+                }
+            }
+        };
         grid.appendChild(el);
     });
+}
+
+function updateBreadcrumbs() {
+    const b = document.getElementById('vfs-breadcrumbs');
+    if (b) b.textContent = terminalCwd.replace('/root', '~').split('/').join(' / ');
 }
 
 function initRepoView() {
@@ -925,6 +935,30 @@ function initPQCSentinel() {
         chart.appendChild(bar);
         if (chart.children.length > 50) chart.removeChild(chart.firstChild);
     }, 500);
+}
+
+function switchMode(mode) {
+    activeMode = mode;
+    const chip = document.getElementById('active-mode-chip');
+    if (chip) chip.textContent = 'MODE: ' + mode;
+    
+    // Aesthetic Absorption
+    document.body.className = 'mode-' + mode.toLowerCase();
+    
+    // Functional Sharding
+    if (mode === 'KALI') {
+        spawnToast('Dragon Shard: Penetration Tools ARMED.');
+        document.querySelector('.term-prompt').textContent = 'kali@sigmaos:~$ ';
+    } else if (mode === 'ALPINE') {
+        spawnToast('Minimalist Shard: Performance Optimizing...');
+        document.querySelector('.term-prompt').textContent = 'alpine-sigmaos:/# ';
+    } else if (mode === 'ARCH') {
+        spawnToast('Arch Shard: Sovereign Master Handover.');
+        document.querySelector('.term-prompt').textContent = '[arch@sigmaos ~]$ ';
+    } else {
+        spawnToast('Zenity Shard: Default Sovereignty.');
+        document.querySelector('.term-prompt').textContent = `root@sigmaos:${terminalCwd.replace('/root', '~')}#`;
+    }
 }
 function initSovereignCamera() {
     const video = document.getElementById('camera-stream');
