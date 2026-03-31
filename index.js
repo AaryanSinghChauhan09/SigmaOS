@@ -1048,17 +1048,42 @@ class SigmaRingBuffer {
 
 const termBuffer = new SigmaRingBuffer(100);
 
-function parseConf(data) {
-    const lines = data.split('\n');
-    const config = {};
-    lines.forEach(line => {
-        if (line.includes('=') && !line.startsWith('#')) {
-            const [k, v] = line.split('=');
-            config[k.trim()] = v.trim();
-        }
-    });
-    return config;
-}
+// SigmaOS Industrial Masterpiece v190.0: Self-Healing & Sovereign Crypto
+const SigmaErrorCore = {
+    report: (origin, error) => {
+        const msg = `Σ CRITICAL [${origin}]: ${error}`;
+        console.error(msg);
+        logAuditEvent(`FAIL: ${origin} - ${error}`);
+        termPrint(msg);
+        spawnToast(`System Error: ${origin} has faulted.`);
+    },
+    panic: (msg) => {
+        document.body.innerHTML = `<div style="background:#800;color:#fff;padding:50px;font-family:monospace;">Σ KERNEL PANIC: ${msg}<br><br>Silicon execution halted. Reboot required.</div>`;
+    }
+};
+
+const SigmaWatchdog = {
+    interval: null,
+    start: () => {
+        SigmaWatchdog.interval = setInterval(() => {
+            console.log('Σ WATCHDOG: Checking silicon health...');
+            if (!document.getElementById('terminal')) {
+                SigmaErrorCore.report('WATCHDOG', 'Terminal Shard Lost. Restarting...');
+                openWindow('terminal');
+            }
+        }, 5000);
+    },
+    stop: () => clearInterval(SigmaWatchdog.interval)
+};
+
+const SigmaCrypto = {
+    encrypt: (data, key) => {
+        return data.split('').map((char, i) => String.fromCharCode(char.charCodeAt(0) ^ key.charCodeAt(i % key.length))).join('');
+    }
+};
+
+// Auto-start Watchdog
+SigmaWatchdog.start();
 
 function setPersona(persona) {
     logAuditEvent(`PERSONA_SET: ${persona}`);
