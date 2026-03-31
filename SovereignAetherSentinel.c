@@ -9,24 +9,37 @@
  * =========================================================================
  */
 
-extern void sigma_sentinel_init(void);
+#define MAX_TRAP_HISTORY 128
 
 typedef struct SovereignAetherSentinel {
     sigma_u32 global_errors_resolved;
     sigma_bool autonomous_mode;
     sigma_u64 last_fault_addr;
+    sigma_u64 trap_history[MAX_TRAP_HISTORY];
+    sigma_u32 trap_index;
 } SovereignAetherSentinel;
 
 void SovereignAetherSentinel_init(SovereignAetherSentinel* self) {
     self->global_errors_resolved = 0;
     self->autonomous_mode = SIGMA_TRUE;
     self->last_fault_addr = 0;
-    sigma_sentinel_init();
+    self->trap_index = 0;
+    sigma_memset(self->trap_history, 0, sizeof(sigma_u64) * MAX_TRAP_HISTORY);
+    sigma_printf("[SENTINEL]: Aether Sentinel Heuristics Engine Initialized Natively.\n");
 }
 
 void SovereignAetherSentinel_HandleTrap(SovereignAetherSentinel* self, sigma_u64 trap_id, sigma_u64 rip) {
-    sigma_printf("[SENTINEL]: CPU TRAP %llx INTERCEPTED at RIP: %llx\n", trap_id, rip);
+    sigma_printf("[SENTINEL]: CPU TRAP %llu INTERCEPTED at RIP: %p\n", trap_id, (void*)rip);
     sigma_printf("[SENTINEL]: Initiating AUTONOMOUS HEALING sequences...\n");
+    
+    // Algorithm: Record trap state dynamically without allocations
+    if (self->trap_index < MAX_TRAP_HISTORY) {
+        self->trap_history[self->trap_index] = rip;
+        self->trap_index++;
+    } else {
+        self->trap_index = 0; 
+        self->trap_history[0] = rip;
+    }
     
     /* Simulate silicon-rollback to a known good state */
     sigma_printf("[SENTINEL]: Executing SILICON-ROLLBACK [T-1] for Shard ID: 0x3f\n");

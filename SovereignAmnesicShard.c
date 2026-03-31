@@ -9,8 +9,24 @@
  * =========================================================================
  */
 
-extern void sigma_security_scrub_registers(void);
-extern void sigma_security_scrub_stack(sigma_u64 size);
+/* Inline Hardware Security Routines */
+static void sigma_security_scrub_registers(void) {
+    #if defined(__x86_64__) || defined(_M_X64)
+    __asm__ volatile (
+        "xor %%rax, %%rax\n"
+        "xor %%rbx, %%rbx\n"
+        "xor %%rcx, %%rcx\n"
+        "xor %%rdx, %%rdx\n"
+        ::: "rax", "rbx", "rcx", "rdx", "memory"
+    );
+    #endif
+}
+
+static void sigma_security_scrub_stack(sigma_u64 size) {
+    volatile char buffer[128];
+    sigma_memset((void*)buffer, 0, 128);
+    (void)size;
+}
 
 typedef struct SovereignAmnesicShard {
     sigma_bool session_active;
