@@ -709,6 +709,29 @@
                      <button class="status-chip" onclick="executeLogicScript()">Execute Playbook</button>
                 </div>
             </div>
+        <!-- ═══════════════════════════════════════════════════════════
+             UNIVERSAL WEB SHARD (BROWSER-IN-BROWSER)
+             ═══════════════════════════════════════════════════════════ -->
+        <section id="win-web" class="window hidden">
+            <div class="win-title-bar">
+                <div class="win-title">🌐 Universal Web Shard (Distro Connectivity)</div>
+                <div class="win-controls">
+                    <div class="win-btn win-min" data-action="minimize" data-win="web"></div>
+                    <div class="win-btn win-close" data-action="close" data-win="web"></div>
+                </div>
+            </div>
+            <div class="win-content u-flex-column u-padding-10">
+                <div class="web-nav">
+                    <input type="text" id="web-url-input" class="web-url-input" placeholder="https://distrosea.com..." value="https://distrosea.com">
+                    <button class="web-btn" onclick="loadWebShard()">GO</button>
+                    <div class="u-divider-v"></div>
+                    <button class="web-btn u-muted-bg" onclick="document.getElementById('web-url-input').value='https://distrosea.com';loadWebShard()">DistroSea</button>
+                    <button class="web-btn u-muted-bg" onclick="document.getElementById('web-url-input').value='https://copy.sh/v86/';loadWebShard()">v86</button>
+                </div>
+                <div class="web-frame-container">
+                    <iframe id="web-frame" title="Universal Web Shard - Industrial Browser Distro Stream" class="web-frame" src="https://distrosea.com"></iframe>
+                </div>
+            </div>
         </section>
 
     </main>
@@ -749,6 +772,9 @@
         </div>
         <div class="dock-item" data-window="sysinfo" data-label="Metrics System">
             <svg viewBox="0 0 24 24"><path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-2 10h-4v4h-2v-4H7v-2h4V7h2v4h4v2z"/></svg>
+        </div>
+        <div class="dock-item" data-window="web" data-label="Browser Shard">
+            <svg viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 17.93c-3.95-.49-7-3.85-7-7.93 0-.62.08-1.21.21-1.79L9 15v1c0 1.1.9 2 2 2v1.93zm6.9-2.54c-.26-.81-1-1.39-1.9-1.39h-1v-3c0-.55-.45-1-1-1H8v-2h2c.55 0 1-.45 1-1V7h2c1.1 0 2-.9 2-2v-.41c2.93 1.19 5 4.06 5 7.41 0 2.08-.8 3.97-2.1 5.39z"/></svg>
         </div>
         <div class="dock-item" data-window="help" data-label="Wiki System">
             <svg viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 17h-2v-2h2v2zm2.07-7.75l-.9.92C13.45 12.9 13 13.5 13 15h-2v-.5c0-1.1.45-2.1 1.17-2.83l1.24-1.26c.37-.36.59-.86.59-1.41 0-1.1-.9-2-2-2s-2 .9-2 2H8c0-2.21 1.79-4 4-4s4 1.79 4 4c0 .88-.36 1.68-.93 2.25z"/></svg>

@@ -662,3 +662,77 @@ body.mode-nix {
   padding: 8px;
   border-radius: 4px;
 }
+
+#win-web {
+  width: 850px;
+  height: 550px;
+  left: 15%;
+  top: 15%;
+}
+
+.u-divider-v {
+  width: 1px;
+  height: 20px;
+  background: rgba(255, 255, 255, 0.1);
+  margin: 0 5px;
+}
+
+.u-muted-bg {
+  background: rgba(255, 255, 255, 0.05) !important;
+  color: #ccc !important;
+}
+
+.u-muted-bg:hover {
+  background: rgba(255, 255, 255, 0.1) !important;
+  color: white !important;
+}
+
+/* Industrial Kiosk Mode (Porteus Parity) */
+.mode-kiosk #top-bar,
+.mode-kiosk #dock {
+  display: none !important;
+}
+
+.mode-kiosk #workspace {
+  position: fixed;
+  top: 0 !important;
+  left: 0;
+  right: 0;
+  bottom: 0 !important;
+  overflow: hidden;
+}
+
+/* Web Shard (Browser-in-Browser) */
+.web-frame-container {
+  width: 100%;
+  height: calc(100% - 50px);
+}
+
+.web-frame {
+  width: 100%;
+  height: 100%;
+  border: none;
+  background: white;
+  border-radius: 4px;
+}
+
+.web-nav {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 10px;
+  background: rgba(255, 255, 255, 0.05);
+  padding: 8px;
+  border-radius: 6px;
+  align-items: center;
+}
+
+.web-url-input {
+  flex: 1;
+  background: rgba(0, 0, 0, 0.3);
+  border: 1px solid var(--glass-border);
+  color: white;
+  padding: 5px 12px;
+  border-radius: 4px;
+  font-family: var(--font-mono);
+  font-size: 13px;
+}

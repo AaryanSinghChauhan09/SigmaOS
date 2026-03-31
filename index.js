@@ -100,7 +100,8 @@ const THEMES = [
     { id: 'zenith', name: 'Zenith-Default', primary: '#00d2ff', blur: '20px' },
     { id: 'crimson', name: 'Hacker-Crimson', primary: '#ff0033', blur: '10px' },
     { id: 'lupus', name: 'Lupus-Minimal', primary: '#ffffff', blur: '5px' },
-    { id: 'noir', name: 'OLED-Noir', primary: '#111111', blur: '0px' }
+    { id: 'noir', name: 'OLED-Noir', primary: '#111111', blur: '0px' },
+    { id: 'alpine', name: 'Alpine-Lite', primary: '#0d192e', blur: '2px' }
 ];
 
 const VMS = [
@@ -1160,8 +1161,13 @@ function switchMode(mode) {
     } else if (mode === 'UBUNTU') {
         spawnToast('Elite Desktop Shard: Industrial Efficiency.');
         if (prompt) prompt.textContent = 'ubuntu@sigmaos:~$ ';
+    } else if (mode === 'KIOSK') {
+        spawnToast('Industrial Kiosk Active: Total Focus Shard.');
+        document.body.classList.add('mode-kiosk');
+        openWindow('terminal');
     } else {
         spawnToast('Zenith Shard: Default Sovereignty.');
+        document.body.classList.remove('mode-kiosk');
         if (prompt) prompt.textContent = `root@sigmaos:${terminalCwd.replace('/root', '~')}#`;
     }
 }
@@ -1186,6 +1192,20 @@ function sendAIMessage() {
 }
 
 window.sendAIMessage = sendAIMessage;
+
+function loadWebShard() {
+    const input = document.getElementById('web-url-input');
+    const frame = document.getElementById('web-frame');
+    if (!input || !frame) return;
+    
+    let url = input.value.trim();
+    if (!url.startsWith('http')) url = 'https://' + url;
+    
+    frame.src = url;
+    spawnToast('Loading Universal Web Shard: ' + url);
+}
+
+window.loadWebShard = loadWebShard;
 
 function initSovereignCamera() {
     const video = document.getElementById('camera-stream');
