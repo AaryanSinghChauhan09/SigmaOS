@@ -1,0 +1,1 @@
+; ASM Shard Template\nsection .text\nglobal _start\n_start:\n    ; Silicon logic goes here\n    mov eax, 1\n    int 0x80

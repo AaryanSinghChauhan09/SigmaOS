@@ -58,8 +58,9 @@ SigmaOS includes a built-in management utility. Open the terminal and use:
 - `sigmactl list`: View all active system shards.
 - `sigmactl audit`: Review the industrial security logs.
 - `sigmactl health`: Check silicon-level telemetry.
-- `sigmactl profile switch <MODE>`: Toggle between Developer, Gaming, and Minimal environments.
-- `sigmactl macro run <NAME>`: Execute complex automation workflows (e.g. DEV_READY).
+- `sigmactl status --live`: Show real-time system performance and VFS health.
+- `sigmactl persona set <ROLE>`: Apply role-based environments (Developer/Gamer/Researcher).
+- `sigmactl suggest performance`: Get AI-assisted recommendations to optimize the OS.
 
 ---
 
@@ -67,8 +68,9 @@ SigmaOS includes a built-in management utility. Open the terminal and use:
 
 - [x] v152.0: Persistent VFS & Industrial Shell.
 - [x] v153.0: Site Sharding & Sovereign Cloud Hub.
-- [x] v154.0: **Industrial Profiles & Automation Macros**.
-- [ ] v155.0: **Peer-to-Peer Shard Sharing** (Planned).
+- [x] v154.0: Industrial Profiles & Automation Macros.
+- [x] v155.0: **Industrial Orchestration & Personas (Zenith Masterpiece)**.
+- [ ] v156.0: **Peer-to-Peer Shard Sharing** (Planned).
 - [ ] v155.0: **Sovereign VPN & Privacy Matrix** (Planned).
 
 ---

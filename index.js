@@ -944,7 +944,7 @@ const COMMANDS = {
         spawnToast('Aether Customization: Accent Shard Updated to ' + args[0]);
     },
     sigmactl: (args) => {
-        if (!args[0]) return termPrint('Usage: sigmactl <list|audit|health|profile|macro|trigger>');
+        if (!args[0]) return termPrint('Usage: sigmactl <list|audit|health|profile|macro|trigger|status|persona|suggest>');
         const sub = args[0].toLowerCase();
         
         switch(sub) {
@@ -952,7 +952,7 @@ const COMMANDS = {
                 termPrint('ACTIVE SYSTEM SHARDS (VFS PERSISTENT):');
                 termPrint('- Kernel: Σ-Zenith-6.8');
                 termPrint('- Storage: SovereignVFS v151');
-                termPrint('- UI: Zenith Dashboard v154.0');
+                termPrint('- UI: Zenith Dashboard v155.0');
                 termPrint('- AI: Neural Matrix v94');
                 break;
             case 'audit':
@@ -964,29 +964,75 @@ const COMMANDS = {
                 termPrint('SILICON TELEMETRY (TSC):');
                 termPrint(`Uptime: ${sysUptime}s | CPU Load: ${cpuVal.textContent} | VFS Integrity: 100%`);
                 break;
-            case 'profile':
-                if (args[1] === 'switch' && args[2]) {
-                    const profile = args[2].toUpperCase();
-                    switchProfile(profile);
+            case 'status':
+                if (args[1] === '--live') {
+                    termPrint('Σ LIVE INDUSTRIAL METRICS:');
+                    termPrint(`- Latency: ${Math.random().toFixed(2)}ms`);
+                    termPrint(`- VFS State: ${localStorage.length} Entries [PERSISTENT]`);
+                    termPrint(`- Health: OK | TSC Sharding: Active`);
+                    return;
+                }
+                termPrint('Usage: sigmactl status --live');
+                break;
+            case 'persona':
+                if (args[1] === 'set' && args[2]) {
+                    setPersona(args[2].toUpperCase());
                 } else {
-                    termPrint('Usage: sigmactl profile switch <DEVELOPER|GAMING|MINIMAL>');
+                    termPrint('Usage: sigmactl persona set <RESEARCHER|GAMER|DEVELOPER>');
                 }
                 break;
-            case 'macro':
-                if (args[1] === 'run' && args[2]) {
-                    executeMacro(args[2].toUpperCase());
-                } else {
-                    termPrint('Usage: sigmactl macro run <DEV_READY|SYS_CHECK>');
+            case 'suggest':
+                if (args[1] === 'performance') {
+                    termPrint('Σ AI RECOMMENDATIONS (PERFORMANCE):');
+                    termPrint('- [!] Shard "Voice" is consuming memory. Recommend "sigmactl reboot shard voice".');
+                    termPrint('- [!] VFS cache at 82%. Recommend "clear" or "VFS cleanup".');
+                    termPrint('- [!] Shard "Web" detected latency. Scaling back CSS blurs...');
                 }
                 break;
             case 'trigger':
-                termPrint('EVENT TRIGGERS ACTIVE: [NETWORK_UP], [VFS_MOUNT], [SHARD_CRASH]');
+                termPrint('EVENT TRIGGERS ACTIVE: [on_boot], [on_network_up], [on_shard_crash]');
                 break;
             default:
                 termPrint(`sigmactl: unknown command: ${sub}`);
         }
     }
 };
+
+function setPersona(persona) {
+    logAuditEvent(`PERSONA_SET: ${persona}`);
+    if (persona === 'RESEARCHER') {
+        executeMacro('SYS_CHECK');
+        openWindow('web');
+        document.body.className = 'mode-nix';
+        spawnToast('Sovereign Researcher Persona Applied: Distro-Matrix Active.');
+    } else if (persona === 'GAMER') {
+        document.body.className = 'mode-crimson';
+        openWindow('industrialmatrix');
+        spawnToast('Extreme Performance Gamer Persona Applied.');
+    } else if (persona === 'DEVELOPER') {
+        switchMode('KALI');
+        executeMacro('DEV_READY');
+        spawnToast('Sovereign Developer Persona Applied: Root Access Secured.');
+    } else {
+        termPrint(`Unknown persona: ${persona}`);
+    }
+}
+
+function triggerEvent(event) {
+    console.log(`Σ INTERRUPT [${event}]: Triggering Sovereign Hooks...`);
+    logAuditEvent(`EVENT_TRIGGER: ${event}`);
+    if (event === 'on_boot') {
+        if (navigator.onLine) {
+            setTimeout(() => {
+                spawnToast('Network Shard Active: Mounting Cloud Hub...');
+                openWindow('cloud');
+            }, 2000);
+        }
+    }
+}
+
+// System Init Hooks
+setTimeout(() => triggerEvent('on_boot'), 1500);
 
 const MACROS = {
     'DEV_READY': ['OPEN_WINDOW terminal', 'OPEN_WINDOW web', 'LOAD_URL https://github.com', 'SET_THEME noir'],
