@@ -1072,6 +1072,17 @@ const COMMANDS = {
                 termPrint('Σ UPDATE: Sharding latest Zenith kernel bits...');
                 setTimeout(() => termPrint('Update Complete. System v220.0 Supreme Active.'), 1000);
                 break;
+            case 'ipc':
+                if (args[1] === 'send' && args[2]) SigmaIPC.send('SHELL', args[2], args.slice(3).join(' '));
+                else termPrint('Usage: sigmactl ipc send <SHARD> <MSG>');
+                break;
+            case 'paging':
+                termPrint('Σ RAW VIRTUAL PAGES:');
+                Object.keys(SigmaPaging.pageTable).forEach(s => termPrint(`- ${s}: ${SigmaPaging.pageTable[s].pages} Pages [BASE: 0x${SigmaPaging.pageTable[s].base.toString(16)}]`));
+                break;
+            case 'net':
+                termPrint(`Σ NET-BRIDGE: Sockets Active: ${Object.keys(SigmaNetworkBridge.sockets).length}`);
+                break;
             default:
                 termPrint(`sigmactl: unknown command: ${sub}`);
         }
@@ -1201,6 +1212,41 @@ const SigmaSync = {
     autoBackup: () => {
         termPrint('Σ SYNC: Automatic pre-mission snapshot created.');
         VFS.snapshot('PRE_UPDATE_' + Date.now());
+    }
+};
+
+// SigmaOS v230.0: Industrial Backend Sovereignty (IPC + Paging + Networking)
+const SigmaIPC = {
+    channels: {},
+    send: (from, to, msg) => {
+        if (!SigmaIPC.channels[to]) SigmaIPC.channels[to] = [];
+        SigmaIPC.channels[to].push({ from, msg, time: Date.now() });
+        console.log(`Σ IPC: Message from [${from}] to [${to}] queued.`);
+        logAuditEvent(`IPC_SEND: ${from} -> ${to}`);
+    },
+    recv: (shard) => {
+        return SigmaIPC.channels[shard] ? SigmaIPC.channels[shard].shift() : null;
+    }
+};
+
+const SigmaPaging = {
+    pageTable: {},
+    pageSize: 4096, // 4KB Pages
+    allocate: (shard, size) => {
+        const pages = Math.ceil(size / SigmaPaging.pageSize);
+        SigmaPaging.pageTable[shard] = { pages, base: Math.random() * 0xFFFFFF };
+        console.log(`Σ PAGING: Allocated ${pages} mission pages for shard ${shard}.`);
+    }
+};
+
+const SigmaNetworkBridge = {
+    sockets: {},
+    connect: (dest) => {
+        spawnToast(`SigmaNet: Connecting to silicon cloud [${dest}]...`);
+        return Math.floor(Math.random() * 1000); // Socket handle
+    },
+    send_raw: (handle, data) => {
+        logAuditEvent(`NET_RAW_SEND: ${handle} -> ${data.length} bytes`);
     }
 };
 
