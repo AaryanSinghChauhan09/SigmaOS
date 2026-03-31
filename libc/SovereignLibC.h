@@ -16,6 +16,8 @@ typedef long long          sigma_ssize_t;
 typedef unsigned char      sigma_u8;
 typedef unsigned int       sigma_u32;
 typedef unsigned long long sigma_u64;
+typedef long long          sigma_i64;
+typedef double             sigma_f64;
 typedef int               sigma_bool;
 
 #define SIGMA_TRUE  1
@@ -44,7 +46,12 @@ extern "C" {
     int           sigma_streq(const char* s1, const char* s2);
     int           sigma_compare(const char* s1, const char* s2);
     void          sigma_strcat(char* dest, const char* src);
+    void          sigma_strncat(char* dest, const char* src, sigma_size_t n);
     int           sigma_atoi(const char* s);
+    int           sigma_shm_open(const char* name, int oflag, int mode);
+    int           sigma_shm_unlink(const char* name);
+    int           sigma_ioctl(int fd, unsigned long request, ...);
+    int           sigma_mprotect(void* addr, sigma_size_t len, int prot);
 }
 
 // --- High-Level primitives implemented at Low-Level ---

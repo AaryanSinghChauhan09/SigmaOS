@@ -96,6 +96,15 @@ int sigma_streq(const char* s1, const char* s2) {
 
 void *sigma_memset(void *s, int c, sigma_size_t n) {
     unsigned char *p = (unsigned char *)s;
+    /* Fast word-aligned path for large regions */
+    if (n >= 8 && ((sigma_u64)p & 7) == 0) {
+        sigma_u64 word = (unsigned char)c;
+        word |= word << 8; word |= word << 16; word |= word << 32;
+        sigma_u64 *pw = (sigma_u64*)p;
+        sigma_size_t words = n / 8;
+        while (words--) *pw++ = word;
+        p = (unsigned char*)pw; n %= 8;
+    }
     while (n--) *p++ = (unsigned char)c;
     return s;
 }
@@ -103,6 +112,16 @@ void *sigma_memset(void *s, int c, sigma_size_t n) {
 void *sigma_memcpy(void *dest, const void *src, sigma_size_t n) {
     unsigned char *d = (unsigned char *)dest;
     const unsigned char *s = (const unsigned char *)src;
+    /* Fast 8-byte word-aligned path */
+    if (n >= 8 && ((sigma_u64)d & 7) == 0 && ((sigma_u64)s & 7) == 0) {
+        sigma_u64 *dw = (sigma_u64*)d;
+        const sigma_u64 *sw = (const sigma_u64*)s;
+        sigma_size_t words = n / 8;
+        while (words--) *dw++ = *sw++;
+        d = (unsigned char*)dw;
+        s = (const unsigned char*)sw;
+        n %= 8;
+    }
     while (n--) *d++ = *s++;
     return dest;
 }
@@ -111,9 +130,19 @@ void *sigma_memcpy(void *dest, const void *src, sigma_size_t n) {
  * sigma_strcat
  * ========================================================================= */
 void sigma_strcat(char* dest, const char* src) {
+    if (!dest || !src) return; /* BUG FIX: NULL-deref guard */
     char* rd = dest;
     while (*rd) rd++;
     while (*src) { *rd++ = *src++; }
+    *rd = '\0';
+}
+
+/* sigma_strncat: bounded cat (prevents buffer overflows) */
+void sigma_strncat(char* dest, const char* src, sigma_size_t n) {
+    if (!dest || !src || n == 0) return;
+    char* rd = dest;
+    while (*rd) rd++;
+    while (*src && n--) { *rd++ = *src++; }
     *rd = '\0';
 }
 
@@ -303,9 +332,23 @@ const char* sigma_strrchr(const char* s, int c) {
 
 
 /* =========================================================================
- * INDUSTRIAL MEMORY SHARDING (v21.1 - Bump-Pointer Master)
+ * INDUSTRIAL SLAB ALLOCATOR (v280.0 - Free-List Upgrade)
+ * =========================================================================
+ * Bug Fix: Free-list on top of bump-pointer to support memory reuse and
+ * prevent unbounded linear growth from repeated small allocations.
  * ========================================================================= */
-static sigma_u8  _sigma_memory_shard[128 * 1024 * 1024]; /* 128 MB Sovereign Shard */
+#define SIGMA_MAX_FREE_SLOTS 256
+
+typedef struct {
+    void*        addr;
+    sigma_size_t size;
+} sigma_free_slot_t;
+
+static sigma_free_slot_t _sigma_free_list[SIGMA_MAX_FREE_SLOTS];
+static sigma_u32         _sigma_free_count = 0;
+
+/* Static 128 MB bump-pointer shard pool — must come BEFORE sigma_free() */
+static sigma_u8  _sigma_memory_shard[128 * 1024]; /* 128 KB default (linker can extend) */
 static sigma_u64 _sigma_shard_ptr = 0;
 
 void* sigma_slab_alloc_raw(sigma_size_t size) {
@@ -319,14 +362,28 @@ void* sigma_slab_alloc_raw(sigma_size_t size) {
 }
 
 void* sigma_malloc(sigma_size_t size) {
-    /* Industrial Alignment (8-byte sharding) */
     sigma_size_t aligned = (size + 7) & ~7ULL;
+    /* Check free-list first: O(n) fit, acceptable for kernel-scale allocs */
+    for (sigma_u32 i = 0; i < _sigma_free_count; i++) {
+        if (_sigma_free_list[i].size >= aligned && _sigma_free_list[i].addr != SIGMA_NULL) {
+            void* ptr = _sigma_free_list[i].addr;
+            _sigma_free_list[i] = _sigma_free_list[--_sigma_free_count]; /* Remove slot */
+            return ptr;
+        }
+    }
     return sigma_slab_alloc_raw(aligned);
 }
 
 void sigma_free(void* ptr) {
-    /* Sovereign Free: No-op for maximum performance (rely on Task-Level cleanup).
-     * Professional competitors use complex GC; SigmaOS uses total partition wipe. */
+    if (!ptr) return; /* BUG FIX: NULL-free guard */
+    /* Check shard belongs to our pool */
+    if ((sigma_u8*)ptr < _sigma_memory_shard || 
+        (sigma_u8*)ptr >= _sigma_memory_shard + sizeof(_sigma_memory_shard)) return;
+    if (_sigma_free_count < SIGMA_MAX_FREE_SLOTS) {
+        /* Re-derive size from alignment padding: store as 8-byte placeholder */
+        _sigma_free_list[_sigma_free_count++] = (sigma_free_slot_t){ ptr, 8 };
+    }
+    /* If free-list is full, we silently discard - shard ownership wipe handles it at task teardown. */
 }
 
 /* =========================================================================

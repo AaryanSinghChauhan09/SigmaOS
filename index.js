@@ -13,6 +13,19 @@ let currentWorkspace = 1;
 const WINDOW_WORKSPACES = {}; // Map winId -> workspaceNum
 let activeMode = 'ZENITH';
 
+// --- System Stability & Error Catching (v270.0 Patch) ---
+window.onerror = function(msg, url, lineNo, columnNo, error) {
+    console.error(`Σ FATAL ERROR: ${msg} at ${url}:${lineNo}:${columnNo}`, error);
+    spawnToast(`Kernel Fault Prevented: ${msg}`, 0, true);
+    logAuditEvent(`ERROR_CAUGHT: ${msg}`);
+    return true; // Prevent default browser crash handler
+};
+window.onunhandledrejection = function(event) {
+    console.error(`Σ UNHANDLED PROMISE: ${event.reason}`);
+    spawnToast(`Async Promise Fault: ${event.reason}`, 0, true);
+    return true;
+};
+
 // --- Persistent Sovereign VFS (No Simulation) ---
 class SovereignVFS {
     constructor() {
@@ -1543,15 +1556,25 @@ if (termInput) {
     });
 }
 
-function spawnToast(msg, delay = 0) {
-    setTimeout(() => {
-        const container = document.getElementById('toast-container');
-        const toast = document.createElement('div');
-        toast.className = 'toast';
-        toast.textContent = msg;
-        container.appendChild(toast);
-        setTimeout(() => toast.remove(), 3000);
-    }, delay);
+function spawnToast(msg, delay = 0, isError = false) {
+    queueMicrotask(() => {
+        setTimeout(() => {
+            const container = document.getElementById('toast-container');
+            if (!container) return;
+            // Memory Optimization: Prevent massive toast spamming
+            if (container.children.length > 5) container.removeChild(container.firstChild);
+
+            const toast = document.createElement('div');
+            toast.className = `toast ${isError ? 'toast-error' : ''}`;
+            toast.textContent = msg;
+            if (isError) toast.style.borderLeft = '4px solid #f03';
+            
+            container.appendChild(toast);
+            setTimeout(() => {
+                if(container.contains(toast)) container.removeChild(toast);
+            }, 3500);
+        }, delay);
+    });
 }
 
 // --- Sovereign Industrial Sharding (Memory Logic) ---

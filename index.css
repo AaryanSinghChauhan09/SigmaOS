@@ -460,6 +460,8 @@ html, body {
 .win-pkg-default      { width: 580px; height: 480px; left: 150px; top: 120px; }
 .win-services-default { width: 420px; height: 400px; right: 40px; top: 180px; }
 .win-distro-default   { width: 850px; height: 550px; left: 50%; top: 50%; transform: translate(-50%, -50%); }
+.win-emu-default      { width: 360px; height: 600px; left: 50%; top: 50%; transform: translate(-50%, -50%); }
+.win-emu-icon         { font-size: 64px; margin-bottom: 20px; }
 
 .distro-frame-container { padding: 0; overflow: hidden; display: flex; flex-direction: column; height: 100%; }
 .distro-selector { padding: 16px; display: grid; grid-template-columns: repeat(2, 1fr); gap: 16px; }
