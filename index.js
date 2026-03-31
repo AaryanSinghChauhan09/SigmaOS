@@ -122,6 +122,7 @@ document.addEventListener('DOMContentLoaded', () => {
     initServices();
     initPlugins();
     initUtils();
+    initAdvancedKernel();
     spawnToast('Σ SIGMAOS ZENITH SUPREME INITIALIZED');
     spawnToast('Industrial Shard Mastery Active', 1500);
 });
@@ -868,7 +869,63 @@ function initMetrics() {
     // Overridden by the main implementation above to avoid duplication.
 }
 
-// --- Sovereign Camera (Snapchat/Scratch USP) ---
+function initAdvancedKernel() {
+    initContainerShard();
+    initModuleShard();
+    initPQCSentinel();
+}
+
+function initContainerShard() {
+    const list = document.getElementById('container-list');
+    if (!list) return;
+    const containers = [
+        { id: 'S-88', name: 'Nginx-Sovereign', mem: '124MB', status: 'RUNNING' },
+        { id: 'S-92', name: 'Postgres-Shard', mem: '512MB', status: 'RUNNING' },
+        { id: 'S-41', name: 'Redis-Aether', mem: '64MB', status: 'PAUSED' }
+    ];
+    list.innerHTML = containers.map(c => `
+        <div class="metric-card u-margin-b-5 u-flex-between">
+            <div><span class="u-muted-text">[${c.id}]</span> ${c.name}</div>
+            <div class="u-accent-text u-bold">${c.status}</div>
+        </div>
+    `).join('');
+}
+
+function initModuleShard() {
+    const list = document.getElementById('module-list');
+    if (!list) return;
+    const modules = [
+        { name: 'sigma_net_m', size: '256K', state: 'Live' },
+        { name: 'sigma_fs_ext', size: '128K', state: 'Live' },
+        { name: 'sigma_gpu_accel', size: '1.2M', state: 'Live' },
+        { name: 'sigma_bt_hid', size: '64K', state: 'Idle' }
+    ];
+    list.innerHTML = modules.map(m => `
+        <div class="u-flex-between u-margin-b-5">
+            <span>${m.name}</span>
+            <span class="u-muted-text">${m.size} [${m.state}]</span>
+        </div>
+    `).join('');
+}
+
+function initPQCSentinel() {
+    const chart = document.getElementById('pqc-chart');
+    const entropy = document.getElementById('pqc-entropy');
+    if (!chart) return;
+    
+    setInterval(() => {
+        const val = (94 + Math.random() * 5).toFixed(1);
+        if (entropy) entropy.textContent = val + '%';
+        
+        const bar = document.createElement('div');
+        bar.style.flex = '1';
+        bar.style.height = (val - 90) * 10 + 'px';
+        bar.style.background = 'var(--accent-primary)';
+        bar.style.opacity = '0.7';
+        chart.appendChild(bar);
+        if (chart.children.length > 50) chart.removeChild(chart.firstChild);
+    }, 500);
+}
 function initSovereignCamera() {
     const video = document.getElementById('camera-stream');
     const filterSelect = document.getElementById('camera-filter');
