@@ -43,8 +43,17 @@
   --accent-gradient: linear-gradient(90deg, var(--accent-secondary), var(--accent-primary));
 }
 
-body {
+html, body {
+  margin: 0;
+  padding: 0;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
   background: var(--amoled-dark);
+  font-family: 'Inter', sans-serif;
+  color: var(--text-main);
+  -webkit-user-select: none;
+  user-select: none;
 }
 
 #bg-canvas {
@@ -80,17 +89,17 @@ body {
   top: 0;
   left: 0;
   width: 100%;
-  height: 36px;
-  background: var(--glass-bg);
-  -webkit-backdrop-filter: blur(12px);
-  backdrop-filter: blur(12px);
-  border-bottom: 1px solid var(--glass-border);
+  height: 32px;
+  background: rgba(0, 0, 0, 0.6);
+  -webkit-backdrop-filter: blur(10px);
+  backdrop-filter: blur(10px);
+  border-bottom: 0.5px solid rgba(255, 255, 255, 0.05);
   display: flex;
   align-items: center;
   justify-content: space-between;
   padding: 0 16px;
   z-index: 9999;
-  font-size: 0.85rem;
+  font-size: 0.75rem;
 }
 
 #top-bar-left, #top-bar-right {
@@ -160,25 +169,31 @@ body {
    ═══════════════════════════════════════════════════════════ */
 
 #workspace {
-  position: absolute;
-  top: 36px;
+  position: fixed;
+  top: 32px;
+  left: 0;
+  right: 0;
   bottom: 0;
-  width: 100%;
+  overflow: hidden;
   perspective: 1200px;
 }
 
 .window {
-  background: var(--fluent-acrylic);
-  -webkit-backdrop-filter: blur(var(--glass-blur));
-  backdrop-filter: blur(var(--glass-blur));
-  border: 1px solid var(--fluent-border);
-  border-radius: var(--radius-lg);
-  box-shadow: var(--aqua-shadow);
+  position: absolute;
+  top: 100px;
+  left: 100px;
+  width: 450px;
+  min-height: 200px;
+  background: rgba(10, 12, 18, 0.7);
+  -webkit-backdrop-filter: blur(15px);
+  backdrop-filter: blur(15px);
+  border: 1px solid rgba(227, 176, 75, 0.15);
+  border-radius: 12px;
+  box-shadow: 0 15px 45px rgba(0, 0, 0, 0.7);
   display: flex;
   flex-direction: column;
   overflow: hidden;
-  transition: var(--transition);
-  animation: diffraction-shimmer 10s infinite linear;
+  transition: opacity 0.3s, transform 0.3s;
 }
 
 @keyframes diffraction-shimmer {
@@ -620,4 +635,14 @@ body.mode-nix {
   display: flex;
   align-items: flex-end;
   gap: 2px;
+}
+
+.ai-chat-log {
+  height: 150px;
+  overflow-y: auto;
+  margin-bottom: 10px;
+  font-family: var(--font-main);
+  background: rgba(0, 0, 0, 0.1);
+  padding: 8px;
+  border-radius: 4px;
 }

@@ -16,6 +16,7 @@ SECTION .text
     GLOBAL _sigma_sys_mmap
     GLOBAL _sigma_sys_exit
     GLOBAL _sigma_asm_strlen
+    GLOBAL _sigma_asm_memcpy
 
 ; _sigma_sys_write(rdi: fd, rsi: buf, rdx: count)
 _sigma_sys_write:
@@ -80,4 +81,10 @@ _sigma_asm_strlen:
     inc rax
     jmp .loop
 .done:
+    ret
+
+; _sigma_asm_memcpy(rdi: dest, rsi: src, rdx: count)
+_sigma_asm_memcpy:
+    mov rcx, rdx        ; count
+    rep movsb           ; copy bytes
     ret

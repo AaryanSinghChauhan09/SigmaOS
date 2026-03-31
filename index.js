@@ -579,24 +579,27 @@ function initSpectrumTerminal() {
     const output = document.getElementById('spectrum-output');
     if (!input) return;
 
-    input.addEventListener('keydown', e => {
-        if (e.key === 'Enter') {
-            const val = input.value.trim();
-            const line = document.createElement('div');
-            line.className = 'term-line';
-            line.textContent = 'spectrum@sigma:~$ ' + val;
-            output.appendChild(line);
-            
-            // AI Prediction Simulation
-            const prediction = document.createElement('div');
-            prediction.className = 'term-line u-muted-text';
-            prediction.textContent = '[AI-PREDICT] Executing industrial shard for: ' + val;
-            output.appendChild(prediction);
-            
-            output.scrollTop = output.scrollHeight;
-            input.value = '';
+// AI-Predict Terminal Core (Industrial Intelligence)
+if (termInput) {
+    termInput.addEventListener('input', () => {
+        const val = termInput.value.trim().toLowerCase();
+        if (!val) return;
+        const suggestions = Object.keys(COMMANDS).filter(c => c.startsWith(val));
+        const predictEl = document.getElementById('ai-predict-hint');
+        if (predictEl) {
+            predictEl.textContent = suggestions.length > 0 ? ` [AI-PREDICT: ${suggestions[0]}]` : '';
         }
     });
+
+    termInput.addEventListener('keydown', e => {
+        if (e.key === 'Tab') {
+            e.preventDefault();
+            const val = termInput.value.trim().toLowerCase();
+            const suggestions = Object.keys(COMMANDS).filter(c => c.startsWith(val));
+            if (suggestions.length > 0) termInput.value = suggestions[0];
+        }
+    });
+}
 }
 
 function initDistroRunner() {
@@ -711,6 +714,10 @@ function initWorkspaces() {
     });
     // Initial workspace state
     WINDOW_WORKSPACES['terminal'] = 1;
+    WINDOW_WORKSPACES['ai'] = 1;
+    WINDOW_WORKSPACES['ml'] = 1;
+    WINDOW_WORKSPACES['notebook'] = 1;
+    WINDOW_WORKSPACES['automation'] = 1;
     renderWorkspaces();
 }
 
@@ -868,16 +875,22 @@ if (termInput) {
     termInput.addEventListener('keydown', e => {
         if (e.key === 'Enter') {
             const raw = termInput.value.trim();
+            if (!raw) return;
             const parts = raw.split(' ');
             const cmd = parts[0].toLowerCase();
             const args = parts.slice(1);
             
-            const prompt = document.querySelector('.term-prompt').textContent;
-            termPrint(prompt + ' ' + raw);
-            
-            if (COMMANDS[cmd]) COMMANDS[cmd](args);
-            else if (cmd) termPrint('sigma_shell: command not found: ' + cmd);
+            // Execute industrial handler
+            if (COMMANDS[cmd]) {
+                const promptLine = `root@sigmaos:${terminalCwd.replace('/root', '~')}# ${raw}`;
+                termPrint(promptLine);
+                COMMANDS[cmd](args);
+            } else {
+                termPrint(`root@sigmaos:${terminalCwd.replace('/root', '~')}# ${raw}`);
+                termPrint(`sigma_shell: command not found: ${cmd}`);
+            }
             termInput.value = '';
+            termOutput.scrollTop = termOutput.scrollHeight;
         }
     });
 }
@@ -1006,14 +1019,38 @@ function initPQCSentinel() {
 }
 
 function runPlaybook(type) {
-    if (type === 'INIT') {
-        spawnToast('Executing Mission Playbook: INIT_SEQUENCES...');
-        setTimeout(() => termPrint('Initializing Shard Containers... DONE'), 500);
-        setTimeout(() => termPrint('Scanning PQC Entropy... [94.8%]'), 1000);
-    } else if (type === 'CLEANUP') {
-        spawnToast('Executing Mission Playbook: INDUSTRIAL_SCRUB...');
-        setTimeout(() => termPrint('Clearing Memory Shards... [128MB FREE]'), 500);
+    const output = document.getElementById('automation-log');
+    if (!output) {
+        spawnToast(`Mission Shard: automation-log element missing for '${type}'...`);
+        return;
     }
+    
+    output.innerHTML = ''; // Start clean mission
+    spawnToast(`Initiating '${type}' Sovereign Playbook...`);
+    output.innerHTML += `<div class="u-margin-b-10 u-accent-text">[MISSION START]: ${type}_SEQUENCER ACTIVE</div>`;
+    
+    const steps = type === 'INIT' ? [
+        `[${type}] Sharding UBUNTU-ELITE parity... OK`,
+        `[${type}] Absorbing KALI security primitives... OK`,
+        `[${type}] Optimizing ARCH rolling-release logic... OK`,
+        `[${type}] ALL SHARDS SYNCHRONIZED. SYSTEM SOVEREIGNTY: 100%`
+    ] : [
+        `[${type}] Initiating silicon scrub...`,
+        `[${type}] Zeroing memory shards... OK`,
+        `[${type}] Scrubbing amnesic cache... DONE`,
+        `[${type}] SYSTEM CLEAN. ABSOLUTE SECURITY ACHIEVED.`
+    ];
+    
+    let i = 0;
+    const interval = setInterval(() => {
+        if (i >= steps.length) {
+            clearInterval(interval);
+            output.innerHTML += `<div class="u-accent-text u-bold u-margin-t-10">[MISSION SUCCESS] Shard Matrix Status: NOMINAL.</div>`;
+            return;
+        }
+        output.innerHTML += `<div class="u-muted-text">> ${steps[i++]}</div>`;
+        output.scrollTop = output.scrollHeight;
+    }, 1200);
 }
 
 function switchMode(mode) {
@@ -1022,15 +1059,44 @@ function switchMode(mode) {
     if (chip) chip.textContent = 'MODE: ' + mode;
     document.body.className = 'mode-' + mode.toLowerCase();
     
-    // Functional Sharding
+    // Industrial Distro Parity Logic
+    const prompt = document.querySelector('.term-prompt');
     if (mode === 'KALI') {
         spawnToast('Dragon Shard: Penetration Tools ARMED.');
-        document.querySelector('.term-prompt').textContent = 'kali@sigmaos:~$ ';
+        if (prompt) prompt.textContent = 'kali@sigmaos:~$ ';
+    } else if (mode === 'ARCH') {
+        spawnToast('Rolling-Release Shard: Absolute Bleeding Edge.');
+        if (prompt) prompt.textContent = '[root@archlinux ~]# ';
+    } else if (mode === 'UBUNTU') {
+        spawnToast('Elite Desktop Shard: Industrial Efficiency.');
+        if (prompt) prompt.textContent = 'ubuntu@sigmaos:~$ ';
     } else {
-        spawnToast('Zenity Shard: Default Sovereignty.');
-        document.querySelector('.term-prompt').textContent = `root@sigmaos:${terminalCwd.replace('/root', '~')}#`;
+        spawnToast('Zenith Shard: Default Sovereignty.');
+        if (prompt) prompt.textContent = `root@sigmaos:${terminalCwd.replace('/root', '~')}#`;
     }
 }
+function sendAIMessage() {
+    const input = document.getElementById('ai-chat-input');
+    const log = document.getElementById('ai-chat-log');
+    if (!input || !input.value) return;
+    
+    const userMsg = document.createElement('div');
+    userMsg.className = 'u-accent-text';
+    userMsg.textContent = '[USER]: ' + input.value;
+    log.appendChild(userMsg);
+    
+    setTimeout(() => {
+        const aiMsg = document.createElement('div');
+        aiMsg.className = 'u-muted-text';
+        aiMsg.textContent = '[AI]: Sharding response for mission: ' + input.value + '. Mastery Shard Active.';
+        log.appendChild(aiMsg);
+        log.scrollTop = log.scrollHeight;
+    }, 800);
+    input.value = '';
+}
+
+window.sendAIMessage = sendAIMessage;
+
 function initSovereignCamera() {
     const video = document.getElementById('camera-stream');
     const filterSelect = document.getElementById('camera-filter');
