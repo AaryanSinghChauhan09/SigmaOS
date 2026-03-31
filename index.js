@@ -942,8 +942,35 @@ const COMMANDS = {
         }
         document.documentElement.style.setProperty('--accent-primary', args[0]);
         spawnToast('Aether Customization: Accent Shard Updated to ' + args[0]);
+    },
+    sigmactl: (args) => {
+        if (!args[0]) return termPrint('Usage: sigmactl <list|audit|health>');
+        const sub = args[0].toLowerCase();
+        if (sub === 'list') {
+            termPrint('ACTIVE SYSTEM SHARDS (VFS PERSISTENT):');
+            termPrint('- Kernel: Σ-Zenith-6.8');
+            termPrint('- Storage: SovereignVFS v151');
+            termPrint('- UI: Zenith Dashboard v153.2');
+            termPrint('- AI: Neural Matrix v94');
+        } else if (sub === 'audit') {
+            const audit = VFS.read('/root/data/audit.log') || 'No audit logs found.';
+            termPrint('INDUSTRIAL SECURITY AUDIT:');
+            termPrint(audit);
+        } else if (sub === 'health') {
+            termPrint('SILICON TELEMETRY (TSC):');
+            termPrint(`Uptime: ${sysUptime}s | CPU Load: ${cpuVal.textContent} | VFS Integrity: 100%`);
+        } else {
+            termPrint(`sigmactl: unknown command: ${sub}`);
+        }
     }
 };
+
+function logAuditEvent(event) {
+    const time = new Date().toISOString();
+    const line = `[${time}] ${event}\n`;
+    const current = VFS.read('/root/data/audit.log') || '';
+    VFS.write('/root/data/audit.log', current + line);
+}
 
 if (termInput) {
     termInput.addEventListener('keydown', e => {
@@ -1149,6 +1176,7 @@ function switchMode(mode) {
     const chip = document.getElementById('active-mode-chip');
     if (chip) chip.textContent = 'MODE: ' + mode;
     document.body.className = 'mode-' + mode.toLowerCase();
+    logAuditEvent(`MODE_SWITCH: ${mode}`);
     
     // Industrial Distro Parity Logic
     const prompt = document.querySelector('.term-prompt');
