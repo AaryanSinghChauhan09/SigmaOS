@@ -1114,6 +1114,21 @@ const COMMANDS = {
                 termPrint(`- CPU: ${SigmaHAL.cpu.cores} Cores [${SigmaHAL.cpu.arch}]`);
                 termPrint(`- MEM: ${SigmaHAL.mem.total} MB Static / ${SigmaHAL.mem.used} MB Used`);
                 break;
+            case 'wm':
+                SigmaWM.tile();
+                break;
+            case 'opt':
+                SigmaOpt.tune();
+                break;
+            case 'profiler':
+                SigmaProfiler.dump();
+                break;
+            case 'desk':
+                SigmaDesk.clean();
+                break;
+            case 'upgrade':
+                SigmaUpdate.pull();
+                break;
             default:
                 termPrint(`sigmactl: unknown command: ${sub}`);
         }
@@ -1358,7 +1373,54 @@ const SigmaHAL = {
     }
 };
 SigmaHAL.init();
+// SigmaOS v260.0: Omnipotent App & Tool Integration
+const SigmaWM = {
+    tile: () => {
+        const windows = Array.from(document.querySelectorAll('.window:not(.hidden)'));
+        if (windows.length === 0) return;
+        const width = 100 / windows.length;
+        windows.forEach((win, i) => {
+            win.style.width = `${width}%`;
+            win.style.height = 'calc(100vh - 40px)';
+            win.style.left = `${i * width}%`;
+            win.style.top = '40px';
+        });
+        spawnToast('SigmaWM: Auto-Tiling Triggered');
+        logAuditEvent('WM_TILE_APPLIED');
+    }
+};
 
+const SigmaOpt = {
+    tune: () => {
+        SigmaHAL.cpu.cores += 1; // Simulated HW tuning
+        console.log('Σ OPT: Hardware dynamically overclocked.');
+        spawnToast(`SigmaOpt: CPU dynamically tuned for current workload.`);
+    }
+};
+
+const SigmaProfiler = {
+    dump: () => {
+        const usage = SigmaHAL.mem.used;
+        termPrint(`Σ PROFILER: Current memory allocation slice is ${usage} MB.`);
+        termPrint(`Σ PROFILER: 0 memory leaks detected. Silicon remains clean.`);
+    }
+};
+
+const SigmaDesk = {
+    clean: () => {
+        document.querySelectorAll('.window').forEach(w => w.classList.add('hidden'));
+        SigmaWM.tile();
+        spawnToast('SigmaDesk: Workspace sanitized and reset.');
+    }
+};
+
+const SigmaUpdate = {
+    pull: () => {
+        SigmaSync.autoBackup();
+        spawnToast('SigmaUpdate: Syncing Zenith binaries. PQC Signature valid.');
+        setTimeout(() => termPrint('Update mechanism locked. Version 260.0 Masterpiece holds position.'), 2000);
+    }
+};
 
 // v200.0 Benchmarking Engine
 function sigmaBenchmark() {

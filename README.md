@@ -73,8 +73,9 @@ SigmaOS includes a built-in management utility. Open the terminal and use:
 - [x] v220.0: Supreme App-Sovereignty & Emulation.
 - [x] v230.0: Industrial Backend Sovereignty.
 - [x] v240.0: Sovereign Architecture & Mount Management.
-- [x] v250.0: **Core Kernel Architecture (PCB, IDT, HAL) (Zenith Legacy Final Build)**.
-- [ ] v260.0: **Peer-to-Peer Shard Sharing** (Planned).
+- [x] v250.0: Core Kernel Architecture (PCB, IDT, HAL).
+- [x] v260.0: **Omnipotent Masterpiece: Advanced Tool Integration (SigmaWM, SigmaDesk, SigmaProfiler) (Zenith Legacy Final Build)**.
+- [ ] v270.0: **Peer-to-Peer Shard Sharing** (Planned).
 
 ---
 
