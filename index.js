@@ -987,43 +987,66 @@ const COMMANDS = {
                 termPrint('- [!] VFS cache at 82%. Recommend "clear" or "VFS cleanup".');
                 break;
             case 'system':
-                if (args[1] === 'power-save') {
+                if (args[1] === 'bare-metal') {
+                    termPrint('Σ BARE-METAL TRANSITION: Purging POSIX abstractions...');
+                    const bar = document.getElementById('taskbar');
+                    if (bar) bar.style.display = 'none';
+                    document.querySelectorAll('.window').forEach(w => { if (w.id !== 'terminal') w.style.display = 'none'; });
+                    document.body.style.background = '#000';
+                    document.body.className = 'mode-noir';
+                    spawnToast('BARE-METAL MODE ACTIVE: [ZENITH_CORE_ONLY]');
+                    return;
+                } else if (args[1] === 'power-save') {
                     document.body.style.filter = args[2] === 'on' ? 'brightness(0.6)' : 'none';
-                    spawnToast(`Power-Save Mode: ${args[2] === 'on' ? 'ENABLED' : 'DISABLED'}`);
                     return;
                 }
-                termPrint('Usage: sigmactl system power-save <on|off>');
+                termPrint('Usage: sigmactl system bare-metal | power-save <on|off>');
                 break;
             case 'config':
-                if (args[1] === 'diff' && args[2] && args[3]) {
-                    termPrint(`Σ CONFIG DIFF [${args[2]} vs ${args[3]}]:`);
-                    termPrint(`- [${args[2]}]: Restricted permissions, high security.`);
-                    termPrint(`- [${args[3]}]: Unrestricted silicon access, low latency.`);
+                if (args[1] === 'load') {
+                    const conf = VFS.read('/etc/sigmaos.conf') || 'VERSION=170.0\nTHEME=ZENITH_GOLD\nLOW_DEP=TRUE';
+                    termPrint('Σ MOUNTING RAW CONFIG (/etc/sigmaos.conf):');
+                    termPrint(conf);
                     return;
                 }
-                termPrint('Usage: sigmactl config diff <PERSONA_A> <PERSONA_B>');
+                termPrint('Usage: sigmactl config load');
+                break;
+            case 'kernel':
+                termPrint('Σ SILICON DRIVERS: [GPU_ASM], [NET_RAW], [MEM_LEAN]');
+                termPrint('- TSC Timer: ' + performance.now());
+                termPrint('- Interrupts: OK | Paging: IDENTITY');
                 break;
             case 'macro':
-                if (args[1] === 'share' && args[2]) {
-                    termPrint(`Macro '${args[2]}' exported to VFS for P2P sharing.`);
-                } else if (args[1] === 'run' && args[2]) {
+                if (args[1] === 'run' && args[2]) {
                     executeMacro(args[2].toUpperCase());
                 } else {
-                    termPrint('Usage: sigmactl macro run <NAME> | sigmactl macro share <NAME>');
+                    termPrint('Usage: sigmactl macro run <NAME>');
                 }
                 break;
             case 'remote':
                 termPrint(`Σ REMOTE BRIDGE: Connecting to ${args[1] || 'Sovereign-Node-1'}...`);
-                setTimeout(() => termPrint(`[SECURE]: Handshake Complete. P2P Tunnel Established (Lattice-PQC Encrypted).`), 1000);
+                setTimeout(() => termPrint(`[SECURE]: Handshake Complete. P2P Tunnel Established.`), 1000);
                 break;
             case 'trigger':
-                termPrint('EVENT TRIGGERS ACTIVE: [on_boot], [on_network_up], [on_shard_crash]');
+                termPrint('EVENT TRIGGERS ACTIVE: [on_boot], [on_network_detection]');
                 break;
             default:
                 termPrint(`sigmactl: unknown command: ${sub}`);
         }
     }
 };
+
+function parseConf(data) {
+    const lines = data.split('\n');
+    const config = {};
+    lines.forEach(line => {
+        if (line.includes('=') && !line.startsWith('#')) {
+            const [k, v] = line.split('=');
+            config[k.trim()] = v.trim();
+        }
+    });
+    return config;
+}
 
 function setPersona(persona) {
     logAuditEvent(`PERSONA_SET: ${persona}`);
