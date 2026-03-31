@@ -944,26 +944,92 @@ const COMMANDS = {
         spawnToast('Aether Customization: Accent Shard Updated to ' + args[0]);
     },
     sigmactl: (args) => {
-        if (!args[0]) return termPrint('Usage: sigmactl <list|audit|health>');
+        if (!args[0]) return termPrint('Usage: sigmactl <list|audit|health|profile|macro|trigger>');
         const sub = args[0].toLowerCase();
-        if (sub === 'list') {
-            termPrint('ACTIVE SYSTEM SHARDS (VFS PERSISTENT):');
-            termPrint('- Kernel: Σ-Zenith-6.8');
-            termPrint('- Storage: SovereignVFS v151');
-            termPrint('- UI: Zenith Dashboard v153.2');
-            termPrint('- AI: Neural Matrix v94');
-        } else if (sub === 'audit') {
-            const audit = VFS.read('/root/data/audit.log') || 'No audit logs found.';
-            termPrint('INDUSTRIAL SECURITY AUDIT:');
-            termPrint(audit);
-        } else if (sub === 'health') {
-            termPrint('SILICON TELEMETRY (TSC):');
-            termPrint(`Uptime: ${sysUptime}s | CPU Load: ${cpuVal.textContent} | VFS Integrity: 100%`);
-        } else {
-            termPrint(`sigmactl: unknown command: ${sub}`);
+        
+        switch(sub) {
+            case 'list':
+                termPrint('ACTIVE SYSTEM SHARDS (VFS PERSISTENT):');
+                termPrint('- Kernel: Σ-Zenith-6.8');
+                termPrint('- Storage: SovereignVFS v151');
+                termPrint('- UI: Zenith Dashboard v154.0');
+                termPrint('- AI: Neural Matrix v94');
+                break;
+            case 'audit':
+                const audit = VFS.read('/root/data/audit.log') || 'No audit logs found.';
+                termPrint('INDUSTRIAL SECURITY AUDIT:');
+                termPrint(audit);
+                break;
+            case 'health':
+                termPrint('SILICON TELEMETRY (TSC):');
+                termPrint(`Uptime: ${sysUptime}s | CPU Load: ${cpuVal.textContent} | VFS Integrity: 100%`);
+                break;
+            case 'profile':
+                if (args[1] === 'switch' && args[2]) {
+                    const profile = args[2].toUpperCase();
+                    switchProfile(profile);
+                } else {
+                    termPrint('Usage: sigmactl profile switch <DEVELOPER|GAMING|MINIMAL>');
+                }
+                break;
+            case 'macro':
+                if (args[1] === 'run' && args[2]) {
+                    executeMacro(args[2].toUpperCase());
+                } else {
+                    termPrint('Usage: sigmactl macro run <DEV_READY|SYS_CHECK>');
+                }
+                break;
+            case 'trigger':
+                termPrint('EVENT TRIGGERS ACTIVE: [NETWORK_UP], [VFS_MOUNT], [SHARD_CRASH]');
+                break;
+            default:
+                termPrint(`sigmactl: unknown command: ${sub}`);
         }
     }
 };
+
+const MACROS = {
+    'DEV_READY': ['OPEN_WINDOW terminal', 'OPEN_WINDOW web', 'LOAD_URL https://github.com', 'SET_THEME noir'],
+    'SYS_CHECK': ['SIGMACTL health', 'SIGMACTL audit', 'SPAWN_TOAST "Integrity Check Complete"']
+};
+
+function executeMacro(name) {
+    const steps = MACROS[name];
+    if (!steps) return termPrint(`Macro '${name}' not found.`);
+    termPrint(`Executing Macro: ${name}...`);
+    steps.forEach(step => {
+        const [cmd, ...args] = step.split(' ');
+        if (cmd === 'OPEN_WINDOW') openWindow(args[0]);
+        if (cmd === 'LOAD_URL') {
+            const input = document.getElementById('web-url-input');
+            if (input) input.value = args[0];
+            loadWebShard();
+        }
+        if (cmd === 'SET_THEME') document.body.className = 'mode-' + args[0];
+        if (cmd === 'SIGMACTL') COMMANDS.sigmactl(args);
+        if (cmd === 'SPAWN_TOAST') spawnToast(args.join(' ').replace(/"/g, ''));
+    });
+}
+
+function switchProfile(profile) {
+    logAuditEvent(`PROFILE_SWITCH: ${profile}`);
+    if (profile === 'DEVELOPER') {
+        executeMacro('DEV_READY');
+        switchMode('KALI');
+        spawnToast('Sovereign Developer Profile Active.');
+    } else if (profile === 'GAMING') {
+        document.body.className = 'mode-crimson';
+        openWindow('industrialmatrix');
+        spawnToast('High-Performance Gaming Shard Active.');
+    } else if (profile === 'MINIMAL') {
+        document.body.className = 'mode-alpine';
+        document.body.classList.add('mode-kiosk');
+        openWindow('terminal');
+        spawnToast('Absolute Minimalist Shard Active.');
+    } else {
+        termPrint(`Unknown profile: ${profile}`);
+    }
+}
 
 function logAuditEvent(event) {
     const time = new Date().toISOString();
