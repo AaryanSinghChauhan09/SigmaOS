@@ -13,10 +13,47 @@ let currentWorkspace = 1;
 const WINDOW_WORKSPACES = {}; // Map winId -> workspaceNum
 let activeMode = 'ZENITH';
 
-// --- Low-Level Memory Sharding (VFS) ---
-// Replaces high-level object storage with buffer-oriented shards.
-const VFS_FILES = new Map(); // path -> Uint8Array
-const VFS_DIRS = new Set(['/root', '/root/bin', '/root/kernel', '/root/userland', '/root/data']);
+// --- Persistent Sovereign VFS (No Simulation) ---
+class SovereignVFS {
+    constructor() {
+        this.storageKey = 'SIGMAOS_VFS_ZENITH';
+        this.fs = JSON.parse(localStorage.getItem(this.storageKey)) || {
+            '/root': { type: 'dir', children: ['bin', 'kernel', 'userland', 'data', 'media'] },
+            '/root/bin': { type: 'dir', children: [] },
+            '/root/kernel': { type: 'dir', children: [] },
+            '/root/userland': { type: 'dir', children: [] },
+            '/root/data': { type: 'dir', children: ['industrial.json'] },
+            '/root/media': { type: 'dir', children: [] },
+            '/root/data/industrial.json': { type: 'file', content: '{"status": "SOVEREIGN", "integrity": 100}' }
+        };
+        this.sync();
+    }
+    sync() { localStorage.setItem(this.storageKey, JSON.stringify(this.fs)); }
+    exists(path) { return !!this.fs[path]; }
+    isDir(path) { return this.fs[path] && this.fs[path].type === 'dir'; }
+    ls(path) { return this.fs[path] ? this.fs[path].children : []; }
+    mkdir(path) {
+        if (this.exists(path)) return false;
+        const parent = path.substring(0, path.lastIndexOf('/')) || '/root';
+        if (!this.isDir(parent)) return false;
+        this.fs[path] = { type: 'dir', children: [] };
+        this.fs[parent].children.push(path.split('/').pop());
+        this.sync();
+        return true;
+    }
+    write(path, content) {
+        const parent = path.substring(0, path.lastIndexOf('/')) || '/root';
+        if (!this.isDir(parent)) return false;
+        if (!this.exists(path)) this.fs[parent].children.push(path.split('/').pop());
+        this.fs[path] = { type: 'file', content };
+        this.sync();
+        return true;
+    }
+    read(path) { return this.fs[path] ? this.fs[path].content : null; }
+}
+
+const VFS = new SovereignVFS();
+let terminalCwd = '/root';
 
 const PROCESSES = [
     { pid: 0, name: 'sigma_kernel', state: 'RUNNING', cpu: 0.1 },
@@ -774,40 +811,69 @@ function termPrint(text, type = '') {
     termOutput.scrollTop = termOutput.scrollHeight;
 }
 
-let terminalCwd = '/root';
-const VFS = {
-    '/root': ['bin', 'etc', 'home', 'kernel', 'lib', 'mnt', 'proc', 'sys', 'usr', 'var', 'sigma_core.asm'],
-    '/root/bin': ['apt-sigma', 'ls-pure', 'cat-raw', 'top-zenith'],
-    '/root/kernel': ['sigma_kernel.c', 'pmm.c', 'vmm.c', 'scheduler.c'],
-    '/root/home': ['media']
-};
-
 const COMMANDS = {
     help: () => {
-        termPrint('AVAILABLE COMMANDS: help, clear, ls, cd, neofetch, cpu, mem, matrix, scrub, shutdown, run_playbook');
+        termPrint('OS COMMANDS: help, clear, ls, cd, mkdir, touch, cat, rm, neofetch, cpu, mem, matrix, scrub, shutdown');
     },
     clear: () => {
         termOutput.innerHTML = '';
     },
-    ls: (args) => {
-        const path = args[0] || terminalCwd;
-        const target = VFS[path] || VFS[terminalCwd];
-        termPrint(target.join('  '));
+    ls: () => {
+        const items = VFS.ls(terminalCwd);
+        if (items.length === 0) termPrint('Directory is empty.');
+        else {
+            items.forEach(item => {
+                const fullPath = terminalCwd + (terminalCwd.endsWith('/') ? '' : '/') + item;
+                const type = VFS.isDir(fullPath) ? '[DIR]' : '[FILE]';
+                termPrint(`- ${item.padEnd(20)} ${type}`);
+            });
+        }
     },
     cd: (args) => {
-        const path = args[0];
-        if (!path || path === '~' || path === '/') {
-            terminalCwd = '/root';
-        } else if (path === '..') {
-            const parts = terminalCwd.split('/');
-            parts.pop();
-            terminalCwd = parts.join('/') || '/root';
+        const path = args[0] || '/root';
+        if (path === '/') { terminalCwd = '/root'; }
+        else if (path === '..') {
+            if (terminalCwd !== '/root') {
+                terminalCwd = terminalCwd.substring(0, terminalCwd.lastIndexOf('/')) || '/root';
+            }
         } else {
-            const newPath = terminalCwd + (terminalCwd.endsWith('/') ? '' : '/') + path;
-            if (VFS[newPath]) terminalCwd = newPath;
-            else termPrint('cd: no such file or directory: ' + path);
+            const target = (path.startsWith('/') ? path : terminalCwd + '/' + path).replace(/\/+/g, '/');
+            if (VFS.exists(target) && VFS.isDir(target)) terminalCwd = target;
+            else termPrint('cd: no such directory: ' + path);
         }
-        document.querySelector('.term-prompt').textContent = `root@sigmaos:${terminalCwd.replace('/root', '~')}#`;
+        document.querySelectorAll('.term-prompt').forEach(p => {
+            p.textContent = `root@sigmaos:${terminalCwd.replace('/root', '~')}#`;
+        });
+    },
+    mkdir: (args) => {
+        if (!args[0]) return termPrint('mkdir: missing operand');
+        const path = (terminalCwd + '/' + args[0]).replace(/\/+/g, '/');
+        if (VFS.mkdir(path)) termPrint(`Created directory: ${args[0]}`);
+        else termPrint(`mkdir: cannot create directory '${args[0]}': File exists or path invalid`);
+    },
+    touch: (args) => {
+        if (!args[0]) return termPrint('touch: missing operand');
+        const path = (terminalCwd + '/' + args[0]).replace(/\/+/g, '/');
+        if (VFS.write(path, '')) termPrint(`Created empty file: ${args[0]}`);
+        else termPrint(`touch: cannot create file '${args[0]}'`);
+    },
+    cat: (args) => {
+        if (!args[0]) return termPrint('cat: missing operand');
+        const path = (terminalCwd + '/' + args[0]).replace(/\/+/g, '/');
+        const content = VFS.read(path);
+        if (content !== null) termPrint(content);
+        else termPrint(`cat: ${args[0]}: No such file`);
+    },
+    rm: (args) => {
+        if (!args[0]) return termPrint('rm: missing operand');
+        const path = (terminalCwd + '/' + args[0]).replace(/\/+/g, '/');
+        if (VFS.fs[path]) {
+            const parent = path.substring(0, path.lastIndexOf('/')) || '/root';
+            VFS.fs[parent].children = VFS.fs[parent].children.filter(c => c !== args[0]);
+            delete VFS.fs[path];
+            VFS.sync();
+            termPrint(`Removed: ${args[0]}`);
+        } else termPrint(`rm: cannot remove '${args[0]}': No such file or directory`);
     },
     neofetch: () => {
         termPrint('           .----------------.           ');
@@ -947,15 +1013,32 @@ function initMLShard() {
     const canvas = document.getElementById('ml-canvas');
     if (!canvas) return;
     const ctx = canvas.getContext('2d');
+    
+    // Real Matrix Math Simulation (Zenith Neural Engine)
+    const weights = Array.from({length: 100}, () => Math.random());
+    const inputs = Array.from({length: 100}, () => Math.random());
+    
     function draw() {
         ctx.clearRect(0, 0, canvas.width, canvas.height);
-        ctx.strokeStyle = 'rgba(0, 210, 255, 0.4)';
-        ctx.beginPath();
-        for (let i = 0; i < 20; i++) {
-            ctx.moveTo(Math.random() * 300, Math.random() * 150);
-            ctx.lineTo(Math.random() * 300, Math.random() * 150);
+        
+        // PURE PERFORMANCE: Real-time dot product visualization
+        let sum = 0;
+        for(let i=0; i<100; i++) {
+            sum += weights[i] * inputs[i];
+            const x = (i % 10) * 30;
+            const y = Math.floor(i / 10) * 15;
+            const activation = weights[i] * inputs[i];
+            ctx.fillStyle = `rgba(0, 210, 255, ${activation})`;
+            ctx.fillRect(x, y, 25, 10);
+            
+            // Randomly evolve weights (Live Training)
+            weights[i] += (Math.random() - 0.5) * 0.01;
         }
-        ctx.stroke();
+        
+        ctx.fillStyle = 'white';
+        ctx.font = '10px Fira Code';
+        ctx.fillText(`NEURAL ENERGY: ${sum.toFixed(4)}`, 10, 140);
+        
         requestAnimationFrame(draw);
     }
     draw();
