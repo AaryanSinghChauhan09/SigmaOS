@@ -944,7 +944,7 @@ const COMMANDS = {
         spawnToast('Aether Customization: Accent Shard Updated to ' + args[0]);
     },
     sigmactl: (args) => {
-        if (!args[0]) return termPrint('Usage: sigmactl <list|audit|health|profile|macro|trigger|status|persona|suggest>');
+        if (!args[0]) return termPrint('Usage: sigmactl <list|audit|health|profile|macro|trigger|status|persona|suggest|system|config|remote>');
         const sub = args[0].toLowerCase();
         
         switch(sub) {
@@ -952,7 +952,7 @@ const COMMANDS = {
                 termPrint('ACTIVE SYSTEM SHARDS (VFS PERSISTENT):');
                 termPrint('- Kernel: Σ-Zenith-6.8');
                 termPrint('- Storage: SovereignVFS v151');
-                termPrint('- UI: Zenith Dashboard v155.0');
+                termPrint('- UI: Zenith Dashboard v160.0');
                 termPrint('- AI: Neural Matrix v94');
                 break;
             case 'audit':
@@ -982,12 +982,39 @@ const COMMANDS = {
                 }
                 break;
             case 'suggest':
-                if (args[1] === 'performance') {
-                    termPrint('Σ AI RECOMMENDATIONS (PERFORMANCE):');
-                    termPrint('- [!] Shard "Voice" is consuming memory. Recommend "sigmactl reboot shard voice".');
-                    termPrint('- [!] VFS cache at 82%. Recommend "clear" or "VFS cleanup".');
-                    termPrint('- [!] Shard "Web" detected latency. Scaling back CSS blurs...');
+                termPrint('Σ AI RECOMMENDATIONS (v160.0):');
+                termPrint('- [!] Shard "Voice" is consuming memory. Recommend "sigmactl reboot shard voice".');
+                termPrint('- [!] VFS cache at 82%. Recommend "clear" or "VFS cleanup".');
+                break;
+            case 'system':
+                if (args[1] === 'power-save') {
+                    document.body.style.filter = args[2] === 'on' ? 'brightness(0.6)' : 'none';
+                    spawnToast(`Power-Save Mode: ${args[2] === 'on' ? 'ENABLED' : 'DISABLED'}`);
+                    return;
                 }
+                termPrint('Usage: sigmactl system power-save <on|off>');
+                break;
+            case 'config':
+                if (args[1] === 'diff' && args[2] && args[3]) {
+                    termPrint(`Σ CONFIG DIFF [${args[2]} vs ${args[3]}]:`);
+                    termPrint(`- [${args[2]}]: Restricted permissions, high security.`);
+                    termPrint(`- [${args[3]}]: Unrestricted silicon access, low latency.`);
+                    return;
+                }
+                termPrint('Usage: sigmactl config diff <PERSONA_A> <PERSONA_B>');
+                break;
+            case 'macro':
+                if (args[1] === 'share' && args[2]) {
+                    termPrint(`Macro '${args[2]}' exported to VFS for P2P sharing.`);
+                } else if (args[1] === 'run' && args[2]) {
+                    executeMacro(args[2].toUpperCase());
+                } else {
+                    termPrint('Usage: sigmactl macro run <NAME> | sigmactl macro share <NAME>');
+                }
+                break;
+            case 'remote':
+                termPrint(`Σ REMOTE BRIDGE: Connecting to ${args[1] || 'Sovereign-Node-1'}...`);
+                setTimeout(() => termPrint(`[SECURE]: Handshake Complete. P2P Tunnel Established (Lattice-PQC Encrypted).`), 1000);
                 break;
             case 'trigger':
                 termPrint('EVENT TRIGGERS ACTIVE: [on_boot], [on_network_up], [on_shard_crash]');
