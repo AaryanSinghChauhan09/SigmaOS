@@ -9,7 +9,7 @@
  * =========================================================================
  */
 
-#include "../libc/sigma_libc.h"
+#include "../libc/SovereignLibC.h"
 #include "../SovereignOmniShard.h"   /* Industrial sharding structs (C11) */
 
 /* =========================================================================
@@ -238,6 +238,10 @@ static void shell_init(OmniShellZenith* sh) {
     SovereignAetherSentinel_init(&sh->sentinel);
     SovereignAetherOrchestrator_init(&sh->orchestrator);
     SovereignAmnesicShard_init(&sh->amnesic);
+    
+    /* Sovereign Process Manager Handover (Industrial C11) */
+    Sovereign_PM_Main();
+
     sigma_printf("[SIGMA_SHELL]: Omni-Shell Zenith Online (v27.0). System-Master [ACTIVE].\n");
     sigma_printf("[SIGMA_SHELL]: %llu commands loaded.\n", (sigma_u64)SIGMA_CMD_COUNT);
 }

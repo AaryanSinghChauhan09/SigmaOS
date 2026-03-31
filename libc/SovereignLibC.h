@@ -57,8 +57,15 @@ extern "C" {
     int           sigma_shm_open(const char* name, int oflag, int mode);
     int           sigma_shm_unlink(const char* name);
     int           sigma_ioctl(int fd, unsigned long request, ...);
-    int           sigma_mprotect(void* addr, sigma_size_t len, int prot);
-    
+    void          sigma_print_hex(sigma_u64 val);
+
+    int           sigma_socket(int domain, int type, int protocol);
+    int           sigma_bind(int sockfd, const void* addr, sigma_u32 addrlen);
+    int           sigma_connect(int sockfd, const void* addr, sigma_u32 addrlen);
+
+    const char*   sigma_strstr(const char* haystack, const char* needle);
+    const char*   sigma_strrchr(const char* s, int c);
+
     void          sigma_log(const char* msg);
 #ifdef __cplusplus
 }

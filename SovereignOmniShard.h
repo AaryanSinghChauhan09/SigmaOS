@@ -145,4 +145,9 @@ void SovereignOffensive_CrushLinux(void);
 void SovereignOffensive_CrushWindows(void);
 void SovereignOffensive_NeutronAudit(void);
 
+/* =========================================================================
+ * DOMAIN: PROCESS MANAGEMENT ORCHESTRATION
+ * ========================================================================= */
+void Sovereign_PM_Main(void);
+
 #endif /* SOVEREIGN_OMNI_SHARD_H */
