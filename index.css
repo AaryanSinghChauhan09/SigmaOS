@@ -609,3 +609,15 @@ body.mode-nix {
 }
 
 .mode-transition { transition: all 0.5s ease; }
+
+.neural-canvas {
+  background: rgba(0, 0, 0, 0.2);
+  border-radius: 8px;
+}
+
+.notebook-chart {
+  height: 100px;
+  display: flex;
+  align-items: flex-end;
+  gap: 2px;
+}

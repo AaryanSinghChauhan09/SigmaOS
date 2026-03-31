@@ -346,6 +346,64 @@
             </div>
         </section>
 
+        <!-- SOVEREIGN AUTOMATION MASTER WINDOW -->
+        <section id="win-automation" class="window hidden win-distro-default">
+            <div class="win-header">
+                <div class="win-title">📜 Sovereign Automation Master</div>
+                <div class="win-controls">
+                    <div class="win-btn win-min" data-action="minimize" data-win="automation"></div>
+                    <div class="win-btn win-close" data-action="close" data-win="automation"></div>
+                </div>
+            </div>
+            <div class="win-content">
+                <div class="u-margin-b-10 u-accent-text u-bold">SOVEREIGN MISSION PLAYBOOKS</div>
+                <div id="automation-list" class="u-grid-2">
+                    <div class="distro-card" onclick="runPlaybook('INIT')">
+                        <div class="u-font-size-md">🚀 INIT</div>
+                        <div class="u-font-size-xxs">Bootstrap</div>
+                    </div>
+                    <div class="distro-card" onclick="runPlaybook('CLEANUP')">
+                        <div class="u-font-size-md">🧹 CLEANUP</div>
+                        <div class="u-font-size-xxs">Memory Scrub</div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- NEURAL-SHARD (ML ANALYTICS) WINDOW -->
+        <section id="win-ml" class="window hidden win-sysinfo-default">
+            <div class="win-header">
+                <div class="win-title">🧠 NEURAL-SHARD (ML CORE)</div>
+                <div class="win-controls">
+                    <div class="win-btn win-min" data-action="minimize" data-win="ml"></div>
+                    <div class="win-btn win-close" data-action="close" data-win="ml"></div>
+                </div>
+            </div>
+            <div class="win-content u-text-center">
+                <canvas id="ml-canvas" width="300" height="150" class="neural-canvas u-margin-b-10"></canvas>
+                <div class="u-accent-text u-bold">INFERENCE ENGINE: <span id="ml-load">0.02ms</span></div>
+                <div class="u-muted-text u-font-size-xxs">MODEL: Sovereign-Transformer-v4</div>
+            </div>
+        </section>
+
+        <!-- SIGMA-NOTEBOOK (DATA SCIENCE) WINDOW -->
+        <section id="win-notebook" class="window hidden win-distro-default">
+            <div class="win-header">
+                <div class="win-title">📓 Sigma-Notebook (Data Shard)</div>
+                <div class="win-controls">
+                    <div class="win-btn win-min" data-action="minimize" data-win="notebook"></div>
+                    <div class="win-btn win-close" data-action="close" data-win="notebook"></div>
+                </div>
+            </div>
+            <div class="win-content">
+                <div class="metric-card u-margin-b-10">
+                    <div class="u-font-size-xs u-accent-text">IN [1]: import sigmatensor as st</div>
+                    <div class="u-font-size-xs">OUT [1]: <span class="u-muted-text">SigmaTensor v1.0 Shard Loaded.</span></div>
+                </div>
+                <div id="notebook-chart" class="notebook-chart"></div>
+            </div>
+        </section>
+
         <!-- THEME STORE WINDOW -->
         <section id="win-themes" class="window hidden win-services-default">
             <div class="win-header">
@@ -738,6 +796,15 @@
         </div>
         <div class="dock-item" data-window="updates" data-label="Software Updater">
             <svg viewBox="0 0 24 24"><path d="M12 4V1L8 5l4 4V6c3.31 0 6 2.69 6 6 0 1.01-.25 1.97-.7 2.8l1.46 1.46C19.54 15.03 20 13.57 20 12c0-4.42-3.58-8-8-8zm-1.46 6.1L9.08 8.64C8.41 9.61 8 10.76 8 12c0 4.42 3.58 8 8 8v3l4-4-4-4v3c-3.31 0-6-2.69-6-6 0-1.01.25-1.97.7-2.8z"/></svg>
+        </div>
+        <div class="dock-item" data-window="ml" data-label="Neural Shard">
+            <svg viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-2h2v2zm0-4h-2V7h2v6z"/></svg>
+        </div>
+        <div class="dock-item" data-window="notebook" data-label="Data Science">
+            <svg viewBox="0 0 24 24"><path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zM9 17H7v-7h2v7zm4 0h-2V7h2v10zm4 0h-2v-4h2v4z"/></svg>
+        </div>
+        <div class="dock-item" data-window="automation" data-label="Automation Master">
+            <svg viewBox="0 0 24 24"><path d="M14 2H6c-1.1 0-1.99.9-1.99 2L4 20c0 1.1.89 2 1.99 2H18c1.1 0 2-.9 2-2V8l-6-6zm2 16H8v-2h8v2zm0-4H8v-2h8v2zm-3-5V3.5L18.5 9H13z"/></svg>
         </div>
         <div class="dock-item" data-window="camera" data-label="Camera Shard">
             <svg viewBox="0 0 24 24"><path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/></svg>

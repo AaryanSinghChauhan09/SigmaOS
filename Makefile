@@ -78,6 +78,7 @@ LDFLAGS   := -nostdlib -static
 # Core libc Implementation (Our sovereign stdlib replacement)
 SIGMA_LIBC_C   := libc/sigma_libc.c
 SIGMA_LIBC_OBJ := build/sigma_libc.o
+SIGMA_ZEROLIB_OBJ := build/SovereignZeroLib.o
 
 # Kernel C sources (refactored for industrial sovereignty)
 KERNEL_C_SRCS := kernel/sigma_kernel.c \
@@ -201,8 +202,12 @@ dirs:
 	@mkdir -p build build/kernel
 
 # --- SOVEREIGN LIBC (Our core replacement for glibc/musl) ---
-sigma_libc: dirs $(SIGMA_LIBC_OBJ) $(SIGMA_ROOT_LIBC_OBJ)
+sigma_libc: dirs $(SIGMA_LIBC_OBJ) $(SIGMA_ROOT_LIBC_OBJ) $(SIGMA_ZEROLIB_OBJ)
 	@echo "[SIGMA_LIBC] Sovereign Standard Library compiled."
+
+$(SIGMA_ZEROLIB_OBJ): SovereignZeroLib.asm
+	@echo "[NASM] SovereignZeroLib.asm"
+	@$(NASM) $(ASM_FLAGS) $< -o $@
 
 $(SIGMA_LIBC_OBJ): $(SIGMA_LIBC_C) libc/sigma_types.h libc/sigma_libc.h
 	@echo "[CC]  libc/sigma_libc.c"

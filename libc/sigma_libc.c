@@ -11,6 +11,14 @@ typedef __builtin_va_list sigma_va_list;
 #define sigma_va_arg(ap, type)   __builtin_va_arg(ap, type)
 #define sigma_va_end(ap)         __builtin_va_end(ap)
 
+/* External ASM Shards */
+extern sigma_size_t _sigma_asm_strlen(const char* s);
+extern int _sigma_sys_open(const char* path, int flags, int mode);
+extern int _sigma_sys_close(int fd);
+extern int _sigma_sys_socket(int domain, int type, int protocol);
+extern int _sigma_sys_bind(int sockfd, const void* addr, sigma_u32 addrlen);
+extern int _sigma_sys_connect(int sockfd, const void* addr, sigma_u32 addrlen);
+
 /* =========================================================================
  * sigma_log — minimal labelled print (replaces SigmaOOP.hpp sigma_log)
  * ========================================================================= */
@@ -25,7 +33,7 @@ void sigma_log(const char* msg) {
  * ========================================================================= */
 void sigma_print(const char* str) {
     if (!str) return;
-    sigma_write(1, str, sigma_strlen(str));
+    sigma_write(1, str, _sigma_asm_strlen(str));
 }
 
 void sigma_print_num(sigma_u64 val) {

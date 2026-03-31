@@ -11,6 +11,12 @@
 let sysUptime = 0;
 let currentWorkspace = 1;
 const WINDOW_WORKSPACES = {}; // Map winId -> workspaceNum
+let activeMode = 'ZENITH';
+
+// --- Low-Level Memory Sharding (VFS) ---
+// Replaces high-level object storage with buffer-oriented shards.
+const VFS_FILES = new Map(); // path -> Uint8Array
+const VFS_DIRS = new Set(['/root', '/root/bin', '/root/kernel', '/root/userland', '/root/data']);
 
 const PROCESSES = [
     { pid: 0, name: 'sigma_kernel', state: 'RUNNING', cpu: 0.1 },
@@ -122,6 +128,7 @@ document.addEventListener('DOMContentLoaded', () => {
     initServices();
     initPlugins();
     initUtils();
+    initVFSBuffer();
     initAdvancedKernel();
     spawnToast('Σ SIGMAOS ZENITH SUPREME INITIALIZED');
     spawnToast('Industrial Shard Mastery Active', 1500);
@@ -622,30 +629,51 @@ function startDistroStream(id) {
 }
 
 // --- Standard UI Helpers ---
+function initVFSBuffer() {
+    const defaultFiles = [
+        { path: '/root/sigma_core.asm', content: 'Σ SOVEREIGN CORE v151.0 (RAW ASM SHARD)\nSECTION .text\n  global _start\n_start: mov rax, 60\n syscall' },
+        { path: '/root/boot_master.c', content: '/* Σ SIGMAOS BOOT MASTER */\nvoid _start() { sigma_kernel_main(); }' },
+        { path: '/root/config.sys', content: 'SYSTEM_SOVEREIGNTY=ABSOLUTE\nAI_MODELS=v4-TRANSFORMER' }
+    ];
+    for (let i = 0; i < defaultFiles.length; i++) {
+        const f = defaultFiles[i];
+        const enc = new TextEncoder();
+        VFS_FILES.set(f.path, enc.encode(f.content));
+    }
+}
+
 function initVFSView() {
     const grid = document.getElementById('file-grid');
     if (!grid) return;
-    const target = VFS[terminalCwd] || VFS['/root'];
     grid.innerHTML = '';
-    target.forEach(name => {
-        const isDir = !name.includes('.');
-        const el = document.createElement('div');
-        el.className = 'distro-card';
-        el.style.padding = '10px';
-        el.innerHTML = `<div style="font-size: 2rem">${isDir ? '📂' : '📄'}</div><div class="u-font-size-xs">${name}</div>`;
-        el.onclick = () => {
-            if (isDir) {
-                const newPath = terminalCwd + (terminalCwd.endsWith('/') ? '' : '/') + name;
-                if (VFS[newPath]) {
-                    terminalCwd = newPath;
-                    initVFSView();
-                    updateBreadcrumbs();
-                    document.querySelector('.term-prompt').textContent = `root@sigmaos:${terminalCwd.replace('/root', '~')}#`;
-                }
-            }
-        };
-        grid.appendChild(el);
-    });
+    
+    // Low-dependency iteration
+    const dirs = Array.from(VFS_DIRS);
+    for (let i = 0; i < dirs.length; i++) {
+        const d = dirs[i];
+        if (d.startsWith(terminalCwd) && d !== terminalCwd) {
+            const name = d.split('/').pop();
+            const el = document.createElement('div');
+            el.className = 'distro-card';
+            el.style.padding = '10px';
+            el.innerHTML = `<div style="font-size: 2rem">📂</div><div class="u-font-size-xs">${name}</div>`;
+            el.onclick = () => { terminalCwd = d; initVFSView(); updateBreadcrumbs(); };
+            grid.appendChild(el);
+        }
+    }
+    
+    const files = Array.from(VFS_FILES.keys());
+    for (let i = 0; i < files.length; i++) {
+        const f = files[i];
+        if (f.startsWith(terminalCwd)) {
+            const name = f.split('/').pop();
+            const el = document.createElement('div');
+            el.className = 'distro-card';
+            el.style.padding = '10px';
+            el.innerHTML = `<div style="font-size: 2rem">📄</div><div class="u-font-size-xs">${name}</div>`;
+            grid.appendChild(el);
+        }
+    }
 }
 
 function updateBreadcrumbs() {
@@ -825,6 +853,14 @@ const COMMANDS = {
         termPrint('Broadcast message from root@sigmaos (pts/0):');
         termPrint('The system is going down for maintenance NOW!');
         setTimeout(() => location.reload(), 2000);
+    },
+    set_accent: (args) => {
+        if (!args[0]) {
+            termPrint('Usage: set_accent <color_hex>');
+            return;
+        }
+        document.documentElement.style.setProperty('--accent-primary', args[0]);
+        spawnToast('Aether Customization: Accent Shard Updated to ' + args[0]);
     }
 };
 
@@ -883,6 +919,38 @@ function initAdvancedKernel() {
     initContainerShard();
     initModuleShard();
     initPQCSentinel();
+    initMLShard();
+    initNotebookShard();
+}
+
+function initMLShard() {
+    const canvas = document.getElementById('ml-canvas');
+    if (!canvas) return;
+    const ctx = canvas.getContext('2d');
+    function draw() {
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        ctx.strokeStyle = 'rgba(0, 210, 255, 0.4)';
+        ctx.beginPath();
+        for (let i = 0; i < 20; i++) {
+            ctx.moveTo(Math.random() * 300, Math.random() * 150);
+            ctx.lineTo(Math.random() * 300, Math.random() * 150);
+        }
+        ctx.stroke();
+        requestAnimationFrame(draw);
+    }
+    draw();
+}
+
+function initNotebookShard() {
+    const chart = document.getElementById('notebook-chart');
+    if (!chart) return;
+    for (let i = 0; i < 30; i++) {
+        const bar = document.createElement('div');
+        bar.style.flex = '1';
+        bar.style.height = Math.random() * 100 + '%';
+        bar.style.background = 'var(--accent-primary)';
+        chart.appendChild(bar);
+    }
 }
 
 function initContainerShard() {
@@ -937,24 +1005,27 @@ function initPQCSentinel() {
     }, 500);
 }
 
+function runPlaybook(type) {
+    if (type === 'INIT') {
+        spawnToast('Executing Mission Playbook: INIT_SEQUENCES...');
+        setTimeout(() => termPrint('Initializing Shard Containers... DONE'), 500);
+        setTimeout(() => termPrint('Scanning PQC Entropy... [94.8%]'), 1000);
+    } else if (type === 'CLEANUP') {
+        spawnToast('Executing Mission Playbook: INDUSTRIAL_SCRUB...');
+        setTimeout(() => termPrint('Clearing Memory Shards... [128MB FREE]'), 500);
+    }
+}
+
 function switchMode(mode) {
     activeMode = mode;
     const chip = document.getElementById('active-mode-chip');
     if (chip) chip.textContent = 'MODE: ' + mode;
-    
-    // Aesthetic Absorption
     document.body.className = 'mode-' + mode.toLowerCase();
     
     // Functional Sharding
     if (mode === 'KALI') {
         spawnToast('Dragon Shard: Penetration Tools ARMED.');
         document.querySelector('.term-prompt').textContent = 'kali@sigmaos:~$ ';
-    } else if (mode === 'ALPINE') {
-        spawnToast('Minimalist Shard: Performance Optimizing...');
-        document.querySelector('.term-prompt').textContent = 'alpine-sigmaos:/# ';
-    } else if (mode === 'ARCH') {
-        spawnToast('Arch Shard: Sovereign Master Handover.');
-        document.querySelector('.term-prompt').textContent = '[arch@sigmaos ~]$ ';
     } else {
         spawnToast('Zenity Shard: Default Sovereignty.');
         document.querySelector('.term-prompt').textContent = `root@sigmaos:${terminalCwd.replace('/root', '~')}#`;

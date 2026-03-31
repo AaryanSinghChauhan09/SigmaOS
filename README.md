@@ -1,15 +1,20 @@
-# Σ SIGMAOS: THE UNIVERSAL INDUSTRIAL MASTER SHARD (v150.0 AUTONOMOUS)
+# Σ SIGMAOS: THE UNIVERSAL INDUSTRIAL MASTER SHARD (v151.0 AI-AUGMENTED)
 
 [![GitHub license](https://img.shields.io/badge/license-MIT%20Sovereignty-blue.svg)](LICENSE)
-[![Commit Code](https://img.shields.io/badge/Commit--Code-Σ--ZENITH--AUTONOMOUS--v150.0-gold)](https://github.com/AaryanSinghChauhan09/SigmaOS/commits/main)
+[![Commit Code](https://img.shields.io/badge/Commit--Code-Σ--ZENITH--AI--v151.0-gold)](https://github.com/AaryanSinghChauhan09/SigmaOS/commits/main)
 
-**SigmaOS** is an absolute scratch-made, zero-dependency, bare-metal sovereign operating system. Version 150.0 marks the **Autonomous Century**, introducing a fully self-healing silicon architecture that has absorbed the Unique Selling Points (USPs) of the entire Linux distribution landscape—from the stability of Debian and the minimalism of Arch to the declarative perfection of NixOS and the amnesic privacy of Tails.
+**SigmaOS** is an absolute scratch-made, zero-dependency, bare-metal sovereign operating system. Version 151.0 marks the **AI-Augmented Century**, introducing the **Sovereign Intelligence Engine** which has absorbed the mission-critical USPs of the entire distribution landscape.
 
 ---
 
-## 🏛️ v150.0 AUTONOMOUS CENTURY (Universal Master Shards)
+## 🏛️ v151.0 AI-AUGMENTED CENTURY (Intelligence Shards)
 
-- **Sovereign Shard-On-Demand (SOD)**: Radical modular execution engine. **Now 100% raw x86_64 Assembly.** Only the specific code required for a task is mapped into silicon memory, while the rest remains dormant, achieving 0% silicon waste and absolute low-level control.
+- **Neural-Shard (ML Core)**: An integrated machine learning visualization and inference engine. Real-time silicon-direct transformer execution simulation (v4-Sovereign).
+- **Sigma-Notebook (Data Science)**: A built-in industrial environment for data orchestration and analytics. Supports `sigmatensor` parity for high-speed data sharding.
+---
+
+- **Sovereign Shard-On-Demand (SOD)**: Radical modular execution engine. **Now 100% raw x86_64 Assembly.**
+
 - **Zero Library Dependence**: Purged all standard library dependencies (libc, libstdc++). All primitives are now raw assembly shards (`SigmaCore.asm`).
 - **Reduced HLL Dependency**: Core OS logic and task orchestration have been transitioned to **raw Assembly** and **no_std Rust**, minimizing reliance on high-level language runtimes.
 - **Universal Distro Absorption**: Integrated philosophies and mission shards from **Debian**, **Arch**, **Gentoo**, **NixOS**, **Alpine**, **Kali**, **Tails**, and **Legacy Distros** (Corel/Lindows).
