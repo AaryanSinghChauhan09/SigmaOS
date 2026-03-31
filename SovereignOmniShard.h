@@ -150,4 +150,11 @@ void SovereignOffensive_NeutronAudit(void);
  * ========================================================================= */
 void Sovereign_PM_Main(void);
 
+/* =========================================================================
+ * DOMAIN: QUANTUM-RESISTANT CRYPTOGRAPHY (Lattice-PQC)
+ * ========================================================================= */
+void SovereignQuantum_LatticeInit(void);
+sigma_status SovereignQuantum_GenerateKey(void* pk, void* sk);
+void SovereignQuantum_AuditSecurity(void);
+
 #endif /* SOVEREIGN_OMNI_SHARD_H */
