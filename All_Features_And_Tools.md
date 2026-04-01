@@ -11,6 +11,9 @@ This document serves as the master index for every capability, Shard, and tool e
 | **SigmaOOP Polymorphism** | C11 structure-based Object-Oriented polymorphism utilized via `CLASS_DECLARE` macros. | `SovereignOmniShard.h` | 🟢 **Complete & Native** |
 | **Virtual File System (VFS)** | Sub-nanosecond UNIX-style file mapping utilizing direct memory-mapped snapshots and full rollback features. | `SigmaVFS.js`, `sigma_std.c` | 🟢 **Complete & Native** |
 | **Zero-Copy Memory Manager** | PMM/VMM implementation combined with slab allocators explicitly built to bypass standard OS bottlenecks. | `SovereignProcessManager.c` | 🟢 **Complete & Native** |
+| **Aether Shard Loader** | Custom ELF-loader and mapping agent designed to hot-swap `.c` modules straight into the ring-0 space. | `SovereignAetherShardLoader.asm` | 🟢 **Complete & Native** |
+| **Sovereign Assurance Protocol** | Cryptographic hashing and validation logic evaluating system kernel states against intrusion vectors. | `SovereignAssurance.asm` | 🟢 **Complete & Native** |
+| **Sigma Core Engine** | The absolute lowest-level fundamental CPU bootstrapping logic enabling native `CMPXCHG16B` lock-free queues. | `SigmaCore.asm` | 🟢 **Complete & Native** |
 
 ## 🧩 Shard-On-Demand (SOD) Ecosystem
 
@@ -39,6 +42,9 @@ We do not use standard GNU coreutils. All tools are native `C11` or strictly con
 | `remote_bot` | Native Remote Procedure Call network executor with absolute zero-dependency mapping. | `ssh`, `netcat` | 🟢 **Complete & Native** |
 | `gaming` | Pre-allocation tool locking CPU cores and dynamically releasing graphic V-RAM for isolation. | `gamemode` | 🟢 **Complete & Native** |
 | `system_cleaner` | Executes rapid cache dumping, forensic wiping, and history sanitization in C11. | `shred`, `bleachbit` | 🟢 **Complete & Native** |
+| `academy` | Dedicated Educational orchestrator for interactive simulations, locking out distractions while running NCERT math shards. | EdTech Application Hub | 🟢 **Complete & Native** |
+| `studio` | Multimedia processing pipeline hooking directly into hardware rendering elements for video/audio processing. | Multimedia Creators | 🟢 **Complete & Native** |
+| `backup_manager` | CLI implementation interacting natively with VFS snapshots and block deduplication algorithms. | `timeshift`, `rsync` | 🟢 **Complete & Native** |
 
 ## 🌌 Zenith-Gold UX & Application Architecture
 
