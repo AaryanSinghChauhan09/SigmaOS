@@ -22,8 +22,9 @@
   --accent-glow:   rgba(0, 210, 255, 0.4);
   --text-main:     #e6edf3;
   --text-muted:    #8b949e;
-  --glass-bg:      rgba(13, 17, 23, 0.75);
+  --glass-bg:      rgba(10, 10, 10, 0.85); /* Optimized for Zenith */
   --glass-border:  rgba(48, 54, 61, 0.8);
+  --glass-blur:    45px;
   --shadow-color:  rgba(0, 0, 0, 0.6);
   --radius-lg:     16px;
   --radius-md:     10px;
@@ -35,14 +36,8 @@
   --amoled-dark:   #000000;
   --fluent-acrylic: rgba(20, 20, 20, 0.88);
   --fluent-border:  rgba(227, 176, 75, 0.25); /* Yaru-Gold Tint */
-  --aqua-highlight: rgba(255, 255, 255, 0.25);
-  --aqua-shadow:    0 30px 100px rgba(0, 0, 0, 0.95);
-  --gold-gradient:  linear-gradient(135deg, var(--yaru-gold) 0%, #8b6e3d 100%);
-  --desktop-bg:     radial-gradient(circle at center, #2c001e 0%, #000000 100%); /* Canonical Dark Purple Fusion */
-  --glass-bg:       rgba(10, 10, 10, 0.85);
-  --glass-blur:     45px;
+  --desktop-bg:     radial-gradient(circle at center, #2c001e 0%, #000000 100%);
   --transition-smooth: all 0.6s cubic-bezier(0.16, 1, 0.3, 1);
-  --aqua-gradient: linear-gradient(135deg, rgba(233, 84, 32, 0.1) 0%, rgba(227, 176, 75, 0.05) 100%);
   --accent-gradient: linear-gradient(90deg, var(--accent-secondary), var(--accent-primary));
 }
 
@@ -144,6 +139,25 @@ html, body {
   font-weight: 700;
   color: var(--accent-primary);
   letter-spacing: 1px;
+}
+
+#taskbar {
+  flex: 1;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 12px;
+  overflow-x: auto;
+  scrollbar-width: none;
+  padding: 0 20px;
+}
+#taskbar::-webkit-scrollbar { display: none; }
+
+.active-chip {
+  background: var(--accent-gradient) !important;
+  color: white !important;
+  border-color: var(--accent-primary) !important;
+  box-shadow: 0 0 15px var(--accent-glow) !important;
 }
 
 #clock {
