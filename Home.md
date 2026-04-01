@@ -69,6 +69,7 @@ Hot-loadable feature modules enabled/disabled at runtime:
 | [[BioInformatics_Shard]] | Bio-Informatics Shard capabilities |
 | [[OS_Level_USPs]] | Core Unique Selling Propositions |
 | [[Lost_Features]] | Features removed for system sovereignty |
+| [[Competitor_Comparison]] | Detailed comparison against market OS competitors |
 
 ---
 
