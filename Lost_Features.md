@@ -34,4 +34,30 @@ This page catalogs the "Lost Features," explaining why they no longer exist in t
 - **Reasoning:** Centralized package managers (like `apt` or `pacman`) rely on a cascade of PGP keys, third-party mirrors, and cloud dependencies, which violates our first Principle of Sovereignty: *No cloud dependencies.*
 - **Replacement:** Everything required for a sovereign workflow is compiled locally via local shard loading or native C11 assembly linkage.
 
+---
+
+## The Continuous Purge: Features Scrapped During Recent Updates
+
+As SigmaOS evolved, several architectural concepts that were initially prototyped were actively hunted down and killed to maintain absolute sovereignty.
+
+### 7. The Electron / Chromium UI Shell
+- **Status:** Annihilated (Update v0.4)
+- **Reasoning:** Early prototypes of the Zenith-Gold UI relied on Chromium/Electron wrappers. It was discovered that idle DOM rendering consumed 1.2GB of RAM. This was unacceptable for an OS targeting latency-critical domains (HFT, Bio-Informatics).
+- **Replacement:** Re-engineered the UI using fractional native Javascript orchestrators directly interpreting the HTML/CSS arrays without heavy Chromium compositing.
+
+### 8. Background VFS Indexing Daemons
+- **Status:** Scrapped (Update v0.7)
+- **Reasoning:** Standard OS environments use background daemons (like Windows Indexer or Linux `updatedb`) that randomly spike CPU usage, causing unacceptable jitter for the **Gamer Persona** and **AI Tensors**.
+- **Replacement:** Absolute O(1) hash mapping upon file creation (`SovereignVFS`). If you don’t manually search it, it doesn’t index it.
+
+### 9. Cloud-Sync Backup Vectors
+- **Status:** Severed (Update v0.9)
+- **Reasoning:** Integrating cloud-sync features violated the fundamental law of data gravity. 
+- **Replacement:** The `backup_manager.c` Shard now exclusively performs local, air-gapped, encrypted tarball snapshots. No byte ever touches AWS/Azure.
+
+### 10. Dynamic Link Libraries (`.so` / `.dll`)
+- **Status:** Banned (Update v1.0)
+- **Reasoning:** Relying on shared libraries creates dependency hell and version mismatch exploits. 
+- **Replacement:** The entire OS operates on **Shard-On-Demand (SOD)** dynamically compiling raw `.c` payloads into Ring-0 memory on invocation. 
+
 While standard operating systems mourn the loss of these abstracted layers, SigmaOS users embrace the direct, unfiltered power that comes with their excision.
