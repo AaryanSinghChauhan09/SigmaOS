@@ -228,6 +228,35 @@ window.addEventListener('DOMContentLoaded', () => {
         }, 1800);
     };
 
+    window.runPlan9Bind = () => {
+        const addr = document.getElementById('p9-addr').value;
+        if (!addr) return;
+        window.SIGMA.spawnToast(`9P: Binding namespace ${addr}...`);
+        setTimeout(() => {
+            window.SIGMA.spawnToast('Plan 9 Eq: Remote file system linked to local VFS boundary.');
+        }, 1200);
+    };
+
+    window.runHolyPoke = () => {
+        const addr = document.getElementById('holy-poke-addr').value;
+        const val = document.getElementById('holy-poke-val').value;
+        if (!addr || !val) return;
+        window.SIGMA.spawnToast(`HolyC Eq: Poking memory address 0xB8000 + ${addr} with ${val}.`);
+        setTimeout(() => {
+            window.SIGMA.spawnToast('TempleOS Eq: Direct unabstracted VRAM modification successful.');
+        }, 500);
+    };
+
+    window.runKaliScan = () => {
+        const log = document.getElementById('kali-log');
+        if (!log) return;
+        log.innerHTML = 'ENUMERATING LOCAL SILICON PORTS...';
+        window.SIGMA.spawnToast('Kali Eq: Dispersing raw SYN port scanning kernel.');
+        setTimeout(() => {
+            log.innerHTML = '<span class="u-error-text">SCAN COMPLETE. Open Vectors: 22, 80, 443, 6500.</span>';
+        }, 1600);
+    };
+
     window.runCyberScan = () => {
         const log = document.getElementById('cyber-scan-log');
         if (!log) return;

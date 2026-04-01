@@ -37,6 +37,9 @@ export const SOVEREIGN_SHARDS = [
     { id: 'qubesshard', name: 'Hypervisor Bounds', icon: '🧊', domain: 'Security', enabled: true, description: 'Virtual Machine Compartmentalization (Qubes OS Eq).' },
     { id: 'timeshard', name: 'Time Machine', icon: '⏳', domain: 'System', enabled: false, description: 'Delta-block Incremental Backups (macOS Eq).' },
     { id: 'tailshard', name: 'Onion Router', icon: '🧅', domain: 'Network', enabled: false, description: 'Deep Web 3-Node Obfuscation (Tails OS Eq).' },
+    { id: 'plan9shard', name: '9P Network', icon: '🌌', domain: 'Network', enabled: false, description: 'Everything-is-a-file 9P Protocol (Plan 9 Eq).' },
+    { id: 'holyshard', name: 'Ring-0 Oracle', icon: '✝️', domain: 'System', enabled: false, description: 'Direct unabstracted hardware mapping (TempleOS Eq).' },
+    { id: 'kalishard', name: 'Pen-Test Map', icon: '🐉', domain: 'Security', enabled: true, description: 'Low-level Nmap port enumeration (Kali OS Eq).' },
     { id: 'vfsmanager', name: 'VFS Admin', icon: '💾', domain: 'System', enabled: false, description: 'Manage raw silicon storage blocks.' },
     { id: 'netviz', name: 'Net Shard', icon: '🌐', domain: 'Network', enabled: false, description: 'Visualize real local network topography.' },
     { id: 'principles', name: 'Principles', icon: '⚖️', domain: 'System', enabled: true, description: 'Sovereign OS Manifest & Performance USPs.' }

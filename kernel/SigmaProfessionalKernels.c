@@ -35,3 +35,6 @@ float sigma_pow(float base, int exp) {
 #include "shards/SovereignQubes.c"
 #include "shards/SovereignTimeMachine.c"
 #include "shards/SovereignTailRouter.c"
+#include "shards/SovereignPlan9.c"
+#include "shards/SovereignHolyC.c"
+#include "shards/SovereignKali.c"

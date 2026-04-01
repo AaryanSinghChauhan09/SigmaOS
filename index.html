@@ -1298,6 +1298,59 @@ msg: db "SIGMAOS ACTIVE", 10
             </div>
         </section>
 
+        <!-- PLAN 9 SHARD -->
+        <section id="win-plan9shard" class="window hidden win-services-default">
+            <div class="win-header">
+                <div class="win-title">🌌 9P Network (Plan 9 Eq)</div>
+                <div class="win-controls">
+                    <div class="win-btn win-min" data-action="minimize" data-win="plan9shard"></div>
+                    <div class="win-btn win-close" data-action="close" data-win="plan9shard"></div>
+                </div>
+            </div>
+            <div class="win-content u-padding-16">
+                <div class="u-muted-text u-font-size-xxs u-margin-b-10">EVERYTHING-IS-A-FILE 9P BINDING</div>
+                <div class="win-input-group u-margin-t-10">
+                    <input type="text" id="p9-addr" class="win-input u-font-size-xxs" value="/net/tcp/192.168.1.5" title="9P Target Address">
+                </div>
+                <button class="status-chip u-margin-t-10 u-full-width" onclick="window.runPlan9Bind()">MOUNT TO VFS RING</button>
+            </div>
+        </section>
+
+        <!-- TEMPLE-OS HOLY SHARD -->
+        <section id="win-holyshard" class="window hidden win-emu-default">
+            <div class="win-header">
+                <div class="win-title">✝️ Ring-0 Oracle (TempleOS Eq)</div>
+                <div class="win-controls">
+                    <div class="win-btn win-min" data-action="minimize" data-win="holyshard"></div>
+                    <div class="win-btn win-close" data-action="close" data-win="holyshard"></div>
+                </div>
+            </div>
+            <div class="win-content u-padding-16">
+                <div class="u-muted-text u-font-size-xxs u-margin-b-10">DIRECT UNABSTRACTED VGA POINTER</div>
+                <div class="win-input-group u-margin-t-10">
+                    <input type="text" id="holy-poke-addr" class="win-input u-font-size-xxs" placeholder="Address (0-4000)" title="VRAM Address">
+                    <input type="text" id="holy-poke-val" class="win-input u-font-size-xxs" placeholder="Hex Value" title="Byte Value">
+                </div>
+                <button class="status-chip u-error-text u-margin-t-10 u-full-width" onclick="window.runHolyPoke()">POKE HARDWARE REGISTER</button>
+            </div>
+        </section>
+
+        <!-- KALI PEN-TEST SHARD -->
+        <section id="win-kalishard" class="window hidden win-matrix-default">
+            <div class="win-header">
+                <div class="win-title">🐉 Pen-Test Map (Kali OS Eq)</div>
+                <div class="win-controls">
+                    <div class="win-btn win-min" data-action="minimize" data-win="kalishard"></div>
+                    <div class="win-btn win-close" data-action="close" data-win="kalishard"></div>
+                </div>
+            </div>
+            <div class="win-content u-padding-16">
+                <div class="u-muted-text u-font-size-xxs u-margin-b-10">LOW-LEVEL NMAP SYN-EQUIVALENT</div>
+                <button class="status-chip u-full-width" onclick="window.runKaliScan()">INITIATE TARGET PORT SCAN</button>
+                <div id="kali-log" class="u-margin-t-10 u-font-size-xxs u-accent-text">Scanner Dormant.</div>
+            </div>
+        </section>
+
         <section id="win-mlshard" class="window hidden win-matrix-default">
             <div class="win-header">
                 <div class="win-title">🚀 Sovereign ML-Ops (Deployment Pipeline)</div>
