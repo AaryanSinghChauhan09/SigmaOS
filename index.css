@@ -817,3 +817,144 @@ body.mode-ascii #dock {
     border-top: 1px dashed var(--accent-primary) !important;
     background: #000 !important;
 }
+
+/* ═══════════════════════════════════════════════════════════
+   XV. SOVEREIGN MENU & SHARD MANAGEMENT
+   ═══════════════════════════════════════════════════════════ */
+#sigma-menu {
+    position: fixed;
+    top: 50px;
+    left: 20px;
+    width: 320px;
+    max-height: 80vh;
+    background: rgba(10, 10, 15, 0.95);
+    -webkit-backdrop-filter: blur(20px);
+    backdrop-filter: blur(20px);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-top: 2px solid var(--accent-primary);
+    border-radius: 8px;
+    z-index: 5000;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+    display: flex;
+    flex-direction: column;
+    animation: slideInMenu 0.3s ease-out;
+}
+
+@keyframes slideInMenu {
+    from { opacity: 0; transform: translateY(-10px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+#sigma-menu.hidden { display: none; }
+
+.menu-header {
+    padding: 16px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+#menu-search {
+    width: 100%;
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    color: white;
+    padding: 8px;
+    margin-top: 10px;
+    border-radius: 4px;
+    font-size: 12px;
+}
+
+.menu-items-grid {
+    padding: 16px;
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 12px;
+    overflow-y: auto;
+}
+
+.menu-card {
+    background: rgba(255, 255, 255, 0.02);
+    border: 1px solid rgba(255, 255, 255, 0.05);
+    padding: 12px 8px;
+    border-radius: 6px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.menu-card:hover {
+    background: rgba(255, 255, 255, 0.08);
+    border-color: var(--accent-primary);
+    transform: translateY(-2px);
+}
+
+.menu-footer {
+    padding: 12px;
+    background: rgba(0,0,0,0.2);
+    display: flex;
+    justify-content: space-around;
+}
+
+/* Toggle Switch */
+.switch {
+  position: relative;
+  display: inline-block;
+  width: 40px;
+  height: 20px;
+}
+
+.switch input { opacity: 0; width: 0; height: 0; }
+
+.slider {
+  position: absolute;
+  cursor: pointer;
+  top: 0; left: 0; right: 0; bottom: 0;
+  background-color: rgba(255,255,255,0.1);
+  transition: .4s;
+  border-radius: 34px;
+}
+
+.slider:before {
+  position: absolute;
+  content: "";
+  height: 14px; width: 14px;
+  left: 3px; bottom: 3px;
+  background-color: white;
+  transition: .4s;
+  border-radius: 50%;
+}
+
+input:checked + .slider { background-color: var(--accent-primary); }
+input:checked + .slider:before { transform: translateX(20px); }
+
+/* Dev Shard specific */
+.dev-sidebar {
+    width: 150px;
+    border-right: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.file-item {
+    font-size: 10px;
+    padding: 4px 8px;
+    cursor: pointer;
+    border-radius: 3px;
+    margin-bottom: 2px;
+}
+
+.file-item:hover { background: rgba(255, 255, 255, 0.05); }
+.file-item.active { background: rgba(0, 210, 255, 0.2); color: var(--accent-primary); }
+
+.task-item {
+    font-size: 11px;
+    padding: 6px;
+    background: rgba(255,255,255,0.02);
+    margin-bottom: 4px;
+    border-radius: 4px;
+}
+
+.studio-preview {
+    height: 180px;
+    border-radius: 6px;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+}

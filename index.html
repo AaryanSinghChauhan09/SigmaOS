@@ -31,18 +31,13 @@
          ═══════════════════════════════════════════════════════════ -->
     <header id="top-bar">
         <div id="top-bar-left">
-            <span class="sigma-logo">Σ SIGMAOS <span class="u-muted-text u-font-size-xs">AUTONOMOUS v150.0</span></span>
+            <div id="sigma-button" class="top-item sigma-logo" onclick="toggleMenu()">Σ</div>
+            <span class="sigma-logo-text">SIGMAOS <span class="u-muted-text u-font-size-xs">AUTONOMOUS v160.0</span></span>
             <div class="top-item" data-window="sysinfo">
                 <div class="status-chip"><div class="pulse"></div> KERNEL: ACTIVE</div>
             </div>
             <div class="top-item" title="Sovereign Sentinel Status">
                 <div class="status-chip" id="sentinel-status"><div class="pulse sentinel-pulse"></div> SENTINEL: ARMED</div>
-            </div>
-            <div class="top-item" title="Universal Distro Sharding" onclick="openWindow('sharding')">
-                <div id="active-mode-chip" class="status-chip mode-chip">MODE: ZENITH</div>
-            </div>
-            <div class="top-item" title="Market Crushing Matrix" onclick="openWindow('matrix')">
-                <div class="status-chip matrix-chip">📊 MARKET MATRIX</div>
             </div>
             <div class="top-item u-muted-text u-font-size-xs">
                 CPU: <span id="cpu-val" class="u-accent-text">--%</span>
@@ -51,10 +46,31 @@
         </div>
         <div id="taskbar"></div>
         <div id="top-bar-right">
+            <div class="top-item" title="Sovereign Shard Manager" onclick="openWindow('shardmanager')">
+                <div class="status-chip manager-chip">🧩 SHARD MGR</div>
+            </div>
             <span id="clock" title="Sovereign System Time">00:00:00</span>
             <span id="power-icon" class="top-item" title="Kernel Power Integration">⚡</span>
         </div>
     </header>
+
+    <!-- ═══════════════════════════════════════════════════════════
+         2.5 SOVEREIGN MENU
+         ═══════════════════════════════════════════════════════════ -->
+    <div id="sigma-menu" class="hidden">
+        <div class="menu-header">
+            <div class="u-accent-text u-bold">Σ SOVEREIGN NAVIGATOR</div>
+            <input type="text" id="menu-search" placeholder="Search Shards..." onkeyup="filterMenu()">
+        </div>
+        <div id="menu-items" class="menu-items-grid">
+            <!-- Dynamic menu items will be injected here -->
+        </div>
+        <div class="menu-footer">
+            <div class="status-chip" onclick="switchMode('ZENITH')">ZENITH</div>
+            <div class="status-chip" onclick="switchMode('KALI')">KALI</div>
+            <div class="status-chip" onclick="switchMode('ARCH')">ARCH</div>
+        </div>
+    </div>
 
     <!-- ═══════════════════════════════════════════════════════════
          3. WORKSPACE (WINDOW AREA)
@@ -780,24 +796,194 @@
         </section>
 
 
-        <!-- SOVEREIGN CAMERA SHARD (SNAPCHAT/SCRATCH USP) -->
-        <section id="win-camera" class="window hidden win-distro-default">
+        <!-- SOVEREIGN SHARD MANAGER (AUTONOMY CORE) -->
+        <section id="win-shardmanager" class="window hidden win-services-default">
             <div class="win-header">
-                <div class="win-title">📸 Sovereign Camera & Vision Shard</div>
+                <div class="win-title">🧩 Sovereign Shard Store & Autonomy Hub</div>
                 <div class="win-controls">
-                    <div class="win-btn win-min" data-action="minimize" data-win="camera"></div>
-                    <div class="win-btn win-close" data-action="close" data-win="camera"></div>
+                    <div class="win-btn win-min" data-action="minimize" data-win="shardmanager"></div>
+                    <div class="win-btn win-close" data-action="close" data-win="shardmanager"></div>
                 </div>
             </div>
-            <div class="win-content u-flex-column u-padding-16">
-                <div class="camera-container u-full-height u-bg-black u-margin-b-10">
-                    <video id="camera-stream" autoplay class="u-full-width u-full-height"></video>
+            <div class="win-content u-scroll-y">
+                <div class="u-margin-b-20 u-padding-16 u-bg-glass-heavy">
+                    <h3 class="u-accent-text">SYSTEM SOVEREIGNTY</h3>
+                    <p class="u-muted-text u-font-size-xxs">You are the Kernel. Install only what is essential for your mission.</p>
                 </div>
-                <div class="u-flex-between">
-                    <select id="camera-filter" title="Sovereign Camera Lens" class="u-bg-transparent u-text-white u-border-glass u-padding-4">
-                        <option value="none">No Filter</option>
-                        <option value="grayscale(100%)">Sovereign B&W</option>
-                        <option value="sepia(100%)">Industrial Legacy</option>
+                <div id="shard-manager-list" class="u-grid-1">
+                    <!-- Dynamic shard toggles -->
+                </div>
+                <div class="u-padding-16 u-text-center">
+                    <button class="status-chip u-error-bg" onclick="purgeUnusedShards()">PURGE ALL INACTIVE SHARDS</button>
+                </div>
+            </div>
+        </section>
+
+        <!-- DEVELOPER SHARD (INDUSTRIAL IDE) -->
+        <section id="win-devshard" class="window hidden win-terminal-default">
+            <div class="win-header">
+                <div class="win-title">👨‍💻 Sovereign Dev-Shard (C11/Asm IDE)</div>
+                <div class="win-controls">
+                    <div class="win-btn win-min" data-action="minimize" data-win="devshard"></div>
+                    <div class="win-btn win-max" data-action="maximize" data-win="devshard"></div>
+                    <div class="win-btn win-close" data-action="close" data-win="devshard"></div>
+                </div>
+            </div>
+            <div class="win-content u-flex-row">
+                <aside class="dev-sidebar u-bg-glass-heavy u-padding-8">
+                    <div class="u-font-size-xxs u-muted-text u-margin-b-10">PROJECTS</div>
+                    <div class="file-item active">kernel_core.asm</div>
+                    <div class="file-item">memory_mgr.c</div>
+                    <div class="file-item">sovereign_scheduler.h</div>
+                </aside>
+                <div class="u-flex-column u-full-width">
+                    <textarea id="dev-editor" class="u-font-code u-full-width u-full-height u-bg-transparent u-text-white u-padding-16 u-border-none u-outline-none u-resize-none" spellcheck="false" autocomplete="off">
+; SigmaOS Kernel Entry Point
+global _start
+
+section .text
+_start:
+    mov rax, 1          ; syscall: write
+    mov rdi, 1          ; fd: stdout
+    mov rsi, msg        ; buffer
+    mov rdx, 13         ; length
+    syscall
+
+    mov rax, 60         ; syscall: exit
+    xor rdi, rdi
+    syscall
+
+section .data
+msg: db "SIGMAOS ACTIVE", 10
+                    </textarea>
+                    <div class="dev-status-bar u-bg-glass-heavy u-padding-4 u-font-size-xxs u-flex-between">
+                        <span>Line 1, Column 1</span>
+                        <span>Language: Assembly</span>
+                        <button class="status-chip" onclick="SIGMA.spawnToast('Building Kernel Shard...')">BUILD</button>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- CYBER-SHARD (PENETRATION & AUDIT) -->
+        <section id="win-cybershard" class="window hidden win-matrix-default">
+            <div class="win-header">
+                <div class="win-title">🐲 Sovereign Cyber-Shard (Offensive Audit)</div>
+                <div class="win-controls">
+                    <div class="win-btn win-min" data-action="minimize" data-win="cybershard"></div>
+                    <div class="win-btn win-close" data-action="close" data-win="cybershard"></div>
+                </div>
+            </div>
+            <div class="win-content">
+                <div class="u-grid-2">
+                    <div class="metric-card">
+                        <div class="u-font-size-xs u-accent-text">NETWORK SCANNER</div>
+                        <div id="cyber-scan-log" class="win-terminal-pre u-font-size-xxs u-margin-t-10 u-scroll-y" style="height: 100px;">
+                            [INFO] Scanner Idle.
+                        </div>
+                        <button class="status-chip u-margin-t-5" onclick="runCyberScan()">SCAN LOCAL MESH</button>
+                    </div>
+                    <div class="metric-card">
+                        <div class="u-font-size-xs u-accent-text">VULNERABILITY HUB</div>
+                        <div class="u-font-size-xxs u-muted-text">• CVE-2026-999 (Linux Kernel) - DETECTED</div>
+                        <div class="u-font-size-xxs u-muted-text">• Buffer Overflow (WinSS) - MITIGATED</div>
+                        <button class="status-chip u-margin-t-5" onclick="SIGMA.spawnToast('Neutron Audit Triggered...')">AUDIT ALL</button>
+                    </div>
+                </div>
+                <div class="u-margin-t-20 u-accent-text u-bold">TARGET MATRIX: <span id="cyber-target">NONE</span></div>
+            </div>
+        </section>
+
+        <!-- DATA-SHARD (TENSOR FIELD MONITOR) -->
+        <section id="win-datashard" class="window hidden win-sysinfo-default">
+            <div class="win-header">
+                <div class="win-title">📊 Sovereign Data-Shard (Tensor Analytics)</div>
+                <div class="win-controls">
+                    <div class="win-btn win-min" data-action="minimize" data-win="datashard"></div>
+                    <div class="win-btn win-close" data-action="close" data-win="datashard"></div>
+                </div>
+            </div>
+            <div class="win-content u-text-center">
+                <canvas id="data-chart" width="400" height="200" class="neural-canvas u-margin-b-10"></canvas>
+                <div class="u-accent-text u-bold">TENSOR FLOW: <span id="tensor-flow-rate">1.4 TB/s</span></div>
+                <div class="u-muted-text u-font-size-xxs">SOURCE: Global Silicon Mesh</div>
+            </div>
+        </section>
+
+        <!-- FINANCE-SHARD (CRYPTO & STOCK MATRIX) -->
+        <section id="win-financeshard" class="window hidden win-matrix-default">
+            <div class="win-header">
+                <div class="win-title">💰 Sovereign Finance-Shard (Market Matrix)</div>
+                <div class="win-controls">
+                    <div class="win-btn win-min" data-action="minimize" data-win="financeshard"></div>
+                    <div class="win-btn win-close" data-action="close" data-win="financeshard"></div>
+                </div>
+            </div>
+            <div class="win-content">
+                <table class="u-full-width matrix-table">
+                    <thead>
+                        <tr>
+                            <th>ASSET</th>
+                            <th>PRICE</th>
+                            <th>24H CHG</th>
+                        </tr>
+                    </thead>
+                    <tbody id="finance-table">
+                        <!-- Dynamic finance data -->
+                    </tbody>
+                </table>
+            </div>
+        </section>
+
+        <!-- CONTENT-SHARD (CREATIVE STUDIO) -->
+        <section id="win-contentshard" class="window hidden win-emu-default">
+            <div class="win-header">
+                <div class="win-title">🎬 Sovereign Content-Shard (Studio Zenith)</div>
+                <div class="win-controls">
+                    <div class="win-btn win-min" data-action="minimize" data-win="contentshard"></div>
+                    <div class="win-btn win-close" data-action="close" data-win="contentshard"></div>
+                </div>
+            </div>
+            <div class="win-content u-flex-column">
+                <div class="studio-preview u-full-width u-bg-black u-margin-b-10 u-flex-center">
+                    <span class="u-muted-text">Studio Preview (Direct FB)</span>
+                </div>
+                <div class="studio-controls u-grid-4">
+                    <button class="status-chip" onclick="SIGMA.spawnToast('Stream Initiated...')">LIVE</button>
+                    <button class="status-chip" onclick="SIGMA.spawnToast('Rendering Video...')">RENDER</button>
+                    <button class="status-chip">LENS</button>
+                    <button class="status-chip">AUDIO</button>
+                </div>
+            </div>
+        </section>
+
+        <!-- PRODUCTIVITY-SHARD (SOVEREIGN BOARD) -->
+        <section id="win-productivity" class="window hidden win-services-default">
+            <div class="win-header">
+                <div class="win-title">✅ Sovereign Task Board</div>
+                <div class="win-controls">
+                    <div class="win-btn win-min" data-action="minimize" data-win="productivity"></div>
+                    <div class="win-btn win-close" data-action="close" data-win="productivity"></div>
+                </div>
+            </div>
+            <div class="win-content">
+                <div id="task-board" class="u-grid-3">
+                    <div class="metric-card">
+                        <div class="u-font-size-xs u-accent-text">TO DO</div>
+                        <div class="task-item">• Finish Kernel ASM</div>
+                        <div class="task-item">• Clean Silicon</div>
+                    </div>
+                    <div class="metric-card">
+                        <div class="u-font-size-xs u-accent-text">IN PROGRESS</div>
+                        <div class="task-item">• Sharding UI Core</div>
+                    </div>
+                    <div class="metric-card">
+                        <div class="u-font-size-xs u-accent-text">DONE</div>
+                        <div class="task-item">• Purge Windows</div>
+                    </div>
+                </div>
+            </div>
+        </section>
                         <option value="hue-rotate(90deg)">Neon Shard</option>
                         <option value="blur(5px)">Privacy Blur</option>
                     </select>
@@ -839,6 +1025,145 @@
                 </div>
             </div>
         </section>
+        <!-- AI LAB SHARD -->
+        <section id="win-aishard" class="window hidden win-sysinfo-default">
+            <div class="win-header">
+                <div class="win-title">🧠 Sovereign AI Lab (Model Forge)</div>
+                <div class="win-controls">
+                    <div class="win-btn win-min" data-action="minimize" data-win="aishard"></div>
+                    <div class="win-btn win-max" data-action="maximize" data-win="aishard"></div>
+                    <div class="win-btn win-close" data-action="close" data-win="aishard"></div>
+                </div>
+            </div>
+            <div class="win-content u-scroll-y">
+                <div class="u-grid-2">
+                    <div class="metric-card">
+                        <div class="u-font-size-xs u-accent-text">SYNTHETIC DATA GEN</div>
+                        <div id="ai-gen-progress" class="progress-bar u-margin-t-10"><div class="progress-fill" id="ai-bar"></div></div>
+                        <button class="status-chip u-margin-t-10" onclick="startAIGen()">START GENERATION</button>
+                    </div>
+                    <div class="metric-card">
+                        <div class="u-font-size-xs u-accent-text">PROMPT TEMPLATES</div>
+                        <select aria-label="Prompt Templates" class="u-full-width u-bg-transparent u-text-white u-border-glass u-margin-t-10">
+                            <option>Optimized Coding Assist</option>
+                            <option>Zero-Shot Reasoning</option>
+                            <option>Chain-of-Thought Shard</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="u-padding-16">
+                    <div class="u-accent-text u-bold">AI PRINCIPLES:</div>
+                    <ul class="u-muted-text u-font-size-xxs">
+                        <li>• Sovereign Privacy: All inference is local-first.</li>
+                        <li>• Bias Mitigation: Synthetic data diversity engine.</li>
+                        <li>• Optimization: Bit-perfect C11 kernels for tensor flow.</li>
+                    </ul>
+                </div>
+                <div class="u-margin-t-20 u-accent-text u-bold u-text-center">MISSION: <span id="ai-mission-status">IDLE</span></div>
+            </div>
+        </section>
+
+        <!-- DATA SCIENCE SHARD -->
+        <section id="win-dsshard" class="window hidden win-sysinfo-default">
+            <div class="win-header">
+                <div class="win-title">📉 Sovereign Data-Sci (Analysis Shard)</div>
+                <div class="win-controls">
+                    <div class="win-btn win-min" data-action="minimize" data-win="dsshard"></div>
+                    <div class="win-btn win-close" data-action="close" data-win="dsshard"></div>
+                </div>
+            </div>
+            <div class="win-content">
+                <div class="u-flex-between u-margin-b-10">
+                    <span class="u-accent-text u-bold">REAL-TIME ANALYTICS</span>
+                    <button class="status-chip" onclick="runDSAnalysis()">PERFORM PURE ANALYSIS</button>
+                </div>
+                <div class="u-grid-2">
+                    <div class="metric-card">
+                        <div class="u-font-size-xs u-accent-text">STATISTICAL MATRIX</div>
+                        <div id="ds-stats-log" class="u-font-size-xxs u-muted-text">Awaiting Analysis...</div>
+                    </div>
+                </div>
+                <canvas id="ds-canvas" width="400" height="150" class="neural-canvas u-margin-t-20"></canvas>
+            </div>
+        </section>
+
+        <!-- DSA VISUALIZER SHARD -->
+        <section id="win-dsashard" class="window hidden win-terminal-default">
+            <div class="win-header">
+                <div class="win-title">🧮 Sovereign DSA-Viz (Complexity Auditor)</div>
+                <div class="win-controls">
+                    <div class="win-btn win-min" data-action="minimize" data-win="dsashard"></div>
+                    <div class="win-btn win-close" data-action="close" data-win="dsashard"></div>
+                </div>
+            </div>
+            <div class="win-content">
+                <div class="u-flex-between u-margin-b-10">
+                    <select id="dsa-algo" aria-label="Algorithm Selection" class="status-chip">
+                        <option>QUICKSORT</option>
+                        <option>DIJKSTRA</option>
+                        <option>AVL-TREE</option>
+                    </select>
+                    <button class="status-chip" onclick="runDSAViz()">ANIMATE</button>
+                </div>
+                <div id="dsa-viz-area" class="u-full-width u-bg-glass-heavy u-margin-t-10 u-flex-center dsa-viz-height">
+                    <div class="u-muted-text">Auditor Ready. Select Algorithm.</div>
+                </div>
+                <div class="u-margin-t-10 u-font-size-xxs u-flex-between">
+                    <span>COMPLEXITY: <span class="u-accent-text">O(N log N)</span></span>
+                    <span>PRINCIPLE: HEAP-DIRECT STORAGE</span>
+                </div>
+            </div>
+        </section>
+
+        <!-- ML OPS SHARD -->
+        <section id="win-mlshard" class="window hidden win-matrix-default">
+            <div class="win-header">
+                <div class="win-title">🚀 Sovereign ML-Ops (Deployment Pipeline)</div>
+                <div class="win-controls">
+                    <div class="win-btn win-min" data-action="minimize" data-win="mlshard"></div>
+                    <div class="win-btn win-close" data-action="close" data-win="mlshard"></div>
+                </div>
+            </div>
+            <div class="win-content">
+                <div class="metric-card u-margin-b-10">
+                    <div class="u-font-size-xs u-accent-text">FEATURE ENGINEERING</div>
+                    <div class="u-font-size-xxs u-muted-text">One-Hot Encoding Shard: ACTIVE</div>
+                    <div class="u-font-size-xxs u-muted-text">Normalization (MinMax): ACTIVE</div>
+                </div>
+                <div class="u-grid-2">
+                    <button class="status-chip" onclick="SIGMA.spawnToast('Tuning Hyperparameters...')">TUNE_HYPER</button>
+                    <button class="status-chip" onclick="SIGMA.spawnToast('Deploying to Silicon...')">DEPLOY_PUSH</button>
+                </div>
+                <div class="u-margin-t-10 u-muted-text u-font-size-xxs">USP: Zero-Latency Model Quantization</div>
+            </div>
+        </section>
+
+        <!-- SOVEREIGN PRINCIPLES SHARD -->
+        <section id="win-principles" class="window hidden win-services-default">
+            <div class="win-header">
+                <div class="win-title">⚖️ Sovereign Principles (The Sigma Ethos)</div>
+                <div class="win-controls">
+                    <div class="win-btn win-min" data-action="minimize" data-win="principles"></div>
+                    <div class="win-btn win-close" data-action="close" data-win="principles"></div>
+                </div>
+            </div>
+            <div class="win-content u-scroll-y u-padding-16">
+                <article class="u-font-size-xs">
+                    <h2 class="u-accent-text u-margin-b-10">THE SIGMAOS MANIFESTO</h2>
+                    <p class="u-margin-b-10">1. **ABSOLUTE DISCRETION**: No cloud dependency. All logic is silicon-local.</p>
+                    <p class="u-margin-b-10">2. **ZERO ABSTRACTION LIES**: C11 and Assembly are the only truths.</p>
+                    <p class="u-margin-b-10">3. **SHARD AUTONOMY**: Every tool is a choice. The user is the final kernel branch.</p>
+                    <h4 class="u-accent-text u-margin-t-20">CORE DOMAIN USPs</h4>
+                    <ul class="u-muted-text">
+                        <li>**AI / ML**: Synthetic data generation eliminates training bias. No metadata scraping.</li>
+                        <li>**DS**: Statistical integrity via raw silicon precision math units.</li>
+                        <li>**CS**: Zero-trust architecture baked into the kernel-level IPC layer.</li>
+                        <li>**DSA**: Performance-first implementation of industrial primitives in x86_64 ASM.</li>
+                    </ul>
+                </article>
+            </div>
+        </section>
+
         <!-- ═══════════════════════════════════════════════════════════
              UNIVERSAL WEB SHARD (BROWSER-IN-BROWSER)
              ═══════════════════════════════════════════════════════════ -->
@@ -955,6 +1280,6 @@
     <!-- TOASTS -->
     <div id="toast-container"></div>
 
-    <script src="index.js"></script>
+    <script type="module" src="scripts/js/SigmaMain.js"></script>
 </body>
 </html>

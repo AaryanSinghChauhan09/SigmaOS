@@ -10,6 +10,29 @@
 "use strict";
 
 /**
+ * Σ SOVEREIGN SHARD CONFIG
+ * Defines which tools are available and their metadata.
+ */
+const SOVEREIGN_SHARDS = [
+    { id: 'terminal', name: 'Sigma Shell', icon: '🐚', domain: 'System', enabled: true, description: 'Core system command line interface.' },
+    { id: 'shardmanager', name: 'Shard Store', icon: '🧩', domain: 'System', enabled: true, description: 'Full autonomy over tools & performance.' },
+    { id: 'sysinfo', name: 'Metrics Hub', icon: '📊', domain: 'System', enabled: true, description: 'Real-time performance telemetry.' },
+    { id: 'devshard', name: 'Dev IDE', icon: '👨‍💻', domain: 'Dev', enabled: true, description: 'C11/ASM IDE - Pure performance.' },
+    { id: 'aishard', name: 'AI Lab', icon: '🧠', domain: 'AI', enabled: true, description: 'Gradient Descent & Tensor flow kernels.' },
+    { id: 'dsshard', name: 'Data Sci', icon: '📉', domain: 'DS', enabled: true, description: 'Statistical analysis & Real-time math.' },
+    { id: 'dsashard', name: 'DSA Viz', icon: '🧮', domain: 'DSA', enabled: true, description: 'Algorithm auditing & Real-performance sorting.' },
+    { id: 'cybershard', name: 'Cyber Sec', icon: '🐲', domain: 'CS', enabled: true, description: 'Zero-trust audit & VFS path security.' },
+    { id: 'mlshard', name: 'ML Ops', icon: '🚀', domain: 'ML', enabled: true, description: 'Deployment pipelines & Feature engineering.' },
+    { id: 'financeshard', name: 'Finance', icon: '💰', domain: 'Finance', enabled: true, description: 'Industrial Finance - Stock & Crypto Matrix.' },
+    { id: 'contentshard', name: 'Studio', icon: '🎬', domain: 'Media', enabled: true, description: 'Creative media studio - Direct Rendering.' },
+    { id: 'productivity', name: 'Tasks', icon: '✅', domain: 'Productivity', enabled: true, description: 'Industrial Task Orchestration.' },
+    { id: 'vfsmanager', name: 'VFS Admin', icon: '💾', domain: 'System', enabled: false, description: 'Manage raw silicon storage blocks.' },
+    { id: 'netviz', name: 'Net Shard', icon: '🌐', domain: 'Network', enabled: false, description: 'Visualize real local network topography.' },
+    { id: 'principles', name: 'Principles', icon: '⚖️', domain: 'System', enabled: true, description: 'Sovereign OS Manifest & Performance USPs.' }
+];
+
+
+/**
  * Σ SOVEREIGN VFS (Virtual File System)
  * High-performance, persistent sharded storage.
  */
@@ -263,7 +286,18 @@ class SigmaSystem {
         this.vfs = new SigmaVFS();
         this.wm = new SigmaWM(this);
         this.activeMode = 'ZENITH';
+        this.shards = this.loadShardConfig();
         this.init();
+    }
+
+    loadShardConfig() {
+        const saved = localStorage.getItem('SOVEREIGN_SHARDS');
+        if (saved) return JSON.parse(saved);
+        return SOVEREIGN_SHARDS;
+    }
+
+    saveShardConfig() {
+        localStorage.setItem('SOVEREIGN_SHARDS', JSON.stringify(this.shards));
     }
 
     init() {
@@ -273,13 +307,15 @@ class SigmaSystem {
         this.initShell();
         this.initSpotlight();
         this.initSpecializedShards();
+        this.renderShardManager();
+        this.renderMenu();
 
         window.onerror = (msg, url, line) => {
             this.spawnToast(`Kernel Fault: ${msg}`, 0, true);
             return true;
         };
 
-        this.spawnToast('Σ SIGMAOS ZENITH MASTERPIECE INITIALIZED');
+        this.spawnToast('Σ SIGMAOS ZENITH SUPREME INITIALIZED');
     }
 
     initClock() {
@@ -459,6 +495,114 @@ class SigmaSystem {
         this.initAIOrchestrator();
         this.initSovereignCamera();
         this.initKeyboardAccessibility();
+        this.initFinanceData();
+        this.initDataChart();
+        this.initDSChart();
+        this.initSysAuditor();
+    }
+
+    initSysAuditor() {
+        // CS Shard: Real path scanning for 'insecure' patterns in VFS
+        const insecurePatterns = ['password', 'secret', 'token', 'key'];
+        this.vfs_vulnerabilities = [];
+        Object.keys(this.vfs.fs).forEach(path => {
+            insecurePatterns.forEach(p => {
+                if (path.toLowerCase().includes(p)) this.vfs_vulnerabilities.push(path);
+            });
+        });
+    }
+
+    initDSChart() {
+        const canvas = document.getElementById('ds-canvas');
+        if (!canvas) return;
+        const ctx = canvas.getContext('2d');
+        const draw = () => {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            ctx.strokeStyle = '#00d2ff';
+            ctx.beginPath();
+            for(let i=0; i<canvas.width; i++) {
+                const y = Math.sin(i * 0.05 + Date.now() * 0.005) * 30 + 75;
+                if(i===0) ctx.moveTo(i, y);
+                else ctx.lineTo(i, y);
+            }
+            ctx.stroke();
+            requestAnimationFrame(draw);
+        };
+        draw();
+    }
+
+    initFinanceData() {
+        const table = document.getElementById('finance-table');
+        if (!table) return;
+        const assets = [
+            { name: 'Σ-Coin', price: '$94,203', chg: '+8.4%' },
+            { name: 'BTC', price: '$1.2M', chg: '+1.2%' },
+            { name: 'US-Industrial', price: '$204.1', chg: '-0.3%' }
+        ];
+        table.innerHTML = assets.map(a => `
+            <tr>
+                <td class="u-accent-text u-bold">${a.name}</td>
+                <td>${a.price}</td>
+                <td class="${a.chg.startsWith('+') ? 'u-accent-text' : 'u-error-text'}">${a.chg}</td>
+            </tr>
+        `).join('');
+    }
+
+    initDataChart() {
+        const canvas = document.getElementById('data-chart');
+        if (!canvas) return;
+        const ctx = canvas.getContext('2d');
+        let points = Array(20).fill(0).map(() => Math.random() * 100);
+
+        const draw = () => {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            ctx.strokeStyle = '#00d2ff';
+            ctx.lineWidth = 2;
+            ctx.beginPath();
+            points.forEach((p, i) => {
+                const x = (canvas.width / 20) * i;
+                const y = canvas.height - (p / 100 * canvas.height);
+                if (i === 0) ctx.moveTo(x, y);
+                else ctx.lineTo(x, y);
+            });
+            ctx.stroke();
+            points.shift();
+            points.push(Math.random() * 100);
+        };
+        setInterval(draw, 500);
+    }
+
+    renderShardManager() {
+        const list = document.getElementById('shard-manager-list');
+        if (!list) return;
+        list.innerHTML = this.shards.map(s => `
+            <div class="metric-card u-flex-between u-margin-b-10">
+                <div>
+                    <div class="u-bold">${s.icon} ${s.name}</div>
+                    <div class="u-muted-text u-font-size-xxs">${s.description}</div>
+                </div>
+                <div class="u-flex-center">
+                    <span class="u-muted-text u-font-size-xxs u-margin-r-10">${s.enabled ? 'ACTIVE' : 'DISABLED'}</span>
+                    <label class="switch">
+                        <input type="checkbox" ${s.enabled ? 'checked' : ''} onchange="toggleShard('${s.id}')">
+                        <span class="slider round"></span>
+                    </label>
+                </div>
+            </div>
+        `).join('');
+    }
+
+    renderMenu() {
+        const items = document.getElementById('menu-items');
+        if (!items) return;
+        items.innerHTML = this.shards
+            .filter(s => s.enabled)
+            .map(s => `
+                <div class="menu-card" onclick="openWindow('${s.id}'); toggleMenu()">
+                    <div class="u-font-size-lg">${s.icon}</div>
+                    <div class="u-font-size-xxs u-bold">${s.name.toUpperCase()}</div>
+                </div>
+            `).join('');
     }
 
     initAIOrchestrator() {
@@ -556,3 +700,165 @@ window.switchMode = (mode) => {
     const chip = document.getElementById('active-mode-chip');
     if (chip) chip.textContent = 'MODE: ' + mode;
 };
+
+// --- NEW SOVEREIGN HANDLERS ---
+window.toggleMenu = () => {
+    document.getElementById('sigma-menu').classList.toggle('hidden');
+};
+
+window.filterMenu = () => {
+    const q = document.getElementById('menu-search').value.toLowerCase();
+    document.querySelectorAll('.menu-card').forEach(card => {
+        const name = card.innerText.toLowerCase();
+        card.style.display = name.includes(q) ? 'flex' : 'none';
+    });
+};
+
+window.toggleShard = (id) => {
+    const shard = window.SIGMA.shards.find(s => s.id === id);
+    if (!shard) return;
+    shard.enabled = !shard.enabled;
+    window.SIGMA.saveShardConfig();
+    window.SIGMA.renderShardManager();
+    window.SIGMA.renderMenu();
+    window.SIGMA.spawnToast(`Shard [${id}] ${shard.enabled ? 'Enabled' : 'Disabled'}.`);
+    
+    // If disabled, close the window
+    if (!shard.enabled) window.SIGMA.wm.close(id);
+};
+
+window.purgeUnusedShards = () => {
+    window.SIGMA.shards = window.SIGMA.shards.filter(s => s.enabled || s.id === 'shardmanager');
+    window.SIGMA.saveShardConfig();
+    window.SIGMA.renderShardManager();
+    window.SIGMA.renderMenu();
+    window.SIGMA.spawnToast('AUTONOMY TRIGGERED: Unused Shards Purged from Silicon.');
+};
+
+window.runCyberScan = () => {
+    const log = document.getElementById('cyber-scan-log');
+    if (!log) return;
+    log.innerHTML = '[INFO] Auditing Sovereign VFS...<br>';
+    
+    // PURE PERFORMANCE: Real VFS Scan
+    const vulns = window.SIGMA.vfs_vulnerabilities;
+    let i = 0;
+    const interval = setInterval(() => {
+        if (i >= vulns.length) { 
+            clearInterval(interval); 
+            log.innerHTML += `[COMPLETE] Audit finished. ${vulns.length} insecure paths found.<br>`;
+            window.SIGMA.spawnToast(`Security: Audit finished. Clean up requested.`);
+            return; 
+        }
+        log.innerHTML += `<span class="u-error-text">[VULN] Insecure Path: ${vulns[i++]}</span><br>`;
+        log.scrollTop = log.scrollHeight;
+    }, 400);
+};
+
+window.runDSAnalysis = () => {
+    const canvas = document.getElementById('ds-canvas');
+    if (!canvas) return;
+    const ctx = canvas.getContext('2d');
+    
+    // PURE PERFORMANCE: Real Mean/Variance Calculation
+    const data = Array(100).fill(0).map(() => Math.random() * 100);
+    const mean = data.reduce((a, b) => a + b) / data.length;
+    const variance = data.reduce((a, b) => a + Math.pow(b - mean, 2), 0) / data.length;
+    
+    window.SIGMA.spawnToast(`DS: Analysis finished. Mean: ${mean.toFixed(2)}, Var: ${variance.toFixed(2)}`);
+    
+    // Visualize histogram
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    const bins = Array(10).fill(0);
+    data.forEach(d => bins[Math.floor(d/10)]++);
+    bins.forEach((b, i) => {
+        ctx.fillStyle = '#00d2ff';
+        ctx.fillRect(i * 40, canvas.height - b * 10, 35, b * 10);
+    });
+};
+
+window.startAIGen = () => {
+    const bar = document.getElementById('ai-bar');
+    const status = document.getElementById('ai-mission-status');
+    if (!bar || !status) return;
+    
+    // PURE PERFORMANCE: Linear Regression Gradient Descent
+    status.textContent = 'RUNNING GRADIENT DESCENT...';
+    let w = 0, b = 0, alpha = 0.01;
+    const data = Array(100).fill(0).map((_, i) => ({ x: i, y: 2 * i + 5 + Math.random() }));
+    
+    let epoch = 0;
+    const runEpoch = () => {
+        let dw = 0, db = 0;
+        data.forEach(p => {
+            const pred = w * p.x + b;
+            dw += (pred - p.y) * p.x;
+            db += (pred - p.y);
+        });
+        w -= (dw / 100) * alpha;
+        b -= (db / 100) * alpha;
+        epoch++;
+        
+        bar.style.width = (epoch / 5) + '%'; // 500 epochs
+        if (epoch < 500) requestAnimationFrame(runEpoch);
+        else {
+            status.textContent = `TRAINED: y = ${w.toFixed(2)}x + ${b.toFixed(2)}`;
+            window.SIGMA.spawnToast('AI Lab: Model training complete on Silicon.');
+        }
+    };
+    runEpoch();
+};
+
+window.runDSAViz = () => {
+    const area = document.getElementById('dsa-viz-area');
+    const algo = document.getElementById('dsa-algo').value;
+    if (!area) return;
+    
+    // PURE PERFORMANCE: Real Quicksort/BubbleSort
+    const arr = Array(20).fill(0).map(() => Math.floor(Math.random() * 100));
+    const render = (a) => {
+        area.innerHTML = '';
+        a.forEach(v => {
+            const bar = document.createElement('div');
+            bar.className = 'status-chip';
+            bar.style.height = v + 'px';
+            bar.style.width = '10px';
+            bar.style.margin = '1px';
+            area.appendChild(bar);
+        });
+    };
+
+    if (algo === 'QUICKSORT') {
+        const sort = async (a, low, high) => {
+            if (low < high) {
+                let pivot = a[high];
+                let i = low - 1;
+                for (let j = low; j < high; j++) {
+                    if (a[j] < pivot) {
+                        i++;
+                        [a[i], a[j]] = [a[j], a[i]];
+                        render(a);
+                        await new Promise(r => setTimeout(r, 50));
+                    }
+                }
+                [a[i + 1], a[high]] = [a[high], a[i + 1]];
+                render(a);
+                let pi = i + 1;
+                await sort(a, low, pi - 1);
+                await sort(a, pi + 1, high);
+            }
+        };
+        sort(arr, 0, arr.length - 1).then(() => window.SIGMA.spawnToast('DSA: Quicksort logic audit complete.'));
+    }
+};
+
+window.updateFinanceData = () => {
+    window.SIGMA.initFinanceData();
+    window.SIGMA.spawnToast('Finance Matrix Synchronized.');
+};
+
+// Periodic updates for Data Shard
+setInterval(() => {
+    const flow = document.getElementById('tensor-flow-rate');
+    if (flow) flow.textContent = (Math.random() * 5 + 1).toFixed(2) + ' TB/s';
+}, 3000);
