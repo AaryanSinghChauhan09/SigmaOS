@@ -74,6 +74,7 @@ Hot-loadable feature modules enabled/disabled at runtime:
 | [[Future_Developments]] | Development roadmap and pending tool pipeline |
 | [[Shortcut_Commands]] | Native kernel keybindings and shell shorthand aliases |
 | [[OS_Development_History]] | Milestones, epochs, and bloat reduction timeline |
+| [[Faults_And_Improvements]] | Known system faults, scope of improvement, and resolutions |
 
 ---
 
