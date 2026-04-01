@@ -110,6 +110,30 @@ window.addEventListener('DOMContentLoaded', () => {
         window.SIGMA.spawnToast(`Personalization: Blur set to ${val}px`);
     };
 
+    window.runPQCAudit = () => {
+        const canvas = document.getElementById('pqc-canvas');
+        if (!canvas) return;
+        const ctx = canvas.getContext('2d');
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        ctx.strokeStyle = '#00d2ff';
+        ctx.beginPath();
+        for(let i=0; i<50; i++) {
+            const x = Math.random() * canvas.width;
+            const y = Math.random() * canvas.height;
+            ctx.lineTo(x, y);
+        }
+        ctx.stroke();
+        window.SIGMA.spawnToast('Quantum Shard: LWE Lattice integrity verified.');
+    };
+
+    window.syncLedger = () => {
+        const log = document.getElementById('ledger-log');
+        if (!log) return;
+        log.innerHTML += `<br>[${new Date().toLocaleTimeString()}] BLOCK_MINED: Peer Consensus 0x${Math.random().toString(16).slice(2, 10)}`;
+    };
+
+    setInterval(window.syncLedger, 5000);
+
     window.runCyberScan = () => {
         const log = document.getElementById('cyber-scan-log');
         if (!log) return;

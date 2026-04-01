@@ -1116,6 +1116,38 @@ msg: db "SIGMAOS ACTIVE", 10
         </section>
 
         <!-- ML OPS SHARD -->
+        <!-- QUANTUM SHARD -->
+        <section id="win-pqcshard" class="window hidden win-services-default">
+            <div class="win-header">
+                <div class="win-title">⚛️ Post-Quantum Finality (LWE Lattice)</div>
+                <div class="win-controls">
+                    <div class="win-btn win-min" data-action="minimize" data-win="pqcshard"></div>
+                    <div class="win-btn win-close" data-action="close" data-win="pqcshard"></div>
+                </div>
+            </div>
+            <div class="win-content u-padding-16">
+                <div class="u-muted-text u-font-size-xxs u-margin-b-10">LWE LATTICE INTEGRITY SYSTEM</div>
+                <div class="u-flex-center">
+                    <canvas id="pqc-canvas" width="300" height="150" class="u-bg-glass-heavy"></canvas>
+                </div>
+                <button class="status-chip u-margin-t-20 u-full-width" onclick="window.runPQCAudit()">AUDIT QUANTUM LATTICE</button>
+            </div>
+        </section>
+
+        <!-- LEDGER SHARD -->
+        <section id="win-ledger-shard" class="window hidden win-matrix-default">
+            <div class="win-header">
+                <div class="win-title">⛓️ Sovereign Distributed Ledger (Chain)</div>
+                <div class="win-controls">
+                    <div class="win-btn win-min" data-action="minimize" data-win="ledger-shard"></div>
+                    <div class="win-btn win-close" data-action="close" data-win="ledger-shard"></div>
+                </div>
+            </div>
+            <div class="win-content u-scroll-y u-padding-16">
+                <div id="ledger-log" class="u-font-size-xxs u-muted-text">Awaiting P2P Consensus...</div>
+            </div>
+        </section>
+
         <section id="win-mlshard" class="window hidden win-matrix-default">
             <div class="win-header">
                 <div class="win-title">🚀 Sovereign ML-Ops (Deployment Pipeline)</div>

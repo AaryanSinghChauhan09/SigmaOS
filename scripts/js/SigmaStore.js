@@ -26,6 +26,8 @@ export const SOVEREIGN_SHARDS = [
     { id: 'automationshard', name: 'Automation', icon: '🤖', domain: 'System', enabled: true, description: 'Sovereign task scheduling and headless scripting.' },
     { id: 'personalshard', name: 'Zenith Styles', icon: '🎨', domain: 'Design', enabled: true, description: 'Absolute UI personalization and aesthetics.' },
     { id: 'amnesicshard', name: 'Amnesic Mode', icon: '🧼', domain: 'Security', enabled: false, description: 'Forensic-grade memory scrubbing and data-scrub.' },
+    { id: 'pqcshard', name: 'Quantum Shard', icon: '⚛️', domain: 'Security', enabled: true, description: 'Post-Quantum LWE Lattice cryptography.' },
+    { id: 'ledger-shard', name: 'Sovereign Ledger', icon: '⛓️', domain: 'Network', enabled: false, description: 'Peer-to-Peer sharded consensus ledger.' },
     { id: 'vfsmanager', name: 'VFS Admin', icon: '💾', domain: 'System', enabled: false, description: 'Manage raw silicon storage blocks.' },
     { id: 'netviz', name: 'Net Shard', icon: '🌐', domain: 'Network', enabled: false, description: 'Visualize real local network topography.' },
     { id: 'principles', name: 'Principles', icon: '⚖️', domain: 'System', enabled: true, description: 'Sovereign OS Manifest & Performance USPs.' }
