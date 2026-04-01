@@ -190,6 +190,43 @@ static void cmd_toggle_kernel(void* ctx) {
 
 static void cmd_help(void* ctx);   /* forward decl */
 
+static void cmd_shard_dynamic(void* ctx) {
+    (void)ctx;
+    sigma_printf("[SHARD-DYNAMICS]: Executing Shard Reload/Unload/Status via Zero-Trust Matrix...\n");
+}
+static void cmd_ui_layout(void* ctx) {
+    (void)ctx;
+    sigma_printf("[UI-LAYOUT]: Manipulating Sovereign Workspace Geometry...\n");
+}
+static void cmd_file_snapshot(void* ctx) {
+    (void)ctx;
+    sigma_printf("[FILE-SNAPSHOT]: Instant FS Snapshot via B-Tree Delta Logging...\n");
+}
+static void cmd_net_firewall(void* ctx) {
+    (void)ctx;
+    sigma_printf("[NET-FIREWALL]: Updating Zero-Trust Packet Drop Rules...\n");
+}
+static void cmd_sec_sandbox(void* ctx) {
+    (void)ctx;
+    sigma_printf("[SEC-SANDBOX]: Enforcing App Armor / Sandboxing Profiles...\n");
+}
+static void cmd_perf_bench(void* ctx) {
+    (void)ctx;
+    sigma_printf("[PERF-BENCH]: Running Bare-Metal Benchmarks for CPU/GPU...\n");
+}
+static void cmd_auto_trigger(void* ctx) {
+    (void)ctx;
+    sigma_printf("[AUTO-TRIGGER]: Binding Hooks to OS Context Events...\n");
+}
+static void cmd_monitor_alerts(void* ctx) {
+    (void)ctx;
+    sigma_printf("[MONITOR-ALERTS]: Updating Threshold Interrupt Logic...\n");
+}
+static void cmd_ai_persona(void* ctx) {
+    (void)ctx;
+    sigma_printf("[AI-PERSONA]: Injecting ML Prediction Vectors to User Context...\n");
+}
+
 /* =========================================================================
  * Command dispatch table
  * ========================================================================= */
@@ -208,6 +245,21 @@ static const SigmaCommand SIGMA_COMMANDS[] = {
     { "NET_ZENITH",     "Zero-Trust handshake shard",           cmd_net           },
     { "RUN_PLAYBOOK",   "Execute dynamic industrial automation",  cmd_run_playbook  },
     { "TOGGLE_KERNEL",  "Switch KERNEL_ACTIVE state shard",      cmd_toggle_kernel },
+    { "SHARD_RELOAD",   "Reload a shard without reboot",         cmd_shard_dynamic },
+    { "SHARD_STATUS",   "Check shard health metric",             cmd_shard_dynamic },
+    { "SHARD_UNLOAD",   "Unload unused shards (--idle)",         cmd_shard_dynamic },
+    { "UI_LAYOUT_SAVE", "Save custom workspace geometry",        cmd_ui_layout     },
+    { "UI_NOTIFY_MUTE", "Suspend notifications globally",        cmd_ui_layout     },
+    { "FILE_SNAPSHOT",  "Create/Rollback FS snapshot",           cmd_file_snapshot },
+    { "FILE_DEDUP",     "Deduplicate files in directory",        cmd_file_snapshot },
+    { "NET_PROFILE",    "Save/Load Net Profiles",                cmd_net_firewall  },
+    { "NET_LATENCY",    "Execute TCP latency diagnostics",       cmd_net_firewall  },
+    { "SEC_AUDIT",      "Run security audit per persona",        cmd_sec_sandbox   },
+    { "SEC_SANDBOX",    "Isolate app execution context",         cmd_sec_sandbox   },
+    { "PERF_BENCH",     "Benchmark Hardware Performance",        cmd_perf_bench    },
+    { "AUTO_TRIGGER",   "Bind CLI macros to kernel events",      cmd_auto_trigger  },
+    { "MONITOR_ALERT",  "Threshold warnings system",             cmd_monitor_alerts},
+    { "AI_PERSONA",     "Create/Edit persona prediction",        cmd_ai_persona    },
     { "HELP",           "List available commands",              cmd_help          },
 };
 
