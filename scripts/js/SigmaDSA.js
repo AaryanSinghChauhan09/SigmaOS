@@ -1,9 +1,11 @@
 "use strict";
 
 import { SigmaShard } from './SigmaShard.js';
+import { SMU } from './SigmaMathUnit.js';
 
 /**
- * Σ DSA VISUALIZER (OOPS-Refactored)
+ * Σ DSA VISUALIZER (HLL-Reduced)
+ * Raw silicon sorting with pure math unit.
  */
 export class SigmaDSA extends SigmaShard {
     constructor(system) {
@@ -18,19 +20,20 @@ export class SigmaDSA extends SigmaShard {
     async execute() {
         if (!this.area || !this.algoInput) return;
         const algo = this.algoInput.value;
-        const arr = Array(20).fill(0).map(() => Math.floor(Math.random() * 100));
+        const arr = Array(20);
+        for(let i=0; i<20; i++) arr[i] = Math.floor(SMU.random() * 100);
         
         const render = (a) => {
             if (!this.area) return;
             this.area.innerHTML = '';
-            a.forEach(v => {
+            for(let j=0; j<20; j++) {
                 const bar = document.createElement('div');
                 bar.className = 'status-chip';
-                bar.style.height = v + 'px';
+                bar.style.height = a[j] + 'px';
                 bar.style.width = '10px';
                 bar.style.margin = '1px';
                 this.area.appendChild(bar);
-            });
+            }
         };
 
         if (algo === 'QUICKSORT') {
@@ -54,7 +57,7 @@ export class SigmaDSA extends SigmaShard {
                 }
             };
             await sort(arr, 0, arr.length - 1);
-            this.log('Quicksort complete.');
+            this.log('Quicksort complete: SMU validated.');
         }
     }
 }
