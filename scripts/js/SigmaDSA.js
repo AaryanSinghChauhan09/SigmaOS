@@ -1,23 +1,35 @@
 "use strict";
 
+import { SigmaShard } from './SigmaShard.js';
+
 /**
- * Σ DSA VISUALIZER
- * Algorithm performance auditing and visualization.
+ * Σ DSA VISUALIZER (OOPS-Refactored)
  */
-export class SigmaDSA {
-    static async runViz(area, algo, spawnToast) {
-        if (!area) return;
-        
+export class SigmaDSA extends SigmaShard {
+    constructor(system) {
+        super('dsashard', 'DSA Viz', system);
+        this.area = document.getElementById('dsa-viz-area');
+        this.algoInput = document.getElementById('dsa-algo');
+    }
+
+    /**
+     * Polymorphic implementation of execute() for Quicksort.
+     */
+    async execute() {
+        if (!this.area || !this.algoInput) return;
+        const algo = this.algoInput.value;
         const arr = Array(20).fill(0).map(() => Math.floor(Math.random() * 100));
+        
         const render = (a) => {
-            area.innerHTML = '';
+            if (!this.area) return;
+            this.area.innerHTML = '';
             a.forEach(v => {
                 const bar = document.createElement('div');
                 bar.className = 'status-chip';
                 bar.style.height = v + 'px';
                 bar.style.width = '10px';
                 bar.style.margin = '1px';
-                area.appendChild(bar);
+                this.area.appendChild(bar);
             });
         };
 
@@ -42,7 +54,7 @@ export class SigmaDSA {
                 }
             };
             await sort(arr, 0, arr.length - 1);
-            spawnToast('DSA: Quicksort complete.');
+            this.log('Quicksort complete.');
         }
     }
 }

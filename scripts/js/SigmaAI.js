@@ -1,14 +1,24 @@
 "use strict";
 
+import { SigmaShard } from './SigmaShard.js';
+
 /**
- * Σ SOVEREIGN AI SHARD
- * Pure performance Gradient Descent and Model Orchestration.
+ * Σ SOVEREIGN AI SHARD (OOPS-Refactored)
  */
-export class SigmaAI {
-    static startTraining(bar, status, spawnToast) {
-        if (!bar || !status) return;
+export class SigmaAI extends SigmaShard {
+    constructor(system) {
+        super('aishard', 'AI Lab', system);
+        this.bar = document.getElementById('ai-bar');
+        this.status = document.getElementById('ai-mission-status');
+    }
+
+    /**
+     * Polymorphic implementation of execute() for Gradient Descent.
+     */
+    execute() {
+        if (!this.bar || !this.status) return;
         
-        status.textContent = 'RUNNING GRADIENT DESCENT...';
+        this.status.textContent = 'RUNNING GRADIENT DESCENT...';
         let w = 0, b = 0, alpha = 0.01;
         const data = Array(100).fill(0).map((_, i) => ({ x: i, y: 2 * i + 5 + Math.random() }));
         
@@ -24,11 +34,11 @@ export class SigmaAI {
             b -= (db / 100) * alpha;
             epoch++;
             
-            bar.style.width = (epoch / 5) + '%';
+            this.bar.style.width = (epoch / 5) + '%';
             if (epoch < 500) requestAnimationFrame(runEpoch);
             else {
-                status.textContent = `TRAINED: y = ${w.toFixed(2)}x + ${b.toFixed(2)}`;
-                spawnToast('AI Lab: Model training complete on Silicon.');
+                this.status.textContent = `TRAINED: y = ${w.toFixed(2)}x + ${b.toFixed(2)}`;
+                this.log('Model training complete on Silicon.');
             }
         };
         runEpoch();
