@@ -34,7 +34,7 @@ void user_manager_init(void) {
     
     /* Default Sovereign Master Identity */
     g_users[0].uid = 0;
-    const char* master_name = "Sovereign-Master";
+    const char* master_name = "SigmaSystem-Admin";
     usize j = 0; while (master_name[j]) { g_users[0].name[j] = master_name[j]; j++; }
     g_users[0].name[j] = '\0';
     g_users[0].privilege_level = 2; /* Absolute Sovereignty */

@@ -175,6 +175,7 @@
                 <div class="win-title">📦 Shard Containers (Cgroup-Parity)</div>
                 <div class="win-controls">
                     <div class="win-btn win-min" data-action="minimize" data-win="containers"></div>
+                    <div class="win-btn win-max" data-action="maximize" data-win="containers"></div>
                     <div class="win-btn win-close" data-action="close" data-win="containers"></div>
                 </div>
             </div>
@@ -195,6 +196,7 @@
                 <div class="win-title">🧩 Kernel Module Shards</div>
                 <div class="win-controls">
                     <div class="win-btn win-min" data-action="minimize" data-win="kernel-modules"></div>
+                    <div class="win-btn win-max" data-action="maximize" data-win="kernel-modules"></div>
                     <div class="win-btn win-close" data-action="close" data-win="kernel-modules"></div>
                 </div>
             </div>
@@ -209,6 +211,7 @@
                 <div class="win-title">🔐 Lattice-PQC Sentinel</div>
                 <div class="win-controls">
                     <div class="win-btn win-min" data-action="minimize" data-win="pqc-sentinel"></div>
+                    <div class="win-btn win-max" data-action="maximize" data-win="pqc-sentinel"></div>
                     <div class="win-btn win-close" data-action="close" data-win="pqc-sentinel"></div>
                 </div>
             </div>
@@ -225,6 +228,7 @@
                 <div class="win-title">📂 Sovereign VFS</div>
                 <div class="win-controls">
                     <div class="win-btn win-min" data-action="minimize" data-win="files"></div>
+                    <div class="win-btn win-max" data-action="maximize" data-win="files"></div>
                     <div class="win-btn win-close" data-action="close" data-win="files"></div>
                 </div>
             </div>
@@ -234,12 +238,85 @@
             </div>
         </section>
 
+        <!-- Σ LAW SHARD: INDIAN COMPLIANCE (BNSS/BNS/BSA 2023) -->
+        <section id="win-law" class="window hidden win-sysinfo-default">
+            <div class="win-header">
+                <div class="win-title">⚖️ Indian Law Compliance Shard (v2.0)</div>
+                <div class="win-controls">
+                    <div class="win-btn win-min" data-action="minimize" data-win="law"></div>
+                    <div class="win-btn win-max" data-action="maximize" data-win="law"></div>
+                    <div class="win-btn win-close" data-action="close" data-win="law"></div>
+                </div>
+            </div>
+            <div class="win-content u-scroll-y">
+                <div class="u-margin-b-10 u-accent-text u-bold">BNSS / BNS / BSA 2023 (Latest Legislation)</div>
+                <div id="law-log" class="ai-chat-log u-margin-b-10" style="height: 200px;">
+                    <div class="u-muted-text">[STATUS] Monitoring Supreme Court & High Court Interpretations...</div>
+                </div>
+                <div class="u-grid-1">
+                    <div class="metric-card">
+                        <div class="u-bold u-font-size-xs">Forensic Seizure Checklist (Section 105 BNSS)</div>
+                        <div class="u-font-size-xxs u-muted-text">• Mandatory Videography Protocol ACTIVE</div>
+                        <div class="u-font-size-xxs u-muted-text">• Evidence Chain-of-Custody Hashing ACTIVE</div>
+                        <button class="status-chip u-margin-t-5" onclick="executeJusticeShard()">Verify Compliance</button>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Σ CAMERA SHARD: SNAP-SCRATCH PARITY -->
+        <section id="win-camera" class="window hidden win-emu-default">
+            <div class="win-header">
+                <div class="win-title">📸 Sovereign Lens Shard (Snap-Style)</div>
+                <div class="win-controls">
+                    <div class="win-btn win-min" data-action="minimize" data-win="camera"></div>
+                    <div class="win-btn win-max" data-action="maximize" data-win="camera"></div>
+                    <div class="win-btn win-close" data-action="close" data-win="camera"></div>
+                </div>
+            </div>
+            <div class="win-content u-flex-column u-flex-center">
+                <div class="metric-card u-full-width u-full-height u-flex-column u-flex-center">
+                    <video id="camera-stream" class="u-full-width neural-canvas" autoplay playsinline style="border-radius: 8px;"></video>
+                    <div class="u-flex-between u-full-width u-margin-t-10">
+                        <select id="camera-filter" class="status-chip u-bg-transparent">
+                            <option value="none">Normal</option>
+                            <option value="grayscale(100%)">Forensic Mono</option>
+                            <option value="sepia(100%)">Amber NCERT</option>
+                            <option value="invert(100%)">Ghost Shard</option>
+                        </select>
+                        <button class="status-chip" onclick="takeSnapshot()">Snap</button>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Σ SHARE TASK SHARD: NETWORK ORCHESTRATION -->
+        <section id="win-share" class="window hidden win-sysinfo-default">
+            <div class="win-header">
+                <div class="win-title">🔗 Task Sharing Matrix (Aether Link)</div>
+                <div class="win-controls">
+                    <div class="win-btn win-min" data-action="minimize" data-win="share"></div>
+                    <div class="win-btn win-max" data-action="maximize" data-win="share"></div>
+                    <div class="win-btn win-close" data-action="close" data-win="share"></div>
+                </div>
+            </div>
+            <div class="win-content">
+                <div class="u-margin-b-10 u-accent-text">Share mission with peer nodes:</div>
+                <div id="share-nodes" class="u-grid-2">
+                    <div class="metric-card">Peer-01 (Ubuntu-Elite) <span class="u-accent-text">[IDLE]</span></div>
+                    <div class="metric-card">Peer-02 (Arch-Zenith) <span class="u-accent-text">[ACTIVE]</span></div>
+                </div>
+                <button class="status-chip u-margin-t-10 u-full-width" onclick="shareTask()">Distribute Current Load</button>
+            </div>
+        </section>
+
         <!-- APP STORE / REPOSITORY WINDOW -->
         <section id="win-pkg" class="window hidden win-pkg-default">
             <div class="win-header">
                 <div class="win-title">📦 Sovereign App Repository</div>
                 <div class="win-controls">
                     <div class="win-btn win-min" data-action="minimize" data-win="pkg"></div>
+                    <div class="win-btn win-max" data-action="maximize" data-win="pkg"></div>
                     <div class="win-btn win-close" data-action="close" data-win="pkg"></div>
                 </div>
             </div>

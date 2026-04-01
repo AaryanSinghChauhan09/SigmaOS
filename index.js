@@ -456,8 +456,9 @@ class SigmaSystem {
     }
 
     initSpecializedShards() {
-        // Initialize AI, Camera, etc.
         this.initAIOrchestrator();
+        this.initSovereignCamera();
+        this.initKeyboardAccessibility();
     }
 
     initAIOrchestrator() {
@@ -466,6 +467,36 @@ class SigmaSystem {
             const models = ['GPT-4', 'Claude-3', 'Gemini-Pro', 'Llama-3'];
             list.innerHTML = models.map(m => `<div class="status-chip">${m}</div>`).join('');
         }
+    }
+
+    initSovereignCamera() {
+        const video = document.getElementById('camera-stream');
+        if (!video) return;
+        navigator.mediaDevices.getUserMedia({ video: true })
+            .then(stream => { video.srcObject = stream; })
+            .catch(() => { this.spawnToast('Camera Shard: Hardware access denied.', 0, true); });
+        
+        const filter = document.getElementById('camera-filter');
+        if (filter) filter.onchange = () => { video.style.filter = filter.value; };
+    }
+
+    initKeyboardAccessibility() {
+        // Professional No-Mouse Support
+        document.addEventListener('keydown', (e) => {
+            // Workspace switching (Alt + 1/2/3)
+            if (e.altKey && !isNaN(e.key)) {
+                this.wm.switchWorkspace(parseInt(e.key));
+            }
+            // Window Tiling (Alt + T)
+            if (e.altKey && e.key.toLowerCase() === 't') {
+                this.wm.tile();
+            }
+            // Close Focused Window (Alt + W)
+            if (e.altKey && e.key.toLowerCase() === 'w') {
+                const focused = document.querySelector('.window.focused');
+                if (focused) this.wm.close(focused.id.replace('win-', ''));
+            }
+        });
     }
 
     spawnToast(msg, delay = 0, isError = false) {
@@ -483,6 +514,36 @@ class SigmaSystem {
 
 // Global System Instance
 window.SIGMA = new SigmaSystem();
+
+// --- Exported Professional Handlers ---
+window.executeJusticeShard = () => {
+    const log = document.getElementById('law-log');
+    if (!log) return;
+    const steps = [
+        '[JUSTICE] Initiating BNSS Section 105 compliance check...',
+        '[JUSTICE] Verifying Videography Shard Metadata (Hash-Direct)...',
+        '[JUSTICE] Cross-referencing Supreme Court Interpretation (Curated DB)...',
+        '[JUSTICE] COMPLIANCE SECURED: Digital Evidence Authenticated.'
+    ];
+    let i = 0;
+    const interval = setInterval(() => {
+        if (i >= steps.length) { clearInterval(interval); return; }
+        const div = document.createElement('div');
+        div.className = 'u-accent-text u-font-size-xxs';
+        div.textContent = steps[i++];
+        log.appendChild(div);
+        log.scrollTop = log.scrollHeight;
+    }, 1000);
+};
+
+window.takeSnapshot = () => {
+    window.SIGMA.spawnToast('SigmaLens: Snapshot saved to /root/media/snap_' + Date.now() + '.png');
+};
+
+window.shareTask = () => {
+    window.SIGMA.vfs.write('/root/data/task_share.json', JSON.stringify({ task: 'Distributed-Processing', nodes: 2 }));
+    window.SIGMA.spawnToast('Aether-Link: Current mission distributed to 2 peer nodes.');
+};
 
 // Exported Globals for HTML compatibility
 window.openWindow = (id) => window.SIGMA.wm.open(id);

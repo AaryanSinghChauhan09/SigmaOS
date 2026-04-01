@@ -1,6 +1,6 @@
 /*
  * =============================================================================
- * Σ SIGMAOS KERNEL: SOVEREIGN-MASTER-CHECKLIST-DATABASE (v14.0 - EDUCATIONAL)
+ * Σ SIGMAOS KERNEL: SigmaSystem-Admin-CHECKLIST-DATABASE (v14.0 - EDUCATIONAL)
  * =============================================================================
  * Algorithm: Sovereign Universal Educational Mastery (SUEM)
  * Content: 100,000+ Case/Tutorial Shards (W3S, GFG, FCC, MDN, TutorialsPoint)

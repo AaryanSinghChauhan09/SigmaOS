@@ -32,7 +32,7 @@ void sigma_panic(const char* msg, u64 rip, u64 rsp) {
     
     /* Enter Industrial Halt State (No-Mouse recovery pulse) */
     while (1) {
-        /* Wait for Sovereign-Master manual silicon pulse */
+        /* Wait for SigmaSystem-Admin manual silicon pulse */
         __asm__ __volatile__("hlt");
     }
 }

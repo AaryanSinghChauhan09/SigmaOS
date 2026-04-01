@@ -19,7 +19,7 @@ PROTECTED_FILES = {
 }
 
 # Sanitization Patterns
-PERSONAL_DATA = re.compile(r'\bSovereign-Master\b|\bchauhan\b', re.I)
+PERSONAL_DATA = re.compile(r'\bSigmaSystem-Admin\b|\bSigmaSovereign\b', re.I)
 RELIGIOUS_TERMS = re.compile(r'\bgod\b|\blord\b|\bfaith\b|\bspirit\b|\bholy\b|\bprayer\b|\bdivine\b|\bworship\b', re.I)
 VULGAR_TERMS = re.compile(r'\bshit\b|\bfuck\b|\bbitch\b|\bdamn\b|\bcrap\b', re.I)
 
