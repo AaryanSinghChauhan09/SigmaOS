@@ -70,6 +70,7 @@ Hot-loadable feature modules enabled/disabled at runtime:
 | [[OS_Level_USPs]] | Core Unique Selling Propositions |
 | [[Lost_Features]] | Features removed for system sovereignty |
 | [[Competitor_Comparison]] | Detailed comparison against market OS competitors |
+| [[All_Features_And_Tools]] | Complete master index of all native OS capabilities |
 
 ---
 
