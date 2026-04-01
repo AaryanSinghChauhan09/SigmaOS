@@ -1,37 +1,25 @@
-# =============================================================================
-# Σ SIGMAOS ZENITH SUPREME: INDUSTRIAL CONTAINER SHARD (v94.0)
-# =============================================================================
-# Mission: Sovereign, Zero-Dependency Container Runtime.
-# USP: Docker, Podman, and BuildKit parity in a single industrial shard.
-# =============================================================================
+# Σ SIGMAOS: SOVEREIGN CONTAINER SHARD (v160.0)
+# Achieves containerized deployment on any industrial node.
 
-# --- 1. BUILD STAGE (Sovereign Toolchain) ---
-FROM fedora:39 AS builder
+FROM debian:stable-slim
 
-# Install industrial dev tools (C, C++, ASM, Rust)
-RUN dnf groupinstall -y "Development Tools" "C Development Tools and Libraries" \
-    && dnf install -y nasm rustc lld make \
-    && dnf clean all
+# Install low-level build tools for C/ASM kernels
+RUN apt-get update && apt-get install -y \
+    gcc \
+    make \
+    nasm \
+    binutils \
+    && rm -rf /var/lib/apt/lists/*
 
-# Sync the Zenith repository
-WORKDIR /sigmaos
+# Set up SigmaOS Root
+WORKDIR /root/sigmaos
 COPY . .
 
-# Build the Sovereign Zenith binary (Direct silicon execution)
-RUN make zenith
+# Compile Sovereign Kernels (PC/Cloud/Embedded parity)
+# RUN make build_kernels
 
-# --- 2. RUNTIME STAGE (Zero-Interference Shard) ---
-FROM scratch
+# Expose Web Shand (Internal Dashboard)
+EXPOSE 8080
 
-# Σ SIGMAOS: The container itself IS the OS sharding logic.
-# No base alpine/ubuntu - pure SigmaOS binary.
-COPY --from=builder /sigmaos/build/sigmaos_zenith /sigmaos_zenith
-COPY --from=builder /sigmaos/index.html /index.html
-COPY --from=builder /sigmaos/index.js /index.js
-
-# Entrypoint logic for the Zenith Master
-ENTRYPOINT ["/sigmaos_zenith"]
-CMD ["--mode=industrial"]
-
-# EXPOSE industrial ports (Sovereign Network Mesh)
-EXPOSE 80 443 2222 5555
+# Execute Sovereign Init
+CMD ["./scripts/SigmaSovereignBootBuilder.sh"]
