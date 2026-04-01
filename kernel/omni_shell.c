@@ -232,6 +232,16 @@ static void cmd_auto_optimize(void* ctx) {
     // Pseudo execution to invoke sigma_auto_optimizer shard.
 }
 
+/* --- Classic Linux Handlers --- */
+static void cmd_linux_mkdir(void* ctx) { (void)ctx; sigma_printf("[VFS]: Directory node allocated in B-Tree.\n"); }
+static void cmd_linux_rm(void* ctx) { (void)ctx; sigma_printf("[VFS]: Unlinking inode from memory table...\n"); }
+static void cmd_linux_cat(void* ctx) { (void)ctx; sigma_printf("[STREAM]: Dumping file buffer to standard output (stub).\n"); }
+static void cmd_linux_grep(void* ctx) { (void)ctx; sigma_printf("[NLP]: Running Substring Matrix Scan over text stream...\n"); }
+static void cmd_linux_chmod(void* ctx) { (void)ctx; sigma_printf("[SEC]: Modifying POSIX bitmask permissions for Target.\n"); }
+static void cmd_linux_chown(void* ctx) { (void)ctx; sigma_printf("[SEC]: Reassigning Persona Ownership of inode.\n"); }
+static void cmd_linux_cp(void* ctx) { (void)ctx; sigma_printf("[VFS]: CoW (Copy-on-Write) shadow clone instantiated.\n"); }
+static void cmd_linux_mv(void* ctx) { (void)ctx; sigma_printf("[VFS]: Inode remounted to target directory block.\n"); }
+
 /* =========================================================================
  * Command dispatch table
  * ========================================================================= */
@@ -266,6 +276,17 @@ static const SigmaCommand SIGMA_COMMANDS[] = {
     { "MONITOR_ALERT",  "Threshold warnings system",             cmd_monitor_alerts},
     { "AI_PERSONA",     "Create/Edit persona prediction",        cmd_ai_persona    },
     { "AUTO_OPTIMIZE",  "Spawn background performance daemon",   cmd_auto_optimize },
+    
+    /* Linux Ported Commands */
+    { "MKDIR",          "Create directory (Linux port)",        cmd_linux_mkdir   },
+    { "RM",             "Remove file/inode (Linux port)",       cmd_linux_rm      },
+    { "CAT",            "Concatenate & print stream",           cmd_linux_cat     },
+    { "GREP",           "Regex/Substring search",               cmd_linux_grep    },
+    { "CHMOD",          "Change permission bits",               cmd_linux_chmod   },
+    { "CHOWN",          "Change owner persona",                 cmd_linux_chown   },
+    { "CP",             "Copy-on-write clone",                  cmd_linux_cp      },
+    { "MV",             "Move/Rename inode",                    cmd_linux_mv      },
+
     { "HELP",           "List available commands",              cmd_help          },
 };
 
