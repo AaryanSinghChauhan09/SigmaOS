@@ -324,7 +324,25 @@ static void shell_execute(OmniShellZenith* sh, const char* cmd) {
             return;
         }
     }
-    sigma_printf("[OMNI-SHELL]: Unknown command '%s'. Dispatching to AI-Kernel...\n", cmd);
+    
+    sigma_printf("[OMNI-SHELL]: Unknown command '%s'. Generating Suggestions...\n", cmd);
+    
+    /* CLI Command Suggestion Matrix (Performance Tuned) */
+    sigma_bool match_found = SIGMA_FALSE;
+    for (i = 0; i < SIGMA_CMD_COUNT; i++) {
+        /* Suggest if user input is a substring of any known command */
+        if (sigma_strstr(SIGMA_COMMANDS[i].name, cmd) || sigma_strstr(cmd, SIGMA_COMMANDS[i].name)) {
+            if (!match_found) {
+                sigma_printf("     ✨ Did you mean:\n");
+                match_found = SIGMA_TRUE;
+            }
+            sigma_printf("        - %s (%s)\n", SIGMA_COMMANDS[i].name, SIGMA_COMMANDS[i].description);
+        }
+    }
+    
+    if (!match_found) {
+        sigma_printf("        - No local shards match. Dispatching to AI-Orchestrator...\n");
+    }
     sh->commands_sharded++;
 }
 
