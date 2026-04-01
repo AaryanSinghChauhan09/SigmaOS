@@ -81,6 +81,7 @@ Hot-loadable feature modules enabled/disabled at runtime:
 | [[Sovereign_Domain_Dominance]] | How SigmaOS natively crushes competitors in AI, ML, CS, DSA, Indian Law, and NCERT |
 | [[Indian_Legal_Procedure_Checklist]] | Bare-metal execution matrix mapping BNS, BNSS, and BSA procedures natively |
 | [[Indian_Education_NCERT_Matrix]] | Hardware-enforced student lockdown and bare-metal algorithmic syllabus generation |
+| [[Changelog]] | The definitive version-by-version history tracking the brutal evolution and purges of SigmaOS |
 
 ---
 
