@@ -226,6 +226,11 @@ static void cmd_ai_persona(void* ctx) {
     (void)ctx;
     sigma_printf("[AI-PERSONA]: Injecting ML Prediction Vectors to User Context...\n");
 }
+static void cmd_auto_optimize(void* ctx) {
+    (void)ctx;
+    sigma_printf("[AUTO-OPTIMIZE]: Spawning Background Optimization Daemon via execve...\n");
+    // Pseudo execution to invoke sigma_auto_optimizer shard.
+}
 
 /* =========================================================================
  * Command dispatch table
@@ -260,6 +265,7 @@ static const SigmaCommand SIGMA_COMMANDS[] = {
     { "AUTO_TRIGGER",   "Bind CLI macros to kernel events",      cmd_auto_trigger  },
     { "MONITOR_ALERT",  "Threshold warnings system",             cmd_monitor_alerts},
     { "AI_PERSONA",     "Create/Edit persona prediction",        cmd_ai_persona    },
+    { "AUTO_OPTIMIZE",  "Spawn background performance daemon",   cmd_auto_optimize },
     { "HELP",           "List available commands",              cmd_help          },
 };
 
