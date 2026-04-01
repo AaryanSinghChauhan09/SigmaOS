@@ -31,3 +31,7 @@ float sigma_pow(float base, int exp) {
 #include "shards/SovereignCowork.c"
 #include "shards/SovereignComputeOracle.c"
 #include "shards/SovereignMacroClaw.c"
+// OS USP INJECTIONS
+#include "shards/SovereignQubes.c"
+#include "shards/SovereignTimeMachine.c"
+#include "shards/SovereignTailRouter.c"

@@ -34,6 +34,9 @@ export const SOVEREIGN_SHARDS = [
     { id: 'coworkshard', name: 'Co-Work IPC', icon: '🤝', domain: 'Agent', enabled: true, description: 'Multi-Agent Local Silicon Collaboration.' },
     { id: 'oracleshard', name: 'Compute Oracle', icon: '🔮', domain: 'Agent', enabled: false, description: 'Silicon Knowledge Graph (Perplexity Eq).' },
     { id: 'clawshard', name: 'Macro Claw', icon: '🦾', domain: 'Agent', enabled: true, description: 'Hardware-level Cursor & Automation Driver.' },
+    { id: 'qubesshard', name: 'Hypervisor Bounds', icon: '🧊', domain: 'Security', enabled: true, description: 'Virtual Machine Compartmentalization (Qubes OS Eq).' },
+    { id: 'timeshard', name: 'Time Machine', icon: '⏳', domain: 'System', enabled: false, description: 'Delta-block Incremental Backups (macOS Eq).' },
+    { id: 'tailshard', name: 'Onion Router', icon: '🧅', domain: 'Network', enabled: false, description: 'Deep Web 3-Node Obfuscation (Tails OS Eq).' },
     { id: 'vfsmanager', name: 'VFS Admin', icon: '💾', domain: 'System', enabled: false, description: 'Manage raw silicon storage blocks.' },
     { id: 'netviz', name: 'Net Shard', icon: '🌐', domain: 'Network', enabled: false, description: 'Visualize real local network topography.' },
     { id: 'principles', name: 'Principles', icon: '⚖️', domain: 'System', enabled: true, description: 'Sovereign OS Manifest & Performance USPs.' }

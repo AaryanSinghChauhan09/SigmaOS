@@ -1250,6 +1250,54 @@ msg: db "SIGMAOS ACTIVE", 10
             </div>
         </section>
 
+        <!-- QUBES OS SHARD -->
+        <section id="win-qubesshard" class="window hidden win-services-default">
+            <div class="win-header">
+                <div class="win-title">🧊 Qubes Bounds (Hypervisor Layer)</div>
+                <div class="win-controls">
+                    <div class="win-btn win-min" data-action="minimize" data-win="qubesshard"></div>
+                    <div class="win-btn win-close" data-action="close" data-win="qubesshard"></div>
+                </div>
+            </div>
+            <div class="win-content u-padding-16">
+                <div class="u-muted-text u-font-size-xxs u-margin-b-10">VM MEMORY COMPARTMENTALIZATION</div>
+                <button class="status-chip u-margin-t-10 u-full-width" onclick="window.runQubesAudit()">ENFORCE STRICT THREAT ISOLATION</button>
+                <div id="qubes-log" class="u-margin-t-10 u-font-size-xxs u-accent-text">All Domains Secure.</div>
+            </div>
+        </section>
+
+        <!-- TIME MACHINE SHARD -->
+        <section id="win-timeshard" class="window hidden win-settings-default">
+            <div class="win-header">
+                <div class="win-title">⏳ Time Delta (macOS Eq Backup)</div>
+                <div class="win-controls">
+                    <div class="win-btn win-min" data-action="minimize" data-win="timeshard"></div>
+                    <div class="win-btn win-close" data-action="close" data-win="timeshard"></div>
+                </div>
+            </div>
+            <div class="win-content u-padding-16">
+                <div class="u-muted-text u-font-size-xxs u-margin-b-10">INCREMENTAL SILICON SNAPSHOTS</div>
+                <button class="status-chip u-full-width" onclick="window.runTimeDelta()">COMPUTE VFS BLOCK DELTAS</button>
+                <div id="time-log" class="u-margin-t-10 u-font-size-xxs u-accent-text">Snapshot Ready.</div>
+            </div>
+        </section>
+
+        <!-- TAILS ONION SHARD -->
+        <section id="win-tailshard" class="window hidden win-matrix-default">
+            <div class="win-header">
+                <div class="win-title">🧅 Deep Router (Tails OS Eq)</div>
+                <div class="win-controls">
+                    <div class="win-btn win-min" data-action="minimize" data-win="tailshard"></div>
+                    <div class="win-btn win-close" data-action="close" data-win="tailshard"></div>
+                </div>
+            </div>
+            <div class="win-content u-padding-16">
+                <div class="u-muted-text u-font-size-xxs u-margin-b-10">3-NODE PACKET OBFUSCATION KERNEL</div>
+                <button class="status-chip u-full-width" onclick="window.runTailsRoute()">OBFUSCATE OUTBOUND PACKET</button>
+                <div id="tails-log" class="u-margin-t-10 u-font-size-xxs u-accent-text">Awaiting Traffic.</div>
+            </div>
+        </section>
+
         <section id="win-mlshard" class="window hidden win-matrix-default">
             <div class="win-header">
                 <div class="win-title">🚀 Sovereign ML-Ops (Deployment Pipeline)</div>

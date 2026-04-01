@@ -198,6 +198,36 @@ window.addEventListener('DOMContentLoaded', () => {
         }, 800);
     };
 
+    window.runQubesAudit = () => {
+        const log = document.getElementById('qubes-log');
+        if (!log) return;
+        log.innerHTML = 'VERIFYING APP_VM BOUNDARIES...';
+        window.SIGMA.spawnToast('Qubes Eq: Hypervisor separation check initiated.');
+        setTimeout(() => {
+            log.innerHTML = '<span class="u-accent-text">Xen Sub-VMs isolated. Ring-0 secure.</span>';
+        }, 1000);
+    };
+
+    window.runTimeDelta = () => {
+        const log = document.getElementById('time-log');
+        if (!log) return;
+        log.innerHTML = 'CALCULATING FILE POINTER DELTAS...';
+        window.SIGMA.spawnToast('Time Machine Eq: Snapshotting differential bits.');
+        setTimeout(() => {
+            log.innerHTML = '<span class="u-accent-text">DELTA BACKUP: 142KB Synced to Persistence.</span>';
+        }, 1500);
+    };
+
+    window.runTailsRoute = () => {
+        const log = document.getElementById('tails-log');
+        if (!log) return;
+        log.innerHTML = 'OBFUSCATING: NODE 1 -> NODE 2 -> NODE 3...';
+        window.SIGMA.spawnToast('Tails Eq: Onion packet encase generated.');
+        setTimeout(() => {
+            log.innerHTML = '<span class="u-accent-text">TRAFFIC MASKED (AES-XOR). Deep route complete.</span>';
+        }, 1800);
+    };
+
     window.runCyberScan = () => {
         const log = document.getElementById('cyber-scan-log');
         if (!log) return;
