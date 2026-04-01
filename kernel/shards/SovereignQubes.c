@@ -4,7 +4,7 @@
  * Execution: Simulates isolated VM memory bounds (AppVMs, NetVMs) in pure C.
  */
 
-#include "../SovereignOSBasicsZenith.h"
+
 
 #define MAX_APP_VMS 8
 

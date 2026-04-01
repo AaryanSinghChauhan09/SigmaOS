@@ -3,7 +3,7 @@
  * Industry Disruption: Silicon-local DNA sequence alignment without cloud dependency.
  */
 
-#include "../SovereignOSBasicsZenith.h"
+
 
 int sigma_max(int a, int b) {
     return (a > b) ? a : b;

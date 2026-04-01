@@ -4,7 +4,7 @@
  * Execution: Raw port-checking simulation and vulnerability string matching.
  */
 
-#include "../SovereignOSBasicsZenith.h"
+
 
 #define ALL_PORTS 65535
 

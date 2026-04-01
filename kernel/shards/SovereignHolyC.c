@@ -4,7 +4,7 @@
  * Execution: Removes virtualization layers, allowing direct pointer arithmetic to VRAM.
  */
 
-#include "../SovereignOSBasicsZenith.h"
+
 
 // Simulate VGA VRAM memory address 0xB8000
 unsigned char simulated_vram[4000];

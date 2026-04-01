@@ -4,7 +4,7 @@
  * Bypasses web APIs using pure string iteration over raw silicon memory.
  */
 
-#include "../SovereignOSBasicsZenith.h"
+
 
 int sigma_str_len(const char* s) {
     const char* p = s;

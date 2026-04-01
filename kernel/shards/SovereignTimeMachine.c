@@ -4,7 +4,7 @@
  * Execution: Simulates file modification pointers (deltas) across the silicon array.
  */
 
-#include "../SovereignOSBasicsZenith.h"
+
 
 #define MAX_SNAPSHOTS 64
 

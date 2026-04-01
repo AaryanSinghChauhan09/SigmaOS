@@ -3,7 +3,7 @@
  * Industry Disruption: Simulates graphical interaction logic at the kernel space without electron.js automation wrappers.
  */
 
-#include "../SovereignOSBasicsZenith.h"
+
 
 typedef struct {
     int x;

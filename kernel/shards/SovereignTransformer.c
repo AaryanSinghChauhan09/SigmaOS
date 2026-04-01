@@ -3,7 +3,7 @@
  * Industry Disruption: Base silicon matrix operation primitives for local-first LLMs.
  */
 
-#include "../SovereignOSBasicsZenith.h"
+
 
 /**
  * SIGMA_ATTENTION_SCORE

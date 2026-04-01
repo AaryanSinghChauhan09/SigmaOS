@@ -4,7 +4,7 @@
  * Execution: Pure C implementation of namespace synthetic binding across a cluster.
  */
 
-#include "../SovereignOSBasicsZenith.h"
+
 
 #define MAX_NAMESPACES 16
 

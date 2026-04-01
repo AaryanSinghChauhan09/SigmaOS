@@ -4,7 +4,7 @@
  * Execution: Math simulation of packet obfuscation across local node layers.
  */
 
-#include "../SovereignOSBasicsZenith.h"
+
 
 #define RELAY_NODES 3
 

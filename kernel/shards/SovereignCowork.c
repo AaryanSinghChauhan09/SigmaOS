@@ -4,7 +4,7 @@
  * Replaces Cloud-Based Co-Work systems with true local silicon execution boundaries.
  */
 
-#include "../SovereignOSBasicsZenith.h"
+
 
 #define MAX_AGENTS 4
 #define IPC_BUFFER_SIZE 1024
