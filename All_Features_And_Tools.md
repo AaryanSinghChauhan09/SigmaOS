@@ -45,6 +45,8 @@ We do not use standard GNU coreutils. All tools are native `C11` or strictly con
 | `academy` | Dedicated Educational orchestrator for interactive simulations, locking out distractions while running NCERT math shards. | EdTech Application Hub | 🟢 **Complete & Native** |
 | `studio` | Multimedia processing pipeline hooking directly into hardware rendering elements for video/audio processing. | Multimedia Creators | 🟢 **Complete & Native** |
 | `backup_manager` | CLI implementation interacting natively with VFS snapshots and block deduplication algorithms. | `timeshift`, `rsync` | 🟢 **Complete & Native** |
+| `indian_law` | Natively parses BNS, BNSS, and BSA regulations directly into memory, rendering external databases obsolete. | SCC Online, Manupatra | 🟢 **Complete & Native** |
+| `ncert_core` | The engine mapping the Indian educational syllabus onto native geometric renderers, ignoring web distractions entirely. | Byjus, Unacademy | 🟢 **Complete & Native** |
 
 ## 🌌 Zenith-Gold UX & Application Architecture
 
