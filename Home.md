@@ -65,6 +65,9 @@ Hot-loadable feature modules enabled/disabled at runtime:
 | [[HLL_Reduction]] | High-Level Language Reduction policy |
 | [[Principles_of_Sovereignty]] | Founding OS principles |
 | [[Installation_Finality]] | Build system and deployment |
+| [[HFT_Shard_Architecture]] | High Frequency Trading (HFT) Shard |
+| [[BioInformatics_Shard]] | Bio-Informatics Shard capabilities |
+| [[OS_Level_USPs]] | Core Unique Selling Propositions |
 
 ---
 
