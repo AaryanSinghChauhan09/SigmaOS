@@ -10,19 +10,6 @@
 #define SYS_EXECVE 59
 #define SYS_EXIT 60
 
-// Basic string matching tool
-int sigma_strcmp(const char* s1, const char* s2) {
-    while (*s1 && (*s1 == *s2)) { s1++; s2++; }
-    return *(unsigned char*)s1 - *(unsigned char*)s2;
-}
-
-// Length utility
-int sigma_strlen(const char* s) {
-    int len = 0;
-    while(s[len]) len++;
-    return len;
-}
-
 // URL Encoder (simplified for spaces -> %20)
 void encode_url(const char* src, char* dest) {
     while (*src) {
