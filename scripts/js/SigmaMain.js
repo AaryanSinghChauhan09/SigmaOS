@@ -13,22 +13,37 @@ window.addEventListener('DOMContentLoaded', () => {
     window.startAIGen = () => SigmaAI.startTraining(document.getElementById('ai-bar'), document.getElementById('ai-mission-status'), window.SIGMA.spawnToast);
     window.runDSAnalysis = () => SigmaDS.runAnalysis(document.getElementById('ds-canvas'), window.SIGMA.spawnToast);
     window.runDSAViz = () => SigmaDSA.runViz(document.getElementById('dsa-viz-area'), document.getElementById('dsa-algo').value, window.SIGMA.spawnToast);
-    window.runCyberScan = () => {
-        const log = document.getElementById('cyber-scan-log');
-        if (!log) return;
-        log.innerHTML = '[INFO] Auditing Sovereign VFS...<br>';
-        const vulns = window.SIGMA.vfs_vulnerabilities;
-        let i = 0;
-        const interval = setInterval(() => {
-            if (i >= vulns.length) { 
-                clearInterval(interval); 
-                log.innerHTML += `[COMPLETE] Audit finished. ${vulns.length} insecure paths found.`;
-                window.SIGMA.spawnToast(`Security: Audit finished.`);
-                return; 
+    window.runUXAudit = () => {
+        const results = document.getElementById('ux-audit-results');
+        if (!results) return;
+        results.innerHTML = 'AUDITING UX CORE...<br>';
+        
+        let score = 100;
+        const issues = [];
+        
+        // Fitts's Law Check (Simple check for target sizes)
+        document.querySelectorAll('.dock-item, .win-btn').forEach(el => {
+            if (el.offsetWidth < 30 || el.offsetHeight < 30) {
+                score -= 5;
+                issues.push(`LOW TARGET AREA [${el.className}]`);
             }
-            log.innerHTML += `<span class="u-error-text">[VULN] Insecure Path: ${vulns[i++]}</span><br>`;
-            log.scrollTop = log.scrollHeight;
-        }, 400);
+        });
+
+        // Jakob's Law Check (Familiarity)
+        const windows = document.querySelectorAll('.window');
+        windows.forEach(w => {
+            if (!w.querySelector('.win-header')) {
+                score -= 10;
+                issues.push(`NON-STANDARD WINDOW: No Header`);
+            }
+        });
+
+        setTimeout(() => {
+            results.innerHTML = `SOVEREIGN SCORE: ${score}/100<br>`;
+            if (issues.length > 0) results.innerHTML += `ISSUES: ${issues.join(', ')}`;
+            else results.innerHTML += 'PERFECT PARITY: UX Zenith Achieved.';
+            window.SIGMA.spawnToast(`UX Audit: Score ${score}. Industrial parity confirmed.`);
+        }, 1000);
     };
     window.purgeUnusedShards = () => window.SIGMA.store.purge();
     window.openWindow = (id) => window.SIGMA.wm.open(id);

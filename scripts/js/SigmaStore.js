@@ -17,6 +17,9 @@ export const SOVEREIGN_SHARDS = [
     { id: 'financeshard', name: 'Finance', icon: '💰', domain: 'Finance', enabled: true, description: 'Industrial Finance - Stock & Crypto Matrix.' },
     { id: 'contentshard', name: 'Studio', icon: '🎬', domain: 'Media', enabled: true, description: 'Creative media studio - Direct Rendering.' },
     { id: 'productivity', name: 'Tasks', icon: '✅', domain: 'Productivity', enabled: true, description: 'Industrial Task Orchestration.' },
+    { id: 'uxaudit', name: 'UX Audit', icon: '📐', domain: 'Design', enabled: true, description: 'UI/UX principle auditing & consistency.' },
+    { id: 'mediahub', name: 'Media Hub', icon: '🖼️', domain: 'Media', enabled: false, description: 'Professional media manipulation tools.' },
+    { id: 'planmaster', name: 'Plan Master', icon: '📅', domain: 'Management', enabled: false, description: 'Sovereign project orchestration.' },
     { id: 'vfsmanager', name: 'VFS Admin', icon: '💾', domain: 'System', enabled: false, description: 'Manage raw silicon storage blocks.' },
     { id: 'netviz', name: 'Net Shard', icon: '🌐', domain: 'Network', enabled: false, description: 'Visualize real local network topography.' },
     { id: 'principles', name: 'Principles', icon: '⚖️', domain: 'System', enabled: true, description: 'Sovereign OS Manifest & Performance USPs.' }

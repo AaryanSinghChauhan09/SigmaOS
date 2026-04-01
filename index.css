@@ -10,7 +10,7 @@
 /* ZERO EXTERNAL DEPENDENCIES: Using Built-in System Fonts */
 :root {
   /* Dynamic Color Palette (Sovereign Zenith) */
-  --font-main:     system-ui, -apple-system, sans-serif;
+  --font-main:     'Outfit', 'Inter', system-ui, -apple-system, sans-serif;
   --font-heading:  'Segoe UI', Roboto, sans-serif;
   --font-mono:     'Courier New', Courier, monospace;
   
