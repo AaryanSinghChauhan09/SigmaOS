@@ -1228,6 +1228,47 @@ msg: db "SIGMAOS ACTIVE", 10
             </div>
         </section>
 
+        <!-- AUTOMATION SHARD -->
+        <section id="win-automationshard" class="window hidden win-services-default">
+            <div class="win-header">
+                <div class="win-title">🤖 Sovereign Automation (Engine v1)</div>
+                <div class="win-controls">
+                    <div class="win-btn win-min" data-action="minimize" data-win="automationshard"></div>
+                    <div class="win-btn win-close" data-action="close" data-win="automationshard"></div>
+                </div>
+            </div>
+            <div class="win-content u-scroll-y u-padding-16">
+                <h4 class="u-accent-text">TASK SCHEDULER</h4>
+                <div class="win-input-group u-margin-t-10">
+                    <input type="text" id="auto-task" class="win-input" placeholder="Enter sigmactl command...">
+                    <button class="status-chip" onclick="window.scheduleTask()">SCHEDULE</button>
+                </div>
+                <div id="auto-log" class="u-margin-t-10 u-font-size-xxs u-muted-text"></div>
+            </div>
+        </section>
+
+        <!-- PERSONALIZATION SHARD -->
+        <section id="win-personalshard" class="window hidden win-settings-default">
+            <div class="win-header">
+                <div class="win-title">🎨 Zenith Personalization (Aesthetics)</div>
+                <div class="win-controls">
+                    <div class="win-btn win-min" data-action="minimize" data-win="personalshard"></div>
+                    <div class="win-btn win-close" data-action="close" data-win="personalshard"></div>
+                </div>
+            </div>
+            <div class="win-content u-scroll-y u-padding-16">
+                <h4 class="u-accent-text">THEME ENGINE</h4>
+                <div class="u-flex-between u-margin-t-10">
+                    <span class="u-font-size-xxs">ACCENT COLOR</span>
+                    <input type="color" id="theme-color" onchange="window.setAccent(this.value)">
+                </div>
+                <div class="u-flex-between u-margin-t-10">
+                    <span class="u-font-size-xxs">BLUR INTENSITY</span>
+                    <input type="range" min="0" max="100" value="40" onchange="window.setBlur(this.value)">
+                </div>
+            </div>
+        </section>
+
         <!-- DISTRO MIRROR SHARD -->
         <section id="win-distromirror" class="window hidden win-emu-default">
             <div class="win-header">

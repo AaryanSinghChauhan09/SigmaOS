@@ -23,6 +23,8 @@ export const SOVEREIGN_SHARDS = [
     { id: 'planmaster', name: 'Plan Master', icon: '📅', domain: 'Management', enabled: false, description: 'Sovereign project orchestration.' },
     { id: 'oopsshard', name: 'OOPS Audit', icon: '🧱', domain: 'System', enabled: true, description: 'Codebase inheritance and encapsulation audit.' },
     { id: 'networkshard', name: 'Net Shard', icon: '📡', domain: 'Network', enabled: false, description: 'Industrial network latency and topology.' },
+    { id: 'automationshard', name: 'Automation', icon: '🤖', domain: 'System', enabled: true, description: 'Sovereign task scheduling and headless scripting.' },
+    { id: 'personalshard', name: 'Zenith Styles', icon: '🎨', domain: 'Design', enabled: true, description: 'Absolute UI personalization and aesthetics.' },
     { id: 'vfsmanager', name: 'VFS Admin', icon: '💾', domain: 'System', enabled: false, description: 'Manage raw silicon storage blocks.' },
     { id: 'netviz', name: 'Net Shard', icon: '🌐', domain: 'Network', enabled: false, description: 'Visualize real local network topography.' },
     { id: 'principles', name: 'Principles', icon: '⚖️', domain: 'System', enabled: true, description: 'Sovereign OS Manifest & Performance USPs.' }

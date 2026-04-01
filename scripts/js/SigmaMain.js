@@ -53,6 +53,27 @@ window.addEventListener('DOMContentLoaded', () => {
         }, 1000);
     };
 
+    window.scheduleTask = () => {
+        const task = document.getElementById('auto-task').value;
+        const log = document.getElementById('auto-log');
+        if (!task || !log) return;
+        log.innerHTML += `[${new Date().toLocaleTimeString()}] SCHEDULING: ${task}<br>`;
+        setTimeout(() => {
+            window.SIGMA.shell.execute(task);
+            log.innerHTML += `<span class="u-accent-text">[DONE] EXEC: ${task}</span><br>`;
+        }, 2000);
+    };
+
+    window.setAccent = (color) => {
+        document.documentElement.style.setProperty('--accent-primary', color);
+        window.SIGMA.spawnToast(`Personalization: Accent set to ${color}`);
+    };
+
+    window.setBlur = (val) => {
+        document.documentElement.style.setProperty('--glass-blur', `${val}px`);
+        window.SIGMA.spawnToast(`Personalization: Blur set to ${val}px`);
+    };
+
     window.runCyberScan = () => {
         const log = document.getElementById('cyber-scan-log');
         if (!log) return;
