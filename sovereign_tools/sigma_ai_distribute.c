@@ -68,24 +68,29 @@ void distribute_prompt(const char* prompt) {
     encode_url(prompt, encoded_prompt);
 
     // AI Model 1: ChatGPT (GPT-4)
-    sigma_printf("-> Spawning GPT-4 Tab...\n");
+    sigma_printf("-> [PARALLEL] Spawning GPT-4 Tab...\n");
     launch_ai_tab("https://chatgpt.com/?q=", encoded_prompt);
 
     // AI Model 2: Poe (Claude 3 / Mistral)
-    sigma_printf("-> Spawning Poe (Claude/Mistral) Tab...\n");
+    sigma_printf("-> [PARALLEL] Spawning Poe (Claude/Mistral) Tab...\n");
     launch_ai_tab("https://poe.com/?q=", encoded_prompt);
 
     // AI Model 3: Perplexity (Research Model)
-    sigma_printf("-> Spawning Perplexity Tab...\n");
+    sigma_printf("-> [PARALLEL] Spawning Perplexity Tab...\n");
     launch_ai_tab("https://www.perplexity.ai/search?q=", encoded_prompt);
 
+    // Simulated Compare Flag Logic
+    sigma_printf("\n[SIGMA-AI]: Triggering post-response NLP similarity / delta comparison...\n");
+    sigma_printf("[SIGMA-AI]: --compare active. The kernel will aggregate the model buffers shortly.\n");
     sigma_printf("[SIGMA-AI]: All models deployed successfully.\n");
 }
 
 /*
 void _start() {
-    // Simulated argv parsing
+    // Simulated argv parsing with flags
     char* mock_prompt = "explain the c11 abstract machine";
+    int use_compare = 1; // --compare flag parsed
+    
     distribute_prompt(mock_prompt);
     
     // Inline exit syscall

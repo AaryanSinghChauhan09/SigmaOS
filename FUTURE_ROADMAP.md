@@ -134,7 +134,24 @@ For strict control over hardware and performance, SigmaOS binds itself to these 
 *This will be implemented natively using Omni-Shell.*
 
 **Command Syntax:**
-`sigma-ai distribute "<prompt>" --models gpt4,llama3,mistral --tabs`
+`sigma-ai distribute "<prompt>" --models gpt4,llama3,mistral,claude --tabs --compare`
 
-**Functionality Overview:**
-When parsed by the Omni-Shell, the OS intercepts the standard prompt and dynamically formats HTTP GET/POST queries bound to localhost servers or external endpoints. It uses underlying `sys_execve` wrapping to force open `sigma://desktop/browser` with parameters instructing it to open multiple instances (tabs) simultaneously, rendering the prompt sent simultaneously to all respective AI backends!
+**Features:**
+- `--models` → specify AI models (GPT‑4, LLaMA‑3, Mistral, Claude, etc.).
+- `--tabs` → open each model’s response in a new browser tab for comparison.
+- `--merge` → consolidate outputs into one unified view.
+- `--persona <profile>` → run distributed prompt under a persona context (e.g., researcher vs gamer).
+- `--parallel` → execute prompts simultaneously for faster results.
+- `--compare` → auto-highlight differences between model outputs.
+
+**Example Workflow:**
+`sigma-ai distribute "Design a memory manager for SigmaOS" --models gpt4,llama3,mistral --tabs --compare`
+→ Opens three tabs, each with a different model's architectural design. The `--compare` flag triggers an NLP delta-analysis highlighting philosophical differences.
+
+---
+
+## 🚀 4. Long-Term Vision
+* **AI-Assisted OS Orchestration:** The OS MLFQ dynamically surrenders execution vectors to a specialized neural-net deciding shard loads.
+* **Cross-Device Persona Sync:** Personas and strict capability bounds replicate peer-to-peer across mesh hardware.
+* **Industrial Plugin Ecosystem:** Community shards written directly to ABI spec without dynamic wrapper layers.
+* **Distributed Collaborative AI:** Multiple specialized agents orchestrating OS internals iteratively as a hive-mind.
