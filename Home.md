@@ -1,2 +1,1 @@
-Welcome to the SigmaOS wiki!
-# 
+SigmaOS Zenith Home
