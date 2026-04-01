@@ -1199,6 +1199,57 @@ msg: db "SIGMAOS ACTIVE", 10
             </div>
         </section>
 
+        <!-- CO-WORK IPC SHARD -->
+        <section id="win-coworkshard" class="window hidden win-services-default">
+            <div class="win-header">
+                <div class="win-title">🤝 Co-Work IPC (Agent Sandbox)</div>
+                <div class="win-controls">
+                    <div class="win-btn win-min" data-action="minimize" data-win="coworkshard"></div>
+                    <div class="win-btn win-close" data-action="close" data-win="coworkshard"></div>
+                </div>
+            </div>
+            <div class="win-content u-padding-16">
+                <div class="u-muted-text u-font-size-xxs u-margin-b-10">MULTI-AGENT COLLABORATION BUS</div>
+                <textarea id="cowork-msg" class="win-input u-font-size-xs" rows="3" placeholder="Broadcast context to local agents..."></textarea>
+                <button class="status-chip u-margin-t-10 u-full-width" onclick="window.runCoworkBroadcast()">INITIATE IPC BROADCAST</button>
+                <div id="cowork-log" class="u-margin-t-10 u-font-size-xxs u-accent-text">Bus Idle.</div>
+            </div>
+        </section>
+
+        <!-- COMPUTE ORACLE SHARD -->
+        <section id="win-oracleshard" class="window hidden win-matrix-default">
+            <div class="win-header">
+                <div class="win-title">🔮 Compute Oracle (Silicon Knowledge)</div>
+                <div class="win-controls">
+                    <div class="win-btn win-min" data-action="minimize" data-win="oracleshard"></div>
+                    <div class="win-btn win-close" data-action="close" data-win="oracleshard"></div>
+                </div>
+            </div>
+            <div class="win-content u-padding-16">
+                <div class="win-input-group u-margin-b-10">
+                    <input type="text" id="oracle-query" class="win-input" placeholder="Query Local Silicon Graph..." title="Oracle Query">
+                    <button class="status-chip" onclick="window.runOracleQuery()">INDEX</button>
+                </div>
+                <div id="oracle-out" class="u-font-size-xs u-muted-text">Awaiting Query...</div>
+            </div>
+        </section>
+
+        <!-- MACRO CLAW SHARD -->
+        <section id="win-clawshard" class="window hidden win-settings-default">
+            <div class="win-header">
+                <div class="win-title">🦾 Macro Claw (Hardware Automation)</div>
+                <div class="win-controls">
+                    <div class="win-btn win-min" data-action="minimize" data-win="clawshard"></div>
+                    <div class="win-btn win-close" data-action="close" data-win="clawshard"></div>
+                </div>
+            </div>
+            <div class="win-content u-padding-16">
+                <div class="u-muted-text u-font-size-xxs u-margin-b-10">CURSOR ROUTING KERNEL</div>
+                <button class="status-chip u-full-width" onclick="window.runMacroClaw()">ENGAGE CLAW TELEPORT</button>
+                <div class="u-margin-t-10 u-font-size-xxs u-error-text" id="claw-status">WARNING: Unrestricted Hardware Access</div>
+            </div>
+        </section>
+
         <section id="win-mlshard" class="window hidden win-matrix-default">
             <div class="win-header">
                 <div class="win-title">🚀 Sovereign ML-Ops (Deployment Pipeline)</div>

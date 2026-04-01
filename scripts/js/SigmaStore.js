@@ -31,6 +31,9 @@ export const SOVEREIGN_SHARDS = [
     { id: 'bioshard', name: 'Genomics', icon: '🧬', domain: 'Science', enabled: false, description: 'Bio-Informatics Sequence Alignment (Needleman-Wunsch).' },
     { id: 'llmshard', name: 'Transformer', icon: '🧠', domain: 'AI', enabled: true, description: 'Local-first matrix operations for LLM attention.' },
     { id: 'hftshard', name: 'HFT Oracle', icon: '📈', domain: 'Finance', enabled: false, description: 'Zero-latency High-Frequency Trading quantitative math.' },
+    { id: 'coworkshard', name: 'Co-Work IPC', icon: '🤝', domain: 'Agent', enabled: true, description: 'Multi-Agent Local Silicon Collaboration.' },
+    { id: 'oracleshard', name: 'Compute Oracle', icon: '🔮', domain: 'Agent', enabled: false, description: 'Silicon Knowledge Graph (Perplexity Eq).' },
+    { id: 'clawshard', name: 'Macro Claw', icon: '🦾', domain: 'Agent', enabled: true, description: 'Hardware-level Cursor & Automation Driver.' },
     { id: 'vfsmanager', name: 'VFS Admin', icon: '💾', domain: 'System', enabled: false, description: 'Manage raw silicon storage blocks.' },
     { id: 'netviz', name: 'Net Shard', icon: '🌐', domain: 'Network', enabled: false, description: 'Visualize real local network topography.' },
     { id: 'principles', name: 'Principles', icon: '⚖️', domain: 'System', enabled: true, description: 'Sovereign OS Manifest & Performance USPs.' }

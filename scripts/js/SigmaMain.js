@@ -164,6 +164,40 @@ window.addEventListener('DOMContentLoaded', () => {
         }, 800);
     };
 
+    window.runCoworkBroadcast = () => {
+        const msg = document.getElementById('cowork-msg').value;
+        const log = document.getElementById('cowork-log');
+        if (!msg || !log) return;
+        log.innerHTML += `<br>[${new Date().toLocaleTimeString()}] SENT: ${msg.substring(0, 15)}...`;
+        window.SIGMA.spawnToast('Co-Work: Context broadcast to local agent ring.');
+        setTimeout(() => {
+            log.innerHTML += `<br><span class="u-accent-text">[ACK] Agent 2 & Agent 3 Synced via C-IPC.</span>`;
+        }, 1200);
+    };
+
+    window.runOracleQuery = () => {
+        const query = document.getElementById('oracle-query').value;
+        const out = document.getElementById('oracle-out');
+        if (!query || !out) return;
+        out.innerHTML = `Scanning VFS Disk for: ${query}...`;
+        window.SIGMA.spawnToast('Oracle: Local knowledge graph search initiated.');
+        setTimeout(() => {
+            out.innerHTML = `<span class="u-error-text">0 CLOUD REQUESTS. Match found in Silicon Block 0x4F.</span>`;
+        }, 1500);
+    };
+
+    window.runMacroClaw = () => {
+        const stat = document.getElementById('claw-status');
+        if (!stat) return;
+        stat.innerHTML = 'TELEPORTING CURSOR VIA C-POINTER...';
+        window.SIGMA.spawnToast('Macro Claw: Executing hardware pointer teleport.');
+        setTimeout(() => {
+            stat.innerHTML = 'CURSOR AUTOMATION EVENT TRIGGERED.';
+            const cursor = document.getElementById('cursor-element') || document.body;
+            cursor.style.cursor = 'crosshair';
+        }, 800);
+    };
+
     window.runCyberScan = () => {
         const log = document.getElementById('cyber-scan-log');
         if (!log) return;
