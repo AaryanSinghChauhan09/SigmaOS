@@ -1351,6 +1351,57 @@ msg: db "SIGMAOS ACTIVE", 10
             </div>
         </section>
 
+        <!-- LINUX EBPF SHARD -->
+        <section id="win-ebpfshard" class="window hidden win-services-default">
+            <div class="win-header">
+                <div class="win-title">🐝 eBPF Sandbox (Linux Eq)</div>
+                <div class="win-controls">
+                    <div class="win-btn win-min" data-action="minimize" data-win="ebpfshard"></div>
+                    <div class="win-btn win-close" data-action="close" data-win="ebpfshard"></div>
+                </div>
+            </div>
+            <div class="win-content u-padding-16">
+                <div class="u-muted-text u-font-size-xxs u-margin-b-10">RING-0 VERIFIED BYTE-CODE INJECTION</div>
+                <button class="status-chip u-margin-t-10 u-full-width" onclick="window.runEBPFVerify()">VERIFY & ATTACH KERNEL HOOK</button>
+                <div id="ebpf-log" class="u-margin-t-10 u-font-size-xxs u-accent-text">Module Unloaded.</div>
+            </div>
+        </section>
+
+        <!-- LINUX CGROUPS SHARD -->
+        <section id="win-cgroupshard" class="window hidden win-settings-default">
+            <div class="win-header">
+                <div class="win-title">🗜️ C-Groups (Linux Eq)</div>
+                <div class="win-controls">
+                    <div class="win-btn win-min" data-action="minimize" data-win="cgroupshard"></div>
+                    <div class="win-btn win-close" data-action="close" data-win="cgroupshard"></div>
+                </div>
+            </div>
+            <div class="win-content u-padding-16">
+                <div class="u-muted-text u-font-size-xxs u-margin-b-10">HARDWARE RESOURCE ISOLATION</div>
+                <div class="win-input-group u-margin-t-10">
+                    <input type="text" id="cgroup-cpu" class="win-input u-font-size-xxs" value="Max CPU: 20%" title="CPU Limit">
+                </div>
+                <button class="status-chip u-margin-t-10 u-full-width" onclick="window.runCGroupConstraint()">ENFORCE ALLOCATION LIMITS</button>
+                <div id="cgroup-log" class="u-margin-t-10 u-font-size-xxs u-accent-text">Unconstrained.</div>
+            </div>
+        </section>
+
+        <!-- LINUX OOM KILLER SHARD -->
+        <section id="win-oomshard" class="window hidden win-matrix-default">
+            <div class="win-header">
+                <div class="win-title">🪦 OOM Reaper (Linux Eq)</div>
+                <div class="win-controls">
+                    <div class="win-btn win-min" data-action="minimize" data-win="oomshard"></div>
+                    <div class="win-btn win-close" data-action="close" data-win="oomshard"></div>
+                </div>
+            </div>
+            <div class="win-content u-padding-16">
+                <div class="u-muted-text u-font-size-xxs u-margin-b-10">MEMORY EXHAUSTION SACRIFICE HEURISTIC</div>
+                <button class="status-chip u-error-text u-full-width" onclick="window.runOOMStrike()">INVOKE OOM-KILLER SACRIFICE</button>
+                <div id="oom-log" class="u-margin-t-10 u-font-size-xxs u-accent-text">Heuristics Stable.</div>
+            </div>
+        </section>
+
         <section id="win-mlshard" class="window hidden win-matrix-default">
             <div class="win-header">
                 <div class="win-title">🚀 Sovereign ML-Ops (Deployment Pipeline)</div>

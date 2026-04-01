@@ -38,3 +38,7 @@ float sigma_pow(float base, int exp) {
 #include "shards/SovereignPlan9.c"
 #include "shards/SovereignHolyC.c"
 #include "shards/SovereignKali.c"
+// LINUX KERNEL INJECTIONS
+#include "shards/SovereignEBPF.c"
+#include "shards/SovereignCgroups.c"
+#include "shards/SovereignOOMKiller.c"

@@ -257,6 +257,36 @@ window.addEventListener('DOMContentLoaded', () => {
         }, 1600);
     };
 
+    window.runEBPFVerify = () => {
+        const log = document.getElementById('ebpf-log');
+        if (!log) return;
+        log.innerHTML = 'VERIFYING BYTE-CODE SAFETY...';
+        window.SIGMA.spawnToast('eBPF Eq: Sandboxed kernel instruction evaluation.');
+        setTimeout(() => {
+            log.innerHTML = '<span class="u-accent-text">BYTE-CODE VERIFIED. Hook attached to Ring-0.</span>';
+        }, 1200);
+    };
+
+    window.runCGroupConstraint = () => {
+        const log = document.getElementById('cgroup-log');
+        if (!log) return;
+        log.innerHTML = 'ALLOCATING HARDWARE CONSTRAINTS...';
+        window.SIGMA.spawnToast('C-Groups Eq: Simulating process isolation mapping.');
+        setTimeout(() => {
+            log.innerHTML = '<span class="u-accent-text">CGROUP LOCKED. CPU capped at assigned threshold.</span>';
+        }, 1000);
+    };
+
+    window.runOOMStrike = () => {
+        const log = document.getElementById('oom-log');
+        if (!log) return;
+        log.innerHTML = 'MEMORY CRITICAL. SEEKING SACRIFICE HEURISTIC...';
+        window.SIGMA.spawnToast('OOM-Killer Eq: System exhaustion protocol triggered.');
+        setTimeout(() => {
+            log.innerHTML = '<span class="u-error-text">OOM STRIKE: Process PID 42 (Largest memory consumer) terminated.</span>';
+        }, 1400);
+    };
+
     window.runCyberScan = () => {
         const log = document.getElementById('cyber-scan-log');
         if (!log) return;
