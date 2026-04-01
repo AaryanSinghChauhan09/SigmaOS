@@ -63,3 +63,22 @@ SigmaOS requires a sprawling user-space ecosystem to match decades of Linux dist
 Unlike Linux Distros, SigmaOS treats AI as a foundational OS layer, not a tertiary app.
 * **Missing Components**: Multi-model Orchestration Dashboard, AI-Assisted Shard Scheduler, AI-Anamoly IDSs.
 * **Architecture Pipeline**: The `sigma-ai distribute` framework is the vanguard. Subsequent AI models will interface over RPC in Go/Python directly bound to the C11 Shard Master.
+
+---
+
+## 🎯 Unique Selling Propositions (USPs)
+SigmaOS distinguishes itself from established software ecosystems natively:
+
+1. **Persona-Aware Applications**: Unlike static Linux apps, SigmaOS shards adapt to strict Developer, Gamer, and Minimialist bounds.
+2. **Shard-Based Modularity**: Bypassing monolithic binaries, shards are hot-loadable to aggressively conserve RAM.
+3. **Adaptive Security Profiles**: Zero-Trust policies mutate automatically to match the risk footprint of the active Persona context.
+4. **Unified Control Hub**: Bypassing the DE fragmentation of Linux, SigmaOS natively unifies Customizations, Shell actions, and Accessibility beneath single C11 namespaces.
+5. **AI-Driven Orchestration**: Distros rely on external third-party plugins. SigmaOS intends to run predictions directly on MLFQ kernel queues natively.
+
+---
+
+## 💼 Investor Pitch Deck Outline
+* **Problem**: Classical Linux fragmentation (DE, package managers, scaling constraints) and total lack of native AI hooks. Stale monolithic designs block context-dependent hardware optimization.
+* **Solution**: A C11 Shard-On-Demand architecture explicitly designed as an AI-augmented, context-aware environment.
+* **Advantage**: Ease of orchestration masked via an AI Shell, eliminating steep learning curves while dominating performance metrics with zero-dependency binaries.
+* **Vision Roadmap**: Stabilize Core C11 -> Deploy Rust-Sandboxed Daemons -> Integrate P2P Cloud Persona Sync -> Reach Total Market Decapitation against Legacy Systems.
