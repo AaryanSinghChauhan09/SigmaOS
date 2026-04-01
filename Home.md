@@ -77,6 +77,7 @@ Hot-loadable feature modules enabled/disabled at runtime:
 | [[Faults_And_Improvements]] | Known system faults, scope of improvement, and resolutions |
 | [[Coding_For_SigmaOS]] | The developer mindset shift: programming without standard libraries |
 | [[Persona_Configuration_Guide]] | Understanding Contextual Hypervisor Boundaries and Roles |
+| [[System_Boot_Sequence]] | Step-by-step breakdown of the zero-dependency bare-metal kernel initialization |
 
 ---
 
