@@ -4,6 +4,26 @@ This document outlines the frontier implementations required to achieve absolute
 
 ---
 
+## 🏗️ 0. OS Architecture & Low-Level Languages Choice
+For strict control over hardware and performance, SigmaOS binds itself to these paradigms:
+
+### 1. **Assembly Language**
+- **Use case**: Direct hardware control, bootloaders, interrupt handling.
+- **Strengths**: Absolute control over CPU instructions, registers, and memory.
+
+### 2. **C (C11 Core Standard)**
+- **Use case**: Kernel development, drivers, shell arrays.
+- **Strengths**: Balance of low-level control and raw syscall alignment without HLL dependencies.
+
+### 3. **C++**
+- **Use case**: GUI subsystems, OOP abstractions.
+- **Limitations**: Kept strictly isolated due to complex runtime and vtable overheads.
+
+### 4. **Rust / Ada (Future Sandboxing)**
+- **Use case**: Memory safety layers / Safety-critical formal verify.
+
+---
+
 ## 🧩 1. CLI Commands Yet to Be Made
 
 ### System & Kernel
