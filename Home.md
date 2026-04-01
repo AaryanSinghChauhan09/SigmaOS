@@ -79,6 +79,7 @@ Hot-loadable feature modules enabled/disabled at runtime:
 | [[Persona_Configuration_Guide]] | Understanding Contextual Hypervisor Boundaries and Roles |
 | [[System_Boot_Sequence]] | Step-by-step breakdown of the zero-dependency bare-metal kernel initialization |
 | [[Sovereign_Domain_Dominance]] | How SigmaOS natively crushes competitors in AI, ML, CS, DSA, Indian Law, and NCERT |
+| [[Indian_Legal_Procedure_Checklist]] | Bare-metal execution matrix mapping BNS, BNSS, and BSA procedures natively |
 
 ---
 
