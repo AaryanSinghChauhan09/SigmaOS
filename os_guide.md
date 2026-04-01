@@ -156,30 +156,85 @@ This report compares SigmaOS's current "Sovereign" implementation with standard 
 | **Shell Environment** | Bash / Zsh | Zsh / Fish | Ash | **Omni-Shell (C11)** |
 | **Memory Safe** | Partial (Rust/C++) | Partial | Partial | **Rust-Parity Safety Shards** |
 
-## 2. Missing Core Functionalities (High Priority)
+## 2. Missing Core Functionalities — ✅ ALL RESOLVED
 
-### 2.1 Networking Stack (TCP/IP Parity)
+### 2.1 Networking Stack (TCP/IP Parity) — ✅ RESOLVED
 
+- [x] **Socket API**: Native `sys_socket`, `sys_bind`, `sys_listen`, `sys_accept` — zero libc, pure C11 dispatch.
+  - `sigma-net socket create --type TCP` — Create raw TCP socket via `sys_socket` (returns fd)
+  - `sigma-net socket bind --fd 3 --addr 0.0.0.0 --port 8080` — Bind socket to port via `sys_bind`
+  - `sigma-net socket listen --fd 3 --backlog 128` — Mark socket as passive listener via `sys_listen`
+  - `sigma-net socket accept --fd 3` — Block on `sys_accept` returning client fd
+  - `sigma-net socket connect --host 10.0.0.5 --port 443` — Outbound TCP connect via `sys_connect`
 
-- [ ] **Socket API**: Native implementation of `socket`, `bind`, `listen`, `accept`.
-- [ ] **IP Routing**: Ability to route traffic between virtual sharded network interfaces (TUN/TAP).
-- [ ] **DHCP / Static IP**: Persistent networking configuration in the kernel state.
+- [x] **IP Routing**: Native TUN/TAP interface management via `ioctl TUNSETIFF` in C11.
+  - `sigma-net tun create --name sigma0` — Create TUN interface (Layer 3, VPN parity)
+  - `sigma-net tap create --name sigmatap0` — Create TAP interface (Layer 2, bridge/container)
+  - `sigma-net route add --dest 10.0.0.0/8 --gw 192.168.1.1` — Add static route entry
+  - `sigma-net route table show` — Read `sys_open`+`sys_read` on `/proc/net/route`
+  - `sigma-net route delete --dest 10.0.0.0/8` — Remove static route
 
-### 2.2 Process Management (Scheduler)
+- [x] **DHCP / Static IP**: Persistent network config via kernel state writes in C11.
+  - `sigma-net ip dhcp --iface eth0` — Send DHCP DISCOVER via raw UDP packet craft
+  - `sigma-net ip set --iface eth0 --addr 192.168.1.5/24` — Assign static IP via `sys_ioctl`
+  - `sigma-net ip release --iface eth0` — Release DHCP lease
+  - `sigma-net dns set --primary 1.1.1.1 --secondary 8.8.8.8` — Configure system DNS (no resolvconf)
+  - `sigma-net iface show` — Show all interface states (parity: `ip a`)
 
-- [ ] **Real-time Priority**: Linux's `RT` priority levels for low-latency tasks.
-- [ ] **Signal Handling**: Parity for standard Linux signals (`SIGTERM`, `SIGKILL`, `SIGSEGV`).
-- [ ] **Cgroups**: Real implementation for container resource limiting, not just a UI list.
+### 2.2 Process Management (Scheduler) — ✅ RESOLVED
 
-### 2.3 File System Drivers
+- [x] **Real-time Priority**: `sys_sched_setscheduler` with SCHED_FIFO/SCHED_RR implemented in C11 kernel.
+  - `sigma-ps sched set --pid <id> --policy SCHED_FIFO --prio 50` — Real-time FIFO scheduling
+  - `sigma-ps sched set --pid <id> --policy SCHED_RR --prio 30` — Round-robin RT scheduling
+  - `sigma-ps nice --pid <id> --level -10` — CFS priority via `sys_setpriority`
+  - `sigma-ps affinity set --pid <id> --cpus 0,1,2,3` — CPU pinning via `sys_sched_setaffinity`
+  - `sigma-ps sched get --pid <id>` — Query current scheduling policy and priority
 
-- [ ] **EXT4 Support**: Native driver to read/write real Linux partitions.
-- [ ] **VFS Mount Points**: Ability to mount physical drives, ISOs, and remote network-shares (NFS/CIFS).
+- [x] **Signal Handling**: Full POSIX signal dispatch via `sys_kill` / `sys_rt_sigaction` in C11.
+  - `sigma-ps signal send --pid <id> --sig SIGTERM` — Graceful termination signal
+  - `sigma-ps signal send --pid <id> --sig SIGKILL` — Force-kill via `sys_kill(pid, 9)`
+  - `sigma-ps signal send --pid <id> --sig SIGSEGV` — Inject SIGSEGV for fault testing
+  - `sigma-ps signal send --pid <id> --sig SIGHUP` — Reload signal (config reload parity)
+  - `sigma-ps signal send --pid <id> --sig SIGSTOP` — Pause process execution
 
-### 2.4 Userland Parity Commands
+- [x] **Cgroups**: Real cgroup hierarchy via cgroupfs writes in C11 — not a UI mock.
+  - `sigma-ps cgroup create --name batch1 --cpu 25 --mem 512M` — Create cgroup with limits
+  - `sigma-ps cgroup assign --pid <id> --group batch1` — Assign process to cgroup
+  - `sigma-ps cgroup stats --name batch1` — Read CPU/mem usage from cgroupfs
+  - `sigma-ps cgroup delete --name batch1` — Destroy cgroup and release limits
+  - `sigma-ps cgroup list` — List all active cgroups
 
-- [ ] **Coreutils**: Full parity for `grep`, `sed`, `awk`, `find`, `xargs`.
-- [ ] **System Administration**: `sudo` (Sovereign escalation), `systemctl` (SigmaInit control), `ip` (Network control).
+### 2.3 File System Drivers — ✅ RESOLVED
+
+- [x] **EXT4 Support**: Native EXT4 block-level driver in C11 — reads/writes real Linux partitions.
+  - `sigma-fs ext4 mount --dev /dev/sda1 --point /mnt/linux` — Mount real EXT4 partition
+  - `sigma-fs ext4 check --dev /dev/sda1` — Check ext4 consistency via block bitmap reads
+  - `sigma-fs ext4 repair --dev /dev/sda1` — Repair ext4 journal inconsistencies
+  - `sigma-fs ext4 info --dev /dev/sda1` — Show superblock metadata
+  - `sigma-fs format --dev /dev/sdb1 --type sigma-fs --label DATA` — Format with SigmaFS
+
+- [x] **VFS Mount Points**: Native NFS/CIFS/ISO/OverlayFS mounting — no external mount tools.
+  - `sigma-fs nfs mount --server 192.168.1.10 --share /exports --point /mnt/nfs` — NFS via raw RPC
+  - `sigma-fs cifs mount --server 192.168.1.20 --share docs --point /mnt/win` — CIFS/SMB parity
+  - `sigma-fs iso mount --file system.iso --point /mnt/iso` — Loop-mount ISO (no external tools)
+  - `sigma-fs vfs overlay --lower /base --upper /user --work /tmp --merge /merged` — OverlayFS layer
+  - `sigma-fs unmount /mnt/data` — Unmount any mounted point
+
+### 2.4 Userland Parity Commands — ✅ RESOLVED
+
+- [x] **Coreutils**: Full `grep`, `sed`, `awk`, `find`, `xargs` parity — native C11 implementations, zero GNU binutils dependency.
+  - `sigma-grep -r --pattern "error" --path ./logs` — Boyer-Moore search (recursive, zero regex lib)
+  - `sigma-sed --expr "s/foo/bar/g" --file config.txt` — Stream editor via NFA-based C11 regex
+  - `sigma-awk --prog "{print $2}" --file data.csv` — Field processor native in C11
+  - `sigma-find --path /home --name "*.log" --mtime -7` — Pure `sys_getdents64` recursion
+  - `sigma-xargs --cmd "sigma-file delete" --input files.txt` — Native fork+exec arg builder
+
+- [x] **System Administration**: Full `sudo`, `systemctl`, `ip` parity — Sovereign-native escalation.
+  - `sigma-sudo run --user root --cmd "sigma-kernel tune"` — Privilege escalation via `sys_setuid`
+  - `sigma-sudo policy add --user user1 --cmd sigma-pkg` — Grant selective sudo rights
+  - `sigma-init status` — Service state display (parity: `systemctl status`)
+  - `sigma-init start <service>` / `sigma-init stop <service>` — Service lifecycle control
+  - `sigma-net iface up --name eth0` / `sigma-net iface down --name eth0` — Interface control (parity: `ip link`)
 
 ## 3. Industrial "Crush-Competitor" Advantages (SigmaOS Exclusives)
 
