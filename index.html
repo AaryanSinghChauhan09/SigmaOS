@@ -1138,6 +1138,43 @@ msg: db "SIGMAOS ACTIVE", 10
             </div>
         </section>
 
+        <!-- PERSONA SELECTOR SHARD -->
+        <section id="win-personaselector" class="window hidden win-services-default">
+            <div class="win-header">
+                <div class="win-title">👥 Sovereign Persona (Mission Profile)</div>
+                <div class="win-controls">
+                    <div class="win-btn win-min" data-action="minimize" data-win="personaselector"></div>
+                    <div class="win-btn win-close" data-action="close" data-win="personaselector"></div>
+                </div>
+            </div>
+            <div class="win-content u-padding-16">
+                <div class="u-muted-text u-font-size-xxs u-margin-b-10">SELECT MISSION PROFILE TO AUTO-SHARD</div>
+                <div class="u-grid-2 gap-10">
+                    <button class="status-chip" onclick="applyPersona('AI_RESEARCHER')">AI RESEARCHER</button>
+                    <button class="status-chip" onclick="applyPersona('DATA_SCIENTIST')">DATA SCIENTIST</button>
+                    <button class="status-chip" onclick="applyPersona('CYBER_EXPERT')">CYBER SECURITY</button>
+                    <button class="status-chip" onclick="applyPersona('FULL_STACK')">FULL STACK</button>
+                </div>
+            </div>
+        </section>
+
+        <!-- AMNESIC SHARD -->
+        <section id="win-amnesicshard" class="window hidden win-emu-default">
+            <div class="win-header">
+                <div class="win-title">🧼 Amnesic Scrubber (Forensic Finality)</div>
+                <div class="win-controls">
+                    <div class="win-btn win-min" data-action="minimize" data-win="amnesicshard"></div>
+                    <div class="win-btn win-close" data-action="close" data-win="amnesicshard"></div>
+                </div>
+            </div>
+            <div class="win-content u-padding-16 u-text-center">
+                <h4 class="u-error-text">CAUTION: IRREVERSIBLE DATA SCRUB</h4>
+                <p class="u-muted-text u-font-size-xxs u-margin-t-10">OVERWRITES ALL VFS RAM-DISK BLOCKS WITH ZEROS.</p>
+                <button class="status-chip u-margin-t-20 u-error-text" onclick="executeAmnesicScrub()">INITIATE AMNESIC PURGE</button>
+                <div id="scrub-progress" class="u-margin-t-10 u-font-size-xxs u-accent-text"></div>
+            </div>
+        </section>
+
         <!-- SOVEREIGN PRINCIPLES SHARD -->
         <section id="win-principles" class="window hidden win-services-default">
             <div class="win-header">

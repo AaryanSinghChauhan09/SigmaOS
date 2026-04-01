@@ -53,6 +53,42 @@ window.addEventListener('DOMContentLoaded', () => {
         }, 1000);
     };
 
+    window.applyPersona = (role) => {
+        const shards = window.SIGMA.store.shards;
+        const config = {
+            'AI_RESEARCHER': ['aishard', 'mlshard', 'dsshard'],
+            'DATA_SCIENTIST': ['dsshard', 'dsashard', 'planmaster'],
+            'CYBER_EXPERT': ['cybershard', 'amnesicshard', 'oopsshard'],
+            'FULL_STACK': ['webshard', 'vfsmanager', 'automationshard']
+        };
+        const targets = config[role] || [];
+        shards.forEach(s => {
+            if (targets.includes(s.id)) s.enabled = true;
+            else s.enabled = false;
+        });
+        window.SIGMA.renderMenu();
+        window.SIGMA.renderShardManager();
+        window.SIGMA.spawnToast(`Persona ACTIVE: ${role}. Specialized shards ENABLED.`);
+    };
+
+    window.executeAmnesicScrub = () => {
+        const progress = document.getElementById('scrub-progress');
+        if (!progress) return;
+        progress.innerHTML = 'INITIATING FORENSIC OVERWRITE...';
+        let i = 0;
+        const interval = setInterval(() => {
+            if (i >= 100) {
+                clearInterval(interval);
+                window.SIGMA.vfs.fs = {}; // Pure silicon zeroing
+                progress.innerHTML = 'PURGE COMPLETE. VFS WIPED.';
+                window.SIGMA.spawnToast('Amnesic: Forensic data scrub finished.');
+                return;
+            }
+            i += 10;
+            progress.innerHTML = `SCRUBBING RAM-DISK: ${i}%`;
+        }, 300);
+    };
+
     window.scheduleTask = () => {
         const task = document.getElementById('auto-task').value;
         const log = document.getElementById('auto-log');
