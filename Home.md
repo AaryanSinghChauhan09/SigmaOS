@@ -71,6 +71,7 @@ Hot-loadable feature modules enabled/disabled at runtime:
 | [[Lost_Features]] | Features removed for system sovereignty |
 | [[Competitor_Comparison]] | Detailed comparison against market OS competitors |
 | [[All_Features_And_Tools]] | Complete master index of all native OS capabilities |
+| [[Future_Developments]] | Development roadmap and pending tool pipeline |
 
 ---
 
