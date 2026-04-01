@@ -1,4 +1,4 @@
-#include "../SovereignLibC.h"
+#include "../libc/SovereignLibC.h"
 
 /*
  * Σ SIGMAOS: SOVEREIGN REMOTE BOT (v1.0)

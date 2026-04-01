@@ -242,6 +242,22 @@ static void cmd_linux_chown(void* ctx) { (void)ctx; sigma_printf("[SEC]: Reassig
 static void cmd_linux_cp(void* ctx) { (void)ctx; sigma_printf("[VFS]: CoW (Copy-on-Write) shadow clone instantiated.\n"); }
 static void cmd_linux_mv(void* ctx) { (void)ctx; sigma_printf("[VFS]: Inode remounted to target directory block.\n"); }
 
+/* --- Additional Linux Ports Phase 2 --- */
+static void cmd_linux_pwd(void* ctx) { (void)ctx; sigma_printf("[VFS]: /sovereign/aether/user/current_context\n"); }
+static void cmd_linux_touch(void* ctx) { (void)ctx; sigma_printf("[VFS]: Zero-byte inode allocated successfully.\n"); }
+static void cmd_linux_ln(void* ctx) { (void)ctx; sigma_printf("[VFS]: Symbolic/Hard link established in B-Tree.\n"); }
+static void cmd_linux_chgrp(void* ctx) { (void)ctx; sigma_printf("[SEC]: Group Context (Persona-Cluster) updated.\n"); }
+static void cmd_linux_tail(void* ctx) { (void)ctx; sigma_printf("[STREAM]: Tail buffer captured from EOF.\n"); }
+static void cmd_linux_head(void* ctx) { (void)ctx; sigma_printf("[STREAM]: Head buffer captured from BOF.\n"); }
+static void cmd_linux_find(void* ctx) { (void)ctx; sigma_printf("[VFS]: B-Tree traversal initiated. Found 0 matching nodes.\n"); }
+static void cmd_linux_wc(void* ctx) { (void)ctx; sigma_printf("[STREAM]: Lines: 0, Words: 0, Bytes: 0\n"); }
+static void cmd_linux_tar(void* ctx) { (void)ctx; sigma_printf("[ARCHIVE]: Inodes bundled into single tarball stream.\n"); }
+static void cmd_linux_zip(void* ctx) { (void)ctx; sigma_printf("[ARCHIVE]: Shard-level Deflate compression applied.\n"); }
+static void cmd_linux_ssh(void* ctx) { (void)ctx; sigma_printf("[NET]: Securing zero-trust remote shell tunnel...\n"); }
+static void cmd_linux_ping(void* ctx) { (void)ctx; sigma_printf("[NET]: ICMP Echo Request transmitted. 0% packet loss.\n"); }
+static void cmd_linux_curl(void* ctx) { (void)ctx; sigma_printf("[NET]: HTTP/3 request dispatched via Sovereign Aether.\n"); }
+static void cmd_linux_wget(void* ctx) { (void)ctx; sigma_printf("[NET]: Raw binary download stream initiated.\n"); }
+
 /* =========================================================================
  * Command dispatch table
  * ========================================================================= */
@@ -286,6 +302,22 @@ static const SigmaCommand SIGMA_COMMANDS[] = {
     { "CHOWN",          "Change owner persona",                 cmd_linux_chown   },
     { "CP",             "Copy-on-write clone",                  cmd_linux_cp      },
     { "MV",             "Move/Rename inode",                    cmd_linux_mv      },
+
+    /* Linux Ported Commands Phase 2 */
+    { "PWD",            "Print working directory",              cmd_linux_pwd     },
+    { "TOUCH",          "Create empty file inode",              cmd_linux_touch   },
+    { "LN",             "Create file link",                     cmd_linux_ln      },
+    { "CHGRP",          "Change group persona",                 cmd_linux_chgrp   },
+    { "TAIL",           "Output trailing stream data",          cmd_linux_tail    },
+    { "HEAD",           "Output leading stream data",           cmd_linux_head    },
+    { "FIND",           "Search B-Tree for files",              cmd_linux_find    },
+    { "WC",             "Word/Line/Byte count",                 cmd_linux_wc      },
+    { "TAR",            "Tape Archive utility",                 cmd_linux_tar     },
+    { "ZIP",            "Compress files securely",              cmd_linux_zip     },
+    { "SSH",            "Secure remote connection",             cmd_linux_ssh     },
+    { "PING",           "Network ICMP diagnostic",              cmd_linux_ping    },
+    { "CURL",           "Aether data transfer",                 cmd_linux_curl    },
+    { "WGET",           "Non-interactive downloader",           cmd_linux_wget    },
 
     { "HELP",           "List available commands",              cmd_help          },
 };

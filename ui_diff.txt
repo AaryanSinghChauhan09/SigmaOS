@@ -1,0 +1,357 @@
+commit a16b48c17fb175df9908d243396646049ef226ee
+Author: Sovereign-User <sovereign@users.noreply.github.com>
+Date:   Wed Apr 1 11:20:04 2026 +0530
+
+    Σ SigmaOS Zenith: Integrated Linux Kernel eBPF, Cgroups, and OOM-Killer
+
+diff --git a/index.html b/index.html
+index af96ee9e8..24257bc8d 100644
+--- a/index.html
++++ b/index.html
+@@ -1351,6 +1351,57 @@ msg: db "SIGMAOS ACTIVE", 10
+             </div>
+         </section>
+ 
++        <!-- LINUX EBPF SHARD -->
++        <section id="win-ebpfshard" class="window hidden win-services-default">
++            <div class="win-header">
++                <div class="win-title">🐝 eBPF Sandbox (Linux Eq)</div>
++                <div class="win-controls">
++                    <div class="win-btn win-min" data-action="minimize" data-win="ebpfshard"></div>
++                    <div class="win-btn win-close" data-action="close" data-win="ebpfshard"></div>
++                </div>
++            </div>
++            <div class="win-content u-padding-16">
++                <div class="u-muted-text u-font-size-xxs u-margin-b-10">RING-0 VERIFIED BYTE-CODE INJECTION</div>
++                <button class="status-chip u-margin-t-10 u-full-width" onclick="window.runEBPFVerify()">VERIFY & ATTACH KERNEL HOOK</button>
++                <div id="ebpf-log" class="u-margin-t-10 u-font-size-xxs u-accent-text">Module Unloaded.</div>
++            </div>
++        </section>
++
++        <!-- LINUX CGROUPS SHARD -->
++        <section id="win-cgroupshard" class="window hidden win-settings-default">
++            <div class="win-header">
++                <div class="win-title">🗜️ C-Groups (Linux Eq)</div>
++                <div class="win-controls">
++                    <div class="win-btn win-min" data-action="minimize" data-win="cgroupshard"></div>
++                    <div class="win-btn win-close" data-action="close" data-win="cgroupshard"></div>
++                </div>
++            </div>
++            <div class="win-content u-padding-16">
++                <div class="u-muted-text u-font-size-xxs u-margin-b-10">HARDWARE RESOURCE ISOLATION</div>
++                <div class="win-input-group u-margin-t-10">
++                    <input type="text" id="cgroup-cpu" class="win-input u-font-size-xxs" value="Max CPU: 20%" title="CPU Limit">
++                </div>
++                <button class="status-chip u-margin-t-10 u-full-width" onclick="window.runCGroupConstraint()">ENFORCE ALLOCATION LIMITS</button>
++                <div id="cgroup-log" class="u-margin-t-10 u-font-size-xxs u-accent-text">Unconstrained.</div>
++            </div>
++        </section>
++
++        <!-- LINUX OOM KILLER SHARD -->
++        <section id="win-oomshard" class="window hidden win-matrix-default">
++            <div class="win-header">
++                <div class="win-title">🪦 OOM Reaper (Linux Eq)</div>
++                <div class="win-controls">
++                    <div class="win-btn win-min" data-action="minimize" data-win="oomshard"></div>
++                    <div class="win-btn win-close" data-action="close" data-win="oomshard"></div>
++                </div>
++            </div>
++            <div class="win-content u-padding-16">
++                <div class="u-muted-text u-font-size-xxs u-margin-b-10">MEMORY EXHAUSTION SACRIFICE HEURISTIC</div>
++                <button class="status-chip u-error-text u-full-width" onclick="window.runOOMStrike()">INVOKE OOM-KILLER SACRIFICE</button>
++                <div id="oom-log" class="u-margin-t-10 u-font-size-xxs u-accent-text">Heuristics Stable.</div>
++            </div>
++        </section>
++
+         <section id="win-mlshard" class="window hidden win-matrix-default">
+             <div class="win-header">
+                 <div class="win-title">🚀 Sovereign ML-Ops (Deployment Pipeline)</div>
+
+commit 4cf1374cf3607576b6418cd57ba4a86673bb9c3c
+Author: Sovereign-User <sovereign@users.noreply.github.com>
+Date:   Wed Apr 1 11:16:00 2026 +0530
+
+    Σ SigmaOS Zenith: Integrated Plan 9, TempleOS, and Kali Linux Equivalent USPs
+
+diff --git a/index.html b/index.html
+index 5371f1f62..af96ee9e8 100644
+--- a/index.html
++++ b/index.html
+@@ -1298,6 +1298,59 @@ msg: db "SIGMAOS ACTIVE", 10
+             </div>
+         </section>
+ 
++        <!-- PLAN 9 SHARD -->
++        <section id="win-plan9shard" class="window hidden win-services-default">
++            <div class="win-header">
++                <div class="win-title">🌌 9P Network (Plan 9 Eq)</div>
++                <div class="win-controls">
++                    <div class="win-btn win-min" data-action="minimize" data-win="plan9shard"></div>
++                    <div class="win-btn win-close" data-action="close" data-win="plan9shard"></div>
++                </div>
++            </div>
++            <div class="win-content u-padding-16">
++                <div class="u-muted-text u-font-size-xxs u-margin-b-10">EVERYTHING-IS-A-FILE 9P BINDING</div>
++                <div class="win-input-group u-margin-t-10">
++                    <input type="text" id="p9-addr" class="win-input u-font-size-xxs" value="/net/tcp/192.168.1.5" title="9P Target Address">
++                </div>
++                <button class="status-chip u-margin-t-10 u-full-width" onclick="window.runPlan9Bind()">MOUNT TO VFS RING</button>
++            </div>
++        </section>
++
++        <!-- TEMPLE-OS HOLY SHARD -->
++        <section id="win-holyshard" class="window hidden win-emu-default">
++            <div class="win-header">
++                <div class="win-title">✝️ Ring-0 Oracle (TempleOS Eq)</div>
++                <div class="win-controls">
++                    <div class="win-btn win-min" data-action="minimize" data-win="holyshard"></div>
++                    <div class="win-btn win-close" data-action="close" data-win="holyshard"></div>
++                </div>
++            </div>
++            <div class="win-content u-padding-16">
++                <div class="u-muted-text u-font-size-xxs u-margin-b-10">DIRECT UNABSTRACTED VGA POINTER</div>
++                <div class="win-input-group u-margin-t-10">
++                    <input type="text" id="holy-poke-addr" class="win-input u-font-size-xxs" placeholder="Address (0-4000)" title="VRAM Address">
++                    <input type="text" id="holy-poke-val" class="win-input u-font-size-xxs" placeholder="Hex Value" title="Byte Value">
++                </div>
++                <button class="status-chip u-error-text u-margin-t-10 u-full-width" onclick="window.runHolyPoke()">POKE HARDWARE REGISTER</button>
++            </div>
++        </section>
++
++        <!-- KALI PEN-TEST SHARD -->
++        <section id="win-kalishard" class="window hidden win-matrix-default">
++            <div class="win-header">
++                <div class="win-title">🐉 Pen-Test Map (Kali OS Eq)</div>
++                <div class="win-controls">
++                    <div class="win-btn win-min" data-action="minimize" data-win="kalishard"></div>
++                    <div class="win-btn win-close" data-action="close" data-win="kalishard"></div>
++                </div>
++            </div>
++            <div class="win-content u-padding-16">
++                <div class="u-muted-text u-font-size-xxs u-margin-b-10">LOW-LEVEL NMAP SYN-EQUIVALENT</div>
++                <button class="status-chip u-full-width" onclick="window.runKaliScan()">INITIATE TARGET PORT SCAN</button>
++                <div id="kali-log" class="u-margin-t-10 u-font-size-xxs u-accent-text">Scanner Dormant.</div>
++            </div>
++        </section>
++
+         <section id="win-mlshard" class="window hidden win-matrix-default">
+             <div class="win-header">
+                 <div class="win-title">🚀 Sovereign ML-Ops (Deployment Pipeline)</div>
+
+commit cbfc23cb3e151cd5160864d16c4e69c5d8d01517
+Author: Sovereign-User <sovereign@users.noreply.github.com>
+Date:   Wed Apr 1 11:12:36 2026 +0530
+
+    Σ SigmaOS Zenith: Integrated Qubes OS, macOS, and Tails OS Equivalent Shards
+
+diff --git a/index.html b/index.html
+index eed68a60c..5371f1f62 100644
+--- a/index.html
++++ b/index.html
+@@ -1250,6 +1250,54 @@ msg: db "SIGMAOS ACTIVE", 10
+             </div>
+         </section>
+ 
++        <!-- QUBES OS SHARD -->
++        <section id="win-qubesshard" class="window hidden win-services-default">
++            <div class="win-header">
++                <div class="win-title">🧊 Qubes Bounds (Hypervisor Layer)</div>
++                <div class="win-controls">
++                    <div class="win-btn win-min" data-action="minimize" data-win="qubesshard"></div>
++                    <div class="win-btn win-close" data-action="close" data-win="qubesshard"></div>
++                </div>
++            </div>
++            <div class="win-content u-padding-16">
++                <div class="u-muted-text u-font-size-xxs u-margin-b-10">VM MEMORY COMPARTMENTALIZATION</div>
++                <button class="status-chip u-margin-t-10 u-full-width" onclick="window.runQubesAudit()">ENFORCE STRICT THREAT ISOLATION</button>
++                <div id="qubes-log" class="u-margin-t-10 u-font-size-xxs u-accent-text">All Domains Secure.</div>
++            </div>
++        </section>
++
++        <!-- TIME MACHINE SHARD -->
++        <section id="win-timeshard" class="window hidden win-settings-default">
++            <div class="win-header">
++                <div class="win-title">⏳ Time Delta (macOS Eq Backup)</div>
++                <div class="win-controls">
++                    <div class="win-btn win-min" data-action="minimize" data-win="timeshard"></div>
++                    <div class="win-btn win-close" data-action="close" data-win="timeshard"></div>
++                </div>
++            </div>
++            <div class="win-content u-padding-16">
++                <div class="u-muted-text u-font-size-xxs u-margin-b-10">INCREMENTAL SILICON SNAPSHOTS</div>
++                <button class="status-chip u-full-width" onclick="window.runTimeDelta()">COMPUTE VFS BLOCK DELTAS</button>
++                <div id="time-log" class="u-margin-t-10 u-font-size-xxs u-accent-text">Snapshot Ready.</div>
++            </div>
++        </section>
++
++        <!-- TAILS ONION SHARD -->
++        <section id="win-tailshard" class="window hidden win-matrix-default">
++            <div class="win-header">
++                <div class="win-title">🧅 Deep Router (Tails OS Eq)</div>
++                <div class="win-controls">
++                    <div class="win-btn win-min" data-action="minimize" data-win="tailshard"></div>
++                    <div class="win-btn win-close" data-action="close" data-win="tailshard"></div>
++                </div>
++            </div>
++            <div class="win-content u-padding-16">
++                <div class="u-muted-text u-font-size-xxs u-margin-b-10">3-NODE PACKET OBFUSCATION KERNEL</div>
++                <button class="status-chip u-full-width" onclick="window.runTailsRoute()">OBFUSCATE OUTBOUND PACKET</button>
++                <div id="tails-log" class="u-margin-t-10 u-font-size-xxs u-accent-text">Awaiting Traffic.</div>
++            </div>
++        </section>
++
+         <section id="win-mlshard" class="window hidden win-matrix-default">
+             <div class="win-header">
+                 <div class="win-title">🚀 Sovereign ML-Ops (Deployment Pipeline)</div>
+
+commit 6206b10559af5516db7d1dfb1a142085f8ce5edf
+Author: Sovereign-User <sovereign@users.noreply.github.com>
+Date:   Wed Apr 1 10:47:24 2026 +0530
+
+    Σ SigmaOS Zenith: Autonomous Architectures (Cowork, Compute Oracle, OpenClaw eq)
+
+diff --git a/index.html b/index.html
+index 4d72f82ab..eed68a60c 100644
+--- a/index.html
++++ b/index.html
+@@ -1199,6 +1199,57 @@ msg: db "SIGMAOS ACTIVE", 10
+             </div>
+         </section>
+ 
++        <!-- CO-WORK IPC SHARD -->
++        <section id="win-coworkshard" class="window hidden win-services-default">
++            <div class="win-header">
++                <div class="win-title">🤝 Co-Work IPC (Agent Sandbox)</div>
++                <div class="win-controls">
++                    <div class="win-btn win-min" data-action="minimize" data-win="coworkshard"></div>
++                    <div class="win-btn win-close" data-action="close" data-win="coworkshard"></div>
++                </div>
++            </div>
++            <div class="win-content u-padding-16">
++                <div class="u-muted-text u-font-size-xxs u-margin-b-10">MULTI-AGENT COLLABORATION BUS</div>
++                <textarea id="cowork-msg" class="win-input u-font-size-xs" rows="3" placeholder="Broadcast context to local agents..."></textarea>
++                <button class="status-chip u-margin-t-10 u-full-width" onclick="window.runCoworkBroadcast()">INITIATE IPC BROADCAST</button>
++                <div id="cowork-log" class="u-margin-t-10 u-font-size-xxs u-accent-text">Bus Idle.</div>
++            </div>
++        </section>
++
++        <!-- COMPUTE ORACLE SHARD -->
++        <section id="win-oracleshard" class="window hidden win-matrix-default">
++            <div class="win-header">
++                <div class="win-title">🔮 Compute Oracle (Silicon Knowledge)</div>
++                <div class="win-controls">
++                    <div class="win-btn win-min" data-action="minimize" data-win="oracleshard"></div>
++                    <div class="win-btn win-close" data-action="close" data-win="oracleshard"></div>
++                </div>
++            </div>
++            <div class="win-content u-padding-16">
++                <div class="win-input-group u-margin-b-10">
++                    <input type="text" id="oracle-query" class="win-input" placeholder="Query Local Silicon Graph..." title="Oracle Query">
++                    <button class="status-chip" onclick="window.runOracleQuery()">INDEX</button>
++                </div>
++                <div id="oracle-out" class="u-font-size-xs u-muted-text">Awaiting Query...</div>
++            </div>
++        </section>
++
++        <!-- MACRO CLAW SHARD -->
++        <section id="win-clawshard" class="window hidden win-settings-default">
++            <div class="win-header">
++                <div class="win-title">🦾 Macro Claw (Hardware Automation)</div>
++                <div class="win-controls">
++                    <div class="win-btn win-min" data-action="minimize" data-win="clawshard"></div>
++                    <div class="win-btn win-close" data-action="close" data-win="clawshard"></div>
++                </div>
++            </div>
++            <div class="win-content u-padding-16">
++                <div class="u-muted-text u-font-size-xxs u-margin-b-10">CURSOR ROUTING KERNEL</div>
++                <button class="status-chip u-full-width" onclick="window.runMacroClaw()">ENGAGE CLAW TELEPORT</button>
++                <div class="u-margin-t-10 u-font-size-xxs u-error-text" id="claw-status">WARNING: Unrestricted Hardware Access</div>
++            </div>
++        </section>
++
+         <section id="win-mlshard" class="window hidden win-matrix-default">
+             <div class="win-header">
+                 <div class="win-title">🚀 Sovereign ML-Ops (Deployment Pipeline)</div>
+
+commit e1db98898aecb91f502d1b9c795863fadd3101f8
+Author: Sovereign-User <sovereign@users.noreply.github.com>
+Date:   Wed Apr 1 10:40:58 2026 +0530
+
+    Σ SigmaOS Zenith: Advanced HFT, LLM Transformer, and Bio-Informatics Precision Shards
+
+diff --git a/index.html b/index.html
+index 23630d62e..4d72f82ab 100644
+--- a/index.html
++++ b/index.html
+@@ -1148,6 +1148,57 @@ msg: db "SIGMAOS ACTIVE", 10
+             </div>
+         </section>
+ 
++        <!-- BIO-INFORMATICS SHARD -->
++        <section id="win-bioshard" class="window hidden win-services-default">
++            <div class="win-header">
++                <div class="win-title">🧬 Sovereign Bio-Informatics (Genomics)</div>
++                <div class="win-controls">
++                    <div class="win-btn win-min" data-action="minimize" data-win="bioshard"></div>
++                    <div class="win-btn win-close" data-action="close" data-win="bioshard"></div>
++                </div>
++            </div>
++            <div class="win-content u-padding-16">
++                <div class="u-muted-text u-font-size-xxs u-margin-b-10">NEEDLEMAN-WUNSCH ALIGNMENT KERNEL</div>
++                <div class="win-input-group u-margin-t-10">
++                    <input type="text" id="bio-seq1" class="win-input u-font-size-xxs" value="ATCGATCGA" title="DNA Sequence 1">
++                    <input type="text" id="bio-seq2" class="win-input u-font-size-xxs" value="ATCGTTCGA" title="DNA Sequence 2">
++                </div>
++                <button class="status-chip u-margin-t-10 u-full-width" onclick="window.runBioAlign()">ALIGN ON SILICON</button>
++            </div>
++        </section>
++
++        <!-- LLM TRANSFORMER SHARD -->
++        <section id="win-llmshard" class="window hidden win-matrix-default">
++            <div class="win-header">
++                <div class="win-title">🧠 Sovereign Transformer (Attention Ops)</div>
++                <div class="win-controls">
++                    <div class="win-btn win-min" data-action="minimize" data-win="llmshard"></div>
++                    <div class="win-btn win-close" data-action="close" data-win="llmshard"></div>
++                </div>
++            </div>
++            <div class="win-content u-padding-16">
++                <div class="u-muted-text u-font-size-xxs u-margin-b-10">LOCAL MATMUL ATTENTION PRIMITIVE (Q x K^T)</div>
++                <button class="status-chip u-margin-t-10 u-full-width" onclick="window.runLLMAttention()">EXECUTE SELF-ATTENTION</button>
++                <div id="llm-ops-log" class="u-margin-t-10 u-font-size-xxs u-accent-text">Matrix Ready.</div>
++            </div>
++        </section>
++
++        <!-- HFT ORACLE SHARD -->
++        <section id="win-hftshard" class="window hidden win-settings-default">
++            <div class="win-header">
++                <div class="win-title">📈 HFT Oracle (Zero-Latency Desk)</div>
++                <div class="win-controls">
++                    <div class="win-btn win-min" data-action="minimize" data-win="hftshard"></div>
++                    <div class="win-btn win-close" data-action="close" data-win="hftshard"></div>
++                </div>
++            </div>
++            <div class="win-content u-padding-16">
++                <div class="u-muted-text u-font-size-xxs u-margin-b-10">C-KERNEL VWAP CALCULATOR</div>
++                <button class="status-chip u-margin-t-10 u-full-width" onclick="window.runHFTCalc()">CALCULATE LIQUIDITY</button>
++                <div id="hft-vwap-out" class="u-margin-t-10 u-font-size-xxs u-accent-text">Awaiting Market Data.</div>
++            </div>
++        </section>
++
+         <section id="win-mlshard" class="window hidden win-matrix-default">
+             <div class="win-header">
+                 <div class="win-title">🚀 Sovereign ML-Ops (Deployment Pipeline)</div>
+@@ -1329,11 +1380,11 @@ msg: db "SIGMAOS ACTIVE", 10
+                 <h4 class="u-accent-text">THEME ENGINE</h4>
+                 <div class="u-flex-between u-margin-t-10">
+                     <span class="u-font-size-xxs">ACCENT COLOR</span>
+-                    <input type="color" id="theme-color" onchange="window.setAccent(this.value)">
++                    <input type="color" id="theme-color" onchange="window.setAccent(this.value)" title="Choose an accent color">
+                 </div>
+                 <div class="u-flex-between u-margin-t-10">
+                     <span class="u-font-size-xxs">BLUR INTENSITY</span>
+-                    <input type="range" min="0" max="100" value="40" onchange="window.setBlur(this.value)">
++                    <input type="range" min="0" max="100" value="40" onchange="window.setBlur(this.value)" title="Adjust window blur intensity">
+                 </div>
+             </div>
+         </section>

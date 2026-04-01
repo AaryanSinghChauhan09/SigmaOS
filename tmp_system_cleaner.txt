@@ -1,0 +1,1 @@
+fatal: path 'sovereign_tools/system_cleaner.c' exists on disk, but not in 'HEAD~30'

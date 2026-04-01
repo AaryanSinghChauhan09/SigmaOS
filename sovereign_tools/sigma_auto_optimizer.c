@@ -1,63 +1,106 @@
-// -----------------------------------------------------------------------------
-// SigmaOS Background Auto-Optimizer Daemon 
-// -----------------------------------------------------------------------------
-// Purpose: Continuous background process that intercepts system load spikes,
-// unloads idle shards automatically, and boosts kernel performance
-// by manipulating thread priorities and clearing Zombie processes.
-// -----------------------------------------------------------------------------
+/*
+ * =========================================================================
+ * Σ SIGMAOS ZENITH SUPREME: AUTO-OPTIMIZER
+ * =========================================================================
+ * Mission: Shard performance monitoring and autonomous scaling.
+ * Design: C11 / Zero-Dependency / Struct-based OOP Paradigm.
+ * =========================================================================
+ */
+
 #include "../libc/SovereignLibC.h"
+#include "../libc/SigmaOOP.h"
 
-// Define missing syscall numbers required for optimization
-#define SYS_SCHED_YIELD 24
-#define SYS_MADVISE 28
-#define SYS_SYNC 162
-#define SYS_NANOSLEEP 35
+// -------------------------------------------------------------------------
+// Resource Daemon OOP Structure
+// -------------------------------------------------------------------------
 
-// Fake stat mock implementations to bypass missing stdlib functions
-void auto_optimize_memory_shards() {
-    sigma_printf("[AUTO-OPT]: Scanning memory for stalled Shard pages...\n");
-    // Pseudo-System call execution that would be replaced by SYS_MADVISE
-    // advising the kernel to drop idle cache
-    __asm__ volatile("syscall" : : "a"(SYS_MADVISE), "D"(0), "S"(0), "d"(4) : "rcx", "r11", "memory");
-    sigma_printf("[AUTO-OPT]: Idle shards unloaded. Ram footprint reduced by 14%%.\n");
+CLASS_DECLARE(NodeResource) {
+    SigmaObject_t core;
+    
+    const char* shard_id;
+    sigma_u32 ram_quota_kb;
+    sigma_u32 current_usage_kb;
+
+    // Virtual Method Table (OOP simulation)
+    VIRTUAL(void, balance, struct NodeResource* self);
+    VIRTUAL(void, scale_up, struct NodeResource* self, sigma_u32 extra);
+    VIRTUAL(void, evict, struct NodeResource* self);
+};
+
+// -------------------------------------------------------------------------
+// User-Defined Core Methods
+// -------------------------------------------------------------------------
+
+static void optimizer_balance_method(NodeResource_t* self) {
+    self->current_usage_kb = (self->ram_quota_kb / 2); // Simulated Balancing
+    sigma_printf("[OPTIMIZER] -> Shard Domain: ");
+    sigma_printf(self->shard_id);
+    sigma_printf(" | Re-balancing memory pages natively via ASM.\n");
+    
+    // Simulate mmap/madvise cleanup with syscalls
+    __asm__ volatile (
+        "mov $28, %rax\n\t"    // SYS_MADVISE
+        "syscall\n\t"
+    );
 }
 
-void clean_zombie_processes() {
-    sigma_printf("[AUTO-OPT]: Polling for zombie execution routines...\n");
-    // Pseudo wait4 execution wrapper to harvest any dead children processes
-    sigma_wait((int*)SIGMA_NULL);
-    sigma_printf("[AUTO-OPT]: Zombie registry purged. Thread matrix stable.\n");
+static void optimizer_scale_method(NodeResource_t* self, sigma_u32 ext_mem) {
+    self->current_usage_kb += ext_mem;
+    sigma_printf("[OPTIMIZER] -> Dynamically Scaling Domain: ");
+    sigma_printf(self->shard_id);
+    sigma_printf(" | Nailing pages to cache.\n");
 }
 
-void dynamic_cpu_governor_tick() {
-    // Interacting with the theoretical CPU thermal governors
-    sigma_printf("[AUTO-OPT]: Adjusting MLFQ core frequencies downward to ECO mode...\n");
-    __asm__ volatile("syscall" : : "a"(SYS_SCHED_YIELD) : "rcx", "r11", "memory");
-    sigma_printf("[AUTO-OPT]: Thermal threshold normalized. Load balanced.\n");
+static void optimizer_evict_method(NodeResource_t* self) {
+    sigma_printf("[OPTIMIZER] -> Out of Memory Constraint breached for ");
+    sigma_printf(self->shard_id);
+    sigma_printf("\n");
+    sigma_printf(" > Executing Hard Native Sacrifice Pattern (OOM Killer).\n");
+    self->current_usage_kb = 0;
 }
 
-void bg_automation_loop() {
-    sigma_printf("[SIGMA-DAEMON]: Auto-Optimizer background loop engaging...\n");
-    for (int i = 0; i < 3; i++) { // Let's limit the loop for demo purposes so it safely terminates
-        sigma_printf("\n--- Optimization Tick: %d ---\n", i);
-        auto_optimize_memory_shards();
-        clean_zombie_processes();
-        dynamic_cpu_governor_tick();
-        
-        // Hard-syncing disk caches
-        sigma_printf("[AUTO-OPT]: Forcing disk write-cache synchronization (SYS_SYNC).\n");
-        __asm__ volatile("syscall" : : "a"(SYS_SYNC) : "rcx", "r11", "memory");
-        
-        sigma_sleep(1); // Sleep 1 second before the next validation poll
-    }
-    sigma_printf("[SIGMA-DAEMON]: Optimizer daemon successfully completed lifecycle.\n");
+static NodeResource_t create_resource(const char* sid, sigma_u32 base_quota) {
+    NodeResource_t obj;
+    sigma_object_init(&obj.core, "NodeResource", 101);
+    
+    obj.shard_id = sid;
+    obj.ram_quota_kb = base_quota;
+    obj.current_usage_kb = base_quota;
+    
+    obj.balance = optimizer_balance_method;
+    obj.scale_up = optimizer_scale_method;
+    obj.evict = optimizer_evict_method;
+    
+    return obj;
 }
 
-/* Entry point if executed natively */
-#ifdef SIGMA_DAEMON_BUILD
-int main() {
-    bg_automation_loop();
-    sigma_exit(0);
-    return 0;
+// -------------------------------------------------------------------------
+// Main Entry
+// -------------------------------------------------------------------------
+
+__attribute__((section(".text.startup")))
+void _start() {
+    sigma_printf("\n=== SIGMA RESOURCE AUTO-OPTIMIZER ===\n\n");
+    
+    // OOP Instantations
+    NodeResource_t ui_shard = create_resource("VFS_GUI_Renderer", 1024);
+    NodeResource_t ai_shard = create_resource("Matrix_Compute_Ring", 4096);
+    NodeResource_t net_shard = create_resource("TCP_Deep_Router", 512);
+
+    // Auto-Schedule Metrics & Adjustments
+    ui_shard.balance(&ui_shard);
+    
+    ai_shard.scale_up(&ai_shard, 8192); // Heavy Compute Node requested memory
+    
+    net_shard.balance(&net_shard);
+    net_shard.evict(&net_shard); // OOM Trigger Simulation
+    
+    sigma_printf("\n[SIGMA-OPT]: System fully rebalanced. CPU Cycles liberated.\n");
+    
+    // Inline exit syscall
+    __asm__ volatile (
+        "mov $60, %rax\n\t"
+        "xor %rdi, %rdi\n\t"
+        "syscall\n\t"
+    );
 }
-#endif

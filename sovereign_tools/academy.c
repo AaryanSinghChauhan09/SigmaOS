@@ -1,4 +1,4 @@
-#include "../SovereignLibC.h"
+#include "../libc/SovereignLibC.h"
 
 /*
  * Σ SIGMAOS: SOVEREIGN ACADEMY (v1.0)

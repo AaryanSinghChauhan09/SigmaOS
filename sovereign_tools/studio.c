@@ -1,4 +1,4 @@
-#include "../SovereignLibC.h"
+#include "../libc/SovereignLibC.h"
 
 /*
  * Σ SIGMAOS: SOVEREIGN STUDIO (v1.0)

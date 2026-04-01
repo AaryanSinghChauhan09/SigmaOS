@@ -862,3 +862,4 @@ setInterval(() => {
     const flow = document.getElementById('tensor-flow-rate');
     if (flow) flow.textContent = (Math.random() * 5 + 1).toFixed(2) + ' TB/s';
 }, 3000);
+window.setAccent = (color) => { document.documentElement.style.setProperty('--accent-primary', color); }; window.setBlur = (val) => { document.documentElement.style.setProperty('--window-bg', \gba(10, 15, 25, \)\); document.documentElement.style.setProperty('--backdrop-blur', \lur(\px)\); };
