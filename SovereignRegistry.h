@@ -1,7 +1,7 @@
 #ifndef SOVEREIGN_REGISTRY_H
 #define SOVEREIGN_REGISTRY_H
 
-#include "SigmaOOP.hpp"
+#include "SigmaC11.h"
 
 namespace SigmaOS {
 namespace WindowsShard {

@@ -1,7 +1,7 @@
 #ifndef SOVEREIGN_INTERFERENCE_GUARD_H
 #define SOVEREIGN_INTERFERENCE_GUARD_H
 
-#include "SigmaOOP.hpp"
+#include "SigmaC11.h"
 #include "SovereignLibC.h"
 
 namespace SigmaOS {

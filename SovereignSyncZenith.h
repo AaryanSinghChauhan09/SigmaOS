@@ -1,7 +1,7 @@
 #ifndef SOVEREIGN_SYNC_ZENITH_H
 #define SOVEREIGN_SYNC_ZENITH_H
 
-#include "SigmaOOP.hpp"
+#include "SigmaC11.h"
 
 namespace SigmaOS {
 namespace Sync {

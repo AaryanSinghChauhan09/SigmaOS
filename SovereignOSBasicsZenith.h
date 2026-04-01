@@ -1,7 +1,7 @@
 #ifndef SOVEREIGN_OS_BASICS_ZENITH_H
 #define SOVEREIGN_OS_BASICS_ZENITH_H
 
-#include "SigmaOOP.hpp"
+#include "SigmaC11.h"
 
 namespace SigmaOS {
 namespace Basics {

@@ -1,7 +1,7 @@
 #ifndef SOVEREIGN_OMNI_SHARD_H
 #define SOVEREIGN_OMNI_SHARD_H
 
-#include "SigmaOOP.hpp"
+#include "SigmaC11.h"
 
 namespace SigmaOS {
 namespace Omni {
