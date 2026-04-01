@@ -75,6 +75,7 @@ Hot-loadable feature modules enabled/disabled at runtime:
 | [[Shortcut_Commands]] | Native kernel keybindings and shell shorthand aliases |
 | [[OS_Development_History]] | Milestones, epochs, and bloat reduction timeline |
 | [[Faults_And_Improvements]] | Known system faults, scope of improvement, and resolutions |
+| [[Coding_For_SigmaOS]] | The developer mindset shift: programming without standard libraries |
 
 ---
 
