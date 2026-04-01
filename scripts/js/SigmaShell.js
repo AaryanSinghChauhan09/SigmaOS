@@ -70,6 +70,8 @@ export class SigmaShell {
                 if (content !== null) this.print(content);
                 else this.print(`cat: no such file: ${a[0]}`);
             },
+            apt: (a) => this.handlePkg(a, 'APT'),
+            pacman: (a) => this.handlePkg(a, 'PACMAN'),
             neofetch: () => this.print(`Σ SIGMAOS ZENITH\nUptime: ${this.system.uptime}s\nKernel: Sovereign C11\nResolution: Industrial Retina`),
             cpu: () => this.print('CPU: ' + document.getElementById('cpu-val').textContent),
             matrix: () => this.system.wm.open('industrialmatrix'),
@@ -95,6 +97,15 @@ export class SigmaShell {
         div.textContent = text;
         this.output.appendChild(div);
         this.output.scrollTop = this.output.scrollHeight;
+    }
+
+    handlePkg(args, mode) {
+        if (!args[0]) return this.print(`${mode}: missing operand`);
+        if (args[0] === 'install' || args[0] === '-S') {
+            const pkg = args[1];
+            this.print(`${mode} [Sovereign]: Sharding package ${pkg}...`);
+            setTimeout(() => this.print(`${pkg} installed at /root/bin/${pkg}`), 800);
+        }
     }
 
     handleSigmaCtl(args) {

@@ -17,6 +17,7 @@ export const SOVEREIGN_SHARDS = [
     { id: 'financeshard', name: 'Finance', icon: '💰', domain: 'Finance', enabled: true, description: 'Industrial Finance - Stock & Crypto Matrix.' },
     { id: 'contentshard', name: 'Studio', icon: '🎬', domain: 'Media', enabled: true, description: 'Creative media studio - Direct Rendering.' },
     { id: 'productivity', name: 'Tasks', icon: '✅', domain: 'Productivity', enabled: true, description: 'Industrial Task Orchestration.' },
+    { id: 'distromirror', name: 'Mirror', icon: '🐧', domain: 'System', enabled: true, description: 'Linux Distro principles mirroring.' },
     { id: 'uxaudit', name: 'UX Audit', icon: '📐', domain: 'Design', enabled: true, description: 'UI/UX principle auditing & consistency.' },
     { id: 'mediahub', name: 'Media Hub', icon: '🖼️', domain: 'Media', enabled: false, description: 'Professional media manipulation tools.' },
     { id: 'planmaster', name: 'Plan Master', icon: '📅', domain: 'Management', enabled: false, description: 'Sovereign project orchestration.' },

@@ -1206,6 +1206,35 @@ msg: db "SIGMAOS ACTIVE", 10
             </div>
         </section>
 
+        <!-- DISTRO MIRROR SHARD -->
+        <section id="win-distromirror" class="window hidden win-emu-default">
+            <div class="win-header">
+                <div class="win-title">🐧 Sovereign Distro Mirror (Mirror-Shard)</div>
+                <div class="win-controls">
+                    <div class="win-btn win-min" data-action="minimize" data-win="distromirror"></div>
+                    <div class="win-btn win-close" data-action="close" data-win="distromirror"></div>
+                </div>
+            </div>
+            <div class="win-content u-padding-16">
+                <div class="u-margin-b-10 u-font-size-xs u-accent-text">MIRROR INDUSTRY PRINCIPLES</div>
+                <div class="u-grid-3 gap-16">
+                    <div class="metric-card u-text-center pointer" onclick="setDistroMirror('UBUNTU')">
+                        <div class="u-font-size-lg">🟠</div>
+                        <div class="u-bold u-margin-t-5">Ubuntu</div>
+                    </div>
+                    <div class="metric-card u-text-center pointer" onclick="setDistroMirror('ARCH')">
+                        <div class="u-font-size-lg">🔹</div>
+                        <div class="u-bold u-margin-t-5">Arch</div>
+                    </div>
+                    <div class="metric-card u-text-center pointer" onclick="setDistroMirror('SIGMA')">
+                        <div class="u-font-size-lg">🌍</div>
+                        <div class="u-bold u-margin-t-5">Sovereign</div>
+                    </div>
+                </div>
+                <div class="u-margin-t-20 u-muted-text u-font-size-xxs">MIRRORS: Shell Aliases, Theme Accents, and Pkg Logic.</div>
+            </div>
+        </section>
+
         <!-- ═══════════════════════════════════════════════════════════
              UNIVERSAL WEB SHARD (BROWSER-IN-BROWSER)
              ═══════════════════════════════════════════════════════════ -->
