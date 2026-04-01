@@ -21,6 +21,7 @@ export class SigmaSystem {
     }
 
     init() {
+        this.detectPlatform();
         setInterval(() => {
             this.uptime++;
             this.updateMetrics();
@@ -144,5 +145,16 @@ export class SigmaSystem {
             `;
             list.appendChild(item);
         });
+    }
+
+    detectPlatform() {
+        const ua = navigator.userAgent.toLowerCase();
+        if (/mobile|android|iphone|ipad|tablet/.test(ua)) {
+            document.body.classList.add('platform-mobile');
+            this.spawnToast('Platform: MOBILE Optimized Shard ACTIVE.');
+        } else {
+            document.body.classList.add('platform-pc');
+            this.spawnToast('Platform: PC Industrial Zenith ACTIVE.');
+        }
     }
 }

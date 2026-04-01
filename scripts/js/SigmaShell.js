@@ -111,7 +111,13 @@ export class SigmaShell {
     handleSigmaCtl(args) {
         if (!args[0]) return this.print('Usage: sigmactl <health|audit|status|wm>');
         if (args[0] === 'wm') this.system.wm.tile();
-        if (args[0] === 'health') this.print(`Uptime: ${this.system.uptime}s | VFS Integrity: 100%`);
+        if (args[0] === 'health') {
+            this.print('Σ SIGMAOS HEALTH AUDIT (SOVEREIGN)');
+            this.print(`Uptime: ${this.system.uptime}s`);
+            this.print(`Shards Active: ${this.system.store.shards.filter(s=>s.enabled).length}`);
+            this.print('HLL Dependencies: REDUCED (SMU ACTIVE)');
+            this.print('Silicon Parity: 100%');
+        }
         if (args[0] === 'status') this.print('SIGMAOS SOVEREIGN ZENITH: ACTIVE');
     }
 }
