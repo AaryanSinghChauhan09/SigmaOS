@@ -25,3 +25,6 @@ float sigma_pow(float base, int exp) {
 #include "shards/SovereignDSA.c"
 #include "shards/SovereignCS.c"
 #include "shards/SovereignLatticePQC.c"
+#include "shards/SovereignBioMetrics.c"
+#include "shards/SovereignTransformer.c"
+#include "shards/SovereignHFT.c"

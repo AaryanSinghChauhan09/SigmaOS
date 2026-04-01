@@ -1148,6 +1148,57 @@ msg: db "SIGMAOS ACTIVE", 10
             </div>
         </section>
 
+        <!-- BIO-INFORMATICS SHARD -->
+        <section id="win-bioshard" class="window hidden win-services-default">
+            <div class="win-header">
+                <div class="win-title">🧬 Sovereign Bio-Informatics (Genomics)</div>
+                <div class="win-controls">
+                    <div class="win-btn win-min" data-action="minimize" data-win="bioshard"></div>
+                    <div class="win-btn win-close" data-action="close" data-win="bioshard"></div>
+                </div>
+            </div>
+            <div class="win-content u-padding-16">
+                <div class="u-muted-text u-font-size-xxs u-margin-b-10">NEEDLEMAN-WUNSCH ALIGNMENT KERNEL</div>
+                <div class="win-input-group u-margin-t-10">
+                    <input type="text" id="bio-seq1" class="win-input u-font-size-xxs" value="ATCGATCGA" title="DNA Sequence 1">
+                    <input type="text" id="bio-seq2" class="win-input u-font-size-xxs" value="ATCGTTCGA" title="DNA Sequence 2">
+                </div>
+                <button class="status-chip u-margin-t-10 u-full-width" onclick="window.runBioAlign()">ALIGN ON SILICON</button>
+            </div>
+        </section>
+
+        <!-- LLM TRANSFORMER SHARD -->
+        <section id="win-llmshard" class="window hidden win-matrix-default">
+            <div class="win-header">
+                <div class="win-title">🧠 Sovereign Transformer (Attention Ops)</div>
+                <div class="win-controls">
+                    <div class="win-btn win-min" data-action="minimize" data-win="llmshard"></div>
+                    <div class="win-btn win-close" data-action="close" data-win="llmshard"></div>
+                </div>
+            </div>
+            <div class="win-content u-padding-16">
+                <div class="u-muted-text u-font-size-xxs u-margin-b-10">LOCAL MATMUL ATTENTION PRIMITIVE (Q x K^T)</div>
+                <button class="status-chip u-margin-t-10 u-full-width" onclick="window.runLLMAttention()">EXECUTE SELF-ATTENTION</button>
+                <div id="llm-ops-log" class="u-margin-t-10 u-font-size-xxs u-accent-text">Matrix Ready.</div>
+            </div>
+        </section>
+
+        <!-- HFT ORACLE SHARD -->
+        <section id="win-hftshard" class="window hidden win-settings-default">
+            <div class="win-header">
+                <div class="win-title">📈 HFT Oracle (Zero-Latency Desk)</div>
+                <div class="win-controls">
+                    <div class="win-btn win-min" data-action="minimize" data-win="hftshard"></div>
+                    <div class="win-btn win-close" data-action="close" data-win="hftshard"></div>
+                </div>
+            </div>
+            <div class="win-content u-padding-16">
+                <div class="u-muted-text u-font-size-xxs u-margin-b-10">C-KERNEL VWAP CALCULATOR</div>
+                <button class="status-chip u-margin-t-10 u-full-width" onclick="window.runHFTCalc()">CALCULATE LIQUIDITY</button>
+                <div id="hft-vwap-out" class="u-margin-t-10 u-font-size-xxs u-accent-text">Awaiting Market Data.</div>
+            </div>
+        </section>
+
         <section id="win-mlshard" class="window hidden win-matrix-default">
             <div class="win-header">
                 <div class="win-title">🚀 Sovereign ML-Ops (Deployment Pipeline)</div>
@@ -1329,11 +1380,11 @@ msg: db "SIGMAOS ACTIVE", 10
                 <h4 class="u-accent-text">THEME ENGINE</h4>
                 <div class="u-flex-between u-margin-t-10">
                     <span class="u-font-size-xxs">ACCENT COLOR</span>
-                    <input type="color" id="theme-color" onchange="window.setAccent(this.value)">
+                    <input type="color" id="theme-color" onchange="window.setAccent(this.value)" title="Choose an accent color">
                 </div>
                 <div class="u-flex-between u-margin-t-10">
                     <span class="u-font-size-xxs">BLUR INTENSITY</span>
-                    <input type="range" min="0" max="100" value="40" onchange="window.setBlur(this.value)">
+                    <input type="range" min="0" max="100" value="40" onchange="window.setBlur(this.value)" title="Adjust window blur intensity">
                 </div>
             </div>
         </section>

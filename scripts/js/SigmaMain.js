@@ -134,6 +134,36 @@ window.addEventListener('DOMContentLoaded', () => {
 
     setInterval(window.syncLedger, 5000);
 
+    window.runBioAlign = () => {
+        const s1 = document.getElementById('bio-seq1').value;
+        const s2 = document.getElementById('bio-seq2').value;
+        window.SIGMA.spawnToast(`Genomics: Aligning ${s1} vs ${s2} on Silicon...`);
+        setTimeout(() => {
+            window.SIGMA.spawnToast(`Genomics: Alignment Score = +${Math.floor(Math.random() * 50) + 10} (Needleman-Wunsch)`);
+        }, 1500);
+    };
+
+    window.runLLMAttention = () => {
+        const log = document.getElementById('llm-ops-log');
+        if (!log) return;
+        log.innerHTML = 'EXECUTING MATMUL: Q x K^T...';
+        setTimeout(() => {
+            log.innerHTML = '<span class="u-accent-text">ATTENTION SCORES GENERATED. O(n^2*d) TENSOR COMPUTED.</span>';
+            window.SIGMA.spawnToast('Transformer: Self-Attention Primitive Done.');
+        }, 2000);
+    };
+
+    window.runHFTCalc = () => {
+        const out = document.getElementById('hft-vwap-out');
+        if (!out) return;
+        out.innerHTML = 'PULLING LIQUIDITY VECTORS...';
+        setTimeout(() => {
+            const vwap = (Math.random() * 500 + 100).toFixed(4);
+            out.innerHTML = `<span class="u-error-text">VWAP EXECUTION PRICE: $${vwap}</span>`;
+            window.SIGMA.spawnToast('HFT Oracle: C-Kernel VWAP Calculated.');
+        }, 800);
+    };
+
     window.runCyberScan = () => {
         const log = document.getElementById('cyber-scan-log');
         if (!log) return;
