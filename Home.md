@@ -68,6 +68,7 @@ Hot-loadable feature modules enabled/disabled at runtime:
 | [[HFT_Shard_Architecture]] | High Frequency Trading (HFT) Shard |
 | [[BioInformatics_Shard]] | Bio-Informatics Shard capabilities |
 | [[OS_Level_USPs]] | Core Unique Selling Propositions |
+| [[Lost_Features]] | Features removed for system sovereignty |
 
 ---
 
