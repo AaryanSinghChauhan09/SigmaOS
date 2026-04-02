@@ -12,7 +12,7 @@ function Write-Header {
     Write-Host ""
 }
 
-function Run-Benchmark {
+function Invoke-Benchmark {
     param($Name, $IndustryStandard, $SigmaResult, $Unit, $StatusColor)
     Write-Host "=> Benchmarking: $Name" -ForegroundColor Yellow
     Start-Sleep -Milliseconds 300
@@ -26,22 +26,22 @@ try {
     Write-Header
 
     # 1. Dependency Footprint
-    Run-Benchmark -Name "Base System Dependency Footprint (Userland + Kernel)" -IndustryStandard "650+" -SigmaResult "0" -Unit "Packages/Libraries" -StatusColor "Green"
+    Invoke-Benchmark -Name "Base System Dependency Footprint (Userland + Kernel)" -IndustryStandard "650+" -SigmaResult "0" -Unit "Packages/Libraries" -StatusColor "Green"
 
     # 2. Boot & Initialization Overhead
-    Run-Benchmark -Name "System Boot to Active Shell Latency" -IndustryStandard "12.5" -SigmaResult "0.08" -Unit "Seconds" -StatusColor "Green"
+    Invoke-Benchmark -Name "System Boot to Active Shell Latency" -IndustryStandard "12.5" -SigmaResult "0.08" -Unit "Seconds" -StatusColor "Green"
 
     # 3. Kernel Component Hot-Loading (Shard vs Monolithic/LKM)
-    Run-Benchmark -Name "Kernel Module / Shard Injection Latency" -IndustryStandard "450" -SigmaResult "2.5" -Unit "Milliseconds" -StatusColor "Green"
+    Invoke-Benchmark -Name "Kernel Module / Shard Injection Latency" -IndustryStandard "450" -SigmaResult "2.5" -Unit "Milliseconds" -StatusColor "Green"
 
     # 4. IPC & VFS Arbitration
-    Run-Benchmark -Name "Local IPC Context Switching Latency" -IndustryStandard "5.2" -SigmaResult "0.3" -Unit "Microseconds" -StatusColor "Green"
+    Invoke-Benchmark -Name "Local IPC Context Switching Latency" -IndustryStandard "5.2" -SigmaResult "0.3" -Unit "Microseconds" -StatusColor "Green"
 
     # 5. Native AI Router Response
-    Run-Benchmark -Name "Embedded Agentic Inference Routing Overhead" -IndustryStandard "N/A (Requires External Python/Torch)" -SigmaResult "4.1" -Unit "Milliseconds" -StatusColor "Green"
+    Invoke-Benchmark -Name "Embedded Agentic Inference Routing Overhead" -IndustryStandard "N/A (Requires External Python/Torch)" -SigmaResult "4.1" -Unit "Milliseconds" -StatusColor "Green"
 
     # 6. Memory Overhead 
-    Run-Benchmark -Name "Operating System Idle RAM Consumption" -IndustryStandard "850+" -SigmaResult "8" -Unit "Megabytes" -StatusColor "Green"
+    Invoke-Benchmark -Name "Operating System Idle RAM Consumption" -IndustryStandard "850+" -SigmaResult "8" -Unit "Megabytes" -StatusColor "Green"
 
 
     Write-Host "============================================================" -ForegroundColor Cyan

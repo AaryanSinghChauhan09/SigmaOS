@@ -57,8 +57,8 @@ $total_roadmap_items = 0
 
 foreach ($roadmap in $roadmap_files) {
     $content = Get-Content $roadmap.FullName -Raw
-    $matches = [regex]::Matches($content, '\| (\d{3,4}) \|')
-    $total_roadmap_items += $matches.Count
+    $regex_matches = [regex]::Matches($content, '\| (\d{3,4}) \|')
+    $total_roadmap_items += $regex_matches.Count
 }
 
 if ($total_roadmap_items -eq 2350) {
