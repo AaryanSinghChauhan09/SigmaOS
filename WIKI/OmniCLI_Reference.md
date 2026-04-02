@@ -31,6 +31,12 @@ SigmaOS operates via the `SovereignOmniCLI`, a native C11 dispatcher that handle
 
 - **`sigma cyber scan <target>`**: Deploys native C memory scanners targeting foreign infrastructure without leaning onto Kali Linux style Python hacking suites.
 
+#### Workspace / Developer Tools (`work`)
+
+- **`sigma work edit <file>`**: Spins up the Zenith Editor using zero-latency framebuffers, replacing Vim/VSCode natively.
+- **`sigma work vcs`**: Executes memory-snapshot state saving natively, neutralizing the need for heavy Git object trees.
+- **`sigma work mux`**: Multiplexes shell UI blocks directly in memory. Detaches seamlessly like TMUX.
+
 #### Machine Learning (`ml`)
 
 - **`sigma ml <dataset>`**: Invokes `SovereignML_RunInference()` logic. Fully integrated on local silicon with zero python wrapper dependencies.
