@@ -6,7 +6,11 @@ SigmaOS is inherently engineered to render every other operating system obsolete
 - **The Competitor USP:** Fluid, hardware-accelerated interfaces with tightly integrated software ecosystems.
 - **The SigmaOS Absorption:** Instead of relying on multi-layer display servers (like X11 or Wayland wrapper libraries), SigmaOS dynamically projects low-level memory buffers via pure WebAssembly streams. This enables a fully browser-based GUI interaction mapping directly to kernel framebuffers, rendering visual responses in nanoseconds without standard UI lag overhead.
 
-## 2. Absorbing Arch Linux / Gentoo: Absolute Modularity
+## 2. Absorbing Linux CLI & `/proc` Virtual File Systems
+- **The Competitor USP:** The Unix philosophy: "Everything is a file" and deep CLI control over the system state natively (via `/proc`, `/sys`, etc.).
+- **The SigmaOS Absorption:** Instead of mapping complex inode structures and mounting massive I/O pipelines blocking memory, SigmaOS introduces the **Virtual File System (VFS) Shard**. The `SovereignOmniCLI` replicates massive file system traversal naturally out of the box (`sigma fs ls`, `sigma fs read`), meaning the system possesses complete Linux transparency combined with instant memory-mapped speed, bypassing block-device overhead entirely.
+
+## 3. Absorbing Arch Linux / Gentoo: Absolute Modularity
 - **The Competitor USP:** Build everything from the ground up natively. Stripped away bloat.
 - **The SigmaOS Absorption:** We removed GNU, glibc, and package managers entirely. Our "Shard-On-Demand" (SOD) architecture implements "Compile-on-Demand." Using our native `SovereignOmniCLI`, every application and shard dynamically compiles and loads via `_sigma_sys_open_window` right at invocation. No unneeded bin packages lingering on disk. 
 

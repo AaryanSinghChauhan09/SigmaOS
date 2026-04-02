@@ -8,6 +8,11 @@ SigmaOS operates via the `SovereignOmniCLI`, a native C11 dispatcher that handle
 
 - **`sigma sys kill <pid>`**: Instantly terminates processes via raw `_sigma_sys_kill_pid` C hooks bypassing standard DAEMON constraints.
 
+#### Virtual File System (`fs`)
+
+- **`sigma fs ls <target>`**: Directly queries the SigmaOS mapped-memory directory trees identically to standard Linux `ls`.
+- **`sigma fs read <target>`**: Reads the raw buffer shards of an exact file seamlessly like `cat`.
+
 #### UI Orchestration (`ui`)
 
 - **`sigma ui open <app_name>`**: Spins up WebAssembly UI contexts mapped from C directly to hardware buffers.

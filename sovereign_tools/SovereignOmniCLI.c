@@ -76,6 +76,21 @@ void SovereignCLI_HandleLaw(int argc, char** argv) {
     SovereignIndianLaw_Query(argv[2]);
 }
 
+void SovereignCLI_HandleFileSystem(int argc, char** argv) {
+    if (argc < 3) return;
+    const char* action = argv[2];
+    /* Map to Sovereign Virtual File System */
+    if (sigma_strcmp(action, "ls") == 0) {
+        sigma_printf("[OMNI-FS] Querying memory-mapped directory structure...\n");
+        // SovereignVFS_List(argv[3]);
+    } else if (sigma_strcmp(action, "read") == 0 && argc > 3) {
+        sigma_printf("[OMNI-FS] Reading raw buffer shard for: %s\n", argv[3]);
+        // SovereignVFS_Read(argv[3]);
+    } else {
+        sigma_printf("[OMNI-FS] Unknown file system command.\n");
+    }
+}
+
 void SovereignCLI_HandleNetwork(int argc, char** argv) {
     SovereignNetZenith n;
     SovereignNet_init(&n);
@@ -103,6 +118,7 @@ int main(int argc, char** argv) {
     else if (sigma_strcmp(module, "ml") == 0) SovereignCLI_HandleML(argc, argv);
     else if (sigma_strcmp(module, "law") == 0) SovereignCLI_HandleLaw(argc, argv);
     else if (sigma_strcmp(module, "net") == 0) SovereignCLI_HandleNetwork(argc, argv);
+    else if (sigma_strcmp(module, "fs") == 0) SovereignCLI_HandleFileSystem(argc, argv);
     else if (sigma_strcmp(module, "ds") == 0 && argc > 2) SovereignDataScience_RunAnalysis(argv[2]);
     else {
         sigma_printf("[OMNI-CLI] Invalid Shard mapping. Purge or correct command.\n");
