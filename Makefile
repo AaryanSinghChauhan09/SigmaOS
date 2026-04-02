@@ -1,9 +1,10 @@
 # =============================================================================
-# Σ SIGMAOS: SOVEREIGN INDUSTRIAL MAKEFILE (v160.0 - PURE C11 MASTER)
+# Σ SIGMAOS: SOVEREIGN INDUSTRIAL MAKEFILE (v170.0 - PURE C11 MASTER)
 # =============================================================================
 # Mission: Absolute System Sovereignty. Zero-Dependency Build.
 # Standard: C11 (ISO/IEC 9899:2011)
-# Output: build/sigmaos_工业_zenith 
+# Output: build/sigmaos_zenith
+# New Shards: sigma_distro_absorber, sigma_tool_absorber, sigma_linux_usps
 # =============================================================================
 
 CC      := gcc
@@ -11,31 +12,42 @@ NASM    := nasm
 LD      := ld
 OBJCOPY := objcopy
 
-# Industrial Compiler Flags
+# Industrial Compiler Flags (Linux)
 CFLAGS  := -std=c11 -Wall -Wextra -Wpedantic -Werror \
            -Wno-unused-parameter -O3 -ffreestanding \
            -fno-stack-protector -fno-builtin -mno-red-zone \
            -I. -Ilibc -DSIGMA_INDUSTRIAL_BUILD=1
 
+# Windows-compatible Compiler Flags (relaxed for Win32 toolchain)
+CFLAGS_WIN := -std=c11 -Wall -O3 -I. -Ilibc -DSIGMA_INDUSTRIAL_BUILD=1 -DSIGMA_WIN32=1
+
 ASMFLAGS := -f elf64
-LDFLAGS  := -nostdlib -static -e main # Using main for the shell entry point in this simulation
+LDFLAGS  := -nostdlib -static -e main
 
 # Directories
-BUILD_DIR := build
-KERNEL_DIR := kernel
-LIBC_DIR := libc
+BUILD_DIR      := build
+KERNEL_DIR     := kernel
+LIBC_DIR       := libc
+TOOLS_DIR      := sovereign_tools
 
 # Source Discovery
-KERNEL_SRCS := $(wildcard $(KERNEL_DIR)/*.c)
-LIBC_SRCS   := $(wildcard $(LIBC_DIR)/*.c)
-ASM_SRCS    := $(wildcard $(KERNEL_DIR)/*.asm) $(wildcard $(LIBC_DIR)/*.asm)
+KERNEL_SRCS    := $(wildcard $(KERNEL_DIR)/*.c)
+LIBC_SRCS      := $(wildcard $(LIBC_DIR)/*.c)
+ASM_SRCS       := $(wildcard $(KERNEL_DIR)/*.asm) $(wildcard $(LIBC_DIR)/*.asm)
+
+# NEW: Sovereign Tool Shards
+TOOL_SRCS      := $(TOOLS_DIR)/SovereignOmniCLI.c \
+                  $(TOOLS_DIR)/SigmaCLI_Dispatcher.c \
+                  $(TOOLS_DIR)/sigma_distro_absorber.c \
+                  $(TOOLS_DIR)/sigma_tool_absorber.c \
+                  $(TOOLS_DIR)/sigma_linux_usps.c
 
 # Object Mapping
-KERNEL_OBJS := $(patsubst $(KERNEL_DIR)/%.c, $(BUILD_DIR)/kernel_%.o, $(KERNEL_SRCS))
-LIBC_OBJS   := $(patsubst $(LIBC_DIR)/%.c, $(BUILD_DIR)/libc_%.o, $(LIBC_SRCS))
-ASM_OBJS    := $(patsubst %.asm, $(BUILD_DIR)/%.o, $(notdir $(ASM_SRCS)))
+KERNEL_OBJS    := $(patsubst $(KERNEL_DIR)/%.c, $(BUILD_DIR)/kernel_%.o, $(KERNEL_SRCS))
+LIBC_OBJS      := $(patsubst $(LIBC_DIR)/%.c, $(BUILD_DIR)/libc_%.o, $(LIBC_SRCS))
+ASM_OBJS       := $(patsubst %.asm, $(BUILD_DIR)/%.o, $(notdir $(ASM_SRCS)))
 
-.PHONY: all clean dirs zenith sync
+.PHONY: all clean dirs zenith sync win32 shards absorb-check
 
 all: dirs zenith
 
