@@ -1,5 +1,5 @@
 # Σ SIGMAOS: DISTRO COMMAND PROMPT & OMNI-CLI ABSORBER
-# Translates & absorbs command sets from 30+ Linux distributions into the native SigmaOS Omni-CLI Kernel.
+# Translates & absorbs command sets from 39+ Linux distributions into the native SigmaOS Omni-CLI Kernel.
 
 $ErrorActionPreference = "Stop"
 $output_header = "include\SovereignOmniCLI_DistroAbsorber.h"
@@ -10,9 +10,10 @@ Write-Host "============================================================" -Foreg
 
 $distros = @(
     "Arch", "Artix", "Bazzite", "Bedrock", "Catchy", "CentOS", "Debian", "Deepin",
-    "Elementary", "Endeavour", "Fedora", "Garuda", "Gentoo", "Gobo", "Kali", "KDE",
-    "Linpus", "LFS", "LFW", "Lubuntu", "Manjaro", "Mint", "Neon", "Nobara", "Peach",
-    "Pop!", "Puppy", "Qubes", "RedHat", "Slackware", "Tails", "Ubuntu", "Zorin"
+    "Elementary", "Endeavour", "Fedora", "Garuda", "Gentoo", "Gobo", "Kali", "KDE", "Kubuntu",
+    "Leap", "Linpus", "LFS", "LFW", "Lubuntu", "Manjaro", "Mint", "MX", "Neon", "Nobara", 
+    "openSUSE", "Peach", "Pop!", "Puppy", "Qubes", "RedHat", "Slackware", "Tails", "Tumbleweed", 
+    "Ubuntu", "Zorin", "Zubuntu"
 )
 
 # Generating pure C11 parser mappings
@@ -21,7 +22,7 @@ $header_content = @"
  * Σ SIGMAOS ZENITH : SovereignOmniCLI_DistroAbsorber.h
  * 
  * AUTOMATICALLY GENERATED. DO NOT EDIT FREQUENTLY.
- * Absorbs structural command prompts and syntax from 30+ legacy Linux distributions.
+ * Absorbs structural command prompts and syntax from 39+ legacy Linux distributions.
  * All generic package managers & shell syntaxes are translated directly into 
  * Sovereign ring-0 C11 execution primitives natively via the Omni-CLI.
  */
@@ -45,24 +46,30 @@ Write-Host ">> Absorbing syntax from $($distros.Count) legacy distributions..." 
 
 # Simulate mapping core unique package manager and shell syntaxes to SigmaOS standard
 $header_content += "`n    // --- Arch Linux (Pacman, AUR) Family ---"
-$header_content += "`n    {`"pacman -Syu`", `"Arch/Manjaro/Garuda`", `"sigma_sync_shard_all`"},"
+$header_content += "`n    {`"pacman -Syu`", `"Arch/Manjaro/Garuda/Endeavour`", `"sigma_sync_shard_all`"},"
 $header_content += "`n    {`"paru -S`", `"Arch`", `"sigma_hotload_community_shard`"},"
 
 $header_content += "`n`n    // --- Debian / Ubuntu Family (Apt, dpkg) ---"
-$header_content += "`n    {`"apt-get install`", `"Debian/Ubuntu/Pop!/Mint`", `"sigma_hotload_shard`"},"
+$header_content += "`n    {`"apt-get install`", `"Debian/Ubuntu/Pop!/Mint/MX/Zorin/Zubuntu/Kubuntu`", `"sigma_hotload_shard`"},"
 $header_content += "`n    {`"dpkg -i`", `"Debian/Ubuntu`", `"sigma_mount_raw_shard`"},"
+$header_content += "`n    {`"apt install`", `"Deepin/Elementary/Neon/Lubuntu/Catchy`", `"sigma_hotload_shard`"},"
+
+$header_content += "`n`n    // --- SUSE / openSUSE Family (zypper) ---"
+$header_content += "`n    {`"zypper install`", `"openSUSE/Leap/Tumbleweed/Bazzite`", `"sigma_hotload_shard`"},"
+$header_content += "`n    {`"zypper dup`", `"openSUSE/Tumbleweed`", `"sigma_sync_shard_all`"},"
 
 $header_content += "`n`n    // --- RedHat / Fedora / CentOS Family (DNF, Yum, RPM) ---"
 $header_content += "`n    {`"dnf update`", `"Fedora/CentOS/RedHat/Nobara`", `"sigma_sync_shard_all`"},"
 $header_content += "`n    {`"yum install`", `"Legacy RedHat`", `"sigma_hotload_shard`"},"
 
 $header_content += "`n`n    // --- Gentoo Family (Portage) ---"
-$header_content += "`n    {`"emerge --ask`", `"Gentoo`", `"sigma_compile_shard_source`"},"
+$header_content += "`n    {`"emerge --ask`", `"Gentoo/LFS/LFW`", `"sigma_compile_shard_source`"},"
 
-$header_content += "`n`n    // --- Immutable / Custom (Bedrock, Gobo, Slackware) ---"
+$header_content += "`n`n    // --- Immutable / Custom (Bedrock, Gobo, Slackware, Puppy) ---"
 $header_content += "`n    {`"brl fetch`", `"Bedrock`", `"sigma_hijack_subsystem`"},"
 $header_content += "`n    {`"slackpkg update`", `"Slackware`", `"sigma_sync_legacy`"},"
 $header_content += "`n    {`"Compile`", `"GoboLinux`", `"sigma_compile_shard_source`"},"
+$header_content += "`n    {`"petget`", `"Puppy/Peach/Linpus`", `"sigma_mount_raw_shard`"},"
 
 $header_content += "`n`n    // --- Forensics & Security (Kali, Tails, Qubes) ---"
 $header_content += "`n    {`"amnesia-wipe`", `"Tails/Kali`", `"sigma_pqc_amnesic_purge`"},"
@@ -84,7 +91,6 @@ void sigma_omnicli_absorb_command(const char* legacy_input) {
         if (sigma_strstr(legacy_input, g_omnicli_absorption_table[i].legacy_command) != 0) {
             sigma_print_info("OMNI-CLI INTERCEPT: Absorbed Legacy [%s] syntax.", g_omnicli_absorption_table[i].legacy_distro_origin);
             sigma_print_info("-> Redirecting to Zero-Dependency Native Shard: %s", g_omnicli_absorption_table[i].target_sigma_shard);
-            // sigma_execute_shard(g_omnicli_absorption_table[i].target_sigma_shard);
             return;
         }
     }

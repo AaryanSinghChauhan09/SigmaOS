@@ -2,7 +2,7 @@
  * Σ SIGMAOS ZENITH : SovereignOmniCLI_DistroAbsorber.h
  * 
  * AUTOMATICALLY GENERATED. DO NOT EDIT FREQUENTLY.
- * Absorbs structural command prompts and syntax from 30+ legacy Linux distributions.
+ * Absorbs structural command prompts and syntax from 39+ legacy Linux distributions.
  * All generic package managers & shell syntaxes are translated directly into 
  * Sovereign ring-0 C11 execution primitives natively via the Omni-CLI.
  */
@@ -21,24 +21,30 @@ typedef struct {
 // Massive translation table
 OmniCLIPromptMapping_t g_omnicli_absorption_table[] = {
     // --- Arch Linux (Pacman, AUR) Family ---
-    {"pacman -Syu", "Arch/Manjaro/Garuda", "sigma_sync_shard_all"},
+    {"pacman -Syu", "Arch/Manjaro/Garuda/Endeavour", "sigma_sync_shard_all"},
     {"paru -S", "Arch", "sigma_hotload_community_shard"},
 
     // --- Debian / Ubuntu Family (Apt, dpkg) ---
-    {"apt-get install", "Debian/Ubuntu/Pop!/Mint", "sigma_hotload_shard"},
+    {"apt-get install", "Debian/Ubuntu/Pop!/Mint/MX/Zorin/Zubuntu/Kubuntu", "sigma_hotload_shard"},
     {"dpkg -i", "Debian/Ubuntu", "sigma_mount_raw_shard"},
+    {"apt install", "Deepin/Elementary/Neon/Lubuntu/Catchy", "sigma_hotload_shard"},
+
+    // --- SUSE / openSUSE Family (zypper) ---
+    {"zypper install", "openSUSE/Leap/Tumbleweed/Bazzite", "sigma_hotload_shard"},
+    {"zypper dup", "openSUSE/Tumbleweed", "sigma_sync_shard_all"},
 
     // --- RedHat / Fedora / CentOS Family (DNF, Yum, RPM) ---
     {"dnf update", "Fedora/CentOS/RedHat/Nobara", "sigma_sync_shard_all"},
     {"yum install", "Legacy RedHat", "sigma_hotload_shard"},
 
     // --- Gentoo Family (Portage) ---
-    {"emerge --ask", "Gentoo", "sigma_compile_shard_source"},
+    {"emerge --ask", "Gentoo/LFS/LFW", "sigma_compile_shard_source"},
 
-    // --- Immutable / Custom (Bedrock, Gobo, Slackware) ---
+    // --- Immutable / Custom (Bedrock, Gobo, Slackware, Puppy) ---
     {"brl fetch", "Bedrock", "sigma_hijack_subsystem"},
     {"slackpkg update", "Slackware", "sigma_sync_legacy"},
     {"Compile", "GoboLinux", "sigma_compile_shard_source"},
+    {"petget", "Puppy/Peach/Linpus", "sigma_mount_raw_shard"},
 
     // --- Forensics & Security (Kali, Tails, Qubes) ---
     {"amnesia-wipe", "Tails/Kali", "sigma_pqc_amnesic_purge"},
@@ -58,7 +64,6 @@ void sigma_omnicli_absorb_command(const char* legacy_input) {
         if (sigma_strstr(legacy_input, g_omnicli_absorption_table[i].legacy_command) != 0) {
             sigma_print_info("OMNI-CLI INTERCEPT: Absorbed Legacy [%s] syntax.", g_omnicli_absorption_table[i].legacy_distro_origin);
             sigma_print_info("-> Redirecting to Zero-Dependency Native Shard: %s", g_omnicli_absorption_table[i].target_sigma_shard);
-            // sigma_execute_shard(g_omnicli_absorption_table[i].target_sigma_shard);
             return;
         }
     }
