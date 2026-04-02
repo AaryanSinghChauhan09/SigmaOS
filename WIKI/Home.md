@@ -13,7 +13,8 @@
 - **📊 DATA SCI**: Statistical variance & histogram kernels.
 - **🧮 DSA VIZ**: Quicksort audit logic.
 - **🐲 CYBER SEC**: Zero-trust VFS vulnerability auditing.
-- **🐧 DISTRO MIRROR**: Linux Distro principles (Ubuntu/Arch Parity).
+- **🐧 DISTRO PARITY**: [Linux Component Parity & Sovereign Rewrite](Linux_Component_Parity.md)
+- **🛠️ ARCHITECTURE FIXES**: [Feature Suggestions & Restorations](Feature_Suggestions_and_Restorations.md)
 
 ## 🌍 MULTI-PLATFORM FINALITY
 - Run natively on **PC (Dual Boot)**, **Mobile (Touch)**, **Cloud (Cluster)**, **VirtualBox (ISO)**, or **Container (Docker)**.
