@@ -98,6 +98,10 @@ For strict control over hardware and performance, SigmaOS binds itself to these 
 * `sigma-ai persona import <file>` → Import persona parameters.
 * `sigma-ai predict <task>` → Request heuristic prediction for shard usage.
 * `sigma-ai orchestrate` → Surrender MLFQ scheduling to AI optimization vector.
+* `sigma-ai agent code-assist` → Start an interactive agentic coding assistant in the terminal, natively understanding the OS codebase.
+* `sigma-ai agent explain <module>` → Break down complex low-level kernel C11/Assembly paths in natural language.
+* `sigma-ai agent git-workflow` → Handle code commits, branch management, and git synchronization through natural language.
+* `sigma-ai agent routine <task>` → Execute routine maintenance, formatting, or refactoring native source tasks autonomously.
 
 ---
 

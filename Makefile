@@ -42,10 +42,16 @@ TOOL_SRCS      := $(TOOLS_DIR)/SovereignOmniCLI.c \
                   $(TOOLS_DIR)/sigma_tool_absorber.c \
                   $(TOOLS_DIR)/sigma_linux_usps.c
 
+# NEW: Agent Userland Tools
+USERLAND_DIR   := userland
+AGENT_SRCS     := $(KERNEL_DIR)/SovereignOmniAgent.c $(USERLAND_DIR)/OmniCLI.c
+
 # Object Mapping
 KERNEL_OBJS    := $(patsubst $(KERNEL_DIR)/%.c, $(BUILD_DIR)/kernel_%.o, $(KERNEL_SRCS))
 LIBC_OBJS      := $(patsubst $(LIBC_DIR)/%.c, $(BUILD_DIR)/libc_%.o, $(LIBC_SRCS))
 ASM_OBJS       := $(patsubst %.asm, $(BUILD_DIR)/%.o, $(notdir $(ASM_SRCS)))
+AGENT_OBJS     := $(patsubst $(KERNEL_DIR)/%.c, $(BUILD_DIR)/kernel_%.o, $(KERNEL_DIR)/SovereignOmniAgent.c) \
+                  $(patsubst $(USERLAND_DIR)/%.c, $(BUILD_DIR)/userland_%.o, $(USERLAND_DIR)/OmniCLI.c)
 
 .PHONY: all clean dirs zenith sync win32 shards absorb-check
 
@@ -62,6 +68,10 @@ $(BUILD_DIR)/libc_%.o: $(LIBC_DIR)/%.c
 	@echo "[LIBC-CC]  $<"
 	@$(CC) $(CFLAGS) -c $< -o $@
 
+$(BUILD_DIR)/userland_%.o: $(USERLAND_DIR)/%.c
+	@echo "[USER-CC]  $<"
+	@$(CC) $(CFLAGS) -c $< -o $@
+
 $(BUILD_DIR)/%.o: $(KERNEL_DIR)/%.asm
 	@echo "[SHARD-ASM] $<"
 	@$(NASM) $(ASMFLAGS) $< -o $@
@@ -70,10 +80,10 @@ $(BUILD_DIR)/%.o: $(LIBC_DIR)/%.asm
 	@echo "[LIBC-ASM]  $<"
 	@$(NASM) $(ASMFLAGS) $< -o $@
 
-zenith: $(KERNEL_OBJS) $(LIBC_OBJS) $(ASM_OBJS)
+zenith: $(KERNEL_OBJS) $(LIBC_OBJS) $(ASM_OBJS) $(AGENT_OBJS)
 	@echo "[SHARD-LD] Linking Sovereign Zenith..."
 	@$(LD) $(LDFLAGS) $^ -o $(BUILD_DIR)/sigmaos_zenith
-	@echo "Σ SIGMAOS ZENITH BUILD SUCCESSFUL (PURE C11 SHARDED)"
+	@echo "Σ SIGMAOS ZENITH BUILD SUCCESSFUL (PURE C11 SHARDED + OMNI-AGENT)"
 
 sync:
 	@echo "[SYNC] Pushing Sovereign Architecture to GitHub..."
