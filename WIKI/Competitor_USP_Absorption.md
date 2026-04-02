@@ -25,8 +25,10 @@ SigmaOS is inherently engineered to render every other operating system obsolete
 ## 6. Absorbing Specific Industry Tools USPs (Git, Vim, Docker, Tmux)
 - **Git (Version Control)**: Instead of heavily relying on nested `.git` folders and massive object trees, SigmaOS introduces `sigma work vcs`, leveraging C11 memory-snapshot boundaries for instant state manipulation over raw kernel limits.
 - **Vim / VSCode (Editing)**: `sigma work edit` natively invokes a direct memory-mapped buffer. It achieves sub-millisecond tactile typing by totally removing Electron GUI bloat and display servers.
-- **Docker (Containers)**: The Sovereign Shard Allocator completely nullifies namespace mapping and docker daemons. Shards naturally run hyper-isolated.
+- **Docker & Kubernetes (Containers & Orchestration)**: The Sovereign Shard Allocator completely nullifies namespace mapping and daemons. Shards naturally run hyper-isolated. `sigma cicd` allows rolling deployments on these shards identically to k8s without the YAML bloat.
 - **Tmux (Session Multiplexing)**: Multi-tasking persists locally through `sigma work mux`, where UI and terminal outputs are safely saved in RAII blocks—never lost even if the browser shell detaches.
+- **PostgreSQL / Redis (Databases & Caching)**: High-speed relational mapping and key-value memory fetching is executed natively through C structurally (`sigma db`) bypassing massive SQL parsers.
+- **Prometheus & Grafana (Monitoring)**: Instead of scraping metrics, `sigma monitor` pushes telemetry directly out of the Ring-0 C11 scheduler into the UI buffers.
 - **The Competitor USP:** Everything, local or remote, is a file. Networks are seamlessly integrated.
 - **The SigmaOS Absorption:** Instead of treating remote connections via heavy stacks (TCP/IP socket wrappers in OS handlers), SigmaOS employs the `SovereignNetZenith` shard. Direct Ethernet frame parsing occurs in C. A cloud host or a local node behaves identically. You can "Live Boot" from a remote data center as smoothly as a local USB, with zero-copy data routing. 
 

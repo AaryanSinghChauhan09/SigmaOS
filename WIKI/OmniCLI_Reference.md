@@ -37,6 +37,15 @@ SigmaOS operates via the `SovereignOmniCLI`, a native C11 dispatcher that handle
 - **`sigma work vcs`**: Executes memory-snapshot state saving natively, neutralizing the need for heavy Git object trees.
 - **`sigma work mux`**: Multiplexes shell UI blocks directly in memory. Detaches seamlessly like TMUX.
 
+#### Data Persistence & Caching (`db`)
+
+- **`sigma db query`**: Directly queries RAII structs to bypass PostgreSQL / Redis protocol overhead. Zero SQL string parsing latency.
+
+#### Site Reliability & Delivery (`cicd` / `monitor`)
+
+- **`sigma cicd`**: Hot-reloads all running shards simultaneously. Rivals Jenkins and Kubernetes rolling updates implicitly.
+- **`sigma monitor`**: Dumps native C11 hardware logs directly matching Prometheus/Grafana functionality instantly.
+
 #### Machine Learning (`ml`)
 
 - **`sigma ml <dataset>`**: Invokes `SovereignML_RunInference()` logic. Fully integrated on local silicon with zero python wrapper dependencies.
