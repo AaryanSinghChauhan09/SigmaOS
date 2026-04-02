@@ -21,6 +21,7 @@
 ## ⚔️ COMPETITOR NEUTRALIZATION
 
 - **👑 USP ABSORPTION**: [Competitor USP Absorption & Zero-Dependency](Competitor_USP_Absorption.md)
+- **⚡ OMNICLI ENGINE**: [OmniCLI Zero-Dependency Reference Guide](OmniCLI_Reference.md)
 
 ## 🌍 MULTI-PLATFORM FINALITY
 

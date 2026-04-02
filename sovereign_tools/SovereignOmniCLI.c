@@ -8,7 +8,6 @@
  * =========================================================================
  */
 
-#include "../SigmaC11.h"
 #include "../libc/SovereignLibC.h"
 #include "../kernel/SovereignOmniShard.h"
 
@@ -21,7 +20,6 @@ extern void SovereignAIKernel_ExecutePrompt(const char* prompt);
 extern void SovereignML_RunInference(const char* data);
 extern void SovereignIndianLaw_Query(const char* section);
 extern void SovereignDataScience_RunAnalysis(const char* dataset);
-extern void SovereignNet_ZeroTrustHandshake(void);
 
 static int sigma_strcmp(const char* s1, const char* s2) {
     while (*s1 && (*s1 == *s2)) { s1++; s2++; }
@@ -79,7 +77,9 @@ void SovereignCLI_HandleLaw(int argc, char** argv) {
 }
 
 void SovereignCLI_HandleNetwork(int argc, char** argv) {
-    SovereignNet_ZeroTrustHandshake();
+    SovereignNetZenith n;
+    SovereignNet_init(&n);
+    SovereignNet_ZeroTrustHandshake(&n);
     sigma_printf("[OMNI-CLI] Zero-Trust Aether Mesh connected.\n");
 }
 
