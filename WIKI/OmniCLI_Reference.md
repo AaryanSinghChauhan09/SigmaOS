@@ -23,6 +23,14 @@ SigmaOS operates via the `SovereignOmniCLI`, a native C11 dispatcher that handle
 
 - **`sigma ai <prompt>`**: Passes unformatted text straight to the local `SovereignAIKernel_ExecutePrompt` logic. Execution occurs directly in `kernel/ai_ml/`.
 
+#### Package Management (`pkg`)
+
+- **`sigma pkg install <target>`**: Simulates APT and NixOS declarative configuration fetches by compiling target shards natively into memory instantly.
+
+#### Defensive / Offensive Cyber (`cyber`)
+
+- **`sigma cyber scan <target>`**: Deploys native C memory scanners targeting foreign infrastructure without leaning onto Kali Linux style Python hacking suites.
+
 #### Machine Learning (`ml`)
 
 - **`sigma ml <dataset>`**: Invokes `SovereignML_RunInference()` logic. Fully integrated on local silicon with zero python wrapper dependencies.

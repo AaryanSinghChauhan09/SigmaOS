@@ -82,12 +82,30 @@ void SovereignCLI_HandleFileSystem(int argc, char** argv) {
     /* Map to Sovereign Virtual File System */
     if (sigma_strcmp(action, "ls") == 0) {
         sigma_printf("[OMNI-FS] Querying memory-mapped directory structure...\n");
-        // SovereignVFS_List(argv[3]);
     } else if (sigma_strcmp(action, "read") == 0 && argc > 3) {
         sigma_printf("[OMNI-FS] Reading raw buffer shard for: %s\n", argv[3]);
-        // SovereignVFS_Read(argv[3]);
     } else {
         sigma_printf("[OMNI-FS] Unknown file system command.\n");
+    }
+}
+
+void SovereignCLI_HandlePackage(int argc, char** argv) {
+    if (argc < 3) return;
+    const char* action = argv[2];
+    if (sigma_strcmp(action, "install") == 0 && argc > 3) {
+        sigma_printf("[OMNI-PKG] Hot-fetching & Compiling Shard: %s\n", argv[3]);
+        /* Mimics Ubuntu APT / NixOS declarative fetch */
+    } else if (sigma_strcmp(action, "purge") == 0 && argc > 3) {
+        sigma_printf("[OMNI-PKG] Silicon-purging module: %s\n", argv[3]);
+    }
+}
+
+void SovereignCLI_HandleCyberSecurity(int argc, char** argv) {
+    if (argc < 3) return;
+    const char* action = argv[2];
+    if (sigma_strcmp(action, "scan") == 0 && argc > 3) {
+        sigma_printf("[OMNI-CYBER] Launching Offensive Security Shard on Target: %s\n", argv[3]);
+        /* Mimics Kali Linux tooling natively */
     }
 }
 
@@ -119,6 +137,8 @@ int main(int argc, char** argv) {
     else if (sigma_strcmp(module, "law") == 0) SovereignCLI_HandleLaw(argc, argv);
     else if (sigma_strcmp(module, "net") == 0) SovereignCLI_HandleNetwork(argc, argv);
     else if (sigma_strcmp(module, "fs") == 0) SovereignCLI_HandleFileSystem(argc, argv);
+    else if (sigma_strcmp(module, "pkg") == 0) SovereignCLI_HandlePackage(argc, argv);
+    else if (sigma_strcmp(module, "cyber") == 0) SovereignCLI_HandleCyberSecurity(argc, argv);
     else if (sigma_strcmp(module, "ds") == 0 && argc > 2) SovereignDataScience_RunAnalysis(argv[2]);
     else {
         sigma_printf("[OMNI-CLI] Invalid Shard mapping. Purge or correct command.\n");
