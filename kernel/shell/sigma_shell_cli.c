@@ -4,7 +4,6 @@
 */
 
 #include <stdint.h>
-#include <string.h>
 #include "SigmaSovereignInternal.h"
 
 // Σ COMMAND MAPPING STRUCTURE
@@ -31,7 +30,7 @@ static sigma_cli_map g_CliAbsorberRegistry[] = {
 // Σ ABSORBER DISPATCHER
 const char* sigma_shell_absorb(const char* input) {
     for (int i = 0; g_CliAbsorberRegistry[i].alien_cmd != NULL; i++) {
-        if (strcmp(input, g_CliAbsorberRegistry[i].alien_cmd) == 0) {
+        if (sigma_strcmp(input, g_CliAbsorberRegistry[i].alien_cmd) == 0) {
             sigma_print("Σ [ABSORBER]: Alien Command '");
             sigma_print(input);
             sigma_print("' absorbed into Sovereign Mission.\n");
