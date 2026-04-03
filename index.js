@@ -124,7 +124,7 @@ class SigmaSystem {
 
         // Raw Silicon Directive Matrix
         const matrix = {
-            ai: ['think', 'dream', 'summarize', 'generate', 'review', 'inference', 'train', 'explain', 'predict', 'fine-tune'],
+            ai: ['think', 'dream', 'summarize', 'generate', 'review', 'inference', 'train', 'explain', 'predict', 'fine-tune', 'propagate', 'consensus'],
             auto: ['script', 'flow', 'trigger', 'cron', 'watch', 'pipe', 'schedule', 'abort', 'sync-pulse'],
             ui: ['morph', 'accent', 'blur', 'opacity', 'font', 'shard', 'pulse', 'theme', 'animate', 'render'],
             persona: ['profile', 'traits', 'memory', 'context', 'identity', 'switch', 'restore'],
