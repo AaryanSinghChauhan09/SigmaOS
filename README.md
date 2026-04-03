@@ -1,4 +1,3 @@
-<iframe style="width:100%;height:auto;min-width:600px;min-height:400px;" src="https://www.star-history.com/?repos=AaryanSinghChauhan09%2FSigmaOS&type=timeline&logscale=&legend=top-left" frameBorder="0"></iframe>
   <h1>Σ SIGMA OS : ZERO-DEPENDENCY ZENITH </h1>
   <p><strong>The Absolute Sovereign Architecture. Built on Pure C11 & Assembly.</strong></p>
   <p><a href="https://github.com/AaryanSinghChauhan09/SigmaOS">https://github.com/AaryanSinghChauhan09/SigmaOS</a></p>
