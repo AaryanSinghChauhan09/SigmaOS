@@ -1,17 +1,16 @@
 /* 
- Σ SIGMAOS ZENITH: SOVEREIGN INTERNAL UTILS (v2600.0)
- Mission: SSE-Accelerated Silicon Performance & Total Dependency Purge.
+ Σ SIGMAOS ZENITH: SOVEREIGN INTERNAL UTILS (v2800.0)
+ Mission: SSE-Accelerated Silicon Performance & Absolute Type Sovereignty.
 */
 
 #ifndef SIGMA_INTERNAL_H
 #define SIGMA_INTERNAL_H
 
-#include <stdint.h>
-#include <stdbool.h>
-#include <stddef.h>
+#include "libc/sigma_types.h"
 
 // Σ BARE-METAL PRINTS
 void sigma_print(const char* s);
+void sigma_clear_screen();
 
 /* Σ SOVEREIGN STRING UTILITIES (v2600.0)
    ZERO DEPENDENCY MISSION: Replacing <string.h> and <stdio.h>.
