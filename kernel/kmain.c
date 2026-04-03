@@ -1,37 +1,30 @@
 /* 
- Σ SIGMAOS ZENITH: BARE-METAL KERNEL ENTRY (v1500.0)
- Mission: Real Hardware Initialization & VGA Console Emit. 
+ Σ SIGMAOS ZENITH: SOVEREIGN KERNEL ENTRY (v3000.0)
+ Mission: Core Orchestration & User-Space Handoff.
 */
 
 #include "SigmaSovereignInternal.h"
 
-// Σ HARDWARE BINDING: VGA TEXT BUFFER
-static volatile unsigned short* VGA_BUFFER = (unsigned short*)0xB8000;
-static const int VGA_WIDTH = 80;
-static const int VGA_HEIGHT = 25;
+// Σ MISSIONS: FS, Memory, Shell
+void sigma_fs_init();
+void sigma_shell_exec(const char* input);
 
-void sigma_printk(const char* s, unsigned char color) {
-    static int cursor = 0;
-    while (*s) {
-        VGA_BUFFER[cursor++] = (unsigned short)((color << 8) | *s++);
-        if (cursor >= VGA_WIDTH * VGA_HEIGHT) cursor = 0;
-    }
-}
+void kmain() {
+    // 1. Clear Screen (Hardware-Direct)
+    sigma_clear_screen();
 
-// Σ THE BARE-METAL KERNEL ENTRY POINT
-void kmain(void) {
-    // 1. Clear Screen
-    for (int i = 0; i < VGA_WIDTH * VGA_HEIGHT; i++) {
-        VGA_BUFFER[i] = (unsigned short)((0x07 << 8) | ' ');
-    }
+    // 2. Initial Boot Logo
+    sigma_print("Σ SIGMAOS ZENITH SUPREME (v3000.0)\n");
+    sigma_print("Sovereign. Intellectual. Operational.\n\n");
 
-    // 2. Emit Sovereign Boot Logo
-    sigma_printk("Σ SIGMAOS ZENITH : BARE-METAL SOVEREIGNTY ACHIEVED (v1500.0)\n", 0x0F);
-    sigma_printk("Σ [BOOT]: GDT/IDT Validated (Stub)\n", 0x0A);
-    sigma_printk("Σ [BOOT]: VGA Hardware Console Active\n", 0x0B);
+    // 3. Initialize Shared Services
+    sigma_fs_init();
 
-    // 3. Infinite Sleep (Transition to Scheduler)
-    while (1) {
-        __asm__ volatile ("hlt");
-    }
+    // 4. Mission Handoff (Interactive Shell)
+    sigma_print("Σ [USER]: Handoff to Sovereign Shell...\n");
+    sigma_shell_exec("whoami");
+    
+    // 5. Success Halt
+    sigma_print("\nΣ MISSION COMPLETE. CPU IDLE.\n");
+    while(1) { __asm__ volatile ("hlt"); }
 }
