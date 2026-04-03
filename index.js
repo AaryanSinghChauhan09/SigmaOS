@@ -110,24 +110,26 @@ class SigmaSystem {
             neofetch: () => this.termPrint(output, 'Σ SIGMAOS ZENITH OPERATIONAL\nKernel: Sovereign C11 | v180.0\nStatus: 100% MASTER COVERAGE'),
             'sigma-ai': (a) => {
                 const sub = a[0];
-                if (sub === 'inference') {
-                    this.termPrint(output, 'Σ AI: Loading weights into SigmaTransformer cache...');
-                    this.termPrint(output, 'Σ AI: Loop active. Reason: Sovereignty achieved.');
-                } else if (sub === 'train') {
-                    this.termPrint(output, 'Σ AI: Initiating Sharded Pretraining mission...');
-                } else {
-                    this.termPrint(output, 'Usage: sigma-ai [train|inference|explain]');
-                }
+                if (sub === 'summarize') this.termPrint(output, 'Σ AI: Summarizing sharded VFS context...');
+                else if (sub === 'generate') this.termPrint(output, 'Σ AI: Generating C11/ASM mission shards...');
+                else if (sub === 'review') this.termPrint(output, 'Σ AI: Performing zero-trust code review...');
+                else if (sub === 'inference') this.termPrint(output, 'Σ AI: Executing SigmaTransformer reasoning loop...');
+                else this.termPrint(output, 'Usage: sigma-ai [summarize|generate|review|inference|train|explain]');
             },
-            'sigma-ds': (a) => this.termPrint(output, 'Σ DATA SCIENCE: Preprocessing datasets in sharded memory...'),
+            'sigma-ds': (a) => {
+                const sub = a[0];
+                if (sub === 'plot') this.termPrint(output, 'Σ DS: Rendering real-time silicon telemetry plot...');
+                else if (sub === 'stat') this.termPrint(output, 'Σ DS: Calculating P-value and shard variance...');
+                else if (sub === 'regress') this.termPrint(output, 'Σ DS: Performing tensor-accelerated linear regression...');
+                else this.termPrint(output, 'Usage: sigma-ds [plot|stat|regress|preprocess]');
+            },
             'sigma-dsa': (a) => this.termPrint(output, 'Σ DSA: Benchmarking O(log N) algorithm shards...'),
             'sigma-cs': (a) => {
                 const sub = a[0];
-                if (sub === 'quiz') {
-                    this.termPrint(output, 'Σ CS QUIZ: Q: What is the complexity of Shard Sort? A: O(log N).');
-                } else {
-                    this.termPrint(output, 'Σ COMPUTER SCIENCE: Running memory-mapped I/O simulation...');
-                }
+                if (sub === 'asm') this.termPrint(output, 'Σ CS: Disassembling ring-0 kernel shards...');
+                else if (sub === 'asm-audit') this.termPrint(output, 'Σ CS: Auditing AVX-512 instruction density...');
+                else if (sub === 'quiz') this.termPrint(output, 'Σ CS QUIZ: Q: What is the complexity of Shard Sort? A: O(log N).');
+                else this.termPrint(output, 'Usage: sigma-cs [asm|asm-audit|quiz|simulate]');
             },
             'sigma-proc': (a) => {
                 const sub = a[0];
@@ -169,10 +171,27 @@ class SigmaSystem {
                 this.termPrint(output, 'Σ SYNC: Establishing PQC-1024 Handshake...');
                 setTimeout(() => this.termPrint(output, '[SUCCESS]: Master Parity Achieved.'), 1000);
             },
-            'sigma-auto': (a) => this.termPrint(output, `Σ AUTOMATION: Mission '${a.join(' ')}' scheduled.`),
+            'sigma-auto': (a) => {
+                const sub = a[0];
+                if (sub === 'cron') this.termPrint(output, 'Σ AUTO: Registering periodic shard listeners...');
+                else if (sub === 'watch') this.termPrint(output, 'Σ AUTO: Watching VFS partitions for change events...');
+                else if (sub === 'pipe') this.termPrint(output, 'Σ AUTO: Establishing shard data-pipes...');
+                else this.termPrint(output, 'Usage: sigma-auto [cron|watch|pipe]');
+            },
             'sigma-tool': (a) => this.termPrint(output, 'Σ TOOLS: studio, gaming, remote-bot, xclicker ready.'),
-            'sigma-ui': (a) => this.termPrint(output, 'Σ UI: Aesthetic Zenith Morph applied.'),
-            'sigma-persona': (a) => this.termPrint(output, `Σ PERSONA: Switching to ${a[0]?.toUpperCase() || 'ZENITH'} kernel context.`)
+            'sigma-ui': (a) => {
+                const sub = a[0];
+                const val = a[1];
+                if (sub === 'blur') this.termPrint(output, `Σ UI: Setting backdrop blur to ${val}px...`);
+                else if (sub === 'opacity') this.termPrint(output, `Σ UI: Setting window opacity to ${val}%...`);
+                else if (sub === 'accent') this.termPrint(output, `Σ UI: Injecting accent color: ${val}...`);
+                else this.termPrint(output, 'Usage: sigma-ui [blur|opacity|accent|font]');
+            },
+            'sigma-persona': (a) => {
+                const sub = a[0];
+                if (['dev', 'root', 'guest', 'user'].includes(sub)) this.termPrint(output, `Σ PERSONA: Switching to ${sub.toUpperCase()} kernel context.`);
+                else this.termPrint(output, 'Usage: sigma-persona [dev|root|guest|user]');
+            },
         };
 
         if (cmds[name]) cmds[name](args);
