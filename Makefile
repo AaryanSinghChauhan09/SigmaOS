@@ -51,6 +51,9 @@ KERNEL_OBJS    := $(patsubst $(KERNEL_DIR)/%.c, $(BUILD_DIR)/kernel_%.o, $(KERNE
 LIBC_OBJS      := $(patsubst $(LIBC_DIR)/%.c, $(BUILD_DIR)/libc_%.o, $(LIBC_SRCS))
 ASM_OBJS       := $(patsubst %.asm, $(BUILD_DIR)/%.o, $(notdir $(ASM_SRCS)))
 AGENT_OBJS     := $(patsubst $(KERNEL_DIR)/%.c, $(BUILD_DIR)/kernel_%.o, $(KERNEL_DIR)/SovereignOmniAgent.c) \
+                  $(patsubst $(KERNEL_DIR)/%.c, $(BUILD_DIR)/kernel_%.o, $(KERNEL_DIR)/SovereignNetData.c) \
+                  $(patsubst $(KERNEL_DIR)/%.c, $(BUILD_DIR)/kernel_%.o, $(KERNEL_DIR)/SovereignOrchestrator.c) \
+                  $(patsubst $(KERNEL_DIR)/%.c, $(BUILD_DIR)/kernel_%.o, $(KERNEL_DIR)/SovereignMCP.c) \
                   $(patsubst $(USERLAND_DIR)/%.c, $(BUILD_DIR)/userland_%.o, $(USERLAND_DIR)/OmniCLI.c)
 
 .PHONY: all clean dirs zenith sync win32 shards absorb-check

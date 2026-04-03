@@ -16,7 +16,7 @@ if (-not (Test-Path -Path ".\build")) {
 
 Write-Host "[SYS] Compiling Omni-CLI C11 shards native..." -ForegroundColor DarkGray
 # Compile the userland CLI and the Kernel Agent Logic
-gcc -std=c11 -Wall -O3 .\userland\OmniCLI.c .\kernel\SovereignOmniAgent.c -o .\build\sigma-cli.exe -I. -DSIGMA_WIN32=1
+gcc -std=c11 -Wall -O3 .\userland\OmniCLI.c .\kernel\SovereignOmniAgent.c .\kernel\SovereignNetData.c .\kernel\SovereignOrchestrator.c .\kernel\SovereignMCP.c -o .\build\sigma-cli.exe -I. -DSIGMA_WIN32=1
 
 if ($LASTEXITCODE -eq 0) {
     Write-Host "[SYS] Compilation Success. Handoff to Native Binary." -ForegroundColor DarkGray

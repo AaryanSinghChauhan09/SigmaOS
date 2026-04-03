@@ -9,9 +9,13 @@ extern void SovereignOmniAgent_Init();
 extern unsigned char SovereignOmniAgent_AnalyzeCodebase(const char* target_directory);
 extern unsigned char SovereignOmniAgent_ExecuteRoutine(const char* routine_signature);
 
+extern void SovereignNetData_Poll();
+extern void SovereignOrchestrator_RunDAG();
+extern void SovereignMCP_Dispatch(const char* intent);
+
 void print_omni_prompt() {
     printf("\nSigmaOS Omni-Agent \033[36m(Sovereign Mode)\033[0m\n");
-    printf("Type a natural language command (e.g. 'explain memory manager', 'refactor /kernel', 'commit changes')\n");
+    printf("Type commands (e.g., 'workflow', 'telemetry', 'context', 'commit changes')\n");
     printf("sigma> ");
 }
 
@@ -41,18 +45,18 @@ int main(int argc, char** argv) {
             break;
         }
 
-        if (strstr(input_buffer, "explain") != NULL) {
+        if (strstr(input_buffer, "telemetry") != NULL || strstr(input_buffer, "netdata") != NULL) {
+            SovereignNetData_Poll();
+        } else if (strstr(input_buffer, "workflow") != NULL || strstr(input_buffer, "dag") != NULL) {
+            SovereignOrchestrator_RunDAG();
+        } else if (strstr(input_buffer, "context") != NULL || strstr(input_buffer, "mcp") != NULL) {
+            SovereignMCP_Dispatch("context");
+        } else if (strstr(input_buffer, "explain") != NULL) {
             printf("[OMNI-AGENT] Parsing AST in local context...\n");
             SovereignOmniAgent_AnalyzeCodebase("./");
-            printf("[OMNI-AGENT] The codebase utilizes zero-dependency C11. Core structures handle memory natively avoiding fragmentation.\n");
         } else if (strstr(input_buffer, "commit") != NULL || strstr(input_buffer, "git") != NULL) {
-            printf("[OMNI-AGENT] Generating secure delta map using B-Tree snapshot structure natively.\n");
+            printf("[OMNI-AGENT] Generating secure delta map natively.\n");
             SovereignOmniAgent_ExecuteRoutine("VCS_SYNC");
-            printf("[OMNI-AGENT] Workspace synchronized cleanly.\n");
-        } else if (strstr(input_buffer, "refactor") != NULL) {
-            printf("[OMNI-AGENT] Initiating isolated C11 rewrite routines natively...\n");
-            SovereignOmniAgent_ExecuteRoutine("REFACTOR_ALL");
-            printf("[OMNI-AGENT] Safety snapshotted. Codebase optimal.\n");
         } else if (strlen(input_buffer) > 0) {
             printf("[OMNI-AGENT] Awaiting further semantic context for: %s\n", input_buffer);
         }
