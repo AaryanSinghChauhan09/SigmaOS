@@ -134,17 +134,16 @@ class SigmaSystem {
         if (!shardOpCode) return this.termPrint(output, `[ERROR]: Shard ${shard} not mapped in OpCode table.`);
 
         const matrix = {
-            ai: ['think', 'dream', 'summarize', 'generate', 'review', 'inference', 'train', 'explain', 'predict', 'fine-tune', 'propagate', 'consensus', 'recursive-review', 'neural-evolve', 'usc-align'],
+            ai: ['think', 'dream', 'summarize', 'generate', 'review', 'inference', 'train', 'explain', 'predict', 'fine-tune', 'propagate', 'consensus', 'recursive-review', 'neural-evolve', 'usc-align', 'bias-audit', 'weight-snapshot'],
             agent: ['spawn', 'collaborate', 'memory-sync', 'register', 'mission-control', 'autonomous-plan', 'agency-hive', 'replicate', 'hive-mind', 'migrate'],
             auto: ['script', 'flow', 'trigger', 'cron', 'watch', 'pipe', 'schedule', 'abort', 'sync-pulse', 'autonomous-mission', 'linear-automation', 'core-logic-emit'],
-            ui: ['morph', 'accent', 'blur', 'opacity', 'font', 'shard', 'pulse', 'theme', 'animate', 'render', 'zenith-morph', 'aether-ui', 'reality-morph'],
-            persona: ['profile', 'traits', 'memory', 'context', 'identity', 'switch', 'restore', 'ego-shard', 'persona-merge'],
+            ui: ['morph', 'accent', 'blur', 'opacity', 'font', 'shard', 'pulse', 'theme', 'animate', 'render', 'zenith-morph', 'aether-ui', 'reality-morph', 'reality-shift'],
             proc: ['list', 'kill', 'status', 'top', 'renice', 'suspend', 'resume', 'trace', 'heal-task', 'raw-exec', 'task-entangle'],
             quantum: ['lock', 'isolate', 'check', 'sync', 'barrier', 'tunnel', 'entangle', 'pqc-shield', 'quantum-trap'],
             vfs: ['format', 'mount', 'shred', 'snapshot', 'rollback', 'sync', 'sharded-read', 'scramble', 'raw-block-write', 'vfs-scramble'],
             sec: ['audit', 'verify', 'encrypt', 'decrypt', 'scan', 'pqc-check', 'zero-trust', 'heartbeat', 'threat-neutralize'],
-            ds: ['plot', 'stat', 'regress', 'tensor-map', 'model', 'derive', 'predict', 'clean', 'anomaly-detect', 'regression-shard'],
-            cs: ['asm', 'asm-audit', 'quiz', 'simulate', 'disasm', 'trap', 'instruction-trace', 'c11-link', 'mem-dump', 'raw-instruction-emit', 'logic-shred'],
+            ds: ['plot', 'stat', 'regress', 'tensor-map', 'model', 'derive', 'predict', 'clean', 'anomaly-detect', 'regression-shard', 'correlation-shard', 'outlier-neutralize'],
+            cs: ['asm', 'asm-audit', 'quiz', 'simulate', 'disasm', 'trap', 'instruction-trace', 'c11-link', 'mem-dump', 'raw-instruction-emit', 'logic-shred', 'bit-mask-audit'],
             debug: ['trace', 'trap', 'heal', 'fault-check', 'stack-dump', 'debug-pulse']
         };
 
