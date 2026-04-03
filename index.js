@@ -122,24 +122,37 @@ class SigmaSystem {
         const sid = Date.now().toString(16).toUpperCase();
         this.termPrint(output, `Σ DIRECTIVE [${sid}]: Targeting Shard ${shard.toUpperCase()}...`, 'u-accent-text');
 
-        // Raw Silicon Directive Matrix
+        // Σ DIRECT DISPATCH TABLE (v500.0)
+        // Reduces procedural switch/case/if reliance via reactive domain mapping.
         const matrix = {
-            ai: ['think', 'dream', 'summarize', 'generate', 'review', 'inference', 'train', 'explain', 'predict', 'fine-tune', 'propagate', 'consensus'],
-            auto: ['script', 'flow', 'trigger', 'cron', 'watch', 'pipe', 'schedule', 'abort', 'sync-pulse'],
-            ui: ['morph', 'accent', 'blur', 'opacity', 'font', 'shard', 'pulse', 'theme', 'animate', 'render'],
-            persona: ['profile', 'traits', 'memory', 'context', 'identity', 'switch', 'restore'],
-            proc: ['list', 'kill', 'status', 'top', 'renice', 'suspend', 'resume', 'trace'],
-            quantum: ['lock', 'isolate', 'check', 'sync', 'barrier', 'tunnel', 'entangle'],
-            vfs: ['format', 'mount', 'shred', 'snapshot', 'rollback', 'sync', 'sharded-read'],
-            sec: ['audit', 'verify', 'encrypt', 'decrypt', 'scan', 'pqc-check', 'zero-trust'],
-            ds: ['plot', 'stat', 'regress', 'tensor-map', 'model', 'derive', 'predict', 'clean'],
-            cs: ['asm', 'asm-audit', 'quiz', 'simulate', 'disasm', 'trap', 'instruction-trace', 'c11-link']
+            ai: ['think', 'dream', 'summarize', 'generate', 'review', 'inference', 'train', 'explain', 'predict', 'fine-tune', 'propagate', 'consensus', 'recursive-review'],
+            auto: ['script', 'flow', 'trigger', 'cron', 'watch', 'pipe', 'schedule', 'abort', 'sync-pulse', 'autonomous-mission'],
+            ui: ['morph', 'accent', 'blur', 'opacity', 'font', 'shard', 'pulse', 'theme', 'animate', 'render', 'zenith-morph'],
+            persona: ['profile', 'traits', 'memory', 'context', 'identity', 'switch', 'restore', 'ego-shard'],
+            proc: ['list', 'kill', 'status', 'top', 'renice', 'suspend', 'resume', 'trace', 'heal-task'],
+            quantum: ['lock', 'isolate', 'check', 'sync', 'barrier', 'tunnel', 'entangle', 'pqc-shield'],
+            vfs: ['format', 'mount', 'shred', 'snapshot', 'rollback', 'sync', 'sharded-read', 'scramble'],
+            sec: ['audit', 'verify', 'encrypt', 'decrypt', 'scan', 'pqc-check', 'zero-trust', 'heartbeat'],
+            ds: ['plot', 'stat', 'regress', 'tensor-map', 'model', 'derive', 'predict', 'clean', 'anomaly-detect'],
+            cs: ['asm', 'asm-audit', 'quiz', 'simulate', 'disasm', 'trap', 'instruction-trace', 'c11-link', 'mem-dump'],
+            debug: ['trace', 'trap', 'heal', 'fault-check', 'stack-dump']
         };
 
-        if (matrix[shard] && matrix[shard].includes(verb)) {
+        const directiveFound = matrix[shard]?.includes(verb);
+        if (directiveFound) {
             this.termPrint(output, `[DIRECTIVE]: Shard ${shard} executing mission: ${verb} with params [${params.join(',')}].`);
-            if (shard === 'vfs' && verb === 'format') this.vfs.format();
-            if (shard === 'ui' && verb === 'accent') document.documentElement.style.setProperty('--u-accent', params[0]);
+            
+            // Raw Operational Logic Binding
+            const actions = {
+                'vfs/format': () => this.vfs.format(),
+                'ui/accent': () => document.documentElement.style.setProperty('--u-accent', params[0]),
+                'debug/heal': () => this.termPrint(output, '[DEBUG]: Self-healing shard active. Faults cleared.'),
+                'proc/kill': () => this.termPrint(output, `[PROC]: Purged mission ${params[0]} from kernel memory.`)
+            };
+            
+            const actionKey = `${shard}/${verb}`;
+            if (actions[actionKey]) actions[actionKey]();
+            
             this.termPrint(output, `[STATUS]: Mission ${sid} Successfully Realized.`);
         } else {
             this.termPrint(output, `[ERROR]: Directive '${verb}' invalid for Shard '${shard}'. Use WIKI_MASTER for documentation.`);
