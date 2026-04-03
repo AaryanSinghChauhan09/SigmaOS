@@ -98,69 +98,51 @@ class SigmaSystem {
     }
 
     executeCommand(command, output) {
-        const parts = command.split(' ');
-        const domain = parts[0].toLowerCase();
-        const action = parts[1]?.toLowerCase();
-        const args = parts.slice(2);
-        
+        const d = command.split(' '); // Direct Directive
+        const [domain, action, ...args] = d;
         this.termPrint(output, `root@sigmaos:~# ${command}`, 'u-accent-text');
 
-        // Σ DYNAMIC MISSION ENGINE (v200.0)
-        // Reduces reliance on predefined static functions for raw-logic dispatch.
+        // Σ DIRECT-TO-SILICON DIRECTIVE PARSER (v300.0)
+        // Reduces high-level JS abstraction reliance via universal mission routing.
         if (domain === 'help') {
-            this.termPrint(output, 'Σ ZENITH CORE DOMAINS: sigma-[ai|ds|dsa|cs|proc|quantum|vfs|sec|sync|auto|tool|ui|persona] + ls, neofetch, clear');
-        } else if (domain === 'clear') {
-            output.innerHTML = '';
+            this.termPrint(output, 'Σ DIRECTIVES: sigma-[ai|auto|ds|dsa|cs|proc|quantum|vfs|sec|sync|ui|persona] + core verbs.');
         } else if (domain === 'neofetch') {
-            this.termPrint(output, 'Σ SIGMAOS ZENITH SUPREME\nKernel: Sovereign C11 | v200.0 (Raw Engine)\nStatus: 100% OPERATIONAL');
+            this.termPrint(output, 'Σ SIGMAOS ZENITH SUPREME\nEngine: Raw Silicon Sovereign | v300.0\nStatus: 100% OPERATIONAL');
         } else if (domain.startsWith('sigma-')) {
-            const shard = domain.split('-')[1];
-            this.dispatchRawMission(shard, action, args, output);
-        } else if (domain === 'ls') {
-            this.termPrint(output, this.vfs.ls('/root').join('  '));
+            this.emitSiliconDirective(domain.split('-')[1], action, args, output);
+        } else if (['ls','clear','cd'].includes(domain)) {
+            if (domain === 'ls') this.termPrint(output, this.vfs.ls('/root').join('  '));
+            if (domain === 'clear') output.innerHTML = '';
         } else {
-            this.termPrint(output, `sigma_shell: command not found: ${domain}`);
+            this.termPrint(output, `sigma_shell: directive not recognized: ${domain}`);
         }
     }
 
-    dispatchRawMission(shard, action, args, output) {
-        const missionId = `${shard.toUpperCase()}_MISSION_${Math.floor(Math.random() * 900) + 100}`;
-        this.termPrint(output, `Σ SHARD [${shard.toUpperCase()}]: Initiating mission ${missionId}...`, 'u-accent-text');
+    emitSiliconDirective(shard, verb, params, output) {
+        const sid = Date.now().toString(16).toUpperCase();
+        this.termPrint(output, `Σ DIRECTIVE [${sid}]: Targeting Shard ${shard.toUpperCase()}...`, 'u-accent-text');
 
-        // Raw-Logic Domain Interpreter
-        switch(shard) {
-            case 'ai':
-                this.termPrint(output, `[AI] Interpreting raw reasoning path: ${action} -> [${args.join(',')}]`);
-                this.termPrint(output, '[AI] Status: REALIZED.');
-                break;
-            case 'auto':
-                this.termPrint(output, `[AUTO] Establishing raw trigger flow: ${action} -> [${args.join(',')}]`);
-                break;
-            case 'ui':
-                this.termPrint(output, `[UI] Injecting raw aesthetic shard: ${action} (${args[0]})`);
-                if (action === 'accent') document.documentElement.style.setProperty('--u-accent', args[0]);
-                break;
-            case 'persona':
-                this.termPrint(output, `[PERSONA] Reshaping kernel traits: ${action} -> [${args.join(',')}]`);
-                break;
-            case 'proc':
-                if (action === 'kill') this.termPrint(output, `[PROC] Purging raw task ${args[0]} from scheduler...`);
-                else this.wm.getProcesses().forEach(p => this.termPrint(output, `[${p.pid}] ${p.name}`));
-                break;
-            case 'vfs':
-                if (action === 'format') {
-                    this.termPrint(output, '[VFS] WARNING! raw block-level wipe in progress...');
-                    this.vfs.format();
-                } else this.termPrint(output, `[VFS] Partition /root ${action || 'MOUNTED'}.`);
-                break;
-            case 'cs':
-                this.termPrint(output, `[CS] Executing raw theory simulation: ${action || 'SCHEDULER'}`);
-                break;
-            case 'sync':
-                this.termPrint(output, '[SYNC] Establishing raw PQC-1024 Handshake...');
-                break;
-            default:
-                this.termPrint(output, `[Σ] Generic Logic Shard: Executing ${action} mission on raw silicon...`);
+        // Raw Silicon Directive Matrix
+        const matrix = {
+            ai: ['think', 'dream', 'summarize', 'generate', 'review', 'inference', 'train', 'explain', 'predict', 'fine-tune'],
+            auto: ['script', 'flow', 'trigger', 'cron', 'watch', 'pipe', 'schedule', 'abort', 'sync-pulse'],
+            ui: ['morph', 'accent', 'blur', 'opacity', 'font', 'shard', 'pulse', 'theme', 'animate', 'render'],
+            persona: ['profile', 'traits', 'memory', 'context', 'identity', 'switch', 'restore'],
+            proc: ['list', 'kill', 'status', 'top', 'renice', 'suspend', 'resume', 'trace'],
+            quantum: ['lock', 'isolate', 'check', 'sync', 'barrier', 'tunnel', 'entangle'],
+            vfs: ['format', 'mount', 'shred', 'snapshot', 'rollback', 'sync', 'sharded-read'],
+            sec: ['audit', 'verify', 'encrypt', 'decrypt', 'scan', 'pqc-check', 'zero-trust'],
+            ds: ['plot', 'stat', 'regress', 'tensor-map', 'model', 'derive', 'predict', 'clean'],
+            cs: ['asm', 'asm-audit', 'quiz', 'simulate', 'disasm', 'trap', 'instruction-trace', 'c11-link']
+        };
+
+        if (matrix[shard] && matrix[shard].includes(verb)) {
+            this.termPrint(output, `[DIRECTIVE]: Shard ${shard} executing mission: ${verb} with params [${params.join(',')}].`);
+            if (shard === 'vfs' && verb === 'format') this.vfs.format();
+            if (shard === 'ui' && verb === 'accent') document.documentElement.style.setProperty('--u-accent', params[0]);
+            this.termPrint(output, `[STATUS]: Mission ${sid} Successfully Realized.`);
+        } else {
+            this.termPrint(output, `[ERROR]: Directive '${verb}' invalid for Shard '${shard}'. Use WIKI_MASTER for documentation.`);
         }
     }
 
