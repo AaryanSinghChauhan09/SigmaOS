@@ -1,0 +1,17 @@
+name: Σ SIGMAOS ZENITH CI
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+jobs:
+  sovereign-audit:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v3
+    - name: Σ KERNEL STRUCTURAL VERIFICATION
+      run: |
+        node --check index.js
+    - name: Σ WIKI MASTER INTEGRITY CHECK
+      run: |
+        grep -q "Σ SIGMAOS ZENITH SUPREME: SOVEREIGN WIKI MASTER" WIKI_MASTER.md

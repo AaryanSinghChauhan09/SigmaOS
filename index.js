@@ -135,7 +135,7 @@ class SigmaSystem {
 
         const matrix = {
             ai: ['think', 'dream', 'summarize', 'generate', 'review', 'inference', 'train', 'explain', 'predict', 'fine-tune', 'propagate', 'consensus', 'recursive-review', 'neural-evolve', 'usc-align'],
-            agent: ['spawn', 'collaborate', 'memory-sync', 'register', 'mission-control', 'autonomous-plan', 'agency-hive', 'replicate'],
+            agent: ['spawn', 'collaborate', 'memory-sync', 'register', 'mission-control', 'autonomous-plan', 'agency-hive', 'replicate', 'hive-mind', 'migrate'],
             auto: ['script', 'flow', 'trigger', 'cron', 'watch', 'pipe', 'schedule', 'abort', 'sync-pulse', 'autonomous-mission', 'linear-automation', 'core-logic-emit'],
             ui: ['morph', 'accent', 'blur', 'opacity', 'font', 'shard', 'pulse', 'theme', 'animate', 'render', 'zenith-morph', 'aether-ui', 'reality-morph'],
             persona: ['profile', 'traits', 'memory', 'context', 'identity', 'switch', 'restore', 'ego-shard', 'persona-merge'],
