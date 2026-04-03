@@ -80,6 +80,13 @@ SigmaOS is managed via a unified OpCode pipeline:
 
 ---
 
+## 📈 Star History
+A real-time trajectory of the SigmaOS Neural Matrix evolution:
+
+[![Star History Chart](https://api.star-history.com/svg?repos=AaryanSinghChauhan09/SigmaOS&type=Date)](https://star-history.com/#AaryanSinghChauhan09/SigmaOS&Date)
+
+---
+
 ## 🤝 Contributing
 Only Pure C11 or Assembly pull requests are accepted. External headers or standard packages will be rejected by our automated **Sovereign CI Check**.
 
