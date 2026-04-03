@@ -99,6 +99,31 @@ void SovereignAetherOrchestrator_RouteMission(SovereignAetherOrchestrator* o, co
 void SovereignAetherOrchestrator_DeepThinkMode(SovereignAetherOrchestrator* o);
 
 /* =========================================================================
+ * DOMAIN: OMNI-AGENT & AGENTIC CODING (CLAUDE-CODE ABSORPTION)
+ * ========================================================================= */
+typedef enum SovereignAgentState {
+    AGENT_IDLE,
+    AGENT_PLANNING,
+    AGENT_EXECUTING,
+    AGENT_WAITING_APPROVAL
+} SovereignAgentState;
+
+typedef struct SovereignOmniAgent {
+    const char*         agent_id;
+    SovereignAgentState state;
+    sigma_u32           tasks_completed;
+    sigma_bool          auto_mode;
+    sigma_u64           memory_usage_bytes;
+} SovereignOmniAgent;
+
+void SovereignOmniAgent_init(SovereignOmniAgent* a);
+void SovereignOmniAgent_AnalyzeWorkspace(SovereignOmniAgent* a, const char* root_path);
+void SovereignOmniAgent_ExecutePlan(SovereignOmniAgent* a, const char* goal);
+void SovereignOmniAgent_CommitChanges(SovereignOmniAgent* a, const char* message);
+void SovereignOmniAgent_RequestPermission(SovereignOmniAgent* a, const char* action);
+void SovereignOmniAgent_DeepCodebaseUnderstanding(SovereignOmniAgent* a);
+
+/* =========================================================================
  * DOMAIN: AMNESIC SHARD & SILICON SCRUBBING
  * ========================================================================= */
 typedef struct SovereignAmnesicShard {

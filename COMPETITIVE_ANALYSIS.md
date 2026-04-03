@@ -5,7 +5,7 @@ This active document serves as the **Supreme Roadmap** to crush incumbent Linux 
 ## 🧩 Comprehensive Feature & USP Mapping
 
 | Category | Linux Distros (Current State) | SigmaOS (Current State) | SigmaOS (Needed Enhancements / Supreme USPs) |
-|----------|---------------------------|-----------------|------------------------------------|
+|----------|-------------------------------|-------------------------|----------------------------------------------|
 | **USPs (Unique Selling Propositions)** | Powerful but fragmented; static apps; minimal AI | Persona-aware shards, modularity, zero-dependency cores | AI-native ecosystem, adaptive security, unified hub, cloud-native sync, accessibility-first |
 | **Automation Tools** | `cron`, `systemd timers`, Ansible, udev rules | Embedded C11 Optimizer Daemons (`sigma_auto_optimizer.c`) | GUI automation dashboards, AI workflow builder, persona-aware autonomous logic, rollback/export/import |
 | **Customization Tools** | KDE Plasma widgets, GTK/QT themes, dotfiles, shell configs | Native JS DOM-Level Shard Morphing (`restore_features.js`) | Unified customization hub, theme matrix marketplace, dynamic CSS icon packs, plugin ecosystem via `SigmaOOP.h` |
@@ -17,6 +17,7 @@ This active document serves as the **Supreme Roadmap** to crush incumbent Linux 
 | **NCERT / EdTech** | Repositories with basic open-source apps (GeoGebra, GCompris) | Procedural JS DOM Shards (BioLab, MathLab) | High-performance interactive textbooks, algorithmic quizzes, AI tutors, 3D bio/physics silicon simulators mapped to the kernel |
 | **ML Tools** | TensorFlow, PyTorch, scikit-learn (installed separately) | Prototype tensor math / basic matrix loops | Native C11 ML shards, persona-configurable ML training pipelines, direct hardware-layer GPU/OpenCL orchestration |
 | **DS Tools** | Jupyter, RStudio, pandas, NumPy | Minimal dashboard charting components | Fully integrated Data Science shard, persona-aware data processing dashboards, AI-driven predictive charting, cloud-native notebooks |
+| **Agentic Tools** | **Claude-Code (CLI)**: Agentic IDE tool; plans & executes tasks | **Sigma-Agent (Omni-Agent)**: In-kernel autonomous loop; zero-dependency C11/Asm | Native AST-aware plan-execute loops, B-Tree snapshots for safe rollback, pure C11 agentic sharding, system-wide task automation |
 | **DSA Tools** | Third-party IDEs, external online platforms | Vanilla DSA algorithmic visualization templates | Built-in interactive DSA shard loaded with problem banks, real-time AI tutor logic, and computational complexity tree/graph rendering |
 
 ---

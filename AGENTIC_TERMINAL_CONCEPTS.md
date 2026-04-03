@@ -13,11 +13,13 @@ Instead of relying on heavy Language Servers (LSPs) built in node.js or python, 
 ### B. Natural Language Command Resolution
 - The Omni-CLI will securely map natural language queries (e.g., *"Explain why SovereignQuantumShard panicked on boot"*) to actual system diagnostics mapping back to `dmesg` buffers, git histories, and source code files.
 
-## ⚙️ 2. Execution of Routine Operations
-By leveraging the existing SigmaOS **Automated Workflows / Triggers**, the agent will autonomously perform:
-1. **Intelligent Version Control Management**: Generating commit messages by natively diffing branches and parsing the AST for semantic intent (e.g., "Refactored `SovereignRegistry.h` struct padding").
-2. **Autonomous Refactoring**: The agent can be instructed to *"Optimize all arrays to linked lists in dir /kernel"*, relying on the OS's internal C11 parser to apply safe, sandboxed source code mutations.
-3. **P0 Task Processing**: Handling repetitive boilerplates, writing native unit-tests for Assembly shards, and automatically debugging segmentation faults using native stack-trace analysis mapping it directly to English heuristics.
+## ⚙️ 2. Execution of Routine Operations (Absorbing `claude-code` USPs)
+By leveraging the existing SigmaOS **Automated Workflows / Triggers**, the agent will autonomously perform operations drawing inspiration from advanced agentic IDE wrappers like Anthropic's `claude-code`:
+1. **Interactive REPL & Auto-Debugging Loop**: Just like `claude-code`, the Omni-Agent doesn't just return one line. It can enter a native C11 REPL loop where it compiles tests, catches segmentation faults internally, reads the panic dump, and writes the fix—entirely autonomously without user intervention until completion.
+2. **Intelligent Version Control Management**: Generating commit messages natively by diffing branches and parsing the AST for semantic intent (e.g., "Refactored `SovereignRegistry.h` struct padding"). Native pre-commit hooks that utilize the agent logic.
+3. **No Context Switching**: Developers stay strictly in the terminal. The agent maps terminal interactions (grep, cat, ls) to `SovereignOmniShard` system calls natively.
+4. **Autonomous Refactoring**: The agent can be instructed to *"Optimize all arrays to linked lists in dir /kernel"*, relying on the OS's internal C11 parser to apply safe, sandboxed source code mutations.
+5. **P0 Task Processing**: Handling repetitive boilerplates, writing native unit-tests for Assembly shards, and automatically debugging segmentation faults using native stack-trace analysis mapping it directly to English heuristics.
 
 ## 🔌 3. Dynamic Plugin Ecosystem
 Instead of generic `.app-plugin` json wrappers, SigmaOS will introduce **`.sigma-plugin` ELF Shards**:
@@ -29,6 +31,8 @@ Instead of generic `.app-plugin` json wrappers, SigmaOS will introduce **`.sigma
 - **Rollback Snapshots**: Every time the AI agent executes a file modification, a bare-metal file-system `snapshot` is quietly triggered. If the AI hallucinates or corrupts a `.asm` file, the user can say *"Undo the last edit"* and the OS instantly unlinks the delta using B-Tree snapshotting.
 
 ## 🗺️ 5. Next Steps for Implementation
-1. **Develop `OmniAgentLoop` in C11**: The event loop parsing stdin for conversational English.
-2. **Build the `SigmaASTIndexer`**: The in-memory buffer that tracks code structures.
-3. **Integrate B-Tree Sandboxing**: Enforce automatic rollback gates on AI filesystem write permissions.
+1.  [✅] **Develop `OmniAgentLoop` in C11**: Initial kernel loop for reasoning and mission routing.
+2.  [✅] **Build the `SigmaASTIndexer`**: In-memory codebase understanding via C11 string parsing.
+3.  [ ] **Integrate B-Tree Sandboxing**: Enforce automatic rollback gates on AI filesystem write permissions.
+4.  [ ] **Natural Language to Mission Mapping**: Refine the English intent parser in `SigmaParseIntent`.
+5.  [ ] **Autonomous Debugging Loops**: Connect the agent to the `SigmaDiagnosticsZenith.c` stack trace analysis.

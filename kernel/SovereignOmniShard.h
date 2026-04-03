@@ -54,4 +54,46 @@ void SovereignNet_ZeroTrustHandshake(SovereignNetZenith* n);
 void SovereignNet_RecursiveDNSNode(SovereignNetZenith* n, const char* domain);
 void SovereignNet_audit(const SovereignNetZenith* n);
 
-#endif
+#endif // SOVEREIGN_OMNI_SHARD_H
+
+/* --- OMNI-AGENT SOVEREIGN INTERFACE (AGENTIC CODING) --- */
+
+typedef enum {
+    AGENT_STATE_WAITING,
+    AGENT_STATE_PLANNING,
+    AGENT_STATE_EXECUTING,
+    AGENT_STATE_AUDITING,
+    AGENT_STATE_ERROR
+} AgentState;
+
+typedef enum {
+    MISSION_TYPE_CODE_GEN,
+    MISSION_TYPE_OPTIMIZE,
+    MISSION_TYPE_QUERY,
+    MISSION_TYPE_FIX
+} MissionType;
+
+typedef struct SovereignMission {
+    char id[64];
+    MissionType type;
+    int priority;
+    char intent[256];
+} SovereignMission;
+
+typedef struct SovereignOmniAgent {
+    AgentState state;
+    int perms;
+    SovereignMission active_mission;
+} SovereignOmniAgent;
+
+#define PERM_READ   (1 << 0)
+#define PERM_WRITE  (1 << 1)
+#define PERM_PLAN   (1 << 2)
+
+/**
+ * Σ Sovereign Omni-Agent Prototypes
+ */
+void SovereignOmniAgentInit();
+void SovereignOmniAgentPlan(const char* mission_id);
+void SovereignOmniAgentExecute(const char* mission_id);
+SovereignMission SigmaParseIntent(const char* prompt);

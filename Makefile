@@ -40,7 +40,10 @@ TOOL_SRCS      := $(TOOLS_DIR)/SovereignOmniCLI.c \
                   $(TOOLS_DIR)/SigmaCLI_Dispatcher.c \
                   $(TOOLS_DIR)/sigma_distro_absorber.c \
                   $(TOOLS_DIR)/sigma_tool_absorber.c \
-                  $(TOOLS_DIR)/sigma_linux_usps.c
+                  $(TOOLS_DIR)/sigma_linux_usps.c \
+                  $(KERNEL_DIR)/ai_ml/SigmaTrainer.c \
+                  $(KERNEL_DIR)/SovereignToolOrchestrator.c \
+                  $(KERNEL_DIR)/SovereignAutomation.c
 
 # NEW: Agent Userland Tools
 USERLAND_DIR   := userland

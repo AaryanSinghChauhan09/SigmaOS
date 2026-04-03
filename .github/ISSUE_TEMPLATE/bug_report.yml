@@ -1,11 +1,13 @@
-name: Bug Report
-description: Report a bug in SigmaOS to help us improve the system.
-labels: ["bug"]
+name: Σ Bug Report (Sovereign Context)
+description: Report system-level regressions in the Sovereign Zenith Core. 
+labels: ["bug", "zenith"]
 body:
   - type: markdown
     attributes:
       value: |
-        Thanks for reporting a bug in SigmaOS! Please provide as much detail as possible to help us resolve the issue.
+        ### 👑 Sovereignty Check
+        Before reporting, please verify the bug hasn't been resolved via `sigma help` or the `Sigma Academy` mission tracking.
+        **AI Readiness Status**: Ensure `sigma-ai eval` passes for the respective shard.
 
   - type: textarea
     id: bug-description

@@ -59,6 +59,11 @@ extern "C" {
     int           sigma_ioctl(int fd, unsigned long request, ...);
     void          sigma_print_hex(sigma_u64 val);
 
+    // --- Sovereign Math Primitives (ML Backbone) ---
+    sigma_f64     sigma_math_exp(sigma_f64 x);
+    sigma_f64     sigma_math_log(sigma_f64 x);
+    sigma_f64     sigma_math_pow(sigma_f64 x, sigma_f64 y);
+
     int           sigma_socket(int domain, int type, int protocol);
     int           sigma_bind(int sockfd, const void* addr, sigma_u32 addrlen);
     int           sigma_connect(int sockfd, const void* addr, sigma_u32 addrlen);

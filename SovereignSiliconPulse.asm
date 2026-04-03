@@ -46,5 +46,39 @@ sovereign_pulse_trigger:
     pop rbp
     ret
 
+; sovereign_ml_dot_product(float* a, float* b, int n): RAW x86_64 SILICON DOT-PRODUCT.
+; Mission: Industrial MatMul acceleration for Sigma Transformer.
+GLOBAL sovereign_ml_dot_product
+sovereign_ml_dot_product:
+    push rbp
+    mov rbp, rsp
+    
+    ; RDI: a, RSI: b, RDX: n
+    vxorps ymm0, ymm0, ymm0     ; Clear accumulator
+    mov rcx, rdx
+    shr rcx, 3                  ; Divide n by 8 (AVX 256-bit = 8 floats)
+    
+.ml_loop:
+    test rcx, rcx
+    jz .ml_cleanup
+    vmovups ymm1, [rdi]         ; Load 8 floats from a
+    vmovups ymm2, [rsi]         ; Load 8 floats from b
+    vmulps ymm3, ymm1, ymm2     ; Multiply
+    vaddps ymm0, ymm0, ymm3     ; Accumulate
+    add rdi, 32                 ; Move 8 floats (32 bytes)
+    add rsi, 32
+    dec rcx
+    jmp .ml_loop
+
+.ml_cleanup:
+    ; Horizontal add ymm0 to get single float result in xmm0
+    vextractf128 xmm1, ymm0, 1
+    vaddps xmm0, xmm0, xmm1
+    vhaddps xmm0, xmm0, xmm0
+    vhaddps xmm0, xmm0, xmm0
+    
+    pop rbp
+    ret
+
 SECTION .data
     pulse_start_tick dq 0

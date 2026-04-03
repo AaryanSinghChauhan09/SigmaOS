@@ -24,4 +24,8 @@ Write-Host "[SIGMA-AUTO]: Validating GCC and Make toolchains..." -ForegroundColo
 choco install make -y
 choco install mingw -y
 
-Write-Host "[SIGMA-AUTO]: Environment automated. SigmaOS repository is ready for a raw 'make' build." -ForegroundColor Green
+# Σ SOVEREIGN MISSION: Initial AI Pretraining
+Write-Host "[SIGMA-AUTO]: Initiating industrial-grade AI PRETRAINING..." -ForegroundColor Cyan
+./build/sigmaos_zenith --ai-train --epochs 50
+
+Write-Host "[SIGMA-AUTO]: Environment automated. SigmaOS architecture is SYNCED & SOVEREIGN." -ForegroundColor Green
