@@ -1,4 +1,4 @@
-# Σ SIGMAOS ZENITH: SOVEREIGN MAKEFILE (v1800.0)
+# Σ SIGMAOS ZENITH: SOVEREIGN MAKEFILE (v2900.0)
 # Mission: Absolute Build Purity & Hardware-Direct Compilation.
 
 CC = x86_64-elf-gcc
@@ -14,7 +14,12 @@ OBJS = \
     build/kmain.o \
     build/slab.o \
     build/syscall.o \
-    build/vfs_stub.o
+    build/vfs_stub.o \
+    build/vga.o \
+    build/sigma_strings.o \
+    build/exceptions.o \
+    build/signals.o \
+    build/sigma_shell_cli.o
 
 all: build build/sigmaos_zenith
 
