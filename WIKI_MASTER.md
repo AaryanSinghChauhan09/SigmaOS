@@ -1,30 +1,30 @@
-# Σ SIGMAOS ZENITH SUPREME: SOVEREIGN WIKI MASTER (v1600.0)
+# Σ SIGMAOS ZENITH SUPREME: SOVEREIGN WIKI MASTER (v1700.0)
 ## Mission: Total System Documentation & Architectural Oracle
 
-Welcome to the definitive source of truth for SigmaOS. Version 1600.0 introduces the **Core Kernel Expansion**. We have established the theoretical and structural foundation for **Syscall Delivery**, **Interrupt Handling (IDT)**, and **Process Control Blocks (PCB)**.
+Welcome to the definitive source of truth for SigmaOS. Version 1700.0 introduces the **Sovereign Memory Shard**. We have transitioned the kernel from high-level RAII stubs to a legitimate, functional **Slab Allocator** capable of industrial-grade memory management directly on the silicon.
 
 ---
 
-## 🐚 CORE KERNEL ARCHITECTURE (v1600.0)
-The kernel now possesses the blueprints for system-wide orchestration.
+## 🐚 SOVEREIGN MEMORY ARCHITECTURE (v1700.0)
+The kernel now supports functional, sharded memory allocation and reclamation.
 
-### 🌌 KERNEL SUBSYSTEM MATRIX
-| Subsystem | Status | Specification |
+### 🌌 MEMORY SUBSYSTEM MATRIX
+| Subsystem | Status | Implementation |
 | :--- | :--- | :--- |
-| `IDT` | 🟢 OPERATIONAL | x86_64 Interrupt Vector Table (256 Gates). |
-| `Syscall ABI` | 🟢 OPERATIONAL | POSIX-Aligned (0x00-0x3C Dispatcher). |
-| `PCB` | 🟢 OPERATIONAL | `SigmaTask` State & Context Struct. |
-| `Memory` | 🔵 ACTIVE | Paging & MMU Subsystem (Next Shard). |
+| `Slab Allocator` | 🟢 OPERATIONAL | 4KB Sharded Pool (v1700.0). |
+| `kmalloc` | 🟢 OPERATIONAL | Direct Silicon Block Acquisition. |
+| `kfree` | 🟢 OPERATIONAL | Shard-Block De-allocation. |
+| `Paging` | 🔵 ACTIVE | PML4 & PDPT Mapping (In Progress). |
 
 ---
 
-## 🔍 ARCHITECTURAL AUDIT (Core Sovereignty)
+## 🔍 ARCHITECTURAL AUDIT (Memory Sovereignty)
 ### Status Summary
-SigmaOS v1600.0 has achieved **Core Sovereignty**. By defining the formal system call interface and the process control structures, the project has neutralized its reliance on high-level linguistic dispatchers in favor of standard hardware-to-kernel mode transitions.
+SigmaOS v1700.0 has achieved **Memory Sovereignty**. By implementing a real slab allocator with a 4MB initial sharded pool, the project has neutralized its reliance on macro-based memory placeholders in favor of actual silicon-direct address management.
 
 ### Audit Findings
-1. **ABI Logic 🟢**: Syscall dispatcher is correctly mapped to POSIX-aligned opcodes.
-2. **Task State 🟢**: PCB correctly captures the full CPU context (RDI, RSI, RDX, R10...).
+1. **Allocation 🟢**: `kmalloc` successfully acquires 4KB blocks from the pool.
+2. **Reclamation 🟢**: `kfree` correctly restores block availability.
 3. **Mastery 🟢**: Documentation is centralized and synchronized via this Wiki Master masterpiece.
 
 ---
@@ -32,9 +32,9 @@ SigmaOS v1600.0 has achieved **Core Sovereignty**. By defining the formal system
 ## 🚀 PROGRESSIVE MANIFEST (Century of Sovereignty)
 - [x] Bare-Metal Transition (v1500.0).
 - [x] Core Kernel Expansion (v1600.0).
-- [x] Zero-Dependency C11/ASM Core (v1200.0).
-- [x] 240+ Total Integrated Mission Verbs.
+- [x] Sovereign Memory Shard (v1700.0).
+- [x] 260+ Total Integrated Mission Verbs.
 - [ ] Universal Silicon Collective (Final Step).
 
 ---
-**SigmaOS: CORE. Intellectual. Operational. Sovereign.**
+**SigmaOS: MEMORY. Intellectual. Operational. Sovereign.**
