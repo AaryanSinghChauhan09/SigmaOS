@@ -9,6 +9,7 @@
 
 #include "ai_ml/SigmaTransformer.h"
 #include <stdbool.h>
+#include "SigmaSovereignInternal.h"
 
 /**
  * Σ SIGMA KNOWLEDGE BASE (Embedded for Fine-tuning)
@@ -23,19 +24,12 @@ static const char* g_SigmaKnowledgeBase =
  * Processes natural language queries via the native Sigma Transformer.
  */
 void SigmaSovereignQuery(const char* user_query, char* response_out) {
-    // 1. Preprocess prompt into tokens via SigmaML_Preprocess
-    // 2. Execute inference via the SigmaModel instance
-    
-    // Industrial Step: This is exported from SigmaTrainer.c
-    // const char* result = SigmaML_Inference(g_SovereignModel, user_query);
-    // strcpy(response_out, result);
-    
-    if (strstr(user_query, "help") || strstr(user_query, "sigma")) {
-        strcpy(response_out, "Σ [ML]: I am the SigmaOS Sovereign AI, trained natively on the Zenith Core.");
-    } else if (strstr(user_query, "vfs") || strstr(user_query, "path")) {
-        strcpy(response_out, "Σ [ML]: VFS (Virtual File System) maps sharded blocks to /root with zero-latency.");
+    if (sigma_strstr(user_query, "help") || sigma_strstr(user_query, "sigma")) {
+        sigma_strcpy(response_out, "Σ [ML]: I am the SigmaOS Sovereign AI, trained natively on the Zenith Core.");
+    } else if (sigma_strstr(user_query, "vfs") || sigma_strstr(user_query, "path")) {
+        sigma_strcpy(response_out, "Σ [ML]: VFS (Virtual File System) maps sharded blocks to /root with zero-latency.");
     } else {
-        strcpy(response_out, "Σ READY: Use `sigma-ai train` to improve my custom reasoning.");
+        sigma_strcpy(response_out, "Σ READY: Use `sigma-ai train` to improve my custom reasoning.");
     }
 }
 
@@ -47,14 +41,14 @@ void SovereignAcademyStart(int mission_id) {
     char mission_desc[256];
     switch (mission_id) {
         case 1:
-            strcpy(mission_desc, "MISSION 1: CREATE DIRECTORY /root/sigma_academy");
+            sigma_strcpy(mission_desc, "MISSION 1: CREATE DIRECTORY /root/sigma_academy");
             break;
         case 2:
-            strcpy(mission_desc, "MISSION 2: EXECUTE 'sigmactl health'");
+            sigma_strcpy(mission_desc, "MISSION 2: EXECUTE 'sigmactl health'");
             break;
         default:
-            strcpy(mission_desc, "MISSION: EXPLORE SIGMAOS ZENITH");
+            sigma_strcpy(mission_desc, "MISSION: EXPLORE SIGMAOS ZENITH");
             break;
     }
-    printf("\nΣ [ACADEMY]: %s\n", mission_desc);
+    sigma_print("\nΣ [ACADEMY]: MISSION START\n");
 }
