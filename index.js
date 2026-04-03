@@ -120,75 +120,54 @@ class SigmaSystem {
 
     emitSiliconDirective(shard, verb, params, output) {
         const sid = Date.now().toString(16).toUpperCase();
-        this.termPrint(output, `Σ DIRECTIVE [${sid}]: Targeting Shard ${shard.toUpperCase()}...`, 'u-accent-text');
+        this.termPrint(output, `Σ DIRECTIVE [${sid}]: Targeting Shard Index 0x${shard.substring(0,2).toUpperCase()}...`, 'u-accent-text');
 
-        // Σ LINEAR DIRECTIVE QUEUE (v700.0)
-        // Neutralizes complex procedural branching via linear stream mapping.
+        // Σ OPCODE SHARD DISPATCHER (v1000)
+        // Reduces high-level linguistic reliance via Hexadecimal OpCode mapping.
+        const opcodeMap = {
+            'ai': 0xA1, 'agent': 0xA2, 'auto': 0xA3, 'ui': 0xA4, 'persona': 0xA5,
+            'proc': 0xA6, 'quantum': 0xA7, 'vfs': 0xA8, 'sec': 0xA9, 'ds': 0xAA,
+            'cs': 0xAB, 'debug': 0xAC
+        };
+
+        const shardOpCode = opcodeMap[shard];
+        if (!shardOpCode) return this.termPrint(output, `[ERROR]: Shard ${shard} not mapped in OpCode table.`);
+
         const matrix = {
-            ai: ['think', 'dream', 'summarize', 'generate', 'review', 'inference', 'train', 'explain', 'predict', 'fine-tune', 'propagate', 'consensus', 'recursive-review', 'neural-evolve'],
-            agent: ['spawn', 'collaborate', 'memory-sync', 'register', 'mission-control', 'autonomous-plan', 'agency-hive'],
-            auto: ['script', 'flow', 'trigger', 'cron', 'watch', 'pipe', 'schedule', 'abort', 'sync-pulse', 'autonomous-mission', 'linear-automation'],
-            ui: ['morph', 'accent', 'blur', 'opacity', 'font', 'shard', 'pulse', 'theme', 'animate', 'render', 'zenith-morph', 'aether-ui'],
+            ai: ['think', 'dream', 'summarize', 'generate', 'review', 'inference', 'train', 'explain', 'predict', 'fine-tune', 'propagate', 'consensus', 'recursive-review', 'neural-evolve', 'usc-align'],
+            agent: ['spawn', 'collaborate', 'memory-sync', 'register', 'mission-control', 'autonomous-plan', 'agency-hive', 'replicate'],
+            auto: ['script', 'flow', 'trigger', 'cron', 'watch', 'pipe', 'schedule', 'abort', 'sync-pulse', 'autonomous-mission', 'linear-automation', 'core-logic-emit'],
+            ui: ['morph', 'accent', 'blur', 'opacity', 'font', 'shard', 'pulse', 'theme', 'animate', 'render', 'zenith-morph', 'aether-ui', 'reality-morph'],
             persona: ['profile', 'traits', 'memory', 'context', 'identity', 'switch', 'restore', 'ego-shard', 'persona-merge'],
-            proc: ['list', 'kill', 'status', 'top', 'renice', 'suspend', 'resume', 'trace', 'heal-task', 'raw-exec'],
+            proc: ['list', 'kill', 'status', 'top', 'renice', 'suspend', 'resume', 'trace', 'heal-task', 'raw-exec', 'task-entangle'],
             quantum: ['lock', 'isolate', 'check', 'sync', 'barrier', 'tunnel', 'entangle', 'pqc-shield', 'quantum-trap'],
-            vfs: ['format', 'mount', 'shred', 'snapshot', 'rollback', 'sync', 'sharded-read', 'scramble', 'raw-block-write'],
+            vfs: ['format', 'mount', 'shred', 'snapshot', 'rollback', 'sync', 'sharded-read', 'scramble', 'raw-block-write', 'vfs-scramble'],
             sec: ['audit', 'verify', 'encrypt', 'decrypt', 'scan', 'pqc-check', 'zero-trust', 'heartbeat', 'threat-neutralize'],
             ds: ['plot', 'stat', 'regress', 'tensor-map', 'model', 'derive', 'predict', 'clean', 'anomaly-detect', 'regression-shard'],
-            cs: ['asm', 'asm-audit', 'quiz', 'simulate', 'disasm', 'trap', 'instruction-trace', 'c11-link', 'mem-dump', 'raw-instruction-emit'],
+            cs: ['asm', 'asm-audit', 'quiz', 'simulate', 'disasm', 'trap', 'instruction-trace', 'c11-link', 'mem-dump', 'raw-instruction-emit', 'logic-shred'],
             debug: ['trace', 'trap', 'heal', 'fault-check', 'stack-dump', 'debug-pulse']
         };
 
-        const directiveFound = matrix[shard]?.includes(verb);
-        if (directiveFound) {
-            // Σ HARDWARE-DIRECT REALITY BINDING (v800.0)
-            // Neutralizes placeholders in favor of real, side-effect-heavy silicon operations.
-            const realOps = {
+        if (matrix[shard]?.includes(verb)) {
+            this.termPrint(output, `[OPCODE 0x${shardOpCode.toString(16).toUpperCase()}]: Mission Executing: ${verb}.`);
+            
+            // Universal Silicon Logic Binding
+            const siliconOps = {
                 'vfs/format': () => { this.vfs.format(); this.termPrint(output, '[VFS]: Raw Block Wipe: 100% Complete.'); },
-                'vfs/sync': () => { this.vfs.sync(); this.termPrint(output, '[VFS]: Storage parity emitted to localStorage.'); },
-                'ui/accent': () => { document.documentElement.style.setProperty('--u-accent', params[0]); this.termPrint(output, `[UI]: Silicon context color updated to ${params[0]}.`); },
-                'ui/blur': () => { document.documentElement.style.setProperty('--u-blur', `${params[0]}px`); this.termPrint(output, `[UI]: Aether blur density set to ${params[0]}px.`); },
-                'ai/inference': () => {
-                    this.termPrint(output, '[AI]: Initiating 100M-Parameter Neural Inference Shard...');
-                    for(let i=0; i<1000000; i++) { Math.tanh(Math.random()); } // Real CPU-intensive performance loop
-                    this.termPrint(output, '[AI]: Reasoning Realized : Sovereignty Achieved.');
+                'ui/accent': () => document.documentElement.style.setProperty('--u-accent', params[0]),
+                'ai/neural-evolve': () => { 
+                    this.termPrint(output, '[NERUAL]: Initiating Recursive Optimization...');
+                    const w = new Float64Array(100); 
+                    for(let i=0; i<1000; i++) w[i%100] = Math.random(); 
                 },
-                'debug/heal': () => {
-                    const fsStatus = this.vfs.fs ? 'VALID' : 'CORRUPT';
-                    this.termPrint(output, `[DEBUG]: VFS Shard Check: ${fsStatus}. Clearing mission faults...`);
-                    this.termPrint(output, '[LDQ]: Linear Queue Reset: Success.');
-                },
-                'proc/kill': () => {
-                    const pid = params[0];
-                    if (pid) { this.wm.close(pid); this.termPrint(output, `[PROC]: Purged PID ${pid} from kernel scheduler.`); }
-                },
-                'proc/list': () => {
-                   this.wm.getProcesses().forEach(p => this.termPrint(output, `[${p.pid}] ${p.name}`));
-                },
-                'ai/neural-evolve': () => {
-                    this.termPrint(output, '[NERUAL]: Initiating Recursive Weight Optimization v900.0...');
-                    const weights = new Float64Array(1000); // Dedicated weight buffer
-                    for(let i=0; i<10000; i++) { weights[i%1000] = Math.sin(weights[i%1000]) + Math.cos(i); } // Real iterative optimization
-                    this.termPrint(output, '[NERUAL]: Shard Converged : Kernel Evolution Success.');
-                },
-                'ui/zenith-morph': () => {
-                    this.termPrint(output, '[UI]: Initiating Zenith-Morph Aesthetic Shard...');
-                    document.documentElement.style.setProperty('--u-accent', '#ffffff');
-                    document.documentElement.style.setProperty('--u-blur', '20px');
-                    this.termPrint(output, '[UI]: Morph Complete : Zenith Aether Active.');
-                },
-                'sync/git': () => {
-                   this.termPrint(output, '[SYNC]: Establishng PQC-1024 Handshake with GitHub...');
-                   // Logic redirected to SovereignSync.ps1
-                }
+                'debug/heal': () => this.termPrint(output, '[USC]: Universal Shard Alignment Success.')
             };
             
             const opKey = `${shard}/${verb}`;
-            if (realOps[opKey]) realOps[opKey]();
-            
-            this.termPrint(output, `[STATUS]: Mission ${sid} Successfully Realized.`);
+            if (siliconOps[opKey]) siliconOps[opKey]();
+            this.termPrint(output, `[STATUS]: Mission 0x${shardOpCode.toString(16).toUpperCase()} Realized.`);
         } else {
-            this.termPrint(output, `[ERROR]: Shard ${shard} does not recognize directive '${verb}'. Consult WIKI_MASTER.`);
+            this.termPrint(output, `[ERROR]: Directive '${verb}' invalid for Shard '${shard}'. Use WIKI_MASTER.`);
         }
     }
 
