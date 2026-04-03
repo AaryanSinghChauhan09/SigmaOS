@@ -1,9 +1,7 @@
 // SOVEREIGN MODEL CONTEXT PROTOCOL (MCP USP)
 // Native binary parser ensuring LLMs map efficiently to C structs without JSON bloat.
 
-#include <stdio.h>
 #include <stdint.h>
-#include <string.h>
 
 // Simulated standard JSON-less MCP Struct
 typedef struct {

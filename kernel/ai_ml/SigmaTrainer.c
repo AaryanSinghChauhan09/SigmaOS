@@ -8,10 +8,7 @@
  */
 
 #include "SigmaTransformer.h"
-#include <stdio.h>
-#include <stdlib.h>
 #include <math.h>
-#include <string.h>
 
 /**
  * Σ ML PREPROCESSING: TOKENIZATION

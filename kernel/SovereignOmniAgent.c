@@ -4,9 +4,6 @@
 
 #include <stdint.h>
 #include <stddef.h>
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
 #include <sys/stat.h>
 
 #define OMNI_AGENT_MAX_CONTEXT_BUFFER 1024 * 1024 * 10 // 10MB Codebase Context Buffer

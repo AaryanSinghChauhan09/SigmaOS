@@ -1,7 +1,6 @@
 // SOVEREIGN ORCHESTRATOR SHARD (N8N / COMFYUI / LANGCHAIN USP)
 // Executes nodes of compute dynamically in pure C11 memory pipelines.
 
-#include <stdio.h>
 #include <stdint.h>
 
 typedef uint8_t (*SigmaNodeExecutionPtr)(void* context);

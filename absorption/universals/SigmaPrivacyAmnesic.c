@@ -8,8 +8,6 @@
  */
 
 #include "../../kernel/SovereignOmniShard.h"
-#include <stdio.h>
-#include <string.h>
 
 /**
  * Σ Sovereign Amnesia

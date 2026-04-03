@@ -1,9 +1,7 @@
 // SOVEREIGN TELEMETRY SHARD (NETDATA / MONITORING USP)
 // Real-time bare-metal performance tracking without HTTP overhead.
 
-#include <stdio.h>
 #include <stdint.h>
-#include <stdlib.h>
 
 #ifdef _WIN32
 #include <windows.h>

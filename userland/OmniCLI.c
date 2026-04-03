@@ -1,8 +1,6 @@
 // SOVEREIGN OMNI-CLI USERLAND
 // Interactive Terminal Agent Interface
 
-#include <stdio.h>
-#include <string.h>
 
 // Simulated external link to SovereignOmniAgent
 extern void SovereignOmniAgent_Init();

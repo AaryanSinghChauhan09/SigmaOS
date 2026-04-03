@@ -8,8 +8,6 @@
  */
 
 #include "ai_ml/SigmaTransformer.h"
-#include <stdio.h>
-#include <string.h>
 #include <stdbool.h>
 
 /**

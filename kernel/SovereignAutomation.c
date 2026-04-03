@@ -8,8 +8,6 @@
  */
 
 #include "SovereignOmniShard.h"
-#include <stdio.h>
-#include <string.h>
 
 /**
  * Σ Sovereign Personalization

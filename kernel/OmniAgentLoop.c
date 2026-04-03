@@ -10,8 +10,6 @@
 #include "SovereignOmniShard.h"
 #include "SovereignAetherOrchestrator.h"
 #include "SigmaVFS.h"
-#include <stdio.h>
-#include <string.h>
 
 /**
  * Σ OMNI-AGENT STATE MACHINE
