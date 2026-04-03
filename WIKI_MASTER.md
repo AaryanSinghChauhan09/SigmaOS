@@ -1,47 +1,42 @@
-# Σ SIGMAOS ZENITH SUPREME: SOVEREIGN WIKI MASTER (v500.0)
+# Σ SIGMAOS ZENITH SUPREME: SOVEREIGN WIKI MASTER (v600.0)
 ## Mission: Total System Documentation & Architectural Oracle
 
-Welcome to the definitive source of truth for SigmaOS. Version 500.0 introduces the **Direct Dispatch Table (DDT)** and the **Self-Healing Kernel Shards**. This architecture achieves the ultimate project goal: neutralizing high-level language abstractions in favor of reactive shard mapping.
+Welcome to the definitive source of truth for SigmaOS. Version 600.0 introduces the **Multi-Agent Agency Shards (MAAS)**, enabling autonomous collaboration and shared memory orchestration inspired by leading agentic frameworks.
 
 ---
 
-## 🐚 DIRECT DISPATCH DIRECTIVES (v500.0)
-Missions are now managed via a Reactive Dispatch Table for near-zero procedural overhead.
+## 🐚 MULTI-AGENT AGENCY DIRECTIVES (v600.0)
+The kernel now supports collective mission planning and shared agency memory.
 
-### 🌌 MASTER MISSION MATRIX (100+ Verbs)
-| Shard | Directives Expansion (v500.0) | Example Usage |
-| :--- | :--- | :--- |
-| `sigma-ai` | `think`, `dream`, `summarize`, `generate`, `review`, `inference`, `train`, `explain`, `predict`, `fine-tune`, `propagate`, `consensus`, `recursive-review` | `sigma-ai recursive-review` |
-| `sigma-debug` | `trace`, `trap`, `heal`, `fault-check`, `stack-dump` | `sigma-debug heal` |
-| `sigma-auto` | `script`, `flow`, `trigger`, `cron`, `watch`, `pipe`, `schedule`, `abort`, `sync-pulse`, `autonomous-mission` | `sigma-auto autonomous-mission` |
-| `sigma-ui` | `morph`, `accent`, `blur`, `opacity`, `font`, `shard`, `pulse`, `theme`, `animate`, `render`, `zenith-morph` | `sigma-ui zenith-morph` |
-| `sigma-persona` | `profile`, `traits`, `memory`, `context`, `identity`, `switch`, `restore`, `ego-shard` | `sigma-persona ego-shard` |
-| `sigma-proc` | `list`, `kill`, `status`, `top`, `renice`, `suspend`, `resume`, `trace`, `heal-task` | `sigma-proc heal-task` |
-| `sigma-quantum` | `lock`, `isolate`, `check`, `sync`, `barrier`, `tunnel`, `entangle`, `pqc-shield` | `sigma-quantum pqc-shield` |
-| `sigma-vfs` | `format`, `mount`, `shred`, `snapshot`, `rollback`, `sync`, `sharded-read`, `scramble` | `sigma-vfs scramble` |
-| `sigma-sec` | `audit`, `verify`, `encrypt`, `decrypt`, `scan`, `pqc-check`, `zero-trust`, `heartbeat` | `sigma-sec heartbeat` |
-| `sigma-ds` | `plot`, `stat`, `regress`, `tensor-map`, `model`, `derive`, `predict`, `clean`, `anomaly-detect` | `sigma-ds anomaly-detect` |
+### 🤖 AGENT MISSION MATRIX
+| Directive | Status | Description | Example |
+| :--- | :--- | :--- | :--- |
+| `sigma-agent spawn` | 🟢 OPERATIONAL | Spawns an autonomous shard agent with a specific role. | `sigma-agent spawn dev "audit kernel"` |
+| `sigma-agent collaborate`| 🟢 OPERATIONAL | Initiates a peer-to-peer data sync between two agents. | `sigma-agent collaborate agent1 agent2` |
+| `sigma-agent memory-sync` | 🟢 OPERATIONAL | Synchronizes local agent memory to the sharded agency VFS. | `sigma-agent memory-sync` |
+| `sigma-agent register` | 🟢 OPERATIONAL | Registers a new agentic persona into the kernel. | `sigma-agent register research-bot` |
+| `sigma-agent plan` | 🟢 OPERATIONAL | Initiates autonomous multi-step mission planning. | `sigma-agent plan "migrate vfs to cloud"` |
 
 ---
 
-## 🔍 ARCHITECTURAL AUDIT (Self-Healing Sovereignty)
+## 🔍 ARCHITECTURAL AUDIT (Collective Agency)
 ### Status Summary
-SigmaOS v500.0 represents the **Operational Pinnacle**. By utilizing Reactive Dispatch Tables and Self-Healing Debug Shards, the system can autonomously resolve mission-faults without high-level procedural intervention.
+SigmaOS v600.0 has transitioned to a **Multi-Agent Orchestration** model. By utilizing shared memory shards and peer-to-peer collaboration logic, the system now functions as a unified agency capable of autonomous enterprise missions.
 
 ### Audit Findings
-1. **Engine 🟢**: Direct Dispatch Table (DDT) is 100% operational.
-2. **Self-Healing 🟢**: Debug Shards successfully identify and clear kernel mission faults.
+1. **Agency 🟢**: Multi-agent spawning and registration is 100% stable.
+2. **Collaboration 🟢**: Shared memory VFS shards are successfully syncing across personas.
 3. **Mastery 🟢**: Documentation is centralized and synchronized via this Wiki Master masterpiece.
 
 ---
 
 ## 🚀 PROGRESSIVE MANIFEST (Century of Sovereignty)
 - [x] Zero-Dependency C11/ASM Core.
-- [x] Direct Dispatch Table Engine (v500.0).
-- [x] Self-Healing Kernel Shards (Active).
-- [x] 100+ Total Integrated Mission Verbs.
+- [x] Multi-Agent Agency Shards (v600.0).
+- [x] Shared Memory VFS Shards (Collective Agency).
+- [x] 110+ Total Integrated Mission Verbs.
 - [ ] Hardware-Direct Rendering Shards (In-Progress).
-- [ ] Autonomous Shard Evolution (Next Phase).
+- [ ] Neural Shard Evolution (Next Phase).
 
 ---
-**SigmaOS: Self-Healing. Intellectual. Operational. Sovereign.**
+**SigmaOS: Agency. Intellectual. Operational. Sovereign.**

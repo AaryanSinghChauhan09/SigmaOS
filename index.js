@@ -126,6 +126,7 @@ class SigmaSystem {
         // Reduces procedural switch/case/if reliance via reactive domain mapping.
         const matrix = {
             ai: ['think', 'dream', 'summarize', 'generate', 'review', 'inference', 'train', 'explain', 'predict', 'fine-tune', 'propagate', 'consensus', 'recursive-review'],
+            agent: ['spawn', 'collaborate', 'memory-sync', 'register', 'mission-control', 'autonomous-plan'],
             auto: ['script', 'flow', 'trigger', 'cron', 'watch', 'pipe', 'schedule', 'abort', 'sync-pulse', 'autonomous-mission'],
             ui: ['morph', 'accent', 'blur', 'opacity', 'font', 'shard', 'pulse', 'theme', 'animate', 'render', 'zenith-morph'],
             persona: ['profile', 'traits', 'memory', 'context', 'identity', 'switch', 'restore', 'ego-shard'],
