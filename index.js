@@ -104,10 +104,10 @@ class SigmaSystem {
         this.termPrint(output, `root@sigmaos:~# ${command}`, 'u-accent-text');
 
         const cmds = {
-            help: () => this.termPrint(output, 'Commands: sigma-ai, sigma-ds, sigma-dsa, sigma-cs, sigma-proc, sigma-quantum, sigma-vfs, sigma-sec, sigma-sync, ls, neofetch, clear'),
+            help: () => this.termPrint(output, 'Commands: sigma-ai, sigma-ds, sigma-dsa, sigma-cs, sigma-proc, sigma-quantum, sigma-vfs, sigma-sec, sigma-sync, sigma-auto, sigma-tool, sigma-ui, sigma-persona, ls, neofetch, clear'),
             clear: () => { output.innerHTML = ''; },
             ls: () => this.termPrint(output, this.vfs.ls('/root').join('  ')),
-            neofetch: () => this.termPrint(output, 'Σ SIGMAOS ZENITH OPERATIONAL\nKernel: Sovereign C11 | v170.0\nStatus: 100% OPERATIONAL'),
+            neofetch: () => this.termPrint(output, 'Σ SIGMAOS ZENITH OPERATIONAL\nKernel: Sovereign C11 | v180.0\nStatus: 100% MASTER COVERAGE'),
             'sigma-ai': (a) => {
                 const sub = a[0];
                 if (sub === 'inference') {
@@ -117,6 +117,16 @@ class SigmaSystem {
                     this.termPrint(output, 'Σ AI: Initiating Sharded Pretraining mission...');
                 } else {
                     this.termPrint(output, 'Usage: sigma-ai [train|inference|explain]');
+                }
+            },
+            'sigma-ds': (a) => this.termPrint(output, 'Σ DATA SCIENCE: Preprocessing datasets in sharded memory...'),
+            'sigma-dsa': (a) => this.termPrint(output, 'Σ DSA: Benchmarking O(log N) algorithm shards...'),
+            'sigma-cs': (a) => {
+                const sub = a[0];
+                if (sub === 'quiz') {
+                    this.termPrint(output, 'Σ CS QUIZ: Q: What is the complexity of Shard Sort? A: O(log N).');
+                } else {
+                    this.termPrint(output, 'Σ COMPUTER SCIENCE: Running memory-mapped I/O simulation...');
                 }
             },
             'sigma-proc': (a) => {
@@ -155,18 +165,14 @@ class SigmaSystem {
                 this.termPrint(output, 'Σ SECURITY: Initiating Real-time Zero-Trust audit...');
                 this.termPrint(output, '[SEC]: Integrity: 100% | Hash: SHA3-512 Verified.');
             },
-            'sigma-cs': (a) => {
-                const sub = a[0];
-                if (sub === 'quiz') {
-                    this.termPrint(output, 'Σ CS QUIZ: Q: What is the complexity of Shard Sort? A: O(log N).');
-                } else {
-                    this.termPrint(output, 'Σ CS: Running scheduler simulation mission...');
-                }
-            },
             'sigma-sync': () => {
                 this.termPrint(output, 'Σ SYNC: Establishing PQC-1024 Handshake...');
                 setTimeout(() => this.termPrint(output, '[SUCCESS]: Master Parity Achieved.'), 1000);
-            }
+            },
+            'sigma-auto': (a) => this.termPrint(output, `Σ AUTOMATION: Mission '${a.join(' ')}' scheduled.`),
+            'sigma-tool': (a) => this.termPrint(output, 'Σ TOOLS: studio, gaming, remote-bot, xclicker ready.'),
+            'sigma-ui': (a) => this.termPrint(output, 'Σ UI: Aesthetic Zenith Morph applied.'),
+            'sigma-persona': (a) => this.termPrint(output, `Σ PERSONA: Switching to ${a[0]?.toUpperCase() || 'ZENITH'} kernel context.`)
         };
 
         if (cmds[name]) cmds[name](args);
