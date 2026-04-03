@@ -25,10 +25,19 @@ class SigmaVFS {
 
     getDefaultFS() {
         return {
-            '/root': { type: 'dir', children: ['bin', 'kernel', 'userland'] },
+            '/root': { type: 'dir', children: ['bin', 'kernel', 'userland', 'data', 'etc'] },
             '/root/bin': { type: 'dir', children: ['sigma_shell', 'sigmactl'] },
-            '/root/kernel': { type: 'dir', children: ['sigma_core.asm'] }
+            '/root/kernel': { type: 'dir', children: ['sigma_core.asm', 'process_mgr.c', 'quantum_shard.c'] },
+            '/root/etc': { type: 'dir', children: ['sigmaos.conf'] },
+            '/root/etc/sigmaos.conf': { type: 'file', content: 'VERSION=170.0\nTHEME=ZENITH\nMODE=OPERATIONAL' }
         };
+    }
+
+    format() {
+        localStorage.removeItem(this.storageKey);
+        this.fs = this.getDefaultFS();
+        this.sync();
+        return true;
     }
 
     sync() { localStorage.setItem(this.storageKey, JSON.stringify(this.fs)); }
@@ -38,9 +47,8 @@ class SigmaVFS {
 class SigmaWM {
     constructor(system) {
         this.system = system;
-        this.zIndex = 1000;
-        this.activeWorkspace = 1;
-        this.workspaces = {};
+        this.zIndex = 2000;
+        this.windows = {}; // id -> winObj
     }
 
     open(id) {
@@ -48,13 +56,19 @@ class SigmaWM {
         if (win) {
             win.classList.remove('hidden');
             win.style.zIndex = ++this.zIndex;
+            this.windows[id] = { pid: Math.floor(Math.random() * 9000) + 1000, state: 'RUNNING' };
         }
     }
 
     close(id) {
         const win = document.getElementById('win-' + id);
-        if (win) win.classList.add('hidden');
+        if (win) {
+            win.classList.add('hidden');
+            delete this.windows[id];
+        }
     }
+    
+    getProcesses() { return Object.entries(this.windows).map(([id, p]) => ({ name: `shard_${id}`, pid: p.pid, state: p.state })); }
 }
 
 class SigmaSystem {
@@ -90,25 +104,69 @@ class SigmaSystem {
         this.termPrint(output, `root@sigmaos:~# ${command}`, 'u-accent-text');
 
         const cmds = {
-            help: () => this.termPrint(output, 'Commands: sigma-ai, sigma-ds, sigma-dsa, sigma-cs, sigma-proc, sigma-quantum, sigma-vfs, sigma-sec, sigma-sync, sigma-auto, sigma-tool, sigma-ui, ls, neofetch, clear'),
+            help: () => this.termPrint(output, 'Commands: sigma-ai, sigma-ds, sigma-dsa, sigma-cs, sigma-proc, sigma-quantum, sigma-vfs, sigma-sec, sigma-sync, ls, neofetch, clear'),
             clear: () => { output.innerHTML = ''; },
             ls: () => this.termPrint(output, this.vfs.ls('/root').join('  ')),
-            neofetch: () => this.termPrint(output, 'Σ SIGMAOS ZENITH SUPREME\nKernel: Sovereign C11\nShell: Omni-Shell v160.0'),
-            'sigma-ai': (a) => this.termPrint(output, 'Σ AI/ML: Industrial Reasoning Shard Active...'),
-            'sigma-ds': (a) => this.termPrint(output, 'Σ DATA SCIENCE: Preprocessing sharded datasets...'),
-            'sigma-dsa': (a) => this.termPrint(output, 'Σ DSA: Benchmarking O(log N) algorithm shards...'),
-            'sigma-cs': (a) => this.termPrint(output, 'Σ COMPUTER SCIENCE: Simulating memory-mapped I/O...'),
-            'sigma-proc': (a) => this.termPrint(output, 'Σ PROCESS MANAGER: Listing all sovereign PIDs...'),
-            'sigma-quantum': (a) => this.termPrint(output, 'Σ QUANTUM SHARD: Integrity check at 100.00%.'),
-            'sigma-vfs': (a) => this.termPrint(output, 'Σ VFS: Shard mount successful on /root.'),
-            'sigma-sec': (a) => this.termPrint(output, 'Σ SECURITY: Zero-trust diagnostic running...'),
-            'sigma-sync': () => {
-                this.termPrint(output, 'Σ SYNC: Establishing PQC-1024 Handshake with GitHub...', 'u-accent-text');
-                setTimeout(() => this.termPrint(output, '[SUCCESS]: Cloud Shards Synchronized.'), 1000);
+            neofetch: () => this.termPrint(output, 'Σ SIGMAOS ZENITH OPERATIONAL\nKernel: Sovereign C11 | v170.0\nStatus: 100% OPERATIONAL'),
+            'sigma-ai': (a) => {
+                const sub = a[0];
+                if (sub === 'inference') {
+                    this.termPrint(output, 'Σ AI: Loading weights into SigmaTransformer cache...');
+                    this.termPrint(output, 'Σ AI: Loop active. Reason: Sovereignty achieved.');
+                } else if (sub === 'train') {
+                    this.termPrint(output, 'Σ AI: Initiating Sharded Pretraining mission...');
+                } else {
+                    this.termPrint(output, 'Usage: sigma-ai [train|inference|explain]');
+                }
             },
-            'sigma-auto': (a) => this.termPrint(output, `Σ AUTOMATION: Mission '${a.join(' ')}' scheduled.`),
-            'sigma-tool': (a) => this.termPrint(output, 'Σ TOOLS: studio, gaming, remote-bot, xclicker ready.'),
-            'sigma-ui': (a) => this.termPrint(output, 'Σ UI: Aesthetic Zenith Morph applied.')
+            'sigma-proc': (a) => {
+                const sub = a[0];
+                if (sub === 'kill') {
+                    const pid = a[1];
+                    this.termPrint(output, `Σ PROC: Purging PID ${pid} from kernel scheduler...`);
+                    this.termPrint(output, '[SUCCESS]: Shard memory released.');
+                } else {
+                    this.termPrint(output, 'Σ PROCESS MANAGER: Active Shards:');
+                    this.wm.getProcesses().forEach(p => this.termPrint(output, `[${p.pid}] ${p.name} - ${p.state}`));
+                }
+            },
+            'sigma-quantum': (a) => {
+                const sub = a[0];
+                if (sub === 'lock') {
+                    this.termPrint(output, 'Σ QUANTUM: Engaging AVX-512 memory isolation locks...');
+                    this.termPrint(output, '[SEC]: Ring-0 hardware barrier established.');
+                } else {
+                    this.termPrint(output, 'Σ QUANTUM: Shard density stable at 100%.');
+                }
+            },
+            'sigma-vfs': (a) => {
+                const sub = a[0];
+                if (sub === 'format') {
+                    this.termPrint(output, 'Σ VFS: WARNING! Block-level wipe initiating in 3s...');
+                    setTimeout(() => {
+                        this.vfs.format();
+                        this.termPrint(output, '[SUCCESS]: Partition /root re-initialized (Zenith Layout).');
+                    }, 3000);
+                } else {
+                    this.termPrint(output, 'Σ VFS: Partition /root mounted (Sovereign Block Shards).');
+                }
+            },
+            'sigma-sec': (a) => {
+                this.termPrint(output, 'Σ SECURITY: Initiating Real-time Zero-Trust audit...');
+                this.termPrint(output, '[SEC]: Integrity: 100% | Hash: SHA3-512 Verified.');
+            },
+            'sigma-cs': (a) => {
+                const sub = a[0];
+                if (sub === 'quiz') {
+                    this.termPrint(output, 'Σ CS QUIZ: Q: What is the complexity of Shard Sort? A: O(log N).');
+                } else {
+                    this.termPrint(output, 'Σ CS: Running scheduler simulation mission...');
+                }
+            },
+            'sigma-sync': () => {
+                this.termPrint(output, 'Σ SYNC: Establishing PQC-1024 Handshake...');
+                setTimeout(() => this.termPrint(output, '[SUCCESS]: Master Parity Achieved.'), 1000);
+            }
         };
 
         if (cmds[name]) cmds[name](args);
@@ -121,10 +179,6 @@ class SigmaSystem {
         div.textContent = text;
         output.appendChild(div);
         output.scrollTop = output.scrollHeight;
-    }
-
-    spawnToast(msg) {
-        console.log(`[Σ TOAST]: ${msg}`);
     }
 }
 
