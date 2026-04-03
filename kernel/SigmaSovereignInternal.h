@@ -1,39 +1,39 @@
 /* 
- Σ SIGMAOS ZENITH SUPREME: INTERNAL KERNEL UTILS (v1300.0)
- Absolute Zero-Dependency Replacements for Forbidden Stdlib Functions.
+ Σ SIGMAOS ZENITH: SOVEREIGN INTERNAL UTILS (v2300.0)
+ Mission: SSE-Accelerated Silicon Performance.
 */
 
 #ifndef SIGMA_INTERNAL_H
 #define SIGMA_INTERNAL_H
 
-// Σ PRIVE-LEVEL LOGGING
-static inline void sigma_print(const char* s) {
-   // Hardware-direct character emit logic placeholder (Bare-metal UART/TTY)
-}
+#include <stdint.h>
+#include <stdbool.h>
 
-// Σ BASIC STRING OPS
-static inline void sigma_strcpy(char* dest, const char* src) {
-    while ((*dest++ = *src++));
-}
+// Σ BARE-METAL PRINTS
+void sigma_print(const char* s);
 
-static inline int sigma_strstr(const char* haystack, const char* needle) {
-    if (!*needle) return 1;
-    for (; *haystack; haystack++) {
-        if (*haystack == *needle) {
-            const char *h = haystack, *n = needle;
-            while (*h && *n && *h == *n) { h++; n++; }
-            if (!*n) return 1;
-        }
+// Σ SSE-ACCELERATED MEMORY SHARD (v2300.0)
+inline void* sigma_memcpy_sse(void* dest, const void* src, uint32_t n) {
+    uint8_t* d = (uint8_t*)dest;
+    const uint8_t* s = (const uint8_t*)src;
+    while (n >= 16) {
+        // Σ SSE-Direct Block Transfer
+        __asm__ volatile (
+            "movups (%0), %%xmm0\n"
+            "movups %%xmm0, (%1)\n"
+            :: "r"(s), "r"(d) : "xmm0", "memory"
+        );
+        d += 16;
+        s += 16;
+        n -= 16;
     }
-    return 0;
+    // Handle alignment fragments (linear byte pass)
+    while (n--) *d++ = *s++;
+    return dest;
 }
 
-// Σ RANDOM NUMBER GENERATOR (LINEAR CONGRUENTIAL)
-static unsigned long _sigma_seed = 0x51634A;
-#define SIGMA_RAND_MAX 32767
-static inline int sigma_rand() {
-    _sigma_seed = _sigma_seed * 1103515245 + 12345;
-    return (unsigned int)(_sigma_seed / 65536) % 32768;
-}
+// Σ UTILS: STRING SHARDS
+char* sigma_strcpy(char* dest, const char* src);
+const char* sigma_strstr(const char* str, const char* substr);
 
 #endif
