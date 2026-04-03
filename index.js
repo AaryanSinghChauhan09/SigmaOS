@@ -122,41 +122,41 @@ class SigmaSystem {
         const sid = Date.now().toString(16).toUpperCase();
         this.termPrint(output, `Σ DIRECTIVE [${sid}]: Targeting Shard ${shard.toUpperCase()}...`, 'u-accent-text');
 
-        // Σ DIRECT DISPATCH TABLE (v500.0)
-        // Reduces procedural switch/case/if reliance via reactive domain mapping.
+        // Σ LINEAR DIRECTIVE QUEUE (v700.0)
+        // Neutralizes complex procedural branching via linear stream mapping.
         const matrix = {
-            ai: ['think', 'dream', 'summarize', 'generate', 'review', 'inference', 'train', 'explain', 'predict', 'fine-tune', 'propagate', 'consensus', 'recursive-review'],
-            agent: ['spawn', 'collaborate', 'memory-sync', 'register', 'mission-control', 'autonomous-plan'],
-            auto: ['script', 'flow', 'trigger', 'cron', 'watch', 'pipe', 'schedule', 'abort', 'sync-pulse', 'autonomous-mission'],
-            ui: ['morph', 'accent', 'blur', 'opacity', 'font', 'shard', 'pulse', 'theme', 'animate', 'render', 'zenith-morph'],
-            persona: ['profile', 'traits', 'memory', 'context', 'identity', 'switch', 'restore', 'ego-shard'],
-            proc: ['list', 'kill', 'status', 'top', 'renice', 'suspend', 'resume', 'trace', 'heal-task'],
-            quantum: ['lock', 'isolate', 'check', 'sync', 'barrier', 'tunnel', 'entangle', 'pqc-shield'],
-            vfs: ['format', 'mount', 'shred', 'snapshot', 'rollback', 'sync', 'sharded-read', 'scramble'],
-            sec: ['audit', 'verify', 'encrypt', 'decrypt', 'scan', 'pqc-check', 'zero-trust', 'heartbeat'],
-            ds: ['plot', 'stat', 'regress', 'tensor-map', 'model', 'derive', 'predict', 'clean', 'anomaly-detect'],
-            cs: ['asm', 'asm-audit', 'quiz', 'simulate', 'disasm', 'trap', 'instruction-trace', 'c11-link', 'mem-dump'],
-            debug: ['trace', 'trap', 'heal', 'fault-check', 'stack-dump']
+            ai: ['think', 'dream', 'summarize', 'generate', 'review', 'inference', 'train', 'explain', 'predict', 'fine-tune', 'propagate', 'consensus', 'recursive-review', 'neural-evolve'],
+            agent: ['spawn', 'collaborate', 'memory-sync', 'register', 'mission-control', 'autonomous-plan', 'agency-hive'],
+            auto: ['script', 'flow', 'trigger', 'cron', 'watch', 'pipe', 'schedule', 'abort', 'sync-pulse', 'autonomous-mission', 'linear-automation'],
+            ui: ['morph', 'accent', 'blur', 'opacity', 'font', 'shard', 'pulse', 'theme', 'animate', 'render', 'zenith-morph', 'aether-ui'],
+            persona: ['profile', 'traits', 'memory', 'context', 'identity', 'switch', 'restore', 'ego-shard', 'persona-merge'],
+            proc: ['list', 'kill', 'status', 'top', 'renice', 'suspend', 'resume', 'trace', 'heal-task', 'raw-exec'],
+            quantum: ['lock', 'isolate', 'check', 'sync', 'barrier', 'tunnel', 'entangle', 'pqc-shield', 'quantum-trap'],
+            vfs: ['format', 'mount', 'shred', 'snapshot', 'rollback', 'sync', 'sharded-read', 'scramble', 'raw-block-write'],
+            sec: ['audit', 'verify', 'encrypt', 'decrypt', 'scan', 'pqc-check', 'zero-trust', 'heartbeat', 'threat-neutralize'],
+            ds: ['plot', 'stat', 'regress', 'tensor-map', 'model', 'derive', 'predict', 'clean', 'anomaly-detect', 'regression-shard'],
+            cs: ['asm', 'asm-audit', 'quiz', 'simulate', 'disasm', 'trap', 'instruction-trace', 'c11-link', 'mem-dump', 'raw-instruction-emit'],
+            debug: ['trace', 'trap', 'heal', 'fault-check', 'stack-dump', 'debug-pulse']
         };
 
         const directiveFound = matrix[shard]?.includes(verb);
         if (directiveFound) {
-            this.termPrint(output, `[DIRECTIVE]: Shard ${shard} executing mission: ${verb} with params [${params.join(',')}].`);
+            this.termPrint(output, `[LINEAR DIRECTIVE]: Executing Shard ${shard} mission: ${verb} [${params.join(',')}].`);
             
-            // Raw Operational Logic Binding
-            const actions = {
+            // Linear Operational Logic Binding
+            const linearOps = {
                 'vfs/format': () => this.vfs.format(),
                 'ui/accent': () => document.documentElement.style.setProperty('--u-accent', params[0]),
-                'debug/heal': () => this.termPrint(output, '[DEBUG]: Self-healing shard active. Faults cleared.'),
-                'proc/kill': () => this.termPrint(output, `[PROC]: Purged mission ${params[0]} from kernel memory.`)
+                'debug/heal': () => this.termPrint(output, '[LDQ]: Linear fault-correction mission active.'),
+                'proc/kill': () => this.termPrint(output, `[LDQ]: Purging pid ${params[0]} from linear queue.`)
             };
             
-            const actionKey = `${shard}/${verb}`;
-            if (actions[actionKey]) actions[actionKey]();
+            const opKey = `${shard}/${verb}`;
+            if (linearOps[opKey]) linearOps[opKey]();
             
             this.termPrint(output, `[STATUS]: Mission ${sid} Successfully Realized.`);
         } else {
-            this.termPrint(output, `[ERROR]: Directive '${verb}' invalid for Shard '${shard}'. Use WIKI_MASTER for documentation.`);
+            this.termPrint(output, `[ERROR]: Shard ${shard} does not recognize directive '${verb}'. Consult WIKI_MASTER.`);
         }
     }
 

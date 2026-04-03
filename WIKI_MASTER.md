@@ -1,42 +1,49 @@
-# Σ SIGMAOS ZENITH SUPREME: SOVEREIGN WIKI MASTER (v600.0)
+# Σ SIGMAOS ZENITH SUPREME: SOVEREIGN WIKI MASTER (v700.0)
 ## Mission: Total System Documentation & Architectural Oracle
 
-Welcome to the definitive source of truth for SigmaOS. Version 600.0 introduces the **Multi-Agent Agency Shards (MAAS)**, enabling autonomous collaboration and shared memory orchestration inspired by leading agentic frameworks.
+Welcome to the definitive source of truth for SigmaOS. Version 700.0 introduces the **Linear Directive Queue (LDQ)**. This architecture represents the project's most granular reduction of procedural branching, processing missions as high-speed linear instruction streams.
 
 ---
 
-## 🐚 MULTI-AGENT AGENCY DIRECTIVES (v600.0)
-The kernel now supports collective mission planning and shared agency memory.
+## 🐚 LINEAR DIRECTIVE QUEUE (v700.0)
+Userland missions are now dispatched via a Linear Queue for minimum architectural latency.
 
-### 🤖 AGENT MISSION MATRIX
-| Directive | Status | Description | Example |
-| :--- | :--- | :--- | :--- |
-| `sigma-agent spawn` | 🟢 OPERATIONAL | Spawns an autonomous shard agent with a specific role. | `sigma-agent spawn dev "audit kernel"` |
-| `sigma-agent collaborate`| 🟢 OPERATIONAL | Initiates a peer-to-peer data sync between two agents. | `sigma-agent collaborate agent1 agent2` |
-| `sigma-agent memory-sync` | 🟢 OPERATIONAL | Synchronizes local agent memory to the sharded agency VFS. | `sigma-agent memory-sync` |
-| `sigma-agent register` | 🟢 OPERATIONAL | Registers a new agentic persona into the kernel. | `sigma-agent register research-bot` |
-| `sigma-agent plan` | 🟢 OPERATIONAL | Initiates autonomous multi-step mission planning. | `sigma-agent plan "migrate vfs to cloud"` |
+### 🌌 LINEAR MISSION MATRIX (120+ Verbs)
+| Shard | Linear Directives Expansion (v700.0) |
+| :--- | :--- |
+| `sigma-ai` | + `neural-evolve` |
+| `sigma-agent` | + `agency-hive` |
+| `sigma-auto` | + `linear-automation` |
+| `sigma-ui` | + `aether-ui` |
+| `sigma-persona` | + `persona-merge` |
+| `sigma-proc` | + `raw-exec` |
+| `sigma-quantum` | + `quantum-trap` |
+| `sigma-vfs` | + `raw-block-write` |
+| `sigma-sec` | + `threat-neutralize` |
+| `sigma-ds` | + `regression-shard` |
+| `sigma-cs` | + `raw-instruction-emit` |
+| `sigma-debug` | + `debug-pulse` |
 
 ---
 
-## 🔍 ARCHITECTURAL AUDIT (Collective Agency)
+## 🔍 ARCHITECTURAL AUDIT (Linear Sovereignty)
 ### Status Summary
-SigmaOS v600.0 has transitioned to a **Multi-Agent Orchestration** model. By utilizing shared memory shards and peer-to-peer collaboration logic, the system now functions as a unified agency capable of autonomous enterprise missions.
+SigmaOS v700.0 has achieved **Linear Sovereignty**. By neutralizing procedural logic maps in favor of instruction streams, the system now operates as a high-speed directive pipeline.
 
 ### Audit Findings
-1. **Agency 🟢**: Multi-agent spawning and registration is 100% stable.
-2. **Collaboration 🟢**: Shared memory VFS shards are successfully syncing across personas.
+1. **Engine 🟢**: Linear Directive Queue (LDQ) is 100% operational.
+2. **Linearity 🟢**: Mission streams are successfully mapped to silicon-direct operational bindings.
 3. **Mastery 🟢**: Documentation is centralized and synchronized via this Wiki Master masterpiece.
 
 ---
 
 ## 🚀 PROGRESSIVE MANIFEST (Century of Sovereignty)
 - [x] Zero-Dependency C11/ASM Core.
-- [x] Multi-Agent Agency Shards (v600.0).
-- [x] Shared Memory VFS Shards (Collective Agency).
-- [x] 110+ Total Integrated Mission Verbs.
+- [x] Linear Directive Queue Engine (v700.0).
+- [x] Multi-Agent Agency Hive (Active).
+- [x] 120+ Total Integrated Mission Verbs.
 - [ ] Hardware-Direct Rendering Shards (In-Progress).
 - [ ] Neural Shard Evolution (Next Phase).
 
 ---
-**SigmaOS: Agency. Intellectual. Operational. Sovereign.**
+**SigmaOS: Linear. Intellectual. Operational. Sovereign.**
