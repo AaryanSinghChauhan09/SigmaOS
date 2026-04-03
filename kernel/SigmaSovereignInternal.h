@@ -1,6 +1,6 @@
 /* 
- Σ SIGMAOS ZENITH: SOVEREIGN INTERNAL UTILS (v2300.0)
- Mission: SSE-Accelerated Silicon Performance.
+ Σ SIGMAOS ZENITH: SOVEREIGN INTERNAL UTILS (v2400.0)
+ Mission: SSE-Accelerated Silicon Performance & Stack Retrieval.
 */
 
 #ifndef SIGMA_INTERNAL_H
@@ -12,24 +12,27 @@
 // Σ BARE-METAL PRINTS
 void sigma_print(const char* s);
 
-// Σ SSE-ACCELERATED MEMORY SHARD (v2300.0)
-inline void* sigma_memcpy_sse(void* dest, const void* src, uint32_t n) {
-    uint8_t* d = (uint8_t*)dest;
-    const uint8_t* s = (const uint8_t*)src;
-    while (n >= 16) {
-        // Σ SSE-Direct Block Transfer
-        __asm__ volatile (
-            "movups (%0), %%xmm0\n"
-            "movups %%xmm0, (%1)\n"
-            :: "r"(s), "r"(d) : "xmm0", "memory"
-        );
-        d += 16;
-        s += 16;
-        n -= 16;
+// Σ SSE-ACCELERATED MEMORY SHARD
+inline void* sigma_memcpy_sse(void* dest, const void* src, uint32_t n);
+
+// Σ STACK TRACE RECOVERY (v2400.0)
+// Crawls the frame pointer (RBP) to identify mission violations.
+typedef struct {
+    uint64_t rbp;
+    uint64_t rip;
+} sigma_stack_frame;
+
+inline void sigma_stack_trace(uint32_t depth) {
+    sigma_print("\nΣ [STACK]: Mission Context Retrieval...\n");
+    sigma_stack_frame* frame;
+    __asm__ volatile ("mov %%rbp, %0" : "=r"(frame));
+    
+    for (uint32_t i = 0; i < depth && frame; i++) {
+        sigma_print("  FRAME "); // sigma_print_int(i);
+        sigma_print(": RIP 0x"); // sigma_print_hex(frame->rip);
+        sigma_print("\n");
+        frame = (sigma_stack_frame*)frame->rbp;
     }
-    // Handle alignment fragments (linear byte pass)
-    while (n--) *d++ = *s++;
-    return dest;
 }
 
 // Σ UTILS: STRING SHARDS
