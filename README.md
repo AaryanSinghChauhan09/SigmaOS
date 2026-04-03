@@ -58,8 +58,26 @@ All lore, architectural specs, and novice guides have been systematically assemb
 SigmaOS implements a native, zero-dependency **Industrial ML Training Pipeline** on the silicon.
 - **Core Architecture**: Sigma Transformer (2-Layer / 4-Head / 8-bit Quantized)
 - **Factual Accuracy**: 100.00% (VFS Native Context)
-- **Reasoning Accuracy**: 94.2% (Tuned on Help/Mission Domain)
 - **Training Pipeline**: [✅ READY] | [Pre-training: COMPLETE]
+
+## 🛠️ Omni-CLI Command Domains
+SigmaOS has evolved into a unified industrial ecosystem managed entirely via the terminal:
+
+### 🔮 AI & ML
+- `sigma-ai train`: Industrial next-token pretraining.
+- `sigma-ai evaluate`: Industrial model benchmarking.
+- `sigma-ai explain`: Natural language command explanation.
+
+### 📊 Data Science (DS)
+- `sigma-ds preprocess`: Clean and prepare raw silicon datasets.
+- `sigma-ds visualize`: Native charting and exploratory analysis.
+- `sigma-ds feature-engineer`: Extracting signal from raw hardware logs.
+
+### 🧮 DSA & CS
+- `sigma-dsa run`: Execute algorithm shards (O(log N) optimized).
+- `sigma-dsa benchmark`: Compare cross-algorithm performance.
+- `sigma-cs compile`: Industrial freestanding C11/ASM compilation.
+- `sigma-cs simulate`: Compute theory and OS scheduling simulations.
 
 ## 🤝 Contributing
 Development on the core architecture is highly restricted. Only Pure C11 or Assembly pull requests are accepted. Do not include external headers, standard packages, or high-level scripting logic. 
