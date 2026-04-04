@@ -1,4 +1,8 @@
 name: Σ SIGMAOS ZENITH CI
+
+env:
+  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
+
 on:
   push:
     branches: [ main ]
@@ -8,7 +12,7 @@ jobs:
   sovereign-audit:
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@v3
+    - uses: actions/checkout@v4
     - name: Σ KERNEL STRUCTURAL VERIFICATION
       run: |
         node --check index.js

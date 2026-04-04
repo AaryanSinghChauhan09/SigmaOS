@@ -17,8 +17,8 @@
  * SILICON-DIRECT SYSCALL BRIDGE (x86_64)
  * Used only when running on Linux host for testing (not in bare-metal kernel)
  * ========================================================================= */
-static inline long sigma_syscall(long n, long a1, long a2, long a3) {
-    long ret;
+static inline i64 sigma_syscall(i64 n, i64 a1, i64 a2, i64 a3) {
+    i64 ret;
     __asm__ __volatile__ (
         "syscall"
         : "=a"(ret)
@@ -237,7 +237,7 @@ CPUIDResult sigma_cpuid(u32 leaf) {
 
 /* Write to serial COM1 (Linux testing path) */
 void k_print_raw(const char* s) {
-    sigma_syscall(1, 1, (long)(usize)s, (long)sigma_strlen(s));
+    sigma_syscall(1, 1, (i64)(usize)s, (i64)sigma_strlen(s));
 }
 
 /* =========================================================================

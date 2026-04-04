@@ -1,5 +1,8 @@
 name: Σ SigmaOS Sovereign CI Zenith (v150.8)
 
+env:
+  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
+
 on:
   push:
     branches: [ main ]

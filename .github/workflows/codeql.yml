@@ -1,5 +1,8 @@
 name: "Σ SIGMAOS: SOVEREIGN CODE SCANNING (CODEQL)"
 
+env:
+  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
+
 on:
   push:
     branches: [ "main" ]
@@ -30,7 +33,7 @@ jobs:
 
     # Initializes the CodeQL tools for scanning.
     - name: Initialize CodeQL
-      uses: github/codeql-action/init@v3
+      uses: github/codeql-action/init@v4
       with:
         languages: ${{ matrix.language }}
 
@@ -45,6 +48,6 @@ jobs:
         make -j$(nproc) CC=x86_64-linux-gnu-gcc AS=nasm LD=x86_64-linux-gnu-ld
 
     - name: Perform CodeQL Analysis
-      uses: github/codeql-action/analyze@v3
+      uses: github/codeql-action/analyze@v4
       with:
         category: "/language:${{matrix.language}}"
