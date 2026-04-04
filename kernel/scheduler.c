@@ -7,75 +7,56 @@
  * =========================================================================
  */
 
+#include "scheduler.h"
 #include "../libc/sigma_libc.h"
 #include "../libc/sigma_types.h"
 
-#define MAX_TASKS 64
-#define STACK_SIZE 16384
 
-typedef enum {
-    TASK_STATE_READY,
-    TASK_STATE_RUNNING,
-    TASK_STATE_SLEEPING,
-    TASK_STATE_BLOCKED,
-    TASK_STATE_DEAD
-} task_state_t;
-
-typedef struct {
-    pid_t pid;
-    task_state_t state;
-    virt_addr_t stack_ptr;
-    virt_addr_t entry_point;
-    sigma_u64 cpu_time;
-    sigma_u32 priority;
-} task_control_block_t;
-
-static task_control_block_t task_list[MAX_TASKS];
-static int current_task_idx = -1;
-static int total_tasks = 0;
-
-void sigma_scheduler_init() {
-    sigma_memset(task_list, 0, sizeof(task_list));
-    current_task_idx = -1;
-    total_tasks = 0;
-    sigma_printf("[KERNEL] Scheduler initialized (MAX_TASKS: %d)\n", MAX_TASKS);
-}
-
-sigma_err_t sigma_task_create(virt_addr_t entry, sigma_u32 priority) {
-    if (total_tasks >= MAX_TASKS) return SIGMA_ENOMEM;
-    
-    int idx = total_tasks++;
-    task_list[idx].pid = idx + 1;
-    task_list[idx].state = TASK_STATE_READY;
-    task_list[idx].entry_point = entry;
-    task_list[idx].priority = priority;
-    task_list[idx].cpu_time = 0;
-    
-    sigma_printf("[KERNEL] Task created (PID: %d, Entry: 0x%llx)\n", task_list[idx].pid, entry);
-    return SIGMA_OK;
-}
+task_control_block_t task_list[MAX_TASKS];
+int current_task_idx = -1;
+int total_tasks = 0;
 
 void sigma_schedule() {
+
     if (total_tasks == 0) return;
     
-    // Simple Round-Robin Sharding
-    int next_idx = (current_task_idx + 1) % total_tasks;
-    
-    // Check if task is valid for running
-    while (task_list[next_idx].state != TASK_STATE_READY && task_list[next_idx].state != TASK_STATE_RUNNING) {
-        next_idx = (next_idx + 1) % total_tasks;
+    /* 1. Find highest priority among READY tasks */
+    sigma_u32 max_prio = 0;
+    sigma_bool any_ready = SIGMA_FALSE;
+    for (int i = 0; i < total_tasks; i++) {
+        if (task_list[i].pid != 0 && (task_list[i].state == TASK_STATE_READY || task_list[i].state == TASK_STATE_RUNNING)) {
+            if (!any_ready || task_list[i].priority > max_prio) {
+                max_prio = task_list[i].priority;
+                any_ready = SIGMA_TRUE;
+            }
+        }
     }
-    
-    if (current_task_idx != -1) {
-        task_list[current_task_idx].state = TASK_STATE_READY;
+
+    if (!any_ready) return; /* No tasks ready to run */
+
+    /* 2. Round-Robin Sharding: find next task with max_prio */
+    int start = (current_task_idx + 1) % total_tasks;
+    int next_idx = -1;
+    for (int i = 0; i < total_tasks; i++) {
+        int idx = (start + i) % total_tasks;
+        if (task_list[idx].pid != 0 && task_list[idx].state == TASK_STATE_READY && task_list[idx].priority == max_prio) {
+            next_idx = idx;
+            break;
+        }
     }
-    
-    current_task_idx = next_idx;
-    task_list[current_task_idx].state = TASK_STATE_RUNNING;
-    
-    // In a real kernel, we would trigger a context switch here (SovereignTaskSwitch)
-    // sigma_printf("[KERNEL] Context switch to PID: %d\n", task_list[current_task_idx].pid);
+
+    /* 3. Execute Switch */
+    if (next_idx != -1) {
+        if (current_task_idx != -1 && task_list[current_task_idx].state == TASK_STATE_RUNNING) {
+            task_list[current_task_idx].state = TASK_STATE_READY;
+        }
+        current_task_idx = next_idx;
+        task_list[current_task_idx].state = TASK_STATE_RUNNING;
+        
+        /* Note: In bare-metal, we would call SovereignTaskSwitch(current_task_idx) here */
+    }
 }
+
 
 SIGMA_NORETURN void sigma_panic(const char* message) {
     sigma_printf("\nΣ SIGMAOS KERNEL PANIC: %s\n", message);

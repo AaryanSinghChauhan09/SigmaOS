@@ -153,8 +153,6 @@ html, body {
   padding: 0 20px;
   /* IE 10+, Edge Legacy */
   -ms-overflow-style: none;
-  /* Firefox 64+ — placed here rather than in @supports to avoid linter false-positives */
-  scrollbar-width: none; /* stylelint-disable-line property-no-unknown */
 }
 
 /* Chrome 4+, Safari 3.1+, Opera 11.5+ */

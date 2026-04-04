@@ -7,7 +7,7 @@
  * =========================================================================
  */
 
-#include <stdbool.h>
+#include "../SigmaC11.h"
 
 #define MAX_SYMBOLS 1024
 #define MAX_PATH 256
@@ -40,40 +40,50 @@ void SigmaIndexFile(const char* path, const char* content) {
     while (*ptr && g_SymbolCount < MAX_SYMBOLS) {
         // Extract line
         int i = 0;
-        while (*ptr && *ptr != '\n' && i < 511) line[i++] = *ptr++;
+        while (*ptr && *ptr != '\n' && i < 511) {
+            line[i++] = *ptr++;
+        }
         line[i] = '\0';
         if (*ptr == '\n') ptr++;
         
         // Simple Function Match: type name(args) {
-        if ((strstr(line, "void ") || strstr(line, "int ") || strstr(line, "char* ")) && 
-            strchr(line, '(') && strchr(line, ')') && !strchr(line, ';')) {
+        if ((sigma_strstr(line, "void ") || sigma_strstr(line, "int ") || sigma_strstr(line, "char* ")) && 
+            sigma_strrchr(line, '(') && sigma_strrchr(line, ')') && !sigma_strrchr(line, ';')) {
             
             CodeSymbol* sym = &g_SymbolTable[g_SymbolCount++];
             sym->type = SYM_FUNCTION;
             sym->line = line_num;
-            strcpy(sym->path, path);
+            sigma_strncpy(sym->path, path, MAX_PATH - 1);
+            sym->path[MAX_PATH - 1] = '\0';
             
             // Extract Name (Basic)
-            char* name_start = strchr(line, ' ') + 1;
-            char* name_end = strchr(name_start, '(');
-            int len = name_end - name_start;
-            strncpy(sym->name, name_start, len);
-            sym->name[len] = '\0';
+            const char* name_start = sigma_strstr(line, " ") + 1;
+            const char* name_end = sigma_strstr(name_start, "(");
+            if (name_end) {
+                sigma_size_t len = (sigma_size_t)(name_end - name_start);
+                if (len > 63) len = 63;
+                sigma_memcpy(sym->name, name_start, len);
+                sym->name[len] = '\0';
+            }
         }
         
         // Simple Struct Match: struct name {
-        if (strstr(line, "struct ") && strchr(line, '{')) {
+        if (sigma_strstr(line, "struct ") && sigma_strrchr(line, '{')) {
             CodeSymbol* sym = &g_SymbolTable[g_SymbolCount++];
             sym->type = SYM_STRUCT;
             sym->line = line_num;
-            strcpy(sym->path, path);
+            sigma_strncpy(sym->path, path, MAX_PATH - 1);
+            sym->path[MAX_PATH - 1] = '\0';
             
-            char* name_start = strstr(line, "struct ") + 7;
-            char* name_end = strchr(name_start, ' ');
-            if (!name_end) name_end = strchr(name_start, '{');
-            int len = name_end - name_start;
-            strncpy(sym->name, name_start, len);
-            sym->name[len] = '\0';
+            const char* name_start = sigma_strstr(line, "struct ") + 7;
+            const char* name_end = sigma_strstr(name_start, " ");
+            if (!name_end) name_end = sigma_strrchr(name_start, '{');
+            if (name_end) {
+                sigma_size_t len = (sigma_size_t)(name_end - name_start);
+                if (len > 63) len = 63;
+                sigma_memcpy(sym->name, name_start, len);
+                sym->name[len] = '\0';
+            }
         }
         
         line_num++;
@@ -85,7 +95,10 @@ void SigmaIndexFile(const char* path, const char* content) {
  */
 CodeSymbol* SigmaFindSymbol(const char* name) {
     for (int i = 0; i < g_SymbolCount; i++) {
-        if (strcmp(g_SymbolTable[i].name, name) == 0) return &g_SymbolTable[i];
+        if (sigma_streq(g_SymbolTable[i].name, name)) {
+            return &g_SymbolTable[i];
+        }
     }
-    return NULL;
+    return SIGMA_NULL;
 }
+

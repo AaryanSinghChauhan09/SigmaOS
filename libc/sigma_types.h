@@ -23,13 +23,24 @@ typedef sigma_u64          sigma_size_t;
 typedef sigma_i64          sigma_ssize_t;
 
 typedef int                sigma_bool;
+typedef sigma_i32          pid_t;
+typedef sigma_u64          virt_addr_t;
 
 #define SIGMA_TRUE  1
 #define SIGMA_FALSE 0
 #define SIGMA_NULL  ((void*)0)
 #define SIGMA_UNUSED(x) (void)(x)
-#define SIGMA_OK    0
-#define SIGMA_EIO   1
+
+#define SIGMA_OK      0
+#define SIGMA_EIO     1
+#define SIGMA_ENOMEM  2
+
 typedef int sigma_err_t;
+
+#ifndef SIGMA_NORETURN
+#define SIGMA_NORETURN _Noreturn
+#endif
+
+
 
 #endif

@@ -62,30 +62,64 @@ static void sched_reset(void) {
 }
 
 static int sched_add(uint32_t pid, uint32_t priority) {
-    if (g_task_count >= MAX_TASKS) return -1;
-    tcb_t* t = &g_tasks[g_task_count++];
+    /* Search for a free slot (pid 0 or state DEAD/REAPED) */
+    int slot = -1;
+    for (int i = 0; i < MAX_TASKS; i++) {
+        if (g_tasks[i].pid == 0) {
+            slot = i;
+            break;
+        }
+    }
+    
+    if (slot == -1) return -1;
+    
+    tcb_t* t = &g_tasks[slot];
     t->pid               = pid;
     t->state             = TASK_READY;
     t->priority          = priority;
     t->cpu_time_ns       = 0;
     t->stack_pointer     = 0xC0000000UL - (uint64_t)pid * 4096UL;
     t->quantum_remaining = 10u + priority;   /* higher priority → bigger quantum */
-    return (int)(g_task_count - 1);
+    
+    if (slot >= g_task_count) g_task_count = slot + 1;
+    return slot;
 }
 
-/* Priority-based pick_next: returns index of highest-priority READY task */
+/* Priority-based pick_next with Round-Robin fairness for equal priorities */
 static int sched_pick_next(void) {
-    int best = -1;
-    uint32_t best_prio = 0;
+    if (g_task_count == 0) return -1;
+    
+    uint32_t max_prio = 0;
+    int found_any = 0;
+
+    /* 1. Find the highest priority currently available among READY tasks */
     for (int i = 0; i < g_task_count; i++) {
-        if (g_tasks[i].state == TASK_READY) {
-            if (best == -1 || g_tasks[i].priority > best_prio) {
-                best      = i;
-                best_prio = g_tasks[i].priority;
+        if (g_tasks[i].state == TASK_READY || g_tasks[i].state == TASK_RUNNING) {
+            if (!found_any || g_tasks[i].priority > max_prio) {
+                max_prio = g_tasks[i].priority;
+                found_any = 1;
             }
         }
     }
-    return best;
+    
+    if (!found_any) return -1;
+
+    /* 2. Pick the next task with 'max_prio', starting search after g_current (Round-Robin) */
+    int start = (g_current + 1) % g_task_count;
+    for (int i = 0; i < g_task_count; i++) {
+        int idx = (start + i) % g_task_count;
+        if (g_tasks[idx].state == TASK_READY && g_tasks[idx].priority == max_prio) {
+            return idx;
+        }
+    }
+
+    /* Fallback: if g_current is the only one with max_prio and it's RUNNING, stay there 
+       (Though sched_tick usually sets it to READY before calling pick_next) */
+    if (g_current >= 0 && g_tasks[g_current].state == TASK_RUNNING && g_tasks[g_current].priority == max_prio) {
+        return g_current;
+    }
+
+    return -1;
 }
 
 /* Simulate one scheduling tick (1 ms) */
@@ -95,15 +129,22 @@ static void sched_tick(uint64_t delta_ns) {
         if (g_current >= 0) g_tasks[g_current].state = TASK_RUNNING;
         return;
     }
+    
     tcb_t* cur = &g_tasks[g_current];
     cur->cpu_time_ns += delta_ns;
+    
     if (cur->quantum_remaining > 0) cur->quantum_remaining--;
+    
     if (cur->quantum_remaining == 0) {
         /* Preempt: move back to READY */
-        cur->state             = TASK_READY;
+        cur->state = TASK_READY;
         cur->quantum_remaining = 10u + cur->priority;
-        g_current = sched_pick_next();
-        if (g_current >= 0) g_tasks[g_current].state = TASK_RUNNING;
+        
+        int next = sched_pick_next();
+        if (next >= 0) {
+            g_current = next;
+            g_tasks[g_current].state = TASK_RUNNING;
+        }
     }
 }
 
@@ -137,11 +178,13 @@ static int sched_reap_zombies(void) {
     for (int i = 0; i < g_task_count; i++) {
         if (g_tasks[i].state == TASK_ZOMBIE) {
             g_tasks[i].pid = 0;
+            g_tasks[i].state = TASK_READY; // Reset state for reuse
             reaped++;
         }
     }
     return reaped;
 }
+
 
 /* =========================================================================
  * TEST GROUPS
@@ -249,10 +292,49 @@ static void test_max_tasks(void) {
     printf("\n[GROUP] Task Limit Enforcement\n");
     sched_reset();
 
-    for (int i = 0; i < MAX_TASKS; i++) sched_add((uint32_t)i, 10);
+    for (int i = 0; i < MAX_TASKS; i++) sched_add((uint32_t)(i + 1), 10);
     int overflow = sched_add(999, 10);
     SIGMA_TEST("adding task beyond MAX_TASKS returns -1", overflow == -1);
 }
+
+static void test_empty_scheduler(void) {
+    printf("\n[GROUP] Empty Scheduler Safety\n");
+    sched_reset();
+    int next = sched_pick_next();
+    SIGMA_TEST("pick_next returns -1 when no tasks exist", next == -1);
+}
+
+static void test_slot_reuse(void) {
+    printf("\n[GROUP] Shard Slot Reuse\n");
+    sched_reset();
+    for (int i = 0; i < MAX_TASKS; i++) sched_add((uint32_t)(i + 1), 10);
+    
+    /* Terminate task at slot 5 */
+    sched_terminate(5);
+    sched_reap_zombies();
+    
+    int reused = sched_add(1024, 20);
+    SIGMA_TEST("re-adding task reuses the reaped slot 5", reused == 5);
+}
+
+static void test_priority_rotation(void) {
+    printf("\n[GROUP] Priority Rotation Fairness\n");
+    sched_reset();
+    sched_add(100, 10); // Task A
+    sched_add(101, 10); // Task B
+    
+    g_current = -1;
+    sched_tick(1000000); 
+    int first = g_current;
+    
+    /* Force preemption of first task */
+    g_tasks[first].quantum_remaining = 0;
+    sched_tick(1000000);
+    
+    SIGMA_TEST("scheduler rotates to the next equal-priority peer", g_current != first);
+}
+
+
 
 /* =========================================================================
  * ENTRY POINT
@@ -269,6 +351,10 @@ int main(void) {
     test_round_robin_fairness();
     test_zombie_reaper();
     test_max_tasks();
+    test_empty_scheduler();
+    test_slot_reuse();
+    test_priority_rotation();
+
 
     printf("\n========================================================\n");
     printf("  Results: %d PASSED | %d FAILED\n", g_passed, g_failed);

@@ -3,32 +3,34 @@
 
 #include "SigmaC11.h"
 
-namespace SigmaOS {
-namespace WindowsShard {
+/* =========================================================================
+ * Σ SIGMAOS: SOVEREIGN REGISTRY SHARD (v20.0 - PURE C11)
+ * ========================================================================= */
 
-enum class RegistryHive {
-    LOCAL_MACHINE,
-    CURRENT_USER,
-    SYSTEM,
-    SOFTWARE
-};
+typedef enum sigma_registry_hive_t {
+    SIGMA_HIVE_LOCAL_MACHINE,
+    SIGMA_HIVE_CURRENT_USER,
+    SIGMA_HIVE_SYSTEM,
+    SIGMA_HIVE_SOFTWARE
+} sigma_registry_hive_t;
 
-class SovereignRegistry : public SigmaObject {
-public:
-    const char* type_name() const noexcept override { return "SovereignRegistry"; }
+typedef struct sigma_registry_t {
+    sigma_obj_header_t hdr;   /* Shard header for introspection */
+    sigma_u32 entries_sharded;
+    void* internal_map;       /* Pointer to hashmap/tree structure */
+} sigma_registry_t;
 
-    void SetValue(RegistryHive hive, const char* path, const char* key, const char* value);
-    const char* GetValue(RegistryHive hive, const char* path, const char* key);
-    void DeleteValue(RegistryHive hive, const char* path, const char* key);
+/* --- Core Registry API --- */
 
-    void LoadFromDisk(const char* filePath);
-    void SaveToDisk(const char* filePath);
+sigma_status_t sigma_registry_init(sigma_registry_t* reg);
+sigma_status_t sigma_registry_set(sigma_registry_t* reg, sigma_registry_hive_t hive, const char* path, const char* key, const char* value);
+const char*    sigma_registry_get(sigma_registry_t* reg, sigma_registry_hive_t hive, const char* path, const char* key);
+sigma_status_t sigma_registry_delete(sigma_registry_t* reg, sigma_registry_hive_t hive, const char* path, const char* key);
 
-private:
-   sigma_u32 _entries_sharded = 0;
-};
+/* --- Persistence --- */
 
-} // namespace WindowsShard
-} // namespace SigmaOS
+sigma_status_t sigma_registry_load(sigma_registry_t* reg, const char* file_path);
+sigma_status_t sigma_registry_save(sigma_registry_t* reg, const char* file_path);
 
-#endif
+#endif /* SOVEREIGN_REGISTRY_H */
+

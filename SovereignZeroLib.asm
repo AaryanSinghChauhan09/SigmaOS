@@ -36,8 +36,9 @@ _sigma_sys_exit:
     syscall
     ret
 
-; _sigma_sys_mmap(rdi: addr, rsi: len, rdx: prot, r10: flags, r8: fd, r9: off)
+; _sigma_sys_mmap(rdi: addr, rsi: len, rdx: prot, rcx: flags, r8: fd, r9: off)
 _sigma_sys_mmap:
+    mov r10, rcx        ; System Call uses R10 instead of RCX for 4th arg
     mov rax, 9          ; sys_mmap
     syscall
     ret

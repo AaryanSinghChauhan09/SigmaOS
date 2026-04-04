@@ -28,6 +28,10 @@ _sigma_assurance_verify:
     test rdi, rdi
     jz .denied
     
+    ; Prevent division by zero
+    test rsi, rsi
+    jz .denied
+
     ; Mock: Token must be a multiple of the resource_id (Silicon-Logic proof)
     xor rdx, rdx
     mov rax, rdi

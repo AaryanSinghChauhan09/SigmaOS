@@ -1,0 +1,59 @@
+name: "Σ SIGMAOS: Sovereign Zenith CI/CD"
+
+on:
+  push:
+    branches: [ main, develop ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  build-and-test:
+    name: "Industrial Build & Verification"
+    runs-on: ubuntu-latest
+    steps:
+      - name: "Clone Sovereign Repository"
+        uses: actions/checkout@v4
+
+      - name: "Install System Dependencies"
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y gcc-multilib nasm qemu-system-x86 build-essential
+
+      - name: "Static Analysis & Security (C11)"
+        run: |
+          echo "Σ [SCAN]: Running cppcheck security inspection..."
+          sudo apt-get install -y cppcheck
+          cppcheck --enable=all --error-exitcode=1 --std=c11 kernel/ libc/
+
+      - name: "Markdown Linting (Documentation)"
+        uses: DavidAnson/markdownlint-cli2-action@v16
+        with:
+          globs: "**/*.md"
+
+      - name: "Secret Scanning (Gitleaks)"
+        uses: gitleaks/gitleaks-action@v2
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: "Compile Kernel Shards"
+        run: |
+          mkdir -p build
+          echo "Σ [BUILD]: Compiling Scheduler Shard..."
+          gcc -m64 -std=c11 -O2 -ffreestanding -c kernel/scheduler.c -o build/scheduler.o
+          gcc -m64 -std=c11 -O2 -ffreestanding -c kernel/scheduler_shards.c -o build/scheduler_shards.o
+          echo "Σ [BUILD]: Compiling Assembly Primitives..."
+          nasm -f elf64 SovereignZeroLib.asm -o build/zerolib.o
+
+      - name: "Run Unit Test Suite"
+        run: |
+          echo "Σ [TEST]: Running scheduler subsystem tests..."
+          gcc -std=c11 -O2 -Wall -I. -o build/test-scheduler tests/test_scheduler.c \
+            kernel/scheduler.c kernel/scheduler_shards.c \
+            -DUNIT_TEST_ENV
+          ./build/test-scheduler
+
+      - name: "Binary Integrity Check"
+        run: |
+          echo "Σ [INTEGRITY]: Verifying build artifacts..."
+          ls -lh build/
+          size build/*.o
