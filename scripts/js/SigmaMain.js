@@ -305,6 +305,20 @@ window.addEventListener('DOMContentLoaded', () => {
         }, 400);
     };
 
-    window.purgeUnusedShards = () => window.SIGMA.store.purge();
     window.openWindow = (id) => window.SIGMA.wm.open(id);
+
+    // Dynamic UI Rendering for Sovereign Shards
+    window.SIGMA.renderDistros();
+    window.SIGMA.renderMatrix();
+
+    // Sovereign Zenith Autonomous Tasks
+    window.SIGMA.scheduleAutoBackup();
+    
+    window.runBiasAudit = () => aiShard.runBiasAudit();
+    window.runSelfHealing = () => aiShard.selfHeal();
+    window.createSnapshot = (name) => window.SIGMA.createSnapshot(name);
+
+    setTimeout(() => {
+        window.SIGMA.spawnToast('ZENITH: Self-Healing Architecture Online.');
+    }, 5000);
 });

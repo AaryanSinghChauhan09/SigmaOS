@@ -1,65 +1,66 @@
-# OmniCLI Zero-Dependency Reference Guide
+# Σ OmniCLI: The Sovereign Dispatcher Reference (v3.0)
 
-SigmaOS operates via the `SovereignOmniCLI`, a native C11 dispatcher that handles all kernel triggers natively. Due to our zero-dependency constraints, we do not use bash wrappers.
+SigmaOS operations are orchestrated via the `sigma` command. This native C11 dispatcher maps directly to kernel shards, neutralizing the need for high-level wrappers or legacy shells.
 
-### Available System Invokers
+## 🏛️ Core Modules Matrix
 
-#### System Operations (`sys`)
+### ⚙️ System & Kernel (`sys`, `ps`, `shard`, `cron`, `hook`)
+- `sigma sys <kill|tune|irq|info>`: Direct kernel-level resource management.
+- `sigma ps`: Advanced process scheduler and cgroup hierarchy control.
+- `sigma shard <load|unload|reload>`: Hot-modular execution environment control.
+- `sigma cron`: Native task scheduling without background daemons.
+- `sigma hook`: Hardware event binding (USB, Wifi, Battery).
 
-- **`sigma sys kill <pid>`**: Instantly terminates processes via raw `_sigma_sys_kill_pid` C hooks bypassing standard DAEMON constraints.
+### 🌌 Linux USP Absorption (`proc`, `bpf`, `cg`, `ns`, `io`, `numa`, `mem`)
+- `sigma proc`: Virtual filesystem mapping for kernel state.
+- `sigma bpf`: eBPF/XDP program deployment and syscall tracing.
+- `sigma cg`: Cgroups v2 resource isolation.
+- `sigma ns`: PID/NET/MNT/USER namespace sharding.
+- `sigma io`: io_uring asynchronous ring-buffer I/O.
+- `sigma mem`: THP, ZRAM, KSM, and OOM-Killer priority tuning.
+- `sigma linux-usps all`: Activate every unique selling proposition of the Linux kernel.
 
-#### Virtual File System (`fs`)
+### 💾 Storage & Files (`fs`, `vcs`, `vault`)
+- `sigma fs <ls|read|mount|snapshot>`: Universal filesystem dispatcher (EXT4, Btrfs, NFS, OverlayFS).
+- `sigma vcs`: Memory-snapshot based version control (Git-parity).
+- `sigma vault`: Sovereign "Chrono-Vault" snapshot management (Time Machine parity).
 
-- **`sigma fs ls <target>`**: Directly queries the SigmaOS mapped-memory directory trees identically to standard Linux `ls`.
-- **`sigma fs read <target>`**: Reads the raw buffer shards of an exact file seamlessly like `cat`.
+### 🌐 Networking (`net`, `http`)
+- `sigma net`: Zero-Trust mesh networking and Aether handshake.
+- `sigma http`: Nginx-parity proxy, load-balancing, and SSL termination.
 
-#### UI Orchestration (`ui`)
+### 🧠 Intelligence & Math (`ai`, `ml`, `ds`)
+- `sigma ai <prompt|persona|predict>`: Local LLM inference and persona projection.
+- `sigma ml`: Native C11 inference engine for sharded datasets.
+- `sigma ds`: Tensor math and histogram analysis across mapped buffers.
 
-- **`sigma ui open <app_name>`**: Spins up WebAssembly UI contexts mapped from C directly to hardware buffers.
-- **`sigma ui close <app_name>`**: Destroys the UI shard dynamically.
-- **`sigma ui minimize <app_name>`**: Temporarily suspends UI memory projections.
+### 🛡️ Security & Forensics (`sec`, `cyber`, `sandbox`, `clean`)
+- `sigma sec`: PQC keygen (Lattice-based), TPM binding, and ASLR management.
+- `sigma cyber <scan|nmap|metasploit>`: Native offensive security tools.
+- `sigma sandbox`: Namespace-isolated application execution.
+- `sigma clean`: DOD 5220.22-M compliant amnesic silicon wipe.
 
-#### Artificial Intelligence (`ai`)
+### 📦 Distribution & Tools (`pkg`, `container`, `distro`, `tools`)
+- `sigma pkg`: Shard package manager (APT/Pacman/Nix parity).
+- `sigma container`: Docker/OCI native runtime (no daemon).
+- `sigma distro <absorb|activate>`: Absorb any Linux distribution's personality.
+- `sigma tools`: Direct absorption of Git, Docker, Vim, VSCode, etc.
 
-- **`sigma ai <prompt>`**: Passes unformatted text straight to the local `SovereignAIKernel_ExecutePrompt` logic. Execution occurs directly in `kernel/ai_ml/`.
+### ⚖️ Specialized Shards (`law`, `ui`, `media`, `gaming`, `qube`)
+- `sigma law <section>`: Offline Indian Law (BNS/BNSS/BSA) query engine.
+- `sigma ui <open|close|tile|theme>`: Framebuffer-direct window management.
+- `sigma media`: FFmpeg-parity transcoding and streaming.
+- `sigma gaming`: Proton/Vulkan boost and GameMode activation.
+- `sigma qube`: Qubes OS style VM isolation and compartmentalization.
 
-#### Package Management (`pkg`)
+---
 
-- **`sigma pkg install <target>`**: Simulates APT and NixOS declarative configuration fetches by compiling target shards natively into memory instantly.
+## ⚡ The God-Matrix
 
-#### Defensive / Offensive Cyber (`cyber`)
+The ultimate mission directive for absolute system dominance.
 
-- **`sigma cyber scan <target>`**: Deploys native C memory scanners targeting foreign infrastructure without leaning onto Kali Linux style Python hacking suites.
+- `sigma god-matrix`: Simultaneously invokes all distro, tool, and kernel absorbers. 
+  > **Result**: ∞ Absolute Sovereignty Achieved. No competitor survives. ∞
 
-#### Workspace / Developer Tools (`work`)
-
-- **`sigma work edit <file>`**: Spins up the Zenith Editor using zero-latency framebuffers, replacing Vim/VSCode natively.
-- **`sigma work vcs`**: Executes memory-snapshot state saving natively, neutralizing the need for heavy Git object trees.
-- **`sigma work mux`**: Multiplexes shell UI blocks directly in memory. Detaches seamlessly like TMUX.
-
-#### Data Persistence & Caching (`db`)
-
-- **`sigma db query`**: Directly queries RAII structs to bypass PostgreSQL / Redis protocol overhead. Zero SQL string parsing latency.
-
-#### Site Reliability & Delivery (`cicd` / `monitor`)
-
-- **`sigma cicd`**: Hot-reloads all running shards simultaneously. Rivals Jenkins and Kubernetes rolling updates implicitly.
-- **`sigma monitor`**: Dumps native C11 hardware logs directly matching Prometheus/Grafana functionality instantly.
-
-#### Machine Learning (`ml`)
-
-- **`sigma ml <dataset>`**: Invokes `SovereignML_RunInference()` logic. Fully integrated on local silicon with zero python wrapper dependencies.
-
-#### Legal Compliance Database (`law`)
-
-- **`sigma law <section_number>`**: Executes `SovereignIndianLaw_Query()` parsing local C-struct definitions of compliance logs dynamically, guaranteeing offline availability.
-
-#### Defense Connectivity (`net`)
-
-- **`sigma net`**: Performs `SovereignNet_ZeroTrustHandshake()`. Instantiates a `SovereignNetZenith` network shard to securely encrypt outward traffic at the hardware frame level before reaching standard proxy routes.
-
-#### Advanced Data Analytics (`ds`)
-
-- **`sigma ds <query>`**: Starts pure C-driven histogram and tensor math across mapped buffers using `SovereignDataScience_RunAnalysis()`.
-
-> Note: All commands map back directly to `sovereign_tools/SovereignOmniCLI.c`. Any modification must compile through the C11 toolchain structure.
+---
+**Note**: All commands map to `sovereign_tools/SovereignOmniCLI.c`. Modify at shard-level for custom mission verbs.

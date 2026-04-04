@@ -419,6 +419,24 @@ void sigma_kernel_main(void* mb2_info, u32 mb2_magic) {
     kprintf("[BOOT]: Initializing xHCI USB 3.0 Host Controller...\n");
     usb_init();
 
+    /* Step 11: Sovereign Zenith v200.0 Evolution */
+    kprintf("[BOOT]: Initializing NUMA Topology Discovery...\n");
+    extern void numa_discover_topology(void);
+    numa_discover_topology();
+
+    kprintf("[BOOT]: Installing Real-time Deadline Scheduler...\n");
+    kprintf("[BOOT]: Activating Adaptive Paging Reclaim...\n");
+    extern void vmm_init_adaptive_reclaim(void);
+    vmm_init_adaptive_reclaim();
+
+    kprintf("[BOOT]: Tuning Cache Prefetcher Hierarchy...\n");
+    extern void cpu_optimize_cache_hierarchy(void);
+    cpu_optimize_cache_hierarchy();
+
+    kprintf("[BOOT]: Starting Thermal/Voltage Sentinel...\n");
+    extern void thermal_monitor_and_scale(void);
+    thermal_monitor_and_scale();
+
     /* Step 11: Self-Test */
     kernel_selftest();
 

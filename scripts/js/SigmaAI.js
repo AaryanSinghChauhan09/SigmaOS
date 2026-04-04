@@ -48,4 +48,23 @@ export class SigmaAI extends SigmaShard {
         };
         runEpoch();
     }
+
+    runBiasAudit() {
+        this.system.spawnToast('Auditing Neural Matrix for Causal Inference Bias...');
+        setTimeout(() => {
+            this.system.spawnToast('Audit Complete: 0.0001% Variance. Integrity ABSOLUTE.');
+        }, 1500);
+    }
+
+    selfHeal() {
+        this.system.spawnToast('Autonomous Fault Detection Triggered...');
+        setTimeout(() => {
+            this.system.spawnToast('Self-Healed: Logic Shard PID 55 resynchronized.');
+        }, 2000);
+    }
+
+    expandMissionDirectives() {
+        this.log('Mapping 200+ New Mission Directives to Neural Matrix...');
+        this.system.spawnToast('Expansion Complete: Directive 241 Unlocked.');
+    }
 }

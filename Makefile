@@ -46,3 +46,15 @@ build/sigmaos_zenith: $(OBJS)
 
 clean:
 	rm -rf build
+
+# Σ KERNEL UNIT TESTING (v2900.0)
+test: build
+	gcc -o build/sigma-test-memory tests/test_memory.c -Ikernel
+	gcc -o build/sigma-test-scheduler tests/test_scheduler.c -Ikernel
+	./build/sigma-test-memory
+	./build/sigma-test-scheduler
+
+# Σ PERFORMANCE BENCHMARKING
+sigma-bench: build
+	gcc -o build/sigma-bench tools/sigma-bench.c -Ikernel
+	./build/sigma-bench

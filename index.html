@@ -96,6 +96,7 @@
                     <span class="term-line u-muted-text u-margin-b-20">(c) 2026 Sovereign-Zenith-Developer. Absolute System Sovereignty Achieved.</span>
                     <span class="term-line">Type 'help' to see available kernel commands.</span>
                 </div>
+                <div id="shell-suggestions" class="u-margin-t-5 u-padding-x-10"></div>
                 <div class="term-input-line">
                     <span class="term-prompt">root@sigmaos:~#</span>
                     <input type="text" id="terminal-input" class="term-field" autofocus spellcheck="false" autocomplete="off" title="Terminal Input" aria-label="Terminal Input field">
@@ -1424,6 +1425,67 @@ msg: db "SIGMAOS ACTIVE", 10
             </div>
         </section>
 
+        <!-- SYSTEM MONITOR SHARD -->
+        <section id="win-monitor" class="window hidden win-services-default">
+            <div class="win-header">
+                <div class="win-title">📊 Sovereign Monitor (Industrial telemetry)</div>
+                <div class="win-controls">
+                    <div class="win-btn win-min" data-action="minimize" data-win="monitor"></div>
+                    <div class="win-btn win-close" data-action="close" data-win="monitor"></div>
+                </div>
+            </div>
+            <div class="win-content u-scroll-y u-padding-16">
+                <div class="u-flex-between u-margin-b-10">
+                    <span class="u-font-size-xs u-accent-text">SYSTEM HEALTH SCORE</span>
+                    <span id="health-score-val" class="u-font-size-lg u-bold">100</span>
+                </div>
+                <div class="metric-card u-margin-b-10">
+                    <div class="u-font-size-xxs u-muted-text">OOM STATUS: <span class="u-accent-text">STABLE</span></div>
+                    <div class="u-font-size-xxs u-muted-text">NUMA TOPOLOGY: <span class="u-accent-text">DISCOVERED (NODE 0,1)</span></div>
+                </div>
+                <div class="u-font-size-xs u-accent-text u-margin-b-10">MEMORY PRESSURE HEATMAP</div>
+                <div id="memory-heatmap" class="u-grid-4 gap-5 u-margin-b-10">
+                    <!-- Heatmap tiles -->
+                    <div class="status-chip u-bg-accent-low"></div><div class="status-chip u-bg-accent-high"></div>
+                    <div class="status-chip u-bg-accent-low"></div><div class="status-chip u-bg-accent-low"></div>
+                </div>
+                <div class="u-font-size-xs u-accent-text u-margin-b-10">NETWORK FLOWS (ZERO-TRUST)</div>
+                <div id="net-flows-list" class="u-font-size-xxs u-muted-text">
+                    [ZN-882] target: sovereign.node.01 | load: 12% | status: SECURED<br>
+                    [ZN-431] target: aether.mesh.v4    | load: 4%  | status: AUDITED
+                </div>
+                <div id="oom-log-monitor" class="u-margin-t-10 u-font-size-xxs u-accent-text">Heuristics Stable.</div>
+                <div class="u-divider u-margin-t-10"></div>
+                <div class="u-flex-between u-margin-t-10">
+                    <span class="u-font-size-xxs">COLLABORATIVE MODE</span>
+                    <button class="status-chip" onclick="SIGMA.spawnToast('Aether Mesh: Collaborative Link ACTIVE.')">ACTIVATE</button>
+                </div>
+            </div>
+        </section>
+
+        <!-- CONFIG EDITOR SHARD -->
+        <section id="win-configeditor" class="window hidden win-settings-default">
+            <div class="win-header">
+                <div class="win-title">⚙️ Sovereign Config (Kernel Tuner)</div>
+                <div class="win-controls">
+                    <div class="win-btn win-min" data-action="minimize" data-win="configeditor"></div>
+                    <div class="win-btn win-close" data-action="close" data-win="configeditor"></div>
+                </div>
+            </div>
+            <div class="win-content u-scroll-y u-padding-16">
+                <div class="u-muted-text u-font-size-xxs u-margin-b-10">MANUAL KERNEL OVERRIDES (C11 PARITY)</div>
+                <div class="win-input-group u-margin-b-10">
+                    <label class="u-font-size-xxs">SCHEDULER_LATENCY_NS</label>
+                    <input type="text" class="win-input" value="1000000" id="cfg-sched-lat" title="Enter scheduler latency in ns">
+                </div>
+                <div class="win-input-group u-margin-b-10">
+                    <label class="u-font-size-xxs">PAGING_ADAPTIVE_RECLAIM</label>
+                    <input type="checkbox" checked id="cfg-page-reclaim" title="Toggle adaptive paging reclaim">
+                </div>
+                <button class="status-chip u-full-width" onclick="SIGMA.spawnToast('Kernel Config Applied Successfully.')">COMMIT TO SILICON</button>
+            </div>
+        </section>
+
         <!-- PERSONA SELECTOR SHARD -->
         <section id="win-personaselector" class="window hidden win-services-default">
             <div class="win-header">
@@ -1595,29 +1657,39 @@ msg: db "SIGMAOS ACTIVE", 10
         <!-- DISTRO MIRROR SHARD -->
         <section id="win-distromirror" class="window hidden win-emu-default">
             <div class="win-header">
-                <div class="win-title">🐧 Sovereign Distro Mirror (Mirror-Shard)</div>
+                <div class="win-title">🐧 Sovereign Distro Mirror (Aether Sharding)</div>
                 <div class="win-controls">
                     <div class="win-btn win-min" data-action="minimize" data-win="distromirror"></div>
                     <div class="win-btn win-close" data-action="close" data-win="distromirror"></div>
                 </div>
             </div>
-            <div class="win-content u-padding-16">
-                <div class="u-margin-b-10 u-font-size-xs u-accent-text">MIRROR INDUSTRY PRINCIPLES</div>
-                <div class="u-grid-3 gap-16">
-                    <div class="metric-card u-text-center pointer" onclick="setDistroMirror('UBUNTU')">
-                        <div class="u-font-size-lg">🟠</div>
-                        <div class="u-bold u-margin-t-5">Ubuntu</div>
+            <div class="win-content u-scroll-y">
+                <div class="u-padding-16">
+                    <div class="u-margin-b-10 u-font-size-xs u-accent-text">ACTIVATE TARGET MIRROR PARITY</div>
+                    <div id="distro-selector-container" class="u-grid-3 gap-16">
+                        <!-- Populated by SigmaSystem.renderDistros() -->
                     </div>
-                    <div class="metric-card u-text-center pointer" onclick="setDistroMirror('ARCH')">
-                        <div class="u-font-size-lg">🔹</div>
-                        <div class="u-bold u-margin-t-5">Arch</div>
-                    </div>
-                    <div class="metric-card u-text-center pointer" onclick="setDistroMirror('SIGMA')">
-                        <div class="u-font-size-lg">🌍</div>
-                        <div class="u-bold u-margin-t-5">Sovereign</div>
+                    <div class="u-margin-t-20 u-muted-text u-font-size-xxs">MIRRORS: Shell Aliases, Theme Accents, and Pkg Logic sharded instantaneously.</div>
+                </div>
+            </div>
+        </section>
+
+        <!-- INDUSTRIAL MATRIX SHARD -->
+        <section id="win-industrialmatrix" class="window hidden win-matrix-default">
+            <div class="win-header">
+                <div class="win-title">⚡ Industrial Matrix (Tool Sharding)</div>
+                <div class="win-controls">
+                    <div class="win-btn win-min" data-action="minimize" data-win="industrialmatrix"></div>
+                    <div class="win-btn win-close" data-action="close" data-win="industrialmatrix"></div>
+                </div>
+            </div>
+            <div class="win-content u-scroll-y">
+                <div class="u-padding-16">
+                    <div class="u-margin-b-10 u-font-size-xs u-accent-text">DEPLOY MATRIX TOOLS TO LOCAL SILICON</div>
+                    <div id="matrix-tools-container" class="u-grid-2 gap-10">
+                        <!-- Populated by SigmaSystem.renderMatrix() -->
                     </div>
                 </div>
-                <div class="u-margin-t-20 u-muted-text u-font-size-xxs">MIRRORS: Shell Aliases, Theme Accents, and Pkg Logic.</div>
             </div>
         </section>
 
@@ -1692,6 +1764,12 @@ msg: db "SIGMAOS ACTIVE", 10
         <div class="dock-item" data-window="pkg" data-label="Files">
             <svg viewBox="0 0 24 24"><path d="M20 6h-8l-2-2H4c-1.1 0-1.99.9-1.99 2L2 18c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V8c0-1.1-.9-2-2-2zm0 12H4V8h16v10z"/></svg>
         </div>
+        <div class="dock-item" data-window="monitor" data-label="Monitor">
+            <svg viewBox="0 0 24 24"><path d="M11 5H6c-1.1 0-2 .9-2 2v11c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2v-5h-2v5H6V7h5V5zm4 0v2h2.59l-9.99 9.99 1.41 1.41L19 8.41V11h2V5h-6z"/></svg>
+        </div>
+        <div class="dock-item" data-window="configeditor" data-label="Config">
+            <svg viewBox="0 0 24 24"><path d="M19.14 12.94c.04-.3.06-.61.06-.94s-.02-.64-.06-.94l2.03-1.58c.18-.14.23-.41.12-.61l-1.92-3.32c-.12-.22-.37-.29-.59-.22l-2.39.96c-.5-.38-1.03-.7-1.62-.94l-.36-2.54c-.04-.24-.24-.41-.48-.41h-3.84c-.24 0-.43.17-.47.41l-.36 2.54c-.59.24-1.13.57-1.62.94l-2.39-.96c-.22-.08-.47 0-.59.22L2.74 8.87c-.12.21-.08.47.12.61l2.03 1.58c-.04.3-.06.61-.06.94s.02.64.06.94l-2.03 1.58c-.18.14-.23.41-.12.61l1.92 3.32c.12.22.37.29.59.22l2.39-.96c.5.38 1.03.7 1.62.94l.36 2.54c.05.24.24.41.48.41h3.84c.24 0 .44-.17.47-.41l.36-2.54c.59-.24 1.13-.57 1.62-.94l2.39.96c.22.08.47 0 .59-.22l1.92-3.32c.12-.22.07-.47-.12-.61l-2.01-1.58zM12 15.6c-1.98 0-3.6-1.62-3.6-3.6s1.62-3.6 3.6-3.6 3.6 1.62 3.6 3.6-1.62 3.6-3.6 3.6z"/></svg>
+        </div>
         <div class="dock-item" data-window="industrialmatrix" data-label="Apps">
             <svg viewBox="0 0 24 24"><path d="M4 8h4V4H4v4zm6 12h4v-4h-4v4zm-6 0h4v-4H4v4zm0-6h4v-4H4v4zm6 0h4v-4h-4v4zm6-10v4h4V4h-4zm-6 4h4V4h-4v4zm6 6h4v-4h-4v4zm0 6h4v-4h-4v4z"/></svg>
         </div>
@@ -1738,7 +1816,5 @@ msg: db "SIGMAOS ACTIVE", 10
     <div id="toast-container"></div>
 
     <script type="module" src="scripts/js/SigmaMain.js"></script>
-    <script src="index.js"></script>
-    <script src="restore_features.js"></script>
 </body>
 </html>

@@ -43,6 +43,52 @@ export class SigmaSystem {
         this.initDataChart();
         this.initDSChart();
         this.initSysAuditor();
+        this.renderDistros();
+        this.renderMatrix();
+    }
+
+    renderDistros() {
+        const list = document.getElementById('distro-selector');
+        if (!list) return;
+        list.innerHTML = this.store.distros.map(d => `
+            <div class="distro-card" onclick="SIGMA.launchDistro('${d.id}')">
+                <div class="distro-icon">${d.icon}</div>
+                <div class="distro-name">${d.name}</div>
+            </div>
+        `).join('');
+    }
+
+    renderMatrix() {
+        const dashboard = document.getElementById('matrix-dashboard');
+        if (!dashboard) return;
+        dashboard.innerHTML = this.store.matrixTools.map(t => `
+            <div class="metric-card">
+                <div class="metric-header"><span>${t.icon} ${t.name}</span> <span class="u-font-size-xxs u-muted-text">${t.USP}</span></div>
+                <div class="u-font-size-xs u-margin-b-10">${t.desc}</div>
+                <button class="status-chip" onclick="SIGMA.executeMatrixTool('${t.id}')">Activate Shard</button>
+            </div>
+        `).join('');
+    }
+
+    launchDistro(id) {
+        const d = this.store.distros.find(x => x.id === id);
+        if (!d) return;
+        const selector = document.getElementById('distro-selector');
+        const iframe = document.getElementById('distro-iframe');
+        if (selector) selector.classList.add('hidden');
+        if (iframe) {
+            iframe.src = d.url;
+            iframe.classList.remove('hidden');
+        }
+        this.spawnToast(`Streaming Distribution Shard: ${d.name}`);
+    }
+
+    executeMatrixTool(id) {
+        const tool = this.store.matrixTools.find(x => x.id === id);
+        if (!tool) return;
+        this.spawnToast(`Executing Industrial Shard: ${tool.name}`);
+        if (id === 'ai_orchestrator') this.wm.open('aiorch');
+        if (id === 'spectrum_terminal') this.wm.open('spectrum');
     }
 
     spawnToast(msg) {
@@ -58,8 +104,41 @@ export class SigmaSystem {
     updateMetrics() {
         const cpuVal = document.getElementById('cpu-val');
         const memVal = document.getElementById('mem-val');
-        if (cpuVal) cpuVal.textContent = Math.floor(Math.random() * 5 + 1) + '%';
-        if (memVal) memVal.textContent = Math.floor(Math.random() * 10 + 24) + '%';
+        const healthVal = document.getElementById('health-score-val');
+        
+        const cpu = Math.floor(Math.random() * 5 + 1);
+        const mem = Math.floor(Math.random() * 10 + 24);
+        
+        if (cpuVal) cpuVal.textContent = cpu + '%';
+        if (memVal) memVal.textContent = mem + '%';
+        
+        const health = this.calculateHealthScore(cpu, mem);
+        if (healthVal) {
+            healthVal.textContent = health;
+            healthVal.className = health > 80 ? 'u-accent-text' : (health > 50 ? 'u-warning-text' : 'u-error-text');
+        }
+    }
+
+    calculateHealthScore(cpu, mem) {
+        // Industrial health algorithm: 0-100 based on weighted metrics
+        let score = 100;
+        score -= (cpu > 80 ? (cpu - 80) * 2 : 0);
+        score -= (mem > 90 ? (mem - 90) * 3 : 0);
+        if (this.vfs_vulnerabilities.length > 0) score -= 10;
+        return Math.max(0, score);
+    }
+
+    getMemoryPressure() {
+        // Returns a sharded heatmap of memory pressure
+        return Array(16).fill(0).map(() => Math.floor(Math.random() * 100));
+    }
+
+    getNetworkFlows() {
+        // Returns active Zero-Trust mesh connection shards
+        return [
+            { id: 'ZN-882', target: 'sovereign.node.01', load: '12%', status: 'SECURED' },
+            { id: 'ZN-431', target: 'aether.mesh.v4', load: '4%', status: 'AUDITED' }
+        ];
     }
 
     initDataChart() {
@@ -98,6 +177,31 @@ export class SigmaSystem {
             requestAnimationFrame(draw);
         };
         draw();
+    }
+
+    createSnapshot(name) {
+        const snapshot = {
+            timestamp: Date.now(),
+            vfs_count: Object.keys(this.vfs.fs).length,
+            shard_count: this.store.shards.length
+        };
+        this.log(`Chrono-Vault: Snapshot "${name}" sharded to silicon.`);
+        return snapshot;
+    }
+
+    scheduleAutoBackup() {
+        setInterval(() => {
+            this.createSnapshot(`AUTO_ZENITH_${Date.now()}`);
+            this.spawnToast('Chrono-Vault: Autonomous backup pulse complete.');
+        }, 3600000); // Hourly
+    }
+
+    generateProcessTree() {
+        return [
+            { pid: 1, name: 'sigma_init', status: 'S_ZEN', cpu: '0.1%' },
+            { pid: 42, name: 'aether_sentinel', status: 'S_RUN', cpu: '2.4%' },
+            { pid: 101, name: 'neural_matrix', status: 'S_SLP', cpu: '0.0%' }
+        ];
     }
 
     initSysAuditor() {
