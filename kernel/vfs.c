@@ -84,6 +84,7 @@ typedef struct SigmaVFS {
     u64     dentry_count;
     u64     total_reads;
     u64     total_writes;
+    spinlock_t lock;      /* B4: Global VFS Lock for Concurrency */
 } SigmaVFS;
 
 static SigmaVFS g_vfs;
@@ -186,6 +187,7 @@ void vfs_init(void) {
     g_vfs.dentry_count = 0;
     g_vfs.total_reads  = 0;
     g_vfs.total_writes = 0;
+    spinlock_init(&g_vfs.lock);
 
     /* Root inode (ino=0, directory) */
     VInode* root = inode_alloc(INODE_DIR, 0755);
@@ -233,11 +235,15 @@ void vfs_init(void) {
 
 /* vfs_open: return fd or negative error */
 i32 vfs_open(const char* path, u32 flags, u32 mode) {
+    spinlock_acquire(&g_vfs.lock);
     u64 ino = path_resolve(path);
 
     if (ino == (u64)-1) {
         /* Create if O_CREAT (flags & 0x40 on Linux) */
-        if (!(flags & 0x40)) return K_ERR_NOTFOUND;
+        if (!(flags & 0x40)) {
+            spinlock_release(&g_vfs.lock);
+            return K_ERR_NOTFOUND;
+        }
         /* Find parent directory */
         char parent[VFS_PATH_MAX];
         const char* last_slash = path;
@@ -249,7 +255,10 @@ i32 vfs_open(const char* path, u32 flags, u32 mode) {
         for (j = 0; j < plen && j < VFS_PATH_MAX-1; j++) parent[j] = path[j];
         parent[j] = '\0';
         u64 parent_ino = path_resolve(parent);
-        if (parent_ino == (u64)-1) return K_ERR_NOTFOUND;
+        if (parent_ino == (u64)-1) {
+            spinlock_release(&g_vfs.lock);
+            return K_ERR_NOTFOUND;
+        }
 
         VInode* new_in = inode_alloc(INODE_FILE, mode ? mode : 0644);
         dentry_add(parent_ino, last_slash + 1, new_in->ino);
@@ -264,19 +273,30 @@ i32 vfs_open(const char* path, u32 flags, u32 mode) {
             g_vfs.fds[fd].offset = 0;
             g_vfs.fds[fd].flags  = flags & 3;
             g_vfs.fds[fd].used   = TRUE;
+            spinlock_release(&g_vfs.lock);
             return fd;
         }
     }
+    spinlock_release(&g_vfs.lock);
     return K_ERR_BUSY;
 }
 
 /* vfs_read: return bytes read or negative error */
 i64 vfs_read(i32 fd, void* buf, usize count) {
-    if (fd < 0 || fd >= (i32)VFS_MAX_FDS || !g_vfs.fds[fd].used)
+    spinlock_acquire(&g_vfs.lock);
+    if (fd < 0 || fd >= (i32)VFS_MAX_FDS || !g_vfs.fds[fd].used) {
+        spinlock_release(&g_vfs.lock);
         return K_ERR_INVAL;
+    }
     VInode* in = inode_get(g_vfs.fds[fd].ino);
-    if (!in || in->type != INODE_FILE) return K_ERR_INVAL;
-    if (!in->data) return 0;
+    if (!in || in->type != INODE_FILE) {
+        spinlock_release(&g_vfs.lock);
+        return K_ERR_INVAL;
+    }
+    if (!in->data) {
+        spinlock_release(&g_vfs.lock);
+        return 0;
+    }
 
     u64 avail = in->size - g_vfs.fds[fd].offset;
     if (avail == 0) return 0;
@@ -287,15 +307,22 @@ i64 vfs_read(i32 fd, void* buf, usize count) {
     for (i = 0; i < n; i++) dst[i] = src[i];
     g_vfs.fds[fd].offset += n;
     g_vfs.total_reads++;
+    spinlock_release(&g_vfs.lock);
     return (i64)n;
 }
 
 /* vfs_write: return bytes written or negative error */
 i64 vfs_write(i32 fd, const void* buf, usize count) {
-    if (fd < 0 || fd >= (i32)VFS_MAX_FDS || !g_vfs.fds[fd].used)
+    spinlock_acquire(&g_vfs.lock);
+    if (fd < 0 || fd >= (i32)VFS_MAX_FDS || !g_vfs.fds[fd].used) {
+        spinlock_release(&g_vfs.lock);
         return K_ERR_INVAL;
+    }
     VInode* in = inode_get(g_vfs.fds[fd].ino);
-    if (!in || in->type != INODE_FILE) return K_ERR_INVAL;
+    if (!in || in->type != INODE_FILE) {
+        spinlock_release(&g_vfs.lock);
+        return K_ERR_INVAL;
+    }
 
     u64 new_size = g_vfs.fds[fd].offset + count;
     /* Grow data buffer if needed (Geometric Growth) */
@@ -303,7 +330,10 @@ i64 vfs_write(i32 fd, const void* buf, usize count) {
         u64 next_cap = in->data_cap ? in->data_cap * 2 : 512;
         while (next_cap < new_size) next_cap *= 2;
         u8* new_buf = (u8*)sigma_malloc(next_cap);
-        if (!new_buf) return K_ERR_NOMEM;
+        if (!new_buf) {
+            spinlock_release(&g_vfs.lock);
+            return K_ERR_NOMEM;
+        }
         if (in->data) {
             usize i;
             for (i = 0; i < in->size; i++) new_buf[i] = in->data[i];
@@ -320,19 +350,25 @@ i64 vfs_write(i32 fd, const void* buf, usize count) {
     if (g_vfs.fds[fd].offset > in->size) in->size = g_vfs.fds[fd].offset;
     in->mtime = timer_get_ns();
     g_vfs.total_writes++;
+    spinlock_release(&g_vfs.lock);
     return (i64)count;
 }
 
 /* vfs_close */
 i32 vfs_close(i32 fd) {
-    if (fd < 0 || fd >= (i32)VFS_MAX_FDS || !g_vfs.fds[fd].used)
+    spinlock_acquire(&g_vfs.lock);
+    if (fd < 0 || fd >= (i32)VFS_MAX_FDS || !g_vfs.fds[fd].used) {
+        spinlock_release(&g_vfs.lock);
         return K_ERR_INVAL;
+    }
     g_vfs.fds[fd].used = FALSE;
+    spinlock_release(&g_vfs.lock);
     return K_OK;
 }
 
 /* vfs_mkdir */
 i32 vfs_mkdir(const char* path, u32 mode) {
+    spinlock_acquire(&g_vfs.lock);
     /* Resolve parent */
     char parent[VFS_PATH_MAX];
     const char* last = path; const char* p = path;
@@ -341,9 +377,13 @@ i32 vfs_mkdir(const char* path, u32 mode) {
     usize j; for (j = 0; j < pl && j < VFS_PATH_MAX-1; j++) parent[j] = path[j];
     parent[j] = '\0';
     u64 parent_ino = path_resolve(parent);
-    if (parent_ino == (u64)-1) return K_ERR_NOTFOUND;
+    if (parent_ino == (u64)-1) {
+        spinlock_release(&g_vfs.lock);
+        return K_ERR_NOTFOUND;
+    }
     VInode* d = inode_alloc(INODE_DIR, mode ? mode : 0755);
     dentry_add(parent_ino, last + 1, d->ino);
+    spinlock_release(&g_vfs.lock);
     return K_OK;
 }
 

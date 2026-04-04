@@ -576,14 +576,58 @@ extern u32 user_get_current_uid(void);
 extern bool_t user_is_sovereign(u32 uid);
 extern void user_switch_identity(u32 uid);
 
-// -> Source Shard: vfs.c
+/**
+ * @brief Initialize Virtual File System (VFS).
+ * Sets up the ramfs root and default mount points.
+ */
 extern void vfs_init(void);
+
+/**
+ * @brief Open a file or directory.
+ * @param path Absolute path to the file.
+ * @param flags O_RDONLY, O_WRONLY, O_CREAT, etc.
+ * @param mode Unix-style permission bits.
+ * @return File descriptor index on success, negative error code on failure.
+ * @note B4: Thread-safe via global VFS spinlock.
+ */
 extern i32 vfs_open(const char* path, u32 flags, u32 mode);
+
+/**
+ * @brief Read data from an open file descriptor.
+ * @param fd File descriptor returned by vfs_open.
+ * @param buf Destination buffer.
+ * @param count Maximum bytes to read.
+ * @return Number of bytes read, or negative error code.
+ */
 extern i64 vfs_read(i32 fd, void* buf, usize count);
+
+/**
+ * @brief Write data to an open file descriptor.
+ * @param fd File descriptor returned by vfs_open.
+ * @param buf Source buffer.
+ * @param count Bytes to write.
+ * @return Number of bytes written, or negative error code.
+ */
 extern i64 vfs_write(i32 fd, const void* buf, usize count);
+
+/**
+ * @brief Close an open file descriptor.
+ */
 extern i32 vfs_close(i32 fd);
+
+/**
+ * @brief Create a new directory.
+ */
 extern i32 vfs_mkdir(const char* path, u32 mode);
+
+/**
+ * @brief Retrieve file status metadata.
+ */
 extern i32 vfs_stat(const char* path, VFileStat* st);
+
+/**
+ * @brief Audit VFS usage and performance metrics.
+ */
 extern void vfs_audit(void);
 
 // -> Source Shard: voice_zenith.c

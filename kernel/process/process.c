@@ -13,7 +13,7 @@
  * =============================================================================
  */
 
-#include "sigma_kernel_types.h"
+#include "../sigma_kernel_types.h"
 
 /* =========================================================================
  * Constants
@@ -83,6 +83,7 @@ typedef struct SigmaProcTable {
     SigmaProc procs[PROC_MAX];
     u32       next_pid;
     u32       active;
+    spinlock_t lock;      /* B7: Process table lock */
 } SigmaProcTable;
 
 static SigmaProcTable g_proctab;
@@ -141,6 +142,7 @@ static void proc_copy_name(SigmaProc* p, const char* name) {
  * ========================================================================= */
 void proc_init(void) {
     u32 i;
+    spinlock_init(&g_proctab.lock);
     for (i = 0; i < PROC_MAX; i++) g_proctab.procs[i].state = PS_UNUSED;
     g_proctab.next_pid = 0;
     g_proctab.active   = 0;
@@ -233,7 +235,30 @@ void proc_exit(SigmaProc* p, i32 code) {
     p->exit_code = code;
     p->state     = PS_ZOMBIE;
     kprintf("[PROC]: exit() pid=%u code=%d → ZOMBIE\n", p->pid, code);
+    
+    /* B7: If no parent (or parent is init), harvest can be done by reaper */
     sched_yield();
+}
+
+/* =========================================================================
+ * sigma_harvest_zombies() — B7: Background reaper for orphan zombies
+ * ========================================================================= */
+void proc_harvest_zombies(void) {
+    u32 i;
+    spinlock_acquire(&g_proctab.lock); /* Assuming a lock exists or adding one */
+    for (i = 0; i < PROC_MAX; i++) {
+        SigmaProc* p = &g_proctab.procs[i];
+        if (p->state == PS_ZOMBIE) {
+            /* If parent is dead or not interested, reap it */
+            SigmaProc* parent = proc_find(p->ppid);
+            if (!parent || parent->state == PS_UNUSED) {
+                p->state = PS_UNUSED;
+                g_proctab.active--;
+                kprintf("[PROC]: B7 Reaper reaped orphan pid=%u\n", p->pid);
+            }
+        }
+    }
+    spinlock_release(&g_proctab.lock);
 }
 
 /* =========================================================================

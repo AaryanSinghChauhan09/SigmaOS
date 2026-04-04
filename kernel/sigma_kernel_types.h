@@ -24,6 +24,14 @@ typedef long long          isize;
 typedef u64                paddr_t;   /* physical address */
 typedef u64                vaddr_t;   /* virtual  address */
 typedef int                bool_t;
+typedef volatile u32       spinlock_t;
+
+extern void hal_spinlock_acquire(spinlock_t* lock);
+extern void hal_spinlock_release(spinlock_t* lock);
+
+#define spinlock_init(l)    (*(l) = 0)
+#define spinlock_acquire(l) hal_spinlock_acquire(l)
+#define spinlock_release(l) hal_spinlock_release(l)
 
 #define TRUE   1
 #define FALSE  0

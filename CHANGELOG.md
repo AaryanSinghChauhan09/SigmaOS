@@ -1,42 +1,28 @@
-# Changelog
+# Σ SIGMAOS ZENITH: SOVEREIGN CHANGELOG 📜
 
-All notable changes to this project will be documented in this file.
+All notable changes to the SigmaOS industrial core are documented here.
 
-The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
-and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
+## [1.5.0] - 2024-04-04 (Zenith Phase 2 Update) 🌌
 
-## [150.0] - 2026-04-03 (CENTURY OF SOVEREIGNTY)
 ### Added
-- **Industrial ML Training Pipeline**: Native C11 Transformer+Trainer engine for autonomous reasoning.
-- **Sovereign Omni-CLI Hub**: Advanced terminal verbs for personalization (sigma-ui), automation (sigma-auto), and tool management (sigma-tool).
-- **GitHub Zenith Sync**: CI/CD-integrated AI audits and real-time status mirroring.
-- **Sovereign Math Shards**: Raw x86_64 Assembly acceleration for Matrix Multiplication and ML inference.
-- **Academy Mission System**: AI-driven onboarding and guidance for new users.
-- **Specialized Shards**: Integrated Studio, Gaming, Remote-Bot, and Xclicker performance tools.
-
-### Changed
-- Transitioned from static CLI to an intent-based Omni-Agent reasoning shell.
-- Unified all system mutations under the Sovereign Personalization engine.
+- **SovereignUserShard**: Framework for fully custom user-defined logic (Issue #1).
+- **Stack Overflow Resilience**: DEADC0DE memory canary at `stack_bottom` (B6).
+- **Zombie Process Reaper**: Background harvesting of orphan tasks (B7).
+- **Integrated Unit Testing**: `tests/` directory with memory and scheduler validation logic.
+- **Performance Benchmarking**: `sigma-bench` tool for latency verification.
+- **Glassmorphism Enhancement**: Updated UI saturation and blur depth.
+- **Getting Started Guide**: Detailed DOC1 for new sovereign users.
+- **Architecture Diagram**: Mermaid-based dependency graph (DOC2).
 
 ### Fixed
-- Fixed VFS shard-locking regressions during high-frequency I/O.
-- Resolved naming collisions between math primitives and logging utilities.
-
-## [Unreleased]
-### Added
-- Initial project structure for SigmaOS, a bare-metal, zero-dependency OS.
-- Core architecture using pure C11 and Assembly.
-- Zenith CI workflows.
-- Native Omni-CLI capabilities.
-- Detailed roadmaps and comprehensive documentation for future Sovereign updates.
-- Tiling window compositor placeholder and structural logic.
-- **Omni-Agent Reasoning Engine**: Native C11 kernel loop for autonomous mission routing.
-- **SigmaASTIndexer**: In-memory codebase understanding engine for context-aware agents.
-- **B-Tree Snapshotting**: Automated VFS rollback for safe agentic mutation.
-- **Non-Interference Audit**: Safety verification scripts for host OS isolation.
+- **VFS Race Condition**: Implemented global spinlock in `vfs.c` (B4).
+- **Memory Corruption**: Fixed double-free bug and added safety checks to slab allocator (B2).
+- **Dashboard Consistency**: Theme persistence via localStorage (Zenith, Kali, Nord, etc).
+- **Window Alignment**: Applied 20px snap-to-grid to the window manager.
 
 ### Changed
-### Deprecated
-### Removed
-### Fixed
-### Security
+- Increased kernel stack verification frequency.
+- Refined `Omni-CLI` dispatcher logging for native shards.
+
+---
+**SigmaOS: Full System Sovereignty Accomplished.**
