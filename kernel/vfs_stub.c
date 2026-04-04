@@ -1,27 +1,21 @@
 /* 
- Σ SIGMAOS ZENITH: SOVEREIGN VFS STUB (v1800.0)
+ Σ SIGMAOS ZENITH: VFS STUB SHARD (v2800.0)
  Mission: Filesystem Abstraction Blueprint.
+ Status: Zero-Dependency. Pure Silicon.
 */
 
-#include <stdint.h>
-#include <stdbool.h>
+#include "sigma_kernel_types.h"
 
 // Σ VFS NODE SHARD
 typedef struct {
-    uint32_t id;
-    char name[32];
-    bool is_directory;
-} sigma_vfs_node;
+    char   name[64];
+    u32    ino;
+    u32    size;
+    bool_t is_dir;
+} VFSNodeStub;
 
-// Σ VFS KERNEL ENTRY
-void sigma_vfs_init() {
-    // Sharded block mapping (Placeholder)
-}
-
-int sigma_vfs_read(uint32_t id, void* buf, uint32_t size) {
-    return 0; // Mission Ready (Stub)
-}
-
-int sigma_vfs_write(uint32_t id, const void* buf, uint32_t size) {
-    return size; // Mission Realized (Stub)
-}
+// Σ STUB INTERFACE (TO BE LINKED WITH VFS.C)
+void vfs_init(void);
+i32  vfs_open(const char* path, u32 flags, u32 mode);
+void vfs_audit(void);
+void vfs_sync(void);

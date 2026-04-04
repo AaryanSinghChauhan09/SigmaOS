@@ -26,6 +26,21 @@ typedef u64                vaddr_t;   /* virtual  address */
 typedef int                bool_t;
 typedef volatile u32       spinlock_t;
 
+/* ---- standard aliases (Zero-Dependency compliant) ---- */
+typedef u8  uint8_t;
+typedef u16 uint16_t;
+typedef u32 uint32_t;
+typedef u64 uint64_t;
+typedef i8  int8_t;
+typedef i16 int16_t;
+typedef i32 int32_t;
+typedef i64 int64_t;
+typedef usize size_t;
+typedef isize ssize_t;
+typedef bool_t bool;
+#define true  TRUE
+#define false FALSE
+
 extern void hal_spinlock_acquire(spinlock_t* lock);
 extern void hal_spinlock_release(spinlock_t* lock);
 
@@ -35,7 +50,10 @@ extern void hal_spinlock_release(spinlock_t* lock);
 
 #define TRUE   1
 #define FALSE  0
+
+#ifndef NULL
 #define NULL   ((void*)0)
+#endif
 
 /* ---- page constants ---- */
 #define PAGE_SIZE       4096ULL
@@ -118,13 +136,14 @@ static inline void sigma_memcpy(void* dst, const void* src, usize n) {
     );
 }
 
-static inline void sigma_memset(void* s, int c, usize n) {
+static inline void* sigma_memset(void* s, int c, usize n) {
     __asm__ __volatile__ (
         "rep stosb"
         : "+D"(s), "+c"(n)
         : "a"((u8)c)
         : "memory"
     );
+    return s;
 }
 
 static inline usize sigma_strlen(const char* s) {
@@ -140,5 +159,10 @@ void sigma_panic(const char* msg, u64 rip, u64 rsp);
 
 #define SIGMA_ASSERT(cond, msg) \
     do { if (!(cond)) sigma_panic(msg, 0, 0); } while (0)
+
+/* ---- prng ---- */
+#define SIGMA_RAND_MAX 0xFFFFFFFFU
+extern u32 sigma_rand32(void);
+extern u64 sigma_rand64(void);
 
 #endif /* SIGMA_KERNEL_TYPES_H */

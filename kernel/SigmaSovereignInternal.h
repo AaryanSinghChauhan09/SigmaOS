@@ -6,30 +6,25 @@
 #ifndef SIGMA_INTERNAL_H
 #define SIGMA_INTERNAL_H
 
-#include "libc/sigma_types.h"
+#include "sigma_kernel_types.h"
 
-// Σ BARE-METAL PRINTS
+/** Σ SOVEREIGN STRING UTILITIES (v2600.0)
+ * Logic: Primitive Shards for Silicon Orchestration.
+ */
+// Redundant declarations removed - using sigma_kernel_types.h inlines.
 void sigma_print(const char* s);
-void sigma_clear_screen();
-
-/* Σ SOVEREIGN STRING UTILITIES (v2600.0)
-   ZERO DEPENDENCY MISSION: Replacing <string.h> and <stdio.h>.
-*/
-size_t sigma_strlen(const char* s);
-int sigma_strcmp(const char* s1, const char* s2);
-void* sigma_memset(void* s, int c, size_t n);
+void sigma_clear_screen(void);
 char* sigma_strcpy(char* dest, const char* src);
-const char* sigma_strstr(const char* str, const char* substr);
 
 // Σ SSE-ACCELERATED MEMORY SHARD
-inline void* sigma_memcpy_sse(void* dest, const void* src, uint32_t n);
+inline void* sigma_memcpy_sse(void* dest, const void* src, u32 n);
 
 // Σ STACK TRACE RECOVERY
 typedef struct {
-    uint64_t rbp;
-    uint64_t rip;
+    u64 rbp;
+    u64 rip;
 } sigma_stack_frame;
 
-inline void sigma_stack_trace(uint32_t depth);
+inline void sigma_stack_trace(u32 depth);
 
 #endif

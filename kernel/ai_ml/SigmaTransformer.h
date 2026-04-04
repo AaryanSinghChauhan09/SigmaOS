@@ -10,7 +10,7 @@
 #ifndef SIGMA_TRANSFORMER_H
 #define SIGMA_TRANSFORMER_H
 
-#include <stddef.h>
+#include "../sigma_kernel_types.h"
 
 #define MAX_SEQ_LEN 128
 #define D_MODEL     256

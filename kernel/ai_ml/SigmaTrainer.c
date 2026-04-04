@@ -8,7 +8,6 @@
  */
 
 #include "SigmaTransformer.h"
-#include <math.h>
 #include "../SigmaSovereignInternal.h"
 
 /**
@@ -41,8 +40,8 @@ void SigmaML_TrainStep(SigmaModel* model, int* tokens_batch, float learning_rate
         SigmaTransformerLayer* layer = &model->layers[l];
         // Gradient update: W = W - LR * GRAD
         for (int i = 0; i < D_MODEL * D_MODEL; i++) {
-            layer->att_qkv[i] -= learning_rate * (sigma_rand() / (float)SIGMA_RAND_MAX * 0.01f);
-            layer->ffn_w1[i] -= learning_rate * (sigma_rand() / (float)SIGMA_RAND_MAX * 0.01f);
+            layer->att_qkv[i] -= learning_rate * (sigma_rand32() / (float)SIGMA_RAND_MAX * 0.01f);
+            layer->ffn_w1[i] -= learning_rate * (sigma_rand32() / (float)SIGMA_RAND_MAX * 0.01f);
         }
     }
 }

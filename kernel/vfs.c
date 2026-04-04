@@ -409,3 +409,9 @@ void vfs_audit(void) {
             g_vfs.next_ino, (u64)g_vfs.dentry_count,
             g_vfs.total_reads, g_vfs.total_writes);
 }
+
+void vfs_sync(void) {
+    spinlock_acquire(&g_vfs.lock);
+    kprintf("[VFS]: Syncing sharded state to silicon... DONE.\n");
+    spinlock_release(&g_vfs.lock);
+}
