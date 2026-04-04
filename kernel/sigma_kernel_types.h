@@ -176,7 +176,7 @@ static inline const char* sigma_strstr(const char* haystack, const char* needle)
         if (!*n) return h;
         h++;
     }
-    return NULL;
+    return (const char*)0;
 }
 
 /* =========================================================================

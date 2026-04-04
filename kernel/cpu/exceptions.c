@@ -3,8 +3,8 @@
  Mission: Graceful Hardware-Direct Error Mitigation.
 */
 
-#include <stdint.h>
-#include "SigmaSovereignInternal.h"
+#include "../sigma_kernel_types.h"
+#include "../SigmaSovereignInternal.h"
 
 // Σ EXCEPTION FRAME
 typedef struct {

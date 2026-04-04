@@ -6,8 +6,7 @@
 #ifndef SIGMA_SLAB_H
 #define SIGMA_SLAB_H
 
-#include <stdint.h>
-#include <stdbool.h>
+#include "../sigma_kernel_types.h"
 
 #define SLAB_BLOCK_SIZE 4096
 #define SLAB_MAX_BLOCKS 1024

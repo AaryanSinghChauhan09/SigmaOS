@@ -3,8 +3,8 @@
  Mission: Hardware-Direct VGA/VESA Text Buffer Orchestration.
 */
 
-#include <stdint.h>
-#include "SigmaSovereignInternal.h"
+#include "../sigma_kernel_types.h"
+#include "../SigmaSovereignInternal.h"
 
 #define VGA_BUFFER 0xB8000
 #define VGA_WIDTH 80

@@ -3,9 +3,8 @@
  Mission: Catch-Identify-Redirect Hardware Violations.
 */
 
-#include <stdint.h>
-#include <stdbool.h>
-#include "SigmaSovereignInternal.h"
+#include "../sigma_kernel_types.h"
+#include "../SigmaSovereignInternal.h"
 
 // Σ SIGNAL TYPES
 #define SIG_SEGV 11 // Segmentation Fault

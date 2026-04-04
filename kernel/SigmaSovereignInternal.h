@@ -17,7 +17,7 @@ void sigma_clear_screen(void);
 char* sigma_strcpy(char* dest, const char* src);
 
 // Σ SSE-ACCELERATED MEMORY SHARD
-inline void* sigma_memcpy_sse(void* dest, const void* src, u32 n);
+static inline void* sigma_memcpy_sse(void* dest, const void* src, u32 n) { (void)dest; (void)src; (void)n; return (void*)0; }
 
 // Σ STACK TRACE RECOVERY
 typedef struct {
@@ -25,6 +25,6 @@ typedef struct {
     u64 rip;
 } sigma_stack_frame;
 
-inline void sigma_stack_trace(u32 depth);
+static inline void sigma_stack_trace(u32 depth) { (void)depth; }
 
 #endif

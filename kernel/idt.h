@@ -6,7 +6,7 @@
 #ifndef SIGMA_IDT_H
 #define SIGMA_IDT_H
 
-#include <stdint.h>
+#include "sigma_kernel_types.h"
 
 // Σ IDT ENTRY STRUCTURE
 struct idt_entry {

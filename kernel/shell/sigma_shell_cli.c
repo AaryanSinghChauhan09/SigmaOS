@@ -3,8 +3,8 @@
  Mission: Universal Command Parity & Alien-to-Sovereign Mapping.
 */
 
-#include <stdint.h>
-#include "SigmaSovereignInternal.h"
+#include "../sigma_kernel_types.h"
+#include "../SigmaSovereignInternal.h"
 
 // Σ COMMAND MAPPING STRUCTURE
 typedef struct {

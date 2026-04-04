@@ -41,6 +41,21 @@ build/syscall.o: kernel/syscall.c
 build/vfs_stub.o: kernel/vfs_stub.c
 	$(CC) $(CFLAGS) -c kernel/vfs_stub.c -o build/vfs_stub.o
 
+build/sigma_strings.o: kernel/libc/sigma_strings.c
+	$(CC) $(CFLAGS) -c kernel/libc/sigma_strings.c -o build/sigma_strings.o
+
+build/vga.o: kernel/drivers/vga.c
+	$(CC) $(CFLAGS) -c kernel/drivers/vga.c -o build/vga.o
+
+build/exceptions.o: kernel/cpu/exceptions.c
+	$(CC) $(CFLAGS) -c kernel/cpu/exceptions.c -o build/exceptions.o
+
+build/signals.o: kernel/cpu/signals.c
+	$(CC) $(CFLAGS) -c kernel/cpu/signals.c -o build/signals.o
+
+build/sigma_shell_cli.o: kernel/shell/sigma_shell_cli.c
+	$(CC) $(CFLAGS) -c kernel/shell/sigma_shell_cli.c -o build/sigma_shell_cli.o
+
 build/sigmaos_zenith: $(OBJS)
 	$(LD) $(LDFLAGS) $(OBJS) -o build/sigmaos_zenith
 
