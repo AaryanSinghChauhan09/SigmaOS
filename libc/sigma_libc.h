@@ -85,6 +85,7 @@ int           sigma_dup(int oldfd);
 sigma_size_t  sigma_strlen(const char* s);
 void*         sigma_memset(void* s, int c, sigma_size_t n);
 void*         sigma_memcpy(void* dest, const void* src, sigma_size_t n);
+char*         sigma_strncpy(char* dest, const char* src, sigma_size_t n);
 
 /* =========================================================================
  * HIGH-LEVEL PRIMITIVES (implemented in SovereignLibC.c — pure C11)

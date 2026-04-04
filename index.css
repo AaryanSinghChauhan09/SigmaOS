@@ -141,6 +141,7 @@ html, body {
   letter-spacing: 1px;
 }
 
+/* Hide scrollbars for the taskbar while maintaining functionality */
 #taskbar {
   flex: 1;
   display: flex;
@@ -148,10 +149,19 @@ html, body {
   align-items: center;
   gap: 12px;
   overflow-x: auto;
-  scrollbar-width: none;
   padding: 0 20px;
+  -ms-overflow-style: none; /* IE and Edge */
 }
-#taskbar::-webkit-scrollbar { display: none; }
+
+/* Firefox-specific scrollbar hiding */
+@supports (scrollbar-width: none) {
+  #taskbar { scrollbar-width: none; }
+}
+
+/* Chrome, Safari and Opera scrollbar hiding */
+#taskbar::-webkit-scrollbar { 
+  display: none; 
+}
 
 .active-chip {
   background: var(--accent-gradient) !important;
@@ -968,3 +978,49 @@ input:checked + .slider:before { transform: translateX(20px); }
 /* PLATFORM OVERRIDES */
 .platform-cloud .window { background: black !important; }
 @media (max-width: 768px) { #dock { height: 80px; } }
+/* ═══════════════════════════════════════════════════════════
+   8. INLINE STYLE REPLACEMENTS (SOVEREIGN OVERRIDES)
+   ═══════════════════════════════════════════════════════════ */
+
+#gpu-framebuffer {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: -2;
+  opacity: 0.3;
+}
+
+#ascii-widget-cpu {
+  position: fixed;
+  top: 50px;
+  left: 20px;
+  z-index: 100;
+}
+
+#ascii-widget-mem {
+  position: fixed;
+  top: 110px;
+  left: 20px;
+  z-index: 100;
+}
+
+#law-log {
+  height: 200px;
+}
+
+#camera-stream {
+  border-radius: 8px;
+}
+
+#cyber-scan-log {
+  height: 100px;
+}
+
+#oom-log-monitor {
+  height: 100px;
+  overflow-y: auto;
+  background: rgba(0, 0, 0, 0.1);
+  padding: 8px;
+}

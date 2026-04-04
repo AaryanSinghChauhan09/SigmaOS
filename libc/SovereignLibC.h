@@ -53,6 +53,7 @@ extern "C" {
     int           sigma_compare(const char* s1, const char* s2);
     void          sigma_strcat(char* dest, const char* src);
     void          sigma_strncat(char* dest, const char* src, sigma_size_t n);
+    char*         sigma_strncpy(char* dest, const char* src, sigma_size_t n);
     int           sigma_atoi(const char* s);
     int           sigma_shm_open(const char* name, int oflag, int mode);
     int           sigma_shm_unlink(const char* name);
@@ -80,6 +81,7 @@ extern "C" {
 void sigma_print(const char* str);
 void sigma_print_num(sigma_u64 val);
 void sigma_printf(const char* format, ...);
+int  sigma_snprintf(char* str, sigma_size_t size, const char* format, ...);
 
 // --- Memory Management (Sovereign Zenith) ---
 void* sigma_slab_alloc_raw(sigma_size_t size);

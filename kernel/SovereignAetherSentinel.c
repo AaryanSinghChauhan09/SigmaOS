@@ -1,5 +1,5 @@
 #include "libc/SovereignLibC.h"
-#include "SovereignOmniShard.h"
+#include "../SovereignOmniShard.h"
 
 /*
  * =========================================================================

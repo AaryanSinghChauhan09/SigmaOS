@@ -1,1 +1,0 @@
-fatal: path 'sovereign_tools/sigma_ai_distribute.c' exists on disk, but not in 'HEAD~30'

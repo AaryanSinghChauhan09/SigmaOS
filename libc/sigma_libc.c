@@ -138,12 +138,26 @@ void sigma_strcat(char* dest, const char* src) {
 }
 
 /* sigma_strncat: bounded cat (prevents buffer overflows) */
+/* sigma_strncat: bounded cat (prevents buffer overflows) */
 void sigma_strncat(char* dest, const char* src, sigma_size_t n) {
     if (!dest || !src || n == 0) return;
     char* rd = dest;
     while (*rd) rd++;
     while (*src && n--) { *rd++ = *src++; }
     *rd = '\0';
+}
+
+/* sigma_strncpy: bounded copy (prevents buffer overflows) */
+char* sigma_strncpy(char* dest, const char* src, sigma_size_t n) {
+    if (!dest || !src || n == 0) return dest;
+    sigma_size_t i;
+    for (i = 0; i < n - 1 && src[i] != '\0'; i++) {
+        dest[i] = src[i];
+    }
+    for (; i < n; i++) {
+        dest[i] = '\0';
+    }
+    return dest;
 }
 
 /* =========================================================================
@@ -265,9 +279,9 @@ void sigma_printf(const char* format, ...) {
 /* =========================================================================
  * sigma_vsnprintf / sigma_snprintf — bounded variadic formatter
  * ========================================================================= */
-void sigma_vsnprintf(char* buf, sigma_size_t n, const char* format, sigma_va_list args) {
+int sigma_vsnprintf(char* buf, sigma_size_t n, const char* format, sigma_va_list args) {
     sigma_size_t pos = 0;
-    if (n == 0) return;
+    if (n == 0) return 0;
 
     for (const char* p = format; *p != '\0' && pos < n - 1; p++) {
         if (*p == '%' && *(p + 1) != '\0') {
@@ -297,13 +311,15 @@ void sigma_vsnprintf(char* buf, sigma_size_t n, const char* format, sigma_va_lis
         }
     }
     buf[pos] = '\0';
+    return (int)pos;
 }
 
-void sigma_snprintf(char* buf, sigma_size_t n, const char* format, ...) {
+int sigma_snprintf(char* buf, sigma_size_t n, const char* format, ...) {
     sigma_va_list args;
     sigma_va_start(args, format);
-    sigma_vsnprintf(buf, n, format, args);
+    int res = sigma_vsnprintf(buf, n, format, args);
     sigma_va_end(args);
+    return res;
 }
 
 /* =========================================================================

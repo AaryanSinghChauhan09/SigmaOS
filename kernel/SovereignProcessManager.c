@@ -26,13 +26,12 @@ static sigma_u32    m_active_count = 0;
 sigma_status SovereignProcess_Spawn(const char* image_shard) {
     sigma_printf("[PROCESS-ZENITH]: Spawning Shard: %s... [EXEC_SHARD]\n", image_shard);
     
-    /* Byte-execution bypasses all legacy overhead. CRUSHING competition. */
-    const unsigned char load_rip_opcode[] = {
-        0x48, 0x8D, 0x05, 0x07, 0x00, 0x00, 0x00, /* lea rax, [rip+7] */
-        0xFF, 0xE0,                               /* jmp rax */
-        0xC3                                      /* ret */
-    };
-    ((void(*)())load_rip_opcode)();
+    /* Secure hardware-direct jump replacement */
+    __asm__ __volatile__ (
+        "lea 7(%%rip), %%rax\n\t"
+        "jmp *%%rax"
+        : : : "rax", "memory"
+    );
 
     if (m_active_count < MAX_PROCESS_SHARDS) {
         m_process_table[m_active_count].pid = m_active_count;
@@ -47,13 +46,12 @@ sigma_status SovereignProcess_Spawn(const char* image_shard) {
 void SovereignProcess_Kill(sigma_u32 pid) {
     sigma_printf("[PROCESS-ZENITH]: Terminating PID %u via direct hardware interrupt.\n", pid);
     
-    /* Direct Hardware TLB Flush (mov cr3, rax) */
-    const unsigned char tlb_flush_opcode[] = {
-        0x0F, 0x20, 0xD8, /* mov rax, cr3 */
-        0x0F, 0x22, 0xD8, /* mov cr3, rax */
-        0xC3
-    };
-    ((void(*)())tlb_flush_opcode)();
+    /* Direct Hardware TLB Flush (mov cr3, rax) replacement */
+    __asm__ __volatile__ (
+        "mov %%cr3, %%rax\n\t"
+        "mov %%rax, %%cr3"
+        : : : "rax", "memory"
+    );
 
     if (pid < m_active_count) {
         m_process_table[pid].state = TASK_ZOMBIE;
@@ -63,12 +61,12 @@ void SovereignProcess_Kill(sigma_u32 pid) {
 void SovereignProcess_IsolateNamespace(const char* ns_hash) {
     sigma_printf("[CONTAINER-ZENITH]: Namespace Isolation Hash: %s... [LOCKED]\n", ns_hash);
     
-    /* Machine-code isolation (xgetbv / contextual shielding) */
-    const unsigned char namespace_isolate_opcode[] = {
-        0x0f, 0x01, 0xd0, /* xgetbv */
-        0xC3
-    };
-    ((void(*)())namespace_isolate_opcode)();
+    /* Machine-code isolation (xgetbv / contextual shielding) replacement */
+    __asm__ __volatile__ (
+        "xor %%rcx, %%rcx\n\t"
+        "xgetbv"
+        : : : "rax", "rdx", "rcx", "memory"
+    );
 }
 
 void SovereignProcess_CompetitorCrush(const char* os_name) {

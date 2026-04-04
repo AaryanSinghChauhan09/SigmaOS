@@ -1,5 +1,5 @@
-#include "libc/SovereignLibC.h"
-#include "SovereignOmniShard.h"
+#include "../libc/SovereignLibC.h"
+#include "SovereignAetherOrchestrator.h"
 
 /*
  * =========================================================================
@@ -41,4 +41,24 @@ void SovereignAetherOrchestrator_RouteMission(SovereignAetherOrchestrator* self,
 void SovereignAetherOrchestrator_DeepThinkMode(SovereignAetherOrchestrator* self) {
     sigma_printf("[AETHER-ORCHESTRATOR]: Enabling Deep-Think Mode (v3.5 Industrial)...\n");
     sigma_printf("[AETHER]: L3 Cache pinned securely to Neural Core. Thinking...\n");
+}
+
+/* --- Public Aether Dispatcher (Sovereign API) --- */
+void SovereignAetherDispatch(const char* mission_id) {
+    sigma_printf("[AETHER-DISPATCH]: Mission Identifier: %s Initiated.\n", mission_id);
+    
+    // Static orchestrator for dispatching
+    static SovereignAetherOrchestrator g_Orch;
+    static int initialized = 0;
+    if (!initialized) {
+        SovereignAetherOrchestrator_init(&g_Orch);
+        initialized = 1;
+    }
+    
+    SovereignAetherOrchestrator_RouteMission(&g_Orch, mission_id);
+}
+
+void SovereignAetherRegisterMission(const SovereignMission* mission) {
+    sigma_printf("[AETHER-REG]: Registering Shard Mission: %s [Prio:%d]\n", 
+                 mission->id, mission->priority);
 }

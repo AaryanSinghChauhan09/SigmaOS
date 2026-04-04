@@ -87,6 +87,23 @@ void SovereignAetherSentinel_ResolveLastError(SovereignAetherSentinel* s, const 
 void SovereignAetherSentinel_AuditIntegrity(SovereignAetherSentinel* s);
 
 /* =========================================================================
+ * DOMAIN: AETHER MISSIONS & AGENTIC INTENT
+ * ========================================================================= */
+typedef enum {
+    MISSION_TYPE_CODE_GEN,
+    MISSION_TYPE_OPTIMIZE,
+    MISSION_TYPE_QUERY,
+    MISSION_TYPE_FIX
+} MissionType;
+
+typedef struct SovereignMission {
+    char id[64];
+    MissionType type;
+    int priority;
+    char intent[256];
+} SovereignMission;
+
+/* =========================================================================
  * DOMAIN: AETHER ORCHESTRATOR & AI MISSION ROUTING
  * ========================================================================= */
 typedef struct SovereignAetherOrchestrator {
@@ -97,6 +114,8 @@ typedef struct SovereignAetherOrchestrator {
 void SovereignAetherOrchestrator_init(SovereignAetherOrchestrator* o);
 void SovereignAetherOrchestrator_RouteMission(SovereignAetherOrchestrator* o, const char* mission);
 void SovereignAetherOrchestrator_DeepThinkMode(SovereignAetherOrchestrator* o);
+void SovereignAetherDispatch(const char* mission_id);
+void SovereignAetherRegisterMission(const SovereignMission* mission);
 
 /* =========================================================================
  * DOMAIN: OMNI-AGENT & AGENTIC CODING (CLAUDE-CODE ABSORPTION)

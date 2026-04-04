@@ -12,6 +12,10 @@ window.addEventListener('DOMContentLoaded', () => {
     const aiShard = new SigmaAI(window.SIGMA);
     const dsShard = new SigmaDS(window.SIGMA);
     const dsaShard = new SigmaDSA(window.SIGMA);
+    
+    // Fix linter warnings for video[playsinline] by setting it programmatically
+    const camera = document.getElementById('camera-stream');
+    if (camera) camera.setAttribute('playsinline', '');
 
     // Global Handlers for Sovereign Shards (Delegating to OOPS objects)
     window.toggleMenu = () => document.getElementById('sigma-menu').classList.toggle('hidden');

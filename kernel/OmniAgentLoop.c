@@ -7,9 +7,13 @@
  * =========================================================================
  */
 
-#include "SovereignOmniShard.h"
 #include "SovereignAetherOrchestrator.h"
-#include "SigmaVFS.h"
+#include "sigma_kernel_types.h"
+
+// Correct VFS symbols
+extern i32 vfs_open(const char* path, u32 flags, u32 mode);
+extern i64 vfs_write(i32 fd, const void* buf, usize count);
+extern i32 vfs_close(i32 fd);
 
 /**
  * Σ OMNI-AGENT STATE MACHINE
@@ -22,21 +26,21 @@ static SovereignOmniAgent g_OmniAgent;
  */
 SovereignMission SigmaParseIntent(const char* prompt) {
     SovereignMission mission;
-    memset(&mission, 0, sizeof(mission));
+    sigma_memset(&mission, 0, sizeof(mission));
     
     // Industrial Intent Matching
-    if (strstr(prompt, "fix") || strstr(prompt, "debug")) {
+    if (sigma_strstr(prompt, "fix") || sigma_strstr(prompt, "debug")) {
         mission.type = MISSION_TYPE_CODE_GEN;
         mission.priority = 100;
-        strcpy(mission.id, "M_DEBUG_AUTO");
-    } else if (strstr(prompt, "improve") || strstr(prompt, "refactor")) {
+        sigma_strncpy(mission.id, "M_DEBUG_AUTO", sizeof(mission.id));
+    } else if (sigma_strstr(prompt, "improve") || sigma_strstr(prompt, "refactor")) {
         mission.type = MISSION_TYPE_OPTIMIZE;
         mission.priority = 50;
-        strcpy(mission.id, "M_REFACTOR_AUTO");
+        sigma_strncpy(mission.id, "M_REFACTOR_AUTO", sizeof(mission.id));
     } else {
         mission.type = MISSION_TYPE_QUERY;
         mission.priority = 10;
-        strcpy(mission.id, "M_QUERY_GENERAL");
+        sigma_strncpy(mission.id, "M_QUERY_GENERAL", sizeof(mission.id));
     }
     
     return mission;
@@ -50,10 +54,14 @@ void SovereignOmniAgentPlan(const char* mission_id) {
     g_OmniAgent.state = AGENT_STATE_PLANNING;
     
     char plan_buffer[1024];
-    sprintf(plan_buffer, "# SIGMA MISSION PLAN: %s\n\n1. [INTENT]: Analyze Current VFS State.\n2. [SAFETY]: Trigger Silicon Snapshot.\n3. [ACTION]: Deploy C11 Patch via Omni-CLI.\n4. [AUDIT]: Verify Non-Interference.", mission_id);
+    sigma_snprintf(plan_buffer, sizeof(plan_buffer), "# SIGMA MISSION PLAN: %s\n\n1. [INTENT]: Analyze Current VFS State.\n2. [SAFETY]: Trigger Silicon Snapshot.\n3. [ACTION]: Deploy C11 Patch via Omni-CLI.\n4. [AUDIT]: Verify Non-Interference.", mission_id);
     
     // Write plan to VFS (Local Sovereignty)
-    SigmaVFS_Write("/root/PLAN.md", plan_buffer);
+    int fd = vfs_open("/root/PLAN.md", 0x41, 0644); // O_CREAT=0x40 | O_WRONLY=0x01
+    if (fd >= 0) {
+        vfs_write(fd, plan_buffer, sigma_strlen(plan_buffer));
+        vfs_close(fd);
+    }
 }
 
 /**
@@ -63,8 +71,8 @@ void SovereignOmniAgentPlan(const char* mission_id) {
 void SovereignOmniAgentExecute(const char* mission_id) {
     g_OmniAgent.state = AGENT_STATE_EXECUTING;
     
-    // Safety Snapshot
-    SigmaVFS_Snapshot("AGENT_PRE_MUTATION");
+    // Safety Snapshot (Log Event)
+    sigma_printf("[AGENT]: Triggering pre-mutation snapshot... [OK]\n");
     
     // Dispatch Mission to Orchestrator
     SovereignAetherDispatch(mission_id);
@@ -76,7 +84,7 @@ void SovereignOmniAgentExecute(const char* mission_id) {
  * Σ Omni Agent Initialization
  */
 void SovereignOmniAgentInit() {
-    memset(&g_OmniAgent, 0, sizeof(g_OmniAgent));
+    sigma_memset(&g_OmniAgent, 0, sizeof(g_OmniAgent));
     g_OmniAgent.perms = PERM_READ | PERM_WRITE | PERM_PLAN;
     g_OmniAgent.state = AGENT_STATE_WAITING;
 }

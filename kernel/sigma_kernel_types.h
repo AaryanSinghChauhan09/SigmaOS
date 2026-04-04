@@ -131,15 +131,16 @@ static inline void port_outw(u16 port, u16 val) {
  * SOVEREIGN-ASM: Silicon-Direct Memory Orchestration (No Pre-Defined Functions)
  * ========================================================================= */
 
-static inline void sigma_memcpy(void* dst, const void* src, usize n) {
+static inline void* k_memcpy(void* dst, const void* src, usize n) {
     __asm__ __volatile__ (
         "rep movsb"
         : "+D"(dst), "+S"(src), "+c"(n)
         : : "memory"
     );
+    return dst;
 }
 
-static inline void* sigma_memset(void* s, int c, usize n) {
+static inline void* k_memset(void* s, int c, usize n) {
     __asm__ __volatile__ (
         "rep stosb"
         : "+D"(s), "+c"(n)

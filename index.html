@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Σ SIGMAOS ZENITH SUPREME (v150.0) | AUTONOMOUS CENTURY</title>
+    <title>Σ SIGMAOS ZENITH SUPREME (v160.0) | AUTONOMOUS CENTURY</title>
     <meta name="description" content="The ultimate sovereign operating system. Zero-dependency, bit-perfect, and ultra-high performance. Built for industrial supremacy.">
     <link rel="stylesheet" href="index.css">
 </head>
@@ -14,14 +14,14 @@
     <canvas id="bg-canvas"></canvas>
     <div id="mesh-overlay"></div>
     <!-- GPU Framebuffer (v280 Direct Rendering) -->
-    <canvas id="gpu-framebuffer" style="position:fixed; top:0; left:0; width:100%; height:100%; z-index:-2; opacity:0.3;"></canvas>
+    <canvas id="gpu-framebuffer"></canvas>
 
     <!-- ASCII System Widgets -->
-    <div id="ascii-widget-cpu" class="widget-ascii" style="position:fixed; top:50px; left:20px; z-index:100;">
+    <div id="ascii-widget-cpu" class="widget-ascii">
         [Σ] CPU: --%<br>
         [=---------]
     </div>
-    <div id="ascii-widget-mem" class="widget-ascii" style="position:fixed; top:110px; left:20px; z-index:100;">
+    <div id="ascii-widget-mem" class="widget-ascii">
         [Σ] MEM: --MB<br>
         [==--------]
     </div>
@@ -267,7 +267,7 @@
             </div>
             <div class="win-content u-scroll-y">
                 <div class="u-margin-b-10 u-accent-text u-bold">BNSS / BNS / BSA 2023 (Latest Legislation)</div>
-                <div id="law-log" class="ai-chat-log u-margin-b-10" style="height: 200px;">
+                <div id="law-log" class="ai-chat-log u-margin-b-10">
                     <div class="u-muted-text">[STATUS] Monitoring Supreme Court & High Court Interpretations...</div>
                 </div>
                 <div class="u-grid-1">
@@ -293,7 +293,7 @@
             </div>
             <div class="win-content u-flex-column u-flex-center">
                 <div class="metric-card u-full-width u-full-height u-flex-column u-flex-center">
-                    <video id="camera-stream" class="u-full-width neural-canvas" autoplay playsinline style="border-radius: 8px;"></video>
+                    <video id="camera-stream" class="u-full-width neural-canvas" autoplay></video>
                     <div class="u-flex-between u-full-width u-margin-t-10">
                         <select id="camera-filter" class="status-chip u-bg-transparent" title="Camera Filter">
                             <option value="none">Normal</option>
@@ -449,7 +449,12 @@
             </div>
             <div class="win-content u-padding-16">
                 <div class="u-margin-b-20 u-accent-text u-bold">SOVEREIGN SYSTEM SHARDS (ABSORBED REPOSITORIES)</div>
-                <div id="matrix-dashboard" class="u-grid-2"></div>
+                <div id="matrix-dashboard" class="u-grid-2 u-margin-b-10"></div>
+                
+                <div class="u-margin-b-10 u-accent-text u-bold u-margin-t-20">DEPLOY MATRIX TOOLS TO LOCAL SILICON</div>
+                <div id="matrix-tools-container" class="u-grid-2 gap-10">
+                    <!-- Populated by SigmaSystem.renderMatrix() -->
+                </div>
             </div>
         </section>
 
@@ -525,7 +530,7 @@
             </div>
         </section>
 
-        </section>
+
 
         <!-- SOVEREIGN AI (GPT-PARITY) WINDOW -->
         <section id="win-ai" class="window hidden win-sysinfo-default">
@@ -879,7 +884,7 @@ msg: db "SIGMAOS ACTIVE", 10
                 <div class="u-grid-2">
                     <div class="metric-card">
                         <div class="u-font-size-xs u-accent-text">NETWORK SCANNER</div>
-                        <div id="cyber-scan-log" class="win-terminal-pre u-font-size-xxs u-margin-t-10 u-scroll-y" style="height: 100px;">
+                        <div id="cyber-scan-log" class="win-terminal-pre u-font-size-xxs u-margin-t-10 u-scroll-y">
                             [INFO] Scanner Idle.
                         </div>
                         <button class="status-chip u-margin-t-5" onclick="runCyberScan()">SCAN LOCAL MESH</button>
@@ -985,15 +990,7 @@ msg: db "SIGMAOS ACTIVE", 10
                 </div>
             </div>
         </section>
-                        <option value="hue-rotate(90deg)">Neon Shard</option>
-                        <option value="blur(5px)">Privacy Blur</option>
-                    </select>
-                    <button class="status-chip" onclick="takeSnapshot()">Snap Shard</button>
-                    <button class="status-chip" onclick="shareTask()">Shard Task</button>
-                    <button class="status-chip u-accent-bg" onclick="executeJusticeShard()">Justice Audit</button>
-                </div>
-            </div>
-        </section>
+
 
         <!-- HELP / COMPLIANCE WIKI WINDOW -->
         <section id="win-help" class="window hidden win-pkg-default">
@@ -1387,22 +1384,6 @@ msg: db "SIGMAOS ACTIVE", 10
             </div>
         </section>
 
-        <!-- LINUX OOM KILLER SHARD -->
-        <section id="win-oomshard" class="window hidden win-matrix-default">
-            <div class="win-header">
-                <div class="win-title">🪦 OOM Reaper (Linux Eq)</div>
-                <div class="win-controls">
-                    <div class="win-btn win-min" data-action="minimize" data-win="oomshard"></div>
-                    <div class="win-btn win-close" data-action="close" data-win="oomshard"></div>
-                </div>
-            </div>
-            <div class="win-content u-padding-16">
-                <div class="u-muted-text u-font-size-xxs u-margin-b-10">MEMORY EXHAUSTION SACRIFICE HEURISTIC</div>
-                <button class="status-chip u-error-text u-full-width" onclick="window.runOOMStrike()">INVOKE OOM-KILLER SACRIFICE</button>
-                <div id="oom-log" class="u-margin-t-10 u-font-size-xxs u-accent-text">Heuristics Stable.</div>
-            </div>
-        </section>
-
         <section id="win-mlshard" class="window hidden win-matrix-default">
             <div class="win-header">
                 <div class="win-title">🚀 Sovereign ML-Ops (Deployment Pipeline)</div>
@@ -1425,7 +1406,7 @@ msg: db "SIGMAOS ACTIVE", 10
             </div>
         </section>
 
-        <!-- SYSTEM MONITOR SHARD -->
+        <!-- SOVEREIGN MONITOR SHARD (CONSULTED) -->
         <section id="win-monitor" class="window hidden win-services-default">
             <div class="win-header">
                 <div class="win-title">📊 Sovereign Monitor (Industrial telemetry)</div>
@@ -1437,28 +1418,22 @@ msg: db "SIGMAOS ACTIVE", 10
             <div class="win-content u-scroll-y u-padding-16">
                 <div class="u-flex-between u-margin-b-10">
                     <span class="u-font-size-xs u-accent-text">SYSTEM HEALTH SCORE</span>
-                    <span id="health-score-val" class="u-font-size-lg u-bold">100</span>
+                    <span id="health-score-val" class="u-font-size-lg u-bold">100% Supreme</span>
                 </div>
                 <div class="metric-card u-margin-b-10">
-                    <div class="u-font-size-xxs u-muted-text">OOM STATUS: <span class="u-accent-text">STABLE</span></div>
-                    <div class="u-font-size-xxs u-muted-text">NUMA TOPOLOGY: <span class="u-accent-text">DISCOVERED (NODE 0,1)</span></div>
+                    <div class="u-font-size-xxs u-muted-text">OOM KILLER: <span class="u-accent-text">STABLE / REAPER READY</span></div>
+                    <div class="u-font-size-xxs u-muted-text">NUMA TOPOLOGY: <span class="u-accent-text">OPTIMIZED (NODES: 0x01)</span></div>
                 </div>
-                <div class="u-font-size-xs u-accent-text u-margin-b-10">MEMORY PRESSURE HEATMAP</div>
-                <div id="memory-heatmap" class="u-grid-4 gap-5 u-margin-b-10">
-                    <!-- Heatmap tiles -->
-                    <div class="status-chip u-bg-accent-low"></div><div class="status-chip u-bg-accent-high"></div>
-                    <div class="status-chip u-bg-accent-low"></div><div class="status-chip u-bg-accent-low"></div>
+                <button class="status-chip u-error-text u-full-width u-margin-b-10" onclick="window.runOOMStrike()">INVOKE OOM-KILLER SACRIFICE</button>
+                <div id="oom-log-monitor" class="u-margin-t-10 u-font-size-xxs u-accent-text">
+                    [KRNL] Monitor Shard Active...
+                    [KRNL] Memory Deduplication Shard Active...
+                    [KRNL] OOM Reaper Ready...
                 </div>
-                <div class="u-font-size-xs u-accent-text u-margin-b-10">NETWORK FLOWS (ZERO-TRUST)</div>
-                <div id="net-flows-list" class="u-font-size-xxs u-muted-text">
-                    [ZN-882] target: sovereign.node.01 | load: 12% | status: SECURED<br>
-                    [ZN-431] target: aether.mesh.v4    | load: 4%  | status: AUDITED
-                </div>
-                <div id="oom-log-monitor" class="u-margin-t-10 u-font-size-xxs u-accent-text">Heuristics Stable.</div>
                 <div class="u-divider u-margin-t-10"></div>
                 <div class="u-flex-between u-margin-t-10">
-                    <span class="u-font-size-xxs">COLLABORATIVE MODE</span>
-                    <button class="status-chip" onclick="SIGMA.spawnToast('Aether Mesh: Collaborative Link ACTIVE.')">ACTIVATE</button>
+                    <span class="u-font-size-xxs">COLLABORATIVE MESH</span>
+                    <button class="status-chip" onclick="SIGMA.spawnToast('Aether Mesh: Collaborative Link ACTIVE.')">LINK</button>
                 </div>
             </div>
         </section>
@@ -1674,24 +1649,7 @@ msg: db "SIGMAOS ACTIVE", 10
             </div>
         </section>
 
-        <!-- INDUSTRIAL MATRIX SHARD -->
-        <section id="win-industrialmatrix" class="window hidden win-matrix-default">
-            <div class="win-header">
-                <div class="win-title">⚡ Industrial Matrix (Tool Sharding)</div>
-                <div class="win-controls">
-                    <div class="win-btn win-min" data-action="minimize" data-win="industrialmatrix"></div>
-                    <div class="win-btn win-close" data-action="close" data-win="industrialmatrix"></div>
-                </div>
-            </div>
-            <div class="win-content u-scroll-y">
-                <div class="u-padding-16">
-                    <div class="u-margin-b-10 u-font-size-xs u-accent-text">DEPLOY MATRIX TOOLS TO LOCAL SILICON</div>
-                    <div id="matrix-tools-container" class="u-grid-2 gap-10">
-                        <!-- Populated by SigmaSystem.renderMatrix() -->
-                    </div>
-                </div>
-            </div>
-        </section>
+
 
         <!-- ═══════════════════════════════════════════════════════════
              UNIVERSAL WEB SHARD (BROWSER-IN-BROWSER)
@@ -1721,8 +1679,8 @@ msg: db "SIGMAOS ACTIVE", 10
             <div class="win-title-bar">
                 <div class="win-title">☁️ Sovereign Cloud Hub (Jolicloud Parity)</div>
                 <div class="win-controls">
-                    <div class="win-btn win-min" data-action="minimize" data-win="cloud"></div>
-                    <div class="win-btn win-close" data-action="close" data-win="cloud"></div>
+                    <div class="win-btn win-min" data-action="minimize" data-win="cloud-apps"></div>
+                    <div class="win-btn win-close" data-action="close" data-win="cloud-apps"></div>
                 </div>
             </div>
             <div class="win-content u-flex-column u-padding-16">
@@ -1780,7 +1738,7 @@ msg: db "SIGMAOS ACTIVE", 10
             <svg viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-2h2v2zm0-4h-2V7h2v6z"/></svg>
         </div>
         <div class="dock-item" data-window="ml" data-label="Neural Shard">
-            <svg viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 15h-2v-2h2v2zm0-4h-2V7h2v6z"/></svg>
+            <svg viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 19l-1 1-1-1zm0-4h-2l-2-2v-4h6v4l-2 2zM9 13H7v-2h2v2zm4 0h-2v-2h2v2zm4 0h-2v-2h2v2z"/></svg>
         </div>
         <div class="dock-item" data-window="notebook" data-label="Notebook">
             <svg viewBox="0 0 24 24"><path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zM9 17H7v-7h2v7zm4 0h-2V7h2v10zm4 0h-2v-4h2v4z"/></svg>

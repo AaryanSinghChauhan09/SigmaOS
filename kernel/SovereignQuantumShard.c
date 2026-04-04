@@ -1,5 +1,5 @@
 #include "SovereignLibC.h"
-#include "SovereignOmniShard.h"
+#include "../SovereignOmniShard.h"
 
 /* =========================================================================
  * Σ SIGMAOS: SOVEREIGN QUANTUM SHARD (Lattice-PQC)

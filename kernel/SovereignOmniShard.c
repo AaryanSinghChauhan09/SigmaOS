@@ -8,7 +8,7 @@
  * =========================================================================
  */
 
-#include "SovereignOmniShard.h"
+#include "../SovereignOmniShard.h"
 
 /* =========================================================================
  * DOMAIN: OS KERNEL & ADVANCED SCHEDULING
