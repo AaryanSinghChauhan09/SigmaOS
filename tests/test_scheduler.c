@@ -18,14 +18,16 @@ static int g_passed = 0;
 static int g_failed = 0;
 
 #define SIGMA_TEST(name, cond) do { \
-    if (cond) { \
-        printf("  [PASS] %s\n", name); \
+    int passed = (cond); \
+    if (passed) { \
+        printf("  [PASS %d] %s\n", g_passed + g_failed + 1, name); \
         g_passed++; \
     } else { \
-        printf("  [FAIL] %s  (line %d)\n", name, __LINE__); \
+        printf("  [FAIL %d] %s  (line %d)\n", g_passed + g_failed + 1, name, __LINE__); \
         g_failed++; \
     } \
 } while (0)
+
 
 /* =========================================================================
  * PROCESS STATE & TCB MODEL (mirrors kernel/SovereignOmniShard.h)

@@ -55,15 +55,15 @@ jobs:
         run: |
           echo "Σ [CI]: Compiling performance benchmark..."
           if [ -f tools/sigma-bench.c ]; then
-            # We provide mocks for sigma_printf and cpu_rdtsc for the CI environment
             gcc -std=c11 -O3 -march=native -o /tmp/sigma-bench tools/sigma-bench.c \
-                -D"sigma_printf=printf" -D"cpu_rdtsc()=0" -D"sigma_u64=unsigned long long"
+                -DUNIT_TEST_ENV
             echo "Σ [CI]: Running benchmark..."
             /tmp/sigma-bench 2>&1 || echo "Σ [INFO]: Benchmark ran (check output for latency)"
           else
             echo "Σ [INFO]: sigma-bench.c not found — skipping benchmark."
           fi
           echo "Σ [PASS]: Benchmark stage complete."
+
 
       - name: "Run Unit Test Suite"
         run: |

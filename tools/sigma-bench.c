@@ -4,10 +4,17 @@
  * Status: Zero-Dependency. Pure C11.
  */
 
-#include "../libc/SovereignLibC.h"
+#ifdef UNIT_TEST_ENV
+  #include <stdio.h>
+  #include <stdint.h>
+  #define sigma_printf printf
+  #define sigma_u64 uint64_t
+  static inline uint64_t cpu_rdtsc(void) { return 0; }
+#else
+  #include "../libc/SovereignLibC.h"
+  extern sigma_u64 cpu_rdtsc(void);
+#endif
 
-// Σ EXTERN KERNEL APIS
-extern sigma_u64 cpu_rdtsc(void);
 
 void run_latency_test() {
     sigma_printf("Σ [BENCH]: Initiating Direct-Silicon Latency Test...\n");
