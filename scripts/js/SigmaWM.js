@@ -50,9 +50,17 @@ export class SigmaWM {
     dragWindow(win, e) {
         let offsetX = e.clientX - win.offsetLeft;
         let offsetY = e.clientY - win.offsetTop;
+        const SNAP_GRID = 20; // pixels
         const onMove = (ev) => {
-            win.style.left = (ev.clientX - offsetX) + 'px';
-            win.style.top = (ev.clientY - offsetY) + 'px';
+            let left = ev.clientX - offsetX;
+            let top = ev.clientY - offsetY;
+            
+            // Snap to grid
+            left = Math.round(left / SNAP_GRID) * SNAP_GRID;
+            top = Math.round(top / SNAP_GRID) * SNAP_GRID;
+            
+            win.style.left = left + 'px';
+            win.style.top = top + 'px';
         };
         const onUp = () => {
             document.removeEventListener('mousemove', onMove);

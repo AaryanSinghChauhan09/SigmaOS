@@ -16,15 +16,26 @@ export class SigmaSystem {
         this.store = new SigmaStore(this);
         this.wm = new SigmaWM(this);
         this.shell = new SigmaShell(this);
-        
+
+        this.THEMES = {
+            'ZENITH': { accent: '#00d2ff', bg: '#0f0f14' },
+            'KALI': { accent: '#33ff00', bg: '#000000' },
+            'UBUNTU': { accent: '#dd4814', bg: '#221f1f' },
+            'NORD': { accent: '#88c0d0', bg: '#2e3440' },
+            'DRACULA': { accent: '#ff79c6', bg: '#282a36' }
+        };
+
         this.init();
     }
 
     init() {
         this.detectPlatform();
+        this.loadTheme();
+        
         setInterval(() => {
             this.uptime++;
             this.updateMetrics();
+            this.handleMemoryPressure();
         }, 1000);
 
         this.renderMenu();
@@ -37,6 +48,19 @@ export class SigmaSystem {
             if (e.altKey && e.key === 'r') this.spawnToast('System Hard-Refresh Initiated...');
             if (e.key === 'Escape') this.wm.close('all');
         };
+    }
+
+    loadTheme() {
+        const theme = localStorage.getItem('sigma-theme') || 'ZENITH';
+        this.switchMode(theme);
+    }
+
+    handleMemoryPressure() {
+        const pressure = Math.floor(Math.random() * 100);
+        if (pressure > 85) {
+            this.spawnToast('⚠️ HIGH MEMORY PRESSURE DETECTED: Triggering Eviction...');
+            // Implement eviction policy here
+        }
     }
 
     initSpecializedShards() {
@@ -249,6 +273,16 @@ export class SigmaSystem {
             `;
             list.appendChild(item);
         });
+    }
+
+    switchMode(mode) {
+        document.body.className = `mode-${mode.toLowerCase()}`;
+        localStorage.setItem('sigma-theme', mode);
+        const config = this.THEMES[mode];
+        if (config) {
+            document.documentElement.style.setProperty('--accent-primary', config.accent);
+            this.spawnToast(`System Mode Switched: ${mode}`);
+        }
     }
 
     detectPlatform() {
