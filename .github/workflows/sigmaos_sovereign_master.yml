@@ -75,7 +75,9 @@ jobs:
           echo "Σ [CI]: Checking kernel C11 shards..."
           for src in kernel/kmain.c kernel/mm/slab.c kernel/syscall.c kernel/vfs_stub.c \
                      kernel/checklist_shard.c kernel/camera_shard.c kernel/omni_shell.c \
-                     kernel/scheduler.c kernel/vfs.c kernel/idt.c; do
+                     kernel/scheduler.c kernel/vfs.c kernel/idt.c \
+                     kernel/core/init.c kernel/SovereignVoiceShard.c \
+                     kernel/SovereignAetherOrchestrator.c; do
             if [ -f "$src" ]; then
               gcc -std=c11 -ffreestanding -fno-builtin -fno-stack-protector \
                   -mno-red-zone -Ikernel -Wall -Wextra \

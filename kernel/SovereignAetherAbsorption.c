@@ -7,7 +7,7 @@
  * =========================================================================
  */
 
-#include "SovereignLibC.h"
+#include "../libc/SovereignLibC.h"
 
 typedef struct SovereignAetherAbsorber {
     sigma_u32 shards_absorbed;

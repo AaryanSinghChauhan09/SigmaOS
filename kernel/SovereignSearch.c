@@ -9,7 +9,7 @@
  * =========================================================================
  */
 
-#include "SovereignLibC.h"
+#include "../libc/SovereignLibC.h"
 
 /* =========================================================================
  * Search Result (replaces SigmaString return)

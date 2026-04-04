@@ -24,6 +24,9 @@ OBJS = \
     build/sigma_shell_cli.o \
     build/sigma_shell.o \
     build/sigma_fs.o \
+    build/init.o \
+    build/vfs.o \
+    build/omni_shell.o \
     build/sigma_std.o
 
 all: build build/sigmaos_zenith
@@ -75,6 +78,15 @@ build/sigma_fs.o: kernel/fs/sigma_fs.c
 
 build/sigma_std.o: kernel/sigma_std.c
 	$(CC) $(CFLAGS) -c kernel/sigma_std.c -o build/sigma_std.o
+
+build/init.o: kernel/core/init.c
+	$(CC) $(CFLAGS) -Ilibc -c kernel/core/init.c -o build/init.o
+
+build/vfs.o: kernel/vfs.c
+	$(CC) $(CFLAGS) -c kernel/vfs.c -o build/vfs.o
+
+build/omni_shell.o: kernel/omni_shell.c
+	$(CC) $(CFLAGS) -c kernel/omni_shell.c -o build/omni_shell.o
 
 build/sigmaos_zenith: $(OBJS)
 	$(LD) $(LDFLAGS) $(OBJS) -o build/sigmaos_zenith

@@ -41,6 +41,9 @@ align 4096
 global stack_bottom
 stack_bottom:
     dd 0xDEADC0DE ; Σ SOVEREIGN STACK CANARY (B6)
+
+section .bss
+align 16
     resb 16380    ; 16KB Stack (minus 4 bytes for canary)
 sigma_stack_top:
 

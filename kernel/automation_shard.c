@@ -12,7 +12,7 @@
  */
 
 #include "sigma_kernel_types.h"
-#include "SovereignLibC.h"
+#include "../libc/SovereignLibC.h"
 
 #define AUTOMATION_TICK_THRESHOLD 60000 // Every 60s @ 1kHz
 

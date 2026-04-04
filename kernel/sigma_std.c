@@ -13,6 +13,9 @@
 
 #include "sigma_kernel_types.h"
 
+void* sigma_memset(void* s, int c, usize n);
+void* sigma_memcpy(void* dest, const void* src, usize n);
+
 /* =========================================================================
  * SILICON-DIRECT SYSCALL BRIDGE (x86_64)
  * Used only when running on Linux host for testing (not in bare-metal kernel)
@@ -59,6 +62,14 @@ void* sigma_memset32(void* s, u32 val, usize count) {
     u32* p = (u32*)s;
     while (count--) *p++ = val;
     return s;
+}
+
+void* sigma_memset(void* s, int c, usize n) {
+    return k_memset(s, c, n);
+}
+
+void* sigma_memcpy(void* dest, const void* src, usize n) {
+    return k_memcpy(dest, src, n);
 }
 
 /* Zero a buffer */
