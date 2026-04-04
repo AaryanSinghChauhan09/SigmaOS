@@ -50,3 +50,14 @@ SigmaDevice* hal_find_device(u16 vendor, u16 device) {
     }
     return NULL;
 }
+
+// Σ SOVEREIGN SPINLOCK (x86_64 CPU-DIRECT)
+void hal_spinlock_acquire(spinlock_t* lock) {
+    while (__sync_lock_test_and_set(lock, 1)) {
+        cpu_pause();
+    }
+}
+
+void hal_spinlock_release(spinlock_t* lock) {
+    __sync_lock_release(lock);
+}

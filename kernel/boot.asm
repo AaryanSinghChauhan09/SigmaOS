@@ -19,6 +19,7 @@ multiboot_header_end:
 section .text
 bits 32
 global sigma_kernel_entry
+global stack_bottom
 extern kmain
 
 sigma_kernel_entry:

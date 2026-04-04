@@ -3,9 +3,9 @@
  Mission: Inode-Based Disk Persistence & Bloom Optimized Lookup.
 */
 
-#include <stdint.h>
-#include <stdbool.h>
-#include "drivers/disk.h"
+#include "../sigma_kernel_types.h"
+#include "../SigmaSovereignInternal.h"
+#include "../drivers/disk.h"
 
 // Σ BLOOM FILTER SHARD (v2400.0)
 // High-performance 1MB bitmask for fast negative file lookups.
