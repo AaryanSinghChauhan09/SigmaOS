@@ -1,26 +1,30 @@
 /**
- * @file test_memory.c
- * @brief Unit tests for SigmaOS memory management
+ * Σ SIGMAOS ZENITH: MEMORY UNIT TESTS (SILICON-DIRECT)
+ * Mission: Zero-Dependency validation of core memory orchestration.
+ * Status: Sovereign Pure C11.
  */
 
-#include <stdio.h>
-#include <stdint.h>
-#include <assert.h>
+#include "../libc/SovereignLibC.h"
 
-// Mock memory management functions (since we are testing in a userland-like environment)
-// In a real kernel test, these would call the actual kernel functions.
+// Σ SOVEREIGN ASSERTION SHARD
+#define SIGMA_ASSERT(cond, msg) \
+    if (!(cond)) { sigma_printf("Σ [FAIL]: %s\n", msg); sigma_exit(1); }
 
 void test_slab_allocation() {
-    printf("[TEST] Running Slab Allocation Test...\n");
-    // Simulate slab allocation
-    void* ptr = (void*)0x1000; // Mock pointer
-    assert(ptr != NULL);
-    printf("[PASS] Slab Allocation Successful.\n");
+    sigma_printf("Σ [TEST]: Running Slab Allocation Test...\n");
+    
+    // Mission: Test the actual sigma_malloc shard logic.
+    void* ptr = sigma_malloc(1024);
+    
+    SIGMA_ASSERT(ptr != SIGMA_NULL, "Slab allocation failed in silicon shard");
+    
+    sigma_free(ptr);
+    sigma_printf("Σ [PASS]: Slab Allocation & Free life-cycle verified.\n");
 }
 
-int main() {
-    printf("--- SIGMAOS KERNEL UNIT TESTS: MEMORY ---\n");
+int main(int argc, char** argv) {
+    sigma_printf("--- Σ SIGMAOS KERNEL UNIT TESTS: MEMORY (SILICON-DIRECT) ---\n");
     test_slab_allocation();
-    printf("--- ALL MEMORY TESTS PASSED ---\n");
+    sigma_printf("--- ALL MEMORY TESTS PASSED ---\n");
     return 0;
 }

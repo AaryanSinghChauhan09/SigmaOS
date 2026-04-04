@@ -1,12 +1,12 @@
 /**
- * @file test_scheduler.c
- * @brief Unit tests for SigmaOS scheduler
+ * Σ SIGMAOS ZENITH: SCHEDULER UNIT TESTS (SILICON-DIRECT)
+ * Mission: Zero-Dependency validation of core process orchestration.
+ * Status: Sovereign Pure C11.
  */
 
-#include <stdio.h>
-#include <stdint.h>
-#include <assert.h>
+#include "../libc/SovereignLibC.h"
 
+// Σ PROJECT TYPES (Reflected from task.h)
 typedef enum {
     RUNNING,
     READY,
@@ -15,22 +15,29 @@ typedef enum {
 } process_state_t;
 
 typedef struct {
-    uint32_t pid;
+    sigma_u32 pid;
     process_state_t state;
-    uint32_t priority;
+    sigma_u32 priority;
 } process_t;
 
+// Σ SOVEREIGN ASSERTION SHARD
+#define SIGMA_ASSERT(cond, msg) \
+    if (!(cond)) { sigma_printf("Σ [FAIL]: %s\n", msg); sigma_exit(1); }
+
 void test_process_scheduling_logic() {
-    printf("[TEST] Running Process Scheduling Logic Test...\n");
+    sigma_printf("Σ [TEST]: Running Process Scheduling Logic Test...\n");
+    
     process_t p1 = {1, READY, 10};
-    assert(p1.pid == 1);
-    assert(p1.state == READY);
-    printf("[PASS] Process scheduling logic verified.\n");
+    
+    SIGMA_ASSERT(p1.pid == 1, "PID mismatch in scheduling shard");
+    SIGMA_ASSERT(p1.state == READY, "State mismatch in scheduling shard");
+    
+    sigma_printf("Σ [PASS]: Process scheduling logic verified.\n");
 }
 
-int main() {
-    printf("--- SIGMAOS KERNEL UNIT TESTS: SCHEDULER ---\n");
+int main(int argc, char** argv) {
+    sigma_printf("--- Σ SIGMAOS KERNEL UNIT TESTS: SCHEDULER (SILICON-DIRECT) ---\n");
     test_process_scheduling_logic();
-    printf("--- ALL SCHEDULER TESTS PASSED ---\n");
+    sigma_printf("--- ALL SCHEDULER TESTS PASSED ---\n");
     return 0;
 }

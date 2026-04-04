@@ -1,25 +1,31 @@
 /**
- * @file sigma-bench.c
- * @brief Performance benchmarking suite for SigmaOS
+ * Σ SIGMAOS ZENITH: SOVEREIGN BENCH (v1.0)
+ * Mission: Silicon-Direct latency tracking without libc time overhead.
+ * Status: Zero-Dependency. Pure C11.
  */
 
-#include <stdio.h>
-#include <stdint.h>
-#include <time.h>
+#include "../libc/SovereignLibC.h"
+
+// Σ EXTERN KERNEL APIS
+extern sigma_u64 cpu_rdtsc(void);
 
 void run_latency_test() {
-    printf("[BENCH] Running Latency Test...\n");
-    clock_t start = clock();
-    // Simulate some work
-    for(int i=0; i<1000000; i++);
-    clock_t end = clock();
-    double time_spent = (double)(end - start) / CLOCKS_PER_SEC;
-    printf("[BENCH] Latency: %f seconds\n", time_spent);
+    sigma_printf("Σ [BENCH]: Initiating Direct-Silicon Latency Test...\n");
+    
+    sigma_u64 start = cpu_rdtsc();
+    
+    // Mission Work: Simple wait-loop calibration
+    for(volatile int i=0; i<1000000; i++);
+    
+    sigma_u64 end = cpu_rdtsc();
+    sigma_u64 cycles = end - start;
+    
+    sigma_printf("Σ [BENCH]: Latency: %llu clock cycles.\n", cycles);
 }
 
-int main() {
-    printf("--- SIGMAOS PERFORMANCE BENCHMARK SUITE ---\n");
+int main(int argc, char** argv) {
+    sigma_printf("--- Σ SIGMAOS PERFORMANCE BENCHMARK SUITE (SILICON-DIRECT) ---\n");
     run_latency_test();
-    printf("--- BENCHMARK COMPLETED ---\n");
+    sigma_printf("--- BENCHMARK COMPLETED ---\n");
     return 0;
 }

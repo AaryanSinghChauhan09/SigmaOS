@@ -3,8 +3,7 @@
  Mission: Bare-Metal Command Interpretation & Syscall Invocation.
 */
 
-#include <stdint.h>
-#include <stdbool.h>
+#include "../sigma_kernel_types.h"
 #include "SigmaSovereignInternal.h"
 
 // Σ SHELL COMMAND HANDLER
