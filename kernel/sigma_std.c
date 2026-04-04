@@ -237,7 +237,7 @@ CPUIDResult sigma_cpuid(u32 leaf) {
 
 /* Write to serial COM1 (Linux testing path) */
 void k_print_raw(const char* s) {
-    sigma_syscall(1, 1, (long)s, (long)sigma_strlen(s));
+    sigma_syscall(1, 1, (long)(usize)s, (long)sigma_strlen(s));
 }
 
 /* =========================================================================
