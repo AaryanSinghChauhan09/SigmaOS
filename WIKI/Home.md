@@ -1,5 +1,6 @@
-# Σ SIGMAOS ZENITH: THE SOVEREIGN MANIFESTO (v160.0)
-[![Status](https://img.shields.io/badge/Status-SOVEREIGN-00d2ff?style=for-the-badge)]()
+# Σ SIGMAOS ZENITH: THE SOVEREIGN MANIFESTO (v1.8.0) 🛡️
+
+[![Status](https://github.com/AaryanSinghChauhan09/SigmaOS)](https://github.com/AaryanSinghChauhan09/SigmaOS)
 
 **Σ SIGMAOS** is the absolute technical finality in industrial operating system design. It is built to restore **Total Technical Sovereignty** to the professional user.
 

@@ -1,10 +1,11 @@
-# Σ SIGMAOS ZENITH SUPREME: NEURAL MATRIX SOVEREIGNTY (v1400.0)
+# Σ SIGMAOS ZENITH SUPREME: NEURAL MATRIX SOVEREIGNTY (v1.8.0) 🛡️
 
 **The Absolute Zero-Dependency Neural Operating System. Built on Pure C11 & Assembly.**
 
-[![Status](https://img.shields.io/badge/Status-SOVEREIGN-00d2ff?style=for-the-badge)]()
-[![Build](https://img.shields.io/badge/Build-C11%20%2F%20ASM-E95420?style=for-the-badge)]()
-[![License](https://img.shields.io/badge/License-MIT-green?style=for-the-badge)]()
+[![Status](https://github.com/AaryanSinghChauhan09/SigmaOS)](https://github.com/AaryanSinghChauhan09/SigmaOS)
+[![Build](https://github.com/AaryanSinghChauhan09/SigmaOS)](https://github.com/AaryanSinghChauhan09/SigmaOS)
+[![Security](https://github.com/AaryanSinghChauhan09/SigmaOS)](https://github.com/AaryanSinghChauhan09/SigmaOS)
+[![License](https://github.com/AaryanSinghChauhan09/SigmaOS)](https://github.com/AaryanSinghChauhan09/SigmaOS)
 
 ---
 
@@ -27,6 +28,7 @@ If it runs in SigmaOS, it is a direct hexadecimal mission to the silicon.
 To bootstrap the SigmaOS v1400.0 environment and verify the OpCode Matrix:
 
 ### 1. Boot up the Sovereign OS
+
 Run the official launch entry point to load the NMA and initialize the environment:
 
 ```powershell
@@ -34,6 +36,7 @@ Run the official launch entry point to load the NMA and initialize the environme
 ```
 
 ### 2. Enter the Omni-CLI (The Neural Matrix)
+
 The OS unifies all applications and utilities into a single, clean Omni-CLI. Use the `sigma-` command prefix to invoke any mission natively:
 
 ```shell
@@ -60,11 +63,14 @@ SigmaOS is transitioning from architectural planning to active, industrial-grade
 - **TEST1**: Kernel Unit Testing framework initialized.
 
 ### 🔄 Phase 2: Essential Features (IN PROGRESS)
+
 - **F1/F3**: Memory Pressure Monitoring and Auto Crash Recovery (Pulsed).
 - **UI1/UI2**: Dashboard Theme Persistence & Snap-to-Grid Window Management.
 
 ### 🚀 Issue #1: Universal Build Matrix
+
 SigmaOS now supports custom user-functions and targeted builds for:
+
 - [x] **Web/Browser** | [x] **Cloud Native** | [x] **Virtual Machine**
 - [ ] **Docker/OCI** | [ ] **Live ISO/USB** | [ ] **Emulator Optimized**
 
