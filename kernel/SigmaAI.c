@@ -29,7 +29,10 @@ void sigma_ai_reason(const char* prompt) {
     sigma_printf("-------------------------------------------\n\n");
 }
 
-void sigma_ai_init() {
+void sigma_ai_init(void) {
     sigma_printf("[AI] Initializing Sovereign Intelligence (Merlin/Claude style)...\n");
     sigma_printf("[AI] Industrial Shards Linked: Autonomous Balancing (ENABLED).\n");
+    sigma_printf("[AI] Active Model: %s | Online: %d | Shards: %u\n", 
+                 sigma_ai_state.model_name, sigma_ai_state.online, sigma_ai_state.context_shards);
 }
+

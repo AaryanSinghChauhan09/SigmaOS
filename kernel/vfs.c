@@ -14,7 +14,9 @@
  * =============================================================================
  */
 
+#include "../libc/sigma_libc.h"
 #include "sigma_kernel_types.h"
+
 
 /* =========================================================================
  * VFS Constants
@@ -125,9 +127,15 @@ static VInode* inode_get(u64 ino) {
 static VDentry* dentry_add(u64 parent_ino, const char* name, u64 child_ino) {
     if (g_vfs.dentry_count >= VFS_MAX_DENTRIES) return NULL;
     VDentry* d = &g_vfs.dentries[g_vfs.dentry_count++];
-    usize i = 0;
-    while (i < VFS_NAME_MAX - 1 && name[i]) { d->name[i] = name[i]; i++; }
-    d->name[i]   = '\0';
+    sigma_size_t i = 0;
+    sigma_size_t name_len = sigma_strlen(name);
+    while (i < name_len && i < VFS_NAME_MAX - 1) { 
+        d->name[i] = name[i]; 
+        i++; 
+    }
+    d->name[i] = '\0';
+
+
     d->ino       = child_ino;
     d->parent_ino = parent_ino;
     d->valid     = TRUE;
@@ -164,6 +172,7 @@ static u64 path_resolve(const char* path) {
             component[i++] = *p++;
         }
         component[i] = '\0';
+
         if (*p == '/') p++;
 
         if (i == 0) continue;           /* skip double slashes */

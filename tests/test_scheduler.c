@@ -94,13 +94,14 @@ static int sched_pick_next(void) {
 
     /* 1. Find the highest priority currently available among READY tasks */
     for (int i = 0; i < g_task_count; i++) {
-        if (g_tasks[i].state == TASK_READY || g_tasks[i].state == TASK_RUNNING) {
+        if (g_tasks[i].pid != 0 && (g_tasks[i].state == TASK_READY || g_tasks[i].state == TASK_RUNNING)) {
             if (!found_any || g_tasks[i].priority > max_prio) {
                 max_prio = g_tasks[i].priority;
                 found_any = 1;
             }
         }
     }
+
     
     if (!found_any) return -1;
 
@@ -108,10 +109,11 @@ static int sched_pick_next(void) {
     int start = (g_current + 1) % g_task_count;
     for (int i = 0; i < g_task_count; i++) {
         int idx = (start + i) % g_task_count;
-        if (g_tasks[idx].state == TASK_READY && g_tasks[idx].priority == max_prio) {
+        if (g_tasks[idx].pid != 0 && g_tasks[idx].state == TASK_READY && g_tasks[idx].priority == max_prio) {
             return idx;
         }
     }
+
 
     /* Fallback: if g_current is the only one with max_prio and it's RUNNING, stay there 
        (Though sched_tick usually sets it to READY before calling pick_next) */
@@ -178,9 +180,10 @@ static int sched_reap_zombies(void) {
     for (int i = 0; i < g_task_count; i++) {
         if (g_tasks[i].state == TASK_ZOMBIE) {
             g_tasks[i].pid = 0;
-            g_tasks[i].state = TASK_READY; // Reset state for reuse
+            g_tasks[i].state = TASK_BLOCKED; // Non-runnable state
             reaped++;
         }
+
     }
     return reaped;
 }

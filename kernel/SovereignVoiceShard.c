@@ -9,7 +9,8 @@
  * =========================================================================
  */
 
-#include "libc/SovereignLibC.h"
+#include "../libc/sigma_libc.h"
+
 
 /* =========================================================================
  * Audio ring-buffer (replaces IAudioSource interface)
@@ -81,15 +82,20 @@ static void transcribe_run(SovereignTranscriptionEngine* t,
                  samples);
     /* Fixed demo transcript — in production: MFCC + Viterbi lattice shard */
     const char* raw = "sigmaos has achieved sovereign voice sovereignty no 3rd-party apis needed";
+    /* Bounded copy ensuring we respect both the source literal size and dest buffer */
+    sigma_size_t raw_len = sigma_strlen(raw);
     sigma_size_t i = 0;
-    while (i < VOICE_TEXT_MAX-1 && raw[i]) {
-        t->last_transcript[i] = raw[i]; i++;
+    while (i < raw_len && i < VOICE_TEXT_MAX - 1) {
+        t->last_transcript[i] = raw[i];
+        i++;
     }
     t->last_transcript[i] = '\0';
     postprocess_text(t->last_transcript);
     t->frames_processed++;
     (void)pcm_buf;
+    (void)samples;
 }
+
 
 /* =========================================================================
  * HID Injection Bridge (replaces IHIDBridge + WIN32 SendInput + cout)

@@ -18,10 +18,11 @@ typedef enum {
 } sigma_bin_format_t;
 
 typedef struct {
-    sigma_bin_format_t format;
+    char* format;             /* "ELF64", "PE32+", or "MACH-O" */
     sigma_u64 entry_point;
-    const char* symbol_table_ptr;
-} sigma_translation_ctx_t;
+    sigma_u64 symbol_table_ptr;
+    sigma_u16 syscall_set;    /* Linux=0x1, Win=0x2, macOS=0x3 */
+} sigma_binary_header_t;
 
 void sigma_abi_init(void) {
     sigma_printf("[KERNEL] Universal ABI Translation engine initialized.\n");
@@ -39,17 +40,12 @@ sigma_u64 sigma_abi_translate_syscall(sigma_bin_format_t format, sigma_u32 nativ
 }
 
 /* Hybrid loader for external executable formats */
-sigma_err_t sigma_abi_load_external(const void* buffer, sigma_bin_format_t format) {
-    sigma_printf("[ABI] Detecting binary structure for foreign format: %d\n", format);
-    
-    /* ELF Header check for Linux */
-    if (format == BIN_TYPE_LINUX) {
-        /* Check magic \x7fELF */
-        if (((const char*)buffer)[0] == 0x7f && ((const char*)buffer)[1] == 'E' &&
-            ((const char*)buffer)[2] == 'L' && ((const char*)buffer)[3] == 'F') {
-            sigma_printf("[ABI] Valid Linux ELF header detected. Sharding execution environment...\n");
-        }
+sigma_err_t sigma_abi_elf_load(const sigma_binary_header_t* bin) {
+    /* Perform standard Sovereign translation check */
+    if (bin->format && bin->entry_point > 0) {
+        sigma_printf("[ABI]: Mapping ELF64 binary architecture... at entry 0x%llx\n", bin->entry_point);
+        (void)bin->symbol_table_ptr; /* Ready for kernel-side dynamic linking */
     }
-    
     return SIGMA_OK;
 }
+

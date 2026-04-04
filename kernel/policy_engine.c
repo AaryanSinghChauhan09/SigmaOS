@@ -7,8 +7,8 @@
  * =========================================================================
  */
 
-#include "scheduler.h"
 #include "../libc/sigma_libc.h"
+
 
 typedef enum {
     RULE_PF_MANDATORY,
@@ -37,11 +37,12 @@ void sigma_policy_init(void) {
 
 /* Compliance status check for an enterprise shard */
 sigma_bool sigma_policy_check_PF_mandatory(sigma_u32 employee_count) {
-    if (employee_count >= rules_matrix[0].threshold) {
+    if (rules_matrix[0].active && employee_count >= rules_matrix[0].threshold) {
         return SIGMA_TRUE;
     }
     return SIGMA_FALSE;
 }
+
 
 /* API for compliance dashboard overlays */
 void sigma_policy_get_rule_description(sigma_rule_type_t type, char* out_buf, sigma_size_t size) {
