@@ -4,7 +4,7 @@
 */
 
 #include "../sigma_kernel_types.h"
-#include "SigmaSovereignInternal.h"
+#include "../SigmaSovereignInternal.h"
 
 // Σ SHELL COMMAND HANDLER
 void sigma_shell_exec(const char* cmd) {

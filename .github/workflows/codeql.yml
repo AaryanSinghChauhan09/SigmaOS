@@ -33,13 +33,16 @@ jobs:
       uses: github/codeql-action/init@v3
       with:
         languages: ${{ matrix.language }}
-        # If you wish to specify custom queries:
-        # queries: security-extended,security-and-quality
 
-    # Autobuild attempts to build any compiled languages.
-    # In a zero-dependency kernel, we might need a custom build step if it fails.
-    - name: Autobuild
-      uses: github/codeql-action/autobuild@v3
+    - name: Install Build Toolchain (nasmn / gcc-x86_64)
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y nasm gcc-x86-64-linux-gnu binutils-x86-64-linux-gnu
+
+    # Custom Build Step: Using x86_64-linux-gnu-gcc since CodeQL only needs static analysis.
+    - name: Build Shards for Analysis
+      run: |
+        make -j$(nproc) CC=x86_64-linux-gnu-gcc AS=nasm LD=x86_64-linux-gnu-ld
 
     - name: Perform CodeQL Analysis
       uses: github/codeql-action/analyze@v3

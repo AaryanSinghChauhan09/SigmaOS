@@ -1,4 +1,4 @@
-#include "SovereignLibC.h"
+#include "../libc/SovereignLibC.h"
 
 #define C_BOLD   "\033[1m"
 #define C_RESET  "\033[0m"
