@@ -27,6 +27,11 @@ OBJS = \
     build/init.o \
     build/vfs.o \
     build/omni_shell.o \
+    build/AmnesicShard.o \
+    build/AetherOrchestrator.o \
+    build/ProcessManager.o \
+    build/VoiceShard.o \
+    build/LatticePQC.o \
     build/sigma_std.o
 
 all: build build/sigmaos_zenith
@@ -87,6 +92,21 @@ build/vfs.o: kernel/vfs.c
 
 build/omni_shell.o: kernel/omni_shell.c
 	$(CC) $(CFLAGS) -c kernel/omni_shell.c -o build/omni_shell.o
+
+build/AmnesicShard.o: kernel/SovereignAmnesicShard.c
+	$(CC) $(CFLAGS) -c kernel/SovereignAmnesicShard.c -o build/AmnesicShard.o
+
+build/AetherOrchestrator.o: kernel/SovereignAetherOrchestrator.c
+	$(CC) $(CFLAGS) -c kernel/SovereignAetherOrchestrator.c -o build/AetherOrchestrator.o
+
+build/ProcessManager.o: kernel/SovereignProcessManager.c
+	$(CC) $(CFLAGS) -c kernel/SovereignProcessManager.c -o build/ProcessManager.o
+
+build/VoiceShard.o: kernel/SovereignVoiceShard.c
+	$(CC) $(CFLAGS) -c kernel/SovereignVoiceShard.c -o build/VoiceShard.o
+
+build/LatticePQC.o: kernel/shards/SovereignLatticePQC.c
+	$(CC) $(CFLAGS) -c kernel/shards/SovereignLatticePQC.c -o build/LatticePQC.o
 
 build/sigmaos_zenith: $(OBJS)
 	$(LD) $(LDFLAGS) $(OBJS) -o build/sigmaos_zenith

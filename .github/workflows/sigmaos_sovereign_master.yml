@@ -77,7 +77,9 @@ jobs:
                      kernel/checklist_shard.c kernel/camera_shard.c kernel/omni_shell.c \
                      kernel/scheduler.c kernel/vfs.c kernel/idt.c \
                      kernel/core/init.c kernel/SovereignVoiceShard.c \
-                     kernel/SovereignAetherOrchestrator.c; do
+                     kernel/SovereignAetherOrchestrator.c \
+                     kernel/SovereignAmnesicShard.c kernel/SovereignProcessManager.c \
+                     kernel/shards/SovereignLatticePQC.c; do
             if [ -f "$src" ]; then
               gcc -std=c11 -ffreestanding -fno-builtin -fno-stack-protector \
                   -mno-red-zone -Ikernel -Wall -Wextra \
