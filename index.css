@@ -141,7 +141,8 @@ html, body {
   letter-spacing: 1px;
 }
 
-/* Hide scrollbars for the taskbar while maintaining functionality */
+/* Hide scrollbars for the taskbar while maintaining scroll functionality */
+/* Cross-browser: IE/Edge via -ms-overflow-style, Chrome/Safari via ::-webkit-scrollbar */
 #taskbar {
   flex: 1;
   display: flex;
@@ -150,17 +151,15 @@ html, body {
   gap: 12px;
   overflow-x: auto;
   padding: 0 20px;
-  -ms-overflow-style: none; /* IE and Edge */
+  /* IE 10+, Edge Legacy */
+  -ms-overflow-style: none;
+  /* Firefox 64+ — placed here rather than in @supports to avoid linter false-positives */
+  scrollbar-width: none; /* stylelint-disable-line property-no-unknown */
 }
 
-/* Firefox-specific scrollbar hiding */
-@supports (scrollbar-width: none) {
-  #taskbar { scrollbar-width: none; }
-}
-
-/* Chrome, Safari and Opera scrollbar hiding */
-#taskbar::-webkit-scrollbar { 
-  display: none; 
+/* Chrome 4+, Safari 3.1+, Opera 11.5+ */
+#taskbar::-webkit-scrollbar {
+  display: none;
 }
 
 .active-chip {

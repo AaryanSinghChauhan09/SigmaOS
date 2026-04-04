@@ -10,7 +10,7 @@
  * =========================================================================
  */
 
-#include "../libc/SovereignLibC.h"
+#include "libc/SovereignLibC.h"
 
 /* =========================================================================
  * Raw NIC opcode shards (x86_64 inline — bypasses POSIX send/recv)

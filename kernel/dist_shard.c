@@ -12,7 +12,7 @@
  */
 
 #include "sigma_kernel_types.h"
-#include "../libc/SovereignLibC.h"
+#include "libc/SovereignLibC.h"
 
 #ifndef __cplusplus
 typedef _Bool bool;

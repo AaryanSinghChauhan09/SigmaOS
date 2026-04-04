@@ -5,7 +5,9 @@ CC = x86_64-elf-gcc
 AS = nasm
 LD = x86_64-elf-ld
 
-CFLAGS = -m64 -ffreestanding -fno-stack-protector -fno-builtin -nostdlib -Ikernel
+# -I. ensures 'libc/SovereignLibC.h' and 'SovereignOmniShard.h' resolve from any subdir
+# -Ilibc ensures '#include "SovereignLibC.h"' also resolves directly
+CFLAGS  = -m64 -ffreestanding -fno-stack-protector -fno-builtin -nostdlib -I. -Ikernel -Ilibc
 LDFLAGS = -T kernel/kernel.ld -nostdlib
 
 # Σ CORE KERNEL SHARDS (COMPLETE LINKAGE)
@@ -114,14 +116,19 @@ build/sigmaos_zenith: $(OBJS)
 clean:
 	rm -rf build
 
-# Σ KERNEL UNIT TESTING
-test: build
-	gcc -o build/sigma-test-memory tests/test_memory.c -Ikernel
-	gcc -o build/sigma-test-scheduler tests/test_scheduler.c -Ikernel
+# Σ KERNEL UNIT TESTING (host-side — native gcc, no cross-compiler needed)
+test:
+	@echo 'Σ [BUILD]: Compiling memory test suite...'
+	gcc -std=c11 -O2 -Wall -Wextra -o build/sigma-test-memory tests/test_memory.c
+	@echo 'Σ [BUILD]: Compiling scheduler test suite...'
+	gcc -std=c11 -O2 -Wall -Wextra -o build/sigma-test-scheduler tests/test_scheduler.c
+	@echo 'Σ [RUN]: Memory Tests...'
 	./build/sigma-test-memory
+	@echo 'Σ [RUN]: Scheduler Tests...'
 	./build/sigma-test-scheduler
+	@echo 'Σ [PASS]: All sovereign tests PASSED.'
 
 # Σ PERFORMANCE BENCHMARKING
 sigma-bench: build
-	gcc -o build/sigma-bench tools/sigma-bench.c -Ikernel
+	gcc -std=c11 -O3 -march=native -o build/sigma-bench tools/sigma-bench.c
 	./build/sigma-bench

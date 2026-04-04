@@ -1,7 +1,7 @@
 #ifndef SOVEREIGN_MEMORY_RAII_H
 #define SOVEREIGN_MEMORY_RAII_H
 
-#include "../libc/SovereignLibC.h"
+#include "libc/SovereignLibC.h"
 #include "../SigmaC11.h"
 
 /* =========================================================================

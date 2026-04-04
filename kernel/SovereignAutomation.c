@@ -7,7 +7,7 @@
  * =========================================================================
  */
 
-#include "../SovereignOmniShard.h"
+#include "SovereignOmniShard.h"
 
 /**
  * Σ Sovereign Personalization

@@ -10,7 +10,7 @@
  * =========================================================================
  */
 
-#include "../libc/SovereignLibC.h"
+#include "libc/SovereignLibC.h"
 
 /* =========================================================================
  * Guest Type enum (replaces C++ enum class)

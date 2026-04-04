@@ -9,8 +9,8 @@
  * =========================================================================
  */
 
-#include "../libc/SovereignLibC.h"
-#include "../SovereignOmniShard.h"   /* Industrial sharding structs (C11) */
+#include "libc/SovereignLibC.h"
+#include "SovereignOmniShard.h"   /* Industrial sharding structs (C11) */
 
 /* =========================================================================
  * Command dispatch table entry (replaces C++ if-else chain with data table)

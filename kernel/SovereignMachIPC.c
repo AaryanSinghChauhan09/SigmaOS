@@ -1,5 +1,5 @@
 #include "SovereignMachIPC.h"
-#include "../libc/SovereignLibC.h"
+#include "libc/SovereignLibC.h"
 
 static sigma_u32 current_port_id = 1000;
 
