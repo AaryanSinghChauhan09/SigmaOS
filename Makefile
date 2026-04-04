@@ -16,7 +16,6 @@ OBJS = \
     build/syscall.o \
     build/vfs_stub.o \
     build/vga.o \
-    build/sigma_strings.o \
     build/exceptions.o \
     build/signals.o \
     build/sigma_shell_cli.o
@@ -40,9 +39,6 @@ build/syscall.o: kernel/syscall.c
 
 build/vfs_stub.o: kernel/vfs_stub.c
 	$(CC) $(CFLAGS) -c kernel/vfs_stub.c -o build/vfs_stub.o
-
-build/sigma_strings.o: kernel/libc/sigma_strings.c
-	$(CC) $(CFLAGS) -c kernel/libc/sigma_strings.c -o build/sigma_strings.o
 
 build/vga.o: kernel/drivers/vga.c
 	$(CC) $(CFLAGS) -c kernel/drivers/vga.c -o build/vga.o
