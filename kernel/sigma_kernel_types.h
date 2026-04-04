@@ -37,9 +37,12 @@ typedef i32 int32_t;
 typedef i64 int64_t;
 typedef usize size_t;
 typedef isize ssize_t;
+
+#ifndef __cplusplus
 typedef bool_t bool;
 #define true  TRUE
 #define false FALSE
+#endif
 
 extern void hal_spinlock_acquire(spinlock_t* lock);
 extern void hal_spinlock_release(spinlock_t* lock);
@@ -150,6 +153,30 @@ static inline usize sigma_strlen(const char* s) {
     usize len = 0;
     while (s[len]) len++;
     return len;
+}
+
+static inline int sigma_strcmp(const char* s1, const char* s2) {
+    while (*s1 && (*s1 == *s2)) { s1++; s2++; }
+    return (unsigned char)*s1 - (unsigned char)*s2;
+}
+
+static inline char* sigma_strcpy_safe(char* dst, const char* src, usize max) {
+    usize i;
+    for (i = 0; i < max - 1 && src[i]; i++) dst[i] = src[i];
+    dst[i] = '\0';
+    return dst;
+}
+
+static inline const char* sigma_strstr(const char* haystack, const char* needle) {
+    if (!*needle) return haystack;
+    const char* h = haystack;
+    while (*h) {
+        const char* p = h, *n = needle;
+        while (*p && *n && *p == *n) { p++; n++; }
+        if (!*n) return h;
+        h++;
+    }
+    return NULL;
 }
 
 /* =========================================================================

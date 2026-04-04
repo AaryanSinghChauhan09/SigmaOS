@@ -3,7 +3,7 @@
  Mission: User-to-Kernel Mode Transition & ABI Fulfillment.
 */
 
-#include <stdint.h>
+#include "sigma_kernel_types.h"
 #include "idt.h"
 
 // Σ SYSCALL ABI TABLE

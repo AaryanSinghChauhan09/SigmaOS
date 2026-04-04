@@ -6,8 +6,7 @@
 #ifndef SIGMA_TASK_H
 #define SIGMA_TASK_H
 
-#include <stdint.h>
-#include <stdbool.h>
+#include "sigma_kernel_types.h"
 
 // Σ PROCESS STATE
 typedef enum {
