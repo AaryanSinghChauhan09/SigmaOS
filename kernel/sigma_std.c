@@ -78,19 +78,6 @@ int sigma_memcmp(const void* a, const void* b, usize n) {
     return 0;
 }
 
-/* Safe bounded string copy — always null-terminates destination */
-void sigma_strcpy_safe(char* dst, const char* src, usize max) {
-    usize i;
-    for (i = 0; i < max - 1 && src[i]; i++) dst[i] = src[i];
-    dst[i] = '\0';
-}
-
-/* String comparison — returns 0 if equal */
-int sigma_strcmp(const char* s1, const char* s2) {
-    while (*s1 && (*s1 == *s2)) { s1++; s2++; }
-    return (unsigned char)*s1 - (unsigned char)*s2;
-}
-
 /* Case-insensitive compare */
 int sigma_strcasecmp(const char* s1, const char* s2) {
     while (*s1 && *s2) {
@@ -100,19 +87,6 @@ int sigma_strcasecmp(const char* s1, const char* s2) {
         s1++; s2++;
     }
     return (unsigned char)*s1 - (unsigned char)*s2;
-}
-
-/* String search — returns pointer to first occurrence of needle */
-const char* sigma_strstr(const char* haystack, const char* needle) {
-    if (!*needle) return haystack;
-    const char* h = haystack;
-    while (*h) {
-        const char* p = h, *n = needle;
-        while (*p && *n && *p == *n) { p++; n++; }
-        if (!*n) return h;
-        h++;
-    }
-    return NULL;
 }
 
 /* Convert integer to decimal string (zero-dep itoa) */
@@ -299,22 +273,9 @@ bool_t rb_pop(RingBuffer* rb, u8* out) {
 }
 
 /* =========================================================================
- * SPINLOCK (x86_64 CMPXCHG-based — proper SMP locking primitive)
- * ========================================================================= */
-typedef volatile u32 spinlock_t;
-
-static inline void spinlock_init(spinlock_t* l)    { *l = 0; }
-static inline void spinlock_acquire(spinlock_t* l) {
-    while (__sync_lock_test_and_set(l, 1)) { cpu_pause(); }
-}
-static inline void spinlock_release(spinlock_t* l) {
-    __sync_lock_release(l);
-}
-
-/* =========================================================================
  * ENTROPY GENERATOR (RDTSC-seeded XorShift64 — zero-dep PRNG)
  * ========================================================================= */
-static u64 g_entropy_state = 0xDEADC0DESIGMAULL;
+static u64 g_entropy_state = 0xDEADC0DE5164AULL;
 
 u64 sigma_rand64(void) {
     u64 x = g_entropy_state ^ cpu_rdtsc();

@@ -11,7 +11,7 @@
 // High-performance 1MB bitmask for fast negative file lookups.
 static uint8_t g_SigmaBloom[1024]; // 8KB Sharded Bitmask
 
-inline bool sigma_bloom_check(const char* filename) {
+static inline bool sigma_bloom_check(const char* filename) {
     uint32_t hash = 0;
     while (*filename) hash = (hash << 5) + *filename++;
     return (g_SigmaBloom[(hash % (8192*8)) / 8] & (1 << (hash % 8)));

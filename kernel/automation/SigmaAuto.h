@@ -6,8 +6,7 @@
 #ifndef SIGMA_AUTO_H
 #define SIGMA_AUTO_H
 
-#include <stdint.h>
-#include <stdbool.h>
+#include "../sigma_kernel_types.h"
 
 // Σ AUTOMATION MISSION DOMAINS
 typedef enum {

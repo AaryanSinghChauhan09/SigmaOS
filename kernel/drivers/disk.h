@@ -6,8 +6,7 @@
 #ifndef SIGMA_DISK_H
 #define SIGMA_DISK_H
 
-#include <stdint.h>
-#include <stdbool.h>
+#include "../sigma_kernel_types.h"
 
 #define DISK_BLOCK_SIZE 512
 
