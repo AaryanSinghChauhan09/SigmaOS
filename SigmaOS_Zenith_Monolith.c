@@ -1,67 +1,57 @@
-#include <stdint.h>
-#include <stdbool.h>
+/* SigmaOS_Zenith_Monolith.c - Sovereign Zenith Shard (Zero-Dependency) */
+#include "kernel/sigma_kernel_types.h"
 
 #ifndef SIGMAOS_ZENITH_MONOLITH_H
 #define SIGMAOS_ZENITH_MONOLITH_H
 
-// Custom type definitions
-typedef struct MemoryBlock {
-    struct MemoryBlock* next;
-    size_t size;
-} MemoryBlock;
+// Σ Memory Sharding
+typedef struct SigmaMemoryBlock {
+    struct SigmaMemoryBlock* next;
+    usize size;
+} SigmaMemoryBlock;
 
-// Memory management functions
-void* custom_malloc(size_t size);
-void custom_free(void* ptr);
+// Σ Silicon Primitives
+void* sigma_custom_malloc(usize size);
+void  sigma_custom_free(void* ptr);
 
-// Synchronization primitives
-typedef struct Mutex {
-    // Mutex structure
-} Mutex;
-void mutex_lock(Mutex* m);
-void mutex_unlock(Mutex* m);
+// Σ Synchronization Matrix
+typedef struct SigmaMutex {
+    spinlock_t lock;
+} SigmaMutex;
 
-// Error handling
+void sigma_mutex_lock(SigmaMutex* m);
+void sigma_mutex_unlock(SigmaMutex* m);
+
+// Σ Status Registry
 typedef enum {
-    ERR_SUCCESS,
-    ERR_OUT_OF_MEMORY,
-    ERR_INVALID_ARGUMENT
-} ErrorCode;
+    SIGMA_SUCCESS = 0,
+    SIGMA_ERR_NOMEM = 1,
+    SIGMA_ERR_INVAL = 2
+} SigmaErrorCode;
 
-// System call implementations
-void syscall_example();
-
-// Kernel entry point
-void kernel_main();
+// Σ Mission Handoff
+void sigma_kernel_main(void);
 
 #endif // SIGMAOS_ZENITH_MONOLITH_H
 
-#include "SigmaOS_Zenith_Monolith.h"
-
-// Memory management implementation
-void* custom_malloc(size_t size) {
-    // Custom malloc implementation
+// Σ Implementation
+void* sigma_custom_malloc(usize size) {
+    (void)size;
+    return (void*)0;
 }
 
-void custom_free(void* ptr) {
-    // Custom free implementation
+void sigma_custom_free(void* ptr) {
+    (void)ptr;
 }
 
-// Synchronization implementation
-void mutex_lock(Mutex* m) {
-    // Lock implementation
+void sigma_mutex_lock(SigmaMutex* m) {
+    spinlock_acquire(&m->lock);
 }
 
-void mutex_unlock(Mutex* m) {
-    // Unlock implementation
+void sigma_mutex_unlock(SigmaMutex* m) {
+    spinlock_release(&m->lock);
 }
 
-// System call implementation
-void syscall_example() {
-    // Example syscall implementation
-}
-
-// Kernel entry point implementation
-void kernel_main() {
-    // Kernel initialization
+void sigma_kernel_main() {
+    sigma_kprintf("Σ SIGMAOS: ZENITH MONOLITH SHARD ONLINE.\n");
 }
