@@ -7,8 +7,8 @@
  * =========================================================================
  */
 
-#include "SovereignOmniShard.h"
-#include <stdbool.h>
+#include "sigma_kernel_types.h"
+#include "SigmaSovereignInternal.h"
 
 #define MAX_TOOLS 64
 
@@ -30,12 +30,12 @@ void SovereignToolRegister(const char* name, const char* path, int perms) {
     if (g_ToolCount >= MAX_TOOLS) return;
     
     SovereignTool* tool = &g_Tools[g_ToolCount++];
-    strcpy(tool->name, name);
-    strcpy(tool->path, path);
+    sigma_strcpy_safe(tool->name, name, sizeof(tool->name));
+    sigma_strcpy_safe(tool->path, path, sizeof(tool->path));
     tool->active = true;
     tool->permissions = perms;
     
-    printf("Σ [TOOL]: '%s' registered to %s. [PERMS: %04X]\n", name, path, perms);
+    sigma_kprintf("Σ [TOOL]: '%s' registered to %s. [PERMS: %04X]\n", name, path, perms);
 }
 
 /**
@@ -44,13 +44,13 @@ void SovereignToolRegister(const char* name, const char* path, int perms) {
  */
 void SovereignToolExecute(const char* name, const char* args) {
     for (int i = 0; i < g_ToolCount; i++) {
-        if (strcmp(g_Tools[i].name, name) == 0 && g_Tools[i].active) {
-            printf("Σ [MISSION]: Executing tool '%s' with args '%s'...\n", name, args);
+        if (sigma_strcmp(g_Tools[i].name, name) == 0 && g_Tools[i].active) {
+    sigma_kprintf("Σ [MISSION]: Executing tool '%s' with args '%s'...\n", name, args);
             // Industrial Step: Jump to entry point or spawn child mission.
             return;
         }
     }
-    printf("Σ [ERROR]: Tool '%s' not found or inactive.\n", name);
+    sigma_kprintf("Σ [ERROR]: Tool '%s' not found or inactive.\n", name);
 }
 
 /**
@@ -58,5 +58,5 @@ void SovereignToolExecute(const char* name, const char* args) {
  * Syncs tool definitions with the GitHub/VFS metadata.
  */
 void SovereignToolSync() {
-    printf("Σ [SYNC]: Tool metadata synchronized with GitHub/VFS. Issue templates updated.\n");
+    sigma_kprintf("Σ [SYNC]: Tool metadata synchronized with GitHub/VFS. Issue templates updated.\n");
 }

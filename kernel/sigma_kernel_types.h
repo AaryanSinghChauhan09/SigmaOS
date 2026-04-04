@@ -30,11 +30,11 @@ typedef volatile u32       spinlock_t;
 typedef u8  uint8_t;
 typedef u16 uint16_t;
 typedef u32 uint32_t;
-typedef u64 uint64_t;
+typedef unsigned long long uint64_t;
 typedef i8  int8_t;
 typedef i16 int16_t;
 typedef i32 int32_t;
-typedef i64 int64_t;
+typedef long long int64_t;
 typedef usize size_t;
 typedef isize ssize_t;
 
@@ -183,6 +183,7 @@ static inline const char* sigma_strstr(const char* haystack, const char* needle)
  * SOVEREIGN-FAULT: Industrial Recovery & Assertion
  * ========================================================================= */
 void sigma_panic(const char* msg, u64 rip, u64 rsp);
+void sigma_kprintf(const char* fmt, ...);
 
 #define SIGMA_ASSERT(cond, msg) \
     do { if (!(cond)) sigma_panic(msg, 0, 0); } while (0)

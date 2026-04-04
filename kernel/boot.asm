@@ -36,10 +36,12 @@ sigma_kernel_entry:
     hlt
     jmp .halt
 
-section .bss
+section .data
 align 4096
+global stack_bottom
 stack_bottom:
-    resb 16384    ; 16KB Stack (Zero-filled in BSS)
+    dd 0xDEADC0DE ; Σ SOVEREIGN STACK CANARY (B6)
+    resb 16380    ; 16KB Stack (minus 4 bytes for canary)
 sigma_stack_top:
 
 section .note.GNU-stack noalloc noexec nowrite progbits

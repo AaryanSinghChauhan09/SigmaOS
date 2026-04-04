@@ -243,11 +243,15 @@ void k_print_raw(const char* s) {
 /* =========================================================================
  * FORMATTED OUTPUT (SOVEREIGN KPRINTF)
  * ========================================================================= */
-#include <stdarg.h>
+typedef __builtin_va_list va_list;
+#define va_start(v,l)   __builtin_va_start(v,l)
+#define va_end(v)       __builtin_va_end(v)
+#define va_arg(v,l)     __builtin_va_arg(v,l)
+#define va_copy(d,s)    __builtin_va_copy(d,s)
 
 extern void sigma_putchar(char c);
 
-void kprintf(const char* fmt, ...) {
+void sigma_kprintf(const char* fmt, ...) {
     va_list args;
     va_start(args, fmt);
 
