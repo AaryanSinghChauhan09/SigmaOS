@@ -2,7 +2,23 @@
 
 All notable changes to the SigmaOS industrial core are documented here.
 
-## [1.5.0] - 2024-04-04 (Zenith Phase 2 Update) 🌌
+## [1.6.0] - 2026-04-04 (Zenith Supreme Finalization) 🌌🚀
+
+### Added
+- **Complete Kernel Linkage**: Unified all Zenith core shards (`AmnesicShard`, `AetherOrchestrator`, `ProcessManager`, `VoiceShard`, `LatticePQC`) into the primary OS target.
+- **Master Pipeline V2**: Updated GitHub Actions workflow with 100% kernel source coverage and syntax validation for all core fragments.
+- **Sovereign Memory Symbols**: Global `sigma_memset` and `sigma_memcpy` implementations in `sigma_std.c` for absolute architectural independence.
+
+### Fixed
+- **Linker Inconsistency**: Resolved `undefined reference` and `implicit declaration` errors across the kernel monolith.
+- **Assembly Sectioning**: Optimized `boot.asm` by moving the kernel stack to the `.bss` section, eliminating nasm warnings and streamlining memory layout.
+- **CSS Compliance**: Standardized scrollbar-hiding logic for taskbars using modern `@supports` selectors for 100% cross-browser monitoring.
+
+### Changed
+- Standardized all `kernel/` root includes to use absolute relative paths to `libc/`.
+- Enhanced `OBJS` list in `Makefile` to reflect full system sharding.
+
+## [1.5.0] - 2026-04-04 (Zenith Phase 2 Update) 🌌
 
 ### Added
 - **SovereignUserShard**: Framework for fully custom user-defined logic (Issue #1).
