@@ -241,6 +241,61 @@ void k_print_raw(const char* s) {
 }
 
 /* =========================================================================
+ * FORMATTED OUTPUT (SOVEREIGN KPRINTF)
+ * ========================================================================= */
+#include <stdarg.h>
+
+extern void sigma_putchar(char c);
+
+void kprintf(const char* fmt, ...) {
+    va_list args;
+    va_start(args, fmt);
+
+    for (const char* p = fmt; *p != '\0'; p++) {
+        if (*p != '%') {
+            sigma_putchar(*p);
+            continue;
+        }
+
+        p++; // move past %
+        switch (*p) {
+            case 's': {
+                const char* s = va_arg(args, const char*);
+                while (*s) sigma_putchar(*s++);
+                break;
+            }
+            case 'd': {
+                long d = va_arg(args, long);
+                char buf[32];
+                sigma_itoa(d, buf, sizeof(buf));
+                const char* s = buf;
+                while (*s) sigma_putchar(*s++);
+                break;
+            }
+            case 'x': 
+            case 'p': {
+                unsigned long x = va_arg(args, unsigned long);
+                char buf[32];
+                sigma_utohex(x, buf, sizeof(buf));
+                const char* s = buf;
+                while (*s) sigma_putchar(*s++);
+                break;
+            }
+            case '%': {
+                sigma_putchar('%');
+                break;
+            }
+            default: {
+                sigma_putchar('%');
+                sigma_putchar(*p);
+                break;
+            }
+        }
+    }
+    va_end(args);
+}
+
+/* =========================================================================
  * LIGHTWEIGHT RING BUFFER (generic, used by event busses)
  * ========================================================================= */
 typedef struct RingBuffer {

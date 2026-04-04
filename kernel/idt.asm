@@ -186,3 +186,5 @@ idt_load:
     ; rdi = pointer to IDTR (limit:u16 + base:u64, 10 bytes)
     lidt  [rdi]
     ret
+
+section .note.GNU-stack noalloc noexec nowrite progbits

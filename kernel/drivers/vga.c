@@ -14,23 +14,32 @@ static uint16_t* g_VideoBuffer = (uint16_t*)VGA_BUFFER;
 static int g_CursorX = 0;
 static int g_CursorY = 0;
 
+// Σ SOVEREIGN CHARACTER OUTPUT
+void sigma_putchar(char c) {
+    if (c == '\n') {
+        g_CursorX = 0;
+        g_CursorY++;
+    } else {
+        int index = g_CursorY * VGA_WIDTH + g_CursorX;
+        g_VideoBuffer[index] = (uint16_t)c | (0x07 << 8); // White on Black
+        g_CursorX++;
+    }
+    
+    if (g_CursorX >= VGA_WIDTH) {
+        g_CursorX = 0;
+        g_CursorY++;
+    }
+    
+    if (g_CursorY >= VGA_HEIGHT) {
+        // Simple scrolling: clear screen when full (v1.0 strategy)
+        sigma_clear_screen();
+    }
+}
+
 // Σ SOVEREIGN PRINT
 void sigma_print(const char* s) {
     while (*s) {
-        if (*s == '\n') {
-            g_CursorX = 0;
-            g_CursorY++;
-        } else {
-            int index = g_CursorY * VGA_WIDTH + g_CursorX;
-            g_VideoBuffer[index] = (uint16_t)*s | (0x07 << 8); // White on Black
-            g_CursorX++;
-        }
-        
-        if (g_CursorX >= VGA_WIDTH) {
-            g_CursorX = 0;
-            g_CursorY++;
-        }
-        s++;
+        sigma_putchar(*s++);
     }
 }
 

@@ -11,6 +11,7 @@ LDFLAGS = -T kernel/kernel.ld -nostdlib
 # Σ CORE KERNEL SHARDS (COMPLETE LINKAGE)
 OBJS = \
     build/boot.o \
+    build/idt_asm.o \
     build/kmain.o \
     build/hal.o \
     build/idt.o \
@@ -32,6 +33,9 @@ build:
 
 build/boot.o: kernel/boot.asm
 	$(AS) -f elf64 kernel/boot.asm -o build/boot.o
+
+build/idt_asm.o: kernel/idt.asm
+	$(AS) -f elf64 kernel/idt.asm -o build/idt_asm.o
 
 build/kmain.o: kernel/kmain.c
 	$(CC) $(CFLAGS) -c kernel/kmain.c -o build/kmain.o

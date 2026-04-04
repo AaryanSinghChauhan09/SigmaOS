@@ -39,6 +39,7 @@ sigma_kernel_entry:
 section .bss
 align 4096
 stack_bottom:
-    dd 0xDEADC0DE ; Σ SOVEREIGN STACK CANARY (B6)
-    resb 16380    ; 16KB Stack (minus 4 bytes for canary)
+    resb 16384    ; 16KB Stack (Zero-filled in BSS)
 sigma_stack_top:
+
+section .note.GNU-stack noalloc noexec nowrite progbits
