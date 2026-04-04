@@ -257,22 +257,15 @@ static void test_preemption(void) {
 static void test_round_robin_fairness(void) {
     printf("\n[GROUP] Round-Robin Fairness\n");
     sched_reset();
-
-    /* 4 equal-priority tasks */
-    for (int i = 0; i < 4; i++) sched_add((uint32_t)(i + 1), 50);
-
-    /* Run for many ticks and count how many times each ran */
+    for (int i = 0; i < 4; i++) sched_add((uint32_t)(i + 1), 10);
     uint32_t run_count[MAX_TASKS] = {0};
-    uint32_t ticks = 500;
-    for (uint32_t t = 0; t < ticks; t++) {
+    for (uint32_t t = 0; t < 1000; t++) {
         sched_tick(1000000ULL);
         if (g_current >= 0) run_count[g_current]++;
     }
-
-    /* Each task should have run at least once */
     int all_ran = 1;
-    for (int i = 0; i < 4; i++) if (run_count[i] == 0) { all_ran = 0; break; }
-    SIGMA_TEST("all 4 equal-priority tasks ran over 500 ticks", all_ran);
+    for (int i = 0; i < 4; i++) if (run_count[i] < 10) { all_ran = 0; break; }
+    SIGMA_TEST("all 4 equal-priority tasks ran multiple times", all_ran);
 }
 
 static void test_zombie_reaper(void) {
