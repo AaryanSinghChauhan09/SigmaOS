@@ -10,7 +10,6 @@
  */
 
 #include "../../libc/SovereignLibC.h"
-#include "../sigma_kernel_types.h"
 
 typedef struct {
     sigma_u32 current_term;

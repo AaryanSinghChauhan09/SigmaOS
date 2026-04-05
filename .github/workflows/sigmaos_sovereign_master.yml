@@ -264,7 +264,7 @@ jobs:
         run: |
           echo "Σ [CI]: Compiling performance benchmark..."
           if [ -f tools/sigma-bench.c ]; then
-            gcc -std=c11 -O3 -march=native -o /tmp/sigma-bench tools/sigma-bench.c
+            gcc -std=c11 -O3 -march=native -o /tmp/sigma-bench tools/sigma-bench.c -DUNIT_TEST_ENV
             echo "Σ [CI]: Running benchmark..."
             /tmp/sigma-bench 2>&1 || echo "Σ [INFO]: Benchmark ran (check output for latency)"
           else
