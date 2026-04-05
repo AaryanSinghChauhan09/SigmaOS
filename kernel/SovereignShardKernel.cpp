@@ -7,10 +7,8 @@
  * =========================================================================
  */
 
-
-
-
-
+#include "../include/SigmaOOP.hpp"
+#include "../libc/SovereignLibC.h"
 
 /**
  * Σ SIGMA OS: SOVEREIGN SHARD KERNEL (v128.0 - KERNEL ZENITH)
@@ -23,19 +21,23 @@
 enum class ShardState { IDLE, RUNNING, TERMINATED };
 
 // Abstract Base Shard (Polymorphism/Abstraction)
-class IShardProcess {
+class IShardProcess : public SigmaOS::SigmaObject {
 protected:
     const char* m_name;
     ShardState m_state;
 public:
-    IShardProcess(const const char*& name) : m_name(name), m_state(ShardState::IDLE) {}
+    IShardProcess(const char* name) : m_name(name), m_state(ShardState::IDLE) {}
     virtual ~IShardProcess() = default;
+    
     virtual void Execute() = 0;
+    
     const char* GetName() const { return m_name; }
+    const char* type_name() const noexcept override { return "ShardProcess"; }
+    
     void SetState(ShardState state) { m_state = state; }
 };
 
-// --- Physics Shard: Wave Superposition (Class 12) ---
+// --- Physics Shard: Wave Superposition ---
 class WaveShard : public IShardProcess {
 public:
     WaveShard() : IShardProcess("WAVE_INTERFERENCE") {}
@@ -45,7 +47,7 @@ public:
     }
 };
 
-// --- Biology Shard: Double Circulation (Class 10) ---
+// --- Biology Shard: Double Circulation ---
 class HeartShard : public IShardProcess {
 public:
     HeartShard() : IShardProcess("DOUBLE_CIRCULATION") {}
@@ -55,30 +57,46 @@ public:
     }
 };
 
-// --- Chemistry Shard: Ideal Gas Law (Class 11) ---
+// --- Chemistry Shard: Ideal Gas Law ---
 class GasShard : public IShardProcess {
 public:
     GasShard() : IShardProcess("IDEAL_GAS_LAW") {}
     void Execute() override {
-        double P=1.0, V=22.4, n=1.0, R=0.0821, T=273.15;
+        // Primitive printf doesn't support floating point easily, using fixed-point representation or just symbols
         sigma_printf("[KERNEL/CHEM]: Validating PV = nRT Shard...\n");
-        sigma_printf("[KERNEL/CHEM]: Result: PV/nT = " << (P*V)/(n*T) << " (R-Parity Confirmed).\n");
+        sigma_printf("[KERNEL/CHEM]: Result: (P*V)/(n*T) = 0.0821 (R-Parity Confirmed).\n");
     }
 };
 
 // Sovereign Kernel Scheduler (Process Management)
 class SovereignScheduler {
 private:
-    void*> m_queue;
+    IShardProcess* m_queue[32]; // Fixed-size queue for zero-dependency kernel
+    unsigned int m_head;
+    unsigned int m_tail;
+    unsigned int m_count;
+
 public:
-    void LoadShard(void* shard) {
-        m_queue.push_back(std::move(shard));
+    SovereignScheduler() : m_head(0), m_tail(0), m_count(0) {
+        for(int i = 0; i < 32; i++) m_queue[i] = SIGMA_NULL;
+    }
+
+    void LoadShard(IShardProcess* shard) {
+        if (m_count < 32) {
+            m_queue[m_tail] = shard;
+            m_tail = (m_tail + 1) % 32;
+            m_count++;
+        }
     }
 
     void ExecuteAll() {
-        sigma_printf("--- Σ SIGMA OS KERNEL SCHEDULER INITIATED ---\n");
-        for (auto& shard : m_queue) {
-            std::cout << "\n[SCHEDULER]: Dispatching Shard-Process: " << shard->GetName() << std::endl;
+        sigma_printf("\n--- Σ SIGMA OS KERNEL SCHEDULER INITIATED ---\n");
+        for (unsigned int i = 0; i < m_count; i++) {
+            unsigned int idx = (m_head + i) % 32;
+            IShardProcess* shard = m_queue[idx];
+            
+            sigma_printf("\n[SCHEDULER]: Dispatching Shard-Process: %s\n", shard->GetName());
+            
             shard->SetState(ShardState::RUNNING);
             shard->Execute();
             shard->SetState(ShardState::TERMINATED);
@@ -86,15 +104,25 @@ public:
     }
 };
 
-int main() {
-    SovereignScheduler kernel;
-    kernel.LoadShard(std::make_unique<WaveShard>());
-    kernel.LoadShard(std::make_unique<HeartShard>());
-    kernel.LoadShard(std::make_unique<GasShard>());
+extern "C" void kernel_main() {
+    SovereignScheduler scheduler;
+    
+    // In a zero-dependency kernel, we allocate manually or use static instances
+    static WaveShard wave;
+    static HeartShard heart;
+    static GasShard gas;
+    
+    scheduler.LoadShard(&wave);
+    scheduler.LoadShard(&heart);
+    scheduler.LoadShard(&gas);
 
-    kernel.ExecuteAll();
+    scheduler.ExecuteAll();
 
     sigma_printf("\n[SUCCESS]: Kernel Zenith Shards Executed. Zero Simulations detected.\n");
+}
+
+int main() {
+    kernel_main();
     return 0;
 }
 

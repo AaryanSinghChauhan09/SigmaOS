@@ -55,7 +55,7 @@ sigma_close:
 
 ; --- sigma_mmap (void* addr... etc) ---
 sigma_mmap:
-    mov r10, rcx    ; R10 = R9 (fourth param for syscall)
+    mov r10, rcx    ; R10 = syscall 4th param (flags)
     mov rax, 9      ; sys_mmap
     syscall
     ret
@@ -85,15 +85,17 @@ sigma_strlen:
 
 ; --- sigma_memset (void* s, int c, size_t n) ---
 sigma_memset:
+    push rdi        ; save original destination pointer
     mov rax, rsi    ; rax = c (value to set)
     mov rcx, rdx    ; rcx = n (count)
-    mov rdi, rdi    ; rdi = s (destination)
-    rep stosb       ; set n bytes
-    mov rax, rdi    ; return original s? Actually rep stosb modifies rdi.
+    rep stosb       ; set n bytes, rdi is incremented
+    pop rax         ; return original pointer
     ret
 
 ; --- sigma_memcpy (void* dest, const void* src, size_t n) ---
 sigma_memcpy:
+    push rdi        ; save destination pointer
     mov rcx, rdx    ; count
-    rep movsb       ; copy bytes
+    rep movsb       ; copy rcx bytes from rsi to rdi
+    pop rax         ; return original destination
     ret

@@ -76,48 +76,28 @@ LDFLAGS   := -nostdlib -static
 # =============================================================================
 
 # Core libc Implementation (Our sovereign stdlib replacement)
-SIGMA_LIBC_C   := libc/sigma_libc.c
-SIGMA_LIBC_OBJ := build/sigma_libc.o
-
-# Root libc wrapper
-SIGMA_ROOT_LIBC_C   := SigmaLibC.c
-SIGMA_ROOT_LIBC_OBJ := build/SigmaLibCRoot.o
+SIGMA_LIBC_C   := libc/SovereignLibC.c
+SIGMA_LIBC_OBJ := build/SovereignLibC.o
 
 # Kernel C sources (refactored to use sigma_types.h only)
-KERNEL_C_SRCS := kernel/slab_allocator.c \
-                 kernel/mmu_core.c \
-                 kernel/idt_core.c \
-                 kernel/pci_scanner.c \
-                 kernel/sovereign_scheduler.c \
-                 kernel/sovereign_ipc.c \
-                 kernel/sovereign_vfs.c \
-                 kernel/sovereign_nic.c \
-                 kernel/system_healer.c \
-                 kernel/synch.c \
-                 kernel/sovereign_bpf.c \
-                 kernel/sovereign_timer.c \
-                 libc/sigma_hal.c
+KERNEL_C_SRCS := kernel/slab.c \
+                 kernel/SovereignProcessManager.cpp \
+                 kernel/SovereignMemoryZenith.cpp \
+                 kernel/SovereignShardKernel.cpp \
+                 kernel/SovereignZenithComplete.cpp \
+                 kernel/SovereignAIKernelZenith.cpp \
+                 kernel/SovereignXV6Bridge.cpp
 KERNEL_OBJS   := $(patsubst %, build/kernel_%.o, $(notdir $(KERNEL_C_SRCS)))
 
 # ASM sources
-BOOT_ASM_SRC     := kernel/boot.asm
-LONG_MODE_ASM    := kernel/long_mode.asm
-SYSCALL_ASM      := kernel/syscall.asm
-TASK_SWITCH_ASM  := kernel/task_switch.asm
-SIGMA_HAL_ASM    := sigma_hal.asm
-BOOT_OBJS        := build/boot.o build/long_mode.o build/syscall.o build/task_switch.o
-
-# Root C++ sources
-ROOT_CPP_SRCS := SigmaMmapAllocator.c \
-                 SigmaNoLib_Compute.c
-ROOT_C_OBJS   := $(patsubst %.c, build/%.o, $(ROOT_CPP_SRCS))
+BOOT_ASM_SRC     := arch/SovereignStandardHAL.asm
+SYSCALL_ASM      := libc/SovereignLibC.asm
+KERNEL_FINAL_ASM := kernel/SovereignKernelFinality.asm
+BOOT_OBJS        := build/hal.o build/syscall.o build/finality.o
 
 # Rust no_std modules
-RUST_SRCS := SigmaRustCore.rs \
-             sigma_chaos.rs \
-             sigma_devforge.rs \
-             sigma_gaming_sovereign.rs \
-             kernel/vanguard_crypto.rs
+RUST_SRCS := kernel/rust/SigmaRustCore.rs \
+             kernel/rust/SovereignSafety.rs
 RUST_TARGETS := $(patsubst %.rs, build/%.a, $(notdir $(RUST_SRCS)))
 
 # C++ Kernel drivers / apps

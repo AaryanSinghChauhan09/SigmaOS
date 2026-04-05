@@ -11,7 +11,8 @@
 #ifndef SIGMA_OOP_HPP
 #define SIGMA_OOP_HPP
 
-#include "SovereignLibC.h"
+#include "../libc/SovereignLibC.h"
+#include "../libc/sigma_types.h"
 
 namespace SigmaOS {
 

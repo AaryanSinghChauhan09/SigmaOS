@@ -93,9 +93,18 @@ int sigma_pipe(int pipefd[2]) {
 }
 
 unsigned int sigma_sleep(unsigned int seconds) {
-    // x86_64 rax=35 (nanosleep) - implementation simplifies for seconds
-    sigma_printf("[ZENITH-LIBC]: Pulse sleep for %d seconds...\n", seconds);
-    return 0;
+    // x86_64 rax=35 (nanosleep)
+    struct {
+        long tv_sec;
+        long tv_nsec;
+    } req = { (long)seconds, 0 };
+    
+    long res;
+    __asm__ __volatile__ ("syscall" 
+        : "=a"(res) 
+        : "a"(35), "D"(&req), "S"(0) 
+        : "rcx", "r11", "memory");
+    return (unsigned int)res;
 }
 
 int sigma_wait(int* wstatus) {
@@ -130,6 +139,9 @@ void sigma_printf(const char* format, ...) {
                     sigma_print(va_arg(args, const char*));
                     break;
                 case 'd':
+                case 'i':
+                    sigma_print_num((sigma_u64)va_arg(args, int));
+                    break;
                 case 'u':
                     sigma_print_num(va_arg(args, sigma_u64));
                     break;
@@ -142,8 +154,11 @@ void sigma_printf(const char* format, ...) {
                     sigma_write(1, &c, 1);
                     break;
                 }
+                case '%':
+                    sigma_write(1, "%", 1);
+                    break;
                 default:
-                    sigma_write(1, p, 1);
+                    sigma_print("[UNKNOWN_FORMAT]");
             }
         } else {
             sigma_write(1, p, 1);
