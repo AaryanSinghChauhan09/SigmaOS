@@ -1,0 +1,64 @@
+name: "Σ SIGMAOS: Sovereign Universal Verification"
+
+on:
+  push:
+    branches: [ main, develop ]
+  pull_request:
+    branches: [ main ]
+  workflow_dispatch:
+
+jobs:
+  universal-verification:
+    name: "Total System Sovereign Audit"
+    runs-on: ubuntu-latest
+    steps:
+      - name: "Clone Sovereign Repository"
+        run: |
+          git init
+          git remote add origin https://github.com/${{ github.repository }}
+          git fetch --depth 1 origin ${{ github.sha }}
+          git reset --hard FETCH_HEAD
+
+      - name: "Install Build Essentials"
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y gcc-multilib nasm cppcheck
+
+      - name: "1. Security Inspection (Forbidden Functions)"
+        run: |
+          echo "Σ [AUDIT]: Scanning for unsafe string primitives..."
+          ! grep -rE "gets\(|strcpy\(|strcat\(|sprintf\(" . --exclude-dir=tests --exclude-dir=libc --exclude-dir=.git || (echo "Σ [FAIL]: Unsafe functions detected!" && exit 1)
+          echo "Σ [PASS]: Security standards verified."
+
+      - name: "2. Static Analysis Audit"
+        run: |
+          cppcheck --enable=all --std=c11 --suppress=unusedFunction --suppress=missingIncludeSystem kernel/ libc/
+
+      - name: "3. Unit Test Suite (Matrix)"
+        run: |
+          mkdir -p build
+          gcc -std=c11 -O2 -Wall -o build/test-scheduler tests/test_scheduler.c
+          ./build/test-scheduler
+          gcc -std=c11 -O2 -Wall -o build/test-memory tests/test_memory.c
+          ./build/test-memory
+
+      - name: "4. Shard Integration Audit"
+        run: |
+          gcc -std=c11 -O2 -Wall -o build/test-integration tests/test_integration.c
+          ./build/test-integration
+
+      - name: "5. Security Fuzz Audit"
+        run: |
+          gcc -std=c11 -O2 -Wall -o build/test-security-fuzz tests/test_security_fuzz.c
+          ./build/test-security-fuzz
+
+      - name: "6. Performance Benchmark Sharding"
+        run: |
+          if [ -f tools/sigma-bench.c ]; then
+            gcc -std=c11 -O3 -o build/sigma-bench tools/sigma-bench.c -DUNIT_TEST_ENV
+            ./build/sigma-bench
+          fi
+
+      - name: "Σ TOTAL SOVEREIGNTY ACHIEVED"
+        run: |
+          echo "Σ [SUCCESS]: Universal Verification Complete. OS Integrity Secured."

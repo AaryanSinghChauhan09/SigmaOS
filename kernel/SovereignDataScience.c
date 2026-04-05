@@ -22,7 +22,34 @@ typedef struct {
     sigma_u32 big_data_nodes;
 } sigma_ds_pipeline_t;
 
+/**
+ * Σ NATIVE DATAFRAME ENGINE (41): PANDAS-X PARITY
+ */
+typedef struct {
+    sigma_f64* data;
+    sigma_u32  rows;
+    sigma_u32  cols;
+} sigma_ds_dataframe_t;
+
 static sigma_ds_pipeline_t g_ds_pipeline;
+
+/* --- Init DataFrame (Milestone 41) --- */
+void SovereignDS_InitDF(sigma_ds_dataframe_t* df, sigma_u32 rows, sigma_u32 cols) {
+    df->rows = rows;
+    df->cols = cols;
+    df->data = (sigma_f64*)sigma_malloc(rows * cols * sizeof(sigma_f64));
+    sigma_memset(df->data, 0, rows * cols * sizeof(sigma_f64));
+    sigma_printf("[PANDAS-X]: Initialized %ux%u DataFrame shard.\n", rows, cols);
+}
+
+/* --- Vectorized Addition (NumPy Parity) --- */
+void SovereignDS_VectorAdd(sigma_ds_dataframe_t* out, const sigma_ds_dataframe_t* a, const sigma_ds_dataframe_t* b) {
+    if (a->rows != b->rows || a->cols != b->cols) return;
+    for (sigma_u32 i = 0; i < a->rows * a->cols; i++) {
+        out->data[i] = a->data[i] + b->data[i];
+    }
+    sigma_print("[NUMPY-X]: Vectorized addition shard executed on Silicon.\n");
+}
 
 /**
  * Σ STAGE 1: COLLECTION (SQL, EXCEL, APIs, BIGQUERY, POSTGRES)

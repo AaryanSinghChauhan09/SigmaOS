@@ -10,7 +10,7 @@
  * =========================================================================
  */
 
-#include "libc/SovereignLibC.h"
+#include "../libc/SovereignLibC.h"
 
 /* =========================================================================
  * Sovereign AI Kernel State (struct replaces C++ class)
@@ -58,6 +58,26 @@ static void aikernel_audit(const SovereignAIKernel* ai) {
     sigma_printf("--------------------------------------\n");
 }
 
+/* --- Anomaly Detection (Milestone 20) --- */
+static int aikernel_detect_anomaly(const SovereignAIKernel* ai, const sigma_f64* data, int size) {
+    sigma_printf("\nΣ [ANOMALY-AI]: SCANNING KERNEL TELEMETRY... (Size: %d)\n", size);
+    
+    sigma_f64 mean = 0, variance = 0;
+    for(int i=0; i<size; i++) mean += data[i];
+    mean /= size;
+    
+    for(int i=0; i<size; i++) variance += (data[i] - mean) * (data[i] - mean);
+    variance /= size;
+
+    if (variance > 100.0) {
+        sigma_print("[ANOMALY-AI]: UNUSUAL VARIANCE DETECTED. Triggering Entropy lockdown.\n");
+        return 1;
+    }
+    sigma_print("[OK]: Telemetry nominal. Variance within Sovereign bounds.\n");
+    (void)ai;
+    return 0;
+}
+
 /* =========================================================================
  * Entry Point
  * ========================================================================= */
@@ -72,6 +92,10 @@ void start_aikernel_zenith(void) {
     /* Demonstrate bare-metal linear regression shard */
     sigma_f64 result = aikernel_linear_predict(7.0, 2.5, 0.1);
     sigma_printf("[AI_KERNEL-ZENITH]: Regression(7.0) = %f\n", result);
+
+    /* Anomaly Check (Milestone 20) */
+    sigma_f64 sample_data[5] = {10.0, 12.0, 11.0, 45.0, 13.0}; // Simulated spike
+    aikernel_detect_anomaly(&ai, sample_data, 5);
 
     aikernel_audit(&ai);
 }
