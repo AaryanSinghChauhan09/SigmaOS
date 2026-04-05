@@ -8,7 +8,7 @@
  * =========================================================================
  */
 
-#include "../../libc/sigma_libc.h"
+#include "../../libc/SovereignLibC.h"
 #include "../SovereignMemoryRAII.h"
 
 // --- OS Core Subsystems ---
@@ -22,6 +22,12 @@ extern void SovereignML_Init(void);
 extern void SovereignDataScience_Init(void);
 extern void SovereignIndianLaw_BNSS_Init(void);
 extern void SovereignQuantum_LatticeInit(void);
+extern void SovereignGaming_Init(void);
+extern void SovereignCyber_Init(void);
+extern void SovereignFintech_Init(void);
+extern void SovereignBio_Init(void);
+extern void SovereignWatchdog_Init(void);
+extern void SovereignWatchdog_Pulse(void);
 
 void sigma_kernel_main() {
     sigma_printf("\n==================================================\n");
@@ -48,8 +54,16 @@ void sigma_kernel_main() {
     SovereignAIKernel_Init();
     SovereignML_Init();
 
-    /* 4. LAYER FOUR: Data Science & Analytics */
+    /* 4. LAYER FOUR: Industrial Sectors (Data Science, Gaming, Cyber, Fintech, Bio) */
     SovereignDataScience_Init();
+    SovereignGaming_Init();
+    SovereignCyber_Init();
+    SovereignFintech_Init();
+    SovereignBio_Init();
+    
+    /* 4.5 LAYER 4.5: Automation & Reliability (Self-Healing) */
+    SovereignWatchdog_Init();
+    SovereignWatchdog_Pulse();
     
     /* 5. LAYER FIVE: Legal Frameworks (BNS / BNSS compliance) */
     sigma_printf("\n[*] Loading Indian Legal Framework Constants...\n");

@@ -41,6 +41,7 @@ void zen_editor_init(void) {
 void zen_editor_highlight(u32 line_idx) {
     if (line_idx >= MAX_EDITOR_LINES) return;
     const char* line = g_editor.lines[line_idx];
+    (void)line;
     
     /* 
      * Shard-based Syntax Coloring (Mockup Logic for CLI/GUI)

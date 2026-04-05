@@ -250,7 +250,7 @@ void proc_harvest_zombies(void) {
         SigmaProc* p = &g_proctab.procs[i];
         if (p->state == PS_ZOMBIE) {
             /* If parent is dead or not interested, reap it */
-            SigmaProc* parent = proc_find(p->ppid);
+            const SigmaProc* parent = proc_find(p->ppid);
             if (!parent || parent->state == PS_UNUSED) {
                 p->state = PS_UNUSED;
                 g_proctab.active--;

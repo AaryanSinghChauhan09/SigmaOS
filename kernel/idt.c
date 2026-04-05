@@ -189,11 +189,9 @@ void sigma_interrupt_handler(SigmaInterruptFrame* frame) {
         return;
     }
 
-    /* CPU Exception — kernel panic */
     if (vec < 32) {
         sigma_kprintf("\n[KERNEL PANIC] Exception #%llu: %s\n",
-                vec,
-                (vec < 32) ? g_exception_names[vec] : "Unknown");
+                vec, g_exception_names[vec]);
         sigma_kprintf("  Error Code : %016llx\n", frame->error_code);
         sigma_kprintf("  RIP        : %016llx\n", frame->rip);
         sigma_kprintf("  CS         : %04llx\n",  frame->cs);

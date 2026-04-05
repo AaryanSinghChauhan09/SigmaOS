@@ -1,4 +1,4 @@
-#include "libc/SovereignLibC.h"
+#include "../libc/SovereignLibC.h"
 
 /*
  * =========================================================================
@@ -9,6 +9,8 @@
  * 3. BARE-METAL EFFICIENCY: Direct hardware orchestration.
  * 4. AMNESIC PRIVACY: Registers and stack wiped after every task.
  * 5. QUANTUM RESILIENCE: Lattice-based PQC at the core.
+ * 6. INDUSTRIAL DOMINANCE: Absorbing the USPs of every major sector.
+ * 7. SELF-HEALING ARCH: Automated shard-recovery via Watchdog.
  * =========================================================================
  */
 
@@ -18,6 +20,7 @@ void Sovereign_DisplayPrinciples(void) {
     sigma_printf("2. Isolation: Every shard runs in a dedicated memory cage.\n");
     sigma_printf("3. Zenith-Gold: Industrial aesthetic for mission-critical UX.\n");
     sigma_printf("4. Competitor Neutralization: Direct syscall absorption.\n");
+    sigma_printf("5. Sector Dominance: Best of Gaming, Fintech, Cyber, Bio.\n");
     sigma_printf("--------------------------------------------------\n");
 }
 

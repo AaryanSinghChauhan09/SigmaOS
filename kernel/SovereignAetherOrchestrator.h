@@ -1,7 +1,8 @@
 #ifndef SOVEREIGN_AETHER_ORCHESTRATOR_H
 #define SOVEREIGN_AETHER_ORCHESTRATOR_H
 
-#include "SovereignOmniShard.h"
+#include "../libc/SovereignLibC.h"
+#include "../SovereignOmniShard.h"
 
 /**
  * Σ Sovereign Aether Orchestrator Types

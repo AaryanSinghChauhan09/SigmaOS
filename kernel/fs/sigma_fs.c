@@ -5,17 +5,9 @@
 
 #include "../sigma_kernel_types.h"
 #include "../SigmaSovereignInternal.h"
-#include "../drivers/disk.h"
 
-// Σ BLOOM FILTER SHARD (v2400.0)
-// High-performance 1MB bitmask for fast negative file lookups.
-static uint8_t g_SigmaBloom[1024]; // 8KB Sharded Bitmask
 
-static inline bool sigma_bloom_check(const char* filename) {
-    uint32_t hash = 0;
-    while (*filename) hash = (hash << 5) + *filename++;
-    return (g_SigmaBloom[(hash % (8192*8)) / 8] & (1 << (hash % 8)));
-}
+
 
 // Σ SIGMAFS INODE STRUCTURE
 typedef struct {

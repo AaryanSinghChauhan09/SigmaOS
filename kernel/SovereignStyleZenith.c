@@ -1,4 +1,4 @@
-#include "libc/SovereignLibC.h"
+#include "../libc/SovereignLibC.h"
 
 /*
  * =========================================================================
@@ -34,15 +34,15 @@ void SovereignStyleZenith_ShardDynamicDesign(SovereignStyleZenith* self, const c
 
 // Full Automation & Personalization Shard implementation
 void SovereignStyleZenith_Personalize(SovereignStyleZenith* self, const char* user_pref) {
-    if (sigma_compare(user_pref, "NIGHT_OWL")) {
+    if (sigma_streq(user_pref, "NIGHT_OWL")) {
         sigma_printf("[STYLE-ZENITH]: Auto-applying pure deep-space dark mode (Zero-Glare) for Ultimate Focus.\n");
         self->theme_id = 0x01;
         self->active_shaders += 5;
-    } else if (sigma_compare(user_pref, "CYBERPUNK_NEON")) {
+    } else if (sigma_streq(user_pref, "CYBERPUNK_NEON")) {
         sigma_printf("[STYLE-ZENITH]: Auto-applying neon-saturated cyberpunk aesthetic. Crushing visual competitors.\n");
         self->theme_id = 0x02;
         self->active_shaders += 10;
-    } else if (sigma_compare(user_pref, "MINIMALIST_ZEN")) {
+    } else if (sigma_streq(user_pref, "MINIMALIST_ZEN")) {
         sigma_printf("[STYLE-ZENITH]: Engaging zero-distraction structural minimalism.\n");
         self->theme_id = 0x03;
         self->active_shaders = 1;
@@ -51,7 +51,3 @@ void SovereignStyleZenith_Personalize(SovereignStyleZenith* self, const char* us
         self->theme_id = 0xAF;
     }
 }
-
-// [SOVEREIGN-IMPROVISE-LINK] Roadmap Category: Visual Design & Theming mapped successfully.
-
-// [SOVEREIGN-IMPROVISE-LINK] Roadmap Category: Visual Design & Theming mapped successfully.

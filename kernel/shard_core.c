@@ -81,7 +81,7 @@ extern void shard_switch_asm(u64 from_stack, u64 to_stack);
 void shard_isolate_and_switch(u64 next_shard_id) {
     if (next_shard_id >= g_shard_count) return;
     
-    SigmaShard* next = &g_shards[next_shard_id];
+    const SigmaShard* next = &g_shards[next_shard_id];
     if (!next->active) return;
 
     // Trigger hardware-level memory boundary enforcement (Updating CR3 or MPU)

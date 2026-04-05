@@ -80,8 +80,8 @@ _sigma_streq:
     xor rax, rax
 .loop:
     mov al, [rdi]
-    mov bl, [rsi]
-    cmp al, bl
+    mov cl, [rsi]
+    cmp al, cl
     jne .not_equal
     cmp al, 0
     je .equal

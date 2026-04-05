@@ -42,7 +42,7 @@ void keyboard_master_init(void) {
 
 void keyboard_on_event(u32 mod, u32 key) {
     /* Industry-leading shortcut matching */
-    for (u32 i = 0; i < g_shortcut_count; i++) {
+    for (int i = 0; i < (int)g_shortcut_count; i++) {
         if (g_shortcuts[i].active && 
             g_shortcuts[i].modifier == mod && 
             g_shortcuts[i].key_code == key) {

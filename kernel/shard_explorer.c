@@ -52,7 +52,7 @@ void explorer_navigate(const char* target) {
     /* Industrial Path Validation */
     if (!target) return;
     
-    u32 i = 0; while (target[i] && i < 255) { g_explorer.current_path[i] = target[i]; i++; }
+    u32 i = 0; while (i < 255 && target[i]) { g_explorer.current_path[i] = target[i]; i++; }
     g_explorer.current_path[i] = '\0';
     
     // kprintf("[SHARD-EXPLORER]: Navigating Shard: %s\n", g_explorer.current_path);

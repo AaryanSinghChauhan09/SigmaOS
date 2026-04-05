@@ -7,7 +7,7 @@
  * Provides port-based communication between shards.
  */
 
-#include "SovereignLibC.h"
+#include "libc/SovereignLibC.h"
 
 typedef sigma_u32 mach_port_t;
 typedef sigma_u32 mach_msg_size_t;
@@ -27,7 +27,7 @@ typedef struct {
 
 // Action Prototypes
 mach_port_t sovereign_mach_port_allocate();
-void sovereign_mach_msg_send(mach_msg_header_t* header, void* data, mach_msg_size_t size);
+void sovereign_mach_msg_send(const mach_msg_header_t* header, const void* data, mach_msg_size_t size);
 void sovereign_mach_msg_receive(mach_port_t port, mach_msg_header_t* header, void* buffer, mach_msg_size_t buffer_size);
 
 #endif

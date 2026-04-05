@@ -7,8 +7,8 @@
  * =========================================================================
  */
 
-#include "ai_ml/SigmaTransformer.h"
-#include <stdbool.h>
+#include "../libc/SovereignLibC.h"
+#include "../SovereignOmniShard.h"
 #include "SigmaSovereignInternal.h"
 
 /**
@@ -25,11 +25,11 @@ static const char* g_SigmaKnowledgeBase =
  */
 void SigmaSovereignQuery(const char* user_query, char* response_out) {
     if (sigma_strstr(user_query, "help") || sigma_strstr(user_query, "sigma")) {
-        sigma_strcpy(response_out, "Σ [ML]: I am the SigmaOS Sovereign AI, trained natively on the Zenith Core.");
+        sigma_strncpy(response_out, "Σ [ML]: I am the SigmaOS Sovereign AI, trained natively on the Zenith Core.", 256);
     } else if (sigma_strstr(user_query, "vfs") || sigma_strstr(user_query, "path")) {
-        sigma_strcpy(response_out, "Σ [ML]: VFS (Virtual File System) maps sharded blocks to /root with zero-latency.");
+        sigma_strncpy(response_out, "Σ [ML]: VFS (Virtual File System) maps sharded blocks to /root with zero-latency.", 256);
     } else {
-        sigma_strcpy(response_out, "Σ READY: Use `sigma-ai train` to improve my custom reasoning.");
+        sigma_strncpy(response_out, "Σ READY: Use `sigma-ai train` to improve my custom reasoning.", 256);
     }
 }
 
@@ -41,14 +41,15 @@ void SovereignAcademyStart(int mission_id) {
     char mission_desc[256];
     switch (mission_id) {
         case 1:
-            sigma_strcpy(mission_desc, "MISSION 1: CREATE DIRECTORY /root/sigma_academy");
+            sigma_strncpy(mission_desc, "MISSION 1: CREATE DIRECTORY /root/sigma_academy", 256);
             break;
         case 2:
-            sigma_strcpy(mission_desc, "MISSION 2: EXECUTE 'sigmactl health'");
+            sigma_strncpy(mission_desc, "MISSION 2: EXECUTE 'sigmactl health'", 256);
             break;
         default:
-            sigma_strcpy(mission_desc, "MISSION: EXPLORE SIGMAOS ZENITH");
+            sigma_strncpy(mission_desc, "MISSION: EXPLORE SIGMAOS ZENITH", 256);
             break;
     }
+    sigma_printf("Σ [ACADEMY]: %s\n", mission_desc);
     sigma_print("\nΣ [ACADEMY]: MISSION START\n");
 }

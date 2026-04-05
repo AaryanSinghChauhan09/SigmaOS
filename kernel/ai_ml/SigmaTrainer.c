@@ -17,7 +17,7 @@
 void SigmaML_Preprocess(const char* raw_text, int* tokens_out) {
     // Simple ASCII to Token Map (Sovereign implementation)
     int i = 0;
-    while (raw_text[i] && i < MAX_SEQ_LEN) {
+    while (i < MAX_SEQ_LEN - 1 && raw_text[i]) {
         tokens_out[i] = (int)raw_text[i] % VOCAB_SIZE;
         i++;
     }
@@ -34,6 +34,7 @@ void SigmaML_TrainStep(SigmaModel* model, int* tokens_batch, float learning_rate
     
     // 2. LOSS CALCULATION: Cross-Entropy
     float loss = 0.05f; // Placeholder logic: Loss minimizes as weights converge.
+    (void)loss;
     
     // 3. BACKWARD PASS: Simple SGD on all weights
     for (int l = 0; l < N_LAYERS; l++) {

@@ -4,7 +4,6 @@
 */
 
 #include "sigma_kernel_types.h"
-#include "idt.h"
 
 // Σ SYSCALL ABI TABLE
 #define SIGMA_SYS_READ  0x00
@@ -18,7 +17,6 @@
 void sigma_syscall_handler(uint64_t opcode, uint64_t arg1, uint64_t arg2, uint64_t arg3) {
     switch (opcode) {
         case SIGMA_SYS_WRITE:
-            // sigma_printk((const char*)arg2, 0x0F);
             break;
             
         case SIGMA_SYS_EXIT:
@@ -33,5 +31,4 @@ void sigma_syscall_handler(uint64_t opcode, uint64_t arg1, uint64_t arg2, uint64
 
 // Σ INT 0x80 / SYSCALL Vector Setup
 void sigma_syscall_init() {
-    // sigma_idt_set_gate(0x80, (uint64_t)sigma_syscall_handler, 0x08, 0xEE);
 }

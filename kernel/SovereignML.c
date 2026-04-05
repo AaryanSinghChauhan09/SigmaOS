@@ -131,7 +131,7 @@ int main(void) {
     neural_forward(&forge, inputs, NEURAL_N);
     neural_automl(&forge);
 
-    sigma_f64 data[5] = {2.0, 4.0, 4.0, 4.0, 5.0};
+    const sigma_f64 data[5] = {2.0, 4.0, 4.0, 4.0, 5.0};
     sigma_printf("[STATS]: Mean=%f  Variance=%f\n",
                  stats_mean(data, 5), stats_variance(data, 5));
 

@@ -34,6 +34,12 @@ OBJS = \
     build/ProcessManager.o \
     build/VoiceShard.o \
     build/LatticePQC.o \
+    build/SovereignDataScience.o \
+    build/SovereignGaming.o \
+    build/SovereignCyber.o \
+    build/SovereignFintech.o \
+    build/SovereignBio.o \
+    build/SovereignWatchdog.o \
     build/sigma_std.o
 
 all: build build/sigmaos_zenith
@@ -109,6 +115,24 @@ build/VoiceShard.o: kernel/SovereignVoiceShard.c
 
 build/LatticePQC.o: kernel/shards/SovereignLatticePQC.c
 	$(CC) $(CFLAGS) -c kernel/shards/SovereignLatticePQC.c -o build/LatticePQC.o
+
+build/SovereignDataScience.o: kernel/SovereignDataScience.c
+	$(CC) $(CFLAGS) -c kernel/SovereignDataScience.c -o build/SovereignDataScience.o
+
+build/SovereignGaming.o: kernel/shards/SovereignGaming.c
+	$(CC) $(CFLAGS) -c kernel/shards/SovereignGaming.c -o build/SovereignGaming.o
+
+build/SovereignCyber.o: kernel/shards/SovereignCyber.c
+	$(CC) $(CFLAGS) -c kernel/shards/SovereignCyber.c -o build/SovereignCyber.o
+
+build/SovereignFintech.o: kernel/shards/SovereignFintech.c
+	$(CC) $(CFLAGS) -c kernel/shards/SovereignFintech.c -o build/SovereignFintech.o
+
+build/SovereignBio.o: kernel/shards/SovereignBio.c
+	$(CC) $(CFLAGS) -c kernel/shards/SovereignBio.c -o build/SovereignBio.o
+
+build/SovereignWatchdog.o: kernel/shards/SovereignWatchdog.c
+	$(CC) $(CFLAGS) -c kernel/shards/SovereignWatchdog.c -o build/SovereignWatchdog.o
 
 build/sigmaos_zenith: $(OBJS)
 	$(LD) $(LDFLAGS) $(OBJS) -o build/sigmaos_zenith

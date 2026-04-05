@@ -42,7 +42,8 @@ void sigma_hw_wipe_page(sigma_u64 addr) {
     sigma_printf("[KERNEL-ZENITH]: Amnesic Wipe of Memory at [0x%llx] - SILICON INTEGRITY [OK]\n", addr);
     
     // Simulate high-speed zeroing
-    char* p = (char*)addr;
+    const char* p = (const char*)addr;
+    (void)p;
     /* Normally: memset(p, 0, 4096); plus clflush */
 }
 

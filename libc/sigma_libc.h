@@ -8,8 +8,8 @@
  * =========================================================================
  */
 
-#ifndef SOVEREIGN_LIBC_H
-#define SOVEREIGN_LIBC_H
+#ifndef SIGMA_LIBC_H
+#define SIGMA_LIBC_H
 
 #include "sigma_types.h"
 
@@ -99,4 +99,4 @@ void* sigma_slab_alloc_raw(sigma_size_t size);
 void* sigma_malloc(sigma_size_t size);
 void  sigma_free(void* ptr);
 
-#endif /* SOVEREIGN_LIBC_H */
+#endif /* SIGMA_LIBC_H */

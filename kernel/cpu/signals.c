@@ -21,7 +21,6 @@ void sigma_signal_dispatch(int signum) {
         g_SignalTable[signum](signum);
     } else {
         sigma_print("\nΣ [SIGNAL]: Unhandled Silicon Violation: ");
-        // sigma_print_int(signum);
         sigma_print("\n");
         while(1);
     }

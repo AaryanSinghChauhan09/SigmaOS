@@ -6,31 +6,32 @@
 // ROADMAP REFERENCE: Section X (Quality Assurance)
 // ==============================================================================
 
-#include "SovereignDiagnosticsZenith.h"
+#include "sigma_kernel_types.h"
 
 // ==============================================================================
 // 1. NATIVE ASSERTION ENGINE
 // ==============================================================================
 
 typedef struct {
-    uint32_t tests_run;
-    uint32_t tests_passed;
-    uint32_t tests_failed;
+    u32 tests_run;
+    u32 tests_passed;
+    u32 tests_failed;
 } test_suite_results_t;
 
 static test_suite_results_t _master_results = {0, 0, 0};
 
-void __attribute__((noinline)) assert_eq_memory(void* a, void* b, uint32_t size, const char* name) {
+void __attribute__((noinline)) assert_eq_memory(void* a, void* b, u32 size, const char* name) {
+    (void)name;
     _master_results.tests_run++;
     
     // Sovereign fast memory comparison (rep cmpsb)
-    uint8_t match = 1;
-    uint8_t* pa = (uint8_t*)a;
-    uint8_t* pb = (uint8_t*)b;
+    bool_t match = TRUE;
+    const u8* pa = (const u8*)a;
+    const u8* pb = (const u8*)b;
     
-    for(uint32_t i = 0; i < size; i++) {
+    for(u32 i = 0; i < size; i++) {
         if (pa[i] != pb[i]) {
-            match = 0;
+            match = FALSE;
             break;
         }
     }
@@ -49,7 +50,9 @@ void __attribute__((noinline)) assert_eq_memory(void* a, void* b, uint32_t size,
 // 2. FUZZING CONTROLLER
 // ==============================================================================
 
-void execute_fuzzer_run(void (*target_func)(void*), uint32_t iterations) {
+void execute_fuzzer_run(void (*target_func)(void*), u32 iterations) {
+    (void)target_func;
+    (void)iterations;
     // Use Sovereign hardware RNG to blast inputs into the target function
     // Catch Exceptions/Page Faults natively using IDT hooks
 }

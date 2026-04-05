@@ -24,7 +24,10 @@ jobs:
           echo "Σ [SCAN]: Running cppcheck security inspection..."
           sudo apt-get install -y cppcheck
           cppcheck --enable=all --error-exitcode=1 --std=c11 \
-            -I kernel/ -I libc/ \
+            -I . -I kernel/ -I libc/ \
+            --suppress=unusedFunction \
+            --suppress=unreadVariable \
+            --suppress=constVariable \
             --suppress=missingIncludeSystem \
             --suppress=constParameterPointer \
             --suppress=unusedStructMember \

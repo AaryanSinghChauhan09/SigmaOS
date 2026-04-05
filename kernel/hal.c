@@ -29,7 +29,6 @@ static u32 g_dev_count = 0;
  * ========================================================================= */
 
 void hal_discover_hardware(void) {
-    // kprintf("[HAL]: Auditing System Hardware Shards (PCI/ACPI)...\n");
     
     /* 1. Audit PCI Bus (Minimal) */
     // In a professional kernel, we'd scan PCI here
@@ -37,9 +36,6 @@ void hal_discover_hardware(void) {
     g_hal_devices[g_dev_count++] = vga;
     
     /* 2. Audit Core Timers (HPET/PIT) */
-    // kprintf("[HAL]: Found High-Precision HPET @ 0xFED00000\n");
-    
-    // kprintf("[HAL]: Hardware Discovery Complete. %u Shards Identified.\n", g_dev_count);
 }
 
 SigmaDevice* hal_find_device(u16 vendor, u16 device) {

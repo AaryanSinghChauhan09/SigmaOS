@@ -20,7 +20,7 @@
  * ========================================================================= */
 typedef i32 fixed_t;   /* 16.16 fixed point */
 #define FIXED_SHIFT  16
-#define FIXED(x)     ((fixed_t)((x) << FIXED_SHIFT))
+#define FIXED(x)     ((fixed_t)((x) * (1 << FIXED_SHIFT)))
 #define FIXED_MUL(a,b) (((i64)(a) * (b)) >> FIXED_SHIFT)
 #define FIXED_CLAMP(v, lo, hi) ((v) < (lo) ? (lo) : (v) > (hi) ? (hi) : (v))
 
@@ -290,7 +290,7 @@ static k_status camera_apply_filter_internal(Frame* frame, const FilterKernel3x3
     /* Special-case: Passthrough — no-op */
     u32 name_is_passthrough = 1;
     u32 k;
-    for (k = 0; kernel->name[k] && k < 4; k++) {
+    for (k = 0; k < 4 && kernel->name[k]; k++) {
         if (kernel->name[k] != "PASS"[k]) { name_is_passthrough = 0; break; }
     }
     if (name_is_passthrough) return K_OK;
@@ -385,7 +385,7 @@ k_status camera_capture_frame(void* external_buffer) {
 
     if (external_buffer) {
         /* Copy from external VBE/DMA buffer */
-        u8* src = (u8*)external_buffer;
+        const u8* src = (const u8*)external_buffer;
         for (i = 0; i < CAMERA_FRAME_BUFSIZE; i++) dst[i] = src[i];
     } else {
         /* Synthetic frame: fill with procedural test pattern */

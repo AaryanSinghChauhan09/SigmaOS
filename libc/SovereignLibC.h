@@ -11,22 +11,10 @@
 #ifndef SOVEREIGN_LIBC_H
 #define SOVEREIGN_LIBC_H
 
-typedef unsigned long long sigma_size_t;
-typedef long long          sigma_ssize_t;
-typedef unsigned char      sigma_u8;
-typedef unsigned int       sigma_u32;
-typedef unsigned long long sigma_u64;
-typedef long long          sigma_i64;
-typedef double             sigma_f64;
-typedef int               sigma_bool;
-
-#define SIGMA_TRUE  1
-#define SIGMA_FALSE 0
-#define SIGMA_NULL  ((void*)0)
+#include "sigma_types.h"
 
 typedef sigma_u32 sigma_status;
-#define SIGMA_OK    0x00000000
-#define SIGMA_ERROR 0xFFFFFFFF
+/* SIGMA_OK/SIGMA_ERROR are defined in sigma_types.h */
 
 // --- Direct Syscalls (Linux x64) ---
 #ifdef __cplusplus

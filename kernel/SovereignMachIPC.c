@@ -1,5 +1,5 @@
-#include "SovereignMachIPC.h"
-#include "libc/SovereignLibC.h"
+#include "../SovereignMachIPC.h"
+#include "../libc/SovereignLibC.h"
 
 static sigma_u32 current_port_id = 1000;
 
@@ -9,7 +9,7 @@ mach_port_t sovereign_mach_port_allocate() {
     return (mach_port_t)allocated;
 }
 
-void sovereign_mach_msg_send(mach_msg_header_t* header, void* data, mach_msg_size_t size) {
+void sovereign_mach_msg_send(const mach_msg_header_t* header, const void* data, mach_msg_size_t size) {
     if (header->remote_port == MACH_PORT_NULL) {
         sigma_printf("[MACH] Error: Sending to NULL port.\n");
         return;

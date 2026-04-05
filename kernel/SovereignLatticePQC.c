@@ -10,7 +10,8 @@
  * =========================================================================
  */
 
-#include "libc/SovereignLibC.h"
+#include "../libc/SovereignLibC.h"
+/* sigma_types.h is included via SovereignLibC.h */
 
 /* =========================================================================
  * PQC Constants
@@ -133,7 +134,7 @@ static void pqc_encrypt(SovereignLatticePQC* p,
     /* Append PQC tag */
     const char* tag = "_PQC_SHARDED";
     sigma_size_t ti = 0;
-    while (tag[ti] && (i + ti) < buflen - 1) {
+    while ((i + ti) < buflen - 1 && tag[ti]) {
         ciphertext_buf[i + ti] = tag[ti]; ti++;
     }
     ciphertext_buf[i + ti] = '\0';

@@ -269,7 +269,7 @@ i32 vfs_open(const char* path, u32 flags, u32 mode) {
             return K_ERR_NOTFOUND;
         }
 
-        VInode* new_in = inode_alloc(INODE_FILE, mode ? mode : 0644);
+        const VInode* new_in = inode_alloc(INODE_FILE, mode ? mode : 0644);
         dentry_add(parent_ino, last_slash + 1, new_in->ino);
         ino = new_in->ino;
     }
@@ -297,7 +297,7 @@ i64 vfs_read(i32 fd, void* buf, usize count) {
         spinlock_release(&g_vfs.lock);
         return K_ERR_INVAL;
     }
-    VInode* in = inode_get(g_vfs.fds[fd].ino);
+    const VInode* in = inode_get(g_vfs.fds[fd].ino);
     if (!in || in->type != INODE_FILE) {
         spinlock_release(&g_vfs.lock);
         return K_ERR_INVAL;
@@ -310,7 +310,7 @@ i64 vfs_read(i32 fd, void* buf, usize count) {
     u64 avail = in->size - g_vfs.fds[fd].offset;
     if (avail == 0) return 0;
     usize n = (count < (usize)avail) ? count : (usize)avail;
-    u8* src = in->data + g_vfs.fds[fd].offset;
+    const u8* src = in->data + g_vfs.fds[fd].offset;
     u8* dst = (u8*)buf;
     usize i;
     for (i = 0; i < n; i++) dst[i] = src[i];
@@ -390,7 +390,8 @@ i32 vfs_mkdir(const char* path, u32 mode) {
         spinlock_release(&g_vfs.lock);
         return K_ERR_NOTFOUND;
     }
-    VInode* d = inode_alloc(INODE_DIR, mode ? mode : 0755);
+    const VInode* d = inode_alloc(INODE_DIR, mode ? mode : 0755);
+    (void)d;
     dentry_add(parent_ino, last + 1, d->ino);
     spinlock_release(&g_vfs.lock);
     return K_OK;
@@ -405,7 +406,7 @@ typedef struct VFileStat {
 i32 vfs_stat(const char* path, VFileStat* st) {
     u64 ino = path_resolve(path);
     if (ino == (u64)-1) return K_ERR_NOTFOUND;
-    VInode* in = inode_get(ino);
+    const VInode* in = inode_get(ino);
     if (!in) return K_ERR_NOTFOUND;
     st->ino   = in->ino;  st->size  = in->size;
     st->mode  = in->mode; st->type  = in->type;

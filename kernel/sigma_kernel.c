@@ -169,15 +169,15 @@ static void parse_mb2_mmap(void* mb2_info,
     *best_start = 0; *best_end = 0;
 
     while (1) {
-        MB2Tag* tag = (MB2Tag*)(usize)ptr;
+        const MB2Tag* tag = (const MB2Tag*)(usize)ptr;
         if (tag->type == MB2_TAG_END) break;
 
         if (tag->type == MB2_TAG_MMAP) {
-            MB2MmapTag* mmap = (MB2MmapTag*)(usize)ptr;
+            const MB2MmapTag* mmap = (const MB2MmapTag*)(usize)ptr;
             u32 nentries = (mmap->size - 16) / mmap->entry_size;
             u32 i;
             for (i = 0; i < nentries; i++) {
-                MB2MmapEntry* e = &mmap->entries[i];
+                const MB2MmapEntry* e = &mmap->entries[i];
                 if (e->type == MB2_MMAP_AVAIL && e->length > (*best_end - *best_start)) {
                     *best_start = e->base;
                     *best_end   = e->base + e->length;
@@ -238,6 +238,7 @@ static void kernel_selftest(void) {
     fd = vfs_open("/tmp/selftest.txt", 0, 0);
     char rbuf[64] = {0};
     i64 n = vfs_read(fd, rbuf, sizeof(rbuf)-1);
+    (void)n;
     vfs_close(fd);
     kprintf("[SELFTEST]: VFS wrote %llu bytes, read '%s'\n", (u64)hlen, rbuf);
     kprintf("[SELFTEST]: VFS PASS\n");
