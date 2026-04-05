@@ -73,10 +73,10 @@ jobs:
           echo "Checking index.html for broken internal references..."
           if [ -f "index.html" ]; then
             grep -oE 'href="[^"]+"' index.html | cut -d'"' -f2 | while read ref; do
-              if [[ $ref == #* ]]; then continue; fi
-              if [[ $ref != http* ]] && [ -f "$ref" ]; then
+              if [[ "$ref" == "#"* ]]; then continue; fi
+              if [[ "$ref" != "http"* ]] && [[ "$ref" != "https"* ]] && [ -f "$ref" ]; then
                 echo "[PASS] Reference ok: $ref"
-              elif [[ $ref != http* ]] && [ ! -f "$ref" ]; then
+              elif [[ "$ref" != "http"* ]] && [[ "$ref" != "https"* ]] && [ ! -f "$ref" ]; then
                 echo "[WARN] Broken local reference detected: $ref"
               fi
             done
