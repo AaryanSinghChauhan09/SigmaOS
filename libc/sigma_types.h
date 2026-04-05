@@ -35,6 +35,7 @@ typedef sigma_u64          sigma_size_t;
 typedef sigma_i64          sigma_ssize_t;
 typedef sigma_u64          usize;
 typedef sigma_i64          isize;
+typedef float              sigma_f32;
 typedef double             sigma_f64;
 typedef int                sigma_bool;
 typedef sigma_i32          pid_t;

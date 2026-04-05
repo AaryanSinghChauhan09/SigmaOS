@@ -25,7 +25,12 @@ extern void SovereignQuantum_LatticeInit(void);
 extern void SovereignGaming_Init(void);
 extern void SovereignCyber_Init(void);
 extern void SovereignFintech_Init(void);
+extern void SovereignFintech_Init(void);
 extern void SovereignBio_Init(void);
+extern void SovereignMoE_Init(void);
+extern void SovereignEBPF_Init(void);
+extern void SovereignVectorDB_Init(void);
+extern void SovereignNUMA_Init(void);
 extern void SovereignWatchdog_Init(void);
 extern void SovereignWatchdog_Pulse(void);
 
@@ -61,7 +66,11 @@ void sigma_kernel_main() {
     SovereignFintech_Init();
     SovereignBio_Init();
     
-    /* 4.5 LAYER 4.5: Automation & Reliability (Self-Healing) */
+    /* 4.5 LAYER 4.5: Research & Reliability (SOTA Sharding) */
+    SovereignMoE_Init();
+    SovereignEBPF_Init();
+    SovereignVectorDB_Init();
+    SovereignNUMA_Init();
     SovereignWatchdog_Init();
     SovereignWatchdog_Pulse();
     

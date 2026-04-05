@@ -40,6 +40,10 @@ OBJS = \
     build/SovereignFintech.o \
     build/SovereignBio.o \
     build/SovereignWatchdog.o \
+    build/SovereignMoE.o \
+    build/SovereignEBPF.o \
+    build/SovereignVectorDB.o \
+    build/SovereignNUMA.o \
     build/sigma_std.o
 
 all: build build/sigmaos_zenith
@@ -133,6 +137,18 @@ build/SovereignBio.o: kernel/shards/SovereignBio.c
 
 build/SovereignWatchdog.o: kernel/shards/SovereignWatchdog.c
 	$(CC) $(CFLAGS) -c kernel/shards/SovereignWatchdog.c -o build/SovereignWatchdog.o
+
+build/SovereignMoE.o: kernel/shards/SovereignMoE.c
+	$(CC) $(CFLAGS) -c kernel/shards/SovereignMoE.c -o build/SovereignMoE.o
+
+build/SovereignEBPF.o: kernel/shards/SovereignEBPF.c
+	$(CC) $(CFLAGS) -c kernel/shards/SovereignEBPF.c -o build/SovereignEBPF.o
+
+build/SovereignVectorDB.o: kernel/shards/SovereignVectorDB.c
+	$(CC) $(CFLAGS) -c kernel/shards/SovereignVectorDB.c -o build/SovereignVectorDB.o
+
+build/SovereignNUMA.o: kernel/shards/SovereignNUMA.c
+	$(CC) $(CFLAGS) -c kernel/shards/SovereignNUMA.c -o build/SovereignNUMA.o
 
 build/sigmaos_zenith: $(OBJS)
 	$(LD) $(LDFLAGS) $(OBJS) -o build/sigmaos_zenith
