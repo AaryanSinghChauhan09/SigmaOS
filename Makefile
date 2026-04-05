@@ -52,6 +52,8 @@ OBJS = \
     build/SovereignZeroTrust.o \
     build/SovereignNeuroSymbolic.o \
     build/SovereignGraphNet.o \
+    build/SovereignAdaptiveZeroTrust.o \
+    build/SovereignAdversarialDefense.o \
     build/sigma_std.o
 
 all: build build/sigmaos_zenith
@@ -181,6 +183,12 @@ build/SovereignNeuroSymbolic.o: kernel/shards/SovereignNeuroSymbolic.c
 
 build/SovereignGraphNet.o: kernel/shards/SovereignGraphNet.c
 	$(CC) $(CFLAGS) -c kernel/shards/SovereignGraphNet.c -o build/SovereignGraphNet.o
+
+build/SovereignAdaptiveZeroTrust.o: kernel/shards/SovereignAdaptiveZeroTrust.c
+	$(CC) $(CFLAGS) -c kernel/shards/SovereignAdaptiveZeroTrust.c -o build/SovereignAdaptiveZeroTrust.o
+
+build/SovereignAdversarialDefense.o: kernel/shards/SovereignAdversarialDefense.c
+	$(CC) $(CFLAGS) -c kernel/shards/SovereignAdversarialDefense.c -o build/SovereignAdversarialDefense.o
 
 build/sigmaos_zenith: $(OBJS)
 	$(LD) $(LDFLAGS) $(OBJS) -o build/sigmaos_zenith
