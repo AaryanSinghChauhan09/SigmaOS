@@ -59,6 +59,11 @@ jobs:
             ./build/sigma-bench
           fi
 
+      - name: "8. Self-Healing Resilience Audit"
+        run: |
+          gcc -std=c11 -O2 -Wall -o build/test-healer kernel/self_healing.c tests/test_security_fuzz.c -I kernel/ -I libc/ -DUNIT_TEST_ENV
+          ./build/test-healer
+
       - name: "Σ TOTAL SOVEREIGNTY ACHIEVED"
         run: |
           echo "Σ [SUCCESS]: Universal Verification Complete. OS Integrity Secured."

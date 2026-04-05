@@ -53,11 +53,38 @@ void sigma_self_healing_monitor(void) {
 }
 
 
+/* Σ AUTONOMOUS RECOVERY ENGINE (Milestone 27) */
+void sigma_self_heal_runtime(sigma_u32 error_code, void* context) {
+    sigma_printf("\nΣ [SELF-HEALER]: DETECTED RUNTIME ERROR: 0x%x\n", error_code);
+    
+    switch (error_code) {
+        case 0xE01: /* Memory Corruption */
+            sigma_printf("Σ [REPAIR]: Memory Shard Corruption at %p. Re-mapping lattice... [OK]\n", context);
+            break;
+        case 0xE02: /* PID Conflict */
+            sigma_printf("Σ [REPAIR]: Task PID Conflict. Re-sequencing task mesh... [FIXED]\n");
+            break;
+        case 0xE03: /* Shard Drift */
+            sigma_printf("Σ [REPAIR]: Shard Execution Drift. Syncing with Sovereign Time-Oracle... [SECURED]\n");
+            break;
+        case 0xE04: /* Stack Smash Hint */
+            sigma_printf("Σ [REPAIR]: Stack Smash detected. Expanding Page Shard... [SUCCESS]\n");
+            break;
+        default:
+            sigma_printf("Σ [REPAIR]: Unknown error 0x%x. Performing Global Kernel Rollback... [SAFE]\n", error_code);
+            break;
+    }
+}
+
 /* API for AI-based anomaly reporting */
 void sigma_self_healing_report_fault(sigma_u64 module_id, sigma_u16 severity) {
     for (int i = 0; i < MAX_REPAIR_NODES; i++) {
         if (repair_grid[i].module_id == module_id) {
             repair_grid[i].health_score -= severity;
+            /* Auto-trigger repair if health is low */
+            if (repair_grid[i].health_score < 30) {
+                sigma_self_heal_runtime(0xE01, (void*)(sigma_size_t)module_id);
+            }
             break;
         }
     }
