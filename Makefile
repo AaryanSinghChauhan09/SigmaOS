@@ -54,6 +54,8 @@ OBJS = \
     build/SovereignGraphNet.o \
     build/SovereignAdaptiveZeroTrust.o \
     build/SovereignAdversarialDefense.o \
+    build/SovereignDataPipeline.o \
+    build/SovereignModelForge.o \
     build/sigma_std.o
 
 all: build build/sigmaos_zenith
@@ -189,6 +191,12 @@ build/SovereignAdaptiveZeroTrust.o: kernel/shards/SovereignAdaptiveZeroTrust.c
 
 build/SovereignAdversarialDefense.o: kernel/shards/SovereignAdversarialDefense.c
 	$(CC) $(CFLAGS) -c kernel/shards/SovereignAdversarialDefense.c -o build/SovereignAdversarialDefense.o
+
+build/SovereignDataPipeline.o: kernel/shards/SovereignDataPipeline.c
+	$(CC) $(CFLAGS) -c kernel/shards/SovereignDataPipeline.c -o build/SovereignDataPipeline.o
+
+build/SovereignModelForge.o: kernel/shards/SovereignModelForge.c
+	$(CC) $(CFLAGS) -c kernel/shards/SovereignModelForge.c -o build/SovereignModelForge.o
 
 build/sigmaos_zenith: $(OBJS)
 	$(LD) $(LDFLAGS) $(OBJS) -o build/sigmaos_zenith
