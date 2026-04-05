@@ -56,6 +56,8 @@ OBJS = \
     build/SovereignAdversarialDefense.o \
     build/SovereignDataPipeline.o \
     build/SovereignModelForge.o \
+    build/SovereignMemoryBrain.o \
+    build/SovereignNetMesh.o \
     build/sigma_std.o
 
 all: build build/sigmaos_zenith
@@ -197,6 +199,12 @@ build/SovereignDataPipeline.o: kernel/shards/SovereignDataPipeline.c
 
 build/SovereignModelForge.o: kernel/shards/SovereignModelForge.c
 	$(CC) $(CFLAGS) -c kernel/shards/SovereignModelForge.c -o build/SovereignModelForge.o
+
+build/SovereignMemoryBrain.o: kernel/shards/SovereignMemoryBrain.c
+	$(CC) $(CFLAGS) -c kernel/shards/SovereignMemoryBrain.c -o build/SovereignMemoryBrain.o
+
+build/SovereignNetMesh.o: kernel/shards/SovereignNetMesh.c
+	$(CC) $(CFLAGS) -c kernel/shards/SovereignNetMesh.c -o build/SovereignNetMesh.o
 
 build/sigmaos_zenith: $(OBJS)
 	$(LD) $(LDFLAGS) $(OBJS) -o build/sigmaos_zenith
