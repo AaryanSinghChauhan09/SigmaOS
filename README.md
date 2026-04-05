@@ -541,12 +541,164 @@ SigmaOS follows a **Sovereign Shard Architecture**, isolating system services in
 * `libc/`: Zero-dependency, C11-compliant standard library primitives.
 * `SovereignZeroLib.asm`: High-performance AMD64 system call interface.
 
+## 🧪 Sovereign Test Strategy: 100-Milestone Roadmap
+
+> A multi-layered, industrial-grade testing framework ensuring every shard, scheduler, and shard-interaction is verified from unit level to chaos engineering.
+
+### 🧩 Test Strategy Improvements (20)
+
+| # | Strategy | Status |
+|---|----------|--------|
+| 1 | Comprehensive unit tests covering every function/module with edge cases | ✅ Implemented |
+| 2 | Integration tests validating shard-to-shard interactions | 🔄 In Progress |
+| 3 | End-to-end tests simulating real kernel boot workflows | 🔄 In Progress |
+| 4 | Regression tests ensuring new commits don't break existing shards | ✅ Implemented |
+| 5 | Property-based testing with fuzzing-style input generation | 🔄 In Progress |
+| 6 | Mocking & stubs replacing bare-metal deps in host-side tests | ✅ Implemented |
+| 7 | Test coverage reports with minimum thresholds enforced in CI | 🔜 Planned |
+| 8 | Static analysis (cppcheck, clang) before test execution | ✅ Implemented |
+| 9 | Security tests: fuzzing and vulnerability scanning | 🔄 In Progress |
+| 10 | Performance benchmarks on critical scheduler paths | ✅ Implemented |
+| 11 | Memory sanitizer tests (ASAN/UBSAN parity) | ✅ Implemented |
+| 12 | Concurrency & race condition tests | 🔜 Planned |
+| 13 | Zombie reaper and lifecycle stress tests | ✅ Implemented |
+| 14 | Round-robin fairness validation under load | ✅ Implemented |
+| 15 | Slot reuse and boundary condition tests | ✅ Implemented |
+| 16 | Priority rotation and preemption edge cases | ✅ Implemented |
+| 17 | Empty scheduler safety tests | ✅ Implemented |
+| 18 | NULL/zero-value guard tests for all shard APIs | 🔜 Planned |
+| 19 | Stack boundary/overflow detection | 🔜 Planned |
+| 20 | Cross-architecture (x86_64 + AArch64) test parity | ✅ Implemented |
+
+### ⚙️ CI/CD Pipeline Enhancements (20)
+
+| # | Enhancement | Status |
+|---|-------------|--------|
+| 21 | Automated test execution on every commit via GitHub Actions | ✅ Implemented |
+| 22 | Parallel test runs splitting unit/integration/security suites | 🔄 In Progress |
+| 23 | Fail-fast strategy — halt pipeline on critical test failure | ✅ Implemented |
+| 24 | Artifact storage for logs and reports | 🔜 Planned |
+| 25 | Environment matrix — test across GCC, Clang, AArch64 | ✅ Implemented |
+| 26 | Containerized testing via Docker | 🔜 Planned |
+| 27 | Secrets management — zero credential leakage in configs | ✅ Implemented |
+| 28 | Rollback mechanism for failing deployments | ✅ Implemented |
+| 29 | Contributor notifications on test failures | 🔜 Planned |
+| 30 | Scheduled nightly builds to catch hidden regressions | 🔜 Planned |
+| 31 | Clang/LLVM cross-compiler verification stage | ✅ Implemented |
+| 32 | KASAN/UBSAN sanitizer build stage | ✅ Implemented |
+| 33 | Sparse/Smatch strict pointer type-checking | ✅ Implemented |
+| 34 | Markdown linting on every PR | ✅ Implemented |
+| 35 | cppcheck security scan with domain suppressions | ✅ Implemented |
+| 36 | Binary integrity check on build artifacts | ✅ Implemented |
+| 37 | Secret scanning via native bash (zero-dependency) | ✅ Implemented |
+| 38 | Shell script syntax validation (bash -n) | ✅ Implemented |
+| 39 | Python script compile-check (py_compile) | ✅ Implemented |
+| 40 | UI/UX component integrity audit | ✅ Implemented |
+
+### 🔒 Reliability & Security Testing (20)
+
+| # | Test | Status |
+|---|------|--------|
+| 41 | Penetration testing scripts for kernel entry points | 🔜 Planned |
+| 42 | Dependency vulnerability scans (native grep-based) | ✅ Implemented |
+| 43 | Static Application Security Testing (SAST via cppcheck) | ✅ Implemented |
+| 44 | Dynamic Application Security Testing (DAST) | 🔜 Planned |
+| 45 | Threat modeling test cases for known attack vectors | 🔜 Planned |
+| 46 | Data privacy tests — anonymization and encryption validation | 🔜 Planned |
+| 47 | Access control tests (RBAC rule enforcement) | 🔜 Planned |
+| 48 | Audit logging completeness and immutability tests | 🔜 Planned |
+| 49 | GDPR/HIPAA compliance test suites | 🔜 Planned |
+| 50 | Secure API authentication flow validation | 🔜 Planned |
+| 51 | Unsafe function blocker (gets/strcpy/strcat/sprintf) | ✅ Implemented |
+| 52 | Hardcoded credential detection scan | ✅ Implemented |
+| 53 | Shell injection risk detection | ✅ Implemented |
+| 54 | Privilege escalation scenario tests | 🔜 Planned |
+| 55 | Kernel rollback integrity verification | ✅ Implemented |
+| 56 | Secure enclave isolation tests | 🔜 Planned |
+| 57 | Ransomware simulation and recovery tests | 🔜 Planned |
+| 58 | Malware detection false-positive/negative tests | 🔜 Planned |
+| 59 | Federated analytics privacy boundary tests | 🔜 Planned |
+| 60 | Cryptographic key lifecycle tests | 🔜 Planned |
+
+### 📊 Data & System Design Testing (20)
+
+| # | Test | Status |
+|---|------|--------|
+| 61 | Database migration tests — validate schema changes | 🔜 Planned |
+| 62 | Load testing — simulate thousands of concurrent tasks | 🔄 In Progress |
+| 63 | Stress testing — push scheduler beyond MAX_TASKS | ✅ Implemented |
+| 64 | Chaos engineering — kill random shards, test recovery | 🔜 Planned |
+| 65 | CAP theorem consistency tests (SovereignConsensus) | ✅ Implemented |
+| 66 | Raft/Paxos leader election correctness tests | 🔜 Planned |
+| 67 | Cache consistency tests | 🔜 Planned |
+| 68 | Data lineage validation | 🔜 Planned |
+| 69 | ETL pipeline correctness tests | 🔜 Planned |
+| 70 | Data drift detection tests | 🔜 Planned |
+| 71 | Event Mesh pub-sub delivery guarantee tests | 🔜 Planned |
+| 72 | Distributed consensus split-brain tests | 🔜 Planned |
+| 73 | Round-robin fairness under 1000-tick simulation | ✅ Implemented |
+| 74 | Priority inversion detection tests | 🔜 Planned |
+| 75 | Memory allocation pressure tests | 🔄 In Progress |
+| 76 | IPC channel integrity tests | 🔜 Planned |
+| 77 | Telemetry data accuracy tests | 🔜 Planned |
+| 78 | Shard slot reuse correctness tests | ✅ Implemented |
+| 79 | Watchdog recovery after simulated failures | 🔜 Planned |
+| 80 | Multi-architecture binary integrity cross-tests | ✅ Implemented |
+
+### 🧩 Developer Workflow Enhancements (20)
+
+| # | Enhancement | Status |
+|---|-------------|--------|
+| 81 | Pre-commit hooks running lint/tests before push | 🔜 Planned |
+| 82 | Code review checklists enforcing test coverage | 🔜 Planned |
+| 83 | Test-Driven Development (TDD) adoption | 🔄 In Progress |
+| 84 | Behavior-Driven Development (BDD) with Gherkin | 🔜 Planned |
+| 85 | Pair programming guidelines for test writing | 🔜 Planned |
+| 86 | Continuous monitoring with post-deployment feedback | 🔜 Planned |
+| 87 | Documentation tests — README examples verified runnable | 🔜 Planned |
+| 88 | Version control hooks blocking merges without passing tests | 🔜 Planned |
+| 89 | Test strategy wiki documentation | 🔜 Planned |
+| 90 | Contributor guidelines requiring test cases for new features | 🔜 Planned |
+| 91 | `CONTRIBUTING.md` test requirement policy | 🔜 Planned |
+| 92 | Dedicated `tests/` directory with organized test suites | ✅ Implemented |
+| 93 | Self-contained test harness (zero external deps) | ✅ Implemented |
+| 94 | Test result badges in README | 🔄 In Progress |
+| 95 | Automated test scaffolding for new shards | 🔜 Planned |
+| 96 | Integration test harness for shard-to-shard APIs | 🔜 Planned |
+| 97 | Nightly stress-test scheduled workflow | 🔜 Planned |
+| 98 | Mutation testing to strengthen test suites | 🔜 Planned |
+| 99 | AI-driven auto-generation of test cases | 🔜 Planned |
+| 100 | Concurrency and scheduling test reports in CI artifacts | 🔜 Planned |
+
+> **Legend**: ✅ Implemented · 🔄 In Progress · 🔜 Planned
+
+---
+
+## 🏛️ Architecture
+
+SigmaOS follows a **Sovereign Shard Architecture**, isolating system services into autonomous coordination units.
+
+* `kernel/`: Core sharding logic, scheduler, and telemetry.
+* `libc/`: Zero-dependency, C11-compliant standard library primitives.
+* `SovereignZeroLib.asm`: High-performance AMD64 system call interface.
+* `tests/`: Self-contained sovereign test suites (unit, integration, memory, stress).
+
 ## 🧪 Industrial CI/CD
 
 All commits are subjected to the **Sovereign Zenith CI/CD Pipeline**:
-1. **Static Analysis**: Memory safety and security scanning via `cppcheck`.
-2. **Secret Scanning**: Prevents credential leakage using `gitleaks`.
-3. **Unit Verification**: Automated execution of the scheduler test suite.
+
+| Stage | Tool | Scope |
+|-------|------|-------|
+| Static Analysis | `cppcheck` | Memory safety, C11 compliance |
+| Clang Verification | `clang -Wall -Wextra` | Compiler-agnostic UB detection |
+| Sanitizer Builds | `ASAN + UBSAN` | Memory and undefined behavior |
+| Secret Scanning | Native bash | Credential leakage prevention |
+| Unit Tests | Self-contained C11 harness | Scheduler, memory, regression |
+| AArch64 Cross-Compile | `aarch64-linux-gnu-gcc` | Architecture agnosticism |
+| Sparse/Smatch Parity | `gcc -Wcast-align` | Strict pointer/type checking |
+| Binary Integrity | `size build/*.o` | Artifact verification |
+| Markdown Lint | `markdownlint-cli` | Documentation quality |
+| UI/UX Audit | Native bash | Internal reference integrity |
 
 ## 📖 Documentation
 Detailed procedures and algorithmic matrices are available in the [Sovereign Wiki](https://github.com/AaryanSinghChauhan09/SigmaOS/wiki).
