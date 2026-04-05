@@ -48,6 +48,8 @@ OBJS = \
     build/SovereignIntelliViz.o \
     build/SovereignSecureWorkspace.o \
     build/SovereignPredictiveEngine.o \
+    build/SovereignFederatedLearning.o \
+    build/SovereignZeroTrust.o \
     build/sigma_std.o
 
 all: build build/sigmaos_zenith
@@ -165,6 +167,12 @@ build/SovereignSecureWorkspace.o: kernel/shards/SovereignSecureWorkspace.c
 
 build/SovereignPredictiveEngine.o: kernel/shards/SovereignPredictiveEngine.c
 	$(CC) $(CFLAGS) -c kernel/shards/SovereignPredictiveEngine.c -o build/SovereignPredictiveEngine.o
+
+build/SovereignFederatedLearning.o: kernel/shards/SovereignFederatedLearning.c
+	$(CC) $(CFLAGS) -c kernel/shards/SovereignFederatedLearning.c -o build/SovereignFederatedLearning.o
+
+build/SovereignZeroTrust.o: kernel/shards/SovereignZeroTrust.c
+	$(CC) $(CFLAGS) -c kernel/shards/SovereignZeroTrust.c -o build/SovereignZeroTrust.o
 
 build/sigmaos_zenith: $(OBJS)
 	$(LD) $(LDFLAGS) $(OBJS) -o build/sigmaos_zenith
