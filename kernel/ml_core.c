@@ -11,7 +11,7 @@
  * =============================================================================
  */
 
-#include "sigma_kernel_types.h"
+#include "../libc/SovereignLibC.h"
 
 typedef struct MatrixShard {
     u32 rows;

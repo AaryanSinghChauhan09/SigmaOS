@@ -8,7 +8,7 @@
  */
 
 #include "SovereignAetherOrchestrator.h"
-#include "sigma_kernel_types.h"
+#include "../libc/SovereignLibC.h"
 
 // Correct VFS symbols
 extern i32 vfs_open(const char* path, u32 flags, u32 mode);

@@ -10,7 +10,7 @@
  * =============================================================================
  */
 
-#include "sigma_kernel_types.h"
+#include "../libc/SovereignLibC.h"
 
 #define MAX_ZENITH_APPS 16
 

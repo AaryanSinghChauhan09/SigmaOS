@@ -7,7 +7,7 @@
  * =============================================================================
  */
 
-#include "sigma_kernel_types.h"   /* types, intrinsics, SIGMA_ASSERT */
+#include "../libc/SovereignLibC.h"   /* types, intrinsics, SIGMA_ASSERT */
 #include "SovereignUnifiedShards.h" /* all domain shards in one include */
 
 /* =========================================================================

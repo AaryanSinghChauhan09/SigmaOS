@@ -9,7 +9,7 @@
  * =========================================================================
  */
 
-#include "libc/SovereignLibC.h"
+#include "../libc/SovereignLibC.h"
 #include "SovereignOmniShard.h"   /* Industrial sharding structs (C11) */
 
 /* =========================================================================
