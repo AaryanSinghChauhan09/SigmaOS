@@ -10,7 +10,6 @@
  */
 
 #include "../../libc/SovereignLibC.h"
-#include "../sigma_kernel_types.h"
 
 #define MAX_PLUGINS 128u
 
@@ -39,6 +38,19 @@ void SovereignPredictive_NextStep(const char* current_action) {
 }
 
 /**
+ * Σ REINFORCEMENT LEARNING (2): AGENT OPTIMIZATION
+ */
+void SovereignPredictive_Optimize(int success_score) {
+    sigma_printf("\nΣ [RL]: UPDATING WORKFLOW POLICY -> SCORE: %d\n", success_score);
+    
+    if (success_score > 80) {
+        sigma_print("[RL]: Reward RECEIVED. Strengthening current workflow sharding policy.\n");
+    } else {
+        sigma_print("[RL]: Penalty APPLIED. Re-calculating adaptive sharding weights.\n");
+    }
+}
+
+/**
  * Σ PLUGIN ECOSYSTEM (9): MINI AI APPS
  */
 void SovereignPredictive_RegisterPlugin(const char* name) {
@@ -58,6 +70,7 @@ void SovereignPredictiveEngine_Init(void) {
     
     /* Simulate AI-Native Environment */
     SovereignPredictive_NextStep("finishing the industrial report");
+    SovereignPredictive_Optimize(85);
     SovereignPredictive_RegisterPlugin("ER_Explainer");
 }
 

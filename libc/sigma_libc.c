@@ -154,11 +154,15 @@ void sigma_printf(const char* format, ...) {
         if (*p == '%' && *(p + 1) != '\0') {
             p++;
             switch (*p) {
+                case '%':
+                    sigma_write(1, "%", 1);
+                    break;
                 case 's':
                     sigma_print(sigma_va_arg(args, const char*));
                     break;
-                case 'd': {
-                    int v = sigma_va_arg(args, int);
+                case 'd':
+                case 'i': {
+                    long long v = (long long)sigma_va_arg(args, int);
                     if (v < 0) { sigma_write(1, "-", 1); v = -v; }
                     sigma_print_num((sigma_u64)v);
                     break;
@@ -184,6 +188,17 @@ void sigma_printf(const char* format, ...) {
         }
     }
     sigma_va_end(args);
+}
+
+/* =========================================================================
+ * sigma_sleep (unsigned int seconds)
+ * ========================================================================= */
+extern int sigma_nanosleep(const void* req, void* rem);
+
+unsigned int sigma_sleep(unsigned int seconds) {
+    long long timing[2] = { (long long)seconds, 0 };
+    sigma_nanosleep(timing, SIGMA_NULL);
+    return 0; // Simplified
 }
 
 int sigma_snprintf(char* buf, sigma_size_t n, const char* format, ...) {

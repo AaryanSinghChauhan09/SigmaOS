@@ -35,6 +35,21 @@ void SovereignViz_IntelliChart(const char* csv_source) {
 }
 
 /**
+ * Σ INTELLIGENT VIZ REC (58): AUTO-RECOMMENDING CHARTS
+ */
+void SovereignViz_Recommendation(const char* data_type) {
+    sigma_printf("\nΣ [VIZ-REC]: DATA TYPE IDENTIFIED -> '%s'\n", data_type);
+    
+    if (sigma_strstr(data_type, "time") != SIGMA_NULL) {
+        sigma_print("[VIZ-REC]: Suggestion: 'Line Chart' (Temporal Shard).\n");
+    } else if (sigma_strstr(data_type, "category") != SIGMA_NULL) {
+        sigma_print("[VIZ-REC]: Suggestion: 'Bar Chart' (Categorical Shard).\n");
+    } else {
+        sigma_print("[VIZ-REC]: Suggestion: 'Scatter Plot' (Relational Shard).\n");
+    }
+}
+
+/**
  * Σ MULTI-MODAL AI (6): SKETCH -> SCHEMA
  */
 void SovereignViz_OmniModal(void) {
@@ -55,6 +70,7 @@ void SovereignIntelliViz_Init(void) {
     
     /* Simulate AI-Native Environment */
     SovereignViz_IntelliChart("Silicon_Data_Lake_v5");
+    SovereignViz_Recommendation("time_series");
     SovereignViz_OmniModal();
 }
 

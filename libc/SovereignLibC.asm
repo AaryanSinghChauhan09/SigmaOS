@@ -19,6 +19,7 @@ global sigma_execve
 global sigma_strlen
 global sigma_memset
 global sigma_memcpy
+global sigma_nanosleep
 
 section .text
 
@@ -87,13 +88,21 @@ sigma_strlen:
 sigma_memset:
     mov rax, rsi    ; rax = c (value to set)
     mov rcx, rdx    ; rcx = n (count)
-    mov rdi, rdi    ; rdi = s (destination)
+    push rdi        ; save original s
     rep stosb       ; set n bytes
-    mov rax, rdi    ; return original s? Actually rep stosb modifies rdi.
+    pop rax         ; return original s
     ret
 
 ; --- sigma_memcpy (void* dest, const void* src, size_t n) ---
 sigma_memcpy:
     mov rcx, rdx    ; count
+    push rdi        ; save original dest
     rep movsb       ; copy bytes
+    pop rax         ; return original dest
+    ret
+
+; --- sigma_nanosleep (const void* req, void* rem) ---
+sigma_nanosleep:
+    mov rax, 35     ; sys_nanosleep
+    syscall
     ret
