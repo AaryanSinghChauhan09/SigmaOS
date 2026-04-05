@@ -10,14 +10,14 @@ Write-Host "Σ [INIT]: Building SigmaOS Sovereign Zenith Supreme (vROADMAP_1000)
 $CC = "gcc"
 $AS_CMD = "nasm -f elf64"
 $LD_CMD = "ld -T kernel/sigma.ld -m elf_x86_64 -nostdlib"
-$CFLAGS = "-m64 -ffreestanding -O2 -Wall -Wextra -I./kernel/libc -I./kernel -fno-stack-protector -fno-pic -nostdlib"
+$CFLAGS = "-m64 -ffreestanding -O2 -Wall -Wextra -I./kernel/libc -I./kernel/core -I./kernel/shards -fno-stack-protector -fno-pic -nostdlib"
 
 # 🗂️ SHARD AGGREGATION
-# We search for all .c files in the kernel directory and its subdirectories
-$Shards = Get-ChildItem -Path "kernel" -Filter "*.c" -Recurse | Select-Object -ExpandProperty FullName
+# Industrial sweep for all core logic and modular shards
+$Sources = Get-ChildItem -Path "kernel" -Filter "*.c" -Recurse | Select-Object -ExpandProperty FullName
 $Objs = @()
 
-foreach ($src in $Shards) {
+foreach ($src in $Sources) {
     if ($src -like "*build.ps1*") { continue }
     
     $obj = $src.Replace(".c", ".o")
