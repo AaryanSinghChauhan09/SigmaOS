@@ -33,7 +33,10 @@ jobs:
     steps:
       - name: Checkout Sovereign Shards
         run: |
-          git clone https://github.com/${{ github.repository }} .
+          git init
+          git remote add origin https://github.com/${{ github.repository }}
+          git fetch --depth 1 origin ${{ github.sha }}
+          git reset --hard FETCH_HEAD
 
       - name: "Audit: Forbidden stdlib Headers (Zero-Dependency Protocol)"
         run: |
@@ -97,7 +100,10 @@ jobs:
     steps:
       - name: Checkout
         run: |
-          git clone https://github.com/${{ github.repository }} .
+          git init
+          git remote add origin https://github.com/${{ github.repository }}
+          git fetch --depth 1 origin ${{ github.sha }}
+          git reset --hard FETCH_HEAD
 
       - name: Install Native GCC
         run: |
@@ -122,6 +128,24 @@ jobs:
           echo "Σ [CI]: Running scheduler tests..."
           /tmp/sigma-test-scheduler
           echo "Σ [PASS]: Scheduler subsystem tests PASSED."
+
+      - name: "Test: Integration Suite (Shard-to-Shard + Event Mesh)"
+        run: |
+          echo "Σ [CI]: Compiling integration test suite..."
+          gcc -std=c11 -O2 -Wall -Wextra -Wpedantic \
+              -o /tmp/sigma-test-integration tests/test_integration.c
+          echo "Σ [CI]: Running integration tests..."
+          /tmp/sigma-test-integration
+          echo "Σ [PASS]: Integration tests PASSED."
+
+      - name: "Test: Security Fuzz Suite (Privilege + Buffer + Injection)"
+        run: |
+          echo "Σ [CI]: Compiling security fuzz test suite..."
+          gcc -std=c11 -O2 -Wall -Wextra -Wpedantic \
+              -o /tmp/sigma-test-security tests/test_security_fuzz.c
+          echo "Σ [CI]: Running security fuzz tests..."
+          /tmp/sigma-test-security
+          echo "Σ [PASS]: Security fuzz tests PASSED."
 
   # ============================================================================
   # STAGE 3: KERNEL SYNTAX VERIFICATION (OSDLC — Implementation Phase)
@@ -220,7 +244,10 @@ jobs:
     steps:
       - name: Checkout repository
         run: |
-          git clone https://github.com/${{ github.repository }} .
+          git init
+          git remote add origin https://github.com/${{ github.repository }}
+          git fetch --depth 1 origin ${{ github.sha }}
+          git reset --hard FETCH_HEAD
 
       - name: Initialize Security Scanner (Flawfinder Parity)
         run: |
@@ -261,7 +288,10 @@ jobs:
     steps:
       - name: Checkout
         run: |
-          git clone https://github.com/${{ github.repository }} .
+          git init
+          git remote add origin https://github.com/${{ github.repository }}
+          git fetch --depth 1 origin ${{ github.sha }}
+          git reset --hard FETCH_HEAD
 
       - name: Install GCC
         run: sudo apt-get install -y gcc -qq
