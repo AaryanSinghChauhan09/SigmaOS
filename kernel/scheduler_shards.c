@@ -36,10 +36,13 @@ sigma_err_t sigma_task_create(virt_addr_t entry, sigma_u32 priority) {
     task_list[slot].state = TASK_STATE_READY;
     task_list[slot].entry_point = entry;
     task_list[slot].priority = priority;
+    task_list[slot].queue_id = 0;   /* Initial MLFQ Queue (Roadmap 21) */
+    task_list[slot].time_slice = 10; /* Starting Quantum */
     task_list[slot].cpu_time = 0;
+    task_list[slot].wait_time = 0;
     
     if (slot >= total_tasks) total_tasks = slot + 1;
     
-    sigma_printf("[KERNEL] Task created (PID: %d, Slot: %d, Entry: 0x%llx)\n", task_list[slot].pid, slot, entry);
+    sigma_printf("[KERNEL] MLFQ Task created (PID: %d, Queue: %d, Entry: 0x%llx)\n", task_list[slot].pid, task_list[slot].queue_id, entry);
     return SIGMA_OK;
 }

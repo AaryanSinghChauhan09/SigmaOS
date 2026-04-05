@@ -29,6 +29,9 @@ typedef struct {
     virt_addr_t entry_point;
     sigma_u64 cpu_time;
     sigma_u32 priority;
+    sigma_u32 queue_id;    /* MLFQ Queue Level (0-3) */
+    sigma_u32 time_slice;  /* Remaining ticks in current queue */
+    sigma_u32 wait_time;   /* Ticks spent waiting (for Boosting) */
 } task_control_block_t;
 
 /* Global Shard Interface */

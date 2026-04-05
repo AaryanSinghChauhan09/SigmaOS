@@ -51,6 +51,13 @@ export class SigmaWM {
         let offsetX = e.clientX - win.offsetLeft;
         let offsetY = e.clientY - win.offsetTop;
         const SNAP_GRID = 20; // pixels
+        const EDGE_SNAP = 50; // pixels from edge to maximize
+        
+        /* LIVE SHARDING: Visual Feedback (Roadmap #94) */
+        win.style.transition = 'none';
+        win.style.opacity = '0.86';
+        win.style.boxShadow = '0 30px 90px rgba(0, 210, 255, 0.3)';
+
         const onMove = (ev) => {
             let left = ev.clientX - offsetX;
             let top = ev.clientY - offsetY;
@@ -61,10 +68,26 @@ export class SigmaWM {
             
             win.style.left = left + 'px';
             win.style.top = top + 'px';
+
+            /* WINDOW SNAPPING (Aero-Snap Shard) */
+            if (ev.clientY < EDGE_SNAP) {
+                win.style.border = '2px dashed var(--accent-primary)';
+            } else {
+                win.style.border = '1px solid rgba(255, 255, 255, 0.1)';
+            }
         };
-        const onUp = () => {
+
+        const onUp = (ev) => {
             document.removeEventListener('mousemove', onMove);
             document.removeEventListener('mouseup', onUp);
+            
+            win.style.transition = 'all 0.4s cubic-bezier(0.16, 1, 0.3, 1)';
+            win.style.opacity = '1';
+            win.style.boxShadow = '0 15px 45px rgba(0, 0, 0, 0.7)';
+
+            if (ev.clientY < EDGE_SNAP) {
+                this.maximize(win.id.replace('win-', ''));
+            }
         };
         document.addEventListener('mousemove', onMove);
         document.addEventListener('mouseup', onUp);

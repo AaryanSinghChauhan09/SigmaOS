@@ -17,43 +17,66 @@ int current_task_idx = -1;
 int total_tasks = 0;
 
 void sigma_schedule() {
-
     if (total_tasks == 0) return;
-    
-    /* 1. Find highest priority among READY tasks */
-    sigma_u32 max_prio = 0;
-    sigma_bool any_ready = SIGMA_FALSE;
-    for (int i = 0; i < total_tasks; i++) {
-        if (task_list[i].pid != 0 && (task_list[i].state == TASK_STATE_READY || task_list[i].state == TASK_STATE_RUNNING)) {
-            if (!any_ready || task_list[i].priority > max_prio) {
-                max_prio = task_list[i].priority;
-                any_ready = SIGMA_TRUE;
+
+    /* MLFQ CORE LOGIC: RoadMap #21 Compliance */
+    /* 1. Starvation Prevention: Priority Boosting */
+    static sigma_u64 total_ticks = 0;
+    total_ticks++;
+    if (total_ticks % 1000 == 0) {
+        for (int i = 0; i < MAX_TASKS; i++) {
+            if (task_list[i].pid != 0) {
+                task_list[i].queue_id = 0; /* Promote all to highest priority */
+                task_list[i].time_slice = 10;
+                task_list[i].wait_time = 0;
             }
         }
+        sigma_printf("[KERNEL] MLFQ Priority Boost Pulsed.\n");
     }
 
-    if (!any_ready) return; /* No tasks ready to run */
+    /* 2. Sharding Mechanism: Find highest non-empty queue */
+    int target_queue = -1;
+    for (int q = 0; q < 4; q++) {
+        for (int i = 0; i < total_tasks; i++) {
+            if (task_list[i].pid != 0 && (task_list[i].state == TASK_STATE_READY || task_list[i].state == TASK_STATE_RUNNING)) {
+                if (task_list[i].queue_id == (sigma_u32)q) {
+                    target_queue = q;
+                    break;
+                }
+            }
+        }
+        if (target_queue != -1) break;
+    }
 
-    /* 2. Round-Robin Sharding: find next task with max_prio */
+    if (target_queue == -1) return;
+
+    /* 3. Round-Robin within the priority queue */
     int start = (current_task_idx + 1) % total_tasks;
     int next_idx = -1;
     for (int i = 0; i < total_tasks; i++) {
         int idx = (start + i) % total_tasks;
-        if (task_list[idx].pid != 0 && task_list[idx].state == TASK_STATE_READY && task_list[idx].priority == max_prio) {
+        if (task_list[idx].pid != 0 && task_list[idx].state == TASK_STATE_READY && task_list[idx].queue_id == (sigma_u32)target_queue) {
             next_idx = idx;
             break;
         }
     }
 
-    /* 3. Execute Switch */
+    /* 4. Execution context switch with Time-Slice Demotion */
     if (next_idx != -1) {
         if (current_task_idx != -1 && task_list[current_task_idx].state == TASK_STATE_RUNNING) {
             task_list[current_task_idx].state = TASK_STATE_READY;
+            /* MLFQ Penalty: If task used its FULL slice, demote it */
+            if (task_list[current_task_idx].time_slice == 0) {
+                if (task_list[current_task_idx].queue_id < 3) {
+                    task_list[current_task_idx].queue_id++;
+                    task_list[current_task_idx].time_slice = (task_list[current_task_idx].queue_id + 1) * 10;
+                }
+            }
         }
         current_task_idx = next_idx;
         task_list[current_task_idx].state = TASK_STATE_RUNNING;
-        
-        /* Note: In bare-metal, we would call SovereignTaskSwitch(current_task_idx) here */
+        if (task_list[current_task_idx].time_slice > 0)
+            task_list[current_task_idx].time_slice--; /* Consume shard time */
     }
 }
 

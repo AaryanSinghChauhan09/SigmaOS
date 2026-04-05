@@ -200,10 +200,42 @@ int sigma_snprintf(char* buf, sigma_size_t n, const char* format, ...) {
     if (n == 0) return 0;
     sigma_va_list args;
     sigma_va_start(args, format);
-    /* Simplified snprintf for kernel use */
+    
     sigma_size_t pos = 0;
     for (const char* p = format; *p != '\0' && pos < n - 1; p++) {
-        buf[pos++] = *p; 
+        if (*p == '%' && *(p + 1) != '\0') {
+            p++;
+            switch (*p) {
+                case 's': {
+                    const char* s = sigma_va_arg(args, const char*);
+                    while (*s && pos < n - 1) buf[pos++] = *s++;
+                    break;
+                }
+                case 'd': {
+                    int v = sigma_va_arg(args, int);
+                    if (v < 0) { if (pos < n - 1) buf[pos++] = '-'; v = -v; }
+                    char tmp[20]; int i = 0;
+                    if (v == 0) tmp[i++] = '0';
+                    while (v > 0) { tmp[i++] = (v % 10) + '0'; v /= 10; }
+                    while (i > 0 && pos < n - 1) buf[pos++] = tmp[--i];
+                    break;
+                }
+                case 'x': {
+                    sigma_u64 v = (sigma_u64)sigma_va_arg(args, sigma_u64);
+                    const char* hex = "0123456789abcdef";
+                    char tmp[16]; int i = 0;
+                    if (v == 0) tmp[i++] = '0';
+                    while (v > 0) { tmp[i++] = hex[v % 16]; v /= 16; }
+                    while (i > 0 && pos < n - 1) buf[pos++] = tmp[--i];
+                    break;
+                }
+                default:
+                    buf[pos++] = *p;
+                    break;
+            }
+        } else {
+            buf[pos++] = *p;
+        }
     }
     buf[pos] = '\0';
     sigma_va_end(args);
