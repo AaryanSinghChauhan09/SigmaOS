@@ -13,7 +13,10 @@ jobs:
     steps:
       - name: "Clone Repository Natively"
         run: |
-          git clone https://github.com/${{ github.repository }} .
+          git init
+          git remote add origin https://github.com/${{ github.repository }}
+          git fetch --depth 1 origin ${{ github.sha }}
+          git reset --hard FETCH_HEAD
 
 
       - name: "Audit: Secret Leak Detection"
@@ -68,12 +71,18 @@ jobs:
       - name: "Audit: UI Component Integrity"
         run: |
           echo "Checking index.html for broken internal references..."
-          grep -oE 'href="[^"]+"' index.html | cut -d'"' -f2 | while read ref; do
-            if [[ $ref == #* ]]; then continue; fi
-            if [[ $ref != http* ]] && [ ! -f "$ref" ]; then
-              echo "[WARN] Broken local reference detected: $ref"
-            fi
-          done
+          if [ -f "index.html" ]; then
+            grep -oE 'href="[^"]+"' index.html | cut -d'"' -f2 | while read ref; do
+              if [[ $ref == #* ]]; then continue; fi
+              if [[ $ref != http* ]] && [ -f "$ref" ]; then
+                echo "[PASS] Reference ok: $ref"
+              elif [[ $ref != http* ]] && [ ! -f "$ref" ]; then
+                echo "[WARN] Broken local reference detected: $ref"
+              fi
+            done
+          else
+            echo "Σ [INFO]: index.html not found, skipping."
+          fi
 
   ease_of_use_check:
     name: "Σ Ease of Use: Documentation & Accessibility"
