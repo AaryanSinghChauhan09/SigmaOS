@@ -168,10 +168,12 @@ static void test_null_pointer_guards(void) {
     SIGMA_SEC_TEST("secure_strcpy with NULL dst returns -1",
         secure_strcpy(NULL, 64, "data") == -1);
 
-    SIGMA_SEC_TEST("secure_strcpy with NULL src returns -1", ({
+    /* Standard C11: use local variable instead of GCC statement expression */
+    {
         char buf[64];
-        secure_strcpy(buf, 64, NULL) == -1;
-    }));
+        int rc = secure_strcpy(buf, 64, NULL);
+        SIGMA_SEC_TEST("secure_strcpy with NULL src returns -1", rc == -1);
+    }
 
     SIGMA_SEC_TEST("validate_token with NULL returns -1",
         validate_token(NULL) == -1);

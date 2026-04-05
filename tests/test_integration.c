@@ -11,7 +11,6 @@
 #include <stdio.h>
 #include <stdint.h>
 #include <string.h>
-#include <stdlib.h>
 
 /* ---- Test harness ---- */
 static int g_pass = 0, g_fail = 0;

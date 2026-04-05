@@ -2,7 +2,7 @@
 
 > **Sovereign Protocol**: Every contribution must arrive with a test. No test, no merge.
 
-## 🧪 Test Requirements (Roadmap #90, #91)
+## 🧪 Test Requirements
 
 All PRs **must** include:
 
@@ -16,7 +16,7 @@ All PRs **must** include:
 
 ## 🗂️ Test Directory Structure
 
-```
+```text
 tests/
 ├── test_scheduler.c       # Unit: scheduler (MLFQ, preemption, zombie reap)
 ├── test_integration.c     # Integration: shard-to-shard interactions
@@ -43,11 +43,13 @@ gcc -std=c11 -O2 -Wall -o build/test-security-fuzz tests/test_security_fuzz.c
 
 ## 🔬 Test Writing Standards
 
-### 1. Self-Contained (Roadmap #93)
-Tests must compile with **only** standard C11 headers (`stdio.h`, `stdint.h`, `string.h`).  
+### 1. Self-Contained
+
+Tests must compile with **only** standard C11 headers (`stdio.h`, `stdint.h`, `string.h`).
 Never include `kernel/` headers that require freestanding/bare-metal environments.
 
 ### 2. Use the Sovereign Test Macro
+
 ```c
 #define SIGMA_TEST(name, cond) do { \
     if (cond) { printf("  [PASS] %s\n", name); g_passed++; } \
@@ -56,6 +58,7 @@ Never include `kernel/` headers that require freestanding/bare-metal environment
 ```
 
 ### 3. Group Tests by Domain
+
 ```c
 static void test_group_name(void) {
     printf("\n[GROUP] Description\n");
@@ -65,6 +68,7 @@ static void test_group_name(void) {
 ```
 
 ### 4. Return Correct Exit Code
+
 ```c
 int main(void) {
     // ... run groups ...
@@ -83,11 +87,12 @@ Every push triggers:
 | Sovereign Master | `sigmaos_sovereign_master.yml` | Benchmark, static analysis |
 | Nightly Stress | `sigma_nightly_stress.yml` | Chaos, ASAN, perf (00:00 UTC) |
 
-## 🔒 Security Testing Requirements (Roadmap #41-60)
+## 🔒 Security Testing Requirements
 
 Security-impacting changes require:
-- [ ] A new test case in `test_security_fuzz.c`
-- [ ] Entry in the Sovereign Security Checklist:
+
+- A new test case in `test_security_fuzz.c`
+- Entry in the Sovereign Security Checklist:
   - No use of `gets`, `strcpy`, `strcat`, `sprintf`
   - All pointers NULL-checked before use
   - All string operations length-bounded
@@ -110,4 +115,5 @@ Security-impacting changes require:
 - [ ] README updated if API surface changed
 
 ---
+
 **Σ SIGMAOS**: Sovereign by design. Verified by test. Deployed with zero compromise.
