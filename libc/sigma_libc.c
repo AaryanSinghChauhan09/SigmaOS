@@ -115,31 +115,26 @@ void *sigma_memcpy(void *dest, const void *src, sigma_size_t n) {
     return dest;
 }
 
-void sigma_strcat(char* dest, const char* src) {
-    if (!dest || !src) return;
-    char* rd = dest;
-    while (*rd) rd++;
-    while (*src) { *rd++ = *src++; }
-    *rd = '\0';
+void sigma_strlcat(char* dest, const char* src, sigma_size_t dstsize) {
+    if (!dest || !src || dstsize == 0) return;
+    sigma_size_t dlen = 0;
+    while (dlen < dstsize && dest[dlen]) dlen++;
+    if (dlen == dstsize) return;
+    sigma_size_t i = 0;
+    while (src[i] && (dlen + i < dstsize - 1)) {
+        dest[dlen + i] = src[i];
+        i++;
+    }
+    dest[dlen + i] = '\0';
 }
 
-void sigma_strncat(char* dest, const char* src, sigma_size_t n) {
-    if (!dest || !src || n == 0) return;
-    char* rd = dest;
-    while (*rd) rd++;
-    while (*src && n--) { *rd++ = *src++; }
-    *rd = '\0';
-}
-
-char* sigma_strncpy(char* dest, const char* src, sigma_size_t n) {
-    if (!dest || !src || n == 0) return dest;
+char* sigma_strcpy(char* dest, const char* src, sigma_size_t maxlen) {
+    if (!dest || !src || maxlen == 0) return dest;
     sigma_size_t i;
-    for (i = 0; i < n - 1 && src[i] != '\0'; i++) {
+    for (i = 0; i < maxlen - 1 && src[i] != '\0'; i++) {
         dest[i] = src[i];
     }
-    for (; i < n; i++) {
-        dest[i] = '\0';
-    }
+    dest[i] = '\0';
     return dest;
 }
 
