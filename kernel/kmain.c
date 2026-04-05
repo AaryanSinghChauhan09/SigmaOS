@@ -12,6 +12,8 @@ void sigma_self_healing_init();
 void SovereignIntelliViz_Init();
 void SovereignDSMatrix_Init();
 void SovereignBillionShard_Init();
+void SovereignConvergence_Init();
+void sigma_clear_screen();
 void sigma_shell_exec(const char* input);
 
 // Σ STACK VERIFICATION (B6)
@@ -38,6 +40,7 @@ void kmain() {
     SovereignIntelliViz_Init();        /* Milestone 58: Visual Synthesis Shard */
     SovereignDSMatrix_Init();          /* Milestone 10000+: DS Master Matrix */
     SovereignBillionShard_Init();      /* Milestone 1B: Combinatorial DS Mesh */
+    SovereignConvergence_Init();       /* Milestone 100/100: Total Roadmap Sync */
 
     // 4. Mission Handoff (Interactive Shell)
     sigma_print("Σ [USER]: Handoff to Sovereign Shell...\n");
