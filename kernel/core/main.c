@@ -45,6 +45,8 @@ extern void SovereignDataPipeline_Init(void);
 extern void SovereignModelForge_Init(void);
 extern void SovereignMemoryBrain_Init(void);
 extern void SovereignNetMesh_Init(void);
+extern void SovereignEventMesh_Init(void);
+extern void SovereignConsensus_Init(void);
 extern void SovereignWatchdog_Init(void);
 extern void SovereignWatchdog_Pulse(void);
 
@@ -101,6 +103,8 @@ void sigma_kernel_main() {
     SovereignModelForge_Init();
     SovereignMemoryBrain_Init();
     SovereignNetMesh_Init();
+    SovereignEventMesh_Init();
+    SovereignConsensus_Init();
 
     SovereignWatchdog_Init();
     SovereignWatchdog_Pulse();

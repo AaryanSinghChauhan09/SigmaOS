@@ -58,6 +58,8 @@ OBJS = \
     build/SovereignModelForge.o \
     build/SovereignMemoryBrain.o \
     build/SovereignNetMesh.o \
+    build/SovereignEventMesh.o \
+    build/SovereignConsensus.o \
     build/sigma_std.o
 
 all: build build/sigmaos_zenith
@@ -205,6 +207,12 @@ build/SovereignMemoryBrain.o: kernel/shards/SovereignMemoryBrain.c
 
 build/SovereignNetMesh.o: kernel/shards/SovereignNetMesh.c
 	$(CC) $(CFLAGS) -c kernel/shards/SovereignNetMesh.c -o build/SovereignNetMesh.o
+
+build/SovereignEventMesh.o: kernel/shards/SovereignEventMesh.c
+	$(CC) $(CFLAGS) -c kernel/shards/SovereignEventMesh.c -o build/SovereignEventMesh.o
+
+build/SovereignConsensus.o: kernel/shards/SovereignConsensus.c
+	$(CC) $(CFLAGS) -c kernel/shards/SovereignConsensus.c -o build/SovereignConsensus.o
 
 build/sigmaos_zenith: $(OBJS)
 	$(LD) $(LDFLAGS) $(OBJS) -o build/sigmaos_zenith
