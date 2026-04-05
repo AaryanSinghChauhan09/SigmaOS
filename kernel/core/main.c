@@ -31,6 +31,10 @@ extern void SovereignMoE_Init(void);
 extern void SovereignEBPF_Init(void);
 extern void SovereignVectorDB_Init(void);
 extern void SovereignNUMA_Init(void);
+extern void SovereignContextBrain_Init(void);
+extern void SovereignIntelliViz_Init(void);
+extern void SovereignSecureWorkspace_Init(void);
+extern void SovereignPredictiveEngine_Init(void);
 extern void SovereignWatchdog_Init(void);
 extern void SovereignWatchdog_Pulse(void);
 
@@ -71,6 +75,13 @@ void sigma_kernel_main() {
     SovereignEBPF_Init();
     SovereignVectorDB_Init();
     SovereignNUMA_Init();
+
+    /* 4.75 LAYER 4.75: Visionary AI (AI-Native Experience) */
+    SovereignContextBrain_Init();
+    SovereignIntelliViz_Init();
+    SovereignSecureWorkspace_Init();
+    SovereignPredictiveEngine_Init();
+
     SovereignWatchdog_Init();
     SovereignWatchdog_Pulse();
     

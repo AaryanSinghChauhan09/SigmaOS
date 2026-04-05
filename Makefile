@@ -44,6 +44,10 @@ OBJS = \
     build/SovereignEBPF.o \
     build/SovereignVectorDB.o \
     build/SovereignNUMA.o \
+    build/SovereignContextBrain.o \
+    build/SovereignIntelliViz.o \
+    build/SovereignSecureWorkspace.o \
+    build/SovereignPredictiveEngine.o \
     build/sigma_std.o
 
 all: build build/sigmaos_zenith
@@ -149,6 +153,18 @@ build/SovereignVectorDB.o: kernel/shards/SovereignVectorDB.c
 
 build/SovereignNUMA.o: kernel/shards/SovereignNUMA.c
 	$(CC) $(CFLAGS) -c kernel/shards/SovereignNUMA.c -o build/SovereignNUMA.o
+
+build/SovereignContextBrain.o: kernel/shards/SovereignContextBrain.c
+	$(CC) $(CFLAGS) -c kernel/shards/SovereignContextBrain.c -o build/SovereignContextBrain.o
+
+build/SovereignIntelliViz.o: kernel/shards/SovereignIntelliViz.c
+	$(CC) $(CFLAGS) -c kernel/shards/SovereignIntelliViz.c -o build/SovereignIntelliViz.o
+
+build/SovereignSecureWorkspace.o: kernel/shards/SovereignSecureWorkspace.c
+	$(CC) $(CFLAGS) -c kernel/shards/SovereignSecureWorkspace.c -o build/SovereignSecureWorkspace.o
+
+build/SovereignPredictiveEngine.o: kernel/shards/SovereignPredictiveEngine.c
+	$(CC) $(CFLAGS) -c kernel/shards/SovereignPredictiveEngine.c -o build/SovereignPredictiveEngine.o
 
 build/sigmaos_zenith: $(OBJS)
 	$(LD) $(LDFLAGS) $(OBJS) -o build/sigmaos_zenith
