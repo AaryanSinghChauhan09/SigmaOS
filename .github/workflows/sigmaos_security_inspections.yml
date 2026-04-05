@@ -11,7 +11,10 @@ jobs:
     name: "Σ Security: Multi-Domain Audit"
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - name: "Clone Repository Natively"
+        run: |
+          git clone https://github.com/${{ github.repository }} .
+
 
       - name: "Audit: Secret Leak Detection"
         run: |
@@ -41,7 +44,10 @@ jobs:
     name: "Σ Automation: Protocol Validation"
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - name: "Clone Repository Natively"
+        run: |
+          git clone https://github.com/${{ github.repository }} .
+
 
       - name: "Dry-Run: Script Syntax Check"
         run: |
@@ -54,7 +60,10 @@ jobs:
     name: "Σ UI/UX: Design System Consistency"
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - name: "Clone Repository Natively"
+        run: |
+          git clone https://github.com/${{ github.repository }} .
+
 
       - name: "Audit: UI Component Integrity"
         run: |
@@ -70,7 +79,10 @@ jobs:
     name: "Σ Ease of Use: Documentation & Accessibility"
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - name: "Clone Repository Natively"
+        run: |
+          git clone https://github.com/${{ github.repository }} .
+
 
       - name: "Audit: Command Help & Documentation Sync"
         run: |
