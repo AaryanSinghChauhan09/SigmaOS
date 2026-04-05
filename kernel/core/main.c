@@ -37,6 +37,8 @@ extern void SovereignSecureWorkspace_Init(void);
 extern void SovereignPredictiveEngine_Init(void);
 extern void SovereignFederatedLearning_Init(void);
 extern void SovereignZeroTrust_Init(void);
+extern void SovereignNeuroSymbolic_Init(void);
+extern void SovereignGraphNet_Init(void);
 extern void SovereignWatchdog_Init(void);
 extern void SovereignWatchdog_Pulse(void);
 
@@ -85,6 +87,8 @@ void sigma_kernel_main() {
     SovereignPredictiveEngine_Init();
     SovereignFederatedLearning_Init();
     SovereignZeroTrust_Init();
+    SovereignNeuroSymbolic_Init();
+    SovereignGraphNet_Init();
 
     SovereignWatchdog_Init();
     SovereignWatchdog_Pulse();
