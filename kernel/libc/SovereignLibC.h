@@ -1,1 +1,11 @@
-#ifndef SOVEREIGN_LIBC_H\n#define SOVEREIGN_LIBC_H\n\ntypedef unsigned long long sigma_u64;\ntypedef unsigned int       sigma_u32;\ntypedef unsigned short     sigma_u16;\ntypedef unsigned char      sigma_u8;\n\nextern void sigma_printf(const char* fmt, ...);\n\n#endif
+#ifndef SOVEREIGN_LIBC_H
+#define SOVEREIGN_LIBC_H
+
+typedef unsigned long long sigma_u64;
+typedef unsigned int       sigma_u32;
+typedef unsigned short     sigma_u16;
+typedef unsigned char      sigma_u8;
+
+extern void sigma_printf(const char* fmt, ...);
+
+#endif

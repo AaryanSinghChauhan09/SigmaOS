@@ -135,4 +135,5 @@
 | SovereignKqueue | FreeBSD | Scalable O(1) High-Performance Event Notification | PURE |
 | SovereignCapsicum | FreeBSD | Capability-Based Security Shard Sandboxing | PURE |
 | SovereignGEOM | FreeBSD | Modular Silicon Disk Transformation & Encryption Topology | PURE |
+| SovereignIntelliViz | SigmaOS Zenith | Real-time Observability Analytics & Telemetry Visualization | PURE |
 | SovereignCHERI | FreeBSD / CHERI | Capability-Hardware Enhanced RISC Memory Safety | PURE |
