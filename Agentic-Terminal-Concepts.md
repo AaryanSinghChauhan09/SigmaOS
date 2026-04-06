@@ -14,6 +14,7 @@ Instead of relying on heavy Language Servers (LSPs) built in node.js or python, 
 * **Contextual Retrieval Vectors**: Direct file parsing without dependencies. The Omni-Agent Shell will dynamically fetch function signatures, memory struct layouts (like `Persona` models in C), and map relationships when the user asks questions.
 
 ### B. Natural Language Command Resolution
+
 * The Omni-CLI will securely map natural language queries (e.g., *"Explain why SovereignQuantumShard panicked on boot"*) to actual system diagnostics mapping back to `dmesg` buffers, git histories, and source code files.
 
 ## ⚙️ 2. Execution of Routine Operations (Absorbing `claude-code` USPs)
@@ -34,6 +35,7 @@ Instead of generic `.app-plugin` json wrappers, SigmaOS will introduce **`.sigma
 * **Declarative Tool Actions**: Users can write their own terminal commands using custom C11 macros. The Omni-Agent will map these to specific intent-triggers when having dialogue with the user.
 
 ## 🛡️ 4. Data Safety & Privacy
+
 * **Local Priority**: As SigmaOS strives for full sovereignty, telemetry or "training on user data" is fundamentally rejected. State retention for the AI terminal will exist entirely on the local `inode` snapshot volume.
 * **Rollback Snapshots**: Every time the AI agent executes a file modification, a bare-metal file-system `snapshot` is quietly triggered. If the AI hallucinates or corrupts a `.asm` file, the user can say *"Undo the last edit"* and the OS instantly unlinks the delta using B-Tree snapshotting.
 
