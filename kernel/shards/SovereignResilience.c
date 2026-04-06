@@ -1,4 +1,4 @@
-#include "../libc/SovereignLibC.h"
+#include "../../libc/SovereignLibC.h"
 
 typedef enum {
     RES_HEALTHY = 0,
@@ -20,3 +20,4 @@ void SovereignResilience_Check() {
         current_health = RES_HEALTHY;
     }
 }
+

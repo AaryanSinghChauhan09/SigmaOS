@@ -249,4 +249,17 @@ void SovereignAsahi_Init(void);
 void SovereignNixCore_Init(void);
 void SovereignAtomicFS_Init(void);
 
+// --- Phase 28 Global Distro Absorption (Apex Sovereignty) ---
+void SovereignIgnition_Init(void);
+void SovereignGamescope_Init(void);
+void SovereignProcd_Init(void);
+void SovereignAshmem_Init(void);
+void SovereignSELinux_Init(void);
+void SovereignALPM_Init(void);
+void SovereignZorin_Init(void);
+void SovereignMageia_Init(void);
+void SovereignKnoppix_Init(void);
+void SovereignBodhi_Init(void);
+void SovereignDeepin_Init(void);
+
 #endif /* SOVEREIGN_OMNI_SHARD_H */

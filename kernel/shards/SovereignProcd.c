@@ -1,0 +1,5 @@
+#include "../../libc/SovereignLibC.h"
+
+void SovereignProcd_Init() {
+    sigma_printf("Σ [ABSORB]: SovereignProcd Zenith Online. Unified Parity Verified.\n");
+}

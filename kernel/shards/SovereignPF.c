@@ -1,4 +1,4 @@
-#include "../libc/SovereignLibC.h"
+#include "../../libc/SovereignLibC.h"
 
 // Σ SovereignPF: Packet Filter Zenith
 // Inspired by FreeBSD PF (Packet Filter): Stateful Firewall & NAT Engine
@@ -50,3 +50,4 @@ void SovereignPF_NAT_Enable(const char* ext_if, const char* int_net) {
     sigma_printf("Σ [NAT]: Internal Network %s now NATing through %s.
 ", int_net, ext_if);
 }
+

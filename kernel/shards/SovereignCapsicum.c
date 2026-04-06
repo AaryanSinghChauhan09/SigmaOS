@@ -1,4 +1,4 @@
-#include "../libc/SovereignLibC.h"
+#include "../../libc/SovereignLibC.h"
 
 // Σ SovereignCapsicum: Capability Zenith
 // Inspired by FreeBSD Capsicum: Capability-Based Security Framework
@@ -40,3 +40,4 @@ int SovereignCapsicum_Limit(int fd, sigma_u64 rights) {
 sigma_u8 SovereignCapsicum_Validate(int fd, sigma_u64 required_rights) {
     return 1; // Validated
 }
+

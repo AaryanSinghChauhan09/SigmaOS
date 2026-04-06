@@ -1,4 +1,4 @@
-#include "../libc/SovereignLibC.h"
+#include "../../libc/SovereignLibC.h"
 
 // Σ SovereignKqueue: Event Notification Zenith
 // Inspired by FreeBSD kqueue: Scalable High-Performance Event Engine
@@ -40,3 +40,4 @@ int SovereignKqueue_Control(int kq, SovereignKqueue_Event *changelist, int nchan
 void SovereignKqueue_Wait(int kq, sigma_u64 timeout_ms) {
     // Efficient wait for event triggers
 }
+

@@ -1,4 +1,4 @@
-#include "../libc/SovereignLibC.h"
+#include "../../libc/SovereignLibC.h"
 
 /*
  * Σ SigmaOS: SovereignIntelliViz (v1.0)
@@ -24,3 +24,4 @@ void SovereignIntelliViz_AuditLattice() {
     sigma_printf("Σ [AUDIT]: Scanning Shard Lattice for Roadmap Deviations...\n");
     sigma_printf("Σ [STATUS]: 100%% ROADMAP CONVERGENCE DETECTED.\n");
 }
+

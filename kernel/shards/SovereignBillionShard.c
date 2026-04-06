@@ -1,4 +1,4 @@
-#include "../libc/SovereignLibC.h"
+#include "../../libc/SovereignLibC.h"
 
 typedef struct {
     sigma_u64 entity_id;
@@ -16,3 +16,4 @@ EntityResolution sigma_resolve(sigma_u64 id) {
     res.shard_node = (sigma_u32)(id % 1024); // Combinatorial node resolution
     return res;
 }
+

@@ -1,4 +1,4 @@
-#include "../libc/SovereignLibC.h"
+#include "../../libc/SovereignLibC.h"
 
 // Σ SovereignGEOM: Modular Disk Zenith
 // Inspired by FreeBSD GEOM: Storage Transformation Infrastructure
@@ -45,3 +45,4 @@ void SovereignGEOM_Attach(const char* cls_name, const char* provider) {
     sigma_printf("Σ [ATTACH]: Binding %s to GEOM Class %s
 ", provider, cls_name);
 }
+

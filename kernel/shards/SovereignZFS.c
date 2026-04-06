@@ -42,3 +42,4 @@ void SovereignZFS_Scrub() {
     sigma_printf("Σ [SCRUB]: Comprehensive Pool Integrity Verification in Progress.
 ");
 }
+

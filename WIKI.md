@@ -162,6 +162,12 @@
 | SovereignAlpine | Alpine Linux | RAM-Resident Minimalist musl-grade Execution | PURE |
 | SovereignAVX | Clear Linux | Silicon-Level AVX-512 Vector Performance Zenith | PURE |
 | SovereignLisket | Solus (Lisket) | Latency-Optimized Desktop-First Shard Scheduling | PURE |
+
+| Shard | Inspiration | USP | Status |
+| :--- | :--- | :--- | :--- |
+| SovereignAlpine | Alpine Linux | RAM-Resident Minimalist musl-grade Execution | PURE |
+| SovereignAVX | Clear Linux | Silicon-Level AVX-512 Vector Performance Zenith | PURE |
+| SovereignLisket | Solus (Lisket) | Latency-Optimized Desktop-First Shard Scheduling | PURE |
 | SovereignSlackInit | Slackware | Raw Procedural System Initialization Finality | PURE |
 | SovereignBusybox | BusyBox | Industrial-Grade Tool Aggregation & Multicall Zenith | PURE |
 | SovereignMusl | musl-libc | Ultra-Clean POSIX Compatibility Layer | PURE |
@@ -170,3 +176,18 @@
 | SovereignAsahi | Asahi Linux | M1/M2 Apple Silicon Sovereign Boot & Parity | PURE |
 | SovereignNixCore | NixOS | Declarative Lattice State & Atomic Rollback Logic | PURE |
 | SovereignAtomicFS | Fedora Silverblue| Transactional Read-Only Root Architecture | PURE |
+
+### Phase 28: Global Linux Distro Absorption (Apex Sovereignty)
+| Shard | Inspiration | USP | Status |
+| :--- | :--- | :--- | :--- |
+| SovereignIgnition | CoreOS / Flatcar | Immutable Shard Provisioning & Ignition Parity | PURE |
+| SovereignGamescope | SteamOS | Silicon-Level Wayland Compositor & GameScope Scaling | PURE |
+| SovereignProcd | OpenWrt | Zero-Overhead procd System Supervision Matrix | PURE |
+| SovereignAshmem | Android | Anonymous Shared Memory Sharding & Reclamation | PURE |
+| SovereignSELinux | Fedora / RHEL | Label-Based Mandatory Access Control (MAC) Zenith | PURE |
+| SovereignALPM | Arch Linux | Lattice-Aware Shard Dependency & Package Parity | PURE |
+| SovereignZorin | Zorin OS | Adaptive Visual Lattice Logic & Transition Engine | PURE |
+| SovereignMageia | Mageia | Industrial URPMI-Grade Dependency Shard Resolution | PURE |
+| SovereignKnoppix | Knoppix | Live On-The-Fly Silicon Hardware Auto-Detection | PURE |
+| SovereignBodhi | Bodhi Linux | Resource-Calibrated Moksha Efficiency Shard | PURE |
+| SovereignDeepin | Deepin | High-Fidelity Visual Aesthetics & UI Refinement | PURE |

@@ -1,4 +1,4 @@
-#include "../libc/SovereignLibC.h"
+#include "../../libc/SovereignLibC.h"
 #include "../SovereignInterferenceGuard.h"
 
 // Σ SovereignJail: Isolation Zenith
@@ -40,3 +40,4 @@ void SovereignJail_VNET_Init(sigma_u32 jid) {
     sigma_printf("Σ [VNET]: Virtual Network Stack Segmented for Jail %u.
 ", jid);
 }
+

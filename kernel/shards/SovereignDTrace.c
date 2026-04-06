@@ -1,4 +1,4 @@
-#include "../libc/SovereignLibC.h"
+#include "../../libc/SovereignLibC.h"
 
 // Σ SovereignDTrace: Observability Pulse
 // Inspired by FreeBSD DTrace: Dynamic Kernel/Userland Probing & Telemetry
@@ -42,3 +42,4 @@ void SovereignDTrace_EnableProvider(const char* provider) {
 void SovereignDTrace_Aggregate(const char* name, sigma_u64 val) {
     // Aggregation logic (@count, @sum, @avg)
 }
+
