@@ -48,3 +48,30 @@ Beyond tools, the kernel architecture itself is expanding to operate entirely au
 * **Cross-Device Persona Sync:** Personas and strict capability bounds replicate peer-to-peer across mesh hardware.
 * **Industrial Plugin Ecosystem:** Community shards written directly to ABI spec without dynamic wrapper layers.
 * **Distributed Collaborative AI:** Multiple specialized agents orchestrating OS internals iteratively as a hive-mind.
+
+## 🛠️ High-Impact Engineering Upgrades
+
+Based on recent architectural reviews, the following foundational upgrades are prioritized to transition SigmaOS from a hobbyist tier into an industrial-grade bare-metal system:
+
+### 1. Advanced Memory Management
+*   **Physical Memory Manager (PMM):** Transitioning from simple bump allocators to Buddy Allocators or Stack-based managers to minimize external fragmentation.
+*   **Virtual Memory Manager (VMM):** Implementing robust 4-level/5-level recursive temporary paging to securely map the `x86_64` kernel against user space domains.
+
+### 2. Standardized Virtual File System (VFS)
+*   **Decoupled Device Nodes:** Replacing hardcoded driver calls with a uniform `vfs_node` methodology (read/write/open/close function pointers).
+*   **`/dev/` Abstraction:** Registering native system hardware into scalable block and character endpoints for improved modularity.
+
+### 3. Industrial Toolchain Modernization
+*   **Cross-Compilation Enclaves:** Forcing strictly `x86_64-elf-gcc` targets to prevent host header contamination and system leakage.
+*   **CI/CD Pipeline Expansion:** Integrating aggressive continuous integration tests to guard master branches.
+
+### 4. Concurrency and SMP (Symmetric Multiprocessing)
+*   **APIC Routing:** Graduating from the legacy 8259 PIC to full Advanced Programmable Interrupt Controllers for concurrent multi-core awareness.
+*   **Native Spinlocks:** Establishing atomic test-and-set locks with `__builtin_ia32_pause()` instruction hooks to avoid IRQ deadlocks.
+
+### 5. x86_64 Long Mode Transition
+*   Expanding Global Descriptor Tables (GDT) and updating native boot assembly strictly to 64-bit bounds, opening access to expanded general-purpose registers (R8-R15).
+
+### 6. Subsystem Quality & Hardening
+*   **Address Sanitizers (UBSan/KASan):** Detecting in-bounds corruption silently before ring-0 faults.
+*   **Hierarchical KLogs:** Introducing tiered, hardware-isolated ring buffers (`DEBUG`, `INFO`, `WARN`, `ERROR`) output directly to the serial debugging interfaces in QEMU.
