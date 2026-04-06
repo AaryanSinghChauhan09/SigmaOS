@@ -200,5 +200,13 @@ void SovereignKata_Init(void);
 void SovereignUnikraft_Init(void);
 void SovereignMirage_Init(void);
 
+// --- Phase 38: Cognitive Zenith (Academic Syllabi Absorption) ---
+void SovereignEdu_OOP_Init(void);
+void SovereignEdu_RDBMS_Init(void);
+void SovereignEdu_Statistics_Init(void);
+void SovereignEdu_AI_ML_Init(void);
+void SovereignEdu_Web_OS_Init(void);
+
 #endif /* SOVEREIGN_OMNI_SHARD_H */
+
 

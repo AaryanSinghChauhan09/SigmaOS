@@ -29,9 +29,13 @@ void test_shard_initialization_matrix();
 void test_libc_purity_audit();
     test_silicon_floating_point();
     test_edu_syllabus_parity();
+    test_academic_competency_audit();
 void test_silicon_floating_point();
     test_edu_syllabus_parity();
+    test_academic_competency_audit();
 void test_edu_syllabus_parity();
+    test_academic_competency_audit();
+void test_academic_competency_audit();
 
 // Σ SCHEDULER SUBSYSTEM TESTS
 // =========================================================================
@@ -70,10 +74,12 @@ int main(int argc, char** argv) {
     test_libc_purity_audit();
     test_silicon_floating_point();
     test_edu_syllabus_parity();
+    test_academic_competency_audit();
     
     sigma_printf("--- Σ ALL SOVEREIGN TESTS PASSED ACCORDING TO PLAN. --- \n");
     return 0;
 }
+
 
 
 
