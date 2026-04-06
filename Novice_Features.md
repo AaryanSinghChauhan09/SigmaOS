@@ -5,21 +5,27 @@
 Welcome to SigmaOS! As a zero-dependency, bare-metal C11 and Assembly based operating system, standard operations differ significantly from traditional Linux or Windows environments. Here is how a novice can get started and navigate the system:
 
 ### 1.1 Command Execution and Shards
+
 SigmaOS replaces traditional pre-installed "bloat" applications with **Shards**. Shards are pure C11/ASM highly optimized, silicon-direct executables.
+
 - **Executing Tasks:** Instead of using traditional monolithic binaries, you call the exact Shard required for your task. For network operations, you use the `NetShard`; for filesystem interactions, you use the native `FSShard`.
 - **Shard-On-Demand (SOD):** You don't need to manually close background services. Invoking a task spins up its Shard via the SOD system. Once execution is complete, the Shard dissolves from kernel memory automatically.
 
 ### 1.2 System File Management
+
 - **No Virtual File System (VFS) Overhead:** File actions happen via raw `SovereignDiskZenith` and `fs` module commands.
 - **Basic Commands:** To copy or move files, use the raw CLI mapped to `SovereignCoreUtils`.
 Example: Use `sigma-fs --read [PATH]` to view a file, and `sigma-fs --write [PATH]` to create files natively.
 
 ### 1.3 Navigating Process Management
+
 - **SovereignPulse:** Monitor system operations and active shards by executing `sigma-pulse`. This directly queries the bare-metal kernel (`kernel_pulse`) for thread information.
 - **SovereignSentinel:** If a process locks up, the `SovereignSentinel` subsystem automatically catches kernel panics. You can manually terminate rogue threads via `sigma-kill [THREAD_ID]`.
 
 ### 1.4 Creating Custom Tools
+
 As a sovereign OS, you have total autonomy to build custom tools without needing third-party libraries.
+
 - All tools must be written in **pure C11 or x86/ARM Assembly**, making direct syscalls to the kernel.
 - Use the included `.asm` templates (like `SovereignEntry.asm`) and compile via the native build system (`make` and the custom compiler orchestration scripts).
 - No Python, Node.js, or external standard libraries (`libc` wrappers) are required or supported by default to execute logic.

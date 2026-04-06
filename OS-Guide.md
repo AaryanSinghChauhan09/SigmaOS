@@ -1,7 +1,5 @@
 # SIGMAOS ZENITH: THE ULTIMATE SOVEREIGN OS GUIDE
 
-
-
 ## --- AUTOMATION_ZENITH.MD ---
 
 # Σ SIGMAOS: AUTOMATION ZENITH (v150.0)
@@ -32,7 +30,6 @@ SigmaOS has **absorbed every USP** from the world's most advanced automation and
 ---
 
 Σ SIGMAOS: AUTOMATION. CENTURY. SOVEREIGNTY.
-
 
 ## --- CHANGELOG.MD ---
 
@@ -69,7 +66,6 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 
 Σ SIGMAOS: EVOLUTION. FINALITY. SHARDING.
 
-
 ## --- CODE_OF_CONDUCT.MD ---
 
 # SIGMAOS CODE OF CONDUCT
@@ -82,19 +78,19 @@ In the interest of fostering an open and welcoming environment, we as contributo
 
 Examples of behavior that contributes to creating a positive environment include:
 
-*   Using welcoming and inclusive language
-*   Being respectful of differing viewpoints and experiences
-*   Gracefully accepting constructive criticism
-*   Focusing on what is best for the community
-*   Showing empathy towards other community members
+- Using welcoming and inclusive language
+- Being respectful of differing viewpoints and experiences
+- Gracefully accepting constructive criticism
+- Focusing on what is best for the community
+- Showing empathy towards other community members
 
 Examples of unacceptable behavior by participants include:
 
-*   The use of sexualized language or imagery and unwelcome sexual attention or advances
-*   Trolling, insulting/derogatory comments, and personal or political attacks
-*   Public or private harassment
-*   Publishing others' private information, such as a physical or electronic address, without explicit permission
-*   Other conduct which could reasonably be considered inappropriate in a professional setting
+- The use of sexualized language or imagery and unwelcome sexual attention or advances
+- Trolling, insulting/derogatory comments, and personal or political attacks
+- Public or private harassment
+- Publishing others' private information, such as a physical or electronic address, without explicit permission
+- Other conduct which could reasonably be considered inappropriate in a professional setting
 
 ## Our Responsibilities
 
@@ -118,7 +114,6 @@ This Code of Conduct is adapted from the [Contributor Covenant][homepage], versi
 
 [homepage]: https://www.contributor-covenant.org
 
-
 ## --- CONTRIBUTING.MD ---
 
 # Σ SIGMAOS: CONTRIBUTING TO SOVEREIGNTY (v1.0)
@@ -126,18 +121,19 @@ This Code of Conduct is adapted from the [Contributor Covenant][homepage], versi
 Thank you for contributing to the most advanced, scratch-made operating system in existence. SigmaOS is built on the principle of **Absolute Scratch Finality**—no predefined libraries, no compiler-provided runtimes, and 100% silicon-sharded logic.
 
 ## 🏛️ CONTRIBUTION PRINCIPLES
-1.  **Zero-Dependency**: Do not use `<stdio.h>`, `<stdlib.h>`, or any standard C/C++ library headers. Use `SovereignLibC.h` and its raw ASM sharding instead.
-2.  **Silicon-Direct**: Prefer Assembly (`.asm`) and Pure C11 (`.c`) or no_std Rust for all core logic.
-3.  **Autonomous Error Handling**: All new shards MUST hook into the **Sovereign-Sentinel** for automatic error resolution.
-4.  **Ubuntu-Elite Grade UI**: Visual additions must conform to the **Yaru-Gold** design system in `index.css`.
+
+1. **Zero-Dependency**: Do not use `<stdio.h>`, `<stdlib.h>`, or any standard C/C++ library headers. Use `SovereignLibC.h` and its raw ASM sharding instead.
+2. **Silicon-Direct**: Prefer Assembly (`.asm`) and Pure C11 (`.c`) or no_std Rust for all core logic.
+3. **Autonomous Error Handling**: All new shards MUST hook into the **Sovereign-Sentinel** for automatic error resolution.
+4. **Ubuntu-Elite Grade UI**: Visual additions must conform to the **Yaru-Gold** design system in `index.css`.
 
 ## 🚀 GETTING STARTED
-1.  Familiarize yourself with `SovereignEntry.asm` (the raw entry point).
-2.  Use `make zenith` to verify your environment.
-3.  Pull requests must pass the **Sovereign-Sentinel Audit**.
+
+1. Familiarize yourself with `SovereignEntry.asm` (the raw entry point).
+2. Use `make zenith` to verify your environment.
+3. Pull requests must pass the **Sovereign-Sentinel Audit**.
 
 Σ SIGMAOS: THE DEFINITIVE SILICON ZENITH.
-
 
 ## --- OS_MISSING_PARITY.MD ---
 
@@ -247,7 +243,6 @@ This report compares SigmaOS's current "Sovereign" implementation with standard 
 
 Σ SIGMAOS: EVOLVING BEYOND LINUX. INDUSTRIAL FINALITY.
 
-
 ## --- PULL_REQUEST_TEMPLATE.MD ---
 
 # SigmaOS Pull Request Template
@@ -256,17 +251,17 @@ This report compares SigmaOS's current "Sovereign" implementation with standard 
 
 Please provide a clear description of the modifications you have made to the SigmaOS industrial-grade codebase.
 
--   **Changes Made**: [Summary of changes]
--   **Goal/Motivation**: [Why were these changes made?]
--   **Impact**: [Which shards are affected?]
+- **Changes Made**: [Summary of changes]
+- **Goal/Motivation**: [Why were these changes made?]
+- **Impact**: [Which shards are affected?]
 
 ## Checklist
 
--   [ ] **Zero-Dependency**: No standard library or predefined functions used.
--   [ ] **C11/ASM Purity**: Pure C11 or x86_64 Assembly only.
--   [ ] **Security Audit**: Verified for zero-leak privacy.
--   [ ] **Testing**: Confirmed in the Zenith environment.
--   [ ] **Documentation**: Updated necessary `.md` files.
+- [ ] **Zero-Dependency**: No standard library or predefined functions used.
+- [ ] **C11/ASM Purity**: Pure C11 or x86_64 Assembly only.
+- [ ] **Security Audit**: Verified for zero-leak privacy.
+- [ ] **Testing**: Confirmed in the Zenith environment.
+- [ ] **Documentation**: Updated necessary `.md` files.
 
 ## Screenshots (if applicable)
 
@@ -276,10 +271,10 @@ Please provide a clear description of the modifications you have made to the Sig
 
 Fixes #[IssueNumber]
 
-
 ## --- README.MD ---
 
 # Σ SIGMAOS ZENITH SUPREME (v160.0)
+
 [![Status](https://img.shields.io/badge/Status-SOVEREIGN-00d2ff?style=for-the-badge)]()
 [![Build](https://img.shields.io/badge/Build-C11%20%2F%20ASM-E95420?style=for-the-badge)]()
 [![License](https://img.shields.io/badge/License-SOVEREIGN-yaru?style=for-the-badge)]()
@@ -287,12 +282,14 @@ Fixes #[IssueNumber]
 **Σ SIGMAOS** is an industrial-grade, zero-dependency, sharded operating system designed for absolute technical sovereignty. It eliminates all high-level language (HLL) simulations in favor of pure-performance silicon execution.
 
 ## 🏛️ CORE PRINCIPLES
+
 - **HLL-REDUCTION**: Minimizes dependency on high-level language libraries (Math.*, standard headers). All compute is sharded into User-Defined Functions (UDFs).
 - **PURE PERFORMANCE**: Zero simulations. Real Gradient Descent, Real Quicksort, Real VFS Auditing.
 - **SHARD-ON-DEMAND (SOD)**: Full user autonomy. Keep only the shards required for your mission; PURGE the rest.
 - **MULTI-PLATFORM PARITY**: Deploy natively on PC (Dual Boot), Cloud (Docker), Mobile (Responsive), and Embedded (Minimal C Kernel).
 
 ## 🧩 PROFESSIONAL SHARDS
+
 | Shard | Domain | Principle | USP |
 | :--- | :--- | :--- | :--- |
 | **AI Lab** | Artificial Intelligence | Pure Gradient Descent | Real Weights/Bias training on local silicon. |
@@ -302,18 +299,19 @@ Fixes #[IssueNumber]
 | **Distro Mirror**| OS Consistency | Linux Parity | Real-time Ubuntu/Arch personality mirroring. |
 
 ## ⚙️ TECHNICAL FINALITY
+
 - **Architecture**: Sharded OOPS Hierarchy (Encapsulation, Polymorphism).
 - **Languages**: C11, x86_64 Assembly, HLL-Reduced JavaScript ESM.
 - **Management**: Shard Store with Autonomy Hub and Silicon Purge Trigger.
 
 ## 🚀 DEPLOYMENT
+
 - **Containerized**: `docker build -t sigmaos .`
 - **Bootable Media**: `bash scripts/SigmaSovereignBootBuilder.sh`
 - **Distributed**: `bash scripts/SigmaClusterShard.sh`
 
 ---
 **Σ SIGMAOS: RAW SILICON. ABSOLUTE SOVEREIGNTY.**
-
 
 ## --- SECURITY.MD ---
 
@@ -322,16 +320,17 @@ Fixes #[IssueNumber]
 SigmaOS is the most secure operating system in the universe. It is built to ensure your personal information remains **absolutely private** and **never leaves your silicon**.
 
 ## 🛡️ CORE SECURITY SHARDS
-1.  **Sovereign-Sentinel (Auto-Healing)**: An autonomous exception handler that intercepts CPU traps at the assembly level to resolve errors and perform silicon-rollback before a crash can leak state.
-2.  **Silicon-Scrubbing (Zero-Leak)**: Every task switch and exit triggers `sigma_security_scrub_registers` and `sigma_security_scrub_stack`.
-3.  **Amnesic-Session-Shard**: Native support for **"Amnesic" sessions** that leave zero trace in RAM or on disk. Managed via `SovereignAmnesicShard.c`.
-4.  **Zero-Network Privacy**: All local activity is isolated behind the **Zero-Trust Handshake** of the **Sovereign-Net** shard.
+
+1. **Sovereign-Sentinel (Auto-Healing)**: An autonomous exception handler that intercepts CPU traps at the assembly level to resolve errors and perform silicon-rollback before a crash can leak state.
+2. **Silicon-Scrubbing (Zero-Leak)**: Every task switch and exit triggers `sigma_security_scrub_registers` and `sigma_security_scrub_stack`.
+3. **Amnesic-Session-Shard**: Native support for **"Amnesic" sessions** that leave zero trace in RAM or on disk. Managed via `SovereignAmnesicShard.c`.
+4. **Zero-Network Privacy**: All local activity is isolated behind the **Zero-Trust Handshake** of the **Sovereign-Net** shard.
 
 ## 🚀 REPORTING VULNERABILITIES
+
 If you find a shard that does not correctly scrub the register state, please report it via the **Sovereign-Maintainer-Link**. All reports are handled with **Kyber-768 encryption**.
 
 Σ SIGMAOS: THE DEFINTIVE SILICON ZENITH (SECURITY EDITION).
-
 
 ## --- SUGGESTIONS.MD ---
 
@@ -485,7 +484,6 @@ If you find a shard that does not correctly scrub the register state, please rep
 
 Σ SIGMAOS: THE DEFINITIVE ROADMAP TO SUPREMACY. **ALL SUGGESTIONS RESOLVED.**
 
-
 ## --- SUPPORT.MD ---
 
 # Support for SIGMAOS
@@ -496,21 +494,21 @@ Thank you for using SigmaOS! We are committed to providing the best support poss
 
 If you have questions, encounter issues, or need guidance on using SigmaOS, here are the official ways to get support:
 
-1.  **GitHub Issues**:
-    -   Before opening a new issue, please check existing issues to see if your question has been answered or if a solution is already being discussed.
-    -   For bugs, use the `Bug Report` template.
-    -   For feature requests, use the `Feature Request` template.
-    -   Link: [SigmaOS GitHub Issues](https://github.com/[REDACTED_AUTHOR]SinghSigmaSovereign09/SigmaOS/issues)
+1. **GitHub Issues**:
+    - Before opening a new issue, please check existing issues to see if your question has been answered or if a solution is already being discussed.
+    - For bugs, use the `Bug Report` template.
+    - For feature requests, use the `Feature Request` template.
+    - Link: [SigmaOS GitHub Issues](https://github.com/[REDACTED_AUTHOR]SinghSigmaSovereign09/SigmaOS/issues)
 
-2.  **Official Documentation**:
-    -   Comprehensive guides and architectural insights are available in:
-        -   [os_guide.md](os_guide.md)
-        -   [AUTOMATION_ZENITH.md](AUTOMATION_ZENITH.md)
-        -   [SECURITY.md](SECURITY.md)
+2. **Official Documentation**:
+    - Comprehensive guides and architectural insights are available in:
+        - [os_guide.md](os_guide.md)
+        - [AUTOMATION_ZENITH.md](AUTOMATION_ZENITH.md)
+        - [SECURITY.md](SECURITY.md)
 
-3.  **Community & Discussions**:
-    -   Join our SigmaOS community discussions for real-time support and collaboration.
-    -   Link: [SigmaOS GitHub Discussions](https://github.com/[REDACTED_AUTHOR]SinghSigmaSovereign09/SigmaOS/discussions)
+3. **Community & Discussions**:
+    - Join our SigmaOS community discussions for real-time support and collaboration.
+    - Link: [SigmaOS GitHub Discussions](https://github.com/[REDACTED_AUTHOR]SinghSigmaSovereign09/SigmaOS/discussions)
 
 ## Professional Support
 
@@ -519,7 +517,6 @@ For industrial or enterprise deployments of SigmaOS, we offer premium support ti
 ---
 
 Σ SIGMAOS: SOVEREIGN. SUPPORT. SUCCESS.
-
 
 ## --- VULNERABILITY_REPORT.MD ---
 
@@ -559,10 +556,9 @@ SigmaOS may, at its discretion, provide rewards for high-impact security discove
 
 Σ SIGMAOS: SECURE. SOVEREIGN. SUPREME.
 
-    
 ## LEGAL PROCEDURE CHECKLIST (AS PER LATEST INDIAN LAWS)
 
-This OS accommodates legal researchers and professionals with an integrated adherence to the Bharatiya Nyaya Sanhita (BNS), Bharatiya Nagarik Suraksha Sanhita (BNSS), and Bharatiya Sakshya Adhiniyam (BSA). 
+This OS accommodates legal researchers and professionals with an integrated adherence to the Bharatiya Nyaya Sanhita (BNS), Bharatiya Nagarik Suraksha Sanhita (BNSS), and Bharatiya Sakshya Adhiniyam (BSA).
 
 **Pre-requisite / Scenario: Filing a First Information Report (FIR) under BNSS 2023**
 
@@ -575,16 +571,19 @@ This OS accommodates legal researchers and professionals with an integrated adhe
 ## COMPETITOR USP ABSORPTION & DATA SCIENCE DEPLOYMENTS
 
 ### Linus Torvalds / Linux Kernel Parity
+
 - Absorbed full **Symmetric Multi-Processing (SMP)** affinity patterns but implemented purely in user-defined C11 arrays to reduce library bloat.
 - **Process Scheduler**: Completely rewritten using O(1) custom native queues. Eliminating traditional python/C++ abstract structs for raw linked lists in Assembly.
 - **Microkernel / Monolithic Hybrid**: Adapts the best from Arch, Ubuntu, Alpine, Windows Subsystem for Linux (WSL).
 
 ### Data Science & ML Automation
+
 - A native `SigmaML` assembler engine allows graphing and training neural networks directly through low-level C instructions. Eliminates need for PyTorch/Python completely.
 - Real-time Graph Plotting in Terminal (Omni-Shell).
 - Forensic capabilities: Directly scrub and analyze RAM state, disk states (`SovereignAetherShard`).
 
 ### Camera App (Mit Scratch / Snapchat USP)
+
 - Native Camera Shard developed directly via V4L2 low-level syscalls.
 - Features AR-level filters mathematically calculated using matrix multiplications in Assembly (SovereignMath.asm).
 
@@ -593,21 +592,23 @@ This OS accommodates legal researchers and professionals with an integrated adhe
 - **NO PRE-DEFINED LIBRARIES**: All `malloc`, `printf`, `socket`, `open`, etc are re-implemented in `SovereignLibC.asm` natively.
 - **OOP Principles in C11**: Implementation of Encapsulation, Polymorphism via v-tables array structures in C.
 
-
 ## 🌟 POLYMORPHIC ARCHITECTURE: THE DEFINITIVE "BEST OS" PARADIGM
 
 SigmaOS has formally evolved into a **Polymorphic OS**—stable like Fedora, customizable like Arch, optimized like Gentoo, secure like Qubes, and beginner-friendly like Ubuntu—all while maintaining absolute sovereignty and avoiding high-level abstractions.
 
 ### 1. Universal Absorption & Cross-Distro Parity
+
 - **Universal Package Management Meta-Layer**: SigmaOS transparently translates commands across ecosystems. `apt`, `pacman`, and `dnf` syntax are dynamically mapped to native `SigmaPKG` low-level routines.
 - **Containerized Legacy Support**: Utilize isolated container shards to run legacy applications and older distro environments natively.
 
 ### 2. Automation, Intelligence & Self-Healing
+
 - **AI-Driven Anomaly Detection**: Incorporates zero-trust auditing (Qubes OS isolation) with predictive AI for real-time observability and self-healing.
 - **Self-Optimizing System**: AI monitors usage patterns to auto-adjust CPU governors, I/O schedulers, and memory management at the kernel level.
 - **Declarative Automation**: Unified YAML/JSON-based recipes replace fragmented bash scripts for system tasks (updates, backups).
 
 ### 3. Absolute Customization & Persona-Driven OS
+
 - **Persona Profiles**: Instantly switch kernel and UI behavior without rebooting.
   - *Developer Mode*: Optimized toolchains, containers, latency execution.
   - *Gamer Mode*: GPU priority polling, customized interrupt handling.
@@ -615,25 +616,30 @@ SigmaOS has formally evolved into a **Polymorphic OS**—stable like Fedora, cus
 - **Modular UI Morphing**: KDE Plasma-level flexibility mapped to a minimalist, low-overhead native drawing pipeline (Direct-Canvas GPU).
 
 ### 4. Advanced Security & Privacy Boundaries
+
 - **Multi-Layer Isolation**: Each shard runs in its own memory namespace, drastically reducing the blast radius of potential exploits.
 - **Transparent Encryption**: Automatic encryption for user data and communications, integrated seamlessly with TPM/secure enclave hardware.
 
 ### 5. Performance & Efficiency
+
 - **eBPF Everywhere**: Low-level observability matrices for live patching and kernel-level performance profiling, managed without Python/C++ overhead.
 - **Source + Binary Hybrid Optimization**: Critical components utilize source-based optimization (Gentoo-style), while non-critical shards run via pre-compiled binaries.
 
 ### 6. Bold Advancements: Shard-On-Demand (SOD)
+
 - **Dynamic Modular Boot**: The system boots using strictly essential shards. Additional modules are loaded dynamically via memory projection, resulting in a near-instant startup footprint.
 
 ### SUMMARY OF REDUNDANCY PURGES
+
 - **Removed**: Fragmented dist-specific Quirks, overlapping desktop environments, and high-level wrappers.
 - **Retained**: Lean, silicon-close execution paths implemented purely in C11 and Assembly.
 
-
 ## 🗂️ COMMAND TAXONOMY FOR SIGMAOS (OMNI-SHELL)
+
 SigmaOS incorporates a robust command taxonomy designed to scale beyond 10,000 unique commands through base verbs, explicit objects, and flag-based expansion, entirely circumventing the reliance on high-level Python parsers in favor of C11 native parsing.
 
 ### 1. System Management
+
 - `sigma-update` → Update system shards and native modules.
 - `sigma-shard list` → List all dynamically loaded active shards.
 - `sigma-shard purge <name>` → Remove shard natively from memory and disk.
@@ -641,6 +647,7 @@ SigmaOS incorporates a robust command taxonomy designed to scale beyond 10,000 u
 - `sigma-backup create --incremental` → Snapshot system state via VFS Amnesic Persistence.
 
 ### 2. Package & Cross-Distro Software Absorption
+
 - `sigma-pkg install <package>`
 - `sigma-pkg remove <package>`
 - `sigma-pkg search <query>`
@@ -649,6 +656,7 @@ SigmaOS incorporates a robust command taxonomy designed to scale beyond 10,000 u
 - `sigma-distro personality ubuntu` / `fedora` / `gentoo` / `nix` → Universal Absorption.
 
 ### 3. Desktop & Window Management (Direct-Canvas UI)
+
 - `sigma-ui window open <app>` / `sigma-ui window close <id>`
 - `sigma-ui window resize --width 800 --height 600`
 - `sigma-ui window move --x 100 --y 200`
@@ -656,6 +664,7 @@ SigmaOS incorporates a robust command taxonomy designed to scale beyond 10,000 u
 - `sigma-ui workspace tile --vertical` / `split --ratio 70:30`
 
 ### 4. Customization & Personalization (UI Morphing)
+
 - `sigma-ui theme set dark` / `sigma-ui theme list`
 - `sigma-ui persona gamer` / `sigma-ui morph --minimal`
 - `sigma-ui wallpaper set <file>` / `sigma-ui font set <family>`
@@ -663,12 +672,14 @@ SigmaOS incorporates a robust command taxonomy designed to scale beyond 10,000 u
 - `sigma-ui dock position bottom` / `sigma-ui dock auto-hide enable`
 
 ### 5. File Management & Media
+
 - `sigma-file open <path>` / `sigma-file copy <src> <dest>` / `sigma-file delete <path>`
 - `sigma-file search <query>` / `sigma-file compress <path>` / `sigma-file extract <archive>`
 - `sigma-media play <file>` / `sigma-media pause` / `sigma-media stop`
 - `sigma-media volume set 50` / `sigma-media record <output>`
 
 ### 6. Security, Privacy & Compliance
+
 - `sigma-sec audit` → Run low-level SELinux/AppArmor parity checks natively.
 - `sigma-sec sandbox <app>` → Launch an application strictly in an isolated namespace.
 - `sigma-sec encrypt home` / `sigma-sec decrypt <path>`
@@ -677,6 +688,7 @@ SigmaOS incorporates a robust command taxonomy designed to scale beyond 10,000 u
 - `sigma-sec user add <name>` / `sigma-sec user remove <name>`
 
 ### 7. Performance & Hardware Efficiency
+
 - `sigma-perf profile` → Display real-time system performance insights without overhead.
 - `sigma-perf tune --gpu-priority` / `sigma-perf cache prefetch <app>`
 - `sigma-perf shard optimize`
@@ -684,6 +696,7 @@ SigmaOS incorporates a robust command taxonomy designed to scale beyond 10,000 u
 - `sigma-monitor network` / `sigma-monitor processes` / `sigma-monitor logs tail`
 
 ### 8. Networking & Connectivity
+
 - `sigma-net connect <ssid>` / `sigma-net firewall enable`
 - `sigma-net monitor --live` / `sigma-net persona server`
 - `sigma-net wifi connect <ssid>` / `sigma-net wifi disconnect`
@@ -691,35 +704,42 @@ SigmaOS incorporates a robust command taxonomy designed to scale beyond 10,000 u
 - `sigma-net firewall rule add <rule>`
 
 ### 9. Automation, Intelligence & Scalability
+
 - `sigma-auto schedule <task>` / `sigma-auto recipe apply <file>`
 - `sigma-auto heal` → Self-repair system anomalies utilizing local, low-level Sentinel logs.
 - `sigma-ai optimize workload` / `sigma-ai predict cache` / `sigma-ai tune --ml`
 
 ### 📈 Scaling Strategy: 10,000+ Commands
+
 By utilizing **Namespaces** (`sigma-ui`, `sigma-sec`, `sigma-net`), **Personas** (developer, gamer, server), and **Flags** (`--force`, `--dry-run`, `--source`, `--verbose`, `--json`), the Omnibus terminal architecture inherently expands from a few hundred robust native commands to a virtually infinite topology capable of handling every possible computational requirement.
 
-
 ## 🌐 SIGMAFLEET: NATIVE MOBILE DEVICE MANAGEMENT (MDM) & KIOSK ARCHITECTURE
+
 Absorbing the unique selling propositions (USPs) of enterprise endpoint managers like Scalefusion, Microsoft Intune, and Workspace ONE, SigmaOS integrates **SigmaFleet**—a native, bare-metal MDM solution. Unlike competitors reliant on bloated Node.js/Java background agents, SigmaFleet operates entirely in C11 native memory-space, virtually eliminating overhead and maximizing battery/CPU efficiency for IoT and embedded devices.
 
 ### 1. Absolute Kiosk Mode (Single/Multi-App Lock)
+
 - **Low-Level UI Lockdown**: Bypass standard window manager rules. `sigma-ui persona kiosk <app>` locks the Direct-Canvas GPU layer to render strictly one or designated multiple applications.
 - **Hardware Button Sanitization**: Peripheral interrupts (Power button, Volume, Escape sequences) are natively intercepted at the ASM kernel level (in `SovereignStandardHAL.asm`), preventing unauthorized device resets or app exits.
 
 ### 2. Zero-Touch Fleet Provisioning
+
 - **Silicon-Direct Enrollment**: Devices fetch encrypted provisioning payloads natively from the bootloader (`SovereignEntry.asm`) before mounting the OS, mimicking Apple DEP / Scalefusion Out-Of-Box orchestration.
 - **Over-The-Air (OTA) Shard Deployment**: IT Admins can push granular `SigmaPKG` shards dynamically without requiring system reboots.
 
 ### 3. Deep Content & Application Management
+
 - **Amnesic Remote Wipe & Lock**: A single CLI command (`sigma-fleet wipe --amnesic`) permanently wipes the VFS and silicon states instantly upon receiving the remote trigger, mitigating data theft.
 - **Silent Installations**: Apps are pushed centrally and installed strictly in isolated namespaces (`sigma-sec sandbox`) without interrupting the active user.
 - **Remote Cast & Control Native Hooks**: Integrated Remote Framebuffer (RFB) protocol in C natively streams the UI directly to IT administrator consoles without third-party tools like TeamViewer.
 
 ### 4. Advanced Telemetry & Geofencing
+
 - **eBPF Fleet Monitoring**: Tracks real-time CPU, RAM, and Battery telemetry across 1000+ devices with less than <1MB footprint per device.
 - **Kernel-Level Geofencing**: The kernel periodically polls GPS/Network hardware state. If a device breaches an established polygon perimeter, it immediately drops to a mathematically restricted secure mode or self-wipes (data protection compliance).
 
 ### ⚙️ MDM Command Expansion (Omni-Shell integration)
+
 - `sigma-fleet enroll --token <jwt-token>`
 - `sigma-fleet policy apply --strict-kiosk`
 - `sigma-fleet telemetry push --interval 10`
@@ -728,80 +748,96 @@ Absorbing the unique selling propositions (USPs) of enterprise endpoint managers
 
 By embedding MDM deeply into the OS architecture rather than slapping it on top as a third-party application, SigmaOS permanently outclasses standard Linux distributions in edge-computing, PoS systems, digital signage, and enterprise fleet mobility.
 
-
 ## 🧩 SHARD-ON-DEMAND (SOD) & LAZY-LOAD ARCHITECTURE
+
 SigmaOS aggressively rejects the monolithic "always-on" daemon model in favor of **Shard-On-Demand (SOD)** processing. By breaking the OS into thousands of micro-shards mapped physically to C11 dynamic memory arenas, the OS mathematically reduces idle RAM and CPU consumption by calling parts only when an absolute execution state requires it.
 
 ### 1. The Shard Architecture Paradigm
-- **Independent Modular APIs**: The kernel, UI (Direct-Canvas), network stack, and security isolators are compiled into disjointed shards. 
+
+- **Independent Modular APIs**: The kernel, UI (Direct-Canvas), network stack, and security isolators are compiled into disjointed shards.
 - **Namespace Micro-Containers**: Shards run entirely in their own memory namespaces. Crashing a network shard does not crash the kernel; the OS natively self-heals by instantly `sigma-shard reload net` without requiring a hard reboot.
 - **Dynamic Micro-Libraries**: Replaces monolithic C++ abstractions. For instance, matrix-math logic needed for the Camera App loads strictly when the camera is requested, then instantly unloads to free cache lines.
 
 ### 2. Event-Driven Hooks vs Polling Daemons
+
 - **Zero-Poll Triggers**: Standard Linux polling loops (e.g., constantly checking battery states or background daemons) are entirely purged. SigmaOS hooks hardware directly via Silicon Pulse Interrupts. The battery monitor only allocates memory exactly when a voltage step-down interrupt is fired.
 - **Predictive Prefetching**: AI logic anticipates user behaviors (e.g., tracking historical launches of an IDE at 9:00 AM) and pre-loads the `dev` persona networking shards directly into the CPU L2 cache before the actual mouse click occurs.
 
 ### 3. Absolute Persona-Driven Customization
+
 Workloads and execution environments are completely morphable based on Persona State toggles:
+
 - **Developer Persona** (`sigma-ui persona dev`): Instantly loads LLVM compilers, unloads gaming-latency tweaks, activates Docker-parity namespaces, and switches the UI to a floating terminal minimal theme.
 - **Gamer Persona** (`sigma-ui persona gamer`): Flushes memory caches, strictly prioritizes the GPU Direct-Canvas shard interrupts, loads dedicated audio stacks, and optimizes the CPU scheduler to a latency-first throughput algorithm.
 - **Researcher Persona** (`sigma-ui persona research`): Installs strict AppArmor-parity boundaries, loads High-Performance Computing (HPC) libraries, and locks reproducibility standards.
 
 ### 4. Orchestration & Workflow Execution
+
 An optimized SigmaOS boot sequence consumes practically zero overhead:
+
 1. **Boot Level 1**: Mount SovereignEntry, initialize the immutable C11 Kernel Base + Hardware Security Shard. (Startup time < 0.2s).
 2. **Boot Level 2**: User logs in. Persona dynamically evaluated.
-3. **Triggered Execution**: User launches a Web Browser. The kernel dynamically links the `sigma-net` networking shard and `sigma-ui` canvas shard. 
+3. **Triggered Execution**: User launches a Web Browser. The kernel dynamically links the `sigma-net` networking shard and `sigma-ui` canvas shard.
 4. **Instant De-Allocation**: User closes the browser; the OS instantly unmaps the `sigma-net` networking shards from memory. The OS idles back to flat-zero load.
 
 Through SOD and predictive pre-fetching, SigmaOS achieves unparalleled computational density, capable of operating flawlessly on IoT embedded hardware while scaling infinitely to Datacenter mainframes—merely by adjusting which shards are executed.
 
-
 ## 🧩 GRANULAR CLI MODULARITY & GUI PARITY
+
 SigmaOS is engineered so that **every single GUI action is perfectly mirrored by a low-level CLI Omni-Shell command.** This design completely decentralizes the OS into callable micro-shards, allowing power users to script and automate entire graphical workflows natively from the terminal.
 
 ### 1. CLI / GUI Parity Integration
+
 If a novice user clicks "Change Wallpaper" in the GUI Architect, the OS translates that action into the exact equivalent CLI command natively: `sigma-ui wallpaper set file.jpg`. This extends to everything:
+
 - **GUI:** User switches to Gaming Mode.
 - **CLI Equivalent:** `sigma-persona switch gamer --lazy` (Flushes unrelated memory, summons GPU interrupts).
 - **GUI:** User runs a system update.
 - **CLI Equivalent:** `sigma-update --mode ubuntu` (Translates the graphical sequence directly into the specific distro personality protocol).
 
 ### 2. Base Command Catalog Extension
+
 The Omni-Shell provides ~200 highly optimized Base Commands traversing all logical subsystems:
 
 #### System & Kernel Operations
+
 - `sigma-shard load kernel --minimal`
 - `sigma-shard swap scheduler --latency` (Hotswap CPU schedulers dynamically).
 - `sigma-shard heal kernel` (Self-monitor and hot-patch failing memory sectors).
 
 #### Automation & AI Routines
+
 - `sigma-auto recipe apply <file.yaml>` (Load declarative configurations natively).
 - `sigma-auto hook battery --on-change` (Establish event-driven hardware triggers instead of loops).
 - `sigma-ai tune --ml` / `sigma-ai optimize workload`
 - `sigma-ai prefetch net --time 09:00` (Pre-loads networking hardware into cache before daily execution).
 
 #### Customization & Personalization
+
 - `sigma-ui morph tiling` (Instantly rewrite the window manager logic).
 - `sigma-ui theme auto --day-night`
 - `sigma-perf governor performance` / `sigma-perf governor balanced`
 
 #### Developer & Storage Controls
+
 - `sigma-sec persona researcher` (Enforce strict SELinux/AppArmor parameters globally).
 - `sigma-file compress <path>` / `sigma-file extract <archive>`
 - `sigma-app launch <name> --secure`
 
 ### 3. Infinite Scalability via Flag Expansion
+
 By leveraging **Flags**, **Personas**, and **Distro Modes**, a single concept creates an exponential number of specific commands:
+
 - `sigma-shard load net --persona gamer` (Loads networking optimized for UDP packet latency).
 - `sigma-shard load net --mode arch` (Executes Arch-style rolling network parameters).
 - `sigma-shard load net --secure --minimal` (Loads tightly sandboxed networking without graphical overhead).
 
 This structure guarantees that SigmaOS operates reliably at scale, remaining lightweight, adaptive, and infinitely customizable through CLI orchestration natively.
 
-
 ## 🟢 FINAL PARITY STATUS: ALL OMITTED RESOURCES RESTORED & FIXED
+
 Historically, SigmaOS lacked several fundamental subsystems detailed in deprecated planning documents (like `OS_MISSING_PARITY.md` and `suggestions.md`). As of this version, **all previously missing components have been engineered, fixed, and integrated into the C11 kernel:**
+
 1. **Networking Stack Parity (TCP/IP natively handled via Socket APIs)**: Fixed.
 2. **Dynamic Linker & Journaling VFS**: Fixed. BTRFS-parity snapshots and amnesic VFS logic operate perfectly without external `.so` linkages.
 3. **Advanced Tiling UI**: Fixed. Integrated directly into the GPU Direct-Canvas interface.
@@ -810,41 +846,49 @@ Historically, SigmaOS lacked several fundamental subsystems detailed in deprecat
 ---
 
 ## ⚡ SIGMA_OMNI CLI EXPANSION: ADVANCED LOW-LEVEL COMMANDS
+
 SigmaOS natively processes more than 10,000 uniquely expandable instructions. Here are additional low-level, zero-abstraction commands natively bypassing legacy dependencies:
 
 ### Hardware & Silicon Direct Commands
+
 - `sigma-silicon read --register EAX` (Directly peek into processor registers, entirely bypassing debuggers like GDB).
 - `sigma-silicon scrub --level 3 --amnesic` (Perform aggressive RAM scrubbing via 0-byte overrides instantly upon kernel instruction).
 - `sigma-silicon pulse --frequency 1000` (Manually dictate CPU clock cycles).
 - `sigma-hardware flush --bus PCI` (Clear PCI controller caches immediately without unmounting).
 
 ### Forensic & Legal Compliance Commands (BNS/BNSS/BSA Parity)
+
 - `sigma-forensic snapshot --vfs --encrypt` (Generate an indisputable, mathematically signed system snapshot admissible in Indian court under BSA).
 - `sigma-forensic chain-of-custody lock --file <artifact>`
 - `sigma-forensic diff --pre <snapshot1> --post <snapshot2>` (Generate zero-trust diff logs of memory tampering).
 
 ### Artificial Intelligence & Data Science Vectors
+
 - `sigma-ai init-graph --accelerate` (Render a data map directly through GPU C11 calls, circumventing massive matplotlib wrappers).
 - `sigma-ml compile --model <weights> --target assembly` (Convert static ML weights straight into Assembly instructions for maximum iteration speed).
 
 ### Autonomous Fleet Management & MDM Orchestration
+
 - `sigma-fleet sync --all`
 - `sigma-fleet geo-locate --stealth` (Fetch device telemetry strictly below the user-space boundary).
 - `sigma-distro emulate --kernel linux --version 6.5` (Boot an isolated Linux 6.5 kernel namespace alongside SigmaOS instantly).
 
 ### 🛠️ Continuous Orchestration
+
 There are virtually zero limitations for the SigmaOS architecture. By bridging strict, mathematically defined C11 instructions into a dynamic Omni-Shell, the user can control every transistor locally and globally with 100% confidence.
 
 *END OF MANUAL.*
 
-
 ## 🌌 THE ABSOLUTE OMNI-SHELL CATALOG: 100% GUI PARITY
-Every graphical interaction in SigmaOS is fundamentally powered by an Omni-Shell command. There is zero functionality restricted to the GUI. The CLI possesses equivalent or vastly superior control mechanisms. 
+
+Every graphical interaction in SigmaOS is fundamentally powered by an Omni-Shell command. There is zero functionality restricted to the GUI. The CLI possesses equivalent or vastly superior control mechanisms.
 
 Below is an expanded catalogue detailing the underlying Omni-Shell logic for graphical tasks, mathematical executions, hardware bridging, and orchestration:
 
 ### 🎨 Direct-Canvas & Visual Rendering Manipulations
+
 *(The GUI Architect is permanently mapped to these commands)*
+
 - `sigma-canvas draw rect --x 0 --y 0 --width 1920 --height 1080 --hex #000000` (Forces standard UI to black instantly via hardware buffers).
 - `sigma-canvas overlay enable --glass-blur 20` (Activates the native shader composition algorithm for glassmorphism).
 - `sigma-canvas refresh-rate set 144 --force` (Override display EDID variables directly).
@@ -854,14 +898,18 @@ Below is an expanded catalogue detailing the underlying Omni-Shell logic for gra
 - `sigma-ui notify push "Build Complete" --urgency critical --sound success.wav` (Native push notifications generated blindly from terminal).
 
 ### 🖱️ Input & Accessibility Control
+
 *(Bypassing the need for System Settings Panels)*
+
 - `sigma-input map --device "Logitech G Pro" --key Mouse4 --action "sigma-ui workspace switch dev"` (Hardware macros assigned dynamically).
-- `sigma-input pointer speed set 0.8 --acceleration off` 
+- `sigma-input pointer speed set 0.8 --acceleration off`
 - `sigma-input keyboard layout hot-swap IN-ENG`
 - `sigma-input accessibility speech --read-buffer "stdout"` (Pipes terminal logs directly into local neural voice text-to-speech without external APIs).
 
 ### ⚙️ Hardware, Bluetooth & Edge Connectivity
+
 *(Native C11 handling replacing traditional BlueZ / NetworkManager abstractions)*
+
 - `sigma-bt scan --continuous --filter audio`
 - `sigma-bt pair <mac> --trust --auto-connect`
 - `sigma-hardware usb block --class mass-storage --whitelist <uuid>` (Instantly secure all USB ports except trusted encrypted drives).
@@ -869,31 +917,36 @@ Below is an expanded catalogue detailing the underlying Omni-Shell logic for gra
 - `sigma-hardware fan profile write --curve "custom.yaml"` (Overrides BIOS fan profiles strictly from CLI).
 
 ### 🧪 Advanced Memory & Kernel Surgery
+
 *(No GUI equivalent exists for these advanced operations)*
+
 - `sigma-kernel module inject <compiled_shard.so> --namespace 0x4` (Live kernel-module injection without reboot).
 - `sigma-kernel freeze --pid <id> --dump-state file.dmp` (Stops a process mid-clock-cycle, exports its entire RAM footprint for forensic evaluation).
 - `sigma-kernel allocate --hugepages 4096` (Manually dictate memory architectures for HPC workflows before starting a task).
 - `sigma-vfs amnesia enable --path /var/local` (Locks a directory to strictly exist in RAM. Upon power loss or reboot, it evaporates mathematically).
 
 ### 🌐 Scalefusion MDM & Fleet Extension Catalog
+
 - `sigma-fleet remote-cast start --target <admin-ip> --framerate 30` (Stream GUI framebuffers directly from CLI).
 - `sigma-fleet wipe isolate --retain-kernel --purge-userland` (Destroy all user files and applications while leaving the bootable OS intact).
 - `sigma-fleet heartbeat force --payload "Location, Battery, User"` (Force an MDM ping out of schedule).
 
 ### 🧠 Autonomous Workflow & Data Flow Chains
+
 - `sigma-pipe bind --source stdout --target "sigma-ai summarize --bullets"` (Redirects the output of any script into the local Sigma LLM and outputs a native summary).
 - `sigma-auto trigger --on "wifi-disconnect" --action "sigma-sec lock screen"`
 - `sigma-auto cron register --time "03:00" --action "sigma-kernel scrub --amnesic"`
 
 **Every flag, interaction, visual blur, animation speed, and layout coordinate that can be clicked on in a UI is intrinsically exposed as an argument within the Omni-Shell.** The GUI does not execute tasks; it merely generates Omni-Shell commands mathematically and pipes them to the kernel.
 
-
 ## 🔱 SIGMA OMNI-SHELL: MEGA CLI CATALOG (BATCH 2)
-### Zero GUI-Only Actions. 100% CLI Parity. Zero HLL Dependency.
+
+### Zero GUI-Only Actions. 100% CLI Parity. Zero HLL Dependency
 
 ---
 
 ### 📺 Display & Screen Management
+
 | Command | Action |
 |---|---|
 | `sigma-display brightness set 80` | Set screen brightness to 80% via hardware backlight register |
@@ -910,6 +963,7 @@ Below is an expanded catalogue detailing the underlying Omni-Shell logic for gra
 ---
 
 ### 🖥️ Window & Workspace Management
+
 | Command | Action |
 |---|---|
 | `sigma-ui window list` | List all open windows with PIDs |
@@ -932,6 +986,7 @@ Below is an expanded catalogue detailing the underlying Omni-Shell logic for gra
 ---
 
 ### 🗂️ File System & Storage
+
 | Command | Action |
 |---|---|
 | `sigma-fs mount --dev /dev/sda2 --point /mnt/data --type ext4` | Mount drive natively |
@@ -953,6 +1008,7 @@ Below is an expanded catalogue detailing the underlying Omni-Shell logic for gra
 ---
 
 ### 🌐 Networking & Connectivity
+
 | Command | Action |
 |---|---|
 | `sigma-net ip set --iface eth0 --addr 192.168.1.5/24` | Statically assign IP to an interface |
@@ -983,6 +1039,7 @@ Below is an expanded catalogue detailing the underlying Omni-Shell logic for gra
 ---
 
 ### 🔒 Security & Privacy
+
 | Command | Action |
 |---|---|
 | `sigma-sec passwd change --user user1` | Change a user password |
@@ -1002,6 +1059,7 @@ Below is an expanded catalogue detailing the underlying Omni-Shell logic for gra
 ---
 
 ### 🔈 Audio & Media
+
 | Command | Action |
 |---|---|
 | `sigma-audio volume set --sink default 75` | Set master volume |
@@ -1020,6 +1078,7 @@ Below is an expanded catalogue detailing the underlying Omni-Shell logic for gra
 ---
 
 ### 📊 Process & System Monitoring
+
 | Command | Action |
 |---|---|
 | `sigma-ps list --sort cpu --top 20` | List top 20 CPU-consuming processes |
@@ -1038,6 +1097,7 @@ Below is an expanded catalogue detailing the underlying Omni-Shell logic for gra
 ---
 
 ### 🤖 AI Copilot & Intelligence
+
 | Command | Action |
 |---|---|
 | `sigma-ai explain --cmd "sigma-kernel module inject"` | Get explanation of any OS command |
@@ -1055,6 +1115,7 @@ Below is an expanded catalogue detailing the underlying Omni-Shell logic for gra
 ---
 
 ### 🧩 Shard & Persona Orchestration
+
 | Command | Action |
 |---|---|
 | `sigma-shard status` | Show all currently loaded shards and their memory footprints |
@@ -1069,6 +1130,7 @@ Below is an expanded catalogue detailing the underlying Omni-Shell logic for gra
 ---
 
 ### 🏗️ Developer & Toolchain
+
 | Command | Action |
 |---|---|
 | `sigma-dev compile --lang c11 --src main.c --out main --flags "-O3"` | Compile C11 source natively |
@@ -1086,6 +1148,7 @@ Below is an expanded catalogue detailing the underlying Omni-Shell logic for gra
 ---
 
 ### 📦 Package Management (SigmaPKG)
+
 | Command | Action |
 |---|---|
 | `sigma-pkg list --installed` | List all installed packages |
@@ -1100,13 +1163,14 @@ Below is an expanded catalogue detailing the underlying Omni-Shell logic for gra
 
 **PRINCIPLE:** The GUI Architect generates Omni-Shell commands and dispatches them. The Omni-Shell IS the true OS. The GUI is a convenience layer only.
 
-
 ## 🔱 SIGMA OMNI-SHELL: MEGA CLI CATALOG (BATCH 3)
-### Resolves all missing parity items from OS_MISSING_PARITY & suggestions. Zero HLL dependency enforced.
+
+### Resolves all missing parity items from OS_MISSING_PARITY & suggestions. Zero HLL dependency enforced
 
 ---
 
 ### ✅ MISSING PARITY FIXES: Networking Stack (TCP/IP Native Implementation)
+
 All items previously listed as `[ ]` in OS_MISSING_PARITY.md are now RESOLVED:
 
 | Command | Resolution & Working |
@@ -1123,6 +1187,7 @@ All items previously listed as `[ ]` in OS_MISSING_PARITY.md are now RESOLVED:
 ---
 
 ### ✅ MISSING PARITY FIXES: Process Management (Scheduler RT)
+
 | Command | Resolution & Working |
 |---|---|
 | `sigma-ps sched set --pid <id> --policy SCHED_FIFO --prio 50` | Sets real-time scheduling policy via `sys_sched_setscheduler`. |
@@ -1137,6 +1202,7 @@ All items previously listed as `[ ]` in OS_MISSING_PARITY.md are now RESOLVED:
 ---
 
 ### ✅ MISSING PARITY FIXES: File System Drivers
+
 | Command | Resolution & Working |
 |---|---|
 | `sigma-fs ext4 mount --dev /dev/sda1 --point /mnt/linux` | Mounts real EXT4 partition. Native ext4 driver in C11. |
@@ -1150,6 +1216,7 @@ All items previously listed as `[ ]` in OS_MISSING_PARITY.md are now RESOLVED:
 ---
 
 ### ✅ MISSING PARITY FIXES: Coreutils Native Implementations
+
 | Command | Resolution & Working |
 |---|---|
 | `sigma-grep --pattern "error" --file system.log` | Native grep via custom Boyer-Moore in C11. Zero regex lib. |
@@ -1172,6 +1239,7 @@ All items previously listed as `[ ]` in OS_MISSING_PARITY.md are now RESOLVED:
 ---
 
 ### ✅ MISSING PARITY FIXES: System Administration Commands
+
 | Command | Resolution & Working |
 |---|---|
 | `sigma-sudo run --user root --cmd "sigma-kernel tune"` | Privilege escalation via `sys_setuid`. Sovereign-native. |
@@ -1191,6 +1259,7 @@ All items previously listed as `[ ]` in OS_MISSING_PARITY.md are now RESOLVED:
 ---
 
 ### 🔬 Forensics & Legal Compliance Commands
+
 | Command | Resolution & Working |
 |---|---|
 | `sigma-forensic dd --src /dev/sda --out /mnt/evidence/disk.img --bs 512` | Forensic byte-for-byte disk image. `sys_read` loop with progress. |
@@ -1205,6 +1274,7 @@ All items previously listed as `[ ]` in OS_MISSING_PARITY.md are now RESOLVED:
 ---
 
 ### 🤖 Automation Cron & Event Hooks
+
 | Command | Resolution & Working |
 |---|---|
 | `sigma-cron list` | List all scheduled tasks. |
@@ -1219,6 +1289,7 @@ All items previously listed as `[ ]` in OS_MISSING_PARITY.md are now RESOLVED:
 ---
 
 ### 🎯 Camera App (MIT Scratch USP + Snapchat USP)
+
 | Command | Resolution & Working |
 |---|---|
 | `sigma-camera list` | List available camera devices. |
@@ -1233,6 +1304,7 @@ All items previously listed as `[ ]` in OS_MISSING_PARITY.md are now RESOLVED:
 ---
 
 ### 🌍 Cross-Distro Personality Commands
+
 | Command | Resolution & Working |
 |---|---|
 | `sigma-distro personality ubuntu --mode lts` | Emulate Ubuntu LTS package behaviors. |
@@ -1251,9 +1323,10 @@ All commands above dispatch directly via `sys_*` syscalls or hardware registers.
 No Python. No Node. No libc. No pre-defined function libraries.  
 The Omni-Shell IS the API surface of the entire operating system.
 
-
 ## 📌 QUICK NAVIGATION INDEX
+>
 > For previously separate documents, all content has been merged here:
+>
 > - **Missing Parity Content**: See section [SigmaOS vs. Industry Linux Distributions: Parity & Gap Analysis](#sigmaos-vs-industry-linux-distributions-parity--gap-analysis)
 > - **Suggestions & Roadmap**: See section [Final Parity Status: All Omitted Resources Restored & Fixed](#-final-parity-status-all-omitted-resources-restored--fixed)
 > - **GitHub Guide Link**: [os_guide.md on GitHub](https://github.com/AaryanSinghChauhan09/SigmaOS/blob/main/os_guide.md)
@@ -1261,11 +1334,13 @@ The Omni-Shell IS the API surface of the entire operating system.
 ---
 
 ## 🔱 SIGMA OMNI-SHELL: MEGA CLI CATALOG (BATCH 4)
+
 ### Extended Parity: Boot, Init, Containers, Virtualisation, Cloud & Indian Law
 
 ---
 
 ### 🥾 Bootloader & Init System Commands
+
 | Command | Working / Implementation |
 |---|---|
 | `sigma-boot entry list` | Lists all UEFI/BIOS boot entries via EFI variables. No GRUB CLI needed. |
@@ -1287,6 +1362,7 @@ The Omni-Shell IS the API surface of the entire operating system.
 ---
 
 ### 📦 Containerisation & Virtualisation
+
 | Command | Working / Implementation |
 |---|---|
 | `sigma-container build --file Containerfile --tag myapp:1.0` | Build container image from spec. Native overlayfs layers. |
@@ -1313,6 +1389,7 @@ The Omni-Shell IS the API surface of the entire operating system.
 ---
 
 ### ☁️ Cloud, Live Boot & Portable OS Commands
+
 | Command | Working / Implementation |
 |---|---|
 | `sigma-cloud deploy --provider hetzner --plan cx21 --region nbg1` | Deploy SigmaOS to a cloud VPS via native HTTPS API calls in C11. |
@@ -1332,6 +1409,7 @@ The Omni-Shell IS the API surface of the entire operating system.
 ---
 
 ### ⚖️ Indian Legal Procedure Checklist Commands
+
 | Command | Working / Implementation |
 |---|---|
 | `sigma-law fir new --state UP --ps "Kotwali" --offence "BNS-103"` | Generate FIR draft per BNS 2023 Sec 173 BNSS. |
@@ -1351,6 +1429,7 @@ The Omni-Shell IS the API surface of the entire operating system.
 ---
 
 ### 📡 Advanced Networking & Security (Batch 4)
+
 | Command | Working / Implementation |
 |---|---|
 | `sigma-net tunnel wireguard create --name wg0 --listen 51820` | Create WireGuard tunnel. Native C11 crypto (ChaCha20-Poly1305). |
@@ -1367,6 +1446,7 @@ The Omni-Shell IS the API surface of the entire operating system.
 ---
 
 ### 🧠 Data Science & ML CLI (Full Parity)
+
 | Command | Working / Implementation |
 |---|---|
 | `sigma-ds csv load --file data.csv --out ds1` | Load CSV into native columnar store. |
@@ -1389,15 +1469,16 @@ The Omni-Shell IS the API surface of the entire operating system.
 
 **ZERO DEPENDENCY GUARANTEE:**  
 Every command above is implemented purely via:  
+
 - Raw `sys_*` syscalls (no libc wrappers)  
 - Custom C11 algorithms (no Python/NumPy/Pandas/sklearn)  
 - Native ASM math primitives in `SovereignMath.asm`  
 - Direct hardware register reads where applicable  
 
-
 ---
 
 ## ✅ COMPLETION: `---- OS_MISSING_PARITY.MD ----` SECTION (FULLY RESOLVED)
+>
 > All items from the original `OS_MISSING_PARITY.md` file are now implemented & verified.
 > GitHub anchor: `#----os_missing_paritymd----`
 
@@ -1424,17 +1505,20 @@ Every command above is implemented purely via:
 ### 2. ALL Missing Core Functionalities — RESOLVED
 
 #### 2.1 Networking Stack ✅
+
 - [x] `sigma-net socket create/bind/listen/accept` — Native `sys_socket` syscall
 - [x] `sigma-net tun create` / `sigma-net tap create` — TUN/TAP routing interfaces
 - [x] `sigma-net dhcp request` — Raw UDP DHCP client in C11
 - [x] `sigma-net ip set` / `sigma-net ip dhcp` — Static and dynamic IP config
 
 #### 2.2 Process Management (Scheduler) ✅
+
 - [x] `sigma-ps sched set --policy SCHED_FIFO --prio 99` — Real-time POSIX scheduling
 - [x] `sigma-ps signal send --sig SIGTERM/SIGKILL/SIGSEGV` — Full signal parity
 - [x] `sigma-ps cgroup create/assign/stats` — Real cgroup resource limiting
 
 #### 2.3 File System Drivers ✅
+
 - [x] `sigma-fs ext4 mount` — EXT4 native C11 driver
 - [x] `sigma-fs btrfs mount` — BTRFS CoW support
 - [x] `sigma-fs nfs mount` — NFS via raw RPC
@@ -1442,16 +1526,19 @@ Every command above is implemented purely via:
 - [x] `sigma-fs vfs overlay` — OverlayFS for containers/live-boot
 
 #### 2.4 Userland Parity Commands ✅
+
 - [x] `sigma-grep`, `sigma-sed`, `sigma-awk`, `sigma-find`, `sigma-xargs`
 - [x] `sigma-sudo`, `sigma-init`, `sigma-net iface`
 
 ---
 
 ## ✅ COMPLETION: `---- SUGGESTIONS.MD ----` SECTION (FULLY RESOLVED)
+>
 > All items from the original `suggestions.md` file are now implemented.
 > GitHub anchor: `#----suggestionsmd----`
 
 ### 1. Core OS Components — RESOLVED
+
 - [x] **Native Package Manager (SigmaPKG)**: `sigma-pkg install/remove/build/publish` — Full `.sigma` shard format with dependency graph (C11)
 - [x] **SMP (Multi-CPU affinity)**: `sigma-ps affinity set --cpus 0,1,2,3` — Native `sys_sched_setaffinity`
 - [x] **UDM (Unified Device Model)**: `sigma-hardware usb block`, `sigma-hardware fan profile` — HAL in `SovereignStandardHAL.asm`
@@ -1459,6 +1546,7 @@ Every command above is implemented purely via:
 - [x] **Journaling FS (SFS)**: `sigma-fs snapshot create/restore` — Real CoW journaling, not localStorage
 
 ### 2. Browser-Based UI ✅
+
 - [x] **Live Taskbar/Dock**: `sigma-ui dock position bottom`, `sigma-ui window list` — DOM events mapped to Omni-Shell
 - [x] **Window Snapping & Tiling**: `sigma-ui tile layout columns 3`, `sigma-ui window snap --edge top-right`
 - [x] **Multi-Tab Support**: `sigma-ui workspace create/switch/list` — native multiplexed workspace logic
@@ -1466,16 +1554,19 @@ Every command above is implemented purely via:
 - [x] **Global Search**: `sigma-find --path / --name <query>` — content search via inotify
 
 ### 3. Automation & AI ✅
+
 - [x] **Neural Mission Pipe**: `sigma-pipe bind --source stdout --target "sigma-ai summarize"` — native AI pipe
 - [x] **Autonomous Cron**: `sigma-cron add --time "0 3 * * *" --cmd "sigma-kernel scrub"` — kernel cron shard
 - [x] **Low-Level Automation API**: `sigma-auto recipe apply <file.yaml>` — C11 YAML parser, no PyYAML
 
 ### 4. Security ✅
+
 - [x] **Amnesic Kernel Mode**: `sigma-vfs amnesia enable`, `sigma-liveboot create` — full RAM-only boot
 - [x] **PQC Keychain**: `sigma-sec pqc keygen --algo Kyber-1024` — native Kyber C11 implementation
 - [x] **Hardware-Locked Sovereignty**: `sigma-sec tpm bind` — TPM hardware binding
 
 ### 5. Industrial Parity ✅
+
 - [x] **pacman Parity**: `sigma-distro personality arch`, `sigma-pkg rebuild --source`
 - [x] **Kali Metasploit Shard**: `sigma-distro personality kali --enable-sec-tools` — native pen-test primitives
 - [x] **Snap/Flatpak Parity**: `sigma-container run`, `sigma-container build` — native container runtime
@@ -1483,11 +1574,13 @@ Every command above is implemented purely via:
 ---
 
 ## 🔱 SIGMA OMNI-SHELL: MEGA CLI CATALOG (BATCH 5)
+
 ### Advanced I/O, Inter-Process, Scripting, Multi-Device Sync, Printing, Accessibility
 
 ---
 
 ### ⌨️ Inter-Process Communication (IPC)
+
 | Command | Working / Implementation |
 |---|---|
 | `sigma-ipc pipe create --name mypipe` | Create a named pipe (FIFO) via `sys_mkfifo`. |
@@ -1508,6 +1601,7 @@ Every command above is implemented purely via:
 ---
 
 ### 📝 Scripting & Shell Primitives
+
 | Command | Working / Implementation |
 |---|---|
 | `sigma-sh --file script.sh` | Execute a SigmaOS shell script. Native shell interpreter in C11. |
@@ -1527,6 +1621,7 @@ Every command above is implemented purely via:
 ---
 
 ### 🖨️ Printing & Document Operations
+
 | Command | Working / Implementation |
 |---|---|
 | `sigma-print list` | List available printers via CUPS-parity native C11. |
@@ -1543,6 +1638,7 @@ Every command above is implemented purely via:
 ---
 
 ### ♿ Accessibility Commands
+
 | Command | Working / Implementation |
 |---|---|
 | `sigma-a11y tts enable --voice neural-hi` | Enable text-to-speech (Hindi/English) natively. |
@@ -1560,6 +1656,7 @@ Every command above is implemented purely via:
 ---
 
 ### 🔗 Multi-Device Task Sharing
+
 | Command | Working / Implementation |
 |---|---|
 | `sigma-share task --cmd "sigma-ml train --ds ds1" --target 192.168.1.55` | Offload a task to another SigmaOS device. |
@@ -1575,6 +1672,7 @@ Every command above is implemented purely via:
 ---
 
 ### 🕹️ Gaming & GPU Commands
+
 | Command | Working / Implementation |
 |---|---|
 | `sigma-gpu list` | List GPUs and their VRAM/driver status. |
@@ -1591,6 +1689,7 @@ Every command above is implemented purely via:
 ---
 
 ### 📱 Mobile & Embedded Commands
+
 | Command | Working / Implementation |
 |---|---|
 | `sigma-embed flash --device /dev/mmcblk0 --image sigma-embedded.img` | Flash SigmaOS image to embedded eMMC storage. |
@@ -1609,10 +1708,10 @@ Every command above is implemented purely via:
 > Total estimated unique commands: **500+** across all catalog batches.  
 > Implementation language: **Pure C11 + x86-64 ASM. Zero Python. Zero libc. Zero HLL libraries.**
 
-
 ---
 
 ## 🔱 SIGMA OMNI-SHELL: MEGA CLI CATALOG (BATCH 6)
+
 ### Grouped by Functional Domain | Zero HLL | Pure C11 + ASM
 
 ---
@@ -1819,15 +1918,16 @@ Every command above is implemented purely via:
 > **HLL/Library Dependency**: ZERO. All commands dispatch via raw C11 syscall wrappers or ASM primitives.
 > **GUI Parity**: COMPLETE. Every GUI Architect action has a 1:1 Omni-Shell equivalent.
 
-
 ---
 
 ## 🔱 SIGMA OMNI-SHELL: MEGA CLI CATALOG (BATCH 7)
+
 ### Cross-OS Absorption: Windows + macOS + All Linux Distros → Native SigmaOS Parity
 
 ---
 
 ## 🪟 GROUP 9: WINDOWS OS PARITY (PowerShell + CMD + WinAPI)
+>
 > SigmaOS absorbs all Windows CLI capabilities, exposing them natively via Omni-Shell.
 
 | SigmaOS Command | Windows Equivalent | Working / Implementation |
@@ -1866,6 +1966,7 @@ Every command above is implemented purely via:
 ---
 
 ## 🍎 GROUP 10: macOS PARITY (Terminal + zsh + Cocoa APIs)
+>
 > SigmaOS natively mirrors all macOS CLI utilities.
 
 | SigmaOS Command | macOS Equivalent | Working / Implementation |
@@ -2081,10 +2182,10 @@ Every command above is implemented purely via:
 > IoT/MQTT, WebAssembly, Database, Cross-Platform Sync.
 > Implementation: Pure C11 + x86-64 ASM. Zero Python. Zero libc. Zero HLL.
 
-
 ---
 
 ## 🔱 SIGMA OMNI-SHELL: MEGA CLI CATALOG (BATCH 8)
+
 ### New Suggestions Absorbed: Version Control, HPC, Crypto, Voice, IoT, WASM, DB, Cross-Platform
 
 > All items in this batch originate from the `---- SUGGESTIONS.MD ----` extended roadmap.
@@ -2276,6 +2377,7 @@ Every command above is implemented purely via:
 ---
 
 ## 🔱 SIGMA OMNI-SHELL: MEGA CLI CATALOG (BATCH 9)
+
 ### Advanced System Automation, Monitoring & Persona Parity
 
 > This batch resolves missing GUI-CLI parity for advanced system interactions, integrating missing automation hooks, persona management, monitoring/benchmarking, UI accessibility, and file system enhancements (snapshots/deduplication).
@@ -2283,6 +2385,7 @@ Every command above is implemented purely via:
 ---
 
 ## 🧩 GROUP 27: SYSTEM & KERNEL DYNAMICS
+
 | SigmaOS Command | Working / Implementation |
 |---|---|
 | `sigma-shard load kernel` | Load a core kernel shard. |
@@ -2300,6 +2403,7 @@ Every command above is implemented purely via:
 ---
 
 ## 🎨 GROUP 28: UI & DESKTOP ENVIRONMENT
+
 | SigmaOS Command | Working / Implementation |
 |---|---|
 | `sigma-ui window open <app>` | Open application window from CLI. |
@@ -2320,6 +2424,7 @@ Every command above is implemented purely via:
 ---
 
 ## 📂 GROUP 29: ADVANCED FILE & STORAGE
+
 | SigmaOS Command | Working / Implementation |
 |---|---|
 | `sigma-file open <path>` | Open a file using the preferred persona handler. |
@@ -2338,6 +2443,7 @@ Every command above is implemented purely via:
 ---
 
 ## 🌐 GROUP 30: NETWORK PROFILING & FIREWALL
+
 | SigmaOS Command | Working / Implementation |
 |---|---|
 | `sigma-net wifi connect <ssid>` | Connect directly to wireless network. |
@@ -2356,6 +2462,7 @@ Every command above is implemented purely via:
 ---
 
 ## 🔒 GROUP 31: COMPREHENSIVE SECURITY
+
 | SigmaOS Command | Working / Implementation |
 |---|---|
 | `sigma-sec lock screen` | Enact immediate session lock via C11 Sovereign Security Shard. |
@@ -2373,6 +2480,7 @@ Every command above is implemented purely via:
 ---
 
 ## ⚡ GROUP 32: PERFORMANCE & BENCHMARKING
+
 | SigmaOS Command | Working / Implementation |
 |---|---|
 | `sigma-perf profile` | Run comprehensive system performance diagnostic. |
@@ -2389,6 +2497,7 @@ Every command above is implemented purely via:
 ---
 
 ## 🧠 GROUP 33: ADVANCED AUTOMATION
+
 | SigmaOS Command | Working / Implementation |
 |---|---|
 | `sigma-auto recipe apply <file>` | Trigger system configuration automation recipe. |
@@ -2405,6 +2514,7 @@ Every command above is implemented purely via:
 ---
 
 ## 📊 GROUP 34: MONITORING & ALERTING
+
 | SigmaOS Command | Working / Implementation |
 |---|---|
 | `sigma-monitor cpu` | Standard CPU metrics observation loop. |
@@ -2421,6 +2531,7 @@ Every command above is implemented purely via:
 ---
 
 ## 🛠️ GROUP 35: APPLICATION MANAGEMENT
+
 | SigmaOS Command | Working / Implementation |
 |---|---|
 | `sigma-app install <name>` | Fetch and unpack an application dynamically formatted for SigmaOS. |
@@ -2437,6 +2548,7 @@ Every command above is implemented purely via:
 ---
 
 ## 🤖 GROUP 36: AI & PERSONAS
+
 | SigmaOS Command | Working / Implementation |
 |---|---|
 | `sigma-ai optimize workload` | Engage deterministic AI heuristics to shape scheduling logic layout. |
@@ -2456,10 +2568,7 @@ Every command above is implemented purely via:
 > Extending base structures through dynamic parameter flags: `--force`, `--verbose`, `--dry-run`, `--secure`, `--minimal`.  
 > Combining expansion templates across multi-flavored persona states ensures **over 5,000 CLI command variations** to crush competitor fragmentation loops.
 
-
-
 --- MERGED FROM FUTURE_ROADMAP.md ---
-
 
 # 🚀 SigmaOS: The Sovereign Future Roadmap
 
@@ -2468,21 +2577,26 @@ This document outlines the frontier implementations required to achieve absolute
 ---
 
 ## 🏗️ 0. OS Architecture & Low-Level Languages Choice
+
 For strict control over hardware and performance, SigmaOS binds itself to these paradigms:
 
 ### 1. **Assembly Language**
+
 - **Use case**: Direct hardware control, bootloaders, interrupt handling.
 - **Strengths**: Absolute control over CPU instructions, registers, and memory.
 
 ### 2. **C (C11 Core Standard)**
+
 - **Use case**: Kernel development, drivers, shell arrays.
 - **Strengths**: Balance of low-level control and raw syscall alignment without HLL dependencies.
 
 ### 3. **C++**
+
 - **Use case**: GUI subsystems, OOP abstractions.
 - **Limitations**: Kept strictly isolated due to complex runtime and vtable overheads.
 
 ### 4. **Rust / Ada (Future Sandboxing)**
+
 - **Use case**: Memory safety layers / Safety-critical formal verify.
 
 ---
@@ -2490,116 +2604,118 @@ For strict control over hardware and performance, SigmaOS binds itself to these 
 ## 🧩 1. CLI Commands Yet to Be Made
 
 ### System & Kernel
-* `sigma-shard reload <name>` → Hot-reload a shard without reboot.
-* `sigma-shard status <name>` → Dump real-time shard health and uptime via syscalls.
-* `sigma-shard dependency graph` → ASCII-visualize shard dependencies natively.
-* `sigma-shard unload --idle` → Automatically purge unused shards from memory.
-* `sigma-shard migrate <target>` → Move shard execution to another node/container seamlessly.
+- `sigma-shard reload <name>` → Hot-reload a shard without reboot.
+- `sigma-shard status <name>` → Dump real-time shard health and uptime via syscalls.
+- `sigma-shard dependency graph` → ASCII-visualize shard dependencies natively.
+- `sigma-shard unload --idle` → Automatically purge unused shards from memory.
+- `sigma-shard migrate <target>` → Move shard execution to another node/container seamlessly.
 
 ### UI & Desktop
-* `sigma-ui layout save <profile>` → Serialize custom workspace layout to binary.
-* `sigma-ui layout restore <profile>` → Restore saved layout natively.
-* `sigma-ui accessibility enable screen-reader` → Attach low-level TTS engine to DOM.
-* `sigma-ui accessibility enable magnifier` → Bind framebuffer scaling to cursor.
-* `sigma-ui notifications mute --duration 30m` → Disable UI interrupt vectors.
-* `sigma-ui persona switch <profile>` → Hot-swap UI persona without restarting compositor.
+- `sigma-ui layout save <profile>` → Serialize custom workspace layout to binary.
+- `sigma-ui layout restore <profile>` → Restore saved layout natively.
+- `sigma-ui accessibility enable screen-reader` → Attach low-level TTS engine to DOM.
+- `sigma-ui accessibility enable magnifier` → Bind framebuffer scaling to cursor.
+- `sigma-ui notifications mute --duration 30m` → Disable UI interrupt vectors.
+- `sigma-ui persona switch <profile>` → Hot-swap UI persona without restarting compositor.
 
 ### File & Storage
-* `sigma-file snapshot create <dir>` → Instant filesystem snapshot using B-Tree Delta Logging.
-* `sigma-file snapshot rollback <dir>` → Fast rollback to snapshot state.
-* `sigma-file deduplicate <dir>` → Unlink duplicate inodes instantly.
-* `sigma-file sync <src> <dest>` → Sync directories directly passing libc.
-* `sigma-file quota set <limit>` → Enforce absolute bare-metal storage limits.
+- `sigma-file snapshot create <dir>` → Instant filesystem snapshot using B-Tree Delta Logging.
+- `sigma-file snapshot rollback <dir>` → Fast rollback to snapshot state.
+- `sigma-file deduplicate <dir>` → Unlink duplicate inodes instantly.
+- `sigma-file sync <src> <dest>` → Sync directories directly passing libc.
+- `sigma-file quota set <limit>` → Enforce absolute bare-metal storage limits.
 
 ### Networking
-* `sigma-net profile save <name>` → Serialize network settings/rules as profile.
-* `sigma-net profile load <name>` → Inject saved profile into network stack.
-* `sigma-net firewall export rules` → Export Zero-Trust firewall rules.
-* `sigma-net firewall import rules` → Import Zero-Trust firewall rules.
-* `sigma-net latency test <host>` → Run TCP/ICMP latency diagnostics natively.
-* `sigma-net persona switch <profile>` → Apply persona-specific firewall/network routing.
+- `sigma-net profile save <name>` → Serialize network settings/rules as profile.
+- `sigma-net profile load <name>` → Inject saved profile into network stack.
+- `sigma-net firewall export rules` → Export Zero-Trust firewall rules.
+- `sigma-net firewall import rules` → Import Zero-Trust firewall rules.
+- `sigma-net latency test <host>` → Run TCP/ICMP latency diagnostics natively.
+- `sigma-net persona switch <profile>` → Apply persona-specific firewall/network routing.
 
 ### Security
-* `sigma-sec audit persona <profile>` → Run security audit bounded purely to a persona.
-* `sigma-sec sandbox list` → List all apps trapped in the C11 sandbox.
-* `sigma-sec sandbox export <app>` → Export strict capability-bounding configs.
-* `sigma-sec password policy set <rules>` → Enforce rigorous string/entropy policies.
-* `sigma-sec intrusion detect` → Run kernel-space memory intrusion scan.
+- `sigma-sec audit persona <profile>` → Run security audit bounded purely to a persona.
+- `sigma-sec sandbox list` → List all apps trapped in the C11 sandbox.
+- `sigma-sec sandbox export <app>` → Export strict capability-bounding configs.
+- `sigma-sec password policy set <rules>` → Enforce rigorous string/entropy policies.
+- `sigma-sec intrusion detect` → Run kernel-space memory intrusion scan.
 
 ### Performance
-* `sigma-perf benchmark cpu` → Run TSC hardware benchmarking.
-* `sigma-perf benchmark gpu` → Run memory-bandwidth benchmarking.
-* `sigma-perf optimize memory` → Auto-tune and defragment heap allocations.
-* `sigma-perf shard unload --low-priority` → Aggressive RAM scavenging.
-* `sigma-perf persona tune <profile>` → Bind CPU governor directly to persona.
+- `sigma-perf benchmark cpu` → Run TSC hardware benchmarking.
+- `sigma-perf benchmark gpu` → Run memory-bandwidth benchmarking.
+- `sigma-perf optimize memory` → Auto-tune and defragment heap allocations.
+- `sigma-perf shard unload --low-priority` → Aggressive RAM scavenging.
+- `sigma-perf persona tune <profile>` → Bind CPU governor directly to persona.
 
 ### Automation
-* `sigma-auto trigger <event>` → Bind custom C11 macros to OS state hooks.
-* `sigma-auto rollback <recipe>` → Discard latest automation recipe.
-* `sigma-auto export <recipe>` → Dump recipe into config file.
-* `sigma-auto import <recipe>` → Read recipe from config file.
-* `sigma-auto chain <task1> <task2>` → Queue asynchronous pipeline tasks.
+- `sigma-auto trigger <event>` → Bind custom C11 macros to OS state hooks.
+- `sigma-auto rollback <recipe>` → Discard latest automation recipe.
+- `sigma-auto export <recipe>` → Dump recipe into config file.
+- `sigma-auto import <recipe>` → Read recipe from config file.
+- `sigma-auto chain <task1> <task2>` → Queue asynchronous pipeline tasks.
 
 ### Monitoring
-* `sigma-monitor alerts set <threshold>` → Bind TSC thresholds to alert interrupts.
-* `sigma-monitor alerts list` → List active threshold listeners.
-* `sigma-monitor export logs` → Compress and dump machine logs out of dmesg ring buffer.
-* `sigma-monitor visualize <metric>` → Generate native CLI ASCII graphs.
-* `sigma-monitor persona view <profile>` → Persona-isolated resource tracking.
+- `sigma-monitor alerts set <threshold>` → Bind TSC thresholds to alert interrupts.
+- `sigma-monitor alerts list` → List active threshold listeners.
+- `sigma-monitor export logs` → Compress and dump machine logs out of dmesg ring buffer.
+- `sigma-monitor visualize <metric>` → Generate native CLI ASCII graphs.
+- `sigma-monitor persona view <profile>` → Persona-isolated resource tracking.
 
 ### Applications
-* `sigma-app sandbox <name>` → Force payload into a namespace sandbox.
-* `sigma-app export <name>` → Dump app's local memory data limits.
-* `sigma-app import <file>` → Register a pre-bounded sandboxed app.
-* `sigma-app rollback <name>` → Rollback app state using FS snapshots.
-* `sigma-app persona assign <profile>` → Tie an app’s privilege explicitly to a Persona.
+- `sigma-app sandbox <name>` → Force payload into a namespace sandbox.
+- `sigma-app export <name>` → Dump app's local memory data limits.
+- `sigma-app import <file>` → Register a pre-bounded sandboxed app.
+- `sigma-app rollback <name>` → Rollback app state using FS snapshots.
+- `sigma-app persona assign <profile>` → Tie an app’s privilege explicitly to a Persona.
 
 ### AI & Personas
-* `sigma-ai persona create <name>` → Allocate a new machine persona struct.
-* `sigma-ai persona edit <name>` → Edit persona parameters.
-* `sigma-ai persona export <name>` → Export persona parameters.
-* `sigma-ai persona import <file>` → Import persona parameters.
-* `sigma-ai predict <task>` → Request heuristic prediction for shard usage.
-* `sigma-ai orchestrate` → Surrender MLFQ scheduling to AI optimization vector.
+- `sigma-ai persona create <name>` → Allocate a new machine persona struct.
+- `sigma-ai persona edit <name>` → Edit persona parameters.
+- `sigma-ai persona export <name>` → Export persona parameters.
+- `sigma-ai persona import <file>` → Import persona parameters.
+- `sigma-ai predict <task>` → Request heuristic prediction for shard usage.
+- `sigma-ai orchestrate` → Surrender MLFQ scheduling to AI optimization vector.
 
 ---
 
 ## ⚡ 2. SigmaOS Automation Vectors
 
 ### Resource Efficiency
-* **Idle Shard Unloading:** Kernel daemon (via `SYS_NANOSLEEP`) sweeps memory to drop unaccessed execution shards.
-* **Deferred Service Start:** All non-critical network protocols halt until User-Persona handshakes successfully.
-* **Event-Driven Hooks:** Loading networking stack immediately spawns the security sandbox shard dynamically.
+- **Idle Shard Unloading:** Kernel daemon (via `SYS_NANOSLEEP`) sweeps memory to drop unaccessed execution shards.
+- **Deferred Service Start:** All non-critical network protocols halt until User-Persona handshakes successfully.
+- **Event-Driven Hooks:** Loading networking stack immediately spawns the security sandbox shard dynamically.
 
 ### Personalization
-* **Real-Time Persona Switching:** OS morphs from strict researcher mode during day, to low-latency gamer mode at night (CPU governors swapped directly).
-* **Adaptive Performance:** TSC readings dynamically scale `SYS_NICE` values on background shards.
-* **Predictive Prefetching:** Heuristics predict next app launches based on time and faults shards directly into RAM beforehand.
+- **Real-Time Persona Switching:** OS morphs from strict researcher mode during day, to low-latency gamer mode at night (CPU governors swapped directly).
+- **Adaptive Performance:** TSC readings dynamically scale `SYS_NICE` values on background shards.
+- **Predictive Prefetching:** Heuristics predict next app launches based on time and faults shards directly into RAM beforehand.
 
 ### Customization
-* **Dynamic UI Profiles:** Window geometry changes natively upon switching context (Work vs Play).
-* **Accessibility Automation:** Hooking `sys_execve` to trigger `screen-reader` bounds when a text-heavy payload is executed.
-* **Notification Control:** Hardware interrupts routed directly to `/dev/null` during focus/gaming mode.
+- **Dynamic UI Profiles:** Window geometry changes natively upon switching context (Work vs Play).
+- **Accessibility Automation:** Hooking `sys_execve` to trigger `screen-reader` bounds when a text-heavy payload is executed.
+- **Notification Control:** Hardware interrupts routed directly to `/dev/null` during focus/gaming mode.
 
 ### Security
-* **Persona-Aware Security Policies:** 'Researcher' runs all processes in strict namespaces. 'Gamer' runs with full bare-metal access for speed.
-* **Automated Audits:** Integrity checks execute in the background comparing hash trees against signed binaries.
-* **Self-Healing Shards:** Kernel panics trigger instant shard reload without pulling down `systemd` / PID 1.
+- **Persona-Aware Security Policies:** 'Researcher' runs all processes in strict namespaces. 'Gamer' runs with full bare-metal access for speed.
+- **Automated Audits:** Integrity checks execute in the background comparing hash trees against signed binaries.
+- **Self-Healing Shards:** Kernel panics trigger instant shard reload without pulling down `systemd` / PID 1.
 
 ### Monitoring
-* **Threshold Alerts:** Out of Memory triggers automatic warning messages straight to framebuffer.
-* **Automated Log Rotation:** Old memory pools are dumped and zero-wiped to prevent reverse engineering.
-* **Visual Dashboards:** The OmniShell provides living breathing charts constructed purely from ASCII and C11 loops.
+- **Threshold Alerts:** Out of Memory triggers automatic warning messages straight to framebuffer.
+- **Automated Log Rotation:** Old memory pools are dumped and zero-wiped to prevent reverse engineering.
+- **Visual Dashboards:** The OmniShell provides living breathing charts constructed purely from ASCII and C11 loops.
 
 ---
 
 ## 🌟 3. Special Feature: Distributed AI Prompt Command
+
 *This will be implemented natively using Omni-Shell.*
 
 **Command Syntax:**
 `sigma-ai distribute "<prompt>" --models gpt4,llama3,mistral,claude --tabs --compare`
 
 **Features:**
+
 - `--models` → specify AI models (GPT‑4, LLaMA‑3, Mistral, Claude, etc.).
 - `--tabs` → open each model’s response in a new browser tab for comparison.
 - `--merge` → consolidate outputs into one unified view.
@@ -2614,14 +2730,12 @@ For strict control over hardware and performance, SigmaOS binds itself to these 
 ---
 
 ## 🚀 4. Long-Term Vision
-* **AI-Assisted OS Orchestration:** The OS MLFQ dynamically surrenders execution vectors to a specialized neural-net deciding shard loads.
-* **Cross-Device Persona Sync:** Personas and strict capability bounds replicate peer-to-peer across mesh hardware.
-* **Industrial Plugin Ecosystem:** Community shards written directly to ABI spec without dynamic wrapper layers.
-* **Distributed Collaborative AI:** Multiple specialized agents orchestrating OS internals iteratively as a hive-mind.
-
+- **AI-Assisted OS Orchestration:** The OS MLFQ dynamically surrenders execution vectors to a specialized neural-net deciding shard loads.
+- **Cross-Device Persona Sync:** Personas and strict capability bounds replicate peer-to-peer across mesh hardware.
+- **Industrial Plugin Ecosystem:** Community shards written directly to ABI spec without dynamic wrapper layers.
+- **Distributed Collaborative AI:** Multiple specialized agents orchestrating OS internals iteratively as a hive-mind.
 
 --- MERGED FROM COMPETITIVE_ANALYSIS.md ---
-
 
 # 🏆 SigmaOS: Competitive Scalability & Industry Analysis
 
@@ -2648,7 +2762,7 @@ This document outlines the strategic scaling pathways required to position Sigma
 
 ## 🚀 Scaling to 99,999 Improvements (The Matrix Formula)
 
-To achieve unbounded feature parity while remaining perfectly modular, SigmaOS adopts a **Dimensional Scaling** approach over hardcoded linear features. 
+To achieve unbounded feature parity while remaining perfectly modular, SigmaOS adopts a **Dimensional Scaling** approach over hardcoded linear features.
 
 Every single system concept is multiplied by:
 
@@ -2657,41 +2771,45 @@ Every single system concept is multiplied by:
 3. **Granularity Dimensions**: (Per-file, per-shard, per-device context)
 
 *Example Breakdown:*
-`Snapshot & Rollback` → *Per file, per directory, per shard, per persona, per cluster.* 
+`Snapshot & Rollback` → *Per file, per directory, per shard, per persona, per cluster.*
 This instantly transforms 1 static concept into a matrix of actionable architectural enhancements without bloating the C11 base.
 
-### The True Competitive Edge:
+### The True Competitive Edge
+
 SigmaOS does not aim to recreate Ubuntu shell scripts. It targets **absolute persona awareness, memory-perfect shard modularity, AI-driven backend orchestration, and zero-dependency execution.**
 
 ---
 
 ## 🏗️ Core Ecosystem & Applications Gap Analysis
+
 SigmaOS requires a sprawling user-space ecosystem to match decades of Linux distributions. The goal is not merely to copy, but to build native, memory-safe, and AI-first equivalents.
 
 ### 1. System Utilities & Dev Tools
-* **Missing Components**: Terminal Emulators, File Managers, Compilers (`gcc` equivalent), Container Tooling.
-* **Architecture Pipeline**: Core engines written in Pure C/C++ for absolute execution speed; Modern CLI daemons routed through Rust.
+- **Missing Components**: Terminal Emulators, File Managers, Compilers (`gcc` equivalent), Container Tooling.
+- **Architecture Pipeline**: Core engines written in Pure C/C++ for absolute execution speed; Modern CLI daemons routed through Rust.
 
 ### 2. Networking & Cloud Services
-* **Missing Components**: Network Config GUIs, VPN Integrations (WireGuard equivalents), Packet analyzers.
-* **Architecture Pipeline**: Raw network sockets managed in C11. Orchestration and configuration handlers managed in Go.
+- **Missing Components**: Network Config GUIs, VPN Integrations (WireGuard equivalents), Packet analyzers.
+- **Architecture Pipeline**: Raw network sockets managed in C11. Orchestration and configuration handlers managed in Go.
 
 ### 3. Desktop Productivity & Multimedia
-* **Missing Components**: Office Suites, Remote Desktop Clients, Media Decoders, Web Browsers.
-* **Architecture Pipeline**: Framebuffer and decoding blocks in C++. GUI wrappers in Rust. Secure browser execution engines built directly upon the core sandbox.
+- **Missing Components**: Office Suites, Remote Desktop Clients, Media Decoders, Web Browsers.
+- **Architecture Pipeline**: Framebuffer and decoding blocks in C++. GUI wrappers in Rust. Secure browser execution engines built directly upon the core sandbox.
 
 ### 4. Zero-Trust Security Enforcement
-* **Missing Components**: MAC frameworks (AppArmor equivalents), Mandatory Access Control, Encrypted Vaults.
-* **Architecture Pipeline**: C-based Kernel modules and Rust-based cryptographic orchestration.
+- **Missing Components**: MAC frameworks (AppArmor equivalents), Mandatory Access Control, Encrypted Vaults.
+- **Architecture Pipeline**: C-based Kernel modules and Rust-based cryptographic orchestration.
 
 ### 5. Automated System Integration (AI-First)
+
 Unlike Linux Distros, SigmaOS treats AI as a foundational OS layer, not a tertiary app.
-* **Missing Components**: Multi-model Orchestration Dashboard, AI-Assisted Shard Scheduler, AI-Anamoly IDSs.
-* **Architecture Pipeline**: The `sigma-ai distribute` framework is the vanguard. Subsequent AI models will interface over RPC in Go/Python directly bound to the C11 Shard Master.
+- **Missing Components**: Multi-model Orchestration Dashboard, AI-Assisted Shard Scheduler, AI-Anamoly IDSs.
+- **Architecture Pipeline**: The `sigma-ai distribute` framework is the vanguard. Subsequent AI models will interface over RPC in Go/Python directly bound to the C11 Shard Master.
 
 ---
 
 ## 🎯 Unique Selling Propositions (USPs)
+
 SigmaOS distinguishes itself from established software ecosystems natively:
 
 1. **Persona-Aware Applications**: Unlike static Linux apps, SigmaOS shards adapt to strict Developer, Gamer, and Minimialist bounds.
@@ -2703,7 +2821,7 @@ SigmaOS distinguishes itself from established software ecosystems natively:
 ---
 
 ## 💼 Investor Pitch Deck Outline
-* **Problem**: Classical Linux fragmentation (DE, package managers, scaling constraints) and total lack of native AI hooks. Stale monolithic designs block context-dependent hardware optimization.
-* **Solution**: A C11 Shard-On-Demand architecture explicitly designed as an AI-augmented, context-aware environment.
-* **Advantage**: Ease of orchestration masked via an AI Shell, eliminating steep learning curves while dominating performance metrics with zero-dependency binaries.
-* **Vision Roadmap**: Stabilize Core C11 -> Deploy Rust-Sandboxed Daemons -> Integrate P2P Cloud Persona Sync -> Reach Total Market Decapitation against Legacy Systems.
+- **Problem**: Classical Linux fragmentation (DE, package managers, scaling constraints) and total lack of native AI hooks. Stale monolithic designs block context-dependent hardware optimization.
+- **Solution**: A C11 Shard-On-Demand architecture explicitly designed as an AI-augmented, context-aware environment.
+- **Advantage**: Ease of orchestration masked via an AI Shell, eliminating steep learning curves while dominating performance metrics with zero-dependency binaries.
+- **Vision Roadmap**: Stabilize Core C11 -> Deploy Rust-Sandboxed Daemons -> Integrate P2P Cloud Persona Sync -> Reach Total Market Decapitation against Legacy Systems.

@@ -1,6 +1,7 @@
 ## X. QUALITY ASSURANCE & TESTING (100+ changes)
 
 ### A. Testing Framework (50+ changes)
+>
 > **Target Shards**: new `test_framework_shard.c`, `SovereignDiagnosticsZenith.c`
 
 | # | Item | Status | Priority | Target Shard |
@@ -57,6 +58,7 @@
 | 2150 | Create test report generation | [ ] | P0 | `test_framework_shard.c` |
 
 ### B. Quality Metrics & Analysis (50+ changes)
+>
 > **Target Shards**: `SovereignDiagnosticsZenith.c`, `test_framework_shard.c`
 
 | # | Item | Status | Priority | Target Shard |
@@ -117,6 +119,7 @@
 ## XI. ACCESSIBILITY & INCLUSIVITY (100+ changes)
 
 ### A. Vision Accessibility (80+ changes)
+>
 > **Target Shards**: `SovereignStyleZenith.c`, `SovereignVoiceShard.c`, `SovereignDesktopZenith.h`
 
 | # | Item | Status | Priority | Target Shard |
@@ -203,6 +206,7 @@
 | 2280 | Accessible drag and drop | [ ] | P1 | `SovereignDesktopZenith.h` |
 
 ### B. Hearing & Speech Accessibility (50+ changes)
+>
 > **Target Shards**: `SovereignVoiceShard.c`, `audio_engine_shard.c`, `SovereignDesktopZenith.h`
 
 | # | Item | Status | Priority | Target Shard |
@@ -234,6 +238,7 @@
 | 2305 | Sound identification labels | [ ] | P0 | `SovereignDesktopZenith.h` |
 
 ### C. Motor & Cognitive Accessibility (40+ changes)
+>
 > **Target Shards**: `keyboard_master.c`, `SovereignDesktopZenith.h`, `personalizer.c`
 
 | # | Item | Status | Priority | Target Shard |

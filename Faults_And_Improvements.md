@@ -31,6 +31,7 @@ This matrix outlines the current known faults, the resulting bottlenecks, and th
 ## 💡 Suggestions for Contributors
 
 If you are developing for the Sovereign ecosystem, avoid trying to port large-scale generic tools directly. Instead:
+
 - **Think in Shards:** Don't build monolithic applications. Build discrete `.c` functionality files that hook into the `sigma_invoke` ecosystem directly.
 - **Ignore the Standard Library:** Write intrinsic parsing logic yourself. The speed delta is unparalleled.
 - **Leverage the UI Orchestrator:** Instead of writing native C++ GUI toolkits, rely on the system's `index.js` DOM generation capabilities for your application interface needs.

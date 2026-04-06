@@ -1,5 +1,7 @@
 # Σ SIGMAOS COMPREHENSIVE IMPROVEMENT ROADMAP — MASTER INDEX
+
 ### **2,350 Engineering Items** | **11 Sections** | **Zero External Dependencies**
+
 #### Document Version: v1.0 | Date: 2026-04-02 | Classification: SOVEREIGN INTERNAL
 
 ---
@@ -48,14 +50,18 @@ SigmaOS/
 ## 🎯 Priority Distribution
 
 ### P0 — Critical (670 items, 28.5%)
+
 Must-implement for system sovereignty and competitive parity.
+
 - Security foundations, memory safety, kernel stability
 - Core accessibility (WCAG AAA compliance)
 - Essential developer tooling (debugger, test framework, CLI)
 - Fundamental monitoring and logging
 
 ### P1 — High (1,044 items, 44.4%)
+
 Required for feature completeness and industry dominance.
+
 - Advanced automation algorithms
 - Full customization framework
 - Performance optimization tuning
@@ -63,7 +69,9 @@ Required for feature completeness and industry dominance.
 - Enterprise features
 
 ### P2 — Normal (636 items, 27.1%)
+
 Polish, optimization, and frontier capabilities.
+
 - Visual effects and advanced rendering
 - Scientific computing extensions
 - Distributed computing edge cases
@@ -74,10 +82,12 @@ Polish, optimization, and frontier capabilities.
 ## 🏗️ Implementation Phases
 
 ### Phase 1: Foundation (Items ~670)
+>
 > **Focus**: All P0 items across all sections
 > **Estimated Complexity**: Maximum — establishes sovereign building blocks
 
 **Key Deliverables:**
+
 - Kernel memory safety guarantees (`SovereignMemoryRAII.c`)
 - Security hardening (ASLR, stack canaries, CFI, PQC)
 - Unit test framework (`test_framework_shard.c`)
@@ -88,10 +98,12 @@ Polish, optimization, and frontier capabilities.
 - API gateway and REST framework
 
 ### Phase 2: Expansion (Items ~1,044)
+>
 > **Focus**: All P1 items across all sections
 > **Estimated Complexity**: High — builds complete feature matrix
 
 **Key Deliverables:**
+
 - Full customization engine (personas, themes, input methods)
 - Advanced scheduler with AI prediction
 - Complete audio/graphics pipeline
@@ -102,10 +114,12 @@ Polish, optimization, and frontier capabilities.
 - Build system and CI/CD pipeline
 
 ### Phase 3: Dominance (Items ~636)
+>
 > **Focus**: All P2 items — frontier features
 > **Estimated Complexity**: Variable — many are research-grade
 
 **Key Deliverables:**
+
 - Ray tracing and volumetric rendering
 - Reinforcement learning / NAS
 - Scientific computing (fluid dynamics, quantum sim)

@@ -1,6 +1,6 @@
 # Developing for SigmaOS: The Mindset Shift
 
-If you are a traditional software engineer, reading standard tutorials, expecting POSIX frameworks, or relying on high-level languages—stop. 
+If you are a traditional software engineer, reading standard tutorials, expecting POSIX frameworks, or relying on high-level languages—stop.
 
 Developing shards or scripts for SigmaOS is a fundamentally different discipline. This OS is governed by **Absolute Sovereignty and Zero Dependencies**. If you attempt to port standard Linux/Windows mentalities here, your code will fail compilation instantly via `SovereignBuildMaster.c`.
 
@@ -11,10 +11,11 @@ Here is exactly what you need to know before writing your first line of code for
 ## 🛑 1. The Standard Library (`libc`) is Dead
 
 Do **not** use `#include <stdio.h>`, `#include <stdlib.h>`, or `#include <string.h>`.
-The compiler will reject them. 
+The compiler will reject them.
 
 **The Default SigmaOS Substitution:**
 All tools are routed through `SovereignLibC.h`.
+
 * Need to print? You must use `sigma_printf()` which hooks `SYS_WRITE`.
 * Need a string length? Use `sigma_strlen()`.
 * Need a memory wipe? Use `sigma_memset()` or `sigma_zero_memory()`.
@@ -24,6 +25,7 @@ All tools are routed through `SovereignLibC.h`.
 There is no Python-esque garbage collection. There is no standard heap allocator like `malloc` or `free`. SigmaOS relies on a highly specialized **Slab Allocator** and **Physical Memory Manager (PMM)** structured to bypass general-purpose bottlenecks.
 
 **How to Allocate Memory Natively:**
+
 ```c
 // DO NOT DO THIS:
 // char* buffer = (char*)malloc(1024);
@@ -46,8 +48,8 @@ SigmaOS does not execute massive `ELF` binaries loaded with thousands of backgro
 
 ## 🌐 4. Networking Bypasses the Kernel Socket Layer
 
-If you are building an HFT or high-throughput Shard, do not rely on standard BSD Sockets (`socket()`, `bind()`, `listen()`). 
-SigmaOS utilizes **Zero-Copy DMA (Direct Memory Access)** ring buffers. 
+If you are building an HFT or high-throughput Shard, do not rely on standard BSD Sockets (`socket()`, `bind()`, `listen()`).
+SigmaOS utilizes **Zero-Copy DMA (Direct Memory Access)** ring buffers.
 
 To read from the network, your Shard must be permitted (via Persona bounds) to poll the hardware NIC ring array directly. The kernel will format the contiguous byte block in `SovereignNetMesh.c`.
 
@@ -55,6 +57,7 @@ To read from the network, your Shard must be permitted (via Persona bounds) to p
 
 SigmaOS is an omni-tool platform, but it will never natively interpret `.py`, `.js` (back-end logic), or Java Bytecode within the kernel boundary.
 If you need automated scripts or macro sequences, they must either be:
+
 1. Compiled dynamically via `sigma_invoke`.
 2. Passed via the `omni_shell` native bash-replacement arrays.
 3. Hooked via custom `.asm` logic mapped directly to an interrupt trigger by `keyboard_master.c`.

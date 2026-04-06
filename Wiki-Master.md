@@ -36,9 +36,9 @@ Access the specialized documentation for each domain:
 
 The absolute heart of SigmaOS is the **Sovereign Omni-CLI Dispatcher**. It is a pure C11 routing authority that maps every mission verb (ai, law, net, fs) straight to the silicon.
 
--   **Source of Truth**: [SovereignOmniCLI.c](file:///c:/Users/Aaryan/.gemini/antigravity/scratch/SigmaOS/sovereign_tools/SovereignOmniCLI.c)
--   **Mission Matrix**: maps over 200+ specialized shards across 12 domains.
--   **Reference Guide**: [OmniCLI_Reference.md](file:///c:/Users/Aaryan/.gemini/antigravity/scratch/SigmaOS/WIKI/OmniCLI_Reference.md)
+- **Source of Truth**: [SovereignOmniCLI.c](file:///c:/Users/Aaryan/.gemini/antigravity/scratch/SigmaOS/sovereign_tools/SovereignOmniCLI.c)
+- **Mission Matrix**: maps over 200+ specialized shards across 12 domains.
+- **Reference Guide**: [OmniCLI_Reference.md](file:///c:/Users/Aaryan/.gemini/antigravity/scratch/SigmaOS/WIKI/OmniCLI_Reference.md)
 
 ## 🐚 SOVEREIGN ZENITH v3000.0 LAUNCH
 

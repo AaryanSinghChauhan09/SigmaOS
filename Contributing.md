@@ -15,16 +15,17 @@ Please note we have a [Code of Conduct](./CODE_OF_CONDUCT.md), please follow it 
 
 ## Development Standards 🛡️
 
-*   **Zero-Dependency**: No external headers or libraries. Use `sigma_kernel_types.h` and the defined silicon-direct primitives.
-*   **Pure x86_64**: Ensure all assembly is for 64-bit Long Mode.
-*   **Safety First**: Use **B6 Sovereign Stack Canaries** and **NMA Isolation** for all new shards.
-*   **Performance Purity**: Use the provided benchmarking shards to ensure your code is at least 25% more efficient than standard OS counterparts.
+* **Zero-Dependency**: No external headers or libraries. Use `sigma_kernel_types.h` and the defined silicon-direct primitives.
+* **Pure x86_64**: Ensure all assembly is for 64-bit Long Mode.
+* **Safety First**: Use **B6 Sovereign Stack Canaries** and **NMA Isolation** for all new shards.
+* **Performance Purity**: Use the provided benchmarking shards to ensure your code is at least 25% more efficient than standard OS counterparts.
 
 ## Bug Reports 🛡️
 
 We use GitHub Issues to track public bugs. Report a bug by [opening a new issue](https://github.com/AaryanSinghChauhan09/SigmaOS/issues/new).
 
 **A great bug report includes:**
+
 * A quick summary and/or background
 * Steps to reproduce
 * What you expected would happen

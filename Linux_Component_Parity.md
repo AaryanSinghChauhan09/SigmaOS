@@ -1,6 +1,7 @@
 # SigmaOS: Complete Linux Component Parity & Sovereign Re-engineering (v170.0)
 
 ## Overview
+
 This document maps every core Linux kernel feature and distro USP to its native SigmaOS equivalent — all implemented in pure C11 and x86_64 Assembly. No third-party libraries, no Python scripts, no runtime bloat.
 
 ---
@@ -8,6 +9,7 @@ This document maps every core Linux kernel feature and distro USP to its native 
 ## ✅ Core OS Modules — Sovereign Re-engineering
 
 ### 1. Process Management
+
 | Linux Standard | SigmaOS Sovereign Equivalent |
 |:---|:---|
 | `systemd` / `init` / OpenRC | `SigmaInit` (C11 service lifecycle) |
@@ -19,6 +21,7 @@ This document maps every core Linux kernel feature and distro USP to its native 
 | cgroups v2 | `sigma cg create/assign/stats/freeze/delete` |
 
 ### 2. Memory Management
+
 | Linux Standard | SigmaOS Sovereign Equivalent |
 |:---|:---|
 | `malloc` / glibc heap | SovereignLibC slab allocator (`sigma_malloc`) |
@@ -29,6 +32,7 @@ This document maps every core Linux kernel feature and distro USP to its native 
 | OOM killer | `sigma mem oom-score set --pid <pid> --score -500` |
 
 ### 3. Concurrency & Synchronisation
+
 | Linux Standard | SigmaOS Sovereign Equivalent |
 |:---|:---|
 | `pthread` | Lock-free atomics via `lock cmpxchg` in ASM |
@@ -38,6 +42,7 @@ This document maps every core Linux kernel feature and distro USP to its native 
 | Message queues (`mq_open`) | `sigma ipc mq create/send/recv` |
 
 ### 4. Interrupt Handling & I/O
+
 | Linux Standard | SigmaOS Sovereign Equivalent |
 |:---|:---|
 | IRQ balancing | `sigma sys irq bind --irq 10 --cpu 2` |
@@ -47,6 +52,7 @@ This document maps every core Linux kernel feature and distro USP to its native 
 | NUMA topology | `sigma numa bind --pid <pid> --node 0` |
 
 ### 5. File System
+
 | Linux Standard | SigmaOS Sovereign Equivalent |
 |:---|:---|
 | ext4 | `sigma fs ext4 mount/check/repair/info` |
@@ -59,6 +65,7 @@ This document maps every core Linux kernel feature and distro USP to its native 
 | Data deduplication | `sigma fs deduplicate <dir>` |
 
 ### 6. Security & Protection
+
 | Linux Standard | SigmaOS Sovereign Equivalent |
 |:---|:---|
 | SELinux | `sigma sec selinux enforce --policy targeted` |
@@ -71,6 +78,7 @@ This document maps every core Linux kernel feature and distro USP to its native 
 | PQC (post-quantum) | `sigma sec pqc keygen --algo Kyber-1024` |
 
 ### 7. Networking Stack
+
 | Linux Standard | SigmaOS Sovereign Equivalent |
 |:---|:---|
 | Netfilter / iptables | `sigma net firewall add/export/import` |
@@ -83,6 +91,7 @@ This document maps every core Linux kernel feature and distro USP to its native 
 | Zero-copy TCP | `SovereignNetMesh.c` — direct Ethernet-frame-level dispatch |
 
 ### 8. Namespaces & Containers
+
 | Linux Standard | SigmaOS Sovereign Equivalent |
 |:---|:---|
 | PID namespace | `sigma ns create --type pid` |
@@ -95,6 +104,7 @@ This document maps every core Linux kernel feature and distro USP to its native 
 | Qubes OS VM isolation | `sigma qube create/disposable/copy-file` |
 
 ### 9. eBPF (Sovereign BPF Engine)
+
 | Linux Standard | SigmaOS Sovereign Equivalent |
 |:---|:---|
 | kprobe / uprobe | `sigma bpf trace --event sys_enter_write --pid <pid>` |
@@ -105,6 +115,7 @@ This document maps every core Linux kernel feature and distro USP to its native 
 | bpftrace | `sigma trace bpf --prog 'tracepoint:syscalls:sys_enter_write'` |
 
 ### 10. /proc & /sys Virtual Filesystem
+
 | Linux Standard | SigmaOS Sovereign Equivalent |
 |:---|:---|
 | `/proc/cpuinfo` | `sigma proc show /proc/cpuinfo` |
@@ -115,6 +126,7 @@ This document maps every core Linux kernel feature and distro USP to its native 
 | `/proc/loadavg` | `sigma proc show /proc/loadavg` |
 
 ### 11. CPU Frequency Scaling (cpufreq)
+
 | Linux Standard | SigmaOS Sovereign Equivalent |
 |:---|:---|
 | `performance` governor | `sigma power governor set --cpu all --mode performance` |
@@ -124,6 +136,7 @@ This document maps every core Linux kernel feature and distro USP to its native 
 | Frequency limits | `sigma power freq set --cpu 0 --min 800MHz --max 3600MHz` |
 
 ### 12. kdump / kexec
+
 | Linux Standard | SigmaOS Sovereign Equivalent |
 |:---|:---|
 | `kdump` crash kernel | `sigma kernel crashkernel reserve --mem 256M` |
@@ -131,6 +144,7 @@ This document maps every core Linux kernel feature and distro USP to its native 
 | `crash` vmcore analysis | `sigma kernel dump analyze --core ./vmcore` |
 
 ### 13. Bootstrapping
+
 | Linux Standard | SigmaOS Sovereign Equivalent |
 |:---|:---|
 | GRUB2 | `SovereignEntry.asm` — Assembly-direct boot |
@@ -168,6 +182,7 @@ SigmaOS absorbs **every** Linux distro and activates their personality on demand
 | **EndeavourOS** | Arch-based, friendly, AUR | `sigma distro absorb endeavouros` |
 
 **Activate any distro personality:**
+
 ```
 sigma distro personality arch
 sigma distro list
@@ -179,6 +194,7 @@ sigma distro absorb all
 ## ✅ Advanced Environments
 
 ### Virtualization & Containerization
+
 | Tool | SigmaOS Equivalent |
 |:---|:---|
 | KVM / QEMU | `SovereignHypervisorZenith.c` — Ring -1 Type-1 hypervisor |
@@ -187,6 +203,7 @@ sigma distro absorb all
 | Qubes VM | `sigma qube create/disposable/copy-file/list` |
 
 ### Cloud & Live Boot
+
 | Scenario | SigmaOS Command |
 |:---|:---|
 | Live USB creation | `sigma liveboot create --iso sigma-live.iso --target /dev/sdb` |

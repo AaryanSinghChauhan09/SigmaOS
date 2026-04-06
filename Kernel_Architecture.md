@@ -24,6 +24,7 @@ BIOS/UEFI POST
 ## Subsystem Map
 
 ### Memory Management
+
 | File | Description |
 | ---- | ----------- |
 | `pmm.c` | Physical Memory Manager — page frame allocator using bitmap |
@@ -32,6 +33,7 @@ BIOS/UEFI POST
 | `quantum_rcu.c` | Read-Copy-Update for lock-free concurrent access |
 
 ### Process & Scheduling
+
 | File | Description |
 | ---- | ----------- |
 | `process.c` | Process creation, forking, context switching |
@@ -41,6 +43,7 @@ BIOS/UEFI POST
 | `signal.c` | POSIX-compatible signal delivery |
 
 ### Filesystem (VFS)
+
 | File | Description |
 | ---- | ----------- |
 | `vfs.c` | Virtual File System: inode tree, path resolution, mount points |
@@ -48,6 +51,7 @@ BIOS/UEFI POST
 | `syscall.c` | System call dispatch table (200+ syscalls) |
 
 ### Hardware & Drivers
+
 | File | Description |
 | ---- | ----------- |
 | `hal.asm` + `hal.c` | Hardware Abstraction Layer |
@@ -58,6 +62,7 @@ BIOS/UEFI POST
 | `drivers/` | Extended device driver directory |
 
 ### IPC & Networking
+
 | File | Description |
 | ---- | ----------- |
 | `ipc.c` | Full IPC: pipes, message queues, shared memory, semaphores |
@@ -66,6 +71,7 @@ BIOS/UEFI POST
 | `SovereignNetMesh.c` | Mesh networking + onion routing (Tails OS equivl.) |
 
 ### Security
+
 | File | Description |
 | ---- | ----------- |
 | `sovereign_bpf.c` | Ring-0 eBPF sandbox for verified bytecode execution |
@@ -75,6 +81,7 @@ BIOS/UEFI POST
 | `SovereignAmnesicShard.c` | Volatile memory forensic wiper |
 
 ### Advanced Modules
+
 | File | Description |
 | ---- | ----------- |
 | `elf_loader.c` | Native ELF binary loader + relocations |
@@ -89,6 +96,7 @@ BIOS/UEFI POST
 ## Key Data Structures
 
 ### Process Control Block (`process.c`)
+
 ```c
 typedef struct SigmaProcess {
     sigma_u32     pid;
@@ -103,6 +111,7 @@ typedef struct SigmaProcess {
 ```
 
 ### VFS Inode (`vfs.c`)
+
 ```c
 typedef struct SigmaInode {
     sigma_u32  ino;

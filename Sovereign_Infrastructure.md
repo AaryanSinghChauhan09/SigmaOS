@@ -1,4 +1,5 @@
 # Σ SIGMAOS: SOVEREIGN INFRASTRUCTURE & OBSERVABILITY
+
 [![Domain](https://img.shields.io/badge/Domain-INFRASTRUCTURE-00d2ff?style=for-the-badge)](https://github.com/AaryanSinghChauhan09/SigmaOS)
 
 **SigmaOS Zenith Supreme** integrates industrial-grade observability, automated development pipelines, and a modular compliance rule engine to ensure absolute system sovereignty and reliability.

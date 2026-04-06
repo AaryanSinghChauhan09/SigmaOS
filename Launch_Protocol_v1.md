@@ -13,6 +13,7 @@ To initiate the formal SigmaOS environment, execute the unified launcher:
 ```
 
 **Actions Performed during Launch Protocol**:
+
 - Verification of Sovereign Hardware/DMA paths.
 - Execution payload loads the Interference Guard into memory to catch kernel panics.
 - Unnecessary legacy dependencies are purged from execution scope.
@@ -25,7 +26,7 @@ To make SigmaOS the ultimate professional-grade system, all previously scattered
 Within the launched environment or direct terminal, every tool is invoked simply as:
 `sigma <shard_target> <args>`
 
-### Official Launch Directory of Sovereign Tools:
+### Official Launch Directory of Sovereign Tools
 
 | Command Argument | Target Shard | Launch State Impact |
 | :--- | :--- | :--- |

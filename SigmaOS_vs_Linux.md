@@ -24,6 +24,7 @@ This page documents SigmaOS's definitive competitive roadmap against every major
 ## Category-by-Category USP Table
 
 ### 🤖 AI Tools
+
 | Linux (External) | SigmaOS (Native) |
 | ----------------- | ----------------- |
 | Ollama (installed) | `sigma_ai_distribute.c` — kernel-level IPC routing |
@@ -33,6 +34,7 @@ This page documents SigmaOS's definitive competitive roadmap against every major
 | No AI file organizer | `SovereignSearch.c` — AI-powered VFS search |
 
 ### 🔬 Forensic Tools
+
 | Kali Linux Tool | SigmaOS Equivalent |
 | ---------------- | ------------------- |
 | Volatility (memory) | `SovereignForensicMatrix.c` |
@@ -42,6 +44,7 @@ This page documents SigmaOS's definitive competitive roadmap against every major
 | No legal compliance | `bnss_shard.c` (Indian BNSS Section 105) |
 
 ### 📚 Education Tools
+
 | Linux (External Apps) | SigmaOS (Native Shards) |
 | ---------------------- | ------------------------ |
 | GeoGebra (install) | `ncert_shard.c` — math lab native |
@@ -51,6 +54,7 @@ This page documents SigmaOS's definitive competitive roadmap against every major
 | Khan Academy (browser) | Integrated shard with offline-first content |
 
 ### 🧮 DSA / CS Tools
+
 | Linux (External) | SigmaOS (Native) |
 | ----------------- | ----------------- |
 | Competitive coding (browser) | `SovereignSuperCalculator.c` DSA shard |
@@ -59,6 +63,7 @@ This page documents SigmaOS's definitive competitive roadmap against every major
 | No graph visualizer | Native D3-style graph rendering in browser UI |
 
 ### 📊 Data Science / ML
+
 | Linux (Install required) | SigmaOS (Native) |
 | ------------------------ | ----------------- |
 | Jupyter Notebook | Browser DS shard (no Python) |

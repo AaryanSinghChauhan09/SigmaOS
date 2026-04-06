@@ -1,6 +1,7 @@
 ## II. CUSTOMIZATION & PERSONALIZATION (300+ changes)
 
 ### A. User Profile & Preferences (60+ changes)
+>
 > **Target Shards**: `personalizer.c`, `SovereignPersonalizerZenith.c`, `identity.c`
 
 | # | Item | Status | Priority | Target Shard |
@@ -67,6 +68,7 @@
 | 280 | Create adaptive persona trigger rules per user | [ ] | P1 | `SovereignPersonalizerZenith.c` |
 
 ### B. Desktop Environment Customization (60+ changes)
+>
 > **Target Shards**: `SovereignDesktopZenith.h`, `SovereignStyleZenith.c`
 
 | # | Item | Status | Priority | Target Shard |
@@ -133,6 +135,7 @@
 | 340 | Create custom desktop zoom controls | [ ] | P2 | `SovereignDesktopZenith.h` |
 
 ### C. Application Experience Customization (60+ changes)
+>
 > **Target Shards**: `app_manager.c`, `personalizer.c`, `cgroup_shard.c`
 
 | # | Item | Status | Priority | Target Shard |
@@ -199,6 +202,7 @@
 | 400 | Create app-specific capability bitmask | [ ] | P0 | `SovereignSecurity.asm` |
 
 ### D. Input Method Customization (60+ changes)
+>
 > **Target Shards**: `keyboard_master.c`, `SovereignVoiceShard.c`, `personalizer.c`
 
 | # | Item | Status | Priority | Target Shard |
@@ -265,6 +269,7 @@
 | 460 | Create input diagnostics and testing tool | [ ] | P2 | `SovereignDiagnosticsZenith.c` |
 
 ### E. System Behavior Customization (60+ changes)
+>
 > **Target Shards**: `sovereign_auto.c`, `personalizer.c`, `registry.c`
 
 | # | Item | Status | Priority | Target Shard |
@@ -331,6 +336,7 @@
 | 520 | Create custom capability bounding set per context | [ ] | P1 | `SovereignSecurity.asm` |
 
 ### F. Performance Customization (60+ changes)
+>
 > **Target Shards**: `scheduler.c`, `SovereignSiliconPulse.asm`, `health.c`
 
 | # | Item | Status | Priority | Target Shard |

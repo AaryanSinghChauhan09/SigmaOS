@@ -1,6 +1,6 @@
 # Persona Configuration Guide: Contextual Sovereignty
 
-In SigmaOS, you do not simply manage "User Accounts." You manage **Personas**. 
+In SigmaOS, you do not simply manage "User Accounts." You manage **Personas**.
 Standard operating systems (like Linux or Windows) use a static permission model (`root` vs `user`), where the underlying system behaves exactly the same regardless of what you are doing.
 
 SigmaOS utilizes **Contextual Hypervisor Boundaries**. When you shift a Persona, the entire Operating System—from the CPU governors in Ring-0 down to the UI DOM—dynamically morphs to optimize for your exact intent.
@@ -24,6 +24,7 @@ SigmaOS utilizes **Contextual Hypervisor Boundaries**. When you shift a Persona,
 You do not need to reboot the server to shift a Persona. It is an instantaneous, hot-swappable namespace shift managed via the **Omni Shell**.
 
 ### Switching Context
+
 ```bash
 # Shift the entire machine hypervisor into Developer Mode
 sigma_invoke persona --shift developer
@@ -33,7 +34,9 @@ invoke academy
 ```
 
 ### Auto-Scheduling (The Future Roadmap)
+
 *As outlined in our OS Development roadmap, SigmaOS will eventually support predictive Persona shifting:*
+
 - **Time-Based:** Automatically morphing from *Researcher Mode* during the day into *Gamer Mode* at 21:00, altering CPU voltages automatically.
 - **Payload-Based:** Detecting a `.c` file compilation and instantly raising the process privileges to mimic the *Developer* context for that specific PID.
 

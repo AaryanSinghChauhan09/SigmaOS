@@ -1,5 +1,7 @@
 # Σ SIGMAOS COMPREHENSIVE IMPROVEMENT ROADMAP
+
 ### Sovereign Architecture Evolution Matrix — 1850+ Engineering Changes
+
 #### Document Version: v1.0 | Date: 2026-04-02 | Classification: SOVEREIGN INTERNAL
 
 ---
@@ -14,6 +16,7 @@
 ## I. AUTOMATION & SYSTEM INTELLIGENCE (200+ changes)
 
 ### A. Kernel-Level Automation (50+ changes)
+>
 > **Target Shards**: `SovereignKernelZenith.c`, `scheduler_ai.c`, `SovereignMemoryZenith.c`
 
 | # | Item | Status | Priority | Target Shard |
@@ -70,6 +73,7 @@
 | 050 | Implement real-time power consumption optimization | [ ] | P1 | `health.c` |
 
 ### B. Application-Level Automation (50+ changes)
+>
 > **Target Shards**: `app_manager.c`, `SovereignProcessManager.c`, `automation_shard.c`
 
 | # | Item | Status | Priority | Target Shard |
@@ -126,6 +130,7 @@
 | 100 | Auto-optimize application signal handling | [ ] | P2 | `signal.c` |
 
 ### C. Storage & I/O Automation (40+ changes)
+>
 > **Target Shards**: `vfs.c`, `io_scheduler.c`, `SovereignFileSystemZenith.c`
 
 | # | Item | Status | Priority | Target Shard |
@@ -172,6 +177,7 @@
 | 140 | Create predictive storage capacity planning | [ ] | P2 | `SovereignDiagnosticsZenith.c` |
 
 ### D. Network Automation (40+ changes)
+>
 > **Target Shards**: `net.c`, `net_firewall.c`, `SovereignNetMesh.c`
 
 | # | Item | Status | Priority | Target Shard |
@@ -218,6 +224,7 @@
 | 180 | Create smart network caching strategies | [ ] | P1 | `net.c` |
 
 ### E. Security Automation (40+ changes)
+>
 > **Target Shards**: `SovereignSecurity.asm`, `SovereignAetherSentinel.c`, `SovereignLatticePQC.c`
 
 | # | Item | Status | Priority | Target Shard |

@@ -7,15 +7,18 @@ This document outlines the industrial enhancements implemented to transition Sig
 The v250.0 kernel introduces direct hardware locality and real-time deterministic scheduling.
 
 ### 🌐 NUMA Awareness
+
 - **Logic**: ACPI SRAT table parsing for node discovery.
 - **Goal**: Minimize cross-node memory latency by sharding tasks to their local RAM nodes.
 - **Code**: `kernel/sigma_zenith.c:numa_discover_topology()`
 
 ### ⚡ Real-time Scheduling
+
 - **Logic**: Deadline-driven task prioritization.
 - **Capability**: Guarantees sub-millisecond response times for industrial mission shards.
 
 ### 💾 Adaptive Memory Management
+
 - **Logic**: Machine learning-based predictive page allocation.
 - **USP**: Neutralizes typical Linux swapping latency (zram-parity) via hardware-direct predictive sharding.
 
@@ -26,10 +29,12 @@ The v250.0 kernel introduces direct hardware locality and real-time deterministi
 The AI shard has evolved from a simple inference engine into a **Self-Healing Hive-Mind**.
 
 ### 🛡️ Self-Healing Architecture
+
 - **Capability**: Autonomous fault detection and logic shard resynchronization.
 - **Execution**: `SigmaAI.selfHeal()`
 
 ### ⚖️ Bias Auditing Framework
+
 - **Capability**: Causal inference auditing to ensure neural models maintain absolute system sovereignty and objective integrity.
 - **Execution**: `SigmaAI.runBiasAudit()`
 

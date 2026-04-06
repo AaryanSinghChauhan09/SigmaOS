@@ -6,6 +6,7 @@
 ---
 
 ## Table of Contents
+
 1. [Introduction to Absolute Sovereignty](#1-introduction-to-absolute-sovereignty)
 2. [Booting and Initialization](#2-booting-and-initialization)
 3. [The Zenith Window Manager (GUI)](#3-the-zenith-window-manager-gui)
@@ -27,14 +28,18 @@ By removing heavy Virtual File Systems (VFS), high-level language wrappers (like
 
 ## 2. Booting and Initialization
 
-Booting SigmaOS on supported hardware (or via the simulated environment) involves bypassing standard bootloaders. 
+Booting SigmaOS on supported hardware (or via the simulated environment) involves bypassing standard bootloaders.
 
 ### Launching the System
+
 From your host environment shell, run the launch dispatcher:
+
 ```powershell
 ./launch_sigmaos.ps1
 ```
+
 **The Boot Sequence**:
+
 1. **System Pulse Verification**: Verifies your silicon DMA paths.
 2. **SOD (Shard-On-Demand) Core Load**: The central allocator is shoved into kernel space.
 3. **RAM Sweep**: Any residual generic execution artifacts are forcefully purged.
@@ -44,7 +49,7 @@ From your host environment shell, run the launch dispatcher:
 
 ## 3. The Zenith Window Manager (GUI)
 
-SigmaOS features the `SigmaWM` – an ultra-lightweight dynamic window manager built without heavy X11/Wayland bloat. 
+SigmaOS features the `SigmaWM` – an ultra-lightweight dynamic window manager built without heavy X11/Wayland bloat.
 
 - **Workspace Navigation**: Workspaces dynamically appear as Shards are activated.
 - **Display Matrix**: Native matrix calculations happen natively over assembly (`SigmaMathUnit`), providing smooth, 120 FPS capable UI scaling without relying on massive external graphic compositors.
@@ -80,8 +85,9 @@ SigmaOS utilizes `SigmaVFS`—a sovereign filesystem approach that avoids the cl
 ## 6. Process Isolation & Interference Guard
 
 Security within SigmaOS is strictly enforced through **Sovereign Interference Guards** rather than standard antivirus signatures.
-- **Kernel Panics Nulled**: Rogue processes attempting to access segmented memory bounds trigger the `SovereignSentinel`. 
-- **Process Trapping**: The offending Shard is immediately suspended and unmapped from memory within microseconds. 
+
+- **Kernel Panics Nulled**: Rogue processes attempting to access segmented memory bounds trigger the `SovereignSentinel`.
+- **Process Trapping**: The offending Shard is immediately suspended and unmapped from memory within microseconds.
 - **Privacy Amnesic Feature**: Using `SigmaPrivacyAmnesic` tools, user sessions are wiped from RAM completely when the system locks. There are no persistence caches left for attackers to scrape.
 
 ---
@@ -91,17 +97,21 @@ Security within SigmaOS is strictly enforced through **Sovereign Interference Gu
 SigmaOS replaces traditional software with "Shards". When a task is complete, the Shard dissolves safely from RAM.
 
 ### 7.1. Indian Legal Compliance Portal (`indian_law.c`)
+
 Offline, fully BNS/BNSS/BSA compliant database capable of generating Form 61 Hash Value certificates and guiding officers through explicit operational bounds for FIR generation.
 *Usage*: `sigma law --search "Search and Seizure procedures"`
 
 ### 7.2. OmniMedia Engine (`omni_media_engine.c`)
+
 VLC/Standard Media Competitor. Bypasses ffmpeg decoding wrappers and pipes H.265/AV1 frames directly to hardware arrays. Reduces playback latency by 10x over Windows paradigms.
 *Usage*: `sigma omni-media /path/to/vid.av1`
 
 ### 7.3. Sigma Academy (`academy.c` & `ncert_core.c`)
-Offline educational routing, fetching curriculum instantaneously from an uncompressed internal storage shard. 
+
+Offline educational routing, fetching curriculum instantaneously from an uncompressed internal storage shard.
 
 ### 7.4. Sigma AI Matrix (`sigma_ai_distribute.c` & `SigmaAI.js`)
+
 Removes PyTorch/Python completely. Processes neural network layers directly through Sovereign Native Assembly calls. Eliminates memory constraints usually found in cross-layer matrix manipulation.
 
 ---
@@ -110,7 +120,8 @@ Removes PyTorch/Python completely. Processes neural network layers directly thro
 
 SigmaOS grants absolute tool autonomy. If you want a new application, build a Shard.
 
-### Rules of Development:
+### Rules of Development
+
 1. **No External Wrappers**: Do not include `#include <stdio.h>` or Python files natively. Use `<SigmaC11.h>` and call native kernel utilities (`sigma_print`).
 2. **Respect the Void**: When your application terminates, it MUST release its memory structure completely to the SOD architecture to maintain the zero-background footprint rule.
 3. **Registration**: Ensure your built C11 binary is registered inside `sovereign_tools/SigmaCLI_Dispatcher.c` to bind it to the Omni-CLI.

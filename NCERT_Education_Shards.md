@@ -21,6 +21,7 @@ User selects Subject
 ## Biology Lab (Class 11/12 NCERT)
 
 ### DNA Sequence Alignment
+
 ```c
 // Needleman-Wunsch global alignment
 void sigma_nw_align(const char* seq1, const char* seq2,
@@ -34,6 +35,7 @@ sigma_nw_align("AGCTAG", "AGCTTG", 1, -1, -2, out1, out2);
 ```
 
 ### Ecosystem Simulator (Lotka-Volterra ODE)
+
 ```c
 // Predator-prey population dynamics
 void sigma_lotka_volterra(sigma_f64 prey0, sigma_f64 pred0,
@@ -48,6 +50,7 @@ void sigma_lotka_volterra(sigma_f64 prey0, sigma_f64 pred0,
 ## Mathematics Lab (Class 11/12 NCERT)
 
 ### Implemented Functions (No `<math.h>`)
+
 ```c
 // Trigonometry via Taylor Series
 sigma_f64 sigma_sin(sigma_f64 x);     // 12-term Taylor expansion

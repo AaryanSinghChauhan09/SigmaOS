@@ -7,6 +7,7 @@ SigmaOS implements Object-Oriented Programming **without any C++ runtime**, usin
 ## The Problem with C++ in a Sovereign Kernel
 
 Using C++ in a zero-dependency kernel would introduce:
+
 - RTTI (Run Time Type Information) overhead
 - `std::` namespace dependencies
 - Implicit vtable management by the compiler
@@ -41,6 +42,7 @@ CLASS_DECLARE(SigmaObject) {
 ```
 
 Initialization acts as a constructor call:
+
 ```c
 sigma_object_init(&obj.core, "MyClass", 101);
 ```
@@ -82,6 +84,7 @@ static AIModel_t create_ai_model(const char* name, const char* sock, sigma_u32 p
 ```
 
 ### Polymorphic Call
+
 ```c
 AIModel_t llm = create_ai_model("Sigma_QWen_local", "/var/ipc/llm.sock", 100);
 llm.dispatch(&llm, "Analyze kernel memory.");   // Runtime dispatch
@@ -121,24 +124,29 @@ typedef signed long long   sigma_i64;
 - **Constructor pattern**: Factory functions initialize + bind methods
 - **Zero overhead**: No RTTI, no exceptions, no ABI hidden calls
 
-
 ---
+
 ## ADDED FROM Architecture-OOPS.md
+
 # Σ SIGMAOS: ARCHITECTURE & OOPS FINALITY
+
 [![OOPS](https://img.shields.io/badge/Architecture-OOPS-blue?style=for-the-badge)]()
 
 **Σ SIGMAOS** is built on a strictly sharded, Object-Oriented architecture to ensure **Absolute Technical Encapsulation**.
 
 ## 🧱 THE SIGMASHARD BASE CLASS
+
 - All professional tools (AI, DS, DSA) inherit from the **`SigmaShard`** base class.
 - **Polymorphism**: Tools override the `execute()` and `render()` methods to provide domain-specific silicon logic.
 - **Encapsulation**: Shard-state is contained within the class context, preventing unauthorized state-leaks between system modules.
 
 ## ⚙️ HLL-REDUCTION & SMU
+
 - **Sovereign Math Unit (SMU)**: Replaces high-level `Math.*` dependencies with User-Defined Functions (UDFs).
 - **Silicon Parity**: Browser-based shards use raw indexing and loops to mirror the Low-Level C Kernels.
 
 ## 📦 SHARDED BOUNDARIES
+
 - **SigmaVFS**: Virtual File System shard.
 - **SigmaWM**: Low-latency Window Manager.
 - **SigmaShell**: C11-parity Command Interface.
