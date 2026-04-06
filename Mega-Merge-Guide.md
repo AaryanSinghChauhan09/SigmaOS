@@ -32,7 +32,12 @@ This guide provides a comprehensive overview of the mega-merge process, includin
 
 ## 4. Merging Branches
 
+<<<<<<< HEAD
 ### Step-by-Step Instructions
+=======
+
+### Step-by-Step Instructions:
+>>>>>>> 99f2ef5 (chore: precise lint eradication via AST script algorithms)
 
 1. Fetch updates:
 

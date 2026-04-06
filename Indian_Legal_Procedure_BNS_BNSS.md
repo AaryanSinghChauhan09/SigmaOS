@@ -11,7 +11,11 @@ This document serves as the master checklist to outline the exact execution step
 
 The Bharatiya Nagarik Suraksha Sanhita (BNSS) standardizes digital entry and preliminary inquiries.
 
+<<<<<<< HEAD
 ### Procedures & Essentials
+=======
+### Procedures & Essentials:
+>>>>>>> 99f2ef5 (chore: precise lint eradication via AST script algorithms)
 
 - **e-FIR (Electronic FIR)**: Information can be submitted electronically but MUST be followed by the informant's signature within 3 days to become an actionable FIR.
 - **Zero FIR Protocol**: Can be registered irrespective of the area where the offense was committed. The SigmaOS shard automatically routes jurisdiction mapping to the correct station.
@@ -24,7 +28,11 @@ The Bharatiya Nagarik Suraksha Sanhita (BNSS) standardizes digital entry and pre
 
 Updates to arrest mechanics grant explicit permissions for complex crimes while mandating strict rights.
 
+<<<<<<< HEAD
 ### Procedures & Essentials
+=======
+### Procedures & Essentials:
+>>>>>>> 99f2ef5 (chore: precise lint eradication via AST script algorithms)
 
 - **Handcuffing Guidelines (Sec 43(3))**: Explicitly permitted when arresting habitual offenders, escaping convicts, or persons involved in organized crime, terrorism, or severe economic offenses.
 - **Notice of Appearance (Sec 35)**: Replaces the old Sec 41A of CrPC. If arrest is not strictly required, a formal notice must be issued.
@@ -39,7 +47,11 @@ Updates to arrest mechanics grant explicit permissions for complex crimes while 
 
 SigmaOS is particularly designed to interface with the stringent new digital evidence laws.
 
+<<<<<<< HEAD
 ### Procedures & Essentials
+=======
+### Procedures & Essentials:
+>>>>>>> 99f2ef5 (chore: precise lint eradication via AST script algorithms)
 
 - **Mandatory Videography**: Search and seizure operations MUST be recorded via audio-video electronic means. (The Sigma Omni-Media Engine supports native, offline cryptographic hashing of these videos).
 - **Digital Evidence Admissibility (Sec 61 BSA)**: Electronic records are now primary evidence. However, they require a certificate detailing the device, exact timestamps, and cryptographic hash functions.
@@ -53,7 +65,11 @@ SigmaOS is particularly designed to interface with the stringent new digital evi
 
 The structure of Police Custody (PC) has been heavily modified.
 
+<<<<<<< HEAD
 ### Procedures & Essentials
+=======
+### Procedures & Essentials:
+>>>>>>> 99f2ef5 (chore: precise lint eradication via AST script algorithms)
 
 - **Phased Custody**: Police Custody (maximum 15 days) can now be requested *in phases* during the initial 40 days (for offenses with up to 10 years punishment) or 60 days (for offenses with death/life imprisonment/10+ years), rather than being restricted to the first 15 days post-arrest.
 - **Form Requirement**:
@@ -65,7 +81,11 @@ The structure of Police Custody (PC) has been heavily modified.
 
 Strict timelines are enforced to crush pendency.
 
+<<<<<<< HEAD
 ### Procedures & Essentials
+=======
+### Procedures & Essentials:
+>>>>>>> 99f2ef5 (chore: precise lint eradication via AST script algorithms)
 
 - **Trial in Absentia (Sec 356 BNSS)**: If a proclaimed offender absconds to evade trial and there is no immediate prospect of arresting them, the trial can commence and conclude in their absence after 90 days from the framing of charges.
 - **Judgement Timeline**: Judgments must be pronounced within **30 days** (extendable to 45 days) from the conclusion of arguments.

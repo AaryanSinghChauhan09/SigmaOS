@@ -1,4 +1,4 @@
-# Σ SIGMAOS: SOVEREIGN INFRASTRUCTURE & OBSERVABILITY
+# Σ SIGMAOS: SOVEREIGN INFRASTRUCTURE AND OBSERVABILITY
 
 [![Domain](https://img.shields.io/badge/Domain-INFRASTRUCTURE-00d2ff?style=for-the-badge)](https://github.com/AaryanSinghChauhan09/SigmaOS)
 
@@ -14,19 +14,19 @@ graph TD
     Kernel --> MPS[Modular Plugin Shard]
 
     Telemetry --> Exporter[Prometheus Metrics Export]
-    SCPE --> Rules[Labor Law & PF/ESI Rules]
+    SCPE --> Rules[Labor Law and PF/ESI Rules]
     MPS --> ThirdParty[EPF/Gig Worker Plugins]
 ```
 
-## 📊 Monitoring & Reliability (Observability)
+## 📊 Monitoring and Reliability (Observability)
 
 The **Observability Shard (`telemetry.c`)** provides real-time system metrics exported in the Prometheus text format. This enables industrial monitoring via Grafana without external dependencies.
 
-* **sigma_active_tasks**: Real-time gauge of task shards in the execution grid.
-* **sigma_cpu_cycles_total**: Monotonic counter tracking absolute silicon utilization.
-* **sigma_last_panic_rip**: Error tracking primitive for capturing the exact instruction pointer of system faults.
+- **sigma_active_tasks**: Real-time gauge of task shards in the execution grid.
+- **sigma_cpu_cycles_total**: Monotonic counter tracking absolute silicon utilization.
+- **sigma_last_panic_rip**: Error tracking primitive for capturing the exact instruction pointer of system faults.
 
-## 🛡️ Compliance & Governance (SCPE)
+## 🛡️ Compliance and Governance (SCPE)
 
 The **Statutory Compliance Policy Engine (`policy_engine.c`)** encodes labor law rules directly into the kernel's coordination logic.
 
@@ -38,9 +38,9 @@ The **Statutory Compliance Policy Engine (`policy_engine.c`)** encodes labor law
 
 SigmaOS utilizes **GitHub Actions** for automated build and verification:
 
-* **Static Analysis**: `cppcheck` scans kernel shards for memory vulnerabilities and security violations.
-* **Secret Scanning**: `gitleaks` prevents unauthorized credential leakage.
-* **Binary Integrity**: Every commit is cross-compiled (ELF64/NASM) and verified against the unit test suite.
+- **Static Analysis**: `cppcheck` scans kernel shards for memory vulnerabilities and security violations.
+- **Secret Scanning**: `gitleaks` prevents unauthorized credential leakage.
+- **Binary Integrity**: Every commit is cross-compiled (ELF64/NASM) and verified against the unit test suite.
 
 ---
 

@@ -10,7 +10,11 @@ SigmaOS violently rejects this bloat. The boot process is a sheer, unabstracted 
 
 ### Time taken: &lt; 0.1s
 
+<<<<<<< HEAD
 The moment power is mapped to the CPU, SigmaOS ignores legacy BIOS calls and hooks directly into the UEFI physical payload.
+=======
+The moment power is mapped to the CPU, SigmaOS ignores legacy BIOS calls and hooks directly into the UEFI physical payload. 
+>>>>>>> 99f2ef5 (chore: precise lint eradication via AST script algorithms)
 
 - `SigmaCore.asm` establishes the fundamental **Interrupt Descriptor Table (IDT)** and the Global Descriptor Table (GDT).
 - It switches the CPU into absolute **64-bit Long Mode**.

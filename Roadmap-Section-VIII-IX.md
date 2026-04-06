@@ -2,7 +2,10 @@
 
 ### A. CLI Enhancement (50+ changes)
 
+<<<<<<< HEAD
 >
+=======
+>>>>>>> 99f2ef5 (chore: precise lint eradication via AST script algorithms)
 > **Target Shards**: `omni_shell.c`, `console.c`, `SovereignCoreUtils.c`
 
 | # | Item | Status | Priority | Target Shard |
@@ -60,7 +63,10 @@
 
 ### B. API & Integration (50+ changes)
 
+<<<<<<< HEAD
 >
+=======
+>>>>>>> 99f2ef5 (chore: precise lint eradication via AST script algorithms)
 > **Target Shards**: `SovereignHTTPServer.c`, `web_bridge.c`, `ipc.c`
 
 | # | Item | Status | Priority | Target Shard |
@@ -118,7 +124,10 @@
 
 ### C. Build & Deployment Tools (50+ changes)
 
+<<<<<<< HEAD
 >
+=======
+>>>>>>> 99f2ef5 (chore: precise lint eradication via AST script algorithms)
 > **Target Shards**: `sovereign_auto.c`, `SovereignAetherShardLoader.c`, new `build_system_shard.c`
 
 | # | Item | Status | Priority | Target Shard |
@@ -180,7 +189,10 @@
 
 ### A. Scientific Computing (30+ changes)
 
+<<<<<<< HEAD
 >
+=======
+>>>>>>> 99f2ef5 (chore: precise lint eradication via AST script algorithms)
 > **Target Shards**: `SovereignML.c`, `SovereignSuperCalculator.c`, new `sci_compute_shard.c`
 
 | # | Item | Status | Priority | Target Shard |
@@ -218,7 +230,10 @@
 
 ### B. Multimedia Production (35+ changes)
 
+<<<<<<< HEAD
 >
+=======
+>>>>>>> 99f2ef5 (chore: precise lint eradication via AST script algorithms)
 > **Target Shards**: `camera_shard.c`, `audio_engine_shard.c`, `screen_recorder.c`
 
 | # | Item | Status | Priority | Target Shard |
@@ -261,7 +276,10 @@
 
 ### C. Enterprise Features (35+ changes)
 
+<<<<<<< HEAD
 >
+=======
+>>>>>>> 99f2ef5 (chore: precise lint eradication via AST script algorithms)
 > **Target Shards**: `identity.c`, `user_manager.c`, `audit_master.c`
 
 | # | Item | Status | Priority | Target Shard |

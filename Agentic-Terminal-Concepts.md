@@ -15,7 +15,11 @@ Instead of relying on heavy Language Servers (LSPs) built in node.js or python, 
 
 ### B. Natural Language Command Resolution
 
+<<<<<<< HEAD
 * The Omni-CLI will securely map natural language queries (e.g., *"Explain why SovereignQuantumShard panicked on boot"*) to actual system diagnostics mapping back to `dmesg` buffers, git histories, and source code files.
+=======
+- The Omni-CLI will securely map natural language queries (e.g., *"Explain why SovereignQuantumShard panicked on boot"*) to actual system diagnostics mapping back to `dmesg` buffers, git histories, and source code files.
+>>>>>>> 99f2ef5 (chore: precise lint eradication via AST script algorithms)
 
 ## ⚙️ 2. Execution of Routine Operations (Absorbing `claude-code` USPs)
 
@@ -36,6 +40,7 @@ Instead of generic `.app-plugin` json wrappers, SigmaOS will introduce **`.sigma
 
 ## 🛡️ 4. Data Safety & Privacy
 
+<<<<<<< HEAD
 * **Local Priority**: As SigmaOS strives for full sovereignty, telemetry or "training on user data" is fundamentally rejected. State retention for the AI terminal will exist entirely on the local `inode` snapshot volume.
 * **Rollback Snapshots**: Every time the AI agent executes a file modification, a bare-metal file-system `snapshot` is quietly triggered. If the AI hallucinates or corrupts a `.asm` file, the user can say *"Undo the last edit"* and the OS instantly unlinks the delta using B-Tree snapshotting.
 
@@ -46,3 +51,15 @@ Instead of generic `.app-plugin` json wrappers, SigmaOS will introduce **`.sigma
 3. [ ] **Integrate B-Tree Sandboxing**: Enforce automatic rollback gates on AI filesystem write permissions.
 4. [ ] **Natural Language to Mission Mapping**: Refine the English intent parser in `SigmaParseIntent`.
 5. [ ] **Autonomous Debugging Loops**: Connect the agent to the `SigmaDiagnosticsZenith.c` stack trace analysis.
+=======
+- **Local Priority**: As SigmaOS strives for full sovereignty, telemetry or "training on user data" is fundamentally rejected. State retention for the AI terminal will exist entirely on the local `inode` snapshot volume.
+- **Rollback Snapshots**: Every time the AI agent executes a file modification, a bare-metal file-system `snapshot` is quietly triggered. If the AI hallucinates or corrupts a `.asm` file, the user can say *"Undo the last edit"* and the OS instantly unlinks the delta using B-Tree snapshotting.
+
+## 🗺️ 5. Next Steps for Implementation
+
+1.  [✅] **Develop `OmniAgentLoop` in C11**: Initial kernel loop for reasoning and mission routing.
+2.  [✅] **Build the `SigmaASTIndexer`**: In-memory codebase understanding via C11 string parsing.
+3.  [ ] **Integrate B-Tree Sandboxing**: Enforce automatic rollback gates on AI filesystem write permissions.
+4.  [ ] **Natural Language to Mission Mapping**: Refine the English intent parser in `SigmaParseIntent`.
+5.  [ ] **Autonomous Debugging Loops**: Connect the agent to the `SigmaDiagnosticsZenith.c` stack trace analysis.
+>>>>>>> 99f2ef5 (chore: precise lint eradication via AST script algorithms)

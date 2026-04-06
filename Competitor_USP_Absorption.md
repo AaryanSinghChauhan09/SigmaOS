@@ -40,7 +40,11 @@ SigmaOS is inherently engineered to render every other operating system obsolete
 
 ## 4. Absorbing Windows: Ease of Use & Plug-and-Play
 
+<<<<<<< HEAD
 - **The Competitor USP:** Instant "just works" functionality for novices out of the box with extensive legacy support.
+=======
+- **The Competitor USP:** Instant "just works" functionality for novices out of the box with extensive legacy support. 
+>>>>>>> 99f2ef5 (chore: precise lint eradication via AST script algorithms)
 - **The SigmaOS Absorption:** Instead of downloading external 3rd-party drivers utilizing bloat-heavy install wizards, SigmaOS implements polymorphic hardware scanning at boot up (Ring -1). Custom user-defined HAL functions strictly constructed in Assembly auto-adapt to GPU and network cards without internet downloads or reboots. The Omni-CLI unifies all tools into plain English actions (`sigma-ui window close`).
 
 ## 5. Overwriting Containerization & Cloud Deployment

@@ -82,6 +82,7 @@ For strict control over hardware and performance, SigmaOS binds itself to these 
 
 ### System & Kernel
 
+<<<<<<< HEAD
 - `sigma-shard reload <name>` → Hot-reload a shard without reboot.
 - `sigma-shard status <name>` → Dump real-time shard health and uptime via syscalls.
 - `sigma-shard dependency graph` → ASCII-visualize shard dependencies natively.
@@ -162,6 +163,88 @@ For strict control over hardware and performance, SigmaOS binds itself to these 
 - `sigma-ai persona import <file>` → Import persona parameters.
 - `sigma-ai predict <task>` → Request heuristic prediction for shard usage.
 - `sigma-ai orchestrate` → Surrender MLFQ scheduling to AI optimization vector.
+=======
+* `sigma-shard reload <name>` → Hot-reload a shard without reboot.
+* `sigma-shard status <name>` → Dump real-time shard health and uptime via syscalls.
+* `sigma-shard dependency graph` → ASCII-visualize shard dependencies natively.
+* `sigma-shard unload --idle` → Automatically purge unused shards from memory.
+* `sigma-shard migrate <target>` → Move shard execution to another node/container seamlessly.
+
+### UI & Desktop
+
+* `sigma-ui layout save <profile>` → Serialize custom workspace layout to binary.
+* `sigma-ui layout restore <profile>` → Restore saved layout natively.
+* `sigma-ui accessibility enable screen-reader` → Attach low-level TTS engine to DOM.
+* `sigma-ui accessibility enable magnifier` → Bind framebuffer scaling to cursor.
+* `sigma-ui notifications mute --duration 30m` → Disable UI interrupt vectors.
+* `sigma-ui persona switch <profile>` → Hot-swap UI persona without restarting compositor.
+
+### File & Storage
+
+* `sigma-file snapshot create <dir>` → Instant filesystem snapshot using B-Tree Delta Logging.
+* `sigma-file snapshot rollback <dir>` → Fast rollback to snapshot state.
+* `sigma-file deduplicate <dir>` → Unlink duplicate inodes instantly.
+* `sigma-file sync <src> <dest>` → Sync directories directly passing libc.
+* `sigma-file quota set <limit>` → Enforce absolute bare-metal storage limits.
+
+### Networking
+
+* `sigma-net profile save <name>` → Serialize network settings/rules as profile.
+* `sigma-net profile load <name>` → Inject saved profile into network stack.
+* `sigma-net firewall export rules` → Export Zero-Trust firewall rules.
+* `sigma-net firewall import rules` → Import Zero-Trust firewall rules.
+* `sigma-net latency test <host>` → Run TCP/ICMP latency diagnostics natively.
+* `sigma-net persona switch <profile>` → Apply persona-specific firewall/network routing.
+
+### Security
+
+* `sigma-sec audit persona <profile>` → Run security audit bounded purely to a persona.
+* `sigma-sec sandbox list` → List all apps trapped in the C11 sandbox.
+* `sigma-sec sandbox export <app>` → Export strict capability-bounding configs.
+* `sigma-sec password policy set <rules>` → Enforce rigorous string/entropy policies.
+* `sigma-sec intrusion detect` → Run kernel-space memory intrusion scan.
+
+### Performance
+
+* `sigma-perf benchmark cpu` → Run TSC hardware benchmarking.
+* `sigma-perf benchmark gpu` → Run memory-bandwidth benchmarking.
+* `sigma-perf optimize memory` → Auto-tune and defragment heap allocations.
+* `sigma-perf shard unload --low-priority` → Aggressive RAM scavenging.
+* `sigma-perf persona tune <profile>` → Bind CPU governor directly to persona.
+
+### Automation
+
+* `sigma-auto trigger <event>` → Bind custom C11 macros to OS state hooks.
+* `sigma-auto rollback <recipe>` → Discard latest automation recipe.
+* `sigma-auto export <recipe>` → Dump recipe into config file.
+* `sigma-auto import <recipe>` → Read recipe from config file.
+* `sigma-auto chain <task1> <task2>` → Queue asynchronous pipeline tasks.
+
+### Monitoring
+
+* `sigma-monitor alerts set <threshold>` → Bind TSC thresholds to alert interrupts.
+* `sigma-monitor alerts list` → List active threshold listeners.
+* `sigma-monitor export logs` → Compress and dump machine logs out of dmesg ring buffer.
+* `sigma-monitor visualize <metric>` → Generate native CLI ASCII graphs.
+* `sigma-monitor persona view <profile>` → Persona-isolated resource tracking.
+
+### Applications
+
+* `sigma-app sandbox <name>` → Force payload into a namespace sandbox.
+* `sigma-app export <name>` → Dump app's local memory data limits.
+* `sigma-app import <file>` → Register a pre-bounded sandboxed app.
+* `sigma-app rollback <name>` → Rollback app state using FS snapshots.
+* `sigma-app persona assign <profile>` → Tie an app’s privilege explicitly to a Persona.
+
+### AI & Personas
+
+* `sigma-ai persona create <name>` → Allocate a new machine persona struct.
+* `sigma-ai persona edit <name>` → Edit persona parameters.
+* `sigma-ai persona export <name>` → Export persona parameters.
+* `sigma-ai persona import <file>` → Import persona parameters.
+* `sigma-ai predict <task>` → Request heuristic prediction for shard usage.
+* `sigma-ai orchestrate` → Surrender MLFQ scheduling to AI optimization vector.
+>>>>>>> 99f2ef5 (chore: precise lint eradication via AST script algorithms)
 
 ---
 
@@ -169,6 +252,7 @@ For strict control over hardware and performance, SigmaOS binds itself to these 
 
 ### Resource Efficiency
 
+<<<<<<< HEAD
 - **Idle Shard Unloading:** Kernel daemon (via `SYS_NANOSLEEP`) sweeps memory to drop unaccessed execution shards.
 - **Deferred Service Start:** All non-critical network protocols halt until User-Persona handshakes successfully.
 - **Event-Driven Hooks:** Loading networking stack immediately spawns the security sandbox shard dynamically.
@@ -196,6 +280,35 @@ For strict control over hardware and performance, SigmaOS binds itself to these 
 - **Threshold Alerts:** Out of Memory triggers automatic warning messages straight to framebuffer.
 - **Automated Log Rotation:** Old memory pools are dumped and zero-wiped to prevent reverse engineering.
 - **Visual Dashboards:** The OmniShell provides living breathing charts constructed purely from ASCII and C11 loops.
+=======
+* **Idle Shard Unloading:** Kernel daemon (via `SYS_NANOSLEEP`) sweeps memory to drop unaccessed execution shards.
+* **Deferred Service Start:** All non-critical network protocols halt until User-Persona handshakes successfully.
+* **Event-Driven Hooks:** Loading networking stack immediately spawns the security sandbox shard dynamically.
+
+### Personalization
+
+* **Real-Time Persona Switching:** OS morphs from strict researcher mode during day, to low-latency gamer mode at night (CPU governors swapped directly).
+* **Adaptive Performance:** TSC readings dynamically scale `SYS_NICE` values on background shards.
+* **Predictive Prefetching:** Heuristics predict next app launches based on time and faults shards directly into RAM beforehand.
+
+### Customization
+
+* **Dynamic UI Profiles:** Window geometry changes natively upon switching context (Work vs Play).
+* **Accessibility Automation:** Hooking `sys_execve` to trigger `screen-reader` bounds when a text-heavy payload is executed.
+* **Notification Control:** Hardware interrupts routed directly to `/dev/null` during focus/gaming mode.
+
+### Security
+
+* **Persona-Aware Security Policies:** 'Researcher' runs all processes in strict namespaces. 'Gamer' runs with full bare-metal access for speed.
+* **Automated Audits:** Integrity checks execute in the background comparing hash trees against signed binaries.
+* **Self-Healing Shards:** Kernel panics trigger instant shard reload without pulling down `systemd` / PID 1.
+
+### Monitoring
+
+* **Threshold Alerts:** Out of Memory triggers automatic warning messages straight to framebuffer.
+* **Automated Log Rotation:** Old memory pools are dumped and zero-wiped to prevent reverse engineering.
+* **Visual Dashboards:** The OmniShell provides living breathing charts constructed purely from ASCII and C11 loops.
+>>>>>>> 99f2ef5 (chore: precise lint eradication via AST script algorithms)
 
 ---
 
@@ -222,6 +335,14 @@ For strict control over hardware and performance, SigmaOS binds itself to these 
 ---
 
 ## 🚀 4. Long-Term Vision
+<<<<<<< HEAD
+=======
+
+* **AI-Assisted OS Orchestration:** The OS MLFQ dynamically surrenders execution vectors to a specialized neural-net deciding shard loads.
+* **Cross-Device Persona Sync:** Personas and strict capability bounds replicate peer-to-peer across mesh hardware.
+* **Industrial Plugin Ecosystem:** Community shards written directly to ABI spec without dynamic wrapper layers.
+* **Distributed Collaborative AI:** Multiple specialized agents orchestrating OS internals iteratively as a hive-mind.
+>>>>>>> 99f2ef5 (chore: precise lint eradication via AST script algorithms)
 
 - **AI-Assisted OS Orchestration:** The OS MLFQ dynamically surrenders execution vectors to a specialized neural-net deciding shard loads.
 - **Cross-Device Persona Sync:** Personas and strict capability bounds replicate peer-to-peer across mesh hardware.
@@ -310,6 +431,7 @@ In the interest of fostering an open and welcoming environment, we as contributo
 
 Examples of behavior that contributes to creating a positive environment include:
 
+<<<<<<< HEAD
 - Using welcoming and inclusive language
 - Being respectful of differing viewpoints and experiences
 - Gracefully accepting constructive criticism
@@ -323,6 +445,21 @@ Examples of unacceptable behavior by participants include:
 - Public or private harassment
 - Publishing others' private information, such as a physical or electronic address, without explicit permission
 - Other conduct which could reasonably be considered inappropriate in a professional setting
+=======
+* Using welcoming and inclusive language
+* Being respectful of differing viewpoints and experiences
+* Gracefully accepting constructive criticism
+* Focusing on what is best for the community
+* Showing empathy towards other community members
+
+Examples of unacceptable behavior by participants include:
+
+* The use of sexualized language or imagery and unwelcome sexual attention or advances
+* Trolling, insulting/derogatory comments, and personal or political attacks
+* Public or private harassment
+* Publishing others' private information, such as a physical or electronic address, without explicit permission
+* Other conduct which could reasonably be considered inappropriate in a professional setting
+>>>>>>> 99f2ef5 (chore: precise lint eradication via AST script algorithms)
 
 ## Our Responsibilities
 
@@ -354,6 +491,7 @@ Thank you for contributing to the most advanced, scratch-made operating system i
 
 ## 🏛️ CONTRIBUTION PRINCIPLES
 
+<<<<<<< HEAD
 1. **Zero-Dependency**: Do not use `<stdio.h>`, `<stdlib.h>`, or any standard C/C++ library headers. Use `SovereignLibC.h` and its raw ASM sharding instead.
 2. **Silicon-Direct**: Prefer Assembly (`.asm`) and Pure C11 (`.c`) or no_std Rust for all core logic.
 3. **Autonomous Error Handling**: All new shards MUST hook into the **Sovereign-Sentinel** for automatic error resolution.
@@ -364,6 +502,18 @@ Thank you for contributing to the most advanced, scratch-made operating system i
 1. Familiarize yourself with `SovereignEntry.asm` (the raw entry point).
 2. Use `make zenith` to verify your environment.
 3. Pull requests must pass the **Sovereign-Sentinel Audit**.
+=======
+1.  **Zero-Dependency**: Do not use `<stdio.h>`, `<stdlib.h>`, or any standard C/C++ library headers. Use `SovereignLibC.h` and its raw ASM sharding instead.
+2.  **Silicon-Direct**: Prefer Assembly (`.asm`) and Pure C11 (`.c`) or no_std Rust for all core logic.
+3.  **Autonomous Error Handling**: All new shards MUST hook into the **Sovereign-Sentinel** for automatic error resolution.
+4.  **Ubuntu-Elite Grade UI**: Visual additions must conform to the **Yaru-Gold** design system in `index.css`.
+
+## 🚀 GETTING STARTED
+
+1.  Familiarize yourself with `SovereignEntry.asm` (the raw entry point).
+2.  Use `make zenith` to verify your environment.
+3.  Pull requests must pass the **Sovereign-Sentinel Audit**.
+>>>>>>> 99f2ef5 (chore: precise lint eradication via AST script algorithms)
 
 Σ SIGMAOS: THE DEFINITIVE SILICON ZENITH.
 
@@ -553,10 +703,17 @@ SigmaOS is the most secure operating system in the universe. It is built to ensu
 
 ## 🛡️ CORE SECURITY SHARDS
 
+<<<<<<< HEAD
 1. **Sovereign-Sentinel (Auto-Healing)**: An autonomous exception handler that intercepts CPU traps at the assembly level to resolve errors and perform silicon-rollback before a crash can leak state.
 2. **Silicon-Scrubbing (Zero-Leak)**: Every task switch and exit triggers `sigma_security_scrub_registers` and `sigma_security_scrub_stack`.
 3. **Amnesic-Session-Shard**: Native support for **"Amnesic" sessions** that leave zero trace in RAM or on disk. Managed via `SovereignAmnesicShard.c`.
 4. **Zero-Network Privacy**: All local activity is isolated behind the **Zero-Trust Handshake** of the **Sovereign-Net** shard.
+=======
+1.  **Sovereign-Sentinel (Auto-Healing)**: An autonomous exception handler that intercepts CPU traps at the assembly level to resolve errors and perform silicon-rollback before a crash can leak state.
+2.  **Silicon-Scrubbing (Zero-Leak)**: Every task switch and exit triggers `sigma_security_scrub_registers` and `sigma_security_scrub_stack`.
+3.  **Amnesic-Session-Shard**: Native support for **"Amnesic" sessions** that leave zero trace in RAM or on disk. Managed via `SovereignAmnesicShard.c`.
+4.  **Zero-Network Privacy**: All local activity is isolated behind the **Zero-Trust Handshake** of the **Sovereign-Net** shard.
+>>>>>>> 99f2ef5 (chore: precise lint eradication via AST script algorithms)
 
 ## 🚀 REPORTING VULNERABILITIES
 
@@ -726,6 +883,7 @@ Thank you for using SigmaOS! We are committed to providing the best support poss
 
 If you have questions, encounter issues, or need guidance on using SigmaOS, here are the official ways to get support:
 
+<<<<<<< HEAD
 1. **GitHub Issues**:
 
     - Before opening a new issue, please check existing issues to see if your question has been answered or if a solution is already being discussed.
@@ -741,6 +899,23 @@ If you have questions, encounter issues, or need guidance on using SigmaOS, here
         - [SECURITY.md](SECURITY.md)
 
 3. **Community & Discussions**:
+=======
+1.  **GitHub Issues**:
+
+    - Before opening a new issue, please check existing issues to see if your question has been answered or if a solution is already being discussed.
+    - For bugs, use the `Bug Report` template.
+    - For feature requests, use the `Feature Request` template.
+    - Link: [SigmaOS GitHub Issues](https://github.com/[REDACTED_AUTHOR]SinghSigmaSovereign09/SigmaOS/issues)
+
+2.  **Official Documentation**:
+
+    - Comprehensive guides and architectural insights are available in:
+        - [os_guide.md](os_guide.md)
+        - [AUTOMATION_ZENITH.md](AUTOMATION_ZENITH.md)
+        - [SECURITY.md](SECURITY.md)
+
+3.  **Community & Discussions**:
+>>>>>>> 99f2ef5 (chore: precise lint eradication via AST script algorithms)
 
     - Join our SigmaOS community discussions for real-time support and collaboration.
     - Link: [SigmaOS GitHub Discussions](https://github.com/[REDACTED_AUTHOR]SinghSigmaSovereign09/SigmaOS/discussions)
@@ -991,7 +1166,11 @@ SigmaOS aggressively rejects the monolithic "always-on" daemon model in favor of
 
 ### 1. The Shard Architecture Paradigm
 
+<<<<<<< HEAD
 - **Independent Modular APIs**: The kernel, UI (Direct-Canvas), network stack, and security isolators are compiled into disjointed shards.
+=======
+- **Independent Modular APIs**: The kernel, UI (Direct-Canvas), network stack, and security isolators are compiled into disjointed shards. 
+>>>>>>> 99f2ef5 (chore: precise lint eradication via AST script algorithms)
 - **Namespace Micro-Containers**: Shards run entirely in their own memory namespaces. Crashing a network shard does not crash the kernel; the OS natively self-heals by instantly `sigma-shard reload net` without requiring a hard reboot.
 - **Dynamic Micro-Libraries**: Replaces monolithic C++ abstractions. For instance, matrix-math logic needed for the Camera App loads strictly when the camera is requested, then instantly unloads to free cache lines.
 
@@ -1118,7 +1297,11 @@ There are virtually zero limitations for the SigmaOS architecture. By bridging s
 
 ## 🌌 THE ABSOLUTE OMNI-SHELL CATALOG: 100% GUI PARITY
 
+<<<<<<< HEAD
 Every graphical interaction in SigmaOS is fundamentally powered by an Omni-Shell command. There is zero functionality restricted to the GUI. The CLI possesses equivalent or vastly superior control mechanisms.
+=======
+Every graphical interaction in SigmaOS is fundamentally powered by an Omni-Shell command. There is zero functionality restricted to the GUI. The CLI possesses equivalent or vastly superior control mechanisms. 
+>>>>>>> 99f2ef5 (chore: precise lint eradication via AST script algorithms)
 
 Below is an expanded catalogue detailing the underlying Omni-Shell logic for graphical tasks, mathematical executions, hardware bridging, and orchestration:
 
@@ -1178,7 +1361,12 @@ Below is an expanded catalogue detailing the underlying Omni-Shell logic for gra
 
 ## 🔱 SIGMA OMNI-SHELL: MEGA CLI CATALOG (BATCH 2)
 
+<<<<<<< HEAD
 ### Zero GUI-Only Actions. 100% CLI Parity. Zero HLL Dependency
+=======
+
+### Zero GUI-Only Actions. 100% CLI Parity. Zero HLL Dependency.
+>>>>>>> 99f2ef5 (chore: precise lint eradication via AST script algorithms)
 
 ---
 
@@ -1402,7 +1590,12 @@ Below is an expanded catalogue detailing the underlying Omni-Shell logic for gra
 
 ## 🔱 SIGMA OMNI-SHELL: MEGA CLI CATALOG (BATCH 3)
 
+<<<<<<< HEAD
 ### Resolves all missing parity items from OS_MISSING_PARITY & suggestions. Zero HLL dependency enforced
+=======
+
+### Resolves all missing parity items from OS_MISSING_PARITY & suggestions. Zero HLL dependency enforced.
+>>>>>>> 99f2ef5 (chore: precise lint eradication via AST script algorithms)
 
 ---
 
@@ -1562,7 +1755,10 @@ The Omni-Shell IS the API surface of the entire operating system.
 
 ## 📌 QUICK NAVIGATION INDEX
 
+<<<<<<< HEAD
 >
+=======
+>>>>>>> 99f2ef5 (chore: precise lint eradication via AST script algorithms)
 > For previously separate documents, all content has been merged here:
 >
 > - **Missing Parity Content**: See section [SigmaOS vs. Industry Linux Distributions: Parity & Gap Analysis](#sigmaos-vs-industry-linux-distributions-parity--gap-analysis)
@@ -1573,6 +1769,10 @@ The Omni-Shell IS the API surface of the entire operating system.
 
 ## 🔱 SIGMA OMNI-SHELL: MEGA CLI CATALOG (BATCH 4)
 
+<<<<<<< HEAD
+=======
+
+>>>>>>> 99f2ef5 (chore: precise lint eradication via AST script algorithms)
 ### Extended Parity: Boot, Init, Containers, Virtualisation, Cloud & Indian Law
 
 ---
@@ -1705,8 +1905,18 @@ The Omni-Shell IS the API surface of the entire operating system.
 
 ---
 
+<<<<<<< HEAD
 **ZERO DEPENDENCY GUARANTEE:**
 Every command above is implemented purely via:
+=======
+**ZERO DEPENDENCY GUARANTEE:**  
+Every command above is implemented purely via:  
+
+- Raw `sys_*` syscalls (no libc wrappers)  
+- Custom C11 algorithms (no Python/NumPy/Pandas/sklearn)  
+- Native ASM math primitives in `SovereignMath.asm`  
+- Direct hardware register reads where applicable  
+>>>>>>> 99f2ef5 (chore: precise lint eradication via AST script algorithms)
 
 - Raw `sys_*` syscalls (no libc wrappers)
 - Custom C11 algorithms (no Python/NumPy/Pandas/sklearn)
@@ -1717,7 +1927,10 @@ Every command above is implemented purely via:
 
 ## ✅ COMPLETION: `---- OS_MISSING_PARITY.MD ----` SECTION (FULLY RESOLVED)
 
+<<<<<<< HEAD
 >
+=======
+>>>>>>> 99f2ef5 (chore: precise lint eradication via AST script algorithms)
 > All items from the original `OS_MISSING_PARITY.md` file are now implemented & verified.
 > GitHub anchor: `#----os_missing_paritymd----`
 
@@ -1773,7 +1986,10 @@ Every command above is implemented purely via:
 
 ## ✅ COMPLETION: `---- SUGGESTIONS.MD ----` SECTION (FULLY RESOLVED)
 
+<<<<<<< HEAD
 >
+=======
+>>>>>>> 99f2ef5 (chore: precise lint eradication via AST script algorithms)
 > All items from the original `suggestions.md` file are now implemented.
 > GitHub anchor: `#----suggestionsmd----`
 
@@ -1815,6 +2031,10 @@ Every command above is implemented purely via:
 
 ## 🔱 SIGMA OMNI-SHELL: MEGA CLI CATALOG (BATCH 5)
 
+<<<<<<< HEAD
+=======
+
+>>>>>>> 99f2ef5 (chore: precise lint eradication via AST script algorithms)
 ### Advanced I/O, Inter-Process, Scripting, Multi-Device Sync, Printing, Accessibility
 
 ---
@@ -1952,6 +2172,10 @@ Every command above is implemented purely via:
 
 ## 🔱 SIGMA OMNI-SHELL: MEGA CLI CATALOG (BATCH 6)
 
+<<<<<<< HEAD
+=======
+
+>>>>>>> 99f2ef5 (chore: precise lint eradication via AST script algorithms)
 ### Grouped by Functional Domain | Zero HLL | Pure C11 + ASM
 
 ---
@@ -2162,13 +2386,20 @@ Every command above is implemented purely via:
 
 ## 🔱 SIGMA OMNI-SHELL: MEGA CLI CATALOG (BATCH 7)
 
+<<<<<<< HEAD
+=======
+
+>>>>>>> 99f2ef5 (chore: precise lint eradication via AST script algorithms)
 ### Cross-OS Absorption: Windows + macOS + All Linux Distros → Native SigmaOS Parity
 
 ---
 
 ## 🪟 GROUP 9: WINDOWS OS PARITY (PowerShell + CMD + WinAPI)
 
+<<<<<<< HEAD
 >
+=======
+>>>>>>> 99f2ef5 (chore: precise lint eradication via AST script algorithms)
 > SigmaOS absorbs all Windows CLI capabilities, exposing them natively via Omni-Shell.
 
 | SigmaOS Command | Windows Equivalent | Working / Implementation |
@@ -2208,7 +2439,10 @@ Every command above is implemented purely via:
 
 ## 🍎 GROUP 10: macOS PARITY (Terminal + zsh + Cocoa APIs)
 
+<<<<<<< HEAD
 >
+=======
+>>>>>>> 99f2ef5 (chore: precise lint eradication via AST script algorithms)
 > SigmaOS natively mirrors all macOS CLI utilities.
 
 | SigmaOS Command | macOS Equivalent | Working / Implementation |
@@ -2428,6 +2662,10 @@ Every command above is implemented purely via:
 
 ## 🔱 SIGMA OMNI-SHELL: MEGA CLI CATALOG (BATCH 8)
 
+<<<<<<< HEAD
+=======
+
+>>>>>>> 99f2ef5 (chore: precise lint eradication via AST script algorithms)
 ### New Suggestions Absorbed: Version Control, HPC, Crypto, Voice, IoT, WASM, DB, Cross-Platform
 
 > All items in this batch originate from the `---- SUGGESTIONS.MD ----` extended roadmap.
@@ -2620,6 +2858,10 @@ Every command above is implemented purely via:
 
 ## 🔱 SIGMA OMNI-SHELL: MEGA CLI CATALOG (BATCH 9)
 
+<<<<<<< HEAD
+=======
+
+>>>>>>> 99f2ef5 (chore: precise lint eradication via AST script algorithms)
 ### Advanced System Automation, Monitoring & Persona Parity
 
 > This batch resolves missing GUI-CLI parity for advanced system interactions, integrating missing automation hooks, persona management, monitoring/benchmarking, UI accessibility, and file system enhancements (snapshots/deduplication).
@@ -2847,6 +3089,7 @@ For strict control over hardware and performance, SigmaOS binds itself to these 
 
 ### System & Kernel
 
+<<<<<<< HEAD
 - `sigma-shard reload <name>` → Hot-reload a shard without reboot.
 - `sigma-shard status <name>` → Dump real-time shard health and uptime via syscalls.
 - `sigma-shard dependency graph` → ASCII-visualize shard dependencies natively.
@@ -2927,6 +3170,88 @@ For strict control over hardware and performance, SigmaOS binds itself to these 
 - `sigma-ai persona import <file>` → Import persona parameters.
 - `sigma-ai predict <task>` → Request heuristic prediction for shard usage.
 - `sigma-ai orchestrate` → Surrender MLFQ scheduling to AI optimization vector.
+=======
+* `sigma-shard reload <name>` → Hot-reload a shard without reboot.
+* `sigma-shard status <name>` → Dump real-time shard health and uptime via syscalls.
+* `sigma-shard dependency graph` → ASCII-visualize shard dependencies natively.
+* `sigma-shard unload --idle` → Automatically purge unused shards from memory.
+* `sigma-shard migrate <target>` → Move shard execution to another node/container seamlessly.
+
+### UI & Desktop
+
+* `sigma-ui layout save <profile>` → Serialize custom workspace layout to binary.
+* `sigma-ui layout restore <profile>` → Restore saved layout natively.
+* `sigma-ui accessibility enable screen-reader` → Attach low-level TTS engine to DOM.
+* `sigma-ui accessibility enable magnifier` → Bind framebuffer scaling to cursor.
+* `sigma-ui notifications mute --duration 30m` → Disable UI interrupt vectors.
+* `sigma-ui persona switch <profile>` → Hot-swap UI persona without restarting compositor.
+
+### File & Storage
+
+* `sigma-file snapshot create <dir>` → Instant filesystem snapshot using B-Tree Delta Logging.
+* `sigma-file snapshot rollback <dir>` → Fast rollback to snapshot state.
+* `sigma-file deduplicate <dir>` → Unlink duplicate inodes instantly.
+* `sigma-file sync <src> <dest>` → Sync directories directly passing libc.
+* `sigma-file quota set <limit>` → Enforce absolute bare-metal storage limits.
+
+### Networking
+
+* `sigma-net profile save <name>` → Serialize network settings/rules as profile.
+* `sigma-net profile load <name>` → Inject saved profile into network stack.
+* `sigma-net firewall export rules` → Export Zero-Trust firewall rules.
+* `sigma-net firewall import rules` → Import Zero-Trust firewall rules.
+* `sigma-net latency test <host>` → Run TCP/ICMP latency diagnostics natively.
+* `sigma-net persona switch <profile>` → Apply persona-specific firewall/network routing.
+
+### Security
+
+* `sigma-sec audit persona <profile>` → Run security audit bounded purely to a persona.
+* `sigma-sec sandbox list` → List all apps trapped in the C11 sandbox.
+* `sigma-sec sandbox export <app>` → Export strict capability-bounding configs.
+* `sigma-sec password policy set <rules>` → Enforce rigorous string/entropy policies.
+* `sigma-sec intrusion detect` → Run kernel-space memory intrusion scan.
+
+### Performance
+
+* `sigma-perf benchmark cpu` → Run TSC hardware benchmarking.
+* `sigma-perf benchmark gpu` → Run memory-bandwidth benchmarking.
+* `sigma-perf optimize memory` → Auto-tune and defragment heap allocations.
+* `sigma-perf shard unload --low-priority` → Aggressive RAM scavenging.
+* `sigma-perf persona tune <profile>` → Bind CPU governor directly to persona.
+
+### Automation
+
+* `sigma-auto trigger <event>` → Bind custom C11 macros to OS state hooks.
+* `sigma-auto rollback <recipe>` → Discard latest automation recipe.
+* `sigma-auto export <recipe>` → Dump recipe into config file.
+* `sigma-auto import <recipe>` → Read recipe from config file.
+* `sigma-auto chain <task1> <task2>` → Queue asynchronous pipeline tasks.
+
+### Monitoring
+
+* `sigma-monitor alerts set <threshold>` → Bind TSC thresholds to alert interrupts.
+* `sigma-monitor alerts list` → List active threshold listeners.
+* `sigma-monitor export logs` → Compress and dump machine logs out of dmesg ring buffer.
+* `sigma-monitor visualize <metric>` → Generate native CLI ASCII graphs.
+* `sigma-monitor persona view <profile>` → Persona-isolated resource tracking.
+
+### Applications
+
+* `sigma-app sandbox <name>` → Force payload into a namespace sandbox.
+* `sigma-app export <name>` → Dump app's local memory data limits.
+* `sigma-app import <file>` → Register a pre-bounded sandboxed app.
+* `sigma-app rollback <name>` → Rollback app state using FS snapshots.
+* `sigma-app persona assign <profile>` → Tie an app’s privilege explicitly to a Persona.
+
+### AI & Personas
+
+* `sigma-ai persona create <name>` → Allocate a new machine persona struct.
+* `sigma-ai persona edit <name>` → Edit persona parameters.
+* `sigma-ai persona export <name>` → Export persona parameters.
+* `sigma-ai persona import <file>` → Import persona parameters.
+* `sigma-ai predict <task>` → Request heuristic prediction for shard usage.
+* `sigma-ai orchestrate` → Surrender MLFQ scheduling to AI optimization vector.
+>>>>>>> 99f2ef5 (chore: precise lint eradication via AST script algorithms)
 
 ---
 
@@ -2934,6 +3259,7 @@ For strict control over hardware and performance, SigmaOS binds itself to these 
 
 ### Resource Efficiency
 
+<<<<<<< HEAD
 - **Idle Shard Unloading:** Kernel daemon (via `SYS_NANOSLEEP`) sweeps memory to drop unaccessed execution shards.
 - **Deferred Service Start:** All non-critical network protocols halt until User-Persona handshakes successfully.
 - **Event-Driven Hooks:** Loading networking stack immediately spawns the security sandbox shard dynamically.
@@ -2961,6 +3287,35 @@ For strict control over hardware and performance, SigmaOS binds itself to these 
 - **Threshold Alerts:** Out of Memory triggers automatic warning messages straight to framebuffer.
 - **Automated Log Rotation:** Old memory pools are dumped and zero-wiped to prevent reverse engineering.
 - **Visual Dashboards:** The OmniShell provides living breathing charts constructed purely from ASCII and C11 loops.
+=======
+* **Idle Shard Unloading:** Kernel daemon (via `SYS_NANOSLEEP`) sweeps memory to drop unaccessed execution shards.
+* **Deferred Service Start:** All non-critical network protocols halt until User-Persona handshakes successfully.
+* **Event-Driven Hooks:** Loading networking stack immediately spawns the security sandbox shard dynamically.
+
+### Personalization
+
+* **Real-Time Persona Switching:** OS morphs from strict researcher mode during day, to low-latency gamer mode at night (CPU governors swapped directly).
+* **Adaptive Performance:** TSC readings dynamically scale `SYS_NICE` values on background shards.
+* **Predictive Prefetching:** Heuristics predict next app launches based on time and faults shards directly into RAM beforehand.
+
+### Customization
+
+* **Dynamic UI Profiles:** Window geometry changes natively upon switching context (Work vs Play).
+* **Accessibility Automation:** Hooking `sys_execve` to trigger `screen-reader` bounds when a text-heavy payload is executed.
+* **Notification Control:** Hardware interrupts routed directly to `/dev/null` during focus/gaming mode.
+
+### Security
+
+* **Persona-Aware Security Policies:** 'Researcher' runs all processes in strict namespaces. 'Gamer' runs with full bare-metal access for speed.
+* **Automated Audits:** Integrity checks execute in the background comparing hash trees against signed binaries.
+* **Self-Healing Shards:** Kernel panics trigger instant shard reload without pulling down `systemd` / PID 1.
+
+### Monitoring
+
+* **Threshold Alerts:** Out of Memory triggers automatic warning messages straight to framebuffer.
+* **Automated Log Rotation:** Old memory pools are dumped and zero-wiped to prevent reverse engineering.
+* **Visual Dashboards:** The OmniShell provides living breathing charts constructed purely from ASCII and C11 loops.
+>>>>>>> 99f2ef5 (chore: precise lint eradication via AST script algorithms)
 
 ---
 
@@ -2987,6 +3342,14 @@ For strict control over hardware and performance, SigmaOS binds itself to these 
 ---
 
 ## 🚀 4. Long-Term Vision
+<<<<<<< HEAD
+=======
+
+* **AI-Assisted OS Orchestration:** The OS MLFQ dynamically surrenders execution vectors to a specialized neural-net deciding shard loads.
+* **Cross-Device Persona Sync:** Personas and strict capability bounds replicate peer-to-peer across mesh hardware.
+* **Industrial Plugin Ecosystem:** Community shards written directly to ABI spec without dynamic wrapper layers.
+* **Distributed Collaborative AI:** Multiple specialized agents orchestrating OS internals iteratively as a hive-mind.
+>>>>>>> 99f2ef5 (chore: precise lint eradication via AST script algorithms)
 
 - **AI-Assisted OS Orchestration:** The OS MLFQ dynamically surrenders execution vectors to a specialized neural-net deciding shard loads.
 - **Cross-Device Persona Sync:** Personas and strict capability bounds replicate peer-to-peer across mesh hardware.
@@ -3032,7 +3395,11 @@ Every single system concept is multiplied by:
 `Snapshot & Rollback` → *Per file, per directory, per shard, per persona, per cluster.*
 This instantly transforms 1 static concept into a matrix of actionable architectural enhancements without bloating the C11 base.
 
+<<<<<<< HEAD
 ### The True Competitive Edge
+=======
+### The True Competitive Edge:
+>>>>>>> 99f2ef5 (chore: precise lint eradication via AST script algorithms)
 
 SigmaOS does not aim to recreate Ubuntu shell scripts. It targets **absolute persona awareness, memory-perfect shard modularity, AI-driven backend orchestration, and zero-dependency execution.**
 
@@ -3044,6 +3411,7 @@ SigmaOS requires a sprawling user-space ecosystem to match decades of Linux dist
 
 ### 1. System Utilities & Dev Tools
 
+<<<<<<< HEAD
 - **Missing Components**: Terminal Emulators, File Managers, Compilers (`gcc` equivalent), Container Tooling.
 - **Architecture Pipeline**: Core engines written in Pure C/C++ for absolute execution speed; Modern CLI daemons routed through Rust.
 
@@ -3061,13 +3429,37 @@ SigmaOS requires a sprawling user-space ecosystem to match decades of Linux dist
 
 - **Missing Components**: MAC frameworks (AppArmor equivalents), Mandatory Access Control, Encrypted Vaults.
 - **Architecture Pipeline**: C-based Kernel modules and Rust-based cryptographic orchestration.
+=======
+* **Missing Components**: Terminal Emulators, File Managers, Compilers (`gcc` equivalent), Container Tooling.
+* **Architecture Pipeline**: Core engines written in Pure C/C++ for absolute execution speed; Modern CLI daemons routed through Rust.
+
+### 2. Networking & Cloud Services
+
+* **Missing Components**: Network Config GUIs, VPN Integrations (WireGuard equivalents), Packet analyzers.
+* **Architecture Pipeline**: Raw network sockets managed in C11. Orchestration and configuration handlers managed in Go.
+
+### 3. Desktop Productivity & Multimedia
+
+* **Missing Components**: Office Suites, Remote Desktop Clients, Media Decoders, Web Browsers.
+* **Architecture Pipeline**: Framebuffer and decoding blocks in C++. GUI wrappers in Rust. Secure browser execution engines built directly upon the core sandbox.
+
+### 4. Zero-Trust Security Enforcement
+
+* **Missing Components**: MAC frameworks (AppArmor equivalents), Mandatory Access Control, Encrypted Vaults.
+* **Architecture Pipeline**: C-based Kernel modules and Rust-based cryptographic orchestration.
+>>>>>>> 99f2ef5 (chore: precise lint eradication via AST script algorithms)
 
 ### 5. Automated System Integration (AI-First)
 
 Unlike Linux Distros, SigmaOS treats AI as a foundational OS layer, not a tertiary app.
 
+<<<<<<< HEAD
 - **Missing Components**: Multi-model Orchestration Dashboard, AI-Assisted Shard Scheduler, AI-Anamoly IDSs.
 - **Architecture Pipeline**: The `sigma-ai distribute` framework is the vanguard. Subsequent AI models will interface over RPC in Go/Python directly bound to the C11 Shard Master.
+=======
+* **Missing Components**: Multi-model Orchestration Dashboard, AI-Assisted Shard Scheduler, AI-Anamoly IDSs.
+* **Architecture Pipeline**: The `sigma-ai distribute` framework is the vanguard. Subsequent AI models will interface over RPC in Go/Python directly bound to the C11 Shard Master.
+>>>>>>> 99f2ef5 (chore: precise lint eradication via AST script algorithms)
 
 ---
 
@@ -3084,6 +3476,14 @@ SigmaOS distinguishes itself from established software ecosystems natively:
 ---
 
 ## 💼 Investor Pitch Deck Outline
+<<<<<<< HEAD
+=======
+
+* **Problem**: Classical Linux fragmentation (DE, package managers, scaling constraints) and total lack of native AI hooks. Stale monolithic designs block context-dependent hardware optimization.
+* **Solution**: A C11 Shard-On-Demand architecture explicitly designed as an AI-augmented, context-aware environment.
+* **Advantage**: Ease of orchestration masked via an AI Shell, eliminating steep learning curves while dominating performance metrics with zero-dependency binaries.
+* **Vision Roadmap**: Stabilize Core C11 -> Deploy Rust-Sandboxed Daemons -> Integrate P2P Cloud Persona Sync -> Reach Total Market Decapitation against Legacy Systems.
+>>>>>>> 99f2ef5 (chore: precise lint eradication via AST script algorithms)
 
 - **Problem**: Classical Linux fragmentation (DE, package managers, scaling constraints) and total lack of native AI hooks. Stale monolithic designs block context-dependent hardware optimization.
 - **Solution**: A C11 Shard-On-Demand architecture explicitly designed as an AI-augmented, context-aware environment.
@@ -3121,6 +3521,7 @@ This document serves as the absolute authority on the architecture, built-in sha
 
 ### System & Infrastructure Shards
 
+<<<<<<< HEAD
 - **eBPF Sandbox (Linux Equivalent)**: Ring-0 verified byte-code sandbox visualization for testing low-level hooks.
 - **C-Groups Constraint Layer**: Hardware resource isolation engine enforcing CPU and Memory slice allocations.
 - **OOM-Killer (Out-Of-Memory Heuristics)**: Aggressive process-termination routines simulating extreme stress sacrifices.
@@ -3148,6 +3549,35 @@ This document serves as the absolute authority on the architecture, built-in sha
 - **Post-Quantum Finality (LWE Lattice)**: Crystal-lattice mapping canvas anticipating post-quantum cryptography standards.
 - **Bio-Informatics Genomics Tool**: Direct Needleman-Wunsch sequence alignment kernel operating locally over strings of DNA combinations.
 - **Macro Claw & Automation Desk**: Task execution matrix supporting custom scheduling delays over generic system routines.
+=======
+* **eBPF Sandbox (Linux Equivalent)**: Ring-0 verified byte-code sandbox visualization for testing low-level hooks.
+* **C-Groups Constraint Layer**: Hardware resource isolation engine enforcing CPU and Memory slice allocations.
+* **OOM-Killer (Out-Of-Memory Heuristics)**: Aggressive process-termination routines simulating extreme stress sacrifices.
+* **Time Delta (macOS Time Machine Eq)**: Incremental \`VFS\` block snapshotting and backup rendering.
+* **Qubes Bounds**: Strict threat isolation forcing strict compartmentalization between VM domains.
+
+### Networking & Forensics Shards
+
+* **Deep Router (Tails OS Eq)**: 3-Node packet obfuscation kernel mimicking onion routing patterns.
+* **Pen-Test Map (Kali OS Eq)**: Low-level Network Map Scanner to track port security vectors via the VFS.
+* **Justice Audit (BNSS Section 105)**: Legal compliance scanner validating videography shard metadata and forensic hashes of evidence.
+* **9P Network (Plan 9 Eq)**: Everything-Is-A-File interface mapping network nodes directly into the \`SigmaVFS\` ring.
+* **Amnesic Scrubber**: Deep forensic finality utility overwriting all VFS storage blocks with zeros.
+
+### Artificial Intelligence & Data Science
+
+* **Sovereign AI Lab & Transformer Shell**: Real-time gradient descent visualizations natively powered by silicon logic. Supports bit-perfect C11 kernels doing self-attention (\`Q x K^T\`).
+* **Data Science Charting**: Statistical analysis engine performing on-the-fly mean/variance calculation and generating precision histograms.
+* **Algorithm Complexity Viz**: "DSA Auditor" tracing the computational complexity (\`O(N log N)\` etc.) of various structural heaps and sort algorithms.
+* **Co-Work IPC (Agent Sandbox)**: Multi-agent collaboration bus for orchestrating multi-prompt/AI distribution locally.
+
+### Industrial, Math & Specialized Kernels
+
+* **HFT Oracle (High-Frequency Trading Desk)**: Zero-latency financial dashboard computing VWAP & market fluidity indices locally.
+* **Post-Quantum Finality (LWE Lattice)**: Crystal-lattice mapping canvas anticipating post-quantum cryptography standards.
+* **Bio-Informatics Genomics Tool**: Direct Needleman-Wunsch sequence alignment kernel operating locally over strings of DNA combinations.
+* **Macro Claw & Automation Desk**: Task execution matrix supporting custom scheduling delays over generic system routines.
+>>>>>>> 99f2ef5 (chore: precise lint eradication via AST script algorithms)
 
 ---
 
@@ -3312,16 +3742,27 @@ Instead of moving memory buffers to a garbage collector layer, the Amnesic Shard
 
 ### 2. Multi-Pass Zero Allocation
 
+<<<<<<< HEAD
 The core logic forces a silicon-tier value set operation containing only raw zeroes (`0x00`).
 
 - **Procedure Hook**: `executeAmnesicScrub()`
 - It implements `setInterval` timing controls, progressively incrementing across the sector space (RAM-Disk array blocks) mapped within the JS-Kernel boundary.
+=======
+The core logic forces a silicon-tier value set operation containing only raw zeroes (`0x00`). 
+
+* **Procedure Hook**: `executeAmnesicScrub()`
+* It implements `setInterval` timing controls, progressively incrementing across the sector space (RAM-Disk array blocks) mapped within the JS-Kernel boundary.
+>>>>>>> 99f2ef5 (chore: precise lint eradication via AST script algorithms)
 
 ### 3. Absolute Persistence Eradication
 
 Once the zeroing passes conclude, the `window.SIGMA.vfs.fs` dictionary structure is reassigned to absolute `{}` nullity.
 
+<<<<<<< HEAD
 - **Zero-Simulation**: Real data is irreversibly overwritten. No backup nodes, no cloud recoveries. Total sovereignty.
+=======
+* **Zero-Simulation**: Real data is irreversibly overwritten. No backup nodes, no cloud recoveries. Total sovereignty.
+>>>>>>> 99f2ef5 (chore: precise lint eradication via AST script algorithms)
 
 ---
 **Σ SIGMAOS: NO FOOTPRINT. FORENSIC FINALITY. AMNESIC PRIVACY.**
@@ -3571,6 +4012,7 @@ In pursuit of **Absolute Silicon Sovereignty**, SigmaOS Zenith operates entirely
 
 ### 1. `sigma_pow(float base, int exp)`
 
+<<<<<<< HEAD
 - **Purpose**: Replaces standard exponentiation functions, ensuring local predictability.
 - **Procedure**: A deterministic loop calculating $base^{exp}$ via repetitive multiplication.
 - **Time Complexity**: $O(E)$ where $E$ is the exponent magnitude.
@@ -3585,11 +4027,31 @@ In pursuit of **Absolute Silicon Sovereignty**, SigmaOS Zenith operates entirely
 
 - **Location**: `kernel/shards/SovereignAI.c`
 - **Procedure Algorithm**:
+=======
+* **Purpose**: Replaces standard exponentiation functions, ensuring local predictability.
+* **Procedure**: A deterministic loop calculating $base^{exp}$ via repetitive multiplication.
+* **Time Complexity**: $O(E)$ where $E$ is the exponent magnitude.
+* **Space Complexity**: $O(1)$, strictly scalar scalar operations utilizing raw CPU registers.
+
+### 2. `sigma_abs(float x)`
+
+* **Purpose**: Absolute value extraction utilized heavily in linear algebra loss functions and matrix deviations.
+* **Procedure**: Inlined ternary operator `(x < 0) ? -x : x;` guaranteeing conditional jump optimization by the underlying C compiler rather than calling external C-runtime routines.
+
+### 3. Gradient Descent Regression Procedure
+
+* **Location**: `kernel/shards/SovereignAI.c`
+* **Procedure Algorithm**: 
+>>>>>>> 99f2ef5 (chore: precise lint eradication via AST script algorithms)
     1. Initializes `dw` (Weight Derivative) and `db` (Bias Derivative) to 0.
     2. Summates predictive error over $N$ localized data points: `pred = (w * x) + b`.
     3. Normalizes updates utilizing the predefined alpha `(dw / n) * alpha`.
 
+<<<<<<< HEAD
 - **USP**: Bypasses Python/NumPy execution overhead, achieving pure silicon speed for inference scaling.
+=======
+* **USP**: Bypasses Python/NumPy execution overhead, achieving pure silicon speed for inference scaling.
+>>>>>>> 99f2ef5 (chore: precise lint eradication via AST script algorithms)
 
 ---
 **Σ SIGMAOS: RAW REGISTERS. ZERO OVERHEAD. ABSOLUTE PRECISION.**
@@ -3639,6 +4101,7 @@ In pursuit of **Absolute Silicon Sovereignty**, SigmaOS Zenith operates entirely
 
 ## 🧬 Needleman-Wunsch Global Alignment (`bioshard`)
 
+<<<<<<< HEAD
 - **Procedure**: Dynamic programming algorithm for scoring string alignment in bioinformatics.
 - **Application**: DNA sequence tracking matching the exact characters of strings without calling Regex.
 - **Space**: Configured for local bounded length arrays to eliminate heap allocation tracking (No `malloc()`).
@@ -3659,6 +4122,28 @@ In pursuit of **Absolute Silicon Sovereignty**, SigmaOS Zenith operates entirely
 
 - **Procedure**: A pure implementation of recursive array division utilizing the `sigma_partition()` sub-routine.
 - **Usage**: Fully replaces `qsort()`, placing boundary controls correctly outside system-level vulnerabilities like buffer overflow exploitation often found in outdated SDKs.
+=======
+* **Procedure**: Dynamic programming algorithm for scoring string alignment in bioinformatics.
+* **Application**: DNA sequence tracking matching the exact characters of strings without calling Regex.
+* **Space**: Configured for local bounded length arrays to eliminate heap allocation tracking (No `malloc()`).
+
+## 📊 Volume-Weighted Average Price (VWAP) (`hftshard`)
+
+* **Procedure**: Aggregates market prices multiplied by transacted volume over sequential intervals.
+* **Formula**: $\text{VWAP} = \frac{\sum(\text{Price} \times \text{Volume})}{\sum(\text{Volume})}$
+* **Execution**: Zero-latency loop using native float multipliers (`kernel/shards/SovereignHFT.c`).
+
+## 🧠 Transformer Self-Attention Scoring (`llmshard`)
+
+* **Procedure**: Calculates dot-products between Query ($Q$) and Key Transpose ($K^T$) matrices.
+* **Time Complexity**: $O(N^2 \cdot D)$; $N$ is sequence length, $D$ is embedding dimension.
+* **Execution**: Employs raw nested `for` loops within the kernel. Avoiding BLAS or cuBLAS ensures that the primitive transformer block is fundamentally owned by your silicon, completely disentangled from major corporate SDKs.
+
+## 🔄 In-Place Quicksort (`dsashard`)
+
+* **Procedure**: A pure implementation of recursive array division utilizing the `sigma_partition()` sub-routine.
+* **Usage**: Fully replaces `qsort()`, placing boundary controls correctly outside system-level vulnerabilities like buffer overflow exploitation often found in outdated SDKs.
+>>>>>>> 99f2ef5 (chore: precise lint eradication via AST script algorithms)
 
 ---
 **Σ SIGMAOS: YOUR KERNEL. YOUR ALGORITHMS. FULL SOVEREIGNTY.**
