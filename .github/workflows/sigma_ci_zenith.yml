@@ -1,0 +1,19 @@
+name: Σ SigmaOS Sovereign CI Zenith (v21.0)
+
+on: [push, pull_request]
+
+jobs:
+  sigma_audit:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Sovereign Shards
+        uses: actions/checkout@v4
+      - name: Install Industrial Toolchain
+        run: sudo apt-get update && sudo apt-get install -y nasm g++-12 make
+      - name: Pulse Bit-Perfect Audit
+        run: |
+          echo 'Σ [CI-ZENITH]: Commencing Bit-Perfect Shard Audit (v94.0)...'
+          make verify
+          make zenith
+          echo 'Σ [CI-ZENITH]: Integrity: 100%. Sovereignty: SECURED.'
+          echo 'Σ [CI-ZENITH]: OS Build SUCCESS.'
