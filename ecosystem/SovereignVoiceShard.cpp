@@ -46,7 +46,7 @@ public:
 
 // Concrete implementation for Windows-based HID Bridge
 #ifdef _WIN32
-#include <windows.h>
+#include "../libc/SovereignLibC.h"
 class WindowsHIDBridge : public IHIDBridge {
 public:
     void InjectText(const const char*& text) override {
@@ -131,4 +131,5 @@ int main() {
     
     return 0;
 }
+
 

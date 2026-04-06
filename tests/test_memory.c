@@ -12,7 +12,7 @@
 
 #include "../libc/sigma_types.h"
 #include "../libc/SovereignLibC.h"
-#include <assert.h>
+#include "../libc/SovereignLibC.h"
 
 /* ---- Minimal test harness ---- */
 static int g_passed = 0;
@@ -228,5 +228,6 @@ int main(void) {
 
     return (g_failed == 0) ? 0 : 1;
 }
+
 
 

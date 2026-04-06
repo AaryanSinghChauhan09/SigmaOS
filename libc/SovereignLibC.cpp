@@ -1,5 +1,5 @@
 #include "SovereignLibC.h"
-#include <stdarg.h>
+// stdarg parity in Sovereign Zenith
 
 // --- sigma_print ---
 void sigma_print(const char* str) {
@@ -196,3 +196,4 @@ void sigma_free(void* ptr) {
     // In this zero-latency shard, we do not reclaim small blocks yet.
     // Genuine SigmaOS memory management is per-process shard cleanup.
 }
+

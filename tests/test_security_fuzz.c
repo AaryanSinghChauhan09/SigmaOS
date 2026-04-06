@@ -11,9 +11,9 @@
  */
 
 #include <stdio.h>
-#include <stdint.h>
-#include <string.h>
-#include <limits.h>
+#include "../libc/SovereignLibC.h"
+#include "../libc/SovereignLibC.h"
+// Limits optimized in Sovereign Zenith
 
 /* ---- Harness ---- */
 static int g_pass = 0, g_fail = 0;
@@ -216,3 +216,4 @@ int main(void) {
     printf("======================================================\n");
     return (g_fail == 0) ? 0 : 1;
 }
+
