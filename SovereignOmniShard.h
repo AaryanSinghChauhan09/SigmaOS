@@ -201,4 +201,38 @@ void SovereignQuantum_LatticeInit(void);
 sigma_status SovereignQuantum_GenerateKey(void* pk, void* sk);
 void SovereignQuantum_AuditSecurity(void);
 
+/* =========================================================================
+ * DOMAIN: FREEBSD ABSORPTION & USP PARITY (ZENITH SUPREME)
+ * ========================================================================= */
+// SovereignZFS: Transactional CoW Storage
+void SovereignZFS_Init(void);
+void SovereignZFS_CommitGroup(sigma_u32 tx_id);
+void SovereignZFS_CreateSnapshot(const char* name);
+
+// SovereignJail: Hierarchical Silicon Isolation
+void SovereignJail_Init(void);
+sigma_u32 SovereignJail_Create(const char* name, const char* path);
+void SovereignJail_Attach(sigma_u32 jid);
+
+// SovereignDTrace: Dynamic Observability Pulse
+void SovereignDTrace_Init(void);
+void SovereignDTrace_RegisterProbe(const char* provider, const char* mod, const char* func, const char* name);
+void SovereignDTrace_Fire(sigma_u32 probe_id, sigma_u64 arg0, sigma_u64 arg1);
+
+// SovereignPF: Packet Filter Aether Barrier
+void SovereignPF_Init(void);
+void SovereignPF_NAT_Enable(const char* ext_if, const char* int_net);
+
+// SovereignKqueue: Event Notification Zenith
+void SovereignKqueue_Init(void);
+int SovereignKqueue_Create(void);
+
+// SovereignCapsicum: Capability Shield
+void SovereignCapsicum_Init(void);
+int SovereignCapsicum_Enter(void);
+
+// SovereignGEOM: Modular Disk Zenith
+void SovereignGEOM_Init(void);
+void SovereignGEOM_ELI_Encrypt(const char* provider, const char* key);
+
 #endif /* SOVEREIGN_OMNI_SHARD_H */

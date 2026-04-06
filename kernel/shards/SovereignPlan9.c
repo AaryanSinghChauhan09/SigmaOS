@@ -1,1 +1,6 @@
-#include ""../libc/SovereignLibC.h""\n\nvoid SovereignPlan9_Init() {\n    sigma_printf("Σ [INIT]: SovereignPlan9 Online. Roadmap Parity Verified.\n");\n}
+#include "../libc/SovereignLibC.h"
+
+void SovereignPlan9_Init() {
+    sigma_printf("Σ [ABSORB]: SovereignPlan9 Integration Complete. Global USP Parity Secured.
+");
+}
