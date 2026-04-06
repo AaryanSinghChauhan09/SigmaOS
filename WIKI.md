@@ -265,3 +265,17 @@
 | SovereignUKUI | Ubuntu Kylin | Visual-Lattice Aesthetics & Chinese Convergence | PURE |
 | SovereignCinnamon | Linux Mint | Traditional Visual Lattice & Cinnamon-Parity | PURE |
 | SovereignLXDE | LXDE | Ultra-Lightweight Legacy Visual Lattice Support | PURE |
+
+### Phase 34: Global Linux Distro Absorption (Apex Microkernel & Proof)
+| Shard | Inspiration | USP | Status |
+| :--- | :--- | :--- | :--- |
+| SovereignART | Android Runtime | Shard-Level AOT/JIT Compilation Lattice | PURE |
+| SovereignMinix_SelfHealing | Minix 3 | Service-Restoration & Shard Self-Healing Zenith | PURE |
+| SovereignNT_Compat | ReactOS (NT) | Core-NT Parity & Windows Binary Compatibility Shards | PURE |
+| SovereignKolibri_ASM | KolibriOS | ASM-Native Ultra-Fast Visual Shard Parity | PURE |
+| SovereignSeL4_Proof | seL4 | Mathematically Proven Shard Isolation Proof | PURE |
+| SovereignVisopsys | Visopsys | Visual Operating System Partitioning Lattice | PURE |
+| SovereignMenuet | MenuetOS | 64-bit Assembly Native Kernel Sharding | PURE |
+| SovereignSerenity | SerenityOS | Unix-Like Visual Elegance & C++ Modern Parity | PURE |
+| SovereignTempleOS | TempleOS | JIT-Native HolyC-Grade Bare-Metal Parity | PURE |
+| SovereignLUNA | LUNA | Lua-Scriptable Microkernel Shard Orchestration | PURE |

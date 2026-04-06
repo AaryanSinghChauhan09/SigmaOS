@@ -160,4 +160,16 @@ void SovereignUKUI_Init(void);
 void SovereignCinnamon_Init(void);
 void SovereignLXDE_Init(void);
 
+// --- Phase 34 Global Distro Absorption (Apex Microkernel & Proof) ---
+void SovereignART_Init(void);
+void SovereignMinix_SelfHealing_Init(void);
+void SovereignNT_Compat_Init(void);
+void SovereignKolibri_ASM_Init(void);
+void SovereignSeL4_Proof_Init(void);
+void SovereignVisopsys_Init(void);
+void SovereignMenuet_Init(void);
+void SovereignSerenity_Init(void);
+void SovereignTempleOS_Init(void);
+void SovereignLUNA_Init(void);
+
 #endif /* SOVEREIGN_OMNI_SHARD_H */
