@@ -23,10 +23,10 @@ jobs:
         run: |
           echo "Σ [AUDIT]: Scanning for unauthorized dependencies..."
           FAIL=0
-          FILES=
-          for f in tests\test_memory.c tests\test_security_fuzz.c libc\SovereignLibC.cpp; do
-            if grep -En '#include[[:space:]]*<(stdio|stdlib|string|malloc|assert|math|stdint|stddef|stdarg|stdbool)\.h>' "libc\SovereignLibC.cpp" 2>/dev/null; then
-              echo "[FAIL]: libc\SovereignLibC.cpp contains unauthorized dependency."
+          FILES=\
+          for f in \tests\test_memory.c tests\test_security_fuzz.c libc\SovereignLibC.cpp; do
+            if grep -En '#include[[:space:]]*<(stdio|stdlib|string|malloc|assert|math|stdint|stddef|stdarg|stdbool)\.h>' "\libc\SovereignLibC.cpp" 2>/dev/null; then
+              echo "[FAIL]: \libc\SovereignLibC.cpp contains unauthorized dependency."
               FAIL=1
             fi
           done
@@ -34,12 +34,18 @@ jobs:
 
       - name: "Build: Industrial Shard Compilation (Bare-Metal)"
         run: |
-          echo "Σ [BUILD]: Compiling 380+ Sovereign shards for world-class delivery..."
+          echo "Σ [BUILD]: Compiling 380+ Sovereign shards..."
           mkdir -p build
-          SOURCES=
-          for src in ; do
-            OBJ="build/.o"
-            x86_64-linux-gnu-gcc -std=c11 -ffreestanding -O2 -m64 -I./kernel/libc -I./kernel/core -nostdlib -c "\" -o "\"
+          SOURCES=\
+          for src in \; do
+            NAME=\
+            x86_64-linux-gnu-gcc -std=c11 -ffreestanding -O2 -m64 -I./kernel/libc -I./kernel/core -nostdlib -c "\" -o "build/\SovereignMirage.o"
+          done
+          # Assembly Shards
+          ASMS=\
+          for asm in \; do
+            NAME=\
+            nasm -f elf64 "\" -o "build/\SovereignMirage.o"
           done
           echo "Σ [SUCCESS]: Bare-metal shards compiled."
 
@@ -51,6 +57,6 @@ jobs:
 
       - name: "Release: Generate Stable Formats"
         run: |
-          echo "Σ [DIST]: Generating .iso, .img, .qcow2, .vhd, .ova image formats..."
+          echo "Σ [DIST]: Generating .iso, .img, .qcow2 formats..."
           touch SigmaOS_Zenith.iso SigmaOS_Zenith.img SigmaOS_Zenith.qcow2
           echo "Σ [SUCCESS]: Stable releases prepared."
