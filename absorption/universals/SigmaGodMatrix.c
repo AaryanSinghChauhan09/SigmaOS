@@ -1,4 +1,4 @@
-#include "../include/SigmaC11.h"
+#include "../../SigmaC11.h"
 
 // =========================================================================================
 // Σ THE SIGMA GOD-MATRIX (Omni-Absorber Engine)
@@ -56,9 +56,9 @@ int main(int argc, char* argv[]) {
         return 0;
     }
     
-    if (sigma_strcmp(argv[1], "--activate") == 0) {
+    if (sigma_compare(argv[1], "--activate") == 0) {
         activate_all_absorbed_shards();
-    } else if (sigma_strcmp(argv[1], "--absorb") == 0 && argc >= 3) {
+    } else if (sigma_compare(argv[1], "--absorb") == 0 && argc >= 3) {
         assimilate_competitor_stack(argv[2]);
     } else {
         sigma_print("[GOD-MATRIX] Invalid instruction. The Matrix requires absolute commands.\n");

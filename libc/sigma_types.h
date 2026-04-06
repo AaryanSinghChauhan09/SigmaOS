@@ -38,8 +38,11 @@ typedef sigma_u8           sigma_bool;
 #define SIGMA_TRUE  ((sigma_bool)1)
 #define SIGMA_FALSE ((sigma_bool)0)
 
-/* Null pointer (avoids ((void*)0) everywhere). */
-#define SIGMA_NULL nullptr
+/* Null pointer. */
+#define SIGMA_NULL ((void*)0)
+
+/* General status codes. */
+#define SIGMA_ERROR ((sigma_err_t)-1)
 
 /* Compile-time array size helper. */
 #define SIGMA_ARRAY_SIZE(arr) (sizeof(arr) / sizeof((arr)[0]))
@@ -114,8 +117,3 @@ typedef char* sigma_va_list;
 #endif
 
 #endif /* SIGMAOS_SIGMA_TYPES_H */
-
-
-
-
-

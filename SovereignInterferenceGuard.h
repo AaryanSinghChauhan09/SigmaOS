@@ -2,7 +2,8 @@
 #define SOVEREIGN_INTERFERENCE_GUARD_H
 
 #include "SigmaC11.h"
-#include "SovereignLibC.h"
+#include "libc/SovereignLibC.h"
+#include "include/SigmaOOP.hpp"
 
 namespace SigmaOS {
 namespace Safety {
@@ -11,7 +12,7 @@ namespace Safety {
  * @brief Sovereign-Interference-Guard (SIG)
  * Ensures that SigmaOS does not interfere with the performance, data, or operation of other installed OSs.
  */
-class SovereignInterferenceGuard : public SigmaObject {
+class SovereignInterferenceGuard : public SigmaOS::SigmaObject {
 public:
     const char* type_name() const noexcept override { return "SovereignInterferenceGuard"; }
 

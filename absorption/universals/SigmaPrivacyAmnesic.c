@@ -7,7 +7,8 @@
  * =========================================================================
  */
 
-#include "../../kernel/SovereignOmniShard.h"
+
+#include "../../libc/SovereignLibC.h"
 
 /**
  * Σ Sovereign Amnesia
@@ -20,7 +21,7 @@ void SovereignAmnesiaPurge(int level) {
     // 2. Clear VFS transient shards
     // 3. Flush hardware TLB (if kernel-level)
     
-    printf("Σ [SUCCESS]: System state is now AMNESIC. No transient data remaining.\n");
+    sigma_printf("Σ [SUCCESS]: System state is now AMNESIC. No transient data remaining.\n");
 }
 
 /**
