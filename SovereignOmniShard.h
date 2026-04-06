@@ -134,4 +134,17 @@ void SovereignPamac_Init(void);
 void SovereignClear_Init(void);
 void SovereignQiana_Init(void);
 
+// --- Phase 32 Global Distro Absorption (Apex Privacy & Portability) ---
+void SovereignTails_Init(void);
+void SovereignKodachi_Init(void);
+void SovereignSeptor_Init(void);
+void SovereignChimera_Init(void);
+void SovereignLakka_Init(void);
+void SovereignBatocera_Init(void);
+void SovereignRecalbox_Init(void);
+void SovereignEndless_Init(void);
+void SovereignVoyager_Init(void);
+void SovereignMakulu_Init(void);
+void SovereignFeren_Init(void);
+
 #endif /* SOVEREIGN_OMNI_SHARD_H */
