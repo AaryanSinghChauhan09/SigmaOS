@@ -1,40 +1,119 @@
-# CONTRIBUTING TO Σ SIGMAOS: SOVEREIGN ZENITH 🛡️
+# Σ SIGMAOS: Contributor Guidelines
 
-First of all, thank you for considering contributing to SigmaOS. We are building the world's most performant, zero-dependency, and industrial-grade operating system monolith. Your help is mission-critical!
+> **Sovereign Protocol**: Every contribution must arrive with a test. No test, no merge.
 
-When contributing to this repository, please first discuss the change you wish to make via an issue, email, or any other method with the owners of this repository before making a change.
+## 🧪 Test Requirements
 
-Please note we have a [Code of Conduct](./CODE_OF_CONDUCT.md), please follow it in all your interactions with the project.
+All PRs **must** include:
 
-## Pull Request Process 🌌
+| Type | Requirement |
+|------|-------------|
+| New shard/feature | Unit test in `tests/test_<feature>.c` |
+| Bug fix | Regression test that reproduces the bug before fix |
+| Security change | Entry in `tests/test_security_fuzz.c` |
+| API change | Updated integration test in `tests/test_integration.c` |
+| CI/CD change | Dry-run validation in `.github/workflows/` |
 
-1. Ensure any install or build dependencies are removed before the end of the layer when doing a build.
-2. Update the `README.md` with details of changes to the interface, this includes new environment variables, exposed ports, useful file locations and container parameters.
-3. Increase the version numbers in any relevant files and the `README.md` to the new version that this Pull Request would represent.
-4. You may merge the Pull Request after it has been reviewed and signed off by at least two other maintainers. If you do not have permission to do so, a maintainer will merge it for you.
+## 🗂️ Test Directory Structure
 
-## Development Standards 🛡️
+```text
+tests/
+├── test_scheduler.c       # Unit: scheduler (MLFQ, preemption, zombie reap)
+├── test_integration.c     # Integration: shard-to-shard interactions
+├── test_security_fuzz.c   # Security: fuzzing, injection, privilege escalation
+├── test_memory.c          # Memory: allocation, pressure, boundary
+└── test_automations_dry.sh# Automation: script syntax dry-run
+```
 
-* **Zero-Dependency**: No external headers or libraries. Use `sigma_kernel_types.h` and the defined silicon-direct primitives.
-* **Pure x86_64**: Ensure all assembly is for 64-bit Long Mode.
-* **Safety First**: Use **B6 Sovereign Stack Canaries** and **NMA Isolation** for all new shards.
-* **Performance Purity**: Use the provided benchmarking shards to ensure your code is at least 25% more efficient than standard OS counterparts.
+## 🏃 Running Tests Locally
 
-## Bug Reports 🛡️
+```bash
+# Compile and run all tests
+make test
 
-We use GitHub Issues to track public bugs. Report a bug by [opening a new issue](https://github.com/AaryanSinghChauhan09/SigmaOS/issues/new).
+# Or individually:
+gcc -std=c11 -O2 -Wall -o build/test-scheduler     tests/test_scheduler.c
+gcc -std=c11 -O2 -Wall -o build/test-integration   tests/test_integration.c
+gcc -std=c11 -O2 -Wall -o build/test-security-fuzz tests/test_security_fuzz.c
 
-**A great bug report includes:**
+./build/test-scheduler
+./build/test-integration
+./build/test-security-fuzz
+```
 
-* A quick summary and/or background
-* Steps to reproduce
-* What you expected would happen
-* What actually happens
-* Notes (possibly including why you think this might be happening, or stuff you tried that didn't work)
+## 🔬 Test Writing Standards
 
-## License 🌌
+### 1. Self-Contained
 
-By contributing to SigmaOS, you agree that your contributions will be licensed under its license.
+Tests must compile with **only** standard C11 headers (`stdio.h`, `stdint.h`, `string.h`).
+Never include `kernel/` headers that require freestanding/bare-metal environments.
+
+### 2. Use the Sovereign Test Macro
+
+```c
+#define SIGMA_TEST(name, cond) do { \
+    if (cond) { printf("  [PASS] %s\n", name); g_passed++; } \
+    else { printf("  [FAIL] %s  (line %d)\n", name, __LINE__); g_failed++; } \
+} while(0)
+```
+
+### 3. Group Tests by Domain
+
+```c
+static void test_group_name(void) {
+    printf("\n[GROUP] Description\n");
+    sched_reset();  // Always reset state before each group
+    SIGMA_TEST("test case description", condition);
+}
+```
+
+### 4. Return Correct Exit Code
+
+```c
+int main(void) {
+    // ... run groups ...
+    return (g_failed == 0) ? 0 : 1;  // CI relies on exit code
+}
+```
+
+## ⚙️ CI/CD Pipeline
+
+Every push triggers:
+
+| Pipeline | File | Scope |
+|----------|------|-------|
+| Zenith CI/CD | `sigma_zenith_ci.yml` | Full build, unit tests, multi-arch |
+| Security Inspections | `sigmaos_security_inspections.yml` | Secret/unsafe function/shell audits |
+| Sovereign Master | `sigmaos_sovereign_master.yml` | Benchmark, static analysis |
+| Nightly Stress | `sigma_nightly_stress.yml` | Chaos, ASAN, perf (00:00 UTC) |
+
+## 🔒 Security Testing Requirements
+
+Security-impacting changes require:
+
+- A new test case in `test_security_fuzz.c`
+- Entry in the Sovereign Security Checklist:
+  - No use of `gets`, `strcpy`, `strcat`, `sprintf`
+  - All pointers NULL-checked before use
+  - All string operations length-bounded
+  - No hardcoded credentials or tokens
+
+## 📏 Code Style
+
+- **Standard**: C11 (`-std=c11`)
+- **Warnings**: All code must compile clean under `-Wall -Wextra`
+- **Memory**: No dynamic allocation in kernel shards (`malloc` forbidden — use sigma_libc)
+- **Naming**: `snake_case` for functions, `UPPER_CASE` for macros, `PascalCase` for types
+
+## 🔃 PR Checklist
+
+- [ ] Tests compile with `gcc -std=c11 -O2 -Wall`
+- [ ] All existing tests still pass (`./build/test-*`)
+- [ ] New feature has a corresponding test group
+- [ ] No hardcoded secrets or credentials
+- [ ] No forbidden C functions (`gets`, `strcpy`, etc.)
+- [ ] README updated if API surface changed
 
 ---
-**SigmaOS Zenith. Pure Performance. Absolute Sovereignty.**
+
+**Σ SIGMAOS**: Sovereign by design. Verified by test. Deployed with zero compromise.
