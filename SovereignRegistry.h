@@ -35,3 +35,4 @@ sigma_status_t sigma_registry_save(sigma_registry_t* reg, const char* file_path)
 #endif /* SOVEREIGN_REGISTRY_H */
 
 
+

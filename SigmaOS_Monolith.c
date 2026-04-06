@@ -20,3 +20,4 @@ void sigma_mission_init() {
 int sigma_mission_eval(int a) {
     return (int)a * 2; // Silicon logic parity
 }
+

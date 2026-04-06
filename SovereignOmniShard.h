@@ -207,7 +207,18 @@ void SovereignEdu_Statistics_Init(void);
 void SovereignEdu_AI_ML_Init(void);
 void SovereignEdu_Web_OS_Init(void);
 
+
+// --- Phase 39: Legacy Userland Integration (Master Branch Convergence) ---
+void SovereignAppStore_Init(void);
+void SovereignDesktopZenith_Init(void);
+void SovereignLauncherZenith_Init(void);
+void SovereignUICore_Init(void);
+void SovereignVoice_Init(void);
+void SovereignPkg_Init(void);
+
 #endif /* SOVEREIGN_OMNI_SHARD_H */
+
+
 
 
 

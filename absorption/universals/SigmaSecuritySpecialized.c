@@ -21,3 +21,4 @@ void sigma_shard_forensic_wipe(void) {
     _sigma_sys_write(1, "[FORENSIC]: Executing DEEP-SILICON-WIPE (Parrot-style)...\n", 59);
 }
 
+

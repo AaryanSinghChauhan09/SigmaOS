@@ -27,3 +27,4 @@ void SovereignZenithDesktop::RenderDesktop() {
 
 } // namespace Desktop
 } // namespace SigmaOS
+
