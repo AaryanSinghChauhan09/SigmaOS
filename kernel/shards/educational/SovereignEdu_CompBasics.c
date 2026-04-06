@@ -11,3 +11,4 @@ void sigma_edu_convert_base(sigma_u64 val, int base) {
     sigma_printf("Σ [MATH]: Base Conversion (%d) Parity Verified.\n", base);
     sigma_print_hex(val);
 }
+

@@ -44,3 +44,4 @@ void sigma_safety_shard_init() {
     sigma_printf("[SAFETY] Initializing Rust-Parity Logic Shards (ENABLED)...\n");
     sigma_printf("[SAFETY] Memory Isolation & Bounds Checking: ACTIVE\n");
 }
+

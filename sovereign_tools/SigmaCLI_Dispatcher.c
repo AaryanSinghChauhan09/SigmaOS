@@ -236,3 +236,4 @@ int main(int argc, char* argv[]) {
     sigma_print_usage();
     return 1;
 }
+

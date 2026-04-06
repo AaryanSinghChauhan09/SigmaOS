@@ -308,3 +308,4 @@ int sigma_distro_absorber_main(int argc, char** argv) {
     sigma_printf("[ERROR] Unknown subcommand: %s\n  Usage: sigma distro <absorb|personality|list|info>\n", sub);
     return 1;
 }
+

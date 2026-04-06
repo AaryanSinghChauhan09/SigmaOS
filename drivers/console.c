@@ -57,3 +57,4 @@ void sigma_console_print(const char* str) {
         sigma_console_putc(*str++);
     }
 }
+

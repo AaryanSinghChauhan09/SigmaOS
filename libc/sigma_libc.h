@@ -28,3 +28,4 @@ void sigma_print(const char* str);
 void sigma_printf(const char* format, ...);
 
 #endif
+

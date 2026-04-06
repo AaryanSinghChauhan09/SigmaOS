@@ -24,3 +24,4 @@ _start:
     mov rdi, rax        ; Use sigma_main return value as exit code
     mov rax, 60         ; sys_exit
     syscall
+

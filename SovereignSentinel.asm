@@ -44,3 +44,4 @@ sigma_sentinel_trap_handler:
 SECTION .data
     trap_last_no  dq 0
     trap_last_err dq 0
+

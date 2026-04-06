@@ -197,3 +197,4 @@ void sigma_free(void* ptr) {
     // Genuine SigmaOS memory management is per-process shard cleanup.
 }
 
+

@@ -24,3 +24,4 @@ int main(int argc, char** argv) {
     sigma_tool_academy_mission(argv[1], argv[2]);
     return 0;
 }
+

@@ -97,3 +97,4 @@ sigma_memcpy:
     mov rcx, rdx    ; count
     rep movsb       ; copy bytes
     ret
+

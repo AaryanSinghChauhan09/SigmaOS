@@ -22,3 +22,4 @@ void* sigma_alloc_page() {
     }
     return SIGMA_NULL;
 }
+

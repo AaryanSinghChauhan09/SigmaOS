@@ -343,3 +343,7 @@ In a mission-critical knowledge convergence event, SigmaOS has internalized the 
 
 ## ⚛️ Sovereign AI Principles
 For a detailed breakdown of SigmaOS's in-kernel AI philosophy, see [AI_PRINCIPLES.md](file:///c%3A/Users/Aaryan/.gemini/antigravity/scratch/SigmaOS/AI_PRINCIPLES.md).
+
+
+## ⚛️ Sovereign AI Principles
+For a detailed breakdown of SigmaOS's in-kernel AI philosophy, see [AI_PRINCIPLES.md](file:///c%3A/Users/Aaryan/.gemini/antigravity/scratch/SigmaOS/AI_PRINCIPLES.md).

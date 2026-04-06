@@ -10,3 +10,4 @@ void sigma_syscall_handler(sigma_u64 syscall_num, sigma_u64 arg1, sigma_u64 arg2
 void SovereignInterrupts_Init() {
     sigma_printf("Σ [INIT]: x86_64 MSR_LSTAR & IA32_EFER Syscall Logic Synchronized.\n");
 }
+

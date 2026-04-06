@@ -40,3 +40,4 @@ void sigma_page_fault_handler(sigma_u64 error_code, sigma_u64 address) {
     // Industrial kernels would perform cow or swapping here
     sigma_printf("[PAGING] Attempting demand paging recovery...\n");
 }
+

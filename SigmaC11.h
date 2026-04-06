@@ -87,3 +87,4 @@ static inline void sigma_dealloc(void* ptr) {
 #define SIGMA_BARRIER() __asm__ __volatile__("" ::: "memory")
 
 #endif /* SIGMA_C11_H */
+

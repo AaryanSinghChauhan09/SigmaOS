@@ -42,3 +42,4 @@ sigma_hal_personalized_pulse:
     sigma_hal_end:
     pop rbp
     ret
+

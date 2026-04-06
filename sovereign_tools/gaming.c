@@ -26,3 +26,4 @@ int main(int argc, char** argv) {
     sigma_tool_gaming_accelerate(argv[1]);
     return 0;
 }
+

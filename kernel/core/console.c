@@ -12,3 +12,4 @@ void sigma_baremetal_putchar(char c) {
     // Port I/O for UART write
     // __asm__ volatile ("outb %0, %1" : : "a"(c), "Nd"((sigma_u16)UART_PORT));
 }
+

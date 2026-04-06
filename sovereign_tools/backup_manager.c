@@ -37,3 +37,4 @@ int main(int argc, char** argv) {
     sigma_tool_backup_shard(argv[1], argv[2]);
     return 0;
 }
+

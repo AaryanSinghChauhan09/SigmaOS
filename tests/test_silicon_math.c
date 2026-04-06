@@ -12,3 +12,4 @@ void test_silicon_floating_point() {
     
     sigma_printf("Σ [PASS]: Silicon Floating-Point (f32/f64) Parity Verified.\n");
 }
+

@@ -36,3 +36,4 @@ sigma_math_cos:
     movsd xmm0, [rsp]
     add rsp, 8
     ret
+

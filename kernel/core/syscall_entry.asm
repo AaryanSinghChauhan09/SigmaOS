@@ -25,3 +25,4 @@ sigma_syscall_entry:
     mov rsp, [gs:0x10]         ; Restore user stack
     swapgs
     sysretq
+

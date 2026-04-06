@@ -42,3 +42,4 @@ sigma_security_scrub_stack:
     
     pop rbp
     ret
+

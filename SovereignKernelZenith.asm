@@ -114,3 +114,4 @@ align 16
 kernel_stack_bottom:
     resb 4096 * 4 ; 16KB Kernel Stack
 kernel_stack_top:
+

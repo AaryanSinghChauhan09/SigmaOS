@@ -32,3 +32,4 @@ int main(int argc, char* argv[]) {
     setup_automation(argv[1]);
     return 0;
 }
+

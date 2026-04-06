@@ -409,3 +409,4 @@ int sigma_tool_absorber_main(int argc, char** argv) {
     sigma_printf("[ERROR] Unknown subcommand: %s\n  Usage: sigma tools <absorb|list> [name]\n", sub);
     return 1;
 }
+

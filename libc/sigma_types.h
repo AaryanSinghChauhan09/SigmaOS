@@ -98,5 +98,16 @@ static inline sigma_bool sigma_err(sigma_err_t err) {
     return err < 0;
 }
 
+#ifndef SIGMA_ASSERT
+#define SIGMA_ASSERT(cond, msg) do { \
+    if (!(cond)) { \
+        sigma_printf("\nΣ [PANIC]: ASSERTION FAILED: %s (at %s:%d)\n", msg, __FILE__, __LINE__); \
+        for(;;); \
+    } \
+} while(0)
+#endif
+
 #endif /* SIGMAOS_SIGMA_TYPES_H */
+
+
 

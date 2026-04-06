@@ -25,3 +25,4 @@ int main(int argc, char** argv) {
     sigma_tool_xclicker(sigma_atoi(argv[1]), sigma_atoi(argv[2]));
     return 0;
 }
+

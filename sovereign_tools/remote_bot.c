@@ -28,3 +28,4 @@ int main(int argc, char** argv) {
     sigma_tool_remote_execute(argv[1], argv[2]);
     return 0;
 }
+

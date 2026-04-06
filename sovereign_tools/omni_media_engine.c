@@ -45,3 +45,4 @@ int main(int argc, char* argv[]) {
     decode_and_render_video(argv[1]);
     return 0;
 }
+

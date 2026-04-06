@@ -42,3 +42,4 @@ sigma_u8 SovereignCapsicum_Validate(int fd, sigma_u64 required_rights) {
 }
 
 
+

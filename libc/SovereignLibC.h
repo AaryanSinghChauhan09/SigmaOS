@@ -76,3 +76,4 @@ void* sigma_malloc(sigma_size_t size);
 void  sigma_free(void* ptr);
 
 #endif
+
