@@ -339,3 +339,7 @@ In a mission-critical knowledge convergence event, SigmaOS has internalized the 
 - **RDBMS & SQL**: Absorption of Codd's Rules and Transactional ACID logic.
 - **AI/ML & Statistics**: High-speed math primitives for ANN and Regression analysis.
 - **Web & Programming**: DOM, CSS, and PHP syntax logic parity.
+
+
+## ⚛️ Sovereign AI Principles
+For a detailed breakdown of SigmaOS's in-kernel AI philosophy, see [AI_PRINCIPLES.md](file:///c%3A/Users/Aaryan/.gemini/antigravity/scratch/SigmaOS/AI_PRINCIPLES.md).
