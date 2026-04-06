@@ -1,6 +1,6 @@
 # Bio-Informatics Shard
 
-The Bio-Informatics Shard leverages SigmaOS's bare-metal processing capabilities to provide unprecedented acceleration for genomic sequencing, protein structure prediction, and biological data processing. 
+The Bio-Informatics Shard leverages SigmaOS's bare-metal processing capabilities to provide unprecedented acceleration for genomic sequencing, protein structure prediction, and biological data processing.
 
 ## The Sovereignty of Biological Compute
 
@@ -8,13 +8,13 @@ Traditional operating systems abstract the hardware, adding layers of overhead t
 
 ### Key Capabilities
 
-1.  **SIMD-Accelerated Sequence Alignment:** 
+1. **SIMD-Accelerated Sequence Alignment:**
     By bypassing the standard HLL logic and utilizing heavily optimized AVX-512 Assembly routines (`SovereignMath.asm`), the Bio-Informatics shard natively accelerates algorithms such as Smith-Waterman or Needleman-Wunsch.
 
-2.  **Memory-Mapped Data Ingestion:**
+2. **Memory-Mapped Data Ingestion:**
     Genomic datasets (like FASTQ or BAM files) are loaded using our proprietary memory-mapping system, ensuring zero-copy operations. The shard can iterate over memory-mapped contiguous arrays without triggering user/kernel space context switches.
 
-3.  **Custom Vector Operations for K-mer Counting:**
+3. **Custom Vector Operations for K-mer Counting:**
     Hashing and counting K-mers are fundamental to many bioinformatics pipelines. SigmaOS provides hardware-accelerated, collision-resistant hashing at a fraction of the clock cycles required by traditional Linux environments.
 
 ## Activating the Shard

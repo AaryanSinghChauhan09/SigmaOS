@@ -10,7 +10,7 @@ SigmaOS utilizes **Contextual Hypervisor Boundaries**. When you shift a Persona,
 ## 🎭 The 5 Core System Personas
 
 | Persona Identity | Execution Focus | Hardware / Kernel Behavior Shifts |
-|---|---|---|
+| --- | --- | --- |
 | **The Developer** | Maximize compilation speed and shell access. | • Unlocks full `C11` build capabilities in `omni_shell`.<br>• Allocates 80% RAM directly to the `SovereignBuildMaster`.<br>• Bypasses all aggressive sandboxing for trusted local workspace directories. |
 | **The Gamer** | Absolute zero-latency input and maximized framerates. | • Halts all background indexing or VFS backup daemons instantly.<br>• Routs GPU mapping directly to the framebuffer (bypassing the DOM compositor if needed).<br>• Sets CPU governors to absolute maximum TSC thresholds. |
 | **The Forensic Analyst** | Strict machine isolation, tracking, and packet auditing. | • Engages the `Amnesic_Forensic_Scrubbing_Algorithm` on all temporary memory allocations.<br>• Forces every incoming/outgoing network packet through zero-trust DMA bounds.<br>• Prevents any binary execution not explicitly signed in the kernel block-list. |

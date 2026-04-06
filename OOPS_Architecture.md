@@ -92,7 +92,7 @@ llm.dispatch(&llm, "Analyze kernel memory.");   // Runtime dispatch
 ## All OOP Classes in SigmaOS
 
 | Class | File | Inherits | Virtual Methods |
-|-------|------|----------|----------------|
+| ------- | ------ | ---------- | ---------------- |
 | `AIModel_t` | `sigma_ai_distribute.c` | `SigmaObject_t` | `dispatch`, `print_status` |
 | `NodeResource_t` | `sigma_auto_optimizer.c` | `SigmaObject_t` | `balance`, `scale_up`, `evict` |
 | `MemoryScrubber_t` | `system_cleaner.c` | `SigmaObject_t` | `scrub`, `report` |

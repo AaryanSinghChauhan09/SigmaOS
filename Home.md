@@ -9,7 +9,7 @@ SigmaOS is an industrial-grade, zero-dependency operating system built on pure *
 ## 🏗️ Architecture At a Glance
 
 | Layer | Technology | Description |
-|-------|-----------|-------------|
+| ------- | ----------- | ----------- |
 | **Kernel** | C11 + x86-64 Assembly | Ring-0 bootloader, interrupt handlers, memory management, VFS |
 | **LibC** | Custom `SovereignLibC.h` | Zero-dependency C standard replacement |
 | **OOP Layer** | `SigmaOOP.h` | C11 struct-based polymorphism via `CLASS_DECLARE` + `VIRTUAL` macros |
@@ -22,6 +22,7 @@ SigmaOS is an industrial-grade, zero-dependency operating system built on pure *
 ## 🔑 System Feature Set
 
 ### Kernel Layer
+
 - **Zero-Dependency Kernel**: No `stdio.h`, `windows.h`, or stdlib — pure native syscall dispatch
 - **Custom LibC** (`sigma_libc.c`): User-defined string, memory, math, and I/O functions built from scratch
 - **VFS**: UNIX-style directory tree with snapshot/rollback support
@@ -35,7 +36,7 @@ SigmaOS is an industrial-grade, zero-dependency operating system built on pure *
 Hot-loadable feature modules enabled/disabled at runtime:
 
 | Shard | File | Function |
-|-------|------|----------|
+| ------- | ------ | -------- |
 | AI Distributor | `sigma_ai_distribute.c` | Multi-model LLM IPC routing via ring-0 |
 | Auto Optimizer | `sigma_auto_optimizer.c` | OOM killer, memory rebalancing daemon |
 | System Cleaner | `system_cleaner.c` | DOD 5220.22-M multi-pass secure wipe |
@@ -50,7 +51,7 @@ Hot-loadable feature modules enabled/disabled at runtime:
 ## 📑 Wiki Index
 
 | Page | Description |
-|------|-------------|
+| ------ | ------------- |
 | [[Home]] | Overview & Architecture |
 | [[OOPS_Architecture]] | C11 struct-based OOP system |
 | [[Shard_Autonomy]] | Shard-On-Demand system deep dive |

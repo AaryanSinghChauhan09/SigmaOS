@@ -6,7 +6,7 @@ SigmaOS embeds a native **Data Science Shard** that runs statistical analysis, v
 
 ## Architecture
 
-```
+```text
 Raw Data (VFS / Upload)
     └─► DS Shard (kernel/SovereignML.c + sigma_std.c)
             ├─► Ingestion (CSV/binary parsing)
@@ -77,7 +77,7 @@ The `SigmaSystem` class in `index.js` renders an interactive DS dashboard:
 ## Comparison: SigmaOS vs Traditional DS Tools
 
 | Feature | Jupyter / Python | SigmaOS DS Shard |
-|---------|-----------------|-----------------|
+| --------- | ----------------- | ----------------- |
 | **Runtime** | Python interpreter required | Native C11, zero interpreter |
 | **Dependencies** | NumPy, pandas, matplotlib | Zero external libraries |
 | **Privacy** | Cloud notebooks possible | Always local, zero telemetry |

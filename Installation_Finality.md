@@ -7,7 +7,7 @@ This page documents the complete procedure to build and run SigmaOS from source.
 ## Prerequisites
 
 | Tool | Version | Purpose |
-|------|---------|---------|
+| --- | --------- | --------- |
 | `gcc` | ≥ 10.0 | C11 kernel compilation |
 | `nasm` | ≥ 2.15 | x86-64 Assembly assembly |
 | `ld` | ≥ 2.35 | Linker for ELF output |

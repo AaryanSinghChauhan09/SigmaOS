@@ -6,7 +6,7 @@ The SigmaOS kernel is a monolithic bare-metal kernel written in **pure C11 and x
 
 ## Boot Sequence
 
-```
+```text
 BIOS/UEFI POST
     └─► boot.asm (MBR / Stage-1 Bootloader)
             └─► hal.asm (Hardware Abstraction Layer setup)
@@ -25,7 +25,7 @@ BIOS/UEFI POST
 
 ### Memory Management
 | File | Description |
-|------|-------------|
+| ---- | ----------- |
 | `pmm.c` | Physical Memory Manager — page frame allocator using bitmap |
 | `vmm.c` | Virtual Memory Manager — 4-level paging, TLB shootdown |
 | `slab.c` | Slab allocator for fixed-size kernel objects |
@@ -33,7 +33,7 @@ BIOS/UEFI POST
 
 ### Process & Scheduling
 | File | Description |
-|------|-------------|
+| ---- | ----------- |
 | `process.c` | Process creation, forking, context switching |
 | `scheduler.c` | Round-robin scheduler with priority bands |
 | `scheduler_ai.c` | AI-assisted adaptive scheduler (heuristic load prediction) |
@@ -42,14 +42,14 @@ BIOS/UEFI POST
 
 ### Filesystem (VFS)
 | File | Description |
-|------|-------------|
+| ---- | ----------- |
 | `vfs.c` | Virtual File System: inode tree, path resolution, mount points |
 | `procfs.c` | `/proc`-style process info filesystem |
 | `syscall.c` | System call dispatch table (200+ syscalls) |
 
 ### Hardware & Drivers
 | File | Description |
-|------|-------------|
+| ---- | ----------- |
 | `hal.asm` + `hal.c` | Hardware Abstraction Layer |
 | `idt.asm` + `idt.c` | Interrupt Descriptor Table + ISR handlers |
 | `pit.c` | Programmable Interval Timer (system clock) |
@@ -59,7 +59,7 @@ BIOS/UEFI POST
 
 ### IPC & Networking
 | File | Description |
-|------|-------------|
+| ---- | ----------- |
 | `ipc.c` | Full IPC: pipes, message queues, shared memory, semaphores |
 | `net.c` | TCP/IP stack (ARP, IP, TCP, UDP) — zero external libs |
 | `net_firewall.c` | Kernel-level stateful packet filter |
@@ -67,7 +67,7 @@ BIOS/UEFI POST
 
 ### Security
 | File | Description |
-|------|-------------|
+| ---- | ----------- |
 | `sovereign_bpf.c` | Ring-0 eBPF sandbox for verified bytecode execution |
 | `cgroup_shard.c` | CPU/Memory cgroup isolation (Linux cgroups equivalent) |
 | `oom_killer.c` | Out-of-Memory heuristic sacrificer |
@@ -76,7 +76,7 @@ BIOS/UEFI POST
 
 ### Advanced Modules
 | File | Description |
-|------|-------------|
+| ---- | ----------- |
 | `elf_loader.c` | Native ELF binary loader + relocations |
 | `SovereignHypervisorZenith.c` | Type-2 Hypervisor with VM isolation |
 | `hot_replace.c` | Live kernel module hot-patching engine |

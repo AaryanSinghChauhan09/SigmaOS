@@ -5,7 +5,7 @@ These are the **five immutable laws** that govern every decision in SigmaOS's ar
 ## The Ideology Matrix
 
 | Sovereign Principle | The Core Ideology | Key Excision / Rule | Kernel Implementation Enforcement |
-|---|---|---|---|
+| --- | --- | --- | --- |
 | **1. Absolute Discretion** | *"No data leaves the machine without explicit sovereign consent."* | Zero cloud telemetry, no API beacon pings, local-only inference. | All network rings in `SovereignNetMesh.c` require explicit user capability flags. |
 | **2. Zero Abstraction Lies** | *"What you see is what executes. No hidden runtime, no framework."* | Pure C11/Assembly execution. No managed runtimes (Python/Node). | `SovereignBuildMaster.c` refuses compilation if standard libraries (`glibc`) are linked. |
 | **3. User Autonomy** | *"Every tool is a choice. The user is the final kernel branch."* | Shard-On-Demand (SOD). No mandatory background daemons. | `shard_core.c` only dynamically allocates execution pages when explicitly invoked by the user. |
@@ -16,7 +16,7 @@ These are the **five immutable laws** that govern every decision in SigmaOS's ar
 
 ## 🏛️ The Sovereign Manifesto (Architecture Summary)
 
-```
+```text
 Σ SigmaOS Zenith Supreme
     ├─ No cloud. No compromise. No abstraction lies.
     ├─ Every byte is sovereign. Every function is owned.

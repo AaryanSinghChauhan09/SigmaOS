@@ -6,7 +6,7 @@ SigmaOS is the **first sovereign operating system with a fully integrated NCERT-
 
 ## Education Architecture
 
-```
+```text
 User selects Subject
     └─► ncert_shard.c loaded by SOD system
             ├─► Biology Lab  (DNA alignment, cell simulation)
@@ -74,7 +74,7 @@ sigma_u64 sigma_lcm(sigma_u64 a, sigma_u64 b);
 ## Physics Lab (Class 11/12 NCERT)
 
 | Simulation | Method | Description |
-|-----------|--------|-------------|
+| ----------- | ------ | ----------- |
 | Projectile Motion | Euler integration | 2D trajectory with drag |
 | Simple Harmonic Motion | Analytical ODE | Spring-mass oscillator |
 | Wave Interference | Superposition principle | Double-slit visualization |
@@ -97,7 +97,7 @@ Every NCERT shard connects to the local `Sigma_Tutor` AI model:
 ## NCERT Shard vs External EdTech Apps
 
 | Feature | GeoGebra / GCompris | SigmaOS NCERT Shard |
-|---------|--------------------|--------------------|
+| --------- | -------------------- | -------------------- |
 | Installation required | Yes | No — built into OS |
 | Internet needed | Sometimes | Never |
 | AI tutor | No | Yes — local, no API |

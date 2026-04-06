@@ -7,7 +7,7 @@
 ## The Three Forbidden Dependencies
 
 | Type | Examples | Status |
-|------|----------|--------|
+| ---- | ---------- | -------- |
 | **Standard Libraries** | `stdio.h`, `stdlib.h`, `string.h` | ❌ Forbidden in kernel |
 | **OS-Specific APIs** | `windows.h`, `unistd.h` | ❌ Forbidden everywhere |
 | **Runtime Environments** | Python, Node.js, Java in kernel | ❌ Forbidden in kernel |
@@ -17,7 +17,7 @@
 ## Allowed Replacements
 
 | Forbidden | Sovereign Replacement |
-|-----------|-----------------------|
+| ----------- | ----------------------- |
 | `printf()` | `sigma_printf()` in `sigma_libc.c` |
 | `malloc()` / `free()` | `sigma_alloc()` / `sigma_free()` via PMM slab allocator |
 | `memcpy()` / `memset()` | `sigma_memcpy()` / `sigma_memset()` in `sigma_std.c` |
@@ -43,6 +43,7 @@ const char* forbidden[] = {
 ```
 
 Run before every build:
+
 ```powershell
 gcc -o SovereignBuildMaster sovereign_tools/SovereignBuildMaster.c
 ./SovereignBuildMaster
@@ -65,7 +66,7 @@ gcc -nostdlib -ffreestanding -std=c11 `
 ```
 
 | Flag | Effect |
-|------|--------|
+| ---- | ------ |
 | `-nostdlib` | No standard library linked |
 | `-ffreestanding` | No hosted environment assumptions |
 | `-fno-builtin` | No compiler built-in function substitution |
@@ -76,7 +77,7 @@ gcc -nostdlib -ffreestanding -std=c11 `
 ## HLL Reduction Progress
 
 | Module | HLL Score (lower = better) | Status |
-|--------|---------------------------|--------|
+| -------- | --------------------------- | -------- |
 | `kernel/` core | 0 external deps | ✅ Sovereign |
 | `libc/` | 0 external deps | ✅ Sovereign |
 | `sovereign_tools/` | 0 external deps | ✅ Sovereign |
@@ -88,6 +89,7 @@ gcc -nostdlib -ffreestanding -std=c11 `
 ## Why This Matters
 
 By eliminating HLL dependencies:
+
 1. **No supply chain attacks** — no external packages can be compromised
 2. **Predictable performance** — no hidden allocations or GC pauses
 3. **True portability** — compiles on any C11-compliant toolchain

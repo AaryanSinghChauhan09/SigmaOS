@@ -5,7 +5,7 @@ This document serves as the master index for every capability, Shard, and tool e
 ## 🛡️ Sovereign Kernel Foundations
 
 | Foundation Module | Description | Location / Execution | Status |
-|---|---|---|---|
+| --- | --- | --- | --- |
 | **Zero-Dependency Kernel** | The x86_64 architecture avoids `glibc`/`musl` entirely. Custom ring-0 bootloader and intrinsic memory handlers. | `SovereignKernelZenith.asm`, `main.c` | 🟢 **Complete & Native** |
 | **SovereignLibC** | The native library replacing standard C headers (`stdio.h`, `stdlib.h`), executing pure direct `syscalls`. | `SovereignLibC.asm` | 🟢 **Complete & Native** |
 | **SigmaOOP Polymorphism** | C11 structure-based Object-Oriented polymorphism utilized via `CLASS_DECLARE` macros. | `SovereignOmniShard.h` | 🟢 **Complete & Native** |
@@ -20,7 +20,7 @@ This document serves as the master index for every capability, Shard, and tool e
 The Shard architecture executes functionalities directly in Ring-0 and unwinds them instantly when not needed.
 
 | Shard | Primary Function | Target Persona / Sector | Status |
-|---|---|---|---|
+| --- | --- | --- | --- |
 | **High Frequency Trading (HFT)** | Native DMA ingress/egress bypassing the TCP/IP ring, nanosecond latency arbitrage execution. | Quantitative Finance | 🔷 **Hot-Loadable / Active** |
 | **Bio-Informatics Core** | AVX-512 SIMD-accelerated K-mer counting and memory-mapped fast sequencing (FASTQ/BAM). | Computational Biology | 🔷 **Hot-Loadable / Active** |
 | **Amnesic Forensic Scruber** | Overrides volatile memory caches; DOD-5220.22-M storage wiping and audit obfuscation. | Cyber-Forensics / SecOps | 🔷 **Hot-Loadable / Active** |
@@ -34,7 +34,7 @@ The Shard architecture executes functionalities directly in Ring-0 and unwinds t
 We do not use standard GNU coreutils. All tools are native `C11` or strictly controlled UI orchestrator scripts.
 
 | Sovereign Tool | Primary Function | Equivalent Replaced | Status |
-|---|---|---|---|
+| --- | --- | --- | --- |
 | `sigma_invoke` | The foundation CLI command. Mounts, compiles, and loads `.c` Shards directly into system memory. | `apt-get`, `pacman` | 🟢 **Complete & Native** |
 | `sigma_auto_optimizer` | The memory daemon that silently checks slab fragmentation and executes process rebalancing. | `cron`, `systemd` | 🟢 **Complete & Native** |
 | `omni_shell` | The 400+ command native POSIX-compatible terminal interface loaded with AI extensions. | `bash`, `zsh` | 🟢 **Complete & Native** |
@@ -51,6 +51,6 @@ We do not use standard GNU coreutils. All tools are native `C11` or strictly con
 ## 🌌 Zenith-Gold UX & Application Architecture
 
 | UI Component | Description | Status |
-|---|---|---|
+| --- | --- | --- |
 | **JS DOM UI Orchestrator** | A completely bespoke window manager built natively in Javascript (`index.js`). Floating windows, dynamic resizing. | 🟢 **Complete & Native** |
 | **Persona-Aware Adaption** | The kernel and UI seamlessly morph when switching user mode paradigms. | 🟢 **Complete & Active** |

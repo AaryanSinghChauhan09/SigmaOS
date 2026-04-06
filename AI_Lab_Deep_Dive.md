@@ -6,7 +6,7 @@ SigmaOS is **AI-native by design** — intelligence is embedded at every kernel 
 
 ## Architecture
 
-```
+```text
 User Prompt
     │
     ▼
@@ -24,7 +24,7 @@ All routing happens at Ring-0 level via UNIX socket IPC. **No HTTP, no cloud, no
 ## Local AI Models Supported
 
 | Model | Type | Socket |
-|-------|------|--------|
+| :--- | :--- | :--- |
 | `Sigma_QWen_local` | General LLM | `/var/ipc/sigma_llm.sock` |
 | `Sigma_StarCoder_local` | Code generation | `/var/ipc/sigma_code.sock` |
 | `Sigma_Forensic_Analyst` | Security analysis | `/var/ipc/sigma_forensic.sock` |
@@ -43,6 +43,7 @@ CLASS_DECLARE(AIModel) {
 ```
 
 Example usage from the kernel:
+
 ```c
 AIModel_t llm = create_ai_model("Sigma_QWen_local", "/var/ipc/sigma_llm.sock", 100);
 llm.dispatch(&llm, "Summarize memory allocation anomalies in last 10 seconds.");
@@ -53,7 +54,7 @@ llm.dispatch(&llm, "Summarize memory allocation anomalies in last 10 seconds.");
 ## AI Features Across the OS
 
 | Feature | Description | Location |
-|---------|-------------|----------|
+| :--- | :--- | :--- |
 | **Multi-Model Distributor** | Route one prompt to N models in parallel | `sigma_ai_distribute.c` |
 | **Autonomous Scheduler AI** | Predict resource needs before OOM | `scheduler_ai.c` |
 | **AI VFS Organizer** | Classify files by content automatically | `SovereignSearch.c` |

@@ -6,7 +6,7 @@ SigmaOS embeds **persona-aware automation** directly into the kernel — no exte
 
 ## Automation Architecture
 
-```
+```text
 User / Persona Profile
     └─► Automation Shard (automation_shard.c)
             ├─► Task Scheduler (scheduler_ai.c)
@@ -20,7 +20,7 @@ User / Persona Profile
 ## Built-in Automation Capabilities
 
 | Tool | File | Description |
-|------|------|-------------|
+| ---- | ---- | ----------- |
 | **Task Scheduler** | `scheduler_ai.c` | AI-predicted task slots using lightweight heuristics |
 | **Macro Engine** | `automation_shard.c` | Record, replay, and script event automation |
 | **XClicker** | `xclicker.c` | High-frequency auto-clicker with jitter profiles |
@@ -65,7 +65,7 @@ sigma task remove "Daily VFS Backup"
 ## Persona-Aware Automation Profiles
 
 | Persona | Automated Tasks |
-|---------|----------------|
+| --------- | ---------------- |
 | **Developer** | Auto-build on file change, auto-commit reminders, dependency scanner |
 | **Student** | Daily quiz generation at 08:00, spaced-repetition flashcard review |
 | **Forensic Analyst** | Hourly memory snapshot, real-time PCAP capture, audit log rotation |

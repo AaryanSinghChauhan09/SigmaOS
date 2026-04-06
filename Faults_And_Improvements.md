@@ -7,7 +7,7 @@ This matrix outlines the current known faults, the resulting bottlenecks, and th
 ## 🛑 Known System Faults & Limitations
 
 | Architectural Fault | Cause (Sovereign Principle) | Consequence / User Impact |
-|---|---|---|
+| --- | --- | --- |
 | **Driver Desertification** | *Zero Abstraction Lies* (Refusal to use generic Linux Kernel driver modules) | SigmaOS cannot communicate with niche external peripherals. Users are restricted to standard NVMe, universal input drivers (`keyboard_master.c`), and basic NIC buffers. |
 | **Monolithic Third-Party App Rejection** | *Absolute Discretion / Zero Dependencies* | The system simply refuses to execute standard `.AppImage` or `Debian` packages that rely on `glibc`, Python wrappers, or dynamically linked `libc.so.6`. |
 | **UI Graphical Boundary Limits** | *HLL-Reduction* (Excision of heavy rendering pipelines like Wayland/X11) | The current Javascript `UI Orchestrator` is insanely fast but lacks hardware-accelerated 3D compositing libraries for high-end graphic application hosting natively. |
@@ -19,7 +19,7 @@ This matrix outlines the current known faults, the resulting bottlenecks, and th
 ## 🏗️ Scope of Improvements & Solutions
 
 | Targeted Improvement | Strategy / Solution Vector | Anticipated Resolution |
-|---|---|---|
+| --- | --- | --- |
 | **Sovereign Shard Device API** | Developing an explicit compiler hook that allows hardware manufacturers to wrap their proprietary binaries inside securely sandboxed C11 Shard formats. | Resolves peripheral communication without inheriting bloated background driver daemons. |
 | **POSIX Simulation Layer (Shunt)** | Implementing a Shard-On-Demand (SOD) virtual POSIX translator. When a standard package is loaded, it maps `glibc` syscalls to `SovereignLibC.h` seamlessly. | Enables users to run Linux-native CLI and GUI applications seamlessly inside the isolated workspace. |
 | **Hardware-Accelerated Framebuffer** | Rewriting the UI Orchestrator’s core DOM-rendering backend in `SovereignMultimediaRealtime.c` to directly invoke GPU instructions natively. | Complete native 3D and graphical compositing without X11 or Wayland middleware overhead. |

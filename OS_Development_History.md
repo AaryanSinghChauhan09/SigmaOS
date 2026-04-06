@@ -5,7 +5,7 @@ The roadmap of SigmaOS is a chronicle of systematic reduction, elimination of bl
 ## 🕰️ Milestone Execution Timeline
 
 | Version Epoch | Evolutionary Phase | Architectural Milestones Achieved |
-|---|---|---|
+| --- | --- | --- |
 | **Epoch I** <br> *(Initial Genesis)* | Base Kernel Prototype | • Basic bootloader assembly.<br>• Implementation of standard `libc` routines natively.<br>• First hardware interrupt descriptor tables (IDT). |
 | **Epoch II** <br> *(The Great Purge)* | High-Level Language Reduction | • Complete excision of Python/Perl interpreters from the kernel boundaries.<br>• Stripping of generic POSIX dependencies to prioritize direct syscall routing.<br>• Establishment of `SovereignLibC.h`. |
 | **Epoch III** <br> *(Structural Modularity)* | Shard-On-Demand (SOD) Architecture | • Transition away from monolithic drivers.<br>• Implementation of `SovereignAetherShardLoader.asm` for `.c` hot-swapping.<br>• Deployment of initial shards (Cyber-Forensics, ML Core). |
@@ -18,7 +18,7 @@ The roadmap of SigmaOS is a chronicle of systematic reduction, elimination of bl
 Historically, development is typically measured in lines of code added. The SigmaOS paradigm measures success by the overhead **removed**.
 
 | Component Eliminated | Replaced Natively By | Net Result |
-|---|---|---|
+| --- | --- | --- |
 | Standard C Library (`glibc` / `musl`) | `SovereignLibC.asm` | Drastic binary size reduction; elimination of generic abstraction layers. |
 | Standard OS Coreutils (`ls`, `cat`) | Native C11 `sigma_std.c` functions within `omni_shell` | Removal of complex sub-process spawning overhead. |
 | Inheritance (C++) | `SigmaOOP.h` (`CLASS_DECLARE` macros) | Elimination of hidden v-table pointer bloat and unpredictable constructor behavior. |

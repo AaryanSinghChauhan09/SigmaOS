@@ -7,7 +7,7 @@ This page documents SigmaOS's definitive competitive roadmap against every major
 ## Direct Distro Comparisons
 
 | Linux Distro | Specialty | SigmaOS Equivalent | SigmaOS Advantage |
-|-------------|-----------|-------------------|-------------------|
+| ------------- | ----------- | ------------------- | ------------------- |
 | **Ubuntu** | General purpose, beginner-friendly | Zenith UI + Distro Runner | AI-native, shard modular, no bloat |
 | **Arch Linux** | DIY rolling release | SOD (Shard-On-Demand) system | Hot-loadable shards vs package builds |
 | **Kali Linux** | Penetration testing / forensics | ForensicMatrix + BNSS + Amnesic | Built-in, no install needed, AI-enhanced |
@@ -25,7 +25,7 @@ This page documents SigmaOS's definitive competitive roadmap against every major
 
 ### 🤖 AI Tools
 | Linux (External) | SigmaOS (Native) |
-|-----------------|-----------------|
+| ----------------- | ----------------- |
 | Ollama (installed) | `sigma_ai_distribute.c` — kernel-level IPC routing |
 | llama.cpp (installed) | Native GGUF-aimed local model pipeline |
 | No AI in scheduler | `scheduler_ai.c` — adaptive heuristic scheduler |
@@ -34,7 +34,7 @@ This page documents SigmaOS's definitive competitive roadmap against every major
 
 ### 🔬 Forensic Tools
 | Kali Linux Tool | SigmaOS Equivalent |
-|----------------|-------------------|
+| ---------------- | ------------------- |
 | Volatility (memory) | `SovereignForensicMatrix.c` |
 | Wireshark (PCAP) | `net.c` + forensic PCAP capture shard |
 | shred / DBAN | `system_cleaner.c` (DOD 5220.22-M, 7-pass) |
@@ -43,7 +43,7 @@ This page documents SigmaOS's definitive competitive roadmap against every major
 
 ### 📚 Education Tools
 | Linux (External Apps) | SigmaOS (Native Shards) |
-|----------------------|------------------------|
+| ---------------------- | ------------------------ |
 | GeoGebra (install) | `ncert_shard.c` — math lab native |
 | GCompris (install) | NCERT Biology simulator (DNA alignment) |
 | No AI tutor | AI Tutor built into every NCERT shard |
@@ -52,7 +52,7 @@ This page documents SigmaOS's definitive competitive roadmap against every major
 
 ### 🧮 DSA / CS Tools
 | Linux (External) | SigmaOS (Native) |
-|-----------------|-----------------|
+| ----------------- | ----------------- |
 | Competitive coding (browser) | `SovereignSuperCalculator.c` DSA shard |
 | No complexity visualizer | Big-O complexity visualizer in UI |
 | No built-in debugger | AI-assisted debug hints in omni_shell |
@@ -60,7 +60,7 @@ This page documents SigmaOS's definitive competitive roadmap against every major
 
 ### 📊 Data Science / ML
 | Linux (Install required) | SigmaOS (Native) |
-|------------------------|-----------------|
+| ------------------------ | ----------------- |
 | Jupyter Notebook | Browser DS shard (no Python) |
 | pandas / NumPy | `SovereignML.c` native C11 matrix ops |
 | TensorFlow / PyTorch | Native gradient descent in C11 |
@@ -72,7 +72,7 @@ This page documents SigmaOS's definitive competitive roadmap against every major
 ## SigmaOS Unique Features With No Linux Equivalent
 
 | Feature | Description |
-|---------|-------------|
+| --------- | ------------- |
 | **Zero-Dependency Kernel** | No libc, no glibc, pure native syscalls |
 | **Shard-On-Demand (SOD)** | Hot-loadable features, no package manager needed |
 | **Persona-Aware OS** | Entire UI, tools, and shards adapt to user role |
