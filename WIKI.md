@@ -280,6 +280,26 @@
 | SovereignTempleOS | TempleOS | JIT-Native HolyC-Grade Bare-Metal Parity | PURE |
 | SovereignLUNA | LUNA | Lua-Scriptable Microkernel Shard Orchestration | PURE |
 
+### Phase 36: Educational Convergence (Syllabus Absorption)
+| Shard | Source | USP | Status |
+| :--- | :--- | :--- | :--- |
+| SovereignEdu_CompBasics | IT Basics | Computer Generations, Base Type Conversion & ASCII Logic | PURE |
+| SovereignEdu_Hardware| Hardware | I/O Devices, RAM/ROM, PROM/EEPROM & Cloud Storage | PURE |
+| SovereignEdu_Software| Software | System/Application Software, OS Basics & Virus Detection | PURE |
+| SovereignEdu_Math | Discrete Math| Matrix Theory, Set Theory, Logic & Truth Value Parity | PURE |
+| SovereignEdu_CProg | C Programming| Algorithms, Pointers, Arrays, Structs & File Management | PURE |
+
+### Phase 37: Global Cloud-Native & Immutable Infrastructure
+| Shard | Inspiration | USP | Status |
+| :--- | :--- | :--- | :--- |
+| SovereignTalos | Talos Linux | API-Focused Immutable Shard Infrastructure Parity | PURE |
+| SovereignK3s | K3s | Lightweight K8s-Lattice Orchestration & Edge Delivery | PURE |
+| SovereignBottlerocket| AWS Bottlerocket| Shard-Level Transactional Cloud-Compute Optimization | PURE |
+| SovereignGarden | Cloud Foundry | Shard-Isolated Container Engine Parity (Garden) | PURE |
+| SovereignKata | Kata Containers | VM-Isolated Silicon Shard Security Matrix | PURE |
+| SovereignUnikraft | Unikraft | Unikernel Library-OS Shard Lightweight Delivery | PURE |
+| SovereignMirage | MirageOS | OCaml-Parity Cloud-Native Type-Safe Sharding | PURE |
+
 ### Phase 35: Global Linux Distro Absorption (Apex Enterprise & Cloud-Edge)
 | Shard | Inspiration | USP | Status |
 | :--- | :--- | :--- | :--- |

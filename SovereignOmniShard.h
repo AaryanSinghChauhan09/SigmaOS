@@ -184,4 +184,21 @@ void SovereignRancher_Init(void);
 void SovereignFlatcar_Init(void);
 void SovereignMicroOS_Init(void);
 
+// --- Phase 36: Educational Convergence (Syllabus Absorption) ---
+void SovereignEdu_CompBasics_Init(void);
+void SovereignEdu_Hardware_Init(void);
+void SovereignEdu_Software_Init(void);
+void SovereignEdu_Math_Init(void);
+void SovereignEdu_CProg_Init(void);
+
+// --- Phase 37: Cloud-Native & Immutable Infrastructure ---
+void SovereignTalos_Init(void);
+void SovereignK3s_Init(void);
+void SovereignBottlerocket_Init(void);
+void SovereignGarden_Init(void);
+void SovereignKata_Init(void);
+void SovereignUnikraft_Init(void);
+void SovereignMirage_Init(void);
+
 #endif /* SOVEREIGN_OMNI_SHARD_H */
+
