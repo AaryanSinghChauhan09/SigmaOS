@@ -262,4 +262,17 @@ void SovereignKnoppix_Init(void);
 void SovereignBodhi_Init(void);
 void SovereignDeepin_Init(void);
 
+// --- Phase 29 Global Distro Absorption (Lattice Expansion) ---
+void SovereignPurple_Init(void);
+void SovereignRocky_Init(void);
+void SovereignAlma_Init(void);
+void SovereignEndeavour_Init(void);
+void SovereignGaruda_Init(void);
+void SovereignIce_Init(void);
+void SovereignLite_Init(void);
+void SovereignLXQt_Init(void);
+void SovereignPantheon_Init(void);
+void SovereignAnonsurf_Init(void);
+void SovereignNobara_Init(void);
+
 #endif /* SOVEREIGN_OMNI_SHARD_H */

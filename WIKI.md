@@ -191,3 +191,18 @@
 | SovereignKnoppix | Knoppix | Live On-The-Fly Silicon Hardware Auto-Detection | PURE |
 | SovereignBodhi | Bodhi Linux | Resource-Calibrated Moksha Efficiency Shard | PURE |
 | SovereignDeepin | Deepin | High-Fidelity Visual Aesthetics & UI Refinement | PURE |
+
+### Phase 29: Global Linux Distro Absorption (Lattice Expansion)
+| Shard | Inspiration | USP | Status |
+| :--- | :--- | :--- | :--- |
+| SovereignPurple | Kali Purple | Defensive Security SIEM/SOC Shard Finality | PURE |
+| SovereignRocky | Rocky Linux | Enterprise Bug-for-Bug RHEL Shard Stability | PURE |
+| SovereignAlma | AlmaLinux | Community-Driven Enterprise Lattice Parity | PURE |
+| SovereignEndeavour| EndeavourOS | Refined Arch-Lattice Bootstrap Logic | PURE |
+| SovereignGaruda | Garuda Linux | Btrfs-Accelerated Performance Latency Zenith | PURE |
+| SovereignIce | Peppermint OS | Cloud-to-Lattice Seamless Shard Abstraction | PURE |
+| SovereignLite | Linux Lite | Ultra-Low-Resource Hardware Shard Abstraction | PURE |
+| SovereignLXQt | Lubuntu | Lightweight Shard Visual UI Energy Efficiency | PURE |
+| SovereignPantheon | Elementary OS | Aesthetic-First Visual Lattice HIG Consistency | PURE |
+| SovereignAnonsurf | Parrot OS | Privacy-Centric Lattice-Gate Anonymity Shard | PURE |
+| SovereignNobara | Nobara Project | Full-Matrix Gaming Zenith & Kernel Latency Tuning | PURE |
