@@ -128,29 +128,29 @@ int sigma_dup(int oldfd) {
 
 // --- sigma_printf (v1.0 ZENITH) ---
 void sigma_printf(const char* format, ...) {
-    va_list args;
-    va_start(args, format);
+    sigma_va_list args;
+    sigma_va_start(args, format);
     
     for (const char* p = format; *p != '\0'; p++) {
         if (*p == '%' && *(p + 1) != '\0') {
             p++;
             switch (*p) {
                 case 's':
-                    sigma_print(va_arg(args, const char*));
+                    sigma_print(sigma_va_arg(args, const char*));
                     break;
                 case 'd':
                 case 'i':
-                    sigma_print_num((sigma_u64)va_arg(args, int));
+                    sigma_print_num((sigma_u64)sigma_va_arg(args, int));
                     break;
                 case 'u':
-                    sigma_print_num(va_arg(args, sigma_u64));
+                    sigma_print_num(sigma_va_arg(args, sigma_u64));
                     break;
                 case 'x':
                 case 'p':
-                    sigma_print_hex(va_arg(args, sigma_u64));
+                    sigma_print_hex(sigma_va_arg(args, sigma_u64));
                     break;
                 case 'c': {
-                    char c = (char)va_arg(args, int);
+                    char c = (char)sigma_va_arg(args, int);
                     sigma_write(1, &c, 1);
                     break;
                 }
@@ -164,7 +164,7 @@ void sigma_printf(const char* format, ...) {
             sigma_write(1, p, 1);
         }
     }
-    va_end(args);
+    sigma_va_end(args);
 }
 
 // --- Memory Management Shard ---
@@ -196,6 +196,7 @@ void sigma_free(void* ptr) {
     // In this zero-latency shard, we do not reclaim small blocks yet.
     // Genuine SigmaOS memory management is per-process shard cleanup.
 }
+
 
 
 

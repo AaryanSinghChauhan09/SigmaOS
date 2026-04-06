@@ -354,3 +354,7 @@ For a detailed breakdown of SigmaOS's in-kernel AI philosophy, see [AI_PRINCIPLE
 | SovereignAppStore | Master Legacy | Industrial App Delivery | PURE |
 | SovereignDesktopZenith | Master Legacy | Visual Lattice Composition | PURE |
 | SovereignUICore | Master Legacy | Hardware-Accelerated UI | PURE |
+
+## 📦 Dependency & Runtime Reduction
+- **Zero-Stdarg**: Internalized x86_64 a_list and a_start to neutralize stdarg.h overhead.
+- **Zero-Builtin**: Replaced all remaining compiler-provided specialized functions with sovereign C11 logic.
