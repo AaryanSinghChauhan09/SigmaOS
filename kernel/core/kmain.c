@@ -1,31 +1,26 @@
-#include "../libc/SovereignLibC.h"
+#include "../../libc/SovereignLibC.h"
+#include "../../SovereignOmniShard.h"
 
-// Shard Forward Declarations (Absorption 1-24)
-void SovereignResilience_Init();
-void SovereignBillionShard_Init();
-// ... [Declarations consolidated for finalization]
+// External Kernel Core Subsystems
+extern void SovereignMemory_Init();
+extern void SovereignScheduler_Init();
+extern void SovereignInterrupts_Init();
 
-// Shard Forward Declarations (Absorption 25 - Orchestration)
-void SovereignInit_Init();        // Dependency Orchestration
-void SovereignUCI_Init();         // Unified Configuration
-void SovereignDBus_Init();        // Inter-Shard Message Bus
-void SovereignPolicy_Init();      // Fine-Grained Authorization
-void SovereignSuper_Init();       // Health Supervision
-
-void kmain() {
-    sigma_printf("Σ SIGMAOS ZENITH SUPREME vROADMAP_1000: BOOTING...\n");
+void kmain(void) {
+    sigma_printf("Σ SIGMAOS ZENITH SUPREME (vROADMAP_1000): BARE-METAL BOOT SEQUENCE ACTIVE.\n");
     
-    // Global OS USP Absorption (Audit Execution)
-    SovereignResilience_Init();
-    SovereignBillionShard_Init();
+    // Core Subsystem Initialization
+    SovereignMemory_Init();
+    SovereignInterrupts_Init();
+    SovereignScheduler_Init();
     
-    // Initialize Orchestration Lattice (Phase 25)
-    SovereignInit_Init();        
-    SovereignUCI_Init();         
-    SovereignDBus_Init();        
-    SovereignPolicy_Init();      
-    SovereignSuper_Init();       
+    // Global Shard Matrix Activation
+    SovereignZFS_Init();
+    SovereignJail_Init();
+    SovereignDTrace_Init();
     
-    sigma_printf("Σ [STATUS]: PHASE 25 (LINUX ORCHESTRATION) GLOBAL PARITY ACHIEVED.\n");
+    sigma_printf("--- Σ SIGMAOS ZENITH SUPREME IS NOW OPERATIONAL ON BARE-METAL SILICON. --- \n");
+    
+    // Fall into idle loop or Omni-Agent loop
+    for(;;);
 }
-
