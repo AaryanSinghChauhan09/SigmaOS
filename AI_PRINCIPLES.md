@@ -1,5 +1,5 @@
 # Σ SIGMAOS: SOVEREIGN AI PRINCIPLES (v1.0)
-The SigmaOS Zenith architecture internalizes AI as a core computational shard, governed by the following pillars of absolute sovereignty:
+The SigmaOS Zenith architecture internalizes AI as a core computational shard, governed by the following pillars:
 
 ## 1. Zero-Telemetry In-Kernel Inference
 All AI model inference occurs natively within the Sovereign Shard Lattice. SigmaOS forbids all foreign API calls or external telemetry. The model weights and execution logic are strictly local to the silicon.
