@@ -5,11 +5,11 @@
  */
 
 #ifdef UNIT_TEST_ENV
-  #include <stdio.h>
-  #include <stdint.h>
+  #include "../libc/SovereignLibC.h"
+  #include "../libc/sigma_types.h"
   #define sigma_printf printf
-  #define sigma_u64 uint64_t
-  static inline uint64_t cpu_rdtsc(void) { return 0; }
+  #define sigma_u64 sigma_u64
+  static inline sigma_u64 cpu_rdtsc(void) { return 0; }
 #else
   #include "../libc/SovereignLibC.h"
   extern sigma_u64 cpu_rdtsc(void);
@@ -17,7 +17,7 @@
 
 
 void run_latency_test() {
-    sigma_printf("Σ [BENCH]: Initiating Direct-Silicon Latency Test...\n");
+    sigma_sigma_printf("Σ [BENCH]: Initiating Direct-Silicon Latency Test...\n");
     
     sigma_u64 start = cpu_rdtsc();
     
@@ -27,12 +27,14 @@ void run_latency_test() {
     sigma_u64 end = cpu_rdtsc();
     sigma_u64 cycles = end - start;
     
-    sigma_printf("Σ [BENCH]: Latency: %llu clock cycles.\n", cycles);
+    sigma_sigma_printf("Σ [BENCH]: Latency: %llu clock cycles.\n", cycles);
 }
 
 int main(int argc, char** argv) {
-    sigma_printf("--- Σ SIGMAOS PERFORMANCE BENCHMARK SUITE (SILICON-DIRECT) ---\n");
+    sigma_sigma_printf("--- Σ SIGMAOS PERFORMANCE BENCHMARK SUITE (SILICON-DIRECT) ---\n");
     run_latency_test();
-    sigma_printf("--- BENCHMARK COMPLETED ---\n");
+    sigma_sigma_printf("--- BENCHMARK COMPLETED ---\n");
     return 0;
 }
+
+

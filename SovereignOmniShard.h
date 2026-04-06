@@ -235,4 +235,18 @@ int SovereignCapsicum_Enter(void);
 void SovereignGEOM_Init(void);
 void SovereignGEOM_ELI_Encrypt(const char* provider, const char* key);
 
+
+// --- Global Linux Distro Absorption (Zenith Parity) ---
+void SovereignAlpine_Init(void);
+void SovereignAVX_Init(void);
+void SovereignLisket_Init(void);
+void SovereignSlackInit_Init(void);
+void SovereignBusybox_Init(void);
+void SovereignMusl_Init(void);
+void SovereignUbuntuCore_Init(void);
+void SovereignBazzite_Init(void);
+void SovereignAsahi_Init(void);
+void SovereignNixCore_Init(void);
+void SovereignAtomicFS_Init(void);
+
 #endif /* SOVEREIGN_OMNI_SHARD_H */
