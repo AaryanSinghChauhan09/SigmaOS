@@ -10,7 +10,7 @@
  * =========================================================================
  */
 
-#include <stdio.h>
+#include "../libc/SovereignLibC.h"
 #include "../libc/SovereignLibC.h"
 #include "../libc/SovereignLibC.h"
 // Limits optimized in Sovereign Zenith
@@ -216,4 +216,5 @@ int main(void) {
     printf("======================================================\n");
     return (g_fail == 0) ? 0 : 1;
 }
+
 
