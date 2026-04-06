@@ -172,4 +172,16 @@ void SovereignSerenity_Init(void);
 void SovereignTempleOS_Init(void);
 void SovereignLUNA_Init(void);
 
+// --- Phase 35 Global Distro Absorption (Apex Enterprise & Cloud-Edge) ---
+void SovereignUEK_Init(void);
+void SovereignKpatch_Init(void);
+void SovereignAL2_Init(void);
+void SovereignSLES_Init(void);
+void SovereignPhoton_Init(void);
+void SovereignUpdateA_Init(void);
+void SovereignUpdateB_Init(void);
+void SovereignRancher_Init(void);
+void SovereignFlatcar_Init(void);
+void SovereignMicroOS_Init(void);
+
 #endif /* SOVEREIGN_OMNI_SHARD_H */

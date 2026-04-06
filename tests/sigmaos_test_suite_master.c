@@ -27,6 +27,8 @@ void test_slab_allocation() {
 // =========================================================================
 void test_shard_initialization_matrix();
 void test_libc_purity_audit();
+    test_silicon_floating_point();
+void test_silicon_floating_point();
 
 // Σ SCHEDULER SUBSYSTEM TESTS
 // =========================================================================
@@ -63,8 +65,10 @@ int main(int argc, char** argv) {
     test_process_scheduling_logic();
     test_shard_initialization_matrix();
     test_libc_purity_audit();
+    test_silicon_floating_point();
     
     sigma_printf("--- Σ ALL SOVEREIGN TESTS PASSED ACCORDING TO PLAN. --- \n");
     return 0;
 }
+
 

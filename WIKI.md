@@ -279,3 +279,17 @@
 | SovereignSerenity | SerenityOS | Unix-Like Visual Elegance & C++ Modern Parity | PURE |
 | SovereignTempleOS | TempleOS | JIT-Native HolyC-Grade Bare-Metal Parity | PURE |
 | SovereignLUNA | LUNA | Lua-Scriptable Microkernel Shard Orchestration | PURE |
+
+### Phase 35: Global Linux Distro Absorption (Apex Enterprise & Cloud-Edge)
+| Shard | Inspiration | USP | Status |
+| :--- | :--- | :--- | :--- |
+| SovereignUEK | Oracle Linux | Unbreakable Enterprise Kernel (UEK) Shard Parity | PURE |
+| SovereignKpatch | RHEL/Fedora | Live Kernel Shard Patching & Non-Disruptive Sync | PURE |
+| SovereignAL2 | Amazon Linux | AWS-Optimized Shard Lifecycle & Cloud-Gate Parity | PURE |
+| SovereignSLES | SUSE SLES | Enterprise-Grade YaST-Lattice & Kiwi Image Parity | PURE |
+| SovereignPhoton | VMware Photon | Micro-Container Optimized Shard-Execution Matrix | PURE |
+| SovereignUpdateA | CoreOS/Flatcar | Shard-Level A/B Transactional Update Cluster A | PURE |
+| SovereignUpdateB | CoreOS/Flatcar | Shard-Level A/B Transactional Update Cluster B | PURE |
+| SovereignRancher | RancherOS | Shard-Native Container-as-Process Orchestration | PURE |
+| SovereignFlatcar | Flatcar Linux | Stateless Shard Partitioning & Ignition Parity | PURE |
+| SovereignMicroOS | SUSE MicroOS | Transactional-Lattice Self-Healing Shard Matrix | PURE |
