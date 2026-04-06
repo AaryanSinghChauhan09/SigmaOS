@@ -1,0 +1,6 @@
+#include "../../../../libc/SovereignLibC.h"
+
+void SovereignTiny_Init() {
+    sigma_printf("Σ [ABSORB]: SovereignTiny Zenith Online. Unified Parity Verified.\n");
+}
+

@@ -147,4 +147,17 @@ void SovereignVoyager_Init(void);
 void SovereignMakulu_Init(void);
 void SovereignFeren_Init(void);
 
+// --- Phase 33 Global Distro Absorption (Apex Boot & Hal) ---
+void SovereignHAL_Init(void);
+void SovereignCrOS_Init(void);
+void SovereignCoreboot_Init(void);
+void SovereignLibreboot_Init(void);
+void SovereignVyOS_Init(void);
+void SovereignOPNsense_Init(void);
+void SovereignOpenRC_Init(void);
+void SovereignSystemdStub_Init(void);
+void SovereignUKUI_Init(void);
+void SovereignCinnamon_Init(void);
+void SovereignLXDE_Init(void);
+
 #endif /* SOVEREIGN_OMNI_SHARD_H */

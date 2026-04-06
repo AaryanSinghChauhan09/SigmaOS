@@ -250,3 +250,18 @@
 | SovereignVoyager | Voyager | Aesthetic XFCE-Lattice Customization & Flair | PURE |
 | SovereignMakulu | MakuluLinux | Visual AI-Lattice Navigation & Gesture Sovereignty | PURE |
 | SovereignFeren | Feren OS | Seamless Win/Mac Transition & Visual Convergence | PURE |
+
+### Phase 33: Global Linux Distro Absorption (Apex Boot & HAL)
+| Shard | Inspiration | USP | Status |
+| :--- | :--- | :--- | :--- |
+| SovereignHAL | Android (AOSP) | Bare-Metal Hardware Abstraction Layer (HAL) Lattice | PURE |
+| SovereignCrOS | ChromeOS | Cloud-Focused Shard Synchronization & Coreboot Parity | PURE |
+| SovereignCoreboot| Coreboot | Open-Source BIOS/UEFI Replacement Shard Stability | PURE |
+| SovereignLibreboot| Libreboot | 100% Free Hardware Bootloader Shard Integrity | PURE |
+| SovereignVyOS | VyOS | Industrial Net-Filter & Routing Gateway Matrix | PURE |
+| SovereignOPNsense | OPNsense | Hardened BSD-Grade Firewall Sharding & Filtering | PURE |
+| SovereignOpenRC | Gentoo (OpenRC) | Procedural Service Management & Sync Parity | PURE |
+| SovereignSystemdStub| systemd | Non-Intrusive systemd Compatibility Layer Shard | PURE |
+| SovereignUKUI | Ubuntu Kylin | Visual-Lattice Aesthetics & Chinese Convergence | PURE |
+| SovereignCinnamon | Linux Mint | Traditional Visual Lattice & Cinnamon-Parity | PURE |
+| SovereignLXDE | LXDE | Ultra-Lightweight Legacy Visual Lattice Support | PURE |
