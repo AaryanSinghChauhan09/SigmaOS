@@ -221,3 +221,17 @@
 | SovereignPCC | PCLinuxOS | Rolling Lattice-Shard Consistency & Parity | PURE |
 | SovereignYaST | OpenSUSE | Unified Lattice Configuration & Admin Matrix | PURE |
 | SovereignOBS | OpenSUSE | Distributed Lattice Build & Build-Service Parity | PURE |
+
+### Phase 31: Global Linux Distro Absorption (Apex Management)
+| Shard | Inspiration | USP | Status |
+| :--- | :--- | :--- | :--- |
+| SovereignRescue | SystemRescue | Shard-Level Disaster Recovery & Silicon Rescue | PURE |
+| SovereignClone | Clonezilla | Block-Level Shard Cloning & Multi-Cast Replication | PURE |
+| SovereignProxmox | Proxmox | Shard-Level Virtualization & Container Orchestration | PURE |
+| SovereignTrueNAS | TrueNAS | Transactional ZFS Shard-Storage Management Matrix | PURE |
+| SovereignOMV | OpenMediaVault | Minimalist NAS-Grade Shard Cluster Orchestration | PURE |
+| SovereignCosmic | Pop!_OS (COSMIC) | Auto-Tiling Visual Lattice & Workspace Zenith | PURE |
+| SovereignMXTools | MX Linux | Industrial Matrix Toolsets & Snapshot Parity | PURE |
+| SovereignPamac | Manjaro | Lattice-Aware GUI Package Management Finality | PURE |
+| SovereignClear | ClearOS | Small-Business Gateway Shard & Network Parity | PURE |
+| SovereignQiana | Linux Mint 17 | Refined Mint-Specific Aesthetic Tools & Stability | PURE |

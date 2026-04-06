@@ -2,9 +2,8 @@
  * =========================================================================
  * Σ SIGMAOS: SOVEREIGN OMNI-SHARD (v20.0 - PURE C11 FINALITY)
  * =========================================================================
- * Converted from C++ OOP to ANSI C11 — C-style vtable structs.
- * Domains: OS Kernel, Cloud, Web UI, Networking, Security, AI
- * Principle: Zero OOP runtime. Zero vtable overhead. Raw function pointers.
+ * Principle: Zero OOP runtime. Zero vtable overhead. Unified Matrix.
+ * Standard: C11 (ISO/IEC 9899:2011)
  * =========================================================================
  */
 
@@ -14,7 +13,19 @@
 #include "libc/SovereignLibC.h"
 
 /* =========================================================================
- * CORE KERNEL & SCHEDULING
+ * CORE ABSTRACTIONS
+ * ========================================================================= */
+#define CLASS_DECLARE(name) typedef struct name name##_t; struct name
+#define VIRTUAL(ret, name, ...) ret (*name)(__VA_ARGS__)
+
+CLASS_DECLARE(SigmaObject) {
+    const char* class_name;
+    sigma_u32 object_id;
+    VIRTUAL(void, destroy, struct SigmaObject* self);
+};
+
+/* =========================================================================
+ * DOMAIN: KERNEL & SCHEDULING
  * ========================================================================= */
 typedef struct SovereignScheduler {
     const char* type_name;
@@ -23,26 +34,26 @@ typedef struct SovereignScheduler {
 } SovereignScheduler;
 
 void SovereignScheduler_init(SovereignScheduler* s);
-void SovereignScheduler_MultilevelFeedbackQueue(SovereignScheduler* s);
-void SovereignScheduler_RealTimeDeadlineSchedule(SovereignScheduler* s);
-void SovereignScheduler_audit(const SovereignScheduler* s);
 
 /* =========================================================================
- * AETHER SENTINEL & AUTONOMOUS RECOVERY
+ * DOMAIN: OMNI-CLI & DISTRO ABSORPTION CORE
  * ========================================================================= */
-#define MAX_TRAP_HISTORY 128
-typedef struct SovereignAetherSentinel {
-    sigma_u32 global_errors_resolved;
-    sigma_bool autonomous_mode;
-    sigma_u64 last_fault_addr;
-    sigma_u64 trap_history[MAX_TRAP_HISTORY];
-    sigma_u32 trap_index;
-} SovereignAetherSentinel;
+typedef struct {
+    char legacy_command[64];
+    char legacy_distro_origin[64];
+    char target_sigma_shard[64];
+    sigma_bool was_destructive;
+} OmniCLI_AbsorptionRule_t;
 
-void SovereignAetherSentinel_init(SovereignAetherSentinel* s);
-void SovereignAetherSentinel_HandleTrap(SovereignAetherSentinel* s, sigma_u64 trap_id, sigma_u64 rip);
-void SovereignAetherSentinel_ResolveLastError(SovereignAetherSentinel* s, const char* shard_id, sigma_u64 error_code);
-void SovereignAetherSentinel_AuditIntegrity(SovereignAetherSentinel* s);
+static const OmniCLI_AbsorptionRule_t g_omnicli_absorption_table[] = {
+    {"apt install", "Debian/Ubuntu", "SovereignAPT_Install", SIGMA_FALSE},
+    {"pacman -S",   "Arch Linux",    "SovereignALPM_Sync",   SIGMA_FALSE},
+    {"dnf update",  "Fedora/RHEL",   "SovereignDNF_Update",  SIGMA_FALSE},
+    {"EOF",         "",              "",                     SIGMA_FALSE}
+};
+
+void sigma_omnicli_absorb_command(const char* legacy_input);
+void sigma_omnicli_dispatch(const char* distro, const char* command);
 
 /* =========================================================================
  * FREEBSD ABSORPTION (ZENITH SUPREME)
@@ -56,10 +67,10 @@ void SovereignCapsicum_Init(void);
 void SovereignGEOM_Init(void);
 
 /* =========================================================================
- * GLOBAL LINUX DISTRO ABSORPTION REGISTRY
+ * GLOBAL LINUX DISTRO ABSORPTION (SHARD REGISTRY)
  * ========================================================================= */
 
-// --- Phase 27: Base Distribution Parity ---
+// --- Phase 27: Base Parity ---
 void SovereignAlpine_Init(void);
 void SovereignAVX_Init(void);
 void SovereignLisket_Init(void);
@@ -111,24 +122,16 @@ void SovereignPCC_Init(void);
 void SovereignYaST_Init(void);
 void SovereignOBS_Init(void);
 
-/* =========================================================================
- * SIGMAOS ZENITH SUPREME: OOP ABSTRACTION LAYER
- * ========================================================================= */
-#define CLASS_DECLARE(name) typedef struct name name##_t; struct name
-#define VIRTUAL(ret, name, ...) ret (*name)(__VA_ARGS__)
-
-CLASS_DECLARE(SigmaObject) {
-    const char* class_name;
-    sigma_u32 object_id;
-    VIRTUAL(void, destroy, struct SigmaObject* self);
-};
-
-static inline void sigma_object_init(SigmaObject_t* obj, const char* name, sigma_u32 id) {
-    if (obj) {
-        obj->class_name = name;
-        obj->object_id = id;
-        obj->destroy = 0;
-    }
-}
+// --- Phase 31: Apex Management ---
+void SovereignRescue_Init(void);
+void SovereignClone_Init(void);
+void SovereignProxmox_Init(void);
+void SovereignTrueNAS_Init(void);
+void SovereignOMV_Init(void);
+void SovereignCosmic_Init(void);
+void SovereignMXTools_Init(void);
+void SovereignPamac_Init(void);
+void SovereignClear_Init(void);
+void SovereignQiana_Init(void);
 
 #endif /* SOVEREIGN_OMNI_SHARD_H */
