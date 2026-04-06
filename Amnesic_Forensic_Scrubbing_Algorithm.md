@@ -97,7 +97,7 @@ cpu_cache.scrub(&cpu_cache);     cpu_cache.report(&cpu_cache);
 The forensic matrix kernel shard provides additional capabilities:
 
 | Feature | Description |
-| --------- | ----------- |
+| --- | --- |
 | **Memory Imaging** | Captures volatile RAM snapshots before wipe |
 | **PCAP Forensics** | Records network packets for post-analysis |
 | **Audit Log Encryption** | Signs all logs with a kernel-level hash |
@@ -120,7 +120,7 @@ The BNSS shard certifies that digital evidence collected by SigmaOS meets Indian
 ## Supported Target Domains
 
 | Domain | Description |
-| -------- | ----------- |
+| --- | --- |
 | `Kernel_Memory_Pages` | Raw kernel RAM pages |
 | `VFS_Temporary_Blocks` | Temp write buffers in the VFS |
 | `L1_L2_CPU_Caches` | Hardware CPU cache flush simulation |

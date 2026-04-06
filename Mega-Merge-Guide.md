@@ -106,10 +106,12 @@ Below are example scripts to automate common tasks:
 #!/bin/bash
 
 # Merge feature branch to main
+
 git checkout main
 git merge feature/my-feature
 
 # Push changes
+
 git push origin main
 ```
 
@@ -119,6 +121,7 @@ git push origin main
 #!/bin/bash
 
 # Example automation script to run tests before merging
+
 npm test
 
 if [ $? -ne 0 ]; then
@@ -127,6 +130,7 @@ if [ $? -ne 0 ]; then
 fi
 
 # Proceed with the merge if tests pass
+
 ./merge_push.sh
 ```
 

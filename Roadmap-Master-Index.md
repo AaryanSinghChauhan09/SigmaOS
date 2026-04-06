@@ -14,7 +14,7 @@
 ## 📊 Executive Dashboard
 
 | Section | Items | P0 (Critical) | P1 (High) | P2 (Normal) | File |
-|---------|-------|---------------|-----------|-------------|------|
+| --- | --- | --- | --- | --- | --- |
 | **I. Automation & System Intelligence** | 220 | 58 | 104 | 58 | `COMPREHENSIVE_IMPROVEMENT_ROADMAP.md` |
 | **II. Customization & Personalization** | 360 | 22 | 168 | 170 | `ROADMAP_SECTION_II.md` |
 | **III. Specialization & Feature Expansion** | 410 | 78 | 198 | 134 | `ROADMAP_SECTION_III.md` |
@@ -82,6 +82,7 @@ Polish, optimization, and frontier capabilities.
 ## 🏗️ Implementation Phases
 
 ### Phase 1: Foundation (Items ~670)
+
 >
 > **Focus**: All P0 items across all sections
 > **Estimated Complexity**: Maximum — establishes sovereign building blocks
@@ -98,6 +99,7 @@ Polish, optimization, and frontier capabilities.
 - API gateway and REST framework
 
 ### Phase 2: Expansion (Items ~1,044)
+
 >
 > **Focus**: All P1 items across all sections
 > **Estimated Complexity**: High — builds complete feature matrix
@@ -114,6 +116,7 @@ Polish, optimization, and frontier capabilities.
 - Build system and CI/CD pipeline
 
 ### Phase 3: Dominance (Items ~636)
+
 >
 > **Focus**: All P2 items — frontier features
 > **Estimated Complexity**: Variable — many are research-grade
@@ -133,7 +136,7 @@ Polish, optimization, and frontier capabilities.
 ## 🧩 Target Shard Heatmap (Top 20 Most Impacted)
 
 | Shard | Total Items | Role |
-|-------|------------|------|
+| --- | --- | --- |
 | `SovereignDiagnosticsZenith.c` | 120+ | Monitoring, profiling, metrics |
 | `SovereignDesktopZenith.h` | 110+ | Window mgr, UI framework, accessibility |
 | `SovereignStyleZenith.c` | 90+ | Theming, visual design, CSS engine |
@@ -160,7 +163,7 @@ Polish, optimization, and frontier capabilities.
 ## 🔗 CLI Command Namespace Mapping
 
 | CLI Namespace | Sections Covered | Example Commands |
-|--------------|------------------|-----------------|
+| --- | --- | --- |
 | `sigma auto` | I-A,B | `sigma auto tune memory`, `sigma auto schedule` |
 | `sigma sec` | I-E, III-F | `sigma sec scan`, `sigma sec rotate-keys` |
 | `sigma perf` | V-A,B,C,D,E | `sigma perf bench cpu`, `sigma perf cache stats` |
@@ -199,7 +202,7 @@ Polish, optimization, and frontier capabilities.
 ## 📌 New Shards Required
 
 | New Shard | Section | Purpose |
-|-----------|---------|---------|
+| --- | --- | --- |
 | `gpu_compute_shard.c` | III-B | GPU abstraction, rendering, compute shaders |
 | `audio_engine_shard.c` | III-C | Audio DSP, effects, routing, codecs |
 | `sci_compute_shard.c` | IX-A | BLAS, FFT, scientific math library |
@@ -211,7 +214,7 @@ Polish, optimization, and frontier capabilities.
 ## 📜 Status Legend
 
 | Symbol | Meaning |
-|--------|---------|
+| --- | --- |
 | `[ ]` | Pending — Not yet started |
 | `[~]` | In Progress — Active development |
 | `[✓]` | Complete — Verified and merged |

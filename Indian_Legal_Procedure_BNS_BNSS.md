@@ -1,6 +1,6 @@
 # SigmaOS Legal Portal: Indian Law Checklists (BNS, BNSS, BSA)
 
-**Repository Synchronization Target**: `indian_law.c` Shard  
+**Repository Synchronization Target**: `indian_law.c` Shard
 **Status**: ACTIVE as of Current Indian Court Standings (Post July 1, 2024 implementation of BNS, BNSS, and BSA)
 
 This document serves as the master checklist to outline the exact execution steps, forms, and procedural necessities embedded within the `sigma law` execution module. This allows forensic professionals using SigmaOS to navigate the modern Indian Criminal Justice System locally without internet dependencies.
@@ -78,9 +78,12 @@ Strict timelines are enforced to crush pendency.
 The `indian_law.c` Shard allows users to instantly generate the BSA Sec 61 certificates and pre-fill Arrest/Seizure Memos directly via the terminal:
 
 ```bash
+
 # Generate a Sec 61 BSA digital evidence certificate for a seized hard drive
+
 root@sigma:~# sigma law --generate-cert --device /dev/sdX1 --hash SHA256
 
 # Pull exact arrest procedures for organized crime
+
 root@sigma:~# sigma law --query "handcuffing procedure BNSS"
 ```

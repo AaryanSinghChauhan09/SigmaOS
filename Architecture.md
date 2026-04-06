@@ -14,17 +14,17 @@ graph TD
     subgraph "Kernel Layer (Sovereign Core)"
         K1[boot.asm] --> K2[kmain.c]
         K2 --> K3[SigmaCore]
-        
+
         subgraph "Memory Management"
             M1[slab.c] --- M2[vmm.c]
             M2 --- M3[pmm.c]
         end
-        
+
         subgraph "Process Management"
             P1[process.c] --- P2[scheduler.c]
             P2 --- P3[signal.c]
         end
-        
+
         subgraph "Filesystem"
             V1[vfs.c] --- V2[ramfs]
             V2 --- V3[procfs]

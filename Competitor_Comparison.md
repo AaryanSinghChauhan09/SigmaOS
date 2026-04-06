@@ -5,7 +5,7 @@ This detailed comparison matrix outlines the absolute operational superiority of
 ## ⚔️ The Sovereign Comparison Matrix
 
 | Feature / Paradigm | 💎 SigmaOS (Zenith Supreme) | 🐧 Linux (Arch / Ubuntu) | 🪟 Windows 11 | 🍏 macOS | 🕵️ Kali / Qubes OS |
-| -------------------- | ---------------------------- | ---------------------------- | ---------------- | ---------- | ------------------- |
+| --- | --- | --- | --- | --- | --- |
 | **Core Dependency Model** | **Zero-Dependency.** No `glibc`/`musl`/POSIX bloat. Native `SovereignLibC.h`. | Heavily dependent on deeply nested dependency trees and standard C libraries. | Massive legacy NT kernel dependency map. | Proprietary Mach kernel / BSD dependencies. | Inherits Linux dependencies; Qubes uses Xen virtualization overhead. |
 | **System Extensibility** | **Shard-On-Demand (SOD).** Dynamic C11 shards hot-loaded into Ring-0 directly. | Package managers (`apt`, `pacman`) injecting permanent system daemons. | Installers mutating the central registry. | Signed bundle installations in `/Applications`. | Meta-packages and dom0/appVM strict boundaries. |
 | **AI Integration** | **AI-Native Core.** Local LLM IPC dispatch baked into Ring-0 VFS and Omnishell. | Fragmented. Requires user installation of Python/CUDA/PyTorch ecosystems. | Copilot (Cloud-dependent, integrated as an overlay layer). | CoreML and generic Apple Intelligence. | None natively. Requires external package configurations. |

@@ -3,7 +3,7 @@
 ## Audit Overview
 
 | Field         | Value                                       |
-| ------------- | ------------------------------------------- |
+| --- | --- |
 | Audit Version | v2.0 (Comprehensive Multi-Domain)           |
 | Audit Date    | 2026-04-04                                  |
 | Auditor       | Sovereign AI Zenith Agent (Claude Sonnet)   |
@@ -63,7 +63,7 @@
 ### 2.1 Zero-Dependency Protocol
 
 | Check | Status |
-| ----- | ------ |
+| --- | --- |
 | `#include <stdio.h>` in kernel/libc | ✅ NONE FOUND |
 | `#include <stdlib.h>` in kernel/libc | ✅ NONE FOUND |
 | `#include <string.h>` in kernel/libc | ✅ NONE FOUND |
@@ -73,7 +73,7 @@
 ### 2.2 Stack Protection
 
 | Check | Status |
-| ----- | ------ |
+| --- | --- |
 | Stack Canary (`0xDEADC0DE`) | ✅ ACTIVE at `stack_bottom` |
 | Stack in `.bss` section | ✅ FIXED (moved from `.data`) |
 | `-fno-stack-protector` flag | ✅ Set for freestanding kernel |
@@ -81,7 +81,7 @@
 ### 2.3 Memory Safety
 
 | Feature | Status |
-| ------- | ------ |
+| --- | --- |
 | `k_memset` (REP STOSB) | ✅ Hardware-direct |
 | `k_memcpy` (REP MOVSB) | ✅ Hardware-direct |
 | Slab allocator double-free guard | ✅ Verified in test_memory |
@@ -92,7 +92,7 @@
 ## Phase 3: Lifecycle Compliance Matrix
 
 | Lifecycle | Key Shards | Status |
-| --------- | ---------- | ------ |
+| --- | --- | --- |
 | OSDLC | kmain.c, boot.asm, idt.c, scheduler.c | ✅ COMPLIANT |
 | SDLC | tests/, CI/CD, CHANGELOG.md | ✅ COMPLIANT |
 | CySDLC | SovereignLatticePQC.c, SovereignAmnesicShard.c | ✅ COMPLIANT |
@@ -110,7 +110,7 @@
 ## Phase 4: Test Coverage Summary
 
 | Test Suite | Test Groups | Assertions | Result |
-| ---------- | ----------- | ---------- | ------ |
+| --- | --- | --- | --- |
 | test_memory.c | 5 | 20+ | PASS |
 | test_scheduler.c | 6 | 25+ | PASS |
 | sigmaos_test_suite_master.c | 2 (integration) | 4 | PASS (CI) |

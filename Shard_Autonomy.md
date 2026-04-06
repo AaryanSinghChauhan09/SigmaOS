@@ -35,7 +35,7 @@ Boot Sequence
 ## Shard Lifecycle
 
 | State | Description |
-| ------- | ----------- |
+| --- | --- |
 | `DORMANT` | Registered but not loaded into memory |
 | `LOADING` | Being compiled/injected by shard_core |
 | `ACTIVE` | Running in its isolated memory domain |
@@ -47,7 +47,7 @@ Boot Sequence
 ## Shard Manifest (Full List)
 
 | Shard ID | File | Domain | Description |
-| ---------- | ------ | -------- | ----------- |
+| --- | --- | --- | --- |
 | `ai_lab` | `SovereignAIKernelZenith.c` | AI | LLM orchestration and tensor kernel |
 | `forensics` | `SovereignForensicMatrix.c` | Security | Memory imaging  + PCAP + audit |
 | `pqc` | `SovereignLatticePQC.c` | Security | Post-quantum LWE cryptography |
@@ -96,7 +96,7 @@ sigma shard evict camera_shard
 ## Persona-Aware Shard Profiles
 
 | Persona | Auto-loaded Shards |
-| --------- | -------------------- |
+| --- | --- |
 | **Developer** | `ai_lab`, `cs_research`, `automation`, `checklist` |
 | **Forensic Analyst** | `forensics`, `amnesic`, `bnss`, `pqc`, `netmesh` |
 | **Student** | `ncert`, `calculator`, `dsa_shard`, `ml_core` |

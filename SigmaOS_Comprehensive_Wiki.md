@@ -19,7 +19,7 @@ This active document serves as the **Supreme Roadmap** to crush incumbent Linux 
 ## 🧩 Comprehensive Feature & USP Mapping
 
 | Category | Linux Distros (Current State) | SigmaOS (Current State) | SigmaOS (Needed Enhancements / Supreme USPs) |
-|----------|---------------------------|-----------------|------------------------------------|
+| --- | --- | --- | --- |
 | **USPs (Unique Selling Propositions)** | Powerful but fragmented; static apps; minimal AI | Persona-aware shards, modularity, zero-dependency cores | AI-native ecosystem, adaptive security, unified hub, cloud-native sync, accessibility-first |
 | **Automation Tools** | `cron`, `systemd timers`, Ansible, udev rules | Embedded C11 Optimizer Daemons (`sigma_auto_optimizer.c`) | GUI automation dashboards, AI workflow builder, persona-aware autonomous logic, rollback/export/import |
 | **Customization Tools** | KDE Plasma widgets, GTK/QT themes, dotfiles, shell configs | Native JS DOM-Level Shard Morphing (`restore_features.js`) | Unified customization hub, theme matrix marketplace, dynamic CSS icon packs, plugin ecosystem via `SigmaOOP.h` |
@@ -727,18 +727,21 @@ Thank you for using SigmaOS! We are committed to providing the best support poss
 If you have questions, encounter issues, or need guidance on using SigmaOS, here are the official ways to get support:
 
 1. **GitHub Issues**:
+
     - Before opening a new issue, please check existing issues to see if your question has been answered or if a solution is already being discussed.
     - For bugs, use the `Bug Report` template.
     - For feature requests, use the `Feature Request` template.
     - Link: [SigmaOS GitHub Issues](https://github.com/[REDACTED_AUTHOR]SinghSigmaSovereign09/SigmaOS/issues)
 
 2. **Official Documentation**:
+
     - Comprehensive guides and architectural insights are available in:
         - [os_guide.md](os_guide.md)
         - [AUTOMATION_ZENITH.md](AUTOMATION_ZENITH.md)
         - [SECURITY.md](SECURITY.md)
 
 3. **Community & Discussions**:
+
     - Join our SigmaOS community discussions for real-time support and collaboration.
     - Link: [SigmaOS GitHub Discussions](https://github.com/[REDACTED_AUTHOR]SinghSigmaSovereign09/SigmaOS/discussions)
 
@@ -761,6 +764,7 @@ Your research into the security of SigmaOS is highly valued. We are committed to
 If you have discovered a security vulnerability in SigmaOS, please report it through the official channels listed below. **Do not create a public GitHub issue** for reporting vulnerabilities.
 
 1. **Email Reporting**:
+
    - Send a detailed description of the vulnerability to: [INSERT EMAIL].
    - Please include:
      - The nature of the vulnerability.
@@ -769,6 +773,7 @@ If you have discovered a security vulnerability in SigmaOS, please report it thr
      - Any recommended fixes or mitigations.
 
 2. **Secure Shard Submission**:
+
    - You can also submit reports via the **Sovereign-Security Shard** if you are already a verified contributor.
 
 ## Response Process
@@ -1180,7 +1185,7 @@ Below is an expanded catalogue detailing the underlying Omni-Shell logic for gra
 ### 📺 Display & Screen Management
 
 | Command | Action |
-|---|---|
+| --- | --- |
 | `sigma-display brightness set 80` | Set screen brightness to 80% via hardware backlight register |
 | `sigma-display gamma set 1.2 1.2 1.0` | Adjust RGB gamma correction curves directly |
 | `sigma-display color-profile apply sRGB` | Load an ICC color profile at hardware buffer level |
@@ -1197,7 +1202,7 @@ Below is an expanded catalogue detailing the underlying Omni-Shell logic for gra
 ### 🖥️ Window & Workspace Management
 
 | Command | Action |
-|---|---|
+| --- | --- |
 | `sigma-ui window list` | List all open windows with PIDs |
 | `sigma-ui window focus --pid <id>` | Bring a window into foreground focus |
 | `sigma-ui window minimize --pid <id>` | Minimize a specific window |
@@ -1220,7 +1225,7 @@ Below is an expanded catalogue detailing the underlying Omni-Shell logic for gra
 ### 🗂️ File System & Storage
 
 | Command | Action |
-|---|---|
+| --- | --- |
 | `sigma-fs mount --dev /dev/sda2 --point /mnt/data --type ext4` | Mount drive natively |
 | `sigma-fs unmount /mnt/data` | Unmount drive |
 | `sigma-fs format --dev /dev/sdb1 --type sigma-fs --label DATA` | Format drive with SigmaFS |
@@ -1242,7 +1247,7 @@ Below is an expanded catalogue detailing the underlying Omni-Shell logic for gra
 ### 🌐 Networking & Connectivity
 
 | Command | Action |
-|---|---|
+| --- | --- |
 | `sigma-net ip set --iface eth0 --addr 192.168.1.5/24` | Statically assign IP to an interface |
 | `sigma-net ip dhcp --iface eth0` | Request DHCP lease on interface |
 | `sigma-net route add --dest 10.0.0.0/8 --gw 192.168.1.1` | Add a static route |
@@ -1273,7 +1278,7 @@ Below is an expanded catalogue detailing the underlying Omni-Shell logic for gra
 ### 🔒 Security & Privacy
 
 | Command | Action |
-|---|---|
+| --- | --- |
 | `sigma-sec passwd change --user user1` | Change a user password |
 | `sigma-sec 2fa enable --user user1 --method totp` | Enable two-factor auth |
 | `sigma-sec session list` | List all active user sessions |
@@ -1293,7 +1298,7 @@ Below is an expanded catalogue detailing the underlying Omni-Shell logic for gra
 ### 🔈 Audio & Media
 
 | Command | Action |
-|---|---|
+| --- | --- |
 | `sigma-audio volume set --sink default 75` | Set master volume |
 | `sigma-audio mute toggle --sink default` | Toggle mute |
 | `sigma-audio device list` | List audio devices |
@@ -1312,7 +1317,7 @@ Below is an expanded catalogue detailing the underlying Omni-Shell logic for gra
 ### 📊 Process & System Monitoring
 
 | Command | Action |
-|---|---|
+| --- | --- |
 | `sigma-ps list --sort cpu --top 20` | List top 20 CPU-consuming processes |
 | `sigma-ps kill --pid <id> --signal SIGTERM` | Send signal to process |
 | `sigma-ps kill --name chrome --signal SIGKILL` | Kill all processes by name |
@@ -1331,7 +1336,7 @@ Below is an expanded catalogue detailing the underlying Omni-Shell logic for gra
 ### 🤖 AI Copilot & Intelligence
 
 | Command | Action |
-|---|---|
+| --- | --- |
 | `sigma-ai explain --cmd "sigma-kernel module inject"` | Get explanation of any OS command |
 | `sigma-ai suggest --context "high cpu usage"` | Get AI suggestions for current state |
 | `sigma-ai anomaly scan` | Run AI anomaly detection on system state |
@@ -1349,7 +1354,7 @@ Below is an expanded catalogue detailing the underlying Omni-Shell logic for gra
 ### 🧩 Shard & Persona Orchestration
 
 | Command | Action |
-|---|---|
+| --- | --- |
 | `sigma-shard status` | Show all currently loaded shards and their memory footprints |
 | `sigma-shard load ui --lazy` | Lazily pre-queue UI shard for next GUI invocation |
 | `sigma-shard profile save --name my-dev-state` | Save entire loaded shard profile |
@@ -1364,7 +1369,7 @@ Below is an expanded catalogue detailing the underlying Omni-Shell logic for gra
 ### 🏗️ Developer & Toolchain
 
 | Command | Action |
-|---|---|
+| --- | --- |
 | `sigma-dev compile --lang c11 --src main.c --out main --flags "-O3"` | Compile C11 source natively |
 | `sigma-dev compile --lang asm --src boot.asm --out boot.bin` | Assemble ASM to binary |
 | `sigma-dev link --objs "a.o b.o" --out app --static` | Native static linker |
@@ -1382,7 +1387,7 @@ Below is an expanded catalogue detailing the underlying Omni-Shell logic for gra
 ### 📦 Package Management (SigmaPKG)
 
 | Command | Action |
-|---|---|
+| --- | --- |
 | `sigma-pkg list --installed` | List all installed packages |
 | `sigma-pkg depends <name>` | Show dependency tree for a package |
 | `sigma-pkg verify <name>` | Verify cryptographic integrity of installed package |
@@ -1406,7 +1411,7 @@ Below is an expanded catalogue detailing the underlying Omni-Shell logic for gra
 All items previously listed as `[ ]` in OS_MISSING_PARITY.md are now RESOLVED:
 
 | Command | Resolution & Working |
-|---|---|
+| --- | --- |
 | `sigma-net socket create --type TCP` | Creates a raw TCP socket via `sys_socket` syscall. No libc wrapper. Returns fd. |
 | `sigma-net socket bind --fd 3 --addr 0.0.0.0 --port 8080` | Binds socket fd to port via `sys_bind`. Pure ASM dispatch. |
 | `sigma-net socket listen --fd 3 --backlog 128` | Marks socket as passive listener via `sys_listen`. |
@@ -1421,7 +1426,7 @@ All items previously listed as `[ ]` in OS_MISSING_PARITY.md are now RESOLVED:
 ### ✅ MISSING PARITY FIXES: Process Management (Scheduler RT)
 
 | Command | Resolution & Working |
-|---|---|
+| --- | --- |
 | `sigma-ps sched set --pid <id> --policy SCHED_FIFO --prio 50` | Sets real-time scheduling policy via `sys_sched_setscheduler`. |
 | `sigma-ps sched set --pid <id> --policy SCHED_RR --prio 30` | Round-robin RT scheduling. |
 | `sigma-ps signal send --pid <id> --sig SIGTERM` | Dispatches POSIX signal via `sys_kill`. |
@@ -1436,7 +1441,7 @@ All items previously listed as `[ ]` in OS_MISSING_PARITY.md are now RESOLVED:
 ### ✅ MISSING PARITY FIXES: File System Drivers
 
 | Command | Resolution & Working |
-|---|---|
+| --- | --- |
 | `sigma-fs ext4 mount --dev /dev/sda1 --point /mnt/linux` | Mounts real EXT4 partition. Native ext4 driver in C11. |
 | `sigma-fs ext4 check --dev /dev/sda1` | Checks ext4 consistency via block bitmap reads. |
 | `sigma-fs btrfs mount --dev /dev/sdb1 --point /mnt/btrfs` | Mounts BTRFS with CoW support. |
@@ -1450,7 +1455,7 @@ All items previously listed as `[ ]` in OS_MISSING_PARITY.md are now RESOLVED:
 ### ✅ MISSING PARITY FIXES: Coreutils Native Implementations
 
 | Command | Resolution & Working |
-|---|---|
+| --- | --- |
 | `sigma-grep --pattern "error" --file system.log` | Native grep via custom Boyer-Moore in C11. Zero regex lib. |
 | `sigma-grep -r --pattern "TODO" --path ./src` | Recursive file search. |
 | `sigma-sed --expr "s/foo/bar/g" --file config.txt` | Stream editor. Custom NFA-based regex in C11 ASM. |
@@ -1473,7 +1478,7 @@ All items previously listed as `[ ]` in OS_MISSING_PARITY.md are now RESOLVED:
 ### ✅ MISSING PARITY FIXES: System Administration Commands
 
 | Command | Resolution & Working |
-|---|---|
+| --- | --- |
 | `sigma-sudo run --user root --cmd "sigma-kernel tune"` | Privilege escalation via `sys_setuid`. Sovereign-native. |
 | `sigma-sudo policy add --user user1 --cmd sigma-pkg` | Grant selective sudo rights. |
 | `sigma-init status` | Show SigmaInit service states (parity: `systemctl status`). |
@@ -1493,7 +1498,7 @@ All items previously listed as `[ ]` in OS_MISSING_PARITY.md are now RESOLVED:
 ### 🔬 Forensics & Legal Compliance Commands
 
 | Command | Resolution & Working |
-|---|---|
+| --- | --- |
 | `sigma-forensic dd --src /dev/sda --out /mnt/evidence/disk.img --bs 512` | Forensic byte-for-byte disk image. `sys_read` loop with progress. |
 | `sigma-forensic hash --file disk.img --algo SHA3-256` | Hash file with SHA3. Native C11 implementation. |
 | `sigma-forensic strings --file binary --min-len 8` | Extract printable strings from binary. |
@@ -1508,7 +1513,7 @@ All items previously listed as `[ ]` in OS_MISSING_PARITY.md are now RESOLVED:
 ### 🤖 Automation Cron & Event Hooks
 
 | Command | Resolution & Working |
-|---|---|
+| --- | --- |
 | `sigma-cron list` | List all scheduled tasks. |
 | `sigma-cron add --time "0 3 * * *" --cmd "sigma-kernel scrub"` | Schedule nightly silicon scrub. |
 | `sigma-cron delete --id <cron_id>` | Remove a cron task. |
@@ -1523,7 +1528,7 @@ All items previously listed as `[ ]` in OS_MISSING_PARITY.md are now RESOLVED:
 ### 🎯 Camera App (MIT Scratch USP + Snapchat USP)
 
 | Command | Resolution & Working |
-|---|---|
+| --- | --- |
 | `sigma-camera list` | List available camera devices. |
 | `sigma-camera stream --device /dev/video0 --port 8554` | Stream camera via raw RTSP. No GStreamer. |
 | `sigma-camera ar-filter load --name "dog-ears"` | Load AR filter (matrix convolution in ASM). |
@@ -1538,7 +1543,7 @@ All items previously listed as `[ ]` in OS_MISSING_PARITY.md are now RESOLVED:
 ### 🌍 Cross-Distro Personality Commands
 
 | Command | Resolution & Working |
-|---|---|
+| --- | --- |
 | `sigma-distro personality ubuntu --mode lts` | Emulate Ubuntu LTS package behaviors. |
 | `sigma-distro personality arch --aur enable` | Emulate Arch with AUR-parity shard. |
 | `sigma-distro personality kali --enable-sec-tools` | Load Kali-parity penetration testing shards. |
@@ -1550,12 +1555,13 @@ All items previously listed as `[ ]` in OS_MISSING_PARITY.md are now RESOLVED:
 
 ---
 
-**ARCHITECTURAL PRINCIPLE:**  
-All commands above dispatch directly via `sys_*` syscalls or hardware registers.  
-No Python. No Node. No libc. No pre-defined function libraries.  
+**ARCHITECTURAL PRINCIPLE:**
+All commands above dispatch directly via `sys_*` syscalls or hardware registers.
+No Python. No Node. No libc. No pre-defined function libraries.
 The Omni-Shell IS the API surface of the entire operating system.
 
 ## 📌 QUICK NAVIGATION INDEX
+
 >
 > For previously separate documents, all content has been merged here:
 >
@@ -1574,7 +1580,7 @@ The Omni-Shell IS the API surface of the entire operating system.
 ### 🥾 Bootloader & Init System Commands
 
 | Command | Working / Implementation |
-|---|---|
+| --- | --- |
 | `sigma-boot entry list` | Lists all UEFI/BIOS boot entries via EFI variables. No GRUB CLI needed. |
 | `sigma-boot entry add --label SigmaOS --path /EFI/sigma/sigmaos.efi` | Adds a boot entry to EFI NVRAM directly. |
 | `sigma-boot entry delete --id 3` | Removes boot entry from NVRAM. |
@@ -1596,7 +1602,7 @@ The Omni-Shell IS the API surface of the entire operating system.
 ### 📦 Containerisation & Virtualisation
 
 | Command | Working / Implementation |
-|---|---|
+| --- | --- |
 | `sigma-container build --file Containerfile --tag myapp:1.0` | Build container image from spec. Native overlayfs layers. |
 | `sigma-container run --image myapp:1.0 --name c1 --net host` | Run container with host networking. |
 | `sigma-container exec --name c1 --cmd "/bin/sigma-sh"` | Exec into running container. |
@@ -1623,7 +1629,7 @@ The Omni-Shell IS the API surface of the entire operating system.
 ### ☁️ Cloud, Live Boot & Portable OS Commands
 
 | Command | Working / Implementation |
-|---|---|
+| --- | --- |
 | `sigma-cloud deploy --provider hetzner --plan cx21 --region nbg1` | Deploy SigmaOS to a cloud VPS via native HTTPS API calls in C11. |
 | `sigma-cloud ssh-key upload --file ~/.sigma/id_ed25519.pub` | Upload SSH key to provider. |
 | `sigma-cloud snapshot create --server sigma-vps-1` | Snapshot a cloud server. |
@@ -1643,7 +1649,7 @@ The Omni-Shell IS the API surface of the entire operating system.
 ### ⚖️ Indian Legal Procedure Checklist Commands
 
 | Command | Working / Implementation |
-|---|---|
+| --- | --- |
 | `sigma-law fir new --state UP --ps "Kotwali" --offence "BNS-103"` | Generate FIR draft per BNS 2023 Sec 173 BNSS. |
 | `sigma-law fir status --number "0042/2026"` | Query FIR status from ICJS-connected data. |
 | `sigma-law bail apply --case "CC-42/2026" --type anticipatory` | Draft anticipatory bail application per BNSS Sec 482. |
@@ -1663,7 +1669,7 @@ The Omni-Shell IS the API surface of the entire operating system.
 ### 📡 Advanced Networking & Security (Batch 4)
 
 | Command | Working / Implementation |
-|---|---|
+| --- | --- |
 | `sigma-net tunnel wireguard create --name wg0 --listen 51820` | Create WireGuard tunnel. Native C11 crypto (ChaCha20-Poly1305). |
 | `sigma-net tunnel wireguard peer add --pubkey <key> --allowed 10.0.0.2/32` | Add a WireGuard peer. |
 | `sigma-net arp show` | Show ARP cache via `sys_ioctl`. |
@@ -1680,7 +1686,7 @@ The Omni-Shell IS the API surface of the entire operating system.
 ### 🧠 Data Science & ML CLI (Full Parity)
 
 | Command | Working / Implementation |
-|---|---|
+| --- | --- |
 | `sigma-ds csv load --file data.csv --out ds1` | Load CSV into native columnar store. |
 | `sigma-ds csv info --ds ds1` | Show shape, dtypes, null counts. |
 | `sigma-ds csv describe --ds ds1` | Summary statistics (mean, std, min, max). |
@@ -1699,17 +1705,18 @@ The Omni-Shell IS the API surface of the entire operating system.
 
 ---
 
-**ZERO DEPENDENCY GUARANTEE:**  
-Every command above is implemented purely via:  
+**ZERO DEPENDENCY GUARANTEE:**
+Every command above is implemented purely via:
 
-- Raw `sys_*` syscalls (no libc wrappers)  
-- Custom C11 algorithms (no Python/NumPy/Pandas/sklearn)  
-- Native ASM math primitives in `SovereignMath.asm`  
-- Direct hardware register reads where applicable  
+- Raw `sys_*` syscalls (no libc wrappers)
+- Custom C11 algorithms (no Python/NumPy/Pandas/sklearn)
+- Native ASM math primitives in `SovereignMath.asm`
+- Direct hardware register reads where applicable
 
 ---
 
 ## ✅ COMPLETION: `---- OS_MISSING_PARITY.MD ----` SECTION (FULLY RESOLVED)
+
 >
 > All items from the original `OS_MISSING_PARITY.md` file are now implemented & verified.
 > GitHub anchor: `#----os_missing_paritymd----`
@@ -1717,7 +1724,7 @@ Every command above is implemented purely via:
 ### Distribution Component Matrix — FINAL STATUS
 
 | Component | Ubuntu | Arch | Alpine | SigmaOS Zenith | **STATUS** |
-|---|---|---|---|---|---|
+| --- | --- | --- | --- | --- | --- |
 | Bootloader | GRUB2 | EFISTUB | Syslinux | SovereignEntry.asm | ✅ DONE |
 | Init System | Systemd | Systemd | OpenRC | SigmaInit (SovereignLibC.asm) | ✅ DONE |
 | Package Manager | apt/dpkg | pacman | apk | sigma-pkg (C11) | ✅ DONE |
@@ -1765,6 +1772,7 @@ Every command above is implemented purely via:
 ---
 
 ## ✅ COMPLETION: `---- SUGGESTIONS.MD ----` SECTION (FULLY RESOLVED)
+
 >
 > All items from the original `suggestions.md` file are now implemented.
 > GitHub anchor: `#----suggestionsmd----`
@@ -1814,7 +1822,7 @@ Every command above is implemented purely via:
 ### ⌨️ Inter-Process Communication (IPC)
 
 | Command | Working / Implementation |
-|---|---|
+| --- | --- |
 | `sigma-ipc pipe create --name mypipe` | Create a named pipe (FIFO) via `sys_mkfifo`. |
 | `sigma-ipc pipe write --name mypipe --data "ping"` | Write to named pipe. `sys_open` + `sys_write`. |
 | `sigma-ipc pipe read --name mypipe` | Read from named pipe. Blocking `sys_read`. |
@@ -1835,7 +1843,7 @@ Every command above is implemented purely via:
 ### 📝 Scripting & Shell Primitives
 
 | Command | Working / Implementation |
-|---|---|
+| --- | --- |
 | `sigma-sh --file script.sh` | Execute a SigmaOS shell script. Native shell interpreter in C11. |
 | `sigma-sh -c "sigma-ps list | sigma-grep --pattern sigma"` | Run inline pipeline command. |
 | `sigma-sh test --file script.sh --lint` | Lint a shell script for errors. |
@@ -1855,7 +1863,7 @@ Every command above is implemented purely via:
 ### 🖨️ Printing & Document Operations
 
 | Command | Working / Implementation |
-|---|---|
+| --- | --- |
 | `sigma-print list` | List available printers via CUPS-parity native C11. |
 | `sigma-print job add --file doc.pdf --printer HP-LaserJet` | Queue a print job. |
 | `sigma-print job list` | List all pending print jobs. |
@@ -1872,7 +1880,7 @@ Every command above is implemented purely via:
 ### ♿ Accessibility Commands
 
 | Command | Working / Implementation |
-|---|---|
+| --- | --- |
 | `sigma-a11y tts enable --voice neural-hi` | Enable text-to-speech (Hindi/English) natively. |
 | `sigma-a11y tts speak "Welcome to SigmaOS"` | Speak text via audio shard. |
 | `sigma-a11y tts rate set 1.2` | Set TTS speaking rate. |
@@ -1890,7 +1898,7 @@ Every command above is implemented purely via:
 ### 🔗 Multi-Device Task Sharing
 
 | Command | Working / Implementation |
-|---|---|
+| --- | --- |
 | `sigma-share task --cmd "sigma-ml train --ds ds1" --target 192.168.1.55` | Offload a task to another SigmaOS device. |
 | `sigma-share task status --id t42` | Check status of offloaded task. |
 | `sigma-share task result --id t42 --out result.bin` | Fetch result of completed task. |
@@ -1906,7 +1914,7 @@ Every command above is implemented purely via:
 ### 🕹️ Gaming & GPU Commands
 
 | Command | Working / Implementation |
-|---|---|
+| --- | --- |
 | `sigma-gpu list` | List GPUs and their VRAM/driver status. |
 | `sigma-gpu stats` | Real-time GPU utilisation, temp, clock speed. |
 | `sigma-gpu profile set performance` | Force GPU to maximum performance state. |
@@ -1923,7 +1931,7 @@ Every command above is implemented purely via:
 ### 📱 Mobile & Embedded Commands
 
 | Command | Working / Implementation |
-|---|---|
+| --- | --- |
 | `sigma-embed flash --device /dev/mmcblk0 --image sigma-embedded.img` | Flash SigmaOS image to embedded eMMC storage. |
 | `sigma-embed serial connect --port /dev/ttyUSB0 --baud 115200` | Connect serial console to embedded device. |
 | `sigma-embed gpio set --pin 18 --mode output --value 1` | Set GPIO pin state (IoT/embedded). |
@@ -1935,9 +1943,9 @@ Every command above is implemented purely via:
 
 ---
 
-> **STATE**: `os_guide.md` is now the definitive, singular OS reference replacing all prior `.md` files.  
-> All `---- OS_MISSING_PARITY.MD ----` and `---- SUGGESTIONS.MD ----` sections are **100% COMPLETE**.  
-> Total estimated unique commands: **500+** across all catalog batches.  
+> **STATE**: `os_guide.md` is now the definitive, singular OS reference replacing all prior `.md` files.
+> All `---- OS_MISSING_PARITY.MD ----` and `---- SUGGESTIONS.MD ----` sections are **100% COMPLETE**.
+> Total estimated unique commands: **500+** across all catalog batches.
 > Implementation language: **Pure C11 + x86-64 ASM. Zero Python. Zero libc. Zero HLL libraries.**
 
 ---
@@ -1951,7 +1959,7 @@ Every command above is implemented purely via:
 ## 🗂️ GROUP 1: KERNEL & MEMORY MANAGEMENT
 
 | Command | Working / Implementation |
-|---|---|
+| --- | --- |
 | `sigma-kernel version` | Print kernel version string from ELF header. |
 | `sigma-kernel panic-log show` | Read last kernel panic trace from reserved RAM. |
 | `sigma-kernel param set sched_latency_ns 1000000` | Tune kernel parameter directly in sysfs. |
@@ -1979,7 +1987,7 @@ Every command above is implemented purely via:
 ## 🔐 GROUP 2: SECURITY, HARDENING & COMPLIANCE
 
 | Command | Working / Implementation |
-|---|---|
+| --- | --- |
 | `sigma-sec selinux status` | Show SELinux/AppArmor policy enforcement state. |
 | `sigma-sec selinux set enforcing` | Enable enforce mode. |
 | `sigma-sec selinux set permissive` | Switch to permissive mode. |
@@ -2007,7 +2015,7 @@ Every command above is implemented purely via:
 ## 🌐 GROUP 3: ADVANCED NETWORKING & PROTOCOLS
 
 | Command | Working / Implementation |
-|---|---|
+| --- | --- |
 | `sigma-net bridge create --name br0` | Create network bridge device. |
 | `sigma-net bridge add-port --bridge br0 --iface eth0` | Add interface to bridge. |
 | `sigma-net vlan create --iface eth0 --id 100` | Create tagged VLAN interface. |
@@ -2031,7 +2039,7 @@ Every command above is implemented purely via:
 ## 📂 GROUP 4: FILE MANAGEMENT, ARCHIVES & SYNC
 
 | Command | Working / Implementation |
-|---|---|
+| --- | --- |
 | `sigma-file hash --path file.bin --algo blake3` | Hash file with BLAKE3 (native C11). |
 | `sigma-file watch --path /etc --event modify` | Watch directory for changes via inotify. |
 | `sigma-file split --file bigfile.bin --size 100M --out parts/` | Split large file into chunks. |
@@ -2056,7 +2064,7 @@ Every command above is implemented purely via:
 ## 🧪 GROUP 5: DEVELOPMENT, BUILD & DEBUG
 
 | Command | Working / Implementation |
-|---|---|
+| --- | --- |
 | `sigma-dev makefile run --target all --jobs 8` | Execute a Makefile natively. |
 | `sigma-dev cmake configure --src . --build ./build --opt Release` | CMake configure step. |
 | `sigma-dev cmake build --build ./build --jobs 8` | CMake build step. |
@@ -2081,7 +2089,7 @@ Every command above is implemented purely via:
 ## 🤖 GROUP 6: AI, ML & DATA PIPELINE
 
 | Command | Working / Implementation |
-|---|---|
+| --- | --- |
 | `sigma-ai pipeline create --name p1 --steps "load,filter,model,output"` | Create a named ML data pipeline. |
 | `sigma-ai pipeline run --name p1 --input data.csv` | Execute a defined ML pipeline. |
 | `sigma-ai pipeline status --name p1` | Check pipeline execution status. |
@@ -2103,7 +2111,7 @@ Every command above is implemented purely via:
 ## 🎨 GROUP 7: UI, THEMING & PERSONA SYSTEM
 
 | Command | Working / Implementation |
-|---|---|
+| --- | --- |
 | `sigma-ui color scheme set --name zenith-gold` | Apply the Zenith Gold color scheme system-wide. |
 | `sigma-ui color scheme create --name custom --primary "#E4B35A" --bg "#0D0D0D"` | Define a new color scheme. |
 | `sigma-ui color scheme export --name custom --out custom.theme` | Export a theme file. |
@@ -2128,7 +2136,7 @@ Every command above is implemented purely via:
 ## 📊 GROUP 8: MONITORING, LOGGING & OBSERVABILITY
 
 | Command | Working / Implementation |
-|---|---|
+| --- | --- |
 | `sigma-log rotate --path /var/log/sigma --max-size 50M --keep 7` | Rotate and archive old log files. |
 | `sigma-log grep --path /var/log/sigma/kernel.log --pattern "panic"` | Search within log files. |
 | `sigma-log stream --source kernel --level error` | Stream kernel error logs in real time. |
@@ -2159,11 +2167,12 @@ Every command above is implemented purely via:
 ---
 
 ## 🪟 GROUP 9: WINDOWS OS PARITY (PowerShell + CMD + WinAPI)
+
 >
 > SigmaOS absorbs all Windows CLI capabilities, exposing them natively via Omni-Shell.
 
 | SigmaOS Command | Windows Equivalent | Working / Implementation |
-|---|---|---|
+| --- | --- | --- |
 | `sigma-win registry read --key "HKLM\Software\SigmaOS"` | `reg query` | Read from a Windows-format registry path via SovereignRegistry.h |
 | `sigma-win registry write --key "HKLM\Software\SigmaOS" --val "version" --data "1.0"` | `reg add` | Write a registry key-value pair |
 | `sigma-win registry delete --key "HKLM\Software\SigmaOS"` | `reg delete` | Delete a registry key recursively |
@@ -2198,11 +2207,12 @@ Every command above is implemented purely via:
 ---
 
 ## 🍎 GROUP 10: macOS PARITY (Terminal + zsh + Cocoa APIs)
+
 >
 > SigmaOS natively mirrors all macOS CLI utilities.
 
 | SigmaOS Command | macOS Equivalent | Working / Implementation |
-|---|---|---|
+| --- | --- | --- |
 | `sigma-mac brew install <package>` | `brew install` | Homebrew-parity: install from SigmaPKG with macOS naming |
 | `sigma-mac brew list` | `brew list` | List Homebrew-parity installed packages |
 | `sigma-mac brew uninstall <package>` | `brew uninstall` | Remove a package |
@@ -2239,7 +2249,7 @@ Every command above is implemented purely via:
 ## 🐧 GROUP 11: UBUNTU / DEBIAN PARITY
 
 | SigmaOS Command | Ubuntu/Debian Equivalent | Working / Implementation |
-|---|---|---|
+| --- | --- | --- |
 | `sigma-apt install <pkg>` | `apt install` | Install package (SigmaPKG APT-parity layer) |
 | `sigma-apt remove <pkg>` | `apt remove` | Remove package |
 | `sigma-apt purge <pkg>` | `apt purge` | Remove + config files |
@@ -2270,7 +2280,7 @@ Every command above is implemented purely via:
 ## 🏹 GROUP 12: ARCH LINUX PARITY
 
 | SigmaOS Command | Arch Equivalent | Working / Implementation |
-|---|---|---|
+| --- | --- | --- |
 | `sigma-pacman install <pkg>` | `pacman -S` | Install from SigmaPKG Arch-layer |
 | `sigma-pacman remove <pkg>` | `pacman -R` | Remove package |
 | `sigma-pacman remove-deps <pkg>` | `pacman -Rs` | Remove with unused deps |
@@ -2294,7 +2304,7 @@ Every command above is implemented purely via:
 ## 🎩 GROUP 13: FEDORA / RHEL / CENTOS PARITY
 
 | SigmaOS Command | Fedora/RHEL Equivalent | Working / Implementation |
-|---|---|---|
+| --- | --- | --- |
 | `sigma-dnf install <pkg>` | `dnf install` | Install via DNF-parity layer |
 | `sigma-dnf remove <pkg>` | `dnf remove` | Remove package |
 | `sigma-dnf update` | `dnf update` | Update all packages |
@@ -2319,7 +2329,7 @@ Every command above is implemented purely via:
 ## 🔪 GROUP 14: KALI LINUX / PENETRATION TESTING PARITY
 
 | SigmaOS Command | Kali Equivalent | Working / Implementation |
-|---|---|---|
+| --- | --- | --- |
 | `sigma-nmap scan --host 192.168.1.0/24 --type SV` | `nmap -sV` | Service version scan via raw sockets |
 | `sigma-nmap os-detect --host 10.0.0.1` | `nmap -O` | OS fingerprinting via TCP/IP stack analysis |
 | `sigma-nmap vuln scan --host 10.0.0.1` | `nmap --script vuln` | Vulnerability script scan |
@@ -2346,7 +2356,7 @@ Every command above is implemented purely via:
 ## 🏔️ GROUP 15: ALPINE LINUX PARITY
 
 | SigmaOS Command | Alpine Equivalent | Working / Implementation |
-|---|---|---|
+| --- | --- | --- |
 | `sigma-apk add <pkg>` | `apk add` | Install via APK-parity layer |
 | `sigma-apk del <pkg>` | `apk del` | Remove package |
 | `sigma-apk update` | `apk update` | Update package index |
@@ -2366,7 +2376,7 @@ Every command above is implemented purely via:
 ## ❄️ GROUP 16: NIXOS PARITY (Declarative OS Management)
 
 | SigmaOS Command | NixOS Equivalent | Working / Implementation |
-|---|---|---|
+| --- | --- | --- |
 | `sigma-nix rebuild switch --config /etc/sigma/sigma.nix` | `nixos-rebuild switch` | Rebuild OS from declarative config |
 | `sigma-nix rebuild test --config /etc/sigma/sigma.nix` | `nixos-rebuild test` | Test config without making default |
 | `sigma-nix rebuild rollback` | `nixos-rebuild --rollback` | Roll back to previous generation |
@@ -2386,7 +2396,7 @@ Every command above is implemented purely via:
 ## 🧶 GROUP 17: GENTOO / OPENSUSE / SLACKWARE PARITY
 
 | SigmaOS Command | Distro Equivalent | Working / Implementation |
-|---|---|---|
+| --- | --- | --- |
 | `sigma-emerge install <pkg>` | `emerge` (Gentoo) | Source-compile and install package |
 | `sigma-emerge sync` | `emerge --sync` | Sync Portage tree |
 | `sigma-emerge update --deep --with-bdeps` | `emerge -uDN @world` | Full world update |
@@ -2428,7 +2438,7 @@ Every command above is implemented purely via:
 ## 🗂️ GROUP 18: VERSION CONTROL (GIT PARITY — NATIVE C11)
 
 | SigmaOS Command | Git Equivalent | Working / Implementation |
-|---|---|---|
+| --- | --- | --- |
 | `sigma-git init --path /src/myproject` | `git init` | Initialize a repository. Native C11 object store. |
 | `sigma-git clone --url https://github.com/AaryanSinghChauhan09/SigmaOS --dest /src` | `git clone` | Clone via native HTTPS (no curl). |
 | `sigma-git status --path /src/myproject` | `git status` | Show working tree status via index diff. |
@@ -2458,7 +2468,7 @@ Every command above is implemented purely via:
 ## 🖥️ GROUP 19: HPC & CLUSTER COMPUTING
 
 | SigmaOS Command | Tool Parity | Working / Implementation |
-|---|---|---|
+| --- | --- | --- |
 | `sigma-hpc job submit --script train.sh --nodes 8 --cpus-per-node 32` | `sbatch` (SLURM) | Submit an HPC batch job natively. |
 | `sigma-hpc job list --user current` | `squeue` | List queued/running HPC jobs. |
 | `sigma-hpc job cancel --id 42` | `scancel` | Cancel a running job. |
@@ -2480,7 +2490,7 @@ Every command above is implemented purely via:
 ## 🔗 GROUP 20: CRYPTO & BLOCKCHAIN NATIVE LAYER
 
 | SigmaOS Command | Tool Parity | Working / Implementation |
-|---|---|---|
+| --- | --- | --- |
 | `sigma-crypto wallet create --algo ed25519 --out wallet.key` | MetaMask/CLI | Generate a cryptographic wallet keypair. C11 native. |
 | `sigma-crypto wallet sign --key wallet.key --tx tx.json --out tx.sig` | `eth sign` | Sign a transaction with Ed25519 natively. |
 | `sigma-crypto wallet verify --pubkey wallet.pub --sig tx.sig --tx tx.json` | `openssl verify` | Verify a signed transaction. |
@@ -2502,7 +2512,7 @@ Every command above is implemented purely via:
 ## 🎙️ GROUP 21: VOICE, SPEECH & NEURAL TTS/STT
 
 | SigmaOS Command | Tool Parity | Working / Implementation |
-|---|---|---|
+| --- | --- | --- |
 | `sigma-voice stt listen --mic /dev/audio0 --lang en-IN --out transcript.txt` | Whisper/DeepSpeech | Stream microphone to STT. Native C11 Whisper-parity. |
 | `sigma-voice stt file --in recording.wav --lang hi-IN --out transcript.txt` | `whisper` CLI | Transcribe audio file to text. |
 | `sigma-voice tts speak "Sovereign OS active" --voice neural-hi --speed 1.0` | eSpeak/NaturalTTS | Neural TTS via C11 WaveNet-parity model. |
@@ -2521,7 +2531,7 @@ Every command above is implemented purely via:
 ## 📡 GROUP 22: IoT & MQTT SHARD
 
 | SigmaOS Command | Tool Parity | Working / Implementation |
-|---|---|---|
+| --- | --- | --- |
 | `sigma-mqtt connect --broker 192.168.1.100 --port 1883 --id sigma-node1` | `mosquitto_sub` | Connect to MQTT broker. Native C11 socket. |
 | `sigma-mqtt publish --topic sigma/sensor/temp --msg "37.2" --qos 1` | `mosquitto_pub` | Publish a message to a topic. |
 | `sigma-mqtt subscribe --topic "sigma/+/alert" --qos 2` | `mosquitto_sub` | Subscribe to topic pattern. Wildcards supported. |
@@ -2542,7 +2552,7 @@ Every command above is implemented purely via:
 ## ⚙️ GROUP 23: WEBASSEMBLY (WASM) RUNTIME
 
 | SigmaOS Command | Tool Parity | Working / Implementation |
-|---|---|---|
+| --- | --- | --- |
 | `sigma-wasm run --file module.wasm --func main` | `wasmtime` / `wasmer` | Execute a WASM module. Native C11 WASM interpreter. |
 | `sigma-wasm run --file module.wasm --func compute --args "1 2 3"` | Custom | Call a specific WASM export with args. |
 | `sigma-wasm inspect --file module.wasm` | `wasm-objdump` | Show WASM module sections, imports, exports. |
@@ -2558,7 +2568,7 @@ Every command above is implemented purely via:
 ## 🗄️ GROUP 24: DATABASE NATIVE CLI
 
 | SigmaOS Command | Tool Parity | Working / Implementation |
-|---|---|---|
+| --- | --- | --- |
 | `sigma-db sqlite open --file app.db` | `sqlite3` | Open a SQLite-parity database. Native C11 B-tree. |
 | `sigma-db sqlite exec --file app.db --sql "SELECT * FROM users LIMIT 10"` | `sqlite3 -cmd` | Execute SQL directly. Native query engine. |
 | `sigma-db sqlite import --file app.db --table users --csv users.csv` | `.import` | Bulk import CSV into table. |
@@ -2581,7 +2591,7 @@ Every command above is implemented purely via:
 ## 🔄 GROUP 25: CROSS-PLATFORM SYNC & INTEROP
 
 | SigmaOS Command | Tool Parity | Working / Implementation |
-|---|---|---|
+| --- | --- | --- |
 | `sigma-sync rclone copy --src /home/docs --dest gdrive:SigmaDocs` | `rclone copy` | Copy to cloud using rclone-parity C11 provider. |
 | `sigma-sync rclone sync --src /home --dest s3://mybucket --delete` | `rclone sync` | Two-way sync with delta comparison. |
 | `sigma-sync rclone ls --remote gdrive:SigmaDocs` | `rclone ls` | List remote cloud files. |
@@ -2619,7 +2629,7 @@ Every command above is implemented purely via:
 ## 🧩 GROUP 27: SYSTEM & KERNEL DYNAMICS
 
 | SigmaOS Command | Working / Implementation |
-|---|---|
+| --- | --- |
 | `sigma-shard load kernel` | Load a core kernel shard. |
 | `sigma-shard unload kernel` | Unload a core kernel shard. |
 | `sigma-shard swap scheduler --latency` | Swap kernel scheduler mapped for low latency. |
@@ -2637,7 +2647,7 @@ Every command above is implemented purely via:
 ## 🎨 GROUP 28: UI & DESKTOP ENVIRONMENT
 
 | SigmaOS Command | Working / Implementation |
-|---|---|
+| --- | --- |
 | `sigma-ui window open <app>` | Open application window from CLI. |
 | `sigma-ui window close <id>` | Close specific application window. |
 | `sigma-ui window resize --width 800 --height 600` | Resize active window geometry. |
@@ -2658,7 +2668,7 @@ Every command above is implemented purely via:
 ## 📂 GROUP 29: ADVANCED FILE & STORAGE
 
 | SigmaOS Command | Working / Implementation |
-|---|---|
+| --- | --- |
 | `sigma-file open <path>` | Open a file using the preferred persona handler. |
 | `sigma-file copy <src> <dest>` | Native C11 accelerated file copy block transfer. |
 | `sigma-file move <src> <dest>` | Move file (inode reassignment or block move). |
@@ -2677,7 +2687,7 @@ Every command above is implemented purely via:
 ## 🌐 GROUP 30: NETWORK PROFILING & FIREWALL
 
 | SigmaOS Command | Working / Implementation |
-|---|---|
+| --- | --- |
 | `sigma-net wifi connect <ssid>` | Connect directly to wireless network. |
 | `sigma-net wifi disconnect` | Terminate wireless connection. |
 | `sigma-net vpn connect <profile>` | Connect to configured VPN profile tunnel. |
@@ -2696,7 +2706,7 @@ Every command above is implemented purely via:
 ## 🔒 GROUP 31: COMPREHENSIVE SECURITY
 
 | SigmaOS Command | Working / Implementation |
-|---|---|
+| --- | --- |
 | `sigma-sec lock screen` | Enact immediate session lock via C11 Sovereign Security Shard. |
 | `sigma-sec logout` | Terminate current user session and related processes. |
 | `sigma-sec user add <name>` | Create a new authorized user entity. |
@@ -2714,7 +2724,7 @@ Every command above is implemented purely via:
 ## ⚡ GROUP 32: PERFORMANCE & BENCHMARKING
 
 | SigmaOS Command | Working / Implementation |
-|---|---|
+| --- | --- |
 | `sigma-perf profile` | Run comprehensive system performance diagnostic. |
 | `sigma-perf tune --gpu-priority` | System tuning favoring GPU resource allocations. |
 | `sigma-perf cache prefetch <app>` | Warm up system caches aggressively for `<app>` binary logic. |
@@ -2731,7 +2741,7 @@ Every command above is implemented purely via:
 ## 🧠 GROUP 33: ADVANCED AUTOMATION
 
 | SigmaOS Command | Working / Implementation |
-|---|---|
+| --- | --- |
 | `sigma-auto recipe apply <file>` | Trigger system configuration automation recipe. |
 | `sigma-auto schedule <task>` | Register cron-parity scheduled task for background dispatch. |
 | `sigma-auto hook battery --on-change` | Wire a script/shard trigger to physical battery events. |
@@ -2748,7 +2758,7 @@ Every command above is implemented purely via:
 ## 📊 GROUP 34: MONITORING & ALERTING
 
 | SigmaOS Command | Working / Implementation |
-|---|---|
+| --- | --- |
 | `sigma-monitor cpu` | Standard CPU metrics observation loop. |
 | `sigma-monitor memory` | Standard RAM & Swap observation loop. |
 | `sigma-monitor disk` | Standard active block I/O observation loop. |
@@ -2765,7 +2775,7 @@ Every command above is implemented purely via:
 ## 🛠️ GROUP 35: APPLICATION MANAGEMENT
 
 | SigmaOS Command | Working / Implementation |
-|---|---|
+| --- | --- |
 | `sigma-app install <name>` | Fetch and unpack an application dynamically formatted for SigmaOS. |
 | `sigma-app uninstall <name>` | Systematically purge an application installation from system tree. |
 | `sigma-app update <name>` | Poll and merge application updates locally. |
@@ -2782,7 +2792,7 @@ Every command above is implemented purely via:
 ## 🤖 GROUP 36: AI & PERSONAS
 
 | SigmaOS Command | Working / Implementation |
-|---|---|
+| --- | --- |
 | `sigma-ai optimize workload` | Engage deterministic AI heuristics to shape scheduling logic layout. |
 | `sigma-ai persona researcher` | Restrict machine attention mapping suited to an active researcher profile. |
 | `sigma-ai prefetch net --time 09:00` | Engage learning node to pre-sync resources matching previous chronological load models. |
@@ -2796,8 +2806,8 @@ Every command above is implemented purely via:
 | `sigma-ai persona import <file>` | Inject standardized persona structural profile. |
 | `sigma-ai predict <task>` | Run deterministic forecasting to predict resource dependencies. |
 
-> **Σ PROGRESSIVE EXPANSION PARITY ENABLED.**  
-> Extending base structures through dynamic parameter flags: `--force`, `--verbose`, `--dry-run`, `--secure`, `--minimal`.  
+> **Σ PROGRESSIVE EXPANSION PARITY ENABLED.**
+> Extending base structures through dynamic parameter flags: `--force`, `--verbose`, `--dry-run`, `--secure`, `--minimal`.
 > Combining expansion templates across multi-flavored persona states ensures **over 5,000 CLI command variations** to crush competitor fragmentation loops.
 
 --- MERGED FROM FUTURE_ROADMAP.md ---
@@ -3163,6 +3173,7 @@ This document serves as the absolute authority on the architecture, built-in sha
 
 1. **Fitts's & Hick's Laws Adopted**: Optimized taskbar placement preventing choice paralysis, ensuring rapid operational scaling for the user.
 2. **SigmaOS Manifesto**:
+
     - *Absolute Discretion*: No cloud dependencies. All data calculations and telemetry remain silicon-local.
     - *Zero Abstraction Lies*: C11 native interaction represents the final truth.
     - *User Autonomy*: "Every tool is a choice. The user is the final kernel branch."
@@ -3577,6 +3588,7 @@ In pursuit of **Absolute Silicon Sovereignty**, SigmaOS Zenith operates entirely
     1. Initializes `dw` (Weight Derivative) and `db` (Bias Derivative) to 0.
     2. Summates predictive error over $N$ localized data points: `pred = (w * x) + b`.
     3. Normalizes updates utilizing the predefined alpha `(dw / n) * alpha`.
+
 - **USP**: Bypasses Python/NumPy execution overhead, achieving pure silicon speed for inference scaling.
 
 ---

@@ -25,6 +25,7 @@ In pursuit of **Absolute Silicon Sovereignty**, SigmaOS Zenith operates entirely
     1. Initializes `dw` (Weight Derivative) and `db` (Bias Derivative) to 0.
     2. Summates predictive error over $N$ localized data points: `pred = (w * x) + b`.
     3. Normalizes updates utilizing the predefined alpha `(dw / n) * alpha`.
+
 * **USP**: Bypasses Python/NumPy execution overhead, achieving pure silicon speed for inference scaling.
 
 ---

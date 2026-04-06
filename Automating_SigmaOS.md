@@ -40,7 +40,7 @@ User / Persona Profile
 ## Built-in Automation Capabilities
 
 | Tool | File | Description |
-| ---- | ---- | ----------- |
+| --- | --- | --- |
 | **Task Scheduler** | `scheduler_ai.c` | AI-predicted task slots using lightweight heuristics |
 | **Macro Engine** | `automation_shard.c` | Record, replay, and script event automation |
 | **XClicker** | `xclicker.c` | High-frequency auto-clicker with jitter profiles |
@@ -67,16 +67,21 @@ sigma_ai_schedule_optimize();
 ## Automation via Omni Shell
 
 ```bash
+
 # Create a repeating task
+
 sigma task create --name "Daily VFS Backup" --interval 86400 --cmd "sigma vfs snapshot"
 
 # List all scheduled tasks
+
 sigma task list
 
 # Run immediately
+
 sigma task run "Daily VFS Backup"
 
 # Remove task
+
 sigma task remove "Daily VFS Backup"
 ```
 
@@ -85,7 +90,7 @@ sigma task remove "Daily VFS Backup"
 ## Persona-Aware Automation Profiles
 
 | Persona | Automated Tasks |
-| --------- | ---------------- |
+| --- | --- |
 | **Developer** | Auto-build on file change, auto-commit reminders, dependency scanner |
 | **Student** | Daily quiz generation at 08:00, spaced-repetition flashcard review |
 | **Forensic Analyst** | Hourly memory snapshot, real-time PCAP capture, audit log rotation |

@@ -5,7 +5,7 @@ SigmaOS is designed for industrial-grade, zero-dependency reliability. Security 
 ## Supported Versions 🌌
 
 | Version | Supported |
-| ------- | --------- |
+| --- | --- |
 | v1.6.0+ | ✅ Yes     |
 | v1.5.0  | ✅ Yes     |
 | < v1.5.0| ❌ No      |

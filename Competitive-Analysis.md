@@ -5,7 +5,7 @@ This active document serves as the **Supreme Roadmap** to crush incumbent Linux 
 ## 🧩 Comprehensive Feature & USP Mapping
 
 | Category | Linux Distros (Current State) | SigmaOS (Current State) | SigmaOS (Needed Enhancements / Supreme USPs) |
-|----------|-------------------------------|-------------------------|----------------------------------------------|
+| --- | --- | --- | --- |
 | **USPs (Unique Selling Propositions)** | Powerful but fragmented; static apps; minimal AI | Persona-aware shards, modularity, zero-dependency cores | AI-native ecosystem, adaptive security, unified hub, cloud-native sync, accessibility-first |
 | **Automation Tools** | `cron`, `systemd timers`, Ansible, udev rules | Embedded C11 Optimizer Daemons (`sigma_auto_optimizer.c`) | GUI automation dashboards, AI workflow builder, persona-aware autonomous logic, rollback/export/import |
 | **Customization Tools** | KDE Plasma widgets, GTK/QT themes, dotfiles, shell configs | Native JS DOM-Level Shard Morphing (`restore_features.js`) | Unified customization hub, theme matrix marketplace, dynamic CSS icon packs, plugin ecosystem via `SigmaOOP.h` |

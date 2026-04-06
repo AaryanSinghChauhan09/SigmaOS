@@ -50,13 +50,16 @@ Using SigmaOS, forensic analysts, lawyers, and law enforcement can parse these p
 
 ### 💻 Invoking the Matrix via Omni Shell
 
-To run a procedural check on an open case file in SigmaOS:
+To run a procedural check on an open case file in SigmaOS
 
 ```bash
+
 # Example: Parse an FIR text file against BNS/BNSS requirements
+
 sigma_invoke indian_law --audit_fir /vfs/case_files/FIR_102.txt
 
 # Example: Run the hardware SHA-256 validation for Digital Evidence (BSA Sec 61)
+
 sigma_invoke indian_law --validate_evidence /vfs/evidence/drive.img
 ```
 

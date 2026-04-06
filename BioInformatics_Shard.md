@@ -22,7 +22,9 @@ Traditional operating systems abstract the hardware, adding layers of overhead t
 The Bio-Informatics shard integrates flawlessly into the OS using the Shard-On-Demand (SOD) functionality:
 
 ```bash
+
 # Invoke the Bio-Informatics analysis capabilities natively
+
 sigma_invoke bio_informatics_engine
 ```
 

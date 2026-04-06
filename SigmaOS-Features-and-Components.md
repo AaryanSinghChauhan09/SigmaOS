@@ -79,6 +79,7 @@ This document serves as the absolute authority on the architecture, built-in sha
 
 1. **Fitts's & Hick's Laws Adopted**: Optimized taskbar placement preventing choice paralysis, ensuring rapid operational scaling for the user.
 2. **SigmaOS Manifesto**:
+
     - *Absolute Discretion*: No cloud dependencies. All data calculations and telemetry remain silicon-local.
     - *Zero Abstraction Lies*: C11 native interaction represents the final truth.
     - *User Autonomy*: "Every tool is a choice. The user is the final kernel branch."

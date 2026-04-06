@@ -49,9 +49,12 @@ When testing periods are initiated:
 To initiate the Sovereign Academy without internet constraints:
 
 ```bash
+
 # General Syllabus Load
+
 sigma_invoke ncert 11 mathematics
 
 # Enter JEE-Advanced Strict Isolation Mode
+
 sigma_invoke academy --mode jee_adv --lockdown_duration 180m
 ```

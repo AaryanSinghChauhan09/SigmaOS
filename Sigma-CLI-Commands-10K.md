@@ -5,16 +5,19 @@ This document contains a comprehensive list of 10,000 CLI commands for the Sigma
 ## Table of Contents
 
 1. **Subsystem 1: User Management**
+
    - Command 1
    - Command 2
    - ...
 
 2. **Subsystem 2: Process Management**
+
    - Command 1
    - Command 2
    - ...
 
 3. **Subsystem 3: Networking**
+
    - Command 1
    - Command 2
    - ...
@@ -26,7 +29,7 @@ This document contains a comprehensive list of 10,000 CLI commands for the Sigma
 ### 1. User Management
 
 | Command | Description |
-| ------- | ----------- |
+| --- | --- |
 | user_add | Adds a new user to the system. |
 | user_remove | Removes an existing user from the system. |
 | user_list | Lists all users in the system. |
@@ -34,7 +37,7 @@ This document contains a comprehensive list of 10,000 CLI commands for the Sigma
 ### 2. Process Management
 
 | Command | Description |
-| ------- | ----------- |
+| --- | --- |
 | process_start | Starts a process. |
 | process_stop | Stops a running process. |
 | process_status | Checks the status of a process. |
@@ -42,7 +45,7 @@ This document contains a comprehensive list of 10,000 CLI commands for the Sigma
 ### 3. Networking
 
 | Command | Description |
-| ------- | ----------- |
+| --- | --- |
 | network_connect | Connects to a network. |
 | network_disconnect | Disconnects from the current network. |
 | network_status | Displays current network status. |

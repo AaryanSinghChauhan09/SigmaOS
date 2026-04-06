@@ -40,13 +40,17 @@ Run the official launch entry point to load the NMA and initialize the environme
 The OS unifies all applications and utilities into a single, clean Omni-CLI. Use the `sigma-` command prefix to invoke any mission natively:
 
 ```shell
+
 # Initiate Recursive Neural Weight Optimization
+
 root@sigma:~# sigma-ai neural-evolve
 
 # Distribute an AI Prompt to 11 platforms simultaneously
+
 root@sigma:~# sigma-ai distribute "design a microkernel"
 
 # Execute a Reality-Shift Aesthetic Context
+
 root@sigma:~# sigma-ui theme "#00ffcc"
 ```
 

@@ -26,10 +26,13 @@ You do not need to reboot the server to shift a Persona. It is an instantaneous,
 ### Switching Context
 
 ```bash
+
 # Shift the entire machine hypervisor into Developer Mode
+
 sigma_invoke persona --shift developer
 
 # Enter absolute lockout focus mode
+
 invoke academy
 ```
 

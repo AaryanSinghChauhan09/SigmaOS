@@ -35,7 +35,7 @@ Mission Context (User Input)
 ## Agent Types
 
 | Agent | Specialty | Socket |
-| ------- | ----------- | -------- |
+| --- | --- | --- |
 | **Sigma LLM** | General reasoning, summarization | `/var/ipc/sigma_llm.sock` |
 | **Sigma Coder** | Code generation, debugging | `/var/ipc/sigma_code.sock` |
 | **Sigma Forensic** | Threat analysis, anomaly detection | `/var/ipc/sigma_forensic.sock` |
@@ -66,7 +66,7 @@ Responses are collected over IPC and merged by the orchestrator into a unified r
 Each `AIModel_t` instance carries a `priority_weight`:
 
 | Priority | Meaning |
-| ---------- | --------- |
+| --- | --- |
 | 100 | Critical path — runs first, blocks others |
 | 80–99 | Standard — runs concurrently |
 | < 80 | Background — runs when CPU idle |

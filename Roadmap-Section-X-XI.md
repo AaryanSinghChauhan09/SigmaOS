@@ -1,11 +1,12 @@
 ## X. QUALITY ASSURANCE & TESTING (100+ changes)
 
 ### A. Testing Framework (50+ changes)
+
 >
 > **Target Shards**: new `test_framework_shard.c`, `SovereignDiagnosticsZenith.c`
 
 | # | Item | Status | Priority | Target Shard |
-|---|------|--------|----------|--------------|
+| --- | --- | --- | --- | --- |
 | 2101 | Implement unit test framework | [ ] | P0 | `test_framework_shard.c` |
 | 2102 | Create test assertion library | [ ] | P0 | `test_framework_shard.c` |
 | 2103 | Implement test fixture management | [ ] | P0 | `test_framework_shard.c` |
@@ -58,11 +59,12 @@
 | 2150 | Create test report generation | [ ] | P0 | `test_framework_shard.c` |
 
 ### B. Quality Metrics & Analysis (50+ changes)
+
 >
 > **Target Shards**: `SovereignDiagnosticsZenith.c`, `test_framework_shard.c`
 
 | # | Item | Status | Priority | Target Shard |
-|---|------|--------|----------|--------------|
+| --- | --- | --- | --- | --- |
 | 2151 | Implement code quality metrics | [ ] | P0 | `SovereignDiagnosticsZenith.c` |
 | 2152 | Create complexity analysis | [ ] | P0 | `SovereignDiagnosticsZenith.c` |
 | 2153 | Implement cyclomatic complexity | [ ] | P1 | `SovereignDiagnosticsZenith.c` |
@@ -119,11 +121,12 @@
 ## XI. ACCESSIBILITY & INCLUSIVITY (100+ changes)
 
 ### A. Vision Accessibility (80+ changes)
+
 >
 > **Target Shards**: `SovereignStyleZenith.c`, `SovereignVoiceShard.c`, `SovereignDesktopZenith.h`
 
 | # | Item | Status | Priority | Target Shard |
-|---|------|--------|----------|--------------|
+| --- | --- | --- | --- | --- |
 | 2201 | Screen reader optimization across all UI | [ ] | P0 | `SovereignVoiceShard.c` |
 | 2202 | High contrast mode improvements | [ ] | P0 | `SovereignStyleZenith.c` |
 | 2203 | Text size customization up to 200% | [ ] | P0 | `SovereignStyleZenith.c` |
@@ -206,11 +209,12 @@
 | 2280 | Accessible drag and drop | [ ] | P1 | `SovereignDesktopZenith.h` |
 
 ### B. Hearing & Speech Accessibility (50+ changes)
+
 >
 > **Target Shards**: `SovereignVoiceShard.c`, `audio_engine_shard.c`, `SovereignDesktopZenith.h`
 
 | # | Item | Status | Priority | Target Shard |
-|---|------|--------|----------|--------------|
+| --- | --- | --- | --- | --- |
 | 2281 | Visual captions for all audio | [ ] | P0 | `SovereignVoiceShard.c` |
 | 2282 | Captions for live audio | [ ] | P0 | `SovereignVoiceShard.c` |
 | 2283 | Transcript for audio content | [ ] | P0 | `SovereignVoiceShard.c` |
@@ -238,11 +242,12 @@
 | 2305 | Sound identification labels | [ ] | P0 | `SovereignDesktopZenith.h` |
 
 ### C. Motor & Cognitive Accessibility (40+ changes)
+
 >
 > **Target Shards**: `keyboard_master.c`, `SovereignDesktopZenith.h`, `personalizer.c`
 
 | # | Item | Status | Priority | Target Shard |
-|---|------|--------|----------|--------------|
+| --- | --- | --- | --- | --- |
 | 2306 | Sticky keys implementation | [ ] | P0 | `keyboard_master.c` |
 | 2307 | Filter keys (ignore brief/repeated) | [ ] | P0 | `keyboard_master.c` |
 | 2308 | Slow keys (delay before acceptance) | [ ] | P0 | `keyboard_master.c` |

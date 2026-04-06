@@ -44,6 +44,7 @@ SigmaOS does not execute massive `ELF` binaries loaded with thousands of backgro
 * A Shard is a lightweight, discrete `.c` file containing an entry function that maps directly to the `CLASS_DECLARE` macro logic (`SigmaOOP.h`).
 * Shards are compiled and injected directly into Ring-0 memory at runtime using the CLI command:
   `sigma_invoke my_shard_name`
+
 * When the Shard’s logic concludes, it is instantly unmapped from memory by the `SovereignProcessManager`.
 
 ## 🌐 4. Networking Bypasses the Kernel Socket Layer

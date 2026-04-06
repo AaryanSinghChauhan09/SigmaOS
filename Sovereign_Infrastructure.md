@@ -12,7 +12,7 @@ graph TD
     Kernel --> Telemetry[Observability Shard]
     Kernel --> SCPE[Compliance Policy Engine]
     Kernel --> MPS[Modular Plugin Shard]
-    
+
     Telemetry --> Exporter[Prometheus Metrics Export]
     SCPE --> Rules[Labor Law & PF/ESI Rules]
     MPS --> ThirdParty[EPF/Gig Worker Plugins]
