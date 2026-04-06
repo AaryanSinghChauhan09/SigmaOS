@@ -1,91 +1,88 @@
-# ⚙️ Zero-Dependency Algorithm Reference
+# Σ SIGMAOS: ZERO-DEPENDENCY ALGORITHMS & PROCEDURES
 
-Every algorithm used in the SigmaOS kernel is a **user-defined, zero-dependency implementation** — no `strncpy`, no `qsort`, no `malloc` from the standard library. This page catalogs the entire mathematical subset engineered natively for the Shard framework in table format.
+[![Domain](https://img.shields.io/badge/Domain-ALGORITHMS-00d2ff?style=for-the-badge)](https://github.com/AaryanSinghChauhan09/SigmaOS)
 
----
+**SigmaOS** replaces standard C libraries (`stdlib.h`, `string.h`) with internal, user-defined algorithmic equivalents to ensure absolute autonomy. The execution graph contains highly optimized routines structured for industrial domains.
 
-## 🧵 String Algorithms (`sigma_libc.c` / `sigma_std.c`)
+## 🧬 Needleman-Wunsch Global Alignment (`bioshard`)
 
-| Function Call | Standard Lib Equivalent | Time Complexity | Native Implementation Description |
-|---|---|---|---|
-| `sigma_strlen(s)` | `strlen` | O(N) | Measures null-terminated array lengths without referencing `string.h`. |
-| `sigma_strcmp(a, b)` | `strcmp` | O(N) | Deep lexicographic byte-by-byte comparison logic. |
-| `sigma_strcpy(dst, src)` | `strcpy` | O(N) | Memory-safe iterative string cloning. |
-| `sigma_strcat(dst, src)` | `strcat` | O(N) | Direct native memory pointer concatenation. |
-| `sigma_itoa(n, buf)` | `itoa` | O(log N) | Converts numeric intrinsic values to ASCII representations manually. |
-| `sigma_atoi(s)` | `atoi` | O(N) | Parses raw ASCII byte structures to reconstruct integers. |
-| `sigma_kmp_search(text, pat)` | `strstr` | O(N+M) | Knuth-Morris-Pratt pattern matching utilized heavily by the Amnesic Shard. |
+* Procedure: Dynamic programming algorithm for scoring string alignment in bioinformatics.
+* Application: DNA sequence tracking matching the exact characters of strings without calling Regex.
+* Space: Configured for local bounded length arrays to eliminate heap allocation tracking (No `malloc()`).
 
----
+## 📊 Volume-Weighted Average Price (VWAP) (`hftshard`)
 
-## 🧠 Memory Algorithms (`sigma_libc.c`)
+* Procedure: Aggregates market prices multiplied by transacted volume over sequential intervals.
+* Formula: $\text{VWAP} = \frac{\sum(\text{Price} \times \text{Volume})}{\sum(\text{Volume})}$
+* Execution: Zero-latency loop using native float multipliers (`kernel/shards/SovereignHFT.c`).
 
-| Function Call | Standard Lib Equivalent | Action Documented |
-|---|---|---|
-| `sigma_memset(dst, val, n)` | `memset` | Fills rapid contiguous memory blocks utilizing low-level x86 instructions. |
-| `sigma_memcpy(dst, src, n)` | `memcpy` | Native loop logic structured for unrolled AVX register copying. |
-| `sigma_memmove(dst, src, n)` | `memmove` | Detects overlaps to prevent data obliteration during block shifting. |
-| `sigma_memcmp(a, b, n)` | `memcmp` | Raw binary block assertions. |
-| `sigma_zero_memory(dst, n)` | — (DOD 5220.22-M) | Volatile memory scrubber explicitly engineered for strict Amensic security protocols. |
+## 🧠 Transformer Self-Attention Scoring (`llmshard`)
 
----
+* Procedure: Calculates dot-products between Query ($Q$) and Key Transpose ($K^T$) matrices.
+* Time Complexity: $O(N^2 \cdot D)$; $N$ is sequence length, $D$ is embedding dimension.
+* Execution: Employs raw nested `for` loops within the kernel. Avoiding BLAS or cuBLAS ensures that the primitive transformer block is fundamentally owned by your silicon, completely disentangled from major corporate SDKs.
 
-## 📊 Sorting Algorithms (`SovereignSuperCalculator.c` / `sigma_std.c`)
+## 🔄 In-Place Quicksort (`dsashard`)
 
-All implementations run as absolute native `C11` recursive or iterative structures. No `qsort` wrapper layers.
-
-| Algorithm | Av. Complexity | Worst-Case | In-Place Native Logic |
-|---|---|---|---|
-| **Quicksort Iterative** | O(N log N) | O(N²) | Heavily optimized for the ML shard matrices using a pivot-bound loop. |
-| **Merge Sort** | O(N log N) | O(N log N) | Used strictly when topological stability is required by the File System chunks. |
-| **Heap Sort** | O(N log N) | O(N log N) | Used extensively by the `SovereignProcessManager` slab allocation system. |
-| **Insertion Sort** | O(N²) | O(N²) | Triggered parametrically when sub-arrays drop below 16 elements in sorting shunts. |
-| **Counting Sort** | O(N + K) | O(N + K) | Specialized logic used by HFT to rapid-bucket micro-second latency arrays. |
+* Procedure: A pure implementation of recursive array division utilizing the `sigma_partition()` sub-routine.
+* Usage: Fully replaces `qsort()`, placing boundary controls correctly outside system-level vulnerabilities like buffer overflow exploitation often found in outdated SDKs.
 
 ---
 
-## 📂 Custom Kernel Architecture Algorithms
+**Σ SIGMAOS: YOUR KERNEL. YOUR ALGORITHMS. FULL SOVEREIGNTY.**
 
-| Fundamental Capability | Reference Call | Execution Purpose |
-|---|---|---|
-| **Physical Memory Pagination** | `sigma_pmm_alloc(n_pages)` | Bypasses `malloc` to directly map 4KB hardware page frames. |
-| **Native Slab Structuring** | `sigma_slab_create(size)` | Dedicated continuous object array structures mapping memory deterministically. |
-| **VFS Object Indexing** | `sigma_fnv1a(key, len)` | Computes rapid FNV-1a 64-bit metadata hashes for file directory snapshots. |
-| **Forensic Audit Signing** | `sigma_sha256(data, len)` | Zero-dependency implementation of SHA-256 for signing amnesic scrub logs securely. |
+## 🏛️ EXTENDED ZERO-DEPENDENCY MATRIX (SYNCED)
+
+The following procedures have been integrated from specialized domain documentation to ensure architectural finality.
+
+### ⚙️ 2. Execution of Routine Operations (Absorbing `claude-code` USPs)
+
+By leveraging the existing SigmaOS **Automated Workflows / Triggers**, the agent will autonomously perform operations drawing inspiration from advanced agentic IDE wrappers like Anthropic's `claude-code`:
+
+1. **Interactive REPL & Auto-Debugging Loop**: Just like `claude-code`, the Omni-Agent doesn't just return one line. It can enter a native C11 REPL loop where it compiles tests, catches segmentation faults internally, reads the panic dump, and writes the fix—entirely autonomously without user intervention until completion.
+2. **Intelligent Version Control Management**: Generating commit messages natively by diffing branches and parsing the AST for semantic intent (e.g., "Refactored `SovereignRegistry.h` struct padding"). Native pre-commit hooks that utilize the agent logic.
+3. **No Context Switching**: Developers stay strictly in the terminal. The agent maps terminal interactions (grep, cat, ls) to `SovereignOmniShard` system calls natively.
+4. **Autonomous Refactoring**: The agent can be instructed to *"Optimize all arrays to linked lists in dir /kernel"*, relying on the OS's internal C11 parser to apply safe, sandboxed source code mutations.
+5. **P0 Task Processing**: Handling repetitive boilerplates, writing native unit-tests for Assembly shards, and automatically debugging segmentation faults using native stack-trace analysis mapping it directly to English heuristics.
+
+### 🧮 THE MATHEMATICAL KERNEL
+
+We use **User-Defined Functions (UDFs)** to calculate the derivative of the cost function (MSE) with respect to weight ($w$) and bias ($b$):
+
+$$dw = \frac{1}{n} \sum_{i=1}^{n} (Pred_i - Actual_i) \cdot x_i$$
+$$db = \frac{1}{n} \sum_{i=1}^{n} (Pred_i - Actual_i)$$
+
+The update rule is then applied: $w = w - (L_r \cdot dw)$ and $b = b - (L_r \cdot db)$.
+
+### ⚙️ SOVEREIGN MATH UNIT (SMU)
+
+* Replaces high-level `Math.*` with **User-Defined Functions (UDFs)**.
+* Implementations of `SMU.abs()`, `SMU.pow()`, and `SMU.random()` (LGC-parity).
+* Ensures that the browser UI and the C Kernels use **identical mathematical kernels**.
+
+### ⚙️ HLL-REDUCTION & SMU
+
+* **Sovereign Math Unit (SMU)**: Replaces high-level `Math.*` dependencies with User-Defined Functions (UDFs).
+* **Silicon Parity**: Browser-based shards use raw indexing and loops to mirror the Low-Level C Kernels.
+
+### 📜 Indian Legal Procedure Protocol
+
+* **e-FIR (Electronic FIR)**: Information can be submitted electronically but MUST be followed by the informant's signature within 3 days.
+* **Zero FIR Protocol**: Can be registered irrespective of the area where the offense was committed.
+* **Mandatory Videography**: Search and seizure operations MUST be recorded via audio-video electronic means.
+* **Digital Evidence Admissibility (Sec 61 BSA)**: Electronic records are now primary evidence.
+
+## 💠 Multi-Level Priority Round-Robin (MLPRR) (`scheduler`)
+
+* Procedure: A hybrid coordination logic combining strict priority queuing with circular sharding for fairness.
+* Implementation: Optimized C11 logic within `kernel/scheduler.c`.
+
+### 🛡️ Primitives
+
+1. **Priority Sharding**: Always identifies the highest priority READY state across the shard grid ($O(N)$ lookup).
+2. **Fair Round-Robin**: Cycles through tasks of *equal* priority starting from the last execution index to ensure no starvation within a priority level.
+3. **Zombie Reaping**: Marks DEAD tasks for slot reclamation, allowing PID reuse without heap fragmentation.
 
 ---
 
-## 🕸️ Sovereign Graph Topologies
-
-These are utilized natively by the Data Science (`SigmaDS.js`) and Routing Shards.
-
-| Algorithm | Source Implementation | Purpose |
-|---|---|---|
-| **Breadth-First Native** | `sigma_bfs(adj, src)` | Network protocol traversing and UI node targeting algorithms. |
-| **Recursive Deep-Trace** | `sigma_dfs(adj, node)` | Process dependency graph hunting (killing orphaned process trees). |
-| **Absolute Priority Route** | `sigma_dijkstra(graph, src)` | Minimum latency routing protocol constructed specifically for HFT networks. |
-
----
-
-## 💾 I/O Algorithms (`SovereignLibC.asm`)
-
-All standard user-space buffers are avoided. I/O invokes absolute ring-0 `syscall` assembly interrupts.
-
-| Function | Descriptor Interrupt | Mechanism |
-|---|---|---|
-| `sigma_printf(str)` | `SYS_WRITE = 1` | Translates directly into internal register `RAX` pushing string arrays to the framebuffer DMA limits. |
-| `sigma_read(buf, len)` | `SYS_READ = 0` | Intercepts keyboard hardware limits translating keycodes down the interrupt matrix. |
-
----
-
-## 📘 Complexity Cheat Sheet (DSA Shard Reference Matrix)
-
-Used by the Education/DSA Orchestrator internally.
-
-| Internal Structure | Access Latency | Rapid Search | Native Insert | Secure Delete |
-|---|---|---|---|---|
-| Contiguous Arrays | O(1) | O(N) | O(N) | O(N) |
-| Linked Pointer Lists | O(N) | O(N) | O(1) | O(1) |
-| Hashed Memory Maps | O(1) avg | O(1) avg | O(1) avg | O(1) avg |
-| Binary Search Trees | O(log N) | O(log N) | O(log N) | O(log N) |
-| Binary Priority Heaps | O(N) | O(N) | O(log N) | O(log N) |
+**Σ SIGMAOS: SOVEREIGN COORDINATION. THE ZENITH SUPREME.**

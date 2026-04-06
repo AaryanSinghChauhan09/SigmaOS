@@ -1,8 +1,23 @@
-# 🤖 AI Lab Deep Dive
+# Σ SIGMAOS: AI LAB DEEP DIVE (🧠)
+[![Domain](https://img.shields.io/badge/Domain-AI-blue?style=for-the-badge)]()
 
-SigmaOS is **AI-native by design** — intelligence is embedded at every kernel layer, not installed as an external package.
+**SIGMA_AI** is a pure silicon implementation of the **Stochastic Gradient Descent** algorithm. No cloud-based scraping, no pre-trained weights. You train the model on local data using the local CPU/GPU registers.
+
+## 🧮 THE MATHEMATICAL KERNEL
+We use **User-Defined Functions (UDFs)** to calculate the derivative of the cost function (MSE) with respect to weight ($w$) and bias ($b$):
+
+$$dw = \frac{1}{n} \sum_{i=1}^{n} (Pred_i - Actual_i) \cdot x_i$$
+$$db = \frac{1}{n} \sum_{i=1}^{n} (Pred_i - Actual_i)$$
+
+The update rule is then applied: $w = w - (L_r \cdot dw)$ and $b = b - (L_r \cdot db)$.
+
+## 🛠️ THE SILICON PARITY (HLL-REDUCED)
+- **C Kernel**: `/kernel/SigmaProfessionalKernels.c` (Raw pointers).
+- **Assembly Shard**: `/kernel/SigmaCore.asm` (SIMD-parity vector ops).
+- **JS Proxy**: `/scripts/js/SigmaAI.js` (Delegating to the **Sovereign Math Unit (SMU)** instead of `Math.*`).
 
 ---
+<<<<<<< HEAD
 
 ## Architecture
 
@@ -80,3 +95,6 @@ llm.dispatch(&llm, "Summarize memory allocation anomalies in last 10 seconds.");
 - Hardware GPU dispatch via direct OpenCL syscall simulation
 - Gradient descent visualization rendered natively in the browser UI
 - Multi-agent co-work bus with task allocation and result merging
+=======
+**Σ SIGMAOS: RAW AI. LOCAL INTELLIGENCE. 🧠⚙️🌍**
+>>>>>>> 83e117acaff1ccc62b67a2adfc253454bcf701ae

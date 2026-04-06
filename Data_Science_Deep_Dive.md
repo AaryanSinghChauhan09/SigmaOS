@@ -1,8 +1,21 @@
-# 📊 Data Science Deep Dive
+# Σ SIGMAOS: DATA SCIENCE DEEP DIVE (📊)
+[![Domain](https://img.shields.io/badge/Domain-DS-orange?style=for-the-badge)]()
 
-SigmaOS embeds a native **Data Science Shard** that runs statistical analysis, visualization, and ML preprocessing entirely on-device — no Jupyter, no Python runtime, no cloud backend.
+**SIGMA_DS** provides **Statistical Finality** through raw silicon compute. No third-party data layers.
+
+## 📊 THE STATISTICAL UNIT (SSU)
+The **Sovereign Statistical Unit** implements variance ($\sigma^2$) and mean ($\mu$) using raw loops:
+
+$$\mu = \frac{1}{n} \sum_{i=1}^{n} x_i$$
+$$\sigma^2 = \frac{1}{n} \sum_{i=1}^{n} (x_i - \mu)^2$$
+
+## 🛠️ THE SILICON PARITY (HLL-REDUCED)
+- **Mean Calculation**: Direct accumulation in JS with **SMU.random()** to reduce HLL random dependencies.
+- **Visual Auditing**: Histograms are drawn manually on the canvas with **No High-Level Visual Libraries (D3, Chart.js)**.
+- **Low-Level Kernels**: C11 pointers for industrial-grade data precision.
 
 ---
+<<<<<<< HEAD
 
 ## Architecture
 
@@ -93,3 +106,6 @@ The `SigmaSystem` class in `index.js` renders an interactive DS dashboard:
 - [ ] PCA (Principal Component Analysis) in pure C11
 - [ ] K-Means clustering visualization
 - [ ] Time-series decomposition (trend + seasonality + residual)
+=======
+**Σ SIGMAOS: RAW DATA. ABSOLUTE TRUTH. 📊⚙️🌍**
+>>>>>>> 83e117acaff1ccc62b67a2adfc253454bcf701ae

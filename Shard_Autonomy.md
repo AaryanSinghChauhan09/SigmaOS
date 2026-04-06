@@ -1,6 +1,17 @@
-# 🌿 Shard Autonomy — Shard-On-Demand System
+# Σ SIGMAOS: SHARD AUTONOMY & SILICON PURGE
+[![Autonomy](https://img.shields.io/badge/Autonomy-TOTAL-blue?style=for-the-badge)]()
 
-The **Shard-On-Demand (SOD)** system is SigmaOS's answer to monolithic package managers. Instead of installing bloated packages, features are loaded as lightweight, hot-swappable **Shards** that can be activated, paused, or evicted at runtime.
+**Σ SIGMAOS** grants you **Complete Control** over every professional tool in the OS.
+
+## 🧩 SHARD-ON-DEMAND (SOD)
+- Every system and domain component (AI, DS, DSA) is a **Sovereign Shard**.
+- Use the **Shard Store** UI to toggle tools near the silicon.
+- **OOPS Hierarchy**: Every shard inherits from the `SigmaShard` base class for encapsulated logic.
+
+## ⚙️ THE SILICON PURGE
+- To eliminate all unnecessary code from your active environment, use the **PURGE TRIGGER**.
+- This physically removes the tool definitions from the system memory (`SigmaStore.js`).
+- This is not a "Disable" function; it is a **Sovereign Removal** for pure performance and security.
 
 ---
 
@@ -88,3 +99,4 @@ sigma shard evict camera_shard
 | **Student** | `ncert`, `calculator`, `dsa_shard`, `ml_core` |
 | **Researcher** | `ml_core`, `ai_lab`, `data_science`, `sovereign_search` |
 | **Gamer** | `gaming`, `xclicker`, `oom_killer`, `automation` |
+**Σ SIGMAOS: YOUR HARDWARE. YOUR CODE. YOUR CHOICE. 🧩⚙️🛡️**

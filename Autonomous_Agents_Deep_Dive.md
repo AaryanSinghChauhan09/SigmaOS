@@ -1,8 +1,19 @@
-# 🕵️ Autonomous Agents Deep Dive
+# Σ SIGMAOS: AUTONOMOUS AGENTS DEEP DIVE (🤝🔮🦾)
+[![Domain](https://img.shields.io/badge/Domain-AGENTS-00d2ff?style=for-the-badge)]()
 
-SigmaOS supports **multi-agent AI orchestration** natively — multiple AI personas cooperating on a single task without cloud dependencies.
+**SIGMA_AGENTS** disrupts the cloud-based multi-agent paradigm (e.g., Claude Co-Work, Perplexity, OpenClaw) by enforcing local, silicon-parity computation and Inter-Process Communication (IPC).
+
+## 🤝 CO-WORK IPC (`coworkshard`)
+Traditional co-work spaces relay your data through remote servers. SigmaOS initiates a **Multi-Agent Collaboration Bus** inside the local kernel memory using `SovereignCowork.c`. Messages are passed directly via C-pointers (`SigmaAgentIPC`), simulating multi-agent synchronicity with **Zero external web-socket connections**.
+
+## 🔮 COMPUTE ORACLE (`oracleshard`)
+Instead of hitting external graph APIs for retrieval-augmented generation (RAG), the Compute Oracle relies on **Local VFS RAM-Disk scans**. Using `sigma_silicon_search` in `SovereignComputeOracle.c`, knowledge indexing is purely bound to your local hardware. You have absolute privacy.
+
+## 🦾 MACRO CLAW (`clawshard`)
+Computer use models often rely on heavy automation wrappers (Electron). The **Macro Claw** strips this down to hardware pointer mutation. `sigma_teleport_mouse` in `SovereignMacroClaw.c` manually edits the `(x,y)` coordinate memory of the active cursor state, allowing for precise, low-level OS automation.
 
 ---
+<<<<<<< HEAD
 
 ## Architecture
 
@@ -81,3 +92,6 @@ A higher-level orchestration kernel that manages multi-shard AI pipelines:
 - [ ] Agent specialization via persona-aware fine-tuning
 - [ ] Cross-agent memory sharing via shared VFS namespace
 - [ ] Streaming token merging for real-time unified responses
+=======
+**Σ SIGMAOS: LOCAL AGENTS. ABSOLUTE PRIVACY. SOVEREIGN AUTOMATION.**
+>>>>>>> 83e117acaff1ccc62b67a2adfc253454bcf701ae
