@@ -4,17 +4,19 @@ SigmaOS does not just compete structurally as a kernel. It is explicitly enginee
 
 ---
 
-## 🧠 Artificial Intelligence (AI) & Machine Learning (ML)
+## 🧠 Artificial Intelligence (AI) and Machine Learning (ML)
 
 **The Competition:** Web-based wrappers, bloated Python runtime environments (Anaconda, PyTorch overheads).
+
 **SigmaOS Superiority:**
 
 - The **`SovereignAIKernelZenith.c`** utilizes zero-copy DMA buffers to route GPU tensor calculations directly from the Shard.
 - You don't "open an AI app." The entire `omni_shell` utilizes natural language processing (NLP) natively. The AI is the substrate of the OS, not a plugin.
 
-## 📊 Data Science (DS) & DSA
+## 📊 Data Science (DS) and DSA
 
 **The Competition:** Jupyter Notebooks, interpreted scripts, browser lags.
+
 **SigmaOS Superiority:**
 
 - Data Structures and Algorithms exist as **intrinsic hardware structures**.
@@ -24,23 +26,26 @@ SigmaOS does not just compete structurally as a kernel. It is explicitly enginee
 ## 💻 Computer Science (CS) Engineering
 
 **The Competition:** Standard Linux distributions (Ubuntu) with Frankenstein toolchains (`apt-get`, `cmake`, heavy IDEs).
+
 **SigmaOS Superiority:**
 
 - The **Developer Persona** unlocks the entire OS. Every tool is pure C11.
 - There is no obfuscation. A CS student on SigmaOS learns exactly how memory paging, POSIX, and compilers interact because they are not hidden behind abstraction layers.
 
-## ⚖️ Indian Law & Jurisprudence
+## ⚖️ Indian Law and Jurisprudence
 
 **The Competition:** Paid, slow, cloud-dependent platforms like SCC Online or Manupatra.
+
 **SigmaOS Superiority:**
 
 - The new **`indian_law.c` Shard** maps the Bharatiya Nyaya Sanhita (BNS), IPC, CrPC, and Constitutional articles utilizing an O(1) native hash lookup table directly into the OS's Virtual File System (VFS).
 - Lawyers, judges, and students can parse complete legal frameworks instantaneously offline without a browser.
-*(Invoked natively via `sigma_invoke indian_law bns 103`)*.
+- *(Invoked natively via `sigma_invoke indian_law bns 103`)*
 
 ## 📚 Indian Education (NCERT)
 
 **The Competition:** EdTech giants with subscription models, browser lag, distraction-heavy interfaces (YouTube, Byjus).
+
 **SigmaOS Superiority:**
 
 - The **`ncert_core.c` Shard** literally injects the syllabus into the OS routing.

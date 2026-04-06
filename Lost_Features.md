@@ -56,7 +56,7 @@ As SigmaOS evolved, several architectural concepts that were initially prototype
 
 - **Status:** Scrapped (Update v0.7)
 - **Reasoning:** Standard OS environments use background daemons (like Windows Indexer or Linux `updatedb`) that randomly spike CPU usage, causing unacceptable jitter for the **Gamer Persona** and **AI Tensors**.
-- **Replacement:** Absolute O(1) hash mapping upon file creation (`SovereignVFS`). If you don’t manually search it, it doesn’t index it.
+- **Replacement:** Absolute O(1) hash mapping upon file creation (`SovereignVFS`). If you don't manually search it, it doesn't index it.
 
 ### 9. Cloud-Sync Backup Vectors
 

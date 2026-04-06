@@ -6,7 +6,7 @@ Using SigmaOS, forensic analysts, lawyers, and law enforcement can parse these p
 
 ---
 
-## 1. Information & FIR Registration (Zero-FI)
+## 1. Information and FIR Registration (Zero-FI)
 
 *Transitioning from CrPC Section 154 to **BNSS Section 173**.*
 
@@ -15,23 +15,23 @@ Using SigmaOS, forensic analysts, lawyers, and law enforcement can parse these p
 - [x] **Preliminary Inquiry Flag:** SigmaOS ML algorithms parse the complaint text to determine if it falls under crimes punishable by 3-7 years (requiring a 14-day preliminary inquiry before formal registration).
 - [x] **Information of Cognizable Offense:** Map the offense strictly against the updated **BNS Schedule**.
 
-## 2. Investigation & Digital Forensics
+## 2. Investigation and Digital Forensics
 
-*Transitioning from CrPC to **BNSS Data Search & Seizure**.*
+*Transitioning from CrPC to **BNSS Data Search and Seizure**.*
 
 - [x] **Forensic Videography Check:** If the crime carries a sentence of 7+ years, the SigmaOS shard mathematically flags that **mandatory videography** of the crime scene and evidence collection is required (BNSS Sec 176(3)).
 - [x] **Amnesic Evidence Scrubbing:** Any local copy of seized digital evidence passed through SigmaOS is aggressively locked down utilizing the zero-dependency `sigma_sha256()` hashing system to prove chain-of-custody under **BSA Sec 61** (Electronic evidence).
 - [x] **15-Day Custody Parsing:** Detect and validate police custody spanning up to 60/90 days in tranches, verifying timeline legality natively.
 
-## 3. Arrest & Bail Heuristics
+## 3. Arrest and Bail Heuristics
 
-*BNS & BNSS Rights Validations.*
+*BNS and BNSS Rights Validations.*
 
-- [x] **Handcuffing Verification:** Cross-reference the arrestee’s status. BNSS Section 43 strictly defines when handcuffs are legal (e.g., repeating offenders, organized crime, terror).
+- [x] **Handcuffing Verification:** Cross-reference the arrestee's status. BNSS Section 43 strictly defines when handcuffs are legal (e.g., repeating offenders, organized crime, terror).
 - [x] **Information to Relative:** Verify the digital log proving the designated person was informed of the arrest.
 - [x] **Bail Algorithm Processing:** For first-time offenders who have served 1/3rd of their maximum term (or 1/2 for others), natively prompt a statutory bail recommendation alert based on BNSS Sec 479 constraints.
 
-## 4. Trial, Summons, & Prosecution
+## 4. Trial, Summons, and Prosecution
 
 *Execution speeds drastically increased by BNSS timelines.*
 
@@ -50,16 +50,13 @@ Using SigmaOS, forensic analysts, lawyers, and law enforcement can parse these p
 
 ### 💻 Invoking the Matrix via Omni Shell
 
-To run a procedural check on an open case file in SigmaOS
+To run a procedural check on an open case file in SigmaOS:
 
 ```bash
-
 # Example: Parse an FIR text file against BNS/BNSS requirements
-
 sigma_invoke indian_law --audit_fir /vfs/case_files/FIR_102.txt
 
 # Example: Run the hardware SHA-256 validation for Digital Evidence (BSA Sec 61)
-
 sigma_invoke indian_law --validate_evidence /vfs/evidence/drive.img
 ```
 

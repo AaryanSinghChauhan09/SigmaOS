@@ -8,7 +8,7 @@ SigmaOS violently rejects this bloat. The boot process is a sheer, unabstracted 
 
 ## 🕒 Stage 1: Hardware Handshake (`SigmaCore.asm`)
 
-*Time taken: < 0.1s*
+### Time taken: &lt; 0.1s
 
 The moment power is mapped to the CPU, SigmaOS ignores legacy BIOS calls and hooks directly into the UEFI physical payload.
 
@@ -19,7 +19,7 @@ The moment power is mapped to the CPU, SigmaOS ignores legacy BIOS calls and hoo
 
 ## ⚙️ Stage 2: C11 Kernel Handover (`main.c`)
 
-*Time taken: < 0.05s*
+### Time taken: &lt; 0.05s
 
 The Assembly stub yields execution directly to `kernel/main.c`. Here, the OS asserts its sovereign dominance.
 
@@ -27,9 +27,9 @@ The Assembly stub yields execution directly to `kernel/main.c`. Here, the OS ass
 - The **`SovereignProcessManager.c`** wakes up, establishing the PID 1 state (known internally as the *Sigma Orchestrator*).
 - The **Keyboard Master** (`keyboard_master.c`) binds raw hardware keystrokes (like the `Alt+C` Omni Shell shortcut) directly to the CPU interrupt vector.
 
-## 🕵️ Stage 3: VFS & Persona Detection
+## 🕵️ Stage 3: VFS and Persona Detection
 
-*Time taken: < 0.02s*
+### Time taken: &lt; 0.02s
 
 Before any graphical layer is attempted, the OS needs to know *who* or *what* it is running as.
 
@@ -37,9 +37,9 @@ Before any graphical layer is attempted, the OS needs to know *who* or *what* it
 - The `SovereignPersonalizerZenith.c` checks the default config matrix to identify the active context (e.g., Developer, Gamer, Forensic Analyst).
 - Kernel CPU governors are instantly adjusted. If the Gamer persona is detected, TSX and clock multipliers are maximized.
 
-## 🌉 Stage 4: Shard Loader & Network DMA Binding
+## 🌉 Stage 4: Shard Loader and Network DMA Binding
 
-*Time taken: < 0.05s*
+### Time taken: &lt; 0.05s
 
 SigmaOS does not load a massive library of drivers. It uses the **Shard-On-Demand (SOD)** framework.
 
@@ -48,7 +48,7 @@ SigmaOS does not load a massive library of drivers. It uses the **Shard-On-Deman
 
 ## 🌟 Stage 5: Zenith-Gold JS Orchestrator Matrix
 
-*Time taken: < 0.1s*
+### Time taken: &lt; 0.1s
 
 Once the C11/Assembly sub-system is absolute, SigmaOS initiates its visual representation. It does not spawn heavy window compositors like X11 or Wayland.
 
