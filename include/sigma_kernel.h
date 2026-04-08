@@ -30,6 +30,7 @@
 #include "SovereignPowerBIZenith.h"
 #include "SovereignTableauZenith.h"
 #include "SovereignPythonZenith.h"
+#include "SovereignRZenith.h"
 
 #endif // SIGMA_KERNEL_H
 
