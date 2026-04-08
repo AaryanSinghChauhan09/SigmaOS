@@ -1,4 +1,4 @@
-#include "SovereignLibC.h"
+#include "../include/sigma_kernel.h"
 // stdarg parity in Sovereign Zenith
 
 // --- sigma_print ---

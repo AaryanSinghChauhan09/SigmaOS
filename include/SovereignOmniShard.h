@@ -10,19 +10,7 @@
 #ifndef SOVEREIGN_OMNI_SHARD_H
 #define SOVEREIGN_OMNI_SHARD_H
 
-#include "libc/SovereignLibC.h"
-
-/* =========================================================================
- * CORE ABSTRACTIONS
- * ========================================================================= */
-#define CLASS_DECLARE(name) typedef struct name name##_t; struct name
-#define VIRTUAL(ret, name, ...) ret (*name)(__VA_ARGS__)
-
-CLASS_DECLARE(SigmaObject) {
-    const char* class_name;
-    sigma_u32 object_id;
-    VIRTUAL(void, destroy, struct SigmaObject* self);
-};
+#include "SovereignLibC.h"
 
 /* =========================================================================
  * DOMAIN: KERNEL & SCHEDULING

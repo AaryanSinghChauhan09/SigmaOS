@@ -1,4 +1,4 @@
-#include "../../../libc/SovereignLibC.h"
+#include "../../../include/sigma_kernel.h"
 
 // Transactional control (Commit/Rollback) parity
 void sigma_rdbms_commit() { sigma_printf("Σ [SQL]: Transaction Committed (ACID Verified).\n"); }

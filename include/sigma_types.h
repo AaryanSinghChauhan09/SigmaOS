@@ -17,6 +17,14 @@
 #ifndef SIGMAOS_SIGMA_TYPES_H
 #define SIGMAOS_SIGMA_TYPES_H
 
+/* Boolean */
+typedef unsigned char      sigma_bool;
+#define SIGMA_TRUE  ((sigma_bool)1)
+#define SIGMA_FALSE ((sigma_bool)0)
+
+/* Error code type — negative values indicate errors. */
+typedef signed int         sigma_err_t;
+
 /* Sized integer types — matches C99 <stdint.h> semantics. */
 typedef unsigned char      sigma_u8;
 typedef signed   char      sigma_i8;
@@ -32,11 +40,6 @@ typedef sigma_u64          sigma_uptr;   /* holds a pointer as integer    */
 typedef sigma_i64          sigma_iptr;   /* signed pointer-size integer   */
 typedef sigma_u64          sigma_size_t; /* size of an object in bytes    */
 typedef sigma_i64          sigma_ssize_t;/* signed size (for error codes) */
-
-/* Boolean */
-typedef sigma_u8           sigma_bool;
-#define SIGMA_TRUE  ((sigma_bool)1)
-#define SIGMA_FALSE ((sigma_bool)0)
 
 /* Null pointer. */
 #define SIGMA_NULL ((void*)0)
@@ -74,19 +77,7 @@ typedef sigma_u64 virt_addr_t;
 /* Process identifier */
 typedef sigma_i32 pid_t;
 
-/* Error code type — negative values indicate errors. */
-typedef sigma_i32 sigma_err_t;
-
 /* Common error codes (negative, like Linux <errno.h>). */
-/* --- ARCHITECTURAL SHARDS ---
-#if defined(__x86_64__) || defined(_M_X64)
-    #define SIGMA_ARCH_X64
-#elif defined(__aarch64__) || defined(_M_ARM64)
-    #define SIGMA_ARCH_ARM64
-#elif defined(__riscv)
-    #define SIGMA_ARCH_RISCV
-#endif
-*/
 #define SIGMA_OK      ((sigma_err_t)  0)
 #define SIGMA_EPERM   ((sigma_err_t) -1)  /* Operation not permitted */
 #define SIGMA_ENOENT  ((sigma_err_t) -2)  /* No such file or directory */
@@ -115,14 +106,5 @@ typedef char* sigma_va_list;
 #define sigma_va_start(ap, last) (ap = (sigma_va_list)&(last) + sizeof(last))
 #define sigma_va_arg(ap, type)   (*(type*)((ap += sizeof(type)) - sizeof(type)))
 #define sigma_va_end(ap)         (ap = (sigma_va_list)0)
-
-#ifndef SIGMA_ASSERT
-#define SIGMA_ASSERT(cond, msg) do { \
-    if (!(cond)) { \
-        sigma_printf("\nΣ [PANIC]: ASSERTION FAILED: %s (at %s:%d)\n", msg, __FILE__, __LINE__); \
-        for(;;); \
-    } \
-} while(0)
-#endif
 
 #endif /* SIGMAOS_SIGMA_TYPES_H */

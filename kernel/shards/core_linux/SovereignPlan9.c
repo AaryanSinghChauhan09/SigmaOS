@@ -1,4 +1,4 @@
-#include "../../../../libc/SovereignLibC.h"
+#include "../../../include/sigma_kernel.h"
 
 void SovereignPlan9_Init() {
     sigma_printf("Σ [ABSORB]: SovereignPlan9 Integration Complete. Global USP Parity Secured.

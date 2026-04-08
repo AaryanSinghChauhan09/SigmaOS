@@ -12,8 +12,8 @@
 #define SOVEREIGN_NAMESPACE_SHARD_H
 
 #include "../../../include/SovereignOSBasicsZenith.h"
-#include "../../../libc/SovereignLibC.h"
-#include "../../../libc/SigmaOOP.h"
+#include "../../../include/sigma_kernel.h"
+#include "../../../include/sigma_kernel.h"
 
 // -------------------------------------------------------------------------
 // Namespace Object Structure

@@ -1,4 +1,4 @@
-#include "../../../../libc/SovereignLibC.h"
+#include "../../../include/sigma_kernel.h"
 
 // Σ SovereignGEOM: Modular Disk Zenith
 // Inspired by FreeBSD GEOM: Storage Transformation Infrastructure

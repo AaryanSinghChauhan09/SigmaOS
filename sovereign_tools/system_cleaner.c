@@ -7,8 +7,8 @@
  * =========================================================================
  */
 
-#include "../libc/SovereignLibC.h"
-#include "../libc/SigmaOOP.h"
+#include "../include/sigma_kernel.h"
+#include "../include/sigma_kernel.h"
 
 // -------------------------------------------------------------------------
 // Forensic Amnesic OOP Structure

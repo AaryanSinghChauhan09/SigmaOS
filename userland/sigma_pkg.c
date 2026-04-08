@@ -8,7 +8,7 @@
  */
 
 #include "../libc/sigma_libc.h"
-#include "../libc/sigma_types.h"
+#include "../include/sigma_kernel.h"
 
 typedef struct {
     char name[64];

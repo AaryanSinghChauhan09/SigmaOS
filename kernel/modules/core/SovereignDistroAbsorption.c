@@ -8,8 +8,8 @@
  * =========================================================================
  */
 
-#include "../../../libc/SovereignLibC.h"
-#include "../../../libc/SigmaOOP.h"
+#include "../../../include/sigma_kernel.h"
+#include "../../../include/sigma_kernel.h"
 
 // -------------------------------------------------------------------------
 // Sovereign Distro Absorber Object Structure

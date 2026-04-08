@@ -11,9 +11,7 @@
 #ifndef SOVEREIGN_CGROUP_SHARD_H
 #define SOVEREIGN_CGROUP_SHARD_H
 
-#include "../../../include/SovereignOSBasicsZenith.h"
-#include "../../../libc/SovereignLibC.h"
-#include "../../../libc/SigmaOOP.h"
+#include "../../../include/sigma_kernel.h"
 
 // -------------------------------------------------------------------------
 // CGroup Object Structure

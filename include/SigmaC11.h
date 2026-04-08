@@ -17,7 +17,7 @@
 #ifndef SIGMA_C11_H
 #define SIGMA_C11_H
 
-#include "libc/SovereignLibC.h"
+#include "SovereignLibC.h"
 
 /* =========================================================================
  * Common typedefs used across shards

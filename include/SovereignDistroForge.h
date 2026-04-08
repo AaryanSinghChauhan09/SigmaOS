@@ -1,21 +1,16 @@
 #ifndef SOVEREIGN_DISTRO_FORGE_H
 #define SOVEREIGN_DISTRO_FORGE_H
 
-#include "SigmaC11.h"
+#include "SigmaOOP.h"
 
-namespace SigmaOS {
-namespace DistroForge {
+/* Σ Territory Initiation */
 
-class SovereignDistroForge : public SigmaObject {
-public:
-    const char* type_name() const noexcept override;
-    void AbsorbLinux();
-    void ForgeNewDistro(const char* name);
+CLASS_DECLARE(SovereignDistroForge) { 
+    SigmaObject_t core;
+    VIRTUAL(void, AbsorbLinux, struct SovereignDistroForge* self);
+    VIRTUAL(void, ForgeNewDistro, struct SovereignDistroForge* self, const char* name);
 };
 
-} // namespace DistroForge
-} // namespace SigmaOS
+/* Σ Territory Termination */
 
 #endif
-
-

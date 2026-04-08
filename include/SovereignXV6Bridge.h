@@ -10,8 +10,8 @@
 #ifndef SOVEREIGN_XV6_BRIDGE_H
 #define SOVEREIGN_XV6_BRIDGE_H
 
-#include "libc/SovereignLibC.h"
-#include "libc/SigmaOOP.h"
+#include "SovereignLibC.h"
+#include "SigmaOOP.h"
 
 // -------------------------------------------------------------------------
 // XV6 Style Process & IPC Shards

@@ -1,4 +1,4 @@
-#include "../../../../libc/SovereignLibC.h"
+#include "../../../include/sigma_kernel.h"
 
 void SovereignTranslate_Init() {
     sigma_printf("Σ [OPERATION]: SovereignTranslate (Linux Virtualization) Integration Complete. Phase 22 Pure Parity Online.

@@ -1,4 +1,4 @@
-#include "../../libc/SovereignLibC.h"
+#include "../../../include/sigma_kernel.h"
 
 // System-wide syscall handler
 void sigma_syscall_handler(sigma_u64 syscall_num, sigma_u64 arg1, sigma_u64 arg2) {

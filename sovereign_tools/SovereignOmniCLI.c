@@ -10,7 +10,7 @@
  * =========================================================================
  */
 
-#include "../libc/SovereignLibC.h"
+#include "../include/sigma_kernel.h"
 #include "../kernel/SovereignOmniShard.h"
 
 /* exec_shard: Sovereign Shard-On-Demand loader */

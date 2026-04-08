@@ -1,4 +1,4 @@
-#include "../../../libc/SovereignLibC.h"
+#include "../../../include/sigma_kernel.h"
 
 sigma_f64 sigma_stats_mean(const sigma_f64* data, sigma_size_t n) {
     sigma_f64 sum = 0;

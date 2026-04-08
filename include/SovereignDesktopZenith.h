@@ -1,46 +1,31 @@
 #ifndef SOVEREIGN_DESKTOP_ZENITH_H
 #define SOVEREIGN_DESKTOP_ZENITH_H
 
-#include "SigmaC11.h"
+#include "SigmaOOP.h"
 
-namespace SigmaOS {
-namespace Desktop {
+/* Σ Territory Initiation */
 
 // --- SOVEREIGN WORKSPACE & WINDOWS ---
-class SovereignWindow : public SigmaObject {
-protected:
+CLASS_DECLARE(SovereignWindow) { 
+    SigmaObject_t core;
     int m_x, m_y, m_w, m_h;
     const char* m_title;
-public:
-    SovereignWindow(const char* t, int x, int y, int w, int h)
-        : m_title(t), m_x(x), m_y(y), m_w(w), m_h(h) {}
-    
-    virtual void OnRender() = 0;
+    VIRTUAL(void, OnRender, struct SovereignWindow* self);
 };
 
-class SovereignTerminalWindow : public SovereignWindow {
-public:
-    SovereignTerminalWindow() : SovereignWindow("Omni-Shell Zenith", 50, 50, 800, 600) {}
-    const char* type_name() const noexcept override { return "SovereignTerminalWindow"; }
-    void OnRender() override;
+CLASS_DECLARE(SovereignTerminalWindow) { 
+    SovereignWindow_t core;
+    VIRTUAL(void, OnRender, struct SovereignTerminalWindow* self);
 };
 
-class SovereignZenithDesktop : public SigmaObject {
-private:
-    bool m_gui_active;
-public:
-    SovereignZenithDesktop() : m_gui_active(false) {}
-    const char* type_name() const noexcept override { return "SovereignZenithDesktop"; }
-    
-    void ToggleGUI() { m_gui_active = !m_gui_active; }
-    bool IsGUIActive() const { return m_gui_active; }
-    
-    void RenderDesktop(); // Native DOM Rasterization through SovereignUI
+CLASS_DECLARE(SovereignZenithDesktop) { 
+    SigmaObject_t core;
+    sigma_bool m_gui_active;
+    VIRTUAL(void, ToggleGUI, struct SovereignZenithDesktop* self);
+    VIRTUAL(sigma_bool, IsGUIActive, struct SovereignZenithDesktop* self);
+    VIRTUAL(void, RenderDesktop, struct SovereignZenithDesktop* self); // Native DOM Rasterization
 };
 
-} // namespace Desktop
-} // namespace SigmaOS
+/* Σ Territory Termination */
 
 #endif
-
-

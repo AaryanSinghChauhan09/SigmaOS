@@ -2,7 +2,7 @@
  * Σ SIGMAOS: SOVEREIGN TOOL ABSORBER v2.0 — PURE C11
  * 40+ Tools: Development, DevOps, Security, Media, DB — all absorbed natively.
  */
-#include "../libc/SovereignLibC.h"
+#include "../include/sigma_kernel.h"
 
 static void absorb_git(void) {
     sigma_printf("[ABSORB] Git: Distributed VCS, branching, object store, hooks\n");

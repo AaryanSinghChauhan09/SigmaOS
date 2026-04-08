@@ -1,4 +1,4 @@
-#include "../../../libc/SovereignLibC.h"
+#include "../../../include/sigma_kernel.h"
 
 void SovereignEdu_Web_OS_Init() {
     sigma_printf("Σ [ABSORB]: Web Programming (HTML5/JS/PHP) & OS Concepts Zenith Online.\n");

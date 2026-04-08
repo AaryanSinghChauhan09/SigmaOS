@@ -2,7 +2,7 @@
  * Σ SIGMAOS: SOVEREIGN DISTRO ABSORBER v2.0 — PURE C11
  * 30 Distros: Linux + BSD personalities absorbed natively.
  */
-#include "../libc/SovereignLibC.h"
+#include "../include/sigma_kernel.h"
 
 typedef struct { const char* name; const char* pkg; const char* init; const char* usp; } SigmaDistro;
 static const SigmaDistro DISTROS[] = {

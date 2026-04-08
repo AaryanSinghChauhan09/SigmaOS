@@ -8,7 +8,7 @@
  */
 
 #include "../libc/sigma_libc.h"
-#include "../libc/sigma_types.h"
+#include "../include/sigma_kernel.h"
 
 #define MAX_FILES 128
 #define MAX_PATH_LEN 256

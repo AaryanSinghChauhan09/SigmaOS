@@ -8,8 +8,8 @@
  * =========================================================================
  */
 
-#include "../libc/SovereignLibC.h"
-#include "../libc/sigma_types.h"
+#include "../include/sigma_kernel.h"
+#include "../include/sigma_kernel.h"
 
 
 /* ---- Test harness ---- */

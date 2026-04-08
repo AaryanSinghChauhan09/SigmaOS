@@ -5,13 +5,13 @@
  */
 
 #ifdef UNIT_TEST_ENV
-  #include "../libc/SovereignLibC.h"
-  #include "../libc/sigma_types.h"
+  #include "../include/sigma_kernel.h"
+  #include "../include/sigma_kernel.h"
   #define sigma_printf printf
   #define sigma_u64 sigma_u64
   static inline sigma_u64 cpu_rdtsc(void) { return 0; }
 #else
-  #include "../libc/SovereignLibC.h"
+  #include "../include/sigma_kernel.h"
   extern sigma_u64 cpu_rdtsc(void);
 #endif
 

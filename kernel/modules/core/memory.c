@@ -1,4 +1,4 @@
-#include "../../libc/SovereignLibC.h"
+#include "../../../include/sigma_kernel.h"
 
 #define PAGE_SIZE 4096
 #define MAX_PAGES 1024

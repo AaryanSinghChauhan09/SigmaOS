@@ -1,4 +1,4 @@
-#include "../libc/SovereignLibC.h"
+#include "../include/sigma_kernel.h"
 
 /*
  * Σ SIGMAOS: SOVEREIGN NCERT & EDUCATION SHARD (v1.0)

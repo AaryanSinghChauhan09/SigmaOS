@@ -11,8 +11,8 @@
 #ifndef SOVEREIGN_SYNC_ZENITH_H
 #define SOVEREIGN_SYNC_ZENITH_H
 
-#include "libc/SovereignLibC.h"
-#include "libc/SigmaOOP.h"
+#include "SovereignLibC.h"
+#include "SigmaOOP.h"
 
 // -------------------------------------------------------------------------
 // Sovereign Atomic Mutex (Pure C11)

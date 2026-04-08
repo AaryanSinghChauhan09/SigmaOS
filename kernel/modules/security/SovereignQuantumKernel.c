@@ -11,8 +11,8 @@
 #ifndef SOVEREIGN_QUANTUM_KERNEL_H
 #define SOVEREIGN_QUANTUM_KERNEL_H
 
-#include "../../../libc/SovereignLibC.h"
-#include "../../../libc/SigmaOOP.h"
+#include "../../../include/sigma_kernel.h"
+#include "../../../include/sigma_kernel.h"
 
 // -------------------------------------------------------------------------
 // Quantum Enclave Object Structure

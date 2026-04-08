@@ -1,4 +1,4 @@
-#include "../../../libc/SovereignLibC.h"
+#include "../../../include/sigma_kernel.h"
 
 typedef enum {
     RES_HEALTHY = 0,

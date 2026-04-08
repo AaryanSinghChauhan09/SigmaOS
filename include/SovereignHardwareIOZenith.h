@@ -1,10 +1,9 @@
 #ifndef SOVEREIGN_HARDWARE_IO_ZENITH_H
 #define SOVEREIGN_HARDWARE_IO_ZENITH_H
 
-#include "SigmaC11.h"
+#include "SigmaOOP.h"
 
-namespace SigmaOS {
-namespace Hardware {
+/* Σ Territory Initiation */
 
 // --- INTERRUPT & TRAP ARCHITECTURE ---
 struct InterruptVector {
@@ -12,51 +11,38 @@ struct InterruptVector {
     int type; // Polling vs Vectored
 };
 
-class SovereignInterruptController : public SigmaObject {
-private:
-    InterruptVector m_vectors[256];
-public:
-    const char* type_name() const noexcept override { return "SovereignInterruptController"; }
-    void RegisterHandler(int vec, sigma_u64 addr);
-    void TriggerTrap(int reason); // Software-generated interrupt
+CLASS_DECLARE(SovereignInterruptController) { 
+    SigmaObject_t core;
+    struct InterruptVector m_vectors[256];
+    VIRTUAL(void, RegisterHandler, struct SovereignInterruptController* self, int vec, sigma_u64 addr);
+    VIRTUAL(void, TriggerTrap, struct SovereignInterruptController* self, int reason);
 };
 
 // --- DMA & CONTROLLER LOGIC ---
-class SovereignDMAController : public SigmaObject {
-public:
-    const char* type_name() const noexcept override { return "SovereignDMAController"; }
-    void TransferBlock(void* src, void* dest, sigma_size_t size); // No CPU intervention
+CLASS_DECLARE(SovereignDMAController) { 
+    SigmaObject_t core;
+    VIRTUAL(void, TransferBlock, struct SovereignDMAController* self, void* src, void* dest, sigma_size_t size);
 };
 
 // --- I/O SUBSYSTEM (BLOCK VS CHARACTER) ---
-enum class DeviceType { BLOCK, CHARACTER, NETWORK };
+typedef enum DeviceType { BLOCK, CHARACTER, NETWORK } DeviceType_t;
 
-class SovereignIODevice : public SigmaObject {
-protected:
-    DeviceType m_type;
+CLASS_DECLARE(SovereignIODevice) { 
+    SigmaObject_t core;
+    DeviceType_t m_type;
     const char* m_name;
-public:
-    virtual void Read() = 0;
-    virtual void Write() = 0;
+    VIRTUAL(void, Read, struct SovereignIODevice* self);
+    VIRTUAL(void, Write, struct SovereignIODevice* self);
 };
 
-class SovereignBlockDevice : public SovereignIODevice {
-public:
-    SovereignBlockDevice(const char* n) { m_type = DeviceType::BLOCK; m_name = n; }
-    void Read() override; // Seek/Read/Write
-    void Write() override;
+CLASS_DECLARE(SovereignBlockDevice) { 
+    SovereignIODevice_t core;
 };
 
-class SovereignCharDevice : public SovereignIODevice {
-public:
-    SovereignCharDevice(const char* n) { m_type = DeviceType::CHARACTER; m_name = n; }
-    void Read() override; // Get/Put
-    void Write() override;
+CLASS_DECLARE(SovereignCharDevice) { 
+    SovereignIODevice_t core;
 };
 
-} // namespace Hardware
-} // namespace SigmaOS
+/* Σ Territory Termination */
 
 #endif
-
-

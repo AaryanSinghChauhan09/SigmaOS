@@ -1,4 +1,4 @@
-#include "../libc/SovereignLibC.h"
+#include "../include/sigma_kernel.h"
 
 void test_libc_purity_audit() {
     sigma_printf("Σ [TEST]: Running Zero-Dependency Purity Audit...\n");

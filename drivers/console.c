@@ -8,7 +8,7 @@
  */
 
 #include "../libc/sigma_libc.h"
-#include "../libc/sigma_types.h"
+#include "../include/sigma_kernel.h"
 
 #define VGA_WIDTH 80
 #define VGA_HEIGHT 25

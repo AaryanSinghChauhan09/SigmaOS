@@ -1,4 +1,4 @@
-#include "../../../../libc/SovereignLibC.h"
+#include "../../../include/sigma_kernel.h"
 
 // Σ SovereignKqueue: Event Notification Zenith
 // Inspired by FreeBSD kqueue: Scalable High-Performance Event Engine

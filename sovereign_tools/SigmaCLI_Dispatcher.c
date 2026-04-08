@@ -21,7 +21,7 @@
  * =========================================================================
  */
 
-#include "../libc/SovereignLibC.h"
+#include "../include/sigma_kernel.h"
 
 /* Local utility: replaces strcmp to keep zero-dependency */
 static int sigma_strcmp(const char* a, const char* b) {

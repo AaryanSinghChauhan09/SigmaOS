@@ -1,4 +1,4 @@
-#include "../../../libc/SovereignLibC.h"
+#include "../../../include/sigma_kernel.h"
 
 // Activation function parity
 sigma_f64 sigma_ai_sigmoid(sigma_f64 x) {

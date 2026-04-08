@@ -1,4 +1,4 @@
-#include "../../../../libc/SovereignLibC.h"
+#include "../../../include/sigma_kernel.h"
 #include "../../../../SovereignInterferenceGuard.h"
 
 // Σ SovereignZFS: Transactional Copy-on-Write (CoW) Storage Shard

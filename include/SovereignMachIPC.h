@@ -7,7 +7,7 @@
  * Provides port-based communication between shards.
  */
 
-#include "libc/SovereignLibC.h"
+#include "SovereignLibC.h"
 
 typedef sigma_u32 mach_port_t;
 typedef sigma_u32 mach_msg_size_t;

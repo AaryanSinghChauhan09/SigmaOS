@@ -1,4 +1,4 @@
-#include "../../../libc/SovereignLibC.h"
+#include "../../../include/sigma_kernel.h"
 
 // Characteristic & history of Computer absorption
 void SovereignEdu_CompBasics_Init() {

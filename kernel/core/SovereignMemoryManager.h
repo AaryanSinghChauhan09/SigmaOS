@@ -1,8 +1,8 @@
 #ifndef SOVEREIGN_MEMORY_MANAGER_H
 #define SOVEREIGN_MEMORY_MANAGER_H
 
-#include "../../libc/SovereignLibC.h"
-#include "../../libc/SigmaOOP.h"
+#include "../../SovereignLibC.h"
+#include "../../SigmaOOP.h"
 
 /*
  * Σ SIGMAOS: SOVEREIGN VMM & PMM SUB-SYSTEMS

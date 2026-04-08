@@ -1,57 +1,46 @@
 #ifndef SOVEREIGN_CORE_UTILS_H
 #define SOVEREIGN_CORE_UTILS_H
 
-#include "SigmaC11.h"
+#include "SigmaOOP.h"
 
-namespace SigmaOS {
-namespace CoreUtils {
+/* Σ Territory Initiation */
 
-class SovereignListDir : public SigmaObject {
-public:
-    const char* type_name() const noexcept override;
-    void Execute(const char* path);
+CLASS_DECLARE(SovereignListDir) { 
+    SigmaObject_t core;
+    VIRTUAL(void, Execute, struct SovereignListDir* self, const char* path);
 };
 
-class SovereignConcatenate : public SigmaObject {
-public:
-    const char* type_name() const noexcept override;
-    void Execute(const char* file);
+CLASS_DECLARE(SovereignConcatenate) { 
+    SigmaObject_t core;
+    VIRTUAL(void, Execute, struct SovereignConcatenate* self, const char* file);
 };
 
-class SovereignGrepSearch : public SigmaObject {
-public:
-    const char* type_name() const noexcept override;
-    void Execute(const char* pattern, const char* file);
+CLASS_DECLARE(SovereignGrepSearch) { 
+    SigmaObject_t core;
+    VIRTUAL(void, Execute, struct SovereignGrepSearch* self, const char* pattern, const char* file);
 };
 
-class SovereignProcessMonitor : public SigmaObject {
-public:
-    const char* type_name() const noexcept override;
-    void Execute();
+CLASS_DECLARE(SovereignProcessMonitor) { 
+    SigmaObject_t core;
+    VIRTUAL(void, Execute, struct SovereignProcessMonitor* self);
 };
 
-class SovereignPermissionMod : public SigmaObject {
-public:
-    const char* type_name() const noexcept override;
-    void Execute(const char* permissions, const char* file);
+CLASS_DECLARE(SovereignPermissionMod) { 
+    SigmaObject_t core;
+    VIRTUAL(void, Execute, struct SovereignPermissionMod* self, const char* permissions, const char* file);
 };
 
-class AutoAetherOrchestrator : public SigmaObject {
-public:
-    const char* type_name() const noexcept override;
-    void DispatchCron();
+CLASS_DECLARE(AutoAetherOrchestrator) { 
+    SigmaObject_t core;
+    VIRTUAL(void, DispatchCron, struct AutoAetherOrchestrator* self);
 };
 
-class SovereignDataScienceForge : public SigmaObject {
-public:
-    const char* type_name() const noexcept override;
-    void TrainModel(const char* dataSet);
-    void PlotGraph(const char* metrics);
+CLASS_DECLARE(SovereignDataScienceForge) { 
+    SigmaObject_t core;
+    VIRTUAL(void, TrainModel, struct SovereignDataScienceForge* self, const char* dataSet);
+    VIRTUAL(void, PlotGraph, struct SovereignDataScienceForge* self, const char* metrics);
 };
 
-} // namespace CoreUtils
-} // namespace SigmaOS
+/* Σ Territory Termination */
 
 #endif
-
-

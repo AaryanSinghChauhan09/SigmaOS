@@ -1,4 +1,4 @@
-#include "../../../libc/SovereignLibC.h"
+#include "../../../include/sigma_kernel.h"
 
 void SovereignEdu_Hardware_Init() {
     sigma_printf("Σ [EDU]: I/O Devices, Memory & Storage Shard Online.\n");

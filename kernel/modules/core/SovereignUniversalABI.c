@@ -11,8 +11,8 @@
 #ifndef SOVEREIGN_UNIVERSAL_ABI_H
 #define SOVEREIGN_UNIVERSAL_ABI_H
 
-#include "../../../libc/SovereignLibC.h"
-#include "../../../libc/SigmaOOP.h"
+#include "../../../include/sigma_kernel.h"
+#include "../../../include/sigma_kernel.h"
 
 // -------------------------------------------------------------------------
 // Universal ABI Object Structure

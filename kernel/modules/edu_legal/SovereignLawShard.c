@@ -11,8 +11,8 @@
 #ifndef SOVEREIGN_LAW_SHARD_H
 #define SOVEREIGN_LAW_SHARD_H
 
-#include "../../../libc/SovereignLibC.h"
-#include "../../../libc/SigmaOOP.h"
+#include "../../../include/sigma_kernel.h"
+#include "../../../include/sigma_kernel.h"
 
 // -------------------------------------------------------------------------
 // Law Shard Object Structure

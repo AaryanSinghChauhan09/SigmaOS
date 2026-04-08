@@ -1,4 +1,4 @@
-#include "../../../../libc/SovereignLibC.h"
+#include "../../../include/sigma_kernel.h"
 
 void SovereignNetFilter_Init() {
     sigma_printf("Σ [OPERATION]: SovereignNetFilter (Linux Infra) Integration Complete. Phase 19 Pure Parity Online.

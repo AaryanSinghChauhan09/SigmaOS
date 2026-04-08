@@ -1,4 +1,4 @@
-#include "../../libc/SovereignLibC.h"
+#include "../../../include/sigma_kernel.h"
 
 // Standard COM1 UART I/O Port
 #define UART_PORT 0x3F8

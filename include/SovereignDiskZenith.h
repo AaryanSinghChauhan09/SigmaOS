@@ -1,41 +1,34 @@
 #ifndef SOVEREIGN_DISK_ZENITH_H
 #define SOVEREIGN_DISK_ZENITH_H
 
-#include "SigmaC11.h"
+#include "SigmaOOP.h"
 
-namespace SigmaOS {
-namespace Disk {
+/* Σ Territory Initiation */
 
 // --- DISK SCHEDULING ALGORITHMS (SSTF, SCAN, LOOK) ---
-class SovereignDiskScheduler : public SigmaObject {
-public:
-    const char* type_name() const noexcept override { return "SovereignDiskScheduler"; }
-    void SSTF_Schedule(int* requests, int count, int initialHead);
-    void SCAN_Schedule(int* requests, int count, int initialHead);
-    void SSTF_Program_Sim();
+CLASS_DECLARE(SovereignDiskScheduler) { 
+    SigmaObject_t core;
+    VIRTUAL(void, SSTF_Schedule, struct SovereignDiskScheduler* self, int* requests, int count, int initialHead);
+    VIRTUAL(void, SCAN_Schedule, struct SovereignDiskScheduler* self, int* requests, int count, int initialHead);
+    VIRTUAL(void, SSTF_Program_Sim, struct SovereignDiskScheduler* self);
 };
 
 // --- FILE SYSTEM STRUCTURES (Contiguous, Linked, Indexed) ---
-class SovereignFileSystemShard : public SigmaObject {
-public:
-    const char* type_name() const noexcept override { return "SovereignFileSystemShard"; }
-    void ContiguousAllocation();
-    void LinkedAllocation();
-    void IndexedAllocation();
-    void FreeSpaceManagement(sigma_u64 freeBlocksBitVector);
+CLASS_DECLARE(SovereignFileSystemShard) { 
+    SigmaObject_t core;
+    VIRTUAL(void, ContiguousAllocation, struct SovereignFileSystemShard* self);
+    VIRTUAL(void, LinkedAllocation, struct SovereignFileSystemShard* self);
+    VIRTUAL(void, IndexedAllocation, struct SovereignFileSystemShard* self);
+    VIRTUAL(void, FreeSpaceManagement, struct SovereignFileSystemShard* self, sigma_u64 freeBlocksBitVector);
 };
 
 // --- SPOOLING VS BUFFERING (I/O) ---
-class SovereignIOExpert : public SigmaObject {
-public:
-    const char* type_name() const noexcept override { return "SovereignIOExpert"; }
-    void SpoolingDaemon();
-    void BufferingLogic();
+CLASS_DECLARE(SovereignIOExpert) { 
+    SigmaObject_t core;
+    VIRTUAL(void, SpoolingDaemon, struct SovereignIOExpert* self);
+    VIRTUAL(void, BufferingLogic, struct SovereignIOExpert* self);
 };
 
-} // namespace Disk
-} // namespace SigmaOS
+/* Σ Territory Termination */
 
 #endif
-
-

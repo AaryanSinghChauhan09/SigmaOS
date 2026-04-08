@@ -12,8 +12,8 @@
 #define SOVEREIGN_9P_SHARD_H
 
 #include "../../../include/SovereignOSBasicsZenith.h"
-#include "../../../libc/SovereignLibC.h"
-#include "../../../libc/SigmaOOP.h"
+#include "../../../include/sigma_kernel.h"
+#include "../../../include/sigma_kernel.h"
 
 // -------------------------------------------------------------------------
 // 9P Shard Object Structure

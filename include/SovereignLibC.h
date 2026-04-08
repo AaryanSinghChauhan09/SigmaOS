@@ -77,6 +77,15 @@ void* sigma_slab_alloc_raw(sigma_size_t size);
 void* sigma_malloc(sigma_size_t size);
 void  sigma_free(void* ptr);
 
+#ifndef SIGMA_ASSERT
+#define SIGMA_ASSERT(cond, msg) do { \
+    if (!(cond)) { \
+        sigma_printf("\nΣ [PANIC]: ASSERTION FAILED: %s (at %s:%d)\n", msg, __FILE__, __LINE__); \
+        for(;;); \
+    } \
+} while(0)
+#endif
+
 #endif
 
 

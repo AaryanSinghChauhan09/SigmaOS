@@ -11,8 +11,8 @@
 #ifndef SOVEREIGN_INTERFERENCE_GUARD_H
 #define SOVEREIGN_INTERFERENCE_GUARD_H
 
-#include "libc/SovereignLibC.h"
-#include "libc/SigmaOOP.h"
+#include "SovereignLibC.h"
+#include "SigmaOOP.h"
 
 // -------------------------------------------------------------------------
 // Sovereign Guard Object Structure

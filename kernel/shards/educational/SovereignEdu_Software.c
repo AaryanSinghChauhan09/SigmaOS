@@ -1,4 +1,4 @@
-#include "../../../libc/SovereignLibC.h"
+#include "../../../include/sigma_kernel.h"
 
 void SovereignEdu_Software_Init() {
     sigma_printf("Σ [EDU]: System/Application Software & Operating System Basics Shard Online.\n");
