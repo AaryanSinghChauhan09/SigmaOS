@@ -1,46 +1,44 @@
+/*
+ * =========================================================================
+ * Σ SIGMAOS: SOVEREIGN OMNI SHARD (v14.0 - PURE C11)
+ * =========================================================================
+ * Mission: Universal Shard Absorption (Kernel, Cloud, UI, Net).
+ * Design: C11 / Zero-Dependency / Struct-based OOP.
+ * =========================================================================
+ */
+
 #ifndef SOVEREIGN_OMNI_SHARD_H
 #define SOVEREIGN_OMNI_SHARD_H
 
-#include "SigmaOOP.hpp"
+#include "../libc/SovereignLibC.h"
+#include "../libc/SigmaOOP.h"
 
-namespace SigmaOS {
-namespace Omni {
+// -------------------------------------------------------------------------
+// Sovereign Domain Shards (Pure C11)
+// -------------------------------------------------------------------------
 
-// --- DOMAIN: OS KERNEL & ADVANCED SCHEDULING (IITB / MIT / STANFORD) ---
-class SovereignScheduler : public SigmaObject {
-public:
-    const char* type_name() const noexcept override { return "SovereignScheduler"; }
-    void MultilevelFeedbackQueue();
-    void RealTimeDeadlineSchedule();
+CLASS_DECLARE(SovereignScheduler) {
+    SigmaObject_t core;
+    VIRTUAL(void, MultilevelFeedbackQueue, struct SovereignScheduler* self);
+    VIRTUAL(void, RealTimeDeadlineSchedule, struct SovereignScheduler* self);
 };
 
-// --- DOMAIN: CLOUD & HYPERVISING (AWS / CISCO / COURSERA) ---
-class SovereignCloudOrchestrator : public SigmaObject {
-public:
-    const char* type_name() const noexcept override { return "SovereignCloudOrchestrator"; }
-    void ElasticShardScale(int nodeCount);
-    void VirtualVPCIsolation(const char* tenantId);
+CLASS_DECLARE(SovereignCloudOrchestrator) {
+    SigmaObject_t core;
+    VIRTUAL(void, ElasticShardScale, struct SovereignCloudOrchestrator* self, int nodeCount);
+    VIRTUAL(void, VirtualVPCIsolation, struct SovereignCloudOrchestrator* self, const char* tenantId);
 };
 
-// --- DOMAIN: WEB & UI ENGINE (W3SCHOOLS / FREECODECAMP) ---
-class SovereignUIEngine : public SigmaObject {
-public:
-    const char* type_name() const noexcept override { return "SovereignUIEngine"; }
-    void RenderSovereignDOM(const char* markup);
-    void ApplyZenithCSS(const char* styling);
+CLASS_DECLARE(SovereignUIEngine) {
+    SigmaObject_t core;
+    VIRTUAL(void, RenderSovereignDOM, struct SovereignUIEngine* self, const char* markup);
+    VIRTUAL(void, ApplyZenithCSS, struct SovereignUIEngine* self, const char* styling);
 };
 
-// --- DOMAIN: NETWORKING & SECURITY (CISCO / STANFORD) ---
-class SovereignNetZenith : public SigmaObject {
-public:
-    const char* type_name() const noexcept override { return "SovereignNetZenith"; }
-    void ZeroTrustHandshake();
-    void RecursiveDNSNode(const char* domain);
+CLASS_DECLARE(SovereignNetZenith) {
+    SigmaObject_t core;
+    VIRTUAL(void, ZeroTrustHandshake, struct SovereignNetZenith* self);
+    VIRTUAL(void, RecursiveDNSNode, struct SovereignNetZenith* self, const char* domain);
 };
 
-} // namespace Omni
-} // namespace SigmaOS
-
-#endif
-
-
+#endif // SOVEREIGN_OMNI_SHARD_H

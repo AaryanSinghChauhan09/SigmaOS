@@ -1,45 +1,48 @@
+/*
+ * =========================================================================
+ * Σ SIGMAOS: SOVEREIGN XV6 BRIDGE (v12.0 - PURE C11)
+ * =========================================================================
+ * Mission: XV6-Style Process & IPC Parity for industrial reliability.
+ * Design: C11 / Zero-Dependency / Struct-based OOP.
+ * =========================================================================
+ */
+
 #ifndef SOVEREIGN_XV6_BRIDGE_H
 #define SOVEREIGN_XV6_BRIDGE_H
 
-#include "SigmaC11.h"
+#include "libc/SovereignLibC.h"
+#include "libc/SigmaOOP.h"
 
-namespace SigmaOS {
-namespace XV6Parity {
+// -------------------------------------------------------------------------
+// XV6 Style Process & IPC Shards
+// -------------------------------------------------------------------------
 
-// --- XV6 STYLE PROCESS & IPC (IIT BOMBAY / OSTEP) ---
-class SovereignTrapHandler : public SigmaObject {
-public:
-    const char* type_name() const noexcept override { return "SovereignTrapHandler"; }
-    void HandleTrap(int trapno);
+CLASS_DECLARE(SovereignTrapHandler) {
+    SigmaObject_t core;
+    VIRTUAL(void, HandleTrap, struct SovereignTrapHandler* self, int trapno);
 };
 
-class SovereignPipeNode : public SigmaObject {
-private:
-    int m_fds[2];
-public:
-    const char* type_name() const noexcept override { return "SovereignPipeNode"; }
-    void CreatePipe();
-    void RedirectStdout(int fd);
+CLASS_DECLARE(SovereignPipeNode) {
+    SigmaObject_t core;
+    int fds[2];
+    VIRTUAL(void, CreatePipe, struct SovereignPipeNode* self);
+    VIRTUAL(void, RedirectStdout, struct SovereignPipeNode* self, int fd);
 };
 
-class SovereignSleepWakeup : public SigmaObject {
-public:
-    const char* type_name() const noexcept override { return "SovereignSleepWakeup"; }
-    void Sleep(void* chan);
-    void Wakeup(void* chan);
+CLASS_DECLARE(SovereignSleepWakeup) {
+    SigmaObject_t core;
+    VIRTUAL(void, Sleep, struct SovereignSleepWakeup* self, void* chan);
+    VIRTUAL(void, Wakeup, struct SovereignSleepWakeup* self, void* chan);
 };
 
-// --- ADVANCED LINUX SUBSYSTEM (PART Z) ---
-class SovereignSocketMesh : public SigmaObject {
-public:
-    const char* type_name() const noexcept override { return "SovereignSocketMesh"; }
-    void EstablishTCP(const char* host, int port);
-    void EpollWaitShard();
+// -------------------------------------------------------------------------
+// Advanced Network Subsystem Shards
+// -------------------------------------------------------------------------
+
+CLASS_DECLARE(SovereignSocketMesh) {
+    SigmaObject_t core;
+    VIRTUAL(void, EstablishTCP, struct SovereignSocketMesh* self, const char* host, int port);
+    VIRTUAL(void, EpollWaitShard, struct SovereignSocketMesh* self);
 };
 
-} // namespace XV6Parity
-} // namespace SigmaOS
-
-#endif
-
-
+#endif // SOVEREIGN_XV6_BRIDGE_H
