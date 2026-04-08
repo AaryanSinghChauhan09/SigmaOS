@@ -35,16 +35,10 @@ SigmaOS is inherently engineered to render every other operating system obsolete
 - **Tmux (Session Multiplexing)**: Multi-tasking persists locally through `sigma work mux`, where UI and terminal outputs are safely saved in RAII blocks—never lost even if the browser shell detaches.
 - **PostgreSQL / Redis (Databases & Caching)**: High-speed relational mapping and key-value memory fetching is executed natively through C structurally (`sigma db`) bypassing massive SQL parsers.
 - **Prometheus & Grafana (Monitoring)**: Instead of scraping metrics, `sigma monitor` pushes telemetry directly out of the Ring-0 C11 scheduler into the UI buffers.
-- **The Competitor USP:** Everything, local or remote, is a file. Networks are seamlessly integrated.
-- **The SigmaOS Absorption:** Instead of treating remote connections via heavy stacks (TCP/IP socket wrappers in OS handlers), SigmaOS employs the `SovereignNetZenith` shard. Direct Ethernet frame parsing occurs in C. A cloud host or a local node behaves identically. You can "Live Boot" from a remote data center as smoothly as a local USB, with zero-copy data routing.
 
 ## 4. Absorbing Windows: Ease of Use & Plug-and-Play
 
-<<<<<<< HEAD
 - **The Competitor USP:** Instant "just works" functionality for novices out of the box with extensive legacy support.
-=======
-- **The Competitor USP:** Instant "just works" functionality for novices out of the box with extensive legacy support. 
->>>>>>> 99f2ef5 (chore: precise lint eradication via AST script algorithms)
 - **The SigmaOS Absorption:** Instead of downloading external 3rd-party drivers utilizing bloat-heavy install wizards, SigmaOS implements polymorphic hardware scanning at boot up (Ring -1). Custom user-defined HAL functions strictly constructed in Assembly auto-adapt to GPU and network cards without internet downloads or reboots. The Omni-CLI unifies all tools into plain English actions (`sigma-ui window close`).
 
 ## 5. Overwriting Containerization & Cloud Deployment
@@ -55,7 +49,7 @@ SigmaOS is inherently engineered to render every other operating system obsolete
 ## 6. Absorbing 39+ Linux Distributions: Universal Command Prompts
 
 - **The Competitor USP:** Extensive package managers (apt, pacman, dnf, zypper, emerge) across hundreds of distros (Arch, Debian, openSUSE, Gentoo, MX, Bazzite, etc.), creating massive syntax fragmentation.
-- **The SigmaOS Absorption:** Deeply integrated into ring-0, our `SovereignOmniCLI_DistroAbsorber` directly translates legacy shell languages on the fly. You can type `pacman -Syu` or `zypper dup`, and Omni-CLI intercepts the string without bash installed, natively mapping the request into zero-dependency operations like `sigma_sync_shard_all`. Absolute cross-distro supremacy with zero translation lag.
+- **The SigmaOS Absorption:** Deeply integrated into ring-0, our `SovereignDistroAbsorption.c` directly translates legacy shell languages on the fly. You can type `pacman -Syu` or `zypper dup`, and Omni-CLI intercepts the string without bash installed, natively mapping the request into zero-dependency operations like `sigma_sync_shard_all`. Absolute cross-distro supremacy with zero translation lag.
 
 ## 7. Absorbing Hyprland & Wayland Compositors natively
 
