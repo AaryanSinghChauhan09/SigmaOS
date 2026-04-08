@@ -78,9 +78,11 @@ gcc -nostdlib -ffreestanding -std=c11 `
 
 | Module | HLL Score (lower = better) | Status |
 | --- | --- | --- |
-| `kernel/` core | 0 external deps | ✅ Sovereign |
+| `kernel/` core | 0 external deps (Pure C11) | ✅ Sovereign |
+| `kernel/modules/` | Zero-HLL (C11 OOP) | ✅ Verified (v175.0) |
 | `libc/` | 0 external deps | ✅ Sovereign |
 | `sovereign_tools/` | 0 external deps | ✅ Sovereign |
+| `ecosystem/` shards | Pure C11 (Transitioned) | ✅ Verified (v175.0) |
 | `index.js` (UI) | Browser JS only | ✅ Acceptable |
 | `build.ps1` | PowerShell (host-only) | ✅ Acceptable |
 

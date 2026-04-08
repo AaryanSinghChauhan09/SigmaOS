@@ -1,4 +1,4 @@
-# Σ SIGMAOS ZENITH: THE SOVEREIGN MANIFESTO (v1.8.0) 🛡️
+# Σ SIGMAOS ZENITH: THE SOVEREIGN MANIFESTO (v175.0) 🛡️
 
 [![Status](https://github.com/AaryanSinghChauhan09/SigmaOS)](https://github.com/AaryanSinghChauhan09/SigmaOS)
 
@@ -29,7 +29,6 @@
 - Run natively on **PC (Dual Boot)**, **Mobile (Touch)**, **Cloud (Cluster)**, **VirtualBox (ISO)**, or **Container (Docker)**.
 
 ---
-<<<<<<< HEAD
 
 ## 🏗️ Architecture At a Glance
 
@@ -121,8 +120,6 @@ Hot-loadable feature modules enabled/disabled at runtime:
 
 ---
 
-*Σ SigmaOS Zenith Supreme Architecture v160.0 — Ready for Launch*
-=======
-
 **Σ SIGMAOS: RAW SILICON. ABSOLUTE AUTONOMY.**
->>>>>>> 83e117acaff1ccc62b67a2adfc253454bcf701ae
+
+*Σ SigmaOS Zenith Supreme Architecture v175.0 — Ready for Launch*
