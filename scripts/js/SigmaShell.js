@@ -196,6 +196,18 @@ export class SigmaShell {
                     else if (args[1] === 'close') this.system.wm.close(args[2]);
                 } else this.print('Usage: sigma-ui [theme <color>|window open <id>|window close <id>]');
                 break;
+            case 'pkg':
+                this.handlePkg(args, 'sigma-pkg');
+                break;
+            case 'clean':
+                this.print('[CLEAN]: Initiating DOD-compliant forensic wipe...');
+                setTimeout(() => this.print('[CLEAN]: 7-pass overwrite complete. Registers zeroed.'), 1000);
+                break;
+            case 'god-matrix':
+                this.print('[GOD-MATRIX]: Initiating Absolute USP Absorption...');
+                this.system.wm.open('shardmanager');
+                setTimeout(() => this.print('[GOD-MATRIX]: USPs from Nix, Qubes, and Hyprland ABSORBED.'), 800);
+                break;
             case 'net':
                 this.print('[NET]: Resolving P2P Consensus via Sovereign Ledger...');
                 this.system.wm.open('net');

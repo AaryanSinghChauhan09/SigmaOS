@@ -59,7 +59,11 @@ export class SigmaSystem {
         const pressure = Math.floor(Math.random() * 100);
         if (pressure > 85) {
             this.spawnToast('⚠️ HIGH MEMORY PRESSURE DETECTED: Triggering Eviction...');
-            // Implement eviction policy here
+            // INDUSTRIAL EVICTION POLICY: Purge unused shards from silicon memory
+            if (this.store) {
+                this.store.purge();
+                this.spawnToast('✅ EVICTION COMPLETE: Minimal Core Architecture Restored.');
+            }
         }
     }
 
