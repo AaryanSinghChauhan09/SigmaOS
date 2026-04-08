@@ -26,6 +26,7 @@
 #include "SovereignOmniShard.h"
 #include "SovereignHyprlandZenith.h"
 #include "SovereignInterferenceGuard.h"
+#include "SovereignExcelZenith.h"
 
 #endif // SIGMA_KERNEL_H
 
