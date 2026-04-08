@@ -1,7 +1,8 @@
 #ifndef SOVEREIGN_MEMORY_MANAGER_H
 #define SOVEREIGN_MEMORY_MANAGER_H
 
-#include <stdint.h>
+#include "../../libc/SovereignLibC.h"
+#include "../../libc/SigmaOOP.h"
 
 /*
  * Σ SIGMAOS: SOVEREIGN VMM & PMM SUB-SYSTEMS
@@ -12,31 +13,31 @@
 
 // Example of a basic Page Table Entry structure for x86_64
 typedef struct {
-    uint64_t present    : 1;
-    uint64_t writable   : 1;
-    uint64_t user       : 1;
-    uint64_t write_thru : 1;
-    uint64_t cache_dis  : 1;
-    uint64_t accessed   : 1;
-    uint64_t dirty      : 1;
-    uint64_t huge_page  : 1;
-    uint64_t global     : 1;
-    uint64_t available  : 3;
-    uint64_t address    : 40;
-    uint64_t reserved   : 11;
-    uint64_t no_execute : 1;
+    sigma_u64 present    : 1;
+    sigma_u64 writable   : 1;
+    sigma_u64 user       : 1;
+    sigma_u64 write_thru : 1;
+    sigma_u64 cache_dis  : 1;
+    sigma_u64 accessed   : 1;
+    sigma_u64 dirty      : 1;
+    sigma_u64 huge_page  : 1;
+    sigma_u64 global     : 1;
+    sigma_u64 available  : 3;
+    sigma_u64 address    : 40;
+    sigma_u64 reserved   : 11;
+    sigma_u64 no_execute : 1;
 } __attribute__((packed)) pt_entry_t;
 
 // Buddy Allocator Block for PMM (Physical Memory Manager)
 typedef struct buddy_block {
     struct buddy_block* next;
     struct buddy_block* prev;
-    uint32_t size_order;
-    uint32_t is_free;
+    sigma_u32 size_order;
+    sigma_u32 is_free;
 } buddy_block_t;
 
 // UBSan / KASan Minimal Hooks
-void __ksan_check_bounds(void* ptr, uint64_t size);
+void __ksan_check_bounds(void* ptr, sigma_u64 size);
 void __ksan_report_violation(void* ptr);
 
 #endif // SOVEREIGN_MEMORY_MANAGER_H

@@ -9,10 +9,7 @@
  */
 
 #include "../libc/SovereignLibC.h"
-
 #include "../libc/sigma_types.h"
-#include "../libc/SovereignLibC.h"
-#include "../libc/SovereignLibC.h"
 
 /* ---- Minimal test harness ---- */
 static int g_passed = 0;
@@ -144,17 +141,17 @@ static void test_memory_primitives(void) {
 
     char src[16] = "SigmaOS_Zenith!!";
     char dst[16] = {0};
-    memcpy(dst, src, 16);
-    SIGMA_TEST("memcpy copies bytes exactly", memcmp(src, dst, 16) == 0);
+    sigma_memcpy(dst, src, 16);
+    SIGMA_TEST("memcpy copies bytes exactly", sigma_memcmp(src, dst, 16) == 0);
 
     /* Zero-length ops */
     sigma_memset(buf, 0, 0);
-    memcpy(dst, src, 0);
+    sigma_memcpy(dst, src, 0);
     SIGMA_TEST("zero-length memset/memcpy are safe", 1);
 
     /* Overlap safety check via memmove equivalent */
     char overlap[16] = "ABCDEFGH........";
-    memmove(overlap + 4, overlap, 8);
+    sigma_memmove(overlap + 4, overlap, 8);
     SIGMA_TEST("memmove handles overlap correctly", overlap[4] == 'A');
 }
 
