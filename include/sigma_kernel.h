@@ -29,6 +29,7 @@
 #include "SovereignExcelZenith.h"
 #include "SovereignPowerBIZenith.h"
 #include "SovereignTableauZenith.h"
+#include "SovereignPythonZenith.h"
 
 #endif // SIGMA_KERNEL_H
 
