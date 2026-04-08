@@ -78,6 +78,15 @@ typedef sigma_i32 pid_t;
 typedef sigma_i32 sigma_err_t;
 
 /* Common error codes (negative, like Linux <errno.h>). */
+/* --- ARCHITECTURAL SHARDS ---
+#if defined(__x86_64__) || defined(_M_X64)
+    #define SIGMA_ARCH_X64
+#elif defined(__aarch64__) || defined(_M_ARM64)
+    #define SIGMA_ARCH_ARM64
+#elif defined(__riscv)
+    #define SIGMA_ARCH_RISCV
+#endif
+*/
 #define SIGMA_OK      ((sigma_err_t)  0)
 #define SIGMA_EPERM   ((sigma_err_t) -1)  /* Operation not permitted */
 #define SIGMA_ENOENT  ((sigma_err_t) -2)  /* No such file or directory */
