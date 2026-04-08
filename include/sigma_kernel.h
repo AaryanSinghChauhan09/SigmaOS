@@ -28,6 +28,7 @@
 #include "SovereignInterferenceGuard.h"
 #include "SovereignExcelZenith.h"
 #include "SovereignPowerBIZenith.h"
+#include "SovereignTableauZenith.h"
 
 #endif // SIGMA_KERNEL_H
 
