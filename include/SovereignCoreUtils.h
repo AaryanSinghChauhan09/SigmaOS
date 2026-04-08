@@ -1,56 +1,57 @@
-/*
- * =========================================================================
- * Σ SIGMAOS: SOVEREIGN CORE UTILS (v13.0 - PURE C11)
- * =========================================================================
- * Mission: Industrial-grade CLI utilities for shard management.
- * Design: C11 / Zero-Dependency / Struct-based OOP.
- * =========================================================================
- */
-
 #ifndef SOVEREIGN_CORE_UTILS_H
 #define SOVEREIGN_CORE_UTILS_H
 
-#include "../libc/SovereignLibC.h"
-#include "../libc/SigmaOOP.h"
+#include "SigmaC11.h"
 
-// -------------------------------------------------------------------------
-// Sovereign Utility Shards
-// -------------------------------------------------------------------------
+namespace SigmaOS {
+namespace CoreUtils {
 
-CLASS_DECLARE(SovereignListDir) {
-    SigmaObject_t core;
-    VIRTUAL(void, Execute, struct SovereignListDir* self, const char* path);
+class SovereignListDir : public SigmaObject {
+public:
+    const char* type_name() const noexcept override;
+    void Execute(const char* path);
 };
 
-CLASS_DECLARE(SovereignConcatenate) {
-    SigmaObject_t core;
-    VIRTUAL(void, Execute, struct SovereignConcatenate* self, const char* file);
+class SovereignConcatenate : public SigmaObject {
+public:
+    const char* type_name() const noexcept override;
+    void Execute(const char* file);
 };
 
-CLASS_DECLARE(SovereignGrepSearch) {
-    SigmaObject_t core;
-    VIRTUAL(void, Execute, struct SovereignGrepSearch* self, const char* pattern, const char* file);
+class SovereignGrepSearch : public SigmaObject {
+public:
+    const char* type_name() const noexcept override;
+    void Execute(const char* pattern, const char* file);
 };
 
-CLASS_DECLARE(SovereignProcessMonitor) {
-    SigmaObject_t core;
-    VIRTUAL(void, Execute, struct SovereignProcessMonitor* self);
+class SovereignProcessMonitor : public SigmaObject {
+public:
+    const char* type_name() const noexcept override;
+    void Execute();
 };
 
-CLASS_DECLARE(SovereignPermissionMod) {
-    SigmaObject_t core;
-    VIRTUAL(void, Execute, struct SovereignPermissionMod* self, const char* permissions, const char* file);
+class SovereignPermissionMod : public SigmaObject {
+public:
+    const char* type_name() const noexcept override;
+    void Execute(const char* permissions, const char* file);
 };
 
-CLASS_DECLARE(AutoAetherOrchestrator) {
-    SigmaObject_t core;
-    VIRTUAL(void, DispatchCron, struct AutoAetherOrchestrator* self);
+class AutoAetherOrchestrator : public SigmaObject {
+public:
+    const char* type_name() const noexcept override;
+    void DispatchCron();
 };
 
-CLASS_DECLARE(SovereignDataScienceForge) {
-    SigmaObject_t core;
-    VIRTUAL(void, TrainModel, struct SovereignDataScienceForge* self, const char* dataSet);
-    VIRTUAL(void, PlotGraph, struct SovereignDataScienceForge* self, const char* metrics);
+class SovereignDataScienceForge : public SigmaObject {
+public:
+    const char* type_name() const noexcept override;
+    void TrainModel(const char* dataSet);
+    void PlotGraph(const char* metrics);
 };
 
-#endif // SOVEREIGN_CORE_UTILS_H
+} // namespace CoreUtils
+} // namespace SigmaOS
+
+#endif
+
+
