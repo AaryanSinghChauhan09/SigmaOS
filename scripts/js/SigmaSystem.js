@@ -10,6 +10,8 @@ import { SigmaUIRenderer } from './components/SigmaUIRenderer.js';
 import { SigmaAuditor } from './components/SigmaAuditor.js';
 import { SigmaMetrics } from './components/SigmaMetrics.js';
 
+import { SigmaThemer } from './components/SigmaThemer.js';
+
 /**
  * Σ SIGMAOS SYSTEM CORE
  * Main orchestrator for the sovereign environment.
@@ -26,14 +28,7 @@ export class SigmaSystem {
         this.ui = new SigmaUIRenderer(this);
         this.auditor = new SigmaAuditor(this);
         this.metrics = new SigmaMetrics(this);
-
-        this.THEMES = {
-            'ZENITH': { accent: '#00d2ff', bg: '#0f0f14' },
-            'KALI': { accent: '#33ff00', bg: '#000000' },
-            'UBUNTU': { accent: '#dd4814', bg: '#221f1f' },
-            'NORD': { accent: '#88c0d0', bg: '#2e3440' },
-            'DRACULA': { accent: '#ff79c6', bg: '#282a36' }
-        };
+        this.themer = new SigmaThemer(this);
 
         this.vfs_vulnerabilities = [];
         this.init();
@@ -41,7 +36,7 @@ export class SigmaSystem {
 
     init() {
         this.detectPlatform();
-        this.loadTheme();
+        this.themer.loadInitial();
         
         setInterval(() => {
             this.uptime++;
@@ -60,17 +55,12 @@ export class SigmaSystem {
         this.metrics.initDSChart();
 
         this.vfs_vulnerabilities = this.auditor.sysAudit();
-        this.spawnToast('SIGMAOS ZENITH v185.0: SYSTEM READY');
+        this.spawnToast('SIGMAOS ZENITH v196.0: SYSTEM READY');
 
         document.onkeydown = (e) => {
             if (e.altKey && e.key === 'r') this.spawnToast('System Hard-Refresh Initiated...');
             if (e.key === 'Escape') this.wm.close('all');
         };
-    }
-
-    loadTheme() {
-        const theme = localStorage.getItem('sigma-theme') || 'ZENITH';
-        this.switchMode(theme);
     }
 
     handleMemoryPressure() {
@@ -139,15 +129,7 @@ export class SigmaSystem {
         return Math.max(0, score);
     }
 
-    switchMode(mode) {
-        document.body.className = `mode-${mode.toLowerCase()}`;
-        localStorage.setItem('sigma-theme', mode);
-        const config = this.THEMES[mode];
-        if (config) {
-            document.documentElement.style.setProperty('--accent-primary', config.accent);
-            this.spawnToast(`System Mode Switched: ${mode}`);
-        }
-    }
+    switchMode(mode) { this.themer.apply(mode); }
 
     detectPlatform() {
         const ua = navigator.userAgent.toLowerCase();
