@@ -13,7 +13,7 @@ $distros = @(
     "Elementary", "Endeavour", "Fedora", "Garuda", "Gentoo", "Gobo", "Kali", "KDE", "Kubuntu",
     "Leap", "Linpus", "LFS", "LFW", "Lubuntu", "Manjaro", "Mint", "MX", "Neon", "Nobara", 
     "openSUSE", "Peach", "Pop!", "Puppy", "Qubes", "RedHat", "Slackware", "Tails", "Tumbleweed", 
-    "Ubuntu", "Zorin", "Zubuntu"
+    "Ubuntu", "Zorin", "Zubuntu", "Alpine", "NixOS"
 )
 
 # Generating pure C11 parser mappings
@@ -74,6 +74,15 @@ $header_content += "`n    {`"petget`", `"Puppy/Peach/Linpus`", `"sigma_mount_raw
 $header_content += "`n`n    // --- Forensics & Security (Kali, Tails, Qubes) ---"
 $header_content += "`n    {`"amnesia-wipe`", `"Tails/Kali`", `"sigma_pqc_amnesic_purge`"},"
 $header_content += "`n    {`"qvm-create`", `"Qubes`", `"sigma_spawn_secure_vfs_enclave`"},"
+
+$header_content += "`n`n    // --- Alpine Family (APK) ---"
+$header_content += "`n    {`"apk add`", `"Alpine`", `"sigma_hotload_shard`"},"
+
+$header_content += "`n`n    // --- NixOS Declarative (Nix) ---"
+$header_content += "`n    {`"nix-env -iA`", `"NixOS`", `"sigma_hotload_declarative_shard`"},"
+
+$header_content += "`n`n    // --- Init Systems (Systemd) ---"
+$header_content += "`n    {`"systemctl start`", `"Systemd-based`", `"sigma_ignite_service_shard`"},"
 
 $header_content += "`n`n    // Termination"
 $header_content += "`n    {`"EOF`", `"NONE`", `"EOF`"}`n};"

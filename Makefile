@@ -23,6 +23,9 @@ SHARDS = kernel/modules/core/kmain.o \
          kernel/modules/security/SovereignLatticePQC.o \
          kernel/modules/research/SovereignConvergence.o \
          kernel/modules/distributed/SovereignOrchestrator.o \
+         kernel/modules/security/SovereignMandatoryAccessControl.o \
+         kernel/modules/core/SovereignUniversalPackaging.o \
+         kernel/modules/core/SovereignServiceLattice.o \
          kernel/libc/SovereignLibC.o
 
 # ⚛️ BUILD RULES

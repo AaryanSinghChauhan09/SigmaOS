@@ -3,19 +3,33 @@ const $ZENITH = (id) => document.getElementById(id);
 
 const COMMAND_RESPONSES = {
     'HELP': [
-        "SUPREME ZENITH COMMANDS:",
-        "- FORK_TEST: Demonstrate xv6 silicon process duplication.",
-        "- DMA_CMD: Execute Silberschatz-grade host bus transfer.",
-        "- PETERSON: Coordinate Peterson's critical section lock.",
-        "- ABSORB_LEGACY: Unify v1.0-v92.0 features into Zenith core.",
-        "- SYSTEM_STATUS: Query silicon-direct registry.",
-        "- MASTER_AUDIT: Perform bit-level shard verification."
+        "Σ SUPREME ZENITH COMMANDS:",
+        "  FORK_TEST       — xv6 silicon process duplication.",
+        "  DMA_CMD         — Silberschatz-grade host bus transfer.",
+        "  PETERSON        — Peterson's critical section lock.",
+        "  SYSTEM_STATUS   — Query silicon-direct registry.",
+        "  MASTER_AUDIT    — Bit-level shard verification.",
+        "  NIX_BUILD       — Realise a reproducible Nix derivation.",
+        "  EMERGE          — Portage USE-flag-aware emerge.",
+        "  SV_STATUS       — Runit service supervision tree.",
+        "  PLEDGE          — Apply OpenBSD pledge/unveil sandbox.",
+        "  TILE            — Trigger Pop!_OS auto-tile retile.",
+        "  OSTREE_UPGRADE  — Atomic Silverblue OSTree upgrade.",
+        "  PACMAN_SYNC     — Arch rolling-release mirror sync.",
+        "  ABSORB_LEGACY   — Unify v1.0-v3000.0 into Zenith core."
     ],
     'FORK_TEST': ["[ZENITH]: Duplicating Shard 0x93...", "[CHILD]: Sovereign Child Active.", "[PARENT]: Child re-absorbed."],
     'DMA_CMD': ["[ZENITH-DMA]: Initiating host-bus transfer (4096 bytes).", "[OK]: Success."],
     'PETERSON': ["[ZENITH-SYNC]: Thread-0 Entry. Lock secured via Peterson's Shard."],
-    'SYSTEM_STATUS': ["BUILD: v93.0 SUPREME", "SOVEREIGNTY: 100%", "THREAT-LEVEL: ZERO", "SHARD-PARITY: MASTER"],
-    'MASTER_AUDIT': ["[AUDIT]: Verifying 91+ legacy shards...", "[OK]: 100% integrity across all versions."]
+    'SYSTEM_STATUS': ["BUILD: v3000.0 ZENITH SUPREME", "SOVEREIGNTY: 100%", "THREAT-LEVEL: ZERO", "SHARDS: 380+", "DISTROS-ABSORBED: 220+"],
+    'MASTER_AUDIT': ["[AUDIT]: Verifying 380+ sovereign shards...", "[OK]: 100% integrity — Phase 40 verified."],
+    'NIX_BUILD': ["[NIX]: Hashing inputs...", "[NIX]: /nix/store/abc123-sigmaos-kernel-v3000 realised.", "[OK]: Reproducible build complete."],
+    'EMERGE': ["[PORTAGE]: Calculating USE-flag dependencies...", "[PORTAGE]: >>> Emerging sys-kernel/sigma-sources", "[OK]: 1 package merged."],
+    'SV_STATUS': ["[RUNIT]: ok: sigma-syslog (pid 101)", "[RUNIT]: ok: sigma-network (pid 102)", "[RUNIT]: ok: sigma-dbus (pid 103)", "[RUNIT]: ok: sigma-display (pid 104)"],
+    'PLEDGE': ["[PLEDGE]: pid=1001 restricted to stdio rpath net dns", "[UNVEIL]: /home rw", "[UNVEIL]: LOCKED."],
+    'TILE': ["[AUTOTILE]: Retiling 3 windows in 2x2 grid on ws=0", "[OK]: COSMIC auto-tile applied."],
+    'OSTREE_UPGRADE': ["[OSTREE]: Fetching update for sigmaos/x86_64/stable...", "[OSTREE]: commit staged.", "[OSTREE]: Reboot to activate v3001."],
+    'PACMAN_SYNC': ["[PACMAN]: :: Synchronising package databases...", "[REFLECTOR]: Fastest mirror: sigma.io (12ms)", "[OK]: sigma-core synced."]
 };
 
 const ALL_REPO_FILES = [
@@ -144,29 +158,17 @@ function animateSiliconPulse() {
 
 // Custom Macro Engine (Zero-Dependency)
 function execScript(name) {
-    const term = document.getElementById('output');
-    if (!term) return;
     openWindow('omni-shell');
-    
-    const p = document.createElement('p');
-    p.className = 'line text-neon-gold';
-    p.textContent = `Σ://macro> Pushing Shard: ${name}...`;
-    term.appendChild(p);
-
-    // Simulated Silicon Latency
-    let i = 0;
-    const interval = setInterval(() => {
-        const dot = document.createElement('span');
-        dot.textContent = '.';
-        p.appendChild(dot);
-        if (++i > 5) {
-            clearInterval(interval);
-            const ok = document.createElement('p');
-            ok.className = 'line text-neon-green';
-            ok.textContent = `[OK]: ${name} merged into Zenith context.`;
-            term.appendChild(ok);
-        }
-    }, 100);
+    addLine(`Σ://automation> Running script: ${name}...`, 'text-neon-gold');
+    const steps = [
+        `[INIT]: Loading ${name}...`,
+        `[BUILD]: Compiling shard modules...`,
+        `[LINK]: Binding sovereign symbols...`,
+        `[OK]: ${name} merged into Zenith context.`
+    ];
+    steps.forEach((step, i) => {
+        setTimeout(() => addLine(step, i === steps.length - 1 ? 'text-neon-green' : 'text-neon-dim'), i * 350);
+    });
 }
 
 function initCatalog() {
@@ -209,13 +211,7 @@ function setAccent(color) {
     document.querySelector('.start-btn-zenith').style.boxShadow = `0 0 30px ${color}`;
 }
 
-function execScript(name) {
-    openWindow('omni-shell');
-    addLine(`Σ://automation> Running script: ${name}...`, 'text-neon-gold');
-    setTimeout(() => {
-        addLine(`[OK]: ${name} completed successfully. Shard integrity pinned.`, 'text-neon-green');
-    }, 1500);
-}
+// execScript is defined above (unified implementation)
 
 // Absorption Logic
 function startAbsorption() {

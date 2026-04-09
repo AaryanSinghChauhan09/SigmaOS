@@ -204,6 +204,16 @@ void SovereignUICore_Init(void);
 void SovereignVoice_Init(void);
 void SovereignPkg_Init(void);
 
+// --- Phase 40: Sovereign Distro Improvisation (Next-Gen Linux Absorption) ---
+// Absorbed: NixOS, Gentoo, Void Linux, OpenBSD, Pop!_OS, Fedora Silverblue, Arch
+void SovereignNixReproducibility_Init(void);   /* NixOS: declarative, reproducible builds, generations  */
+void SovereignGentooUSEFlags_Init(void);        /* Gentoo: USE flags, Portage, source-based optimisation  */
+void SovereignVoidRunit_Init(void);             /* Void Linux: runit PID1, stage-2 supervision tree       */
+void SovereignPledgeUnveil_Init(void);          /* OpenBSD: pledge(2)/unveil(2) syscall sandboxing        */
+void SovereignPopAutoTile_Init(void);           /* Pop!_OS: COSMIC auto-tiling, workspace navigation      */
+void SovereignSilverblueOSTree_Init(void);      /* Silverblue: OSTree commit graph, immutable root        */
+void SovereignArchRolling_Init(void);           /* Arch: rolling release, pacman, PKGBUILD, mkinitcpio    */
+
 #endif /* SOVEREIGN_OMNI_SHARD_H */
 
 
