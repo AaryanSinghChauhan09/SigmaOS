@@ -1,6 +1,27 @@
 # SigmaOS Zenith Supreme: Shard Evolution Manifest
 
-## [v3000.0-Phase40] - 2026-04-09 (Distro Improvisation)
+## [v3001.0-Phase41] - 2026-04-09 (Core Sovereignty — Basic Components Hardening)
+### Added
+- **SovereignInitSystem** (`SovereignInitSystem.h` / `.c`): Full PID-1 service supervisor — `sigma_svc_register`, `sigma_svc_start/stop/restart/status`, `sigma_init_reap` (zombie collection + auto-restart), `sigma_init_switch_runlevel`. Inspired by OpenRC, runit, s6, and systemd. 5 system services bootstrapped on first boot.
+- **SovereignEnvManager** (`SovereignEnvManager.h` / `.c`): POSIX-parity environment variable store — `sigma_env_set/get/unset/dump/inherit`. djb2 linear-probed hash table (256-slot). `g_sigma_env` global block seeded with 10 standard POSIX variables (PATH, HOME, SHELL, TERM, LANG…).
+- **SovereignUserManager** (`SovereignUserManager.h` / `.c`): Multi-user UID/GID management — `sigma_user_add/del/passwd/lock/unlock/lookup`, `sigma_group_add/add_user`, `sigma_userdb_dump`, `sigma_auth_verify` (PAM parity). Sovereign PBKDF2-SHA256 stub. Inspired by Linux passwd/shadow, macOS DirectoryService, FreeBSD pw(8).
+- **SovereignDmesg** (`SovereignDmesg.h` / `.c`): Kernel ring buffer / `sigma_printk` — 8 log levels (EMERG→DEBUG), 128-message circular ring with power-of-2 overwrite, `sigma_dmesg_dump`, `sigma_dmesg_clear` (-c), `sigma_dmesg_set_level` (-n). `SIGMA_KERN_*` macro family. Inspired by Linux printk / FreeBSD dmesg / macOS OSLog.
+- **SovereignShell** (`SovereignShell.c`): Full sigma-sh interactive shell — POSIX-parity tokeniser (quotes, escapes, pipes `|`, redirections `>/</>>`), built-ins: `cd`, `pwd`, `exit`, `export`, `unset`, `alias`, `history`, `jobs`, `true`, `false`. $VAR expansion. Command history ring (64 entries). Pipeline dispatcher. Inspired by bash/zsh/fish/dash.
+- **SovereignCLI** (`SovereignCLI.h` / `.c`): Unified sigma-* CLI dispatcher — 25 commands registered: `sigma-ls`, `sigma-cat`, `sigma-cp`, `sigma-mv`, `sigma-rm`, `sigma-mkdir`, `sigma-stat`, `sigma-find`, `sigma-echo`, `sigma-env`, `sigma-ps`, `sigma-kill`, `sigma-top`, `sigma-uname`, `sigma-dmesg`, `sigma-pkg`, `sigma-net`, `sigma-user`, `sigma-svc`, `sigma-df`, `sigma-du`, `sigma-mount`, `sigma-ctl`, `sigma-hash`, `sigma-help`. Full argc/argv tokeniser with quoted-string support.
+- **SovereignOmniCLI_DistroAbsorber.c**: Implementation file for the distro absorber — moved definition of `g_omnicli_absorption_table` out of header (ODR fix). Extended to 33 entries covering Arch, Debian, SUSE, RHEL, Gentoo, Alpine, NixOS, Void, Slackware, Bedrock, Tails, Qubes, macOS Homebrew, Windows WinGet/Chocolatey/Scoop.
+- **sigma_kernel.h v2.0**: Kernel aggregator updated to include all new v2.0 system service shards in a dedicated §3 section.
+
+### Fixed
+- **SovereignProcessManager.c (CRITICAL)**: Removed all raw stack-allocated opcode buffers cast to function pointers. These invoked C11 undefined behaviour and crash any system with W^X/NX-bit enforcement. Replaced with correct process table (`SigmaProcEntry_t[1024]`), safe context-switch (struct assignment), and proper namespace isolation model using documented `clone(2)` flags.
+- **SovereignNetworkStack.c**: Added missing exported `sigma_network_shard_init()` entry point. Removed incorrectly-placed `#ifndef` header guard from a `.c` file.
+- **SovereignOmniCLI_DistroAbsorber.h**: Fixed ODR multiple-definition link error (mutable global array defined in a header). Fixed `sigma_strcmp` → `sigma_streq` (correct SigmaOS LibC name). Fixed undefined `sigma_print_info`/`sigma_print_warn` → `sigma_printf`.
+- **SovereignPythonVM.c**: Added exported `sigma_python_vm_init()` to eliminate cppcheck unused-function warning on `create_python_vm`.
+- **Sovereign_Master_Sync.ps1**: Wrapped `make` and `cppcheck` in availability guards to prevent hard-fail on environments without cross-compilation toolchain. Fixed invalid `ForegroundColor Gold` → `Yellow`.
+
+### Changed
+- **sigma_kernel.h**: Bumped to v2.0. Added §3 system services section with 6 new includes.
+
+
 ### Added
 - **SovereignNixReproducibility**: Content-addressed derivation store, `sigma_nix_build()`, generation management (`sigma_nix_new_generation`, `sigma_nix_rollback`). Pure C11 NixOS parity.
 - **SovereignGentooUSEFlags**: Portage USE-flag system — `sigma_use_define`, `sigma_use_query`, `sigma_emerge`, `sigma_portage_sync`. Source-based optimisation sovereignty.

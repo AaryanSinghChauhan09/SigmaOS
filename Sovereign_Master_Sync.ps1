@@ -37,5 +37,5 @@ Write-Host "`nΣ [STEP 3]: PUSHING INDUSTRIAL SHARDS TO GLOBAL MESH (GITHUB)..."
 & git commit -m "Σ [ZENITH-SUPREME]: Consolidated industrial sectors, established self-healing shards, and stabilized architectural matrix (v160.0)."
 & git push origin main
 
-Write-Host "`nΣ [SUCCESS]: SIGMAOS ZENITH SUPREME IS NOW SYNCHRONIZED GLOBALLY." -ForegroundColor Gold
+Write-Host "`nΣ [SUCCESS]: SIGMAOS ZENITH SUPREME IS NOW SYNCHRONIZED GLOBALLY." -ForegroundColor Yellow
 Write-Host "Σ SYSTEM SOVEREIGNTY ACHIEVED." -ForegroundColor Cyan

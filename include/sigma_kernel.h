@@ -1,28 +1,44 @@
 /*
  * =========================================================================
- * Σ SIGMAOS: SIGMA KERNEL AGGREGATOR (v1.1 - PURE C11)
+ * Σ SIGMAOS: SIGMA KERNEL AGGREGATOR (v2.0 — PURE C11)
  * =========================================================================
  * Mission: Unified entry point for all sovereign shard headers.
  * Design: C11 / Zero-Dependency / Industrial Aggregation.
+ *
+ * Changelog v2.0:
+ *   + SovereignInitSystem    — PID-1 service supervision (OpenRC/runit/s6)
+ *   + SovereignEnvManager    — POSIX environment variables (getenv/setenv)
+ *   + SovereignUserManager   — Multi-user UID/GID management (passwd/shadow)
+ *   + SovereignDmesg         — Kernel ring buffer / printk / dmesg
+ *   + SovereignCLI           — Unified sigma-* CLI dispatcher (25 commands)
+ *   + SovereignOmniCLI       — Legacy distro command absorption table
  * =========================================================================
  */
 
 #ifndef SIGMA_KERNEL_H
 #define SIGMA_KERNEL_H
 
-// 1. LibC Shards
+/* ── 1. Foundation: LibC & Type Shards ─────────────────────────────────── */
 #include "sigma_types.h"
 #include "SovereignLibC.h"
 #include "SigmaOOP.h"
 #include "sigma_libc.h"
 
-// 2. Core Architectural Shards
+/* ── 2. Core Architectural Shards ──────────────────────────────────────── */
 #include "SovereignOSBasicsZenith.h"
 #include "SovereignSyncZenith.h"
 #include "SovereignCoreUtils.h"
 #include "SovereignHardwareIOZenith.h"
 
-// 3. Flagship USPs
+/* ── 3. System Services (new in v2.0) ───────────────────────────────────── */
+#include "SovereignDmesg.h"          /* Kernel ring buffer / printk        */
+#include "SovereignEnvManager.h"     /* POSIX environment variables        */
+#include "SovereignUserManager.h"    /* Multi-user UID/GID / passwd shadow */
+#include "SovereignInitSystem.h"     /* PID-1 service supervisor           */
+#include "SovereignCLI.h"            /* Unified sigma-* CLI dispatcher     */
+#include "SovereignOmniCLI_DistroAbsorber.h" /* Legacy distro absorber    */
+
+/* ── 4. Flagship Feature Shards ─────────────────────────────────────────── */
 #include "SovereignOmniShard.h"
 #include "SovereignHyprlandZenith.h"
 #include "SovereignInterferenceGuard.h"
@@ -32,5 +48,5 @@
 #include "SovereignPythonZenith.h"
 #include "SovereignRZenith.h"
 
-#endif // SIGMA_KERNEL_H
+#endif /* SIGMA_KERNEL_H */
 
