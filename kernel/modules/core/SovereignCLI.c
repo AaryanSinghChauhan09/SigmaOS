@@ -13,6 +13,15 @@
 #include "../../../include/SovereignDmesg.h"
 #include "../../../include/SovereignInitSystem.h"
 
+/* Competitor Shards */
+#include "../../../include/SovereignZFS.h"
+#include "../../../include/SovereignJail.h"
+#include "../../../include/SovereignMediaCodec.h"
+#include "../../../include/SovereignVirtualBox.h"
+#include "../../../include/SovereignBrowserCloud.h"
+#include "../../../include/SovereignDefender.h"
+#include "../../../include/SovereignActiveDirectory.h"
+
 /* Global CLI context */
 SigmaCLICtx_t g_sigma_cli;
 
@@ -310,10 +319,10 @@ sigma_err_t sigma_cmd_user(int argc, char *argv[]) {
 }
 
 /* -------------------------------------------------------------------------
- * Phase 42 Commands (Competitor Shards)
+ * Phase 42 & 43 Commands (Competitor Shards)
  * ---------------------------------------------------------------------- */
 
-static int cmd_sigma_zfs(int argc, char **argv) {
+static int sigma_cmd_zfs(int argc, char **argv) {
     if (argc < 2) { sigma_zfs_list(SIGMA_NULL); return 0; }
     if (sigma_streq(argv[1], "create")) sigma_zfs_create(argv[2], SIGMA_DS_FILESYSTEM);
     else if (sigma_streq(argv[1], "snap")) sigma_zfs_snapshot(argv[2], argv[3]);
@@ -321,41 +330,60 @@ static int cmd_sigma_zfs(int argc, char **argv) {
     return 0;
 }
 
-static int cmd_sigma_jail(int argc, char **argv) {
-    if (argc < 2) { sigma_jls(); return 0; }
+static int sigma_cmd_jail(int argc, char **argv) {
+    (void)argc; (void)argv;
     sigma_jls();
     return 0;
 }
 
-static int cmd_sigma_obs(int argc, char **argv) {
+static int sigma_cmd_obs(int argc, char **argv) {
+    (void)argc; (void)argv;
     sigma_obs_stats();
     return 0;
 }
 
-static int cmd_sigma_vbox(int argc, char **argv) {
+static int sigma_cmd_vbox(int argc, char **argv) {
+    (void)argc; (void)argv;
     sigma_vbox_list_vms();
     return 0;
 }
 
-static int cmd_sigma_browser(int argc, char **argv) {
+static int sigma_cmd_browser(int argc, char **argv) {
+    (void)argc; (void)argv;
     sigma_browser_stats();
     return 0;
 }
 
-/* -------------------------------------------------------------------------
- * Dispatch Array
- * ---------------------------------------------------------------------- */
-static const struct {
-    {"sigma-svc",    cmd_sigma_svc},
-    {"sigma-env",    cmd_sigma_env},
-    {"sigma-user",   cmd_sigma_user},
-    {"sigma-zfs",    cmd_sigma_zfs},
-    {"sigma-jail",   cmd_sigma_jail},
-    {"sigma-obs",    cmd_sigma_obs},
-    {"sigma-vbox",   cmd_sigma_vbox},
-    {"sigma-browser",cmd_sigma_browser},
-    {SIGMA_NULL,     SIGMA_NULL}
-};
+static int sigma_cmd_defender(int argc, char **argv) {
+    if (argc < 2) {
+        sigma_printf("Usage: sigma-defender [scan <file> | quarantine <file>]\n");
+        return 0;
+    }
+    if (sigma_streq(argv[1], "scan") && argc >= 3) {
+        char threat[64] = {0};
+        if (sigma_defender_scan_file(argv[2], threat) == DEFENDER_MALWARE) {
+            sigma_printf("Σ [DEFENDER]: THREAT DETECTED: %s\n", threat);
+        } else {
+            sigma_printf("Σ [DEFENDER]: File is clean.\n");
+        }
+    } else if (sigma_streq(argv[1], "quarantine") && argc >= 3) {
+        sigma_defender_quarantine(argv[2]);
+    }
+    return 0;
+}
+
+static int sigma_cmd_ad(int argc, char **argv) {
+    if (argc < 2) {
+        sigma_printf("Usage: sigma-ad [join <domain> <dc_ip> <user> | gpo <file>]\n");
+        return 0;
+    }
+    if (sigma_streq(argv[1], "join") && argc >= 5) {
+        sigma_ad_join_domain(argv[2], argv[3], argv[4], "");
+    } else if (sigma_streq(argv[1], "gpo") && argc >= 3) {
+        sigma_ad_apply_gpo(argv[2]);
+    }
+    return 0;
+}
 
 /* ---- sigma-svc --------------------------------------------------------- */
 /* Uses a global init context (extern from SovereignInitSystem.c) */
@@ -497,6 +525,16 @@ void SovereignCLI_Init(void) {
     sigma_cli_register(&g_sigma_cli, "sigma-mount", "Mount filesystem",                     sigma_cmd_mount);
     sigma_cli_register(&g_sigma_cli, "sigma-ctl",   "Kernel parameter control (sysctl)",    sigma_cmd_ctl);
     sigma_cli_register(&g_sigma_cli, "sigma-hash",  "Cryptographic hash utilities",         sigma_cmd_hash);
+    
+    /* Phase 42 & 43 Shards */
+    sigma_cli_register(&g_sigma_cli, "sigma-zfs",     "ZFS volume management",                sigma_cmd_zfs);
+    sigma_cli_register(&g_sigma_cli, "sigma-jail",    "Jail/container control",               sigma_cmd_jail);
+    sigma_cli_register(&g_sigma_cli, "sigma-obs",     "OBS media compositor stats",           sigma_cmd_obs);
+    sigma_cli_register(&g_sigma_cli, "sigma-vbox",    "VirtualBox VM management",             sigma_cmd_vbox);
+    sigma_cli_register(&g_sigma_cli, "sigma-browser", "Browser/Cloud stats",                  sigma_cmd_browser);
+    sigma_cli_register(&g_sigma_cli, "sigma-defender","Windows Defender Parity",              sigma_cmd_defender);
+    sigma_cli_register(&g_sigma_cli, "sigma-ad",      "Active Directory Control",             sigma_cmd_ad);
+
     sigma_cli_register(&g_sigma_cli, "sigma-help",  "Show this help",                       sigma_cmd_help);
 
     sigma_printf("Σ [CLI]: %u commands registered.\n", g_sigma_cli.cmd_count);
