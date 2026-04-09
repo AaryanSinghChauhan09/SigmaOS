@@ -1,5 +1,12 @@
 # SigmaOS — Sovereign Open Source Architecture Changelog
 
+## [v3006.0-Phase46] - RTOS Subsystems & BeOS/Haiku Application Matrices
+**Date**: 2026-04-09
+
+### 🟢 Sovereign Shards (FreeRTOS & Haiku OS Parity)
+- **SovereignFreeRTOS**: Absorbed industry embedded standards natively. Deployed zero-dependency parity for `xTaskCreate` priority preemptive tasks, `xQueue` intra-state communication, and hardware ticking logic.
+- **SovereignHaiku**: Implemented pure `BApplication`, `BWindow`, and `BMessage` API wrappers simulating the highly threaded application model of BeOS/Haiku OS within SigmaOS C11 constraints.
+
 ## [v3005.0-Phase45] - Core Asynchronous I/O, GUI Modularization & Code Remediation
 **Date**: 2026-04-09
 

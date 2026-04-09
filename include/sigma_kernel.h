@@ -131,6 +131,10 @@
 #include "SovereignLinuxIoUring.h"
 #include "SovereignSerenityGUI.h"
 
+/* Embedded/RTOS & Haiku Parity Shards (Phase 46) */
+#include "SovereignFreeRTOS.h"
+#include "SovereignHaiku.h"
+
 // Master Aggregator Initialization
 static inline void SovereignMaster_InitAll(void) {
     SovereignOmniCLI_Init();
@@ -156,6 +160,10 @@ static inline void SovereignMaster_InitAll(void) {
     /* Phase 45 Shards */
     SovereignLinuxIoUring_Init();
     SovereignSerenityGUI_Init();
+
+    /* Phase 46 Shards */
+    SovereignFreeRTOS_Init();
+    SovereignHaiku_Init();
 }
 
 #endif /* SIGMA_KERNEL_H */
