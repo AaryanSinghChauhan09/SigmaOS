@@ -11,7 +11,8 @@
 #ifndef SOVEREIGN_BOOT_MASTER_H
 #define SOVEREIGN_BOOT_MASTER_H
 
-#include "../../include/sigma_kernel.h"
+#include "../../include/sigma_libc.h"
+#include "../../include/SigmaOOP.h"
 
 // -------------------------------------------------------------------------
 // Boot Master Object Structure

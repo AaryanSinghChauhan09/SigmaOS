@@ -22,6 +22,10 @@
 #include "../../../include/SovereignDefender.h"
 #include "../../../include/SovereignActiveDirectory.h"
 
+/* Phase 44 Shards */
+#include "../../../include/SovereignAndroidBinder.h"
+#include "../../../include/SovereignDarwinXNU.h"
+
 /* Global CLI context */
 SigmaCLICtx_t g_sigma_cli;
 
@@ -385,6 +389,34 @@ static int sigma_cmd_ad(int argc, char **argv) {
     return 0;
 }
 
+/* -------------------------------------------------------------------------
+ * Phase 44 Commands (Android/macOS Shards)
+ * ---------------------------------------------------------------------- */
+
+static int sigma_cmd_binder(int argc, char **argv) {
+    (void)argc; (void)argv;
+    return 0;
+}
+
+static int sigma_cmd_xnu(int argc, char **argv) {
+    (void)argc; (void)argv;
+    return 0;
+}
+
+/* -------------------------------------------------------------------------
+ * Phase 45 Commands (Linux/SerenityOS)
+ * ---------------------------------------------------------------------- */
+
+static int sigma_cmd_iouring(int argc, char **argv) {
+    (void)argc; (void)argv;
+    return 0;
+}
+
+static int sigma_cmd_gui(int argc, char **argv) {
+    (void)argc; (void)argv;
+    return 0;
+}
+
 /* ---- sigma-svc --------------------------------------------------------- */
 /* Uses a global init context (extern from SovereignInitSystem.c) */
 static SigmaInitCtx_t s_svc_ctx_placeholder;   /* Standalone fallback */
@@ -534,6 +566,14 @@ void SovereignCLI_Init(void) {
     sigma_cli_register(&g_sigma_cli, "sigma-browser", "Browser/Cloud stats",                  sigma_cmd_browser);
     sigma_cli_register(&g_sigma_cli, "sigma-defender","Windows Defender Parity",              sigma_cmd_defender);
     sigma_cli_register(&g_sigma_cli, "sigma-ad",      "Active Directory Control",             sigma_cmd_ad);
+
+    /* Phase 44 Shards */
+    sigma_cli_register(&g_sigma_cli, "sigma-binder",  "Android Binder IPC Control",           sigma_cmd_binder);
+    sigma_cli_register(&g_sigma_cli, "sigma-xnu",     "Darwin XNU Mach Port Control",         sigma_cmd_xnu);
+
+    /* Phase 45 Shards */
+    sigma_cli_register(&g_sigma_cli, "sigma-iouring", "Linux io_uring Parity",                sigma_cmd_iouring);
+    sigma_cli_register(&g_sigma_cli, "sigma-gui",     "SerenityOS GUI Server Control",        sigma_cmd_gui);
 
     sigma_cli_register(&g_sigma_cli, "sigma-help",  "Show this help",                       sigma_cmd_help);
 

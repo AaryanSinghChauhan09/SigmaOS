@@ -1,5 +1,23 @@
 # SigmaOS — Sovereign Open Source Architecture Changelog
 
+## [v3005.0-Phase45] - Core Asynchronous I/O, GUI Modularization & Code Remediation
+**Date**: 2026-04-09
+
+### 🟢 Sovereign Shards (Linux & SerenityOS Parity)
+- **SovereignLinuxIoUring**: Absorbed Linux Kernel `io_uring` methodologies to deliver zero-syscall, lockless asynchronous IO patterns utilising SQ (Submission Queue) and CQ (Completion Queue) ring buffers directly in C11.
+- **SovereignSerenityGUI**: Absorbed SerenityOS WindowServer architectures bringing core libgui primitives, rect validations, and window creation natively into the kernel layer.
+
+### 🛠️ Core Optimization & Remediation
+- **SovereignUniversalPackaging**: Resolved implicit C99 undeclared method errors by standardizing output via `sigma_libc.h` (e.g. tracking `sigma_print_info` strictly to `sigma_printf`).
+- **Dependency Strictness**: Fixed extraneous unlinked head mapping across `SovereignBootMaster.c` and `SovereignPythonVM.c` dynamically resolving IDE linter analysis failures. Modularity is absolute.
+
+## [v3004.0-Phase44] - Mobile & macOS IPC Parity
+**Date**: 2026-04-09
+
+### 🟢 Sovereign Shards (AOSP & macOS XNU Absorption)
+- **SovereignAndroidBinder**: Absorbed Android Open Source Project (AOSP) Binder IPC mechanics natively mapped into SigmaOS, enabling high-performance IPC Transaction nodes, Parcel marshalling, and Context Manager Service deployments.
+- **SovereignDarwinXNU**: Absorbed Apple Darwin XNU capabilities featuring Mach Ports and Mach Msg subsystems. Emulated Grand Central Dispatch (GCD) `libdispatch` queuing methodologies directly into the base structure.
+
 ## [v3003.0-Phase43] - Windows Enterprise Parity & Security Dominance
 **Date**: 2026-04-09
 

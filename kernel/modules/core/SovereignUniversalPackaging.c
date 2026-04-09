@@ -6,7 +6,7 @@
  * dynamically fetched shards without host filesystem pollution.
  */
 
-#include "../../../include/SovereignCoreUtils.h"
+#include "../../../include/sigma_kernel.h"
 
 #define MAX_APP_CONTAINERS 128
 
@@ -25,7 +25,7 @@ int active_containers = 0;
  * @brief Initialize universal packaging engine
  */
 void sigma_universal_packaging_init() {
-    sigma_print_info("Σ [PKG-MATRIX] Initializing Universal Packaging Engine (Flatpak/AppImage Parity)...");
+    sigma_printf("Σ [PKG-MATRIX] Initializing Universal Packaging Engine (Flatpak/AppImage Parity)...\n");
     active_containers = 0;
 }
 
@@ -34,7 +34,7 @@ void sigma_universal_packaging_init() {
  */
 void sigma_deploy_sandboxed_app(const char* identifier, int sandbox_level) {
     if (active_containers >= MAX_APP_CONTAINERS) {
-        sigma_print_error("Σ [PKG-MATRIX] Capacity reached. Cannot deploy [%s]", identifier);
+        sigma_printf("Σ [PKG-MATRIX] Capacity reached. Cannot deploy [%s]\n", identifier);
         return;
     }
     
@@ -46,7 +46,7 @@ void sigma_deploy_sandboxed_app(const char* identifier, int sandbox_level) {
     new_app->has_network_access = (sandbox_level < 2) ? 1 : 0;
     new_app->has_fs_access = (sandbox_level < 3) ? 1 : 0;
     
-    sigma_print_info("Σ [PKG-MATRIX] Application [%s] deployed in ephemeral container. NET:%d FS:%d", 
+    sigma_printf("Σ [PKG-MATRIX] Application [%s] deployed in ephemeral container. NET:%d FS:%d\n", 
                      new_app->app_id, new_app->has_network_access, new_app->has_fs_access);
                      
     active_containers++;
@@ -56,7 +56,7 @@ void sigma_deploy_sandboxed_app(const char* identifier, int sandbox_level) {
  * @brief Execute a dynamically fetched AppImage/Portable Shard
  */
 void sigma_execute_portable_shard(const char* binary_path) {
-    sigma_print_info("Σ [PKG-MATRIX] Hot-loading portable shard directly into memory space: %s", binary_path);
-    sigma_print_info("Σ [PKG-MATRIX] Bypassing traditional dependency resolution. Absolute sovereignty maintained.");
+    sigma_printf("Σ [PKG-MATRIX] Hot-loading portable shard directly into memory space: %s\n", binary_path);
+    sigma_printf("Σ [PKG-MATRIX] Bypassing traditional dependency resolution. Absolute sovereignty maintained.\n");
     // Abstract execution logic here
 }
