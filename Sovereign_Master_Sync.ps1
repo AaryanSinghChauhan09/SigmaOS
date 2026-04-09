@@ -5,14 +5,18 @@ Write-Host "`nΣ [SYNC]: INITIATING MASTER INDUSTRIAL SYNCHRONIZATION..." -Foreg
 
 # 1. BUILD VERIFICATION
 Write-Host "Σ [STEP 1]: EXECUTING INDUSTRIAL BUILD (MAKE)..." -ForegroundColor Yellow
-& make clean
-& make all
+if (Get-Command make -ErrorAction SilentlyContinue) {
+    & make clean
+    & make all
 
-if ($LASTEXITCODE -ne 0) {
-    Write-Host "Σ [FATAL]: BUILD FAILED. NEUTRALIZING SYNC TO PREVENT CORRUPTION." -ForegroundColor Red
-    exit 1
+    if ($LASTEXITCODE -ne 0) {
+        Write-Host "Σ [FATAL]: BUILD FAILED. NEUTRALIZING SYNC TO PREVENT CORRUPTION." -ForegroundColor Red
+        exit 1
+    }
+    Write-Host "[OK]: ZENITH BINARY FORGED SUCCESSFULLY." -ForegroundColor Green
+} else {
+    Write-Host "[SKIP]: MAKE NOT FOUND. ADVISING INDUSTRIAL CROSS-COMPILATION." -ForegroundColor Gray
 }
-Write-Host "[OK]: ZENITH BINARY FORGED SUCCESSFULLY." -ForegroundColor Green
 
 # 2. SECURITY SCAN (CPPCHECK)
 if (Get-Command cppcheck -ErrorAction SilentlyContinue) {

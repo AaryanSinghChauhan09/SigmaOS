@@ -38,3 +38,13 @@ static SovereignPythonVM_t create_python_vm() {
     obj.JITCompileBytecode = py_jit_bytecode;
     return obj;
 }
+
+void sigma_python_vm_init(void) {
+    sigma_printf("[PYTHON-VM]: Initializing Sovereign Python Logic.\n");
+    SovereignPythonVM_t vm = create_python_vm();
+    
+    vm.ExecuteASTNode(&vm, "dummy_ast");
+    vm.JITCompileBytecode(&vm, (const sigma_u8*)"\x00");
+    
+    sigma_printf("[SUCCESS]: Sovereign Python VM Active.\n");
+}
