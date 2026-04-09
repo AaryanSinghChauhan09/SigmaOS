@@ -353,7 +353,8 @@ static void tcp_send_segment(SigmaSocket_t *sk, sigma_u8 flags,
  * ----------------------------------------------------------------------- */
 
 /** socket(AF_INET, SOCK_STREAM/SOCK_DGRAM, 0) */
-int sigma_socket(int type) {
+int sigma_socket(int domain, int type, int protocol) {
+    SIGMA_UNUSED(domain); SIGMA_UNUSED(protocol);
     int fd = sock_alloc();
     if (fd < 0) return -1;
     s_socks[fd].type       = type;
@@ -365,14 +366,20 @@ int sigma_socket(int type) {
 }
 
 /** bind(fd, addr, port) */
-sigma_err_t sigma_bind(int fd, sigma_u32 ip, sigma_u16 port) {
-    if (fd <= 0 || fd >= MAX_SOCKETS || !s_socks[fd].in_use) return SIGMA_EINVAL;
+/** bind(fd, addr, port) */
+int sigma_bind(int fd, const void *addr, sigma_u32 addrlen) {
+    if (fd <= 0 || fd >= MAX_SOCKETS || !s_socks[fd].in_use) return -1;
+    if (!addr || addrlen < 8) return -1;
+    
+    sigma_u16 port = sigma_ntohs(*(const sigma_u16*)((const sigma_u8*)addr + 2));
+    sigma_u32 ip   = sigma_ntohl(*(const sigma_u32*)((const sigma_u8*)addr + 4));
+
     s_socks[fd].local_ip   = ip;
     s_socks[fd].local_port = port;
     s_socks[fd].sock_state = SOCK_STATE_BOUND;
     sigma_printf("Σ [SOCK]: bind(fd=%d) → %u.%u.%u.%u:%u\n",
                  fd,(ip>>24)&0xFF,(ip>>16)&0xFF,(ip>>8)&0xFF,ip&0xFF,port);
-    return SIGMA_OK;
+    return 0;
 }
 
 /** listen(fd, backlog) */
@@ -387,8 +394,13 @@ sigma_err_t sigma_listen(int fd, int backlog) {
 }
 
 /** connect(fd, remote_ip, remote_port) — initiates 3-way handshake */
-sigma_err_t sigma_connect(int fd, sigma_u32 remote_ip, sigma_u16 remote_port) {
-    if (fd <= 0 || fd >= MAX_SOCKETS || !s_socks[fd].in_use) return SIGMA_EINVAL;
+int sigma_connect(int fd, const void *addr, sigma_u32 addrlen) {
+    if (fd <= 0 || fd >= MAX_SOCKETS || !s_socks[fd].in_use) return -1;
+    if (!addr || addrlen < 8) return -1;
+    
+    sigma_u16 remote_port = sigma_ntohs(*(const sigma_u16*)((const sigma_u8*)addr + 2));
+    sigma_u32 remote_ip   = sigma_ntohl(*(const sigma_u32*)((const sigma_u8*)addr + 4));
+
     SigmaSocket_t *sk = &s_socks[fd];
     sk->remote_ip   = remote_ip;
     sk->remote_port = remote_port;
@@ -410,7 +422,7 @@ sigma_err_t sigma_connect(int fd, sigma_u32 remote_ip, sigma_u16 remote_port) {
     sk->tcp_state  = TCP_ESTABLISHED;
     sk->sock_state = SOCK_STATE_CONNECTED;
     sigma_printf("Σ [TCP]: ESTABLISHED fd=%d [3-way handshake complete]\n", fd);
-    return SIGMA_OK;
+    return 0;
 }
 
 /** send(fd, buf, len) */
@@ -551,16 +563,29 @@ void SovereignTCPIP_Init(void) {
     sigma_icmp_ping(0xC0A801FEu);  /* ping gateway */
 
     /* TCP connect → send → close test */
-    int fd = sigma_socket(SOCK_STREAM);
-    sigma_bind(fd, 0xC0A80101u, 54321);
-    sigma_connect(fd, 0x08080808u /* 8.8.8.8 */, 443);
+    int fd = sigma_socket(2 /* AF_INET */, SOCK_STREAM, 0);
+    sigma_u8 bind_addr[16] = {0};
+    *(sigma_u16*)&bind_addr[2] = sigma_htons(54321);
+    *(sigma_u32*)&bind_addr[4] = sigma_htonl(0xC0A80101u);
+    sigma_bind(fd, bind_addr, 16);
+    
+    sigma_u8 conn_addr[16] = {0};
+    *(sigma_u16*)&conn_addr[2] = sigma_htons(443);
+    *(sigma_u32*)&conn_addr[4] = sigma_htonl(0x08080808u); /* 8.8.8.8 */
+    sigma_connect(fd, conn_addr, 16);
+
     const sigma_u8 http[] = "GET / HTTP/1.1\r\nHost: sigma.io\r\n\r\n";
     sigma_send(fd, http, sizeof(http) - 1);
     sigma_sock_close(fd);
 
     /* UDP test */
-    int ufd = sigma_socket(SOCK_DGRAM);
-    sigma_bind(ufd, 0xC0A80101u, 53000);
+    int ufd = sigma_socket(2 /* AF_INET */, SOCK_DGRAM, 0);
+    
+    sigma_u8 ubind_addr[16] = {0};
+    *(sigma_u16*)&ubind_addr[2] = sigma_htons(53000);
+    *(sigma_u32*)&ubind_addr[4] = sigma_htonl(0xC0A80101u);
+    sigma_bind(ufd, ubind_addr, 16);
+
     const sigma_u8 dns_query[] = "\x00\x01\x01\x00\x00\x01\x00\x00\x00\x00\x00\x00";
     sigma_udp_sendto(ufd, dns_query, 12, 0x01010101u /* 1.1.1.1 */, 53);
     s_socks[ufd].in_use = SIGMA_FALSE;

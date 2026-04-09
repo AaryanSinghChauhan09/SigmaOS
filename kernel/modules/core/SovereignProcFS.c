@@ -10,10 +10,10 @@
  *   /proc/version     /proc/uptime      /proc/loadavg
  *   /proc/cpuinfo     /proc/meminfo     /proc/interrupts
  *   /proc/mounts      /proc/filesystems /proc/net/dev
- *   /proc/stat        /proc/cmdline     /proc/sys/kernel/*
+ *   /proc/stat        /proc/cmdline     /proc/sys/kernel/...
  *   /proc/{pid}/status /proc/{pid}/maps /proc/{pid}/fd
  *   /sys/class/net/{iface}/{mtu,address,operstate}
- *   /sys/bus/pci/devices/* /sys/power/state
+ *   /sys/bus/pci/devices/... /sys/power/state
  * =========================================================================
  */
 
