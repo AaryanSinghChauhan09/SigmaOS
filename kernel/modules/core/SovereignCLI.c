@@ -306,8 +306,56 @@ sigma_err_t sigma_cmd_user(int argc, char *argv[]) {
     } else if (sigma_streq(argv[1], "unlock") && argc >= 3) {
         sigma_user_unlock(&g_sigma_userdb, argv[2]);
     }
-    return SIGMA_OK;
+    return 0;
 }
+
+/* -------------------------------------------------------------------------
+ * Phase 42 Commands (Competitor Shards)
+ * ---------------------------------------------------------------------- */
+
+static int cmd_sigma_zfs(int argc, char **argv) {
+    if (argc < 2) { sigma_zfs_list(SIGMA_NULL); return 0; }
+    if (sigma_streq(argv[1], "create")) sigma_zfs_create(argv[2], SIGMA_DS_FILESYSTEM);
+    else if (sigma_streq(argv[1], "snap")) sigma_zfs_snapshot(argv[2], argv[3]);
+    else sigma_zfs_list(SIGMA_NULL);
+    return 0;
+}
+
+static int cmd_sigma_jail(int argc, char **argv) {
+    if (argc < 2) { sigma_jls(); return 0; }
+    sigma_jls();
+    return 0;
+}
+
+static int cmd_sigma_obs(int argc, char **argv) {
+    sigma_obs_stats();
+    return 0;
+}
+
+static int cmd_sigma_vbox(int argc, char **argv) {
+    sigma_vbox_list_vms();
+    return 0;
+}
+
+static int cmd_sigma_browser(int argc, char **argv) {
+    sigma_browser_stats();
+    return 0;
+}
+
+/* -------------------------------------------------------------------------
+ * Dispatch Array
+ * ---------------------------------------------------------------------- */
+static const struct {
+    {"sigma-svc",    cmd_sigma_svc},
+    {"sigma-env",    cmd_sigma_env},
+    {"sigma-user",   cmd_sigma_user},
+    {"sigma-zfs",    cmd_sigma_zfs},
+    {"sigma-jail",   cmd_sigma_jail},
+    {"sigma-obs",    cmd_sigma_obs},
+    {"sigma-vbox",   cmd_sigma_vbox},
+    {"sigma-browser",cmd_sigma_browser},
+    {SIGMA_NULL,     SIGMA_NULL}
+};
 
 /* ---- sigma-svc --------------------------------------------------------- */
 /* Uses a global init context (extern from SovereignInitSystem.c) */
