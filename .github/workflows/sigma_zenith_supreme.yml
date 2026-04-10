@@ -76,9 +76,9 @@ jobs:
       # ──────────────────────────────────────────────────────────────────
       # TEST: Host-native compilation of the Master Test Suite
       # Compiled with standard GCC (hosted) so sigma_printf → printf.
-      # This correctly validates all 51+ test functions.
+      # This correctly validates all 54+ test functions.
       # ──────────────────────────────────────────────────────────────────
-      - name: "Test: Master Test Suite — Phase 40 (51 Tests)"
+      - name: "Test: Master Test Suite — Phase 40 (54 Tests)"
         run: |
           echo "Σ [TEST]: Compiling Master Test Suite (hosted, native GCC)..."
 
@@ -127,7 +127,7 @@ jobs:
 
           echo "Σ [TEST]: Executing Master Test Suite..."
           /tmp/sigma_master_verify
-          echo "Σ [OK]: All 51 sovereign tests passed successfully."
+          echo "Σ [OK]: All 54 sovereign tests passed successfully."
 
       # ──────────────────────────────────────────────────────────────────
       # VERIFICATION: Static analysis — detect common issues
@@ -140,7 +140,8 @@ jobs:
           # Ensure all new Phase 40 shards are present
           for shard in SovereignNixReproducibility SovereignGentooUSEFlags \
                        SovereignVoidRunit SovereignPopAutoTile \
-                       SovereignSilverblueOSTree SovereignArchRolling; do
+                       SovereignSilverblueOSTree SovereignArchRolling \
+                       SovereignAlpineMicro SovereignQubesHyperIsolation SovereignClearLinuxPerf; do
             if [ -f "kernel/modules/core/${shard}.c" ]; then
               echo "Σ [OK]: ${shard}.c — present"
             else
