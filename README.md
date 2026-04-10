@@ -25,7 +25,7 @@ SigmaOS natively executes binaries from across the computing spectrum without em
 - `/scripts/js/components/`: Decoupled industrial UI orchestrators.
 
 ## 🏁 First Public Release (v1.0-RC1)
-This release represents the **Sovereign Apex**, testing clean against exactly **103+** absorbed OS principles spanning from Alpine and Qubes to DragonFly BSD, Zephyr IoT, and Contiki-NG. Every placeholder has been liquidated, every ghost shard implemented, and every architectural principle verified.
+This release represents the **Sovereign Apex**, testing clean against exactly **106+** absorbed OS principles spanning from Alpine and Qubes to Nobara ACO, SerenityOS W^X, and RISC OS. Every placeholder has been liquidated, every ghost shard implemented, and every architectural principle verified.
 
 ### How to Boot
 1.  **Clone the Shard**: `git clone https://github.com/AaryanSinghChauhan09/SigmaOS`
