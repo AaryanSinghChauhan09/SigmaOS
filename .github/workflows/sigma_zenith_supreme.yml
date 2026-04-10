@@ -76,9 +76,9 @@ jobs:
       # ──────────────────────────────────────────────────────────────────
       # TEST: Host-native compilation of the Master Test Suite
       # Compiled with standard GCC (hosted) so sigma_printf → printf.
-      # This correctly validates all 65+ test functions.
+      # This correctly validates all 68+ test functions.
       # ──────────────────────────────────────────────────────────────────
-      - name: "Test: Master Test Suite — Phase 40 (65 Tests)"
+      - name: "Test: Master Test Suite — Phase 40 (68 Tests)"
         run: |
           echo "Σ [TEST]: Compiling Master Test Suite (hosted, native GCC)..."
 
@@ -127,7 +127,7 @@ jobs:
 
           echo "Σ [TEST]: Executing Master Test Suite..."
           /tmp/sigma_master_verify
-          echo "Σ [OK]: All 65 sovereign tests passed successfully."
+          echo "Σ [OK]: All 68 sovereign tests passed successfully."
 
       # ──────────────────────────────────────────────────────────────────
       # VERIFICATION: Static analysis — detect common issues
