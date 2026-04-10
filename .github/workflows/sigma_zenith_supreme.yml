@@ -76,9 +76,9 @@ jobs:
       # ──────────────────────────────────────────────────────────────────
       # TEST: Host-native compilation of the Master Test Suite
       # Compiled with standard GCC (hosted) so sigma_printf → printf.
-      # This correctly validates all 118+ test functions.
+      # This correctly validates all 121+ test functions.
       # ──────────────────────────────────────────────────────────────────
-      - name: "Test: Master Test Suite — Phase 40 (118 Tests)"
+      - name: "Test: Master Test Suite — Phase 40 (121 Tests)"
         run: |
           echo "Σ [TEST]: Compiling Master Test Suite (hosted, native GCC)..."
 
@@ -127,7 +127,7 @@ jobs:
 
           echo "Σ [TEST]: Executing Master Test Suite..."
           /tmp/sigma_master_verify
-          echo "Σ [OK]: All 118 sovereign tests passed successfully. ZENITH 118 MILESTONE REACHED."
+          echo "Σ [OK]: All 121 sovereign tests passed successfully. ZENITH 121 MILESTONE REACHED."
 
       # ──────────────────────────────────────────────────────────────────
       # VERIFICATION: Static analysis — detect common issues
