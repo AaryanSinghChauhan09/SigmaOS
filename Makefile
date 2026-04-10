@@ -13,20 +13,11 @@ CFLAGS = -m64 -ffreestanding -O2 -Wall -Wextra -I./kernel/modules/core -I./kerne
 ASFLAGS = -f elf64
 LDFLAGS = -T kernel/sigma.ld -m elf_x86_64 -nostdlib
 
-# 🧱 MODULAR SHARD AGGREGATION
-SHARDS = kernel/modules/core/kmain.o \
-         kernel/modules/core/SovereignResilience.o \
-         kernel/modules/core/SovereignMemoryZenith.o \
-         kernel/modules/ds_ai/SovereignBillionShard.o \
-         kernel/modules/ds_ai/SovereignDSMatrix.o \
-         kernel/modules/ds_ai/SovereignDataScience.o \
-         kernel/modules/security/SovereignLatticePQC.o \
-         kernel/modules/research/SovereignConvergence.o \
-         kernel/modules/distributed/SovereignOrchestrator.o \
-         kernel/modules/security/SovereignMandatoryAccessControl.o \
-         kernel/modules/core/SovereignUniversalPackaging.o \
-         kernel/modules/core/SovereignServiceLattice.o \
-         kernel/libc/SovereignLibC.o
+# 🧱 DYNAMIC SHARD AGGREGATION
+# Automatically discover all C and ASM shards across all modules, achieving industrial scalability
+C_SOURCES := $(shell find kernel -name '*.c')
+ASM_SOURCES := $(shell find kernel -name '*.asm')
+SHARDS := $(C_SOURCES:.c=.o) $(ASM_SOURCES:.asm=.o)
 
 # ⚛️ BUILD RULES
 all: sigma_zenith.bin
