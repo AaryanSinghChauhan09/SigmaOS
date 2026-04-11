@@ -11,12 +11,14 @@
 extern void SovereignArch_Register(void);
 extern void SovereignNix_Register(void);
 extern void SovereignGentoo_Register(void);
+extern void SovereignGaruda_Register(void);
 
 void sigma_distro_init_all(void) {
     SovereignDistro_InitRegistry();
     
     /* Register Shards */
     SovereignArch_Register();
+    SovereignGaruda_Register();
     /* (Future shards will be registered here) */
 }
 

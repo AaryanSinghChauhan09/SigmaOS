@@ -17,6 +17,7 @@ extern void SovereignSysCommands_Register(void);
 extern void SovereignSecCommands_Register(void);
 extern void SovereignDistroCommands_Register(void);
 extern void SovereignAdvancedCommands_Register(void);
+extern void SovereignAutomationCommands_Register(void);
 
 static void print_modular_help(void) {
     sigma_printf("\n╔══════════════════════════════════════════════════════════════════╗\n");
@@ -35,6 +36,7 @@ int main(int argc, char** argv) {
     SovereignSecCommands_Register();
     SovereignDistroCommands_Register();
     SovereignAdvancedCommands_Register();
+    SovereignAutomationCommands_Register();
 
     /* 3. Execute Dispatch */
     if (argc < 2) {
