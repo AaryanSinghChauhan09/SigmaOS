@@ -66,6 +66,7 @@ static inline void SovereignMaster_InitAll(void) {
     SovereignDriver_InitRegistry();
     SovereignInit_InitRegistry();
     SovereignCommand_InitRegistry();
+    SovereignArchBridge_Register();
 
     /* 2. Seating Shards */
     SovereignSound_Register();
