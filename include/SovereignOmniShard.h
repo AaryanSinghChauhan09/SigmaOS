@@ -10,9 +10,9 @@
 #ifndef SOVEREIGN_OMNI_SHARD_H
 #define SOVEREIGN_OMNI_SHARD_H
 
-#include "../include/sigma_types.h"
-#include "../include/SovereignLibC.h"
-#include "../include/sigma_libc.h"
+#include "sigma_types.h"
+#include "SovereignLibC.h"
+#include "sigma_libc.h"
 
 /* =========================================================================
  * DOMAIN: KERNEL & SCHEDULING
