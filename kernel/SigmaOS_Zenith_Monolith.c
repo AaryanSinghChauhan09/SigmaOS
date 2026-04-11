@@ -1,39 +1,41 @@
 /*
  * =========================================================================
- * Σ SIGMAOS: SOVEREIGN ZENITH ORCHESTRATOR (v1.0 - PURE C11)
+ * Σ SIGMAOS: SOVEREIGN ZENITH ORCHESTRATOR (v2.0 - MODULAR REGISTRY)
  * =========================================================================
  * Mission: Main kernel entry and shard orchestration matrix.
- * Design: C11 / Zero-Dependency / Struct-based OOP.
+ * Design: C11 / Zero-Dependency / Registry-Based.
  * Principle: Bit-Perfect. Zero-Wait. Unified Sovereignty.
  * =========================================================================
  */
 
 #include "../include/SovereignOSBasicsZenith.h"
 #include "../include/sigma_kernel.h"
-#include "../include/sigma_kernel.h"
+#include "../include/SovereignRegistry.h"
 
-// -------------------------------------------------------------------------
-// Global Shard Matrix
-// -------------------------------------------------------------------------
+// Forward declaration for the amalgamation register function (usually in a header)
+void SovereignDistroAmalgamation_Register(void);
 
 void sigma_kernel_main(void) {
     sigma_printf("--- Σ SIGMAOS ZENITH SUPREME: SOVEREIGN REIGN INITIATED --- \n");
 
-    // 1. Initialise Core Shard Territories
+    // 1. Initialise Shard Registry
+    SovereignRegistry_Init();
+
+    // 2. Register and Initialise Amalgamation Shards
+    sigma_printf("Σ [INIT]: Absorbing Linux Goodness Matrix...\n");
+    SovereignDistroAmalgamation_Register();
+
+    // 3. Register Platform Parity Shards (Examples)
+    SovereignRegistry_Register("AndroidBinderBridge", SHARD_CAT_PLATFORM, SovereignAndroidBinder_Init);
+    SovereignRegistry_Register("DarwinMachXNU", SHARD_CAT_PLATFORM, SovereignDarwinXNU_Init);
+    SovereignRegistry_Register("WindowsActiveDirectory", SHARD_CAT_PLATFORM, SovereignActiveDirectory_Init);
+
+    // 4. Initialise Core Territories via Master Aggregator
     sigma_printf("Σ [INIT]: Mounting Core Territories (VFS, Scheduling, Memory)...\n");
-    // (Actual calls to sharded init functions)
+    SovereignMaster_InitAll();
 
-    // 2. Initialise Security Grid
-    sigma_printf("Σ [INIT]: Activating Security Matrix (PQC, Quantum Enclaves)...\n");
-    
-    // 3. Initialise Industrial Shards
-    sigma_printf("Σ [INIT]: Deploying Universal ABI (ELF/PE/Mach-O Absorption)...\n");
-    sigma_printf("Σ [INIT]: Starting Type-1 Hypervisor Zenith...\n");
-    sigma_printf("Σ [INIT]: Engaging Self-Healing Silicon Monitoring...\n");
-
-    // 4. Initialise Interaction Shards
-    sigma_printf("Σ [INIT]: Launching Omni-CLI and Zenith UI Renderer...\n");
-    sigma_printf("Σ [INIT]: Rewards Matrix: ONLINE. Points accumulation active.\n");
+    // 5. Audit the Registry
+    SovereignRegistry_Audit();
 
     sigma_printf("--- Σ SIGMAOS ZENITH SUPREME: SYSTEM SOVEREIGNTY VERIFIED --- \n");
 }
