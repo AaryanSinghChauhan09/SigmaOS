@@ -1,28 +1,31 @@
-# 🌌 Welcome to the SigmaOS Zenith Supreme Wiki
+# SigmaOS: Sovereign Architecture Omnibus (vROADMAP_1003)
 
-SigmaOS Zenith Supreme is the industry-defining, pure C11, zero-dependency operating system forged to establish absolute kernel-level sovereignty.
+Welcome to the definitive architecture manual for **SigmaOS**. This document outlines how SigmaOS has absorbed and revolutionized every major Unique Selling Proposition (USP) from global ecosystems—all condensed into a pure C11, zero-dependency environment.
 
----
+## 1. Modular Registry Architecture (The Shard System)
+SigmaOS has moved away from monolithic initialization. Every component is now a **Sovereign Shard** registered via categorized registries:
+- **`SovereignRegistry`**: Core kernel shards (Memory, Scheduler, Drivers).
+- **`SovereignCommandRegistry`**: Omni-CLI tools (AI, Net, Sys).
+- **`SovereignDistroRegistry`**: Linux distribution personalities (Arch, Nix, Gentoo).
+- **`SovereignUSPRegistry`**: Individual Kernel USPs (eBPF, io_uring, cgroups).
 
-### 🛡️ Core Tenets of Sovereignty
+## 2. Linux Amalgamation Matrix
+SigmaOS is the "Amalgamation of all Goods of Linux." We have natively sharded the USPs of 30+ distributions:
+- **NixOS**: Declarative/Atomic Rollback shards.
+- **Arch**: Rolling-edge C11 performance shards.
+- **Gentoo**: Runtime hardware-optimization shards.
+- **Tails/Kali**: Amnesic security and forensic offensive shards.
 
-1. **Total Silicon Purification**: Zero reliance on C++, GNU extensions, or high-level abstractions. Every instruction is natively aggregated.
-2. **Apple GCD & seL4 Parity**: Advanced asynchronous multithreading paired with unforgeable capability-based security.
-3. **Universal ABI Mastery**: Instant execution of ELF, PE/COFF, and Mach-O binaries seamlessly without intermediate layers like Wine or Proton.
-4. **Gamified Compliance**: Integrated behavioral metrics with tokenized productivity directly at Ring-0.
-5. **No Package Managers**: `sigma-pkg` utilizes deterministic mathematical verification to pull binary configurations directly into the VFS.
+## 3. Zero Foreign Dependency (LibC Sovereignty)
+SigmaOS build system is `-ffreestanding` and `-nostdlib`. We utilize the **Sovereign LibC** (`sigma_libc.h`), ensuring zero reliance on host OS headers or binaries. 
+- **Sovereign Boot Builder**: We are transitioning to a pure-C ISO builder to eliminate dependencies on `xorriso` or `mtools`.
 
----
+## 4. Kernel Hypervisor & Data Path
+- **Type-1.5 Hypervisor**: Bare-metal VMCS interfaces for industrial-grade virtualization.
+- **Sovereign XDP**: Wire-speed packet filtering directly in NIC RX rings.
 
-### 📚 Essential Infrastructure Reading
+## 5. Security & Isolation
+By aggregating Windows AppContainers, Linux SECCOMP BPF, and macOS Seatbelt profiles, SigmaOS provisions isolated execution envelopes. 
 
-To fully comprehend the Zenith Supreme, review the following core documents:
-
-* **[Universal ABI Mastery](Universal_ABI_Mastery.md)**: How SigmaOS neutralizes global distros by absorbing their executables.
-* **[Gamified Compliance Productivity](Gamified_Compliance_Productivity.md)**: Explore the kernel-baked user point matrix mapping.
-* **[Sovereign Command Omnibus](Sovereign-Command-Omnibus.md)**: A machine-readable matrix of every authorized terminal interface interaction.
-* **[Missing OS Components Analysis](Missing-OS-Components-Analysis.md)**: A retrospective on traditional kernels and how SigmaOS bridges the gap.
-* **[Zero Dependency Algorithms](Zero_Dependency_Algorithms.md)**: The standard procedures providing absolute performance logic across all paradigms.
-
----
-> **"Absolute Sovereignty. Zero-Wait Execution. Bit-Perfect Hardware Integrity."** — *The SigmaOS Mantra*
+***
+**"No external lib. No compromise. Absolute Kernel Sovereignty."**
