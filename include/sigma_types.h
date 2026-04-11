@@ -107,4 +107,7 @@ typedef char* sigma_va_list;
 #define sigma_va_arg(ap, type)   (*(type*)((ap += sizeof(type)) - sizeof(type)))
 #define sigma_va_end(ap)         (ap = (sigma_va_list)0)
 
+#define SIGMA_ASSERT(cond, msg) \
+    do { if (!(cond)) { sigma_printf("Σ [ASSERTION FAILED]: %s (%s:%d)\n", msg, __FILE__, __LINE__); sigma_exit(1); } } while(0)
+
 #endif /* SIGMAOS_SIGMA_TYPES_H */

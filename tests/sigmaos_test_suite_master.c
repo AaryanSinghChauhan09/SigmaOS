@@ -30,6 +30,10 @@ int main() {
     
     test_security_audit();
     sigma_printf("\n");
+
+    void test_registries_modular(void);
+    test_registries_modular();
+    sigma_printf("\n");
     
     sigma_printf("--- Σ ALL 140+ SOVEREIGN SHARDS VERIFIED VIA MODULAR DOMAINS. --- \n");
     sigma_printf("--- *** ZENITH 140 STATUS: MODULAR & VALIDATED *** --- \n");

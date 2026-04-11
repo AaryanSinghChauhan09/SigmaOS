@@ -10,7 +10,14 @@ void test_libc_purity_audit() {
     sigma_printf("Σ [INFO]: Testing float parity: %d\n", (int)(x + y));
     
     // Verify string primitives
-    SIGMA_ASSERT(sigma_strlen("SigmaOS") == 7, "sigma_strlen failed in parity audit");
+    SIGMA_ASSERT(sigma_strlen("SigmaOS") == 7, "sigma_strlen failed");
+    
+    char buf[16];
+    sigma_strncpy(buf, "SOVEREIGN", 16);
+    SIGMA_ASSERT(sigma_streq(buf, "SOVEREIGN"), "sigma_strncpy failed");
+
+    sigma_memset(buf, 0, 16);
+    SIGMA_ASSERT(buf[0] == 0, "sigma_memset failed");
     
     sigma_printf("Σ [PASS]: Absolute LibC Purity Audit Verified.\n");
 }
