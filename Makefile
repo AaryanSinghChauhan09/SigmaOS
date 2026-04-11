@@ -15,7 +15,7 @@ LDFLAGS = -T kernel/sigma.ld -m elf_x86_64 -nostdlib
 
 # 🧱 DYNAMIC SHARD AGGREGATION
 # Automatically discover all C and ASM shards across all modules, achieving industrial scalability
-C_SOURCES := $(shell find kernel absorption drivers fs userland -name '*.c')
+C_SOURCES := $(shell find kernel absorption drivers fs userland sovereign_tools -name '*.c')
 ASM_SOURCES := $(shell find kernel -name '*.asm')
 SHARDS := $(C_SOURCES:.c=.o) $(ASM_SOURCES:.asm=.o)
 
