@@ -65,6 +65,7 @@ static inline void SovereignMaster_InitAll(void) {
     SovereignRegistry_Init();
     SovereignDriver_InitRegistry();
     SovereignInit_InitRegistry();
+    SovereignPkg_InitRegistry();
     SovereignCommand_InitRegistry();
     SovereignArchBridge_Register();
 

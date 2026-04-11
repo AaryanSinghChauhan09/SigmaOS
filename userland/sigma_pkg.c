@@ -7,8 +7,11 @@
  * =========================================================================
  */
 
-#include "../libc/sigma_libc.h"
-#include "../include/sigma_kernel.h"
+#include "../include/SovereignToolHeader.h"
+
+/*
+ * Note: Integrated with SovereignPkgRegistry for industrial-grade distribution.
+ */
 
 typedef struct {
     char name[64];
