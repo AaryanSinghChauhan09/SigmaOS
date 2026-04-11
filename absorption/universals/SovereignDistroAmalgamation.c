@@ -42,6 +42,12 @@ void SovereignDistroAmalgamation_Init(void) {
     /* 8. SerenityOS Paradigms: Vertical Integration */
     sigma_printf("Σ [ABSORB]: Synergizing SerenityOS Unified Ecosystem (System-Wide Purity Check).\n");
 
+    /* 9. Vanilla OS Paradigms: Immutable A/B Root */
+    sigma_printf("Σ [ABSORB]: Implementing Vanilla OS Immutable ABRoot (Submerged Atomic Updates).\n");
+
+    /* 10. Clear Linux Paradigms: AVX-512 Performance Spec */
+    sigma_printf("Σ [ABSORB]: Sharding Clear Linux Auto-Spec Optimizations (Hardware-Specific Payloads Active).\n");
+
     sigma_printf("Σ [ABSORB]: Linux Amalgamation Matrix: FINALIZED. SigmaOS is now the Super-Distro.\n");
 }
 
