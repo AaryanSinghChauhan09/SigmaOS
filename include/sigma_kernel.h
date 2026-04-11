@@ -81,6 +81,8 @@ static inline void SovereignMaster_InitAll(void) {
     SovereignPerfController_Register();
     SovereignTurbo_Register();
     SovereignSmartExplorer_Register();
+    SovereignIntegrity_Register();
+    SovereignRollback_Register();
 
     /* 3. Driver/Init Finalization */
     SovereignDriver_InitAll();
