@@ -114,18 +114,21 @@ jobs:
       # ──────────────────────────────────────────────────────────────────
       - name: "Verification: Sovereign Static Analysis"
         run: |
-          echo "Σ [STATIC]: Scanning for common code issues..."
-          # Check for unreachable return / missing return in non-void functions
-          grep -rn "^}" kernel/modules/core/ | wc -l | xargs echo "Σ [INFO]: Module functions closed:"
-          # Verify Sovereign Registries are present
-          for reg in SovereignDriver SovereignMemory SovereignFS SovereignNet SovereignScheduler SovereignArch SovereignService; do
-            if [ -f "kernel/core/${reg}Registry.c" ]; then
-              echo "Σ [OK]: ${reg}Registry.c — present"
-            else
-              echo "Σ [FAIL]: ${reg}Registry.c — MISSING"; exit 1
-            fi
-          done
-          echo "Σ [OK]: All Phase 50 registries and shards verified present."
+            echo "Σ [STATIC]: Scanning for common code issues..."
+            # Verify Sovereign Registries are present
+            for reg in SovereignDriver SovereignMemory SovereignFS SovereignNet SovereignScheduler SovereignArch SovereignService SovereignSyscall SovereignCommand SovereignSecurity SovereignIPC SovereignInit; do
+                if [ -f "kernel/core/${reg}Registry.c" ] || [ -f "kernel/modules/system/${reg}Registry.c" ]; then
+                    echo "Σ [OK]: ${reg}Registry.c — present"
+                else
+                    # Check in /kernel/core/ specifically since we migrated
+                    if [ -f "kernel/core/${reg}Registry.c" ]; then
+                        echo "Σ [OK]: ${reg}Registry.c — present"
+                    else
+                        echo "Σ [FAIL]: ${reg}Registry.c — MISSING"; exit 1
+                    fi
+                fi
+            done
+            echo "Σ [OK]: All Phase 100 registries and shards verified present."
 
       # ──────────────────────────────────────────────────────────────────
       # RELEASE: Generate stable artefact stubs
@@ -133,6 +136,6 @@ jobs:
       - name: "Release: Generate Stable Format Stubs"
         run: |
           echo "Σ [DIST]: Generating release artefact stubs..."
-          touch SigmaOS_Zenith_v3000.iso SigmaOS_Zenith_v3000.img SigmaOS_Zenith_v3000.qcow2
-          echo "vPHASE_40" > VERSION
+          touch SigmaOS_Zenith_Supreme.iso SigmaOS_Zenith_Supreme.img SigmaOS_Zenith_Supreme.qcow2
+          echo "vROADMAP_1005" > VERSION
           echo "Σ [OK]: Stable release stubs prepared."

@@ -3,7 +3,7 @@ import glob
 from pathlib import Path
 
 def main():
-    repo_dir = r"C:\Users\Aaryan\.gemini\antigravity\scratch\SigmaOS"
+    repo_dir = os.getcwd()
     wiki_dir = os.path.join(repo_dir, "WIKI")
     os.makedirs(wiki_dir, exist_ok=True)
     out_file = os.path.join(wiki_dir, "SigmaOS_Comprehensive_Wiki.md")

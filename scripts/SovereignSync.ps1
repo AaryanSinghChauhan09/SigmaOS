@@ -8,7 +8,7 @@
 Write-Host "Σ [SYNC]: Establishing Zenith Handshake..." -ForegroundColor Cyan
 
 # Ensure in local repo root
-$RepoRoot = "c:\Users\Aaryan\.gemini\antigravity\scratch\SigmaOS"
+$RepoRoot = Get-Location
 Set-Location $RepoRoot
 
 # 1. Capture Shard Mutability
