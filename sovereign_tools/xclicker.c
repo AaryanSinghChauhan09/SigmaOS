@@ -1,4 +1,4 @@
-#include "../include/sigma_kernel.h"
+#include "../include/SovereignToolHeader.h"
 
 /*
  * Σ SIGMAOS: SOVEREIGN XCLICKER (v1.0)

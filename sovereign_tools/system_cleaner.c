@@ -7,8 +7,8 @@
  * =========================================================================
  */
 
-#include "../include/sigma_kernel.h"
-#include "../include/sigma_kernel.h"
+#include "../include/SovereignToolHeader.h"
+#include "../include/SovereignToolHeader.h"
 
 // -------------------------------------------------------------------------
 // Forensic Amnesic OOP Structure

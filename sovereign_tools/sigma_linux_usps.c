@@ -3,7 +3,7 @@
  * Mission: Unified entry point for all absorbed Linux Kernel USPs.
  * Design: C11 / Zero-Dependency / Registry-Based.
  */
-#include "../include/sigma_kernel.h"
+#include "../include/SovereignToolHeader.h"
 #include "../include/SovereignUSP.h"
 #include "../include/sigma_string.h"
 

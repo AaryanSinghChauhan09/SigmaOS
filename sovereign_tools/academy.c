@@ -1,4 +1,4 @@
-#include "../include/sigma_kernel.h"
+#include "../include/SovereignToolHeader.h"
 
 /*
  * Σ SIGMAOS: SOVEREIGN ACADEMY (v1.0)

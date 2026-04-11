@@ -61,30 +61,29 @@
 
 // Master Aggregator Initialization
 static inline void SovereignMaster_InitAll(void) {
-    SovereignRegistry_Init(); /* Initialize the registry first */
-    SovereignOmniCLI_Init();
+    /* 1. Base Registries */
+    SovereignRegistry_Init();
+    SovereignDriver_InitRegistry();
+    SovereignInit_InitRegistry();
+    SovereignCommand_InitRegistry();
 
-    /* Register and Init core shards */
-    SovereignJail_Init();
-    SovereignZFS_Init();
-    SovereignMediaCodec_Init();
-    SovereignWineCompat_Init();
-    SovereignDTrace_Init();
-    SovereignBrowserCloud_Init();
-    SovereignVirtualBox_Init();
-    SovereignBandicam_Init();
+    /* 2. Seating Shards */
+    SovereignSound_Register();
+    SovereignDisplay_Register();
+    SovereignVMM_Register();
+    SovereignCrypto_Register();
+    SovereignUSB_Register();
+    SovereignPower_Register();
+    SovereignTimer_Register();
+    SovereignInput_Register();
+    SovereignTCPIP_Register();
+    SovereignPageCache_Register();
 
-    /* Platform Parity */
-    SovereignDefender_Init();
-    SovereignActiveDirectory_Init();
-    SovereignAndroidBinder_Init();
-    SovereignDarwinXNU_Init();
-    SovereignLinuxIoUring_Init();
-    SovereignSerenityGUI_Init();
-    SovereignFreeRTOS_Init();
-    SovereignHaiku_Init();
+    /* 3. Driver/Init Finalization */
+    SovereignDriver_InitAll();
+    SovereignInit_StartAll();
 
-    /* Finalize Shard Discovery */
+    /* 4. Registry Finalization */
     SovereignRegistry_Finalize();
 }
 

@@ -10,7 +10,7 @@
 #ifndef SOVEREIGN_SELF_HEAL_C
 #define SOVEREIGN_SELF_HEAL_C
 
-#include "../include/sigma_kernel.h"
+#include "../include/SovereignToolHeader.h"
 #include "../include/sigma_libc.h"
 
 void SovereignSelfHeal_Reclaim(void) {
