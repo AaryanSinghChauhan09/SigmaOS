@@ -78,6 +78,7 @@ static inline void SovereignMaster_InitAll(void) {
     SovereignInput_Register();
     SovereignTCPIP_Register();
     SovereignPageCache_Register();
+    SovereignPerfController_Register();
 
     /* 3. Driver/Init Finalization */
     SovereignDriver_InitAll();
