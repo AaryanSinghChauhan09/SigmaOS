@@ -28,7 +28,7 @@ void test_registries_modular() {
     sigma_printf("Σ [PASS]: Tool Absorption Registry Verified.\n");
 
     /* 5. Audit Command Registry */
-    SovereignCommand_Init();
+    SovereignCommand_InitRegistry();
     SIGMA_ASSERT(SovereignCommand_Register("test-cmd", "Desc", SIGMA_NULL) == SIGMA_OK, "Command registration failed");
     sigma_printf("Σ [PASS]: Omni-CLI Command Registry Verified.\n");
 
