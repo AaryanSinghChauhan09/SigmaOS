@@ -2,15 +2,15 @@ const logConsole = document.getElementById('log-console');
 const clockElement = document.getElementById('clock');
 
 const logs = [
-    "[BOOT] Initializing Sovereign Kernel v1.0-RC1...",
-    "[CORE] Loading 135 Integrated Distribution Shards...",
-    "[SECURITY] W^X Memory Mitigation Active",
-    "[SHARD] Solaris FMA Self-Healing: ONLINE",
-    "[SHARD] Windows IOCP Completion: READY",
-    "[SHARD] Android Binder Bridge: CONNECTED",
-    "[SHARD] QNX Adaptive Partition: SEATED",
-    "[BOOT] All 135 tests PASSED in 4.2ms",
-    "[SYSTEM] SigmaOS Zenith Supreme Operational."
+    "[BOOT] Σ SigmaOS Zenith Supreme vROADMAP_1005 initiating...",
+    "[ARCH] Sector 1: x86_64 / ARM64 / RISC-V Support Matrix: ONLINE",
+    "[MEM]  Sector 2: Sovereign Slab & Page Allocation: SEATED",
+    "[ABI]  Sector 3: Linux Syscall Sector & IPC Shards: ACTIVE",
+    "[FS]   Sector 4: Sovereign VFS (Ext4/ZFS/NTFS) Shards: MOUNTED",
+    "[NET]  Sector 5: Industrial TCP/IP & XDP Shunts: TRAFFIC_LOCK",
+    "[COORD]Sector 6: MQ Scheduler & Sovereign Security Jails: HARDENED",
+    "[INIT] Sector 7: PID-1 Service Orchestration: ACTIVATED",
+    "[SYNC] All 425 Sovereign Shards converged. System Sovereignty Verified."
 ];
 
 let logIndex = 0;
