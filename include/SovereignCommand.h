@@ -2,8 +2,8 @@
  * =========================================================================
  * Σ SIGMAOS: SOVEREIGN COMMAND INTERFACE (v1.0)
  * =========================================================================
- * Mission: Modular command dispatching for the Omni-CLI.
- * Design: C11 / Zero-Dependency / Extensible.
+ * Mission: Pluggable CLI commands for community extension.
+ * Design: C11 / Zero-Dependency / Registry-Based.
  * =========================================================================
  */
 
@@ -12,28 +12,17 @@
 
 #include "sigma_types.h"
 
-#define MAX_COMMANDS 512
-#define CMD_NAME_MAX 32
-#define CMD_DESC_MAX 128
-
-typedef void (*sigma_cmd_handler_t)(int argc, char** argv);
+typedef sigma_err_t (*sigma_cmd_exec_fn)(int argc, char** argv);
 
 typedef struct {
-    char name[CMD_NAME_MAX];
-    char description[CMD_DESC_MAX];
-    sigma_cmd_handler_t handler;
-    sigma_u32 security_level;
-} sovereign_command_t;
+    char name[32];
+    char description[64];
+    sigma_cmd_exec_fn execute;
+} sovereign_command_shard_t;
 
-typedef struct {
-    sovereign_command_t commands[MAX_COMMANDS];
-    sigma_u32 command_count;
-} sovereign_command_registry_t;
-
-/* Public API */
-void SovereignCommand_Init(void);
-sigma_err_t SovereignCommand_Register(const char* name, const char* desc, sigma_cmd_handler_t handler);
-void SovereignCommand_Dispatch(int argc, char** argv);
-void SovereignCommand_ListAll(void);
+/* Registry API */
+void SovereignCommand_InitRegistry(void);
+sigma_err_t SovereignCommand_Register(const char* name, const char* desc, sigma_cmd_exec_fn exec);
+sigma_err_t SovereignCommand_Dispatch(const char* name, int argc, char** argv);
 
 #endif /* SOVEREIGN_COMMAND_H */
