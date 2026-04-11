@@ -10,7 +10,9 @@
 #ifndef SOVEREIGN_OMNI_SHARD_H
 #define SOVEREIGN_OMNI_SHARD_H
 
-#include "SovereignLibC.h"
+#include "../include/sigma_types.h"
+#include "../include/SovereignLibC.h"
+#include "../include/sigma_libc.h"
 
 /* =========================================================================
  * DOMAIN: KERNEL & SCHEDULING
@@ -26,21 +28,6 @@ void SovereignScheduler_init(SovereignScheduler* s);
 /* =========================================================================
  * DOMAIN: OMNI-CLI & DISTRO ABSORPTION CORE
  * ========================================================================= */
-typedef struct {
-    char legacy_command[64];
-    char legacy_distro_origin[64];
-    char target_sigma_shard[64];
-    sigma_bool was_destructive;
-} OmniCLI_AbsorptionRule_t;
-
-static const OmniCLI_AbsorptionRule_t g_omnicli_absorption_table[] = {
-    {"apt install", "Debian/Ubuntu", "SovereignAPT_Install", SIGMA_FALSE},
-    {"pacman -S",   "Arch Linux",    "SovereignALPM_Sync",   SIGMA_FALSE},
-    {"dnf update",  "Fedora/RHEL",   "SovereignDNF_Update",  SIGMA_FALSE},
-    {"EOF",         "",              "",                     SIGMA_FALSE}
-};
-
-void sigma_omnicli_absorb_command(const char* legacy_input);
 void sigma_omnicli_dispatch(const char* distro, const char* command);
 
 /* =========================================================================
