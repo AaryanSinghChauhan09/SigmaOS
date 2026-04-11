@@ -33,3 +33,17 @@ const char* sigma_strstr(const char* haystack, const char* needle) {
     }
     return SIGMA_NULL;
 }
+char* sigma_strncpy(char* dest, const char* src, sigma_size_t n) {
+    sigma_size_t i;
+    for (i = 0; i < n && src[i] != '\0'; i++)
+        dest[i] = src[i];
+    for (; i < n; i++)
+        dest[i] = '\0';
+    return dest;
+}
+
+void* sigma_memset(void* s, int c, sigma_size_t n) {
+    unsigned char* p = (unsigned char*)s;
+    while (n--) *p++ = (unsigned char)c;
+    return s;
+}

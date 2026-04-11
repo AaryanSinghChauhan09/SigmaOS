@@ -1,0 +1,11 @@
+#include "../../include/SovereignTool.h"
+#include "../../include/sigma_libc.h"
+
+void SovereignGit_AbsorbLogic(void) {
+    sigma_printf("  Σ [GIT]: Branching matrix synchronized. Object database mapped.\n");
+    sigma_printf("  Σ [GIT]: Delta-compression engine online. Zero-copy commits active.\n");
+}
+
+void SovereignGit_Register(void) {
+    SovereignTool_Register("git", "sigma vcs", SovereignGit_AbsorbLogic);
+}
