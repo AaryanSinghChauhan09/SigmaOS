@@ -21,7 +21,11 @@ void*         sigma_mmap(void* addr, sigma_size_t length, int prot, int flags, i
 sigma_size_t  sigma_strlen(const char* s);
 void*         sigma_memset(void* s, int c, sigma_size_t n);
 void*         sigma_memcpy(void* dest, const void* src, sigma_size_t n);
+void*         sigma_memmove(void* dest, const void* src, sigma_size_t n);
 int           sigma_streq(const char* s1, const char* s2);
+int           sigma_strcmp(const char* s1, const char* s2);
+char*         sigma_strcpy(char* dest, const char* src);
+char*         sigma_strncpy(char* dest, const char* src, sigma_size_t n);
 
 // --- High-Level primitives implemented at Low-Level ---
 void sigma_print(const char* str);
