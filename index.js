@@ -352,3 +352,30 @@ document.getElementById('btn-patch').addEventListener('click', () => {
         document.getElementById('ide-editor').value = '';
     }, 300);
 });
+
+// Sovereign Totality: Auto-Hide Immersion Orchestrator
+const topBar = document.querySelector('.top-bar');
+const taskbarCont = document.querySelector('.taskbar-container');
+taskbarCont.classList.add('auto-hide');
+
+window.addEventListener('mousemove', (e) => {
+    if (e.clientY < 60) topBar.classList.remove('hidden-bar');
+    else topBar.classList.add('hidden-bar');
+    
+    if (e.clientY > window.innerHeight - 80) taskbarCont.classList.remove('hidden-bar');
+    else taskbarCont.classList.add('hidden-bar');
+});
+
+// Code-Stream: Multiversal Shard Visibility
+const codeOverlay = document.getElementById('code-stream-overlay');
+const codeSnippets = ['MOV EAX, ZENITH', 'PUSH SHARD_425', 'JMP OMEGA_POINT', 'XCHG SOVEREIGN, USER', 'CALL SINGULARITY'];
+window.addEventListener('mousemove', (e) => {
+    if (e.altKey) {
+        codeOverlay.textContent = codeSnippets[Math.floor(Math.random() * codeSnippets.length)];
+        codeOverlay.style.left = (e.clientX + 15) + 'px';
+        codeOverlay.style.top = (e.clientY + 15) + 'px';
+        codeOverlay.style.opacity = '1';
+    } else {
+        codeOverlay.style.opacity = '0';
+    }
+});

@@ -240,3 +240,16 @@ body::before {
     60% { filter: contrast(500%) invert(100%) hue-rotate(270deg) blur(5px); }
     100% { filter: none; }
 }
+
+.auto-hide {
+    transition: transform 0.5s cubic-bezier(0.1, 0, 0.1, 1);
+}
+
+.top-bar.hidden-bar { transform: translateY(-100%); }
+.taskbar-container.hidden-bar { transform: translateX(-50%) translateY(150%); }
+
+#code-stream-overlay {
+    position: absolute; pointer-events: none; z-index: 20000;
+    color: var(--acc-color); font-family: monospace; font-size: 0.6rem; opacity: 0.5;
+    white-space: pre;
+}
