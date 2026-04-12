@@ -114,6 +114,9 @@
 #include "../../../include/SovereignForensicShard.h"
 #include "../../../include/SovereignHypervisorShard.h"
 #include "../../../include/SovereignDefragShard.h"
+#include "../../../include/SovereignDSShard.h"
+#include "../../../include/SovereignFlowShard.h"
+#include "../../../include/SovereignPrefetchShard.h"
 
 /* Global CLI context */
 SigmaCLICtx_t g_sigma_cli;
@@ -2244,6 +2247,48 @@ sigma_err_t sigma_cmd_defrag(int argc, char *argv[]) {
     return SIGMA_OK;
 }
 
+/* ---- sigma-ds ---------------------------------------------------------- */
+sigma_err_t sigma_cmd_ds(int argc, char *argv[]) {
+    if (argc < 2) { SovereignDS_Audit();
+        sigma_printf("Usage: sigma-ds [alloc <name> <0-2> <rows> | compute | audit]\n");
+        return SIGMA_OK; }
+    if (sigma_streq(argv[1], "alloc") && argc >= 5)
+        sigma_ds_allocate(argv[2], (SigmaDSDataType_t)sigma_atoi(argv[3]), (sigma_u32)sigma_atoi(argv[4]));
+    else if (sigma_streq(argv[1], "compute"))
+        sigma_ds_compute();
+    else if (sigma_streq(argv[1], "audit"))
+        SovereignDS_Audit();
+    return SIGMA_OK;
+}
+
+/* ---- sigma-flow -------------------------------------------------------- */
+sigma_err_t sigma_cmd_flow(int argc, char *argv[]) {
+    if (argc < 2) { SovereignFlow_Audit();
+        sigma_printf("Usage: sigma-flow [link <trigger> <action> | fire <trigger> | audit]\n");
+        return SIGMA_OK; }
+    if (sigma_streq(argv[1], "link") && argc >= 4)
+        sigma_flow_register(argv[2], argv[3]);
+    else if (sigma_streq(argv[1], "fire") && argc >= 3)
+        sigma_flow_trigger(argv[2]);
+    else if (sigma_streq(argv[1], "audit"))
+        SovereignFlow_Audit();
+    return SIGMA_OK;
+}
+
+/* ---- sigma-prefetch ----------------------------------------------------- */
+sigma_err_t sigma_cmd_prefetch(int argc, char *argv[]) {
+    if (argc < 2) { SovereignPrefetch_Audit();
+        sigma_printf("Usage: sigma-prefetch [warm <shard> | predict | audit]\n");
+        return SIGMA_OK; }
+    if (sigma_streq(argv[1], "warm") && argc >= 3)
+        sigma_prefetch_warm(argv[2]);
+    else if (sigma_streq(argv[1], "predict"))
+        sigma_prefetch_predict();
+    else if (sigma_streq(argv[1], "audit"))
+        SovereignPrefetch_Audit();
+    return SIGMA_OK;
+}
+
 /* ---- sigma-wizard ------------------------------------------------------ */
 sigma_err_t sigma_cmd_wizard(int argc, char *argv[]) {
     (void)argc; (void)argv;
@@ -2533,6 +2578,9 @@ void SovereignCLI_Init(void) {
     sigma_cli_register(&g_sigma_cli, "sigma-scrub",       "Amnesic Forensic Engine",         sigma_cmd_scrub);
     sigma_cli_register(&g_sigma_cli, "sigma-vm",          "Type-1 Silicon Hypervisor",       sigma_cmd_vm);
     sigma_cli_register(&g_sigma_cli, "sigma-defrag",      "Silicon Layout Optimizer",        sigma_cmd_defrag);
+    sigma_cli_register(&g_sigma_cli, "sigma-ds",          "Silicon Data Science (NumPy)",    sigma_cmd_ds);
+    sigma_cli_register(&g_sigma_cli, "sigma-flow",        "Silicon Automation Engine",       sigma_cmd_flow);
+    sigma_cli_register(&g_sigma_cli, "sigma-prefetch",    "Silicon Predictive Loader",       sigma_cmd_prefetch);
 
     sigma_cli_register(&g_sigma_cli, "sigma-help",  "Show this help",                       sigma_cmd_help);
 

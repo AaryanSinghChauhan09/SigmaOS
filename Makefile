@@ -54,7 +54,8 @@ CORE_SHARDS := \
   kernel/modules/core/SovereignRecallShard.c       \
   kernel/modules/core/SovereignWebViewShard.c      \
   kernel/modules/core/SovereignShellShard.c        \
-  kernel/modules/core/SovereignStoreShard.c
+  kernel/modules/core/SovereignStoreShard.c        \
+  kernel/modules/core/SovereignDSShard.c
 
 # Security
 SECURITY_SHARDS := \
@@ -89,7 +90,9 @@ SYSTEM_SHARDS := \
   kernel/modules/system/SovereignNeuralShard.c      \
   kernel/modules/system/SovereignGarbageShard.c     \
   kernel/modules/system/SovereignHypervisorShard.c  \
-  kernel/modules/system/SovereignDefragShard.c
+  kernel/modules/system/SovereignDefragShard.c      \
+  kernel/modules/system/SovereignFlowShard.c        \
+  kernel/modules/system/SovereignPrefetchShard.c
 
 # Filesystem
 FS_SHARDS := \
