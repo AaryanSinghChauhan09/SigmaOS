@@ -129,6 +129,10 @@
 #include "../../../include/SovereignMeshRouteShard.h"
 #include "../../../include/SovereignTelemetryShard.h"
 #include "../../../include/SovereignHandoffShard.h"
+#include "../../../include/SovereignDTraceShard.h"
+#include "../../../include/SovereignDRMShard.h"
+#include "../../../include/SovereignAirDropShard.h"
+#include "../../../include/SovereignSandboxShard.h"
 
 /* Global CLI context */
 SigmaCLICtx_t g_sigma_cli;
@@ -2465,6 +2469,62 @@ sigma_err_t sigma_cmd_handoff(int argc, char *argv[]) {
     return SIGMA_OK;
 }
 
+/* ---- sigma-dtrace ------------------------------------------------------- */
+sigma_err_t sigma_cmd_dtrace(int argc, char *argv[]) {
+    if (argc < 2) { SovereignDTrace_Audit();
+        sigma_printf("Usage: sigma-dtrace [probe <shard> <point> | trace <filter> | audit]\n");
+        return SIGMA_OK; }
+    if (sigma_streq(argv[1], "probe") && argc >= 4)
+        sigma_dtrace_probe(argv[2], argv[3]);
+    else if (sigma_streq(argv[1], "trace") && argc >= 3)
+        sigma_dtrace_trace(argv[2]);
+    else if (sigma_streq(argv[1], "audit"))
+        SovereignDTrace_Audit();
+    return SIGMA_OK;
+}
+
+/* ---- sigma-drm ---------------------------------------------------------- */
+sigma_err_t sigma_cmd_drm(int argc, char *argv[]) {
+    if (argc < 2) { SovereignDRM_Audit();
+        sigma_printf("Usage: sigma-drm [alloc <w> <h> <bpp> | commit <id> | audit]\n");
+        return SIGMA_OK; }
+    if (sigma_streq(argv[1], "alloc") && argc >= 5)
+        sigma_drm_allocate_fb((sigma_u32)sigma_atoi(argv[2]), (sigma_u32)sigma_atoi(argv[3]), (sigma_u32)sigma_atoi(argv[4]));
+    else if (sigma_streq(argv[1], "commit") && argc >= 3)
+        sigma_drm_atomic_commit((sigma_u32)sigma_atoi(argv[2]));
+    else if (sigma_streq(argv[1], "audit"))
+        SovereignDRM_Audit();
+    return SIGMA_OK;
+}
+
+/* ---- sigma-airdrop ------------------------------------------------------ */
+sigma_err_t sigma_cmd_airdrop(int argc, char *argv[]) {
+    if (argc < 2) { SovereignAirDrop_Audit();
+        sigma_printf("Usage: sigma-airdrop [scan | send <peer> <file> | audit]\n");
+        return SIGMA_OK; }
+    if (sigma_streq(argv[1], "scan"))
+        sigma_airdrop_scan();
+    else if (sigma_streq(argv[1], "send") && argc >= 4)
+        sigma_airdrop_send(argv[2], argv[3]);
+    else if (sigma_streq(argv[1], "audit"))
+        SovereignAirDrop_Audit();
+    return SIGMA_OK;
+}
+
+/* ---- sigma-sandbox ------------------------------------------------------ */
+sigma_err_t sigma_cmd_sandbox(int argc, char *argv[]) {
+    if (argc < 2) { SovereignSandbox_Audit();
+        sigma_printf("Usage: sigma-sandbox [enforce <pid> <profile> | audit_pid <pid> | audit]\n");
+        return SIGMA_OK; }
+    if (sigma_streq(argv[1], "enforce") && argc >= 4)
+        sigma_sandbox_enforce((sigma_u32)sigma_atoi(argv[2]), argv[3]);
+    else if (sigma_streq(argv[1], "audit_pid") && argc >= 3)
+        sigma_sandbox_audit_pid((sigma_u32)sigma_atoi(argv[2]));
+    else if (sigma_streq(argv[1], "audit"))
+        SovereignSandbox_Audit();
+    return SIGMA_OK;
+}
+
 /* ---- sigma-wizard ------------------------------------------------------ */
 sigma_err_t sigma_cmd_wizard(int argc, char *argv[]) {
     (void)argc; (void)argv;
@@ -2769,6 +2829,10 @@ void SovereignCLI_Init(void) {
     sigma_cli_register(&g_sigma_cli, "sigma-mesh",        "Zero-Trust Overlay Network",      sigma_cmd_mesh);
     sigma_cli_register(&g_sigma_cli, "sigma-telemetry",   "Silicon Observability Tracing",   sigma_cmd_telemetry);
     sigma_cli_register(&g_sigma_cli, "sigma-handoff",     "Cross-Device State Resumption",   sigma_cmd_handoff);
+    sigma_cli_register(&g_sigma_cli, "sigma-dtrace",      "Silicon Dynamic Probing Engine",  sigma_cmd_dtrace);
+    sigma_cli_register(&g_sigma_cli, "sigma-drm",         "Hardware Direct Rendering",       sigma_cmd_drm);
+    sigma_cli_register(&g_sigma_cli, "sigma-airdrop",     "P2P Encrypted File Transfer",     sigma_cmd_airdrop);
+    sigma_cli_register(&g_sigma_cli, "sigma-sandbox",     "Capability-Based Jailing",        sigma_cmd_sandbox);
 
     sigma_cli_register(&g_sigma_cli, "sigma-help",  "Show this help",                       sigma_cmd_help);
 
