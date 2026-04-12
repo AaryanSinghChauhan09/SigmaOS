@@ -182,3 +182,29 @@ document.addEventListener('mousemove', (e) => {
         card.style.transform = 'rotateY(' + x + 'deg) rotateX(' + (-y) + 'deg)';
     });
 });
+
+// Matrix Terminal Effect
+const mCanvas = document.getElementById('matrix-canvas');
+const mCtx = mCanvas.getContext('2d');
+let drops = [];
+function initMatrix() {
+    mCanvas.width = mCanvas.parentElement.offsetWidth;
+    mCanvas.height = mCanvas.parentElement.offsetHeight;
+    drops = Array(Math.floor(mCanvas.width/20)).fill(0);
+}
+function drawMatrix() {
+    mCtx.fillStyle = 'rgba(0, 0, 0, 0.05)';
+    mCtx.fillRect(0, 0, mCanvas.width, mCanvas.height);
+    mCtx.fillStyle = '#00ffaa';
+    mCtx.font = '15px monospace';
+    drops.forEach((y, i) => {
+        const text = String.fromCharCode(0x30A0 + Math.random() * 96);
+        const x = i * 20;
+        mCtx.fillText(text, x, y);
+        if (y > mCanvas.height && Math.random() > 0.975) drops[i] = 0;
+        else drops[i] += 15;
+    });
+    requestAnimationFrame(drawMatrix);
+}
+initMatrix(); drawMatrix();
+window.addEventListener('resize', initMatrix);

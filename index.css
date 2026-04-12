@@ -169,4 +169,24 @@ body {
 .telemetry-bar { height: 10px; background: rgba(255,255,255,0.05); border-radius: 5px; overflow: hidden; }
 .telemetry-fill { height: 100%; background: linear-gradient(90deg, var(--acc-color), #00d2ff); box-shadow: 0 0 15px var(--acc-color); }
 
-.terminal-body { background: #000; color: #00ffaa; font-family: 'Courier New', monospace; padding: 20px; }
+.terminal-body { 
+    background: #000; 
+    color: #00ffaa; 
+    font-family: 'Courier New', monospace; 
+    padding: 20px; 
+    position: relative;
+    overflow: hidden;
+}
+
+#matrix-canvas {
+    position: absolute;
+    top: 0; left: 0; width: 100%; height: 100%;
+    z-index: 0;
+    opacity: 0.15;
+    pointer-events: none;
+}
+
+#shell-output {
+    position: relative;
+    z-index: 1;
+}
