@@ -118,6 +118,7 @@
             <div class="taskbar-item" id="btn-verify" title="Verify Integrity">🛡️</div>
             <div class="taskbar-item" id="btn-explorer" title="Sovereign Explorer">🚀</div>
             <div class="taskbar-item" id="btn-shell" title="Secure Shell">🧠</div>
+            <div class="taskbar-item" id="btn-ide" title="Sovereign IDE">⚡</div>
             <div class="taskbar-item" id="btn-portal" title="Multiverse Portal">🌀</div>
             <div class="taskbar-item" id="btn-save" title="Checkpoint">💾</div>
         </div>
@@ -148,6 +149,17 @@
         <div class="window-body terminal-body">
             <canvas id="matrix-canvas"></canvas>
             <div id="shell-output">root@sigma-zenith:~# _</div>
+        </div>
+    </div>
+
+    <div id="win-ide" class="window glass-dark hidden animate-fade-in aura-glow">
+        <div class="window-header">
+            <span>Σ Sovereign-IDE (Integrated Dimensional Environment)</span>
+            <button onclick="closeWindow('win-ide')">×</button>
+        </div>
+        <div class="window-body">
+            <textarea id="ide-editor" placeholder="/* Enter Sovereign Code to Patch Kernel... */"></textarea>
+            <button id="btn-patch">PATCH KERNEL</button>
         </div>
     </div>
 

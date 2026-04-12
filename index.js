@@ -336,3 +336,19 @@ if(btnPortal) {
         }, 1000);
     });
 }
+
+// Sovereign-IDE: Integrated Dimensional Environment Orchestrator
+document.getElementById('btn-ide').addEventListener('click', () => openWindow('win-ide'));
+document.getElementById('btn-patch').addEventListener('click', () => {
+    const code = document.getElementById('ide-editor').value;
+    document.body.classList.add('reality-burst');
+    setTimeout(() => {
+        document.body.classList.remove('reality-burst');
+        const patchLog = document.createElement('div');
+        patchLog.style.color = '#00ffaa'; patchLog.style.fontWeight = '900';
+        patchLog.textContent = 'S [IDE]: Real-time Kernel Patch Successful. New Shard Logic Integrated.';
+        logConsole.appendChild(patchLog);
+        logConsole.scrollTop = logConsole.scrollHeight;
+        document.getElementById('ide-editor').value = '';
+    }, 300);
+});
