@@ -134,7 +134,10 @@ SYSTEM_SHARDS := \
   kernel/modules/system/SovereignThermalShard.c     \
   kernel/modules/system/SovereignAudioEngineShard.c \
   kernel/modules/system/SovereignEcoShard.c         \
-  kernel/modules/system/SovereignBluetoothShard.c
+  kernel/modules/system/SovereignBluetoothShard.c   \
+  kernel/modules/system/SovereignFaceTrackShard.c   \
+  kernel/modules/storage/SovereignRAIDShard.c       \
+  kernel/modules/network/SovereignVPNShard.c
 
 # Filesystem
 FS_SHARDS := \

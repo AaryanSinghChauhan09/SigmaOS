@@ -162,6 +162,9 @@
 #include "../../../include/SovereignAudioEngineShard.h"
 #include "../../../include/SovereignEcoShard.h"
 #include "../../../include/SovereignBluetoothShard.h"
+#include "../../../include/SovereignRAIDShard.h"
+#include "../../../include/SovereignFaceTrackShard.h"
+#include "../../../include/SovereignVPNShard.h"
 
 /* Global CLI context */
 SigmaCLICtx_t g_sigma_cli;
@@ -2858,6 +2861,33 @@ sigma_err_t sigma_cmd_bt(int argc, char *argv[]) {
     return SIGMA_OK;
 }
 
+/* ---- sigma-raid --------------------------------------------------------- */
+sigma_err_t sigma_cmd_raid(int argc, char *argv[]) {
+    if (argc < 3) {
+        sigma_printf("Usage: sigma-raid [assemble <level> <count>]\n");
+        return SIGMA_OK; }
+    if (sigma_streq(argv[1], "assemble"))
+        sigma_raid_assemble((sigma_u32)sigma_atoi(argv[2]), (sigma_u32)sigma_atoi(argv[3]));
+    return SIGMA_OK;
+}
+
+/* ---- sigma-eye ---------------------------------------------------------- */
+sigma_err_t sigma_cmd_eye(int argc, char *argv[]) {
+    (void)argc; (void)argv;
+    sigma_gaze_calibrate();
+    return SIGMA_OK;
+}
+
+/* ---- sigma-vpn ---------------------------------------------------------- */
+sigma_err_t sigma_cmd_vpn(int argc, char *argv[]) {
+    if (argc < 2) {
+        sigma_printf("Usage: sigma-vpn [up <peer_ip>]\n");
+        return SIGMA_OK; }
+    if (sigma_streq(argv[1], "up") && argc >= 3)
+        sigma_vpn_up(argv[2]);
+    return SIGMA_OK;
+}
+
 /* ---- sigma-wizard ------------------------------------------------------ */
 sigma_err_t sigma_cmd_wizard(int argc, char *argv[]) {
     (void)argc; (void)argv;
@@ -3195,6 +3225,9 @@ void SovereignCLI_Init(void) {
     sigma_cli_register(&g_sigma_cli, "sigma-audio",       "Silicon Real-Time Audio Engine",  sigma_cmd_audio);
     sigma_cli_register(&g_sigma_cli, "sigma-eco",         "Power-Aware Efficiency Plan",     sigma_cmd_eco);
     sigma_cli_register(&g_sigma_cli, "sigma-bt",          "Silicon Bluetooth Mesh Stack",    sigma_cmd_bt);
+    sigma_cli_register(&g_sigma_cli, "sigma-raid",        "ZFS Matrix Storage Assembly",     sigma_cmd_raid);
+    sigma_cli_register(&g_sigma_cli, "sigma-eye",         "Spatial Gaze/Iris Tracking",      sigma_cmd_eye);
+    sigma_cli_register(&g_sigma_cli, "sigma-vpn",         "WireGuard Silicon Networking",    sigma_cmd_vpn);
 
     sigma_cli_register(&g_sigma_cli, "sigma-help",  "Show this help",                       sigma_cmd_help);
 
