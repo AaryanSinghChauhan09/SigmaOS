@@ -520,7 +520,16 @@ SYSTEM_SHARDS := \
   kernel/modules/system/SovereignCosmicV3000Shard.c  \
   kernel/modules/system/SovereignStellarV3000Shard.c \
   kernel/modules/system/SovereignInfinityV3000Shard.c \
-  kernel/modules/system/Sovereign300000THShard.c
+  kernel/modules/system/Sovereign300000THShard.c      \
+  kernel/modules/system/SovereignUniversalBioShard.c  \
+  kernel/modules/system/SovereignUniversalEnergyShard.c \
+  kernel/modules/system/SovereignNeuralLatticeShard.c \
+  kernel/modules/system/SovereignAetherV5000Shard.c   \
+  kernel/modules/system/SovereignVoidV5000Shard.c     \
+  kernel/modules/system/SovereignCosmicV5000Shard.c   \
+  kernel/modules/system/SovereignStellarV5000Shard.c  \
+  kernel/modules/system/SovereignInfinityV5000Shard.c \
+  kernel/modules/system/Sovereign500000THShard.c
 
 # Storage
 STORAGE_SHARDS := \

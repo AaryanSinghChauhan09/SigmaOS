@@ -312,6 +312,9 @@
 #include "../../../include/SovereignUniversalSyncShard.h"
 #include "../../../include/SovereignAbsoluteMatrixShard.h"
 #include "../../../include/Sovereign300000THShard.h"
+#include "../../../include/SovereignUniversalBioShard.h"
+#include "../../../include/SovereignUniversalEnergyShard.h"
+#include "../../../include/Sovereign500000THShard.h"
 
 /* Global CLI context */
 SigmaCLICtx_t g_sigma_cli;
@@ -4237,6 +4240,27 @@ sigma_err_t sigma_cmd_ascend_300k(int argc, char *argv[]) {
     return SIGMA_OK;
 }
 
+/* ---- sigma-bio-sync ----------------------------------------------------- */
+sigma_err_t sigma_cmd_bio_sync(int argc, char *argv[]) {
+    (void)argc; (void)argv;
+    sigma_bio_matrix_sync();
+    return SIGMA_OK;
+}
+
+/* ---- sigma-energy-sync -------------------------------------------------- */
+sigma_err_t sigma_cmd_energy_sync(int argc, char *argv[]) {
+    (void)argc; (void)argv;
+    sigma_energy_manifold_sync();
+    return SIGMA_OK;
+}
+
+/* ---- sigma-ascend-500000 ------------------------------------------------ */
+sigma_err_t sigma_cmd_ascend_500k(int argc, char *argv[]) {
+    (void)argc; (void)argv;
+    sigma_half_million_ascend();
+    return SIGMA_OK;
+}
+
 /* ---- sigma-wizard ------------------------------------------------------ */
 sigma_err_t sigma_cmd_wizard(int argc, char *argv[]) {
     (void)argc; (void)argv;
@@ -4727,6 +4751,9 @@ void SovereignCLI_Init(void) {
     sigma_cli_register(&g_sigma_cli, "sigma-repo-matrix-sync", "Sync matrix to external repo", sigma_cmd_repo_matrix_sync);
     sigma_cli_register(&g_sigma_cli, "sigma-matrix-simulate", "Simulate Type-0 hypervisor matrix", sigma_cmd_matrix_simulate);
     sigma_cli_register(&g_sigma_cli, "sigma-ascend-300k", "The 300000th Shard: Tri-Centennial", sigma_cmd_ascend_300k);
+    sigma_cli_register(&g_sigma_cli, "sigma-bio-sync", "Sync matrix to native biometric freq", sigma_cmd_bio_sync);
+    sigma_cli_register(&g_sigma_cli, "sigma-energy-sync", "Sync energy manifolds to zero-entropy", sigma_cmd_energy_sync);
+    sigma_cli_register(&g_sigma_cli, "sigma-ascend-500k", "The 500000th Shard: Half-Million", sigma_cmd_ascend_500k);
 
     sigma_cli_register(&g_sigma_cli, "sigma-help",  "Show this help",                       sigma_cmd_help);
 
