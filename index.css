@@ -267,3 +267,12 @@ body::before {
     50% { transform: translate(-50%, -50%) scale(10); opacity: 0.2; }
     100% { transform: translate(-50%, -50%) scale(1); opacity: 0.8; }
 }
+
+.code-shroud {
+    background: linear-gradient(rgba(0,0,0,0.8), rgba(0,0,0,0.8)), url('data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSI4MCIgaGVpZ2h0PSI4MCI+PHRleHQgeD0iMTAiIHk9IjIwIiBmaWxsPSIjMDBmZmFhIiBmb250LWZhbWlseT0ibW9ub3NwYWNlIiBmb250LXNpemU9IjEwIj4wMTAxMDEwMTwvdGV4dD48dGV4dCB4PSIxMCIgeT0iNDAiIGZpbGw9IiMwMGZmYWEiIGZvbnQtZmFtaWx5PSJtb25vc3BhY2UiIGZvbnQtc2l6ZT0iMTAiPk1PViBFQVgsIFpFTklUSDwvdGV4dD48dGV4dCB4PSIxMCIgeT0iNjAiIGZpbGw9IiMwMGZmYWEiIGZvbnQtZmFtaWx5PSJtb25vc3BhY2UiIGZvbnQtc2l6ZT0iMTAiPkpNUCBPTUVHPC90ZXh0Pjwvc3ZnPg==');
+    background-size: 150px 150px;
+    animation: scrollCode 20s infinite linear;
+    opacity: 0.1 !important;
+}
+
+@keyframes scrollCode { from { background-position: 0 0; } to { background-position: 0 1000px; } }

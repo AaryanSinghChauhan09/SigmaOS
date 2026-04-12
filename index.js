@@ -420,3 +420,17 @@ if(btnDissolve) {
         }, 2000);
     });
 }
+
+// Entropy Pulsar: Relativistic Pulse Adaptation
+setInterval(() => {
+    const pulse = document.getElementById('singularity-pulse');
+    const duration = Math.random() * 3 + 0.5;
+    pulse.style.animationDuration = duration + 's';
+    console.log('S [ENTROPY]: Adapting pulse frequency to ' + duration.toFixed(2) + 'Hz');
+    
+    const entropyBar = document.getElementById('entropy-bar');
+    if(entropyBar) {
+        const newEntropy = Math.floor(Math.random() * 40) + 10;
+        entropyBar.style.width = newEntropy + '%';
+    }
+}, 10000);
