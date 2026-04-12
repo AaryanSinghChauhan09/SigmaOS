@@ -27,6 +27,7 @@
 #include "../../../include/SovereignDarwinXNU.h"
 #include "../../../include/SovereignPersonalizer.h"
 #include "../../../include/SovereignAIKernel.h"
+#include "../../../include/SovereignDistroSlinger.h"
 
 /* Global CLI context */
 SigmaCLICtx_t g_sigma_cli;
@@ -471,6 +472,28 @@ sigma_err_t sigma_cmd_personalize(int argc, char *argv[]) {
     return SIGMA_OK;
 }
 
+/* ---- sigma-distro ------------------------------------------------------ */
+sigma_err_t sigma_cmd_distro(int argc, char *argv[]) {
+    static SovereignDistroSlinger_t g_slinger;
+    static sigma_bool init = SIGMA_FALSE;
+    if (!init) { g_slinger = SovereignDistroSlinger_Create(); init = SIGMA_TRUE; }
+
+    if (argc < 2) {
+        g_slinger.audit_shards(&g_slinger);
+        sigma_printf("Usage: sigma-distro [-load <path> <name> | -map | -spawn]\n");
+        return SIGMA_OK;
+    }
+
+    if (sigma_streq(argv[1], "-load") && argc >= 4) {
+        g_slinger.load_shard(&g_slinger, argv[2], argv[3]);
+    } else if (sigma_streq(argv[1], "-map")) {
+        g_slinger.map_syscalls(&g_slinger);
+    } else if (sigma_streq(argv[1], "-spawn")) {
+        g_slinger.spawn_autonomous(&g_slinger);
+    }
+    return SIGMA_OK;
+}
+
 /* ---- sigma-ai ---------------------------------------------------------- */
 sigma_err_t sigma_cmd_ai(int argc, char *argv[]) {
     if (argc < 2) {
@@ -690,6 +713,7 @@ void SovereignCLI_Init(void) {
     sigma_cli_register(&g_sigma_cli, "sigma-ai",          "Predictive Matrix Control",       sigma_cmd_ai);
     sigma_cli_register(&g_sigma_cli, "sigma-wizard",      "Guided Setup Master",             sigma_cmd_wizard);
     sigma_cli_register(&g_sigma_cli, "sigma-alias",       "Create command aliases",          sigma_cmd_alias);
+    sigma_cli_register(&g_sigma_cli, "sigma-distro",      "Sovereign Distro Lifecycle",      sigma_cmd_distro);
 
     sigma_cli_register(&g_sigma_cli, "sigma-help",  "Show this help",                       sigma_cmd_help);
 
