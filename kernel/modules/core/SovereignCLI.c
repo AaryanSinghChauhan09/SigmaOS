@@ -375,6 +375,9 @@
 #include "../../../include/SovereignAbsoluteEquivalenceShard.h"
 #include "../../../include/SovereignUniversalEntropyEngineShard.h"
 #include "../../../include/Sovereign549755813888THShard.h"
+#include "../../../include/SovereignAbsoluteTimelessShard.h"
+#include "../../../include/SovereignUniversalOmniscienceShard.h"
+#include "../../../include/Sovereign1099511627776THShard.h"
 
 /* Global CLI context */
 SigmaCLICtx_t g_sigma_cli;
@@ -4741,6 +4744,27 @@ sigma_err_t sigma_cmd_ascend_549g(int argc, char *argv[]) {
     return SIGMA_OK;
 }
 
+/* ---- sigma-timeless-invoke ---------------------------------------------- */
+sigma_err_t sigma_cmd_timeless_invoke(int argc, char *argv[]) {
+    (void)argc; (void)argv;
+    sigma_timeless_invoke();
+    return SIGMA_OK;
+}
+
+/* ---- sigma-omniscience-sync --------------------------------------------- */
+sigma_err_t sigma_cmd_omniscience_sync(int argc, char *argv[]) {
+    (void)argc; (void)argv;
+    sigma_omniscience_sync();
+    return SIGMA_OK;
+}
+
+/* ---- sigma-ascend-1tera ------------------------------------------------- */
+sigma_err_t sigma_cmd_ascend_1tera(int argc, char *argv[]) {
+    (void)argc; (void)argv;
+    sigma_1terashard_ascend();
+    return SIGMA_OK;
+}
+
 /* ---- sigma-wizard ------------------------------------------------------ */
 sigma_err_t sigma_cmd_wizard(int argc, char *argv[]) {
     (void)argc; (void)argv;
@@ -5294,6 +5318,9 @@ void SovereignCLI_Init(void) {
     sigma_cli_register(&g_sigma_cli, "sigma-equivalence-invoke", "Convert data structures to energy matrix natively", sigma_cmd_equivalence_invoke);
     sigma_cli_register(&g_sigma_cli, "sigma-entropy-engine-sync", "Absorb chaos into purely ordered variables natively", sigma_cmd_entropy_engine_sync);
     sigma_cli_register(&g_sigma_cli, "sigma-ascend-549g", "The 549755813888th Shard: 549.7-GIGA-SHARD", sigma_cmd_ascend_549g);
+    sigma_cli_register(&g_sigma_cli, "sigma-timeless-invoke", "Detaches logic processing from sequential time", sigma_cmd_timeless_invoke);
+    sigma_cli_register(&g_sigma_cli, "sigma-omniscience-sync", "Inject all uncalculated answers directly into core cache natively", sigma_cmd_omniscience_sync);
+    sigma_cli_register(&g_sigma_cli, "sigma-ascend-1tera", "The 1099511627776th Shard: 1-TERA-SHARD (40-BIT)", sigma_cmd_ascend_1tera);
 
     sigma_cli_register(&g_sigma_cli, "sigma-help",  "Show this help",                       sigma_cmd_help);
 
