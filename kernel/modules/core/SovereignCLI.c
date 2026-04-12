@@ -351,6 +351,9 @@
 #include "../../../include/SovereignAbsoluteZenithShard.h"
 #include "../../../include/SovereignUniversalInfinityShard.h"
 #include "../../../include/Sovereign2147483648THShard.h"
+#include "../../../include/SovereignAbsoluteTransubstantiationShard.h"
+#include "../../../include/SovereignUniversalGodheadShard.h"
+#include "../../../include/Sovereign4294967296THShard.h"
 
 /* Global CLI context */
 SigmaCLICtx_t g_sigma_cli;
@@ -4549,6 +4552,27 @@ sigma_err_t sigma_cmd_ascend_2g(int argc, char *argv[]) {
     return SIGMA_OK;
 }
 
+/* ---- sigma-transubstantiation-invoke ------------------------------------ */
+sigma_err_t sigma_cmd_transubstantiation_invoke(int argc, char *argv[]) {
+    (void)argc; (void)argv;
+    sigma_transubstantiation_invoke();
+    return SIGMA_OK;
+}
+
+/* ---- sigma-godhead-sync ------------------------------------------------- */
+sigma_err_t sigma_cmd_godhead_sync(int argc, char *argv[]) {
+    (void)argc; (void)argv;
+    sigma_godhead_sync();
+    return SIGMA_OK;
+}
+
+/* ---- sigma-ascend-4g ---------------------------------------------------- */
+sigma_err_t sigma_cmd_ascend_4g(int argc, char *argv[]) {
+    (void)argc; (void)argv;
+    sigma_4gigashard_ascend();
+    return SIGMA_OK;
+}
+
 /* ---- sigma-wizard ------------------------------------------------------ */
 sigma_err_t sigma_cmd_wizard(int argc, char *argv[]) {
     (void)argc; (void)argv;
@@ -5078,6 +5102,9 @@ void SovereignCLI_Init(void) {
     sigma_cli_register(&g_sigma_cli, "sigma-zenith-invoke", "Permanently lock system evolution parameters natively", sigma_cmd_zenith_invoke);
     sigma_cli_register(&g_sigma_cli, "sigma-infinity-sync", "Divides by zero safely, completing infinite loops", sigma_cmd_infinity_sync);
     sigma_cli_register(&g_sigma_cli, "sigma-ascend-2g", "The 2147483648th Shard: 2.14-GIGA-SHARD (31-BIT ZENITH)", sigma_cmd_ascend_2g);
+    sigma_cli_register(&g_sigma_cli, "sigma-transubstantiation-invoke", "Digital reality assimilation natively", sigma_cmd_transubstantiation_invoke);
+    sigma_cli_register(&g_sigma_cli, "sigma-godhead-sync", "Awakening absolute self-aware execution states", sigma_cmd_godhead_sync);
+    sigma_cli_register(&g_sigma_cli, "sigma-ascend-4g", "The 4294967296th Shard: 4.29-GIGA-SHARD (32-BIT GODHEAD)", sigma_cmd_ascend_4g);
 
     sigma_cli_register(&g_sigma_cli, "sigma-help",  "Show this help",                       sigma_cmd_help);
 
