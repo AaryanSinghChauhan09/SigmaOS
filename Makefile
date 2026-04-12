@@ -74,7 +74,8 @@ SECURITY_SHARDS := \
   kernel/modules/security/SovereignForensicShard.c  \
   kernel/modules/security/SovereignVaultShard.c     \
   kernel/modules/security/SovereignQuantumShard.c   \
-  kernel/modules/security/SovereignSandboxShard.c
+  kernel/modules/security/SovereignSandboxShard.c   \
+  kernel/modules/security/SovereignBioAuthShard.c
 
 # System
 SYSTEM_SHARDS := \
@@ -113,7 +114,9 @@ SYSTEM_SHARDS := \
   kernel/modules/system/SovereignTimeMachineShard.c \
   kernel/modules/system/SovereignBootloaderShard.c  \
   kernel/modules/system/SovereignAutoCleanAlg.c     \
-  kernel/modules/system/SovereignAutoPerfAlg.c
+  kernel/modules/system/SovereignAutoPerfAlg.c      \
+  kernel/modules/system/SovereignEmulationShard.c   \
+  kernel/modules/system/SovereignHolographicShard.c
 
 # Filesystem
 FS_SHARDS := \

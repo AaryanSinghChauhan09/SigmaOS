@@ -141,6 +141,9 @@
 #include "../../../include/SovereignTestShard.h"
 #include "../../../include/SovereignAutoCleanAlg.h"
 #include "../../../include/SovereignAutoPerfAlg.h"
+#include "../../../include/SovereignBioAuthShard.h"
+#include "../../../include/SovereignEmulationShard.h"
+#include "../../../include/SovereignHolographicShard.h"
 
 /* Global CLI context */
 SigmaCLICtx_t g_sigma_cli;
@@ -2627,6 +2630,38 @@ sigma_err_t sigma_cmd_autoperf(int argc, char *argv[]) {
     return SIGMA_OK;
 }
 
+/* ---- sigma-bioauth ------------------------------------------------------ */
+sigma_err_t sigma_cmd_bioauth(int argc, char *argv[]) {
+    if (argc < 2) {
+        sigma_printf("Usage: sigma-bioauth [scan]\n");
+        return SIGMA_OK; }
+    if (sigma_streq(argv[1], "scan"))
+        sigma_bioauth_scan();
+    return SIGMA_OK;
+}
+
+/* ---- sigma-emulate ------------------------------------------------------ */
+sigma_err_t sigma_cmd_emulate(int argc, char *argv[]) {
+    if (argc < 2) {
+        sigma_printf("Usage: sigma-emulate [run <binary_arch>]\n");
+        return SIGMA_OK; }
+    if (sigma_streq(argv[1], "run") && argc >= 3)
+        sigma_emulate_run(argv[2]);
+    return SIGMA_OK;
+}
+
+/* ---- sigma-holo --------------------------------------------------------- */
+sigma_err_t sigma_cmd_holo(int argc, char *argv[]) {
+    if (argc < 2) {
+        sigma_printf("Usage: sigma-holo [anchor <win_id> <z_depth>]\n");
+        return SIGMA_OK; }
+    if (sigma_streq(argv[1], "anchor") && argc >= 4) {
+        // Mock parsing the float string
+        sigma_holo_anchor((sigma_u32)sigma_atoi(argv[2]), 1.5f);
+    }
+    return SIGMA_OK;
+}
+
 /* ---- sigma-wizard ------------------------------------------------------ */
 sigma_err_t sigma_cmd_wizard(int argc, char *argv[]) {
     (void)argc; (void)argv;
@@ -2943,6 +2978,9 @@ void SovereignCLI_Init(void) {
     sigma_cli_register(&g_sigma_cli, "sigma-test",        "Silicon Algorithm Validation",    sigma_cmd_test);
     sigma_cli_register(&g_sigma_cli, "sigma-autoclean",   "Heuristic Deep System Purger",    sigma_cmd_autoclean);
     sigma_cli_register(&g_sigma_cli, "sigma-autoperf",    "Dynamic Hardware Scaling",        sigma_cmd_autoperf);
+    sigma_cli_register(&g_sigma_cli, "sigma-bioauth",     "Hardware Depth Scanning Auth",    sigma_cmd_bioauth);
+    sigma_cli_register(&g_sigma_cli, "sigma-emulate",     "AOT/JIT Binary Translation",      sigma_cmd_emulate);
+    sigma_cli_register(&g_sigma_cli, "sigma-holo",        "Spatial Z-Depth Compositing",     sigma_cmd_holo);
 
     sigma_cli_register(&g_sigma_cli, "sigma-help",  "Show this help",                       sigma_cmd_help);
 
