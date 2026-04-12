@@ -556,7 +556,11 @@ SYSTEM_SHARDS := \
   kernel/modules/system/Sovereign134217728THShard.c \
   kernel/modules/system/SovereignAbsoluteEquilibriumShard.c \
   kernel/modules/system/SovereignUniversalTeleportationShard.c \
-  kernel/modules/system/Sovereign268435456THShard.c
+  kernel/modules/system/Sovereign268435456THShard.c \
+  kernel/modules/system/SovereignAbsoluteAssimilationShard.c \
+  kernel/modules/system/SovereignUniversalPrecognitionShard.c \
+  kernel/modules/system/Sovereign536870912THShard.c
+
 
 
 

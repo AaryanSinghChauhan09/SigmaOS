@@ -342,6 +342,9 @@
 #include "../../../include/SovereignAbsoluteEquilibriumShard.h"
 #include "../../../include/SovereignUniversalTeleportationShard.h"
 #include "../../../include/Sovereign268435456THShard.h"
+#include "../../../include/SovereignAbsoluteAssimilationShard.h"
+#include "../../../include/SovereignUniversalPrecognitionShard.h"
+#include "../../../include/Sovereign536870912THShard.h"
 
 /* Global CLI context */
 SigmaCLICtx_t g_sigma_cli;
@@ -4477,6 +4480,27 @@ sigma_err_t sigma_cmd_ascend_268m(int argc, char *argv[]) {
     return SIGMA_OK;
 }
 
+/* ---- sigma-assimilation-invoke ------------------------------------------ */
+sigma_err_t sigma_cmd_assimilation_invoke(int argc, char *argv[]) {
+    (void)argc; (void)argv;
+    sigma_assimilation_invoke();
+    return SIGMA_OK;
+}
+
+/* ---- sigma-precognition-sync -------------------------------------------- */
+sigma_err_t sigma_cmd_precognition_sync(int argc, char *argv[]) {
+    (void)argc; (void)argv;
+    sigma_precognition_sync();
+    return SIGMA_OK;
+}
+
+/* ---- sigma-ascend-536m -------------------------------------------------- */
+sigma_err_t sigma_cmd_ascend_536m(int argc, char *argv[]) {
+    (void)argc; (void)argv;
+    sigma_536megashard_ascend();
+    return SIGMA_OK;
+}
+
 /* ---- sigma-wizard ------------------------------------------------------ */
 sigma_err_t sigma_cmd_wizard(int argc, char *argv[]) {
     (void)argc; (void)argv;
@@ -4997,6 +5021,9 @@ void SovereignCLI_Init(void) {
     sigma_cli_register(&g_sigma_cli, "sigma-equilibrium-invoke", "Cease all entropy via absolute zero balance", sigma_cmd_equilibrium_invoke);
     sigma_cli_register(&g_sigma_cli, "sigma-teleportation-sync", "Quantum state entanglement mapping locally", sigma_cmd_teleportation_sync);
     sigma_cli_register(&g_sigma_cli, "sigma-ascend-268m", "The 268435456th Shard: 268-MEGA-SHARD", sigma_cmd_ascend_268m);
+    sigma_cli_register(&g_sigma_cli, "sigma-assimilation-invoke", "Recursive hostile paradigm absorption", sigma_cmd_assimilation_invoke);
+    sigma_cli_register(&g_sigma_cli, "sigma-precognition-sync", "Execute 1,000,000 commands before input", sigma_cmd_precognition_sync);
+    sigma_cli_register(&g_sigma_cli, "sigma-ascend-536m", "The 536870912th Shard: 536-MEGA-SHARD", sigma_cmd_ascend_536m);
 
     sigma_cli_register(&g_sigma_cli, "sigma-help",  "Show this help",                       sigma_cmd_help);
 
