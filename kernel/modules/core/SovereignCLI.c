@@ -348,6 +348,9 @@
 #include "../../../include/SovereignAbsoluteSingularityShard.h"
 #include "../../../include/SovereignUniversalOmnipotenceShard.h"
 #include "../../../include/Sovereign1073741824THShard.h"
+#include "../../../include/SovereignAbsoluteZenithShard.h"
+#include "../../../include/SovereignUniversalInfinityShard.h"
+#include "../../../include/Sovereign2147483648THShard.h"
 
 /* Global CLI context */
 SigmaCLICtx_t g_sigma_cli;
@@ -4525,6 +4528,27 @@ sigma_err_t sigma_cmd_ascend_1g(int argc, char *argv[]) {
     return SIGMA_OK;
 }
 
+/* ---- sigma-zenith-invoke ------------------------------------------------ */
+sigma_err_t sigma_cmd_zenith_invoke(int argc, char *argv[]) {
+    (void)argc; (void)argv;
+    sigma_zenith_invoke();
+    return SIGMA_OK;
+}
+
+/* ---- sigma-infinity-sync ------------------------------------------------ */
+sigma_err_t sigma_cmd_infinity_sync(int argc, char *argv[]) {
+    (void)argc; (void)argv;
+    sigma_infinity_sync();
+    return SIGMA_OK;
+}
+
+/* ---- sigma-ascend-2g ---------------------------------------------------- */
+sigma_err_t sigma_cmd_ascend_2g(int argc, char *argv[]) {
+    (void)argc; (void)argv;
+    sigma_2gigashard_ascend();
+    return SIGMA_OK;
+}
+
 /* ---- sigma-wizard ------------------------------------------------------ */
 sigma_err_t sigma_cmd_wizard(int argc, char *argv[]) {
     (void)argc; (void)argv;
@@ -5051,6 +5075,9 @@ void SovereignCLI_Init(void) {
     sigma_cli_register(&g_sigma_cli, "sigma-singularity-invoke", "Compress execution matrix to zero-point density", sigma_cmd_singularity_invoke);
     sigma_cli_register(&g_sigma_cli, "sigma-omnipotence-sync", "Absolute logic override across physical reality", sigma_cmd_omnipotence_sync);
     sigma_cli_register(&g_sigma_cli, "sigma-ascend-1g", "The 1073741824th Shard: 1-GIGA-SHARD", sigma_cmd_ascend_1g);
+    sigma_cli_register(&g_sigma_cli, "sigma-zenith-invoke", "Permanently lock system evolution parameters natively", sigma_cmd_zenith_invoke);
+    sigma_cli_register(&g_sigma_cli, "sigma-infinity-sync", "Divides by zero safely, completing infinite loops", sigma_cmd_infinity_sync);
+    sigma_cli_register(&g_sigma_cli, "sigma-ascend-2g", "The 2147483648th Shard: 2.14-GIGA-SHARD (31-BIT ZENITH)", sigma_cmd_ascend_2g);
 
     sigma_cli_register(&g_sigma_cli, "sigma-help",  "Show this help",                       sigma_cmd_help);
 
