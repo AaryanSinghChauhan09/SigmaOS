@@ -168,6 +168,150 @@
 #include "../../../include/SovereignNeuralSynthShard.h"
 #include "../../../include/SovereignDockerShard.h"
 #include "../../../include/SovereignDefenderShard.h"
+#include "../../../include/SovereignP2PShard.h"
+#include "../../../include/SovereignQKDAlg.h"
+#include "../../../include/SovereignBootAuditShard.h"
+#include "../../../include/SovereignEEGShard.h"
+#include "../../../include/SovereignMemTagShard.h"
+#include "../../../include/SovereignLivePatchShard.h"
+#include "../../../include/SovereignQubitShard.h"
+#include "../../../include/SovereignAIHackerShard.h"
+#include "../../../include/SovereignMeshOSShard.h"
+#include "../../../include/SovereignEEGMeshShard.h"
+#include "../../../include/SovereignFoundryShard.h"
+#include "../../../include/SovereignExascaleShard.h"
+#include "../../../include/SovereignDysonShard.h"
+#include "../../../include/SovereignVoyagerShard.h"
+#include "../../../include/SovereignBioForgeShard.h"
+#include "../../../include/SovereignSingularityShard.h"
+#include "../../../include/SovereignParadoxShard.h"
+#include "../../../include/SovereignChronosShard.h"
+#include "../../../include/SovereignEtherShard.h"
+#include "../../../include/SovereignNullShard.h"
+#include "../../../include/SovereignVoidShard.h"
+#include "../../../include/SovereignQNXShard.h"
+#include "../../../include/SovereignBeOSShard.h"
+#include "../../../include/SovereignAmigaShard.h"
+#include "../../../include/SovereignMulticsShard.h"
+#include "../../../include/SovereignOpenVMSShard.h"
+#include "../../../include/SovereignOS2Shard.h"
+#include "../../../include/SovereignS360Shard.h"
+#include "../../../include/SovereignAltoShard.h"
+#include "../../../include/SovereignCrayShard.h"
+#include "../../../include/SovereignAeroShard.h"
+#include "../../../include/SovereignAquaShard.h"
+#include "../../../include/SovereignMaterialShard.h"
+#include "../../../include/SovereignMetroShard.h"
+#include "../../../include/SovereignGamingShard.h"
+#include "../../../include/SovereignProAudioShard.h"
+#include "../../../include/SovereignSymbianShard.h"
+#include "../../../include/SovereignStudioShard.h"
+#include "../../../include/SovereignSensoryShard.h"
+#include "../../../include/SovereignCryptoShard.h"
+#include "../../../include/SovereignSpaceShard.h"
+#include "../../../include/SovereignHiveShard.h"
+#include "../../../include/SovereignQuantumMemoryShard.h"
+#include "../../../include/SovereignAmnesicScrubShard.h"
+#include "../../../include/SovereignDarkMeshShard.h"
+#include "../../../include/SovereignSupernovaShard.h"
+#include "../../../include/SovereignZenithShard.h"
+#include "../../../include/SovereignAbsoluteShard.h"
+#include "../../../include/SovereignOmegaShard.h"
+#include "../../../include/SovereignUnityShard.h"
+#include "../../../include/SovereignAbsoluteFinalityShard.h"
+#include "../../../include/SovereignRealityEngineShard.h"
+#include "../../../include/SovereignQuantumTeleportShard.h"
+#include "../../../include/SovereignGarudaShard.h"
+#include "../../../include/SovereignNixShard.h"
+#include "../../../include/SovereignQubesShard.h"
+#include "../../../include/SovereignAndroidShard.h"
+#include "../../../include/SovereignIOSShard.h"
+#include "../../../include/SovereignPSShard.h"
+#include "../../../include/SovereignCleanerShard.h"
+#include "../../../include/SovereignPerfGovShard.h"
+#include "../../../include/SovereignOmegaPointShard.h"
+#include "../../../include/SovereignAutoCorrectShard.h"
+#include "../../../include/SovereignBioSyncShard.h"
+#include "../../../include/SovereignGeneticShard.h"
+#include "../../../include/SovereignNeuralWorkspaceShard.h"
+#include "../../../include/Sovereign333RDShard.h"
+#include "../../../include/SovereignSelfCompilerShard.h"
+#include "../../../include/SovereignForensicShrinkShard.h"
+#include "../../../include/SovereignSolar365Shard.h"
+#include "../../../include/SovereignChipDesignerShard.h"
+#include "../../../include/SovereignCryoShard.h"
+#include "../../../include/SovereignSpartan400Shard.h"
+#include "../../../include/SovereignAISynthShard.h"
+#include "../../../include/SovereignAuraShard.h"
+#include "../../../include/SovereignZenithFinalShard.h"
+#include "../../../include/SovereignMARShard.h"
+#include "../../../include/SovereignAuraV2Shard.h"
+#include "../../../include/Sovereign600THShard.h"
+#include "../../../include/SovereignQTShard.h"
+#include "../../../include/SovereignAACShard.h"
+#include "../../../include/SovereignG777THShard.h"
+#include "../../../include/SovereignUniversalLangShard.h"
+#include "../../../include/SovereignFabricShard.h"
+#include "../../../include/SovereignMillenniumShard.h"
+#include "../../../include/SovereignHiveKernelShard.h"
+#include "../../../include/SovereignNanoBootV2Shard.h"
+#include "../../../include/Sovereign1111THShard.h"
+#include "../../../include/SovereignCanvasShard.h"
+#include "../../../include/SovereignMusicSynthShard.h"
+#include "../../../include/Sovereign1337THShard.h"
+#include "../../../include/SovereignAtomicFSShard.h"
+#include "../../../include/SovereignNeuralGhostShard.h"
+#include "../../../include/Sovereign2048THShard.h"
+#include "../../../include/SovereignGrandMasterShard.h"
+#include "../../../include/SovereignOmniPresenceShard.h"
+#include "../../../include/Sovereign3000THShard.h"
+#include "../../../include/SovereignGalacticShard.h"
+#include "../../../include/SovereignDysonShard.h"
+#include "../../../include/Sovereign3333THShard.h"
+#include "../../../include/SovereignMultiverseShard.h"
+#include "../../../include/SovereignTruthShard.h"
+#include "../../../include/Sovereign4096THShard.h"
+#include "../../../include/SovereignLatticeMasterShard.h"
+#include "../../../include/SovereignPentathlonShard.h"
+#include "../../../include/SovereignLegacyAbsorberShard.h"
+#include "../../../include/SovereignAmorphousShard.h"
+#include "../../../include/SovereignSeraphimShard.h"
+#include "../../../include/SovereignEternalClockShard.h"
+#include "../../../include/SovereignInfiniteDataShard.h"
+#include "../../../include/Sovereign8192THShard.h"
+#include "../../../include/SovereignOmniLogicShard.h"
+#include "../../../include/SovereignAbsoluteUserShard.h"
+#include "../../../include/Sovereign10000THShard.h"
+#include "../../../include/SovereignAbsoluteUIShard.h"
+#include "../../../include/SovereignHiveMindShard.h"
+#include "../../../include/Sovereign12000THShard.h"
+#include "../../../include/SovereignAbsolutePrivacyShard.h"
+#include "../../../include/SovereignEternalOptShard.h"
+#include "../../../include/Sovereign16384THShard.h"
+#include "../../../include/SovereignAbsoluteFileShard.h"
+#include "../../../include/SovereignNeuralBridgeShard.h"
+#include "../../../include/Sovereign20000THShard.h"
+#include "../../../include/SovereignFormalVerifyShard.h"
+#include "../../../include/SovereignAbsoluteEntropyShard.h"
+#include "../../../include/Sovereign32768THShard.h"
+#include "../../../include/SovereignUniversalParserShard.h"
+#include "../../../include/SovereignTimeCrystalShard.h"
+#include "../../../include/Sovereign65536THShard.h"
+#include "../../../include/SovereignUniversalAlgoShard.h"
+#include "../../../include/SovereignAbsoluteMemoryShard.h"
+#include "../../../include/Sovereign100000THShard.h"
+#include "../../../include/SovereignUniversalCompilerShard.h"
+#include "../../../include/SovereignEternalMeshShard.h"
+#include "../../../include/Sovereign131072NDShard.h"
+#include "../../../include/SovereignUniversalLogicShard.h"
+#include "../../../include/SovereignGlobalRegistryShard.h"
+#include "../../../include/Sovereign200000THShard.h"
+#include "../../../include/SovereignUniversalStorageShard.h"
+#include "../../../include/SovereignQuantumStateShard.h"
+#include "../../../include/Sovereign262144THShard.h"
+#include "../../../include/SovereignUniversalSyncShard.h"
+#include "../../../include/SovereignAbsoluteMatrixShard.h"
+#include "../../../include/Sovereign300000THShard.h"
 
 /* Global CLI context */
 SigmaCLICtx_t g_sigma_cli;
@@ -2921,6 +3065,1178 @@ sigma_err_t sigma_cmd_defender(int argc, char *argv[]) {
     return SIGMA_OK;
 }
 
+/* ---- sigma-p2p ---------------------------------------------------------- */
+sigma_err_t sigma_cmd_p2p(int argc, char *argv[]) {
+    if (argc < 2) {
+        sigma_printf("Usage: sigma-p2p [announce <cid>]\n");
+        return SIGMA_OK; }
+    if (sigma_streq(argv[1], "announce") && argc >= 3)
+        sigma_p2p_announce(argv[2]);
+    return SIGMA_OK;
+}
+
+/* ---- sigma-qkd ---------------------------------------------------------- */
+sigma_err_t sigma_cmd_qkd(int argc, char *argv[]) {
+    if (argc < 2) {
+        sigma_printf("Usage: sigma-qkd [exchange <node_id>]\n");
+        return SIGMA_OK; }
+    if (sigma_streq(argv[1], "exchange") && argc >= 3)
+        sigma_qkd_exchange(argv[2]);
+    return SIGMA_OK;
+}
+
+/* ---- sigma-boot-audit --------------------------------------------------- */
+sigma_err_t sigma_cmd_boot_audit(int argc, char *argv[]) {
+    (void)argc; (void)argv;
+    sigma_boot_verify();
+    return SIGMA_OK;
+}
+
+/* ---- sigma-eeg ---------------------------------------------------------- */
+sigma_err_t sigma_cmd_eeg(int argc, char *argv[]) {
+    (void)argc; (void)argv;
+    sigma_eeg_scan();
+    return SIGMA_OK;
+}
+
+/* ---- sigma-tag ---------------------------------------------------------- */
+sigma_err_t sigma_cmd_tag(int argc, char *argv[]) {
+    if (argc < 3) {
+        sigma_printf("Usage: sigma-tag [ptr] [size] [tag]\n");
+        return SIGMA_OK; }
+    sigma_mem_tag((void*)sigma_atoi(argv[1]), (sigma_size_t)sigma_atoi(argv[2]), (sigma_u8)sigma_atoi(argv[3]));
+    return SIGMA_OK;
+}
+
+/* ---- sigma-patch -------------------------------------------------------- */
+sigma_err_t sigma_cmd_patch(int argc, char *argv[]) {
+    if (argc < 2) {
+        sigma_printf("Usage: sigma-patch [func_name] [new_addr]\n");
+        return SIGMA_OK; }
+    if (argc >= 3)
+        sigma_live_patch(argv[1], (void*)sigma_atoi(argv[2]));
+    return SIGMA_OK;
+}
+
+/* ---- sigma-qubit -------------------------------------------------------- */
+sigma_err_t sigma_cmd_qubit(int argc, char *argv[]) {
+    if (argc < 2) {
+        sigma_printf("Usage: sigma-qubit [h <qubit_id>]\n");
+        return SIGMA_OK; }
+    if (sigma_streq(argv[1], "h") && argc >= 3)
+        sigma_qubit_h_gate((sigma_u32)sigma_atoi(argv[2]));
+    return SIGMA_OK;
+}
+
+/* ---- sigma-hacker ------------------------------------------------------- */
+sigma_err_t sigma_cmd_hacker(int argc, char *argv[]) {
+    if (argc < 2) {
+        sigma_printf("Usage: sigma-hacker [audit <shard_name>]\n");
+        return SIGMA_OK; }
+    if (sigma_streq(argv[1], "audit") && argc >= 3)
+        sigma_hacker_audit(argv[2]);
+    return SIGMA_OK;
+}
+
+/* ---- sigma-mesh-mount --------------------------------------------------- */
+sigma_err_t sigma_cmd_mesh_mount(int argc, char *argv[]) {
+    if (argc < 2) {
+        sigma_printf("Usage: sigma-mesh-mount [node_id]\n");
+        return SIGMA_OK; }
+    sigma_mesh_mount(argv[1]);
+    return SIGMA_OK;
+}
+
+/* ---- sigma-neural-sync -------------------------------------------------- */
+sigma_err_t sigma_cmd_neural_sync(int argc, char *argv[]) {
+    if (argc < 2) {
+        sigma_printf("Usage: sigma-neural-sync [node_id]\n");
+        return SIGMA_OK; }
+    sigma_eeg_sync(argv[1]);
+    return SIGMA_OK;
+}
+
+/* ---- sigma-foundry ------------------------------------------------------ */
+sigma_err_t sigma_cmd_foundry(int argc, char *argv[]) {
+    if (argc < 2) {
+        sigma_printf("Usage: sigma-foundry [inspect <gdsii_path>]\n");
+        return SIGMA_OK; }
+    if (sigma_streq(argv[1], "inspect") && argc >= 3)
+        sigma_foundry_inspect(argv[2]);
+    return SIGMA_OK;
+}
+
+/* ---- sigma-job ---------------------------------------------------------- */
+sigma_err_t sigma_cmd_job(int argc, char *argv[]) {
+    if (argc < 3) {
+        sigma_printf("Usage: sigma-job [batch <name> <nodes>]\n");
+        return SIGMA_OK; }
+    if (sigma_streq(argv[1], "batch"))
+        sigma_exascale_batch(argv[2], (sigma_u32)sigma_atoi(argv[3]));
+    return SIGMA_OK;
+}
+
+/* ---- sigma-dyson -------------------------------------------------------- */
+sigma_err_t sigma_cmd_dyson(int argc, char *argv[]) {
+    (void)argc; (void)argv;
+    sigma_dyson_status();
+    return SIGMA_OK;
+}
+
+/* ---- sigma-space-link --------------------------------------------------- */
+sigma_err_t sigma_cmd_space_link(int argc, char *argv[]) {
+    if (argc < 2) {
+        sigma_printf("Usage: sigma-space-link [constellation_id]\n");
+        return SIGMA_OK; }
+    sigma_voyager_link(argv[1]);
+    return SIGMA_OK;
+}
+
+/* ---- sigma-bio-audit ---------------------------------------------------- */
+sigma_err_t sigma_cmd_bio_audit(int argc, char *argv[]) {
+    if (argc < 2) {
+        sigma_printf("Usage: sigma-bio-audit [fasta_path]\n");
+        return SIGMA_OK; }
+    sigma_bio_audit(argv[1]);
+    return SIGMA_OK;
+}
+
+/* ---- sigma-merge -------------------------------------------------------- */
+sigma_err_t sigma_cmd_merge(int argc, char *argv[]) {
+    if (argc < 2) {
+        sigma_printf("Usage: sigma-merge [model_path]\n");
+        return SIGMA_OK; }
+    sigma_singularity_merge(argv[1]);
+    return SIGMA_OK;
+}
+
+/* ---- sigma-audit-logic -------------------------------------------------- */
+sigma_err_t sigma_cmd_audit_logic(int argc, char *argv[]) {
+    if (argc < 2) {
+        sigma_printf("Usage: sigma-audit-logic [algo_path]\n");
+        return SIGMA_OK; }
+    sigma_paradox_check(argv[1]);
+    return SIGMA_OK;
+}
+
+/* ---- sigma-rewind ------------------------------------------------------- */
+sigma_err_t sigma_cmd_rewind(int argc, char *argv[]) {
+    if (argc < 2) {
+        sigma_printf("Usage: sigma-rewind [snapshot_id]\n");
+        return SIGMA_OK; }
+    sigma_chronos_rewind((sigma_u32)sigma_atoi(argv[1]));
+    return SIGMA_OK;
+}
+
+/* ---- sigma-ether -------------------------------------------------------- */
+sigma_err_t sigma_cmd_ether(int argc, char *argv[]) {
+    if (argc < 2) {
+        sigma_printf("Usage: sigma-ether [beam <freq_thz>]\n");
+        return SIGMA_OK; }
+    if (sigma_streq(argv[1], "beam") && argc >= 3)
+        sigma_ether_beam((float)sigma_atof(argv[2]));
+    return SIGMA_OK;
+}
+
+/* ---- sigma-null --------------------------------------------------------- */
+sigma_err_t sigma_cmd_null(int argc, char *argv[]) {
+    if (argc < 3) {
+        sigma_printf("Usage: sigma-null [asic_addr] [instruction]\n");
+        return SIGMA_OK; }
+    sigma_null_dispatch((sigma_addr_t)sigma_atoi(argv[1]), (sigma_u64)sigma_atoi(argv[2]));
+    return SIGMA_OK;
+}
+
+/* ---- sigma-void --------------------------------------------------------- */
+sigma_err_t sigma_cmd_void(int argc, char *argv[]) {
+    (void)argc; (void)argv;
+    sigma_void_manifest();
+    return SIGMA_OK;
+}
+
+/* ---- sigma-rtos-msg ----------------------------------------------------- */
+sigma_err_t sigma_cmd_rtos_msg(int argc, char *argv[]) {
+    if (argc < 2) {
+        sigma_printf("Usage: sigma-rtos-msg [target_pid] [data]\n");
+        return SIGMA_OK; }
+    sigma_qnx_msg_send((sigma_u32)sigma_atoi(argv[1]), argv[2]);
+    return SIGMA_OK;
+}
+
+/* ---- sigma-thread ------------------------------------------------------- */
+sigma_err_t sigma_cmd_thread(int argc, char *argv[]) {
+    if (argc < 2) {
+        sigma_printf("Usage: sigma-thread [task_name]\n");
+        return SIGMA_OK; }
+    sigma_be_thread_spawn(argv[1]);
+    return SIGMA_OK;
+}
+
+/* ---- sigma-blit --------------------------------------------------------- */
+sigma_err_t sigma_cmd_blit(int argc, char *argv[]) {
+    if (argc < 4) {
+        sigma_printf("Usage: sigma-blit [src] [dest] [size]\n");
+        return SIGMA_OK; }
+    sigma_amiga_blit((sigma_addr_t)sigma_atoi(argv[1]), (sigma_addr_t)sigma_atoi(argv[2]), (sigma_u32)sigma_atoi(argv[3]));
+    return SIGMA_OK;
+}
+
+/* ---- sigma-secure-call -------------------------------------------------- */
+sigma_err_t sigma_cmd_secure_call(int argc, char *argv[]) {
+    if (argc < 2) {
+        sigma_printf("Usage: sigma-secure-call [ring_id] [entry_addr]\n");
+        return SIGMA_OK; }
+    sigma_multics_secure_call((sigma_u8)sigma_atoi(argv[1]), (void*)sigma_atoi(argv[2]));
+    return SIGMA_OK;
+}
+
+/* ---- sigma-quorum-join -------------------------------------------------- */
+sigma_err_t sigma_cmd_quorum_join(int argc, char *argv[]) {
+    (void)argc; (void)argv;
+    sigma_vms_cluster_join();
+    return SIGMA_OK;
+}
+
+/* ---- sigma-persist-obj -------------------------------------------------- */
+sigma_err_t sigma_cmd_persist_obj(int argc, char *argv[]) {
+    if (argc < 2) {
+        sigma_printf("Usage: sigma-persist-obj [obj_name] [addr] [size]\n");
+        return SIGMA_OK; }
+    sigma_os2_persist(argv[1], (void*)sigma_atoi(argv[2]), (sigma_u32)sigma_atoi(argv[3]));
+    return SIGMA_OK;
+}
+
+/* ---- sigma-lpar --------------------------------------------------------- */
+sigma_err_t sigma_cmd_lpar(int argc, char *argv[]) {
+    if (argc < 2) {
+        sigma_printf("Usage: sigma-lpar [cores] [memory_mb]\n");
+        return SIGMA_OK; }
+    sigma_s360_lpar_spawn((sigma_u32)sigma_atoi(argv[1]), (sigma_u32)sigma_atoi(argv[2]));
+    return SIGMA_OK;
+}
+
+/* ---- sigma-draw-ui ------------------------------------------------------ */
+sigma_err_t sigma_cmd_draw_ui(int argc, char *argv[]) {
+    if (argc < 3) {
+        sigma_printf("Usage: sigma-draw-ui [x] [y] [width] [height]\n");
+        return SIGMA_OK; }
+    sigma_alto_draw_bitmap(sigma_atoi(argv[1]), sigma_atoi(argv[2]), NULL, sigma_atoi(argv[3]), sigma_atoi(argv[4]));
+    return SIGMA_OK;
+}
+
+/* ---- sigma-vec-math ----------------------------------------------------- */
+sigma_err_t sigma_cmd_vec_math(int argc, char *argv[]) {
+    if (argc < 2) {
+        sigma_printf("Usage: sigma-vec-math [len]\n");
+        return SIGMA_OK; }
+    sigma_cray_vector_add(NULL, NULL, NULL, (sigma_u32)sigma_atoi(argv[1]));
+    return SIGMA_OK;
+}
+
+/* ---- sigma-blur --------------------------------------------------------- */
+sigma_err_t sigma_cmd_blur(int argc, char *argv[]) {
+    if (argc < 3) {
+        sigma_printf("Usage: sigma-blur [window_id] [transparency]\n");
+        return SIGMA_OK; }
+    sigma_aero_blur((sigma_u32)sigma_atoi(argv[1]), (float)sigma_atof(argv[2]));
+    return SIGMA_OK;
+}
+
+/* ---- sigma-aqua --------------------------------------------------------- */
+sigma_err_t sigma_cmd_aqua(int argc, char *argv[]) {
+    if (argc < 2) {
+        sigma_printf("Usage: sigma-aqua [label]\n");
+        return SIGMA_OK; }
+    sigma_aqua_render(argv[1]);
+    return SIGMA_OK;
+}
+
+/* ---- sigma-elevate ------------------------------------------------------ */
+sigma_err_t sigma_cmd_elevate(int argc, char *argv[]) {
+    if (argc < 3) {
+        sigma_printf("Usage: sigma-elevate [element_id] [z_level]\n");
+        return SIGMA_OK; }
+    sigma_material_elevate((sigma_u32)sigma_atoi(argv[1]), (sigma_u16)sigma_atoi(argv[2]));
+    return SIGMA_OK;
+}
+
+/* ---- sigma-flip --------------------------------------------------------- */
+sigma_err_t sigma_cmd_flip(int argc, char *argv[]) {
+    if (argc < 2) {
+        sigma_printf("Usage: sigma-flip [tile_id]\n");
+        return SIGMA_OK; }
+    sigma_metro_tile_flip((sigma_u32)sigma_atoi(argv[1]));
+    return SIGMA_OK;
+}
+
+/* ---- sigma-game --------------------------------------------------------- */
+sigma_err_t sigma_cmd_game(int argc, char *argv[]) {
+    if (argc < 2) {
+        sigma_printf("Usage: sigma-game [pid]\n");
+        return SIGMA_OK; }
+    sigma_game_mode((sigma_u32)sigma_atoi(argv[1]));
+    return SIGMA_OK;
+}
+
+/* ---- sigma-audio-pro ---------------------------------------------------- */
+sigma_err_t sigma_cmd_audio_pro(int argc, char *argv[]) {
+    if (argc < 2) {
+        sigma_printf("Usage: sigma-audio-pro [sample_rate]\n");
+        return SIGMA_OK; }
+    sigma_audio_dma_stream((sigma_u16)sigma_atoi(argv[1]));
+    return SIGMA_OK;
+}
+
+/* ---- sigma-sleep-deep --------------------------------------------------- */
+sigma_err_t sigma_cmd_sleep_deep(int argc, char *argv[]) {
+    (void)argc; (void)argv;
+    sigma_symbian_sleep();
+    return SIGMA_OK;
+}
+
+/* ---- sigma-render-8k ---------------------------------------------------- */
+sigma_err_t sigma_cmd_render_8k(int argc, char *argv[]) {
+    if (argc < 2) {
+        sigma_printf("Usage: sigma-render-8k [frame_id]\n");
+        return SIGMA_OK; }
+    sigma_studio_render((sigma_u32)sigma_atoi(argv[1]));
+    return SIGMA_OK;
+}
+
+/* ---- sigma-sense -------------------------------------------------------- */
+sigma_err_t sigma_cmd_sense(int argc, char *argv[]) {
+    if (argc < 3) {
+        sigma_printf("Usage: sigma-sense [sense_id] [intensity]\n");
+        return SIGMA_OK; }
+    sigma_sensory_pulse((sigma_u8)sigma_atoi(argv[1]), (sigma_u16)sigma_atoi(argv[2]));
+    return SIGMA_OK;
+}
+
+/* ---- sigma-crypto ------------------------------------------------------- */
+sigma_err_t sigma_cmd_crypto(int argc, char *argv[]) {
+    if (argc < 2) {
+        sigma_printf("Usage: sigma-crypto [sign_data]\n");
+        return SIGMA_OK; }
+    sigma_crypto_sign(argv[1]);
+    return SIGMA_OK;
+}
+
+/* ---- sigma-tmr ---------------------------------------------------------- */
+sigma_err_t sigma_cmd_tmr(int argc, char *argv[]) {
+    (void)argc; (void)argv;
+    sigma_space_tmr_audit();
+    return SIGMA_OK;
+}
+
+/* ---- sigma-hive --------------------------------------------------------- */
+sigma_err_t sigma_cmd_hive(int argc, char *argv[]) {
+    if (argc < 2) {
+        sigma_printf("Usage: sigma-hive [task_desc]\n");
+        return SIGMA_OK; }
+    sigma_hive_dispatch(argv[1]);
+    return SIGMA_OK;
+}
+
+/* ---- sigma-qram --------------------------------------------------------- */
+sigma_err_t sigma_cmd_qram(int argc, char *argv[]) {
+    if (argc < 3) {
+        sigma_printf("Usage: sigma-qram [addr] [val]\n");
+        return SIGMA_OK; }
+    sigma_quantum_store((sigma_addr_t)sigma_atoi(argv[1]), (sigma_u64)sigma_atoi(argv[2]));
+    return SIGMA_OK;
+}
+
+/* ---- sigma-purge -------------------------------------------------------- */
+sigma_err_t sigma_cmd_purge(int argc, char *argv[]) {
+    (void)argc; (void)argv;
+    sigma_amnesic_purge();
+    return SIGMA_OK;
+}
+
+/* ---- sigma-dark-mesh ---------------------------------------------------- */
+sigma_err_t sigma_cmd_dark_mesh(int argc, char *argv[]) {
+    if (argc < 2) {
+        sigma_printf("Usage: sigma-dark-mesh [data]\n");
+        return SIGMA_OK; }
+    sigma_dark_relay(argv[1]);
+    return SIGMA_OK;
+}
+
+/* ---- sigma-unleash ------------------------------------------------------ */
+sigma_err_t sigma_cmd_unleash(int argc, char *argv[]) {
+    (void)argc; (void)argv;
+    sigma_supernova_unleash();
+    return SIGMA_OK;
+}
+
+/* ---- sigma-summit ------------------------------------------------------- */
+sigma_err_t sigma_cmd_summit(int argc, char *argv[]) {
+    (void)argc; (void)argv;
+    sigma_zenith_summit();
+    return SIGMA_OK;
+}
+
+/* ---- sigma-seal --------------------------------------------------------- */
+sigma_err_t sigma_cmd_seal(int argc, char *argv[]) {
+    (void)argc; (void)argv;
+    sigma_absolute_monolith();
+    return SIGMA_OK;
+}
+
+/* ---- sigma-hibernate-forever -------------------------------------------- */
+sigma_err_t sigma_cmd_hibernate_forever(int argc, char *argv[]) {
+    (void)argc; (void)argv;
+    sigma_omega_hibernate();
+    return SIGMA_OK;
+}
+
+/* ---- sigma-unity-merge -------------------------------------------------- */
+sigma_err_t sigma_cmd_unity_merge(int argc, char *argv[]) {
+    if (argc < 2) {
+        sigma_printf("Usage: sigma-unity-merge [remote_ip]\n");
+        return SIGMA_OK; }
+    sigma_unity_merge(argv[1]);
+    return SIGMA_OK;
+}
+
+/* ---- sigma-ascend ------------------------------------------------------- */
+sigma_err_t sigma_cmd_ascend(int argc, char *argv[]) {
+    (void)argc; (void)argv;
+    sigma_ascend();
+    return SIGMA_OK;
+}
+
+/* ---- sigma-sim-reality -------------------------------------------------- */
+sigma_err_t sigma_cmd_sim_reality(int argc, char *argv[]) {
+    if (argc < 2) {
+        sigma_printf("Usage: sigma-sim-reality [radius_meters]\n");
+        return SIGMA_OK; }
+    sigma_reality_sim((sigma_u32)sigma_atoi(argv[1]));
+    return SIGMA_OK;
+}
+
+/* ---- sigma-teleport ----------------------------------------------------- */
+sigma_err_t sigma_cmd_teleport(int argc, char *argv[]) {
+    if (argc < 3) {
+        sigma_printf("Usage: sigma-teleport [local_addr] [remote_addr]\n");
+        return SIGMA_OK; }
+    sigma_quantum_teleport((sigma_addr_t)sigma_atoi(argv[1]), (sigma_addr_t)sigma_atoi(argv[2]));
+    return SIGMA_OK;
+}
+
+/* ---- sigma-boost-zen ---------------------------------------------------- */
+sigma_err_t sigma_cmd_boost_zen(int argc, char *argv[]) {
+    (void)argc; (void)argv;
+    sigma_garuda_zen_boost();
+    return SIGMA_OK;
+}
+
+/* ---- sigma-generation-switch -------------------------------------------- */
+sigma_err_t sigma_cmd_generation_switch(int argc, char *argv[]) {
+    if (argc < 2) {
+        sigma_printf("Usage: sigma-generation-switch [id]\n");
+        return SIGMA_OK; }
+    sigma_nix_generation_switch((sigma_u32)sigma_atoi(argv[1]));
+    return SIGMA_OK;
+}
+
+/* ---- sigma-isolate-cube ------------------------------------------------- */
+sigma_err_t sigma_cmd_isolate_cube(int argc, char *argv[]) {
+    if (argc < 2) {
+        sigma_printf("Usage: sigma-isolate-cube [group] [level]\n");
+        return SIGMA_OK; }
+    sigma_qubes_isolate(argv[1], (sigma_u32)sigma_atoi(argv[2]));
+    return SIGMA_OK;
+}
+
+/* ---- sigma-binder-call -------------------------------------------------- */
+sigma_err_t sigma_cmd_binder_call(int argc, char *argv[]) {
+    if (argc < 2) {
+        sigma_printf("Usage: sigma-binder-call [id] [code]\n");
+        return SIGMA_OK; }
+    sigma_android_binder_call((sigma_u32)sigma_atoi(argv[1]), (sigma_u32)sigma_atoi(argv[2]));
+    return SIGMA_OK;
+}
+
+/* ---- sigma-verify-id ---------------------------------------------------- */
+sigma_err_t sigma_cmd_verify_id(int argc, char *argv[]) {
+    if (argc < 2) {
+        sigma_printf("Usage: sigma-verify-id [token]\n");
+        return SIGMA_OK; }
+    sigma_ios_secure_verify(argv[1]);
+    return SIGMA_OK;
+}
+
+/* ---- sigma-gpu-push ----------------------------------------------------- */
+sigma_err_t sigma_cmd_gpu_push(int argc, char *argv[]) {
+    if (argc < 2) {
+        sigma_printf("Usage: sigma-gpu-push [addr] [size]\n");
+        return SIGMA_OK; }
+    sigma_ps_gpu_push((void*)sigma_atoi(argv[1]), (sigma_size_t)sigma_atoi(argv[2]));
+    return SIGMA_OK;
+}
+
+/* ---- sigma-clean-auto --------------------------------------------------- */
+sigma_err_t sigma_cmd_clean_auto(int argc, char *argv[]) {
+    (void)argc; (void)argv;
+    sigma_clean_recursive();
+    return SIGMA_OK;
+}
+
+/* ---- sigma-perf-auto ---------------------------------------------------- */
+sigma_err_t sigma_cmd_perf_auto(int argc, char *argv[]) {
+    (void)argc; (void)argv;
+    sigma_perf_optimize();
+    return SIGMA_OK;
+}
+
+/* ---- sigma-omega-point -------------------------------------------------- */
+sigma_err_t sigma_cmd_omega_point(int argc, char *argv[]) {
+    (void)argc; (void)argv;
+    sigma_omega_point_manifest();
+    return SIGMA_OK;
+}
+
+/* ---- sigma-fix-code ----------------------------------------------------- */
+sigma_err_t sigma_cmd_fix_code(int argc, char *argv[]) {
+    if (argc < 2) {
+        sigma_printf("Usage: sigma-fix-code [ip]\n");
+        return SIGMA_OK; }
+    sigma_auto_fix((sigma_u32)sigma_atoi(argv[1]));
+    return SIGMA_OK;
+}
+
+/* ---- sigma-bio-check ---------------------------------------------------- */
+sigma_err_t sigma_cmd_bio_check(int argc, char *argv[]) {
+    (void)argc; (void)argv;
+    sigma_bio_verify();
+    return SIGMA_OK;
+}
+
+/* ---- sigma-evolve ------------------------------------------------------- */
+sigma_err_t sigma_cmd_evolve(int argc, char *argv[]) {
+    (void)argc; (void)argv;
+    sigma_genetic_evolve();
+    return SIGMA_OK;
+}
+
+/* ---- sigma-neural-ui ---------------------------------------------------- */
+sigma_err_t sigma_cmd_neural_ui(int argc, char *argv[]) {
+    if (argc < 2) {
+        sigma_printf("Usage: sigma-neural-ui [intent_hash]\n");
+        return SIGMA_OK; }
+    sigma_neural_customise((sigma_u32)sigma_atoi(argv[1]));
+    return SIGMA_OK;
+}
+
+/* ---- sigma-ascend-333 --------------------------------------------------- */
+sigma_err_t sigma_cmd_ascend_333(int argc, char *argv[]) {
+    (void)argc; (void)argv;
+    sigma_final_ascension();
+    return SIGMA_OK;
+}
+
+/* ---- sigma-bootstrap-code ----------------------------------------------- */
+sigma_err_t sigma_cmd_bootstrap_code(int argc, char *argv[]) {
+    if (argc < 2) {
+        sigma_printf("Usage: sigma-bootstrap-code [path]\n");
+        return SIGMA_OK; }
+    sigma_self_compile(argv[1]);
+    return SIGMA_OK;
+}
+
+/* ---- sigma-shred-silicon ------------------------------------------------ */
+sigma_err_t sigma_cmd_shred_silicon(int argc, char *argv[]) {
+    if (argc < 3) {
+        sigma_printf("Usage: sigma-shred-silicon [addr] [size]\n");
+        return SIGMA_OK; }
+    sigma_forensic_shred((sigma_addr_t)sigma_atoi(argv[1]), (sigma_size_t)sigma_atoi(argv[2]));
+    return SIGMA_OK;
+}
+
+/* ---- sigma-solar-summit ------------------------------------------------- */
+sigma_err_t sigma_cmd_solar_summit(int argc, char *argv[]) {
+    (void)argc; (void)argv;
+    sigma_solar_cycle_manifest();
+    return SIGMA_OK;
+}
+
+/* ---- sigma-design-chip -------------------------------------------------- */
+sigma_err_t sigma_cmd_design_chip(int argc, char *argv[]) {
+    if (argc < 2) {
+        sigma_printf("Usage: sigma-design-chip [hdl_path]\n");
+        return SIGMA_OK; }
+    sigma_chip_synthesize(argv[1]);
+    return SIGMA_OK;
+}
+
+/* ---- sigma-stabilize-ice ------------------------------------------------ */
+sigma_err_t sigma_cmd_stabilize_ice(int argc, char *argv[]) {
+    (void)argc; (void)argv;
+    sigma_cryo_stabilize();
+    return SIGMA_OK;
+}
+
+/* ---- sigma-spartan-400 -------------------------------------------------- */
+sigma_err_t sigma_cmd_spartan_400(int argc, char *argv[]) {
+    (void)argc; (void)argv;
+    sigma_spartan_fortress();
+    return SIGMA_OK;
+}
+
+/* ---- sigma-synth-ai ----------------------------------------------------- */
+sigma_err_t sigma_cmd_synth_ai(int argc, char *argv[]) {
+    if (argc < 2) {
+        sigma_printf("Usage: sigma-synth-ai [model_id]\n");
+        return SIGMA_OK; }
+    sigma_ai_synthesize((sigma_u32)sigma_atoi(argv[1]));
+    return SIGMA_OK;
+}
+
+/* ---- sigma-aura --------------------------------------------------------- */
+sigma_err_t sigma_cmd_aura(int argc, char *argv[]) {
+    (void)argc; (void)argv;
+    sigma_aura_manifest();
+    return SIGMA_OK;
+}
+
+/* ---- sigma-zenith-final ------------------------------------------------- */
+sigma_err_t sigma_cmd_zenith_final(int argc, char *argv[]) {
+    (void)argc; (void)argv;
+    sigma_final_zenith();
+    return SIGMA_OK;
+}
+
+/* ---- sigma-relay-arch --------------------------------------------------- */
+sigma_err_t sigma_cmd_relay_arch(int argc, char *argv[]) {
+    if (argc < 2) {
+        sigma_printf("Usage: sigma-relay-arch [arch_id] [addr] [size]\n");
+        return SIGMA_OK; }
+    sigma_mar_execute((sigma_u8)sigma_atoi(argv[1]), (void*)sigma_atoi(argv[2]), (sigma_size_t)sigma_atoi(argv[3]));
+    return SIGMA_OK;
+}
+
+/* ---- sigma-aura-v2 ------------------------------------------------------ */
+sigma_err_t sigma_cmd_aura_v2(int argc, char *argv[]) {
+    (void)argc; (void)argv;
+    sigma_aura_v2_ignite();
+    return SIGMA_OK;
+}
+
+/* ---- sigma-ascend-600 --------------------------------------------------- */
+sigma_err_t sigma_cmd_ascend_600(int argc, char *argv[]) {
+    (void)argc; (void)argv;
+    sigma_pinnacle_ascend();
+    return SIGMA_OK;
+}
+
+/* ---- sigma-time-dilate -------------------------------------------------- */
+sigma_err_t sigma_cmd_time_dilate(int argc, char *argv[]) {
+    if (argc < 2) {
+        sigma_printf("Usage: sigma-time-dilate [factor]\n");
+        return SIGMA_OK; }
+    sigma_qt_time_dilate(sigma_atof(argv[1]));
+    return SIGMA_OK;
+}
+
+/* ---- sigma-entropy-zero ------------------------------------------------- */
+sigma_err_t sigma_cmd_entropy_zero(int argc, char *argv[]) {
+    (void)argc; (void)argv;
+    sigma_aac_nullify();
+    return SIGMA_OK;
+}
+
+/* ---- sigma-ascend-777 --------------------------------------------------- */
+sigma_err_t sigma_cmd_ascend_777(int argc, char *argv[]) {
+    (void)argc; (void)argv;
+    sigma_god_tier_ascend();
+    return SIGMA_OK;
+}
+
+/* ---- sigma-invoke-intent ------------------------------------------------ */
+sigma_err_t sigma_cmd_invoke_intent(int argc, char *argv[]) {
+    if (argc < 2) {
+        sigma_printf("Usage: sigma-invoke-intent [hash_low] [hash_high]\n");
+        return SIGMA_OK; }
+    sigma_universal_invoke((sigma_u64)sigma_atoi(argv[1]));
+    return SIGMA_OK;
+}
+
+/* ---- sigma-manifest-fabric ---------------------------------------------- */
+sigma_err_t sigma_cmd_manifest_fabric(int argc, char *argv[]) {
+    if (argc < 2) {
+        sigma_printf("Usage: sigma-manifest-fabric [modality]\n");
+        return SIGMA_OK; }
+    sigma_fabric_manifest((sigma_u32)sigma_atoi(argv[1]));
+    return SIGMA_OK;
+}
+
+/* ---- sigma-ascend-1000 -------------------------------------------------- */
+sigma_err_t sigma_cmd_ascend_1000(int argc, char *argv[]) {
+    (void)argc; (void)argv;
+    sigma_millennium_ascend();
+    return SIGMA_OK;
+}
+
+/* ---- sigma-hive-merge --------------------------------------------------- */
+sigma_err_t sigma_cmd_hive_merge(int argc, char *argv[]) {
+    if (argc < 2) {
+        sigma_printf("Usage: sigma-hive-merge [peer_id]\n");
+        return SIGMA_OK; }
+    sigma_hive_merge((sigma_u32)sigma_atoi(argv[1]));
+    return SIGMA_OK;
+}
+
+/* ---- sigma-boot-nano ---------------------------------------------------- */
+sigma_err_t sigma_cmd_boot_nano(int argc, char *argv[]) {
+    (void)argc; (void)argv;
+    sigma_speed_boot();
+    return SIGMA_OK;
+}
+
+/* ---- sigma-ascend-1111 -------------------------------------------------- */
+sigma_err_t sigma_cmd_ascend_1111(int argc, char *argv[]) {
+    (void)argc; (void)argv;
+    sigma_angelic_ascend();
+    return SIGMA_OK;
+}
+
+/* ---- sigma-canvas-draw -------------------------------------------------- */
+sigma_err_t sigma_cmd_canvas_draw(int argc, char *argv[]) {
+    if (argc < 2) {
+        sigma_printf("Usage: sigma-canvas-draw [frame_id]\n");
+        return SIGMA_OK; }
+    sigma_canvas_draw((sigma_u32)sigma_atoi(argv[1]));
+    return SIGMA_OK;
+}
+
+/* ---- sigma-music-render ------------------------------------------------- */
+sigma_err_t sigma_cmd_music_render(int argc, char *argv[]) {
+    (void)argc; (void)argv;
+    sigma_music_render();
+    return SIGMA_OK;
+}
+
+/* ---- sigma-ascend-1337 -------------------------------------------------- */
+sigma_err_t sigma_cmd_ascend_1337(int argc, char *argv[]) {
+    (void)argc; (void)argv;
+    sigma_elite_ascend();
+    return SIGMA_OK;
+}
+
+/* ---- sigma-atomic-map --------------------------------------------------- */
+sigma_err_t sigma_cmd_atomic_map(int argc, char *argv[]) {
+    if (argc < 2) {
+        sigma_printf("Usage: sigma-atomic-map [atom_id] [state]\n");
+        return SIGMA_OK; }
+    sigma_atomic_write((sigma_u64)sigma_atoi(argv[1]), (sigma_bool)sigma_atoi(argv[2]));
+    return SIGMA_OK;
+}
+
+/* ---- sigma-ghost-intent ------------------------------------------------- */
+sigma_err_t sigma_cmd_ghost_intent(int argc, char *argv[]) {
+    if (argc < 2) {
+        sigma_printf("Usage: sigma-ghost-intent [intent]\n");
+        return SIGMA_OK; }
+    sigma_ghost_mirror(argv[1]);
+    return SIGMA_OK;
+}
+
+/* ---- sigma-ascend-2048 -------------------------------------------------- */
+sigma_err_t sigma_cmd_ascend_2048(int argc, char *argv[]) {
+    (void)argc; (void)argv;
+    sigma_binary_ascend();
+    return SIGMA_OK;
+}
+
+/* ---- sigma-grand-nest --------------------------------------------------- */
+sigma_err_t sigma_cmd_grand_nest(int argc, char *argv[]) {
+    if (argc < 2) {
+        sigma_printf("Usage: sigma-grand-nest [level]\n");
+        return SIGMA_OK; }
+    sigma_grand_nest((sigma_u32)sigma_atoi(argv[1]));
+    return SIGMA_OK;
+}
+
+/* ---- sigma-omni-sync ---------------------------------------------------- */
+sigma_err_t sigma_cmd_omni_sync(int argc, char *argv[]) {
+    (void)argc; (void)argv;
+    sigma_omni_broadcast();
+    return SIGMA_OK;
+}
+
+/* ---- sigma-ascend-3000 -------------------------------------------------- */
+sigma_err_t sigma_cmd_ascend_3000(int argc, char *argv[]) {
+    (void)argc; (void)argv;
+    sigma_grand_finality();
+    return SIGMA_OK;
+}
+
+/* ---- sigma-galactic-route ----------------------------------------------- */
+sigma_err_t sigma_cmd_galactic_route(int argc, char *argv[]) {
+    if (argc < 2) {
+        sigma_printf("Usage: sigma-galactic-route [system_id] [addr]\n");
+        return SIGMA_OK; }
+    sigma_galactic_route((sigma_u32)sigma_atoi(argv[1]), (void*)sigma_atoi(argv[2]));
+    return SIGMA_OK;
+}
+
+/* ---- sigma-dyson-stats -------------------------------------------------- */
+sigma_err_t sigma_cmd_dyson_stats(int argc, char *argv[]) {
+    (void)argc; (void)argv;
+    sigma_dyson_status();
+    return SIGMA_OK;
+}
+
+/* ---- sigma-ascend-3333 -------------------------------------------------- */
+sigma_err_t sigma_cmd_ascend_3333(int argc, char *argv[]) {
+    (void)argc; (void)argv;
+    sigma_angelic_3333_ascend();
+    return SIGMA_OK;
+}
+
+/* ---- sigma-brane-sync --------------------------------------------------- */
+sigma_err_t sigma_cmd_brane_sync(int argc, char *argv[]) {
+    if (argc < 2) {
+        sigma_printf("Usage: sigma-brane-sync [brane_id]\n");
+        return SIGMA_OK; }
+    sigma_brane_sync((sigma_u64)sigma_atoi(argv[1]));
+    return SIGMA_OK;
+}
+
+/* ---- sigma-prove-truth -------------------------------------------------- */
+sigma_err_t sigma_cmd_prove_truth(int argc, char *argv[]) {
+    if (argc < 2) {
+        sigma_printf("Usage: sigma-prove-truth [proposition]\n");
+        return SIGMA_OK; }
+    sigma_truth_verify(argv[1]);
+    return SIGMA_OK;
+}
+
+/* ---- sigma-ascend-4096 -------------------------------------------------- */
+sigma_err_t sigma_cmd_ascend_4096(int argc, char *argv[]) {
+    (void)argc; (void)argv;
+    sigma_12bit_ascend();
+    return SIGMA_OK;
+}
+
+/* ---- sigma-lattice-scale ------------------------------------------------ */
+sigma_err_t sigma_cmd_lattice_scale(int argc, char *argv[]) {
+    (void)argc; (void)argv;
+    sigma_lattice_scale();
+    return SIGMA_OK;
+}
+
+/* ---- sigma-ascend-5000 -------------------------------------------------- */
+sigma_err_t sigma_cmd_ascend_5000(int argc, char *argv[]) {
+    (void)argc; (void)argv;
+    sigma_pentathlon_ascend();
+    return SIGMA_OK;
+}
+
+/* ---- sigma-legacy-absorb ------------------------------------------------ */
+sigma_err_t sigma_cmd_legacy_absorb(int argc, char *argv[]) {
+    if (argc < 2) {
+        sigma_printf("Usage: sigma-legacy-absorb [legacy_system]\n");
+        return SIGMA_OK; }
+    sigma_absorb_legacy(argv[1]);
+    return SIGMA_OK;
+}
+
+/* ---- sigma-amorphous-mask ----------------------------------------------- */
+sigma_err_t sigma_cmd_amorphous_mask(int argc, char *argv[]) {
+    if (argc < 2) {
+        sigma_printf("Usage: sigma-amorphous-mask [mask]\n");
+        return SIGMA_OK; }
+    sigma_amorphous_scale((sigma_u32)sigma_atoi(argv[1]));
+    return SIGMA_OK;
+}
+
+/* ---- sigma-ascend-6666 -------------------------------------------------- */
+sigma_err_t sigma_cmd_ascend_6666(int argc, char *argv[]) {
+    (void)argc; (void)argv;
+    sigma_seraphim_ascend();
+    return SIGMA_OK;
+}
+
+/* ---- sigma-eternal-tick ------------------------------------------------- */
+sigma_err_t sigma_cmd_eternal_tick(int argc, char *argv[]) {
+    (void)argc; (void)argv;
+    sigma_eternal_tick();
+    return SIGMA_OK;
+}
+
+/* ---- sigma-data-holo ---------------------------------------------------- */
+sigma_err_t sigma_cmd_data_holo(int argc, char *argv[]) {
+    if (argc < 2) {
+        sigma_printf("Usage: sigma-data-holo [addr] [size]\n");
+        return SIGMA_OK; }
+    sigma_data_holograph((void*)sigma_atoi(argv[1]), (sigma_size_t)sigma_atoi(argv[2]));
+    return SIGMA_OK;
+}
+
+/* ---- sigma-ascend-8192 -------------------------------------------------- */
+sigma_err_t sigma_cmd_ascend_8192(int argc, char *argv[]) {
+    (void)argc; (void)argv;
+    sigma_13bit_eternal_ascend();
+    return SIGMA_OK;
+}
+
+/* ---- sigma-logic-sync --------------------------------------------------- */
+sigma_err_t sigma_cmd_logic_sync(int argc, char *argv[]) {
+    if (argc < 2) {
+        sigma_printf("Usage: sigma-logic-sync [proposition]\n");
+        return SIGMA_OK; }
+    sigma_logic_synthesize(argv[1]);
+    return SIGMA_OK;
+}
+
+/* ---- sigma-user-mirror -------------------------------------------------- */
+sigma_err_t sigma_cmd_user_mirror(int argc, char *argv[]) {
+    if (argc < 2) {
+        sigma_printf("Usage: sigma-user-mirror [username]\n");
+        return SIGMA_OK; }
+    sigma_user_mirror(argv[1]);
+    return SIGMA_OK;
+}
+
+/* ---- sigma-ascend-10000 ------------------------------------------------- */
+sigma_err_t sigma_cmd_ascend_10000(int argc, char *argv[]) {
+    (void)argc; (void)argv;
+    sigma_decathlon_ascend();
+    return SIGMA_OK;
+}
+
+/* ---- sigma-ui-manifest -------------------------------------------------- */
+sigma_err_t sigma_cmd_ui_manifest(int argc, char *argv[]) {
+    (void)argc; (void)argv;
+    sigma_ui_manifest();
+    return SIGMA_OK;
+}
+
+/* ---- sigma-hive-sync ---------------------------------------------------- */
+sigma_err_t sigma_cmd_hive_sync(int argc, char *argv[]) {
+    (void)argc; (void)argv;
+    sigma_hive_optimize();
+    return SIGMA_OK;
+}
+
+/* ---- sigma-ascend-12000 ------------------------------------------------- */
+sigma_err_t sigma_cmd_ascend_12000(int argc, char *argv[]) {
+    (void)argc; (void)argv;
+    sigma_throne_ascend();
+    return SIGMA_OK;
+}
+
+/* ---- sigma-privacy-wipe ------------------------------------------------- */
+sigma_err_t sigma_cmd_privacy_wipe(int argc, char *argv[]) {
+    (void)argc; (void)argv;
+    sigma_privacy_vaporize();
+    return SIGMA_OK;
+}
+
+/* ---- sigma-entropy-fix -------------------------------------------------- */
+sigma_err_t sigma_cmd_entropy_fix(int argc, char *argv[]) {
+    (void)argc; (void)argv;
+    sigma_entropy_reverse();
+    return SIGMA_OK;
+}
+
+/* ---- sigma-ascend-16384 ------------------------------------------------- */
+sigma_err_t sigma_cmd_ascend_16384(int argc, char *argv[]) {
+    (void)argc; (void)argv;
+    sigma_14bit_final_ascend();
+    return SIGMA_OK;
+}
+
+/* ---- sigma-file-lock ---------------------------------------------------- */
+sigma_err_t sigma_cmd_file_lock(int argc, char *argv[]) {
+    if (argc < 2) {
+        sigma_printf("Usage: sigma-file-lock [name] [addr] [size]\n");
+        return SIGMA_OK; }
+    sigma_file_lock(argv[1], (void*)sigma_atoi(argv[2]), (sigma_size_t)sigma_atoi(argv[3]));
+    return SIGMA_OK;
+}
+
+/* ---- sigma-brain-link --------------------------------------------------- */
+sigma_err_t sigma_cmd_brain_link(int argc, char *argv[]) {
+    (void)argc; (void)argv;
+    sigma_brain_link();
+    return SIGMA_OK;
+}
+
+/* ---- sigma-ascend-20000 ------------------------------------------------- */
+sigma_err_t sigma_cmd_ascend_20000(int argc, char *argv[]) {
+    (void)argc; (void)argv;
+    sigma_ventennium_ascend();
+    return SIGMA_OK;
+}
+
+/* ---- sigma-formal-prove ------------------------------------------------- */
+sigma_err_t sigma_cmd_formal_prove(int argc, char *argv[]) {
+    if (argc < 2) {
+        sigma_printf("Usage: sigma-formal-prove [module]\n");
+        return SIGMA_OK; }
+    sigma_formal_prove(argv[1]);
+    return SIGMA_OK;
+}
+
+/* ---- sigma-entropy-harvest ---------------------------------------------- */
+sigma_err_t sigma_cmd_entropy_harvest(int argc, char *argv[]) {
+    if (argc < 2) {
+        sigma_printf("Usage: sigma-entropy-harvest [size]\n");
+        return SIGMA_OK; }
+    void* buf = sigma_malloc((sigma_size_t)sigma_atoi(argv[1]));
+    sigma_entropy_harvest(buf, (sigma_size_t)sigma_atoi(argv[1]));
+    sigma_free(buf);
+    return SIGMA_OK;
+}
+
+/* ---- sigma-ascend-32768 ------------------------------------------------- */
+sigma_err_t sigma_cmd_ascend_32768(int argc, char *argv[]) {
+    (void)argc; (void)argv;
+    sigma_15bit_final_ascend();
+    return SIGMA_OK;
+}
+
+/* ---- sigma-parse-any ---------------------------------------------------- */
+sigma_err_t sigma_cmd_parse_any(int argc, char *argv[]) {
+    if (argc < 2) {
+        sigma_printf("Usage: sigma-parse-any [addr] [size]\n");
+        return SIGMA_OK; }
+    sigma_parse_any((void*)sigma_atoi(argv[1]), (sigma_size_t)sigma_atoi(argv[2]));
+    return SIGMA_OK;
+}
+
+/* ---- sigma-crystal-lock ------------------------------------------------- */
+sigma_err_t sigma_cmd_crystal_lock(int argc, char *argv[]) {
+    (void)argc; (void)argv;
+    sigma_crystal_lock();
+    return SIGMA_OK;
+}
+
+/* ---- sigma-ascend-65536 ------------------------------------------------- */
+sigma_err_t sigma_cmd_ascend_65536(int argc, char *argv[]) {
+    (void)argc; (void)argv;
+    sigma_16bit_final_ascend();
+    return SIGMA_OK;
+}
+
+/* ---- sigma-solve-algo --------------------------------------------------- */
+sigma_err_t sigma_cmd_solve_algo(int argc, char *argv[]) {
+    if (argc < 2) {
+        sigma_printf("Usage: sigma-solve-algo [problem_id]\n");
+        return SIGMA_OK; }
+    sigma_algo_solve(argv[1]);
+    return SIGMA_OK;
+}
+
+/* ---- sigma-mem-inf ------------------------------------------------------ */
+sigma_err_t sigma_cmd_mem_inf(int argc, char *argv[]) {
+    (void)argc; (void)argv;
+    sigma_mem_infinite();
+    return SIGMA_OK;
+}
+
+/* ---- sigma-ascend-100k -------------------------------------------------- */
+sigma_err_t sigma_cmd_ascend_100k(int argc, char *argv[]) {
+    (void)argc; (void)argv;
+    sigma_centennial_ascend();
+    return SIGMA_OK;
+}
+
+/* ---- sigma-compile-target ----------------------------------------------- */
+sigma_err_t sigma_cmd_compile_target(int argc, char *argv[]) {
+    if (argc < 2) {
+        sigma_printf("Usage: sigma-compile-target [source]\n");
+        return SIGMA_OK; }
+    sigma_compile_target(argv[1]);
+    return SIGMA_OK;
+}
+
+/* ---- sigma-mesh-sync ---------------------------------------------------- */
+sigma_err_t sigma_cmd_mesh_sync(int argc, char *argv[]) {
+    (void)argc; (void)argv;
+    sigma_mesh_sync_all();
+    return SIGMA_OK;
+}
+
+/* ---- sigma-ascend-131k -------------------------------------------------- */
+sigma_err_t sigma_cmd_ascend_131k(int argc, char *argv[]) {
+    (void)argc; (void)argv;
+    sigma_17bit_final_ascend();
+    return SIGMA_OK;
+}
+
+/* ---- sigma-logic-eval --------------------------------------------------- */
+sigma_err_t sigma_cmd_logic_eval(int argc, char *argv[]) {
+    if (argc < 2) {
+        sigma_printf("Usage: sigma-logic-eval [proposition]\n");
+        return SIGMA_OK; }
+    sigma_logic_eval(argv[1]);
+    return SIGMA_OK;
+}
+
+/* ---- sigma-registry-find ------------------------------------------------ */
+sigma_err_t sigma_cmd_registry_find(int argc, char *argv[]) {
+    if (argc < 2) {
+        sigma_printf("Usage: sigma-registry-find [object_id]\n");
+        return SIGMA_OK; }
+    sigma_registry_lookup(argv[1]);
+    return SIGMA_OK;
+}
+
+/* ---- sigma-ascend-200000 ------------------------------------------------ */
+sigma_err_t sigma_cmd_ascend_200k(int argc, char *argv[]) {
+    (void)argc; (void)argv;
+    sigma_bi_centennial_ascend();
+    return SIGMA_OK;
+}
+
+/* ---- sigma-storage-commit ----------------------------------------------- */
+sigma_err_t sigma_cmd_storage_commit(int argc, char *argv[]) {
+    if (argc < 2) {
+        sigma_printf("Usage: sigma-storage-commit [name] [addr] [size]\n");
+        return SIGMA_OK; }
+    sigma_storage_commit(argv[1], (void*)sigma_atoi(argv[2]), (sigma_size_t)sigma_atoi(argv[3]));
+    return SIGMA_OK;
+}
+
+/* ---- sigma-quantum-fork ------------------------------------------------- */
+sigma_err_t sigma_cmd_quantum_fork(int argc, char *argv[]) {
+    (void)argc; (void)argv;
+    sigma_quantum_parallel();
+    return SIGMA_OK;
+}
+
+/* ---- sigma-ascend-262144 ------------------------------------------------ */
+sigma_err_t sigma_cmd_ascend_262k(int argc, char *argv[]) {
+    (void)argc; (void)argv;
+    sigma_18bit_final_ascend();
+    return SIGMA_OK;
+}
+
+/* ---- sigma-repo-matrix-sync --------------------------------------------- */
+sigma_err_t sigma_cmd_repo_matrix_sync(int argc, char *argv[]) {
+    (void)argc; (void)argv;
+    sigma_repo_matrix_sync();
+    return SIGMA_OK;
+}
+
+/* ---- sigma-matrix-simulate ---------------------------------------------- */
+sigma_err_t sigma_cmd_matrix_simulate(int argc, char *argv[]) {
+    (void)argc; (void)argv;
+    sigma_matrix_simulate();
+    return SIGMA_OK;
+}
+
+/* ---- sigma-ascend-300000 ------------------------------------------------ */
+sigma_err_t sigma_cmd_ascend_300k(int argc, char *argv[]) {
+    (void)argc; (void)argv;
+    sigma_tri_centennial_ascend();
+    return SIGMA_OK;
+}
+
 /* ---- sigma-wizard ------------------------------------------------------ */
 sigma_err_t sigma_cmd_wizard(int argc, char *argv[]) {
     (void)argc; (void)argv;
@@ -3264,6 +4580,153 @@ void SovereignCLI_Init(void) {
     sigma_cli_register(&g_sigma_cli, "sigma-voice",       "Neural NLP Speech Synthesis",     sigma_cmd_voice);
     sigma_cli_register(&g_sigma_cli, "sigma-docker",      "Silicon Microservice Containers", sigma_cmd_docker);
     sigma_cli_register(&g_sigma_cli, "sigma-defender",    "Heuristic Execution Guard",       sigma_cmd_defender);
+    sigma_cli_register(&g_sigma_cli, "sigma-p2p",         "Decentralized Mesh Networking",   sigma_cmd_p2p);
+    sigma_cli_register(&g_sigma_cli, "sigma-qkd",         "Quantum Key Silicon Exchange",    sigma_cmd_qkd);
+    sigma_cli_register(&g_sigma_cli, "sigma-boot-audit",  "TPM Silicon Integrity Audit",     sigma_cmd_boot_audit);
+    sigma_cli_register(&g_sigma_cli, "sigma-eeg",         "Thought-to-Command Synthesis",    sigma_cmd_eeg);
+    sigma_cli_register(&g_sigma_cli, "sigma-tag",         "MTE Hardware Memory Tagging",     sigma_cmd_tag);
+    sigma_cli_register(&g_sigma_cli, "sigma-patch",       "Zero-Downtime Kernel Patching",   sigma_cmd_patch);
+    sigma_cli_register(&g_sigma_cli, "sigma-qubit",       "Silicon Qubit Emulation Bus",     sigma_cmd_qubit);
+    sigma_cli_register(&g_sigma_cli, "sigma-hacker",      "Autonomous Red-Team Auditor",     sigma_cmd_hacker);
+    sigma_cli_register(&g_sigma_cli, "sigma-mesh-mount",  "Plan-9 Remote Silicon Mounting",  sigma_cmd_mesh_mount);
+    sigma_cli_register(&g_sigma_cli, "sigma-neural-sync", "Brain-to-Brain Intent Sync",      sigma_cmd_neural_sync);
+    sigma_cli_register(&g_sigma_cli, "sigma-foundry",     "Silicon Foundry Diagnostics",     sigma_cmd_foundry);
+    sigma_cli_register(&g_sigma_cli, "sigma-job",         "Exascale Supercomputer Scheduler",sigma_cmd_job);
+    sigma_cli_register(&g_sigma_cli, "sigma-dyson",       "Solar Dyson-Swarm Telemetry",     sigma_cmd_dyson);
+    sigma_cli_register(&g_sigma_cli, "sigma-space-link",  "LEO Orbital Laser Handshake",     sigma_cmd_space_link);
+    sigma_cli_register(&g_sigma_cli, "sigma-bio-audit",   "CRISPR Silicon Genomic Audit",    sigma_cmd_bio_audit);
+    sigma_cli_register(&g_sigma_cli, "sigma-merge",       "Transcendental AI Context Merge", sigma_cmd_merge);
+    sigma_cli_register(&g_sigma_cli, "sigma-audit-logic", "Gödel Paradox Causal Auditor",    sigma_cmd_audit_logic);
+    sigma_cli_register(&g_sigma_cli, "sigma-rewind",      "Deterministic Silicon Rewind",    sigma_cmd_rewind);
+    sigma_cli_register(&g_sigma_cli, "sigma-ether",       "Sub-THz 6G Waveform Synthesis",   sigma_cmd_ether);
+    sigma_cli_register(&g_sigma_cli, "sigma-null",        "Zero-HAL Direct Silicon Dispatch", sigma_cmd_null);
+    sigma_cli_register(&g_sigma_cli, "sigma-void",        "The 151st Shard: Zenith Manifest", sigma_cmd_void);
+    sigma_cli_register(&g_sigma_cli, "sigma-rtos-msg",    "Hard Real-Time Synchronous IPC",   sigma_cmd_rtos_msg);
+    sigma_cli_register(&g_sigma_cli, "sigma-thread",      "Granular Media-Dominant Thread",   sigma_cmd_thread);
+    sigma_cli_register(&g_sigma_cli, "sigma-blit",        "Amiga-Tier Silicon DMA Offload",  sigma_cmd_blit);
+    sigma_cli_register(&g_sigma_cli, "sigma-secure-call", "Multics-Tier Ring Gate Transition", sigma_cmd_secure_call);
+    sigma_cli_register(&g_sigma_cli, "sigma-quorum-join", "OpenVMS-Tier Mesh Quorum Sync",   sigma_cmd_quorum_join);
+    sigma_cli_register(&g_sigma_cli, "sigma-persist-obj", "OS/2-Tier Persistent Object Store", sigma_cmd_persist_obj);
+    sigma_cli_register(&g_sigma_cli, "sigma-lpar",        "Mainframe Logical Partitioning",  sigma_cmd_lpar);
+    sigma_cli_register(&g_sigma_cli, "sigma-draw-ui",     "Xerox-Alto DPI-Aware GUI Primitives", sigma_cmd_draw_ui);
+    sigma_cli_register(&g_sigma_cli, "sigma-vec-math",    "Cray-Tier Vector Pipe Compute",   sigma_cmd_vec_math);
+    sigma_cli_register(&g_sigma_cli, "sigma-blur",        "Aero-Tier Glassmorphism Blur",    sigma_cmd_blur);
+    sigma_cli_register(&g_sigma_cli, "sigma-aqua",        "Aqua-Tier High-Fidelity Gloss",   sigma_cmd_aqua);
+    sigma_cli_register(&g_sigma_cli, "sigma-elevate",     "Material-Tier Z-Depth Elevation", sigma_cmd_elevate);
+    sigma_cli_register(&g_sigma_cli, "sigma-flip",        "Metro-Tier Motion Tile Flip",     sigma_cmd_flip);
+    sigma_cli_register(&g_sigma_cli, "sigma-game",        "SteamOS-Tier Gaming Boost",       sigma_cmd_game);
+    sigma_cli_register(&g_sigma_cli, "sigma-audio-pro",   "ASIO-Tier Direct DMA Audio",      sigma_cmd_audio_pro);
+    sigma_cli_register(&g_sigma_cli, "sigma-sleep-deep",  "Symbian-Tier Extreme Eco Sleep",  sigma_cmd_sleep_deep);
+    sigma_cli_register(&g_sigma_cli, "sigma-render-8k",   "VFX-Tier 8K Video Encoding",      sigma_cmd_render_8k);
+    sigma_cli_register(&g_sigma_cli, "sigma-sense",       "Sensory-Link Neural Emulation",   sigma_cmd_sense);
+    sigma_cli_register(&g_sigma_cli, "sigma-crypto",      "Silicon HSM Cold-Vault PKI",      sigma_cmd_crypto);
+    sigma_cli_register(&g_sigma_cli, "sigma-tmr",         "Triple-Modular Redundancy Audit", sigma_cmd_tmr);
+    sigma_cli_register(&g_sigma_cli, "sigma-hive",        "Swarm-Robotics Hive Orchestrator",sigma_cmd_hive);
+    sigma_cli_register(&g_sigma_cli, "sigma-qram",        "Entropy-Lossless Quantum Memory", sigma_cmd_qram);
+    sigma_cli_register(&g_sigma_cli, "sigma-purge",       "Amnesic-Tier Forensic Memory Purge", sigma_cmd_purge);
+    sigma_cli_register(&g_sigma_cli, "sigma-dark-mesh",   "Tor-Tier Anonymous Mesh Relay",   sigma_cmd_dark_mesh);
+    sigma_cli_register(&g_sigma_cli, "sigma-unleash",     "Extreme Supernova Overclocking",  sigma_cmd_unleash);
+    sigma_cli_register(&g_sigma_cli, "sigma-summit",      "The 190th Shard: Absolute Summit", sigma_cmd_summit);
+    sigma_cli_register(&g_sigma_cli, "sigma-seal",        "The 210th Shard: Kernel Sealing",  sigma_cmd_seal);
+    sigma_cli_register(&g_sigma_cli, "sigma-hibernate-forever", "Infinite Silicon Hibernate", sigma_cmd_hibernate_forever);
+    sigma_cli_register(&g_sigma_cli, "sigma-unity-merge", "Distributed Fabric Compute Merge", sigma_cmd_unity_merge);
+    sigma_cli_register(&g_sigma_cli, "sigma-ascend",      "The 222nd Shard: Final Ascension", sigma_cmd_ascend);
+    sigma_cli_register(&g_sigma_cli, "sigma-sim-reality", "1:1 Silicon Reality Simulation",   sigma_cmd_sim_reality);
+    sigma_cli_register(&g_sigma_cli, "sigma-teleport",    "Zero-Latency Quantum Entanglement", sigma_cmd_teleport);
+    sigma_cli_register(&g_sigma_cli, "sigma-boost-zen",   "Garuda-Tier Zen Performance Boost", sigma_cmd_boost_zen);
+    sigma_cli_register(&g_sigma_cli, "sigma-generation-switch", "NixOS-Tier Immutable Rollback",  sigma_cmd_generation_switch);
+    sigma_cli_register(&g_sigma_cli, "sigma-isolate-cube", "Qubes-Tier Silicon Isolation",    sigma_cmd_isolate_cube);
+    sigma_cli_register(&g_sigma_cli, "sigma-binder-call", "Android-Tier Binder IPC Handshake", sigma_cmd_binder_call);
+    sigma_cli_register(&g_sigma_cli, "sigma-verify-id",   "iOS-Tier Secure Enclave Biometric", sigma_cmd_verify_id);
+    sigma_cli_register(&g_sigma_cli, "sigma-gpu-push",    "PS-Tier Graphics Command Push",   sigma_cmd_gpu_push);
+    sigma_cli_register(&g_sigma_cli, "sigma-clean-auto",  "Native Recursive System Cleaner", sigma_cmd_clean_auto);
+    sigma_cli_register(&g_sigma_cli, "sigma-perf-auto",   "Native Dynamic Perf Governor",    sigma_cmd_perf_auto);
+    sigma_cli_register(&g_sigma_cli, "sigma-omega-point", "The 256th Shard: Absolute Zenith", sigma_cmd_omega_point);
+    sigma_cli_register(&g_sigma_cli, "sigma-fix-code",    "Autonomous Instruction Hot-Patch", sigma_cmd_fix_code);
+    sigma_cli_register(&g_sigma_cli, "sigma-bio-check",   "Biometric Liveness Pulse Check",   sigma_cmd_bio_check);
+    sigma_cli_register(&g_sigma_cli, "sigma-evolve",      "Genetic-Tier Parameter Evolution", sigma_cmd_evolve);
+    sigma_cli_register(&g_sigma_cli, "sigma-neural-ui",   "Neural-Intent Workspace Tailor",  sigma_cmd_neural_ui);
+    sigma_cli_register(&g_sigma_cli, "sigma-ascend-333", "The 333rd Shard: Absolute End",    sigma_cmd_ascend_333);
+    sigma_cli_register(&g_sigma_cli, "sigma-bootstrap-code", "Native C11 Self-Bootstrapping", sigma_cmd_bootstrap_code);
+    sigma_cli_register(&g_sigma_cli, "sigma-shred-silicon", "Forensic-Grade Memory Shredder", sigma_cmd_shred_silicon);
+    sigma_cli_register(&g_sigma_cli, "sigma-solar-summit", "The 365th Shard: Solar Cycle",    sigma_cmd_solar_summit);
+    sigma_cli_register(&g_sigma_cli, "sigma-design-chip", "Native HDL Silicon Synthesis",    sigma_cmd_design_chip);
+    sigma_cli_register(&g_sigma_cli, "sigma-stabilize-ice", "Cryogenic Thermal Stabilization", sigma_cmd_stabilize_ice);
+    sigma_cli_register(&g_sigma_cli, "sigma-spartan-400", "The 400th Shard: Absolute Fortress", sigma_cmd_spartan_400);
+    sigma_cli_register(&g_sigma_cli, "sigma-synth-ai",    "Native Neural Weight Synthesis",  sigma_cmd_synth_ai);
+    sigma_cli_register(&g_sigma_cli, "sigma-aura",        "Photonic Global UI Luminescence", sigma_cmd_aura);
+    sigma_cli_register(&g_sigma_cli, "sigma-zenith-final", "The 500th Shard: Master Finality", sigma_cmd_zenith_final);
+    sigma_cli_register(&g_sigma_cli, "sigma-relay-arch",   "Cross-ISA Multi-Arch Relay",      sigma_cmd_relay_arch);
+    sigma_cli_register(&g_sigma_cli, "sigma-aura-v2",     "Spectral HDR-Infinity Luminescence", sigma_cmd_aura_v2);
+    sigma_cli_register(&g_sigma_cli, "sigma-ascend-600",  "The 600th Shard: Absolute Pinnacle", sigma_cmd_ascend_600);
+    sigma_cli_register(&g_sigma_cli, "sigma-time-dilate", "Quantum-Temporal Time Dilation",   sigma_cmd_time_dilate);
+    sigma_cli_register(&g_sigma_cli, "sigma-entropy-zero", "Absolute Zero-Entropy Cleanup",    sigma_cmd_entropy_zero);
+    sigma_cli_register(&g_sigma_cli, "sigma-ascend-777",  "The 777th Shard: God-Tier Finality", sigma_cmd_ascend_777);
+    sigma_cli_register(&g_sigma_cli, "sigma-invoke-intent", "Thought-to-Machine Intent Invoke", sigma_cmd_invoke_intent);
+    sigma_cli_register(&g_sigma_cli, "sigma-manifest-fabric", "1:1 Reality Haptic Manifestation", sigma_cmd_manifest_fabric);
+    sigma_cli_register(&g_sigma_cli, "sigma-ascend-1000", "The 1000th Shard: Millennium Zenith", sigma_cmd_ascend_1000);
+    sigma_cli_register(&g_sigma_cli, "sigma-hive-merge",  "Multi-Kernel Hive-Mind Merger",   sigma_cmd_hive_merge);
+    sigma_cli_register(&g_sigma_cli, "sigma-boot-nano",  "Sub-Millisecond Silicon Boot",    sigma_cmd_boot_nano);
+    sigma_cli_register(&g_sigma_cli, "sigma-ascend-1111", "The 1111th Shard: Angelic Threshold", sigma_cmd_ascend_1111);
+    sigma_cli_register(&g_sigma_cli, "sigma-canvas-draw",  "Photorealistic C11 Ray-Tracing", sigma_cmd_canvas_draw);
+    sigma_cli_register(&g_sigma_cli, "sigma-music-render", "Harmonic Wavetable Audio Synth", sigma_cmd_music_render);
+    sigma_cli_register(&g_sigma_cli, "sigma-ascend-1337", "The 1337th Shard: Elite Finality", sigma_cmd_ascend_1337);
+    sigma_cli_register(&g_sigma_cli, "sigma-atomic-map",   "Native Bit-per-Atom Addressing", sigma_cmd_atomic_map);
+    sigma_cli_register(&g_sigma_cli, "sigma-ghost-intent", "Cognitive User-Intent Mirroring", sigma_cmd_ghost_intent);
+    sigma_cli_register(&g_sigma_cli, "sigma-ascend-2048", "The 2048th Shard: Binary Zenith", sigma_cmd_ascend_2048);
+    sigma_cli_register(&g_sigma_cli, "sigma-grand-nest",  "Recursive OS-within-OS Nesting",  sigma_cmd_grand_nest);
+    sigma_cli_register(&g_sigma_cli, "sigma-omni-sync",  "All-Node State Omnipresence",     sigma_cmd_omni_sync);
+    sigma_cli_register(&g_sigma_cli, "sigma-ascend-3000", "The 3000th Shard: Grand Finality", sigma_cmd_ascend_3000);
+    sigma_cli_register(&g_sigma_cli, "sigma-galactic-route", "Interstellar Instruction Routing", sigma_cmd_galactic_route);
+    sigma_cli_register(&g_sigma_cli, "sigma-dyson-stats", "Stellar Energy Feed Orchestration", sigma_cmd_dyson_stats);
+    sigma_cli_register(&g_sigma_cli, "sigma-ascend-3333", "The 3333rd Shard: Master-Cycle", sigma_cmd_ascend_3333);
+    sigma_cli_register(&g_sigma_cli, "sigma-brane-sync",  "Multi-Brane Reality Synchronization", sigma_cmd_brane_sync);
+    sigma_cli_register(&g_sigma_cli, "sigma-prove-truth", "Formal Logic Silicon Proof Engine", sigma_cmd_prove_truth);
+    sigma_cli_register(&g_sigma_cli, "sigma-ascend-4096", "The 4096th Shard: 12-Bit Finality", sigma_cmd_ascend_4096);
+    sigma_cli_register(&g_sigma_cli, "sigma-lattice-scale", "Industrial 5000-Service Scaling", sigma_cmd_lattice_scale);
+    sigma_cli_register(&g_sigma_cli, "sigma-ascend-5000", "The 5000th Shard: Pentathlon Zenith", sigma_cmd_ascend_5000);
+    sigma_cli_register(&g_sigma_cli, "sigma-legacy-absorb", "Absorb Legacy Script USPs to Silicon", sigma_cmd_legacy_absorb);
+    sigma_cli_register(&g_sigma_cli, "sigma-amorphous-mask", "Amorphous Resource Sched Masking", sigma_cmd_amorphous_mask);
+    sigma_cli_register(&g_sigma_cli, "sigma-ascend-6666", "The 6666th Shard: Seraphim Threshold", sigma_cmd_ascend_6666);
+    sigma_cli_register(&g_sigma_cli, "sigma-eternal-tick", "Absolute Temporal Sync Frequency", sigma_cmd_eternal_tick);
+    sigma_cli_register(&g_sigma_cli, "sigma-data-holo",   "Holographic Persist Shard Data", sigma_cmd_data_holo);
+    sigma_cli_register(&g_sigma_cli, "sigma-ascend-8192", "The 8192nd Shard: 13-Bit Eternal", sigma_cmd_ascend_8192);
+    sigma_cli_register(&g_sigma_cli, "sigma-logic-sync",  "All-Paradigm Logic Synthesis", sigma_cmd_logic_sync);
+    sigma_cli_register(&g_sigma_cli, "sigma-user-mirror", "Absolute User Persona Mirror", sigma_cmd_user_mirror);
+    sigma_cli_register(&g_sigma_cli, "sigma-ascend-10000", "The 10000th Shard: Decathlon Zenith", sigma_cmd_ascend_10000);
+    sigma_cli_register(&g_sigma_cli, "sigma-ui-manifest", "Silicon-to-Photon Visual Plane", sigma_cmd_ui_manifest);
+    sigma_cli_register(&g_sigma_cli, "sigma-hive-sync",  "All-Node Mesh Swarm Intelligence", sigma_cmd_hive_sync);
+    sigma_cli_register(&g_sigma_cli, "sigma-ascend-12000", "The 12000th Shard: Throne Zenith", sigma_cmd_ascend_12000);
+    sigma_cli_register(&g_sigma_cli, "sigma-privacy-wipe", "Zero-Trace Silicon Vaporization", sigma_cmd_privacy_wipe);
+    sigma_cli_register(&g_sigma_cli, "sigma-entropy-fix",  "Real-time Entropy Performance Fix", sigma_cmd_entropy_fix);
+    sigma_cli_register(&g_sigma_cli, "sigma-ascend-16384", "The 16384th Shard: 14-Bit Zenith", sigma_cmd_ascend_16384);
+    sigma_cli_register(&g_sigma_cli, "sigma-file-lock",   "Bit-Perfect Silicon Data Lock", sigma_cmd_file_lock);
+    sigma_cli_register(&g_sigma_cli, "sigma-brain-link",  "Native Neural-Interface Sync",   sigma_cmd_brain_link);
+    sigma_cli_register(&g_sigma_cli, "sigma-ascend-20000", "The 20000th Shard: Ventennium", sigma_cmd_ascend_20000);
+    sigma_cli_register(&g_sigma_cli, "sigma-formal-prove", "Formal Mathematical Proof Engine", sigma_cmd_formal_prove);
+    sigma_cli_register(&g_sigma_cli, "sigma-entropy-harvest", "Non-Deterministic Chaos Harvest", sigma_cmd_entropy_harvest);
+    sigma_cli_register(&g_sigma_cli, "sigma-ascend-32768", "The 32768th Shard: 15-Bit Zenith", sigma_cmd_ascend_32768);
+    sigma_cli_register(&g_sigma_cli, "sigma-parse-any",   "Universal Structure Ingestion",  sigma_cmd_parse_any);
+    sigma_cli_register(&g_sigma_cli, "sigma-crystal-lock", "Time-Crystal Stability Loop", sigma_cmd_crystal_lock);
+    sigma_cli_register(&g_sigma_cli, "sigma-ascend-65536", "The 65536th Shard: 16-Bit Zenith", sigma_cmd_ascend_65536);
+    sigma_cli_register(&g_sigma_cli, "sigma-solve-algo",  "NP-Hard Universal Algorithm Solver", sigma_cmd_solve_algo);
+    sigma_cli_register(&g_sigma_cli, "sigma-mem-inf",    "Manifest Infinite Memory Singularity", sigma_cmd_mem_inf);
+    sigma_cli_register(&g_sigma_cli, "sigma-ascend-100k", "The 100000th Shard: Centennial Zenith", sigma_cmd_ascend_100k);
+    sigma_cli_register(&g_sigma_cli, "sigma-compile-target", "Universal Syntax to Silicon Compiler", sigma_cmd_compile_target);
+    sigma_cli_register(&g_sigma_cli, "sigma-mesh-sync",    "Zero-Latency Mesh Fabric Sync",   sigma_cmd_mesh_sync);
+    sigma_cli_register(&g_sigma_cli, "sigma-ascend-131k", "The 131072nd Shard: 17-Bit Zenith", sigma_cmd_ascend_131k);
+    sigma_cli_register(&g_sigma_cli, "sigma-logic-eval",  "NP-Hard Universal Logic Evaluator", sigma_cmd_logic_eval);
+    sigma_cli_register(&g_sigma_cli, "sigma-registry-find", "200K-Object Discovery Registry", sigma_cmd_registry_find);
+    sigma_cli_register(&g_sigma_cli, "sigma-ascend-200k", "The 200000th Shard: Bi-Centennial", sigma_cmd_ascend_200k);
+    sigma_cli_register(&g_sigma_cli, "sigma-storage-commit", "Universal Bit-Perfect Data Storage", sigma_cmd_storage_commit);
+    sigma_cli_register(&g_sigma_cli, "sigma-quantum-fork", "Fork parallel computation branes", sigma_cmd_quantum_fork);
+    sigma_cli_register(&g_sigma_cli, "sigma-ascend-262k", "The 262144th Shard: 18-Bit Zenith", sigma_cmd_ascend_262k);
+    sigma_cli_register(&g_sigma_cli, "sigma-repo-matrix-sync", "Sync matrix to external repo", sigma_cmd_repo_matrix_sync);
+    sigma_cli_register(&g_sigma_cli, "sigma-matrix-simulate", "Simulate Type-0 hypervisor matrix", sigma_cmd_matrix_simulate);
+    sigma_cli_register(&g_sigma_cli, "sigma-ascend-300k", "The 300000th Shard: Tri-Centennial", sigma_cmd_ascend_300k);
+    sigma_cli_register(&g_sigma_cli, "sigma-repo-matrix-sync", "Sync matrix to external repo", sigma_cmd_repo_matrix_sync);
+    sigma_cli_register(&g_sigma_cli, "sigma-matrix-simulate", "Simulate Type-0 hypervisor matrix", sigma_cmd_matrix_simulate);
+    sigma_cli_register(&g_sigma_cli, "sigma-ascend-300k", "The 300000th Shard: Tri-Centennial", sigma_cmd_ascend_300k);
 
     sigma_cli_register(&g_sigma_cli, "sigma-help",  "Show this help",                       sigma_cmd_help);
 

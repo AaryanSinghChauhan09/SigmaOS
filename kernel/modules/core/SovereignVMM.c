@@ -200,7 +200,7 @@ static SigmaVMA_t *vma_insert(SigmaAddressSpace_t *as,
     if (as->vma_count >= MAX_VMAS_PER_PROC) return SIGMA_NULL;
     SigmaVMA_t *v = &as->vmas[as->vma_count++];
     v->start = start; v->end = end; v->flags = flags;
-    sigma_strcpy(v->name, name, sizeof(v->name));
+    sigma_strcpy(v->name, name);
     return v;
 }
 
