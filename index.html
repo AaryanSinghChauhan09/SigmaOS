@@ -24,6 +24,7 @@
     </div>
 
     <main class="workspace scene">
+        <div id="singularity-pulse"></div>
         <!-- Sovereign Forge Floating Panel -->
         <div id="sovereign-forge" class="glass aura-glow animate-slide-up">
             <div class="stat-label">SOVEREIGN FORGE: SHARD CONSTRUCTION</div>
@@ -120,6 +121,7 @@
             <div class="taskbar-item" id="btn-explorer" title="Sovereign Explorer">🚀</div>
             <div class="taskbar-item" id="btn-shell" title="Secure Shell">🧠</div>
             <div class="taskbar-item" id="btn-ide" title="Sovereign IDE">⚡</div>
+            <div class="taskbar-item" id="btn-sentience" title="Sentience Core">👁️</div>
             <div class="taskbar-item" id="btn-portal" title="Multiverse Portal">🌀</div>
             <div class="taskbar-item" id="btn-save" title="Checkpoint">💾</div>
         </div>
@@ -161,6 +163,16 @@
         <div class="window-body">
             <textarea id="ide-editor" placeholder="/* Enter Sovereign Code to Patch Kernel... */"></textarea>
             <button id="btn-patch">PATCH KERNEL</button>
+        </div>
+    </div>
+
+    <div id="win-sentience" class="window glass-dark hidden animate-fade-in aura-glow">
+        <div class="window-header">
+            <span>Σ Sovereign Sentience Core</span>
+            <button onclick="closeWindow('win-sentience')">×</button>
+        </div>
+        <div class="window-body">
+            <div id="sentience-log" class="console-text" style="height: 300px; color: #fff600;"></div>
         </div>
     </div>
 

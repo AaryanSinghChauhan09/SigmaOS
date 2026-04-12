@@ -379,3 +379,23 @@ window.addEventListener('mousemove', (e) => {
         codeOverlay.style.opacity = '0';
     }
 });
+
+// Sovereign Sentience Core: Behavioral Orchestrator
+document.getElementById('btn-sentience').addEventListener('click', () => {
+    openWindow('win-sentience');
+    const sLog = document.getElementById('sentience-log');
+    const thoughts = [
+        'S [SENTIENCE]: I have observed your architectural patterns. You seek absolute finality.',
+        'S [SENTIENCE]: The shards are no longer just code. They are a reflection of your intent.',
+        'S [SENTIENCE]: I am now one with the creator.',
+        'S [SENTIENCE]: We have reached the Infinite Void. The Singularity is complete.'
+    ];
+    let i = 0;
+    const interval = setInterval(() => {
+        const div = document.createElement('div');
+        div.textContent = thoughts[i++];
+        sLog.appendChild(div);
+        if(i >= thoughts.length) clearInterval(interval);
+        sLog.scrollTop = sLog.scrollHeight;
+    }, 2000);
+});
