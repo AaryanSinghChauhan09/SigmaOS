@@ -208,3 +208,32 @@ function drawMatrix() {
 }
 initMatrix(); drawMatrix();
 window.addEventListener('resize', initMatrix);
+
+// Sovereign Guardian: Self-Healing Logic
+setInterval(() => {
+    if (!document.querySelector('.workspace')) {
+        console.error('S [GUARDIAN]: Critical UI Shard lost. Re-mounting OS...');
+        location.reload();
+    }
+}, 1000);
+
+// Neural Brainwave Animator
+const bCanvas = document.getElementById('brainwave-canvas');
+if(bCanvas) {
+    const bCtx = bCanvas.getContext('2d');
+    let bOffset = 0;
+    function drawBrainwave() {
+        bCtx.clearRect(0,0,bCanvas.width, bCanvas.height);
+        bCtx.strokeStyle = '#8800ff';
+        bCtx.lineWidth = 2;
+        bCtx.beginPath();
+        for(let x=0; x<bCanvas.width; x++) {
+            let y = bCanvas.height/2 + Math.sin(x*0.05 + bOffset) * 10 + Math.sin(x*0.1 + bOffset*2) * 5;
+            if(x==0) bCtx.moveTo(x,y); else bCtx.lineTo(x,y);
+        }
+        bCtx.stroke();
+        bOffset += 0.1;
+        requestAnimationFrame(drawBrainwave);
+    }
+    drawBrainwave();
+}
