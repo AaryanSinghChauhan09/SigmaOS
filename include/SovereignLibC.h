@@ -42,7 +42,7 @@ extern "C" {
     int           sigma_streq(const char* s1, const char* s2);
     int           sigma_compare(const char* s1, const char* s2);
     void          sigma_strlcat(char* dest, const char* src, sigma_size_t dstsize);
-    char*         sigma_strcpy(char* dest, const char* src, sigma_size_t maxlen);
+    char*         sigma_strcpy(char* dest, const char* src);
     int           sigma_atoi(const char* s);
     int           sigma_shm_open(const char* name, int oflag, int mode);
     int           sigma_shm_unlink(const char* name);

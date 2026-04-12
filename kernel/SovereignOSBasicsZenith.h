@@ -10,7 +10,7 @@
 #ifndef SOVEREIGN_OS_BASICS_ZENITH_H
 #define SOVEREIGN_OS_BASICS_ZENITH_H
 
-#include "../SigmaC11.h"
+#include "../include/SigmaC11.h"
 
 /* --- Process Control Block (PCB) --- */
 typedef struct sovereign_pcb_t {

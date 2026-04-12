@@ -8,7 +8,6 @@
  */
 
 #include "../include/SovereignToolHeader.h"
-#include "../include/SovereignToolHeader.h"
 
 // -------------------------------------------------------------------------
 // AI Model OOP Structure
