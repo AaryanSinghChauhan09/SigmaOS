@@ -17,8 +17,12 @@ void SovereignCLI_Register(void) {
     /* 4. Seat Developer-Grade Tools (git, python, cc, make) */
     extern void SovereignCLI_DevSuite_Register(void);
     SovereignCLI_DevSuite_Register();
+
+    /* 5. Seat Cyber-Security Tools (nmap, whoami, iptables, defender, vault) */
+    extern void SovereignCLI_CyberSuite_Register(void);
+    SovereignCLI_CyberSuite_Register();
     
-    sigma_printf("Σ [CLI-REGISTRY]: Industrial Command Omnibus (80+ Matrix) Seated.\n");
+    sigma_printf("Σ [CLI-REGISTRY]: Industrial Command Omnibus (100+ Matrix) Seated.\n");
 
     static SovereignModule_t s_cli_module = {
         .name = "SovereignCLI",
