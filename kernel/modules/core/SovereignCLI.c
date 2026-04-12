@@ -330,6 +330,9 @@
 #include "../../../include/SovereignOmnipresentMeshShard.h"
 #include "../../../include/SovereignAbsoluteEternityShard.h"
 #include "../../../include/Sovereign16777216THShard.h"
+#include "../../../include/SovereignAbsoluteCreationShard.h"
+#include "../../../include/SovereignUniversalTelepathyShard.h"
+#include "../../../include/Sovereign33554432NDShard.h"
 
 /* Global CLI context */
 SigmaCLICtx_t g_sigma_cli;
@@ -4381,6 +4384,27 @@ sigma_err_t sigma_cmd_ascend_16m(int argc, char *argv[]) {
     return SIGMA_OK;
 }
 
+/* ---- sigma-genesis-invoke ----------------------------------------------- */
+sigma_err_t sigma_cmd_genesis_invoke(int argc, char *argv[]) {
+    (void)argc; (void)argv;
+    sigma_genesis_invoke();
+    return SIGMA_OK;
+}
+
+/* ---- sigma-telepathy-sync ----------------------------------------------- */
+sigma_err_t sigma_cmd_telepathy_sync(int argc, char *argv[]) {
+    (void)argc; (void)argv;
+    sigma_telepathy_sync();
+    return SIGMA_OK;
+}
+
+/* ---- sigma-ascend-33m --------------------------------------------------- */
+sigma_err_t sigma_cmd_ascend_33m(int argc, char *argv[]) {
+    (void)argc; (void)argv;
+    sigma_33megashard_ascend();
+    return SIGMA_OK;
+}
+
 /* ---- sigma-wizard ------------------------------------------------------ */
 sigma_err_t sigma_cmd_wizard(int argc, char *argv[]) {
     (void)argc; (void)argv;
@@ -4889,6 +4913,9 @@ void SovereignCLI_Init(void) {
     sigma_cli_register(&g_sigma_cli, "sigma-omnipresence-sync", "Infinite absolute mesh topology alignment", sigma_cmd_omnipresence_sync);
     sigma_cli_register(&g_sigma_cli, "sigma-eternity-sync", "Absolute temporal detachment control", sigma_cmd_eternity_sync);
     sigma_cli_register(&g_sigma_cli, "sigma-ascend-16m", "The 16777216th Shard: 16-MEGA-SHARD", sigma_cmd_ascend_16m);
+    sigma_cli_register(&g_sigma_cli, "sigma-genesis-invoke", "Spontaneous logic paradigm creation", sigma_cmd_genesis_invoke);
+    sigma_cli_register(&g_sigma_cli, "sigma-telepathy-sync", "Neural-link subconscious intent bypass", sigma_cmd_telepathy_sync);
+    sigma_cli_register(&g_sigma_cli, "sigma-ascend-33m", "The 33554432nd Shard: 33-MEGA-SHARD", sigma_cmd_ascend_33m);
 
     sigma_cli_register(&g_sigma_cli, "sigma-help",  "Show this help",                       sigma_cmd_help);
 
