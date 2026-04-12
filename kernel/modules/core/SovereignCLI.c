@@ -159,6 +159,9 @@
 #include "../../../include/SovereignKMSShard.h"
 #include "../../../include/SovereignThermalShard.h"
 #include "../../../include/SovereignRegistryShard.h"
+#include "../../../include/SovereignAudioEngineShard.h"
+#include "../../../include/SovereignEcoShard.h"
+#include "../../../include/SovereignBluetoothShard.h"
 
 /* Global CLI context */
 SigmaCLICtx_t g_sigma_cli;
@@ -2828,6 +2831,33 @@ sigma_err_t sigma_cmd_reg(int argc, char *argv[]) {
     return SIGMA_OK;
 }
 
+/* ---- sigma-audio -------------------------------------------------------- */
+sigma_err_t sigma_cmd_audio(int argc, char *argv[]) {
+    if (argc < 2) {
+        sigma_printf("Usage: sigma-audio [stream <rate> <depth>]\n");
+        return SIGMA_OK; }
+    if (sigma_streq(argv[1], "stream") && argc >= 4)
+        sigma_audio_stream((sigma_u32)sigma_atoi(argv[2]), (sigma_u32)sigma_atoi(argv[3]));
+    return SIGMA_OK;
+}
+
+/* ---- sigma-eco ---------------------------------------------------------- */
+sigma_err_t sigma_cmd_eco(int argc, char *argv[]) {
+    (void)argc; (void)argv;
+    sigma_eco_engage();
+    return SIGMA_OK;
+}
+
+/* ---- sigma-bt ----------------------------------------------------------- */
+sigma_err_t sigma_cmd_bt(int argc, char *argv[]) {
+    if (argc < 2) {
+        sigma_printf("Usage: sigma-bt [pair <device_id>]\n");
+        return SIGMA_OK; }
+    if (sigma_streq(argv[1], "pair") && argc >= 3)
+        sigma_bt_pair(argv[2]);
+    return SIGMA_OK;
+}
+
 /* ---- sigma-wizard ------------------------------------------------------ */
 sigma_err_t sigma_cmd_wizard(int argc, char *argv[]) {
     (void)argc; (void)argv;
@@ -3162,6 +3192,9 @@ void SovereignCLI_Init(void) {
     sigma_cli_register(&g_sigma_cli, "sigma-kms",         "Kernel Mode-Setting Display",     sigma_cmd_kms);
     sigma_cli_register(&g_sigma_cli, "sigma-thermal",     "Auto Silicon Thermal Guard",      sigma_cmd_thermal);
     sigma_cli_register(&g_sigma_cli, "sigma-reg",         "High-Perf B+Tree Registry",       sigma_cmd_reg);
+    sigma_cli_register(&g_sigma_cli, "sigma-audio",       "Silicon Real-Time Audio Engine",  sigma_cmd_audio);
+    sigma_cli_register(&g_sigma_cli, "sigma-eco",         "Power-Aware Efficiency Plan",     sigma_cmd_eco);
+    sigma_cli_register(&g_sigma_cli, "sigma-bt",          "Silicon Bluetooth Mesh Stack",    sigma_cmd_bt);
 
     sigma_cli_register(&g_sigma_cli, "sigma-help",  "Show this help",                       sigma_cmd_help);
 

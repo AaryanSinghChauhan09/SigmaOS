@@ -131,7 +131,10 @@ SYSTEM_SHARDS := \
   kernel/modules/system/SovereignExokernelShard.c   \
   kernel/modules/system/SovereignServiceShard.c     \
   kernel/modules/system/SovereignKMSShard.c         \
-  kernel/modules/system/SovereignThermalShard.c
+  kernel/modules/system/SovereignThermalShard.c     \
+  kernel/modules/system/SovereignAudioEngineShard.c \
+  kernel/modules/system/SovereignEcoShard.c         \
+  kernel/modules/system/SovereignBluetoothShard.c
 
 # Filesystem
 FS_SHARDS := \
