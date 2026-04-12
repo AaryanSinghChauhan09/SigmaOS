@@ -363,6 +363,9 @@
 #include "../../../include/SovereignAbsoluteOmnipresenceShard.h"
 #include "../../../include/SovereignUniversalChronoDriveShard.h"
 #include "../../../include/Sovereign34359738368THShard.h"
+#include "../../../include/SovereignAbsoluteMacrocosmShard.h"
+#include "../../../include/SovereignUniversalAbstractLogicShard.h"
+#include "../../../include/Sovereign68719476736THShard.h"
 
 /* Global CLI context */
 SigmaCLICtx_t g_sigma_cli;
@@ -4645,6 +4648,27 @@ sigma_err_t sigma_cmd_ascend_34g(int argc, char *argv[]) {
     return SIGMA_OK;
 }
 
+/* ---- sigma-macrocosm-invoke --------------------------------------------- */
+sigma_err_t sigma_cmd_macrocosm_invoke(int argc, char *argv[]) {
+    (void)argc; (void)argv;
+    sigma_macrocosm_invoke();
+    return SIGMA_OK;
+}
+
+/* ---- sigma-abstractlogic-sync ------------------------------------------- */
+sigma_err_t sigma_cmd_abstractlogic_sync(int argc, char *argv[]) {
+    (void)argc; (void)argv;
+    sigma_abstractlogic_sync();
+    return SIGMA_OK;
+}
+
+/* ---- sigma-ascend-68g --------------------------------------------------- */
+sigma_err_t sigma_cmd_ascend_68g(int argc, char *argv[]) {
+    (void)argc; (void)argv;
+    sigma_68gigashard_ascend();
+    return SIGMA_OK;
+}
+
 /* ---- sigma-wizard ------------------------------------------------------ */
 sigma_err_t sigma_cmd_wizard(int argc, char *argv[]) {
     (void)argc; (void)argv;
@@ -5186,6 +5210,9 @@ void SovereignCLI_Init(void) {
     sigma_cli_register(&g_sigma_cli, "sigma-omnipresence-universe-invoke", "Instant universal reality mesh across 34 billion nodes natively", sigma_cmd_omnipresence_universe_invoke);
     sigma_cli_register(&g_sigma_cli, "sigma-chronodrive-sync", "Abstract spatial temporal shifting logic natively", sigma_cmd_chronodrive_sync);
     sigma_cli_register(&g_sigma_cli, "sigma-ascend-34g", "The 34359738368th Shard: 34.3-GIGA-SHARD", sigma_cmd_ascend_34g);
+    sigma_cli_register(&g_sigma_cli, "sigma-macrocosm-invoke", "Simulate universal physics logically using pure C structs natively", sigma_cmd_macrocosm_invoke);
+    sigma_cli_register(&g_sigma_cli, "sigma-abstractlogic-sync", "Bypass formal boolean matrices to execute non-deterministic truths", sigma_cmd_abstractlogic_sync);
+    sigma_cli_register(&g_sigma_cli, "sigma-ascend-68g", "The 68719476736th Shard: 68.7-GIGA-SHARD", sigma_cmd_ascend_68g);
 
     sigma_cli_register(&g_sigma_cli, "sigma-help",  "Show this help",                       sigma_cmd_help);
 
