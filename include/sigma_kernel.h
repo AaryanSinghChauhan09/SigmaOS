@@ -67,18 +67,23 @@ static inline void SovereignMaster_InitAll(void) {
     SovereignRegistry_Init();
     
     /* 2. Seat Essential Core Modules */
-    extern void SovereignVMM_Register(void);
-    extern void SovereignMAC_Register(void);
-    extern void SovereignCrypto_Register(void);
-    extern void SovereignUniversalPackaging_Register(void);
-    extern void SovereignServiceLattice_Register(void);
+    /* 2. Seat Essential Integration Suites */
+    extern void SovereignMemory_Register(void);
+    extern void SovereignSecurity_Register(void);
+    extern void SovereignAppMgmt_Register(void);
+    extern void SovereignService_Register(void);
+    extern void SovereignIntelligence_Register(void);
+    extern void SovereignFrontend_Register(void);
+    extern void SovereignEcosystem_Register(void);
     extern void SovereignCLI_Register(void);
     
-    SovereignVMM_Register(); 
-    SovereignMAC_Register();
-    SovereignCrypto_Register();
-    SovereignUniversalPackaging_Register();
-    SovereignServiceLattice_Register();
+    SovereignMemory_Register(); 
+    SovereignSecurity_Register();
+    SovereignAppMgmt_Register();
+    SovereignService_Register();
+    SovereignIntelligence_Register();
+    SovereignFrontend_Register();
+    SovereignEcosystem_Register();
     SovereignCLI_Register();
 
     /* 3. Run Industrial Init */
