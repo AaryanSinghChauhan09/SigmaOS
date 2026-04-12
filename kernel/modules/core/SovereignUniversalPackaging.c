@@ -1,62 +1,44 @@
 /**
- * Σ SIGMAOS ZENITH : Sovereign Universal Packaging Matrix 
+ * Σ SIGMAOS ZENITH : Sovereign Universal Packaging Matrix (Modular v2.0)
  * 
- * Implements Flatpak, Snap, and AppImage parity within a zero-dependency, 
- * ring-0 C11 environment. Enables containerized, sandboxed execution of 
- * dynamically fetched shards without host filesystem pollution.
+ * Refactored into Container and Engine components.
  */
 
 #include "../../../include/sigma_kernel.h"
-
-#define MAX_APP_CONTAINERS 128
-
-typedef struct {
-    char app_id[64];
-    int is_sandboxed;
-    int has_network_access;
-    int has_fs_access;
-    char root_mount[128];
-} SovereignAppContainer_t;
-
-SovereignAppContainer_t application_matrix[MAX_APP_CONTAINERS];
-int active_containers = 0;
+#include "SovereignAppContainer.h"
 
 /**
  * @brief Initialize universal packaging engine
  */
 void sigma_universal_packaging_init() {
-    sigma_printf("Σ [PKG-MATRIX] Initializing Universal Packaging Engine (Flatpak/AppImage Parity)...\n");
-    active_containers = 0;
+    sigma_printf("Σ [PKG-MATRIX] Initializing Universal Packaging Engine (Modular v2.0)...\n");
+    app_container_init();
 }
 
 /**
  * @brief Deploy a sandboxed application (Flatpak style)
  */
 void sigma_deploy_sandboxed_app(const char* identifier, int sandbox_level) {
-    if (active_containers >= MAX_APP_CONTAINERS) {
+    SovereignAppContainer_t* new_app = app_container_alloc();
+    if (!new_app) {
         sigma_printf("Σ [PKG-MATRIX] Capacity reached. Cannot deploy [%s]\n", identifier);
         return;
     }
     
-    SovereignAppContainer_t* new_app = &application_matrix[active_containers];
     sigma_strncpy(new_app->app_id, identifier, 64);
-    
-    // Strict Sandbox by default
     new_app->is_sandboxed = 1;
     new_app->has_network_access = (sandbox_level < 2) ? 1 : 0;
     new_app->has_fs_access = (sandbox_level < 3) ? 1 : 0;
     
-    sigma_printf("Σ [PKG-MATRIX] Application [%s] deployed in ephemeral container. NET:%d FS:%d\n", 
+    sigma_printf("Σ [PKG-MATRIX] Application [%s] deployed. NET:%d FS:%d\n", 
                      new_app->app_id, new_app->has_network_access, new_app->has_fs_access);
-                     
-    active_containers++;
 }
 
-/**
- * @brief Execute a dynamically fetched AppImage/Portable Shard
- */
-void sigma_execute_portable_shard(const char* binary_path) {
-    sigma_printf("Σ [PKG-MATRIX] Hot-loading portable shard directly into memory space: %s\n", binary_path);
-    sigma_printf("Σ [PKG-MATRIX] Bypassing traditional dependency resolution. Absolute sovereignty maintained.\n");
-    // Abstract execution logic here
+void SovereignUniversalPackaging_Register(void) {
+    static SovereignModule_t s_pkg_module = {
+        .name = "SovereignUniversalPackaging",
+        .type = MODULE_TYPE_CORE,
+        .Init = (sigma_err_t(*)(void))sigma_universal_packaging_init,
+    };
+    sigma_module_register(&s_pkg_module);
 }

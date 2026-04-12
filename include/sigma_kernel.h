@@ -69,9 +69,15 @@ static inline void SovereignMaster_InitAll(void) {
     /* 2. Seat Essential Core Modules */
     extern void SovereignVMM_Register(void);
     extern void SovereignMAC_Register(void);
+    extern void SovereignCrypto_Register(void);
+    extern void SovereignUniversalPackaging_Register(void);
+    extern void SovereignServiceLattice_Register(void);
     
     SovereignVMM_Register(); 
     SovereignMAC_Register();
+    SovereignCrypto_Register();
+    SovereignUniversalPackaging_Register();
+    SovereignServiceLattice_Register();
 
     /* 3. Run Industrial Init */
     sigma_modules_init_all();

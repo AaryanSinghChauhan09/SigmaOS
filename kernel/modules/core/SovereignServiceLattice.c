@@ -1,64 +1,53 @@
 /**
- * Σ SIGMAOS ZENITH : Sovereign Service Lattice (Init System)
- * 
- * An aggressive, highly-parallel init system designed as an industrial-grade
- * successor to systemd and OpenRC. Manages dependency graphs, service units,
- * and self-healing service monitoring natively in Ring-0.
+ * Σ SIGMAOS ZENITH : Sovereign Service Lattice (Init System) (Modular v2.0)
  */
 
 #include "../../../include/sigma_kernel.h"
-#include "../../../include/SovereignDmesg.h"
-#include "../../../include/SovereignCoreUtils.h"
-
-
-typedef struct {
-    char service_name[64];
-    int is_active;
-    int restart_on_failure;
-    char dependencies[3][64]; // simple 3-dependency array for POC
-} SovereignServiceUnit_t;
-
-SovereignServiceUnit_t runtime_services[128];
-int total_services = 0;
+#include "SovereignServiceUnit.h"
 
 /**
  * @brief Initialize the Service Lattice
  */
 void sigma_service_lattice_init() {
-    SIGMA_KERN_INFO("Σ [INIT] Bootstrapping Sovereign Service Lattice (Systemd/OpenRC Parity)...");
-    total_services = 0;
+    sigma_printf("Σ [INIT] Bootstrapping Sovereign Service Lattice (Modular v2.0)...\n");
+    service_unit_init();
 }
-
 
 /**
  * @brief Register a new service unit
  */
 void sigma_register_service(const char* name, int restart_flag) {
-    if (total_services < 128) {
-        sigma_strcpy(runtime_services[total_services].service_name, name);
-        runtime_services[total_services].is_active = 0;
-        runtime_services[total_services].restart_on_failure = restart_flag;
-        total_services++;
-        SIGMA_KERN_INFO("Σ [INIT] Registered new service unit: %s.target", name);
+    SovereignServiceUnit_t* unit = service_unit_alloc();
+    if (unit) {
+        sigma_strcpy(unit->service_name, name);
+        unit->is_active = 0;
+        unit->restart_on_failure = restart_flag;
+        sigma_printf("Σ [INIT] Registered new service unit: %s.target\n", name);
     }
 }
-
 
 /**
  * @brief Ignite (start) a service and its dependencies
  */
 void sigma_ignite_service_shard(const char* target_name) {
-    for (int i = 0; i < total_services; i++) {
-        if (sigma_compare(runtime_services[i].service_name, target_name) == 0) {
-            if (runtime_services[i].is_active) {
-                SIGMA_KERN_WARN("Σ [INIT] Service %s is already running.", target_name);
-                return;
-            }
-            runtime_services[i].is_active = 1;
-            SIGMA_KERN_INFO("Σ [INIT] Ignited service shard: [%s] successfully. CPU allocation prioritized.", target_name);
+    SovereignServiceUnit_t* unit = service_unit_find(target_name);
+    if (unit) {
+        if (unit->is_active) {
+            sigma_printf("Σ [INIT] Service %s is already running.\n", target_name);
             return;
         }
+        unit->is_active = 1;
+        sigma_printf("Σ [INIT] Ignited service shard: [%s] successfully.\n", target_name);
+        return;
     }
-    SIGMA_KERN_ERR("Σ [INIT] CRITICAL: Service %s not found in lattice.", target_name);
+    sigma_printf("Σ [INIT] CRITICAL: Service %s not found in lattice.\n", target_name);
 }
 
+void SovereignServiceLattice_Register(void) {
+    static SovereignModule_t s_lattice_module = {
+        .name = "SovereignServiceLattice",
+        .type = MODULE_TYPE_CORE,
+        .Init = (sigma_err_t(*)(void))sigma_service_lattice_init,
+    };
+    sigma_module_register(&s_lattice_module);
+}
