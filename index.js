@@ -52,12 +52,29 @@ setInterval(updateClock, 1000);
 updateClock();
 setTimeout(addLog, 500);
 
-document.querySelectorAll('.taskbar-item').forEach(item => {
-    item.addEventListener('click', () => {
-        item.style.transform = 'scale(1.2)';
-        setTimeout(() => { item.style.transform = ''; }, 200);
-        logIndex = 0;
-        logConsole.innerHTML = '<div style="color: #ffaa00;">[RE-AUDIT] Initiating full system re-verification...</div>';
-        setTimeout(addLog, 500);
-    });
+// Window Management
+function openWindow(id) {
+    document.getElementById(id).classList.remove('hidden');
+}
+
+function closeWindow(id) {
+    document.getElementById(id).classList.add('hidden');
+}
+
+document.getElementById('btn-verify').addEventListener('click', () => {
+    logIndex = 0;
+    logConsole.innerHTML = '<div style="color: #ffaa00;">[RE-AUDIT] Initiating full system re-verification...</div>';
+    setTimeout(addLog, 500);
+});
+
+document.getElementById('btn-explorer').addEventListener('click', () => openWindow('win-explorer'));
+document.getElementById('btn-shell').addEventListener('click', () => {
+    openWindow('win-shell');
+    const shellOut = document.getElementById('shell-output');
+    shellOut.innerHTML = 'root@sigma-zenith:~# sigma-uname -a<br>Σ SigmaOS Sovereign Zenith v2.5.0-industrial x86_64<br>root@sigma-zenith:~# _';
+});
+
+document.getElementById('btn-home').addEventListener('click', () => {
+    closeWindow('win-explorer');
+    closeWindow('win-shell');
 });

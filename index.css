@@ -9,7 +9,7 @@ body {
     margin: 0;
     padding: 0;
     font-family: 'Inter', sans-serif;
-    background: var(--bg-color);
+    background: radial-gradient(circle at center, #101010 0%, #050505 100%);
     color: #fff;
     overflow: hidden;
     height: 100vh;
@@ -104,3 +104,73 @@ body {
 }
 
 .taskbar-item:hover { transform: scale(1.4) translateY(-5px); filter: drop-shadow(0 0 10px var(--acc-color)); }
+
+/* Window System Styles */
+.hidden { display: none !important; }
+
+.window {
+    position: absolute;
+    top: 100px;
+    left: 200px;
+    width: 600px;
+    height: 400px;
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    border-radius: 12px;
+    box-shadow: 0 20px 50px rgba(0, 0, 0, 0.5);
+    display: flex;
+    flex-direction: column;
+    z-index: 1000;
+}
+
+.window-header {
+    padding: 10px 15px;
+    background: rgba(255, 255, 255, 0.1);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    font-weight: 600;
+    font-size: 0.9rem;
+}
+
+.window-header button {
+    background: none;
+    border: none;
+    color: #fff;
+    font-size: 1.2rem;
+    cursor: pointer;
+    opacity: 0.5;
+}
+
+.window-header button:hover { opacity: 1; }
+
+.window-body {
+    flex: 1;
+    padding: 20px;
+    overflow-y: auto;
+}
+
+.file-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
+    gap: 20px;
+}
+
+.file-icon {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    font-size: 0.9rem;
+    cursor: pointer;
+    padding: 10px;
+    border-radius: 8px;
+}
+
+.file-icon:hover { background: rgba(255, 255, 255, 0.1); }
+
+.terminal-body {
+    background: #000;
+    color: #0f0;
+    font-family: 'Courier New', monospace;
+    font-size: 0.9rem;
+}
