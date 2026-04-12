@@ -60,7 +60,8 @@ CORE_SHARDS := \
   kernel/modules/core/SovereignMathShard.c         \
   kernel/modules/core/SovereignDockShard.c         \
   kernel/modules/core/SovereignSpotlightShard.c    \
-  kernel/modules/core/SovereignSideloadShard.c
+  kernel/modules/core/SovereignSideloadShard.c     \
+  kernel/modules/core/SovereignTestShard.c
 
 # Security
 SECURITY_SHARDS := \
@@ -110,7 +111,9 @@ SYSTEM_SHARDS := \
   kernel/modules/system/SovereignVoiceShard.c       \
   kernel/modules/system/SovereignContinuityShard.c  \
   kernel/modules/system/SovereignTimeMachineShard.c \
-  kernel/modules/system/SovereignBootloaderShard.c
+  kernel/modules/system/SovereignBootloaderShard.c  \
+  kernel/modules/system/SovereignAutoCleanAlg.c     \
+  kernel/modules/system/SovereignAutoPerfAlg.c
 
 # Filesystem
 FS_SHARDS := \

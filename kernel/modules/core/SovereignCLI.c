@@ -138,6 +138,9 @@
 #include "../../../include/SovereignContinuityShard.h"
 #include "../../../include/SovereignTimeMachineShard.h"
 #include "../../../include/SovereignBootloaderShard.h"
+#include "../../../include/SovereignTestShard.h"
+#include "../../../include/SovereignAutoCleanAlg.h"
+#include "../../../include/SovereignAutoPerfAlg.h"
 
 /* Global CLI context */
 SigmaCLICtx_t g_sigma_cli;
@@ -2594,6 +2597,36 @@ sigma_err_t sigma_cmd_boot(int argc, char *argv[]) {
     return SIGMA_OK;
 }
 
+/* ---- sigma-test --------------------------------------------------------- */
+sigma_err_t sigma_cmd_test(int argc, char *argv[]) {
+    if (argc < 2) {
+        sigma_printf("Usage: sigma-test [algorithms]\n");
+        return SIGMA_OK; }
+    if (sigma_streq(argv[1], "algorithms"))
+        sigma_test_algorithms();
+    return SIGMA_OK;
+}
+
+/* ---- sigma-autoclean ---------------------------------------------------- */
+sigma_err_t sigma_cmd_autoclean(int argc, char *argv[]) {
+    if (argc < 2) {
+        sigma_printf("Usage: sigma-autoclean [execute]\n");
+        return SIGMA_OK; }
+    if (sigma_streq(argv[1], "execute"))
+        sigma_autoclean_execute();
+    return SIGMA_OK;
+}
+
+/* ---- sigma-autoperf ----------------------------------------------------- */
+sigma_err_t sigma_cmd_autoperf(int argc, char *argv[]) {
+    if (argc < 2) {
+        sigma_printf("Usage: sigma-autoperf [mode <gaming/battery/auto>]\n");
+        return SIGMA_OK; }
+    if (sigma_streq(argv[1], "mode") && argc >= 3)
+        sigma_autoperf_execute(argv[2]);
+    return SIGMA_OK;
+}
+
 /* ---- sigma-wizard ------------------------------------------------------ */
 sigma_err_t sigma_cmd_wizard(int argc, char *argv[]) {
     (void)argc; (void)argv;
@@ -2907,6 +2940,9 @@ void SovereignCLI_Init(void) {
     sigma_cli_register(&g_sigma_cli, "sigma-continuity",  "Cross-Device HID Sharing",        sigma_cmd_continuity);
     sigma_cli_register(&g_sigma_cli, "sigma-timemachine", "CoW Filesystem Snapshots",        sigma_cmd_timemachine);
     sigma_cli_register(&g_sigma_cli, "sigma-boot",        "Silicon Hardware Initialization", sigma_cmd_boot);
+    sigma_cli_register(&g_sigma_cli, "sigma-test",        "Silicon Algorithm Validation",    sigma_cmd_test);
+    sigma_cli_register(&g_sigma_cli, "sigma-autoclean",   "Heuristic Deep System Purger",    sigma_cmd_autoclean);
+    sigma_cli_register(&g_sigma_cli, "sigma-autoperf",    "Dynamic Hardware Scaling",        sigma_cmd_autoperf);
 
     sigma_cli_register(&g_sigma_cli, "sigma-help",  "Show this help",                       sigma_cmd_help);
 
