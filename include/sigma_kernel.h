@@ -75,6 +75,8 @@ static inline void SovereignMaster_InitAll(void) {
     extern void SovereignIntelligence_Register(void);
     extern void SovereignFrontend_Register(void);
     extern void SovereignEcosystem_Register(void);
+    extern void SovereignBackend_Register(void);
+    extern void SovereignConfig_Register(void);
     extern void SovereignCLI_Register(void);
     
     SovereignMemory_Register(); 
@@ -84,6 +86,8 @@ static inline void SovereignMaster_InitAll(void) {
     SovereignIntelligence_Register();
     SovereignFrontend_Register();
     SovereignEcosystem_Register();
+    SovereignBackend_Register();
+    SovereignConfig_Register();
     SovereignCLI_Register();
 
     /* 3. Run Industrial Init */
