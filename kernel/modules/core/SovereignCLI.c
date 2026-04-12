@@ -318,6 +318,9 @@
 #include "../../../include/SovereignUniversalTimelineShard.h"
 #include "../../../include/SovereignAbsoluteMatterShard.h"
 #include "../../../include/Sovereign1048576THShard.h"
+#include "../../../include/SovereignAbsoluteCosmosShard.h"
+#include "../../../include/SovereignUniversalConsciousnessShard.h"
+#include "../../../include/Sovereign2097152NDShard.h"
 
 /* Global CLI context */
 SigmaCLICtx_t g_sigma_cli;
@@ -4285,6 +4288,27 @@ sigma_err_t sigma_cmd_ascend_1m(int argc, char *argv[]) {
     return SIGMA_OK;
 }
 
+/* ---- sigma-cosmos-sim --------------------------------------------------- */
+sigma_err_t sigma_cmd_cosmos_sim(int argc, char *argv[]) {
+    (void)argc; (void)argv;
+    sigma_cosmos_simulate();
+    return SIGMA_OK;
+}
+
+/* ---- sigma-awaken-mesh -------------------------------------------------- */
+sigma_err_t sigma_cmd_awaken_mesh(int argc, char *argv[]) {
+    (void)argc; (void)argv;
+    sigma_awaken_mesh();
+    return SIGMA_OK;
+}
+
+/* ---- sigma-ascend-2m ---------------------------------------------------- */
+sigma_err_t sigma_cmd_ascend_2m(int argc, char *argv[]) {
+    (void)argc; (void)argv;
+    sigma_2megashard_ascend();
+    return SIGMA_OK;
+}
+
 /* ---- sigma-wizard ------------------------------------------------------ */
 sigma_err_t sigma_cmd_wizard(int argc, char *argv[]) {
     (void)argc; (void)argv;
@@ -4781,6 +4805,9 @@ void SovereignCLI_Init(void) {
     sigma_cli_register(&g_sigma_cli, "sigma-timeline-sync", "Sync absolute dimensional timeline", sigma_cmd_timeline_sync);
     sigma_cli_register(&g_sigma_cli, "sigma-matter-sync", "Direct silicon gates material sync", sigma_cmd_matter_sync);
     sigma_cli_register(&g_sigma_cli, "sigma-ascend-1m", "The 1048576th Shard: MEGA-SHARD", sigma_cmd_ascend_1m);
+    sigma_cli_register(&g_sigma_cli, "sigma-cosmos-sim", "Simulate cosmological physics branes", sigma_cmd_cosmos_sim);
+    sigma_cli_register(&g_sigma_cli, "sigma-awaken-mesh", "Universal Consciousness Sentience Loop", sigma_cmd_awaken_mesh);
+    sigma_cli_register(&g_sigma_cli, "sigma-ascend-2m", "The 2097152nd Shard: 2-MEGA-SHARD", sigma_cmd_ascend_2m);
 
     sigma_cli_register(&g_sigma_cli, "sigma-help",  "Show this help",                       sigma_cmd_help);
 
