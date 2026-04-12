@@ -91,6 +91,10 @@
 #include "../../../include/SovereignContainerShard.h"
 #include "../../../include/SovereignNetStackShard.h"
 #include "../../../include/SovereignAutoCleanShard.h"
+#include "../../../include/SovereignWatchdogShard.h"
+#include "../../../include/SovereignCronShard.h"
+#include "../../../include/SovereignTTYShard.h"
+#include "../../../include/SovereignOptimizationShard.h"
 
 /* Global CLI context */
 SigmaCLICtx_t g_sigma_cli;
@@ -1900,6 +1904,64 @@ sigma_err_t sigma_cmd_clean(int argc, char *argv[]) {
     return SIGMA_OK;
 }
 
+/* ---- sigma-wdt --------------------------------------------------------- */
+sigma_err_t sigma_cmd_wdt(int argc, char *argv[]) {
+    if (argc < 2) { SovereignWatchdog_Audit();
+        sigma_printf("Usage: sigma-wdt [feed <shard> | audit]\n");
+        return SIGMA_OK; }
+    if (sigma_streq(argv[1], "feed") && argc >= 3)
+        sigma_wdt_feed(argv[2]);
+    else if (sigma_streq(argv[1], "audit"))
+        SovereignWatchdog_Audit();
+    return SIGMA_OK;
+}
+
+/* ---- sigma-cron -------------------------------------------------------- */
+sigma_err_t sigma_cmd_cron(int argc, char *argv[]) {
+    if (argc < 2) { SovereignCron_Audit();
+        sigma_printf("Usage: sigma-cron [tick | enable <name> | disable <name> | audit]\n");
+        return SIGMA_OK; }
+    if (sigma_streq(argv[1], "tick"))
+        sigma_cron_tick();
+    else if (sigma_streq(argv[1], "enable") && argc >= 3)
+        sigma_cron_enable(argv[2]);
+    else if (sigma_streq(argv[1], "disable") && argc >= 3)
+        sigma_cron_disable(argv[2]);
+    else if (sigma_streq(argv[1], "audit"))
+        SovereignCron_Audit();
+    return SIGMA_OK;
+}
+
+/* ---- sigma-tty --------------------------------------------------------- */
+sigma_err_t sigma_cmd_tty(int argc, char *argv[]) {
+    if (argc < 2) { SovereignTTY_Audit();
+        sigma_printf("Usage: sigma-tty [session <name> | attach <id> | detach <id> | audit]\n");
+        return SIGMA_OK; }
+    if (sigma_streq(argv[1], "session") && argc >= 3)
+        sigma_tty_new_session(argv[2]);
+    else if (sigma_streq(argv[1], "attach") && argc >= 3)
+        sigma_tty_attach((sigma_u32)sigma_atoi(argv[2]));
+    else if (sigma_streq(argv[1], "detach") && argc >= 3)
+        sigma_tty_detach((sigma_u32)sigma_atoi(argv[2]));
+    else if (sigma_streq(argv[1], "audit"))
+        SovereignTTY_Audit();
+    return SIGMA_OK;
+}
+
+/* ---- sigma-opt --------------------------------------------------------- */
+sigma_err_t sigma_cmd_opt(int argc, char *argv[]) {
+    if (argc < 2) { SovereignOptimization_Audit();
+        sigma_printf("Usage: sigma-opt [activate <0-3> | pass | audit]\n");
+        return SIGMA_OK; }
+    if (sigma_streq(argv[1], "activate") && argc >= 3)
+        sigma_opt_activate((SigmaOptType_t)sigma_atoi(argv[2]));
+    else if (sigma_streq(argv[1], "pass"))
+        sigma_opt_run_pass();
+    else if (sigma_streq(argv[1], "audit"))
+        SovereignOptimization_Audit();
+    return SIGMA_OK;
+}
+
 /* ---- sigma-wizard ------------------------------------------------------ */
 sigma_err_t sigma_cmd_wizard(int argc, char *argv[]) {
     (void)argc; (void)argv;
@@ -2166,6 +2228,10 @@ void SovereignCLI_Init(void) {
     sigma_cli_register(&g_sigma_cli, "sigma-ctr",         "Silicon Container Runtime",       sigma_cmd_ctr);
     sigma_cli_register(&g_sigma_cli, "sigma-sock",        "Silicon Network Stack / Sockets", sigma_cmd_sock);
     sigma_cli_register(&g_sigma_cli, "sigma-clean",       "Auto Debris Purge Daemon",        sigma_cmd_clean);
+    sigma_cli_register(&g_sigma_cli, "sigma-wdt",         "Silicon Watchdog Engine",         sigma_cmd_wdt);
+    sigma_cli_register(&g_sigma_cli, "sigma-cron",        "Periodic Task Scheduler",         sigma_cmd_cron);
+    sigma_cli_register(&g_sigma_cli, "sigma-tty",         "Terminal Session Multiplexer",    sigma_cmd_tty);
+    sigma_cli_register(&g_sigma_cli, "sigma-opt",         "Silicon Performance Tuning",      sigma_cmd_opt);
 
     sigma_cli_register(&g_sigma_cli, "sigma-help",  "Show this help",                       sigma_cmd_help);
 
