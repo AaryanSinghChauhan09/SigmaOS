@@ -29,6 +29,7 @@
 #include "../../../include/SovereignAIKernel.h"
 #include "../../../include/SovereignDistroSlinger.h"
 #include "../../../include/SovereignAutomationEngine.h"
+#include "../../../include/SovereignAutonomousAgent.h"
 
 /* Global CLI context */
 SigmaCLICtx_t g_sigma_cli;
@@ -500,6 +501,10 @@ sigma_err_t sigma_cmd_distro(int argc, char *argv[]) {
 }
 
 /* ---- sigma-run --------------------------------------------------------- */
+    return SIGMA_OK;
+}
+
+/* ---- sigma-run --------------------------------------------------------- */
 sigma_err_t sigma_cmd_run(int argc, char *argv[]) {
     static SovereignAutomationEngine_t g_auto_eng;
     static sigma_bool init = SIGMA_FALSE;
@@ -522,6 +527,29 @@ sigma_err_t sigma_cmd_run(int argc, char *argv[]) {
     } else {
         sigma_printf("Σ [RUN]: Reading script '%s'...\n", argv[1]);
         sigma_printf("[SKIPPED]: File I/O simulation only.\n");
+    }
+    return SIGMA_OK;
+}
+
+/* ---- sigma-agent ------------------------------------------------------- */
+sigma_err_t sigma_cmd_agent(int argc, char *argv[]) {
+    static SovereignAutonomousAgent_t g_agent;
+    static sigma_bool init = SIGMA_FALSE;
+    if (!init) { g_agent = SovereignAutonomousAgent_Create(7); init = SIGMA_TRUE; }
+
+    if (argc < 2) {
+        g_agent.execute_autonomous_audit(&g_agent);
+        sigma_printf("Usage: sigma-agent [start | prowl <sector> | stop]\n");
+        return SIGMA_OK;
+    }
+
+    if (sigma_streq(argv[1], "start")) {
+        g_agent.bootstrap_mission(&g_agent);
+    } else if (sigma_streq(argv[1], "prowl") && argc >= 3) {
+        g_agent.prowl_sector(&g_agent, argv[2]);
+    } else if (sigma_streq(argv[1], "stop")) {
+        sigma_printf("[AGENT]: Missions suspended. Returning to carrier.\n");
+        g_agent.prowling = SIGMA_FALSE;
     }
     return SIGMA_OK;
 }
@@ -747,6 +775,7 @@ void SovereignCLI_Init(void) {
     sigma_cli_register(&g_sigma_cli, "sigma-alias",       "Create command aliases",          sigma_cmd_alias);
     sigma_cli_register(&g_sigma_cli, "sigma-distro",      "Sovereign Distro Lifecycle",      sigma_cmd_distro);
     sigma_cli_register(&g_sigma_cli, "sigma-run",         "Execute SigmaScript Automations", sigma_cmd_run);
+    sigma_cli_register(&g_sigma_cli, "sigma-agent",       "Background Agent Orchestration",  sigma_cmd_agent);
 
     sigma_cli_register(&g_sigma_cli, "sigma-help",  "Show this help",                       sigma_cmd_help);
 
