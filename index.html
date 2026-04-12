@@ -10,6 +10,7 @@
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;800&display=swap" rel="stylesheet">
 </head>
 <body>
+    <div id="hologram-overlay"></div>
     <canvas id="particle-canvas"></canvas>
     <div class="top-bar">
         <div class="logo">Σ SigmaOS | Sovereign v2.0-STABLE</div>
@@ -24,7 +25,7 @@
     <main class="workspace">
         <div class="dashboard animate-fade-in">
             <!-- Core Shard Status -->
-            <div class="stat-card glass">
+            <div class="stat-card glass scanline">
                 <div class="stat-value">425</div>
                 <div class="stat-label">Sovereign Shards Active</div>
                 <div class="progress-bar-bg">
@@ -33,14 +34,14 @@
             </div>
 
             <!-- Security Matrix -->
-            <div class="stat-card glass">
+            <div class="stat-card glass scanline">
                 <div class="stat-value">SHIELD</div>
                 <div class="stat-label">Pledge / Unveil / IDS Hardened</div>
                 <div class="stat-meta-accent">✓ Integrity Verified</div>
             </div>
 
             <!-- ABI Sovereignty -->
-            <div class="stat-card glass">
+            <div class="stat-card glass scanline">
                 <div class="stat-value">ABI:TRANSLATE</div>
                 <div class="stat-label">Linux / BSD / PE-COFF Binary Support</div>
                 <div class="stat-meta-secondary">✓ ELF64 Trans-Matrix Seated</div>
