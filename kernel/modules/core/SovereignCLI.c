@@ -390,6 +390,9 @@
 #include "../../../include/SovereignAbsoluteFateShard.h"
 #include "../../../include/SovereignUniversalEternityShard.h"
 #include "../../../include/Sovereign17592186044416THShard.h"
+#include "../../../include/SovereignAbsolutePurityShard.h"
+#include "../../../include/SovereignUniversalConvergenceShard.h"
+#include "../../../include/Sovereign35184372088832NDShard.h"
 
 /* Global CLI context */
 SigmaCLICtx_t g_sigma_cli;
@@ -4861,6 +4864,27 @@ sigma_err_t sigma_cmd_ascend_17tera(int argc, char *argv[]) {
     return SIGMA_OK;
 }
 
+/* ---- sigma-purity-invoke ------------------------------------------------ */
+sigma_err_t sigma_cmd_purity_invoke(int argc, char *argv[]) {
+    (void)argc; (void)argv;
+    sigma_purity_invoke();
+    return SIGMA_OK;
+}
+
+/* ---- sigma-convergence-sync --------------------------------------------- */
+sigma_err_t sigma_cmd_convergence_sync(int argc, char *argv[]) {
+    (void)argc; (void)argv;
+    sigma_convergence_sync();
+    return SIGMA_OK;
+}
+
+/* ---- sigma-ascend-35tera ------------------------------------------------ */
+sigma_err_t sigma_cmd_ascend_35tera(int argc, char *argv[]) {
+    (void)argc; (void)argv;
+    sigma_35terashard_ascend();
+    return SIGMA_OK;
+}
+
 /* ---- sigma-wizard ------------------------------------------------------ */
 sigma_err_t sigma_cmd_wizard(int argc, char *argv[]) {
     (void)argc; (void)argv;
@@ -5429,6 +5453,9 @@ void SovereignCLI_Init(void) {
     sigma_cli_register(&g_sigma_cli, "sigma-fate-invoke", "Define predetermined logical conclusions instantly", sigma_cmd_fate_invoke);
     sigma_cli_register(&g_sigma_cli, "sigma-eternity-sync", "Remove uptime limits ensuring infinite OS reality state", sigma_cmd_eternity_sync);
     sigma_cli_register(&g_sigma_cli, "sigma-ascend-17tera", "The 17592186044416th Shard: 17.59-TERA-SHARD (44-BIT)", sigma_cmd_ascend_17tera);
+    sigma_cli_register(&g_sigma_cli, "sigma-purity-invoke", "Eradicate legacy instruction bloat natively", sigma_cmd_purity_invoke);
+    sigma_cli_register(&g_sigma_cli, "sigma-convergence-sync", "Fold parallel multiverse threads into 0-point singularity natively", sigma_cmd_convergence_sync);
+    sigma_cli_register(&g_sigma_cli, "sigma-ascend-35tera", "The 35184372088832nd Shard: 35.18-TERA-SHARD (45-BIT)", sigma_cmd_ascend_35tera);
 
     sigma_cli_register(&g_sigma_cli, "sigma-help",  "Show this help",                       sigma_cmd_help);
 

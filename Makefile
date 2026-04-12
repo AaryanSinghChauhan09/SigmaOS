@@ -604,7 +604,11 @@ SYSTEM_SHARDS := \
   kernel/modules/system/Sovereign8796093022208THShard.c \
   kernel/modules/system/SovereignAbsoluteFateShard.c \
   kernel/modules/system/SovereignUniversalEternityShard.c \
-  kernel/modules/system/Sovereign17592186044416THShard.c
+  kernel/modules/system/Sovereign17592186044416THShard.c \
+  kernel/modules/system/SovereignAbsolutePurityShard.c \
+  kernel/modules/system/SovereignUniversalConvergenceShard.c \
+  kernel/modules/system/Sovereign35184372088832NDShard.c
+
 
 
 
