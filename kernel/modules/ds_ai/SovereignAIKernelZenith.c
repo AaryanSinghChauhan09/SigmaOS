@@ -19,19 +19,56 @@ CLASS_DECLARE(SovereignAIKernel) {
     SigmaObject_t core;
     sigma_u64     predictions;
     sigma_f64     confidence;
+    sigma_f64     w; // Weight
+    sigma_f64     b; // Bias
 
     // Virtual Methods (Simulated)
     VIRTUAL(void, predict_intent, struct SovereignAIKernel* self, const char* action);
+    VIRTUAL(void, train_model, struct SovereignAIKernel* self, sigma_f64* x, sigma_f64* y, sigma_size_t n, sigma_u32 epochs);
     VIRTUAL(void, shard_resources, struct SovereignAIKernel* self);
     VIRTUAL(void, audit, struct SovereignAIKernel* self);
 };
 
 // -------------------------------------------------------------------------
+// Low-Level Math (x86_64 FPU Assembly)
+// -------------------------------------------------------------------------
+
+static inline sigma_f64 sigma_fpu_mul_add(sigma_f64 a, sigma_f64 b, sigma_f64 c) {
+    sigma_f64 result;
+    __asm__ volatile (
+        "mulsd %2, %1\n\t"
+        "addsd %3, %1\n\t"
+        "movsd %1, %0"
+        : "=m"(result)
+        : "x"(a), "x"(b), "x"(c)
+    );
+    return result;
+}
+
+// -------------------------------------------------------------------------
 // Implementation Methods
 // -------------------------------------------------------------------------
 
+static void ai_train_model(SovereignAIKernel_t* self, sigma_f64* x, sigma_f64* y, sigma_size_t n, sigma_u32 epochs) {
+    sigma_f64 alpha = 0.01;
+    sigma_printf("[AI_KERNEL]: Initiating Pure Silicon SGD Training (%u epochs)...\n", epochs);
+    
+    for (sigma_u32 e = 0; e < epochs; e++) {
+        sigma_f64 dw = 0, db = 0;
+        for (sigma_size_t i = 0; i < n; i++) {
+            sigma_f64 pred = self->w * x[i] + self->b;
+            dw += (pred - y[i]) * x[i];
+            db += (pred - y[i]);
+        }
+        self->w -= (dw / n) * alpha;
+        self->b -= (db / n) * alpha;
+    }
+    sigma_printf("[AI_KERNEL]: Training complete. Model: y = %.2fx + %.2f\n", self->w, self->b);
+}
+
 static void ai_predict_intent(SovereignAIKernel_t* self, const char* action) {
-    sigma_printf("[AI_KERNEL-ZENITH]: Analyzing Intent: %s... Prediction [ZENITH_APP_LOAD]\n", action);
+    (void)action;
+    sigma_printf("[AI_KERNEL-ZENITH]: Predicting based on weight %.4f...\n", self->w);
     self->predictions++;
 }
 
@@ -59,9 +96,12 @@ static SovereignAIKernel_t create_ai_kernel() {
     
     obj.predictions = 0;
     obj.confidence = 0.999;
+    obj.w = 0.0;
+    obj.b = 0.0;
     
     // Bind Virtual Methods
     obj.predict_intent = ai_predict_intent;
+    obj.train_model = ai_train_model;
     obj.shard_resources = ai_shard_resources;
     obj.audit = ai_audit;
     
