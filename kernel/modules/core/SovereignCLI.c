@@ -107,6 +107,9 @@
 #include "../../../include/SovereignGPUShard.h"
 #include "../../../include/SovereignRecallShard.h"
 #include "../../../include/SovereignWebViewShard.h"
+#include "../../../include/SovereignNeuralShard.h"
+#include "../../../include/SovereignShellShard.h"
+#include "../../../include/SovereignGarbageShard.h"
 
 /* Global CLI context */
 SigmaCLICtx_t g_sigma_cli;
@@ -2147,6 +2150,46 @@ sigma_err_t sigma_cmd_web(int argc, char *argv[]) {
     return SIGMA_OK;
 }
 
+/* ---- sigma-neural ------------------------------------------------------ */
+sigma_err_t sigma_cmd_neural(int argc, char *argv[]) {
+    if (argc < 2) { SovereignNeural_Audit();
+        sigma_printf("Usage: sigma-neural [predict <\"context\"> | op <0-3> | audit]\n");
+        return SIGMA_OK; }
+    if (sigma_streq(argv[1], "predict") && argc >= 3)
+        sigma_neural_predict(argv[2]);
+    else if (sigma_streq(argv[1], "op") && argc >= 3)
+        sigma_neural_dispatch((SigmaNeuralOp_t)sigma_atoi(argv[2]), 1024);
+    else if (sigma_streq(argv[1], "audit"))
+        SovereignNeural_Audit();
+    return SIGMA_OK;
+}
+
+/* ---- sigma-shell ------------------------------------------------------- */
+sigma_err_t sigma_cmd_shell(int argc, char *argv[]) {
+    if (argc < 2) { SovereignShell_Audit();
+        sigma_printf("Usage: sigma-shell [process <\"cmd\"> | audit]\n");
+        return SIGMA_OK; }
+    if (sigma_streq(argv[1], "process") && argc >= 3)
+        sigma_shell_process(argv[2]);
+    else if (sigma_streq(argv[1], "audit"))
+        SovereignShell_Audit();
+    return SIGMA_OK;
+}
+
+/* ---- sigma-gc ---------------------------------------------------------- */
+sigma_err_t sigma_cmd_gc(int argc, char *argv[]) {
+    if (argc < 2) { SovereignGarbage_Audit();
+        sigma_printf("Usage: sigma-gc [sweep | proactive | audit]\n");
+        return SIGMA_OK; }
+    if (sigma_streq(argv[1], "sweep"))
+        sigma_gc_sweep();
+    else if (sigma_streq(argv[1], "proactive"))
+        sigma_gc_proactive();
+    else if (sigma_streq(argv[1], "audit"))
+        SovereignGarbage_Audit();
+    return SIGMA_OK;
+}
+
 /* ---- sigma-wizard ------------------------------------------------------ */
 sigma_err_t sigma_cmd_wizard(int argc, char *argv[]) {
     (void)argc; (void)argv;
@@ -2429,6 +2472,9 @@ void SovereignCLI_Init(void) {
     sigma_cli_register(&g_sigma_cli, "sigma-gpu",         "Hardware GPU Orchestrator",       sigma_cmd_gpu);
     sigma_cli_register(&g_sigma_cli, "sigma-recall",      "Semantic Timeline Recall",        sigma_cmd_recall);
     sigma_cli_register(&g_sigma_cli, "sigma-web",         "Native WebSurface Parser",        sigma_cmd_web);
+    sigma_cli_register(&g_sigma_cli, "sigma-neural",      "Silicon Neural Engine (CUDA)",    sigma_cmd_neural);
+    sigma_cli_register(&g_sigma_cli, "sigma-shell",       "Industrial Shell Core (Zsh)",     sigma_cmd_shell);
+    sigma_cli_register(&g_sigma_cli, "sigma-gc",          "Autonomic Silicon Scavenger",     sigma_cmd_gc);
 
     sigma_cli_register(&g_sigma_cli, "sigma-help",  "Show this help",                       sigma_cmd_help);
 

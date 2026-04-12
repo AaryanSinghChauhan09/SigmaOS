@@ -1,17 +1,13 @@
-/*
- * =========================================================================
- * Σ SIGMAOS: SOVEREIGN NEURAL SHARD HEADER
- * =========================================================================
- */
-
+/* Σ SIGMAOS: SOVEREIGN NEURAL SHARD HEADER */
 #ifndef SOVEREIGN_NEURAL_SHARD_H
 #define SOVEREIGN_NEURAL_SHARD_H
-
 #include "sigma_types.h"
 
-sigma_err_t sigma_neural_load          (const char* name, sigma_u32 layers, sigma_u64 params);
-void        sigma_neural_infer         (const char* model_name);
-void        SovereignNeuralShard_Init  (void);
-void        SovereignNeural_Audit      (void);
+typedef enum { NEURAL_OP_MATMUL, NEURAL_OP_RELOO, NEURAL_OP_CONV2D, NEURAL_OP_SOFTMAX } SigmaNeuralOp_t;
 
-#endif /* SOVEREIGN_NEURAL_SHARD_H */
+sigma_err_t sigma_neural_dispatch (SigmaNeuralOp_t op, sigma_u32 params);
+void        sigma_neural_predict  (const char* context);
+void        SovereignNeuralShard_Init   (void);
+void        SovereignNeural_Audit       (void);
+
+#endif
