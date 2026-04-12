@@ -625,7 +625,11 @@ SYSTEM_SHARDS := \
   kernel/modules/system/Sovereign1125899906842624THShard.c \
   kernel/modules/system/SovereignAbsoluteInfiniteRecursionShard.c \
   kernel/modules/system/SovereignUniversalOmnipresenceShard.c \
-  kernel/modules/system/Sovereign2251799813685248THShard.c
+  kernel/modules/system/Sovereign2251799813685248THShard.c \
+  kernel/modules/system/SovereignAbsoluteTimewarpShard.c \
+  kernel/modules/system/SovereignUniversalDimensionFoldShard.c \
+  kernel/modules/system/Sovereign4503599627370496THShard.c
+
 
 
 

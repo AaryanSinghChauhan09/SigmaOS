@@ -411,6 +411,9 @@
 #include "../../../include/SovereignAbsoluteInfiniteRecursionShard.h"
 #include "../../../include/SovereignUniversalOmnipresenceShard.h"
 #include "../../../include/Sovereign2251799813685248THShard.h"
+#include "../../../include/SovereignAbsoluteTimewarpShard.h"
+#include "../../../include/SovereignUniversalDimensionFoldShard.h"
+#include "../../../include/Sovereign4503599627370496THShard.h"
 
 /* Global CLI context */
 SigmaCLICtx_t g_sigma_cli;
@@ -5029,6 +5032,27 @@ sigma_err_t sigma_cmd_ascend_2peta(int argc, char *argv[]) {
     return SIGMA_OK;
 }
 
+/* ---- sigma-timewarp-invoke ---------------------------------------------- */
+sigma_err_t sigma_cmd_timewarp_invoke(int argc, char *argv[]) {
+    (void)argc; (void)argv;
+    sigma_timewarp_invoke();
+    return SIGMA_OK;
+}
+
+/* ---- sigma-dimensionfold-sync ------------------------------------------- */
+sigma_err_t sigma_cmd_dimensionfold_sync(int argc, char *argv[]) {
+    (void)argc; (void)argv;
+    sigma_dimensionfold_sync();
+    return SIGMA_OK;
+}
+
+/* ---- sigma-ascend-4peta ------------------------------------------------- */
+sigma_err_t sigma_cmd_ascend_4peta(int argc, char *argv[]) {
+    (void)argc; (void)argv;
+    sigma_4petashard_ascend();
+    return SIGMA_OK;
+}
+
 /* ---- sigma-wizard ------------------------------------------------------ */
 sigma_err_t sigma_cmd_wizard(int argc, char *argv[]) {
     (void)argc; (void)argv;
@@ -5618,6 +5642,9 @@ void SovereignCLI_Init(void) {
     sigma_cli_register(&g_sigma_cli, "sigma-infiniterecursion-invoke", "Unbind stack logic enabling self-sustaining loops naturally", sigma_cmd_infiniterecursion_invoke);
     sigma_cli_register(&g_sigma_cli, "sigma-omnipresence-sync", "Imprint the sentinel matrix observing all vectors simultaneously", sigma_cmd_omnipresence_sync);
     sigma_cli_register(&g_sigma_cli, "sigma-ascend-2peta", "The 2251799813685248th Shard: 2.25-PETASHARD (51-BIT)", sigma_cmd_ascend_2peta);
+    sigma_cli_register(&g_sigma_cli, "sigma-timewarp-invoke", "Decouple mathematical execution from physical machine cycles natively", sigma_cmd_timewarp_invoke);
+    sigma_cli_register(&g_sigma_cli, "sigma-dimensionfold-sync", "Fold 4.5 Quadrillion node memory grids into 0 physical latency space", sigma_cmd_dimensionfold_sync);
+    sigma_cli_register(&g_sigma_cli, "sigma-ascend-4peta", "The 4503599627370496th Shard: 4.50-PETASHARD (52-BIT)", sigma_cmd_ascend_4peta);
 
     sigma_cli_register(&g_sigma_cli, "sigma-help",  "Show this help",                       sigma_cmd_help);
 
