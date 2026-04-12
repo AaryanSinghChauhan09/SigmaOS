@@ -237,3 +237,11 @@ if(bCanvas) {
     }
     drawBrainwave();
 }
+
+// Cyber-Cube Rotation Orchestrator
+document.addEventListener('mousemove', (e) => {
+    const cube = document.getElementById('cyber-cube');
+    const x = (window.innerHeight / 2 - e.clientY) / 20;
+    const y = (e.clientX - window.innerWidth / 2) / 20;
+    cube.style.transform = 'rotateX(' + x + 'deg) rotateY(' + y + 'deg)';
+});
