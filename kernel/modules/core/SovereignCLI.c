@@ -117,6 +117,10 @@
 #include "../../../include/SovereignDSShard.h"
 #include "../../../include/SovereignFlowShard.h"
 #include "../../../include/SovereignPrefetchShard.h"
+#include "../../../include/SovereignDbShard.h"
+#include "../../../include/SovereignVaultShard.h"
+#include "../../../include/SovereignRTOSShard.h"
+#include "../../../include/SovereignPerfShard.h"
 
 /* Global CLI context */
 SigmaCLICtx_t g_sigma_cli;
@@ -2289,6 +2293,62 @@ sigma_err_t sigma_cmd_prefetch(int argc, char *argv[]) {
     return SIGMA_OK;
 }
 
+/* ---- sigma-db ----------------------------------------------------------- */
+sigma_err_t sigma_cmd_db(int argc, char *argv[]) {
+    if (argc < 2) { SovereignDb_Audit();
+        sigma_printf("Usage: sigma-db [put <key> <val> | get <key> | audit]\n");
+        return SIGMA_OK; }
+    if (sigma_streq(argv[1], "put") && argc >= 4)
+        sigma_db_put(argv[2], argv[3]);
+    else if (sigma_streq(argv[1], "get") && argc >= 3) {
+        const char* val = sigma_db_get(argv[2]);
+        sigma_printf("[DB]: '%s' -> %s\n", argv[2], val ? val : "NOT_FOUND");
+    }
+    else if (sigma_streq(argv[1], "audit"))
+        SovereignDb_Audit();
+    return SIGMA_OK;
+}
+
+/* ---- sigma-vault -------------------------------------------------------- */
+sigma_err_t sigma_cmd_vault(int argc, char *argv[]) {
+    if (argc < 2) { SovereignVault_Audit();
+        sigma_printf("Usage: sigma-vault [seal <path> <val> <clearance> | unseal <path> <clearance> | audit]\n");
+        return SIGMA_OK; }
+    if (sigma_streq(argv[1], "seal") && argc >= 5)
+        sigma_vault_seal(argv[2], argv[3], (sigma_u32)sigma_atoi(argv[4]));
+    else if (sigma_streq(argv[1], "unseal") && argc >= 4) {
+        const char* val = sigma_vault_unseal(argv[2], (sigma_u32)sigma_atoi(argv[3]));
+        sigma_printf("[VAULT]: Result for '%s' -> %s\n", argv[2], val ? val : "ACCESS_DENIED");
+    }
+    else if (sigma_streq(argv[1], "audit"))
+        SovereignVault_Audit();
+    return SIGMA_OK;
+}
+
+/* ---- sigma-rtos --------------------------------------------------------- */
+sigma_err_t sigma_cmd_rtos(int argc, char *argv[]) {
+    if (argc < 2) { SovereignRTOS_Audit();
+        sigma_printf("Usage: sigma-rtos [sched <name> <period_us> <1/0> | audit]\n");
+        return SIGMA_OK; }
+    if (sigma_streq(argv[1], "sched") && argc >= 5)
+        sigma_rtos_schedule(argv[2], (sigma_u32)sigma_atoi(argv[3]), (sigma_bool)sigma_atoi(argv[4]));
+    else if (sigma_streq(argv[1], "audit"))
+        SovereignRTOS_Audit();
+    return SIGMA_OK;
+}
+
+/* ---- sigma-perf --------------------------------------------------------- */
+sigma_err_t sigma_cmd_perf(int argc, char *argv[]) {
+    if (argc < 2) { SovereignPerf_Audit();
+        sigma_printf("Usage: sigma-perf [snapshot | audit]\n");
+        return SIGMA_OK; }
+    if (sigma_streq(argv[1], "snapshot"))
+        sigma_perf_snapshot();
+    else if (sigma_streq(argv[1], "audit"))
+        SovereignPerf_Audit();
+    return SIGMA_OK;
+}
+
 /* ---- sigma-wizard ------------------------------------------------------ */
 sigma_err_t sigma_cmd_wizard(int argc, char *argv[]) {
     (void)argc; (void)argv;
@@ -2581,6 +2641,10 @@ void SovereignCLI_Init(void) {
     sigma_cli_register(&g_sigma_cli, "sigma-ds",          "Silicon Data Science (NumPy)",    sigma_cmd_ds);
     sigma_cli_register(&g_sigma_cli, "sigma-flow",        "Silicon Automation Engine",       sigma_cmd_flow);
     sigma_cli_register(&g_sigma_cli, "sigma-prefetch",    "Silicon Predictive Loader",       sigma_cmd_prefetch);
+    sigma_cli_register(&g_sigma_cli, "sigma-db",          "Silicon Append-Only Journal",     sigma_cmd_db);
+    sigma_cli_register(&g_sigma_cli, "sigma-vault",       "Hierarchical Security Policy",    sigma_cmd_vault);
+    sigma_cli_register(&g_sigma_cli, "sigma-rtos",        "Hard Real-Time Scheduler",        sigma_cmd_rtos);
+    sigma_cli_register(&g_sigma_cli, "sigma-perf",        "Silicon Cycle Telemetry",         sigma_cmd_perf);
 
     sigma_cli_register(&g_sigma_cli, "sigma-help",  "Show this help",                       sigma_cmd_help);
 
