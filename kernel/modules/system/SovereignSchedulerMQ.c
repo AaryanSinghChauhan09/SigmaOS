@@ -34,6 +34,13 @@
 #define SCHED_TICK_HZ         1000  /* 1ms tick */
 #define SYS_MIN_GRANULARITY   (3 * 1000 * 1000) /* 3ms in ns */
 
+#define TASK_POLICY_NORMAL    0
+#define TASK_POLICY_GAMING    1     /* Zenith Boost mode */
+#define TASK_POLICY_REALTIME  2
+
+/* ----------------------------------------------------------------------- */
+void sigma_sched_boost_pid(sigma_u32 pid);
+
 /* -----------------------------------------------------------------------
  * ░░ SCHEDULING ENTITIES (Task representation)
  * ----------------------------------------------------------------------- */
@@ -140,9 +147,31 @@ static void dequeue_task(SigmaRunqueue_t *rq, SigmaSchedEntity_t *p) {
 SigmaSchedEntity_t* pick_next_task(SigmaRunqueue_t *rq) {
     if (!rq->tasks_head) return rq->idle;
     
+    /* Zenith Boost: Search for high-priority gaming tasks first */
+    SigmaSchedEntity_t *curr = rq->tasks_head;
+    while (curr) {
+        if (curr->nice < -15) { /* Simulated Gaming Priority threshold */
+             dequeue_task(rq, curr);
+             return curr;
+        }
+        curr = curr->next;
+    }
+
     SigmaSchedEntity_t *next = rq->tasks_head;
     dequeue_task(rq, next);
     return next;
+}
+
+void sigma_sched_boost_pid(sigma_u32 pid) {
+    sigma_printf("Σ [BOOST]: Elevating PID %u to Zenith Gaming Priority...\n", pid);
+    for (sigma_u32 i = 0; i < s_task_alloc; i++) {
+        if (s_task_pool[i].pid == pid) {
+            s_task_pool[i].nice = -19; /* Extreme boost */
+            s_task_pool[i].vruntime = 0; /* Clear virtual aging */
+            sigma_printf("[OK]: PID %u is now in Zenith Boost mode (Silicon Pinning simulated).\n", pid);
+            return;
+        }
+    }
 }
 
 void sigma_schedule(sigma_u32 cpu_id, sigma_u64 now_ns) {

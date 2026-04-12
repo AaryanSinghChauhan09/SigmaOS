@@ -14,15 +14,24 @@
 // Distro Slinger Object Structure
 // -------------------------------------------------------------------------
 
+typedef enum {
+    PERSONA_SIGMA,
+    PERSONA_LINUX,
+    PERSONA_DARWIN,
+    PERSONA_WINDOWS
+} SigmaPersona_t;
+
 CLASS_DECLARE(SovereignDistroSlinger) {
     SigmaObject_t core;
     
     char current_distro[64];
     sigma_u32 active_instances;
     sigma_bool parity_mapped;
+    SigmaPersona_t active_persona;
     
     // Virtual Methods
     VIRTUAL(sigma_err_t, load_shard, struct SovereignDistroSlinger* self, const char* path, const char* name);
+    VIRTUAL(void, switch_persona, struct SovereignDistroSlinger* self, SigmaPersona_t persona);
     VIRTUAL(sigma_err_t, map_syscalls, struct SovereignDistroSlinger* self);
     VIRTUAL(void, spawn_autonomous, struct SovereignDistroSlinger* self);
     VIRTUAL(void, audit_shards, struct SovereignDistroSlinger* self);
@@ -65,11 +74,32 @@ static void sigma_distro_spawn(SovereignDistroSlinger_t* self) {
     self->active_instances++;
 }
 
+static void sigma_distro_switch_persona(SovereignDistroSlinger_t* self, SigmaPersona_t persona) {
+    const char* persona_name = "UNKNOWN";
+    switch(persona) {
+        case PERSONA_SIGMA:   persona_name = "SIGMA_NATIVE"; break;
+        case PERSONA_LINUX:   persona_name = "LINUX_ABI";    break;
+        case PERSONA_DARWIN:  persona_name = "DARWIN_ABI";   break;
+        case PERSONA_WINDOWS: persona_name = "WINDOWS_ABI";  break;
+    }
+    sigma_printf("[DISTRO-SLINGER]: Switching industrial silicon persona to '%s'...\n", persona_name);
+    self->active_persona = persona;
+    self->parity_mapped = (persona != PERSONA_SIGMA); // Simulation: external personas need mapping
+}
+
 static void sigma_distro_audit(SovereignDistroSlinger_t* self) {
+    const char* persona_name = "SIGMA_NATIVE";
+    switch(self->active_persona) {
+        case PERSONA_LINUX:   persona_name = "LINUX_ABI";    break;
+        case PERSONA_DARWIN:  persona_name = "DARWIN_ABI";   break;
+        case PERSONA_WINDOWS: persona_name = "WINDOWS_ABI";  break;
+        default: break;
+    }
     sigma_printf("\n--- SOVEREIGN DISTRO AUDIT ---\n");
-    sigma_printf("ACTIVE_DISTRO: %s\n", self->current_distro);
-    sigma_printf("INSTANCES:     %u\n", (unsigned int)self->active_instances);
-    sigma_printf("PARITY_STATE:  %s\n", self->parity_mapped ? "OPTIMAL" : "UNMAPPED");
+    sigma_printf("ACTIVE_PERSONA: %s\n", persona_name);
+    sigma_printf("ACTIVE_DISTRO:  %s\n", self->current_distro);
+    sigma_printf("INSTANCES:      %u\n", (unsigned int)self->active_instances);
+    sigma_printf("PARITY_STATE:   %s\n", self->parity_mapped ? "OPTIMAL" : "UNMAPPED");
     sigma_printf("------------------------------\n");
 }
 
@@ -81,11 +111,13 @@ SovereignDistroSlinger_t SovereignDistroSlinger_Create() {
     SovereignDistroSlinger_t s;
     sigma_object_init(&s.core, "SovereignDistroSlinger", 808);
     
-    sigma_strcpy(s.current_distro, "Generic-Linux-Shard");
+    sigma_strcpy(s.current_distro, "Generic-Sovereign-Shard");
     s.active_instances = 0;
     s.parity_mapped = SIGMA_FALSE;
+    s.active_persona = PERSONA_SIGMA;
     
     s.load_shard = sigma_distro_load;
+    s.switch_persona = sigma_distro_switch_persona;
     s.map_syscalls = sigma_distro_map_syscalls;
     s.spawn_autonomous = sigma_distro_spawn;
     s.audit_shards = sigma_distro_audit;

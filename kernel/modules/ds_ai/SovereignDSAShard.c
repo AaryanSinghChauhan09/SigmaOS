@@ -22,6 +22,7 @@ CLASS_DECLARE(SovereignDSAShard) {
     // Virtual Methods
     VIRTUAL(void, sort_quicksort, struct SovereignDSAShard* self, sigma_u32* arr, sigma_size_t size);
     VIRTUAL(void, sort_mergesort, struct SovereignDSAShard* self, sigma_u32* arr, sigma_size_t size);
+    VIRTUAL(void*, map_silicon_shard, struct SovereignDSAShard* self, sigma_u64 phys_addr, sigma_size_t size);
     VIRTUAL(void, audit_complexity, struct SovereignDSAShard* self);
 };
 
@@ -89,6 +90,18 @@ static void sigma_dsa_audit(SovereignDSAShard_t* self) {
 // Shard Constructor
 // -------------------------------------------------------------------------
 
+static void* sigma_dsa_map_silicon(SovereignDSAShard_t* self, sigma_u64 phys_addr, sigma_size_t size) {
+    sigma_printf("[DSA]: Mapping physical silicon sector 0x%llX (%d bytes) to Zenith Virtual Memory...\n", 
+                 (unsigned long long)phys_addr, (int)size);
+    // simulated Mach VM mapping
+    self->total_ops++;
+    return (void*)(sigma_size_t)phys_addr; // Direct mapping simulation
+}
+
+// -------------------------------------------------------------------------
+// Shard Constructor
+// -------------------------------------------------------------------------
+
 SovereignDSAShard_t SovereignDSA_Create() {
     SovereignDSAShard_t shard;
     sigma_object_init(&shard.core, "SovereignDSAShard", 501);
@@ -97,6 +110,7 @@ SovereignDSAShard_t SovereignDSA_Create() {
     shard.total_ops = 0;
     
     shard.sort_quicksort = sigma_dsa_quicksort;
+    shard.map_silicon_shard = sigma_dsa_map_silicon;
     shard.audit_complexity = sigma_dsa_audit;
     
     return shard;

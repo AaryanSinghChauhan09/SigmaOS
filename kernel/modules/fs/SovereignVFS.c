@@ -5,6 +5,7 @@
  */
 #include "../../../include/sigma_kernel.h"
 #include "../../../include/SovereignVFS.h"
+#include "../../../include/SovereignSvcFS.h"
 #include "../../../include/sigma_string.h"
 
 /* Extern Shard Registration Functions */
@@ -12,17 +13,16 @@ extern void SovereignExt4_Register(void);
 extern void SovereignProcFS_Register(void);
 
 void SovereignVFS_Init(void) {
-    sigma_printf("Σ [VFS]: Synchronizing Sovereign VFS Shards...\n");
-
     /* 1. Initialize Registry */
     SovereignVFS_InitRegistry();
 
     /* 2. Register FS Shards */
     SovereignExt4_Register();
-    /* (ProcFS, SysFS will be registered here) */
-
+    SovereignSvcFS_Init();
+    
     /* 3. Execute Boot Mounts */
     sigma_vfs_mount("/dev/nvme0n1p1", "/", "ext4");
+    sigma_vfs_mount("svc_node", "/svc", "svcfs");
     
     sigma_printf("Σ [VFS]: VFS layer online. Industrial Routing Active.\n");
 }

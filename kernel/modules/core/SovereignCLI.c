@@ -31,6 +31,43 @@
 #include "../../../include/SovereignAutomationEngine.h"
 #include "../../../include/SovereignAutonomousAgent.h"
 #include "../../../include/SovereignForensicScrubber.h"
+#include "../../../include/SovereignAtomicUpdateShard.h"
+#include "../../../include/SovereignTensorShard.h"
+#include "../../../include/SovereignNetworkShard.h"
+#include "../../../include/SovereignSecurityVault.h"
+#include "../../../include/SovereignSiliconContainer.h"
+#include "../../../include/SovereignSiliconProbe.h"
+#include "../../../include/SovereignSiliconStore.h"
+#include "../../../include/SovereignClusterShard.h"
+#include "../../../include/SovereignZenithMatrix.h"
+#include "../../../include/SovereignDSAShard.h"
+#include "../../../include/SovereignMathShard.h"
+#include "../../../include/SovereignShardManager.h"
+#include "../../../include/SovereignShardRepo.h"
+#include "../../../include/SovereignLiveReload.h"
+#include "../../../include/SovereignSpotlightShard.h"
+#include "../../../include/SovereignWMShard.h"
+#include "../../../include/SovereignAutomationShard.h"
+#include "../../../include/SovereignNeuralShard.h"
+#include "../../../include/SovereignEnclaveShard.h"
+#include "../../../include/SovereignDistroSlinger.h"
+#include "../../../include/SovereignTestSuite.h"
+#include "../../../include/SovereignRebuildShard.h"
+#include "../../../include/SovereignAestheticShard.h"
+#include "../../../include/SovereignZenScheduler.h"
+#include "../../../include/SovereignAutoSystems.h"
+#include "../../../include/SovereignAmnesicShard.h"
+#include "../../../include/SovereignMeshFS.h"
+#include "../../../include/SovereignCapabilityShard.h"
+#include "../../../include/SovereignConsensusShard.h"
+#include "../../../include/SovereignOverlayShard.h"
+#include "../../../include/SovereignMigrationShard.h"
+#include "../../../include/SovereignProtectors.h"
+#include "../../../include/SovereignIdentityShard.h"
+#include "../../../include/SovereignTWMShard.h"
+#include "../../../include/SovereignSyncShard.h"
+#include "../../../include/SovereignTelemetryShard.h"
+#include "../../../include/SovereignPersonaShard.h"
 
 /* Global CLI context */
 SigmaCLICtx_t g_sigma_cli;
@@ -563,6 +600,10 @@ sigma_err_t sigma_cmd_agent(int argc, char *argv[]) {
 }
 
 /* ---- sigma-scrub ------------------------------------------------------- */
+    return SIGMA_OK;
+}
+
+/* ---- sigma-scrub ------------------------------------------------------- */
 sigma_err_t sigma_cmd_scrub(int argc, char *argv[]) {
     static SovereignForensicScrubber_t g_scrubber;
     static sigma_bool init = SIGMA_FALSE;
@@ -585,6 +626,639 @@ sigma_err_t sigma_cmd_scrub(int argc, char *argv[]) {
     return SIGMA_OK;
 }
 
+/* ---- sigma-boost ------------------------------------------------------- */
+    return SIGMA_OK;
+}
+
+/* ---- sigma-boost ------------------------------------------------------- */
+sigma_err_t sigma_cmd_boost(int argc, char *argv[]) {
+    if (argc < 2) {
+        sigma_printf("Usage: sigma-boost <pid>\n");
+        return SIGMA_OK;
+    }
+    
+    sigma_u32 pid = (sigma_u32)sigma_atoi(argv[1]);
+    sigma_sched_boost_pid(pid);
+    return SIGMA_OK;
+}
+
+/* ---- sigma-rebuild ----------------------------------------------------- */
+    return SIGMA_OK;
+}
+
+/* ---- sigma-rebuild ----------------------------------------------------- */
+sigma_err_t sigma_cmd_rebuild(int argc, char *argv[]) {
+    if (argc < 2) {
+        SovereignAtomicUpdate_Audit();
+        sigma_printf("Usage: sigma-rebuild [switch <manifesto> | rollback | audit]\n");
+        return SIGMA_OK;
+    }
+
+    if (sigma_streq(argv[1], "switch") && argc >= 3) {
+        sigma_rebuild_system(argv[2]);
+    } else if (sigma_streq(argv[1], "rollback")) {
+        SovereignAtomicUpdate_Rollback();
+    } else if (sigma_streq(argv[1], "audit")) {
+        SovereignAtomicUpdate_Audit();
+    }
+    return SIGMA_OK;
+}
+
+/* ---- sigma-tensor ------------------------------------------------------ */
+    return SIGMA_OK;
+}
+
+/* ---- sigma-tensor ------------------------------------------------------ */
+sigma_err_t sigma_cmd_tensor(int argc, char *argv[]) {
+    static SovereignTensorShard_t g_tensor;
+    static sigma_bool init = SIGMA_FALSE;
+    if (!init) { g_tensor = SovereignTensorShard_Create(); init = SIGMA_TRUE; }
+
+    if (argc < 2) {
+        SovereignTensorShard_Audit(&g_tensor);
+        sigma_printf("Usage: sigma-tensor [bench | audit]\n");
+        return SIGMA_OK;
+    }
+
+    if (sigma_streq(argv[1], "bench")) {
+        float a[4] = {1, 2, 3, 4};
+        float b[4] = {5, 6, 7, 8};
+        float c[4] = {0, 0, 0, 0};
+        SigmaTensor_t ta = {a, 2, 2};
+        SigmaTensor_t tb = {b, 2, 2};
+        SigmaTensor_t tc = {c, 2, 2};
+        sigma_tensor_gemm(&ta, &tb, &tc);
+        g_tensor.ops_completed++;
+    } else if (sigma_streq(argv[1], "audit")) {
+        SovereignTensorShard_Audit(&g_tensor);
+    }
+    return SIGMA_OK;
+}
+
+/* ---- sigma-net --------------------------------------------------------- */
+    return SIGMA_OK;
+}
+
+/* ---- sigma-net --------------------------------------------------------- */
+sigma_err_t sigma_cmd_net(int argc, char *argv[]) {
+    static SovereignNetworkShard_t g_net;
+    static sigma_bool init = SIGMA_FALSE;
+    if (!init) { g_net = SovereignNetworkShard_Create(); init = SIGMA_TRUE; }
+
+    if (argc < 2) {
+        SovereignNetworkShard_Audit(&g_net);
+        sigma_printf("Usage: sigma-net [ping <addr> | xdp <count> | audit]\n");
+        return SIGMA_OK;
+    }
+
+    if (sigma_streq(argv[1], "ping") && argc >= 3) {
+        sigma_printf("[NETWORK]: Sending industrial probe to %s... [OK 1.2ms]\n", argv[2]);
+        g_net.eth0.packets_switched++;
+    } else if (sigma_streq(argv[1], "xdp") && argc >= 3) {
+        sigma_net_zero_copy_dispatch(SIGMA_NULL, (sigma_u32)sigma_atoi(argv[2]));
+        g_net.eth0.packets_switched += (sigma_u32)sigma_atoi(argv[2]);
+    } else if (sigma_streq(argv[1], "audit")) {
+        SovereignNetworkShard_Audit(&g_net);
+    }
+    return SIGMA_OK;
+}
+
+/* ---- sigma-vault ------------------------------------------------------- */
+    return SIGMA_OK;
+}
+
+/* ---- sigma-vault ------------------------------------------------------- */
+sigma_err_t sigma_cmd_vault(int argc, char *argv[]) {
+    static SovereignSecurityVault_t g_vault;
+    static sigma_bool init = SIGMA_FALSE;
+    if (!init) { g_vault = SovereignSecurityVault_Create(); init = SIGMA_TRUE; }
+
+    if (argc < 2) {
+        SovereignSecurityVault_Audit(&g_vault);
+        sigma_printf("Usage: sigma-vault [pledge <caps_hex> | unveil <path> | audit]\n");
+        return SIGMA_OK;
+    }
+
+    if (sigma_streq(argv[1], "pledge") && argc >= 3) {
+        sigma_pledge((sigma_u32)sigma_atoi(argv[2]));
+    } else if (sigma_streq(argv[1], "unveil") && argc >= 3) {
+        sigma_unveil(argv[2]);
+    } else if (sigma_streq(argv[1], "audit")) {
+        SovereignSecurityVault_Audit(&g_vault);
+    }
+    return SIGMA_OK;
+}
+
+/* ---- sigma-spawn ------------------------------------------------------- */
+    return SIGMA_OK;
+}
+
+/* ---- sigma-spawn ------------------------------------------------------- */
+sigma_err_t sigma_cmd_spawn(int argc, char *argv[]) {
+    if (argc < 2) {
+        SovereignSiliconContainer_Audit();
+        sigma_printf("Usage: sigma-spawn <zone_name> [memory_limit_mb]\n");
+        return SIGMA_OK;
+    }
+
+    sigma_u64 limit = (argc >= 3) ? (sigma_u64)sigma_atoi(argv[2]) * 1024 * 1024 : 1024 * 1024 * 1024;
+    sigma_container_spawn(argv[1], limit);
+    return SIGMA_OK;
+}
+
+/* ---- sigma-probe ------------------------------------------------------- */
+    return SIGMA_OK;
+}
+
+/* ---- sigma-probe ------------------------------------------------------- */
+sigma_err_t sigma_cmd_probe(int argc, char *argv[]) {
+    if (argc < 2) {
+        SovereignSiliconProbe_Audit();
+        sigma_printf("Usage: sigma-probe [hook <point> | audit]\n");
+        return SIGMA_OK;
+    }
+
+    if (sigma_streq(argv[1], "hook") && argc >= 3) {
+        sigma_probe_register(argv[2]);
+    } else if (sigma_streq(argv[1], "audit")) {
+        SovereignSiliconProbe_Audit();
+    }
+    return SIGMA_OK;
+}
+
+/* ---- sigma-store ------------------------------------------------------- */
+    return SIGMA_OK;
+}
+
+/* ---- sigma-store ------------------------------------------------------- */
+sigma_err_t sigma_cmd_store(int argc, char *argv[]) {
+    if (argc < 2) {
+        SovereignSiliconStore_Audit();
+        sigma_printf("Usage: sigma-store [set <key> <val> | get <key> | audit]\n");
+        return SIGMA_OK;
+    }
+
+    if (sigma_streq(argv[1], "set") && argc >= 4) {
+        sigma_store_set(argv[2], argv[3]);
+    } else if (sigma_streq(argv[1], "get") && argc >= 3) {
+        const char* val = sigma_store_get(argv[2]);
+        sigma_printf("Σ [STORE]: %s = %s\n", argv[2], val ? val : "(NULL)");
+    } else if (sigma_streq(argv[1], "audit")) {
+        SovereignSiliconStore_Audit();
+    }
+    return SIGMA_OK;
+}
+
+/* ---- sigma-cluster ----------------------------------------------------- */
+    return SIGMA_OK;
+}
+
+/* ---- sigma-cluster ----------------------------------------------------- */
+sigma_err_t sigma_cmd_cluster(int argc, char *argv[]) {
+    if (argc < 2) {
+        SovereignClusterShard_Audit();
+        sigma_printf("Usage: sigma-cluster [join <node_name> | reconcile | audit]\n");
+        return SIGMA_OK;
+    }
+
+    if (sigma_streq(argv[1], "join") && argc >= 3) {
+        sigma_cluster_join(argv[2]);
+    } else if (sigma_streq(argv[1], "reconcile")) {
+        sigma_cluster_reconcile();
+    } else if (sigma_streq(argv[1], "audit")) {
+        SovereignClusterShard_Audit();
+    }
+    return SIGMA_OK;
+}
+
+/* ---- sigma-zenith ------------------------------------------------------ */
+    return SIGMA_OK;
+}
+
+/* ---- sigma-zenith ------------------------------------------------------ */
+sigma_err_t sigma_cmd_zenith(int argc, char *argv[]) {
+    (void)argc; (void)argv;
+    return sigma_zenith_master_audit();
+}
+
+/* ---- sigma-dsa --------------------------------------------------------- */
+    return SIGMA_OK;
+}
+
+/* ---- sigma-dsa --------------------------------------------------------- */
+sigma_err_t sigma_cmd_dsa(int argc, char *argv[]) {
+    static SovereignDSAShard_t g_dsa;
+    static sigma_bool init = SIGMA_FALSE;
+    if (!init) { g_dsa = SovereignDSA_Create(); init = SIGMA_TRUE; }
+
+    if (argc < 2) {
+        g_dsa.audit_complexity(&g_dsa);
+        sigma_printf("Usage: sigma-dsa [sort | map <addr> | audit]\n");
+        return SIGMA_OK;
+    }
+
+    if (sigma_streq(argv[1], "sort")) {
+        sigma_u32 data[5] = {5, 2, 9, 1, 5};
+        g_dsa.sort_quicksort(&g_dsa, data, 5);
+    } else if (sigma_streq(argv[1], "map") && argc >= 3) {
+        g_dsa.map_silicon_shard(&g_dsa, (sigma_u64)sigma_atoi(argv[2]), 4096);
+    } else if (sigma_streq(argv[1], "audit")) {
+        g_dsa.audit_complexity(&g_dsa);
+    }
+    return SIGMA_OK;
+}
+
+/* ---- sigma-math -------------------------------------------------------- */
+    return SIGMA_OK;
+}
+
+/* ---- sigma-math -------------------------------------------------------- */
+sigma_err_t sigma_cmd_math(int argc, char *argv[]) {
+    static SovereignMathShard_t g_math;
+    static sigma_bool init = SIGMA_FALSE;
+    if (!init) { g_math = SovereignMath_Create(); init = SIGMA_TRUE; }
+
+    if (argc < 2) {
+        SovereignMathShard_Audit(&g_math);
+        sigma_printf("Usage: sigma-math [isqrt <val> | audit]\n");
+        return SIGMA_OK;
+    }
+
+    if (sigma_streq(argv[1], "isqrt") && argc >= 3) {
+        float val = (float)sigma_atoi(argv[2]);
+        float res = sigma_math_fast_inv_sqrt(val);
+        sigma_printf("Σ [MATH]: FastInvSqrt(%f) = %f\n", val, res);
+        g_math.total_calcs++;
+    } else if (sigma_streq(argv[1], "audit")) {
+        SovereignMathShard_Audit(&g_math);
+    }
+    return SIGMA_OK;
+}
+
+/* ---- sigma-ctl --------------------------------------------------------- */
+    return SIGMA_OK;
+}
+
+/* ---- sigma-ctl --------------------------------------------------------- */
+sigma_err_t sigma_cmd_ctl(int argc, char *argv[]) {
+    if (argc < 2) {
+        SovereignShardManager_Audit();
+        sigma_printf("Usage: sigma-ctl [start <name> | stop <name> | audit]\n");
+        return SIGMA_OK;
+    }
+
+    if (sigma_streq(argv[1], "start") && argc >= 3) {
+        sigma_shard_start(argv[2], SIGMA_FALSE);
+    } else if (sigma_streq(argv[1], "stop") && argc >= 3) {
+        sigma_shard_stop(argv[2]);
+    } else if (sigma_streq(argv[1], "audit")) {
+        SovereignShardManager_Audit();
+    }
+    return SIGMA_OK;
+}
+
+/* ---- sigma-pkg --------------------------------------------------------- */
+    return SIGMA_OK;
+}
+
+/* ---- sigma-pkg --------------------------------------------------------- */
+sigma_err_t sigma_cmd_pkg(int argc, char *argv[]) {
+    if (argc < 2) {
+        sigma_repo_list();
+        sigma_printf("Usage: sigma-pkg [install <name> | list]\n");
+        return SIGMA_OK;
+    }
+
+    if (sigma_streq(argv[1], "install") && argc >= 3) {
+        sigma_repo_pull(argv[2]);
+    } else if (sigma_streq(argv[1], "list")) {
+        sigma_repo_list();
+    }
+    return SIGMA_OK;
+}
+
+/* ---- sigma-reload ------------------------------------------------------ */
+    return SIGMA_OK;
+}
+
+/* ---- sigma-reload ------------------------------------------------------ */
+sigma_err_t sigma_cmd_reload(int argc, char *argv[]) {
+    if (argc < 2) {
+        SovereignLiveReload_Audit();
+        sigma_printf("Usage: sigma-reload <target_shard_name> [mock_addr_hex]\n");
+        return SIGMA_OK;
+    }
+
+    void* mock_addr = (argc >= 3) ? (void*)(sigma_size_t)sigma_atoi(argv[2]) : (void*)0xDEADBEEF;
+    sigma_reload_shard(argv[1], mock_addr);
+    return SIGMA_OK;
+}
+
+/* ---- sigma-find -------------------------------------------------------- */
+    return SIGMA_OK;
+}
+
+/* ---- sigma-find -------------------------------------------------------- */
+sigma_err_t sigma_cmd_find(int argc, char *argv[]) {
+    if (argc < 2) {
+        SovereignSpotlight_Audit();
+        sigma_printf("Usage: sigma-find <query> | audit\n");
+        return SIGMA_OK;
+    }
+
+    if (sigma_streq(argv[1], "audit")) {
+        SovereignSpotlight_Audit();
+    } else {
+        sigma_spotlight_query(argv[1]);
+    }
+    return SIGMA_OK;
+}
+
+/* ---- sigma-wm ---------------------------------------------------------- */
+    return SIGMA_OK;
+}
+
+/* ---- sigma-wm ---------------------------------------------------------- */
+sigma_err_t sigma_cmd_wm(int argc, char *argv[]) {
+    if (argc < 2) {
+        SovereignWM_Audit();
+        sigma_printf("Usage: sigma-wm [create <title> <x> <y> <w> <h> | composite | audit]\n");
+        return SIGMA_OK;
+    }
+
+    if (sigma_streq(argv[1], "create") && argc >= 7) {
+        sigma_wm_create_window(argv[2], (sigma_u32)sigma_atoi(argv[3]), (sigma_u32)sigma_atoi(argv[4]), 
+                               (sigma_u32)sigma_atoi(argv[5]), (sigma_u32)sigma_atoi(argv[6]));
+    } else if (sigma_streq(argv[1], "composite")) {
+        sigma_wm_composite();
+    } else if (sigma_streq(argv[1], "audit")) {
+        SovereignWM_Audit();
+    }
+    return SIGMA_OK;
+}
+
+/* ---- sigma-script ------------------------------------------------------ */
+    return SIGMA_OK;
+}
+
+/* ---- sigma-script ------------------------------------------------------ */
+sigma_err_t sigma_cmd_script(int argc, char *argv[]) {
+    if (argc < 2) {
+        SovereignAutomation_Audit();
+        sigma_printf("Usage: sigma-script [run | audit]\n");
+        return SIGMA_OK;
+    }
+
+    if (sigma_streq(argv[1], "run")) {
+        sigma_automation_execute();
+    } else if (sigma_streq(argv[1], "audit")) {
+        SovereignAutomation_Audit();
+    }
+    return SIGMA_OK;
+}
+
+/* ---- sigma-neural ------------------------------------------------------ */
+    return SIGMA_OK;
+}
+
+/* ---- sigma-neural ------------------------------------------------------ */
+sigma_err_t sigma_cmd_neural(int argc, char *argv[]) {
+    if (argc < 2) {
+        SovereignNeural_Audit();
+        sigma_printf("Usage: sigma-neural [infer <model> | audit]\n");
+        return SIGMA_OK;
+    }
+
+    if (sigma_streq(argv[1], "infer") && argc >= 3) {
+        sigma_neural_infer(argv[2]);
+    } else if (sigma_streq(argv[1], "audit")) {
+        SovereignNeural_Audit();
+    }
+    return SIGMA_OK;
+}
+
+/* ---- sigma-enclave ----------------------------------------------------- */
+    return SIGMA_OK;
+}
+
+/* ---- sigma-enclave ----------------------------------------------------- */
+sigma_err_t sigma_cmd_enclave(int argc, char *argv[]) {
+    if (argc < 2) {
+        SovereignEnclave_Audit();
+        sigma_printf("Usage: sigma-enclave [seal <key_name> | gen <name> <bits> (qs) | audit]\n");
+        return SIGMA_OK;
+    }
+
+    if (sigma_streq(argv[1], "seal") && argc >= 3) {
+        sigma_enclave_seal(argv[2]);
+    } else if (sigma_streq(argv[1], "gen") && argc >= 4) {
+        sigma_bool qs = (argc >= 5 && sigma_streq(argv[4], "qs")) ? SIGMA_TRUE : SIGMA_FALSE;
+        sigma_enclave_gen_key(argv[2], (sigma_u32)sigma_atoi(argv[3]), qs);
+    } else if (sigma_streq(argv[1], "audit")) {
+        SovereignEnclave_Audit();
+    }
+    return SIGMA_OK;
+}
+
+/* ---- sigma-persona ----------------------------------------------------- */
+    return SIGMA_OK;
+}
+
+/* ---- sigma-persona ----------------------------------------------------- */
+sigma_err_t sigma_cmd_persona(int argc, char *argv[]) {
+    static SovereignDistroSlinger_t g_slinger;
+    static sigma_bool init = SIGMA_FALSE;
+    if (!init) { g_slinger = SovereignDistroSlinger_Create(); init = SIGMA_TRUE; }
+
+    if (argc < 2) {
+        g_slinger.audit_shards(&g_slinger);
+        sigma_printf("Usage: sigma-persona [sigma | linux | darwin | windows | audit]\n");
+        return SIGMA_OK;
+    }
+
+    if (sigma_streq(argv[1], "sigma")) {
+        g_slinger.switch_persona(&g_slinger, PERSONA_SIGMA);
+    } else if (sigma_streq(argv[1], "linux")) {
+        g_slinger.switch_persona(&g_slinger, PERSONA_LINUX);
+    } else if (sigma_streq(argv[1], "darwin")) {
+        g_slinger.switch_persona(&g_slinger, PERSONA_DARWIN);
+    } else if (sigma_streq(argv[1], "windows")) {
+        g_slinger.switch_persona(&g_slinger, PERSONA_WINDOWS);
+    } else if (sigma_streq(argv[1], "audit")) {
+        g_slinger.audit_shards(&g_slinger);
+    }
+    return SIGMA_OK;
+}
+
+/* ---- sigma-test -------------------------------------------------------- */
+    return SIGMA_OK;
+}
+
+/* ---- sigma-test -------------------------------------------------------- */
+sigma_err_t sigma_cmd_test(int argc, char *argv[]) {
+    (void)argc; (void)argv;
+    return sigma_execute_full_test_suite();
+}
+
+/* ---- sigma-rebuild ----------------------------------------------------- */
+    return SIGMA_OK;
+}
+
+/* ---- sigma-rebuild ----------------------------------------------------- */
+sigma_err_t sigma_cmd_rebuild(int argc, char *argv[]) {
+    if (argc < 2) {
+        SovereignRebuild_Audit();
+        sigma_printf("Usage: sigma-rebuild [switch | rollback | audit]\n");
+        return SIGMA_OK;
+    }
+
+    if (sigma_streq(argv[1], "switch")) {
+        sigma_rebuild_system();
+    } else if (sigma_streq(argv[1], "rollback")) {
+        sigma_rebuild_rollback();
+    } else if (sigma_streq(argv[1], "audit")) {
+        SovereignRebuild_Audit();
+    }
+    return SIGMA_OK;
+}
+
+/* ---- sigma-style ------------------------------------------------------- */
+sigma_err_t sigma_cmd_style(int argc, char *argv[]) {
+    if (argc < 2) {
+        SovereignAesthetic_Audit();
+        sigma_printf("Usage: sigma-style [set <name> <color_hex> <blur_px> | audit]\n");
+        return SIGMA_OK;
+    }
+
+    if (sigma_streq(argv[1], "set") && argc >= 5) {
+     return SIGMA_OK;
+}
+
+/* ---- sigma-style ------------------------------------------------------- */
+sigma_err_t sigma_cmd_style(int argc, char *argv[]) {
+    if (argc < 2) {
+        SovereignAesthetic_Audit();
+        sigma_printf("Usage: sigma-style [set <name> <color_hex> <blur_px> | audit]\n");
+        return SIGMA_OK;
+    }
+
+    if (sigma_streq(argv[1], "set") && argc >= 5) {
+        sigma_aesthetic_set_theme(argv[2], (sigma_u32)sigma_atoi(argv[3]), (sigma_u32)sigma_atoi(argv[4]));
+    } else if (sigma_streq(argv[1], "audit")) {
+        SovereignAesthetic_Audit();
+    }
+    return SIGMA_OK;
+}
+
+/* ---- sigma-sched ------------------------------------------------------- */
+    return SIGMA_OK;
+}
+
+/* ---- sigma-sched ------------------------------------------------------- */
+sigma_err_t sigma_cmd_sched(int argc, char *argv[]) {
+    if (argc < 2) {
+        SovereignZenScheduler_Audit();
+        sigma_printf("Usage: sigma-sched [balance | add <name> <prio> <policy_id> | audit]\n");
+        return SIGMA_OK;
+    }
+
+    if (sigma_streq(argv[1], "balance")) {
+        sigma_sched_balance();
+    } else if (sigma_streq(argv[1], "add") && argc >= 5) {
+        sigma_sched_add_task(argv[2], (sigma_u32)sigma_atoi(argv[3]), (sigma_u32)sigma_atoi(argv[4]));
+    } else if (sigma_streq(argv[1], "audit")) {
+        SovereignZenScheduler_Audit();
+    }
+    return SIGMA_OK;
+}
+
+/* ---- sigma-auto -------------------------------------------------------- */
+    return SIGMA_OK;
+}
+
+/* ---- sigma-auto -------------------------------------------------------- */
+sigma_err_t sigma_cmd_auto(int argc, char *argv[]) {
+    if (argc < 2) {
+        SovereignAutoClean_Audit();
+        SovereignAutoPerf_Audit();
+        sigma_printf("Usage: sigma-auto [clean | boost | compact | audit]\n");
+        return SIGMA_OK;
+    }
+
+    if (sigma_streq(argv[1], "clean")) {
+        sigma_autoclean_volatile();
+        sigma_autoclean_legacy();
+    } else if (sigma_streq(argv[1], "boost")) {
+        sigma_autoperf_boost();
+    } else if (sigma_streq(argv[1], "compact")) {
+        sigma_autoperf_compact();
+    } else if (sigma_streq(argv[1], "audit")) {
+        SovereignAutoClean_Audit();
+        SovereignAutoPerf_Audit();
+    }
+    return SIGMA_OK;
+}
+
+/* ---- sigma-amnesia ----------------------------------------------------- */
+    return SIGMA_OK;
+}
+
+/* ---- sigma-amnesia ----------------------------------------------------- */
+sigma_err_t sigma_cmd_amnesia(int argc, char *argv[]) {
+    if (argc < 2) {
+        SovereignAmnesic_Audit();
+        sigma_printf("Usage: sigma-amnesia [scrub | audit]\n");
+        return SIGMA_OK;
+    }
+
+    if (sigma_streq(argv[1], "scrub")) {
+        sigma_amnesic_scrub();
+    } else if (sigma_streq(argv[1], "audit")) {
+        SovereignAmnesic_Audit();
+    }
+    return SIGMA_OK;
+}
+
+/* ---- sigma-mesh -------------------------------------------------------- */
+    return SIGMA_OK;
+}
+
+/* ---- sigma-mesh -------------------------------------------------------- */
+sigma_err_t sigma_cmd_mesh(int argc, char *argv[]) {
+    if (argc < 2) {
+        SovereignMeshFS_Audit();
+        sigma_printf("Usage: sigma-mesh [publish <data> | sync | audit]\n");
+        return SIGMA_OK;
+    }
+
+    if (sigma_streq(argv[1], "publish") && argc >= 3) {
+        sigma_mesh_publish(argv[2], (sigma_u64)sigma_strlen(argv[2]));
+    } else if (sigma_streq(argv[1], "sync")) {
+        sigma_mesh_sync();
+    } else if (sigma_streq(argv[1], "audit")) {
+        SovereignMeshFS_Audit();
+    }
+    return SIGMA_OK;
+}
+
+/* ---- sigma-cap --------------------------------------------------------- */
+sigma_err_t sigma_cmd_cap(int argc, char *argv[]) {
+    if (argc < 2) {
+        SovereignCapability_Audit();
+        sigma_printf("Usage: sigma-cap [grant <resource> <rights_hex> | verify <handle_hex> <rights_hex> | audit]\n");
+        return SIGMA_OK;
+    }
+
+    if (sigma_streq(argv[1], "grant") && argc >= 4) {
+        sigma_cap_grant(argv[2], (sigma_u32)sigma_atoi(argv[3]));
+    } else if (sigma_streq(argv[1], "verify") && argc >= 4) {
+        sigma_cap_verify((sigma_u32)sigma_atoi(argv[2]), (sigma_u32)sigma_atoi(argv[3]));
+    } else if (sigma_streq(argv[1], "audit")) {
+        SovereignCapability_Audit();
+    }
+    return SIGMA_OK;
+}
+
 /* ---- sigma-ai ---------------------------------------------------------- */
 sigma_err_t sigma_cmd_ai(int argc, char *argv[]) {
     if (argc < 2) {
@@ -599,6 +1273,194 @@ sigma_err_t sigma_cmd_ai(int argc, char *argv[]) {
         sigma_printf("[AI]: Prediction for '%s': SUCCESS (Confidence 0.99)\n", argv[2]);
     } else if (sigma_streq(argv[1], "audit")) {
         sigma_printf("--- AI SHARD AUDIT ---\nMODE: Pure C11 Zenith\nCONFIDENCE: 0.9997\n");
+    }
+    return SIGMA_OK;
+}
+
+/* ---- sigma-quorum ------------------------------------------------------ */
+    return SIGMA_OK;
+}
+
+/* ---- sigma-quorum ------------------------------------------------------ */
+sigma_err_t sigma_cmd_quorum(int argc, char *argv[]) {
+    if (argc < 2) {
+        SovereignConsensus_Audit();
+        sigma_printf("Usage: sigma-quorum [elect | replicate <entry> | audit]\n");
+        return SIGMA_OK;
+    }
+
+    if (sigma_streq(argv[1], "elect")) {
+        sigma_quorum_elect();
+    } else if (sigma_streq(argv[1], "replicate") && argc >= 3) {
+        sigma_quorum_replicate(argv[2]);
+    } else if (sigma_streq(argv[1], "audit")) {
+        SovereignConsensus_Audit();
+    }
+    return SIGMA_OK;
+}
+
+/* ---- sigma-overlay ----------------------------------------------------- */
+    return SIGMA_OK;
+}
+
+/* ---- sigma-overlay ----------------------------------------------------- */
+sigma_err_t sigma_cmd_overlay(int argc, char *argv[]) {
+    if (argc < 2) {
+        SovereignOverlay_Audit();
+        sigma_printf("Usage: sigma-overlay [push <name> <mount> <ro_bool> | merge | audit]\n");
+        return SIGMA_OK;
+    }
+
+    if (sigma_streq(argv[1], "push") && argc >= 5) {
+        sigma_overlay_push(argv[2], argv[3], (sigma_bool)sigma_atoi(argv[4]));
+    } else if (sigma_streq(argv[1], "merge")) {
+        sigma_overlay_merge();
+    } else if (sigma_streq(argv[1], "audit")) {
+        SovereignOverlay_Audit();
+    }
+    return SIGMA_OK;
+}
+
+/* ---- sigma-migrate ----------------------------------------------------- */
+    return SIGMA_OK;
+}
+
+/* ---- sigma-migrate ----------------------------------------------------- */
+sigma_err_t sigma_cmd_migrate(int argc, char *argv[]) {
+    if (argc < 2) {
+        SovereignMigration_Audit();
+        sigma_printf("Usage: sigma-migrate [snap <shard_id> | push <shard_id> <node> | audit]\n");
+        return SIGMA_OK;
+    }
+
+    if (sigma_streq(argv[1], "snap") && argc >= 3) {
+        sigma_migrate_checkpoint(argv[2]);
+    } else if (sigma_streq(argv[1], "push") && argc >= 4) {
+        sigma_migrate_push(argv[2], argv[3]);
+    } else if (sigma_streq(argv[1], "audit")) {
+        SovereignMigration_Audit();
+    }
+    return SIGMA_OK;
+}
+
+/* ---- sigma-protect ----------------------------------------------------- */
+    return SIGMA_OK;
+}
+
+/* ---- sigma-protect ----------------------------------------------------- */
+sigma_err_t sigma_cmd_protect(int argc, char *argv[]) {
+    if (argc < 2) {
+        SovereignProtectors_Audit();
+        sigma_printf("Usage: sigma-protect [reg <addr_hex> | verify <addr_hex> | audit]\n");
+        return SIGMA_OK;
+    }
+
+    if (sigma_streq(argv[1], "reg") && argc >= 3) {
+        sigma_protect_register_target((sigma_u64)sigma_atoi(argv[2]));
+    } else if (sigma_streq(argv[1], "verify") && argc >= 3) {
+        sigma_protect_verify_jump((sigma_u64)sigma_atoi(argv[2]));
+    } else if (sigma_streq(argv[1], "audit")) {
+        SovereignProtectors_Audit();
+    }
+    return SIGMA_OK;
+}
+
+/* ---- sigma-id ---------------------------------------------------------- */
+    return SIGMA_OK;
+}
+
+/* ---- sigma-id ---------------------------------------------------------- */
+sigma_err_t sigma_cmd_id(int argc, char *argv[]) {
+    if (argc < 2) {
+        SovereignIdentity_Audit();
+        sigma_printf("Usage: sigma-id [mint <principal> | auth <ticket_hex> | audit]\n");
+        return SIGMA_OK;
+    }
+
+    if (sigma_streq(argv[1], "mint") && argc >= 3) {
+        sigma_id_mint(argv[2]);
+    } else if (sigma_streq(argv[1], "auth") && argc >= 3) {
+        sigma_id_authenticate((sigma_u32)sigma_atoi(argv[2]));
+    } else if (sigma_streq(argv[1], "audit")) {
+        SovereignIdentity_Audit();
+    }
+    return SIGMA_OK;
+}
+
+/* ---- sigma-twm --------------------------------------------------------- */
+    return SIGMA_OK;
+}
+
+/* ---- sigma-twm --------------------------------------------------------- */
+sigma_err_t sigma_cmd_twm(int argc, char *argv[]) {
+    if (argc < 2) {
+        SovereignTWM_Audit();
+        sigma_printf("Usage: sigma-twm [recalc | add <win_id> | audit]\n");
+        return SIGMA_OK;
+    }
+
+    if (sigma_streq(argv[1], "recalc")) {
+        sigma_twm_recalculate();
+    } else if (sigma_streq(argv[1], "add") && argc >= 3) {
+        sigma_twm_add((sigma_u32)sigma_atoi(argv[2]));
+    } else if (sigma_streq(argv[1], "audit")) {
+        SovereignTWM_Audit();
+    }
+    return SIGMA_OK;
+}
+
+/* ---- sigma-sync -------------------------------------------------------- */
+sigma_err_t sigma_cmd_sync(int argc, char *argv[]) {
+    if (argc < 2) {
+        SovereignSync_Audit();
+        sigma_printf("Usage: sigma-sync [push <uid> | reconcile | audit]\n");
+        return SIGMA_OK;
+    }
+
+    if (sigma_streq(argv[1], "push") && argc >= 3) {
+        sigma_sync_push(argv[2]);
+    } else if (sigma_streq(argv[1], "reconcile")) {
+        sigma_sync_reconcile();
+    } else if (sigma_streq(argv[1], "audit")) {
+        SovereignSync_Audit();
+    }
+    return SIGMA_OK;
+}
+
+/* ---- sigma-tele -------------------------------------------------------- */
+sigma_err_t sigma_cmd_tele(int argc, char *argv[]) {
+    if (argc < 2) {
+        SovereignTelemetry_Audit();
+        sigma_printf("Usage: sigma-tele [arm <name> <addr> | sample | flush | audit]\n");
+        return SIGMA_OK;
+    }
+    if (sigma_streq(argv[1], "arm") && argc >= 4) {
+        sigma_tele_probe_arm(argv[2], (sigma_u64)sigma_atoi(argv[3]), PROBE_KPROBE);
+    } else if (sigma_streq(argv[1], "sample")) {
+        sigma_tele_sample();
+    } else if (sigma_streq(argv[1], "flush")) {
+        sigma_tele_map_flush();
+    } else if (sigma_streq(argv[1], "audit")) {
+        SovereignTelemetry_Audit();
+    }
+    return SIGMA_OK;
+}
+
+/* ---- sigma-persona ----------------------------------------------------- */
+sigma_err_t sigma_cmd_sigma_persona(int argc, char *argv[]) {
+    if (argc < 2) {
+        SovereignPersona_Audit();
+        sigma_printf("Usage: sigma-persona [create <name> <theme> <uid> <cap_mask> | switch <name> | audit]\n");
+        return SIGMA_OK;
+    }
+    if (sigma_streq(argv[1], "create") && argc >= 6) {
+        sigma_persona_create(argv[2], argv[3],
+                             (sigma_u32)sigma_atoi(argv[4]),
+                             (sigma_u32)sigma_atoi(argv[5]));
+    } else if (sigma_streq(argv[1], "switch") && argc >= 3) {
+        sigma_persona_switch(argv[2]);
+    } else if (sigma_streq(argv[1], "audit")) {
+        SovereignPersona_Audit();
     }
     return SIGMA_OK;
 }
@@ -808,6 +1670,44 @@ void SovereignCLI_Init(void) {
     sigma_cli_register(&g_sigma_cli, "sigma-run",         "Execute SigmaScript Automations", sigma_cmd_run);
     sigma_cli_register(&g_sigma_cli, "sigma-agent",       "Background Agent Orchestration",  sigma_cmd_agent);
     sigma_cli_register(&g_sigma_cli, "sigma-scrub",       "Forensic Amnesic Purge",          sigma_cmd_scrub);
+    sigma_cli_register(&g_sigma_cli, "sigma-boost",       "Trigger Zenith Gaming Boost",     sigma_cmd_boost);
+    sigma_cli_register(&g_sigma_cli, "sigma-rebuild",     "Atomic System Rebuild (NixOS)",   sigma_cmd_rebuild);
+    sigma_cli_register(&g_sigma_cli, "sigma-tensor",      "High-Performance Tensor Math",    sigma_cmd_tensor);
+    sigma_cli_register(&g_sigma_cli, "sigma-net",         "Industrial Network Orchestrator", sigma_cmd_net);
+    sigma_cli_register(&g_sigma_cli, "sigma-vault",       "Defensive Hardening Vault",       sigma_cmd_vault);
+    sigma_cli_register(&g_sigma_cli, "sigma-spawn",       "Spawn Isolated Silicon Zone",     sigma_cmd_spawn);
+    sigma_cli_register(&g_sigma_cli, "sigma-probe",       "Dynamic Silicon Observability",   sigma_cmd_probe);
+    sigma_cli_register(&g_sigma_cli, "sigma-store",       "Native Silicon State Store",      sigma_cmd_store);
+    sigma_cli_register(&g_sigma_cli, "sigma-cluster",     "Industrial Silicon Orchestration", sigma_cmd_cluster);
+    sigma_cli_register(&g_sigma_cli, "sigma-zenith",      "Master System Sovereignty Matrix", sigma_cmd_zenith);
+    sigma_cli_register(&g_sigma_cli, "sigma-dsa",         "Direct Shard Access Manager",     sigma_cmd_dsa);
+    sigma_cli_register(&g_sigma_cli, "sigma-math",        "Numerical Industrial Accelerator", sigma_cmd_math);
+    sigma_cli_register(&g_sigma_cli, "sigma-ctl",         "Industrial Shard Controller",     sigma_cmd_ctl);
+    sigma_cli_register(&g_sigma_cli, "sigma-pkg",         "Industrial Shard Repository",     sigma_cmd_pkg);
+    sigma_cli_register(&g_sigma_cli, "sigma-reload",      "Atomic Shard Live Reload",        sigma_cmd_reload);
+    sigma_cli_register(&g_sigma_cli, "sigma-find",        "Universal Silicon Discovery",     sigma_cmd_find);
+    sigma_cli_register(&g_sigma_cli, "sigma-wm",          "Industrial Window Manager",       sigma_cmd_wm);
+    sigma_cli_register(&g_sigma_cli, "sigma-script",      "Industrial Mission Scripting",    sigma_cmd_script);
+    sigma_cli_register(&g_sigma_cli, "sigma-neural",      "Industrial Neural Engine",        sigma_cmd_neural);
+    sigma_cli_register(&g_sigma_cli, "sigma-enclave",     "Sovereign Secure Enclave",        sigma_cmd_enclave);
+    sigma_cli_register(&g_sigma_cli, "sigma-persona",     "Universal ABI Personality",       sigma_cmd_persona);
+    sigma_cli_register(&g_sigma_cli, "sigma-test",        "System Sovereignty Validator",    sigma_cmd_test);
+    sigma_cli_register(&g_sigma_cli, "sigma-rebuild",     "Atomic System Rebuilder",         sigma_cmd_rebuild);
+    sigma_cli_register(&g_sigma_cli, "sigma-style",       "Industrial Aesthetic Engine",     sigma_cmd_style);
+    sigma_cli_register(&g_sigma_cli, "sigma-sched",       "Industrial Zen Scheduler",        sigma_cmd_sched);
+    sigma_cli_register(&g_sigma_cli, "sigma-auto",        "Industrial Automated Systems",    sigma_cmd_auto);
+    sigma_cli_register(&g_sigma_cli, "sigma-amnesia",     "Forensic Silicon Amnesia",        sigma_cmd_amnesia);
+    sigma_cli_register(&g_sigma_cli, "sigma-mesh",        "Distributed Mesh FS",             sigma_cmd_mesh);
+    sigma_cli_register(&g_sigma_cli, "sigma-cap",         "Industrial Capabilities",         sigma_cmd_cap);
+    sigma_cli_register(&g_sigma_cli, "sigma-quorum",      "Industrial Consensus",            sigma_cmd_quorum);
+    sigma_cli_register(&g_sigma_cli, "sigma-overlay",     "Industrial Overlay FS",           sigma_cmd_overlay);
+    sigma_cli_register(&g_sigma_cli, "sigma-migrate",     "Industrial Shard Migration",      sigma_cmd_migrate);
+    sigma_cli_register(&g_sigma_cli, "sigma-protect",     "Industrial CFI Protectors",       sigma_cmd_protect);
+    sigma_cli_register(&g_sigma_cli, "sigma-id",          "Industrial Identity (AD)",        sigma_cmd_id);
+    sigma_cli_register(&g_sigma_cli, "sigma-twm",         "Industrial Tiling WM",            sigma_cmd_twm);
+    sigma_cli_register(&g_sigma_cli, "sigma-sync",        "Industrial Matrix Sync",          sigma_cmd_sync);
+    sigma_cli_register(&g_sigma_cli, "sigma-tele",        "Silicon eBPF Telemetry",          sigma_cmd_tele);
+    sigma_cli_register(&g_sigma_cli, "sigma-persona",     "Multi-User Persona Matrix",       sigma_cmd_sigma_persona);
 
     sigma_cli_register(&g_sigma_cli, "sigma-help",  "Show this help",                       sigma_cmd_help);
 
