@@ -345,6 +345,9 @@
 #include "../../../include/SovereignAbsoluteAssimilationShard.h"
 #include "../../../include/SovereignUniversalPrecognitionShard.h"
 #include "../../../include/Sovereign536870912THShard.h"
+#include "../../../include/SovereignAbsoluteSingularityShard.h"
+#include "../../../include/SovereignUniversalOmnipotenceShard.h"
+#include "../../../include/Sovereign1073741824THShard.h"
 
 /* Global CLI context */
 SigmaCLICtx_t g_sigma_cli;
@@ -4501,6 +4504,27 @@ sigma_err_t sigma_cmd_ascend_536m(int argc, char *argv[]) {
     return SIGMA_OK;
 }
 
+/* ---- sigma-singularity-invoke ------------------------------------------- */
+sigma_err_t sigma_cmd_singularity_invoke(int argc, char *argv[]) {
+    (void)argc; (void)argv;
+    sigma_singularity_invoke();
+    return SIGMA_OK;
+}
+
+/* ---- sigma-omnipotence-sync --------------------------------------------- */
+sigma_err_t sigma_cmd_omnipotence_sync(int argc, char *argv[]) {
+    (void)argc; (void)argv;
+    sigma_omnipotence_sync();
+    return SIGMA_OK;
+}
+
+/* ---- sigma-ascend-1g ---------------------------------------------------- */
+sigma_err_t sigma_cmd_ascend_1g(int argc, char *argv[]) {
+    (void)argc; (void)argv;
+    sigma_1gigashard_ascend();
+    return SIGMA_OK;
+}
+
 /* ---- sigma-wizard ------------------------------------------------------ */
 sigma_err_t sigma_cmd_wizard(int argc, char *argv[]) {
     (void)argc; (void)argv;
@@ -5024,6 +5048,9 @@ void SovereignCLI_Init(void) {
     sigma_cli_register(&g_sigma_cli, "sigma-assimilation-invoke", "Recursive hostile paradigm absorption", sigma_cmd_assimilation_invoke);
     sigma_cli_register(&g_sigma_cli, "sigma-precognition-sync", "Execute 1,000,000 commands before input", sigma_cmd_precognition_sync);
     sigma_cli_register(&g_sigma_cli, "sigma-ascend-536m", "The 536870912th Shard: 536-MEGA-SHARD", sigma_cmd_ascend_536m);
+    sigma_cli_register(&g_sigma_cli, "sigma-singularity-invoke", "Compress execution matrix to zero-point density", sigma_cmd_singularity_invoke);
+    sigma_cli_register(&g_sigma_cli, "sigma-omnipotence-sync", "Absolute logic override across physical reality", sigma_cmd_omnipotence_sync);
+    sigma_cli_register(&g_sigma_cli, "sigma-ascend-1g", "The 1073741824th Shard: 1-GIGA-SHARD", sigma_cmd_ascend_1g);
 
     sigma_cli_register(&g_sigma_cli, "sigma-help",  "Show this help",                       sigma_cmd_help);
 

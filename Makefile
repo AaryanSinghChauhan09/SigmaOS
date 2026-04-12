@@ -559,7 +559,11 @@ SYSTEM_SHARDS := \
   kernel/modules/system/Sovereign268435456THShard.c \
   kernel/modules/system/SovereignAbsoluteAssimilationShard.c \
   kernel/modules/system/SovereignUniversalPrecognitionShard.c \
-  kernel/modules/system/Sovereign536870912THShard.c
+  kernel/modules/system/Sovereign536870912THShard.c \
+  kernel/modules/system/SovereignAbsoluteSingularityShard.c \
+  kernel/modules/system/SovereignUniversalOmnipotenceShard.c \
+  kernel/modules/system/Sovereign1073741824THShard.c
+
 
 
 
