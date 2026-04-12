@@ -78,7 +78,16 @@ document.getElementById('btn-explorer').addEventListener('click', () => openWind
 document.getElementById('btn-shell').addEventListener('click', () => {
     openWindow('win-shell');
     const shellOut = document.getElementById('shell-output');
-    shellOut.innerHTML = 'root@sigma-zenith:~# sigma-uname -a<br>Σ SigmaOS Sovereign Zenith v2.5.0-industrial x86_64<br>root@sigma-zenith:~# _';
+    shellOut.innerHTML = 'root@sigma-zenith:~# sigma-neofetch<br>' + 
+                         '   .------.      Σ SigmaOS Zenith Supreme (v2.5-MODULAR)<br>' +
+                         '  /  ΣΣΣ   \\     --------------------------------------<br>' +
+                         ' |  Σ    Σ  |    Host: Sovereign Silicon Hub v1<br>' +
+                         '  \\  ΣΣΣ   /     Kernel: 6.9.42-sovereign-x86_64<br>' +
+                         '   \'------\'      Uptime: 13 minutes, 37 seconds<br>' +
+                         '                 Packages: 425 (shards)<br>' +
+                         '                 Shell: sigma-sh v1.0<br>' +
+                         '                 Memory: 2.1GiB / 64GiB<br><br>' +
+                         'root@sigma-zenith:~# _';
 });
 
 document.getElementById('btn-home').addEventListener('click', () => {
