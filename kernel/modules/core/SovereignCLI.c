@@ -369,6 +369,9 @@
 #include "../../../include/SovereignAbsoluteMetaphysicsShard.h"
 #include "../../../include/SovereignUniversalTelekinesisShard.h"
 #include "../../../include/Sovereign137438953472NDShard.h"
+#include "../../../include/SovereignAbsoluteGenesisShard.h"
+#include "../../../include/SovereignUniversalNirvanaShard.h"
+#include "../../../include/Sovereign274877906944THShard.h"
 
 /* Global CLI context */
 SigmaCLICtx_t g_sigma_cli;
@@ -4693,6 +4696,27 @@ sigma_err_t sigma_cmd_ascend_137g(int argc, char *argv[]) {
     return SIGMA_OK;
 }
 
+/* ---- sigma-genesis-invoke ----------------------------------------------- */
+sigma_err_t sigma_cmd_genesis_invoke(int argc, char *argv[]) {
+    (void)argc; (void)argv;
+    sigma_genesis_invoke();
+    return SIGMA_OK;
+}
+
+/* ---- sigma-nirvana-sync ------------------------------------------------- */
+sigma_err_t sigma_cmd_nirvana_sync(int argc, char *argv[]) {
+    (void)argc; (void)argv;
+    sigma_nirvana_sync();
+    return SIGMA_OK;
+}
+
+/* ---- sigma-ascend-274g -------------------------------------------------- */
+sigma_err_t sigma_cmd_ascend_274g(int argc, char *argv[]) {
+    (void)argc; (void)argv;
+    sigma_274gigashard_ascend();
+    return SIGMA_OK;
+}
+
 /* ---- sigma-wizard ------------------------------------------------------ */
 sigma_err_t sigma_cmd_wizard(int argc, char *argv[]) {
     (void)argc; (void)argv;
@@ -5240,6 +5264,9 @@ void SovereignCLI_Init(void) {
     sigma_cli_register(&g_sigma_cli, "sigma-metaphysics-invoke", "Overwrite logical spacetime parameters within kernel mapping", sigma_cmd_metaphysics_invoke);
     sigma_cli_register(&g_sigma_cli, "sigma-telekinesis-sync", "Route intent seamlessly to kernel parameters naturally", sigma_cmd_telekinesis_sync);
     sigma_cli_register(&g_sigma_cli, "sigma-ascend-137g", "The 137438953472nd Shard: 137.4-GIGA-SHARD", sigma_cmd_ascend_137g);
+    sigma_cli_register(&g_sigma_cli, "sigma-genesis-invoke", "Construct algorithmic logic from absolute zero natively", sigma_cmd_genesis_invoke);
+    sigma_cli_register(&g_sigma_cli, "sigma-nirvana-sync", "Process streams at zero friction natively", sigma_cmd_nirvana_sync);
+    sigma_cli_register(&g_sigma_cli, "sigma-ascend-274g", "The 274877906944th Shard: 274.8-GIGA-SHARD", sigma_cmd_ascend_274g);
 
     sigma_cli_register(&g_sigma_cli, "sigma-help",  "Show this help",                       sigma_cmd_help);
 

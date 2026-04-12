@@ -583,7 +583,11 @@ SYSTEM_SHARDS := \
   kernel/modules/system/Sovereign68719476736THShard.c \
   kernel/modules/system/SovereignAbsoluteMetaphysicsShard.c \
   kernel/modules/system/SovereignUniversalTelekinesisShard.c \
-  kernel/modules/system/Sovereign137438953472NDShard.c
+  kernel/modules/system/Sovereign137438953472NDShard.c \
+  kernel/modules/system/SovereignAbsoluteGenesisShard.c \
+  kernel/modules/system/SovereignUniversalNirvanaShard.c \
+  kernel/modules/system/Sovereign274877906944THShard.c
+
 
 
 
