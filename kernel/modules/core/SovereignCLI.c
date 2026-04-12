@@ -144,6 +144,11 @@
 #include "../../../include/SovereignBioAuthShard.h"
 #include "../../../include/SovereignEmulationShard.h"
 #include "../../../include/SovereignHolographicShard.h"
+#include "../../../include/SovereignSwarmAIShard.h"
+#include "../../../include/SovereignNeuralInterfaceShard.h"
+#include "../../../include/SovereignAutoHealingAlg.h"
+#include "../../../include/SovereignFuzzShard.h"
+#include "../../../include/SovereignCommandParseAlg.h"
 
 /* Global CLI context */
 SigmaCLICtx_t g_sigma_cli;
@@ -2662,6 +2667,56 @@ sigma_err_t sigma_cmd_holo(int argc, char *argv[]) {
     return SIGMA_OK;
 }
 
+/* ---- sigma-swarm -------------------------------------------------------- */
+sigma_err_t sigma_cmd_swarm(int argc, char *argv[]) {
+    if (argc < 2) {
+        sigma_printf("Usage: sigma-swarm [infer <prompt>]\n");
+        return SIGMA_OK; }
+    if (sigma_streq(argv[1], "infer") && argc >= 3)
+        sigma_swarm_infer(argv[2]);
+    return SIGMA_OK;
+}
+
+/* ---- sigma-bci ---------------------------------------------------------- */
+sigma_err_t sigma_cmd_bci(int argc, char *argv[]) {
+    if (argc < 2) {
+        sigma_printf("Usage: sigma-bci [poll]\n");
+        return SIGMA_OK; }
+    if (sigma_streq(argv[1], "poll"))
+        sigma_bci_poll();
+    return SIGMA_OK;
+}
+
+/* ---- sigma-heal --------------------------------------------------------- */
+sigma_err_t sigma_cmd_heal(int argc, char *argv[]) {
+    if (argc < 2) {
+        sigma_printf("Usage: sigma-heal [execute]\n");
+        return SIGMA_OK; }
+    if (sigma_streq(argv[1], "execute"))
+        sigma_heal_execute();
+    return SIGMA_OK;
+}
+
+/* ---- sigma-fuzz --------------------------------------------------------- */
+sigma_err_t sigma_cmd_fuzz(int argc, char *argv[]) {
+    if (argc < 2) {
+        sigma_printf("Usage: sigma-fuzz [run]\n");
+        return SIGMA_OK; }
+    if (sigma_streq(argv[1], "run"))
+        sigma_fuzz_run();
+    return SIGMA_OK;
+}
+
+/* ---- sigma-infer -------------------------------------------------------- */
+sigma_err_t sigma_cmd_infer(int argc, char *argv[]) {
+    if (argc < 2) {
+        sigma_printf("Usage: sigma-infer [parse <ambiguous_cmd>]\n");
+        return SIGMA_OK; }
+    if (sigma_streq(argv[1], "parse") && argc >= 3)
+        sigma_parse_infer(argv[2]);
+    return SIGMA_OK;
+}
+
 /* ---- sigma-wizard ------------------------------------------------------ */
 sigma_err_t sigma_cmd_wizard(int argc, char *argv[]) {
     (void)argc; (void)argv;
@@ -2981,6 +3036,11 @@ void SovereignCLI_Init(void) {
     sigma_cli_register(&g_sigma_cli, "sigma-bioauth",     "Hardware Depth Scanning Auth",    sigma_cmd_bioauth);
     sigma_cli_register(&g_sigma_cli, "sigma-emulate",     "AOT/JIT Binary Translation",      sigma_cmd_emulate);
     sigma_cli_register(&g_sigma_cli, "sigma-holo",        "Spatial Z-Depth Compositing",     sigma_cmd_holo);
+    sigma_cli_register(&g_sigma_cli, "sigma-swarm",       "Distributed Edge LLM Mesh",       sigma_cmd_swarm);
+    sigma_cli_register(&g_sigma_cli, "sigma-bci",         "Neural Intent Brain-Computer",    sigma_cmd_bci);
+    sigma_cli_register(&g_sigma_cli, "sigma-heal",        "ECC Logic Fault Quarantining",    sigma_cmd_heal);
+    sigma_cli_register(&g_sigma_cli, "sigma-fuzz",        "Autonomous Logic Regression",     sigma_cmd_fuzz);
+    sigma_cli_register(&g_sigma_cli, "sigma-infer",       "Neural Vector String Parsing",    sigma_cmd_infer);
 
     sigma_cli_register(&g_sigma_cli, "sigma-help",  "Show this help",                       sigma_cmd_help);
 
