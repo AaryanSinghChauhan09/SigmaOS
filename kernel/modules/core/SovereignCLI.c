@@ -399,6 +399,9 @@
 #include "../../../include/SovereignAbsoluteEquilibriumShard.h"
 #include "../../../include/SovereignUniversalConstellationShard.h"
 #include "../../../include/Sovereign140737488355328THShard.h"
+#include "../../../include/SovereignAbsolutePerfectionShard.h"
+#include "../../../include/SovereignUniversalZenithShard.h"
+#include "../../../include/Sovereign281474976710656THShard.h"
 
 /* Global CLI context */
 SigmaCLICtx_t g_sigma_cli;
@@ -4933,6 +4936,27 @@ sigma_err_t sigma_cmd_ascend_140tera(int argc, char *argv[]) {
     return SIGMA_OK;
 }
 
+/* ---- sigma-perfection-invoke -------------------------------------------- */
+sigma_err_t sigma_cmd_perfection_invoke(int argc, char *argv[]) {
+    (void)argc; (void)argv;
+    sigma_perfection_invoke();
+    return SIGMA_OK;
+}
+
+/* ---- sigma-zenith-sync -------------------------------------------------- */
+sigma_err_t sigma_cmd_zenith_sync(int argc, char *argv[]) {
+    (void)argc; (void)argv;
+    sigma_zenith_sync();
+    return SIGMA_OK;
+}
+
+/* ---- sigma-ascend-281tera ----------------------------------------------- */
+sigma_err_t sigma_cmd_ascend_281tera(int argc, char *argv[]) {
+    (void)argc; (void)argv;
+    sigma_281terashard_ascend();
+    return SIGMA_OK;
+}
+
 /* ---- sigma-wizard ------------------------------------------------------ */
 sigma_err_t sigma_cmd_wizard(int argc, char *argv[]) {
     (void)argc; (void)argv;
@@ -5510,6 +5534,9 @@ void SovereignCLI_Init(void) {
     sigma_cli_register(&g_sigma_cli, "sigma-equilibrium-invoke", "Nullify computational heat into 0 thermodynamic loss naturally", sigma_cmd_equilibrium_invoke);
     sigma_cli_register(&g_sigma_cli, "sigma-constellation-sync", "Interconnect multiversal grids into core node matrices", sigma_cmd_constellation_sync);
     sigma_cli_register(&g_sigma_cli, "sigma-ascend-140tera", "The 140737488355328th Shard: 140.7-TERA-SHARD (47-BIT)", sigma_cmd_ascend_140tera);
+    sigma_cli_register(&g_sigma_cli, "sigma-perfection-invoke", "Lock architecture logic into absolute error-free conclusion", sigma_cmd_perfection_invoke);
+    sigma_cli_register(&g_sigma_cli, "sigma-zenith-sync", "Solidify universal dominance natively across all dimensions", sigma_cmd_zenith_sync);
+    sigma_cli_register(&g_sigma_cli, "sigma-ascend-281tera", "The 281474976710656th Shard: 281.4-TERA-SHARD (THE 48-BIT APEX MAX)", sigma_cmd_ascend_281tera);
 
     sigma_cli_register(&g_sigma_cli, "sigma-help",  "Show this help",                       sigma_cmd_help);
 
