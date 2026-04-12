@@ -339,6 +339,9 @@
 #include "../../../include/SovereignAbsoluteConvergenceShard.h"
 #include "../../../include/SovereignUniversalResurrectionShard.h"
 #include "../../../include/Sovereign134217728THShard.h"
+#include "../../../include/SovereignAbsoluteEquilibriumShard.h"
+#include "../../../include/SovereignUniversalTeleportationShard.h"
+#include "../../../include/Sovereign268435456THShard.h"
 
 /* Global CLI context */
 SigmaCLICtx_t g_sigma_cli;
@@ -4453,6 +4456,27 @@ sigma_err_t sigma_cmd_ascend_134m(int argc, char *argv[]) {
     return SIGMA_OK;
 }
 
+/* ---- sigma-equilibrium-invoke ------------------------------------------- */
+sigma_err_t sigma_cmd_equilibrium_invoke(int argc, char *argv[]) {
+    (void)argc; (void)argv;
+    sigma_equilibrium_invoke();
+    return SIGMA_OK;
+}
+
+/* ---- sigma-teleportation-sync ------------------------------------------- */
+sigma_err_t sigma_cmd_teleportation_sync(int argc, char *argv[]) {
+    (void)argc; (void)argv;
+    sigma_teleportation_sync();
+    return SIGMA_OK;
+}
+
+/* ---- sigma-ascend-268m -------------------------------------------------- */
+sigma_err_t sigma_cmd_ascend_268m(int argc, char *argv[]) {
+    (void)argc; (void)argv;
+    sigma_268megashard_ascend();
+    return SIGMA_OK;
+}
+
 /* ---- sigma-wizard ------------------------------------------------------ */
 sigma_err_t sigma_cmd_wizard(int argc, char *argv[]) {
     (void)argc; (void)argv;
@@ -4970,6 +4994,9 @@ void SovereignCLI_Init(void) {
     sigma_cli_register(&g_sigma_cli, "sigma-convergence-invoke", "Collapse all disparate paradigms into singular truth", sigma_cmd_convergence_invoke);
     sigma_cli_register(&g_sigma_cli, "sigma-resurrection-sync", "Native microcode replacement for dead hardware", sigma_cmd_resurrection_sync);
     sigma_cli_register(&g_sigma_cli, "sigma-ascend-134m", "The 134217728th Shard: 134-MEGA-SHARD", sigma_cmd_ascend_134m);
+    sigma_cli_register(&g_sigma_cli, "sigma-equilibrium-invoke", "Cease all entropy via absolute zero balance", sigma_cmd_equilibrium_invoke);
+    sigma_cli_register(&g_sigma_cli, "sigma-teleportation-sync", "Quantum state entanglement mapping locally", sigma_cmd_teleportation_sync);
+    sigma_cli_register(&g_sigma_cli, "sigma-ascend-268m", "The 268435456th Shard: 268-MEGA-SHARD", sigma_cmd_ascend_268m);
 
     sigma_cli_register(&g_sigma_cli, "sigma-help",  "Show this help",                       sigma_cmd_help);
 
