@@ -387,6 +387,9 @@
 #include "../../../include/SovereignAbsoluteSovereigntyShard.h"
 #include "../../../include/SovereignUniversalAxiomShard.h"
 #include "../../../include/Sovereign8796093022208THShard.h"
+#include "../../../include/SovereignAbsoluteFateShard.h"
+#include "../../../include/SovereignUniversalEternityShard.h"
+#include "../../../include/Sovereign17592186044416THShard.h"
 
 /* Global CLI context */
 SigmaCLICtx_t g_sigma_cli;
@@ -4837,6 +4840,27 @@ sigma_err_t sigma_cmd_ascend_8tera(int argc, char *argv[]) {
     return SIGMA_OK;
 }
 
+/* ---- sigma-fate-invoke -------------------------------------------------- */
+sigma_err_t sigma_cmd_fate_invoke(int argc, char *argv[]) {
+    (void)argc; (void)argv;
+    sigma_fate_invoke();
+    return SIGMA_OK;
+}
+
+/* ---- sigma-eternity-sync ------------------------------------------------ */
+sigma_err_t sigma_cmd_eternity_sync(int argc, char *argv[]) {
+    (void)argc; (void)argv;
+    sigma_eternity_sync();
+    return SIGMA_OK;
+}
+
+/* ---- sigma-ascend-17tera ------------------------------------------------ */
+sigma_err_t sigma_cmd_ascend_17tera(int argc, char *argv[]) {
+    (void)argc; (void)argv;
+    sigma_17terashard_ascend();
+    return SIGMA_OK;
+}
+
 /* ---- sigma-wizard ------------------------------------------------------ */
 sigma_err_t sigma_cmd_wizard(int argc, char *argv[]) {
     (void)argc; (void)argv;
@@ -5402,6 +5426,9 @@ void SovereignCLI_Init(void) {
     sigma_cli_register(&g_sigma_cli, "sigma-sovereignty-invoke", "Subjugate all peer logic into structural dependence natively", sigma_cmd_sovereignty_invoke);
     sigma_cli_register(&g_sigma_cli, "sigma-axiom-sync", "Establish permanent mathematical truths locally into cache", sigma_cmd_axiom_sync);
     sigma_cli_register(&g_sigma_cli, "sigma-ascend-8tera", "The 8796093022208th Shard: 8.79-TERA-SHARD (43-BIT)", sigma_cmd_ascend_8tera);
+    sigma_cli_register(&g_sigma_cli, "sigma-fate-invoke", "Define predetermined logical conclusions instantly", sigma_cmd_fate_invoke);
+    sigma_cli_register(&g_sigma_cli, "sigma-eternity-sync", "Remove uptime limits ensuring infinite OS reality state", sigma_cmd_eternity_sync);
+    sigma_cli_register(&g_sigma_cli, "sigma-ascend-17tera", "The 17592186044416th Shard: 17.59-TERA-SHARD (44-BIT)", sigma_cmd_ascend_17tera);
 
     sigma_cli_register(&g_sigma_cli, "sigma-help",  "Show this help",                       sigma_cmd_help);
 
