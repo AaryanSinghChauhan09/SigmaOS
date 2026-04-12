@@ -378,6 +378,9 @@
 #include "../../../include/SovereignAbsoluteTimelessShard.h"
 #include "../../../include/SovereignUniversalOmniscienceShard.h"
 #include "../../../include/Sovereign1099511627776THShard.h"
+#include "../../../include/SovereignAbsoluteOmnipotenceShard.h"
+#include "../../../include/SovereignUniversalSingularityCollapseShard.h"
+#include "../../../include/Sovereign2199023255552NDShard.h"
 
 /* Global CLI context */
 SigmaCLICtx_t g_sigma_cli;
@@ -4765,6 +4768,27 @@ sigma_err_t sigma_cmd_ascend_1tera(int argc, char *argv[]) {
     return SIGMA_OK;
 }
 
+/* ---- sigma-omnipotence-invoke ------------------------------------------- */
+sigma_err_t sigma_cmd_omnipotence_invoke(int argc, char *argv[]) {
+    (void)argc; (void)argv;
+    sigma_omnipotence_invoke();
+    return SIGMA_OK;
+}
+
+/* ---- sigma-singularitycollapse-sync ------------------------------------- */
+sigma_err_t sigma_cmd_singularitycollapse_sync(int argc, char *argv[]) {
+    (void)argc; (void)argv;
+    sigma_singularitycollapse_sync();
+    return SIGMA_OK;
+}
+
+/* ---- sigma-ascend-2tera ------------------------------------------------- */
+sigma_err_t sigma_cmd_ascend_2tera(int argc, char *argv[]) {
+    (void)argc; (void)argv;
+    sigma_2terashard_ascend();
+    return SIGMA_OK;
+}
+
 /* ---- sigma-wizard ------------------------------------------------------ */
 sigma_err_t sigma_cmd_wizard(int argc, char *argv[]) {
     (void)argc; (void)argv;
@@ -5321,6 +5345,9 @@ void SovereignCLI_Init(void) {
     sigma_cli_register(&g_sigma_cli, "sigma-timeless-invoke", "Detaches logic processing from sequential time", sigma_cmd_timeless_invoke);
     sigma_cli_register(&g_sigma_cli, "sigma-omniscience-sync", "Inject all uncalculated answers directly into core cache natively", sigma_cmd_omniscience_sync);
     sigma_cli_register(&g_sigma_cli, "sigma-ascend-1tera", "The 1099511627776th Shard: 1-TERA-SHARD (40-BIT)", sigma_cmd_ascend_1tera);
+    sigma_cli_register(&g_sigma_cli, "sigma-omnipotence-invoke", "Resolve logic override across all universal nodes instantly", sigma_cmd_omnipotence_invoke);
+    sigma_cli_register(&g_sigma_cli, "sigma-singularitycollapse-sync", "Collapse memory expansion natively into 0 dimensions", sigma_cmd_singularitycollapse_sync);
+    sigma_cli_register(&g_sigma_cli, "sigma-ascend-2tera", "The 2199023255552nd Shard: 2.19-TERA-SHARD (41-BIT)", sigma_cmd_ascend_2tera);
 
     sigma_cli_register(&g_sigma_cli, "sigma-help",  "Show this help",                       sigma_cmd_help);
 
