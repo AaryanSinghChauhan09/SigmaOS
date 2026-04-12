@@ -303,3 +303,12 @@ setInterval(() => {
     logConsole.appendChild(div);
     logConsole.scrollTop = logConsole.scrollHeight;
 }, 30000);
+
+// Omniversal-Shell Galaxy Pulse
+setInterval(() => {
+    const omniLog = document.createElement('div');
+    omniLog.style.color = '#00f2ff'; omniLog.style.fontSize = '0.65rem';
+    omniLog.textContent = 'S [OMNI]: Galaxy-Mesh Data Convergence: 100%. All stars linked.';
+    logConsole.appendChild(omniLog);
+    logConsole.scrollTop = logConsole.scrollHeight;
+}, 45000);

@@ -165,3 +165,13 @@ body::before {
     50% { filter: drop-shadow(0 0 25px var(--sec-color)); }
     100% { filter: drop-shadow(0 0 5px var(--acc-color)); }
 }
+
+.galaxy-mesh {
+    background: radial-gradient(circle at center, rgba(136, 0, 255, 0.1) 0%, transparent 70%);
+    animation: nebulaPulse 10s infinite alternate;
+}
+
+@keyframes nebulaPulse {
+    from { opacity: 0.2; transform: scale(1); }
+    to { opacity: 0.4; transform: scale(1.2); }
+}

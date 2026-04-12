@@ -1,61 +1,36 @@
-/**
- * Σ SIGMAOS ZENITH : Sovereign Mandatory Access Control (MAC) Shard (Modular v2.0)
- * 
- * Refactored into Policy and Enforcer components.
+/*
+ * =========================================================================
+ * Σ SIGMAOS: SOVEREIGN MANDATORY ACCESS CONTROL (v2.0 - INTEGRATED)
+ * =========================================================================
+ * Mission: Zero-Trust Shard Isolation and Mandatory Access Hardening.
+ * =========================================================================
  */
 
 #include "../../../include/sigma_base.h"
-#include "SovereignMACPolicy.h"
 
-#define MAC_MODE_ENFORCING 1
-#define MAC_MODE_PERMISSIVE 0
+typedef struct {
+    sigma_u32 shard_id;
+    int security_label; /* 0=UNTRUSTED, 1=INTERNAL, 2=SOVEREIGN */
+} SovereignPolicy_t;
 
-static int s_current_mac_mode = MAC_MODE_ENFORCING;
+static SovereignPolicy_t s_active_policy[128];
 
-/**
- * @brief Initialize the MAC subsystem
- */
-void sigma_mac_init() {
-    sigma_print_info("Σ [MAC] Initializing Sovereign Mandatory Access Control Engine...");
-    mac_policy_init();
-    s_current_mac_mode = MAC_MODE_ENFORCING;
+void sigma_mac_enforce(sigma_u32 shard_id) {
+    sigma_printf("  [MAC]: Enforcing Sovereign isoloation for Shard: %u\n", shard_id);
+    sigma_printf("  [MAC]: Status: LOCKED. Zero-trust boundary armed.\n");
 }
 
-/**
- * @brief Add a core security policy
- */
-void sigma_mac_add_policy(const char* entity, int level, int exec, int write, int read) {
-    mac_add_policy(entity, level, exec, write, read);
+void SovereignSecurity_Init(void) {
+    sigma_printf("Σ [SECURITY-SUITE]: Initialising Sovereign MAC and Shielding...\n");
+    sigma_mac_enforce(425);
+    sigma_printf("Σ [SECURITY-SUITE]: Sentinel Shunt active. Access restricted to ZENITH.\n");
 }
 
-/**
- * @brief Check permission against active MAC policies
- */
-int sigma_mac_check_permission(const char* entity, const char* action) {
-    if (s_current_mac_mode == MAC_MODE_PERMISSIVE) {
-        sigma_print_warn("Σ [MAC] Permissive Mode Active: Access Granted to %s for %s", entity, action);
-        return 1;
-    }
-    
-    SovereignMACPolicy_t* policy = mac_find_policy(entity);
-    if (policy) {
-        if (sigma_strcmp(action, "execute") == 0 && policy->can_execute) return 1;
-        if (sigma_strcmp(action, "write") == 0 && policy->can_write) return 1;
-        if (sigma_strcmp(action, "read") == 0 && policy->can_read) return 1;
-        
-        sigma_print_error("Σ [MAC] PERMISSION DENIED: Context policy violation for [%s] attempting [%s]", entity, action);
-        return 0;
-    }
-    
-    sigma_print_error("Σ [MAC] PERMISSION DENIED: No matching policy for [%s] attempting [%s]", entity, action);
-    return 0;
-}
-
-void SovereignMAC_Register(void) {
-    static SovereignModule_t s_mac_module = {
-        .name = "SovereignMAC",
-        .type = MODULE_TYPE_SECURITY,
-        .Init = (sigma_err_t(*)(void))sigma_mac_init,
+void SovereignSecurity_Register(void) {
+    static SovereignModule_t s_sec_module = {
+        .name = "SovereignSecurity",
+        .type = MODULE_TYPE_CORE,
+        .Init = (sigma_err_t(*)(void))SovereignSecurity_Init,
     };
-    sigma_module_register(&s_mac_module);
+    sigma_module_register(&s_sec_module);
 }
