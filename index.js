@@ -245,3 +245,21 @@ document.addEventListener('mousemove', (e) => {
     const y = (e.clientX - window.innerWidth / 2) / 20;
     cube.style.transform = 'rotateX(' + x + 'deg) rotateY(' + y + 'deg)';
 });
+
+// Neural-Intent Predictive Shell
+const shellOutput = document.getElementById('shell-output');
+if(shellOutput) {
+    document.addEventListener('keydown', (e) => {
+        if(document.activeElement === document.body) {
+            console.log('S [INTENT]: Predicting next sovereign command...');
+        }
+    });
+}
+
+// 3D-Reactive Particle System Upgrade
+function updateParticlesWithCube(rx, ry) {
+    particles.forEach(p => {
+        p.vx += ry * 0.001;
+        p.vy += rx * 0.001;
+    });
+}

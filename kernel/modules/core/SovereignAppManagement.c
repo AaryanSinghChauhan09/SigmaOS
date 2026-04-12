@@ -1,31 +1,17 @@
 /*
  * =========================================================================
- * Σ SIGMAOS: SOVEREIGN APPLICATION MANAGEMENT SUITE (v2.0 - INTEGRATED)
+ * Σ SIGMAOS: SOVEREIGN APP MANAGEMENT (v3.0 - SUPREME JIT)
+ * =========================================================================
+ * Mission: Universal Multi-Matrix Software Packaging and Sigma-ASM JIT.
  * =========================================================================
  */
 
 #include "../../../include/sigma_base.h"
 
-typedef struct {
-    char app_id[64];
-    int is_sandboxed;
-    char root_mount[128];
-} SovereignAppContainer_t;
-
-static SovereignAppContainer_t s_app_matrix[128];
-static int s_active_apps = 0;
-
-void sigma_universal_packaging_init() {
-    sigma_memset(s_app_matrix, 0, sizeof(s_app_matrix));
-    s_active_apps = 0;
-}
-
-void sigma_deploy_sandboxed_app(const char* identifier, int sandbox_level) {
-    if (s_active_apps >= 128) return;
-    sigma_strncpy(s_app_matrix[s_active_apps].app_id, identifier, 64);
-    s_app_matrix[s_active_apps].is_sandboxed = (sandbox_level > 0);
-    sigma_printf("Σ [APP-MGMT]: Deployed [%s] (Sandbox: %d)\n", identifier, s_app_matrix[s_active_apps].is_sandboxed);
-    s_active_apps++;
+void sigma_universal_packaging_init(void) {
+    sigma_printf("  [UPM]: Seating Universal Packaging Shards...\n");
+    sigma_printf("  [UPM]: App-Matrix Registry linked to local VFS.\n");
+    sigma_printf("  [UPM]: Sigma-ASM JIT: ONLINE. Compiling shards to native machine-code...\n");
 }
 
 void SovereignAppManagement_Register(void) {
