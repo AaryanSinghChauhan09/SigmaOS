@@ -381,6 +381,9 @@
 #include "../../../include/SovereignAbsoluteOmnipotenceShard.h"
 #include "../../../include/SovereignUniversalSingularityCollapseShard.h"
 #include "../../../include/Sovereign2199023255552NDShard.h"
+#include "../../../include/SovereignAbsoluteTranscendenceShard.h"
+#include "../../../include/SovereignUniversalOntologyFrameShard.h"
+#include "../../../include/Sovereign4398046511104THShard.h"
 
 /* Global CLI context */
 SigmaCLICtx_t g_sigma_cli;
@@ -4789,6 +4792,27 @@ sigma_err_t sigma_cmd_ascend_2tera(int argc, char *argv[]) {
     return SIGMA_OK;
 }
 
+/* ---- sigma-transcendence-invoke ----------------------------------------- */
+sigma_err_t sigma_cmd_transcendence_invoke(int argc, char *argv[]) {
+    (void)argc; (void)argv;
+    sigma_transcendence_invoke();
+    return SIGMA_OK;
+}
+
+/* ---- sigma-ontology-sync ------------------------------------------------ */
+sigma_err_t sigma_cmd_ontology_sync(int argc, char *argv[]) {
+    (void)argc; (void)argv;
+    sigma_ontology_sync();
+    return SIGMA_OK;
+}
+
+/* ---- sigma-ascend-4tera ------------------------------------------------- */
+sigma_err_t sigma_cmd_ascend_4tera(int argc, char *argv[]) {
+    (void)argc; (void)argv;
+    sigma_4terashard_ascend();
+    return SIGMA_OK;
+}
+
 /* ---- sigma-wizard ------------------------------------------------------ */
 sigma_err_t sigma_cmd_wizard(int argc, char *argv[]) {
     (void)argc; (void)argv;
@@ -5348,6 +5372,9 @@ void SovereignCLI_Init(void) {
     sigma_cli_register(&g_sigma_cli, "sigma-omnipotence-invoke", "Resolve logic override across all universal nodes instantly", sigma_cmd_omnipotence_invoke);
     sigma_cli_register(&g_sigma_cli, "sigma-singularitycollapse-sync", "Collapse memory expansion natively into 0 dimensions", sigma_cmd_singularitycollapse_sync);
     sigma_cli_register(&g_sigma_cli, "sigma-ascend-2tera", "The 2199023255552nd Shard: 2.19-TERA-SHARD (41-BIT)", sigma_cmd_ascend_2tera);
+    sigma_cli_register(&g_sigma_cli, "sigma-transcendence-invoke", "Merge Architect neural intent with core execution completely", sigma_cmd_transcendence_invoke);
+    sigma_cli_register(&g_sigma_cli, "sigma-ontology-sync", "Remap universal concepts as mutable C variables", sigma_cmd_ontology_sync);
+    sigma_cli_register(&g_sigma_cli, "sigma-ascend-4tera", "The 4398046511104th Shard: 4.39-TERA-SHARD (42-BIT)", sigma_cmd_ascend_4tera);
 
     sigma_cli_register(&g_sigma_cli, "sigma-help",  "Show this help",                       sigma_cmd_help);
 
