@@ -405,6 +405,9 @@
 #include "../../../include/SovereignAbsoluteTranscendentalMemoryShard.h"
 #include "../../../include/SovereignUniversalCosmicGridShard.h"
 #include "../../../include/Sovereign562949953421312THShard.h"
+#include "../../../include/SovereignAbsoluteOmniGenesisShard.h"
+#include "../../../include/SovereignUniversalPetaScaleMatrixShard.h"
+#include "../../../include/Sovereign1125899906842624THShard.h"
 
 /* Global CLI context */
 SigmaCLICtx_t g_sigma_cli;
@@ -4981,6 +4984,27 @@ sigma_err_t sigma_cmd_ascend_562tera(int argc, char *argv[]) {
     return SIGMA_OK;
 }
 
+/* ---- sigma-omnigenesis-invoke ------------------------------------------- */
+sigma_err_t sigma_cmd_omnigenesis_invoke(int argc, char *argv[]) {
+    (void)argc; (void)argv;
+    sigma_omnigenesis_invoke();
+    return SIGMA_OK;
+}
+
+/* ---- sigma-petascalematrix-sync ----------------------------------------- */
+sigma_err_t sigma_cmd_petascalematrix_sync(int argc, char *argv[]) {
+    (void)argc; (void)argv;
+    sigma_petascalematrix_sync();
+    return SIGMA_OK;
+}
+
+/* ---- sigma-ascend-1peta ------------------------------------------------- */
+sigma_err_t sigma_cmd_ascend_1peta(int argc, char *argv[]) {
+    (void)argc; (void)argv;
+    sigma_1petashard_ascend();
+    return SIGMA_OK;
+}
+
 /* ---- sigma-wizard ------------------------------------------------------ */
 sigma_err_t sigma_cmd_wizard(int argc, char *argv[]) {
     (void)argc; (void)argv;
@@ -5564,6 +5588,9 @@ void SovereignCLI_Init(void) {
     sigma_cli_register(&g_sigma_cli, "sigma-transcendentalmemory-invoke", "Synthesize 49-Bit grid virtualizing physical address gaps natively", sigma_cmd_transcendentalmemory_invoke);
     sigma_cli_register(&g_sigma_cli, "sigma-cosmicgrid-sync", "Map all core logic arrays natively across synthetic cosmic vectors", sigma_cmd_cosmicgrid_sync);
     sigma_cli_register(&g_sigma_cli, "sigma-ascend-562tera", "The 562949953421312th Shard: 562.9-TERA-SHARD (49-BIT)", sigma_cmd_ascend_562tera);
+    sigma_cli_register(&g_sigma_cli, "sigma-omnigenesis-invoke", "Ignite spontaneous native system logic generation", sigma_cmd_omnigenesis_invoke);
+    sigma_cli_register(&g_sigma_cli, "sigma-petascalematrix-sync", "Bind architecture natively to Petabyte scale dimensions", sigma_cmd_petascalematrix_sync);
+    sigma_cli_register(&g_sigma_cli, "sigma-ascend-1peta", "The 1125899906842624th Shard: 1.12-PETASHARD (50-BIT)", sigma_cmd_ascend_1peta);
 
     sigma_cli_register(&g_sigma_cli, "sigma-help",  "Show this help",                       sigma_cmd_help);
 
