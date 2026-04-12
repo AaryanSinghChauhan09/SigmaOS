@@ -88,6 +88,9 @@
 #include "../../../include/SovereignGamingShard.h"
 #include "../../../include/SovereignMultimediaShard.h"
 #include "../../../include/SovereignPrivacyShard.h"
+#include "../../../include/SovereignContainerShard.h"
+#include "../../../include/SovereignNetStackShard.h"
+#include "../../../include/SovereignAutoCleanShard.h"
 
 /* Global CLI context */
 SigmaCLICtx_t g_sigma_cli;
@@ -1833,6 +1836,70 @@ sigma_err_t sigma_cmd_privacy(int argc, char *argv[]) {
     return SIGMA_OK;
 }
 
+/* ---- sigma-ctr --------------------------------------------------------- */
+sigma_err_t sigma_cmd_ctr(int argc, char *argv[]) {
+    if (argc < 2) { SovereignContainer_Audit();
+        sigma_printf("Usage: sigma-ctr [run <image> <host> <ns_flags> <mem_mb> <cpu_pct> | pause <id> | stop <id> | exec <id> <cmd> | audit]\n");
+        return SIGMA_OK; }
+    if (sigma_streq(argv[1], "run") && argc >= 7)
+        sigma_container_run(argv[2], argv[3],
+                            (SigmaNamespaceFlags_t)sigma_atoi(argv[4]),
+                            (sigma_u32)sigma_atoi(argv[5]),
+                            (sigma_u32)sigma_atoi(argv[6]), SIGMA_FALSE);
+    else if (sigma_streq(argv[1], "pause") && argc >= 3)
+        sigma_container_pause(argv[2]);
+    else if (sigma_streq(argv[1], "stop") && argc >= 3)
+        sigma_container_stop(argv[2]);
+    else if (sigma_streq(argv[1], "exec") && argc >= 4)
+        sigma_container_exec(argv[2], argv[3]);
+    else if (sigma_streq(argv[1], "audit"))
+        SovereignContainer_Audit();
+    return SIGMA_OK;
+}
+
+/* ---- sigma-sock -------------------------------------------------------- */
+sigma_err_t sigma_cmd_sock(int argc, char *argv[]) {
+    if (argc < 2) { SovereignNetStack_Audit();
+        sigma_printf("Usage: sigma-sock [tcp | udp | connect <dst> <port> | route <dest> <gw> <dev> | audit]\n");
+        return SIGMA_OK; }
+    if (sigma_streq(argv[1], "tcp"))
+        sigma_socket(SOCK_SIGMA_TCP);
+    else if (sigma_streq(argv[1], "udp"))
+        sigma_socket(SOCK_SIGMA_UDP);
+    else if (sigma_streq(argv[1], "connect") && argc >= 4) {
+        sigma_u32 fd = sigma_socket(SOCK_SIGMA_TCP);
+        sigma_connect(fd, (sigma_u32)sigma_atoi(argv[2]),
+                          (sigma_u16)sigma_atoi(argv[3]));
+    } else if (sigma_streq(argv[1], "route") && argc >= 5) {
+        sigma_route_add((sigma_u32)sigma_atoi(argv[2]), 0xFFFFFF00,
+                        (sigma_u32)sigma_atoi(argv[3]), argv[4], 100);
+    } else if (sigma_streq(argv[1], "audit")) {
+        SovereignNetStack_Audit();
+    }
+    return SIGMA_OK;
+}
+
+/* ---- sigma-clean ------------------------------------------------------- */
+sigma_err_t sigma_cmd_clean(int argc, char *argv[]) {
+    if (argc < 2) {
+        sigma_autoclean_scan();
+        sigma_autoclean_run(SIGMA_TRUE);
+        sigma_printf("Usage: sigma-clean [scan | run | dry | audit]\n");
+        return SIGMA_OK; }
+    if (sigma_streq(argv[1], "scan"))
+        sigma_autoclean_scan();
+    else if (sigma_streq(argv[1], "run")) {
+        sigma_autoclean_scan();
+        sigma_autoclean_run(SIGMA_FALSE);
+    } else if (sigma_streq(argv[1], "dry")) {
+        sigma_autoclean_scan();
+        sigma_autoclean_run(SIGMA_TRUE);
+    } else if (sigma_streq(argv[1], "audit")) {
+        SovereignAutoClean_Audit();
+    }
+    return SIGMA_OK;
+}
+
 /* ---- sigma-wizard ------------------------------------------------------ */
 sigma_err_t sigma_cmd_wizard(int argc, char *argv[]) {
     (void)argc; (void)argv;
@@ -2096,6 +2163,9 @@ void SovereignCLI_Init(void) {
     sigma_cli_register(&g_sigma_cli, "sigma-gaming",      "Gaming Performance Governor",     sigma_cmd_gaming);
     sigma_cli_register(&g_sigma_cli, "sigma-mm",          "Multimedia Stream Pipeline",      sigma_cmd_mm);
     sigma_cli_register(&g_sigma_cli, "sigma-privacy",     "Silicon Privacy Governor",        sigma_cmd_privacy);
+    sigma_cli_register(&g_sigma_cli, "sigma-ctr",         "Silicon Container Runtime",       sigma_cmd_ctr);
+    sigma_cli_register(&g_sigma_cli, "sigma-sock",        "Silicon Network Stack / Sockets", sigma_cmd_sock);
+    sigma_cli_register(&g_sigma_cli, "sigma-clean",       "Auto Debris Purge Daemon",        sigma_cmd_clean);
 
     sigma_cli_register(&g_sigma_cli, "sigma-help",  "Show this help",                       sigma_cmd_help);
 
