@@ -9,6 +9,12 @@ void kmain(void) {
     /* 4. Run Sovereign Functional Test Suite */
     extern void SovereignFunctionalTest_Run(void);
     SovereignFunctionalTest_Run();
+
+    /* 5. Launch Sovereign Applications */
+    extern void SovereignExplorer_Run(void);
+    extern void SovereignSecureShell_Run(void);
+    SovereignExplorer_Run();
+    SovereignSecureShell_Run();
     
     sigma_printf("--- Σ SIGMAOS ZENITH SUPREME IS NOW OPERATIONAL (MODULAR ARCHITECTURE). --- \n");
     for(;;);

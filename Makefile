@@ -51,7 +51,9 @@ SUITE_SHARDS := \
   kernel/modules/core/cli/SovereignCLI_Essential.c   \
   kernel/modules/core/cli/SovereignCLI_Registry.c    \
   kernel/modules/core/SovereignFunctionalTest.c      \
-  kernel/modules/core/kmain.c
+  kernel/modules/core/kmain.c                        \
+  apps/SovereignExplorer.c                           \
+  apps/SovereignSecureShell.c
 
 # Aggregate all C sources
 C_SOURCES := $(SUITE_SHARDS)
