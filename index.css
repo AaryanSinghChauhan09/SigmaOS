@@ -174,3 +174,46 @@ body {
     font-family: 'Courier New', monospace;
     font-size: 0.9rem;
 }
+
+/* Supreme Upgrades */
+.monitor-grid {
+    display: grid;
+    grid-template-columns: 1fr 300px;
+    gap: 30px;
+    margin-top: 30px;
+    height: 400px;
+}
+
+.shadow-intense { box-shadow: 0 0 50px rgba(0, 255, 170, 0.1); }
+
+.telemetry-panel {
+    display: flex;
+    flex-direction: column;
+    padding: 20px;
+    gap: 20px;
+    justify-content: center;
+}
+
+.telemetry-item { display: flex; flex-direction: column; gap: 8px; }
+
+.telemetry-label {
+    font-size: 0.75rem;
+    font-weight: 800;
+    color: rgba(255, 255, 255, 0.5);
+    letter-spacing: 2px;
+}
+
+.telemetry-bar {
+    height: 12px;
+    background: rgba(255, 255, 255, 0.05);
+    border-radius: 6px;
+    overflow: hidden;
+    position: relative;
+}
+
+.telemetry-fill {
+    height: 100%;
+    background: linear-gradient(to right, var(--acc-color), #00bbff);
+    transition: width 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+    box-shadow: 0 0 15px var(--acc-color);
+}

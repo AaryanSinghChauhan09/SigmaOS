@@ -95,3 +95,18 @@ document.getElementById('btn-home').addEventListener('click', () => {
     closeWindow('win-explorer');
     closeWindow('win-shell');
 });
+
+// Supreme Telemetry Simulation
+function simulateTelemetry() {
+    const cpuBar = document.getElementById('cpu-bar');
+    const neuralBar = document.getElementById('neural-bar');
+    const entropyBar = document.getElementById('entropy-bar');
+
+    if (cpuBar) cpuBar.style.width = (Math.random() * 30 + 10) + '%';
+    if (neuralBar) neuralBar.style.width = (Math.random() * 20 + 75) + '%';
+    if (entropyBar) entropyBar.style.width = (Math.random() * 10 + 5) + '%';
+    
+    setTimeout(simulateTelemetry, 2000);
+}
+
+simulateTelemetry();

@@ -47,8 +47,25 @@
         </div>
 
         <!-- System Logs Console -->
-        <div class="glass-dark system-console">
-            <div id="log-console" class="console-text"></div>
+        <div class="monitor-grid">
+            <div class="glass-dark system-console shadow-intense">
+                <div id="log-console" class="console-text"></div>
+            </div>
+            
+            <div class="telemetry-panel glass">
+                <div class="telemetry-item">
+                    <div class="telemetry-label">CPU CORE LOAD</div>
+                    <div class="telemetry-bar"><div id="cpu-bar" class="telemetry-fill" style="width: 42%;"></div></div>
+                </div>
+                <div class="telemetry-item">
+                    <div class="telemetry-label">NEURAL SYNC</div>
+                    <div class="telemetry-bar"><div id="neural-bar" class="telemetry-fill" style="width: 88%;"></div></div>
+                </div>
+                <div class="telemetry-item">
+                    <div class="telemetry-label">ENTROPY LEVEL</div>
+                    <div class="telemetry-bar"><div id="entropy-bar" class="telemetry-fill" style="width: 12%;"></div></div>
+                </div>
+            </div>
         </div>
     </main>
 
