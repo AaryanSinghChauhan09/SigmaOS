@@ -73,6 +73,9 @@
 #include "../../../include/SovereignOOMShard.h"
 #include "../../../include/SovereignJournalShard.h"
 #include "../../../include/SovereignTraceShard.h"
+#include "../../../include/SovereignIRQShard.h"
+#include "../../../include/SovereignRollbackShard.h"
+#include "../../../include/SovereignFirewallShard.h"
 
 /* Global CLI context */
 SigmaCLICtx_t g_sigma_cli;
@@ -1564,6 +1567,60 @@ sigma_err_t sigma_cmd_trace(int argc, char *argv[]) {
     return SIGMA_OK;
 }
 
+/* ---- sigma-irq --------------------------------------------------------- */
+sigma_err_t sigma_cmd_irq(int argc, char *argv[]) {
+    if (argc < 2) { SovereignIRQ_Audit();
+        sigma_printf("Usage: sigma-irq [reg <irq> <dev> <type> <cpu> | balance | pin <irq> <cpu> | audit]\n");
+        return SIGMA_OK; }
+    if (sigma_streq(argv[1], "reg") && argc >= 6) {
+        sigma_irq_register((sigma_u32)sigma_atoi(argv[2]), argv[3],
+                           (SigmaIRQType_t)sigma_atoi(argv[4]),
+                           (sigma_u32)sigma_atoi(argv[5]));
+    } else if (sigma_streq(argv[1], "balance")) {
+        sigma_irq_balance();
+    } else if (sigma_streq(argv[1], "pin") && argc >= 4) {
+        sigma_irq_set_affinity((sigma_u32)sigma_atoi(argv[2]),
+                               (sigma_u32)sigma_atoi(argv[3]));
+    } else if (sigma_streq(argv[1], "audit")) { SovereignIRQ_Audit(); }
+    return SIGMA_OK;
+}
+
+/* ---- sigma-rollback ---------------------------------------------------- */
+sigma_err_t sigma_cmd_rollback(int argc, char *argv[]) {
+    if (argc < 2) { SovereignRollback_Audit();
+        sigma_printf("Usage: sigma-rollback [snap <path> | restore <id> | prune <n> | audit]\n");
+        return SIGMA_OK; }
+    if (sigma_streq(argv[1], "snap") && argc >= 3) {
+        sigma_rollback_snap(argv[2]);
+    } else if (sigma_streq(argv[1], "restore") && argc >= 3) {
+        sigma_rollback_restore(argv[2]);
+    } else if (sigma_streq(argv[1], "prune") && argc >= 3) {
+        sigma_rollback_prune((sigma_u32)sigma_atoi(argv[2]));
+    } else if (sigma_streq(argv[1], "audit")) { SovereignRollback_Audit(); }
+    return SIGMA_OK;
+}
+
+/* ---- sigma-fw ---------------------------------------------------------- */
+sigma_err_t sigma_cmd_fw(int argc, char *argv[]) {
+    if (argc < 2) { SovereignFirewall_Audit();
+        sigma_printf("Usage: sigma-fw [add <proto> <src> <dst> <port> <verdict> <comment> | test <proto> <dst_port> | audit]\n");
+        return SIGMA_OK; }
+    if (sigma_streq(argv[1], "add") && argc >= 8) {
+        sigma_fw_add_rule((SigmaFWProto_t)sigma_atoi(argv[2]),
+                          (sigma_u32)sigma_atoi(argv[3]),
+                          (sigma_u32)sigma_atoi(argv[4]),
+                          (sigma_u16)sigma_atoi(argv[5]),
+                          (SigmaFWVerdict_t)sigma_atoi(argv[6]), argv[7]);
+    } else if (sigma_streq(argv[1], "test") && argc >= 4) {
+        SigmaFWVerdict_t v = sigma_fw_classify(
+            (SigmaFWProto_t)sigma_atoi(argv[2]), 0, 0,
+            (sigma_u16)sigma_atoi(argv[3]));
+        static const char* vn[] = { "ACCEPT", "DROP", "REJECT", "LOG+ACCEPT" };
+        sigma_printf("[FW-TEST]: Verdict -> %s\n", vn[v]);
+    } else if (sigma_streq(argv[1], "audit")) { SovereignFirewall_Audit(); }
+    return SIGMA_OK;
+}
+
 /* ---- sigma-wizard ------------------------------------------------------ */
 sigma_err_t sigma_cmd_wizard(int argc, char *argv[]) {
     (void)argc; (void)argv;
@@ -1812,6 +1869,9 @@ void SovereignCLI_Init(void) {
     sigma_cli_register(&g_sigma_cli, "sigma-oom",         "Silicon OOM Governor",            sigma_cmd_oom);
     sigma_cli_register(&g_sigma_cli, "sigma-journal",     "Kernel Structured Journal",       sigma_cmd_journal);
     sigma_cli_register(&g_sigma_cli, "sigma-trace",       "Silicon Syscall Tracer",          sigma_cmd_trace);
+    sigma_cli_register(&g_sigma_cli, "sigma-irq",         "Silicon IRQ Affinity Manager",    sigma_cmd_irq);
+    sigma_cli_register(&g_sigma_cli, "sigma-rollback",    "COW Snapshot & Rollback",         sigma_cmd_rollback);
+    sigma_cli_register(&g_sigma_cli, "sigma-fw",          "Silicon Packet Firewall",         sigma_cmd_fw);
 
     sigma_cli_register(&g_sigma_cli, "sigma-help",  "Show this help",                       sigma_cmd_help);
 
