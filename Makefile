@@ -529,7 +529,10 @@ SYSTEM_SHARDS := \
   kernel/modules/system/SovereignCosmicV5000Shard.c   \
   kernel/modules/system/SovereignStellarV5000Shard.c  \
   kernel/modules/system/SovereignInfinityV5000Shard.c \
-  kernel/modules/system/Sovereign500000THShard.c
+  kernel/modules/system/Sovereign500000THShard.c      \
+  kernel/modules/system/SovereignUniversalTimelineShard.c \
+  kernel/modules/system/SovereignAbsoluteMatterShard.c \
+  kernel/modules/system/Sovereign1048576THShard.c
 
 # Storage
 STORAGE_SHARDS := \
