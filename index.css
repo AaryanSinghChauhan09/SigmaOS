@@ -175,3 +175,35 @@ body::before {
     from { opacity: 0.2; transform: scale(1); }
     to { opacity: 0.4; transform: scale(1.2); }
 }
+
+#sovereign-forge {
+    position: absolute;
+    top: 100px; right: 40px;
+    width: 350px;
+    z-index: 15000;
+    display: flex; flex-direction: column; gap: 15px;
+}
+
+.forge-container { display: flex; gap: 10px; }
+#forge-seed {
+    background: rgba(0,0,0,0.3); border: 1px solid var(--acc-color);
+    color: var(--acc-color); padding: 10px; border-radius: 8px; flex: 1; outline: none;
+    font-family: monospace; font-size: 0.8rem;
+}
+
+#btn-forge {
+    background: var(--acc-color); color: #000; border: none; padding: 10px 15px;
+    border-radius: 8px; font-weight: 800; cursor: pointer;
+}
+
+#btn-forge:hover { transform: scale(1.1); box-shadow: 0 0 20px var(--acc-color); }
+
+.forged-shard {
+    animation: forgeArrival 1s forwards;
+    box-shadow: 0 0 30px #fff600;
+}
+
+@keyframes forgeArrival {
+    from { transform: scale(0) rotate(180deg); opacity: 0; }
+    to { transform: scale(1) rotate(0deg); opacity: 1; }
+}
