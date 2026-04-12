@@ -58,6 +58,7 @@
 #include "SovereignSerenityGUI.h"
 #include "SovereignFreeRTOS.h"
 #include "SovereignHaiku.h"
+#include "SovereignPersonalizer.h"
 
 // Master Aggregator Initialization
 static inline void SovereignMaster_InitAll(void) {
@@ -87,6 +88,7 @@ static inline void SovereignMaster_InitAll(void) {
     SovereignRollback_Register();
     SovereignPrefetcher_Register();
     SovereignSystemDoctor_Register();
+    SovereignPersonalizer_Init();
 
     /* 3. Driver/Init Finalization */
     SovereignDriver_InitAll();

@@ -25,6 +25,7 @@
 /* Phase 44 Shards */
 #include "../../../include/SovereignAndroidBinder.h"
 #include "../../../include/SovereignDarwinXNU.h"
+#include "../../../include/SovereignPersonalizer.h"
 
 /* Global CLI context */
 SigmaCLICtx_t g_sigma_cli;
@@ -413,8 +414,29 @@ static int sigma_cmd_iouring(int argc, char **argv) {
 }
 
 static int sigma_cmd_gui(int argc, char **argv) {
-    (void)argc; (void)argv;
     return 0;
+}
+
+/* ---- sigma-personalize ------------------------------------------------- */
+sigma_err_t sigma_cmd_personalize(int argc, char *argv[]) {
+    static SovereignPersonalizer_t g_user_p;
+    static sigma_bool init = SIGMA_FALSE;
+    if (!init) { g_user_p = SovereignPersonalizer_Create("SigmaSovereign"); init = SIGMA_TRUE; }
+
+    if (argc < 2) {
+        g_user_p.audit_customizations(&g_user_p);
+        sigma_printf("Usage: sigma-personalize [theme <name> | auto <0-2> | heal]\n");
+        return SIGMA_OK;
+    }
+
+    if (sigma_streq(argv[1], "theme") && argc >= 3) {
+        g_user_p.apply_theme(&g_user_p, argv[2]);
+    } else if (sigma_streq(argv[1], "auto") && argc >= 3) {
+        g_user_p.set_automation_policy(&g_user_p, (sigma_u32)sigma_atoi(argv[2]));
+    } else if (sigma_streq(argv[1], "heal")) {
+        g_user_p.trigger_self_healing(&g_user_p);
+    }
+    return SIGMA_OK;
 }
 
 /* ---- sigma-svc --------------------------------------------------------- */
@@ -574,6 +596,7 @@ void SovereignCLI_Init(void) {
     /* Phase 45 Shards */
     sigma_cli_register(&g_sigma_cli, "sigma-iouring", "Linux io_uring Parity",                sigma_cmd_iouring);
     sigma_cli_register(&g_sigma_cli, "sigma-gui",     "SerenityOS GUI Server Control",        sigma_cmd_gui);
+    sigma_cli_register(&g_sigma_cli, "sigma-personalize", "Aesthetics & Automation Control",  sigma_cmd_personalize);
 
     sigma_cli_register(&g_sigma_cli, "sigma-help",  "Show this help",                       sigma_cmd_help);
 
