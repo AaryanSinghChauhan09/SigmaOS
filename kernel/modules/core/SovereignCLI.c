@@ -101,6 +101,9 @@
 #include "../../../include/SovereignPackageShard.h"
 #include "../../../include/SovereignSoundShard.h"
 #include "../../../include/SovereignButlerShard.h"
+#include "../../../include/SovereignWindowShard.h"
+#include "../../../include/SovereignSessionShard.h"
+#include "../../../include/SovereignRestoreShard.h"
 
 /* Global CLI context */
 SigmaCLICtx_t g_sigma_cli;
@@ -2055,6 +2058,52 @@ sigma_err_t sigma_cmd_butler(int argc, char *argv[]) {
     return SIGMA_OK;
 }
 
+/* ---- sigma-window ------------------------------------------------------ */
+sigma_err_t sigma_cmd_window(int argc, char *argv[]) {
+    if (argc < 2) { SovereignWindow_Audit();
+        sigma_printf("Usage: sigma-window [layout <0-3> | snap <id> <pos> | cycle <id> | audit]\n");
+        return SIGMA_OK; }
+    if (sigma_streq(argv[1], "layout") && argc >= 3)
+        sigma_wm_set_layout((SigmaLayout_t)sigma_atoi(argv[2]));
+    else if (sigma_streq(argv[1], "snap") && argc >= 4)
+        sigma_wm_snap_window((sigma_u32)sigma_atoi(argv[2]), (SigmaSnapPos_t)sigma_atoi(argv[3]));
+    else if (sigma_streq(argv[1], "cycle") && argc >= 3)
+        sigma_wm_cycle_workspace((sigma_u32)sigma_atoi(argv[2]));
+    else if (sigma_streq(argv[1], "audit"))
+        SovereignWindow_Audit();
+    return SIGMA_OK;
+}
+
+/* ---- sigma-session ----------------------------------------------------- */
+sigma_err_t sigma_cmd_session(int argc, char *argv[]) {
+    if (argc < 2) { SovereignSession_Audit();
+        sigma_printf("Usage: sigma-session [login <name> <type> | lock | elevate | audit]\n");
+        return SIGMA_OK; }
+    if (sigma_streq(argv[1], "login") && argc >= 4)
+        sigma_session_login(argv[2], (SigmaAuthType_t)sigma_atoi(argv[3]));
+    else if (sigma_streq(argv[1], "lock"))
+        sigma_session_lock();
+    else if (sigma_streq(argv[1], "elevate"))
+        sigma_session_elevate();
+    else if (sigma_streq(argv[1], "audit"))
+        SovereignSession_Audit();
+    return SIGMA_OK;
+}
+
+/* ---- sigma-restore ----------------------------------------------------- */
+sigma_err_t sigma_cmd_restore(int argc, char *argv[]) {
+    if (argc < 2) { SovereignRestore_Audit();
+        sigma_printf("Usage: sigma-restore [checkpoint <\"label\"> | rollback <id> | audit]\n");
+        return SIGMA_OK; }
+    if (sigma_streq(argv[1], "checkpoint") && argc >= 3)
+        sigma_restore_checkpoint(argv[2]);
+    else if (sigma_streq(argv[1], "rollback") && argc >= 3)
+        sigma_restore_rollback((sigma_u32)sigma_atoi(argv[2]));
+    else if (sigma_streq(argv[1], "audit"))
+        SovereignRestore_Audit();
+    return SIGMA_OK;
+}
+
 /* ---- sigma-wizard ------------------------------------------------------ */
 sigma_err_t sigma_cmd_wizard(int argc, char *argv[]) {
     (void)argc; (void)argv;
@@ -2331,6 +2380,9 @@ void SovereignCLI_Init(void) {
     sigma_cli_register(&g_sigma_cli, "sigma-pkg",         "Atomic Package Manager",          sigma_cmd_pkg);
     sigma_cli_register(&g_sigma_cli, "sigma-sound",       "Native Sound Pipeline",           sigma_cmd_sound);
     sigma_cli_register(&g_sigma_cli, "sigma-butler",      "System Automation Assistant",     sigma_cmd_butler);
+    sigma_cli_register(&g_sigma_cli, "sigma-window",      "Silicon Window Orchestrator",     sigma_cmd_window);
+    sigma_cli_register(&g_sigma_cli, "sigma-session",     "Identity & Session Governor",     sigma_cmd_session);
+    sigma_cli_register(&g_sigma_cli, "sigma-restore",     "Atomic Recovery Engine",          sigma_cmd_restore);
 
     sigma_cli_register(&g_sigma_cli, "sigma-help",  "Show this help",                       sigma_cmd_help);
 
