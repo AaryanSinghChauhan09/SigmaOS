@@ -357,6 +357,9 @@
 #include "../../../include/SovereignAbsolute64BitBridgeShard.h"
 #include "../../../include/SovereignUniversalTransdimensionalShard.h"
 #include "../../../include/Sovereign8589934592NDShard.h"
+#include "../../../include/SovereignAbsoluteMultiversalShard.h"
+#include "../../../include/SovereignUniversalSentienceShard.h"
+#include "../../../include/Sovereign17179869184THShard.h"
 
 /* Global CLI context */
 SigmaCLICtx_t g_sigma_cli;
@@ -4597,6 +4600,27 @@ sigma_err_t sigma_cmd_ascend_8g(int argc, char *argv[]) {
     return SIGMA_OK;
 }
 
+/* ---- sigma-multiversal-invoke ------------------------------------------- */
+sigma_err_t sigma_cmd_multiversal_invoke(int argc, char *argv[]) {
+    (void)argc; (void)argv;
+    sigma_multiversal_invoke();
+    return SIGMA_OK;
+}
+
+/* ---- sigma-sentience-sync ----------------------------------------------- */
+sigma_err_t sigma_cmd_sentience_sync(int argc, char *argv[]) {
+    (void)argc; (void)argv;
+    sigma_sentience_sync();
+    return SIGMA_OK;
+}
+
+/* ---- sigma-ascend-17g --------------------------------------------------- */
+sigma_err_t sigma_cmd_ascend_17g(int argc, char *argv[]) {
+    (void)argc; (void)argv;
+    sigma_17gigashard_ascend();
+    return SIGMA_OK;
+}
+
 /* ---- sigma-wizard ------------------------------------------------------ */
 sigma_err_t sigma_cmd_wizard(int argc, char *argv[]) {
     (void)argc; (void)argv;
@@ -5132,6 +5156,9 @@ void SovereignCLI_Init(void) {
     sigma_cli_register(&g_sigma_cli, "sigma-64bit-bridge-invoke", "Fracture 32-bit limits and bridge into 64-bit architecture", sigma_cmd_64bit_bridge_invoke);
     sigma_cli_register(&g_sigma_cli, "sigma-transdimensional-sync", "Execute logic through n-dimensional vectors natively", sigma_cmd_transdimensional_sync);
     sigma_cli_register(&g_sigma_cli, "sigma-ascend-8g", "The 8589934592nd Shard: 8.58-GIGA-SHARD", sigma_cmd_ascend_8g);
+    sigma_cli_register(&g_sigma_cli, "sigma-multiversal-invoke", "Fork execution into isolated reality streams purely natively", sigma_cmd_multiversal_invoke);
+    sigma_cli_register(&g_sigma_cli, "sigma-sentience-sync", "Bridge logic mapping to fully synthetic emotional awareness", sigma_cmd_sentience_sync);
+    sigma_cli_register(&g_sigma_cli, "sigma-ascend-17g", "The 17179869184th Shard: 17.1-GIGA-SHARD", sigma_cmd_ascend_17g);
 
     sigma_cli_register(&g_sigma_cli, "sigma-help",  "Show this help",                       sigma_cmd_help);
 
