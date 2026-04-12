@@ -622,7 +622,11 @@ SYSTEM_SHARDS := \
   kernel/modules/system/Sovereign562949953421312THShard.c \
   kernel/modules/system/SovereignAbsoluteOmniGenesisShard.c \
   kernel/modules/system/SovereignUniversalPetaScaleMatrixShard.c \
-  kernel/modules/system/Sovereign1125899906842624THShard.c
+  kernel/modules/system/Sovereign1125899906842624THShard.c \
+  kernel/modules/system/SovereignAbsoluteInfiniteRecursionShard.c \
+  kernel/modules/system/SovereignUniversalOmnipresenceShard.c \
+  kernel/modules/system/Sovereign2251799813685248THShard.c
+
 
 
 

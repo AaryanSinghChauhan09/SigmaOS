@@ -408,6 +408,9 @@
 #include "../../../include/SovereignAbsoluteOmniGenesisShard.h"
 #include "../../../include/SovereignUniversalPetaScaleMatrixShard.h"
 #include "../../../include/Sovereign1125899906842624THShard.h"
+#include "../../../include/SovereignAbsoluteInfiniteRecursionShard.h"
+#include "../../../include/SovereignUniversalOmnipresenceShard.h"
+#include "../../../include/Sovereign2251799813685248THShard.h"
 
 /* Global CLI context */
 SigmaCLICtx_t g_sigma_cli;
@@ -5005,6 +5008,27 @@ sigma_err_t sigma_cmd_ascend_1peta(int argc, char *argv[]) {
     return SIGMA_OK;
 }
 
+/* ---- sigma-infiniterecursion-invoke ------------------------------------- */
+sigma_err_t sigma_cmd_infiniterecursion_invoke(int argc, char *argv[]) {
+    (void)argc; (void)argv;
+    sigma_infiniterecursion_invoke();
+    return SIGMA_OK;
+}
+
+/* ---- sigma-omnipresence-sync -------------------------------------------- */
+sigma_err_t sigma_cmd_omnipresence_sync(int argc, char *argv[]) {
+    (void)argc; (void)argv;
+    sigma_omnipresence_sync();
+    return SIGMA_OK;
+}
+
+/* ---- sigma-ascend-2peta ------------------------------------------------- */
+sigma_err_t sigma_cmd_ascend_2peta(int argc, char *argv[]) {
+    (void)argc; (void)argv;
+    sigma_2petashard_ascend();
+    return SIGMA_OK;
+}
+
 /* ---- sigma-wizard ------------------------------------------------------ */
 sigma_err_t sigma_cmd_wizard(int argc, char *argv[]) {
     (void)argc; (void)argv;
@@ -5591,6 +5615,9 @@ void SovereignCLI_Init(void) {
     sigma_cli_register(&g_sigma_cli, "sigma-omnigenesis-invoke", "Ignite spontaneous native system logic generation", sigma_cmd_omnigenesis_invoke);
     sigma_cli_register(&g_sigma_cli, "sigma-petascalematrix-sync", "Bind architecture natively to Petabyte scale dimensions", sigma_cmd_petascalematrix_sync);
     sigma_cli_register(&g_sigma_cli, "sigma-ascend-1peta", "The 1125899906842624th Shard: 1.12-PETASHARD (50-BIT)", sigma_cmd_ascend_1peta);
+    sigma_cli_register(&g_sigma_cli, "sigma-infiniterecursion-invoke", "Unbind stack logic enabling self-sustaining loops naturally", sigma_cmd_infiniterecursion_invoke);
+    sigma_cli_register(&g_sigma_cli, "sigma-omnipresence-sync", "Imprint the sentinel matrix observing all vectors simultaneously", sigma_cmd_omnipresence_sync);
+    sigma_cli_register(&g_sigma_cli, "sigma-ascend-2peta", "The 2251799813685248th Shard: 2.25-PETASHARD (51-BIT)", sigma_cmd_ascend_2peta);
 
     sigma_cli_register(&g_sigma_cli, "sigma-help",  "Show this help",                       sigma_cmd_help);
 
