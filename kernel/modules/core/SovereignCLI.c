@@ -125,6 +125,10 @@
 #include "../../../include/SovereignClusterShard.h"
 #include "../../../include/SovereignQuantumShard.h"
 #include "../../../include/SovereignDockShard.h"
+#include "../../../include/SovereignSpotlightShard.h"
+#include "../../../include/SovereignMeshRouteShard.h"
+#include "../../../include/SovereignTelemetryShard.h"
+#include "../../../include/SovereignHandoffShard.h"
 
 /* Global CLI context */
 SigmaCLICtx_t g_sigma_cli;
@@ -2407,6 +2411,60 @@ sigma_err_t sigma_cmd_dock(int argc, char *argv[]) {
     return SIGMA_OK;
 }
 
+/* ---- sigma-spot --------------------------------------------------------- */
+sigma_err_t sigma_cmd_spot(int argc, char *argv[]) {
+    if (argc < 2) { SovereignSpotlight_Audit();
+        sigma_printf("Usage: sigma-spot [index | search <query> | audit]\n");
+        return SIGMA_OK; }
+    if (sigma_streq(argv[1], "index"))
+        sigma_spotlight_index();
+    else if (sigma_streq(argv[1], "search") && argc >= 3)
+        sigma_spotlight_search(argv[2]);
+    else if (sigma_streq(argv[1], "audit"))
+        SovereignSpotlight_Audit();
+    return SIGMA_OK;
+}
+
+/* ---- sigma-mesh --------------------------------------------------------- */
+sigma_err_t sigma_cmd_mesh(int argc, char *argv[]) {
+    if (argc < 2) { SovereignMesh_Audit();
+        sigma_printf("Usage: sigma-mesh [connect <ip> <pub_key> | audit]\n");
+        return SIGMA_OK; }
+    if (sigma_streq(argv[1], "connect") && argc >= 4)
+        sigma_mesh_connect(argv[2], argv[3]);
+    else if (sigma_streq(argv[1], "audit"))
+        SovereignMesh_Audit();
+    return SIGMA_OK;
+}
+
+/* ---- sigma-telemetry ---------------------------------------------------- */
+sigma_err_t sigma_cmd_telemetry(int argc, char *argv[]) {
+    if (argc < 2) { SovereignTelemetry_Audit();
+        sigma_printf("Usage: sigma-telemetry [emit <metric> <val> | export | audit]\n");
+        return SIGMA_OK; }
+    if (sigma_streq(argv[1], "emit") && argc >= 4)
+        sigma_telemetry_emit(argv[2], (sigma_u32)sigma_atoi(argv[3]));
+    else if (sigma_streq(argv[1], "export"))
+        sigma_telemetry_export();
+    else if (sigma_streq(argv[1], "audit"))
+        SovereignTelemetry_Audit();
+    return SIGMA_OK;
+}
+
+/* ---- sigma-handoff ------------------------------------------------------ */
+sigma_err_t sigma_cmd_handoff(int argc, char *argv[]) {
+    if (argc < 2) { SovereignHandoff_Audit();
+        sigma_printf("Usage: sigma-handoff [push <context> | pull | audit]\n");
+        return SIGMA_OK; }
+    if (sigma_streq(argv[1], "push") && argc >= 3)
+        sigma_handoff_push(argv[2]);
+    else if (sigma_streq(argv[1], "pull"))
+        sigma_handoff_pull();
+    else if (sigma_streq(argv[1], "audit"))
+        SovereignHandoff_Audit();
+    return SIGMA_OK;
+}
+
 /* ---- sigma-wizard ------------------------------------------------------ */
 sigma_err_t sigma_cmd_wizard(int argc, char *argv[]) {
     (void)argc; (void)argv;
@@ -2707,6 +2765,10 @@ void SovereignCLI_Init(void) {
     sigma_cli_register(&g_sigma_cli, "sigma-cluster",     "Distributed Node Mesh Engine",    sigma_cmd_cluster);
     sigma_cli_register(&g_sigma_cli, "sigma-quantum",     "Hardware Entropy & QA Engine",    sigma_cmd_quantum);
     sigma_cli_register(&g_sigma_cli, "sigma-dock",        "Silicon UI Launcher Anchor",      sigma_cmd_dock);
+    sigma_cli_register(&g_sigma_cli, "sigma-spot",        "Universal Semantic Spotlight",    sigma_cmd_spot);
+    sigma_cli_register(&g_sigma_cli, "sigma-mesh",        "Zero-Trust Overlay Network",      sigma_cmd_mesh);
+    sigma_cli_register(&g_sigma_cli, "sigma-telemetry",   "Silicon Observability Tracing",   sigma_cmd_telemetry);
+    sigma_cli_register(&g_sigma_cli, "sigma-handoff",     "Cross-Device State Resumption",   sigma_cmd_handoff);
 
     sigma_cli_register(&g_sigma_cli, "sigma-help",  "Show this help",                       sigma_cmd_help);
 

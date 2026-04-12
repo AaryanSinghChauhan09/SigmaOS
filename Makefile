@@ -58,7 +58,8 @@ CORE_SHARDS := \
   kernel/modules/core/SovereignDSShard.c           \
   kernel/modules/core/SovereignDbShard.c           \
   kernel/modules/core/SovereignMathShard.c         \
-  kernel/modules/core/SovereignDockShard.c
+  kernel/modules/core/SovereignDockShard.c         \
+  kernel/modules/core/SovereignSpotlightShard.c
 
 # Security
 SECURITY_SHARDS := \
@@ -99,7 +100,9 @@ SYSTEM_SHARDS := \
   kernel/modules/system/SovereignFlowShard.c        \
   kernel/modules/system/SovereignPrefetchShard.c    \
   kernel/modules/system/SovereignRTOSShard.c        \
-  kernel/modules/system/SovereignPerfShard.c
+  kernel/modules/system/SovereignPerfShard.c        \
+  kernel/modules/system/SovereignTelemetryShard.c   \
+  kernel/modules/system/SovereignHandoffShard.c
 
 # Filesystem
 FS_SHARDS := \
@@ -108,7 +111,8 @@ FS_SHARDS := \
 # Network
 NET_SHARDS := \
   kernel/modules/net/SovereignNetStackShard.c       \
-  kernel/modules/net/SovereignClusterShard.c
+  kernel/modules/net/SovereignClusterShard.c        \
+  kernel/modules/net/SovereignMeshRouteShard.c
 
 # Absorption layer (universal OS features)
 ABSORPTION_SHARDS := $(shell find absorption -name '*.c' 2>/dev/null)
