@@ -28,12 +28,17 @@
                 <!-- Front Dimension (Zenith OS) -->
             <!-- Global Satellite Mesh Map -->
             <div class="stat-card glass full-width scanline">
-                <div class="stat-label">SOVEREIGN GLOBAL SATELLITE MESH</div>
-                <div id="satellite-map">
+                <div class="stat-label">SOVEREIGN SOLAR SYSTEM MESH</div>
+                <div id="satellite-map" class="solar-glow">
                     <div class="orbital-path" style="width: 160px; height: 80px;"></div>
-                    <div class="orbital-path" style="width: 240px; height: 120px;"></div>
+                    <div class="orbital-path" style="width: 280px; height: 140px;"></div>
+                    <div class="planet mars"></div>
                 </div>
-                <div class="stat-meta-accent">✓ 12/12 Satellites Linked | 100% Global Coverage</div>
+                <div class="temporal-controls">
+                    <span class="stat-label">TEMPORAL SHARD INDEX</span>
+                    <input type="range" id="temporal-slider" min="1" max="100" value="100">
+                    <div id="temporal-status" class="stat-meta-accent">✓ CURRENT STATE: ZENITH PRESENT</div>
+                </div>
             </div>
 
             <!-- Core Shard Status -->

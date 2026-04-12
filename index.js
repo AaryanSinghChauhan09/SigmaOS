@@ -263,3 +263,20 @@ function updateParticlesWithCube(rx, ry) {
         p.vy += rx * 0.001;
     });
 }
+
+// Temporal Shard Time-Travel Orchestrator
+const tSlider = document.getElementById('temporal-slider');
+const tStatus = document.getElementById('temporal-status');
+if(tSlider) {
+    tSlider.addEventListener('input', (e) => {
+        const val = e.target.value;
+        if(val == 100) {
+            tStatus.textContent = '? CURRENT STATE: ZENITH PRESENT';
+            tStatus.style.color = '#00ffaa';
+        } else {
+            tStatus.textContent = '? VIEWING TEMPORAL SHARD: -' + (100-val) + 'ns (RESTRICTED)';
+            tStatus.style.color = '#8800ff';
+        }
+        logConsole.style.filter = 'grayscale(' + (100-val)/100 + ') blur(' + (100-val)/50 + 'px)';
+    });
+}
