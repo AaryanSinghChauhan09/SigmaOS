@@ -95,6 +95,9 @@
 #include "../../../include/SovereignCronShard.h"
 #include "../../../include/SovereignTTYShard.h"
 #include "../../../include/SovereignOptimizationShard.h"
+#include "../../../include/SovereignCompositorShard.h"
+#include "../../../include/SovereignHIDShard.h"
+#include "../../../include/SovereignIntelligenceShard.h"
 
 /* Global CLI context */
 SigmaCLICtx_t g_sigma_cli;
@@ -1962,6 +1965,53 @@ sigma_err_t sigma_cmd_opt(int argc, char *argv[]) {
     return SIGMA_OK;
 }
 
+/* ---- sigma-compositor -------------------------------------------------- */
+sigma_err_t sigma_cmd_compositor(int argc, char *argv[]) {
+    if (argc < 2) { SovereignCompositor_Audit();
+        sigma_printf("Usage: sigma-compositor [create <title> <x> <y> <w> <h> | render | alpha <id> <val> | audit]\n");
+        return SIGMA_OK; }
+    if (sigma_streq(argv[1], "create") && argc >= 7)
+        sigma_compositor_create_window(argv[2], sigma_atoi(argv[3]), sigma_atoi(argv[4]),
+                                       sigma_atoi(argv[5]), sigma_atoi(argv[6]), 100);
+    else if (sigma_streq(argv[1], "render"))
+        sigma_compositor_render();
+    else if (sigma_streq(argv[1], "alpha") && argc >= 4)
+        sigma_compositor_set_opacity((sigma_u32)sigma_atoi(argv[2]), (sigma_f32)sigma_atof(argv[3]));
+    else if (sigma_streq(argv[1], "audit"))
+        SovereignCompositor_Audit();
+    return SIGMA_OK;
+}
+
+/* ---- sigma-hid --------------------------------------------------------- */
+sigma_err_t sigma_cmd_hid(int argc, char *argv[]) {
+    if (argc < 2) { SovereignHID_Audit();
+        sigma_printf("Usage: sigma-hid [poll | audit]\n");
+        return SIGMA_OK; }
+    if (sigma_streq(argv[1], "poll")) {
+        SigmaInputEv_t ev;
+        if (sigma_hid_pop_event(&ev))
+            sigma_printf("[HID]: Popped event: type=%d code=%u val=%d\n", ev.type, ev.code, ev.value);
+        else
+            sigma_printf("[HID]: Queue empty.\n");
+    } else if (sigma_streq(argv[1], "audit"))
+        SovereignHID_Audit();
+    return SIGMA_OK;
+}
+
+/* ---- sigma-intel ------------------------------------------------------- */
+sigma_err_t sigma_cmd_intel(int argc, char *argv[]) {
+    if (argc < 2) { SovereignIntelligence_Audit();
+        sigma_printf("Usage: sigma-intel [eval | person <name> | audit]\n");
+        return SIGMA_OK; }
+    if (sigma_streq(argv[1], "eval"))
+        sigma_intel_evaluate();
+    else if (sigma_streq(argv[1], "person") && argc >= 3)
+        sigma_intel_optimize_user(argv[2]);
+    else if (sigma_streq(argv[1], "audit"))
+        SovereignIntelligence_Audit();
+    return SIGMA_OK;
+}
+
 /* ---- sigma-wizard ------------------------------------------------------ */
 sigma_err_t sigma_cmd_wizard(int argc, char *argv[]) {
     (void)argc; (void)argv;
@@ -2232,6 +2282,9 @@ void SovereignCLI_Init(void) {
     sigma_cli_register(&g_sigma_cli, "sigma-cron",        "Periodic Task Scheduler",         sigma_cmd_cron);
     sigma_cli_register(&g_sigma_cli, "sigma-tty",         "Terminal Session Multiplexer",    sigma_cmd_tty);
     sigma_cli_register(&g_sigma_cli, "sigma-opt",         "Silicon Performance Tuning",      sigma_cmd_opt);
+    sigma_cli_register(&g_sigma_cli, "sigma-compositor",  "Native GUI Compositor",           sigma_cmd_compositor);
+    sigma_cli_register(&g_sigma_cli, "sigma-hid",         "Silicon Input Manager",           sigma_cmd_hid);
+    sigma_cli_register(&g_sigma_cli, "sigma-intel",       "Heuristic Intelligence Shard",    sigma_cmd_intel);
 
     sigma_cli_register(&g_sigma_cli, "sigma-help",  "Show this help",                       sigma_cmd_help);
 
