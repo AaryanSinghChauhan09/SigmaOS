@@ -547,7 +547,11 @@ SYSTEM_SHARDS := \
   kernel/modules/system/Sovereign16777216THShard.c \
   kernel/modules/system/SovereignAbsoluteCreationShard.c \
   kernel/modules/system/SovereignUniversalTelepathyShard.c \
-  kernel/modules/system/Sovereign33554432NDShard.c
+  kernel/modules/system/Sovereign33554432NDShard.c \
+  kernel/modules/system/SovereignAbsoluteNothingnessShard.c \
+  kernel/modules/system/SovereignUniversalTranscendenceShard.c \
+  kernel/modules/system/Sovereign67108864THShard.c
+
 
 
 

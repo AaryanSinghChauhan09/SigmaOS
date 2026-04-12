@@ -333,6 +333,9 @@
 #include "../../../include/SovereignAbsoluteCreationShard.h"
 #include "../../../include/SovereignUniversalTelepathyShard.h"
 #include "../../../include/Sovereign33554432NDShard.h"
+#include "../../../include/SovereignAbsoluteNothingnessShard.h"
+#include "../../../include/SovereignUniversalTranscendenceShard.h"
+#include "../../../include/Sovereign67108864THShard.h"
 
 /* Global CLI context */
 SigmaCLICtx_t g_sigma_cli;
@@ -4405,6 +4408,27 @@ sigma_err_t sigma_cmd_ascend_33m(int argc, char *argv[]) {
     return SIGMA_OK;
 }
 
+/* ---- sigma-void-invoke -------------------------------------------------- */
+sigma_err_t sigma_cmd_void_invoke(int argc, char *argv[]) {
+    (void)argc; (void)argv;
+    sigma_void_invoke();
+    return SIGMA_OK;
+}
+
+/* ---- sigma-transcendence-sync ------------------------------------------- */
+sigma_err_t sigma_cmd_transcendence_sync(int argc, char *argv[]) {
+    (void)argc; (void)argv;
+    sigma_transcendence_sync();
+    return SIGMA_OK;
+}
+
+/* ---- sigma-ascend-67m --------------------------------------------------- */
+sigma_err_t sigma_cmd_ascend_67m(int argc, char *argv[]) {
+    (void)argc; (void)argv;
+    sigma_67megashard_ascend();
+    return SIGMA_OK;
+}
+
 /* ---- sigma-wizard ------------------------------------------------------ */
 sigma_err_t sigma_cmd_wizard(int argc, char *argv[]) {
     (void)argc; (void)argv;
@@ -4916,6 +4940,9 @@ void SovereignCLI_Init(void) {
     sigma_cli_register(&g_sigma_cli, "sigma-genesis-invoke", "Spontaneous logic paradigm creation", sigma_cmd_genesis_invoke);
     sigma_cli_register(&g_sigma_cli, "sigma-telepathy-sync", "Neural-link subconscious intent bypass", sigma_cmd_telepathy_sync);
     sigma_cli_register(&g_sigma_cli, "sigma-ascend-33m", "The 33554432nd Shard: 33-MEGA-SHARD", sigma_cmd_ascend_33m);
+    sigma_cli_register(&g_sigma_cli, "sigma-void-invoke", "Erase logic blocks into pure nothingness", sigma_cmd_void_invoke);
+    sigma_cli_register(&g_sigma_cli, "sigma-transcendence-sync", "Elevate kernel logic above boolean limits", sigma_cmd_transcendence_sync);
+    sigma_cli_register(&g_sigma_cli, "sigma-ascend-67m", "The 67108864th Shard: 67-MEGA-SHARD", sigma_cmd_ascend_67m);
 
     sigma_cli_register(&g_sigma_cli, "sigma-help",  "Show this help",                       sigma_cmd_help);
 
