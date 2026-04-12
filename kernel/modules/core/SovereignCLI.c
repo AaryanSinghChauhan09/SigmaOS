@@ -133,6 +133,11 @@
 #include "../../../include/SovereignDRMShard.h"
 #include "../../../include/SovereignAirDropShard.h"
 #include "../../../include/SovereignSandboxShard.h"
+#include "../../../include/SovereignVoiceShard.h"
+#include "../../../include/SovereignSideloadShard.h"
+#include "../../../include/SovereignContinuityShard.h"
+#include "../../../include/SovereignTimeMachineShard.h"
+#include "../../../include/SovereignBootloaderShard.h"
 
 /* Global CLI context */
 SigmaCLICtx_t g_sigma_cli;
@@ -2525,6 +2530,70 @@ sigma_err_t sigma_cmd_sandbox(int argc, char *argv[]) {
     return SIGMA_OK;
 }
 
+/* ---- sigma-voice -------------------------------------------------------- */
+sigma_err_t sigma_cmd_voice(int argc, char *argv[]) {
+    if (argc < 2) { SovereignVoice_Audit();
+        sigma_printf("Usage: sigma-voice [listen | intent <phrase> | audit]\n");
+        return SIGMA_OK; }
+    if (sigma_streq(argv[1], "listen"))
+        sigma_voice_listen();
+    else if (sigma_streq(argv[1], "intent") && argc >= 3)
+        sigma_voice_intent(argv[2]);
+    else if (sigma_streq(argv[1], "audit"))
+        SovereignVoice_Audit();
+    return SIGMA_OK;
+}
+
+/* ---- sigma-sideload ----------------------------------------------------- */
+sigma_err_t sigma_cmd_sideload(int argc, char *argv[]) {
+    if (argc < 2) { SovereignSideload_Audit();
+        sigma_printf("Usage: sigma-sideload [install <file> | audit]\n");
+        return SIGMA_OK; }
+    if (sigma_streq(argv[1], "install") && argc >= 3)
+        sigma_sideload_install(argv[2]);
+    else if (sigma_streq(argv[1], "audit"))
+        SovereignSideload_Audit();
+    return SIGMA_OK;
+}
+
+/* ---- sigma-continuity --------------------------------------------------- */
+sigma_err_t sigma_cmd_continuity(int argc, char *argv[]) {
+    if (argc < 2) { SovereignContinuity_Audit();
+        sigma_printf("Usage: sigma-continuity [link <device> | audit]\n");
+        return SIGMA_OK; }
+    if (sigma_streq(argv[1], "link") && argc >= 3)
+        sigma_continuity_link(argv[2]);
+    else if (sigma_streq(argv[1], "audit"))
+        SovereignContinuity_Audit();
+    return SIGMA_OK;
+}
+
+/* ---- sigma-timemachine -------------------------------------------------- */
+sigma_err_t sigma_cmd_timemachine(int argc, char *argv[]) {
+    if (argc < 2) { SovereignTimeMachine_Audit();
+        sigma_printf("Usage: sigma-timemachine [snap | restore <time> | audit]\n");
+        return SIGMA_OK; }
+    if (sigma_streq(argv[1], "snap"))
+        sigma_timemachine_snap();
+    else if (sigma_streq(argv[1], "restore") && argc >= 3)
+        sigma_timemachine_restore(argv[2]);
+    else if (sigma_streq(argv[1], "audit"))
+        SovereignTimeMachine_Audit();
+    return SIGMA_OK;
+}
+
+/* ---- sigma-boot --------------------------------------------------------- */
+sigma_err_t sigma_cmd_boot(int argc, char *argv[]) {
+    if (argc < 2) { SovereignBootloader_Audit();
+        sigma_printf("Usage: sigma-boot [handoff | audit]\n");
+        return SIGMA_OK; }
+    if (sigma_streq(argv[1], "handoff"))
+        sigma_boot_handoff();
+    else if (sigma_streq(argv[1], "audit"))
+        SovereignBootloader_Audit();
+    return SIGMA_OK;
+}
+
 /* ---- sigma-wizard ------------------------------------------------------ */
 sigma_err_t sigma_cmd_wizard(int argc, char *argv[]) {
     (void)argc; (void)argv;
@@ -2833,6 +2902,11 @@ void SovereignCLI_Init(void) {
     sigma_cli_register(&g_sigma_cli, "sigma-drm",         "Hardware Direct Rendering",       sigma_cmd_drm);
     sigma_cli_register(&g_sigma_cli, "sigma-airdrop",     "P2P Encrypted File Transfer",     sigma_cmd_airdrop);
     sigma_cli_register(&g_sigma_cli, "sigma-sandbox",     "Capability-Based Jailing",        sigma_cmd_sandbox);
+    sigma_cli_register(&g_sigma_cli, "sigma-voice",       "On-Device NLP Assistant",         sigma_cmd_voice);
+    sigma_cli_register(&g_sigma_cli, "sigma-sideload",    "Ad-Hoc App Provisioning",         sigma_cmd_sideload);
+    sigma_cli_register(&g_sigma_cli, "sigma-continuity",  "Cross-Device HID Sharing",        sigma_cmd_continuity);
+    sigma_cli_register(&g_sigma_cli, "sigma-timemachine", "CoW Filesystem Snapshots",        sigma_cmd_timemachine);
+    sigma_cli_register(&g_sigma_cli, "sigma-boot",        "Silicon Hardware Initialization", sigma_cmd_boot);
 
     sigma_cli_register(&g_sigma_cli, "sigma-help",  "Show this help",                       sigma_cmd_help);
 
