@@ -121,6 +121,10 @@
 #include "../../../include/SovereignVaultShard.h"
 #include "../../../include/SovereignRTOSShard.h"
 #include "../../../include/SovereignPerfShard.h"
+#include "../../../include/SovereignMathShard.h"
+#include "../../../include/SovereignClusterShard.h"
+#include "../../../include/SovereignQuantumShard.h"
+#include "../../../include/SovereignDockShard.h"
 
 /* Global CLI context */
 SigmaCLICtx_t g_sigma_cli;
@@ -2349,6 +2353,60 @@ sigma_err_t sigma_cmd_perf(int argc, char *argv[]) {
     return SIGMA_OK;
 }
 
+/* ---- sigma-math --------------------------------------------------------- */
+sigma_err_t sigma_cmd_math(int argc, char *argv[]) {
+    if (argc < 2) { SovereignMath_Audit();
+        sigma_printf("Usage: sigma-math [exec <operation> | audit]\n");
+        return SIGMA_OK; }
+    if (sigma_streq(argv[1], "exec") && argc >= 3)
+        sigma_math_execute(argv[2]);
+    else if (sigma_streq(argv[1], "audit"))
+        SovereignMath_Audit();
+    return SIGMA_OK;
+}
+
+/* ---- sigma-cluster ------------------------------------------------------ */
+sigma_err_t sigma_cmd_cluster(int argc, char *argv[]) {
+    if (argc < 2) { SovereignCluster_Audit();
+        sigma_printf("Usage: sigma-cluster [join <ip> | balance | audit]\n");
+        return SIGMA_OK; }
+    if (sigma_streq(argv[1], "join") && argc >= 3)
+        sigma_cluster_join(argv[2]);
+    else if (sigma_streq(argv[1], "balance"))
+        sigma_cluster_balance();
+    else if (sigma_streq(argv[1], "audit"))
+        SovereignCluster_Audit();
+    return SIGMA_OK;
+}
+
+/* ---- sigma-quantum ------------------------------------------------------ */
+sigma_err_t sigma_cmd_quantum(int argc, char *argv[]) {
+    if (argc < 2) { SovereignQuantum_Audit();
+        sigma_printf("Usage: sigma-quantum [entropy | simulate <qubits> | audit]\n");
+        return SIGMA_OK; }
+    if (sigma_streq(argv[1], "entropy"))
+        sigma_printf("[QUANTUM]: Hardware Entropy Seed -> 0x%llX\n", (unsigned long long)sigma_quantum_entropy());
+    else if (sigma_streq(argv[1], "simulate") && argc >= 3)
+        sigma_quantum_simulate((sigma_u32)sigma_atoi(argv[2]));
+    else if (sigma_streq(argv[1], "audit"))
+        SovereignQuantum_Audit();
+    return SIGMA_OK;
+}
+
+/* ---- sigma-dock --------------------------------------------------------- */
+sigma_err_t sigma_cmd_dock(int argc, char *argv[]) {
+    if (argc < 2) { SovereignDock_Audit();
+        sigma_printf("Usage: sigma-dock [pin <name> <cmd> | launch <name> | audit]\n");
+        return SIGMA_OK; }
+    if (sigma_streq(argv[1], "pin") && argc >= 4)
+        sigma_dock_pin(argv[2], argv[3]);
+    else if (sigma_streq(argv[1], "launch") && argc >= 3)
+        sigma_dock_launch(argv[2]);
+    else if (sigma_streq(argv[1], "audit"))
+        SovereignDock_Audit();
+    return SIGMA_OK;
+}
+
 /* ---- sigma-wizard ------------------------------------------------------ */
 sigma_err_t sigma_cmd_wizard(int argc, char *argv[]) {
     (void)argc; (void)argv;
@@ -2645,6 +2703,10 @@ void SovereignCLI_Init(void) {
     sigma_cli_register(&g_sigma_cli, "sigma-vault",       "Hierarchical Security Policy",    sigma_cmd_vault);
     sigma_cli_register(&g_sigma_cli, "sigma-rtos",        "Hard Real-Time Scheduler",        sigma_cmd_rtos);
     sigma_cli_register(&g_sigma_cli, "sigma-perf",        "Silicon Cycle Telemetry",         sigma_cmd_perf);
+    sigma_cli_register(&g_sigma_cli, "sigma-math",        "Hardware-Accelerated Math Engine",sigma_cmd_math);
+    sigma_cli_register(&g_sigma_cli, "sigma-cluster",     "Distributed Node Mesh Engine",    sigma_cmd_cluster);
+    sigma_cli_register(&g_sigma_cli, "sigma-quantum",     "Hardware Entropy & QA Engine",    sigma_cmd_quantum);
+    sigma_cli_register(&g_sigma_cli, "sigma-dock",        "Silicon UI Launcher Anchor",      sigma_cmd_dock);
 
     sigma_cli_register(&g_sigma_cli, "sigma-help",  "Show this help",                       sigma_cmd_help);
 
