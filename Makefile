@@ -50,7 +50,9 @@ CORE_SHARDS := \
   kernel/modules/core/SovereignTTYShard.c          \
   kernel/modules/core/SovereignCompositorShard.c   \
   kernel/modules/core/SovereignPackageShard.c      \
-  kernel/modules/core/SovereignWindowShard.c
+  kernel/modules/core/SovereignWindowShard.c       \
+  kernel/modules/core/SovereignRecallShard.c       \
+  kernel/modules/core/SovereignWebViewShard.c
 
 # Security
 SECURITY_SHARDS := \
@@ -79,7 +81,8 @@ SYSTEM_SHARDS := \
   kernel/modules/system/SovereignIntelligenceShard.c\
   kernel/modules/system/SovereignSoundShard.c       \
   kernel/modules/system/SovereignButlerShard.c      \
-  kernel/modules/system/SovereignRestoreShard.c
+  kernel/modules/system/SovereignRestoreShard.c     \
+  kernel/modules/system/SovereignGPUShard.c
 
 # Filesystem
 FS_SHARDS := \

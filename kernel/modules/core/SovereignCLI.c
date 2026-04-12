@@ -104,6 +104,9 @@
 #include "../../../include/SovereignWindowShard.h"
 #include "../../../include/SovereignSessionShard.h"
 #include "../../../include/SovereignRestoreShard.h"
+#include "../../../include/SovereignGPUShard.h"
+#include "../../../include/SovereignRecallShard.h"
+#include "../../../include/SovereignWebViewShard.h"
 
 /* Global CLI context */
 SigmaCLICtx_t g_sigma_cli;
@@ -2104,6 +2107,46 @@ sigma_err_t sigma_cmd_restore(int argc, char *argv[]) {
     return SIGMA_OK;
 }
 
+/* ---- sigma-gpu --------------------------------------------------------- */
+sigma_err_t sigma_cmd_gpu(int argc, char *argv[]) {
+    if (argc < 2) { SovereignGPU_Audit();
+        sigma_printf("Usage: sigma-gpu [submit <client> <count> | alloc <mb> | audit]\n");
+        return SIGMA_OK; }
+    if (sigma_streq(argv[1], "submit") && argc >= 4)
+        sigma_gpu_submit_stream(argv[2], GPU_CMD_DRAW_TRI, (sigma_u32)sigma_atoi(argv[3]));
+    else if (sigma_streq(argv[1], "alloc") && argc >= 3)
+        sigma_gpu_alloc_vram((sigma_u32)sigma_atoi(argv[2]));
+    else if (sigma_streq(argv[1], "audit"))
+        SovereignGPU_Audit();
+    return SIGMA_OK;
+}
+
+/* ---- sigma-recall ------------------------------------------------------ */
+sigma_err_t sigma_cmd_recall(int argc, char *argv[]) {
+    if (argc < 2) { SovereignRecall_Audit();
+        sigma_printf("Usage: sigma-recall [query <\"keyword\"> | audit]\n");
+        return SIGMA_OK; }
+    if (sigma_streq(argv[1], "query") && argc >= 3)
+        sigma_recall_query(argv[2]);
+    else if (sigma_streq(argv[1], "audit"))
+        SovereignRecall_Audit();
+    return SIGMA_OK;
+}
+
+/* ---- sigma-web --------------------------------------------------------- */
+sigma_err_t sigma_cmd_web(int argc, char *argv[]) {
+    if (argc < 2) { SovereignWebView_Audit();
+        sigma_printf("Usage: sigma-web [load <url> | render <id> | audit]\n");
+        return SIGMA_OK; }
+    if (sigma_streq(argv[1], "load") && argc >= 3)
+        sigma_web_load(argv[2]);
+    else if (sigma_streq(argv[1], "render") && argc >= 3)
+        sigma_web_render_frame((sigma_u32)sigma_atoi(argv[2]));
+    else if (sigma_streq(argv[1], "audit"))
+        SovereignWebView_Audit();
+    return SIGMA_OK;
+}
+
 /* ---- sigma-wizard ------------------------------------------------------ */
 sigma_err_t sigma_cmd_wizard(int argc, char *argv[]) {
     (void)argc; (void)argv;
@@ -2383,6 +2426,9 @@ void SovereignCLI_Init(void) {
     sigma_cli_register(&g_sigma_cli, "sigma-window",      "Silicon Window Orchestrator",     sigma_cmd_window);
     sigma_cli_register(&g_sigma_cli, "sigma-session",     "Identity & Session Governor",     sigma_cmd_session);
     sigma_cli_register(&g_sigma_cli, "sigma-restore",     "Atomic Recovery Engine",          sigma_cmd_restore);
+    sigma_cli_register(&g_sigma_cli, "sigma-gpu",         "Hardware GPU Orchestrator",       sigma_cmd_gpu);
+    sigma_cli_register(&g_sigma_cli, "sigma-recall",      "Semantic Timeline Recall",        sigma_cmd_recall);
+    sigma_cli_register(&g_sigma_cli, "sigma-web",         "Native WebSurface Parser",        sigma_cmd_web);
 
     sigma_cli_register(&g_sigma_cli, "sigma-help",  "Show this help",                       sigma_cmd_help);
 
