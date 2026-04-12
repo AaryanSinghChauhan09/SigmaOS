@@ -336,6 +336,9 @@
 #include "../../../include/SovereignAbsoluteNothingnessShard.h"
 #include "../../../include/SovereignUniversalTranscendenceShard.h"
 #include "../../../include/Sovereign67108864THShard.h"
+#include "../../../include/SovereignAbsoluteConvergenceShard.h"
+#include "../../../include/SovereignUniversalResurrectionShard.h"
+#include "../../../include/Sovereign134217728THShard.h"
 
 /* Global CLI context */
 SigmaCLICtx_t g_sigma_cli;
@@ -4429,6 +4432,27 @@ sigma_err_t sigma_cmd_ascend_67m(int argc, char *argv[]) {
     return SIGMA_OK;
 }
 
+/* ---- sigma-convergence-invoke ------------------------------------------- */
+sigma_err_t sigma_cmd_convergence_invoke(int argc, char *argv[]) {
+    (void)argc; (void)argv;
+    sigma_convergence_invoke();
+    return SIGMA_OK;
+}
+
+/* ---- sigma-resurrection-sync -------------------------------------------- */
+sigma_err_t sigma_cmd_resurrection_sync(int argc, char *argv[]) {
+    (void)argc; (void)argv;
+    sigma_resurrection_sync();
+    return SIGMA_OK;
+}
+
+/* ---- sigma-ascend-134m -------------------------------------------------- */
+sigma_err_t sigma_cmd_ascend_134m(int argc, char *argv[]) {
+    (void)argc; (void)argv;
+    sigma_134megashard_ascend();
+    return SIGMA_OK;
+}
+
 /* ---- sigma-wizard ------------------------------------------------------ */
 sigma_err_t sigma_cmd_wizard(int argc, char *argv[]) {
     (void)argc; (void)argv;
@@ -4943,6 +4967,9 @@ void SovereignCLI_Init(void) {
     sigma_cli_register(&g_sigma_cli, "sigma-void-invoke", "Erase logic blocks into pure nothingness", sigma_cmd_void_invoke);
     sigma_cli_register(&g_sigma_cli, "sigma-transcendence-sync", "Elevate kernel logic above boolean limits", sigma_cmd_transcendence_sync);
     sigma_cli_register(&g_sigma_cli, "sigma-ascend-67m", "The 67108864th Shard: 67-MEGA-SHARD", sigma_cmd_ascend_67m);
+    sigma_cli_register(&g_sigma_cli, "sigma-convergence-invoke", "Collapse all disparate paradigms into singular truth", sigma_cmd_convergence_invoke);
+    sigma_cli_register(&g_sigma_cli, "sigma-resurrection-sync", "Native microcode replacement for dead hardware", sigma_cmd_resurrection_sync);
+    sigma_cli_register(&g_sigma_cli, "sigma-ascend-134m", "The 134217728th Shard: 134-MEGA-SHARD", sigma_cmd_ascend_134m);
 
     sigma_cli_register(&g_sigma_cli, "sigma-help",  "Show this help",                       sigma_cmd_help);
 
