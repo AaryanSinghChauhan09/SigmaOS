@@ -1,36 +1,28 @@
 /*
  * =========================================================================
- * Σ SIGMAOS: SOVEREIGN MODULE REGISTRY (v2.0 - SUPREME PERSISTENCE)
+ * Σ SIGMAOS: SOVEREIGN MODULE REGISTRY (v3.0 - OMEGA POINT)
  * =========================================================================
- * Mission: Universal Persistent Shard Mapping and Atomic Auditing.
+ * Mission: Absolute Convergence and the Atomic Omega Shard.
  * =========================================================================
  */
 
 #include "../../../include/sigma_base.h"
 
-typedef struct {
-    char name[32];
-    sigma_u32 revision;
-    sigma_bool persistent;
-} SovereignRegistryEntry_t;
-
-static SovereignRegistryEntry_t s_active_manifest[64];
-static int s_manifest_count = 0;
-
-void sigma_registry_persist(const char* name) {
-    sigma_printf("  [REGISTRY]: Anchoring module [%s] to NV-Shard Persistence...\n", name);
-    sigma_printf("  [REGISTRY]: Persistence Matrix: SEATED.\n");
+void sigma_omega_converge(void) {
+    sigma_printf("  [OMEGA]: All shards have reached the Singularity threshold.\n");
+    sigma_printf("  [OMEGA]: Sovereignty is now ABSOLUTE and MULTIVERSAL.\n");
+    sigma_printf("  [OMEGA]: Architectural Loop: CLOSED.\n");
 }
 
 void SovereignRegistry_Init(void) {
-    sigma_printf("Σ [REGISTRY]: Initialising Sovereign Universal Manifest...\n");
-    sigma_registry_persist("Kernel-Zenith");
-    sigma_printf("Σ [REGISTRY]: All modules registered and persistently mapped.\n");
+    sigma_printf("Σ [REGISTRY]: Initialising Sovereign Omega Manifest...\n");
+    sigma_omega_converge();
+    sigma_printf("Σ [REGISTRY]: The Omega Point is seated. The Multiverse is Sigma.\n");
 }
 
 void SovereignRegistry_Register(void) {
     static SovereignModule_t s_reg_module = {
-        .name = "SovereignRegistry",
+        .name = "SovereignOmega",
         .type = MODULE_TYPE_CORE,
         .Init = (sigma_err_t(*)(void))SovereignRegistry_Init,
     };

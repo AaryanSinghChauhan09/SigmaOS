@@ -312,3 +312,27 @@ setInterval(() => {
     logConsole.appendChild(omniLog);
     logConsole.scrollTop = logConsole.scrollHeight;
 }, 45000);
+
+// Multiverse Portal: Dimensional Shift Orchestrator
+const btnPortal = document.getElementById('btn-portal');
+if(btnPortal) {
+    btnPortal.addEventListener('click', () => {
+        const cube = document.getElementById('cyber-cube');
+        cube.classList.add('warping');
+        setTimeout(() => {
+            cube.classList.remove('warping');
+            const newHue = Math.floor(Math.random() * 360);
+            document.body.style.filter = 'hue-rotate(' + newHue + 'deg)';
+            particles.forEach(p => {
+                p.vx *= 5; p.vy *= 5;
+                p.size = Math.random() * 5 + 2;
+                p.alpha = 1.0;
+            });
+            const portalLog = document.createElement('div');
+            portalLog.style.color = '#fff'; portalLog.style.fontWeight = '800';
+            portalLog.textContent = 'S [PORTAL]: Jump to Dimension-[' + newHue + '] Successful.';
+            logConsole.appendChild(portalLog);
+            logConsole.scrollTop = logConsole.scrollHeight;
+        }, 1000);
+    });
+}

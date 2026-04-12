@@ -207,3 +207,13 @@ body::before {
     from { transform: scale(0) rotate(180deg); opacity: 0; }
     to { transform: scale(1) rotate(0deg); opacity: 1; }
 }
+
+.warping {
+    animation: dimensionJump 1s cubic-bezier(0.7, 0, 0.3, 1) forwards;
+}
+
+@keyframes dimensionJump {
+    0% { transform: scale(1) rotate(0deg); filter: brightness(1) blur(0px); }
+    50% { transform: scale(0.1) rotate(1080deg); filter: brightness(10) blur(20px); }
+    100% { transform: scale(1) rotate(2160deg); filter: brightness(1) blur(0px); }
+}
