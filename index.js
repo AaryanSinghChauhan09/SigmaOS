@@ -171,3 +171,13 @@ document.getElementById('btn-home').addEventListener('click', () => {
     closeWindow('win-explorer');
     closeWindow('win-shell');
 });
+
+// 3D Parallax Tilt Orchestrator
+document.addEventListener('mousemove', (e) => {
+    const cards = document.querySelectorAll('.stat-card');
+    const x = (window.innerWidth / 2 - e.clientX) / 40;
+    const y = (window.innerHeight / 2 - e.clientY) / 40;
+    cards.forEach(card => {
+        card.style.transform = 'rotateY(' + x + 'deg) rotateX(' + (-y) + 'deg)';
+    });
+});
