@@ -85,6 +85,9 @@
 #include "../../../include/SovereignIPCShard.h"
 #include "../../../include/SovereignCryptoShard.h"
 #include "../../../include/SovereignAuditShard.h"
+#include "../../../include/SovereignGamingShard.h"
+#include "../../../include/SovereignMultimediaShard.h"
+#include "../../../include/SovereignPrivacyShard.h"
 
 /* Global CLI context */
 SigmaCLICtx_t g_sigma_cli;
@@ -1776,6 +1779,60 @@ sigma_err_t sigma_cmd_audit(int argc, char *argv[]) {
     return SIGMA_OK;
 }
 
+/* ---- sigma-gaming ----------------------------------------------------- */
+sigma_err_t sigma_cmd_gaming(int argc, char *argv[]) {
+    if (argc < 2) { SovereignGaming_Audit();
+        sigma_printf("Usage: sigma-gaming [launch <title> <pid> <mode:0-3> <fps> | stop <pid> | audit]\n");
+        return SIGMA_OK; }
+    if (sigma_streq(argv[1], "launch") && argc >= 6)
+        sigma_gaming_launch(argv[2], (sigma_u32)sigma_atoi(argv[3]),
+                            (SigmaGamingMode_t)sigma_atoi(argv[4]),
+                            (sigma_u32)sigma_atoi(argv[5]));
+    else if (sigma_streq(argv[1], "stop") && argc >= 3)
+        sigma_gaming_stop((sigma_u32)sigma_atoi(argv[2]));
+    else if (sigma_streq(argv[1], "audit"))
+        SovereignGaming_Audit();
+    return SIGMA_OK;
+}
+
+/* ---- sigma-mm ---------------------------------------------------------- */
+sigma_err_t sigma_cmd_mm(int argc, char *argv[]) {
+    if (argc < 2) { SovereignMultimedia_Audit();
+        sigma_printf("Usage: sigma-mm [open <client> <type:0-3> <rate> <ch> <bits> <lat> | vol <0-100> | audit]\n");
+        return SIGMA_OK; }
+    if (sigma_streq(argv[1], "open") && argc >= 8)
+        sigma_mm_open_stream(argv[2], (SigmaStreamType_t)sigma_atoi(argv[3]),
+                             (sigma_u32)sigma_atoi(argv[4]),
+                             (sigma_u32)sigma_atoi(argv[5]),
+                             (sigma_u32)sigma_atoi(argv[6]),
+                             (sigma_u32)sigma_atoi(argv[7]),
+                             SIGMA_TRUE);
+    else if (sigma_streq(argv[1], "vol") && argc >= 3)
+        sigma_mm_set_volume((sigma_u32)sigma_atoi(argv[2]));
+    else if (sigma_streq(argv[1], "audit"))
+        SovereignMultimedia_Audit();
+    return SIGMA_OK;
+}
+
+/* ---- sigma-privacy ----------------------------------------------------- */
+sigma_err_t sigma_cmd_privacy(int argc, char *argv[]) {
+    if (argc < 2) { SovereignPrivacy_Audit();
+        sigma_printf("Usage: sigma-privacy [level <0-3> | policy <shard> <type> <verdict> | report | audit]\n");
+        return SIGMA_OK; }
+    if (sigma_streq(argv[1], "level") && argc >= 3)
+        sigma_privacy_set_level((sigma_u32)sigma_atoi(argv[2]));
+    else if (sigma_streq(argv[1], "policy") && argc >= 5)
+        sigma_privacy_set_policy(argv[2],
+                                 (SigmaPrivAccessType_t)sigma_atoi(argv[3]),
+                                 (SigmaPrivVerdict_t)sigma_atoi(argv[4]),
+                                 SIGMA_FALSE);
+    else if (sigma_streq(argv[1], "report"))
+        sigma_privacy_report();
+    else if (sigma_streq(argv[1], "audit"))
+        SovereignPrivacy_Audit();
+    return SIGMA_OK;
+}
+
 /* ---- sigma-wizard ------------------------------------------------------ */
 sigma_err_t sigma_cmd_wizard(int argc, char *argv[]) {
     (void)argc; (void)argv;
@@ -2036,6 +2093,9 @@ void SovereignCLI_Init(void) {
     sigma_cli_register(&g_sigma_cli, "sigma-ipc",         "Silicon Inter-Shard Message Bus", sigma_cmd_ipc);
     sigma_cli_register(&g_sigma_cli, "sigma-crypto",      "Hardware Crypto Primitives",      sigma_cmd_crypto);
     sigma_cli_register(&g_sigma_cli, "sigma-audit",       "Tamper-Evident Security Trail",   sigma_cmd_audit);
+    sigma_cli_register(&g_sigma_cli, "sigma-gaming",      "Gaming Performance Governor",     sigma_cmd_gaming);
+    sigma_cli_register(&g_sigma_cli, "sigma-mm",          "Multimedia Stream Pipeline",      sigma_cmd_mm);
+    sigma_cli_register(&g_sigma_cli, "sigma-privacy",     "Silicon Privacy Governor",        sigma_cmd_privacy);
 
     sigma_cli_register(&g_sigma_cli, "sigma-help",  "Show this help",                       sigma_cmd_help);
 
