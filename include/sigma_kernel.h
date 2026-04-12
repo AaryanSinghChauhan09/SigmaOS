@@ -22,6 +22,7 @@
 #include "SovereignCoreUtils.h"
 #include "SovereignHardwareIOZenith.h"
 #include "SovereignRegistry.h"
+#include "SovereignModule.h"
 
 /* ── 3. System Services ────────────────────────────────────────────────── */
 #include "SovereignDmesg.h"          /* Kernel ring buffer / printk        */
@@ -62,39 +63,23 @@
 
 // Master Aggregator Initialization
 static inline void SovereignMaster_InitAll(void) {
-    /* 1. Base Registries */
+    /* 1. Base Registries & Frameworks */
     SovereignRegistry_Init();
-    SovereignDriver_InitRegistry();
-    SovereignInit_InitRegistry();
-    SovereignPkg_InitRegistry();
-    SovereignCommand_InitRegistry();
-    SovereignArchBridge_Register();
+    
+    /* 2. Seat Essential Core Modules */
+    extern void SovereignVMM_Register(void);
+    extern void SovereignMAC_Register(void);
+    
+    SovereignVMM_Register(); 
+    SovereignMAC_Register();
 
-    /* 2. Seating Shards */
-    SovereignSound_Register();
-    SovereignDisplay_Register();
-    SovereignVMM_Register();
-    SovereignCrypto_Register();
-    SovereignUSB_Register();
-    SovereignPower_Register();
-    SovereignTimer_Register();
-    SovereignInput_Register();
-    SovereignTCPIP_Register();
-    SovereignPageCache_Register();
-    SovereignPerfController_Register();
-    SovereignTurbo_Register();
-    SovereignSmartExplorer_Register();
-    SovereignIntegrity_Register();
-    SovereignRollback_Register();
-    SovereignPrefetcher_Register();
-    SovereignSystemDoctor_Register();
-    SovereignPersonalizer_Init();
+    /* 3. Run Industrial Init */
+    sigma_modules_init_all();
 
-    /* 3. Driver/Init Finalization */
+    /* 4. Driver/Init Finalization */
     SovereignDriver_InitAll();
     SovereignInit_StartAll();
 
-    /* 4. Registry Finalization */
     SovereignRegistry_Finalize();
 }
 
