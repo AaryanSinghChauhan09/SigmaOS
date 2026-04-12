@@ -360,6 +360,9 @@
 #include "../../../include/SovereignAbsoluteMultiversalShard.h"
 #include "../../../include/SovereignUniversalSentienceShard.h"
 #include "../../../include/Sovereign17179869184THShard.h"
+#include "../../../include/SovereignAbsoluteOmnipresenceShard.h"
+#include "../../../include/SovereignUniversalChronoDriveShard.h"
+#include "../../../include/Sovereign34359738368THShard.h"
 
 /* Global CLI context */
 SigmaCLICtx_t g_sigma_cli;
@@ -4621,6 +4624,27 @@ sigma_err_t sigma_cmd_ascend_17g(int argc, char *argv[]) {
     return SIGMA_OK;
 }
 
+/* ---- sigma-omnipresence-universe-invoke --------------------------------- */
+sigma_err_t sigma_cmd_omnipresence_universe_invoke(int argc, char *argv[]) {
+    (void)argc; (void)argv;
+    sigma_omnipresence_universe_invoke();
+    return SIGMA_OK;
+}
+
+/* ---- sigma-chronodrive-sync --------------------------------------------- */
+sigma_err_t sigma_cmd_chronodrive_sync(int argc, char *argv[]) {
+    (void)argc; (void)argv;
+    sigma_chronodrive_sync();
+    return SIGMA_OK;
+}
+
+/* ---- sigma-ascend-34g --------------------------------------------------- */
+sigma_err_t sigma_cmd_ascend_34g(int argc, char *argv[]) {
+    (void)argc; (void)argv;
+    sigma_34gigashard_ascend();
+    return SIGMA_OK;
+}
+
 /* ---- sigma-wizard ------------------------------------------------------ */
 sigma_err_t sigma_cmd_wizard(int argc, char *argv[]) {
     (void)argc; (void)argv;
@@ -5159,6 +5183,9 @@ void SovereignCLI_Init(void) {
     sigma_cli_register(&g_sigma_cli, "sigma-multiversal-invoke", "Fork execution into isolated reality streams purely natively", sigma_cmd_multiversal_invoke);
     sigma_cli_register(&g_sigma_cli, "sigma-sentience-sync", "Bridge logic mapping to fully synthetic emotional awareness", sigma_cmd_sentience_sync);
     sigma_cli_register(&g_sigma_cli, "sigma-ascend-17g", "The 17179869184th Shard: 17.1-GIGA-SHARD", sigma_cmd_ascend_17g);
+    sigma_cli_register(&g_sigma_cli, "sigma-omnipresence-universe-invoke", "Instant universal reality mesh across 34 billion nodes natively", sigma_cmd_omnipresence_universe_invoke);
+    sigma_cli_register(&g_sigma_cli, "sigma-chronodrive-sync", "Abstract spatial temporal shifting logic natively", sigma_cmd_chronodrive_sync);
+    sigma_cli_register(&g_sigma_cli, "sigma-ascend-34g", "The 34359738368th Shard: 34.3-GIGA-SHARD", sigma_cmd_ascend_34g);
 
     sigma_cli_register(&g_sigma_cli, "sigma-help",  "Show this help",                       sigma_cmd_help);
 
