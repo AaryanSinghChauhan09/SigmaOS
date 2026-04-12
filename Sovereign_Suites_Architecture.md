@@ -30,7 +30,27 @@ This document defines the modular architecture of SigmaOS, organized into **Inte
 - **Lattice**: PID-1 Init system and service lattice
 - **LSD**: Large-Scale Service Daemon / Unit supervisor
 
-## 5. Sovereign CLI Suite
+## 5. Sovereign Intelligence Suite
+**Location**: `kernel/modules/core/SovereignIntelligenceSuite.c`
+**Components**:
+- **AI Kernel**: Native LLM/ML acceleration shard
+- **Neural Bridge**: Synaptic logic mapping
+- **Tensor Core**: Hardware-accelerated matrix operations
+
+## 6. Sovereign Frontend Suite
+**Location**: `kernel/modules/core/SovereignFrontendSuite.c`
+**Components**:
+- **Display**: Window Manager and Compositor
+- **Sound**: Audio Engine and Neural Synth
+- **UI**: Hyprland-inspired Sovereign GUI
+
+## 7. Sovereign Ecosystem Suite
+**Location**: `kernel/modules/core/SovereignEcosystemSuite.c`
+**Components**:
+- **Legacy Absorbers**: XNU, Android Binder, Haiku, and Wine compatibility
+- **Interoperability**: Binary translation and ABI bridging
+
+## 8. Sovereign CLI Suite
 **Location**: `kernel/modules/core/cli/`
 **Components**:
 - **Core Dispatcher**: O(1) Command Hash Dispatcher
