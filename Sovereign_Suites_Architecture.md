@@ -50,7 +50,21 @@ This document defines the modular architecture of SigmaOS, organized into **Inte
 - **Legacy Absorbers**: XNU, Android Binder, Haiku, and Wine compatibility
 - **Interoperability**: Binary translation and ABI bridging
 
-## 8. Sovereign CLI Suite
+## 8. Sovereign Backend Suite
+**Location**: `kernel/modules/core/SovereignBackendSuite.c`
+**Components**:
+- **VFS**: Sovereign Virtual File System
+- **Network Stack**: Native TCP/IP and socket abstraction
+- **ProcFS**: Kernel state reflection filesystem
+
+## 9. Sovereign Configuration & Identity Suite
+**Location**: `kernel/modules/core/SovereignConfigIdentitySuite.c`
+**Components**:
+- **Config**: System-wide persistent settings
+- **Identity**: Multi-factor authentication and biometric state
+- **Audit**: Log integrity and tamper-proofing
+
+## 10. Sovereign CLI Suite
 **Location**: `kernel/modules/core/cli/`
 **Components**:
 - **Core Dispatcher**: O(1) Command Hash Dispatcher
