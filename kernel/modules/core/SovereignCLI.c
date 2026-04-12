@@ -149,6 +149,9 @@
 #include "../../../include/SovereignAutoHealingAlg.h"
 #include "../../../include/SovereignFuzzShard.h"
 #include "../../../include/SovereignCommandParseAlg.h"
+#include "../../../include/SovereignQuantumResilienceAlg.h"
+#include "../../../include/SovereignSiliconDefectTest.h"
+#include "../../../include/SovereignMacroAutomationAlg.h"
 
 /* Global CLI context */
 SigmaCLICtx_t g_sigma_cli;
@@ -2717,6 +2720,36 @@ sigma_err_t sigma_cmd_infer(int argc, char *argv[]) {
     return SIGMA_OK;
 }
 
+/* ---- sigma-pqc ---------------------------------------------------------- */
+sigma_err_t sigma_cmd_pqc(int argc, char *argv[]) {
+    if (argc < 2) {
+        sigma_printf("Usage: sigma-pqc [test]\n");
+        return SIGMA_OK; }
+    if (sigma_streq(argv[1], "test"))
+        sigma_quantum_test();
+    return SIGMA_OK;
+}
+
+/* ---- sigma-silicon ------------------------------------------------------ */
+sigma_err_t sigma_cmd_silicon(int argc, char *argv[]) {
+    if (argc < 2) {
+        sigma_printf("Usage: sigma-silicon [test]\n");
+        return SIGMA_OK; }
+    if (sigma_streq(argv[1], "test"))
+        sigma_silicon_test();
+    return SIGMA_OK;
+}
+
+/* ---- sigma-macro -------------------------------------------------------- */
+sigma_err_t sigma_cmd_macro(int argc, char *argv[]) {
+    if (argc < 2) {
+        sigma_printf("Usage: sigma-macro [execute <macro_name>]\n");
+        return SIGMA_OK; }
+    if (sigma_streq(argv[1], "execute") && argc >= 3)
+        sigma_macro_execute(argv[2]);
+    return SIGMA_OK;
+}
+
 /* ---- sigma-wizard ------------------------------------------------------ */
 sigma_err_t sigma_cmd_wizard(int argc, char *argv[]) {
     (void)argc; (void)argv;
@@ -3041,6 +3074,9 @@ void SovereignCLI_Init(void) {
     sigma_cli_register(&g_sigma_cli, "sigma-heal",        "ECC Logic Fault Quarantining",    sigma_cmd_heal);
     sigma_cli_register(&g_sigma_cli, "sigma-fuzz",        "Autonomous Logic Regression",     sigma_cmd_fuzz);
     sigma_cli_register(&g_sigma_cli, "sigma-infer",       "Neural Vector String Parsing",    sigma_cmd_infer);
+    sigma_cli_register(&g_sigma_cli, "sigma-pqc",         "Post-Quantum Defense Tester",     sigma_cmd_pqc);
+    sigma_cli_register(&g_sigma_cli, "sigma-silicon",     "L1/L2 Cache Microcode Tester",    sigma_cmd_silicon);
+    sigma_cli_register(&g_sigma_cli, "sigma-macro",       "Custom O/S Profile Automation",   sigma_cmd_macro);
 
     sigma_cli_register(&g_sigma_cli, "sigma-help",  "Show this help",                       sigma_cmd_help);
 
