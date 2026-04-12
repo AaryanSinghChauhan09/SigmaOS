@@ -399,3 +399,24 @@ document.getElementById('btn-sentience').addEventListener('click', () => {
         sLog.scrollTop = sLog.scrollHeight;
     }, 2000);
 });
+
+// Sovereign Zen-Mode: Absolute Focus Orchestrator
+document.addEventListener('dblclick', () => {
+    const elements = document.querySelectorAll('.dashboard, .taskbar-container, .top-bar, .window, #sovereign-forge');
+    elements.forEach(el => el.classList.toggle('hidden-bar'));
+    console.log('S [ZEN]: Toggling Absolute Focus Dimension...');
+});
+
+// Cube Dissolve: Particle Morphing Orchestrator
+const btnDissolve = document.getElementById('btn-dissolve');
+if(btnDissolve) {
+    btnDissolve.addEventListener('click', () => {
+        const cube = document.getElementById('cyber-cube');
+        cube.style.opacity = '0';
+        particles.forEach(p => { p.vx *= 20; p.vy *= 20; p.size *= 2; });
+        setTimeout(() => {
+            cube.style.opacity = '1';
+            particles.forEach(p => { p.vx /= 20; p.vy /= 20; p.size /= 2; });
+        }, 2000);
+    });
+}
