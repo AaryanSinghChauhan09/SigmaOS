@@ -28,6 +28,7 @@
 #include "../../../include/SovereignPersonalizer.h"
 #include "../../../include/SovereignAIKernel.h"
 #include "../../../include/SovereignDistroSlinger.h"
+#include "../../../include/SovereignAutomationEngine.h"
 
 /* Global CLI context */
 SigmaCLICtx_t g_sigma_cli;
@@ -473,6 +474,10 @@ sigma_err_t sigma_cmd_personalize(int argc, char *argv[]) {
 }
 
 /* ---- sigma-distro ------------------------------------------------------ */
+    return SIGMA_OK;
+}
+
+/* ---- sigma-distro ------------------------------------------------------ */
 sigma_err_t sigma_cmd_distro(int argc, char *argv[]) {
     static SovereignDistroSlinger_t g_slinger;
     static sigma_bool init = SIGMA_FALSE;
@@ -490,6 +495,33 @@ sigma_err_t sigma_cmd_distro(int argc, char *argv[]) {
         g_slinger.map_syscalls(&g_slinger);
     } else if (sigma_streq(argv[1], "-spawn")) {
         g_slinger.spawn_autonomous(&g_slinger);
+    }
+    return SIGMA_OK;
+}
+
+/* ---- sigma-run --------------------------------------------------------- */
+sigma_err_t sigma_cmd_run(int argc, char *argv[]) {
+    static SovereignAutomationEngine_t g_auto_eng;
+    static sigma_bool init = SIGMA_FALSE;
+    if (!init) { g_auto_eng = SovereignAutomationEngine_Create(); init = SIGMA_TRUE; }
+
+    if (argc < 2) {
+        g_auto_eng.audit_automation(&g_auto_eng);
+        sigma_printf("Usage: sigma-run <script_path | label>\n");
+        return SIGMA_OK;
+    }
+
+    if (sigma_streq(argv[1], "standard_boot")) {
+        const char* script = 
+            "sigma-uname -a\n"
+            "sigma-personalize theme ZENITH_DARK\n"
+            "sigma-ai audit\n"
+            "sigma-ls /\n"
+            "sigma-echo [AUTO]: System Stabilized.\n";
+        g_auto_eng.execute_script(&g_auto_eng, script);
+    } else {
+        sigma_printf("Σ [RUN]: Reading script '%s'...\n", argv[1]);
+        sigma_printf("[SKIPPED]: File I/O simulation only.\n");
     }
     return SIGMA_OK;
 }
@@ -714,6 +746,7 @@ void SovereignCLI_Init(void) {
     sigma_cli_register(&g_sigma_cli, "sigma-wizard",      "Guided Setup Master",             sigma_cmd_wizard);
     sigma_cli_register(&g_sigma_cli, "sigma-alias",       "Create command aliases",          sigma_cmd_alias);
     sigma_cli_register(&g_sigma_cli, "sigma-distro",      "Sovereign Distro Lifecycle",      sigma_cmd_distro);
+    sigma_cli_register(&g_sigma_cli, "sigma-run",         "Execute SigmaScript Automations", sigma_cmd_run);
 
     sigma_cli_register(&g_sigma_cli, "sigma-help",  "Show this help",                       sigma_cmd_help);
 
