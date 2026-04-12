@@ -610,7 +610,11 @@ SYSTEM_SHARDS := \
   kernel/modules/system/Sovereign35184372088832NDShard.c \
   kernel/modules/system/SovereignAbsoluteHarmonyShard.c \
   kernel/modules/system/SovereignUniversalSyncShard.c \
-  kernel/modules/system/Sovereign70368744177664THShard.c
+  kernel/modules/system/Sovereign70368744177664THShard.c \
+  kernel/modules/system/SovereignAbsoluteEquilibriumShard.c \
+  kernel/modules/system/SovereignUniversalConstellationShard.c \
+  kernel/modules/system/Sovereign140737488355328THShard.c
+
 
 
 

@@ -396,6 +396,9 @@
 #include "../../../include/SovereignAbsoluteHarmonyShard.h"
 #include "../../../include/SovereignUniversalSyncShard.h"
 #include "../../../include/Sovereign70368744177664THShard.h"
+#include "../../../include/SovereignAbsoluteEquilibriumShard.h"
+#include "../../../include/SovereignUniversalConstellationShard.h"
+#include "../../../include/Sovereign140737488355328THShard.h"
 
 /* Global CLI context */
 SigmaCLICtx_t g_sigma_cli;
@@ -4909,6 +4912,27 @@ sigma_err_t sigma_cmd_ascend_70tera(int argc, char *argv[]) {
     return SIGMA_OK;
 }
 
+/* ---- sigma-equilibrium-invoke ------------------------------------------- */
+sigma_err_t sigma_cmd_equilibrium_invoke(int argc, char *argv[]) {
+    (void)argc; (void)argv;
+    sigma_equilibrium_invoke();
+    return SIGMA_OK;
+}
+
+/* ---- sigma-constellation-sync ------------------------------------------- */
+sigma_err_t sigma_cmd_constellation_sync(int argc, char *argv[]) {
+    (void)argc; (void)argv;
+    sigma_constellation_sync();
+    return SIGMA_OK;
+}
+
+/* ---- sigma-ascend-140tera ----------------------------------------------- */
+sigma_err_t sigma_cmd_ascend_140tera(int argc, char *argv[]) {
+    (void)argc; (void)argv;
+    sigma_140terashard_ascend();
+    return SIGMA_OK;
+}
+
 /* ---- sigma-wizard ------------------------------------------------------ */
 sigma_err_t sigma_cmd_wizard(int argc, char *argv[]) {
     (void)argc; (void)argv;
@@ -5483,6 +5507,9 @@ void SovereignCLI_Init(void) {
     sigma_cli_register(&g_sigma_cli, "sigma-harmony-invoke", "Enforce absolute node resonance without friction natively", sigma_cmd_harmony_invoke);
     sigma_cli_register(&g_sigma_cli, "sigma-sync-invoke", "Bind mathematical states to the core atomic register", sigma_cmd_sync_invoke);
     sigma_cli_register(&g_sigma_cli, "sigma-ascend-70tera", "The 70368744177664th Shard: 70.36-TERA-SHARD (46-BIT)", sigma_cmd_ascend_70tera);
+    sigma_cli_register(&g_sigma_cli, "sigma-equilibrium-invoke", "Nullify computational heat into 0 thermodynamic loss naturally", sigma_cmd_equilibrium_invoke);
+    sigma_cli_register(&g_sigma_cli, "sigma-constellation-sync", "Interconnect multiversal grids into core node matrices", sigma_cmd_constellation_sync);
+    sigma_cli_register(&g_sigma_cli, "sigma-ascend-140tera", "The 140737488355328th Shard: 140.7-TERA-SHARD (47-BIT)", sigma_cmd_ascend_140tera);
 
     sigma_cli_register(&g_sigma_cli, "sigma-help",  "Show this help",                       sigma_cmd_help);
 
