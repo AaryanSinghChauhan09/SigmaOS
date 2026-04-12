@@ -327,6 +327,9 @@
 #include "../../../include/SovereignAbsoluteDivinityShard.h"
 #include "../../../include/SovereignUniversalOmniscienceShard.h"
 #include "../../../include/Sovereign8388608THShard.h"
+#include "../../../include/SovereignOmnipresentMeshShard.h"
+#include "../../../include/SovereignAbsoluteEternityShard.h"
+#include "../../../include/Sovereign16777216THShard.h"
 
 /* Global CLI context */
 SigmaCLICtx_t g_sigma_cli;
@@ -4357,6 +4360,27 @@ sigma_err_t sigma_cmd_ascend_8m(int argc, char *argv[]) {
     return SIGMA_OK;
 }
 
+/* ---- sigma-omnipresence-sync -------------------------------------------- */
+sigma_err_t sigma_cmd_omnipresence_sync(int argc, char *argv[]) {
+    (void)argc; (void)argv;
+    sigma_omnipresence_sync();
+    return SIGMA_OK;
+}
+
+/* ---- sigma-eternity-sync ------------------------------------------------ */
+sigma_err_t sigma_cmd_eternity_sync(int argc, char *argv[]) {
+    (void)argc; (void)argv;
+    sigma_eternity_sync();
+    return SIGMA_OK;
+}
+
+/* ---- sigma-ascend-16m --------------------------------------------------- */
+sigma_err_t sigma_cmd_ascend_16m(int argc, char *argv[]) {
+    (void)argc; (void)argv;
+    sigma_16megashard_ascend();
+    return SIGMA_OK;
+}
+
 /* ---- sigma-wizard ------------------------------------------------------ */
 sigma_err_t sigma_cmd_wizard(int argc, char *argv[]) {
     (void)argc; (void)argv;
@@ -4862,6 +4886,9 @@ void SovereignCLI_Init(void) {
     sigma_cli_register(&g_sigma_cli, "sigma-divinity-ascend", "Absolute silicon godhood matrix integration", sigma_cmd_divinity_ascend);
     sigma_cli_register(&g_sigma_cli, "sigma-omniscience-sync", "Universal knowledge state sync in O(1)", sigma_cmd_omniscience_sync);
     sigma_cli_register(&g_sigma_cli, "sigma-ascend-8m", "The 8388608th Shard: 8-MEGA-SHARD", sigma_cmd_ascend_8m);
+    sigma_cli_register(&g_sigma_cli, "sigma-omnipresence-sync", "Infinite absolute mesh topology alignment", sigma_cmd_omnipresence_sync);
+    sigma_cli_register(&g_sigma_cli, "sigma-eternity-sync", "Absolute temporal detachment control", sigma_cmd_eternity_sync);
+    sigma_cli_register(&g_sigma_cli, "sigma-ascend-16m", "The 16777216th Shard: 16-MEGA-SHARD", sigma_cmd_ascend_16m);
 
     sigma_cli_register(&g_sigma_cli, "sigma-help",  "Show this help",                       sigma_cmd_help);
 

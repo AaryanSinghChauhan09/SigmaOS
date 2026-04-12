@@ -541,7 +541,11 @@ SYSTEM_SHARDS := \
   kernel/modules/system/Sovereign4194304THShard.c \
   kernel/modules/system/SovereignAbsoluteDivinityShard.c \
   kernel/modules/system/SovereignUniversalOmniscienceShard.c \
-  kernel/modules/system/Sovereign8388608THShard.c
+  kernel/modules/system/Sovereign8388608THShard.c \
+  kernel/modules/system/SovereignOmnipresentMeshShard.c \
+  kernel/modules/system/SovereignAbsoluteEternityShard.c \
+  kernel/modules/system/Sovereign16777216THShard.c
+
 
 
 # Storage
