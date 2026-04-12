@@ -82,6 +82,9 @@
 #include "../../../include/SovereignSignalShard.h"
 #include "../../../include/SovereignVFSShard.h"
 #include "../../../include/SovereignNUMAShard.h"
+#include "../../../include/SovereignIPCShard.h"
+#include "../../../include/SovereignCryptoShard.h"
+#include "../../../include/SovereignAuditShard.h"
 
 /* Global CLI context */
 SigmaCLICtx_t g_sigma_cli;
@@ -1719,6 +1722,60 @@ sigma_err_t sigma_cmd_numa(int argc, char *argv[]) {
     return SIGMA_OK;
 }
 
+/* ---- sigma-ipc --------------------------------------------------------- */
+sigma_err_t sigma_cmd_ipc(int argc, char *argv[]) {
+    if (argc < 2) { SovereignIPC_Audit();
+        sigma_printf("Usage: sigma-ipc [open <name> <pid> | send <ch> <src> <dst> <iface> <method> <payload> | recv <ch> | audit]\n");
+        return SIGMA_OK; }
+    if (sigma_streq(argv[1], "open") && argc >= 4)
+        sigma_ipc_open(argv[2], (sigma_u32)sigma_atoi(argv[3]));
+    else if (sigma_streq(argv[1], "send") && argc >= 8)
+        sigma_ipc_send(argv[2], (sigma_u32)sigma_atoi(argv[3]),
+                       (sigma_u32)sigma_atoi(argv[4]), IPC_METHOD_CALL,
+                       argv[5], argv[6], argv[7]);
+    else if (sigma_streq(argv[1], "recv") && argc >= 3)
+        sigma_ipc_recv(argv[2]);
+    else if (sigma_streq(argv[1], "audit"))
+        SovereignIPC_Audit();
+    return SIGMA_OK;
+}
+
+/* ---- sigma-crypto ------------------------------------------------------ */
+sigma_err_t sigma_cmd_crypto(int argc, char *argv[]) {
+    if (argc < 2) { SovereignCrypto_Audit();
+        sigma_printf("Usage: sigma-crypto [sha256 <text> | audit]\n");
+        return SIGMA_OK; }
+    if (sigma_streq(argv[1], "sha256") && argc >= 3) {
+        sigma_u8 digest[SHA256_DIGEST_LEN];
+        sigma_sha256((const sigma_u8*)argv[2],
+                     (sigma_u32)sigma_strlen(argv[2]), digest);
+        sigma_printf("[CRYPTO]: SHA-256('%s') = ", argv[2]);
+        for (sigma_u32 i = 0; i < SHA256_DIGEST_LEN; i++)
+            sigma_printf("%02x", digest[i]);
+        sigma_printf("\n");
+    } else if (sigma_streq(argv[1], "audit")) {
+        SovereignCrypto_Audit();
+    }
+    return SIGMA_OK;
+}
+
+/* ---- sigma-audit ------------------------------------------------------- */
+sigma_err_t sigma_cmd_audit(int argc, char *argv[]) {
+    if (argc < 2) { SovereignAudit_Audit();
+        sigma_printf("Usage: sigma-audit [write <type> <pid> <uid> <subj> <action> | verify | audit]\n");
+        return SIGMA_OK; }
+    if (sigma_streq(argv[1], "write") && argc >= 7)
+        sigma_audit_write((SigmaAuditType_t)sigma_atoi(argv[2]),
+                          (sigma_u32)sigma_atoi(argv[3]),
+                          (sigma_u32)sigma_atoi(argv[4]),
+                          argv[5], argv[6]);
+    else if (sigma_streq(argv[1], "verify"))
+        sigma_audit_verify_chain();
+    else if (sigma_streq(argv[1], "audit"))
+        SovereignAudit_Audit();
+    return SIGMA_OK;
+}
+
 /* ---- sigma-wizard ------------------------------------------------------ */
 sigma_err_t sigma_cmd_wizard(int argc, char *argv[]) {
     (void)argc; (void)argv;
@@ -1976,6 +2033,9 @@ void SovereignCLI_Init(void) {
     sigma_cli_register(&g_sigma_cli, "sigma-signal",      "Silicon Signal Dispatcher",       sigma_cmd_signal);
     sigma_cli_register(&g_sigma_cli, "sigma-vfs",         "Virtual Filesystem Layer",        sigma_cmd_vfs);
     sigma_cli_register(&g_sigma_cli, "sigma-numa",        "NUMA Topology Manager",           sigma_cmd_numa);
+    sigma_cli_register(&g_sigma_cli, "sigma-ipc",         "Silicon Inter-Shard Message Bus", sigma_cmd_ipc);
+    sigma_cli_register(&g_sigma_cli, "sigma-crypto",      "Hardware Crypto Primitives",      sigma_cmd_crypto);
+    sigma_cli_register(&g_sigma_cli, "sigma-audit",       "Tamper-Evident Security Trail",   sigma_cmd_audit);
 
     sigma_cli_register(&g_sigma_cli, "sigma-help",  "Show this help",                       sigma_cmd_help);
 

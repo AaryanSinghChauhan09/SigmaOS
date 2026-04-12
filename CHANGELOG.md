@@ -1,7 +1,48 @@
 # SigmaOS — Sovereign Open Source Architecture Changelog
 
+## [v3010.0-Phase50] - Silicon IPC Bus, Crypto Engine & Audit Trail
+**Date**: 2026-04-12
+
+### 🟢 Sovereign Shards
+- **SovereignIPCShard**: Native D-Bus/Binder/Mach IPC/COM silicon message bus — typed channels, 16-deep FIFO, METHOD_CALL/SIGNAL/REPLY/ERROR dispatch. CLI: `sigma-ipc`.
+- **SovereignCryptoShard**: Native hardware-accelerated crypto (AES-NI/SHA/BoringSSL parity) — FIPS 180-4 SHA-256 with self-test at init, AES-128-ECB with AES-NI intrinsics path. CLI: `sigma-crypto sha256`.
+- **SovereignAuditShard**: Tamper-evident SHA-256 hash-chained audit ring (auditd/BSM/EVTX parity) — 9 event types, chain integrity verification, immediate ALERT for SUSPICIOUS/PRIV_ESC events. CLI: `sigma-audit`.
+
+### 🔥 CLI Milestone
+- **47+ commands** registered in the master `SovereignCLI` dispatcher.
+- Sync: GLOBAL MESH ACTIVE — commit `901a9cec1`.
+
+---
+
+## [v3009.0-Phase49] - DMA/Power/Config + Signal/VFS/NUMA Sovereignty
+**Date**: 2026-04-12
+
+### 🟢 Sovereign Shards
+- **SovereignDMAShard**: Intel VT-d/AMD-Vi/ARM SMMU — IOMMU domain isolation, quarantine. CLI: `sigma-dma`.
+- **SovereignPowerShard**: ACPI/cpufreq/TLP/Windows Plans — 4 power plans, P-state array, schedutil auto-governor. CLI: `sigma-power`.
+- **SovereignConfigShard**: NixOS/Registry/macOS defaults — 128-key typed register bank, atomic commit+rollback. CLI: `sigma-cfg`.
+- **SovereignSignalShard**: POSIX/Mach/SEH — handler-table dispatch, TERM/KILL/SEGV/USR defaults. CLI: `sigma-signal`.
+- **SovereignVFSShard**: Linux VFS/FUSE/APFS/Plan9 — pluggable backend op-table, SigmaExt4 built-in. CLI: `sigma-vfs`.
+- **SovereignNUMAShard**: Linux NUMA/libnuma/Windows NUMA — node latency matrix, local-first alloc, auto-balance. CLI: `sigma-numa`.
+
+---
+
+## [v3008.0-Phase48] - OOM + Journal + Trace + IRQ + Rollback + Firewall
+**Date**: 2026-04-12
+
+### 🟢 Sovereign Shards
+- **SovereignOOMShard**: Linux OOM Killer/Jetsam — score-based culling, 512MB/128MB thresholds. CLI: `sigma-oom`.
+- **SovereignJournalShard**: systemd-journal/syslog/EventLog — 64-entry lock-free ring, 8-level ANSI priority. CLI: `sigma-journal`.
+- **SovereignTraceShard**: strace/ptrace/DTrace/Frida/ETW — 128-event syscall ring, ns-timing, histogram. CLI: `sigma-trace`.
+- **SovereignIRQShard**: APIC/MSI-X/irqbalance — per-IRQ affinity + auto round-robin rebalance. CLI: `sigma-irq`.
+- **SovereignRollbackShard**: Btrfs/ZFS/NixOS/Time Machine — COW snapshot chain, zero-downtime rollback. CLI: `sigma-rollback`.
+- **SovereignFirewallShard**: nftables/iptables/pf/WFP — deny-by-default, ACCEPT/DROP/REJECT/LOG+ACCEPT. CLI: `sigma-fw`.
+
+---
+
 ## [v3007.0-Phase47] - Native DSA Sharding & HLL Modularization
 **Date**: 2026-04-12
+
 
 ### 🟢 Sovereign Shards (DSA & Visualizer Absorption)
 - **SovereignDSAShard**: Absorbed HLL JavaScript DSA visualizers into native C11/Assembly kernels. Implemented high-performance Quicksort with inline assembly `xchg` swap logic for absolute silicon sovereignty.
