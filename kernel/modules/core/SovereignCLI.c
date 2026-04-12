@@ -445,6 +445,9 @@ static int sigma_cmd_iouring(int argc, char **argv) {
 }
 
 static int sigma_cmd_gui(int argc, char **argv) {
+    (void)argc; (void)argv;
+    sigma_printf("Σ [GUI]: Requesting hardware-accelerated frame flush...\n");
+    sigma_window_server_flush_compositor();
     return 0;
 }
 

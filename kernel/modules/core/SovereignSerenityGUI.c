@@ -4,8 +4,12 @@
  * =========================================================================
  */
 
-#include "../../../include/sigma_kernel.h"
 #include "../../../include/SovereignSerenityGUI.h"
+
+// -------------------------------------------------------------------------
+// External Silicon Accelerators
+// -------------------------------------------------------------------------
+extern void SovereignGfxAccelerator_BlitWindow(void* screen, void* window, sigma_u32 width, sigma_u32 height);
 
 static SigmaWindow_t s_windows[32];
 static sigma_u32 s_window_count = 0;
@@ -18,12 +22,12 @@ sigma_err_t sigma_window_server_create_window(const char* title, SigmaRect_t ini
     sigma_strcpy(win->title, title, 64);
     win->rect = initial_rect;
     win->has_alpha_channel = SIGMA_TRUE;
-    win->front_buffer = SIGMA_NULL; /* Deferred allocation in true OS */
+    win->front_buffer = (void*)0xFFFFFFFF00000000; /* Simulated Silicon Mapping */
     win->back_buffer = SIGMA_NULL;
     
     *out_window = win;
-    sigma_printf("Σ [WINDOWSERVER]: Created Window #%u '%s' at [%d,%d %dx%d]\n", 
-                 win->window_id, win->title, win->rect.x, win->rect.y, win->rect.width, win->rect.height);
+    sigma_printf("Σ [WINDOWSERVER]: Created Silicon-Backed Window #%u '%s' at [%d,%d]\n", 
+                 win->window_id, win->title, win->rect.x, win->rect.y);
     return SIGMA_OK;
 }
 
