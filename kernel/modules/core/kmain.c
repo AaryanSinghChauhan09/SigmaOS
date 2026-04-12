@@ -5,6 +5,10 @@ void kmain(void) {
     
     /* Orchestrate all modular shards through the Master Aggregator */
     SovereignMaster_InitAll();
+
+    /* 4. Run Sovereign Functional Test Suite */
+    extern void SovereignFunctionalTest_Run(void);
+    SovereignFunctionalTest_Run();
     
     sigma_printf("--- Σ SIGMAOS ZENITH SUPREME IS NOW OPERATIONAL (MODULAR ARCHITECTURE). --- \n");
     for(;;);
