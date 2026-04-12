@@ -81,7 +81,8 @@ SECURITY_SHARDS := \
   kernel/modules/security/SovereignBioAuthShard.c   \
   kernel/modules/security/SovereignQuantumResilienceAlg.c \
   kernel/modules/security/SovereignHomomorphicAlg.c \
-  kernel/modules/security/SovereignZeroKnowledgeAlg.c
+  kernel/modules/security/SovereignZeroKnowledgeAlg.c \
+  kernel/modules/security/SovereignDefenderShard.c
 
 # System
 SYSTEM_SHARDS := \
@@ -136,6 +137,8 @@ SYSTEM_SHARDS := \
   kernel/modules/system/SovereignEcoShard.c         \
   kernel/modules/system/SovereignBluetoothShard.c   \
   kernel/modules/system/SovereignFaceTrackShard.c   \
+  kernel/modules/system/SovereignNeuralSynthShard.c \
+  kernel/modules/system/SovereignDockerShard.c      \
   kernel/modules/storage/SovereignRAIDShard.c       \
   kernel/modules/network/SovereignVPNShard.c
 

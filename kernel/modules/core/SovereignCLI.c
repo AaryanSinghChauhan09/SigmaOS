@@ -165,6 +165,9 @@
 #include "../../../include/SovereignRAIDShard.h"
 #include "../../../include/SovereignFaceTrackShard.h"
 #include "../../../include/SovereignVPNShard.h"
+#include "../../../include/SovereignNeuralSynthShard.h"
+#include "../../../include/SovereignDockerShard.h"
+#include "../../../include/SovereignDefenderShard.h"
 
 /* Global CLI context */
 SigmaCLICtx_t g_sigma_cli;
@@ -2888,6 +2891,36 @@ sigma_err_t sigma_cmd_vpn(int argc, char *argv[]) {
     return SIGMA_OK;
 }
 
+/* ---- sigma-voice -------------------------------------------------------- */
+sigma_err_t sigma_cmd_voice(int argc, char *argv[]) {
+    if (argc < 2) {
+        sigma_printf("Usage: sigma-voice [parse <wav_path>]\n");
+        return SIGMA_OK; }
+    if (sigma_streq(argv[1], "parse") && argc >= 3)
+        sigma_voice_parse(argv[2]);
+    return SIGMA_OK;
+}
+
+/* ---- sigma-docker ------------------------------------------------------- */
+sigma_err_t sigma_cmd_docker(int argc, char *argv[]) {
+    if (argc < 2) {
+        sigma_printf("Usage: sigma-docker [spawn <image_id>]\n");
+        return SIGMA_OK; }
+    if (sigma_streq(argv[1], "spawn") && argc >= 3)
+        sigma_container_spawn(argv[2]);
+    return SIGMA_OK;
+}
+
+/* ---- sigma-defender ----------------------------------------------------- */
+sigma_err_t sigma_cmd_defender(int argc, char *argv[]) {
+    if (argc < 2) {
+        sigma_printf("Usage: sigma-defender [scan <binary_path>]\n");
+        return SIGMA_OK; }
+    if (sigma_streq(argv[1], "scan") && argc >= 3)
+        sigma_defender_scan(argv[2]);
+    return SIGMA_OK;
+}
+
 /* ---- sigma-wizard ------------------------------------------------------ */
 sigma_err_t sigma_cmd_wizard(int argc, char *argv[]) {
     (void)argc; (void)argv;
@@ -3228,6 +3261,9 @@ void SovereignCLI_Init(void) {
     sigma_cli_register(&g_sigma_cli, "sigma-raid",        "ZFS Matrix Storage Assembly",     sigma_cmd_raid);
     sigma_cli_register(&g_sigma_cli, "sigma-eye",         "Spatial Gaze/Iris Tracking",      sigma_cmd_eye);
     sigma_cli_register(&g_sigma_cli, "sigma-vpn",         "WireGuard Silicon Networking",    sigma_cmd_vpn);
+    sigma_cli_register(&g_sigma_cli, "sigma-voice",       "Neural NLP Speech Synthesis",     sigma_cmd_voice);
+    sigma_cli_register(&g_sigma_cli, "sigma-docker",      "Silicon Microservice Containers", sigma_cmd_docker);
+    sigma_cli_register(&g_sigma_cli, "sigma-defender",    "Heuristic Execution Guard",       sigma_cmd_defender);
 
     sigma_cli_register(&g_sigma_cli, "sigma-help",  "Show this help",                       sigma_cmd_help);
 
