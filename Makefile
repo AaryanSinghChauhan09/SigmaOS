@@ -50,6 +50,7 @@ SUITE_SHARDS := \
   kernel/modules/core/cli/SovereignCLI_Core.c        \
   kernel/modules/core/cli/SovereignCLI_Essential.c   \
   kernel/modules/core/cli/SovereignCLI_DistroSuite.c \
+  kernel/modules/core/cli/SovereignCLI_DevSuite.c    \
   kernel/modules/core/cli/SovereignCLI_Registry.c    \
   kernel/modules/core/SovereignFunctionalTest.c      \
   kernel/modules/core/kmain.c                        \

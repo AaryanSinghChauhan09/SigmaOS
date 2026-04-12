@@ -13,8 +13,12 @@ void SovereignCLI_Register(void) {
     /* 3. Seat Linux-Grade Distro Tools (apt, pacman, top, neofetch, grep) */
     extern void SovereignCLI_DistroSuite_Register(void);
     SovereignCLI_DistroSuite_Register();
+
+    /* 4. Seat Developer-Grade Tools (git, python, cc, make) */
+    extern void SovereignCLI_DevSuite_Register(void);
+    SovereignCLI_DevSuite_Register();
     
-    sigma_printf("Σ [CLI-REGISTRY]: Industrial Command Omnibus (56+ Matrix) Seated.\n");
+    sigma_printf("Σ [CLI-REGISTRY]: Industrial Command Omnibus (80+ Matrix) Seated.\n");
 
     static SovereignModule_t s_cli_module = {
         .name = "SovereignCLI",
