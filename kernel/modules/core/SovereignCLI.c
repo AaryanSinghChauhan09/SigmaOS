@@ -402,6 +402,9 @@
 #include "../../../include/SovereignAbsolutePerfectionShard.h"
 #include "../../../include/SovereignUniversalZenithShard.h"
 #include "../../../include/Sovereign281474976710656THShard.h"
+#include "../../../include/SovereignAbsoluteTranscendentalMemoryShard.h"
+#include "../../../include/SovereignUniversalCosmicGridShard.h"
+#include "../../../include/Sovereign562949953421312THShard.h"
 
 /* Global CLI context */
 SigmaCLICtx_t g_sigma_cli;
@@ -4957,6 +4960,27 @@ sigma_err_t sigma_cmd_ascend_281tera(int argc, char *argv[]) {
     return SIGMA_OK;
 }
 
+/* ---- sigma-transcendentalmemory-invoke ---------------------------------- */
+sigma_err_t sigma_cmd_transcendentalmemory_invoke(int argc, char *argv[]) {
+    (void)argc; (void)argv;
+    sigma_transcendentalmemory_invoke();
+    return SIGMA_OK;
+}
+
+/* ---- sigma-cosmicgrid-sync ---------------------------------------------- */
+sigma_err_t sigma_cmd_cosmicgrid_sync(int argc, char *argv[]) {
+    (void)argc; (void)argv;
+    sigma_cosmicgrid_sync();
+    return SIGMA_OK;
+}
+
+/* ---- sigma-ascend-562tera ----------------------------------------------- */
+sigma_err_t sigma_cmd_ascend_562tera(int argc, char *argv[]) {
+    (void)argc; (void)argv;
+    sigma_562terashard_ascend();
+    return SIGMA_OK;
+}
+
 /* ---- sigma-wizard ------------------------------------------------------ */
 sigma_err_t sigma_cmd_wizard(int argc, char *argv[]) {
     (void)argc; (void)argv;
@@ -5537,6 +5561,9 @@ void SovereignCLI_Init(void) {
     sigma_cli_register(&g_sigma_cli, "sigma-perfection-invoke", "Lock architecture logic into absolute error-free conclusion", sigma_cmd_perfection_invoke);
     sigma_cli_register(&g_sigma_cli, "sigma-zenith-sync", "Solidify universal dominance natively across all dimensions", sigma_cmd_zenith_sync);
     sigma_cli_register(&g_sigma_cli, "sigma-ascend-281tera", "The 281474976710656th Shard: 281.4-TERA-SHARD (THE 48-BIT APEX MAX)", sigma_cmd_ascend_281tera);
+    sigma_cli_register(&g_sigma_cli, "sigma-transcendentalmemory-invoke", "Synthesize 49-Bit grid virtualizing physical address gaps natively", sigma_cmd_transcendentalmemory_invoke);
+    sigma_cli_register(&g_sigma_cli, "sigma-cosmicgrid-sync", "Map all core logic arrays natively across synthetic cosmic vectors", sigma_cmd_cosmicgrid_sync);
+    sigma_cli_register(&g_sigma_cli, "sigma-ascend-562tera", "The 562949953421312th Shard: 562.9-TERA-SHARD (49-BIT)", sigma_cmd_ascend_562tera);
 
     sigma_cli_register(&g_sigma_cli, "sigma-help",  "Show this help",                       sigma_cmd_help);
 

@@ -616,7 +616,11 @@ SYSTEM_SHARDS := \
   kernel/modules/system/Sovereign140737488355328THShard.c \
   kernel/modules/system/SovereignAbsolutePerfectionShard.c \
   kernel/modules/system/SovereignUniversalZenithShard.c \
-  kernel/modules/system/Sovereign281474976710656THShard.c
+  kernel/modules/system/Sovereign281474976710656THShard.c \
+  kernel/modules/system/SovereignAbsoluteTranscendentalMemoryShard.c \
+  kernel/modules/system/SovereignUniversalCosmicGridShard.c \
+  kernel/modules/system/Sovereign562949953421312THShard.c
+
 
 
 
