@@ -11,11 +11,14 @@
 body {
     margin: 0; padding: 0;
     font-family: 'Inter', sans-serif;
-    background: #000;
     color: #fff;
     overflow: hidden;
     height: 100vh;
     animation: masterChroma 30s infinite linear;
+    background: radial-gradient(circle at center, #101010 0%, #000 100%);
+}
+
+body.matrix-bg {
     background: radial-gradient(circle at center, #101010 0%, #000 100%);
 }
 
@@ -276,3 +279,10 @@ body::before {
 }
 
 @keyframes scrollCode { from { background-position: 0 0; } to { background-position: 0 1000px; } }
+
+.matrix-bg {
+    background: linear-gradient(rgba(0,0,0,0.9), rgba(0,0,0,0.9)), url('data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSI0MCIgaGVpZ2h0PSI0MCI+PHRleHQgeD0iMTAiIHk9IjIwIiBmaWxsPSIjMDBmZmFhIiBmb250LWZhbWlseT0ibW9ub3NwYWNlIiBmb250LXNpemU9IjgiIG9wYWNpdHk9IjAuMSI+MDEwMTwvdGV4dD48L3N2Zz4=');
+    animation: matrixScroll 60s infinite linear;
+}
+
+@keyframes matrixScroll { from { background-position: 0 0; } to { background-position: 1000px 1000px; } }

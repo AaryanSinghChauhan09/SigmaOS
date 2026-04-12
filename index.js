@@ -434,3 +434,21 @@ setInterval(() => {
         entropyBar.style.width = newEntropy + '%';
     }
 }, 10000);
+
+// Sovereign Nexus: Free-Look Zoom Orchestrator
+let currentZoom = 1;
+window.addEventListener('wheel', (e) => {
+    const cube = document.getElementById('cyber-cube');
+    currentZoom -= e.deltaY * 0.001;
+    currentZoom = Math.min(Math.max(currentZoom, 0.5), 2);
+    cube.style.transform += ' scale(' + currentZoom + ')';
+    console.log('S [NEXUS]: Adjusting Dimensional Scale to ' + currentZoom.toFixed(2) + 'x');
+});
+
+window.addEventListener('contextmenu', (e) => {
+    e.preventDefault();
+    const cube = document.getElementById('cyber-cube');
+    currentZoom = 1;
+    cube.style.transform = 'rotateX(-5deg) rotateY(-5deg) scale(1)';
+    console.log('S [NEXUS]: Resetting Dimensional Orientation.');
+});
