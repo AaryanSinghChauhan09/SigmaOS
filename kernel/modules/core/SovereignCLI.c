@@ -68,6 +68,8 @@
 #include "../../../include/SovereignSyncShard.h"
 #include "../../../include/SovereignTelemetryShard.h"
 #include "../../../include/SovereignPersonaShard.h"
+#include "../../../include/SovereignHotpatchShard.h"
+#include "../../../include/SovereignCgroupShard.h"
 
 /* Global CLI context */
 SigmaCLICtx_t g_sigma_cli;
@@ -1465,6 +1467,45 @@ sigma_err_t sigma_cmd_sigma_persona(int argc, char *argv[]) {
     return SIGMA_OK;
 }
 
+/* ---- sigma-hotpatch ---------------------------------------------------- */
+sigma_err_t sigma_cmd_hotpatch(int argc, char *argv[]) {
+    if (argc < 2) {
+        SovereignHotpatch_Audit();
+        sigma_printf("Usage: sigma-hotpatch [load <id> <target_addr> <patch_addr> | revert <id> | audit]\n");
+        return SIGMA_OK;
+    }
+    if (sigma_streq(argv[1], "load") && argc >= 5) {
+        sigma_hotpatch_load(argv[2],
+                            (sigma_u64)sigma_atoi(argv[3]),
+                            (sigma_u64)sigma_atoi(argv[4]));
+    } else if (sigma_streq(argv[1], "revert") && argc >= 3) {
+        sigma_hotpatch_revert(argv[2]);
+    } else if (sigma_streq(argv[1], "audit")) {
+        SovereignHotpatch_Audit();
+    }
+    return SIGMA_OK;
+}
+
+/* ---- sigma-cgroup ------------------------------------------------------ */
+sigma_err_t sigma_cmd_cgroup(int argc, char *argv[]) {
+    if (argc < 2) {
+        SovereignCgroup_Audit();
+        sigma_printf("Usage: sigma-cgroup [create <name> <cpu_pct> <mem_mb> <io_weight> | enforce | audit]\n");
+        return SIGMA_OK;
+    }
+    if (sigma_streq(argv[1], "create") && argc >= 6) {
+        sigma_cgroup_create(argv[2],
+                            (sigma_u32)sigma_atoi(argv[3]),
+                            (sigma_u64)sigma_atoi(argv[4]) * 1024ULL * 1024ULL,
+                            (sigma_u32)sigma_atoi(argv[5]));
+    } else if (sigma_streq(argv[1], "enforce")) {
+        sigma_cgroup_enforce();
+    } else if (sigma_streq(argv[1], "audit")) {
+        SovereignCgroup_Audit();
+    }
+    return SIGMA_OK;
+}
+
 /* ---- sigma-wizard ------------------------------------------------------ */
 sigma_err_t sigma_cmd_wizard(int argc, char *argv[]) {
     (void)argc; (void)argv;
@@ -1708,6 +1749,8 @@ void SovereignCLI_Init(void) {
     sigma_cli_register(&g_sigma_cli, "sigma-sync",        "Industrial Matrix Sync",          sigma_cmd_sync);
     sigma_cli_register(&g_sigma_cli, "sigma-tele",        "Silicon eBPF Telemetry",          sigma_cmd_tele);
     sigma_cli_register(&g_sigma_cli, "sigma-persona",     "Multi-User Persona Matrix",       sigma_cmd_sigma_persona);
+    sigma_cli_register(&g_sigma_cli, "sigma-hotpatch",    "Zero-Reboot Live Patching",       sigma_cmd_hotpatch);
+    sigma_cli_register(&g_sigma_cli, "sigma-cgroup",      "Silicon Resource Governor",       sigma_cmd_cgroup);
 
     sigma_cli_register(&g_sigma_cli, "sigma-help",  "Show this help",                       sigma_cmd_help);
 
