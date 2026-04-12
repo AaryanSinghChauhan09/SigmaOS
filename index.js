@@ -280,3 +280,26 @@ if(tSlider) {
         logConsole.style.filter = 'grayscale(' + (100-val)/100 + ') blur(' + (100-val)/50 + 'px)';
     });
 }
+
+// Infinite Cyber-Cube Rotation Orchestrator
+let cubeAngleX = -5; let cubeAngleY = -5;
+function autoRotateCube() {
+    if(!activeWin) {
+        const cube = document.getElementById('cyber-cube');
+        cubeAngleX += 0.05; cubeAngleY += 0.05;
+        cube.style.transform = 'rotateX(' + cubeAngleX + 'deg) rotateY(' + cubeAngleY + 'deg)';
+    }
+    requestAnimationFrame(autoRotateCube);
+}
+autoRotateCube();
+
+// Trans-Etheric Future Prediction
+setInterval(() => {
+    const futureLines = ['S [FUTURE]: Shard Convergence confirmed in Epoch T+1000.', 'S [FUTURE]: Omnipotence status: REACHED.', 'S [FUTURE]: Architectural loop closed.'];
+    const line = futureLines[Math.floor(Math.random() * futureLines.length)];
+    const div = document.createElement('div');
+    div.style.color = '#fff600'; div.style.fontSize = '0.7rem';
+    div.textContent = line;
+    logConsole.appendChild(div);
+    logConsole.scrollTop = logConsole.scrollHeight;
+}, 30000);

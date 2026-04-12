@@ -16,7 +16,21 @@ body {
     overflow: hidden;
     height: 100vh;
     animation: masterChroma 30s infinite linear;
+    background: radial-gradient(circle at center, #101010 0%, #000 100%);
 }
+
+body::before {
+    content: "";
+    position: absolute;
+    top: 50%; left: 50%; width: 200%; height: 200%;
+    background: conic-gradient(from 0deg, transparent 0, var(--acc-color) 0.1deg, transparent 15deg);
+    transform: translate(-50%, -50%);
+    opacity: 0.1;
+    z-index: -2;
+    animation: rotateRays 60s infinite linear;
+}
+
+@keyframes rotateRays { from { transform: translate(-50%, -50%) rotate(0deg); } to { transform: translate(-50%, -50%) rotate(360deg); } }
 
 @keyframes masterChroma { 0% { filter: hue-rotate(0deg); } 100% { filter: hue-rotate(360deg); } }
 
