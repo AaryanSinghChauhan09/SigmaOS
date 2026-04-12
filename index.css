@@ -66,7 +66,36 @@ body {
 .dashboard {
     display: grid;
     grid-template-columns: repeat(3, 1fr);
+    grid-template-rows: auto auto;
     gap: 30px;
+}
+
+.full-width { grid-column: span 3; }
+
+#satellite-map {
+    height: 150px;
+    background: url('https://upload.wikimedia.org/wikipedia/commons/e/ec/World_map_blank_without_borders.svg') center/contain no-repeat;
+    filter: invert(1) sepia(1) saturate(5) hue-rotate(100deg);
+    opacity: 0.2;
+    position: relative;
+    overflow: hidden;
+    border-radius: 8px;
+    margin: 15px 0;
+}
+
+#satellite-map::after {
+    content: "";
+    position: absolute;
+    top: 50%; left: 50%; width: 10px; height: 10px;
+    background: var(--acc-color);
+    border-radius: 50%;
+    box-shadow: 0 0 20px var(--acc-color);
+    animation: pulse 2s infinite;
+}
+
+@keyframes pulse {
+    0% { transform: scale(1); opacity: 1; }
+    100% { transform: scale(5); opacity: 0; }
 }
 
 .glass {
