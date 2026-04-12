@@ -68,18 +68,38 @@ static sigma_u32 cli_tokenise(const char *line,
 /* =========================================================================
  * § 2  CLI REGISTRATION HELPERS
  * ====================================================================== */
+
+static sigma_u32 sigma_cli_hash(const char *str) {
+    sigma_u32 hash = 5381;
+    int c;
+    while ((c = *str++)) hash = ((hash << 5) + hash) + c;
+    return hash % SIGMA_CLI_HASH_SIZE;
+}
+
 void sigma_cli_init(SigmaCLICtx_t *ctx) {
     sigma_memset(ctx, 0, sizeof(*ctx));
+    sigma_memset(ctx->hash_occupied, 0, sizeof(ctx->hash_occupied));
 }
 
 sigma_err_t sigma_cli_register(SigmaCLICtx_t *ctx,
                                 const char *name, const char *desc,
                                 SigmaCLIHandler_t handler) {
     if (ctx->cmd_count >= SIGMA_CLI_MAX_COMMANDS) return SIGMA_ENOSPC;
-    SigmaCLICmd_t *cmd = &ctx->cmds[ctx->cmd_count++];
-    sigma_strcpy(cmd->name,        name, SIGMA_CLI_NAME_MAX);
+
+    sigma_u32 h = sigma_cli_hash(name);
+    while (ctx->hash_occupied[h]) {
+        h = (h + 1) % SIGMA_CLI_HASH_SIZE; // Linear probing
+    }
+
+    SigmaCLICmd_t *cmd = &ctx->cmds[ctx->cmd_count];
+    sigma_strcpy(cmd->name, name, SIGMA_CLI_NAME_MAX);
     sigma_strcpy(cmd->description, desc, SIGMA_CLI_DESC_MAX);
     cmd->handler = handler;
+
+    ctx->hash_map[h] = (sigma_u16)ctx->cmd_count;
+    ctx->hash_occupied[h] = SIGMA_TRUE;
+    ctx->cmd_count++;
+
     return SIGMA_OK;
 }
 
@@ -89,10 +109,17 @@ sigma_err_t sigma_cli_dispatch(SigmaCLICtx_t *ctx, const char *cmdline) {
     sigma_u32 argc = cli_tokenise(cmdline, argv_buf, argv, CLI_ARGV_MAX);
     if (argc == 0) return SIGMA_OK;
 
-    for (sigma_u32 i = 0; i < ctx->cmd_count; i++) {
-        if (sigma_streq(ctx->cmds[i].name, argv[0]))
-            return ctx->cmds[i].handler((int)argc, argv);
+    sigma_u32 h = sigma_cli_hash(argv[0]);
+    sigma_u32 start = h;
+
+    while (ctx->hash_occupied[h]) {
+        SigmaCLICmd_t *cmd = &ctx->cmds[ctx->hash_map[h]];
+        if (sigma_streq(cmd->name, argv[0]))
+            return cmd->handler((int)argc, argv);
+        h = (h + 1) % SIGMA_CLI_HASH_SIZE;
+        if (h == start) break;
     }
+
     sigma_printf("Σ [CLI]: Unknown command: '%s'. Run 'sigma-help' for usage.\n", argv[0]);
     return SIGMA_ENOENT;
 }
@@ -462,6 +489,46 @@ sigma_err_t sigma_cmd_ai(int argc, char *argv[]) {
     return SIGMA_OK;
 }
 
+/* ---- sigma-wizard ------------------------------------------------------ */
+sigma_err_t sigma_cmd_wizard(int argc, char *argv[]) {
+    (void)argc; (void)argv;
+    sigma_printf("Σ [WIZARD]: Initiating native setup master...\n");
+    sigma_printf("Starting Sovereign Boot Wizard (v1.0) for Citizen Personalization...\n");
+    return SIGMA_OK;
+}
+
+/* ---- sigma-alias ------------------------------------------------------- */
+sigma_err_t sigma_cmd_alias(int argc, char *argv[]) {
+    if (argc < 3) {
+        sigma_printf("Usage: sigma-alias <new_name> <existing_command>\n");
+        return SIGMA_OK;
+    }
+    
+    // Find existing command
+    sigma_u32 h = sigma_cli_hash(argv[2]);
+    sigma_u32 start = h;
+    SigmaCLIHandler_t target_handler = SIGMA_NULL;
+    const char* target_desc = "Alias";
+    
+    while (g_sigma_cli.hash_occupied[h]) {
+        if (sigma_streq(g_sigma_cli.cmds[g_sigma_cli.hash_map[h]].name, argv[2])) {
+            target_handler = g_sigma_cli.cmds[g_sigma_cli.hash_map[h]].handler;
+            target_desc = g_sigma_cli.cmds[g_sigma_cli.hash_map[h]].description;
+            break;
+        }
+        h = (h + 1) % SIGMA_CLI_HASH_SIZE;
+        if (h == start) break;
+    }
+    
+    if (target_handler) {
+        sigma_cli_register(&g_sigma_cli, argv[1], target_desc, target_handler);
+        sigma_printf("Σ [ALIAS]: Linked '%s' -> '%s'.\n", argv[1], argv[2]);
+    } else {
+        sigma_printf("Σ [ALIAS]: Target command '%s' not found.\n", argv[2]);
+    }
+    return SIGMA_OK;
+}
+
 /* ---- sigma-svc --------------------------------------------------------- */
 /* Uses a global init context (extern from SovereignInitSystem.c) */
 static SigmaInitCtx_t s_svc_ctx_placeholder;   /* Standalone fallback */
@@ -621,6 +688,8 @@ void SovereignCLI_Init(void) {
     sigma_cli_register(&g_sigma_cli, "sigma-gui",     "SerenityOS GUI Server Control",        sigma_cmd_gui);
     sigma_cli_register(&g_sigma_cli, "sigma-personalize", "Aesthetics & Automation Control",  sigma_cmd_personalize);
     sigma_cli_register(&g_sigma_cli, "sigma-ai",          "Predictive Matrix Control",       sigma_cmd_ai);
+    sigma_cli_register(&g_sigma_cli, "sigma-wizard",      "Guided Setup Master",             sigma_cmd_wizard);
+    sigma_cli_register(&g_sigma_cli, "sigma-alias",       "Create command aliases",          sigma_cmd_alias);
 
     sigma_cli_register(&g_sigma_cli, "sigma-help",  "Show this help",                       sigma_cmd_help);
 

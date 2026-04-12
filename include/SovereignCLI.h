@@ -59,11 +59,16 @@ typedef struct {
 /* -------------------------------------------------------------------------
  * CLI context
  * ---------------------------------------------------------------------- */
-#define SIGMA_CLI_MAX_COMMANDS 64
+#define SIGMA_CLI_MAX_COMMANDS 128
+#define SIGMA_CLI_HASH_SIZE    256
 
 typedef struct {
     SigmaCLICmd_t cmds[SIGMA_CLI_MAX_COMMANDS];
     sigma_u32     cmd_count;
+    
+    // Hash Table for O(1) lookup
+    sigma_u16     hash_map[SIGMA_CLI_HASH_SIZE]; // Index into cmds[]
+    sigma_bool    hash_occupied[SIGMA_CLI_HASH_SIZE];
 } SigmaCLICtx_t;
 
 /* -------------------------------------------------------------------------
