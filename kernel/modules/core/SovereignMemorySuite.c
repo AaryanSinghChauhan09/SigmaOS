@@ -139,11 +139,11 @@ void SovereignVMM_Init(void) {
     sigma_printf("Σ [VMM-SUITE]: Memory Core online.\n");
 }
 
-void SovereignVMM_Register(void) {
-    static SovereignModule_t s_vmm_module = {
-        .name = "SovereignVMM",
+void SovereignMemory_Register(void) {
+    static SovereignModule_t s_mem_module = {
+        .name = "SovereignMemory",
         .type = MODULE_TYPE_CORE,
         .Init = (sigma_err_t(*)(void))SovereignVMM_Init,
     };
-    sigma_module_register(&s_vmm_module);
+    sigma_module_register(&s_mem_module);
 }

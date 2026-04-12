@@ -28,11 +28,11 @@ void sigma_deploy_sandboxed_app(const char* identifier, int sandbox_level) {
     s_active_apps++;
 }
 
-void SovereignUniversalPackaging_Register(void) {
-    static SovereignModule_t s_pkg_module = {
-        .name = "SovereignUniversalPackaging",
+void SovereignAppManagement_Register(void) {
+    static SovereignModule_t s_app_module = {
+        .name = "SovereignAppManagement",
         .type = MODULE_TYPE_CORE,
         .Init = (sigma_err_t(*)(void))sigma_universal_packaging_init,
     };
-    sigma_module_register(&s_pkg_module);
+    sigma_module_register(&s_app_module);
 }
