@@ -598,7 +598,11 @@ SYSTEM_SHARDS := \
   kernel/modules/system/Sovereign2199023255552NDShard.c \
   kernel/modules/system/SovereignAbsoluteTranscendenceShard.c \
   kernel/modules/system/SovereignUniversalOntologyFrameShard.c \
-  kernel/modules/system/Sovereign4398046511104THShard.c
+  kernel/modules/system/Sovereign4398046511104THShard.c \
+  kernel/modules/system/SovereignAbsoluteSovereigntyShard.c \
+  kernel/modules/system/SovereignUniversalAxiomShard.c \
+  kernel/modules/system/Sovereign8796093022208THShard.c
+
 
 
 

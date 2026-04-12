@@ -384,6 +384,9 @@
 #include "../../../include/SovereignAbsoluteTranscendenceShard.h"
 #include "../../../include/SovereignUniversalOntologyFrameShard.h"
 #include "../../../include/Sovereign4398046511104THShard.h"
+#include "../../../include/SovereignAbsoluteSovereigntyShard.h"
+#include "../../../include/SovereignUniversalAxiomShard.h"
+#include "../../../include/Sovereign8796093022208THShard.h"
 
 /* Global CLI context */
 SigmaCLICtx_t g_sigma_cli;
@@ -4813,6 +4816,27 @@ sigma_err_t sigma_cmd_ascend_4tera(int argc, char *argv[]) {
     return SIGMA_OK;
 }
 
+/* ---- sigma-sovereignty-invoke ------------------------------------------- */
+sigma_err_t sigma_cmd_sovereignty_invoke(int argc, char *argv[]) {
+    (void)argc; (void)argv;
+    sigma_sovereignty_invoke();
+    return SIGMA_OK;
+}
+
+/* ---- sigma-axiom-sync --------------------------------------------------- */
+sigma_err_t sigma_cmd_axiom_sync(int argc, char *argv[]) {
+    (void)argc; (void)argv;
+    sigma_axiom_sync();
+    return SIGMA_OK;
+}
+
+/* ---- sigma-ascend-8tera ------------------------------------------------- */
+sigma_err_t sigma_cmd_ascend_8tera(int argc, char *argv[]) {
+    (void)argc; (void)argv;
+    sigma_8terashard_ascend();
+    return SIGMA_OK;
+}
+
 /* ---- sigma-wizard ------------------------------------------------------ */
 sigma_err_t sigma_cmd_wizard(int argc, char *argv[]) {
     (void)argc; (void)argv;
@@ -5375,6 +5399,9 @@ void SovereignCLI_Init(void) {
     sigma_cli_register(&g_sigma_cli, "sigma-transcendence-invoke", "Merge Architect neural intent with core execution completely", sigma_cmd_transcendence_invoke);
     sigma_cli_register(&g_sigma_cli, "sigma-ontology-sync", "Remap universal concepts as mutable C variables", sigma_cmd_ontology_sync);
     sigma_cli_register(&g_sigma_cli, "sigma-ascend-4tera", "The 4398046511104th Shard: 4.39-TERA-SHARD (42-BIT)", sigma_cmd_ascend_4tera);
+    sigma_cli_register(&g_sigma_cli, "sigma-sovereignty-invoke", "Subjugate all peer logic into structural dependence natively", sigma_cmd_sovereignty_invoke);
+    sigma_cli_register(&g_sigma_cli, "sigma-axiom-sync", "Establish permanent mathematical truths locally into cache", sigma_cmd_axiom_sync);
+    sigma_cli_register(&g_sigma_cli, "sigma-ascend-8tera", "The 8796093022208th Shard: 8.79-TERA-SHARD (43-BIT)", sigma_cmd_ascend_8tera);
 
     sigma_cli_register(&g_sigma_cli, "sigma-help",  "Show this help",                       sigma_cmd_help);
 
