@@ -3,7 +3,7 @@
 #define SOVEREIGN_UNIVERSALSYNC_SHARD_H
 #include "sigma_types.h"
 
-void sigma_repo_matrix_sync (void);
-void SovereignUniversalSyncShard_Init (void);
+void sigma_sync_invoke(void);
+void SovereignUniversalSyncShard_Init(void);
 
 #endif

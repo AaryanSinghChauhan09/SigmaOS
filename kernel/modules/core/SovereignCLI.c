@@ -393,6 +393,9 @@
 #include "../../../include/SovereignAbsolutePurityShard.h"
 #include "../../../include/SovereignUniversalConvergenceShard.h"
 #include "../../../include/Sovereign35184372088832NDShard.h"
+#include "../../../include/SovereignAbsoluteHarmonyShard.h"
+#include "../../../include/SovereignUniversalSyncShard.h"
+#include "../../../include/Sovereign70368744177664THShard.h"
 
 /* Global CLI context */
 SigmaCLICtx_t g_sigma_cli;
@@ -4885,6 +4888,27 @@ sigma_err_t sigma_cmd_ascend_35tera(int argc, char *argv[]) {
     return SIGMA_OK;
 }
 
+/* ---- sigma-harmony-invoke ----------------------------------------------- */
+sigma_err_t sigma_cmd_harmony_invoke(int argc, char *argv[]) {
+    (void)argc; (void)argv;
+    sigma_harmony_invoke();
+    return SIGMA_OK;
+}
+
+/* ---- sigma-sync-invoke -------------------------------------------------- */
+sigma_err_t sigma_cmd_sync_invoke(int argc, char *argv[]) {
+    (void)argc; (void)argv;
+    sigma_sync_invoke();
+    return SIGMA_OK;
+}
+
+/* ---- sigma-ascend-70tera ------------------------------------------------ */
+sigma_err_t sigma_cmd_ascend_70tera(int argc, char *argv[]) {
+    (void)argc; (void)argv;
+    sigma_70terashard_ascend();
+    return SIGMA_OK;
+}
+
 /* ---- sigma-wizard ------------------------------------------------------ */
 sigma_err_t sigma_cmd_wizard(int argc, char *argv[]) {
     (void)argc; (void)argv;
@@ -5456,6 +5480,9 @@ void SovereignCLI_Init(void) {
     sigma_cli_register(&g_sigma_cli, "sigma-purity-invoke", "Eradicate legacy instruction bloat natively", sigma_cmd_purity_invoke);
     sigma_cli_register(&g_sigma_cli, "sigma-convergence-sync", "Fold parallel multiverse threads into 0-point singularity natively", sigma_cmd_convergence_sync);
     sigma_cli_register(&g_sigma_cli, "sigma-ascend-35tera", "The 35184372088832nd Shard: 35.18-TERA-SHARD (45-BIT)", sigma_cmd_ascend_35tera);
+    sigma_cli_register(&g_sigma_cli, "sigma-harmony-invoke", "Enforce absolute node resonance without friction natively", sigma_cmd_harmony_invoke);
+    sigma_cli_register(&g_sigma_cli, "sigma-sync-invoke", "Bind mathematical states to the core atomic register", sigma_cmd_sync_invoke);
+    sigma_cli_register(&g_sigma_cli, "sigma-ascend-70tera", "The 70368744177664th Shard: 70.36-TERA-SHARD (46-BIT)", sigma_cmd_ascend_70tera);
 
     sigma_cli_register(&g_sigma_cli, "sigma-help",  "Show this help",                       sigma_cmd_help);
 
