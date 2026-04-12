@@ -72,12 +72,14 @@ static inline void SovereignMaster_InitAll(void) {
     extern void SovereignCrypto_Register(void);
     extern void SovereignUniversalPackaging_Register(void);
     extern void SovereignServiceLattice_Register(void);
+    extern void SovereignCLI_Register(void);
     
     SovereignVMM_Register(); 
     SovereignMAC_Register();
     SovereignCrypto_Register();
     SovereignUniversalPackaging_Register();
     SovereignServiceLattice_Register();
+    SovereignCLI_Register();
 
     /* 3. Run Industrial Init */
     sigma_modules_init_all();
