@@ -163,8 +163,9 @@ document.getElementById('btn-explorer').addEventListener('click', () => openWind
 document.getElementById('btn-shell').addEventListener('click', () => {
     openWindow('win-shell');
     const shellOut = document.getElementById('shell-output');
-    shellOut.innerHTML = 'root@sigma-zenith:~# sigma-llm --predict<br>' + 
-                         '<span style="color: #ff00ff;">Σ [LLM]: Analyzing system shards... Predictions: 100% Stability.</span><br>' +
+    shellOut.innerHTML = 'root@sigma-zenith:~# sigma-sisp<br>' + 
+                         '<span style="color: #ffaa00;">Σ [SISP]: (defun sovereignty (os) (modularize os))</span><br>' +
+                         '<span style="color: #00ffaa;">=> OS-SUPREMACY-ACHIEVED</span><br>' +
                          'root@sigma-zenith:~# _';
 });
 document.getElementById('btn-home').addEventListener('click', () => {
