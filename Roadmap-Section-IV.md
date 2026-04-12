@@ -2,7 +2,10 @@
 
 ### A. Visual Design & Theming (60+ changes)
 
+<<<<<<< HEAD
 >
+=======
+>>>>>>> 99f2ef5 (chore: precise lint eradication via AST script algorithms)
 > **Target Shards**: `SovereignStyleZenith.c`, `SovereignDesktopZenith.h`
 
 | # | Item | Status | Priority | Target Shard |
@@ -70,7 +73,10 @@
 
 ### B. Interaction Design (70+ changes)
 
+<<<<<<< HEAD
 >
+=======
+>>>>>>> 99f2ef5 (chore: precise lint eradication via AST script algorithms)
 > **Target Shards**: `SovereignDesktopZenith.h`, `keyboard_master.c`, `personalizer.c`
 
 | # | Item | Status | Priority | Target Shard |
@@ -148,7 +154,10 @@
 
 ### C. Information Architecture (60+ changes)
 
+<<<<<<< HEAD
 >
+=======
+>>>>>>> 99f2ef5 (chore: precise lint eradication via AST script algorithms)
 > **Target Shards**: `SovereignDesktopZenith.h`, `SovereignSearch.c`, `shard_explorer.c`
 
 | # | Item | Status | Priority | Target Shard |
@@ -216,7 +225,10 @@
 
 ### D. Onboarding & Help System (50+ changes)
 
+<<<<<<< HEAD
 >
+=======
+>>>>>>> 99f2ef5 (chore: precise lint eradication via AST script algorithms)
 > **Target Shards**: `SovereignDesktopZenith.h`, `SovereignPersonalizerZenith.c`
 
 | # | Item | Status | Priority | Target Shard |
@@ -274,7 +286,10 @@
 
 ### E. Notifications & Feedback (50+ changes)
 
+<<<<<<< HEAD
 >
+=======
+>>>>>>> 99f2ef5 (chore: precise lint eradication via AST script algorithms)
 > **Target Shards**: `SovereignDesktopZenith.h`, `personalizer.c`, `health.c`
 
 | # | Item | Status | Priority | Target Shard |

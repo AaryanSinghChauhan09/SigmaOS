@@ -86,8 +86,13 @@ SigmaOS utilizes `SigmaVFS`—a sovereign filesystem approach that avoids the cl
 
 Security within SigmaOS is strictly enforced through **Sovereign Interference Guards** rather than standard antivirus signatures.
 
+<<<<<<< HEAD
 - **Kernel Panics Nulled**: Rogue processes attempting to access segmented memory bounds trigger the `SovereignSentinel`.
 - **Process Trapping**: The offending Shard is immediately suspended and unmapped from memory within microseconds.
+=======
+- **Kernel Panics Nulled**: Rogue processes attempting to access segmented memory bounds trigger the `SovereignSentinel`. 
+- **Process Trapping**: The offending Shard is immediately suspended and unmapped from memory within microseconds. 
+>>>>>>> 99f2ef5 (chore: precise lint eradication via AST script algorithms)
 - **Privacy Amnesic Feature**: Using `SigmaPrivacyAmnesic` tools, user sessions are wiped from RAM completely when the system locks. There are no persistence caches left for attackers to scrape.
 
 ---
@@ -108,7 +113,11 @@ VLC/Standard Media Competitor. Bypasses ffmpeg decoding wrappers and pipes H.265
 
 ### 7.3. Sigma Academy (`academy.c` & `ncert_core.c`)
 
+<<<<<<< HEAD
 Offline educational routing, fetching curriculum instantaneously from an uncompressed internal storage shard.
+=======
+Offline educational routing, fetching curriculum instantaneously from an uncompressed internal storage shard. 
+>>>>>>> 99f2ef5 (chore: precise lint eradication via AST script algorithms)
 
 ### 7.4. Sigma AI Matrix (`sigma_ai_distribute.c` & `SigmaAI.js`)
 
@@ -120,7 +129,11 @@ Removes PyTorch/Python completely. Processes neural network layers directly thro
 
 SigmaOS grants absolute tool autonomy. If you want a new application, build a Shard.
 
+<<<<<<< HEAD
 ### Rules of Development
+=======
+### Rules of Development:
+>>>>>>> 99f2ef5 (chore: precise lint eradication via AST script algorithms)
 
 1. **No External Wrappers**: Do not include `#include <stdio.h>` or Python files natively. Use `<SigmaC11.h>` and call native kernel utilities (`sigma_print`).
 2. **Respect the Void**: When your application terminates, it MUST release its memory structure completely to the SOD architecture to maintain the zero-background footprint rule.

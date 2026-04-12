@@ -21,7 +21,11 @@ In pursuit of **Absolute Silicon Sovereignty**, SigmaOS Zenith operates entirely
 ### 3. Gradient Descent Regression Procedure
 
 * **Location**: `kernel/shards/SovereignAI.c`
+<<<<<<< HEAD
 * **Procedure Algorithm**:
+=======
+* **Procedure Algorithm**: 
+>>>>>>> 99f2ef5 (chore: precise lint eradication via AST script algorithms)
     1. Initializes `dw` (Weight Derivative) and `db` (Bias Derivative) to 0.
     2. Summates predictive error over $N$ localized data points: `pred = (w * x) + b`.
     3. Normalizes updates utilizing the predefined alpha `(dw / n) * alpha`.

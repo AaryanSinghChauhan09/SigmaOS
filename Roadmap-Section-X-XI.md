@@ -2,7 +2,10 @@
 
 ### A. Testing Framework (50+ changes)
 
+<<<<<<< HEAD
 >
+=======
+>>>>>>> 99f2ef5 (chore: precise lint eradication via AST script algorithms)
 > **Target Shards**: new `test_framework_shard.c`, `SovereignDiagnosticsZenith.c`
 
 | # | Item | Status | Priority | Target Shard |
@@ -60,7 +63,10 @@
 
 ### B. Quality Metrics & Analysis (50+ changes)
 
+<<<<<<< HEAD
 >
+=======
+>>>>>>> 99f2ef5 (chore: precise lint eradication via AST script algorithms)
 > **Target Shards**: `SovereignDiagnosticsZenith.c`, `test_framework_shard.c`
 
 | # | Item | Status | Priority | Target Shard |
@@ -122,7 +128,10 @@
 
 ### A. Vision Accessibility (80+ changes)
 
+<<<<<<< HEAD
 >
+=======
+>>>>>>> 99f2ef5 (chore: precise lint eradication via AST script algorithms)
 > **Target Shards**: `SovereignStyleZenith.c`, `SovereignVoiceShard.c`, `SovereignDesktopZenith.h`
 
 | # | Item | Status | Priority | Target Shard |
@@ -210,7 +219,10 @@
 
 ### B. Hearing & Speech Accessibility (50+ changes)
 
+<<<<<<< HEAD
 >
+=======
+>>>>>>> 99f2ef5 (chore: precise lint eradication via AST script algorithms)
 > **Target Shards**: `SovereignVoiceShard.c`, `audio_engine_shard.c`, `SovereignDesktopZenith.h`
 
 | # | Item | Status | Priority | Target Shard |
@@ -243,7 +255,10 @@
 
 ### C. Motor & Cognitive Accessibility (40+ changes)
 
+<<<<<<< HEAD
 >
+=======
+>>>>>>> 99f2ef5 (chore: precise lint eradication via AST script algorithms)
 > **Target Shards**: `keyboard_master.c`, `SovereignDesktopZenith.h`, `personalizer.c`
 
 | # | Item | Status | Priority | Target Shard |

@@ -1,7 +1,14 @@
 # Σ SIGMAOS COMPREHENSIVE IMPROVEMENT ROADMAP — MASTER INDEX
 
+<<<<<<< HEAD
 ### **2,350 Engineering Items** | **11 Sections** | **Zero External Dependencies**
 
+=======
+
+### **2,350 Engineering Items** | **11 Sections** | **Zero External Dependencies**
+
+
+>>>>>>> 99f2ef5 (chore: precise lint eradication via AST script algorithms)
 #### Document Version: v1.0 | Date: 2026-04-02 | Classification: SOVEREIGN INTERNAL
 
 ---
@@ -83,7 +90,10 @@ Polish, optimization, and frontier capabilities.
 
 ### Phase 1: Foundation (Items ~670)
 
+<<<<<<< HEAD
 >
+=======
+>>>>>>> 99f2ef5 (chore: precise lint eradication via AST script algorithms)
 > **Focus**: All P0 items across all sections
 > **Estimated Complexity**: Maximum — establishes sovereign building blocks
 
@@ -100,7 +110,10 @@ Polish, optimization, and frontier capabilities.
 
 ### Phase 2: Expansion (Items ~1,044)
 
+<<<<<<< HEAD
 >
+=======
+>>>>>>> 99f2ef5 (chore: precise lint eradication via AST script algorithms)
 > **Focus**: All P1 items across all sections
 > **Estimated Complexity**: High — builds complete feature matrix
 
@@ -117,7 +130,10 @@ Polish, optimization, and frontier capabilities.
 
 ### Phase 3: Dominance (Items ~636)
 
+<<<<<<< HEAD
 >
+=======
+>>>>>>> 99f2ef5 (chore: precise lint eradication via AST script algorithms)
 > **Focus**: All P2 items — frontier features
 > **Estimated Complexity**: Variable — many are research-grade
 

@@ -2,7 +2,10 @@
 
 ### A. User Profile & Preferences (60+ changes)
 
+<<<<<<< HEAD
 >
+=======
+>>>>>>> 99f2ef5 (chore: precise lint eradication via AST script algorithms)
 > **Target Shards**: `personalizer.c`, `SovereignPersonalizerZenith.c`, `identity.c`
 
 | # | Item | Status | Priority | Target Shard |
@@ -70,7 +73,10 @@
 
 ### B. Desktop Environment Customization (60+ changes)
 
+<<<<<<< HEAD
 >
+=======
+>>>>>>> 99f2ef5 (chore: precise lint eradication via AST script algorithms)
 > **Target Shards**: `SovereignDesktopZenith.h`, `SovereignStyleZenith.c`
 
 | # | Item | Status | Priority | Target Shard |
@@ -138,7 +144,10 @@
 
 ### C. Application Experience Customization (60+ changes)
 
+<<<<<<< HEAD
 >
+=======
+>>>>>>> 99f2ef5 (chore: precise lint eradication via AST script algorithms)
 > **Target Shards**: `app_manager.c`, `personalizer.c`, `cgroup_shard.c`
 
 | # | Item | Status | Priority | Target Shard |
@@ -206,7 +215,10 @@
 
 ### D. Input Method Customization (60+ changes)
 
+<<<<<<< HEAD
 >
+=======
+>>>>>>> 99f2ef5 (chore: precise lint eradication via AST script algorithms)
 > **Target Shards**: `keyboard_master.c`, `SovereignVoiceShard.c`, `personalizer.c`
 
 | # | Item | Status | Priority | Target Shard |
@@ -274,7 +286,10 @@
 
 ### E. System Behavior Customization (60+ changes)
 
+<<<<<<< HEAD
 >
+=======
+>>>>>>> 99f2ef5 (chore: precise lint eradication via AST script algorithms)
 > **Target Shards**: `sovereign_auto.c`, `personalizer.c`, `registry.c`
 
 | # | Item | Status | Priority | Target Shard |
@@ -342,7 +357,10 @@
 
 ### F. Performance Customization (60+ changes)
 
+<<<<<<< HEAD
 >
+=======
+>>>>>>> 99f2ef5 (chore: precise lint eradication via AST script algorithms)
 > **Target Shards**: `scheduler.c`, `SovereignSiliconPulse.asm`, `health.c`
 
 | # | Item | Status | Priority | Target Shard |

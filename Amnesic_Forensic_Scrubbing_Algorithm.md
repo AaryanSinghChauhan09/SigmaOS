@@ -12,7 +12,11 @@ Instead of moving memory buffers to a garbage collector layer, the Amnesic Shard
 
 ### 2. Multi-Pass Zero Allocation
 
+<<<<<<< HEAD
 The core logic forces a silicon-tier value set operation containing only raw zeroes (`0x00`).
+=======
+The core logic forces a silicon-tier value set operation containing only raw zeroes (`0x00`). 
+>>>>>>> 99f2ef5 (chore: precise lint eradication via AST script algorithms)
 
 * **Procedure Hook**: `executeAmnesicScrub()`
 * It implements `setInterval` timing controls, progressively incrementing across the sector space (RAM-Disk array blocks) mapped within the JS-Kernel boundary.

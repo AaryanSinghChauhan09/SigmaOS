@@ -18,7 +18,11 @@ Rather than bloat the kernel with dormant capabilities, SigmaOS uses a modular s
 
 ## 3. The "Zenith-Gold" Acoustic and Visual Philosophy
 
+<<<<<<< HEAD
 SigmaOS understands that high performance does not excuse poor aesthetics. The command-line architecture and integrated tools follow the premium Zenith-Gold aesthetic pattern, ensuring that pure efficiency is coupled with an unparalleled user experience.
+=======
+SigmaOS understands that high performance does not excuse poor aesthetics. The command-line architecture and integrated tools follow the premium Zenith-Gold aesthetic pattern, ensuring that pure efficiency is coupled with an unparalleled user experience. 
+>>>>>>> 99f2ef5 (chore: precise lint eradication via AST script algorithms)
 
 ## 4. Unrivaled Bare-Metal Execution
 

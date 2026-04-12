@@ -128,6 +128,10 @@ typedef signed long long   sigma_i64;
 
 ## ADDED FROM Architecture-OOPS.md
 
+<<<<<<< HEAD
+=======
+
+>>>>>>> 99f2ef5 (chore: precise lint eradication via AST script algorithms)
 # Σ SIGMAOS: ARCHITECTURE & OOPS FINALITY
 
 [![OOPS](https://img.shields.io/badge/Architecture-OOPS-blue?style=for-the-badge)]()

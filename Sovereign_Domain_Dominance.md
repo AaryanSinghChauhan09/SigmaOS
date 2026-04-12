@@ -7,10 +7,19 @@ SigmaOS does not just compete structurally as a kernel. It is explicitly enginee
 ## 🧠 Artificial Intelligence (AI) and Machine Learning (ML)
 
 **The Competition:** Web-based wrappers, bloated Python runtime environments (Anaconda, PyTorch overheads).
+<<<<<<< Updated upstream
 
+=======
+<<<<<<< HEAD
+>>>>>>> Stashed changes
 **SigmaOS Superiority:**
 
 - The **`SovereignAIKernelZenith.c`** utilizes zero-copy DMA buffers to route GPU tensor calculations directly from the Shard.
+=======
+**SigmaOS Superiority:** 
+
+- The **`SovereignAIKernelZenith.c`** utilizes zero-copy DMA buffers to route GPU tensor calculations directly from the Shard. 
+>>>>>>> 99f2ef5 (chore: precise lint eradication via AST script algorithms)
 - You don't "open an AI app." The entire `omni_shell` utilizes natural language processing (NLP) natively. The AI is the substrate of the OS, not a plugin.
 
 ## 📊 Data Science (DS) and DSA
@@ -19,7 +28,11 @@ SigmaOS does not just compete structurally as a kernel. It is explicitly enginee
 
 **SigmaOS Superiority:**
 
+<<<<<<< HEAD
 - Data Structures and Algorithms exist as **intrinsic hardware structures**.
+=======
+- Data Structures and Algorithms exist as **intrinsic hardware structures**. 
+>>>>>>> 99f2ef5 (chore: precise lint eradication via AST script algorithms)
 - The `SigmaDS.js` UI orchestrator and C11 sorting topologies map millions of rows using the native Slab Allocator (`sigma_slab_alloc`) instead of garbage-collected wrappers.
 - Time complexities are guaranteed mathematically on bare metal: QuickSort runs exactly at O(N log N) with no background `systemd` daemons interrupting CPU cycles.
 
@@ -29,10 +42,21 @@ SigmaOS does not just compete structurally as a kernel. It is explicitly enginee
 
 **SigmaOS Superiority:**
 
+<<<<<<< HEAD
 - The **Developer Persona** unlocks the entire OS. Every tool is pure C11.
 - There is no obfuscation. A CS student on SigmaOS learns exactly how memory paging, POSIX, and compilers interact because they are not hidden behind abstraction layers.
 
+<<<<<<< Updated upstream
 ## ⚖️ Indian Law and Jurisprudence
+=======
+## ⚖️ Indian Law & Jurisprudence
+=======
+- The **Developer Persona** unlocks the entire OS. Every tool is pure C11. 
+- There is no obfuscation. A CS student on SigmaOS learns exactly how memory paging, POSIX, and compilers interact because they are not hidden behind abstraction layers.
+
+## ⚖️ Indian Law & Jurisprudence 
+>>>>>>> 99f2ef5 (chore: precise lint eradication via AST script algorithms)
+>>>>>>> Stashed changes
 
 **The Competition:** Paid, slow, cloud-dependent platforms like SCC Online or Manupatra.
 
@@ -48,6 +72,10 @@ SigmaOS does not just compete structurally as a kernel. It is explicitly enginee
 
 **SigmaOS Superiority:**
 
+<<<<<<< HEAD
 - The **`ncert_core.c` Shard** literally injects the syllabus into the OS routing.
+=======
+- The **`ncert_core.c` Shard** literally injects the syllabus into the OS routing. 
+>>>>>>> 99f2ef5 (chore: precise lint eradication via AST script algorithms)
 - When the **Student Persona** is engaged (`sigma_invoke ncert 12 physics`), the OS drops all social media network packets natively at the NIC and mounts the educational workspace directly to the framebuffer.
 - Unparalleled focus. Zero subscriptions. Bare-metal pedagogical execution.

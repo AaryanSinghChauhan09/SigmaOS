@@ -2,7 +2,10 @@
 
 ### A. CPU Optimization (60+ changes)
 
+<<<<<<< HEAD
 >
+=======
+>>>>>>> 99f2ef5 (chore: precise lint eradication via AST script algorithms)
 > **Target Shards**: `scheduler.c`, `SovereignSiliconPulse.asm`, `task_switch.asm`
 
 | # | Item | Status | Priority | Target Shard |
@@ -70,7 +73,10 @@
 
 ### B. Memory Optimization (60+ changes)
 
+<<<<<<< HEAD
 >
+=======
+>>>>>>> 99f2ef5 (chore: precise lint eradication via AST script algorithms)
 > **Target Shards**: `SovereignMemoryZenith.c`, `SovereignMemoryRAII.c`, `zram_shard.c`
 
 | # | Item | Status | Priority | Target Shard |
@@ -138,7 +144,10 @@
 
 ### C. Storage I/O Optimization (60+ changes)
 
+<<<<<<< HEAD
 >
+=======
+>>>>>>> 99f2ef5 (chore: precise lint eradication via AST script algorithms)
 > **Target Shards**: `io_scheduler.c`, `vfs.c`, `SovereignFileSystemZenith.c`
 
 | # | Item | Status | Priority | Target Shard |
@@ -206,7 +215,10 @@
 
 ### D. Network I/O Optimization (50+ changes)
 
+<<<<<<< HEAD
 >
+=======
+>>>>>>> 99f2ef5 (chore: precise lint eradication via AST script algorithms)
 > **Target Shards**: `net.c`, `SovereignNetMesh.c`, `sovereign_bpf.c`
 
 | # | Item | Status | Priority | Target Shard |
@@ -264,7 +276,10 @@
 
 ### E. Caching Strategy (50+ changes)
 
+<<<<<<< HEAD
 >
+=======
+>>>>>>> 99f2ef5 (chore: precise lint eradication via AST script algorithms)
 > **Target Shards**: `SovereignMemoryZenith.c`, `vfs.c`, `net.c`
 
 | # | Item | Status | Priority | Target Shard |
