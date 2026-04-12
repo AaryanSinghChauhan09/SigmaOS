@@ -76,6 +76,12 @@
 #include "../../../include/SovereignIRQShard.h"
 #include "../../../include/SovereignRollbackShard.h"
 #include "../../../include/SovereignFirewallShard.h"
+#include "../../../include/SovereignDMAShard.h"
+#include "../../../include/SovereignPowerShard.h"
+#include "../../../include/SovereignConfigShard.h"
+#include "../../../include/SovereignSignalShard.h"
+#include "../../../include/SovereignVFSShard.h"
+#include "../../../include/SovereignNUMAShard.h"
 
 /* Global CLI context */
 SigmaCLICtx_t g_sigma_cli;
@@ -1621,6 +1627,98 @@ sigma_err_t sigma_cmd_fw(int argc, char *argv[]) {
     return SIGMA_OK;
 }
 
+/* ---- sigma-dma --------------------------------------------------------- */
+sigma_err_t sigma_cmd_dma(int argc, char *argv[]) {
+    if (argc < 2) { SovereignDMA_Audit();
+        sigma_printf("Usage: sigma-dma [map <bdf> <iova> <pa> <size_kb> | quarantine <bdf> | sweep | audit]\n");
+        return SIGMA_OK; }
+    if (sigma_streq(argv[1], "map") && argc >= 6)
+        sigma_dma_map(argv[2], (sigma_u64)sigma_atoi(argv[3]),
+                      (sigma_u64)sigma_atoi(argv[4]),
+                      (sigma_u64)sigma_atoi(argv[5]) * 1024ULL, DMA_PROT_RW);
+    else if (sigma_streq(argv[1], "quarantine") && argc >= 3)
+        sigma_dma_quarantine(argv[2]);
+    else if (sigma_streq(argv[1], "sweep"))
+        sigma_dma_integrity_sweep();
+    else if (sigma_streq(argv[1], "audit"))
+        SovereignDMA_Audit();
+    return SIGMA_OK;
+}
+
+/* ---- sigma-power ------------------------------------------------------- */
+sigma_err_t sigma_cmd_power(int argc, char *argv[]) {
+    if (argc < 2) { SovereignPower_Audit();
+        sigma_printf("Usage: sigma-power [plan <0-3> | govern | audit]\n");
+        return SIGMA_OK; }
+    if (sigma_streq(argv[1], "plan") && argc >= 3)
+        sigma_power_set_plan((SigmaPowerPlan_t)sigma_atoi(argv[2]));
+    else if (sigma_streq(argv[1], "govern"))
+        sigma_power_auto_govern();
+    else if (sigma_streq(argv[1], "audit"))
+        SovereignPower_Audit();
+    return SIGMA_OK;
+}
+
+/* ---- sigma-cfg --------------------------------------------------------- */
+sigma_err_t sigma_cmd_cfg(int argc, char *argv[]) {
+    if (argc < 2) { SovereignConfig_Audit();
+        sigma_printf("Usage: sigma-cfg [set <key> <val> | get <key> | commit <tag> | rollback | audit]\n");
+        return SIGMA_OK; }
+    if (sigma_streq(argv[1], "set") && argc >= 4)
+        sigma_cfg_set(argv[2], argv[3], CFG_STRING, SIGMA_FALSE);
+    else if (sigma_streq(argv[1], "get") && argc >= 3)
+        sigma_printf("[CFG]: %s = %s\n", argv[2], sigma_cfg_get(argv[2]));
+    else if (sigma_streq(argv[1], "commit") && argc >= 3)
+        sigma_cfg_commit(argv[2]);
+    else if (sigma_streq(argv[1], "rollback"))
+        sigma_cfg_rollback();
+    else if (sigma_streq(argv[1], "audit"))
+        SovereignConfig_Audit();
+    return SIGMA_OK;
+}
+
+/* ---- sigma-signal ------------------------------------------------------ */
+sigma_err_t sigma_cmd_signal(int argc, char *argv[]) {
+    if (argc < 2) { SovereignSignal_Audit();
+        sigma_printf("Usage: sigma-signal [send <pid> <signum> | audit]\n");
+        return SIGMA_OK; }
+    if (sigma_streq(argv[1], "send") && argc >= 4)
+        sigma_signal_send((sigma_u32)sigma_atoi(argv[2]),
+                          (SigmaSignal_t)sigma_atoi(argv[3]));
+    else if (sigma_streq(argv[1], "audit"))
+        SovereignSignal_Audit();
+    return SIGMA_OK;
+}
+
+/* ---- sigma-vfs --------------------------------------------------------- */
+sigma_err_t sigma_cmd_vfs(int argc, char *argv[]) {
+    if (argc < 2) { SovereignVFS_Audit();
+        sigma_printf("Usage: sigma-vfs [mount <dev> <mp> <fstype> | umount <mp> | audit]\n");
+        return SIGMA_OK; }
+    if (sigma_streq(argv[1], "mount") && argc >= 5)
+        sigma_vfs_mount(argv[2], argv[3], argv[4], SIGMA_FALSE);
+    else if (sigma_streq(argv[1], "umount") && argc >= 3)
+        sigma_vfs_umount(argv[2]);
+    else if (sigma_streq(argv[1], "audit"))
+        SovereignVFS_Audit();
+    return SIGMA_OK;
+}
+
+/* ---- sigma-numa -------------------------------------------------------- */
+sigma_err_t sigma_cmd_numa(int argc, char *argv[]) {
+    if (argc < 2) { SovereignNUMA_Audit();
+        sigma_printf("Usage: sigma-numa [alloc <node> <size_mb> | balance | audit]\n");
+        return SIGMA_OK; }
+    if (sigma_streq(argv[1], "alloc") && argc >= 4)
+        sigma_numa_alloc((sigma_u32)sigma_atoi(argv[2]),
+                         (sigma_u64)sigma_atoi(argv[3]));
+    else if (sigma_streq(argv[1], "balance"))
+        sigma_numa_balance();
+    else if (sigma_streq(argv[1], "audit"))
+        SovereignNUMA_Audit();
+    return SIGMA_OK;
+}
+
 /* ---- sigma-wizard ------------------------------------------------------ */
 sigma_err_t sigma_cmd_wizard(int argc, char *argv[]) {
     (void)argc; (void)argv;
@@ -1872,6 +1970,12 @@ void SovereignCLI_Init(void) {
     sigma_cli_register(&g_sigma_cli, "sigma-irq",         "Silicon IRQ Affinity Manager",    sigma_cmd_irq);
     sigma_cli_register(&g_sigma_cli, "sigma-rollback",    "COW Snapshot & Rollback",         sigma_cmd_rollback);
     sigma_cli_register(&g_sigma_cli, "sigma-fw",          "Silicon Packet Firewall",         sigma_cmd_fw);
+    sigma_cli_register(&g_sigma_cli, "sigma-dma",         "IOMMU/DMA Domain Manager",        sigma_cmd_dma);
+    sigma_cli_register(&g_sigma_cli, "sigma-power",       "Silicon CPU Power Governor",      sigma_cmd_power);
+    sigma_cli_register(&g_sigma_cli, "sigma-cfg",         "Declarative Config Manager",      sigma_cmd_cfg);
+    sigma_cli_register(&g_sigma_cli, "sigma-signal",      "Silicon Signal Dispatcher",       sigma_cmd_signal);
+    sigma_cli_register(&g_sigma_cli, "sigma-vfs",         "Virtual Filesystem Layer",        sigma_cmd_vfs);
+    sigma_cli_register(&g_sigma_cli, "sigma-numa",        "NUMA Topology Manager",           sigma_cmd_numa);
 
     sigma_cli_register(&g_sigma_cli, "sigma-help",  "Show this help",                       sigma_cmd_help);
 
