@@ -78,7 +78,9 @@ SECURITY_SHARDS := \
   kernel/modules/security/SovereignQuantumShard.c   \
   kernel/modules/security/SovereignSandboxShard.c   \
   kernel/modules/security/SovereignBioAuthShard.c   \
-  kernel/modules/security/SovereignQuantumResilienceAlg.c
+  kernel/modules/security/SovereignQuantumResilienceAlg.c \
+  kernel/modules/security/SovereignHomomorphicAlg.c \
+  kernel/modules/security/SovereignZeroKnowledgeAlg.c
 
 # System
 SYSTEM_SHARDS := \
@@ -124,7 +126,8 @@ SYSTEM_SHARDS := \
   kernel/modules/system/SovereignNeuralInterfaceShard.c \
   kernel/modules/system/SovereignAutoHealingAlg.c   \
   kernel/modules/system/SovereignSiliconDefectTest.c\
-  kernel/modules/system/SovereignMacroAutomationAlg.c
+  kernel/modules/system/SovereignMacroAutomationAlg.c \
+  kernel/modules/system/SovereignExokernelShard.c
 
 # Filesystem
 FS_SHARDS := \

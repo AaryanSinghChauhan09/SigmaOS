@@ -152,6 +152,9 @@
 #include "../../../include/SovereignQuantumResilienceAlg.h"
 #include "../../../include/SovereignSiliconDefectTest.h"
 #include "../../../include/SovereignMacroAutomationAlg.h"
+#include "../../../include/SovereignExokernelShard.h"
+#include "../../../include/SovereignHomomorphicAlg.h"
+#include "../../../include/SovereignZeroKnowledgeAlg.h"
 
 /* Global CLI context */
 SigmaCLICtx_t g_sigma_cli;
@@ -2750,6 +2753,36 @@ sigma_err_t sigma_cmd_macro(int argc, char *argv[]) {
     return SIGMA_OK;
 }
 
+/* ---- sigma-exo ---------------------------------------------------------- */
+sigma_err_t sigma_cmd_exo(int argc, char *argv[]) {
+    if (argc < 2) {
+        sigma_printf("Usage: sigma-exo [bypass <pid>]\n");
+        return SIGMA_OK; }
+    if (sigma_streq(argv[1], "bypass") && argc >= 3)
+        sigma_exo_bypass((sigma_u32)sigma_atoi(argv[2]));
+    return SIGMA_OK;
+}
+
+/* ---- sigma-fhe ---------------------------------------------------------- */
+sigma_err_t sigma_cmd_fhe(int argc, char *argv[]) {
+    if (argc < 2) {
+        sigma_printf("Usage: sigma-fhe [compute]\n");
+        return SIGMA_OK; }
+    if (sigma_streq(argv[1], "compute"))
+        sigma_fhe_compute();
+    return SIGMA_OK;
+}
+
+/* ---- sigma-zk ----------------------------------------------------------- */
+sigma_err_t sigma_cmd_zk(int argc, char *argv[]) {
+    if (argc < 2) {
+        sigma_printf("Usage: sigma-zk [prove]\n");
+        return SIGMA_OK; }
+    if (sigma_streq(argv[1], "prove"))
+        sigma_zk_prove();
+    return SIGMA_OK;
+}
+
 /* ---- sigma-wizard ------------------------------------------------------ */
 sigma_err_t sigma_cmd_wizard(int argc, char *argv[]) {
     (void)argc; (void)argv;
@@ -3077,6 +3110,9 @@ void SovereignCLI_Init(void) {
     sigma_cli_register(&g_sigma_cli, "sigma-pqc",         "Post-Quantum Defense Tester",     sigma_cmd_pqc);
     sigma_cli_register(&g_sigma_cli, "sigma-silicon",     "L1/L2 Cache Microcode Tester",    sigma_cmd_silicon);
     sigma_cli_register(&g_sigma_cli, "sigma-macro",       "Custom O/S Profile Automation",   sigma_cmd_macro);
+    sigma_cli_register(&g_sigma_cli, "sigma-exo",         "Hardware Exokernel PID Bypass",   sigma_cmd_exo);
+    sigma_cli_register(&g_sigma_cli, "sigma-fhe",         "Homomorphic Ciphertext Compute",  sigma_cmd_fhe);
+    sigma_cli_register(&g_sigma_cli, "sigma-zk",          "Zero-Knowledge Truth Prover",     sigma_cmd_zk);
 
     sigma_cli_register(&g_sigma_cli, "sigma-help",  "Show this help",                       sigma_cmd_help);
 
