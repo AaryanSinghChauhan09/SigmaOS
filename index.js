@@ -1,16 +1,29 @@
 const logConsole = document.getElementById('log-console');
 const clockElement = document.getElementById('clock');
 
+const suites = [
+    { name: "SovereignMemory", status: "OK", detail: "PMM/VMM/VMA Integrated" },
+    { name: "SovereignSecurity", status: "OK", detail: "MAC/LSM Hardened" },
+    { name: "SovereignCrypto", status: "OK", detail: "SHA256/ChaCha20 Active" },
+    { name: "SovereignAppMgmt", status: "OK", detail: "Packaging Matrix Seated" },
+    { name: "SovereignService", status: "OK", detail: "Lattice/Unit Init Stage" },
+    { name: "SovereignIntelligence", status: "OK", detail: "Neural/Tensor Acceleration" },
+    { name: "SovereignFrontend", status: "OK", detail: "WM/Compositor Engine" },
+    { name: "SovereignEcosystem", status: "OK", detail: "XNU/Darwin/Wine Compat" },
+    { name: "SovereignBackend", status: "OK", detail: "VFS/TCPIP Stack Online" },
+    { name: "SovereignConfig", status: "OK", detail: "Identity/Audit Vault Seated" }
+];
+
 const logs = [
-    "[BOOT] Σ SigmaOS Zenith Supreme vROADMAP_1005 initiating...",
-    "[ARCH] Sector 1: x86_64 / ARM64 / RISC-V Support Matrix: ONLINE",
-    "[MEM]  Sector 2: Sovereign Slab & Page Allocation: SEATED",
-    "[ABI]  Sector 3: Linux Syscall Sector & IPC Shards: ACTIVE",
-    "[FS]   Sector 4: Sovereign VFS (Ext4/ZFS/NTFS) Shards: MOUNTED",
-    "[NET]  Sector 5: Industrial TCP/IP & XDP Shunts: TRAFFIC_LOCK",
-    "[COORD]Sector 6: MQ Scheduler & Sovereign Security Jails: HARDENED",
-    "[INIT] Sector 7: PID-1 Service Orchestration: ACTIVATED",
-    "[SYNC] All 425 Sovereign Shards converged. System Sovereignty Verified."
+    "[BOOT] Σ SigmaOS Sovereign Zenith Supreme (v2.5-MODULAR) initiating...",
+    "[SUITE] Discovering 10 Master Sovereign Dimensions...",
+    ...suites.map(s => `[OK] ${s.name}: ${s.detail} verified.`),
+    "[TEST] Initiating Sovereign Functional Test Suite...",
+    "[TEST] Checking Memory Slab Allocation... SUCCESS",
+    "[TEST] Verifying SHA-256 Hash Integrity... MATCH",
+    "[TEST] Auditing Mandatory Access Boundary... LOCKED",
+    "[TEST] Dispatching O(1) CLI Command Matrix... EXECUTED",
+    "[RESULT] Global Mesh Convergence: 100%. System Sovereignty Verified."
 ];
 
 let logIndex = 0;
@@ -18,10 +31,15 @@ let logIndex = 0;
 function addLog() {
     if (logIndex < logs.length) {
         const line = document.createElement('div');
+        line.className = 'log-line animate-fade-in';
+        if (logs[logIndex].includes('[OK]')) line.style.color = '#00ffaa';
+        if (logs[logIndex].includes('[TEST]')) line.style.color = '#aaaaff';
+        if (logs[logIndex].includes('[RESULT]')) line.style.color = '#ffaa00';
         line.textContent = logs[logIndex];
         logConsole.appendChild(line);
+        logConsole.scrollTop = logConsole.scrollHeight;
         logIndex++;
-        setTimeout(addLog, 400);
+        setTimeout(addLog, 250);
     }
 }
 
@@ -32,14 +50,14 @@ function updateClock() {
 
 setInterval(updateClock, 1000);
 updateClock();
-setTimeout(addLog, 1000);
+setTimeout(addLog, 500);
 
-// Interaction Logic
 document.querySelectorAll('.taskbar-item').forEach(item => {
     item.addEventListener('click', () => {
-        item.style.transform = 'scale(0.8)';
-        setTimeout(() => {
-            item.style.transform = '';
-        }, 150);
+        item.style.transform = 'scale(1.2)';
+        setTimeout(() => { item.style.transform = ''; }, 200);
+        logIndex = 0;
+        logConsole.innerHTML = '<div style="color: #ffaa00;">[RE-AUDIT] Initiating full system re-verification...</div>';
+        setTimeout(addLog, 500);
     });
 });

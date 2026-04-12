@@ -1,194 +1,106 @@
 :root {
-    --bg-color: #050508;
-    --primary: #6366f1;
-    --secondary: #a855f7;
-    --accent: #22d3ee;
-    --glass: rgba(255, 255, 255, 0.03);
-    --glass-border: rgba(255, 255, 255, 0.1);
-    --text: #f8fafc;
-    --text-dim: #94a3b8;
-    --font: 'Inter', system-ui, -apple-system, sans-serif;
-}
-
-.stat-meta-accent {
-    color: var(--accent);
-    font-size: 12px;
-    margin-top: 20px;
-}
-
-.stat-meta-secondary {
-    color: var(--secondary);
-    font-size: 12px;
-    margin-top: 20px;
-}
-
-* {
-    margin: 0;
-    padding: 0;
-    box-sizing: border-box;
+    --bg-color: #050505;
+    --acc-color: #00ffaa;
+    --glass: rgba(255, 255, 255, 0.05);
+    --glass-dark: rgba(0, 0, 0, 0.4);
 }
 
 body {
-    background-color: var(--bg-color);
-    background-image: url('sigmaos_zenith_wallpaper_1775843755308.png');
-    background-size: cover;
-    background-position: center;
-    color: var(--text);
-    font-family: var(--font);
-    height: 100vh;
+    margin: 0;
+    padding: 0;
+    font-family: 'Inter', sans-serif;
+    background: var(--bg-color);
+    color: #fff;
     overflow: hidden;
-    display: flex;
-    flex-direction: column;
+    height: 100vh;
 }
 
-/* Glassmorphism Classes */
-.glass {
-    background: var(--glass);
-    -webkit-backdrop-filter: blur(24px);
-    backdrop-filter: blur(24px);
-    border: 1px solid var(--glass-border);
-    border-radius: 16px;
-}
-
-.glass-dark {
-    background: rgba(0, 0, 0, 0.4);
-    -webkit-backdrop-filter: blur(32px);
-    backdrop-filter: blur(32px);
-    border: 1px solid rgba(255, 255, 255, 0.05);
-}
-
-/* Main UI Layout */
 .top-bar {
-    height: 48px;
-    width: 100%;
     display: flex;
     justify-content: space-between;
     align-items: center;
-    padding: 0 24px;
-    font-size: 14px;
-    font-weight: 500;
+    padding: 10px 20px;
+    background: var(--glass);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.logo {
+    font-weight: 800;
+    letter-spacing: 1px;
+    color: var(--acc-color);
 }
 
 .system-stats {
     display: flex;
     gap: 20px;
-    color: var(--text-dim);
+    font-size: 0.8rem;
+    opacity: 0.7;
 }
 
 .workspace {
-    flex: 1;
-    position: relative;
     padding: 40px;
+    display: flex;
+    flex-direction: column;
+    gap: 30px;
+    height: calc(100vh - 120px);
 }
 
-/* Dashboard Grid */
 .dashboard {
-    display: grid;
-    grid-template-columns: repeat(3, 1fr);
-    gap: 24px;
-    max-width: 1200px;
-    margin: 0 auto;
+    display: flex;
+    gap: 20px;
 }
 
 .stat-card {
-    padding: 32px;
-    display: flex;
-    flex-direction: column;
-    justify-content: space-between;
-    transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    padding: 20px;
+    border-radius: 12px;
+    flex: 1;
+    border: 1px solid rgba(255, 255, 255, 0.1);
 }
 
-.stat-card:hover {
-    transform: translateY(-8px);
-    border-color: var(--primary);
+.glass { background: var(--glass); backdrop-filter: blur(10px); }
+.glass-dark { background: var(--glass-dark); backdrop-filter: blur(15px); }
+
+.stat-value { font-size: 1.5rem; font-weight: 800; margin-bottom: 5px; }
+.stat-label { font-size: 0.75rem; opacity: 0.6; text-transform: uppercase; }
+
+.system-console {
+    flex: 1;
+    border-radius: 12px;
+    padding: 20px;
+    font-family: 'Courier New', monospace;
+    font-size: 0.9rem;
+    overflow-y: auto;
+    border: 1px solid rgba(0, 255, 170, 0.2);
+    box-shadow: inset 0 0 20px rgba(0, 255, 170, 0.1);
 }
 
-.stat-value {
-    font-size: 48px;
-    font-weight: 800;
-    background: linear-gradient(135deg, var(--primary), var(--secondary));
-    -webkit-background-clip: text;
-    background-clip: text;
-    -webkit-text-fill-color: transparent;
-}
+.log-line { margin-bottom: 8px; border-left: 2px solid transparent; padding-left: 8px; }
+.log-line:hover { border-left-color: var(--acc-color); background: rgba(0, 255, 170, 0.05); }
 
-.stat-label {
-    text-transform: uppercase;
-    font-size: 12px;
-    letter-spacing: 2px;
-    color: var(--text-dim);
-    margin-top: 8px;
-}
+.animate-fade-in { animation: fadeIn 0.5s ease-out forwards; }
+@keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
 
-/* Taskbar */
 .taskbar-container {
-    padding-bottom: 24px;
+    position: fixed;
+    bottom: 20px;
+    left: 0;
+    right: 0;
     display: flex;
     justify-content: center;
 }
 
 .taskbar {
-    padding: 8px 12px;
     display: flex;
-    gap: 12px;
-    border-radius: 24px;
+    gap: 15px;
+    padding: 10px 20px;
+    border-radius: 20px;
+    border: 1px solid rgba(255, 255, 255, 0.1);
 }
 
 .taskbar-item {
-    width: 48px;
-    height: 48px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
+    font-size: 1.5rem;
     cursor: pointer;
-    border-radius: 12px;
-    transition: all 0.2s ease;
+    transition: all 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
 }
 
-.taskbar-item:hover {
-    background: rgba(255, 255, 255, 0.1);
-    transform: translateY(-4px);
-}
-
-/* Animations */
-@keyframes fadeIn {
-    from { opacity: 0; transform: scale(0.95); }
-    to { opacity: 1; transform: scale(1); }
-}
-
-.animate-fade-in {
-    animation: fadeIn 0.8s cubic-bezier(0.16, 1, 0.3, 1) forwards;
-}
-
-/* Progress Bar */
-.progress-bar-bg {
-    height: 4px;
-    background: rgba(255, 255, 255, 0.05);
-    margin-top: 20px;
-    border-radius: 2px;
-}
-
-.progress-bar-fill {
-    width: 100%;
-    height: 100%;
-    background: var(--accent);
-    border-radius: 2px;
-}
-
-/* System Console */
-.system-console {
-    position: absolute;
-    bottom: 120px;
-    left: 40px;
-    right: 40px;
-    height: 180px;
-    border-radius: 12px;
-    padding: 20px;
-    font-family: 'Courier New', monospace;
-    font-size: 12px;
-    overflow-y: hidden;
-}
-
-.console-text {
-    color: #6ee7b7;
-}
+.taskbar-item:hover { transform: scale(1.4) translateY(-5px); filter: drop-shadow(0 0 10px var(--acc-color)); }
