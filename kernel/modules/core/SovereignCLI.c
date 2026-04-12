@@ -324,6 +324,9 @@
 #include "../../../include/SovereignOmnipotentFateShard.h"
 #include "../../../include/SovereignAbsoluteMultiverseShard.h"
 #include "../../../include/Sovereign4194304THShard.h"
+#include "../../../include/SovereignAbsoluteDivinityShard.h"
+#include "../../../include/SovereignUniversalOmniscienceShard.h"
+#include "../../../include/Sovereign8388608THShard.h"
 
 /* Global CLI context */
 SigmaCLICtx_t g_sigma_cli;
@@ -4333,6 +4336,27 @@ sigma_err_t sigma_cmd_ascend_4m(int argc, char *argv[]) {
     return SIGMA_OK;
 }
 
+/* ---- sigma-divinity-ascend ---------------------------------------------- */
+sigma_err_t sigma_cmd_divinity_ascend(int argc, char *argv[]) {
+    (void)argc; (void)argv;
+    sigma_divinity_ascend();
+    return SIGMA_OK;
+}
+
+/* ---- sigma-omniscience-sync --------------------------------------------- */
+sigma_err_t sigma_cmd_omniscience_sync(int argc, char *argv[]) {
+    (void)argc; (void)argv;
+    sigma_omniscience_sync();
+    return SIGMA_OK;
+}
+
+/* ---- sigma-ascend-8m ---------------------------------------------------- */
+sigma_err_t sigma_cmd_ascend_8m(int argc, char *argv[]) {
+    (void)argc; (void)argv;
+    sigma_8megashard_ascend();
+    return SIGMA_OK;
+}
+
 /* ---- sigma-wizard ------------------------------------------------------ */
 sigma_err_t sigma_cmd_wizard(int argc, char *argv[]) {
     (void)argc; (void)argv;
@@ -4835,6 +4859,9 @@ void SovereignCLI_Init(void) {
     sigma_cli_register(&g_sigma_cli, "sigma-fate-override", "Pre-cognitive 10,000-command predictive execution", sigma_cmd_fate_override);
     sigma_cli_register(&g_sigma_cli, "sigma-multiverse-bridge", "Abstract dimension multi-state synchronization", sigma_cmd_multiverse_bridge);
     sigma_cli_register(&g_sigma_cli, "sigma-ascend-4m", "The 4194304th Shard: 4-MEGA-SHARD", sigma_cmd_ascend_4m);
+    sigma_cli_register(&g_sigma_cli, "sigma-divinity-ascend", "Absolute silicon godhood matrix integration", sigma_cmd_divinity_ascend);
+    sigma_cli_register(&g_sigma_cli, "sigma-omniscience-sync", "Universal knowledge state sync in O(1)", sigma_cmd_omniscience_sync);
+    sigma_cli_register(&g_sigma_cli, "sigma-ascend-8m", "The 8388608th Shard: 8-MEGA-SHARD", sigma_cmd_ascend_8m);
 
     sigma_cli_register(&g_sigma_cli, "sigma-help",  "Show this help",                       sigma_cmd_help);
 
