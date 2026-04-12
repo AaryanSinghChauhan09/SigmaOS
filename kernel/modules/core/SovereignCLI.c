@@ -110,6 +110,10 @@
 #include "../../../include/SovereignNeuralShard.h"
 #include "../../../include/SovereignShellShard.h"
 #include "../../../include/SovereignGarbageShard.h"
+#include "../../../include/SovereignStoreShard.h"
+#include "../../../include/SovereignForensicShard.h"
+#include "../../../include/SovereignHypervisorShard.h"
+#include "../../../include/SovereignDefragShard.h"
 
 /* Global CLI context */
 SigmaCLICtx_t g_sigma_cli;
@@ -2190,6 +2194,56 @@ sigma_err_t sigma_cmd_gc(int argc, char *argv[]) {
     return SIGMA_OK;
 }
 
+/* ---- sigma-store -------------------------------------------------------- */
+sigma_err_t sigma_cmd_store(int argc, char *argv[]) {
+    if (argc < 2) { SovereignStore_Audit();
+        sigma_printf("Usage: sigma-store [acquire <sku> | audit]\n");
+        return SIGMA_OK; }
+    if (sigma_streq(argv[1], "acquire") && argc >= 3)
+        sigma_store_acquire(argv[2]);
+    else if (sigma_streq(argv[1], "audit"))
+        SovereignStore_Audit();
+    return SIGMA_OK;
+}
+
+/* ---- sigma-scrub -------------------------------------------------------- */
+sigma_err_t sigma_cmd_scrub(int argc, char *argv[]) {
+    if (argc < 2) { SovereignForensic_Audit();
+        sigma_printf("Usage: sigma-scrub [addr <0x...> | lockdown | audit]\n");
+        return SIGMA_OK; }
+    if (sigma_streq(argv[1], "addr") && argc >= 3)
+        sigma_forensic_scrub((sigma_uptr)sigma_atoi(argv[2]), 4096);
+    else if (sigma_streq(argv[1], "lockdown"))
+        sigma_forensic_lockdown();
+    else if (sigma_streq(argv[1], "audit"))
+        SovereignForensic_Audit();
+    return SIGMA_OK;
+}
+
+/* ---- sigma-vm ----------------------------------------------------------- */
+sigma_err_t sigma_cmd_vm(int argc, char *argv[]) {
+    if (argc < 2) { SovereignHypervisor_Audit();
+        sigma_printf("Usage: sigma-vm [create <os> <ram_mb> | audit]\n");
+        return SIGMA_OK; }
+    if (sigma_streq(argv[1], "create") && argc >= 4)
+        sigma_hyp_create_guest(argv[2], (sigma_u32)sigma_atoi(argv[3]));
+    else if (sigma_streq(argv[1], "audit"))
+        SovereignHypervisor_Audit();
+    return SIGMA_OK;
+}
+
+/* ---- sigma-defrag ------------------------------------------------------- */
+sigma_err_t sigma_cmd_defrag(int argc, char *argv[]) {
+    if (argc < 2) { SovereignDefrag_Audit();
+        sigma_printf("Usage: sigma-defrag [run | audit]\n");
+        return SIGMA_OK; }
+    if (sigma_streq(argv[1], "run"))
+        sigma_defrag_run();
+    else if (sigma_streq(argv[1], "audit"))
+        SovereignDefrag_Audit();
+    return SIGMA_OK;
+}
+
 /* ---- sigma-wizard ------------------------------------------------------ */
 sigma_err_t sigma_cmd_wizard(int argc, char *argv[]) {
     (void)argc; (void)argv;
@@ -2475,6 +2529,10 @@ void SovereignCLI_Init(void) {
     sigma_cli_register(&g_sigma_cli, "sigma-neural",      "Silicon Neural Engine (CUDA)",    sigma_cmd_neural);
     sigma_cli_register(&g_sigma_cli, "sigma-shell",       "Industrial Shell Core (Zsh)",     sigma_cmd_shell);
     sigma_cli_register(&g_sigma_cli, "sigma-gc",          "Autonomic Silicon Scavenger",     sigma_cmd_gc);
+    sigma_cli_register(&g_sigma_cli, "sigma-store",       "Native Silicon App Store",        sigma_cmd_store);
+    sigma_cli_register(&g_sigma_cli, "sigma-scrub",       "Amnesic Forensic Engine",         sigma_cmd_scrub);
+    sigma_cli_register(&g_sigma_cli, "sigma-vm",          "Type-1 Silicon Hypervisor",       sigma_cmd_vm);
+    sigma_cli_register(&g_sigma_cli, "sigma-defrag",      "Silicon Layout Optimizer",        sigma_cmd_defrag);
 
     sigma_cli_register(&g_sigma_cli, "sigma-help",  "Show this help",                       sigma_cmd_help);
 
