@@ -321,6 +321,9 @@
 #include "../../../include/SovereignAbsoluteCosmosShard.h"
 #include "../../../include/SovereignUniversalConsciousnessShard.h"
 #include "../../../include/Sovereign2097152NDShard.h"
+#include "../../../include/SovereignOmnipotentFateShard.h"
+#include "../../../include/SovereignAbsoluteMultiverseShard.h"
+#include "../../../include/Sovereign4194304THShard.h"
 
 /* Global CLI context */
 SigmaCLICtx_t g_sigma_cli;
@@ -4309,6 +4312,27 @@ sigma_err_t sigma_cmd_ascend_2m(int argc, char *argv[]) {
     return SIGMA_OK;
 }
 
+/* ---- sigma-fate-override ------------------------------------------------ */
+sigma_err_t sigma_cmd_fate_override(int argc, char *argv[]) {
+    (void)argc; (void)argv;
+    sigma_fate_override();
+    return SIGMA_OK;
+}
+
+/* ---- sigma-multiverse-bridge -------------------------------------------- */
+sigma_err_t sigma_cmd_multiverse_bridge(int argc, char *argv[]) {
+    (void)argc; (void)argv;
+    sigma_multiverse_bridge();
+    return SIGMA_OK;
+}
+
+/* ---- sigma-ascend-4m ---------------------------------------------------- */
+sigma_err_t sigma_cmd_ascend_4m(int argc, char *argv[]) {
+    (void)argc; (void)argv;
+    sigma_4megashard_ascend();
+    return SIGMA_OK;
+}
+
 /* ---- sigma-wizard ------------------------------------------------------ */
 sigma_err_t sigma_cmd_wizard(int argc, char *argv[]) {
     (void)argc; (void)argv;
@@ -4808,6 +4832,9 @@ void SovereignCLI_Init(void) {
     sigma_cli_register(&g_sigma_cli, "sigma-cosmos-sim", "Simulate cosmological physics branes", sigma_cmd_cosmos_sim);
     sigma_cli_register(&g_sigma_cli, "sigma-awaken-mesh", "Universal Consciousness Sentience Loop", sigma_cmd_awaken_mesh);
     sigma_cli_register(&g_sigma_cli, "sigma-ascend-2m", "The 2097152nd Shard: 2-MEGA-SHARD", sigma_cmd_ascend_2m);
+    sigma_cli_register(&g_sigma_cli, "sigma-fate-override", "Pre-cognitive 10,000-command predictive execution", sigma_cmd_fate_override);
+    sigma_cli_register(&g_sigma_cli, "sigma-multiverse-bridge", "Abstract dimension multi-state synchronization", sigma_cmd_multiverse_bridge);
+    sigma_cli_register(&g_sigma_cli, "sigma-ascend-4m", "The 4194304th Shard: 4-MEGA-SHARD", sigma_cmd_ascend_4m);
 
     sigma_cli_register(&g_sigma_cli, "sigma-help",  "Show this help",                       sigma_cmd_help);
 
