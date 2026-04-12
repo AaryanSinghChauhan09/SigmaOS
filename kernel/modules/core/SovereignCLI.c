@@ -70,6 +70,9 @@
 #include "../../../include/SovereignPersonaShard.h"
 #include "../../../include/SovereignHotpatchShard.h"
 #include "../../../include/SovereignCgroupShard.h"
+#include "../../../include/SovereignOOMShard.h"
+#include "../../../include/SovereignJournalShard.h"
+#include "../../../include/SovereignTraceShard.h"
 
 /* Global CLI context */
 SigmaCLICtx_t g_sigma_cli;
@@ -1506,6 +1509,61 @@ sigma_err_t sigma_cmd_cgroup(int argc, char *argv[]) {
     return SIGMA_OK;
 }
 
+/* ---- sigma-oom --------------------------------------------------------- */
+sigma_err_t sigma_cmd_oom(int argc, char *argv[]) {
+    if (argc < 2) {
+        SovereignOOM_Audit();
+        sigma_printf("Usage: sigma-oom [reg <name> <pid> <mem_kb> <score> <prot> | sweep <free_kb> | audit]\n");
+        return SIGMA_OK;
+    }
+    if (sigma_streq(argv[1], "reg") && argc >= 7) {
+        sigma_oom_register(argv[2],
+                           (sigma_u32)sigma_atoi(argv[3]),
+                           (sigma_u64)sigma_atoi(argv[4]),
+                           (sigma_i32)sigma_atoi(argv[5]),
+                           (sigma_bool)sigma_atoi(argv[6]));
+    } else if (sigma_streq(argv[1], "sweep") && argc >= 3) {
+        sigma_oom_sweep((sigma_u64)sigma_atoi(argv[2]));
+    } else if (sigma_streq(argv[1], "audit")) {
+        SovereignOOM_Audit();
+    }
+    return SIGMA_OK;
+}
+
+/* ---- sigma-journal ----------------------------------------------------- */
+sigma_err_t sigma_cmd_journal(int argc, char *argv[]) {
+    if (argc < 2) {
+        sigma_journal_follow(LOG_INFO);
+        sigma_printf("Usage: sigma-journal [write <level> <unit> <msg> | follow <min_level> | audit]\n");
+        return SIGMA_OK;
+    }
+    if (sigma_streq(argv[1], "write") && argc >= 5) {
+        sigma_journal_write((SigmaLogLevel_t)sigma_atoi(argv[2]), argv[3], argv[4]);
+    } else if (sigma_streq(argv[1], "follow") && argc >= 3) {
+        sigma_journal_follow((SigmaLogLevel_t)sigma_atoi(argv[2]));
+    } else if (sigma_streq(argv[1], "audit")) {
+        SovereignJournal_Audit();
+    }
+    return SIGMA_OK;
+}
+
+/* ---- sigma-trace ------------------------------------------------------- */
+sigma_err_t sigma_cmd_trace(int argc, char *argv[]) {
+    if (argc < 2) {
+        SovereignTrace_Audit();
+        sigma_printf("Usage: sigma-trace [attach <pid> | detach | audit]\n");
+        return SIGMA_OK;
+    }
+    if (sigma_streq(argv[1], "attach") && argc >= 3) {
+        sigma_trace_attach((sigma_u32)sigma_atoi(argv[2]));
+    } else if (sigma_streq(argv[1], "detach")) {
+        sigma_trace_detach();
+    } else if (sigma_streq(argv[1], "audit")) {
+        SovereignTrace_Audit();
+    }
+    return SIGMA_OK;
+}
+
 /* ---- sigma-wizard ------------------------------------------------------ */
 sigma_err_t sigma_cmd_wizard(int argc, char *argv[]) {
     (void)argc; (void)argv;
@@ -1751,6 +1809,9 @@ void SovereignCLI_Init(void) {
     sigma_cli_register(&g_sigma_cli, "sigma-persona",     "Multi-User Persona Matrix",       sigma_cmd_sigma_persona);
     sigma_cli_register(&g_sigma_cli, "sigma-hotpatch",    "Zero-Reboot Live Patching",       sigma_cmd_hotpatch);
     sigma_cli_register(&g_sigma_cli, "sigma-cgroup",      "Silicon Resource Governor",       sigma_cmd_cgroup);
+    sigma_cli_register(&g_sigma_cli, "sigma-oom",         "Silicon OOM Governor",            sigma_cmd_oom);
+    sigma_cli_register(&g_sigma_cli, "sigma-journal",     "Kernel Structured Journal",       sigma_cmd_journal);
+    sigma_cli_register(&g_sigma_cli, "sigma-trace",       "Silicon Syscall Tracer",          sigma_cmd_trace);
 
     sigma_cli_register(&g_sigma_cli, "sigma-help",  "Show this help",                       sigma_cmd_help);
 
