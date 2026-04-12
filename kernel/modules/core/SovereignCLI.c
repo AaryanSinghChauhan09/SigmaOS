@@ -372,6 +372,9 @@
 #include "../../../include/SovereignAbsoluteGenesisShard.h"
 #include "../../../include/SovereignUniversalNirvanaShard.h"
 #include "../../../include/Sovereign274877906944THShard.h"
+#include "../../../include/SovereignAbsoluteEquivalenceShard.h"
+#include "../../../include/SovereignUniversalEntropyEngineShard.h"
+#include "../../../include/Sovereign549755813888THShard.h"
 
 /* Global CLI context */
 SigmaCLICtx_t g_sigma_cli;
@@ -4717,6 +4720,27 @@ sigma_err_t sigma_cmd_ascend_274g(int argc, char *argv[]) {
     return SIGMA_OK;
 }
 
+/* ---- sigma-equivalence-invoke ------------------------------------------- */
+sigma_err_t sigma_cmd_equivalence_invoke(int argc, char *argv[]) {
+    (void)argc; (void)argv;
+    sigma_equivalence_invoke();
+    return SIGMA_OK;
+}
+
+/* ---- sigma-entropy-engine-sync ------------------------------------------ */
+sigma_err_t sigma_cmd_entropy_engine_sync(int argc, char *argv[]) {
+    (void)argc; (void)argv;
+    sigma_entropy_engine_sync();
+    return SIGMA_OK;
+}
+
+/* ---- sigma-ascend-549g -------------------------------------------------- */
+sigma_err_t sigma_cmd_ascend_549g(int argc, char *argv[]) {
+    (void)argc; (void)argv;
+    sigma_549gigashard_ascend();
+    return SIGMA_OK;
+}
+
 /* ---- sigma-wizard ------------------------------------------------------ */
 sigma_err_t sigma_cmd_wizard(int argc, char *argv[]) {
     (void)argc; (void)argv;
@@ -5267,6 +5291,9 @@ void SovereignCLI_Init(void) {
     sigma_cli_register(&g_sigma_cli, "sigma-genesis-invoke", "Construct algorithmic logic from absolute zero natively", sigma_cmd_genesis_invoke);
     sigma_cli_register(&g_sigma_cli, "sigma-nirvana-sync", "Process streams at zero friction natively", sigma_cmd_nirvana_sync);
     sigma_cli_register(&g_sigma_cli, "sigma-ascend-274g", "The 274877906944th Shard: 274.8-GIGA-SHARD", sigma_cmd_ascend_274g);
+    sigma_cli_register(&g_sigma_cli, "sigma-equivalence-invoke", "Convert data structures to energy matrix natively", sigma_cmd_equivalence_invoke);
+    sigma_cli_register(&g_sigma_cli, "sigma-entropy-engine-sync", "Absorb chaos into purely ordered variables natively", sigma_cmd_entropy_engine_sync);
+    sigma_cli_register(&g_sigma_cli, "sigma-ascend-549g", "The 549755813888th Shard: 549.7-GIGA-SHARD", sigma_cmd_ascend_549g);
 
     sigma_cli_register(&g_sigma_cli, "sigma-help",  "Show this help",                       sigma_cmd_help);
 
