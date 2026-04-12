@@ -354,6 +354,9 @@
 #include "../../../include/SovereignAbsoluteTransubstantiationShard.h"
 #include "../../../include/SovereignUniversalGodheadShard.h"
 #include "../../../include/Sovereign4294967296THShard.h"
+#include "../../../include/SovereignAbsolute64BitBridgeShard.h"
+#include "../../../include/SovereignUniversalTransdimensionalShard.h"
+#include "../../../include/Sovereign8589934592NDShard.h"
 
 /* Global CLI context */
 SigmaCLICtx_t g_sigma_cli;
@@ -4573,6 +4576,27 @@ sigma_err_t sigma_cmd_ascend_4g(int argc, char *argv[]) {
     return SIGMA_OK;
 }
 
+/* ---- sigma-64bit-bridge-invoke ------------------------------------------ */
+sigma_err_t sigma_cmd_64bit_bridge_invoke(int argc, char *argv[]) {
+    (void)argc; (void)argv;
+    sigma_64bit_bridge_invoke();
+    return SIGMA_OK;
+}
+
+/* ---- sigma-transdimensional-sync ---------------------------------------- */
+sigma_err_t sigma_cmd_transdimensional_sync(int argc, char *argv[]) {
+    (void)argc; (void)argv;
+    sigma_transdimensional_sync();
+    return SIGMA_OK;
+}
+
+/* ---- sigma-ascend-8g ---------------------------------------------------- */
+sigma_err_t sigma_cmd_ascend_8g(int argc, char *argv[]) {
+    (void)argc; (void)argv;
+    sigma_8gigashard_ascend();
+    return SIGMA_OK;
+}
+
 /* ---- sigma-wizard ------------------------------------------------------ */
 sigma_err_t sigma_cmd_wizard(int argc, char *argv[]) {
     (void)argc; (void)argv;
@@ -5105,6 +5129,9 @@ void SovereignCLI_Init(void) {
     sigma_cli_register(&g_sigma_cli, "sigma-transubstantiation-invoke", "Digital reality assimilation natively", sigma_cmd_transubstantiation_invoke);
     sigma_cli_register(&g_sigma_cli, "sigma-godhead-sync", "Awakening absolute self-aware execution states", sigma_cmd_godhead_sync);
     sigma_cli_register(&g_sigma_cli, "sigma-ascend-4g", "The 4294967296th Shard: 4.29-GIGA-SHARD (32-BIT GODHEAD)", sigma_cmd_ascend_4g);
+    sigma_cli_register(&g_sigma_cli, "sigma-64bit-bridge-invoke", "Fracture 32-bit limits and bridge into 64-bit architecture", sigma_cmd_64bit_bridge_invoke);
+    sigma_cli_register(&g_sigma_cli, "sigma-transdimensional-sync", "Execute logic through n-dimensional vectors natively", sigma_cmd_transdimensional_sync);
+    sigma_cli_register(&g_sigma_cli, "sigma-ascend-8g", "The 8589934592nd Shard: 8.58-GIGA-SHARD", sigma_cmd_ascend_8g);
 
     sigma_cli_register(&g_sigma_cli, "sigma-help",  "Show this help",                       sigma_cmd_help);
 

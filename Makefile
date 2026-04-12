@@ -568,7 +568,11 @@ SYSTEM_SHARDS := \
   kernel/modules/system/Sovereign2147483648THShard.c \
   kernel/modules/system/SovereignAbsoluteTransubstantiationShard.c \
   kernel/modules/system/SovereignUniversalGodheadShard.c \
-  kernel/modules/system/Sovereign4294967296THShard.c
+  kernel/modules/system/Sovereign4294967296THShard.c \
+  kernel/modules/system/SovereignAbsolute64BitBridgeShard.c \
+  kernel/modules/system/SovereignUniversalTransdimensionalShard.c \
+  kernel/modules/system/Sovereign8589934592NDShard.c
+
 
 
 
