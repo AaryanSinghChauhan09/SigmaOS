@@ -155,6 +155,10 @@
 #include "../../../include/SovereignExokernelShard.h"
 #include "../../../include/SovereignHomomorphicAlg.h"
 #include "../../../include/SovereignZeroKnowledgeAlg.h"
+#include "../../../include/SovereignServiceShard.h"
+#include "../../../include/SovereignKMSShard.h"
+#include "../../../include/SovereignThermalShard.h"
+#include "../../../include/SovereignRegistryShard.h"
 
 /* Global CLI context */
 SigmaCLICtx_t g_sigma_cli;
@@ -2783,6 +2787,47 @@ sigma_err_t sigma_cmd_zk(int argc, char *argv[]) {
     return SIGMA_OK;
 }
 
+/* ---- sigma-service ------------------------------------------------------ */
+sigma_err_t sigma_cmd_service(int argc, char *argv[]) {
+    if (argc < 2) { sigma_service_list();
+        sigma_printf("Usage: sigma-service [start <service> | list]\n");
+        return SIGMA_OK; }
+    if (sigma_streq(argv[1], "start") && argc >= 3)
+        sigma_service_start(argv[2]);
+    else if (sigma_streq(argv[1], "list"))
+        sigma_service_list();
+    return SIGMA_OK;
+}
+
+/* ---- sigma-kms ---------------------------------------------------------- */
+sigma_err_t sigma_cmd_kms(int argc, char *argv[]) {
+    if (argc < 2) {
+        sigma_printf("Usage: sigma-kms [set <w> <h> <refresh>]\n");
+        return SIGMA_OK; }
+    if (sigma_streq(argv[1], "set") && argc >= 5)
+        sigma_kms_set_mode((sigma_u32)sigma_atoi(argv[2]), (sigma_u32)sigma_atoi(argv[3]), 60.0f);
+    return SIGMA_OK;
+}
+
+/* ---- sigma-thermal ------------------------------------------------------ */
+sigma_err_t sigma_cmd_thermal(int argc, char *argv[]) {
+    (void)argc; (void)argv;
+    sigma_thermal_monitor();
+    return SIGMA_OK;
+}
+
+/* ---- sigma-reg ---------------------------------------------------------- */
+sigma_err_t sigma_cmd_reg(int argc, char *argv[]) {
+    if (argc < 2) {
+        sigma_printf("Usage: sigma-reg [set <key> <val> | query <key>]\n");
+        return SIGMA_OK; }
+    if (sigma_streq(argv[1], "set") && argc >= 4)
+        sigma_registry_set(argv[2], argv[3]);
+    else if (sigma_streq(argv[1], "query") && argc >= 3)
+        sigma_printf("Value: %s\n", sigma_registry_query(argv[2]));
+    return SIGMA_OK;
+}
+
 /* ---- sigma-wizard ------------------------------------------------------ */
 sigma_err_t sigma_cmd_wizard(int argc, char *argv[]) {
     (void)argc; (void)argv;
@@ -3113,6 +3158,10 @@ void SovereignCLI_Init(void) {
     sigma_cli_register(&g_sigma_cli, "sigma-exo",         "Hardware Exokernel PID Bypass",   sigma_cmd_exo);
     sigma_cli_register(&g_sigma_cli, "sigma-fhe",         "Homomorphic Ciphertext Compute",  sigma_cmd_fhe);
     sigma_cli_register(&g_sigma_cli, "sigma-zk",          "Zero-Knowledge Truth Prover",     sigma_cmd_zk);
+    sigma_cli_register(&g_sigma_cli, "sigma-service",     "Silicon Service Orchestrator",    sigma_cmd_service);
+    sigma_cli_register(&g_sigma_cli, "sigma-kms",         "Kernel Mode-Setting Display",     sigma_cmd_kms);
+    sigma_cli_register(&g_sigma_cli, "sigma-thermal",     "Auto Silicon Thermal Guard",      sigma_cmd_thermal);
+    sigma_cli_register(&g_sigma_cli, "sigma-reg",         "High-Perf B+Tree Registry",       sigma_cmd_reg);
 
     sigma_cli_register(&g_sigma_cli, "sigma-help",  "Show this help",                       sigma_cmd_help);
 
