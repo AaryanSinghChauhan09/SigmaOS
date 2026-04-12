@@ -30,6 +30,7 @@
 #include "../../../include/SovereignDistroSlinger.h"
 #include "../../../include/SovereignAutomationEngine.h"
 #include "../../../include/SovereignAutonomousAgent.h"
+#include "../../../include/SovereignForensicScrubber.h"
 
 /* Global CLI context */
 SigmaCLICtx_t g_sigma_cli;
@@ -535,6 +536,10 @@ sigma_err_t sigma_cmd_run(int argc, char *argv[]) {
 }
 
 /* ---- sigma-agent ------------------------------------------------------- */
+    return SIGMA_OK;
+}
+
+/* ---- sigma-agent ------------------------------------------------------- */
 sigma_err_t sigma_cmd_agent(int argc, char *argv[]) {
     static SovereignAutonomousAgent_t g_agent;
     static sigma_bool init = SIGMA_FALSE;
@@ -553,6 +558,29 @@ sigma_err_t sigma_cmd_agent(int argc, char *argv[]) {
     } else if (sigma_streq(argv[1], "stop")) {
         sigma_printf("[AGENT]: Missions suspended. Returning to carrier.\n");
         g_agent.prowling = SIGMA_FALSE;
+    }
+    return SIGMA_OK;
+}
+
+/* ---- sigma-scrub ------------------------------------------------------- */
+sigma_err_t sigma_cmd_scrub(int argc, char *argv[]) {
+    static SovereignForensicScrubber_t g_scrubber;
+    static sigma_bool init = SIGMA_FALSE;
+    if (!init) { g_scrubber = SovereignForensicScrubber_Create(); init = SIGMA_TRUE; }
+
+    if (argc < 2) {
+        SovereignForensicScrubber_Audit(&g_scrubber);
+        sigma_printf("Usage: sigma-scrub [all | sector <address> <size> | audit]\n");
+        return SIGMA_OK;
+    }
+
+    if (sigma_streq(argv[1], "all")) {
+        sigma_printf("[SCRUB]: Triggering system-wide amnesic purge...\n");
+        sigma_scrub_memory_sector(&g_scrubber, (void*)0x1000, 4096); // Simulated
+    } else if (sigma_streq(argv[1], "sector") && argc >= 4) {
+         sigma_scrub_memory_sector(&g_scrubber, (void*)0xABCD, (sigma_size_t)sigma_atoi(argv[3]));
+    } else if (sigma_streq(argv[1], "audit")) {
+        SovereignForensicScrubber_Audit(&g_scrubber);
     }
     return SIGMA_OK;
 }
@@ -779,6 +807,7 @@ void SovereignCLI_Init(void) {
     sigma_cli_register(&g_sigma_cli, "sigma-distro",      "Sovereign Distro Lifecycle",      sigma_cmd_distro);
     sigma_cli_register(&g_sigma_cli, "sigma-run",         "Execute SigmaScript Automations", sigma_cmd_run);
     sigma_cli_register(&g_sigma_cli, "sigma-agent",       "Background Agent Orchestration",  sigma_cmd_agent);
+    sigma_cli_register(&g_sigma_cli, "sigma-scrub",       "Forensic Amnesic Purge",          sigma_cmd_scrub);
 
     sigma_cli_register(&g_sigma_cli, "sigma-help",  "Show this help",                       sigma_cmd_help);
 
