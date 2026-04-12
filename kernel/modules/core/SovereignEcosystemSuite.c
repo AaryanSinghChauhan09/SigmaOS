@@ -6,7 +6,7 @@
  * =========================================================================
  */
 
-#include "../../../include/sigma_kernel.h"
+#include "../../../include/sigma_base.h"
 
 void sigma_ecosystem_darwin_shim(void) {
     sigma_printf("  [ABI]: Darwin/XNU Mach Port simulation active.\n");
@@ -45,8 +45,8 @@ void SovereignEcosystem_Register(void) {
 #define SOVEREIGN_9P_SHARD_H
 
 #include "../../../include/SovereignOSBasicsZenith.h"
-#include "../../../include/sigma_kernel.h"
-#include "../../../include/sigma_kernel.h"
+#include "../../../include/sigma_base.h"
+#include "../../../include/sigma_base.h"
 
 // -------------------------------------------------------------------------
 // 9P Shard Object Structure
@@ -149,7 +149,7 @@ void sigma_jail_status(void) {
  * =========================================================================
  */
 
-#include "../../../include/sigma_kernel.h"
+#include "../../../include/sigma_base.h"
 #include "../../../include/SovereignHaiku.h"
 
 sigma_err_t sigma_BApplication_Init(SigmaBApplication_t *app, const char *signature) {
@@ -299,7 +299,7 @@ void sigma_alpine_micro_status(void) {
  * =========================================================================
  */
 
-#include "../../../include/sigma_kernel.h"
+#include "../../../include/sigma_base.h"
 
 /* -----------------------------------------------------------------------
  * Mirror list — ranked by speed (reflector-style)
@@ -499,7 +499,7 @@ void sigma_garuda_zen_status(void) {
  * =========================================================================
  */
 
-#include "../../../include/sigma_kernel.h"
+#include "../../../include/sigma_base.h"
 
 /* -----------------------------------------------------------------------
  * USE flag registry — compile-time feature gating at shard level
@@ -668,7 +668,7 @@ void sigma_hash_status(void) {
  * =========================================================================
  */
 
-#include "../../../include/sigma_kernel.h"
+#include "../../../include/sigma_base.h"
 
 /* -----------------------------------------------------------------------
  * Nix Store Path: Immutable, content-addressed derivation paths
@@ -795,7 +795,7 @@ void SovereignNixReproducibility_Init(void) {
  * =========================================================================
  */
 
-#include "../../../include/sigma_kernel.h"
+#include "../../../include/sigma_base.h"
 
 /* -----------------------------------------------------------------------
  * Tiling layout modes (inspired by COSMIC, i3, sway)
@@ -1074,7 +1074,7 @@ void sigma_silicon_status(void) {
  * =========================================================================
  */
 
-#include "../../../include/sigma_kernel.h"
+#include "../../../include/sigma_base.h"
 
 /* -----------------------------------------------------------------------
  * OSTree content-addressed object store
@@ -1318,7 +1318,7 @@ void sigma_tce_status(void) {
  * =========================================================================
  */
 
-#include "../../../include/sigma_kernel.h"
+#include "../../../include/sigma_base.h"
 
 #define MAX_SERVICES  64
 #define SVC_NAME_LEN  64
@@ -1469,7 +1469,7 @@ void sigma_yast_status(void) {
  * =========================================================================
  */
 
-#include "../../../include/sigma_kernel.h"
+#include "../../../include/sigma_base.h"
 #include "../../../include/SovereignAndroidBinder.h"
 
 static sigma_u8 s_parcel_buffers[16][1024]; /* Mock allocation */
@@ -1755,7 +1755,7 @@ int sigma_execute_stackless(void* execution_block) {
  * =========================================================================
  */
 
-#include "../../../include/sigma_kernel.h"
+#include "../../../include/sigma_base.h"
 #include "../../../include/SovereignFreeRTOS.h"
 
 static SigmaFreeRTOSTask_t s_tasks[16];
@@ -2033,7 +2033,7 @@ int sigma_assert_isr_time_margin(sigma_u32 microseconds) {
  * =========================================================================
  */
 
-#include "../../../include/sigma_kernel.h"
+#include "../../../include/sigma_base.h"
 #include "../../../include/SovereignActiveDirectory.h"
 
 static sigma_bool s_is_dc = SIGMA_FALSE;
@@ -2119,7 +2119,7 @@ void sigma_reputation_status(void) {
  * =========================================================================
  */
 
-#include "../../../include/sigma_kernel.h"
+#include "../../../include/sigma_base.h"
 #include "../../../include/SovereignDefender.h"
 
 static sigma_bool s_rt_protection = SIGMA_FALSE;
@@ -2233,7 +2233,7 @@ void sigma_iocp_status(void) {
  * =========================================================================
  */
 
-#include "../../../include/sigma_kernel.h"
+#include "../../../include/sigma_base.h"
 
 /* -----------------------------------------------------------------------
  * ░░ CONSTANTS & MACROS
@@ -2442,7 +2442,7 @@ void sigma_react_status(void) {
  * =========================================================================
  */
 
-#include "../../../include/sigma_kernel.h"
+#include "../../../include/sigma_base.h"
 #include "../../../include/SovereignWineCompat.h"
 
 /* Global Wine context */

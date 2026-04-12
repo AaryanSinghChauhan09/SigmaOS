@@ -4,7 +4,7 @@
  * =========================================================================
  */
 
-#include "../../../include/sigma_kernel.h"
+#include "../../../include/sigma_base.h"
 
 typedef struct {
     char app_id[64];

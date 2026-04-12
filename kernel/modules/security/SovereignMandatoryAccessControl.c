@@ -4,7 +4,7 @@
  * Refactored into Policy and Enforcer components.
  */
 
-#include "../../../include/sigma_kernel.h"
+#include "../../../include/sigma_base.h"
 #include "SovereignMACPolicy.h"
 
 #define MAC_MODE_ENFORCING 1

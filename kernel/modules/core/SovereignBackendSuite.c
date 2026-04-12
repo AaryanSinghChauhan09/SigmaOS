@@ -6,7 +6,7 @@
  * =========================================================================
  */
 
-#include "../../../include/sigma_kernel.h"
+#include "../../../include/sigma_base.h"
 
 /* --- Sub-Module 1: Virtual File System (VFS) Hardened --- */
 typedef struct {

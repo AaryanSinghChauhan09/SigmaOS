@@ -6,7 +6,7 @@
  * =========================================================================
  */
 
-#include "../../../include/sigma_kernel.h"
+#include "../../../include/sigma_base.h"
 
 typedef struct {
     sigma_u64 timestamp;
