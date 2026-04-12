@@ -98,6 +98,9 @@
 #include "../../../include/SovereignCompositorShard.h"
 #include "../../../include/SovereignHIDShard.h"
 #include "../../../include/SovereignIntelligenceShard.h"
+#include "../../../include/SovereignPackageShard.h"
+#include "../../../include/SovereignSoundShard.h"
+#include "../../../include/SovereignButlerShard.h"
 
 /* Global CLI context */
 SigmaCLICtx_t g_sigma_cli;
@@ -2012,6 +2015,46 @@ sigma_err_t sigma_cmd_intel(int argc, char *argv[]) {
     return SIGMA_OK;
 }
 
+/* ---- sigma-pkg --------------------------------------------------------- */
+sigma_err_t sigma_cmd_pkg(int argc, char *argv[]) {
+    if (argc < 2) { SovereignPackage_Audit();
+        sigma_printf("Usage: sigma-pkg [install <name> <ver> | update | audit]\n");
+        return SIGMA_OK; }
+    if (sigma_streq(argv[1], "install") && argc >= 4)
+        sigma_pkg_install(argv[2], argv[3]);
+    else if (sigma_streq(argv[1], "update"))
+        sigma_pkg_update_all();
+    else if (sigma_streq(argv[1], "audit"))
+        SovereignPackage_Audit();
+    return SIGMA_OK;
+}
+
+/* ---- sigma-sound ------------------------------------------------------- */
+sigma_err_t sigma_cmd_sound(int argc, char *argv[]) {
+    if (argc < 2) { SovereignSound_Audit();
+        sigma_printf("Usage: sigma-sound [open <client> <rate> | render | audit]\n");
+        return SIGMA_OK; }
+    if (sigma_streq(argv[1], "open") && argc >= 4)
+        sigma_snd_open(argv[2], SND_STREAM_PCM, (sigma_u32)sigma_atoi(argv[3]), 2, 20);
+    else if (sigma_streq(argv[1], "render"))
+        sigma_snd_render_block();
+    else if (sigma_streq(argv[1], "audit"))
+        SovereignSound_Audit();
+    return SIGMA_OK;
+}
+
+/* ---- sigma-butler ------------------------------------------------------ */
+sigma_err_t sigma_cmd_butler(int argc, char *argv[]) {
+    if (argc < 2) { SovereignButler_Audit();
+        sigma_printf("Usage: sigma-butler [ask <\"request\"> | audit]\n");
+        return SIGMA_OK; }
+    if (sigma_streq(argv[1], "ask") && argc >= 3)
+        sigma_butler_request(argv[2]);
+    else if (sigma_streq(argv[1], "audit"))
+        SovereignButler_Audit();
+    return SIGMA_OK;
+}
+
 /* ---- sigma-wizard ------------------------------------------------------ */
 sigma_err_t sigma_cmd_wizard(int argc, char *argv[]) {
     (void)argc; (void)argv;
@@ -2285,6 +2328,9 @@ void SovereignCLI_Init(void) {
     sigma_cli_register(&g_sigma_cli, "sigma-compositor",  "Native GUI Compositor",           sigma_cmd_compositor);
     sigma_cli_register(&g_sigma_cli, "sigma-hid",         "Silicon Input Manager",           sigma_cmd_hid);
     sigma_cli_register(&g_sigma_cli, "sigma-intel",       "Heuristic Intelligence Shard",    sigma_cmd_intel);
+    sigma_cli_register(&g_sigma_cli, "sigma-pkg",         "Atomic Package Manager",          sigma_cmd_pkg);
+    sigma_cli_register(&g_sigma_cli, "sigma-sound",       "Native Sound Pipeline",           sigma_cmd_sound);
+    sigma_cli_register(&g_sigma_cli, "sigma-butler",      "System Automation Assistant",     sigma_cmd_butler);
 
     sigma_cli_register(&g_sigma_cli, "sigma-help",  "Show this help",                       sigma_cmd_help);
 
