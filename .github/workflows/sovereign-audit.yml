@@ -1,0 +1,44 @@
+name: Sovereign Integrity Audit
+
+on: [push, pull_request]
+
+jobs:
+  audit:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.x'
+          
+      - name: Run Sovereign structural audit
+        run: python test_algorithms.py
+        
+      - name: Install GCC
+        run: sudo apt-get update && sudo apt-get install -y gcc
+        
+      - name: Build Sovereign Simulator
+        run: |
+          gcc simulate.c kernel/modules/core/kmain.c \
+              kernel/modules/core/SovereignModuleRegistry.c \
+              kernel/modules/core/SovereignMemorySuite.c \
+              kernel/modules/core/SovereignAppManagement.c \
+              kernel/modules/core/SovereignServiceControl.c \
+              kernel/modules/core/SovereignIntelligenceSuite.c \
+              kernel/modules/core/SovereignFrontendSuite.c \
+              kernel/modules/core/SovereignEcosystemSuite.c \
+              kernel/modules/core/SovereignBackendSuite.c \
+              kernel/modules/core/SovereignConfigIdentitySuite.c \
+              kernel/modules/security/SovereignCryptoSuite.c \
+              kernel/modules/core/cli/SovereignCLI_Core.c \
+              kernel/modules/core/cli/SovereignCLI_Essential.c \
+              kernel/modules/core/cli/SovereignCLI_Registry.c \
+              kernel/modules/core/SovereignFunctionalTest.c \
+              apps/SovereignExplorer.c \
+              apps/SovereignSecureShell.c \
+              -Iinclude -Ikernel/modules/core -Ikernel/modules/core/cli -o sigma_audit.exe
+              
+      - name: Execute Functional Test Suite
+        run: ./sigma_audit.exe

@@ -27,6 +27,7 @@ const logs = [
 ];
 
 let logIndex = 0;
+let logTimer = null;
 
 function addLog() {
     if (logIndex < logs.length) {
@@ -39,7 +40,7 @@ function addLog() {
         logConsole.appendChild(line);
         logConsole.scrollTop = logConsole.scrollHeight;
         logIndex++;
-        setTimeout(addLog, 250);
+        logTimer = setTimeout(addLog, 150);
     }
 }
 
@@ -61,11 +62,14 @@ function closeWindow(id) {
     document.getElementById(id).classList.add('hidden');
 }
 
-document.getElementById('btn-verify').addEventListener('click', () => {
+function startAudit() {
+    if (logTimer) clearTimeout(logTimer);
     logIndex = 0;
     logConsole.innerHTML = '<div style="color: #ffaa00;">[RE-AUDIT] Initiating full system re-verification...</div>';
-    setTimeout(addLog, 500);
-});
+    addLog();
+}
+
+document.getElementById('btn-verify').addEventListener('click', startAudit);
 
 document.getElementById('btn-explorer').addEventListener('click', () => openWindow('win-explorer'));
 document.getElementById('btn-shell').addEventListener('click', () => {
