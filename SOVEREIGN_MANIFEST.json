@@ -1,9 +1,10 @@
 {
   "project": "SigmaOS Zenith Supreme",
-  "version": "v3250.0-ZENITH-SUPREME-FINAL",
+  "version": "v3250.4-ZENITH-SUPREME-FINAL",
   "status": "STABLE - UNIVERSAL SINGULARITY",
   "build_date": "2026-04-13",
   "shards": 443,
+  "principles": 20,
   "purity": "100% PURE C11/ASM (ZERO FOREIGN DEP)",
   "verification": "PASSED - ALL REGISTRIES VERIFIED",
   "architecture": "MODULAR_REGISTRY_V2",
