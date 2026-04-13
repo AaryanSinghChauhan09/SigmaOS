@@ -1,5 +1,5 @@
 # =========================================================================
-# Σ SIGMAOS ZENITH: MASTER BUILD SYSTEM (v3010.0 — Phase 56)
+# Σ SIGMAOS ZENITH: MASTER BUILD SYSTEM (v3250.0 — Phase 60)
 # =========================================================================
 # Target:        sigma_zenith.bin — Sovereign Zenith Supreme
 # Architecture:  x86_64 (bare-metal, QEMU, Cloud VMs, USB flash)
