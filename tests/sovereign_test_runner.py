@@ -16,8 +16,8 @@ def check_principles(path):
             # ZENITH Principles Detection
             laws = {
                 "Foundational": ["scheduler", "neural", "tensor", "dataframe", "matrix", "sort", "search", "complexity"],
-                "Structural": ["interface", "poly", "class", "void (*", "acid", "transaction", "zero-trust", "osi", "packet", "udf"],
-                "Experience": ["automation", "customization", "personalization", "identity", "theme"],
+                "Structural": ["interface", "poly", "class", "void (*", "acid", "transaction", "zero-trust", "osi", "packet", "udf", "vtable", "dispatch", "encapsulat"],
+                "Experience": ["automation", "customization", "customisation", "personalization", "identity", "theme", "config_set", "config_get"],
                 "Industrial": ["scalability", "microservice", "parallel", "load balance", "resilience", "failover"],
                 "Sustainability": ["green", "sustainability", "power", "efficiency", "carbon"],
                 "Global": ["consensus", "raft", "paxos", "edge", "mesh", "distributed"],
