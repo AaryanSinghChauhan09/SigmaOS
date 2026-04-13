@@ -114,6 +114,31 @@ def test_cache_lru_logic():
     assert 4 in cache
     print("  [OK] Cache LRU Eviction Logic Passed.")
 
+def test_logger_ring_buffer_logic():
+    print("[TEST]: Logger Logic (Ring-Buffer Journal)")
+    size = 10
+    buffer = [0] * size
+    head = 0
+    tail = 0
+    
+    def write(val):
+        nonlocal head, tail
+        buffer[head % size] = val
+        head += 1
+        if head - tail > size:
+            tail += 1
+            
+    # Write more than size
+    for i in range(15):
+        write(i)
+        
+    # Check that it wrapped around
+    assert head == 15
+    assert tail == 5
+    assert buffer[5 % size] == 5
+    assert buffer[14 % size] == 14
+    print("  [OK] Logger Ring-Buffer Wrap Passed.")
+
 if __name__ == "__main__":
     print("=========================================")
     print(" SIGMAOS SOVEREIGN LOGIC AUDIT (PYTHON) ")
@@ -125,6 +150,7 @@ if __name__ == "__main__":
         test_dvfs_power_logic()
         test_crypto_logic()
         test_cache_lru_logic()
+        test_logger_ring_buffer_logic()
         print("\n[VERIFICATION]: ALL ALGORITHMIC LOGIC VALIDATED.")
     except AssertionError as e:
         print(f"\n[FAIL]: Logic validation failed: {e}")
