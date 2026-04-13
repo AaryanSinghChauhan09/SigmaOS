@@ -24,6 +24,10 @@ This matrix confirms the structural enforcement of all 25 core engineering princ
 | **Intrusion Detection** | `SovereignIDSShard.c` | **Heuristic Anomaly Detection**, Thresholds |
 | **Fault Tolerance** | `SovereignMirrorShard.c` | **State Mirroring**, Checkpointing, Reconcile |
 | **Lexical Analysis** | `SovereignLexerShard.c` | **FSA-based Tokenizer**, UDF Compiler pipeline |
+| **Graph Theory** | `SovereignGraphShard.c` | **Dijkstra Shortest Path**, Adjacency Matrix |
+| **Data Compression**| `SovereignLZShard.c` | **Run-Length Encoding (RLE)**, LZ-dictionary |
+| **Key Exchange** | `SovereignDHShard.c` | **Diffie-Hellman**, Modular Exponentiation |
+| **Native CLI** | `SovereignCommandShard.c` | **Argv Tokenization**, Registry Dispatch |
 
 ## 📊 Verification Status
 - **Static Analysis Target**: `make lint` -> [OK]

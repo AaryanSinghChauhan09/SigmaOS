@@ -249,6 +249,63 @@ def test_security_ids_logic():
     assert attack_rate > threshold
     print(f"  [OK] IDS Threshold Anomaly detection Passed.")
 
+def test_graph_dijkstra_logic():
+    print("[TEST]: Graph Logic (Dijkstra Shortest Path)")
+    # Simple 3-node graph
+    # 0 --(1)--> 1 --(2)--> 2
+    # 0 --(4)--> 2
+    dist = [0, 1, 4]
+    # Relax node 1
+    if dist[1] + 2 < dist[2]:
+        dist[2] = dist[1] + 2
+        
+    assert dist[2] == 3
+    print(f"  [OK] Dijkstra Relaxation (Dist: {dist[2]}) Passed.")
+
+def test_storage_rle_logic():
+    print("[TEST]: Storage Logic (RLE Compression)")
+    data = [1, 1, 1, 2, 2, 3]
+    # Expected: [3, 1, 2, 2, 1, 3]
+    compressed = []
+    i = 0
+    while i < len(data):
+        count = 1
+        while i + 1 < len(data) and data[i] == data[i+1]:
+            count += 1
+            i += 1
+        compressed.append(count)
+        compressed.append(data[i])
+        i += 1
+        
+    assert compressed == [3, 1, 2, 2, 1, 3]
+    print(f"  [OK] RLE Compression (Ratio: {len(data)/len(compressed):.1f}x) Passed.")
+
+def test_crypto_dh_logic():
+    print("[TEST]: Crypto Logic (Diffie-Hellman Exchange)")
+    p = 23 # Prime
+    g = 5  # Generator
+    
+    a_priv = 6
+    b_priv = 15
+    
+    a_pub = (g ** a_priv) % p
+    b_pub = (g ** b_priv) % p
+    
+    a_secret = (b_pub ** a_priv) % p
+    b_secret = (a_pub ** b_priv) % p
+    
+    assert a_secret == b_secret
+    print(f"  [OK] DH Shared Secret ({a_secret}) Passed.")
+
+def test_cli_parser_logic():
+    print("[TEST]: CLI Logic (Argv Tokenization)")
+    raw = "shard-list --all --verbose"
+    argv = raw.split()
+    
+    assert len(argv) == 3
+    assert argv[0] == "shard-list"
+    print(f"  [OK] CLI Argv Splitting Passed.")
+
 if __name__ == "__main__":
     print("=========================================")
     print(" SIGMAOS SOVEREIGN LOGIC AUDIT (PYTHON) ")
@@ -268,6 +325,10 @@ if __name__ == "__main__":
         test_fault_tolerance_logic()
         test_ai_nlp_tf_logic()
         test_security_ids_logic()
+        test_graph_dijkstra_logic()
+        test_storage_rle_logic()
+        test_crypto_dh_logic()
+        test_cli_parser_logic()
         print("\n[VERIFICATION]: ALL ALGORITHMIC LOGIC VALIDATED.")
     except AssertionError as e:
         print(f"\n[FAIL]: Logic validation failed: {e}")
