@@ -12,6 +12,21 @@ AS      = nasm
 LD      = ld
 OBJCOPY = objcopy
 
+# Default target
+all: help
+
+# Sovereign build help
+help:
+	@echo "Σ SIGMAOS MASTER BUILD SYSTEM"
+	@echo "=============================="
+	@echo "make all         : Show this help"
+	@echo "make bin         : Build the sovereign kernel binary"
+	@echo "make iso         : Build the bootable QEMU ISO"
+	@echo "make lint        : Run static analysis"
+	@echo "make shard-list  : Show sovereign shard inventory"
+	@echo "make test        : Run the high-fidelity audit pipeline"
+	@echo "make clean       : Purge all build artifacts"
+
 # ---------------------------------------------------------------------------
 # Compiler flags
 # ---------------------------------------------------------------------------
