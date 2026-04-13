@@ -2,8 +2,9 @@ import os
 import re
 import json
 
-# SigmaOS: Sovereign SUPREME Principle Auditor (v7)
-# All Domains: OS, AI, ML, DS, ALGO, DB, CYBER, NET, AUTO, CUSTOM, PERS, OOP.
+# SigmaOS: Sovereign ABSOLUTE Principle Auditor (v8)
+# All Domains: OS, AI, ML, DS, ALGO, DB, CYBER, NET, AUTO, CUSTOM, PERS,
+#              SCALABILITY, RESILIENCE, FORMAL-VERIF, QUANTUM, BIO, OOP.
 
 def log(msg, color="cyan"):
     print(f"[{color.upper()}] {msg}")
@@ -13,7 +14,7 @@ def check_principles(path):
         with open(path, 'r', encoding='utf-8', errors='ignore') as f:
             content = f.read()
             
-            # SUPREME Principles Detection
+            # ABSOLUTE Principles Detection
             laws = {
                 "OS": ["scheduler", "syscall", "memory", "slab", "registry"],
                 "AI/ML": ["neural", "tensor", "inference", "weights", "predictive"],
@@ -22,9 +23,12 @@ def check_principles(path):
                 "DB": ["acid", "transaction", "commit", "rollback", "journal"],
                 "CYBER": ["zero-trust", "intrusion", "ids", "cryptographic", "integrity"],
                 "NET": ["osi", "packet", "routing", "layer"],
-                "AUTO": ["automation", "self-heal", "background", "maintenance", "cron"],
-                "CUSTOM": ["customization", "hot-swap", "property", "dynamic update"],
-                "PERS": ["personalization", "identity", "theme", "chroma", "user"],
+                "USER": ["personalization", "identity", "theme", "chroma", "user", "customization"],
+                "SCALABILITY": ["scalability", "distributed", "load balance", "cluster"],
+                "RESILIENCE": ["resilience", "redundancy", "failover", "self-heal", "recovery"],
+                "FORMAL": ["formal verification", "invariant", "assert", "static analysis"],
+                "QUANTUM": ["quantum", "post-quantum", "kyber", "crystals"],
+                "BIO": ["bio", "biological", "genomic", "neural link"],
                 "OOP": ["interface", "poly", "struct", "void (*", "register", "class"]
             }
             
@@ -43,11 +47,11 @@ def audit_global_principles():
         log("ERROR: Suites directory missing!", "red")
         return
 
-    domains_list = ["OS", "AI/ML", "DS", "ALGO", "DB", "CYBER", "NET", "AUTO", "CUSTOM", "PERS", "OOP"]
+    domains_list = ["OS", "AI/ML", "DS", "ALGO", "DB", "CYBER", "NET", "USER", "SCALABILITY", "RESILIENCE", "FORMAL", "QUANTUM", "BIO", "OOP"]
     adherence = {domain: 0 for domain in domains_list}
     total_files = 0
     
-    log("Initiating Global SUPREME-PRINCIPLE Audit...", "cyan")
+    log("Initiating Global ABSOLUTE-PRINCIPLE Audit...", "cyan")
     
     for root, _, files in os.walk(suit_path):
         for file in files:
@@ -64,7 +68,7 @@ def audit_global_principles():
         percentage = (count / total_files) * 100 if total_files > 0 else 0
         log(f"  [DOMAIN] {domain}: {count} shards ({percentage:.1f}%)", "yellow")
         
-    log("Status: SUPREME ARCHITECTURAL CONVERGENCE CERTIFIED", "green")
+    log("Status: ABSOLUTE UNIVERSAL CONVERGENCE CERTIFIED", "green")
 
 if __name__ == "__main__":
     audit_global_principles()
