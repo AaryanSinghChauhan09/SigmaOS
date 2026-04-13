@@ -47,7 +47,21 @@ void DSPrinciple_Audit() {
     sigma_printf("  [META]: Shard-wise checksums within tolerance (99.999%% purity).\n");
 }
 
-/* --- Domain 4: Object Oriented Programming (OOP) ---
+/* --- Domain 4: Algorithms & DSA Principles ---
+ * Law: Big O Complexity, Space-Time Efficiency, and Cache Locality.
+ */
+typedef struct {
+    const char* algo_name;
+    const char* complexity;
+    sigma_bool_t stable;
+} AlgoMetrics_t;
+
+void AlgoPrinciple_Audit(AlgoMetrics_t* metrics) {
+    sigma_printf("[PRINCIPLE-DSA]: Auditing Complexity for '%s'...\n", metrics->algo_name);
+    sigma_printf("  [BigO]: Theoretical Bound: %s\n", metrics->complexity);
+}
+
+/* --- Domain 5: Object Oriented Programming (OOP) ---
  * Law: Encapsulation, Polymorphism, and Interface Segregation.
  */
 typedef struct {
@@ -74,6 +88,10 @@ void SovereignParadigmGuard_Enforce() {
     
     // DS Check
     DSPrinciple_Audit();
+
+    // DSA Check
+    AlgoMetrics_t dsa = { .algo_name = "Quicksort", .complexity = "O(N log N)", .stable = false };
+    AlgoPrinciple_Audit(&dsa);
     
     // OOP Check (Example of Interface)
     extern void SovereignMemory_Init(void); // Mocking as an init method
