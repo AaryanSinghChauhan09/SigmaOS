@@ -111,13 +111,7 @@ shard-list:
 	@echo "Total C Sources: $(words $(C_SOURCES))"
 	@echo "ASM Sources:     $(words $(ASM_SOURCES))"
 
-# Sovereign resilience audit
+# Sovereign resilience audit (High-Fidelity)
 test:
-	@echo "Σ [TEST]: Running Sovereign Resilience Audit..."
-	@echo "  [OK] Shard manifest: $(words $(C_SOURCES)) C11 modules discovered"
-	@echo "  [OK] Header parity: include/ directory synchronized"
-	@echo "  [OK] Principle domains: 13/13 enforced"
-	@echo "  [OK] Zero HLL dependency: No Python/Node/Shell logic in kernel/"
-	@echo "  [OK] ABI: x86_64 System V ABI compliance"
-	@echo "Σ [STATUS]: ZENITH SUPREME v3250.4 — ALL PRINCIPLES VERIFIED."
+	@py scripts/advancement_pipeline.py
 
