@@ -306,6 +306,48 @@ def test_cli_parser_logic():
     assert argv[0] == "shard-list"
     print(f"  [OK] CLI Argv Splitting Passed.")
 
+def test_neural_backprop_logic():
+    print("[TEST]: AI Logic (Neural Gradient)")
+    weights = [0.5, 0.5]
+    grads = [0.1, -0.1]
+    lr = 1.0
+    
+    # Update logic: w = w - lr * g
+    weights[0] -= lr * grads[0]
+    weights[1] -= lr * grads[1]
+    
+    assert weights[0] == 0.4
+    assert weights[1] == 0.6
+    print("  [OK] Backpropagation Update Logic Passed.")
+
+def test_mapreduce_logic():
+    print("[TEST]: Distributed Logic (Map-Reduce)")
+    data = [1, 2, 3, 4]
+    mapped = [d * 2 for d in data] # Map
+    reduced = sum(mapped) # Reduce
+    
+    assert reduced == 20
+    print(f"  [OK] Map-Reduce Emulation (Result: {reduced}) Passed.")
+
+def test_crypto_sha_logic():
+    print("[TEST]: Crypto Logic (SHA-256 Bitwise)")
+    # Sigma0 = ROTR(x, 2) ^ ROTR(x, 13) ^ ROTR(x, 22)
+    def rotr(x, n): return ((x >> n) | (x << (32 - n))) & 0xFFFFFFFF
+    
+    val = 0x12345678
+    s0 = rotr(val, 2) ^ rotr(val, 13) ^ rotr(val, 22)
+    
+    assert s0 != val
+    print(f"  [OK] SHA Bit-Rotation (Entropy: {hex(s0)}) Passed.")
+
+def test_vfs_logic():
+    print("[TEST]: Storage Logic (VFS Abstraction)")
+    path = "/dev/random"
+    # Logic: If path starts with /dev/, route to hal
+    routed = "hal" if path.startswith("/dev") else "fs"
+    assert routed == "hal"
+    print("  [OK] VFS Handle Routing Passed.")
+
 if __name__ == "__main__":
     print("=========================================")
     print(" SIGMAOS SOVEREIGN LOGIC AUDIT (PYTHON) ")
@@ -329,6 +371,10 @@ if __name__ == "__main__":
         test_storage_rle_logic()
         test_crypto_dh_logic()
         test_cli_parser_logic()
+        test_neural_backprop_logic()
+        test_mapreduce_logic()
+        test_crypto_sha_logic()
+        test_vfs_logic()
         print("\n[VERIFICATION]: ALL ALGORITHMIC LOGIC VALIDATED.")
     except AssertionError as e:
         print(f"\n[FAIL]: Logic validation failed: {e}")

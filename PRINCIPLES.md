@@ -28,6 +28,11 @@ This matrix confirms the structural enforcement of all 25 core engineering princ
 | **Data Compression**| `SovereignLZShard.c` | **Run-Length Encoding (RLE)**, LZ-dictionary |
 | **Key Exchange** | `SovereignDHShard.c` | **Diffie-Hellman**, Modular Exponentiation |
 | **Native CLI** | `SovereignCommandShard.c` | **Argv Tokenization**, Registry Dispatch |
+| **Neural Gradient** | `SovereignNeuralGradient.c` | **Backpropagation**, SGD, Chain Rule |
+| **MapReduce** | `SovereignMapReduce.c` | **Distributed Sharding**, Map/Reduce pattern |
+| **Integrity (SHA)**| `SovereignSHA256.c` | **Bitwise Entropy**, SHA-core rotation |
+| **VFS Abstraction**| `SovereignVFSShard.c` | **Polymorphic Handle Routing**, Multi-backend |
+| **Telemetry** | `SovereignMetricsShard.c` | **Counters, Gauges**, Observability metrics |
 
 ## 📊 Verification Status
 - **Static Analysis Target**: `make lint` -> [OK]
