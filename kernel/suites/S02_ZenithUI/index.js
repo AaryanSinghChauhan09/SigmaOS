@@ -143,14 +143,40 @@ document.addEventListener('mouseup', () => {
 });
 
 function simulateTelemetry() {
+    const cpuVal = Math.floor(Math.random() * 30 + 10);
+    const memVal = Math.floor(Math.random() * 20 + 75);
+    const entVal = Math.floor(Math.random() * 10 + 5);
+
+    SovereignStore.dispatch({ 
+        type: 'UPDATE_TELEMETRY', 
+        payload: { cpu: cpuVal, mem: memVal, entropy: entVal } 
+    });
+
     const cpuBar = document.getElementById('cpu-bar');
     const neuralBar = document.getElementById('neural-bar');
     const entropyBar = document.getElementById('entropy-bar');
-    if (cpuBar) cpuBar.style.width = (Math.random() * 30 + 10) + '%';
-    if (neuralBar) neuralBar.style.width = (Math.random() * 20 + 75) + '%';
-    if (entropyBar) entropyBar.style.width = (Math.random() * 10 + 5) + '%';
+    
+    if (cpuBar) cpuBar.style.width = cpuVal + '%';
+    if (neuralBar) neuralBar.style.width = memVal + '%';
+    if (entropyBar) entropyBar.style.width = entVal + '%';
+
+    // Log backend metrics to console occasionally
+    if (Math.random() > 0.8) {
+        addLogLine(`[BACKEND]: Paging Matrix Synced | Latency: ${Math.random().toFixed(2)}ms`);
+    }
+
     setTimeout(simulateTelemetry, 2000);
 }
+
+function addLogLine(text) {
+    const line = document.createElement('div');
+    line.className = 'log-line animate-fade-in';
+    line.style.color = '#fff600';
+    line.textContent = text;
+    logConsole.appendChild(line);
+    logConsole.scrollTop = logConsole.scrollHeight;
+}
+
 simulateTelemetry();
 
 document.getElementById('btn-verify').addEventListener('click', () => {
