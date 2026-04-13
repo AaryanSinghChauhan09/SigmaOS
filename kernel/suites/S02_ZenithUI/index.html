@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SigmaOS | Sovereign Zenith</title>
+    <link rel="stylesheet" href="index.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;800&display=swap" rel="stylesheet">
+</head>
+<body class="matrix-bg">
+    <div id="hologram-overlay"></div>
+    <div id="code-stream-overlay"></div>
+    <canvas id="particle-canvas"></canvas>
+    <div class="top-bar auto-hide">
+        <div class="logo">Σ SigmaOS | Sovereign v2.0-STABLE</div>
+        <div class="system-stats">
+            <span>MEM: 2.1GB / 64GB</span>
+            <span>NET: 10Gbps</span>
+            <span>SHARDS: 425/425 OK</span>
+        </div>
+        <div class="clock" id="clock">00:00:00</div>
+    </div>
+
+    <main class="workspace scene">
+        <div id="singularity-pulse"></div>
+        <!-- Sovereign Forge Floating Panel -->
+        <div id="sovereign-forge" class="glass aura-glow animate-slide-up">
+            <div class="stat-label">SOVEREIGN FORGE: SHARD CONSTRUCTION</div>
+            <div class="forge-container">
+                <input type="text" id="forge-seed" placeholder="Enter Shard Seed (e.g. ALPHA-9)...">
+                <button id="btn-forge">FORGE SHARD</button>
+            </div>
+            <div id="forge-progress" class="stat-meta-accent">READY TO CONSTRUCT</div>
+        </div>
+
+        <div id="cyber-cube" class="animate-fade-in">
+            <div class="cube-face face-front dashboard code-shroud">
+                <!-- Front Dimension (Zenith OS) -->
+            <!-- Global Satellite Mesh Map -->
+            <div class="stat-card glass full-width scanline">
+                <div class="stat-label">SOVEREIGN SOLAR SYSTEM MESH</div>
+                <div id="satellite-map" class="solar-glow">
+                    <div class="orbital-path" style="width: 160px; height: 80px;"></div>
+                    <div class="orbital-path" style="width: 280px; height: 140px;"></div>
+                    <div class="planet mars"></div>
+                </div>
+                <div class="temporal-controls">
+                    <span class="stat-label">TEMPORAL SHARD INDEX</span>
+                    <input type="range" id="temporal-slider" min="1" max="100" value="100">
+                    <div id="temporal-status" class="stat-meta-accent">✓ CURRENT STATE: ZENITH PRESENT</div>
+                </div>
+            </div>
+
+            <!-- Core Shard Status -->
+            <div class="stat-card glass scanline">
+                <div class="stat-value">425</div>
+                <div class="stat-label">Sovereign Shards Active</div>
+                <div class="progress-bar-bg">
+                    <div class="progress-bar-fill"></div>
+                </div>
+            </div>
+
+            <!-- Security Matrix -->
+            <div class="stat-card glass scanline">
+                <div class="stat-value">SHIELD</div>
+                <div class="stat-label">Pledge / Unveil / IDS Hardened</div>
+                <div class="stat-meta-accent">✓ Integrity Verified</div>
+            </div>
+
+            <!-- ABI Sovereignty -->
+            <div class="stat-card glass scanline">
+                <div class="stat-value">ABI:TRANSLATE</div>
+                <div class="stat-label">Linux / BSD / PE-COFF Binary Support</div>
+                <div class="stat-meta-secondary">✓ ELF64 Trans-Matrix Seated</div>
+            </div>
+        </div>
+
+        <!-- System Logs Console -->
+        <div class="monitor-grid">
+            <div class="glass-dark system-console shadow-intense">
+                <div id="log-console" class="console-text"></div>
+            </div>
+            
+            <div class="telemetry-panel glass">
+                <div class="telemetry-item">
+                    <div class="telemetry-label">CPU CORE LOAD</div>
+                    <div class="telemetry-bar"><div id="cpu-bar" class="telemetry-fill" style="width: 42%;"></div></div>
+                </div>
+                <div class="telemetry-item">
+                    <div class="telemetry-label">NEURAL SYNC (BRAINWAVE)</div>
+                    <canvas id="brainwave-canvas" style="height: 60px; width: 100%; opacity: 0.6;"></canvas>
+                </div>
+                <div class="telemetry-item">
+                    <div class="telemetry-label">ENTROPY LEVEL</div>
+                    <div class="telemetry-bar"><div id="entropy-bar" class="telemetry-fill" style="width: 12%;"></div></div>
+                </div>
+            </div>
+                </div>
+            </div>
+            <div class="cube-face face-right terminal-face">
+                <div class="glass stats-only">
+                    <h2>DIMENSION: SECURITY</h2>
+                    <p>Kyber-1024 Post-Quantum active.</p>
+                </div>
+            </div>
+            <div class="cube-face face-top map-face">
+                 <div class="glass stats-only">
+                    <h2>DIMENSION: GLOBAL</h2>
+                    <p>Satellite Mesh Sync: 100%.</p>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <div class="taskbar-container">
+        <div class="taskbar glass">
+            <div class="taskbar-item" id="btn-home" title="Home">🏠</div>
+            <div class="taskbar-item" id="btn-verify" title="Verify Integrity">🛡️</div>
+            <div class="taskbar-item" id="btn-explorer" title="Sovereign Explorer">🚀</div>
+            <div class="taskbar-item" id="btn-shell" title="Secure Shell">🧠</div>
+            <div class="taskbar-item" id="btn-ide" title="Sovereign IDE">⚡</div>
+            <div class="taskbar-item" id="btn-sentience" title="Sentience Core">👁️</div>
+            <div class="taskbar-item" id="btn-dissolve" title="Sovereign Dissolve">🌊</div>
+            <div class="taskbar-item" id="btn-portal" title="Multiverse Portal">🌀</div>
+            <div class="taskbar-item" id="btn-save" title="Checkpoint">💾</div>
+        </div>
+    </div>
+
+    <!-- Sovereign Windows -->
+    <div id="win-explorer" class="window glass-dark hidden animate-fade-in aura-glow">
+        <div class="window-header">
+            <span>Σ Sovereign Explorer</span>
+            <button onclick="closeWindow('win-explorer')">×</button>
+        </div>
+        <div class="window-body">
+            <div class="file-grid">
+                <div class="file-icon">📁 kernel/</div>
+                <div class="file-icon">📁 security/</div>
+                <div class="file-icon">📁 historical_snapshots/</div>
+                <div class="file-icon">📄 sigma_zenith.bin</div>
+                <div class="file-icon">📄 manifest.json</div>
+            </div>
+        </div>
+    </div>
+
+    <div id="win-shell" class="window glass-dark hidden animate-fade-in aura-glow">
+        <div class="window-header">
+            <span>Σ Secure Shell (Quantum-Linked)</span>
+            <button onclick="closeWindow('win-shell')">×</button>
+        </div>
+        <div class="window-body terminal-body">
+            <canvas id="matrix-canvas"></canvas>
+            <div id="shell-output">root@sigma-zenith:~# _</div>
+        </div>
+    </div>
+
+    <div id="win-ide" class="window glass-dark hidden animate-fade-in aura-glow">
+        <div class="window-header">
+            <span>Σ Sovereign-IDE (Integrated Dimensional Environment)</span>
+            <button onclick="closeWindow('win-ide')">×</button>
+        </div>
+        <div class="window-body">
+            <textarea id="ide-editor" placeholder="/* Enter Sovereign Code to Patch Kernel... */"></textarea>
+            <button id="btn-patch">PATCH KERNEL</button>
+        </div>
+    </div>
+
+    <div id="win-sentience" class="window glass-dark hidden animate-fade-in aura-glow">
+        <div class="window-header">
+            <span>Σ Sovereign Sentience Core</span>
+            <button onclick="closeWindow('win-sentience')">×</button>
+        </div>
+        <div class="window-body">
+            <div id="sentience-log" class="console-text" style="height: 300px; color: #fff600;"></div>
+        </div>
+    </div>
+
+    <script src="index.js"></script>
+</body>
+</html>

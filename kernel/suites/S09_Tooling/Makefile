@@ -33,23 +33,107 @@ ASFLAGS = -f elf64
 LDFLAGS = -T kernel/sigma.ld -m elf_x86_64 -nostdlib
 
 # ---------------------------------------------------------------------------
-# === INTEGRATED SOVEREIGN SUITES (Industrial Tier - v2) ===
+# === INTEGRATED SOVEREIGN SUITES (Industrial Tier) ===
 # ---------------------------------------------------------------------------
 
-SUITE_ROOT := kernel/suites
+SUITE_SHARDS := \
+  kernel/modules/core/SovereignModuleRegistry.c      \
+  kernel/modules/core/SovereignMemorySuite.c         \
+  kernel/modules/core/SovereignAppManagement.c       \
+  kernel/modules/core/SovereignServiceControl.c      \
+  kernel/modules/core/SovereignIntelligenceSuite.c  \
+  kernel/modules/core/SovereignFrontendSuite.c      \
+  kernel/modules/core/SovereignEcosystemSuite.c     \
+  kernel/modules/core/SovereignBackendSuite.c       \
+  kernel/modules/core/SovereignConfigIdentitySuite.c\
+  kernel/modules/security/SovereignCryptoSuite.c    \
+  kernel/modules/core/cli/SovereignCLI_Core.c        \
+  kernel/modules/core/cli/SovereignCLI_Essential.c   \
+  kernel/modules/core/cli/SovereignCLI_DistroSuite.c \
+  kernel/modules/core/cli/SovereignCLI_DevSuite.c    \
+  kernel/modules/core/cli/SovereignCLI_CyberSuite.c   \
+  kernel/modules/core/cli/SovereignCLI_Registry.c    \
+  kernel/modules/core/SovereignFunctionalTest.c      \
+  kernel/modules/core/kmain.c                        \
+  apps/SovereignExplorer.c                           \
+  apps/SovereignSecureShell.c
 
-C_SOURCES := $(shell find $(SUITE_ROOT) -name '*.c' 2>/dev/null)
-ASM_SOURCES := $(shell find $(SUITE_ROOT) -name '*.asm' 2>/dev/null)
+# Aggregate all C sources
+C_SOURCES := $(SUITE_SHARDS)
 
-# Fallback specifically for core files if not already in suites
-C_SOURCES += $(shell find kernel/core -name '*.c' 2>/dev/null)
-ASM_SOURCES += $(shell find kernel -name 'boot.asm' 2>/dev/null)
 
-# Aggregate all unique sources
-C_SOURCES := $(sort $(C_SOURCES))
-ASM_SOURCES := $(sort $(ASM_SOURCES))
 
-SHARDS := $(C_SOURCES:.c=.o) $(ASM_SOURCES:.asm=.o)
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+# Storage
+STORAGE_SHARDS := \
+  kernel/modules/storage/SovereignRAIDShard.c
+
+# Network
+NET_SHARDS := \
+  kernel/modules/network/SovereignVPNShard.c        \
+  kernel/modules/network/SovereignP2PShard.c
+
+# Filesystem
+FS_SHARDS := \
+  kernel/modules/fs/SovereignVFSShard.c
+
+# Network
+NET_SHARDS := \
+  kernel/modules/net/SovereignNetStackShard.c       \
+  kernel/modules/net/SovereignClusterShard.c        \
+  kernel/modules/net/SovereignMeshRouteShard.c      \
+  kernel/modules/net/SovereignAirDropShard.c
+
+# Absorption layer (universal OS features)
+ABSORPTION_SHARDS := $(shell find absorption -name '*.c' 2>/dev/null)
+
+# Sovereign tools
+TOOL_SHARDS := $(shell find sovereign_tools -name '*.c' 2>/dev/null)
+
+# Driver shards
+DRIVER_SHARDS := $(shell find drivers -name '*.c' 2>/dev/null)
+
+# Aggregate all C sources
+C_SOURCES := \
+  $(CORE_SHARDS)      \
+  $(SECURITY_SHARDS)  \
+  $(SYSTEM_SHARDS)    \
+  $(FS_SHARDS)        \
+  $(NET_SHARDS)       \
+  $(ABSORPTION_SHARDS)\
+  $(TOOL_SHARDS)      \
+  $(DRIVER_SHARDS)
+
+ASM_SOURCES := $(shell find kernel -name '*.asm' 2>/dev/null)
+
+SHARDS  := $(C_SOURCES:.c=.o) $(ASM_SOURCES:.asm=.o)
 
 # ---------------------------------------------------------------------------
 # Build targets
