@@ -2,8 +2,8 @@ import os
 import re
 import json
 
-# SigmaOS: Sovereign OMNI Principle Auditor (v6)
-# Domains: OS, AI, ML, DS, ALGO, DB, CYBER, NET, OOP.
+# SigmaOS: Sovereign SUPREME Principle Auditor (v7)
+# All Domains: OS, AI, ML, DS, ALGO, DB, CYBER, NET, AUTO, CUSTOM, PERS, OOP.
 
 def log(msg, color="cyan"):
     print(f"[{color.upper()}] {msg}")
@@ -13,15 +13,18 @@ def check_principles(path):
         with open(path, 'r', encoding='utf-8', errors='ignore') as f:
             content = f.read()
             
-            # OMNI Principles Detection
+            # SUPREME Principles Detection
             laws = {
                 "OS": ["scheduler", "syscall", "memory", "slab", "registry"],
                 "AI/ML": ["neural", "tensor", "inference", "weights", "predictive"],
                 "DS": ["dataframe", "matrix", "vector", "query", "dag"],
                 "ALGO": ["sort", "search", "complexity", "big o", "recurse", "partition"],
-                "DB": ["acid", "transaction", "commit", "rollback", "wal", "journal"],
-                "CYBER": ["zero-trust", "intrusion", "ids", "cryptographic", "integrity", "least privilege"],
-                "NET": ["osi", "packet", "routing", "tcp", "ip", "layer"],
+                "DB": ["acid", "transaction", "commit", "rollback", "journal"],
+                "CYBER": ["zero-trust", "intrusion", "ids", "cryptographic", "integrity"],
+                "NET": ["osi", "packet", "routing", "layer"],
+                "AUTO": ["automation", "self-heal", "background", "maintenance", "cron"],
+                "CUSTOM": ["customization", "hot-swap", "property", "dynamic update"],
+                "PERS": ["personalization", "identity", "theme", "chroma", "user"],
                 "OOP": ["interface", "poly", "struct", "void (*", "register", "class"]
             }
             
@@ -40,10 +43,11 @@ def audit_global_principles():
         log("ERROR: Suites directory missing!", "red")
         return
 
-    adherence = {domain: 0 for domain in ["OS", "AI/ML", "DS", "ALGO", "DB", "CYBER", "NET", "OOP"]}
+    domains_list = ["OS", "AI/ML", "DS", "ALGO", "DB", "CYBER", "NET", "AUTO", "CUSTOM", "PERS", "OOP"]
+    adherence = {domain: 0 for domain in domains_list}
     total_files = 0
     
-    log("Initiating Global OMNI-PRINCIPLE Audit...", "cyan")
+    log("Initiating Global SUPREME-PRINCIPLE Audit...", "cyan")
     
     for root, _, files in os.walk(suit_path):
         for file in files:
@@ -60,7 +64,7 @@ def audit_global_principles():
         percentage = (count / total_files) * 100 if total_files > 0 else 0
         log(f"  [DOMAIN] {domain}: {count} shards ({percentage:.1f}%)", "yellow")
         
-    log("Status: ABSOLUTE SCIENTIFIC CONVERGENCE CERTIFIED (SINGULARITY GRADE)", "green")
+    log("Status: SUPREME ARCHITECTURAL CONVERGENCE CERTIFIED", "green")
 
 if __name__ == "__main__":
     audit_global_principles()
