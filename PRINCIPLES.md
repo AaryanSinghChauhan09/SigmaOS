@@ -19,6 +19,7 @@ This matrix confirms the structural enforcement of all 20 core engineering princ
 | **Design Patterns** | `SovereignDesignPatterns.c` | Singleton, Observer, Strategy, Factory, Iterator (C11 Patterns) |
 | **Control Systems** | `SovereignControlShard.c` | **Proportional-Integral-Derivative (PID)** feedback loop |
 | **Quantum Computing** | `SovereignQuantumShard.c` | **Qubit Simulation**, Hadamard Gates, Measurement |
+| **Applied Graphics** | `SovereignGraphicsShard.c` | **Ray-Sphere Intersection**, Vector math, Lambertian |
 
 ## 📊 Verification Status
 - **Static Analysis Target**: `make lint` -> [OK]

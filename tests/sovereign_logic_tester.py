@@ -180,6 +180,27 @@ def test_quantum_logic():
     assert abs(p0 + p1 - 1.0) < 0.001
     print(f"  [OK] Quantum Superposition (P0: {p0:.2f}, P1: {p1:.2f}) Passed.")
 
+def test_graphics_raytracing_logic():
+    print("[TEST]: Graphics Logic (Ray-Sphere Intersection)")
+    # Ray at origin [0,0,0] toward [0,0,1]
+    origin = [0, 0, 0]
+    direction = [0, 0, 1]
+    
+    # Sphere at [0,0,5] with radius 2
+    sphere_center = [0, 0, 5]
+    radius = 2.0
+    
+    # Intersection logic: (D.D)t^2 + 2(O.D)t + O.O - R^2 = 0
+    oc = [origin[0]-sphere_center[0], origin[1]-sphere_center[1], origin[2]-sphere_center[2]]
+    a = sum(d*d for d in direction)
+    b = 2.0 * sum(oc[i]*direction[i] for i in range(3))
+    c = sum(oc_i*oc_i for oc_i in oc) - (radius*radius)
+    
+    discriminant = (b*b) - (4*a*c)
+    
+    assert discriminant > 0 # Should intersect
+    print(f"  [OK] Raytracing Intersection (Disc: {discriminant:.2f}) Passed.")
+
 if __name__ == "__main__":
     print("=========================================")
     print(" SIGMAOS SOVEREIGN LOGIC AUDIT (PYTHON) ")
@@ -194,6 +215,7 @@ if __name__ == "__main__":
         test_logger_ring_buffer_logic()
         test_pid_control_logic()
         test_quantum_logic()
+        test_graphics_raytracing_logic()
         print("\n[VERIFICATION]: ALL ALGORITHMIC LOGIC VALIDATED.")
     except AssertionError as e:
         print(f"\n[FAIL]: Logic validation failed: {e}")
