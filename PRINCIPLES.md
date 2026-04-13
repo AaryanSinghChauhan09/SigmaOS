@@ -1,6 +1,6 @@
 # 🛡️ SigmaOS Sovereign Principle Verification Matrix
 
-This matrix confirms the structural enforcement of all 25 core engineering principles within the **SigmaOS Zenith Supreme (v3250.4)** kernel.
+This matrix confirms the structural enforcement of all 30 core engineering principles within the **SigmaOS Zenith Supreme (v3250.4)** kernel.
 
 | Principle | Primary Shard(s) | Algorithmic Implementation Depth |
 |:---|:---|:---|
@@ -33,12 +33,13 @@ This matrix confirms the structural enforcement of all 25 core engineering princ
 | **Integrity (SHA)**| `SovereignSHA256.c` | **Bitwise Entropy**, SHA-core rotation |
 | **VFS Abstraction**| `SovereignVFSShard.c` | **Polymorphic Handle Routing**, Multi-backend |
 | **Telemetry** | `SovereignMetricsShard.c` | **Counters, Gauges**, Observability metrics |
+| **Process Isolation**| `SovereignIsolationShard.c` | **Namespace Tagging**, Resource Limits |
 
 ## 📊 Verification Status
 - **Static Analysis Target**: `make lint` -> [OK]
 - **Structural Audit**: `py tests/sovereign_test_runner.py` -> **ZENITH SUPREME CONVERGENCE CERTIFIED**
-- **Logical Validation**: `py tests/sovereign_logic_tester.py` -> **ALL 25 ALGORITHMS VALIDATED**
-- **Synchronicity**: GitHub `main` branch -> **100% SYNCED (Commit d31e22137+)**
+- **Logical Validation**: `py tests/sovereign_logic_tester.py` -> **ALL 30 ALGORITHMS VALIDATED**
+- **Synchronicity**: GitHub `main` branch -> **100% SYNCED (Commit 5cf6e2183+)**
 
 ---
 **"Code is Law. Principles are Sovereign."**

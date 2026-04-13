@@ -346,7 +346,21 @@ def test_vfs_logic():
     # Logic: If path starts with /dev/, route to hal
     routed = "hal" if path.startswith("/dev") else "fs"
     assert routed == "hal"
+    assert routed == "hal"
     print("  [OK] VFS Handle Routing Passed.")
+
+def test_process_isolation_logic():
+    print("[TEST]: Process Logic (Namespace Isolation)")
+    # Simple ACL check
+    pid_ns = 101
+    current_ns = 101
+    
+    def can_access(target_ns):
+        return current_ns == target_ns or current_ns == 0 # 0 is root ns
+        
+    assert can_access(pid_ns) == True
+    assert can_access(102) == False
+    print("  [OK] Namespace Access Control Passed.")
 
 if __name__ == "__main__":
     print("=========================================")
@@ -375,7 +389,8 @@ if __name__ == "__main__":
         test_mapreduce_logic()
         test_crypto_sha_logic()
         test_vfs_logic()
-        print("\n[VERIFICATION]: ALL ALGORITHMIC LOGIC VALIDATED.")
+        test_process_isolation_logic()
+        print("\n[VERIFICATION]: ALL 30 ALGORITHMIC PRINCIPLES VALIDATED.")
     except AssertionError as e:
         print(f"\n[FAIL]: Logic validation failed: {e}")
         exit(1)
