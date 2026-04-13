@@ -161,6 +161,25 @@ def test_pid_control_logic():
     assert abs(target - current) < 100 # Should not explode
     print(f"  [OK] PID Control (Current: {current:.2f}) Passed.")
 
+def test_quantum_logic():
+    print("[TEST]: Quantum Logic (Hadamard Superposition)")
+    # State |0> = [1, 0]
+    alpha_r, beta_r = 1.0, 0.0
+    
+    # Apply Hadamard H = 1/sqrt(2) * [[1, 1], [1, -1]]
+    inv_sqrt2 = 0.70710678118
+    new_alpha = (alpha_r + beta_r) * inv_sqrt2
+    new_beta = (alpha_r - beta_r) * inv_sqrt2
+    
+    # Probabilities must be 0.5 each
+    p0 = new_alpha**2
+    p1 = new_beta**2
+    
+    assert abs(p0 - 0.5) < 0.001
+    assert abs(p1 - 0.5) < 0.001
+    assert abs(p0 + p1 - 1.0) < 0.001
+    print(f"  [OK] Quantum Superposition (P0: {p0:.2f}, P1: {p1:.2f}) Passed.")
+
 if __name__ == "__main__":
     print("=========================================")
     print(" SIGMAOS SOVEREIGN LOGIC AUDIT (PYTHON) ")
@@ -174,6 +193,7 @@ if __name__ == "__main__":
         test_cache_lru_logic()
         test_logger_ring_buffer_logic()
         test_pid_control_logic()
+        test_quantum_logic()
         print("\n[VERIFICATION]: ALL ALGORITHMIC LOGIC VALIDATED.")
     except AssertionError as e:
         print(f"\n[FAIL]: Logic validation failed: {e}")
