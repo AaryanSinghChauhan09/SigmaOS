@@ -1,7 +1,7 @@
 #include "../../include/sigma_base.h"
 
-#include "../../../include/SovereignFS.h"
-#include "../../../include/sigma_libc.h"
+#include "../../include/SovereignFS.h"
+#include "../../include/sigma_libc.h"
 
 /*
  * Async I/O Rings (io_uring parity).

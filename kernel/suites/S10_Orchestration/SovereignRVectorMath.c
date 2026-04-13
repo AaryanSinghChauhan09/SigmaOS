@@ -8,8 +8,8 @@
  * =========================================================================
  */
 
-#include "../../../include/sigma_kernel.h"
-#include "../../../include/SovereignRZenith.h"
+#include "../../include/sigma_kernel.h"
+#include "../../include/SovereignRZenith.h"
 
 // -------------------------------------------------------------------------
 // Implementation

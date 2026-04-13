@@ -1,7 +1,7 @@
 #include "../../include/sigma_base.h"
 
-#include "../../../include/SovereignArch.h"
-#include "../../../include/sigma_libc.h"
+#include "../../include/SovereignArch.h"
+#include "../../include/sigma_libc.h"
 
 /*
  * Sovereign Power Governor (ACPI/DT Parity).

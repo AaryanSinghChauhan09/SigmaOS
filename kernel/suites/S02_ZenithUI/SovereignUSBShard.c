@@ -1,8 +1,8 @@
 #include "../../include/sigma_base.h"
 
-#include "../../../include/SovereignHardwareIOZenith.h"
-#include "../../../include/SovereignRegistry.h"
-#include "../../../include/sigma_libc.h"
+#include "../../include/SovereignHardwareIOZenith.h"
+#include "../../include/SovereignRegistry.h"
+#include "../../include/sigma_libc.h"
 
 /*
  * Sovereign USB/Thunderbolt Matrix.

@@ -1,4 +1,4 @@
-#include "../../../include/sigma_kernel.h"
+#include "../../include/sigma_kernel.h"
 
 void SovereignPolicy_Init() {
     sigma_printf("Σ [OPERATION]: SovereignPolicy (Linux Orchestration) Integration Complete. Phase 25 Pure Parity Online.

@@ -6,7 +6,7 @@
  * =========================================================================
  */
 
-#include "../../../include/sigma_base.h"
+#include "../../include/sigma_base.h"
 
 void sigma_kyber_encrypt(const char* data) {
     sigma_printf("  [KYBER]: Seating Lattice-based Cryptogram (Kyber-1024)\n");

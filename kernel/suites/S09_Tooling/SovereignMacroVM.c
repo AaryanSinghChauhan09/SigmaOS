@@ -8,8 +8,8 @@
  * =========================================================================
  */
 
-#include "../../../include/sigma_kernel.h"
-#include "../../../include/SovereignExcelZenith.h"
+#include "../../include/sigma_kernel.h"
+#include "../../include/SovereignExcelZenith.h"
 
 // -------------------------------------------------------------------------
 // Implementation

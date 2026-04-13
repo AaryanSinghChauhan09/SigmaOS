@@ -6,7 +6,7 @@
  * =========================================================================
  */
 
-#include "../../../include/sigma_base.h"
+#include "../../include/sigma_base.h"
 
 void sigma_kernel_patch(const char* asm_code) {
     sigma_printf("  [IDE]: Synthesizing machine-code from Eternal Source...\n");

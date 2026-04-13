@@ -6,7 +6,7 @@
  * =========================================================================
  */
 
-#include "../../../include/sigma_base.h"
+#include "../../include/sigma_base.h"
 
 void sigma_voice_command(const char* transcript) {
     sigma_printf("  [VOICE]: Recognized Intent: '%s'\n", transcript);

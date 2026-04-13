@@ -6,7 +6,7 @@
  * =========================================================================
  */
 
-#include "../../../include/sigma_base.h"
+#include "../../include/sigma_base.h"
 
 void sigma_ecosystem_ether_sync(void) {
     sigma_printf("  [ETHER]: Synchronizing with Trans-Dimensional Shard Instances...\n");

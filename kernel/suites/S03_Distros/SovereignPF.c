@@ -1,4 +1,4 @@
-#include "../../../include/sigma_kernel.h"
+#include "../../include/sigma_kernel.h"
 
 // Σ SovereignPF: Packet Filter Zenith
 // Inspired by FreeBSD PF (Packet Filter): Stateful Firewall & NAT Engine

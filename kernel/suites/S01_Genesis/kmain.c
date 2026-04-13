@@ -1,4 +1,4 @@
-#include "../../../include/sigma_kernel.h"
+#include "../../include/sigma_kernel.h"
 
 void kmain(void) {
     sigma_printf("Σ SIGMAOS ZENITH SUPREME (vMODULAR): BARE-METAL BOOT SEQUENCE ACTIVE.\n");

@@ -1,4 +1,4 @@
-#include "../../../include/sigma_kernel.h"
+#include "../../include/sigma_kernel.h"
 
 typedef struct {
     sigma_u64 entity_id;

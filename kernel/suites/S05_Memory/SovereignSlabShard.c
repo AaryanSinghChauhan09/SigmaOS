@@ -1,5 +1,5 @@
-#include "../../../include/SovereignMemory.h"
-#include "../../../include/sigma_kernel.h"
+#include "../../include/SovereignMemory.h"
+#include "../../include/sigma_kernel.h"
 #include "../../../libc/sigma_libc.h"
 
 #define SLAB_SIGNATURE 0x516D4105

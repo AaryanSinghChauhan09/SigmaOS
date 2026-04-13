@@ -4,8 +4,8 @@
  * =========================================================================
  */
 
-#include "../../../include/sigma_kernel.h"
-#include "../../../include/SovereignDTrace.h"
+#include "../../include/sigma_kernel.h"
+#include "../../include/SovereignDTrace.h"
 
 /* =========================================================================
  * §1  DTRACE SUBSYSTEM

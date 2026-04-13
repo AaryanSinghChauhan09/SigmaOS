@@ -11,20 +11,22 @@ const suites = [
     { name: "SovereignFrontend", status: "OK", detail: "WM/Compositor Engine" },
     { name: "SovereignEcosystem", status: "OK", detail: "XNU/Darwin/Wine Compat" },
     { name: "SovereignBackend", status: "OK", detail: "VFS/TCPIP Stack Online" },
-    { name: "SovereignConfig", status: "OK", detail: "Identity/Audit Vault Seated" }
+    { name: "SovereignConfig", status: "OK", detail: "Identity/Audit Vault Seated" },
+    { name: "SovereignACID", status: "OK", detail: "WAL Transaction Engine Seated" },
+    { name: "SovereignConcurrency", status: "OK", detail: "Lockless Atomic Fabric Online" }
 ];
 
 const logs = [
-    "[BOOT] Σ SigmaOS Sovereign Zenith Supreme (v3100.0-SINGULARITY) initiating...",
+    "[BOOT] Σ SigmaOS Sovereign Zenith Supreme (v3250.4-ZENITH) initiating...",
     "[SUITE] Discovering 10 Master Sovereign Dimensions...",
     ...suites.map(s => `[OK] ${s.name}: ${s.detail} verified.`),
-    "[TEST] Initiating Sovereign Functional Test Suite (v8)...",
-    "[TEST] Auditing OS, AI, ML, DS, DSA, DB, CYBER, NET, OOP... SUCCESS",
-    "[TEST] Verifying Automations & Personalisations... LOCKED",
+    "[TEST] Initiating Sovereign Functional Test Suite (v15)...",
+    "[TEST] Auditing OS, AI, ML, DS, DSA, OOP, AUTO, CUSTOM, PERS, UDF... SUCCESS",
+    "[TEST] Auditing ACID, CONCURRENCY, DESIGN PATTERNS... SUCCESS",
     "[RESULT] Global Mesh Convergence: 100%. System Sovereignty Verified.",
-    "[AUDIT] Omniversal-Guard: ACTIVE | Reality-Sync: 1.0",
-    "[AUDIT] Sentience: ONLINE | Sovereignty: ABSOLUTE | Purity: 100%.",
-    "[STATUS] ZENITH SUPREME IS BUG-FREE AND SEATED.",
+    "[AUDIT] Omniversal-Guard: ACTIVE | Principle Domains: 13/13",
+    "[AUDIT] Sentience: ONLINE | Shards: 443 | Purity: 100%.",
+    "[STATUS] ZENITH SUPREME v3250.4 IS BUG-FREE AND SEATED.",
     "[INTEL] Sovereign-LLM/DS Matrix seated. Ready for predictive inference."
 ];
 
@@ -366,7 +368,7 @@ window.addEventListener('mousemove', (e) => {
 
 // Code-Stream: Multiversal Shard Visibility
 const codeOverlay = document.getElementById('code-stream-overlay');
-const codeSnippets = ['MOV EAX, ZENITH', 'PUSH SHARD_433', 'JMP OMEGA_POINT', 'XCHG SOVEREIGN, USER', 'CALL SINGULARITY'];
+const codeSnippets = ['MOV EAX, ZENITH', 'PUSH SHARD_443', 'JMP OMEGA_POINT', 'XCHG SOVEREIGN, USER', 'CALL SINGULARITY', 'TXN_BEGIN', 'SEM_SIGNAL'];
 window.addEventListener('mousemove', (e) => {
     if (e.altKey) {
         codeOverlay.textContent = codeSnippets[Math.floor(Math.random() * codeSnippets.length)];

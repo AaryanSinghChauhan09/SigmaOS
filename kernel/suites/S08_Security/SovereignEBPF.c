@@ -11,9 +11,9 @@
 #ifndef SOVEREIGN_EBPF_H
 #define SOVEREIGN_EBPF_H
 
-#include "../../../include/SovereignOSBasicsZenith.h"
-#include "../../../include/sigma_kernel.h"
-#include "../../../include/sigma_kernel.h"
+#include "../../include/SovereignOSBasicsZenith.h"
+#include "../../include/sigma_kernel.h"
+#include "../../include/sigma_kernel.h"
 
 // -------------------------------------------------------------------------
 // EBPF Engine Object Structure

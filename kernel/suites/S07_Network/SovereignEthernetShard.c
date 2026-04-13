@@ -1,7 +1,7 @@
 #include "../../include/sigma_base.h"
 
-#include "../../../include/SovereignNet.h"
-#include "../../../include/sigma_libc.h"
+#include "../../include/SovereignNet.h"
+#include "../../include/sigma_libc.h"
 
 void sigma_ethernet_handler(void* payload, sigma_size_t size) {
     sigma_printf("  Σ [ETH]: Received Ethernet Frame (%lu bytes) via hardware shunt.\n", (unsigned long)size);

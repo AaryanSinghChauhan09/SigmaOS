@@ -1,7 +1,7 @@
 #include "../../include/sigma_base.h"
 
-#include "../../../include/SovereignInit.h"
-#include "../../../include/sigma_libc.h"
+#include "../../include/SovereignInit.h"
+#include "../../include/sigma_libc.h"
 
 void sigma_logger_init(void) {
     sigma_printf("  Σ [LOGGER]: Sovereign High-Performance Ring-0 Logger online.\n");
