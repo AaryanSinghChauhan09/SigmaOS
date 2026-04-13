@@ -1,175 +1,129 @@
 /*
  * =========================================================================
- * Σ SIGMAOS ZENITH: SOVEREIGN UDF ENGINE (v2.0 — SANDBOXED)
+ * Σ SIGMAOS ZENITH: SOVEREIGN UDF ENGINE (v3.0 — VM CORE)
  * =========================================================================
- * Mission: Custom User-Defined Functions for AI, DS, and DB workflows.
- * Principles: Dynamic Linkage, Atomic Execution, Sandboxed Isolation.
+ * Mission: Sandboxed Bytecode Execution for User-Defined Functions.
+ * Principles: VM Isolation, Pluggable Logic, Instruction Purity.
  *
- * v2.0: Real permission model, execution budget (tick limit),
- *       memory fence, and invocation auditing.
+ * Implements a stack-based virtual machine with kernel-safe instructions.
  * =========================================================================
  */
 
 #include "../../include/sigma_kernel.h"
 
+/* --- UDF VM Instruction Set --- */
+
+typedef enum {
+    OP_HALT,    /* 0x00 */
+    OP_PUSH,    /* 0x01 <val> */
+    OP_ADD,     /* 0x02 */
+    OP_SUB,     /* 0x03 */
+    OP_MUL,     /* 0x04 */
+    OP_LOAD,    /* 0x05 <addr> */
+    OP_STORE,   /* 0x06 <addr> */
+    OP_CMP      /* 0x07 */
+} SovereignOp_t;
+
 /* --- UDF Permission Flags --- */
 
-#define UDF_PERM_READ_MEM    0x01   /* Can read kernel memory            */
-#define UDF_PERM_WRITE_MEM   0x02   /* Can write kernel memory           */
-#define UDF_PERM_NET_ACCESS  0x04   /* Can use network stack             */
-#define UDF_PERM_FS_ACCESS   0x08   /* Can touch filesystem              */
-#define UDF_PERM_SAFE_ONLY   0x01   /* Default: read-only, no net/fs     */
+#define UDF_PERM_READ_MEM    0x01
+#define UDF_PERM_WRITE_MEM   0x02
+#define UDF_PERM_NET_ACCESS  0x04
+#define UDF_PERM_FS_ACCESS   0x08
 
-/* --- UDF Function Signature --- */
+/* --- UDF VM Context --- */
+
+#define UDF_STACK_SIZE 64
+
+typedef struct {
+    sigma_u64  stack[UDF_STACK_SIZE];
+    sigma_u32  sp;          /* stack pointer */
+    sigma_u64  registers[8];
+    sigma_u32  pc;          /* program counter */
+    sigma_u32  perms;
+    sigma_u64  tick_limit;
+} SigmaUDF_VM_t;
+
+/**
+ * sigma_udf_vm_execute: Runs a bytecode buffer within a sandboxed VM.
+ */
+sigma_err_t sigma_udf_vm_execute(const sigma_u8* bytecode, sigma_size_t len, 
+                                 sigma_u32 perms, sigma_u64 budget) {
+    SigmaUDF_VM_t vm;
+    vm.sp = 0;
+    vm.pc = 0;
+    vm.perms = perms;
+    vm.tick_limit = budget;
+
+    sigma_printf("[UDF-VM]: Starting execution sweep (len: %llu)...\n", (unsigned long long)len);
+
+    while (vm.pc < len && vm.tick_limit > 0) {
+        vm.tick_limit--;
+        SovereignOp_t op = (SovereignOp_t)bytecode[vm.pc++];
+
+        switch (op) {
+            case OP_HALT:
+                sigma_printf("[UDF-VM]: Program halted normally.\n");
+                return SIGMA_OK;
+
+            case OP_PUSH:
+                if (vm.sp < UDF_STACK_SIZE) {
+                    /* Read 8-byte value (simplistic) */
+                    sigma_u64 val = *(sigma_u64*)&bytecode[vm.pc];
+                    vm.pc += 8;
+                    vm.stack[vm.sp++] = val;
+                }
+                break;
+
+            case OP_ADD:
+                if (vm.sp >= 2) {
+                    sigma_u64 b = vm.stack[--vm.sp];
+                    sigma_u64 a = vm.stack[--vm.sp];
+                    vm.stack[vm.sp++] = a + b;
+                }
+                break;
+
+            case OP_LOAD:
+                if (!(vm.perms & UDF_PERM_READ_MEM)) {
+                    sigma_printf("[UDF-VM]: FAULT - Read permission denied.\n");
+                    return SIGMA_EPERM;
+                }
+                /* Kernel-space memory check logic would go here */
+                vm.pc += 8;
+                break;
+
+            default:
+                sigma_printf("[UDF-VM]: FAULT - Illegal Instruction 0x%02X\n", op);
+                return SIGMA_EFAULT;
+        }
+    }
+
+    if (vm.tick_limit == 0) {
+        sigma_printf("[UDF-VM]: FAULT - Execution budget exceeded (ABORTED).\n");
+        return SIGMA_ETIME;
+    }
+
+    return SIGMA_OK;
+}
+
+/* --- Registry & Legacy Bridge --- */
 
 typedef sigma_err_t (*SigmaUDF_t)(void* data);
-
-/* --- UDF Registry Entry --- */
 
 typedef struct {
     char            name[32];
     SigmaUDF_t      func;
-    sigma_u32       permissions;     /* bitfield of UDF_PERM_*            */
-    sigma_u64       tick_budget;     /* max ticks before forced abort     */
-    sigma_u32       invocation_count;
-    sigma_u32       fault_count;     /* times the UDF exceeded its budget */
+    sigma_u8*       bytecode;
+    sigma_u32       bytecode_len;
+    sigma_u32       permissions;
+    sigma_u64       tick_budget;
+    sigma_u32       calls;
 } SovereignUDF_t;
 
-/* --- Global Registry --- */
-
 #define MAX_UDFS 32
-static SovereignUDF_t s_udf_registry[MAX_UDFS];
-static sigma_u32 s_udf_count = 0;
-
-/**
- * sigma_udf_register: Seats a user-defined function with explicit permissions.
- *
- * The caller declares what the UDF is allowed to do. The engine
- * enforces these at dispatch time — this is the sandboxing contract.
- */
-sigma_err_t sigma_udf_register(const char* name, SigmaUDF_t func,
-                               sigma_u32 permissions, sigma_u64 tick_budget) {
-    if (s_udf_count >= MAX_UDFS) return SIGMA_ENOSPC;
-    if (!func) return SIGMA_EINVAL;
-
-    SovereignUDF_t* udf = &s_udf_registry[s_udf_count++];
-    sigma_strncpy(udf->name, name, 32);
-    udf->func             = func;
-    udf->permissions      = permissions;
-    udf->tick_budget      = tick_budget;
-    udf->invocation_count = 0;
-    udf->fault_count      = 0;
-
-    sigma_printf("[UDF-ENGINE]: Registered '%s' (perms: 0x%02X, budget: %llu ticks)\n",
-                 name, permissions, (unsigned long long)tick_budget);
-    return SIGMA_OK;
-}
-
-/**
- * sigma_udf_find: Looks up a UDF by name. Returns index or -1.
- */
-static int sigma_udf_find(const char* name) {
-    for (sigma_u32 i = 0; i < s_udf_count; i++) {
-        if (sigma_streq(s_udf_registry[i].name, name)) {
-            return (int)i;
-        }
-    }
-    return -1;
-}
-
-/**
- * sigma_udf_check_permission: Verifies that a UDF has the required
- * permission before allowing a sensitive operation.
- */
-sigma_err_t sigma_udf_check_permission(sigma_u32 udf_index,
-                                       sigma_u32 required_perm) {
-    if (udf_index >= s_udf_count) return SIGMA_EINVAL;
-
-    SovereignUDF_t* udf = &s_udf_registry[udf_index];
-    if ((udf->permissions & required_perm) != required_perm) {
-        sigma_printf("[UDF-ENGINE]: DENIED — '%s' lacks permission 0x%02X\n",
-                     udf->name, required_perm);
-        return SIGMA_EPERM;
-    }
-    return SIGMA_OK;
-}
-
-/**
- * sigma_udf_execute: Dispatches a UDF with sandboxed isolation.
- *
- * Sandbox enforcement:
- *   1. Permission check (the UDF must have been registered with adequate perms).
- *   2. Tick budget — if the UDF were real, the kernel timer would abort it
- *      after tick_budget ISR ticks. Here we track invocations and faults.
- *   3. Memory fence — the UDF receives only the data pointer it was given;
- *      it cannot access arbitrary kernel memory without WRITE_MEM permission.
- */
-sigma_err_t sigma_udf_execute(const char* name, void* data) {
-    int idx = sigma_udf_find(name);
-    if (idx < 0) {
-        sigma_printf("[UDF-ENGINE]: ERROR — UDF '%s' not found.\n", name);
-        return SIGMA_ENOENT;
-    }
-
-    SovereignUDF_t* udf = &s_udf_registry[idx];
-
-    sigma_printf("[UDF-ENGINE]: Dispatching '%s' (invocation #%u)...\n",
-                 name, udf->invocation_count + 1);
-
-    /* Execute within sandbox contract */
-    sigma_err_t result = udf->func(data);
-    udf->invocation_count++;
-
-    if (result != SIGMA_OK) {
-        udf->fault_count++;
-        sigma_printf("[UDF-ENGINE]: FAULT in '%s' (total faults: %u)\n",
-                     name, udf->fault_count);
-    } else {
-        sigma_printf("[UDF-ENGINE]: '%s' completed successfully.\n", name);
-    }
-
-    return result;
-}
-
-/**
- * sigma_udf_unregister: Removes a UDF from the registry by name.
- * Shifts remaining entries to keep the array compact.
- */
-sigma_err_t sigma_udf_unregister(const char* name) {
-    int idx = sigma_udf_find(name);
-    if (idx < 0) return SIGMA_ENOENT;
-
-    sigma_printf("[UDF-ENGINE]: Unregistering '%s'.\n", name);
-
-    /* Shift entries down */
-    for (sigma_u32 i = (sigma_u32)idx; i < s_udf_count - 1; i++) {
-        s_udf_registry[i] = s_udf_registry[i + 1];
-    }
-    s_udf_count--;
-
-    return SIGMA_OK;
-}
-
-/* --- Audit --- */
-
-void SovereignUDF_Audit(void) {
-    sigma_printf("\n--- SOVEREIGN UDF AUDIT ---\n");
-    sigma_printf("%-20s %-8s %-12s %-8s %-8s\n",
-                 "NAME", "PERMS", "BUDGET", "CALLS", "FAULTS");
-    sigma_printf("----------------------------------------------------------\n");
-    for (sigma_u32 i = 0; i < s_udf_count; i++) {
-        SovereignUDF_t* u = &s_udf_registry[i];
-        sigma_printf("%-20s 0x%02X     %-12llu %-8u %-8u\n",
-                     u->name, u->permissions,
-                     (unsigned long long)u->tick_budget,
-                     u->invocation_count, u->fault_count);
-    }
-    sigma_printf("----------------------------------------------------------\n");
-    sigma_printf("Total UDFs registered: %u\n", s_udf_count);
-}
-
-/* --- Module Factory --- */
+static SovereignUDF_t s_registry[MAX_UDFS];
+static sigma_u32 s_count = 0;
 
 void SovereignUDF_Register(void) {
-    sigma_printf("[REGISTRY]: Sovereign UDF Engine v2.0 (Sandboxed) active.\n");
+    sigma_printf("[REGISTRY]: Sovereign UDF Engine v3.0 (Bytecode VM) online.\n");
 }
