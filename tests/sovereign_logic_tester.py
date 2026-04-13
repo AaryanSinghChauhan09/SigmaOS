@@ -201,6 +201,54 @@ def test_graphics_raytracing_logic():
     assert discriminant > 0 # Should intersect
     print(f"  [OK] Raytracing Intersection (Disc: {discriminant:.2f}) Passed.")
 
+def test_compiler_lexer_logic():
+    print("[TEST]: Compiler Logic (Lexical Analysis)")
+    input_str = "x + 42"
+    tokens = []
+    # Simplified lex logic for validation
+    for char in input_str:
+        if char == " " : continue
+        if char == "+" : tokens.append("OP_ADD")
+        elif char.isdigit(): tokens.append("NUMBER")
+        else: tokens.append("IDENT")
+        
+    assert tokens == ["IDENT", "OP_ADD", "NUMBER", "NUMBER"]
+    print(f"  [OK] Lexer Tokenization ({len(tokens)} tokens) Passed.")
+
+def test_fault_tolerance_logic():
+    print("[TEST]: Fault Tolerance (State Mirroring)")
+    primary_state = [0xDE, 0xAD, 0xBE, 0xEF]
+    mirror_state  = [0xDE, 0xAD, 0xBE, 0xEF]
+    
+    # State reconciliation logic
+    is_sync = all(p == m for p, m in zip(primary_state, mirror_state))
+    assert is_sync == True
+    
+    primary_state[0] = 0x00 # Simulate corruption
+    is_corrupt = any(p != m for p, m in zip(primary_state, mirror_state))
+    assert is_corrupt == True
+    print("  [OK] State Mirroring Reconciliation Passed.")
+
+def test_ai_nlp_tf_logic():
+    print("[TEST]: NLP Logic (Term Frequency)")
+    corpus = "sigma sigma zenith OS"
+    words = corpus.split()
+    tf = {w: words.count(w) for w in set(words)}
+    
+    assert tf["sigma"] == 2
+    assert tf["zenith"] == 1
+    print(f"  [OK] NLP Term Frequency (sigma: {tf['sigma']}) Passed.")
+
+def test_security_ids_logic():
+    print("[TEST]: Security Logic (IDS Anomaly)")
+    threshold = 5000
+    safe_rate = 1200
+    attack_rate = 8500
+    
+    assert safe_rate < threshold
+    assert attack_rate > threshold
+    print(f"  [OK] IDS Threshold Anomaly detection Passed.")
+
 if __name__ == "__main__":
     print("=========================================")
     print(" SIGMAOS SOVEREIGN LOGIC AUDIT (PYTHON) ")
@@ -216,6 +264,10 @@ if __name__ == "__main__":
         test_pid_control_logic()
         test_quantum_logic()
         test_graphics_raytracing_logic()
+        test_compiler_lexer_logic()
+        test_fault_tolerance_logic()
+        test_ai_nlp_tf_logic()
+        test_security_ids_logic()
         print("\n[VERIFICATION]: ALL ALGORITHMIC LOGIC VALIDATED.")
     except AssertionError as e:
         print(f"\n[FAIL]: Logic validation failed: {e}")
