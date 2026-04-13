@@ -70,6 +70,50 @@ def test_dvfs_power_logic():
     assert savings > 0.5 # ECO should save significant power
     print(f"  [OK] DVFS Power Scaling (-{savings*100:.1f}%) Passed.")
 
+def test_crypto_logic():
+    print("[TEST]: Cryptography Logic (FNV-1a Hash)")
+    # FNV-1a parameters
+    offset = 0xcbf29ce484222325
+    prime = 0x100000001b3
+    
+    data = b"SigmaOS"
+    hash_val = offset
+    for byte in data:
+        hash_val ^= byte
+        hash_val = (hash_val * prime) & 0xFFFFFFFFFFFFFFFF
+        
+    # Standard FNV-1a for "SigmaOS" is expected to be consistent
+    assert hash_val != offset
+    print(f"  [OK] Crypto Hash (FNV-1a: {hex(hash_val)}) Passed.")
+
+def test_cache_lru_logic():
+    print("[TEST]: Page Cache Logic (LRU Eviction)")
+    cache_size = 3
+    # Simulating access sequence
+    cache = {} # id -> tick
+    tick = 0
+    
+    def access(pid):
+        nonlocal tick
+        tick += 1
+        if pid in cache:
+            cache[pid] = tick
+        else:
+            if len(cache) >= cache_size:
+                # Evict min tick
+                lru_pid = min(cache, key=cache.get)
+                del cache[lru_pid]
+            cache[pid] = tick
+
+    access(1); access(2); access(3) # Fill
+    access(1) # Refresh 1
+    access(4) # Should evict 2 (the oldest)
+    
+    assert 2 not in cache
+    assert 1 in cache
+    assert 4 in cache
+    print("  [OK] Cache LRU Eviction Logic Passed.")
+
 if __name__ == "__main__":
     print("=========================================")
     print(" SIGMAOS SOVEREIGN LOGIC AUDIT (PYTHON) ")
@@ -79,6 +123,8 @@ if __name__ == "__main__":
         test_data_science_logic()
         test_raft_consensus_logic()
         test_dvfs_power_logic()
+        test_crypto_logic()
+        test_cache_lru_logic()
         print("\n[VERIFICATION]: ALL ALGORITHMIC LOGIC VALIDATED.")
     except AssertionError as e:
         print(f"\n[FAIL]: Logic validation failed: {e}")

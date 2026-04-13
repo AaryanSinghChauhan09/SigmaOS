@@ -47,7 +47,7 @@ def generate_mermaid():
         f.write("\n".join(mmd))
         f.write("\n```\n")
     
-    print("Σ [OK]: SHARD_GRAPH.md generated successfully.")
+    print("[OK]: SHARD_GRAPH.md generated successfully.")
 
 if __name__ == "__main__":
     try:
