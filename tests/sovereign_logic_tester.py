@@ -139,6 +139,28 @@ def test_logger_ring_buffer_logic():
     assert buffer[14 % size] == 14
     print("  [OK] Logger Ring-Buffer Wrap Passed.")
 
+def test_pid_control_logic():
+    print("[TEST]: Control Logic (PID Loop)")
+    kp, ki, kd = 1.0, 0.1, 0.05
+    target = 100.0
+    current = 0.0
+    prev_error = 0.0
+    integral = 0.0
+    dt = 1.0
+    
+    # Run 5 iterations
+    for _ in range(5):
+        error = target - current
+        integral += error * dt
+        derivative = (error - prev_error) / dt
+        output = (kp * error) + (ki * integral) + (kd * derivative)
+        current += output # Simple plant
+        prev_error = error
+        
+    assert current > 50 # Should be approaching target
+    assert abs(target - current) < 100 # Should not explode
+    print(f"  [OK] PID Control (Current: {current:.2f}) Passed.")
+
 if __name__ == "__main__":
     print("=========================================")
     print(" SIGMAOS SOVEREIGN LOGIC AUDIT (PYTHON) ")
@@ -151,6 +173,7 @@ if __name__ == "__main__":
         test_crypto_logic()
         test_cache_lru_logic()
         test_logger_ring_buffer_logic()
+        test_pid_control_logic()
         print("\n[VERIFICATION]: ALL ALGORITHMIC LOGIC VALIDATED.")
     except AssertionError as e:
         print(f"\n[FAIL]: Logic validation failed: {e}")

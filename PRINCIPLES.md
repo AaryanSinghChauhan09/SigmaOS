@@ -17,6 +17,7 @@ This matrix confirms the structural enforcement of all 13 core engineering princ
 | **Database & ACID** | `SovereignACIDEngine.c` | **Write-Ahead Log (WAL)**, Atomic Transactions (BEGIN/COMMIT) |
 | **Concurrency** | `SovereignConcurrencyEngine.c` | Spinlocks, Semaphores, RW-Locks, **Lock-free Ring Buffer** |
 | **Design Patterns** | `SovereignDesignPatterns.c` | Singleton, Observer, Strategy, Factory, Iterator (C11 Patterns) |
+| **Control Systems** | `SovereignControlShard.c` | **Proportional-Integral-Derivative (PID)** feedback loop |
 
 ## 📊 Verification Status
 - **Static Analysis Target**: `make lint` -> [OK]
