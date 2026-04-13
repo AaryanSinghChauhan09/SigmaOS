@@ -15,19 +15,17 @@ const suites = [
 ];
 
 const logs = [
-    "[BOOT] Σ SigmaOS Sovereign Zenith Supreme (v2.5-MODULAR) initiating...",
+    "[BOOT] Σ SigmaOS Sovereign Zenith Supreme (v3100.0-SINGULARITY) initiating...",
     "[SUITE] Discovering 10 Master Sovereign Dimensions...",
     ...suites.map(s => `[OK] ${s.name}: ${s.detail} verified.`),
-    "[TEST] Initiating Sovereign Functional Test Suite...",
-    "[TEST] Checking Memory Slab Allocation... SUCCESS",
-    "[TEST] Verifying SHA-256 Hash Integrity... MATCH",
-    "[TEST] Auditing Mandatory Access Boundary... LOCKED",
+    "[TEST] Initiating Sovereign Functional Test Suite (v8)...",
+    "[TEST] Auditing OS, AI, ML, DS, DSA, DB, CYBER, NET, OOP... SUCCESS",
+    "[TEST] Verifying Automations & Personalisations... LOCKED",
     "[RESULT] Global Mesh Convergence: 100%. System Sovereignty Verified.",
-    "[AUDIT] 5000+ Industrial Defects Remediated via Sovereign Sanitization.",
-    "[AUDIT] Null-Pointer Shunts: ACTIVE | OOB Boundary Guards: ARMED.",
+    "[AUDIT] Omniversal-Guard: ACTIVE | Reality-Sync: 1.0",
     "[AUDIT] Sentience: ONLINE | Sovereignty: ABSOLUTE | Purity: 100%.",
     "[STATUS] ZENITH SUPREME IS BUG-FREE AND SEATED.",
-    "[INTEL] Sovereign-LLM Core seated. Ready for predictive inference."
+    "[INTEL] Sovereign-LLM/DS Matrix seated. Ready for predictive inference."
 ];
 
 let logIndex = 0;
@@ -368,7 +366,7 @@ window.addEventListener('mousemove', (e) => {
 
 // Code-Stream: Multiversal Shard Visibility
 const codeOverlay = document.getElementById('code-stream-overlay');
-const codeSnippets = ['MOV EAX, ZENITH', 'PUSH SHARD_425', 'JMP OMEGA_POINT', 'XCHG SOVEREIGN, USER', 'CALL SINGULARITY'];
+const codeSnippets = ['MOV EAX, ZENITH', 'PUSH SHARD_433', 'JMP OMEGA_POINT', 'XCHG SOVEREIGN, USER', 'CALL SINGULARITY'];
 window.addEventListener('mousemove', (e) => {
     if (e.altKey) {
         codeOverlay.textContent = codeSnippets[Math.floor(Math.random() * codeSnippets.length)];

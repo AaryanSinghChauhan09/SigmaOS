@@ -11,6 +11,21 @@ The system has achieved **100% Roadmap Convergence**. All 434 functional shards 
 
 ## 🏛️ The 10 Master Sovereign Suites
 The kernel is modularized into 10 hierarchical dimensions, ensuring absolute isolation and scalability:
+
+```mermaid
+graph TD
+    S01[S01 Genesis] --> S04[S04 HAL]
+    S01 --> S05[S05 Memory]
+    S04 --> S08[S08 Security]
+    S05 --> S06[S06 Storage]
+    S08 --> S10[S10 Orchestration]
+    S06 --> S10
+    S07[S07 Network] --> S10
+    S03[S03 Distros] --> S10
+    S09[S09 Tooling] --> S01
+    S10 --> S02[S02 ZenithUI]
+```
+
 1. **S01_Genesis**: Boot, core registries, and post-quantum identity.
 2. **S02_ZenithUI**: Sentient-Chroma frontend and high-fidelity WM.
 3. **S03_Distros**: Absorption layer for global OS ecosystems (Linux/Darwin/Windows).
@@ -26,14 +41,20 @@ The kernel is modularized into 10 hierarchical dimensions, ensuring absolute iso
 
 ## 🧬 Enforced Scientific Principles
 SigmaOS is built on the following foundational paradigms:
-- **Operating Systems**: Atomic resource management, process isolation, and hardware-bridged HAL.
-- **AI & Machine Learning**: Native Neural Engine (NPU) parity and SIMD-accelerated inference.
-- **Data Science**: Matrix-sharded data handling and high-velocity analytical UDFs.
-- **Algorithms (DSA)**: O(N log N) sorting, efficient graph traversal, and Big O verified logic.
-- **Object Oriented Programming**: Poly-dispatch interfaces and strict encapsulation in C.
-- **Cybersecurity**: Zero-Trust architecture, Kyber Post-Quantum Crypto, and IDS/LSM hardening.
-- **Networking**: Strict adherence to the OSI Model and distributed mesh connectivity.
-- **Automations & Personalizations**: Autonomous self-healing and identity-aware UI adaptation.
+
+| **Domain** | **Implementation Path** | **Core Law Enforced** |
+| :--- | :--- | :--- |
+| **Operating Systems** | `S01_Genesis`, `S05_Memory` | Process Fairness & Virtual Isolation |
+| **AI & ML** | `S10_Orchestration` | Native Tensor & Neural Shard Inference |
+| **Data Science** | `S10_Orchestration` | Matrix Sharding & Analytical Consistency |
+| **Algorithms (DSA)** | `S10_Orchestration` | O(N log N) Quicksort Complexity |
+| **OOP** | `include/sigma_kernel.h` | Polymorphic Registry Dispatch |
+| **Automations** | `S09_Tooling` | Autonomous Self-Healing & Cron Tasks |
+| **Customisations** | `S01_Genesis` | Dynamic Sentient-Chroma Identity |
+| **UDFs** | `S10_Orchestration` | Sandboxed User Defined Logic |
+| **Database** | `S06_Storage` | ACID Transactional Purity |
+| **Networking** | `S07_Network` | OSI 7-Layer Model Adherence |
+| **Sustainability** | `S04_HAL` | Green Computing & DFS Scaling |
 
 ---
 
