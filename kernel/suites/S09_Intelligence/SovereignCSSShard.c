@@ -32,3 +32,4 @@ void sigma_opt_css_interact(SigmaCParticle_t* p1, SigmaCParticle_t* p2) {
 void SovereignCSS_Register(void) {
     sigma_printf("[INTELLIGENCE]: Sovereign CSS (Electromagnetic Optima) active.\n");
 }
+

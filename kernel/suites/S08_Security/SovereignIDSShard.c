@@ -36,3 +36,4 @@ void sigma_security_forensic_log(const char* event) {
 void SovereignIDS_Register(void) {
     sigma_printf("[SECURITY]: Sovereign Intrusion Detection (IDS/Forensics) active.\n");
 }
+

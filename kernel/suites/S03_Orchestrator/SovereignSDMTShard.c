@@ -33,3 +33,4 @@ void sigma_sched_sdmt_dispatch(SigmaVCore_t* vcore) {
 void SovereignSDMT_Register(void) {
     sigma_printf("[ORCHESTRATOR]: Sovereign SDMT (Software Hyper-Threading) active.\n");
 }
+

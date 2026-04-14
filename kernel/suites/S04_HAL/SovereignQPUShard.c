@@ -26,3 +26,4 @@ void sigma_hal_qpu_superpose(void* tensor_matrix) {
 void SovereignQPU_Register(void) {
     sigma_printf("[HAL]: Sovereign QPU (Native Qubit Superposition) active.\n");
 }
+

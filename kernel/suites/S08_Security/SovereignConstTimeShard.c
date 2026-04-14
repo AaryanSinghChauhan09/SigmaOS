@@ -28,3 +28,4 @@ void sigma_sec_const_time_swap(sigma_u64* a, sigma_u64* b, int do_swap) {
 void SovereignConstTime_Register(void) {
     sigma_printf("[SECURITY]: Sovereign Const-Time Math (Timing Defiance) active.\n");
 }
+

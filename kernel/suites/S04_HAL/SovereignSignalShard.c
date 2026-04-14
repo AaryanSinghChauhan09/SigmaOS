@@ -32,3 +32,4 @@ void sigma_dsp_fft(SigmaComplex_t* data, int n) {
 void SovereignSignal_Register(void) {
     sigma_printf("[HAL]: Sovereign Signal Engine (FFT) active.\n");
 }
+

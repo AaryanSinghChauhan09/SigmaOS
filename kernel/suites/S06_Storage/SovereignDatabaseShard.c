@@ -38,3 +38,4 @@ sigma_err_t sigma_db_commit(SigmaTransaction_t* tx) {
 void SovereignDatabase_Register() {
     sigma_printf("[REGISTRY]: Database Engine (ACID) registered as Storage Shard.\n");
 }
+

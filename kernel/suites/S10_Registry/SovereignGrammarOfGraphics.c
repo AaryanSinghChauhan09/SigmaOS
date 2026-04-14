@@ -38,3 +38,4 @@ static SovereignGrammarOfGraphics_t create_grammar_graphics() {
     obj.ApplyGeometricTopology = gog_apply_geometric;
     return obj;
 }
+

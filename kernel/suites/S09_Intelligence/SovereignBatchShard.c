@@ -29,3 +29,4 @@ void sigma_batch_submit(const char* cmd, int prio) {
 void SovereignBatch_Register(void) {
     sigma_printf("[SERVICES]: Sovereign Batch Engine (Throughput) active.\n");
 }
+

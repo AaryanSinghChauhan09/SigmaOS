@@ -38,3 +38,4 @@ void sigma_audio_play_beep(float freq, float duration) {
 void SovereignAudio_Register(void) {
     sigma_printf("[HAL]: Sovereign Audio Synthesis (Vox-Mastery) active.\n");
 }
+

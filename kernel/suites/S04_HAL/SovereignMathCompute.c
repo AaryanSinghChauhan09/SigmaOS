@@ -12,8 +12,8 @@
 //   • Used by S09 Intelligence and S13 Sentience for real-time inference.
 // =============================================================================
 
-#include <stdint.h>
-#include <stdbool.h>
+#include "sigma_types.h"
+
 
 #define MAX_MATRIX_DIM 8192
 
@@ -43,3 +43,4 @@ uint64_t math_compute_get_gflops(void);
 
 // Map a math kernel directly to the NPU/TPU silicon (S04 HAL path)
 void math_compute_bind_silicon(uint32_t hw_unit_id);
+

@@ -27,3 +27,4 @@ void SovereignIntelligence_Register(void) {
     };
     sigma_module_register(&s_intel_module);
 }
+

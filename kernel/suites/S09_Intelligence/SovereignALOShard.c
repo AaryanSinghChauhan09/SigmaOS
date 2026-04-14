@@ -26,3 +26,4 @@ void sigma_opt_alo_trap(float* search_matrix, float trap_radius) {
 void SovereignALO_Register(void) {
     sigma_printf("[INTELLIGENCE]: Sovereign ALO (Ant Lion Optimization) active.\n");
 }
+

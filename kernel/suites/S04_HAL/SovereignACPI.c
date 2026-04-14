@@ -165,3 +165,4 @@ void SovereignACPI_Init(void) {
 
     sigma_printf("Σ [ACPI]: ACPI engine online. Advanced configuration sovereignty achieved.\n");
 }
+

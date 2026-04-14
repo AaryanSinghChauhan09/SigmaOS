@@ -26,3 +26,4 @@ void sigma_hal_p2pdma_stream(sigma_u32 nvme_id, sigma_u32 nic_id) {
 void SovereignP2PDMA_Register(void) {
     sigma_printf("[HAL]: Sovereign P2PDMA (PCIe Endpoint Fabric) active.\n");
 }
+

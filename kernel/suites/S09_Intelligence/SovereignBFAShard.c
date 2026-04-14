@@ -26,3 +26,4 @@ void sigma_opt_bfa_chemotaxis(float nutrient_gradient) {
 void SovereignBFA_Register(void) {
     sigma_printf("[INTELLIGENCE]: Sovereign BFA (Bacterial Foraging) active.\n");
 }
+

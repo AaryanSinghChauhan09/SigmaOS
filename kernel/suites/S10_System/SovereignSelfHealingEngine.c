@@ -13,8 +13,8 @@
 //     WITHOUT interrupting the running process.
 // =============================================================================
 
-#include <stdint.h>
-#include <stdbool.h>
+#include "sigma_types.h"
+
 
 #define VAULT_PATH "/boot/sovereign/vault"
 
@@ -45,3 +45,4 @@ void healing_report_to_zenith(const char* detail);
 
 // Deep Scan: Full system binary audit (Background task)
 void healing_deep_scan_async(void);
+

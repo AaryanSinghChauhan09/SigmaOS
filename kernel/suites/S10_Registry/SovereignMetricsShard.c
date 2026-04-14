@@ -34,3 +34,4 @@ void sigma_metrics_increment(const char* name) {
 void SovereignMetrics_Register(void) {
     sigma_printf("[TOOLING]: Sovereign Metrics Engine (Observability) active.\n");
 }
+

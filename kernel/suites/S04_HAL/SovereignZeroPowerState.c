@@ -10,8 +10,8 @@
 // Result: Always-On Hive connectivity with zero effective battery drain.
 // =============================================================================
 
-#include <stdint.h>
-#include <stdbool.h>
+#include "sigma_types.h"
+
 
 typedef struct {
     uint32_t core_id;
@@ -38,3 +38,4 @@ float zero_power_audit_efficiency(void);
 
 // Synchronize shadow-clocks with Hive peers (S12)
 void zero_power_sync_mesh_clocks(void);
+

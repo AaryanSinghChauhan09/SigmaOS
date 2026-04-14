@@ -26,3 +26,4 @@ void sigma_opt_mro_forage(float* node_vector, int generation_cycle) {
 void SovereignMRO_Register(void) {
     sigma_printf("[INTELLIGENCE]: Sovereign MRO (Manta Ray Foraging) active.\n");
 }
+

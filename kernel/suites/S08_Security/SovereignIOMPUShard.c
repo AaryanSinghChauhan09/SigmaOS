@@ -26,3 +26,4 @@ void sigma_sec_iompu_restrict(sigma_u32 device_master_id, void* safe_region_star
 void SovereignIOMPU_Register(void) {
     sigma_printf("[SECURITY]: Sovereign IOMPU (Hardware Bus Enforcer) active.\n");
 }
+

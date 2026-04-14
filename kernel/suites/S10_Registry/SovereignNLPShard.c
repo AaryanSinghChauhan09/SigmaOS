@@ -36,3 +36,4 @@ void sigma_ai_nlp_analyze(const char* text) {
 void SovereignNLP_Register(void) {
     sigma_printf("[AI]: Sovereign NLP Engine seated.\n");
 }
+

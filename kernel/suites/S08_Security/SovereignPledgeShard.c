@@ -12,3 +12,4 @@ sigma_err_t sigma_pledge_init(void) {
 void SovereignPledge_Register(void) {
     SovereignSecurity_Register("pledge", sigma_pledge_init);
 }
+

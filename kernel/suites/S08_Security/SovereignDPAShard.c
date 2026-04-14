@@ -26,3 +26,4 @@ void sigma_sec_dpa_mask(void) {
 void SovereignDPA_Register(void) {
     sigma_printf("[SECURITY]: Sovereign DPA (Power Analysis Blinding) active.\n");
 }
+

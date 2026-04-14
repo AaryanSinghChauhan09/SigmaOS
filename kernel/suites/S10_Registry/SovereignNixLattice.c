@@ -10,8 +10,8 @@
 // Result: Impossible to 'break' the OS via configuration errors.
 // =============================================================================
 
-#include <stdint.h>
-#include <stdbool.h>
+#include "sigma_types.h"
+
 
 typedef struct {
     uint8_t  generation_id;
@@ -38,3 +38,4 @@ void nixlattice_sync_mesh_history(void);
 
 // Report 'Consistency Factor' (System stability index)
 float nixlattice_get_stability(void);
+

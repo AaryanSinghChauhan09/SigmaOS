@@ -12,3 +12,4 @@ sigma_err_t sigma_fat32_mount(const char* target) {
 void SovereignFAT32_Register(void) {
     SovereignFSRegistry_Register("fat32", sigma_fat32_mount);
 }
+

@@ -31,3 +31,4 @@ void sigma_opt_bfo_chemotaxis(SigmaBacterium_t* bacterium, float nutrient_gradie
 void SovereignBFO_Register(void) {
     sigma_printf("[INTELLIGENCE]: Sovereign BFO (Bacterial Foraging) active.\n");
 }
+

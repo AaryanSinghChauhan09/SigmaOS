@@ -11,8 +11,8 @@
 //         exactly as intended at the silicon level.
 // =============================================================================
 
-#include <stdint.h>
-#include <stdbool.h>
+#include "sigma_types.h"
+
 
 typedef struct {
     uint32_t total_suites_audited;
@@ -40,3 +40,4 @@ void lattice_auditor_sync_mesh_verdict(void);
 
 // Report 'Operational Integrity' to the ZenithUI (S02)
 float lattice_auditor_get_system_iq(void);
+

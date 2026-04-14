@@ -335,3 +335,4 @@ void SovereignPowerManagement_Init(void) {
 
     sigma_printf("Σ [PM]: Power management sovereignty achieved.\n");
 }
+

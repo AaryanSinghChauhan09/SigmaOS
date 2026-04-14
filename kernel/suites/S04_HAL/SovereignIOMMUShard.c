@@ -26,3 +26,4 @@ void sigma_hal_iommu_bind(sigma_u32 pci_bdf, sigma_u32 domain_id) {
 void SovereignIOMMU_Register(void) {
     sigma_printf("[HAL]: Sovereign IOMMU (Hardware DMA Defense) active.\n");
 }
+

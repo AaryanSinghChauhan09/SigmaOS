@@ -33,3 +33,4 @@ void sigma_net_p2p_mesh(void) {
 void SovereignVPN_Register(void) {
     sigma_printf("[NETWORK]: Sovereign Overlay (VPN Mastery) active.\n");
 }
+

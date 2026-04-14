@@ -26,3 +26,4 @@ void sigma_sec_mpu_lock(sigma_u32 region_number, void* base_addr, sigma_u32 size
 void SovereignMPU_Register(void) {
     sigma_printf("[SECURITY]: Sovereign MPU (Embedded Isolation) active.\n");
 }
+

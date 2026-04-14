@@ -10,8 +10,8 @@
 // Result: 0-Latency game/asset loading with 0% CPU impact.
 // =============================================================================
 
-#include <stdint.h>
-#include <stdbool.h>
+#include "sigma_types.h"
+
 
 typedef struct {
     uint64_t source_lba;
@@ -36,3 +36,4 @@ uint64_t directpath_get_throughput_mbps(void);
 
 // Sync DirectPath state with MeshDisplay (S12) for remote DMA
 void directpath_sync_mesh_dma(void);
+

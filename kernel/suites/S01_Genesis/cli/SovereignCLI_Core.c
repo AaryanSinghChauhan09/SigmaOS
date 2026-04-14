@@ -71,3 +71,4 @@ sigma_err_t sigma_cli_dispatch(SigmaCLICtx_t *ctx, const char *cmdline) {
     sigma_printf("Σ [CLI]: Unknown command: '%s'\n", argv[0]);
     return SIGMA_ENOENT;
 }
+

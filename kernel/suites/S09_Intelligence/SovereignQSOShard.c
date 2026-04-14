@@ -26,3 +26,4 @@ void sigma_opt_qso_tunnel(float* global_best, float delta_potential) {
 void SovereignQSO_Register(void) {
     sigma_printf("[INTELLIGENCE]: Sovereign QSO (Quantum Swarm Optima) active.\n");
 }
+

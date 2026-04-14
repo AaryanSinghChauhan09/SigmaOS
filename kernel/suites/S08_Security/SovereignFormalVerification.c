@@ -11,8 +11,8 @@
 //   • Statistically proves the absence of common buffer-overflows and race conditions
 // =============================================================================
 
-#include <stdint.h>
-#include <stdbool.h>
+#include "sigma_types.h"
+
 
 typedef struct {
     const char* property_name;
@@ -39,3 +39,4 @@ void formal_report_to_oracle(void);
 
 // Emergency Halt: If an assertion is violated, enter Secure Seal mode (S08)
 void formal_enforce_safety(void);
+

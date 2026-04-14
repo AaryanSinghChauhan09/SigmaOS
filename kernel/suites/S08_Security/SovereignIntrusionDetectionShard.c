@@ -13,3 +13,4 @@ sigma_err_t sigma_ids_init(void) {
 void SovereignIDS_Register(void) {
     SovereignSecurity_Register("ids", sigma_ids_init);
 }
+

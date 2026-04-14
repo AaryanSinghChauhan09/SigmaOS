@@ -120,3 +120,4 @@ void SovereignSustainability_Register(void) {
     sigma_printf("[REGISTRY]: Sovereign Green Sustainability v2.0 (DVFS) active.\n");
     SovereignGreen_Audit();
 }
+

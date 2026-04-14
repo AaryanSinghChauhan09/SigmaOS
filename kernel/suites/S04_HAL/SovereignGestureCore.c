@@ -12,8 +12,8 @@
 //   • Unified Gesture API: Same logic for touchscreens, trackpads, and sensors
 // =============================================================================
 
-#include <stdint.h>
-#include <stdbool.h>
+#include "sigma_types.h"
+
 
 #define MAX_TOUCH_POINTS    10
 
@@ -50,3 +50,4 @@ void gesture_tune_sensitivity(float threshold);
 
 // Broadcast recognized gestures to S02_ZenithUI (Holographic Flyout hook)
 void gesture_dispatch_to_ui(void);
+

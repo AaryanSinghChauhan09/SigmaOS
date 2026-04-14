@@ -32,3 +32,4 @@ void sigma_net_anycast_route(sigma_u32 source_ip, sigma_u32 vip) {
 void SovereignAnycast_Register(void) {
     sigma_printf("[NETWORK]: Sovereign Anycast Routing (Cloud Orchestration) active.\n");
 }
+

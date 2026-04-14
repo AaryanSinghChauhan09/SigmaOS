@@ -27,3 +27,4 @@ void sigma_ai_backprop(sigma_f64* weights, sigma_f64* grads, sigma_f64 learning_
 void SovereignNeuralGradient_Register(void) {
     sigma_printf("[AI]: Sovereign Neural Gradient (Learning) active.\n");
 }
+

@@ -35,3 +35,4 @@ sigma_err_t SovereignCommand_Dispatch(const char* name, int argc, char** argv) {
     sigma_printf("Σ [CMD/ERR]: Command '%s' not found.\n", name);
     return SIGMA_ENOENT;
 }
+

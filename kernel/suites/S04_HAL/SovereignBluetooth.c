@@ -254,3 +254,4 @@ void SovereignBluetooth_Init(void) {
 
     sigma_printf("Σ [BLUETOOTH]: Bluetooth stack online. Wireless peripheral sovereignty active.\n");
 }
+

@@ -29,3 +29,4 @@ void sigma_opt_de_mutate(float* target, float* r1, float* r2, float* r3, float F
 void SovereignDiffEvolution_Register(void) {
     sigma_printf("[INTELLIGENCE]: Sovereign Differential Evolution active.\n");
 }
+

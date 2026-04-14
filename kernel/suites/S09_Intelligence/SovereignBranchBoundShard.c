@@ -27,3 +27,4 @@ void sigma_opt_bnb_solve(float upper_bound, float lower_bound) {
 void SovereignBranchBound_Register(void) {
     sigma_printf("[INTELLIGENCE]: Sovereign Branch-and-Bound (Discrete Mastery) active.\n");
 }
+

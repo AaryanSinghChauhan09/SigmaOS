@@ -17,8 +17,8 @@
 //   • Clean shutdown: sends SIGTERM to all shards in reverse dep order
 // =============================================================================
 
-#include <stdint.h>
-#include <stdbool.h>
+#include "sigma_types.h"
+
 #include <string.h>
 
 #define SIGMA_MAX_UNITS      256
@@ -88,3 +88,4 @@ void init_supervise_tick(void);
 
 // Graceful shutdown: SIGTERM in reverse dependency order, then SIGKILL timeout
 void init_shutdown(uint8_t exit_code);
+

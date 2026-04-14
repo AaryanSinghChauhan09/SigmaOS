@@ -26,3 +26,4 @@ void sigma_hal_hmat_parse(void* acpi_hmat_table) {
 void SovereignHMAT_Register(void) {
     sigma_printf("[HAL]: Sovereign HMAT (Heterogeneous Latency Topology) active.\n");
 }
+

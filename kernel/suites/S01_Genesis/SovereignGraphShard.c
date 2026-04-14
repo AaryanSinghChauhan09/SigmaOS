@@ -57,3 +57,4 @@ void sigma_graph_dijkstra(SigmaGraph_t* g, int start_node, int* dist) {
 void SovereignGraph_Register(void) {
     sigma_printf("[ALGO]: Sovereign Graph Engine (Dijkstra) seeded.\n");
 }
+

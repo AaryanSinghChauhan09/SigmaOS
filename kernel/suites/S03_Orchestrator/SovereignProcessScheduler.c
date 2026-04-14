@@ -14,8 +14,8 @@
 //   • Interactive boost: tracks sleep/run ratio, boosts waking tasks
 // =============================================================================
 
-#include <stdint.h>
-#include <stdbool.h>
+#include "sigma_types.h"
+
 
 #define SIGMA_MAX_TASKS     4096
 #define SIGMA_CPU_MAX_CORES   64
@@ -70,3 +70,4 @@ void sched_interactive_boost(uint32_t pid, uint64_t sleep_ns);
 
 // Set real-time deadline for a task (EDF/RTLinux style)
 void sched_set_deadline(uint32_t pid, uint64_t deadline_ns);
+

@@ -31,3 +31,4 @@ void sigma_opt_bha_collapse(SigmaStar_t* star, float bh_pos, float event_horizon
 void SovereignBHA_Register(void) {
     sigma_printf("[INTELLIGENCE]: Sovereign BHA (Singularity Optima) active.\n");
 }
+

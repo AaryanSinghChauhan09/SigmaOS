@@ -14,8 +14,8 @@
 //   • Sub-10ms microVM cold-boot target (Firecracker model)
 // =============================================================================
 
-#include <stdint.h>
-#include <stdbool.h>
+#include "sigma_types.h"
+
 
 #define MAX_VMS             16
 #define VM_MAX_VCPUS        128
@@ -63,3 +63,4 @@ void hypervisor_terminate_vm(uint32_t vm_id);
 
 // Snapshot a running VM to disk (hibernation)
 void hypervisor_snapshot_vm(uint32_t vm_id, const char* out_path);
+

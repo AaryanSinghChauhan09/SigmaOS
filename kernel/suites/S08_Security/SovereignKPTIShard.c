@@ -26,3 +26,4 @@ void sigma_sec_kpti_switch(sigma_u32 target_ring) {
 void SovereignKPTI_Register(void) {
     sigma_printf("[SECURITY]: Sovereign KPTI (Silicon Isolation) active.\n");
 }
+

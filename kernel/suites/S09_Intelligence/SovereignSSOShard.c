@@ -26,3 +26,4 @@ void sigma_opt_sso_vibrate(float fitness_signal, float attenuation) {
 void SovereignSSO_Register(void) {
     sigma_printf("[INTELLIGENCE]: Sovereign SSO (Spider Web Foraging) active.\n");
 }
+

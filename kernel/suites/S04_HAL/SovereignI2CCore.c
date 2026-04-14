@@ -192,3 +192,4 @@ void SovereignI2CCore_Init(void) {
 
     sigma_printf("Σ [I2C]: I2C engine online. Sensor bus parameter sovereignty established.\n");
 }
+

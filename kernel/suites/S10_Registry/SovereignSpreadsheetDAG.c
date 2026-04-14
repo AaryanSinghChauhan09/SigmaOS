@@ -44,3 +44,4 @@ static SovereignSpreadsheetDAG_t create_spreadsheet_dag() {
     obj.TriggerCascadeUpdate = dag_trigger_cascade;
     return obj;
 }
+

@@ -29,3 +29,4 @@ void SovereignSecCommands_Register(void) {
     SovereignCommand_Register("cyber", "Pentesting and offensive security tools", handle_cyber);
     SovereignCommand_Register("qube", "Qubes-style VM and app isolation", handle_qube);
 }
+

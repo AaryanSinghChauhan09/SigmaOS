@@ -31,3 +31,4 @@ void sigma_gfx_draw_curve(SigmaBezier_t* curve, sigma_u32 color) {
 void SovereignVector_Register(void) {
     sigma_printf("[HAL]: Sovereign Vector Engine (Resolution Mastery) active.\n");
 }
+

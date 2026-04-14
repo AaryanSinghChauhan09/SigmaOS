@@ -12,3 +12,4 @@ void sigma_arm64_init(void) {
 void SovereignARM64_Register(void) {
     SovereignArch_Register("ARM64", sigma_arm64_init, SIGMA_NULL);
 }
+

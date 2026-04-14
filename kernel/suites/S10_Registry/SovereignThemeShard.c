@@ -49,3 +49,4 @@ void sigma_theme_update(sigma_u32 accent, int blur) {
 void SovereignTheme_Register(void) {
     sigma_printf("[REGISTRY]: Sovereign Theme Shard (Personalization) active.\n");
 }
+

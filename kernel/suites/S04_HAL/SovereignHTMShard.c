@@ -34,3 +34,4 @@ void sigma_hal_htm_commit(void) {
 void SovereignHTM_Register(void) {
     sigma_printf("[HAL]: Sovereign HTM (Transaction Mastery) active.\n");
 }
+

@@ -25,3 +25,4 @@ const char* SovereignSmartExplorer_Suggest(const char* current_dir) {
 void SovereignSmartExplorer_Register(void) {
     SovereignRegistry_Register("smart_explorer", sigma_smart_explorer_init);
 }
+

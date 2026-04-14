@@ -25,3 +25,4 @@ void sigma_smp_barrier(int cpu_id, volatile int* lock) {
 void SovereignSMP_Register(void) {
     sigma_printf("[HAL]: Sovereign SMP Engine (Multi-Core) active.\n");
 }
+

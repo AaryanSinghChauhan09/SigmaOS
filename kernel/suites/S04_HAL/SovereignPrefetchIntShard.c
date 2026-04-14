@@ -26,3 +26,4 @@ void sigma_hal_prefetch_audit(void) {
 void SovereignPrefetchInt_Register(void) {
     sigma_printf("[HAL]: Sovereign Prefetch-Int (Hardware Awareness) active.\n");
 }
+

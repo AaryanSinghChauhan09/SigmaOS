@@ -26,3 +26,4 @@ void sigma_hal_amx_multiply(void* tile_a, void* tile_b, void* tile_c) {
 void SovereignAMX_Register(void) {
     sigma_printf("[HAL]: Sovereign AMX (Tensor Hardware Mastery) active.\n");
 }
+

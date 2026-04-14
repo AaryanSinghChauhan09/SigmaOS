@@ -26,3 +26,4 @@ void sigma_opt_pbo_survive(float ice_concentration, float* global_optimum) {
 void SovereignPBO_Register(void) {
     sigma_printf("[INTELLIGENCE]: Sovereign PBO (Polar Bear Migration) active.\n");
 }
+

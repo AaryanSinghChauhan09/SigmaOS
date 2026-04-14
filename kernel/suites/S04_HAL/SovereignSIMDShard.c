@@ -37,3 +37,4 @@ float sigma_math_dot_product(float* a, float* b, int len) {
 void SovereignSIMD_Register(void) {
     sigma_printf("[HAL]: Sovereign SIMD Acceleration (Vector Singularity) active.\n");
 }
+

@@ -38,3 +38,4 @@ void sigma_cpu_smt_schedule(sigma_u32 thread_id) {
 void SovereignSMT_Register(void) {
     sigma_printf("[ORCHESTRATOR]: Sovereign SMT & Core Parking (Omnipresence Load-Balancing) active.\n");
 }
+

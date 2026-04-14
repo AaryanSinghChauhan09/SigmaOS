@@ -148,3 +148,4 @@ void SovereignAutomation_Register(void) {
     sigma_cron_register("slab-gc",      handler_slab_gc,     30000);
     sigma_cron_register("fs-defrag",    handler_fs_defrag,   120000);
 }
+

@@ -27,3 +27,4 @@ void sigma_hal_spec_wait(void* addr, sigma_u64 timeout_tsc) {
 void SovereignSpecGuard_Register(void) {
     sigma_printf("[HAL]: Sovereign Spec-Guard (Power-Aware Sync) active.\n");
 }
+

@@ -257,3 +257,4 @@ void SovereignUSBCore_Init(void) {
 
     sigma_printf("Σ [USB]: USB Core Online. Hotplug sovereignty established.\n");
 }
+

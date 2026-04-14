@@ -39,3 +39,4 @@ void sigma_sync_monitor_progress(sigma_u32 thread_id) {
 void SovereignWaitFree_Register(void) {
     sigma_printf("[ORCHESTRATOR]: Sovereign Wait-Free Concurrency (Singularity-Nexus) active.\n");
 }
+

@@ -11,8 +11,8 @@
 //     memory zone BEFORE the system slows down.
 // =============================================================================
 
-#include <stdint.h>
-#include <stdbool.h>
+#include "sigma_types.h"
+
 
 #define TREND_WINDOW    32
 #define ALERT_THRESHOLD 0.85f
@@ -43,3 +43,4 @@ void guardian_recycle_process(uint32_t pid);
 
 // Report "System Health" interventions to ZenithUI
 void guardian_report_actions(void);
+

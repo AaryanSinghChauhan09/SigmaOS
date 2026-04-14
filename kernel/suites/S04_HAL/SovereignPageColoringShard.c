@@ -37,3 +37,4 @@ void* sigma_hal_palloc_colored(sigma_u32 color) {
 void SovereignPageColoring_Register(void) {
     sigma_printf("[HAL]: Sovereign Page Coloring (Cache Harmony) active.\n");
 }
+

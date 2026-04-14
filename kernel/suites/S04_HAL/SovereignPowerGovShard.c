@@ -19,3 +19,4 @@ sigma_err_t sigma_power_init(void) {
 void SovereignPower_Register(void) {
     SovereignArch_Register("power_gov", sigma_power_init);
 }
+

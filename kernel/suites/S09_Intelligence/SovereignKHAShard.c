@@ -31,3 +31,4 @@ void sigma_opt_kha_motion(SigmaKrill_t* krill) {
 void SovereignKHA_Register(void) {
     sigma_printf("[INTELLIGENCE]: Sovereign KHA (Krill Herd Foraging) active.\n");
 }
+

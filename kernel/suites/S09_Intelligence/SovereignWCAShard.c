@@ -31,3 +31,4 @@ void sigma_opt_wca_flow(SigmaStream_t* stream, float* sea_pos, float C) {
 void SovereignWCA_Register(void) {
     sigma_printf("[INTELLIGENCE]: Sovereign WCA (Hydrological Optima) active.\n");
 }
+

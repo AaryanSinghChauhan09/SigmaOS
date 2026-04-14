@@ -47,3 +47,4 @@ void SovereignCommand_ListAll(void) {
     }
     sigma_printf("--------------------------------------------------\n");
 }
+

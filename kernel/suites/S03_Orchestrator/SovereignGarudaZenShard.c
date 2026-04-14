@@ -19,3 +19,4 @@ sigma_err_t sigma_zen_perf_init(void) {
 void SovereignGarudaZen_Register(void) {
     SovereignScheduler_Register("zen_perf", sigma_zen_perf_init);
 }
+

@@ -39,3 +39,4 @@ sigma_err_t sigma_vfs_mount(const char* source, const char* target, const char* 
     sigma_printf("Σ [VFS/ERR]: Unknown Filesystem Type '%s'\n", fstype);
     return SIGMA_ENOSYS;
 }
+

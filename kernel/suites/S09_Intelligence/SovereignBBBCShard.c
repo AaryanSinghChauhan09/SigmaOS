@@ -35,3 +35,4 @@ void sigma_opt_bbbc_crunch(SigmaBBBCPoint_t* points, int count, float* center) {
 void SovereignBBBC_Register(void) {
     sigma_printf("[INTELLIGENCE]: Sovereign BBBC (Convergence Mastery) active.\n");
 }
+

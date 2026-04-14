@@ -47,3 +47,4 @@ void SovereignRegistry_Audit(void) {
         sigma_printf("Shard %d: %s | Status: %d | Category: %d\n", i, s->name, s->status, s->category);
     }
 }
+

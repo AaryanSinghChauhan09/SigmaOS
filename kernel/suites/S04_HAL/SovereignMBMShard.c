@@ -33,3 +33,4 @@ void sigma_hal_mbm_audit(void) {
 void SovereignMBM_Register(void) {
     sigma_printf("[HAL]: Sovereign MBM (Bandwidth Awareness) active.\n");
 }
+

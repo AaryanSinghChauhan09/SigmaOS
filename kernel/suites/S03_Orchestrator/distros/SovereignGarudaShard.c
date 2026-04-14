@@ -12,3 +12,4 @@ void SovereignGaruda_Register(void) {
     SovereignDistro_Register("garuda", "pacman", "systemd", "Zen-Kernel, Dragonized Aesthetics", SovereignGaruda_AbsorbLogic);
     SovereignDistro_Register("popos", "apt", "systemd", "Auto-Tiling, NVIDIA Optimized", SovereignGaruda_AbsorbLogic);
 }
+

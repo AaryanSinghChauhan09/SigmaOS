@@ -31,3 +31,4 @@ void sigma_mem_buddy_split(sigma_u8 order, void* addr) {
 void SovereignMemoryBuddy_Register(void) {
     sigma_printf("[MEMORY]: Sovereign Buddy Allocator (Buddy-System) active.\n");
 }
+

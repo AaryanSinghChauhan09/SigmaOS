@@ -51,3 +51,4 @@ void SovereignMemory_Register(void) {
     };
     sigma_module_register(&s_mem_module);
 }
+

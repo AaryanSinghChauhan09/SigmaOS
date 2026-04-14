@@ -33,3 +33,4 @@ void sigma_opt_hyper_select(int problem_dim, float time_budget) {
 void SovereignHyperHeuristic_Register(void) {
     sigma_printf("[INTELLIGENCE]: Sovereign Hyper-Heuristic (Meta-Strategy) active.\n");
 }
+

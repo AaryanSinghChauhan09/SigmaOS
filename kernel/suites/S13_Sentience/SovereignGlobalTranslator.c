@@ -12,8 +12,8 @@
 //   • Continuity Sync: Shared translation caches across Hive peers (S12).
 // =============================================================================
 
-#include <stdint.h>
-#include <stdbool.h>
+#include "sigma_types.h"
+
 
 #define MAX_LANGUAGES       128
 
@@ -42,3 +42,4 @@ bool translator_update_model(const char* lang_code);
 
 // Sync user-specific translation history across Hive devices (S12)
 void translator_sync_mesh(void);
+

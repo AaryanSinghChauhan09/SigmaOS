@@ -15,8 +15,8 @@
 //   • Distributed clipboard ring buffer (synchronized across peers)
 // =============================================================================
 
-#include <stdint.h>
-#include <stdbool.h>
+#include "sigma_types.h"
+
 
 #define MAX_PEER_DEVICES    16
 #define CONTINUITY_IV       "sig_cont_v1"
@@ -63,3 +63,4 @@ bool continuity_transfer_file(uint32_t peer_id, const char* vfs_path);
 
 // Paired device heartbeat (Keep-alive)
 void continuity_heartbeat_tick(void);
+

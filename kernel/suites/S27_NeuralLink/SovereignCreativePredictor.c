@@ -10,8 +10,8 @@
 // Result: High-speed creative output (10x - 100x human baseline).
 // =============================================================================
 
-#include <stdint.h>
-#include <stdbool.h>
+#include "sigma_types.h"
+
 
 typedef struct {
     uint8_t  intention_vector[128];
@@ -38,3 +38,4 @@ void neurallink_audit_prediction(bool was_correct);
 
 // Report 'Human-Machine IQ' (The link strength index)
 float neurallink_get_link_fidelity(void);
+

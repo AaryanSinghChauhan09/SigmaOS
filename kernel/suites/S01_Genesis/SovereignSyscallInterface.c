@@ -2,7 +2,7 @@
 // Absorbs Linux syscall table + Windows NT Executive + Mach Traps
 // Zero-dependency, hardware-trap-based, C11 pure.
 
-#include <stdint.h>
+#include "sigma_types.h"
 
 #define SIGMA_SYSCALL_MAX   512
 
@@ -35,3 +35,4 @@ int64_t sci_dispatch(uint32_t syscall_id, uint64_t a0, uint64_t a1,
 
 // Initialize the syscall table with all built-in implementations
 void sci_init_table(void);
+

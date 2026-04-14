@@ -30,3 +30,4 @@ void SovereignAdvancedCommands_Register(void) {
     SovereignCommand_Register("fs", "Advanced VFS management (EXT4, Btrfs, P9)", handle_fs);
     SovereignCommand_Register("work", "Zenith Editor and session management", handle_work);
 }
+

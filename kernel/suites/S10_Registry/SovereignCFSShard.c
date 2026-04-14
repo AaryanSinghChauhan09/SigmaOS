@@ -11,3 +11,4 @@ void sigma_cfs_schedule(sigma_u32 cpu_id, sigma_u64 now_ns) {
 void SovereignCFS_Register(void) {
     SovereignScheduler_Register("CFS", sigma_cfs_schedule);
 }
+

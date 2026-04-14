@@ -26,3 +26,4 @@ void sigma_sec_sfi_mask(void) {
 void SovereignSFI_Register(void) {
     sigma_printf("[SECURITY]: Sovereign SFI (Software Address Masking) active.\n");
 }
+

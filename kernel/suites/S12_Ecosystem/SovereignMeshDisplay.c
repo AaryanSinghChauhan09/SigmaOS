@@ -12,8 +12,8 @@
 //   • Touch-Back: Multi-touch on external device flows back to host (S04).
 // =============================================================================
 
-#include <stdint.h>
-#include <stdbool.h>
+#include "sigma_types.h"
+
 
 #define DISPLAY_MAX_RESOLUTION_W 7680
 #define DISPLAY_MAX_RESOLUTION_H 4320
@@ -44,3 +44,4 @@ void mesh_display_sync_hid(uint8_t* target_node_id);
 
 // Handle touch-back events from the remote display (S04)
 void mesh_display_process_remote_touch(void* touch_event);
+

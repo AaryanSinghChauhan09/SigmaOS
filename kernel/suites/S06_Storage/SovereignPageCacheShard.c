@@ -97,3 +97,4 @@ void SovereignPageCache_Register(void) {
     sigma_printf("[REGISTRY]: Sovereign Page Cache v2.0 (LRU) active.\n");
     sigma_page_cache_init();
 }
+

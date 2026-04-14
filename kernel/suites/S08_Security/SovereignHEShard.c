@@ -33,3 +33,4 @@ void sigma_he_scalar_mul(sigma_u8* c, sigma_u64 scalar, sigma_u8* result) {
 void SovereignHE_Register(void) {
     sigma_printf("[SECURITY]: Sovereign HE (Homomorphic Mastery) active.\n");
 }
+

@@ -2,8 +2,8 @@
 // Absorbs ALSA (Linux), CoreAudio (macOS), WASAPI (Windows) paradigms.
 // Zero-dependency, hardware-mapped C11 shard.
 
-#include <stdint.h>
-#include <stdbool.h>
+#include "sigma_types.h"
+
 
 #define SIGMA_AUDIO_SAMPLE_RATE_48K   48000
 #define SIGMA_AUDIO_SAMPLE_RATE_192K 192000
@@ -30,3 +30,4 @@ void audio_route_shards(uint32_t src_port, uint32_t dst_port);
 
 // Apply hardware EQ filters using GPU compute shaders (WASAPI APO equivalent)
 void audio_apply_hw_equalizer(float* band_gains, uint8_t band_count);
+

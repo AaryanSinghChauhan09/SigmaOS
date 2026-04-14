@@ -13,8 +13,8 @@
 //   • Invisible Mode: Zero response to unauthorized probes (Dark Cloud parity)
 // =============================================================================
 
-#include <stdint.h>
-#include <stdbool.h>
+#include "sigma_types.h"
+
 
 #define FIREWALL_MAX_RULES  1024
 
@@ -53,3 +53,4 @@ void firewall_audit_anomalies(void);
 
 // Sync rules across the S12 Continuity Mesh (Dark Cloud parity)
 void firewall_mesh_sync(void);
+

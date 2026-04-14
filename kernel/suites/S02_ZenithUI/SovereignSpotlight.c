@@ -12,8 +12,8 @@
 //   • Real-time VFS watcher: Instant index updates on every S06 write
 // =============================================================================
 
-#include <stdint.h>
-#include <stdbool.h>
+#include "sigma_types.h"
+
 
 #define MAX_INDEX_ENTRIES   65536
 #define SEARCH_RESULT_MAX   64
@@ -55,3 +55,4 @@ void spotlight_deep_search(const char* query, void (*on_result)(SearchEntry*));
 
 // Clear index and rebuild from scratch
 void spotlight_rebuild(void);
+

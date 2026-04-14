@@ -27,3 +27,4 @@ sigma_u64 sigma_sec_trng_harvest(void) {
 void SovereignTRNG_Register(void) {
     sigma_printf("[SECURITY]: Sovereign TRNG (True Silicon Entropy) active.\n");
 }
+

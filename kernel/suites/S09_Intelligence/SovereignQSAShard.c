@@ -26,3 +26,4 @@ void sigma_opt_qsa_sphere(float spherical_angle, float radius_intensity) {
 void SovereignQSA_Register(void) {
     sigma_printf("[INTELLIGENCE]: Sovereign QSA (Quantum Spherical Search) active.\n");
 }
+

@@ -12,8 +12,8 @@
 //   • Sentiment Efficiency: Correlates user patterns (S13) to battery drain
 // =============================================================================
 
-#include <stdint.h>
-#include <stdbool.h>
+#include "sigma_types.h"
+
 
 typedef enum {
     POWER_STATE_P0   = 0, // Max Performance
@@ -50,3 +50,4 @@ void power_pulse_report_telemetry(PowerNode* nodes_out, uint32_t count);
 
 // Emergency Throttle: Instant downscale to prevent hardware damage
 void power_pulse_panic_cool(void);
+

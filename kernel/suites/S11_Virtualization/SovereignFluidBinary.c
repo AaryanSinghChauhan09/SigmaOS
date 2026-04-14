@@ -11,8 +11,8 @@
 //         or emulation overhead.
 // =============================================================================
 
-#include <stdint.h>
-#include <stdbool.h>
+#include "sigma_types.h"
+
 
 typedef struct {
     uint8_t  source_type; // 0: PE, 1: ELF, 2: Mach-O
@@ -39,3 +39,4 @@ float fluid_get_fidelity_score(void);
 
 // Sync transmuted shards across Hive mesh (Shared Apps S12)
 void fluid_sync_hive_cache(void);
+

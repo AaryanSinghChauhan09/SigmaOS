@@ -32,3 +32,4 @@ int main(int argc, char** argv) {
     sigma_purity_audit(argv[1]);
     return 0;
 }
+

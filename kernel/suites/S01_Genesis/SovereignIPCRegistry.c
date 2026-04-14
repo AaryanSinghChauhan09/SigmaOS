@@ -31,3 +31,4 @@ void SovereignIPC_ActivateAll(void) {
         if (g_ipc_shards[i].init) g_ipc_shards[i].init();
     }
 }
+

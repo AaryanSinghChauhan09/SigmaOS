@@ -19,3 +19,4 @@ sigma_err_t sigma_boot_audit_init(void) {
 void SovereignBootAudit_Register(void) {
     SovereignSecurity_Register("boot_audit", sigma_boot_audit_init);
 }
+

@@ -33,3 +33,4 @@ void sigma_gpu_sync(void) {
 void SovereignGPU_Register(void) {
     sigma_printf("[HAL]: Sovereign GPGPU Acceleration (Omnipresence Neural Flux) active.\n");
 }
+

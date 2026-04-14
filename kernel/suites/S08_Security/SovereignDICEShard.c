@@ -26,3 +26,4 @@ void sigma_sec_dice_compound(void* boot_layer_hash) {
 void SovereignDICE_Register(void) {
     sigma_printf("[SECURITY]: Sovereign DICE (Compound Hardware Identity) active.\n");
 }
+

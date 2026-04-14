@@ -11,8 +11,8 @@
 //         you ask for it.
 // =============================================================================
 
-#include <stdint.h>
-#include <stdbool.h>
+#include "sigma_types.h"
+
 
 #define MAX_UI_ELEMENTS     256
 
@@ -46,3 +46,4 @@ void liquid_ui_sync_spatial(void);
 // Switch "Personality Profile" (e.g. Developer -> Gamer -> Researcher) 
 // based on Neural Fabric consensus.
 void liquid_ui_set_personality(uint8_t personality_id);
+

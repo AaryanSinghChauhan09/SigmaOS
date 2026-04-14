@@ -27,3 +27,4 @@ void sigma_wiki_gen_shard_doc(sigma_u32 shard_id, const char* name, const char* 
 void SovereignWiki_Register(void) {
     sigma_printf("[WIKI]: Sovereign Wiki Shard (Self-Documenting OS) active.\n");
 }
+

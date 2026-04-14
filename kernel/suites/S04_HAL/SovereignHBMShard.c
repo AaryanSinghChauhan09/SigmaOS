@@ -26,3 +26,4 @@ void sigma_hal_hbm_pin(void* tensor_data, sigma_u8 die_layer_id) {
 void SovereignHBM_Register(void) {
     sigma_printf("[HAL]: Sovereign HBM (3D-Stacked Sub-Channel Pinning) active.\n");
 }
+

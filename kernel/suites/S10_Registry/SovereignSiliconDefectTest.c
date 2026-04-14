@@ -32,3 +32,4 @@ void sigma_silicon_test() {
 void SovereignSiliconDefectTest_Init() {
     sigma_printf("[SOC]: Seating Native Silicon Defect Test (Microcode Parity v1.0)...\n");
 }
+

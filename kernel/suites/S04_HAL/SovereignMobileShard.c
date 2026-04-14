@@ -25,3 +25,4 @@ void sigma_mobile_doze_check(sigma_u64 idle_ticks) {
 void SovereignMobile_Register(void) {
     sigma_printf("[HAL]: Sovereign Mobile Engine (Power Efficiency) active.\n");
 }
+

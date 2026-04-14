@@ -33,3 +33,4 @@ void sigma_opt_gsa_force(SigmaGParticle_t* p1, SigmaGParticle_t* p2, float G) {
 void SovereignGSA_Register(void) {
     sigma_printf("[INTELLIGENCE]: Sovereign GSA (Gravitational Optima) active.\n");
 }
+

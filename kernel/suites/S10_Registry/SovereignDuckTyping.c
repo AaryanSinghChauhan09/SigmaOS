@@ -38,3 +38,4 @@ static SovereignDuckTyping_t create_duck_typing_engine() {
     obj.DynamicDispatchMethod = duck_dynamic_dispatch;
     return obj;
 }
+

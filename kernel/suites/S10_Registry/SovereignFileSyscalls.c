@@ -11,3 +11,4 @@ sigma_i64 sys_read_shard(sigma_u64 fd, sigma_u64 buf, sigma_u64 count, sigma_u64
 void SovereignFileSyscalls_Register(void) {
     SovereignSyscall_Register(0, sys_read_shard); /* SYS_read = 0 */
 }
+

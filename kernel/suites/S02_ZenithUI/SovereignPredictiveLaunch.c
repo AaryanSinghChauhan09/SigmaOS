@@ -9,8 +9,8 @@
 //     in a "Frozen" state in the background, ready for instant wake.
 // =============================================================================
 
-#include <stdint.h>
-#include <stdbool.h>
+#include "sigma_types.h"
+
 
 #define MAX_PREDICTIONS 8
 
@@ -38,3 +38,4 @@ bool predictive_ux_promote_app(const char* app_id);
 
 // Adjust pre-loading intensity based on thermal/battery limits (S04_HAL)
 void predictive_ux_tune_intensity(uint8_t power_level);
+

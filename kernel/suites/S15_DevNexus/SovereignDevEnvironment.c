@@ -11,8 +11,8 @@
 //         debugging (S04) integrated into the compositor (S02).
 // =============================================================================
 
-#include <stdint.h>
-#include <stdbool.h>
+#include "sigma_types.h"
+
 
 typedef struct {
     uint32_t cursor_pos;
@@ -40,3 +40,4 @@ void devnexus_debug_step(void);
 
 // Sync workspace state across Hive mesh (Shared pair-programming S12)
 void devnexus_mesh_collab(uint8_t* peer_uuid);
+

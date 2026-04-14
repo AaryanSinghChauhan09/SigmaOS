@@ -29,3 +29,4 @@ void sigma_process_isolate(sigma_u32 pid, sigma_u32 ns_id) {
 void SovereignIsolation_Register(void) {
     sigma_printf("[PROCESS]: Sovereign Isolation Engine (Namespaces) active.\n");
 }
+

@@ -26,3 +26,4 @@ void sigma_opt_quench_step(float* current_state, float cooling_factor) {
 void SovereignQuenching_Register(void) {
     sigma_printf("[INTELLIGENCE]: Sovereign Simulated Quenching (Fast Optima) active.\n");
 }
+

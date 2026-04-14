@@ -26,3 +26,4 @@ void sigma_opt_lsh_bucket(void* high_dimensional_matrix) {
 void SovereignLSH_Register(void) {
     sigma_printf("[INTELLIGENCE]: Sovereign LSH (Locality-Sensitive Hash) active.\n");
 }
+

@@ -45,3 +45,4 @@ void sigma_sync_seqlock_write_lock(SigmaSeqlock_t* sl) {
 void SovereignSeqlock_Register(void) {
     sigma_printf("[ORCHESTRATOR]: Sovereign Seqlock (Writer-Priority Sync) active.\n");
 }
+

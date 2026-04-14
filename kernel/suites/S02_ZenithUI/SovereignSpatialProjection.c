@@ -10,8 +10,8 @@
 // Result: Total immersion leader for all form-factors.
 // =============================================================================
 
-#include <stdint.h>
-#include <stdbool.h>
+#include "sigma_types.h"
+
 
 typedef struct {
     float projection_matrix[16];
@@ -39,3 +39,4 @@ void spatial_project_apply_occlusion(void);
 
 // Sync spatial workspace across Hive mesh (Shared AR S12)
 void spatial_project_mesh_collab(uint8_t* peer_uuid);
+

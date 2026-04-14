@@ -11,8 +11,8 @@
 //   • 100% Sovereign: No external libraries (No nVidia/Microsoft binary bloat).
 // =============================================================================
 
-#include <stdint.h>
-#include <stdbool.h>
+#include "sigma_types.h"
+
 
 typedef struct {
     uint32_t obj_id;
@@ -42,3 +42,4 @@ void physics_apply_gesture_force(uint32_t obj_id, float fx, float fy);
 
 // Synchronize physics state across the Hive Mesh (Multi-device physics)
 void physics_sync_mesh(void);
+

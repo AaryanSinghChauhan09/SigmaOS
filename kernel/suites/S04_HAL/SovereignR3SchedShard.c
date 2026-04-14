@@ -26,3 +26,4 @@ void sigma_sched_r3_yield(void) {
 void SovereignR3Sched_Register(void) {
     sigma_printf("[HAL]: Sovereign Ring-3 Scheduler (Trap-less Concurrency) active.\n");
 }
+

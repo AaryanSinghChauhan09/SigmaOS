@@ -26,3 +26,4 @@ void sigma_hal_mpk_write(sigma_u32 pkey_mask) {
 void SovereignMPK_Register(void) {
     sigma_printf("[HAL]: Sovereign MPK (Fast Domain Switching) active.\n");
 }
+

@@ -26,3 +26,4 @@ void sigma_hal_uci_bridge(sigma_u16 source_die, sigma_u16 target_die) {
 void SovereignUCI_Register(void) {
     sigma_printf("[HAL]: Sovereign UCI (Chiplet Substrate Interconnect) active.\n");
 }
+

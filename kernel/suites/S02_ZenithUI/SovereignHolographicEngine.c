@@ -13,8 +13,8 @@
 //   • Parallax holographic icons that react to gyroscope/mouse tilt
 // =============================================================================
 
-#include <stdint.h>
-#include <stdbool.h>
+#include "sigma_types.h"
+
 
 #define MAX_ZENITH_LAYERS   16
 #define HOLOGRAPHIC_DEPTH   255
@@ -58,3 +58,4 @@ void holographic_composite_frame(void);
 
 // Sync with S04_HAL GpuDriverStack for triple-buffered flip
 void holographic_sync_flip(void);
+

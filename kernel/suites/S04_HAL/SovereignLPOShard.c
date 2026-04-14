@@ -26,3 +26,4 @@ void sigma_hal_lpo_drive(void* packet_stream) {
 void SovereignLPO_Register(void) {
     sigma_printf("[HAL]: Sovereign LPO (Linear-Drive Pluggable Optics) active.\n");
 }
+

@@ -18,3 +18,4 @@ sigma_err_t sigma_audio_init(void) {
 void SovereignSound_Register(void) {
     SovereignRegistry_Register("sound", sigma_audio_init);
 }
+

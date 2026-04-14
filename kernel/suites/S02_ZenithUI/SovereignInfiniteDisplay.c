@@ -14,8 +14,8 @@
 //   • Predictive Window Placement using S13 Sentiment.
 // =============================================================================
 
-#include <stdint.h>
-#include <stdbool.h>
+#include "sigma_types.h"
+
 
 #define MAX_VIRTUAL_SCREENS 8
 #define VIRTUAL_WIDTH       3840
@@ -49,3 +49,4 @@ void infinite_display_capture_state(void);
 
 // Sync virtual screen layout to Continuity mesh (S12)
 void infinite_display_sync_mesh(void);
+

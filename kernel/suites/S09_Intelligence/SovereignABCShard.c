@@ -32,3 +32,4 @@ void sigma_opt_abc_forage(SigmaBee_t* colony, int colony_size) {
 void SovereignABC_Register(void) {
     sigma_printf("[INTELLIGENCE]: Sovereign ABC (Foraging Swarm) active.\n");
 }
+

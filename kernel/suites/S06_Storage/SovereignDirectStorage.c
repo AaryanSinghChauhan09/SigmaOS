@@ -12,8 +12,8 @@
 //   • Reduces asset loading latency by 90% via zero-copy pipeline
 // =============================================================================
 
-#include <stdint.h>
-#include <stdbool.h>
+#include "sigma_types.h"
+
 
 #define DS_MAX_STREAMS      8
 #define DS_QUEUE_DEPTH      128
@@ -54,3 +54,4 @@ void dstorage_set_decompression(uint32_t stream_id, uint8_t codec_type);
 
 // Tear down and sync all buffers
 void dstorage_teardown(void);
+

@@ -32,3 +32,4 @@ void sigma_i2c_transfer(sigma_u8 addr, sigma_u8* data, sigma_size_t size) {
 void SovereignEmbedded_Register(void) {
     sigma_printf("[HAL]: Sovereign Peripheral Bridge (Embedded Mastery) active.\n");
 }
+

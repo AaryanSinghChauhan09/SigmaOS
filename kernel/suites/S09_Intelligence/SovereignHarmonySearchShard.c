@@ -33,3 +33,4 @@ void sigma_opt_harmony_improvise(void) {
 void SovereignHarmonySearch_Register(void) {
     sigma_printf("[INTELLIGENCE]: Sovereign Harmony Search (Aesthetic Optima) active.\n");
 }
+

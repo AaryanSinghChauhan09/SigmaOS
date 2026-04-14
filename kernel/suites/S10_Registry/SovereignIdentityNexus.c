@@ -13,8 +13,8 @@
 //   • Zero-Knowledge Proofs: Login without ever transmitting the password.
 // =============================================================================
 
-#include <stdint.h>
-#include <stdbool.h>
+#include "sigma_types.h"
+
 
 #define MAX_IDENTITY_TOKENS 16
 
@@ -44,3 +44,4 @@ void identity_revoke_peer(uint8_t* peer_uuid);
 
 // Request an identity-bound session for a .sab app (SSO parity)
 void* identity_request_session(const char* app_id);
+

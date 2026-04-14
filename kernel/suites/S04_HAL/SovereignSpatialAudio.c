@@ -12,8 +12,8 @@
 //   • 128 Object Limit: Simulates 128 concurrent sound sources in 3D space.
 // =============================================================================
 
-#include <stdint.h>
-#include <stdbool.h>
+#include "sigma_types.h"
+
 
 #define MAX_AUDIO_OBJECTS 128
 
@@ -43,3 +43,4 @@ void spatial_audio_sync_mesh_speakers(void);
 
 // Export spatial state to ZenithUI 3D Visualizer (S02)
 void spatial_audio_report_to_ui(void);
+

@@ -44,3 +44,4 @@ void sigma_bus_subscribe(const char* topic, void (*callback)(void*)) {
 void SovereignEventBus_Register(void) {
     sigma_printf("[REGISTRY]: Sovereign Event Bus (Inter-Shard Pub/Sub) active.\n");
 }
+

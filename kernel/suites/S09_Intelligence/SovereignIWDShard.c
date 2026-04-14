@@ -36,3 +36,4 @@ void sigma_opt_iwd_flow(SigmaWaterDrop_t* drop, float path_soil, float dv) {
 void SovereignIWD_Register(void) {
     sigma_printf("[INTELLIGENCE]: Sovereign IWD (Liquid Pathfinding) active.\n");
 }
+

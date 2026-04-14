@@ -25,3 +25,4 @@ int sigma_route_mesh_packet(void* packet) {
 void sigma_openwrt_status(void) {
     sigma_print("[OPENWRT-MESH] Status: ACTIVE. Absolute wireless decentralized networking achieved.\n");
 }
+

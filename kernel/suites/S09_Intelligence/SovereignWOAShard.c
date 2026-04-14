@@ -32,3 +32,4 @@ void sigma_opt_woa_bubble_net(float* shard_pos, float* leader_pos, float b, floa
 void SovereignWOA_Register(void) {
     sigma_printf("[INTELLIGENCE]: Sovereign WOA (Bubble-Net Optima) active.\n");
 }
+

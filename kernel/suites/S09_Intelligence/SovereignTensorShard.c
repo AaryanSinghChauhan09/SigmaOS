@@ -56,3 +56,4 @@ float sigma_ml_infer(SigmaNeuralLayer_t* layer, float input) {
 void SovereignTensor_Register(void) {
     sigma_printf("[INTELLIGENCE]: Sovereign Tensor Shard (Ultron-ML) active.\n");
 }
+

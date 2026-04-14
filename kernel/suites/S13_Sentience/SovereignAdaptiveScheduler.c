@@ -13,8 +13,8 @@
 //   • Jitter-free real-time adjustment for pro-audio and holographic rendering
 // =============================================================================
 
-#include <stdint.h>
-#include <stdbool.h>
+#include "sigma_types.h"
+
 
 #define TRAINING_WINDOW     1024
 #define MAX_PREDICTED_PIDS  64
@@ -49,3 +49,4 @@ void sentience_persist_model(void);
 
 // Adjust power-scaling (S04_HAL) based on predicted load bursts
 void sentience_tune_frequencies(void);
+

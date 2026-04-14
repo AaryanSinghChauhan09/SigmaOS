@@ -32,3 +32,4 @@ void sigma_cloud_scale(SigmaCloud_t* pool, sigma_u64 requested) {
 void SovereignCloud_Register(void) {
     sigma_printf("[ORCHESTRATION]: Sovereign Cloud Engine (Elasticity) active.\n");
 }
+

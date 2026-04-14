@@ -31,3 +31,4 @@ void sigma_sync_tree_increment(SigmaTreeNode_t* tree, int leaf_id) {
 void SovereignCombiningTree_Register(void) {
     sigma_printf("[ORCHESTRATOR]: Sovereign CombiningTree (Count Scaling) active.\n");
 }
+

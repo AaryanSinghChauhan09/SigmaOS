@@ -12,8 +12,8 @@
 //   • 100% Zero-Dependency: No external glibc or wine-runtime required.
 // =============================================================================
 
-#include <stdint.h>
-#include <stdbool.h>
+#include "sigma_types.h"
+
 
 typedef enum {
     API_WIN_NT    = 0,
@@ -47,3 +47,4 @@ void api_bridge_audit_miss(ApiCall* call);
 
 // Formal Verification: Check if a translation is memory-safe (S08)
 bool api_bridge_verify_safety(ApiCall* call);
+

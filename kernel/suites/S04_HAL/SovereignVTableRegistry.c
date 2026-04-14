@@ -128,3 +128,4 @@ void SovereignVTable_Audit(void) {
 void SovereignVTableRegistry_Register(void) {
     sigma_printf("[REGISTRY]: Sovereign VTable OOP Engine active in HAL Suite.\n");
 }
+

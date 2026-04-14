@@ -26,3 +26,4 @@ void SovereignIntegrity_Audit(void) {
 void SovereignIntegrity_Register(void) {
     SovereignRegistry_Register("integrity_daemon", sigma_integrity_init);
 }
+

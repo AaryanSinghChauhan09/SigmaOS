@@ -46,3 +46,4 @@ void sigma_security_detect_breakout(void) {
 void SovereignSecurityHardening_Register(void) {
     sigma_printf("[SECURITY]: Sovereign Honeypot & Sandbox (Ultron-Hardened) active.\n");
 }
+

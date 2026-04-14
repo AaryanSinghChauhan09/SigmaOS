@@ -33,3 +33,4 @@ void sigma_mob_telemetry_emit(SigmaTelemetry_t* status) {
 void SovereignTelemetry_Register(void) {
     sigma_printf("[HAL]: Sovereign Mobile Telemetry (Low-Power Sync) active.\n");
 }
+

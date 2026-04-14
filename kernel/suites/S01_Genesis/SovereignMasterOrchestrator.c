@@ -24,3 +24,4 @@ int main(void) {
     sigma_kernel_main();
     return 0;
 }
+

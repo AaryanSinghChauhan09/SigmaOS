@@ -26,3 +26,4 @@ void sigma_opt_epo_huddle(float temperature_gradient) {
 void SovereignEPO_Register(void) {
     sigma_printf("[INTELLIGENCE]: Sovereign EPO (Thermal Penguin Packing) active.\n");
 }
+

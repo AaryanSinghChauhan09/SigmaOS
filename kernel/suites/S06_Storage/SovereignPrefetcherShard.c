@@ -20,3 +20,4 @@ sigma_err_t sigma_prefetcher_init(void) {
 void SovereignPrefetcher_Register(void) {
     SovereignFSRegistry_Register("prefetch_engine", sigma_prefetcher_init);
 }
+

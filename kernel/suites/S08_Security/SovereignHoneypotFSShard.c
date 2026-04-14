@@ -32,3 +32,4 @@ void sigma_sec_hfs_trigger(sigma_u32 actor_id, const char* path) {
 void SovereignHoneypotFS_Register(void) {
     sigma_printf("[SECURITY]: Sovereign Honeypot FS (Intrusion Detection) active.\n");
 }
+

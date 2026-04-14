@@ -39,3 +39,4 @@ void sigma_sync_barrier_wait(SigmaBarrier_t* barrier) {
 void SovereignBarrier_Register(void) {
     sigma_printf("[ORCHESTRATOR]: Sovereign Barrier Sync (Rendezvous Mastery) active.\n");
 }
+

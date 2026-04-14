@@ -19,3 +19,4 @@ sigma_err_t sigma_hal_edge_init(void) {
 void SovereignEdgeHAL_Register(void) {
     SovereignArch_Register("edge_hal", sigma_hal_edge_init);
 }
+

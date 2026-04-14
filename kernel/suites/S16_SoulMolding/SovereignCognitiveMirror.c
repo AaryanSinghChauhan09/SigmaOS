@@ -11,8 +11,8 @@
 //     learned baseline.
 // =============================================================================
 
-#include <stdint.h>
-#include <stdbool.h>
+#include "sigma_types.h"
+
 
 #define MAX_COGNITIVE_TRAITS 1024
 
@@ -41,3 +41,4 @@ void soulmolding_sync_vault(void);
 
 // Audit "Identity Parity": Does the proxy still match the User?
 float soulmolding_audit_parity(void);
+

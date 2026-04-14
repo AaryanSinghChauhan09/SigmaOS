@@ -10,8 +10,8 @@
 // Result: The first OS designed for human biological integration.
 // =============================================================================
 
-#include <stdint.h>
-#include <stdbool.h>
+#include "sigma_types.h"
+
 
 typedef struct {
     uint32_t signal_id;
@@ -39,3 +39,4 @@ bool bionexus_verify_source(void);
 
 // Sync user-specific neural profiles across SoulMolding traits (S16)
 void bionexus_sync_brain_profile(void);
+

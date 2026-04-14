@@ -26,3 +26,4 @@ void sigma_sec_dit_enforce(void) {
 void SovereignDIT_Register(void) {
     sigma_printf("[SECURITY]: Sovereign DIT (Constant-Time Execution) active.\n");
 }
+

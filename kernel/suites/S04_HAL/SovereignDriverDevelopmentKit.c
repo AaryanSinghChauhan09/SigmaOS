@@ -12,8 +12,8 @@
 //   • Hot-Plug Event Bus for dynamic hardware discovery
 // =============================================================================
 
-#include <stdint.h>
-#include <stdbool.h>
+#include "sigma_types.h"
+
 
 #define DRIVER_VERSION "1.0.0"
 
@@ -44,3 +44,4 @@ void sddk_dispatch_interrupt(uint32_t irq_line);
 
 // Unload a driver and release hardware locks
 void sddk_unload_driver(const char* name);
+

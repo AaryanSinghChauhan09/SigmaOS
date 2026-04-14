@@ -47,3 +47,4 @@ void SovereignSysCommands_Register(void) {
     SovereignCommand_Register("ui", "Window manager and UI controls", handle_ui);
     SovereignCommand_Register("sys", "Core system and kernel tuning", handle_sys);
 }
+

@@ -134,3 +134,4 @@ void SovereignPersonalization_Register(void) {
                          0x0A0A2E, 0xE0E0FF, 0xFF00FF);
     sigma_profile_switch(0);
 }
+

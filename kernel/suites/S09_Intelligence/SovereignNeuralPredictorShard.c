@@ -33,3 +33,4 @@ float sigma_ml_predict_spike(float load_history) {
 void SovereignNeuralPredictor_Register(void) {
     sigma_printf("[INTELLIGENCE]: Sovereign Neural Predictor (Load-Forecasting) active.\n");
 }
+

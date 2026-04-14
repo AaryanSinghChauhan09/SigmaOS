@@ -34,3 +34,4 @@ void sigma_sec_prevent_tamper(void) {
 void SovereignAttestation_Register(void) {
     sigma_printf("[SECURITY]: Sovereign Dynamic Attestation (Trust Mastery) active.\n");
 }
+

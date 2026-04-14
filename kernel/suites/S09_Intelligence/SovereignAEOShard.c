@@ -26,3 +26,4 @@ void sigma_opt_aeo_consume(float* producers, float* consumers, float* decomposer
 void SovereignAEO_Register(void) {
     sigma_printf("[INTELLIGENCE]: Sovereign AEO (Ecological Breakdown) active.\n");
 }
+

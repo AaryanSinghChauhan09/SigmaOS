@@ -11,8 +11,8 @@
 // Result: Deterministic performance leadership at the instruction level.
 // =============================================================================
 
-#include <stdint.h>
-#include <stdbool.h>
+#include "sigma_types.h"
+
 
 typedef struct {
     uint32_t shard_count;
@@ -36,3 +36,4 @@ float fusion_get_ipc_gain(void);
 
 // Deploy fused blocks to Hive peers for redundant execution (S12)
 void fusion_broadcast_block(void* block, uint32_t size);
+

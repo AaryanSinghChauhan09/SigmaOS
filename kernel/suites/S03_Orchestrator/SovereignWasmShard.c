@@ -32,3 +32,4 @@ void sigma_wasm_execute(SigmaWasmVM_t* vm, sigma_u8 opcode) {
 void SovereignWasm_Register(void) {
     sigma_printf("[ORCHESTRATOR]: Sovereign Wasm Runtime (Portable Bytecode) active.\n");
 }
+

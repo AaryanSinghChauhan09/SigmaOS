@@ -27,3 +27,4 @@ sigma_u64 sigma_hal_rdtsc_measure(void) {
 void SovereignRDTSC_Register(void) {
     sigma_printf("[HAL]: Sovereign RDTSC (Invariant Clock Mastery) active.\n");
 }
+

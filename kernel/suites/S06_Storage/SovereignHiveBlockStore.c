@@ -12,8 +12,8 @@
 //   • Near-Zero latency local cache with lazy-mesh synchronization.
 // =============================================================================
 
-#include <stdint.h>
-#include <stdbool.h>
+#include "sigma_types.h"
+
 
 #define BLOCK_SIZE          4096
 #define REPLICATION_FACTOR  3
@@ -44,3 +44,4 @@ uint64_t hive_store_anchor_file(const char* path);
 
 // Synchronize block metadata handles with S10_Registry
 void hive_store_sync_registry(void);
+

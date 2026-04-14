@@ -24,3 +24,4 @@ int sigma_migrate_live_payload(int node_id, void* virtual_environment) {
 void sigma_proxmox_status(void) {
     sigma_print("[PROXMOX-HCI] Status: ACTIVE. Unified virtualization cluster sovereignty achieved.\n");
 }
+

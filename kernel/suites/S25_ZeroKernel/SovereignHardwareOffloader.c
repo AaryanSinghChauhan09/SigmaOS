@@ -11,8 +11,8 @@
 //         The OS effectively has ZERO overhead.
 // =============================================================================
 
-#include <stdint.h>
-#include <stdbool.h>
+#include "sigma_types.h"
+
 
 typedef enum {
     OFFLOAD_SCHEDULER = 0,
@@ -37,3 +37,4 @@ float zerokernel_get_cpu_freedom_index(void);
 
 // Failover: Safe-migration of logic back to main CPU (S10 Self-Healing)
 void zerokernel_trigger_failover(void);
+

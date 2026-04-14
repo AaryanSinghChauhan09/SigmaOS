@@ -13,3 +13,4 @@ sigma_err_t sigma_ext4_mount(const char* source, const char* target, void** sb_o
 void SovereignExt4_Register(void) {
     SovereignVFS_RegisterFS("ext4", sigma_ext4_mount);
 }
+

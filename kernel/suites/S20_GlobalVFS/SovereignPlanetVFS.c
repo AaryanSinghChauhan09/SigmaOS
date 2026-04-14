@@ -10,8 +10,8 @@
 //         decentralized QSSS transport (S07).
 // =============================================================================
 
-#include <stdint.h>
-#include <stdbool.h>
+#include "sigma_types.h"
+
 
 #define MAX_GLOBAL_NODES    1000000
 
@@ -41,3 +41,4 @@ void planetvfs_handle_conflict(const char* path);
 
 // Transparently cache remote global files to S05 Omnicache
 void planetvfs_prefetch_to_omni(const char* path);
+

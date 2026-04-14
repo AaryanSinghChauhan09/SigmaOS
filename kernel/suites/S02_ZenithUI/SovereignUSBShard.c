@@ -19,3 +19,4 @@ sigma_err_t sigma_usb_init(void) {
 void SovereignUSB_Register(void) {
     SovereignRegistry_Register("usb_core", sigma_usb_init);
 }
+

@@ -46,3 +46,4 @@ void sigma_sec_shadow_verify(SigmaShadowStack_t* ss, sigma_u64 addr) {
 void SovereignShadowStack_Register(void) {
     sigma_printf("[SECURITY]: Sovereign Shadow Stack (ROP Protection) active.\n");
 }
+

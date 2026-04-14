@@ -26,3 +26,4 @@ void sigma_sec_abs_lock(void* threat_vector) {
 void SovereignABS_Register(void) {
     sigma_printf("[SECURITY]: Sovereign ABS (Sentient Hardware Firewall) active.\n");
 }
+

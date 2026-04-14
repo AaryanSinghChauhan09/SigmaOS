@@ -34,3 +34,4 @@ void sigma_arch_jit_compile(void* bytecode) {
 void SovereignBinaryTranslator_Register(void) {
     sigma_printf("[ORCHESTRATOR]: Sovereign Binary Translator (ISA-Agnostic Mastery) active.\n");
 }
+

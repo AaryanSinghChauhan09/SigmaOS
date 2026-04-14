@@ -35,3 +35,4 @@ void sigma_opt_pso_step(void) {
 void SovereignPSO_Register(void) {
     sigma_printf("[INTELLIGENCE]: Sovereign PSO Optimizer (Swarm-Tuning) active.\n");
 }
+

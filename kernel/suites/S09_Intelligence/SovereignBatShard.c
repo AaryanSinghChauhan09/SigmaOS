@@ -26,3 +26,4 @@ void sigma_opt_bat_emit(float frequency, float loudness) {
 void SovereignBat_Register(void) {
     sigma_printf("[INTELLIGENCE]: Sovereign Bat Algorithm (Acoustic Optima) active.\n");
 }
+

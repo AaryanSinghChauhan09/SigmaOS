@@ -27,3 +27,4 @@ sigma_u32 sigma_hal_nvme_poll(volatile void* cq, sigma_u32 tail) {
 void SovereignNVMERing_Register(void) {
     sigma_printf("[HAL]: Sovereign NVMe-Ring (Polled IO Mastery) active.\n");
 }
+

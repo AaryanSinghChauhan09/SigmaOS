@@ -148,3 +148,4 @@ void SovereignConsensus_Register(void) {
     sigma_raft_init();
     sigma_raft_elect();   /* Bootstrap: elect initial leader */
 }
+

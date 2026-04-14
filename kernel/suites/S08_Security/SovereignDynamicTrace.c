@@ -30,3 +30,4 @@ int sigma_fire_memory_probe(sigma_u64 memory_vector) {
 void sigma_trace_status(void) {
     sigma_print("[DYNAMIC-TRACE] Status: ACTIVE. Unyielding real-time DTrace observability achieved.\n");
 }
+

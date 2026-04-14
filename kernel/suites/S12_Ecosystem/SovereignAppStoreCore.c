@@ -12,8 +12,8 @@
 //   • Immutable Apps: Every app is a .sab bundle, guaranteed unmodifiable.
 // =============================================================================
 
-#include <stdint.h>
-#include <stdbool.h>
+#include "sigma_types.h"
+
 
 #define MAX_STORE_ITEMS     4096
 
@@ -44,3 +44,4 @@ void app_store_sync_across_mesh(void);
 
 // Register a local SAB for P2P sharing (Optional user toggle)
 void app_store_seed_bundle(const char* app_id);
+

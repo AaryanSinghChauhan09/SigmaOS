@@ -11,8 +11,8 @@
 //         mitm attacks through lattice-based packet integrity.
 // =============================================================================
 
-#include <stdint.h>
-#include <stdbool.h>
+#include "sigma_types.h"
+
 
 typedef struct {
     uint8_t  dest_uuid[16];
@@ -40,3 +40,4 @@ void qsss_audit_throughput(void);
 
 // Sync mesh-routing tables with S13 Global Consensus
 void qsss_sync_routing(void);
+

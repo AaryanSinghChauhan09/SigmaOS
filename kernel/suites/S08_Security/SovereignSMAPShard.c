@@ -26,3 +26,4 @@ void sigma_sec_smap_enforce(void) {
 void SovereignSMAP_Register(void) {
     sigma_printf("[SECURITY]: Sovereign SMAP (Access Defense) active.\n");
 }
+

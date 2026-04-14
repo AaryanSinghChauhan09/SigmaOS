@@ -35,3 +35,4 @@ void sigma_privacy_audit(void) {
 void SovereignPrivacy_Register(void) {
     sigma_printf("[SECURITY]: Sovereign Privacy (Differential Masking) active.\n");
 }
+

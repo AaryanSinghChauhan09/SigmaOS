@@ -12,8 +12,8 @@
 //     closeness and orientation (pointing your phone at your PC).
 // =============================================================================
 
-#include <stdint.h>
-#include <stdbool.h>
+#include "sigma_types.h"
+
 
 typedef struct {
     uint8_t  peer_uuid[16];
@@ -40,3 +40,4 @@ void proximity_mesh_transfer(const char* sab_path, uint8_t* peer_uuid);
 
 // Notify ZenithUI (S02) of "Nearby Device Found" with 3D spatial location
 void proximity_report_to_ui(void);
+

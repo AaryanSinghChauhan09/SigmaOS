@@ -12,8 +12,8 @@
 //   • Dynamic Weighting: Adjusts font weight based on system "Sentiment" scale
 // =============================================================================
 
-#include <stdint.h>
-#include <stdbool.h>
+#include "sigma_types.h"
+
 
 #define MAX_GLYPH_CACHE     4096
 
@@ -44,3 +44,4 @@ void typography_measure_text(const char* text, float size, int* w, int* h);
 
 // Synchronise with GraphicsBridge (S04) for hardware-accelerated glyph blitting
 void typography_sync_vram(void);
+

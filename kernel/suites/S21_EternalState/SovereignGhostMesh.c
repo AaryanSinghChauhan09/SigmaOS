@@ -10,8 +10,8 @@
 // Result: The OS is 'Everywhere' and 'Nowhere', effectively immortal.
 // =============================================================================
 
-#include <stdint.h>
-#include <stdbool.h>
+#include "sigma_types.h"
+
 
 typedef struct {
     uint8_t  ghost_uuid[16];
@@ -39,3 +39,4 @@ bool ghost_verify_coherence(void);
 
 // Report 'Eternal Readiness' to ZenithUI (S02)
 float ghost_get_eternal_score(void);
+

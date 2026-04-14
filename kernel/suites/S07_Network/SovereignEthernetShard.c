@@ -11,3 +11,4 @@ void sigma_ethernet_handler(void* payload, sigma_size_t size) {
 void SovereignEthernet_Register(void) {
     SovereignNet_RegisterProtocol("ethernet", 0x88B5, sigma_ethernet_handler);
 }
+

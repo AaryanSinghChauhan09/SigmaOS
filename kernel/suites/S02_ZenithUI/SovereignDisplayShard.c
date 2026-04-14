@@ -18,3 +18,4 @@ sigma_err_t sigma_display_init(void) {
 void SovereignDisplay_Register(void) {
     SovereignRegistry_Register("display", sigma_display_init);
 }
+

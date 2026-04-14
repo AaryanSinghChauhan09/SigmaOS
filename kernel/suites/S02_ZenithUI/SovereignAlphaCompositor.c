@@ -25,3 +25,4 @@ void sigma_blend_layers(sigma_u32* src_buf, sigma_u32* dst_buf, sigma_u8 alpha) 
 void sigma_compositor_status(void) {
     sigma_print("[ALPHA-COMPOSITOR] Status: ACTIVE. Sub-pixel rendering sovereignty achieved.\n");
 }
+

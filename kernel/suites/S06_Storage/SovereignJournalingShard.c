@@ -42,3 +42,4 @@ void sigma_journal_recover(void) {
 void SovereignJournal_Register(void) {
     sigma_printf("[STORAGE]: Sovereign Journaling (ACID Mastery) active.\n");
 }
+

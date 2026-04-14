@@ -34,3 +34,4 @@ void sigma_quorum_elect(void) {
 void SovereignQuorum_Register(void) {
     sigma_printf("[NETWORK]: Sovereign Quorum Consensus (Omnipresence Consistency) active.\n");
 }
+

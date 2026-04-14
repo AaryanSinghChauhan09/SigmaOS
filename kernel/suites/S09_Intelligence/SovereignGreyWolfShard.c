@@ -33,3 +33,4 @@ void sigma_opt_gwo_encircle(float* wolf_pos, float* target_pos, float A, float C
 void SovereignGreyWolf_Register(void) {
     sigma_printf("[INTELLIGENCE]: Sovereign Grey-Wolf (Hierarchical Optima) active.\n");
 }
+

@@ -26,3 +26,4 @@ void sigma_sec_sgx_enclave_create(sigma_u32 enclave_size) {
 void SovereignSGX_Register(void) {
     sigma_printf("[SECURITY]: Sovereign SGX (Hardware Enclosures) active.\n");
 }
+

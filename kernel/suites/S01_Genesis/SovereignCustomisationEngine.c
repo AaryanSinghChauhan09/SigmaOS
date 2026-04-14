@@ -122,3 +122,4 @@ void SovereignCustomisation_Register(void) {
     sigma_printf("[REGISTRY]: Sovereign Customisation Engine active in Genesis Suite.\n");
     SovereignCustomisation_Init();
 }
+

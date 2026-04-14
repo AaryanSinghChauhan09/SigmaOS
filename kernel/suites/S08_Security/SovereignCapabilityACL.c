@@ -15,8 +15,8 @@
 //   • Syscall dispatcher checks capability before dispatch (zero-cost fast path)
 // =============================================================================
 
-#include <stdint.h>
-#include <stdbool.h>
+#include "sigma_types.h"
+
 
 // ── Capability Bit Definitions ───────────────────────────────────────────────
 #define CAP_NET_BIND_PORT    (1ULL <<  0)  // Bind ports < 1024
@@ -57,3 +57,4 @@ void cap_fork_restrict(uint32_t parent_pid, uint32_t child_pid, uint64_t mask);
 
 // Log a capability violation to the S08 audit chain
 void cap_log_violation(uint32_t pid, uint64_t attempted_cap);
+

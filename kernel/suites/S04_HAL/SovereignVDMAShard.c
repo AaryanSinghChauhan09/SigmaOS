@@ -27,3 +27,4 @@ void sigma_hal_vdma_copy(void* dst, void* src, sigma_size_t size) {
 void SovereignVDMA_Register(void) {
     sigma_printf("[HAL]: Sovereign V-DMA (DMA-Offload Mastery) active.\n");
 }
+

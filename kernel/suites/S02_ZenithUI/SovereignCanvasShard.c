@@ -24,3 +24,4 @@ void sigma_canvas_draw(sigma_u32 frame_id) {
 void SovereignCanvasShard_Init() {
     sigma_printf("[SOC]: Seating Native Creative-Canvas Shard (Multimedia Parity v1.0)...\n");
 }
+

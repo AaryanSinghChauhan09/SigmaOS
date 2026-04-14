@@ -26,3 +26,4 @@ void sigma_hal_tpm_extend(sigma_u32 pcr_index, sigma_u8* sha256_hash) {
 void SovereignTPM_Register(void) {
     sigma_printf("[HAL]: Sovereign TPM (Hardware Root of Trust) active.\n");
 }
+

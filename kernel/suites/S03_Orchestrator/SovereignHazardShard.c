@@ -37,3 +37,4 @@ void sigma_sync_hazard_release(SigmaHazardPointer_t* hp) {
 void SovereignHazard_Register(void) {
     sigma_printf("[ORCHESTRATOR]: Sovereign Hazard Pointers (Lock-Free Reclamation) active.\n");
 }
+

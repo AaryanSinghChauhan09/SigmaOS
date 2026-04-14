@@ -39,3 +39,4 @@ void sigma_vmm_exit_handler(SigmaVMCB_t* vmcb) {
 void SovereignHypervisor_Register(void) {
     sigma_printf("[ORCHESTRATOR]: Sovereign Micro-Hypervisor (Hardware Isolation) active.\n");
 }
+

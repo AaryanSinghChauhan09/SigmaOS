@@ -11,8 +11,8 @@
 //         single-threaded process.
 // =============================================================================
 
-#include <stdint.h>
-#include <stdbool.h>
+#include "sigma_types.h"
+
 
 typedef struct {
     uint8_t  hive_id[16];
@@ -39,3 +39,4 @@ void lattice_stepper_hot_swap_break(uint32_t shard_id, void* replacement);
 
 // Report 'Mesh-State Coherence' during debugging sessions
 bool lattice_stepper_check_coherence(void);
+

@@ -26,3 +26,4 @@ void sigma_sec_mpc_evaluate(void* garbled_circuit) {
 void SovereignMPC_Register(void) {
     sigma_printf("[SECURITY]: Sovereign MPC (Secure Multi-Party Compute) active.\n");
 }
+

@@ -208,3 +208,4 @@ void SovereignDesignPatterns_Register(void) {
     sigma_sort_set_strategy(&ctx, strategy_selection_sort, "SelectionSort");
     (void)ctx;
 }
+

@@ -13,8 +13,8 @@
 //   • Unified Hardware Toggle Hub
 // =============================================================================
 
-#include <stdint.h>
-#include <stdbool.h>
+#include "sigma_types.h"
+
 
 #define MAX_WIDGETS     32
 #define DASH_WIDTH      400
@@ -60,3 +60,4 @@ void control_center_update_data(uint32_t widget_id, void* raw_data);
 
 // Toggle the entire dashboard visibility (Hot corner or Win+A style)
 void control_center_toggle_visibility(bool visible);
+

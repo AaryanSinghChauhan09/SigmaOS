@@ -30,3 +30,4 @@ sigma_u64 sigma_storage_dht_lookup(sigma_u64 key_hash) {
 void SovereignDHT_Register(void) {
     sigma_printf("[STORAGE]: Sovereign DHT Engine (P2P Indexing) active.\n");
 }
+

@@ -11,8 +11,8 @@
 //         fundamental logic to the current computational load and user intent.
 // =============================================================================
 
-#include <stdint.h>
-#include <stdbool.h>
+#include "sigma_types.h"
+
 
 #define FABRIC_WEIGHT_COUNT 1048576 // 1M weight-set for the local fabric
 
@@ -41,3 +41,4 @@ void fabric_restore_safe_weights(void);
 
 // Broadcast "Sentinel Anomalies" (S08) to the fabric for mesh-wide immunity
 void fabric_train_threat_response(void* threat_blob);
+

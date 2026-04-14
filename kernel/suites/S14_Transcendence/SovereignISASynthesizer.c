@@ -11,8 +11,8 @@
 // Result: SigmaOS can boot on ANY silicon, even those not yet invented.
 // =============================================================================
 
-#include <stdint.h>
-#include <stdbool.h>
+#include "sigma_types.h"
+
 
 typedef enum {
     ARCH_KNOWN   = 0,
@@ -39,3 +39,4 @@ void transcendence_report_to_oracle(void);
 
 // Persist the synthesized ISA-map to S10_Registry for fast reboot
 void transcendence_persist_isa_map(void);
+

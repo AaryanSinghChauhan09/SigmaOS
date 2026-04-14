@@ -26,3 +26,4 @@ void SovereignAutomationCommands_Register(void) {
     SovereignCommand_Register("gaming", "SteamOS/Garuda-style performance boosting", handle_gaming);
     SovereignCommand_Register("automate", "Industrial automation and clicker shards", handle_automate);
 }
+

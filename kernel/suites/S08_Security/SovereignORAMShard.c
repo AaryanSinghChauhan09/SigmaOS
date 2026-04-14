@@ -26,3 +26,4 @@ void sigma_sec_oram_access(sigma_u64 addr, int is_write) {
 void SovereignORAM_Register(void) {
     sigma_printf("[SECURITY]: Sovereign ORAM Mastery (Side-Channel Defense) active.\n");
 }
+

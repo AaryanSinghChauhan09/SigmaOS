@@ -26,3 +26,4 @@ void sigma_sec_klocker_wrap(void* raw_aes_key) {
 void SovereignKLocker_Register(void) {
     sigma_printf("[SECURITY]: Sovereign KLocker (Hardware Key Handles) active.\n");
 }
+

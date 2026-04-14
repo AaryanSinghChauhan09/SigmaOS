@@ -10,8 +10,8 @@
 //     (Mobile, Desktop, Server, RTOS) at boot to match the hardware.
 // =============================================================================
 
-#include <stdint.h>
-#include <stdbool.h>
+#include "sigma_types.h"
+
 
 typedef enum {
     FORM_MOBILE  = 0,
@@ -36,3 +36,4 @@ void synthesizer_adapt_interface(FormFactor form);
 
 // Final Release: Synthesize the 'Golden Master' binary for the node
 void synthesizer_output_master(void);
+

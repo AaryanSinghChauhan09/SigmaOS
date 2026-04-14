@@ -26,3 +26,4 @@ void sigma_sec_mte_tag(void* memory_ptr, sigma_u8 tag_value) {
 void SovereignMTE_Register(void) {
     sigma_printf("[SECURITY]: Sovereign MTE (Silicon Memory Tagging) active.\n");
 }
+

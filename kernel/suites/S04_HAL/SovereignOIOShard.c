@@ -26,3 +26,4 @@ void sigma_hal_oio_laser(sigma_u64 light_frequency) {
 void SovereignOIO_Register(void) {
     sigma_printf("[HAL]: Sovereign OIO (Silicon Photonics Direct I/O) active.\n");
 }
+

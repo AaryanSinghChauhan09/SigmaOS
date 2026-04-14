@@ -26,3 +26,4 @@ void sigma_sec_pks_seal(sigma_u16 protection_key, void* page_dir) {
 void SovereignPKS_Register(void) {
     sigma_printf("[SECURITY]: Sovereign PKS (Supervisor Protection Keys) active.\n");
 }
+

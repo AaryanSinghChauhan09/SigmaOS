@@ -46,3 +46,4 @@ void sigma_numa_bind(sigma_u32 pid, sigma_u32 node_id) {
 void SovereignNUMA_Register(void) {
     sigma_printf("[ORCHESTRATOR]: Sovereign NUMA Mastery (Topology Awareness) active.\n");
 }
+

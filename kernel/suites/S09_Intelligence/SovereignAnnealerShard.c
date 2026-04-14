@@ -33,3 +33,4 @@ void sigma_opt_anneal(float initial_temp, float cooling_rate) {
 void SovereignAnnealer_Register(void) {
     sigma_printf("[INTELLIGENCE]: Sovereign Annealer (Thermal Mastery) active.\n");
 }
+

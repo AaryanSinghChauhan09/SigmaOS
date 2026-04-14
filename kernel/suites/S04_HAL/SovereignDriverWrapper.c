@@ -13,8 +13,8 @@
 //   • Automatic Sandboxing: If the driver crashes, SigmaOS isolates it.
 // =============================================================================
 
-#include <stdint.h>
-#include <stdbool.h>
+#include "sigma_types.h"
+
 
 typedef struct {
     char     driver_id[128];
@@ -42,3 +42,4 @@ void driver_wrapper_handle_fault(uint32_t driver_handle);
 
 // Sync wrapped driver state to S10_Registry for persistence
 void driver_wrapper_persist_state(void);
+

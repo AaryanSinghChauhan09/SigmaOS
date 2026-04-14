@@ -10,8 +10,8 @@
 //     to avoid reboots entirely.
 // =============================================================================
 
-#include <stdint.h>
-#include <stdbool.h>
+#include "sigma_types.h"
+
 
 #define UPDATE_CHUNK_SIZE   65536
 #define MAX_PEER_SOURCES    8
@@ -42,3 +42,4 @@ void mesh_update_report_status(float progress);
 
 // Broadcast update availability to Continuity peers (S12)
 void mesh_update_advertise_shard(uint32_t suite_id);
+

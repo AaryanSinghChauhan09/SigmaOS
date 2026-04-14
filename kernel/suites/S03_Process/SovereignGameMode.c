@@ -12,8 +12,8 @@
 //   • 100% Zero-Throttling: Bypasses S04 PowerPulse to maintain max clock.
 // =============================================================================
 
-#include <stdint.h>
-#include <stdbool.h>
+#include "sigma_types.h"
+
 
 typedef struct {
     uint32_t target_pid;
@@ -42,3 +42,4 @@ void gamemode_silence_background(void);
 
 // Leave Game Mode and restore standard S03 scheduler balance
 void gamemode_exit(void);
+

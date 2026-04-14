@@ -16,8 +16,8 @@
 //   • Sovereign signature verified via S08_Security before any write
 // =============================================================================
 
-#include <stdint.h>
-#include <stdbool.h>
+#include "sigma_types.h"
+
 
 #define UPDATER_MAX_GENERATIONS  32
 #define UPDATER_DELTA_CHUNK_SIZE (1024 * 1024)  // 1MB delta blocks
@@ -61,3 +61,4 @@ uint32_t updater_list_generations(SigmaGeneration* out, uint32_t max);
 // Verify sovereign cryptographic signature of a staged update
 bool updater_verify_signature(const uint8_t* pkg_data, uint32_t size,
                                const uint8_t* sig, uint32_t sig_len);
+

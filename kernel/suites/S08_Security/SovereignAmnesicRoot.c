@@ -10,8 +10,8 @@
 // Result: The most private operating mode in existence.
 // =============================================================================
 
-#include <stdint.h>
-#include <stdbool.h>
+#include "sigma_types.h"
+
 
 typedef struct {
     bool     is_amnesic_active;
@@ -35,3 +35,4 @@ void amnesic_sync_dark_mesh(void);
 
 // Audit 'Entropy Leakage' (Trace-prevention audit)
 float amnesic_get_stealth_score(void);
+

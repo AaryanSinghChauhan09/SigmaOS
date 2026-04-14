@@ -12,3 +12,4 @@ sigma_err_t sigma_jail_init(void) {
 void SovereignJail_Register(void) {
     SovereignSecurity_Register("jail", sigma_jail_init);
 }
+

@@ -32,3 +32,4 @@ void sigma_opt_mfo_spiral(float* moth_pos, float* flame_pos, float b, float t) {
 void SovereignMFO_Register(void) {
     sigma_printf("[INTELLIGENCE]: Sovereign MFO (Moth-Flame Optima) active.\n");
 }
+

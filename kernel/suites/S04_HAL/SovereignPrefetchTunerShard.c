@@ -27,3 +27,4 @@ void sigma_hal_prefetch_set_aggression(int level) {
 void SovereignPrefetchTuner_Register(void) {
     sigma_printf("[HAL]: Sovereign Prefetch Tuner (Dynamic HW Tuning) active.\n");
 }
+

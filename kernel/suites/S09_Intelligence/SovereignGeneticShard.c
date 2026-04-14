@@ -40,3 +40,4 @@ void sigma_optimizer_apply(void) {
 void SovereignGenetic_Register(void) {
     sigma_printf("[INTELLIGENCE]: Sovereign Genetic Optimizer (Self-Evolving Code) active.\n");
 }
+

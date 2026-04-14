@@ -12,8 +12,8 @@
 //   • Native 8000Hz Polling Support for pro-level HID interaction.
 // =============================================================================
 
-#include <stdint.h>
-#include <stdbool.h>
+#include "sigma_types.h"
+
 
 #define INPUT_QUEUE_DEPTH   1024
 
@@ -42,3 +42,4 @@ void input_pipeline_predict_motion(int* px, int* py);
 
 // Report end-to-end latency (Click-to-Blit) in microseconds
 uint32_t input_pipeline_audit_latency(void);
+

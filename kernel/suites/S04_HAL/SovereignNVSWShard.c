@@ -26,3 +26,4 @@ void sigma_hal_nvsw_route(sigma_u32 cluster_id) {
 void SovereignNVSW_Register(void) {
     sigma_printf("[HAL]: Sovereign NVSW (NVLink Non-Blocking Fabric) active.\n");
 }
+

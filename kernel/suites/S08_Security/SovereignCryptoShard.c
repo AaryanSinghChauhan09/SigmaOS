@@ -73,3 +73,4 @@ sigma_err_t sigma_crypto_init(void) {
 void SovereignCryptoShard_Init(void) {
     sigma_crypto_init();
 }
+

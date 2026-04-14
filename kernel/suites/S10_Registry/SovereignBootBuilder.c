@@ -53,3 +53,4 @@ int main(int argc, char** argv) {
     sigma_printf("Σ [DONE]: Standalone Sovereign Image Ready for deployment on any %s device.\n", ctx.target_arch);
     return 0;
 }
+

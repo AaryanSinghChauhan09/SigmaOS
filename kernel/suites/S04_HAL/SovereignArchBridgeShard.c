@@ -27,3 +27,4 @@ sigma_err_t sigma_arch_bridge_init(void) {
 void SovereignArchBridge_Register(void) {
     SovereignArch_Register("multi_arch_bridge", sigma_arch_bridge_init);
 }
+

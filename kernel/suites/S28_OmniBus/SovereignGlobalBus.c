@@ -10,8 +10,8 @@
 // Result: Distributed computing that feels like a single multi-socket board.
 // =============================================================================
 
-#include <stdint.h>
-#include <stdbool.h>
+#include "sigma_types.h"
+
 
 typedef struct {
     uint8_t  peer_node_id[16];
@@ -39,3 +39,4 @@ float omnibus_get_interconnect_health(void);
 
 // Sync device state for 'Hot-Migration' of hardware tasks
 void omnibus_swap_peripheral_host(uint32_t dev_id, uint8_t new_host_id);
+

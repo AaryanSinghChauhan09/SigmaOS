@@ -33,3 +33,4 @@ void sigma_forth_step(SigmaForthVM_t* vm, const char* word) {
 void SovereignForth_Register(void) {
     sigma_printf("[ORCHESTRATOR]: Sovereign Forth Engine (Stack Mastery) active.\n");
 }
+

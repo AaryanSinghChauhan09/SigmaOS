@@ -18,3 +18,4 @@ sigma_err_t sigma_9p_init(void) {
 void Sovereign9P_Register(void) {
     SovereignFSRegistry_Register("9p", sigma_9p_init);
 }
+

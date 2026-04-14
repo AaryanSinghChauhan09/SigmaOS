@@ -33,3 +33,4 @@ void sigma_hal_pmu_audit(void) {
 void SovereignPMU_Register(void) {
     sigma_printf("[HAL]: Sovereign PMU Mastery (Hardware Observability) active.\n");
 }
+

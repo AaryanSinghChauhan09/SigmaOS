@@ -26,3 +26,4 @@ void sigma_opt_runge_kutta(float step_size, float* vector_slopes) {
 void SovereignRUN_Register(void) {
     sigma_printf("[INTELLIGENCE]: Sovereign RUN (Runge-Kutta Method) active.\n");
 }
+

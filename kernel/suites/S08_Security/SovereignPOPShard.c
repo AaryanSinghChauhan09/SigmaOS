@@ -26,3 +26,4 @@ void sigma_sec_pop_verify(sigma_u16 target_node) {
 void SovereignPOP_Register(void) {
     sigma_printf("[SECURITY]: Sovereign POP (Proof of Physical Position) active.\n");
 }
+

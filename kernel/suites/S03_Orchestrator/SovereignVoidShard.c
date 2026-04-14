@@ -18,3 +18,4 @@ sigma_err_t sigma_void_init(void) {
 void SovereignVoid_Register(void) {
     SovereignInit_Register("void_amalgam", sigma_void_init);
 }
+

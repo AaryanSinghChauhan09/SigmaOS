@@ -31,3 +31,4 @@ void sigma_sync_hle_lock(SigmaHLELock_t* sl) {
 void SovereignHLE_Register(void) {
     sigma_printf("[ORCHESTRATOR]: Sovereign HLE (Lock Elision Mastery) active.\n");
 }
+

@@ -14,8 +14,8 @@
 //   • Guard pages surround slab arenas (Rust-backed bounds via S05 RS)
 // =============================================================================
 
-#include <stdint.h>
-#include <stdbool.h>
+#include "sigma_types.h"
+
 
 #define SIGMA_SLAB_MAGAZINE_SIZE  128   // Objects per per-CPU magazine
 #define SIGMA_SLAB_MAX_CACHES      64   // Max simultaneous object type caches
@@ -57,3 +57,4 @@ void  slab_trim_all(void);
 
 // Validate guard canaries on all active caches (called by Rust safety shard)
 bool  slab_verify_integrity(void);
+

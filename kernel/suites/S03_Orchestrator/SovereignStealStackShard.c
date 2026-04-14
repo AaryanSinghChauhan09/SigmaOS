@@ -37,3 +37,4 @@ int sigma_sync_steal_pop(SigmaStealStack_t* stack, sigma_u32* out_val) {
 void SovereignStealStack_Register(void) {
     sigma_printf("[ORCHESTRATOR]: Sovereign Steal-Stack (Back-end Balancing) active.\n");
 }
+

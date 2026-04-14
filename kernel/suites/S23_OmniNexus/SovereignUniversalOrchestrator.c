@@ -11,8 +11,8 @@
 //         with 0-Latency.
 // =============================================================================
 
-#include <stdint.h>
-#include <stdbool.h>
+#include "sigma_types.h"
+
 
 typedef enum {
     GUEST_WIN11 = 0,
@@ -39,3 +39,4 @@ void omninexus_dedup_ram(void);
 
 // Report 'Guest Transparency' index (Frictionless factor)
 float omninexus_get_friction_iq(void);
+

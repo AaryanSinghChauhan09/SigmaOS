@@ -33,3 +33,4 @@ void sigma_hal_hpc_audit(void) {
 void SovereignHPC_Register(void) {
     sigma_printf("[HAL]: Sovereign HPC (Hardware Performance Auditing) active.\n");
 }
+

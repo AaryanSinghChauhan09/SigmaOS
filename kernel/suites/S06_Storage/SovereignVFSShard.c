@@ -41,3 +41,4 @@ sigma_err_t sigma_vfs_open(const char* path) {
 void SovereignVFS_Register(void) {
     sigma_printf("[STORAGE]: Sovereign VFS Layer (Abstraction) online.\n");
 }
+

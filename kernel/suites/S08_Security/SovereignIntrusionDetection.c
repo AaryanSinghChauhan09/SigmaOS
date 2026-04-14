@@ -16,8 +16,8 @@
 //   • On alert: logs to S08 AuditLog, optionally kills offending PID
 // =============================================================================
 
-#include <stdint.h>
-#include <stdbool.h>
+#include "sigma_types.h"
+
 
 #define IDS_MAX_RULES     512
 #define IDS_RULE_NAME_LEN  64
@@ -85,3 +85,4 @@ uint32_t ids_drain_alerts(IDSAlert* out, uint32_t max);
 
 // Load default sovereign ruleset (syscall + network signatures)
 void ids_load_default_rules(void);
+

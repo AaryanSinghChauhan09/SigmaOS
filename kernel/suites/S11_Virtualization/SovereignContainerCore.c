@@ -12,8 +12,8 @@
 //   • Zero-Overhead VFS: Direct mount of S06 Hive files into the container.
 // =============================================================================
 
-#include <stdint.h>
-#include <stdbool.h>
+#include "sigma_types.h"
+
 
 #define MAX_CONTAINERS      64
 #define CONT_CPU_QUOTA      1000 // In microseconds per slice
@@ -45,3 +45,4 @@ void container_scale_to_hive(uint32_t container_id, uint8_t node_count);
 
 // Verify container integrity via PQC-Seal (S08)
 bool container_verify(uint32_t container_id);
+

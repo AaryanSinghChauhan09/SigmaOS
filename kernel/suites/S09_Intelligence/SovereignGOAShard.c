@@ -31,3 +31,4 @@ void sigma_opt_goa_repulsion(SigmaGrasshopper_t* g1, SigmaGrasshopper_t* g2, flo
 void SovereignGOA_Register(void) {
     sigma_printf("[INTELLIGENCE]: Sovereign GOA (Swarm-Social Optima) active.\n");
 }
+

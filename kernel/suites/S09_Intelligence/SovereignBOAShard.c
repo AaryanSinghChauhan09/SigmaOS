@@ -31,3 +31,4 @@ void sigma_opt_boa_fragrance(SigmaButterfly_t* b, float c, float a, float intens
 void SovereignBOA_Register(void) {
     sigma_printf("[INTELLIGENCE]: Sovereign BOA (Fragrance-Social Optima) active.\n");
 }
+

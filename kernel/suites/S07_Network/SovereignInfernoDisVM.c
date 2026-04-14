@@ -18,3 +18,4 @@ void sigma_inferno_dis_vm_init(void) {
 void sigma_execute_dis_bytecode(void* limbo_bytecode) {
     sigma_print("[INFERNO-DIS-VM] Iterating and processing native Dis structures across the VFS.\n");
 }
+

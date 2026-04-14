@@ -26,3 +26,4 @@ void sigma_sec_smep_enforce(void) {
 void SovereignSMEP_Register(void) {
     sigma_printf("[SECURITY]: Sovereign SMEP (Execution Defense) active.\n");
 }
+

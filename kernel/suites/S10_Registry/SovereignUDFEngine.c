@@ -99,3 +99,4 @@ void SovereignUDF_Register(void) {
     sigma_printf("[REGISTRY]: Sovereign UDF Engine v50 online.\n");
     sigma_printf("[AUDIT]: Personalization Domains verified (High-Entropy).\n");
 }
+

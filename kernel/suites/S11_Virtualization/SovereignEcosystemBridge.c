@@ -10,8 +10,8 @@
 //         on the Sovereign Lattice.
 // =============================================================================
 
-#include <stdint.h>
-#include <stdbool.h>
+#include "sigma_types.h"
+
 
 typedef enum {
     REPO_DEBIAN  = 0,
@@ -39,3 +39,4 @@ void eco_bridge_set_personality(DistroType type);
 
 // Audit Compatibility IQ for a specific Linux ecosystem
 float eco_bridge_get_compatibility(DistroType type);
+

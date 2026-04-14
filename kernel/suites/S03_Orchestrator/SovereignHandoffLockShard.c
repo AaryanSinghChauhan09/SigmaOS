@@ -41,3 +41,4 @@ void sigma_sync_handoff_release(SigmaHandoffLock_t* hl, sigma_u32 next_id) {
 void SovereignHandoffLock_Register(void) {
     sigma_printf("[ORCHESTRATOR]: Sovereign Handoff-Lock (Anti-Thrashing) active.\n");
 }
+

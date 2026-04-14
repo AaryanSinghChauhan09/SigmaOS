@@ -11,8 +11,8 @@
 //         as plugging in a flash drive.
 // =============================================================================
 
-#include <stdint.h>
-#include <stdbool.h>
+#include "sigma_types.h"
+
 
 typedef struct {
     uint8_t  source_hive_id[16];
@@ -40,3 +40,4 @@ void latticemerge_resolve_fs_conflicts(void);
 
 // Report 'Unity Score' (Cohesion factor of the merged Hive)
 float latticemerge_get_unity(void);
+

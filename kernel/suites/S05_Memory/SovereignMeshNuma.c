@@ -13,8 +13,8 @@
 //     minimize mesh traffic while maintaining thread safety.
 // =============================================================================
 
-#include <stdint.h>
-#include <stdbool.h>
+#include "sigma_types.h"
+
 
 #define HIVE_PAGE_SIZE      4096
 #define MESH_ADDR_SPACE_BITS 64
@@ -46,3 +46,4 @@ uint32_t mesh_numa_get_latency_ns(uint8_t node_id);
 
 // Synchronize Mesh Page Tables with the S13 Neural Fabric (Predictive pre-fetch)
 void mesh_numa_sentience_prefetch(uintptr_t predicted_addr);
+

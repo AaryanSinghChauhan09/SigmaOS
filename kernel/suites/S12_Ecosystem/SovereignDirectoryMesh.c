@@ -12,8 +12,8 @@
 //   • E2EE Membership: Group rosters are encrypted via PQC (S08).
 // =============================================================================
 
-#include <stdint.h>
-#include <stdbool.h>
+#include "sigma_types.h"
+
 
 #define MAX_MESH_GROUPS     64
 #define MAX_MESH_USERS      1024
@@ -44,3 +44,4 @@ bool directory_check_access(uint8_t* user_uuid, uint16_t required_mask);
 
 // Synchronize directory state with S10_Registry and Hive peers
 void directory_sync_mesh(void);
+

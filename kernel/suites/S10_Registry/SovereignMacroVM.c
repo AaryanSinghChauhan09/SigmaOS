@@ -37,3 +37,4 @@ static SovereignMacroVM_t create_macro_vm() {
     obj.ExecuteMacroSovereign = vm_execute_macro;
     return obj;
 }
+

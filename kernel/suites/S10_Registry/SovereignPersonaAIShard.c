@@ -43,3 +43,4 @@ void sigma_persona_adapt(void) {
 void SovereignPersonaAI_Register(void) {
     sigma_printf("[REGISTRY]: Sovereign Persona AI (Adaptive UX) active.\n");
 }
+

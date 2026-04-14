@@ -42,3 +42,4 @@ static SovereignPowerQueryMaster_t create_power_query_master() {
     obj.FinalizeIngestion = pquery_finalize;
     return obj;
 }
+

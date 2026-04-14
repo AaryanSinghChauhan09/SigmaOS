@@ -34,3 +34,4 @@ void SovereignWeb_Register(void) {
     sigma_printf("[ZENITHUI]: Sovereign Web-Sync Engine (Chromium-Native) active.\n");
     sigma_printf("[CHROME]: PWA Service Worker Handshake Initiated.\n");
 }
+

@@ -11,8 +11,8 @@
 //         Sovereign device over QSSS (S07).
 // =============================================================================
 
-#include <stdint.h>
-#include <stdbool.h>
+#include "sigma_types.h"
+
 
 typedef struct {
     uint8_t  node_uuid[16];
@@ -37,3 +37,4 @@ void screenflow_stream_vram(void);
 
 // Audit latency and bandwidth (S07 QSSS hook)
 void screenflow_audit_qos(void);
+

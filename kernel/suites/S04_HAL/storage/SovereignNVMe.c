@@ -11,3 +11,4 @@ sigma_err_t sigma_nvme_probe(SigmaDevice_t* dev) {
 void SovereignNVMe_Register(void) {
     sigma_driver_register("nvme-sigma", BUS_PCI, 0x1022, 0x43b9, sigma_nvme_probe, SIGMA_NULL);
 }
+

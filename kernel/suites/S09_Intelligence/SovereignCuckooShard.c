@@ -26,3 +26,4 @@ void sigma_opt_cuckoo_levy(void) {
 void SovereignCuckoo_Register(void) {
     sigma_printf("[INTELLIGENCE]: Sovereign Cuckoo Search (Global Optima) active.\n");
 }
+

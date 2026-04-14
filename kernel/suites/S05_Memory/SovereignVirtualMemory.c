@@ -2,8 +2,8 @@
 // Absorbs Linux THP (Transparent Huge Pages) + Windows AWE + macOS Compressed RAM
 // Zero-dependency C11 — manages page tables, TLB, demand paging
 
-#include <stdint.h>
-#include <stdbool.h>
+#include "sigma_types.h"
+
 
 #define SIGMA_PAGE_SIZE_4K      0x1000
 #define SIGMA_PAGE_SIZE_2M      0x200000
@@ -42,3 +42,4 @@ bool vm_promote_to_huge_page(uint64_t virt_base);
 // Flush TLB for a specific address (invlpg) or full CR3 reload
 void vm_flush_tlb_page(uint64_t virt_addr);
 void vm_flush_tlb_full(void);
+

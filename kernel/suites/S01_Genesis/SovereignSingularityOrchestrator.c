@@ -11,8 +11,8 @@
 // Result: Total system readiness from 0 to 'Sentient Desktop' in <500ms.
 // =============================================================================
 
-#include <stdint.h>
-#include <stdbool.h>
+#include "sigma_types.h"
+
 
 typedef struct {
     uint32_t suite_id;
@@ -42,3 +42,4 @@ void singularity_broadcast_ready(void);
 
 // Handle Suite-Failure: Hot-patch and Restart (S10 Self-Healing hook)
 void singularity_reboot_shard(uint32_t suite_id);
+

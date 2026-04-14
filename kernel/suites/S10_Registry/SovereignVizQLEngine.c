@@ -38,3 +38,4 @@ static SovereignVizQLEngine_t create_vizql_engine() {
     obj.RenderHardwareDashboard = vizql_render_dashboard;
     return obj;
 }
+

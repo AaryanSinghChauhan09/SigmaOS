@@ -32,3 +32,4 @@ void sigma_opt_wdo_flow(SigmaAirParcel_t* parcel, float coriolis_force, float fr
 void SovereignWDO_Register(void) {
     sigma_printf("[INTELLIGENCE]: Sovereign WDO (Atmospheric Search) active.\n");
 }
+

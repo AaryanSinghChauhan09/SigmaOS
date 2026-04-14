@@ -2,8 +2,8 @@
 // Absorbs Linux auditd + Windows Event Log + macOS OSLog
 // Cryptographically chained, tamper-evident, kernel-level log ring.
 
-#include <stdint.h>
-#include <stdbool.h>
+#include "sigma_types.h"
+
 
 #define SIGMA_AUDIT_MAX_ENTRIES  8192
 #define SIGMA_AUDIT_MSG_LEN      256
@@ -41,3 +41,4 @@ bool audit_verify_chain(void);
 
 // Export the audit ring to the VFS for persistence
 void audit_flush_to_disk(const char* mount_point);
+

@@ -63,3 +63,4 @@ sigma_err_t sigma_device_register(const char* name, SigmaBusType_t bus, SigmaDev
     }
     return SIGMA_OK;
 }
+

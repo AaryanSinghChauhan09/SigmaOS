@@ -12,8 +12,8 @@
 //   • Pipeline: Automatic frame-graph optimization before VRAM transfer
 // =============================================================================
 
-#include <stdint.h>
-#include <stdbool.h>
+#include "sigma_types.h"
+
 
 #define MAX_COMMANDS_PER_BLOCK 4096
 
@@ -50,3 +50,4 @@ void gfx_bridge_wait_sync(void);
 
 // Benchmark current GPU draw-call throughput (Perf parity)
 uint64_t gfx_bridge_get_throughput(void);
+

@@ -11,8 +11,8 @@
 //         'Re-Materialize' on a new node in seconds with 100% state parity.
 // =============================================================================
 
-#include <stdint.h>
-#include <stdbool.h>
+#include "sigma_types.h"
+
 
 #define MATERIALIZATION_VERSION 1
 
@@ -42,3 +42,4 @@ bool immortality_verify_integrity(uint8_t* puf_signature);
 
 // Report 'Solidity' (Recovery Readiness) to ZenithUI Dash (S02)
 float immortality_get_solidity_factor(void);
+

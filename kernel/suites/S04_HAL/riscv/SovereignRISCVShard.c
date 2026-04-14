@@ -12,3 +12,4 @@ void sigma_riscv_init(void) {
 void SovereignRISCV_Register(void) {
     SovereignArch_Register("RISCV", sigma_riscv_init, SIGMA_NULL);
 }
+

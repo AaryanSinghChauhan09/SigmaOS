@@ -31,3 +31,4 @@ void sigma_opt_gso_luminescence(SigmaGlowworm_t* worm, float fitness_terrain) {
 void SovereignGSO_Register(void) {
     sigma_printf("[INTELLIGENCE]: Sovereign GSO (Luminescence Swarm) active.\n");
 }
+

@@ -2,7 +2,7 @@
 // Absorbs Linux IDT/APIC + Windows Interrupt Dispatch Table + Mach interrupt stacks
 // Hardened C11 — all interrupt handlers run at ring-0 with safe stack switching.
 
-#include <stdint.h>
+#include "sigma_types.h"
 
 #define SIGMA_IRQ_VECTORS    256
 #define SIGMA_STACK_SIZE     8192 // Dedicated kernel interrupt stack per vector
@@ -33,3 +33,4 @@ void irq_send_eoi(uint32_t vector);
 // Enable/disable non-maskable interrupts (NMI) for watchdog
 void irq_enable_nmi(void);
 void irq_disable_nmi(void);
+

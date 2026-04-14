@@ -26,3 +26,4 @@ void sigma_sec_qst_verify(void* polarization_matrix) {
 void SovereignQST_Register(void) {
     sigma_printf("[SECURITY]: Sovereign QST (Quantum State Tomography) active.\n");
 }
+

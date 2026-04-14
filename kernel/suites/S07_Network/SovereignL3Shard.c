@@ -32,3 +32,4 @@ int sigma_net_route_lookup(sigma_u32 ip) {
 void SovereignL3_Register(void) {
     sigma_printf("[NETWORK]: Sovereign L3 Routing Engine active.\n");
 }
+

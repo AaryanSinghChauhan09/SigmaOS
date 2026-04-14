@@ -24,3 +24,4 @@ int main() {
     sigma_printf("\nΣ [DONE]: Silicon identity confirmed. SigmaOS is optimized for this target.\n");
     return 0;
 }
+

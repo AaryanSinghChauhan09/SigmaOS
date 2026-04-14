@@ -2,8 +2,8 @@
 // Absorbs ACPI paradigms (Linux), Windows Modern Standby (S0ix), and Apple Energy Saver.
 // Modular C11 implementation, zero external deps.
 
-#include <stdint.h>
-#include <stdbool.h>
+#include "sigma_types.h"
+
 
 typedef enum {
     SIGMA_POWER_PERFORMANCE  = 0,  // Max CPU/GPU clock, no throttle
@@ -51,3 +51,4 @@ void power_adaptive_scale(uint8_t cpu_utilization_pct) {
     else if (cpu_utilization_pct > 75)
         power_set_state(SIGMA_POWER_PERFORMANCE);
 }
+

@@ -27,3 +27,4 @@ void sigma_sec_kasan_check(void* ptr, sigma_u32 size, int is_write) {
 void SovereignKASAN_Register(void) {
     sigma_printf("[SECURITY]: Sovereign KASAN (Memory Sanitization) active.\n");
 }
+

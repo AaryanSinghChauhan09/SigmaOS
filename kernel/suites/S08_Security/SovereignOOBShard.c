@@ -26,3 +26,4 @@ void sigma_sec_oob_isolate(void) {
 void SovereignOOB_Register(void) {
     sigma_printf("[SECURITY]: Sovereign OOB (Baseboard Controller Firewall) active.\n");
 }
+

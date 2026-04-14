@@ -31,3 +31,4 @@ void sigma_opt_tlbo_teach(float* student_pos, SigmaClassroom_t* classroom, float
 void SovereignTLBO_Register(void) {
     sigma_printf("[INTELLIGENCE]: Sovereign TLBO (Pedagogical Optima) active.\n");
 }
+

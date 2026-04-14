@@ -32,3 +32,4 @@ void SovereignSecurity_Register(void) {
     sigma_printf("[SECURITY]: Sovereign Cyber Defense v50 active.\n");
     sigma_printf("[SECURITY]: Kernel Gate: LOCKED.\n");
 }
+

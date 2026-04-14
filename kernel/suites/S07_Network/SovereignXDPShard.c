@@ -10,8 +10,8 @@
 // Result: Wire-speed (100Gbps+) packet filtering and routing.
 // =============================================================================
 
-#include <stdint.h>
-#include <stdbool.h>
+#include "sigma_types.h"
+
 
 typedef struct {
     uint32_t action; // PASS, DROP, REDIRECT
@@ -35,3 +35,4 @@ void xdp_gather_telemetry(void);
 
 // Synchronize XDP policies with SovereignQSSS (S07)
 void xdp_sync_mesh_rules(void);
+

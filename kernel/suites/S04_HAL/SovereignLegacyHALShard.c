@@ -20,3 +20,4 @@ sigma_err_t sigma_hal_legacy_init(void) {
 void SovereignLegacyHAL_Register(void) {
     SovereignArch_Register("legacy_hal", sigma_hal_legacy_init);
 }
+

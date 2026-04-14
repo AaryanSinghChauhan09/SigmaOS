@@ -33,3 +33,4 @@ void sigma_hal_usb_connect(SigmaUsbDevice_t* dev) {
 void SovereignHIDBridge_Register(void) {
     sigma_printf("[HAL]: Sovereign HID Bridge (Universal Peripheral Gateway) active.\n");
 }
+

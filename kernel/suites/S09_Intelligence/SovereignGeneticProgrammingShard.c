@@ -26,3 +26,4 @@ void sigma_opt_gp_cross(void* tree1, void* tree2) {
 void SovereignGeneticProgramming_Register(void) {
     sigma_printf("[INTELLIGENCE]: Sovereign GP-Core (Code Evolution) active.\n");
 }
+

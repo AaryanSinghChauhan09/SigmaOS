@@ -26,3 +26,4 @@ void sigma_hal_mpam_allocate(sigma_u16 part_id, sigma_u8 bandwidth_percentage) {
 void SovereignMPAM_Register(void) {
     sigma_printf("[HAL]: Sovereign MPAM (ARM Bandwidth Partitioning) active.\n");
 }
+

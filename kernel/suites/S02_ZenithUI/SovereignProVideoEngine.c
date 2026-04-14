@@ -12,8 +12,8 @@
 //   • Zero-Latency Scrubbing: Uses S13 Sentience to pre-fetch video blocks.
 // =============================================================================
 
-#include <stdint.h>
-#include <stdbool.h>
+#include "sigma_types.h"
+
 
 #define MAX_VIDEO_STREAMS   4
 #define VIDEO_MAX_RES_W     7680
@@ -46,3 +46,4 @@ void pro_video_sync_mesh(uint32_t stream_id, uint8_t* peer_uuid);
 
 // Audit frame-to-render latency (Zero-lag parity)
 uint32_t pro_video_get_latency_ns(void);
+

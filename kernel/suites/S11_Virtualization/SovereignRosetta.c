@@ -12,8 +12,8 @@
 //   • Zero-copy syscall translation directly to SigmaOS kernel shards
 // =============================================================================
 
-#include <stdint.h>
-#include <stdbool.h>
+#include "sigma_types.h"
+
 
 #define TRANSLATION_CACHE_SIZE 256 * 1024 * 1024 // 256MB
 
@@ -43,3 +43,4 @@ void rosetta_sync_context(void* guest_regs, void* host_regs);
 
 // Flush translation cache (S13 Sentiment trigger)
 void rosetta_flush_cache(void);
+

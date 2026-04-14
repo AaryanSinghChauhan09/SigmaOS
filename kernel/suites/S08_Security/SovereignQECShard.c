@@ -26,3 +26,4 @@ void sigma_sec_qec_syndrome(void* qubit_lattice) {
 void SovereignQEC_Register(void) {
     sigma_printf("[SECURITY]: Sovereign QEC (Quantum Error Correction) active.\n");
 }
+

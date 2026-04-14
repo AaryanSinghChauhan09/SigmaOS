@@ -14,8 +14,8 @@
 //   • Private & Native: Zero cloud dependencies; all logic runs in C/Wasm.
 // =============================================================================
 
-#include <stdint.h>
-#include <stdbool.h>
+#include "sigma_types.h"
+
 
 #define MAX_AUTOMATIONS     64
 #define MAX_STEPS           32
@@ -53,3 +53,4 @@ void automator_suggest_workflow(void);
 
 // Export/Import workflows via S12 Continuity Mesh
 void automator_mesh_sync(void);
+

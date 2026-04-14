@@ -64,3 +64,4 @@ void sovereign_obj_call(SovereignObject_t* obj, sigma_u32 msg_id) {
 void SovereignObject_Register(void) {
     sigma_printf("[MEMORY]: Sovereign OOP Shard (VTable Dispatch) online.\n");
 }
+

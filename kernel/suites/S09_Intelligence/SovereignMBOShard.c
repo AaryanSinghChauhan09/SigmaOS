@@ -26,3 +26,4 @@ void sigma_opt_mbo_migrate(float* subpopulation1, float* subpopulation2, float m
 void SovereignMBO_Register(void) {
     sigma_printf("[INTELLIGENCE]: Sovereign MBO (Monarch Butterfly Migration) active.\n");
 }
+

@@ -59,3 +59,4 @@ void SovereignGfxAccelerator_BlitWindow(void* screen, void* window, sigma_u32 wi
 void SovereignGfxAccelerator_Init() {
     sigma_printf("[SOC]: Initializing Sovereign GFX Silicon Pulse (v1.0)...\n");
 }
+

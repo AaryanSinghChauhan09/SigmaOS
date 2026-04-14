@@ -25,3 +25,4 @@ sigma_i64 sigma_syscall_dispatch(sigma_u64 nr, sigma_u64 a1, sigma_u64 a2, sigma
     if (nr >= TABLE_SIZE) return -38;
     return s_syscall_table[nr](a1, a2, a3, a4, a5, a6);
 }
+

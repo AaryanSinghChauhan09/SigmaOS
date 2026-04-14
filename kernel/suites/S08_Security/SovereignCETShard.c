@@ -26,3 +26,4 @@ void sigma_sec_cet_enable(void) {
 void SovereignCET_Register(void) {
     sigma_printf("[SECURITY]: Sovereign CET (Hardware CFI) active.\n");
 }
+

@@ -31,3 +31,4 @@ void sigma_opt_eho_clan_update(SigmaElephant_t* elephant, float* matriarch_pos, 
 void SovereignEHO_Register(void) {
     sigma_printf("[INTELLIGENCE]: Sovereign EHO (Clan-Social Optima) active.\n");
 }
+

@@ -28,3 +28,4 @@ void SovereignEcosystem_Register(void) {
     };
     sigma_module_register(&s_eco_module);
 }
+

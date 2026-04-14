@@ -15,8 +15,8 @@
 //   • Zero cloud dependency — all inference local via S09 NPU shard
 // =============================================================================
 
-#include <stdint.h>
-#include <stdbool.h>
+#include "sigma_types.h"
+
 
 #define SIGMA_VOICE_MAX_SKILLS    64
 #define SIGMA_VOICE_WAKE_WORD     "Hey Sigma"
@@ -68,3 +68,4 @@ bool voice_register_skill(VoiceSkill* skill);
 
 // TTS: synthesize and play a response string via the audio stack
 void voice_speak_response(const char* response_text);
+

@@ -3,8 +3,8 @@
 // Final industrial Registry Configuration Hub
 // =============================================================================
 
-#include <stdint.h>
-#include <stdbool.h>
+#include "sigma_types.h"
+
 
 typedef struct {
     char     vendor_id[64];
@@ -26,3 +26,4 @@ void industrial_registry_set_profile(uint8_t profile_id);
 
 // Synchronize industrial config across global Hive nodes (S12)
 void industrial_registry_sync_global(void);
+

@@ -60,3 +60,4 @@ void sigma_slab_free_ext(void* ptr, sigma_size_t size) {
 void SovereignSlab_Register(void) {
     SovereignMemory_Register("slab", sigma_slab_malloc_ext, sigma_slab_free_ext);
 }
+

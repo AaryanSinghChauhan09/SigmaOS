@@ -39,3 +39,4 @@ void SovereignServiceControl_Register(void) {
     };
     sigma_module_register(&s_svc_module);
 }
+

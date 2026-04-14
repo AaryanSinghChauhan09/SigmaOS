@@ -28,3 +28,4 @@ sigma_u8 sigma_sec_aes_masked_sub(sigma_u8 input, sigma_u8 mask) {
 void SovereignAES_Register(void) {
     sigma_printf("[SECURITY]: Sovereign Masked-AES (DPA-Resistance) active.\n");
 }
+

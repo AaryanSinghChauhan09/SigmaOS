@@ -26,3 +26,4 @@ void sigma_opt_sca_oscillate(float* current_pos, float global_best_pos, float am
 void SovereignSCA_Register(void) {
     sigma_printf("[INTELLIGENCE]: Sovereign SCA (Trigonometric Optima) active.\n");
 }
+

@@ -26,3 +26,4 @@ void sigma_opt_cma_adapt(float* mean, float* cov_matrix, float step_size) {
 void SovereignCMAES_Register(void) {
     sigma_printf("[INTELLIGENCE]: Sovereign CMA-ES (Continuous Adaptation) active.\n");
 }
+

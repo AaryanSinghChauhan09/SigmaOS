@@ -9,8 +9,8 @@
 //     and occlusion as it moves further away in the spatial desktop.
 // =============================================================================
 
-#include <stdint.h>
-#include <stdbool.h>
+#include "sigma_types.h"
+
 
 typedef struct {
     uint32_t object_id;
@@ -39,3 +39,4 @@ void zspace_cache_topology(void);
 
 // Sync workspace depth with Hive mesh (MeshDisplay S12)
 void zspace_sync_mesh(void);
+

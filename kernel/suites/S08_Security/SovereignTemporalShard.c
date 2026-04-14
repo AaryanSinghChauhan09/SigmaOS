@@ -42,3 +42,4 @@ void sigma_forensic_replay(sigma_u64 start_t, sigma_u64 end_t) {
 void SovereignTemporal_Register(void) {
     sigma_printf("[SECURITY]: Sovereign Temporal Forensics (Time-Travel Audit) active.\n");
 }
+

@@ -13,8 +13,8 @@
 //   • Integrated Spotlight (S02) and Control Center (S02) hooks
 // =============================================================================
 
-#include <stdint.h>
-#include <stdbool.h>
+#include "sigma_types.h"
+
 
 #define MAX_WINDOWS         128
 #define TASKBAR_HEIGHT      48
@@ -50,3 +50,4 @@ void shell_switch_workspace(uint8_t workspace_id);
 
 // Broadcast shell state to S12 Continuity for "Handoff" across screens
 void shell_sync_state_to_mesh(void);
+

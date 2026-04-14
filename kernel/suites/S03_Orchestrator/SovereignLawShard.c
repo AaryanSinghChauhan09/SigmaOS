@@ -80,3 +80,4 @@ void sovereign_law_start(void) {
 }
 
 #endif // SOVEREIGN_LAW_SHARD_H
+

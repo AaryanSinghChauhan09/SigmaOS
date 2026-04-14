@@ -24,3 +24,4 @@ int sigma_apply_ignition_payload(void* json_payload) {
 void sigma_ignition_status(void) {
     sigma_print("[IGNITION-CLUSTER] Status: ACTIVE. Distributed immutable node sovereignty achieved.\n");
 }
+

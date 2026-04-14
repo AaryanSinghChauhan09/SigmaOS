@@ -32,3 +32,4 @@ void SovereignDistroCommands_Register(void) {
     SovereignCommand_Register("linux-usps", "Display and manage Linux kernel USPs", handle_linux_usps);
     SovereignCommand_Register("amalgamate", "Fuse all goods of Linux into a single matrix", handle_amalgamate);
 }
+

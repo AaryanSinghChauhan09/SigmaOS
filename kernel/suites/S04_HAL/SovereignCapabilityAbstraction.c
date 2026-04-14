@@ -10,8 +10,8 @@
 //     (iGPU, dGPU, NPU, or Peer Hive Node) without app-level visibility.
 // =============================================================================
 
-#include <stdint.h>
-#include <stdbool.h>
+#include "sigma_types.h"
+
 
 typedef enum {
     CAP_COMPUTE = 0,
@@ -47,3 +47,4 @@ bool capability_verify_stack_integrity(void);
 
 // Sync available Capabilities with the Hive Mesh (Distributed Power)
 void capability_mesh_sync(void);
+

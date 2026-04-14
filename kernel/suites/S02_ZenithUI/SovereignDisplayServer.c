@@ -13,8 +13,8 @@
 //   • GPU flip chain managed by S04_HAL GpuDriverStack
 // =============================================================================
 
-#include <stdint.h>
-#include <stdbool.h>
+#include "sigma_types.h"
+
 
 // ── Window Surface ──────────────────────────────────────────────────────────
 typedef struct {
@@ -52,3 +52,4 @@ ZenithSurface* display_server_x11_shim(uint32_t x11_window_id);
 
 // Destroy a surface and reclaim GPU VRAM
 void display_server_destroy_surface(ZenithSurface* surface);
+

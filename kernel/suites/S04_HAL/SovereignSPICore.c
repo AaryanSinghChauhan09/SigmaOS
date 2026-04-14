@@ -236,3 +236,4 @@ void SovereignSPICore_Init(void) {
 
     sigma_printf("Σ [SPI]: SPI Core online. High-speed serial sovereignty achieved.\n");
 }
+

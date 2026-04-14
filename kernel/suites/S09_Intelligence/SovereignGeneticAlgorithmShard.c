@@ -32,3 +32,4 @@ sigma_u32 sigma_opt_ga_crossover(sigma_u32 g1, sigma_u32 g2, int point) {
 void SovereignGeneticAlgorithm_Register(void) {
     sigma_printf("[INTELLIGENCE]: Sovereign Genetic Algorithm (Evolutionary Search) active.\n");
 }
+

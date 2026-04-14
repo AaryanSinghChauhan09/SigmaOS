@@ -45,3 +45,4 @@ void SovereignScheduler_Register(void) {
     };
     sigma_module_register(&s_sched_module);
 }
+

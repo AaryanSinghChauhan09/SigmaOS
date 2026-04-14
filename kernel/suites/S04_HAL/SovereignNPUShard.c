@@ -26,3 +26,4 @@ void sigma_hal_npu_infer(void* neural_graph) {
 void SovereignNPU_Register(void) {
     sigma_printf("[HAL]: Sovereign NPU (Silicon Neural Engine) active.\n");
 }
+

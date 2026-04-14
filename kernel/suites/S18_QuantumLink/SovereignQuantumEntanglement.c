@@ -11,8 +11,8 @@
 // Result: Multi-node clusters act as a single monolithic processor.
 // =============================================================================
 
-#include <stdint.h>
-#include <stdbool.h>
+#include "sigma_types.h"
+
 
 typedef struct {
     uint64_t state_key;
@@ -39,3 +39,4 @@ void quantumlink_transcend_sync(void);
 
 // Report 'Entanglement Density' to the Sovereign Neural Oracle (S13)
 uint32_t quantumlink_get_density(void);
+

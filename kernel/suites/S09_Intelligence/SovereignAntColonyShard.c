@@ -27,3 +27,4 @@ void sigma_opt_aco_pheromone_update(sigma_u32 link_id, float delta_pheromone) {
 void SovereignAntColony_Register(void) {
     sigma_printf("[INTELLIGENCE]: Sovereign Ant-Colony (Swarm Routing) active.\n");
 }
+

@@ -26,3 +26,4 @@ void sigma_opt_hho_pounce(float escaping_energy, int pursuit_tactic) {
 void SovereignHHO_Register(void) {
     sigma_printf("[INTELLIGENCE]: Sovereign HHO (Harris Hawks Pounce) active.\n");
 }
+

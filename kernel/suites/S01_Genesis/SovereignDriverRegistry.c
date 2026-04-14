@@ -40,3 +40,4 @@ void SovereignDriver_InitAll(void) {
         if (g_driver_registry[i].init) g_driver_registry[i].init();
     }
 }
+

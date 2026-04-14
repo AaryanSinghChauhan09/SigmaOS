@@ -26,3 +26,4 @@ void sigma_sec_sev_snp(void* guest_vm) {
 void SovereignSEV_Register(void) {
     sigma_printf("[SECURITY]: Sovereign SEV (Secure Encrypted Virtualization) active.\n");
 }
+

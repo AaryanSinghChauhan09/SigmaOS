@@ -12,8 +12,8 @@
 //   • S13 Sentience identifies "Idle Peers" and recruits them into the hive.
 // =============================================================================
 
-#include <stdint.h>
-#include <stdbool.h>
+#include "sigma_types.h"
+
 
 #define MAX_HIVE_NODES      16
 #define TASK_TIMEOUT_MS     1000
@@ -44,3 +44,4 @@ void hive_recombine_results(uint32_t result_id);
 
 // Synchronize S13 learned "Sentiment" models across the whole Hive
 void hive_sync_sentiment_weights(void);
+

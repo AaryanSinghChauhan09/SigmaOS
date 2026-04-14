@@ -26,3 +26,4 @@ void sigma_hal_dpu_delegate(void* packet_filter_graph) {
 void SovereignDPU_Register(void) {
     sigma_printf("[HAL]: Sovereign DPU (SmartNIC Hardware Delegation) active.\n");
 }
+

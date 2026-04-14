@@ -33,3 +33,4 @@ void sigma_sync_handoff_delegate(SigmaHandoffSlot_t* slot, void* data) {
 void SovereignHandoffQueue_Register(void) {
     sigma_printf("[ORCHESTRATOR]: Sovereign Handoff-Queue (Direct Delegation) active.\n");
 }
+

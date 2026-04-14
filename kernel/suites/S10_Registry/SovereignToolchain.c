@@ -35,3 +35,4 @@ int main(int argc, char** argv) {
     sigma_printf("\nΣ [DONE]: Sovereign Toolchain ready for %s deployment.\n", argv[1]);
     return 0;
 }
+

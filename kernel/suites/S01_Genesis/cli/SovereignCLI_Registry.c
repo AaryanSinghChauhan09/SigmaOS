@@ -33,3 +33,4 @@ void SovereignCLI_Register(void) {
     };
     sigma_module_register(&s_cli_module);
 }
+

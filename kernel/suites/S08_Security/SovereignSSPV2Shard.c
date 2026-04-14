@@ -32,3 +32,4 @@ sigma_u64 sigma_sec_ssp_gen_canary(SigmaSSPRoot_t* root, sigma_u32 func_id) {
 void SovereignSSPV2_Register(void) {
     sigma_printf("[SECURITY]: Sovereign SSP-v2 (Dynamic Canaries) active.\n");
 }
+

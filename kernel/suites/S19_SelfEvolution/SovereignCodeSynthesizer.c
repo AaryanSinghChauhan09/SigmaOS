@@ -10,8 +10,8 @@
 // Result: The OS evolves and optimizes its own source code in real-time.
 // =============================================================================
 
-#include <stdint.h>
-#include <stdbool.h>
+#include "sigma_types.h"
+
 
 typedef struct {
     uint32_t target_shard_id;
@@ -38,3 +38,4 @@ bool synthesizer_verify_safety(const char* shard_path);
 
 // Sync learned code patterns across the global Hive mesh (S12)
 void synthesizer_mesh_sync(void);
+

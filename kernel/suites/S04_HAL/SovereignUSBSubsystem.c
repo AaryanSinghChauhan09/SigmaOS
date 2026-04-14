@@ -2,8 +2,8 @@
 // Absorbs LibUSB (Linux), WinUSB (Windows), IOKit (macOS) paradigms.
 // Modular, hot-plug aware, zero-dependency C11 shard.
 
-#include <stdint.h>
-#include <stdbool.h>
+#include "sigma_types.h"
+
 
 #define SIGMA_USB_MAX_DEVICES 128
 
@@ -36,3 +36,4 @@ void usb_hotplug_event(uint8_t device_addr, bool is_connected);
 
 // Transfer raw data to/from a USB endpoint (bulk/interrupt/isoch)
 uint32_t usb_transfer(uint8_t device_addr, uint8_t endpoint, void* buffer, uint32_t length);
+

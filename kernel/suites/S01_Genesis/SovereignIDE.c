@@ -28,3 +28,4 @@ void SovereignIDE_Register(void) {
     };
     sigma_module_register(&s_ide_module);
 }
+

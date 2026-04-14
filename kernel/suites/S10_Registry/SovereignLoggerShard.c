@@ -86,3 +86,4 @@ sigma_err_t sigma_logger_start(void) {
 void SovereignLogger_Register(void) {
     sigma_logger_start();
 }
+

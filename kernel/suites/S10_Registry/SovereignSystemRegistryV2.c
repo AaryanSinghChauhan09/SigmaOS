@@ -13,8 +13,8 @@
 //   • Real-time observers (pub-sub) for system-wide setting changes
 // =============================================================================
 
-#include <stdint.h>
-#include <stdbool.h>
+#include "sigma_types.h"
+
 
 #define REG_MAX_KEY_LEN     256
 #define REG_MAX_VAL_LEN     4096
@@ -55,3 +55,4 @@ void registry_export_subtree(const char* root_path, const char* out_vfs_file);
 
 // Flush WAL and sync to hardware
 void registry_checkpoint(void);
+

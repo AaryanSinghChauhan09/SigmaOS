@@ -31,3 +31,4 @@ void sigma_opt_foa_swarm(SigmaFruitFly_t* fly, float x_axis, float y_axis) {
 void SovereignFOA_Register(void) {
     sigma_printf("[INTELLIGENCE]: Sovereign FOA (Osphresis-Swarm Optima) active.\n");
 }
+

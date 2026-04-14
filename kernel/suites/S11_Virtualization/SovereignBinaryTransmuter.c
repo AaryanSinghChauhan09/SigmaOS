@@ -13,8 +13,8 @@
 //         emulation overhead.
 // =============================================================================
 
-#include <stdint.h>
-#include <stdbool.h>
+#include "sigma_types.h"
+
 
 typedef struct {
     char     input_binary_path[256];
@@ -42,3 +42,4 @@ bool transmuter_verify_result(const char* sab_path);
 
 // Sync with App Store Core (S12) to share transmuted "Master Images"
 void transmuter_mesh_sync(void);
+

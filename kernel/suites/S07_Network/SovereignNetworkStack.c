@@ -28,3 +28,4 @@ void SovereignNetwork_Init() {
     sigma_printf("[NET]: Initializing Sovereign Cluster-Aware Networking Stack.\n");
     sigma_network_process_packet(OSI_LAYER_NETWORK); // Example: Routing
 }
+

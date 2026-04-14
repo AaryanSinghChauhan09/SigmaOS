@@ -18,3 +18,4 @@ sigma_err_t sigma_pipe_create(int* r, int* w) {
     *r = 10; *w = 11; /* Dummy FDs */
     return SIGMA_OK;
 }
+

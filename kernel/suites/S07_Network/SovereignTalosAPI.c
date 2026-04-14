@@ -24,3 +24,4 @@ int sigma_apply_grpc_configuration(const char* yaml_payload) {
 void sigma_talos_status(void) {
     sigma_print("[TALOS-API] Status: ACTIVE. Shell-free immutable Machine API sovereignty achieved.\n");
 }
+

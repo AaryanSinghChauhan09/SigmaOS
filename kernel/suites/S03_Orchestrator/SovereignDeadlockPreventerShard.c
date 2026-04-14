@@ -41,3 +41,4 @@ void sigma_sync_deadlock_audit(void) {
 void SovereignDeadlockPreventer_Register(void) {
     sigma_printf("[ORCHESTRATOR]: Sovereign Deadlock Prevention (Resonance Safety) active.\n");
 }
+

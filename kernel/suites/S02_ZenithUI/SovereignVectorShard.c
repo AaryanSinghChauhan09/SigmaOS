@@ -29,3 +29,4 @@ void sigma_gfx_draw_curve(SigmaVec2_t p0, SigmaVec2_t p1, SigmaVec2_t p2) {
 void SovereignVector_Register(void) {
     sigma_printf("[ZENITHUI]: Sovereign Vector Engine (Scalable Art) active.\n");
 }
+

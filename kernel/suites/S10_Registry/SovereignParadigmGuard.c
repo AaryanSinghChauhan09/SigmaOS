@@ -134,3 +134,4 @@ void SovereignParadigmGuard_Register(void) {
     };
     sigma_module_register(&s_guard);
 }
+

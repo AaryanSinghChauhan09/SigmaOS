@@ -157,3 +157,4 @@ void SovereignACID_Audit(void) {
 void SovereignACID_Register(void) {
     sigma_printf("[REGISTRY]: Sovereign ACID Database Engine active in Storage Suite.\n");
 }
+

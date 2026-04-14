@@ -27,3 +27,4 @@ sigma_u64 sigma_sec_puf_fingerprint(void) {
 void SovereignPUF_Register(void) {
     sigma_printf("[SECURITY]: Sovereign PUF (Silicon Biometrics) active.\n");
 }
+

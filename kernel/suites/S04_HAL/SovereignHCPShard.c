@@ -26,3 +26,4 @@ void sigma_hal_hcp_pin(sigma_u32 physical_core_id) {
 void SovereignHCP_Register(void) {
     sigma_printf("[HAL]: Sovereign HCP (Hardware Core-Pinning) active.\n");
 }
+

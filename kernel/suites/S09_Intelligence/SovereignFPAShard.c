@@ -26,3 +26,4 @@ void sigma_opt_fpa_pollinate(float* global_best) {
 void SovereignFPA_Register(void) {
     sigma_printf("[INTELLIGENCE]: Sovereign FPA (Levy Flight Pollination) active.\n");
 }
+

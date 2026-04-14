@@ -27,3 +27,4 @@ void* sigma_sec_pac_sign(void* ptr, sigma_u64 modifier) {
 void SovereignPAC_Register(void) {
     sigma_printf("[SECURITY]: Sovereign PAC (Cryptographic Pointers) active.\n");
 }
+

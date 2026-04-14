@@ -32,3 +32,4 @@ void sigma_opt_ssa_chain(SigmaSalp_t* salp, float* leader_pos, float c1, float c
 void SovereignSSA_Register(void) {
     sigma_printf("[INTELLIGENCE]: Sovereign SSA (Salp-Chain Optima) active.\n");
 }
+

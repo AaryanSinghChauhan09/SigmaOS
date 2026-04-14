@@ -27,3 +27,4 @@ void sigma_hal_sriov_split(sigma_u32 pci_physical_func, sigma_u16 num_virtual_fu
 void SovereignSRIOV_Register(void) {
     sigma_printf("[HAL]: Sovereign SR-IOV (Hardware Scaling Fabric) active.\n");
 }
+

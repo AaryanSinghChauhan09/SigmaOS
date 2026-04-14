@@ -41,3 +41,4 @@ float sigma_ai_tuner_suggest(void) {
 void SovereignBayesian_Register(void) {
     sigma_printf("[INTELLIGENCE]: Sovereign Bayesian Optimizer (Oracle-Tuning) active.\n");
 }
+

@@ -26,3 +26,4 @@ void sigma_hal_cxlc_fabric(sigma_u64 total_petabytes) {
 void SovereignCXLC_Register(void) {
     sigma_printf("[HAL]: Sovereign CXLC (CXL Dynamic Capacity Fabric) active.\n");
 }
+

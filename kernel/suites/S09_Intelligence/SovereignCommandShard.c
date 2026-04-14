@@ -64,3 +64,4 @@ void sigma_cli_execute(char* raw_cmd) {
 void SovereignCommand_Register(void) {
     sigma_printf("[ZENITH]: Sovereign CLI Engine (Kernel Shell) active.\n");
 }
+

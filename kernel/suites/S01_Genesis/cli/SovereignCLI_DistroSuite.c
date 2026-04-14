@@ -60,3 +60,4 @@ void SovereignCLI_DistroSuite_Register(void) {
     sigma_cli_register(&g_sigma_cli, "sigma-htop", cmd_sigma_htop);
     sigma_cli_register(&g_sigma_cli, "sigma-neofetch", cmd_sigma_neofetch);
 }
+

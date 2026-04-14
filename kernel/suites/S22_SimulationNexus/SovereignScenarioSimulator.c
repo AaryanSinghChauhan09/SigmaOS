@@ -12,8 +12,8 @@
 //         in the real system.
 // =============================================================================
 
-#include <stdint.h>
-#include <stdbool.h>
+#include "sigma_types.h"
+
 
 #define MAX_SIM_CORES       1024
 
@@ -43,3 +43,4 @@ void simulation_distribute_load(void);
 
 // Sync simulation heuristics with the Global Consensus (S13)
 void simulation_sync_heuristics(void);
+

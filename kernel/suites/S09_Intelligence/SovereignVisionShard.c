@@ -34,3 +34,4 @@ int sigma_cv_match_pattern(sigma_u8* buffer, sigma_u8* template) {
 void SovereignVision_Register(void) {
     sigma_printf("[INTELLIGENCE]: Sovereign Vision Shard (Visual Sentience) active.\n");
 }
+

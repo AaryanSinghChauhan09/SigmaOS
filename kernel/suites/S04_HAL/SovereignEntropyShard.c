@@ -33,3 +33,4 @@ void sigma_hal_entropy_pool(void) {
 void SovereignEntropy_Register(void) {
     sigma_printf("[HAL]: Sovereign Entropy Bridge (Quantum Purity) active.\n");
 }
+

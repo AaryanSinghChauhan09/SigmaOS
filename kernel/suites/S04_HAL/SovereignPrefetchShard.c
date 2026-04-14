@@ -33,3 +33,4 @@ void sigma_fs_prefetch_read(sigma_u64 lba) {
 void SovereignPrefetch_Register(void) {
     sigma_printf("[HAL]: Sovereign Prefetch mastery (Latency Minimization) active.\n");
 }
+

@@ -10,8 +10,8 @@
 // Result: 15-20% efficiency gains unmatched by standard XNU/NT kernels.
 // =============================================================================
 
-#include <stdint.h>
-#include <stdbool.h>
+#include "sigma_types.h"
+
 
 typedef struct {
     uint32_t unit_id;
@@ -39,3 +39,4 @@ void sil_resynth_sync_mesh_profiles(void);
 
 // Emergency-Safe: Restore hard-coded firmware safety mesh if over-temps detected
 void sil_resynth_emergency_lock(void);
+

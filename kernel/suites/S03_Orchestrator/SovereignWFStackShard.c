@@ -41,3 +41,4 @@ void sigma_sync_wf_push(SigmaWFStack_t* stack, SigmaWFNode_t* node) {
 void SovereignWFStack_Register(void) {
     sigma_printf("[ORCHESTRATOR]: Sovereign Wait-Free Stack (LIFO Peak) active.\n");
 }
+

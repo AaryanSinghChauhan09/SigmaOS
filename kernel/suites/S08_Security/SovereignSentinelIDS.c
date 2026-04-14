@@ -9,8 +9,8 @@
 //     Uses S13 Sentience to identify abnormal syscall chains *before* exploit.
 // =============================================================================
 
-#include <stdint.h>
-#include <stdbool.h>
+#include "sigma_types.h"
+
 
 #define MAX_THREAT_SIGNATURES 1024
 
@@ -39,3 +39,4 @@ void sentinel_report_threat(const char* details);
 
 // Sync learned "Attack Patterns" across the Hive mesh (Immunity through Mesh)
 void sentinel_mesh_sync(void);
+

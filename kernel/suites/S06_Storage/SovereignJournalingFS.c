@@ -14,8 +14,8 @@
 //   • Recovery: replay uncommitted journal entries on mount after crash
 // =============================================================================
 
-#include <stdint.h>
-#include <stdbool.h>
+#include "sigma_types.h"
+
 
 #define SIGMA_JOURNAL_MAGIC       0x5349474D4A524E4CULL // "SIGMAJRNL"
 #define SIGMA_JOURNAL_MAX_ENTRIES  8192
@@ -62,3 +62,4 @@ void fs_journal_abort(SigmaTransaction* tx);
 
 // On-mount crash recovery: replay all DIRTY entries, discard ABORTED
 void fs_journal_recover(void);
+

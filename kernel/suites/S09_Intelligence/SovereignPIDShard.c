@@ -38,3 +38,4 @@ float sigma_ctrl_pid_update(SigmaPID_t* pid, float setpoint, float measured) {
 void SovereignPID_Register(void) {
     sigma_printf("[INTELLIGENCE]: Sovereign PID Controller (Loop Mastery) active.\n");
 }
+

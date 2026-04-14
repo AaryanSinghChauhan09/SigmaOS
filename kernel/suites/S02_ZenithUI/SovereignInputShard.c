@@ -18,3 +18,4 @@ sigma_err_t sigma_input_init(void) {
 void SovereignInput_Register(void) {
     SovereignRegistry_Register("input", sigma_input_init);
 }
+

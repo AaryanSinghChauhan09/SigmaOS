@@ -38,3 +38,4 @@ void sigma_mobile_sensor_sync(float x, float y, float z) {
 void SovereignAndroidBridge_Register(void) {
     sigma_printf("[HAL]: Sovereign Android Bridge (Mobile Mastery) active.\n");
 }
+

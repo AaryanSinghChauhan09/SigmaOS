@@ -13,8 +13,8 @@
 //   • Multi-Arch Fat Binaries: Support for x86_64, ARM64, and RISC-V in one bundle
 // =============================================================================
 
-#include <stdint.h>
-#include <stdbool.h>
+#include "sigma_types.h"
+
 
 #define SAB_MAX_PERMISSIONS 32
 #define SAB_MAGIC           "SIGMABND"
@@ -56,3 +56,4 @@ void app_bundle_unmount(SabBundle* bundle);
 
 // Query installed bundles in /apps/
 uint32_t app_bundle_list_installed(SabBundle* out, uint32_t max);
+

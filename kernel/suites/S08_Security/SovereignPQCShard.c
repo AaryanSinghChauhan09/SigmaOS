@@ -26,3 +26,4 @@ void sigma_sec_pqc_seal(void* payload, sigma_u32 len) {
 void SovereignPQC_Register(void) {
     sigma_printf("[SECURITY]: Sovereign PQC (Quantum-Resistant Vault) active.\n");
 }
+

@@ -27,3 +27,4 @@ void sigma_sec_cb_scramble(void* start, sigma_u32 size, sigma_u32 seed) {
 void SovereignColdBoot_Register(void) {
     sigma_printf("[SECURITY]: Sovereign Cold-Boot Mitigation (Physical Defiance) active.\n");
 }
+

@@ -12,8 +12,8 @@
 //     for a compilation burst or "Undervolt" for a reading session.
 // =============================================================================
 
-#include <stdint.h>
-#include <stdbool.h>
+#include "sigma_types.h"
+
 
 typedef struct {
     uint32_t core_id;
@@ -41,3 +41,4 @@ float hw_tuner_audit_efficiency(void);
 
 // Safe-Revert: Restore factory firmware defaults if instability is detected
 void hw_tuner_emergency_revert(void);
+

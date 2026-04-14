@@ -45,3 +45,4 @@ void SovereignMesh_Audit() {
 void SovereignMeshShard_Init() {
     sigma_printf("[SOC]: Seating Native Mesh Shard (WireGuard/Tailscale Parity v1.0)...\n");
 }
+

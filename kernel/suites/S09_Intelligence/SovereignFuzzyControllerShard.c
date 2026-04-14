@@ -34,3 +34,4 @@ void sigma_control_fuzzy_eval(float temp) {
 void SovereignFuzzyController_Register(void) {
     sigma_printf("[INTELLIGENCE]: Sovereign Fuzzy Logic (Control Mastery) active.\n");
 }
+

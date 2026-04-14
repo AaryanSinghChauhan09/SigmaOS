@@ -26,3 +26,4 @@ void sigma_hal_dsa_memcpy(void* dest, void* src, sigma_u64 bytes) {
 void SovereignDSA_Register(void) {
     sigma_printf("[HAL]: Sovereign DSA (Data Streaming Acceleration) active.\n");
 }
+

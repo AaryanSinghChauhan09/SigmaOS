@@ -36,3 +36,4 @@ void SovereignArch_InitializeCPU(const char* arch_name) {
     }
     sigma_printf("Σ [ARCH/FATAL]: Unsupported Architecture '%s'\n", arch_name);
 }
+

@@ -28,3 +28,4 @@ void SovereignSentience_Register(void) {
     };
     sigma_module_register(&s_sent_module);
 }
+

@@ -34,3 +34,4 @@ int sigma_sync_elim_push(SigmaEliminationSlot_t* slot, sigma_u32 val) {
 void SovereignEliminationStack_Register(void) {
     sigma_printf("[ORCHESTRATOR]: Sovereign Elimination (Content Defiance) active.\n");
 }
+

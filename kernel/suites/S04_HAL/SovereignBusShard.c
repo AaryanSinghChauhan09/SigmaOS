@@ -44,3 +44,4 @@ void sigma_bus_attach_device(SigmaPCIDevice_t* dev) {
 void SovereignBus_Register(void) {
     sigma_printf("[HAL]: Sovereign Bus Discovery v50 active.\n");
 }
+

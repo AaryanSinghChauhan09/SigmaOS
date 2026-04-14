@@ -11,8 +11,8 @@
 //     to any timestamp in under 5 seconds (Atomic boot flip).
 // =============================================================================
 
-#include <stdint.h>
-#include <stdbool.h>
+#include "sigma_types.h"
+
 
 #define MAX_SNAPSHOTS       128
 
@@ -47,3 +47,4 @@ void timevault_prune(uint32_t days_to_keep);
 
 // Mount a snapshot as Read-Only for granular file recovery
 bool timevault_mount_ro(uint32_t snapshot_id, const char* mount_point);
+

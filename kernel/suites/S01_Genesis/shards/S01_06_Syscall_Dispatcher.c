@@ -3,8 +3,8 @@
 // Industrial-grade Syscall Gate Shard
 // =============================================================================
 
-#include <stdint.h>
-#include <stdbool.h>
+#include "sigma_types.h"
+
 
 void syscall_gate_handler(uint32_t syscall_num, void* args) {
     // Routes to S10_System API Bridge or S01 internal handlers
@@ -14,3 +14,4 @@ void syscall_gate_handler(uint32_t syscall_num, void* args) {
 void syscall_register_vector(uint32_t num, void (*handler)(void*)) {
     // Thread-safe registration of system primitives
 }
+

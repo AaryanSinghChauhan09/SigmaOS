@@ -12,3 +12,4 @@ void SovereignBPF_ShowLogic(void) {
 void SovereignBPF_Register(void) {
     SovereignUSP_Register("ebpf", "eBPF, XDP, and dynamic kernel tracing", SovereignBPF_ShowLogic);
 }
+

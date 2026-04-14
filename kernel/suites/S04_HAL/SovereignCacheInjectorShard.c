@@ -27,3 +27,4 @@ void sigma_hal_cache_inject(sigma_u64 phys_addr, sigma_u16 len) {
 void SovereignCacheInjector_Register(void) {
     sigma_printf("[HAL]: Sovereign Cache Injector (Throughput Singularity) active.\n");
 }
+

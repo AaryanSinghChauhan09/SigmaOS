@@ -32,3 +32,4 @@ void sigma_opt_tabu_schedule(sigma_u32 shard_id) {
 void SovereignTabu_Register(void) {
     sigma_printf("[INTELLIGENCE]: Sovereign Tabu Search (Optima-Forensics) active.\n");
 }
+

@@ -12,8 +12,8 @@
 //   • Multi-Model Support: Swap between lightweight 1B models and Pro-Models.
 // =============================================================================
 
-#include <stdint.h>
-#include <stdbool.h>
+#include "sigma_types.h"
+
 
 #define MAX_PROMPT_LEN      4096
 #define MAX_RESPONSE_LEN    8192
@@ -43,3 +43,4 @@ void intelligence_execute_intent(const char* user_intent);
 
 // Scale Inference: Use Hive (S13) to run 70B+ models across multiple devices
 void intelligence_distribute_load(void);
+

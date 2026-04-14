@@ -30,3 +30,4 @@ void sigma_orch_reduce(const void* mapped, void* result) {
 void SovereignMapReduce_Register(void) {
     sigma_printf("[ORCHESTRATION]: Sovereign MapReduce (Distributed) active.\n");
 }
+

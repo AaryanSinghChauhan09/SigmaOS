@@ -35,3 +35,4 @@ void sigma_service_heartbeat(SigmaService_t* svc) {
 void SovereignMicroservice_Register() {
     sigma_printf("[REGISTRY]: Microservice Mesh Discovery active in Orchestration Suite.\n");
 }
+

@@ -26,3 +26,4 @@ void sigma_hal_pagewalk_audit(void) {
 void SovereignPageWalkBridge_Register(void) {
     sigma_printf("[HAL]: Sovereign Page-Walk Bridge (Translation Mastery) active.\n");
 }
+

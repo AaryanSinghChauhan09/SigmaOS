@@ -39,3 +39,4 @@ static SovereignRVectorMath_t create_r_vector_math() {
     obj.ExecuteStatisticalInference = r_execute_statistical_inference;
     return obj;
 }
+

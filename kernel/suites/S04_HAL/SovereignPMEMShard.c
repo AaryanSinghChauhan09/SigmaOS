@@ -26,3 +26,4 @@ void sigma_hal_pmem_flush(void* addr, sigma_u32 size) {
 void SovereignPMEM_Register(void) {
     sigma_printf("[HAL]: Sovereign PMEM (Persistent DAX Mastery) active.\n");
 }
+

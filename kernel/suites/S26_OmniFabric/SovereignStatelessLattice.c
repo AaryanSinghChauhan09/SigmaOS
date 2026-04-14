@@ -11,8 +11,8 @@
 // Result: Total hardware independence. You ARE the OS, not the machine.
 // =============================================================================
 
-#include <stdint.h>
-#include <stdbool.h>
+#include "sigma_types.h"
+
 
 typedef struct {
     uint8_t  identity_hash[64];
@@ -39,3 +39,4 @@ void omnifabric_migrate_shard(uint32_t shard_id, uint8_t target_node_id);
 
 // Report 'Identity Fluidity' score (Mobility factor)
 float omnifabric_get_fluidity(void);
+

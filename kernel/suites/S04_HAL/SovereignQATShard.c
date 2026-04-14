@@ -26,3 +26,4 @@ void sigma_hal_qat_compress(void* data, sigma_u64 size) {
 void SovereignQAT_Register(void) {
     sigma_printf("[HAL]: Sovereign QAT (Hardware Crypto & Compression) active.\n");
 }
+

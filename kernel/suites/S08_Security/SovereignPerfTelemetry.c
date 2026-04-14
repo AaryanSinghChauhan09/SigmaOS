@@ -26,3 +26,4 @@ sigma_u64 sigma_read_silicon_counter(sigma_u32 counter_id) {
 void sigma_perf_status(void) {
     sigma_print("[PERF-TELEMETRY] Status: ACTIVE. Real-time silicon telemetry sovereignty achieved.\n");
 }
+

@@ -33,3 +33,4 @@ void sigma_ai_search_similarity(float* query_vector) {
 void SovereignSemanticSearch_Register(void) {
     sigma_printf("[INTELLIGENCE]: Sovereign Semantic Search (Vector Mastery) active.\n");
 }
+

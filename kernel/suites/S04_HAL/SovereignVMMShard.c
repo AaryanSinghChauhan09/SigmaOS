@@ -27,3 +27,4 @@ void sigma_hal_vmm_launch(sigma_u64 vmcs_pointer) {
 void SovereignVMM_Register(void) {
     sigma_printf("[HAL]: Sovereign VMM (Hardware Hypervisor) active.\n");
 }
+

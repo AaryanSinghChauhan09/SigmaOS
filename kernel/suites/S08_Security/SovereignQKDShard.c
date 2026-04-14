@@ -26,3 +26,4 @@ void sigma_sec_qkd_entangle(void) {
 void SovereignQKD_Register(void) {
     sigma_printf("[SECURITY]: Sovereign QKD (Quantum Key Distribution) active.\n");
 }
+

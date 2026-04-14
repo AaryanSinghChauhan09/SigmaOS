@@ -40,3 +40,4 @@ void SovereignPkg_Audit(void) {
         sigma_printf("  ✓ [OK]: %s (v%s) — integrity verified.\n", g_pkg_registry[i].name, g_pkg_registry[i].version);
     }
 }
+

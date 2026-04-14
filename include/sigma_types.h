@@ -35,10 +35,26 @@ typedef signed   int       sigma_i32;
 typedef unsigned long long sigma_u64;
 typedef signed   long long sigma_i64;
 
+/* Industrial Standard Aliases (Zero-Dependency) */
+typedef sigma_u8           uint8_t;
+typedef sigma_i8           int8_t;
+typedef sigma_u16          uint16_t;
+typedef sigma_i16          int16_t;
+typedef sigma_u32          uint32_t;
+typedef sigma_i32          int32_t;
+typedef sigma_u64          uint64_t;
+typedef sigma_i64          int64_t;
+
+/* Standard Boolean Aliases */
+typedef sigma_bool         bool;
+#define true               SIGMA_TRUE
+#define false              SIGMA_FALSE
+
 /* Architecture-natural word sizes (pointer-compatible). */
 typedef sigma_u64          sigma_uptr;   /* holds a pointer as integer    */
-typedef sigma_i64          sigma_iptr;   /* signed pointer-size integer   */
+typedef sigma_iptr          sigma_iptr;   /* signed pointer-size integer   */
 typedef sigma_u64          sigma_size_t; /* size of an object in bytes    */
+typedef sigma_size_t        size_t;      /* industrial standard alias     */
 typedef sigma_i64          sigma_ssize_t;/* signed size (for error codes) */
 
 /* Null pointer. */

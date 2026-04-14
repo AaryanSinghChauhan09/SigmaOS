@@ -40,3 +40,4 @@ int sigma_sync_txn_commit(void) {
 void SovereignSTM_Register(void) {
     sigma_printf("[ORCHESTRATOR]: Sovereign STM (Transactional Memory) active.\n");
 }
+

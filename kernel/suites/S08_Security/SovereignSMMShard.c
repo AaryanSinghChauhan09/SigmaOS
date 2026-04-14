@@ -26,3 +26,4 @@ void sigma_sec_smm_firewall(sigma_u32 smi_code) {
 void SovereignSMM_Register(void) {
     sigma_printf("[SECURITY]: Sovereign SMM (Hardware Firewall) active.\n");
 }
+

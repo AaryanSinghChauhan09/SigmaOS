@@ -31,3 +31,4 @@ void sigma_schedule(sigma_u32 cpu_id, sigma_u64 now_ns) {
         g_sched_shards[g_active_sched].schedule(cpu_id, now_ns);
     }
 }
+

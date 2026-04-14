@@ -10,8 +10,8 @@
 //     the CPU/GPU is genuine and has no backdoors.
 // =============================================================================
 
-#include <stdint.h>
-#include <stdbool.h>
+#include "sigma_types.h"
+
 
 #define PUF_SIG_LEN         128
 #define MAX_SENSORS         256
@@ -43,3 +43,4 @@ void silicon_fingerprint_lock_security(void);
 
 // Log hardware integrity status to the Sovereign Neural Oracle (S13)
 void silicon_fingerprint_report_status(void);
+

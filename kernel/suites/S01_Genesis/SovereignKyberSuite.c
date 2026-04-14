@@ -27,3 +27,4 @@ void SovereignKyber_Register(void) {
     };
     sigma_module_register(&s_kyber_module);
 }
+

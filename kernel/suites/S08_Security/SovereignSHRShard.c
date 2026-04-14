@@ -26,3 +26,4 @@ void sigma_sec_shr_split(sigma_u8* secret, int n_shares, int threshold_k) {
 void SovereignSHR_Register(void) {
     sigma_printf("[SECURITY]: Sovereign SHR (Threshold Secret Sharing) active.\n");
 }
+

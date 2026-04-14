@@ -3,8 +3,8 @@
 // Persistent System Configuration Hive Shard
 // =============================================================================
 
-#include <stdint.h>
-#include <stdbool.h>
+#include "sigma_types.h"
+
 
 #define MAX_SYSTEM_KEYS 4096
 
@@ -27,3 +27,4 @@ bool registry_hklm_write(const char* key, RegEntry* in);
 
 // Synchronize global settings with Hive peers (Ecosystem hook)
 void registry_hklm_broadcast_change(const char* key);
+

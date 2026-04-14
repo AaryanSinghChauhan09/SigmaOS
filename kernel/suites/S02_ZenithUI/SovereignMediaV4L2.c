@@ -236,3 +236,4 @@ void SovereignMediaV4L2_Init(void) {
     
     sigma_printf("Σ [V4L2]: Media framing online. Optical sensor sovereignty established.\n");
 }
+

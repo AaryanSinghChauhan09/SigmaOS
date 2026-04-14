@@ -26,3 +26,4 @@ void sigma_hal_dca_inject(sigma_u32 pcie_device_id) {
 void SovereignDCA_Register(void) {
     sigma_printf("[HAL]: Sovereign DCA (Direct Cache Injection) active.\n");
 }
+

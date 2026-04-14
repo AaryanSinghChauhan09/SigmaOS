@@ -26,3 +26,4 @@ void sigma_hal_wse_route(void* tensor_graph) {
 void SovereignWSE_Register(void) {
     sigma_printf("[HAL]: Sovereign WSE (Wafer-Scale Engine Routing) active.\n");
 }
+

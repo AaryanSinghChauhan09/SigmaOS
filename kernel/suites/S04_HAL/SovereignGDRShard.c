@@ -26,3 +26,4 @@ void sigma_hal_gdr_bridge(sigma_u32 nic_id, sigma_u32 gpu_id) {
 void SovereignGDR_Register(void) {
     sigma_printf("[HAL]: Sovereign GDR (GPU-Direct VRAM Bridging) active.\n");
 }
+

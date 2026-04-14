@@ -27,3 +27,4 @@ void sigma_hal_cxl_bind(sigma_u32 device_id, sigma_u64 memory_size) {
 void SovereignCXL_Register(void) {
     sigma_printf("[HAL]: Sovereign CXL (Coherent Memory Pooling) active.\n");
 }
+

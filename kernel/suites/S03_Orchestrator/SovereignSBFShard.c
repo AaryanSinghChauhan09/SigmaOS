@@ -26,3 +26,4 @@ void sigma_os_sbf_execute(sigma_u8* bytecode, sigma_u32 len) {
 void SovereignSBF_Register(void) {
     sigma_printf("[ORCHESTRATOR]: Sovereign SBF (Sandboxed Bytecode Fabric) active.\n");
 }
+

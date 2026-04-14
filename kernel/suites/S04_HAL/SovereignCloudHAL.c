@@ -19,3 +19,4 @@ sigma_err_t sigma_hal_cloud_init(void) {
 void SovereignCloudHAL_Register(void) {
     SovereignArch_Register("cloud_hal", sigma_hal_cloud_init);
 }
+

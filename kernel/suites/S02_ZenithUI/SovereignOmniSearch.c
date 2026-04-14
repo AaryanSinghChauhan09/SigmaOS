@@ -11,8 +11,8 @@
 //         cognitive prediction from your own Digital Twin.
 // =============================================================================
 
-#include <stdint.h>
-#include <stdbool.h>
+#include "sigma_types.h"
+
 
 #define MAX_SEARCH_RESULTS 256
 
@@ -48,3 +48,4 @@ void omnisearch_project_to_ui(void);
 
 // Sync search indexes across the Hive mesh (Distributed Search S12)
 void omnisearch_sync_mesh(void);
+

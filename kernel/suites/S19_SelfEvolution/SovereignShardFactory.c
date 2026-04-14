@@ -10,8 +10,8 @@
 // Result: 100% pluggable architecture without shared-object overhead.
 // =============================================================================
 
-#include <stdint.h>
-#include <stdbool.h>
+#include "sigma_types.h"
+
 
 typedef struct {
     uint32_t shard_id;
@@ -39,3 +39,4 @@ bool shard_factory_audit_integrity(uint32_t shard_id);
 
 // Sync synthesized shard-definitions across the Hive mesh (S12)
 void shard_factory_sync_hive(void);
+

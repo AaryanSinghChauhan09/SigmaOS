@@ -26,3 +26,4 @@ void sigma_opt_firefly_attract(float* f1, float* f2, float attraction_coeff) {
 void SovereignFirefly_Register(void) {
     sigma_printf("[INTELLIGENCE]: Sovereign Firefly (Bioluminescent Optima) active.\n");
 }
+

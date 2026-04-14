@@ -26,3 +26,4 @@ void sigma_sync_ebr_leave(sigma_u32 thread_id) {
 void SovereignEBR_Register(void) {
     sigma_printf("[ORCHESTRATOR]: Sovereign EBR (Epoch Memory Reclamation) active.\n");
 }
+

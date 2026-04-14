@@ -2,8 +2,8 @@
 // Absorbs Mach Ports (macOS) + UNIX Domain Sockets (Linux) + Named Pipes (Windows)
 // Modular, zero-dependency, C11 native
 
-#include <stdint.h>
-#include <stdbool.h>
+#include "sigma_types.h"
+
 
 #define SIGMA_IPC_MAX_PORTS    1024
 #define SIGMA_IPC_MSG_MAX_SIZE 65536
@@ -59,3 +59,4 @@ void ipc_destroy_port(uint32_t port_id) {
         }
     }
 }
+

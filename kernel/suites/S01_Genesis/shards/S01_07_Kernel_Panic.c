@@ -3,8 +3,8 @@
 // Zero-Bloat Crash Recovery & Internal Audit Shard
 // =============================================================================
 
-#include <stdint.h>
-#include <stdbool.h>
+#include "sigma_types.h"
+
 
 void kernel_panic(const char* reason, void* stack_frame) {
     // 1. Halt all Hive cores (S12)
@@ -13,3 +13,4 @@ void kernel_panic(const char* reason, void* stack_frame) {
     // 4. Force VT100 Blue Screen if recovery fails
     while(1) { __asm__("hlt"); }
 }
+

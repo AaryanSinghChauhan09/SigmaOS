@@ -16,8 +16,8 @@
 //   • Remote Desktop: GPU H.265 encode → RTP stream (RDP hardware model)
 // =============================================================================
 
-#include <stdint.h>
-#include <stdbool.h>
+#include "sigma_types.h"
+
 
 #define SIGMA_CLOUD_MAX_PROVIDERS   8
 #define SIGMA_SYNC_CHUNK_SIZE      (4 * 1024 * 1024)  // 4MB block dedup
@@ -66,3 +66,4 @@ RemoteDesktopSession* rdp_start_session(uint16_t port, uint8_t codec);
 
 // Stop and clean up a Remote Desktop session
 void rdp_terminate_session(uint32_t session_id);
+

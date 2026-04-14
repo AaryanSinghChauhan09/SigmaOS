@@ -13,8 +13,8 @@
 //     on actual process fragmentation trends.
 // =============================================================================
 
-#include <stdint.h>
-#include <stdbool.h>
+#include "sigma_types.h"
+
 
 #define HOTPATH_THRESHOLD 1000000 // Cycles
 
@@ -45,3 +45,4 @@ void evolution_persist_state(void);
 
 // Broadcast "Evolutionary Step" to ZenithUI (Self-awareness HUD)
 void evolution_report_to_zenith(void);
+

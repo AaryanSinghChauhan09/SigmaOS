@@ -12,8 +12,8 @@
 //   • Anti-Tamper: Physical memory erasure on unauthorized hardware access.
 // =============================================================================
 
-#include <stdint.h>
-#include <stdbool.h>
+#include "sigma_types.h"
+
 
 #define ENCLAVE_KEY_LEN     64
 
@@ -51,3 +51,4 @@ void bio_enclave_seal_system(void);
 
 // Synchronise identity seeds across Continuity peers (S12 E2EE)
 void bio_enclave_mesh_sync(void);
+

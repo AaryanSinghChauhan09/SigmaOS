@@ -18,3 +18,4 @@ sigma_err_t sigma_lbu_init(void) {
 void SovereignLBU_Register(void) {
     SovereignFSRegistry_Register("lbu_persist", sigma_lbu_init);
 }
+

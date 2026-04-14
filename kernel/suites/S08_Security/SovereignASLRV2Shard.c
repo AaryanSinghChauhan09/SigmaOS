@@ -27,3 +27,4 @@ void sigma_sec_aslr_permute(sigma_u32 shard_id, sigma_u64 entropy_seed) {
 void SovereignASLRV2_Register(void) {
     sigma_printf("[SECURITY]: Sovereign ASLR-v2 (Fine-Grained Randomization) active.\n");
 }
+

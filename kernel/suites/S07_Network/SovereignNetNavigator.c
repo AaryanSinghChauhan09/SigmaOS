@@ -12,8 +12,8 @@
 //   • Direct VFS-to-Render path for web resources.
 // =============================================================================
 
-#include <stdint.h>
-#include <stdbool.h>
+#include "sigma_types.h"
+
 
 #define MAX_TABS            32
 #define USER_AGENT          "SigmaOS/Navigator (Sovereign Singularity)"
@@ -44,3 +44,4 @@ bool navigator_verify_safety(uint32_t tab_id);
 
 // Clear web cache and sync state to S06 Storage
 void navigator_flush_cache(void);
+

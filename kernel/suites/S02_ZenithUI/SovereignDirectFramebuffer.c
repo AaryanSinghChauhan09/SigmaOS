@@ -27,3 +27,4 @@ void sigma_draw_pixel_pure(sigma_u32 coord_x, sigma_u32 coord_y, sigma_u32 hex_c
 void sigma_direct_fb_status(void) {
     sigma_print("[DIRECT-FB] Status: ACTIVE. Absolute unabstracted framebuffer sovereignty achieved.\n");
 }
+

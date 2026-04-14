@@ -26,3 +26,4 @@ void sigma_hal_spdk_poll(sigma_u16 nvme_queue_id) {
 void SovereignSPDK_Register(void) {
     sigma_printf("[HAL]: Sovereign SPDK (Zero-Interrupt Polled NVMe) active.\n");
 }
+

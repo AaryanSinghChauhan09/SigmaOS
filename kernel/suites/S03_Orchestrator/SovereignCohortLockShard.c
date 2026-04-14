@@ -33,3 +33,4 @@ void sigma_sync_cohort_acquire(SigmaCohortLock_t* cl, sigma_u32 my_cohort_id) {
 void SovereignCohortLock_Register(void) {
     sigma_printf("[ORCHESTRATOR]: Sovereign Cohort-Lock (SIMD Serialization) active.\n");
 }
+

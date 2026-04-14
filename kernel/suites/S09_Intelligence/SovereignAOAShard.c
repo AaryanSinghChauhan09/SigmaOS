@@ -26,3 +26,4 @@ void sigma_opt_aoa_calculate(float* math_obj, float acceleration_coefficient) {
 void SovereignAOA_Register(void) {
     sigma_printf("[INTELLIGENCE]: Sovereign AOA (Arithmetic Optimization) active.\n");
 }
+

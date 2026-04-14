@@ -26,3 +26,4 @@ void sigma_opt_sma_oscillate(float resource_concentration) {
 void SovereignSMA_Register(void) {
     sigma_printf("[INTELLIGENCE]: Sovereign SMA (Slime Mould Intelligence) active.\n");
 }
+

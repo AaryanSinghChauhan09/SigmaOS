@@ -16,8 +16,8 @@
 //   • Per-file granular encryption via VFS open() hook
 // =============================================================================
 
-#include <stdint.h>
-#include <stdbool.h>
+#include "sigma_types.h"
+
 #include <string.h>
 
 #define FDE_SECTOR_SIZE       512
@@ -70,3 +70,4 @@ bool fde_decrypt_file(const char* vfs_path, const uint8_t* file_key);
 
 // Lock a volume and zeroize key material from RAM
 void fde_lock_volume(SigmaVolumeSession* sess);
+

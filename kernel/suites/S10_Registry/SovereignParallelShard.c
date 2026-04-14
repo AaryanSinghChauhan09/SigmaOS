@@ -24,3 +24,4 @@ void sigma_parallel_for(sigma_u32 start, sigma_u32 end, void (*work)(sigma_u32))
 void SovereignParallel_Register() {
     sigma_printf("[REGISTRY]: Parallel Computing (HPC) active in Orchestration Suite.\n");
 }
+

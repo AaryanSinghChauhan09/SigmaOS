@@ -2,8 +2,8 @@
 // Absorbs systemd-resolved (Linux) + Windows DNS Client + macOS mDNSResponder
 // Modular zero-dependency C11 network shard
 
-#include <stdint.h>
-#include <stdbool.h>
+#include "sigma_types.h"
+
 
 #define SIGMA_DNS_CACHE_SIZE    512
 #define SIGMA_DHCP_LEASE_MAX    256
@@ -39,3 +39,4 @@ void dhcp_server_start(uint32_t subnet, uint32_t netmask, uint32_t ip_pool_start
 
 // Clear stale DNS cache entries
 void dns_flush_cache(void);
+

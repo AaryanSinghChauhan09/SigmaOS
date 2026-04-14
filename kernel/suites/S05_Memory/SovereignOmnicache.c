@@ -11,8 +11,8 @@
 // Result: App launches and file reads appear to have ZERO latency.
 // =============================================================================
 
-#include <stdint.h>
-#include <stdbool.h>
+#include "sigma_types.h"
+
 
 #define OMNI_BUF_SIZE       1024 * 1024 * 512 // 512MB OmniCache
 
@@ -41,3 +41,4 @@ float omnicache_get_iq(void);
 
 // Sync prefetch hints across Continuity mesh (Predictive Handoff)
 void omnicache_sync_mesh(void);
+

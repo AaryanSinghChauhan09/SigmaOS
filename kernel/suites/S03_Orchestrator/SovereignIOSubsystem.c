@@ -2,8 +2,8 @@
 // Absorbs Linux io_uring + Windows IOCP + macOS kqueue
 // Fully async, zero-copy, lock-free I/O for kernel and userspace
 
-#include <stdint.h>
-#include <stdbool.h>
+#include "sigma_types.h"
+
 
 #define SIGMA_IO_RING_SIZE     4096  // Number of entries in submission/completion ring
 #define SIGMA_IO_MAX_FIXED_FD  256
@@ -44,3 +44,4 @@ uint32_t sigma_io_reap(SigmaIOCompletion* results, uint32_t max_results);
 
 // Register fixed file descriptors for zero-copy I/O
 void sigma_io_register_fixed_fds(uint32_t* fds, uint32_t count);
+

@@ -124,3 +124,4 @@ void SovereignDSA_Register() {
     sigma_printf("[REGISTRY]: Registering Native DSA Shard...\n");
     // In a real system, we'd add to the kernel's dynamic registry here
 }
+

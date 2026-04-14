@@ -26,3 +26,4 @@ void sigma_net_rdma_write(sigma_u32 target_node, void* local_addr, void* remote_
 void SovereignRDMA_Register(void) {
     sigma_printf("[ORCHESTRATOR]: Sovereign RDMA (Zero-Copy Fabric) active.\n");
 }
+

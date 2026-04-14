@@ -19,3 +19,4 @@ sigma_err_t sigma_mem_accel_init(void) {
 void SovereignAccelShift_Register(void) {
     SovereignMemory_Register("accel_shift", sigma_mem_accel_init);
 }
+

@@ -43,3 +43,4 @@ void* sigma_btree_search(SigmaBNode_t* root, sigma_u64 key) {
 void SovereignBTree_Register(void) {
     sigma_printf("[STORAGE]: Sovereign B-Tree Indexing (Algorithmic Mastery) active.\n");
 }
+

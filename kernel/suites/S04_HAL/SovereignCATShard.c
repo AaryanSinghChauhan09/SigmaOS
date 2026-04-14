@@ -27,3 +27,4 @@ void sigma_hal_cat_set_mask(sigma_u32 cos_id, sigma_u64 cbm) {
 void SovereignCAT_Register(void) {
     sigma_printf("[HAL]: Sovereign CAT (Cache Partitioning) active.\n");
 }
+

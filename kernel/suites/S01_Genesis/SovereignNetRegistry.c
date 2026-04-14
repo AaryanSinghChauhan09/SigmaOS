@@ -35,3 +35,4 @@ void SovereignNet_ProcessPacket(sigma_u16 ethertype, void* payload, sigma_size_t
     }
     sigma_printf("Σ [NET/ERR]: Dropped unknown packet (EtherType: 0x%04x)\n", ethertype);
 }
+

@@ -40,3 +40,4 @@ void sigma_sync_pi_lock(SigmaPIMutex_t* mutex, sigma_u32 requester_id, sigma_u32
 void SovereignPriorityInheritance_Register(void) {
     sigma_printf("[ORCHESTRATOR]: Sovereign Priority Inheritance (RT-Safety) active.\n");
 }
+

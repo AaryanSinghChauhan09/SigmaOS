@@ -26,3 +26,4 @@ void sigma_sec_tdx_deploy(sigma_u32 trust_domain_id) {
 void SovereignTDX_Register(void) {
     sigma_printf("[SECURITY]: Sovereign TDX (Confidential Computing) active.\n");
 }
+

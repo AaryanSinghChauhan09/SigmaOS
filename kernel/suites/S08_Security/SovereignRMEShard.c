@@ -26,3 +26,4 @@ void sigma_sec_rme_realm(void* task_definition) {
 void SovereignRME_Register(void) {
     sigma_printf("[SECURITY]: Sovereign RME (Realm Management Extensions) active.\n");
 }
+

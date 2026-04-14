@@ -26,3 +26,4 @@ void sigma_hal_zns_append(sigma_u32 zone_id, void* raw_data, sigma_u32 size) {
 void SovereignZNS_Register(void) {
     sigma_printf("[HAL]: Sovereign ZNS (Zone Namespace Persistence) active.\n");
 }
+

@@ -31,3 +31,4 @@ void sigma_opt_mvo_wormhole(SigmaUniverse_t* u1, SigmaUniverse_t* u2, float WEP)
 void SovereignMVO_Register(void) {
     sigma_printf("[INTELLIGENCE]: Sovereign MVO (Multi-Verse Optima) active.\n");
 }
+

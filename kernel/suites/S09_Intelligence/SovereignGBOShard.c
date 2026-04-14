@@ -26,3 +26,4 @@ void sigma_opt_gbo_escalate(float* parameter_hessian) {
 void SovereignGBO_Register(void) {
     sigma_printf("[INTELLIGENCE]: Sovereign GBO (Gradient-Based Optimizer) active.\n");
 }
+

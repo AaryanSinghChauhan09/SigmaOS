@@ -26,3 +26,4 @@ void sigma_hal_nvdimm_map(void* nvdimm_namespace) {
 void SovereignNVDIMM_Register(void) {
     sigma_printf("[HAL]: Sovereign NVDIMM (Persistent Main Memory) active.\n");
 }
+

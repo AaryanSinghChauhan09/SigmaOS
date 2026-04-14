@@ -26,3 +26,4 @@ void sigma_sec_sme_enable(void) {
 void SovereignSME_Register(void) {
     sigma_printf("[SECURITY]: Sovereign SME (Transparent Memory Encryption) active.\n");
 }
+

@@ -18,3 +18,4 @@ sigma_err_t sigma_slab_magazine_init(void) {
 void SovereignMagazineSlab_Register(void) {
     SovereignMemory_Register("magazine_slab", sigma_slab_magazine_init);
 }
+

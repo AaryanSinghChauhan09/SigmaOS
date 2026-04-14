@@ -9,8 +9,8 @@
 //     root cause analysis and autonomous resolution suggestions.
 // =============================================================================
 
-#include <stdint.h>
-#include <stdbool.h>
+#include "sigma_types.h"
+
 
 typedef struct {
     uint32_t log_id;
@@ -39,3 +39,4 @@ const char* oracle_get_health_summary(void);
 
 // Export neural log weights for Continuity sync (S12)
 void oracle_sync_learned_patterns(void);
+

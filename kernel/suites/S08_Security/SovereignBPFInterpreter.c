@@ -28,3 +28,4 @@ int sigma_execute_bpf_prog(sigma_u8* bytecode, sigma_u32 len) {
 void sigma_bpf_status(void) {
     sigma_print("[SOVEREIGN-BPF] Status: ACTIVE. Dynamic kernel-native instrumentation sovereignty achieved.\n");
 }
+

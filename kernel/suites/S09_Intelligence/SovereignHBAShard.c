@@ -26,3 +26,4 @@ void sigma_opt_hba_dig(float* local_best, float smell_intensity) {
 void SovereignHBA_Register(void) {
     sigma_printf("[INTELLIGENCE]: Sovereign HBA (Honey Badger Digging) active.\n");
 }
+

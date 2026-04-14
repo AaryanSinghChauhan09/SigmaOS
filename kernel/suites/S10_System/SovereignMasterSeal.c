@@ -11,8 +11,8 @@
 // Result: 100% immune to runtime injection, logic-bombs, or bit-flip corruption.
 // =============================================================================
 
-#include <stdint.h>
-#include <stdbool.h>
+#include "sigma_types.h"
+
 
 typedef struct {
     uint8_t  master_logical_hash[64];
@@ -39,3 +39,4 @@ void master_seal_on_breach(void);
 
 // Sync Seal-State with Global Hive (Sovereign Consensus S13)
 void master_seal_sync_hive(void);
+

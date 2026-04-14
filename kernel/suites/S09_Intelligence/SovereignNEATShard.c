@@ -26,3 +26,4 @@ void sigma_opt_neat_evolve(void* mesh) {
 void SovereignNEAT_Register(void) {
     sigma_printf("[INTELLIGENCE]: Sovereign NEAT-Core (Structural Evolution) active.\n");
 }
+

@@ -13,3 +13,4 @@ sigma_err_t sigma_ns_init(void) {
 void SovereignNamespace_Register(void) {
     SovereignSecurity_Register("namespace", sigma_ns_init);
 }
+

@@ -13,8 +13,8 @@
 //   • Native DSP Engine: kernel-level 32-band EQ and Dynamics
 // =============================================================================
 
-#include <stdint.h>
-#include <stdbool.h>
+#include "sigma_types.h"
+
 
 #define AUDIO_MAX_CHANNELS  64
 #define AUDIO_SAMPLE_RATE   192000 // 192kHz Pro Standard
@@ -57,3 +57,4 @@ bool proaudio_aggregate_devices(uint8_t count, uint32_t* dev_ids);
 
 // Route audio from app A to app B (JACK parity)
 void proaudio_route_patch(uint32_t src_stream, uint32_t dst_stream);
+

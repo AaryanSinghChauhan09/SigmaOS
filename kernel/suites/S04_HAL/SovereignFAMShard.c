@@ -26,3 +26,4 @@ void sigma_hal_fam_map(sigma_u64 load_store_address, sigma_u16 remote_rack_id) {
 void SovereignFAM_Register(void) {
     sigma_printf("[HAL]: Sovereign FAM (Fabric Attached Memory) active.\n");
 }
+

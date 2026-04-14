@@ -31,3 +31,4 @@ void sigma_opt_bbo_migrate(SigmaHabitat_t* h1, SigmaHabitat_t* h2, float mu, flo
 void SovereignBBO_Register(void) {
     sigma_printf("[INTELLIGENCE]: Sovereign BBO (Habitat Optima) active.\n");
 }
+

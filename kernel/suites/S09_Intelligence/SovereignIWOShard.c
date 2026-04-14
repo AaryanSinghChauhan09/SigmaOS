@@ -26,3 +26,4 @@ void sigma_opt_iwo_propagate(float weed_fitness, float dispersion_radius) {
 void SovereignIWO_Register(void) {
     sigma_printf("[INTELLIGENCE]: Sovereign IWO (Invasive Weed Expansion) active.\n");
 }
+

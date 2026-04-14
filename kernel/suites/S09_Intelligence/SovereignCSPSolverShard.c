@@ -36,3 +36,4 @@ int sigma_opt_csp_solve(SigmaCSP_t* csp, int index) {
 void SovereignCSPSolver_Register(void) {
     sigma_printf("[INTELLIGENCE]: Sovereign CSP Solver (Constraint Mastery) active.\n");
 }
+

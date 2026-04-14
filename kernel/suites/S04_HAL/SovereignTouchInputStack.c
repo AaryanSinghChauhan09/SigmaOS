@@ -2,8 +2,8 @@
 // Absorbs evdev (Linux), HID (Windows), IOKit Multitouch (macOS)
 // Modular C11 — feeds directly into ZenithUI compositor and gesture recognizer
 
-#include <stdint.h>
-#include <stdbool.h>
+#include "sigma_types.h"
+
 
 #define SIGMA_MAX_TOUCH_POINTS 10
 
@@ -36,3 +36,4 @@ SigmaGestureType input_classify_gesture(SigmaTouchPoint* points, uint8_t count);
 
 // Dispatch gesture to the ZenithUI window manager compositor
 void input_dispatch_gesture(SigmaGestureType gesture, SigmaTouchPoint* origin);
+

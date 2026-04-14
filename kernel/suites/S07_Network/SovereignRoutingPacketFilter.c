@@ -2,8 +2,8 @@
 // Absorbs Linux Netfilter/iptables + BSD pf + Windows WFP
 // Modular C11 shard — integrated into custom TCP/IP stack
 
-#include <stdint.h>
-#include <stdbool.h>
+#include "sigma_types.h"
+
 
 #define SIGMA_MAX_ROUTES   1024
 #define SIGMA_MAX_PF_RULES 2048
@@ -42,3 +42,4 @@ void net_pf_add_rule(SigmaPFRule* rule);
 
 // Evaluate an incoming/outgoing packet against the rule chain
 bool net_pf_evaluate(uint32_t src, uint32_t dst, uint16_t sport, uint16_t dport, uint8_t proto);
+

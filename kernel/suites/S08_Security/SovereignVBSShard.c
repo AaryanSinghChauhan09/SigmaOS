@@ -26,3 +26,4 @@ void sigma_sec_vbs_isolate(void* lsa_state) {
 void SovereignVBS_Register(void) {
     sigma_printf("[SECURITY]: Sovereign VBS (Hypervisor Credential Guard) active.\n");
 }
+

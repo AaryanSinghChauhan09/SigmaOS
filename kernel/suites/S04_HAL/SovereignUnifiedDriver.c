@@ -28,3 +28,4 @@ int sigma_transmit_driver_stream(sigma_u32 device_id, void* payload, sigma_u64 l
 void sigma_driver_status(void) {
     sigma_print("[UNIFIED-DRIVER] Status: ACTIVE. Unified driver-model sovereignty achieved.\n");
 }
+

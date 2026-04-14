@@ -36,3 +36,4 @@ void sigma_sync_snapshot(SigmaAtomicArray_t* arr, sigma_u64* out_copy) {
 void SovereignSnapshot_Register(void) {
     sigma_printf("[ORCHESTRATOR]: Sovereign Snapshot (Wait-Free Consistency) active.\n");
 }
+
