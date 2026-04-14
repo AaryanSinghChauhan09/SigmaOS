@@ -28,10 +28,18 @@ ALLOWED EXTERNAL DEPS (vendored only, no network fetch):
   - No npm, no pip, no cargo registry access at build time
 
 MIGRATION STATUS:
-  ✅ sovereign_audit.c       → replaces global_integrated_audit.py
-  ✅ sovereign_test_runner.c → replaces sovereign_test_runner.py + logic_tester.py
-  ✅ sovereign_wiki_builder.c→ replaces wiki_builder.py
-  ✅ sigma_libc_alloc.rs     → replaces glibc malloc in kernel allocations
-  ⏳ scripts/*.py            → pending migration (non-blocking; tooling only)
-  ⏳ S02_ZenithUI/*.js       → pending Wasm/native path; UI prototype only
-  ⏳ scripts/zenith_shell.py → will become omni_shell.c (in-progress)
+  ✅ sovereign_audit.c        → replaces global_integrated_audit.py
+  ✅ sovereign_test_runner.c  → replaces sovereign_test_runner.py + logic_tester.py
+  ✅ sovereign_wiki_builder.c → replaces wiki_builder.py (all copies)
+  ✅ sigma_libc_alloc.rs      → replaces glibc malloc in kernel allocations
+  ✅ sovereign_pkg_manager.c  → replaces sigpkg.py
+  ✅ sovereign_shell.c        → replaces zenith_shell.py (full REPL + VT100)
+  ✅ sovereign_depgraph.c     → replaces generate_dependency_graph.py
+  ✅ sigma_libc_extended.c    → memcpy/strlen/snprintf/sort without glibc
+  ✅ sovereign_ci.yml         → 5-job GitHub Actions CI purity + build gate
+  ✅ tools/Makefile (v2)      → static linking, install, purity check target
+  ⏳ scripts/sovereign_modularize_v2.py → pending → tools/sovereign_modularize.c
+  ⏳ scripts/sovereign_purge.py         → pending → tools/sovereign_purge.c
+  ⏳ scripts/advancement_pipeline.py    → pending → absorbed into sigma-audit
+  ⏳ S02_ZenithUI/*.js        → prototype only; native Wasm path planned
+  ⏳ S10_Registry/*.py        → tooling only; will move to tools/ as C binaries

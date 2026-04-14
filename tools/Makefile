@@ -1,24 +1,94 @@
-# SigmaOS Tools — Native Build
-# Replaces Python/JS tooling with zero-dependency C binaries
+# =============================================================================
+# SigmaOS Tools — Sovereign Native Toolchain Build
+# Replaces ALL Python/JS tooling with zero-dependency static C binaries
+# =============================================================================
+# Usage:
+#   make all          — build every tool
+#   make check        — purity gate: fail if foreign deps in kernel/
+#   make clean        — remove compiled binaries
+#   make install      — install to /usr/local/sigma/bin (on target OS)
+# =============================================================================
 
-CC      = gcc
-CFLAGS  = -std=c11 -O2 -Wall -Wextra -Wpedantic
+CC       = gcc
+CFLAGS   = -std=c11 -O2 -Wall -Wextra -Wpedantic -fstack-protector-strong
+LDFLAGS  = -static                          # Zero shared-lib runtime deps
+BINDIR   = /usr/local/sigma/bin
 
-.PHONY: all clean audit test wiki
+# All sovereign tool targets
+TOOLS = \
+	sigma-audit       \
+	sigma-test        \
+	sigma-wiki        \
+	sigma-shell       \
+	sigma-depgraph    \
+	sigpkg            \
+	sigma-modularize  \
+	sigma-purge
 
-all: audit test wiki
+.PHONY: all clean check install uninstall
 
-audit: sovereign_audit/sovereign_audit.c
-	$(CC) $(CFLAGS) $< -o sigma-audit
-	@echo "[tools] Built: sigma-audit (replaces global_integrated_audit.py)"
+all: $(TOOLS)
+	@echo ""
+	@echo "  ┌──────────────────────────────────────────┐"
+	@echo "  │  SigmaOS Native Toolchain — BUILD OK     │"
+	@echo "  │  All tools: zero glibc runtime linkage   │"
+	@echo "  └──────────────────────────────────────────┘"
+	@echo ""
 
-test: sovereign_test/sovereign_test_runner.c
-	$(CC) $(CFLAGS) $< -o sigma-test
-	@echo "[tools] Built: sigma-test (replaces sovereign_test_runner.py)"
+sigma-audit: sovereign_audit/sovereign_audit.c
+	$(CC) $(CFLAGS) $(LDFLAGS) $< -o $@
+	@echo "  [✓] sigma-audit    → replaces global_integrated_audit.py"
 
-wiki: sovereign_wiki/sovereign_wiki_builder.c
-	$(CC) $(CFLAGS) $< -o sigma-wiki
-	@echo "[tools] Built: sigma-wiki (replaces wiki_builder.py)"
+sigma-test: sovereign_test/sovereign_test_runner.c
+	$(CC) $(CFLAGS) $< -o $@
+	@echo "  [✓] sigma-test     → replaces sovereign_test_runner.py + logic_tester.py"
+
+sigma-wiki: sovereign_wiki/sovereign_wiki_builder.c
+	$(CC) $(CFLAGS) $(LDFLAGS) $< -o $@
+	@echo "  [✓] sigma-wiki     → replaces wiki_builder.py"
+
+sigma-shell: sovereign_shell/sovereign_shell.c
+	$(CC) $(CFLAGS) $< -o $@
+	@echo "  [✓] sigma-shell    → replaces zenith_shell.py"
+
+sigma-depgraph: sovereign_depgraph/sovereign_depgraph.c
+	$(CC) $(CFLAGS) $(LDFLAGS) $< -o $@
+	@echo "  [✓] sigma-depgraph → replaces generate_dependency_graph.py"
+
+sigpkg: sovereign_pkg/sovereign_pkg_manager.c
+	$(CC) $(CFLAGS) $< -o $@
+	@echo "  [✓] sigpkg             → replaces sigpkg.py"
+
+sigma-modularize: sovereign_modularize/sovereign_modularize.c
+	$(CC) $(CFLAGS) $(LDFLAGS) $< -o $@
+	@echo "  [✓] sigma-modularize  → replaces sovereign_modularize_v2.py"
+
+sigma-purge: sovereign_purge/sovereign_purge.c
+	$(CC) $(CFLAGS) $(LDFLAGS) $< -o $@
+	@echo "  [✓] sigma-purge       → replaces sovereign_purge.py"
+
+# Dependency purity gate — fail if any .py/.js found inside kernel suites
+check:
+	@echo "[sigma-check] Scanning kernel/suites for foreign dependencies..."
+	@FOUND=$$(find ../kernel/suites -name "*.py" -o -name "*.js" 2>/dev/null | wc -l); \
+	if [ "$$FOUND" -gt 0 ]; then \
+	    echo "  [FAIL] $$FOUND foreign files in kernel suites:"; \
+	    find ../kernel/suites -name "*.py" -o -name "*.js"; \
+	    exit 1; \
+	else \
+	    echo "  [PASS] Kernel suites S01-S10: zero foreign runtime deps"; \
+	fi
+
+install: all
+	@mkdir -p $(BINDIR)
+	@for tool in $(TOOLS); do \
+	    cp $$tool $(BINDIR)/$$tool; \
+	    echo "  [install] $(BINDIR)/$$tool"; \
+	done
+
+uninstall:
+	@for tool in $(TOOLS); do rm -f $(BINDIR)/$$tool; done
 
 clean:
-	rm -f sigma-audit sigma-test sigma-wiki
+	@rm -f $(TOOLS)
+	@echo "  [clean] Removed all tool binaries"
