@@ -2,29 +2,31 @@
 # SigmaOS — .clangd
 # IDE Configuration for Sovereign Singularity
 # =============================================================================
-# Purpose:
-#   Resolves recursive preamble errors in system headers (like stdint.h) 
-#   by refining the include hierarchy and compiler flags.
-# =============================================================================
 
 CompileFlags:
   Add: [
+    "-xc",
+    "-std=c11",
     "-Iinclude",
     "-Ilibc",
-    "-std=c11",
-    "-Wall",
-    "-Wextra",
-    "-Wno-unknown-attributes",
-    "-Wno-unused-function"
+    "-ffreestanding",
+    "-nostdinc",
+    "-D__SIGMAOS__",
+    "-Wno-unknown-attributes"
   ]
-  Remove: ["-fprebuilt-module-path", "-fmodules"] # Disable modules to prevent recursion
+  Remove: ["-fprebuilt-module-path", "-fmodules"]
 
 Index:
   Background: true
+  ExternalIndex: None
 
 Diagnostics:
   UnusedIncludes: Strict
   MissingIncludes: Strict
 
-Hover:
-  ShowAKA: true
+# Prevent recursive preamble building in system-like headers
+If:
+  PathMatch: .*\.h
+---
+CompileFlags:
+  Remove: [-include] # Never force-include anything into a header via flags

@@ -110,21 +110,15 @@ lint:
 
 # Sovereign shard inventory (per-suite breakdown)
 shard-list:
-	@echo "Σ [MANIFEST]: Sovereign Shard Inventory"
-	@echo "==========================================="
-	@echo "S01 Genesis:       $$(find $(SUITE_ROOT)/S01_Genesis -name '*.c' 2>/dev/null | wc -l) shards"
-	@echo "S02 ZenithUI:      $$(find $(SUITE_ROOT)/S02_ZenithUI -name '*.c' 2>/dev/null | wc -l) shards"
-	@echo "S03 Distros:       $$(find $(SUITE_ROOT)/S03_Distros -name '*.c' 2>/dev/null | wc -l) shards"
-	@echo "S04 HAL:           $$(find $(SUITE_ROOT)/S04_HAL -name '*.c' 2>/dev/null | wc -l) shards"
-	@echo "S05 Memory:        $$(find $(SUITE_ROOT)/S05_Memory -name '*.c' 2>/dev/null | wc -l) shards"
-	@echo "S06 Storage:       $$(find $(SUITE_ROOT)/S06_Storage -name '*.c' 2>/dev/null | wc -l) shards"
-	@echo "S07 Network:       $$(find $(SUITE_ROOT)/S07_Network -name '*.c' 2>/dev/null | wc -l) shards"
-	@echo "S08 Security:      $$(find $(SUITE_ROOT)/S08_Security -name '*.c' 2>/dev/null | wc -l) shards"
-	@echo "S09 Tooling:       $$(find $(SUITE_ROOT)/S09_Tooling -name '*.c' 2>/dev/null | wc -l) shards"
-	@echo "S10 Orchestration: $$(find $(SUITE_ROOT)/S10_Orchestration -name '*.c' 2>/dev/null | wc -l) shards"
-	@echo "-------------------------------------------"
-	@echo "Total C Sources: $(words $(C_SOURCES))"
-	@echo "ASM Sources:     $(words $(ASM_SOURCES))"
+	@echo "Σ [MANIFEST]: Sovereign Shard Inventory (33-Suite Terminal)"
+	@echo "==========================================================="
+	@for suite in $$(ls -d $(SUITE_ROOT)/S* 2>/dev/null); do \
+		name=$$(basename $$suite); \
+		count=$$(find $$suite -name "*.c" 2>/dev/null | wc -l); \
+		printf "║ %-22s : %3s shards ║\n" "$$name" "$$count"; \
+	done
+	@echo "╚══════════════════════════════════════════╝"
+	@echo "Total Sovereignty: $(words $(C_SOURCES)) C11 / $(words $(ASM_SOURCES)) ASM"
 
 # Sovereign resilience audit (High-Fidelity)
 test:
