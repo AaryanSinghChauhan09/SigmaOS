@@ -128,5 +128,6 @@ shard-list:
 
 # Sovereign resilience audit (High-Fidelity)
 test:
-	@py scripts/advancement_pipeline.py
+	gcc -std=c11 -O2 -I ./include tools/sovereign_test/sovereign_test_runner.c -o sigma-test && ./sigma-test
+
 
