@@ -46,22 +46,22 @@ jobs:
       - uses: actions/checkout@v4
 
       - name: Build sigma-audit
-        run: gcc -std=c11 -O2 -Wall -Wpedantic tools/sovereign_audit/sovereign_audit.c -o sigma-audit
+        run: gcc -std=c11 -O2 -Wall -Wpedantic -I include tools/sovereign_audit/sovereign_audit.c -o sigma-audit
 
       - name: Build sigma-test
-        run: gcc -std=c11 -O2 -Wall tools/sovereign_test/sovereign_test_runner.c -o sigma-test
+        run: gcc -std=c11 -O2 -Wall -I include tools/sovereign_test/sovereign_test_runner.c -o sigma-test
 
       - name: Build sigma-wiki
-        run: gcc -std=c11 -O2 -Wall tools/sovereign_wiki/sovereign_wiki_builder.c -o sigma-wiki
+        run: gcc -std=c11 -O2 -Wall -I include tools/sovereign_wiki/sovereign_wiki_builder.c -o sigma-wiki
 
       - name: Build sigma-shell
-        run: gcc -std=c11 -O2 -Wall tools/sovereign_shell/sovereign_shell.c -o sigma-shell
+        run: gcc -std=c11 -O2 -Wall -I include tools/sovereign_shell/sovereign_shell.c -o sigma-shell
 
       - name: Build sigma-depgraph
-        run: gcc -std=c11 -O2 -Wall tools/sovereign_depgraph/sovereign_depgraph.c -o sigma-depgraph
+        run: gcc -std=c11 -O2 -Wall -I include tools/sovereign_depgraph/sovereign_depgraph.c -o sigma-depgraph
 
       - name: Build sigma-pkg
-        run: gcc -std=c11 -O2 -Wall tools/sovereign_pkg/sovereign_pkg_manager.c -o sigpkg
+        run: gcc -std=c11 -O2 -Wall -I include tools/sovereign_pkg/sovereign_pkg_manager.c -o sigpkg
 
       - name: Verify all binaries are statically linked (no glibc runtime)
         run: |
@@ -104,9 +104,9 @@ jobs:
 
       - name: Build and run sigma-test
         run: |
-          gcc -std=c11 -O2 tools/sovereign_test/sovereign_test_runner.c -o sigma-test
-          ./sigma-test
-          echo "Exit code: $?"
+          gcc -std=c11 -O2 -I include tools/sovereign_test/sovereign_test_runner.c -o sigma-test
+          ./sigma-test || { echo "❌ TESTS FAILED"; exit 1; }
+          echo "✅ ALL TESTS PASSED"
 
   # ─────────────────────────────────────────────────────────────────────────────
   # Step 5: Auto-generate Wiki on every main push
