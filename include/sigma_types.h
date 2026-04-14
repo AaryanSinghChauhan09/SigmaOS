@@ -52,9 +52,9 @@ typedef sigma_bool         bool;
 
 /* Architecture-natural word sizes (pointer-compatible). */
 typedef sigma_u64          sigma_uptr;   /* holds a pointer as integer    */
-typedef sigma_iptr          sigma_iptr;   /* signed pointer-size integer   */
+typedef sigma_i64          sigma_iptr;   /* signed pointer-size integer   */
 typedef sigma_u64          sigma_size_t; /* size of an object in bytes    */
-typedef sigma_size_t        size_t;      /* industrial standard alias     */
+typedef sigma_size_t       size_t;      /* industrial standard alias     */
 typedef sigma_i64          sigma_ssize_t;/* signed size (for error codes) */
 
 /* Null pointer. */

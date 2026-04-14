@@ -84,13 +84,15 @@ jobs:
         run: |
           FAIL=0
           for f in $(find kernel/suites -name "*.c" | sort); do
+            # Use -nostdinc to ensure zero dependency on host system headers
             gcc -std=c11 -fsyntax-only -Wall -Wextra \
-                -I include -I libc \
-                "$f" 2>/dev/null && echo "✅ $f" || \
-                { echo "⚠️  $f (warnings — non-blocking)"; }
+                -nostdinc -I include -I libc \
+                -D__SIGMAOS__ \
+                "$f" && echo "✅ $f" || \
+                { echo "❌ $f FAILED (SYXTAX OR PURITY ERROR)"; FAIL=1; }
           done
-          # Only hard-fail on missing headers that we own
-          echo "Shard compile check complete"
+          if [ $FAIL -ne 0 ]; then exit 1; fi
+          echo "✅ All shards passed 100% industrial purity check"
 
   # ─────────────────────────────────────────────────────────────────────────────
   # Step 4: Run Native Test Suite
