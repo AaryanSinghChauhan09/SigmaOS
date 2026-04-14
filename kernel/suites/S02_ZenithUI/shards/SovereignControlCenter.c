@@ -62,3 +62,4 @@ void control_center_update_data(uint32_t widget_id, void* raw_data);
 void control_center_toggle_visibility(bool visible);
 
 
+

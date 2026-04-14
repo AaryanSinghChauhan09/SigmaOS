@@ -1,0 +1,11 @@
+/* S SIGMAOS: S12_Ecosystem Registry */
+#include "sigma_base.h"
+#include "SovereignRegistry.h"
+
+extern void ecosystem_consensus_init(void);
+
+void S12_Ecosystem_Register(void) {
+    ecosystem_consensus_init();
+    SovereignRegistry_Register("S12_Ecosystem", 0, NULL);
+    sigma_printf("S [S12_Ecosystem]: Raft Consensus Engine integrated.\n");
+}

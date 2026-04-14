@@ -72,3 +72,4 @@ bool fde_decrypt_file(const char* vfs_path, const uint8_t* file_key);
 void fde_lock_volume(SigmaVolumeSession* sess);
 
 
+

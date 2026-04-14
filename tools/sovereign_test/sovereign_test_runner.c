@@ -14,6 +14,7 @@
 #include <stdio.h>
 #include <sigma_types.h>
 #include <string.h>
+#include <sigma_kernel.h>
 
 #include <setjmp.h>
 #include <time.h>
@@ -110,6 +111,7 @@ static void register_builtin_tests(void) {
 int main(int argc, char* argv[]) {
     const char* filter = (argc > 1) ? argv[1] : NULL;
     register_builtin_tests();
+    SovereignMaster_InitAll();
 
     uint32_t passed = 0, failed = 0, skipped = 0;
     clock_t start = clock();

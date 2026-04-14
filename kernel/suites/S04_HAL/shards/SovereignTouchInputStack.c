@@ -38,3 +38,4 @@ SigmaGestureType input_classify_gesture(SigmaTouchPoint* points, uint8_t count);
 void input_dispatch_gesture(SigmaGestureType gesture, SigmaTouchPoint* origin);
 
 
+

@@ -8,3 +8,4 @@ void S12_Ecosystem_Register(void) {
     // Logic: Materialize suite-specific V-Tables and behavioral hulls.
 }
 
+

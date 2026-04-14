@@ -1,4 +1,5 @@
 #include "../../include/sigma_base.h"
+#include "../../include/SovereignInterconnect.h"
 
 #include "SovereignPMM.h"
 
@@ -27,8 +28,14 @@ sigma_u64 pmm_alloc_frame(void) {
                 s_frame_bitmap[word] &= ~(1ULL << bit);
                 s_free_frames--;
                 sigma_u64 frame = (sigma_u64)(word * 64 + bit);
+                sigma_u64 phys = frame * PAGE_SIZE;
                 s_next_frame_hint = (sigma_u32)frame + 1;
-                return frame * PAGE_SIZE; /* physical address */
+                
+                /* Interconnect: Notify lattice of allocation */
+                sigma_u64 payload[4] = {phys, s_free_frames, 0, 0};
+                OmniFabric_Send(SUITE_MEMORY, SUITE_SECURITY, MSG_TYPE_MEM_ALLOC, payload);
+                
+                return phys;
             }
         }
     }
@@ -111,6 +118,7 @@ SigmaAddressSpace_t *vmm_create_space(sigma_u32 pid) {
     }
     return as;
 }
+
 
 
 

@@ -38,3 +38,4 @@ void synthesizer_adapt_interface(FormFactor form);
 void synthesizer_output_master(void);
 
 
+

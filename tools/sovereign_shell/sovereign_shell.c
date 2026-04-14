@@ -84,6 +84,9 @@ static const ShellBuiltin builtins[] = {
     { "sigpkg",  "Package manager",             NULL },
     { "vbox",    "Container/VM manager",        NULL },
     { "handoff", "Cross-device continuity",     NULL },
+    { "sql",     "Sovereign Database Query",    NULL },
+    { "audio",   "Spatial Audio Mixer",         NULL },
+    { "task",    "Orchestrate execution shards",NULL },
     { NULL, NULL, NULL }
 };
 

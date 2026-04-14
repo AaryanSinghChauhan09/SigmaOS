@@ -8,3 +8,4 @@ void S24_GlobalDebugger_Register(void) {
     // Logic: Materialize suite-specific V-Tables and behavioral hulls.
 }
 
+

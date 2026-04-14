@@ -38,3 +38,4 @@ void usb_hotplug_event(uint8_t device_addr, bool is_connected);
 uint32_t usb_transfer(uint8_t device_addr, uint8_t endpoint, void* buffer, uint32_t length);
 
 
+

@@ -1,0 +1,11 @@
+/* S SIGMAOS: S25_ZeroKernel Registry */
+#include "sigma_base.h"
+#include "SovereignRegistry.h"
+
+extern void isa_emulator_init(void);
+
+void S25_ZeroKernel_Register(void) {
+    isa_emulator_init();
+    SovereignRegistry_Register("S25_ZeroKernel", 0, NULL);
+    sigma_printf("S [S25_ZeroKernel]: SigmaISA Emulator integrated.\n");
+}

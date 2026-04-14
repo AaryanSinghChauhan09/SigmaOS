@@ -8,3 +8,4 @@ void S04_HAL_Register(void) {
     // Logic: Materialize suite-specific V-Tables and behavioral hulls.
 }
 
+

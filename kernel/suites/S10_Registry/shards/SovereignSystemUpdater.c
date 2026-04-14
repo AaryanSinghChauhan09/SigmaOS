@@ -63,3 +63,4 @@ bool updater_verify_signature(const uint8_t* pkg_data, uint32_t size,
                                const uint8_t* sig, uint32_t sig_len);
 
 
+

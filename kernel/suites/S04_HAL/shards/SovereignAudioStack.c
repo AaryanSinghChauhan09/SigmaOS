@@ -32,3 +32,4 @@ void audio_route_shards(uint32_t src_port, uint32_t dst_port);
 void audio_apply_hw_equalizer(float* band_gains, uint8_t band_count);
 
 
+

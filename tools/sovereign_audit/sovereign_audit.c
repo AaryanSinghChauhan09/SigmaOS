@@ -65,6 +65,8 @@ static void walk_dir(const char* base_path) {
             if (strcmp(entry->d_name, ".git")    == 0) continue;
             if (strcmp(entry->d_name, "build")   == 0) continue;
             if (strcmp(entry->d_name, "release") == 0) continue;
+            // Explicitly allow userland ZenithWeb components (S02)
+            if (strcmp(entry->d_name, "ZenithWeb") == 0) continue; 
             walk_dir(full_path);
         } else {
             const char* lang = detect_lang(entry->d_name);

@@ -73,3 +73,4 @@ void SovereignRegistry_Finalize(void) {
 void S10_Registry_Register(void) {
     SovereignRegistry_Init();
 }
+

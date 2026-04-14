@@ -46,3 +46,4 @@ uint64_t hive_store_anchor_file(const char* path);
 void hive_store_sync_registry(void);
 
 
+

@@ -19,3 +19,4 @@ void sigma_kernel_main(void) {
     
     sigma_printf("--- Σ SIGMAOS ZENITH SUPREME: SYSTEM SOVEREIGNTY VERIFIED --- \n");
 }
+

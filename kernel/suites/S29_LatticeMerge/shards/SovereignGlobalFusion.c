@@ -42,3 +42,4 @@ void latticemerge_resolve_fs_conflicts(void);
 float latticemerge_get_unity(void);
 
 
+

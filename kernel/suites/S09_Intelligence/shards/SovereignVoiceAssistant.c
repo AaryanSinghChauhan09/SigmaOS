@@ -70,3 +70,4 @@ bool voice_register_skill(VoiceSkill* skill);
 void voice_speak_response(const char* response_text);
 
 
+

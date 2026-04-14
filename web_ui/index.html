@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Σ SigmaOS | Sovereign Zenith Dashboard</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;800&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
+</head>
+<body>
+    <div class="background-mesh"></div>
+    
+    <header>
+        <div class="logo-container">
+            <span class="sigma-symbol">Σ</span>
+            <div class="title-group">
+                <h1>SigmaOS Sovereign</h1>
+                <span class="version-badge">v33.1 Singularity</span>
+            </div>
+        </div>
+        <div class="system-stats">
+            <div class="stat-item">
+                <span class="label">LATTICE COVERAGE</span>
+                <span class="value" id="coverage-val">0%</span>
+            </div>
+            <div class="stat-item">
+                <span class="label">PURITY RATIO</span>
+                <span class="value">100% Verified</span>
+            </div>
+            <div class="stat-item">
+                <span class="label">SYSTEM STATUS</span>
+                <span class="value state-active">ACTIVE</span>
+            </div>
+        </div>
+    </header>
+
+    <main>
+        <section class="suite-grid" id="lattice-grid">
+            <!-- 33 Suites will be injected here -->
+        </section>
+
+        <section class="side-panel">
+            <div class="terminal-container">
+                <div class="terminal-header">
+                    <span>SOVEREIGN ARCHIVE AUDITOR</span>
+                    <div class="window-controls">
+                        <span></span><span></span><span></span>
+                    </div>
+                </div>
+                <div class="terminal-body" id="audit-log">
+                    <p class="log-entry">> Σ [BOOT]: Initializing Sovereign Genesis (S01)...</p>
+                </div>
+            </div>
+
+            <div class="performance-card">
+                <h3>LATTICE PERFORMANCE</h3>
+                <div class="chart-mockup">
+                    <div class="bar" style="height: 80%"></div>
+                    <div class="bar" style="height: 60%"></div>
+                    <div class="bar" style="height: 95%"></div>
+                    <div class="bar" style="height: 40%"></div>
+                    <div class="bar" style="height: 75%"></div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <script src="app.js"></script>
+</body>
+</html>

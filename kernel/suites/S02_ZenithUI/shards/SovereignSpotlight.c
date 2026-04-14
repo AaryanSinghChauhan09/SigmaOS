@@ -57,3 +57,4 @@ void spotlight_deep_search(const char* query, void (*on_result)(SearchEntry*));
 void spotlight_rebuild(void);
 
 
+

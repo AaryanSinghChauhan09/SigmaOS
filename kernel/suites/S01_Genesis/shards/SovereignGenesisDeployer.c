@@ -31,3 +31,4 @@ void deployer_seal_system(void);
 
 // Report 'Deployment Fidelity' (Integrity of the materialized lattice)
 float deployer_get_fidelity(void);
+

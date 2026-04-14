@@ -80,7 +80,7 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - name: Compile-check all kernel shards (C11 strict)
+      - name: Compile-check all 33 kernel suites (C11 strict)
         run: |
           FAIL=0
           for f in $(find kernel/suites -name "*.c" | sort); do
@@ -92,7 +92,7 @@ jobs:
                 { echo "❌ $f FAILED (SYXTAX OR PURITY ERROR)"; FAIL=1; }
           done
           if [ $FAIL -ne 0 ]; then exit 1; fi
-          echo "✅ All shards passed 100% industrial purity check"
+          echo "✅ All 33 suites passed 100% industrial purity check"
 
   # ─────────────────────────────────────────────────────────────────────────────
   # Step 4: Run Native Test Suite

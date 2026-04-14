@@ -44,3 +44,4 @@ void mesh_update_report_status(float progress);
 void mesh_update_advertise_shard(uint32_t suite_id);
 
 
+

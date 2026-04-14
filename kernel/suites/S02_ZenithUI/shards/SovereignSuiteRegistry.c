@@ -8,3 +8,4 @@ void S02_ZenithUI_Register(void) {
     // Logic: Materialize suite-specific V-Tables and behavioral hulls.
 }
 
+

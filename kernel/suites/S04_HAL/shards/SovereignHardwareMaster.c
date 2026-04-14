@@ -65,3 +65,4 @@ static SovereignHardwareMaster_t create_hardware_master() {
 #endif // SOVEREIGN_HARDWARE_MASTER_H
 
 
+

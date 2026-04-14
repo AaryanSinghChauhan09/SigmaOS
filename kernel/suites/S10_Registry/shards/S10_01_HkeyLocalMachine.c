@@ -29,3 +29,4 @@ bool registry_hklm_write(const char* key, RegEntry* in);
 void registry_hklm_broadcast_change(const char* key);
 
 
+

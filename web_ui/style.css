@@ -1,0 +1,220 @@
+:root {
+    --bg-color: #050508;
+    --accent-cyan: #00f3ff;
+    --accent-magenta: #ff00f7;
+    --text-primary: #ffffff;
+    --text-secondary: rgba(255, 255, 255, 0.6);
+    --glass-bg: rgba(255, 255, 255, 0.03);
+    --glass-border: rgba(255, 255, 255, 0.08);
+    --card-hover: rgba(0, 243, 255, 0.1);
+}
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    background: var(--bg-color);
+    color: var(--text-primary);
+    font-family: 'Outfit', sans-serif;
+    overflow-x: hidden;
+    height: 100vh;
+    display: flex;
+    flex-direction: column;
+}
+
+.background-mesh {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: 
+        radial-gradient(circle at 20% 30%, rgba(0, 243, 255, 0.05) 0%, transparent 50%),
+        radial-gradient(circle at 80% 70%, rgba(255, 0, 247, 0.05) 0%, transparent 50%);
+    z-index: -1;
+}
+
+header {
+    height: 80px;
+    padding: 0 40px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 1px solid var(--glass-border);
+    backdrop-filter: blur(20px);
+}
+
+.logo-container {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+}
+
+.sigma-symbol {
+    font-size: 32px;
+    font-weight: 800;
+    background: linear-gradient(45deg, var(--accent-cyan), var(--accent-magenta));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+}
+
+.version-badge {
+    font-size: 10px;
+    font-family: 'JetBrains Mono';
+    background: var(--glass-border);
+    padding: 2px 8px;
+    border-radius: 4px;
+    letter-spacing: 1px;
+}
+
+.system-stats {
+    display: flex;
+    gap: 30px;
+}
+
+.stat-item {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+}
+
+.stat-item .label {
+    font-size: 9px;
+    color: var(--text-secondary);
+    letter-spacing: 1px;
+}
+
+.stat-item .value {
+    font-weight: 600;
+    font-family: 'JetBrains Mono';
+}
+
+.state-active {
+    color: var(--accent-cyan);
+    text-shadow: 0 0 10px rgba(0, 243, 255, 0.5);
+}
+
+main {
+    flex: 1;
+    display: grid;
+    grid-template-columns: 1fr 380px;
+    gap: 30px;
+    padding: 30px;
+}
+
+.suite-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+    gap: 15px;
+    overflow-y: auto;
+    padding-right: 10px;
+}
+
+.suite-card {
+    background: var(--glass-bg);
+    border: 1px solid var(--glass-border);
+    border-radius: 12px;
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    cursor: default;
+    position: relative;
+    overflow: hidden;
+}
+
+.suite-card:hover {
+    border-color: var(--accent-cyan);
+    background: var(--card-hover);
+    transform: translateY(-5px);
+}
+
+.suite-card .sh-code {
+    font-family: 'JetBrains Mono';
+    font-size: 10px;
+    color: var(--accent-cyan);
+}
+
+.suite-card .sh-name {
+    font-weight: 600;
+    font-size: 14px;
+}
+
+.suite-card .sh-status {
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: #444;
+}
+
+.suite-card.loaded .sh-status {
+    background: var(--accent-cyan);
+    box-shadow: 0 0 8px var(--accent-cyan);
+}
+
+.side-panel {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+.terminal-container {
+    flex: 1;
+    background: rgba(0, 0, 0, 0.6);
+    border: 1px solid var(--glass-border);
+    border-radius: 12px;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+}
+
+.terminal-header {
+    background: var(--glass-border);
+    padding: 10px 15px;
+    font-size: 10px;
+    font-family: 'JetBrains Mono';
+    display: flex;
+    justify-content: space-between;
+}
+
+.terminal-body {
+    padding: 15px;
+    font-family: 'JetBrains Mono';
+    font-size: 12px;
+    color: #0f0;
+    line-height: 1.6;
+    overflow-y: auto;
+}
+
+.log-entry { margin-bottom: 8px; }
+
+.performance-card {
+    background: var(--glass-bg);
+    border: 1px solid var(--glass-border);
+    border-radius: 12px;
+    padding: 20px;
+}
+
+.chart-mockup {
+    display: flex;
+    align-items: flex-end;
+    gap: 4px;
+    height: 60px;
+    margin-top: 15px;
+}
+
+.bar {
+    flex: 1;
+    background: linear-gradient(to top, var(--accent-cyan), transparent);
+    border-radius: 2px 2px 0 0;
+    animation: pulse 2s infinite ease-in-out;
+}
+
+@keyframes pulse {
+    0%, 100% { opacity: 0.5; }
+    50% { opacity: 1; height: calc(10% + var(--h, 50%)); }
+}

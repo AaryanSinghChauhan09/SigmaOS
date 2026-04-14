@@ -52,3 +52,4 @@ void power_pulse_report_telemetry(PowerNode* nodes_out, uint32_t count);
 void power_pulse_panic_cool(void);
 
 
+

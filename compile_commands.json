@@ -1,0 +1,17 @@
+[
+  {
+    "directory": "C:/Users/Aaryan/.gemini/antigravity/scratch/SigmaOS",
+    "command": "gcc -std=c11 -O2 -Iinclude -Ilibc -ffreestanding -nostdinc -D__SIGMAOS__ -c kernel/suites/S01_Genesis/shards/S01_Genesis_Register.c -o kernel/suites/S01_Genesis/shards/S01_Genesis_Register.o",
+    "file": "kernel/suites/S01_Genesis/shards/S01_Genesis_Register.c"
+  },
+  {
+    "directory": "C:/Users/Aaryan/.gemini/antigravity/scratch/SigmaOS",
+    "command": "gcc -std=c11 -O2 -Iinclude -Ilibc -ffreestanding -nostdinc -D__SIGMAOS__ -c kernel/suites/S10_Registry/shards/SovereignSystemRegistry.c -o kernel/suites/S10_Registry/shards/SovereignSystemRegistry.o",
+    "file": "kernel/suites/S10_Registry/shards/SovereignSystemRegistry.c"
+  },
+  {
+    "directory": "C:/Users/Aaryan/.gemini/antigravity/scratch/SigmaOS",
+    "command": "gcc -std=c11 -O2 -Iinclude -Ilibc -ffreestanding -nostdinc -D__SIGMAOS__ -c kernel/suites/S13_Sentience/shards/SovereignLatticeAuditor.c -o kernel/suites/S13_Sentience/shards/SovereignLatticeAuditor.o",
+    "file": "kernel/suites/S13_Sentience/shards/SovereignLatticeAuditor.c"
+  }
+]

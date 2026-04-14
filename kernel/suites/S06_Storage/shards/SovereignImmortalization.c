@@ -44,3 +44,4 @@ bool immortality_verify_integrity(uint8_t* puf_signature);
 float immortality_get_solidity_factor(void);
 
 
+

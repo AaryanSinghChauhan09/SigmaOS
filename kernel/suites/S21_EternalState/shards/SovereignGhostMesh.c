@@ -41,3 +41,4 @@ bool ghost_verify_coherence(void);
 float ghost_get_eternal_score(void);
 
 
+

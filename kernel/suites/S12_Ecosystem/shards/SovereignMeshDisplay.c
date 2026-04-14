@@ -46,3 +46,4 @@ void mesh_display_sync_hid(uint8_t* target_node_id);
 void mesh_display_process_remote_touch(void* touch_event);
 
 
+

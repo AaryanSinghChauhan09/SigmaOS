@@ -44,3 +44,4 @@ bool translator_update_model(const char* lang_code);
 void translator_sync_mesh(void);
 
 
+

@@ -1,8 +1,8 @@
 -xc
 -std=c11
 -O2
--Iinclude
 -Ilibc
+-Iinclude
 -ffreestanding
 -nostdinc
 -fno-builtin

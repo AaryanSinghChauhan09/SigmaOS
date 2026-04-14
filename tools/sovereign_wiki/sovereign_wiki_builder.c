@@ -133,17 +133,36 @@ int main(int argc, char* argv[]) {
     const char* suites_root = (argc > 1) ? argv[1] : "kernel/suites";
     const char* output_file = (argc > 2) ? argv[2] : "WIKI/AUTO_SOVEREIGN_WIKI.md";
 
-    // Walk known suites
-    const char* suites[] = {
-        "S01_Genesis","S02_ZenithUI","S03_Orchestrator","S04_HAL",
-        "S05_Memory","S06_Storage","S07_Network","S08_Security",
-        "S09_Intelligence","S10_System","S10_Registry"
-    };
-    for (int i = 0; i < 11; i++) {
-        char suite_path[MAX_PATH_LEN];
-        snprintf(suite_path, sizeof(suite_path), "%s/%s", suites_root, suites[i]);
-        walk_suite(suite_path, suites[i]);
+    DIR* root_dir = opendir(suites_root);
+    if (!root_dir) {
+        fprintf(stderr, "[sigma-wiki ERROR]: Cannot open suites root: %s\n", suites_root);
+        return 1;
     }
+
+    struct dirent* suite_entry;
+    while ((suite_entry = readdir(root_dir)) != NULL) {
+        if (suite_entry->d_name[0] == '.') continue;
+        
+        char suite_path[MAX_PATH_LEN];
+        snprintf(suite_path, sizeof(suite_path), "%s/%s", suites_root, suite_entry->d_name);
+
+        struct stat st;
+        if (stat(suite_path, &st) == 0 && S_ISDIR(st.st_mode)) {
+            // Document the suite shards
+            char shards_path[MAX_PATH_LEN];
+            snprintf(shards_path, sizeof(shards_path), "%s/shards", suite_path);
+            
+            // Check if shards/ exists, else walk the suite dir directly
+            struct stat sst;
+            if (stat(shards_path, &sst) == 0 && S_ISDIR(sst.st_mode)) {
+                walk_suite(shards_path, suite_entry->d_name);
+            } else {
+                walk_suite(suite_path, suite_entry->d_name);
+            }
+        }
+    }
+    closedir(root_dir);
+
     emit_wiki_markdown(output_file);
     return 0;
 }

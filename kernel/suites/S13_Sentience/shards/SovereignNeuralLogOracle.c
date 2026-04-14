@@ -41,3 +41,4 @@ const char* oracle_get_health_summary(void);
 void oracle_sync_learned_patterns(void);
 
 
+

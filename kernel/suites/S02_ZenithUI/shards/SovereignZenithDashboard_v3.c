@@ -35,3 +35,4 @@ void zenith_v3_sync_hive_stats(void);
 
 // Toggle 'Proactive Mode' visualization (Intent projection)
 void zenith_v3_toggle_proactive(bool enabled);
+

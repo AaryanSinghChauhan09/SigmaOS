@@ -35,3 +35,4 @@ float demand_engine_get_noise_floor(void);
 // Sync demand-patterns with S13 Oracle for hardware-level pre-paging (S04)
 void demand_engine_predict_next(void);
 
+

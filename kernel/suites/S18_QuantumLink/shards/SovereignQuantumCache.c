@@ -38,3 +38,4 @@ float quantum_cache_get_coherence(void);
 // Optimize data-locality using the S13 Intention Oracle
 void quantum_cache_auto_balance(void);
 
+

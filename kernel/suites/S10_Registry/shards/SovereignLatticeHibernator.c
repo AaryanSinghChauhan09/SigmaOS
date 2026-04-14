@@ -33,3 +33,4 @@ void hibernator_purge_stale(void);
 // Verify State-Hash for industrial integrity (S08)
 bool hibernator_verify_hash(uint32_t shard_id);
 
+
