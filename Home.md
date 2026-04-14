@@ -1,4 +1,4 @@
-# SigmaOS Sovereign — THE FACTUAL RECORD
+# SigmaOS Sovereign — THE FACTUAL RECORD (v33.1)
 
 Welcome to the definitive, fact-only repository for SigmaOS. This wiki contains strictly verifiable technical specifications, competitive audits, and structural maps.
 
@@ -7,16 +7,27 @@ Welcome to the definitive, fact-only repository for SigmaOS. This wiki contains 
 ## 🏛️ 1. Technical Specifications
 - **[SOVEREIGN_FINAL_SPEC.md](SOVEREIGN_FINAL_SPEC.md)**: The terminal technical record (Latency, Throughput, Purity).
 - **[TECHNICAL_SPECIFICATIONS.md](TECHNICAL_SPECIFICATIONS.md)**: Hardware-level silicon alignment and multi-suite specs.
-- **[SOVEREIGN_HIVE_SYNTHESIS.md](SOVEREIGN_HIVE_SYNTHESIS.md)**: Factual record of the 33-suite orchestration phases.
+- **[SPECIFICATION.md](SPECIFICATION.md)**: Detailed architectural requirements and constraints.
+- **[SOVEREIGN_HIVE_SYNTHESIS.md](SOVEREIGN_HIVE_SYNTHESIS.md)**: 4-Phase orchestration and suite materialization.
 - **[PERFORMANCE_ULTIMATUM.md](PERFORMANCE_ULTIMATUM.md)**: Zero-background and demand-shard execution facts.
-- **[SOVEREIGN_FINALITY_CERTIFICATE.md](SOVEREIGN_FINALITY_CERTIFICATE.md)**: Certified project enclosure status.
 
-## 📊 2. Market Standing
+## 📊 2. Market & Feature Parity
+- **[COMPETITOR_COMPARISON.md](COMPETITOR_COMPARISON.md)**: Industrial feature comparison and implementation conditions.
 - **[MARKET_COMPETITIVE_AUDIT.md](MARKET_COMPETITIVE_AUDIT.md)**: Factual comparison against NT, Darwin, Linux, seL4, and QNX.
+- **[GLOSSARY.md](GLOSSARY.md)**: Essential terminology for the Sovereign Singularity.
 
-## ⚙️ 3. Structural Maps
+## ⚙️ 3. Structural & Developer Records
 - **[GRAND_FINALE_SUPREMACY.md](GRAND_FINALE_SUPREMACY.md)**: Terminal 33-suite modularity map.
-- **[SOVEREIGN_SUPREMACY_30_INDEX.md](SOVEREIGN_SUPREMACY_30_INDEX.md)**: Shard-level navigation across the genesis-to-supremacy tiers.
+- **[API_REFERENCE.md](API_REFERENCE.md)**: Sovereign Registry and Interconnect API definitions.
+- **[SHARD_GRAPH.md](SHARD_GRAPH.md)**: Visual mapping of inter-suite dependencies.
+- **[PRINCIPLES.md](PRINCIPLES.md)**: The foundational logic of Zero-Dependency Sovereignty.
+- **[DEPENDENCY_POLICY.md](DEPENDENCY_POLICY.md)**: Strict rules for shard-level containment.
+
+## 📜 4. Project History & Certification
+- **[CHANGELOG.md](CHANGELOG.md)**: Complete chronological evolution from v1.0 to Singularity.
+- **[V1_0_0_ASCENDANCE_STATEMENT.md](V1_0_0_ASCENDANCE_STATEMENT.md)**: The historical declaration of SigmaOS modularity.
+- **[SOVEREIGN_FINALITY_CERTIFICATE.md](SOVEREIGN_FINALITY_CERTIFICATE.md)**: Certified project enclosure status.
+- **[SOVEREIGN_CERTIFICATE.md](SOVEREIGN_CERTIFICATE.md)**: Real-time silicon-purity certification log.
 
 ---
 **ALL LOGIC TRACEABLE. ALL FACTS VERIFIED VIA S13 LATTICE AUDITOR.**
