@@ -1,6 +1,6 @@
 # =============================================================================
 # SigmaOS — .clangd
-# IDE Configuration for Sovereign Singularity
+# Industrial-grade IDE Configuration (TERMINAL SUPREMACY)
 # =============================================================================
 
 CompileFlags:
@@ -11,6 +11,8 @@ CompileFlags:
     "-Ilibc",
     "-ffreestanding",
     "-nostdinc",
+    "-fno-modules",
+    "-fno-ms-extensions",
     "-D__SIGMAOS__",
     "-Wno-unknown-attributes"
   ]
@@ -24,9 +26,17 @@ Diagnostics:
   UnusedIncludes: Strict
   MissingIncludes: Strict
 
-# Prevent recursive preamble building in system-like headers
+# Prevent Clangd from trying to build redundant preambles for system-like headers
 If:
   PathMatch: .*\.h
 ---
 CompileFlags:
-  Remove: [-include] # Never force-include anything into a header via flags
+  Add: [-fno-modules-cache]
+  Remove: [-include]
+
+# Terminal Fix for recursive stdint.h preamble bugs
+If:
+  PathMatch: .*stdint\.h
+---
+Diagnostics:
+  Suppress: ["*"]
