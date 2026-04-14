@@ -3,7 +3,7 @@
 // Industrial-grade Syscall Gate Shard
 // =============================================================================
 
-#include "sigma_types.h"
+#include <sigma_types.h>
 
 
 void syscall_gate_handler(uint32_t syscall_num, void* args) {
@@ -14,4 +14,5 @@ void syscall_gate_handler(uint32_t syscall_num, void* args) {
 void syscall_register_vector(uint32_t num, void (*handler)(void*)) {
     // Thread-safe registration of system primitives
 }
+
 

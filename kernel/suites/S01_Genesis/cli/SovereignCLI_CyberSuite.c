@@ -40,3 +40,4 @@ void SovereignCLI_CyberSuite_Register(void) {
     sigma_cli_register(&g_sigma_cli, "sigma-defender", cmd_sigma_defender);
 }
 
+

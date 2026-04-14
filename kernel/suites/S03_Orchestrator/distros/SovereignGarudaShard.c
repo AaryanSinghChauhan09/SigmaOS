@@ -13,3 +13,4 @@ void SovereignGaruda_Register(void) {
     SovereignDistro_Register("popos", "apt", "systemd", "Auto-Tiling, NVIDIA Optimized", SovereignGaruda_AbsorbLogic);
 }
 
+

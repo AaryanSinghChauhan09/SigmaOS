@@ -3,7 +3,7 @@
 // Industrial-Grade Unified GPU Orchestration Shard
 // =============================================================================
 
-#include "sigma_types.h"
+#include <sigma_types.h>
 
 
 typedef struct {
@@ -23,4 +23,5 @@ void gpustack_dispatch(uint32_t gpu_id, void* cmd_list);
 
 // Sync VRAM state across Hive peers (MeshDisplay hook)
 void gpustack_sync_mesh(uint32_t gpu_id);
+
 

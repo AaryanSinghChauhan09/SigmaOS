@@ -8,7 +8,7 @@
 //   • Sigma SSM — Formal Verification (S08) backed policy enforcement
 // =============================================================================
 
-#include "sigma_types.h"
+#include <sigma_types.h>
 
 
 typedef struct {
@@ -27,4 +27,5 @@ void ssm_load_policy(const char* policy_path);
 
 // Log an access violation to the Neural Oracle (S13)
 void ssm_audit_violation(uint32_t pid, uint8_t op);
+
 

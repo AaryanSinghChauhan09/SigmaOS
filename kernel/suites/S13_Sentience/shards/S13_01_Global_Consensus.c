@@ -9,7 +9,7 @@
 // Result: A globally unified OS identity that feels like a single brain.
 // =============================================================================
 
-#include "sigma_types.h"
+#include <sigma_types.h>
 
 
 typedef struct {
@@ -34,4 +34,5 @@ void consensus_resolve_clash(void);
 
 // Anchor the consensus history to the Hive BlockStore (S06)
 void consensus_checkpoint(void);
+
 

@@ -3,7 +3,7 @@
 // Zero-Bloat Crash Recovery & Internal Audit Shard
 // =============================================================================
 
-#include "sigma_types.h"
+#include <sigma_types.h>
 
 
 void kernel_panic(const char* reason, void* stack_frame) {
@@ -13,4 +13,5 @@ void kernel_panic(const char* reason, void* stack_frame) {
     // 4. Force VT100 Blue Screen if recovery fails
     while(1) { __asm__("hlt"); }
 }
+
 

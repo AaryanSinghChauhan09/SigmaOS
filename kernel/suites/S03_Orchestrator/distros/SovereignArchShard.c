@@ -12,3 +12,4 @@ void SovereignArch_Register(void) {
     SovereignDistro_Register("arch", "pacman", "systemd", "Rolling, AUR, KISS Purity", SovereignArch_AbsorbLogic);
 }
 
+

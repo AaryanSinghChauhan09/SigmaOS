@@ -72,3 +72,4 @@ sigma_err_t sigma_cli_dispatch(SigmaCLICtx_t *ctx, const char *cmdline) {
     return SIGMA_ENOENT;
 }
 
+

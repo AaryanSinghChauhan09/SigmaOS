@@ -26,3 +26,4 @@ void SovereignCLI_DevSuite_Register(void) {
     sigma_cli_register(&g_sigma_cli, "sigma-cc", cmd_sigma_cc);
 }
 
+

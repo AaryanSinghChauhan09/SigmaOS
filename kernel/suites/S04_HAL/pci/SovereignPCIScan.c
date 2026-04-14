@@ -34,3 +34,4 @@ void sigma_pcie_scan(void) {
     sigma_printf("Σ [PCI]: PCIe scan complete — %u devices found.\n", s_pci_count);
 }
 
+

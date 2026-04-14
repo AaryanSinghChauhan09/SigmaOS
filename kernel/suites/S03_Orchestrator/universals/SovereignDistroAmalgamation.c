@@ -56,3 +56,4 @@ void SovereignDistroAmalgamation_Register(void) {
     SovereignRegistry_Register("LinuxAmalgamation", SHARD_CAT_DISTRO, SovereignDistroAmalgamation_Init);
 }
 
+

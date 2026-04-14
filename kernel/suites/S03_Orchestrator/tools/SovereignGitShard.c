@@ -12,3 +12,4 @@ void SovereignGit_Register(void) {
     SovereignTool_Register("git", "sigma vcs", SovereignGit_AbsorbLogic);
 }
 
+
