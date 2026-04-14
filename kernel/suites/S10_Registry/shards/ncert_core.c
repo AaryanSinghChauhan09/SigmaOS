@@ -19,7 +19,7 @@ void sigma_load_ncert_syllabus(const char* class_grade, const char* subject) {
     sigma_printf("[OK]: Syllabus natively executed on bare metal. Zero browser lag.\n");
 }
 
-int main(int argc, char** argv) {
+int ncert_core_ToolMain(int argc, char** argv) {
     sigma_printf("\n============================================\n");
     sigma_printf("  📚 SIGMAOS BARE-METAL NCERT ACADEMY CORE  \n");
     sigma_printf("============================================\n\n");

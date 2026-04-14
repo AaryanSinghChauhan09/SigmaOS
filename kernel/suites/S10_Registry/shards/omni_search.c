@@ -35,7 +35,7 @@ void execute_search(const char* query) {
     sigma_print("\n[OmniSearch] Completed in 0.04 ms. Competitor average: 1.2 seconds.\n");
 }
 
-int main(int argc, char* argv[]) {
+int omni_search_ToolMain(int argc, char* argv[]) {
     if(argc < 2) {
         sigma_print("=========================================\n");
         sigma_print("   Σ SOVEREIGN OMNI-SEARCH ENGINE (SOSE) \n");

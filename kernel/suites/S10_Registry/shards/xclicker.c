@@ -19,7 +19,7 @@ void sigma_tool_xclicker(int interval_ms, int clicks) {
     sigma_printf("[OK]: Clicker mission complete.\n");
 }
 
-int main(int argc, char** argv) {
+int xclicker_ToolMain(int argc, char** argv) {
     if (argc < 3) {
         sigma_print("Usage: xclicker <interval_ms> <clicks>\n");
         return 1;

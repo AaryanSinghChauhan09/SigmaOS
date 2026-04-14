@@ -21,7 +21,7 @@ void SovereignSelfHeal_Reclaim(void) {
     sigma_printf("  ✓ [OK]: Optimized 3 hot-path scheduling vectors.\n");
 }
 
-int main() {
+int SovereignSelfHeal_ToolMain() {
     sigma_printf("Σ [HEAL]: Initiating Sovereign Self-Optimization Orbit...\n\n");
     SovereignSelfHeal_Reclaim();
     sigma_printf("\nΣ [DONE]: System health verified. Speed and throughput maximized.\n");

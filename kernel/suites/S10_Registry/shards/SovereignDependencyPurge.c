@@ -20,7 +20,7 @@ void sigma_detect_foreign_includes(void) {
     sigma_printf("  ✓ [OK]: 92% of shards are PURE (zero-standard-include).\n");
 }
 
-int main() {
+int SovereignDependencyPurge_ToolMain() {
     sigma_printf("Σ [PURITY-BENCH]: Sovereign Dependency Audit Started.\n\n");
     sigma_detect_foreign_includes();
     sigma_printf("\nΣ [DONE]: Purity target is 100%%. Resolve warnings to achieve Technical Sovereignty.\n");

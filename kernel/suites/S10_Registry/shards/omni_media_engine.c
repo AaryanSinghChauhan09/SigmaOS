@@ -33,7 +33,7 @@ void decode_and_render_video(const char* file_path) {
     sigma_print("[OmniMedia] Competitor Analysis: VLC (147ms latency), Windows Media (210ms latency). WE WIN.\n");
 }
 
-int main(int argc, char* argv[]) {
+int omni_media_engine_ToolMain(int argc, char* argv[]) {
     // Sigma CLI Integration check
     if (argc < 2) {
         sigma_print("===================================\n");

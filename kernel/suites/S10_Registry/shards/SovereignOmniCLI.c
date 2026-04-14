@@ -27,7 +27,7 @@ static void print_modular_help(void) {
     SovereignCommand_ListAll();
 }
 
-int main(int argc, char** argv) {
+int SovereignOmniCLI_ToolMain(int argc, char** argv) {
     /* 1. Initialize Registry */
     SovereignCommand_Init();
 

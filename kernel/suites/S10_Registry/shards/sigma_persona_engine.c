@@ -44,7 +44,7 @@ void engage_persona(const char* persona_name) {
     sigma_print("[PERSONA-ENGINE] State Shift completed in 0.08ms. Welcome to your optimized workflow.\n");
 }
 
-int main(int argc, char* argv[]) {
+int sigma_persona_engine_ToolMain(int argc, char* argv[]) {
     if (argc < 2) {
         sigma_print("===================================================\n");
         sigma_print("      Σ SIGMA PERSONA ENGINE (Personalization)     \n");

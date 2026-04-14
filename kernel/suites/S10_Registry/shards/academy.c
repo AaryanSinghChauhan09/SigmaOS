@@ -18,7 +18,7 @@ void sigma_tool_academy_mission(const char* student_id, const char* mission_id) 
     sigma_printf("[OK]: Learning Mission Complete.\n");
 }
 
-int main(int argc, char** argv) {
+int academy_ToolMain(int argc, char** argv) {
     if (argc < 3) {
         sigma_print("Usage: academy <student_id> <mission_id>\n");
         return 1;

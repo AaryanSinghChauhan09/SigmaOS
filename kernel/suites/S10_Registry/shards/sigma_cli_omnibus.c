@@ -33,7 +33,7 @@ void print_help(void) {
     sigma_printf("======================================================\n\n");
 }
 
-int main(int argc, char **argv) {
+int sigma_cli_omnibus_ToolMain(int argc, char **argv) {
     if (argc < 2) {
         print_help();
         return 0;

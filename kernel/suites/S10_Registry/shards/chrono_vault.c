@@ -26,7 +26,7 @@ void vault_restore(const char* snapshot_id) {
     sigma_print(" >> Rollback complete in 0.05 milliseconds. State restored.\n");
 }
 
-int main(int argc, char* argv[]) {
+int chrono_vault_ToolMain(int argc, char* argv[]) {
     if(argc < 2) {
         sigma_print("===================================\n");
         sigma_print("    Σ SOVEREIGN CHRONO-VAULT       \n");

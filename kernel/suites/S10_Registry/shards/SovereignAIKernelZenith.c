@@ -123,7 +123,7 @@ void start_aikernel_zenith() {
 }
 
 /* Standalone entry for experimental validation */
-int main() {
+int SovereignAIKernelZenith_ToolMain() {
     start_aikernel_zenith();
     return 0;
 }

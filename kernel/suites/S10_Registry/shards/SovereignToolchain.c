@@ -22,7 +22,7 @@ void SovereignToolchain_CompilerHandshake(void) {
     sigma_printf("  ✓ [OK]: -ffreestanding -nostdlib -mabi=lp64 hooks verified.\n");
 }
 
-int main(int argc, char** argv) {
+int SovereignToolchain_ToolMain(int argc, char** argv) {
     if (argc < 2) {
         sigma_printf("Usage: sigma-toolchain <target-arch>\n");
         return 0;

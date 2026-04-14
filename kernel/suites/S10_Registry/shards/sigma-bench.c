@@ -32,7 +32,7 @@ void run_latency_test() {
     sigma_sigma_printf("Σ [BENCH]: Latency: %llu clock cycles.\n", cycles);
 }
 
-int main(int argc, char** argv) {
+int sigma-bench_ToolMain(int argc, char** argv) {
     sigma_sigma_printf("--- Σ SIGMAOS PERFORMANCE BENCHMARK SUITE (SILICON-DIRECT) ---\n");
     run_latency_test();
     sigma_sigma_printf("--- BENCHMARK COMPLETED ---\n");

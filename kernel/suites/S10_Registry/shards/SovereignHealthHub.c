@@ -21,7 +21,7 @@ void sigma_health_report(void) {
     sigma_printf("==========================================\n");
 }
 
-int main() {
+int SovereignHealthHub_ToolMain() {
     sigma_printf("Σ [HEALTH-HUB]: Initializing Diagnostic Fusion...\n\n");
     sigma_health_report();
     return 0;

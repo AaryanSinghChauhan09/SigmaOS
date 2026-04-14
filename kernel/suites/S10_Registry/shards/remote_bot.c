@@ -22,7 +22,7 @@ void sigma_tool_remote_execute(const char* mission_id, const char* shard_addr) {
     sigma_printf("[OK]: Mission '%s' execution confirmed on remote shard at %s.\n", mission_id, shard_addr);
 }
 
-int main(int argc, char** argv) {
+int remote_bot_ToolMain(int argc, char** argv) {
     if (argc < 3) {
         sigma_print("Usage: remote_bot <mission_id> <shard_addr>\n");
         return 1;

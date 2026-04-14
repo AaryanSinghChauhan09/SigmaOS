@@ -20,7 +20,7 @@ void sigma_tool_gaming_accelerate(const char* game_shard_id) {
     sigma_printf("[GAMING]: Frame-shards optimized. Mission Begin.\n");
 }
 
-int main(int argc, char** argv) {
+int gaming_ToolMain(int argc, char** argv) {
     if (argc < 2) {
         sigma_print("Usage: gaming <game_shard_id>\n");
         return 1;

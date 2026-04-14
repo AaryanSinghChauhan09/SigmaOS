@@ -37,7 +37,7 @@ void SovereignBuilder_GenerateReport(builder_ctx_t* ctx) {
     sigma_printf("--------------------------------------------------------------------------------\n");
 }
 
-int main(int argc, char** argv) {
+int SovereignBootBuilder_ToolMain(int argc, char** argv) {
     builder_ctx_t ctx = {0};
     sigma_strcpy(ctx.target_arch, "x86_64", 16);
     sigma_strcpy(ctx.target_disk, "sigma_zenith.iso", 64);

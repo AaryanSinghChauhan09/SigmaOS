@@ -55,7 +55,7 @@ void scan_dir(const char* dir_path) {
     verify_file("kernel/SovereignNetData.c");
 }
 
-int main(int argc, char** argv) {
+int SovereignBuildMaster_ToolMain(int argc, char** argv) {
     sigma_printf("\n%sΣ SOVEREIGN BUILD MASTER (v12.0 SILICON-DIRECT)%s\n", C_BOLD, C_RESET);
     sigma_printf("Mission: Zero-Dependency Sovereignty Audit.\n");
     

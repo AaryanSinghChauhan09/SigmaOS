@@ -29,7 +29,7 @@ static void wizard_get_input(const char* prompt, char* buffer, sigma_size_t max)
     sigma_printf("%s (AUTO_INPUT)\n", buffer);
 }
 
-int main(int argc, char** argv) {
+int SovereignBootWizard_ToolMain(int argc, char** argv) {
     (void)argc; (void)argv;
     
     wizard_print_header();

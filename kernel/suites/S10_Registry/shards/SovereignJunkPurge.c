@@ -19,7 +19,7 @@ void sigma_purge_junk(void) {
     sigma_printf("  ✓ [OK]: Cleared 4 orphaned debug lockfiles.\n");
 }
 
-int main() {
+int SovereignJunkPurge_ToolMain() {
     sigma_printf("Σ [PURGE]: Initiating Sovereign System Maintenance Orbit...\n\n");
     sigma_purge_junk();
     sigma_printf("\nΣ [DONE]: System environment scrubbed. Build parity: PURE.\n");

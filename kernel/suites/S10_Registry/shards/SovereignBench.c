@@ -22,7 +22,7 @@ void SovereignBench_ContextSwitch(void) {
     sigma_printf("  Σ [RESULT]: 120 cycles (Cross-core NUMA affinity).\n");
 }
 
-int main() {
+int SovereignBench_ToolMain() {
     sigma_printf("Σ [BENCH]: Initiating Sovereign Performance Audit...\n\n");
 
     SovereignBench_SyscallLatency();

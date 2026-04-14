@@ -22,7 +22,7 @@ void sigma_query_constitution(const char* article) {
     sigma_printf("[OK]: Native parsing complete in 0.001ms.\n");
 }
 
-int main(int argc, char** argv) {
+int indian_law_ToolMain(int argc, char** argv) {
     sigma_printf("\n==========================================\n");
     sigma_printf("  ⚖️  SIGMAOS BARE-METAL INDIAN LAW CORE  \n");
     sigma_printf("==========================================\n\n");

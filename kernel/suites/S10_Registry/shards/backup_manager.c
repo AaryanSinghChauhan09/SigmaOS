@@ -33,7 +33,7 @@ void sigma_tool_backup_shard(const char* src_shard, const char* dest_shard) {
     sigma_printf("[OK]: Backup mission complete for shard '%s'.\n", src_shard);
 }
 
-int main(int argc, char** argv) {
+int backup_manager_ToolMain(int argc, char** argv) {
     if (argc < 3) {
         sigma_print("Usage: backup_manager <src_shard> <dest_shard>\n");
         return 1;

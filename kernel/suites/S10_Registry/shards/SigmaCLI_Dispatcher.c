@@ -49,7 +49,7 @@ void sigma_print_usage(void) {
     sigma_print("=================================================================\n");
 }
 
-int main(int argc, char* argv[]) {
+int SigmaCLI_Dispatcher_ToolMain(int argc, char* argv[]) {
     if (argc < 2) {
         sigma_print_usage();
         return 0;

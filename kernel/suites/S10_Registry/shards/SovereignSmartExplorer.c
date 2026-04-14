@@ -20,7 +20,7 @@ void sigma_smart_ls(const char* dir) {
     sigma_printf("\nΣ [SUGGESTION]: Based on your current workflow, we recommend entering: 'shards' ★\n");
 }
 
-int main(int argc, char** argv) {
+int SovereignSmartExplorer_ToolMain(int argc, char** argv) {
     const char* target = (argc > 1) ? argv[1] : "/include";
     sigma_printf("Σ [SMART-EXPLORER]: Predictive Navigator Active.\n\n");
     sigma_smart_ls(target);

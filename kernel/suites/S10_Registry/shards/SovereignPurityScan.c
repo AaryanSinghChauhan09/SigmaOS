@@ -23,7 +23,7 @@ void sigma_purity_audit(const char* file_path) {
     sigma_printf("  ✓ [OK]: Shard '%s' verified — 100%% Sovereign Purity.\n", file_path);
 }
 
-int main(int argc, char** argv) {
+int SovereignPurityScan_ToolMain(int argc, char** argv) {
     if (argc < 2) {
         sigma_printf("Usage: sigma-purity-scan <shard_path>\n");
         return 0;

@@ -20,7 +20,7 @@ void sigma_kernel_main(void) {
     sigma_printf("\nΣ [DONE]: All 445 shards seated. Operational Sovereignty achieved.\n");
 }
 
-int main(void) {
+int SovereignMasterOrchestrator_ToolMain(void) {
     sigma_kernel_main();
     return 0;
 }

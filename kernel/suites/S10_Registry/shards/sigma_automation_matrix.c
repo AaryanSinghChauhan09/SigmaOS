@@ -22,7 +22,7 @@ void setup_automation(const char* workflow_file) {
     sigma_print(" >> [SUCCESS] Native C11 thread assigned to run workflow exactly every 24ns without context switches.\n");
 }
 
-int main(int argc, char* argv[]) {
+int sigma_automation_matrix_ToolMain(int argc, char* argv[]) {
     if (argc < 2) {
         sigma_print("===================================\n");
         sigma_print("      Σ SIGMA AUTOMATION MATRIX    \n");

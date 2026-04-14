@@ -19,7 +19,7 @@ void sigma_tool_studio_pulse(const char* project_id, int sample_rate) {
     sigma_printf("[STUDIO]: Mission Ready. [BITRATE_LOCKED]\n");
 }
 
-int main(int argc, char** argv) {
+int studio_ToolMain(int argc, char** argv) {
     if (argc < 3) {
         sigma_print("Usage: studio <project_id> <sample_rate>\n");
         return 1;

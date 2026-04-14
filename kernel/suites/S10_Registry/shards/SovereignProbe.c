@@ -18,7 +18,7 @@ void sigma_device_audit(void) {
     sigma_printf("  [COMPAT]: Cross-Platform Shard Matrix: 446/446 OK\n");
 }
 
-int main() {
+int SovereignProbe_ToolMain() {
     sigma_printf("Σ [PROBE]: Sovereign Hardware Discovery Active.\n\n");
     sigma_device_audit();
     sigma_printf("\nΣ [DONE]: Silicon identity confirmed. SigmaOS is optimized for this target.\n");

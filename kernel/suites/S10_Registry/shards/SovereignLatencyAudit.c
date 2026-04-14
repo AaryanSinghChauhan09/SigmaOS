@@ -19,7 +19,7 @@ void sigma_audit_latency(void) {
     sigma_printf("  ✓ [TIME]: IRQ Dispatch: 85ns (Priority Path)\n");
 }
 
-int main() {
+int SovereignLatencyAudit_ToolMain() {
     sigma_printf("Σ [AUDIT]: Starting Industrial Performance Benchmark Orbit...\n\n");
     sigma_audit_latency();
     sigma_printf("\nΣ [DONE]: System speed verified. Performance matrix: PEAK.\n");

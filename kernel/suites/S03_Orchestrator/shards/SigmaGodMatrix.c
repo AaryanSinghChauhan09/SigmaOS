@@ -51,7 +51,7 @@ void activate_all_absorbed_shards() {
     sigma_print("It has become the Singular Computing Standard.\n");
 }
 
-int main(int argc, char* argv[]) {
+int SigmaGodMatrix_ToolMain(int argc, char* argv[]) {
     if (argc < 2) {
         sigma_print("Usage: sigma god-matrix --activate\n");
         sigma_print("       sigma god-matrix --absorb [legacy_tech_name]\n");
