@@ -1,7 +1,7 @@
 #ifndef SIGMA_PERIPHERALS_DRIVER_H
 #define SIGMA_PERIPHERALS_DRIVER_H
 
-#include <stdint.h>
+#include <sigma_types.h>
 
 // SigmaOS Peripheral Hardware Drivers Module
 // Handling specific zero-dependency I/O for Printers, Cameras, and Bluetooth bands.
@@ -17,3 +17,4 @@ void hal_printer_spool_document(const void* doc_blob, uint32_t doc_size);
 void* hal_camera_init_stream(uint32_t resolution_x, uint32_t resolution_y);
 
 #endif // SIGMA_PERIPHERALS_DRIVER_H
+

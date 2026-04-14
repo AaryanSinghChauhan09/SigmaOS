@@ -1,8 +1,8 @@
 #ifndef SIGMA_BIOMETRICS_H
 #define SIGMA_BIOMETRICS_H
 
-#include <stdint.h>
-#include <stdbool.h>
+#include <sigma_types.h>
+
 
 // SigmaOS Biometric Authentication Module
 // Ties into the Zero Trust architecture
@@ -19,3 +19,4 @@ bool sec_authenticate_fingerprint(uint32_t user_id);
 void sec_gather_biometric_entropy(uint8_t* buffer, uint32_t length);
 
 #endif // SIGMA_BIOMETRICS_H
+

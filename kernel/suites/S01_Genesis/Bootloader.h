@@ -1,7 +1,7 @@
 #ifndef SIGMA_BOOTLOADER_H
 #define SIGMA_BOOTLOADER_H
 
-#include <stdint.h>
+#include <sigma_types.h>
 
 // SigmaOS Genesis Bootloader (S01)
 // Absorbing rapid-boot paradigms of systemd-boot and flexibility of GRUB
@@ -13,3 +13,4 @@ void genesis_decompress_kernel(void);
 void genesis_handoff_to_orchestrator(void);
 
 #endif // SIGMA_BOOTLOADER_H
+

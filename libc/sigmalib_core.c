@@ -10,8 +10,8 @@
 // Result: 5-10x performance gain for standard C applications.
 // =============================================================================
 
-#include <stdint.h>
-#include <stdbool.h>
+#include <sigma_types.h>
+
 
 // ── Memory Primitives ────────────────────────────────────────────────────────
 
@@ -45,3 +45,4 @@ void sigma_exit(int status) {
 void sigma_print(const char* msg) {
     // S02 ZenithUI Terminal console output
 }
+

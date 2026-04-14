@@ -1,8 +1,8 @@
 #ifndef SIGMA_NOTIFICATION_ENGINE_H
 #define SIGMA_NOTIFICATION_ENGINE_H
 
-#include <stdint.h>
-#include <stdbool.h>
+#include <sigma_types.h>
+
 
 // SigmaOS Notification & Desktop Environment Module
 // Natively integrated with ZenithUI to handle non-intrusive alerts and Universal Clipboard
@@ -18,3 +18,4 @@ void ui_clipboard_paste(void* payload, uint32_t payload_size);
 void ui_theme_apply_engine(const char* theme_json_path);
 
 #endif // SIGMA_NOTIFICATION_ENGINE_H
+

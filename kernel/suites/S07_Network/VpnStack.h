@@ -1,7 +1,7 @@
 #ifndef SIGMA_VPN_STACK_H
 #define SIGMA_VPN_STACK_H
 
-#include <stdint.h>
+#include <sigma_types.h>
 
 // SigmaOS Modular VPN Stack
 // Absorbs WireGuard's speed and OpenVPN's robustness natively into S07_Network
@@ -16,3 +16,4 @@ void net_vpn_force_route(uint32_t tunnel_id);
 void net_vpn_split_namespace(uint32_t container_id, uint32_t tunnel_id);
 
 #endif // SIGMA_VPN_STACK_H
+

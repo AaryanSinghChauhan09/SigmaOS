@@ -1,7 +1,7 @@
 #ifndef SIGMA_AI_INFERENCE_H
 #define SIGMA_AI_INFERENCE_H
 
-#include <stdint.h>
+#include <sigma_types.h>
 
 // SigmaOS On-Device AI/ML Inference Engine
 // Zero-dependency neural processing abstraction
@@ -22,3 +22,4 @@ void intel_start_voice_assistant(void);
 void intel_process_gesture_stream(void* camera_feed_buffer);
 
 #endif // SIGMA_AI_INFERENCE_H
+

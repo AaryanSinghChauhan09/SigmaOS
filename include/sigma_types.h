@@ -127,3 +127,4 @@ typedef char* sigma_va_list;
     do { if (!(cond)) { sigma_printf("Σ [ASSERTION FAILED]: %s (%s:%d)\n", msg, __FILE__, __LINE__); sigma_exit(1); } } while(0)
 
 #endif /* SIGMAOS_SIGMA_TYPES_H */
+

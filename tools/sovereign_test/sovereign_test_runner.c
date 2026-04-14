@@ -11,9 +11,9 @@
 // =============================================================================
 
 #include <stdio.h>
-#include <stdint.h>
+#include <sigma_types.h>
 #include <string.h>
-#include <stdbool.h>
+
 #include <setjmp.h>
 #include <time.h>
 
@@ -136,3 +136,4 @@ int main(int argc, char* argv[]) {
 
     return (failed > 0) ? 1 : 0;
 }
+

@@ -14,9 +14,9 @@
 //   • This file extends: string ops, memory ops, printf, atoi, qsort
 // =============================================================================
 
-#include <stdint.h>
+#include <sigma_types.h>
 #include <stdarg.h>
-#include <stdbool.h>
+
 
 // ── Memory Primitives (no glibc) ──────────────────────────────────────────────
 void* sigma_memcpy(void* dest, const void* src, uint32_t n) {
@@ -149,3 +149,4 @@ void sigma_sort_small(void* base, uint32_t n, uint32_t size,
         sigma_memcpy(arr + (j + 1) * size, tmp, size);
     }
 }
+

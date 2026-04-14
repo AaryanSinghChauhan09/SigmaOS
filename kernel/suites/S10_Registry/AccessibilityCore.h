@@ -1,8 +1,8 @@
 #ifndef SIGMA_ACCESSIBILITY_H
 #define SIGMA_ACCESSIBILITY_H
 
-#include <stdint.h>
-#include <stdbool.h>
+#include <sigma_types.h>
+
 
 // SigmaOS Accessibility Framework Shard
 // Native system-level support for Screen Reading, Dictation, and Assistive Touch.
@@ -20,3 +20,4 @@ void system_acc_describe_widget(uint32_t widget_id);
 void system_acc_set_visual_mode(uint8_t mode);
 
 #endif // SIGMA_ACCESSIBILITY_H
+

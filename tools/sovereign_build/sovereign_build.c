@@ -16,7 +16,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include <stdbool.h>
+
 
 #define BUILD_VERSION "2.0.0"
 
@@ -56,3 +56,4 @@ int main(int argc, char** argv) {
     printf("╚══════════════════════════════════════════════╝\n\n");
     return 0;
 }
+

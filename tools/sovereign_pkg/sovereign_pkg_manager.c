@@ -14,8 +14,8 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include <stdint.h>
-#include <stdbool.h>
+#include <sigma_types.h>
+
 #include <sys/stat.h>
 
 #define SIGPKG_VERSION      "2.0.0"
@@ -114,3 +114,4 @@ int main(int argc, char* argv[]) {
     else { printf("Unknown command: %s\n", argv[1]); return 1; }
     return 0;
 }
+

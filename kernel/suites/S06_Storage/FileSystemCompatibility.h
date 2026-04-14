@@ -1,8 +1,8 @@
 #ifndef SIGMA_FILESYSTEM_LEGACY_H
 #define SIGMA_FILESYSTEM_LEGACY_H
 
-#include <stdint.h>
-#include <stdbool.h>
+#include <sigma_types.h>
+
 
 // SigmaOS Legacy & Compatibility File System Shards
 // Modular support for industry-standard formats
@@ -20,3 +20,4 @@ bool fs_mount_fat(const char* device_id, const char* mount_point);
 void fs_trigger_cow_snapshot(const char* mount_point);
 
 #endif // SIGMA_FILESYSTEM_LEGACY_H
+

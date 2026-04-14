@@ -1,8 +1,8 @@
 #ifndef SIGMA_WEB_PROTOCOLS_H
 #define SIGMA_WEB_PROTOCOLS_H
 
-#include <stdint.h>
-#include <stdbool.h>
+#include <sigma_types.h>
+
 
 // SigmaOS Web & Connectivity Protocol Stack
 // Natively accelerates modern web interactions bypassing traditional bloated libraries.
@@ -23,3 +23,4 @@ bool net_web_mount_webdav(const char* target_url, const char* local_mount_point)
 void net_web_start_remote_desktop(uint16_t listen_port);
 
 #endif // SIGMA_WEB_PROTOCOLS_H
+

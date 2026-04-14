@@ -1,7 +1,7 @@
 #ifndef SIGMA_TYPOGRAPHY_H
 #define SIGMA_TYPOGRAPHY_H
 
-#include <stdint.h>
+#include <sigma_types.h>
 
 // SigmaOS Typography & Sub-pixel Engine
 // Absorbs FreeType/DirectWrite paradigms for beautiful, hardware-accelerated font rendering.
@@ -16,3 +16,4 @@ void ui_font_render_string(uint32_t font_id, const char* text, uint32_t x, uint3
 void ui_font_handle_ime_input(uint32_t keystroke_buffer);
 
 #endif // SIGMA_TYPOGRAPHY_H
+

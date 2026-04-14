@@ -10,7 +10,7 @@
 // =============================================================================
 
 #include <stdio.h>
-#include <stdint.h>
+#include <sigma_types.h>
 
 typedef struct {
     uintptr_t pc;
@@ -39,3 +39,4 @@ void sdebug_visualise_hive_threads(void);
 
 // Report Silicon State to ZenithUI for developer HUD
 void sdebug_report_state(SiliconState* state);
+

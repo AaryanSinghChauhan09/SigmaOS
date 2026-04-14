@@ -1,7 +1,7 @@
 #ifndef SIGMA_SENSOR_FUSION_H
 #define SIGMA_SENSOR_FUSION_H
 
-#include <stdint.h>
+#include <sigma_types.h>
 
 // SigmaOS Sensor Fusion Shard
 // Modular integration for Gyroscopes, Accelerometers, and Magnetometers.
@@ -23,3 +23,4 @@ SensorData hal_sensor_read_gyro(void);
 uint8_t hal_sensor_get_orientation(void);
 
 #endif // SIGMA_SENSOR_FUSION_H
+

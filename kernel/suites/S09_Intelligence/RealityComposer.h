@@ -1,7 +1,7 @@
 #ifndef SIGMA_REALITY_COMPOSER_H
 #define SIGMA_REALITY_COMPOSER_H
 
-#include <stdint.h>
+#include <sigma_types.h>
 
 // SigmaOS Reality Composer Shard (AR/VR)
 // Spatial tracking, stereo rendering, and pass-through hooks.
@@ -19,3 +19,4 @@ void intelligence_reality_composite_window(uint32_t window_id, uint32_t anchor_i
 void intelligence_reality_trigger_haptic(uint8_t controller_id, uint32_t pattern_id);
 
 #endif // SIGMA_REALITY_COMPOSER_H
+

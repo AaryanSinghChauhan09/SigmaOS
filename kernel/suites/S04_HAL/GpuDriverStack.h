@@ -1,7 +1,7 @@
 #ifndef SIGMA_GPU_STACK_H
 #define SIGMA_GPU_STACK_H
 
-#include <stdint.h>
+#include <sigma_types.h>
 
 // SigmaOS Universal GPU Driver Stack
 // Native hardware manipulation for modern graphics
@@ -19,3 +19,4 @@ void hal_gpu_bitblt(void* dest, void* src, uint32_t width, uint32_t height);
 void hal_gpu_set_power_state(uint8_t power_level);
 
 #endif // SIGMA_GPU_STACK_H
+

@@ -13,7 +13,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include <stdint.h>
+#include <sigma_types.h>
 #include <dirent.h>
 #include <sys/stat.h>
 
@@ -117,3 +117,4 @@ int main(int argc, char* argv[]) {
     emit_dot(output);
     return 0;
 }
+

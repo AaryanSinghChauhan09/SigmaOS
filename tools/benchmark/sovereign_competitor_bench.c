@@ -12,7 +12,7 @@
 // =============================================================================
 
 #include <stdio.h>
-#include <stdint.h>
+#include <sigma_types.h>
 #include <time.h>
 
 static uint64_t rdtsc(void) {
@@ -48,3 +48,4 @@ int main() {
     printf("\nBenchmark Summary: SigmaOS is consistently 2-5x faster in core primitives.\n\n");
     return 0;
 }
+

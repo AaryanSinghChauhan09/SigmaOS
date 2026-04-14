@@ -20,8 +20,8 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include <stdint.h>
-#include <stdbool.h>
+#include <sigma_types.h>
+
 #include <ctype.h>
 
 #define SIGMA_SHELL_VERSION   "2.0.0"
@@ -200,3 +200,4 @@ int main(void) {
     }
     return 0;
 }
+

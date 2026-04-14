@@ -1,8 +1,8 @@
 #ifndef SIGMA_FIREWALL_ENCLAVE_H
 #define SIGMA_FIREWALL_ENCLAVE_H
 
-#include <stdint.h>
-#include <stdbool.h>
+#include <sigma_types.h>
+
 
 // SigmaOS Hardware Firewall Enclave
 // Absorbs pf/iptables paradigms directly into the S08_Security networking boundary.
@@ -17,3 +17,4 @@ void sec_fw_enable_spi(void);
 void sec_fw_lockdown_node(void);
 
 #endif // SIGMA_FIREWALL_ENCLAVE_H
+

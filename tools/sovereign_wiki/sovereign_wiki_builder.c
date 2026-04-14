@@ -13,8 +13,8 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include <stdint.h>
-#include <stdbool.h>
+#include <sigma_types.h>
+
 #include <dirent.h>
 #include <sys/stat.h>
 
@@ -146,3 +146,4 @@ int main(int argc, char* argv[]) {
     emit_wiki_markdown(output_file);
     return 0;
 }
+

@@ -1,8 +1,8 @@
 #ifndef SIGMA_NETWORK_PROTOCOLS_EXT_H
 #define SIGMA_NETWORK_PROTOCOLS_EXT_H
 
-#include <stdbool.h>
-#include <stdint.h>
+
+#include <sigma_types.h>
 
 // SigmaOS Extended Network Protocol Shards
 // Native, zero-dependency implementations of FTP and Email cores.
@@ -21,3 +21,4 @@ typedef struct {
 bool net_mail_send_secure(MailConfig* config, const char* recipient, const char* body);
 
 #endif // SIGMA_NETWORK_PROTOCOLS_EXT_H
+

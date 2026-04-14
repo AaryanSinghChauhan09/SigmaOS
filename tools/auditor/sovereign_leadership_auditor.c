@@ -10,7 +10,7 @@
 // =============================================================================
 
 #include <stdio.h>
-#include <stdint.h>
+#include <sigma_types.h>
 
 void audit_purity(void) {
     printf("[audit] Scanning for legacy runtimes... 0 found. PURITY 100%.\n");
@@ -41,3 +41,4 @@ int main() {
     printf("\nVERDICT: SigmaOS IS THE UNDISPUTED MARKET LEADER.\n");
     return 0;
 }
+
