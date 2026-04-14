@@ -1,9 +1,10 @@
 # =============================================================================
 # SigmaOS — .clangd
-# Industrial-grade IDE Configuration (TERMINAL SUPREMACY)
+# Industrial-grade IDE Configuration (TERMINAL SUPREMACY v33.6)
 # =============================================================================
 
 CompileFlags:
+  CompilationDatabase: "."
   Add: [
     "-xc",
     "-std=c11",
@@ -13,31 +14,29 @@ CompileFlags:
     "-nostdinc",
     "-fno-modules",
     "-fno-ms-extensions",
-    "-D__SIGMAOS__",
-    "-Wno-unknown-attributes"
+    "-D__SIGMAOS__"
   ]
-  Remove: ["-fprebuilt-module-path", "-fmodules"]
+  Remove: ["-fprebuilt-module-path", "-fmodules", "-fms-extensions"]
 
 Index:
-  Background: true
+  Background: Build
   ExternalIndex: None
 
 Diagnostics:
   UnusedIncludes: Strict
   MissingIncludes: Strict
 
-# Prevent Clangd from trying to build redundant preambles for system-like headers
+# Prevent preamble recursion by disabling preamble-building for ANY header
 If:
   PathMatch: .*\.h
 ---
 CompileFlags:
-  Add: [-fno-modules-cache]
+  Add: [-fno-modules-cache, -Wno-pragma-once-outside-header]
   Remove: [-include]
 
-# Terminal Fix for recursive stdint.h preamble bugs
+# Terminal suppression for host-system header interference
 If:
-  PathMatch: .*stdint\.h
+  PathMatch: .*AppData.*
 ---
 Diagnostics:
   Suppress: ["*"]
-

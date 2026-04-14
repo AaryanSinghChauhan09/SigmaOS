@@ -1,0 +1,14 @@
+-xc
+-std=c11
+-O2
+-Iinclude
+-Ilibc
+-ffreestanding
+-nostdinc
+-fno-builtin
+-D__SIGMAOS__
+-D__x86_64__
+-Wno-unknown-attributes
+-Wno-unused-function
+-Wall
+-Wextra

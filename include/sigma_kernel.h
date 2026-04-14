@@ -48,22 +48,25 @@ static inline void SovereignMaster_InitAll(void) {
     extern void S28_OmniBus_Register(void);
     extern void S29_LatticeMerge_Register(void);
     extern void S30_Supremacy_Register(void);
+    extern void S31_GlobalGovernance_Register(void);
+    extern void S32_UnifiedSovereignty_Register(void);
+    extern void S33_TerminalFulfillment_Register(void);
 
-    /* Phase 1: Materialization */
+    /* Phase 1: Materialization (S01–S05) */
     S01_Genesis_Register();
     S02_ZenithUI_Register();
     S03_Orchestrator_Register();
     S04_HAL_Register();
     S05_Memory_Register();
     
-    /* Phase 2: Mesh Integration */
+    /* Phase 2: Mesh Integration (S06–S10) */
     S06_Storage_Register();
     S07_Network_Register();
     S08_Security_Register();
     S09_Intelligence_Register();
     S10_Registry_Register();
     
-    /* Phase 3: Transcendental Synthesis */
+    /* Phase 3: Transcendental Synthesis (S11–S20) */
     S11_Virtualization_Register();
     S12_Ecosystem_Register();
     S13_Sentience_Register();
@@ -75,7 +78,7 @@ static inline void SovereignMaster_InitAll(void) {
     S19_SelfEvolution_Register();
     S20_GlobalVFS_Register();
     
-    /* Phase 4: Supremacy Terminal */
+    /* Phase 4: Supremacy Terminal (S21–S33) */
     S21_EternalState_Register();
     S22_SimulationNexus_Register();
     S23_OmniNexus_Register();
@@ -86,6 +89,9 @@ static inline void SovereignMaster_InitAll(void) {
     S28_OmniBus_Register();
     S29_LatticeMerge_Register();
     S30_Supremacy_Register();
+    S31_GlobalGovernance_Register();
+    S32_UnifiedSovereignty_Register();
+    S33_TerminalFulfillment_Register();
 
     sigma_printf("\nΣ [SOVEREIGN-MASTER]: 33-Suite Lattice Materialization COMPLETE.\n");
 }
