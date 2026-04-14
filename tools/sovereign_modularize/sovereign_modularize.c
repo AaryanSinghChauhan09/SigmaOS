@@ -1,3 +1,4 @@
+#define SIGMA_EXCLUDE_STD_ALIASES
 // =============================================================================
 // SigmaOS — tools/sovereign_modularize — sovereign_modularize.c
 // Native C Replacement for scripts/sovereign_modularize_v2.py
@@ -152,4 +153,5 @@ int main(int argc, char* argv[]) {
     emit_registry_header(output);
     return 0;
 }
+
 

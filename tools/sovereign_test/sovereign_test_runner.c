@@ -1,3 +1,4 @@
+#define SIGMA_EXCLUDE_STD_ALIASES
 // =============================================================================
 // SigmaOS — tools/sovereign_test — sovereign_test_runner.c
 // Native C Replacement for tests/sovereign_test_runner.py
@@ -136,4 +137,5 @@ int main(int argc, char* argv[]) {
 
     return (failed > 0) ? 1 : 0;
 }
+
 

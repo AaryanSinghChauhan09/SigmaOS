@@ -1,3 +1,4 @@
+#define SIGMA_EXCLUDE_STD_ALIASES
 // =============================================================================
 // SigmaOS — tools/sovereign_debug — sovereign_silicon_debugger.c
 // Industrial Silicon-Aware Debugger Core
@@ -39,4 +40,5 @@ void sdebug_visualise_hive_threads(void);
 
 // Report Silicon State to ZenithUI for developer HUD
 void sdebug_report_state(SiliconState* state);
+
 

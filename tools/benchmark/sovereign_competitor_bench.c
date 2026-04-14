@@ -1,3 +1,4 @@
+#define SIGMA_EXCLUDE_STD_ALIASES
 // =============================================================================
 // SigmaOS — tools/benchmark — sovereign_competitor_bench.c
 // Industrial Parity & Performance Benchmark vs Competitors
@@ -48,4 +49,5 @@ int main() {
     printf("\nBenchmark Summary: SigmaOS is consistently 2-5x faster in core primitives.\n\n");
     return 0;
 }
+
 

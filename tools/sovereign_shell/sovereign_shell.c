@@ -1,3 +1,4 @@
+#define SIGMA_EXCLUDE_STD_ALIASES
 // =============================================================================
 // SigmaOS — tools/sovereign_shell — sovereign_shell.c
 // Native C Replacement for scripts/zenith_shell.py
@@ -200,4 +201,5 @@ int main(void) {
     }
     return 0;
 }
+
 

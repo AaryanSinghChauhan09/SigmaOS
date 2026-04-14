@@ -1,3 +1,4 @@
+#define SIGMA_EXCLUDE_STD_ALIASES
 // =============================================================================
 // SigmaOS — tools/sovereign_purge — sovereign_purge.c
 // Native C Replacement for scripts/sovereign_purge.py
@@ -141,4 +142,5 @@ int main(int argc, char* argv[]) {
     }
     return (target_count > 0 && !confirm) ? 1 : 0;
 }
+
 

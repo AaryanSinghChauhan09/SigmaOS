@@ -1,3 +1,4 @@
+#define SIGMA_EXCLUDE_STD_ALIASES
 // =============================================================================
 // SigmaOS — tools/sovereign_audit — sovereign_audit.c
 // Native C Replacement for Python Dependency Audit Scripts
@@ -117,4 +118,5 @@ int main(int argc, char* argv[]) {
     print_report();
     return (foreign_count > 0) ? 1 : 0; // Non-zero exit if foreign files found
 }
+
 

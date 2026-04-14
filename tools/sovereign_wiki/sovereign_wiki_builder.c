@@ -1,3 +1,4 @@
+#define SIGMA_EXCLUDE_STD_ALIASES
 // =============================================================================
 // SigmaOS — tools/sovereign_wiki — sovereign_wiki_builder.c
 // Native C Replacement for scripts/wiki_builder.py
@@ -146,4 +147,5 @@ int main(int argc, char* argv[]) {
     emit_wiki_markdown(output_file);
     return 0;
 }
+
 

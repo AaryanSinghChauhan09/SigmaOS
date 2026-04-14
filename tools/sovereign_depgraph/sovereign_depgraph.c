@@ -1,3 +1,4 @@
+#define SIGMA_EXCLUDE_STD_ALIASES
 // =============================================================================
 // SigmaOS — tools/sovereign_depgraph — sovereign_depgraph.c
 // Native C Replacement for scripts/generate_dependency_graph.py
@@ -117,4 +118,5 @@ int main(int argc, char* argv[]) {
     emit_dot(output);
     return 0;
 }
+
 

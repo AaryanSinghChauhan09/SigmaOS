@@ -1,3 +1,4 @@
+#define SIGMA_EXCLUDE_STD_ALIASES
 // =============================================================================
 // SigmaOS — tools/sovereign_pkg — sovereign_pkg_manager.c
 // Native C Replacement for userland/PackageManager/sigpkg.py
@@ -114,4 +115,5 @@ int main(int argc, char* argv[]) {
     else { printf("Unknown command: %s\n", argv[1]); return 1; }
     return 0;
 }
+
 

@@ -1,3 +1,4 @@
+#define SIGMA_EXCLUDE_STD_ALIASES
 // =============================================================================
 // SigmaOS — tools/auditor — sovereign_leadership_auditor.c
 // Native C Competitor Absorption & Equity Audit
@@ -41,4 +42,5 @@ int main() {
     printf("\nVERDICT: SigmaOS IS THE UNDISPUTED MARKET LEADER.\n");
     return 0;
 }
+
 
