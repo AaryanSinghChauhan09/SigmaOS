@@ -1,0 +1,22 @@
+{
+  "name": "SigmaOS Sovereign Zenith",
+  "short_name": "SigmaOS",
+  "start_url": "./index.html",
+  "display": "standalone",
+  "background_color": "#0a0a0c",
+  "theme_color": "#00f2ff",
+  "description": "The Absolute Sovereign Operating System Singularity.",
+  "icons": [
+    {
+      "src": "https://img.icons8.com/wired/512/sigma.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ],
+  "orientation": "landscape",
+  "categories": ["productivity", "utilities"],
+  "screenshots": [],
+  "related_applications": [],
+  "prefer_related_applications": false
+}

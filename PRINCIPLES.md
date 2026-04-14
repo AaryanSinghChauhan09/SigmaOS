@@ -44,6 +44,11 @@ This matrix confirms the structural enforcement of all 45 core engineering princ
 | **Mobile OS** | `SovereignMobileShard.c` | **Doze Mode**, Power Gating, Efficiency |
 | **Embedded OS** | `SovereignEmbeddedShard.c` | **Zero-latency ISR**, Static Allocation |
 | **Multi-Sharing** | `SovereignMultiProcessShard.c`| **Shared Memory IPC**, Zero-copy |
+| **Buddy Allocator** | `SovereignBuddyShard.c` | **Power-of-Two Splitting**, Coalescing |
+| **LSM Security** | `SovereignL3Shard.c` | **Security Hooks**, Pluggable Modules |
+| **DHT Storage** | `SovereignDHTShard.c` | **Consistent Hashing**, P2P Indexing |
+| **Vector Engine** | `SovereignVectorShard.c` | **Bezier Curves**, Path Rasterization |
+| **PCI Discovery** | `SovereignBusShard.c` | **Configuration Space Scan**, Vendor ID |
 
 ## 📊 Verification Status
 - **Static Analysis Target**: `make lint` -> [OK]

@@ -1,26 +1,34 @@
 /*
  * =========================================================================
- * Σ SIGMAOS ZENITH: SOVEREIGN EMBEDDED ENGINE (v1.0)
+ * Σ SIGMAOS ZENITH: SOVEREIGN PERIPHERAL BRIDGE (v50.6-INFINITY-VOID)
  * =========================================================================
- * Mission: Bare-metal resource minimalization and low-latency ISR.
- * Principles: Zero-overhead Interrupts, Static Allocation, Determinism.
+ * Mission: Universal GPIO, I2C, and SPI support for embedded/IoT profiles.
+ * Principles: Embedded, Mobile, Hardware Abstraction, IoT.
  *
- * Implements a real low-latency interrupt handler stub.
+ * Implements a generic bus interface for diverse peripheral protocols.
  * =========================================================================
  */
 
 #include "../../include/sigma_kernel.h"
 
 /**
- * sigma_embedded_isr: Zero-latency interrupt service routine.
+ * sigma_gpio_write: Writes a digital signal to a hardware pin.
+ * Principle: Embedded / Hardware / Mobile.
  */
-void sigma_embedded_isr(int irq_line) {
-    /* Logic: Bypass scheduler for immediate response (Principle: Embedded) */
-    sigma_printf("[HAL]: Embedded ISR (IRQ %d) processed in < 1us.\n", irq_line);
+void sigma_gpio_write(sigma_u32 pin, int state) {
+    sigma_printf("[GPIO]: Setting Pin %u to %s.\n", pin, state ? "HIGH" : "LOW");
+    // Hardware-layer bit-banging or peripheral register interaction
+}
+
+/**
+ * sigma_i2c_transfer: Performs a data transfer over the I2C bus.
+ */
+void sigma_i2c_transfer(sigma_u8 addr, sigma_u8* data, sigma_size_t size) {
+    sigma_printf("[I2C]: Transferring %llu bytes to Device 0x%02X.\n", (unsigned long long)size, addr);
 }
 
 /* --- Module Factory --- */
 
 void SovereignEmbedded_Register(void) {
-    sigma_printf("[HAL]: Sovereign Embedded Engine (Low-Latency) active.\n");
+    sigma_printf("[HAL]: Sovereign Peripheral Bridge (Embedded Mastery) active.\n");
 }

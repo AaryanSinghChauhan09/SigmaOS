@@ -21,7 +21,7 @@ def main():
     print(" SIGMAOS GLOBAL INTEGRATED AUDIT & CERTIFICATION ")
     print("====================================================")
     print(f"Timestamp: {get_timestamp()}")
-    print(f"Target: SigmaOS Zenith Supreme v3250.4")
+    print(f"Target: SigmaOS Zenith Supreme v50.0")
     print("----------------------------------------------------")
 
     all_passed = True
@@ -31,7 +31,7 @@ def main():
     if not p1: all_passed = False
     
     # 2. Algorithmic Logic Audit
-    p2, out2 = run_check("Kernel Algorithmic Logic (45 Principles)", "py tests/sovereign_logic_tester.py")
+    p2, out2 = run_check("Kernel Algorithmic Logic (50 Principles)", "py tests/sovereign_logic_tester.py")
     if not p2: all_passed = False
     
     # 3. Build System Integrity
