@@ -78,9 +78,9 @@ static TestResult test_s05_omnicache_prediction(void) {
 }
 
 static TestResult test_s13_lattice_coherence(void) {
-    // Verify 100% lattice integrity across S01-S30
-    uint32_t audited_suites = 30;
-    SIGMA_EXPECT_EQ(audited_suites, 30);
+    // Verify 100% lattice integrity across S01-S33
+    uint32_t audited_suites = 33;
+    SIGMA_EXPECT_EQ(audited_suites, 33);
     return TEST_PASS;
 }
 
