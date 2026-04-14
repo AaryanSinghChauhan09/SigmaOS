@@ -130,11 +130,11 @@ static inline sigma_bool sigma_err(sigma_err_t err) {
     return err < 0;
 }
 
-/* Sovereign stdarg parity (x86_64 ABI) */
-typedef char* sigma_va_list;
-#define sigma_va_start(ap, last) (ap = (sigma_va_list)&(last) + sizeof(last))
-#define sigma_va_arg(ap, type)   (*(type*)((ap += sizeof(type)) - sizeof(type)))
-#define sigma_va_end(ap)         (ap = (sigma_va_list)0)
+/* Sovereign stdarg parity (Compiler Builtins) */
+typedef __builtin_va_list  sigma_va_list;
+#define sigma_va_start(ap, last) __builtin_va_start(ap, last)
+#define sigma_va_arg(ap, type)   __builtin_va_arg(ap, type)
+#define sigma_va_end(ap)         __builtin_va_end(ap)
 
 #endif /* SIGMAOS_SIGMA_TYPES_H */
 
