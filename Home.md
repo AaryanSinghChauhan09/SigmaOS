@@ -7,11 +7,12 @@ Welcome to the definitive, fact-only repository for SigmaOS. This wiki contains 
 ## 🏛️ 1. Technical Specifications
 - **[SOVEREIGN_FINAL_SPEC.md](SOVEREIGN_FINAL_SPEC.md)**: The terminal technical record (Latency, Throughput, Purity).
 - **[TECHNICAL_SPECIFICATIONS.md](TECHNICAL_SPECIFICATIONS.md)**: Hardware-level silicon alignment and multi-suite specs.
+- **[SOVEREIGN_HIVE_SYNTHESIS.md](SOVEREIGN_HIVE_SYNTHESIS.md)**: Factual record of the 33-suite orchestration phases.
 - **[PERFORMANCE_ULTIMATUM.md](PERFORMANCE_ULTIMATUM.md)**: Zero-background and demand-shard execution facts.
+- **[SOVEREIGN_FINALITY_CERTIFICATE.md](SOVEREIGN_FINALITY_CERTIFICATE.md)**: Certified project enclosure status.
 
 ## 📊 2. Market Standing
 - **[MARKET_COMPETITIVE_AUDIT.md](MARKET_COMPETITIVE_AUDIT.md)**: Factual comparison against NT, Darwin, Linux, seL4, and QNX.
-- **[COMPETITOR_DOMINANCE_MATRIX.md](COMPETITOR_DOMINANCE_MATRIX.md)**: Multi-dimensional leadership indicators.
 
 ## ⚙️ 3. Structural Maps
 - **[GRAND_FINALE_SUPREMACY.md](GRAND_FINALE_SUPREMACY.md)**: Terminal 33-suite modularity map.
