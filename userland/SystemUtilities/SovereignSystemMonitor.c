@@ -15,8 +15,8 @@
 //   • Renders to SigmaShell TUI using ANSI-256 or to ZenithUI widget
 // =============================================================================
 
-#include <stdint.h>
-#include <stdbool.h>
+#include <sigma_types.h>
+
 
 // ── Process Telemetry Snapshot ────────────────────────────────────────────────
 typedef struct {
@@ -58,3 +58,4 @@ void sysmon_terminate_process(uint32_t pid);
 
 // Render the TUI monitor to a SigmaShell terminal (ANSI escape codes)
 void sysmon_render_tui(void);
+

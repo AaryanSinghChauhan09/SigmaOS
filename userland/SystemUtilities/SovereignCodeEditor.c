@@ -12,8 +12,8 @@
 //   • Integrated SovereignVersionControl (S10) and sigma-build (Tools)
 // =============================================================================
 
-#include <stdint.h>
-#include <stdbool.h>
+#include <sigma_types.h>
+
 
 #define MAX_OPEN_FILES      16
 #define MAX_LINE_LEN        2048
@@ -48,3 +48,4 @@ void editor_trigger_build(CodeBuffer* buffer);
 
 // Integrated Search: Unified Spotlight (S02) query within the editor
 void editor_global_search(const char* query);
+

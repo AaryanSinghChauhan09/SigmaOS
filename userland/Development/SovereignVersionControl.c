@@ -14,8 +14,8 @@
 //   • Sovereign object store uses S06_Storage block encryption by default
 // =============================================================================
 
-#include <stdint.h>
-#include <stdbool.h>
+#include <sigma_types.h>
+
 
 #define VCS_MAX_REPO_PATH  512
 #define VCS_SHA_LEN         20   // SHA-1 / 160-bit object hash (Git compat)
@@ -58,3 +58,4 @@ bool vcs_push(VCSRepository* repo, const char* remote_url);
 
 // Enable/disable APFS-style auto-snapshot on file operations
 void vcs_set_auto_snapshot(VCSRepository* repo, bool enabled);
+

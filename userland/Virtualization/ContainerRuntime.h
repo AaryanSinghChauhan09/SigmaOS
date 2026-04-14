@@ -1,7 +1,7 @@
 #ifndef SIGMA_CONTAINER_RUNTIME_H
 #define SIGMA_CONTAINER_RUNTIME_H
 
-#include <stdint.h>
+#include <sigma_types.h>
 
 // SigmaOS Hyper-Fast Containerization & Virtualization
 // Achieving Docker/LXC parity at the C11 native level
@@ -19,3 +19,4 @@ uint32_t virt_launch_vm(const char* disk_image, uint32_t ram_mb);
 void virt_attach_container(uint32_t container_id);
 
 #endif // SIGMA_CONTAINER_RUNTIME_H
+

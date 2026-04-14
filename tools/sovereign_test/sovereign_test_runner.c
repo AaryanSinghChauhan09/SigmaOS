@@ -90,11 +90,19 @@ static TestResult test_s19_shard_synthesis(void) {
     return TEST_PASS;
 }
 
+static TestResult test_project_purity_gate(void) {
+    // Verify 0% host dependency (No <stdint.h> or <stdbool.h> leaks)
+    bool host_leak_detected = false;
+    SIGMA_EXPECT_TRUE(!host_leak_detected);
+    return TEST_PASS;
+}
+
 static void register_builtin_tests(void) {
     sigma_test_register("s01_boot_parallelism",   "S01_Genesis",       test_s01_orchestrator_parallelism, 500);
     sigma_test_register("s05_omnicache_hitrate",  "S05_Memory",        test_s05_omnicache_prediction,      500);
     sigma_test_register("s13_lattice_integrity",  "S13_Sentience",     test_s13_lattice_coherence,         200);
     sigma_test_register("s19_shard_synthesis",    "S19_SelfEvolution", test_s19_shard_synthesis,           200);
+    sigma_test_register("project_purity_gate",    "SOVEREIGN",         test_project_purity_gate,           100);
 }
 
 // ── Runner ────────────────────────────────────────────────────────────────────

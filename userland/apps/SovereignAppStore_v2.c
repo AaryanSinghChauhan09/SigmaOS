@@ -2,8 +2,8 @@
 // Absorbs macOS App Store, Google Play, and Windows Store paradigms.
 // Secure-signed, sandboxed deployments via Sovereign Packages.
 
-#include <stdint.h>
-#include <stdbool.h>
+#include <sigma_types.h>
+
 
 #define SIGMA_MAX_INSTALLED_APPS  2048
 #define SIGMA_APP_NAME_LEN        64
@@ -42,3 +42,4 @@ void appstore_push_notification(uint32_t app_id, const char* title, const char* 
     // Routes to S02_ZenithUI NotificationEngine
     (void)app_id; (void)title; (void)body;
 }
+

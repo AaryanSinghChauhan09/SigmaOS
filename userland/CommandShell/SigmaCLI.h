@@ -1,8 +1,8 @@
 #ifndef SIGMA_CLI_SHELL_H
 #define SIGMA_CLI_SHELL_H
 
-#include <stdint.h>
-#include <stdbool.h>
+#include <sigma_types.h>
+
 
 // SigmaOS Command Shell (CLI)
 // Absorbing the pipeline power of PowerShell and the speed of Bash/Zsh
@@ -41,3 +41,4 @@ void shell_register_command(SigmaCommand* cmd);
 void shell_start_interactive(void);
 
 #endif // SIGMA_CLI_SHELL_H
+

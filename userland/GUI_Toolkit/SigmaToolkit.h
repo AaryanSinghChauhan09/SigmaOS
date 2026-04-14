@@ -1,7 +1,7 @@
 #ifndef SIGMA_GUI_TOOLKIT_H
 #define SIGMA_GUI_TOOLKIT_H
 
-#include <stdint.h>
+#include <sigma_types.h>
 
 // SigmaOS Native GUI Toolkit Wrapper
 // Absorbing the object-oriented structure of Qt and the styling flexibility of GTK
@@ -19,3 +19,4 @@ void ui_render(Widget* widget);
 void ui_set_event_listener(Widget* widget, void (*event_handler)(uint32_t event_type));
 
 #endif // SIGMA_GUI_TOOLKIT_H
+

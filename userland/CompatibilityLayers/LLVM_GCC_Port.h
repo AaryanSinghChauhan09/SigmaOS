@@ -9,3 +9,4 @@ void compat_load_gcc_toolchain();
 void compat_provide_posix_translation();
 
 #endif // SIGMA_COMPAT_LAYER_H
+

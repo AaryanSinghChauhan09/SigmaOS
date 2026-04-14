@@ -12,8 +12,8 @@
 //   • Native UTF-8 and Emoji support via SovereignTypography engine
 // =============================================================================
 
-#include <stdint.h>
-#include <stdbool.h>
+#include <sigma_types.h>
+
 
 #define TERM_ROWS       40
 #define TERM_COLS       120
@@ -58,3 +58,4 @@ void term_split_pane(SigmaTerminal* term, bool vertical);
 
 // Export current buffer to VFS (Log audit parity)
 void term_export_buffer(SigmaTerminal* term, const char* path);
+

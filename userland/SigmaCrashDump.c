@@ -128,3 +128,4 @@ void SigmaCrashDump_Main(int argc, char **argv) {
         sigma_crash_analyze_vmcore(CRASH_DUMP_PATH);
     }
 }
+

@@ -14,3 +14,4 @@ void continuity_sync_clipboard(const char* mime_type, void* data, uint32_t lengt
 void continuity_manage_iot_device(uint32_t device_id, uint8_t state);
 
 #endif // SIGMA_CROSS_DEVICE_H
+

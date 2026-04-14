@@ -1,7 +1,7 @@
 #ifndef SIGMA_BACKUP_RESTORE_H
 #define SIGMA_BACKUP_RESTORE_H
 
-#include <stdint.h>
+#include <sigma_types.h>
 
 // SigmaOS Sovereign Backup & Restore Utility
 // Absorbs Apple Time Machine and ZFS snapshot paradigms.
@@ -16,3 +16,4 @@ void util_restore_from_snapshot(const char* volume_mount, uint32_t snapshot_id);
 void util_defragment_and_trim(const char* volume_mount);
 
 #endif // SIGMA_BACKUP_RESTORE_H
+

@@ -1,7 +1,7 @@
 #ifndef SIGMA_CLI_EXTENSIONS_H
 #define SIGMA_CLI_EXTENSIONS_H
 
-#include <stdint.h>
+#include <sigma_types.h>
 
 // SigmaOS Command Shell - Extended Utility Set
 // The second wave of native commands, built for text streams, networking, and disk management.
@@ -27,3 +27,4 @@ int cmd_sigaguard(int argc, char** argv);
 int cmd_sigahardware(int argc, char** argv);
 
 #endif // SIGMA_CLI_EXTENSIONS_H
+

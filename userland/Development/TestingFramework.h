@@ -1,7 +1,7 @@
 #ifndef SIGMA_PROFILING_TESTING_H
 #define SIGMA_PROFILING_TESTING_H
 
-#include <stdint.h>
+#include <sigma_types.h>
 
 // SigmaOS Development Profiling & Testing Framework
 // Hardware-level hooks for TDD and kernel tracing.
@@ -16,3 +16,4 @@ void dev_profiler_start_tracing(uint32_t target_pid);
 void dev_api_generate_docs(const char* module_path, const char* output_repo);
 
 #endif // SIGMA_PROFILING_TESTING_H
+
