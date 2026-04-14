@@ -13,7 +13,14 @@
 #include "SovereignLibC.h"
 #include "SovereignModule.h"
 
-#define SIGMA_ASSERT(cond, msg) \
+#ifndef SIGMA_ASSERT
+ #ifdef __SIGMAOS__
+  #define SIGMA_ASSERT(cond, msg) \
+    do { if (!(cond)) { sigma_printf("Σ [PANIC]: %s (%s:%d)\n", msg, __FILE__, __LINE__); for(;;); } } while(0)
+ #else
+  #define SIGMA_ASSERT(cond, msg) \
     do { if (!(cond)) { sigma_printf("Σ [ASSERTION FAILED]: %s (%s:%d)\n", msg, __FILE__, __LINE__); sigma_exit(1); } } while(0)
+ #endif
+#endif
 
 #endif /* SIGMA_BASE_H */
