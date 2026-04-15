@@ -12,5 +12,7 @@
 -Wno-unknown-attributes
 -nostdinc
 -include include/SovereignPurity.h
+-fms-extensions
+
 
 

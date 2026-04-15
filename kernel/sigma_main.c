@@ -35,6 +35,7 @@
 #include "kernel/suites/S22_IPC/shards/sigma_ipc.h"
 #include "kernel/suites/S23_Biosphere/shards/sigma_biosphere.h"
 #include "kernel/suites/S24_Simulation/shards/sigma_simulation.h"
+#include "kernel/suites/S25_ZeroTrust/shards/sigma_zerotrust.h"
 #include "userland/init/sigma_init.h"
 #include "userland/ipc/sigma_ipc.h"
 #include "userland/proc/sigma_proc.h"
@@ -134,6 +135,10 @@ static void sigma_kernel_phase(void) {
     sigma_net_if_up(1);
     sigma_net_route_add(0, 0, 0xC0A800FE, 1, 1); /* default GW */
 
+    /* S25 Zero-Trust Verify */
+    sigma_zerotrust_init();
+    sigma_verify_shard("S11_PQC");
+
     /* PQC — init + self-test */
     sigma_pqc_init();
     sigma_pqc_selftest();
@@ -193,7 +198,7 @@ static void sigma_final_report(void) {
     sigma_printf("\n");
     sigma_printf("S ══════════════════════════════════════════════════════\n");
     sigma_printf("  SIGMAOS SOVEREIGN v4.0 — SYSTEM UP\n");
-    sigma_printf("  24 Suites | GIV Verified | PQC Hardened | Neural-Driven\n");
+    sigma_printf("  25 Suites | GIV Verified | PQC Hardened | Neural-Driven\n");
     sigma_printf("S ══════════════════════════════════════════════════════\n\n");
 
     sigma_boot_report();
