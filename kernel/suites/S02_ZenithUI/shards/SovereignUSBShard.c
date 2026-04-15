@@ -1,7 +1,7 @@
 #include "sigma_base.h"
 
 #include "SovereignHardwareIOZenith.h"
-#include "SovereignRegistry.h"
+#include "SovereignLatticeRegistry.h"
 #include "sigma_libc.h"
 
 /*

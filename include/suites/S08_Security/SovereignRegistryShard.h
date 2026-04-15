@@ -5,6 +5,6 @@
 
 void        sigma_registry_set   (const char* key, const char* value);
 const char* sigma_registry_query (const char* key);
-void        SovereignRegistryShard_Init (void);
+void        SovereignLatticeRegistry.hard_Init (void);
 
 #endif

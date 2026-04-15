@@ -1,6 +1,6 @@
 /* S SIGMAOS: S04_HAL Registry */
 #include "sigma_base.h"
-#include "SovereignRegistry.h"
+#include "SovereignLatticeRegistry.h"
 
 extern void hal_init(void);
 extern void acpi_init(void);

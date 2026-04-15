@@ -10,7 +10,7 @@
 #define SIGMA_KERNEL_H
 
 #include "sigma_base.h"
-#include "SovereignRegistry.h"
+#include "SovereignLatticeRegistry.h"
 #include "SovereignInterconnect.h"
 
 /* 33-Suite Orchestration Entry Points */

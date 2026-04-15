@@ -1,6 +1,6 @@
 /* S SIGMAOS: S31_GlobalGovernance Registry */
 #include "sigma_base.h"
-#include "SovereignRegistry.h"
+#include "SovereignLatticeRegistry.h"
 
 void S31_GlobalGovernance_Register(void) {
     SovereignRegistry_Register("S31_GlobalGovernance", 0, NULL);

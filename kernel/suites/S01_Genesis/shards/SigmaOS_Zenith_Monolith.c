@@ -10,7 +10,7 @@
 
 #include "SovereignOSBasicsZenith.h"
 #include "sigma_kernel.h"
-#include "SovereignRegistry.h"
+#include "SovereignLatticeRegistry.h"
 
 // Forward declaration for the amalgamation register function (usually in a header)
 void SovereignDistroAmalgamation_Register(void);

@@ -1,6 +1,6 @@
 /* S SIGMAOS: S09_Intelligence Registry */
 #include "sigma_base.h"
-#include "SovereignRegistry.h"
+#include "SovereignLatticeRegistry.h"
 
 extern void neural_engine_init(void);
 

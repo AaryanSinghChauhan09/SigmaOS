@@ -1,6 +1,6 @@
 /* S SIGMAOS: S13_Sentience Registry */
 #include "sigma_base.h"
-#include "SovereignRegistry.h"
+#include "SovereignLatticeRegistry.h"
 
 extern void forensic_logger_init(void);
 extern void self_healer_init(void);

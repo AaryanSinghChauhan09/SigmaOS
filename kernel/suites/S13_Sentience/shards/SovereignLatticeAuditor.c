@@ -8,7 +8,7 @@
 
 #include "sigma_base.h"
 #include "sigma_types.h"
-#include "SovereignRegistry.h"
+#include "SovereignLatticeRegistry.h"
 #include "sigma_types.h"
 #include "sigma_types.h"
 

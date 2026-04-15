@@ -1,6 +1,6 @@
 /* S SIGMAOS: S05_Memory Registry */
 #include "sigma_base.h"
-#include "SovereignRegistry.h"
+#include "SovereignLatticeRegistry.h"
 
 void S05_Memory_Register(void) {
     SovereignRegistry_Register("S05_Memory", 0, NULL);

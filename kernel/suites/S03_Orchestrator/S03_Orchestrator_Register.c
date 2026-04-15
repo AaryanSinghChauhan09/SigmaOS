@@ -1,6 +1,6 @@
 /* S SIGMAOS: S03_Orchestrator Registry */
 #include "sigma_base.h"
-#include "SovereignRegistry.h"
+#include "SovereignLatticeRegistry.h"
 
 extern void dag_init(void);
 

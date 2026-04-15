@@ -1,6 +1,6 @@
 /* S SIGMAOS: S07_Network Registry */
 #include "sigma_base.h"
-#include "SovereignRegistry.h"
+#include "SovereignLatticeRegistry.h"
 
 extern void tcp_fsm_init(void);
 

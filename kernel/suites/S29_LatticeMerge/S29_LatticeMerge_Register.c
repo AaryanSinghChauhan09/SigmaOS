@@ -1,6 +1,6 @@
 /* S SIGMAOS: S29_LatticeMerge Registry */
 #include "sigma_base.h"
-#include "SovereignRegistry.h"
+#include "SovereignLatticeRegistry.h"
 
 void S29_LatticeMerge_Register(void) {
     SovereignRegistry_Register("S29_LatticeMerge", 0, NULL);

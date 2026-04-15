@@ -1,6 +1,6 @@
 /* S SIGMAOS: S15_DevNexus Registry */
 #include "sigma_base.h"
-#include "SovereignRegistry.h"
+#include "SovereignLatticeRegistry.h"
 
 extern void compiler_frontend_init(void);
 

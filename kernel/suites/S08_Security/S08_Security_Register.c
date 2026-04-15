@@ -1,6 +1,6 @@
 /* S SIGMAOS: S08_Security Registry */
 #include "sigma_base.h"
-#include "SovereignRegistry.h"
+#include "SovereignLatticeRegistry.h"
 
 extern void crypto_engine_init(void);
 
