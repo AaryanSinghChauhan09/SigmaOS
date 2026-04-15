@@ -166,9 +166,11 @@ void sigma_printf(const char* format, ...) {
         if (*p == '%' && *(p + 1) != '\0') {
             p++;
             switch (*p) {
-                case 's':
-                    sigma_print(sigma_va_arg(args, const char*));
+                case 's': {
+                    const char* s = sigma_va_arg(args, const char*);
+                    sigma_print(s ? s : "(null)");
                     break;
+                }
                 case 'd':
                 case 'i':
                     sigma_print_num((sigma_u64)sigma_va_arg(args, int));
@@ -210,6 +212,11 @@ void* sigma_slab_alloc_raw(sigma_size_t size) {
         // Linux: PROT_READ=1, PROT_WRITE=2 -> 3
         // MAP_PRIVATE=0x02, MAP_ANONYMOUS=0x20 -> 0x22
         g_heap_start = sigma_mmap(SIGMA_NULL, HEAP_SIZE, 3, 0x22, -1, 0);
+        if (g_heap_start == (void*)-1) {
+            sigma_printf("Σ [ERROR]: mmap failed for heap shard.\n");
+            g_heap_start = SIGMA_NULL;
+            return SIGMA_NULL;
+        }
     }
     
     if (g_heap_used + size > HEAP_SIZE) return SIGMA_NULL;

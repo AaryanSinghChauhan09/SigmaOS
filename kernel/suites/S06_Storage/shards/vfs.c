@@ -58,7 +58,10 @@ vfs_node_t* sigma_vfs_create_node(const char* name, vfs_node_type_t type, vfs_no
     if (!node) return SIGMA_NULL;
     
     sigma_memset(node, 0, sizeof(vfs_node_t));
-    sigma_memcpy(node->name, name, sigma_strlen(name));
+    sigma_size_t name_len = sigma_strlen(name);
+    if (name_len > 63) name_len = 63;
+    sigma_memcpy(node->name, name, name_len);
+    node->name[name_len] = '\0';
     node->type = type;
     node->parent = parent;
     
