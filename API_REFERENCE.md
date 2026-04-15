@@ -1,6 +1,17 @@
-# 📘 SigmaOS Sovereign API Reference (v3250.4)
+# 📘 SigmaOS Sovereign API Reference (v4.0 Singularity)
 
-This document details the primary C11 exported functions across the Sovereign Kernel Principle Shards.
+This document details the primary C11 exported functions across the Sovereign Kernel 33-Suite Lattice.
+
+## 🏗️ S01: Genesis (Foundation)
+
+### Master Types (`SovereignCommon.h`)
+- `sigma_sz_t`: Unified 64-bit size type.
+- `sigma_err_t`: Standard error return type (`SIGMA_OK`, etc.).
+
+### Registry API (`SovereignRegistry.h`)
+- `SovereignRegistry_Init()`: Bootstraps the master silicon registry.
+- `SovereignRegistry_Register(name, category, init_fn)`: Binds a Sovereign Shard to the lattice.
+- `SovereignRegistry_Audit()`: Verifies the integrity of all active shards via hashing.
 
 ## 🧠 S10: Orchestration (AI, ML, DS, UDF)
 
