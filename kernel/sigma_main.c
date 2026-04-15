@@ -31,6 +31,7 @@
 #include "kernel/suites/S18_USB/shards/sigma_usb.h"
 #include "kernel/suites/S19_Parallelism/shards/sigma_gcd.h"
 #include "kernel/suites/S20_Interconnect/shards/sigma_interconnect.h"
+#include "kernel/suites/S21_Userland/shards/sigma_shell.h"
 #include "userland/init/sigma_init.h"
 #include "userland/ipc/sigma_ipc.h"
 #include "userland/proc/sigma_proc.h"
@@ -169,6 +170,10 @@ static void sigma_userspace_phase(void) {
     /* PID-1 */
     sigma_init_start();
 
+    /* S21 Userland Shell */
+    sigma_shell_init();
+    sigma_shell_run();
+
     sigma_boot_phase_advance(BOOT_PHASE_USERSPACE);
 }
 
@@ -177,7 +182,7 @@ static void sigma_final_report(void) {
     sigma_printf("\n");
     sigma_printf("Σ ══════════════════════════════════════════════════════\n");
     sigma_printf("  SIGMAOS SOVEREIGN v4.0 — SYSTEM UP\n");
-    sigma_printf("  20 Suites | GIV Verified | PQC Hardened | Neural-Driven\n");
+    sigma_printf("  21 Suites | GIV Verified | PQC Hardened | Neural-Driven\n");
     sigma_printf("Σ ══════════════════════════════════════════════════════\n\n");
 
     sigma_boot_report();

@@ -1,9 +1,9 @@
 /*
  * =========================================================================
- * Σ SIGMAOS: SUPREME TYPES (v3.0 — LATTICE SHARD)
+ * Σ SIGMAOS: SUPREME TYPES (v4.0 — DEFENSIVE LATTICE)
  * =========================================================================
  * Mission: Universal type definitions for all Sovereign Shards.
- * Design: Wraps SovereignCommon.h to ensure zero-include purity.
+ * Design: Hardened against toolchain stdint.h preamble recursion.
  * =========================================================================
  */
 
@@ -12,13 +12,26 @@
 
 #include "SovereignCommon.h"
 
+/* 
+ * ── Ultra-Defensive Guards ─────────────────────────────────────────────── 
+ * We define internal macros to signal "types already defined" to any
+ * potential toolchain headers that might sneak in.
+ */
+#ifndef _STDINT_H
+#define _STDINT_H
+#endif
+#ifndef _STDINT_H_
+#define _STDINT_H_
+#endif
+#ifndef __CLANG_STDINT_H
+#define __CLANG_STDINT_H
+#endif
+#ifndef _SIZE_T
+#define _SIZE_T
+#endif
+
 /* ── Compatibility Aliases ────────────────────────────────────────────── */
 #ifndef SIGMA_EXCLUDE_STD_ALIASES
-  /* 
-   * These aliases are provided for industrial-grade parity with C99/C11.
-   * We guard against toolchain stdint.h to prevent recursive preamble loops.
-   */
-  #if !defined(_STDINT_H) && !defined(_STDINT_H_) && !defined(_GCC_STDINT_H)
     typedef sigma_u8   uint8_t;
     typedef sigma_u16  uint16_t;
     typedef sigma_u32  uint32_t;
@@ -27,12 +40,9 @@
     typedef sigma_i16  int16_t;
     typedef sigma_i32  int32_t;
     typedef sigma_i64  int64_t;
-  #endif
 
-  #if !defined(_SIZE_T) && !defined(_SIZE_T_DEFINED) && !defined(__SIZE_TYPE__)
     typedef sigma_size_t  size_t;
     typedef sigma_ssize_t ssize_t;
-  #endif
 #endif
 
 #endif /* SIGMAOS_SUPREME_TYPES_H */

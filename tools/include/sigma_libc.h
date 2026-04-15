@@ -12,7 +12,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include <stdint.h>
+#include "SovereignCommon.h"
 #include <stdbool.h>
 
 #define sigma_printf(...)    printf(__VA_ARGS__)
