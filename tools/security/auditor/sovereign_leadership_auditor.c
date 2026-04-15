@@ -10,8 +10,8 @@
 //   - Supremacy Score (Features unique to SigmaOS)
 // =============================================================================
 
-#include "sigma_libc.h"
-#include <sigma_types.h>
+#include "suites/S01_Genesis/shards/sigma_libc.h"
+#include "suites/S01_Genesis/shards/sigma_types.h"
 
 void audit_purity(void) {
     sigma_printf("[audit] Scanning for legacy runtimes... 0 found. PURITY 100%.\n");

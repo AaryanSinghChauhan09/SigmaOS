@@ -10,8 +10,8 @@
 //     cache hit/miss ratios, and thermal junctions during execution.
 // =============================================================================
 
-#include "sigma_libc.h"
-#include <sigma_types.h>
+#include "suites/S01_Genesis/shards/sigma_libc.h"
+#include "suites/S01_Genesis/shards/sigma_types.h"
 
 typedef struct {
     uintptr_t pc;

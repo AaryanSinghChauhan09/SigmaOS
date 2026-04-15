@@ -12,10 +12,10 @@
 // Zero external deps — single-file C11, no Python runtime
 // =============================================================================
 
-#include "sigma_libc.h"
-#include "sigma_libc.h"
-#include "sigma_libc.h"
-#include <sigma_types.h>
+#include "suites/S01_Genesis/shards/sigma_libc.h"
+#include "suites/S01_Genesis/shards/sigma_libc.h"
+#include "suites/S01_Genesis/shards/sigma_libc.h"
+#include "suites/S01_Genesis/shards/sigma_types.h"
 
 #include <sys/stat.h>
 

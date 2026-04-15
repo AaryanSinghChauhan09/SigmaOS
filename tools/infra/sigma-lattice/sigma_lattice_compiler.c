@@ -11,9 +11,9 @@
 //         pluggable, hot-swappable module.
 // =============================================================================
 
-#include "sigma_libc.h"
-#include "sigma_libc.h"
-#include "sigma_libc.h"
+#include "suites/S01_Genesis/shards/sigma_libc.h"
+#include "suites/S01_Genesis/shards/sigma_libc.h"
+#include "suites/S01_Genesis/shards/sigma_libc.h"
 
 void analyze_and_split(const char* source_path) {
     sigma_printf("[lattice] Analyzing AST for: %s\n", source_path);

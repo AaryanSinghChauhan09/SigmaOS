@@ -13,9 +13,9 @@
 //   • Parallel execution via S03_Orchestrator work-stealing concepts
 // =============================================================================
 
-#include "sigma_libc.h"
-#include "sigma_libc.h"
-#include "sigma_libc.h"
+#include "suites/S01_Genesis/shards/sigma_libc.h"
+#include "suites/S01_Genesis/shards/sigma_libc.h"
+#include "suites/S01_Genesis/shards/sigma_libc.h"
 
 
 #define BUILD_VERSION "2.0.0"

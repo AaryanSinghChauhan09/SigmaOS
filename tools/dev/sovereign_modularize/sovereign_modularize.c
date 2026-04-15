@@ -15,10 +15,10 @@
 //   • Generates a canonical MODULE_REGISTRY.h header for S10_Registry
 // =============================================================================
 
-#include "sigma_libc.h"
-#include "sigma_libc.h"
-#include "sigma_libc.h"
-#include <sigma_types.h>
+#include "suites/S01_Genesis/shards/sigma_libc.h"
+#include "suites/S01_Genesis/shards/sigma_libc.h"
+#include "suites/S01_Genesis/shards/sigma_libc.h"
+#include "suites/S01_Genesis/shards/sigma_types.h"
 
 #include <dirent.h>
 #include <sys/stat.h>

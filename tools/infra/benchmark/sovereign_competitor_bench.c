@@ -12,8 +12,8 @@
 //   • Empirically prove SigmaOS is 5x–50x more efficient than legacy OSs.
 // =============================================================================
 
-#include "sigma_libc.h"
-#include <sigma_types.h>
+#include "suites/S01_Genesis/shards/sigma_libc.h"
+#include "suites/S01_Genesis/shards/sigma_types.h"
 #include <time.h>
 
 static uint64_t rdtsc(void) {

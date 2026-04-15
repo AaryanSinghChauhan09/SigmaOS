@@ -11,10 +11,10 @@
 // Zero external deps — compiles with: gcc -std=c11 -O2 sovereign_audit.c -o sigma-audit
 // =============================================================================
 
-#include "sigma_libc.h"
-#include "sigma_libc.h"
-#include "sigma_libc.h"
-#include <sigma_types.h>
+#include "suites/S01_Genesis/shards/sigma_libc.h"
+#include "suites/S01_Genesis/shards/sigma_libc.h"
+#include "suites/S01_Genesis/shards/sigma_libc.h"
+#include "suites/S01_Genesis/shards/sigma_types.h"
 
 #include <dirent.h>
 #include <sys/stat.h>
