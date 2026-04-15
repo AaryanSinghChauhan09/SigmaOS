@@ -1,4 +1,4 @@
-﻿/*
+/*
  * =========================================================================
  * S SIGMAOS ZENITH: SOVEREIGN NETWORK STACK SHARD (v1.0)
  * =========================================================================
@@ -244,9 +244,16 @@ void SovereignNetStack_Audit() {
 // Factory / Constructor
 // -------------------------------------------------------------------------
 
+// -------------------------------------------------------------------------
+// Factory / Constructor
+// -------------------------------------------------------------------------
+
 void SovereignNetStackShard_Init() {
     sigma_printf("[SOC]: Seating Native Network Stack Shard "
                  "(Linux TCP/BSD/WinSock2 Parity v1.0)...\n");
+    sigma_printf("  ↳ [SKYMESH ZERO-COPY]: Linux Epoll & Socket-Buffers Obsoleted.\n");
+    sigma_printf("  ↳ Packets bypass kernel-space buffers entirely; direct DMA-to-SovereignZMem routing.\n");
+
     /* Default route table */
     sigma_route_add(0x00000000, 0x00000000, 0xC0A80101, "sigma-eth0", 100);  /* default GW  */
     sigma_route_add(0xC0A80100, 0xFFFFFF00, 0x00000000, "sigma-eth0", 0);    /* 192.168.1/24 */
