@@ -17,6 +17,7 @@ Welcome to the definitive, fact-only repository for SigmaOS. This wiki contains 
 - **[GLOSSARY.md](GLOSSARY.md)**: Essential terminology for the Sovereign Singularity.
 
 ## ⚙️ 3. Structural & Developer Records
+- **[SOVEREIGN_LATTICE_ARCH_v4.md](SOVEREIGN_LATTICE_ARCH_v4.md)**: Absolute Guide to the Modularized 33-Suite Architecture.
 - **[GRAND_FINALE_SUPREMACY.md](GRAND_FINALE_SUPREMACY.md)**: Terminal 33-suite modularity map.
 - **[API_REFERENCE.md](API_REFERENCE.md)**: Sovereign Registry and Interconnect API definitions.
 - **[SHARD_GRAPH.md](SHARD_GRAPH.md)**: Visual mapping of inter-suite dependencies.
