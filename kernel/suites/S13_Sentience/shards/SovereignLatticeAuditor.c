@@ -9,8 +9,8 @@
 #include "sigma_base.h"
 #include "sigma_types.h"
 #include "SovereignRegistry.h"
-#include <stdint.h>
-#include <stdbool.h>
+#include "sigma_types.h"
+#include "sigma_types.h"
 
 static uint32_t g_audited_count = 0;
 static bool g_sealed = false;

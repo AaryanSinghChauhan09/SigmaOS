@@ -8,7 +8,7 @@
  */
 
 #include "sigma_base.h"
-#include <stdint.h>
+#include "sigma_types.h"
 
 typedef struct {
     uint64_t registers[32];

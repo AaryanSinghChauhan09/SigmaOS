@@ -16,7 +16,8 @@ sigma_ssize_t sigma_read(int fd, void* buf, sigma_size_t count);
 int           sigma_open(const char* filename, int flags, int mode);
 int           sigma_close(int fd);
 void*         sigma_mmap(void* addr, sigma_size_t length, int prot, int flags, int fd, sigma_u64 offset);
-
+void*         sigma_malloc(sigma_size_t size);
+void          sigma_free(void* ptr);
 // --- libc utility functions ---
 sigma_size_t  sigma_strlen(const char* s);
 void*         sigma_memset(void* s, int c, sigma_size_t n);

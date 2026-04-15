@@ -22,11 +22,11 @@ if (Get-Command make -ErrorAction SilentlyContinue) {
 if (Get-Command cppcheck -ErrorAction SilentlyContinue) {
     Write-Host "`nΣ [STEP 2]: RUNNING CPPCHECK SECURITY INSPECTION..." -ForegroundColor Yellow
     & cppcheck --enable=all --error-exitcode=1 --std=c11 `
-      -I kernel/ -I libc/ `
+      -I include/ -I libc/ `
       --suppress=missingIncludeSystem `
       --suppress=constParameterPointer `
       --suppress=unusedStructMember `
-      kernel/ libc/
+      kernel/suites/ libc/
 } else {
     Write-Host "[SKIP]: CPPCHECK NOT FOUND. ADVISING INDUSTRIAL INSTALLATION." -ForegroundColor Gray
 }

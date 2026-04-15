@@ -10,7 +10,7 @@
 #ifndef SOVEREIGN_XV6_BRIDGE_H
 #define SOVEREIGN_XV6_BRIDGE_H
 
-#include "SovereignLibC.h"
+#include "sigma_libc.h"
 #include "SigmaOOP.h"
 
 // -------------------------------------------------------------------------

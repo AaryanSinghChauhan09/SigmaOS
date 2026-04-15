@@ -8,7 +8,7 @@
  */
 
 #include "sigma_base.h"
-#include <stdint.h>
+#include "sigma_types.h"
 
 #define MAX_TASKS 32
 
@@ -30,7 +30,7 @@ void dag_init(void) {
 void dag_add_task(const char* name, void (*action)(void)) {
     if (g_task_count >= MAX_TASKS) return;
     SovereignTask* t = &g_task_registry[g_task_count++];
-    strncpy(t->name, name, 31);
+    sigma_strncpy(t->name, name, 31);
     t->action = action;
     t->dep_count = 0;
     t->completed = false;

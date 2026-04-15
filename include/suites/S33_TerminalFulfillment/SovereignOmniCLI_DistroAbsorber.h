@@ -16,7 +16,7 @@
 #ifndef SOVEREIGN_OMNICLI_DISTRO_ABSORBER_H
 #define SOVEREIGN_OMNICLI_DISTRO_ABSORBER_H
 
-#include "SovereignLibC.h"
+#include "sigma_libc.h"
 
 /* -------------------------------------------------------------------------
  * Unified Absorption Token Structure

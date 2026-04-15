@@ -79,7 +79,7 @@ sigma_err_t sigma_vfs_mount(const char* path, vfs_node_t* device_node) {
 
 sigma_ssize_t sigma_vfs_read(vfs_node_t* node, void* buffer, sigma_size_t size) {
     if (node && node->read) {
-        return node->read(node, 0, buffer, size);
+        return node->sigma_read(node, 0, buffer, size);
     }
     return (sigma_ssize_t)SIGMA_EIO;
 }

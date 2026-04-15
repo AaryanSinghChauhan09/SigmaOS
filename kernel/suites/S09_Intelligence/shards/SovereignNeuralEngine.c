@@ -8,7 +8,7 @@
  */
 
 #include "sigma_base.h"
-#include <stdint.h>
+#include "sigma_types.h"
 #include <math.h>
 
 #define MAX_NEURONS 256

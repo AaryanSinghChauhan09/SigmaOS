@@ -11,7 +11,7 @@
 #ifndef SOVEREIGN_INTERFERENCE_GUARD_H
 #define SOVEREIGN_INTERFERENCE_GUARD_H
 
-#include "SovereignLibC.h"
+#include "sigma_libc.h"
 #include "SigmaOOP.h"
 
 // -------------------------------------------------------------------------

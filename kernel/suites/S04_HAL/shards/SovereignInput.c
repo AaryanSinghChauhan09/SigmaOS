@@ -198,7 +198,7 @@ void sigma_input_event(SigmaInputDevice_t *dev, sigma_u16 type, sigma_u16 code, 
 
 void sigma_input_sync(SigmaInputDevice_t *dev) {
     enqueue_event(dev, EV_SYN, SYN_REPORT, 0);
-    /* In reality, wake up any tasks blocking on read() or poll() of /dev/input/eventX */
+    /* In reality, wake up any tasks blocking on sigma_read() or poll() of /dev/input/eventX */
 }
 
 /* -----------------------------------------------------------------------

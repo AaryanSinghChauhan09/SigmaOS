@@ -81,7 +81,7 @@ sigma_err_t sigma_vtable_dispatch_read(const char* name,
         if (sigma_streq(s_object_pool[i].name, name)) {
             SovereignObject_t* obj = &s_object_pool[i];
             if (obj->vtable && obj->vtable->read) {
-                return obj->vtable->read(obj->instance, buf, size);
+                return obj->vtable->sigma_read(obj->instance, buf, size);
             }
             return SIGMA_ENOTSUP;
         }
@@ -98,7 +98,7 @@ sigma_err_t sigma_vtable_dispatch_write(const char* name,
         if (sigma_streq(s_object_pool[i].name, name)) {
             SovereignObject_t* obj = &s_object_pool[i];
             if (obj->vtable && obj->vtable->write) {
-                return obj->vtable->write(obj->instance, buf, size);
+                return obj->vtable->sigma_write(obj->instance, buf, size);
             }
             return SIGMA_ENOTSUP;
         }

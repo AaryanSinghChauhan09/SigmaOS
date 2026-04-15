@@ -11,7 +11,7 @@
 #define SOVEREIGN_OMNI_SHARD_H
 
 #include "sigma_types.h"
-#include "SovereignLibC.h"
+#include "sigma_libc.h"
 #include "sigma_libc.h"
 
 /* =========================================================================

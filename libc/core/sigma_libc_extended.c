@@ -15,7 +15,7 @@
 // =============================================================================
 
 #include <sigma_types.h>
-#include <stdarg.h>
+#include "sigma_types.h"
 
 
 // ── Memory Primitives (no glibc) ──────────────────────────────────────────────

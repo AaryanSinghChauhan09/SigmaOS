@@ -13,7 +13,7 @@
 
 #include "sigma_types.h"
 #include "sigma_libc.h"
-#include "SovereignLibC.h"
+#include "sigma_libc.h"
 #include "SigmaOOP.h"
 
 #endif /* SOVEREIGN_TOOL_HEADER_H */

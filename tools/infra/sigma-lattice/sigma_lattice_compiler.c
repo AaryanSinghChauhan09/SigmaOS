@@ -11,12 +11,12 @@
 //         pluggable, hot-swappable module.
 // =============================================================================
 
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
+#include "sigma_libc.h"
+#include "sigma_libc.h"
+#include "sigma_libc.h"
 
 void analyze_and_split(const char* source_path) {
-    printf("[lattice] Analyzing AST for: %s\n", source_path);
+    sigma_printf("[lattice] Analyzing AST for: %s\n", source_path);
     // 1. Identify function boundaries
     // 2. Extract into separate .c sub-shards
     // 3. Generate Sovereign Attribution headers
@@ -24,16 +24,16 @@ void analyze_and_split(const char* source_path) {
 }
 
 int main(int argc, char** argv) {
-    printf("SigmaOS Quantum Lattice Compiler v1.0\n");
-    printf("======================================\n");
+    sigma_printf("SigmaOS Quantum Lattice Compiler v1.0\n");
+    sigma_printf("======================================\n");
     
     if (argc < 2) {
-        printf("Usage: sigma-lattice <source_file>\n");
+        sigma_printf("Usage: sigma-lattice <source_file>\n");
         return 1;
     }
 
     analyze_and_split(argv[1]);
-    printf("\nLattice synthesis complete. Codebase is now Quantum-Modularized.\n");
+    sigma_printf("\nLattice synthesis complete. Codebase is now Quantum-Modularized.\n");
     
     return 0;
 }

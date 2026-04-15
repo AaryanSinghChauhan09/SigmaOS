@@ -18,9 +18,9 @@
 //   • Tab-completion hooked into VFS readdir + command table
 // =============================================================================
 
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
+#include "sigma_libc.h"
+#include "sigma_libc.h"
+#include "sigma_libc.h"
 #include <sigma_types.h>
 
 #include <ctype.h>
@@ -46,7 +46,7 @@ static uint32_t history_head = 0;
 static uint32_t history_len  = 0;
 
 static void history_push(const char* line) {
-    strncpy(history[history_head % SIGMA_HISTORY_SIZE], line, SIGMA_LINE_MAX - 1);
+    sigma_strncpy(history[history_head % SIGMA_HISTORY_SIZE], line, SIGMA_LINE_MAX - 1);
     history_head++;
     if (history_len < SIGMA_HISTORY_SIZE) history_len++;
 }
@@ -92,51 +92,51 @@ static const ShellBuiltin builtins[] = {
 
 static int builtin_help(int argc, char** argv) {
     (void)argc; (void)argv;
-    printf(VT_BOLD VT_CYAN "\n  SigmaShell v%s — Built-in Commands\n" VT_RESET, SIGMA_SHELL_VERSION);
-    printf("  %-14s  %s\n", "─────────────", "──────────────────────────────────");
+    sigma_printf(VT_BOLD VT_CYAN "\n  SigmaShell v%s — Built-in Commands\n" VT_RESET, SIGMA_SHELL_VERSION);
+    sigma_printf("  %-14s  %s\n", "─────────────", "──────────────────────────────────");
     for (int i = 0; builtins[i].name; i++)
-        printf("  " VT_GREEN "%-14s" VT_RESET "  %s\n", builtins[i].name, builtins[i].description);
-    printf("\n");
+        sigma_printf("  " VT_GREEN "%-14s" VT_RESET "  %s\n", builtins[i].name, builtins[i].description);
+    sigma_printf("\n");
     return 0;
 }
 
 static int builtin_exit(int argc, char** argv) {
     (void)argc; (void)argv;
-    printf(VT_YELLOW "  [sigma] Session terminated.\n" VT_RESET);
-    exit(0);
+    sigma_printf(VT_YELLOW "  [sigma] Session terminated.\n" VT_RESET);
+    sigma_exit(0);
 }
 
 static int builtin_history(int argc, char** argv) {
     (void)argc; (void)argv;
     uint32_t start = (history_len < SIGMA_HISTORY_SIZE) ? 0 : history_head;
     for (uint32_t i = 0; i < history_len; i++)
-        printf("  %4u  %s\n", i + 1, history[(start + i) % SIGMA_HISTORY_SIZE]);
+        sigma_printf("  %4u  %s\n", i + 1, history[(start + i) % SIGMA_HISTORY_SIZE]);
     return 0;
 }
 
 static int builtin_clear(int argc, char** argv) {
     (void)argc; (void)argv;
-    printf("\033[2J\033[H");
+    sigma_printf("\033[2J\033[H");
     return 0;
 }
 
 static int builtin_echo(int argc, char** argv) {
     for (int i = 1; i < argc; i++)
-        printf("%s%s", argv[i], i + 1 < argc ? " " : "\n");
+        sigma_printf("%s%s", argv[i], i + 1 < argc ? " " : "\n");
     return 0;
 }
 
 static int builtin_env(int argc, char** argv) {
     (void)argc; (void)argv;
     extern char** environ;
-    for (char** e = environ; *e; e++) printf("  %s\n", *e);
+    for (char** e = environ; *e; e++) sigma_printf("  %s\n", *e);
     return 0;
 }
 
 static int builtin_pwd(int argc, char** argv) {
     (void)argc; (void)argv;
     char buf[SIGMA_LINE_MAX];
-    if (_getcwd(buf, sizeof(buf))) printf("  %s\n", buf);
+    if (_getcwd(buf, sizeof(buf))) sigma_printf("  %s\n", buf);
     return 0;
 }
 
@@ -156,27 +156,27 @@ static int tokenize(char* line, char** argv, int max_args) {
 static int dispatch(int argc, char** argv) {
     if (argc == 0) return 0;
     for (int i = 0; builtins[i].name; i++) {
-        if (strcmp(argv[0], builtins[i].name) == 0) {
+        if (sigma_strcmp(argv[0], builtins[i].name) == 0) {
             if (builtins[i].handler) return builtins[i].handler(argc, argv);
             // External: spawn from tools/ PATH (static binaries)
-            printf(VT_YELLOW "  [sigma] Routing to external: %s\n" VT_RESET, argv[0]);
+            sigma_printf(VT_YELLOW "  [sigma] Routing to external: %s\n" VT_RESET, argv[0]);
             return 127; // Stub: replace with execv() against tools/ binary
         }
     }
-    printf(VT_RED "  [sigma] Unknown command: %s  (type 'help' for list)\n" VT_RESET, argv[0]);
+    sigma_printf(VT_RED "  [sigma] Unknown command: %s  (type 'help' for list)\n" VT_RESET, argv[0]);
     return 1;
 }
 
 // ── Prompt renderer ───────────────────────────────────────────────────────────
 static void print_prompt(void) {
-    printf(VT_BOLD VT_MAGENTA "σ" VT_RESET VT_CYAN " sigma" VT_RESET
+    sigma_printf(VT_BOLD VT_MAGENTA "σ" VT_RESET VT_CYAN " sigma" VT_RESET
            VT_GREEN " ❯ " VT_RESET);
     fflush(stdout);
 }
 
 // ── Main REPL ─────────────────────────────────────────────────────────────────
 int main(void) {
-    printf(VT_BOLD VT_CYAN
+    sigma_printf(VT_BOLD VT_CYAN
            "\n  ╔═══════════════════════════════════════╗\n"
            "  ║  SigmaShell v%-24s  ║\n"
            "  ║  Type 'help' for command list         ║\n"
@@ -191,13 +191,13 @@ int main(void) {
         if (!fgets(line, sizeof(line), stdin)) break;
 
         // Strip trailing newline
-        size_t len = strlen(line);
+        size_t len = sigma_strlen(line);
         if (len > 0 && line[len - 1] == '\n') line[len - 1] = '\0';
-        if (strlen(line) == 0) continue;
+        if (sigma_strlen(line) == 0) continue;
 
         history_push(line);
         char line_copy[SIGMA_LINE_MAX];
-        strncpy(line_copy, line, sizeof(line_copy) - 1);
+        sigma_strncpy(line_copy, line, sizeof(line_copy) - 1);
 
         int argc = tokenize(line_copy, argv, SIGMA_MAX_ARGS);
         dispatch(argc, argv);

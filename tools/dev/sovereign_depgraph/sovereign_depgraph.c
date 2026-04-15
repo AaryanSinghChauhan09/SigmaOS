@@ -11,9 +11,9 @@
 // Zero external deps — outputs DOT format for Graphviz rendering
 // =============================================================================
 
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
+#include "sigma_libc.h"
+#include "sigma_libc.h"
+#include "sigma_libc.h"
 #include <sigma_types.h>
 #include <dirent.h>
 #include <sys/stat.h>
@@ -30,26 +30,26 @@ static uint32_t node_count = 0, edge_count = 0;
 
 static bool node_exists(const char* name) {
     for (uint32_t i = 0; i < node_count; i++)
-        if (strcmp(nodes[i], name) == 0) return true;
+        if (sigma_strcmp(nodes[i], name) == 0) return true;
     return false;
 }
 
 static void add_node(const char* name) {
     if (!node_exists(name) && node_count < MAX_NODES)
-        strncpy(nodes[node_count++], name, MAX_NAME - 1);
+        sigma_strncpy(nodes[node_count++], name, MAX_NAME - 1);
 }
 
 static void add_edge(const char* from, const char* to) {
     if (edge_count < MAX_EDGES) {
-        strncpy(edges[edge_count].from, from, MAX_NAME - 1);
-        strncpy(edges[edge_count].to,   to,   MAX_NAME - 1);
+        sigma_strncpy(edges[edge_count].from, from, MAX_NAME - 1);
+        sigma_strncpy(edges[edge_count].to,   to,   MAX_NAME - 1);
         edge_count++;
     }
 }
 
 // Scan a C file for #include "..." dependencies
 static void scan_includes(const char* suite_name, const char* filepath) {
-    FILE* f = fopen(filepath, "r");
+    FILE* f = sigma_open(filepath, "r");
     if (!f) return;
     char line[512];
     while (fgets(line, sizeof(line), f)) {
@@ -60,11 +60,11 @@ static void scan_includes(const char* suite_name, const char* filepath) {
         if (!end) continue;
         uint32_t len = (uint32_t)(end - start);
         if (len >= MAX_NAME) continue;
-        strncpy(dep, start, len);
+        sigma_strncpy(dep, start, len);
         add_node(dep);
         add_edge(suite_name, dep);
     }
-    fclose(f);
+    sigma_close(f);
 }
 
 static void walk_suite(const char* suites_root, const char* suite) {
@@ -79,7 +79,7 @@ static void walk_suite(const char* suites_root, const char* suite) {
         if (e->d_name[0] == '.') continue;
         const char* ext = strrchr(e->d_name, '.');
         if (!ext) continue;
-        if (strcmp(ext, ".c") != 0 && strcmp(ext, ".h") != 0) continue;
+        if (sigma_strcmp(ext, ".c") != 0 && sigma_strcmp(ext, ".h") != 0) continue;
         char fpath[MAX_PATH];
         snprintf(fpath, sizeof(fpath), "%s/%s", path, e->d_name);
         scan_includes(suite, fpath);
@@ -88,7 +88,7 @@ static void walk_suite(const char* suites_root, const char* suite) {
 }
 
 static void emit_dot(const char* out_path) {
-    FILE* f = fopen(out_path, "w");
+    FILE* f = sigma_open(out_path, "w");
     if (!f) { fprintf(stderr, "Cannot open %s\n", out_path); return; }
     fprintf(f, "digraph SigmaOS {\n");
     fprintf(f, "  rankdir=LR;\n");
@@ -101,8 +101,8 @@ static void emit_dot(const char* out_path) {
     for (uint32_t i = 0; i < edge_count; i++)
         fprintf(f, "  \"%s\" -> \"%s\";\n", edges[i].from, edges[i].to);
     fprintf(f, "}\n");
-    fclose(f);
-    printf("[sigma-depgraph] %u nodes, %u edges → %s\n",
+    sigma_close(f);
+    sigma_printf("[sigma-depgraph] %u nodes, %u edges → %s\n",
            node_count, edge_count, out_path);
 }
 

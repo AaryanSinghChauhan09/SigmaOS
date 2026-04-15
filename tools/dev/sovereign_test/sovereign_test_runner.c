@@ -11,9 +11,9 @@
 // Zero external deps — compiles with: gcc -std=c11 -O2 sovereign_test_runner.c
 // =============================================================================
 
-#include <stdio.h>
+#include "sigma_libc.h"
 #include <sigma_types.h>
-#include <string.h>
+#include "sigma_libc.h"
 #include <sigma_kernel.h>
 
 #include <setjmp.h>
@@ -39,15 +39,15 @@ static uint32_t      test_count = 0;
 
 // ── Assertion Macros ──────────────────────────────────────────────────────────
 #define SIGMA_EXPECT_TRUE(expr) \
-    do { if (!(expr)) { printf("  FAIL: %s:%d — expected TRUE: " #expr "\n", \
+    do { if (!(expr)) { sigma_printf("  FAIL: %s:%d — expected TRUE: " #expr "\n", \
         __FILE__, __LINE__); return TEST_FAIL; } } while(0)
 
 #define SIGMA_EXPECT_EQ(a, b) \
-    do { if ((a) != (b)) { printf("  FAIL: %s:%d — " #a " != " #b "\n", \
+    do { if ((a) != (b)) { sigma_printf("  FAIL: %s:%d — " #a " != " #b "\n", \
         __FILE__, __LINE__); return TEST_FAIL; } } while(0)
 
 #define SIGMA_EXPECT_NULL(ptr) \
-    do { if ((ptr) != NULL) { printf("  FAIL: %s:%d — expected NULL\n", \
+    do { if ((ptr) != NULL) { sigma_printf("  FAIL: %s:%d — expected NULL\n", \
         __FILE__, __LINE__); return TEST_FAIL; } } while(0)
 
 // ── Registration ──────────────────────────────────────────────────────────────
@@ -55,7 +55,7 @@ void sigma_test_register(const char* name, const char* suite,
                           TestResult (*fn)(void), uint32_t timeout_ms) {
     if (test_count >= SIGMA_MAX_TESTS) return;
     SigmaTestCase* tc = &test_registry[test_count++];
-    strncpy(tc->name, name, SIGMA_TEST_NAME_LEN - 1);
+    sigma_strncpy(tc->name, name, SIGMA_TEST_NAME_LEN - 1);
     tc->suite      = suite;
     tc->fn         = fn;
     tc->timeout_ms = timeout_ms;
@@ -116,26 +116,26 @@ int main(int argc, char* argv[]) {
     uint32_t passed = 0, failed = 0, skipped = 0;
     clock_t start = clock();
 
-    printf("\n╔══════════════════════════════════════════════╗\n");
-    printf("║  SigmaOS Sovereign Test Runner  v%-12s ║\n", RUNNER_VERSION);
-    printf("╠══════════════════════════════════════════════╣\n");
+    sigma_printf("\n╔══════════════════════════════════════════════╗\n");
+    sigma_printf("║  SigmaOS Sovereign Test Runner  v%-12s ║\n", RUNNER_VERSION);
+    sigma_printf("╠══════════════════════════════════════════════╣\n");
 
     for (uint32_t i = 0; i < test_count; i++) {
         SigmaTestCase* tc = &test_registry[i];
         if (filter && strstr(tc->name, filter) == NULL) { skipped++; continue; }
 
-        printf("║  RUN   %-38s ║\n", tc->name);
+        sigma_printf("║  RUN   %-38s ║\n", tc->name);
         TestResult r = tc->fn();
-        if      (r == TEST_PASS) { passed++;  printf("║  PASS  %-38s ║\n", tc->name); }
-        else if (r == TEST_FAIL) { failed++;  printf("║  FAIL  %-38s ║\n", tc->name); }
-        else                     { skipped++; printf("║  SKIP  %-38s ║\n", tc->name); }
+        if      (r == TEST_PASS) { passed++;  sigma_printf("║  PASS  %-38s ║\n", tc->name); }
+        else if (r == TEST_FAIL) { failed++;  sigma_printf("║  FAIL  %-38s ║\n", tc->name); }
+        else                     { skipped++; sigma_printf("║  SKIP  %-38s ║\n", tc->name); }
     }
 
     double elapsed = (double)(clock() - start) / CLOCKS_PER_SEC * 1000.0;
-    printf("╠══════════════════════════════════════════════╣\n");
-    printf("║  PASS:%-4u FAIL:%-4u SKIP:%-4u  %.1fms       ║\n",
+    sigma_printf("╠══════════════════════════════════════════════╣\n");
+    sigma_printf("║  PASS:%-4u FAIL:%-4u SKIP:%-4u  %.1fms       ║\n",
            passed, failed, skipped, elapsed);
-    printf("╚══════════════════════════════════════════════╝\n\n");
+    sigma_printf("╚══════════════════════════════════════════════╝\n\n");
 
     return (failed > 0) ? 1 : 0;
 }

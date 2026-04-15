@@ -8,8 +8,8 @@
  */
 
 #include "sigma_base.h"
-#include <stdint.h>
-#include <string.h>
+#include "sigma_types.h"
+#include "sigma_libc.h"
 
 #ifdef __SIGMAOS__
 #include "SovereignVFS.h"

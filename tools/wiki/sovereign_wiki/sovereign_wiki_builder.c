@@ -11,9 +11,9 @@
 // Zero external deps — single-file, compiles with gcc -std=c11 -O2
 // =============================================================================
 
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
+#include "sigma_libc.h"
+#include "sigma_libc.h"
+#include "sigma_libc.h"
 #include <sigma_types.h>
 
 #include <dirent.h>
@@ -38,12 +38,12 @@ static uint32_t doc_count = 0;
 // ── Extract doc metadata from a .c/.h source file ─────────────────────────────
 static bool extract_shard_doc(const char* path, const char* suite,
                                const char* filename) {
-    FILE* f = fopen(path, "r");
+    FILE* f = sigma_open(path, "r");
     if (!f) return false;
 
     ShardDoc* doc = &docs[doc_count];
-    strncpy(doc->suite,    suite,    31);
-    strncpy(doc->filename, filename, 127);
+    sigma_strncpy(doc->suite,    suite,    31);
+    sigma_strncpy(doc->filename, filename, 127);
     doc->usps[0]        = '\0';
     doc->description[0] = '\0';
     doc->title[0]       = '\0';
@@ -57,7 +57,7 @@ static bool extract_shard_doc(const char* path, const char* suite,
             char* dash = strstr(line, "—");
             if (dash) {
                 dash = strstr(dash + 3, "—");
-                if (dash) strncpy(doc->title, dash + 2, 127);
+                if (dash) sigma_strncpy(doc->title, dash + 2, 127);
                 // Strip trailing newline
                 char* nl = strchr(doc->title, '\n');
                 if (nl) *nl = '\0';
@@ -68,7 +68,7 @@ static bool extract_shard_doc(const char* path, const char* suite,
         if (in_usps) {
             if (strstr(line, "//   •")) {
                 strncat(doc->usps, line + 6,
-                        sizeof(doc->usps) - strlen(doc->usps) - 1);
+                        sizeof(doc->usps) - sigma_strlen(doc->usps) - 1);
             } else if (strstr(line, "// Architecture") ||
                        strstr(line, "// Zero") ||
                        strstr(line, "#include")) {
@@ -76,9 +76,9 @@ static bool extract_shard_doc(const char* path, const char* suite,
             }
         }
     }
-    fclose(f);
+    sigma_close(f);
     if (doc->title[0] == '\0')
-        strncpy(doc->title, filename, 127);
+        sigma_strncpy(doc->title, filename, 127);
 
     doc_count++;
     return true;
@@ -93,8 +93,8 @@ static void walk_suite(const char* suite_path, const char* suite_name) {
         if (entry->d_name[0] == '.') continue;
         const char* ext = strrchr(entry->d_name, '.');
         if (!ext) continue;
-        if (strcmp(ext, ".c") != 0 && strcmp(ext, ".h") != 0 &&
-            strcmp(ext, ".rs") != 0) continue;
+        if (sigma_strcmp(ext, ".c") != 0 && sigma_strcmp(ext, ".h") != 0 &&
+            sigma_strcmp(ext, ".rs") != 0) continue;
 
         char full_path[MAX_PATH_LEN];
         snprintf(full_path, sizeof(full_path), "%s/%s", suite_path, entry->d_name);
@@ -105,7 +105,7 @@ static void walk_suite(const char* suite_path, const char* suite_name) {
 
 // ── Emit Markdown wiki page ───────────────────────────────────────────────────
 static void emit_wiki_markdown(const char* out_path) {
-    FILE* f = fopen(out_path, "w");
+    FILE* f = sigma_open(out_path, "w");
     if (!f) { fprintf(stderr, "Cannot open %s\n", out_path); return; }
 
     fprintf(f, "# SigmaOS Sovereign Shard Wiki\n");
@@ -117,7 +117,7 @@ static void emit_wiki_markdown(const char* out_path) {
         ShardDoc* d = &docs[i];
         // Collapse multi-line USP to single line
         char usps_flat[512];
-        strncpy(usps_flat, d->usps, 511);
+        sigma_strncpy(usps_flat, d->usps, 511);
         for (char* c = usps_flat; *c; c++) if (*c == '\n') *c = ' ';
 
         fprintf(f, "| `%s` | `%s` | %s |\n",
@@ -125,8 +125,8 @@ static void emit_wiki_markdown(const char* out_path) {
     }
 
     fprintf(f, "\n_Total shards documented: %u_\n", doc_count);
-    fclose(f);
-    printf("[sigma-wiki] Written %u entries → %s\n", doc_count, out_path);
+    sigma_close(f);
+    sigma_printf("[sigma-wiki] Written %u entries → %s\n", doc_count, out_path);
 }
 
 int main(int argc, char* argv[]) {

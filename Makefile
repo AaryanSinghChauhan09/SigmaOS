@@ -122,6 +122,6 @@ shard-list:
 
 # Sovereign resilience audit (High-Fidelity)
 test:
-	gcc -std=c11 -O2 -I ./include tools/sovereign_test/sovereign_test_runner.c -o sigma-test && ./sigma-test
+	gcc -std=c11 -O2 -I ./include tools/dev/sovereign_test/sovereign_test_runner.c -o sigma-test && ./sigma-test
 
 

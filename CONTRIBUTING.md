@@ -9,14 +9,13 @@ SigmaOS is a **Pure C11 and Assembly** environment.
 - **NO External Dependencies**: Every routine must be natively sharded within the repository.
 
 ## 2. Shard Alignment
-New features should be sharded into their respective territories:
-- **Core Logic**: `/kernel/modules/core/`
-- **Security Logic**: `/kernel/modules/security/`
-- **Headers**: `/include/`
-- **UI Components**: `/scripts/js/components/`
+New features should be sharded into their respective modular territories:
+- **Core Kernel Suites**: `/kernel/suites/`
+- **Userland Apps & GUI**: `/userland/`
+- **Tooling & Test Hooks**: `/tools/`
 
 ## 3. Verification
-All contributions must be accompanied by an update to the `tests/sigmaos_test_suite_master.c`. A 100% pass rate is mandatory for shard merging.
+All contributions must be accompanied by an update to the corresponding `tools/dev/sovereign_test/sovereign_test_runner.c` suite. A 100% pass rate is mandatory for shard merging.
 
 ## 4. Submission Process
 1.  **Fork the Shard**.

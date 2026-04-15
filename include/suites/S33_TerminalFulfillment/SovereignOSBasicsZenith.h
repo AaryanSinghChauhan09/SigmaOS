@@ -11,7 +11,7 @@
 #ifndef SOVEREIGN_OS_BASICS_ZENITH_H
 #define SOVEREIGN_OS_BASICS_ZENITH_H
 
-#include "SovereignLibC.h"
+#include "sigma_libc.h"
 #include "SigmaOOP.h"
 
 // -------------------------------------------------------------------------

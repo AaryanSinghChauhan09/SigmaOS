@@ -8,7 +8,7 @@
  */
 
 #include "sigma_base.h"
-#include <stdint.h>
+#include "sigma_types.h"
 
 /* Port I/O primitives */
 static inline void outb(uint16_t port, uint8_t val) {

@@ -8,8 +8,8 @@
  */
 
 #include "sigma_base.h"
-#include <stdint.h>
-#include <string.h>
+#include "sigma_types.h"
+#include "sigma_libc.h"
 
 #define MAX_VFS_NODES 1024
 
@@ -26,7 +26,7 @@ static SovereignVfsNode g_vfs_root[MAX_VFS_NODES];
 static uint32_t g_vfs_count = 0;
 
 void vfs_init(void) {
-    memset(g_vfs_root, 0, sizeof(g_vfs_root));
+    sigma_memset(g_vfs_root, 0, sizeof(g_vfs_root));
     g_vfs_count = 0;
     sigma_printf("Σ [S20]: Global VFS Materialized (Apex Idea 218).\n");
 }
@@ -35,7 +35,7 @@ SovereignVfsNode* vfs_mount(const char* name, VfsNodeType type) {
     if (g_vfs_count >= MAX_VFS_NODES) return NULL;
     
     SovereignVfsNode* node = &g_vfs_root[g_vfs_count++];
-    strncpy(node->name, name, 63);
+    sigma_strncpy(node->name, name, 63);
     node->type = type;
     node->size = 0;
     

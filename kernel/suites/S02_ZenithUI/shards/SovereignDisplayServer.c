@@ -8,8 +8,8 @@
  */
 
 #include "sigma_base.h"
-#include <stdint.h>
-#include <string.h>
+#include "sigma_types.h"
+#include "sigma_libc.h"
 
 #define FB_WIDTH  1920
 #define FB_HEIGHT 1080
@@ -24,7 +24,7 @@ typedef struct {
 static uint8_t g_backbuffer[FB_WIDTH * FB_HEIGHT * FB_BPP];
 
 void display_server_init(void) {
-    memset(g_backbuffer, 0, sizeof(g_backbuffer));
+    sigma_memset(g_backbuffer, 0, sizeof(g_backbuffer));
     sigma_printf("Σ [S02]: SigmaDisplay Server Materialized (Apex Idea 506).\n");
 }
 

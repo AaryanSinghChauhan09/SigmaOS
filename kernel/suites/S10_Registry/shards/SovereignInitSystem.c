@@ -19,7 +19,7 @@
 
 #include <sigma_types.h>
 
-#include <string.h>
+#include "sigma_libc.h"
 
 #define SIGMA_MAX_UNITS      256
 #define SIGMA_UNIT_NAME_LEN   64

@@ -10,7 +10,7 @@
 #define SIGMA_BASE_H
 
 #include "sigma_types.h"
-#include "SovereignLibC.h"
+#include "sigma_libc.h"
 #include "SovereignModule.h"
 
 #ifndef SIGMA_ASSERT

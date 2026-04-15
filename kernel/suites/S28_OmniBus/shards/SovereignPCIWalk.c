@@ -8,7 +8,7 @@
  */
 
 #include "sigma_base.h"
-#include <stdint.h>
+#include "sigma_types.h"
 
 /* PCI Access primitives (using HAL S04 logic implicitly) */
 extern void outb(uint16_t port, uint8_t val);

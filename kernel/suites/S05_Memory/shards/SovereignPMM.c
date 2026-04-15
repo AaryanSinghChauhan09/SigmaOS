@@ -8,8 +8,8 @@
  */
 
 #include "sigma_base.h"
-#include <stdint.h>
-#include <string.h>
+#include "sigma_types.h"
+#include "sigma_libc.h"
 
 #define PAGE_SIZE 4096
 #define MAX_PAGES 1048576 // 4GB management coverage
@@ -18,7 +18,7 @@ static uint8_t g_memory_bitmap[MAX_PAGES / 8];
 
 void pmm_init(uint64_t mem_size) {
     uint32_t total_pages = mem_size / PAGE_SIZE;
-    memset(g_memory_bitmap, 0xFF, sizeof(g_memory_bitmap)); // Mark all as reserved initially
+    sigma_memset(g_memory_bitmap, 0xFF, sizeof(g_memory_bitmap)); // Mark all as reserved initially
     
     // Unreserve available pages (simulated for now)
     for (uint32_t i = 0; i < total_pages; i++) {

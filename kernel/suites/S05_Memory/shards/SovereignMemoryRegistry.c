@@ -29,7 +29,7 @@ sigma_err_t SovereignMemory_Register(const char* name, sigma_malloc_fn malloc, s
 void* SovereignMemory_Alloc(const char* shard_name, sigma_size_t size) {
     for (sigma_u32 i = 0; i < g_mem_shard_count; i++) {
         if (sigma_streq(g_mem_shards[i].name, shard_name)) {
-            return g_mem_shards[i].malloc(size);
+            return g_mem_shards[i].sigma_malloc(size);
         }
     }
     return SIGMA_NULL;
@@ -38,7 +38,7 @@ void* SovereignMemory_Alloc(const char* shard_name, sigma_size_t size) {
 void SovereignMemory_Free(const char* shard_name, void* ptr, sigma_size_t size) {
     for (sigma_u32 i = 0; i < g_mem_shard_count; i++) {
         if (sigma_streq(g_mem_shards[i].name, shard_name)) {
-            g_mem_shards[i].free(ptr, size);
+            g_mem_shards[i].sigma_free(ptr, size);
             return;
         }
     }

@@ -29,9 +29,9 @@ void tcp_fsm_init(void) {
 }
 
 SovereignTcpState tcp_transition(SovereignTcpState current, const char* event) {
-    if (current == TCP_CLOSED && strcmp(event, "PASSIVE_OPEN") == 0) return TCP_LISTEN;
-    if (current == TCP_LISTEN && strcmp(event, "SYN") == 0) return TCP_SYN_RECEIVED;
-    if (current == TCP_SYN_RECEIVED && strcmp(event, "ACK") == 0) return TCP_ESTABLISHED;
+    if (current == TCP_CLOSED && sigma_strcmp(event, "PASSIVE_OPEN") == 0) return TCP_LISTEN;
+    if (current == TCP_LISTEN && sigma_strcmp(event, "SYN") == 0) return TCP_SYN_RECEIVED;
+    if (current == TCP_SYN_RECEIVED && sigma_strcmp(event, "ACK") == 0) return TCP_ESTABLISHED;
     
     return current;
 }
