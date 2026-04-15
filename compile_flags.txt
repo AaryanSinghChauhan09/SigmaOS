@@ -1,0 +1,12 @@
+-xc
+-std=c11
+-D__SIGMAOS__
+-DSIGMA_EXCLUDE_STD_ALIASES
+-Iinclude
+-Ilibc
+-ffreestanding
+-fno-builtin
+-Wall
+-Wno-typedef-redefinition
+-Wno-builtin-requires-header
+-Wno-unknown-attributes
