@@ -56,12 +56,9 @@ SUITE_ROOT := kernel/suites
 C_SOURCES := $(shell find $(SUITE_ROOT) -name '*.c' 2>/dev/null)
 ASM_SOURCES := $(shell find $(SUITE_ROOT) -name '*.asm' 2>/dev/null)
 
-# Fallback specifically for core files if not already in suites
-C_SOURCES += $(shell find kernel/core -name '*.c' 2>/dev/null)
-ASM_SOURCES += $(shell find kernel -name 'boot.asm' 2>/dev/null)
-
 # Aggregate all unique sources
 C_SOURCES := $(sort $(C_SOURCES))
+ASM_SOURCES += $(shell find kernel -name '*.asm' 2>/dev/null)
 ASM_SOURCES := $(sort $(ASM_SOURCES))
 
 SHARDS := $(C_SOURCES:.c=.o) $(ASM_SOURCES:.asm=.o)
