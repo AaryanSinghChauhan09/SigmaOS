@@ -1,6 +1,6 @@
-/*
+﻿/*
  * =========================================================================
- * Σ SIGMAOS: S11_VIRTUALIZATION — SovereignWASM_Runtime.c
+ * S SIGMAOS: S11_VIRTUALIZATION — SovereignWASM_Runtime.c
  * =========================================================================
  * Implementation of Idea 56.5 (Apex Infinity): Sovereign WASM Runtime.
  * Sandboxed stack-based interpreter for portable machine code.
@@ -16,7 +16,7 @@ typedef struct {
 } __attribute__((packed)) WASMHeader;
 
 void wasm_runtime_init(void) {
-    sigma_printf("Σ [S11]: Sovereign WASM Runtime Materialized (Apex Idea 56.5).\n");
+    sigma_printf("S [S11]: Sovereign WASM Runtime Materialized (Apex Idea 56.5).\n");
 }
 
 int wasm_execute(const uint8_t* bytecode, uint32_t size) {
@@ -25,7 +25,7 @@ int wasm_execute(const uint8_t* bytecode, uint32_t size) {
         return -1;
     }
     
-    sigma_printf("Σ [WASM]: Validated WASM Module (Size: %u). Executing...\n", size);
+    sigma_printf("S [WASM]: Validated WASM Module (Size: %u). Executing...\n", size);
     // Stack-based opcode execution starts here
     return 0;
 }

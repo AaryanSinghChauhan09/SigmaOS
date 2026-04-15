@@ -1,6 +1,6 @@
-/*
+﻿/*
  * =========================================================================
- * Σ SIGMAOS ZENITH: SOVEREIGN WOA SHARD (v55.1-SUPREME-SIRIUS)
+ * S SIGMAOS ZENITH: SOVEREIGN WOA SHARD (v55.1-SUPREME-SIRIUS)
  * =========================================================================
  * Mission: Bubble-net resource search and convergence.
  * Principles: AI, Algorithms, Data Science, Throughput.

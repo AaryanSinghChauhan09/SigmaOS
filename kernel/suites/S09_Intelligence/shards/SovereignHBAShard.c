@@ -1,6 +1,6 @@
-/*
+﻿/*
  * =========================================================================
- * Σ SIGMAOS ETERNITY: SOVEREIGN HBA SHARD (v57.6-SUPREME-ETERNITY)
+ * S SIGMAOS ETERNITY: SOVEREIGN HBA SHARD (v57.6-SUPREME-ETERNITY)
  * =========================================================================
  * Mission: Extremely aggressive multi-modal exploration and digging behaviors.
  * Principles: AI, Algorithms, Data Science.

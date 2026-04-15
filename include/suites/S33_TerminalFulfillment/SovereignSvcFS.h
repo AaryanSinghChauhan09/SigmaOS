@@ -1,6 +1,6 @@
-/*
+﻿/*
  * =========================================================================
- * Σ SIGMAOS: SOVEREIGN SERVICE FILESYSTEM HEADER
+ * S SIGMAOS: SOVEREIGN SERVICE FILESYSTEM HEADER
  * =========================================================================
  */
 

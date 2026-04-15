@@ -1,6 +1,6 @@
-/*
+﻿/*
  * =========================================================================
- * Σ SIGMAOS ZENITH: SOVEREIGN CET SHARD (v56.0-SUPREME-ORION-SINGULARITY)
+ * S SIGMAOS ZENITH: SOVEREIGN CET SHARD (v56.0-SUPREME-ORION-SINGULARITY)
  * =========================================================================
  * Mission: Hardware-enforced Control-Flow Integrity (CFI).
  * Principles: Cyber Security, Safety, Computer Science, Hardware Mastery.

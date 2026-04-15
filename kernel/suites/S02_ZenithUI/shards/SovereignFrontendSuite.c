@@ -1,6 +1,6 @@
-/*
+﻿/*
  * =========================================================================
- * Σ SIGMAOS: SOVEREIGN FRONTEND SUITE (v2.0 - SUPREME UPGRADE)
+ * S SIGMAOS: SOVEREIGN FRONTEND SUITE (v2.0 - SUPREME UPGRADE)
  * =========================================================================
  * Mission: Real Window Management and Compositor Logic.
  * =========================================================================
@@ -35,10 +35,10 @@ void sigma_frontend_create_window(int x, int y, int w, int h) {
 }
 
 void SovereignFrontend_Init(void) {
-    sigma_printf("Σ [FRONTEND]: Initialising Sovereign Compositor...\n");
+    sigma_printf("S [FRONTEND]: Initialising Sovereign Compositor...\n");
     sigma_frontend_wm_init();
     sigma_frontend_create_window(100, 100, 800, 600);
-    sigma_printf("Σ [FRONTEND]: Accelerator seated. Framebuffer mapped.\n");
+    sigma_printf("S [FRONTEND]: Accelerator seated. Framebuffer mapped.\n");
 }
 
 void SovereignFrontend_Register(void) {

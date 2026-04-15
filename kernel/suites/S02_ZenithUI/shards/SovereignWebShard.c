@@ -1,6 +1,6 @@
-/*
+﻿/*
  * =========================================================================
- * Σ SIGMAOS ZENITH: SOVEREIGN WEB-SYNC ENGINE (v50.0-SINGULARITY)
+ * S SIGMAOS ZENITH: SOVEREIGN WEB-SYNC ENGINE (v50.0-SINGULARITY)
  * =========================================================================
  * Mission: Zero-latency kernel state sync with Chromium-based browsers.
  * Principles: WebSocket Stream, V8 Bridge, PWA Convergence, WebUSB Hooks.

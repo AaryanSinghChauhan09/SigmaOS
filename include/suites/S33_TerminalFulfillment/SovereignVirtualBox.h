@@ -1,6 +1,6 @@
-/*
+﻿/*
  * =========================================================================
- * Σ SIGMAOS: SOVEREIGN VIRTUALIZATION (v1.0 — C11)
+ * S SIGMAOS: SOVEREIGN VIRTUALIZATION (v1.0 — C11)
  * =========================================================================
  * Absorbed USPs from: VirtualBox / Portable-VirtualBox
  *   https://github.com/vboxme/Portable-VirtualBox

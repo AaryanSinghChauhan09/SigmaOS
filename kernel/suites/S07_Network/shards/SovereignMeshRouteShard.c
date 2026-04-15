@@ -1,6 +1,6 @@
-/*
+﻿/*
  * =========================================================================
- * Σ SIGMAOS ZENITH: SOVEREIGN MESH SHARD (v1.0)
+ * S SIGMAOS ZENITH: SOVEREIGN MESH SHARD (v1.0)
  * =========================================================================
  * Mission: Absorb Tailscale / Cloudflare WARP / WireGuard USP.
  *          Native Silicon Zero-Trust Overlay Networking & Stealth Routing.

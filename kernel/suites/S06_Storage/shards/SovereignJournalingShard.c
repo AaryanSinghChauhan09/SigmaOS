@@ -1,6 +1,6 @@
-/*
+﻿/*
  * =========================================================================
- * Σ SIGMAOS ZENITH: SOVEREIGN JOURNALING SHARD (v50.8-ETERNITY-CORE)
+ * S SIGMAOS ZENITH: SOVEREIGN JOURNALING SHARD (v50.8-ETERNITY-CORE)
  * =========================================================================
  * Mission: Atomic file transactions and power-failure resilience.
  * Principles: ACID, Storage Sovereignty, Backend, Real-Time.

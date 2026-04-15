@@ -1,6 +1,6 @@
-/*
+﻿/*
  * =========================================================================
- * Σ SIGMAOS ABSOLUTE_FINALITY: SOVEREIGN HMAT SHARD (v59.2-ABSOLUTE)
+ * S SIGMAOS ABSOLUTE_FINALITY: SOVEREIGN HMAT SHARD (v59.2-ABSOLUTE)
  * =========================================================================
  * Mission: Unifying radically heterogeneous latency topologies into standard scheduler flow.
  * Principles: Performance, Hardware Mastery, Supercomputing.

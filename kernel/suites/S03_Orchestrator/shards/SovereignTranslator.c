@@ -1,7 +1,7 @@
-#include "sigma_kernel.h"
+﻿#include "sigma_kernel.h"
 
 void SovereignTranslator_Init() {
-    sigma_printf("Σ [ABSORB]: SovereignTranslator Integration Complete. Phase 2 USP Parity Secured.
+    sigma_printf("S [ABSORB]: SovereignTranslator Integration Complete. Phase 2 USP Parity Secured.
 ");
 }
 

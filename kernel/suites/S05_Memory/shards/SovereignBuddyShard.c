@@ -1,6 +1,6 @@
-/*
+﻿/*
  * =========================================================================
- * Σ SIGMAOS ZENITH: SOVEREIGN BUDDY ALLOCATOR (v1.0)
+ * S SIGMAOS ZENITH: SOVEREIGN BUDDY ALLOCATOR (v1.0)
  * =========================================================================
  * Mission: High-efficiency exponential block memory management.
  * Principles: Power-of-Two splitting, Coalescing, Zero Fragmentation.

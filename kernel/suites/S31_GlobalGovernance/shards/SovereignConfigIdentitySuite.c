@@ -1,6 +1,6 @@
-/*
+﻿/*
  * =========================================================================
- * Σ SIGMAOS: SOVEREIGN CONFIG & IDENTITY SUITE (v2.0 - INDUSTRIAL HARDENED)
+ * S SIGMAOS: SOVEREIGN CONFIG & IDENTITY SUITE (v2.0 - INDUSTRIAL HARDENED)
  * =========================================================================
  * Fixing 1500+ Audit and Config Bugs: Implementing sealed integrity audits.
  * =========================================================================
@@ -32,9 +32,9 @@ void sigma_audit_log_event(sigma_u32 event, const char* msg) {
 }
 
 void SovereignConfig_Init(void) {
-    sigma_printf("Σ [CONFIG]: Loading System Manifest [SOVEREIGN_ZENITH]...\n");
+    sigma_printf("S [CONFIG]: Loading System Manifest [SOVEREIGN_ZENITH]...\n");
     sigma_audit_log_event(0x0001, "Sovereign Master Boot Initiated");
-    sigma_printf("Σ [AUDIT]: Log Integrity Chain started - Tamper-Proofing ON.\n");
+    sigma_printf("S [AUDIT]: Log Integrity Chain started - Tamper-Proofing ON.\n");
 }
 
 void SovereignConfig_Register(void) {

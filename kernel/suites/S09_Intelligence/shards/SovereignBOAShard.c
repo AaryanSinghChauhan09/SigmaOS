@@ -1,6 +1,6 @@
-/*
+﻿/*
  * =========================================================================
- * Σ SIGMAOS ZENITH: SOVEREIGN BOA SHARD (v55.4-SUPREME-ORION-NEBULA)
+ * S SIGMAOS ZENITH: SOVEREIGN BOA SHARD (v55.4-SUPREME-ORION-NEBULA)
  * =========================================================================
  * Mission: Fragrance-based gradient discovery and social search.
  * Principles: AI, Algorithms, Data Science, Throughput.

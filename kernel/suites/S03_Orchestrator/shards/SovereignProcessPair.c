@@ -1,7 +1,7 @@
-#include "sigma_kernel.h"
+﻿#include "sigma_kernel.h"
 
 void SovereignProcessPair_Init() {
-    sigma_printf("Σ [OPERATION]: SovereignProcessPair Integration Complete. Phase 5 Pure Parity Online.
+    sigma_printf("S [OPERATION]: SovereignProcessPair Integration Complete. Phase 5 Pure Parity Online.
 ");
 }
 

@@ -1,6 +1,6 @@
-/*
+﻿/*
  * =========================================================================
- * Σ SIGMAOS ZENITH: SOVEREIGN TEMPORAL FORENSICS (v50.6-INFINITY-VOID)
+ * S SIGMAOS ZENITH: SOVEREIGN TEMPORAL FORENSICS (v50.6-INFINITY-VOID)
  * =========================================================================
  * Mission: Record and replay kernel states for forensic debugging.
  * Principles: Cyber Security, Forensics, Logic Auditing.

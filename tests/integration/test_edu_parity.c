@@ -1,8 +1,8 @@
-#include "sigma_kernel.h"
+﻿#include "sigma_kernel.h"
 #include "SovereignOmniShard.h"
 
 void test_edu_syllabus_parity() {
-    sigma_printf("Σ [TEST]: Running Educational Syllabus Parity Audit...\n");
+    sigma_printf("S [TEST]: Running Educational Syllabus Parity Audit...\n");
     
     SovereignEdu_CompBasics_Init();
     SovereignEdu_Hardware_Init();
@@ -13,7 +13,7 @@ void test_edu_syllabus_parity() {
     // Discrete Math Example: Matrix Multiplication
     // (Logic check if initialized correctly)
     
-    sigma_printf("Σ [PASS]: Educational Syllabus Knowledge Shards Verified.\n");
+    sigma_printf("S [PASS]: Educational Syllabus Knowledge Shards Verified.\n");
 }
 
 

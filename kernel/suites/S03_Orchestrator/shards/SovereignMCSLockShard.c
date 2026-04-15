@@ -1,6 +1,6 @@
-/*
+﻿/*
  * =========================================================================
- * Σ SIGMAOS ZENITH: SOVEREIGN MCS-LOCK SHARD (v55.3-SUPREME-ORION)
+ * S SIGMAOS ZENITH: SOVEREIGN MCS-LOCK SHARD (v55.3-SUPREME-ORION)
  * =========================================================================
  * Mission: NUMA-aware scalability via queue-based spinlocks.
  * Principles: Multi-Processing, Computer Science, Throughput, Scalability.

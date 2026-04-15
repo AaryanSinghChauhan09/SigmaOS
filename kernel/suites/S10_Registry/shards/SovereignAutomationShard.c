@@ -1,6 +1,6 @@
-/*
+﻿/*
  * =========================================================================
- * Σ SIGMAOS ZENITH: SOVEREIGN AUTOMATION SHARD (v2.0 — DEEP)
+ * S SIGMAOS ZENITH: SOVEREIGN AUTOMATION SHARD (v2.0 — DEEP)
  * =========================================================================
  * Mission: Zero-Touch Self-Healing & Autonomous Task Management.
  * Principles: Determinism, Self-Correction, Atomic Scheduling.

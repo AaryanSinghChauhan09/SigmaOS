@@ -1,6 +1,6 @@
-/*
+﻿/*
  * =========================================================================
- * Σ SIGMAOS ZENITH: SOVEREIGN PQC SHARD (v56.9-SUPREME-ETERNITY_GATE)
+ * S SIGMAOS ZENITH: SOVEREIGN PQC SHARD (v56.9-SUPREME-ETERNITY_GATE)
  * =========================================================================
  * Mission: Lattice-based cryptographic sealing against quantum decryption.
  * Principles: Cyber Security, Privacy, Computer Science, Algorithms.

@@ -1,6 +1,6 @@
-/*
+﻿/*
  * =========================================================================
- * Σ SIGMAOS: S07_NETWORK — SovereignNetwork_FSM.c
+ * S SIGMAOS: S07_NETWORK — SovereignNetwork_FSM.c
  * =========================================================================
  * Implementation of Idea 251 (Apex Infinity): TCP Finite State Machine.
  * Zero external libraries. Direct state transitions.
@@ -25,7 +25,7 @@ const char* tcp_state_to_str(SovereignTcpState state) {
 }
 
 void tcp_fsm_init(void) {
-    sigma_printf("Σ [S07]: TCP Finite State Machine Materialized (Apex Idea 251).\n");
+    sigma_printf("S [S07]: TCP Finite State Machine Materialized (Apex Idea 251).\n");
 }
 
 SovereignTcpState tcp_transition(SovereignTcpState current, const char* event) {

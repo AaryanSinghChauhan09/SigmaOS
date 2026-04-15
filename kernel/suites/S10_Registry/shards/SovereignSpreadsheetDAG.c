@@ -1,6 +1,6 @@
-/*
+﻿/*
  * =========================================================================
- * Σ SIGMAOS: SOVEREIGN SPREADSHEET DAG (v1.0 - PURE C11)
+ * S SIGMAOS: SOVEREIGN SPREADSHEET DAG (v1.0 - PURE C11)
  * =========================================================================
  * Mission: Absorb Excel Calculation Parity (Cell Dependency Matrix).
  * Design: C11 / Zero-Dependency / Hardware-Accelerated Evaluation.

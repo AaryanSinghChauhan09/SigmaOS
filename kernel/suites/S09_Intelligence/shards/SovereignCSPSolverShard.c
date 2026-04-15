@@ -1,6 +1,6 @@
-/*
+﻿/*
  * =========================================================================
- * Σ SIGMAOS ZENITH: SOVEREIGN CSP SOLVER SHARD (v52.2-SUPREME-MULTIVERSE)
+ * S SIGMAOS ZENITH: SOVEREIGN CSP SOLVER SHARD (v52.2-SUPREME-MULTIVERSE)
  * =========================================================================
  * Mission: Solving multi-variable constraint problems for registry logic.
  * Principles: AI, Algorithms, Data Science, Automations.

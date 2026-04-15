@@ -1,6 +1,6 @@
-/*
+﻿/*
  * =========================================================================
- * Σ SIGMAOS ZENITH: SOVEREIGN NEURAL GRADIENT (v1.0)
+ * S SIGMAOS ZENITH: SOVEREIGN NEURAL GRADIENT (v1.0)
  * =========================================================================
  * Mission: Autonomous learning through backpropagation.
  * Principles: Gradient Descent, Chain Rule, Weight Delta Calculation.

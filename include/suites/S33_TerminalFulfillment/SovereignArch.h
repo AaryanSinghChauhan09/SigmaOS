@@ -1,6 +1,6 @@
-/*
+﻿/*
  * =========================================================================
- * Σ SIGMAOS: SOVEREIGN ARCHITECTURE INTERFACE (v1.0)
+ * S SIGMAOS: SOVEREIGN ARCHITECTURE INTERFACE (v1.0)
  * =========================================================================
  * Mission: Multi-Architecture, Multi-Device Support Matrix.
  * Design: C11 / Zero-Dependency / Registry-Based.

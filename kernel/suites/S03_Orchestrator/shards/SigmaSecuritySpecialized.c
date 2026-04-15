@@ -1,7 +1,7 @@
-#include "sigma_kernel.h"
+﻿#include "sigma_kernel.h"
 
 /*
- * Σ SIGMAOS: SOVEREIGN SECURITY SPECIALIZED (v1.0)
+ * S SIGMAOS: SOVEREIGN SECURITY SPECIALIZED (v1.0)
  * USP: Absorb Kali Linux / Parrot Security OS / BlackArch USPs.
  * Shard: Industrial Security Auditing & Forensics.
  */

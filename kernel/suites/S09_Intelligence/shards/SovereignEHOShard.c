@@ -1,6 +1,6 @@
-/*
+﻿/*
  * =========================================================================
- * Σ SIGMAOS ZENITH: SOVEREIGN EHO SHARD (v55.3-SUPREME-ORION)
+ * S SIGMAOS ZENITH: SOVEREIGN EHO SHARD (v55.3-SUPREME-ORION)
  * =========================================================================
  * Mission: Clan-based resource convergence and social migration.
  * Principles: AI, Algorithms, Data Science, Throughput.

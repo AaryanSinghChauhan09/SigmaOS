@@ -1,6 +1,6 @@
-/*
+﻿/*
  * =========================================================================
- * Σ SIGMAOS MULTIVERSE_EXODUS: SOVEREIGN FAM SHARD (v58.0-SUPREME-MULTIVERSE_EXODUS)
+ * S SIGMAOS MULTIVERSE_EXODUS: SOVEREIGN FAM SHARD (v58.0-SUPREME-MULTIVERSE_EXODUS)
  * =========================================================================
  * Mission: Rack-scale memory unification via cache-coherent serial links.
  * Principles: Performance, Hardware Mastery, High-Performance Computing (HPC).

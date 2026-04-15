@@ -1,6 +1,6 @@
-/*
+﻿/*
  * =========================================================================
- * Σ SIGMAOS: SIGMA KERNEL AGGREGATOR (v2.0 — MASTER)
+ * S SIGMAOS: SIGMA KERNEL AGGREGATOR (v2.0 — MASTER)
  * =========================================================================
  * Mission: Master initialization orchestrator only.
  * =========================================================================
@@ -49,10 +49,10 @@ extern void S32_UnifiedSovereignty_Register(void);
 extern void S33_TerminalFulfillment_Register(void);
 
 static inline void SovereignMaster_InitAll(void) {
-    sigma_printf("Σ [ORCHESTRATOR]: Initializing Sovereign Interconnect (S26)...\n");
+    sigma_printf("S [ORCHESTRATOR]: Initializing Sovereign Interconnect (S26)...\n");
     S26_OmniFabric_Register();
 
-    sigma_printf("Σ [ORCHESTRATOR]: Initializing State Registry (S10)...\n");
+    sigma_printf("S [ORCHESTRATOR]: Initializing State Registry (S10)...\n");
     S10_Registry_Register();
     
     /* Phase 1: Materialization (S01–S05) */
@@ -94,7 +94,7 @@ static inline void SovereignMaster_InitAll(void) {
     S32_UnifiedSovereignty_Register();
     S33_TerminalFulfillment_Register();
 
-    sigma_printf("\nΣ [SOVEREIGN-MASTER]: 33-Suite Lattice Materialization COMPLETE.\n");
+    sigma_printf("\nS [SOVEREIGN-MASTER]: 33-Suite Lattice Materialization COMPLETE.\n");
 }
 
 #endif /* SIGMA_KERNEL_H */

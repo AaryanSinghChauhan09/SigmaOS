@@ -1,6 +1,6 @@
-/*
+﻿/*
  * =========================================================================
- * Σ SIGMAOS ZENITH: SOVEREIGN SGX SHARD (v56.6-SUPREME-PANTHEON)
+ * S SIGMAOS ZENITH: SOVEREIGN SGX SHARD (v56.6-SUPREME-PANTHEON)
  * =========================================================================
  * Mission: Silicon-level secure enclaves for absolute data secrecy.
  * Principles: Cyber Security, Privacy, Hardware Mastery, Safety.

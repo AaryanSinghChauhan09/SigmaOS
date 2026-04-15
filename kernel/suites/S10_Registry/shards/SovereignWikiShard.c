@@ -1,6 +1,6 @@
-/*
+﻿/*
  * =========================================================================
- * Σ SIGMAOS ZENITH: SOVEREIGN WIKI SHARD (v55.4-SUPREME-ORION-NEBULA)
+ * S SIGMAOS ZENITH: SOVEREIGN WIKI SHARD (v55.4-SUPREME-ORION-NEBULA)
  * =========================================================================
  * Mission: Auto-generating technical wiki documentation from kernel state.
  * Principles: Automations, Ease-of-Use, Computer Science, Transparency.

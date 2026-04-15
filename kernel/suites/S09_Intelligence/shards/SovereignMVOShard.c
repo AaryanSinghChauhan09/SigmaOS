@@ -1,6 +1,6 @@
-/*
+﻿/*
  * =========================================================================
- * Σ SIGMAOS ZENITH: SOVEREIGN MVO SHARD (v55.0-SUPREME-CENTAURI-PRIME)
+ * S SIGMAOS ZENITH: SOVEREIGN MVO SHARD (v55.0-SUPREME-CENTAURI-PRIME)
  * =========================================================================
  * Mission: Wormhole-based discovery of extreme performance states.
  * Principles: AI, Algorithms, Data Science, Distributed.

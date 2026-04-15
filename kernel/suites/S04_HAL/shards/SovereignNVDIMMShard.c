@@ -1,6 +1,6 @@
-/*
+﻿/*
  * =========================================================================
- * Σ SIGMAOS ULTIMATE_APOTHEOSIS: SOVEREIGN NVDIMM SHARD (v60.1-ULTIMATE)
+ * S SIGMAOS ULTIMATE_APOTHEOSIS: SOVEREIGN NVDIMM SHARD (v60.1-ULTIMATE)
  * =========================================================================
  * Mission: Byte-addressable persistence functioning at CPU bus velocities.
  * Principles: Performance, Hardware Mastery, Main Memory Storage.

@@ -1,6 +1,6 @@
-/*
+﻿/*
  * =========================================================================
- * Σ SIGMAOS: SOVEREIGN ACTIVE DIRECTORY (v1.0 — C11)
+ * S SIGMAOS: SOVEREIGN ACTIVE DIRECTORY (v1.0 — C11)
  * =========================================================================
  * Absorbed USPs from: Windows Server Active Directory / LDAP / Kerberos
  *

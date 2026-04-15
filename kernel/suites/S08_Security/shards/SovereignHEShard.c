@@ -1,6 +1,6 @@
-/*
+﻿/*
  * =========================================================================
- * Σ SIGMAOS ZENITH: SOVEREIGN HE SHARD (v50.5-OMEGA-INFINITY)
+ * S SIGMAOS ZENITH: SOVEREIGN HE SHARD (v50.5-OMEGA-INFINITY)
  * =========================================================================
  * Mission: Computing on encrypted data without decryption.
  * Principles: Cyber Security, Privacy, Mathematics, Computer Science.

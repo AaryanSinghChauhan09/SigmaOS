@@ -1,6 +1,6 @@
-/*
+﻿/*
  * =========================================================================
- * Σ SIGMAOS: SOVEREIGN OMNI-SHARD (v20.0 - PURE C11 FINALITY)
+ * S SIGMAOS: SOVEREIGN OMNI-SHARD (v20.0 - PURE C11 FINALITY)
  * =========================================================================
  * Principle: Zero OOP runtime. Zero vtable overhead. Unified Matrix.
  * Standard: C11 (ISO/IEC 9899:2011)

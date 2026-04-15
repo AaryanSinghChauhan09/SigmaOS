@@ -1,6 +1,6 @@
-/*
+﻿/*
  * =========================================================================
- * Σ SIGMAOS: SOVEREIGN DESIGN PRINCIPLES SUITE (v2.0 - INDUSTRIAL)
+ * S SIGMAOS: SOVEREIGN DESIGN PRINCIPLES SUITE (v2.0 - INDUSTRIAL)
  * =========================================================================
  * Mission: Enforce Architectural Principles as Kernel Features.
  * =========================================================================
@@ -51,7 +51,7 @@ void sigma_principle_auditability(void) {
 
 /* --- Initialization --- */
 void SovereignPrinciple_Init(void) {
-    sigma_printf("Σ [PRINCIPLE-SUITE]: Enforcing Extended Sovereign Principles...\n");
+    sigma_printf("S [PRINCIPLE-SUITE]: Enforcing Extended Sovereign Principles...\n");
     sigma_principle_self_repair();
     sigma_principle_zkp_audit();
     sigma_principle_zerocopy_io();
@@ -60,7 +60,7 @@ void SovereignPrinciple_Init(void) {
     sigma_principle_sovereignty();
     sigma_principle_purity();
     sigma_principle_auditability();
-    sigma_printf("Σ [PRINCIPLE-SUITE]: Architectural dominance established.\n");
+    sigma_printf("S [PRINCIPLE-SUITE]: Architectural dominance established.\n");
 }
 
 void SovereignPrinciple_Register(void) {

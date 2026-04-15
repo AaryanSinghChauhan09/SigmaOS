@@ -1,6 +1,6 @@
-/*
+﻿/*
  * =========================================================================
- * Σ SIGMAOS ZENITH: SOVEREIGN DHT ENGINE (v1.0)
+ * S SIGMAOS ZENITH: SOVEREIGN DHT ENGINE (v1.0)
  * =========================================================================
  * Mission: Decentralized data indexing and peer-to-peer sharding.
  * Principles: Distributed Hash Table (DHT), Chord-style Routing.

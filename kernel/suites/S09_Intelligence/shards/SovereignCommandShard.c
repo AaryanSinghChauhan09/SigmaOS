@@ -1,6 +1,6 @@
-/*
+﻿/*
  * =========================================================================
- * Σ SIGMAOS ZENITH: SOVEREIGN CLI ENGINE (v1.0)
+ * S SIGMAOS ZENITH: SOVEREIGN CLI ENGINE (v1.0)
  * =========================================================================
  * Mission: High-performance Command Line Shell (Kernel Level).
  * Principles: Argv Tokenization, Command Routing, Help-System Integration.

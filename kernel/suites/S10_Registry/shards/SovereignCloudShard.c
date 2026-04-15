@@ -1,6 +1,6 @@
-/*
+﻿/*
  * =========================================================================
- * Σ SIGMAOS ZENITH: SOVEREIGN CLOUD ENGINE (v1.0)
+ * S SIGMAOS ZENITH: SOVEREIGN CLOUD ENGINE (v1.0)
  * =========================================================================
  * Mission: Elastic resource scaling and virtualized multi-tenancy.
  * Principles: Resource Pooling, On-demand Scaling, Quotas.

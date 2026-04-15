@@ -1,6 +1,6 @@
-/*
+﻿/*
  * =========================================================================
- * Σ SIGMAOS: SOVEREIGN LOCKING INTERFACE (v1.0)
+ * S SIGMAOS: SOVEREIGN LOCKING INTERFACE (v1.0)
  * =========================================================================
  * Mission: High-performance synchronization primitives.
  * Design: C11 / Zero-Dependency / Hardware-Accelerated.

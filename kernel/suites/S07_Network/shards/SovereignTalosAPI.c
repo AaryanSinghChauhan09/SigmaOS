@@ -1,10 +1,10 @@
-#include "sigma_base.h"
+﻿#include "sigma_base.h"
 
 #include <sigma_types.h>
 #include "sigma_print.h"
 
 /*
- * Σ Sovereign Talos API Monolith
+ * S Sovereign Talos API Monolith
  * USP: Talos Linux / K3OS (API-managed Immutable Kubernetes)
  * Concept: Vaporizes standard SSH access and user shells entirely. 
  *          The core operating system enforces configuration explicitly

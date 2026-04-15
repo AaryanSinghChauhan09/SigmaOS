@@ -1,6 +1,6 @@
-/*
+﻿/*
  * =========================================================================
- * Σ SIGMAOS ZENITH: SOVEREIGN BRANCH-AND-BOUND (v51.9-DIVINE-SINGULARITY)
+ * S SIGMAOS ZENITH: SOVEREIGN BRANCH-AND-BOUND (v51.9-DIVINE-SINGULARITY)
  * =========================================================================
  * Mission: Global optimization for discrete resource allocation.
  * Principles: Algorithms, Data Science, Storage, Automations.

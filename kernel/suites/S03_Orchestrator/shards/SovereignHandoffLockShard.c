@@ -1,6 +1,6 @@
-/*
+﻿/*
  * =========================================================================
- * Σ SIGMAOS ZENITH: SOVEREIGN HANDOFF-LOCK SHARD (v53.3-SUPREME-NEBULA)
+ * S SIGMAOS ZENITH: SOVEREIGN HANDOFF-LOCK SHARD (v53.3-SUPREME-NEBULA)
  * =========================================================================
  * Mission: Preventing core thrashing via controlled lock ownership transfer.
  * Principles: Multi-Processing, Computer Science, Throughput, Scalability.

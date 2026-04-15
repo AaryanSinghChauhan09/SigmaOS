@@ -1,6 +1,6 @@
-/*
+﻿/*
  * =========================================================================
- * Σ SIGMAOS ZENITH: SOVEREIGN GFX ACCELERATOR (v1.0)
+ * S SIGMAOS ZENITH: SOVEREIGN GFX ACCELERATOR (v1.0)
  * =========================================================================
  * Mission: Zero-Dependency Hardware-Accelerated GFX Operations.
  * Design: C11 / x86_64 Assembly / Minimal Silicon Latency.

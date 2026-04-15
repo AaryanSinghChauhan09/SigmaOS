@@ -1,6 +1,6 @@
-/*
+﻿/*
  * =========================================================================
- * Σ SIGMAOS: SOVEREIGN NETWORKING INTERFACE (v1.0)
+ * S SIGMAOS: SOVEREIGN NETWORKING INTERFACE (v1.0)
  * =========================================================================
  * Mission: Modular protocol stack (Ethernet, IPv4, IPv6, TCP, UDP).
  * Design: C11 / Zero-Dependency / Registry-Based.

@@ -1,6 +1,6 @@
-/*
+﻿/*
  * =========================================================================
- * Σ SIGMAOS ZENITH: SOVEREIGN LEXER SHARD (v50.0-SINGULARITY)
+ * S SIGMAOS ZENITH: SOVEREIGN LEXER SHARD (v50.0-SINGULARITY)
  * =========================================================================
  * Mission: Zero-dependency lexical analysis for Sovereign Scripts.
  * Principles: Finite State Automata, Tokenization, Grammar Purity.

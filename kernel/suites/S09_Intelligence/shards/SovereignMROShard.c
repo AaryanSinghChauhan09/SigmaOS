@@ -1,6 +1,6 @@
-/*
+﻿/*
  * =========================================================================
- * Σ SIGMAOS MULTIVERSE_CORE: SOVEREIGN MRO SHARD (v58.1-SUPREME-MULTIVERSE_CORE)
+ * S SIGMAOS MULTIVERSE_CORE: SOVEREIGN MRO SHARD (v58.1-SUPREME-MULTIVERSE_CORE)
  * =========================================================================
  * Mission: Radical 3D somersaulting maneuvers to escape dimensional traps.
  * Principles: AI, Algorithms, Data Science.

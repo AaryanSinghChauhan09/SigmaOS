@@ -1,6 +1,6 @@
-/*
+﻿/*
  * =========================================================================
- * Σ SIGMAOS ZENITH: SOVEREIGN DIFF-PRIVACY SHARD (v53.2-SUPREME-EMPYREAN)
+ * S SIGMAOS ZENITH: SOVEREIGN DIFF-PRIVACY SHARD (v53.2-SUPREME-EMPYREAN)
  * =========================================================================
  * Mission: Statistical privacy for kernel telemetry and analytics.
  * Principles: Cyber Security, Privacy, Data Science, Mathematics.

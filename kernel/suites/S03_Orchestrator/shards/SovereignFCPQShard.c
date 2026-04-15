@@ -1,6 +1,6 @@
-/*
+﻿/*
  * =========================================================================
- * Σ SIGMAOS ZENITH: SOVEREIGN FC-PQUEUE SHARD (v55.2-SUPREME-PROXIMA)
+ * S SIGMAOS ZENITH: SOVEREIGN FC-PQUEUE SHARD (v55.2-SUPREME-PROXIMA)
  * =========================================================================
  * Mission: High-throughput task prioritization via aggregated combining.
  * Principles: Multi-Processing, Computer Science, Throughput, Scalability.

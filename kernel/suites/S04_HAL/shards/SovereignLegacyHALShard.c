@@ -1,4 +1,4 @@
-#include "sigma_base.h"
+﻿#include "sigma_base.h"
 
 #include "SovereignArch.h"
 #include "sigma_libc.h"
@@ -11,9 +11,9 @@
  */
 
 sigma_err_t sigma_hal_legacy_init(void) {
-    sigma_printf("  Σ [HAL-LEGACY]: Sovereign legacy architecture resurrection active.\n");
-    sigma_printf("  Σ [HAL-LEGACY]: Memory footprint crushed to sub-50MB bounds.\n");
-    sigma_printf("  Σ [HAL-LEGACY]: Defaulting to base ALU instruction set.\n");
+    sigma_printf("  S [HAL-LEGACY]: Sovereign legacy architecture resurrection active.\n");
+    sigma_printf("  S [HAL-LEGACY]: Memory footprint crushed to sub-50MB bounds.\n");
+    sigma_printf("  S [HAL-LEGACY]: Defaulting to base ALU instruction set.\n");
     return SIGMA_OK;
 }
 

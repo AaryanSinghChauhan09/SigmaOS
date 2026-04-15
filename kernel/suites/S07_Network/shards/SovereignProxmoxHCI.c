@@ -1,10 +1,10 @@
-#include "sigma_base.h"
+﻿#include "sigma_base.h"
 
 #include <sigma_types.h>
 #include "sigma_print.h"
 
 /*
- * Σ Sovereign Proxmox HCI Matrix
+ * S Sovereign Proxmox HCI Matrix
  * USP: Proxmox Virtual Environment (Hyper-Converged Infrastructure)
  * Concept: Blends LXC container limits and KVM full-virtualization seamlessly
  *          into a unified hyper-converged orchestration substrate. Handles computing,

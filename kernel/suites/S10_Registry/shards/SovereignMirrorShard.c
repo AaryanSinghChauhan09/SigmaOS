@@ -1,6 +1,6 @@
-/*
+﻿/*
  * =========================================================================
- * Σ SIGMAOS ZENITH: SOVEREIGN MIRROR ENGINE (v1.0)
+ * S SIGMAOS ZENITH: SOVEREIGN MIRROR ENGINE (v1.0)
  * =========================================================================
  * Mission: High-availability through process and shard mirroring.
  * Principles: Checkpointing, State Reconciliation, Hot-Swap Failover.

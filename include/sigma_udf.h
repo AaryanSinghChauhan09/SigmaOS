@@ -1,6 +1,6 @@
-/*
+﻿/*
  * =========================================================================
- * Σ SIGMAOS: SOVEREIGN USER-DEFINED FUNCTIONS (UDF) REGISTRY
+ * S SIGMAOS: SOVEREIGN USER-DEFINED FUNCTIONS (UDF) REGISTRY
  * =========================================================================
  * Mission: Allow customized, user-defined logic within the Sovereign Lattice.
  * =========================================================================

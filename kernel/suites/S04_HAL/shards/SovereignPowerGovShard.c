@@ -1,4 +1,4 @@
-#include "sigma_base.h"
+﻿#include "sigma_base.h"
 
 #include "SovereignArch.h"
 #include "sigma_libc.h"
@@ -10,9 +10,9 @@
  */
 
 sigma_err_t sigma_power_init(void) {
-    sigma_printf("  Σ [POWER]: Sovereign Power Governor online.\n");
-    sigma_printf("  Σ [POWER]: ACPI/DeviceTree state transitions mapped.\n");
-    sigma_printf("  Σ [POWER]: CPU P-states: dynamic scaling active.\n");
+    sigma_printf("  S [POWER]: Sovereign Power Governor online.\n");
+    sigma_printf("  S [POWER]: ACPI/DeviceTree state transitions mapped.\n");
+    sigma_printf("  S [POWER]: CPU P-states: dynamic scaling active.\n");
     return SIGMA_OK;
 }
 

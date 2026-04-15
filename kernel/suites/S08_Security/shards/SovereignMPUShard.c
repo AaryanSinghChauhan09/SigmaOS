@@ -1,6 +1,6 @@
-/*
+﻿/*
  * =========================================================================
- * Σ SIGMAOS EON: SOVEREIGN MPU SHARD (v57.1-SUPREME-EON)
+ * S SIGMAOS EON: SOVEREIGN MPU SHARD (v57.1-SUPREME-EON)
  * =========================================================================
  * Mission: Deterministic memory protection for embedded environments.
  * Principles: Cyber Security, Safety, Hardware Mastery, Embedded.

@@ -1,6 +1,6 @@
-/*
+﻿/*
  * =========================================================================
- * Σ SIGMAOS tests/giv/sigma_giv.c — GIV Engine
+ * S SIGMAOS tests/giv/sigma_giv.c — GIV Engine
  * =========================================================================
  */
 
@@ -32,7 +32,7 @@ static const char *res_str[] = {"PASS","FAIL","SKIP","TIMEOUT"};
 void sigma_giv_init(void) {
     sigma_memset(s_tests, 0, sizeof(s_tests));
     sigma_memset(&s_stats, 0, sizeof(s_stats));
-    sigma_printf("Σ [GIV] Global Integration Verification initialized\n");
+    sigma_printf("S [GIV] Global Integration Verification initialized\n");
 }
 
 void sigma_giv_register(const char *suite, const char *name,
@@ -59,19 +59,19 @@ static void run_test(gv_test_t *t) {
 }
 
 void sigma_giv_run_all(void) {
-    sigma_printf("\nΣ GIV RUN ALL (%u tests)\n", s_count);
+    sigma_printf("\nS GIV RUN ALL (%u tests)\n", s_count);
     sigma_printf("%-42s %-8s %s\n", "TEST", "CAT", "RESULT");
     for (gv_u32 i = 0; i < s_count; i++) run_test(&s_tests[i]);
 }
 
 void sigma_giv_run_suite(const char *suite) {
-    sigma_printf("\nΣ GIV SUITE: %s\n", suite);
+    sigma_printf("\nS GIV SUITE: %s\n", suite);
     for (gv_u32 i = 0; i < s_count; i++)
         if (sigma_streq(s_tests[i].suite, suite)) run_test(&s_tests[i]);
 }
 
 void sigma_giv_run_category(gv_category_t cat) {
-    sigma_printf("\nΣ GIV CATEGORY: %s\n", cat_str[cat]);
+    sigma_printf("\nS GIV CATEGORY: %s\n", cat_str[cat]);
     for (gv_u32 i = 0; i < s_count; i++)
         if (s_tests[i].category == cat) run_test(&s_tests[i]);
 }
@@ -80,9 +80,9 @@ gv_stats_t sigma_giv_stats(void) { return s_stats; }
 
 void sigma_giv_report(void) {
     sigma_printf("\n");
-    sigma_printf("Σ ══════════════════════════════════════════════\n");
+    sigma_printf("S ══════════════════════════════════════════════\n");
     sigma_printf("  GIV REPORT — SOVEREIGN LATTICE VERIFICATION\n");
-    sigma_printf("Σ ══════════════════════════════════════════════\n");
+    sigma_printf("S ══════════════════════════════════════════════\n");
     sigma_printf("  Total:   %u\n",  s_stats.total);
     sigma_printf("  Passed:  %u ✓\n",s_stats.passed);
     sigma_printf("  Failed:  %u ✗\n",s_stats.failed);
@@ -91,9 +91,9 @@ void sigma_giv_report(void) {
                  s_stats.total ? (s_stats.passed * 100 / s_stats.total) : 0);
 
     if (s_stats.failed == 0)
-        sigma_printf("\nΣ ALL SUITES VERIFIED. SOVEREIGNTY IS ABSOLUTE.\n");
+        sigma_printf("\nS ALL SUITES VERIFIED. SOVEREIGNTY IS ABSOLUTE.\n");
     else {
-        sigma_printf("\nΣ FAILURES:\n");
+        sigma_printf("\nS FAILURES:\n");
         for (gv_u32 i = 0; i < s_count; i++)
             if (s_tests[i].result == GV_RESULT_FAIL)
                 sigma_printf("  [%s] %s\n", s_tests[i].suite, s_tests[i].name);

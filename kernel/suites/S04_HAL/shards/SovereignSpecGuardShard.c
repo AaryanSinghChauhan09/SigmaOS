@@ -1,6 +1,6 @@
-/*
+﻿/*
  * =========================================================================
- * Σ SIGMAOS ZENITH: SOVEREIGN SPEC-GUARD SHARD (v55.0-CENTAURI-PRIME)
+ * S SIGMAOS ZENITH: SOVEREIGN SPEC-GUARD SHARD (v55.0-CENTAURI-PRIME)
  * =========================================================================
  * Mission: Energy-efficient spin-waiting and speculation control.
  * Principles: Performance, Power-Management, Computer Science, Safety.

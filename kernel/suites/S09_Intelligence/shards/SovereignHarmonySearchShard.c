@@ -1,6 +1,6 @@
-/*
+﻿/*
  * =========================================================================
- * Σ SIGMAOS ZENITH: SOVEREIGN HARMONY SHARD (v52.5-SUPREME-VALKYRIE)
+ * S SIGMAOS ZENITH: SOVEREIGN HARMONY SHARD (v52.5-SUPREME-VALKYRIE)
  * =========================================================================
  * Mission: Musical-instrument based metaheuristic optimization.
  * Principles: AI, Algorithms, Data Science, Personalisation.

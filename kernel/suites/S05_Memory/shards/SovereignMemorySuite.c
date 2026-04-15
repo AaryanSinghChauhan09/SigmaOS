@@ -1,6 +1,6 @@
-/*
+﻿/*
  * =========================================================================
- * Σ SIGMAOS: SOVEREIGN MEMORY MANAGEMENT SUITE (v2.5 - SUPREME OPTIMIZED)
+ * S SIGMAOS: SOVEREIGN MEMORY MANAGEMENT SUITE (v2.5 - SUPREME OPTIMIZED)
  * =========================================================================
  * Mission: O(1) Slab Allocation & Background Defragmentation.
  * =========================================================================
@@ -37,10 +37,10 @@ void sigma_memory_defrag(void) {
 
 /* --- Sub-Module 3: VMM Aggregator --- */
 void SovereignMemory_Init(void) {
-    sigma_printf("Σ [MEMORY-SUITE]: Initialising Sovereign PMM and VMM...\n");
+    sigma_printf("S [MEMORY-SUITE]: Initialising Sovereign PMM and VMM...\n");
     pmm_init();
     sigma_memory_defrag();
-    sigma_printf("Σ [MEMORY-SUITE]: Slab-based allocation matrix ONLINE.\n");
+    sigma_printf("S [MEMORY-SUITE]: Slab-based allocation matrix ONLINE.\n");
 }
 
 void SovereignMemory_Register(void) {

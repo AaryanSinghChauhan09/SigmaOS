@@ -1,6 +1,6 @@
-/*
+﻿/*
  * =========================================================================
- * Σ SIGMAOS ZENITH: SOVEREIGN ORAM SHARD (v51.4-ABSOLUTE-VOID)
+ * S SIGMAOS ZENITH: SOVEREIGN ORAM SHARD (v51.4-ABSOLUTE-VOID)
  * =========================================================================
  * Mission: Hiding memory access patterns from side-channel analysis.
  * Principles: Cyber Security, Computer Science, Privacy.

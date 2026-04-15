@@ -1,6 +1,6 @@
-/*
+﻿/*
  * =========================================================================
- * Σ SIGMAOS: S02_ZENITHUI — SovereignDisplayServer.c
+ * S SIGMAOS: S02_ZENITHUI — SovereignDisplayServer.c
  * =========================================================================
  * Implementation of Idea 506 (Apex Infinity): SigmaDisplay Server.
  * Hand-coded framebuffer management and alpha-blending compositor stubs.
@@ -25,11 +25,11 @@ static uint8_t g_backbuffer[FB_WIDTH * FB_HEIGHT * FB_BPP];
 
 void display_server_init(void) {
     sigma_memset(g_backbuffer, 0, sizeof(g_backbuffer));
-    sigma_printf("Σ [S02]: SigmaDisplay Server Materialized (Apex Idea 506).\n");
+    sigma_printf("S [S02]: SigmaDisplay Server Materialized (Apex Idea 506).\n");
 }
 
 void display_blit(SovereignSurface* src, uint32_t x, uint32_t y) {
-    sigma_printf("Σ [S02]: Blitting surface -> (%u, %u) Size: (%ux%u)\n", 
+    sigma_printf("S [S02]: Blitting surface -> (%u, %u) Size: (%ux%u)\n", 
                  x, y, src->width, src->height);
     // Compositor logic for alpha-blending goes here
 }

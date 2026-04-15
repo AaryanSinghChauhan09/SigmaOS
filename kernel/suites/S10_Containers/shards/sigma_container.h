@@ -1,6 +1,6 @@
-/*
+﻿/*
  * =========================================================================
- * Σ SIGMAOS kernel/suites/S10_Containers/shards/sigma_container.h
+ * S SIGMAOS kernel/suites/S10_Containers/shards/sigma_container.h
  * =========================================================================
  * Sovereign Container Runtime — gap-closes:
  *   Linux  : LXC/Docker namespaces, cgroups v2, seccomp-BPF, overlayfs

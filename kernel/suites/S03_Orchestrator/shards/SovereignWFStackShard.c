@@ -1,6 +1,6 @@
-/*
+﻿/*
  * =========================================================================
- * Σ SIGMAOS ZENITH: SOVEREIGN WF-STACK SHARD (v54.0-PULSAR-CENTAURI)
+ * S SIGMAOS ZENITH: SOVEREIGN WF-STACK SHARD (v54.0-PULSAR-CENTAURI)
  * =========================================================================
  * Mission: ABA-proof wait-free stack for high-concurrency LIFO tasks.
  * Principles: Multi-Processing, Computer Science, Throughput, Scalability.

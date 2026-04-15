@@ -1,6 +1,6 @@
-/*
+﻿/*
  * =========================================================================
- * Σ SIGMAOS: SOVEREIGN AUDIO SHARD (v1.0 - PURE C11)
+ * S SIGMAOS: SOVEREIGN AUDIO SHARD (v1.0 - PURE C11)
  * =========================================================================
  * Mission: High-Fidelity Silicon-Direct Sound (ALSA/OSS Parity).
  * Design: C11 / Zero-Dependency / Waveform-Buffer-Matrix.

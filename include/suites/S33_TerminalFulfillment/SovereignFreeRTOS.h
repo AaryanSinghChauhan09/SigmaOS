@@ -1,6 +1,6 @@
-/*
+﻿/*
  * =========================================================================
- * Σ SIGMAOS: SOVEREIGN FREERTOS PARITY (v1.0 — C11)
+ * S SIGMAOS: SOVEREIGN FREERTOS PARITY (v1.0 — C11)
  * =========================================================================
  * Absorbed USPs from: FreeRTOS
  *   https://github.com/FreeRTOS/FreeRTOS-Kernel

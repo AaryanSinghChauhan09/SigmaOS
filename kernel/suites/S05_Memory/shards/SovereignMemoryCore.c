@@ -1,4 +1,4 @@
-#include "sigma_base.h"
+﻿#include "sigma_base.h"
 #include "SovereignInterconnect.h"
 
 #include "SovereignPMM.h"
@@ -15,7 +15,7 @@ void pmm_init(void) {
     for (sigma_u32 i = 0; i < 8; i++)
         s_frame_bitmap[i] = 0;
     s_free_frames = (sigma_u32)TOTAL_FRAMES - 512;
-    sigma_printf("Σ [PMM]: %u frames available (%u MB)\n",
+    sigma_printf("S [PMM]: %u frames available (%u MB)\n",
                  s_free_frames, s_free_frames * 4 / 1024);
 }
 

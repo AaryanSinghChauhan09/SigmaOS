@@ -1,10 +1,10 @@
-#ifndef SOVEREIGN_VFS_H
+﻿#ifndef SOVEREIGN_VFS_H
 #define SOVEREIGN_VFS_H
 
 #include "SovereignLibC.h"
 
 /*
- * Σ SIGMAOS: VIRTUAL FILE SYSTEM ABSTRACTION
+ * S SIGMAOS: VIRTUAL FILE SYSTEM ABSTRACTION
  * Implements /dev/ abstraction decoupled from hardcoded drivers.
  */
 

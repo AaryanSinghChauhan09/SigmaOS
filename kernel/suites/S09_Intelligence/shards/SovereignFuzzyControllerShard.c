@@ -1,6 +1,6 @@
-/*
+﻿/*
  * =========================================================================
- * Σ SIGMAOS ZENITH: SOVEREIGN FUZZY CONTROLLER (v51.4-ABSOLUTE-VOID)
+ * S SIGMAOS ZENITH: SOVEREIGN FUZZY CONTROLLER (v51.4-ABSOLUTE-VOID)
  * =========================================================================
  * Mission: Linguistic-based adaptive hardware control (fans/thermal).
  * Principles: AI, Algorithms, Automations, Embedded.

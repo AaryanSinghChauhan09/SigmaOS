@@ -1,6 +1,6 @@
-/*
+﻿/*
  * =========================================================================
- * Σ SIGMAOS: SOVEREIGN INTELLIGENCE (Suite S09)
+ * S SIGMAOS: SOVEREIGN INTELLIGENCE (Suite S09)
  * =========================================================================
  */
 
@@ -15,8 +15,8 @@ void sigma_sentience_init(void) {
     s_sentience.entropy_score = 100; /* Perfect order */
     s_sentience.lattice_health = 100;
     
-    sigma_printf("Σ [INT] Sovereign Sentience Shard initialized\n");
-    sigma_printf("Σ [INT] Neural Weight Ingest: Q8 Quantized | Meta-Heuristic\n");
+    sigma_printf("S [INT] Sovereign Sentience Shard initialized\n");
+    sigma_printf("S [INT] Neural Weight Ingest: Q8 Quantized | Meta-Heuristic\n");
 }
 
 /* ── Lifecycle ────────────────────────────────────────────────────────── */
@@ -44,5 +44,5 @@ sigma_bool sigma_detect_anomaly(void) {
 
 /* ── Self-Evolution ────────────────────────────────────────────────────── */
 void sigma_optimize_scheduler(void) {
-    sigma_printf("Σ [INT] Sentience Engine: Recalibrating CFS time-slice quotas...\n");
+    sigma_printf("S [INT] Sentience Engine: Recalibrating CFS time-slice quotas...\n");
 }

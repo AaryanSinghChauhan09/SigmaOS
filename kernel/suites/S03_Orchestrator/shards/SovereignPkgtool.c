@@ -1,7 +1,7 @@
-#include "sigma_kernel.h"
+﻿#include "sigma_kernel.h"
 
 void SovereignPkgtool_Init() {
-    sigma_printf("Σ [ABSORB]: SovereignPkgtool Zenith Online. Unified Parity Verified.\n");
+    sigma_printf("S [ABSORB]: SovereignPkgtool Zenith Online. Unified Parity Verified.\n");
 }
 
 

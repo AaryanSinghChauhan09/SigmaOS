@@ -1,6 +1,6 @@
-/*
+﻿/*
  * =========================================================================
- * Σ SIGMAOS: SOVEREIGN SYSCALL SHARD (v1.0 - PURE C11 / ASM)
+ * S SIGMAOS: SOVEREIGN SYSCALL SHARD (v1.0 - PURE C11 / ASM)
  * =========================================================================
  * Mission: Zero-Library hardware interaction via inline assembly.
  * =========================================================================

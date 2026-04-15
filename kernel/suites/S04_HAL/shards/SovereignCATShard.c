@@ -1,6 +1,6 @@
-/*
+﻿/*
  * =========================================================================
- * Σ SIGMAOS ZENITH: SOVEREIGN CAT SHARD (v55.3-SUPREME-ORION)
+ * S SIGMAOS ZENITH: SOVEREIGN CAT SHARD (v55.3-SUPREME-ORION)
  * =========================================================================
  * Mission: Silicon-level L3 cache partitioning for critical shard isolation.
  * Principles: Performance, Computer Science, Quality-of-Service.

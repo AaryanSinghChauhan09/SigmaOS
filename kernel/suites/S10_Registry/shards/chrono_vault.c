@@ -1,4 +1,4 @@
-#include "sigma_base.h"
+﻿#include "sigma_base.h"
 
 #include "SigmaC11.h"
 
@@ -29,7 +29,7 @@ void vault_restore(const char* snapshot_id) {
 int chrono_vault_ToolMain(int argc, char* argv[]) {
     if(argc < 2) {
         sigma_print("===================================\n");
-        sigma_print("    Σ SOVEREIGN CHRONO-VAULT       \n");
+        sigma_print("    S SOVEREIGN CHRONO-VAULT       \n");
         sigma_print("===================================\n");
         sigma_print("Usage: sigma vault --snapshot\n");
         sigma_print("Usage: sigma vault --restore [ID]\n\n");

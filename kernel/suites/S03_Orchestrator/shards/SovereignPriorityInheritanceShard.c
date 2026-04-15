@@ -1,6 +1,6 @@
-/*
+﻿/*
  * =========================================================================
- * Σ SIGMAOS ZENITH: SOVEREIGN PRIORITY-INHERITANCE (v53.1-SUPREME-AETHER)
+ * S SIGMAOS ZENITH: SOVEREIGN PRIORITY-INHERITANCE (v53.1-SUPREME-AETHER)
  * =========================================================================
  * Mission: Eliminating priority inversion in real-time core scheduling.
  * Principles: Multi-Processing, Computer Science, Real-Time, Safety.

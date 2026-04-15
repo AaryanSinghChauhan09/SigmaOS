@@ -1,6 +1,6 @@
-/*
+﻿/*
  * =========================================================================
- * Σ SIGMAOS kernel/suites/S08_Security/shards/sigma_lsm.h
+ * S SIGMAOS kernel/suites/S08_Security/shards/sigma_lsm.h
  * =========================================================================
  * Sovereign Linux Security Module (LSM) framework — gap-closes:
  *   Linux  : LSM hooks, SELinux, AppArmor, seccomp-BPF

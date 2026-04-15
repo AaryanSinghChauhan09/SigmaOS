@@ -1,6 +1,6 @@
-/*
+﻿/*
  * =========================================================================
- * Σ SIGMAOS OLYMPUS: SOVEREIGN PUF SHARD (v57.9-SUPREME-OLYMPUS)
+ * S SIGMAOS OLYMPUS: SOVEREIGN PUF SHARD (v57.9-SUPREME-OLYMPUS)
  * =========================================================================
  * Mission: Silicon biometrics for absolute zero-storage authentication.
  * Principles: Cyber Security, Hardware Mastery, Privacy.

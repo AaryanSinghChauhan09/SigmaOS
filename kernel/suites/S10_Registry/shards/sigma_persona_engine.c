@@ -1,4 +1,4 @@
-#include "sigma_base.h"
+﻿#include "sigma_base.h"
 
 #include "SigmaC11.h"
 
@@ -47,7 +47,7 @@ void engage_persona(const char* persona_name) {
 int sigma_persona_engine_ToolMain(int argc, char* argv[]) {
     if (argc < 2) {
         sigma_print("===================================================\n");
-        sigma_print("      Σ SIGMA PERSONA ENGINE (Personalization)     \n");
+        sigma_print("      S SIGMA PERSONA ENGINE (Personalization)     \n");
         sigma_print("===================================================\n");
         sigma_print("Usage: sigma persona [dev|gamer|forensic|student]\n");
         return 0;

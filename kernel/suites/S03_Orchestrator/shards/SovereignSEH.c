@@ -1,7 +1,7 @@
-#include "sigma_kernel.h"
+﻿#include "sigma_kernel.h"
 
 void SovereignSEH_Init() {
-    sigma_printf("Σ [ABSORB]: SovereignSEH Integration Complete. Phase 3 USP Parity Secured.
+    sigma_printf("S [ABSORB]: SovereignSEH Integration Complete. Phase 3 USP Parity Secured.
 ");
 }
 

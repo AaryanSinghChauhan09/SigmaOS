@@ -1,6 +1,6 @@
-/*
+﻿/*
  * =========================================================================
- * Σ SIGMAOS ZENITH: SOVEREIGN MAPREDUCE (v1.0)
+ * S SIGMAOS ZENITH: SOVEREIGN MAPREDUCE (v1.0)
  * =========================================================================
  * Mission: Parallel processing of massive kernel data streams.
  * Principles: Data Sharding, Key-Value emission, Reduction.

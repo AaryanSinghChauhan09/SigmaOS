@@ -1,6 +1,6 @@
-/*
+﻿/*
  * =========================================================================
- * Σ SIGMAOS MULTIVERSE_CHRONOS: SOVEREIGN VBS SHARD (v58.2-SUPREME-MULTIVERSE_CHRONOS)
+ * S SIGMAOS MULTIVERSE_CHRONOS: SOVEREIGN VBS SHARD (v58.2-SUPREME-MULTIVERSE_CHRONOS)
  * =========================================================================
  * Mission: Absolute credential isolation outside the core OS execution context.
  * Principles: Cyber Security, Privacy, Hardware Mastery, Server.

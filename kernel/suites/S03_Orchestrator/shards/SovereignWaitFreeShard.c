@@ -1,6 +1,6 @@
-/*
+﻿/*
  * =========================================================================
- * Σ SIGMAOS ZENITH: SOVEREIGN WAIT-FREE CONCURRENCY (v51.1-SINGULARITY-NEXUS)
+ * S SIGMAOS ZENITH: SOVEREIGN WAIT-FREE CONCURRENCY (v51.1-SINGULARITY-NEXUS)
  * =========================================================================
  * Mission: Guaranteeing per-thread progress for critical kernel paths.
  * Principles: Multi-Processing, Computer Science, Determinism, Safety.

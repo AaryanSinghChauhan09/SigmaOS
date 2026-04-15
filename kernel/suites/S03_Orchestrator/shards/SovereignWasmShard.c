@@ -1,6 +1,6 @@
-/*
+﻿/*
  * =========================================================================
- * Σ SIGMAOS ZENITH: SOVEREIGN WASM RUNTIME (v51.7-ULTIMATE-ORACLE)
+ * S SIGMAOS ZENITH: SOVEREIGN WASM RUNTIME (v51.7-ULTIMATE-ORACLE)
  * =========================================================================
  * Mission: Platform-agnostic bytecode execution for User-Defined Functions.
  * Principles: Computer Science, Browser-OS Parity, Portability, Safety.

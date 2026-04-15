@@ -1,6 +1,6 @@
-/*
+﻿/*
  * =========================================================================
- * Σ SIGMAOS MULTIVERSE_ETERNITY_GATE: SOVEREIGN OOB SHARD (v58.3-SUPREME)
+ * S SIGMAOS MULTIVERSE_ETERNITY_GATE: SOVEREIGN OOB SHARD (v58.3-SUPREME)
  * =========================================================================
  * Mission: Neutralizing Above-Kernel hardware management exploits.
  * Principles: Cyber Security, Hardware Mastery, Server.

@@ -1,6 +1,6 @@
-/*
+﻿/*
  * =========================================================================
- * Σ SIGMAOS ZENITH: SOVEREIGN HLE SHARD (v55.1-SUPREME-SIRIUS)
+ * S SIGMAOS ZENITH: SOVEREIGN HLE SHARD (v55.1-SUPREME-SIRIUS)
  * =========================================================================
  * Mission: Hardware Lock Elision (HLE) fallback for scalable spinlocks.
  * Principles: Multi-Processing, Computer Science, Performance, Throughput.

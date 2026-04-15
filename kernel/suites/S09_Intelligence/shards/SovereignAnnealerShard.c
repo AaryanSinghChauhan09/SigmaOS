@@ -1,6 +1,6 @@
-/*
+﻿/*
  * =========================================================================
- * Σ SIGMAOS ZENITH: SOVEREIGN ANNEALER (v51.3-COSMIC-RESONANCE)
+ * S SIGMAOS ZENITH: SOVEREIGN ANNEALER (v51.3-COSMIC-RESONANCE)
  * =========================================================================
  * Mission: Global thermal and power optimization via metaheuristics.
  * Principles: Algorithms, Embedded, Automations, Self-Healing.

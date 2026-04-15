@@ -1,9 +1,9 @@
-#ifndef SOVEREIGN_R_ZENITH_H
+﻿#ifndef SOVEREIGN_R_ZENITH_H
 #define SOVEREIGN_R_ZENITH_H
 
 #include "SigmaOOP.h"
 
-/* Σ Territory Initiation */
+/* S Territory Initiation */
 
 // --- VECTORIZED COMPUTATION (R BASE PARITY) ---
 CLASS_DECLARE(SovereignRVectorMath) { 
@@ -32,6 +32,6 @@ CLASS_DECLARE(SovereignGrammarOfGraphics) {
     VIRTUAL(void, ApplyGeometricTopology, struct SovereignGrammarOfGraphics* self, const char* geomType);
 };
 
-/* Σ Territory Termination */
+/* S Territory Termination */
 
 #endif

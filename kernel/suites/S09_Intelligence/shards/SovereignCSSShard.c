@@ -1,6 +1,6 @@
-/*
+﻿/*
  * =========================================================================
- * Σ SIGMAOS ZENITH: SOVEREIGN CSS SHARD (v53.5-SUPREME-QUASAR)
+ * S SIGMAOS ZENITH: SOVEREIGN CSS SHARD (v53.5-SUPREME-QUASAR)
  * =========================================================================
  * Mission: High-precision electrical and resource distribution optimization.
  * Principles: AI, Algorithms, Data Science, Throughput.

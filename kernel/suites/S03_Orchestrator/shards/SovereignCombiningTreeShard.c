@@ -1,6 +1,6 @@
-/*
+﻿/*
  * =========================================================================
- * Σ SIGMAOS ZENITH: SOVEREIGN COMBINING-TREE SHARD (v54.1-ANDROMEDA)
+ * S SIGMAOS ZENITH: SOVEREIGN COMBINING-TREE SHARD (v54.1-ANDROMEDA)
  * =========================================================================
  * Mission: High-throughput counting via distributed tree increments.
  * Principles: Multi-Processing, Computer Science, Throughput, Scalability.

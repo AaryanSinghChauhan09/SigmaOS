@@ -1,6 +1,6 @@
-/*
+﻿/*
  * =========================================================================
- * Σ SIGMAOS ZENITH: SOVEREIGN DEADLOCK PREVENTER (v51.3-COSMIC-RESONANCE)
+ * S SIGMAOS ZENITH: SOVEREIGN DEADLOCK PREVENTER (v51.3-COSMIC-RESONANCE)
  * =========================================================================
  * Mission: Guaranteeing system liveness via Banker's Algorithm.
  * Principles: Real-Time, Multi-Processing, Computer Science, Safety.

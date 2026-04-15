@@ -1,6 +1,6 @@
-/*
+﻿/*
  * =========================================================================
- * Σ SIGMAOS ZENITH: SOVEREIGN PARADIGM GUARD (v2.0 — DEEP AUDIT)
+ * S SIGMAOS ZENITH: SOVEREIGN PARADIGM GUARD (v2.0 — DEEP AUDIT)
  * =========================================================================
  * Mission: Universal Enforcement of ALL Master Engineering Domains.
  * Method:  Each audit function verifies that its domain's shards

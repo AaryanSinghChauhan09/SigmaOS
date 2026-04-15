@@ -1,8 +1,8 @@
-#include "sigma_kernel.h"
+﻿#include "sigma_kernel.h"
 #include "SovereignOmniShard.h"
 
 void test_academic_competency_audit() {
-    sigma_printf("Σ [TEST]: Running Global Academic Competency Audit...\n");
+    sigma_printf("S [TEST]: Running Global Academic Competency Audit...\n");
     
     SovereignEdu_OOP_Init();
     SovereignEdu_RDBMS_Init();
@@ -17,7 +17,7 @@ void test_academic_competency_audit() {
     sigma_f64 test_data[] = {10.0, 20.0, 30.0};
     // (test logic for mean sum(data)/3)
     
-    sigma_printf("Σ [PASS]: 11 Syllabi Knowledge Matrix Verified.\n");
+    sigma_printf("S [PASS]: 11 Syllabi Knowledge Matrix Verified.\n");
 }
 
 

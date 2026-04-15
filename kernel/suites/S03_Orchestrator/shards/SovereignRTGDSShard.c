@@ -1,6 +1,6 @@
-/*
+﻿/*
  * =========================================================================
- * Σ SIGMAOS ZENITH: SOVEREIGN RT-GDS SHARD (v55.0-CENTAURI-PRIME)
+ * S SIGMAOS ZENITH: SOVEREIGN RT-GDS SHARD (v55.0-CENTAURI-PRIME)
  * =========================================================================
  * Mission: Global Earliest-Deadline-First (EDF) for the real-time mesh.
  * Principles: Multi-Processing, Computer Science, Real-Time, Distributed.

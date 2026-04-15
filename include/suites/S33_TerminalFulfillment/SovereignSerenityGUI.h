@@ -1,6 +1,6 @@
-/*
+﻿/*
  * =========================================================================
- * Σ SIGMAOS: SOVEREIGN SERENITY GUI (v1.0 — C11)
+ * S SIGMAOS: SOVEREIGN SERENITY GUI (v1.0 — C11)
  * =========================================================================
  * Absorbed USPs from: SerenityOS / Ladybird
  *   https://github.com/SerenityOS/serenity

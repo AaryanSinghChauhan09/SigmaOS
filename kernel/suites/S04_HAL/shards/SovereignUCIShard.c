@@ -1,6 +1,6 @@
-/*
+﻿/*
  * =========================================================================
- * Σ SIGMAOS MULTIVERSE_CHRONOS: SOVEREIGN UCI SHARD (v58.2-SUPREME-MULTIVERSE_CHRONOS)
+ * S SIGMAOS MULTIVERSE_CHRONOS: SOVEREIGN UCI SHARD (v58.2-SUPREME-MULTIVERSE_CHRONOS)
  * =========================================================================
  * Mission: Substrate-level routing between discrete processor chiplets.
  * Principles: Performance, Hardware Mastery, Embedded.

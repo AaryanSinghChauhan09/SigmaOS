@@ -1,6 +1,6 @@
-/*
+﻿/*
  * =========================================================================
- * Σ SIGMAOS ZENITH: SOVEREIGN BARRIER SHARD (v52.3-SUPREME-OMNIPOTENCE)
+ * S SIGMAOS ZENITH: SOVEREIGN BARRIER SHARD (v52.3-SUPREME-OMNIPOTENCE)
  * =========================================================================
  * Mission: Large-scale parallel task rendezvous and synchronization.
  * Principles: Multi-Processing, Computer Science, Distributed, Throughput.

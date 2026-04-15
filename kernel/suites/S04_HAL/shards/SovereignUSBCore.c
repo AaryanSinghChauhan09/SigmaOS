@@ -1,6 +1,6 @@
-/*
+﻿/*
  * =========================================================================
- * Σ SIGMAOS: SOVEREIGN USB CORE (v1.0 — PURE C11)
+ * S SIGMAOS: SOVEREIGN USB CORE (v1.0 — PURE C11)
  * =========================================================================
  * Competitor Gap Closed: Linux drivers/usb/core/ (URB routing, hubs),
  * macOS IOUSBHostFamily, Windows USB Core Stack (usbcore.sys).
@@ -173,11 +173,11 @@ sigma_err_t sigma_usb_submit_urb(SigmaURB_t *urb) {
     if (!urb || !urb->dev || !urb->dev->bus) return SIGMA_EINVAL;
     
     if (!urb->dev->bus->submit_urb) {
-        sigma_printf("Σ [USB]: HCD missing submit_urb hook!\n");
+        sigma_printf("S [USB]: HCD missing submit_urb hook!\n");
         return SIGMA_ENOTSUP;
     }
     
-    sigma_printf("Σ [USB]: Submitting URB [Pipe: 0x%08x] Len: %u\n", urb->pipe, urb->transfer_buffer_length);
+    sigma_printf("S [USB]: Submitting URB [Pipe: 0x%08x] Len: %u\n", urb->pipe, urb->transfer_buffer_length);
     return urb->dev->bus->submit_urb(urb);
 }
 
@@ -194,7 +194,7 @@ void sigma_usb_complete_urb(SigmaURB_t *urb, sigma_err_t status, sigma_u32 actua
  * ░░ ENUMERATION MOCK (Hub driver behavior)
  * ----------------------------------------------------------------------- */
 static void hub_port_connect_change(SigmaUSBDevice_t *hub, int port) {
-    sigma_printf("Σ [USB]: Port %d on Hub '%s' state changed.\n", port, hub->devpath);
+    sigma_printf("S [USB]: Port %d on Hub '%s' state changed.\n", port, hub->devpath);
     /* In reality: 
      * 1. debounce 
      * 2. reset port 
@@ -212,14 +212,14 @@ static sigma_err_t mock_hcd_submit_urb(SigmaURB_t *urb) {
 }
 
 static void my_urb_callback(SigmaURB_t *urb) {
-    sigma_printf("Σ [USB]: URB completed with status %d, actual_len %u\n", urb->status, urb->actual_length);
+    sigma_printf("S [USB]: URB completed with status %d, actual_len %u\n", urb->status, urb->actual_length);
 }
 
 /* -----------------------------------------------------------------------
  * ░░ INITIALISATION
  * ----------------------------------------------------------------------- */
 void SovereignUSBCore_Init(void) {
-    sigma_printf("Σ [USB]: Initialising Sovereign USB Core...\n");
+    sigma_printf("S [USB]: Initialising Sovereign USB Core...\n");
 
     if (s_usb_bus_count >= MAX_USB_BUSES) return;
     
@@ -255,7 +255,7 @@ void SovereignUSBCore_Init(void) {
 
     sigma_usb_submit_urb(urb);
 
-    sigma_printf("Σ [USB]: USB Core Online. Hotplug sovereignty established.\n");
+    sigma_printf("S [USB]: USB Core Online. Hotplug sovereignty established.\n");
 }
 
 

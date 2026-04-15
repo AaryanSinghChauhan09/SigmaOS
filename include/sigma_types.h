@@ -1,6 +1,6 @@
-/*
+﻿/*
  * =========================================================================
- * Σ SIGMAOS: SUPREME TYPES (v4.0 — DEFENSIVE LATTICE)
+ * S SIGMAOS: SUPREME TYPES (v4.0 — DEFENSIVE LATTICE)
  * =========================================================================
  * Mission: Universal type definitions for all Sovereign Shards.
  * Design: Hardened against toolchain stdint.h preamble recursion.

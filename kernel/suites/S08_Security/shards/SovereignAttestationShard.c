@@ -1,6 +1,6 @@
-/*
+﻿/*
  * =========================================================================
- * Σ SIGMAOS ZENITH: SOVEREIGN ATTESTATION SHARD (v50.9-SUPREME-ORACLE)
+ * S SIGMAOS ZENITH: SOVEREIGN ATTESTATION SHARD (v50.9-SUPREME-ORACLE)
  * =========================================================================
  * Mission: Zero-trust integrity verification of kernel modules at runtime.
  * Principles: Cyber Security, Computer Science, Trust Sovereignty.

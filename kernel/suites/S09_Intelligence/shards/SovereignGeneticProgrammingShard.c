@@ -1,6 +1,6 @@
-/*
+﻿/*
  * =========================================================================
- * Σ SIGMAOS ZENITH: SOVEREIGN GP-CORE SHARD (v52.1-SUPREME-COSMOS)
+ * S SIGMAOS ZENITH: SOVEREIGN GP-CORE SHARD (v52.1-SUPREME-COSMOS)
  * =========================================================================
  * Mission: Autonomous code-patching and functional evolution (GP).
  * Principles: AI, Algorithms, Data Science, Self-Healing.

@@ -1,6 +1,6 @@
-/*
+﻿/*
  * =========================================================================
- * Σ SIGMAOS: SOVEREIGN TRACE SHARD HEADER
+ * S SIGMAOS: SOVEREIGN TRACE SHARD HEADER
  * =========================================================================
  */
 #ifndef SOVEREIGN_TRACE_SHARD_H

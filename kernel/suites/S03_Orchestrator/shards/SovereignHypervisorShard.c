@@ -1,6 +1,6 @@
-/*
+﻿/*
  * =========================================================================
- * Σ SIGMAOS ZENITH: SOVEREIGN MICRO-HYPERVISOR (v51.6-SUPREME-SINGULARITY)
+ * S SIGMAOS ZENITH: SOVEREIGN MICRO-HYPERVISOR (v51.6-SUPREME-SINGULARITY)
  * =========================================================================
  * Mission: Bare-metal hardware virtualization and guest isolation.
  * Principles: Multi-Processing, Computer Science, Distributed, Safety.

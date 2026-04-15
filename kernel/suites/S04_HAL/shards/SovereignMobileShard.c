@@ -1,6 +1,6 @@
-/*
+﻿/*
  * =========================================================================
- * Σ SIGMAOS ZENITH: SOVEREIGN MOBILE ENGINE (v1.0)
+ * S SIGMAOS ZENITH: SOVEREIGN MOBILE ENGINE (v1.0)
  * =========================================================================
  * Mission: Extreme power efficiency for mobile and handheld devices.
  * Principles: Doze Mode, App Hibernation, Thermal Guard.

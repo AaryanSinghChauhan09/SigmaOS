@@ -1,6 +1,6 @@
-/*
+﻿/*
  * =========================================================================
- * Σ SIGMAOS ZENITH: SOVEREIGN HPC SHARD (v53.4-SUPREME-SUPERNOVA)
+ * S SIGMAOS ZENITH: SOVEREIGN HPC SHARD (v53.4-SUPREME-SUPERNOVA)
  * =========================================================================
  * Mission: Shard-level performance auditing via hardware counters.
  * Principles: Performance, Computer Science, Hardware Mastery.

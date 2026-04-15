@@ -1,4 +1,4 @@
-#include "sigma_base.h"
+﻿#include "sigma_base.h"
 
 #include "SovereignNet.h"
 #include "sigma_libc.h"
@@ -11,7 +11,7 @@ static sigma_u32 g_net_proto_count = 0;
 void SovereignNet_InitRegistry(void) {
     sigma_memset(g_net_protocols, 0, sizeof(g_net_protocols));
     g_net_proto_count = 0;
-    sigma_printf("Σ [NET]: Sovereign Network Registry Operational.\n");
+    sigma_printf("S [NET]: Sovereign Network Registry Operational.\n");
 }
 
 sigma_err_t SovereignNet_RegisterProtocol(const char* name, sigma_u16 ethertype, sigma_net_handler_fn handler) {
@@ -22,7 +22,7 @@ sigma_err_t SovereignNet_RegisterProtocol(const char* name, sigma_u16 ethertype,
     p->ethertype = ethertype;
     p->handler = handler;
     
-    sigma_printf("Σ [NET]: Registered Network Protocol Shard '%s' (Type: 0x%04x)\n", name, ethertype);
+    sigma_printf("S [NET]: Registered Network Protocol Shard '%s' (Type: 0x%04x)\n", name, ethertype);
     return SIGMA_OK;
 }
 
@@ -33,7 +33,7 @@ void SovereignNet_ProcessPacket(sigma_u16 ethertype, void* payload, sigma_size_t
             return;
         }
     }
-    sigma_printf("Σ [NET/ERR]: Dropped unknown packet (EtherType: 0x%04x)\n", ethertype);
+    sigma_printf("S [NET/ERR]: Dropped unknown packet (EtherType: 0x%04x)\n", ethertype);
 }
 
 

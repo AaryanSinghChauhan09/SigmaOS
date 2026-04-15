@@ -1,7 +1,7 @@
-#include "sigma_kernel.h"
+﻿#include "sigma_kernel.h"
 
 void SovereignBFS_Init() {
-    sigma_printf("Σ [OPERATION]: SovereignBFS (Linux Performance) Integration Complete. Phase 20 Pure Parity Online.
+    sigma_printf("S [OPERATION]: SovereignBFS (Linux Performance) Integration Complete. Phase 20 Pure Parity Online.
 ");
 }
 

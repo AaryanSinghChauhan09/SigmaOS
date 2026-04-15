@@ -1,6 +1,6 @@
-/*
+﻿/*
  * =========================================================================
- * Σ SIGMAOS: SOVEREIGN SYSCALL INTERFACE (v2.0)
+ * S SIGMAOS: SOVEREIGN SYSCALL INTERFACE (v2.0)
  * =========================================================================
  * Mission: Pluggable syscall handlers (FS, MM, Process, Net).
  * Design: C11 / Zero-Dependency / Registry-Based.

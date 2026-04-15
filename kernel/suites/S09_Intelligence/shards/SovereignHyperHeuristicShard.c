@@ -1,6 +1,6 @@
-/*
+﻿/*
  * =========================================================================
- * Σ SIGMAOS ZENITH: SOVEREIGN HYPER-HEURISTIC (v52.4-SUPREME-ETERNITY)
+ * S SIGMAOS ZENITH: SOVEREIGN HYPER-HEURISTIC (v52.4-SUPREME-ETERNITY)
  * =========================================================================
  * Mission: Meta-optimization: Selecting optimal heuristics for OS tuning.
  * Principles: AI, Algorithms, Data Science, Automations.

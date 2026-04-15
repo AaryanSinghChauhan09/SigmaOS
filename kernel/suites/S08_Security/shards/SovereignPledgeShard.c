@@ -1,11 +1,11 @@
-#include "sigma_base.h"
+﻿#include "sigma_base.h"
 
 #include "SovereignSecurity.h"
 #include "sigma_libc.h"
 
 sigma_err_t sigma_pledge_init(void) {
-    sigma_printf("  Σ [PLEDGE]: Sovereign OpenBSD-style promise auditing online.\n");
-    sigma_printf("  Σ [PLEDGE]: System call restriction capabilities ('stdio','rpath','inet') activated.\n");
+    sigma_printf("  S [PLEDGE]: Sovereign OpenBSD-style promise auditing online.\n");
+    sigma_printf("  S [PLEDGE]: System call restriction capabilities ('stdio','rpath','inet') activated.\n");
     return SIGMA_OK;
 }
 

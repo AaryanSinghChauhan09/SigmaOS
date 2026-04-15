@@ -1,6 +1,6 @@
-/*
+﻿/*
  * =========================================================================
- * Σ SIGMAOS ZENITH: SOVEREIGN CUSTOMISATION ENGINE (v1.0)
+ * S SIGMAOS ZENITH: SOVEREIGN CUSTOMISATION ENGINE (v1.0)
  * =========================================================================
  * Mission:  Dynamic System Behavior Tuning & User-Driven Configuration.
  * Principle: Customisation — distinct from Personalisation.

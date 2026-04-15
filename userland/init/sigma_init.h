@@ -1,6 +1,6 @@
-/*
+﻿/*
  * =========================================================================
- * Σ SIGMAOS userland/init/sigma_init.h
+ * S SIGMAOS userland/init/sigma_init.h
  * =========================================================================
  * Modular PID-1 service manager — gap-closes Linux systemd, macOS launchd,
  * BSD rc, and Windows SCM in a single zero-glibc C11 module.

@@ -1,6 +1,6 @@
-/*
+﻿/*
  * =========================================================================
- * Σ SIGMAOS ZENITH: SOVEREIGN TLBO SHARD (v54.1-SUPREME-ANDROMEDA)
+ * S SIGMAOS ZENITH: SOVEREIGN TLBO SHARD (v54.1-SUPREME-ANDROMEDA)
  * =========================================================================
  * Mission: Pedagogical metaheuristic for optimizing shard-pack intelligence.
  * Principles: AI, Algorithms, Data Science, Throughput.

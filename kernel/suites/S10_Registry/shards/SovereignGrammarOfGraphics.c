@@ -1,6 +1,6 @@
-/*
+﻿/*
  * =========================================================================
- * Σ SIGMAOS: SOVEREIGN GRAMMAR OF GRAPHICS (v1.0 - PURE C11)
+ * S SIGMAOS: SOVEREIGN GRAMMAR OF GRAPHICS (v1.0 - PURE C11)
  * =========================================================================
  * Mission: Absorb ggplot2 visual logic structure into Silicon Execution.
  * Capability: Hardware-accelerated geometric layering protocol mapping to Hyprland parity.

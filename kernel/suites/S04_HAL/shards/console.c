@@ -1,6 +1,6 @@
-/*
+﻿/*
  * =========================================================================
- * Σ SIGMAOS ZENITH SUPREME: CONSOLE DRIVER (SILICON OUTPUT)
+ * S SIGMAOS ZENITH SUPREME: CONSOLE DRIVER (SILICON OUTPUT)
  * =========================================================================
  * Mission: Abstract kernel logging and user terminal output.
  * Capability: VGA Text Mode, Serial COM1, Scrolling, Colors.

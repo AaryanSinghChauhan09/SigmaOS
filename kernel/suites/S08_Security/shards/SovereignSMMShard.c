@@ -1,6 +1,6 @@
-/*
+﻿/*
  * =========================================================================
- * Σ SIGMAOS NEBULA: SOVEREIGN SMM SHARD (v57.3-SUPREME-NEBULA)
+ * S SIGMAOS NEBULA: SOVEREIGN SMM SHARD (v57.3-SUPREME-NEBULA)
  * =========================================================================
  * Mission: System Management Interrupt (SMI) telemetry and Ring -2 firewall.
  * Principles: Cyber Security, Hardware Mastery, Safety.

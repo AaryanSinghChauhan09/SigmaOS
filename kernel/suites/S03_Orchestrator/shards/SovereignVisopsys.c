@@ -1,7 +1,7 @@
-#include "sigma_kernel.h"
+﻿#include "sigma_kernel.h"
 
 void SovereignVisopsys_Init() {
-    sigma_printf("Σ [ABSORB]: SovereignVisopsys Zenith Online. Unified Parity Verified.\n");
+    sigma_printf("S [ABSORB]: SovereignVisopsys Zenith Online. Unified Parity Verified.\n");
 }
 
 

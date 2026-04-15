@@ -1,11 +1,11 @@
-#include "sigma_base.h"
+﻿#include "sigma_base.h"
 
 #include "sigma_types.h"
 #include "SovereignLibC.h"
 #include "sigma_libc.h"
 
 /*
- * Σ SIGMAOS: SOVEREIGN BACKUP MANAGER (v1.0)
+ * S SIGMAOS: SOVEREIGN BACKUP MANAGER (v1.0)
  * USP: Absorb BackUpYouTubeMusic / miladhzzzz/vsphere-infra.
  * Shard: Industrial Management & Data Persistence.
  */

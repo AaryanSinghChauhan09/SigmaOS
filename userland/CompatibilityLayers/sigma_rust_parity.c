@@ -1,6 +1,6 @@
-/*
+﻿/*
  * =========================================================================
- * Σ SIGMAOS ZENITH SUPREME: RUST-PARITY SAFETY SHARD (v1.0)
+ * S SIGMAOS ZENITH SUPREME: RUST-PARITY SAFETY SHARD (v1.0)
  * =========================================================================
  * Mission: Zero-Vulnerability Industrial Logic (Rust style).
  * Based on: Industrial safety-critical OS sharding.
@@ -29,7 +29,7 @@ sigma_result_t sigma_safe_shard_access(const char* shard_id) {
 }
 
 void sigma_safety_audit() {
-    sigma_printf("\nΣ SOVEREIGN RUST-PARITY SAFETY AUDIT\n");
+    sigma_printf("\nS SOVEREIGN RUST-PARITY SAFETY AUDIT\n");
     sigma_printf("-------------------------------------------\n");
     sigma_result_t check = sigma_safe_shard_access("Sovereign-Core-01");
     if (check.is_error) {

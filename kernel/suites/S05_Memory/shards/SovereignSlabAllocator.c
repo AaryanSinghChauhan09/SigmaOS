@@ -1,6 +1,6 @@
-/*
+﻿/*
  * =========================================================================
- * Σ SIGMAOS ZENITH SUPREME: SLAB ALLOCATOR (O(1) MEMORY SHARD)
+ * S SIGMAOS ZENITH SUPREME: SLAB ALLOCATOR (O(1) MEMORY SHARD)
  * =========================================================================
  * Mission: High-performance memory sharding with zero fragmentation.
  * Capability: Linux-style caches (kmalloc-8...kmalloc-4096).

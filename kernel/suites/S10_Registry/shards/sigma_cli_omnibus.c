@@ -1,8 +1,8 @@
-#include "sigma_base.h"
+﻿#include "sigma_base.h"
 
 /*
  * =========================================================================
- * Σ SIGMAOS: OMNIBUS CLI CONTROLLER (v2.0 — PURE C11)
+ * S SIGMAOS: OMNIBUS CLI CONTROLLER (v2.0 — PURE C11)
  * =========================================================================
  * An industrial-grade Command Line Interface to interact with every 
  * Sovereign Subsystem in the kernel natively via IPC/sysfs.
@@ -13,7 +13,7 @@
 
 void print_help(void) {
     sigma_printf("\n======================================================\n");
-    sigma_printf("   Σ SIGMA-CLI OMNIBUS v2.0 (SOVEREIGN EDITION)\n");
+    sigma_printf("   S SIGMA-CLI OMNIBUS v2.0 (SOVEREIGN EDITION)\n");
     sigma_printf("======================================================\n");
     sigma_printf("Usage: sigma <subsystem> [commands]\n\n");
     sigma_printf("SUBSYSTEMS:\n");
@@ -44,12 +44,12 @@ int sigma_cli_omnibus_ToolMain(int argc, char **argv) {
         return 0;
     }
 
-    sigma_printf("Σ [CLI]: Dispatching command to /sys/kernel/omnibus/%s. Please wait...\n", argv[1]);
+    sigma_printf("S [CLI]: Dispatching command to /sys/kernel/omnibus/%s. Please wait...\n", argv[1]);
 
     /* Simulate IPC transaction / sysfs writing */
     sigma_sleep(1);
 
-    sigma_printf("Σ [CLI]: Command '%s' successfully acknowledged by SigmaCore.\n", argv[1]);
+    sigma_printf("S [CLI]: Command '%s' successfully acknowledged by SigmaCore.\n", argv[1]);
     
     return 0;
 }

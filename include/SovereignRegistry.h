@@ -1,6 +1,6 @@
-/*
+﻿/*
  * =========================================================================
- * Σ SIGMAOS: SOVEREIGN SHARD REGISTRY (v4.0 — LATTICE CORE)
+ * S SIGMAOS: SOVEREIGN SHARD REGISTRY (v4.0 — LATTICE CORE)
  * =========================================================================
  * Purpose: Central authority for shard lifecycle management.
  * Design: Powered by SovereignCommon.h. Zero legacy dependencies.

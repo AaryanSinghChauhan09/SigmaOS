@@ -1,6 +1,6 @@
-/*
+﻿/*
  * =========================================================================
- * Σ SIGMAOS ZENITH: SOVEREIGN CACHE INJECTOR (v52.5-SUPREME-VALKYRIE)
+ * S SIGMAOS ZENITH: SOVEREIGN CACHE INJECTOR (v52.5-SUPREME-VALKYRIE)
  * =========================================================================
  * Mission: Direct hardware-to-cache data injection (DDIO parity).
  * Principles: Performance, Server, Network, Computer Science.

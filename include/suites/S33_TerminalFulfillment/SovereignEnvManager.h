@@ -1,6 +1,6 @@
-/*
+﻿/*
  * =========================================================================
- * Σ SIGMAOS: SOVEREIGN ENVIRONMENT MANAGER (v1.0 — PURE C11)
+ * S SIGMAOS: SOVEREIGN ENVIRONMENT MANAGER (v1.0 — PURE C11)
  * =========================================================================
  * Mission: POSIX-parity environment variable store, per-process inheritance.
  * Inspired By: UNIX environ[], bash/zsh export, Windows HKCU Registry env.

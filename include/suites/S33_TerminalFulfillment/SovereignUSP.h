@@ -1,6 +1,6 @@
-/*
+﻿/*
  * =========================================================================
- * Σ SIGMAOS: SOVEREIGN KERNEL USP INTERFACE (v1.0)
+ * S SIGMAOS: SOVEREIGN KERNEL USP INTERFACE (v1.0)
  * =========================================================================
  * Mission: Modular implementation of global Kernel USPs (eBPF, XDP, etc.)
  * Design: C11 / Zero-Dependency / Registry-Based.

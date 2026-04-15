@@ -1,6 +1,6 @@
-/*
+﻿/*
  * =========================================================================
- * Σ SIGMAOS ZENITH: SOVEREIGN AMX SHARD (v56.8-SUPREME-CHRONOS)
+ * S SIGMAOS ZENITH: SOVEREIGN AMX SHARD (v56.8-SUPREME-CHRONOS)
  * =========================================================================
  * Mission: Silicon-level tensor offloading for kernel AI.
  * Principles: Performance, Hardware Mastery, Data Science, AI.

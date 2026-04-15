@@ -1,6 +1,6 @@
-/*
+﻿/*
  * =========================================================================
- * Σ SIGMAOS COSMOS: SOVEREIGN IOMPU SHARD (v57.4-SUPREME-COSMOS)
+ * S SIGMAOS COSMOS: SOVEREIGN IOMPU SHARD (v57.4-SUPREME-COSMOS)
  * =========================================================================
  * Mission: Device-centric memory constraint execution across RISC-V buses.
  * Principles: Cyber Security, Safety, Computer Science, Hardware Mastery.

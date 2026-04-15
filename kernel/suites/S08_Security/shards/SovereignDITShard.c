@@ -1,6 +1,6 @@
-/*
+﻿/*
  * =========================================================================
- * Σ SIGMAOS ZENITH: SOVEREIGN DIT SHARD (v56.8-SUPREME-CHRONOS)
+ * S SIGMAOS ZENITH: SOVEREIGN DIT SHARD (v56.8-SUPREME-CHRONOS)
  * =========================================================================
  * Mission: Guaranteeing constant-time instruction execution.
  * Principles: Cyber Security, Safety, Computer Science, Hardware Mastery.

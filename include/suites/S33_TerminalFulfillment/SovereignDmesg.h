@@ -1,6 +1,6 @@
-/*
+﻿/*
  * =========================================================================
- * Σ SIGMAOS: SOVEREIGN DMESG — KERNEL RING BUFFER (v1.0 — PURE C11)
+ * S SIGMAOS: SOVEREIGN DMESG — KERNEL RING BUFFER (v1.0 — PURE C11)
  * =========================================================================
  * Mission: Persistent kernel message log, printk-level filtering, dmesg CLI.
  * Inspired By: Linux printk / dmesg, FreeBSD dmesg, macOS OSLog / kern.msgbuf.

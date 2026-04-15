@@ -1,11 +1,11 @@
-#include "sigma_base.h"
+﻿#include "sigma_base.h"
 
 #include "SovereignDistro.h"
 #include "sigma_libc.h"
 
 void SovereignGaruda_AbsorbLogic(void) {
-    sigma_printf("  Σ [GARUDA]: Zen-Kernel optimizations applied. Scheduler tuned for low latency.\n");
-    sigma_printf("  Σ [POPOS]: Auto-tiling window manager sharded into SigmaUI.\n");
+    sigma_printf("  S [GARUDA]: Zen-Kernel optimizations applied. Scheduler tuned for low latency.\n");
+    sigma_printf("  S [POPOS]: Auto-tiling window manager sharded into SigmaUI.\n");
 }
 
 void SovereignGaruda_Register(void) {

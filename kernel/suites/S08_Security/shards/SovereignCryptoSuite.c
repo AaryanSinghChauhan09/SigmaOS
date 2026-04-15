@@ -1,6 +1,6 @@
-/*
+﻿/*
  * =========================================================================
- * Σ SIGMAOS: SOVEREIGN CRYPTOGRAPHY SUITE (v2.0 - INTEGRATED)
+ * S SIGMAOS: SOVEREIGN CRYPTOGRAPHY SUITE (v2.0 - INTEGRATED)
  * =========================================================================
  */
 
@@ -112,7 +112,7 @@ void sigma_chacha20_encrypt(const sigma_u8 key[32], const sigma_u8 nonce[12], si
 
 /* ... (Remaining primitives) ... */
 void SovereignCrypto_Init(void) {
-    sigma_printf("Σ [CRYPTO-SUITE]: Industrial SHA-256 and HMAC matrices seated.\n");
+    sigma_printf("S [CRYPTO-SUITE]: Industrial SHA-256 and HMAC matrices seated.\n");
 }
 
 void SovereignCrypto_Register(void) {

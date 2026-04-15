@@ -1,6 +1,6 @@
-/*
+﻿/*
  * =========================================================================
- * Σ SIGMAOS ZENITH: SOVEREIGN FOA SHARD (v56.4-SUPREME-HEAVEN)
+ * S SIGMAOS ZENITH: SOVEREIGN FOA SHARD (v56.4-SUPREME-HEAVEN)
  * =========================================================================
  * Mission: Osphresis-based collective pathfinding and convergence.
  * Principles: AI, Algorithms, Data Science, Distributed.

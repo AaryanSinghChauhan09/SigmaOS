@@ -1,6 +1,6 @@
-/*
+﻿/*
  * =========================================================================
- * Σ SIGMAOS NEBULA: SOVEREIGN SR-IOV SHARD (v57.3-SUPREME-NEBULA)
+ * S SIGMAOS NEBULA: SOVEREIGN SR-IOV SHARD (v57.3-SUPREME-NEBULA)
  * =========================================================================
  * Mission: Silicon-level splitting of hardware capabilities for virtualization.
  * Principles: Hardware Mastery, Multi-Processing, Computer Science.

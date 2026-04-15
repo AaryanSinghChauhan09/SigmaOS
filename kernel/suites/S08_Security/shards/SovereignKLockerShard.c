@@ -1,6 +1,6 @@
-/*
+﻿/*
  * =========================================================================
- * Σ SIGMAOS ULTIMATE_APOTHEOSIS: SOVEREIGN K-LOCKER SHARD (v60.1-ULTIMATE)
+ * S SIGMAOS ULTIMATE_APOTHEOSIS: SOVEREIGN K-LOCKER SHARD (v60.1-ULTIMATE)
  * =========================================================================
  * Mission: Absolute isolation of AES encryption keys from system DRAM.
  * Principles: Cyber Security, Privacy, Cryptography.

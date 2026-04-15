@@ -1,6 +1,6 @@
-/*
+﻿/*
  * =========================================================================
- * Σ SIGMAOS ZENITH: SOVEREIGN OBJECT SHARD (v50.0-SINGULARITY)
+ * S SIGMAOS ZENITH: SOVEREIGN OBJECT SHARD (v50.0-SINGULARITY)
  * =========================================================================
  * Mission: Memory-native Object-Oriented Programming (OOP) in C11.
  * Principles: Polymorphism, Encapsulation, Dynamic Dispatch.

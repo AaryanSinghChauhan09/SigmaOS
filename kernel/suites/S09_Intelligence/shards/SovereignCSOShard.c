@@ -1,6 +1,6 @@
-/*
+﻿/*
  * =========================================================================
- * Σ SIGMAOS OLYMPUS: SOVEREIGN CSO SHARD (v57.9-SUPREME-OLYMPUS)
+ * S SIGMAOS OLYMPUS: SOVEREIGN CSO SHARD (v57.9-SUPREME-OLYMPUS)
  * =========================================================================
  * Mission: Dual-mode mapping utilizing seeking and tracing behaviors.
  * Principles: AI, Algorithms, Data Science.

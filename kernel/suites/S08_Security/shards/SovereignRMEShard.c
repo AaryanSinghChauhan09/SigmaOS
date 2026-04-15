@@ -1,6 +1,6 @@
-/*
+﻿/*
  * =========================================================================
- * Σ SIGMAOS ULTIMATE_GENESIS: SOVEREIGN RME SHARD (v60.0-ULTIMATE)
+ * S SIGMAOS ULTIMATE_GENESIS: SOVEREIGN RME SHARD (v60.0-ULTIMATE)
  * =========================================================================
  * Mission: Four-tier hardware confidential computing logic structures.
  * Principles: Cyber Security, Hardware Mastery, Trusted Execution.

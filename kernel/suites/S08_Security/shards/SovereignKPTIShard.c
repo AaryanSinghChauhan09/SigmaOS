@@ -1,6 +1,6 @@
-/*
+﻿/*
  * =========================================================================
- * Σ SIGMAOS ZENITH: SOVEREIGN KPTI SHARD (v56.2-SUPREME-ASGARD)
+ * S SIGMAOS ZENITH: SOVEREIGN KPTI SHARD (v56.2-SUPREME-ASGARD)
  * =========================================================================
  * Mission: Isolating user and kernel page tables to prevent data leaks.
  * Principles: Cyber Security, Safety, Computer Science, Hardware Mastery.

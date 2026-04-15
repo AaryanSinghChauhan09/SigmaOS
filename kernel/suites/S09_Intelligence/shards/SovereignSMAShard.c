@@ -1,6 +1,6 @@
-/*
+﻿/*
  * =========================================================================
- * Σ SIGMAOS ABSOLUTE_INFINITY: SOVEREIGN SMA SHARD (v59.1-ABSOLUTE)
+ * S SIGMAOS ABSOLUTE_INFINITY: SOVEREIGN SMA SHARD (v59.1-ABSOLUTE)
  * =========================================================================
  * Mission: Biological oscillation feedback for shortest-path extraction.
  * Principles: AI, Algorithms, Data Science.

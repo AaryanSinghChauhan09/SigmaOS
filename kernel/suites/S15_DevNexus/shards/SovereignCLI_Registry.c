@@ -1,4 +1,4 @@
-#include "sigma_base.h"
+﻿#include "sigma_base.h"
 
 #include "SovereignCLI_Core.h"
 #include "../../include/SovereignCLI.h"
@@ -24,7 +24,7 @@ void SovereignCLI_Register(void) {
     extern void SovereignCLI_CyberSuite_Register(void);
     SovereignCLI_CyberSuite_Register();
     
-    sigma_printf("Σ [CLI-REGISTRY]: Industrial Command Omnibus (100+ Matrix) Seated.\n");
+    sigma_printf("S [CLI-REGISTRY]: Industrial Command Omnibus (100+ Matrix) Seated.\n");
 
     static SovereignModule_t s_cli_module = {
         .name = "SovereignCLI",

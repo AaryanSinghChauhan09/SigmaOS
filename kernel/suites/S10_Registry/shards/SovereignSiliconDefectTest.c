@@ -1,6 +1,6 @@
-/*
+﻿/*
  * =========================================================================
- * Σ SIGMAOS ZENITH: SOVEREIGN SILICON DEFECT TEST (v1.0)
+ * S SIGMAOS ZENITH: SOVEREIGN SILICON DEFECT TEST (v1.0)
  * =========================================================================
  * Mission: Low-level testing algorithm for CPU microcode vulnerabilities.
  * Design: C11 / Zero-Dependency / Cache-Timing Inference.

@@ -1,9 +1,9 @@
-#ifndef SOVEREIGN_POWERBI_ZENITH_H
+﻿#ifndef SOVEREIGN_POWERBI_ZENITH_H
 #define SOVEREIGN_POWERBI_ZENITH_H
 
 #include "SigmaOOP.h"
 
-/* Σ Territory Initiation */
+/* S Territory Initiation */
 
 // --- DAX EVALUATION ENGINE (DATA MODELING) ---
 CLASS_DECLARE(SovereignDAXEngine) { 
@@ -24,6 +24,6 @@ CLASS_DECLARE(SovereignPowerQueryMaster) {
     VIRTUAL(void, FinalizeIngestion, struct SovereignPowerQueryMaster* self);
 };
 
-/* Σ Territory Termination */
+/* S Territory Termination */
 
 #endif

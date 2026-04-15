@@ -1,6 +1,6 @@
-/*
+﻿/*
  * =========================================================================
- * Σ SIGMAOS ZENITH: SOVEREIGN ANDROID BRIDGE (v51.4-ABSOLUTE-VOID)
+ * S SIGMAOS ZENITH: SOVEREIGN ANDROID BRIDGE (v51.4-ABSOLUTE-VOID)
  * =========================================================================
  * Mission: Universal mobile-interface and Android-intent orchestration.
  * Principles: Mobile, Frontend, User Experience, Portability.

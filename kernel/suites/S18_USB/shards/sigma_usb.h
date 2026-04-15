@@ -1,6 +1,6 @@
-/*
+﻿/*
  * =========================================================================
- * Σ SIGMAOS kernel/suites/S18_USB/shards/sigma_usb.h
+ * S SIGMAOS kernel/suites/S18_USB/shards/sigma_usb.h
  * =========================================================================
  * Sovereign USB Subsystem — gap-closes:
  *   Linux  : USB core, xHCI/EHCI host controller, usb-storage, usbhid

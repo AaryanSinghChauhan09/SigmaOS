@@ -1,6 +1,6 @@
-/*
+﻿/*
  * =========================================================================
- * Σ SIGMAOS ABSOLUTE_TRANSCENDENCE: SOVEREIGN WSE SHARD (v59.0-ABSOLUTE)
+ * S SIGMAOS ABSOLUTE_TRANSCENDENCE: SOVEREIGN WSE SHARD (v59.0-ABSOLUTE)
  * =========================================================================
  * Mission: Commanding monolithic wafers containing trillions of transistors.
  * Principles: Performance, Hardware Mastery, Supercomputing.

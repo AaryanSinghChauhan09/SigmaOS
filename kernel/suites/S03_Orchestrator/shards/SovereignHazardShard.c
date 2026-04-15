@@ -1,6 +1,6 @@
-/*
+﻿/*
  * =========================================================================
- * Σ SIGMAOS ZENITH: SOVEREIGN HAZARD SHARD (v52.9-SUPREME-NIRVANA)
+ * S SIGMAOS ZENITH: SOVEREIGN HAZARD SHARD (v52.9-SUPREME-NIRVANA)
  * =========================================================================
  * Mission: Safe lock-free memory reclamation via Hazard Pointers.
  * Principles: Multi-Processing, Computer Science, Throughput, Performance.

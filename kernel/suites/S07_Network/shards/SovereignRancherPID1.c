@@ -1,10 +1,10 @@
-#include "sigma_base.h"
+﻿#include "sigma_base.h"
 
 #include <sigma_types.h>
 #include "sigma_print.h"
 
 /*
- * Σ Sovereign Rancher PID1
+ * S Sovereign Rancher PID1
  * USP: RancherOS (PID 1 System Containerization)
  * Concept: Obliterates systemd or sysvinit. Natively maps the fundamental
  *          PID 1 boot sequence to execute universally as isolated container

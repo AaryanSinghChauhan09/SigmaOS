@@ -1,4 +1,4 @@
-#include "sigma_base.h"
+﻿#include "sigma_base.h"
 
 #include "SigmaC11.h"
 
@@ -25,7 +25,7 @@ void setup_automation(const char* workflow_file) {
 int sigma_automation_matrix_ToolMain(int argc, char* argv[]) {
     if (argc < 2) {
         sigma_print("===================================\n");
-        sigma_print("      Σ SIGMA AUTOMATION MATRIX    \n");
+        sigma_print("      S SIGMA AUTOMATION MATRIX    \n");
         sigma_print("===================================\n");
         sigma_print("Usage: sigma automate [workflow.yaml]\n");
         return 0;

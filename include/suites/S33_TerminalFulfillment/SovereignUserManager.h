@@ -1,6 +1,6 @@
-/*
+﻿/*
  * =========================================================================
- * Σ SIGMAOS: SOVEREIGN USER & GROUP MANAGER (v1.0 — PURE C11)
+ * S SIGMAOS: SOVEREIGN USER & GROUP MANAGER (v1.0 — PURE C11)
  * =========================================================================
  * Mission: Multi-user POSIX UID/GID management, shadow-password hashing.
  * Inspired By: Linux /etc/passwd + /etc/shadow, macOS DirectoryService,

@@ -1,6 +1,6 @@
-/*
+﻿/*
  * =========================================================================
- * Σ SIGMAOS ZENITH: SOVEREIGN NUMA & TOPOLOGY SHARD (v50.4-GOD-MATRIX)
+ * S SIGMAOS ZENITH: SOVEREIGN NUMA & TOPOLOGY SHARD (v50.4-GOD-MATRIX)
  * =========================================================================
  * Mission: Hardware-aware performance scaling across many-core architectures.
  * Principles: NUMA, Multi-Processing, Topology Mapping, Locality.

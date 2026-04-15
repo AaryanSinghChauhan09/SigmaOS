@@ -1,6 +1,6 @@
-/*
+﻿/*
  * =========================================================================
- * Σ SIGMAOS: SOVEREIGN PARALLELISM (Suite S19)
+ * S SIGMAOS: SOVEREIGN PARALLELISM (Suite S19)
  * =========================================================================
  */
 
@@ -35,8 +35,8 @@ void sigma_gcd_init(void) {
     sigma_gcd_queue_create("com.sigma.default", GCD_PRIO_DEFAULT);
     sigma_gcd_queue_create("com.sigma.bg",      GCD_PRIO_BACKGROUND);
 
-    sigma_printf("Σ [GCD] Sovereign Parallelism Engine initialized\n");
-    sigma_printf("Σ [GCD] Parity: libdispatch (macOS) | WorkQueues (Linux)\n");
+    sigma_printf("S [GCD] Sovereign Parallelism Engine initialized\n");
+    sigma_printf("S [GCD] Parity: libdispatch (macOS) | WorkQueues (Linux)\n");
 }
 
 /* ── Queue Management ─────────────────────────────────────────────────── */
@@ -60,7 +60,7 @@ gcd_queue_t* sigma_gcd_queue_create(const char* name, gcd_priority_t prio) {
     q->head = q->tail = 0;
     sigma_strncpy(q->name, name, 31);
     
-    sigma_printf("Σ [GCD] Registered queue: %s (prio=%d)\n", name, prio);
+    sigma_printf("S [GCD] Registered queue: %s (prio=%d)\n", name, prio);
     return q;
 }
 
@@ -68,7 +68,7 @@ gcd_queue_t* sigma_gcd_queue_create(const char* name, gcd_priority_t prio) {
 void sigma_gcd_async(gcd_queue_t* queue, gcd_block_t block, void* context) {
     gcd_task_t task = { block, context };
     if (!queue_push(queue, task)) {
-        sigma_printf("Σ [GCD] Warning: Queue %s is full! Dropping task.\n", queue->name);
+        sigma_printf("S [GCD] Warning: Queue %s is full! Dropping task.\n", queue->name);
         return;
     }
     /* In a real kernel, this would trigger a scheduler signal or wake a work thread */
@@ -79,12 +79,12 @@ void sigma_gcd_sync(gcd_queue_t* queue, gcd_block_t block, void* context) {
      * In Sovereign GCD, sync execution waits for the immediate availability 
      * or executes locally if possible. For simulation, we execute locally.
      */
-    sigma_printf("Σ [GCD] Sync execution on queue: %s\n", queue->name);
+    sigma_printf("S [GCD] Sync execution on queue: %s\n", queue->name);
     block(context);
 }
 
 void sigma_gcd_apply(sigma_u32 iterations, gcd_queue_t* queue, void (*block)(sigma_u32 index)) {
-    sigma_printf("Σ [GCD] Applying %u iterations on queue: %s\n", iterations, queue->name);
+    sigma_printf("S [GCD] Applying %u iterations on queue: %s\n", iterations, queue->name);
     for (sigma_u32 i = 0; i < iterations; i++) {
         /* Distribute iterations across the queue ring */
         block(i);
@@ -93,7 +93,7 @@ void sigma_gcd_apply(sigma_u32 iterations, gcd_queue_t* queue, void (*block)(sig
 
 /* ── Statistics ────────────────────────────────────────────────────────── */
 void sigma_gcd_stats(void) {
-    sigma_printf("\nΣ GCD LATTICE STATS\n");
+    sigma_printf("\nS GCD LATTICE STATS\n");
     sigma_printf("%-4s %-20s %-8s %-8s\n", "ID", "NAME", "PRIO", "PENDING");
     for (sigma_u32 i = 0; i < s_queue_count; i++) {
         gcd_queue_t* q = &s_queues[i];

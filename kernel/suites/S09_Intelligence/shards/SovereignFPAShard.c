@@ -1,6 +1,6 @@
-/*
+﻿/*
  * =========================================================================
- * Σ SIGMAOS GENESIS: SOVEREIGN FPA SHARD (v57.2-SUPREME-GENESIS)
+ * S SIGMAOS GENESIS: SOVEREIGN FPA SHARD (v57.2-SUPREME-GENESIS)
  * =========================================================================
  * Mission: Lévy-flight based global exploration and self-pollination.
  * Principles: AI, Algorithms, Data Science.

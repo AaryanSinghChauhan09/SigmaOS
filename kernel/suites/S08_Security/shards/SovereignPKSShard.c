@@ -1,6 +1,6 @@
-/*
+﻿/*
  * =========================================================================
- * Σ SIGMAOS VALKYRIE: SOVEREIGN PKS SHARD (v57.7-SUPREME-VALKYRIE)
+ * S SIGMAOS VALKYRIE: SOVEREIGN PKS SHARD (v57.7-SUPREME-VALKYRIE)
  * =========================================================================
  * Mission: Zero-latency kernel memory access restriction via CPU hardware keys.
  * Principles: Cyber Security, Safety, Hardware Mastery.

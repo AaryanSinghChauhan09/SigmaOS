@@ -1,6 +1,6 @@
-/*
+﻿/*
  * =========================================================================
- * Σ SIGMAOS: SOVEREIGN DEFENDER (v1.0 — C11)
+ * S SIGMAOS: SOVEREIGN DEFENDER (v1.0 — C11)
  * =========================================================================
  * Absorbed USPs from: Windows Defender / YARA
  *

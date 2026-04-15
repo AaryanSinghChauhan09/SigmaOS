@@ -1,10 +1,10 @@
-#include "sigma_base.h"
+﻿#include "sigma_base.h"
 
 #include <sigma_types.h>
 #include "sigma_print.h"
 
 /*
- * Σ Sovereign Inferno VM
+ * S Sovereign Inferno VM
  * USP: Inferno OS (Dis Virtual Machine)
  * Concept: Absorbs absolute distributed portability. Executes all logic via an
  *          internal Dis VM byte-code structure natively mapped to the kernel,

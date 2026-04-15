@@ -1,6 +1,6 @@
-/*
+﻿/*
  * =========================================================================
- * Σ SIGMAOS kernel/suites/S08_Security/shards/sigma_lsm.c
+ * S SIGMAOS kernel/suites/S08_Security/shards/sigma_lsm.c
  * =========================================================================
  */
 
@@ -38,13 +38,13 @@ static sigma_security_ctx_t *get_ctx(lsm_u32 pid) {
 /* ── Init ────────────────────────────────────────────────────────────────── */
 void sigma_lsm_init(void) {
     sigma_memset(s_ctxs, 0, sizeof(s_ctxs));
-    sigma_printf("Σ [LSM] Security framework initialized\n");
-    sigma_printf("Σ [LSM] Active policies: SELinux | AppArmor | Pledge | MIC | TCC\n");
+    sigma_printf("S [LSM] Security framework initialized\n");
+    sigma_printf("S [LSM] Active policies: SELinux | AppArmor | Pledge | MIC | TCC\n");
 }
 
 void sigma_lsm_register_hooks(sigma_lsm_hooks_t *hooks) {
     s_hooks = hooks;
-    sigma_printf("Σ [LSM] Hook table registered\n");
+    sigma_printf("S [LSM] Hook table registered\n");
 }
 
 /* ── Context ─────────────────────────────────────────────────────────────── */
@@ -58,7 +58,7 @@ lsm_i32 sigma_lsm_ctx_create(lsm_u32 pid, const char *domain) {
     ctx->caps_permitted  = SIGMA_CAP_STDIO;
     ctx->caps_effective  = 0;
     ctx->selinux_enforcing = LSM_TRUE;
-    sigma_printf("Σ [LSM] CTX: pid=%u domain=%s\n", pid, domain);
+    sigma_printf("S [LSM] CTX: pid=%u domain=%s\n", pid, domain);
     return LSM_ALLOW;
 }
 
@@ -87,7 +87,7 @@ lsm_i32 sigma_lsm_pledge(lsm_u32 pid, lsm_u32 pledge_mask) {
     /* pledge() is one-way — can only reduce privileges */
     ctx->pledge_mask &= pledge_mask;
     if (pledge_mask == 0) ctx->unveil_locked = LSM_TRUE;
-    sigma_printf("Σ [LSM] PLEDGE: pid=%u mask=0x%x\n", pid, ctx->pledge_mask);
+    sigma_printf("S [LSM] PLEDGE: pid=%u mask=0x%x\n", pid, ctx->pledge_mask);
     return LSM_ALLOW;
 }
 
@@ -95,7 +95,7 @@ void sigma_lsm_unveil(lsm_u32 pid, const char *path, const char *perms) {
     sigma_security_ctx_t *ctx = get_ctx(pid);
     if (!ctx || ctx->unveil_locked) return;
     if (!path) { ctx->unveil_locked = LSM_TRUE; return; }
-    sigma_printf("Σ [LSM] UNVEIL: pid=%u path=%s perms=%s\n", pid, path, perms);
+    sigma_printf("S [LSM] UNVEIL: pid=%u path=%s perms=%s\n", pid, path, perms);
 }
 
 /* ── Access checks ─────────────────────────────────────────────────────────── */
@@ -106,7 +106,7 @@ lsm_i32 sigma_lsm_check_file_open(lsm_u32 pid, const char *path, lsm_u32 flags) 
     /* pledge RPATH/WPATH check */
     if ((flags & 0x01) && !(ctx->pledge_mask & PLEDGE_WPATH)) {
         audit_write(pid, path, LSM_FALSE);
-        sigma_printf("Σ [LSM] DENY: pid=%u write-open '%s' (pledge WPATH)\n", pid, path);
+        sigma_printf("S [LSM] DENY: pid=%u write-open '%s' (pledge WPATH)\n", pid, path);
         return LSM_DENY;
     }
 
@@ -124,7 +124,7 @@ lsm_i32 sigma_lsm_check_net(lsm_u32 pid, lsm_u32 dst_ip, lsm_u32 port) {
     sigma_security_ctx_t *ctx = get_ctx(pid);
     if (!ctx) return LSM_ALLOW;
     if (!(ctx->pledge_mask & (PLEDGE_INET | PLEDGE_DNS))) {
-        sigma_printf("Σ [LSM] DENY: pid=%u net dst=0x%x:%u (pledge INET)\n",
+        sigma_printf("S [LSM] DENY: pid=%u net dst=0x%x:%u (pledge INET)\n",
                      pid, dst_ip, (unsigned)port);
         return LSM_DENY;
     }
@@ -143,7 +143,7 @@ lsm_i32 sigma_lsm_check_cap(lsm_u32 pid, unsigned long long needed_cap) {
     sigma_security_ctx_t *ctx = get_ctx(pid);
     if (!ctx) return LSM_ALLOW;
     if (ctx->caps_effective & needed_cap) return LSM_ALLOW;
-    sigma_printf("Σ [LSM] DENY: pid=%u missing cap 0x%llx\n",
+    sigma_printf("S [LSM] DENY: pid=%u missing cap 0x%llx\n",
                  pid, (unsigned long long)needed_cap);
     return LSM_DENY;
 }
@@ -151,7 +151,7 @@ lsm_i32 sigma_lsm_check_cap(lsm_u32 pid, unsigned long long needed_cap) {
 /* ── Audit dump ───────────────────────────────────────────────────────────── */
 void sigma_lsm_audit_dump(void) {
     lsm_u32 count = s_audit_head < AUDIT_LOG_MAX ? s_audit_head : AUDIT_LOG_MAX;
-    sigma_printf("\nΣ LSM AUDIT LOG (%u events)\n", count);
+    sigma_printf("\nS LSM AUDIT LOG (%u events)\n", count);
     for (lsm_u32 i = 0; i < count; i++) {
         lsm_u32 idx = i % AUDIT_LOG_MAX;
         sigma_printf("  pid=%-5u %-6s %s\n",

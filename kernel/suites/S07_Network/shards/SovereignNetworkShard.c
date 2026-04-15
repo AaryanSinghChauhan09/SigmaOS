@@ -1,6 +1,6 @@
-/*
+﻿/*
  * =========================================================================
- * Σ SIGMAOS ZENITH: SOVEREIGN NETWORK NEXUS (v50.0-SINGULARITY)
+ * S SIGMAOS ZENITH: SOVEREIGN NETWORK NEXUS (v50.0-SINGULARITY)
  * =========================================================================
  * Mission: Decentralized P2P Networking and Sovereign Cloud Sync.
  * Principles: Zero-Dependency TCP/IP, DHT Discovery, Gossip Protocol.

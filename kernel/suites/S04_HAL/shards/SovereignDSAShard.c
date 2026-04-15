@@ -1,6 +1,6 @@
-/*
+﻿/*
  * =========================================================================
- * Σ SIGMAOS OLYMPUS: SOVEREIGN DSA SHARD (v57.9-SUPREME-OLYMPUS)
+ * S SIGMAOS OLYMPUS: SOVEREIGN DSA SHARD (v57.9-SUPREME-OLYMPUS)
  * =========================================================================
  * Mission: Radical offloading of memory copy and transformation.
  * Principles: Performance, Hardware Mastery, Storage.

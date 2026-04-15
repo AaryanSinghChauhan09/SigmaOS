@@ -1,6 +1,6 @@
-/*
+﻿/*
  * =========================================================================
- * Σ SIGMAOS ABSOLUTE_FINALITY: SOVEREIGN IWO SHARD (v59.2-ABSOLUTE)
+ * S SIGMAOS ABSOLUTE_FINALITY: SOVEREIGN IWO SHARD (v59.2-ABSOLUTE)
  * =========================================================================
  * Mission: Extreme colonizing behavior executing spatial domination.
  * Principles: AI, Algorithms, Data Science.

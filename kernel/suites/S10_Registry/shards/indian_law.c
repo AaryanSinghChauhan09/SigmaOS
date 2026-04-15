@@ -1,9 +1,9 @@
-#include "sigma_base.h"
+﻿#include "sigma_base.h"
 
 #include "SovereignToolHeader.h"
 
 /*
- * Σ SIGMAOS: SOVEREIGN INDIAN LAW SHARD (v1.0)
+ * S SIGMAOS: SOVEREIGN INDIAN LAW SHARD (v1.0)
  * Bypasses online databases. Uses O(1) memory mapping for Bharatiya Nyaya Sanhita (BNS), 
  * IPC, CrPC, and Constitutional articles natively on silicon.
  * Competitor Crud: SCC Online, Manupatra (Slow, cloud-dependent, paid).

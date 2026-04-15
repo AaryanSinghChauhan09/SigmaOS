@@ -1,4 +1,4 @@
-#include "sigma_base.h"
+﻿#include "sigma_base.h"
 
 #include "SovereignMemory.h"
 #include "sigma_libc.h"
@@ -10,9 +10,9 @@
  */
 
 sigma_err_t sigma_mem_accel_init(void) {
-    sigma_printf("  Σ [MEM-ACCEL]: Sovereign hardware-accelerated memory matrix online.\n");
-    sigma_printf("  Σ [MEM-ACCEL]: SIMD (AVX-512/NEON) burst-copy engines: ENGAGED.\n");
-    sigma_printf("  Σ [MEM-ACCEL]: 256KB block-shift latency: < 5 cycles.\n");
+    sigma_printf("  S [MEM-ACCEL]: Sovereign hardware-accelerated memory matrix online.\n");
+    sigma_printf("  S [MEM-ACCEL]: SIMD (AVX-512/NEON) burst-copy engines: ENGAGED.\n");
+    sigma_printf("  S [MEM-ACCEL]: 256KB block-shift latency: < 5 cycles.\n");
     return SIGMA_OK;
 }
 

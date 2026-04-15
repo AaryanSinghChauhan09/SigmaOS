@@ -1,6 +1,6 @@
-/*
+﻿/*
  * =========================================================================
- * Σ SIGMAOS: SOVEREIGN DUCK TYPING (v1.0 - PURE C11)
+ * S SIGMAOS: SOVEREIGN DUCK TYPING (v1.0 - PURE C11)
  * =========================================================================
  * Mission: Absorb Python's dynamic duck-typing capabilities.
  * Capability: Constant-time attribute lookups through static layout hashes.

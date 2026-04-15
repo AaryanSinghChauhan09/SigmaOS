@@ -1,6 +1,6 @@
-/*
+﻿/*
  * =========================================================================
- * Σ SIGMAOS: SOVEREIGN TOOL INTERFACE (v1.0)
+ * S SIGMAOS: SOVEREIGN TOOL INTERFACE (v1.0)
  * =========================================================================
  * Mission: Modular absorption of global developer/ops tools into SigmaOS.
  * Design: C11 / Zero-Dependency / Registry-Based.

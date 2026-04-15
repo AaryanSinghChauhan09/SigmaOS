@@ -1,6 +1,6 @@
-/*
+﻿/*
  * =========================================================================
- * Σ SIGMAOS ZENITH: SOVEREIGN COLD-BOOT SHARD (v55.4-SUPREME-ORION-NEBULA)
+ * S SIGMAOS ZENITH: SOVEREIGN COLD-BOOT SHARD (v55.4-SUPREME-ORION-NEBULA)
  * =========================================================================
  * Mission: Neutralizing physical memory extraction via cold-boot attacks.
  * Principles: Cyber Security, Privacy, Safety.

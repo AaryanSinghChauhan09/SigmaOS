@@ -1,6 +1,6 @@
-/*
+﻿/*
  * =========================================================================
- * Σ SIGMAOS ZENITH: SOVEREIGN CONTROL ENGINE (v1.0)
+ * S SIGMAOS ZENITH: SOVEREIGN CONTROL ENGINE (v1.0)
  * =========================================================================
  * Mission: High-precision feedback control for Hardware and Robotics.
  * Principles: Proportional-Integral-Derivative (PID) Control.

@@ -1,4 +1,4 @@
-#include "sigma_base.h"
+﻿#include "sigma_base.h"
 
 #include "SovereignCommand.h"
 #include "sigma_libc.h"
@@ -12,7 +12,7 @@ static int sigma_strcmp_local(const char* s1, const char* s2) {
 
 void SovereignCommand_Init(void) {
     sigma_memset(&g_cmd_registry, 0, sizeof(sovereign_command_registry_t));
-    sigma_printf("Σ [CMD]: Sovereign Command Registry Online. Capacity: %d commands.\n", MAX_COMMANDS);
+    sigma_printf("S [CMD]: Sovereign Command Registry Online. Capacity: %d commands.\n", MAX_COMMANDS);
 }
 
 sigma_err_t SovereignCommand_Register(const char* name, const char* desc, sigma_cmd_handler_t handler) {
@@ -40,7 +40,7 @@ void SovereignCommand_Dispatch(int argc, char** argv) {
 }
 
 void SovereignCommand_ListAll(void) {
-    sigma_printf("\nΣ SIGMAOS OMNI-CLI: MODULAR COMMAND CATALOG\n");
+    sigma_printf("\nS SIGMAOS OMNI-CLI: MODULAR COMMAND CATALOG\n");
     sigma_printf("--------------------------------------------------\n");
     for (sigma_u32 i = 0; i < g_cmd_registry.command_count; i++) {
         sigma_printf("%-12s - %s\n", g_cmd_registry.commands[i].name, g_cmd_registry.commands[i].description);

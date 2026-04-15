@@ -1,6 +1,6 @@
-/*
+﻿/*
  * =========================================================================
- * Σ SIGMAOS ZENITH: SOVEREIGN TIME-SHARE & RTOS ENGINE (v50.3-ULTRON)
+ * S SIGMAOS ZENITH: SOVEREIGN TIME-SHARE & RTOS ENGINE (v50.3-ULTRON)
  * =========================================================================
  * Mission: Preemptive multi-tasking and fair-share resource distribution.
  * Principles: Quantum Slicing, Time-Sharing, Multi-Sharing, RT-Priorities.

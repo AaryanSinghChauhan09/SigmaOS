@@ -1,6 +1,6 @@
-/*
+﻿/*
  * =========================================================================
- * Σ SIGMAOS ZENITH: SOVEREIGN PAGE-WALK BRIDGE (v54.2-TRIANGULUM)
+ * S SIGMAOS ZENITH: SOVEREIGN PAGE-WALK BRIDGE (v54.2-TRIANGULUM)
  * =========================================================================
  * Mission: Tracking and optimizing TLB-miss and page-walk efficiency.
  * Principles: Performance, Computer Science, Hardware Mastery.

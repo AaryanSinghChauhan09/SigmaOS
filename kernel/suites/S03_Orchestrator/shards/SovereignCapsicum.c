@@ -1,6 +1,6 @@
-#include "sigma_kernel.h"
+﻿#include "sigma_kernel.h"
 
-// Σ SovereignCapsicum: Capability Zenith
+// S SovereignCapsicum: Capability Zenith
 // Inspired by FreeBSD Capsicum: Capability-Based Security Framework
 
 typedef struct {
@@ -21,18 +21,18 @@ typedef enum {
 } SovereignCapsicum_Rights;
 
 void SovereignCapsicum_Init() {
-    sigma_printf("Σ [ABSORB]: SovereignCapsicum Capability Shield Online.
+    sigma_printf("S [ABSORB]: SovereignCapsicum Capability Shield Online.
 ");
 }
 
 int SovereignCapsicum_Enter() {
-    sigma_printf("Σ [CAP]: Process Entering Capability Mode. File Namespace Restricted.
+    sigma_printf("S [CAP]: Process Entering Capability Mode. File Namespace Restricted.
 ");
     return 0; // Mode: LOCKED
 }
 
 int SovereignCapsicum_Limit(int fd, sigma_u64 rights) {
-    sigma_printf("Σ [LIMIT]: FD %d Rights set to 0x%llx
+    sigma_printf("S [LIMIT]: FD %d Rights set to 0x%llx
 ", fd, rights);
     return 0;
 }

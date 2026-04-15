@@ -1,6 +1,6 @@
-/*
+﻿/*
  * =========================================================================
- * Σ SIGMAOS: SOVEREIGN INTEGRATION TEST SUITE (v1.0)
+ * S SIGMAOS: SOVEREIGN INTEGRATION TEST SUITE (v1.0)
  * =========================================================================
  * Tests inter-shard interactions: Scheduler ↔ Memory ↔ Event Mesh
  * Strategy: Integration testing (Roadmap #2), End-to-end (#3), TDD (#83)
@@ -213,7 +213,7 @@ static void test_e2e_task_lifecycle(void) {
  * ========================================================================= */
 int main(void) {
     sigma_printf("======================================================\n");
-    sigma_printf("  Σ SIGMAOS: SOVEREIGN INTEGRATION TEST SUITE (v1.0)\n");
+    sigma_printf("  S SIGMAOS: SOVEREIGN INTEGRATION TEST SUITE (v1.0)\n");
     sigma_printf("  Strategy: Integration | E2E | Stress | Property\n");
     sigma_printf("======================================================\n");
 

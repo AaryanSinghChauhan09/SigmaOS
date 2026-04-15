@@ -1,11 +1,11 @@
-#include "sigma_base.h"
+﻿#include "sigma_base.h"
 
 #include "SovereignSecurity.h"
 #include "sigma_libc.h"
 
 sigma_err_t sigma_jail_init(void) {
-    sigma_printf("  Σ [JAIL]: Sovereign FreeBSD-style Isolation online.\n");
-    sigma_printf("  Σ [JAIL]: Root chroot / VNET virtualization matrix established.\n");
+    sigma_printf("  S [JAIL]: Sovereign FreeBSD-style Isolation online.\n");
+    sigma_printf("  S [JAIL]: Root chroot / VNET virtualization matrix established.\n");
     return SIGMA_OK;
 }
 

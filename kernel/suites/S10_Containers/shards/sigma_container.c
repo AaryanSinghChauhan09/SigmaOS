@@ -1,6 +1,6 @@
-/*
+﻿/*
  * =========================================================================
- * Σ SIGMAOS kernel/suites/S10_Containers/shards/sigma_container.c
+ * S SIGMAOS kernel/suites/S10_Containers/shards/sigma_container.c
  * =========================================================================
  */
 
@@ -45,7 +45,7 @@ static ct_u32 isolation_to_ns(sigma_isolation_t lvl) {
 
 void sigma_ct_init(void) {
     sigma_memset(s_containers, 0, sizeof(s_containers));
-    sigma_printf("Σ [CT] Container Runtime initialized. Max slots: %u\n", CT_MAX);
+    sigma_printf("S [CT] Container Runtime initialized. Max slots: %u\n", CT_MAX);
 }
 
 ct_i32 sigma_ct_create(const char *name, const char *image,
@@ -63,7 +63,7 @@ ct_i32 sigma_ct_create(const char *name, const char *image,
     ct->readonly_rootfs= CT_TRUE;
     if (limits) ct->limits = *limits;
 
-    sigma_printf("Σ [CT] CREATE: %s (%s) image=%s isolation=%d ns=0x%x\n",
+    sigma_printf("S [CT] CREATE: %s (%s) image=%s isolation=%d ns=0x%x\n",
                  ct->name, ct->id, ct->image, (int)level, ct->ns_flags);
     return CT_OK;
 }
@@ -74,7 +74,7 @@ ct_i32 sigma_ct_start(const char *name) {
     ct->state    = CT_RUNNING;
     ct->root_pid = 1000 + s_ct_count;  /* simulated container init PID */
 
-    sigma_printf("Σ [CT] START: %s (root_pid=%u)\n", ct->name, ct->root_pid);
+    sigma_printf("S [CT] START: %s (root_pid=%u)\n", ct->name, ct->root_pid);
 
     /* Apply cgroup v2 limits */
     if (ct->limits.cpu_quota_us)
@@ -97,7 +97,7 @@ ct_i32 sigma_ct_pause(const char *name) {
     sigma_container_t *ct = find_ct(name);
     if (!ct || ct->state != CT_RUNNING) return CT_ERR;
     ct->state = CT_PAUSED;
-    sigma_printf("Σ [CT] PAUSE: %s (SIGSTOP all procs)\n", ct->name);
+    sigma_printf("S [CT] PAUSE: %s (SIGSTOP all procs)\n", ct->name);
     return CT_OK;
 }
 
@@ -105,14 +105,14 @@ ct_i32 sigma_ct_resume(const char *name) {
     sigma_container_t *ct = find_ct(name);
     if (!ct || ct->state != CT_PAUSED) return CT_ERR;
     ct->state = CT_RUNNING;
-    sigma_printf("Σ [CT] RESUME: %s (SIGCONT all procs)\n", ct->name);
+    sigma_printf("S [CT] RESUME: %s (SIGCONT all procs)\n", ct->name);
     return CT_OK;
 }
 
 ct_i32 sigma_ct_stop(const char *name) {
     sigma_container_t *ct = find_ct(name);
     if (!ct) return CT_ERR;
-    sigma_printf("Σ [CT] STOP: %s (SIGTERM -> SIGKILL)\n", ct->name);
+    sigma_printf("S [CT] STOP: %s (SIGTERM -> SIGKILL)\n", ct->name);
     ct->state    = CT_STOPPED;
     ct->root_pid = 0;
     return CT_OK;
@@ -121,7 +121,7 @@ ct_i32 sigma_ct_stop(const char *name) {
 ct_i32 sigma_ct_destroy(const char *name) {
     for (ct_u32 i = 0; i < s_ct_count; i++) {
         if (sigma_streq(s_containers[i].name, name)) {
-            sigma_printf("Σ [CT] DESTROY: %s (%s)\n",
+            sigma_printf("S [CT] DESTROY: %s (%s)\n",
                          s_containers[i].name, s_containers[i].id);
             for (ct_u32 j = i; j < s_ct_count - 1; j++)
                 s_containers[j] = s_containers[j+1];
@@ -135,16 +135,16 @@ ct_i32 sigma_ct_destroy(const char *name) {
 void sigma_ct_exec(const char *name, const char *cmd) {
     sigma_container_t *ct = find_ct(name);
     if (!ct || ct->state != CT_RUNNING) {
-        sigma_printf("Σ [CT] EXEC FAIL: %s not running\n", name);
+        sigma_printf("S [CT] EXEC FAIL: %s not running\n", name);
         return;
     }
-    sigma_printf("Σ [CT] EXEC: [%s] $ %s\n", ct->id, cmd);
+    sigma_printf("S [CT] EXEC: [%s] $ %s\n", ct->id, cmd);
 }
 
 void sigma_ct_stats(const char *name) {
     sigma_container_t *ct = find_ct(name);
     if (!ct) return;
-    sigma_printf("\nΣ CT STATS: %s (%s)\n", ct->name, ct->id);
+    sigma_printf("\nS CT STATS: %s (%s)\n", ct->name, ct->id);
     sigma_printf("  state:    %d   root_pid: %u\n", (int)ct->state, ct->root_pid);
     sigma_printf("  cpu_used: %llu us   mem_used: %llu KB\n",
                  (unsigned long long)ct->cpu_used_us,
@@ -153,7 +153,7 @@ void sigma_ct_stats(const char *name) {
 
 void sigma_ct_ps(void) {
     static const char *st[] = {"CREATED","RUNNING","PAUSED","STOPPED","DEAD"};
-    sigma_printf("\nΣ CONTAINER TABLE (%u)\n", s_ct_count);
+    sigma_printf("\nS CONTAINER TABLE (%u)\n", s_ct_count);
     sigma_printf("%-12s %-16s %-8s %-24s\n", "ID", "NAME", "STATE", "IMAGE");
     for (ct_u32 i = 0; i < s_ct_count; i++) {
         sigma_container_t *ct = &s_containers[i];

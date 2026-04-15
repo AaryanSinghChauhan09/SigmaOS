@@ -1,6 +1,6 @@
-/*
+﻿/*
  * =========================================================================
- * Σ SIGMAOS: TOOLS — sovereign_ls.c
+ * S SIGMAOS: TOOLS — sovereign_ls.c
  * =========================================================================
  * Implementation of Idea 361 (Apex Infinity): Native Sovereign LS.
  * Zero dependency on coreutils/stat/libc wrappers.
@@ -18,11 +18,11 @@
 #endif
 
 void sovereign_ls(const char* path) {
-    sigma_printf("Σ [LS]: Scanning %s\n", path);
+    sigma_printf("S [LS]: Scanning %s\n", path);
     
 #ifdef __SIGMAOS__
     // Sovereign VFS Traversal logic
-    sigma_printf("Σ [VFS]: root . .. kernel tools apps\n");
+    sigma_printf("S [VFS]: root . .. kernel tools apps\n");
 #else
     // Host-bound simulation for developer clarity
     DIR* d = opendir(path);

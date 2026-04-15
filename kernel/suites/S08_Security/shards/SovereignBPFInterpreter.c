@@ -1,10 +1,10 @@
-#include "sigma_base.h"
+﻿#include "sigma_base.h"
 
 #include <sigma_types.h>
 #include "sigma_print.h"
 
 /*
- * Σ Sovereign BPF Interpreter
+ * S Sovereign BPF Interpreter
  * USP: Linux (eBPF)
  * Concept: Sandboxed dynamic kernel observability.
  *          Implements a native bitwise bytecode interpreter that 

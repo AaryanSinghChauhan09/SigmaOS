@@ -1,6 +1,6 @@
-/*
+﻿/*
  * =========================================================================
- * Σ SIGMAOS: SOVEREIGN SILICON CONTAINER HEADER
+ * S SIGMAOS: SOVEREIGN SILICON CONTAINER HEADER
  * =========================================================================
  */
 

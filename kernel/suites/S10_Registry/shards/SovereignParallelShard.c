@@ -1,6 +1,6 @@
-/*
+﻿/*
  * =========================================================================
- * Σ SIGMAOS ZENITH: SOVEREIGN PARALLEL COMPUTING (v1.0)
+ * S SIGMAOS ZENITH: SOVEREIGN PARALLEL COMPUTING (v1.0)
  * =========================================================================
  * Mission: High-Performance Parallel Execution & SIMD Processing.
  * Principles: Data Parallelism, Thread Affinity, Lock-Free Concurrency.

@@ -1,6 +1,6 @@
-/*
+﻿/*
  * =========================================================================
- * Σ SIGMAOS ZENITH: SOVEREIGN VTABLE REGISTRY (v1.0)
+ * S SIGMAOS ZENITH: SOVEREIGN VTABLE REGISTRY (v1.0)
  * =========================================================================
  * Mission:  Centralized OOP Polymorphism Engine for C11.
  * Principle: Encapsulation, Inheritance (Composition), Dynamic Dispatch.

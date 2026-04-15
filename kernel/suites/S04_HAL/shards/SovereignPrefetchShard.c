@@ -1,6 +1,6 @@
-/*
+﻿/*
  * =========================================================================
- * Σ SIGMAOS ZENITH: SOVEREIGN PREFETCH SHARD (v52.1-SUPREME-COSMOS)
+ * S SIGMAOS ZENITH: SOVEREIGN PREFETCH SHARD (v52.1-SUPREME-COSMOS)
  * =========================================================================
  * Mission: Minimizing memory latency via software-directed prefetching.
  * Principles: Computer Science, Performance, Hardware Mastery.

@@ -1,6 +1,6 @@
-/*
+﻿/*
  * =========================================================================
- * Σ SIGMAOS ZENITH: SOVEREIGN CONCURRENCY ENGINE (v1.0)
+ * S SIGMAOS ZENITH: SOVEREIGN CONCURRENCY ENGINE (v1.0)
  * =========================================================================
  * Mission: Kernel-level concurrency primitives.
  * Principles: Mutual Exclusion, Deadlock Avoidance, Lock-Free Atomics,

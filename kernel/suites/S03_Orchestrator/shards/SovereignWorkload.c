@@ -1,7 +1,7 @@
-#include "sigma_kernel.h"
+﻿#include "sigma_kernel.h"
 
 void SovereignWorkload_Init() {
-    sigma_printf("Σ [ABSORB]: SovereignWorkload Integration Complete. Global USP Parity Secured.
+    sigma_printf("S [ABSORB]: SovereignWorkload Integration Complete. Global USP Parity Secured.
 ");
 }
 

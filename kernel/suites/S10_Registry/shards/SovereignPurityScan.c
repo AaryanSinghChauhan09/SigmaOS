@@ -1,8 +1,8 @@
-#include "sigma_base.h"
+﻿#include "sigma_base.h"
 
 /*
  * =========================================================================
- * Σ SIGMAOS: SOVEREIGN PURITY SCAN (v1.0)
+ * S SIGMAOS: SOVEREIGN PURITY SCAN (v1.0)
  * =========================================================================
  * Mission: Automated audit of zero-dependency purity and data privacy.
  * Design: C11 / Zero-Dependency / Static-Analysis.
@@ -14,7 +14,7 @@
 #include "sigma_libc.h"
 
 void sigma_purity_audit(const char* file_path) {
-    sigma_printf("Σ [PURITY]: Auditing shard '%s' for unauthorized high-level dependencies...\n", file_path);
+    sigma_printf("S [PURITY]: Auditing shard '%s' for unauthorized high-level dependencies...\n", file_path);
     
     /* Mock audit logic: searches for forbidden headers */
     const char* forbidden[] = {"stdio.h", "stdlib.h", "string.h", "Aaryan"};

@@ -1,6 +1,6 @@
-/*
+﻿/*
  * =========================================================================
- * Σ SIGMAOS: SOVEREIGN I2C CORE (v1.0 — PURE C11)
+ * S SIGMAOS: SOVEREIGN I2C CORE (v1.0 — PURE C11)
  * =========================================================================
  * Competitor Gap Closed: Linux drivers/i2c/ (I2C/SMBus core layer),
  * macOS I2C Family, Windows SpbCx.
@@ -88,7 +88,7 @@ sigma_err_t sigma_i2c_add_adapter(SigmaI2CAdapter_t *adap) {
     s_adapters[s_adapter_count++] = *adap;
     s_adapters[adap->nr].online = SIGMA_TRUE;
     
-    sigma_printf("Σ [I2C]: Registered adapter i2c-%u: '%s'\n", adap->nr, adap->name);
+    sigma_printf("S [I2C]: Registered adapter i2c-%u: '%s'\n", adap->nr, adap->name);
     return SIGMA_OK;
 }
 
@@ -147,7 +147,7 @@ static sigma_i32 mock_i2c_xfer(SigmaI2CAdapter_t *adap, SigmaI2CMsg_t *msgs, sig
     SIGMA_UNUSED(adap);
     for (int i = 0; i < num; i++) {
         sigma_bool is_read = (msgs[i].flags & I2C_M_RD) != 0;
-        sigma_printf("Σ [I2C-HW]: %s Addr: 0x%02X Len: %u\n", 
+        sigma_printf("S [I2C-HW]: %s Addr: 0x%02X Len: %u\n", 
                      is_read ? "RX(M->S)" : "TX(S->M)", 
                      msgs[i].addr, msgs[i].len);
         
@@ -167,7 +167,7 @@ static const SigmaI2CAlgorithm_t mock_algo = {
  * ░░ INITIALISATION
  * ----------------------------------------------------------------------- */
 void SovereignI2CCore_Init(void) {
-    sigma_printf("Σ [I2C]: Initialising Sovereign I2C/SMBus Core...\n");
+    sigma_printf("S [I2C]: Initialising Sovereign I2C/SMBus Core...\n");
 
     /* Register DesignWare I2C Controller (Common on Intel/AMD) */
     SigmaI2CAdapter_t dw_adap;
@@ -188,9 +188,9 @@ void SovereignI2CCore_Init(void) {
     
     /* Read from register 0x01 */
     sigma_i32 val = sigma_i2c_smbus_read_byte_data(&eeprom, 0x01);
-    sigma_printf("Σ [I2C]: Read from client 0x50 -> 0x%02X\n", val);
+    sigma_printf("S [I2C]: Read from client 0x50 -> 0x%02X\n", val);
 
-    sigma_printf("Σ [I2C]: I2C engine online. Sensor bus parameter sovereignty established.\n");
+    sigma_printf("S [I2C]: I2C engine online. Sensor bus parameter sovereignty established.\n");
 }
 
 

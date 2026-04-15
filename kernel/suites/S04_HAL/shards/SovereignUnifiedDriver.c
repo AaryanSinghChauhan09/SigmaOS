@@ -1,10 +1,10 @@
-#include "sigma_base.h"
+﻿#include "sigma_base.h"
 
 #include <sigma_types.h>
 #include "sigma_print.h"
 
 /*
- * Σ Sovereign Unified Driver
+ * S Sovereign Unified Driver
  * USP: Minoca OS (Unified Device Driver Interface)
  * Concept: Radical driver-to-kernel simplification.
  *          Enforces a singular, unified byte-stream protocol for 

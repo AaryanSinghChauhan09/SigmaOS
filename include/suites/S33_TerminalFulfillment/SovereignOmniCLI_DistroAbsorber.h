@@ -1,6 +1,6 @@
-/*
+﻿/*
  * =========================================================================
- * Σ SIGMAOS ZENITH: SovereignOmniCLI_DistroAbsorber.h (v2.0)
+ * S SIGMAOS ZENITH: SovereignOmniCLI_DistroAbsorber.h (v2.0)
  * =========================================================================
  * Absorbs command syntax from 20+ legacy Linux distributions.
  * All foreign package managers & shell syntaxes map to native Sovereign

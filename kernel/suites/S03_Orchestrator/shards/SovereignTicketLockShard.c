@@ -1,6 +1,6 @@
-/*
+﻿/*
  * =========================================================================
- * Σ SIGMAOS ZENITH: SOVEREIGN TICKET-LOCK SHARD (v52.4-SUPREME-ETERNITY)
+ * S SIGMAOS ZENITH: SOVEREIGN TICKET-LOCK SHARD (v52.4-SUPREME-ETERNITY)
  * =========================================================================
  * Mission: Fair spinlock synchronization to prevent thread starvation.
  * Principles: Multi-Processing, Computer Science, Fairness, Determinism.

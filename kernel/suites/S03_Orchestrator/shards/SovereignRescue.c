@@ -1,7 +1,7 @@
-#include "sigma_kernel.h"
+﻿#include "sigma_kernel.h"
 
 void SovereignRescue_Init() {
-    sigma_printf("Σ [ABSORB]: SovereignRescue Zenith Online. Unified Parity Verified.\n");
+    sigma_printf("S [ABSORB]: SovereignRescue Zenith Online. Unified Parity Verified.\n");
 }
 
 

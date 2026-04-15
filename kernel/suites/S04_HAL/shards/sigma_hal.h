@@ -1,6 +1,6 @@
-/*
+﻿/*
  * =========================================================================
- * Σ SIGMAOS kernel/suites/S04_HAL/shards/sigma_hal.h
+ * S SIGMAOS kernel/suites/S04_HAL/shards/sigma_hal.h
  * =========================================================================
  * Hardware Abstraction Layer — gap-closes:
  *   Linux  : platform_device, of_device, ACPI, irqdomain

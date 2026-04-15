@@ -1,6 +1,6 @@
-/*
+﻿/*
  * =========================================================================
- * Σ SIGMAOS ZENITH: SOVEREIGN TDX SHARD (v56.7-SUPREME-MULTIVERSE_CORE)
+ * S SIGMAOS ZENITH: SOVEREIGN TDX SHARD (v56.7-SUPREME-MULTIVERSE_CORE)
  * =========================================================================
  * Mission: Full hardware-encrypted VM isolation and confidential computing.
  * Principles: Cyber Security, Privacy, Hardware Mastery, Safety.

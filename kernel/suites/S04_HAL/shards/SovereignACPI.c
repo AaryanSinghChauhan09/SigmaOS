@@ -1,6 +1,6 @@
-/*
+﻿/*
  * =========================================================================
- * Σ SIGMAOS: SOVEREIGN ACPI SUBSYSTEM (v1.0 — PURE C11)
+ * S SIGMAOS: SOVEREIGN ACPI SUBSYSTEM (v1.0 — PURE C11)
  * =========================================================================
  * Competitor Gap Closed: Linux drivers/acpi/ (ACPI CA), Windows acpi.sys.
  * Modern x86 and ARM servers completely rely on ACPI (Advanced Configuration
@@ -95,7 +95,7 @@ static sigma_bool acpi_checksum(const void *ptr, sigma_u32 len) {
 static SigmaACPIRSDP_t* acpi_find_rsdp(void) {
     /* In a real kernel: scan EBDA (0x80000..0x9ffff) or 0xE0000..0xFFFFF */
     /* Alternatively passed via UEFI or multiboot2 tags. */
-    sigma_printf("Σ [ACPI]: Initiating UEFI / Memory scan for RSDP...\n");
+    sigma_printf("S [ACPI]: Initiating UEFI / Memory scan for RSDP...\n");
     return SIGMA_NULL; /* Simulated; we will inject a fake one in Init */
 }
 
@@ -103,9 +103,9 @@ static SigmaACPIRSDP_t* acpi_find_rsdp(void) {
  * ░░ TABLE PARSING
  * ----------------------------------------------------------------------- */
 static void acpi_parse_madt(SigmaACPIMADT_t *madt) {
-    sigma_printf("Σ [ACPI]: Parsing MADT (Multiple APIC Description Table)\n");
+    sigma_printf("S [ACPI]: Parsing MADT (Multiple APIC Description Table)\n");
     sigma_u32 local_apic = madt->local_apic_address;
-    sigma_printf("Σ [ACPI]: Local APIC Base Address = 0x%08X\n", local_apic);
+    sigma_printf("S [ACPI]: Local APIC Base Address = 0x%08X\n", local_apic);
 
     sigma_u8 *ptr = (sigma_u8 *)madt + sizeof(SigmaACPIMADT_t);
     sigma_u8 *end = (sigma_u8 *)madt + madt->header.length;
@@ -126,14 +126,14 @@ static void acpi_parse_madt(SigmaACPIMADT_t *madt) {
         }
         ptr += entry->length;
     }
-    sigma_printf("Σ [ACPI]: Detected %u CPUs, %u I/O APICs.\n", cpu_count, io_apic_count);
+    sigma_printf("S [ACPI]: Detected %u CPUs, %u I/O APICs.\n", cpu_count, io_apic_count);
 }
 
 /* -----------------------------------------------------------------------
  * ░░ POWER & THERMAL ABSTRACTIONS
  * ----------------------------------------------------------------------- */
 void sigma_acpi_reboot(void) {
-    sigma_printf("Σ [ACPI]: Executing ACPI reboot via RESET_REG...\n");
+    sigma_printf("S [ACPI]: Executing ACPI reboot via RESET_REG...\n");
     /* Real implementation outwits port 0x64 or FADT reset register */
 }
 
@@ -146,11 +146,11 @@ sigma_i32 sigma_acpi_get_temperature(void) {
  * ░░ INITIALISATION
  * ----------------------------------------------------------------------- */
 void SovereignACPI_Init(void) {
-    sigma_printf("Σ [ACPI]: Initialising Sovereign ACPI Core...\n");
+    sigma_printf("S [ACPI]: Initialising Sovereign ACPI Core...\n");
 
     s_rsdp = acpi_find_rsdp();
     if (!s_rsdp) {
-        sigma_printf("Σ [ACPI]: RSDP not physically found. Simulating Virtual ACPI Tree...\n");
+        sigma_printf("S [ACPI]: RSDP not physically found. Simulating Virtual ACPI Tree...\n");
         
         static SigmaACPIMADT_t fake_madt;
         sigma_memset(&fake_madt, 0, sizeof(fake_madt));
@@ -160,10 +160,10 @@ void SovereignACPI_Init(void) {
         
         acpi_parse_madt(&fake_madt);
         
-        sigma_printf("Σ [ACPI]: Thermal Zone Temperature: %d C\n", sigma_acpi_get_temperature());
+        sigma_printf("S [ACPI]: Thermal Zone Temperature: %d C\n", sigma_acpi_get_temperature());
     }
 
-    sigma_printf("Σ [ACPI]: ACPI engine online. Advanced configuration sovereignty achieved.\n");
+    sigma_printf("S [ACPI]: ACPI engine online. Advanced configuration sovereignty achieved.\n");
 }
 
 

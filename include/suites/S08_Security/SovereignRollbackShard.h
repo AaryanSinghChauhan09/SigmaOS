@@ -1,5 +1,5 @@
-/* =========================================================================
- * Σ SIGMAOS: SOVEREIGN ROLLBACK SHARD HEADER
+﻿/* =========================================================================
+ * S SIGMAOS: SOVEREIGN ROLLBACK SHARD HEADER
  * ========================================================================= */
 #ifndef SOVEREIGN_ROLLBACK_SHARD_H
 #define SOVEREIGN_ROLLBACK_SHARD_H

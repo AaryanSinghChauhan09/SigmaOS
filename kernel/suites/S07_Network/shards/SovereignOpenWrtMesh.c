@@ -1,10 +1,10 @@
-#include "sigma_base.h"
+﻿#include "sigma_base.h"
 
 #include <sigma_types.h>
 #include "sigma_print.h"
 
 /*
- * Σ Sovereign OpenWrt Mesh Node
+ * S Sovereign OpenWrt Mesh Node
  * USP: OpenWrt (Wireless Mesh Orchestration)
  * Concept: Optimizes the kernel's network stack specifically for
  *          low-latency wireless packet routing, auto-meshing across

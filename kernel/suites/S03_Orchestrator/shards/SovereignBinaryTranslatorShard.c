@@ -1,6 +1,6 @@
-/*
+﻿/*
  * =========================================================================
- * Σ SIGMAOS ZENITH: SOVEREIGN BINARY TRANSLATOR (v51.2-OMNIPOTENCE-VOX)
+ * S SIGMAOS ZENITH: SOVEREIGN BINARY TRANSLATOR (v51.2-OMNIPOTENCE-VOX)
  * =========================================================================
  * Mission: Cross-architecture functional execution via DBT.
  * Principles: Computer Science, Multi-Processing, Distributed, Portability.

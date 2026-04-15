@@ -1,6 +1,6 @@
-/*
+﻿/*
  * =========================================================================
- * Σ SIGMAOS: SIGMA-INIT (PID 1) & SERVICE MANAGER (v1.0 — PURE C11)
+ * S SIGMAOS: SIGMA-INIT (PID 1) & SERVICE MANAGER (v1.0 — PURE C11)
  * =========================================================================
  * Competitor Gap Closed: Linux systemd/sysvinit, Windows Service Control 
  * Manager (SCM), macOS launchd.
@@ -78,11 +78,11 @@ void sigma_init_start_service(SigmaService_t *svc) {
     
     /* DAG Check */
     if (!is_service_running(svc->requires)) {
-        sigma_printf("Σ [INIT]: Cannot start %s. Dependency %s not met.\n", svc->name, svc->requires);
+        sigma_printf("S [INIT]: Cannot start %s. Dependency %s not met.\n", svc->name, svc->requires);
         return;
     }
 
-    sigma_printf("Σ [INIT]: Starting Service -> %s (%s)\n", svc->name, svc->exec_path);
+    sigma_printf("S [INIT]: Starting Service -> %s (%s)\n", svc->name, svc->exec_path);
     svc->state = SVC_STATE_STARTING;
 
     /* Simulating fork + execve */
@@ -94,7 +94,7 @@ void sigma_init_start_service(SigmaService_t *svc) {
     } else if (new_pid > 0) {
         svc->pid = new_pid;
         svc->state = SVC_STATE_RUNNING;
-        sigma_printf("Σ [INIT]: %s running as PID %u.\n", svc->name, new_pid);
+        sigma_printf("S [INIT]: %s running as PID %u.\n", svc->name, new_pid);
     } else {
         svc->state = SVC_STATE_FAILED;
     }
@@ -106,7 +106,7 @@ void sigma_init_start_service(SigmaService_t *svc) {
 void sigma_init_sigchld_handler(int sig) {
     SIGMA_UNUSED(sig);
     /* In a real init, loop waitpid(-1, &status, WNOHANG) to reap zombie children */
-    sigma_printf("Σ [INIT]: Child died. Reaping process and evaluating restart triggers...\n");
+    sigma_printf("S [INIT]: Child died. Reaping process and evaluating restart triggers...\n");
     
     /* Mock finding the dead process */
     for (sigma_u32 i = 0; i < s_service_count; i++) {
@@ -123,7 +123,7 @@ void sigma_init_sigchld_handler(int sig) {
  * ----------------------------------------------------------------------- */
 void SigmaInit_Main(void) {
     sigma_printf("\n======================================================\n");
-    sigma_printf("   Σ SIGMA-INIT (PID 1) BOOTSTRAP ORCHESTRATOR\n");
+    sigma_printf("   S SIGMA-INIT (PID 1) BOOTSTRAP ORCHESTRATOR\n");
     sigma_printf("======================================================\n");
 
     /* Register OS Services natively */
@@ -133,18 +133,18 @@ void SigmaInit_Main(void) {
     sigma_init_register_service("sigma-gui", "/usr/bin/sigma-wayland", "sigma-journal", SIGMA_FALSE);
 
     /* Run-Level: Multi-User / Graphical Target */
-    sigma_printf("Σ [INIT]: Entering Graphical Target mode...\n");
+    sigma_printf("S [INIT]: Entering Graphical Target mode...\n");
 
     for (sigma_u32 i = 0; i < s_service_count; i++) {
         /* Ignore socket-activated services until a connection actually arrives */
         if (!s_services[i].wants_socket_activation) {
             sigma_init_start_service(&s_services[i]);
         } else {
-            sigma_printf("Σ [INIT]: Pre-bound listening socket for %s (Lazy Load).\n", s_services[i].name);
+            sigma_printf("S [INIT]: Pre-bound listening socket for %s (Lazy Load).\n", s_services[i].name);
         }
     }
 
-    sigma_printf("Σ [INIT]: System is fully operational. Awaiting signals...\n");
+    sigma_printf("S [INIT]: System is fully operational. Awaiting signals...\n");
     
     /* Event Loop Sleep */
     while (1) {

@@ -1,6 +1,6 @@
-/*
+﻿/*
  * =========================================================================
- * Σ SIGMAOS ZENITH: SOVEREIGN AUDIO SYNTHESIS (v51.2-OMNIPOTENCE-VOX)
+ * S SIGMAOS ZENITH: SOVEREIGN AUDIO SYNTHESIS (v51.2-OMNIPOTENCE-VOX)
  * =========================================================================
  * Mission: High-fidelity audio synthesis and system voice feedback.
  * Principles: Frontend, User Experience, User Interface.

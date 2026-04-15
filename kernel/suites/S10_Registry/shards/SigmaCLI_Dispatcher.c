@@ -1,6 +1,6 @@
-/*
+﻿/*
  * =========================================================================
- * Σ SIGMAOS: SOVEREIGN CLI DISPATCHER (v50.2-OMEGA — TRANS-OS SUPREMACY)
+ * S SIGMAOS: SOVEREIGN CLI DISPATCHER (v50.2-OMEGA — TRANS-OS SUPREMACY)
  * =========================================================================
  * The universal user-facing entry point for the Omni-CLI. 
  * Orchestrates thousands of shards via the Sentient Command Matrix.

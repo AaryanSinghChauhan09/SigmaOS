@@ -1,4 +1,4 @@
-#include "sigma_base.h"
+﻿#include "sigma_base.h"
 
 #include "SovereignOSBasicsZenith.h"
 #include "sigma_libc.h"
@@ -10,8 +10,8 @@
  */
 
 sigma_err_t sigma_audio_init(void) {
-    sigma_printf("  Σ [AUDIO]: Sovereign Sound Matrix active.\n");
-    sigma_printf("  Σ [AUDIO]: PCM ring-buffer initialized (48kHz/24-bit).\n");
+    sigma_printf("  S [AUDIO]: Sovereign Sound Matrix active.\n");
+    sigma_printf("  S [AUDIO]: PCM ring-buffer initialized (48kHz/24-bit).\n");
     return SIGMA_OK;
 }
 

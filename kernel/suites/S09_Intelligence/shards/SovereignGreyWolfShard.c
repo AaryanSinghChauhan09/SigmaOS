@@ -1,6 +1,6 @@
-/*
+﻿/*
  * =========================================================================
- * Σ SIGMAOS ZENITH: SOVEREIGN GREY-WOLF SHARD (v53.0-SINGULARITY-OMEGA)
+ * S SIGMAOS ZENITH: SOVEREIGN GREY-WOLF SHARD (v53.0-SINGULARITY-OMEGA)
  * =========================================================================
  * Mission: Hierarchical hierarchical peer-delegation and pack-tuning.
  * Principles: AI, Algorithms, Data Science, Distributed.

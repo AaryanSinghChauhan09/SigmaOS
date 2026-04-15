@@ -1,6 +1,6 @@
-/*
+﻿/*
  * =========================================================================
- * Σ SIGMAOS kernel/sigma_main.c
+ * S SIGMAOS kernel/sigma_main.c
  * =========================================================================
  * Sovereign Kernel Main Entry Point — wires all 15 suites + userland.
  * This is the single entry point called by the boot stub after
@@ -183,10 +183,10 @@ static void sigma_userspace_phase(void) {
 /* ── 5. Final Report ─────────────────────────────────────────────────────── */
 static void sigma_final_report(void) {
     sigma_printf("\n");
-    sigma_printf("Σ ══════════════════════════════════════════════════════\n");
+    sigma_printf("S ══════════════════════════════════════════════════════\n");
     sigma_printf("  SIGMAOS SOVEREIGN v4.0 — SYSTEM UP\n");
     sigma_printf("  22 Suites | GIV Verified | PQC Hardened | Neural-Driven\n");
-    sigma_printf("Σ ══════════════════════════════════════════════════════\n\n");
+    sigma_printf("S ══════════════════════════════════════════════════════\n\n");
 
     sigma_boot_report();
     sigma_hal_device_list();
@@ -205,7 +205,7 @@ static void sigma_final_report(void) {
     sigma_audio_stats();
     sigma_usb_stats();
 
-    sigma_printf("\nΣ SOVEREIGNTY IS ABSOLUTE.\n");
+    sigma_printf("\nS SOVEREIGNTY IS ABSOLUTE.\n");
 }
 
 /* ── kernel_main: The one entry point ───────────────────────────────────── */

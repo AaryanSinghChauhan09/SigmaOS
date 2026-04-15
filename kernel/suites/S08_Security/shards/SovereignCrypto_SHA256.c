@@ -1,6 +1,6 @@
-/*
+﻿/*
  * =========================================================================
- * Σ SIGMAOS: S08_SECURITY — SovereignCrypto_SHA256.c
+ * S SIGMAOS: S08_SECURITY — SovereignCrypto_SHA256.c
  * =========================================================================
  * Implementation of Idea 292 (Apex Infinity): Native SHA-256 Digest.
  * Hand-coded message schedule and compression function.
@@ -40,5 +40,5 @@ void sha256_update(SovereignSHA256Ctx* ctx, const uint8_t* data, uint32_t len) {
 }
 
 void crypto_engine_init(void) {
-    sigma_printf("Σ [S08]: Sovereign Crypto Engine Materialized (Apex Idea 292).\n");
+    sigma_printf("S [S08]: Sovereign Crypto Engine Materialized (Apex Idea 292).\n");
 }

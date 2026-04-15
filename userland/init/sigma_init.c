@@ -1,6 +1,6 @@
-/*
+﻿/*
  * =========================================================================
- * Σ SIGMAOS userland/init/sigma_init.c
+ * S SIGMAOS userland/init/sigma_init.c
  * =========================================================================
  * PID-1 Service Manager Implementation — zero glibc, pure C11.
  * Gaps closed: systemd | launchd | rc | SCM | OpenRC | runit | s6
@@ -36,7 +36,7 @@ void sigma_init_register(const char *name, const char *path,
                          si_bool sock_act)
 {
     if (s_count >= SIGMA_INIT_MAX_SERVICES) {
-        sigma_printf("Σ [INIT] ERROR: service table full\n");
+        sigma_printf("S [INIT] ERROR: service table full\n");
         return;
     }
     sigma_service_t *svc = &s_table[s_count++];
@@ -56,23 +56,23 @@ void sigma_init_register(const char *name, const char *path,
 
 void sigma_init_start(const char *name) {
     sigma_service_t *svc = find_service(name);
-    if (!svc) { sigma_printf("Σ [INIT] ERROR: unknown service '%s'\n", name); return; }
+    if (!svc) { sigma_printf("S [INIT] ERROR: unknown service '%s'\n", name); return; }
     if (svc->state == SVC_ACTIVE) return;
 
     if (!dep_satisfied(svc->requires)) {
-        sigma_printf("Σ [INIT] HOLD: '%s' waiting for '%s'\n",
+        sigma_printf("S [INIT] HOLD: '%s' waiting for '%s'\n",
                      svc->name, svc->requires);
         return;
     }
 
     svc->state = SVC_ACTIVATING;
-    sigma_printf("Σ [INIT] START: %s -> %s%s\n",
+    sigma_printf("S [INIT] START: %s -> %s%s\n",
                  svc->name, svc->exec_path,
                  svc->socket_activated ? " [socket-activated]" : "");
 
     /* Cgroup v2 isolation hook */
     if (svc->cgroup_isolated)
-        sigma_printf("Σ [INIT] CGROUP: isolating %s in v2 namespace\n", svc->name);
+        sigma_printf("S [INIT] CGROUP: isolating %s in v2 namespace\n", svc->name);
 
     svc->state = SVC_ACTIVE;
 }
@@ -81,7 +81,7 @@ void sigma_init_stop(const char *name) {
     sigma_service_t *svc = find_service(name);
     if (!svc || svc->state != SVC_ACTIVE) return;
     svc->state = SVC_DEACTIVATING;
-    sigma_printf("Σ [INIT] STOP: %s (PID %u)\n", svc->name, svc->pid);
+    sigma_printf("S [INIT] STOP: %s (PID %u)\n", svc->name, svc->pid);
     svc->pid   = 0;
     svc->state = SVC_INACTIVE;
 }
@@ -94,7 +94,7 @@ void sigma_init_restart(const char *name) {
 void sigma_init_reap_zombies(void) {
     for (si_u32 i = 0; i < s_count; i++) {
         if (s_table[i].state == SVC_ZOMBIE) {
-            sigma_printf("Σ [INIT] REAP: zombie PID %u (%s)\n",
+            sigma_printf("S [INIT] REAP: zombie PID %u (%s)\n",
                          s_table[i].pid, s_table[i].name);
             s_table[i].pid   = 0;
             s_table[i].state = SVC_FAILED;
@@ -106,7 +106,7 @@ void sigma_init_reap_zombies(void) {
                     s_table[i].restart_count++;
                     sigma_init_start(s_table[i].name);
                 } else {
-                    sigma_printf("Σ [INIT] FAIL: %s exceeded restart limit\n",
+                    sigma_printf("S [INIT] FAIL: %s exceeded restart limit\n",
                                  s_table[i].name);
                 }
             }
@@ -118,7 +118,7 @@ void sigma_init_status(void) {
     static const char *state_str[] = {
         "inactive","activating","active","deactivating","failed","zombie"
     };
-    sigma_printf("\nΣ SIGMA-INIT STATUS TABLE\n");
+    sigma_printf("\nS SIGMA-INIT STATUS TABLE\n");
     sigma_printf("%-32s %-12s %s\n", "SERVICE", "STATE", "PID");
     for (si_u32 i = 0; i < s_count; i++) {
         sigma_printf("  %-30s %-12s %u\n",
@@ -129,13 +129,13 @@ void sigma_init_status(void) {
 }
 
 void sigma_init_bootstrap(sigma_run_target_t target) {
-    sigma_printf("\nΣ ══════════════════════════════════════════════\n");
+    sigma_printf("\nS ══════════════════════════════════════════════\n");
     sigma_printf("  SIGMA-INIT  PID-1  BOOTSTRAP  v2.0\n");
     sigma_printf("  Target: %s\n",
         target == TARGET_RESCUE    ? "rescue.target" :
         target == TARGET_MULTIUSER ? "multi-user.target" :
                                      "graphical.target");
-    sigma_printf("Σ ══════════════════════════════════════════════\n\n");
+    sigma_printf("S ══════════════════════════════════════════════\n\n");
 
     /* Phase 1: Core services (always, any target) */
     sigma_init_start("sigma-journal");
@@ -152,7 +152,7 @@ void sigma_init_bootstrap(sigma_run_target_t target) {
     }
 
     sigma_init_status();
-    sigma_printf("\nΣ [INIT] System operational — entering event loop.\n");
+    sigma_printf("\nS [INIT] System operational — entering event loop.\n");
 }
 
 void sigma_init_event_loop(void) {

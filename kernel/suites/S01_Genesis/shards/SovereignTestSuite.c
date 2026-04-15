@@ -1,6 +1,6 @@
-/*
+﻿/*
  * =========================================================================
- * Σ SIGMAOS ZENITH: SOVEREIGN TEST SUITE (v1.0)
+ * S SIGMAOS ZENITH: SOVEREIGN TEST SUITE (v1.0)
  * =========================================================================
  * Mission: Absolute Verification of the Sovereign Shard Matrix.
  * Design: C11 / Zero-Dependency / Industrial Audit Loop.
@@ -38,7 +38,7 @@ extern void SovereignEnclave_Audit(void);
 sigma_err_t sigma_execute_full_test_suite() {
     sigma_printf("\n");
     sigma_printf("=================================================================\n");
-    sigma_printf("Σ SIGMAOS ZENITH SUPREME — FULL SYSTEM SOVEREIGNTY TEST\n");
+    sigma_printf("S SIGMAOS ZENITH SUPREME — FULL SYSTEM SOVEREIGNTY TEST\n");
     sigma_printf("=================================================================\n");
     
     sigma_printf("[TEST]: 01 - AI_KERNEL_INTEGRITY... "); SovereignAIKernel_Audit();

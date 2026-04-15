@@ -1,6 +1,6 @@
-/*
+﻿/*
  * =========================================================================
- * Σ SIGMAOS: SOVEREIGN EBPF (v1.0 - PURE C11)
+ * S SIGMAOS: SOVEREIGN EBPF (v1.0 - PURE C11)
  * =========================================================================
  * Mission: Silicon-direct observability and network sharding (eBPF Parity).
  * Design: C11 / Zero-Dependency / VM-Engine-Matrix.

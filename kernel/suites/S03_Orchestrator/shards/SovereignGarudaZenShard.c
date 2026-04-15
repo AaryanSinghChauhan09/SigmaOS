@@ -1,4 +1,4 @@
-#include "sigma_base.h"
+﻿#include "sigma_base.h"
 
 #include "SovereignScheduler.h"
 #include "sigma_libc.h"
@@ -10,9 +10,9 @@
  */
 
 sigma_err_t sigma_zen_perf_init(void) {
-    sigma_printf("  Σ [AMAL-ZEN]: Absorbing Garuda Linux Zen-Kernel USPs...\n");
-    sigma_printf("  Σ [AMAL-ZEN]: Preemptive tasking threshold: AGGRESSIVE.\n");
-    sigma_printf("  Σ [AMAL-ZEN]: CFS latency matrix: OPTIMIZED (sub-0.05ms).\n");
+    sigma_printf("  S [AMAL-ZEN]: Absorbing Garuda Linux Zen-Kernel USPs...\n");
+    sigma_printf("  S [AMAL-ZEN]: Preemptive tasking threshold: AGGRESSIVE.\n");
+    sigma_printf("  S [AMAL-ZEN]: CFS latency matrix: OPTIMIZED (sub-0.05ms).\n");
     return SIGMA_OK;
 }
 

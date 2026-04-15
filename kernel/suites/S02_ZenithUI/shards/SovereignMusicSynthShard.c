@@ -1,6 +1,6 @@
-/*
+﻿/*
  * =========================================================================
- * Σ SIGMAOS ZENITH: SOVEREIGN MUSIC-SYNTHESIS SHARD (v1.0)
+ * S SIGMAOS ZENITH: SOVEREIGN MUSIC-SYNTHESIS SHARD (v1.0)
  * =========================================================================
  * Mission: Absolute Audio & DAW USP.
  *          Native C11 Wavetable Synthesis & Harmonic Resonance.

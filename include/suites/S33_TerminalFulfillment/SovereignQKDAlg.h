@@ -1,4 +1,4 @@
-/* Σ SIGMAOS: SOVEREIGN QKD ALG HEADER */
+﻿/* S SIGMAOS: SOVEREIGN QKD ALG HEADER */
 #ifndef SOVEREIGN_QKD_ALG_H
 #define SOVEREIGN_QKD_ALG_H
 #include "sigma_types.h"

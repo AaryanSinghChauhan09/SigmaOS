@@ -1,6 +1,6 @@
-/*
+﻿/*
  * =========================================================================
- * Σ SIGMAOS: S20_GLOBALVFS — SovereignVFS_Node.c
+ * S SIGMAOS: S20_GLOBALVFS — SovereignVFS_Node.c
  * =========================================================================
  * Implementation of Idea 218 (Apex Infinity): Unified VFS Node.
  * Provides the industrial-grade interface for all Sovereign file systems.
@@ -28,7 +28,7 @@ static uint32_t g_vfs_count = 0;
 void vfs_init(void) {
     sigma_memset(g_vfs_root, 0, sizeof(g_vfs_root));
     g_vfs_count = 0;
-    sigma_printf("Σ [S20]: Global VFS Materialized (Apex Idea 218).\n");
+    sigma_printf("S [S20]: Global VFS Materialized (Apex Idea 218).\n");
 }
 
 SovereignVfsNode* vfs_mount(const char* name, VfsNodeType type) {
@@ -39,6 +39,6 @@ SovereignVfsNode* vfs_mount(const char* name, VfsNodeType type) {
     node->type = type;
     node->size = 0;
     
-    sigma_printf("Σ [VFS]: Mounted %s [%s]\n", name, (type == VFS_DIR) ? "DIR" : "FILE");
+    sigma_printf("S [VFS]: Mounted %s [%s]\n", name, (type == VFS_DIR) ? "DIR" : "FILE");
     return node;
 }

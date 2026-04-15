@@ -1,6 +1,6 @@
-/*
+﻿/*
  * =========================================================================
- * Σ SIGMAOS: S11_VIRTUALIZATION — SovereignGCD_Engine.c
+ * S SIGMAOS: S11_VIRTUALIZATION — SovereignGCD_Engine.c
  * =========================================================================
  * Mission: Grand Central Dispatch (GCD) Parity. 
  * Capability: Asynchronous task queues, serial/concurrent dispatch.

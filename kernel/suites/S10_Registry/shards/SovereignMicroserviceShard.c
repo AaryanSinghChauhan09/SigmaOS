@@ -1,6 +1,6 @@
-/*
+﻿/*
  * =========================================================================
- * Σ SIGMAOS ZENITH: SOVEREIGN MICROSERVICE SHARD (v1.0)
+ * S SIGMAOS ZENITH: SOVEREIGN MICROSERVICE SHARD (v1.0)
  * =========================================================================
  * Mission: Cloud-Native Microservices & Service Discovery within the Kernel.
  * Principles: Loose Coupling, Service Autonomy, Distributed IPC.

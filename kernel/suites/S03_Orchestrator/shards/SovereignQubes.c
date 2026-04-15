@@ -1,7 +1,7 @@
-#include "sigma_kernel.h"
+﻿#include "sigma_kernel.h"
 
 void SovereignQubes_Init() {
-    sigma_printf("Σ [ABSORB]: SovereignQubes Zenith Online. Unified Parity Verified.\n");
+    sigma_printf("S [ABSORB]: SovereignQubes Zenith Online. Unified Parity Verified.\n");
 }
 
 

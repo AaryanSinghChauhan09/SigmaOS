@@ -1,6 +1,6 @@
-/*
+﻿/*
  * =========================================================================
- * Σ SIGMAOS: SOVEREIGN MEMORY INTERFACE (v1.0)
+ * S SIGMAOS: SOVEREIGN MEMORY INTERFACE (v1.0)
  * =========================================================================
  * Mission: Modular memory management (Slab, Buddy, Virtual, Paging).
  * Design: C11 / Zero-Dependency / Registry-Based.

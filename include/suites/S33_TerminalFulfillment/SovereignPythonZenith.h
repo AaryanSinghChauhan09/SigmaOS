@@ -1,9 +1,9 @@
-#ifndef SOVEREIGN_PYTHON_ZENITH_H
+﻿#ifndef SOVEREIGN_PYTHON_ZENITH_H
 #define SOVEREIGN_PYTHON_ZENITH_H
 
 #include "SigmaOOP.h"
 
-/* Σ Territory Initiation */
+/* S Territory Initiation */
 
 // --- DYNAMIC GIL-FREE AST ENGINE (PYTHON VM PARITY) ---
 CLASS_DECLARE(SovereignPythonVM) { 
@@ -32,6 +32,6 @@ CLASS_DECLARE(SovereignRefCounting) {
     VIRTUAL(void, DecrementRefAndReclaim, struct SovereignRefCounting* self, SigmaObject_t* target);
 };
 
-/* Σ Territory Termination */
+/* S Territory Termination */
 
 #endif

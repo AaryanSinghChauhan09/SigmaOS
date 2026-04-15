@@ -1,6 +1,6 @@
-/*
+﻿/*
  * =========================================================================
- * Σ SIGMAOS ZENITH: SOVEREIGN CYBER DEFENSE (v50.0-SINGULARITY)
+ * S SIGMAOS ZENITH: SOVEREIGN CYBER DEFENSE (v50.0-SINGULARITY)
  * =========================================================================
  * Mission: Proactive kernel-level security and anomaly detection.
  * Principles: Zero-Trust, Heuristic Analysis, Immutable Memory.

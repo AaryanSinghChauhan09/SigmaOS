@@ -1,6 +1,6 @@
-/*
+﻿/*
  * =========================================================================
- * Σ SIGMAOS: S03_ORCHESTRATOR — SovereignHeartbeat.c
+ * S SIGMAOS: S03_ORCHESTRATOR — SovereignHeartbeat.c
  * =========================================================================
  * Mission: Main Execution Loop & System Pulse.
  * Design: High-frequency task auditing and interconnect polling.
@@ -20,7 +20,7 @@ void Sovereign_Heartbeat_Step(void) {
     OmniMessage msg;
     if (OmniFabric_Poll(&msg)) {
         if (msg.msg_type == MSG_TYPE_SYS_PANIC) {
-            sigma_printf("Σ [HALT]: Critical Shard Failure Detected (Suite S%02d)\n", msg.sender_id);
+            sigma_printf("S [HALT]: Critical Shard Failure Detected (Suite S%02d)\n", msg.sender_id);
             // In a sentient system, we would trigger self-healing (S16) here.
         }
     }
@@ -28,5 +28,5 @@ void Sovereign_Heartbeat_Step(void) {
 
 void S03_Orchestrator_Register(void) {
     SovereignRegistry_Register("S03_Orchestrator", 0, NULL);
-    sigma_printf("Σ [S03]: Master Orchestrator Heartbeat synchronized.\n");
+    sigma_printf("S [S03]: Master Orchestrator Heartbeat synchronized.\n");
 }

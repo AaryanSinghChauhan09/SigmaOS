@@ -1,6 +1,6 @@
-/*
+﻿/*
  * =========================================================================
- * Σ SIGMAOS ULTIMATE_GENESIS: SOVEREIGN LPO SHARD (v60.0-ULTIMATE)
+ * S SIGMAOS ULTIMATE_GENESIS: SOVEREIGN LPO SHARD (v60.0-ULTIMATE)
  * =========================================================================
  * Mission: Driving un-retimed raw optical transceivers to annihilate DSP latency.
  * Principles: Performance, Hardware Mastery, High-Performance Computing (HPC).

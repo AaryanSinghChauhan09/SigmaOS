@@ -1,9 +1,9 @@
-#include "sigma_base.h"
+﻿#include "sigma_base.h"
 
 #include "SovereignToolHeader.h"
 
 /*
- * Σ SIGMAOS: SOVEREIGN XCLICKER (v1.0)
+ * S SIGMAOS: SOVEREIGN XCLICKER (v1.0)
  * USP: Absorb robiot/xclicker functionality.
  * Shard: Industrial Automation.
  */

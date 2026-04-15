@@ -1,6 +1,6 @@
-/*
+﻿/*
  * =========================================================================
- * Σ SIGMAOS ZENITH: SOVEREIGN CONST-TIME CRYPTO (v52.4-SUPREME-ETERNITY)
+ * S SIGMAOS ZENITH: SOVEREIGN CONST-TIME CRYPTO (v52.4-SUPREME-ETERNITY)
  * =========================================================================
  * Mission: Timing-attack resistant field arithmetic for signatures.
  * Principles: Cyber Security, Computer Science, Cryptography.

@@ -1,6 +1,6 @@
-/*
+﻿/*
  * =========================================================================
- * Σ SIGMAOS MULTIVERSE_EXODUS: SOVEREIGN QEC SHARD (v58.0-SUPREME-MULTIVERSE_EXODUS)
+ * S SIGMAOS MULTIVERSE_EXODUS: SOVEREIGN QEC SHARD (v58.0-SUPREME-MULTIVERSE_EXODUS)
  * =========================================================================
  * Mission: Fault-tolerant quantum execution shielding for topological qubits.
  * Principles: Cyber Security, Safety, Computer Science.

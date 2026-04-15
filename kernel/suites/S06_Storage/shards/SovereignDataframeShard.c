@@ -1,6 +1,6 @@
-/*
+﻿/*
  * =========================================================================
- * Σ SIGMAOS ZENITH: SOVEREIGN DATAFRAME SHARD (v50.2-OMEGA)
+ * S SIGMAOS ZENITH: SOVEREIGN DATAFRAME SHARD (v50.2-OMEGA)
  * =========================================================================
  * Mission: Zero-copy persistence for AI/ML and Data Science matrices.
  * Principles: Columnar Storage, Tensor Parallelism, Data Sovereignty.

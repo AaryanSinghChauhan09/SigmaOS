@@ -1,6 +1,6 @@
-/*
+﻿/*
  * =========================================================================
- * Σ SIGMAOS ABSOLUTE_TRANSCENDENCE: SOVEREIGN QKD SHARD (v59.0-ABSOLUTE)
+ * S SIGMAOS ABSOLUTE_TRANSCENDENCE: SOVEREIGN QKD SHARD (v59.0-ABSOLUTE)
  * =========================================================================
  * Mission: Absolute mathematical intercept detection via optical entanglement.
  * Principles: Cyber Security, Privacy, Quantum Communication.

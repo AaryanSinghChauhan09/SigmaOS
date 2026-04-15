@@ -1,6 +1,6 @@
-/*
+﻿/*
  * =========================================================================
- * Σ SIGMAOS ZENITH: SOVEREIGN VISION SHARD (v50.7-TRANSCENDENCE)
+ * S SIGMAOS ZENITH: SOVEREIGN VISION SHARD (v50.7-TRANSCENDENCE)
  * =========================================================================
  * Mission: Zero-dependency Computer Vision and Pattern Recognition.
  * Principles: AI, Machine Learning, Algorithms, Image Processing.

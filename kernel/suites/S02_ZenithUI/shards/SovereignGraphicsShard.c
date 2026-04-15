@@ -1,6 +1,6 @@
-/*
+﻿/*
  * =========================================================================
- * Σ SIGMAOS ZENITH: SOVEREIGN GRAPHICS ENGINE (v1.0 — RAYTRACING)
+ * S SIGMAOS ZENITH: SOVEREIGN GRAPHICS ENGINE (v1.0 — RAYTRACING)
  * =========================================================================
  * Mission: High-fidelity photo-realistic rendering for Zenith Dashboard.
  * Principles: Ray-Sphere Intersection, Vector Projection, Lambertian Shading.

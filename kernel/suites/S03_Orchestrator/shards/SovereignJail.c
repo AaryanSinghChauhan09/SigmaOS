@@ -1,7 +1,7 @@
-#include "sigma_kernel.h"
+﻿#include "sigma_kernel.h"
 #include "../../SovereignInterferenceGuard.h"
 
-// Σ SovereignJail: Isolation Zenith
+// S SovereignJail: Isolation Zenith
 // Inspired by FreeBSD Jails: Hierarchical, Silicon-Segmented Containers
 
 typedef struct {
@@ -16,28 +16,28 @@ typedef struct {
 } SovereignJail_Context;
 
 void SovereignJail_Init() {
-    sigma_printf("Σ [ABSORB]: SovereignJails Isolation Zenith Online.
+    sigma_printf("S [ABSORB]: SovereignJails Isolation Zenith Online.
 ");
 }
 
 sigma_u32 SovereignJail_Create(const char* name, const char* path) {
-    sigma_printf("Σ [JAIL]: Segmenting Domain: %s -> %s
+    sigma_printf("S [JAIL]: Segmenting Domain: %s -> %s
 ", name, path);
     return 1; // Sovereign Anchor ID
 }
 
 void SovereignJail_Attach(sigma_u32 jid) {
-    sigma_printf("Σ [ATTACH]: Entering Jail Domain %u. Environment Locked.
+    sigma_printf("S [ATTACH]: Entering Jail Domain %u. Environment Locked.
 ", jid);
 }
 
 void SovereignJail_ForceRelease(sigma_u32 jid) {
-    sigma_printf("Σ [RELEASE]: Purging Jail Context %u. Network Stack Dissolved.
+    sigma_printf("S [RELEASE]: Purging Jail Context %u. Network Stack Dissolved.
 ", jid);
 }
 
 void SovereignJail_VNET_Init(sigma_u32 jid) {
-    sigma_printf("Σ [VNET]: Virtual Network Stack Segmented for Jail %u.
+    sigma_printf("S [VNET]: Virtual Network Stack Segmented for Jail %u.
 ", jid);
 }
 

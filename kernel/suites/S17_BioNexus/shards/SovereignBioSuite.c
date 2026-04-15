@@ -1,6 +1,6 @@
-/*
+﻿/*
  * =========================================================================
- * Σ SIGMAOS: SOVEREIGN BIO-CRYPTOGRAPHY SUITE (v2.0 - SUPREME)
+ * S SIGMAOS: SOVEREIGN BIO-CRYPTOGRAPHY SUITE (v2.0 - SUPREME)
  * =========================================================================
  * Mission: DNA-Sequence based Entropy and Encryption.
  * =========================================================================
@@ -15,9 +15,9 @@ void sigma_bio_auth(const char* dna_sequence) {
 }
 
 void SovereignBio_Init(void) {
-    sigma_printf("Σ [BIO-SUITE]: Initialising Sovereign Biological Convergence...\n");
+    sigma_printf("S [BIO-SUITE]: Initialising Sovereign Biological Convergence...\n");
     sigma_bio_auth("TGCA-CGAT-ZENITH-ZENITH");
-    sigma_printf("Σ [BIO-SUITE]: Biological Identity Matrix SEATED.\n");
+    sigma_printf("S [BIO-SUITE]: Biological Identity Matrix SEATED.\n");
 }
 
 void SovereignBio_Register(void) {

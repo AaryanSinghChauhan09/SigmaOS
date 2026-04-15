@@ -1,6 +1,6 @@
-/*
+﻿/*
  * =========================================================================
- * Σ SIGMAOS: S10_REGISTRY — SovereignSystemRegistry.c
+ * S SIGMAOS: S10_REGISTRY — SovereignSystemRegistry.c
  * =========================================================================
  * Mission: Transactional System State & Configuration Nexus.
  * Design: No-Glibc, No-Host-Headers. Zero-Corruption WAL architecture.
@@ -22,7 +22,7 @@ void SovereignRegistry_Init(void) {
     g_registry.active_count = 0;
     g_registry.registry_lock = 0;
     
-    sigma_printf("Σ [REGISTRY]: Initialized Sovereign State Nexus (Capacity: %d entries)\n", MAX_REG_ENTRIES);
+    sigma_printf("S [REGISTRY]: Initialized Sovereign State Nexus (Capacity: %d entries)\n", MAX_REG_ENTRIES);
 }
 
 /**
@@ -41,7 +41,7 @@ sigma_err_t SovereignRegistry_Register(const char* name, shard_category_t cat, s
     shard->init = init;
     shard->version = 1;
     
-    sigma_printf("Σ [REGISTRY]: Registered Shard '%s' (Category: %d)\n", name, cat);
+    sigma_printf("S [REGISTRY]: Registered Shard '%s' (Category: %d)\n", name, cat);
     return SIGMA_OK;
 }
 
@@ -65,7 +65,7 @@ void SovereignRegistry_Audit(void) {
  * @brief Finalize and seal the registry before system handoff or hibernation.
  */
 void SovereignRegistry_Finalize(void) {
-    sigma_printf("Σ [REGISTRY]: System State Persisted. Locking Lattice.\n");
+    sigma_printf("S [REGISTRY]: System State Persisted. Locking Lattice.\n");
     g_registry.registry_lock = 1;
 }
 

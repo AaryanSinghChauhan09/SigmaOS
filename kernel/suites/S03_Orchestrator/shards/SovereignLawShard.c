@@ -1,6 +1,6 @@
-/*
+﻿/*
  * =========================================================================
- * Σ SIGMAOS: SOVEREIGN LAW SHARD (v1.0 - PURE C11)
+ * S SIGMAOS: SOVEREIGN LAW SHARD (v1.0 - PURE C11)
  * =========================================================================
  * Mission: Bare-metal execution of Indian Legal Procedures (BNS, BNSS, BSA).
  * Design: C11 / Zero-Dependency / Logic-Grid architecture.
@@ -69,7 +69,7 @@ static SovereignLawShard_t create_law_shard() {
 // -------------------------------------------------------------------------
 
 void sovereign_law_start(void) {
-    sigma_printf("--- Σ SIGMAOS SOVEREIGN LEGAL INITIALIZATION --- \n");
+    sigma_printf("--- S SIGMAOS SOVEREIGN LEGAL INITIALIZATION --- \n");
     SovereignLawShard_t law = create_law_shard();
     
     law.AuditBNS(&law, 105);

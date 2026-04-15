@@ -1,4 +1,4 @@
-#include "sigma_base.h"
+﻿#include "sigma_base.h"
 
 #include "SovereignInit.h"
 #include "sigma_libc.h"
@@ -10,8 +10,8 @@
  */
 
 sigma_err_t sigma_void_init(void) {
-    sigma_printf("  Σ [AMAL-VOID]: Absorbing Void Linux USPs (Runit/XBPS)...\n");
-    sigma_printf("  Σ [AMAL-VOID]: Parallel service supervision engine: ACTIVE.\n");
+    sigma_printf("  S [AMAL-VOID]: Absorbing Void Linux USPs (Runit/XBPS)...\n");
+    sigma_printf("  S [AMAL-VOID]: Parallel service supervision engine: ACTIVE.\n");
     return SIGMA_OK;
 }
 

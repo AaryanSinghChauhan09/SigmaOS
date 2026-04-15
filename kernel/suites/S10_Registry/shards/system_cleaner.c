@@ -1,8 +1,8 @@
-#include "sigma_base.h"
+﻿#include "sigma_base.h"
 
 /*
  * =========================================================================
- * Σ SIGMAOS ZENITH SUPREME: SYSTEM CLEANER / MEMORY MANAGER
+ * S SIGMAOS ZENITH SUPREME: SYSTEM CLEANER / MEMORY MANAGER
  * =========================================================================
  * Mission: Amnesic Shard Integration and RAM zeroing mechanisms.
  * Design: C11 / Zero-Dependency / Struct-based OOP Paradigm.

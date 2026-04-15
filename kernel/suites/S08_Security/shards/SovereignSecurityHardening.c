@@ -1,6 +1,6 @@
-/*
+﻿/*
  * =========================================================================
- * Σ SIGMAOS ZENITH: SOVEREIGN HONEYPOT & SANDBOX (v50.3-ULTRON)
+ * S SIGMAOS ZENITH: SOVEREIGN HONEYPOT & SANDBOX (v50.3-ULTRON)
  * =========================================================================
  * Mission: Decoy-based defense and strict sandbox containment.
  * Principles: Cyber Security, Isolation, Deception, Forensics.

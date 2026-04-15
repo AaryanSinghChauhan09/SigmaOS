@@ -1,6 +1,6 @@
-/*
+﻿/*
  * =========================================================================
- * Σ SIGMAOS ASGARD: SOVEREIGN EPO SHARD (v57.8-SUPREME-ASGARD)
+ * S SIGMAOS ASGARD: SOVEREIGN EPO SHARD (v57.8-SUPREME-ASGARD)
  * =========================================================================
  * Mission: Thermal huddling simulation for dense optima extraction.
  * Principles: AI, Algorithms, Data Science.

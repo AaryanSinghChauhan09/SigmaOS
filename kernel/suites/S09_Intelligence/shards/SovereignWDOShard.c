@@ -1,6 +1,6 @@
-/*
+﻿/*
  * =========================================================================
- * Σ SIGMAOS ZENITH: SOVEREIGN WDO SHARD (v56.9-SUPREME-ETERNITY_GATE)
+ * S SIGMAOS ZENITH: SOVEREIGN WDO SHARD (v56.9-SUPREME-ETERNITY_GATE)
  * =========================================================================
  * Mission: Atmospheric flow physics for high-dimensional distributed tuning.
  * Principles: AI, Algorithms, Data Science, Distributed.

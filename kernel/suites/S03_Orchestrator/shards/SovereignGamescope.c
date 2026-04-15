@@ -1,7 +1,7 @@
-#include "sigma_kernel.h"
+﻿#include "sigma_kernel.h"
 
 void SovereignGamescope_Init() {
-    sigma_printf("Σ [ABSORB]: SovereignGamescope Zenith Online. Unified Parity Verified.\n");
+    sigma_printf("S [ABSORB]: SovereignGamescope Zenith Online. Unified Parity Verified.\n");
 }
 
 

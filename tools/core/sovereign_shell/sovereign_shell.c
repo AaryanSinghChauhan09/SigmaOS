@@ -1,4 +1,4 @@
-#define SIGMA_EXCLUDE_STD_ALIASES
+﻿#define SIGMA_EXCLUDE_STD_ALIASES
 // =============================================================================
 // SigmaOS — tools/sovereign_shell — sovereign_shell.c
 // Native C Replacement for scripts/zenith_shell.py
@@ -169,7 +169,7 @@ static int dispatch(int argc, char** argv) {
 
 // ── Prompt renderer ───────────────────────────────────────────────────────────
 static void print_prompt(void) {
-    sigma_printf(VT_BOLD VT_MAGENTA "σ" VT_RESET VT_CYAN " sigma" VT_RESET
+    sigma_printf(VT_BOLD VT_MAGENTA "S" VT_RESET VT_CYAN " sigma" VT_RESET
            VT_GREEN " ❯ " VT_RESET);
     fflush(stdout);
 }

@@ -1,6 +1,6 @@
-/*
+﻿/*
  * =========================================================================
- * Σ SIGMAOS OMNIPOTENCE: SOVEREIGN SME SHARD (v57.5-SUPREME-OMNIPOTENCE)
+ * S SIGMAOS OMNIPOTENCE: SOVEREIGN SME SHARD (v57.5-SUPREME-OMNIPOTENCE)
  * =========================================================================
  * Mission: Total absolute transparent RAM encryption.
  * Principles: Cyber Security, Privacy, Hardware Mastery, Safety.

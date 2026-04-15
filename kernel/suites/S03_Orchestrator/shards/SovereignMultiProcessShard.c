@@ -1,6 +1,6 @@
-/*
+﻿/*
  * =========================================================================
- * Σ SIGMAOS ZENITH: SOVEREIGN MULTIPROCESS & BATCH ENGINE (v50.2-OMEGA)
+ * S SIGMAOS ZENITH: SOVEREIGN MULTIPROCESS & BATCH ENGINE (v50.2-OMEGA)
  * =========================================================================
  * Mission: High-performance IPC and Batch-Multiprogramming throughput.
  * Principles: Shared Memory, Batch Queues, Time-Sharing, Multi-Tasking.

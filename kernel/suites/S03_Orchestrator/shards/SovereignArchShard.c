@@ -1,11 +1,11 @@
-#include "sigma_base.h"
+﻿#include "sigma_base.h"
 
 #include "SovereignDistro.h"
 #include "sigma_libc.h"
 
 void SovereignArch_AbsorbLogic(void) {
-    sigma_printf("  Σ [ARCH]: Rolling Matrix Sync... AUR initialized.\n");
-    sigma_printf("  Σ [ARCH]: Pacman Parity: LTO and -march=native optimizations forced.\n");
+    sigma_printf("  S [ARCH]: Rolling Matrix Sync... AUR initialized.\n");
+    sigma_printf("  S [ARCH]: Pacman Parity: LTO and -march=native optimizations forced.\n");
 }
 
 void SovereignArch_Register(void) {

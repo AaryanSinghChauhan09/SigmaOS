@@ -1,8 +1,8 @@
-#include "sigma_base.h"
+﻿#include "sigma_base.h"
 
 /*
  * =========================================================================
- * Σ SIGMAOS: SOVEREIGN PYTHON VM (v1.0 - PURE C11)
+ * S SIGMAOS: SOVEREIGN PYTHON VM (v1.0 - PURE C11)
  * =========================================================================
  * Mission: Absorb Python's Dynamic Execution Environment.
  * Capability: Absolute GIL-free multi-core dispatch. JIT bytecode.

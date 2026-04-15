@@ -1,6 +1,6 @@
-/*
+﻿/*
  * =========================================================================
- * Σ SIGMAOS: SOVEREIGN JOURNAL SHARD HEADER
+ * S SIGMAOS: SOVEREIGN JOURNAL SHARD HEADER
  * =========================================================================
  */
 #ifndef SOVEREIGN_JOURNAL_SHARD_H

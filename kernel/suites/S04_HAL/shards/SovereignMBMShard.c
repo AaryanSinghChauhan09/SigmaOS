@@ -1,6 +1,6 @@
-/*
+﻿/*
  * =========================================================================
- * Σ SIGMAOS ZENITH: SOVEREIGN MBM SHARD (v55.2-SUPREME-PROXIMA)
+ * S SIGMAOS ZENITH: SOVEREIGN MBM SHARD (v55.2-SUPREME-PROXIMA)
  * =========================================================================
  * Mission: Real-time silicon-level memory bandwidth auditing.
  * Principles: Performance, Computer Science, Hardware Mastery.

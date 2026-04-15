@@ -1,6 +1,6 @@
-/*
+﻿/*
  * =========================================================================
- * Σ SIGMAOS ZENITH: SOVEREIGN DESIGN PATTERNS ENGINE (v1.0)
+ * S SIGMAOS ZENITH: SOVEREIGN DESIGN PATTERNS ENGINE (v1.0)
  * =========================================================================
  * Mission: Classical GoF Design Patterns implemented in pure C11.
  * Patterns: Singleton, Observer, Strategy, Factory, Iterator.

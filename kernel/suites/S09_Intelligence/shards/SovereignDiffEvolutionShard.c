@@ -1,6 +1,6 @@
-/*
+﻿/*
  * =========================================================================
- * Σ SIGMAOS ZENITH: SOVEREIGN DIFF-EVO SHARD (v52.0-SUPREME-GALAXY)
+ * S SIGMAOS ZENITH: SOVEREIGN DIFF-EVO SHARD (v52.0-SUPREME-GALAXY)
  * =========================================================================
  * Mission: Continuous multidimensional parameter refinement.
  * Principles: AI, Algorithms, Data Science, Automations.

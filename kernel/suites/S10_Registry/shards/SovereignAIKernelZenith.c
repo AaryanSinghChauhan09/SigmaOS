@@ -1,6 +1,6 @@
-/*
+﻿/*
  * =========================================================================
- * Σ SIGMAOS: SOVEREIGN AI KERNEL (v13.0 - PURE C11 SHARD)
+ * S SIGMAOS: SOVEREIGN AI KERNEL (v13.0 - PURE C11 SHARD)
  * =========================================================================
  * Mission: Predictive Scheduling & Real-Time Intent Sharding.
  * Capability: Native AI (no PyTorch/TF). Linear-Regression Shards.
@@ -78,7 +78,7 @@ static void ai_shard_resources(SovereignAIKernel_t* self) {
 }
 
 static void ai_audit(SovereignAIKernel_t* self) {
-    sigma_printf("\n--- Σ SOVEREIGN AI AUDIT (v13.0) ---\n");
+    sigma_printf("\n--- S SOVEREIGN AI AUDIT (v13.0) ---\n");
     sigma_printf("| Predictions    : %llu\n", self->predictions);
     sigma_printf("| Confidence     : 99.9%%\n");
     sigma_printf("| Architecture   : Pure C11 (Zero HLL Overhead)\n");

@@ -1,7 +1,7 @@
-#include "sigma_kernel.h"
+﻿#include "sigma_kernel.h"
 
 /*
- * Σ SIGMAOS: SOVEREIGN GAMING PERFORMANCE (v1.0)
+ * S SIGMAOS: SOVEREIGN GAMING PERFORMANCE (v1.0)
  * USP: Absorb SteamOS / Garuda Performance USPs.
  * Shard: Industrial Performance Acceleration.
  */

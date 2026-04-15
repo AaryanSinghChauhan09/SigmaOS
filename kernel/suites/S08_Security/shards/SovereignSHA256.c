@@ -1,6 +1,6 @@
-/*
+﻿/*
  * =========================================================================
- * Σ SIGMAOS ZENITH: SOVEREIGN SHA256 (v1.0)
+ * S SIGMAOS ZENITH: SOVEREIGN SHA256 (v1.0)
  * =========================================================================
  * Mission: Cryptographic proof-of-integrity for kernel modules.
  * Principles: Bit-rotation, XOR compaction, Merkle-Damgard.

@@ -1,6 +1,6 @@
-/*
+﻿/*
  * =========================================================================
- * Σ SIGMAOS COSMOS: SOVEREIGN SSO SHARD (v57.4-SUPREME-COSMOS)
+ * S SIGMAOS COSMOS: SOVEREIGN SSO SHARD (v57.4-SUPREME-COSMOS)
  * =========================================================================
  * Mission: Spider-web vibrational propagation for distributed searching.
  * Principles: AI, Algorithms, Data Science, Distributed.

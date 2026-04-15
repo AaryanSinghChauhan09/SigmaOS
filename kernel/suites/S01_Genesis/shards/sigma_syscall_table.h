@@ -1,6 +1,6 @@
-/*
+﻿/*
  * =========================================================================
- * Σ SIGMAOS kernel/suites/S01_Genesis/shards/sigma_syscall_table.h
+ * S SIGMAOS kernel/suites/S01_Genesis/shards/sigma_syscall_table.h
  * =========================================================================
  * Sovereign Syscall Table — gap-closes Linux x86-64 syscall ABI, BSD
  * SVC interface, and Windows NT syscall numbers.

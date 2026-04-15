@@ -1,6 +1,6 @@
-/*
+﻿/*
  * =========================================================================
- * Σ SIGMAOS OMNIPOTENCE: SOVEREIGN QAT SHARD (v57.5-SUPREME-OMNIPOTENCE)
+ * S SIGMAOS OMNIPOTENCE: SOVEREIGN QAT SHARD (v57.5-SUPREME-OMNIPOTENCE)
  * =========================================================================
  * Mission: Hardware offloading of extreme cryptographic and compression workloads.
  * Principles: Performance, Hardware Mastery, Data Science.

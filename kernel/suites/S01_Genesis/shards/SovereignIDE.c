@@ -1,6 +1,6 @@
-/*
+﻿/*
  * =========================================================================
- * Σ SIGMAOS: SOVEREIGN-IDE (v1.0 - ETERNAL ARCHITECT)
+ * S SIGMAOS: SOVEREIGN-IDE (v1.0 - ETERNAL ARCHITECT)
  * =========================================================================
  * Mission: Real-time Kernel Patching and Shard Synthesis.
  * =========================================================================
@@ -15,9 +15,9 @@ void sigma_kernel_patch(const char* asm_code) {
 }
 
 void SovereignIDE_Init(void) {
-    sigma_printf("Σ [IDE-SUITE]: Initialising Sovereign Integrated Dimensional Environment...\n");
+    sigma_printf("S [IDE-SUITE]: Initialising Sovereign Integrated Dimensional Environment...\n");
     sigma_kernel_patch("; Eternal Patch v1.0\nMOV ZENITH, 1");
-    sigma_printf("Σ [IDE-SUITE]: IDE is now bridged to the Eternal Source.\n");
+    sigma_printf("S [IDE-SUITE]: IDE is now bridged to the Eternal Source.\n");
 }
 
 void SovereignIDE_Register(void) {

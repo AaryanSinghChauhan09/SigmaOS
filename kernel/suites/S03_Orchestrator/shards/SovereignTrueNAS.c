@@ -1,7 +1,7 @@
-#include "sigma_kernel.h"
+﻿#include "sigma_kernel.h"
 
 void SovereignTrueNAS_Init() {
-    sigma_printf("Σ [ABSORB]: SovereignTrueNAS Zenith Online. Unified Parity Verified.\n");
+    sigma_printf("S [ABSORB]: SovereignTrueNAS Zenith Online. Unified Parity Verified.\n");
 }
 
 

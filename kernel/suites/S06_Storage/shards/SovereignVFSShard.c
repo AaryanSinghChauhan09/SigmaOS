@@ -1,6 +1,6 @@
-/*
+﻿/*
  * =========================================================================
- * Σ SIGMAOS ZENITH: SOVEREIGN VFS LAYER (v1.0)
+ * S SIGMAOS ZENITH: SOVEREIGN VFS LAYER (v1.0)
  * =========================================================================
  * Mission: Abstract File System Interface for Multi-Backends.
  * Principles: Polymorphism, Handle Management, File Operations.

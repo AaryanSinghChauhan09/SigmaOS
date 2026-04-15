@@ -1,6 +1,6 @@
-/*
+﻿/*
  * =========================================================================
- * Σ SIGMAOS DIVINE_OMNIPRESENCE: SOVEREIGN POP SHARD (v61.1-DIVINE)
+ * S SIGMAOS DIVINE_OMNIPRESENCE: SOVEREIGN POP SHARD (v61.1-DIVINE)
  * =========================================================================
  * Mission: Guaranteeing physical geographical locality via speed-of-light timing.
  * Principles: Cyber Security, Privacy, Distributed.

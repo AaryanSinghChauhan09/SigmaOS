@@ -1,6 +1,6 @@
-/*
+﻿/*
  * =========================================================================
- * Σ SIGMAOS ZENITH: SOVEREIGN HTM SHARD (v54.0-PULSAR-CENTAURI)
+ * S SIGMAOS ZENITH: SOVEREIGN HTM SHARD (v54.0-PULSAR-CENTAURI)
  * =========================================================================
  * Mission: Hardware-assisted transactional memory for simplified sync.
  * Principles: Performance, Computer Science, Throughput.

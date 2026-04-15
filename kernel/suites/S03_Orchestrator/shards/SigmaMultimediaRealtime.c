@@ -1,7 +1,7 @@
-#include "sigma_kernel.h"
+﻿#include "sigma_kernel.h"
 
 /*
- * Σ SIGMAOS: SOVEREIGN MULTIMEDIA REALTIME (v1.0)
+ * S SIGMAOS: SOVEREIGN MULTIMEDIA REALTIME (v1.0)
  * USP: Absorb Ubuntu Studio / AV Linux Low-Latency USPs.
  * Shard: Industrial Real-time Multimedia production.
  */

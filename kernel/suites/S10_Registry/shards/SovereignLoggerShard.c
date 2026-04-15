@@ -1,6 +1,6 @@
-/*
+﻿/*
  * =========================================================================
- * Σ SIGMAOS ZENITH: SOVEREIGN LOGGER ENGINE (v2.0)
+ * S SIGMAOS ZENITH: SOVEREIGN LOGGER ENGINE (v2.0)
  * =========================================================================
  * Mission: High-performance, low-latency kernel observability.
  * Principles: Buffered Journaling, Log-Level Isolation, Atomic Flushing.

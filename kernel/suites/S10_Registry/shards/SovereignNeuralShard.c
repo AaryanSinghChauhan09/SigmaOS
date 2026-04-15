@@ -1,6 +1,6 @@
-/*
+﻿/*
  * =========================================================================
- * Σ SIGMAOS ZENITH: SOVEREIGN NEURAL SHARD (v2.0 — DEEP INFERENCE)
+ * S SIGMAOS ZENITH: SOVEREIGN NEURAL SHARD (v2.0 — DEEP INFERENCE)
  * =========================================================================
  * Mission: Native Silicon Inference — AI/ML at the kernel level.
  * Principles: Forward-pass, Activation functions, Loss computation.

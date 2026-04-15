@@ -1,6 +1,6 @@
-/*
+﻿/*
  * =========================================================================
- * Σ SIGMAOS tests/giv/sigma_giv.h
+ * S SIGMAOS tests/giv/sigma_giv.h
  * =========================================================================
  * Global Integration Verification (GIV) — SigmaOS test harness that
  * validates all 12 kernel suites interlock correctly.
@@ -73,7 +73,7 @@ typedef struct {
 /* ── Assertion macros ───────────────────────────────────────────────────── */
 #define GV_ASSERT(expr) \
     do { if (!(expr)) { \
-        sigma_printf("Σ [GIV] ASSERT FAIL: %s:%d  %s\n", __FILE__, __LINE__, #expr); \
+        sigma_printf("S [GIV] ASSERT FAIL: %s:%d  %s\n", __FILE__, __LINE__, #expr); \
         return GV_RESULT_FAIL; \
     } } while(0)
 

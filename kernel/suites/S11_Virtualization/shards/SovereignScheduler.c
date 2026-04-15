@@ -1,6 +1,6 @@
-/*
+﻿/*
  * =========================================================================
- * Σ SIGMAOS: SOVEREIGN QUANTUM SCHEDULER (v2.0 - SUPREME UPGRADE)
+ * S SIGMAOS: SOVEREIGN QUANTUM SCHEDULER (v2.0 - SUPREME UPGRADE)
  * =========================================================================
  * Mission: Multi-queue, Core-Affinity scheduling simulation.
  * =========================================================================
@@ -30,11 +30,11 @@ void sigma_scheduler_spawn(const char* name, int priority, sigma_u32 affinity) {
 }
 
 void SovereignScheduler_Init(void) {
-    sigma_printf("Σ [SCHEDULER]: Initialising Quantum Affinity Engine...\n");
+    sigma_printf("S [SCHEDULER]: Initialising Quantum Affinity Engine...\n");
     sigma_scheduler_spawn("kernel-idle", 0, 0xFF);
     sigma_scheduler_spawn("zenith-matrix", 99, 0x0F);
     sigma_scheduler_spawn("neural-sync", 80, 0xF0);
-    sigma_printf("Σ [SCHEDULER]: Multi-queue dispatcher ACTIVE.\n");
+    sigma_printf("S [SCHEDULER]: Multi-queue dispatcher ACTIVE.\n");
 }
 
 void SovereignScheduler_Register(void) {

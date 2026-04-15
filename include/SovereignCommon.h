@@ -1,6 +1,6 @@
-/*
+﻿/*
  * =========================================================================
- * Σ SIGMAOS: SOVEREIGN COMMON SHARD (v2.0 — PRIORITY DEFINES)
+ * S SIGMAOS: SOVEREIGN COMMON SHARD (v2.0 — PRIORITY DEFINES)
  * =========================================================================
  * Strictly no includes. Immediate type definitions.
  * =========================================================================

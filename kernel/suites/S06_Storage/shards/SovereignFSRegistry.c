@@ -1,4 +1,4 @@
-#include "sigma_base.h"
+﻿#include "sigma_base.h"
 
 #include "SovereignVFS.h"
 #include "sigma_libc.h"
@@ -11,7 +11,7 @@ static sigma_u32 g_fs_type_count = 0;
 void SovereignVFS_InitRegistry(void) {
     sigma_memset(g_fs_types, 0, sizeof(g_fs_types));
     g_fs_type_count = 0;
-    sigma_printf("Σ [VFS]: Sovereign FS Registry Operational.\n");
+    sigma_printf("S [VFS]: Sovereign FS Registry Operational.\n");
 }
 
 sigma_err_t SovereignVFS_RegisterFS(const char* fstype, sigma_mount_fn mount) {
@@ -21,7 +21,7 @@ sigma_err_t SovereignVFS_RegisterFS(const char* fstype, sigma_mount_fn mount) {
     sigma_strncpy(f->fstype, fstype, 16);
     f->mount = mount;
     
-    sigma_printf("Σ [VFS]: Registered Filesystem Shard '%s'\n", fstype);
+    sigma_printf("S [VFS]: Registered Filesystem Shard '%s'\n", fstype);
     return SIGMA_OK;
 }
 
@@ -31,12 +31,12 @@ sigma_err_t sigma_vfs_mount(const char* source, const char* target, const char* 
             void* sb = SIGMA_NULL;
             sigma_err_t err = g_fs_types[i].mount(source, target, &sb);
             if (sigma_ok(err)) {
-                sigma_printf("Σ [VFS]: Successfully mounted %s at %s (%s)\n", source, target, fstype);
+                sigma_printf("S [VFS]: Successfully mounted %s at %s (%s)\n", source, target, fstype);
             }
             return err;
         }
     }
-    sigma_printf("Σ [VFS/ERR]: Unknown Filesystem Type '%s'\n", fstype);
+    sigma_printf("S [VFS/ERR]: Unknown Filesystem Type '%s'\n", fstype);
     return SIGMA_ENOSYS;
 }
 

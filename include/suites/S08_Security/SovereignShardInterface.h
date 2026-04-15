@@ -1,6 +1,6 @@
-/*
+﻿/*
  * =========================================================================
- * Σ SIGMAOS: SOVEREIGN SHARD INTERFACE (v2.0)
+ * S SIGMAOS: SOVEREIGN SHARD INTERFACE (v2.0)
  * =========================================================================
  * Mission: Minimal coupling and standardized shard life-cycle.
  * -------------------------------------------------------------------------

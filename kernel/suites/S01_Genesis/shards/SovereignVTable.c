@@ -1,6 +1,6 @@
-/*
+﻿/*
  * =========================================================================
- * Σ SIGMAOS: S01_GENESIS — SovereignVTable.c
+ * S SIGMAOS: S01_GENESIS — SovereignVTable.c
  * =========================================================================
  * Mission: Outperforming C++ VTables.
  * Capability: Ultra-fast dynamic dispatch for modular drivers.
@@ -24,6 +24,6 @@ static inline void* sigma_vtable_dispatch(sigma_vtable_t* vtable, sigma_u32 inde
 }
 
 void sigma_vtable_init(void) {
-    sigma_printf("Σ [VTABLE]: Sovereign Dynamic Dispatcher (S01) active.\n");
-    sigma_printf("Σ [VTABLE]: Benchmark: 1.2ns per dispatch gate (Zenith Optimized).\n");
+    sigma_printf("S [VTABLE]: Sovereign Dynamic Dispatcher (S01) active.\n");
+    sigma_printf("S [VTABLE]: Benchmark: 1.2ns per dispatch gate (Zenith Optimized).\n");
 }

@@ -1,6 +1,6 @@
-/*
+﻿/*
  * =========================================================================
- * Σ SIGMAOS ZENITH: SOVEREIGN RDMA SHARD (v56.1-SUPREME-VALKYRIE)
+ * S SIGMAOS ZENITH: SOVEREIGN RDMA SHARD (v56.1-SUPREME-VALKYRIE)
  * =========================================================================
  * Mission: Zero-copy direct memory transfers across the sovereign mesh.
  * Principles: Distributed, Network, Multi-Processing, Throughput.

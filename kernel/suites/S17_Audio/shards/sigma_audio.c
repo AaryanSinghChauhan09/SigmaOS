@@ -1,6 +1,6 @@
-/*
+﻿/*
  * =========================================================================
- * Σ SIGMAOS kernel/suites/S17_Audio/shards/sigma_audio.c
+ * S SIGMAOS kernel/suites/S17_Audio/shards/sigma_audio.c
  * =========================================================================
  */
 
@@ -34,9 +34,9 @@ void sigma_audio_init(void) {
     mic->volume_pct = 70;
     mic->muted      = AU_FALSE;
 
-    sigma_printf("Σ [AUDIO] Sovereign Audio subsystem initialized\n");
-    sigma_printf("Σ [AUDIO] ALSA/WASAPI/CoreAudio/AAudio parity active\n");
-    sigma_printf("Σ [AUDIO] %u mixer controls registered\n", s_ctrl_count);
+    sigma_printf("S [AUDIO] Sovereign Audio subsystem initialized\n");
+    sigma_printf("S [AUDIO] ALSA/WASAPI/CoreAudio/AAudio parity active\n");
+    sigma_printf("S [AUDIO] %u mixer controls registered\n", s_ctrl_count);
 }
 
 /* ── Stream lifecycle ────────────────────────────────────────────────────── */
@@ -48,7 +48,7 @@ au_i32 sigma_au_open(sigma_au_params_t *params) {
     s->params    = *params;
     s->state     = 0; /* IDLE */
 
-    sigma_printf("Σ [AUDIO] OPEN: sid=%u dir=%s fmt=%s rate=%u ch=%u period=%u\n",
+    sigma_printf("S [AUDIO] OPEN: sid=%u dir=%s fmt=%s rate=%u ch=%u period=%u\n",
                  s->stream_id, dir_str[params->dir], fmt_str[params->fmt],
                  params->sample_rate, params->channels, params->period_frames);
     return (au_i32)s->stream_id;
@@ -65,7 +65,7 @@ au_i32 sigma_au_prepare(au_u32 sid) {
     if (!s) return AU_ERR;
     s->state = 1; /* PREPARED */
     s->buf_head = s->buf_tail = s->avail_frames = 0;
-    sigma_printf("Σ [AUDIO] PREPARE: sid=%u (buf=%u frames)\n",
+    sigma_printf("S [AUDIO] PREPARE: sid=%u (buf=%u frames)\n",
                  sid, s->params.buffer_frames);
     return AU_OK;
 }
@@ -74,7 +74,7 @@ au_i32 sigma_au_start(au_u32 sid) {
     sigma_au_stream_t *s = find_stream(sid);
     if (!s || s->state < 1) return AU_ERR;
     s->state = 2; /* RUNNING */
-    sigma_printf("Σ [AUDIO] START: sid=%u\n", sid);
+    sigma_printf("S [AUDIO] START: sid=%u\n", sid);
     return AU_OK;
 }
 
@@ -82,7 +82,7 @@ au_i32 sigma_au_pause(au_u32 sid) {
     sigma_au_stream_t *s = find_stream(sid);
     if (!s || s->state != 2) return AU_ERR;
     s->state = 3; /* PAUSED */
-    sigma_printf("Σ [AUDIO] PAUSE: sid=%u\n", sid);
+    sigma_printf("S [AUDIO] PAUSE: sid=%u\n", sid);
     return AU_OK;
 }
 
@@ -90,7 +90,7 @@ au_i32 sigma_au_stop(au_u32 sid) {
     sigma_au_stream_t *s = find_stream(sid);
     if (!s) return AU_ERR;
     s->state = 0;
-    sigma_printf("Σ [AUDIO] STOP: sid=%u xruns=%llu\n",
+    sigma_printf("S [AUDIO] STOP: sid=%u xruns=%llu\n",
                  sid, (unsigned long long)s->xruns);
     return AU_OK;
 }
@@ -98,7 +98,7 @@ au_i32 sigma_au_stop(au_u32 sid) {
 void sigma_au_close(au_u32 sid) {
     for (au_u32 i = 0; i < s_stream_count; i++) {
         if (s_streams[i].stream_id == sid) {
-            sigma_printf("Σ [AUDIO] CLOSE: sid=%u\n", sid);
+            sigma_printf("S [AUDIO] CLOSE: sid=%u\n", sid);
             for (au_u32 j = i; j < s_stream_count-1; j++)
                 s_streams[j] = s_streams[j+1];
             s_stream_count--;
@@ -168,7 +168,7 @@ au_i32 sigma_au_set_volume(const char *ctrl, au_u32 pct) {
     if (!c) return AU_ERR;
     if (pct > 100) pct = 100;
     c->volume_pct = pct;
-    sigma_printf("Σ [MIXER] %s volume: %u%%\n", ctrl, pct);
+    sigma_printf("S [MIXER] %s volume: %u%%\n", ctrl, pct);
     return AU_OK;
 }
 
@@ -181,20 +181,20 @@ void sigma_au_set_mute(const char *ctrl, au_bool muted) {
     sigma_au_control_t *c = find_ctrl(ctrl);
     if (c) {
         c->muted = muted;
-        sigma_printf("Σ [MIXER] %s: %s\n", ctrl, muted ? "muted":"unmuted");
+        sigma_printf("S [MIXER] %s: %s\n", ctrl, muted ? "muted":"unmuted");
     }
 }
 
 /* ── Routing (PipeWire/AudioFlinger graph) ───────────────────────────────── */
 void sigma_au_route(au_u32 src_sid, au_u32 dst_sid) {
-    sigma_printf("Σ [AUDIO] Route: stream %u -> stream %u (software mix)\n",
+    sigma_printf("S [AUDIO] Route: stream %u -> stream %u (software mix)\n",
                  src_sid, dst_sid);
     /* Real impl: callback-based mix into dst buffer */
 }
 
 /* ── Stats ───────────────────────────────────────────────────────────────── */
 void sigma_audio_stats(void) {
-    sigma_printf("\nΣ AUDIO SUBSYSTEM STATS\n");
+    sigma_printf("\nS AUDIO SUBSYSTEM STATS\n");
     sigma_printf("  Streams: %u\n", s_stream_count);
     sigma_printf("  %-4s %-8s %-10s %-7s %-6s %-10s %s\n",
                  "SID","DIR","FMT","RATE","STATE","WRITTEN","XRUNS");

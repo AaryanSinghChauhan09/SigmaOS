@@ -1,8 +1,8 @@
-#include "sigma_base.h"
+﻿#include "sigma_base.h"
 
 /*
  * =========================================================================
- * Σ SIGMAOS ZENITH SUPREME: SOVEREIGN AI DISTRIBUTOR KERNEL
+ * S SIGMAOS ZENITH SUPREME: SOVEREIGN AI DISTRIBUTOR KERNEL
  * =========================================================================
  * Mission: Multi-Model Prompt Distribution natively from Ring-0 via IPC.
  * Design: C11 / Zero-Dependency / Struct-based OOP Paradigm.

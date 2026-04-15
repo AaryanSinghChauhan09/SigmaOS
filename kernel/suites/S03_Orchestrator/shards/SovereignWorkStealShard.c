@@ -1,6 +1,6 @@
-/*
+﻿/*
  * =========================================================================
- * Σ SIGMAOS ZENITH: SOVEREIGN WORK-STEALING SHARD (v52.1-SUPREME-COSMOS)
+ * S SIGMAOS ZENITH: SOVEREIGN WORK-STEALING SHARD (v52.1-SUPREME-COSMOS)
  * =========================================================================
  * Mission: Dynamic core-balancing via work-stealing queues.
  * Principles: Multi-Processing, Computer Science, Distributed, Throughput.

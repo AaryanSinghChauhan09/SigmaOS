@@ -1,6 +1,6 @@
-/*
+﻿/*
  * =========================================================================
- * Σ SIGMAOS ZENITH: SOVEREIGN THEME SHARD (v50.4-GOD-MATRIX)
+ * S SIGMAOS ZENITH: SOVEREIGN THEME SHARD (v50.4-GOD-MATRIX)
  * =========================================================================
  * Mission: Kernel-level UI/UX styling and personalization.
  * Principles: Customizations, Personalizations, Frontend, UX.

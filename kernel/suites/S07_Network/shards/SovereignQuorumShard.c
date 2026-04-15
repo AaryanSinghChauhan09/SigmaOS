@@ -1,6 +1,6 @@
-/*
+﻿/*
  * =========================================================================
- * Σ SIGMAOS ZENITH: SOVEREIGN QUORUM REPLICATION (v50.5-OMNIPRESENCE)
+ * S SIGMAOS ZENITH: SOVEREIGN QUORUM REPLICATION (v50.5-OMNIPRESENCE)
  * =========================================================================
  * Mission: High-availability and data consistency across a distributed mesh.
  * Principles: Distributed, Network, Cloud, Quorum Consensus.

@@ -1,6 +1,6 @@
-/*
+﻿/*
  * =========================================================================
- * Σ SIGMAOS ZENITH: SOVEREIGN SMT & CORE PARKING SHARD (v50.5-OMNIPRESENCE)
+ * S SIGMAOS ZENITH: SOVEREIGN SMT & CORE PARKING SHARD (v50.5-OMNIPRESENCE)
  * =========================================================================
  * Mission: Dynamic core orchestration and SMT thread scheduling.
  * Principles: Multi-Processing, Power Efficiency, Multi-Programming.

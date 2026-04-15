@@ -1,6 +1,6 @@
-/*
+﻿/*
  * =========================================================================
- * Σ SIGMAOS ZENITH: SOVEREIGN SSP-V2 SHARD (v55.1-SUPREME-SIRIUS)
+ * S SIGMAOS ZENITH: SOVEREIGN SSP-V2 SHARD (v55.1-SUPREME-SIRIUS)
  * =========================================================================
  * Mission: Per-function dynamic canaries for stack protection.
  * Principles: Cyber Security, Safety, Computer Science.

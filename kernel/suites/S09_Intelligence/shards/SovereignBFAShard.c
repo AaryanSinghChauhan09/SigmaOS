@@ -1,6 +1,6 @@
-/*
+﻿/*
  * =========================================================================
- * Σ SIGMAOS OMEGA_POINT: SOVEREIGN BFA SHARD (v62.0-OMEGA)
+ * S SIGMAOS OMEGA_POINT: SOVEREIGN BFA SHARD (v62.0-OMEGA)
  * =========================================================================
  * Mission: Bacterial chemotaxis for massive parallel consumption.
  * Principles: AI, Algorithms, Data Science.

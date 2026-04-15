@@ -1,6 +1,6 @@
-/*
+﻿/*
  * =========================================================================
- * Σ SIGMAOS OMNIPOTENCE: SOVEREIGN MBO SHARD (v57.5-SUPREME-OMNIPOTENCE)
+ * S SIGMAOS OMNIPOTENCE: SOVEREIGN MBO SHARD (v57.5-SUPREME-OMNIPOTENCE)
  * =========================================================================
  * Mission: Migration-based optimization for massive spatial shifting.
  * Principles: AI, Algorithms, Data Science.

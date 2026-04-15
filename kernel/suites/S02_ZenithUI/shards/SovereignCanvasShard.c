@@ -1,6 +1,6 @@
-/*
+﻿/*
  * =========================================================================
- * Σ SIGMAOS ZENITH: SOVEREIGN CREATIVE-CANVAS SHARD (v1.0)
+ * S SIGMAOS ZENITH: SOVEREIGN CREATIVE-CANVAS SHARD (v1.0)
  * =========================================================================
  * Mission: Absolute Multimedia & Artistic USP.
  *          Native C11 Photorealistic Ray-Tracing & Brush Physics.

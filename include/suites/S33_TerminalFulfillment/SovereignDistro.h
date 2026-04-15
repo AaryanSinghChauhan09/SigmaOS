@@ -1,6 +1,6 @@
-/*
+﻿/*
  * =========================================================================
- * Σ SIGMAOS: SOVEREIGN DISTRO INTERFACE (v1.0)
+ * S SIGMAOS: SOVEREIGN DISTRO INTERFACE (v1.0)
  * =========================================================================
  * Mission: Modular absorption of global Linux/BSD distribution USPs.
  * Design: C11 / Zero-Dependency / Registry-Based.

@@ -1,6 +1,6 @@
-/*
+﻿/*
  * =========================================================================
- * Σ SIGMAOS ABSOLUTE_FINALITY: SOVEREIGN MTE SHARD (v59.2-ABSOLUTE)
+ * S SIGMAOS ABSOLUTE_FINALITY: SOVEREIGN MTE SHARD (v59.2-ABSOLUTE)
  * =========================================================================
  * Mission: Hardware-level probabilistic bounds checking to eliminate memory safety bugs.
  * Principles: Cyber Security, Hardware Mastery, Safety.

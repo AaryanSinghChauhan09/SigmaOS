@@ -1,6 +1,6 @@
-/*
+﻿/*
  * =========================================================================
- * Σ SIGMAOS: SOVEREIGN PUTER CLOUD OS + BROWSER ENGINE (v1.0 — C11)
+ * S SIGMAOS: SOVEREIGN PUTER CLOUD OS + BROWSER ENGINE (v1.0 — C11)
  * =========================================================================
  * Absorbed USPs from:
  *   Puter OS  — https://github.com/HeyPuter/puter

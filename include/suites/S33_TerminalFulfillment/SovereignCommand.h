@@ -1,6 +1,6 @@
-/*
+﻿/*
  * =========================================================================
- * Σ SIGMAOS: SOVEREIGN COMMAND INTERFACE (v1.0)
+ * S SIGMAOS: SOVEREIGN COMMAND INTERFACE (v1.0)
  * =========================================================================
  * Mission: Pluggable CLI commands for community extension.
  * Design: C11 / Zero-Dependency / Registry-Based.

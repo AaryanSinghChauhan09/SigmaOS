@@ -1,6 +1,6 @@
-/*
+﻿/*
  * =========================================================================
- * Σ SIGMAOS ZENITH: SOVEREIGN MPK SHARD (v53.5-SUPREME-QUASAR)
+ * S SIGMAOS ZENITH: SOVEREIGN MPK SHARD (v53.5-SUPREME-QUASAR)
  * =========================================================================
  * Mission: Sub-nanosecond domain switching for secure shard isolation.
  * Principles: Performance, Cyber Security, Computer Science.

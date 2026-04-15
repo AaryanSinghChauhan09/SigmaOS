@@ -1,6 +1,6 @@
-/*
+﻿/*
  * =========================================================================
- * Σ SIGMAOS kernel/suites/S12_DistroAbsorption/shards/sigma_distro.h
+ * S SIGMAOS kernel/suites/S12_DistroAbsorption/shards/sigma_distro.h
  * =========================================================================
  * Distro Absorption Engine — closes compatibility gaps vs:
  *   Ubuntu   : APT package database, dpkg format, PPA repositories

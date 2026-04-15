@@ -1,10 +1,10 @@
-#include "sigma_base.h"
+﻿#include "sigma_base.h"
 
 #include <sigma_types.h>
 #include "sigma_print.h"
 
 /*
- * Σ Sovereign Alpha Compositor
+ * S Sovereign Alpha Compositor
  * USP: ToaruOS / PonyOS (Advanced Sub-pixel Compositing)
  * Concept: High-fidelity hardware-level UI rendering.
  *          Implements raw bitwise alpha-blending and sub-pixel 

@@ -1,6 +1,6 @@
-/*
+﻿/*
  * =========================================================================
- * Σ SIGMAOS ZENITH: SOVEREIGN ABC SHARD (v56.3-SUPREME-OLYMPUS)
+ * S SIGMAOS ZENITH: SOVEREIGN ABC SHARD (v56.3-SUPREME-OLYMPUS)
  * =========================================================================
  * Mission: Onlooker and scout bee foraging for distributed optima.
  * Principles: AI, Algorithms, Data Science, Distributed.

@@ -1,6 +1,6 @@
-/*
+﻿/*
  * =========================================================================
- * Σ SIGMAOS ZENITH: SOVEREIGN TELEMETRY SHARD (v53.0-SINGULARITY-OMEGA)
+ * S SIGMAOS ZENITH: SOVEREIGN TELEMETRY SHARD (v53.0-SINGULARITY-OMEGA)
  * =========================================================================
  * Mission: Low-power heartbeat and sensor-sync for mobile/distributed nodes.
  * Principles: Mobile, Network, Embedded, Real-Time, Power-Management.

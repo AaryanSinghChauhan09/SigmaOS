@@ -1,6 +1,6 @@
-/*
+﻿/*
  * =========================================================================
- * Σ SIGMAOS: SOVEREIGN IPC INTERFACE (v2.0)
+ * S SIGMAOS: SOVEREIGN IPC INTERFACE (v2.0)
  * =========================================================================
  * Mission: Pluggable IPC primitives (Pipe, MQ, SHM, Sem, Binder).
  * Design: C11 / Zero-Dependency / Registry-Based.

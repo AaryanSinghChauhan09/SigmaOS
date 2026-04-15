@@ -1,6 +1,6 @@
-/*
+﻿/*
  * =========================================================================
- * Σ SIGMAOS kernel/suites/S03_Orchestrator/shards/sigma_sched.h
+ * S SIGMAOS kernel/suites/S03_Orchestrator/shards/sigma_sched.h
  * =========================================================================
  * Sovereign CFS Scheduler — gap-closes:
  *   Linux  : Completely Fair Scheduler (CFS), cgroups v2 bandwidth

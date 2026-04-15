@@ -1,6 +1,6 @@
-/*
+﻿/*
  * =========================================================================
- * Σ SIGMAOS: SOVEREIGN HARDWARE MASTER (v1.0 - PURE C11)
+ * S SIGMAOS: SOVEREIGN HARDWARE MASTER (v1.0 - PURE C11)
  * =========================================================================
  * Mission: Universal Silicon I/O and Driver Orchestration.
  * Design: C11 / Zero-Dependency / Struct-based OOP.

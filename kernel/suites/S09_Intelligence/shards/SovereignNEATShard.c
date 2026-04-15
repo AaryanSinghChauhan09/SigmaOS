@@ -1,6 +1,6 @@
-/*
+﻿/*
  * =========================================================================
- * Σ SIGMAOS ZENITH: SOVEREIGN NEAT-CORE SHARD (v52.3-SUPREME-OMNIPOTENCE)
+ * S SIGMAOS ZENITH: SOVEREIGN NEAT-CORE SHARD (v52.3-SUPREME-OMNIPOTENCE)
  * =========================================================================
  * Mission: NeuroEvolution of Augmenting Topologies for shard efficiency.
  * Principles: AI, Algorithms, Data Science, Self-Healing.

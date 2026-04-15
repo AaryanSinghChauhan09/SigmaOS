@@ -1,6 +1,6 @@
-/*
+﻿/*
  * =========================================================================
- * Σ SIGMAOS: SOVEREIGN INTERCONNECT (v1.0 — MASTER REGISTRY)
+ * S SIGMAOS: SOVEREIGN INTERCONNECT (v1.0 — MASTER REGISTRY)
  * =========================================================================
  * Mission: Unified Interface for Inter-Suite Communication.
  * =========================================================================
@@ -12,7 +12,7 @@
 #include "sigma_base.h"
 
 /* 
- * Σ [OMNIFABRIC] MESSAGE CLASSIFICATIONS 
+ * S [OMNIFABRIC] MESSAGE CLASSIFICATIONS 
  */
 #define MSG_TYPE_MEM_ALLOC    0x01
 #define MSG_TYPE_FS_WRITE     0x02
@@ -31,7 +31,7 @@ typedef struct {
 } OmniMessage;
 
 /* 
- * Σ [S01-S33] CANONICAL SUITE IDENTIFIERS 
+ * S [S01-S33] CANONICAL SUITE IDENTIFIERS 
  */
 #define SUITE_GENESIS              1
 #define SUITE_ZENITHUI             2

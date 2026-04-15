@@ -1,6 +1,6 @@
-/*
+﻿/*
  * =========================================================================
- * Σ SIGMAOS ZENITH: SOVEREIGN SMEP SHARD (v56.4-SUPREME-HEAVEN)
+ * S SIGMAOS ZENITH: SOVEREIGN SMEP SHARD (v56.4-SUPREME-HEAVEN)
  * =========================================================================
  * Mission: Silicon-level blocking of unintended user-space execution.
  * Principles: Cyber Security, Safety, Computer Science.

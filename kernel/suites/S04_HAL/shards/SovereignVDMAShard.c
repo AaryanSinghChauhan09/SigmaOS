@@ -1,6 +1,6 @@
-/*
+﻿/*
  * =========================================================================
- * Σ SIGMAOS ZENITH: SOVEREIGN V-DMA SHARD (v52.6-SUPREME-ASGARD)
+ * S SIGMAOS ZENITH: SOVEREIGN V-DMA SHARD (v52.6-SUPREME-ASGARD)
  * =========================================================================
  * Mission: Memory-to-memory copies using hardware DMA engines.
  * Principles: Performance, Server, Computer Science, Throughput.

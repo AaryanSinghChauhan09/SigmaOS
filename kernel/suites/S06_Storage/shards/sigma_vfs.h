@@ -1,6 +1,6 @@
-/*
+﻿/*
  * =========================================================================
- * Σ SIGMAOS kernel/suites/S06_Storage/shards/sigma_vfs.h
+ * S SIGMAOS kernel/suites/S06_Storage/shards/sigma_vfs.h
  * =========================================================================
  * Sovereign Virtual Filesystem — gap-closes:
  *   Linux  : VFS layer (dentry, inode, file, superblock)

@@ -1,6 +1,6 @@
-/*
+﻿/*
  * =========================================================================
- * Σ SIGMAOS ZENITH: SOVEREIGN NPU SHARD (v56.9-SUPREME-ETERNITY_GATE)
+ * S SIGMAOS ZENITH: SOVEREIGN NPU SHARD (v56.9-SUPREME-ETERNITY_GATE)
  * =========================================================================
  * Mission: Zero-latency bridging to Neural Processing Units.
  * Principles: Performance, Hardware Mastery, AI, Machine Learning.

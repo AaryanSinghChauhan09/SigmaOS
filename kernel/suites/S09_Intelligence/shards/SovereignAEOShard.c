@@ -1,6 +1,6 @@
-/*
+﻿/*
  * =========================================================================
- * Σ SIGMAOS MULTIVERSE_CHRONOS: SOVEREIGN AEO SHARD (v58.2-SUPREME-MULTIVERSE_CHRONOS)
+ * S SIGMAOS MULTIVERSE_CHRONOS: SOVEREIGN AEO SHARD (v58.2-SUPREME-MULTIVERSE_CHRONOS)
  * =========================================================================
  * Mission: Emulating energy flow through three foundational ecological models.
  * Principles: AI, Algorithms, Data Science.

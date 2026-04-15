@@ -1,7 +1,7 @@
-#include "sigma_kernel.h"
+﻿#include "sigma_kernel.h"
 
 void SovereignDSMatrix_Init() {
-    sigma_printf("Σ [INIT]: SovereignDSMatrix Online. Roadmap Parity Verified.
+    sigma_printf("S [INIT]: SovereignDSMatrix Online. Roadmap Parity Verified.
 ");
 }
 

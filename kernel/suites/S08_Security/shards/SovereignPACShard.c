@@ -1,6 +1,6 @@
-/*
+﻿/*
  * =========================================================================
- * Σ SIGMAOS ZENITH: SOVEREIGN PAC SHARD (v56.3-SUPREME-OLYMPUS)
+ * S SIGMAOS ZENITH: SOVEREIGN PAC SHARD (v56.3-SUPREME-OLYMPUS)
  * =========================================================================
  * Mission: Cryptographic pointer authentication and validation.
  * Principles: Cyber Security, Safety, Computer Science.

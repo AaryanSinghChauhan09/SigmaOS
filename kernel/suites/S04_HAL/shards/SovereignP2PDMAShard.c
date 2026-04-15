@@ -1,6 +1,6 @@
-/*
+﻿/*
  * =========================================================================
- * Σ SIGMAOS ABSOLUTE_INFINITY: SOVEREIGN P2PDMA SHARD (v59.1-ABSOLUTE)
+ * S SIGMAOS ABSOLUTE_INFINITY: SOVEREIGN P2PDMA SHARD (v59.1-ABSOLUTE)
  * =========================================================================
  * Mission: Direct endpoint-to-endpoint bus transfers without host memory.
  * Principles: Performance, Hardware Mastery, Storage, Network.

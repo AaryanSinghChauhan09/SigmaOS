@@ -1,4 +1,4 @@
-#include "sigma_kernel.h"
+﻿#include "sigma_kernel.h"
 
 typedef struct {
     sigma_u64 entity_id;
@@ -6,7 +6,7 @@ typedef struct {
 } EntityResolution;
 
 void SovereignBillionShard_Init() {
-    sigma_printf("Σ [OPERATION]: Billion-Scale Mesh Operational. Addressing 1B Entities...
+    sigma_printf("S [OPERATION]: Billion-Scale Mesh Operational. Addressing 1B Entities...
 ");
 }
 

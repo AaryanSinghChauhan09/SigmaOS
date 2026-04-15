@@ -1,6 +1,6 @@
-/*
+﻿/*
  * =========================================================================
- * Σ SIGMAOS: SOVEREIGN SCHEDULER INTERFACE (v2.0)
+ * S SIGMAOS: SOVEREIGN SCHEDULER INTERFACE (v2.0)
  * =========================================================================
  * Mission: Pluggable tasks scheduling (CFS, RT, Deadline).
  * Design: C11 / Zero-Dependency / Registry-Based.

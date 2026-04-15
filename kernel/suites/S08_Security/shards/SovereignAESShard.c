@@ -1,6 +1,6 @@
-/*
+﻿/*
  * =========================================================================
- * Σ SIGMAOS ZENITH: SOVEREIGN MASKED-AES SHARD (v52.2-SUPREME-MULTIVERSE)
+ * S SIGMAOS ZENITH: SOVEREIGN MASKED-AES SHARD (v52.2-SUPREME-MULTIVERSE)
  * =========================================================================
  * Mission: Power-analysis resistant block cipher execution.
  * Principles: Cyber Security, Computer Science, Cryptography.

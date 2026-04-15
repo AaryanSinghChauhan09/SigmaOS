@@ -1,8 +1,8 @@
-#include "sigma_kernel.h"
+﻿#include "sigma_kernel.h"
 #include "SovereignOmniShard.h"
 
 void test_shard_initialization_matrix() {
-    sigma_printf("Σ [TEST]: Running Global Shard Parity Audit (Phases 27-34)...\n");
+    sigma_printf("S [TEST]: Running Global Shard Parity Audit (Phases 27-34)...\n");
     
     // Phase 27 - Base Parity
     SovereignAlpine_Init();
@@ -36,7 +36,7 @@ void test_shard_initialization_matrix() {
     SovereignART_Init();
     SovereignSeL4_Proof_Init();
     
-    sigma_printf("Σ [PASS]: 150+ Shard Initialization Matrix Verified.\n");
+    sigma_printf("S [PASS]: 150+ Shard Initialization Matrix Verified.\n");
 }
 
 

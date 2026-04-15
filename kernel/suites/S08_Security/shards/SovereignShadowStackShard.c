@@ -1,6 +1,6 @@
-/*
+﻿/*
  * =========================================================================
- * Σ SIGMAOS ZENITH: SOVEREIGN SHADOW STACK (v53.1-SUPREME-AETHER)
+ * S SIGMAOS ZENITH: SOVEREIGN SHADOW STACK (v53.1-SUPREME-AETHER)
  * =========================================================================
  * Mission: Preventing ROP and buffer-overflow return attacks.
  * Principles: Cyber Security, Computer Science, Safety.

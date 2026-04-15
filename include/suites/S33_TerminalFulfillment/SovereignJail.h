@@ -1,6 +1,6 @@
-/*
+﻿/*
  * =========================================================================
- * Σ SIGMAOS: SOVEREIGN JAIL — FREEBSD CONTAINER ISOLATION (v1.0 — C11)
+ * S SIGMAOS: SOVEREIGN JAIL — FREEBSD CONTAINER ISOLATION (v1.0 — C11)
  * =========================================================================
  * Absorbed USPs from: FreeBSD jail(8), jail(2), jls, jexec
  *   https://github.com/freebsd/freebsd-src/tree/main/usr.sbin/jail

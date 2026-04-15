@@ -1,7 +1,7 @@
-#include "sigma_kernel.h"
+﻿#include "sigma_kernel.h"
 
 void SovereignOberon_Init() {
-    sigma_printf("Σ [OPERATION]: SovereignOberon Integration Complete. Phase 9 Pure Parity Online.
+    sigma_printf("S [OPERATION]: SovereignOberon Integration Complete. Phase 9 Pure Parity Online.
 ");
 }
 

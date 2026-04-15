@@ -1,6 +1,6 @@
-/*
+﻿/*
  * =========================================================================
- * Σ SIGMAOS: SOVEREIGN PARALLELISM (Suite S19)
+ * S SIGMAOS: SOVEREIGN PARALLELISM (Suite S19)
  * =========================================================================
  * Shard: Sovereign GCD (Grand Central Dispatch parity)
  * Parity: macOS libdispatch, Linux WorkQueues, Windows ThreadPool

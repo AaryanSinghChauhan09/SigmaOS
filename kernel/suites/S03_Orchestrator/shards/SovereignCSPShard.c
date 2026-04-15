@@ -1,6 +1,6 @@
-/*
+﻿/*
  * =========================================================================
- * Σ SIGMAOS ZENITH: SOVEREIGN CSP SHARD (v52.0-SUPREME-GALAXY)
+ * S SIGMAOS ZENITH: SOVEREIGN CSP SHARD (v52.0-SUPREME-GALAXY)
  * =========================================================================
  * Mission: Synchronous coordination via CSP channels (Go-style).
  * Principles: Multi-Processing, Computer Science, Distributed, Safety.

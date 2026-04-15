@@ -1,6 +1,6 @@
-/*
+﻿/*
  * =========================================================================
- * Σ SIGMAOS MULTIVERSE_EXODUS: SOVEREIGN PBO SHARD (v58.0-SUPREME-MULTIVERSE_EXODUS)
+ * S SIGMAOS MULTIVERSE_EXODUS: SOVEREIGN PBO SHARD (v58.0-SUPREME-MULTIVERSE_EXODUS)
  * =========================================================================
  * Mission: Dynamic survival adaptation in hyper-fragmented landscapes.
  * Principles: AI, Algorithms, Data Science.

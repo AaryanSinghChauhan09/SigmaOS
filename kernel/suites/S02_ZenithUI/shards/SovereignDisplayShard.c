@@ -1,4 +1,4 @@
-#include "sigma_base.h"
+﻿#include "sigma_base.h"
 
 #include "SovereignOSBasicsZenith.h"
 #include "sigma_libc.h"
@@ -10,8 +10,8 @@
  */
 
 sigma_err_t sigma_display_init(void) {
-    sigma_printf("  Σ [DISPLAY]: Sovereign mode-setting engine active.\n");
-    sigma_printf("  Σ [DISPLAY]: Atomic frame-buffer flip-path: VALIDATED.\n");
+    sigma_printf("  S [DISPLAY]: Sovereign mode-setting engine active.\n");
+    sigma_printf("  S [DISPLAY]: Atomic frame-buffer flip-path: VALIDATED.\n");
     return SIGMA_OK;
 }
 

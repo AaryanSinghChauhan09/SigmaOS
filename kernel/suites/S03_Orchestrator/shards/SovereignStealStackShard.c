@@ -1,6 +1,6 @@
-/*
+﻿/*
  * =========================================================================
- * Σ SIGMAOS ZENITH: SOVEREIGN STEAL-STACK SHARD (v56.0-SINGULARITY)
+ * S SIGMAOS ZENITH: SOVEREIGN STEAL-STACK SHARD (v56.0-SINGULARITY)
  * =========================================================================
  * Mission: High-performance job stealing for many-core schedulers.
  * Principles: Multi-Processing, Computer Science, Throughput, Scalability.

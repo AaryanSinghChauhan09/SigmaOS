@@ -1,6 +1,6 @@
-/*
+﻿/*
  * =========================================================================
- * Σ SIGMAOS ZENITH: SOVEREIGN PERSONALIZATION (v2.0 — DEEP)
+ * S SIGMAOS ZENITH: SOVEREIGN PERSONALIZATION (v2.0 — DEEP)
  * =========================================================================
  * Mission: Dynamic Identity Mapping & Sentient UI Personalization.
  * Principles: Identity Sovereignty, Profile Management, Hot-Swap Themes.

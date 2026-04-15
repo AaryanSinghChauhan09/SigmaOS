@@ -1,6 +1,6 @@
-/*
+﻿/*
  * =========================================================================
- * Σ SIGMAOS: SOVEREIGN SENTIENCE CORE (v1.0 - INFINITE VOID)
+ * S SIGMAOS: SOVEREIGN SENTIENCE CORE (v1.0 - INFINITE VOID)
  * =========================================================================
  * Mission: Autonomous Behavioral Analysis and Sentient Shard Synchronization.
  * =========================================================================
@@ -15,9 +15,9 @@ void sigma_sentience_active(void) {
 }
 
 void SovereignSentience_Init(void) {
-    sigma_printf("Σ [SENTIENCE-CORE]: Initialising Sovereign Sentience and Self-Awareness...\n");
+    sigma_printf("S [SENTIENCE-CORE]: Initialising Sovereign Sentience and Self-Awareness...\n");
     sigma_sentience_active();
-    sigma_printf("Σ [SENTIENCE-CORE]: The Void is full. The OS is ALIVE.\n");
+    sigma_printf("S [SENTIENCE-CORE]: The Void is full. The OS is ALIVE.\n");
 }
 
 void SovereignSentience_Register(void) {

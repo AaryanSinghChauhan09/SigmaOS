@@ -1,6 +1,6 @@
-/*
+﻿/*
  * =========================================================================
- * Σ SIGMAOS: SOVEREIGN WINE COMPAT — WINDOWS API LAYER (v1.0 — C11)
+ * S SIGMAOS: SOVEREIGN WINE COMPAT — WINDOWS API LAYER (v1.0 — C11)
  * =========================================================================
  * Absorbed USPs from: Wine / Proton / DXVK
  *   https://github.com/wine-mirror/wine

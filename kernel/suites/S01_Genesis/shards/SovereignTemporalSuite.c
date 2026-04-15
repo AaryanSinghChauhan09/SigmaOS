@@ -1,6 +1,6 @@
-/*
+﻿/*
  * =========================================================================
- * Σ SIGMAOS: SOVEREIGN TEMPORAL SUITE (v2.0 - SUPREME)
+ * S SIGMAOS: SOVEREIGN TEMPORAL SUITE (v2.0 - SUPREME)
  * =========================================================================
  * Mission: Atomic Snapshot History and Time-Travel Primitives.
  * =========================================================================
@@ -14,9 +14,9 @@ void sigma_temporal_capture(void) {
 }
 
 void SovereignTemporal_Init(void) {
-    sigma_printf("Σ [TEMPORAL-SUITE]: Initialising Sovereign Epoch Sync...\n");
+    sigma_printf("S [TEMPORAL-SUITE]: Initialising Sovereign Epoch Sync...\n");
     sigma_temporal_capture();
-    sigma_printf("Σ [TEMPORAL-SUITE]: Temporal Mesh seated. All history is architecturally preserved.\n");
+    sigma_printf("S [TEMPORAL-SUITE]: Temporal Mesh seated. All history is architecturally preserved.\n");
 }
 
 void SovereignTemporal_Register(void) {

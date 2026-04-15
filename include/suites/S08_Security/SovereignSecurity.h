@@ -1,6 +1,6 @@
-/*
+﻿/*
  * =========================================================================
- * Σ SIGMAOS: SOVEREIGN SECURITY INTERFACE (v2.0)
+ * S SIGMAOS: SOVEREIGN SECURITY INTERFACE (v2.0)
  * =========================================================================
  * Mission: Pluggable security paradigms (Jail, Pledge, Unveil, Capsicum).
  * Design: C11 / Zero-Dependency / Registry-Based.

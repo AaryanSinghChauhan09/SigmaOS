@@ -1,6 +1,6 @@
-#include "sigma_kernel.h"
+﻿#include "sigma_kernel.h"
 
-// Σ SovereignKqueue: Event Notification Zenith
+// S SovereignKqueue: Event Notification Zenith
 // Inspired by FreeBSD kqueue: Scalable High-Performance Event Engine
 
 typedef enum {
@@ -22,12 +22,12 @@ typedef struct {
 } SovereignKqueue_Event;
 
 void SovereignKqueue_Init() {
-    sigma_printf("Σ [ABSORB]: SovereignKqueue Event Zenith Online. Monitoring All Filters.
+    sigma_printf("S [ABSORB]: SovereignKqueue Event Zenith Online. Monitoring All Filters.
 ");
 }
 
 int SovereignKqueue_Create() {
-    sigma_printf("Σ [KQUEUE]: New Event Queue Initialized.
+    sigma_printf("S [KQUEUE]: New Event Queue Initialized.
 ");
     return 1; // Sovereign KQ Handle
 }

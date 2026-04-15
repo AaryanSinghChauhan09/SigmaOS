@@ -1,9 +1,9 @@
-#include "sigma_base.h"
+﻿#include "sigma_base.h"
 
 #include "SovereignToolHeader.h"
 
 /*
- * Σ SIGMAOS: SOVEREIGN GAMING (v1.0)
+ * S SIGMAOS: SOVEREIGN GAMING (v1.0)
  * USP: Absorb SteamOS/Garuda Performance USPs.
  * Shard: Industrial Performance Sharding.
  */

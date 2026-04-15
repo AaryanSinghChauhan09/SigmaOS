@@ -1,6 +1,6 @@
-/*
+﻿/*
  * =========================================================================
- * Σ SIGMAOS: SOVEREIGN PURITY (FORCE DEFINE)
+ * S SIGMAOS: SOVEREIGN PURITY (FORCE DEFINE)
  * =========================================================================
  * Mission: Absolute type stability across the entire lattice.
  * =========================================================================

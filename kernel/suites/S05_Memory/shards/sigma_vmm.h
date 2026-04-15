@@ -1,6 +1,6 @@
-/*
+﻿/*
  * =========================================================================
- * Σ SIGMAOS kernel/suites/S05_Memory/shards/sigma_vmm.h
+ * S SIGMAOS kernel/suites/S05_Memory/shards/sigma_vmm.h
  * =========================================================================
  * Virtual Memory Manager — gap-closes:
  *   Linux  : mmap, brk, mremap, mprotect, KSM, THP, ASLR, OOM killer

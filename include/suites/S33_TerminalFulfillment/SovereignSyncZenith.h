@@ -1,6 +1,6 @@
-/*
+﻿/*
  * =========================================================================
- * Σ SIGMAOS: SOVEREIGN SYNC ZENITH (v14.0 - PURE C11)
+ * S SIGMAOS: SOVEREIGN SYNC ZENITH (v14.0 - PURE C11)
  * =========================================================================
  * Mission: Hardware-level atomic synchronization primitives.
  * Design: C11 / Zero-Dependency / Struct-based OOP.

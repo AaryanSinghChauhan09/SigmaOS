@@ -1,6 +1,6 @@
-/*
+﻿/*
  * =========================================================================
- * Σ SIGMAOS ZENITH: SOVEREIGN ELIMINATION SHARD (v54.2-TRIANGULUM)
+ * S SIGMAOS ZENITH: SOVEREIGN ELIMINATION SHARD (v54.2-TRIANGULUM)
  * =========================================================================
  * Mission: Ultra-high contention LIFO access via push-pop elimination.
  * Principles: Multi-Processing, Computer Science, Throughput, Scalability.

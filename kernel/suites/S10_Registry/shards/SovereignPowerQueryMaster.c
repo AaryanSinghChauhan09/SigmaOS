@@ -1,6 +1,6 @@
-/*
+﻿/*
  * =========================================================================
- * Σ SIGMAOS: SOVEREIGN POWER QUERY MASTER (v1.0 - PURE C11)
+ * S SIGMAOS: SOVEREIGN POWER QUERY MASTER (v1.0 - PURE C11)
  * =========================================================================
  * Mission: Absorb PowerBI's Data Ingestion Layer (M-Language Parity).
  * Design: C11 / Zero-Dependency / Multi-Threaded I/O Block.

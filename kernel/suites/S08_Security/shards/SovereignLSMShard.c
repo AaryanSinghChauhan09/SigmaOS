@@ -1,6 +1,6 @@
-/*
+﻿/*
  * =========================================================================
- * Σ SIGMAOS ZENITH: SOVEREIGN LSM ENGINE (v1.0)
+ * S SIGMAOS ZENITH: SOVEREIGN LSM ENGINE (v1.0)
  * =========================================================================
  * Mission: Pluggable kernel security modules and mandatory access control.
  * Principles: Hook-based Mediation, Security Blobs, Capability Checks.

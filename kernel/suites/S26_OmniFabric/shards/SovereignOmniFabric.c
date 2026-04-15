@@ -1,6 +1,6 @@
-/*
+﻿/*
  * =========================================================================
- * Σ SIGMAOS: S26_OMNIFABRIC — SovereignOmniFabric.c
+ * S SIGMAOS: S26_OMNIFABRIC — SovereignOmniFabric.c
  * =========================================================================
  * Mission: High-Performance, Zero-Leakage Inter-Shard Communication Bus.
  * Design: Ring-Buffer based, Lock-Free Asynchronous Message Dispatch.
@@ -26,7 +26,7 @@ static volatile sigma_u32 g_tail = 0;
 void OmniFabric_Init(void) {
     g_head = 0;
     g_tail = 0;
-    sigma_printf("Σ [OMNIFABRIC]: Sovereign Message Bus active. 4096-node capacity.\n");
+    sigma_printf("S [OMNIFABRIC]: Sovereign Message Bus active. 4096-node capacity.\n");
 }
 
 sigma_err_t OmniFabric_Send(sigma_u32 sender, sigma_u32 receiver, sigma_u32 type, sigma_u64* data) {

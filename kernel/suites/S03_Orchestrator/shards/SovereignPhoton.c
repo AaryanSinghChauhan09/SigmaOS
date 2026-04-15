@@ -1,7 +1,7 @@
-#include "sigma_kernel.h"
+﻿#include "sigma_kernel.h"
 
 void SovereignPhoton_Init() {
-    sigma_printf("Σ [ABSORB]: SovereignPhoton Zenith Online. Unified Parity Verified.\n");
+    sigma_printf("S [ABSORB]: SovereignPhoton Zenith Online. Unified Parity Verified.\n");
 }
 
 

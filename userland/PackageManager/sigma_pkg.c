@@ -1,6 +1,6 @@
-/*
+﻿/*
  * =========================================================================
- * Σ SIGMAOS ZENITH SUPREME: SOVEREIGN PACKAGE MANAGER (v1.0)
+ * S SIGMAOS ZENITH SUPREME: SOVEREIGN PACKAGE MANAGER (v1.0)
  * =========================================================================
  * Mission: Universal application distribution (Debian/Arch/Ubuntu parity).
  * Capability: Pkg verification, Dependency sharding, Delta updates.
@@ -44,7 +44,7 @@ void sigma_pkg_install(const char* name) {
 }
 
 void sigma_pkg_list() {
-    sigma_printf("\nΣ SOVEREIGN REPOSITORY PULSE\n");
+    sigma_printf("\nS SOVEREIGN REPOSITORY PULSE\n");
     sigma_printf("-------------------------------------------\n");
     sigma_printf("NAME              VERSION   STATUS\n");
     sigma_printf("-------------------------------------------\n");

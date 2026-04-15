@@ -1,4 +1,4 @@
-#include "sigma_base.h"
+﻿#include "sigma_base.h"
 
 #include "SovereignFS.h"
 #include "sigma_libc.h"
@@ -10,8 +10,8 @@
  */
 
 sigma_err_t sigma_io_ring_init(void) {
-    sigma_printf("  Σ [IO-RING]: Sovereign Async I/O Ring Shard active.\n");
-    sigma_printf("  Σ [IO-RING]: SQ/CQ ring-buffer matrices established.\n");
+    sigma_printf("  S [IO-RING]: Sovereign Async I/O Ring Shard active.\n");
+    sigma_printf("  S [IO-RING]: SQ/CQ ring-buffer matrices established.\n");
     return SIGMA_OK;
 }
 

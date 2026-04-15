@@ -1,6 +1,6 @@
-/*
+﻿/*
  * =========================================================================
- * Σ SIGMAOS ZENITH: SOVEREIGN RTOS ENGINE (v50.0-SINGULARITY)
+ * S SIGMAOS ZENITH: SOVEREIGN RTOS ENGINE (v50.0-SINGULARITY)
  * =========================================================================
  * Mission: Hard real-time determinism and priority inheritance.
  * Principles: Fixed-Priority Scheduling, Worst-Case Latency, Inheritance.

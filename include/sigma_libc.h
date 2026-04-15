@@ -1,6 +1,6 @@
-/*
+﻿/*
  * =========================================================================
- * Σ SIGMAOS include/sigma_libc.h (v3.0 — SELF-CONTAINED)
+ * S SIGMAOS include/sigma_libc.h (v3.0 — SELF-CONTAINED)
  * =========================================================================
  * Design: Zero external includes. All primitives declared inline.
  *         Previously included sigma_types.h which pulled in stdint.h via

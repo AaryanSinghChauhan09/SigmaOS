@@ -1,6 +1,6 @@
-/*
+﻿/*
  * =========================================================================
- * Σ SIGMAOS: SOVEREIGN INTELLIGENCE (Suite S09)
+ * S SIGMAOS: SOVEREIGN INTELLIGENCE (Suite S09)
  * =========================================================================
  * Shard: Sentience Core v1.0
  * Parity: AI-Scheduling, Neural Resource Prediction, Self-Healing.

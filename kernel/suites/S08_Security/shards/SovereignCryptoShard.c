@@ -1,6 +1,6 @@
-/*
+﻿/*
  * =========================================================================
- * Σ SIGMAOS ZENITH: SOVEREIGN CRYPTOGRAPHY ENGINE (v2.0)
+ * S SIGMAOS ZENITH: SOVEREIGN CRYPTOGRAPHY ENGINE (v2.0)
  * =========================================================================
  * Mission: Zero-Dependency, industrial-grade crypto primitives.
  * Principles: Post-Quantum resistance, constant-time ops, hash integrity.

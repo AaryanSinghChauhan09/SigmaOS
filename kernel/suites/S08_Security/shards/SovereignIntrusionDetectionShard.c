@@ -1,12 +1,12 @@
-#include "sigma_base.h"
+﻿#include "sigma_base.h"
 
 #include "SovereignSecurity.h"
 #include "sigma_libc.h"
 
 sigma_err_t sigma_ids_init(void) {
-    sigma_printf("  Σ [IDS]: Sovereign Intrusion Detection System online.\n");
-    sigma_printf("  Σ [IDS]: Hooking Syscall Dispatch for anomalous behavior detection...\n");
-    sigma_printf("  Σ [IDS]: Real-time entropy audit: ACTIVE.\n");
+    sigma_printf("  S [IDS]: Sovereign Intrusion Detection System online.\n");
+    sigma_printf("  S [IDS]: Hooking Syscall Dispatch for anomalous behavior detection...\n");
+    sigma_printf("  S [IDS]: Real-time entropy audit: ACTIVE.\n");
     return SIGMA_OK;
 }
 

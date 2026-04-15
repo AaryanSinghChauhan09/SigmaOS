@@ -1,6 +1,6 @@
-/*
+﻿/*
  * =========================================================================
- * Σ SIGMAOS userland/shell/sigma_shell.c
+ * S SIGMAOS userland/shell/sigma_shell.c
  * =========================================================================
  * Sovereign Shell — gap-closes:
  *   Bash    : readline, job control, pipes, redirects, builtins
@@ -15,7 +15,7 @@
 #include "../proc/sigma_proc.h"
 #include "../ipc/sigma_ipc.h"
 
-#define SIGMA_SHELL_PROMPT  "Σ> "
+#define SIGMA_SHELL_PROMPT  "S> "
 #define SIGMA_SHELL_MAX_CMD  512
 #define SIGMA_SHELL_MAX_ARG   64
 #define SIGMA_SHELL_HIST_LEN  64
@@ -33,7 +33,7 @@ static char s_cwd[256] = "/";
 
 /* ── Builtins ────────────────────────────────────────────────────────────── */
 static void sh_help(void) {
-    sigma_printf("Σ SigmaOS Shell — Sovereign CLI v1.0\n");
+    sigma_printf("S SigmaOS Shell — Sovereign CLI v1.0\n");
     sigma_printf("Builtins:\n");
     sigma_printf("  help           show this help\n");
     sigma_printf("  exit [code]    exit the shell\n");
@@ -55,14 +55,14 @@ static void sh_uname(void) {
 }
 
 static void sh_sigma_info(void) {
-    sigma_printf("Σ ════════════════════════════════════════════\n");
+    sigma_printf("S ════════════════════════════════════════════\n");
     sigma_printf("  SIGMAOS SOVEREIGN v4.0\n");
     sigma_printf("  Suites:    15 kernel + 3 userland\n");
     sigma_printf("  Shards:    10,000+ sovereign shards\n");
     sigma_printf("  Security:  ML-KEM-1024 / ML-DSA / LSM\n");
     sigma_printf("  Sched:     CFS + EDF + Neural Balancer\n");
     sigma_printf("  Gaps:      Linux+macOS+Windows+Android+BSD\n");
-    sigma_printf("Σ ════════════════════════════════════════════\n");
+    sigma_printf("S ════════════════════════════════════════════\n");
 }
 
 static void sh_history(void) {
@@ -146,18 +146,18 @@ static void sh_dispatch(char *line) {
         return;
     }
     if (sh_streq(argv[0], "sigma-audit")) {
-        sigma_printf("Σ [GIV] Run: sigma-giv --all\n");
+        sigma_printf("S [GIV] Run: sigma-giv --all\n");
         return;
     }
     if (sh_streq(argv[0], "exit")) {
         int code = argc > 1 ? (argv[1][0]-'0') : 0;
-        sigma_printf("Σ Shell exit %d\n", code);
+        sigma_printf("S Shell exit %d\n", code);
         sh_running = 0;
         return;
     }
 
     /* Unknown: attempt spawn */
-    sigma_printf("Σ Spawning: %s\n", argv[0]);
+    sigma_printf("S Spawning: %s\n", argv[0]);
     proc_i32 pid = sigma_proc_spawn(argv[0], 0,
                                     SCHED_NORMAL, 0,
                                     NS_PID | NS_MNT);
@@ -165,7 +165,7 @@ static void sh_dispatch(char *line) {
         sigma_printf("[%d] started\n", pid);
         sigma_proc_kill((proc_u32)pid, 0); /* just probe */
     } else {
-        sigma_printf("Σ: %s: command not found\n", argv[0]);
+        sigma_printf("S: %s: command not found\n", argv[0]);
     }
 }
 

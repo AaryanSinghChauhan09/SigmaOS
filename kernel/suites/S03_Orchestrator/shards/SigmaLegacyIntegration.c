@@ -1,7 +1,7 @@
-#include "sigma_kernel.h"
+﻿#include "sigma_kernel.h"
 
 /*
- * Σ SIGMAOS: SOVEREIGN LEGACY INTEGRATION (v1.0)
+ * S SIGMAOS: SOVEREIGN LEGACY INTEGRATION (v1.0)
  * USP: Absorb Corel Linux / Lindows (Linspire) Ease-of-Use & Window Compatibility.
  * Shard: Industrial Legacy Interop.
  */

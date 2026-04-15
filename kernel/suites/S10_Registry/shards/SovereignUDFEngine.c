@@ -1,6 +1,6 @@
-/*
+﻿/*
  * =========================================================================
- * Σ SIGMAOS ZENITH: SOVEREIGN UDF ENGINE (v50.0-SINGULARITY)
+ * S SIGMAOS ZENITH: SOVEREIGN UDF ENGINE (v50.0-SINGULARITY)
  * =========================================================================
  * Mission: Sandboxed Bytecode Execution for User-Defined Functions.
  * Principles: VM Isolation, Pluggable Logic, AI-Driven Automation.

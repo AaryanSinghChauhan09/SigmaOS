@@ -1,6 +1,6 @@
-/*
+﻿/*
  * =========================================================================
- * Σ SIGMAOS DIVINE_INTERVENTION: SOVEREIGN SEV SHARD (v61.0-DIVINE)
+ * S SIGMAOS DIVINE_INTERVENTION: SOVEREIGN SEV SHARD (v61.0-DIVINE)
  * =========================================================================
  * Mission: Zero-trust hypervisor-host isolation via real-time cipher keys.
  * Principles: Cyber Security, Privacy, Hardware Mastery, Server.

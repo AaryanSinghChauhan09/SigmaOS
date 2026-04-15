@@ -1,6 +1,6 @@
-/*
+﻿/*
  * =========================================================================
- * Σ SIGMAOS ZENITH: SOVEREIGN TABU SEARCH (v51.8-SUPREME-ZENITH)
+ * S SIGMAOS ZENITH: SOVEREIGN TABU SEARCH (v51.8-SUPREME-ZENITH)
  * =========================================================================
  * Mission: Memory-aware shard scheduling via metaheuristic tabu lists.
  * Principles: AI, Algorithms, Data Science, Scheduling Mastery.

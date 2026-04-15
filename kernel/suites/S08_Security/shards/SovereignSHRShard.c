@@ -1,6 +1,6 @@
-/*
+﻿/*
  * =========================================================================
- * Σ SIGMAOS TRANSCENDENCE: SOVEREIGN SHR SHARD (v57.0-TRANSCENDENCE)
+ * S SIGMAOS TRANSCENDENCE: SOVEREIGN SHR SHARD (v57.0-TRANSCENDENCE)
  * =========================================================================
  * Mission: Polynomial-based threshold cryptography for secure distribution.
  * Principles: Cyber Security, Privacy, Computer Science, Distributed.

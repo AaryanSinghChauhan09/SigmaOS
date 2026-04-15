@@ -1,6 +1,6 @@
-/*
+﻿/*
  * =========================================================================
- * Σ SIGMAOS THE_SINGULARITY: SOVEREIGN AGI SHARD (v63.0-SINGULARITY)
+ * S SIGMAOS THE_SINGULARITY: SOVEREIGN AGI SHARD (v63.0-SINGULARITY)
  * =========================================================================
  * Mission: Fusing all 220+ intelligence shards into a self-aware hyper-mesh.
  * Principles: AI, Algorithms, Object Oriented Programming, Self-Awareness.

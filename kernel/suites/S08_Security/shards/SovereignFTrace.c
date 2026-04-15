@@ -1,6 +1,6 @@
-/*
+﻿/*
  * =========================================================================
- * Σ SIGMAOS: SOVEREIGN FTRACE & EVENT TRACING (v1.0 — PURE C11)
+ * S SIGMAOS: SOVEREIGN FTRACE & EVENT TRACING (v1.0 — PURE C11)
  * =========================================================================
  * Competitor Gap Closed: Linux kernel/trace/ (ftrace), Solaris DTrace,
  * Windows Event Tracing for Windows (ETW).
@@ -159,7 +159,7 @@ sigma_err_t sigma_register_kprobe(SigmaKProbe_t *kp) {
     /* simulated saving of the instruction to be replaced */
     kp->saved_opcode = *(sigma_u8*)kp->address;
     
-    sigma_printf("Σ [FTRACE]: Kprobe registered at %p (Replaced opcode: 0x%02X)\n", 
+    sigma_printf("S [FTRACE]: Kprobe registered at %p (Replaced opcode: 0x%02X)\n", 
                  kp->address, kp->saved_opcode);
     return SIGMA_OK;
 }
@@ -168,7 +168,7 @@ sigma_err_t sigma_register_kprobe(SigmaKProbe_t *kp) {
  * ░░ INITIALISATION
  * ----------------------------------------------------------------------- */
 void SovereignFTrace_Init(void) {
-    sigma_printf("Σ [FTRACE]: Initialising Sovereign Function Tracer & ETW...\n");
+    sigma_printf("S [FTRACE]: Initialising Sovereign Function Tracer & ETW...\n");
 
     /* Allocate ring buffers */
     static sigma_u8 trace_memory[TRACE_MAX_CPUS * TRACE_BUF_SIZE];
@@ -199,7 +199,7 @@ void SovereignFTrace_Init(void) {
     kp.address = (void*)&SovereignFTrace_Init; /* Safe to read opcode from ourselves */
     sigma_register_kprobe(&kp);
 
-    sigma_printf("Σ [FTRACE]: Execution tracing online. Introspection sovereignty achieved.\n");
+    sigma_printf("S [FTRACE]: Execution tracing online. Introspection sovereignty achieved.\n");
 }
 
 

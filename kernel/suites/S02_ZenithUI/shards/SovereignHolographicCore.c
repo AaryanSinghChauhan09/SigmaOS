@@ -1,6 +1,6 @@
-/*
+﻿/*
  * =========================================================================
- * Σ SIGMAOS: S02_ZENITHUI — SovereignHolographicCore.c
+ * S SIGMAOS: S02_ZENITHUI — SovereignHolographicCore.c
  * =========================================================================
  * Mission: 3D-First Terminal UI (超越 Windows/macOS).
  * Capability: Volumetric windowing, Depth-buffered shaders, Sentient Chroma.
@@ -15,11 +15,11 @@ typedef struct {
 } sigma_hologram_vertex_t;
 
 void sigma_ui_render_volumetric(void) {
-    sigma_printf("Σ [ZENITHUI]: Materializing 3D Volumetric Window (Z-Depth: 400px)...\n");
+    sigma_printf("S [ZENITHUI]: Materializing 3D Volumetric Window (Z-Depth: 400px)...\n");
     // Hardware-accelerated holographic projection
-    sigma_printf("Σ [ZENITHUI]: Chroma Shift -> SUPREME_PURPLE (System Health: NOMINAL).\n");
+    sigma_printf("S [ZENITHUI]: Chroma Shift -> SUPREME_PURPLE (System Health: NOMINAL).\n");
 }
 
 void sigma_ui_holo_init(void) {
-    sigma_printf("Σ [ZENITHUI]: Holographic Graphics Pipeline (S02) active.\n");
+    sigma_printf("S [ZENITHUI]: Holographic Graphics Pipeline (S02) active.\n");
 }

@@ -1,7 +1,7 @@
-#include "sigma_kernel.h"
+﻿#include "sigma_kernel.h"
 
 void SovereignKnoppix_Init() {
-    sigma_printf("Σ [ABSORB]: SovereignKnoppix Zenith Online. Unified Parity Verified.\n");
+    sigma_printf("S [ABSORB]: SovereignKnoppix Zenith Online. Unified Parity Verified.\n");
 }
 
 

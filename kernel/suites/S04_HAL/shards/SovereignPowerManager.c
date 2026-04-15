@@ -1,6 +1,6 @@
-/*
+﻿/*
  * =========================================================================
- * Σ SIGMAOS: S04_HAL — SovereignPowerManager.c
+ * S SIGMAOS: S04_HAL — SovereignPowerManager.c
  * =========================================================================
  * Mission: ACPI / Power Management Parity.
  * Capability: S-States (Sleep), P-States (Performance), Throttling.
@@ -18,18 +18,18 @@ typedef enum {
 } sigma_pwr_state_t;
 
 void sigma_hal_pwr_transition(sigma_pwr_state_t target) {
-    sigma_printf("Σ [HAL]: Transitioning Silicon to state S%u...\n", (sigma_u32)target);
+    sigma_printf("S [HAL]: Transitioning Silicon to state S%u...\n", (sigma_u32)target);
     
     switch(target) {
         case PWR_STATE_S5:
-            sigma_printf("Σ [HAL]: ACPI Shutdown command sent to hardware.\n");
+            sigma_printf("S [HAL]: ACPI Shutdown command sent to hardware.\n");
             for(;;); // Halt
         default:
-            sigma_printf("Σ [HAL]: Power state optimized for Sovereign efficiency.\n");
+            sigma_printf("S [HAL]: Power state optimized for Sovereign efficiency.\n");
             break;
     }
 }
 
 void sigma_hal_pwr_init(void) {
-    sigma_printf("Σ [HAL]: Power Management Shard (ACPI Parity) materialized.\n");
+    sigma_printf("S [HAL]: Power Management Shard (ACPI Parity) materialized.\n");
 }

@@ -1,6 +1,6 @@
-/*
+﻿/*
  * =========================================================================
- * Σ SIGMAOS kernel/suites/S02_Boot/shards/sigma_boot.h
+ * S SIGMAOS kernel/suites/S02_Boot/shards/sigma_boot.h
  * =========================================================================
  * Sovereign Boot Subsystem — gap-closes:
  *   Linux  : GRUB2, systemd-boot, EFISTUB, kexec, initramfs

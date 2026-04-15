@@ -1,6 +1,6 @@
-/*
+﻿/*
  * =========================================================================
- * Σ SIGMAOS: SOVEREIGN TOOL HEADER (v1.0)
+ * S SIGMAOS: SOVEREIGN TOOL HEADER (v1.0)
  * =========================================================================
  * Mission: Lightweight header for standalone tools and utilities.
  * Design: Includes only the minimal primitives tools need.

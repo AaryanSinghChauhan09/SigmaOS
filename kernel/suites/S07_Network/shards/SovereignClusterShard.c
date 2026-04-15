@@ -1,6 +1,6 @@
-/*
+﻿/*
  * =========================================================================
- * Σ SIGMAOS ZENITH: SOVEREIGN CLUSTER SHARD (v1.0)
+ * S SIGMAOS ZENITH: SOVEREIGN CLUSTER SHARD (v1.0)
  * =========================================================================
  * Mission: Absorb Kubernetes / Docker Swarm / Erlang OTP USP.
  *          Native Silicon Distributed Node Orchestration Engine.

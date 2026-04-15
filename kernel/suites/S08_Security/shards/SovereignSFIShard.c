@@ -1,6 +1,6 @@
-/*
+﻿/*
  * =========================================================================
- * Σ SIGMAOS GENESIS: SOVEREIGN SFI SHARD (v57.2-SUPREME-GENESIS)
+ * S SIGMAOS GENESIS: SOVEREIGN SFI SHARD (v57.2-SUPREME-GENESIS)
  * =========================================================================
  * Mission: Native Software Fault Isolation for zero-cost sandboxing.
  * Principles: Cyber Security, Safety, Computer Science.

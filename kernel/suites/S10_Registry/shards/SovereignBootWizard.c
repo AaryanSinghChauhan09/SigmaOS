@@ -1,8 +1,8 @@
-#include "sigma_base.h"
+﻿#include "sigma_base.h"
 
 /*
  * =========================================================================
- * Σ SIGMAOS ZENITH: SOVEREIGN BOOT WIZARD (v1.0)
+ * S SIGMAOS ZENITH: SOVEREIGN BOOT WIZARD (v1.0)
  * =========================================================================
  * Mission: Absolute Ease of Use via Native Interactive Personalization.
  * Design: C11 / Zero-Dependency / Direct Syscall I/O.
@@ -15,7 +15,7 @@
 
 static void wizard_print_header() {
     sigma_printf("\n");
-    sigma_printf("  Σ SIGMAOS ZENITH SUPREME — SOVEREIGN SETUP WIZARD\n");
+    sigma_printf("  S SIGMAOS ZENITH SUPREME — SOVEREIGN SETUP WIZARD\n");
     sigma_printf("  ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n");
     sigma_printf("  Welcome, Citizen. Let us personalize your silicon.\n");
     sigma_printf("\n");

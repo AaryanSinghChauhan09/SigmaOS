@@ -1,7 +1,7 @@
-#include "sigma_base.h"
+﻿#include "sigma_base.h"
 
 /*
- * Σ SIGMAOS: SOVEREIGN LINUX USP ENGINE v2.0 — MODULAR
+ * S SIGMAOS: SOVEREIGN LINUX USP ENGINE v2.0 — MODULAR
  * Mission: Unified entry point for all absorbed Linux Kernel USPs.
  * Design: C11 / Zero-Dependency / Registry-Based.
  */

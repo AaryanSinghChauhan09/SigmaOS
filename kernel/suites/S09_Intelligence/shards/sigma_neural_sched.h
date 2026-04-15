@@ -1,6 +1,6 @@
-/*
+﻿/*
  * =========================================================================
- * Σ SIGMAOS kernel/suites/S09_Intelligence/shards/sigma_neural_sched.h
+ * S SIGMAOS kernel/suites/S09_Intelligence/shards/sigma_neural_sched.h
  * =========================================================================
  * Neural Resource Balancer — gap-closes:
  *   Linux  : CGroup v2 CPU/MEM pressure signals, PSI (Pressure Stall Info)

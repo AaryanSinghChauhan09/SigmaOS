@@ -1,6 +1,6 @@
-/*
+﻿/*
  * =========================================================================
- * Σ SIGMAOS: SOVEREIGN MEDIA CODEC + OBS COMPOSITOR — IMPLEMENTATION (v1.0)
+ * S SIGMAOS: SOVEREIGN MEDIA CODEC + OBS COMPOSITOR — IMPLEMENTATION (v1.0)
  * =========================================================================
  */
 
@@ -93,7 +93,7 @@ sigma_err_t sigma_media_open(const char *url, SigmaMediaInfo_t *out) {
     }
 
     sigma_memcpy(&s_current_media, out, sizeof(*out));
-    sigma_printf("Σ [MEDIA]: Opened: %s\n", url);
+    sigma_printf("S [MEDIA]: Opened: %s\n", url);
     sigma_printf("  Video: %s  %ux%u @ %u fps  %u kbps\n",
                  codec_name(out->video.codec_id),
                  out->video.width, out->video.height,
@@ -110,48 +110,48 @@ sigma_err_t sigma_media_play(const char *url, SigmaHWAccel_t accel) {
     SigmaMediaInfo_t info;
     sigma_media_open(url, &info);
     s_media_state = SIGMA_MEDIA_PLAYING;
-    sigma_printf("Σ [MEDIA]: Playing via %s decoder.\n", accel_name(accel));
+    sigma_printf("S [MEDIA]: Playing via %s decoder.\n", accel_name(accel));
     return SIGMA_OK;
 }
 
 sigma_err_t sigma_media_pause(void) {
     if (s_media_state != SIGMA_MEDIA_PLAYING) return SIGMA_EINVAL;
     s_media_state = SIGMA_MEDIA_PAUSED;
-    sigma_printf("Σ [MEDIA]: Paused.\n");
+    sigma_printf("S [MEDIA]: Paused.\n");
     return SIGMA_OK;
 }
 
 sigma_err_t sigma_media_stop(void) {
     s_media_state = SIGMA_MEDIA_STOPPED;
-    sigma_printf("Σ [MEDIA]: Stopped.\n");
+    sigma_printf("S [MEDIA]: Stopped.\n");
     return SIGMA_OK;
 }
 
 sigma_err_t sigma_media_seek(sigma_u64 ms) {
-    sigma_printf("Σ [MEDIA]: Seeking to %llus.\n",
+    sigma_printf("S [MEDIA]: Seeking to %llus.\n",
                  (unsigned long long)(ms / 1000));
     return SIGMA_OK;
 }
 
 sigma_err_t sigma_media_set_rate(sigma_f32 rate) {
-    sigma_printf("Σ [MEDIA]: Playback rate: %.1fx\n", (double)rate);
+    sigma_printf("S [MEDIA]: Playback rate: %.1fx\n", (double)rate);
     return SIGMA_OK;
 }
 
 sigma_err_t sigma_media_set_volume(sigma_f32 vol) {
     s_audio_filter.volume = vol;
-    sigma_printf("Σ [MEDIA]: Volume: %.0f%%\n", (double)(vol * 100.0f));
+    sigma_printf("S [MEDIA]: Volume: %.0f%%\n", (double)(vol * 100.0f));
     return SIGMA_OK;
 }
 
 sigma_err_t sigma_media_set_audio_filter(const SigmaAudioFilter_t *f) {
     sigma_memcpy(&s_audio_filter, f, sizeof(*f));
-    sigma_printf("Σ [MEDIA]: Audio filter applied (EQ/compressor/normalise).\n");
+    sigma_printf("S [MEDIA]: Audio filter applied (EQ/compressor/normalise).\n");
     return SIGMA_OK;
 }
 
 sigma_err_t sigma_media_transcode(const SigmaTranscodeJob_t *job) {
-    sigma_printf("Σ [MEDIA]: Transcoding:\n"
+    sigma_printf("S [MEDIA]: Transcoding:\n"
                  "  src: %s\n"
                  "  dst: %s\n"
                  "  vcodec: %s  %ux%u@%ufps  %ukbps\n"
@@ -162,7 +162,7 @@ sigma_err_t sigma_media_transcode(const SigmaTranscodeJob_t *job) {
                  job->width, job->height, job->fps, job->vbitrate,
                  codec_name(job->acodec), job->abitrate,
                  accel_name(job->hw_accel));
-    sigma_printf("Σ [MEDIA]: Transcode complete.\n");
+    sigma_printf("S [MEDIA]: Transcode complete.\n");
     return SIGMA_OK;
 }
 
@@ -193,7 +193,7 @@ sigma_err_t sigma_obs_scene_create(const char *name) {
     sigma_memset(sc, 0, sizeof(*sc));
     sigma_strcpy(sc->name, name, SIGMA_SCENE_NAME_MAX);
     sc->active = SIGMA_TRUE;
-    sigma_printf("Σ [OBS]: Scene created: %s\n", name);
+    sigma_printf("S [OBS]: Scene created: %s\n", name);
     return SIGMA_OK;
 }
 
@@ -204,7 +204,7 @@ sigma_err_t sigma_obs_scene_switch(const char *name) {
         s_scenes[i].active = SIGMA_FALSE;
     sc->active       = SIGMA_TRUE;
     s_active_scene   = (sigma_u32)(sc - s_scenes);
-    sigma_printf("Σ [OBS]: Scene switched -> %s\n", name);
+    sigma_printf("S [OBS]: Scene switched -> %s\n", name);
     return SIGMA_OK;
 }
 
@@ -225,7 +225,7 @@ sigma_err_t sigma_obs_source_add(const char *scene, const char *name,
     static const char *type_names[] = {
         "Display","Window","Camera","Media","Text","Image","Browser"
     };
-    sigma_printf("Σ [OBS]: Source '%s' (%s) at [%d,%d %dx%d] added to scene '%s'\n",
+    sigma_printf("S [OBS]: Source '%s' (%s) at [%d,%d %dx%d] added to scene '%s'\n",
                  name, type_names[type], x, y, w, h, scene);
     return SIGMA_OK;
 }
@@ -236,7 +236,7 @@ sigma_err_t sigma_obs_source_remove(const char *scene, const char *name) {
     for (sigma_u32 i = 0; i < sc->source_count; i++) {
         if (sigma_streq(sc->sources[i].name, name)) {
             sc->sources[i].visible = SIGMA_FALSE;
-            sigma_printf("Σ [OBS]: Source '%s' removed from scene '%s'\n",
+            sigma_printf("S [OBS]: Source '%s' removed from scene '%s'\n",
                          name, scene);
             return SIGMA_OK;
         }
@@ -248,32 +248,32 @@ sigma_err_t sigma_obs_output_start(const SigmaOutputConfig_t *cfg) {
     sigma_memcpy(&s_output, cfg, sizeof(*cfg));
     s_obs_live = SIGMA_TRUE;
     if (cfg->mode == SIGMA_OUTPUT_STREAM || cfg->mode == SIGMA_OUTPUT_BOTH)
-        sigma_printf("Σ [OBS]: Streaming to %s (key=***) %ukbps %ufps\n",
+        sigma_printf("S [OBS]: Streaming to %s (key=***) %ukbps %ufps\n",
                      cfg->server_url, cfg->vbitrate, cfg->fps);
     if (cfg->mode == SIGMA_OUTPUT_RECORD || cfg->mode == SIGMA_OUTPUT_BOTH)
-        sigma_printf("Σ [OBS]: Recording to %s\n", cfg->record_path);
-    sigma_printf("Σ [OBS]: Encoder: %s via %s\n",
+        sigma_printf("S [OBS]: Recording to %s\n", cfg->record_path);
+    sigma_printf("S [OBS]: Encoder: %s via %s\n",
                  codec_name(cfg->venc), accel_name(cfg->hw_enc));
     return SIGMA_OK;
 }
 
 sigma_err_t sigma_obs_output_stop(void) {
     s_obs_live = SIGMA_FALSE;
-    sigma_printf("Σ [OBS]: Output stopped.\n");
+    sigma_printf("S [OBS]: Output stopped.\n");
     return SIGMA_OK;
 }
 
 void sigma_obs_scene_list(void) {
     for (sigma_u32 i = 0; i < s_scene_cnt; i++) {
         SigmaScene_t *sc = &s_scenes[i];
-        sigma_printf("Σ [OBS]: Scene: %s  sources=%u%s\n",
+        sigma_printf("S [OBS]: Scene: %s  sources=%u%s\n",
                      sc->name, sc->source_count,
                      i == s_active_scene ? "  [ACTIVE]" : "");
     }
 }
 
 void sigma_obs_stats(void) {
-    sigma_printf("Σ [OBS]: Status: %s  Scenes: %u  Output: %s\n",
+    sigma_printf("S [OBS]: Status: %s  Scenes: %u  Output: %s\n",
                  s_obs_live ? "LIVE" : "idle",
                  s_scene_cnt,
                  s_obs_live ? (s_output.mode == SIGMA_OUTPUT_STREAM ?
@@ -284,7 +284,7 @@ void sigma_obs_stats(void) {
  * SovereignMediaCodec_Init
  * ---------------------------------------------------------------------- */
 void SovereignMediaCodec_Init(void) {
-    sigma_printf("Σ [MEDIA]: Initialising Sovereign Media Codec Engine "
+    sigma_printf("S [MEDIA]: Initialising Sovereign Media Codec Engine "
                  "(VLC + OBS parity)...\n");
 
     /* VLC playback demo */
@@ -329,7 +329,7 @@ void SovereignMediaCodec_Init(void) {
     sigma_obs_stats();
     sigma_obs_output_stop();
 
-    sigma_printf("Σ [MEDIA]: Sovereign Media Engine online.\n");
+    sigma_printf("S [MEDIA]: Sovereign Media Engine online.\n");
 }
 
 

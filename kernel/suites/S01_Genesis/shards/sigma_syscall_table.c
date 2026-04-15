@@ -1,6 +1,6 @@
-/*
+﻿/*
  * =========================================================================
- * Σ SIGMAOS kernel/suites/S01_Genesis/shards/sigma_syscall_table.c
+ * S SIGMAOS kernel/suites/S01_Genesis/shards/sigma_syscall_table.c
  * =========================================================================
  * Syscall dispatch engine — zero-overhead table lookup, per-call telemetry,
  * and seccomp class enforcement.
@@ -40,7 +40,7 @@ static sc_i64 sc_handle_write(sc_u64 fd, sc_u64 buf, sc_u64 len,
 static sc_i64 sc_handle_exit(sc_u64 code, sc_u64 b, sc_u64 c,
                               sc_u64 d, sc_u64 e, sc_u64 f) {
     (void)b;(void)c;(void)d;(void)e;(void)f;
-    sigma_printf("Σ [SYSCALL] exit(%llu)\n", (unsigned long long)code);
+    sigma_printf("S [SYSCALL] exit(%llu)\n", (unsigned long long)code);
     sigma_exit((int)code);
     return 0;
 }
@@ -48,7 +48,7 @@ static sc_i64 sc_handle_exit(sc_u64 code, sc_u64 b, sc_u64 c,
 static sc_i64 sc_handle_udf(sc_u64 id, sc_u64 args, sc_u64 c,
                              sc_u64 d, sc_u64 e, sc_u64 f) {
     (void)c;(void)d;(void)e;(void)f;
-    sigma_printf("Σ [SYSCALL] UDF call id=%llu args=0x%llx\n",
+    sigma_printf("S [SYSCALL] UDF call id=%llu args=0x%llx\n",
                  (unsigned long long)id, (unsigned long long)args);
     return 0;
 }
@@ -72,7 +72,7 @@ void sigma_syscall_table_init(void) {
     sigma_syscall_register(SC_EXIT,    "exit",    1, SC_SEC_MODERATE,  sc_handle_exit);
     sigma_syscall_register(SC_SIGMA_UDF_CALL, "sigma_udf", 2, SC_SEC_MODERATE, sc_handle_udf);
 
-    sigma_printf("Σ [SYSCALL] Table initialized: %u entries\n", SIGMA_SYSCALL_MAX);
+    sigma_printf("S [SYSCALL] Table initialized: %u entries\n", SIGMA_SYSCALL_MAX);
 }
 
 /* ── Register a handler ──────────────────────────────────────────────────── */
@@ -96,7 +96,7 @@ sc_i64 sigma_syscall_dispatch(sc_u32 num,
 
     /* Security gate: ring-0 enforcement */
     if (desc->sec_class == SC_SEC_CRITICAL) {
-        sigma_printf("Σ [SYSCALL] DENIED #%u '%s' — ring-0 only\n",
+        sigma_printf("S [SYSCALL] DENIED #%u '%s' — ring-0 only\n",
                      num, desc->name);
         return -1; /* EPERM */
     }
@@ -107,7 +107,7 @@ sc_i64 sigma_syscall_dispatch(sc_u32 num,
 
 /* ── Telemetry audit ─────────────────────────────────────────────────────── */
 void sigma_syscall_audit(void) {
-    sigma_printf("\nΣ SYSCALL TELEMETRY (top 10 by call count)\n");
+    sigma_printf("\nS SYSCALL TELEMETRY (top 10 by call count)\n");
     sigma_printf("%-8s %-24s %s\n", "NUM", "NAME", "CALLS");
     sc_u32 printed = 0;
     for (sc_u32 i = 0; i < SIGMA_SYSCALL_MAX && printed < 10; i++) {

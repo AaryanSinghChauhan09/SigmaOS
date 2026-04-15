@@ -1,6 +1,6 @@
-/*
+﻿/*
  * =========================================================================
- * Σ SIGMAOS: SOVEREIGN AUTOMATED SYSTEMS HEADERS
+ * S SIGMAOS: SOVEREIGN AUTOMATED SYSTEMS HEADERS
  * =========================================================================
  */
 

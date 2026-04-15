@@ -1,4 +1,4 @@
-#include "sigma_base.h"
+﻿#include "sigma_base.h"
 
 #include "SovereignSecurity.h"
 #include "sigma_libc.h"
@@ -10,9 +10,9 @@
  */
 
 sigma_err_t sigma_boot_audit_init(void) {
-    sigma_printf("  Σ [SEC-AUDIT]: Sovereign Boot Verification Engine online.\n");
-    sigma_printf("  Σ [SEC-AUDIT]: Orchestrator hash verified: [BIT-PERFECT].\n");
-    sigma_printf("  Σ [SEC-AUDIT]: Chain-of-Trust extended to Sovereign Registries.\n");
+    sigma_printf("  S [SEC-AUDIT]: Sovereign Boot Verification Engine online.\n");
+    sigma_printf("  S [SEC-AUDIT]: Orchestrator hash verified: [BIT-PERFECT].\n");
+    sigma_printf("  S [SEC-AUDIT]: Chain-of-Trust extended to Sovereign Registries.\n");
     return SIGMA_OK;
 }
 

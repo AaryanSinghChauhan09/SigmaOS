@@ -1,6 +1,6 @@
-/*
+﻿/*
  * =========================================================================
- * Σ SIGMAOS ZENITH: SOVEREIGN L3 ENGINE (v1.0)
+ * S SIGMAOS ZENITH: SOVEREIGN L3 ENGINE (v1.0)
  * =========================================================================
  * Mission: High-speed packet routing and addressing.
  * Principles: IP Forwarding, Route Table Lookup, TTL handling.

@@ -1,11 +1,11 @@
-#ifndef SOVEREIGN_MEMORY_MANAGER_H
+﻿#ifndef SOVEREIGN_MEMORY_MANAGER_H
 #define SOVEREIGN_MEMORY_MANAGER_H
 
 #include "../SovereignLibC.h"
 #include "../SigmaOOP.h"
 
 /*
- * Σ SIGMAOS: SOVEREIGN VMM & PMM SUB-SYSTEMS
+ * S SIGMAOS: SOVEREIGN VMM & PMM SUB-SYSTEMS
  * Implements Advanced Memory Management Overhaul as dictated by Zenith Specifications.
  *
  * Provides x86_64 Recursive Paging Tables & Buddy Allocator structures natively to replace bump allocators.

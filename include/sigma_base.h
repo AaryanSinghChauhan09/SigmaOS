@@ -1,6 +1,6 @@
-/*
+﻿/*
  * =========================================================================
- * Σ SIGMAOS: CORE FOUNDATION (v2.0 — ZERO DEPENDENCY)
+ * S SIGMAOS: CORE FOUNDATION (v2.0 — ZERO DEPENDENCY)
  * =========================================================================
  * Mission: Minimal dependencies for all Sovereign Shards.
  * =========================================================================
@@ -16,10 +16,10 @@
 #ifndef SIGMA_ASSERT
  #ifdef __SIGMAOS__
   #define SIGMA_ASSERT(cond, msg) \
-    do { if (!(cond)) { sigma_printf("Σ [PANIC]: %s (%s:%d)\n", msg, __FILE__, __LINE__); for(;;); } } while(0)
+    do { if (!(cond)) { sigma_printf("S [PANIC]: %s (%s:%d)\n", msg, __FILE__, __LINE__); for(;;); } } while(0)
  #else
   #define SIGMA_ASSERT(cond, msg) \
-    do { if (!(cond)) { sigma_printf("Σ [ASSERTION FAILED]: %s (%s:%d)\n", msg, __FILE__, __LINE__); sigma_exit(1); } } while(0)
+    do { if (!(cond)) { sigma_printf("S [ASSERTION FAILED]: %s (%s:%d)\n", msg, __FILE__, __LINE__); sigma_exit(1); } } while(0)
  #endif
 #endif
 

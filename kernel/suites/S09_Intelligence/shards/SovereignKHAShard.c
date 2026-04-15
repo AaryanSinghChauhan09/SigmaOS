@@ -1,6 +1,6 @@
-/*
+﻿/*
  * =========================================================================
- * Σ SIGMAOS ZENITH: SOVEREIGN KHA SHARD (v56.6-SUPREME-PANTHEON)
+ * S SIGMAOS ZENITH: SOVEREIGN KHA SHARD (v56.6-SUPREME-PANTHEON)
  * =========================================================================
  * Mission: Krill herd dynamics for high-density configuration optimization.
  * Principles: AI, Algorithms, Data Science, Distributed.

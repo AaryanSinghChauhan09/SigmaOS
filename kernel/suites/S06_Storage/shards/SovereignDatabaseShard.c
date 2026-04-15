@@ -1,6 +1,6 @@
-/*
+﻿/*
  * =========================================================================
- * Σ SIGMAOS ZENITH: SOVEREIGN DATABASE SHARD (v1.0)
+ * S SIGMAOS ZENITH: SOVEREIGN DATABASE SHARD (v1.0)
  * =========================================================================
  * Mission: High-Performance Kernel-Level Storage with ACID Guarantees.
  * Principles: Atomicity, Consistency, Isolation, Durability.

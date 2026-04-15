@@ -1,6 +1,6 @@
-/*
+﻿/*
  * =========================================================================
- * Σ SIGMAOS ZENITH: SOVEREIGN IWD SHARD (v56.1-SUPREME-VALKYRIE)
+ * S SIGMAOS ZENITH: SOVEREIGN IWD SHARD (v56.1-SUPREME-VALKYRIE)
  * =========================================================================
  * Mission: Constructive metaheuristic for complex network pathfinding.
  * Principles: AI, Algorithms, Data Science, Distributed.

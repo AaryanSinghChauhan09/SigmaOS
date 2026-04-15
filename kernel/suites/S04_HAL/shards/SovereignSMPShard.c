@@ -1,6 +1,6 @@
-/*
+﻿/*
  * =========================================================================
- * Σ SIGMAOS ZENITH: SOVEREIGN SMP ENGINE (v1.0)
+ * S SIGMAOS ZENITH: SOVEREIGN SMP ENGINE (v1.0)
  * =========================================================================
  * Mission: Symmetrical Multi-Processing and Cache Coherency.
  * Principles: IPI (Inter-Processor Interrupts), Spin-locking, Barries.

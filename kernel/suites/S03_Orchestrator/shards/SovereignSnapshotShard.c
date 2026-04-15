@@ -1,6 +1,6 @@
-/*
+﻿/*
  * =========================================================================
- * Σ SIGMAOS ZENITH: SOVEREIGN SNAPSHOT SHARD (v52.8-SUPREME-HEAVEN)
+ * S SIGMAOS ZENITH: SOVEREIGN SNAPSHOT SHARD (v52.8-SUPREME-HEAVEN)
  * =========================================================================
  * Mission: Atomic, wait-free snapshots of kernel state arrays.
  * Principles: Multi-Processing, Computer Science, Throughput, Safety.

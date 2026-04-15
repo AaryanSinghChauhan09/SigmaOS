@@ -1,6 +1,6 @@
-/*
+﻿/*
  * =========================================================================
- * Σ SIGMAOS ZENITH: SOVEREIGN STM SHARD (v51.5-OMEGA-INFINITY)
+ * S SIGMAOS ZENITH: SOVEREIGN STM SHARD (v51.5-OMEGA-INFINITY)
  * =========================================================================
  * Mission: Conflict-free memory transactions for high-level synchronization.
  * Principles: Multi-Processing, Computer Science, ACID.

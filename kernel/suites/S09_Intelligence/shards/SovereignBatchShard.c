@@ -1,6 +1,6 @@
-/*
+﻿/*
  * =========================================================================
- * Σ SIGMAOS ZENITH: SOVEREIGN BATCH ENGINE (v1.0)
+ * S SIGMAOS ZENITH: SOVEREIGN BATCH ENGINE (v1.0)
  * =========================================================================
  * Mission: High-throughput non-interactive job processing.
  * Principles: Job Control Language (JCL), Batch Queuing, Throughput.

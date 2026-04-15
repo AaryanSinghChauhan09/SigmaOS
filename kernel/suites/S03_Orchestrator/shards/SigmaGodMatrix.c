@@ -1,9 +1,9 @@
-#include "sigma_base.h"
+﻿#include "sigma_base.h"
 
 #include "../SigmaC11.h"
 
 // =========================================================================================
-// Σ THE SIGMA GOD-MATRIX (Omni-Absorber Engine)
+// S THE SIGMA GOD-MATRIX (Omni-Absorber Engine)
 // STATUS: ACTIVE. ABSORPTION COUNT: 99,999+ COMPETITOR APIs & USPs.
 // 
 // Mission: We do not just build alternatives. We assimilate the entire industry.

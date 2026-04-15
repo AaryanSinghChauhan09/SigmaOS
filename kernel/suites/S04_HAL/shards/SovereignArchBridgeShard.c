@@ -1,4 +1,4 @@
-#include "sigma_base.h"
+﻿#include "sigma_base.h"
 
 #include "SovereignArch.h"
 #include "sigma_libc.h"
@@ -10,15 +10,15 @@
  */
 
 sigma_err_t sigma_arch_bridge_init(void) {
-    sigma_printf("  Σ [ARCH-BRIDGE]: Sovereign Multi-Arch Matrix seated.\n");
+    sigma_printf("  S [ARCH-BRIDGE]: Sovereign Multi-Arch Matrix seated.\n");
     
     /* Mock detection */
     #ifdef __aarch64__
-        sigma_printf("  Σ [ARCH-BRIDGE]: Silicon: ARM64 (Zenith-Alpha path).\n");
+        sigma_printf("  S [ARCH-BRIDGE]: Silicon: ARM64 (Zenith-Alpha path).\n");
     #elif defined(__riscv)
-        sigma_printf("  Σ [ARCH-BRIDGE]: Silicon: RISC-V (Zenith-Beta path).\n");
+        sigma_printf("  S [ARCH-BRIDGE]: Silicon: RISC-V (Zenith-Beta path).\n");
     #else
-        sigma_printf("  Σ [ARCH-BRIDGE]: Silicon: x86_64 (Zenith-Standard path).\n");
+        sigma_printf("  S [ARCH-BRIDGE]: Silicon: x86_64 (Zenith-Standard path).\n");
     #endif
     
     return SIGMA_OK;

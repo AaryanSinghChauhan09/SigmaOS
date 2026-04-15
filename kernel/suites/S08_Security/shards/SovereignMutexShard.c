@@ -1,6 +1,6 @@
-/*
+﻿/*
  * =========================================================================
- * Σ SIGMAOS: S08_SECURITY — SovereignMutexShard.c
+ * S SIGMAOS: S08_SECURITY — SovereignMutexShard.c
  * =========================================================================
  * Mission: High-Performance, Deadlock-Aware Atomic Mutex Primitives.
  * Design: x86_64 'lock bts' based spin-mutex with backoff.

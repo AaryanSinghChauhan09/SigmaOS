@@ -1,6 +1,6 @@
-/*
+﻿/*
  * =========================================================================
- * Σ SIGMAOS ZENITH: SOVEREIGN RCU-HASH SHARD (v53.2-SUPREME-EMPYREAN)
+ * S SIGMAOS ZENITH: SOVEREIGN RCU-HASH SHARD (v53.2-SUPREME-EMPYREAN)
  * =========================================================================
  * Mission: Lock-free resizable hash table for kernel registry lookups.
  * Principles: Multi-Processing, Computer Science, Throughput, Scalability.

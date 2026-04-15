@@ -1,9 +1,9 @@
-#include "sigma_base.h"
+﻿#include "sigma_base.h"
 
 #include "SovereignToolHeader.h"
 
 /*
- * Σ SIGMAOS: SOVEREIGN ACADEMY (v1.0)
+ * S SIGMAOS: SOVEREIGN ACADEMY (v1.0)
  * USP: Absorb Edubuntu Classroom Management & Learning USPs.
  * Shard: Industrial Education.
  */

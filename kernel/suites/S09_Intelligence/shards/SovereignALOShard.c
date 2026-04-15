@@ -1,6 +1,6 @@
-/*
+﻿/*
  * =========================================================================
- * Σ SIGMAOS NEBULA: SOVEREIGN ALO SHARD (v57.3-SUPREME-NEBULA)
+ * S SIGMAOS NEBULA: SOVEREIGN ALO SHARD (v57.3-SUPREME-NEBULA)
  * =========================================================================
  * Mission: Random walks within mathematically declining spatial traps.
  * Principles: AI, Algorithms, Data Science, Cyber Security.

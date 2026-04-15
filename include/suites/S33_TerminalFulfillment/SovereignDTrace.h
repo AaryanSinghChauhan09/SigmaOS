@@ -1,6 +1,6 @@
-/*
+﻿/*
  * =========================================================================
- * Σ SIGMAOS: SOVEREIGN DTRACE — DYNAMIC KERNEL TRACING (v1.0 — C11)
+ * S SIGMAOS: SOVEREIGN DTRACE — DYNAMIC KERNEL TRACING (v1.0 — C11)
  * =========================================================================
  * Absorbed USPs from: FreeBSD DTrace / illumos DTrace
  *   https://github.com/freebsd/freebsd-src/tree/main/sys/cddl/contrib/opensolaris

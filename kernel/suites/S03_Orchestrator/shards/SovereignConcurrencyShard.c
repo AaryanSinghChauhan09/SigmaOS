@@ -1,6 +1,6 @@
-/*
+﻿/*
  * =========================================================================
- * Σ SIGMAOS ZENITH: SOVEREIGN LOCK-FREE CONCURRENCY (v50.8-ETERNITY-CORE)
+ * S SIGMAOS ZENITH: SOVEREIGN LOCK-FREE CONCURRENCY (v50.8-ETERNITY-CORE)
  * =========================================================================
  * Mission: High-performance atomic synchronization without mutex overhead.
  * Principles: Multi-Processing, Multi-Programming, Computer Science, Atomic.

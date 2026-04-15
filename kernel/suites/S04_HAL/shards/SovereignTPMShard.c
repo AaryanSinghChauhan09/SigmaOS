@@ -1,6 +1,6 @@
-/*
+﻿/*
  * =========================================================================
- * Σ SIGMAOS GENESIS: SOVEREIGN TPM SHARD (v57.2-SUPREME-GENESIS)
+ * S SIGMAOS GENESIS: SOVEREIGN TPM SHARD (v57.2-SUPREME-GENESIS)
  * =========================================================================
  * Mission: Hardware root-of-trust and secure boot state attestation.
  * Principles: Cyber Security, Hardware Mastery, Safety.

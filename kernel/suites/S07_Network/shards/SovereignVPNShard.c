@@ -1,6 +1,6 @@
-/*
+﻿/*
  * =========================================================================
- * Σ SIGMAOS ZENITH: SOVEREIGN OVERLAY VPN SHARD (v50.4-GOD-MATRIX)
+ * S SIGMAOS ZENITH: SOVEREIGN OVERLAY VPN SHARD (v50.4-GOD-MATRIX)
  * =========================================================================
  * Mission: Zero-trust peer-to-peer encrypted mesh networking.
  * Principles: Cyber Security, Network Sovereignty, Cloud, Distributed.

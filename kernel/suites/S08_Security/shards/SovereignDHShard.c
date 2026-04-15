@@ -1,6 +1,6 @@
-/*
+﻿/*
  * =========================================================================
- * Σ SIGMAOS ZENITH: SOVEREIGN DH ENGINE (v1.0)
+ * S SIGMAOS ZENITH: SOVEREIGN DH ENGINE (v1.0)
  * =========================================================================
  * Mission: Secure Key Exchange for Kernel Inter-sharding.
  * Principles: Diffie-Hellman, Modular Exponentiation, Forward Secrecy.

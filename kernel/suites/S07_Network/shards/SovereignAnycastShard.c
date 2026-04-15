@@ -1,6 +1,6 @@
-/*
+﻿/*
  * =========================================================================
- * Σ SIGMAOS ZENITH: SOVEREIGN ANYCAST ROUTING (v50.7-TRANSCENDENCE)
+ * S SIGMAOS ZENITH: SOVEREIGN ANYCAST ROUTING (v50.7-TRANSCENDENCE)
  * =========================================================================
  * Mission: Global traffic distribution via single-IP anycast orchestration.
  * Principles: Network, Distributed, Cloud, Server.

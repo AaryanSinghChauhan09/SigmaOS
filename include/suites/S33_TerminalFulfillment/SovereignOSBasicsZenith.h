@@ -1,6 +1,6 @@
-/*
+﻿/*
  * =========================================================================
- * Σ SIGMAOS: SOVEREIGN OS BASICS (v16.0 - PURE C11)
+ * S SIGMAOS: SOVEREIGN OS BASICS (v16.0 - PURE C11)
  * =========================================================================
  * Mission: Process Control, Deadlock Prevention, and Advanced Memory Management.
  * Design: C11 / Zero-Dependency / Struct-based OOP.

@@ -1,6 +1,6 @@
-/*
+﻿/*
  * =========================================================================
- * Σ SIGMAOS EON: SOVEREIGN QSO SHARD (v57.1-SUPREME-EON)
+ * S SIGMAOS EON: SOVEREIGN QSO SHARD (v57.1-SUPREME-EON)
  * =========================================================================
  * Mission: Quantum superposition modeling for simultaneous parameter probing.
  * Principles: AI, Algorithms, Data Science, Cyber Security.

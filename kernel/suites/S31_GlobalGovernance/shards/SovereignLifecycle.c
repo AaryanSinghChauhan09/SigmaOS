@@ -1,6 +1,6 @@
-/*
+﻿/*
  * =========================================================================
- * Σ SIGMAOS: S31_GOVERNANCE — SovereignLifecycle.c
+ * S SIGMAOS: S31_GOVERNANCE — SovereignLifecycle.c
  * =========================================================================
  * Mission: Android Parity (Lifecycle States).
  * Capability: OnStart, OnResume, OnPause, OnDestroy for system services.
@@ -21,5 +21,5 @@ typedef void (*sigma_lifecycle_cb)(sigma_lifecycle_state_t state);
 
 void sigma_governance_broadcast_state(sigma_lifecycle_state_t state) {
     const char* names[] = {"BORN", "ACTIVE", "PAUSED", "STOPPED", "DEAD"};
-    sigma_printf("Σ [GOVERNANCE]: System-wide Lifecycle Event -> %s\n", names[state]);
+    sigma_printf("S [GOVERNANCE]: System-wide Lifecycle Event -> %s\n", names[state]);
 }

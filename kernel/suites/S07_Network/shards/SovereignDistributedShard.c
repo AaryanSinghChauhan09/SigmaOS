@@ -1,6 +1,6 @@
-/*
+﻿/*
  * =========================================================================
- * Σ SIGMAOS ZENITH: SOVEREIGN DISTRIBUTED SHARD (v50.2-OMEGA)
+ * S SIGMAOS ZENITH: SOVEREIGN DISTRIBUTED SHARD (v50.2-OMEGA)
  * =========================================================================
  * Mission: Zero-dependency MapReduce and Clustered Task Offloading.
  * Principles: Distributed Systems, Network Sovereignty, Gossip Consensus.

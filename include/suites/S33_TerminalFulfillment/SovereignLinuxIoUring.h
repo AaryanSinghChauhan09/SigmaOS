@@ -1,6 +1,6 @@
-/*
+﻿/*
  * =========================================================================
- * Σ SIGMAOS: SOVEREIGN LINUX IO_URING (v1.0 — C11)
+ * S SIGMAOS: SOVEREIGN LINUX IO_URING (v1.0 — C11)
  * =========================================================================
  * Absorbed USPs from: torvalds/linux (io_uring)
  *   https://github.com/torvalds/linux/tree/master/io_uring

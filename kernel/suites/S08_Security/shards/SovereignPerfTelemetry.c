@@ -1,10 +1,10 @@
-#include "sigma_base.h"
+﻿#include "sigma_base.h"
 
 #include <sigma_types.h>
 #include "sigma_print.h"
 
 /*
- * Σ Sovereign Performance Telemetry
+ * S Sovereign Performance Telemetry
  * USP: Windows (PerfMon) / Linux (perf_events)
  * Concept: Deep hardware execution telemetry.
  *          Maps hardware performance counters (L1 cache misses, 

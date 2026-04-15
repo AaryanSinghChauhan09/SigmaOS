@@ -1,6 +1,6 @@
-/*
+﻿/*
  * =========================================================================
- * Σ SIGMAOS ZENITH: SOVEREIGN VECTOR SHARD (v51.8-SUPREME-ZENITH)
+ * S SIGMAOS ZENITH: SOVEREIGN VECTOR SHARD (v51.8-SUPREME-ZENITH)
  * =========================================================================
  * Mission: Zero-asset resolution-independent vector UI rendering.
  * Principles: Frontend, User Interface, User Experience, Performance.

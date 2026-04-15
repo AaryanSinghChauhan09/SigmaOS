@@ -1,6 +1,6 @@
-/*
+﻿/*
  * =========================================================================
- * Σ SIGMAOS: SOVEREIGN MACRO VM (v1.0 - PURE C11)
+ * S SIGMAOS: SOVEREIGN MACRO VM (v1.0 - PURE C11)
  * =========================================================================
  * Mission: Absorb Excel VBA Parity via Ring-0 Virtual Machine.
  * Design: C11 / Zero-Dependency / Hardware-JIT Integration.

@@ -1,6 +1,6 @@
-/*
+﻿/*
  * =========================================================================
- * Σ SIGMAOS ZENITH: SOVEREIGN PSO OPTIMIZER (v51.7-ULTIMATE-ORACLE)
+ * S SIGMAOS ZENITH: SOVEREIGN PSO OPTIMIZER (v51.7-ULTIMATE-ORACLE)
  * =========================================================================
  * Mission: Swarm-intelligence based multi-variable kernel tuning.
  * Principles: AI, Algorithms, Data Science, Automations.

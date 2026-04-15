@@ -1,6 +1,6 @@
-/*
+﻿/*
  * =========================================================================
- * Σ SIGMAOS ZENITH: SOVEREIGN LEXER ENGINE (v1.0)
+ * S SIGMAOS ZENITH: SOVEREIGN LEXER ENGINE (v1.0)
  * =========================================================================
  * Mission: Tokenization of UDF expressions for the Bytecode VM.
  * Principles: Finite State Automata (FSA), Lexical Analysis.

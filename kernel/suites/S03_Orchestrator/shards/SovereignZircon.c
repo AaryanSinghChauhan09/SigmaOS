@@ -1,7 +1,7 @@
-#include "sigma_kernel.h"
+﻿#include "sigma_kernel.h"
 
 void SovereignZircon_Init() {
-    sigma_printf("Σ [ABSORB]: SovereignZircon Integration Complete. Global USP Parity Secured.
+    sigma_printf("S [ABSORB]: SovereignZircon Integration Complete. Global USP Parity Secured.
 ");
 }
 

@@ -1,6 +1,6 @@
-/*
+﻿/*
  * =========================================================================
- * Σ SIGMAOS: SOVEREIGN MEMORY UNIT TEST (v2.0 - HOST-SIDE CI)
+ * S SIGMAOS: SOVEREIGN MEMORY UNIT TEST (v2.0 - HOST-SIDE CI)
  * =========================================================================
  * Compiles natively on Linux host (no cross-compiler required).
  * Validates: slab logic, memory primitives, ring buffer, hash functions.
@@ -209,7 +209,7 @@ static void test_stack_canary(void) {
  * ========================================================================= */
 int main(void) {
     sigma_printf("========================================================\n");
-    sigma_printf("  Σ SIGMAOS: SOVEREIGN MEMORY TEST SUITE (v2.0)\n");
+    sigma_printf("  S SIGMAOS: SOVEREIGN MEMORY TEST SUITE (v2.0)\n");
     sigma_printf("  Protocol: Zero-Dependency Verification\n");
     sigma_printf("========================================================\n");
 

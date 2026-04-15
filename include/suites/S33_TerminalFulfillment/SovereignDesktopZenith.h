@@ -1,9 +1,9 @@
-#ifndef SOVEREIGN_DESKTOP_ZENITH_H
+﻿#ifndef SOVEREIGN_DESKTOP_ZENITH_H
 #define SOVEREIGN_DESKTOP_ZENITH_H
 
 #include "SigmaOOP.h"
 
-/* Σ Territory Initiation */
+/* S Territory Initiation */
 
 // --- SOVEREIGN WORKSPACE & WINDOWS ---
 CLASS_DECLARE(SovereignWindow) { 
@@ -26,6 +26,6 @@ CLASS_DECLARE(SovereignZenithDesktop) {
     VIRTUAL(void, RenderDesktop, struct SovereignZenithDesktop* self); // Native DOM Rasterization
 };
 
-/* Σ Territory Termination */
+/* S Territory Termination */
 
 #endif

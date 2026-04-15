@@ -1,6 +1,6 @@
-/*
+﻿/*
  * =========================================================================
- * Σ SIGMAOS ZENITH: SOVEREIGN EVENT BUS (v51.0-ZENITH-SUPREME)
+ * S SIGMAOS ZENITH: SOVEREIGN EVENT BUS (v51.0-ZENITH-SUPREME)
  * =========================================================================
  * Mission: High-velocity inter-shard pub/sub communication.
  * Principles: Backend, IPC, Distributed, Multi-Processing.

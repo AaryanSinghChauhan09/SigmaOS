@@ -1,6 +1,6 @@
-/*
+﻿/*
  * =========================================================================
- * Σ SIGMAOS: SOVEREIGN CLI CYBER SUITE (v2.0 - INDUSTRIAL)
+ * S SIGMAOS: SOVEREIGN CLI CYBER SUITE (v2.0 - INDUSTRIAL)
  * =========================================================================
  */
 
@@ -11,24 +11,24 @@ void cmd_sigma_whoami(int argc, char** argv) {
 }
 
 void cmd_sigma_nmap(int argc, char** argv) {
-    sigma_printf("Σ [NMAP]: Scanning local Sovereign mesh...\n");
+    sigma_printf("S [NMAP]: Scanning local Sovereign mesh...\n");
     sigma_printf("  - 127.0.0.1:8080 (Zenith Dashboard) [OPEN]\n");
     sigma_printf("  - 127.0.0.1:22   (Secure Shell)     [OPEN]\n");
 }
 
 void cmd_sigma_iptables(int argc, char** argv) {
-    sigma_printf("Σ [FIREWALL]: Active Sovereign Security Rules:\n");
+    sigma_printf("S [FIREWALL]: Active Sovereign Security Rules:\n");
     sigma_printf("  - [ALLOW] 8080/tcp (local)\n");
     sigma_printf("  - [DENY]  ANY/ANY (foreign)\n");
 }
 
 void cmd_sigma_vault(int argc, char** argv) {
-    sigma_printf("Σ [VAULT]: Sealed Identity Matrices:\n");
+    sigma_printf("S [VAULT]: Sealed Identity Matrices:\n");
     sigma_printf("  [✓] MASTER_KEY_0: Seated\n");
 }
 
 void cmd_sigma_defender(int argc, char** argv) {
-    sigma_printf("Σ [DEFENDER]: Running Real-time Shard Scan...\n");
+    sigma_printf("S [DEFENDER]: Running Real-time Shard Scan...\n");
     sigma_printf("  [✓] 425/425 Shards Integrity Verified.\n");
 }
 

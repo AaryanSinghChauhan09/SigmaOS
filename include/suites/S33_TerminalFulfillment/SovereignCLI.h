@@ -1,6 +1,6 @@
-/*
+﻿/*
  * =========================================================================
- * Σ SIGMAOS: SOVEREIGN UNIFIED CLI DISPATCHER (v1.0 — PURE C11)
+ * S SIGMAOS: SOVEREIGN UNIFIED CLI DISPATCHER (v1.0 — PURE C11)
  * =========================================================================
  * Mission: Single-entry-point CLI dispatcher for all sigma-* commands.
  *

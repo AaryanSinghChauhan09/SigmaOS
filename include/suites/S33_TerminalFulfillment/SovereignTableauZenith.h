@@ -1,9 +1,9 @@
-#ifndef SOVEREIGN_TABLEAU_ZENITH_H
+﻿#ifndef SOVEREIGN_TABLEAU_ZENITH_H
 #define SOVEREIGN_TABLEAU_ZENITH_H
 
 #include "SigmaOOP.h"
 
-/* Σ Territory Initiation */
+/* S Territory Initiation */
 
 // --- VIZQL RENDERING ENGINE (VISUAL QUERY LANGUAGE) ---
 CLASS_DECLARE(SovereignVizQLEngine) { 
@@ -23,6 +23,6 @@ CLASS_DECLARE(SovereignDataBlendMaster) {
     VIRTUAL(void, BlendSecondaryStream, struct SovereignDataBlendMaster* self, const char* secondarySource, const char* linkKey);
 };
 
-/* Σ Territory Termination */
+/* S Territory Termination */
 
 #endif

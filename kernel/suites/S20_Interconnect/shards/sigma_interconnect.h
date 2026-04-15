@@ -1,6 +1,6 @@
-/*
+﻿/*
  * =========================================================================
- * Σ SIGMAOS: SOVEREIGN INTERCONNECT (Suite S20)
+ * S SIGMAOS: SOVEREIGN INTERCONNECT (Suite S20)
  * =========================================================================
  * Shard: Sovereign Interconnect Core
  * Parity: Linux PCI Core / macOS IOKit Plane / CXL 3.0

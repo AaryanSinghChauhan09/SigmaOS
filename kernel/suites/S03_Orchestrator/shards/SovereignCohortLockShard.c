@@ -1,6 +1,6 @@
-/*
+﻿/*
  * =========================================================================
- * Σ SIGMAOS ZENITH: SOVEREIGN COHORT-LOCK SHARD (v55.4-SUPREME-ORION-NEBULA)
+ * S SIGMAOS ZENITH: SOVEREIGN COHORT-LOCK SHARD (v55.4-SUPREME-ORION-NEBULA)
  * =========================================================================
  * Mission: Serializing access to SIMD/Vector units to prevent thrashing.
  * Principles: Multi-Processing, SIMD, Performance, Computer Science.

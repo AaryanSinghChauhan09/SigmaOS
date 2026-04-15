@@ -1,6 +1,6 @@
-/*
+﻿/*
  * =========================================================================
- * Σ SIGMAOS: SOVEREIGN SERVICE CONTROL SUITE (v2.0 - SUPREME UPGRADE)
+ * S SIGMAOS: SOVEREIGN SERVICE CONTROL SUITE (v2.0 - SUPREME UPGRADE)
  * =========================================================================
  * Mission: Lattice Dependency Resolution and Unit Management.
  * =========================================================================
@@ -25,10 +25,10 @@ void sigma_service_start(const char* name) {
 }
 
 void SovereignServiceControl_Init(void) {
-    sigma_printf("Σ [SERVICE]: Initialising Sovereign Lattice...\n");
+    sigma_printf("S [SERVICE]: Initialising Sovereign Lattice...\n");
     sigma_service_start("network-stack");
     sigma_service_start("secure-shell");
-    sigma_printf("Σ [SERVICE]: All critical units initialized.\n");
+    sigma_printf("S [SERVICE]: All critical units initialized.\n");
 }
 
 void SovereignServiceControl_Register(void) {

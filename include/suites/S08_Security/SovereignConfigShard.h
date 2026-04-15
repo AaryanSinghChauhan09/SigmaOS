@@ -1,5 +1,5 @@
-/* =========================================================================
- * Σ SIGMAOS: SOVEREIGN CONFIG SHARD HEADER
+﻿/* =========================================================================
+ * S SIGMAOS: SOVEREIGN CONFIG SHARD HEADER
  * ========================================================================= */
 #ifndef SOVEREIGN_CONFIG_SHARD_H
 #define SOVEREIGN_CONFIG_SHARD_H

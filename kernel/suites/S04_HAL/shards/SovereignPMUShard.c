@@ -1,6 +1,6 @@
-/*
+﻿/*
  * =========================================================================
- * Σ SIGMAOS ZENITH: SOVEREIGN PMU SHARD (v52.0-SUPREME-GALAXY)
+ * S SIGMAOS ZENITH: SOVEREIGN PMU SHARD (v52.0-SUPREME-GALAXY)
  * =========================================================================
  * Mission: Real-time hardware performance monitoring (IPC, Cache-hits).
  * Principles: Computer Science, Performance, Real-Time.

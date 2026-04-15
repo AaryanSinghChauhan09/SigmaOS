@@ -1,10 +1,10 @@
-#include "sigma_base.h"
+﻿#include "sigma_base.h"
 
 #include <sigma_types.h>
 #include "sigma_print.h"
 
 /*
- * Σ Sovereign ACO Shader Compiler Logic
+ * S Sovereign ACO Shader Compiler Logic
  * USP: Nobara / PikaOS (Extreme Gaming Shading)
  * Concept: Pre-loads and intercepts Vulkan/Proton graphical execution vectors.
  *          Implements mathematical ACO-style shader compilation hooks directly

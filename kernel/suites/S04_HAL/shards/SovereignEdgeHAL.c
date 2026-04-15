@@ -1,4 +1,4 @@
-#include "sigma_base.h"
+﻿#include "sigma_base.h"
 
 #include "SovereignArch.h"
 #include "sigma_libc.h"
@@ -10,9 +10,9 @@
  */
 
 sigma_err_t sigma_hal_edge_init(void) {
-    sigma_printf("  Σ [HAL-EDGE]: Sovereign Edge Hardware Abstraction active.\n");
-    sigma_printf("  Σ [HAL-EDGE]: Low-power sleep states: OPTIMIZED.\n");
-    sigma_printf("  Σ [HAL-EDGE]: Deterministic interrupt vectoring: SEATED.\n");
+    sigma_printf("  S [HAL-EDGE]: Sovereign Edge Hardware Abstraction active.\n");
+    sigma_printf("  S [HAL-EDGE]: Low-power sleep states: OPTIMIZED.\n");
+    sigma_printf("  S [HAL-EDGE]: Deterministic interrupt vectoring: SEATED.\n");
     return SIGMA_OK;
 }
 

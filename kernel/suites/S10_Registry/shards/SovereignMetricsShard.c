@@ -1,6 +1,6 @@
-/*
+﻿/*
  * =========================================================================
- * Σ SIGMAOS ZENITH: SOVEREIGN METRICS ENGINE (v1.0)
+ * S SIGMAOS ZENITH: SOVEREIGN METRICS ENGINE (v1.0)
  * =========================================================================
  * Mission: High-precision real-time system telemetry.
  * Principles: Counters, Gauges, Exponential Decay Histograms.

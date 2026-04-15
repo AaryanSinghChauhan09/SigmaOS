@@ -1,6 +1,6 @@
-/*
+﻿/*
  * =========================================================================
- * Σ SIGMAOS ZENITH: SOVEREIGN RCU SHARD (v52.6-SUPREME-ASGARD)
+ * S SIGMAOS ZENITH: SOVEREIGN RCU SHARD (v52.6-SUPREME-ASGARD)
  * =========================================================================
  * Mission: Lock-free read access via Read-Copy-Update (RCU).
  * Principles: Multi-Processing, Computer Science, Throughput, Performance.

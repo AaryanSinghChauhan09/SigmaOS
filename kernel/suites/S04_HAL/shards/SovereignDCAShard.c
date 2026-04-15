@@ -1,6 +1,6 @@
-/*
+﻿/*
  * =========================================================================
- * Σ SIGMAOS VALKYRIE: SOVEREIGN DCA SHARD (v57.7-SUPREME-VALKYRIE)
+ * S SIGMAOS VALKYRIE: SOVEREIGN DCA SHARD (v57.7-SUPREME-VALKYRIE)
  * =========================================================================
  * Mission: Network packet interception directly into CPU L3 Cache.
  * Principles: Performance, Hardware Mastery, Network.

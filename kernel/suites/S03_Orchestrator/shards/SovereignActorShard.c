@@ -1,6 +1,6 @@
-/*
+﻿/*
  * =========================================================================
- * Σ SIGMAOS ZENITH: SOVEREIGN ACTOR SHARD (v51.9-DIVINE-SINGULARITY)
+ * S SIGMAOS ZENITH: SOVEREIGN ACTOR SHARD (v51.9-DIVINE-SINGULARITY)
  * =========================================================================
  * Mission: Isolated, message-passing concurrency for distributed shards.
  * Principles: Multi-Processing, Distributed, Object Oriented (Actor), Safety.

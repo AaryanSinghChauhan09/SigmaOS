@@ -1,6 +1,6 @@
-/*
+﻿/*
  * =========================================================================
- * Σ SIGMAOS: S22_SIMULATIONNEXUS — SovereignPhysicsEngine.c
+ * S SIGMAOS: S22_SIMULATIONNEXUS — SovereignPhysicsEngine.c
  * =========================================================================
  * Mission: High-Fidelity Reality Simulation.
  * Capability: Rigid body dynamics, Collision detection, Entropy math.
@@ -21,5 +21,5 @@ void sigma_physics_apply_gravity(sigma_rigid_body_t* body, sigma_f32 dt) {
 }
 
 void sigma_physics_init(void) {
-    sigma_printf("Σ [PHYSICS]: High-Fidelity Simulation Engine (S22) active.\n");
+    sigma_printf("S [PHYSICS]: High-Fidelity Simulation Engine (S22) active.\n");
 }

@@ -1,7 +1,7 @@
-#include "sigma_kernel.h"
+﻿#include "sigma_kernel.h"
 
 void SovereignAmnesia_Init() {
-    sigma_printf("Σ [OPERATION]: SovereignAmnesia Integration Complete. Phase 12 Pure Parity Online.
+    sigma_printf("S [OPERATION]: SovereignAmnesia Integration Complete. Phase 12 Pure Parity Online.
 ");
 }
 

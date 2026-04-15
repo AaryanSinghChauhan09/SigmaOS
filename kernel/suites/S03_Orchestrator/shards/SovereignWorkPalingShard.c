@@ -1,6 +1,6 @@
-/*
+﻿/*
  * =========================================================================
- * Σ SIGMAOS ZENITH: SOVEREIGN WORK-PALING SHARD (v53.5-SUPREME-QUASAR)
+ * S SIGMAOS ZENITH: SOVEREIGN WORK-PALING SHARD (v53.5-SUPREME-QUASAR)
  * =========================================================================
  * Mission: Distributed work-stealing for the global sovereign mesh.
  * Principles: Multi-Processing, Computer Science, Distributed, Throughput.

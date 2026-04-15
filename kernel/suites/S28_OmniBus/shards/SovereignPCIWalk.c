@@ -1,6 +1,6 @@
-/*
+﻿/*
  * =========================================================================
- * Σ SIGMAOS: S28_OMNIBUS — SovereignPCIWalk.c
+ * S SIGMAOS: S28_OMNIBUS — SovereignPCIWalk.c
  * =========================================================================
  * Implementation of Idea 196 (Apex Infinity): PCI Configuration Walkthrough.
  * Provides the industrial-grade discovery mechanism for all PCIe devices.
@@ -39,12 +39,12 @@ uint32_t pci_config_read(uint8_t bus, uint8_t slot, uint8_t func, uint8_t offset
 }
 
 void pci_walk_lattice(void) {
-    sigma_printf("Σ [S28]: Scanning Sovereign PCI Lattice...\n");
+    sigma_printf("S [S28]: Scanning Sovereign PCI Lattice...\n");
     for (uint16_t bus = 0; bus < 256; bus++) {
         for (uint8_t slot = 0; slot < 32; slot++) {
             uint32_t vendor = pci_config_read((uint8_t)bus, slot, 0, 0);
             if ((vendor & 0xFFFF) != 0xFFFF) {
-                sigma_printf("Σ [PCI]: %02X:%02X.0 -> [VENDOR: %04X] [DEVICE: %04X]\n", 
+                sigma_printf("S [PCI]: %02X:%02X.0 -> [VENDOR: %04X] [DEVICE: %04X]\n", 
                              bus, slot, vendor & 0xFFFF, vendor >> 16);
             }
         }

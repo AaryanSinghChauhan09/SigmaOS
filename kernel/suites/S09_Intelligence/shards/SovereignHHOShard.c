@@ -1,6 +1,6 @@
-/*
+﻿/*
  * =========================================================================
- * Σ SIGMAOS ABSOLUTE_TRANSCENDENCE: SOVEREIGN HHO SHARD (v59.0-ABSOLUTE)
+ * S SIGMAOS ABSOLUTE_TRANSCENDENCE: SOVEREIGN HHO SHARD (v59.0-ABSOLUTE)
  * =========================================================================
  * Mission: Tactical cooperative exhaustion and coordinated surprise pouncing.
  * Principles: AI, Algorithms, Data Science.

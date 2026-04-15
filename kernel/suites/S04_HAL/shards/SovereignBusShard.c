@@ -1,6 +1,6 @@
-/*
+﻿/*
  * =========================================================================
- * Σ SIGMAOS ZENITH: SOVEREIGN BUS DISCOVERY (v50.0-SINGULARITY)
+ * S SIGMAOS ZENITH: SOVEREIGN BUS DISCOVERY (v50.0-SINGULARITY)
  * =========================================================================
  * Mission: Automatic hardware discovery and enumeration of peripheral buses.
  * Principles: PCI Configuration Space, WebUSB/WebHID Bridge, Bus Topology.

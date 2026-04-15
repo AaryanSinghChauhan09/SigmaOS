@@ -1,6 +1,6 @@
-/*
+﻿/*
  * =========================================================================
- * Σ SIGMAOS ZENITH: SOVEREIGN WF-RING SHARD (v53.4-SUPREME-SUPERNOVA)
+ * S SIGMAOS ZENITH: SOVEREIGN WF-RING SHARD (v53.4-SUPREME-SUPERNOVA)
  * =========================================================================
  * Mission: Ultra-low latency shard communication via wait-free queues.
  * Principles: Multi-Processing, Computer Science, Throughput, Scalability.

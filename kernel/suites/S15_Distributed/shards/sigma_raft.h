@@ -1,6 +1,6 @@
-/*
+﻿/*
  * =========================================================================
- * Σ SIGMAOS kernel/suites/S15_Distributed/shards/sigma_raft.h
+ * S SIGMAOS kernel/suites/S15_Distributed/shards/sigma_raft.h
  * =========================================================================
  * Sovereign Distributed Consensus — gap-closes:
  *   etcd    : Raft consensus, leader election, log replication

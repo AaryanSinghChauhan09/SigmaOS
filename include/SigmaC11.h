@@ -1,6 +1,6 @@
-/*
+﻿/*
  * =========================================================================
- * Σ SIGMAOS: SIGMA C11 FOUNDATION (v20.0 - PURE C11 REPLACEMENT)
+ * S SIGMAOS: SIGMA C11 FOUNDATION (v20.0 - PURE C11 REPLACEMENT)
  * =========================================================================
  * Replaces SigmaOOP.hpp — all C++ OOP constructs eliminated.
  * Provides: core types, sigma_status, sigma_log, fundamental macros.

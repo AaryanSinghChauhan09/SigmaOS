@@ -1,6 +1,6 @@
-/*
+﻿/*
  * =========================================================================
- * Σ SIGMAOS: S13_SENTIENCE — SovereignSelfHealer.c
+ * S SIGMAOS: S13_SENTIENCE — SovereignSelfHealer.c
  * =========================================================================
  * Implementation of Idea 61.10 (Apex Infinity): Self-Healing Kernel.
  * Real-time integrity verification and restoration of critical kernel pages.
@@ -20,14 +20,14 @@ static SovereignKernelShard g_protected_lattice[128];
 static uint32_t g_shard_count = 0;
 
 void self_healer_init(void) {
-    sigma_printf("Σ [S13]: Sovereign Self-Healing Kernel Materialized (Apex Idea 61.10).\n");
+    sigma_printf("S [S13]: Sovereign Self-Healing Kernel Materialized (Apex Idea 61.10).\n");
 }
 
 void self_healer_audit(void) {
-    sigma_printf("Σ [S13]: Auditing kernel data structures for corruption...\n");
+    sigma_printf("S [S13]: Auditing kernel data structures for corruption...\n");
     // Comparison against expected_hash and auto-repair logic goes here
 }
 
 void self_healer_repair(uintptr_t addr) {
-    sigma_printf("Σ [REPAIR]: Restoring integrity at 0x%p via Sentience Lattice.\n", (void*)addr);
+    sigma_printf("S [REPAIR]: Restoring integrity at 0x%p via Sentience Lattice.\n", (void*)addr);
 }

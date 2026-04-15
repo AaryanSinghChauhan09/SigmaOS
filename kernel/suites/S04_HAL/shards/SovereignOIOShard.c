@@ -1,6 +1,6 @@
-/*
+﻿/*
  * =========================================================================
- * Σ SIGMAOS OMEGA_POINT: SOVEREIGN OIO SHARD (v62.0-OMEGA)
+ * S SIGMAOS OMEGA_POINT: SOVEREIGN OIO SHARD (v62.0-OMEGA)
  * =========================================================================
  * Mission: Substrate-level Silicon Photonics eliminating all Copper boundaries.
  * Principles: Performance, Hardware Mastery, Supercomputing.

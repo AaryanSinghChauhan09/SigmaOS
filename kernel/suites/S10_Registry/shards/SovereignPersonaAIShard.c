@@ -1,6 +1,6 @@
-/*
+﻿/*
  * =========================================================================
- * Σ SIGMAOS ZENITH: SOVEREIGN PERSONA AI SHARD (v50.6-INFINITY-VOID)
+ * S SIGMAOS ZENITH: SOVEREIGN PERSONA AI SHARD (v50.6-INFINITY-VOID)
  * =========================================================================
  * Mission: Adaptive OS behavior via pattern learning and neural personas.
  * Principles: Personalization, AI, Automation, Customization.

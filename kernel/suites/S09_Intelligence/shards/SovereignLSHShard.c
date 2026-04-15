@@ -1,6 +1,6 @@
-/*
+﻿/*
  * =========================================================================
- * Σ SIGMAOS DIVINE_OMNIPRESENCE: SOVEREIGN LSH SHARD (v61.1-DIVINE)
+ * S SIGMAOS DIVINE_OMNIPRESENCE: SOVEREIGN LSH SHARD (v61.1-DIVINE)
  * =========================================================================
  * Mission: High-dimensional AI Nearest-Neighbor approximation crushing.
  * Principles: AI, Algorithms, Data Science.

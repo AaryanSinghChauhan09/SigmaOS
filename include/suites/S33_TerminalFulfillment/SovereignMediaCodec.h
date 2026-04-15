@@ -1,6 +1,6 @@
-/*
+﻿/*
  * =========================================================================
- * Σ SIGMAOS: SOVEREIGN MEDIA CODEC ENGINE (v1.0 — PURE C11)
+ * S SIGMAOS: SOVEREIGN MEDIA CODEC ENGINE (v1.0 — PURE C11)
  * =========================================================================
  * Absorbed USPs from: VLC media player (libvlc / libvlccore)
  *   https://github.com/videolan/vlc

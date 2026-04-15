@@ -1,6 +1,6 @@
-/*
+﻿/*
  * =========================================================================
- * Σ SIGMAOS userland/init/sigma_service_table.c
+ * S SIGMAOS userland/init/sigma_service_table.c
  * =========================================================================
  * Canonical service table — defines ALL built-in sigma services.
  * Gap-closes: /etc/rc.local, systemd default.target, launchd plists,

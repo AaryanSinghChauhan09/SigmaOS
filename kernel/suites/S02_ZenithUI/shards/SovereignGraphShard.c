@@ -1,6 +1,6 @@
-/*
+﻿/*
  * =========================================================================
- * Σ SIGMAOS ZENITH: SOVEREIGN GRAPH ENGINE (v1.0)
+ * S SIGMAOS ZENITH: SOVEREIGN GRAPH ENGINE (v1.0)
  * =========================================================================
  * Mission: High-performance Routing and Graph Theory in the Kernel.
  * Principles: Dijkstra's Algorithm, Adjacency List, Path Optimization.

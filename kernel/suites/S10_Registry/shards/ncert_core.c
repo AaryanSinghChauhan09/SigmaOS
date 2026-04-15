@@ -1,9 +1,9 @@
-#include "sigma_base.h"
+﻿#include "sigma_base.h"
 
 #include "SovereignToolHeader.h"
 
 /*
- * Σ SIGMAOS: SOVEREIGN NCERT & EDUCATION SHARD (v1.0)
+ * S SIGMAOS: SOVEREIGN NCERT & EDUCATION SHARD (v1.0)
  * Crushes Byjus, Unacademy, and generic school portals.
  * How? By mapping the entire NCERT syllabus into the OS's native DMA. 
  * Students do not log into a website. The OS *is* the syllabus.

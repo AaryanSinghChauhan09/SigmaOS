@@ -1,6 +1,6 @@
-/*
+﻿/*
  * =========================================================================
- * Σ SIGMAOS ZENITH: SOVEREIGN CUCKOO SHARD (v52.6-SUPREME-ASGARD)
+ * S SIGMAOS ZENITH: SOVEREIGN CUCKOO SHARD (v52.6-SUPREME-ASGARD)
  * =========================================================================
  * Mission: Lévy-flight based metaheuristic for global mesh optimization.
  * Principles: AI, Algorithms, Data Science, Distributed.

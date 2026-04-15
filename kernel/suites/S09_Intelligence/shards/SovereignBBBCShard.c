@@ -1,6 +1,6 @@
-/*
+﻿/*
  * =========================================================================
- * Σ SIGMAOS ZENITH: SOVEREIGN BBBC SHARD (v53.4-SUPREME-SUPERNOVA)
+ * S SIGMAOS ZENITH: SOVEREIGN BBBC SHARD (v53.4-SUPREME-SUPERNOVA)
  * =========================================================================
  * Mission: High-speed convergence in unstructured parameter search.
  * Principles: AI, Algorithms, Data Science, Throughput.

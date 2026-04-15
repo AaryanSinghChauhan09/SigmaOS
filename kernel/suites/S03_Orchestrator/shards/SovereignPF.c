@@ -1,6 +1,6 @@
-#include "sigma_kernel.h"
+﻿#include "sigma_kernel.h"
 
-// Σ SovereignPF: Packet Filter Zenith
+// S SovereignPF: Packet Filter Zenith
 // Inspired by FreeBSD PF (Packet Filter): Stateful Firewall & NAT Engine
 
 typedef enum {
@@ -25,19 +25,19 @@ typedef struct {
 } SovereignPF_Rule;
 
 void SovereignPF_Init() {
-    sigma_printf("Σ [ABSORB]: SovereignPF Aether Barrier Online. Packet Filter Engaged.
+    sigma_printf("S [ABSORB]: SovereignPF Aether Barrier Online. Packet Filter Engaged.
 ");
 }
 
 void SovereignPF_AddRule(SovereignPF_Rule rule) {
-    sigma_printf("Σ [RULE]: Adding %s [%u] Source: %u Dst: %u Proto: %u
+    sigma_printf("S [RULE]: Adding %s [%u] Source: %u Dst: %u Proto: %u
 ", 
                 rule.action == PF_PASS ? "PASS" : "BLOCK", rule.keep_state, 
                 rule.src_ip, rule.dst_ip, rule.proto);
 }
 
 void SovereignPF_FlushRules() {
-    sigma_printf("Σ [PF]: Ruleset Flushed. System Open.
+    sigma_printf("S [PF]: Ruleset Flushed. System Open.
 ");
 }
 
@@ -47,7 +47,7 @@ SovereignPF_Action SovereignPF_Inspect(sigma_u8 *packet, sigma_u32 len) {
 }
 
 void SovereignPF_NAT_Enable(const char* ext_if, const char* int_net) {
-    sigma_printf("Σ [NAT]: Internal Network %s now NATing through %s.
+    sigma_printf("S [NAT]: Internal Network %s now NATing through %s.
 ", int_net, ext_if);
 }
 

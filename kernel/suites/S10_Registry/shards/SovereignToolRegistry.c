@@ -1,4 +1,4 @@
-#include "sigma_base.h"
+﻿#include "sigma_base.h"
 
 #include "SovereignTool.h"
 #include "sigma_libc.h"
@@ -8,7 +8,7 @@ static sovereign_tool_registry_t g_tool_registry;
 
 void SovereignTool_InitRegistry(void) {
     sigma_memset(&g_tool_registry, 0, sizeof(sovereign_tool_registry_t));
-    sigma_printf("Σ [TOOL]: Sovereign Tool Registry Online.\n");
+    sigma_printf("S [TOOL]: Sovereign Tool Registry Online.\n");
 }
 
 sigma_err_t SovereignTool_Register(const char* name, const char* replacement, sigma_tool_absorb_fn absorb) {
@@ -27,7 +27,7 @@ void SovereignTool_Absorb(const char* name) {
     
     for (sigma_u32 i = 0; i < g_tool_registry.tool_count; i++) {
         if (all || sigma_streq(g_tool_registry.tools[i].name, name)) {
-            sigma_printf("Σ [ABSORB]: Neutralizing and absorbing Tool: %s\n", g_tool_registry.tools[i].name);
+            sigma_printf("S [ABSORB]: Neutralizing and absorbing Tool: %s\n", g_tool_registry.tools[i].name);
             if (g_tool_registry.tools[i].absorb) {
                 g_tool_registry.tools[i].absorb();
             }
@@ -38,7 +38,7 @@ void SovereignTool_Absorb(const char* name) {
 }
 
 void SovereignTool_ListAll(void) {
-    sigma_printf("\nΣ SIGMAOS: GLOBAL TOOL ABSORPTION CATALOG\n");
+    sigma_printf("\nS SIGMAOS: GLOBAL TOOL ABSORPTION CATALOG\n");
     sigma_printf("--------------------------------------------------------------------------------\n");
     sigma_printf("%-16s | %-40s\n", "Tool", "SigmaOS Replacement Shard");
     sigma_printf("--------------------------------------------------------------------------------\n");

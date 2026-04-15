@@ -1,6 +1,6 @@
-/*
+﻿/*
  * =========================================================================
- * Σ SIGMAOS: SOVEREIGN BACKEND SUITE (v2.5 - SENTINEL EDITION)
+ * S SIGMAOS: SOVEREIGN BACKEND SUITE (v2.5 - SENTINEL EDITION)
  * =========================================================================
  * Mission: Real Logical Volume Snapshotting and Advanced VFS.
  * =========================================================================
@@ -23,9 +23,9 @@ void sigma_lvm_snapshot(void) {
 }
 
 void SovereignBackend_Init(void) {
-    sigma_printf("Σ [BACKEND-SUITE]: Initialising Filesystems and LVM-Sentinel...\n");
+    sigma_printf("S [BACKEND-SUITE]: Initialising Filesystems and LVM-Sentinel...\n");
     sigma_lvm_snapshot();
-    sigma_printf("Σ [BACKEND-SUITE]: Logical Volume [SIGMA_ROOT_ZENITH] is now IMMUTABLE.\n");
+    sigma_printf("S [BACKEND-SUITE]: Logical Volume [SIGMA_ROOT_ZENITH] is now IMMUTABLE.\n");
 }
 
 void SovereignBackend_Register(void) {

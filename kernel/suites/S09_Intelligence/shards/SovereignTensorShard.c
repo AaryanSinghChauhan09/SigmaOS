@@ -1,6 +1,6 @@
-/*
+﻿/*
  * =========================================================================
- * Σ SIGMAOS ZENITH: SOVEREIGN TENSOR SHARD (v50.3-ULTRON)
+ * S SIGMAOS ZENITH: SOVEREIGN TENSOR SHARD (v50.3-ULTRON)
  * =========================================================================
  * Mission: Zero-dependency Neural Graph & Gradient Descent Engine.
  * Principles: AI, Machine Learning, Data Science, Math-Purity.

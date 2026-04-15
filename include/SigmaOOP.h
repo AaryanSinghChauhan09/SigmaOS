@@ -1,6 +1,6 @@
-/*
+﻿/*
  * =========================================================================
- * Σ SIGMAOS: SOVEREIGN OOP FRAMEWORK (v20.0 - C11 ZENITH)
+ * S SIGMAOS: SOVEREIGN OOP FRAMEWORK (v20.0 - C11 ZENITH)
  * =========================================================================
  * Mission: Provide pure-C object-oriented primitives for Sovereign Shards.
  * Principle: Zero-latency. Zero-vtable overhead. Absolute Sovereignty.

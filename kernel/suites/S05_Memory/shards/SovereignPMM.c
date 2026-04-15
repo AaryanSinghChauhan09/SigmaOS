@@ -1,6 +1,6 @@
-/*
+﻿/*
  * =========================================================================
- * Σ SIGMAOS: S05_MEMORY — SovereignPMM.c
+ * S SIGMAOS: S05_MEMORY — SovereignPMM.c
  * =========================================================================
  * Implementation of Idea 41 (Apex Infinity): Bitmap Physical Memory Manager.
  * Zero external libraries. Direct page-frame management.
@@ -25,7 +25,7 @@ void pmm_init(uint64_t mem_size) {
         g_memory_bitmap[i / 8] &= ~(1 << (i % 8));
     }
     
-    sigma_printf("Σ [S05]: Bitmap PMM Materialized. Coverage: %u Pages (%llu MB).\n", 
+    sigma_printf("S [S05]: Bitmap PMM Materialized. Coverage: %u Pages (%llu MB).\n", 
                  total_pages, mem_size / 1024 / 1024);
 }
 

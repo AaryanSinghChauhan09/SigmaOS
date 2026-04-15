@@ -1,9 +1,9 @@
-#include "sigma_base.h"
+﻿#include "sigma_base.h"
 
 #include "SovereignToolHeader.h"
 
 /*
- * Σ SIGMAOS: SOVEREIGN REMOTE BOT (v1.0)
+ * S SIGMAOS: SOVEREIGN REMOTE BOT (v1.0)
  * USP: Absorb Matheus-Souza-Rozendo/bot_comando_remoto.
  * Shard: Industrial Control & Remote Mission Execution.
  */

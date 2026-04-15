@@ -1,7 +1,7 @@
-#include "sigma_kernel.h"
+﻿#include "sigma_kernel.h"
 
 void SovereignBtrfs_Init() {
-    sigma_printf("Σ [OPERATION]: SovereignBtrfs Integration Complete. Phase 14 Pure Parity Online.
+    sigma_printf("S [OPERATION]: SovereignBtrfs Integration Complete. Phase 14 Pure Parity Online.
 ");
 }
 

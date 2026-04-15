@@ -1,4 +1,4 @@
-#include "sigma_base.h"
+﻿#include "sigma_base.h"
 
 #include "SovereignCommand.h"
 #include "sigma_libc.h"
@@ -11,7 +11,7 @@ static sigma_u32 g_cmd_count = 0;
 void SovereignCommand_InitRegistry(void) {
     sigma_memset(g_cmd_shards, 0, sizeof(g_cmd_shards));
     g_cmd_count = 0;
-    sigma_printf("Σ [CMD]: Sovereign Command Registry Operational.\n");
+    sigma_printf("S [CMD]: Sovereign Command Registry Operational.\n");
 }
 
 sigma_err_t SovereignCommand_Register(const char* name, const char* desc, sigma_cmd_exec_fn exec) {
@@ -22,7 +22,7 @@ sigma_err_t SovereignCommand_Register(const char* name, const char* desc, sigma_
     sigma_strncpy(s->description, desc, 64);
     s->execute = exec;
     
-    sigma_printf("Σ [CMD]: Registered Command Shard '%s' (%s)\n", name, desc);
+    sigma_printf("S [CMD]: Registered Command Shard '%s' (%s)\n", name, desc);
     return SIGMA_OK;
 }
 
@@ -32,7 +32,7 @@ sigma_err_t SovereignCommand_Dispatch(const char* name, int argc, char** argv) {
             return g_cmd_shards[i].execute(argc, argv);
         }
     }
-    sigma_printf("Σ [CMD/ERR]: Command '%s' not found.\n", name);
+    sigma_printf("S [CMD/ERR]: Command '%s' not found.\n", name);
     return SIGMA_ENOENT;
 }
 

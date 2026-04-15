@@ -1,5 +1,5 @@
-/**
- * Σ SIGMAOS ZENITH : SovereignHyprlandZenith.h
+﻿/**
+ * S SIGMAOS ZENITH : SovereignHyprlandZenith.h
  * 
  * NATIVE TILING COMPOSITOR SHARD (BARE METAL HYPRLAND EQUIVALENT)
  * Replicates the dynamic tiling, animations, and fractional scaling of Hyprland (Wayland)

@@ -1,4 +1,4 @@
-# Σ Sovereign Code Contribution (Pull Request)
+﻿# S Sovereign Code Contribution (Pull Request)
 
 ## 👑 Sovereignty Check
 Before submitting your PR, please verify the following conditions are met to ensure Zenith-level codebase purity:

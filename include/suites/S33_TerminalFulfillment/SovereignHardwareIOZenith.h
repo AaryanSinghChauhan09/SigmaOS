@@ -1,9 +1,9 @@
-#ifndef SOVEREIGN_HARDWARE_IO_ZENITH_H
+﻿#ifndef SOVEREIGN_HARDWARE_IO_ZENITH_H
 #define SOVEREIGN_HARDWARE_IO_ZENITH_H
 
 #include "SigmaOOP.h"
 
-/* Σ Territory Initiation */
+/* S Territory Initiation */
 
 // --- INTERRUPT & TRAP ARCHITECTURE ---
 struct InterruptVector {
@@ -43,6 +43,6 @@ CLASS_DECLARE(SovereignCharDevice) {
     SovereignIODevice_t core;
 };
 
-/* Σ Territory Termination */
+/* S Territory Termination */
 
 #endif

@@ -1,6 +1,6 @@
-/*
+﻿/*
  * =========================================================================
- * Σ SIGMAOS ZENITH: SOVEREIGN NEURAL PREDICTOR (v51.6-SUPREME-SINGULARITY)
+ * S SIGMAOS ZENITH: SOVEREIGN NEURAL PREDICTOR (v51.6-SUPREME-SINGULARITY)
  * =========================================================================
  * Mission: CPU and I/O spike prediction via recurrent neural models.
  * Principles: AI, Machine Learning, Algorithms, Automations.

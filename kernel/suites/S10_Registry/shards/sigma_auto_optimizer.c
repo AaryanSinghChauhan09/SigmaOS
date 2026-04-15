@@ -1,8 +1,8 @@
-#include "sigma_base.h"
+﻿#include "sigma_base.h"
 
 /*
  * =========================================================================
- * Σ SIGMAOS ZENITH SUPREME: AUTO-OPTIMIZER
+ * S SIGMAOS ZENITH SUPREME: AUTO-OPTIMIZER
  * =========================================================================
  * Mission: Shard performance monitoring and autonomous scaling.
  * Design: C11 / Zero-Dependency / Struct-based OOP Paradigm.

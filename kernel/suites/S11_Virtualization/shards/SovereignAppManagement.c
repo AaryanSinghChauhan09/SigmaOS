@@ -1,6 +1,6 @@
-/*
+﻿/*
  * =========================================================================
- * Σ SIGMAOS: SOVEREIGN APP MANAGEMENT (v3.0 - SUPREME JIT)
+ * S SIGMAOS: SOVEREIGN APP MANAGEMENT (v3.0 - SUPREME JIT)
  * =========================================================================
  * Mission: Universal Multi-Matrix Software Packaging and Sigma-ASM JIT.
  * =========================================================================

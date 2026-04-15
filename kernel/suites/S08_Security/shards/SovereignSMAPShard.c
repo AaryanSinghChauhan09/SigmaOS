@@ -1,6 +1,6 @@
-/*
+﻿/*
  * =========================================================================
- * Σ SIGMAOS ZENITH: SOVEREIGN SMAP SHARD (v56.5-SUPREME-VALHALLA)
+ * S SIGMAOS ZENITH: SOVEREIGN SMAP SHARD (v56.5-SUPREME-VALHALLA)
  * =========================================================================
  * Mission: Silicon-level blocking of unintended user-space memory access.
  * Principles: Cyber Security, Safety, Computer Science.

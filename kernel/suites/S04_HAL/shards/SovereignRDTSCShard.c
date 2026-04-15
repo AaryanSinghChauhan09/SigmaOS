@@ -1,6 +1,6 @@
-/*
+﻿/*
  * =========================================================================
- * Σ SIGMAOS EON: SOVEREIGN RDTSC SHARD (v57.1-SUPREME-EON)
+ * S SIGMAOS EON: SOVEREIGN RDTSC SHARD (v57.1-SUPREME-EON)
  * =========================================================================
  * Mission: Absolute microsecond-telemetry precision and timing-spoof defense.
  * Principles: Cyber Security, Performance, Hardware Mastery, Safety.

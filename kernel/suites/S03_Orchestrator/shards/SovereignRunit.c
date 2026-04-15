@@ -1,7 +1,7 @@
-#include "sigma_kernel.h"
+﻿#include "sigma_kernel.h"
 
 void SovereignRunit_Init() {
-    sigma_printf("Σ [OPERATION]: SovereignRunit Integration Complete. Phase 11 Pure Parity Online.
+    sigma_printf("S [OPERATION]: SovereignRunit Integration Complete. Phase 11 Pure Parity Online.
 ");
 }
 

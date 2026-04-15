@@ -1,6 +1,6 @@
-/*
+﻿/*
  * =========================================================================
- * Σ SIGMAOS: SOVEREIGN XV6 BRIDGE (v12.0 - PURE C11)
+ * S SIGMAOS: SOVEREIGN XV6 BRIDGE (v12.0 - PURE C11)
  * =========================================================================
  * Mission: XV6-Style Process & IPC Parity for industrial reliability.
  * Design: C11 / Zero-Dependency / Struct-based OOP.

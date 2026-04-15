@@ -1,6 +1,6 @@
-/*
+﻿/*
  * =========================================================================
- * Σ SIGMAOS ZENITH: SOVEREIGN HANDOFF-QUEUE SHARD (v55.5-ORION-ZENITH)
+ * S SIGMAOS ZENITH: SOVEREIGN HANDOFF-QUEUE SHARD (v55.5-ORION-ZENITH)
  * =========================================================================
  * Mission: Zero-copy task transfer between mesh nodes.
  * Principles: Multi-Processing, Computer Science, Throughput, Scalability.

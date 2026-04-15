@@ -1,6 +1,6 @@
-/*
+﻿/*
  * =========================================================================
- * Σ SIGMAOS: SOVEREIGN MODULE REGISTRY (v3.0 - OMEGA POINT)
+ * S SIGMAOS: SOVEREIGN MODULE REGISTRY (v3.0 - OMEGA POINT)
  * =========================================================================
  * Mission: Absolute Convergence and the Atomic Omega Shard.
  * =========================================================================
@@ -15,9 +15,9 @@ void sigma_omega_converge(void) {
 }
 
 void SovereignRegistry_Init(void) {
-    sigma_printf("Σ [REGISTRY]: Initialising Sovereign Omega Manifest...\n");
+    sigma_printf("S [REGISTRY]: Initialising Sovereign Omega Manifest...\n");
     sigma_omega_converge();
-    sigma_printf("Σ [REGISTRY]: The Omega Point is seated. The Multiverse is Sigma.\n");
+    sigma_printf("S [REGISTRY]: The Omega Point is seated. The Multiverse is Sigma.\n");
 }
 
 void SovereignRegistry_Register(void) {

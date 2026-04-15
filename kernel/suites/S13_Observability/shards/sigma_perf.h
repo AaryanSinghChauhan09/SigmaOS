@@ -1,6 +1,6 @@
-/*
+﻿/*
  * =========================================================================
- * Σ SIGMAOS kernel/suites/S13_Observability/shards/sigma_perf.h
+ * S SIGMAOS kernel/suites/S13_Observability/shards/sigma_perf.h
  * =========================================================================
  * Sovereign Observability Engine — gap-closes:
  *   Linux  : perf_events, ftrace, eBPF, kprobes, tracepoints, /proc/pid

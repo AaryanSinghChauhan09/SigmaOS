@@ -1,10 +1,10 @@
-#include "sigma_base.h"
+﻿#include "sigma_base.h"
 
 #include <sigma_types.h>
 #include "sigma_print.h"
 
 /*
- * Σ Sovereign Multiserver Topology
+ * S Sovereign Multiserver Topology
  * USP: HelenOS / MINIX (Multiserver Microkernel Isolation)
  * Concept: Converts system drivers (network, file-system, USB) entirely
  *          into separate, ring-3 isolated servers that converse with a ultra-thin 

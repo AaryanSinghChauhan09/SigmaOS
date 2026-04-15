@@ -1,6 +1,6 @@
-/*
+﻿/*
  * =========================================================================
- * Σ SIGMAOS ZENITH: SOVEREIGN SIGNAL ENGINE (v1.0)
+ * S SIGMAOS ZENITH: SOVEREIGN SIGNAL ENGINE (v1.0)
  * =========================================================================
  * Mission: High-performance Digital Signal Processing (DSP).
  * Principles: Fast Fourier Transform (FFT), Frequency Domain Analysis.

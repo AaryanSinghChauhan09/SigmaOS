@@ -1,6 +1,6 @@
-/*
+﻿/*
  * =========================================================================
- * Σ SIGMAOS ZENITH: SOVEREIGN SIMD SHARD (v51.9-DIVINE-SINGULARITY)
+ * S SIGMAOS ZENITH: SOVEREIGN SIMD SHARD (v51.9-DIVINE-SINGULARITY)
  * =========================================================================
  * Mission: Hardware-accelerated data parallelism for AI and GFX.
  * Principles: Computer Science, Performance, AI, Machine Learning.

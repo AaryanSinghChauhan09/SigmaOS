@@ -1,4 +1,4 @@
-#include "sigma_base.h"
+﻿#include "sigma_base.h"
 
 #include "SovereignSyscall.h"
 #include "sigma_libc.h"
@@ -12,7 +12,7 @@ static sigma_i64 sys_enosys(sigma_u64 a1, sigma_u64 a2, sigma_u64 a3, sigma_u64 
 
 void SovereignSyscall_InitRegistry(void) {
     for (int i = 0; i < TABLE_SIZE; i++) s_syscall_table[i] = sys_enosys;
-    sigma_printf("Σ [SYS]: Sovereign Syscall Registry Operational.\n");
+    sigma_printf("S [SYS]: Sovereign Syscall Registry Operational.\n");
 }
 
 sigma_err_t SovereignSyscall_Register(sigma_u32 nr, SyscallFn_t handler) {

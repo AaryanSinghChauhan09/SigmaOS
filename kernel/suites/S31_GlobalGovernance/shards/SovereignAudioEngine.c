@@ -1,6 +1,6 @@
-/*
+﻿/*
  * =========================================================================
- * Σ SIGMAOS: S31_GLOBALGOVERNANCE — SovereignAudioEngine.c
+ * S SIGMAOS: S31_GLOBALGOVERNANCE — SovereignAudioEngine.c
  * =========================================================================
  * Mission: High-Fidelity Spatial Audio and Signal Processing Grid.
  * Design: Low-latency Ring-Buffer, Mixed-Channel Mesh.
@@ -25,7 +25,7 @@ void Sovereign_Audio_Init(void) {
     g_master_out.read_pos = 0;
     g_master_out.write_pos = 0;
     g_master_out.active = SIGMA_TRUE;
-    sigma_printf("Σ [S31]: Sovereign Audio Engine initialized (Sample Rate: %dHz)\n", SAMPLE_RATE);
+    sigma_printf("S [S31]: Sovereign Audio Engine initialized (Sample Rate: %dHz)\n", SAMPLE_RATE);
 }
 
 void Sovereign_Audio_Input(sigma_f32* samples, sigma_size_t count) {

@@ -1,6 +1,6 @@
-/*
+﻿/*
  * =========================================================================
- * Σ SIGMAOS ZENITH: SOVEREIGN WCA SHARD (v54.2-SUPREME-TRIANGULUM)
+ * S SIGMAOS ZENITH: SOVEREIGN WCA SHARD (v54.2-SUPREME-TRIANGULUM)
  * =========================================================================
  * Mission: Hydrological metaheuristic for optimizing resource flow.
  * Principles: AI, Algorithms, Data Science, Throughput.

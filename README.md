@@ -1,4 +1,4 @@
-# Σ SIGMAOS: SOVEREIGN ZENITH SUPREME (v33.1)
+﻿# S SIGMAOS: SOVEREIGN ZENITH SUPREME (v33.1)
 
 ![SigmaOS Status](https://img.shields.io/badge/Architecture-33_Sovereign_Suites-blueviolet)
 ![SigmaOS Status](https://img.shields.io/badge/Status-MATERIALIZED-green)

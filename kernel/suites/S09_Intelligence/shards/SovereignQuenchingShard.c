@@ -1,6 +1,6 @@
-/*
+﻿/*
  * =========================================================================
- * Σ SIGMAOS ZENITH: SOVEREIGN QUENCHING SHARD (v53.3-SUPREME-NEBULA)
+ * S SIGMAOS ZENITH: SOVEREIGN QUENCHING SHARD (v53.3-SUPREME-NEBULA)
  * =========================================================================
  * Mission: Ultra-fast metaheuristic convergence for power-state transitions.
  * Principles: AI, Algorithms, Data Science, Power-Management.

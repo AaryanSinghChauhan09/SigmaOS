@@ -1,6 +1,6 @@
-/*
+﻿/*
  * =========================================================================
- * Σ SIGMAOS: UNIVERSAL SOVEREIGN IMAGE BUILDER (v2.0)
+ * S SIGMAOS: UNIVERSAL SOVEREIGN IMAGE BUILDER (v2.0)
  * =========================================================================
  * Mission: Standalone image synthesis (ISO/IMG/EFI) for ANY device.
  * Design: C11 / Zero-Dependency / Multi-Arch.
@@ -20,17 +20,17 @@ typedef struct {
 } builder_ctx_t;
 
 void SovereignBuilder_SynthesizeEFI(builder_ctx_t* ctx) {
-    sigma_printf("  Σ [BUILDER]: Synthesizing STANDALONE EFI System Partition (ESP) for %s...\n", ctx->target_arch);
-    sigma_printf("  Σ [BUILDER]: Formatting FAT32 / FAT16 sectors (sigma_fs_fat).\n");
-    sigma_printf("  Σ [BUILDER]: Injecting /EFI/BOOT/BOOTX64.EFI native binary.\n");
+    sigma_printf("  S [BUILDER]: Synthesizing STANDALONE EFI System Partition (ESP) for %s...\n", ctx->target_arch);
+    sigma_printf("  S [BUILDER]: Formatting FAT32 / FAT16 sectors (sigma_fs_fat).\n");
+    sigma_printf("  S [BUILDER]: Injecting /EFI/BOOT/BOOTX64.EFI native binary.\n");
 }
 
 void SovereignBuilder_SynthesizeISO(builder_ctx_t* ctx) {
-    sigma_printf("  Σ [BUILDER]: Synthesizing Universal ISO9660 + El Torito image: %s\n", ctx->target_disk);
+    sigma_printf("  S [BUILDER]: Synthesizing Universal ISO9660 + El Torito image: %s\n", ctx->target_disk);
 }
 
 void SovereignBuilder_GenerateReport(builder_ctx_t* ctx) {
-    sigma_printf("\nΣ SIGMAOS: UNIVERSAL DEPLOYMENT REPORT\n");
+    sigma_printf("\nS SIGMAOS: UNIVERSAL DEPLOYMENT REPORT\n");
     sigma_printf("--------------------------------------------------------------------------------\n");
     sigma_printf("Architecture: %-16s | Format: %-10s\n", ctx->target_arch, "ISO/MBR/GPT");
     sigma_printf("Persistence : %-16s | Status: %-10s\n", ctx->persistent ? "ENABLED" : "DISABLED", "VALIDATED");
@@ -44,13 +44,13 @@ int SovereignBootBuilder_ToolMain(int argc, char** argv) {
     ctx.efi_support = SIGMA_TRUE;
     ctx.persistent  = SIGMA_TRUE;
 
-    sigma_printf("Σ [BUILDER]: Initiating Universal Standalone Synthesis...\n");
+    sigma_printf("S [BUILDER]: Initiating Universal Standalone Synthesis...\n");
 
     SovereignBuilder_SynthesizeEFI(&ctx);
     SovereignBuilder_SynthesizeISO(&ctx);
     SovereignBuilder_GenerateReport(&ctx);
 
-    sigma_printf("Σ [DONE]: Standalone Sovereign Image Ready for deployment on any %s device.\n", ctx.target_arch);
+    sigma_printf("S [DONE]: Standalone Sovereign Image Ready for deployment on any %s device.\n", ctx.target_arch);
     return 0;
 }
 

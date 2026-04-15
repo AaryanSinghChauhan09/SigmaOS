@@ -1,9 +1,9 @@
-#ifndef SOVEREIGN_DISTRO_FORGE_H
+﻿#ifndef SOVEREIGN_DISTRO_FORGE_H
 #define SOVEREIGN_DISTRO_FORGE_H
 
 #include "SigmaOOP.h"
 
-/* Σ Territory Initiation */
+/* S Territory Initiation */
 
 CLASS_DECLARE(SovereignDistroForge) { 
     SigmaObject_t core;
@@ -11,6 +11,6 @@ CLASS_DECLARE(SovereignDistroForge) {
     VIRTUAL(void, ForgeNewDistro, struct SovereignDistroForge* self, const char* name);
 };
 
-/* Σ Territory Termination */
+/* S Territory Termination */
 
 #endif

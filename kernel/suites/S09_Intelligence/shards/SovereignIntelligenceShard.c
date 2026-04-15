@@ -1,6 +1,6 @@
-/*
+﻿/*
  * =========================================================================
- * Σ SIGMAOS ZENITH: SOVEREIGN INTELLIGENCE SHARD (v50.0-SINGULARITY)
+ * S SIGMAOS ZENITH: SOVEREIGN INTELLIGENCE SHARD (v50.0-SINGULARITY)
  * =========================================================================
  * Mission: Zero-dependency AI/ML/DS Orchestration in pure C11.
  * Principles: Tensor Math, Neural Primitives, Statistical Sovereignty.

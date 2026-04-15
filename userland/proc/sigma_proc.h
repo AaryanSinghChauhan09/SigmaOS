@@ -1,6 +1,6 @@
-/*
+﻿/*
  * =========================================================================
- * Σ SIGMAOS userland/proc/sigma_proc.h
+ * S SIGMAOS userland/proc/sigma_proc.h
  * =========================================================================
  * Process & Thread Manager — gap-closes:
  *   Linux  : task_struct, clone(), cgroups, namespaces, seccomp

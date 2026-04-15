@@ -1,6 +1,6 @@
-/*
+﻿/*
  * =========================================================================
- * Σ SIGMAOS ZENITH: SOVEREIGN GENETIC OPTIMIZER (v50.6-INFINITY-VOID)
+ * S SIGMAOS ZENITH: SOVEREIGN GENETIC OPTIMIZER (v50.6-INFINITY-VOID)
  * =========================================================================
  * Mission: Autonomous kernel parameter tuning via evolutionary algorithms.
  * Principles: Algorithms, Data Science, Automations, Self-Healing.

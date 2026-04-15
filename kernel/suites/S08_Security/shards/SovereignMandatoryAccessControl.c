@@ -1,6 +1,6 @@
-/*
+﻿/*
  * =========================================================================
- * Σ SIGMAOS: SOVEREIGN MANDATORY ACCESS CONTROL (v2.0 - INTEGRATED)
+ * S SIGMAOS: SOVEREIGN MANDATORY ACCESS CONTROL (v2.0 - INTEGRATED)
  * =========================================================================
  * Mission: Zero-Trust Shard Isolation and Mandatory Access Hardening.
  * =========================================================================
@@ -21,9 +21,9 @@ void sigma_mac_enforce(sigma_u32 shard_id) {
 }
 
 void SovereignSecurity_Init(void) {
-    sigma_printf("Σ [SECURITY-SUITE]: Initialising Sovereign MAC and Shielding...\n");
+    sigma_printf("S [SECURITY-SUITE]: Initialising Sovereign MAC and Shielding...\n");
     sigma_mac_enforce(425);
-    sigma_printf("Σ [SECURITY-SUITE]: Sentinel Shunt active. Access restricted to ZENITH.\n");
+    sigma_printf("S [SECURITY-SUITE]: Sentinel Shunt active. Access restricted to ZENITH.\n");
 }
 
 void SovereignSecurity_Register(void) {

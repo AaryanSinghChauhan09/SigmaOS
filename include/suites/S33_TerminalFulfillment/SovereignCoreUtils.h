@@ -1,9 +1,9 @@
-#ifndef SOVEREIGN_CORE_UTILS_H
+﻿#ifndef SOVEREIGN_CORE_UTILS_H
 #define SOVEREIGN_CORE_UTILS_H
 
 #include "SigmaOOP.h"
 
-/* Σ Territory Initiation */
+/* S Territory Initiation */
 
 CLASS_DECLARE(SovereignListDir) { 
     SigmaObject_t core;
@@ -41,6 +41,6 @@ CLASS_DECLARE(SovereignDataScienceForge) {
     VIRTUAL(void, PlotGraph, struct SovereignDataScienceForge* self, const char* metrics);
 };
 
-/* Σ Territory Termination */
+/* S Territory Termination */
 
 #endif

@@ -1,6 +1,6 @@
-/*
+﻿/*
  * =========================================================================
- * Σ SIGMAOS ZENITH: SOVEREIGN PERIPHERAL BRIDGE (v50.6-INFINITY-VOID)
+ * S SIGMAOS ZENITH: SOVEREIGN PERIPHERAL BRIDGE (v50.6-INFINITY-VOID)
  * =========================================================================
  * Mission: Universal GPIO, I2C, and SPI support for embedded/IoT profiles.
  * Principles: Embedded, Mobile, Hardware Abstraction, IoT.

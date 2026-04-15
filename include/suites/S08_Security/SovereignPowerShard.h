@@ -1,5 +1,5 @@
-/* =========================================================================
- * Σ SIGMAOS: SOVEREIGN POWER SHARD HEADER
+﻿/* =========================================================================
+ * S SIGMAOS: SOVEREIGN POWER SHARD HEADER
  * ========================================================================= */
 #ifndef SOVEREIGN_POWER_SHARD_H
 #define SOVEREIGN_POWER_SHARD_H

@@ -1,10 +1,10 @@
-#include "sigma_base.h"
+﻿#include "sigma_base.h"
 
 #include <sigma_types.h>
 #include "sigma_print.h"
 
 /*
- * Σ Sovereign Ignition Cluster
+ * S Sovereign Ignition Cluster
  * USP: CoreOS / Flatcar (Immutable Distributed Container Node)
  * Concept: Upon pre-boot, evaluates an "Ignition" payload mapping which
  *          determines the node's declarative role in a distributed cluster,

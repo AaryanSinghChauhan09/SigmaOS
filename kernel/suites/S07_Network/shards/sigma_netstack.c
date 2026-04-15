@@ -1,6 +1,6 @@
-/*
+﻿/*
  * =========================================================================
- * Σ SIGMAOS kernel/suites/S07_Network/shards/sigma_netstack.c
+ * S SIGMAOS kernel/suites/S07_Network/shards/sigma_netstack.c
  * =========================================================================
  */
 
@@ -29,7 +29,7 @@ void sigma_net_init(void) {
     /* Add default loopback route */
     sigma_net_route_add(0x7F000000, 0xFF000000, 0, 0, 0);
 
-    sigma_printf("Σ [NET] Stack initialized. Loopback: 127.0.0.1/8\n");
+    sigma_printf("S [NET] Stack initialized. Loopback: 127.0.0.1/8\n");
 }
 
 /* ── Interface management ───────────────────────────────────────────────── */
@@ -48,18 +48,18 @@ net_i32 sigma_net_if_register(const char *name, const net_u8 *mac,
 void sigma_net_if_up(net_u32 idx) {
     if (idx >= s_if_count) return;
     s_ifaces[idx].flags |= IFF_UP | IFF_RUNNING;
-    sigma_printf("Σ [NET] IF UP: %s ip=%u\n",
+    sigma_printf("S [NET] IF UP: %s ip=%u\n",
                  s_ifaces[idx].name, s_ifaces[idx].ip4);
 }
 
 void sigma_net_if_down(net_u32 idx) {
     if (idx >= s_if_count) return;
     s_ifaces[idx].flags &= ~(IFF_UP | IFF_RUNNING);
-    sigma_printf("Σ [NET] IF DOWN: %s\n", s_ifaces[idx].name);
+    sigma_printf("S [NET] IF DOWN: %s\n", s_ifaces[idx].name);
 }
 
 void sigma_net_if_status(void) {
-    sigma_printf("\nΣ NET INTERFACES\n");
+    sigma_printf("\nS NET INTERFACES\n");
     for (net_u32 i = 0; i < s_if_count; i++) {
         sigma_netif_t *n = &s_ifaces[i];
         sigma_printf("  %-8s ip=0x%08x flags=0x%x rx=%llu tx=%llu\n",
@@ -129,7 +129,7 @@ net_i32 sigma_net_rx(net_u32 ifindex, sigma_skb_t *skb) {
 }
 
 void sigma_net_stats(void) {
-    sigma_printf("\nΣ NET STATS — routes=%u fw_rules=%u\n",
+    sigma_printf("\nS NET STATS — routes=%u fw_rules=%u\n",
                  s_route_count, s_fw_count);
     sigma_net_if_status();
 }

@@ -1,6 +1,6 @@
-/*
+﻿/*
  * =========================================================================
- * Σ SIGMAOS ZENITH: SOVEREIGN NLP ENGINE (v1.0)
+ * S SIGMAOS ZENITH: SOVEREIGN NLP ENGINE (v1.0)
  * =========================================================================
  * Mission: High-performance Natural Language Processing in the Kernel.
  * Principles: Term Frequency (TF), Tokenization, Semantic Weighting.

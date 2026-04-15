@@ -1,6 +1,6 @@
-/*
+﻿/*
  * =========================================================================
- * Σ SIGMAOS ZENITH: SOVEREIGN GPU COMPUTE SHARD (v50.5-OMNIPRESENCE)
+ * S SIGMAOS ZENITH: SOVEREIGN GPU COMPUTE SHARD (v50.5-OMNIPRESENCE)
  * =========================================================================
  * Mission: Hardware-accelerated GPGPU compute for AI and Raytracing.
  * Principles: AI, Machine Learning, Parallelism, WebGPU Bridge.

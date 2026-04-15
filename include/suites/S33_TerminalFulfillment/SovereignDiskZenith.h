@@ -1,9 +1,9 @@
-#ifndef SOVEREIGN_DISK_ZENITH_H
+﻿#ifndef SOVEREIGN_DISK_ZENITH_H
 #define SOVEREIGN_DISK_ZENITH_H
 
 #include "SigmaOOP.h"
 
-/* Σ Territory Initiation */
+/* S Territory Initiation */
 
 // --- DISK SCHEDULING ALGORITHMS (SSTF, SCAN, LOOK) ---
 CLASS_DECLARE(SovereignDiskScheduler) { 
@@ -29,6 +29,6 @@ CLASS_DECLARE(SovereignIOExpert) {
     VIRTUAL(void, BufferingLogic, struct SovereignIOExpert* self);
 };
 
-/* Σ Territory Termination */
+/* S Territory Termination */
 
 #endif

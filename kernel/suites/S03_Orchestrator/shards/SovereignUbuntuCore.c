@@ -1,7 +1,7 @@
-#include "sigma_kernel.h"
+﻿#include "sigma_kernel.h"
 
 void SovereignUbuntuCore_Init() {
-    sigma_printf("Σ [ABSORB]: SovereignUbuntuCore Zenith Online. Roadmap Parity Verified.\n");
+    sigma_printf("S [ABSORB]: SovereignUbuntuCore Zenith Online. Roadmap Parity Verified.\n");
 }
 
 

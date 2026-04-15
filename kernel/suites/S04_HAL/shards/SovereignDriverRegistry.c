@@ -1,4 +1,4 @@
-#include "sigma_base.h"
+﻿#include "sigma_base.h"
 
 #include "SovereignLatticeRegistry.h"
 #include "sigma_libc.h"
@@ -23,7 +23,7 @@ static sigma_u32 g_driver_count = 0;
 
 void SovereignDriver_InitRegistry(void) {
     g_driver_count = 0;
-    sigma_printf("Σ [REGISTRY]: Sovereign Driver Registry initialized.\n");
+    sigma_printf("S [REGISTRY]: Sovereign Driver Registry initialized.\n");
 }
 
 sigma_err_t SovereignDriver_Register(const char* name, SovereignDriverInitFn init) {
@@ -36,7 +36,7 @@ sigma_err_t SovereignDriver_Register(const char* name, SovereignDriverInitFn ini
 
 void SovereignDriver_InitAll(void) {
     for (sigma_u32 i = 0; i < g_driver_count; i++) {
-        sigma_printf("Σ [DRIVER]: Seating driver '%s'...\n", g_driver_registry[i].name);
+        sigma_printf("S [DRIVER]: Seating driver '%s'...\n", g_driver_registry[i].name);
         if (g_driver_registry[i].init) g_driver_registry[i].init();
     }
 }

@@ -1,6 +1,6 @@
-/*
+﻿/*
  * =========================================================================
- * Σ SIGMAOS ZENITH: SOVEREIGN SDMT SHARD (v52.2-SUPREME-MULTIVERSE)
+ * S SIGMAOS ZENITH: SOVEREIGN SDMT SHARD (v52.2-SUPREME-MULTIVERSE)
  * =========================================================================
  * Mission: Virtualizing hardware threads for massive parallelism.
  * Principles: Multi-Processing, Embedded, Computer Science, Throughput.

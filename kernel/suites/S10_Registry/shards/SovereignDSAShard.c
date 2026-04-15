@@ -1,6 +1,6 @@
-/*
+﻿/*
  * =========================================================================
- * Σ SIGMAOS ZENITH: SOVEREIGN DSA SHARD (v1.0)
+ * S SIGMAOS ZENITH: SOVEREIGN DSA SHARD (v1.0)
  * =========================================================================
  * Mission: Absolute performance Data Structures & Algorithms Shard.
  * Design: C11 / Zero-Dependency / Inline Assembly Optimizations.

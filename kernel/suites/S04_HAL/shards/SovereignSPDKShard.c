@@ -1,6 +1,6 @@
-/*
+﻿/*
  * =========================================================================
- * Σ SIGMAOS MULTIVERSE_ETERNITY_GATE: SOVEREIGN SPDK SHARD (v58.3-SUPREME)
+ * S SIGMAOS MULTIVERSE_ETERNITY_GATE: SOVEREIGN SPDK SHARD (v58.3-SUPREME)
  * =========================================================================
  * Mission: Interrupt-free, 100% polled mode NVMe execution for absolute IOPS.
  * Principles: Performance, Hardware Mastery, Storage.

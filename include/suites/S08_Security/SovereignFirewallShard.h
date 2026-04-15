@@ -1,5 +1,5 @@
-/* =========================================================================
- * Σ SIGMAOS: SOVEREIGN FIREWALL SHARD HEADER
+﻿/* =========================================================================
+ * S SIGMAOS: SOVEREIGN FIREWALL SHARD HEADER
  * ========================================================================= */
 #ifndef SOVEREIGN_FIREWALL_SHARD_H
 #define SOVEREIGN_FIREWALL_SHARD_H

@@ -1,6 +1,6 @@
-/*
+﻿/*
  * =========================================================================
- * Σ SIGMAOS ZENITH: SOVEREIGN IOMMU SHARD (v56.2-SUPREME-ASGARD)
+ * S SIGMAOS ZENITH: SOVEREIGN IOMMU SHARD (v56.2-SUPREME-ASGARD)
  * =========================================================================
  * Mission: Hardware-enforced DMA isolation for zero-trust driver execution.
  * Principles: Cyber Security, Hardware Mastery, Safety, Multi-Processing.

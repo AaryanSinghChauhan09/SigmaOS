@@ -1,4 +1,4 @@
-#include "sigma_base.h"
+﻿#include "sigma_base.h"
 
 #include "SovereignLatticeRegistry.h"
 #include "sigma_libc.h"
@@ -10,8 +10,8 @@
  */
 
 sigma_err_t sigma_smart_explorer_init(void) {
-    sigma_printf("  Σ [EXPLORER]: Sovereign Smart Explorer Matrix seated.\n");
-    sigma_printf("  Σ [EXPLORER]: File prediction heuristics: ONLINE.\n");
+    sigma_printf("  S [EXPLORER]: Sovereign Smart Explorer Matrix seated.\n");
+    sigma_printf("  S [EXPLORER]: File prediction heuristics: ONLINE.\n");
     return SIGMA_OK;
 }
 

@@ -1,6 +1,6 @@
-/*
+﻿/*
  * =========================================================================
- * Σ SIGMAOS: SOVEREIGN ZFS — COPY-ON-WRITE FILESYSTEM (v1.0 — C11)
+ * S SIGMAOS: SOVEREIGN ZFS — COPY-ON-WRITE FILESYSTEM (v1.0 — C11)
  * =========================================================================
  * Absorbed USPs from: OpenZFS / FreeBSD ZFS
  *   https://github.com/freebsd/freebsd-src/tree/main/sys/contrib/openzfs

@@ -1,6 +1,6 @@
-/*
+﻿/*
  * =========================================================================
- * Σ SIGMAOS ULTIMATE_GENESIS: SOVEREIGN GBO SHARD (v60.0-ULTIMATE)
+ * S SIGMAOS ULTIMATE_GENESIS: SOVEREIGN GBO SHARD (v60.0-ULTIMATE)
  * =========================================================================
  * Mission: Extreme gradient escalation through Newton bounds computation.
  * Principles: AI, Algorithms, Data Science.

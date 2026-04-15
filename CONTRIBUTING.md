@@ -1,4 +1,4 @@
-# Contributing to SigmaOS Zenith Supreme
+﻿# Contributing to SigmaOS Zenith Supreme
 
 Welcome to the Sovereign developmental workforce. To contribute to SigmaOS, you must adhere to our **Industrial Purity Standards**.
 
@@ -24,4 +24,4 @@ All contributions must be accompanied by an update to the corresponding `tools/d
 4.  **Submit Pull Request** for Apex Review.
 
 ---
-**Σ MAINTAIN THE PURITY. EXPAND THE SOVEREIGNTY.**
+**S MAINTAIN THE PURITY. EXPAND THE SOVEREIGNTY.**

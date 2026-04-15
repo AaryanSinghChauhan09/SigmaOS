@@ -1,6 +1,6 @@
-/*
+﻿/*
  * =========================================================================
- * Σ SIGMAOS ZENITH: SOVEREIGN EBR SHARD (v56.6-SUPREME-PANTHEON)
+ * S SIGMAOS ZENITH: SOVEREIGN EBR SHARD (v56.6-SUPREME-PANTHEON)
  * =========================================================================
  * Mission: Ultra-low latency memory reclamation without read-side locks.
  * Principles: Multi-Processing, Computer Science, Throughput, Scalability.

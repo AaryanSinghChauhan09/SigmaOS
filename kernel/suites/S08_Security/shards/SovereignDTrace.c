@@ -1,6 +1,6 @@
-/*
+﻿/*
  * =========================================================================
- * Σ SIGMAOS: SOVEREIGN DTRACE + PF PACKET FILTER — IMPLEMENTATION (v1.0)
+ * S SIGMAOS: SOVEREIGN DTRACE + PF PACKET FILTER — IMPLEMENTATION (v1.0)
  * =========================================================================
  */
 
@@ -102,7 +102,7 @@ sigma_err_t sigma_dt_consumer_enable(const char *clause, SigmaDTAction_t action)
         }
     }
 
-    sigma_printf("Σ [DTRACE]: Consumer enabled: '%s' (%u probes matched)\n",
+    sigma_printf("S [DTRACE]: Consumer enabled: '%s' (%u probes matched)\n",
                  clause, c->probe_count);
     return SIGMA_OK;
 }
@@ -111,7 +111,7 @@ sigma_err_t sigma_dt_consumer_enable(const char *clause, SigmaDTAction_t action)
  * sigma_dt_list_probes — dtrace -l
  * ---------------------------------------------------------------------- */
 void sigma_dt_list_probes(const char *filter) {
-    sigma_printf("Σ [DTRACE]: Probe list (%u total):\n", s_probe_cnt);
+    sigma_printf("S [DTRACE]: Probe list (%u total):\n", s_probe_cnt);
     sigma_printf("   ID  PROVIDER      MODULE        FUNCTION          NAME\n");
     for (sigma_u32 i = 0; i < s_probe_cnt; i++) {
         SigmaDTProbe_t *p = &s_probes[i];
@@ -128,7 +128,7 @@ void sigma_dt_list_probes(const char *filter) {
  * sigma_dt_aggr_print — print aggregation results
  * ---------------------------------------------------------------------- */
 void sigma_dt_aggr_print(const SigmaDTAggr_t *a) {
-    sigma_printf("Σ [DTRACE-AGG]: @%s: count=%llu sum=%lld min=%lld max=%lld\n",
+    sigma_printf("S [DTRACE-AGG]: @%s: count=%llu sum=%lld min=%lld max=%lld\n",
                  a->name,
                  (unsigned long long)a->count,
                  (long long)a->sum,
@@ -146,13 +146,13 @@ SigmaPFCtx_t g_sigma_pf;
 
 sigma_err_t sigma_pf_enable(void) {
     g_sigma_pf.enabled = SIGMA_TRUE;
-    sigma_printf("Σ [PF]: Packet filter enabled.\n");
+    sigma_printf("S [PF]: Packet filter enabled.\n");
     return SIGMA_OK;
 }
 
 sigma_err_t sigma_pf_disable(void) {
     g_sigma_pf.enabled = SIGMA_FALSE;
-    sigma_printf("Σ [PF]: Packet filter disabled.\n");
+    sigma_printf("S [PF]: Packet filter disabled.\n");
     return SIGMA_OK;
 }
 
@@ -165,7 +165,7 @@ sigma_err_t sigma_pf_add_rule(const SigmaPFRule_t *rule) {
 sigma_err_t sigma_pf_flush(void) {
     sigma_memset(g_sigma_pf.rules, 0,
                  sizeof(SigmaPFRule_t) * g_sigma_pf.rule_count);
-    sigma_printf("Σ [PF]: All rules flushed.\n");
+    sigma_printf("S [PF]: All rules flushed.\n");
     g_sigma_pf.rule_count = 0;
     return SIGMA_OK;
 }
@@ -195,7 +195,7 @@ sigma_err_t sigma_pf_match(const char *src, const char *dst,
         if (src_match && dst_match && port_match && proto_match) {
             r->pkts_matched++;
             if (r->log)
-                sigma_printf("Σ [PF]: %s %s:%u -> %s:%u  rule#%u [label:%s]\n",
+                sigma_printf("S [PF]: %s %s:%u -> %s:%u  rule#%u [label:%s]\n",
                              r->action == PF_PASS ? "PASS" : "BLOCK",
                              src, sport, dst, dport, i,
                              r->label[0] ? r->label : "—");
@@ -215,7 +215,7 @@ sigma_err_t sigma_pf_match(const char *src, const char *dst,
 }
 
 void sigma_pf_show_rules(void) {
-    sigma_printf("Σ [PF]: Rules (%u):\n", g_sigma_pf.rule_count);
+    sigma_printf("S [PF]: Rules (%u):\n", g_sigma_pf.rule_count);
     static const char *act[] = {"pass","block","nat","rdr","binat"};
     for (sigma_u32 i = 0; i < g_sigma_pf.rule_count; i++) {
         SigmaPFRule_t *r = &g_sigma_pf.rules[i];
@@ -227,7 +227,7 @@ void sigma_pf_show_rules(void) {
 }
 
 void sigma_pf_show_states(void) {
-    sigma_printf("Σ [PF]: State table (%u entries):\n", g_sigma_pf.state_count);
+    sigma_printf("S [PF]: State table (%u entries):\n", g_sigma_pf.state_count);
     for (sigma_u32 i = 0; i < g_sigma_pf.state_count; i++) {
         SigmaPFState_t *s = &g_sigma_pf.states[i];
         sigma_printf("  %s:%u <-> %s:%u  pkts=%llu bytes=%llu\n",
@@ -238,7 +238,7 @@ void sigma_pf_show_states(void) {
 }
 
 void sigma_pf_show_info(void) {
-    sigma_printf("Σ [PF]: Status: %s\n"
+    sigma_printf("S [PF]: Status: %s\n"
                  "  Passed:  %llu pkts\n"
                  "  Blocked: %llu pkts\n"
                  "  Rules:   %u\n"
@@ -256,12 +256,12 @@ void sigma_pf_show_info(void) {
 static void trace_action(dtrace_id_t id, sigma_u64 a0, sigma_u64 a1,
                           sigma_u64 a2, sigma_u64 a3) {
     (void)a1; (void)a2; (void)a3;
-    sigma_printf("Σ [DTRACE]: PROBE #%u fired: arg0=%llu\n",
+    sigma_printf("S [DTRACE]: PROBE #%u fired: arg0=%llu\n",
                  id, (unsigned long long)a0);
 }
 
 void SovereignDTrace_Init(void) {
-    sigma_printf("Σ [DTRACE]: Initialising DTrace + pf (FreeBSD parity)...\n");
+    sigma_printf("S [DTRACE]: Initialising DTrace + pf (FreeBSD parity)...\n");
     sigma_memset(g_sigma_pf.rules, 0, sizeof(g_sigma_pf.rules));
 
     /* ── DTrace demo ── */
@@ -331,7 +331,7 @@ void SovereignDTrace_Init(void) {
     sigma_pf_show_rules();
     sigma_pf_show_info();
 
-    sigma_printf("Σ [DTRACE]: DTrace + pf Packet Filter online.\n");
+    sigma_printf("S [DTRACE]: DTrace + pf Packet Filter online.\n");
 }
 
 

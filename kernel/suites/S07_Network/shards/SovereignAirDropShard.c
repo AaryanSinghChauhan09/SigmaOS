@@ -1,6 +1,6 @@
-/*
+﻿/*
  * =========================================================================
- * Σ SIGMAOS ZENITH: SOVEREIGN AIRDROP SHARD (v1.0)
+ * S SIGMAOS ZENITH: SOVEREIGN AIRDROP SHARD (v1.0)
  * =========================================================================
  * Mission: Absorb Apple AirDrop / Android Nearby Share USP.
  *          Native Silicon Peer-to-Peer Encrypted File Transfer Engine.

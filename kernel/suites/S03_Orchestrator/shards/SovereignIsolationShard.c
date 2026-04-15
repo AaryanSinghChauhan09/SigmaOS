@@ -1,6 +1,6 @@
-/*
+﻿/*
  * =========================================================================
- * Σ SIGMAOS ZENITH: SOVEREIGN ISOLATION ENGINE (v1.0)
+ * S SIGMAOS ZENITH: SOVEREIGN ISOLATION ENGINE (v1.0)
  * =========================================================================
  * Mission: Strong process isolation through namespaces and tagging.
  * Principles: Containerization, Resource Limiting, Context Jail.

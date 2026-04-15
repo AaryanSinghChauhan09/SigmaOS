@@ -1,6 +1,6 @@
-/*
+﻿/*
  * =========================================================================
- * Σ SIGMAOS: SOVEREIGN LIBC (v19.0 - ZERO-DEPENDENCY)
+ * S SIGMAOS: SOVEREIGN LIBC (v19.0 - ZERO-DEPENDENCY)
  * =========================================================================
  * Mission: Neutralize all high-level language runtimes (glibc, msvcrt).
  * Capability: Direct x86_64 Syscall Integration.

@@ -1,10 +1,10 @@
-#ifndef SIGMA_MODULE_H
+﻿#ifndef SIGMA_MODULE_H
 #define SIGMA_MODULE_H
 
 #include "sigma_types.h"
 
 /*
- * Σ Sovereign Module Interface
+ * S Sovereign Module Interface
  * Concept: Standardized entry point for all 140+ Sovereign Shards.
  *          Defines the contract for initialization, testing, and telemetry
  *          extraction, allowing the kernel to manage modules dynamically.

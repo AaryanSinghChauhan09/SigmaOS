@@ -1,6 +1,6 @@
-/*
+﻿/*
  * =========================================================================
- * Σ SIGMAOS: SOVEREIGN ATOMIC UPDATE SHARD HEADER
+ * S SIGMAOS: SOVEREIGN ATOMIC UPDATE SHARD HEADER
  * =========================================================================
  */
 

@@ -1,7 +1,7 @@
-#include "sigma_kernel.h"
+﻿#include "sigma_kernel.h"
 
 void SovereignMicroOS_Init() {
-    sigma_printf("Σ [ABSORB]: SovereignMicroOS Zenith Online. Unified Parity Verified.\n");
+    sigma_printf("S [ABSORB]: SovereignMicroOS Zenith Online. Unified Parity Verified.\n");
 }
 
 

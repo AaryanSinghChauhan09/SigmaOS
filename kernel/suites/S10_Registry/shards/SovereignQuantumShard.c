@@ -1,6 +1,6 @@
-/*
+﻿/*
  * =========================================================================
- * Σ SIGMAOS ZENITH: SOVEREIGN QUANTUM SIMULATOR (v1.0)
+ * S SIGMAOS ZENITH: SOVEREIGN QUANTUM SIMULATOR (v1.0)
  * =========================================================================
  * Mission: High-fidelity simulation of Quantum states and gates.
  * Principles: Superposition, Measurement, Hadamard Transformation.

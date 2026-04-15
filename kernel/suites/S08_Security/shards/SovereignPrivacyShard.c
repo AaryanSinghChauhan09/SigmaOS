@@ -1,6 +1,6 @@
-/*
+﻿/*
  * =========================================================================
- * Σ SIGMAOS ZENITH: SOVEREIGN PRIVACY SHARD (v50.8-ETERNITY-CORE)
+ * S SIGMAOS ZENITH: SOVEREIGN PRIVACY SHARD (v50.8-ETERNITY-CORE)
  * =========================================================================
  * Mission: Anonymized telemetry harvesting via differential privacy.
  * Principles: Cyber Security, Data Science, Personalization, Privacy.

@@ -1,4 +1,4 @@
-#include "sigma_base.h"
+﻿#include "sigma_base.h"
 
 #include "SovereignFS.h"
 #include "sigma_libc.h"
@@ -10,8 +10,8 @@
  */
 
 sigma_err_t sigma_iocp_init(void) {
-    sigma_printf("  Σ [IO-IOCP]: Sovereign I/O Completion Port Shard active.\n");
-    sigma_printf("  Σ [IO-IOCP]: High-density thread-pool queuing: ENGAGED.\n");
+    sigma_printf("  S [IO-IOCP]: Sovereign I/O Completion Port Shard active.\n");
+    sigma_printf("  S [IO-IOCP]: High-density thread-pool queuing: ENGAGED.\n");
     return SIGMA_OK;
 }
 

@@ -1,6 +1,6 @@
-/*
+﻿/*
  * =========================================================================
- * Σ SIGMAOS ZENITH: SOVEREIGN PID CONTROLLER (v53.1-SUPREME-AETHER)
+ * S SIGMAOS ZENITH: SOVEREIGN PID CONTROLLER (v53.1-SUPREME-AETHER)
  * =========================================================================
  * Mission: Stable feedback-control loops for resource allocation.
  * Principles: Algorithms, Embedded, Automations, Computer Science.

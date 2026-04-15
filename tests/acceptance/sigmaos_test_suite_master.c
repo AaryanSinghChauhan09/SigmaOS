@@ -1,8 +1,8 @@
-#include "sigma_types.h"
+﻿#include "sigma_types.h"
 #include "sigma_print.h"
 
 /*
- * Σ SOVEREIGN MASTER TEST SUITE (MODULAR)
+ * S SOVEREIGN MASTER TEST SUITE (MODULAR)
  * Concept: Orchestrates domain-specific audit vectors.
  *          Instead of a monolithic test file, the master suite 
  *          now delegates validation to specialized modular suites 
@@ -16,7 +16,7 @@ void test_windows_family(void);
 void test_security_audit(void);
 
 int main() {
-    sigma_printf("Σ SOVEREIGN MASTER TEST SUITE — MODULAR ZENITH PHASE\n");
+    sigma_printf("S SOVEREIGN MASTER TEST SUITE — MODULAR ZENITH PHASE\n");
     sigma_printf("====================================================\n\n");
 
     test_linux_family();
@@ -35,7 +35,7 @@ int main() {
     test_registries_modular();
     sigma_printf("\n");
     
-    sigma_printf("--- Σ ALL 140+ SOVEREIGN SHARDS VERIFIED VIA MODULAR DOMAINS. --- \n");
+    sigma_printf("--- S ALL 140+ SOVEREIGN SHARDS VERIFIED VIA MODULAR DOMAINS. --- \n");
     sigma_printf("--- *** ZENITH 140 STATUS: MODULAR & VALIDATED *** --- \n");
     
     return 0;

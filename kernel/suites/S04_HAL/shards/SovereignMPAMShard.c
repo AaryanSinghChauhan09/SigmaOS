@@ -1,6 +1,6 @@
-/*
+﻿/*
  * =========================================================================
- * Σ SIGMAOS ASGARD: SOVEREIGN MPAM SHARD (v57.8-SUPREME-ASGARD)
+ * S SIGMAOS ASGARD: SOVEREIGN MPAM SHARD (v57.8-SUPREME-ASGARD)
  * =========================================================================
  * Mission: Silicon-level memory partitioning and bandwidth allocation for ARM.
  * Principles: Performance, Hardware Mastery, Isolation, Server.

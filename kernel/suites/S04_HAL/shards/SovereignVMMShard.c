@@ -1,6 +1,6 @@
-/*
+﻿/*
  * =========================================================================
- * Σ SIGMAOS ZENITH: SOVEREIGN VMM SHARD (v56.4-SUPREME-HEAVEN)
+ * S SIGMAOS ZENITH: SOVEREIGN VMM SHARD (v56.4-SUPREME-HEAVEN)
  * =========================================================================
  * Mission: Silicon-level hardware virtualization for nested sovereignty.
  * Principles: Computer Science, Quality-of-Service, Hardware Mastery.

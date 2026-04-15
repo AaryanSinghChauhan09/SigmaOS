@@ -1,6 +1,6 @@
-/*
+﻿/*
  * =========================================================================
- * Σ SIGMAOS: SIGMA-CRASHDUMP ANALYSER (v1.0 — PURE C11)
+ * S SIGMAOS: SIGMA-CRASHDUMP ANALYSER (v1.0 — PURE C11)
  * =========================================================================
  * Competitor Gap Closed: Linux `crash` utility / gdb (kdump analysis),
  * Windows WinDbg (Minidump / Kernel Memory Dump).
@@ -79,18 +79,18 @@ void sigma_crash_parse_prstatus(sigma_u8 *desc_data, sigma_size_t size) {
 }
 
 void sigma_crash_analyze_vmcore(const char *path) {
-    sigma_printf("Σ [CRASH]: Opening crash dump -> %s\n", path);
+    sigma_printf("S [CRASH]: Opening crash dump -> %s\n", path);
     int fd = sigma_open(path, O_RDONLY, 0);
     if (fd < 0) {
-        sigma_printf("Σ [CRASH]: No crash dump found (System booted cleanly).\n");
+        sigma_printf("S [CRASH]: No crash dump found (System booted cleanly).\n");
         return;
     }
 
     /* MOCK THE READING OF THE ELF FILE */
-    sigma_printf("Σ [CRASH]: Validating ELF64 Core Headers...\n");
+    sigma_printf("S [CRASH]: Validating ELF64 Core Headers...\n");
     sigma_sleep(1); /* Simulate processing time */
     
-    sigma_printf("Σ [CRASH]: Parsing PT_NOTE segments for CPU states...\n");
+    sigma_printf("S [CRASH]: Parsing PT_NOTE segments for CPU states...\n");
     
     /* Mock Registers mapping RIP to a NULL dereference */
     sigma_u64 mock_regs[4] = {
@@ -111,8 +111,8 @@ void sigma_crash_analyze_vmcore(const char *path) {
     sigma_printf("      [<ffffffffaa0089ab>] sigma_sys_open+0x80/0x200\n");
     sigma_printf("      [<ffffffffaa01cdef>] syscall_dispatcher+0x50/0xa0\n");
 
-    sigma_printf("\nΣ [CRASH]: Automated Bug Report Generation Complete.\n");
-    sigma_printf("Σ [CRASH]: Hint -> Issue lies in `SovereignVFS_LookupObject` attempting to read a NULL dentry.\n");
+    sigma_printf("\nS [CRASH]: Automated Bug Report Generation Complete.\n");
+    sigma_printf("S [CRASH]: Hint -> Issue lies in `SovereignVFS_LookupObject` attempting to read a NULL dentry.\n");
 
     sigma_close(fd);
 }

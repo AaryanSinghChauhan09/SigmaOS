@@ -1,6 +1,6 @@
-/*
+﻿/*
  * =========================================================================
- * Σ SIGMAOS ZENITH: SOVEREIGN PAGE COLORING (v52.8-SUPREME-HEAVEN)
+ * S SIGMAOS ZENITH: SOVEREIGN PAGE COLORING (v52.8-SUPREME-HEAVEN)
  * =========================================================================
  * Mission: Minimizing cache aliasing and conflicts between shards.
  * Principles: Performance, Computer Science, Hardware Mastery.

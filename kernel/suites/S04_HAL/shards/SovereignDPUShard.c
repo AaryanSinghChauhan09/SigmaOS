@@ -1,6 +1,6 @@
-/*
+﻿/*
  * =========================================================================
- * Σ SIGMAOS TRANSCENDENCE: SOVEREIGN DPU SHARD (v57.0-TRANSCENDENCE)
+ * S SIGMAOS TRANSCENDENCE: SOVEREIGN DPU SHARD (v57.0-TRANSCENDENCE)
  * =========================================================================
  * Mission: SmartNIC offloading for zero-overhead networking and storage.
  * Principles: Performance, Hardware Mastery, Distributed, Network.

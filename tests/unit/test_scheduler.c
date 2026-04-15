@@ -1,6 +1,6 @@
-/*
+﻿/*
  * =========================================================================
- * Σ SIGMAOS: SOVEREIGN SCHEDULER UNIT TEST (v2.0 - HOST-SIDE CI)
+ * S SIGMAOS: SOVEREIGN SCHEDULER UNIT TEST (v2.0 - HOST-SIDE CI)
  * =========================================================================
  * Compiles natively on Linux host (no cross-compiler required).
  * Validates: process lifecycle, priority scheduling, TCB management,
@@ -339,7 +339,7 @@ static void test_priority_rotation(void) {
  * ========================================================================= */
 int main(void) {
     sigma_printf("========================================================\n");
-    sigma_printf("  Σ SIGMAOS: SOVEREIGN SCHEDULER TEST SUITE (v2.0)\n");
+    sigma_printf("  S SIGMAOS: SOVEREIGN SCHEDULER TEST SUITE (v2.0)\n");
     sigma_printf("  Protocol: MLFQ + Priority + Preemption + Zombie Reap\n");
     sigma_printf("========================================================\n");
 

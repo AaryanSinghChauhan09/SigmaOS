@@ -1,4 +1,4 @@
-#include "sigma_base.h"
+﻿#include "sigma_base.h"
 
 #include "SovereignCLI_Core.h"
 
@@ -68,7 +68,7 @@ sigma_err_t sigma_cli_dispatch(SigmaCLICtx_t *ctx, const char *cmdline) {
         h = (h + 1) % SIGMA_CLI_HASH_SIZE;
         if (h == start) break;
     }
-    sigma_printf("Σ [CLI]: Unknown command: '%s'\n", argv[0]);
+    sigma_printf("S [CLI]: Unknown command: '%s'\n", argv[0]);
     return SIGMA_ENOENT;
 }
 

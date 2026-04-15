@@ -1,6 +1,6 @@
-/*
+﻿/*
  * =========================================================================
- * Σ SIGMAOS ZENITH: SOVEREIGN RW-SPINLOCK SHARD (v51.4-ABSOLUTE-VOID)
+ * S SIGMAOS ZENITH: SOVEREIGN RW-SPINLOCK SHARD (v51.4-ABSOLUTE-VOID)
  * =========================================================================
  * Mission: High-concurrency resource access with reader-parallism.
  * Principles: Multi-Processing, Multi-Programming, Computer Science.

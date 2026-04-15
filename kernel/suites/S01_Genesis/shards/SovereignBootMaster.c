@@ -1,8 +1,8 @@
-#include "sigma_base.h"
+﻿#include "sigma_base.h"
 
 /*
  * =========================================================================
- * Σ SIGMAOS: SOVEREIGN BOOT MASTER (v5.0 - PURE C11)
+ * S SIGMAOS: SOVEREIGN BOOT MASTER (v5.0 - PURE C11)
  * =========================================================================
  * Mission: Sub-second boot, hardware-skip, shard-init.
  * Design: C11 / Zero-Dependency / Struct-based OOP.

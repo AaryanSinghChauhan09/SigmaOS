@@ -1,6 +1,6 @@
-/*
+﻿/*
  * =========================================================================
- * Σ SIGMAOS THE_SINGULARITY: SOVEREIGN QPU SHARD (v63.0-SINGULARITY)
+ * S SIGMAOS THE_SINGULARITY: SOVEREIGN QPU SHARD (v63.0-SINGULARITY)
  * =========================================================================
  * Mission: Perfect fusion of classical Silicon and topological Quantum states.
  * Principles: Performance, Hardware Mastery, Supercomputing, Quantum.

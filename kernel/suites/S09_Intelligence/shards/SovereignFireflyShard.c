@@ -1,6 +1,6 @@
-/*
+﻿/*
  * =========================================================================
- * Σ SIGMAOS ZENITH: SOVEREIGN FIREFLY SHARD (v52.7-SUPREME-OLYMPUS)
+ * S SIGMAOS ZENITH: SOVEREIGN FIREFLY SHARD (v52.7-SUPREME-OLYMPUS)
  * =========================================================================
  * Mission: Bio-inspired metaheuristic for finding optima in noisy sensor data.
  * Principles: AI, Algorithms, Data Science, Embedded.

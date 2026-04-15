@@ -1,6 +1,6 @@
-/*
+﻿/*
  * =========================================================================
- * Σ SIGMAOS ZENITH: SOVEREIGN ANT-COLONY SHARD (v52.9-SUPREME-NIRVANA)
+ * S SIGMAOS ZENITH: SOVEREIGN ANT-COLONY SHARD (v52.9-SUPREME-NIRVANA)
  * =========================================================================
  * Mission: Pheromone-based pathfinding for optimal network routing.
  * Principles: AI, Algorithms, Data Science, Distributed.

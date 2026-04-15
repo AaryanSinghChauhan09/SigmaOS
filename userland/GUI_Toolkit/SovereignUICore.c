@@ -1,6 +1,6 @@
-/*
+﻿/*
  * =========================================================================
- * Σ SIGMAOS: SOVEREIGN ZENITH (v15.0 - ABSOLUTE FINALITY)
+ * S SIGMAOS: SOVEREIGN ZENITH (v15.0 - ABSOLUTE FINALITY)
  * =========================================================================
  * Author: Sovereign-Zenith-Developer
  * Principles: Zero-Library, Bit-Perfect, Silicon-Integrity, USP-Absorbed.
@@ -8,7 +8,7 @@
  */
 
 /**
- * Σ SIGMA OS: SOVEREIGN UI CORE (v4.0 - ZERO-JAVASCRIPT)
+ * S SIGMA OS: SOVEREIGN UI CORE (v4.0 - ZERO-JAVASCRIPT)
  * ====================================================
  * USP Absorbed: WebAssembly (Wasm), Rust (Safety), C++20 (Performance).
  * Capability: Native UI logic sharding without high-level JavaScript overhead.

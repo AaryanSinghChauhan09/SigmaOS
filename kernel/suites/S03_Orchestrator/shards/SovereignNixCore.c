@@ -1,9 +1,9 @@
-#include "sigma_kernel.h"
+﻿#include "sigma_kernel.h"
 #include "SovereignLatticeRegistry.h"
 
 void SovereignNixCore_Init() {
-    sigma_printf("Σ [ABSORB]: SovereignNixCore Integration Complete. Global USP Parity Secured.\n");
-    sigma_printf("Σ [NIX]: Declarative configuration engine established. Immutability verified.\n");
+    sigma_printf("S [ABSORB]: SovereignNixCore Integration Complete. Global USP Parity Secured.\n");
+    sigma_printf("S [NIX]: Declarative configuration engine established. Immutability verified.\n");
 }
 
 void SovereignNixCore_Register() {

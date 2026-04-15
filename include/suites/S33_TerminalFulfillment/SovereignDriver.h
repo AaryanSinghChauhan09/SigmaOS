@@ -1,6 +1,6 @@
-/*
+﻿/*
  * =========================================================================
- * Σ SIGMAOS: SOVEREIGN DRIVER INTERFACE (v1.0)
+ * S SIGMAOS: SOVEREIGN DRIVER INTERFACE (v1.0)
  * =========================================================================
  * Mission: Unified device model and driver registry for hardware autonomy.
  * Design: C11 / Zero-Dependency / Registry-Based.

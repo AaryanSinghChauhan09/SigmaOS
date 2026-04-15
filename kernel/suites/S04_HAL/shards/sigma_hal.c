@@ -1,6 +1,6 @@
-/*
+﻿/*
  * =========================================================================
- * Σ SIGMAOS kernel/suites/S04_HAL/shards/sigma_hal.c
+ * S SIGMAOS kernel/suites/S04_HAL/shards/sigma_hal.c
  * =========================================================================
  */
 
@@ -19,8 +19,8 @@ void sigma_hal_init(void) {
     sigma_memset(s_devices, 0, sizeof(s_devices));
     sigma_memset(s_irqs,    0, sizeof(s_irqs));
     s_irqs_init = HAL_TRUE;
-    sigma_printf("Σ [HAL] Hardware Abstraction Layer initialized\n");
-    sigma_printf("Σ [HAL] Max devices: %u   Max IRQs: %u\n",
+    sigma_printf("S [HAL] Hardware Abstraction Layer initialized\n");
+    sigma_printf("S [HAL] Max devices: %u   Max IRQs: %u\n",
                  SIGMA_HAL_MAX_DEVICES, SIGMA_HAL_MAX_IRQS);
 }
 
@@ -33,7 +33,7 @@ hal_i32 sigma_hal_register(sigma_device_t *dev) {
     sigma_device_t *slot = &s_devices[s_dev_count++];
     *slot = *dev;
 
-    sigma_printf("Σ [HAL] REGISTER: id=%u name=%s bus=%d class=%d irq=%u\n",
+    sigma_printf("S [HAL] REGISTER: id=%u name=%s bus=%d class=%d irq=%u\n",
                  slot->id, slot->name, (int)slot->bus, (int)slot->cls, slot->irq);
 
     /* Auto-probe */
@@ -41,9 +41,9 @@ hal_i32 sigma_hal_register(sigma_device_t *dev) {
         if (slot->ops->probe(slot) == HAL_OK) {
             if (slot->ops->init) slot->ops->init(slot);
             slot->online = HAL_TRUE;
-            sigma_printf("Σ [HAL] ONLINE: %s\n", slot->name);
+            sigma_printf("S [HAL] ONLINE: %s\n", slot->name);
         } else {
-            sigma_printf("Σ [HAL] PROBE FAIL: %s\n", slot->name);
+            sigma_printf("S [HAL] PROBE FAIL: %s\n", slot->name);
         }
     } else {
         slot->online = HAL_TRUE;  /* no probe = assume always present   */
@@ -57,7 +57,7 @@ void sigma_hal_unregister(hal_u32 dev_id) {
         if (s_devices[i].id == dev_id) {
             if (s_devices[i].ops && s_devices[i].ops->remove)
                 s_devices[i].ops->remove(&s_devices[i]);
-            sigma_printf("Σ [HAL] UNREGISTER: %s\n", s_devices[i].name);
+            sigma_printf("S [HAL] UNREGISTER: %s\n", s_devices[i].name);
             for (hal_u32 j = i; j < s_dev_count - 1; j++)
                 s_devices[j] = s_devices[j+1];
             s_dev_count--;
@@ -74,7 +74,7 @@ sigma_device_t *sigma_hal_find(const char *name) {
 }
 
 void sigma_hal_enumerate_bus(sigma_bus_t bus) {
-    sigma_printf("Σ [HAL] Enumerating bus %d...\n", (int)bus);
+    sigma_printf("S [HAL] Enumerating bus %d...\n", (int)bus);
     for (hal_u32 i = 0; i < s_dev_count; i++)
         if (s_devices[i].bus == bus)
             sigma_printf("  [%u] %s vid=0x%04x did=0x%04x %s\n",
@@ -86,7 +86,7 @@ void sigma_hal_enumerate_bus(sigma_bus_t bus) {
 void sigma_hal_device_list(void) {
     static const char *bus_str[]  = {"PLAT","PCI","USB","I2C","SPI","VIRTIO","ACPI"};
     static const char *cls_str[]  = {"BLOCK","NET","INPUT","DISP","AUDIO","SERIAL","MISC"};
-    sigma_printf("\nΣ HAL DEVICE TABLE (%u devices)\n", s_dev_count);
+    sigma_printf("\nS HAL DEVICE TABLE (%u devices)\n", s_dev_count);
     sigma_printf("%-4s %-20s %-8s %-8s %-6s %s\n",
                  "ID", "NAME", "BUS", "CLASS", "IRQ", "STATUS");
     for (hal_u32 i = 0; i < s_dev_count; i++) {
@@ -107,7 +107,7 @@ hal_i32 sigma_irq_request(hal_u32 irq, sigma_irq_type_t type,
     s_irqs[irq].dev_id  = dev_id;
     s_irqs[irq].count   = 0;
     s_irqs[irq].enabled = HAL_TRUE;
-    sigma_printf("Σ [HAL] IRQ%u registered (type=%d)\n", irq, (int)type);
+    sigma_printf("S [HAL] IRQ%u registered (type=%d)\n", irq, (int)type);
     return HAL_OK;
 }
 
@@ -129,7 +129,7 @@ void sigma_irq_dispatch(hal_u32 irq) {
 }
 
 void sigma_irq_stats(void) {
-    sigma_printf("\nΣ HAL IRQ STATS\n");
+    sigma_printf("\nS HAL IRQ STATS\n");
     for (hal_u32 i = 0; i < SIGMA_HAL_MAX_IRQS; i++) {
         if (s_irqs[i].count > 0)
             sigma_printf("  IRQ%-4u count=%-10llu %s\n", i,
@@ -153,7 +153,7 @@ hal_i32 sigma_dma_alloc(sigma_dma_buf_t *buf, hal_u64 size, hal_bool coherent) {
     buf->coherent  = coherent;
     buf->virt_addr = sigma_malloc(size);
     buf->phys_addr = (hal_u64)(unsigned long long)(hal_u64*)buf->virt_addr;
-    sigma_printf("Σ [DMA] ALLOC: %llu bytes phys=0x%llx coherent=%d\n",
+    sigma_printf("S [DMA] ALLOC: %llu bytes phys=0x%llx coherent=%d\n",
                  (unsigned long long)size, (unsigned long long)buf->phys_addr, coherent);
     return buf->virt_addr ? HAL_OK : HAL_ERR;
 }
@@ -169,7 +169,7 @@ hal_i32 sigma_pm_suspend_device(hal_u32 dev_id) {
     for (hal_u32 i = 0; i < s_dev_count; i++) {
         if (s_devices[i].id == dev_id && s_devices[i].ops && s_devices[i].ops->suspend) {
             s_devices[i].online = HAL_FALSE;
-            sigma_printf("Σ [PM] SUSPEND: %s\n", s_devices[i].name);
+            sigma_printf("S [PM] SUSPEND: %s\n", s_devices[i].name);
             return s_devices[i].ops->suspend(&s_devices[i]);
         }
     }
@@ -180,7 +180,7 @@ hal_i32 sigma_pm_resume_device(hal_u32 dev_id) {
     for (hal_u32 i = 0; i < s_dev_count; i++) {
         if (s_devices[i].id == dev_id && s_devices[i].ops && s_devices[i].ops->resume) {
             s_devices[i].online = HAL_TRUE;
-            sigma_printf("Σ [PM] RESUME: %s\n", s_devices[i].name);
+            sigma_printf("S [PM] RESUME: %s\n", s_devices[i].name);
             return s_devices[i].ops->resume(&s_devices[i]);
         }
     }

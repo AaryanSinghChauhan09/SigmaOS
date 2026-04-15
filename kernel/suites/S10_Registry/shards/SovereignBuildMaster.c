@@ -1,4 +1,4 @@
-#include "sigma_kernel.h"
+﻿#include "sigma_kernel.h"
 
 #define C_BOLD   "\033[1m"
 #define C_RESET  "\033[0m"
@@ -31,7 +31,7 @@ void verify_file(const char* path) {
 
             for (int i = 0; i < 16; i++) {
                 if (sigma_strstr(line, FORBIDDEN[i])) {
-                    sigma_printf("  Σ %s✗%s  %s:%d  →  %s\n", C_RED, C_RESET, path, lineno, line);
+                    sigma_printf("  S %s✗%s  %s:%d  →  %s\n", C_RED, C_RESET, path, lineno, line);
                 }
             }
 
@@ -46,7 +46,7 @@ void verify_file(const char* path) {
 void scan_dir(const char* dir_path) {
     // SigmaOS VFS Audit: Traversing directory shards natively.
     // Logic: In bare-metal, we hook into the VFS directly.
-    sigma_printf("Σ [BUILD_MASTER]: Auditing directory shard: %s\n", dir_path);
+    sigma_printf("S [BUILD_MASTER]: Auditing directory shard: %s\n", dir_path);
     
     // Mission Stub: On bare-metal, we iterate over VFS dentries.
     // For now, we audit the specific known critical shards.
@@ -56,7 +56,7 @@ void scan_dir(const char* dir_path) {
 }
 
 int SovereignBuildMaster_ToolMain(int argc, char** argv) {
-    sigma_printf("\n%sΣ SOVEREIGN BUILD MASTER (v12.0 SILICON-DIRECT)%s\n", C_BOLD, C_RESET);
+    sigma_printf("\n%sS SOVEREIGN BUILD MASTER (v12.0 SILICON-DIRECT)%s\n", C_BOLD, C_RESET);
     sigma_printf("Mission: Zero-Dependency Sovereignty Audit.\n");
     
     scan_dir(".");

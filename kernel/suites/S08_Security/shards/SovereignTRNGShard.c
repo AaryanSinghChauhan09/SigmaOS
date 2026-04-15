@@ -1,6 +1,6 @@
-/*
+﻿/*
  * =========================================================================
- * Σ SIGMAOS ETERNITY: SOVEREIGN TRNG SHARD (v57.6-SUPREME-ETERNITY)
+ * S SIGMAOS ETERNITY: SOVEREIGN TRNG SHARD (v57.6-SUPREME-ETERNITY)
  * =========================================================================
  * Mission: Unbreakable cryptographic entropy harvesting from physical silicon.
  * Principles: Cyber Security, Hardware Mastery, Privacy.

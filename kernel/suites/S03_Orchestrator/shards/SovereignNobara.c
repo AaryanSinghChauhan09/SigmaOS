@@ -1,7 +1,7 @@
-#include "sigma_kernel.h"
+﻿#include "sigma_kernel.h"
 
 void SovereignNobara_Init() {
-    sigma_printf("Σ [ABSORB]: SovereignNobara Zenith Online. Unified Parity Verified.\n");
+    sigma_printf("S [ABSORB]: SovereignNobara Zenith Online. Unified Parity Verified.\n");
 }
 
 

@@ -1,6 +1,6 @@
-/*
+﻿/*
  * =========================================================================
- * Σ SIGMAOS MULTIVERSE_CORE: SOVEREIGN DPA SHARD (v58.1-SUPREME-MULTIVERSE_CORE)
+ * S SIGMAOS MULTIVERSE_CORE: SOVEREIGN DPA SHARD (v58.1-SUPREME-MULTIVERSE_CORE)
  * =========================================================================
  * Mission: Eradicating physical energy side-channels during cryptography.
  * Principles: Cyber Security, Privacy.

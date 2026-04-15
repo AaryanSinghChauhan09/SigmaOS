@@ -1,6 +1,6 @@
-/*
+﻿/*
  * =========================================================================
- * Σ SIGMAOS kernel/suites/S14_PowerManagement/shards/sigma_pm.h
+ * S SIGMAOS kernel/suites/S14_PowerManagement/shards/sigma_pm.h
  * =========================================================================
  * Sovereign Power Management — gap-closes:
  *   Linux  : ACPI, cpufreq (governors: performance/powersave/schedutil)

@@ -1,6 +1,6 @@
-/*
+﻿/*
  * =========================================================================
- * Σ SIGMAOS kernel/suites/S07_Network/shards/sigma_netstack.h
+ * S SIGMAOS kernel/suites/S07_Network/shards/sigma_netstack.h
  * =========================================================================
  * Sovereign Network Stack — gap-closes:
  *   Linux  : sk_buff, netfilter, routing table, tc/qdisc

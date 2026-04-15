@@ -1,6 +1,6 @@
-/*
+﻿/*
  * =========================================================================
- * Σ SIGMAOS: SOVEREIGN DARWIN XNU (v1.0 — C11)
+ * S SIGMAOS: SOVEREIGN DARWIN XNU (v1.0 — C11)
  * =========================================================================
  * Absorbed USPs from: Apple/Darwin XNU
  *   https://github.com/apple/darwin-xnu

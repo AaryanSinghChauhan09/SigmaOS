@@ -1,9 +1,9 @@
-#ifndef SOVEREIGN_EXCEL_ZENITH_H
+﻿#ifndef SOVEREIGN_EXCEL_ZENITH_H
 #define SOVEREIGN_EXCEL_ZENITH_H
 
 #include "SigmaOOP.h"
 
-/* Σ Territory Initiation */
+/* S Territory Initiation */
 
 // --- CELL DEPENDENCY RENDERER (DAG CORE) ---
 CLASS_DECLARE(SovereignSpreadsheetDAG) { 
@@ -24,6 +24,6 @@ CLASS_DECLARE(SovereignMacroVM) {
     VIRTUAL(void, ExecuteMacroSovereign, struct SovereignMacroVM* self);
 };
 
-/* Σ Territory Termination */
+/* S Territory Termination */
 
 #endif

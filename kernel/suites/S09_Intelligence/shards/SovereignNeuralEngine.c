@@ -1,6 +1,6 @@
-/*
+﻿/*
  * =========================================================================
- * Σ SIGMAOS: S09_INTELLIGENCE — SovereignNeuralEngine.c
+ * S SIGMAOS: S09_INTELLIGENCE — SovereignNeuralEngine.c
  * =========================================================================
  * Implementation of Idea 471 (Apex Infinity): Native Neural Inference.
  * Supports dense layer forward pass and ReLU activation in pure C.
@@ -36,5 +36,5 @@ void neural_forward(SovereignDenseLayer* layer, float* input, float* output) {
 }
 
 void neural_engine_init(void) {
-    sigma_printf("Σ [S09]: Sovereign Neural Inference Engine Materialized (Apex Idea 471).\n");
+    sigma_printf("S [S09]: Sovereign Neural Inference Engine Materialized (Apex Idea 471).\n");
 }

@@ -1,6 +1,6 @@
-/*
+﻿/*
  * =========================================================================
- * Σ SIGMAOS ZENITH: SOVEREIGN PERSONA SHARD (v50.0-SINGULARITY)
+ * S SIGMAOS ZENITH: SOVEREIGN PERSONA SHARD (v50.0-SINGULARITY)
  * =========================================================================
  * Mission: Kernel-level user personalization and behavioral adaptation.
  * Principles: Personalization, Customization, Adaptive Logic.

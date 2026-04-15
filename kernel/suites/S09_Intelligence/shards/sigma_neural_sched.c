@@ -1,6 +1,6 @@
-/*
+﻿/*
  * =========================================================================
- * Σ SIGMAOS kernel/suites/S09_Intelligence/shards/sigma_neural_sched.c
+ * S SIGMAOS kernel/suites/S09_Intelligence/shards/sigma_neural_sched.c
  * =========================================================================
  * Pure C11 feedforward neural predictor for kernel resource management.
  * Fixed-point Q8 arithmetic — no FPU dependency, freestanding safe.
@@ -48,7 +48,7 @@ void sigma_neural_sched_load_defaults(void) {
     s_weights.w2[1][1] = Q8_ONE;   /* reclaim     <- mem sensor  */
     s_weights.w2[2][4] = -Q8_ONE;  /* freq_scale  <- thermal     */
 
-    sigma_printf("Σ [NEURAL] Default Q8 weights loaded\n");
+    sigma_printf("S [NEURAL] Default Q8 weights loaded\n");
 }
 
 /* ── Init ────────────────────────────────────────────────────────────────── */
@@ -57,7 +57,7 @@ void sigma_neural_sched_init(void) {
     sigma_memset(&s_last_pred, 0, sizeof(s_last_pred));
     s_last_pred.freq_scale_pct = 100;
     sigma_neural_sched_load_defaults();
-    sigma_printf("Σ [NEURAL] Resource Balancer initialized (Q8 perceptron)\n");
+    sigma_printf("S [NEURAL] Resource Balancer initialized (Q8 perceptron)\n");
 }
 
 /* ── Feed a new resource snapshot ────────────────────────────────────────── */
@@ -138,16 +138,16 @@ sigma_nn_prediction_t sigma_neural_sched_predict(void) {
 void sigma_neural_sched_apply(void) {
     sigma_nn_prediction_t p = sigma_neural_sched_predict();
 
-    sigma_printf("Σ [NEURAL] APPLY: sched_boost=%d reclaim=%u%% freq=%u%%\n",
+    sigma_printf("S [NEURAL] APPLY: sched_boost=%d reclaim=%u%% freq=%u%%\n",
                  p.sched_boost, p.mem_reclaim_pct, p.freq_scale_pct);
 
     if (p.cpu_pressure >= PRESSURE_HIGH)
-        sigma_printf("Σ [NEURAL] ⚠ CPU PRESSURE HIGH — boosting CFS quantum\n");
+        sigma_printf("S [NEURAL] ⚠ CPU PRESSURE HIGH — boosting CFS quantum\n");
     if (p.mem_pressure >= PRESSURE_HIGH)
-        sigma_printf("Σ [NEURAL] ⚠ MEM PRESSURE HIGH — triggering reclaim %u%%\n",
+        sigma_printf("S [NEURAL] ⚠ MEM PRESSURE HIGH — triggering reclaim %u%%\n",
                      p.mem_reclaim_pct);
     if (p.thermal_advice >= THERMAL_HOT)
-        sigma_printf("Σ [NEURAL] 🌡 THERMAL HOT — scaling freq to %u%%\n",
+        sigma_printf("S [NEURAL] 🌡 THERMAL HOT — scaling freq to %u%%\n",
                      p.freq_scale_pct);
 }
 
@@ -156,7 +156,7 @@ void sigma_neural_sched_stats(void) {
     sigma_nn_prediction_t p = s_last_pred;
     static const char *pres[] = {"none","low","medium","high","critical"};
     static const char *thm[]  = {"normal","warm","hot","critical"};
-    sigma_printf("\nΣ NEURAL RESOURCE BALANCER — Last Prediction\n");
+    sigma_printf("\nS NEURAL RESOURCE BALANCER — Last Prediction\n");
     sigma_printf("  sched_boost:   %+d\n",    p.sched_boost);
     sigma_printf("  mem_reclaim:   %u%%\n",   p.mem_reclaim_pct);
     sigma_printf("  freq_scale:    %u%%\n",   p.freq_scale_pct);

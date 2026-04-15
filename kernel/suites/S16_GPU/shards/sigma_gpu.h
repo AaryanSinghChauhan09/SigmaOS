@@ -1,6 +1,6 @@
-/*
+﻿/*
  * =========================================================================
- * Σ SIGMAOS kernel/suites/S16_GPU/shards/sigma_gpu.h
+ * S SIGMAOS kernel/suites/S16_GPU/shards/sigma_gpu.h
  * =========================================================================
  * Sovereign GPU Subsystem — gap-closes:
  *   Linux  : DRM/KMS, GEM/TTM buffer objects, PRIME (dma-buf), Mesa/Gallium

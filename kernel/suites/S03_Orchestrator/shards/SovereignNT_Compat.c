@@ -1,7 +1,7 @@
-#include "sigma_kernel.h"
+﻿#include "sigma_kernel.h"
 
 void SovereignNT_Compat_Init() {
-    sigma_printf("Σ [ABSORB]: SovereignNT_Compat Zenith Online. Unified Parity Verified.\n");
+    sigma_printf("S [ABSORB]: SovereignNT_Compat Zenith Online. Unified Parity Verified.\n");
 }
 
 

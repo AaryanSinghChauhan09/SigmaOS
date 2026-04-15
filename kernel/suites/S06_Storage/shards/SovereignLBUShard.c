@@ -1,4 +1,4 @@
-#include "sigma_base.h"
+﻿#include "sigma_base.h"
 
 #include "SovereignFS.h"
 #include "sigma_libc.h"
@@ -10,8 +10,8 @@
  */
 
 sigma_err_t sigma_lbu_init(void) {
-    sigma_printf("  Σ [FS-LBU]: Sovereign Alpine-style local backup utility active.\n");
-    sigma_printf("  Σ [FS-LBU]: Persistent shard archives committed to /etc/apkovl.\n");
+    sigma_printf("  S [FS-LBU]: Sovereign Alpine-style local backup utility active.\n");
+    sigma_printf("  S [FS-LBU]: Persistent shard archives committed to /etc/apkovl.\n");
     return SIGMA_OK;
 }
 

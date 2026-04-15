@@ -1,6 +1,6 @@
-/*
+﻿/*
  * =========================================================================
- * Σ SIGMAOS THE_SINGULARITY: SOVEREIGN ABS SHARD (v63.0-SINGULARITY)
+ * S SIGMAOS THE_SINGULARITY: SOVEREIGN ABS SHARD (v63.0-SINGULARITY)
  * =========================================================================
  * Mission: Sentient dynamic hardware lock generation.
  * Principles: Cyber Security, Privacy, Cryptography.

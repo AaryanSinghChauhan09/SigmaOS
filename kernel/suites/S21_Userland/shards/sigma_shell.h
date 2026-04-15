@@ -1,6 +1,6 @@
-/*
+﻿/*
  * =========================================================================
- * Σ SIGMAOS: SOVEREIGN USERLAND (Suite S21)
+ * S SIGMAOS: SOVEREIGN USERLAND (Suite S21)
  * =========================================================================
  * Shard: Sovereign Shell Core
  * Parity: POSIX sh / Windows CMD / macOS Zsh

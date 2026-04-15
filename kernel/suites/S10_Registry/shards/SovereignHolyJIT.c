@@ -1,6 +1,6 @@
-/*
+﻿/*
  * =========================================================================
- * Σ SIGMAOS: SOVEREIGN HOLY JIT (v1.0 - PURE C11)
+ * S SIGMAOS: SOVEREIGN HOLY JIT (v1.0 - PURE C11)
  * =========================================================================
  * Mission: Direct-to-Silicon JIT Compilation (TempleOS Parity).
  * Design: C11 / Zero-Dependency / Shard-Generator-Matrix.

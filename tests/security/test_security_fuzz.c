@@ -1,6 +1,6 @@
-/*
+﻿/*
  * =========================================================================
- * Σ SIGMAOS: SOVEREIGN SECURITY FUZZ TEST (v1.0)
+ * S SIGMAOS: SOVEREIGN SECURITY FUZZ TEST (v1.0)
  * =========================================================================
  * Roadmap #9  -- Security tests: fuzzing and vulnerability scanning
  * Roadmap #5  -- Property-based testing with adversarial input generation
@@ -200,7 +200,7 @@ static void test_credential_leak_scan(void) {
  * ========================================================================= */
 int main(void) {
     sigma_printf("======================================================\n");
-    sigma_printf("  Σ SIGMAOS: SOVEREIGN SECURITY FUZZ SUITE (v1.0)\n");
+    sigma_printf("  S SIGMAOS: SOVEREIGN SECURITY FUZZ SUITE (v1.0)\n");
     sigma_printf("  Scope: Privilege · Buffer · Injection · Integer\n");
     sigma_printf("======================================================\n");
 

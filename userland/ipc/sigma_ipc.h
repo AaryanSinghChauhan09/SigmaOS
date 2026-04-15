@@ -1,6 +1,6 @@
-/*
+﻿/*
  * =========================================================================
- * Σ SIGMAOS userland/ipc/sigma_ipc.h
+ * S SIGMAOS userland/ipc/sigma_ipc.h
  * =========================================================================
  * Modular IPC subsystem — fills gaps vs Linux pipes/sockets, macOS Mach
  * ports, Windows Named Pipes, and Android Binder.

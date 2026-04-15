@@ -1,6 +1,6 @@
-/*
+﻿/*
  * =========================================================================
- * Σ SIGMAOS OMEGA_POINT: SOVEREIGN QST SHARD (v62.0-OMEGA)
+ * S SIGMAOS OMEGA_POINT: SOVEREIGN QST SHARD (v62.0-OMEGA)
  * =========================================================================
  * Mission: Guaranteeing the absolute purity of cryptographic quantum states.
  * Principles: Cyber Security, Privacy, Quantum Super-Architecture.

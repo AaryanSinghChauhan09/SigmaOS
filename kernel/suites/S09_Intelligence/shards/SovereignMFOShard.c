@@ -1,6 +1,6 @@
-/*
+﻿/*
  * =========================================================================
- * Σ SIGMAOS ZENITH: SOVEREIGN MFO SHARD (v55.5-SUPREME-ORION-ZENITH)
+ * S SIGMAOS ZENITH: SOVEREIGN MFO SHARD (v55.5-SUPREME-ORION-ZENITH)
  * =========================================================================
  * Mission: Spiral-based search towards optimal "flame" configurations.
  * Principles: AI, Algorithms, Data Science, Throughput.

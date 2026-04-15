@@ -1,6 +1,6 @@
-/*
+﻿/*
  * =========================================================================
- * Σ SIGMAOS kernel/suites/S11_PQC/shards/sigma_pqc.h
+ * S SIGMAOS kernel/suites/S11_PQC/shards/sigma_pqc.h
  * =========================================================================
  * Post-Quantum Cryptography Suite — gap-closes:
  *   OpenSSL : RSA/ECC/AES (now quantum-vulnerable)

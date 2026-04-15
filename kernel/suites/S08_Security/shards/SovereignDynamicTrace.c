@@ -1,10 +1,10 @@
-#include "sigma_base.h"
+﻿#include "sigma_base.h"
 
 #include <sigma_types.h>
 #include "sigma_print.h"
 
 /*
- * Σ Sovereign Dynamic Tracing Foundry
+ * S Sovereign Dynamic Tracing Foundry
  * USP: Solaris / Illumos (DTrace Live Execution Mapping)
  * Concept: Vaporizes standard debugging latency. Dynamically maps
  *          "probes" straight onto live memory execution vectors asynchronously.

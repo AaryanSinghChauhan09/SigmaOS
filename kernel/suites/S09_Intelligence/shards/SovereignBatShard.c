@@ -1,6 +1,6 @@
-/*
+﻿/*
  * =========================================================================
- * Σ SIGMAOS ZENITH: SOVEREIGN BAT SHARD (v52.8-SUPREME-HEAVEN)
+ * S SIGMAOS ZENITH: SOVEREIGN BAT SHARD (v52.8-SUPREME-HEAVEN)
  * =========================================================================
  * Mission: Echolocation-based metaheuristic for memory-arena discovery.
  * Principles: AI, Algorithms, Data Science, Throughput.

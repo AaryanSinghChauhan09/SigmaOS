@@ -1,6 +1,6 @@
-/*
+﻿/*
  * =========================================================================
- * Σ SIGMAOS: SOVEREIGN OOM SHARD HEADER
+ * S SIGMAOS: SOVEREIGN OOM SHARD HEADER
  * =========================================================================
  */
 #ifndef SOVEREIGN_OOM_SHARD_H

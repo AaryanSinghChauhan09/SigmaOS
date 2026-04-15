@@ -1,6 +1,6 @@
-/*
+﻿/*
  * =========================================================================
- * Σ SIGMAOS DIVINE_INTERVENTION: SOVEREIGN CXLC SHARD (v61.0-DIVINE)
+ * S SIGMAOS DIVINE_INTERVENTION: SOVEREIGN CXLC SHARD (v61.0-DIVINE)
  * =========================================================================
  * Mission: Datacenter-scale RAM sharing across PCIe backplanes.
  * Principles: Performance, Hardware Mastery, Cloud, Distributed.

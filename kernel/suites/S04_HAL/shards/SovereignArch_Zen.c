@@ -1,4 +1,4 @@
-/**
+﻿/**
  * @file SovereignArch_Zen.c
  * @brief Phase 66: Arch Linux Absorption Shard (Zen Optimization).
  */
@@ -6,9 +6,9 @@
 #include "sigma_kernel.h"
 
 sigma_err_t sigma_arch_zen_apply(void) {
-    sigma_printf("Σ [ABSORPTION]: Applying Arch Linux 'Zen' Primitives...\n");
-    sigma_printf("  Σ [ZEN]: Setting preemption threshold to REALTIME.\n");
-    sigma_printf("  Σ [ZEN]: Optimizing CFS latency for interactive workability.\n");
+    sigma_printf("S [ABSORPTION]: Applying Arch Linux 'Zen' Primitives...\n");
+    sigma_printf("  S [ZEN]: Setting preemption threshold to REALTIME.\n");
+    sigma_printf("  S [ZEN]: Optimizing CFS latency for interactive workability.\n");
     
     // In a real kernel, we would adjust the scheduler ticks and power states.
     return SIGMA_OK;

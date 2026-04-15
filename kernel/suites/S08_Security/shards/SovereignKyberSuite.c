@@ -1,6 +1,6 @@
-/*
+﻿/*
  * =========================================================================
- * Σ SIGMAOS: SOVEREIGN KYBER SUITE (v2.0 - POST-QUANTUM)
+ * S SIGMAOS: SOVEREIGN KYBER SUITE (v2.0 - POST-QUANTUM)
  * =========================================================================
  * Mission: Lattice-based Cryptographic Dominance.
  * =========================================================================
@@ -14,9 +14,9 @@ void sigma_kyber_encrypt(const char* data) {
 }
 
 void SovereignKyber_Init(void) {
-    sigma_printf("Σ [KYBER-SUITE]: Initialising Post-Quantum Security Mesh...\n");
+    sigma_printf("S [KYBER-SUITE]: Initialising Post-Quantum Security Mesh...\n");
     sigma_kyber_encrypt("SIGMA_ZENITH_ZENITH");
-    sigma_printf("Σ [KYBER-SUITE]: Lattice verified. Shards are quantum-bulletproof.\n");
+    sigma_printf("S [KYBER-SUITE]: Lattice verified. Shards are quantum-bulletproof.\n");
 }
 
 void SovereignKyber_Register(void) {

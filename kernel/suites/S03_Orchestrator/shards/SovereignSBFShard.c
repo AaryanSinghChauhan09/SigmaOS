@@ -1,6 +1,6 @@
-/*
+﻿/*
  * =========================================================================
- * Σ SIGMAOS ZENITH: SOVEREIGN SBF SHARD (v56.5-SUPREME-VALHALLA)
+ * S SIGMAOS ZENITH: SOVEREIGN SBF SHARD (v56.5-SUPREME-VALHALLA)
  * =========================================================================
  * Mission: JIT-compiled sandboxed execution of user-defined kernel hooks.
  * Principles: Automations, Customisations, Developer Experience, Dynamic.

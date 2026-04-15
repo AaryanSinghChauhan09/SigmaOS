@@ -1,6 +1,6 @@
-/*
+﻿/*
  * =========================================================================
- * Σ SIGMAOS: S25_ZEROKERNEL — SovereignISA_Emulator.c
+ * S SIGMAOS: S25_ZEROKERNEL — SovereignISA_Emulator.c
  * =========================================================================
  * Implementation of Idea 60.1/60.2 (Apex Infinity): SigmaISA Emulator.
  * Fetch-Decode-Execute loop for the custom SigmaOS instruction set.
@@ -28,7 +28,7 @@ void sigma_isa_step(SigmaISACpu* cpu) {
             cpu->registers[(instr >> 8) & 0x1F] += cpu->registers[(instr >> 13) & 0x1F];
             break;
         case 0xFF: // HALT
-            sigma_printf("Σ [SigmaISA]: CPU Halted.\n");
+            sigma_printf("S [SigmaISA]: CPU Halted.\n");
             return;
     }
     
@@ -36,5 +36,5 @@ void sigma_isa_step(SigmaISACpu* cpu) {
 }
 
 void isa_emulator_init(void) {
-    sigma_printf("Σ [S25]: SigmaISA Emulator Materialized (Apex Idea 60.2).\n");
+    sigma_printf("S [S25]: SigmaISA Emulator Materialized (Apex Idea 60.2).\n");
 }

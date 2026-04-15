@@ -1,6 +1,6 @@
-/*
+﻿/*
  * =========================================================================
- * Σ SIGMAOS ZENITH SUPREME: ARCH-DEPENDENT PAGING (x86_64)
+ * S SIGMAOS ZENITH SUPREME: ARCH-DEPENDENT PAGING (x86_64)
  * =========================================================================
  * Mission: Virtual-to-physical mapping with high-performance sharding.
  * Capability: Page Fault handling, TLB flushing, 4-level paging (PML4).

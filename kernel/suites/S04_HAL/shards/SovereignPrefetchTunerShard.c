@@ -1,6 +1,6 @@
-/*
+﻿/*
  * =========================================================================
- * Σ SIGMAOS ZENITH: SOVEREIGN PREFETCH TUNER (v52.7-SUPREME-OLYMPUS)
+ * S SIGMAOS ZENITH: SOVEREIGN PREFETCH TUNER (v52.7-SUPREME-OLYMPUS)
  * =========================================================================
  * Mission: Dynamic hardware prefetcher optimization (MSR control).
  * Principles: Performance, Computer Science, Hardware Mastery.

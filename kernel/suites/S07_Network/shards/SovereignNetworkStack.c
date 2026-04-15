@@ -1,6 +1,6 @@
-/*
+﻿/*
  * =========================================================================
- * Σ SIGMAOS: S07_NETWORK — SovereignNetworkStack.c
+ * S SIGMAOS: S07_NETWORK — SovereignNetworkStack.c
  * =========================================================================
  * Mission: High-Performance TCP/IP Finite State Machine.
  * Design: Zero-Copy Packet processing and sliding window flow control.
@@ -28,16 +28,16 @@ typedef struct {
 } TCPSovereignSocket;
 
 void Sovereign_Net_Init(void) {
-    sigma_printf("Σ [S07]: Sovereign Networking Stack active. Proto: IPv4/TCP/UDP.\n");
+    sigma_printf("S [S07]: Sovereign Networking Stack active. Proto: IPv4/TCP/UDP.\n");
 }
 
 sigma_err_t Sovereign_Net_HandlePacket(void* raw_data, sigma_size_t len) {
     // Process IPv4 Header
     // Process TCP/UDP Port
-    sigma_printf("Σ [S07]: Rx Packet (%d bytes) -> Inter-Shard Dispatching...\n", (int)len);
+    sigma_printf("S [S07]: Rx Packet (%d bytes) -> Inter-Shard Dispatching...\n", (int)len);
     return SIGMA_OK;
 }
 
 void Sovereign_TCP_Listen(sigma_u16 port) {
-    sigma_printf("Σ [S07]: TCP Listening on Sovereign Port: %u\n", port);
+    sigma_printf("S [S07]: TCP Listening on Sovereign Port: %u\n", port);
 }

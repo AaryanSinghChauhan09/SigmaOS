@@ -1,6 +1,6 @@
-/*
+﻿/*
  * =========================================================================
- * Σ SIGMAOS ZENITH: SOVEREIGN PREFETCH-INT SHARD (v54.1-ANDROMEDA)
+ * S SIGMAOS ZENITH: SOVEREIGN PREFETCH-INT SHARD (v54.1-ANDROMEDA)
  * =========================================================================
  * Mission: Tracking and optimizing hardware prefetch efficiency.
  * Principles: Performance, Computer Science, Hardware Mastery.

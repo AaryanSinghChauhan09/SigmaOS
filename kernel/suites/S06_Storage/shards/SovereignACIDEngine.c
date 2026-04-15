@@ -1,6 +1,6 @@
-/*
+﻿/*
  * =========================================================================
- * Σ SIGMAOS ZENITH: SOVEREIGN ACID DATABASE ENGINE (v1.0)
+ * S SIGMAOS ZENITH: SOVEREIGN ACID DATABASE ENGINE (v1.0)
  * =========================================================================
  * Mission: Kernel-level transactional storage with ACID guarantees.
  * Principles: Atomicity, Consistency, Isolation, Durability.

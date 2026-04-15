@@ -1,6 +1,6 @@
-/*
+﻿/*
  * =========================================================================
- * Σ SIGMAOS ZENITH: SOVEREIGN LZ ENGINE (v1.0)
+ * S SIGMAOS ZENITH: SOVEREIGN LZ ENGINE (v1.0)
  * =========================================================================
  * Mission: Zero-dependency dictionary compression for Storage.
  * Principles: Lempel-Ziv (LZ), Run-Length Encoding (RLE).

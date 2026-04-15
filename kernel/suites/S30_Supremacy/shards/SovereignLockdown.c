@@ -1,6 +1,6 @@
-/*
+﻿/*
  * =========================================================================
- * Σ SIGMAOS: S30_SUPREMACY — SovereignLockdown.c
+ * S SIGMAOS: S30_SUPREMACY — SovereignLockdown.c
  * =========================================================================
  * Mission: Hardened Kernel Lockdown.
  * Capability: Disabling raw I/O, untrusted modules, and JIT shards.
@@ -13,8 +13,8 @@ static sigma_bool g_lockdown_active = SIGMA_FALSE;
 
 void sigma_supremacy_lockdown_engage(void) {
     g_lockdown_active = SIGMA_TRUE;
-    sigma_printf("Σ [LOCKDOWN]: Kernel is now SEALED. No further shards can be materialized.\n");
-    sigma_printf("Σ [LOCKDOWN]: Raw hardware access restricted to SUITE_HAL only.\n");
+    sigma_printf("S [LOCKDOWN]: Kernel is now SEALED. No further shards can be materialized.\n");
+    sigma_printf("S [LOCKDOWN]: Raw hardware access restricted to SUITE_HAL only.\n");
 }
 
 sigma_bool sigma_supremacy_is_locked(void) {
@@ -22,5 +22,5 @@ sigma_bool sigma_supremacy_is_locked(void) {
 }
 
 void sigma_supremacy_lockdown_init(void) {
-    sigma_printf("Σ [SUPREMACY]: Lockdown Protocol initialized.\n");
+    sigma_printf("S [SUPREMACY]: Lockdown Protocol initialized.\n");
 }

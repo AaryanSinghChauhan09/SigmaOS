@@ -1,6 +1,6 @@
-/*
+﻿/*
  * =========================================================================
- * Σ SIGMAOS: S04_HAL — SovereignHAL_x86_64.c
+ * S SIGMAOS: S04_HAL — SovereignHAL_x86_64.c
  * =========================================================================
  * Implementation of Idea 131 (Apex Infinity): Hardware Abstraction Layer.
  * Direct silicon interaction for x86_64 architecture.
@@ -46,6 +46,6 @@ void hal_wrmsr(uint32_t msr, uint64_t val) {
 void hal_init(void) {
     uint32_t eax, ebx, ecx, edx;
     hal_get_cpuid(0, &eax, &ebx, &ecx, &edx);
-    sigma_printf("Σ [S04]: x86_64 HAL Materialized. CPU: %4.4s%4.4s%4.4s\n", 
+    sigma_printf("S [S04]: x86_64 HAL Materialized. CPU: %4.4s%4.4s%4.4s\n", 
                  (char*)&ebx, (char*)&edx, (char*)&ecx);
 }

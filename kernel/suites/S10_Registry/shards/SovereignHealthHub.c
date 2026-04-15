@@ -1,17 +1,17 @@
-#include "sigma_base.h"
+﻿#include "sigma_base.h"
 
 #include "SovereignToolHeader.h"
 
 /*
  * =========================================================================
- * Σ SIGMAOS: SOVEREIGN HEALTH HUB (v1.0)
+ * S SIGMAOS: SOVEREIGN HEALTH HUB (v1.0)
  * =========================================================================
  * Mission: Unified dashboard for Integrity, Purity, and Performance.
  * =========================================================================
  */
 
 void sigma_health_report(void) {
-    sigma_printf("Σ [HEALTH-HUB]: Sovereign System Status Report\n");
+    sigma_printf("S [HEALTH-HUB]: Sovereign System Status Report\n");
     sigma_printf("==========================================\n");
     sigma_printf("  [STATUS]: STABLE (vROADMAP_1005)\n");
     sigma_printf("  [INTEGRITY]: 100%% (446/446 SHARDS OK)\n");
@@ -22,7 +22,7 @@ void sigma_health_report(void) {
 }
 
 int SovereignHealthHub_ToolMain() {
-    sigma_printf("Σ [HEALTH-HUB]: Initializing Diagnostic Fusion...\n\n");
+    sigma_printf("S [HEALTH-HUB]: Initializing Diagnostic Fusion...\n\n");
     sigma_health_report();
     return 0;
 }

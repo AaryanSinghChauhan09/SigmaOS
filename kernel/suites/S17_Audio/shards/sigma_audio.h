@@ -1,6 +1,6 @@
-/*
+﻿/*
  * =========================================================================
- * Σ SIGMAOS kernel/suites/S17_Audio/shards/sigma_audio.h
+ * S SIGMAOS kernel/suites/S17_Audio/shards/sigma_audio.h
  * =========================================================================
  * Sovereign Audio Subsystem — gap-closes:
  *   Linux  : ALSA (Advanced Linux Sound Architecture), PipeWire, PulseAudio

@@ -1,6 +1,6 @@
-/*
+﻿/*
  * =========================================================================
- * Σ SIGMAOS ZENITH: SOVEREIGN FLAT-COMBINING SHARD (v53.0-SINGULARITY-OMEGA)
+ * S SIGMAOS ZENITH: SOVEREIGN FLAT-COMBINING SHARD (v53.0-SINGULARITY-OMEGA)
  * =========================================================================
  * Mission: High-throughput shared state access via batching.
  * Principles: Multi-Processing, Computer Science, Performance, Throughput.

@@ -1,6 +1,6 @@
-/*
+﻿/*
  * =========================================================================
- * Σ SIGMAOS ZENITH: SOVEREIGN IDS SHARD (v50.2-OMEGA)
+ * S SIGMAOS ZENITH: SOVEREIGN IDS SHARD (v50.2-OMEGA)
  * =========================================================================
  * Mission: Real-time network-level intrusion detection and forensics.
  * Principles: Cyber Security, Forensic Auditing, Zero-Trust.

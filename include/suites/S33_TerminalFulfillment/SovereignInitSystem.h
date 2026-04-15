@@ -1,6 +1,6 @@
-/*
+﻿/*
  * =========================================================================
- * Σ SIGMAOS: SOVEREIGN INIT SYSTEM (v1.0 — PURE C11)
+ * S SIGMAOS: SOVEREIGN INIT SYSTEM (v1.0 — PURE C11)
  * =========================================================================
  * Mission: PID-1 bootstrap, service supervision, runlevel management.
  * Inspired By: OpenRC (Gentoo), runit (Void), s6 (Skarnet), systemd (Fedora)

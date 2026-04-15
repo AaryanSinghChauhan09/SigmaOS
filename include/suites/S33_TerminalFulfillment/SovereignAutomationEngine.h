@@ -1,6 +1,6 @@
-/*
+﻿/*
  * =========================================================================
- * Σ SIGMAOS: SOVEREIGN AUTOMATION ENGINE HEADER
+ * S SIGMAOS: SOVEREIGN AUTOMATION ENGINE HEADER
  * =========================================================================
  */
 

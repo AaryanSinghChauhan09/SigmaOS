@@ -1,6 +1,6 @@
-/*
+﻿/*
  * =========================================================================
- * Σ SIGMAOS: SOVEREIGN INPUT SUBSYSTEM (v1.0 — PURE C11)
+ * S SIGMAOS: SOVEREIGN INPUT SUBSYSTEM (v1.0 — PURE C11)
  * =========================================================================
  * Competitor Gap Closed: Linux drivers/input/ (evdev), macOS IOHIDFamily,
  * Windows HID Class Drivers. SigmaOS had zero generic input handling.
@@ -150,7 +150,7 @@ sigma_err_t sigma_input_register_device(SigmaInputDevice_t *dev) {
     if (!dev) return SIGMA_EINVAL;
     dev->minor = s_input_dev_count++;
     dev->online = SIGMA_TRUE;
-    sigma_printf("Σ [INPUT]: Registered device /dev/input/event%d : '%s'\n",
+    sigma_printf("S [INPUT]: Registered device /dev/input/event%d : '%s'\n",
                  dev->minor, dev->name);
     return SIGMA_OK;
 }
@@ -222,13 +222,13 @@ sigma_ssize_t sigma_input_read_device(sigma_u32 minor, SigmaInputEvent_t *out_ev
  * ░░ INITIALISATION
  * ----------------------------------------------------------------------- */
 void SovereignInput_Init(void) {
-    sigma_printf("Σ [INPUT]: Initialising Sovereign Input Subsystem (evdev)...\n");
+    sigma_printf("S [INPUT]: Initialising Sovereign Input Subsystem (evdev)...\n");
 
     /* Create a simulated keyboard */
     SigmaInputDevice_t *kbd = sigma_input_allocate_device();
     sigma_strcpy(kbd->name, "Sigma Virtual Keyboard", 64);
     kbd->id_bustype = 0x11; /* BUS_USB */
-    kbd->id_vendor = 0x5163; /* 'Σ' */
+    kbd->id_vendor = 0x5163; /* 'S' */
     kbd->id_product = 0x1001;
     SET_BIT(EV_KEY, kbd->evbit);
     SET_BIT(EV_SYN, kbd->evbit);
@@ -262,7 +262,7 @@ void SovereignInput_Init(void) {
     sigma_input_event(mouse, EV_KEY, BTN_LEFT, 1);
     sigma_input_sync(mouse);
 
-    sigma_printf("Σ [INPUT]: Input engine online. Input sovereignty established.\n");
+    sigma_printf("S [INPUT]: Input engine online. Input sovereignty established.\n");
 }
 
 

@@ -1,6 +1,6 @@
-/*
+﻿/*
  * =========================================================================
- * Σ SIGMAOS ABSOLUTE_INFINITY: SOVEREIGN DICE SHARD (v59.1-ABSOLUTE)
+ * S SIGMAOS ABSOLUTE_INFINITY: SOVEREIGN DICE SHARD (v59.1-ABSOLUTE)
  * =========================================================================
  * Mission: Layered boot stage cryptographic derivation and compounding.
  * Principles: Cyber Security, Hardware Mastery, Trusted Execution.

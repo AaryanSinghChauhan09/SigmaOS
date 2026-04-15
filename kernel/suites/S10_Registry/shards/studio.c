@@ -1,9 +1,9 @@
-#include "sigma_base.h"
+﻿#include "sigma_base.h"
 
 #include "SovereignToolHeader.h"
 
 /*
- * Σ SIGMAOS: SOVEREIGN STUDIO (v1.0)
+ * S SIGMAOS: SOVEREIGN STUDIO (v1.0)
  * USP: Absorb Ubuntu Studio/AV Linux Low-Latency USPs.
  * Shard: Industrial Multimedia & Audio Production.
  */

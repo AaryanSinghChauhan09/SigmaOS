@@ -1,6 +1,6 @@
-/*
+﻿/*
  * =========================================================================
- * Σ SIGMAOS: SOVEREIGN SHARD REGISTRY (v2.0)
+ * S SIGMAOS: SOVEREIGN SHARD REGISTRY (v2.0)
  * =========================================================================
  * Mission: Dynamic management and auditing of all kernel shards.
  * Design: Zero-Dependency / C11 / High-Performance Registry.

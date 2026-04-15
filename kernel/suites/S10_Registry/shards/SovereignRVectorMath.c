@@ -1,6 +1,6 @@
-/*
+﻿/*
  * =========================================================================
- * Σ SIGMAOS: SOVEREIGN R VECTOR MATH (v1.0 - PURE C11)
+ * S SIGMAOS: SOVEREIGN R VECTOR MATH (v1.0 - PURE C11)
  * =========================================================================
  * Mission: Absorb R's implicit vectorized mathematical operations.
  * Capability: True SIMD accelerated instruction logic natively over arrays.

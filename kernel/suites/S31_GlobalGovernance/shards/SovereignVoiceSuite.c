@@ -1,6 +1,6 @@
-/*
+﻿/*
  * =========================================================================
- * Σ SIGMAOS: SOVEREIGN NEURAL VOICE SUITE (v2.0 - SUPREME)
+ * S SIGMAOS: SOVEREIGN NEURAL VOICE SUITE (v2.0 - SUPREME)
  * =========================================================================
  * Mission: Speech-to-Intent Neural Recognition.
  * =========================================================================
@@ -14,9 +14,9 @@ void sigma_voice_command(const char* transcript) {
 }
 
 void SovereignVoice_Init(void) {
-    sigma_printf("Σ [VOICE-SUITE]: Initialising Sovereign Neural Recognition...\n");
+    sigma_printf("S [VOICE-SUITE]: Initialising Sovereign Neural Recognition...\n");
     sigma_voice_command("activate zenith supreme");
-    sigma_printf("Σ [VOICE-SUITE]: Voice command matrix ACTIVE.\n");
+    sigma_printf("S [VOICE-SUITE]: Voice command matrix ACTIVE.\n");
 }
 
 void SovereignVoice_Register(void) {

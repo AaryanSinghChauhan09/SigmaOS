@@ -1,6 +1,6 @@
-/*
+﻿/*
  * =========================================================================
- * Σ SIGMAOS: SOVEREIGN IPC (Suite S22)
+ * S SIGMAOS: SOVEREIGN IPC (Suite S22)
  * =========================================================================
  * Shard: Sovereign Mach Ports (Darwin/macOS parity)
  * Parity: Mach Ports, NT Waitable Ports, Android Binder

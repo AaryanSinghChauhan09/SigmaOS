@@ -1,7 +1,7 @@
-#include "sigma_kernel.h"
+﻿#include "sigma_kernel.h"
 
 void SovereignKodachi_Init() {
-    sigma_printf("Σ [ABSORB]: SovereignKodachi Zenith Online. Unified Parity Verified.\n");
+    sigma_printf("S [ABSORB]: SovereignKodachi Zenith Online. Unified Parity Verified.\n");
 }
 
 

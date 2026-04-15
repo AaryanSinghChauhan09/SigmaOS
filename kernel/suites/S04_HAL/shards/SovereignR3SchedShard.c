@@ -1,6 +1,6 @@
-/*
+﻿/*
  * =========================================================================
- * Σ SIGMAOS ZENITH: SOVEREIGN R3-SCHED SHARD (v52.9-SUPREME-NIRVANA)
+ * S SIGMAOS ZENITH: SOVEREIGN R3-SCHED SHARD (v52.9-SUPREME-NIRVANA)
  * =========================================================================
  * Mission: Zero-trap user-space thread management (U-MDT style).
  * Principles: Performance, Computer Science, Real-Time.

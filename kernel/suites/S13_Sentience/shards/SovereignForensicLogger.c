@@ -1,6 +1,6 @@
-/*
+﻿/*
  * =========================================================================
- * Σ SIGMAOS: S13_SENTIENCE — SovereignForensicLogger.c
+ * S SIGMAOS: S13_SENTIENCE — SovereignForensicLogger.c
  * =========================================================================
  * Implementation of Idea 314 (Apex Infinity): Immutable Audit Logger.
  * Records security-relevant events to the Sovereign Forensic Lattice.
@@ -26,9 +26,9 @@ void forensic_log(SovereignAuditEvent event, const char* details) {
         case AUDIT_PRIVILEGE_ESC: type_str = "PRIV"; break;
     }
     
-    sigma_printf("Σ [AUDIT|%llu]: %s -> %s\n", timestamp, type_str, details);
+    sigma_printf("S [AUDIT|%llu]: %s -> %s\n", timestamp, type_str, details);
 }
 
 void forensic_logger_init(void) {
-    sigma_printf("Σ [S13]: Sovereign Forensic Audit Logger Materialized (Apex Idea 314).\n");
+    sigma_printf("S [S13]: Sovereign Forensic Audit Logger Materialized (Apex Idea 314).\n");
 }

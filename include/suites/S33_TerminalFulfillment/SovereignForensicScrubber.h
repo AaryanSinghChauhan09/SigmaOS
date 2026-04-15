@@ -1,6 +1,6 @@
-/*
+﻿/*
  * =========================================================================
- * Σ SIGMAOS: SOVEREIGN FORENSIC SCRUBBER HEADER
+ * S SIGMAOS: SOVEREIGN FORENSIC SCRUBBER HEADER
  * =========================================================================
  */
 

@@ -1,6 +1,6 @@
-/*
+﻿/*
  * =========================================================================
- * Σ SIGMAOS ZENITH: SOVEREIGN BHA SHARD (v56.8-SUPREME-CHRONOS)
+ * S SIGMAOS ZENITH: SOVEREIGN BHA SHARD (v56.8-SUPREME-CHRONOS)
  * =========================================================================
  * Mission: Event horizon physics for configuration collapsing.
  * Principles: AI, Algorithms, Data Science, Distributed.

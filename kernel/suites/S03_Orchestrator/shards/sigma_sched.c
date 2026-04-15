@@ -1,6 +1,6 @@
-/*
+﻿/*
  * =========================================================================
- * Σ SIGMAOS kernel/suites/S03_Orchestrator/shards/sigma_sched.c
+ * S SIGMAOS kernel/suites/S03_Orchestrator/shards/sigma_sched.c
  * =========================================================================
  */
 
@@ -49,7 +49,7 @@ void sigma_sched_init(sc_u32 num_cpus) {
         s_rqs[i].cpu_id = i;
         s_rqs[i].min_vruntime = 0;
     }
-    sigma_printf("Σ [SCHED] CFS initialized on %u CPU(s)\n", num_cpus);
+    sigma_printf("S [SCHED] CFS initialized on %u CPU(s)\n", num_cpus);
 }
 
 /* ── Enqueue ─────────────────────────────────────────────────────────────── */
@@ -70,7 +70,7 @@ void sigma_sched_enqueue(sc_u32 cpu_id, sc_u32 pid,
     t->on_cpu       = SCHED_FALSE;
     t->preemptible  = (policy != POLICY_FIFO);
 
-    sigma_printf("Σ [SCHED] ENQUEUE: cpu=%u pid=%u policy=%d qos=%d nice=%d\n",
+    sigma_printf("S [SCHED] ENQUEUE: cpu=%u pid=%u policy=%d qos=%d nice=%d\n",
                  cpu_id, pid, (int)policy, (int)qos, nice);
 }
 
@@ -83,7 +83,7 @@ void sigma_sched_dequeue(sc_u32 cpu_id, sc_u32 pid) {
             for (sc_u32 j = i; j < rq->task_count - 1; j++)
                 rq->tasks[j] = rq->tasks[j+1];
             rq->task_count--;
-            sigma_printf("Σ [SCHED] DEQUEUE: cpu=%u pid=%u\n", cpu_id, pid);
+            sigma_printf("S [SCHED] DEQUEUE: cpu=%u pid=%u\n", cpu_id, pid);
             return;
         }
     }
@@ -194,7 +194,7 @@ void sigma_sched_balance(void) {
                 /* Migrate last task from heavy to light */
                 sigma_task_t stolen = heavy->tasks[--heavy->task_count];
                 light->tasks[light->task_count++] = stolen;
-                sigma_printf("Σ [SCHED] STEAL: pid=%u cpu%u->cpu%u\n",
+                sigma_printf("S [SCHED] STEAL: pid=%u cpu%u->cpu%u\n",
                              stolen.pid, heavy->cpu_id, light->cpu_id);
             }
         }
@@ -205,7 +205,7 @@ void sigma_sched_balance(void) {
 void sigma_sched_stats(sc_u32 cpu_id) {
     sigma_runqueue_t *rq = get_rq(cpu_id);
     if (!rq) return;
-    sigma_printf("\nΣ SCHED CPU%u: tasks=%u ctx_sw=%llu prempt=%llu\n",
+    sigma_printf("\nS SCHED CPU%u: tasks=%u ctx_sw=%llu prempt=%llu\n",
                  cpu_id, rq->task_count,
                  (unsigned long long)rq->context_switches,
                  (unsigned long long)rq->preemptions);

@@ -1,6 +1,6 @@
-/*
+﻿/*
  * =========================================================================
- * Σ SIGMAOS ZENITH: SOVEREIGN CMA-ES SHARD (v56.2-SUPREME-ASGARD)
+ * S SIGMAOS ZENITH: SOVEREIGN CMA-ES SHARD (v56.2-SUPREME-ASGARD)
  * =========================================================================
  * Mission: Continuous optimization of non-linear kernel parameters.
  * Principles: AI, Algorithms, Data Science, Throughput.

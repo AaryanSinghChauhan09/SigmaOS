@@ -1,6 +1,6 @@
-/*
+﻿/*
  * =========================================================================
- * Σ SIGMAOS: SOVEREIGN INIT INTERFACE (v2.0)
+ * S SIGMAOS: SOVEREIGN INIT INTERFACE (v2.0)
  * =========================================================================
  * Mission: Pluggable service orchestration (PID 1).
  * Design: C11 / Zero-Dependency / Registry-Based.

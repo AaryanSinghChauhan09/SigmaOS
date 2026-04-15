@@ -1,6 +1,6 @@
-/*
+﻿/*
  * =========================================================================
- * Σ SIGMAOS: S03_ORCHESTRATOR — SovereignServiceMaster.c
+ * S SIGMAOS: S03_ORCHESTRATOR — SovereignServiceMaster.c
  * =========================================================================
  * Mission: Systemd Parity (Unit Management).
  * Capability: Dependency mapping, parallel startup, watchdog monitoring.
@@ -23,9 +23,9 @@ typedef struct {
 } sigma_unit_t;
 
 void sigma_service_start(const char* name) {
-    sigma_printf("Σ [SERVICE]: Materializing unit '%s.service'...\n", name);
+    sigma_printf("S [SERVICE]: Materializing unit '%s.service'...\n", name);
     // Dependency resolution logic would be here
-    sigma_printf("Σ [SERVICE]: Status -> RUNNING (Lattice PID detected).\n");
+    sigma_printf("S [SERVICE]: Status -> RUNNING (Lattice PID detected).\n");
 }
 
 void sigma_service_watchdog_pulse(void) {
@@ -33,5 +33,5 @@ void sigma_service_watchdog_pulse(void) {
 }
 
 void sigma_service_init(void) {
-    sigma_printf("Σ [ORCHESTRATOR]: Sovereign Service Master (Systemd Parity) online.\n");
+    sigma_printf("S [ORCHESTRATOR]: Sovereign Service Master (Systemd Parity) online.\n");
 }

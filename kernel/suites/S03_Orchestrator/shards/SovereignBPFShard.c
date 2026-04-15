@@ -1,10 +1,10 @@
-#include "sigma_base.h"
+﻿#include "sigma_base.h"
 
 #include "SovereignUSP.h"
 #include "sigma_libc.h"
 
 void SovereignBPF_ShowLogic(void) {
-    sigma_printf("[eBPF/XDP] Σ SIGMAOS Sovereign BPF Engine\n");
+    sigma_printf("[eBPF/XDP] S SIGMAOS Sovereign BPF Engine\n");
     sigma_printf("  sigma-bpf prog load --type kprobe --file ./trace.bpf.c\n");
     sigma_printf("  sigma-bpf prog attach --type xdp --iface eth0 --prog ./xdp_drop.bpf.c\n");
 }

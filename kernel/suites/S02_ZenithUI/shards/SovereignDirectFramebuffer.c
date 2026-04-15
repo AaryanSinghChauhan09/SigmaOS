@@ -1,10 +1,10 @@
-#include "sigma_base.h"
+﻿#include "sigma_base.h"
 
 #include <sigma_types.h>
 #include "sigma_print.h"
 
 /*
- * Σ Sovereign Direct Framebuffer
+ * S Sovereign Direct Framebuffer
  * USP: Lubuntu / LXQt (Zero-Overhead Graphics Logic)
  * Concept: Bypasses complex display servers completely natively.
  *          Writes directly to the raw GPU framebuffer memory addresses

@@ -1,6 +1,6 @@
-/*
+﻿/*
  * =========================================================================
- * Σ SIGMAOS: S27_NEURALLINK — SovereignNeuralWeights.c
+ * S SIGMAOS: S27_NEURALLINK — SovereignNeuralWeights.c
  * =========================================================================
  * Mission: Hardware-Accelerated Weight Scaling for Sentient Intelligence.
  * Capability: Matrix dot-products, SIMD-accelerated inference.
@@ -27,5 +27,5 @@ sigma_f32 sigma_neural_infer(sigma_neural_layer_t* layer, sigma_f32* inputs) {
 }
 
 void sigma_neural_init(void) {
-    sigma_printf("Σ [NEURAL]: Weight Scaling Accelerator (S27) materialized.\n");
+    sigma_printf("S [NEURAL]: Weight Scaling Accelerator (S27) materialized.\n");
 }

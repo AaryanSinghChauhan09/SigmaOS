@@ -1,6 +1,6 @@
-/*
+﻿/*
  * =========================================================================
- * Σ SIGMAOS ZENITH: SOVEREIGN NETWORK STACK SHARD (v1.0)
+ * S SIGMAOS ZENITH: SOVEREIGN NETWORK STACK SHARD (v1.0)
  * =========================================================================
  * Mission: Absorb Linux TCP/IP Stack / BSD Networking / WinSock2 USP.
  *          Native Silicon Layer-3/4 Packet Processing Engine.

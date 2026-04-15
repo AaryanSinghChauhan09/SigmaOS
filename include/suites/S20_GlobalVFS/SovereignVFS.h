@@ -1,6 +1,6 @@
-/*
+﻿/*
  * =========================================================================
- * Σ SIGMAOS: SOVEREIGN VIRTUAL FILESYSTEM INTERFACE (v2.0)
+ * S SIGMAOS: SOVEREIGN VIRTUAL FILESYSTEM INTERFACE (v2.0)
  * =========================================================================
  * Mission: Modular Filesystem Routing and Abstracted Storage Sovereignty.
  * Design: C11 / Zero-Dependency / Registry-Based.

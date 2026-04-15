@@ -1,6 +1,6 @@
-/*
+﻿/*
  * =========================================================================
- * Σ SIGMAOS: S04_HAL — SovereignFastMove.c
+ * S SIGMAOS: S04_HAL — SovereignFastMove.c
  * =========================================================================
  * Mission: High-Performance Memory Operations Shard.
  * Design: Branch-Prediction Aware, Unrolled loops for industrial throughput.

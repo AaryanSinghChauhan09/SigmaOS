@@ -1,6 +1,6 @@
-/*
+﻿/*
  * =========================================================================
- * Σ SIGMAOS ZENITH: SOVEREIGN SEQLOCK SHARD (v52.7-SUPREME-OLYMPUS)
+ * S SIGMAOS ZENITH: SOVEREIGN SEQLOCK SHARD (v52.7-SUPREME-OLYMPUS)
  * =========================================================================
  * Mission: Ultra-low overhead concurrent reads for frequently updated data.
  * Principles: Multi-Processing, Computer Science, Real-Time, Performance.

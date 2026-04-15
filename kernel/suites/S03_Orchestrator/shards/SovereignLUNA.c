@@ -1,7 +1,7 @@
-#include "sigma_kernel.h"
+﻿#include "sigma_kernel.h"
 
 void SovereignLUNA_Init() {
-    sigma_printf("Σ [ABSORB]: SovereignLUNA Zenith Online. Unified Parity Verified.\n");
+    sigma_printf("S [ABSORB]: SovereignLUNA Zenith Online. Unified Parity Verified.\n");
 }
 
 

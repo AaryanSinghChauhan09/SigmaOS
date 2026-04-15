@@ -1,6 +1,6 @@
-/*
+﻿/*
  * =========================================================================
- * Σ SIGMAOS: SOVEREIGN INTELLIGENCE SUITE (v2.5 - SINGULARITY)
+ * S SIGMAOS: SOVEREIGN INTELLIGENCE SUITE (v2.5 - SINGULARITY)
  * =========================================================================
  * Mission: Neural-Link Integration and Autonomous Self-Augmentation.
  * =========================================================================
@@ -14,9 +14,9 @@ void sigma_neural_bridge_init(void) {
 }
 
 void SovereignIntelligence_Init(void) {
-    sigma_printf("Σ [INTEL-SUITE]: Initialising Sovereign Intelligence and Neural-Link...\n");
+    sigma_printf("S [INTEL-SUITE]: Initialising Sovereign Intelligence and Neural-Link...\n");
     sigma_neural_bridge_init();
-    sigma_printf("Σ [INTEL-SUITE]: Singularity Convergence: Kernel is now an extension of user consciousness.\n");
+    sigma_printf("S [INTEL-SUITE]: Singularity Convergence: Kernel is now an extension of user consciousness.\n");
 }
 
 void SovereignIntelligence_Register(void) {

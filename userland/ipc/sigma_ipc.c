@@ -1,6 +1,6 @@
-/*
+﻿/*
  * =========================================================================
- * Σ SIGMAOS userland/ipc/sigma_ipc.c — IPC Implementation
+ * S SIGMAOS userland/ipc/sigma_ipc.c — IPC Implementation
  * =========================================================================
  */
 
@@ -34,16 +34,16 @@ ipc_i32 sigma_ipc_create(const char *name, sigma_ipc_type_t type, ipc_u32 owner_
     ch->type      = type;
     ch->owner_pid = owner_pid;
     ch->is_open   = IPC_TRUE;
-    sigma_printf("Σ [IPC] CREATE: %s (type=%d, pid=%u, id=%u)\n",
+    sigma_printf("S [IPC] CREATE: %s (type=%d, pid=%u, id=%u)\n",
                  name, (int)type, owner_pid, ch->id);
     return (ipc_i32)ch->id;
 }
 
 ipc_i32 sigma_ipc_connect(const char *name, ipc_u32 peer_pid) {
     sigma_ipc_chan_t *ch = find_chan_by_name(name);
-    if (!ch) { sigma_printf("Σ [IPC] ERROR: channel '%s' not found\n", name); return IPC_ERR; }
+    if (!ch) { sigma_printf("S [IPC] ERROR: channel '%s' not found\n", name); return IPC_ERR; }
     ch->peer_pid = peer_pid;
-    sigma_printf("Σ [IPC] CONNECT: pid=%u -> channel '%s'\n", peer_pid, name);
+    sigma_printf("S [IPC] CONNECT: pid=%u -> channel '%s'\n", peer_pid, name);
     return (ipc_i32)ch->id;
 }
 
@@ -80,7 +80,7 @@ ipc_i32 sigma_ipc_recv(ipc_u32 chan_id, void *buf, ipc_u32 max_len) {
 void sigma_ipc_close(ipc_u32 chan_id) {
     sigma_ipc_chan_t *ch = find_chan_by_id(chan_id);
     if (!ch) return;
-    sigma_printf("Σ [IPC] CLOSE: channel '%s' (sent=%llu recv=%llu)\n",
+    sigma_printf("S [IPC] CLOSE: channel '%s' (sent=%llu recv=%llu)\n",
                  ch->name, (unsigned long long)ch->bytes_sent,
                  (unsigned long long)ch->bytes_recv);
     ch->is_open = IPC_FALSE;
@@ -90,7 +90,7 @@ void sigma_ipc_status(void) {
     static const char *type_str[] = {
         "PIPE","SOCKET","MACH_PORT","BINDER","SHMEM","NAMED_PIPE"
     };
-    sigma_printf("\nΣ IPC CHANNEL TABLE\n");
+    sigma_printf("\nS IPC CHANNEL TABLE\n");
     sigma_printf("%-6s %-20s %-12s %-8s %-8s\n",
                  "ID", "NAME", "TYPE", "OWNER", "PEER");
     for (ipc_u32 i = 0; i < s_chan_count; i++) {

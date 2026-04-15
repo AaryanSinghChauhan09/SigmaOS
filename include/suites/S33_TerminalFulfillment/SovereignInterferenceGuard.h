@@ -1,6 +1,6 @@
-/*
+﻿/*
  * =========================================================================
- * Σ SIGMAOS: SOVEREIGN INTERFERENCE GUARD (v12.0 - PURE C11)
+ * S SIGMAOS: SOVEREIGN INTERFERENCE GUARD (v12.0 - PURE C11)
  * =========================================================================
  * Mission: Ensure Zero-Interference with host OS and hardware preservation.
  * Principles: Bit-Perfect. Non-Destructive. Sovereign.

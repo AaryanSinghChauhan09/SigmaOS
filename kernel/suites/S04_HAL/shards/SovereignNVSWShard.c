@@ -1,6 +1,6 @@
-/*
+﻿/*
  * =========================================================================
- * Σ SIGMAOS DIVINE_OMNIPRESENCE: SOVEREIGN NVSW SHARD (v61.1-DIVINE)
+ * S SIGMAOS DIVINE_OMNIPRESENCE: SOVEREIGN NVSW SHARD (v61.1-DIVINE)
  * =========================================================================
  * Mission: Monolithic GPU tensor matrix summation over non-blocking fabric.
  * Principles: Performance, Hardware Mastery, High-Performance Computing.

@@ -1,4 +1,4 @@
-#include "sigma_base.h"
+﻿#include "sigma_base.h"
 
 #include "SovereignHardwareIOZenith.h"
 #include "SovereignLatticeRegistry.h"
@@ -11,8 +11,8 @@
  */
 
 sigma_err_t sigma_usb_init(void) {
-    sigma_printf("  Σ [USB]: Sovereign USB 3.x/4.0 stack initialized.\n");
-    sigma_printf("  Σ [USB]: xHCI and Thunderbolt data-matrices loaded with zero overhead.\n");
+    sigma_printf("  S [USB]: Sovereign USB 3.x/4.0 stack initialized.\n");
+    sigma_printf("  S [USB]: xHCI and Thunderbolt data-matrices loaded with zero overhead.\n");
     return SIGMA_OK;
 }
 

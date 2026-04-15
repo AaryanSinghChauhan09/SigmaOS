@@ -1,6 +1,6 @@
-/*
+﻿/*
  * =========================================================================
- * Σ SIGMAOS ZENITH: SOVEREIGN GOA SHARD (v55.2-SUPREME-PROXIMA)
+ * S SIGMAOS ZENITH: SOVEREIGN GOA SHARD (v55.2-SUPREME-PROXIMA)
  * =========================================================================
  * Mission: Social-repulsion inspired global search and convergence.
  * Principles: AI, Algorithms, Data Science, Throughput.

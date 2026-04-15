@@ -1,6 +1,6 @@
-/*
+﻿/*
  * =========================================================================
- * Σ SIGMAOS ZENITH: SOVEREIGN BAYESIAN TUNER (v50.9-SUPREME-ORACLE)
+ * S SIGMAOS ZENITH: SOVEREIGN BAYESIAN TUNER (v50.9-SUPREME-ORACLE)
  * =========================================================================
  * Mission: Probabilistic real-time kernel parameter optimization.
  * Principles: AI, Machine Learning, Algorithms, Automations.

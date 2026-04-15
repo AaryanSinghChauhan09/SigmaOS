@@ -1,6 +1,6 @@
-/*
+﻿/*
  * =========================================================================
- * Σ SIGMAOS ZENITH: SOVEREIGN CXL SHARD (v56.7-SUPREME-MULTIVERSE_CORE)
+ * S SIGMAOS ZENITH: SOVEREIGN CXL SHARD (v56.7-SUPREME-MULTIVERSE_CORE)
  * =========================================================================
  * Mission: Hardware-coherent memory pooling across PCIe.
  * Principles: Multi-Processing, Storage, Hardware Mastery, Throughput.

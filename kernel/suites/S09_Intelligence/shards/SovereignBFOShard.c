@@ -1,6 +1,6 @@
-/*
+﻿/*
  * =========================================================================
- * Σ SIGMAOS ZENITH: SOVEREIGN BFO SHARD (v56.5-SUPREME-VALHALLA)
+ * S SIGMAOS ZENITH: SOVEREIGN BFO SHARD (v56.5-SUPREME-VALHALLA)
  * =========================================================================
  * Mission: Bacterial chemotaxis for high-density configuration search.
  * Principles: AI, Algorithms, Data Science, Throughput.

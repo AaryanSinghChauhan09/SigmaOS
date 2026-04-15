@@ -1,4 +1,4 @@
-#include "sigma_base.h"
+﻿#include "sigma_base.h"
 
 #include "SovereignOSBasicsZenith.h"
 #include "sigma_libc.h"
@@ -10,8 +10,8 @@
  */
 
 sigma_err_t sigma_input_init(void) {
-    sigma_printf("  Σ [INPUT]: Sovereign Input Matrix initialized.\n");
-    sigma_printf("  Σ [INPUT]: HID descriptor parsing and evdev event queuing: READY.\n");
+    sigma_printf("  S [INPUT]: Sovereign Input Matrix initialized.\n");
+    sigma_printf("  S [INPUT]: HID descriptor parsing and evdev event queuing: READY.\n");
     return SIGMA_OK;
 }
 

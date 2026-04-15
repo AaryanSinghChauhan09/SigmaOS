@@ -1,6 +1,6 @@
-/*
+﻿/*
  * =========================================================================
- * Σ SIGMAOS MULTIVERSE_CORE: SOVEREIGN HBM SHARD (v58.1-SUPREME-MULTIVERSE_CORE)
+ * S SIGMAOS MULTIVERSE_CORE: SOVEREIGN HBM SHARD (v58.1-SUPREME-MULTIVERSE_CORE)
  * =========================================================================
  * Mission: Absolute silicon locality pinning inside 3D-stacked RAM blocks.
  * Principles: Performance, Hardware Mastery, Data Science.

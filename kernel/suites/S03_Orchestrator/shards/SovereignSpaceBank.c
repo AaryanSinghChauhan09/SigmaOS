@@ -1,7 +1,7 @@
-#include "sigma_kernel.h"
+﻿#include "sigma_kernel.h"
 
 void SovereignSpaceBank_Init() {
-    sigma_printf("Σ [OPERATION]: SovereignSpaceBank Integration Complete. Phase 10 Pure Parity Online.
+    sigma_printf("S [OPERATION]: SovereignSpaceBank Integration Complete. Phase 10 Pure Parity Online.
 ");
 }
 

@@ -1,7 +1,7 @@
-#include "sigma_kernel.h"
+﻿#include "sigma_kernel.h"
 
 void SovereignMetadataFS_Init() {
-    sigma_printf("Σ [OPERATION]: SovereignMetadataFS Integration Complete. Phase 8 Pure Parity Online.
+    sigma_printf("S [OPERATION]: SovereignMetadataFS Integration Complete. Phase 8 Pure Parity Online.
 ");
 }
 

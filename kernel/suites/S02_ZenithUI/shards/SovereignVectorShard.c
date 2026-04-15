@@ -1,6 +1,6 @@
-/*
+﻿/*
  * =========================================================================
- * Σ SIGMAOS ZENITH: SOVEREIGN VECTOR ENGINE (v1.0)
+ * S SIGMAOS ZENITH: SOVEREIGN VECTOR ENGINE (v1.0)
  * =========================================================================
  * Mission: High-performance vector rasterization and path rendering.
  * Principles: Bezier Curves, Anti-Aliasing, GPU-accelerated math.

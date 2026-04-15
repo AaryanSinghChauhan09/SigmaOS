@@ -1,6 +1,6 @@
-/*
+﻿/*
  * =========================================================================
- * Σ SIGMAOS userland/proc/sigma_proc.c
+ * S SIGMAOS userland/proc/sigma_proc.c
  * =========================================================================
  */
 
@@ -37,7 +37,7 @@ proc_i32 sigma_proc_spawn(const char *cmd, proc_u32 ppid,
     p->vm_rss_kb = 256;   /* base allocation */
     p->cpu_ticks = 0;
 
-    sigma_printf("Σ [PROC] SPAWN pid=%-5u ppid=%-5u sched=%-2d prio=%-3d "
+    sigma_printf("S [PROC] SPAWN pid=%-5u ppid=%-5u sched=%-2d prio=%-3d "
                  "ns=0x%02x cmd=%s\n",
                  p->pid, p->ppid, (int)p->sched, p->priority,
                  p->ns_flags, p->cmd);
@@ -53,13 +53,13 @@ proc_i32 sigma_proc_spawn(const char *cmd, proc_u32 ppid,
 
 void sigma_proc_kill(proc_u32 pid, proc_i32 signal) {
     sigma_pcb_t *p = find_proc(pid);
-    if (!p) { sigma_printf("Σ [PROC] ERROR: pid %u not found\n", pid); return; }
+    if (!p) { sigma_printf("S [PROC] ERROR: pid %u not found\n", pid); return; }
 
-    sigma_printf("Σ [PROC] SIGNAL: pid=%u sig=%d\n", pid, signal);
+    sigma_printf("S [PROC] SIGNAL: pid=%u sig=%d\n", pid, signal);
 
     if (signal == 9 /* SIGKILL */ || signal == 15 /* SIGTERM */) {
         p->state = PROC_ZOMBIE;
-        sigma_printf("Σ [PROC] ZOMBIE: pid=%u awaiting reap\n", pid);
+        sigma_printf("S [PROC] ZOMBIE: pid=%u awaiting reap\n", pid);
     } else if (signal == 19 /* SIGSTOP */) {
         p->state = PROC_STOPPED;
     } else if (signal == 18 /* SIGCONT */) {
@@ -70,7 +70,7 @@ void sigma_proc_kill(proc_u32 pid, proc_i32 signal) {
 void sigma_proc_reap(proc_u32 pid) {
     sigma_pcb_t *p = find_proc(pid);
     if (!p || p->state != PROC_ZOMBIE) return;
-    sigma_printf("Σ [PROC] REAP: pid=%u (%s) cpu_ticks=%llu\n",
+    sigma_printf("S [PROC] REAP: pid=%u (%s) cpu_ticks=%llu\n",
                  pid, p->cmd, (unsigned long long)p->cpu_ticks);
     p->state = PROC_DEAD;
 }
@@ -84,14 +84,14 @@ void sigma_proc_set_sched(proc_u32 pid, sigma_sched_class_t cls, proc_i32 prio) 
     if (!p) return;
     p->sched    = cls;
     p->priority = prio;
-    sigma_printf("Σ [PROC] SCHED: pid=%u cls=%d prio=%d\n", pid, (int)cls, prio);
+    sigma_printf("S [PROC] SCHED: pid=%u cls=%d prio=%d\n", pid, (int)cls, prio);
 }
 
 void sigma_proc_enable_seccomp(proc_u32 pid) {
     sigma_pcb_t *p = find_proc(pid);
     if (!p) return;
     p->seccomp_on = PROC_TRUE;
-    sigma_printf("Σ [PROC] SECCOMP: pid=%u filter active\n", pid);
+    sigma_printf("S [PROC] SECCOMP: pid=%u filter active\n", pid);
 }
 
 void sigma_proc_top(void) {
@@ -100,7 +100,7 @@ void sigma_proc_top(void) {
     };
     static const char *sched_str[] = {"NORM","RT","IDLE","BATCH"};
 
-    sigma_printf("\nΣ SIGMAOS PROCESS TABLE\n");
+    sigma_printf("\nS SIGMAOS PROCESS TABLE\n");
     sigma_printf("%-6s %-6s %-4s %-6s %-5s %-8s %-8s %s\n",
                  "PID","PPID","ST","SCHED","PRI","RSS_KB","CPU","CMD");
     for (proc_u32 i = 0; i < s_proc_count; i++) {

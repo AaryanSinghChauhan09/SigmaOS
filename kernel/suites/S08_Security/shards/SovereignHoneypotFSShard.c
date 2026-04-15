@@ -1,6 +1,6 @@
-/*
+﻿/*
  * =========================================================================
- * Σ SIGMAOS ZENITH: SOVEREIGN HONEYPOT FS SHARD (v53.3-SUPREME-NEBULA)
+ * S SIGMAOS ZENITH: SOVEREIGN HONEYPOT FS SHARD (v53.3-SUPREME-NEBULA)
  * =========================================================================
  * Mission: Detecting and trapping unauthorized file system scans.
  * Principles: Cyber Security, Forensics, Automations, Safety.

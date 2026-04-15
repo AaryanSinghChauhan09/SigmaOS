@@ -1,6 +1,6 @@
-/*
+﻿/*
  * =========================================================================
- * Σ SIGMAOS: SOVEREIGN VIZQL ENGINE (v1.0 - PURE C11)
+ * S SIGMAOS: SOVEREIGN VIZQL ENGINE (v1.0 - PURE C11)
  * =========================================================================
  * Mission: Absorb Tableau's Visual Query Language Capability.
  * Design: C11 / Zero-Dependency / Hardware-Accelerated Rendering.

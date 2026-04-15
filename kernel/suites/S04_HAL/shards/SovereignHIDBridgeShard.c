@@ -1,6 +1,6 @@
-/*
+﻿/*
  * =========================================================================
- * Σ SIGMAOS ZENITH: SOVEREIGN USB/HID BRIDGE (v51.7-ULTIMATE-ORACLE)
+ * S SIGMAOS ZENITH: SOVEREIGN USB/HID BRIDGE (v51.7-ULTIMATE-ORACLE)
  * =========================================================================
  * Mission: Zero-driver peripheral communication via WebUSB/HID.
  * Principles: Embedded, Hardware, Mobile, Browser-OS Parity.

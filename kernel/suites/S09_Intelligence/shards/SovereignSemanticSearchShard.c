@@ -1,6 +1,6 @@
-/*
+﻿/*
  * =========================================================================
- * Σ SIGMAOS ZENITH: SOVEREIGN SEMANTIC SEARCH (v51.1-SINGULARITY-NEXUS)
+ * S SIGMAOS ZENITH: SOVEREIGN SEMANTIC SEARCH (v51.1-SINGULARITY-NEXUS)
  * =========================================================================
  * Mission: Meaning-based shard and data retrieval.
  * Principles: AI, Machine Learning, Data Science, Search.

@@ -1,6 +1,6 @@
-/*
+﻿/*
  * =========================================================================
- * Σ SIGMAOS ZENITH: SOVEREIGN UNIT TEST SUITE (v1.0)
+ * S SIGMAOS ZENITH: SOVEREIGN UNIT TEST SUITE (v1.0)
  * =========================================================================
  * Mission: Verify that all principle shards produce correct outputs.
  * Method:  Calls real functions and asserts expected results.

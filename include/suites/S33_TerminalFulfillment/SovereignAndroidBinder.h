@@ -1,6 +1,6 @@
-/*
+﻿/*
  * =========================================================================
- * Σ SIGMAOS: SOVEREIGN ANDROID BINDER IPC (v1.0 — C11)
+ * S SIGMAOS: SOVEREIGN ANDROID BINDER IPC (v1.0 — C11)
  * =========================================================================
  * Absorbed USPs from: Android Open Source Project (AOSP) - Binder
  *   https://android.googlesource.com/kernel/common/+/refs/heads/android-mainline/drivers/android/binder.c

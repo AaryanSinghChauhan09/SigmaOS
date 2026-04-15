@@ -1,6 +1,6 @@
-/*
+﻿/*
  * =========================================================================
- * Σ SIGMAOS: SOVEREIGN HAIKU OS PARITY (v1.0 — C11)
+ * S SIGMAOS: SOVEREIGN HAIKU OS PARITY (v1.0 — C11)
  * =========================================================================
  * Absorbed USPs from: Haiku / BeOS
  *   https://github.com/haiku/haiku

@@ -1,6 +1,6 @@
-/*
+﻿/*
  * =========================================================================
- * Σ SIGMAOS ASGARD: SOVEREIGN MPC SHARD (v57.8-SUPREME-ASGARD)
+ * S SIGMAOS ASGARD: SOVEREIGN MPC SHARD (v57.8-SUPREME-ASGARD)
  * =========================================================================
  * Mission: Distributed trustless computation across fractured node environments.
  * Principles: Cyber Security, Privacy, Computer Science, Distributed.

@@ -1,6 +1,6 @@
-/*
+﻿/*
  * =========================================================================
- * Σ SIGMAOS ZENITH: SOVEREIGN GA SHARD (v53.2-SUPREME-EMPYREAN)
+ * S SIGMAOS ZENITH: SOVEREIGN GA SHARD (v53.2-SUPREME-EMPYREAN)
  * =========================================================================
  * Mission: Discrete feature selection and parameter discovery.
  * Principles: AI, Algorithms, Data Science, Automations.

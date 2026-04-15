@@ -1,6 +1,6 @@
-/*
+﻿/*
  * =========================================================================
- * Σ SIGMAOS ZENITH: SOVEREIGN HCP SHARD (v55.5-ORION-ZENITH)
+ * S SIGMAOS ZENITH: SOVEREIGN HCP SHARD (v55.5-ORION-ZENITH)
  * =========================================================================
  * Mission: Fixing critical shards to specific silicon clusters.
  * Principles: Performance, Computer Science, Hardware Mastery.

@@ -1,7 +1,7 @@
-#include "sigma_kernel.h"
+﻿#include "sigma_kernel.h"
 
 void SovereignClone_Init() {
-    sigma_printf("Σ [ABSORB]: SovereignClone Zenith Online. Unified Parity Verified.\n");
+    sigma_printf("S [ABSORB]: SovereignClone Zenith Online. Unified Parity Verified.\n");
 }
 
 

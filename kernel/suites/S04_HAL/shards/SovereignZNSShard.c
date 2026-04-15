@@ -1,6 +1,6 @@
-/*
+﻿/*
  * =========================================================================
- * Σ SIGMAOS COSMOS: SOVEREIGN ZNS SHARD (v57.4-SUPREME-COSMOS)
+ * S SIGMAOS COSMOS: SOVEREIGN ZNS SHARD (v57.4-SUPREME-COSMOS)
  * =========================================================================
  * Mission: Predictable Flash-layer execution completely bypassing the FTL.
  * Principles: Performance, Hardware Mastery, Storage.

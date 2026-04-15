@@ -1,6 +1,6 @@
-/*
+﻿/*
  * =========================================================================
- * Σ SIGMAOS kernel/suites/S12_DistroAbsorption/shards/sigma_distro.c
+ * S SIGMAOS kernel/suites/S12_DistroAbsorption/shards/sigma_distro.c
  * =========================================================================
  */
 
@@ -28,8 +28,8 @@ void sigma_distro_init(void) {
     sigma_memset(s_pkgs,  0, sizeof(s_pkgs));
     sigma_memset(s_repos, 0, sizeof(s_repos));
 
-    sigma_printf("Σ [DAL] Distro Absorption Layer initialized\n");
-    sigma_printf("Σ [DAL] Formats: deb|rpm|pacman|nix|portage|apk|flatpak|apk-android|brew|winget|sigma\n");
+    sigma_printf("S [DAL] Distro Absorption Layer initialized\n");
+    sigma_printf("S [DAL] Formats: deb|rpm|pacman|nix|portage|apk|flatpak|apk-android|brew|winget|sigma\n");
 
     /* Add default SigmaOS sovereign repo */
     sigma_repo_add("sigma-core",   "https://pkg.sigmaos.dev/core",
@@ -55,7 +55,7 @@ da_i32 sigma_repo_add(const char *name, const char *url,
     r->channel   = ch;
     r->enabled   = DA_TRUE;
     r->pqc_signed= (fmt == PKG_SIGMA) ? DA_TRUE : DA_FALSE;
-    sigma_printf("Σ [REPO] Added: %s (%s) %s\n", name, s_fmt_str[fmt],
+    sigma_printf("S [REPO] Added: %s (%s) %s\n", name, s_fmt_str[fmt],
                  r->pqc_signed ? "[ML-DSA signed]" : "");
     return DA_OK;
 }
@@ -72,7 +72,7 @@ void sigma_repo_remove(const char *name) {
 }
 
 da_i32 sigma_repo_sync(void) {
-    sigma_printf("Σ [DAL] Syncing %u repositories...\n", s_repo_count);
+    sigma_printf("S [DAL] Syncing %u repositories...\n", s_repo_count);
     for (da_u32 i = 0; i < s_repo_count; i++) {
         if (s_repos[i].enabled)
             sigma_printf("  ✓ %s [%s]\n", s_repos[i].name, s_fmt_str[s_repos[i].fmt]);
@@ -81,7 +81,7 @@ da_i32 sigma_repo_sync(void) {
 }
 
 void sigma_repo_list(void) {
-    sigma_printf("\nΣ REPOSITORIES\n");
+    sigma_printf("\nS REPOSITORIES\n");
     for (da_u32 i = 0; i < s_repo_count; i++) {
         sigma_printf("  %-20s %-10s %s\n",
                      s_repos[i].name, s_fmt_str[s_repos[i].fmt],
@@ -97,7 +97,7 @@ da_i32 sigma_pkg_install(const char *name, sigma_pkg_fmt_t fmt) {
     for (da_u32 i = 0; i < s_pkg_count; i++) {
         if (sigma_streq(s_pkgs[i].name, name) &&
             s_pkgs[i].state == PKG_INSTALLED) {
-            sigma_printf("Σ [PKG] Already installed: %s\n", name);
+            sigma_printf("S [PKG] Already installed: %s\n", name);
             return DA_OK;
         }
     }
@@ -107,7 +107,7 @@ da_i32 sigma_pkg_install(const char *name, sigma_pkg_fmt_t fmt) {
     sigma_strncpy(p->version, "1.0.0", DA_VER_LEN - 1);
     p->fmt   = fmt;
     p->state = PKG_DOWNLOADING;
-    sigma_printf("Σ [PKG] INSTALL: %s [%s] downloading...\n", name, s_fmt_str[fmt]);
+    sigma_printf("S [PKG] INSTALL: %s [%s] downloading...\n", name, s_fmt_str[fmt]);
 
     /* DAL translation: convert to Sovereign Shard if not native */
     if (fmt != PKG_SIGMA) {
@@ -124,10 +124,10 @@ da_i32 sigma_pkg_remove(const char *name, da_bool purge) {
     for (da_u32 i = 0; i < s_pkg_count; i++) {
         if (sigma_streq(s_pkgs[i].name, name)) {
             if (s_pkgs[i].pinned) {
-                sigma_printf("Σ [PKG] ERROR: %s is pinned\n", name);
+                sigma_printf("S [PKG] ERROR: %s is pinned\n", name);
                 return DA_ERR;
             }
-            sigma_printf("Σ [PKG] REMOVE: %s%s\n", name, purge ? " (purge)" : "");
+            sigma_printf("S [PKG] REMOVE: %s%s\n", name, purge ? " (purge)" : "");
             s_pkgs[i].state = PKG_REMOVED;
             return DA_OK;
         }
@@ -143,12 +143,12 @@ da_i32 sigma_pkg_upgrade_all(void) {
             count++;
         }
     }
-    sigma_printf("Σ [PKG] Upgraded %u packages\n", count);
+    sigma_printf("S [PKG] Upgraded %u packages\n", count);
     return DA_OK;
 }
 
 da_i32 sigma_pkg_search(const char *query) {
-    sigma_printf("Σ [PKG] Search: '%s'\n", query);
+    sigma_printf("S [PKG] Search: '%s'\n", query);
     da_i32 found = 0;
     for (da_u32 i = 0; i < s_pkg_count; i++) {
         /* Simple substring match */
@@ -160,7 +160,7 @@ da_i32 sigma_pkg_search(const char *query) {
             if (!*b) { sigma_printf("  %s (%s)\n", s_pkgs[i].name, s_fmt_str[s_pkgs[i].fmt]); found++; break; }
         }
     }
-    sigma_printf("Σ [PKG] %d result(s)\n", found);
+    sigma_printf("S [PKG] %d result(s)\n", found);
     return found;
 }
 
@@ -178,7 +178,7 @@ da_i32 sigma_pkg_show(const char *name) {
 }
 
 void sigma_pkg_list_installed(void) {
-    sigma_printf("\nΣ INSTALLED PACKAGES\n");
+    sigma_printf("\nS INSTALLED PACKAGES\n");
     da_u32 n = 0;
     for (da_u32 i = 0; i < s_pkg_count; i++) {
         if (s_pkgs[i].state == PKG_INSTALLED || s_pkgs[i].state == PKG_UPGRADED) {
@@ -188,35 +188,35 @@ void sigma_pkg_list_installed(void) {
             n++;
         }
     }
-    sigma_printf("Σ [PKG] %u packages installed\n", n);
+    sigma_printf("S [PKG] %u packages installed\n", n);
 }
 
 /* ── DAL translation ─────────────────────────────────────────────────────── */
 da_i32 sigma_dal_translate(sigma_package_t *pkg) {
     if (!pkg || pkg->fmt == PKG_SIGMA) return DA_OK;
-    sigma_printf("Σ [DAL] Translating %s [%s] -> sovereign shard\n",
+    sigma_printf("S [DAL] Translating %s [%s] -> sovereign shard\n",
                  pkg->name, s_fmt_str[pkg->fmt]);
     pkg->fmt = PKG_SIGMA;
     return DA_OK;
 }
 
 void sigma_dal_generation_snapshot(void) {
-    sigma_printf("Σ [NIX] Generation %u snapshotted (%u packages)\n",
+    sigma_printf("S [NIX] Generation %u snapshotted (%u packages)\n",
                  s_gen_id++, s_pkg_count);
 }
 
 da_i32 sigma_dal_rollback(da_u32 gen_id) {
-    sigma_printf("Σ [NIX] Rolling back to generation %u\n", gen_id);
+    sigma_printf("S [NIX] Rolling back to generation %u\n", gen_id);
     return DA_OK;
 }
 
 da_i32 sigma_pkg_run_sandboxed(const char *name) {
-    sigma_printf("Σ [PKG] Launching %s in container sandbox (Flatpak model)\n", name);
+    sigma_printf("S [PKG] Launching %s in container sandbox (Flatpak model)\n", name);
     return DA_OK;
 }
 
 void sigma_distro_report(void) {
-    sigma_printf("\nΣ DISTRO ABSORPTION REPORT\n");
+    sigma_printf("\nS DISTRO ABSORPTION REPORT\n");
     sigma_printf("  Repos:      %u   Generation: %u\n", s_repo_count, s_gen_id);
     sigma_repo_list();
     sigma_pkg_list_installed();

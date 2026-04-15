@@ -1,6 +1,6 @@
-/*
+﻿/*
  * =========================================================================
- * Σ SIGMAOS ZENITH: SOVEREIGN ASLR-V2 SHARD (v56.0-ORION-SINGULARITY)
+ * S SIGMAOS ZENITH: SOVEREIGN ASLR-V2 SHARD (v56.0-ORION-SINGULARITY)
  * =========================================================================
  * Mission: Shard-level fine-grained layout randomization.
  * Principles: Cyber Security, Computer Science, Safety.

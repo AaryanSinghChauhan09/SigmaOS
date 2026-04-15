@@ -1,6 +1,6 @@
-/*
+﻿/*
  * =========================================================================
- * Σ SIGMAOS: S11_VIRTUALIZATION — SovereignCoroutineScheduler.c
+ * S SIGMAOS: S11_VIRTUALIZATION — SovereignCoroutineScheduler.c
  * =========================================================================
  * Implementation of Idea 95 (Apex Infinity): Ultra-lightweight co-routines.
  * Uses setjmp/longjmp for stack-less task switching within a shard.
@@ -26,7 +26,7 @@ void coroutine_init(void) {
     for (int i = 0; i < MAX_COROUTINES; i++) {
         g_coroutines[i].active = false;
     }
-    sigma_printf("Σ [S11]: Co-routine Scheduler Materialized (Apex Idea 95).\n");
+    sigma_printf("S [S11]: Co-routine Scheduler Materialized (Apex Idea 95).\n");
 }
 
 int coroutine_create(void (*entry)(void)) {

@@ -1,9 +1,9 @@
-#ifndef SOVEREIGN_COORDINATION_ZENITH_H
+﻿#ifndef SOVEREIGN_COORDINATION_ZENITH_H
 #define SOVEREIGN_COORDINATION_ZENITH_H
 
 #include "SigmaOOP.h"
 
-/* Σ Territory Initiation */
+/* S Territory Initiation */
 
 // --- ATOMIC HARDWARE INSTRUCTIONS ---
 static inline sigma_bool SigmaTestAndSet(volatile sigma_bool* target) {
@@ -36,6 +36,6 @@ CLASS_DECLARE(SovereignMonitor) {
     VIRTUAL(void, LeaveMonitor, struct SovereignMonitor* self);
 };
 
-/* Σ Territory Termination */
+/* S Territory Termination */
 
 #endif

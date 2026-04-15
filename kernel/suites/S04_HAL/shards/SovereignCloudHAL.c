@@ -1,4 +1,4 @@
-#include "sigma_base.h"
+﻿#include "sigma_base.h"
 
 #include "SovereignArch.h"
 #include "sigma_libc.h"
@@ -10,9 +10,9 @@
  */
 
 sigma_err_t sigma_hal_cloud_init(void) {
-    sigma_printf("  Σ [HAL-CLOUD]: Sovereign Cloud Hardware Abstraction active.\n");
-    sigma_printf("  Σ [HAL-CLOUD]: NUMA-aware resource mapping: ENGAGED.\n");
-    sigma_printf("  Σ [HAL-CLOUD]: Virt-IO passthrough acceleration: READY.\n");
+    sigma_printf("  S [HAL-CLOUD]: Sovereign Cloud Hardware Abstraction active.\n");
+    sigma_printf("  S [HAL-CLOUD]: NUMA-aware resource mapping: ENGAGED.\n");
+    sigma_printf("  S [HAL-CLOUD]: Virt-IO passthrough acceleration: READY.\n");
     return SIGMA_OK;
 }
 

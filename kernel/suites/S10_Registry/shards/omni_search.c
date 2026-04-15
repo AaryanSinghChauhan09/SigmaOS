@@ -1,4 +1,4 @@
-#include "sigma_base.h"
+﻿#include "sigma_base.h"
 
 #include "SigmaC11.h"
 
@@ -38,7 +38,7 @@ void execute_search(const char* query) {
 int omni_search_ToolMain(int argc, char* argv[]) {
     if(argc < 2) {
         sigma_print("=========================================\n");
-        sigma_print("   Σ SOVEREIGN OMNI-SEARCH ENGINE (SOSE) \n");
+        sigma_print("   S SOVEREIGN OMNI-SEARCH ENGINE (SOSE) \n");
         sigma_print("=========================================\n");
         sigma_print("Usage: sigma search \"your query here\"\n");
         sigma_print("Can interpret: Files, Math, BNS Law Queries, App Launches.\n");

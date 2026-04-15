@@ -1,6 +1,6 @@
-/*
+﻿/*
  * =========================================================================
- * Σ SIGMAOS ZENITH: SOVEREIGN ENTROPY BRIDGE (v52.3-SUPREME-OMNIPOTENCE)
+ * S SIGMAOS ZENITH: SOVEREIGN ENTROPY BRIDGE (v52.3-SUPREME-OMNIPOTENCE)
  * =========================================================================
  * Mission: Cryptographic-grade hardware random number generation.
  * Principles: Cyber Security, Computer Science, Hardware Mastery.

@@ -1,6 +1,6 @@
-/*
+﻿/*
  * =========================================================================
- * Σ SIGMAOS: SOVEREIGN QUANTUM MESH SUITE (v2.0 - SUPREME)
+ * S SIGMAOS: SOVEREIGN QUANTUM MESH SUITE (v2.0 - SUPREME)
  * =========================================================================
  * Mission: Entanglement-based Shard Synchronization.
  * =========================================================================
@@ -14,9 +14,9 @@ void sigma_quantum_sync(void) {
 }
 
 void SovereignQuantum_Init(void) {
-    sigma_printf("Σ [QUANTUM-SUITE]: Initialising Sovereign Entanglement Engine...\n");
+    sigma_printf("S [QUANTUM-SUITE]: Initialising Sovereign Entanglement Engine...\n");
     sigma_quantum_sync();
-    sigma_printf("Σ [QUANTUM-SUITE]: Quantum Mesh initialized. Spooky action seated.\n");
+    sigma_printf("S [QUANTUM-SUITE]: Quantum Mesh initialized. Spooky action seated.\n");
 }
 
 void SovereignQuantum_Register(void) {

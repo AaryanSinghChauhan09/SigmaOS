@@ -1,6 +1,6 @@
-/*
+﻿/*
  * =========================================================================
- * Σ SIGMAOS ZENITH: SOVEREIGN KASAN SHARD (v56.1-SUPREME-VALKYRIE)
+ * S SIGMAOS ZENITH: SOVEREIGN KASAN SHARD (v56.1-SUPREME-VALKYRIE)
  * =========================================================================
  * Mission: Runtime detection of out-of-bounds memory accesses.
  * Principles: Cyber Security, Safety, Computer Science.

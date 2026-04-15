@@ -1,6 +1,6 @@
-/*
+﻿/*
  * =========================================================================
- * Σ SIGMAOS ZENITH: SOVEREIGN FORTH SHARD (v51.8-SUPREME-ZENITH)
+ * S SIGMAOS ZENITH: SOVEREIGN FORTH SHARD (v51.8-SUPREME-ZENITH)
  * =========================================================================
  * Mission: High-efficiency stack-based control for low-level automation.
  * Principles: Computer Science, Embedded, Object Oriented (Threaded), Purity.

@@ -1,6 +1,6 @@
-/*
+﻿/*
  * =========================================================================
- * Σ SIGMAOS: SOVEREIGN ECOSYSTEM SUITE (v3.0 - SUPREME ETHER)
+ * S SIGMAOS: SOVEREIGN ECOSYSTEM SUITE (v3.0 - SUPREME ETHER)
  * =========================================================================
  * Mission: Trans-Matrix Binary Absorption and Ether-Sync Convergence.
  * =========================================================================
@@ -15,9 +15,9 @@ void sigma_ecosystem_ether_sync(void) {
 }
 
 void SovereignEcosystem_Init(void) {
-    sigma_printf("Σ [ECOSYSTEM-SUITE]: Initialising Sovereign Multi-Matrix Ecosystem...\n");
+    sigma_printf("S [ECOSYSTEM-SUITE]: Initialising Sovereign Multi-Matrix Ecosystem...\n");
     sigma_ecosystem_ether_sync();
-    sigma_printf("Σ [ECOSYSTEM-SUITE]: Global Convergence reached. All platforms absorbed.\n");
+    sigma_printf("S [ECOSYSTEM-SUITE]: Global Convergence reached. All platforms absorbed.\n");
 }
 
 void SovereignEcosystem_Register(void) {

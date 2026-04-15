@@ -1,8 +1,8 @@
-#ifndef SOVEREIGN_SMP_H
+﻿#ifndef SOVEREIGN_SMP_H
 #define SOVEREIGN_SMP_H
 
 /*
- * Σ SIGMAOS: SOVEREIGN SYMMETRIC MULTIPROCESSING
+ * S SIGMAOS: SOVEREIGN SYMMETRIC MULTIPROCESSING
  * Replaces legacy 8259 PIC with APIC Support frameworks and establishes concurrent spinlocks.
  */
 
