@@ -1,5 +1,5 @@
 /* S SIGMAOS: S26_OmniFabric Registry */
-#include "sigma_base.h"
+#include "suites/S01_Genesis/shards/sigma_base.h"
 #include "suites/S10_Registry/shards/SovereignLatticeRegistry.h"
 
 void S26_OmniFabric_Register(void) {

@@ -5,7 +5,7 @@
  */
 
 #include "sigma_audio.h"
-#include "../../../../include/sigma_libc.h"
+#include "suites/S01_Genesis/shards/sigma_libc.h"
 
 static sigma_au_stream_t  s_streams[AU_MAX_STREAMS];
 static au_u32             s_stream_count = 0;

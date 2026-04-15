@@ -11,8 +11,8 @@
  */
 
 #include "../include/SovereignInit.h"
-#include "../include/sigma_libc.h"
-#include "../include/SigmaC11.h"
+#include "suites/S01_Genesis/shards/sigma_libc.h"
+#include "suites/S01_Genesis/shards/SigmaC11.h"
 #include "SovereignUniversalDistroSuite.h"
 
 /* NixOS USP: Functional Purity & Atomic Rollbacks */

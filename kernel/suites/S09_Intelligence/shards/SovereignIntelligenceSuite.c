@@ -6,7 +6,7 @@
  * =========================================================================
  */
 
-#include "sigma_base.h"
+#include "suites/S01_Genesis/shards/sigma_base.h"
 
 void sigma_neural_bridge_init(void) {
     sigma_printf("  [NEURAL-LINK]: Synchronizing kernel clock with brainwave frequency (Alpha: 10Hz).\n");

@@ -5,7 +5,7 @@
  */
 
 #include "sigma_boot.h"
-#include "../../../../include/sigma_libc.h"
+#include "suites/S01_Genesis/shards/sigma_libc.h"
 
 static sigma_boot_config_t s_cfg;
 static sigma_boot_phase_t  s_phase = BOOT_PHASE_FIRMWARE;

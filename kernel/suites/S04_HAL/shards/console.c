@@ -7,8 +7,8 @@
  * =========================================================================
  */
 
-#include "sigma_libc.h"
-#include "sigma_kernel.h"
+#include "suites/S01_Genesis/shards/sigma_libc.h"
+#include "suites/S01_Genesis/shards/sigma_kernel.h"
 
 #define VGA_WIDTH 80
 #define VGA_HEIGHT 25

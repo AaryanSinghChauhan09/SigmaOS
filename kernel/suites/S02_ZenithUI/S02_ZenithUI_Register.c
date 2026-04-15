@@ -1,5 +1,5 @@
 /* S SIGMAOS: S02_ZenithUI Registry */
-#include "sigma_base.h"
+#include "suites/S01_Genesis/shards/sigma_base.h"
 #include "suites/S10_Registry/shards/SovereignLatticeRegistry.h"
 
 extern void display_server_init(void);

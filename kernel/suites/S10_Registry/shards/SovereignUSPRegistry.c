@@ -1,7 +1,7 @@
-﻿#include "sigma_base.h"
+﻿#include "suites/S01_Genesis/shards/sigma_base.h"
 
 #include "SovereignUSP.h"
-#include "sigma_libc.h"
+#include "suites/S01_Genesis/shards/sigma_libc.h"
 #include "sigma_string.h"
 
 static sovereign_usp_registry_t g_usp_registry;

@@ -9,7 +9,7 @@
  * =========================================================================
  */
 
-#include "sigma_kernel.h"
+#include "suites/S01_Genesis/shards/sigma_kernel.h"
 
 /**
  * sigma_sec_kasan_check: Validates a memory pointer against the shadow map.

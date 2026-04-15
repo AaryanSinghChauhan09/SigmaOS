@@ -9,7 +9,7 @@
 #ifndef SIGMA_KERNEL_H
 #define SIGMA_KERNEL_H
 
-#include "sigma_base.h"
+#include "suites/S01_Genesis/shards/sigma_base.h"
 #include "suites/S10_Registry/shards/SovereignLatticeRegistry.h"
 #include "suites/S20_Interconnect/shards/SovereignInterconnect.h"
 

@@ -9,7 +9,7 @@
  */
 
 #include "SovereignOSBasicsZenith.h"
-#include "sigma_kernel.h"
+#include "suites/S01_Genesis/shards/sigma_kernel.h"
 #include "suites/S10_Registry/shards/SovereignLatticeRegistry.h"
 
 // Forward declaration for the amalgamation register function (usually in a header)

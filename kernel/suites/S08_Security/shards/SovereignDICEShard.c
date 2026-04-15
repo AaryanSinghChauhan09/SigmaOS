@@ -9,7 +9,7 @@
  * =========================================================================
  */
 
-#include "sigma_kernel.h"
+#include "suites/S01_Genesis/shards/sigma_kernel.h"
 
 /**
  * sigma_sec_dice_compound: Derives compound Device Identifiers (CDI) at every boot stage.

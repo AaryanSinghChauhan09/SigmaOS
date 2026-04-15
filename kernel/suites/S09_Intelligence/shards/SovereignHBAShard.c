@@ -9,7 +9,7 @@
  * =========================================================================
  */
 
-#include "sigma_kernel.h"
+#include "suites/S01_Genesis/shards/sigma_kernel.h"
 
 /**
  * sigma_opt_hba_dig: Simulates the aggressive digging behavior of the Honey Badger.

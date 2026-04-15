@@ -5,7 +5,7 @@
  */
 
 #include "sigma_omnifabric.h"
-#include "include/sigma_libc.h"
+#include "suites/S01_Genesis/shards/sigma_libc.h"
 
 static omnifabric_node_t s_nodes[32];
 static sigma_u32         s_node_count = 0;

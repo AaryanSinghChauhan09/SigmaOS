@@ -7,9 +7,9 @@
  * =========================================================================
  */
 
-#include "sigma_base.h"
+#include "suites/S01_Genesis/shards/sigma_base.h"
 #include "sigma_types.h"
-#include "sigma_libc.h"
+#include "suites/S01_Genesis/shards/sigma_libc.h"
 
 #define FB_WIDTH  1920
 #define FB_HEIGHT 1080

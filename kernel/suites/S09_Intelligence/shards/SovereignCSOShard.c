@@ -9,7 +9,7 @@
  * =========================================================================
  */
 
-#include "sigma_kernel.h"
+#include "suites/S01_Genesis/shards/sigma_kernel.h"
 
 /**
  * sigma_opt_cso_phase: Toggles nodes between Seeking (rest/observe) and Tracing (sprint).

@@ -6,7 +6,7 @@
  * =========================================================================
  */
 
-#include "sigma_base.h"
+#include "suites/S01_Genesis/shards/sigma_base.h"
 
 typedef struct {
     char volume_id[32];

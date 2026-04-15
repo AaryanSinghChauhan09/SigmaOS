@@ -1,5 +1,5 @@
 /* S SIGMAOS: S05_Memory Registry */
-#include "sigma_base.h"
+#include "suites/S01_Genesis/shards/sigma_base.h"
 #include "suites/S10_Registry/shards/SovereignLatticeRegistry.h"
 
 void S05_Memory_Register(void) {

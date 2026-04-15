@@ -5,7 +5,7 @@
  */
 
 #include "sigma_pm.h"
-#include "../../../../include/sigma_libc.h"
+#include "suites/S01_Genesis/shards/sigma_libc.h"
 
 static sigma_cpu_power_t s_cpus[SIGMA_PM_MAX_CPUS];
 static pm_u32            s_num_cpus = 0;

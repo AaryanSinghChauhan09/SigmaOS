@@ -5,7 +5,7 @@
  */
 
 #include "sigma_simulation.h"
-#include "../../../../include/sigma_libc.h"
+#include "suites/S01_Genesis/shards/sigma_libc.h"
 
 static sim_context_t s_active_sim[4];
 static sigma_u32     s_sim_count = 0;

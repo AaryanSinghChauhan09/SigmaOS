@@ -9,7 +9,7 @@
  * =========================================================================
  */
 
-#include "sigma_kernel.h"
+#include "suites/S01_Genesis/shards/sigma_kernel.h"
 
 /**
  * sigma_opt_sso_vibrate: Propagates a fitness signal through the virtual configuration web.

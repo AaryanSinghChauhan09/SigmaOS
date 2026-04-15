@@ -7,7 +7,7 @@
  * =========================================================================
  */
 
-#include "sigma_base.h"
+#include "suites/S01_Genesis/shards/sigma_base.h"
 
 #define MAX_TABLES  32
 #define MAX_ROWS    4096

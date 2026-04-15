@@ -6,7 +6,7 @@
  * =========================================================================
  */
 
-#include "sigma_base.h"
+#include "suites/S01_Genesis/shards/sigma_base.h"
 
 void sigma_omega_converge(void) {
     sigma_printf("  [OMEGA]: All shards have reached the Singularity threshold.\n");

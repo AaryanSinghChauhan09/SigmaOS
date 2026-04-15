@@ -5,7 +5,7 @@
  */
 
 #include "sigma_shell.h"
-#include "../../../../include/sigma_libc.h"
+#include "suites/S01_Genesis/shards/sigma_libc.h"
 
 static char s_history[SHELL_HISTORY_MAX][SHELL_MAX_LINE];
 static sigma_u32 s_hist_tail = 0;

@@ -5,7 +5,7 @@
  */
 
 #include "sigma_gcd.h"
-#include "../../../../include/sigma_libc.h"
+#include "suites/S01_Genesis/shards/sigma_libc.h"
 
 static gcd_queue_t s_queues[GCD_MAX_QUEUES];
 static sigma_u32   s_queue_count = 0;

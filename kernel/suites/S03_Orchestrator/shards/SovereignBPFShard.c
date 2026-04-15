@@ -1,7 +1,7 @@
-﻿#include "sigma_base.h"
+﻿#include "suites/S01_Genesis/shards/sigma_base.h"
 
 #include "SovereignUSP.h"
-#include "sigma_libc.h"
+#include "suites/S01_Genesis/shards/sigma_libc.h"
 
 void SovereignBPF_ShowLogic(void) {
     sigma_printf("[eBPF/XDP] S SIGMAOS Sovereign BPF Engine\n");

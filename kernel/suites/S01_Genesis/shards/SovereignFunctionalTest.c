@@ -6,7 +6,7 @@
  * =========================================================================
  */
 
-#include "sigma_kernel.h"
+#include "suites/S01_Genesis/shards/sigma_kernel.h"
 
 void sigma_test_memory() {
     sigma_printf("S [TEST]: Validating Memory Suite...\n");

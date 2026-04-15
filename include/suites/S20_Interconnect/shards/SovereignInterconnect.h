@@ -9,7 +9,7 @@
 #ifndef SOVEREIGN_INTERCONNECT_H
 #define SOVEREIGN_INTERCONNECT_H
 
-#include "sigma_base.h"
+#include "suites/S01_Genesis/shards/sigma_base.h"
 
 /* 
  * S [OMNIFABRIC] MESSAGE CLASSIFICATIONS 

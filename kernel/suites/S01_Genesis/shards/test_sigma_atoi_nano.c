@@ -3,7 +3,7 @@
  * @brief Atomic Shard: Functional Unit Test.
  */
 
-#include "sigma_libc.h"
+#include "suites/S01_Genesis/shards/sigma_libc.h"
 
 int main() {
     int res = sigma_atoi("-123");

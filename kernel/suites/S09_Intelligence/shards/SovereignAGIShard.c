@@ -9,7 +9,7 @@
  * =========================================================================
  */
 
-#include "sigma_kernel.h"
+#include "suites/S01_Genesis/shards/sigma_kernel.h"
 
 /**
  * sigma_opt_agi_synthesize: Blends ALL prior heuristics (PSO, HHO, BFA, etc.) into one fluid thought-vector.

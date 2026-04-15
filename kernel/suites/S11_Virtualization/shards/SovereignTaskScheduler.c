@@ -7,7 +7,7 @@
  * =========================================================================
  */
 
-#include "sigma_base.h"
+#include "suites/S01_Genesis/shards/sigma_base.h"
 
 #define MAX_TASKS 1024
 #define PRIORITY_LEVELS 4

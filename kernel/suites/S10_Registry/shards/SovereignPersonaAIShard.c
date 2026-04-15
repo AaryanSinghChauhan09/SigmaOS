@@ -9,7 +9,7 @@
  * =========================================================================
  */
 
-#include "sigma_kernel.h"
+#include "suites/S01_Genesis/shards/sigma_kernel.h"
 
 typedef struct {
     float behavior_bias; // 0.0 (Conservative) - 1.0 (Aggressive)

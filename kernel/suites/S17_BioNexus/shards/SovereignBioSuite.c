@@ -6,7 +6,7 @@
  * =========================================================================
  */
 
-#include "sigma_base.h"
+#include "suites/S01_Genesis/shards/sigma_base.h"
 
 void sigma_bio_auth(const char* dna_sequence) {
     sigma_printf("  [BIO]: Analyzing DNA Identity Seed: %s\n", dna_sequence);

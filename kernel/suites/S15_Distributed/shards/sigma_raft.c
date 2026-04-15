@@ -7,7 +7,7 @@
  */
 
 #include "sigma_raft.h"
-#include "../../../../include/sigma_libc.h"
+#include "suites/S01_Genesis/shards/sigma_libc.h"
 
 static raft_node_t        s_raft;
 static sigma_service_entry_t s_services[SIGMA_SVC_MAX];

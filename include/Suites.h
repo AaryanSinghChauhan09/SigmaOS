@@ -1,7 +1,7 @@
 #ifndef SOVEREIGN_SUITES_H
 #define SOVEREIGN_SUITES_H
 
-#include "sigma_base.h"
+#include "suites/S01_Genesis/shards/sigma_base.h"
 
 /* 
  * S SIGMAOS MASTER SUITES (S01-S33)

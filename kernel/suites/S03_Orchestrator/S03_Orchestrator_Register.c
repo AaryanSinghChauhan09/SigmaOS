@@ -1,5 +1,5 @@
 /* S SIGMAOS: S03_Orchestrator Registry */
-#include "sigma_base.h"
+#include "suites/S01_Genesis/shards/sigma_base.h"
 #include "suites/S10_Registry/shards/SovereignLatticeRegistry.h"
 
 extern void dag_init(void);

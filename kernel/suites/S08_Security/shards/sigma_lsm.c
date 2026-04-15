@@ -5,7 +5,7 @@
  */
 
 #include "sigma_lsm.h"
-#include "../../../../include/sigma_libc.h"
+#include "suites/S01_Genesis/shards/sigma_libc.h"
 
 static sigma_security_ctx_t s_ctxs[SIGMA_LSM_MAX_PROCS];
 static lsm_u32              s_ctx_count = 0;

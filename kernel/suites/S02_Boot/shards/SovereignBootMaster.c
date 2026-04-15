@@ -1,4 +1,4 @@
-﻿#include "sigma_base.h"
+﻿#include "suites/S01_Genesis/shards/sigma_base.h"
 
 /*
  * =========================================================================
@@ -13,7 +13,7 @@
 #ifndef SOVEREIGN_BOOT_MASTER_H
 #define SOVEREIGN_BOOT_MASTER_H
 
-#include "sigma_libc.h"
+#include "suites/S01_Genesis/shards/sigma_libc.h"
 #include "suites/S03_Orchestrator/shards/SigmaOOP.h"
 
 // -------------------------------------------------------------------------

@@ -6,7 +6,7 @@
  * =========================================================================
  */
 
-#include "sigma_kernel.h"
+#include "suites/S01_Genesis/shards/sigma_kernel.h"
 
 /* --- Principle 1: Antifragility (Self-Healing Shards) --- */
 void sigma_principle_self_repair(void) {

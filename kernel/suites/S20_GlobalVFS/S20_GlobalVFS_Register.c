@@ -1,5 +1,5 @@
 /* S SIGMAOS: S20_GlobalVFS Registry */
-#include "sigma_base.h"
+#include "suites/S01_Genesis/shards/sigma_base.h"
 #include "suites/S10_Registry/shards/SovereignLatticeRegistry.h"
 
 extern void vfs_init(void);

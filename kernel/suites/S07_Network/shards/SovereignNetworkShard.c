@@ -10,7 +10,7 @@
 #ifndef SOVEREIGN_NETWORK_SHARD_H
 #define SOVEREIGN_NETWORK_SHARD_H
 
-#include "sigma_kernel.h"
+#include "suites/S01_Genesis/shards/sigma_kernel.h"
 
 /**
  * sigma_cloud_sync_state: Synchronizes kernel state with the Sovereign Mesh.

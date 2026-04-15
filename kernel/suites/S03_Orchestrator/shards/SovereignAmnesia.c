@@ -1,4 +1,4 @@
-﻿#include "sigma_kernel.h"
+﻿#include "suites/S01_Genesis/shards/sigma_kernel.h"
 
 void SovereignAmnesia_Init() {
     sigma_printf("S [OPERATION]: SovereignAmnesia Integration Complete. Phase 12 Pure Parity Online.

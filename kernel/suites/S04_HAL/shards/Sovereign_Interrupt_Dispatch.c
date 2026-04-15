@@ -3,7 +3,7 @@
  * @brief Atomic Shard: High-Level Interrupt Router.
  */
 
-#include "sigma_kernel.h"
+#include "suites/S01_Genesis/shards/sigma_kernel.h"
 
 void sigma_interrupt_dispatch(void* context) {
     sigma_printf("S [INTERRUPT]: Hardware pulse detected. Context seated.\n");

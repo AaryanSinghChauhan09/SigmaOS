@@ -1,5 +1,5 @@
 /* S SIGMAOS: S14_Transcendence Registry */
-#include "sigma_base.h"
+#include "suites/S01_Genesis/shards/sigma_base.h"
 #include "suites/S10_Registry/shards/SovereignLatticeRegistry.h"
 
 void S14_Transcendence_Register(void) {

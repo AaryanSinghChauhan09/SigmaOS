@@ -3,13 +3,11 @@ import re
 
 # Define moves
 moves = [
-    ("include/SigmaC11.h", "include/suites/S01_Genesis/shards/SigmaC11.h"),
-    ("include/SigmaOOP.h", "include/suites/S03_Orchestrator/shards/SigmaOOP.h"),
-    ("include/SovereignPurity.h", "include/suites/S25_ZeroKernel/shards/SovereignPurity.h"),
-    ("include/Sovereign_API_v1.h", "include/suites/S03_Orchestrator/shards/Sovereign_API_v1.h"),
-    ("kernel/suites/S01_Genesis/shards/SovereignBootMaster.c", "kernel/suites/S02_Boot/shards/SovereignBootMaster.c"),
-    ("kernel/suites/S01_Genesis/shards/SovereignIDE.c", "kernel/suites/S15_DevNexus/shards/SovereignIDE.c"),
-    ("kernel/suites/S01_Genesis/shards/SovereignInterruptHandler.c", "kernel/suites/S04_HAL/shards/SovereignInterruptHandler.c"),
+    ("include/sigma_udf.h", "include/suites/S10_Registry/shards/sigma_udf.h"),
+    ("include/sigma_math.h", "include/suites/S01_Genesis/shards/sigma_math.h"),
+    ("include/sigma_kernel.h", "include/suites/S01_Genesis/shards/sigma_kernel.h"),
+    ("include/sigma_libc.h", "include/suites/S01_Genesis/shards/sigma_libc.h"),
+    ("include/sigma_base.h", "include/suites/S01_Genesis/shards/sigma_base.h"),
 ]
 
 # Create directories and execute moves
@@ -33,6 +31,11 @@ include_mapping = {
     "SigmaOOP.h": "suites/S03_Orchestrator/shards/SigmaOOP.h",
     "SovereignPurity.h": "suites/S25_ZeroKernel/shards/SovereignPurity.h",
     "Sovereign_API_v1.h": "suites/S03_Orchestrator/shards/Sovereign_API_v1.h",
+    "sigma_udf.h": "suites/S10_Registry/shards/sigma_udf.h",
+    "sigma_math.h": "suites/S01_Genesis/shards/sigma_math.h",
+    "sigma_kernel.h": "suites/S01_Genesis/shards/sigma_kernel.h",
+    "sigma_libc.h": "suites/S01_Genesis/shards/sigma_libc.h",
+    "sigma_base.h": "suites/S01_Genesis/shards/sigma_base.h",
 }
 
 def update_includes(directory):
@@ -47,7 +50,8 @@ def update_includes(directory):
                     new_content = content
                     for old_h, new_h in include_mapping.items():
                         # Match #include "old_h" or #include <old_h>
-                        pattern = rf'#include\s+["<]{old_h}[">]'
+                        # And handle relative paths that might already exist but were wrong
+                        pattern = rf'#include\s+["<](?:[^">]*/)?{old_h}[">]'
                         replacement = f'#include "{new_h}"'
                         new_content = re.sub(pattern, replacement, new_content)
                     
@@ -61,15 +65,3 @@ def update_includes(directory):
 # Update includes in include and kernel directories
 update_includes("include")
 update_includes("kernel")
-
-# Update sigma_module_registry.h
-registry_h = "include/sigma_module_registry.h"
-if os.path.exists(registry_h):
-    with open(registry_h, "r") as f:
-        content = f.read()
-    content = content.replace("S01_Genesis/SovereignBootMaster.c", "S02_Boot/SovereignBootMaster.c")
-    content = content.replace("S01_Genesis/SovereignIDE.c", "S15_DevNexus/SovereignIDE.c")
-    content = content.replace("S01_Genesis/SovereignInterruptHandler.c", "S04_HAL/SovereignInterruptHandler.c")
-    with open(registry_h, "w") as f:
-        f.write(content)
-    print(f"Updated comments in {registry_h}")

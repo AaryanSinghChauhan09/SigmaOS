@@ -1,7 +1,7 @@
-﻿#include "sigma_base.h"
+﻿#include "suites/S01_Genesis/shards/sigma_base.h"
 
 #include "SovereignArch.h"
-#include "sigma_libc.h"
+#include "suites/S01_Genesis/shards/sigma_libc.h"
 
 /*
  * Sovereign Edge HAL (Minimalist).

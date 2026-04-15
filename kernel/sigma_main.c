@@ -8,7 +8,7 @@
  * =========================================================================
  */
 
-#include "include/sigma_libc.h"
+#include "suites/S01_Genesis/shards/sigma_libc.h"
 
 /* Suite headers */
 #include "kernel/suites/S01_Genesis/shards/sigma_syscall_table.h"

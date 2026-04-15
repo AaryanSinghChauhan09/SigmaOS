@@ -1,7 +1,7 @@
 #ifndef SOVEREIGN_MODULE_H
 #define SOVEREIGN_MODULE_H
 
-#include "../../include/sigma_kernel.h"
+#include "suites/S01_Genesis/shards/sigma_kernel.h"
 
 typedef enum {
     MODULE_TYPE_CORE,

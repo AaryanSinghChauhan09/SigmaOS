@@ -2,7 +2,7 @@
 #define SOVEREIGN_MEMORY_MANAGER_H
 
 #include "../SovereignLibC.h"
-#include "../SigmaOOP.h"
+#include "suites/S03_Orchestrator/shards/SigmaOOP.h"
 
 /*
  * S SIGMAOS: SOVEREIGN VMM & PMM SUB-SYSTEMS

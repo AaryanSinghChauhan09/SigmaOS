@@ -9,7 +9,7 @@
  * =========================================================================
  */
 
-#include "sigma_kernel.h"
+#include "suites/S01_Genesis/shards/sigma_kernel.h"
 
 #define SIGMA_QUANTUM_MS 20      // Default time-slice
 #define SIGMA_RT_PRIORITY_LIMIT 10 // Real-time thresholds

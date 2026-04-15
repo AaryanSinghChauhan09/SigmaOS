@@ -7,7 +7,7 @@
  * =========================================================================
  */
 
-#include "sigma_base.h"
+#include "suites/S01_Genesis/shards/sigma_base.h"
 #include "sigma_types.h"
 #include <math.h>
 

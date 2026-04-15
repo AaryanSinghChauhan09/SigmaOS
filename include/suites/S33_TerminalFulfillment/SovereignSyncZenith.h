@@ -11,7 +11,7 @@
 #ifndef SOVEREIGN_SYNC_ZENITH_H
 #define SOVEREIGN_SYNC_ZENITH_H
 
-#include "sigma_libc.h"
+#include "suites/S01_Genesis/shards/sigma_libc.h"
 #include "suites/S03_Orchestrator/shards/SigmaOOP.h"
 
 // -------------------------------------------------------------------------

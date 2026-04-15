@@ -16,7 +16,7 @@
  * =========================================================================
  */
 
-#include "sigma_kernel.h"
+#include "suites/S01_Genesis/shards/sigma_kernel.h"
 
 /* -----------------------------------------------------------------------
  * ░░ ACPI STRUCTURES (Packed per specification)

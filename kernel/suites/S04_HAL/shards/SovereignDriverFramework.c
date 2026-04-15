@@ -4,7 +4,7 @@
  * Design: C11 / Zero-Dependency / Registry-Based.
  */
 
-#include "sigma_kernel.h"
+#include "suites/S01_Genesis/shards/sigma_kernel.h"
 #include "SovereignDriver.h"
 
 /* Extern Shard Registration Functions */

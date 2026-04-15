@@ -5,7 +5,7 @@
  */
 
 #include "sigma_vmm.h"
-#include "../../../../include/sigma_libc.h"
+#include "suites/S01_Genesis/shards/sigma_libc.h"
 
 /* ── Global address space table ────────────────────────────────────────── */
 #define SIGMA_MAX_PROCS 512

@@ -3,7 +3,7 @@
  * @brief Phase 66: Arch Linux Absorption Shard (Zen Optimization).
  */
 
-#include "sigma_kernel.h"
+#include "suites/S01_Genesis/shards/sigma_kernel.h"
 
 sigma_err_t sigma_arch_zen_apply(void) {
     sigma_printf("S [ABSORPTION]: Applying Arch Linux 'Zen' Primitives...\n");

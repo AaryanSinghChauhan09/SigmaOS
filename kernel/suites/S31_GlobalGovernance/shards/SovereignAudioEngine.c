@@ -7,7 +7,7 @@
  * =========================================================================
  */
 
-#include "sigma_base.h"
+#include "suites/S01_Genesis/shards/sigma_base.h"
 
 #define AUDIO_BUF_SIZE 65536
 #define SAMPLE_RATE    48000

@@ -3,7 +3,7 @@
  * @brief Phase 66: NixOS Absorption Shard (Immutable State).
  */
 
-#include "sigma_kernel.h"
+#include "suites/S01_Genesis/shards/sigma_kernel.h"
 
 sigma_err_t sigma_nix_immutable_init(void) {
     sigma_printf("S [ABSORPTION]: Applying NixOS 'Immutable' Primitives...\n");

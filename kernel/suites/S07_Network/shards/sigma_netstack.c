@@ -5,7 +5,7 @@
  */
 
 #include "sigma_netstack.h"
-#include "../../../../include/sigma_libc.h"
+#include "suites/S01_Genesis/shards/sigma_libc.h"
 
 static sigma_netif_t  s_ifaces[SIGMA_NET_MAX_IFS];
 static net_u32        s_if_count   = 0;

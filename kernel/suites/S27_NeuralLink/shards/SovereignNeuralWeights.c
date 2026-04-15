@@ -7,8 +7,8 @@
  * =========================================================================
  */
 
-#include "sigma_kernel.h"
-#include "sigma_math.h"
+#include "suites/S01_Genesis/shards/sigma_kernel.h"
+#include "suites/S01_Genesis/shards/sigma_math.h"
 
 typedef struct {
     sigma_f32* weights;

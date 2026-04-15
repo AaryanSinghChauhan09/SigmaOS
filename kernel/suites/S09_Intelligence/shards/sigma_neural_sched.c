@@ -8,7 +8,7 @@
  */
 
 #include "sigma_neural_sched.h"
-#include "../../../../include/sigma_libc.h"
+#include "suites/S01_Genesis/shards/sigma_libc.h"
 
 /* ── Fixed-point helpers (Q8: multiplied by 256) ─────────────────────────── */
 #define Q8_ONE   256

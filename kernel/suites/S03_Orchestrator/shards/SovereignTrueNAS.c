@@ -1,4 +1,4 @@
-﻿#include "sigma_kernel.h"
+﻿#include "suites/S01_Genesis/shards/sigma_kernel.h"
 
 void SovereignTrueNAS_Init() {
     sigma_printf("S [ABSORB]: SovereignTrueNAS Zenith Online. Unified Parity Verified.\n");

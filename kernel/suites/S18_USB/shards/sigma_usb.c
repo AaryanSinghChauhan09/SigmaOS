@@ -5,7 +5,7 @@
  */
 
 #include "sigma_usb.h"
-#include "../../../../include/sigma_libc.h"
+#include "suites/S01_Genesis/shards/sigma_libc.h"
 
 static sigma_usb_dev_t s_devices[USB_MAX_DEVICES];
 static usb_u32         s_dev_count  = 0;

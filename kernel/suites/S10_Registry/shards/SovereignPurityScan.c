@@ -1,4 +1,4 @@
-﻿#include "sigma_base.h"
+﻿#include "suites/S01_Genesis/shards/sigma_base.h"
 
 /*
  * =========================================================================
@@ -11,7 +11,7 @@
 
 #include "sigma_types.h"
 #include "SovereignLibC.h"
-#include "sigma_libc.h"
+#include "suites/S01_Genesis/shards/sigma_libc.h"
 
 void sigma_purity_audit(const char* file_path) {
     sigma_printf("S [PURITY]: Auditing shard '%s' for unauthorized high-level dependencies...\n", file_path);

@@ -1,6 +1,6 @@
 ﻿#include "SovereignCommand.h"
-#include "sigma_libc.h"
-#include "sigma_kernel.h"
+#include "suites/S01_Genesis/shards/sigma_libc.h"
+#include "suites/S01_Genesis/shards/sigma_kernel.h"
 
 extern int sigma_distro_absorber_main(int argc, char** argv);
 extern int sigma_linux_usps_main(int argc, char** argv);

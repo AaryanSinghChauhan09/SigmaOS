@@ -5,7 +5,7 @@
  */
 
 #include "sigma_ipc.h"
-#include "../../../../include/sigma_libc.h"
+#include "suites/S01_Genesis/shards/sigma_libc.h"
 
 static sigma_u32 s_next_port = 0x1000;
 static sigma_u32 s_port_count = 0;

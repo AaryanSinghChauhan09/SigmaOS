@@ -8,7 +8,7 @@
  */
 
 #include "sigma_syscall_table.h"
-#include "../../../../include/sigma_libc.h"
+#include "suites/S01_Genesis/shards/sigma_libc.h"
 
 static sigma_syscall_desc_t s_table[SIGMA_SYSCALL_MAX];
 static sc_u32               s_registered = 0;

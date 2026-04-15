@@ -5,7 +5,7 @@
  */
 
 #include "sigma_gpu.h"
-#include "../../../../include/sigma_libc.h"
+#include "suites/S01_Genesis/shards/sigma_libc.h"
 
 static sigma_bo_t         s_bos[GPU_MAX_BOS];
 static gpu_u32            s_bo_count    = 0;

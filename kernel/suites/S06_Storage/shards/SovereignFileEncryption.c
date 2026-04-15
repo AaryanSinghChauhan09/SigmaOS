@@ -18,7 +18,7 @@
 
 #include <sigma_types.h>
 
-#include "sigma_libc.h"
+#include "suites/S01_Genesis/shards/sigma_libc.h"
 
 #define FDE_SECTOR_SIZE       512
 #define FDE_KEY_LEN_BYTES      32   // AES-256

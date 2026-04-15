@@ -5,7 +5,7 @@
  */
 
 #include "sigma_perf.h"
-#include "../../../../include/sigma_libc.h"
+#include "suites/S01_Genesis/shards/sigma_libc.h"
 
 static sigma_perf_counter_t s_counters[SIGMA_PERF_MAX_COUNTERS];
 static pf_u32               s_counter_count = 0;

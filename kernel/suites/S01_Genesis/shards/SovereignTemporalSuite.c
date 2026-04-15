@@ -6,7 +6,7 @@
  * =========================================================================
  */
 
-#include "sigma_base.h"
+#include "suites/S01_Genesis/shards/sigma_base.h"
 
 void sigma_temporal_capture(void) {
     sigma_printf("  [TEMPORAL]: Seating snapshot for Shard-Index: T-%u\n", (sigma_u32)sigma_get_timestamp());

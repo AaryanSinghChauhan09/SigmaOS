@@ -4,7 +4,7 @@
  * =========================================================================
  */
 
-#include "sigma_base.h"
+#include "suites/S01_Genesis/shards/sigma_base.h"
 
 /* --- Sub-Module 1: SHA-256 (Simplified Industrial) --- */
 typedef struct {

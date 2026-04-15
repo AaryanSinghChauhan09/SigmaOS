@@ -1,4 +1,4 @@
-﻿#include "sigma_kernel.h"
+﻿#include "suites/S01_Genesis/shards/sigma_kernel.h"
 
 void SovereignLXQt_Init() {
     sigma_printf("S [ABSORB]: SovereignLXQt Zenith Online. Unified Parity Verified.\n");

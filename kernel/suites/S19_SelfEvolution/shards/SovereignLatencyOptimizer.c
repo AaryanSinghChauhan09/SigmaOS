@@ -7,7 +7,7 @@
  * =========================================================================
  */
 
-#include "sigma_base.h"
+#include "suites/S01_Genesis/shards/sigma_base.h"
 #include "suites/S20_Interconnect/shards/SovereignInterconnect.h"
 
 static sigma_u64 s_suite_latencies[34];

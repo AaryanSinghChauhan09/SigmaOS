@@ -5,7 +5,7 @@
  */
 
 #include "sigma_interconnect.h"
-#include "../../../../include/sigma_libc.h"
+#include "suites/S01_Genesis/shards/sigma_libc.h"
 
 static interconnect_bus_t s_buses[MAX_BUSES];
 static sigma_u32          s_bus_count = 0;

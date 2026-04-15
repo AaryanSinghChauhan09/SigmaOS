@@ -7,7 +7,7 @@
  * =========================================================================
  */
 
-#include "sigma_kernel.h"
+#include "suites/S01_Genesis/shards/sigma_kernel.h"
 
 void sigma_npu_dispatch_model(void* weights, void* data) {
     sigma_printf("S [INTEL]: Dispatching Neural Shard to NPU Lattice...\n");

@@ -5,7 +5,7 @@
  */
 
 #include "sigma_distro.h"
-#include "../../../../include/sigma_libc.h"
+#include "suites/S01_Genesis/shards/sigma_libc.h"
 
 static sigma_package_t s_pkgs[DA_MAX_PKGS];
 static da_u32          s_pkg_count  = 0;
