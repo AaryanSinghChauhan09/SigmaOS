@@ -10,3 +10,5 @@
 -Wno-typedef-redefinition
 -Wno-builtin-requires-header
 -Wno-unknown-attributes
+-nostdinc
+

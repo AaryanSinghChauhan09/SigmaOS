@@ -1,39 +1,27 @@
 /*
  * =========================================================================
- * Σ SIGMAOS: SOVEREIGN SHARD REGISTRY (v3.0 — SELF-CONTAINED)
+ * Σ SIGMAOS: SOVEREIGN SHARD REGISTRY (v4.0 — LATTICE CORE)
  * =========================================================================
- * Design: Zero external includes. All primitives declared inline.
- *         This prevents any recursive preamble loops from the host
- *         toolchain's stdint.h when the file is opened standalone.
+ * Purpose: Central authority for shard lifecycle management.
+ * Design: Powered by SovereignCommon.h. Zero legacy dependencies.
  * =========================================================================
  */
 
 #ifndef SOVEREIGN_REGISTRY_H
 #define SOVEREIGN_REGISTRY_H
 
-/* ── Inline primitives (no external includes) ─────────────────────────── */
-typedef unsigned char      sr_u8;
-typedef unsigned int       sr_u32;
-typedef unsigned long long sr_u64;
-typedef signed   int       sr_err_t;
-typedef unsigned long long sr_size_t;
-typedef unsigned char      sr_bool;
-
-#define SR_OK    ((sr_err_t) 0)
-#define SR_ERROR ((sr_err_t)-1)
-#define SR_NULL  ((void*)0)
+#include "SovereignCommon.h"
 
 /* ── Registry limits ──────────────────────────────────────────────────── */
-#define MAX_SHARDS     1024
-#define SHARD_NAME_MAX   64
+#define MAX_SHARDS       2048
+#define SHARD_NAME_MAX   128
 
 /* ── Shard category ───────────────────────────────────────────────────── */
 typedef enum {
-    SHARD_CAT_CORE,     /* VFS, MM, SCHED — Suites S01–S05  */
-    SHARD_CAT_DISTRO,   /* Nix, Arch, Gentoo parity         */
-    SHARD_CAT_SECURITY, /* PQC, LSM, Enclaves               */
-    SHARD_CAT_PLATFORM, /* Android / Windows / macOS parity */
-    SHARD_CAT_TOOL      /* Excel, Python, PowerBI shards    */
+    SHARD_CAT_CORE,     /* S01–S05: Genesis, Boot, Sched, HAL, MM */
+    SHARD_CAT_KERNEL,   /* S06–S10: VFS, Net, LSM, AI, Containers */
+    SHARD_CAT_HARDWARE, /* S11–S15: PQC, Distro, GPU, USB, Audio */
+    SHARD_CAT_UNIVERSAL,/* S16–S33: Terminal, GUI, IDE, WASM, etc.*/
 } shard_category_t;
 
 /* ── Shard lifecycle ──────────────────────────────────────────────────── */
@@ -54,21 +42,22 @@ typedef struct {
     shard_category_t category;
     shard_status_t   status;
     shard_init_fn    init;
-    sr_u32           version;
-    sr_u64           load_timestamp;
+    sigma_u32        version;
+    sigma_u64        load_timestamp;
+    sigma_u32        dependencies[8];  /* shard IDs */
 } sovereign_shard_t;
 
 /* ── Master registry ──────────────────────────────────────────────────── */
 typedef struct {
     sovereign_shard_t shards[MAX_SHARDS];
-    sr_u32            shard_count;
-    sr_u32            active_count;
-    sr_u64            registry_lock;
+    sigma_u32         shard_count;
+    sigma_u32         active_count;
+    sigma_u64         registry_lock;
 } sovereign_registry_t;
 
 /* ── Public API ───────────────────────────────────────────────────────── */
 void        SovereignRegistry_Init(void);
-sr_err_t    SovereignRegistry_Register(const char* name,
+sigma_err_t SovereignRegistry_Register(const char* name,
                                        shard_category_t cat,
                                        shard_init_fn init);
 void        SovereignRegistry_Finalize(void);

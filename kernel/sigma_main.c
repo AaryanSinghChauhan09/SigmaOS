@@ -25,6 +25,12 @@
 #include "kernel/suites/S12_DistroAbsorption/shards/sigma_distro.h"
 #include "kernel/suites/S13_Observability/shards/sigma_perf.h"
 #include "kernel/suites/S14_PowerManagement/shards/sigma_pm.h"
+#include "kernel/suites/S15_Distributed/shards/sigma_raft.h"
+#include "kernel/suites/S16_GPU/shards/sigma_gpu.h"
+#include "kernel/suites/S17_Audio/shards/sigma_audio.h"
+#include "kernel/suites/S18_USB/shards/sigma_usb.h"
+#include "kernel/suites/S19_Parallelism/shards/sigma_gcd.h"
+#include "kernel/suites/S20_Interconnect/shards/sigma_interconnect.h"
 #include "userland/init/sigma_init.h"
 #include "userland/ipc/sigma_ipc.h"
 #include "userland/proc/sigma_proc.h"
@@ -78,6 +84,10 @@ static void sigma_hw_phase(void) {
     /* IRQ setup */
     sigma_irq_request(10, IRQ_MSI, (sigma_irq_handler_t)0, (void*)0);
     sigma_irq_request(11, IRQ_MSI, (sigma_irq_handler_t)0, (void*)0);
+
+    /* S20 Interconnect */
+    sigma_interconnect_init();
+
     sigma_hal_device_list();
 }
 
@@ -107,6 +117,9 @@ static void sigma_kernel_phase(void) {
 
     /* Neural resource balancer */
     sigma_neural_sched_init();
+
+    /* S19 Parallelism */
+    sigma_gcd_init();
 
     /* Network */
     sigma_net_init();
@@ -143,6 +156,16 @@ static void sigma_userspace_phase(void) {
     sigma_distro_init();
     sigma_repo_sync();
 
+    /* S16 GPU */
+    sigma_gpu_init();
+
+    /* S17 Audio */
+    sigma_audio_init();
+
+    /* S18 USB */
+    sigma_usb_init();
+    sigma_usb_enumerate(1);
+
     /* PID-1 */
     sigma_init_start();
 
@@ -154,7 +177,7 @@ static void sigma_final_report(void) {
     sigma_printf("\n");
     sigma_printf("Σ ══════════════════════════════════════════════════════\n");
     sigma_printf("  SIGMAOS SOVEREIGN v4.0 — SYSTEM UP\n");
-    sigma_printf("  15 Suites | GIV Verified | PQC Hardened | Neural-Driven\n");
+    sigma_printf("  20 Suites | GIV Verified | PQC Hardened | Neural-Driven\n");
     sigma_printf("Σ ══════════════════════════════════════════════════════\n\n");
 
     sigma_boot_report();
@@ -168,6 +191,11 @@ static void sigma_final_report(void) {
     sigma_distro_report();
     sigma_ct_ps();
     sigma_proc_list();
+    sigma_interconnect_stats();
+    sigma_gcd_stats();
+    sigma_gpu_stats();
+    sigma_audio_stats();
+    sigma_usb_stats();
 
     sigma_printf("\nΣ SOVEREIGNTY IS ABSOLUTE.\n");
 }
