@@ -1,4 +1,4 @@
-﻿/*
+/*
  * =========================================================================
  * S SIGMAOS kernel/suites/S12_Ecosystem/shards/sigma_distro.h
  * =========================================================================
@@ -118,13 +118,12 @@ da_i32 sigma_pkg_search(const char *query);
 da_i32 sigma_pkg_show(const char *name);
 void   sigma_pkg_list_installed(void);
 
-/* Format translation (DAL core) */
-da_i32 sigma_dal_translate(sigma_package_t *pkg);  /* any fmt -> sigma  */
-void   sigma_dal_generation_snapshot(void);        /* NixOS-style rollback */
+/* ── DAL translation & Containerization ──────────────────────────────────── */
+da_i32 sigma_dal_translate(sigma_package_t *pkg);
+void   sigma_dal_generation_snapshot(void);
 da_i32 sigma_dal_rollback(da_u32 gen_id);
-
-/* Flatpak/AppImage/WASM sandbox integration */
 da_i32 sigma_pkg_run_sandboxed(const char *name);
+da_i32 sigma_dal_enable_posix_dominance(void);
 
 void   sigma_distro_report(void);
 
