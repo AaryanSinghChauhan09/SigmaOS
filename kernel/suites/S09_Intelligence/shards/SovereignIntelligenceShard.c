@@ -13,7 +13,7 @@
 #ifndef SOVEREIGN_INTELLIGENCE_SHARD_H
 #define SOVEREIGN_INTELLIGENCE_SHARD_H
 
-#include "../../include/sigma_kernel.h"
+#include "sigma_kernel.h"
 
 /* --- Mathematical Primitives (Zero-Dependency) --- */
 

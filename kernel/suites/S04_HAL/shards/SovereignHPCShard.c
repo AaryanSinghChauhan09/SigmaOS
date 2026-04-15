@@ -9,7 +9,7 @@
  * =========================================================================
  */
 
-#include "../../include/sigma_kernel.h"
+#include "sigma_kernel.h"
 
 /**
  * sigma_hal_hpc_read_instr: Reads the Retired-Instructions counter.

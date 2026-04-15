@@ -9,7 +9,7 @@
  * =========================================================================
  */
 
-#include "../../include/sigma_kernel.h"
+#include "sigma_kernel.h"
 
 /**
  * sigma_opt_lsh_bucket: Collides dimensionally similar tensors into identical hash buckets.

@@ -1,4 +1,4 @@
-#include "../../include/sigma_base.h"
+#include "sigma_base.h"
 
 /*
  * =========================================================================
@@ -12,8 +12,8 @@
 #ifndef SOVEREIGN_SELF_HEAL_C
 #define SOVEREIGN_SELF_HEAL_C
 
-#include "../include/SovereignToolHeader.h"
-#include "../include/sigma_libc.h"
+#include "SovereignToolHeader.h"
+#include "sigma_libc.h"
 
 void SovereignSelfHeal_Reclaim(void) {
     sigma_printf("Σ [HEAL]: Auditing shard registry for orphan resources...\n");

@@ -7,7 +7,7 @@
  * =========================================================================
  */
 
-#include "../../include/sigma_kernel.h"
+#include "sigma_kernel.h"
 
 typedef struct {
     char service_name[32];

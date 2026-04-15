@@ -19,7 +19,7 @@
  * =========================================================================
  */
 
-#include "../../include/sigma_kernel.h"
+#include "sigma_kernel.h"
 
 /* --- Base Interface (Abstract Class equivalent) --- */
 

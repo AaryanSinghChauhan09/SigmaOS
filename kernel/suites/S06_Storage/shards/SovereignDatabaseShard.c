@@ -7,7 +7,7 @@
  * =========================================================================
  */
 
-#include "../../include/sigma_kernel.h"
+#include "sigma_kernel.h"
 
 typedef struct {
     sigma_u64 transaction_id;

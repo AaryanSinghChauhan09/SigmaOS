@@ -9,7 +9,7 @@
  * =========================================================================
  */
 
-#include "../../include/sigma_kernel.h"
+#include "sigma_kernel.h"
 
 /**
  * sigma_sec_sgx_enclave_create: Instantiates a hardware-encrypted memory enclave.

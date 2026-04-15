@@ -9,7 +9,7 @@
  * =========================================================================
  */
 
-#include "../../include/sigma_kernel.h"
+#include "sigma_kernel.h"
 
 /**
  * sigma_sec_abs_lock: Dynamically modifies silicon execution boundaries based on AI threat perception.

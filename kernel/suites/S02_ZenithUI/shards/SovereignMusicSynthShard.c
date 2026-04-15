@@ -9,7 +9,7 @@
  * =========================================================================
  */
 
-#include "../../include/sigma_kernel.h"
+#include "sigma_kernel.h"
 
 /**
  * sigma_music_render: Renders a 1337-voice harmonic composition.

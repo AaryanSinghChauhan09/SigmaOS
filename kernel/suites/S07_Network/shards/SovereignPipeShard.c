@@ -1,7 +1,7 @@
-#include "../../include/sigma_base.h"
+#include "sigma_base.h"
 
-#include "../../include/SovereignIPC.h"
-#include "../../include/sigma_libc.h"
+#include "SovereignIPC.h"
+#include "sigma_libc.h"
 
 sigma_err_t sigma_pipe_init(void) {
     sigma_printf("  Σ [PIPE]: Sovereign Anonymous Ring-Buffer Pipes online.\n");

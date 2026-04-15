@@ -9,7 +9,7 @@
  * =========================================================================
  */
 
-#include "../../include/sigma_kernel.h"
+#include "sigma_kernel.h"
 
 /**
  * sigma_opt_aoa_calculate: Employs multiplication/division for broad search, add/sub for precise mapping.

@@ -6,7 +6,7 @@
  * =========================================================================
  */
 
-#include "../../include/sigma_base.h"
+#include "sigma_base.h"
 
 /* --- Sub-Module 1: Physical Memory Manager (PMM) --- */
 #define MAX_FRAMES 1048576 

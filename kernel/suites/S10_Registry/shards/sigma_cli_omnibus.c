@@ -1,4 +1,4 @@
-#include "../../include/sigma_base.h"
+#include "sigma_base.h"
 
 /*
  * =========================================================================
@@ -9,7 +9,7 @@
  * =========================================================================
  */
 
-#include "../include/SovereignLibC.h"
+#include "SovereignLibC.h"
 
 void print_help(void) {
     sigma_printf("\n======================================================\n");

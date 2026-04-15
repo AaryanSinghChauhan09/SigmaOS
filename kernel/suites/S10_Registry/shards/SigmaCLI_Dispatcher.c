@@ -7,7 +7,7 @@
  * =========================================================================
  */
 
-#include "../include/sigma_kernel.h"
+#include "sigma_kernel.h"
 
 /* Local utility: replaces strcmp for zero-dependency architecture */
 static int sigma_strcmp(const char* a, const char* b) {

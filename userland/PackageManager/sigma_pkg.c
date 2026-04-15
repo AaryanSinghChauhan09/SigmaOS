@@ -7,7 +7,7 @@
  * =========================================================================
  */
 
-#include "../include/SovereignToolHeader.h"
+#include "SovereignToolHeader.h"
 
 /*
  * Note: Integrated with SovereignPkgRegistry for industrial-grade distribution.

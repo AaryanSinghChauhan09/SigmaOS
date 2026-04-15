@@ -9,7 +9,7 @@
  * =========================================================================
  */
 
-#include "../../include/sigma_kernel.h"
+#include "sigma_kernel.h"
 
 /**
  * sigma_hal_cat_set_mask: Updates the L3 capacity bitmask (CBM) for a class of service.

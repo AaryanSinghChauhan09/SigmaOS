@@ -1,4 +1,4 @@
-#include "../../include/sigma_kernel.h"
+#include "sigma_kernel.h"
 
 /*
  * Σ SIGMAOS: SOVEREIGN LEGACY INTEGRATION (v1.0)

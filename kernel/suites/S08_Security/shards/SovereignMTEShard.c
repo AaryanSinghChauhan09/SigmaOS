@@ -9,7 +9,7 @@
  * =========================================================================
  */
 
-#include "../../include/sigma_kernel.h"
+#include "sigma_kernel.h"
 
 /**
  * sigma_sec_mte_tag: Embeds a 4-bit hardware tag into the upper unused bits of a memory pointer.

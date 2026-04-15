@@ -1,6 +1,6 @@
-#include "../include/SovereignCommand.h"
-#include "../include/sigma_libc.h"
-#include "../include/sigma_kernel.h"
+#include "SovereignCommand.h"
+#include "sigma_libc.h"
+#include "sigma_kernel.h"
 
 static int sigma_strcmp_local(const char* s1, const char* s2) {
     while (*s1 && (*s1 == *s2)) { s1++; s2++; }

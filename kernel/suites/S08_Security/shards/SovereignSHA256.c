@@ -9,7 +9,7 @@
  * =========================================================================
  */
 
-#include "../../include/sigma_kernel.h"
+#include "sigma_kernel.h"
 
 #define ROTRIGHT(word, bits) (((word) >> (bits)) | ((word) << (32 - (bits))))
 

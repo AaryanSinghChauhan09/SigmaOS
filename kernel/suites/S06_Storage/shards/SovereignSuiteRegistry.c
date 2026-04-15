@@ -1,11 +1,7 @@
-// =============================================================================
-// SigmaOS — S06_Storage — SovereignSuiteRegistry.c
-// =============================================================================
-#include <sigma_types.h>
-
+#include "sigma_types.h"
+#include "sigma_libc.h"
+extern void sigma_vfs_init(void);
 void S06_Storage_Register(void) {
-    // Register functional shards for S06_Storage into the System Lattice Registry
-    // Logic: Materialize suite-specific V-Tables and behavioral hulls.
+    sigma_printf("S [S06]: Materializing Storage VFS Layer...\n");
+    sigma_vfs_init();
 }
-
-

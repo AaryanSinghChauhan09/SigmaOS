@@ -1,7 +1,7 @@
-#include "../../include/sigma_base.h"
+#include "sigma_base.h"
 
-#include "../../include/SovereignSecurity.h"
-#include "../../include/sigma_libc.h"
+#include "SovereignSecurity.h"
+#include "sigma_libc.h"
 
 /*
  * Sovereign Boot Audit Shard.

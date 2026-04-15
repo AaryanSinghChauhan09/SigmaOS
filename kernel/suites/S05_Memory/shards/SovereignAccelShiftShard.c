@@ -1,7 +1,7 @@
-#include "../../include/sigma_base.h"
+#include "sigma_base.h"
 
-#include "../../include/SovereignMemory.h"
-#include "../../include/sigma_libc.h"
+#include "SovereignMemory.h"
+#include "sigma_libc.h"
 
 /*
  * Sovereign Hardware-Accelerated Memory Shifting.

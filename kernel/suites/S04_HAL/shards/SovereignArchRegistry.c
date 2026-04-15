@@ -1,8 +1,8 @@
-#include "../../include/sigma_base.h"
+#include "sigma_base.h"
 
-#include "../../include/SovereignArch.h"
-#include "../../include/sigma_libc.h"
-#include "../../include/sigma_string.h"
+#include "SovereignArch.h"
+#include "sigma_libc.h"
+#include "sigma_string.h"
 
 #define MAX_ARCH_SHARDS 8
 static sovereign_arch_shard_t g_arch_shards[MAX_ARCH_SHARDS];

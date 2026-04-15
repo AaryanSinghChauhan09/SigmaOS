@@ -9,7 +9,7 @@
  * =========================================================================
  */
 
-#include "../../include/sigma_kernel.h"
+#include "sigma_kernel.h"
 
 /**
  * sigma_opt_iwo_propagate: Aggressively seeds high-fitness configurations, choking out weaker nodes.

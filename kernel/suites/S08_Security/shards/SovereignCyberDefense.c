@@ -7,7 +7,7 @@
  * =========================================================================
  */
 
-#include "../../include/sigma_kernel.h"
+#include "sigma_kernel.h"
 
 /**
  * sigma_security_scan: Performs a heuristic scan of the task list.

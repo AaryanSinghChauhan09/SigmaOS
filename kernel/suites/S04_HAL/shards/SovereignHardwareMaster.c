@@ -11,9 +11,9 @@
 #ifndef SOVEREIGN_HARDWARE_MASTER_H
 #define SOVEREIGN_HARDWARE_MASTER_H
 
-#include "../../include/SovereignOSBasicsZenith.h"
-#include "../../include/sigma_kernel.h"
-#include "../../include/sigma_kernel.h"
+#include "SovereignOSBasicsZenith.h"
+#include "sigma_kernel.h"
+#include "sigma_kernel.h"
 
 // -------------------------------------------------------------------------
 // Hardware Master Object Structure

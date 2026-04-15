@@ -11,7 +11,7 @@
 #ifndef SOVEREIGN_AUDIO_SHARD_H
 #define SOVEREIGN_AUDIO_SHARD_H
 
-#include "../../include/sigma_kernel.h"
+#include "sigma_kernel.h"
 
 // -------------------------------------------------------------------------
 // Audio Shard Object Structure

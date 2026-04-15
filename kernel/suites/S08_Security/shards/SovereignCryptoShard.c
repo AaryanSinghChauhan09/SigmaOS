@@ -9,7 +9,7 @@
  * =========================================================================
  */
 
-#include "../../include/sigma_kernel.h"
+#include "sigma_kernel.h"
 
 /* --- FNV-1a Hash (64-bit) --- */
 #define FNV_OFFSET_BASIS 0xcbf29ce484222325ULL

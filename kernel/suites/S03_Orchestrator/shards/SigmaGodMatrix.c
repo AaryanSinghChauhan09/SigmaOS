@@ -1,6 +1,6 @@
-#include "../../include/sigma_base.h"
+#include "sigma_base.h"
 
-#include "../../SigmaC11.h"
+#include "../SigmaC11.h"
 
 // =========================================================================================
 // Σ THE SIGMA GOD-MATRIX (Omni-Absorber Engine)

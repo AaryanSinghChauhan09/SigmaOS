@@ -1,7 +1,7 @@
-#include "../../include/sigma_base.h"
+#include "sigma_base.h"
 
-#include "../../include/SovereignFS.h"
-#include "../../include/sigma_libc.h"
+#include "SovereignFS.h"
+#include "sigma_libc.h"
 
 /*
  * Windows-style I/O Completion Ports (IOCP).

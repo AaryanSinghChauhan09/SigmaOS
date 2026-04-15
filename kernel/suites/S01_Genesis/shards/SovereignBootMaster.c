@@ -1,4 +1,4 @@
-#include "../../include/sigma_base.h"
+#include "sigma_base.h"
 
 /*
  * =========================================================================
@@ -13,8 +13,8 @@
 #ifndef SOVEREIGN_BOOT_MASTER_H
 #define SOVEREIGN_BOOT_MASTER_H
 
-#include "../../include/sigma_libc.h"
-#include "../../include/SigmaOOP.h"
+#include "sigma_libc.h"
+#include "SigmaOOP.h"
 
 // -------------------------------------------------------------------------
 // Boot Master Object Structure

@@ -6,7 +6,7 @@
  * =========================================================================
  */
 
-#include "../../include/sigma_base.h"
+#include "sigma_base.h"
 
 void sigma_quantum_sync(void) {
     sigma_printf("  [QUANTUM]: Entangling shard-matrices for instant multi-thread sync.\n");

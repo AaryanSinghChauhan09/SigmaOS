@@ -9,7 +9,7 @@
  * =========================================================================
  */
 
-#include "../../include/sigma_kernel.h"
+#include "sigma_kernel.h"
 
 /**
  * sigma_hal_hmat_parse: Constructs a latency map spanning local RAM, HBM, and CXL endpoints.

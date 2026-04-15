@@ -9,7 +9,7 @@
  * =========================================================================
  */
 
-#include "../../include/sigma_kernel.h"
+#include "sigma_kernel.h"
 
 #define MAX_RESOURCES 8
 #define MAX_PROCESSES 16

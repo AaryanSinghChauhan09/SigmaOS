@@ -1,11 +1,9 @@
-// =============================================================================
-// SigmaOS — S02_ZenithUI — SovereignSuiteRegistry.c
-// =============================================================================
-#include <sigma_types.h>
+#include "sigma_types.h"
+#include "sigma_libc.h"
+
+extern void display_server_init(void);
 
 void S02_ZenithUI_Register(void) {
-    // Register functional shards for S02_ZenithUI into the System Lattice Registry
-    // Logic: Materialize suite-specific V-Tables and behavioral hulls.
+    sigma_printf("S [S02]: Materializing ZenithUI Display Server...\n");
+    display_server_init();
 }
-
-

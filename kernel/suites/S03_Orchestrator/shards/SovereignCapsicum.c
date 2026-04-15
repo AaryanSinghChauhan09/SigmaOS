@@ -1,4 +1,4 @@
-#include "../../include/sigma_kernel.h"
+#include "sigma_kernel.h"
 
 // Σ SovereignCapsicum: Capability Zenith
 // Inspired by FreeBSD Capsicum: Capability-Based Security Framework

@@ -1,8 +1,8 @@
-#include "../../include/sigma_base.h"
+#include "sigma_base.h"
 
-#include "../include/SovereignUSP.h"
-#include "../include/sigma_libc.h"
-#include "../include/sigma_string.h"
+#include "SovereignUSP.h"
+#include "sigma_libc.h"
+#include "sigma_string.h"
 
 static sovereign_usp_registry_t g_usp_registry;
 

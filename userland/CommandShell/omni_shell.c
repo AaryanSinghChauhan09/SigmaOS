@@ -9,7 +9,7 @@
  */
 
 #include "SigmaOOP.hpp"
-#include "../include/sigma_kernel.h"
+#include "sigma_kernel.h"
 #include "SovereignDistroForge.h"
 #include "SovereignCoreUtils.h"
 #include "SovereignOmniShard.h"

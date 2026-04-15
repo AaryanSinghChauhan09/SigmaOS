@@ -7,7 +7,7 @@
  * =========================================================================
  */
 
-#include "../../include/sigma_kernel.h"
+#include "sigma_kernel.h"
 
 /**
  * sigma_parallel_for: Distributes a workload across all Sovereign V-Cores.

@@ -1,8 +1,8 @@
-#include "../../include/sigma_base.h"
+#include "sigma_base.h"
 
-#include "../include/sigma_types.h"
-#include "../include/SovereignLibC.h"
-#include "../include/sigma_libc.h"
+#include "sigma_types.h"
+#include "SovereignLibC.h"
+#include "sigma_libc.h"
 
 /*
  * Σ SIGMAOS: SOVEREIGN BACKUP MANAGER (v1.0)

@@ -1,7 +1,7 @@
-#include "../../include/sigma_base.h"
+#include "sigma_base.h"
 
-#include "../../include/SovereignNet.h"
-#include "../../include/sigma_libc.h"
+#include "SovereignNet.h"
+#include "sigma_libc.h"
 
 /*
  * Sovereign TCP/IP Stack.

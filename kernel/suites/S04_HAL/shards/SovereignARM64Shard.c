@@ -1,7 +1,7 @@
-#include "../../include/sigma_base.h"
+#include "sigma_base.h"
 
-#include "../../include/SovereignArch.h"
-#include "../../include/sigma_libc.h"
+#include "SovereignArch.h"
+#include "sigma_libc.h"
 
 void sigma_arm64_init(void) {
     sigma_printf("  Σ [ARM64]: Initialising ARM v8-A/v9 Cortex-A Matrix...\n");

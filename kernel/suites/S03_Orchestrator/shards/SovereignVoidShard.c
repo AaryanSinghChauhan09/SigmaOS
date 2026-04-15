@@ -1,7 +1,7 @@
-#include "../../include/sigma_base.h"
+#include "sigma_base.h"
 
-#include "../../include/SovereignInit.h"
-#include "../../include/sigma_libc.h"
+#include "SovereignInit.h"
+#include "sigma_libc.h"
 
 /*
  * Sovereign Void Shard (Amalgamation).

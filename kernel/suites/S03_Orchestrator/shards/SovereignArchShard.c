@@ -1,7 +1,7 @@
-#include "../../include/sigma_base.h"
+#include "sigma_base.h"
 
-#include "../../include/SovereignDistro.h"
-#include "../../include/sigma_libc.h"
+#include "SovereignDistro.h"
+#include "sigma_libc.h"
 
 void SovereignArch_AbsorbLogic(void) {
     sigma_printf("  Σ [ARCH]: Rolling Matrix Sync... AUR initialized.\n");

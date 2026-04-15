@@ -1,8 +1,8 @@
-#include "../../include/sigma_base.h"
+#include "sigma_base.h"
 
-#include "../../include/SovereignIPC.h"
-#include "../../include/sigma_libc.h"
-#include "../../include/sigma_string.h"
+#include "SovereignIPC.h"
+#include "sigma_libc.h"
+#include "sigma_string.h"
 
 #define MAX_IPC_SHARDS 16
 static sovereign_ipc_shard_t g_ipc_shards[MAX_IPC_SHARDS];

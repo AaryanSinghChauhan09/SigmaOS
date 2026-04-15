@@ -7,8 +7,8 @@
  * =========================================================================
  */
 
-#include "../libc/sigma_libc.h"
-#include "../../include/sigma_kernel.h"
+#include "sigma_libc.h"
+#include "sigma_kernel.h"
 
 #define PAGE_SIZE 4096
 

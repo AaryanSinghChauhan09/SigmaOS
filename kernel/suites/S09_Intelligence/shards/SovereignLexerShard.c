@@ -12,7 +12,7 @@
 #ifndef SOVEREIGN_LEXER_SHARD_H
 #define SOVEREIGN_LEXER_SHARD_H
 
-#include "../../include/sigma_kernel.h"
+#include "sigma_kernel.h"
 
 typedef enum {
     TOK_IDENT,

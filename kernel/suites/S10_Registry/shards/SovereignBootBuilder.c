@@ -8,9 +8,9 @@
  * =========================================================================
  */
 
-#include "../include/sigma_kernel.h"
-#include "../include/sigma_libc.h"
-#include "../include/sigma_string.h"
+#include "sigma_kernel.h"
+#include "sigma_libc.h"
+#include "sigma_string.h"
 
 typedef struct {
     char target_arch[16];

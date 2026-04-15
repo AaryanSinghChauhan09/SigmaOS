@@ -1,4 +1,4 @@
-#include "../../include/sigma_kernel.h"
+#include "sigma_kernel.h"
 
 // Σ SovereignDTrace: Observability Pulse
 // Inspired by FreeBSD DTrace: Dynamic Kernel/Userland Probing & Telemetry

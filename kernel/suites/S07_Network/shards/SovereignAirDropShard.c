@@ -9,7 +9,7 @@
  * =========================================================================
  */
 
-#include "../../include/sigma_kernel.h"
+#include "sigma_kernel.h"
 
 // -------------------------------------------------------------------------
 // AirDrop Logic (AirDrop / Nearby Share parity)

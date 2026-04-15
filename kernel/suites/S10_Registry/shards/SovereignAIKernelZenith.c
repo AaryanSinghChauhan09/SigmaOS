@@ -8,8 +8,8 @@
  * =========================================================================
  */
 
-#include "../../include/sigma_kernel.h"
-#include "../../include/sigma_kernel.h"
+#include "sigma_kernel.h"
+#include "sigma_kernel.h"
 
 // -------------------------------------------------------------------------
 // Sovereign AI Object Structure

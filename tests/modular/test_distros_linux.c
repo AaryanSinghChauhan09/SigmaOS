@@ -1,4 +1,4 @@
-#include "../../include/SovereignDistro.h"
+#include "SovereignDistro.h"
 
 void test_linux_family() {
     sigma_printf("Σ [MODULAR-TEST]: Commencing Linux Distro Absorption Audit...\n");

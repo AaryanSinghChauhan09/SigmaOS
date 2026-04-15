@@ -9,7 +9,7 @@
  * =========================================================================
  */
 
-#include "../../include/sigma_kernel.h"
+#include "sigma_kernel.h"
 
 // -------------------------------------------------------------------------
 // Mesh Route Logic (Tailscale / WireGuard parity)

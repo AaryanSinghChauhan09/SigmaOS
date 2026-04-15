@@ -6,7 +6,7 @@
  * =========================================================================
  */
 
-#include "../include/sigma_base.h"
+#include "sigma_base.h"
 
 void cmd_sigma_sisp(int argc, char** argv) {
     sigma_printf("Σ [SISP]: Sovereign-Lisp (Sigma-Sisp) REPL v1.0\n");

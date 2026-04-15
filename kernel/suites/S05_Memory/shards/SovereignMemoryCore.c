@@ -1,5 +1,5 @@
-#include "../../include/sigma_base.h"
-#include "../../include/SovereignInterconnect.h"
+#include "sigma_base.h"
+#include "SovereignInterconnect.h"
 
 #include "SovereignPMM.h"
 

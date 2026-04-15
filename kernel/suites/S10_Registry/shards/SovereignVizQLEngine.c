@@ -8,8 +8,8 @@
  * =========================================================================
  */
 
-#include "../../include/sigma_kernel.h"
-#include "../../include/SovereignTableauZenith.h"
+#include "sigma_kernel.h"
+#include "SovereignTableauZenith.h"
 
 // -------------------------------------------------------------------------
 // Implementation

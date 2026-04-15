@@ -1,6 +1,6 @@
-#include "../../include/sigma_base.h"
+#include "sigma_base.h"
 
-#include "../include/SigmaC11.h"
+#include "SigmaC11.h"
 
 // =========================================================================
 // SOVEREIGN CHRONO-VAULT (ZFS / MacOS Time Machine Killer)

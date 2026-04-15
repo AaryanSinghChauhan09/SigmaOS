@@ -8,9 +8,9 @@
  */
 
 #ifndef SIGMA_KERNEL_H
-#include "../include/sigma_kernel.h"
+#include "sigma_kernel.h"
 #endif
-#include "../include/SovereignCommand.h"
+#include "SovereignCommand.h"
 
 /* Extern Registration Functions */
 extern void SovereignSysCommands_Register(void);

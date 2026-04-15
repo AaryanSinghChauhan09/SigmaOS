@@ -6,7 +6,7 @@
  * =========================================================================
  */
 
-#include "../include/sigma_kernel.h"
+#include "sigma_kernel.h"
 
 /* --- Package Manager Simulations (Linux Parity) --- */
 void cmd_sigma_apt(int argc, char** argv) {

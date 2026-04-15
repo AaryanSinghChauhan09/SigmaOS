@@ -1,4 +1,4 @@
-#include "../../include/sigma_base.h"
+#include "sigma_base.h"
 
 /*
  * =========================================================================
@@ -10,9 +10,9 @@
  * =========================================================================
  */
 
-#include "../../include/sigma_libc.h"
-#include "../../include/SigmaOOP.h"
-#include "../../include/SovereignPythonZenith.h"
+#include "sigma_libc.h"
+#include "SigmaOOP.h"
+#include "SovereignPythonZenith.h"
 
 // -------------------------------------------------------------------------
 // Implementation

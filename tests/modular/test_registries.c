@@ -1,9 +1,9 @@
-#include "../../include/sigma_kernel.h"
-#include "../../include/SovereignRegistry.h"
-#include "../../include/SovereignDistro.h"
-#include "../../include/SovereignUSP.h"
-#include "../../include/SovereignTool.h"
-#include "../../include/SovereignCommand.h"
+#include "sigma_kernel.h"
+#include "SovereignRegistry.h"
+#include "SovereignDistro.h"
+#include "SovereignUSP.h"
+#include "SovereignTool.h"
+#include "SovereignCommand.h"
 
 void test_registries_modular() {
     sigma_printf("Σ [TEST]: Running Paradigm Registry Audit...\n");

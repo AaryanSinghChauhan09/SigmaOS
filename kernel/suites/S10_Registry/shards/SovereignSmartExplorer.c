@@ -1,4 +1,4 @@
-#include "../include/SovereignToolHeader.h"
+#include "SovereignToolHeader.h"
 
 /*
  * =========================================================================

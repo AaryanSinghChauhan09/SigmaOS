@@ -1,7 +1,7 @@
 #ifndef SOVEREIGN_VFS_H
 #define SOVEREIGN_VFS_H
 
-#include "../../include/SovereignLibC.h"
+#include "SovereignLibC.h"
 
 /*
  * Σ SIGMAOS: VIRTUAL FILE SYSTEM ABSTRACTION

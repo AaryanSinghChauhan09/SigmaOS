@@ -1,5 +1,5 @@
-#include "../include/sigma_kernel.h"
-#include "../SovereignOmniShard.h"
+#include "sigma_kernel.h"
+#include "SovereignOmniShard.h"
 
 void test_academic_competency_audit() {
     sigma_printf("Σ [TEST]: Running Global Academic Competency Audit...\n");

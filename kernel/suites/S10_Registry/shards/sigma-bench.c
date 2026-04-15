@@ -1,4 +1,4 @@
-#include "../../include/sigma_base.h"
+#include "sigma_base.h"
 
 /**
  * Σ SIGMAOS ZENITH: SOVEREIGN BENCH (v1.0)
@@ -7,13 +7,13 @@
  */
 
 #ifdef UNIT_TEST_ENV
-  #include "../include/SovereignToolHeader.h"
-  #include "../include/SovereignToolHeader.h"
+  #include "SovereignToolHeader.h"
+  #include "SovereignToolHeader.h"
   #define sigma_printf printf
   #define sigma_u64 sigma_u64
   static inline sigma_u64 cpu_rdtsc(void) { return 0; }
 #else
-  #include "../include/SovereignToolHeader.h"
+  #include "SovereignToolHeader.h"
   extern sigma_u64 cpu_rdtsc(void);
 #endif
 

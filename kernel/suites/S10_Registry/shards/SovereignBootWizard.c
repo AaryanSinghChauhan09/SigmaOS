@@ -1,4 +1,4 @@
-#include "../../include/sigma_base.h"
+#include "sigma_base.h"
 
 /*
  * =========================================================================
@@ -10,8 +10,8 @@
  * =========================================================================
  */
 
-#include "../include/SovereignToolHeader.h"
-#include "../include/SovereignPersonalizer.h"
+#include "SovereignToolHeader.h"
+#include "SovereignPersonalizer.h"
 
 static void wizard_print_header() {
     sigma_printf("\n");

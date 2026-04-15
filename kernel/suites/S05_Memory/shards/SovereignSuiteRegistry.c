@@ -1,11 +1,11 @@
-// =============================================================================
-// SigmaOS — S05_Memory — SovereignSuiteRegistry.c
-// =============================================================================
-#include <sigma_types.h>
+#include "sigma_types.h"
+#include "sigma_libc.h"
+
+extern void pmm_init(void);
+extern void vmm_as_init(void);
 
 void S05_Memory_Register(void) {
-    // Register functional shards for S05_Memory into the System Lattice Registry
-    // Logic: Materialize suite-specific V-Tables and behavioral hulls.
+    sigma_printf("S [S05]: Materializing Physical/Virtual Memory Controllers...\n");
+    pmm_init();
+    vmm_as_init();
 }
-
-

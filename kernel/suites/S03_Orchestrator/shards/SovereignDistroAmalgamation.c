@@ -8,8 +8,8 @@
  * =========================================================================
  */
 
-#include "../include/sigma_kernel.h"
-#include "../include/SovereignRegistry.h"
+#include "sigma_kernel.h"
+#include "SovereignRegistry.h"
 
 void SovereignDistroAmalgamation_Init(void) {
     sigma_printf("Σ [ABSORB]: Initiating Amalgamation of Linux Sovereignties...\n");

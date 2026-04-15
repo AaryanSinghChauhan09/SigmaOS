@@ -9,7 +9,7 @@
  * =========================================================================
  */
 
-#include "../../include/sigma_kernel.h"
+#include "sigma_kernel.h"
 
 /**
  * sigma_os_sbf_execute: Validates and JIT-compiles a user-submitted bytecode hook.

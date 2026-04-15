@@ -1,13 +1,13 @@
-#include "../../include/sigma_base.h"
+#include "sigma_base.h"
 
 /*
  * Σ SIGMAOS: SOVEREIGN DISTRO ABSORBER v3.0 — MODULAR
  * Mission: Unified entry point for all distro personality shards.
  * Design: C11 / Zero-Dependency / Registry-Based.
  */
-#include "../include/SovereignToolHeader.h"
-#include "../include/SovereignDistro.h"
-#include "../include/sigma_string.h"
+#include "SovereignToolHeader.h"
+#include "SovereignDistro.h"
+#include "sigma_string.h"
 
 /* Extern Registration Functions */
 extern void SovereignArch_Register(void);

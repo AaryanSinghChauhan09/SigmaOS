@@ -8,17 +8,17 @@
  * =========================================================================
  */
 
-#include "../../include/sigma_kernel.h"
-#include "../../include/sigma_libc.h"
-#include "../../include/SovereignArch.h"
-#include "../../include/SovereignMemory.h"
-#include "../../include/SovereignSyscall.h"
-#include "../../include/SovereignIPC.h"
-#include "../../include/SovereignFS.h"
-#include "../../include/SovereignNetwork.h"
-#include "../../include/SovereignScheduler.h"
-#include "../../include/SovereignSecurity.h"
-#include "../../include/SovereignInit.h"
+#include "sigma_kernel.h"
+#include "sigma_libc.h"
+#include "SovereignArch.h"
+#include "SovereignMemory.h"
+#include "SovereignSyscall.h"
+#include "SovereignIPC.h"
+#include "SovereignFS.h"
+#include "SovereignNetwork.h"
+#include "SovereignScheduler.h"
+#include "SovereignSecurity.h"
+#include "SovereignInit.h"
 
 void sigma_kernel_main(void) {
     sigma_printf("--- Σ SIGMAOS ZENITH SUPREME: SOVEREIGN REIGN INITIATED --- \n");

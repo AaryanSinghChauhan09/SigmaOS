@@ -8,9 +8,9 @@
  * =========================================================================
  */
 
-#include "../include/SovereignOSBasicsZenith.h"
-#include "../include/sigma_kernel.h"
-#include "../include/SovereignRegistry.h"
+#include "SovereignOSBasicsZenith.h"
+#include "sigma_kernel.h"
+#include "SovereignRegistry.h"
 
 // Forward declaration for the amalgamation register function (usually in a header)
 void SovereignDistroAmalgamation_Register(void);

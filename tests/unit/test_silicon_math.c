@@ -1,4 +1,4 @@
-#include "../include/sigma_kernel.h"
+#include "sigma_kernel.h"
 
 void test_silicon_floating_point() {
     sigma_printf("Σ [TEST]: Running Silicon Floating-Point Parity... \n");

@@ -1,6 +1,6 @@
-#include "../include/SovereignCommand.h"
-#include "../include/sigma_libc.h"
-#include "../include/sigma_kernel.h"
+#include "SovereignCommand.h"
+#include "sigma_libc.h"
+#include "sigma_kernel.h"
 
 extern void _sigma_sys_close_window(const char* target);
 extern void _sigma_sys_minimize_window(const char* target);

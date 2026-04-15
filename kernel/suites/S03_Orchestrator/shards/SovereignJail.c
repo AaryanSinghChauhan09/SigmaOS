@@ -1,5 +1,5 @@
-#include "../../include/sigma_kernel.h"
-#include "../../../SovereignInterferenceGuard.h"
+#include "sigma_kernel.h"
+#include "../../SovereignInterferenceGuard.h"
 
 // Σ SovereignJail: Isolation Zenith
 // Inspired by FreeBSD Jails: Hierarchical, Silicon-Segmented Containers

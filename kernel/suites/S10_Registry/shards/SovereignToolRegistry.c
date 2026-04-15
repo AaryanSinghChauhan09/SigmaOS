@@ -1,8 +1,8 @@
-#include "../../include/sigma_base.h"
+#include "sigma_base.h"
 
-#include "../include/SovereignTool.h"
-#include "../include/sigma_libc.h"
-#include "../include/sigma_string.h"
+#include "SovereignTool.h"
+#include "sigma_libc.h"
+#include "sigma_string.h"
 
 static sovereign_tool_registry_t g_tool_registry;
 

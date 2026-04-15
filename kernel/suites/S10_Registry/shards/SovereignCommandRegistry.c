@@ -1,7 +1,7 @@
-#include "../../include/sigma_base.h"
+#include "sigma_base.h"
 
-#include "../include/SovereignCommand.h"
-#include "../include/sigma_libc.h"
+#include "SovereignCommand.h"
+#include "sigma_libc.h"
 
 static sovereign_command_registry_t g_cmd_registry;
 

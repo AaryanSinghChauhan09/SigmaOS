@@ -1,5 +1,5 @@
-#include "../../include/sigma_kernel.h"
-#include "../../include/SovereignRegistry.h"
+#include "sigma_kernel.h"
+#include "SovereignRegistry.h"
 
 void SovereignNixCore_Init() {
     sigma_printf("Σ [ABSORB]: SovereignNixCore Integration Complete. Global USP Parity Secured.\n");

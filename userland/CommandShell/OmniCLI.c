@@ -1,4 +1,4 @@
-#include "../include/sigma_kernel.h"
+#include "sigma_kernel.h"
 
 // Forward declarations of Omni-Agent Shards
 extern void SovereignOmniAgent_Init();

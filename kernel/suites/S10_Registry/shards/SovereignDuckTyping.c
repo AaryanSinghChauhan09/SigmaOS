@@ -8,8 +8,8 @@
  * =========================================================================
  */
 
-#include "../../include/sigma_kernel.h"
-#include "../../include/SovereignPythonZenith.h"
+#include "sigma_kernel.h"
+#include "SovereignPythonZenith.h"
 
 // -------------------------------------------------------------------------
 // Implementation

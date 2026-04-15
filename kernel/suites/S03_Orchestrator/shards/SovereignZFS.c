@@ -1,5 +1,5 @@
-#include "../../include/sigma_kernel.h"
-#include "../../../../SovereignInterferenceGuard.h"
+#include "sigma_kernel.h"
+#include "../../../SovereignInterferenceGuard.h"
 
 // Σ SovereignZFS: Transactional Copy-on-Write (CoW) Storage Shard
 // Inspired by FreeBSD ZFS: Self-Healing, Snapshots, and Atomic Commit Groups

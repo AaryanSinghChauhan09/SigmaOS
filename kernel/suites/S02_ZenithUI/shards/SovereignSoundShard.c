@@ -1,7 +1,7 @@
-#include "../../include/sigma_base.h"
+#include "sigma_base.h"
 
-#include "../../include/SovereignOSBasicsZenith.h"
-#include "../../include/sigma_libc.h"
+#include "SovereignOSBasicsZenith.h"
+#include "sigma_libc.h"
 
 /*
  * Sovereign Sound Matrix (ALSA/OSS Parity).

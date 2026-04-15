@@ -1,7 +1,7 @@
-#include "../../include/sigma_base.h"
+#include "sigma_base.h"
 
-#include "../../include/SovereignArch.h"
-#include "../../include/sigma_libc.h"
+#include "SovereignArch.h"
+#include "sigma_libc.h"
 
 void sigma_riscv_init(void) {
     sigma_printf("  Σ [RISC-V]: Initialising RV64GC Industrial Matrix...\n");

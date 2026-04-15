@@ -9,7 +9,7 @@
  * =========================================================================
  */
 
-#include "../../include/sigma_kernel.h"
+#include "sigma_kernel.h"
 
 /**
  * sigma_hal_mpam_allocate: Binds a specific memory bandwidth percentage to a process ID (PARTID).

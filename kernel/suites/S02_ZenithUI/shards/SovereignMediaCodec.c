@@ -4,8 +4,8 @@
  * =========================================================================
  */
 
-#include "../../include/sigma_kernel.h"
-#include "../../include/SovereignMediaCodec.h"
+#include "sigma_kernel.h"
+#include "SovereignMediaCodec.h"
 
 /* -------------------------------------------------------------------------
  * Playback state

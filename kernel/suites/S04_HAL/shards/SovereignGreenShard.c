@@ -10,7 +10,7 @@
  * =========================================================================
  */
 
-#include "../../include/sigma_kernel.h"
+#include "sigma_kernel.h"
 
 /* --- Power States (modeled after ACPI C-States) --- */
 

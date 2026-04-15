@@ -1,7 +1,7 @@
-#include "../../include/sigma_base.h"
+#include "sigma_base.h"
 
-#include "../../include/SovereignRegistry.h"
-#include "../../include/sigma_libc.h"
+#include "SovereignRegistry.h"
+#include "sigma_libc.h"
 
 /*
  * Sovereign Smart Explorer Shard (v1.0).

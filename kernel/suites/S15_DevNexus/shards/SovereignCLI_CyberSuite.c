@@ -4,7 +4,7 @@
  * =========================================================================
  */
 
-#include "../include/sigma_kernel.h"
+#include "sigma_kernel.h"
 
 void cmd_sigma_whoami(int argc, char** argv) {
     sigma_printf("root (Sovereign Zenith Master)\n");

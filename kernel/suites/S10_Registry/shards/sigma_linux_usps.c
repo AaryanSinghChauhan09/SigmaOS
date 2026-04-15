@@ -1,13 +1,13 @@
-#include "../../include/sigma_base.h"
+#include "sigma_base.h"
 
 /*
  * Σ SIGMAOS: SOVEREIGN LINUX USP ENGINE v2.0 — MODULAR
  * Mission: Unified entry point for all absorbed Linux Kernel USPs.
  * Design: C11 / Zero-Dependency / Registry-Based.
  */
-#include "../include/SovereignToolHeader.h"
-#include "../include/SovereignUSP.h"
-#include "../include/sigma_string.h"
+#include "SovereignToolHeader.h"
+#include "SovereignUSP.h"
+#include "sigma_string.h"
 
 /* Extern Registration Functions */
 extern void SovereignBPF_Register(void);

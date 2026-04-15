@@ -9,7 +9,7 @@
  * =========================================================================
  */
 
-#include "../../include/sigma_kernel.h"
+#include "sigma_kernel.h"
 
 /**
  * sigma_canvas_draw: Traces 10^9 photons per frame into the Sovereign VRAM.

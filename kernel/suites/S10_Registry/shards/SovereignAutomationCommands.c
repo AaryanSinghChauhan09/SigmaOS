@@ -1,6 +1,6 @@
-#include "../include/SovereignCommand.h"
-#include "../include/sigma_libc.h"
-#include "../include/sigma_kernel.h"
+#include "SovereignCommand.h"
+#include "sigma_libc.h"
+#include "sigma_kernel.h"
 
 static int sigma_atoi_local(const char* str) {
     int res = 0;

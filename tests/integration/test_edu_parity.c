@@ -1,5 +1,5 @@
-#include "../include/sigma_kernel.h"
-#include "../SovereignOmniShard.h"
+#include "sigma_kernel.h"
+#include "SovereignOmniShard.h"
 
 void test_edu_syllabus_parity() {
     sigma_printf("Σ [TEST]: Running Educational Syllabus Parity Audit...\n");

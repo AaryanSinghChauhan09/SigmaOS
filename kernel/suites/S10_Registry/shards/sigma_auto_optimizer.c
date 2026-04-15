@@ -1,4 +1,4 @@
-#include "../../include/sigma_base.h"
+#include "sigma_base.h"
 
 /*
  * =========================================================================
@@ -9,8 +9,8 @@
  * =========================================================================
  */
 
-#include "../include/SovereignToolHeader.h"
-#include "../include/SovereignToolHeader.h"
+#include "SovereignToolHeader.h"
+#include "SovereignToolHeader.h"
 
 // -------------------------------------------------------------------------
 // Resource Daemon OOP Structure

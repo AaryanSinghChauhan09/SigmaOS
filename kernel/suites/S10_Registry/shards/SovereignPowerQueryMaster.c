@@ -8,8 +8,8 @@
  * =========================================================================
  */
 
-#include "../../include/sigma_kernel.h"
-#include "../../include/SovereignPowerBIZenith.h"
+#include "sigma_kernel.h"
+#include "SovereignPowerBIZenith.h"
 
 // -------------------------------------------------------------------------
 // Implementation

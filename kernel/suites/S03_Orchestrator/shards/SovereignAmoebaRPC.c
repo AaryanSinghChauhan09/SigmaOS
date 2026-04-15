@@ -1,4 +1,4 @@
-#include "../../include/sigma_kernel.h"
+#include "sigma_kernel.h"
 
 void SovereignAmoebaRPC_Init() {
     sigma_printf("Σ [OPERATION]: SovereignAmoebaRPC Integration Complete. Phase 7 Pure Parity Online.

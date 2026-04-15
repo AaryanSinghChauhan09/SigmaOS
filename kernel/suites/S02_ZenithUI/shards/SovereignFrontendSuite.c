@@ -6,7 +6,7 @@
  * =========================================================================
  */
 
-#include "../include/sigma_kernel.h"
+#include "sigma_kernel.h"
 
 typedef struct {
     sigma_u32 win_id;

@@ -1,8 +1,8 @@
-#include "../../include/sigma_base.h"
+#include "sigma_base.h"
 
-#include "../../include/SovereignMemory.h"
-#include "../../include/sigma_libc.h"
-#include "../../include/sigma_string.h"
+#include "SovereignMemory.h"
+#include "sigma_libc.h"
+#include "sigma_string.h"
 
 #define MAX_MEM_SHARDS 8
 static sovereign_memory_shard_t g_mem_shards[MAX_MEM_SHARDS];

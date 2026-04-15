@@ -6,7 +6,7 @@
  * =========================================================================
  */
 
-#include "../../include/sigma_base.h"
+#include "sigma_base.h"
 
 typedef struct {
     sigma_u32 shard_id;

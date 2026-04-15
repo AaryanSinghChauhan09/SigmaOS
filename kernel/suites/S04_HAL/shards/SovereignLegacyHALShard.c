@@ -1,7 +1,7 @@
-#include "../../include/sigma_base.h"
+#include "sigma_base.h"
 
-#include "../../include/SovereignArch.h"
-#include "../../include/sigma_libc.h"
+#include "SovereignArch.h"
+#include "sigma_libc.h"
 
 /*
  * Sovereign Legacy Hardware Abstraction (v1.0).

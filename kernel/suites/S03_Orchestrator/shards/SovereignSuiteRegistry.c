@@ -1,11 +1,9 @@
-// =============================================================================
-// SigmaOS — S03_Orchestrator — SovereignSuiteRegistry.c
-// =============================================================================
-#include <sigma_types.h>
+#include "sigma_types.h"
+#include "sigma_libc.h"
+
+extern void dag_init(void);
 
 void S03_Orchestrator_Register(void) {
-    // Register functional shards for S03_Orchestrator into the System Lattice Registry
-    // Logic: Materialize suite-specific V-Tables and behavioral hulls.
+    sigma_printf("S [S03]: Materializing Orchestrator DAG Engine...\n");
+    dag_init();
 }
-
-

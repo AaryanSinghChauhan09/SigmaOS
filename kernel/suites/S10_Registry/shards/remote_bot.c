@@ -1,6 +1,6 @@
-#include "../../include/sigma_base.h"
+#include "sigma_base.h"
 
-#include "../include/SovereignToolHeader.h"
+#include "SovereignToolHeader.h"
 
 /*
  * Σ SIGMAOS: SOVEREIGN REMOTE BOT (v1.0)

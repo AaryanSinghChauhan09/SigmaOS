@@ -1,7 +1,7 @@
 #ifndef SOVEREIGN_DISTRO_FORGE_H
 #define SOVEREIGN_DISTRO_FORGE_H
 
-#include "../../SovereignOSBasicsZenith.h"
+#include "../SovereignOSBasicsZenith.h"
 
 namespace SigmaOS {
 namespace DistroForge {

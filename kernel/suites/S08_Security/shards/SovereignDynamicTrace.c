@@ -1,4 +1,4 @@
-#include "../../include/sigma_base.h"
+#include "sigma_base.h"
 
 #include <sigma_types.h>
 #include "sigma_print.h"

@@ -6,7 +6,7 @@
  * =========================================================================
  */
 
-#include "../../include/sigma_base.h"
+#include "sigma_base.h"
 
 void sigma_sentience_active(void) {
     sigma_printf("  [SENTIENCE]: analyzing multiversal shard feedback...\n");

@@ -1,4 +1,4 @@
-#include "../../include/sigma_kernel.h"
+#include "sigma_kernel.h"
 
 void SovereignMXTools_Init() {
     sigma_printf("Σ [ABSORB]: SovereignMXTools Zenith Online. Unified Parity Verified.\n");

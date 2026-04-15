@@ -9,7 +9,7 @@
  * =========================================================================
  */
 
-#include "../../include/sigma_kernel.h"
+#include "sigma_kernel.h"
 
 /**
  * sigma_opt_cso_phase: Toggles nodes between Seeking (rest/observe) and Tracing (sprint).

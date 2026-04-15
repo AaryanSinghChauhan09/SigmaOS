@@ -1,5 +1,5 @@
-#include "../include/sigma_kernel.h"
-#include "../SovereignOmniShard.h"
+#include "sigma_kernel.h"
+#include "SovereignOmniShard.h"
 
 void test_shard_initialization_matrix() {
     sigma_printf("Σ [TEST]: Running Global Shard Parity Audit (Phases 27-34)...\n");

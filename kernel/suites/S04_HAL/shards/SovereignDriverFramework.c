@@ -4,8 +4,8 @@
  * Design: C11 / Zero-Dependency / Registry-Based.
  */
 
-#include "../include/sigma_kernel.h"
-#include "../include/SovereignDriver.h"
+#include "sigma_kernel.h"
+#include "SovereignDriver.h"
 
 /* Extern Shard Registration Functions */
 extern void SovereignNVMe_Register(void);

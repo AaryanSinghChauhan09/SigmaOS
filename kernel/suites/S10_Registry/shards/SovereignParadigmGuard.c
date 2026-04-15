@@ -10,7 +10,7 @@
  * =========================================================================
  */
 
-#include "../../include/sigma_kernel.h"
+#include "sigma_kernel.h"
 
 /* -----------------------------------------------------------------------
  * Forward-declare _Register symbols from each principle's shard.

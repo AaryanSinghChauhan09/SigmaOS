@@ -11,7 +11,7 @@
 #ifndef SOVEREIGN_HOLY_JIT_H
 #define SOVEREIGN_HOLY_JIT_H
 
-#include "../../include/sigma_kernel.h"
+#include "sigma_kernel.h"
 
 // -------------------------------------------------------------------------
 // Holy JIT Object Structure

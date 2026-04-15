@@ -9,7 +9,7 @@
  * =========================================================================
  */
 
-#include "../../include/sigma_kernel.h"
+#include "sigma_kernel.h"
 
 typedef struct {
     sigma_u32 scheduler_mode;   // 0: Balanced, 1: High-Throughput (Server), 2: Hard-RT
