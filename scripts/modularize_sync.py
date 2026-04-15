@@ -1,26 +1,7 @@
 import os
 import re
 
-# Define moves
-moves = [
-    ("kernel/suites/S01_Genesis/shards/SovereignFunctionalTest.c", "kernel/suites/S24_Simulation/shards/SovereignFunctionalTest.c"),
-    ("kernel/suites/S01_Genesis/shards/SovereignTestSuite.c", "kernel/suites/S24_Simulation/shards/SovereignTestSuite.c"),
-    ("kernel/suites/S01_Genesis/shards/SovereignTemporalSuite.c", "kernel/suites/S21_EternalState/shards/SovereignTemporalSuite.c"),
-    ("kernel/suites/S01_Genesis/shards/SovereignVTable.c", "kernel/suites/S03_Orchestrator/shards/SovereignVTable.c"),
-    ("kernel/suites/S01_Genesis/shards/SovereignZenithOrchestrator.c", "kernel/suites/S03_Orchestrator/shards/SovereignZenithOrchestrator.c"),
-]
-
-# Create directories and execute moves
-for src, dst in moves:
-    if os.path.exists(src):
-        os.makedirs(os.path.dirname(dst), exist_ok=True)
-        try:
-            os.replace(src, dst)
-            print(f"Moved {src} to {dst}")
-        except Exception as e:
-            print(f"Failed to move {src}: {e}")
-
-# Define include mapping (basename -> full suite path)
+# Define include mapping (basename -> suite path)
 include_mapping = {
     "SovereignRegistry.h": "suites/S10_Registry/shards/SovereignRegistry.h",
     "SovereignLatticeRegistry.h": "suites/S10_Registry/shards/SovereignLatticeRegistry.h",
@@ -54,6 +35,8 @@ def update_includes(directory):
                     
                     new_content = content
                     for old_h, new_h in include_mapping.items():
+                        # Match #include "old_h" or #include <old_h> 
+                        # Also captures existing paths to replace them with the correct namespaced ones
                         pattern = rf'#include\s+["<](?:[^">]*/)?{old_h}[">]'
                         replacement = f'#include "{new_h}"'
                         new_content = re.sub(pattern, replacement, new_content)
@@ -61,11 +44,12 @@ def update_includes(directory):
                     if new_content != content:
                         with open(path, "w", encoding="utf-8") as f:
                             f.write(new_content)
-                        print(f"Updated includes in {path}")
+                        print(f"Updated: {path}")
                 except Exception as e:
-                    print(f"Error processing {path}: {e}")
+                    print(f"Error: {path} - {e}")
 
-# Update includes in include, kernel, and tests directories
+# Bulk update
 update_includes("include")
 update_includes("kernel")
 update_includes("tests")
+print("Absolute Final Sync Complete.")
