@@ -16,7 +16,7 @@
 typedef struct {
     char name[64];
     char version[16];
-    sigma_size_t size;
+    sigma_sz_t size;
     sigma_bool installed;
 } sigma_pkg_t;
 

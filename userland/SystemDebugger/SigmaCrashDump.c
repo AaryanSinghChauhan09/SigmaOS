@@ -69,7 +69,7 @@ typedef struct {
 /* -----------------------------------------------------------------------
  * ░░ CRASH DUMP PARSER
  * ----------------------------------------------------------------------- */
-void sigma_crash_parse_prstatus(sigma_u8 *desc_data, sigma_size_t size) {
+void sigma_crash_parse_prstatus(sigma_u8 *desc_data, sigma_sz_t size) {
     SIGMA_UNUSED(size);
     /* In reality, this parses struct elf_prstatus to get crashing CPU registers */
     sigma_u64 *regs = (sigma_u64*)desc_data; /* Simplification */

@@ -45,7 +45,7 @@ typedef struct {
  * sovereign_udf_execute: Executes autonomous user-defined logic.
  * Principle: User-Defined Functions / Automation.
  */
-sigma_err_t sovereign_udf_execute(const sigma_u8* bytecode, sigma_size_t len) {
+sigma_err_t sovereign_udf_execute(const sigma_u8* bytecode, sigma_sz_t len) {
     SigmaUDF_VM_t vm = {0};
     vm.tick_limit = 10000; // Hard instruction cap
 

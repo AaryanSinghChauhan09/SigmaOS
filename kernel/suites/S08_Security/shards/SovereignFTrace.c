@@ -80,7 +80,7 @@ void sigma_mcount_tracer(void *ip, void *parent_ip) {
     SigmaTraceBuffer_t *ring = &s_trace_buffers[cpu];
     
     /* Naive ring buffer allocation */
-    sigma_size_t len = sizeof(SigmaTraceEntryFunc_t);
+    sigma_sz_t len = sizeof(SigmaTraceEntryFunc_t);
     if ((ring->head + len) - ring->tail > ring->size) {
         ring->dropped++;
         return; /* Ring full */
@@ -129,7 +129,7 @@ void sigma_trace_event_commit(sigma_u32 event_id, sigma_u64 a1, sigma_u64 a2, si
     sigma_u32 cpu = 0;
     SigmaTraceBuffer_t *ring = &s_trace_buffers[cpu];
     
-    sigma_size_t len = sizeof(SigmaTraceEntryEvent_t);
+    sigma_sz_t len = sizeof(SigmaTraceEntryEvent_t);
     SigmaTraceEntryEvent_t *entry = (SigmaTraceEntryEvent_t *)&ring->data[ring->head % ring->size];
     
     entry->hdr.timestamp = 1000050;

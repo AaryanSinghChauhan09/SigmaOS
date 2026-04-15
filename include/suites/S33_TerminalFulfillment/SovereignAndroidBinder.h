@@ -22,8 +22,8 @@ typedef sigma_u32 sigma_binder_handle_t;
 
 typedef struct {
     sigma_u8 *data;
-    sigma_size_t data_size;
-    sigma_size_t data_pos;
+    sigma_sz_t data_size;
+    sigma_sz_t data_pos;
 } SigmaParcel_t;
 
 typedef struct {

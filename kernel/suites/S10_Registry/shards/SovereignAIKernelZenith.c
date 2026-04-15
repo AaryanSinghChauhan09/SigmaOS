@@ -24,7 +24,7 @@ CLASS_DECLARE(SovereignAIKernel) {
 
     // Virtual Methods (Simulated)
     VIRTUAL(void, predict_intent, struct SovereignAIKernel* self, const char* action);
-    VIRTUAL(void, train_model, struct SovereignAIKernel* self, sigma_f64* x, sigma_f64* y, sigma_size_t n, sigma_u32 epochs);
+    VIRTUAL(void, train_model, struct SovereignAIKernel* self, sigma_f64* x, sigma_f64* y, sigma_sz_t n, sigma_u32 epochs);
     VIRTUAL(void, shard_resources, struct SovereignAIKernel* self);
     VIRTUAL(void, audit, struct SovereignAIKernel* self);
 };
@@ -49,13 +49,13 @@ static inline sigma_f64 sigma_fpu_mul_add(sigma_f64 a, sigma_f64 b, sigma_f64 c)
 // Implementation Methods
 // -------------------------------------------------------------------------
 
-static void ai_train_model(SovereignAIKernel_t* self, sigma_f64* x, sigma_f64* y, sigma_size_t n, sigma_u32 epochs) {
+static void ai_train_model(SovereignAIKernel_t* self, sigma_f64* x, sigma_f64* y, sigma_sz_t n, sigma_u32 epochs) {
     sigma_f64 alpha = 0.01;
     sigma_printf("[AI_KERNEL]: Initiating Pure Silicon SGD Training (%u epochs)...\n", epochs);
     
     for (sigma_u32 e = 0; e < epochs; e++) {
         sigma_f64 dw = 0, db = 0;
-        for (sigma_size_t i = 0; i < n; i++) {
+        for (sigma_sz_t i = 0; i < n; i++) {
             sigma_f64 pred = self->w * x[i] + self->b;
             dw += (pred - y[i]) * x[i];
             db += (pred - y[i]);

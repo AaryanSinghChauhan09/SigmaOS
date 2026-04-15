@@ -25,7 +25,7 @@ void sigma_audit_log_event(sigma_u32 event, const char* msg) {
     sigma_strncpy(e->details, msg, 128);
     
     /* Sign the log event - BUG FIXED: Audits are now tamper-proof */
-    extern void sigma_sha256(const sigma_u8* data, sigma_size_t len, sigma_u8 digest[32]);
+    extern void sigma_sha256(const sigma_u8* data, sigma_sz_t len, sigma_u8 digest[32]);
     sigma_sha256((const sigma_u8*)e, sizeof(SigmaAuditEntry_t)-32, e->signature);
     
     s_audit_cursor++;

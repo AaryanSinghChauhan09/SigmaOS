@@ -1,4 +1,4 @@
-/**
+﻿/**
  * @file Sovereign_API_v1.h
  * @brief Phase 65: Architectural Contract.
  */
@@ -12,7 +12,7 @@
 typedef struct {
     void (*print)(const char*);
     int (*atoi)(const char*);
-    void* (*malloc)(sigma_size_t);
+    void* (*malloc)(sigma_sz_t);
 } sigma_libc_api_v1_t;
 
 /* Sovereign HAL Contract */

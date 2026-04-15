@@ -15,7 +15,7 @@
  * sigma_gpu_dispatch: Dispatches a compute shader to the Sovereign GPU.
  * Principle: Parallelism / Machine Learning / AI.
  */
-void sigma_gpu_dispatch(const char* kernel_name, void* data, sigma_size_t size) {
+void sigma_gpu_dispatch(const char* kernel_name, void* data, sigma_sz_t size) {
     sigma_printf("[GPU]: Dispatching compute kernel '%s' to 2048 shader cores...\n", kernel_name);
     sigma_printf("[GPU]: Offloading Matrix multiplication (Tensor) to GPGPU matrix processors.\n");
     // Interface with WebGPU API logic in Zenith UI Bridge

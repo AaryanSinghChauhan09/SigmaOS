@@ -38,7 +38,7 @@ sigma_err_t sigma_msg_send(ipc_header_t* header, const void* data) {
     return SIGMA_OK;
 }
 
-sigma_err_t sigma_msg_recv(ipc_port_t port, ipc_header_t* header, void* data, sigma_size_t max_len) {
+sigma_err_t sigma_msg_recv(ipc_port_t port, ipc_header_t* header, void* data, sigma_sz_t max_len) {
     sigma_printf("S [IPC] Msg RECV on port 0x%x\n", port);
     header->local_port = port;
     header->msg_size = 0;
@@ -47,7 +47,7 @@ sigma_err_t sigma_msg_recv(ipc_port_t port, ipc_header_t* header, void* data, si
 }
 
 /* ── Shared Memory ─────────────────────────────────────────────────────── */
-void* sigma_shm_create(sigma_u32 id, sigma_size_t size) {
+void* sigma_shm_create(sigma_u32 id, sigma_sz_t size) {
     void* addr = (void*)0xFFFF900000000000ULL; /* Mock SHM range */
     sigma_printf("S [SHM] Created segment %u (size=%llu) at %p\n", 
                  id, (unsigned long long)size, addr);

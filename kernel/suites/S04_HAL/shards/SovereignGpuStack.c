@@ -11,10 +11,10 @@
 
 typedef struct {
     sigma_u32 device_id;
-    sigma_size_t vram_total;
+    sigma_sz_t vram_total;
 } sigma_gpu_context_t;
 
-void sigma_gpu_push_command(void* buffer, sigma_size_t size) {
+void sigma_gpu_push_command(void* buffer, sigma_sz_t size) {
     // Zero-copy command submission to hardware rings
 }
 

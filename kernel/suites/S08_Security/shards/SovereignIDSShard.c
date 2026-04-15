@@ -15,7 +15,7 @@
  * sigma_security_ids_inspect: Inspects incoming packets for attack patterns.
  * Principle: Cyber Security / Network Security / Forensics.
  */
-void sigma_security_ids_inspect(sigma_u8* packet, sigma_size_t size) {
+void sigma_security_ids_inspect(sigma_u8* packet, sigma_sz_t size) {
     if (size > 1500) {
         sigma_printf("[IDS]: [ALERT] MTU Overflow detected. Potential DDoS target.\n");
         return;

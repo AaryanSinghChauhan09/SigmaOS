@@ -88,7 +88,7 @@ typedef struct {
     SigmaBTConnection_t conns[BT_MAX_CONNS];
 
     /* Driver hooks (e.g., to SovereignDriverFramework USB transport) */
-    sigma_err_t (*tx_packet)(sigma_u8 type, const sigma_u8 *data, sigma_size_t len);
+    sigma_err_t (*tx_packet)(sigma_u8 type, const sigma_u8 *data, sigma_sz_t len);
 } SigmaHCIController_t;
 
 static SigmaHCIController_t s_hci_ctrl[BT_MAX_DEVICES];
@@ -142,7 +142,7 @@ void sigma_bt_reset(SigmaHCIController_t *ctrl) {
 /* -----------------------------------------------------------------------
  * ░░ HCI EVENT PROCESSING
  * ----------------------------------------------------------------------- */
-void sigma_hci_rx_event(SigmaHCIController_t *ctrl, const sigma_u8 *data, sigma_size_t len) {
+void sigma_hci_rx_event(SigmaHCIController_t *ctrl, const sigma_u8 *data, sigma_sz_t len) {
     if (len < 2) return;
     sigma_u8 event_code = data[0];
     sigma_u8 plen = data[1];
@@ -184,7 +184,7 @@ void sigma_hci_rx_event(SigmaHCIController_t *ctrl, const sigma_u8 *data, sigma_
 /* -----------------------------------------------------------------------
  * ░░ L2CAP MOCK (Logical Link Control and Adaptation Protocol)
  * ----------------------------------------------------------------------- */
-sigma_err_t sigma_l2cap_send(SigmaHCIController_t *ctrl, sigma_u16 handle, sigma_u16 cid, const sigma_u8 *data, sigma_size_t len) {
+sigma_err_t sigma_l2cap_send(SigmaHCIController_t *ctrl, sigma_u16 handle, sigma_u16 cid, const sigma_u8 *data, sigma_sz_t len) {
     if (!ctrl || !data || len == 0) return SIGMA_EINVAL;
     
     /* Simulate L2CAP frame packaging over HCI ACL */
@@ -215,7 +215,7 @@ sigma_err_t sigma_l2cap_send(SigmaHCIController_t *ctrl, sigma_u16 handle, sigma
 /* -----------------------------------------------------------------------
  * ░░ INIT & REGISTRATION
  * ----------------------------------------------------------------------- */
-static sigma_err_t mock_usb_tx(sigma_u8 type, const sigma_u8 *data, sigma_size_t len) {
+static sigma_err_t mock_usb_tx(sigma_u8 type, const sigma_u8 *data, sigma_sz_t len) {
     SIGMA_UNUSED(data); SIGMA_UNUSED(len);
     sigma_printf("S [BLUETOOTH-HW]: (Mock USB TX) Type 0x%02x length %lu dispatched.\n", type, (unsigned long)len);
     return SIGMA_OK;

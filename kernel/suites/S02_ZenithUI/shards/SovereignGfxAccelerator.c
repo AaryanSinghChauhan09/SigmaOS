@@ -18,8 +18,8 @@
  * sigma_asm_blit: Fast memory copy using 'rep movsq' for 8-byte alignment.
  * This reduces GUI dependency on standard memcpy and increases throughput.
  */
-static inline void sigma_asm_blit(void* dest, const void* src, sigma_size_t size) {
-    sigma_size_t count = size / 8;
+static inline void sigma_asm_blit(void* dest, const void* src, sigma_sz_t size) {
+    sigma_sz_t count = size / 8;
     __asm__ volatile (
         "rep movsq"
         : "+D"(dest), "+S"(src), "+c"(count)
@@ -52,7 +52,7 @@ sigma_u32 sigma_blend_rgba(sigma_u32 background, sigma_u32 foreground) {
 
 void SovereignGfxAccelerator_BlitWindow(void* screen, void* window, sigma_u32 width, sigma_u32 height) {
     sigma_printf("[GFX-ACCEL]: Silicon-Level Blit: %ux%u pixels via rep-movsq...\n", width, height);
-    sigma_asm_blit(screen, window, (sigma_size_t)width * height * 4);
+    sigma_asm_blit(screen, window, (sigma_sz_t)width * height * 4);
     sigma_printf("[OK]: Blit complete. Frame latency: 0.1ms (NATIVE).\n");
 }
 

@@ -1,4 +1,4 @@
-/**
+﻿/**
  * @file Sovereign_Simulator_Mocks.c
  * @brief Zero-Dependency Simulation Mocks.
  */
@@ -12,7 +12,7 @@ void sigma_printf_sim(const char* format, ...) {
     // (Actual va_list handling logic implemented in sigma_printf shard)
 }
 
-void* sigma_malloc_sim(sigma_size_t size) { 
+void* sigma_malloc_sim(sigma_sz_t size) { 
     return sigma_slab_alloc_raw(size); 
 }
 
@@ -20,10 +20,10 @@ void sigma_free_sim(void* ptr) {
     sigma_free(ptr); 
 }
 
-void sigma_memset_sim(void* s, sigma_u8 c, sigma_size_t n) { 
+void sigma_memset_sim(void* s, sigma_u8 c, sigma_sz_t n) { 
     sigma_memset(s, c, n); 
 }
 
-void sigma_memcpy_sim(void* d, const void* s, sigma_size_t n) { 
+void sigma_memcpy_sim(void* d, const void* s, sigma_sz_t n) { 
     sigma_memcpy(d, s, n); 
 }

@@ -3,7 +3,7 @@
 #define SOVEREIGN_UNIVERSALSTORAGE_SHARD_H
 #include "sigma_types.h"
 
-void sigma_storage_commit (const char* name, const void* data, sigma_size_t size);
+void sigma_storage_commit (const char* name, const void* data, sigma_sz_t size);
 void SovereignUniversalStorageShard_Init (void);
 
 #endif

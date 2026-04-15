@@ -21,7 +21,7 @@ CLASS_DECLARE(SovereignAudioShard) {
     SigmaObject_t core;
 
     VIRTUAL(void, InitializeAudioSilicon, struct SovereignAudioShard* self);
-    VIRTUAL(void, StreamWaveform, struct SovereignAudioShard* self, void* buffer, sigma_size_t size);
+    VIRTUAL(void, StreamWaveform, struct SovereignAudioShard* self, void* buffer, sigma_sz_t size);
 };
 
 // -------------------------------------------------------------------------
@@ -34,7 +34,7 @@ static void audio_init(SovereignAudioShard_t* self) {
     sigma_printf("[OK]: Audio territory online. High-fidelity output READY.\n");
 }
 
-static void audio_stream(SovereignAudioShard_t* self, void* buffer, sigma_size_t size) {
+static void audio_stream(SovereignAudioShard_t* self, void* buffer, sigma_sz_t size) {
     (void)self; (void)buffer;
     sigma_printf("[AUDIO-SHARD]: Streaming %zu-byte waveform directly to silicon DAC...\n", size);
     sigma_printf("[OK]: Playback complete. Zero jitter detected.\n");

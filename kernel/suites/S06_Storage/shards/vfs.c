@@ -23,8 +23,8 @@ typedef enum {
 struct vfs_node;
 typedef struct vfs_node vfs_node_t;
 
-typedef sigma_ssize_t (*vfs_read_fn)(vfs_node_t* node, sigma_u64 offset, void* buffer, sigma_size_t size);
-typedef sigma_ssize_t (*vfs_write_fn)(vfs_node_t* node, sigma_u64 offset, const void* buffer, sigma_size_t size);
+typedef sigma_ssz_t (*vfs_read_fn)(vfs_node_t* node, sigma_u64 offset, void* buffer, sigma_sz_t size);
+typedef sigma_ssz_t (*vfs_write_fn)(vfs_node_t* node, sigma_u64 offset, const void* buffer, sigma_sz_t size);
 typedef sigma_err_t (*vfs_open_fn)(vfs_node_t* node, sigma_u32 flags);
 typedef void (*vfs_close_fn)(vfs_node_t* node);
 
@@ -32,7 +32,7 @@ struct vfs_node {
     char name[64];
     vfs_node_type_t type;
     sigma_u32 inode_id;
-    sigma_size_t size;
+    sigma_sz_t size;
     vfs_read_fn read;
     vfs_write_fn write;
     vfs_open_fn open;
@@ -58,7 +58,7 @@ vfs_node_t* sigma_vfs_create_node(const char* name, vfs_node_type_t type, vfs_no
     if (!node) return SIGMA_NULL;
     
     sigma_memset(node, 0, sizeof(vfs_node_t));
-    sigma_size_t name_len = sigma_strlen(name);
+    sigma_sz_t name_len = sigma_strlen(name);
     if (name_len > 63) name_len = 63;
     sigma_memcpy(node->name, name, name_len);
     node->name[name_len] = '\0';
@@ -80,11 +80,11 @@ sigma_err_t sigma_vfs_mount(const char* path, vfs_node_t* device_node) {
     return SIGMA_OK;
 }
 
-sigma_ssize_t sigma_vfs_read(vfs_node_t* node, void* buffer, sigma_size_t size) {
+sigma_ssz_t sigma_vfs_read(vfs_node_t* node, void* buffer, sigma_sz_t size) {
     if (node && node->read) {
         return node->read(node, 0, buffer, size);
     }
-    return (sigma_ssize_t)SIGMA_EIO;
+    return (sigma_ssz_t)SIGMA_EIO;
 }
 
 

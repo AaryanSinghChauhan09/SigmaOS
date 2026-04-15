@@ -31,7 +31,7 @@ void Sovereign_Net_Init(void) {
     sigma_printf("S [S07]: Sovereign Networking Stack active. Proto: IPv4/TCP/UDP.\n");
 }
 
-sigma_err_t Sovereign_Net_HandlePacket(void* raw_data, sigma_size_t len) {
+sigma_err_t Sovereign_Net_HandlePacket(void* raw_data, sigma_sz_t len) {
     // Process IPv4 Header
     // Process TCP/UDP Port
     sigma_printf("S [S07]: Rx Packet (%d bytes) -> Inter-Shard Dispatching...\n", (int)len);

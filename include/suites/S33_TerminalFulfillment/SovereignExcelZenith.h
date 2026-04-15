@@ -20,7 +20,7 @@ CLASS_DECLARE(SovereignMacroVM) {
     SigmaObject_t core;
     
     // Core Excel USP: Automated business logic execution
-    VIRTUAL(void, LoadMacroBytecode, struct SovereignMacroVM* self, const sigma_u8* bytecode, sigma_size_t size);
+    VIRTUAL(void, LoadMacroBytecode, struct SovereignMacroVM* self, const sigma_u8* bytecode, sigma_sz_t size);
     VIRTUAL(void, ExecuteMacroSovereign, struct SovereignMacroVM* self);
 };
 

@@ -22,7 +22,7 @@
 CLASS_DECLARE(SovereignEBPF) {
     SigmaObject_t core;
 
-    VIRTUAL(void, LoadProgram, struct SovereignEBPF* self, void* bytecode, sigma_size_t size);
+    VIRTUAL(void, LoadProgram, struct SovereignEBPF* self, void* bytecode, sigma_sz_t size);
     VIRTUAL(void, RunHook, struct SovereignEBPF* self, int hook_type);
     VIRTUAL(void, JITCompile, struct SovereignEBPF* self);
 };
@@ -31,7 +31,7 @@ CLASS_DECLARE(SovereignEBPF) {
 // Implementation
 // -------------------------------------------------------------------------
 
-static void ebpf_load_program(SovereignEBPF_t* self, void* bytecode, sigma_size_t size) {
+static void ebpf_load_program(SovereignEBPF_t* self, void* bytecode, sigma_sz_t size) {
     (void)self; (void)bytecode;
     sigma_printf("[EBPF-CORE]: Sharding bytecode enclave (%zu bytes) into kernel JIT territory...\n", size);
     sigma_printf("[OK]: Program sharded and verified for safety.\n");

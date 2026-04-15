@@ -18,7 +18,7 @@ void verify_file(const char* path) {
 
     // Direct Silicon Read (vfs-backed)
     char buffer[4096]; // Use stack-buffer for mission efficiency
-    sigma_ssize_t bytes = sigma_read(fd, buffer, 4095);
+    sigma_ssz_t bytes = sigma_read(fd, buffer, 4095);
     if (bytes > 0) {
         buffer[bytes] = '\0';
         char* line = buffer;

@@ -32,7 +32,7 @@ typedef enum {
 
 sigma_err_t sigma_defender_enable_real_time_protection(void);
 sigma_err_t sigma_defender_disable_real_time_protection(void);
-SigmaScanResult_t sigma_defender_scan_buffer(const void *buffer, sigma_size_t size, char *threat_name);
+SigmaScanResult_t sigma_defender_scan_buffer(const void *buffer, sigma_sz_t size, char *threat_name);
 SigmaScanResult_t sigma_defender_scan_file(const char *path, char *threat_name);
 sigma_err_t sigma_defender_quarantine(const char *path);
 

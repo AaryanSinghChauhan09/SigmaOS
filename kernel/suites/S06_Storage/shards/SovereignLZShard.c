@@ -14,9 +14,9 @@
 /**
  * sigma_storage_rle_compress: Compresses a buffer using Run-Length Encoding.
  */
-sigma_size_t sigma_storage_rle_compress(const sigma_u8* in, sigma_size_t in_len, sigma_u8* out) {
-    sigma_size_t out_idx = 0;
-    for (sigma_size_t i = 0; i < in_len; i++) {
+sigma_sz_t sigma_storage_rle_compress(const sigma_u8* in, sigma_sz_t in_len, sigma_u8* out) {
+    sigma_sz_t out_idx = 0;
+    for (sigma_sz_t i = 0; i < in_len; i++) {
         sigma_u8 count = 1;
         while (i + 1 < in_len && in[i] == in[i+1] && count < 255) {
             count++;

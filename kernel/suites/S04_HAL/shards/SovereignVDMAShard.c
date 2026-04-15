@@ -15,7 +15,7 @@
  * sigma_hal_vdma_copy: Dispatches an asynchronous memory move to the DMA engine.
  * Principle: Performance / Server / Throughput.
  */
-void sigma_hal_vdma_copy(void* dst, void* src, sigma_size_t size) {
+void sigma_hal_vdma_copy(void* dst, void* src, sigma_sz_t size) {
     sigma_printf("[V-DMA]: Dispatching Async Copy (%llu bytes) to CPU-DMA-Engine...\n", 
                  (unsigned long long)size);
     // Bypassing CPU store/load registers; offloading to hardware logic

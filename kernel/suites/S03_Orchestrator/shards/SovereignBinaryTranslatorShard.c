@@ -15,7 +15,7 @@
  * sigma_arch_translate: Translates a block of machine code to native Zenith ISA.
  * Principle: Computer Science / Portability.
  */
-void sigma_arch_translate(sigma_u8* input_code, sigma_u8* output_code, sigma_size_t size) {
+void sigma_arch_translate(sigma_u8* input_code, sigma_u8* output_code, sigma_sz_t size) {
     sigma_printf("[TRANSLATOR]: Analyzing foreign opcode stream (%llu bytes)...\n", (unsigned long long)size);
     // Real dynamic binary translation logic (e.g., ARM -> x86_64 mapping)
     sigma_printf("[TRANSLATOR]: Optimization: Constant folding and dead-code elimination active.\n");

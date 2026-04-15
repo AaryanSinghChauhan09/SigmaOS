@@ -24,7 +24,7 @@ void sigma_net_ring_init(sigma_net_ring_t* ring, sigma_u32 capacity) {
     sigma_printf("S [NETWORK]: Zero-Copy Ring (100Gbps Parity) materialized.\n");
 }
 
-void sigma_net_ring_push(sigma_net_ring_t* ring, void* packet_data, sigma_size_t len) {
+void sigma_net_ring_push(sigma_net_ring_t* ring, void* packet_data, sigma_sz_t len) {
     // Direct DMA transfer logic would be here
 }
 

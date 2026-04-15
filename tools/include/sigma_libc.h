@@ -28,7 +28,7 @@
 typedef uint64_t sigma_u64;
 typedef uint32_t sigma_u32;
 typedef uint8_t  sigma_u8;
-typedef size_t   sigma_size_t;
+typedef size_t   sigma_sz_t;
 typedef int      sigma_err_t;
 
 #define SIGMA_OK    0

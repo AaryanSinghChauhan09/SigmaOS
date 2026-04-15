@@ -14,8 +14,8 @@
 typedef struct {
     char name[32];
     sigma_err_t (*open)(const char* path);
-    sigma_err_t (*read)(int fd, void* buffer, sigma_size_t size);
-    sigma_err_t (*write)(int fd, const void* buffer, sigma_size_t size);
+    sigma_err_t (*read)(int fd, void* buffer, sigma_sz_t size);
+    sigma_err_t (*write)(int fd, const void* buffer, sigma_sz_t size);
 } SigmaFileSystem_t;
 
 /* --- Registry --- */

@@ -6,9 +6,9 @@
 
 #include "sigma_libc.h"
 
-sigma_size_t sigma_strlen(const char* s) {
+sigma_sz_t sigma_strlen(const char* s) {
     if (!s) return 0;
-    sigma_size_t len = 0;
+    sigma_sz_t len = 0;
     while (s[len]) len++;
     return len;
 }
@@ -33,8 +33,8 @@ const char* sigma_strstr(const char* haystack, const char* needle) {
     }
     return SIGMA_NULL;
 }
-char* sigma_strncpy(char* dest, const char* src, sigma_size_t n) {
-    sigma_size_t i;
+char* sigma_strncpy(char* dest, const char* src, sigma_sz_t n) {
+    sigma_sz_t i;
     for (i = 0; i < n && src[i] != '\0'; i++)
         dest[i] = src[i];
     for (; i < n; i++)

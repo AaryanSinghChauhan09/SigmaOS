@@ -21,7 +21,7 @@ typedef struct {
  * sigma_dist_map_reduce: Distributes a task across the Sovereign Mesh.
  * Principle: Distributed / Multi-Processing / Cloud.
  */
-void sigma_dist_map_reduce(const char* job_name, void* data, sigma_size_t size) {
+void sigma_dist_map_reduce(const char* job_name, void* data, sigma_sz_t size) {
     sigma_printf("[DISTRIBUTED]: Mapping Job '%s' to 16 mesh nodes...\n", job_name);
     sigma_printf("[DISTRIBUTED]: Offloading tensor workload to Server-Shard 0xF1.\n");
     // Interface with S07 Network Nexus for P2P transport

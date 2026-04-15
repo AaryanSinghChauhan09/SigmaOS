@@ -15,8 +15,8 @@ typedef struct SovereignDSAShard {
     const char* active_algo;
     sigma_u64 total_ops;
     
-    void (*sort_quicksort)(struct SovereignDSAShard* self, sigma_u32* arr, sigma_size_t size);
-    void* (*map_silicon_shard)(struct SovereignDSAShard* self, sigma_u64 phys_addr, sigma_size_t size);
+    void (*sort_quicksort)(struct SovereignDSAShard* self, sigma_u32* arr, sigma_sz_t size);
+    void* (*map_silicon_shard)(struct SovereignDSAShard* self, sigma_u64 phys_addr, sigma_sz_t size);
     void (*audit_complexity)(struct SovereignDSAShard* self);
 } SovereignDSAShard_t;
 

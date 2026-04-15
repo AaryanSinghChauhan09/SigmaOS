@@ -21,7 +21,7 @@ CLASS_DECLARE(SovereignInterruptController) {
 // --- DMA & CONTROLLER LOGIC ---
 CLASS_DECLARE(SovereignDMAController) { 
     SigmaObject_t core;
-    VIRTUAL(void, TransferBlock, struct SovereignDMAController* self, void* src, void* dest, sigma_size_t size);
+    VIRTUAL(void, TransferBlock, struct SovereignDMAController* self, void* src, void* dest, sigma_sz_t size);
 };
 
 // --- I/O SUBSYSTEM (BLOCK VS CHARACTER) ---

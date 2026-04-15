@@ -45,7 +45,7 @@ typedef struct sigma_obj_header_t {
 /* =========================================================================
  * Sovereign memory shim (forwards to SovereignLibC slab allocator)
  * ========================================================================= */
-static inline void* sigma_alloc(sigma_size_t size) {
+static inline void* sigma_alloc(sigma_sz_t size) {
     return sigma_malloc(size);
 }
 

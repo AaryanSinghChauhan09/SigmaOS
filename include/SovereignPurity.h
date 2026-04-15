@@ -9,8 +9,8 @@
 #ifndef SOVEREIGN_PURITY_H
 #define SOVEREIGN_PURITY_H
 
-typedef unsigned long long sigma_size_t;
-typedef signed   long long sigma_ssize_t;
+typedef unsigned long long sigma_sz_t;
+typedef signed   long long sigma_ssz_t;
 typedef signed   int       sigma_err_t;
 
 typedef unsigned char      sigma_u8;

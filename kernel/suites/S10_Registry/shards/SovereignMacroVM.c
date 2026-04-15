@@ -15,7 +15,7 @@
 // Implementation
 // -------------------------------------------------------------------------
 
-static void vm_load_bytecode(SovereignMacroVM_t* self, const sigma_u8* bytecode, sigma_size_t size) {
+static void vm_load_bytecode(SovereignMacroVM_t* self, const sigma_u8* bytecode, sigma_sz_t size) {
     (void)self; (void)bytecode;
     sigma_printf("[EXCEL-VM]: Loading %llu bytes of automated business logic bytecode...\n", (unsigned long long)size);
 }

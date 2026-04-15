@@ -204,18 +204,18 @@ void sigma_input_sync(SigmaInputDevice_t *dev) {
 /* -----------------------------------------------------------------------
  * ░░ USERSPACE READ API (Mock)
  * ----------------------------------------------------------------------- */
-sigma_ssize_t sigma_input_read_device(sigma_u32 minor, SigmaInputEvent_t *out_ev, sigma_size_t max_events) {
+sigma_ssz_t sigma_input_read_device(sigma_u32 minor, SigmaInputEvent_t *out_ev, sigma_sz_t max_events) {
     if (minor >= MAX_INPUT_DEVICES) return SIGMA_EINVAL;
     SigmaInputDevice_t *dev = &s_input_devices[minor];
     if (!dev->online) return SIGMA_ENODEV;
 
-    sigma_size_t read_count = 0;
+    sigma_sz_t read_count = 0;
     while (dev->queue_head != dev->queue_tail && read_count < max_events) {
         out_ev[read_count] = dev->queue[dev->queue_head];
         dev->queue_head = (dev->queue_head + 1) % EVENT_QUEUE_SIZE;
         read_count++;
     }
-    return (sigma_ssize_t)read_count;
+    return (sigma_ssz_t)read_count;
 }
 
 /* -----------------------------------------------------------------------

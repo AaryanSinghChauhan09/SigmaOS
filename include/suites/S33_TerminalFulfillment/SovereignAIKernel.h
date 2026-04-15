@@ -17,7 +17,7 @@ CLASS_DECLARE(SovereignAIKernel) {
     sigma_f64     b;
 
     VIRTUAL(void, predict_intent, struct SovereignAIKernel* self, const char* action);
-    VIRTUAL(void, train_model, struct SovereignAIKernel* self, sigma_f64* x, sigma_f64* y, sigma_size_t n, sigma_u32 epochs);
+    VIRTUAL(void, train_model, struct SovereignAIKernel* self, sigma_f64* x, sigma_f64* y, sigma_sz_t n, sigma_u32 epochs);
     VIRTUAL(void, shard_resources, struct SovereignAIKernel* self);
     VIRTUAL(void, audit, struct SovereignAIKernel* self);
 };

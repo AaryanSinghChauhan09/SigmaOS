@@ -53,7 +53,7 @@ typedef struct {
 typedef struct SigmaSndPCMSubstream {
     sigma_u32 stream;         /* Playback or Capture */
     sigma_u8 *dma_buffer;     /* Ring buffer allocated for DMA */
-    sigma_size_t dma_bytes;
+    sigma_sz_t dma_bytes;
     sigma_u32 hw_ptr;         /* Hardware read/write offset */
     sigma_u32 appl_ptr;       /* Application read/write offset */
     

@@ -40,7 +40,7 @@ void sigma_batch_submit(sigma_u32 id, sigma_u8 prio) {
  * sigma_shm_get: Creates a zero-copy shared memory segment for IPC.
  * Principle: Multi-Processing / IPC.
  */
-void* sigma_shm_get(sigma_u32 key, sigma_size_t size) {
+void* sigma_shm_get(sigma_u32 key, sigma_sz_t size) {
     sigma_printf("[PROCESS]: Shared Memory (Key: 0x%08X) mapped [SIZE: %llu].\n", key, (unsigned long long)size);
     return (void*)0x20000000; /* Real physical address in Zenith address space */
 }

@@ -141,7 +141,7 @@ public:
 private:
     // Simple direct comparison (Zero-Library)
     bool sigma_compare(const char* s1, const char* s2) {
-        sigma_size_t i = 0;
+        sigma_sz_t i = 0;
         while(s1[i] != '\0' && s2[i] != '\0') {
             if(s1[i] != s2[i]) return false;
             i++;
@@ -149,8 +149,8 @@ private:
         return (s1[i] == s2[i]);
     }
 
-    sigma_size_t sigma_strlen(const char* s) {
-        sigma_size_t l = 0;
+    sigma_sz_t sigma_strlen(const char* s) {
+        sigma_sz_t l = 0;
         while(s[l]) l++;
         return l;
     }

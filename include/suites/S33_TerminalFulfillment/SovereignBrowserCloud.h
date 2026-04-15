@@ -226,7 +226,7 @@ sigma_bool  sigma_csp_check_script (const SigmaCSP_t *csp, const char *origin);
 sigma_bool  sigma_csp_check_frame  (const SigmaCSP_t *csp, const char *origin);
 
 /* WASM */
-sigma_err_t sigma_wasm_load        (const sigma_u8 *wasm_bytes, sigma_size_t len);
+sigma_err_t sigma_wasm_load        (const sigma_u8 *wasm_bytes, sigma_sz_t len);
 sigma_err_t sigma_wasm_call        (const char *export_name, sigma_u64 *args,
                                      sigma_u32 argc, sigma_u64 *result);
 

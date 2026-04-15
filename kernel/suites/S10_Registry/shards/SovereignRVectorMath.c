@@ -15,13 +15,13 @@
 // Implementation
 // -------------------------------------------------------------------------
 
-static void r_execute_simd_op(SovereignRVectorMath_t* self, const sigma_f64* vecA, const sigma_f64* vecB, sigma_f64* result, sigma_size_t len) {
+static void r_execute_simd_op(SovereignRVectorMath_t* self, const sigma_f64* vecA, const sigma_f64* vecB, sigma_f64* result, sigma_sz_t len) {
     (void)self; (void)vecA; (void)vecB; (void)result;
     sigma_printf("[R-VECTOR]: Executing 100%% Vectorized Mathematical Matrix block (%llu ops)...\n", (unsigned long long)len);
     sigma_printf("[OK]: Iteration loops bypassed. SIMD parallelism deployed across execution vector.\n");
 }
 
-static sigma_f64 r_execute_statistical_inference(SovereignRVectorMath_t* self, const sigma_f64* dataSet, sigma_size_t len) {
+static sigma_f64 r_execute_statistical_inference(SovereignRVectorMath_t* self, const sigma_f64* dataSet, sigma_sz_t len) {
     (void)self; (void)dataSet; (void)len;
     sigma_printf("[R-VECTOR]: Compiling Predictive Statistical Inference Models...\n");
     sigma_printf("[OK]: Standard Deviation and Mathematical Convergence locked.\n");

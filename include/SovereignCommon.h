@@ -10,8 +10,8 @@
 #define SOVEREIGN_COMMON_H
 
 /* ── Priority Core Types (must be first) ──────────────────────────────── */
-typedef unsigned long long sigma_size_t;
-typedef signed long long   sigma_ssize_t;
+typedef unsigned long long sigma_sz_t;
+typedef signed long long   sigma_ssz_t;
 typedef signed int         sigma_err_t;
 
 /* ── Primitives ───────────────────────────────────────────────────────── */

@@ -21,7 +21,7 @@ static void wizard_print_header() {
     sigma_printf("\n");
 }
 
-static void wizard_get_input(const char* prompt, char* buffer, sigma_size_t max) {
+static void wizard_get_input(const char* prompt, char* buffer, sigma_sz_t max) {
     sigma_printf("  [?] %s: ", prompt);
     /* In a real system, we'd use sigma_read(0, ...) here */
     // For demo/shard parity, we simulate input

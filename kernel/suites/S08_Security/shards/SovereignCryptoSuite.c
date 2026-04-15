@@ -57,8 +57,8 @@ void sigma_sha256_init(SHA256Ctx_t* ctx) {
     ctx->bit_count = 0; ctx->buf_len = 0;
 }
 
-void sigma_sha256_update(SHA256Ctx_t* ctx, const sigma_u8* data, sigma_size_t len) {
-    for (sigma_size_t i = 0; i < len; i++) {
+void sigma_sha256_update(SHA256Ctx_t* ctx, const sigma_u8* data, sigma_sz_t len) {
+    for (sigma_sz_t i = 0; i < len; i++) {
         ctx->buf[ctx->buf_len++] = data[i];
         if (ctx->buf_len == 64) {
             sigma_sha256_transform(ctx, ctx->buf);
@@ -82,17 +82,17 @@ void sigma_sha256_final(SHA256Ctx_t* ctx, sigma_u8 digest[32]) {
     }
 }
 
-void sigma_sha256(const sigma_u8* data, sigma_size_t len, sigma_u8 digest[32]) {
+void sigma_sha256(const sigma_u8* data, sigma_sz_t len, sigma_u8 digest[32]) {
     SHA256Ctx_t ctx; sigma_sha256_init(&ctx);
     sigma_sha256_update(&ctx, data, len);
     sigma_sha256_final(&ctx, digest);
 }
 
 /* --- Sub-Module 2: HMAC --- */
-void sigma_hmac_sha256(const sigma_u8* key, sigma_size_t klen, const sigma_u8* msg, sigma_size_t mlen, sigma_u8 mac[32]) {
+void sigma_hmac_sha256(const sigma_u8* key, sigma_sz_t klen, const sigma_u8* msg, sigma_sz_t mlen, sigma_u8 mac[32]) {
     sigma_u8 k_ipad[64], k_opad[64];
     sigma_memset(k_ipad, 0x36, 64); sigma_memset(k_opad, 0x5C, 64);
-    for (sigma_size_t i = 0; i < (klen < 64 ? klen : 64); i++) {
+    for (sigma_sz_t i = 0; i < (klen < 64 ? klen : 64); i++) {
         k_ipad[i] ^= key[i]; k_opad[i] ^= key[i];
     }
     sigma_u8 inner_hash[32];
@@ -106,8 +106,8 @@ void sigma_hmac_sha256(const sigma_u8* key, sigma_size_t klen, const sigma_u8* m
 }
 
 /* --- Sub-Module 3: ChaCha20 (Simulation XOR) --- */
-void sigma_chacha20_encrypt(const sigma_u8 key[32], const sigma_u8 nonce[12], sigma_u32 counter, const sigma_u8* in, sigma_u8* out, sigma_size_t len) {
-    for (sigma_size_t i = 0; i < len; i++) out[i] = in[i] ^ key[i % 32] ^ nonce[i % 12];
+void sigma_chacha20_encrypt(const sigma_u8 key[32], const sigma_u8 nonce[12], sigma_u32 counter, const sigma_u8* in, sigma_u8* out, sigma_sz_t len) {
+    for (sigma_sz_t i = 0; i < len; i++) out[i] = in[i] ^ key[i % 32] ^ nonce[i % 12];
 }
 
 /* ... (Remaining primitives) ... */

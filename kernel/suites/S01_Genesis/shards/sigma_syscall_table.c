@@ -31,7 +31,7 @@ static sc_i64 sc_handle_write(sc_u64 fd, sc_u64 buf, sc_u64 len,
                                sc_u64 d, sc_u64 e, sc_u64 f) {
     (void)d;(void)e;(void)f;
     if (fd == 1 || fd == 2) {  /* stdout/stderr */
-        sigma_write((int)fd, (const void*)buf, (sigma_size_t)len);
+        sigma_write((int)fd, (const void*)buf, (sigma_sz_t)len);
         return (sc_i64)len;
     }
     return -9; /* EBADF */

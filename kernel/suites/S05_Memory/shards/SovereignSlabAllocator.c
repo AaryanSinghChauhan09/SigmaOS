@@ -14,15 +14,15 @@
 
 typedef struct sigma_slab {
     sigma_u32 magic;
-    sigma_size_t obj_size;
-    sigma_size_t count;
+    sigma_sz_t obj_size;
+    sigma_sz_t count;
     void* free_list;
     struct sigma_slab* next;
 } sigma_slab_t;
 
 static sigma_slab_t* slab_caches[32]; // Caches for different sizes
 
-void* sigma_slab_alloc(sigma_size_t size) {
+void* sigma_slab_alloc(sigma_sz_t size) {
     // Find appropriate cache index (pseudo-code/logic)
     int idx = 0;
     while ((1ULL << (idx + 3)) < size && idx < 31) idx++;
@@ -30,7 +30,7 @@ void* sigma_slab_alloc(sigma_size_t size) {
     sigma_slab_t* cache = slab_caches[idx];
     if (!cache) {
         // Create new slab via mmap (using SovereignLibC)
-        sigma_size_t page_size = 4096;
+        sigma_sz_t page_size = 4096;
         void* mem = sigma_mmap(SIGMA_NULL, page_size, 3, 0x22, -1, 0);
         if (mem == (void*)-1) return SIGMA_NULL;
         
@@ -43,7 +43,7 @@ void* sigma_slab_alloc(sigma_size_t size) {
         
         // Initialize free list (linked sharding)
         sigma_u8* ptr = (sigma_u8*)cache->free_list;
-        for (sigma_size_t i = 0; i < cache->count - 1; i++) {
+        for (sigma_sz_t i = 0; i < cache->count - 1; i++) {
             *(void**)ptr = (void*)(ptr + cache->obj_size);
             ptr += cache->obj_size;
         }
@@ -62,7 +62,7 @@ void* sigma_slab_alloc(sigma_size_t size) {
     return SIGMA_NULL; // Out of memory in this slab
 }
 
-void sigma_slab_free(void* ptr, sigma_size_t size) {
+void sigma_slab_free(void* ptr, sigma_sz_t size) {
     if (!ptr) return;
     
     // Find appropriate cache index

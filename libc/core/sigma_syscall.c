@@ -17,8 +17,8 @@ void sigma_exit(int code) {
     );
 }
 
-sigma_ssize_t sigma_write(int fd, const void* buf, sigma_size_t count) {
-    sigma_ssize_t ret;
+sigma_ssz_t sigma_write(int fd, const void* buf, sigma_sz_t count) {
+    sigma_ssz_t ret;
     __asm__ volatile (
         "mov $1, %%rax\n\t"     // syscall number for sys_write
         "mov %1, %%rdi\n\t"     // fd
@@ -33,8 +33,8 @@ sigma_ssize_t sigma_write(int fd, const void* buf, sigma_size_t count) {
     return ret;
 }
 
-sigma_ssize_t sigma_read(int fd, void* buf, sigma_size_t count) {
-    sigma_ssize_t ret;
+sigma_ssz_t sigma_read(int fd, void* buf, sigma_sz_t count) {
+    sigma_ssz_t ret;
     __asm__ volatile (
         "mov $0, %%rax\n\t"     // syscall number for sys_read
         "mov %1, %%rdi\n\t"     // fd

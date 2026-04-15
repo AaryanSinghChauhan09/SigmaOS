@@ -15,7 +15,7 @@
  * sigma_quorum_write: Writes data to the mesh and waits for a quorum.
  * Principle: Distributed / Cloud / Network.
  */
-int sigma_quorum_write(const char* key, void* data, sigma_size_t size) {
+int sigma_quorum_write(const char* key, void* data, sigma_sz_t size) {
     sigma_printf("[QUORUM]: Initiating write for key '%s'. Waiting for (N/2 + 1) nodes...\n", key);
     // Consensus logic: wait for majority of peers to ACK
     sigma_printf("[QUORUM]: Write SUCCESS. Majority of node cluster (3/3) confirmed.\n");

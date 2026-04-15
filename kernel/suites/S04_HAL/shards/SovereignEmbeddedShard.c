@@ -23,7 +23,7 @@ void sigma_gpio_write(sigma_u32 pin, int state) {
 /**
  * sigma_i2c_transfer: Performs a data transfer over the I2C bus.
  */
-void sigma_i2c_transfer(sigma_u8 addr, sigma_u8* data, sigma_size_t size) {
+void sigma_i2c_transfer(sigma_u8 addr, sigma_u8* data, sigma_sz_t size) {
     sigma_printf("[I2C]: Transferring %llu bytes to Device 0x%02X.\n", (unsigned long long)size, addr);
 }
 

@@ -20,9 +20,9 @@ CLASS_DECLARE(SovereignDSAShard) {
     sigma_u64 total_ops;
     
     // Virtual Methods
-    VIRTUAL(void, sort_quicksort, struct SovereignDSAShard* self, sigma_u32* arr, sigma_size_t size);
-    VIRTUAL(void, sort_mergesort, struct SovereignDSAShard* self, sigma_u32* arr, sigma_size_t size);
-    VIRTUAL(void*, map_silicon_shard, struct SovereignDSAShard* self, sigma_u64 phys_addr, sigma_size_t size);
+    VIRTUAL(void, sort_quicksort, struct SovereignDSAShard* self, sigma_u32* arr, sigma_sz_t size);
+    VIRTUAL(void, sort_mergesort, struct SovereignDSAShard* self, sigma_u32* arr, sigma_sz_t size);
+    VIRTUAL(void*, map_silicon_shard, struct SovereignDSAShard* self, sigma_u64 phys_addr, sigma_sz_t size);
     VIRTUAL(void, audit_complexity, struct SovereignDSAShard* self);
 };
 
@@ -30,7 +30,7 @@ CLASS_DECLARE(SovereignDSAShard) {
 // External Assembly Optimizations (arch/x86_64)
 // -------------------------------------------------------------------------
 extern void sigma_asm_atomic_swap(sigma_u32* a, sigma_u32* b);
-extern sigma_size_t sigma_asm_quicksort_partition(sigma_u32* arr, sigma_ssize_t low, sigma_ssize_t high);
+extern sigma_sz_t sigma_asm_quicksort_partition(sigma_u32* arr, sigma_ssz_t low, sigma_ssz_t high);
 
 // -------------------------------------------------------------------------
 // Low-Level Native Swap (Assembly-Bridged)
@@ -44,11 +44,11 @@ static inline void sigma_native_swap(sigma_u32* a, sigma_u32* b) {
 // Quicksort Implementation (Native)
 // -------------------------------------------------------------------------
 
-static sigma_size_t partition(sigma_u32* arr, sigma_ssize_t low, sigma_ssize_t high) {
+static sigma_sz_t partition(sigma_u32* arr, sigma_ssz_t low, sigma_ssz_t high) {
     sigma_u32 pivot = arr[high];
-    sigma_ssize_t i = low - 1;
+    sigma_ssz_t i = low - 1;
     
-    for (sigma_ssize_t j = low; j < high; j++) {
+    for (sigma_ssz_t j = low; j < high; j++) {
         if (arr[j] < pivot) {
             i++;
             sigma_native_swap(&arr[i], &arr[j]);
@@ -58,15 +58,15 @@ static sigma_size_t partition(sigma_u32* arr, sigma_ssize_t low, sigma_ssize_t h
     return i + 1;
 }
 
-static void quicksort_recursive(sigma_u32* arr, sigma_ssize_t low, sigma_ssize_t high) {
+static void quicksort_recursive(sigma_u32* arr, sigma_ssz_t low, sigma_ssz_t high) {
     if (low < high) {
-        sigma_size_t pi = partition(arr, low, high);
+        sigma_sz_t pi = partition(arr, low, high);
         quicksort_recursive(arr, low, pi - 1);
         quicksort_recursive(arr, pi + 1, high);
     }
 }
 
-static void sigma_dsa_quicksort(SovereignDSAShard_t* self, sigma_u32* arr, sigma_size_t size) {
+static void sigma_dsa_quicksort(SovereignDSAShard_t* self, sigma_u32* arr, sigma_sz_t size) {
     self->active_algo = "QUICKSORT";
     sigma_printf("[DSA]: Initiating Native Zenith Quicksort on %d elements...\n", (int)size);
     quicksort_recursive(arr, 0, size - 1);
@@ -90,12 +90,12 @@ static void sigma_dsa_audit(SovereignDSAShard_t* self) {
 // Shard Constructor
 // -------------------------------------------------------------------------
 
-static void* sigma_dsa_map_silicon(SovereignDSAShard_t* self, sigma_u64 phys_addr, sigma_size_t size) {
+static void* sigma_dsa_map_silicon(SovereignDSAShard_t* self, sigma_u64 phys_addr, sigma_sz_t size) {
     sigma_printf("[DSA]: Mapping physical silicon sector 0x%llX (%d bytes) to Zenith Virtual Memory...\n", 
                  (unsigned long long)phys_addr, (int)size);
     // simulated Mach VM mapping
     self->total_ops++;
-    return (void*)(sigma_size_t)phys_addr; // Direct mapping simulation
+    return (void*)(sigma_sz_t)phys_addr; // Direct mapping simulation
 }
 
 // -------------------------------------------------------------------------

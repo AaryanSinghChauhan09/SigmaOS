@@ -30,6 +30,6 @@ sigma_err_t sigma_vfs_mount(const char* source, const char* target, const char* 
 
 /* File Operations API */
 SigmaFile_t* sigma_vfs_open(const char* path, sigma_u32 flags, sigma_u16 mode);
-sigma_err_t sigma_vfs_read(SigmaFile_t* file, char* buf, sigma_size_t len);
+sigma_err_t sigma_vfs_read(SigmaFile_t* file, char* buf, sigma_sz_t len);
 
 #endif /* SOVEREIGN_VFS_H */

@@ -15,7 +15,7 @@ void sigma_tool_backup_shard(const char* src_shard, const char* dest_shard) {
     
     /* Mock backup logic using sigma_read/sigma_write */
     char buf[1024];
-    sigma_ssize_t n;
+    sigma_ssz_t n;
     int fd_src = sigma_open(src_shard, 0, 0);
     int fd_dest = sigma_open(dest_shard, 0, 0); // O_CREAT | O_WRONLY
     

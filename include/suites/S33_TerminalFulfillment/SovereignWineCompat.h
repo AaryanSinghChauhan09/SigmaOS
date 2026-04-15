@@ -183,7 +183,7 @@ sigma_err_t  sigma_fsync_create   (SigmaWineCtx_t *w);
 /* Win32 API stubs */
 sigma_u32    sigma_win32_GetLastError  (void);
 void         sigma_win32_SetLastError  (sigma_u32 err);
-void        *sigma_win32_VirtualAlloc  (void *addr, sigma_size_t size,
+void        *sigma_win32_VirtualAlloc  (void *addr, sigma_sz_t size,
                                          sigma_u32 type, sigma_u32 protect);
 sigma_err_t  sigma_win32_VirtualFree   (void *addr);
 int          sigma_win32_CreateThread  (void *(*fn)(void*), void *arg);

@@ -11,8 +11,8 @@
 
 typedef struct {
     char name[SHARD_NAME_MAX];
-    sigma_bool (*read)(void* buf, sigma_size_t size);
-    sigma_bool (*write)(const void* buf, sigma_size_t size);
+    sigma_bool (*read)(void* buf, sigma_sz_t size);
+    sigma_bool (*write)(const void* buf, sigma_sz_t size);
 } SovereignMountPoint;
 
 static SovereignMountPoint g_mounts[32];

@@ -41,8 +41,8 @@
     typedef sigma_i32  int32_t;
     typedef sigma_i64  int64_t;
 
-    typedef sigma_size_t  size_t;
-    typedef sigma_ssize_t ssize_t;
+    typedef sigma_sz_t  size_t;
+    typedef sigma_ssz_t ssize_t;
 #endif
 
 #endif /* SIGMAOS_SUPREME_TYPES_H */

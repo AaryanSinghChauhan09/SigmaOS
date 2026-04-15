@@ -12,8 +12,8 @@
 
 #include "sigma_types.h"
 
-typedef void* (*sigma_malloc_fn)(sigma_size_t size);
-typedef void  (*sigma_free_fn)(void* ptr, sigma_size_t size);
+typedef void* (*sigma_malloc_fn)(sigma_sz_t size);
+typedef void  (*sigma_free_fn)(void* ptr, sigma_sz_t size);
 
 typedef struct {
     char name[32];
@@ -24,7 +24,7 @@ typedef struct {
 /* Registry API */
 void SovereignMemory_InitRegistry(void);
 sigma_err_t SovereignMemory_Register(const char* name, sigma_malloc_fn malloc, sigma_free_fn free);
-void* SovereignMemory_Alloc(const char* shard_name, sigma_size_t size);
-void  SovereignMemory_Free(const char* shard_name, void* ptr, sigma_size_t size);
+void* SovereignMemory_Alloc(const char* shard_name, sigma_sz_t size);
+void  SovereignMemory_Free(const char* shard_name, void* ptr, sigma_sz_t size);
 
 #endif /* SOVEREIGN_MEMORY_H */

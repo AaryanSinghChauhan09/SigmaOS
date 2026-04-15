@@ -28,7 +28,7 @@ void SovereignAmnesiaPurge(int level) {
  * S Sovereign Isolation Protocol
  * Prevents specific buffers from being used in AI training/preprocessing.
  */
-void SovereignPrivacyIsolate(void* buffer, sigma_size_t size) {
+void SovereignPrivacyIsolate(void* buffer, sigma_sz_t size) {
     // Mark memory as NON-ML-TRAINABLE
     sigma_log("S [PRIVACY]: Buffer isolated from ML preprocessing.");
 }

@@ -21,11 +21,11 @@ typedef sigma_u32 sigma_status;
 extern "C" {
 #endif
     void          sigma_exit(int code);
-    sigma_ssize_t sigma_write(int fd, const void* buf, sigma_size_t count);
-    sigma_ssize_t sigma_read(int fd, void* buf, sigma_size_t count);
+    sigma_ssz_t sigma_write(int fd, const void* buf, sigma_sz_t count);
+    sigma_ssz_t sigma_read(int fd, void* buf, sigma_sz_t count);
     int           sigma_open(const char* filename, int flags, int mode);
     int           sigma_close(int fd);
-    void*         sigma_mmap(void* addr, sigma_size_t length, int prot, int flags, int fd, sigma_u64 offset);
+    void*         sigma_mmap(void* addr, sigma_sz_t length, int prot, int flags, int fd, sigma_u64 offset);
     int           sigma_getdents64(unsigned int fd, void* dirp, unsigned int count);
     int           sigma_execve(const char* filename, char* const argv[], char* const envp[]);
     int           sigma_fork();
@@ -34,14 +34,14 @@ extern "C" {
     int           sigma_wait(int* wstatus);
     int           sigma_dup(int oldfd);
     
-    sigma_size_t  sigma_strlen(const char* s);
-    void*         sigma_memset(void* s, int c, sigma_size_t n);
-    void*         sigma_memcpy(void* dest, const void* src, sigma_size_t n);
-    int           sigma_memcmp(const void* s1, const void* s2, sigma_size_t n);
-    void*         sigma_memmove(void* dest, const void* src, sigma_size_t n);
+    sigma_sz_t  sigma_strlen(const char* s);
+    void*         sigma_memset(void* s, int c, sigma_sz_t n);
+    void*         sigma_memcpy(void* dest, const void* src, sigma_sz_t n);
+    int           sigma_memcmp(const void* s1, const void* s2, sigma_sz_t n);
+    void*         sigma_memmove(void* dest, const void* src, sigma_sz_t n);
     int           sigma_streq(const char* s1, const char* s2);
     int           sigma_compare(const char* s1, const char* s2);
-    void          sigma_strlcat(char* dest, const char* src, sigma_size_t dstsize);
+    void          sigma_strlcat(char* dest, const char* src, sigma_sz_t dstsize);
     char*         sigma_strcpy(char* dest, const char* src);
     int           sigma_atoi(const char* s);
     int           sigma_shm_open(const char* name, int oflag, int mode);
@@ -70,11 +70,11 @@ extern "C" {
 void sigma_print(const char* str);
 void sigma_print_num(sigma_u64 val);
 void sigma_printf(const char* format, ...);
-int  sigma_snprintf(char* str, sigma_size_t size, const char* format, ...);
+int  sigma_snprintf(char* str, sigma_sz_t size, const char* format, ...);
 
 // --- Memory Management (Sovereign Zenith) ---
-void* sigma_slab_alloc_raw(sigma_size_t size);
-void* sigma_malloc(sigma_size_t size);
+void* sigma_slab_alloc_raw(sigma_sz_t size);
+void* sigma_malloc(sigma_sz_t size);
 void  sigma_free(void* ptr);
 
 #endif

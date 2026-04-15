@@ -3,7 +3,7 @@
 #include "SovereignNet.h"
 #include "sigma_libc.h"
 
-void sigma_ethernet_handler(void* payload, sigma_size_t size) {
+void sigma_ethernet_handler(void* payload, sigma_sz_t size) {
     sigma_printf("  S [ETH]: Received Ethernet Frame (%lu bytes) via hardware shunt.\n", (unsigned long)size);
     sigma_printf("  S [ETH]: Payload zero-copied to BPF network-mesh.\n");
 }

@@ -26,7 +26,7 @@ sigma_err_t SovereignNet_RegisterProtocol(const char* name, sigma_u16 ethertype,
     return SIGMA_OK;
 }
 
-void SovereignNet_ProcessPacket(sigma_u16 ethertype, void* payload, sigma_size_t size) {
+void SovereignNet_ProcessPacket(sigma_u16 ethertype, void* payload, sigma_sz_t size) {
     for (sigma_u32 i = 0; i < g_net_proto_count; i++) {
         if (g_net_protocols[i].ethertype == ethertype) {
             g_net_protocols[i].handler(payload, size);

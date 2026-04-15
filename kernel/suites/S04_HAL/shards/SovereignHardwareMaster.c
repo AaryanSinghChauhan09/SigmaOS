@@ -24,7 +24,7 @@ CLASS_DECLARE(SovereignHardwareMaster) {
 
     VIRTUAL(void, ScanPCI, struct SovereignHardwareMaster* self);
     VIRTUAL(void, RegisterIRQ, struct SovereignHardwareMaster* self, int irq, void* handler);
-    VIRTUAL(void, StreamDMA, struct SovereignHardwareMaster* self, void* dest, void* src, sigma_size_t size);
+    VIRTUAL(void, StreamDMA, struct SovereignHardwareMaster* self, void* dest, void* src, sigma_sz_t size);
 };
 
 // -------------------------------------------------------------------------
@@ -43,7 +43,7 @@ static void hw_register_irq(SovereignHardwareMaster_t* self, int irq, void* hand
     sigma_printf("[OK]: Hardware interrupt vector secured.\n");
 }
 
-static void hw_stream_dma(SovereignHardwareMaster_t* self, void* dest, void* src, sigma_size_t size) {
+static void hw_stream_dma(SovereignHardwareMaster_t* self, void* dest, void* src, sigma_sz_t size) {
     (void)self; (void)dest; (void)src; (void)size;
     sigma_printf("[HARDWARE-MASTER]: Initiating Sovereign DMA stream (%zu bytes)...\n", size);
     sigma_printf("[OK]: Silicon DMA transfer complete. No CPU intervention required.\n");

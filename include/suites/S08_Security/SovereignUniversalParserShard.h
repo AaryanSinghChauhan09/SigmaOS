@@ -3,7 +3,7 @@
 #define SOVEREIGN_UNIVERSALPARSER_SHARD_H
 #include "sigma_types.h"
 
-void sigma_parse_any (const void* data, sigma_size_t size);
+void sigma_parse_any (const void* data, sigma_sz_t size);
 void SovereignUniversalParserShard_Init (void);
 
 #endif

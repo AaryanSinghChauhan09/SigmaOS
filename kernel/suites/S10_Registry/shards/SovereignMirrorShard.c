@@ -14,14 +14,14 @@
 typedef struct {
     sigma_u64  shard_id;
     void*      state_ptr;
-    sigma_size_t state_size;
+    sigma_sz_t state_size;
     sigma_u64  last_sync_tick;
 } SigmaMirror_t;
 
 /**
  * sigma_fault_reconcile: Compares primary and mirror states.
  */
-int sigma_fault_reconcile(const void* primary, const void* mirror, sigma_size_t len) {
+int sigma_fault_reconcile(const void* primary, const void* mirror, sigma_sz_t len) {
     /* Byte-wise state comparison (Principle: Checkpointing) */
     return sigma_memcmp(primary, mirror, len);
 }
