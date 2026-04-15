@@ -3,7 +3,7 @@
  * ========================================================================= */
 #ifndef SOVEREIGN_DMA_SHARD_H
 #define SOVEREIGN_DMA_SHARD_H
-#include "suites/S01_Genesis/shards/sigma_types.h"
+#include "sigma_types.h"
 typedef enum { DMA_PROT_NONE=0, DMA_PROT_READ=1, DMA_PROT_WRITE=2, DMA_PROT_RW=3 } SigmaDMAProt_t;
 sigma_err_t sigma_dma_map               (const char* bdf, sigma_u64 iova, sigma_u64 pa,
                                           sigma_u64 size, SigmaDMAProt_t prot);

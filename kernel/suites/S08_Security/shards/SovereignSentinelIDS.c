@@ -9,7 +9,7 @@
 //     Uses S13 Sentience to identify abnormal syscall chains *before* exploit.
 // =============================================================================
 
-#include "suites/S01_Genesis/shards/sigma_types.h"
+#include "sigma_types.h"
 
 
 #define MAX_THREAT_SIGNATURES 1024

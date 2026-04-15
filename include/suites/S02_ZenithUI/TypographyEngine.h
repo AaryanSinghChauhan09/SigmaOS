@@ -1,7 +1,7 @@
 #ifndef SIGMA_TYPOGRAPHY_H
 #define SIGMA_TYPOGRAPHY_H
 
-#include "suites/S01_Genesis/shards/sigma_types.h"
+#include "sigma_types.h"
 
 // SigmaOS Typography & Sub-pixel Engine
 // Absorbs FreeType/DirectWrite paradigms for beautiful, hardware-accelerated font rendering.

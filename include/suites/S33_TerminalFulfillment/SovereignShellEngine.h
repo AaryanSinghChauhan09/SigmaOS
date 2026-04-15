@@ -7,7 +7,7 @@
 #ifndef SOVEREIGN_SHELL_ENGINE_H
 #define SOVEREIGN_SHELL_ENGINE_H
 
-#include "suites/S01_Genesis/shards/sigma_types.h"
+#include "sigma_types.h"
 
 void SovereignShellEngine_Init (void);
 void sigma_shell_highlight     (const char* input);

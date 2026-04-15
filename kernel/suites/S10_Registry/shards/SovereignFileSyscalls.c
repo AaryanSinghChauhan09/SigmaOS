@@ -1,7 +1,7 @@
 ﻿#include "suites/S01_Genesis/shards/sigma_base.h"
 
 #include "SovereignSyscall.h"
-#include "suites/S01_Genesis/shards/sigma_libc.h"
+#include "sigma_libc.h"
 
 sigma_i64 sys_read_shard(sigma_u64 fd, sigma_u64 buf, sigma_u64 count, sigma_u64 a4, sigma_u64 a5, sigma_u64 a6) {
     sigma_printf("  S [SYS-FS]: Routing sigma_read(fd=%llu) via SovereignVFS.\n", (unsigned long long)fd);

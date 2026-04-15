@@ -6,7 +6,7 @@
 #ifndef SOVEREIGN_API_V1_H
 #define SOVEREIGN_API_V1_H
 
-#include "suites/S01_Genesis/shards/sigma_types.h"
+#include "sigma_types.h"
 
 /* Sovereign LibC Contract */
 typedef struct {

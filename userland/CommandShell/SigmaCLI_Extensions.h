@@ -1,7 +1,7 @@
 #ifndef SIGMA_CLI_EXTENSIONS_H
 #define SIGMA_CLI_EXTENSIONS_H
 
-#include "suites/S01_Genesis/shards/sigma_types.h"
+#include "sigma_types.h"
 
 // SigmaOS Command Shell - Extended Utility Set
 // The second wave of native commands, built for text streams, networking, and disk management.

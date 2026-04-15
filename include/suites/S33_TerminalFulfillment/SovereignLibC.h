@@ -11,7 +11,7 @@
 #ifndef SOVEREIGN_LIBC_H
 #define SOVEREIGN_LIBC_H
 
-#include "suites/S01_Genesis/shards/sigma_types.h"
+#include "sigma_types.h"
 
 typedef sigma_u32 sigma_status;
 /* SIGMA_OK/SIGMA_ERROR are defined in sigma_types.h */

@@ -12,7 +12,7 @@
 //   • 128 Object Limit: Simulates 128 concurrent sound sources in 3D space.
 // =============================================================================
 
-#include "suites/S01_Genesis/shards/sigma_types.h"
+#include "sigma_types.h"
 
 
 #define MAX_AUDIO_OBJECTS 128

@@ -1,7 +1,7 @@
 ﻿/* S SIGMAOS: SOVEREIGN MULTIMEDIA SHARD HEADER */
 #ifndef SOVEREIGN_MULTIMEDIA_SHARD_H
 #define SOVEREIGN_MULTIMEDIA_SHARD_H
-#include "suites/S01_Genesis/shards/sigma_types.h"
+#include "sigma_types.h"
 typedef enum { STREAM_PCM_AUDIO, STREAM_COMPRESSED_AUDIO,
                STREAM_VIDEO_RAW, STREAM_VIDEO_ENCODED } SigmaStreamType_t;
 sigma_err_t sigma_mm_open_stream    (const char* client, SigmaStreamType_t type,

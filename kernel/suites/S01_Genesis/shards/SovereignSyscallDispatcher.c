@@ -8,7 +8,7 @@
  */
 
 #include "suites/S01_Genesis/shards/sigma_base.h"
-#include "suites/S01_Genesis/shards/sigma_types.h"
+#include "sigma_types.h"
 
 #define MAX_SYSCALLS 512
 

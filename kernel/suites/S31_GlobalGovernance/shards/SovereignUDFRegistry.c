@@ -4,7 +4,7 @@
  */
 
 #include "suites/S10_Registry/shards/sigma_udf.h"
-#include "suites/S01_Genesis/shards/sigma_libc.h"
+#include "sigma_libc.h"
 #include "suites/S01_Genesis/shards/sigma_kernel.h"
 
 static sigma_udf_t g_udf_registry[MAX_UDFS];

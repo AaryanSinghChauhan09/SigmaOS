@@ -10,7 +10,7 @@
 // Result: Wire-speed (100Gbps+) packet filtering and routing.
 // =============================================================================
 
-#include "suites/S01_Genesis/shards/sigma_types.h"
+#include "sigma_types.h"
 
 
 typedef struct {

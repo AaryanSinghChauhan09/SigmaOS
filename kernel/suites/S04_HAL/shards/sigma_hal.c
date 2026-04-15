@@ -5,7 +5,7 @@
  */
 
 #include "sigma_hal.h"
-#include "suites/S01_Genesis/shards/sigma_libc.h"
+#include "sigma_libc.h"
 
 static sigma_device_t s_devices[SIGMA_HAL_MAX_DEVICES];
 static hal_u32        s_dev_count = 0;

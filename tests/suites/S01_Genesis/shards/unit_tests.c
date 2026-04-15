@@ -7,8 +7,8 @@
  * =========================================================================
  */
 
-#include "suites/S01_Genesis/shards/sigma_libc.h"
-#include "suites/S01_Genesis/shards/sigma_libc.h"
+#include "sigma_libc.h"
+#include "sigma_libc.h"
 #include "suites/S01_Genesis/shards/sigma_math.h"
 
 /* --- Minimal Test Framework --- */

@@ -1,7 +1,7 @@
 ﻿/* S SIGMAOS: SOVEREIGN SYMBIAN SHARD HEADER */
 #ifndef SOVEREIGN_SYMBIAN_SHARD_H
 #define SOVEREIGN_SYMBIAN_SHARD_H
-#include "suites/S01_Genesis/shards/sigma_types.h"
+#include "sigma_types.h"
 
 void sigma_symbian_sleep (void);
 void SovereignSymbianShard_Init (void);

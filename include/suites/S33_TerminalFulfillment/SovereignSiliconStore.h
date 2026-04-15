@@ -7,7 +7,7 @@
 #ifndef SOVEREIGN_SILICON_STORE_H
 #define SOVEREIGN_SILICON_STORE_H
 
-#include "suites/S01_Genesis/shards/sigma_types.h"
+#include "sigma_types.h"
 
 sigma_err_t sigma_store_set       (const char* key, const char* value);
 const char* sigma_store_get       (const char* key);

@@ -1,7 +1,7 @@
 ﻿#include "suites/S01_Genesis/shards/sigma_base.h"
 
 #include "SovereignVFS.h"
-#include "suites/S01_Genesis/shards/sigma_libc.h"
+#include "sigma_libc.h"
 #include "sigma_string.h"
 
 #define MAX_FS_TYPES 16

@@ -11,7 +11,7 @@
 #ifndef SOVEREIGN_ENV_MANAGER_H
 #define SOVEREIGN_ENV_MANAGER_H
 
-#include "suites/S01_Genesis/shards/sigma_types.h"
+#include "sigma_types.h"
 
 #define SIGMA_ENV_KEY_MAX   128
 #define SIGMA_ENV_VAL_MAX   4096

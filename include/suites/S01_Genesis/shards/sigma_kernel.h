@@ -11,7 +11,7 @@
 
 #include "suites/S01_Genesis/shards/sigma_base.h"
 #include "suites/S10_Registry/shards/SovereignLatticeRegistry.h"
-#include "suites/S20_Interconnect/shards/SovereignInterconnect.h"
+#include "suites/S20_GlobalVFS/shards/SovereignInterconnect.h"
 
 /* 33-Suite Orchestration Entry Points */
 extern void S01_Genesis_Register(void);

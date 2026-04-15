@@ -6,7 +6,7 @@
 #ifndef SOVEREIGN_OOM_SHARD_H
 #define SOVEREIGN_OOM_SHARD_H
 
-#include "suites/S01_Genesis/shards/sigma_types.h"
+#include "sigma_types.h"
 
 sigma_err_t sigma_oom_register (const char* name, sigma_u32 pid,
                                   sigma_u64 mem_kb, sigma_i32 score,

@@ -1,7 +1,7 @@
 ﻿/* S SIGMAOS: SOVEREIGN PRIVACY SHARD HEADER */
 #ifndef SOVEREIGN_PRIVACY_SHARD_H
 #define SOVEREIGN_PRIVACY_SHARD_H
-#include "suites/S01_Genesis/shards/sigma_types.h"
+#include "sigma_types.h"
 typedef enum { PRIV_ACCESS_LOCATION, PRIV_ACCESS_CAMERA, PRIV_ACCESS_MICROPHONE,
                PRIV_ACCESS_CONTACTS, PRIV_ACCESS_NETWORK, PRIV_ACCESS_STORAGE,
                PRIV_ACCESS_KERNEL_MEM } SigmaPrivAccessType_t;

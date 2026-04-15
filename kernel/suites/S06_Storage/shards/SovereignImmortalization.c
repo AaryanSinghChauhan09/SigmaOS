@@ -11,7 +11,7 @@
 //         'Re-Materialize' on a new node in seconds with 100% state parity.
 // =============================================================================
 
-#include "suites/S01_Genesis/shards/sigma_types.h"
+#include "sigma_types.h"
 
 
 #define MATERIALIZATION_VERSION 1

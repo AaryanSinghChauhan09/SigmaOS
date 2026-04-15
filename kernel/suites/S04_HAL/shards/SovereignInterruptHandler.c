@@ -2,7 +2,7 @@
 // Absorbs Linux IDT/APIC + Windows Interrupt Dispatch Table + Mach interrupt stacks
 // Hardened C11 — all interrupt handlers run at ring-0 with safe stack switching.
 
-#include "suites/S01_Genesis/shards/sigma_types.h"
+#include "sigma_types.h"
 
 #define SIGMA_IRQ_VECTORS    256
 #define SIGMA_STACK_SIZE     8192 // Dedicated kernel interrupt stack per vector

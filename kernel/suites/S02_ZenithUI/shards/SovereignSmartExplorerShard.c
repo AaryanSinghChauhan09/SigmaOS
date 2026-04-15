@@ -1,7 +1,7 @@
 ﻿#include "suites/S01_Genesis/shards/sigma_base.h"
 
 #include "suites/S10_Registry/shards/SovereignLatticeRegistry.h"
-#include "suites/S01_Genesis/shards/sigma_libc.h"
+#include "sigma_libc.h"
 
 /*
  * Sovereign Smart Explorer Shard (v1.0).

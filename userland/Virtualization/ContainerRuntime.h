@@ -1,7 +1,7 @@
 #ifndef SIGMA_CONTAINER_RUNTIME_H
 #define SIGMA_CONTAINER_RUNTIME_H
 
-#include "suites/S01_Genesis/shards/sigma_types.h"
+#include "sigma_types.h"
 
 // SigmaOS Hyper-Fast Containerization & Virtualization
 // Achieving Docker/LXC parity at the C11 native level

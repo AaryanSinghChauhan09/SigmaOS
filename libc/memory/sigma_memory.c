@@ -4,7 +4,7 @@
  * =========================================================================
  */
 
-#include "suites/S01_Genesis/shards/sigma_libc.h"
+#include "sigma_libc.h"
 
 void* sigma_memset(void* s, int c, sigma_sz_t n) {
     unsigned char* p = (unsigned char*)s;

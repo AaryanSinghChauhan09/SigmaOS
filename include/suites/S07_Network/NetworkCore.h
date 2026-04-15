@@ -3,7 +3,7 @@
 
 // SigmaOS Networking Shard
 // Absorbing robust TCP/IP features and BSD networking ideas
-#include "suites/S01_Genesis/shards/sigma_types.h"
+#include "sigma_types.h"
 
 void net_init_custom_tcp_ip_stack();
 void net_load_wifi_drivers();

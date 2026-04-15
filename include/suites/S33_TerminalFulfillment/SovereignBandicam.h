@@ -16,7 +16,7 @@
 #ifndef SOVEREIGN_BANDICAM_H
 #define SOVEREIGN_BANDICAM_H
 
-#include "suites/S01_Genesis/shards/sigma_types.h"
+#include "sigma_types.h"
 
 typedef struct {
     sigma_i32 x, y, width, height;

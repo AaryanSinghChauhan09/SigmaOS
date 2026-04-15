@@ -5,7 +5,7 @@
  */
 
 #include "sigma_ipc.h"
-#include "suites/S01_Genesis/shards/sigma_libc.h"
+#include "sigma_libc.h"
 
 static sigma_ipc_chan_t s_channels[SIGMA_IPC_MAX_CHANNELS];
 static ipc_u32          s_chan_count = 0;

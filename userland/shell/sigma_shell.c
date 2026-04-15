@@ -11,7 +11,7 @@
  * =========================================================================
  */
 
-#include "suites/S01_Genesis/shards/sigma_libc.h"
+#include "sigma_libc.h"
 #include "../proc/sigma_proc.h"
 #include "../ipc/sigma_ipc.h"
 

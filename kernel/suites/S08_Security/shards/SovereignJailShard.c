@@ -1,7 +1,7 @@
 ﻿#include "suites/S01_Genesis/shards/sigma_base.h"
 
 #include "SovereignSecurity.h"
-#include "suites/S01_Genesis/shards/sigma_libc.h"
+#include "sigma_libc.h"
 
 sigma_err_t sigma_jail_init(void) {
     sigma_printf("  S [JAIL]: Sovereign FreeBSD-style Isolation online.\n");

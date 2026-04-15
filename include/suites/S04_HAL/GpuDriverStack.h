@@ -1,7 +1,7 @@
 #ifndef SIGMA_GPU_STACK_H
 #define SIGMA_GPU_STACK_H
 
-#include "suites/S01_Genesis/shards/sigma_types.h"
+#include "sigma_types.h"
 
 // SigmaOS Universal GPU Driver Stack
 // Native hardware manipulation for modern graphics

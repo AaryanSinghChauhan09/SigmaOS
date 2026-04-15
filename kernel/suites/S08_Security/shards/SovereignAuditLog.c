@@ -2,7 +2,7 @@
 // Absorbs Linux auditd + Windows Event Log + macOS OSLog
 // Cryptographically chained, tamper-evident, kernel-level log ring.
 
-#include "suites/S01_Genesis/shards/sigma_types.h"
+#include "sigma_types.h"
 
 
 #define SIGMA_AUDIT_MAX_ENTRIES  8192

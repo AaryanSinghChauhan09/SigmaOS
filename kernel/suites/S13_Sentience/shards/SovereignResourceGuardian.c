@@ -11,7 +11,7 @@
 //     memory zone BEFORE the system slows down.
 // =============================================================================
 
-#include "suites/S01_Genesis/shards/sigma_types.h"
+#include "sigma_types.h"
 
 
 #define TREND_WINDOW    32

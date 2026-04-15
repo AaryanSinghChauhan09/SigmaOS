@@ -1,7 +1,7 @@
 ﻿/* S SIGMAOS: SOVEREIGN NETWORK STACK SHARD HEADER */
 #ifndef SOVEREIGN_NETSTACK_SHARD_H
 #define SOVEREIGN_NETSTACK_SHARD_H
-#include "suites/S01_Genesis/shards/sigma_types.h"
+#include "sigma_types.h"
 typedef enum { SOCK_SIGMA_TCP=0, SOCK_SIGMA_UDP=1, SOCK_SIGMA_RAW=2 } SigmaSockType_t;
 sigma_u32   sigma_socket    (SigmaSockType_t type);
 sigma_err_t sigma_bind      (sigma_u32 fd, sigma_u32 addr, sigma_u16 port);

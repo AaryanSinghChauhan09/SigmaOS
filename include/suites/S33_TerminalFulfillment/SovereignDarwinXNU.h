@@ -15,7 +15,7 @@
 #ifndef SOVEREIGN_DARWIN_XNU_H
 #define SOVEREIGN_DARWIN_XNU_H
 
-#include "suites/S01_Genesis/shards/sigma_types.h"
+#include "sigma_types.h"
 
 /* --- MACH PORTS --- */
 typedef sigma_u32 mach_port_t;

@@ -11,7 +11,7 @@
 #ifndef SOVEREIGN_INIT_SYSTEM_H
 #define SOVEREIGN_INIT_SYSTEM_H
 
-#include "suites/S01_Genesis/shards/sigma_types.h"
+#include "sigma_types.h"
 
 /* -------------------------------------------------------------------------
  * Service states (mirrors OpenRC / systemd unit states)

@@ -1,7 +1,7 @@
 #ifndef SIGMA_REALITY_COMPOSER_H
 #define SIGMA_REALITY_COMPOSER_H
 
-#include "suites/S01_Genesis/shards/sigma_types.h"
+#include "sigma_types.h"
 
 // SigmaOS Reality Composer Shard (AR/VR)
 // Spatial tracking, stereo rendering, and pass-through hooks.

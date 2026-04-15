@@ -18,10 +18,10 @@
 //   • Tab-completion hooked into VFS readdir + command table
 // =============================================================================
 
-#include "suites/S01_Genesis/shards/sigma_libc.h"
-#include "suites/S01_Genesis/shards/sigma_libc.h"
-#include "suites/S01_Genesis/shards/sigma_libc.h"
-#include "suites/S01_Genesis/shards/sigma_types.h"
+#include "sigma_libc.h"
+#include "sigma_libc.h"
+#include "sigma_libc.h"
+#include "sigma_types.h"
 
 #include <ctype.h>
 

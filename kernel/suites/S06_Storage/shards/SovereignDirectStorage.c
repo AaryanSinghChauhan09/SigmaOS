@@ -12,7 +12,7 @@
 //   • Reduces asset loading latency by 90% via zero-copy pipeline
 // =============================================================================
 
-#include "suites/S01_Genesis/shards/sigma_types.h"
+#include "sigma_types.h"
 
 
 #define DS_MAX_STREAMS      8

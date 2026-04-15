@@ -12,7 +12,7 @@
 //   • Zero-Latency Scrubbing: Uses S13 Sentience to pre-fetch video blocks.
 // =============================================================================
 
-#include "suites/S01_Genesis/shards/sigma_types.h"
+#include "sigma_types.h"
 
 
 #define MAX_VIDEO_STREAMS   4

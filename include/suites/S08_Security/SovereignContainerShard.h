@@ -1,7 +1,7 @@
 ﻿/* S SIGMAOS: SOVEREIGN CONTAINER SHARD HEADER */
 #ifndef SOVEREIGN_CONTAINER_SHARD_H
 #define SOVEREIGN_CONTAINER_SHARD_H
-#include "suites/S01_Genesis/shards/sigma_types.h"
+#include "sigma_types.h"
 typedef enum { NS_PID=0x01,NS_MOUNT=0x02,NS_NET=0x04,NS_UTS=0x08,NS_IPC=0x10,NS_USER=0x20 } SigmaNamespaceFlags_t;
 typedef enum { CONTAINER_CREATED,CONTAINER_RUNNING,CONTAINER_PAUSED,CONTAINER_EXITED } SigmaContainerState_t;
 sigma_err_t sigma_container_run  (const char* image, const char* hostname,

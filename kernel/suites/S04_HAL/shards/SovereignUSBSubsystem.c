@@ -2,7 +2,7 @@
 // Absorbs LibUSB (Linux), WinUSB (Windows), IOKit (macOS) paradigms.
 // Modular, hot-plug aware, zero-dependency C11 shard.
 
-#include "suites/S01_Genesis/shards/sigma_types.h"
+#include "sigma_types.h"
 
 
 #define SIGMA_USB_MAX_DEVICES 128

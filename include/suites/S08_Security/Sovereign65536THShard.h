@@ -1,7 +1,7 @@
 ﻿/* S SIGMAOS: SOVEREIGN 65536TH SHARD HEADER */
 #ifndef SOVEREIGN_65536TH_SHARD_H
 #define SOVEREIGN_65536TH_SHARD_H
-#include "suites/S01_Genesis/shards/sigma_types.h"
+#include "sigma_types.h"
 
 void sigma_16bit_final_ascend (void);
 void Sovereign65536THShard_Init (void);

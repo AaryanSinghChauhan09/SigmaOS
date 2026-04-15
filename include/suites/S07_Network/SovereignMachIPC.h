@@ -7,7 +7,7 @@
  * Provides port-based communication between shards.
  */
 
-#include "suites/S01_Genesis/shards/sigma_libc.h"
+#include "sigma_libc.h"
 
 typedef sigma_u32 mach_port_t;
 typedef sigma_u32 mach_msg_size_t;

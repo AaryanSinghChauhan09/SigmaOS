@@ -12,7 +12,7 @@
 //   • Pipeline: Automatic frame-graph optimization before VRAM transfer
 // =============================================================================
 
-#include "suites/S01_Genesis/shards/sigma_types.h"
+#include "sigma_types.h"
 
 
 #define MAX_COMMANDS_PER_BLOCK 4096

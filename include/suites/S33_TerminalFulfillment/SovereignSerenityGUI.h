@@ -16,7 +16,7 @@
 #ifndef SOVEREIGN_SERENITY_GUI_H
 #define SOVEREIGN_SERENITY_GUI_H
 
-#include "suites/S01_Genesis/shards/sigma_types.h"
+#include "sigma_types.h"
 
 typedef struct {
     sigma_i32 x, y, width, height;

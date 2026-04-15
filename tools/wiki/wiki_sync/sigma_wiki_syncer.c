@@ -7,9 +7,9 @@
 //   internal WIKI.md and external GitHub Wiki structures.
 // =============================================================================
 
-#include "suites/S01_Genesis/shards/sigma_libc.h"
-#include "suites/S01_Genesis/shards/sigma_libc.h"
-#include "suites/S01_Genesis/shards/sigma_libc.h"
+#include "sigma_libc.h"
+#include "sigma_libc.h"
+#include "sigma_libc.h"
 
 void sync_suite_docs(void) {
     sigma_printf("[wiki] Scanning 30 Master Sovereign Suites...\n");

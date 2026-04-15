@@ -1,7 +1,7 @@
 // =============================================================================
 // SigmaOS  S12_Ecosystem  SovereignSuiteRegistry.c
 // =============================================================================
-#include "suites/S01_Genesis/shards/sigma_types.h"
+#include "sigma_types.h"
 
 void S12_Ecosystem_Register(void) {
     // Register functional shards for S12_Ecosystem into the System Lattice Registry

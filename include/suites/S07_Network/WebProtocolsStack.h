@@ -1,7 +1,7 @@
 #ifndef SIGMA_WEB_PROTOCOLS_H
 #define SIGMA_WEB_PROTOCOLS_H
 
-#include "suites/S01_Genesis/shards/sigma_types.h"
+#include "sigma_types.h"
 
 
 // SigmaOS Web & Connectivity Protocol Stack

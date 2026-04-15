@@ -3,7 +3,7 @@
 
 // SigmaOS System Debugging Tool
 // Absorbing paradigms from gdb/lldb but streamlined for Sovereign Shards
-#include "suites/S01_Genesis/shards/sigma_types.h"
+#include "sigma_types.h"
 
 void debug_attach_to_process(uint64_t pid);
 void debug_dump_memory(void* start, uint32_t length);

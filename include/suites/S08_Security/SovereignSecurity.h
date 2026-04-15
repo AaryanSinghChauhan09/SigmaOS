@@ -10,7 +10,7 @@
 #ifndef SOVEREIGN_SECURITY_H
 #define SOVEREIGN_SECURITY_H
 
-#include "suites/S01_Genesis/shards/sigma_types.h"
+#include "sigma_types.h"
 
 typedef sigma_err_t (*sigma_sec_init_fn)(void);
 

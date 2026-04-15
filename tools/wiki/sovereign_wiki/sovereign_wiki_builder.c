@@ -11,10 +11,10 @@
 // Zero external deps — single-file, compiles with gcc -std=c11 -O2
 // =============================================================================
 
-#include "suites/S01_Genesis/shards/sigma_libc.h"
-#include "suites/S01_Genesis/shards/sigma_libc.h"
-#include "suites/S01_Genesis/shards/sigma_libc.h"
-#include "suites/S01_Genesis/shards/sigma_types.h"
+#include "sigma_libc.h"
+#include "sigma_libc.h"
+#include "sigma_libc.h"
+#include "sigma_types.h"
 
 #include <dirent.h>
 #include <sys/stat.h>

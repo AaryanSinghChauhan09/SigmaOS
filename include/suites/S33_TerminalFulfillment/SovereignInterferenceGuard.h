@@ -11,7 +11,7 @@
 #ifndef SOVEREIGN_INTERFERENCE_GUARD_H
 #define SOVEREIGN_INTERFERENCE_GUARD_H
 
-#include "suites/S01_Genesis/shards/sigma_libc.h"
+#include "sigma_libc.h"
 #include "suites/S03_Orchestrator/shards/SigmaOOP.h"
 
 // -------------------------------------------------------------------------

@@ -3,7 +3,7 @@
  * @brief Zero-Dependency Simulation Mocks.
  */
 
-#include "suites/S01_Genesis/shards/sigma_libc.h"
+#include "sigma_libc.h"
 #include "sigma_string.h"
 
 /* Redirecting simulate.c mocks to Sovereign Atoms */

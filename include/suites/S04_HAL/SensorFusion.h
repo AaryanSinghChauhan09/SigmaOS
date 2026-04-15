@@ -1,7 +1,7 @@
 #ifndef SIGMA_SENSOR_FUSION_H
 #define SIGMA_SENSOR_FUSION_H
 
-#include "suites/S01_Genesis/shards/sigma_types.h"
+#include "sigma_types.h"
 
 // SigmaOS Sensor Fusion Shard
 // Modular integration for Gyroscopes, Accelerometers, and Magnetometers.

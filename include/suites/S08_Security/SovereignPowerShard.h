@@ -3,7 +3,7 @@
  * ========================================================================= */
 #ifndef SOVEREIGN_POWER_SHARD_H
 #define SOVEREIGN_POWER_SHARD_H
-#include "suites/S01_Genesis/shards/sigma_types.h"
+#include "sigma_types.h"
 typedef enum { POWER_PLAN_PERFORMANCE, POWER_PLAN_BALANCED,
                POWER_PLAN_POWER_SAVER, POWER_PLAN_ULTRA_LOW_LATENCY } SigmaPowerPlan_t;
 void sigma_power_init_cpu    (sigma_u32 cpu_id);

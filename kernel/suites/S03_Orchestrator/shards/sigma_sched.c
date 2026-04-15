@@ -5,7 +5,7 @@
  */
 
 #include "sigma_sched.h"
-#include "suites/S01_Genesis/shards/sigma_libc.h"
+#include "sigma_libc.h"
 
 static sigma_runqueue_t s_rqs[SIGMA_MAX_CPUS];
 static sc_u32           s_num_cpus = 0;

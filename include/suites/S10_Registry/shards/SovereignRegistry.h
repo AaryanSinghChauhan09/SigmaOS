@@ -10,7 +10,7 @@
 #ifndef SOVEREIGN_REGISTRY_H
 #define SOVEREIGN_REGISTRY_H
 
-#include "suites/S01_Genesis/shards/SovereignCommon.h"
+#include "SovereignCommon.h"
 
 /* ── Registry limits ──────────────────────────────────────────────────── */
 #define MAX_SHARDS       2048

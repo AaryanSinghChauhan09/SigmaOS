@@ -2,7 +2,7 @@
 // Absorbs evdev (Linux), HID (Windows), IOKit Multitouch (macOS)
 // Modular C11 — feeds directly into ZenithUI compositor and gesture recognizer
 
-#include "suites/S01_Genesis/shards/sigma_types.h"
+#include "sigma_types.h"
 
 
 #define SIGMA_MAX_TOUCH_POINTS 10

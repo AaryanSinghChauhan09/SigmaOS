@@ -1,7 +1,7 @@
 ﻿/* S SIGMAOS: SOVEREIGN AAC SHARD HEADER */
 #ifndef SOVEREIGN_AAC_SHARD_H
 #define SOVEREIGN_AAC_SHARD_H
-#include "suites/S01_Genesis/shards/sigma_types.h"
+#include "sigma_types.h"
 
 void sigma_aac_nullify (void);
 void SovereignAACShard_Init (void);

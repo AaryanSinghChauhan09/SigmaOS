@@ -3,7 +3,7 @@
 
 // SigmaOS Custom File System & VFS Shard
 // Absorbing APIs from Linux VFS and ZFS features
-#include "suites/S01_Genesis/shards/sigma_types.h"
+#include "sigma_types.h"
 
 void vfs_init_custom_fs();
 void vfs_mount_partition(const char* target, const char* format);

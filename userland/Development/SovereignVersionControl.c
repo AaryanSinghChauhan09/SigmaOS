@@ -14,7 +14,7 @@
 //   • Sovereign object store uses S06_Storage block encryption by default
 // =============================================================================
 
-#include "suites/S01_Genesis/shards/sigma_types.h"
+#include "sigma_types.h"
 
 
 #define VCS_MAX_REPO_PATH  512

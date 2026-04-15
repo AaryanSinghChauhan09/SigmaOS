@@ -1,7 +1,7 @@
 ﻿/* S SIGMAOS: SOVEREIGN SIGNAL SHARD HEADER */
 #ifndef SOVEREIGN_SIGNAL_SHARD_H
 #define SOVEREIGN_SIGNAL_SHARD_H
-#include "suites/S01_Genesis/shards/sigma_types.h"
+#include "sigma_types.h"
 typedef enum { SIGMA_SIGHUP=1, SIGMA_SIGINT=2, SIGMA_SIGKILL=9,
                SIGMA_SIGSEGV=11, SIGMA_SIGTERM=15,
                SIGMA_SIGUSR1=10, SIGMA_SIGUSR2=12 } SigmaSignal_t;

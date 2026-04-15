@@ -14,7 +14,7 @@
 //   • Interactive boost: tracks sleep/run ratio, boosts waking tasks
 // =============================================================================
 
-#include "suites/S01_Genesis/shards/sigma_types.h"
+#include "sigma_types.h"
 
 
 #define SIGMA_MAX_TASKS     4096

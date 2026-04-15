@@ -6,7 +6,7 @@
 #ifndef SOVEREIGN_TRACE_SHARD_H
 #define SOVEREIGN_TRACE_SHARD_H
 
-#include "suites/S01_Genesis/shards/sigma_types.h"
+#include "sigma_types.h"
 
 void sigma_trace_attach (sigma_u32 pid);
 void sigma_trace_record (sigma_u32 pid, sigma_u32 nr, const char* name,

@@ -16,7 +16,7 @@
 //   • Remote Desktop: GPU H.265 encode → RTP stream (RDP hardware model)
 // =============================================================================
 
-#include "suites/S01_Genesis/shards/sigma_types.h"
+#include "sigma_types.h"
 
 
 #define SIGMA_CLOUD_MAX_PROVIDERS   8

@@ -12,7 +12,7 @@
 //   • S13 Sentience identifies "Idle Peers" and recruits them into the hive.
 // =============================================================================
 
-#include "suites/S01_Genesis/shards/sigma_types.h"
+#include "sigma_types.h"
 
 
 #define MAX_HIVE_NODES      16

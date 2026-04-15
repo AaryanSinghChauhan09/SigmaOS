@@ -9,7 +9,7 @@
  */
 
 #include "sigma_init.h"
-#include "suites/S01_Genesis/shards/sigma_libc.h"
+#include "sigma_libc.h"
 
 void sigma_init_register_all_services(void) {
     /* ── Core Kernel Services ────────────────────────── */

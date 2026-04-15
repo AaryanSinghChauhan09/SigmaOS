@@ -1,7 +1,7 @@
 ﻿/* S SIGMAOS: SOVEREIGN SESSION SHARD HEADER */
 #ifndef SOVEREIGN_SESSION_SHARD_H
 #define SOVEREIGN_SESSION_SHARD_H
-#include "suites/S01_Genesis/shards/sigma_types.h"
+#include "sigma_types.h"
 
 typedef enum { AUTH_PIN, AUTH_BIOMETRIC, AUTH_FIDO2_KEY, AUTH_QUORUM } SigmaAuthType_t;
 

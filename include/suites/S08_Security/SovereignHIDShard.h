@@ -1,7 +1,7 @@
 ﻿/* S SIGMAOS: SOVEREIGN HID SHARD HEADER */
 #ifndef SOVEREIGN_HID_SHARD_H
 #define SOVEREIGN_HID_SHARD_H
-#include "suites/S01_Genesis/shards/sigma_types.h"
+#include "sigma_types.h"
 
 typedef enum { EV_KEY, EV_REL, EV_ABS, EV_MSC } SigmaEvType_t;
 typedef struct { SigmaEvType_t type; sigma_u16 code; sigma_i32 value; sigma_u64 timestamp; } SigmaInputEv_t;

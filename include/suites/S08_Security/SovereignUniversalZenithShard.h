@@ -1,7 +1,7 @@
 ﻿/* S SIGMAOS: SOVEREIGN UNIVERSALZENITH SHARD HEADER */
 #ifndef SOVEREIGN_UNIVERSALZENITH_SHARD_H
 #define SOVEREIGN_UNIVERSALZENITH_SHARD_H
-#include "suites/S01_Genesis/shards/sigma_types.h"
+#include "sigma_types.h"
 
 void sigma_zenith_sync(void);
 void SovereignUniversalZenithShard_Init(void);

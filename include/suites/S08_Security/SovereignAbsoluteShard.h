@@ -1,7 +1,7 @@
 ﻿/* S SIGMAOS: SOVEREIGN ABSOLUTE SHARD HEADER */
 #ifndef SOVEREIGN_ABSOLUTE_SHARD_H
 #define SOVEREIGN_ABSOLUTE_SHARD_H
-#include "suites/S01_Genesis/shards/sigma_types.h"
+#include "sigma_types.h"
 
 void sigma_absolute_monolith (void);
 void SovereignAbsoluteShard_Init (void);

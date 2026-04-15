@@ -2,7 +2,7 @@
 #define SIGMA_NETWORK_PROTOCOLS_EXT_H
 
 
-#include "suites/S01_Genesis/shards/sigma_types.h"
+#include "sigma_types.h"
 
 // SigmaOS Extended Network Protocol Shards
 // Native, zero-dependency implementations of FTP and Email cores.

@@ -12,7 +12,7 @@
 //   • Native 8000Hz Polling Support for pro-level HID interaction.
 // =============================================================================
 
-#include "suites/S01_Genesis/shards/sigma_types.h"
+#include "sigma_types.h"
 
 
 #define INPUT_QUEUE_DEPTH   1024

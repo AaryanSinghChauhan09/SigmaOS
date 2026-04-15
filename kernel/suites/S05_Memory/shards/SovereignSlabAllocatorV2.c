@@ -14,7 +14,7 @@
 //   • Guard pages surround slab arenas (Rust-backed bounds via S05 RS)
 // =============================================================================
 
-#include "suites/S01_Genesis/shards/sigma_types.h"
+#include "sigma_types.h"
 
 
 #define SIGMA_SLAB_MAGAZINE_SIZE  128   // Objects per per-CPU magazine

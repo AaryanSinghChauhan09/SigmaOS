@@ -15,7 +15,7 @@
 //   • Zero cloud dependency — all inference local via S09 NPU shard
 // =============================================================================
 
-#include "suites/S01_Genesis/shards/sigma_types.h"
+#include "sigma_types.h"
 
 
 #define SIGMA_VOICE_MAX_SKILLS    64

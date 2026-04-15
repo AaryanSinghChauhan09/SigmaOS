@@ -7,10 +7,10 @@
  */
 
 #include "suites/S01_Genesis/shards/sigma_base.h"
-#include "suites/S01_Genesis/shards/sigma_types.h"
+#include "sigma_types.h"
 #include "suites/S10_Registry/shards/SovereignLatticeRegistry.h"
-#include "suites/S01_Genesis/shards/sigma_types.h"
-#include "suites/S01_Genesis/shards/sigma_types.h"
+#include "sigma_types.h"
+#include "sigma_types.h"
 
 static uint32_t g_audited_count = 0;
 static bool g_sealed = false;

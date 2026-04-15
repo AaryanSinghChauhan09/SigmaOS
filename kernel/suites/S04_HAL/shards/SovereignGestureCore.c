@@ -12,7 +12,7 @@
 //   • Unified Gesture API: Same logic for touchscreens, trackpads, and sensors
 // =============================================================================
 
-#include "suites/S01_Genesis/shards/sigma_types.h"
+#include "sigma_types.h"
 
 
 #define MAX_TOUCH_POINTS    10

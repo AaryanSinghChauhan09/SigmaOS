@@ -13,7 +13,7 @@
 #define SOVEREIGN_DEVICE_PROBE_C
 
 #include "SovereignArch.h"
-#include "suites/S01_Genesis/shards/sigma_libc.h"
+#include "sigma_libc.h"
 
 void SovereignDevice_ProbeMatrix(void) {
     sigma_printf("S [PROBE]: Initiating Universal Hardware Discovery...\n");

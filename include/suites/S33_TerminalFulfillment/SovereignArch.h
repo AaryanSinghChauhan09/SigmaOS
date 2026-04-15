@@ -11,7 +11,7 @@
 #ifndef SOVEREIGN_ARCH_H
 #define SOVEREIGN_ARCH_H
 
-#include "suites/S01_Genesis/shards/sigma_types.h"
+#include "sigma_types.h"
 
 typedef void (*sigma_arch_halt_fn)(void);
 typedef void (*sigma_arch_init_fn)(void);

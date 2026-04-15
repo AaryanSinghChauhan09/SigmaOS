@@ -12,7 +12,7 @@
 //   • Used by S09 Intelligence and S13 Sentience for real-time inference.
 // =============================================================================
 
-#include "suites/S01_Genesis/shards/sigma_types.h"
+#include "sigma_types.h"
 
 
 #define MAX_MATRIX_DIM 8192

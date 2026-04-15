@@ -5,20 +5,20 @@
  */
 
 #include "sigma_giv.h"
-#include "suites/S01_Genesis/shards/sigma_libc.h"
+#include "sigma_libc.h"
 
 /* Pull in all suite headers for integration tests */
 #include "../../kernel/suites/S01_Genesis/shards/sigma_syscall_table.h"
-#include "../../kernel/suites/S02_Boot/shards/sigma_boot.h"
+#include "../../kernel/suites/S02_ZenithUI/shards/sigma_boot.h"
 #include "../../kernel/suites/S03_Orchestrator/shards/sigma_sched.h"
 #include "../../kernel/suites/S04_HAL/shards/sigma_hal.h"
 #include "../../kernel/suites/S05_Memory/shards/sigma_vmm.h"
 #include "../../kernel/suites/S07_Network/shards/sigma_netstack.h"
 #include "../../kernel/suites/S08_Security/shards/sigma_lsm.h"
 #include "../../kernel/suites/S09_Intelligence/shards/sigma_neural_sched.h"
-#include "../../kernel/suites/S10_Containers/shards/sigma_container.h"
-#include "../../kernel/suites/S11_PQC/shards/sigma_pqc.h"
-#include "../../kernel/suites/S12_DistroAbsorption/shards/sigma_distro.h"
+#include "../../kernel/suites/S10_Registry/shards/sigma_container.h"
+#include "../../kernel/suites/S11_Virtualization/shards/sigma_pqc.h"
+#include "../../kernel/suites/S12_Ecosystem/shards/sigma_distro.h"
 #include "../../userland/proc/sigma_proc.h"
 #include "../../userland/ipc/sigma_ipc.h"
 

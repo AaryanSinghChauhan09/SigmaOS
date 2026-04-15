@@ -11,7 +11,7 @@
 #ifndef SOVEREIGN_OMNIFABRIC_H
 #define SOVEREIGN_OMNIFABRIC_H
 
-#include "suites/S01_Genesis/shards/SovereignCommon.h"
+#include "SovereignCommon.h"
 
 typedef struct {
     sigma_u32 fabric_id;

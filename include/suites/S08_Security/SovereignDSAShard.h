@@ -7,7 +7,7 @@
 #ifndef SOVEREIGN_DSA_SHARD_H
 #define SOVEREIGN_DSA_SHARD_H
 
-#include "suites/S01_Genesis/shards/sigma_types.h"
+#include "sigma_types.h"
 #include "suites/S03_Orchestrator/shards/SigmaOOP.h"
 
 typedef struct SovereignDSAShard {

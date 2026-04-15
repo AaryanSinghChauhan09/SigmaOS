@@ -1,7 +1,7 @@
 ﻿#include "suites/S01_Genesis/shards/sigma_base.h"
 
 #include "SovereignFS.h"
-#include "suites/S01_Genesis/shards/sigma_libc.h"
+#include "sigma_libc.h"
 
 sigma_err_t sigma_fat32_mount(const char* target) {
     sigma_printf("  S [FAT32]: Mounting Legacy Persistence Matrix at %s...\n", target);

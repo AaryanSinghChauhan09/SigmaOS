@@ -7,7 +7,7 @@
 #ifndef SOVEREIGN_SHARD_MANAGER_H
 #define SOVEREIGN_SHARD_MANAGER_H
 
-#include "suites/S01_Genesis/shards/sigma_types.h"
+#include "sigma_types.h"
 
 sigma_err_t sigma_shard_start          (const char* name, sigma_bool essential);
 void        sigma_shard_stop           (const char* name);

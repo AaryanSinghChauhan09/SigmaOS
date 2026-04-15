@@ -7,7 +7,7 @@
 #ifndef SOVEREIGN_SVC_FS_H
 #define SOVEREIGN_SVC_FS_H
 
-#include "suites/S01_Genesis/shards/sigma_types.h"
+#include "sigma_types.h"
 
 void        sigma_svcfs_register(const char* name, sigma_err_t (*trigger)(void));
 void        sigma_svcfs_ls      (void);

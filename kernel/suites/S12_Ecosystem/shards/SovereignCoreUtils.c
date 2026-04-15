@@ -8,7 +8,7 @@
  */
 
 #include "suites/S01_Genesis/shards/sigma_kernel.h"
-#include "suites/S01_Genesis/shards/sigma_libc.h"
+#include "sigma_libc.h"
 
 void sigma_util_ls(const char* path) {
     sigma_printf("S [UTIL]: Listing directory '%s'...\n", path);

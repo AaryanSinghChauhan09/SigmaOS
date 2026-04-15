@@ -8,8 +8,8 @@
  */
 
 #include "suites/S01_Genesis/shards/sigma_base.h"
-#include "suites/S01_Genesis/shards/sigma_types.h"
-#include "suites/S01_Genesis/shards/sigma_libc.h"
+#include "sigma_types.h"
+#include "sigma_libc.h"
 
 #define PAGE_SIZE 4096
 #define MAX_PAGES 1048576 // 4GB management coverage

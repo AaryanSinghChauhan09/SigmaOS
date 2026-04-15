@@ -3,7 +3,7 @@
 
 // SigmaOS Advanced Task Scheduler
 // Absorbing CFS (Linux) and GCD (macOS) paradigms
-#include "suites/S01_Genesis/shards/sigma_types.h"
+#include "sigma_types.h"
 
 void sched_init_appropriate_scheduling();
 void sched_enqueue_task(void(*task_ptr)(void), uint8_t priority);

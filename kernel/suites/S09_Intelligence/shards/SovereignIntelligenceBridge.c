@@ -12,7 +12,7 @@
 //   • Multi-Model Support: Swap between lightweight 1B models and Pro-Models.
 // =============================================================================
 
-#include "suites/S01_Genesis/shards/sigma_types.h"
+#include "sigma_types.h"
 
 
 #define MAX_PROMPT_LEN      4096

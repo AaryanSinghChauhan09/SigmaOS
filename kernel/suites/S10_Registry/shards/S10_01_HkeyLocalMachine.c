@@ -3,7 +3,7 @@
 // Persistent System Configuration Hive Shard
 // =============================================================================
 
-#include "suites/S01_Genesis/shards/sigma_types.h"
+#include "sigma_types.h"
 
 
 #define MAX_SYSTEM_KEYS 4096

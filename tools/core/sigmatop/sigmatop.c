@@ -7,9 +7,9 @@
  * =========================================================================
  */
 
-#include "suites/S01_Genesis/shards/sigma_libc.h"
-#include "suites/S01_Genesis/shards/sigma_libc.h"
-#include "suites/S01_Genesis/shards/sigma_types.h"
+#include "sigma_libc.h"
+#include "sigma_libc.h"
+#include "sigma_types.h"
 
 #define VT_CLEAR "\033[2J\033[H"
 #define VT_HIDE  "\033[?25l"

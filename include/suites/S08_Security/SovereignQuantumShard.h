@@ -1,7 +1,7 @@
 ﻿/* S SIGMAOS: SOVEREIGN QUANTUM SHARD HEADER */
 #ifndef SOVEREIGN_QUANTUM_SHARD_H
 #define SOVEREIGN_QUANTUM_SHARD_H
-#include "suites/S01_Genesis/shards/sigma_types.h"
+#include "sigma_types.h"
 
 sigma_u64   sigma_quantum_entropy  (void);
 void        sigma_quantum_simulate (sigma_u32 qubits);

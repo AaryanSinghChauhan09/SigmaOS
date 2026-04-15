@@ -1,7 +1,7 @@
 ﻿/* S SIGMAOS: SOVEREIGN FORENSIC SHARD HEADER */
 #ifndef SOVEREIGN_FORENSIC_SHARD_H
 #define SOVEREIGN_FORENSIC_SHARD_H
-#include "suites/S01_Genesis/shards/sigma_types.h"
+#include "sigma_types.h"
 
 void sigma_forensic_scrub    (sigma_uptr addr, sigma_sz_t size);
 void sigma_forensic_lockdown (void);

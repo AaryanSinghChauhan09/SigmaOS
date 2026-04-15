@@ -10,7 +10,7 @@
 #ifndef SOVEREIGN_DRIVER_H
 #define SOVEREIGN_DRIVER_H
 
-#include "suites/S01_Genesis/shards/sigma_types.h"
+#include "sigma_types.h"
 
 #define MAX_DEVICES       256
 #define MAX_DRIVERS        64

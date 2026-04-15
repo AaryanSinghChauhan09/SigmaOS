@@ -5,7 +5,7 @@
  */
 
 #include "sigma_proc.h"
-#include "suites/S01_Genesis/shards/sigma_libc.h"
+#include "sigma_libc.h"
 
 static sigma_pcb_t s_procs[SIGMA_PROC_MAX];
 static proc_u32    s_proc_count = 0;

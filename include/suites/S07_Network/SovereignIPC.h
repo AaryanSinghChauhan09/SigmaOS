@@ -10,7 +10,7 @@
 #ifndef SOVEREIGN_IPC_H
 #define SOVEREIGN_IPC_H
 
-#include "suites/S01_Genesis/shards/sigma_types.h"
+#include "sigma_types.h"
 
 typedef sigma_err_t (*sigma_ipc_init_fn)(void);
 

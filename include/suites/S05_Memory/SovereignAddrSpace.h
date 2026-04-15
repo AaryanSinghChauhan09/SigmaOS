@@ -1,7 +1,7 @@
 #ifndef SOVEREIGN_ADDR_SPACE_H
 #define SOVEREIGN_ADDR_SPACE_H
 
-#include "suites/S01_Genesis/shards/sigma_types.h"
+#include "sigma_types.h"
 #include "SovereignVMA.h"
 
 #define MAX_PROCESSES 1024

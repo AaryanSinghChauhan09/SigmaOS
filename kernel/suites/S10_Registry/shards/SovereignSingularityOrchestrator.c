@@ -11,7 +11,7 @@
 // Result: Total system readiness from 0 to 'Sentient Desktop' in <500ms.
 // =============================================================================
 
-#include "suites/S01_Genesis/shards/sigma_types.h"
+#include "sigma_types.h"
 
 
 typedef struct {
