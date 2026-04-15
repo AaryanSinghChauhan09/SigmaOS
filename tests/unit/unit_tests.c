@@ -9,7 +9,7 @@
 
 #include "sigma_libc.h"
 #include "sigma_libc.h"
-#include <math.h>
+#include "sigma_math.h"
 
 /* --- Minimal Test Framework --- */
 
@@ -30,7 +30,7 @@ static int s_tests_failed = 0;
 
 #define ASSERT_FLOAT_EQ(msg, expected, actual, eps) do { \
     s_tests_run++; \
-    if (fabs((double)(expected) - (double)(actual)) < (eps)) { \
+    if (sigma_fabs((sigma_f64)(expected) - (sigma_f64)(actual)) < (eps)) { \
         s_tests_passed++; \
         sigma_printf("  [PASS] %s\n", msg); \
     } else { \
@@ -195,8 +195,8 @@ void test_oop(void) {
     TestObject_t net_obj  = { &net_vt,  100 };
 
     /* Same interface call, different behavior — polymorphism */
-    int disk_result = disk_obj.vtable->sigma_read(&disk_obj, 5);
-    int net_result  = net_obj.vtable->sigma_read(&net_obj, 5);
+    int disk_result = disk_obj.vtable->read(&disk_obj, 5);
+    int net_result  = net_obj.vtable->read(&net_obj, 5);
 
     ASSERT_EQ("DiskDriver.sigma_read(100, 5) = 105", 105, disk_result);
     ASSERT_EQ("NetDriver.sigma_read(100, 5) = 500",  500, net_result);
