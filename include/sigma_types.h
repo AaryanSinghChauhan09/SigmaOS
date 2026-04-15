@@ -1,4 +1,4 @@
-﻿/*
+/*
  * =========================================================================
  * S SIGMAOS: SUPREME TYPES (v4.0 — DEFENSIVE LATTICE)
  * =========================================================================
@@ -11,24 +11,6 @@
 #define SIGMAOS_SUPREME_TYPES_H
 
 #include "SovereignCommon.h"
-
-/* 
- * ── Ultra-Defensive Guards ─────────────────────────────────────────────── 
- * We define internal macros to signal "types already defined" to any
- * potential toolchain headers that might sneak in.
- */
-#ifndef _STDINT_H
-#define _STDINT_H
-#endif
-#ifndef _STDINT_H_
-#define _STDINT_H_
-#endif
-#ifndef __CLANG_STDINT_H
-#define __CLANG_STDINT_H
-#endif
-#ifndef _SIZE_T
-#define _SIZE_T
-#endif
 
 /* ── Compatibility Aliases ────────────────────────────────────────────── */
 #ifndef SIGMA_EXCLUDE_STD_ALIASES
