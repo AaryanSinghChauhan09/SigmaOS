@@ -7,8 +7,8 @@
  * =========================================================================
  */
 
-#ifndef SOVEREIGN_REGISTRY_H
-#define SOVEREIGN_REGISTRY_H
+#ifndef SOVEREIGN_LATTICE_REGISTRY_H
+#define SOVEREIGN_LATTICE_REGISTRY_H
 
 /* Directly include the base primitives to bypass orchestrator latency */
 typedef unsigned long long sigma_u64;
