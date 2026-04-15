@@ -19,7 +19,7 @@
 #include "kernel/suites/S06_Storage/shards/sigma_vfs.h"
 #include "kernel/suites/S07_Network/shards/sigma_netstack.h"
 #include "kernel/suites/S08_Security/shards/sigma_lsm.h"
-#include "kernel/suites/S09_Intelligence/shards/sigma_neural_sched.h"
+#include "kernel/suites/S09_Intelligence/shards/sigma_sentience.h"
 #include "kernel/suites/S10_Containers/shards/sigma_container.h"
 #include "kernel/suites/S11_PQC/shards/sigma_pqc.h"
 #include "kernel/suites/S12_DistroAbsorption/shards/sigma_distro.h"
@@ -117,8 +117,10 @@ static void sigma_kernel_phase(void) {
     pf_i32 cpu_fd = sigma_perf_counter_open("cpu_cycles", PERF_HW_CPU_CYCLES, 0);
     sigma_perf_counter_enable((pf_u32)cpu_fd);
 
-    /* Neural resource balancer */
-    sigma_neural_sched_init();
+    /* Sovereign Sentience Engine */
+    sigma_sentience_init();
+    sigma_sentience_tick();
+    sigma_optimize_scheduler();
 
     /* S19 Parallelism */
     sigma_gcd_init();
