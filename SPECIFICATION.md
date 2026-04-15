@@ -1,4 +1,4 @@
-# Σ SIGMAOS: THE SOVEREIGN SPECIFICATION (v2.0)
+﻿# S SIGMAOS: THE SOVEREIGN SPECIFICATION (v2.0)
 
 This document defines the formal technical requirements for any code unit ("Shard") within the SigmaOS Zenith Supreme architecture.
 

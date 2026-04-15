@@ -1,4 +1,4 @@
-# Σ SigmaOS: Sovereign Feature Comparison Matrix (v33.1)
+﻿# S SigmaOS: Sovereign Feature Comparison Matrix (v33.1)
 
 This factual record explores the parity and supremacy of SigmaOS Sovereign features relative to industrial competitors (Linux, Windows, Darwin/macOS) and specifies the technical working conditions required for optimal modular performance.
 

@@ -1,4 +1,4 @@
-# Σ SigmaOS: THE SOVEREIGN CONSTITUTION
+﻿# S SigmaOS: THE SOVEREIGN CONSTITUTION
 ## "Achieving Absolute Architectural Sovereignty"
 
 This document serves as the supreme law of the SigmaOS codebase. Every shard, suite, and algorithm must adhere to these directives.

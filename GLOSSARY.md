@@ -1,4 +1,4 @@
-# Σ SIGMAOS: SOVEREIGN GLOSSARY
+﻿# S SIGMAOS: SOVEREIGN GLOSSARY
 
 This document defines the unique terminology used in the SigmaOS Zenith Supreme architecture to assist contributors and security auditors.
 

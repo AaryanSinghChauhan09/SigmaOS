@@ -1,4 +1,4 @@
-# Σ SIGMAOS: THE GRAND FINALE SUPREMACY (Full Singularity Materialization)
+﻿# S SIGMAOS: THE GRAND FINALE SUPREMACY (Full Singularity Materialization)
 
 SigmaOS has surpassed all industrial competitors by modularizing every kernel feature into 33 Sovereign Suites. The system is verified as 100% C11/Assembly pure, zero-dependency, and technically supreme.
 

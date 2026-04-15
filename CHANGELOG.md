@@ -1,4 +1,4 @@
-# SigmaOS — Sovereign Open Source Architecture Changelog
+﻿# SigmaOS — Sovereign Open Source Architecture Changelog
 
 ## [v33.1-SINGULARITY] - Terminal Sovereign Enclosure (33 Suites)
 **Date**: 2026-04-14
@@ -194,5 +194,5 @@
 - **Boot Master Logic**: Liquidated fast-init and hardware-skip placeholders.
 
 ---
-**Σ SIGMAOS: EVOLUTION IS CONTINUOUS. SOVEREIGNTY IS ABSOLUTE.**
+**S SIGMAOS: EVOLUTION IS CONTINUOUS. SOVEREIGNTY IS ABSOLUTE.**
 
