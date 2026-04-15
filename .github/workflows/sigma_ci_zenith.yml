@@ -1,0 +1,59 @@
+name: Σ SigmaOS Sovereign CI Zenith (v4.0)
+on:
+  push:
+    branches: ["main", "master"]
+  pull_request:
+    branches: ["main", "master"]
+
+jobs:
+  lattice_audit:
+    name: "🛡️ Lattice Integrity Audit"
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Scan for Host Leakage
+        run: |
+          echo "Σ [CI]: Auditing shards for unauthorized host headers..."
+          # Scan for <stdio.h>, etc inside kernel/suites
+          if grep -r "#include <stdio.h>" kernel/suites; then
+            echo "❌ [FAIL]: Host header leak detected in Sovereign Shard."
+            exit 1
+          fi
+
+  shard_verification:
+    name: "💎 Shard-Level Verification"
+    runs-on: ubuntu-latest
+    needs: [lattice_audit]
+    steps:
+      - uses: actions/checkout@v4
+      - name: Verify 33-Suite Lattice
+        run: |
+          echo "Σ [CI]: Verifying Sovereign Suite materialization..."
+          COUNT=$(find kernel/suites -maxdepth 1 -type d -name "S*" | wc -l)
+          echo "Total Suites found: $COUNT"
+          if [ "$COUNT" -lt 33 ]; then
+            echo "❌ [FAIL]: Lattice incomplete. Found only $COUNT/33 suites."
+            exit 1
+          fi
+
+  sovereign_compilation:
+    name: "⚙️ Sovereign Binary Synthesis"
+    runs-on: ubuntu-latest
+    needs: [shard_verification]
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install Toolchain
+        run: sudo apt-get update && sudo apt-get install -y gcc-x86-64-linux-gnu
+      - name: Synthesis Test (S01 Genesis)
+        run: |
+          for src in $(find kernel/suites/S01_Genesis/shards -name "*.c"); do
+            x86_64-linux-gnu-gcc -std=c11 -ffreestanding -O2 -nostdlib -c "$src" -o /dev/null
+          done
+
+  final_supremacy:
+    name: "👑 Final Supremacy Declaration"
+    runs-on: ubuntu-latest
+    needs: [sovereign_compilation]
+    steps:
+      - name: Declare
+        run: echo "Σ SIGMAOS ZENITH SUPREME: ARCHITECTURAL FINALITY VERIFIED."

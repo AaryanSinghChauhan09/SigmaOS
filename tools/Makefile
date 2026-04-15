@@ -10,8 +10,9 @@
 # =============================================================================
 
 CC       = gcc
-CFLAGS   = -std=c11 -O2 -Wall -Wextra -Wpedantic -fstack-protector-strong
-LDFLAGS  = -static                          # Zero shared-lib runtime deps
+CFLAGS   = -std=c11 -O2 -Wall -Iinclude
+LDFLAGS  = -static
+
 BINDIR   = /usr/local/sigma/bin
 
 # All sovereign tool targets
@@ -35,37 +36,38 @@ all: $(TOOLS)
 	@echo "  └──────────────────────────────────────────┘"
 	@echo ""
 
-sigma-audit: sovereign_audit/sovereign_audit.c
+sigma-audit: security/sovereign_audit/sovereign_audit.c
 	$(CC) $(CFLAGS) $(LDFLAGS) $< -o $@
 	@echo "  [✓] sigma-audit    → replaces global_integrated_audit.py"
 
-sigma-test: sovereign_test/sovereign_test_runner.c
+sigma-test: dev/sovereign_test/sovereign_test_runner.c
 	$(CC) $(CFLAGS) $< -o $@
 	@echo "  [✓] sigma-test     → replaces sovereign_test_runner.py + logic_tester.py"
 
-sigma-wiki: sovereign_wiki/sovereign_wiki_builder.c
+sigma-wiki: wiki/sovereign_wiki/sovereign_wiki_builder.c
 	$(CC) $(CFLAGS) $(LDFLAGS) $< -o $@
 	@echo "  [✓] sigma-wiki     → replaces wiki_builder.py"
 
-sigma-shell: sovereign_shell/sovereign_shell.c
+sigma-shell: core/sovereign_shell/sovereign_shell.c
 	$(CC) $(CFLAGS) $< -o $@
 	@echo "  [✓] sigma-shell    → replaces zenith_shell.py"
 
-sigma-depgraph: sovereign_depgraph/sovereign_depgraph.c
+sigma-depgraph: dev/sovereign_depgraph/sovereign_depgraph.c
 	$(CC) $(CFLAGS) $(LDFLAGS) $< -o $@
 	@echo "  [✓] sigma-depgraph → replaces generate_dependency_graph.py"
 
-sigpkg: sovereign_pkg/sovereign_pkg_manager.c
+sigpkg: infra/sovereign_pkg/sovereign_pkg_manager.c
 	$(CC) $(CFLAGS) $< -o $@
 	@echo "  [✓] sigpkg             → replaces sigpkg.py"
 
-sigma-modularize: sovereign_modularize/sovereign_modularize.c
+sigma-modularize: dev/sovereign_modularize/sovereign_modularize.c
 	$(CC) $(CFLAGS) $(LDFLAGS) $< -o $@
 	@echo "  [✓] sigma-modularize  → replaces sovereign_modularize_v2.py"
 
-sigma-purge: sovereign_purge/sovereign_purge.c
+sigma-purge: dev/sovereign_purge/sovereign_purge.c
 	$(CC) $(CFLAGS) $(LDFLAGS) $< -o $@
 	@echo "  [✓] sigma-purge       → replaces sovereign_purge.py"
+
 
 # Dependency purity gate — fail if any .py/.js found inside kernel suites
 check:

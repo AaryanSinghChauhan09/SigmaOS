@@ -17,14 +17,11 @@ jobs:
           sudo apt-get update
           sudo apt-get install -y gcc-x86-64-linux-gnu make python3
 
-      - name: Compile sovereign-audit
-        run: gcc -std=c11 -O2 -Wall tools/security/sovereign_audit/sovereign_audit.c -o sigma-audit
-
-      - name: Compile Core Tools
+      - name: Compile Sovereign Toolchain
         run: |
-          gcc -std=c11 -O2 -Wall -I include tools/dev/sovereign_test/sovereign_test_runner.c -o sigma-test
-          gcc -std=c11 -O2 -Wall -I include tools/wiki/sovereign_wiki/sovereign_wiki_builder.c -o sigma-wiki
-          gcc -std=c11 -O2 -Wall -I include tools/core/sovereign_shell/sovereign_shell.c -o sigma-shell
+          cd tools
+          make all
+
 
       - name: Foreign Dependency Scan (kernel/suites)
         run: |
@@ -93,8 +90,10 @@ jobs:
 
       - name: Build & Deploy Wiki
         run: |
-          gcc -std=c11 -O2 tools/wiki/sovereign_wiki/sovereign_wiki_builder.c -o sigma-wiki
-          ./sigma-wiki kernel/suites WIKI/AUTO_SOVEREIGN_WIKI.md
+          cd tools
+          make sigma-wiki
+          ./sigma-wiki ../kernel/suites ../WIKI/AUTO_SOVEREIGN_WIKI.md
+
           git config user.name  "sigma-bot"
           git config user.email "bot@sigmaos.dev"
           git add WIKI/AUTO_SOVEREIGN_WIKI.md
