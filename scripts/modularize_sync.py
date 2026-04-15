@@ -8,6 +8,7 @@ include_mapping = {
     "sigma_base.h": "suites/S01_Genesis/shards/sigma_base.h",
     "SovereignCommon.h": "suites/S01_Genesis/shards/SovereignCommon.h",
     "sigma_math.h": "suites/S01_Genesis/shards/sigma_math.h",
+    "sigma_kernel.h": "suites/S01_Genesis/shards/sigma_kernel.h",
 }
 
 def update_includes(directory):
@@ -32,6 +33,6 @@ def update_includes(directory):
                 except Exception as e:
                     print(f"Error: {path} - {e}")
 
-# Apply to userland
-update_includes("userland")
-print("Userland modularization sync complete.")
+# Apply to tests
+update_includes("tests")
+print("Test modularization sync complete.")
