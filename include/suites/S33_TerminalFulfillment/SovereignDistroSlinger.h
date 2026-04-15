@@ -8,7 +8,7 @@
 #define SOVEREIGN_DISTRO_SLINGER_H
 
 #include "sigma_types.h"
-#include "SigmaOOP.h"
+#include "suites/S03_Orchestrator/shards/SigmaOOP.h"
 
 typedef enum {
     PERSONA_SIGMA,

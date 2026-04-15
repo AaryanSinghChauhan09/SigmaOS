@@ -69,12 +69,12 @@ extern void S01_Lattice_Shard_59_init(void);  // S01_Genesis/S01_Lattice_Shard_5
 extern void S01_Lattice_Shard_60_init(void);  // S01_Genesis/S01_Lattice_Shard_60.c
 extern void SigmaOS_Zenith_Monolith_init(void);  // S01_Genesis/SigmaOS_Zenith_Monolith.c
 extern void SovereignBackendSuite_init(void);  // S01_Genesis/SovereignBackendSuite.c
-extern void SovereignBootMaster_init(void);  // S01_Genesis/SovereignBootMaster.c
+extern void SovereignBootMaster_init(void);  // S02_Boot/SovereignBootMaster.c
 extern void SovereignFunctionalTest_init(void);  // S01_Genesis/SovereignFunctionalTest.c
 extern void SovereignGenesisDeployer_init(void);  // S01_Genesis/SovereignGenesisDeployer.c
-extern void SovereignIDE_init(void);  // S01_Genesis/SovereignIDE.c
+extern void SovereignIDE_init(void);  // S15_DevNexus/SovereignIDE.c
 extern void SovereignInitRegistry_init(void);  // S10_Registry/SovereignInitRegistry.c
-extern void SovereignInterruptHandler_init(void);  // S01_Genesis/SovereignInterruptHandler.c
+extern void SovereignInterruptHandler_init(void);  // S04_HAL/SovereignInterruptHandler.c
 extern void SovereignIPCRegistry_init(void);  // S10_Registry/SovereignIPCRegistry.c
 extern void SovereignMemoryManager_init(void);  // S01_Genesis/SovereignMemoryManager.h
 extern void SovereignPrincipleSuite_init(void);  // S01_Genesis/SovereignPrincipleSuite.c

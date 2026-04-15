@@ -1,7 +1,7 @@
 ﻿#ifndef SOVEREIGN_POWERBI_ZENITH_H
 #define SOVEREIGN_POWERBI_ZENITH_H
 
-#include "SigmaOOP.h"
+#include "suites/S03_Orchestrator/shards/SigmaOOP.h"
 
 /* S Territory Initiation */
 

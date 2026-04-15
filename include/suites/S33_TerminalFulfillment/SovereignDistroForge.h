@@ -1,7 +1,7 @@
 ﻿#ifndef SOVEREIGN_DISTRO_FORGE_H
 #define SOVEREIGN_DISTRO_FORGE_H
 
-#include "SigmaOOP.h"
+#include "suites/S03_Orchestrator/shards/SigmaOOP.h"
 
 /* S Territory Initiation */
 

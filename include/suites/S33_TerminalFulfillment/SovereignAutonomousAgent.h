@@ -7,7 +7,7 @@
 #ifndef SOVEREIGN_AUTONOMOUS_AGENT_H
 #define SOVEREIGN_AUTONOMOUS_AGENT_H
 
-#include "SigmaOOP.h"
+#include "suites/S03_Orchestrator/shards/SigmaOOP.h"
 
 CLASS_DECLARE(SovereignAutonomousAgent) {
     SigmaObject_t core;

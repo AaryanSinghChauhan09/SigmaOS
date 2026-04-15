@@ -7,7 +7,7 @@
 #ifndef SOVEREIGN_AI_KERNEL_H
 #define SOVEREIGN_AI_KERNEL_H
 
-#include "SigmaOOP.h"
+#include "suites/S03_Orchestrator/shards/SigmaOOP.h"
 
 CLASS_DECLARE(SovereignAIKernel) {
     SigmaObject_t core;

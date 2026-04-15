@@ -7,7 +7,7 @@
 #ifndef SOVEREIGN_PERSONALIZER_H
 #define SOVEREIGN_PERSONALIZER_H
 
-#include "SigmaOOP.h"
+#include "suites/S03_Orchestrator/shards/SigmaOOP.h"
 
 CLASS_DECLARE(SovereignPersonalizer) {
     SigmaObject_t core;

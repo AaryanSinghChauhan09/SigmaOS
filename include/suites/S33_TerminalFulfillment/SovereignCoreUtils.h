@@ -1,7 +1,7 @@
 ﻿#ifndef SOVEREIGN_CORE_UTILS_H
 #define SOVEREIGN_CORE_UTILS_H
 
-#include "SigmaOOP.h"
+#include "suites/S03_Orchestrator/shards/SigmaOOP.h"
 
 /* S Territory Initiation */
 

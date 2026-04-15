@@ -12,7 +12,7 @@
 #define SOVEREIGN_OS_BASICS_ZENITH_H
 
 #include "sigma_libc.h"
-#include "SigmaOOP.h"
+#include "suites/S03_Orchestrator/shards/SigmaOOP.h"
 
 // -------------------------------------------------------------------------
 // Process Control Block (PCB) Struct

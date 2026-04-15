@@ -7,7 +7,7 @@
 #ifndef SOVEREIGN_AUTOMATION_ENGINE_H
 #define SOVEREIGN_AUTOMATION_ENGINE_H
 
-#include "SigmaOOP.h"
+#include "suites/S03_Orchestrator/shards/SigmaOOP.h"
 
 CLASS_DECLARE(SovereignAutomationEngine) {
     SigmaObject_t core;

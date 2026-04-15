@@ -8,7 +8,7 @@
 #define SOVEREIGN_DSA_SHARD_H
 
 #include "sigma_types.h"
-#include "SigmaOOP.h"
+#include "suites/S03_Orchestrator/shards/SigmaOOP.h"
 
 typedef struct SovereignDSAShard {
     SigmaObject_t core;
