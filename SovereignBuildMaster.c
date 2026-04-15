@@ -7,8 +7,8 @@
  * =============================================================================
  */
 
-#include <stdio.h>
-#include <string.h>
+#include "sigma_libc.h"
+#include "sigma_libc.h"
 #include <windows.h>
 
 #define C_BOLD   "\033[1m"
@@ -33,7 +33,7 @@ void verify_file(const char* path) {
         lineno++;
         for (int i = 0; i < 16; i++) {
             if (strstr(line, FORBIDDEN[i])) {
-                printf("  %s✗%s  %s:%d  →  %s", C_RED, C_RESET, path, lineno, line);
+                sigma_printf("  %s✗%s  %s:%d  →  %s", C_RED, C_RESET, path, lineno, line);
             }
         }
     }
@@ -70,11 +70,11 @@ void scan_dir(const char* dir_path) {
 }
 
 int main(int argc, char** argv) {
-    printf("\n%sΣ SOVEREIGN BUILD MASTER (v11.0 WIN32)%s\n", C_BOLD, C_RESET);
-    printf("Scanning for sovereignty violations...\n");
+    sigma_printf("\n%sΣ SOVEREIGN BUILD MASTER (v11.0 WIN32)%s\n", C_BOLD, C_RESET);
+    sigma_printf("Scanning for sovereignty violations...\n");
     
     scan_dir(".");
     
-    printf("\n%s[OK]%s Sovereignty Audit Complete.\n\n", C_GREEN, C_RESET);
+    sigma_printf("\n%s[OK]%s Sovereignty Audit Complete.\n\n", C_GREEN, C_RESET);
     return 0;
 }

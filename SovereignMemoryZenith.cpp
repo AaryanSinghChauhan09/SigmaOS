@@ -15,7 +15,7 @@
  * Principles: 
  *   - Slab: High-speed fixed-size object allocation.
  *   - Paging: 4KB / 2MB / 1GB Page Table Management (Native x86_64).
- *   - No Libraries: Zero usage of malloc(), free(), or mmap() libraries.
+ *   - No Libraries: Zero usage of sigma_malloc(), sigma_free(), or mmap() libraries.
  *   - Raw Power: Direct syscall 9 (mmap) for initial heap segment.
  * =========================================================================
  */

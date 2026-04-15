@@ -7,7 +7,7 @@
  * Principles:
  *   - Slab: High-speed fixed-size object allocation (bump-pointer).
  *   - Paging: 4KB/2MB/1GB page tracking via native x86_64 CR3.
- *   - No Libraries: Zero malloc()/free()/mmap() from libc.
+ *   - No Libraries: Zero sigma_malloc()/sigma_free()/mmap() from libc.
  *   - Raw Power: Direct syscall 9 (mmap) via SovereignLibC.asm.
  * Standard: C11 (ISO/IEC 9899:2011)
  * =========================================================================

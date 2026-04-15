@@ -9,7 +9,7 @@
  */
 
 #include "sigma_kernel_types.h"
-#include <stdarg.h>   /* compiler built-in — no libc */
+#include "sigma_types.h"   /* compiler built-in — no libc */
 
 /* =========================================================================
  * COM1 Port Map
