@@ -2,6 +2,7 @@
 
 * **[🏠 Home](Home)**
 * **[💠 Hive Synthesis](SOVEREIGN_HIVE_SYNTHESIS)**
+* **[💠 33-Shard Automated Wiki](AUTO_SOVEREIGN_WIKI)**
 * **[📊 Competitive Audit](MARKET_COMPETITIVE_AUDIT)**
 * **[📜 Technical Specs](TECHNICAL_SPECIFICATIONS)**
 * **[✨ Final Spec](SOVEREIGN_FINAL_SPEC)**
