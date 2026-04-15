@@ -1,7 +1,7 @@
 #ifndef SIGMA_CONFIG_REGISTRY_H
 #define SIGMA_CONFIG_REGISTRY_H
 
-#include <sigma_types.h>
+#include "suites/S01_Genesis/shards/sigma_types.h"
 
 // SigmaOS Configuration Registry (S10)
 // Absorbs the centralized control of the Windows Registry but powered by robust JSON nodes.

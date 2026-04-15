@@ -12,7 +12,7 @@
 //   • Native UTF-8 and Emoji support via SovereignTypography engine
 // =============================================================================
 
-#include <sigma_types.h>
+#include "suites/S01_Genesis/shards/sigma_types.h"
 
 
 #define TERM_ROWS       40

@@ -1,7 +1,7 @@
 #ifndef SIGMA_GUI_TOOLKIT_H
 #define SIGMA_GUI_TOOLKIT_H
 
-#include <sigma_types.h>
+#include "suites/S01_Genesis/shards/sigma_types.h"
 
 // SigmaOS Native GUI Toolkit Wrapper
 // Absorbing the object-oriented structure of Qt and the styling flexibility of GTK

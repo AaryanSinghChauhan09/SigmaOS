@@ -12,7 +12,7 @@
 //   • Integrated SovereignVersionControl (S10) and sigma-build (Tools)
 // =============================================================================
 
-#include <sigma_types.h>
+#include "suites/S01_Genesis/shards/sigma_types.h"
 
 
 #define MAX_OPEN_FILES      16

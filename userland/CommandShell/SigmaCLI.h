@@ -1,7 +1,7 @@
 #ifndef SIGMA_CLI_SHELL_H
 #define SIGMA_CLI_SHELL_H
 
-#include <sigma_types.h>
+#include "suites/S01_Genesis/shards/sigma_types.h"
 
 
 // SigmaOS Command Shell (CLI)

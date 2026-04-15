@@ -2,7 +2,7 @@
 // Absorbs macOS App Store, Google Play, and Windows Store paradigms.
 // Secure-signed, sandboxed deployments via Sovereign Packages.
 
-#include <sigma_types.h>
+#include "suites/S01_Genesis/shards/sigma_types.h"
 
 
 #define SIGMA_MAX_INSTALLED_APPS  2048

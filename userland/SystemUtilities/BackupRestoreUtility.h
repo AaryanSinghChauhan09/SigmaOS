@@ -1,7 +1,7 @@
 #ifndef SIGMA_BACKUP_RESTORE_H
 #define SIGMA_BACKUP_RESTORE_H
 
-#include <sigma_types.h>
+#include "suites/S01_Genesis/shards/sigma_types.h"
 
 // SigmaOS Sovereign Backup & Restore Utility
 // Absorbs Apple Time Machine and ZFS snapshot paradigms.

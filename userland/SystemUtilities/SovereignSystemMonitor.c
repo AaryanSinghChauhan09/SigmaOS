@@ -15,7 +15,7 @@
 //   • Renders to SigmaShell TUI using ANSI-256 or to ZenithUI widget
 // =============================================================================
 
-#include <sigma_types.h>
+#include "suites/S01_Genesis/shards/sigma_types.h"
 
 
 // ── Process Telemetry Snapshot ────────────────────────────────────────────────

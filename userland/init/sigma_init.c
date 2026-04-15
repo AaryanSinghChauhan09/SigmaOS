@@ -8,7 +8,7 @@
  */
 
 #include "sigma_init.h"
-#include "../../include/sigma_libc.h"
+#include "suites/S01_Genesis/shards/sigma_libc.h"
 
 /* ── Internal state ─────────────────────────────────────────────────────── */
 static sigma_service_t s_table[SIGMA_INIT_MAX_SERVICES];
