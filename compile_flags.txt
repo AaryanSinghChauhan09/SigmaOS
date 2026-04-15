@@ -4,6 +4,8 @@
 -DSIGMA_EXCLUDE_STD_ALIASES
 -Iinclude
 -Ilibc
+-I.
+
 -ffreestanding
 -fno-builtin
 -Wall

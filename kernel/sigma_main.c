@@ -36,6 +36,7 @@
 #include "kernel/suites/S23_Biosphere/shards/sigma_biosphere.h"
 #include "kernel/suites/S24_Simulation/shards/sigma_simulation.h"
 #include "kernel/suites/S25_ZeroTrust/shards/sigma_zerotrust.h"
+#include "kernel/suites/S26_OmniFabric/shards/sigma_omnifabric.h"
 #include "userland/init/sigma_init.h"
 #include "userland/ipc/sigma_ipc.h"
 #include "userland/proc/sigma_proc.h"
@@ -139,6 +140,9 @@ static void sigma_kernel_phase(void) {
     sigma_zerotrust_init();
     sigma_verify_shard("S11_PQC");
 
+    /* S26 OmniFabric */
+    sigma_omnifabric_init();
+
     /* PQC — init + self-test */
     sigma_pqc_init();
     sigma_pqc_selftest();
@@ -198,7 +202,7 @@ static void sigma_final_report(void) {
     sigma_printf("\n");
     sigma_printf("S ══════════════════════════════════════════════════════\n");
     sigma_printf("  SIGMAOS SOVEREIGN v4.0 — SYSTEM UP\n");
-    sigma_printf("  25 Suites | GIV Verified | PQC Hardened | Neural-Driven\n");
+    sigma_printf("  26 Suites | GIV Verified | PQC Hardened | Neural-Driven\n");
     sigma_printf("S ══════════════════════════════════════════════════════\n\n");
 
     sigma_boot_report();
@@ -217,6 +221,7 @@ static void sigma_final_report(void) {
     sigma_gpu_stats();
     sigma_audio_stats();
     sigma_usb_stats();
+    sigma_omnifabric_stats();
 
     sigma_printf("\nS SOVEREIGNTY IS ABSOLUTE.\n");
 }
