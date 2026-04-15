@@ -3,11 +3,11 @@ import re
 
 # Define moves
 moves = [
-    ("include/SovereignCommon.h", "include/suites/S01_Genesis/shards/SovereignCommon.h"),
-    ("include/SovereignModule.h", "include/suites/S01_Genesis/shards/SovereignModule.h"),
-    ("include/Suites.h", "include/suites/S01_Genesis/shards/Suites.h"),
-    ("include/sigma_module_registry.h", "include/suites/S01_Genesis/shards/sigma_module_registry.h"),
-    ("include/sigma_types.h", "include/suites/S01_Genesis/shards/sigma_types.h"),
+    ("kernel/suites/S01_Genesis/shards/SovereignFunctionalTest.c", "kernel/suites/S24_Simulation/shards/SovereignFunctionalTest.c"),
+    ("kernel/suites/S01_Genesis/shards/SovereignTestSuite.c", "kernel/suites/S24_Simulation/shards/SovereignTestSuite.c"),
+    ("kernel/suites/S01_Genesis/shards/SovereignTemporalSuite.c", "kernel/suites/S21_EternalState/shards/SovereignTemporalSuite.c"),
+    ("kernel/suites/S01_Genesis/shards/SovereignVTable.c", "kernel/suites/S03_Orchestrator/shards/SovereignVTable.c"),
+    ("kernel/suites/S01_Genesis/shards/SovereignZenithOrchestrator.c", "kernel/suites/S03_Orchestrator/shards/SovereignZenithOrchestrator.c"),
 ]
 
 # Create directories and execute moves
@@ -54,8 +54,6 @@ def update_includes(directory):
                     
                     new_content = content
                     for old_h, new_h in include_mapping.items():
-                        # Match #include "old_h" or #include <old_h>
-                        # And handle relative paths that might already exist but were wrong
                         pattern = rf'#include\s+["<](?:[^">]*/)?{old_h}[">]'
                         replacement = f'#include "{new_h}"'
                         new_content = re.sub(pattern, replacement, new_content)
@@ -67,7 +65,7 @@ def update_includes(directory):
                 except Exception as e:
                     print(f"Error processing {path}: {e}")
 
-# Update includes in include and kernel directories
+# Update includes in include, kernel, and tests directories
 update_includes("include")
 update_includes("kernel")
 update_includes("tests")
