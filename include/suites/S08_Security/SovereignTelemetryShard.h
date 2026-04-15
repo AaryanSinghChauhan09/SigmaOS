@@ -1,7 +1,7 @@
 ﻿/* S SIGMAOS: SOVEREIGN TELEMETRY SHARD HEADER */
 #ifndef SOVEREIGN_TELEMETRY_SHARD_H
 #define SOVEREIGN_TELEMETRY_SHARD_H
-#include "sigma_types.h"
+#include "suites/S01_Genesis/shards/sigma_types.h"
 
 void sigma_telemetry_emit   (const char* metric, sigma_u32 value);
 void sigma_telemetry_export (void);

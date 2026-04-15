@@ -10,7 +10,7 @@
 #ifndef SIGMAOS_SUPREME_TYPES_H
 #define SIGMAOS_SUPREME_TYPES_H
 
-#include "SovereignCommon.h"
+#include "suites/S01_Genesis/shards/SovereignCommon.h"
 
 /* 
  * ── Ultra-Defensive Guards ─────────────────────────────────────────────── 

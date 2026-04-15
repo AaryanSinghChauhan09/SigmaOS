@@ -11,7 +11,7 @@
 #ifndef SOVEREIGN_IPC_H
 #define SOVEREIGN_IPC_H
 
-#include "../../../include/SovereignCommon.h"
+#include "suites/S01_Genesis/shards/SovereignCommon.h"
 
 #define IPC_MAX_PORTS    4096
 #define IPC_MSG_MAX_SIZE 8192

@@ -13,7 +13,7 @@
 //   • Invisible Mode: Zero response to unauthorized probes (Dark Cloud parity)
 // =============================================================================
 
-#include <sigma_types.h>
+#include "suites/S01_Genesis/shards/sigma_types.h"
 
 
 #define FIREWALL_MAX_RULES  1024

@@ -3,11 +3,11 @@ import re
 
 # Define moves
 moves = [
-    ("include/sigma_udf.h", "include/suites/S10_Registry/shards/sigma_udf.h"),
-    ("include/sigma_math.h", "include/suites/S01_Genesis/shards/sigma_math.h"),
-    ("include/sigma_kernel.h", "include/suites/S01_Genesis/shards/sigma_kernel.h"),
-    ("include/sigma_libc.h", "include/suites/S01_Genesis/shards/sigma_libc.h"),
-    ("include/sigma_base.h", "include/suites/S01_Genesis/shards/sigma_base.h"),
+    ("include/SovereignCommon.h", "include/suites/S01_Genesis/shards/SovereignCommon.h"),
+    ("include/SovereignModule.h", "include/suites/S01_Genesis/shards/SovereignModule.h"),
+    ("include/Suites.h", "include/suites/S01_Genesis/shards/Suites.h"),
+    ("include/sigma_module_registry.h", "include/suites/S01_Genesis/shards/sigma_module_registry.h"),
+    ("include/sigma_types.h", "include/suites/S01_Genesis/shards/sigma_types.h"),
 ]
 
 # Create directories and execute moves
@@ -36,6 +36,11 @@ include_mapping = {
     "sigma_kernel.h": "suites/S01_Genesis/shards/sigma_kernel.h",
     "sigma_libc.h": "suites/S01_Genesis/shards/sigma_libc.h",
     "sigma_base.h": "suites/S01_Genesis/shards/sigma_base.h",
+    "SovereignCommon.h": "suites/S01_Genesis/shards/SovereignCommon.h",
+    "SovereignModule.h": "suites/S01_Genesis/shards/SovereignModule.h",
+    "Suites.h": "suites/S01_Genesis/shards/Suites.h",
+    "sigma_module_registry.h": "suites/S01_Genesis/shards/sigma_module_registry.h",
+    "sigma_types.h": "suites/S01_Genesis/shards/sigma_types.h",
 }
 
 def update_includes(directory):
@@ -65,3 +70,4 @@ def update_includes(directory):
 # Update includes in include and kernel directories
 update_includes("include")
 update_includes("kernel")
+update_includes("tests")

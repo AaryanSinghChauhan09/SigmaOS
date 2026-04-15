@@ -1,7 +1,7 @@
 #ifndef SOVEREIGN_PMM_H
 #define SOVEREIGN_PMM_H
 
-#include "sigma_types.h"
+#include "suites/S01_Genesis/shards/sigma_types.h"
 
 #define PAGE_SIZE 4096
 #define TOTAL_FRAMES 1048576

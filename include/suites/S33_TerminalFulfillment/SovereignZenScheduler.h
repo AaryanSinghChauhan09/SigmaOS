@@ -7,7 +7,7 @@
 #ifndef SOVEREIGN_ZEN_SCHEDULER_H
 #define SOVEREIGN_ZEN_SCHEDULER_H
 
-#include "sigma_types.h"
+#include "suites/S01_Genesis/shards/sigma_types.h"
 
 void sigma_sched_add_task        (const char* name, sigma_u32 prio, sigma_u32 policy);
 void sigma_sched_balance         (void);

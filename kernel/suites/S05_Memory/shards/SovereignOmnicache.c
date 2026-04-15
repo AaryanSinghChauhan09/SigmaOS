@@ -11,7 +11,7 @@
 // Result: App launches and file reads appear to have ZERO latency.
 // =============================================================================
 
-#include <sigma_types.h>
+#include "suites/S01_Genesis/shards/sigma_types.h"
 
 
 #define OMNI_BUF_SIZE       1024 * 1024 * 512 // 512MB OmniCache

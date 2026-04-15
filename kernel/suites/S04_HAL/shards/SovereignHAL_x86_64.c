@@ -8,7 +8,7 @@
  */
 
 #include "suites/S01_Genesis/shards/sigma_base.h"
-#include "sigma_types.h"
+#include "suites/S01_Genesis/shards/sigma_types.h"
 
 /* Port I/O primitives */
 static inline void outb(uint16_t port, uint8_t val) {

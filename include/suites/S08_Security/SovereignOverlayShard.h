@@ -7,7 +7,7 @@
 #ifndef SOVEREIGN_OVERLAY_SHARD_H
 #define SOVEREIGN_OVERLAY_SHARD_H
 
-#include "sigma_types.h"
+#include "suites/S01_Genesis/shards/sigma_types.h"
 
 void sigma_overlay_push        (const char* name, const char* mount, sigma_bool ro);
 void sigma_overlay_merge       (void);

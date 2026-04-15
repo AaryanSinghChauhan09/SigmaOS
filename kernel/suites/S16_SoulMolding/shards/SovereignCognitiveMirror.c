@@ -11,7 +11,7 @@
 //     learned baseline.
 // =============================================================================
 
-#include <sigma_types.h>
+#include "suites/S01_Genesis/shards/sigma_types.h"
 
 
 #define MAX_COGNITIVE_TRAITS 1024

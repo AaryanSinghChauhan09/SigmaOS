@@ -1,7 +1,7 @@
 #ifndef SIGMA_AI_INFERENCE_H
 #define SIGMA_AI_INFERENCE_H
 
-#include <sigma_types.h>
+#include "suites/S01_Genesis/shards/sigma_types.h"
 
 // SigmaOS On-Device AI/ML Inference Engine
 // Zero-dependency neural processing abstraction

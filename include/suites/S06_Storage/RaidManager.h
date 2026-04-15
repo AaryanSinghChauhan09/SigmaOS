@@ -1,7 +1,7 @@
 #ifndef SIGMA_RAID_MANAGER_H
 #define SIGMA_RAID_MANAGER_H
 
-#include <sigma_types.h>
+#include "suites/S01_Genesis/shards/sigma_types.h"
 
 // SigmaOS Sovereign RAID & Quota Manager
 // Integrated directly into S06_Storage for modular hardware disk arrays

@@ -1,7 +1,7 @@
 ﻿/* S SIGMAOS: SOVEREIGN IPC SHARD HEADER */
 #ifndef SOVEREIGN_IPC_SHARD_H
 #define SOVEREIGN_IPC_SHARD_H
-#include "sigma_types.h"
+#include "suites/S01_Genesis/shards/sigma_types.h"
 typedef enum { IPC_METHOD_CALL, IPC_SIGNAL, IPC_REPLY, IPC_ERROR } SigmaIPCMsgType_t;
 sigma_err_t sigma_ipc_open (const char* name, sigma_u32 owner_pid);
 sigma_err_t sigma_ipc_send (const char* ch, sigma_u32 src, sigma_u32 dst,

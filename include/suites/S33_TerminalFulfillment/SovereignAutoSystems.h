@@ -7,7 +7,7 @@
 #ifndef SOVEREIGN_AUTO_SYSTEMS_H
 #define SOVEREIGN_AUTO_SYSTEMS_H
 
-#include "sigma_types.h"
+#include "suites/S01_Genesis/shards/sigma_types.h"
 
 /* Auto-Clean */
 void sigma_autoclean_volatile  (void);

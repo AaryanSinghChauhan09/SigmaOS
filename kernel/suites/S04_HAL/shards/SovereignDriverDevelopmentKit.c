@@ -12,7 +12,7 @@
 //   • Hot-Plug Event Bus for dynamic hardware discovery
 // =============================================================================
 
-#include <sigma_types.h>
+#include "suites/S01_Genesis/shards/sigma_types.h"
 
 
 #define DRIVER_VERSION "1.0.0"

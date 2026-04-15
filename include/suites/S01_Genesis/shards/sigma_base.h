@@ -9,9 +9,9 @@
 #ifndef SIGMA_BASE_H
 #define SIGMA_BASE_H
 
-#include "sigma_types.h"
+#include "suites/S01_Genesis/shards/sigma_types.h"
 #include "suites/S01_Genesis/shards/sigma_libc.h"
-#include "SovereignModule.h"
+#include "suites/S01_Genesis/shards/SovereignModule.h"
 
 #ifndef SIGMA_ASSERT
  #ifdef __SIGMAOS__

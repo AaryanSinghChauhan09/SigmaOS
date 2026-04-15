@@ -10,7 +10,7 @@
 // Result: Distributed computing that feels like a single multi-socket board.
 // =============================================================================
 
-#include <sigma_types.h>
+#include "suites/S01_Genesis/shards/sigma_types.h"
 
 
 typedef struct {

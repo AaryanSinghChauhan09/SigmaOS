@@ -1,7 +1,7 @@
 ﻿/* S SIGMAOS: SOVEREIGN AUTOCLEAN SHARD HEADER */
 #ifndef SOVEREIGN_AUTOCLEAN_SHARD_H
 #define SOVEREIGN_AUTOCLEAN_SHARD_H
-#include "sigma_types.h"
+#include "suites/S01_Genesis/shards/sigma_types.h"
 typedef enum { DEBRIS_CACHE, DEBRIS_TEMP, DEBRIS_LOG_OLD, DEBRIS_CORE_DUMP,
                DEBRIS_PKG_CACHE, DEBRIS_THUMBNAIL, DEBRIS_ORPHAN_LIB,
                DEBRIS_CRASH_REPORT } SigmaDebrisType_t;

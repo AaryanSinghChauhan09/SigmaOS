@@ -10,7 +10,7 @@
 #ifndef SOVEREIGN_DISTRO_H
 #define SOVEREIGN_DISTRO_H
 
-#include "sigma_types.h"
+#include "suites/S01_Genesis/shards/sigma_types.h"
 
 #define MAX_DISTROS 128
 #define DISTRO_NAME_MAX 32

@@ -10,7 +10,7 @@
 //         decentralized QSSS transport (S07).
 // =============================================================================
 
-#include <sigma_types.h>
+#include "suites/S01_Genesis/shards/sigma_types.h"
 
 
 #define MAX_GLOBAL_NODES    1000000

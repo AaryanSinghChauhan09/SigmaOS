@@ -12,7 +12,7 @@
 #ifndef SOVEREIGN_USER_MANAGER_H
 #define SOVEREIGN_USER_MANAGER_H
 
-#include "sigma_types.h"
+#include "suites/S01_Genesis/shards/sigma_types.h"
 
 #define SIGMA_USER_NAME_MAX    32
 #define SIGMA_USER_HOME_MAX   128

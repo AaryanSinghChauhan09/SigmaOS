@@ -11,7 +11,7 @@
 #ifndef SOVEREIGN_DMESG_H
 #define SOVEREIGN_DMESG_H
 
-#include "sigma_types.h"
+#include "suites/S01_Genesis/shards/sigma_types.h"
 
 /* -------------------------------------------------------------------------
  * Log levels (mirrors Linux KERN_EMERG … KERN_DEBUG)

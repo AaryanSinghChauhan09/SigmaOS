@@ -12,7 +12,7 @@
 //   • E2EE Membership: Group rosters are encrypted via PQC (S08).
 // =============================================================================
 
-#include <sigma_types.h>
+#include "suites/S01_Genesis/shards/sigma_types.h"
 
 
 #define MAX_MESH_GROUPS     64

@@ -1,7 +1,7 @@
 ﻿/* S SIGMAOS: SOVEREIGN AUDIT SHARD HEADER */
 #ifndef SOVEREIGN_AUDIT_SHARD_H
 #define SOVEREIGN_AUDIT_SHARD_H
-#include "sigma_types.h"
+#include "suites/S01_Genesis/shards/sigma_types.h"
 typedef enum { AUDIT_LOGIN, AUDIT_LOGOUT, AUDIT_SYSCALL, AUDIT_CFG_CHANGE,
                AUDIT_FW_RULE, AUDIT_DMA_QUARANTINE, AUDIT_PRIV_ESCALATION,
                AUDIT_PATCH_APPLY, AUDIT_SUSPICIOUS } SigmaAuditType_t;

@@ -10,7 +10,7 @@
 #ifndef SOVEREIGN_GCD_H
 #define SOVEREIGN_GCD_H
 
-#include "sigma_types.h"
+#include "suites/S01_Genesis/shards/sigma_types.h"
 
 typedef void (*sigma_dispatch_fn)(void* context);
 

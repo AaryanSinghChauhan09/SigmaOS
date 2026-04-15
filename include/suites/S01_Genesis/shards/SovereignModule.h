@@ -1,7 +1,7 @@
 ﻿#ifndef SIGMA_MODULE_H
 #define SIGMA_MODULE_H
 
-#include "sigma_types.h"
+#include "suites/S01_Genesis/shards/sigma_types.h"
 
 /*
  * S Sovereign Module Interface

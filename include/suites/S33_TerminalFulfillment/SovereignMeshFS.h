@@ -7,7 +7,7 @@
 #ifndef SOVEREIGN_MESH_FS_H
 #define SOVEREIGN_MESH_FS_H
 
-#include "sigma_types.h"
+#include "suites/S01_Genesis/shards/sigma_types.h"
 
 sigma_err_t sigma_mesh_publish     (const char* data, sigma_u64 len);
 void        sigma_mesh_sync        (void);

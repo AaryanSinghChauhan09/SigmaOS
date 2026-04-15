@@ -12,7 +12,7 @@
 //   • 100% Zero-Dependency: No external glibc or wine-runtime required.
 // =============================================================================
 
-#include <sigma_types.h>
+#include "suites/S01_Genesis/shards/sigma_types.h"
 
 
 typedef enum {

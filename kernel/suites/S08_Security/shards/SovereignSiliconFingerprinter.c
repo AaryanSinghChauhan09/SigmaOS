@@ -10,7 +10,7 @@
 //     the CPU/GPU is genuine and has no backdoors.
 // =============================================================================
 
-#include <sigma_types.h>
+#include "suites/S01_Genesis/shards/sigma_types.h"
 
 
 #define PUF_SIG_LEN         128

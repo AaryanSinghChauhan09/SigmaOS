@@ -13,7 +13,7 @@
 //     WITHOUT interrupting the running process.
 // =============================================================================
 
-#include <sigma_types.h>
+#include "suites/S01_Genesis/shards/sigma_types.h"
 
 
 #define VAULT_PATH "/boot/sovereign/vault"

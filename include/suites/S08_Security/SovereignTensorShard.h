@@ -7,7 +7,7 @@
 #ifndef SOVEREIGN_TENSOR_SHARD_H
 #define SOVEREIGN_TENSOR_SHARD_H
 
-#include "sigma_types.h"
+#include "suites/S01_Genesis/shards/sigma_types.h"
 #include "suites/S03_Orchestrator/shards/SigmaOOP.h"
 
 typedef struct {

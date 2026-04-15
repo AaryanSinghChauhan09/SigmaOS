@@ -1,7 +1,7 @@
 // =============================================================================
-// SigmaOS — S23_OmniNexus — SovereignSuiteRegistry.c
+// SigmaOS  S23_OmniNexus  SovereignSuiteRegistry.c
 // =============================================================================
-#include <sigma_types.h>
+#include "suites/S01_Genesis/shards/sigma_types.h"
 
 void S23_OmniNexus_Register(void) {
     // Register functional shards for S23_OmniNexus into the System Lattice Registry

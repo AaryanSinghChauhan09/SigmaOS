@@ -11,7 +11,7 @@
 #ifndef SOVEREIGN_ZEROTRUST_H
 #define SOVEREIGN_ZEROTRUST_H
 
-#include "../../../include/SovereignCommon.h"
+#include "suites/S01_Genesis/shards/SovereignCommon.h"
 
 typedef enum {
     VERIFY_INTEGRITY_STABLE,

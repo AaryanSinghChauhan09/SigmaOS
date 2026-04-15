@@ -1,7 +1,7 @@
 #ifndef SOVEREIGN_VMA_H
 #define SOVEREIGN_VMA_H
 
-#include "sigma_types.h"
+#include "suites/S01_Genesis/shards/sigma_types.h"
 
 typedef struct {
     sigma_u64 start;

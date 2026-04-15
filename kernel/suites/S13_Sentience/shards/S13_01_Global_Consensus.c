@@ -9,7 +9,7 @@
 // Result: A globally unified OS identity that feels like a single brain.
 // =============================================================================
 
-#include <sigma_types.h>
+#include "suites/S01_Genesis/shards/sigma_types.h"
 
 
 typedef struct {

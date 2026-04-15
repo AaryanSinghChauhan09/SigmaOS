@@ -2,7 +2,7 @@
 // Absorbs Linux io_uring + Windows IOCP + macOS kqueue
 // Fully async, zero-copy, lock-free I/O for kernel and userspace
 
-#include <sigma_types.h>
+#include "suites/S01_Genesis/shards/sigma_types.h"
 
 
 #define SIGMA_IO_RING_SIZE     4096  // Number of entries in submission/completion ring

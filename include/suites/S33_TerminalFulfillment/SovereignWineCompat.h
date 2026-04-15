@@ -25,7 +25,7 @@
 #ifndef SOVEREIGN_WINE_COMPAT_H
 #define SOVEREIGN_WINE_COMPAT_H
 
-#include "sigma_types.h"
+#include "suites/S01_Genesis/shards/sigma_types.h"
 
 /* -------------------------------------------------------------------------
  * PE Format constants

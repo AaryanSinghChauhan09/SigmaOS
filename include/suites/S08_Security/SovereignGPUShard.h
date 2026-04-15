@@ -1,7 +1,7 @@
 ﻿/* S SIGMAOS: SOVEREIGN GPU SHARD HEADER */
 #ifndef SOVEREIGN_GPU_SHARD_H
 #define SOVEREIGN_GPU_SHARD_H
-#include "sigma_types.h"
+#include "suites/S01_Genesis/shards/sigma_types.h"
 
 typedef enum { GPU_CMD_TRANSFER, GPU_CMD_DRAW_TRI, GPU_CMD_COMPUTE, GPU_CMD_PRESENT } SigmaGPUCmd_t;
 

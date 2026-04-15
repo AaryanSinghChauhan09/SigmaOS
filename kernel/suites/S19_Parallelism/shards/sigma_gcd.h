@@ -11,7 +11,7 @@
 #ifndef SOVEREIGN_GCD_H
 #define SOVEREIGN_GCD_H
 
-#include "../../../include/SovereignCommon.h"
+#include "suites/S01_Genesis/shards/SovereignCommon.h"
 
 #define GCD_MAX_QUEUES    64
 #define GCD_RING_SIZE    1024

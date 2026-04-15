@@ -1,7 +1,7 @@
 #ifndef SIGMA_FIREWALL_ENCLAVE_H
 #define SIGMA_FIREWALL_ENCLAVE_H
 
-#include <sigma_types.h>
+#include "suites/S01_Genesis/shards/sigma_types.h"
 
 
 // SigmaOS Hardware Firewall Enclave

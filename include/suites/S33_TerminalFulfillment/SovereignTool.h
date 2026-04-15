@@ -10,7 +10,7 @@
 #ifndef SOVEREIGN_TOOL_H
 #define SOVEREIGN_TOOL_H
 
-#include "sigma_types.h"
+#include "suites/S01_Genesis/shards/sigma_types.h"
 
 #define MAX_TOOLS 128
 #define TOOL_NAME_MAX 32

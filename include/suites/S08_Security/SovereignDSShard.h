@@ -1,7 +1,7 @@
 ﻿/* S SIGMAOS: SOVEREIGN DS SHARD HEADER */
 #ifndef SOVEREIGN_DS_SHARD_H
 #define SOVEREIGN_DS_SHARD_H
-#include "sigma_types.h"
+#include "suites/S01_Genesis/shards/sigma_types.h"
 
 typedef enum { DS_DTYPE_F32, DS_DTYPE_I32, DS_DTYPE_STRING } SigmaDSDataType_t;
 

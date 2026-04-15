@@ -1,7 +1,7 @@
 ﻿/* S SIGMAOS: SOVEREIGN RECALL SHARD HEADER */
 #ifndef SOVEREIGN_RECALL_SHARD_H
 #define SOVEREIGN_RECALL_SHARD_H
-#include "sigma_types.h"
+#include "suites/S01_Genesis/shards/sigma_types.h"
 
 typedef enum { EVENT_WM_FOCUS, EVENT_CLI_CMD, EVENT_FS_ACCESS, EVENT_APP_ACTION } SigmaRecallType_t;
 

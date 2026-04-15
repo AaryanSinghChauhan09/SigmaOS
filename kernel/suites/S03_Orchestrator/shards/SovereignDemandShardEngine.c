@@ -10,7 +10,7 @@
 // Result: Peak single-core performance with zero background interference.
 // =============================================================================
 
-#include <sigma_types.h>
+#include "suites/S01_Genesis/shards/sigma_types.h"
 
 typedef struct {
     uint32_t active_shard_id;

@@ -11,7 +11,7 @@
 // Result: Total hardware independence. You ARE the OS, not the machine.
 // =============================================================================
 
-#include <sigma_types.h>
+#include "suites/S01_Genesis/shards/sigma_types.h"
 
 
 typedef struct {

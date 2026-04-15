@@ -1,7 +1,7 @@
 ﻿/* S SIGMAOS: SOVEREIGN SOUND SHARD HEADER */
 #ifndef SOVEREIGN_SOUND_SHARD_H
 #define SOVEREIGN_SOUND_SHARD_H
-#include "sigma_types.h"
+#include "suites/S01_Genesis/shards/sigma_types.h"
 
 typedef enum { SND_STREAM_PCM, SND_STREAM_MIDI, SND_STREAM_COMP } SigmaSndType_t;
 

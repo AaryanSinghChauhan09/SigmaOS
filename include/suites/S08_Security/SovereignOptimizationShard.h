@@ -1,7 +1,7 @@
 ﻿/* S SIGMAOS: SOVEREIGN OPTIMAL SHARD HEADER */
 #ifndef SOVEREIGN_OPTIMIZATION_SHARD_H
 #define SOVEREIGN_OPTIMIZATION_SHARD_H
-#include "sigma_types.h"
+#include "suites/S01_Genesis/shards/sigma_types.h"
 
 typedef enum {
     OPT_MEM_COMPRESSION,

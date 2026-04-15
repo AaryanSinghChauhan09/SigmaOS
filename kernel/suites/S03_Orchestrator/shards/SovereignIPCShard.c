@@ -2,7 +2,7 @@
 // Absorbs Mach Ports (macOS) + UNIX Domain Sockets (Linux) + Named Pipes (Windows)
 // Modular, zero-dependency, C11 native
 
-#include <sigma_types.h>
+#include "suites/S01_Genesis/shards/sigma_types.h"
 
 
 #define SIGMA_IPC_MAX_PORTS    1024

@@ -1,4 +1,4 @@
-﻿#include "sigma_kernel.h"
+﻿#include "suites/S01_Genesis/shards/sigma_kernel.h"
 
 void test_libc_purity_audit() {
     sigma_printf("S [TEST]: Running Zero-Dependency Purity Audit...\n");

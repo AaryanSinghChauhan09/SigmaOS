@@ -10,7 +10,7 @@
 #ifndef SOVEREIGN_USP_H
 #define SOVEREIGN_USP_H
 
-#include "sigma_types.h"
+#include "suites/S01_Genesis/shards/sigma_types.h"
 
 #define MAX_USPS 64
 #define USP_NAME_MAX 32

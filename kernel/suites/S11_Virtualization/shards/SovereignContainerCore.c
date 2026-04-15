@@ -12,7 +12,7 @@
 //   • Zero-Overhead VFS: Direct mount of S06 Hive files into the container.
 // =============================================================================
 
-#include <sigma_types.h>
+#include "suites/S01_Genesis/shards/sigma_types.h"
 
 
 #define MAX_CONTAINERS      64

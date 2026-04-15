@@ -10,7 +10,7 @@
 #ifndef SOVEREIGN_INIT_H
 #define SOVEREIGN_INIT_H
 
-#include "sigma_types.h"
+#include "suites/S01_Genesis/shards/sigma_types.h"
 
 typedef enum {
     SIGMA_SVC_STOPPED = 0,

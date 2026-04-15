@@ -1,7 +1,7 @@
 #ifndef SIGMA_STRING_H
 #define SIGMA_STRING_H
 
-#include "sigma_types.h"
+#include "suites/S01_Genesis/shards/sigma_types.h"
 
 /* Atomic Shard Prototypes */
 void* sigma_memcpy(void* dest, const void* src, sigma_size n);

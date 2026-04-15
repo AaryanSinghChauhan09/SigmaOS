@@ -3,7 +3,7 @@
 
 // SigmaOS Zenith Tiling Window Manager Shard
 // Absorbing structural WM paradigms (i3/bspwm) with GPU acceleration
-#include <sigma_types.h>
+#include "suites/S01_Genesis/shards/sigma_types.h"
 
 void ui_init_tiling_wm();
 void ui_set_gpu_acceleration(uint8_t enabled);

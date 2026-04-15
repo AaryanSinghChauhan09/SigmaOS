@@ -1,7 +1,7 @@
 #ifndef SIGMA_NOTIFICATION_ENGINE_H
 #define SIGMA_NOTIFICATION_ENGINE_H
 
-#include <sigma_types.h>
+#include "suites/S01_Genesis/shards/sigma_types.h"
 
 
 // SigmaOS Notification & Desktop Environment Module

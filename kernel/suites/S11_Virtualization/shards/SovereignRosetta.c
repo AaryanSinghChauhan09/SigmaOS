@@ -12,7 +12,7 @@
 //   • Zero-copy syscall translation directly to SigmaOS kernel shards
 // =============================================================================
 
-#include <sigma_types.h>
+#include "suites/S01_Genesis/shards/sigma_types.h"
 
 
 #define TRANSLATION_CACHE_SIZE 256 * 1024 * 1024 // 256MB

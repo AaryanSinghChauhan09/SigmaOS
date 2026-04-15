@@ -10,7 +10,7 @@
 #ifndef SOVEREIGN_SCHEDULER_H
 #define SOVEREIGN_SCHEDULER_H
 
-#include "sigma_types.h"
+#include "suites/S01_Genesis/shards/sigma_types.h"
 
 typedef void (*sigma_schedule_fn)(sigma_u32 cpu_id, sigma_u64 now_ns);
 

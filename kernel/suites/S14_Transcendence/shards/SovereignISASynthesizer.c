@@ -11,7 +11,7 @@
 // Result: SigmaOS can boot on ANY silicon, even those not yet invented.
 // =============================================================================
 
-#include <sigma_types.h>
+#include "suites/S01_Genesis/shards/sigma_types.h"
 
 
 typedef enum {

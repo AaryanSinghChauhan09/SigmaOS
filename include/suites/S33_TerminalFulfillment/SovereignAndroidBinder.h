@@ -16,7 +16,7 @@
 #ifndef SOVEREIGN_ANDROID_BINDER_H
 #define SOVEREIGN_ANDROID_BINDER_H
 
-#include "sigma_types.h"
+#include "suites/S01_Genesis/shards/sigma_types.h"
 
 typedef sigma_u32 sigma_binder_handle_t;
 

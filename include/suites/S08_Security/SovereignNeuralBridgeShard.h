@@ -1,7 +1,7 @@
 ﻿/* S SIGMAOS: SOVEREIGN NEURALBRIDGE SHARD HEADER */
 #ifndef SOVEREIGN_NEURALBRIDGE_SHARD_H
 #define SOVEREIGN_NEURALBRIDGE_SHARD_H
-#include "sigma_types.h"
+#include "suites/S01_Genesis/shards/sigma_types.h"
 
 void sigma_brain_link (void);
 void SovereignNeuralBridgeShard_Init (void);

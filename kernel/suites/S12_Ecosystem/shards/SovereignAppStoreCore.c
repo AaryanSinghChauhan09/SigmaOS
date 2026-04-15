@@ -12,7 +12,7 @@
 //   • Immutable Apps: Every app is a .sab bundle, guaranteed unmodifiable.
 // =============================================================================
 
-#include <sigma_types.h>
+#include "suites/S01_Genesis/shards/sigma_types.h"
 
 
 #define MAX_STORE_ITEMS     4096

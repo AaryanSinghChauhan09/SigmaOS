@@ -1,7 +1,7 @@
 ﻿/* S SIGMAOS: SOVEREIGN COMPOSITOR SHARD HEADER */
 #ifndef SOVEREIGN_COMPOSITOR_SHARD_H
 #define SOVEREIGN_COMPOSITOR_SHARD_H
-#include "sigma_types.h"
+#include "suites/S01_Genesis/shards/sigma_types.h"
 
 typedef struct { sigma_i32 x, y, w, h; } SigmaRect_t;
 typedef enum { WIN_TYPE_TOPLEVEL, WIN_TYPE_POPUP, WIN_TYPE_TOOLTIP, WIN_TYPE_OVERLAY } SigmaWinType_t;

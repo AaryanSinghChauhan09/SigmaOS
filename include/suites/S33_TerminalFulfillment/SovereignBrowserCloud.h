@@ -34,7 +34,7 @@
 #ifndef SOVEREIGN_BROWSER_CLOUD_H
 #define SOVEREIGN_BROWSER_CLOUD_H
 
-#include "sigma_types.h"
+#include "suites/S01_Genesis/shards/sigma_types.h"
 
 /* =========================================================================
  * §1  PUTER CLOUD OS

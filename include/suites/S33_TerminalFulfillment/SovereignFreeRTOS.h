@@ -16,7 +16,7 @@
 #ifndef SOVEREIGN_FREERTOS_H
 #define SOVEREIGN_FREERTOS_H
 
-#include "sigma_types.h"
+#include "suites/S01_Genesis/shards/sigma_types.h"
 
 typedef void (*SigmaTaskFunction_t)(void *pvParameters);
 typedef void *SigmaTaskHandle_t;

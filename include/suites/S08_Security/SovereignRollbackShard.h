@@ -3,7 +3,7 @@
  * ========================================================================= */
 #ifndef SOVEREIGN_ROLLBACK_SHARD_H
 #define SOVEREIGN_ROLLBACK_SHARD_H
-#include "sigma_types.h"
+#include "suites/S01_Genesis/shards/sigma_types.h"
 sigma_err_t sigma_rollback_snap     (const char* path);
 sigma_err_t sigma_rollback_restore  (const char* snap_id);
 void        sigma_rollback_prune    (sigma_u32 keep_last_n);

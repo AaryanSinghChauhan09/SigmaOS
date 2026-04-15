@@ -7,7 +7,7 @@
 #ifndef SOVEREIGN_ATOMIC_UPDATE_H
 #define SOVEREIGN_ATOMIC_UPDATE_H
 
-#include "sigma_types.h"
+#include "suites/S01_Genesis/shards/sigma_types.h"
 
 sigma_err_t sigma_rebuild_system        (const char* manifesto_path);
 void        SovereignAtomicUpdate_Rollback (void);

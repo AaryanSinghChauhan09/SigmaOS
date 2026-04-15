@@ -1,7 +1,7 @@
 #ifndef SIGMA_PERIPHERALS_DRIVER_H
 #define SIGMA_PERIPHERALS_DRIVER_H
 
-#include <sigma_types.h>
+#include "suites/S01_Genesis/shards/sigma_types.h"
 
 // SigmaOS Peripheral Hardware Drivers Module
 // Handling specific zero-dependency I/O for Printers, Cameras, and Bluetooth bands.

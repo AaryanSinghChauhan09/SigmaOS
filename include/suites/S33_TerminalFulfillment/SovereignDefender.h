@@ -16,7 +16,7 @@
 #ifndef SOVEREIGN_DEFENDER_H
 #define SOVEREIGN_DEFENDER_H
 
-#include "sigma_types.h"
+#include "suites/S01_Genesis/shards/sigma_types.h"
 
 typedef struct {
     char rule_name[64];

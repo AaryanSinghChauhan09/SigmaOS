@@ -9,7 +9,7 @@
 #ifndef SOVEREIGN_UDF_H
 #define SOVEREIGN_UDF_H
 
-#include "sigma_types.h"
+#include "suites/S01_Genesis/shards/sigma_types.h"
 
 typedef sigma_err_t (*sigma_udf_fn)(void* args);
 

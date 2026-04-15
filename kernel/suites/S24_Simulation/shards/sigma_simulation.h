@@ -11,7 +11,7 @@
 #ifndef SOVEREIGN_SIMULATION_H
 #define SOVEREIGN_SIMULATION_H
 
-#include "../../../include/SovereignCommon.h"
+#include "suites/S01_Genesis/shards/SovereignCommon.h"
 
 typedef struct {
     sigma_u64 pc;

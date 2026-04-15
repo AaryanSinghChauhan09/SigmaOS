@@ -1,7 +1,7 @@
 #ifndef SIGMA_SOCKET_API_H
 #define SIGMA_SOCKET_API_H
 
-#include <sigma_types.h>
+#include "suites/S01_Genesis/shards/sigma_types.h"
 
 // SigmaOS Universal Socket API
 // Absorbing the reliability of BSD sockets with the asynchronous power of Windows IOCP (I/O Completion Ports)

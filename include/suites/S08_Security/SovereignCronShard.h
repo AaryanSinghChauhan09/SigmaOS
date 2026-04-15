@@ -1,7 +1,7 @@
 ﻿/* S SIGMAOS: SOVEREIGN CRON SHARD HEADER */
 #ifndef SOVEREIGN_CRON_SHARD_H
 #define SOVEREIGN_CRON_SHARD_H
-#include "sigma_types.h"
+#include "suites/S01_Genesis/shards/sigma_types.h"
 typedef enum { TASK_ONESHOT, TASK_PERIODIC, TASK_CRON_EXPR } SigmaTaskType_t;
 typedef sigma_err_t (*SigmaTaskFn_t)(void* ctx);
 sigma_err_t sigma_cron_register (const char* name, SigmaTaskType_t type,

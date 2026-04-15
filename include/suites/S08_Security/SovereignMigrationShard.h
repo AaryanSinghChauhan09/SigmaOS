@@ -7,7 +7,7 @@
 #ifndef SOVEREIGN_MIGRATION_SHARD_H
 #define SOVEREIGN_MIGRATION_SHARD_H
 
-#include "sigma_types.h"
+#include "suites/S01_Genesis/shards/sigma_types.h"
 
 sigma_err_t sigma_migrate_checkpoint (const char* shard_id);
 void        sigma_migrate_push       (const char* shard_id, const char* target_node);

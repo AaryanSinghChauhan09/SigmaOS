@@ -2,7 +2,7 @@
 // Absorbs Linux Netfilter/iptables + BSD pf + Windows WFP
 // Modular C11 shard — integrated into custom TCP/IP stack
 
-#include <sigma_types.h>
+#include "suites/S01_Genesis/shards/sigma_types.h"
 
 
 #define SIGMA_MAX_ROUTES   1024

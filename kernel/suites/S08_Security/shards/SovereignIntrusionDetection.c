@@ -16,7 +16,7 @@
 //   • On alert: logs to S08 AuditLog, optionally kills offending PID
 // =============================================================================
 
-#include <sigma_types.h>
+#include "suites/S01_Genesis/shards/sigma_types.h"
 
 
 #define IDS_MAX_RULES     512

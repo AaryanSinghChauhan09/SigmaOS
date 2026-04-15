@@ -17,7 +17,7 @@
 //   • Clean shutdown: sends SIGTERM to all shards in reverse dep order
 // =============================================================================
 
-#include <sigma_types.h>
+#include "suites/S01_Genesis/shards/sigma_types.h"
 
 #include "suites/S01_Genesis/shards/sigma_libc.h"
 

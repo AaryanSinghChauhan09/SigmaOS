@@ -11,7 +11,7 @@
 #ifndef SOVEREIGN_SHELL_H
 #define SOVEREIGN_SHELL_H
 
-#include "../../../include/SovereignCommon.h"
+#include "suites/S01_Genesis/shards/SovereignCommon.h"
 
 #define SHELL_MAX_ARGS    16
 #define SHELL_MAX_LINE    1024

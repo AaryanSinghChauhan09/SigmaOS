@@ -11,7 +11,7 @@
 #ifndef SOVEREIGN_SENTIENCE_H
 #define SOVEREIGN_SENTIENCE_H
 
-#include "../../../include/SovereignCommon.h"
+#include "suites/S01_Genesis/shards/SovereignCommon.h"
 
 typedef struct {
     sigma_u32 neurons[256];

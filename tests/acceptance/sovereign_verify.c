@@ -7,8 +7,8 @@
  * =========================================================================
  */
 
-#include "sigma_base.h"
-#include "sigma_kernel.h"
+#include "suites/S01_Genesis/shards/sigma_base.h"
+#include "suites/S01_Genesis/shards/sigma_kernel.h"
 
 int main() {
     sigma_printf("S [CI/CD]: Initializing SigmaOS Sovereign Verification...\n");

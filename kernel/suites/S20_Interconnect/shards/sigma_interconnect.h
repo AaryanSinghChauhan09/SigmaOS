@@ -11,7 +11,7 @@
 #ifndef SOVEREIGN_INTERCONNECT_H
 #define SOVEREIGN_INTERCONNECT_H
 
-#include "../../../include/SovereignCommon.h"
+#include "suites/S01_Genesis/shards/SovereignCommon.h"
 
 #define MAX_BUSES         16
 #define MAX_DEVICES_PER_BUS 32

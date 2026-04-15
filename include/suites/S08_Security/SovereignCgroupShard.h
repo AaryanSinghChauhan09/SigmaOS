@@ -7,7 +7,7 @@
 #ifndef SOVEREIGN_CGROUP_SHARD_H
 #define SOVEREIGN_CGROUP_SHARD_H
 
-#include "sigma_types.h"
+#include "suites/S01_Genesis/shards/sigma_types.h"
 
 sigma_err_t sigma_cgroup_create  (const char* name, sigma_u32 cpu_quota,
                                    sigma_u64 mem_limit, sigma_u32 io_weight);

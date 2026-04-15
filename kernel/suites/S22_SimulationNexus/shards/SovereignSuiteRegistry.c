@@ -1,7 +1,7 @@
 // =============================================================================
-// SigmaOS — S22_SimulationNexus — SovereignSuiteRegistry.c
+// SigmaOS  S22_SimulationNexus  SovereignSuiteRegistry.c
 // =============================================================================
-#include <sigma_types.h>
+#include "suites/S01_Genesis/shards/sigma_types.h"
 
 void S22_SimulationNexus_Register(void) {
     // Register functional shards for S22_SimulationNexus into the System Lattice Registry

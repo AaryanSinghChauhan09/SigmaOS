@@ -14,7 +14,7 @@
 //   • Private & Native: Zero cloud dependencies; all logic runs in C/Wasm.
 // =============================================================================
 
-#include <sigma_types.h>
+#include "suites/S01_Genesis/shards/sigma_types.h"
 
 
 #define MAX_AUTOMATIONS     64

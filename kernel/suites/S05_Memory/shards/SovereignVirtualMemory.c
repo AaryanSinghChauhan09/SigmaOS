@@ -2,7 +2,7 @@
 // Absorbs Linux THP (Transparent Huge Pages) + Windows AWE + macOS Compressed RAM
 // Zero-dependency C11 — manages page tables, TLB, demand paging
 
-#include <sigma_types.h>
+#include "suites/S01_Genesis/shards/sigma_types.h"
 
 
 #define SIGMA_PAGE_SIZE_4K      0x1000

@@ -1,7 +1,7 @@
 ﻿/* S SIGMAOS: SOVEREIGN TTY SHARD HEADER */
 #ifndef SOVEREIGN_TTY_SHARD_H
 #define SOVEREIGN_TTY_SHARD_H
-#include "sigma_types.h"
+#include "suites/S01_Genesis/shards/sigma_types.h"
 typedef enum { PANE_SHELL, PANE_LOG, PANE_MONITOR } SigmaPaneType_t;
 sigma_err_t sigma_tty_new_session (const char* name);
 sigma_err_t sigma_tty_new_window  (sigma_u32 session_id, const char* win_name);

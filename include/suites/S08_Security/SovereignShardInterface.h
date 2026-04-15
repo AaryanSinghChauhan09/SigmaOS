@@ -9,7 +9,7 @@
 #ifndef SOVEREIGN_SHARD_INTERFACE_H
 #define SOVEREIGN_SHARD_INTERFACE_H
 
-#include "sigma_types.h"
+#include "suites/S01_Genesis/shards/sigma_types.h"
 
 typedef enum {
     SHARD_INIT = 0,

@@ -11,7 +11,7 @@
 #ifndef SOVEREIGN_BIOSPHERE_H
 #define SOVEREIGN_BIOSPHERE_H
 
-#include "../../../include/SovereignCommon.h"
+#include "suites/S01_Genesis/shards/SovereignCommon.h"
 
 typedef enum {
     BIO_POLICY_STRICT,     /* No net, no disk (except home) */

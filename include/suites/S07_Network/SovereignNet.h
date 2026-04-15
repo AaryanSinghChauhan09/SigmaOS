@@ -10,7 +10,7 @@
 #ifndef SOVEREIGN_NET_H
 #define SOVEREIGN_NET_H
 
-#include "sigma_types.h"
+#include "suites/S01_Genesis/shards/sigma_types.h"
 
 typedef void (*sigma_net_handler_fn)(void* payload, sigma_sz_t size);
 

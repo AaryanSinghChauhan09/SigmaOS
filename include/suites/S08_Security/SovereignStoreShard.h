@@ -1,7 +1,7 @@
 ﻿/* S SIGMAOS: SOVEREIGN STORE SHARD HEADER */
 #ifndef SOVEREIGN_STORE_SHARD_H
 #define SOVEREIGN_STORE_SHARD_H
-#include "sigma_types.h"
+#include "suites/S01_Genesis/shards/sigma_types.h"
 
 typedef enum { ASSET_SHARD, ASSET_DATA, ASSET_PLUGIN } SigmaAssetType_t;
 

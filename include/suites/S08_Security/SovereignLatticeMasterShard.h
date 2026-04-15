@@ -1,7 +1,7 @@
 ﻿/* S SIGMAOS: SOVEREIGN LATTICEMASTER SHARD HEADER */
 #ifndef SOVEREIGN_LATTICEMASTER_SHARD_H
 #define SOVEREIGN_LATTICEMASTER_SHARD_H
-#include "sigma_types.h"
+#include "suites/S01_Genesis/shards/sigma_types.h"
 
 void sigma_lattice_scale (void);
 void SovereignLatticeMasterShard_Init (void);

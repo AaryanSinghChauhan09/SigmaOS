@@ -17,7 +17,7 @@
 #ifndef SOVEREIGN_VBOX_H
 #define SOVEREIGN_VBOX_H
 
-#include "sigma_types.h"
+#include "suites/S01_Genesis/shards/sigma_types.h"
 
 #define SIGMA_VBOX_MAX_VMS 16
 

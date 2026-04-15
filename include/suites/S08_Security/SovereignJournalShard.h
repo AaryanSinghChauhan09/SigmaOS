@@ -6,7 +6,7 @@
 #ifndef SOVEREIGN_JOURNAL_SHARD_H
 #define SOVEREIGN_JOURNAL_SHARD_H
 
-#include "sigma_types.h"
+#include "suites/S01_Genesis/shards/sigma_types.h"
 
 typedef enum {
     LOG_EMERG=0, LOG_ALERT=1, LOG_CRIT=2, LOG_ERR=3,

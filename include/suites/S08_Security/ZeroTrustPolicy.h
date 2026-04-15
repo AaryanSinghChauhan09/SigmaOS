@@ -4,7 +4,7 @@
 // SigmaOS Zero Trust & Security Shard
 // Absorbing Defender/SELinux/AppArmor ideas
 // Includes: Sandboxing, Secure Boot validation, ASLR
-#include <sigma_types.h>
+#include "suites/S01_Genesis/shards/sigma_types.h"
 
 void security_init_secure_boot_aslr();
 void security_enforce_zero_trust_policy();

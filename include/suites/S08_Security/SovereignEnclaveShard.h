@@ -7,7 +7,7 @@
 #ifndef SOVEREIGN_ENCLAVE_SHARD_H
 #define SOVEREIGN_ENCLAVE_SHARD_H
 
-#include "sigma_types.h"
+#include "suites/S01_Genesis/shards/sigma_types.h"
 
 sigma_err_t sigma_enclave_gen_key      (const char* name, sigma_u32 bits, sigma_bool qs);
 void        sigma_enclave_seal         (const char* key_name);

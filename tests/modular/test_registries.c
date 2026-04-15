@@ -1,5 +1,5 @@
-﻿#include "sigma_kernel.h"
-#include "SovereignLatticeRegistry.h"
+﻿#include "suites/S01_Genesis/shards/sigma_kernel.h"
+#include "suites/S10_Registry/shards/SovereignLatticeRegistry.h"
 #include "SovereignDistro.h"
 #include "SovereignUSP.h"
 #include "SovereignTool.h"

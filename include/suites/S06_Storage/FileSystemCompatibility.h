@@ -1,7 +1,7 @@
 #ifndef SIGMA_FILESYSTEM_LEGACY_H
 #define SIGMA_FILESYSTEM_LEGACY_H
 
-#include <sigma_types.h>
+#include "suites/S01_Genesis/shards/sigma_types.h"
 
 
 // SigmaOS Legacy & Compatibility File System Shards
