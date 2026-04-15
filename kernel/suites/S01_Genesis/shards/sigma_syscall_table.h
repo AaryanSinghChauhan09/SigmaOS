@@ -1,4 +1,4 @@
-﻿/*
+/*
  * =========================================================================
  * S SIGMAOS kernel/suites/S01_Genesis/shards/sigma_syscall_table.h
  * =========================================================================
@@ -12,12 +12,7 @@
 #ifndef SIGMA_SYSCALL_TABLE_H
 #define SIGMA_SYSCALL_TABLE_H
 
-typedef unsigned long long sc_u64;
-typedef signed   long long sc_i64;
-typedef unsigned int       sc_u32;
-typedef signed   int       sc_i32;
-typedef unsigned char      sc_u8;
-#define SC_NULL ((void*)0)
+#include "suites/S01_Genesis/shards/sigma_types.h"
 
 /* ── Syscall numbers ─────────────────────────────────────────────────────── */
 #define SC_READ          0
@@ -107,25 +102,25 @@ typedef enum {
 } sc_security_t;
 
 /* ── Syscall handler type ───────────────────────────────────────────────── */
-typedef sc_i64 (*sigma_syscall_fn)(sc_u64, sc_u64, sc_u64,
-                                   sc_u64, sc_u64, sc_u64);
+typedef sigma_i64 (*sigma_syscall_fn)(sigma_u64, sigma_u64, sigma_u64,
+                                   sigma_u64, sigma_u64, sigma_u64);
 
 /* ── Syscall descriptor ─────────────────────────────────────────────────── */
 typedef struct {
-    sc_u32           number;
+    sigma_u32           number;
     char             name[32];
-    sc_u8            arity;       /* number of arguments (0–6)        */
+    sigma_u8            arity;       /* number of arguments (0–6)        */
     sc_security_t    sec_class;
     sigma_syscall_fn handler;
-    sc_u32           call_count;  /* telemetry                        */
+    sigma_u32           call_count;  /* telemetry                        */
 } sigma_syscall_desc_t;
 
 /* ── Public API ─────────────────────────────────────────────────────────── */
 void    sigma_syscall_table_init(void);
-sc_i64  sigma_syscall_dispatch(sc_u32 num,
-                                sc_u64 a, sc_u64 b, sc_u64 c,
-                                sc_u64 d, sc_u64 e, sc_u64 f);
-void    sigma_syscall_register(sc_u32 num, const char *name, sc_u8 arity,
+sigma_i64  sigma_syscall_dispatch(sigma_u32 num,
+                                sigma_u64 a, sigma_u64 b, sigma_u64 c,
+                                sigma_u64 d, sigma_u64 e, sigma_u64 f);
+void    sigma_syscall_register(sigma_u32 num, const char *name, sigma_u8 arity,
                                 sc_security_t sec, sigma_syscall_fn handler);
 void    sigma_syscall_audit(void);  /* print call counts for telemetry */
 
