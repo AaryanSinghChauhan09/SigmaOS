@@ -1,11 +1,7 @@
-// =============================================================================
-// SigmaOS — S07_Network — SovereignSuiteRegistry.c
-// =============================================================================
-#include <sigma_types.h>
-
+#include "sigma_types.h"
+#include "sigma_libc.h"
+extern void network_fsm_init(void);
 void S07_Network_Register(void) {
-    // Register functional shards for S07_Network into the System Lattice Registry
-    // Logic: Materialize suite-specific V-Tables and behavioral hulls.
+    sigma_printf("S [S07]: Materializing Sovereign Network Stack...\n");
+    network_fsm_init();
 }
-
-

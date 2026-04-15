@@ -1,11 +1,7 @@
-// =============================================================================
-// SigmaOS — S10_Registry — SovereignSuiteRegistry.c
-// =============================================================================
-#include <sigma_types.h>
-
+#include "sigma_types.h"
+#include "sigma_libc.h"
+#include "SovereignRegistry.h"
 void S10_Registry_Register(void) {
-    // Register functional shards for S10_Registry into the System Lattice Registry
-    // Logic: Materialize suite-specific V-Tables and behavioral hulls.
+    sigma_printf("S [S10]: Materializing System Registry Nexus...\n");
+    SovereignRegistry_Init();
 }
-
-

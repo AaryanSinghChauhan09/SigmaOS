@@ -1,24 +1,58 @@
 /*
  * =========================================================================
- * Σ SIGMAOS: SOVEREIGN SYSTEM REGISTRY (v1.0)
+ * Σ SIGMAOS: SOVEREIGN SHARD REGISTRY (v1.0)
+ * =========================================================================
+ * Mission: Dynamic management and auditing of all kernel shards.
+ * Design: Zero-Dependency / C11 / High-Performance Registry.
  * =========================================================================
  */
 
 #ifndef SOVEREIGN_REGISTRY_H
 #define SOVEREIGN_REGISTRY_H
 
-#include "sigma_base.h"
+#include "sigma_types.h"
+
+#define MAX_SHARDS 1024
+#define SHARD_NAME_MAX 64
+
+typedef enum {
+    SHARD_CAT_CORE,     /* VFS, MM, SCHED */
+    SHARD_CAT_DISTRO,   /* Nix, Arch, Gentoo Absorption */
+    SHARD_CAT_SECURITY, /* PQC, LSM, Enclaves */
+    SHARD_CAT_PLATFORM, /* Android, Windows, macOS Parity */
+    SHARD_CAT_TOOL      /* Excel, Python, PowerBI Shards */
+} shard_category_t;
+
+typedef enum {
+    SHARD_STATUS_REGISTERED,
+    SHARD_STATUS_INITIALIZING,
+    SHARD_STATUS_ACTIVE,
+    SHARD_STATUS_FAILED,
+    SHARD_STATUS_ZOMBIE
+} shard_status_t;
+
+typedef void (*shard_init_fn)(void);
 
 typedef struct {
-    char        name[64];
-    void*       ptr;
-    sigma_u32   flags;
-} RegistryEntry;
+    char name[SHARD_NAME_MAX];
+    shard_category_t category;
+    shard_status_t status;
+    shard_init_fn init;
+    sigma_u32 version;
+    sigma_u64 load_timestamp;
+} sovereign_shard_t;
 
-#define MAX_REGISTRY_ENTRIES 4096
+typedef struct {
+    sovereign_shard_t shards[MAX_SHARDS];
+    sigma_u32 shard_count;
+    sigma_u32 active_count;
+    sigma_u64 registry_lock;
+} sovereign_registry_t;
 
-void        SovereignRegistry_Init(void);
-sigma_err_t SovereignRegistry_Set(const char* name, void* ptr, sigma_u32 flags);
-void*       SovereignRegistry_Get(const char* name);
+/* Public API */
+void SovereignRegistry_Init(void);
+sigma_err_t SovereignRegistry_Register(const char* name, shard_category_t cat, shard_init_fn init);
+void SovereignRegistry_Finalize(void);
+void SovereignRegistry_Audit(void);
 
 #endif /* SOVEREIGN_REGISTRY_H */

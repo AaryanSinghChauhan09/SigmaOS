@@ -1,11 +1,9 @@
-// =============================================================================
-// SigmaOS — S04_HAL — SovereignSuiteRegistry.c
-// =============================================================================
-#include <sigma_types.h>
-
+#include "sigma_types.h"
+#include "sigma_libc.h"
+extern void console_init(void);
+extern void paging_init(void);
 void S04_HAL_Register(void) {
-    // Register functional shards for S04_HAL into the System Lattice Registry
-    // Logic: Materialize suite-specific V-Tables and behavioral hulls.
+    sigma_printf("S [S04]: Materializing HAL Console and Paging Matrix...\n");
+    console_init();
+    paging_init();
 }
-
-
