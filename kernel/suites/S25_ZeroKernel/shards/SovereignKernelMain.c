@@ -3,7 +3,7 @@
 // =============================================================================
 #include "sigma_base.h"
 #include "sigma_kernel.h"
-#include "SovereignLatticeRegistry.h"
+#include "suites/S10_Registry/shards/SovereignLatticeRegistry.h"
 
 /**
  * @brief Terminal Entry Point for the Sovereign OS.

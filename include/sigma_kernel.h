@@ -10,8 +10,8 @@
 #define SIGMA_KERNEL_H
 
 #include "sigma_base.h"
-#include "SovereignLatticeRegistry.h"
-#include "SovereignInterconnect.h"
+#include "suites/S10_Registry/shards/SovereignLatticeRegistry.h"
+#include "suites/S20_Interconnect/shards/SovereignInterconnect.h"
 
 /* 33-Suite Orchestration Entry Points */
 extern void S01_Genesis_Register(void);

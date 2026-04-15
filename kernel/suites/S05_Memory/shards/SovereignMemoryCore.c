@@ -1,5 +1,5 @@
 ﻿#include "sigma_base.h"
-#include "SovereignInterconnect.h"
+#include "suites/S20_Interconnect/shards/SovereignInterconnect.h"
 
 #include "SovereignPMM.h"
 

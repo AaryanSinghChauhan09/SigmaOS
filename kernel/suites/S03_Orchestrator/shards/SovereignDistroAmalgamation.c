@@ -9,7 +9,7 @@
  */
 
 #include "sigma_kernel.h"
-#include "SovereignLatticeRegistry.h"
+#include "suites/S10_Registry/shards/SovereignLatticeRegistry.h"
 
 void SovereignDistroAmalgamation_Init(void) {
     sigma_printf("S [ABSORB]: Initiating Amalgamation of Linux Sovereignties...\n");

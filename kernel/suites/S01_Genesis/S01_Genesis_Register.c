@@ -1,6 +1,6 @@
 /* S SIGMAOS: S01_Genesis Registry */
 #include "sigma_base.h"
-#include "SovereignLatticeRegistry.h"
+#include "suites/S10_Registry/shards/SovereignLatticeRegistry.h"
 
 extern void SovereignSyscall_Init(void);
 

@@ -1,6 +1,6 @@
 /* S SIGMAOS: S14_Transcendence Registry */
 #include "sigma_base.h"
-#include "SovereignLatticeRegistry.h"
+#include "suites/S10_Registry/shards/SovereignLatticeRegistry.h"
 
 void S14_Transcendence_Register(void) {
     SovereignRegistry_Register("S14_Transcendence", 0, NULL);

@@ -1,6 +1,6 @@
 /* S SIGMAOS: S24_GlobalDebugger Registry */
 #include "sigma_base.h"
-#include "SovereignLatticeRegistry.h"
+#include "suites/S10_Registry/shards/SovereignLatticeRegistry.h"
 
 void S24_GlobalDebugger_Register(void) {
     SovereignRegistry_Register("S24_GlobalDebugger", 0, NULL);

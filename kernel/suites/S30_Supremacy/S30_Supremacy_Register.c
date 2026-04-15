@@ -1,6 +1,6 @@
 /* S SIGMAOS: S30_Supremacy Registry */
 #include "sigma_base.h"
-#include "SovereignLatticeRegistry.h"
+#include "suites/S10_Registry/shards/SovereignLatticeRegistry.h"
 
 void S30_Supremacy_Register(void) {
     SovereignRegistry_Register("S30_Supremacy", 0, NULL);

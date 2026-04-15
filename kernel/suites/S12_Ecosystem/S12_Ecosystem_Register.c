@@ -1,6 +1,6 @@
 /* S SIGMAOS: S12_Ecosystem Registry */
 #include "sigma_base.h"
-#include "SovereignLatticeRegistry.h"
+#include "suites/S10_Registry/shards/SovereignLatticeRegistry.h"
 
 extern void ecosystem_consensus_init(void);
 

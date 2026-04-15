@@ -8,7 +8,7 @@
  */
 
 #include "sigma_base.h"
-#include "SovereignLatticeRegistry.h"
+#include "suites/S10_Registry/shards/SovereignLatticeRegistry.h"
 
 #define MAX_REG_ENTRIES 4096
 

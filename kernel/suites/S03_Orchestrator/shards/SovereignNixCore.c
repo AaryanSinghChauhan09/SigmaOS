@@ -1,5 +1,5 @@
 ﻿#include "sigma_kernel.h"
-#include "SovereignLatticeRegistry.h"
+#include "suites/S10_Registry/shards/SovereignLatticeRegistry.h"
 
 void SovereignNixCore_Init() {
     sigma_printf("S [ABSORB]: SovereignNixCore Integration Complete. Global USP Parity Secured.\n");

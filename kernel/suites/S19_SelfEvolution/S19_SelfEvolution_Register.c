@@ -1,6 +1,6 @@
 /* S SIGMAOS: S19_SelfEvolution Registry */
 #include "sigma_base.h"
-#include "SovereignLatticeRegistry.h"
+#include "suites/S10_Registry/shards/SovereignLatticeRegistry.h"
 
 void S19_SelfEvolution_Register(void) {
     SovereignRegistry_Register("S19_SelfEvolution", 0, NULL);

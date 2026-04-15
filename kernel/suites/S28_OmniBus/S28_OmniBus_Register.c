@@ -1,6 +1,6 @@
 /* S SIGMAOS: S28_OmniBus Registry */
 #include "sigma_base.h"
-#include "SovereignLatticeRegistry.h"
+#include "suites/S10_Registry/shards/SovereignLatticeRegistry.h"
 
 extern void pci_walk_lattice(void);
 extern void pru_drone_init(void);

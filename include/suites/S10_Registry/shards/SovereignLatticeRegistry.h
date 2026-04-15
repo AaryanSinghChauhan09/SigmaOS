@@ -1,4 +1,4 @@
-﻿/*
+/*
  * =========================================================================
  * S SIGMAOS: SOVEREIGN SHARD REGISTRY (v2.0)
  * =========================================================================
@@ -58,4 +58,4 @@ sigma_err_t SovereignRegistry_Register(const char* name, shard_category_t cat, s
 void SovereignRegistry_Finalize(void);
 void SovereignRegistry_Audit(void);
 
-#endif /* SOVEREIGN_REGISTRY_H */
+#endif /* SOVEREIGN_LATTICE_REGISTRY_H */

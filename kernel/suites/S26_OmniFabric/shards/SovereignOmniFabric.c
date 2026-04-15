@@ -8,7 +8,7 @@
  */
 
 #include "sigma_base.h"
-#include "SovereignLatticeRegistry.h"
+#include "suites/S10_Registry/shards/SovereignLatticeRegistry.h"
 
 #define OMNIFABRIC_QUEUE_SIZE 4096
 

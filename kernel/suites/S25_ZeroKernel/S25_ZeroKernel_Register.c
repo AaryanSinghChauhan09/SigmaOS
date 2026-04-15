@@ -1,6 +1,6 @@
 /* S SIGMAOS: S25_ZeroKernel Registry */
 #include "sigma_base.h"
-#include "SovereignLatticeRegistry.h"
+#include "suites/S10_Registry/shards/SovereignLatticeRegistry.h"
 
 extern void isa_emulator_init(void);
 

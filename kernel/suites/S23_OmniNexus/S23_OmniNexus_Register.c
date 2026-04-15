@@ -1,6 +1,6 @@
 /* S SIGMAOS: S23_OmniNexus Registry */
 #include "sigma_base.h"
-#include "SovereignLatticeRegistry.h"
+#include "suites/S10_Registry/shards/SovereignLatticeRegistry.h"
 
 void S23_OmniNexus_Register(void) {
     SovereignRegistry_Register("S23_OmniNexus", 0, NULL);

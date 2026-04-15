@@ -1,4 +1,4 @@
-﻿/*
+/*
  * =========================================================================
  * S SIGMAOS: SOVEREIGN COMMON SHARD (v2.0 — PRIORITY DEFINES)
  * =========================================================================
@@ -11,6 +11,7 @@
 
 /* ── Priority Core Types (must be first) ──────────────────────────────── */
 typedef unsigned long long sigma_sz_t;
+typedef sigma_sz_t         sigma_size_t;
 typedef signed long long   sigma_ssz_t;
 typedef signed int         sigma_err_t;
 

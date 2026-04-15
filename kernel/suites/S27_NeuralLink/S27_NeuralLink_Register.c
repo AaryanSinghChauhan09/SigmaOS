@@ -1,6 +1,6 @@
 /* S SIGMAOS: S27_NeuralLink Registry */
 #include "sigma_base.h"
-#include "SovereignLatticeRegistry.h"
+#include "suites/S10_Registry/shards/SovereignLatticeRegistry.h"
 
 void S27_NeuralLink_Register(void) {
     SovereignRegistry_Register("S27_NeuralLink", 0, NULL);
