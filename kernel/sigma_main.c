@@ -32,6 +32,7 @@
 #include "kernel/suites/S19_Parallelism/shards/sigma_gcd.h"
 #include "kernel/suites/S20_Interconnect/shards/sigma_interconnect.h"
 #include "kernel/suites/S21_Userland/shards/sigma_shell.h"
+#include "kernel/suites/S22_IPC/shards/sigma_ipc.h"
 #include "userland/init/sigma_init.h"
 #include "userland/ipc/sigma_ipc.h"
 #include "userland/proc/sigma_proc.h"
@@ -144,9 +145,9 @@ static void sigma_userspace_phase(void) {
     sigma_vfs_mkdir("/run",   0755);
     sigma_vfs_mkdir("/home",  0755);
 
-    /* IPC */
+    /* S22 Sovereign IPC */
     sigma_ipc_init();
-
+    
     /* Process manager */
     sigma_proc_init();
 
@@ -182,7 +183,7 @@ static void sigma_final_report(void) {
     sigma_printf("\n");
     sigma_printf("Σ ══════════════════════════════════════════════════════\n");
     sigma_printf("  SIGMAOS SOVEREIGN v4.0 — SYSTEM UP\n");
-    sigma_printf("  21 Suites | GIV Verified | PQC Hardened | Neural-Driven\n");
+    sigma_printf("  22 Suites | GIV Verified | PQC Hardened | Neural-Driven\n");
     sigma_printf("Σ ══════════════════════════════════════════════════════\n\n");
 
     sigma_boot_report();
