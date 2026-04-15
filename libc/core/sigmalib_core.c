@@ -10,7 +10,7 @@
 // Result: 5-10x performance gain for standard C applications.
 // =============================================================================
 
-#include <sigma_types.h>
+#include "suites/S01_Genesis/shards/sigma_types.h"
 
 
 // ── Memory Primitives ────────────────────────────────────────────────────────

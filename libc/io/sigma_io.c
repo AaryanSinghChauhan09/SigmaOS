@@ -4,7 +4,7 @@
  * =========================================================================
  */
 
-#include "sigma_libc.h"
+#include "suites/S01_Genesis/shards/sigma_libc.h"
 
 void sigma_print(const char* str) {
     if (!str) return;

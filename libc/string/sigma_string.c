@@ -4,7 +4,7 @@
  * =========================================================================
  */
 
-#include "sigma_libc.h"
+#include "suites/S01_Genesis/shards/sigma_libc.h"
 
 sigma_sz_t sigma_strlen(const char* s) {
     if (!s) return 0;
