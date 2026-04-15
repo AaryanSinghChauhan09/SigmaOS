@@ -17,6 +17,12 @@
 #ifndef SIGMAOS_SIGMA_TYPES_H
 #define SIGMAOS_SIGMA_TYPES_H
 
+/* Architecture-natural word sizes (pointer-compatible). */
+typedef unsigned long long sigma_uptr;   /* holds a pointer as integer    */
+typedef signed   long long sigma_iptr;   /* signed pointer-size integer   */
+typedef unsigned long long sigma_size_t; /* size of an object in bytes    */
+typedef signed   long long sigma_ssize_t;/* signed size (for error codes) */
+
 /* Boolean */
 typedef unsigned char      sigma_bool;
 #define SIGMA_TRUE  ((sigma_bool)1)
@@ -34,12 +40,6 @@ typedef unsigned int       sigma_u32;
 typedef signed   int       sigma_i32;
 typedef unsigned long long sigma_u64;
 typedef signed   long long sigma_i64;
-
-/* Architecture-natural word sizes (pointer-compatible). */
-typedef sigma_u64          sigma_uptr;   /* holds a pointer as integer    */
-typedef sigma_i64          sigma_iptr;   /* signed pointer-size integer   */
-typedef sigma_u64          sigma_size_t; /* size of an object in bytes    */
-typedef sigma_i64          sigma_ssize_t;/* signed size (for error codes) */
 
 /* Industrial Standard Aliases (Optional Host Compatibility) */
 #ifndef SIGMA_EXCLUDE_STD_ALIASES
@@ -69,7 +69,6 @@ typedef sigma_size_t       size_t;      /* industrial standard alias     */
 #endif
 
 #endif /* SIGMA_EXCLUDE_STD_ALIASES */
-
 
 /* Null pointer. */
 #define SIGMA_NULL ((void*)0)
@@ -138,4 +137,3 @@ typedef __builtin_va_list  sigma_va_list;
 #define sigma_va_end(ap)         __builtin_va_end(ap)
 
 #endif /* SIGMAOS_SIGMA_TYPES_H */
-
