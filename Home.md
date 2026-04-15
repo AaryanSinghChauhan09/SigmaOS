@@ -1,4 +1,7 @@
-# SigmaOS Sovereign — THE FACTUAL RECORD (v33.1)
+# SigmaOS Sovereign — THE FACTUAL RECORD (v4.0 Finality)
+
+- **[PROJECT_STATUS.md](PROJECT_STATUS.md)**: Current Enclosure Status and Supremacy Metrics.
+- **[MODULAR_REGISTRY_SPEC.md](MODULAR_REGISTRY_SPEC.md)**: Absolute Guide to Shard Registration and GIV.
 
 Welcome to the definitive, fact-only repository for SigmaOS. This wiki contains strictly verifiable technical specifications, competitive audits, and structural maps.
 
