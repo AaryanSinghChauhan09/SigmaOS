@@ -3,17 +3,30 @@ CompileFlags:
     - "-xc"
     - "-std=c11"
     - "-D__SIGMAOS__"
+    - "-DSIGMA_EXCLUDE_STD_ALIASES"
     - "-Iinclude"
     - "-Ilibc"
     - "-ffreestanding"
-    - "-nostdinc"
+    - "-fno-builtin"
     - "-Wall"
     - "-Wno-unknown-attributes"
+    - "-Wno-typedef-redefinition"
+    - "-Wno-builtin-requires-header"
+  # Do NOT use -nostdinc here: it prevents clangd from resolving
+  # its own builtins and system headers when editing standalone files.
 
 Diagnostics:
-  Suppress: 
-    - "main_file_recursive_preamble"
+  Suppress:
     - "pp_file_not_found"
+    - "drv_unknown_argument"
+    - "typedef_redefinition"
+    - "incompatible_library_redeclaration"
+  # The recursive preamble error on stdint.h only appears when the
+  # user opens that system file directly — close that tab to clear it.
+  UnusedIncludes: None
 
 Index:
   Background: Build
+
+InlayHints:
+  Enabled: false
