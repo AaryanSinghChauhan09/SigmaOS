@@ -35,6 +35,12 @@ typedef signed   int       sigma_i32;
 typedef unsigned long long sigma_u64;
 typedef signed   long long sigma_i64;
 
+/* Architecture-natural word sizes (pointer-compatible). */
+typedef sigma_u64          sigma_uptr;   /* holds a pointer as integer    */
+typedef sigma_i64          sigma_iptr;   /* signed pointer-size integer   */
+typedef sigma_u64          sigma_size_t; /* size of an object in bytes    */
+typedef sigma_i64          sigma_ssize_t;/* signed size (for error codes) */
+
 /* Industrial Standard Aliases (Optional Host Compatibility) */
 #ifndef SIGMA_EXCLUDE_STD_ALIASES
 #ifndef _STDINT_H
@@ -64,11 +70,6 @@ typedef sigma_size_t       size_t;      /* industrial standard alias     */
 
 #endif /* SIGMA_EXCLUDE_STD_ALIASES */
 
-/* Architecture-natural word sizes (pointer-compatible). */
-typedef sigma_u64          sigma_uptr;   /* holds a pointer as integer    */
-typedef sigma_i64          sigma_iptr;   /* signed pointer-size integer   */
-typedef sigma_u64          sigma_size_t; /* size of an object in bytes    */
-typedef sigma_i64          sigma_ssize_t;/* signed size (for error codes) */
 
 /* Null pointer. */
 #define SIGMA_NULL ((void*)0)
