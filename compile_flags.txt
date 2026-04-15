@@ -13,7 +13,7 @@
 -Wno-builtin-requires-header
 -Wno-unknown-attributes
 -nostdinc
--include include/SovereignPurity.h
+-include suites/S25_ZeroKernel/shards/SovereignPurity.h
 -fms-extensions
 
 
