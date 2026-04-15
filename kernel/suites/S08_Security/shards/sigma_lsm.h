@@ -1,4 +1,4 @@
-﻿/*
+/*
  * =========================================================================
  * S SIGMAOS kernel/suites/S08_Security/shards/sigma_lsm.h
  * =========================================================================
@@ -14,14 +14,12 @@
 #ifndef SIGMA_LSM_H
 #define SIGMA_LSM_H
 
-typedef unsigned int  lsm_u32;
-typedef signed   int  lsm_i32;
-typedef unsigned char lsm_u8;
-typedef unsigned char lsm_bool;
-#define LSM_TRUE  ((lsm_bool)1)
-#define LSM_FALSE ((lsm_bool)0)
-#define LSM_ALLOW ((lsm_i32) 0)
-#define LSM_DENY  ((lsm_i32)-1)
+#include "suites/S01_Genesis/shards/sigma_types.h"
+
+#define LSM_TRUE  ((sigma_bool)1)
+#define LSM_FALSE ((sigma_bool)0)
+#define LSM_ALLOW ((sigma_i32)0)
+#define LSM_DENY  ((sigma_i32)-1)
 
 /* ── Security labels ─────────────────────────────────────────────────────── */
 #define LSM_LABEL_LEN 128
@@ -57,14 +55,14 @@ typedef struct {
 
 /* ── Permission context per process ─────────────────────────────────────── */
 typedef struct {
-    lsm_u32       pid;
+    sigma_u32       pid;
     sigma_label_t label;
     unsigned long long caps_effective;  /* effective capability set      */
     unsigned long long caps_permitted;  /* permitted capability set      */
-    lsm_u32       pledge_mask;          /* OpenBSD pledge flags          */
-    lsm_bool      selinux_enforcing;
-    lsm_bool      apparmor_confined;
-    lsm_bool      unveil_locked;        /* unveil() called with NULL     */
+    sigma_u32       pledge_mask;          /* OpenBSD pledge flags          */
+    sigma_bool      selinux_enforcing;
+    sigma_bool      apparmor_confined;
+    sigma_bool      unveil_locked;        /* unveil() called with NULL     */
 } sigma_security_ctx_t;
 
 /* ── LSM hook return codes ───────────────────────────────────────────────── */
@@ -76,12 +74,12 @@ typedef enum {
 
 /* ── Hook table (Linux LSM hook structure parity) ─────────────────────────── */
 typedef struct {
-    lsm_hook_result_t (*process_create)(lsm_u32 parent_pid, const char *cmd);
-    lsm_hook_result_t (*file_open)(lsm_u32 pid, const char *path, lsm_u32 flags);
-    lsm_hook_result_t (*file_write)(lsm_u32 pid, const char *path);
-    lsm_hook_result_t (*net_connect)(lsm_u32 pid, lsm_u32 dst_ip, lsm_u32 port);
-    lsm_hook_result_t (*syscall)(lsm_u32 pid, lsm_u32 syscall_num);
-    lsm_hook_result_t (*capability)(lsm_u32 pid, unsigned long long cap);
+    lsm_hook_result_t (*process_create)(sigma_u32 parent_pid, const char *cmd);
+    lsm_hook_result_t (*file_open)(sigma_u32 pid, const char *path, sigma_u32 flags);
+    lsm_hook_result_t (*file_write)(sigma_u32 pid, const char *path);
+    lsm_hook_result_t (*net_connect)(sigma_u32 pid, sigma_u32 dst_ip, sigma_u32 port);
+    lsm_hook_result_t (*syscall)(sigma_u32 pid, sigma_u32 syscall_num);
+    lsm_hook_result_t (*capability)(sigma_u32 pid, unsigned long long cap);
 } sigma_lsm_hooks_t;
 
 #define SIGMA_LSM_MAX_PROCS 512
@@ -91,17 +89,17 @@ void       sigma_lsm_init(void);
 void       sigma_lsm_register_hooks(sigma_lsm_hooks_t *hooks);
 
 /* Context management */
-lsm_i32    sigma_lsm_ctx_create(lsm_u32 pid, const char *domain);
-void       sigma_lsm_ctx_destroy(lsm_u32 pid);
-lsm_i32    sigma_lsm_set_caps(lsm_u32 pid, unsigned long long caps);
-lsm_i32    sigma_lsm_pledge(lsm_u32 pid, lsm_u32 pledge_mask);
-void       sigma_lsm_unveil(lsm_u32 pid, const char *path, const char *perms);
+sigma_i32    sigma_lsm_ctx_create(sigma_u32 pid, const char *domain);
+void       sigma_lsm_ctx_destroy(sigma_u32 pid);
+sigma_i32    sigma_lsm_set_caps(sigma_u32 pid, unsigned long long caps);
+sigma_i32    sigma_lsm_pledge(sigma_u32 pid, sigma_u32 pledge_mask);
+void       sigma_lsm_unveil(sigma_u32 pid, const char *path, const char *perms);
 
 /* Access checks (called from syscall dispatcher) */
-lsm_i32    sigma_lsm_check_file_open(lsm_u32 pid, const char *path, lsm_u32 flags);
-lsm_i32    sigma_lsm_check_net(lsm_u32 pid, lsm_u32 dst_ip, lsm_u32 port);
-lsm_i32    sigma_lsm_check_syscall(lsm_u32 pid, lsm_u32 nr);
-lsm_i32    sigma_lsm_check_cap(lsm_u32 pid, unsigned long long needed_cap);
+sigma_i32    sigma_lsm_check_file_open(sigma_u32 pid, const char *path, sigma_u32 flags);
+sigma_i32    sigma_lsm_check_net(sigma_u32 pid, sigma_u32 dst_ip, sigma_u32 port);
+sigma_i32    sigma_lsm_check_syscall(sigma_u32 pid, sigma_u32 nr);
+sigma_i32    sigma_lsm_check_cap(sigma_u32 pid, unsigned long long needed_cap);
 
 /* Audit log */
 void       sigma_lsm_audit_dump(void);
