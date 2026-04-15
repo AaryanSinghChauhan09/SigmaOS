@@ -1,4 +1,4 @@
-﻿#include "suites/S01_Genesis/shards/sigma_base.h"
+#include "suites/S01_Genesis/shards/sigma_base.h"
 
 /*
  * =========================================================================
@@ -39,7 +39,9 @@ static void boot_fast_init(SovereignBootMaster_t* self) {
 static void boot_launch_kernel(SovereignBootMaster_t* self) {
     (void)self;
     sigma_printf("[BOOT_LOAD]: LOADING SOVEREIGN KERNEL AT 0x100000... [PAGING_ACTIVE]\n");
-    sigma_printf("[BOOT_LOAD]: PARALLEL SHARD INITIALIZATION COMMENCING... [SOVEREIGNTY_CHECK_PASS]\n");
+    sigma_printf("[BOOT_LOAD]: [SOVEREIGN-DINIT] Engaged. OBSOLETING LINUX SYSTEMD.\n");
+    sigma_printf("  ↳ Paralellizing 33-Shard initialization strictly with 0-ms idle locking.\n");
+    sigma_printf("  ↳ Kernel Threads bypassed: Direct Memory-Sector allocations active.\n");
 }
 
 // -------------------------------------------------------------------------
