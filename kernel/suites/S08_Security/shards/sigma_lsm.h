@@ -27,8 +27,8 @@
 typedef struct {
     char  domain[LSM_LABEL_LEN];   /* e.g. "sigma_browser_t"            */
     char  type[LSM_LABEL_LEN];     /* e.g. "sigma_config_t"             */
-    lsm_u32 sensitivity;           /* MLS level (0=unclassified)        */
-    lsm_u32 integrity;             /* Biba-style integrity level        */
+    sigma_u32 sensitivity;           /* MLS level (0=unclassified)        */
+    sigma_u32 integrity;             /* Biba-style integrity level        */
 } sigma_label_t;
 
 /* ── Capability bits (Linux CAP_* parity) ───────────────────────────────── */
