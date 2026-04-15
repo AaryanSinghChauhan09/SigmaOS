@@ -1,6 +1,6 @@
 /*
  * =========================================================================
- * Σ SIGMAOS: SOVEREIGN SHARD REGISTRY (v1.0)
+ * Σ SIGMAOS: SOVEREIGN SHARD REGISTRY (v2.0)
  * =========================================================================
  * Mission: Dynamic management and auditing of all kernel shards.
  * Design: Zero-Dependency / C11 / High-Performance Registry.
@@ -10,13 +10,16 @@
 #ifndef SOVEREIGN_REGISTRY_H
 #define SOVEREIGN_REGISTRY_H
 
-#include "sigma_types.h"
+/* Directly include the base primitives to bypass orchestrator latency */
+typedef unsigned long long sigma_u64;
+typedef unsigned int       sigma_u32;
+typedef signed int         sigma_err_t;
 
 #define MAX_SHARDS 1024
 #define SHARD_NAME_MAX 64
 
 typedef enum {
-    SHARD_CAT_CORE,     /* VFS, MM, SCHED */
+    SHARD_CAT_CORE,     /* S01-S05: VFS, MM, SCHED */
     SHARD_CAT_DISTRO,   /* Nix, Arch, Gentoo Absorption */
     SHARD_CAT_SECURITY, /* PQC, LSM, Enclaves */
     SHARD_CAT_PLATFORM, /* Android, Windows, macOS Parity */
