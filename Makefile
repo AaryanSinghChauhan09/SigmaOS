@@ -88,8 +88,8 @@ sigma_zenith.bin: kernel/boot.o $(SHARDS)
 # Independent Sovereign Web Engine (Pillar 3/Userland Bridge)
 # ---------------------------------------------------------------------------
 web-engine:
-	@echo "Σ [BUILD]: Compiling modular System-Level C Web Engine..."
-	@$(CC) -std=c11 kernel/SovereignHTTPServer.c kernel/net/sigma_network.c kernel/net/sigma_http.c -I./include -o sigma_web_engine -lws2_32 2>/dev/null || $(CC) -std=c11 kernel/SovereignHTTPServer.c kernel/net/sigma_network.c kernel/net/sigma_http.c -I./include -o sigma_web_engine
+	@echo "Σ [BUILD]: Compiling modular System-Level C Web Engine (Network + HTTP + VFS)..."
+	@$(CC) -std=c11 kernel/SovereignHTTPServer.c kernel/net/sigma_network.c kernel/net/sigma_http.c kernel/fs/sigma_vfs.c -I./include -o sigma_web_engine -lws2_32 2>/dev/null || $(CC) -std=c11 kernel/SovereignHTTPServer.c kernel/net/sigma_network.c kernel/net/sigma_http.c kernel/fs/sigma_vfs.c -I./include -o sigma_web_engine
 
 # ---------------------------------------------------------------------------
 # Utility targets

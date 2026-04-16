@@ -1,5 +1,6 @@
 #include "../../include/sigma_http.h"
 #include "../../include/sigma_network.h"
+#include "../../include/sigma_vfs.h"
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -39,33 +40,19 @@ void sigma_http_send_200(int client_socket, const char* ctype, long fsize, const
 }
 
 void sigma_route_static_file(int client_socket, const char* request_path) {
-    char full_path[1024] = "../web_ui/";
-    
-    if (strcmp(request_path, "/") == 0) {
-        strcat(full_path, "index.html");
-    } else {
-        strcat(full_path, request_path + 1);
-    }
-
-    FILE* file = fopen(full_path, "rb");
-    if (!file) {
+    char full_path[1024];
+    if (!sigma_vfs_resolve_path(request_path, full_path, sizeof(full_path))) {
         sigma_http_send_404(client_socket);
         return;
     }
 
-    fseek(file, 0, SEEK_END);
-    long fsize = ftell(file);
-    fseek(file, 0, SEEK_SET);
-
-    char* content = (char*)malloc(fsize + 1);
+    long fsize = 0;
+    char* content = sigma_vfs_read_file(full_path, &fsize);
+    
     if (!content) {
         sigma_http_send_404(client_socket);
-        fclose(file);
         return;
     }
-
-    fread(content, 1, fsize, file);
-    fclose(file);
 
     const char* ctype = sigma_http_get_content_type(full_path);
     sigma_http_send_200(client_socket, ctype, fsize, content);
