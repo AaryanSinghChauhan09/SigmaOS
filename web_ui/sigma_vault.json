@@ -9,11 +9,51 @@
             "status": "dormant"
         },
         {
+            "id": "sv-wayland-compositor",
+            "name": "Wayland Compositor",
+            "description": "Legacy graphics rendering protocol. Made obsolete by Sigma Web-Engine.",
+            "category": "Graphics (Legacy)",
+            "size_mb": 85,
+            "status": "dormant"
+        },
+        {
             "id": "sv-systemd-bloat",
             "name": "Systemd Init Wrapper",
             "description": "Massive monolithic initialization suite. Replaced natively by Sigma kmain.",
             "category": "Core (Legacy)",
             "size_mb": 45,
+            "status": "dormant"
+        },
+        {
+            "id": "sv-selinux",
+            "name": "SELinux Security Module",
+            "description": "Obsolete kernel security module. Replaced by Sovereign 33-Suite isolated matrix.",
+            "category": "Security",
+            "size_mb": 60,
+            "status": "dormant"
+        },
+        {
+            "id": "sv-ebpf",
+            "name": "eBPF Tracing Subsystem",
+            "description": "Legacy Linux kernel-tracing sandbox. Emulated for historic diagnostics.",
+            "category": "Telemetry",
+            "size_mb": 25,
+            "status": "dormant"
+        },
+        {
+            "id": "sv-kvm-hypervisor",
+            "name": "KVM Hypervisor Module",
+            "description": "Torvalds' virtualization standard. Sandboxed here for reverse compatibility.",
+            "category": "Virtualization",
+            "size_mb": 142,
+            "status": "dormant"
+        },
+        {
+            "id": "sv-docker-daemon",
+            "name": "Docker / Containerd Daemon",
+            "description": "Legacy container management. Irrelevant due to Sigma Native Agent Sandboxing.",
+            "category": "Virtualization",
+            "size_mb": 90,
             "status": "dormant"
         },
         {
@@ -25,11 +65,35 @@
             "status": "dormant"
         },
         {
+            "id": "sv-v4l2",
+            "name": "Video4Linux (V4L2)",
+            "description": "Monolithic webcam/capture APIs. Replaced by Sigma hardware endpoints.",
+            "category": "Drivers (Legacy)",
+            "size_mb": 18,
+            "status": "dormant"
+        },
+        {
+            "id": "sv-drm-kms",
+            "name": "DRM/KMS Graphics Drivers",
+            "description": "Direct Rendering Manager API sets. Maintained exclusively for raw hardware bootstrapping.",
+            "category": "Drivers",
+            "size_mb": 310,
+            "status": "dormant"
+        },
+        {
             "id": "sv-floppy-tape",
             "name": "Floppy & Magnetic Tape Drivers",
             "description": "Drivers for hardware that hasn't existed in 30 years.",
             "category": "Drivers (Obsolete)",
             "size_mb": 4,
+            "status": "dormant"
+        },
+        {
+            "id": "sv-scsi-cdrom",
+            "name": "SCSI / CD-ROM Optics",
+            "description": "Legacy spinning-disc storage controller logic.",
+            "category": "Storage",
+            "size_mb": 38,
             "status": "dormant"
         },
         {
@@ -41,11 +105,43 @@
             "status": "dormant"
         },
         {
+            "id": "sv-btrfs",
+            "name": "BTRFS File System",
+            "description": "Copy-on-write filesystem framework. Preserved for legacy Torvalds integration.",
+            "category": "Storage",
+            "size_mb": 75,
+            "status": "dormant"
+        },
+        {
+            "id": "sv-tcpip-legacy",
+            "name": "Legacy TCP/IP Kernel Stack",
+            "description": "Bloated Linux networking APIs. Kept for packet-routing emulation.",
+            "category": "Networking",
+            "size_mb": 156,
+            "status": "dormant"
+        },
+        {
             "id": "sv-network-manager",
             "name": "NetworkManager Daemon",
             "description": "Slow DBus driven internet protocol configuration.",
             "category": "Networking",
             "size_mb": 22,
+            "status": "dormant"
+        },
+        {
+            "id": "sv-bluetooth-bluez",
+            "name": "BlueZ Bluetooth Stack",
+            "description": "Classic torvalds repository for BT bridging.",
+            "category": "Networking",
+            "size_mb": 40,
+            "status": "dormant"
+        },
+        {
+            "id": "sv-posix-wrapper",
+            "name": "GNU POSIX Subsystem",
+            "description": "Complete emulation wrapper to ensure old C applications can talk to SigmaOS.",
+            "category": "Core (Legacy)",
+            "size_mb": 210,
             "status": "dormant"
         }
     ]
