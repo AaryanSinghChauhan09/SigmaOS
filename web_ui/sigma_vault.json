@@ -1,0 +1,52 @@
+{
+    "packages": [
+        {
+            "id": "sv-legacy-x11",
+            "name": "Legacy X11 Display Server",
+            "description": "The obsolete monolithic Unix windowing system.",
+            "category": "Graphics (Legacy)",
+            "size_mb": 110,
+            "status": "dormant"
+        },
+        {
+            "id": "sv-systemd-bloat",
+            "name": "Systemd Init Wrapper",
+            "description": "Massive monolithic initialization suite. Replaced natively by Sigma kmain.",
+            "category": "Core (Legacy)",
+            "size_mb": 45,
+            "status": "dormant"
+        },
+        {
+            "id": "sv-alsa-audio",
+            "name": "ALSA Audio Pipelining",
+            "description": "Torvalds' linux sound architecture setup.",
+            "category": "Drivers (Legacy)",
+            "size_mb": 12,
+            "status": "dormant"
+        },
+        {
+            "id": "sv-floppy-tape",
+            "name": "Floppy & Magnetic Tape Drivers",
+            "description": "Drivers for hardware that hasn't existed in 30 years.",
+            "category": "Drivers (Obsolete)",
+            "size_mb": 4,
+            "status": "dormant"
+        },
+        {
+            "id": "sv-ext4-journal",
+            "name": "Ext4 File System",
+            "description": "Legacy Journaled filesystem, replaced by native SigmaFS arrays.",
+            "category": "Storage",
+            "size_mb": 8,
+            "status": "dormant"
+        },
+        {
+            "id": "sv-network-manager",
+            "name": "NetworkManager Daemon",
+            "description": "Slow DBus driven internet protocol configuration.",
+            "category": "Networking",
+            "size_mb": 22,
+            "status": "dormant"
+        }
+    ]
+}

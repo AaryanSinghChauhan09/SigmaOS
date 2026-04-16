@@ -303,6 +303,45 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
+    // Pillar 5: Sigma Vault (App Store) Loader
+    const vaultContainer = document.querySelector('.vault-container');
+    if (vaultContainer) {
+        fetch('/sigma_vault.json')
+            .then(res => res.json())
+            .then(data => {
+                data.packages.forEach(pkg => {
+                    const card = document.createElement('div');
+                    card.style.cssText = `
+                        background: rgba(20, 20, 25, 0.7);
+                        border: 1px solid var(--glass-border);
+                        border-radius: 12px;
+                        padding: 15px;
+                        display: flex;
+                        flex-direction: column;
+                        justify-content: space-between;
+                        transition: all 0.3s ease;
+                        cursor: pointer;
+                    `;
+                    card.onmouseover = () => card.style.borderColor = 'var(--acc-magenta)';
+                    card.onmouseout = () => card.style.borderColor = 'var(--glass-border)';
+
+                    card.innerHTML = `
+                        <div>
+                            <div style="font-size:0.8rem; color:var(--acc-cyan); margin-bottom:5px;">${pkg.category}</div>
+                            <div style="font-weight:bold; font-size:1.1rem; margin-bottom:10px;">${pkg.name}</div>
+                            <div style="font-size:0.85rem; color:var(--text-muted); line-height:1.4;">${pkg.description}</div>
+                        </div>
+                        <div style="display:flex; justify-content:space-between; align-items:center; margin-top:20px;">
+                            <span style="font-size:0.8rem; color:var(--glass-border);">[ ${pkg.size_mb} MB ]</span>
+                            <button class="sys-btn glow-cyan" onclick="this.textContent = 'Installing...'; setTimeout(() => this.textContent = 'Emulating', 1500);" style="padding: 5px 15px; font-size:0.8rem;">EMULATE</button>
+                        </div>
+                    `;
+                    vaultContainer.appendChild(card);
+                });
+            })
+            .catch(err => console.log('Vault DB offline.'));
+    }
+
     /* ==============================================================
      * CLI MODE: SOVEREIGN SHELL
      * ============================================================== */
