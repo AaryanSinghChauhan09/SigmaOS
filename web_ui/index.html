@@ -118,6 +118,24 @@
                                     <input type="text" class="cli-input-box chat-input" id="agent-input" placeholder="Instruct the agent..." />
                                 </div>
                             </div>
+                            
+                            <div class="ai-segment">
+                                <h3 class="segment-title">Browser-Use Autopilot</h3>
+                                <div class="toggle-row">
+                                    <span>Target Web Engine: </span>
+                                    <select class="ai-select inline-select">
+                                        <option>Local Open-Source Chromium</option>
+                                        <option selected>Browser Use Cloud (Stealth + Captcha)</option>
+                                    </select>
+                                </div>
+                                <div class="task-input-container">
+                                    <textarea id="bu-task-input" class="cli-input-box" rows="2" placeholder="Task: 'Find the number of stars of the browser-use repo'"></textarea>
+                                    <button id="btn-bu-start" class="cyber-btn small-btn">INITIATE AGENT</button>
+                                </div>
+                                <div id="bu-status-log" class="chat-log sim-log">
+                                    <div class="chat-msg" style="color:var(--text-muted)">Agent awaiting task directive...</div>
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </div>

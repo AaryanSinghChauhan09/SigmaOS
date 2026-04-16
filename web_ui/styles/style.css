@@ -635,6 +635,42 @@ body {
     background: rgba(0,0,0,0.6) !important;
 }
 
+/* Browser Use Overhaul */
+.inline-select {
+    width: auto;
+    display: inline-block;
+    padding: 4px;
+    margin-left: 10px;
+}
+
+.toggle-row {
+    display: flex;
+    align-items: center;
+    margin-bottom: 15px;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+}
+
+.task-input-container {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+textarea.cli-input-box {
+    resize: none;
+    padding: 10px;
+    border: 1px solid var(--glass-border);
+    border-radius: 4px;
+    background: rgba(0,0,0,0.4);
+}
+
+.sim-log {
+    height: 90px;
+    margin-top: 10px;
+    border: 1px inset rgba(255, 255, 255, 0.1);
+}
+
 /* Right Wing */
 .right-wing {
     display: flex;

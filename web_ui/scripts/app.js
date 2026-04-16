@@ -180,6 +180,37 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
+    // Browser-Use Sim Logic
+    const buTaskInput = document.getElementById('bu-task-input');
+    const buStatusLog = document.getElementById('bu-status-log');
+    const btnBuStart = document.getElementById('btn-bu-start');
+
+    if (btnBuStart) {
+        btnBuStart.addEventListener('click', () => {
+            const task = buTaskInput.value.trim();
+            if (!task) return;
+            
+            buStatusLog.innerHTML = `<div class="chat-msg" style="color:var(--acc-magenta)">[SYSTEM] Initialising browser-use Agent...</div>`;
+            buStatusLog.scrollTop = buStatusLog.scrollHeight;
+            buTaskInput.value = '';
+            
+            setTimeout(() => {
+                buStatusLog.innerHTML += `<div class="chat-msg" style="color:var(--text-primary)">[AGENT] Spawning stealth browser session via Cloud...</div>`;
+                buStatusLog.scrollTop = buStatusLog.scrollHeight;
+            }, 800);
+            
+            setTimeout(() => {
+                buStatusLog.innerHTML += `<div class="chat-msg ai">[ACTION] Executing DOM evaluations for heuristic task: "${task}"...</div>`;
+                buStatusLog.scrollTop = buStatusLog.scrollHeight;
+            }, 1600);
+            
+            setTimeout(() => {
+                buStatusLog.innerHTML += `<div class="chat-msg" style="color:#27c93f">[SUCCESS] Task completed. Awaiting next command.</div>`;
+                buStatusLog.scrollTop = buStatusLog.scrollHeight;
+            }, 3200);
+        });
+    }
+
     /* ==============================================================
      * CLI MODE: SOVEREIGN SHELL
      * ============================================================== */
