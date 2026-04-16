@@ -46,9 +46,25 @@
 
     <main class="dashboard-layout">
         <section class="left-wing glass-panel">
-            <h2 class="panel-title">SOVEREIGN SUITE LATTICE</h2>
-            <div class="suite-grid" id="lattice-grid">
-                <!-- Javascript will inject 33 suites -->
+            <div class="panel-tabs">
+                <button class="tab-btn active" data-tab="lattice-view">33-SUITE LATTICE</button>
+                <button class="tab-btn" data-tab="explorer-view">SOVEREIGN EXPLORER</button>
+            </div>
+            
+            <div class="tab-content active" id="lattice-view">
+                <div class="suite-grid" id="lattice-grid">
+                    <!-- Javascript will inject 33 suites -->
+                </div>
+            </div>
+
+            <div class="tab-content" id="explorer-view">
+                <div class="explorer-header">
+                    <span id="current-path">/</span>
+                    <button id="btn-up-dir">↑ UP</button>
+                </div>
+                <div class="file-list" id="explorer-list">
+                    <!-- Files injected here -->
+                </div>
             </div>
         </section>
 
@@ -75,6 +91,16 @@
             </div>
         </section>
     </main>
+
+    <div class="modal glass-panel" id="file-modal">
+        <div class="modal-header">
+            <span id="modal-filename" class="t-title">FILE: </span>
+            <button id="btn-close-modal">✕ Close</button>
+        </div>
+        <div class="modal-body">
+            <pre><code id="file-content"></code></pre>
+        </div>
+    </div>
 
     <script src="scripts/app.js"></script>
 </body>

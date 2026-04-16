@@ -88,6 +88,77 @@ document.addEventListener('DOMContentLoaded', () => {
         document.querySelector('.holo-core').style.boxShadow = '0 0 80px var(--acc-purple), 0 0 120px var(--acc-cyan)';
     };
 
-    // Trigger boot
+    // Tab Switching
+    document.querySelectorAll('.tab-btn').forEach(btn => {
+        btn.addEventListener('click', () => {
+            document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+            document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+            btn.classList.add('active');
+            document.getElementById(btn.dataset.tab).classList.add('active');
+        });
+    });
+
+    // Explorer Logic
+    let currentPath = '/';
+    const explorerList = document.getElementById('explorer-list');
+    const pathText = document.getElementById('current-path');
+
+    async function loadDirectory(targetPath) {
+        try {
+            pathText.textContent = targetPath;
+            currentPath = targetPath;
+            explorerList.innerHTML = '<div style="color:var(--text-muted); padding:10px;">Accessing Matrix...</div>';
+            
+            const res = await fetch(`/api/fs?path=${encodeURIComponent(targetPath)}`);
+            if (!res.ok) throw new Error('Path access denied');
+            const data = await res.json();
+            
+            explorerList.innerHTML = '';
+            data.forEach(item => {
+                const row = document.createElement('div');
+                row.className = 'file-row';
+                row.innerHTML = `<span class="file-icon">${item.isDir ? '📁' : '📄'}</span><span class="file-name">${item.name}</span>`;
+                row.onclick = () => {
+                    if (item.isDir) loadDirectory(item.path);
+                    else viewFile(item.path);
+                };
+                explorerList.appendChild(row);
+            });
+        } catch (e) {
+            explorerList.innerHTML = `<div style="color:red; padding:10px;">Error: ${e.message}</div>`;
+        }
+    }
+
+    document.getElementById('btn-up-dir').onclick = () => {
+        if (currentPath === '/') return;
+        const parts = currentPath.split('/').filter(Boolean);
+        parts.pop();
+        loadDirectory('/' + parts.join('/'));
+    };
+
+    // File Viewer
+    const modal = document.getElementById('file-modal');
+    const modalClose = document.getElementById('btn-close-modal');
+    const modalFilename = document.getElementById('modal-filename');
+    const fileContent = document.getElementById('file-content');
+
+    async function viewFile(filePath) {
+        modalFilename.textContent = `FILE: ${filePath}`;
+        modal.classList.add('active');
+        fileContent.textContent = 'Loading source buffer...';
+        
+        try {
+            const res = await fetch(`/api/fs?path=${encodeURIComponent(filePath)}`);
+            const text = await res.text();
+            fileContent.textContent = text;
+        } catch (e) {
+            fileContent.textContent = `Error reading file stream.`;
+        }
+    }
+
+    modalClose.onclick = () => { modal.classList.remove('active'); };
+
+    // Trigger boot & loading root dir
     setTimeout(simulateBootProcess, 1000);
+    loadDirectory('/');
 });
