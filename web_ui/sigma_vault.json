@@ -4,24 +4,40 @@
             "id": "sv-legacy-x11",
             "name": "Legacy X11 Display Server",
             "description": "The obsolete monolithic Unix windowing system.",
-            "category": "Graphics (Legacy)",
+            "category": "Graphics",
             "size_mb": 110,
             "status": "dormant"
         },
         {
             "id": "sv-wayland-compositor",
-            "name": "Wayland Compositor",
-            "description": "Legacy graphics rendering protocol. Made obsolete by Sigma Web-Engine.",
-            "category": "Graphics (Legacy)",
+            "name": "Wayland Graphics Compositor",
+            "description": "Legacy graphics protocol. Made obsolete by Sigma Web-Engine.",
+            "category": "Graphics",
             "size_mb": 85,
+            "status": "dormant"
+        },
+        {
+            "id": "sv-mesa-3d",
+            "name": "Mesa 3D Graphics Library",
+            "description": "Obsolete 3D API matrix for Linux legacy OpenGL support.",
+            "category": "Graphics",
+            "size_mb": 420,
             "status": "dormant"
         },
         {
             "id": "sv-systemd-bloat",
             "name": "Systemd Init Wrapper",
             "description": "Massive monolithic initialization suite. Replaced natively by Sigma kmain.",
-            "category": "Core (Legacy)",
+            "category": "Core",
             "size_mb": 45,
+            "status": "dormant"
+        },
+        {
+            "id": "sv-sysvinit",
+            "name": "SysVinit Legacy Core",
+            "description": "The ancient initialization system of the 1990s.",
+            "category": "Core",
+            "size_mb": 3,
             "status": "dormant"
         },
         {
@@ -33,11 +49,27 @@
             "status": "dormant"
         },
         {
+            "id": "sv-apparmor",
+            "name": "AppArmor Profiles",
+            "description": "Secondary legacy security layer for Unix execution routing.",
+            "category": "Security",
+            "size_mb": 15,
+            "status": "dormant"
+        },
+        {
             "id": "sv-ebpf",
             "name": "eBPF Tracing Subsystem",
             "description": "Legacy Linux kernel-tracing sandbox. Emulated for historic diagnostics.",
             "category": "Telemetry",
             "size_mb": 25,
+            "status": "dormant"
+        },
+        {
+            "id": "sv-perf-tools",
+            "name": "Linux Perf Profiling",
+            "description": "Command line CPU profiling tools, absorbed by Sigma IQ Yield displays.",
+            "category": "Telemetry",
+            "size_mb": 12,
             "status": "dormant"
         },
         {
@@ -49,26 +81,50 @@
             "status": "dormant"
         },
         {
+            "id": "sv-qemu-emulator",
+            "name": "QEMU Hardware Emulator",
+            "description": "Full system emulation backend. Required by KVM plugin.",
+            "category": "Virtualization",
+            "size_mb": 280,
+            "status": "dormant"
+        },
+        {
             "id": "sv-docker-daemon",
-            "name": "Docker / Containerd Daemon",
+            "name": "Docker / Containerd Engine",
             "description": "Legacy container management. Irrelevant due to Sigma Native Agent Sandboxing.",
             "category": "Virtualization",
-            "size_mb": 90,
+            "size_mb": 190,
             "status": "dormant"
         },
         {
             "id": "sv-alsa-audio",
             "name": "ALSA Audio Pipelining",
             "description": "Torvalds' linux sound architecture setup.",
-            "category": "Drivers (Legacy)",
+            "category": "Drivers",
             "size_mb": 12,
+            "status": "dormant"
+        },
+        {
+            "id": "sv-pulseaudio",
+            "name": "PulseAudio Daemon",
+            "description": "Legacy sound server for multiplexing ALSA.",
+            "category": "Drivers",
+            "size_mb": 8,
+            "status": "dormant"
+        },
+        {
+            "id": "sv-pipewire",
+            "name": "PipeWire Multimedia Routing",
+            "description": "Modern Linux Audio/Video streams, contained in Sigma Node Hub.",
+            "category": "Drivers",
+            "size_mb": 20,
             "status": "dormant"
         },
         {
             "id": "sv-v4l2",
             "name": "Video4Linux (V4L2)",
             "description": "Monolithic webcam/capture APIs. Replaced by Sigma hardware endpoints.",
-            "category": "Drivers (Legacy)",
+            "category": "Drivers",
             "size_mb": 18,
             "status": "dormant"
         },
@@ -82,9 +138,9 @@
         },
         {
             "id": "sv-floppy-tape",
-            "name": "Floppy & Magnetic Tape Drivers",
+            "name": "Floppy & Magnetic Tape Logic",
             "description": "Drivers for hardware that hasn't existed in 30 years.",
-            "category": "Drivers (Obsolete)",
+            "category": "Drivers",
             "size_mb": 4,
             "status": "dormant"
         },
@@ -92,8 +148,16 @@
             "id": "sv-scsi-cdrom",
             "name": "SCSI / CD-ROM Optics",
             "description": "Legacy spinning-disc storage controller logic.",
-            "category": "Storage",
+            "category": "Drivers",
             "size_mb": 38,
+            "status": "dormant"
+        },
+        {
+            "id": "sv-usb-core",
+            "name": "Linux USB Core & HID",
+            "description": "Extensive USB multiplexer layers.",
+            "category": "Drivers",
+            "size_mb": 65,
             "status": "dormant"
         },
         {
@@ -113,6 +177,22 @@
             "status": "dormant"
         },
         {
+            "id": "sv-zfs-dkms",
+            "name": "ZFS Kernel Module",
+            "description": "Massive enterprise storage daemon protocol.",
+            "category": "Storage",
+            "size_mb": 115,
+            "status": "dormant"
+        },
+        {
+            "id": "sv-fat32-ntfs",
+            "name": "FAT32/NTFS-3g APIs",
+            "description": "Obsolete USB drive file system compatibility layers.",
+            "category": "Storage",
+            "size_mb": 10,
+            "status": "dormant"
+        },
+        {
             "id": "sv-tcpip-legacy",
             "name": "Legacy TCP/IP Kernel Stack",
             "description": "Bloated Linux networking APIs. Kept for packet-routing emulation.",
@@ -129,6 +209,14 @@
             "status": "dormant"
         },
         {
+            "id": "sv-iptables-nft",
+            "name": "Iptables & Nftables Firewall",
+            "description": "Torvalds' firewall protocols. Bypassed by Sigma HTTP Security Engine.",
+            "category": "Networking",
+            "size_mb": 18,
+            "status": "dormant"
+        },
+        {
             "id": "sv-bluetooth-bluez",
             "name": "BlueZ Bluetooth Stack",
             "description": "Classic torvalds repository for BT bridging.",
@@ -140,8 +228,32 @@
             "id": "sv-posix-wrapper",
             "name": "GNU POSIX Subsystem",
             "description": "Complete emulation wrapper to ensure old C applications can talk to SigmaOS.",
-            "category": "Core (Legacy)",
+            "category": "Core",
             "size_mb": 210,
+            "status": "dormant"
+        },
+        {
+            "id": "sv-glibc",
+            "name": "GNU C Library (Glibc)",
+            "description": "Massive C standard library runtime footprint.",
+            "category": "Core",
+            "size_mb": 180,
+            "status": "dormant"
+        },
+        {
+            "id": "sv-bash-shell",
+            "name": "GNU Bash Interpreter",
+            "description": "Legacy text terminal. Visualized by Sigma Sovereign Shell.",
+            "category": "Userland",
+            "size_mb": 4,
+            "status": "dormant"
+        },
+        {
+            "id": "sv-coreutils",
+            "name": "GNU Coreutils",
+            "description": "ls, cat, system utilities. Native in SigmaOS C Backend.",
+            "category": "Userland",
+            "size_mb": 16,
             "status": "dormant"
         }
     ]
