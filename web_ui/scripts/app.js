@@ -62,6 +62,19 @@ document.addEventListener('DOMContentLoaded', () => {
         log.scrollTop = log.scrollHeight;
     };
 
+    // Live Telemetry Injection (Pillar 4)
+    async function updateTelemetry() {
+        try {
+            const res = await fetch('/api/telemetry');
+            if(res.ok) {
+                const data = await res.json();
+                coverageVal.textContent = data.coverage;
+                document.querySelector('.highlight-magenta').textContent = data.iq_yield + ' PURE';
+            }
+        } catch(e) {}
+    }
+    setInterval(updateTelemetry, 2500);
+
     const simulateBootProcess = async () => {
         appendLog('Establishing C11 Absolute Purity Handshake...', 'system');
         await new Promise(r => setTimeout(r, 600));
@@ -314,9 +327,6 @@ document.addEventListener('DOMContentLoaded', () => {
                     setTimeout(simulateBootProcess, 500);
                     loadDirectory('/');
                     break;
-                case 'pwd':
-                    renderCli(`<div>${cliCurrentDir}</div><br>`);
-                    break;
                 case 'cd': {
                     let dir = args[1] || '/';
                     if (dir === '..') {
@@ -331,7 +341,6 @@ document.addEventListener('DOMContentLoaded', () => {
                         }
                         cliCurrentDir = dir;
                     }
-                    // Validate path
                     try {
                         const res = await fetch(`/api/fs?path=${encodeURIComponent(cliCurrentDir)}`);
                         if (!res.ok) {
@@ -344,41 +353,34 @@ document.addEventListener('DOMContentLoaded', () => {
                     document.querySelector('.cli-prompt').textContent = `root@sigma-zenith:${cliCurrentDir}#`;
                     break;
                 }
-                case 'ls': {
-                    let dir = args[1] || cliCurrentDir;
-                    if (!dir.startsWith('/')) dir = cliCurrentDir === '/' ? `/${dir}` : `${cliCurrentDir}/${dir}`;
-                    try {
-                        const res = await fetch(`/api/fs?path=${encodeURIComponent(dir)}`);
-                        if (!res.ok) throw new Error();
-                        const data = await res.json();
-                        let lsHtml = `<div style="display:grid; grid-template-columns:repeat(auto-fill, minmax(150px, 1fr)); gap:5px;">`;
-                        data.forEach(item => {
-                            const color = item.isDir ? 'var(--acc-cyan)' : 'white';
-                            lsHtml += `<span style="color:${color}">${item.name}${item.isDir?'/':''}</span>`;
-                        });
-                        lsHtml += `</div><br>`;
-                        renderCli(lsHtml);
-                    } catch(e) {
-                        renderCli(`<div style="color:#ff5f56">ls: cannot access '${dir}': No such file or directory</div><br>`);
-                    }
+                case 'clear':
+                    cliOutput.innerHTML = '';
                     break;
-                }
-                case 'cat': {
-                    if (!args[1]) { renderCli(`<div style="color:#ff5f56">cat: missing operand</div><br>`); break; }
-                    let file = args[1];
-                    if (!file.startsWith('/')) file = cliCurrentDir === '/' ? `/${file}` : `${cliCurrentDir}/${file}`;
-                    try {
-                        const res = await fetch(`/api/fs?path=${encodeURIComponent(file)}`);
-                        if (!res.ok) throw new Error();
-                        const text = await res.text();
-                        renderCli(`<div><pre style="white-space:pre-wrap; word-wrap:break-word;">${text.replace(/</g, '&lt;').replace(/>/g, '&gt;')}</pre></div><br>`);
-                    } catch(e) {
-                        renderCli(`<div style="color:#ff5f56">cat: ${args[1]}: No such file or directory or Server Offline</div><br>`);
-                    }
-                    break;
-                }
                 default:
-                    renderCli(`<div style="color:#ff5f56">${cmd}: command not found</div><br>`);
+                    // PILLAR 2: Run Real Native Commands
+                    try {
+                        const resp = await fetch('/api/run', {
+                            method: 'POST',
+                            body: JSON.stringify({ cmd: cmdText, cwd: cliCurrentDir })
+                        });
+                        
+                        const reader = resp.body.getReader();
+                        const decoder = new TextDecoder("utf-8");
+                        
+                        let currentLine = document.createElement('div');
+                        currentLine.style.whiteSpace = 'pre-wrap';
+                        cliOutput.appendChild(currentLine);
+                        
+                        while(true) {
+                            const { done, value } = await reader.read();
+                            if (done) break;
+                            currentLine.innerHTML += decoder.decode(value).replace(/</g, '&lt;').replace(/>/g, '&gt;');
+                            cliOutput.scrollTop = cliOutput.scrollHeight;
+                        }
+                        renderCli('<br>');
+                    } catch(e) {
+                        renderCli(`<div style="color:#ff5f56">Engine Execution Error: ${e.message}</div><br>`);
+                    }
             }
         }
     });
