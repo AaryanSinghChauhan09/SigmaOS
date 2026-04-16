@@ -751,6 +751,63 @@ textarea.cli-input-box {
 }
 @keyframes blink { 0%, 100% { opacity:1; } 50% { opacity:0; } }
 
+/* AGI Omni-Studio Features */
+.node-graph-container {
+    height: 100px;
+    background: repeating-linear-gradient(45deg, rgba(255,255,255,0.02) 0, rgba(255,255,255,0.02) 1px, transparent 1px, transparent 10px);
+    border: 1px inset var(--glass-border);
+    border-radius: 6px;
+    position: relative;
+    overflow: hidden;
+}
+
+.flow-node {
+    position: absolute;
+    background: rgba(0,0,0,0.8);
+    border: 1px solid var(--acc-cyan);
+    padding: 8px;
+    border-radius: 6px;
+    font-family: 'Outfit', sans-serif;
+    font-size: 11px;
+    font-weight: 600;
+    text-align: center;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.5);
+    z-index: 2;
+    cursor: grab;
+}
+
+.node-sub { font-size: 9px; font-family: 'JetBrains Mono', monospace; font-weight: 400; opacity: 0.7; }
+
+.flow-wire {
+    position: absolute;
+    height: 2px;
+    background: rgba(0, 240, 255, 0.4);
+    box-shadow: 0 0 5px var(--acc-cyan);
+    z-index: 1;
+}
+
+.swarm-roster {
+    display: flex;
+    justify-content: space-between;
+    gap: 10px;
+    margin-top: 10px;
+}
+
+.agent-avatar {
+    flex: 1;
+    background: rgba(255,255,255,0.02);
+    border: 1px solid rgba(255,255,255,0.1);
+    padding: 10px;
+    border-radius: 8px;
+    text-align: center;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px;
+    color: var(--text-muted);
+}
+
+.agent-avatar .avatar-icon { font-size: 24px; display: block; margin-bottom: 5px; }
+.agent-avatar .w-status { display: inline-block; margin-top: 5px; }
+
 /* Right Wing */
 .right-wing {
     display: flex;
