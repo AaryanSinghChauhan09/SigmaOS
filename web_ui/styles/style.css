@@ -671,6 +671,86 @@ textarea.cli-input-box {
     border: 1px inset rgba(255, 255, 255, 0.1);
 }
 
+/* Vertical Tabs (BrowserOS) */
+.vertical-tabs {
+    width: 65px;
+    background: rgba(5,5,10,0.85);
+    border-right: 1px solid var(--glass-border);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding-top: 25px;
+    gap: 15px;
+    z-index: 100;
+}
+
+.v-tab {
+    width: 42px; height: 42px;
+    border-radius: 10px;
+    display: flex; justify-content: center; align-items: center;
+    background: rgba(255,255,255,0.03);
+    cursor: pointer;
+    font-size: 20px;
+    color: var(--text-muted);
+    transition: all 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+.v-tab:hover {
+    background: rgba(0,240,255,0.1);
+    transform: scale(1.1);
+}
+
+.v-tab.active {
+    background: rgba(0,240,255,0.2);
+    box-shadow: var(--glow-cyan);
+    border-left: 2px solid var(--acc-cyan);
+    color: #fff;
+}
+
+/* DOM Heuristics Simulation (Browser-Use) */
+.heuristic-marker {
+    position: fixed;
+    border: 2px solid #ffbd2e;
+    background: rgba(255, 189, 46, 0.08);
+    z-index: 9999;
+    pointer-events: none;
+    box-sizing: border-box;
+    animation: flashBox 0.3s ease-out;
+}
+
+.h-label {
+    position: absolute;
+    top: -14px; left: -2px;
+    background: #ffbd2e;
+    color: #000;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px;
+    font-weight: 800;
+    padding: 1px 4px;
+    border-radius: 2px 2px 0 0;
+}
+
+@keyframes flashBox {
+    0% { transform: scale(1.02); opacity: 0; border-color: rgba(255,255,255,0.8); }
+    100% { transform: scale(1); opacity: 1; border-color: #ffbd2e; }
+}
+
+/* Bytebot Simulation */
+.muted-text { font-size:11px; margin-bottom:10px; color:var(--text-muted); }
+.bytebot-view {
+    height: 140px; background: #111; border: 1px solid var(--acc-purple); border-radius: 4px; overflow:hidden; position:relative;
+}
+.bb-topbar {
+    position:absolute; top:0; left:0; right:0; height:18px; background:#333; display:flex; align-items:center; padding:0 8px; font-size:10px; color:#fff;
+}
+.bb-terminal {
+    padding: 25px 10px 10px; color:#0f0; font-family:'JetBrains Mono', monospace; font-size:11px; height:100%;
+}
+.takeover-indicator {
+    position:absolute; top:2px; right:8px; color:#ff5f56; font-size:10px; font-weight:bold; animation: blink 1s infinite;
+}
+@keyframes blink { 0%, 100% { opacity:1; } 50% { opacity:0; } }
+
 /* Right Wing */
 .right-wing {
     display: flex;

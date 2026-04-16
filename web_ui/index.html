@@ -32,9 +32,20 @@
     </div>
     
     <!-- GUI Dashboard View -->
-    <div id="gui-view" class="view-layer hidden">
-        <header class="glass-panel main-header">
-            <div class="logo-container">
+    <div id="gui-view" class="view-layer hidden" style="flex-direction:row;">
+        
+        <!-- BrowserOS Vertical Tabs -->
+        <div class="vertical-tabs" id="v-tabs">
+            <div class="v-tab active" title="Sigma OS Kernel">Σ</div>
+            <div class="v-tab" title="BrowserOS Agent">🤖</div>
+            <div class="v-tab" title="Browser-Use Cloud">☁️</div>
+            <div class="v-tab" title="SOUL.md Memory">🧠</div>
+            <div class="v-tab" style="margin-top:auto; margin-bottom:20px;" title="Settings">⚙️</div>
+        </div>
+        
+        <div class="main-content-wrapper" style="flex:1; display:flex; flex-direction:column; overflow:hidden;">
+            <header class="glass-panel main-header">
+                <div class="logo-container">
                 <div class="sigma-glyph">Σ</div>
                 <div class="title-wrapper">
                     <h1>SigmaOS Zenith</h1>
@@ -136,6 +147,22 @@
                                     <div class="chat-msg" style="color:var(--text-muted)">Agent awaiting task directive...</div>
                                 </div>
                             </div>
+                            
+                            <div class="ai-segment">
+                                <h3 class="segment-title">Bytebot Virtual Desktop</h3>
+                                <p class="muted-text">Stream the AI's autonomous Ubuntu sub-OS sandbox.</p>
+                                <div class="bytebot-view" id="bytebot-canvas" style="display:none;">
+                                    <div class="bb-topbar">Ubuntu Web - bytebot-node-1</div>
+                                    <div class="bb-terminal" id="bb-term">
+                                        bytebot@desktop:~$ _
+                                    </div>
+                                    <div class="takeover-indicator">● LIVE</div>
+                                </div>
+                                <div style="display:flex; gap:10px; margin-top:10px;">
+                                    <button id="btn-bytebot-connect" class="cyber-btn small-btn secondary">CONNECT STREAM</button>
+                                    <button id="btn-bytebot-takeover" class="cyber-btn small-btn" style="display:none;">TAKEOVER CONTROL</button>
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -163,7 +190,7 @@
                     </div>
                 </div>
             </section>
-        </main>
+        </div>
     </div>
 
     <!-- CLI Fullscreen View -->

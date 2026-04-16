@@ -88,13 +88,21 @@ document.addEventListener('DOMContentLoaded', () => {
         document.querySelector('.holo-core').style.boxShadow = '0 0 80px var(--acc-purple), 0 0 120px var(--acc-cyan)';
     };
 
-    // Tab Switching
+    // Tab Switching Central
     document.querySelectorAll('.tab-btn').forEach(btn => {
         btn.addEventListener('click', () => {
             document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
             document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
             btn.classList.add('active');
             document.getElementById(btn.dataset.tab).classList.add('active');
+        });
+    });
+
+    // Vertical Tabs (BrowserOS)
+    document.querySelectorAll('.v-tab').forEach(vbtn => {
+        vbtn.addEventListener('click', () => {
+            document.querySelectorAll('.v-tab').forEach(b => b.classList.remove('active'));
+            vbtn.classList.add('active');
         });
     });
 
@@ -180,6 +188,31 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
+    /* ==============================================================
+     * BROWSER-USE: DOM SWEEP PROTOCOL
+     * ============================================================== */
+    function triggerHeuristicSweep() {
+        const interactables = document.querySelectorAll('button, input, select, textarea, .suite-card, .v-tab, .file-row');
+        const markers = [];
+        interactables.forEach((el, index) => {
+            const rect = el.getBoundingClientRect();
+            if(rect.width === 0 || rect.height === 0 || rect.top < 0) return;
+            
+            const marker = document.createElement('div');
+            marker.className = 'heuristic-marker';
+            marker.style.top = rect.top + 'px';
+            marker.style.left = rect.left + 'px';
+            marker.style.width = rect.width + 'px';
+            marker.style.height = rect.height + 'px';
+            marker.innerHTML = `<span class="h-label">${index}</span>`;
+            document.body.appendChild(marker);
+            markers.push(marker);
+        });
+        
+        // Remove after visual scan completes
+        setTimeout(() => markers.forEach(m => m.remove()), 2500);
+    }
+
     // Browser-Use Sim Logic
     const buTaskInput = document.getElementById('bu-task-input');
     const buStatusLog = document.getElementById('bu-status-log');
@@ -202,12 +235,45 @@ document.addEventListener('DOMContentLoaded', () => {
             setTimeout(() => {
                 buStatusLog.innerHTML += `<div class="chat-msg ai">[ACTION] Executing DOM evaluations for heuristic task: "${task}"...</div>`;
                 buStatusLog.scrollTop = buStatusLog.scrollHeight;
+                triggerHeuristicSweep(); // Launch visual overlay!
             }, 1600);
             
             setTimeout(() => {
-                buStatusLog.innerHTML += `<div class="chat-msg" style="color:#27c93f">[SUCCESS] Task completed. Awaiting next command.</div>`;
+                buStatusLog.innerHTML += `<div class="chat-msg" style="color:#27c93f">[SUCCESS] Task completed. Autopilot Standing By.</div>`;
                 buStatusLog.scrollTop = buStatusLog.scrollHeight;
             }, 3200);
+        });
+    }
+
+    // Bytebot Sim Logic
+    const btnBbConnect = document.getElementById('btn-bytebot-connect');
+    const btnBbTakeover = document.getElementById('btn-bytebot-takeover');
+    const bbCanvas = document.getElementById('bytebot-canvas');
+    const bbTerm = document.getElementById('bb-term');
+
+    if (btnBbConnect) {
+        btnBbConnect.addEventListener('click', () => {
+            btnBbConnect.style.display = 'none';
+            bbCanvas.style.display = 'block';
+            
+            setTimeout(() => {
+                bbTerm.innerHTML = `bytebot@desktop:~$ apt update<br>Hit:1 http://archive.ubuntu.com/ubuntu jammy InRelease<br>bytebot@desktop:~$ _`;
+            }, 500);
+
+            setTimeout(() => {
+                bbTerm.innerHTML += `<br>[Automated] Navigating to target portal...<br>Downloading invoices... DONE.`;
+                btnBbTakeover.style.display = 'block';
+            }, 2000);
+        });
+    }
+
+    if (btnBbTakeover) {
+        btnBbTakeover.addEventListener('click', () => {
+            btnBbTakeover.style.backgroundColor = 'var(--acc-magenta)';
+            btnBbTakeover.style.color = '#fff';
+            btnBbTakeover.textContent = 'YOU HAVE FULL CONTROL';
+            bbTerm.innerHTML += `<br><span style="color:var(--acc-magenta)">[SYSTEM] Human Takeover Initated! Mouse & Keyboard unlocked.</span>`;
+            document.querySelector('.takeover-indicator').style.color = '#27c93f';
         });
     }
 
