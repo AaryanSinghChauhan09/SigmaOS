@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Sovereign Zenith Dashboard | SigmaOS</title>
+    <title>Sovereign Zenith | SigmaOS</title>
     <link rel="stylesheet" href="styles/style.css">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -16,86 +16,119 @@
         <div class="orb orb-3"></div>
         <div class="mesh-grid"></div>
     </div>
-    
-    <header class="glass-panel main-header">
-        <div class="logo-container">
-            <div class="sigma-glyph">Σ</div>
-            <div class="title-wrapper">
-                <h1>SigmaOS Zenith</h1>
-                <div class="badge-row">
-                    <span class="status-badge pulse-ring">LATTICE ACTIVE</span>
-                    <span class="version-badge">v33.1</span>
-                </div>
-            </div>
-        </div>
-        <div class="telemetry-bar">
-            <div class="telemetry-node">
-                <span class="t-label">COVERAGE</span>
-                <span class="t-value highlight-cyan" id="coverage-val">0%</span>
-            </div>
-            <div class="telemetry-node">
-                <span class="t-label">INTEGRITY</span>
-                <span class="t-value highlight-magenta">100% PURE</span>
-            </div>
-            <div class="telemetry-node">
-                <span class="t-label">IQ YIELD</span>
-                <span class="t-value glow-text">ABSOLUTE</span>
-            </div>
-        </div>
-    </header>
 
-    <main class="dashboard-layout">
-        <section class="left-wing glass-panel">
-            <div class="panel-tabs">
-                <button class="tab-btn active" data-tab="lattice-view">33-SUITE LATTICE</button>
-                <button class="tab-btn" data-tab="explorer-view">SOVEREIGN EXPLORER</button>
-            </div>
+    <!-- Boot Sequence / Choice Overlay -->
+    <div id="boot-overlay" class="boot-overlay">
+        <div class="boot-container glass-panel">
+            <div class="sigma-glyph huge-glyph">Σ</div>
+            <h1 class="boot-title">SIGMA_OS BOOTSTRAP</h1>
+            <p class="boot-subtitle">Initialising System Matrices... Awaiting Paradigm Selection.</p>
             
-            <div class="tab-content active" id="lattice-view">
-                <div class="suite-grid" id="lattice-grid">
-                    <!-- Javascript will inject 33 suites -->
-                </div>
+            <div class="boot-options">
+                <button class="cyber-btn" id="btn-gui" data-text="START ZENITH GUI">START ZENITH GUI</button>
+                <button class="cyber-btn secondary" id="btn-cli" data-text="DROP TO SHELL (CLI)">DROP TO SHELL (CLI)</button>
             </div>
-
-            <div class="tab-content" id="explorer-view">
-                <div class="explorer-header">
-                    <span id="current-path">/</span>
-                    <button id="btn-up-dir">↑ UP</button>
-                </div>
-                <div class="file-list" id="explorer-list">
-                    <!-- Files injected here -->
-                </div>
-            </div>
-        </section>
-
-        <section class="right-wing">
-            <div class="glass-panel visualizer-card">
-                <h2 class="panel-title">CHROMATIC RESONANCE</h2>
-                <div class="holographic-display" id="holo-canvas">
-                    <div class="holo-ring outer-ring"></div>
-                    <div class="holo-ring middle-ring"></div>
-                    <div class="holo-core"></div>
-                </div>
-            </div>
-
-            <div class="glass-panel terminal-card">
-                <div class="terminal-header">
-                    <span class="t-title">AUDIT TERMINAL // LIVE</span>
-                    <div class="t-dots">
-                        <span></span><span></span><span></span>
+        </div>
+    </div>
+    
+    <!-- GUI Dashboard View -->
+    <div id="gui-view" class="view-layer hidden">
+        <header class="glass-panel main-header">
+            <div class="logo-container">
+                <div class="sigma-glyph">Σ</div>
+                <div class="title-wrapper">
+                    <h1>SigmaOS Zenith</h1>
+                    <div class="badge-row">
+                        <span class="status-badge pulse-ring">LATTICE ACTIVE</span>
+                        <span class="version-badge">v33.1</span>
                     </div>
                 </div>
-                <div class="terminal-body" id="audit-log">
-                    <div class="log-entry system"><span class="timestamp">[SYSTEM]</span> Initiating Singular Assimilation Protocol...</div>
+            </div>
+            <div class="telemetry-bar">
+                <div class="telemetry-node">
+                    <span class="t-label">COVERAGE</span>
+                    <span class="t-value highlight-cyan" id="coverage-val">0%</span>
+                </div>
+                <div class="telemetry-node">
+                    <span class="t-label">INTEGRITY</span>
+                    <span class="t-value highlight-magenta">100% PURE</span>
+                </div>
+                <div class="telemetry-node">
+                    <span class="t-label">IQ YIELD</span>
+                    <span class="t-value glow-text">ABSOLUTE</span>
                 </div>
             </div>
-        </section>
-    </main>
+        </header>
 
+        <main class="dashboard-layout">
+            <section class="left-wing glass-panel">
+                <div class="panel-tabs">
+                    <button class="tab-btn active" data-tab="lattice-view">33-SUITE LATTICE</button>
+                    <button class="tab-btn" data-tab="explorer-view">SOVEREIGN EXPLORER</button>
+                </div>
+                
+                <div class="tab-content active" id="lattice-view">
+                    <div class="suite-grid" id="lattice-grid">
+                        <!-- Javascript will inject 33 suites -->
+                    </div>
+                </div>
+
+                <div class="tab-content" id="explorer-view">
+                    <div class="explorer-header">
+                        <span id="current-path">/</span>
+                        <button class="cyber-btn small-btn" id="btn-up-dir">↑ UP</button>
+                    </div>
+                    <div class="file-list" id="explorer-list">
+                        <!-- Files injected here -->
+                    </div>
+                </div>
+            </section>
+
+            <section class="right-wing">
+                <div class="glass-panel visualizer-card">
+                    <h2 class="panel-title">CHROMATIC RESONANCE</h2>
+                    <div class="holographic-display" id="holo-canvas">
+                        <div class="holo-ring outer-ring"></div>
+                        <div class="holo-ring middle-ring"></div>
+                        <div class="holo-core"></div>
+                    </div>
+                </div>
+
+                <div class="glass-panel terminal-card">
+                    <div class="terminal-header">
+                        <span class="t-title">AUDIT TERMINAL // LIVE</span>
+                        <div class="t-dots">
+                            <span></span><span></span><span></span>
+                        </div>
+                    </div>
+                    <div class="terminal-body" id="audit-log">
+                        <div class="log-entry system"><span class="timestamp">[SYSTEM]</span> Initiating Singular Assimilation Protocol...</div>
+                    </div>
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <!-- CLI Fullscreen View -->
+    <div id="cli-view" class="view-layer hidden">
+        <div class="cli-container glass-panel">
+            <div class="cli-output" id="cli-output">
+                <div>SIGMA_OS SOVEREIGN SHELL v33.1</div>
+                <div>Type 'help' for matrix commands. Neural link established.</div>
+                <br>
+            </div>
+            <div class="cli-input-line">
+                <span class="cli-prompt">root@sigma-zenith:~#</span>
+                <input type="text" id="cli-input" class="cli-input-box" placeholder="_" autocomplete="off" spellcheck="false" autofocus>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal File Viewer -->
     <div class="modal glass-panel" id="file-modal">
         <div class="modal-header">
             <span id="modal-filename" class="t-title">FILE: </span>
-            <button id="btn-close-modal">✕ Close</button>
+            <button class="cyber-btn default-btn" id="btn-close-modal">✕ Close</button>
         </div>
         <div class="modal-body">
             <pre><code id="file-content"></code></pre>

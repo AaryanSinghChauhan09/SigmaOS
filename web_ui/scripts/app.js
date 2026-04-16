@@ -13,6 +13,31 @@ const suitesData = [
 ];
 
 document.addEventListener('DOMContentLoaded', () => {
+
+    /* ==============================================================
+     * PARADIGM SELECTION (BOOT MENU)
+     * ============================================================== */
+    const overlay = document.getElementById('boot-overlay');
+    const guiView = document.getElementById('gui-view');
+    const cliView = document.getElementById('cli-view');
+
+    document.getElementById('btn-gui').addEventListener('click', () => {
+        overlay.classList.add('hidden');
+        guiView.classList.remove('hidden');
+        setTimeout(simulateBootProcess, 500);
+        loadDirectory('/'); // Init GUI Explorer
+    });
+
+    document.getElementById('btn-cli').addEventListener('click', () => {
+        overlay.classList.add('hidden');
+        cliView.classList.remove('hidden');
+        document.getElementById('cli-input').focus();
+    });
+
+
+    /* ==============================================================
+     * GUI MODE: ZENITH DASHBOARD
+     * ============================================================== */
     const grid = document.getElementById('lattice-grid');
     const log = document.getElementById('audit-log');
     const coverageVal = document.getElementById('coverage-val');
@@ -22,28 +47,18 @@ document.addEventListener('DOMContentLoaded', () => {
         const card = document.createElement('div');
         card.className = 'suite-card';
         card.id = `suite-${suite.id}`;
-        
-        card.innerHTML = `
-            <span class="s-id">SUITE // ${suite.id}</span>
-            <span class="s-name">${suite.name}</span>
-            <div class="s-status"></div>
-        `;
-        
+        card.innerHTML = `<span class="s-id">SUITE // ${suite.id}</span>
+            <span class="s-name">${suite.name}</span><div class="s-status"></div>`;
         grid.appendChild(card);
     });
 
-    const getTimestamp = () => {
-        const date = new Date();
-        return `[${date.toISOString().substring(11, 23)}]`;
-    };
+    const getTimestamp = () => `[${new Date().toISOString().substring(11, 23)}]`;
 
     const appendLog = (message, type = 'normal') => {
         const entry = document.createElement('div');
         entry.className = `log-entry ${type}`;
         entry.innerHTML = `<span class="timestamp">${getTimestamp()}</span> ${message}`;
         log.appendChild(entry);
-        
-        // Auto-scroll
         log.scrollTop = log.scrollHeight;
     };
 
@@ -53,36 +68,21 @@ document.addEventListener('DOMContentLoaded', () => {
         
         for (let i = 0; i < suitesData.length; i++) {
             const suite = suitesData[i];
+            await new Promise(r => setTimeout(r, 50 + Math.random() * 150));
             
-            // Random delay for realism
-            const delay = 50 + Math.random() * 150;
-            await new Promise(r => setTimeout(r, delay));
+            document.getElementById(`suite-${suite.id}`).classList.add('loaded');
             
-            // UI Update
-            const card = document.getElementById(`suite-${suite.id}`);
-            card.classList.add('loaded');
-            
-            // Ripple effect on neighbor cards could be added here in a real reactive system
-            
-            // Log Update
             const hash = Math.random().toString(16).substr(2, 8);
             appendLog(`Integrity Verified: ${suite.id}_${suite.name} (0x${hash})`, 'success');
             
-            // Coverage Update
-            const completion = Math.round(((i + 1) / suitesData.length) * 100);
-            coverageVal.textContent = `${completion}%`;
-            
-            // Glitch effect randomly
-            if (Math.random() > 0.9) {
-                appendLog(`Optimizing Neural Thread pool for ${suite.id}...`, 'warning');
-            }
+            coverageVal.textContent = `${Math.round(((i + 1) / suitesData.length) * 100)}%`;
+            if (Math.random() > 0.9) appendLog(`Optimizing Neural Thread pool for ${suite.id}...`, 'warning');
         }
         
         await new Promise(r => setTimeout(r, 400));
         appendLog('ALL 33 SUITES MATERIALLY HARMONIZED. ZERO HOST LEAKAGE.', 'system');
         appendLog('SOVEREIGNTY ASCENDED.', 'system');
         
-        // Accelerate Hologram
         document.querySelector('.outer-ring').style.animationDuration = '3s';
         document.querySelector('.middle-ring').style.animationDuration = '2s';
         document.querySelector('.holo-core').style.boxShadow = '0 0 80px var(--acc-purple), 0 0 120px var(--acc-cyan)';
@@ -118,14 +118,11 @@ document.addEventListener('DOMContentLoaded', () => {
                 const row = document.createElement('div');
                 row.className = 'file-row';
                 row.innerHTML = `<span class="file-icon">${item.isDir ? '📁' : '📄'}</span><span class="file-name">${item.name}</span>`;
-                row.onclick = () => {
-                    if (item.isDir) loadDirectory(item.path);
-                    else viewFile(item.path);
-                };
+                row.onclick = () => item.isDir ? loadDirectory(item.path) : viewFile(item.path);
                 explorerList.appendChild(row);
             });
         } catch (e) {
-            explorerList.innerHTML = `<div style="color:red; padding:10px;">Error: ${e.message}</div>`;
+            explorerList.innerHTML = `<div style="color:red; padding:10px;">Error: ${e.message}. Server offline?</div>`;
         }
     }
 
@@ -136,29 +133,132 @@ document.addEventListener('DOMContentLoaded', () => {
         loadDirectory('/' + parts.join('/'));
     };
 
-    // File Viewer
+    // File Viewer Modal
     const modal = document.getElementById('file-modal');
-    const modalClose = document.getElementById('btn-close-modal');
-    const modalFilename = document.getElementById('modal-filename');
     const fileContent = document.getElementById('file-content');
-
+    
     async function viewFile(filePath) {
-        modalFilename.textContent = `FILE: ${filePath}`;
+        document.getElementById('modal-filename').textContent = `FILE: ${filePath}`;
         modal.classList.add('active');
         fileContent.textContent = 'Loading source buffer...';
         
         try {
             const res = await fetch(`/api/fs?path=${encodeURIComponent(filePath)}`);
-            const text = await res.text();
-            fileContent.textContent = text;
+            fileContent.textContent = await res.text();
         } catch (e) {
-            fileContent.textContent = `Error reading file stream.`;
+            fileContent.textContent = `Error reading file stream. Server not running?`;
         }
     }
 
-    modalClose.onclick = () => { modal.classList.remove('active'); };
+    document.getElementById('btn-close-modal').onclick = () => modal.classList.remove('active');
 
-    // Trigger boot & loading root dir
-    setTimeout(simulateBootProcess, 1000);
-    loadDirectory('/');
+
+    /* ==============================================================
+     * CLI MODE: SOVEREIGN SHELL
+     * ============================================================== */
+    const cliOutput = document.getElementById('cli-output');
+    const cliInput = document.getElementById('cli-input');
+    let cliCurrentDir = '/';
+
+    const renderCli = (html) => {
+        const div = document.createElement('div');
+        div.innerHTML = html;
+        cliOutput.appendChild(div);
+        cliOutput.scrollTop = cliOutput.scrollHeight;
+    };
+
+    cliInput.addEventListener('keydown', async (e) => {
+        if (e.key === 'Enter') {
+            const cmdText = cliInput.value.trim();
+            cliInput.value = '';
+            renderCli(`<div><span style="color:var(--acc-cyan)">root@sigma-zenith:${cliCurrentDir}#</span> ${cmdText}</div>`);
+            
+            if (!cmdText) return;
+            const args = cmdText.split(' ');
+            const cmd = args[0].toLowerCase();
+
+            switch (cmd) {
+                case 'help':
+                    renderCli(`<div style="color:#aaa">SigmaOS Shell Commands:<br>ls [dir] - List files<br>cat &lt;file&gt; - Read file contents<br>cd &lt;dir&gt; - Move directory<br>clear - Clear shell<br>gui - Switch to Zenith GUI mode</div><br>`);
+                    break;
+                case 'clear':
+                    cliOutput.innerHTML = '';
+                    break;
+                case 'gui':
+                    cliView.classList.add('hidden');
+                    guiView.classList.remove('hidden');
+                    setTimeout(simulateBootProcess, 500);
+                    loadDirectory('/');
+                    break;
+                case 'pwd':
+                    renderCli(`<div>${cliCurrentDir}</div><br>`);
+                    break;
+                case 'cd': {
+                    let dir = args[1] || '/';
+                    if (dir === '..') {
+                        if (cliCurrentDir !== '/') {
+                            const p = cliCurrentDir.split('/').filter(Boolean);
+                            p.pop();
+                            cliCurrentDir = '/' + p.join('/');
+                        }
+                    } else {
+                        if (!dir.startsWith('/')) {
+                            dir = cliCurrentDir === '/' ? `/${dir}` : `${cliCurrentDir}/${dir}`;
+                        }
+                        cliCurrentDir = dir;
+                    }
+                    // Validate path
+                    try {
+                        const res = await fetch(`/api/fs?path=${encodeURIComponent(cliCurrentDir)}`);
+                        if (!res.ok) {
+                            renderCli(`<div style="color:#ff5f56">bash: cd: ${dir}: No such file or directory</div><br>`);
+                            cliCurrentDir = '/';
+                        }
+                    } catch(e) {
+                         renderCli(`<div style="color:#ff5f56">Network error communicating with file orchestrator.</div><br>`);
+                    }
+                    document.querySelector('.cli-prompt').textContent = `root@sigma-zenith:${cliCurrentDir}#`;
+                    break;
+                }
+                case 'ls': {
+                    let dir = args[1] || cliCurrentDir;
+                    if (!dir.startsWith('/')) dir = cliCurrentDir === '/' ? `/${dir}` : `${cliCurrentDir}/${dir}`;
+                    try {
+                        const res = await fetch(`/api/fs?path=${encodeURIComponent(dir)}`);
+                        if (!res.ok) throw new Error();
+                        const data = await res.json();
+                        let lsHtml = `<div style="display:grid; grid-template-columns:repeat(auto-fill, minmax(150px, 1fr)); gap:5px;">`;
+                        data.forEach(item => {
+                            const color = item.isDir ? 'var(--acc-cyan)' : 'white';
+                            lsHtml += `<span style="color:${color}">${item.name}${item.isDir?'/':''}</span>`;
+                        });
+                        lsHtml += `</div><br>`;
+                        renderCli(lsHtml);
+                    } catch(e) {
+                        renderCli(`<div style="color:#ff5f56">ls: cannot access '${dir}': No such file or directory</div><br>`);
+                    }
+                    break;
+                }
+                case 'cat': {
+                    if (!args[1]) { renderCli(`<div style="color:#ff5f56">cat: missing operand</div><br>`); break; }
+                    let file = args[1];
+                    if (!file.startsWith('/')) file = cliCurrentDir === '/' ? `/${file}` : `${cliCurrentDir}/${file}`;
+                    try {
+                        const res = await fetch(`/api/fs?path=${encodeURIComponent(file)}`);
+                        if (!res.ok) throw new Error();
+                        const text = await res.text();
+                        renderCli(`<div><pre style="white-space:pre-wrap; word-wrap:break-word;">${text.replace(/</g, '&lt;').replace(/>/g, '&gt;')}</pre></div><br>`);
+                    } catch(e) {
+                        renderCli(`<div style="color:#ff5f56">cat: ${args[1]}: No such file or directory or Server Offline</div><br>`);
+                    }
+                    break;
+                }
+                default:
+                    renderCli(`<div style="color:#ff5f56">${cmd}: command not found</div><br>`);
+            }
+        }
+    });
+
+    // Make sure click on CLI empty space focuses input
+    cliView.addEventListener('click', () => cliInput.focus());
 });
