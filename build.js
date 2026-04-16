@@ -32,10 +32,12 @@ const shards = [
     { name: "Scheduler (ThreadMTX)",   src: "kernel/suites/S01_Scheduler/sigma_process.c",     obj: "build/sigma_process.o" },
     { name: "File System (SigmaFS)",   src: "kernel/suites/S06_Storage/sigma_fs.c",             obj: "build/sigma_fs.o" },
     { name: "Security (SovereignSec)", src: "kernel/suites/S08_Security/sigma_security.c",     obj: "build/sigma_security.o" },
+    { name: "Registry (SovereignReg)", src: "kernel/suites/S10_Registry/sigma_registry.c",     obj: "build/sigma_registry.o" },
     { name: "Network (SNPS Stack)",    src: "kernel/suites/S07_Network/sigma_network.c",       obj: "build/sigma_network.o" },
     { name: "AI Memory (Agents)",      src: "kernel/suites/S09_Intelligence/sigma_ai_mem.c",   obj: "build/sigma_ai_mem.o" },
     { name: "Hypervisor (VirtIO)",     src: "kernel/suites/S11_Virtualization/sigma_virtio.c", obj: "build/sigma_virtio.o" },
     { name: "Kernel Main (kmain)",     src: "kernel/sigma_kernel.c",                           obj: "build/sigma_kernel.o" },
+    { name: "Syscall Dispatcher",      src: "kernel/suites/S25_ZeroKernel/sigma_syscall.c",    obj: "build/sigma_syscall.o" },
 ];
 
 // Ensure build dir exists

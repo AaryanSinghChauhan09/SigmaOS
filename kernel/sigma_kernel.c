@@ -74,6 +74,9 @@ void kmain(uint32_t multiboot_magic, uint32_t multiboot_addr) {
     /* --- S08: Sovereign Security Domain --- */
     sigma_boot_module("S08 :: Sovereign Security Matrix (SSM)", sigma_security_init);
 
+    /* --- S10: Sovereign Registry --- */
+    sigma_boot_module("S10 :: Sovereign Registry (unified config)", sigma_registry_init);
+
     /* --- S07: Network Protocol Stack --- */
     sigma_boot_module("S07 :: Sovereign Network Protocol Stack", sigma_net_init);
 
