@@ -22,6 +22,7 @@ help:
 	@echo "make all         : Show this help"
 	@echo "make bin         : Build the sovereign kernel binary"
 	@echo "make iso         : Build the bootable QEMU ISO"
+	@echo "make web-engine  : Build the pure C Sovereign Web Server (no Node.js)"
 	@echo "make lint        : Run static analysis"
 	@echo "make shard-list  : Show sovereign shard inventory"
 	@echo "make test        : Run the high-fidelity audit pipeline"
@@ -67,10 +68,10 @@ SHARDS := $(C_SOURCES:.c=.o) $(ASM_SOURCES:.asm=.o)
 # Build targets
 # ---------------------------------------------------------------------------
 
-.PHONY: all clean iso test shard-list lint check
+.PHONY: all clean iso test shard-list lint check web-engine
 
-all: sigma_zenith.bin
-	@echo "Σ [BUILD]: sigma_zenith.bin ready — $(words $(C_SOURCES)) C11 shards compiled."
+all: sigma_zenith.bin web-engine
+	@echo "Σ [BUILD]: sigma_zenith.bin & sigma_web_engine ready."
 
 sigma_zenith.bin: kernel/boot.o $(SHARDS)
 	$(LD) $(LDFLAGS) -o $@ kernel/boot.o $(SHARDS)
@@ -82,6 +83,13 @@ sigma_zenith.bin: kernel/boot.o $(SHARDS)
 %.o: %.asm
 	@mkdir -p $(dir $@)
 	$(AS) $(ASFLAGS) $< -o $@
+
+# ---------------------------------------------------------------------------
+# Independent Sovereign Web Engine (Pillar 3/Userland Bridge)
+# ---------------------------------------------------------------------------
+web-engine:
+	@echo "Σ [BUILD]: Compiling zero-dependency C Web Engine..."
+	@$(CC) -std=c11 kernel/SovereignHTTPServer.c -o sigma_web_engine -lws2_32 2>/dev/null || $(CC) -std=c11 kernel/SovereignHTTPServer.c -o sigma_web_engine
 
 # ---------------------------------------------------------------------------
 # Utility targets
