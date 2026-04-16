@@ -1,6 +1,206 @@
 {
     "packages": [
         {
+            "id": "linux-arch-x86",
+            "name": "Linux ARCH-X86 Subsystem",
+            "description": "Torvalds' legacy monolithic arch-x86 codebase compressed for emulation.",
+            "category": "Torvalds Legacy",
+            "size_mb": 5,
+            "status": "dormant"
+        },
+        {
+            "id": "linux-arch-arm",
+            "name": "Linux ARCH-ARM Subsystem",
+            "description": "Torvalds' legacy monolithic arch-arm codebase compressed for emulation.",
+            "category": "Torvalds Legacy",
+            "size_mb": 5,
+            "status": "dormant"
+        },
+        {
+            "id": "linux-arch-riscv",
+            "name": "Linux ARCH-RISCV Subsystem",
+            "description": "Torvalds' legacy monolithic arch-riscv codebase compressed for emulation.",
+            "category": "Torvalds Legacy",
+            "size_mb": 5,
+            "status": "dormant"
+        },
+        {
+            "id": "linux-block-io",
+            "name": "Linux BLOCK-IO Subsystem",
+            "description": "Torvalds' legacy monolithic block-io codebase compressed for emulation.",
+            "category": "Torvalds Legacy",
+            "size_mb": 5,
+            "status": "dormant"
+        },
+        {
+            "id": "linux-crypto",
+            "name": "Linux CRYPTO Subsystem",
+            "description": "Torvalds' legacy monolithic crypto codebase compressed for emulation.",
+            "category": "Torvalds Legacy",
+            "size_mb": 5,
+            "status": "dormant"
+        },
+        {
+            "id": "linux-drivers-gpu",
+            "name": "Linux DRIVERS-GPU Subsystem",
+            "description": "Torvalds' legacy monolithic drivers-gpu codebase compressed for emulation.",
+            "category": "Torvalds Legacy",
+            "size_mb": 5,
+            "status": "dormant"
+        },
+        {
+            "id": "linux-drivers-net",
+            "name": "Linux DRIVERS-NET Subsystem",
+            "description": "Torvalds' legacy monolithic drivers-net codebase compressed for emulation.",
+            "category": "Torvalds Legacy",
+            "size_mb": 5,
+            "status": "dormant"
+        },
+        {
+            "id": "linux-drivers-usb",
+            "name": "Linux DRIVERS-USB Subsystem",
+            "description": "Torvalds' legacy monolithic drivers-usb codebase compressed for emulation.",
+            "category": "Torvalds Legacy",
+            "size_mb": 5,
+            "status": "dormant"
+        },
+        {
+            "id": "linux-drivers-tty",
+            "name": "Linux DRIVERS-TTY Subsystem",
+            "description": "Torvalds' legacy monolithic drivers-tty codebase compressed for emulation.",
+            "category": "Torvalds Legacy",
+            "size_mb": 5,
+            "status": "dormant"
+        },
+        {
+            "id": "linux-fs-ext4",
+            "name": "Linux FS-EXT4 Subsystem",
+            "description": "Torvalds' legacy monolithic fs-ext4 codebase compressed for emulation.",
+            "category": "Torvalds Legacy",
+            "size_mb": 5,
+            "status": "dormant"
+        },
+        {
+            "id": "linux-fs-btrfs",
+            "name": "Linux FS-BTRFS Subsystem",
+            "description": "Torvalds' legacy monolithic fs-btrfs codebase compressed for emulation.",
+            "category": "Torvalds Legacy",
+            "size_mb": 5,
+            "status": "dormant"
+        },
+        {
+            "id": "linux-fs-xfs",
+            "name": "Linux FS-XFS Subsystem",
+            "description": "Torvalds' legacy monolithic fs-xfs codebase compressed for emulation.",
+            "category": "Torvalds Legacy",
+            "size_mb": 5,
+            "status": "dormant"
+        },
+        {
+            "id": "linux-fs-proc",
+            "name": "Linux FS-PROC Subsystem",
+            "description": "Torvalds' legacy monolithic fs-proc codebase compressed for emulation.",
+            "category": "Torvalds Legacy",
+            "size_mb": 5,
+            "status": "dormant"
+        },
+        {
+            "id": "linux-ipc",
+            "name": "Linux IPC Subsystem",
+            "description": "Torvalds' legacy monolithic ipc codebase compressed for emulation.",
+            "category": "Torvalds Legacy",
+            "size_mb": 5,
+            "status": "dormant"
+        },
+        {
+            "id": "linux-kernel-core",
+            "name": "Linux KERNEL-CORE Subsystem",
+            "description": "Torvalds' legacy monolithic kernel-core codebase compressed for emulation.",
+            "category": "Torvalds Legacy",
+            "size_mb": 5,
+            "status": "dormant"
+        },
+        {
+            "id": "linux-kernel-sched",
+            "name": "Linux KERNEL-SCHED Subsystem",
+            "description": "Torvalds' legacy monolithic kernel-sched codebase compressed for emulation.",
+            "category": "Torvalds Legacy",
+            "size_mb": 5,
+            "status": "dormant"
+        },
+        {
+            "id": "linux-kernel-bpf",
+            "name": "Linux KERNEL-BPF Subsystem",
+            "description": "Torvalds' legacy monolithic kernel-bpf codebase compressed for emulation.",
+            "category": "Torvalds Legacy",
+            "size_mb": 5,
+            "status": "dormant"
+        },
+        {
+            "id": "linux-mm-page_alloc",
+            "name": "Linux MM-PAGE_ALLOC Subsystem",
+            "description": "Torvalds' legacy monolithic mm-page_alloc codebase compressed for emulation.",
+            "category": "Torvalds Legacy",
+            "size_mb": 5,
+            "status": "dormant"
+        },
+        {
+            "id": "linux-mm-slab",
+            "name": "Linux MM-SLAB Subsystem",
+            "description": "Torvalds' legacy monolithic mm-slab codebase compressed for emulation.",
+            "category": "Torvalds Legacy",
+            "size_mb": 5,
+            "status": "dormant"
+        },
+        {
+            "id": "linux-net-ipv4",
+            "name": "Linux NET-IPV4 Subsystem",
+            "description": "Torvalds' legacy monolithic net-ipv4 codebase compressed for emulation.",
+            "category": "Torvalds Legacy",
+            "size_mb": 5,
+            "status": "dormant"
+        },
+        {
+            "id": "linux-net-ipv6",
+            "name": "Linux NET-IPV6 Subsystem",
+            "description": "Torvalds' legacy monolithic net-ipv6 codebase compressed for emulation.",
+            "category": "Torvalds Legacy",
+            "size_mb": 5,
+            "status": "dormant"
+        },
+        {
+            "id": "linux-net-bluetooth",
+            "name": "Linux NET-BLUETOOTH Subsystem",
+            "description": "Torvalds' legacy monolithic net-bluetooth codebase compressed for emulation.",
+            "category": "Torvalds Legacy",
+            "size_mb": 5,
+            "status": "dormant"
+        },
+        {
+            "id": "linux-net-wireless",
+            "name": "Linux NET-WIRELESS Subsystem",
+            "description": "Torvalds' legacy monolithic net-wireless codebase compressed for emulation.",
+            "category": "Torvalds Legacy",
+            "size_mb": 5,
+            "status": "dormant"
+        },
+        {
+            "id": "linux-security-selinux",
+            "name": "Linux SECURITY-SELINUX Subsystem",
+            "description": "Torvalds' legacy monolithic security-selinux codebase compressed for emulation.",
+            "category": "Torvalds Legacy",
+            "size_mb": 5,
+            "status": "dormant"
+        },
+        {
+            "id": "linux-sound-alsa",
+            "name": "Linux SOUND-ALSA Subsystem",
+            "description": "Torvalds' legacy monolithic sound-alsa codebase compressed for emulation.",
+            "category": "Torvalds Legacy",
+            "size_mb": 5,
+            "status": "dormant"
+        },
+        {
             "id": "sv-legacy-x11",
             "name": "Legacy X11 Display Server",
             "description": "The obsolete monolithic Unix windowing system.",
