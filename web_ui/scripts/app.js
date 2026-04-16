@@ -152,6 +152,33 @@ document.addEventListener('DOMContentLoaded', () => {
 
     document.getElementById('btn-close-modal').onclick = () => modal.classList.remove('active');
 
+    // Agent Chat Output
+    const agentInput = document.getElementById('agent-input');
+    const agentLog = document.getElementById('agent-chat-log');
+    
+    if (agentInput) {
+        agentInput.addEventListener('keydown', async (e) => {
+            if (e.key === 'Enter' && agentInput.value.trim() !== '') {
+                const text = agentInput.value.trim();
+                agentInput.value = '';
+                
+                const userMsg = document.createElement('div');
+                userMsg.className = 'chat-msg user';
+                userMsg.innerHTML = `<strong>You:</strong> ${text}`;
+                agentLog.appendChild(userMsg);
+                agentLog.scrollTop = agentLog.scrollHeight;
+                
+                // Simulate Agent MCP Cowork logic
+                setTimeout(() => {
+                    const aiMsg = document.createElement('div');
+                    aiMsg.className = 'chat-msg ai';
+                    aiMsg.innerHTML = `<strong>Agent:</strong> Acknowledged. Synthesizing MCP workflow for \`${text.substring(0, 15)}...\` using local models.`;
+                    agentLog.appendChild(aiMsg);
+                    agentLog.scrollTop = agentLog.scrollHeight;
+                }, 800);
+            }
+        });
+    }
 
     /* ==============================================================
      * CLI MODE: SOVEREIGN SHELL

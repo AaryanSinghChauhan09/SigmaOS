@@ -65,6 +65,7 @@
                 <div class="panel-tabs">
                     <button class="tab-btn active" data-tab="lattice-view">33-SUITE LATTICE</button>
                     <button class="tab-btn" data-tab="explorer-view">SOVEREIGN EXPLORER</button>
+                    <button class="tab-btn" data-tab="ai-hub-view">AI AGENT HUB</button>
                 </div>
                 
                 <div class="tab-content active" id="lattice-view">
@@ -80,6 +81,44 @@
                     </div>
                     <div class="file-list" id="explorer-list">
                         <!-- Files injected here -->
+                    </div>
+                </div>
+
+                <div class="tab-content" id="ai-hub-view">
+                    <div class="ai-hub-container">
+                        <div class="ai-header">
+                            <span class="t-title highlight-magenta">SOVEREIGN AI ORCHESTRATOR</span>
+                            <span class="status-badge pulse-ring">MCP SERVER ONLINE</span>
+                        </div>
+                        <div class="ai-body">
+                            <div class="ai-segment">
+                                <h3 class="segment-title">LLM Synchronization</h3>
+                                <select class="ai-select">
+                                    <option>Local Ollama (Llama 3 8B)</option>
+                                    <option>Local LM Studio (DeepSeek)</option>
+                                    <option>Claude 3 Opus (Anthropic API)</option>
+                                    <option>Kimi K2.5 (Cloud Default)</option>
+                                </select>
+                                <button class="cyber-btn small-btn" style="margin-top: 10px;">CONNECT PROVIDER</button>
+                            </div>
+                            <div class="ai-segment">
+                                <h3 class="segment-title">Active Workflows & Cowork</h3>
+                                <ul class="workflow-list">
+                                    <li><span class="w-status active"></span> Neural Lattice Audit (Scheduled: 10m)</li>
+                                    <li><span class="w-status"></span> Git Sync & Scrape (Paused)</li>
+                                    <li><span class="w-status active"></span> Memory Indexing via SOUL.md</li>
+                                </ul>
+                            </div>
+                            <div class="ai-segment">
+                                <h3 class="segment-title">Agent Chat Hub</h3>
+                                <div class="agent-chat-box">
+                                    <div class="chat-log" id="agent-chat-log">
+                                        <div class="chat-msg ai"><strong>Agent:</strong> Sovereign Memory injected. How can I automate your workflows today?</div>
+                                    </div>
+                                    <input type="text" class="cli-input-box chat-input" id="agent-input" placeholder="Instruct the agent..." />
+                                </div>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </section>

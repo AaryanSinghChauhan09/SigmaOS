@@ -530,6 +530,111 @@ body {
     box-shadow: 0 0 10px var(--acc-cyan);
 }
 
+/* AI Agent Hub */
+.ai-hub-container {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+}
+
+.ai-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+    padding-bottom: 10px;
+    border-bottom: 1px solid var(--glass-border);
+}
+
+.ai-body {
+    flex: 1;
+    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    padding-right: 5px;
+}
+
+.ai-body::-webkit-scrollbar { width: 4px; }
+.ai-body::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.1); }
+
+.ai-segment {
+    background: rgba(0,0,0,0.2);
+    border: 1px solid rgba(255, 255, 255, 0.05);
+    padding: 15px;
+    border-radius: 8px;
+}
+
+.segment-title {
+    font-size: 11px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: var(--acc-cyan);
+    margin-bottom: 15px;
+}
+
+.ai-select {
+    width: 100%;
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid var(--glass-border);
+    color: white;
+    padding: 8px;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 12px;
+    border-radius: 4px;
+    outline: none;
+}
+
+.ai-select option { background: var(--bg-base); }
+
+.workflow-list {
+    list-style: none;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 12px;
+}
+
+.workflow-list li {
+    margin-bottom: 10px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.w-status {
+    width: 8px; height: 8px;
+    border-radius: 50%;
+    background: #444;
+}
+.w-status.active { background: #27c93f; box-shadow: 0 0 10px #27c93f; }
+
+.agent-chat-box {
+    display: flex;
+    flex-direction: column;
+    height: 150px;
+    border: 1px solid var(--glass-border);
+    border-radius: 4px;
+    overflow: hidden;
+}
+
+.chat-log {
+    flex: 1;
+    padding: 10px;
+    overflow-y: auto;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    background: rgba(0, 0, 0, 0.4);
+}
+
+.chat-msg { margin-bottom: 8px; }
+.chat-msg.ai { color: var(--acc-cyan); }
+.chat-msg.user { color: #fff; text-align: right; }
+
+.chat-input {
+    border-top: 1px solid var(--glass-border) !important;
+    padding: 10px !important;
+    background: rgba(0,0,0,0.6) !important;
+}
+
 /* Right Wing */
 .right-wing {
     display: flex;
