@@ -226,35 +226,48 @@ document.addEventListener('DOMContentLoaded', () => {
         setTimeout(() => markers.forEach(m => m.remove()), 2500);
     }
 
-    // Browser-Use Sim Logic
+    // Pillar 1: Browser-Use Python Bridging
     const buTaskInput = document.getElementById('bu-task-input');
     const buStatusLog = document.getElementById('bu-status-log');
     const btnBuStart = document.getElementById('btn-bu-start');
 
     if (btnBuStart) {
-        btnBuStart.addEventListener('click', () => {
+        btnBuStart.addEventListener('click', async () => {
             const task = buTaskInput.value.trim();
             if (!task) return;
             
-            buStatusLog.innerHTML = `<div class="chat-msg" style="color:var(--acc-magenta)">[SYSTEM] Initialising browser-use Agent...</div>`;
-            buStatusLog.scrollTop = buStatusLog.scrollHeight;
+            buStatusLog.innerHTML = `<div class="chat-msg" style="color:var(--acc-magenta)">[SYSTEM] Activating Python Orchestrator...</div>`;
             buTaskInput.value = '';
             
-            setTimeout(() => {
-                buStatusLog.innerHTML += `<div class="chat-msg" style="color:var(--text-primary)">[AGENT] Spawning stealth browser session via Cloud...</div>`;
-                buStatusLog.scrollTop = buStatusLog.scrollHeight;
-            }, 800);
-            
-            setTimeout(() => {
-                buStatusLog.innerHTML += `<div class="chat-msg ai">[ACTION] Executing DOM evaluations for heuristic task: "${task}"...</div>`;
-                buStatusLog.scrollTop = buStatusLog.scrollHeight;
-                triggerHeuristicSweep(); // Launch visual overlay!
-            }, 1600);
-            
-            setTimeout(() => {
-                buStatusLog.innerHTML += `<div class="chat-msg" style="color:#27c93f">[SUCCESS] Task completed. Autopilot Standing By.</div>`;
-                buStatusLog.scrollTop = buStatusLog.scrollHeight;
-            }, 3200);
+            triggerHeuristicSweep(); // Visual overlay
+
+            try {
+                const resp = await fetch('/api/run', {
+                    method: 'POST',
+                    body: JSON.stringify({ cmd: `python tools/agent_orchestrator.py --mode browser-use --task "${task}"`, cwd: '/' })
+                });
+                
+                const reader = resp.body.getReader();
+                const decoder = new TextDecoder("utf-8");
+                
+                while(true) {
+                    const { done, value } = await reader.read();
+                    if (done) break;
+                    const textLines = decoder.decode(value).split('\n').filter(l => l.trim().length > 0);
+                    textLines.forEach(line => {
+                        // Colour-code outputs based on tags mimicking real logs
+                        let color = "var(--text-primary)";
+                        if(line.includes('[ACTION]')) color = "var(--acc-cyan)";
+                        if(line.includes('[SUCCESS]')) color = "#27c93f";
+                        if(line.includes('[SYSTEM]')) color = "var(--text-muted)";
+                        
+                        buStatusLog.innerHTML += `<div class="chat-msg" style="color:${color}">${line}</div>`;
+                        buStatusLog.scrollTop = buStatusLog.scrollHeight;
+                    });
+                }
+            } catch(e) {
+                buStatusLog.innerHTML += `<div class="chat-msg" style="color:red">Backend API connection severed.</div>`;
+            }
         });
     }
 
