@@ -332,14 +332,40 @@ document.addEventListener('DOMContentLoaded', () => {
                             <div style="font-size:0.85rem; color:var(--text-muted); line-height:1.4;">${pkg.description}</div>
                         </div>
                         <div style="display:flex; justify-content:space-between; align-items:center; margin-top:20px;">
-                            <span style="font-size:0.8rem; color:var(--glass-border);">[ ${pkg.size_mb} MB ]</span>
-                            <button class="sys-btn glow-cyan" onclick="this.textContent = 'Installing...'; setTimeout(() => this.textContent = 'Emulating', 1500);" style="padding: 5px 15px; font-size:0.8rem;">EMULATE</button>
+                            <span style="font-size:0.8rem; color:var(--glass-border);">[ ${pkg.size_mb} MB ] &nbsp; <span style="color:var(--acc-magenta); font-size:0.75rem;">DORMANT</span></span>
+                            <button class="sys-btn glow-cyan vault-emulate-btn" data-pkg-id="${pkg.id}" data-pkg-name="${pkg.name}" style="padding: 5px 15px; font-size:0.8rem;">EMULATE</button>
                         </div>
                     `;
                     vaultContainer.appendChild(card);
                 });
             })
             .catch(err => console.log('Vault DB offline.'));
+
+        // Event delegation for EMULATE buttons
+        vaultContainer.addEventListener('click', async (e) => {
+            const btn = e.target.closest('.vault-emulate-btn');
+            if (!btn) return;
+            const id = btn.dataset.pkgId;
+            const name = btn.dataset.pkgName;
+            btn.disabled = true;
+            btn.textContent = 'Fetching...';
+            try {
+                const resp = await fetch(`/api/download/${encodeURIComponent(id)}`);
+                if (resp.ok) {
+                    btn.textContent = 'Decompressing...';
+                    await resp.arrayBuffer(); // consume the stream
+                    btn.textContent = '✓ Emulating';
+                    btn.style.borderColor = '#27c93f';
+                    btn.style.color = '#27c93f';
+                } else {
+                    btn.textContent = 'Error';
+                    btn.style.color = 'red';
+                }
+            } catch (err) {
+                btn.textContent = 'Offline';
+                btn.disabled = false;
+            }
+        });
     }
 
     /* ==============================================================

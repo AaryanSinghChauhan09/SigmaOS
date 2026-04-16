@@ -11,7 +11,7 @@ const fs = require('fs');
 const path = require('path');
 const { spawn } = require('child_process');
 
-const PORT = 3333;
+const PORT = 3334;
 const ROOT_DIR = __dirname;
 const TELEMETRY_FILE = path.join(ROOT_DIR, 'kernel', 'telemetry.json');
 
@@ -26,7 +26,9 @@ const mimeTypes = {
     '.asm': 'text/plain',
     '.ps1': 'text/plain',
     '.py': 'text/plain',
-    '.txt': 'text/plain'
+    '.txt': 'text/plain',
+    '.gz': 'application/gzip',
+    '.archive': 'application/octet-stream'
 };
 
 const server = http.createServer((req, res) => {
@@ -114,6 +116,61 @@ const server = http.createServer((req, res) => {
         
         res.writeHead(200, { 'Content-Type': 'application/json' });
         return res.end(JSON.stringify(defaultTelemetry));
+    }
+
+    // API: Sigma Vault — full App Store package database
+    if (req.url === '/api/vault') {
+        const vaultPath = path.join(ROOT_DIR, 'web_ui', 'sigma_vault.json');
+        try {
+            const data = fs.readFileSync(vaultPath, 'utf-8');
+            res.writeHead(200, { 'Content-Type': 'application/json' });
+            return res.end(data);
+        } catch (e) {
+            res.writeHead(500);
+            return res.end(JSON.stringify({ error: 'Vault DB unreadable' }));
+        }
+    }
+
+    // API: Download/Emulate a package by ID (streams the .tar.gz payload)
+    if (req.url.startsWith('/api/download/')) {
+        const pkgId = decodeURIComponent(req.url.replace('/api/download/', '').split('?')[0]);
+
+        // Read vault to get payload filename
+        try {
+            const vault = JSON.parse(fs.readFileSync(path.join(ROOT_DIR, 'web_ui', 'sigma_vault.json')));
+            const pkg = vault.packages.find(p => p.id === pkgId);
+
+            if (!pkg) {
+                res.writeHead(404);
+                return res.end(JSON.stringify({ error: `Package '${pkgId}' not in Vault.` }));
+            }
+
+            const payloadName = pkg.payload || `${pkgId}.sigma.archive`;
+            const payloadPath = path.join(ROOT_DIR, 'web_ui', 'payloads', payloadName);
+
+            if (fs.existsSync(payloadPath)) {
+                const stat = fs.statSync(payloadPath);
+                res.writeHead(200, {
+                    'Content-Type': 'application/octet-stream',
+                    'Content-Disposition': `attachment; filename="${payloadName}"`,
+                    'Content-Length': stat.size
+                });
+                return fs.createReadStream(payloadPath).pipe(res);
+            } else {
+                // Generate an on-demand payload if not pre-built
+                const onDemand = Buffer.alloc(1024 * 10, pkgId);
+                res.writeHead(200, {
+                    'Content-Type': 'application/octet-stream',
+                    'Content-Disposition': `attachment; filename="${pkgId}.sigma.archive"`,
+                    'Content-Length': onDemand.length,
+                    'X-Sigma-Generated': 'on-demand'
+                });
+                return res.end(onDemand);
+            }
+        } catch (e) {
+            res.writeHead(500);
+            return res.end(`Download error: ${e.message}`);
+        }
     }
 
     // Static Server Logic
