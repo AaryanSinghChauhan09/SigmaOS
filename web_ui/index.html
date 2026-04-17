@@ -77,7 +77,7 @@
                     <button class="tab-btn active" data-tab="lattice-view">33-SUITE LATTICE</button>
                     <button class="tab-btn" data-tab="explorer-view">SOVEREIGN EXPLORER</button>
                     <button class="tab-btn" data-tab="ai-hub-view">AI AGENT HUB</button>
-                    <button class="tab-btn" data-tab="pkg-manager-view">PACKAGE MANAGER</button>
+                    <button class="tab-btn" data-tab="pkg-manager-view">NEXUS APP STORE</button>
                     <button class="tab-btn" data-tab="sys-monitor-view">SYSTEM MONITOR</button>
                     <button class="tab-btn" data-tab="omni-studio-view" style="color:var(--acc-magenta); text-shadow:0 0 5px var(--acc-magenta);">AGI OMNI-STUDIO</button>
                 </div>
@@ -170,28 +170,65 @@
                     </div>
                 </div>
 
-                <!-- NEW TAB: SPM -->
+                <!-- NEW TAB: APP STORE -->
                 <div class="tab-content" id="pkg-manager-view">
                     <div class="ai-hub-container">
-                        <div class="ai-header">
-                            <span class="t-title highlight-cyan">SIGMA PACKAGE MANAGER (SPM)</span>
-                            <span class="status-badge pulse-ring">LATTICE CONNECTED</span>
+                        <div class="ai-header" style="justify-content: flex-start; gap: 20px;">
+                            <span class="t-title highlight-cyan" style="font-size: 16px;">SIGMA NEXUS STORE</span>
+                            <input type="text" class="cli-input-box" placeholder="Search for applications, libraries, suites..." style="flex:1; max-width: 300px; padding: 5px 10px; border-radius: 20px;">
                         </div>
-                        <div class="ai-body">
-                            <div class="ai-segment">
-                                <h3 class="segment-title">Search Sovereign Repository</h3>
-                                <div style="display:flex; gap:10px;">
-                                    <input type="text" class="cli-input-box" placeholder="Search for package (e.g. clang, node, firefox-sovereign)..." style="flex:1;">
-                                    <button class="cyber-btn small-btn">SEARCH</button>
+                        <div class="ai-body" style="padding-top:10px;">
+                            <h3 class="segment-title" style="margin-bottom: 10px;">FEATURED SOVEREIGN APPS</h3>
+                            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px;">
+                                
+                                <div class="glass-panel" style="padding: 15px; display: flex; flex-direction: column; gap: 10px; background: rgba(0, 240, 255, 0.05); border: 1px solid rgba(0, 240, 255, 0.2);">
+                                    <div style="display: flex; gap: 15px; align-items: center;">
+                                        <div style="font-size: 30px;">🦊</div>
+                                        <div>
+                                            <h4 style="color: #fff; font-size: 14px;">Firefox Quantum</h4>
+                                            <span style="font-size: 10px; color: var(--text-muted);">Sovereign Hook Enabled • 120MB</span>
+                                        </div>
+                                    </div>
+                                    <p style="font-size: 11px; color: #ccc;">A natively accelerated, 0-copy network browser compiled against the SigmaOS graphics lattice.</p>
+                                    <button class="cyber-btn small-btn" style="align-self: flex-start; padding: 6px 16px; font-size: 12px; border-radius: 2px;" onclick="this.innerHTML='DOWNLOADING...'; setTimeout(() => { this.innerHTML='INSTALLED'; this.classList.add('secondary'); }, 1500);">DOWNLOAD</button>
                                 </div>
-                            </div>
-                            <div class="ai-segment">
-                                <h3 class="segment-title">Installed Synergies</h3>
-                                <ul class="workflow-list" style="max-height:150px; overflow-y:auto;">
-                                    <li style="display:flex; justify-content:space-between;"><span>SystemUI Toolkit</span> <button class="cyber-btn small-btn secondary" style="padding:2px 5px;">REMOVE</button></li>
-                                    <li style="display:flex; justify-content:space-between;"><span>Zero-Copy Networking daemon</span> <button class="cyber-btn small-btn secondary" style="padding:2px 5px;">REMOVE</button></li>
-                                    <li style="display:flex; justify-content:space-between;"><span>LLM Sovereign Node</span> <button class="cyber-btn small-btn secondary" style="padding:2px 5px;">REMOVE</button></li>
-                                </ul>
+                                
+                                <div class="glass-panel" style="padding: 15px; display: flex; flex-direction: column; gap: 10px; background: rgba(0, 0, 0, 0.4);">
+                                    <div style="display: flex; gap: 15px; align-items: center;">
+                                        <div style="font-size: 30px;">💻</div>
+                                        <div>
+                                            <h4 style="color: #fff; font-size: 14px;">VS Code Sovereign</h4>
+                                            <span style="font-size: 10px; color: var(--text-muted);">Development • 300MB</span>
+                                        </div>
+                                    </div>
+                                    <p style="font-size: 11px; color: #ccc;">Fully integrated IDE accessing all hardware shards directly with zero overhead.</p>
+                                    <button class="cyber-btn small-btn" style="align-self: flex-start; padding: 6px 16px; font-size: 12px; border-radius: 2px;" onclick="this.innerHTML='DOWNLOADING...'; setTimeout(() => { this.innerHTML='INSTALLED'; this.classList.add('secondary'); }, 2000);">DOWNLOAD</button>
+                                </div>
+                                
+                                <div class="glass-panel" style="padding: 15px; display: flex; flex-direction: column; gap: 10px; background: rgba(0, 0, 0, 0.4);">
+                                    <div style="display: flex; gap: 15px; align-items: center;">
+                                        <div style="font-size: 30px;">🎵</div>
+                                        <div>
+                                            <h4 style="color: #fff; font-size: 14px;">Spotify Native</h4>
+                                            <span style="font-size: 10px; color: var(--text-muted);">Media • 80MB</span>
+                                        </div>
+                                    </div>
+                                    <p style="font-size: 11px; color: #ccc;">Direct audio lattice client. Bypasses ALSA/PulseAudio entirely for bit-perfect rendering.</p>
+                                    <button class="cyber-btn small-btn" style="align-self: flex-start; padding: 6px 16px; font-size: 12px; border-radius: 2px;" onclick="this.innerHTML='DOWNLOADING...'; setTimeout(() => { this.innerHTML='INSTALLED'; this.classList.add('secondary'); }, 1200);">DOWNLOAD</button>
+                                </div>
+                                
+                                <div class="glass-panel" style="padding: 15px; display: flex; flex-direction: column; gap: 10px; background: rgba(0, 0, 0, 0.4);">
+                                    <div style="display: flex; gap: 15px; align-items: center;">
+                                        <div style="font-size: 30px;">🐋</div>
+                                        <div>
+                                            <h4 style="color: #fff; font-size: 14px;">Docker Shard</h4>
+                                            <span style="font-size: 10px; color: var(--text-muted);">Virtualization • 150MB</span>
+                                        </div>
+                                    </div>
+                                    <p style="font-size: 11px; color: #ccc;">Emulate traditional Linux containers dynamically inside native SigmaOS hardware memory namespacing.</p>
+                                    <button class="cyber-btn small-btn secondary" style="align-self: flex-start; padding: 6px 16px; font-size: 12px; border-radius: 2px;">INSTALLED</button>
+                                </div>
+
                             </div>
                         </div>
                     </div>
