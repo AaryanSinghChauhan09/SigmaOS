@@ -27,6 +27,31 @@
             </div>
         </div>
     </div>
+
+    <!-- macOS Inspired Mission Control Overlay -->
+    <div id="mission-control-overlay" class="view-layer hidden" style="z-index: 1500; background: rgba(0,0,0,0.85); backdrop-filter: blur(25px); flex-direction: column; padding: 40px;">
+        <div style="display:flex; justify-content:space-between; align-items:center; border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 20px; margin-bottom: 30px;">
+            <h2 class="t-title highlight-cyan" style="font-size: 24px; letter-spacing: 4px;">WORKSPACE MISSION CONTROL</h2>
+            <button class="cyber-btn" onclick="document.getElementById('mission-control-overlay').classList.add('hidden')">CLOSE</button>
+        </div>
+        <div style="flex:1; display:grid; grid-template-columns: repeat(3, 1fr); gap: 30px; max-height: 400px;">
+            <div class="glass-panel" style="padding: 20px; text-align:center; display:flex; flex-direction:column; justify-content:center; transition:all 0.3s; cursor:pointer;" onmouseover="this.style.boxShadow='0 0 15px rgba(0, 240, 255, 0.5)'" onmouseout="this.style.boxShadow='none'">
+                <div style="font-size: 40px; margin-bottom: 15px;">📊</div>
+                <h3 style="color:#fff;">Analytics Dashboard</h3>
+                <p style="color:rgba(255,255,255,0.5); font-size: 12px; margin-top:5px;">3 Apps Open</p>
+            </div>
+            <div class="glass-panel" style="padding: 20px; text-align:center; display:flex; flex-direction:column; justify-content:center; cursor:pointer;" onmouseover="this.style.boxShadow='0 0 15px rgba(255, 0, 85, 0.5)'" onmouseout="this.style.boxShadow='none'">
+                <div style="font-size: 40px; margin-bottom: 15px;">💻</div>
+                <h3 style="color:#fff;">Dev Environment (WSL Hook)</h3>
+                <p style="color:rgba(255,255,255,0.5); font-size: 12px; margin-top:5px;">VS Code + Docker</p>
+            </div>
+            <div class="glass-panel" style="padding: 20px; text-align:center; display:flex; flex-direction:column; justify-content:center; cursor:pointer;" onmouseover="this.style.boxShadow='0 0 15px rgba(138, 43, 226, 0.5)'" onmouseout="this.style.boxShadow='none'">
+                <div style="font-size: 40px; margin-bottom: 15px;">📝</div>
+                <h3 style="color:#fff;">Creative Studio</h3>
+                <p style="color:rgba(255,255,255,0.5); font-size: 12px; margin-top:5px;">Notes + Figma</p>
+            </div>
+        </div>
+    </div>
     
     <!-- GUI Dashboard View -->
     <div id="gui-view" class="view-layer hidden" style="flex-direction:row;">
@@ -65,6 +90,9 @@
                     <span class="t-label">IQ YIELD</span>
                     <span class="t-value glow-text">ABSOLUTE</span>
                 </div>
+                <div class="telemetry-node" style="margin-left: 20px; justify-content:center;">
+                    <button class="cyber-btn small-btn" onclick="document.getElementById('mission-control-overlay').classList.remove('hidden')">MISSION CONTROL</button>
+                </div>
             </div>
         </header>
 
@@ -75,6 +103,7 @@
                     <button class="tab-btn" data-tab="explorer-view">SOVEREIGN EXPLORER</button>
                     <button class="tab-btn" data-tab="ai-hub-view">AI AGENT HUB</button>
                     <button class="tab-btn" data-tab="pkg-manager-view">NEXUS APP STORE</button>
+                    <button class="tab-btn" data-tab="automations-view">AUTOMATIONS</button>
                     <button class="tab-btn" data-tab="sys-monitor-view">SYSTEM MONITOR</button>
                     <button class="tab-btn" data-tab="omni-studio-view" style="color:var(--acc-magenta); text-shadow:0 0 5px var(--acc-magenta);">AGI OMNI-STUDIO</button>
                 </div>
@@ -92,6 +121,33 @@
                     </div>
                     <div class="file-list" id="explorer-list">
                         <!-- Files injected here -->
+                    </div>
+                </div>
+
+                <!-- NEW TAB: AUTOMATIONS -->
+                <div class="tab-content" id="automations-view">
+                    <div class="ai-hub-container">
+                        <div class="ai-header">
+                            <span class="t-title highlight-purple" style="color: #8a2be2; font-size: 16px;">SIGMA AUTOMATIONS</span>
+                            <span class="status-badge pulse-ring" style="border-color: #8a2be2; color: #8a2be2;">ROUTINES ACTIVE</span>
+                        </div>
+                        <div class="ai-body">
+                            <div class="ai-segment">
+                                <h3 class="segment-title" style="color: #8a2be2;">Context-Aware Routines</h3>
+                                <p style="font-size: 11px; color: rgba(255,255,255,0.6); margin-bottom: 15px;">Define logical conditions to alter your workspace state.</p>
+                                <ul class="workflow-list">
+                                    <li style="display:flex; justify-content:space-between; background: rgba(0,0,0,0.4); padding: 10px; border-radius: 4px;">
+                                        <div><strong style="color:#fff;">Focus Mode</strong><br><span style="font-size: 10px; color:rgba(255,255,255,0.5);">If Time >= 09:00, Mute Notifications, Open Dev Environment</span></div>
+                                        <button class="cyber-btn small-btn" style="border-color:#8a2be2; color:#8a2be2;">RUN NOW</button>
+                                    </li>
+                                    <li style="display:flex; justify-content:space-between; background: rgba(0,0,0,0.4); padding: 10px; border-radius: 4px;">
+                                        <div><strong style="color:#fff;">Night Sync</strong><br><span style="font-size: 10px; color:rgba(255,255,255,0.5);">If Time == 23:00, Run GitHub OS Sync + Neural Audit</span></div>
+                                        <button class="cyber-btn small-btn" style="border-color:#8a2be2; color:#8a2be2;">EDIT</button>
+                                    </li>
+                                </ul>
+                                <button class="cyber-btn small-btn" style="margin-top: 10px;">+ NEW ROUTINE</button>
+                            </div>
+                        </div>
                     </div>
                 </div>
 
