@@ -77,6 +77,8 @@
                     <button class="tab-btn active" data-tab="lattice-view">33-SUITE LATTICE</button>
                     <button class="tab-btn" data-tab="explorer-view">SOVEREIGN EXPLORER</button>
                     <button class="tab-btn" data-tab="ai-hub-view">AI AGENT HUB</button>
+                    <button class="tab-btn" data-tab="pkg-manager-view">PACKAGE MANAGER</button>
+                    <button class="tab-btn" data-tab="sys-monitor-view">SYSTEM MONITOR</button>
                     <button class="tab-btn" data-tab="omni-studio-view" style="color:var(--acc-magenta); text-shadow:0 0 5px var(--acc-magenta);">AGI OMNI-STUDIO</button>
                 </div>
                 
@@ -167,6 +169,57 @@
                         </div>
                     </div>
                 </div>
+
+                <!-- NEW TAB: SPM -->
+                <div class="tab-content" id="pkg-manager-view">
+                    <div class="ai-hub-container">
+                        <div class="ai-header">
+                            <span class="t-title highlight-cyan">SIGMA PACKAGE MANAGER (SPM)</span>
+                            <span class="status-badge pulse-ring">LATTICE CONNECTED</span>
+                        </div>
+                        <div class="ai-body">
+                            <div class="ai-segment">
+                                <h3 class="segment-title">Search Sovereign Repository</h3>
+                                <div style="display:flex; gap:10px;">
+                                    <input type="text" class="cli-input-box" placeholder="Search for package (e.g. clang, node, firefox-sovereign)..." style="flex:1;">
+                                    <button class="cyber-btn small-btn">SEARCH</button>
+                                </div>
+                            </div>
+                            <div class="ai-segment">
+                                <h3 class="segment-title">Installed Synergies</h3>
+                                <ul class="workflow-list" style="max-height:150px; overflow-y:auto;">
+                                    <li style="display:flex; justify-content:space-between;"><span>SystemUI Toolkit</span> <button class="cyber-btn small-btn secondary" style="padding:2px 5px;">REMOVE</button></li>
+                                    <li style="display:flex; justify-content:space-between;"><span>Zero-Copy Networking daemon</span> <button class="cyber-btn small-btn secondary" style="padding:2px 5px;">REMOVE</button></li>
+                                    <li style="display:flex; justify-content:space-between;"><span>LLM Sovereign Node</span> <button class="cyber-btn small-btn secondary" style="padding:2px 5px;">REMOVE</button></li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- NEW TAB: SYS MON -->
+                <div class="tab-content" id="sys-monitor-view">
+                     <div class="ai-hub-container">
+                        <div class="ai-header">
+                            <span class="t-title highlight-magenta">SOVEREIGN SYSTEM MONITOR</span>
+                            <span class="status-badge pulse-ring">REALTIME HOOK</span>
+                        </div>
+                        <div class="ai-body" style="display:flex; flex-direction:column; gap:10px;">
+                            <div class="ai-segment" style="display:flex; justify-content:space-between; align-items:center;">
+                                <div><h3 class="segment-title">CPU SHARD LATTICE</h3><p style="color:var(--text-muted); margin:0;">Load: 3% (Idle)</p></div>
+                                <div style="width:100px; height:10px; background:#111; border:1px solid #333;"><div style="width:3%; height:100%; background:var(--acc-cyan);"></div></div>
+                            </div>
+                            <div class="ai-segment" style="display:flex; justify-content:space-between; align-items:center;">
+                                <div><h3 class="segment-title">MEMORY SHARDS</h3><p style="color:var(--text-muted); margin:0;">Used: 2.1 GB / 32 GB</p></div>
+                                <div style="width:100px; height:10px; background:#111; border:1px solid #333;"><div style="width:6%; height:100%; background:var(--acc-magenta);"></div></div>
+                            </div>
+                            <div class="ai-segment" style="display:flex; justify-content:space-between; align-items:center;">
+                                <div><h3 class="segment-title">NETWORK I/O</h3><p style="color:var(--text-muted); margin:0;">Rx: 0 Kbps | Tx: 0 Kbps</p></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
             </section>
 
             <section class="right-wing">
