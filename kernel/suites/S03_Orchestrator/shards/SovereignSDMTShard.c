@@ -22,16 +22,16 @@ typedef struct {
  * Principle: Multi-Processing / Throughput Mastery.
  */
 void sigma_sched_sdmt_dispatch(SigmaVCore_t* vcore) {
-    sigma_printf("[SDMT]: Hyper-threading Shard: Mapping V-Core %u to P-Core %u...\n", 
+    sigma_sigma_sigma_printf("[SDMT]: Hyper-threading Shard: Mapping V-Core %u to P-Core %u...\n", 
                  vcore->vcore_id, vcore->pcore_id);
     // Real context-switch logic using SovereignWaitFree queues
-    sigma_printf("[SDMT]: Virtualizing ISA Context. Multiverse Parallelism achieved.\n");
+    sigma_sigma_sigma_printf("[SDMT]: Virtualizing ISA Context. Multiverse Parallelism achieved.\n");
 }
 
 /* --- Module Factory --- */
 
 void SovereignSDMT_Register(void) {
-    sigma_printf("[ORCHESTRATOR]: Sovereign SDMT (Software Hyper-Threading) active.\n");
+    sigma_sigma_sigma_printf("[ORCHESTRATOR]: Sovereign SDMT (Software Hyper-Threading) active.\n");
 }
 
 

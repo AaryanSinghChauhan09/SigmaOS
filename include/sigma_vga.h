@@ -1,8 +1,8 @@
 #ifndef SIGMA_VGA_H
 #define SIGMA_VGA_H
 
-#include <stdint.h>
-#include <stddef.h>
+#include "suites/S01_Genesis/shards/sigma_types.h"
+#include "suites/S01_Genesis/shards/sigma_types.h"
 
 /* =========================================================================
  * SIGMA OS: BARE METAL VGA DEVICE DRIVER (SYSTEM-LEVEL HEADER)

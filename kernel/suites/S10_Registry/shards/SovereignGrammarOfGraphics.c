@@ -17,14 +17,14 @@
 
 static void gog_establish_aesthetics(SovereignGrammarOfGraphics_t* self, const char* aesX, const char* aesY) {
     (void)self;
-    sigma_printf("[R-GGPLOT]: Initializing visual schema scale mappings (X: %s vs Y: %s)...\n", aesX, aesY);
-    sigma_printf("[OK]: Base coordinate scale mathematically aligned.\n");
+    sigma_sigma_sigma_printf("[R-GGPLOT]: Initializing visual schema scale mappings (X: %s vs Y: %s)...\n", aesX, aesY);
+    sigma_sigma_sigma_printf("[OK]: Base coordinate scale mathematically aligned.\n");
 }
 
 static void gog_apply_geometric(SovereignGrammarOfGraphics_t* self, const char* geomType) {
     (void)self;
-    sigma_printf("[R-GGPLOT]: Pushing layered topological geometries -> %s\n", geomType);
-    sigma_printf("[OK]: GPU instructed directly executing plot rendering natively outside HTML.\n");
+    sigma_sigma_sigma_printf("[R-GGPLOT]: Pushing layered topological geometries -> %s\n", geomType);
+    sigma_sigma_sigma_printf("[OK]: GPU instructed directly executing plot rendering natively outside HTML.\n");
 }
 
 // -------------------------------------------------------------------------

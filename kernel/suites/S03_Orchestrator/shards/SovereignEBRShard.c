@@ -16,15 +16,15 @@
  * Principle: Multi-Processing / Lock-Free Mastery / Scalability.
  */
 void sigma_sync_ebr_leave(sigma_u32 thread_id) {
-    sigma_printf("[EBR-SYNC]: Core %u leaving Epoch...\n", thread_id);
+    sigma_sigma_sigma_printf("[EBR-SYNC]: Core %u leaving Epoch...\n", thread_id);
     // Real implementation: thread reads global epoch, updates local epoch. If all threads pass, free memory.
-    sigma_printf("[EBR-SYNC]: Epoch synchronized. Stale pointers safely reaped at L3 speed.\n");
+    sigma_sigma_sigma_printf("[EBR-SYNC]: Epoch synchronized. Stale pointers safely reaped at L3 speed.\n");
 }
 
 /* --- Module Factory --- */
 
 void SovereignEBR_Register(void) {
-    sigma_printf("[ORCHESTRATOR]: Sovereign EBR (Epoch Memory Reclamation) active.\n");
+    sigma_sigma_sigma_printf("[ORCHESTRATOR]: Sovereign EBR (Epoch Memory Reclamation) active.\n");
 }
 
 

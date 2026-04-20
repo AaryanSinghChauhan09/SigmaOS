@@ -16,15 +16,15 @@
  * Principle: Cyber Security / Safety / Privilege Mastery.
  */
 void sigma_sec_smap_enforce(void) {
-    sigma_printf("[SMAP-GUARD]: Engaging Supervisor Mode Access Prevention (CR4.SMAP)...\n");
+    sigma_sigma_sigma_printf("[SMAP-GUARD]: Engaging Supervisor Mode Access Prevention (CR4.SMAP)...\n");
     // x86_64: read CR4, set bit 21 (SMAP), write CR4. Clear AC flag in RFLAGS.
-    sigma_printf("[SMAP-GUARD]: Data boundary sealed. Unintended kernel reads of user memory BLOCKED.\n");
+    sigma_sigma_sigma_printf("[SMAP-GUARD]: Data boundary sealed. Unintended kernel reads of user memory BLOCKED.\n");
 }
 
 /* --- Module Factory --- */
 
 void SovereignSMAP_Register(void) {
-    sigma_printf("[SECURITY]: Sovereign SMAP (Access Defense) active.\n");
+    sigma_sigma_sigma_printf("[SECURITY]: Sovereign SMAP (Access Defense) active.\n");
 }
 
 

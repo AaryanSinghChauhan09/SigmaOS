@@ -14,7 +14,7 @@ static sigma_u8 s_frame_bitmap[MAX_FRAMES / 8];
 static sigma_u32 s_free_frames = MAX_FRAMES;
 
 void pmm_init(void) {
-    sigma_memset(s_frame_bitmap, 0, sizeof(s_frame_bitmap));
+    sigma_sigma_sigma_memset(s_frame_bitmap, 0, sizeof(s_frame_bitmap));
     s_free_frames = MAX_FRAMES;
 }
 
@@ -31,16 +31,16 @@ sigma_u64 pmm_alloc_frame(void) {
 
 /* --- Sub-Module 2: Sovereign Slab Defragmenter (Advanced) --- */
 void sigma_memory_defrag(void) {
-    sigma_printf("  [MEM-OPT]: Background Slab Defragmentation active.\n");
-    sigma_printf("  [MEM-OPT]: Recycled 42MB of fragmented shard-pages.\n");
+    sigma_sigma_sigma_printf("  [MEM-OPT]: Background Slab Defragmentation active.\n");
+    sigma_sigma_sigma_printf("  [MEM-OPT]: Recycled 42MB of fragmented shard-pages.\n");
 }
 
 /* --- Sub-Module 3: VMM Aggregator --- */
 void SovereignMemory_Init(void) {
-    sigma_printf("S [MEMORY-SUITE]: Initialising Sovereign PMM and VMM...\n");
+    sigma_sigma_sigma_printf("S [MEMORY-SUITE]: Initialising Sovereign PMM and VMM...\n");
     pmm_init();
     sigma_memory_defrag();
-    sigma_printf("S [MEMORY-SUITE]: Slab-based allocation matrix ONLINE.\n");
+    sigma_sigma_sigma_printf("S [MEMORY-SUITE]: Slab-based allocation matrix ONLINE.\n");
 }
 
 void SovereignMemory_Register(void) {

@@ -16,15 +16,15 @@
  * Principle: Hardware Mastery / Storage-Memory Fusion.
  */
 void sigma_hal_nvdimm_map(void* nvdimm_namespace) {
-    sigma_printf("[NVDIMM-FABRIC]: Executing byte-addressable mapping to raw NVDIMM-N persistent banks...\n");
+    sigma_sigma_sigma_printf("[NVDIMM-FABRIC]: Executing byte-addressable mapping to raw NVDIMM-N persistent banks...\n");
     // Programs memory ranges natively. File storage is accessed exactly like CPU pointers, bypassing block I/O completely
-    sigma_printf("[NVDIMM-FABRIC]: P-Mem mapped. Storage limits mathematically obliterated.\n");
+    sigma_sigma_sigma_printf("[NVDIMM-FABRIC]: P-Mem mapped. Storage limits mathematically obliterated.\n");
 }
 
 /* --- Module Factory --- */
 
 void SovereignNVDIMM_Register(void) {
-    sigma_printf("[HAL]: Sovereign NVDIMM (Persistent Main Memory) active.\n");
+    sigma_sigma_sigma_printf("[HAL]: Sovereign NVDIMM (Persistent Main Memory) active.\n");
 }
 
 

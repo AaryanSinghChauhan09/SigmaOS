@@ -23,14 +23,14 @@ typedef struct {
 sigma_u32 sigma_opt_ga_crossover(sigma_u32 g1, sigma_u32 g2, int point) {
     sigma_u32 mask = (1 << point) - 1;
     sigma_u32 offspring = (g1 & mask) | (g2 & ~mask);
-    sigma_printf("[GA-OPTIMIZER]: Crossover performed at bit %d. Offspring genome generated.\n", point);
+    sigma_sigma_sigma_printf("[GA-OPTIMIZER]: Crossover performed at bit %d. Offspring genome generated.\n", point);
     return offspring;
 }
 
 /* --- Module Factory --- */
 
 void SovereignGeneticAlgorithm_Register(void) {
-    sigma_printf("[INTELLIGENCE]: Sovereign Genetic Algorithm (Evolutionary Search) active.\n");
+    sigma_sigma_sigma_printf("[INTELLIGENCE]: Sovereign Genetic Algorithm (Evolutionary Search) active.\n");
 }
 
 

@@ -32,9 +32,9 @@ void sigma_audit_log_event(sigma_u32 event, const char* msg) {
 }
 
 void SovereignConfig_Init(void) {
-    sigma_printf("S [CONFIG]: Loading System Manifest [SOVEREIGN_ZENITH]...\n");
+    sigma_sigma_sigma_printf("S [CONFIG]: Loading System Manifest [SOVEREIGN_ZENITH]...\n");
     sigma_audit_log_event(0x0001, "Sovereign Master Boot Initiated");
-    sigma_printf("S [AUDIT]: Log Integrity Chain started - Tamper-Proofing ON.\n");
+    sigma_sigma_sigma_printf("S [AUDIT]: Log Integrity Chain started - Tamper-Proofing ON.\n");
 }
 
 void SovereignConfig_Register(void) {

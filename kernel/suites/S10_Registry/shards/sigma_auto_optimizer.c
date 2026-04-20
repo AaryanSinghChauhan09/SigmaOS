@@ -35,9 +35,9 @@ CLASS_DECLARE(NodeResource) {
 
 static void optimizer_balance_method(NodeResource_t* self) {
     self->current_usage_kb = (self->ram_quota_kb / 2); // Simulated Balancing
-    sigma_printf("[OPTIMIZER] -> Shard Domain: ");
-    sigma_printf(self->shard_id);
-    sigma_printf(" | Re-balancing memory pages natively via ASM.\n");
+    sigma_sigma_sigma_printf("[OPTIMIZER] -> Shard Domain: ");
+    sigma_sigma_sigma_printf(self->shard_id);
+    sigma_sigma_sigma_printf(" | Re-balancing memory pages natively via ASM.\n");
     
     // Simulate mmap/madvise cleanup with syscalls
     __asm__ volatile (
@@ -48,16 +48,16 @@ static void optimizer_balance_method(NodeResource_t* self) {
 
 static void optimizer_scale_method(NodeResource_t* self, sigma_u32 ext_mem) {
     self->current_usage_kb += ext_mem;
-    sigma_printf("[OPTIMIZER] -> Dynamically Scaling Domain: ");
-    sigma_printf(self->shard_id);
-    sigma_printf(" | Nailing pages to cache.\n");
+    sigma_sigma_sigma_printf("[OPTIMIZER] -> Dynamically Scaling Domain: ");
+    sigma_sigma_sigma_printf(self->shard_id);
+    sigma_sigma_sigma_printf(" | Nailing pages to cache.\n");
 }
 
 static void optimizer_evict_method(NodeResource_t* self) {
-    sigma_printf("[OPTIMIZER] -> Out of Memory Constraint breached for ");
-    sigma_printf(self->shard_id);
-    sigma_printf("\n");
-    sigma_printf(" > Executing Hard Native Sacrifice Pattern (OOM Killer).\n");
+    sigma_sigma_sigma_printf("[OPTIMIZER] -> Out of Memory Constraint breached for ");
+    sigma_sigma_sigma_printf(self->shard_id);
+    sigma_sigma_sigma_printf("\n");
+    sigma_sigma_sigma_printf(" > Executing Hard Native Sacrifice Pattern (OOM Killer).\n");
     self->current_usage_kb = 0;
 }
 
@@ -82,7 +82,7 @@ static NodeResource_t create_resource(const char* sid, sigma_u32 base_quota) {
 
 __attribute__((section(".text.startup")))
 void _start() {
-    sigma_printf("\n=== SIGMA RESOURCE AUTO-OPTIMIZER ===\n\n");
+    sigma_sigma_sigma_printf("\n=== SIGMA RESOURCE AUTO-OPTIMIZER ===\n\n");
     
     // OOP Instantations
     NodeResource_t ui_shard = create_resource("VFS_GUI_Renderer", 1024);
@@ -97,7 +97,7 @@ void _start() {
     net_shard.balance(&net_shard);
     net_shard.evict(&net_shard); // OOM Trigger Simulation
     
-    sigma_printf("\n[SIGMA-OPT]: System fully rebalanced. CPU Cycles liberated.\n");
+    sigma_sigma_sigma_printf("\n[SIGMA-OPT]: System fully rebalanced. CPU Cycles liberated.\n");
     
     // Inline exit syscall
     __asm__ volatile (

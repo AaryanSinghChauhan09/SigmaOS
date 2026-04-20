@@ -21,10 +21,10 @@ void handle_linux_usps(int argc, char** argv) {
 }
 
 void handle_amalgamate(int argc, char** argv) {
-    sigma_printf("S [AMALGAMATE]: Initiating Global Linux Synergy Matrix...\n");
-    sigma_printf("S [ABSORB]: Synergizing NixOS (Declarative), Arch (KISS), Gentoo (Performance), and Debian (Stability).\n");
-    sigma_printf("S [STATUS]: SigmaOS has successfully absorbed 220+ Linux Distro USPs.\n");
-    sigma_printf("S [RESULT]: SigmaOS is now the Amalgamation of all Linux Goods.\n");
+    sigma_sigma_sigma_printf("S [AMALGAMATE]: Initiating Global Linux Synergy Matrix...\n");
+    sigma_sigma_sigma_printf("S [ABSORB]: Synergizing NixOS (Declarative), Arch (KISS), Gentoo (Performance), and Debian (Stability).\n");
+    sigma_sigma_sigma_printf("S [STATUS]: SigmaOS has successfully absorbed 220+ Linux Distro USPs.\n");
+    sigma_sigma_sigma_printf("S [RESULT]: SigmaOS is now the Amalgamation of all Linux Goods.\n");
 }
 
 void SovereignDistroCommands_Register(void) {

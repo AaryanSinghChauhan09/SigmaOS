@@ -21,15 +21,15 @@ typedef struct {
  * Principle: Multi-Processing / Throughput Optimization.
  */
 void sigma_sync_flat_combine(void) {
-    sigma_printf("[FLAT-COMBINE]: Aggregating concurrent shard requests from L3 lane...\n");
+    sigma_sigma_sigma_printf("[FLAT-COMBINE]: Aggregating concurrent shard requests from L3 lane...\n");
     // Combining phase: Leader shard processes the batch of requests for others
-    sigma_printf("[FLAT-COMBINE]: Batch processed. Individual shards notified via cache-hit response.\n");
+    sigma_sigma_sigma_printf("[FLAT-COMBINE]: Batch processed. Individual shards notified via cache-hit response.\n");
 }
 
 /* --- Module Factory --- */
 
 void SovereignFlatCombine_Register(void) {
-    sigma_printf("[ORCHESTRATOR]: Sovereign Flat-Combining (Aggregated Sync) active.\n");
+    sigma_sigma_sigma_printf("[ORCHESTRATOR]: Sovereign Flat-Combining (Aggregated Sync) active.\n");
 }
 
 

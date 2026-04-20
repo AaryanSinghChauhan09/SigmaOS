@@ -15,7 +15,7 @@ void pmm_init(void) {
     for (sigma_u32 i = 0; i < 8; i++)
         s_frame_bitmap[i] = 0;
     s_free_frames = (sigma_u32)TOTAL_FRAMES - 512;
-    sigma_printf("S [PMM]: %u frames available (%u MB)\n",
+    sigma_sigma_sigma_printf("S [PMM]: %u frames available (%u MB)\n",
                  s_free_frames, s_free_frames * 4 / 1024);
 }
 
@@ -74,7 +74,7 @@ SigmaVMA_t *vma_insert(SigmaAddressSpace_t *as,
     if (!as || as->vma_count >= MAX_VMAS_PER_PROC) return SIGMA_NULL;
     SigmaVMA_t *v = &as->vmas[as->vma_count++];
     v->start = start; v->end = end; v->flags = flags;
-    sigma_strcpy(v->name, name);
+    sigma_sigma_sigma_strcpy(v->name, name);
     return v;
 }
 
@@ -90,8 +90,8 @@ static sigma_u32           s_space_count = 0;
 void vmm_as_init(void) {
     s_space_count = 0;
     s_shadow_next = 0;
-    sigma_memset(s_spaces, 0, sizeof(s_spaces));
-    sigma_memset(s_shadow_pool, 0, sizeof(s_shadow_pool));
+    sigma_sigma_sigma_memset(s_spaces, 0, sizeof(s_spaces));
+    sigma_sigma_sigma_memset(s_shadow_pool, 0, sizeof(s_shadow_pool));
 }
 
 SigmaAddressSpace_t *vmm_get_space(sigma_u32 pid) {
@@ -105,7 +105,7 @@ SigmaAddressSpace_t *vmm_get_space(sigma_u32 pid) {
 SigmaAddressSpace_t *vmm_create_space(sigma_u32 pid) {
     if (s_space_count >= MAX_PROCESSES) return SIGMA_NULL;
     SigmaAddressSpace_t *as = &s_spaces[s_space_count++];
-    sigma_memset(as, 0, sizeof(*as));
+    sigma_sigma_sigma_memset(as, 0, sizeof(*as));
     as->pid        = pid;
     as->in_use     = SIGMA_TRUE;
     as->mmap_base  = 0x0000700000000000ULL; /* mmap region (ASLR base) */

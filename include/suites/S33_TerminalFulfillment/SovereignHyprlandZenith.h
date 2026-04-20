@@ -56,10 +56,10 @@ void sigma_hyprland_init(int initial_gaps_in, int initial_gaps_out) {
  * Allows live overriding of animations, gaps, and window routing.
  */
 void sigma_hyprctl_dispatch(const char* command, const char* arg) {
-    if (sigma_strcmp(command, "dispatch") == 0) {
-        if (sigma_strcmp(arg, "exec") == 0) {
+    if (sigma_sigma_strcmp(command, "dispatch") == 0) {
+        if (sigma_sigma_strcmp(arg, "exec") == 0) {
             sigma_print_info("Spawning shard in current workspace cluster...");
-        } else if (sigma_strcmp(arg, "killactive") == 0) {
+        } else if (sigma_sigma_strcmp(arg, "killactive") == 0) {
             sigma_print_info("Dissolving active window node with Bézier curve animation...");
             if (g_tiler_state.window_count > 0) g_tiler_state.window_count--;
         } else {

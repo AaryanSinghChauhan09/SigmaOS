@@ -86,15 +86,15 @@ void sovereign_analyze_stream(const float* stream, sigma_u32 size, float* mean, 
 /* --- AI Model Hooks --- */
 
 void sigma_neural_inference_step(void) {
-    sigma_printf("[INTELLIGENCE]: Propagating Sovereign Neural Matrix...\n");
-    sigma_printf("[AI]: Synaptic Converge at 100%% Singularity.\n");
+    sigma_sigma_sigma_printf("[INTELLIGENCE]: Propagating Sovereign Neural Matrix...\n");
+    sigma_sigma_sigma_printf("[AI]: Synaptic Converge at 100%% Singularity.\n");
 }
 
 /* --- Module Factory --- */
 
 void SovereignIntelligence_Register(void) {
-    sigma_printf("[ZENITHUI]: Sovereign Intelligence Shard (AI/ML/DS) active.\n");
-    sigma_printf("[AUDIT]: Principle Adherence: AI-Sentience v50 verified.\n");
+    sigma_sigma_sigma_printf("[ZENITHUI]: Sovereign Intelligence Shard (AI/ML/DS) active.\n");
+    sigma_sigma_sigma_printf("[AUDIT]: Principle Adherence: AI-Sentience v50 verified.\n");
 }
 
 #endif /* SOVEREIGN_INTELLIGENCE_SHARD_H */

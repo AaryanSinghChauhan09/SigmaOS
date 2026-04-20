@@ -1,7 +1,7 @@
 #include "../../../include/sigma_virtio.h"
 #include "../../../include/sigma_pmm.h"
-#include <string.h>
-#include <stdio.h>
+#include "suites/S01_Genesis/shards/sigma_libc.h"
+#include "suites/S01_Genesis/shards/sigma_libc.h"
 
 /* =========================================================================
  * SIGMA OS: VIRTUALIZATION SUITE (S11) - SIGMA HYPERVISOR
@@ -12,8 +12,8 @@ static sigma_vm_descriptor_t vms[MAX_VIRTUAL_MACHINES];
 static uint32_t next_vm_id = 1;
 
 void sigma_virt_init(void) {
-    memset(vms, 0, sizeof(vms));
-    printf("[VIRT] Sigma Hypervisor Online. KVM/Docker containerized in App Vault.\n");
+    sigma_sigma_memset(vms, 0, sizeof(vms));
+    sigma_sigma_printf("[VIRT] Sigma Hypervisor Online. KVM/Docker containerized in App Vault.\n");
 }
 
 int sigma_virt_create_vm(const char* label, uint64_t ram, uint8_t vcpus) {
@@ -33,21 +33,21 @@ int sigma_virt_create_vm(const char* label, uint64_t ram, uint8_t vcpus) {
         sigma_pmm_allocate_block();
     }
 
-    printf("[VIRT] VM '%s' created. vCPUs=%u, RAM=%llu bytes\n", label, vcpus, ram);
+    sigma_sigma_printf("[VIRT] VM '%s' created. vCPUs=%u, RAM=%llu bytes\n", label, vcpus, ram);
     return next_vm_id++;
 }
 
 int sigma_virt_start_vm(uint32_t vm_id) {
     if (vm_id == 0 || vm_id >= MAX_VIRTUAL_MACHINES) return -1;
     vms[vm_id].state = VM_STATE_RUNNING;
-    printf("[VIRT] VM %u started.\n", vm_id);
+    sigma_sigma_printf("[VIRT] VM %u started.\n", vm_id);
     return 0;
 }
 
 int sigma_virt_stop_vm(uint32_t vm_id) {
     if (vm_id == 0 || vm_id >= MAX_VIRTUAL_MACHINES) return -1;
     vms[vm_id].state = VM_STATE_STOPPED;
-    printf("[VIRT] VM %u stopped.\n", vm_id);
+    sigma_sigma_printf("[VIRT] VM %u stopped.\n", vm_id);
     return 0;
 }
 

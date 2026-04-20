@@ -1,7 +1,7 @@
 #ifndef SIGMA_VIRTIO_H
 #define SIGMA_VIRTIO_H
 
-#include <stdint.h>
+#include "suites/S01_Genesis/shards/sigma_types.h"
 
 /* =========================================================================
  * SIGMA OS: VIRTUALIZATION SUITE (S11) - SIGMA HYPERVISOR INTERFACE

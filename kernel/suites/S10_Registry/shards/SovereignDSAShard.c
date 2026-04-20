@@ -68,10 +68,10 @@ static void quicksort_recursive(sigma_u32* arr, sigma_ssz_t low, sigma_ssz_t hig
 
 static void sigma_dsa_quicksort(SovereignDSAShard_t* self, sigma_u32* arr, sigma_sz_t size) {
     self->active_algo = "QUICKSORT";
-    sigma_printf("[DSA]: Initiating Native Zenith Quicksort on %d elements...\n", (int)size);
+    sigma_sigma_sigma_printf("[DSA]: Initiating Native Zenith Quicksort on %d elements...\n", (int)size);
     quicksort_recursive(arr, 0, size - 1);
     self->total_ops += (size * size); // Theoretical upper bound log approximation for audit
-    sigma_printf("[DSA]: Sorting complete. Shard validated.\n");
+    sigma_sigma_sigma_printf("[DSA]: Sorting complete. Shard validated.\n");
 }
 
 // -------------------------------------------------------------------------
@@ -79,11 +79,11 @@ static void sigma_dsa_quicksort(SovereignDSAShard_t* self, sigma_u32* arr, sigma
 // -------------------------------------------------------------------------
 
 static void sigma_dsa_audit(SovereignDSAShard_t* self) {
-    sigma_printf("\n--- DSA SHARD AUDIT ---\n");
-    sigma_printf("ALGO: %s\n", self->active_algo);
-    sigma_printf("COMPLEXITY: O(N log N) Native Transition\n");
-    sigma_printf("OP_MATRIX: %llu\n", self->total_ops);
-    sigma_printf("-----------------------\n");
+    sigma_sigma_sigma_printf("\n--- DSA SHARD AUDIT ---\n");
+    sigma_sigma_sigma_printf("ALGO: %s\n", self->active_algo);
+    sigma_sigma_sigma_printf("COMPLEXITY: O(N log N) Native Transition\n");
+    sigma_sigma_sigma_printf("OP_MATRIX: %llu\n", self->total_ops);
+    sigma_sigma_sigma_printf("-----------------------\n");
 }
 
 // -------------------------------------------------------------------------
@@ -91,7 +91,7 @@ static void sigma_dsa_audit(SovereignDSAShard_t* self) {
 // -------------------------------------------------------------------------
 
 static void* sigma_dsa_map_silicon(SovereignDSAShard_t* self, sigma_u64 phys_addr, sigma_sz_t size) {
-    sigma_printf("[DSA]: Mapping physical silicon sector 0x%llX (%d bytes) to Zenith Virtual Memory...\n", 
+    sigma_sigma_sigma_printf("[DSA]: Mapping physical silicon sector 0x%llX (%d bytes) to Zenith Virtual Memory...\n", 
                  (unsigned long long)phys_addr, (int)size);
     // simulated Mach VM mapping
     self->total_ops++;
@@ -121,7 +121,7 @@ SovereignDSAShard_t SovereignDSA_Create() {
 // -------------------------------------------------------------------------
 
 void SovereignDSA_Register() {
-    sigma_printf("[REGISTRY]: Registering Native DSA Shard...\n");
+    sigma_sigma_sigma_printf("[REGISTRY]: Registering Native DSA Shard...\n");
     // In a real system, we'd add to the kernel's dynamic registry here
 }
 

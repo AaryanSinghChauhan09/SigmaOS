@@ -21,19 +21,19 @@ typedef struct {
  * Principle: AI / Algorithms / Data Science.
  */
 void sigma_opt_bbbc_crunch(SigmaBBBCPoint_t* points, int count, float* center) {
-    sigma_printf("[BBBC-CORE]: Initiating 'Big Crunch' across %d parameter points...\n", count);
+    sigma_sigma_sigma_printf("[BBBC-CORE]: Initiating 'Big Crunch' across %d parameter points...\n", count);
     float sum[4] = {0, 0, 0, 0};
     for(int i = 0; i < count; i++) {
         for(int j = 0; j < 4; j++) sum[j] += points[i].pos[j];
     }
     for(int j = 0; j < 4; j++) center[j] = sum[j] / count;
-    sigma_printf("[BBBC-CORE]: Metric Center Seated. Ready for next Big Bang expansion.\n");
+    sigma_sigma_sigma_printf("[BBBC-CORE]: Metric Center Seated. Ready for next Big Bang expansion.\n");
 }
 
 /* --- Module Factory --- */
 
 void SovereignBBBC_Register(void) {
-    sigma_printf("[INTELLIGENCE]: Sovereign BBBC (Convergence Mastery) active.\n");
+    sigma_sigma_sigma_printf("[INTELLIGENCE]: Sovereign BBBC (Convergence Mastery) active.\n");
 }
 
 

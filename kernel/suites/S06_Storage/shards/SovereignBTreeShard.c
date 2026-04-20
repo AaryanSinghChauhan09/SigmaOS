@@ -26,7 +26,7 @@ typedef struct BNode {
  * Principle: Algorithms / Data Science.
  */
 void sigma_btree_insert(SigmaBNode_t** root, sigma_u64 key, void* value) {
-    sigma_printf("[ALGORITHM]: Inserting Key 0x%llX into Sovereign B-Tree.\n", key);
+    sigma_sigma_sigma_printf("[ALGORITHM]: Inserting Key 0x%llX into Sovereign B-Tree.\n", key);
     // Real B-Tree balancing and splitting logic
 }
 
@@ -34,14 +34,14 @@ void sigma_btree_insert(SigmaBNode_t** root, sigma_u64 key, void* value) {
  * sigma_btree_search: Performs a fast lookup in the index.
  */
 void* sigma_btree_search(SigmaBNode_t* root, sigma_u64 key) {
-    sigma_printf("[ALGORITHM]: O(log n) lookup for key 0x%llX...\n", key);
+    sigma_sigma_sigma_printf("[ALGORITHM]: O(log n) lookup for key 0x%llX...\n", key);
     return (void*)0xBBBBBBBB;
 }
 
 /* --- Module Factory --- */
 
 void SovereignBTree_Register(void) {
-    sigma_printf("[STORAGE]: Sovereign B-Tree Indexing (Algorithmic Mastery) active.\n");
+    sigma_sigma_sigma_printf("[STORAGE]: Sovereign B-Tree Indexing (Algorithmic Mastery) active.\n");
 }
 
 

@@ -24,20 +24,20 @@ typedef struct {
 void sigma_sync_enqueue_wf(SigmaWaitFreeQueue_t* q, void* item) {
     sigma_u64 pos = __sync_fetch_and_add(&q->head, 1);
     q->buffer[pos % 256] = item;
-    sigma_printf("[SYNC]: Wait-Free Enqueue Success (Pos: %llu).\n", pos);
+    sigma_sigma_sigma_printf("[SYNC]: Wait-Free Enqueue Success (Pos: %llu).\n", pos);
 }
 
 /**
  * sigma_sync_monitor_progress: Verifies that all threads are making progress.
  */
 void sigma_sync_monitor_progress(sigma_u32 thread_id) {
-    sigma_printf("[SYNC]: Progress Monitor [Thread %u]: HEALTHY.\n", thread_id);
+    sigma_sigma_sigma_printf("[SYNC]: Progress Monitor [Thread %u]: HEALTHY.\n", thread_id);
 }
 
 /* --- Module Factory --- */
 
 void SovereignWaitFree_Register(void) {
-    sigma_printf("[ORCHESTRATOR]: Sovereign Wait-Free Concurrency (Singularity-Nexus) active.\n");
+    sigma_sigma_sigma_printf("[ORCHESTRATOR]: Sovereign Wait-Free Concurrency (Singularity-Nexus) active.\n");
 }
 
 

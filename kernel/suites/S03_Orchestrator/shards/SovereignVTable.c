@@ -24,6 +24,6 @@ static inline void* sigma_vtable_dispatch(sigma_vtable_t* vtable, sigma_u32 inde
 }
 
 void sigma_vtable_init(void) {
-    sigma_printf("S [VTABLE]: Sovereign Dynamic Dispatcher (S01) active.\n");
-    sigma_printf("S [VTABLE]: Benchmark: 1.2ns per dispatch gate (Zenith Optimized).\n");
+    sigma_sigma_sigma_printf("S [VTABLE]: Sovereign Dynamic Dispatcher (S01) active.\n");
+    sigma_sigma_sigma_printf("S [VTABLE]: Benchmark: 1.2ns per dispatch gate (Zenith Optimized).\n");
 }

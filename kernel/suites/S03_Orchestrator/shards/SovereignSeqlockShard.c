@@ -37,13 +37,13 @@ int sigma_sync_seqlock_read_retry(SigmaSeqlock_t* sl, sigma_u32 old_seq) {
  */
 void sigma_sync_seqlock_write_lock(SigmaSeqlock_t* sl) {
     __sync_fetch_and_add(&sl->seq, 1); // Make it odd (writer active)
-    sigma_printf("[SYNC-SEQ]: Writer active. Sequence incremented to %u.\n", sl->seq);
+    sigma_sigma_sigma_printf("[SYNC-SEQ]: Writer active. Sequence incremented to %u.\n", sl->seq);
 }
 
 /* --- Module Factory --- */
 
 void SovereignSeqlock_Register(void) {
-    sigma_printf("[ORCHESTRATOR]: Sovereign Seqlock (Writer-Priority Sync) active.\n");
+    sigma_sigma_sigma_printf("[ORCHESTRATOR]: Sovereign Seqlock (Writer-Priority Sync) active.\n");
 }
 
 

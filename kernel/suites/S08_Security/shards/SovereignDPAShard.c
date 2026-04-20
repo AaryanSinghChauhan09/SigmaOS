@@ -16,15 +16,15 @@
  * Principle: Cyber Security / Absolute Physical Stealth.
  */
 void sigma_sec_dpa_mask(void) {
-    sigma_printf("[DPA-VAULT]: Injecting boolean masking and synthetic power draw into ALU pipeline...\n");
+    sigma_sigma_sigma_printf("[DPA-VAULT]: Injecting boolean masking and synthetic power draw into ALU pipeline...\n");
     // Actively consumes variable power independently of the cryptographic data being processed to blind external oscilloscopes
-    sigma_printf("[DPA-VAULT]: Power draw normalized and blinded. DPA extraction mathematically denied.\n");
+    sigma_sigma_sigma_printf("[DPA-VAULT]: Power draw normalized and blinded. DPA extraction mathematically denied.\n");
 }
 
 /* --- Module Factory --- */
 
 void SovereignDPA_Register(void) {
-    sigma_printf("[SECURITY]: Sovereign DPA (Power Analysis Blinding) active.\n");
+    sigma_sigma_sigma_printf("[SECURITY]: Sovereign DPA (Power Analysis Blinding) active.\n");
 }
 
 

@@ -19,16 +19,16 @@ static int console_row = 0;
 static sigma_u8 console_color = 0x07; // Light gray on black
 
 void sigma_console_init() {
-    sigma_memset(VGA_BUFFER, 0, VGA_WIDTH * VGA_HEIGHT * 2);
+    sigma_sigma_sigma_memset(VGA_BUFFER, 0, VGA_WIDTH * VGA_HEIGHT * 2);
     console_col = 0;
     console_row = 0;
 }
 
 static void console_scroll() {
     for (int y = 0; y < VGA_HEIGHT - 1; y++) {
-        sigma_memcpy(VGA_BUFFER + (y * VGA_WIDTH), VGA_BUFFER + ((y + 1) * VGA_WIDTH), VGA_WIDTH * 2);
+        sigma_sigma_sigma_memcpy(VGA_BUFFER + (y * VGA_WIDTH), VGA_BUFFER + ((y + 1) * VGA_WIDTH), VGA_WIDTH * 2);
     }
-    sigma_memset(VGA_BUFFER + ((VGA_HEIGHT - 1) * VGA_WIDTH), 0, VGA_WIDTH * 2);
+    sigma_sigma_sigma_memset(VGA_BUFFER + ((VGA_HEIGHT - 1) * VGA_WIDTH), 0, VGA_WIDTH * 2);
     console_row = VGA_HEIGHT - 1;
 }
 

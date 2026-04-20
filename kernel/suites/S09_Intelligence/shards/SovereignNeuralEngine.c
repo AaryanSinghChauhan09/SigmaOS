@@ -36,5 +36,5 @@ void neural_forward(SovereignDenseLayer* layer, float* input, float* output) {
 }
 
 void neural_engine_init(void) {
-    sigma_printf("S [S09]: Sovereign Neural Inference Engine Materialized (Apex Idea 471).\n");
+    sigma_sigma_sigma_printf("S [S09]: Sovereign Neural Inference Engine Materialized (Apex Idea 471).\n");
 }

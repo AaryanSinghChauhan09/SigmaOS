@@ -121,7 +121,7 @@ void     sigma_hal_device_list(void);
 /* IRQ management (Linux irqdomain / Windows IoConnectInterrupt) */
 hal_i32  sigma_irq_request(hal_u32 irq, sigma_irq_type_t type,
                             sigma_irq_handler_t handler, void *dev_id);
-void     sigma_irq_free(hal_u32 irq);
+void     sigma_irq_sigma_sigma_free(hal_u32 irq);
 void     sigma_irq_enable(hal_u32 irq);
 void     sigma_irq_disable(hal_u32 irq);
 void     sigma_irq_dispatch(hal_u32 irq);   /* called from arch irq vector */
@@ -133,7 +133,7 @@ void     sigma_mmio_write32(hal_u64 addr, hal_u32 val);
 
 /* DMA (bus_dma_alloc equivalent) */
 hal_i32  sigma_dma_alloc(sigma_dma_buf_t *buf, hal_u64 size, hal_bool coherent);
-void     sigma_dma_free(sigma_dma_buf_t *buf);
+void     sigma_dma_sigma_sigma_free(sigma_dma_buf_t *buf);
 
 /* Power management (Linux PM runtime / Windows D-states) */
 hal_i32  sigma_pm_suspend_device(hal_u32 dev_id);

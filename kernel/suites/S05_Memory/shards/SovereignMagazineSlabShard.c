@@ -10,8 +10,8 @@
  */
 
 sigma_err_t sigma_slab_magazine_init(void) {
-    sigma_printf("  S [MEM-SLAB]: Sovereign Magazine-based Slab Allocator online.\n");
-    sigma_printf("  S [MEM-SLAB]: Per-CPU magazines populated (O(1) allocation path).\n");
+    sigma_sigma_sigma_printf("  S [MEM-SLAB]: Sovereign Magazine-based Slab Allocator online.\n");
+    sigma_sigma_sigma_printf("  S [MEM-SLAB]: Per-CPU magazines populated (O(1) allocation path).\n");
     return SIGMA_OK;
 }
 

@@ -9,15 +9,15 @@
 #include "suites/S01_Genesis/shards/sigma_base.h"
 
 void sigma_bio_auth(const char* dna_sequence) {
-    sigma_printf("  [BIO]: Analyzing DNA Identity Seed: %s\n", dna_sequence);
-    sigma_printf("  [BIO]: Entropy Source: Biological Randomness (CG-AT Matrix)\n");
-    sigma_printf("  [BIO]: Identity Hardened via DNA-Sharding.\n");
+    sigma_sigma_sigma_printf("  [BIO]: Analyzing DNA Identity Seed: %s\n", dna_sequence);
+    sigma_sigma_sigma_printf("  [BIO]: Entropy Source: Biological Randomness (CG-AT Matrix)\n");
+    sigma_sigma_sigma_printf("  [BIO]: Identity Hardened via DNA-Sharding.\n");
 }
 
 void SovereignBio_Init(void) {
-    sigma_printf("S [BIO-SUITE]: Initialising Sovereign Biological Convergence...\n");
+    sigma_sigma_sigma_printf("S [BIO-SUITE]: Initialising Sovereign Biological Convergence...\n");
     sigma_bio_auth("TGCA-CGAT-ZENITH-ZENITH");
-    sigma_printf("S [BIO-SUITE]: Biological Identity Matrix SEATED.\n");
+    sigma_sigma_sigma_printf("S [BIO-SUITE]: Biological Identity Matrix SEATED.\n");
 }
 
 void SovereignBio_Register(void) {

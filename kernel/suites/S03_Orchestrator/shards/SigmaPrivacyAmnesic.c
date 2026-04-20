@@ -21,7 +21,7 @@ void SovereignAmnesiaPurge(int level) {
     // 2. Clear VFS transient shards
     // 3. Flush hardware TLB (if kernel-level)
     
-    sigma_printf("S [SUCCESS]: System state is now AMNESIC. No transient data remaining.\n");
+    sigma_sigma_sigma_printf("S [SUCCESS]: System state is now AMNESIC. No transient data remaining.\n");
 }
 
 /**

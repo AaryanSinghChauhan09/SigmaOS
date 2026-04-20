@@ -19,14 +19,14 @@
 
 
 // ── Memory Primitives (no glibc) ──────────────────────────────────────────────
-void* sigma_memcpy(void* dest, const void* src, uint32_t n) {
+void* sigma_sigma_sigma_memcpy(void* dest, const void* src, uint32_t n) {
     uint8_t* d = (uint8_t*)dest;
     const uint8_t* s = (const uint8_t*)src;
     while (n--) *d++ = *s++;
     return dest;
 }
 
-void* sigma_memset(void* dest, int c, uint32_t n) {
+void* sigma_sigma_sigma_memset(void* dest, int c, uint32_t n) {
     uint8_t* d = (uint8_t*)dest;
     while (n--) *d++ = (uint8_t)c;
     return dest;
@@ -51,13 +51,13 @@ void* sigma_memmove(void* dest, const void* src, uint32_t n) {
 }
 
 // ── String Primitives ─────────────────────────────────────────────────────────
-uint32_t sigma_strlen(const char* s) {
+uint32_t sigma_sigma_sigma_strlen(const char* s) {
     const char* p = s;
     while (*p) p++;
     return (uint32_t)(p - s);
 }
 
-char* sigma_strcpy(char* dest, const char* src) {
+char* sigma_sigma_sigma_strcpy(char* dest, const char* src) {
     char* d = dest;
     while ((*d++ = *src++));
     return dest;
@@ -70,7 +70,7 @@ char* sigma_strncpy(char* dest, const char* src, uint32_t n) {
     return dest;
 }
 
-int sigma_strcmp(const char* a, const char* b) {
+int sigma_sigma_sigma_strcmp(const char* a, const char* b) {
     while (*a && (*a == *b)) { a++; b++; }
     return (unsigned char)*a - (unsigned char)*b;
 }
@@ -107,7 +107,7 @@ int64_t sigma_atoi(const char* s) {
 }
 
 // Safe snprintf — no glibc, no vsnprintf. Integer + string only.
-int sigma_snprintf(char* buf, uint32_t size, const char* fmt, ...) {
+int sigma_snsigma_sigma_printf(char* buf, uint32_t size, const char* fmt, ...) {
     va_list ap; va_start(ap, fmt);
     uint32_t written = 0;
     for (const char* f = fmt; *f && written < size - 1; f++) {
@@ -140,13 +140,13 @@ void sigma_sort_small(void* base, uint32_t n, uint32_t size,
     uint8_t* arr = (uint8_t*)base;
     uint8_t  tmp[256];
     for (uint32_t i = 1; i < n; i++) {
-        sigma_memcpy(tmp, arr + i * size, size);
+        sigma_sigma_sigma_memcpy(tmp, arr + i * size, size);
         int32_t j = (int32_t)i - 1;
         while (j >= 0 && cmp(arr + j * size, tmp) > 0) {
-            sigma_memcpy(arr + (j + 1) * size, arr + j * size, size);
+            sigma_sigma_sigma_memcpy(arr + (j + 1) * size, arr + j * size, size);
             j--;
         }
-        sigma_memcpy(arr + (j + 1) * size, tmp, size);
+        sigma_sigma_sigma_memcpy(arr + (j + 1) * size, tmp, size);
     }
 }
 

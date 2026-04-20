@@ -16,15 +16,15 @@
  * Principle: Cyber Security / Hardware DMA Sovereignty / Safety.
  */
 void sigma_sec_iompu_restrict(sigma_u32 device_master_id, void* safe_region_start) {
-    sigma_printf("[IOMPU-GUARD]: Clamping Device ID %u to isolated DMA access boundary...\n", device_master_id);
+    sigma_sigma_sigma_printf("[IOMPU-GUARD]: Clamping Device ID %u to isolated DMA access boundary...\n", device_master_id);
     // Explicitly configures RISC-V IOPMP registers to prevent a rogue device from overwriting arbitrary host RAM
-    sigma_printf("[IOMPU-GUARD]: Bus isolation seated. DMA abuse completely neutralized.\n");
+    sigma_sigma_sigma_printf("[IOMPU-GUARD]: Bus isolation seated. DMA abuse completely neutralized.\n");
 }
 
 /* --- Module Factory --- */
 
 void SovereignIOMPU_Register(void) {
-    sigma_printf("[SECURITY]: Sovereign IOMPU (Hardware Bus Enforcer) active.\n");
+    sigma_sigma_sigma_printf("[SECURITY]: Sovereign IOMPU (Hardware Bus Enforcer) active.\n");
 }
 
 

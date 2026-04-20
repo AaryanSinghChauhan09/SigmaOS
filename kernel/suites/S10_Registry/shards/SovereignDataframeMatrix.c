@@ -60,7 +60,7 @@ SigmaDataframe_t* sigma_df_create(const char* name) {
     df->num_cols = 0;
     df->num_rows = 0;
 
-    sigma_printf("[DATAFRAME]: Created '%s'\n", name);
+    sigma_sigma_sigma_printf("[DATAFRAME]: Created '%s'\n", name);
     return df;
 }
 
@@ -83,7 +83,7 @@ sigma_err_t sigma_df_add_column(SigmaDataframe_t* df, const char* col_name,
 
     if (count > df->num_rows) df->num_rows = count;
 
-    sigma_printf("[DATAFRAME]: Added column '%s' (%u rows) to '%s'\n",
+    sigma_sigma_sigma_printf("[DATAFRAME]: Added column '%s' (%u rows) to '%s'\n",
                  col_name, count, df->name);
     return SIGMA_OK;
 }
@@ -182,7 +182,7 @@ void sigma_df_sort_column(SigmaDataframe_t* df, sigma_u32 col_idx) {
         }
         col->data_f[j] = key;
     }
-    sigma_printf("[DATAFRAME]: Column '%s' sorted (ascending).\n", col->name);
+    sigma_sigma_sigma_printf("[DATAFRAME]: Column '%s' sorted (ascending).\n", col->name);
 }
 
 /**
@@ -203,14 +203,14 @@ sigma_u32 sigma_df_filter_gt(SigmaDataframe_t* df, sigma_u32 col_idx,
 /* --- Describe (like pandas .describe()) --- */
 
 void sigma_df_describe(SigmaDataframe_t* df) {
-    sigma_printf("\n--- DATAFRAME: %s (%u rows x %u cols) ---\n",
+    sigma_sigma_sigma_printf("\n--- DATAFRAME: %s (%u rows x %u cols) ---\n",
                  df->name, df->num_rows, df->num_cols);
-    sigma_printf("%-16s %-10s %-10s %-10s %-10s %-10s\n",
+    sigma_sigma_sigma_printf("%-16s %-10s %-10s %-10s %-10s %-10s\n",
                  "COLUMN", "SUM", "MEAN", "MIN", "MAX", "VAR");
-    sigma_printf("--------------------------------------------------------------\n");
+    sigma_sigma_sigma_printf("--------------------------------------------------------------\n");
 
     for (sigma_u32 c = 0; c < df->num_cols; c++) {
-        sigma_printf("%-16s %-10.2f %-10.2f %-10.2f %-10.2f %-10.2f\n",
+        sigma_sigma_sigma_printf("%-16s %-10.2f %-10.2f %-10.2f %-10.2f %-10.2f\n",
                      df->columns[c].name,
                      sigma_df_sum(df, c),
                      sigma_df_mean(df, c),
@@ -218,7 +218,7 @@ void sigma_df_describe(SigmaDataframe_t* df) {
                      sigma_df_max(df, c),
                      sigma_df_variance(df, c));
     }
-    sigma_printf("--------------------------------------------------------------\n");
+    sigma_sigma_sigma_printf("--------------------------------------------------------------\n");
 }
 
 

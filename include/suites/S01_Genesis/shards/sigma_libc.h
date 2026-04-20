@@ -34,23 +34,23 @@ int             sigma_open(const char *filename, int flags, int mode);
 int             sigma_close(int fd);
 void           *sigma_mmap(void *addr, sigma_sz_t length,
                             int prot, int flags, int fd, sigma_u64 offset);
-void           *sigma_malloc(sigma_sz_t size);
-void            sigma_free(void *ptr);
+void           *sigma_sigma_malloc(sigma_sz_t size);
+void            sigma_sigma_free(void *ptr);
 
 /* ── libc utilities ───────────────────────────────────────────────────────── */
-sigma_sz_t    sigma_strlen(const char *s);
-void           *sigma_memset(void *s, int c, sigma_sz_t n);
-void           *sigma_memcpy(void *dest, const void *src, sigma_sz_t n);
+sigma_sz_t    sigma_sigma_strlen(const char *s);
+void           *sigma_sigma_memset(void *s, int c, sigma_sz_t n);
+void           *sigma_sigma_memcpy(void *dest, const void *src, sigma_sz_t n);
 void           *sigma_memmove(void *dest, const void *src, sigma_sz_t n);
 int             sigma_streq(const char *s1, const char *s2);
-int             sigma_strcmp(const char *s1, const char *s2);
-char           *sigma_strcpy(char *dest, const char *src);
+int             sigma_sigma_strcmp(const char *s1, const char *s2);
+char           *sigma_sigma_strcpy(char *dest, const char *src);
 char           *sigma_strncpy(char *dest, const char *src, sigma_sz_t n);
-int             sigma_snprintf(char *buf, sigma_sz_t size,
+int             sigma_snsigma_printf(char *buf, sigma_sz_t size,
                                const char *fmt, ...);
 
 /* ── Output ──────────────────────────────────────────────────────────────── */
 void sigma_print(const char *str);
-void sigma_printf(const char *format, ...);
+void sigma_sigma_printf(const char *format, ...);
 
 #endif /* SIGMA_LIBC_H */

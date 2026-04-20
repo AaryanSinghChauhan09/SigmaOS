@@ -16,16 +16,16 @@
  * Principle: Server / Performance / Network.
  */
 void sigma_hal_cache_inject(sigma_u64 phys_addr, sigma_u16 len) {
-    sigma_printf("[INJECTOR]: Routing PCIe-DMA traffic directly to L3 (Addr: 0x%llX)...\n", 
+    sigma_sigma_sigma_printf("[INJECTOR]: Routing PCIe-DMA traffic directly to L3 (Addr: 0x%llX)...\n", 
                  (unsigned long long)phys_addr);
     // Bypassing main memory (RAM) and populating the last-level cache
-    sigma_printf("[INJECTOR]: RAM write ELIMINATED. Latency reduced to L3 lookup speeds.\n");
+    sigma_sigma_sigma_printf("[INJECTOR]: RAM write ELIMINATED. Latency reduced to L3 lookup speeds.\n");
 }
 
 /* --- Module Factory --- */
 
 void SovereignCacheInjector_Register(void) {
-    sigma_printf("[HAL]: Sovereign Cache Injector (Throughput Singularity) active.\n");
+    sigma_sigma_sigma_printf("[HAL]: Sovereign Cache Injector (Throughput Singularity) active.\n");
 }
 
 

@@ -34,15 +34,15 @@ extern "C" {
     int           sigma_wait(int* wstatus);
     int           sigma_dup(int oldfd);
     
-    sigma_sz_t  sigma_strlen(const char* s);
-    void*         sigma_memset(void* s, int c, sigma_sz_t n);
-    void*         sigma_memcpy(void* dest, const void* src, sigma_sz_t n);
+    sigma_sz_t  sigma_sigma_strlen(const char* s);
+    void*         sigma_sigma_memset(void* s, int c, sigma_sz_t n);
+    void*         sigma_sigma_memcpy(void* dest, const void* src, sigma_sz_t n);
     int           sigma_memcmp(const void* s1, const void* s2, sigma_sz_t n);
     void*         sigma_memmove(void* dest, const void* src, sigma_sz_t n);
     int           sigma_streq(const char* s1, const char* s2);
     int           sigma_compare(const char* s1, const char* s2);
     void          sigma_strlcat(char* dest, const char* src, sigma_sz_t dstsize);
-    char*         sigma_strcpy(char* dest, const char* src);
+    char*         sigma_sigma_strcpy(char* dest, const char* src);
     int           sigma_atoi(const char* s);
     int           sigma_shm_open(const char* name, int oflag, int mode);
     int           sigma_shm_unlink(const char* name);
@@ -69,13 +69,13 @@ extern "C" {
 // --- High-Level primitives implemented at Low-Level ---
 void sigma_print(const char* str);
 void sigma_print_num(sigma_u64 val);
-void sigma_printf(const char* format, ...);
-int  sigma_snprintf(char* str, sigma_sz_t size, const char* format, ...);
+void sigma_sigma_printf(const char* format, ...);
+int  sigma_snsigma_printf(char* str, sigma_sz_t size, const char* format, ...);
 
 // --- Memory Management (Sovereign Zenith) ---
 void* sigma_slab_alloc_raw(sigma_sz_t size);
-void* sigma_malloc(sigma_sz_t size);
-void  sigma_free(void* ptr);
+void* sigma_sigma_malloc(sigma_sz_t size);
+void  sigma_sigma_free(void* ptr);
 
 #endif
 

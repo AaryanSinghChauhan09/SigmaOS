@@ -22,9 +22,9 @@ typedef struct {
  * Principle: Data Science / Storage Sovereignty.
  */
 void sigma_df_persist(const char* filename, SigmaDataframe_t* df, void* data) {
-    sigma_printf("[STORAGE]: Persisting Columnar Dataframe [%u x %u] to %s.\n", 
+    sigma_sigma_sigma_printf("[STORAGE]: Persisting Columnar Dataframe [%u x %u] to %s.\n", 
                  df->rows, df->cols, filename);
-    sigma_printf("[STORAGE]: Bypassing cache for zero-copy DMA transfer.\n");
+    sigma_sigma_sigma_printf("[STORAGE]: Bypassing cache for zero-copy DMA transfer.\n");
     // Interface with S04_HAL logic for NVMe-native writes
 }
 
@@ -32,14 +32,14 @@ void sigma_df_persist(const char* filename, SigmaDataframe_t* df, void* data) {
  * sigma_df_load: Loads a dataframe directly into an AI/ML tensor.
  */
 void* sigma_df_load(const char* filename, SigmaDataframe_t* df_out) {
-    sigma_printf("[STORAGE]: Loading Tensor Dataframe from %s...\n", filename);
+    sigma_sigma_sigma_printf("[STORAGE]: Loading Tensor Dataframe from %s...\n", filename);
     return (void*)0x30000000;
 }
 
 /* --- Module Factory --- */
 
 void SovereignDataframe_Register(void) {
-    sigma_printf("[STORAGE]: Sovereign Dataframe Shard (DS Engines) active.\n");
+    sigma_sigma_sigma_printf("[STORAGE]: Sovereign Dataframe Shard (DS Engines) active.\n");
 }
 
 

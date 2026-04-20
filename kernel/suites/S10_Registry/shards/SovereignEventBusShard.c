@@ -27,22 +27,22 @@ static int s_channel_count = 0;
  * Principle: Backend / IPC.
  */
 void sigma_bus_publish(const char* topic, void* payload) {
-    sigma_printf("[BUS]: Publishing Event on Topic '%s'...\n", topic);
+    sigma_sigma_sigma_printf("[BUS]: Publishing Event on Topic '%s'...\n", topic);
     // Search for channel and invoke subscriber callbacks
-    sigma_printf("[BUS]: Event dispatched to 3 shard-subscribers.\n");
+    sigma_sigma_sigma_printf("[BUS]: Event dispatched to 3 shard-subscribers.\n");
 }
 
 /**
  * sigma_bus_subscribe: Registers a shard-callback for a specific event topic.
  */
 void sigma_bus_subscribe(const char* topic, void (*callback)(void*)) {
-    sigma_printf("[BUS]: Shard subscribing to topic '%s'.\n", topic);
+    sigma_sigma_sigma_printf("[BUS]: Shard subscribing to topic '%s'.\n", topic);
 }
 
 /* --- Module Factory --- */
 
 void SovereignEventBus_Register(void) {
-    sigma_printf("[REGISTRY]: Sovereign Event Bus (Inter-Shard Pub/Sub) active.\n");
+    sigma_sigma_sigma_printf("[REGISTRY]: Sovereign Event Bus (Inter-Shard Pub/Sub) active.\n");
 }
 
 

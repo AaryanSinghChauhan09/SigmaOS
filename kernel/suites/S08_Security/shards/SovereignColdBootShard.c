@@ -16,16 +16,16 @@
  * Principle: Cyber Security / Privacy.
  */
 void sigma_sec_cb_scramble(void* start, sigma_u32 size, sigma_u32 seed) {
-    sigma_printf("[COLD-BOOT]: Scrambling %u bytes of sensitive data (Seed: 0x%X)...\n", 
+    sigma_sigma_sigma_printf("[COLD-BOOT]: Scrambling %u bytes of sensitive data (Seed: 0x%X)...\n", 
                  size, seed);
     // Real bitwise XOR-shuffling of memory pages
-    sigma_printf("[COLD-BOOT]: Memory sanitized against liquid-nitrogen extraction. Sleep SECURE.\n");
+    sigma_sigma_sigma_printf("[COLD-BOOT]: Memory sanitized against liquid-nitrogen extraction. Sleep SECURE.\n");
 }
 
 /* --- Module Factory --- */
 
 void SovereignColdBoot_Register(void) {
-    sigma_printf("[SECURITY]: Sovereign Cold-Boot Mitigation (Physical Defiance) active.\n");
+    sigma_sigma_sigma_printf("[SECURITY]: Sovereign Cold-Boot Mitigation (Physical Defiance) active.\n");
 }
 
 

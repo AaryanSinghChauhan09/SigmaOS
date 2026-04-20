@@ -15,7 +15,7 @@ static sigma_u64 s_total_ops = 0;
 
 void SelfEvolution_Init(void) {
     for (int i = 0; i < 34; i++) s_suite_latencies[i] = 0;
-    sigma_printf("S [S19]: Self-Evolution Latency Optimizer active.\n");
+    sigma_sigma_sigma_printf("S [S19]: Self-Evolution Latency Optimizer active.\n");
 }
 
 void SelfEvolution_Step(void) {
@@ -28,7 +28,7 @@ void SelfEvolution_Step(void) {
         }
         
         if (s_total_ops % 1000 == 0) {
-            sigma_printf("S [S19]: Performance Snapshot -> 1000 Ops processed. Optimizing Lattice Load...\n");
+            sigma_sigma_sigma_printf("S [S19]: Performance Snapshot -> 1000 Ops processed. Optimizing Lattice Load...\n");
         }
     }
 }

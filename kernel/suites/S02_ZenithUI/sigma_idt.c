@@ -1,6 +1,6 @@
 #include "../../../include/sigma_idt.h"
-#include <stddef.h>
-#include <string.h>
+#include "suites/S01_Genesis/shards/sigma_types.h"
+#include "suites/S01_Genesis/shards/sigma_libc.h"
 
 /* =========================================================================
  * SIGMA OS: HARDWARE INTERRUPT MATRIX (IDT) C11 IMPLEMENTATION

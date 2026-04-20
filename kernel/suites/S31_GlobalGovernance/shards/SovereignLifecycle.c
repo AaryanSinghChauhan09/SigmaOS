@@ -21,5 +21,5 @@ typedef void (*sigma_lifecycle_cb)(sigma_lifecycle_state_t state);
 
 void sigma_governance_broadcast_state(sigma_lifecycle_state_t state) {
     const char* names[] = {"BORN", "ACTIVE", "PAUSED", "STOPPED", "DEAD"};
-    sigma_printf("S [GOVERNANCE]: System-wide Lifecycle Event -> %s\n", names[state]);
+    sigma_sigma_sigma_printf("S [GOVERNANCE]: System-wide Lifecycle Event -> %s\n", names[state]);
 }

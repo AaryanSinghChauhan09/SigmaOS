@@ -19,13 +19,13 @@ void sigma_ai_backprop(sigma_f64* weights, sigma_f64* grads, sigma_f64 learning_
         /* W = W - (LR * G) (Principle: Stochastic Gradient Descent) */
         weights[i] -= learning_rate * grads[i];
     }
-    sigma_printf("[AI]: Neural weights reconciled via backpropagation.\n");
+    sigma_sigma_sigma_printf("[AI]: Neural weights reconciled via backpropagation.\n");
 }
 
 /* --- Module Factory --- */
 
 void SovereignNeuralGradient_Register(void) {
-    sigma_printf("[AI]: Sovereign Neural Gradient (Learning) active.\n");
+    sigma_sigma_sigma_printf("[AI]: Sovereign Neural Gradient (Learning) active.\n");
 }
 
 

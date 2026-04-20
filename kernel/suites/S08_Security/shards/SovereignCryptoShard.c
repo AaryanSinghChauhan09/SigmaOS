@@ -64,9 +64,9 @@ int sigma_crypto_verify(const void* a, const void* b, sigma_sz_t len) {
 /* --- Module Registration --- */
 
 sigma_err_t sigma_crypto_init(void) {
-    sigma_printf("[CRYPTO]: Sovereign Cryptography v2.0 Online.\n");
-    sigma_printf("  [HASH]: FNV-1a 64-bit parity verified.\n");
-    sigma_printf("  [ENCR]: Stream Cipher transformation logic seated.\n");
+    sigma_sigma_sigma_printf("[CRYPTO]: Sovereign Cryptography v2.0 Online.\n");
+    sigma_sigma_sigma_printf("  [HASH]: FNV-1a 64-bit parity verified.\n");
+    sigma_sigma_sigma_printf("  [ENCR]: Stream Cipher transformation logic seated.\n");
     return SIGMA_OK;
 }
 

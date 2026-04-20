@@ -83,14 +83,14 @@ CLASS_DECLARE(SovereignSyncProblems) {
 
 static void solve_dining_philosophers(SovereignSyncProblems_t* self) {
     (void)self;
-    sigma_printf("[SYNC-SOLVER]: Executing Dijkstra's Solution for Dining Philosophers...\n");
-    sigma_printf("[SYNC-SOLVER]: Philosophers are now eating without deadlock in Zenith Shard.\n");
+    sigma_sigma_printf("[SYNC-SOLVER]: Executing Dijkstra's Solution for Dining Philosophers...\n");
+    sigma_sigma_printf("[SYNC-SOLVER]: Philosophers are now eating without deadlock in Zenith Shard.\n");
 }
 
 static void solve_readers_writers(SovereignSyncProblems_t* self) {
     (void)self;
-    sigma_printf("[SYNC-SOLVER]: Executing Readers-Writers Solution (Writer Priority)...\n");
-    sigma_printf("[SYNC-SOLVER]: Multi-reader concurrency verified with single-writer exclusion.\n");
+    sigma_sigma_printf("[SYNC-SOLVER]: Executing Readers-Writers Solution (Writer Priority)...\n");
+    sigma_sigma_printf("[SYNC-SOLVER]: Multi-reader concurrency verified with single-writer exclusion.\n");
 }
 
 static SovereignSyncProblems_t create_sync_problems() {

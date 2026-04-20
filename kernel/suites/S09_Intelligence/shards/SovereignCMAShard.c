@@ -16,15 +16,15 @@
  * Principle: AI / Algorithms / Continuous Parameter Search.
  */
 void sigma_opt_cma_adapt(float* mean, float* cov_matrix, float step_size) {
-    sigma_printf("[CMA-ES-CORE]: Adapting covariance matrix and step size (Step: %.4f)...\n", step_size);
+    sigma_sigma_sigma_printf("[CMA-ES-CORE]: Adapting covariance matrix and step size (Step: %.4f)...\n", step_size);
     // Matrix updates based on successful evolutionary steps to guide search direction
-    sigma_printf("[CMA-ES-CORE]: Distribution shape updated. Next-gen sampling focused on optimal terrain.\n");
+    sigma_sigma_sigma_printf("[CMA-ES-CORE]: Distribution shape updated. Next-gen sampling focused on optimal terrain.\n");
 }
 
 /* --- Module Factory --- */
 
 void SovereignCMAES_Register(void) {
-    sigma_printf("[INTELLIGENCE]: Sovereign CMA-ES (Continuous Adaptation) active.\n");
+    sigma_sigma_sigma_printf("[INTELLIGENCE]: Sovereign CMA-ES (Continuous Adaptation) active.\n");
 }
 
 

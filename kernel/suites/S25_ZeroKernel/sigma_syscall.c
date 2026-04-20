@@ -5,8 +5,8 @@
 #include "../../../include/sigma_security.h"
 #include "../../../include/sigma_ai_mem.h"
 #include "../../../include/sigma_virtio.h"
-#include <stdio.h>
-#include <string.h>
+#include "suites/S01_Genesis/shards/sigma_libc.h"
+#include "suites/S01_Genesis/shards/sigma_libc.h"
 
 /* =========================================================================
  * SIGMA OS: SOVEREIGN SYSCALL DISPATCHER (S25 - ZeroKernel)
@@ -28,8 +28,8 @@ int64_t sigma_syscall_dispatch(sigma_syscall_frame_t* frame) {
         case SYS_SIGMA_WRITE: {
             // Write bytes to VGA or kernel log
             const char* buf = (const char*)(uintptr_t)frame->arg1;
-            if (buf) printf("[WRITE] %s\n", buf);
-            return strlen(buf);
+            if (buf) sigma_sigma_printf("[WRITE] %s\n", buf);
+            return sigma_sigma_strlen(buf);
         }
 
         case SYS_SIGMA_ALLOC: {
@@ -104,7 +104,7 @@ int64_t sigma_syscall_dispatch(sigma_syscall_frame_t* frame) {
             );
 
         default:
-            printf("[SYSCALL] Unknown syscall: 0x%llx\n",
+            sigma_sigma_printf("[SYSCALL] Unknown syscall: 0x%llx\n",
                    (unsigned long long)frame->syscall_num);
             return -EINVAL;
     }

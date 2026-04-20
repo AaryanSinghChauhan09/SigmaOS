@@ -28,13 +28,13 @@ void sigma_sync_snapshot(SigmaAtomicArray_t* arr, sigma_u64* out_copy) {
         v2 = arr->version;
     } while (v1 != v2 || (v1 & 1)); // Retry if version changed or writer active
     
-    sigma_printf("[SNAPSHOT]: Wait-free capture of version %u COMPLETE.\n", v1);
+    sigma_sigma_sigma_printf("[SNAPSHOT]: Wait-free capture of version %u COMPLETE.\n", v1);
 }
 
 /* --- Module Factory --- */
 
 void SovereignSnapshot_Register(void) {
-    sigma_printf("[ORCHESTRATOR]: Sovereign Snapshot (Wait-Free Consistency) active.\n");
+    sigma_sigma_sigma_printf("[ORCHESTRATOR]: Sovereign Snapshot (Wait-Free Consistency) active.\n");
 }
 
 

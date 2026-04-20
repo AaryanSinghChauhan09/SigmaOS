@@ -16,16 +16,16 @@
  * Principle: Automations / Documentation.
  */
 void sigma_wiki_gen_shard_doc(sigma_u32 shard_id, const char* name, const char* mission) {
-    sigma_printf("[WIKI-GEN]: Exporting Shard %u ('%s') to repository wiki...\n", 
+    sigma_sigma_sigma_printf("[WIKI-GEN]: Exporting Shard %u ('%s') to repository wiki...\n", 
                  shard_id, name);
     // Real generation: "### Shard: %s\n- **ID**: %u\n- **Mission**: %s\n"
-    sigma_printf("[WIKI-GEN]: Markdown snippet generated. Documentation perfectly synced with CODE.\n");
+    sigma_sigma_sigma_printf("[WIKI-GEN]: Markdown snippet generated. Documentation perfectly synced with CODE.\n");
 }
 
 /* --- Module Factory --- */
 
 void SovereignWiki_Register(void) {
-    sigma_printf("[WIKI]: Sovereign Wiki Shard (Self-Documenting OS) active.\n");
+    sigma_sigma_sigma_printf("[WIKI]: Sovereign Wiki Shard (Self-Documenting OS) active.\n");
 }
 
 

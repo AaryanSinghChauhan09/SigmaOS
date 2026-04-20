@@ -8,7 +8,7 @@
  *
  * Migration map:
  *   SigmaObject (C++ base class)  -> sigma_obj_header_t (C struct field)
- *   SigmaMemory::allocate()       -> sigma_malloc()
+ *   SigmaMemory::allocate()       -> sigma_sigma_malloc()
  *   namespace SigmaOS             -> sigma_ prefix convention
  *   sigma_log()                   -> sigma_log() in SovereignLibC.h
  * =========================================================================
@@ -46,11 +46,11 @@ typedef struct sigma_obj_header_t {
  * Sovereign memory shim (forwards to SovereignLibC slab allocator)
  * ========================================================================= */
 static inline void* sigma_alloc(sigma_sz_t size) {
-    return sigma_malloc(size);
+    return sigma_sigma_malloc(size);
 }
 
 static inline void sigma_dealloc(void* ptr) {
-    sigma_free(ptr);
+    sigma_sigma_free(ptr);
 }
 
 /* =========================================================================

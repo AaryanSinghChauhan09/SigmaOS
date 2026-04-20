@@ -32,17 +32,17 @@ void sigma_vfs_register(SigmaFileSystem_t* fs) {
  */
 sigma_err_t sigma_vfs_open(const char* path) {
     /* Logic: Route /dev/, /sys/, /mnt/ (Principle: Sharding) */
-    sigma_printf("[VFS]: Dispatching open request for '%s'...\n", path);
+    sigma_sigma_sigma_printf("[VFS]: Dispatching open request for '%s'...\n", path);
     return SIGMA_OK;
 }
 
 /* --- Module Factory --- */
 
 void SovereignVFS_Register(void) {
-    sigma_printf("[STORAGE]: Sovereign VFS Layer (Abstraction) online.\n");
-    sigma_printf("  ↳ [CFS OVERRIDE]: Engaging Cosmic File System (CFS) Layer.\n");
-    sigma_printf("  ↳ ZFS and EXT4 bottlenecks eliminated. Lock-free directory trees active.\n");
-    sigma_printf("  ↳ Quantum-Redundancy & Z-Mem block buffering engaged natively. True bare-metal I/O.\n");
+    sigma_sigma_sigma_printf("[STORAGE]: Sovereign VFS Layer (Abstraction) online.\n");
+    sigma_sigma_sigma_printf("  ↳ [CFS OVERRIDE]: Engaging Cosmic File System (CFS) Layer.\n");
+    sigma_sigma_sigma_printf("  ↳ ZFS and EXT4 bottlenecks eliminated. Lock-free directory trees active.\n");
+    sigma_sigma_sigma_printf("  ↳ Quantum-Redundancy & Z-Mem block buffering engaged natively. True bare-metal I/O.\n");
 }
 
 

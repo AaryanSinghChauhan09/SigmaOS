@@ -11,13 +11,13 @@
  */
 
 void sigma_kernel_main(void) {
-    sigma_printf("\nS [INIT]: Sovereign Master Orchestrator engaged.\n");
-    sigma_printf("S [INIT]: Commencing Trinitarian Boot Sequence (vROADMAP_1005)...\n\n");
+    sigma_sigma_sigma_printf("\nS [INIT]: Sovereign Master Orchestrator engaged.\n");
+    sigma_sigma_sigma_printf("S [INIT]: Commencing Trinitarian Boot Sequence (vROADMAP_1005)...\n\n");
 
     /* Master Aggregator Call */
     SovereignMaster_InitAll();
 
-    sigma_printf("\nS [DONE]: All 445 shards seated. Operational Sovereignty achieved.\n");
+    sigma_sigma_sigma_printf("\nS [DONE]: All 445 shards seated. Operational Sovereignty achieved.\n");
 }
 
 int SovereignMasterOrchestrator_ToolMain(void) {

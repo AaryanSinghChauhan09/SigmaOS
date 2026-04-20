@@ -6,7 +6,7 @@
 
 #include "sigma_libc.h"
 
-sigma_sz_t sigma_strlen(const char* s) {
+sigma_sz_t sigma_sigma_sigma_strlen(const char* s) {
     if (!s) return 0;
     sigma_sz_t len = 0;
     while (s[len]) len++;
@@ -42,13 +42,13 @@ char* sigma_strncpy(char* dest, const char* src, sigma_sz_t n) {
     return dest;
 }
 
-char* sigma_strcpy(char* dest, const char* src) {
+char* sigma_sigma_sigma_strcpy(char* dest, const char* src) {
     char* d = dest;
     while ((*d++ = *src++));
     return dest;
 }
 
-int sigma_strcmp(const char* s1, const char* s2) {
+int sigma_sigma_sigma_strcmp(const char* s1, const char* s2) {
     while (*s1 && (*s1 == *s2)) {
         s1++;
         s2++;

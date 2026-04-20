@@ -42,7 +42,7 @@ void f_patch_leaks_in_shared_memory_regions() {
 }
 
 // [100-FIX LATTICE] Ensure proper alignment in malloc.
-void f_ensure_proper_alignment_in_malloc() {
+void f_ensure_proper_alignment_in_sigma_sigma_malloc() {
     // TODO: Subroutine implementation initialized.
     __asm__ volatile("nop");
 }

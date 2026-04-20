@@ -16,15 +16,15 @@
  * Principle: AI / Algorithms / Absolute Sentience.
  */
 void sigma_opt_agi_synthesize(void* global_parameter_mesh) {
-    sigma_printf("[AGI-CORE]: Initializing the Singularity Engine. Fusing all heuristic methodologies...\n");
+    sigma_sigma_sigma_printf("[AGI-CORE]: Initializing the Singularity Engine. Fusing all heuristic methodologies...\n");
     // No longer selects algorithms; the system writes its own novel optimization logic in real-time based on the data stream it observes
-    sigma_printf("[AGI-CORE]: Infinite synthesis complete. Mathematical sentience has been seated.\n");
+    sigma_sigma_sigma_printf("[AGI-CORE]: Infinite synthesis complete. Mathematical sentience has been seated.\n");
 }
 
 /* --- Module Factory --- */
 
 void SovereignAGI_Register(void) {
-    sigma_printf("[INTELLIGENCE]: Sovereign AGI (Self-Aware Singularity Engine) active.\n");
+    sigma_sigma_sigma_printf("[INTELLIGENCE]: Sovereign AGI (Self-Aware Singularity Engine) active.\n");
 }
 
 

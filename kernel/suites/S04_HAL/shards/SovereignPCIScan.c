@@ -15,7 +15,7 @@ static SigmaPCIDevice_t s_pci_scan[MAX_PCI_DEVICES];
 static sigma_u32        s_pci_count = 0;
 
 void sigma_pcie_scan(void) {
-    sigma_printf("S [PCI]: Enumerating PCIe configuration space...\n");
+    sigma_sigma_sigma_printf("S [PCI]: Enumerating PCIe configuration space...\n");
 
     /* Simulated PCIe population (Architectural Parity) */
     static const struct { sigma_u16 vid; sigma_u16 did; const char* name; } simulated[] = {
@@ -29,9 +29,9 @@ void sigma_pcie_scan(void) {
         SigmaPCIDevice_t* p = &s_pci_scan[s_pci_count++];
         p->vendor_id = simulated[i].vid;
         p->device_id = simulated[i].did;
-        sigma_printf("S [PCI]: 00:%02x.0 [%04x:%04x] — %s\n", i, p->vendor_id, p->device_id, simulated[i].name);
+        sigma_sigma_sigma_printf("S [PCI]: 00:%02x.0 [%04x:%04x] — %s\n", i, p->vendor_id, p->device_id, simulated[i].name);
     }
-    sigma_printf("S [PCI]: PCIe scan complete — %u devices found.\n", s_pci_count);
+    sigma_sigma_sigma_printf("S [PCI]: PCIe scan complete — %u devices found.\n", s_pci_count);
 }
 
 

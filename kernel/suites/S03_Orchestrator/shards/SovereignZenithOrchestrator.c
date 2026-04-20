@@ -21,8 +21,8 @@
 #include "SovereignInit.h"
 
 void sigma_kernel_main(void) {
-    sigma_printf("--- S SIGMAOS ZENITH SUPREME: SOVEREIGN REIGN INITIATED --- \n");
-    sigma_printf("S [INIT]: Formalising Kernel Orchestration Matrix...\n\n");
+    sigma_sigma_sigma_printf("--- S SIGMAOS ZENITH SUPREME: SOVEREIGN REIGN INITIATED --- \n");
+    sigma_sigma_sigma_printf("S [INIT]: Formalising Kernel Orchestration Matrix...\n\n");
 
     /* 1. Architecture Sector (CPU & Device Detection) */
     SovereignArch_InitRegistry();
@@ -44,15 +44,15 @@ void sigma_kernel_main(void) {
     SovereignSecurity_InitRegistry();
 
     /* 6. Multi-Paradigm Amalgamation */
-    sigma_printf("S [INIT]: Absorbing Global Linux/BSD USPs Shards...\n");
+    sigma_sigma_sigma_printf("S [INIT]: Absorbing Global Linux/BSD USPs Shards...\n");
     // External registry calls for distros/tools would be here.
 
     /* 7. Service Sector (PID 1 Initiation) */
     SovereignInit_InitRegistry();
     SovereignInit_StartAll();
 
-    sigma_printf("\n--- S SIGMAOS ZENITH SUPREME: SYSTEM SOVEREIGNTY VERIFIED --- \n");
-    sigma_printf("S [SYNC]: vROADMAP_1005 — ARCHITECTURAL ZENITH REACHED.\n");
+    sigma_sigma_sigma_printf("\n--- S SIGMAOS ZENITH SUPREME: SYSTEM SOVEREIGNTY VERIFIED --- \n");
+    sigma_sigma_sigma_printf("S [SYNC]: vROADMAP_1005 — ARCHITECTURAL ZENITH REACHED.\n");
 }
 
 

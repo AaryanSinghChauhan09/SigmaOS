@@ -26,15 +26,15 @@ void sigma_scheduler_spawn(const char* name, int priority, sigma_u32 affinity) {
     t->priority = priority;
     t->affinity_mask = affinity;
     sigma_strncpy(t->name, name, 32);
-    sigma_printf("  [SCHED]: Spawned task [%s] (TID: %d) on CoreMask: 0x%X\n", name, t->tid, affinity);
+    sigma_sigma_sigma_printf("  [SCHED]: Spawned task [%s] (TID: %d) on CoreMask: 0x%X\n", name, t->tid, affinity);
 }
 
 void SovereignScheduler_Init(void) {
-    sigma_printf("S [SCHEDULER]: Initialising Quantum Affinity Engine...\n");
+    sigma_sigma_sigma_printf("S [SCHEDULER]: Initialising Quantum Affinity Engine...\n");
     sigma_scheduler_spawn("kernel-idle", 0, 0xFF);
     sigma_scheduler_spawn("zenith-matrix", 99, 0x0F);
     sigma_scheduler_spawn("neural-sync", 80, 0xF0);
-    sigma_printf("S [SCHEDULER]: Multi-queue dispatcher ACTIVE.\n");
+    sigma_sigma_sigma_printf("S [SCHEDULER]: Multi-queue dispatcher ACTIVE.\n");
 }
 
 void SovereignScheduler_Register(void) {

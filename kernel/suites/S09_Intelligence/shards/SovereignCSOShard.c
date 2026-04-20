@@ -16,15 +16,15 @@
  * Principle: AI / Algorithms / Biomimetic Pacing.
  */
 void sigma_opt_cso_phase(float* node, int mixture_ratio) {
-    sigma_printf("[CSO-CORE]: Toggling swarm mixture ratio between Seeking and Tracing modes...\n");
+    sigma_sigma_sigma_printf("[CSO-CORE]: Toggling swarm mixture ratio between Seeking and Tracing modes...\n");
     // Seeking mode generates slight random mutations; Tracing mode executes high-velocity leaps toward global best
-    sigma_printf("[CSO-CORE]: Dual-pacing active. Swarm successfully observing and aggressively pursuing.\n");
+    sigma_sigma_sigma_printf("[CSO-CORE]: Dual-pacing active. Swarm successfully observing and aggressively pursuing.\n");
 }
 
 /* --- Module Factory --- */
 
 void SovereignCSO_Register(void) {
-    sigma_printf("[INTELLIGENCE]: Sovereign CSO (Cat Swarm Optimization) active.\n");
+    sigma_sigma_sigma_printf("[INTELLIGENCE]: Sovereign CSO (Cat Swarm Optimization) active.\n");
 }
 
 

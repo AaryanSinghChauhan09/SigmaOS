@@ -1,8 +1,8 @@
 #ifndef SIGMA_REGISTRY_H
 #define SIGMA_REGISTRY_H
 
-#include <stdint.h>
-#include <stddef.h>
+#include "suites/S01_Genesis/shards/sigma_types.h"
+#include "suites/S01_Genesis/shards/sigma_types.h"
 
 /* =========================================================================
  * SIGMA OS: SOVEREIGN REGISTRY (S10)

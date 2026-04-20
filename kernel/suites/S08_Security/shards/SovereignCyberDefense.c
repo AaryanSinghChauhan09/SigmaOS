@@ -14,8 +14,8 @@
  * Principle: Cyber Security / Forensics.
  */
 void sigma_security_scan(void) {
-    sigma_printf("[SECURITY]: Running Heuristic Anomaly Detection...\n");
-    sigma_printf("[SECURITY]: No compromised syscall patterns detected.\n");
+    sigma_sigma_sigma_printf("[SECURITY]: Running Heuristic Anomaly Detection...\n");
+    sigma_sigma_sigma_printf("[SECURITY]: No compromised syscall patterns detected.\n");
 }
 
 /**
@@ -23,14 +23,14 @@ void sigma_security_scan(void) {
  */
 void sigma_kernel_guard_verify(sigma_u64 addr) {
     /* Logic: Cryptographic integrity check (Principle: Data Sovereignty) */
-    sigma_printf("[GUARD]: Integrity verified for address %p.\n", addr);
+    sigma_sigma_sigma_printf("[GUARD]: Integrity verified for address %p.\n", addr);
 }
 
 /* --- Module Factory --- */
 
 void SovereignSecurity_Register(void) {
-    sigma_printf("[SECURITY]: Sovereign Cyber Defense v50 active.\n");
-    sigma_printf("[SECURITY]: Kernel Gate: LOCKED.\n");
+    sigma_sigma_sigma_printf("[SECURITY]: Sovereign Cyber Defense v50 active.\n");
+    sigma_sigma_sigma_printf("[SECURITY]: Kernel Gate: LOCKED.\n");
 }
 
 

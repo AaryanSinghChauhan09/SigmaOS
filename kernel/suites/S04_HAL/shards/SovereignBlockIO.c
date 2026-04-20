@@ -86,7 +86,7 @@ static sigma_u32 s_bdev_count = 0;
 SigmaBlockDevice_t* sigma_blk_allocate_disk(void) {
     if (s_bdev_count >= MAX_BLOCK_DEVICES) return SIGMA_NULL;
     SigmaBlockDevice_t *bdev = &s_bdevs[s_bdev_count++];
-    sigma_memset(bdev, 0, sizeof(*bdev));
+    sigma_sigma_sigma_memset(bdev, 0, sizeof(*bdev));
     bdev->hardsect_size = 512;
     bdev->queue.depth = BLK_QUEUE_DEPTH;
     return bdev;
@@ -95,7 +95,7 @@ SigmaBlockDevice_t* sigma_blk_allocate_disk(void) {
 sigma_err_t sigma_blk_register_disk(SigmaBlockDevice_t *bdev) {
     if (!bdev) return SIGMA_EINVAL;
     bdev->online = SIGMA_TRUE;
-    sigma_printf("S [BLK]: Registered disk '%s' [Capacity: %llu MB]\n", 
+    sigma_sigma_sigma_printf("S [BLK]: Registered disk '%s' [Capacity: %llu MB]\n", 
                  bdev->name, (unsigned long long)((bdev->capacity * 512) / 1024 / 1024));
     return SIGMA_OK;
 }
@@ -127,7 +127,7 @@ sigma_err_t sigma_submit_bio(SigmaBlockDevice_t *bdev, SigmaBio_t *bio) {
     bdev->queue.tail = bio;
     bdev->queue.count++;
 
-    sigma_printf("S [BLK]: Queued %s bio on '%s' (sec: %llu, len: %u)\n",
+    sigma_sigma_sigma_printf("S [BLK]: Queued %s bio on '%s' (sec: %llu, len: %u)\n",
                  bio->opcode == BLK_OP_READ ? "READ" : "WRITE",
                  bdev->name, (unsigned long long)bio->sector, bio->size);
 
@@ -166,7 +166,7 @@ static sigma_err_t dummy_nvme_submit_bio(SigmaBlockDevice_t *bdev, SigmaBio_t *b
 
 static void my_bio_end_io(void *arg) {
     SigmaBio_t *bio = (SigmaBio_t*)arg;
-    sigma_printf("S [BLK]: Completed %s bio on sec %llu [status=%d]\n",
+    sigma_sigma_sigma_printf("S [BLK]: Completed %s bio on sec %llu [status=%d]\n",
                  bio->opcode == BLK_OP_READ ? "READ" : "WRITE",
                  (unsigned long long)bio->sector, bio->status);
 }
@@ -175,10 +175,10 @@ static void my_bio_end_io(void *arg) {
  * ░░ /proc/diskstats Parity
  * ----------------------------------------------------------------------- */
 void sigma_blk_print_stats(void) {
-    sigma_printf("S [BLK]: Block Layer Statistics:\n");
+    sigma_sigma_sigma_printf("S [BLK]: Block Layer Statistics:\n");
     for (sigma_u32 i = 0; i < s_bdev_count; i++) {
         if (!s_bdevs[i].online) continue;
-        sigma_printf("  %s: read_sectors=%llu write_sectors=%llu in_flight=%u\n",
+        sigma_sigma_sigma_printf("  %s: read_sectors=%llu write_sectors=%llu in_flight=%u\n",
                      s_bdevs[i].name, 
                      (unsigned long long)s_bdevs[i].read_sectors,
                      (unsigned long long)s_bdevs[i].write_sectors,
@@ -190,11 +190,11 @@ void sigma_blk_print_stats(void) {
  * ░░ INITIALISATION
  * ----------------------------------------------------------------------- */
 void SovereignBlockIO_Init(void) {
-    sigma_printf("S [BLK]: Initialising Sovereign Block IO Layer (blk-mq)...\n");
+    sigma_sigma_sigma_printf("S [BLK]: Initialising Sovereign Block IO Layer (blk-mq)...\n");
 
     SigmaBlockDevice_t *nvme = sigma_blk_allocate_disk();
     if (nvme) {
-        sigma_strcpy(nvme->name, "nvme0n1", 32);
+        sigma_sigma_sigma_strcpy(nvme->name, "nvme0n1", 32);
         nvme->capacity = 1000204886016ULL / 512; /* ~1TB */
         nvme->hardsect_size = 4096;
         nvme->submit_bio = dummy_nvme_submit_bio;
@@ -203,7 +203,7 @@ void SovereignBlockIO_Init(void) {
 
     SigmaBlockDevice_t *sda = sigma_blk_allocate_disk();
     if (sda) {
-        sigma_strcpy(sda->name, "sda", 32);
+        sigma_sigma_sigma_strcpy(sda->name, "sda", 32);
         sda->capacity = 512000000000ULL / 512; /* ~500GB */
         sda->hardsect_size = 512;
         sda->submit_bio = dummy_nvme_submit_bio; /* reuse dummy */
@@ -219,7 +219,7 @@ void SovereignBlockIO_Init(void) {
     sigma_submit_bio(nvme, &bio1);
 
     sigma_blk_print_stats();
-    sigma_printf("S [BLK]: Block IO layer online. Multi-queue sovereignty active.\n");
+    sigma_sigma_sigma_printf("S [BLK]: Block IO layer online. Multi-queue sovereignty active.\n");
 }
 
 

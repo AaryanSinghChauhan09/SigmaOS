@@ -24,7 +24,7 @@ void sigma_rt_mutex_lock(SigmaMutexRT_t* m, int requester_prio) {
     if (m->locking_pid && requester_prio > m->current_priority) {
         /* Boost holder's priority (Principle: Priority Inheritance) */
         m->current_priority = requester_prio;
-        sigma_printf("[RTOS]: Priority Boost: PID %u elevated to %d.\n", m->locking_pid, requester_prio);
+        sigma_sigma_sigma_printf("[RTOS]: Priority Boost: PID %u elevated to %d.\n", m->locking_pid, requester_prio);
     }
 }
 
@@ -32,13 +32,13 @@ void sigma_rt_mutex_lock(SigmaMutexRT_t* m, int requester_prio) {
  * sovereign_rt_dispatch: Real-time task dispatcher.
  */
 void sovereign_rt_dispatch(sigma_u32 task_id) {
-    sigma_printf("[RTOS]: Dispatching RT-Task %u (Mission Critical).\n", task_id);
+    sigma_sigma_sigma_printf("[RTOS]: Dispatching RT-Task %u (Mission Critical).\n", task_id);
 }
 
 /* --- Module Factory --- */
 
 void SovereignRTOS_Register(void) {
-    sigma_printf("[ORCHESTRATOR]: Sovereign RTOS Engine (Determinism) active.\n");
+    sigma_sigma_sigma_printf("[ORCHESTRATOR]: Sovereign RTOS Engine (Determinism) active.\n");
 }
 
 

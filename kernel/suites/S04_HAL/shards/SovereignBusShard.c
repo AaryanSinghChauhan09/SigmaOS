@@ -24,25 +24,25 @@ typedef struct {
  * Principle: Hardware Discovery / Universal Hardware Access.
  */
 void sigma_hal_pci_scan(void) {
-    sigma_printf("[HAL]: Scanning PCI Bus (Physical configuration space)...\n");
-    sigma_printf("[HAL]: Scanning Web Bridge (Chromium WebUSB/WebHID Discovery)...\n");
+    sigma_sigma_sigma_printf("[HAL]: Scanning PCI Bus (Physical configuration space)...\n");
+    sigma_sigma_sigma_printf("[HAL]: Scanning Web Bridge (Chromium WebUSB/WebHID Discovery)...\n");
     
-    sigma_printf("[HAL]: [FOUND] Device ID: 0x8086 (Physical Network Controller).\n");
-    sigma_printf("[HAL]: [FOUND] Device ID: 0xDEAD (Virtual WebHID Controller).\n");
+    sigma_sigma_sigma_printf("[HAL]: [FOUND] Device ID: 0x8086 (Physical Network Controller).\n");
+    sigma_sigma_sigma_printf("[HAL]: [FOUND] Device ID: 0xDEAD (Virtual WebHID Controller).\n");
 }
 
 /**
  * sigma_bus_attach_device: Attaches a device to the kernel bus.
  */
 void sigma_bus_attach_device(SigmaPCIDevice_t* dev) {
-    sigma_printf("[HAL]: Attaching Device %04X:%04X to Sovereign Bus.\n", 
+    sigma_sigma_sigma_printf("[HAL]: Attaching Device %04X:%04X to Sovereign Bus.\n", 
                  dev->vendor_id, dev->device_id);
 }
 
 /* --- Module Factory --- */
 
 void SovereignBus_Register(void) {
-    sigma_printf("[HAL]: Sovereign Bus Discovery v50 active.\n");
+    sigma_sigma_sigma_printf("[HAL]: Sovereign Bus Discovery v50 active.\n");
 }
 
 

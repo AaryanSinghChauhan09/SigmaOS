@@ -25,16 +25,16 @@ void sigma_ai_nlp_analyze(const char* text) {
     SigmaToken_t dictionary[MAX_TOKENS];
     sigma_u32 dict_size = 0;
 
-    sigma_printf("[NLP]: Analyzing kernel ingress stream...\n");
+    sigma_sigma_sigma_printf("[NLP]: Analyzing kernel ingress stream...\n");
     
     /* Logic: Simplified tokenization and counting (Principle: TF) */
-    sigma_printf("[NLP]: Feature extraction complete. TF matrix generated.\n");
+    sigma_sigma_sigma_printf("[NLP]: Feature extraction complete. TF matrix generated.\n");
 }
 
 /* --- Module Factory --- */
 
 void SovereignNLP_Register(void) {
-    sigma_printf("[AI]: Sovereign NLP Engine seated.\n");
+    sigma_sigma_sigma_printf("[AI]: Sovereign NLP Engine seated.\n");
 }
 
 

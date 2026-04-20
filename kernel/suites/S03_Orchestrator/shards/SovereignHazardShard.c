@@ -21,7 +21,7 @@ typedef struct {
  */
 void sigma_sync_hazard_acquire(SigmaHazardPointer_t* hp, void* p) {
     hp->ptr = p;
-    sigma_printf("[HAZARD]: Pointer 0x%p marked as PROTECTED.\n", p);
+    sigma_sigma_sigma_printf("[HAZARD]: Pointer 0x%p marked as PROTECTED.\n", p);
 }
 
 /**
@@ -29,13 +29,13 @@ void sigma_sync_hazard_acquire(SigmaHazardPointer_t* hp, void* p) {
  */
 void sigma_sync_hazard_release(SigmaHazardPointer_t* hp) {
     hp->ptr = 0;
-    sigma_printf("[HAZARD]: Protection RELEASED.\n");
+    sigma_sigma_sigma_printf("[HAZARD]: Protection RELEASED.\n");
 }
 
 /* --- Module Factory --- */
 
 void SovereignHazard_Register(void) {
-    sigma_printf("[ORCHESTRATOR]: Sovereign Hazard Pointers (Lock-Free Reclamation) active.\n");
+    sigma_sigma_sigma_printf("[ORCHESTRATOR]: Sovereign Hazard Pointers (Lock-Free Reclamation) active.\n");
 }
 
 

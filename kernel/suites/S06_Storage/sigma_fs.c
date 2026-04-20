@@ -1,5 +1,5 @@
 #include "../../../include/sigma_fs.h"
-#include <string.h>
+#include "suites/S01_Genesis/shards/sigma_libc.h"
 
 /* =========================================================================
  * SIGMA OS: VIRTUAL FILE SYSTEM & STORAGE IMPLEMENTATION

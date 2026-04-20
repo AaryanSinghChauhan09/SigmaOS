@@ -22,7 +22,7 @@ typedef struct {
  * Principle: Mobile / Frontend / Portability.
  */
 void sigma_mobile_dispatch_intent(SigmaIntent_t* intent) {
-    sigma_printf("[MOBILE]: Dispatching Intent: ACTION_VIEW -> %s\n", intent->data_uri);
+    sigma_sigma_sigma_printf("[MOBILE]: Dispatching Intent: ACTION_VIEW -> %s\n", intent->data_uri);
     // Link to S02 Zenith UI for PWA/Mobile rendering
 }
 
@@ -30,13 +30,13 @@ void sigma_mobile_dispatch_intent(SigmaIntent_t* intent) {
  * sigma_mobile_sensor_sync: Synchronizes data from accelerometer/gyroscope.
  */
 void sigma_mobile_sensor_sync(float x, float y, float z) {
-    sigma_printf("[SENSORS]: Gravitational Vector Synced: (%.2f, %.2f, %.2f)\n", x, y, z);
+    sigma_sigma_sigma_printf("[SENSORS]: Gravitational Vector Synced: (%.2f, %.2f, %.2f)\n", x, y, z);
 }
 
 /* --- Module Factory --- */
 
 void SovereignAndroidBridge_Register(void) {
-    sigma_printf("[HAL]: Sovereign Android Bridge (Mobile Mastery) active.\n");
+    sigma_sigma_sigma_printf("[HAL]: Sovereign Android Bridge (Mobile Mastery) active.\n");
 }
 
 

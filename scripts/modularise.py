@@ -1,6 +1,6 @@
 import os, re
 
-base_dir = r'C:\Users\Aaryan\.gemini\antigravity\scratch\SigmaOS\web_ui'
+base_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), '..', 'web_ui'))
 app_js_path = os.path.join(base_dir, 'scripts', 'app.js')
 index_html_path = os.path.join(base_dir, 'index.html')
 modules_dir = os.path.join(base_dir, 'scripts', 'modules')

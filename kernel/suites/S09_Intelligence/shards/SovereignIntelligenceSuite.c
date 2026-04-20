@@ -9,14 +9,14 @@
 #include "suites/S01_Genesis/shards/sigma_base.h"
 
 void sigma_neural_bridge_init(void) {
-    sigma_printf("  [NEURAL-LINK]: Synchronizing kernel clock with brainwave frequency (Alpha: 10Hz).\n");
-    sigma_printf("  [NEURAL-LINK]: Bidirectional data-stream established via Shard-Sync.\n");
+    sigma_sigma_sigma_printf("  [NEURAL-LINK]: Synchronizing kernel clock with brainwave frequency (Alpha: 10Hz).\n");
+    sigma_sigma_sigma_printf("  [NEURAL-LINK]: Bidirectional data-stream established via Shard-Sync.\n");
 }
 
 void SovereignIntelligence_Init(void) {
-    sigma_printf("S [INTEL-SUITE]: Initialising Sovereign Intelligence and Neural-Link...\n");
+    sigma_sigma_sigma_printf("S [INTEL-SUITE]: Initialising Sovereign Intelligence and Neural-Link...\n");
     sigma_neural_bridge_init();
-    sigma_printf("S [INTEL-SUITE]: Singularity Convergence: Kernel is now an extension of user consciousness.\n");
+    sigma_sigma_sigma_printf("S [INTEL-SUITE]: Singularity Convergence: Kernel is now an extension of user consciousness.\n");
 }
 
 void SovereignIntelligence_Register(void) {

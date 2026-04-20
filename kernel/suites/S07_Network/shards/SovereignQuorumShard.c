@@ -16,9 +16,9 @@
  * Principle: Distributed / Cloud / Network.
  */
 int sigma_quorum_write(const char* key, void* data, sigma_sz_t size) {
-    sigma_printf("[QUORUM]: Initiating write for key '%s'. Waiting for (N/2 + 1) nodes...\n", key);
+    sigma_sigma_sigma_printf("[QUORUM]: Initiating write for key '%s'. Waiting for (N/2 + 1) nodes...\n", key);
     // Consensus logic: wait for majority of peers to ACK
-    sigma_printf("[QUORUM]: Write SUCCESS. Majority of node cluster (3/3) confirmed.\n");
+    sigma_sigma_sigma_printf("[QUORUM]: Write SUCCESS. Majority of node cluster (3/3) confirmed.\n");
     return 1;
 }
 
@@ -26,13 +26,13 @@ int sigma_quorum_write(const char* key, void* data, sigma_sz_t size) {
  * sigma_quorum_elect: Elects a leader for the distributed shard.
  */
 void sigma_quorum_elect(void) {
-    sigma_printf("[CONSENSUS]: Shard Leader Election in progress... Node 0x01 is the LEADER.\n");
+    sigma_sigma_sigma_printf("[CONSENSUS]: Shard Leader Election in progress... Node 0x01 is the LEADER.\n");
 }
 
 /* --- Module Factory --- */
 
 void SovereignQuorum_Register(void) {
-    sigma_printf("[NETWORK]: Sovereign Quorum Consensus (Omnipresence Consistency) active.\n");
+    sigma_sigma_sigma_printf("[NETWORK]: Sovereign Quorum Consensus (Omnipresence Consistency) active.\n");
 }
 
 

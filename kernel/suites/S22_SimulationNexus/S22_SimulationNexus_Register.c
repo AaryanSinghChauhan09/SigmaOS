@@ -4,5 +4,5 @@
 
 void S22_SimulationNexus_Register(void) {
     SovereignRegistry_Register("S22_SimulationNexus", 0, NULL);
-    sigma_printf("S [S22_SimulationNexus]: Materialized.\n");
+    sigma_sigma_sigma_printf("S [S22_SimulationNexus]: Materialized.\n");
 }

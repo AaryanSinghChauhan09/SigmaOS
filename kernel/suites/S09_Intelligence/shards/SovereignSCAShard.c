@@ -16,15 +16,15 @@
  * Principle: AI / Mathematical Algorithms.
  */
 void sigma_opt_sca_oscillate(float* current_pos, float global_best_pos, float amplitude) {
-    sigma_printf("[SCA-CORE]: Applying trigonometric oscillation to search matrix (Amplitude: %.2f)...\n", amplitude);
+    sigma_sigma_sigma_printf("[SCA-CORE]: Applying trigonometric oscillation to search matrix (Amplitude: %.2f)...\n", amplitude);
     // Sine explores outward, Cosine exploits inward based on a decaying amplitude variable
-    sigma_printf("[SCA-CORE]: Landscape traversed. Mathematics-driven convergence achieved.\n");
+    sigma_sigma_sigma_printf("[SCA-CORE]: Landscape traversed. Mathematics-driven convergence achieved.\n");
 }
 
 /* --- Module Factory --- */
 
 void SovereignSCA_Register(void) {
-    sigma_printf("[INTELLIGENCE]: Sovereign SCA (Trigonometric Optima) active.\n");
+    sigma_sigma_sigma_printf("[INTELLIGENCE]: Sovereign SCA (Trigonometric Optima) active.\n");
 }
 
 

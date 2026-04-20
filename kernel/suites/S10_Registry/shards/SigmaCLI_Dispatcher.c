@@ -10,7 +10,7 @@
 #include "suites/S01_Genesis/shards/sigma_kernel.h"
 
 /* Local utility: replaces strcmp for zero-dependency architecture */
-static int sigma_strcmp(const char* a, const char* b) {
+static int sigma_sigma_sigma_strcmp(const char* a, const char* b) {
     while (*a && (*a == *b)) { a++; b++; }
     return *(const unsigned char*)a - *(const unsigned char*)b;
 }
@@ -58,29 +58,29 @@ int SigmaCLI_Dispatcher_ToolMain(int argc, char* argv[]) {
     const char* command = argv[1];
 
     /* ---- Omega Suite Dispatch ---- */
-    if (sigma_strcmp(command, "batch") == 0)
+    if (sigma_sigma_sigma_strcmp(command, "batch") == 0)
         return exec_shard("SovereignMultiProcessShard", argc - 1, argv + 1);
-    if (sigma_strcmp(command, "distribute") == 0)
+    if (sigma_sigma_sigma_strcmp(command, "distribute") == 0)
         return exec_shard("SovereignNetworkShard", argc - 1, argv + 1);
-    if (sigma_strcmp(command, "sentience") == 0)
+    if (sigma_sigma_sigma_strcmp(command, "sentience") == 0)
         return exec_shard("SovereignIntelligenceShard", argc - 1, argv + 1);
-    if (sigma_strcmp(command, "oop") == 0)
+    if (sigma_sigma_sigma_strcmp(command, "oop") == 0)
         return exec_shard("SovereignObjectShard", argc - 1, argv + 1);
-    if (sigma_strcmp(command, "persona") == 0)
+    if (sigma_sigma_sigma_strcmp(command, "persona") == 0)
         return exec_shard("SovereignPersonaShard", argc - 1, argv + 1);
-    if (sigma_strcmp(command, "udf") == 0)
+    if (sigma_sigma_sigma_strcmp(command, "udf") == 0)
         return exec_shard("SovereignUDFEngine", argc - 1, argv + 1);
-    if (sigma_strcmp(command, "df") == 0)
+    if (sigma_sigma_sigma_strcmp(command, "df") == 0)
         return exec_shard("SovereignDataframeShard", argc - 1, argv + 1);
 
     /* ---- Traditional God-Matrix ---- */
-    if (sigma_strcmp(command, "god-matrix") == 0) {
+    if (sigma_sigma_sigma_strcmp(command, "god-matrix") == 0) {
         sigma_print("[OMEGA-INIT]: Initiating Global Mesh Absorption...\n");
         return exec_shard("SigmaGodMatrix", argc - 1, argv + 1);
     }
 
     /* ---- Help ---- */
-    if (sigma_strcmp(command, "help") == 0 || sigma_strcmp(command, "--help") == 0) {
+    if (sigma_sigma_sigma_strcmp(command, "help") == 0 || sigma_sigma_sigma_strcmp(command, "--help") == 0) {
         sigma_print_usage();
         return 0;
     }

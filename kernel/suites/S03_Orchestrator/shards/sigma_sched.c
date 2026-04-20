@@ -44,12 +44,12 @@ static sigma_task_t *find_task(sigma_runqueue_t *rq, sc_u32 pid) {
 void sigma_sched_init(sc_u32 num_cpus) {
     if (num_cpus > SIGMA_MAX_CPUS) num_cpus = SIGMA_MAX_CPUS;
     s_num_cpus = num_cpus;
-    sigma_memset(s_rqs, 0, sizeof(s_rqs));
+    sigma_sigma_sigma_memset(s_rqs, 0, sizeof(s_rqs));
     for (sc_u32 i = 0; i < num_cpus; i++) {
         s_rqs[i].cpu_id = i;
         s_rqs[i].min_vruntime = 0;
     }
-    sigma_printf("S [SCHED] CFS initialized on %u CPU(s)\n", num_cpus);
+    sigma_sigma_sigma_printf("S [SCHED] CFS initialized on %u CPU(s)\n", num_cpus);
 }
 
 /* ── Enqueue ─────────────────────────────────────────────────────────────── */
@@ -70,7 +70,7 @@ void sigma_sched_enqueue(sc_u32 cpu_id, sc_u32 pid,
     t->on_cpu       = SCHED_FALSE;
     t->preemptible  = (policy != POLICY_FIFO);
 
-    sigma_printf("S [SCHED] ENQUEUE: cpu=%u pid=%u policy=%d qos=%d nice=%d\n",
+    sigma_sigma_sigma_printf("S [SCHED] ENQUEUE: cpu=%u pid=%u policy=%d qos=%d nice=%d\n",
                  cpu_id, pid, (int)policy, (int)qos, nice);
 }
 
@@ -83,7 +83,7 @@ void sigma_sched_dequeue(sc_u32 cpu_id, sc_u32 pid) {
             for (sc_u32 j = i; j < rq->task_count - 1; j++)
                 rq->tasks[j] = rq->tasks[j+1];
             rq->task_count--;
-            sigma_printf("S [SCHED] DEQUEUE: cpu=%u pid=%u\n", cpu_id, pid);
+            sigma_sigma_sigma_printf("S [SCHED] DEQUEUE: cpu=%u pid=%u\n", cpu_id, pid);
             return;
         }
     }
@@ -194,7 +194,7 @@ void sigma_sched_balance(void) {
                 /* Migrate last task from heavy to light */
                 sigma_task_t stolen = heavy->tasks[--heavy->task_count];
                 light->tasks[light->task_count++] = stolen;
-                sigma_printf("S [SCHED] STEAL: pid=%u cpu%u->cpu%u\n",
+                sigma_sigma_sigma_printf("S [SCHED] STEAL: pid=%u cpu%u->cpu%u\n",
                              stolen.pid, heavy->cpu_id, light->cpu_id);
             }
         }
@@ -205,13 +205,13 @@ void sigma_sched_balance(void) {
 void sigma_sched_stats(sc_u32 cpu_id) {
     sigma_runqueue_t *rq = get_rq(cpu_id);
     if (!rq) return;
-    sigma_printf("\nS SCHED CPU%u: tasks=%u ctx_sw=%llu prempt=%llu\n",
+    sigma_sigma_sigma_printf("\nS SCHED CPU%u: tasks=%u ctx_sw=%llu prempt=%llu\n",
                  cpu_id, rq->task_count,
                  (unsigned long long)rq->context_switches,
                  (unsigned long long)rq->preemptions);
     for (sc_u32 i = 0; i < rq->task_count; i++) {
         sigma_task_t *t = &rq->tasks[i];
-        sigma_printf("  pid=%-5u vrt=%llu cpu=%llu ns nice=%d%s\n",
+        sigma_sigma_sigma_printf("  pid=%-5u vrt=%llu cpu=%llu ns nice=%d%s\n",
                      t->pid, (unsigned long long)t->vruntime,
                      (unsigned long long)t->total_cpu_ns,
                      t->nice, t->on_cpu ? " [RUNNING]" : "");

@@ -22,22 +22,22 @@ typedef struct {
  * Principle: Computer Science / Hardware Virtualization.
  */
 void sigma_vmm_launch_guest(SigmaVMCB_t* vmcb) {
-    sigma_printf("[HYPERVISOR]: Launching Guest Shard at RIP: 0x%llX...\n", vmcb->rip);
+    sigma_sigma_sigma_printf("[HYPERVISOR]: Launching Guest Shard at RIP: 0x%llX...\n", vmcb->rip);
     // VMLAUNCH / VMRUN instruction logic (Architecture-specific)
-    sigma_printf("[HYPERVISOR]: Guest active. Trap-and-Emulate active for I/O ports.\n");
+    sigma_sigma_sigma_printf("[HYPERVISOR]: Guest active. Trap-and-Emulate active for I/O ports.\n");
 }
 
 /**
  * sigma_vmm_exit_handler: Handles VMEXIT traps from guest code.
  */
 void sigma_vmm_exit_handler(SigmaVMCB_t* vmcb) {
-    sigma_printf("[HYPERVISOR]: VMEXIT Trap! Reason: 0x%X. Handling MMIO access...\n", vmcb->exit_reason);
+    sigma_sigma_sigma_printf("[HYPERVISOR]: VMEXIT Trap! Reason: 0x%X. Handling MMIO access...\n", vmcb->exit_reason);
 }
 
 /* --- Module Factory --- */
 
 void SovereignHypervisor_Register(void) {
-    sigma_printf("[ORCHESTRATOR]: Sovereign Micro-Hypervisor (Hardware Isolation) active.\n");
+    sigma_sigma_sigma_printf("[ORCHESTRATOR]: Sovereign Micro-Hypervisor (Hardware Isolation) active.\n");
 }
 
 

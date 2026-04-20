@@ -30,14 +30,14 @@ int sigma_sync_ring_enqueue(SigmaWFRing_t* rb, sigma_u32 val) {
     rb->buffer[rb->head] = val;
     __sync_synchronize(); // Memory Barrier: StoreStore
     rb->head = next_head;
-    sigma_printf("[WF-RING]: Message %u enqueued. Head: %u.\n", val, rb->head);
+    sigma_sigma_sigma_printf("[WF-RING]: Message %u enqueued. Head: %u.\n", val, rb->head);
     return 1;
 }
 
 /* --- Module Factory --- */
 
 void SovereignWFRing_Register(void) {
-    sigma_printf("[ORCHESTRATOR]: Sovereign Wait-Free Ring (Sub-Microsecond IPC) active.\n");
+    sigma_sigma_sigma_printf("[ORCHESTRATOR]: Sovereign Wait-Free Ring (Sub-Microsecond IPC) active.\n");
 }
 
 

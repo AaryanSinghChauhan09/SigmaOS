@@ -9,14 +9,14 @@
 #include "suites/S01_Genesis/shards/sigma_base.h"
 
 void sigma_quantum_sync(void) {
-    sigma_printf("  [QUANTUM]: Entangling shard-matrices for instant multi-thread sync.\n");
-    sigma_printf("  [QUANTUM]: Coherence Level: 99.998%% (Zenith Threshold reached).\n");
+    sigma_sigma_sigma_printf("  [QUANTUM]: Entangling shard-matrices for instant multi-thread sync.\n");
+    sigma_sigma_sigma_printf("  [QUANTUM]: Coherence Level: 99.998%% (Zenith Threshold reached).\n");
 }
 
 void SovereignQuantum_Init(void) {
-    sigma_printf("S [QUANTUM-SUITE]: Initialising Sovereign Entanglement Engine...\n");
+    sigma_sigma_sigma_printf("S [QUANTUM-SUITE]: Initialising Sovereign Entanglement Engine...\n");
     sigma_quantum_sync();
-    sigma_printf("S [QUANTUM-SUITE]: Quantum Mesh initialized. Spooky action seated.\n");
+    sigma_sigma_sigma_printf("S [QUANTUM-SUITE]: Quantum Mesh initialized. Spooky action seated.\n");
 }
 
 void SovereignQuantum_Register(void) {

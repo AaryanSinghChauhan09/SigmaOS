@@ -1,6 +1,6 @@
 #include "../../../include/sigma_process.h"
 #include "../../../include/sigma_pmm.h"
-#include <string.h>
+#include "suites/S01_Genesis/shards/sigma_libc.h"
 
 /* =========================================================================
  * SIGMA OS: SCHEDULER & CONTEXT SWITCH IMPLEMENTATION (Step 6)

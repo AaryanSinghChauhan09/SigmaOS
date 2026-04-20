@@ -16,7 +16,7 @@
  * Principle: Computer Science / Hardware Observability.
  */
 sigma_u64 sigma_hal_pmu_read(int counter_id) {
-    sigma_printf("[PMU]: Reading Hardware Performance Counter %d...\n", counter_id);
+    sigma_sigma_sigma_printf("[PMU]: Reading Hardware Performance Counter %d...\n", counter_id);
     // x86_64: __asm__ volatile("rdpmc" : "=a"(lo), "=d"(hi) : "c"(counter_id));
     return 1000000; // Simulated Instructions-Per-Clock baseline
 }
@@ -25,13 +25,13 @@ sigma_u64 sigma_hal_pmu_read(int counter_id) {
  * sigma_hal_pmu_audit: Audits the CPU cache efficiency.
  */
 void sigma_hal_pmu_audit(void) {
-    sigma_printf("[PMU]: L1 Cache-Hit Rate: 98.4%% | Pipeline Stalls: <2%%\n");
+    sigma_sigma_sigma_printf("[PMU]: L1 Cache-Hit Rate: 98.4%% | Pipeline Stalls: <2%%\n");
 }
 
 /* --- Module Factory --- */
 
 void SovereignPMU_Register(void) {
-    sigma_printf("[HAL]: Sovereign PMU Mastery (Hardware Observability) active.\n");
+    sigma_sigma_sigma_printf("[HAL]: Sovereign PMU Mastery (Hardware Observability) active.\n");
 }
 
 

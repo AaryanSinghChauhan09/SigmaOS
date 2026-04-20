@@ -53,7 +53,7 @@ int sigma_ray_sphere_intersect(SigmaRay_t ray, SigmaVec3_t center, sigma_f64 rad
 /* --- Module Factory --- */
 
 void SovereignGraphics_Register(void) {
-    sigma_printf("[ZENITHUI]: Sovereign Graphics Engine (Raytracing) seeded.\n");
+    sigma_sigma_sigma_printf("[ZENITHUI]: Sovereign Graphics Engine (Raytracing) seeded.\n");
 }
 
 

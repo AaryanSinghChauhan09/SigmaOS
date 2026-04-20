@@ -10,8 +10,8 @@
  */
 
 sigma_err_t sigma_display_init(void) {
-    sigma_printf("  S [DISPLAY]: Sovereign mode-setting engine active.\n");
-    sigma_printf("  S [DISPLAY]: Atomic frame-buffer flip-path: VALIDATED.\n");
+    sigma_sigma_sigma_printf("  S [DISPLAY]: Sovereign mode-setting engine active.\n");
+    sigma_sigma_sigma_printf("  S [DISPLAY]: Atomic frame-buffer flip-path: VALIDATED.\n");
     return SIGMA_OK;
 }
 

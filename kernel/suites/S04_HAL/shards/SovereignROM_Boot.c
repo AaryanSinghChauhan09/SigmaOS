@@ -13,11 +13,11 @@
 extern void kernel_main(void);
 
 void rom_boot_init(void) {
-    sigma_printf("S [S04]: Sovereign ROM Bootloader Materialized (Apex Idea 68.1).\n");
+    sigma_sigma_sigma_printf("S [S04]: Sovereign ROM Bootloader Materialized (Apex Idea 68.1).\n");
 }
 
 void rom_entry(void) {
     // Stage 0: Direct from ROM vector
-    sigma_printf("S [ROM]: Executing from non-volatile address 0xFFFF0000...\n");
+    sigma_sigma_sigma_printf("S [ROM]: Executing from non-volatile address 0xFFFF0000...\n");
     kernel_main();
 }

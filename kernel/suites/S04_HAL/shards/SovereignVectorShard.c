@@ -20,16 +20,16 @@ typedef struct {
  * Principle: Frontend / UX / Performance.
  */
 void sigma_gfx_draw_curve(SigmaBezier_t* curve, sigma_u32 color) {
-    sigma_printf("[VECTOR]: Rendering Bezier Segment: (%.1f,%.1f) -> (%.1f,%.1f)...\n", 
+    sigma_sigma_sigma_printf("[VECTOR]: Rendering Bezier Segment: (%.1f,%.1f) -> (%.1f,%.1f)...\n", 
                  curve->x1, curve->y1, curve->x2, curve->y2);
     // Real path interpolation and anti-aliasing logic
-    sigma_printf("[VECTOR]: UI Fragment SHARPENED. Resolution-independent draw COMPLETE.\n");
+    sigma_sigma_sigma_printf("[VECTOR]: UI Fragment SHARPENED. Resolution-independent draw COMPLETE.\n");
 }
 
 /* --- Module Factory --- */
 
 void SovereignVector_Register(void) {
-    sigma_printf("[HAL]: Sovereign Vector Engine (Resolution Mastery) active.\n");
+    sigma_sigma_sigma_printf("[HAL]: Sovereign Vector Engine (Resolution Mastery) active.\n");
 }
 
 

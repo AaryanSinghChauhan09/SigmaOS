@@ -26,7 +26,16 @@ help:
 	@echo "make lint        : Run static analysis"
 	@echo "make shard-list  : Show sovereign shard inventory"
 	@echo "make test        : Run the high-fidelity audit pipeline"
+	@echo "make diagnostics : Build and execute the Sovereign Diagnostics suite"
 	@echo "make clean       : Purge all build artifacts"
+
+# ---------------------------------------------------------------------------
+# Diagnostics Suite (System Verification)
+# ---------------------------------------------------------------------------
+diagnostics:
+	@echo "Σ [BUILD]: Compiling Sovereign Diagnostics Tool..."
+	@$(CC) -std=c11 -O2 -I./include tools/dev/diagnostics.c -o sigma_diag
+	@./sigma_diag
 
 # ---------------------------------------------------------------------------
 # Compiler flags

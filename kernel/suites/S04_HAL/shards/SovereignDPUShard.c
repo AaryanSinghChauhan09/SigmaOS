@@ -16,15 +16,15 @@
  * Principle: Hardware Mastery / Storage & Network Zero-Copy.
  */
 void sigma_hal_dpu_delegate(void* packet_filter_graph) {
-    sigma_printf("[DPU-FABRIC]: Delegating software-defined network state to SmartNIC/DPU...\n");
+    sigma_sigma_sigma_printf("[DPU-FABRIC]: Delegating software-defined network state to SmartNIC/DPU...\n");
     // Offloads entire TCP/IP segmentation, encryption, and routing tables straight onto the NIC SoC
-    sigma_printf("[DPU-FABRIC]: Delegation successful. Host CPU overhead absolutely eliminated.\n");
+    sigma_sigma_sigma_printf("[DPU-FABRIC]: Delegation successful. Host CPU overhead absolutely eliminated.\n");
 }
 
 /* --- Module Factory --- */
 
 void SovereignDPU_Register(void) {
-    sigma_printf("[HAL]: Sovereign DPU (SmartNIC Hardware Delegation) active.\n");
+    sigma_sigma_sigma_printf("[HAL]: Sovereign DPU (SmartNIC Hardware Delegation) active.\n");
 }
 
 

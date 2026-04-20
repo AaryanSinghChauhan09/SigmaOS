@@ -35,7 +35,7 @@ static sigma_u32 g_current_task_idx = 0;
 void Sovereign_Scheduler_Init(void) {
     g_task_count = 0;
     g_current_task_idx = 0;
-    sigma_printf("S [S11]: Sovereign MLFQ Scheduler initialized. Max Tasks: 1024\n");
+    sigma_sigma_sigma_printf("S [S11]: Sovereign MLFQ Scheduler initialized. Max Tasks: 1024\n");
 }
 
 sigma_u32 Sovereign_Task_Create(void (*entry)(void), sigma_u32 priority) {
@@ -49,7 +49,7 @@ sigma_u32 Sovereign_Task_Create(void (*entry)(void), sigma_u32 priority) {
     t->entry_point = entry;
     t->cpu_time_ns = 0;
     
-    sigma_printf("S [S11]: Created Sovereign Task ID: %u (Priority: %u)\n", id, t->priority);
+    sigma_sigma_sigma_printf("S [S11]: Created Sovereign Task ID: %u (Priority: %u)\n", id, t->priority);
     return id;
 }
 
@@ -64,5 +64,5 @@ void Sovereign_Scheduler_Yield(void) {
     
     g_current_task_idx = next_idx;
     // Context switch logic would go here (simulated)
-    sigma_printf("S [S11]: Context Switch -> Task %u\n", g_task_table[g_current_task_idx].id);
+    sigma_sigma_sigma_printf("S [S11]: Context Switch -> Task %u\n", g_task_table[g_current_task_idx].id);
 }

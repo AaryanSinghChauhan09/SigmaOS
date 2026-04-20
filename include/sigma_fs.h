@@ -1,8 +1,8 @@
 #ifndef SIGMA_FS_H
 #define SIGMA_FS_H
 
-#include <stdint.h>
-#include <stddef.h>
+#include "suites/S01_Genesis/shards/sigma_types.h"
+#include "suites/S01_Genesis/shards/sigma_types.h"
 
 /* =========================================================================
  * SIGMA OS: VIRTUAL FILE SYSTEM & STORAGE SHARD (SYSTEM-LEVEL HEADER)

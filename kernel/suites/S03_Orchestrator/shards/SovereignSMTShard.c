@@ -22,7 +22,7 @@ typedef struct {
  * Principle: Power Management / Multi-Tasking.
  */
 void sigma_cpu_park(sigma_u32 core_id) {
-    sigma_printf("[CPU]: Parking Core %u... Entering deep sleep state (C6).\n", core_id);
+    sigma_sigma_sigma_printf("[CPU]: Parking Core %u... Entering deep sleep state (C6).\n", core_id);
 }
 
 /**
@@ -30,13 +30,13 @@ void sigma_cpu_park(sigma_u32 core_id) {
  * Principle: Multi-Programming / Multi-Processing.
  */
 void sigma_cpu_smt_schedule(sigma_u32 thread_id) {
-    sigma_printf("[CPU]: SMT Shard: Scheduling background Task to Sibling Thread of Core %u.\n", thread_id);
+    sigma_sigma_sigma_printf("[CPU]: SMT Shard: Scheduling background Task to Sibling Thread of Core %u.\n", thread_id);
 }
 
 /* --- Module Factory --- */
 
 void SovereignSMT_Register(void) {
-    sigma_printf("[ORCHESTRATOR]: Sovereign SMT & Core Parking (Omnipresence Load-Balancing) active.\n");
+    sigma_sigma_sigma_printf("[ORCHESTRATOR]: Sovereign SMT & Core Parking (Omnipresence Load-Balancing) active.\n");
 }
 
 

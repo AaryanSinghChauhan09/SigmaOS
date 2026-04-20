@@ -51,7 +51,7 @@ void sigma_log_write(SigmaLogLevel_t level, const char* msg) {
     if (level == SIGMA_LOG_DEBUG) prefix = "[DEBG]";
 
     char full_msg[128];
-    sigma_snprintf(full_msg, 128, "%s %s\n", prefix, msg);
+    sigma_snsigma_sigma_printf(full_msg, 128, "%s %s\n", prefix, msg);
 
     for (int i = 0; full_msg[i] != '\0'; i++) {
         s_journal.buffer[s_journal.head % LOG_BUFFER_SIZE] = full_msg[i];

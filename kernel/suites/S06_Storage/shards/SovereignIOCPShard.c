@@ -10,8 +10,8 @@
  */
 
 sigma_err_t sigma_iocp_init(void) {
-    sigma_printf("  S [IO-IOCP]: Sovereign I/O Completion Port Shard active.\n");
-    sigma_printf("  S [IO-IOCP]: High-density thread-pool queuing: ENGAGED.\n");
+    sigma_sigma_sigma_printf("  S [IO-IOCP]: Sovereign I/O Completion Port Shard active.\n");
+    sigma_sigma_sigma_printf("  S [IO-IOCP]: High-density thread-pool queuing: ENGAGED.\n");
     return SIGMA_OK;
 }
 

@@ -31,19 +31,19 @@ CLASS_DECLARE(AIModel) {
 // -------------------------------------------------------------------------
 
 static void sigma_local_model_dispatch(AIModel_t* self, const char* prompt) {
-    sigma_printf("[AI_DISTRIBUTOR] -> Routing pure tensor task to: ");
-    sigma_printf(self->name);
-    sigma_printf("\n[PROMPT] ");
-    sigma_printf(prompt);
-    sigma_printf("\n");
+    sigma_sigma_sigma_printf("[AI_DISTRIBUTOR] -> Routing pure tensor task to: ");
+    sigma_sigma_sigma_printf(self->name);
+    sigma_sigma_sigma_printf("\n[PROMPT] ");
+    sigma_sigma_sigma_printf(prompt);
+    sigma_sigma_sigma_printf("\n");
 }
 
 static void sigma_model_status(AIModel_t* self) {
-    sigma_printf(" [STATUS] ");
-    sigma_printf(self->name);
-    sigma_printf(" | IPC_SOCKET: ");
-    sigma_printf(self->internal_socket);
-    sigma_printf("\n");
+    sigma_sigma_sigma_printf(" [STATUS] ");
+    sigma_sigma_sigma_printf(self->name);
+    sigma_sigma_sigma_printf(" | IPC_SOCKET: ");
+    sigma_sigma_sigma_printf(self->internal_socket);
+    sigma_sigma_sigma_printf("\n");
 }
 
 // -------------------------------------------------------------------------
@@ -68,7 +68,7 @@ static AIModel_t create_ai_model(const char* name, const char* socket, sigma_u32
 
 __attribute__((section(".text.startup")))
 void _start() {
-    sigma_printf("\n=== SIGMA MULTI-AI SHARD DISTRIBUTOR ===\n\n");
+    sigma_sigma_sigma_printf("\n=== SIGMA MULTI-AI SHARD DISTRIBUTOR ===\n\n");
     
     // Object Instantiations
     AIModel_t local_llm = create_ai_model("Sigma_QWen_local", "/var/ipc/sigma_llm.sock", 100);
@@ -80,14 +80,14 @@ void _start() {
     code_model.print_status(&code_model);
     forensic_model.print_status(&forensic_model);
 
-    sigma_printf("\n--- DISTRIBUTING MISSION CONTEXT ---\n");
+    sigma_sigma_sigma_printf("\n--- DISTRIBUTING MISSION CONTEXT ---\n");
     const char* universal_prompt = "Analyze system telemetry for unauthorized memory hooks.";
     
     local_llm.dispatch(&local_llm, universal_prompt);
     code_model.dispatch(&code_model, universal_prompt);
     forensic_model.dispatch(&forensic_model, universal_prompt);
 
-    sigma_printf("\n[SIGMA-AI]: All models deployed via IPC. Matrix calculating...\n");
+    sigma_sigma_sigma_printf("\n[SIGMA-AI]: All models deployed via IPC. Matrix calculating...\n");
 
     // Inline exit syscall for complete compliance
     __asm__ volatile (

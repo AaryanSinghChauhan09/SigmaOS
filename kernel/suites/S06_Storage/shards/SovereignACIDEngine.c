@@ -66,7 +66,7 @@ sigma_u64 sigma_txn_begin(void) {
     txn->wal_start = s_wal_count;
     txn->wal_count = 0;
 
-    sigma_printf("[ACID]: BEGIN transaction %llu\n",
+    sigma_sigma_sigma_printf("[ACID]: BEGIN transaction %llu\n",
                  (unsigned long long)txn->txn_id);
     return txn->txn_id;
 }
@@ -111,7 +111,7 @@ sigma_err_t sigma_txn_commit(sigma_u64 txn_id) {
     if (!txn || txn->state != TXN_ACTIVE) return SIGMA_EINVAL;
 
     txn->state = TXN_COMMITTED;
-    sigma_printf("[ACID]: COMMIT transaction %llu (%u WAL entries flushed)\n",
+    sigma_sigma_sigma_printf("[ACID]: COMMIT transaction %llu (%u WAL entries flushed)\n",
                  (unsigned long long)txn_id, txn->wal_count);
     return SIGMA_OK;
 }
@@ -131,7 +131,7 @@ sigma_err_t sigma_txn_rollback(sigma_u64 txn_id) {
         s_wal[i].txn_id = 0;   /* invalidate */
     }
 
-    sigma_printf("[ACID]: ROLLBACK transaction %llu (%u entries discarded)\n",
+    sigma_sigma_sigma_printf("[ACID]: ROLLBACK transaction %llu (%u entries discarded)\n",
                  (unsigned long long)txn_id, txn->wal_count);
     return SIGMA_OK;
 }
@@ -140,22 +140,22 @@ sigma_err_t sigma_txn_rollback(sigma_u64 txn_id) {
 
 void SovereignACID_Audit(void) {
     const char* state_names[] = {"IDLE", "ACTIVE", "COMMITTED", "ABORTED"};
-    sigma_printf("\n--- SOVEREIGN ACID AUDIT ---\n");
-    sigma_printf("%-8s %-12s %-8s\n", "TXN_ID", "STATE", "WAL_OPS");
-    sigma_printf("----------------------------\n");
+    sigma_sigma_sigma_printf("\n--- SOVEREIGN ACID AUDIT ---\n");
+    sigma_sigma_sigma_printf("%-8s %-12s %-8s\n", "TXN_ID", "STATE", "WAL_OPS");
+    sigma_sigma_sigma_printf("----------------------------\n");
     for (sigma_u32 i = 0; i < s_txn_count; i++) {
-        sigma_printf("%-8llu %-12s %-8u\n",
+        sigma_sigma_sigma_printf("%-8llu %-12s %-8u\n",
                      (unsigned long long)s_txns[i].txn_id,
                      state_names[s_txns[i].state],
                      s_txns[i].wal_count);
     }
-    sigma_printf("WAL entries: %u | Next LSN: %llu\n",
+    sigma_sigma_sigma_printf("WAL entries: %u | Next LSN: %llu\n",
                  s_wal_count, (unsigned long long)s_next_lsn);
-    sigma_printf("----------------------------\n");
+    sigma_sigma_sigma_printf("----------------------------\n");
 }
 
 void SovereignACID_Register(void) {
-    sigma_printf("[REGISTRY]: Sovereign ACID Database Engine active in Storage Suite.\n");
+    sigma_sigma_sigma_printf("[REGISTRY]: Sovereign ACID Database Engine active in Storage Suite.\n");
 }
 
 

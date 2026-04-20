@@ -1,7 +1,7 @@
 #ifndef SIGMA_PROCESS_H
 #define SIGMA_PROCESS_H
 
-#include <stdint.h>
+#include "suites/S01_Genesis/shards/sigma_types.h"
 
 /* =========================================================================
  * SIGMA OS: SCHEDULER & MULTITASKING SHARD (SYSTEM-LEVEL HEADER)

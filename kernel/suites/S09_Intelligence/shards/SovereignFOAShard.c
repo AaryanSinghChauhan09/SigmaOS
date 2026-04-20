@@ -21,15 +21,15 @@ typedef struct {
  * Principle: AI / Algorithms / Chemical-Sensing Optima.
  */
 void sigma_opt_foa_swarm(SigmaFruitFly_t* fly, float x_axis, float y_axis) {
-    sigma_printf("[FOA-CORE]: Calculating Osphresis intensity at coordinates (%.2f, %.2f)...\n", x_axis, y_axis);
+    sigma_sigma_sigma_printf("[FOA-CORE]: Calculating Osphresis intensity at coordinates (%.2f, %.2f)...\n", x_axis, y_axis);
     // Smell concentration (S_i = 1 / Dist). Flies swarm towards the highest concentration.
-    sigma_printf("[FOA-CORE]: High-concentration registry node located. Visual swarm phase initiated.\n");
+    sigma_sigma_sigma_printf("[FOA-CORE]: High-concentration registry node located. Visual swarm phase initiated.\n");
 }
 
 /* --- Module Factory --- */
 
 void SovereignFOA_Register(void) {
-    sigma_printf("[INTELLIGENCE]: Sovereign FOA (Osphresis-Swarm Optima) active.\n");
+    sigma_sigma_sigma_printf("[INTELLIGENCE]: Sovereign FOA (Osphresis-Swarm Optima) active.\n");
 }
 
 

@@ -8,7 +8,7 @@ int sigma_streq(const char* s1, const char* s2) {
     return (s1[i] == s2[i]) ? SIGMA_TRUE : SIGMA_FALSE;
 }
 int sigma_compare(const char* s1, const char* s2) { return sigma_streq(s1, s2); }
-void* sigma_memcpy(void* dest, const void* src, sigma_sz_t n) {
+void* sigma_sigma_sigma_memcpy(void* dest, const void* src, sigma_sz_t n) {
     sigma_u8* d = (sigma_u8*)dest;
     const sigma_u8* s = (const sigma_u8*)src;
     while (n--) *d++ = *s++;

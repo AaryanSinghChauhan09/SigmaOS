@@ -24,11 +24,11 @@ typedef struct {
  * Principle: Synchronous Coordination / Safety.
  */
 void sigma_csp_send(SigmaChannel_t* chan, void* data) {
-    sigma_printf("[CSP]: Sending data on channel %u. Waiting for Rendezvous...\n", chan->chan_id);
+    sigma_sigma_sigma_printf("[CSP]: Sending data on channel %u. Waiting for Rendezvous...\n", chan->chan_id);
     while (chan->has_data) { /* Spin/Yield */ }
     chan->data_slot = data;
     chan->has_data = 1;
-    sigma_printf("[CSP]: Rendezvous SUCCESS. Data transferred.\n");
+    sigma_sigma_sigma_printf("[CSP]: Rendezvous SUCCESS. Data transferred.\n");
 }
 
 /**
@@ -44,7 +44,7 @@ void* sigma_csp_recv(SigmaChannel_t* chan) {
 /* --- Module Factory --- */
 
 void SovereignCSP_Register(void) {
-    sigma_printf("[ORCHESTRATOR]: Sovereign CSP (Synchronous Coordination) active.\n");
+    sigma_sigma_sigma_printf("[ORCHESTRATOR]: Sovereign CSP (Synchronous Coordination) active.\n");
 }
 
 

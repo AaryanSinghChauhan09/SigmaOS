@@ -12,9 +12,9 @@
 #include "sigma_libc.h"
 
 void sigma_pqc_init(void) {
-    sigma_printf("S [PQC] Suite initialized\n");
-    sigma_printf("S [PQC] Algorithms: ML-KEM-1024 | ML-DSA-87 | SLH-DSA-SHA2-256f\n");
-    sigma_printf("S [PQC] Symmetric:  AES-256-GCM | BLAKE3-KDF\n");
+    sigma_sigma_sigma_printf("S [PQC] Suite initialized\n");
+    sigma_sigma_sigma_printf("S [PQC] Algorithms: ML-KEM-1024 | ML-DSA-87 | SLH-DSA-SHA2-256f\n");
+    sigma_sigma_sigma_printf("S [PQC] Symmetric:  AES-256-GCM | BLAKE3-KDF\n");
 }
 
 /* ── BLAKE3 (simplified Merkle-tree sponge, real impl is ~1000 LOC) ─────── */
@@ -27,7 +27,7 @@ static void blake3_compress(const pq_u8 *in, pq_u64 len, pq_u8 out[32]) {
         h[(i+1)&3] += h[i&3];
     }
     for (int j = 0; j < 4; j++)
-        sigma_memcpy(out + j*8, &h[j], 8);
+        sigma_sigma_sigma_memcpy(out + j*8, &h[j], 8);
 }
 
 void sigma_blake3(const pq_u8 *input, pq_u64 len, pq_u8 out[BLAKE3_OUT_LEN]) {
@@ -48,7 +48,7 @@ void sigma_blake3_kdf(const pq_u8 *ikm, pq_u64 ikm_len,
         for (int i = 0; i < 32; i++) block[i] ^= prk[i] ^ (pq_u8)ctr;
         pq_u64 take = okm_len - written;
         if (take > 32) take = 32;
-        sigma_memcpy(okm + written, block, take);
+        sigma_sigma_sigma_memcpy(okm + written, block, take);
         written += take;
         ctr++;
     }
@@ -61,7 +61,7 @@ pq_i32 sigma_mlkem_keygen(sigma_kem_keypair_t *kp, const pq_u8 *seed32) {
     /* Derive pk from seed via BLAKE3, sk = seed || pk-hash */
     sigma_blake3(seed32, 32, kp->sk);
     sigma_blake3(kp->sk, 32, kp->pk);
-    sigma_printf("S [ML-KEM] Keygen complete (pk=%02x%02x... sk=%02x%02x...)\n",
+    sigma_sigma_sigma_printf("S [ML-KEM] Keygen complete (pk=%02x%02x... sk=%02x%02x...)\n",
                  kp->pk[0], kp->pk[1], kp->sk[0], kp->sk[1]);
     return PQ_OK;
 }
@@ -70,7 +70,7 @@ pq_i32 sigma_mlkem_encaps(const sigma_kem_keypair_t *kp,
                            pq_u8 ct[MLKEM_CT_LEN], pq_u8 ss[MLKEM_SS_LEN]) {
     if (!kp) return PQ_ERR;
     sigma_blake3(kp->pk, MLKEM_PK_LEN, ss);
-    sigma_memcpy(ct, ss, 32);  /* stub: real encaps generates proper ct  */
+    sigma_sigma_sigma_memcpy(ct, ss, 32);  /* stub: real encaps generates proper ct  */
     return PQ_OK;
 }
 
@@ -145,23 +145,23 @@ pq_i32 sigma_hybrid_handshake(sigma_kem_keypair_t *local_kp,
                                pq_u8 session_key[AES_KEY_LEN]) {
     pq_u8 ct[MLKEM_CT_LEN], ss[MLKEM_SS_LEN];
     /* Encapsulate using remote pk */
-    sigma_kem_keypair_t remote; sigma_memcpy(remote.pk, remote_pk, MLKEM_PK_LEN);
+    sigma_kem_keypair_t remote; sigma_sigma_sigma_memcpy(remote.pk, remote_pk, MLKEM_PK_LEN);
     sigma_mlkem_encaps(&remote, ct, ss);
     /* KDF: session_key = BLAKE3_KDF(ss || local.pk, "sigma-tls-1.0") */
     pq_u8 ikm[MLKEM_SS_LEN + 32];
-    sigma_memcpy(ikm, ss, MLKEM_SS_LEN);
-    sigma_memcpy(ikm + MLKEM_SS_LEN, local_kp->pk, 32);
+    sigma_sigma_sigma_memcpy(ikm, ss, MLKEM_SS_LEN);
+    sigma_sigma_sigma_memcpy(ikm + MLKEM_SS_LEN, local_kp->pk, 32);
     sigma_blake3_kdf(ikm, sizeof(ikm),
                      (const pq_u8*)"sigma-tls-1.0", 13,
                      session_key, AES_KEY_LEN);
-    sigma_printf("S [PQC] Hybrid handshake complete. Session key: %02x%02x%02x...\n",
+    sigma_sigma_sigma_printf("S [PQC] Hybrid handshake complete. Session key: %02x%02x%02x...\n",
                  session_key[0], session_key[1], session_key[2]);
     return PQ_OK;
 }
 
 /* ── Self-test ────────────────────────────────────────────────────────────── */
 void sigma_pqc_selftest(void) {
-    sigma_printf("\nS [PQC] Self-test running...\n");
+    sigma_sigma_sigma_printf("\nS [PQC] Self-test running...\n");
     pq_u8 seed[32] = {0x01,0x02,0x03};
     sigma_kem_keypair_t kp;
     sigma_mlkem_keygen(&kp, seed);
@@ -174,7 +174,7 @@ void sigma_pqc_selftest(void) {
     for (int i = 0; i < MLKEM_SS_LEN; i++)
         if (ss_enc[i] != ss_dec[i]) { match = PQ_FALSE; break; }
 
-    sigma_printf("S [PQC] ML-KEM shared secret match: %s\n", match ? "PASS" : "FAIL");
+    sigma_sigma_sigma_printf("S [PQC] ML-KEM shared secret match: %s\n", match ? "PASS" : "FAIL");
 
     pq_u8 msg[] = "SigmaOS sovereign kernel";
     sigma_dsa_keypair_t dkp;
@@ -183,7 +183,7 @@ void sigma_pqc_selftest(void) {
     pq_u8 sig[MLDSA_SIG_LEN];
     sigma_mldsa_sign(&dkp, msg, sizeof(msg)-1, sig);
     pq_i32 ok = sigma_mldsa_verify(&dkp, msg, sizeof(msg)-1, sig);
-    sigma_printf("S [PQC] ML-DSA verify: %s\n", ok == PQ_OK ? "PASS" : "FAIL");
+    sigma_sigma_sigma_printf("S [PQC] ML-DSA verify: %s\n", ok == PQ_OK ? "PASS" : "FAIL");
 
-    sigma_printf("S [PQC] Self-test complete.\n");
+    sigma_sigma_sigma_printf("S [PQC] Self-test complete.\n");
 }

@@ -139,7 +139,7 @@ static sigma_u32 s_input_dev_count = 0;
 SigmaInputDevice_t* sigma_input_allocate_device(void) {
     for(int i = 0; i < MAX_INPUT_DEVICES; i++) {
         if (!s_input_devices[i].online) {
-            sigma_memset(&s_input_devices[i], 0, sizeof(SigmaInputDevice_t));
+            sigma_sigma_sigma_memset(&s_input_devices[i], 0, sizeof(SigmaInputDevice_t));
             return &s_input_devices[i];
         }
     }
@@ -150,7 +150,7 @@ sigma_err_t sigma_input_register_device(SigmaInputDevice_t *dev) {
     if (!dev) return SIGMA_EINVAL;
     dev->minor = s_input_dev_count++;
     dev->online = SIGMA_TRUE;
-    sigma_printf("S [INPUT]: Registered device /dev/input/event%d : '%s'\n",
+    sigma_sigma_sigma_printf("S [INPUT]: Registered device /dev/input/event%d : '%s'\n",
                  dev->minor, dev->name);
     return SIGMA_OK;
 }
@@ -222,11 +222,11 @@ sigma_ssz_t sigma_input_read_device(sigma_u32 minor, SigmaInputEvent_t *out_ev, 
  * ░░ INITIALISATION
  * ----------------------------------------------------------------------- */
 void SovereignInput_Init(void) {
-    sigma_printf("S [INPUT]: Initialising Sovereign Input Subsystem (evdev)...\n");
+    sigma_sigma_sigma_printf("S [INPUT]: Initialising Sovereign Input Subsystem (evdev)...\n");
 
     /* Create a simulated keyboard */
     SigmaInputDevice_t *kbd = sigma_input_allocate_device();
-    sigma_strcpy(kbd->name, "Sigma Virtual Keyboard", 64);
+    sigma_sigma_sigma_strcpy(kbd->name, "Sigma Virtual Keyboard", 64);
     kbd->id_bustype = 0x11; /* BUS_USB */
     kbd->id_vendor = 0x5163; /* 'S' */
     kbd->id_product = 0x1001;
@@ -238,7 +238,7 @@ void SovereignInput_Init(void) {
 
     /* Create a simulated mouse */
     SigmaInputDevice_t *mouse = sigma_input_allocate_device();
-    sigma_strcpy(mouse->name, "Sigma USB Optical Mouse", 64);
+    sigma_sigma_sigma_strcpy(mouse->name, "Sigma USB Optical Mouse", 64);
     mouse->id_bustype = 0x11;
     mouse->id_vendor = 0x5163;
     mouse->id_product = 0x1002;
@@ -262,7 +262,7 @@ void SovereignInput_Init(void) {
     sigma_input_event(mouse, EV_KEY, BTN_LEFT, 1);
     sigma_input_sync(mouse);
 
-    sigma_printf("S [INPUT]: Input engine online. Input sovereignty established.\n");
+    sigma_sigma_sigma_printf("S [INPUT]: Input engine online. Input sovereignty established.\n");
 }
 
 

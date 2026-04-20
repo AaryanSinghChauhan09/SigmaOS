@@ -16,15 +16,15 @@
  * Principle: Cyber Security / Absolute Geographic Sovereignty.
  */
 void sigma_sec_pop_verify(sigma_u16 target_node) {
-    sigma_printf("[POP-VAULT]: Pinging Target Node %u to establish Speed-of-Light response bounds...\n", target_node);
+    sigma_sigma_sigma_printf("[POP-VAULT]: Pinging Target Node %u to establish Speed-of-Light response bounds...\n", target_node);
     // Prevents malicious routing or VPN spoofing by ensuring the physical latency delay mathematically guarantees the server is within X meters
-    sigma_printf("[POP-VAULT]: Nano-latency verified. Mathematical proof of correct physical coordinates established.\n");
+    sigma_sigma_sigma_printf("[POP-VAULT]: Nano-latency verified. Mathematical proof of correct physical coordinates established.\n");
 }
 
 /* --- Module Factory --- */
 
 void SovereignPOP_Register(void) {
-    sigma_printf("[SECURITY]: Sovereign POP (Proof of Physical Position) active.\n");
+    sigma_sigma_sigma_printf("[SECURITY]: Sovereign POP (Proof of Physical Position) active.\n");
 }
 
 

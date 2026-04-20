@@ -20,16 +20,16 @@ typedef struct {
  * Principle: Multi-Processing / Performance / Throughput.
  */
 void sigma_sync_hle_lock(SigmaHLELock_t* sl) {
-    sigma_printf("[HLE]: Attempting speculative lock elision (XACQUIRE)...\n");
+    sigma_sigma_sigma_printf("[HLE]: Attempting speculative lock elision (XACQUIRE)...\n");
     // x86_64 prefix: .byte 0xF2 (XACQUIRE) before atomic op
     while (__sync_lock_test_and_set(&sl->lock, 1)) { /* Spin */ }
-    sigma_printf("[HLE]: Lock SEATED. Hardware speculation engine engaged.\n");
+    sigma_sigma_sigma_printf("[HLE]: Lock SEATED. Hardware speculation engine engaged.\n");
 }
 
 /* --- Module Factory --- */
 
 void SovereignHLE_Register(void) {
-    sigma_printf("[ORCHESTRATOR]: Sovereign HLE (Lock Elision Mastery) active.\n");
+    sigma_sigma_sigma_printf("[ORCHESTRATOR]: Sovereign HLE (Lock Elision Mastery) active.\n");
 }
 
 

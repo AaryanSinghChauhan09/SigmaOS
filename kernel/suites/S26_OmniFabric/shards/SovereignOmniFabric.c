@@ -26,7 +26,7 @@ static volatile sigma_u32 g_tail = 0;
 void OmniFabric_Init(void) {
     g_head = 0;
     g_tail = 0;
-    sigma_printf("S [OMNIFABRIC]: Sovereign Message Bus active. 4096-node capacity.\n");
+    sigma_sigma_sigma_printf("S [OMNIFABRIC]: Sovereign Message Bus active. 4096-node capacity.\n");
 }
 
 sigma_err_t OmniFabric_Send(sigma_u32 sender, sigma_u32 receiver, sigma_u32 type, sigma_u64* data) {
@@ -41,7 +41,7 @@ sigma_err_t OmniFabric_Send(sigma_u32 sender, sigma_u32 receiver, sigma_u32 type
     msg->receiver_id = receiver;
     msg->msg_type = type;
     if (data) {
-        sigma_memcpy(msg->payload, data, sizeof(msg->payload));
+        sigma_sigma_sigma_memcpy(msg->payload, data, sizeof(msg->payload));
     }
     
     g_tail = next_tail;
@@ -51,7 +51,7 @@ sigma_err_t OmniFabric_Send(sigma_u32 sender, sigma_u32 receiver, sigma_u32 type
 sigma_bool OmniFabric_Poll(OmniMessage* out_msg) {
     if (g_head == g_tail) return SIGMA_FALSE;
     
-    sigma_memcpy(out_msg, &g_msg_ring[g_head], sizeof(OmniMessage));
+    sigma_sigma_sigma_memcpy(out_msg, &g_msg_ring[g_head], sizeof(OmniMessage));
     g_head = (g_head + 1) % OMNIFABRIC_QUEUE_SIZE;
     
     return SIGMA_TRUE;

@@ -44,17 +44,17 @@ static const char* acpi_state_name(SigmaACPIState_t s) {
 }
 
 sigma_err_t sigma_acpi_transition(SigmaACPIState_t target) {
-    sigma_printf("S [ACPI]: %s → %s\n",
+    sigma_sigma_sigma_printf("S [ACPI]: %s → %s\n",
                  acpi_state_name(s_system_state),
                  acpi_state_name(target));
     if (target == ACPI_S3)
-        sigma_printf("S [ACPI]: Saving CPU state, suspending devices...\n");
+        sigma_sigma_sigma_printf("S [ACPI]: Saving CPU state, suspending devices...\n");
     else if (target == ACPI_S4)
-        sigma_printf("S [ACPI]: Writing hibernation image to swap...\n");
+        sigma_sigma_sigma_printf("S [ACPI]: Writing hibernation image to swap...\n");
     else if (target == ACPI_S5)
-        sigma_printf("S [ACPI]: Powering off (soft-off)...\n");
+        sigma_sigma_sigma_printf("S [ACPI]: Powering off (soft-off)...\n");
     else if (target == ACPI_S0 && s_system_state != ACPI_S0)
-        sigma_printf("S [ACPI]: Resuming — restoring CPU state...\n");
+        sigma_sigma_sigma_printf("S [ACPI]: Resuming — restoring CPU state...\n");
     s_system_state = target;
     return SIGMA_OK;
 }
@@ -122,7 +122,7 @@ sigma_err_t sigma_cpufreq_set_governor(sigma_u32 cpu_id, SigmaCpufreqGov_t gov) 
                 s_cpus[i].freq_khz = s_cpus[i].max_freq_khz;
             else if (gov == CPUFREQ_GOV_POWERSAVE)
                 s_cpus[i].freq_khz = s_cpus[i].min_freq_khz;
-            sigma_printf("S [CPUFREQ]: CPU%u governor=%s freq=%uMHz\n",
+            sigma_sigma_sigma_printf("S [CPUFREQ]: CPU%u governor=%s freq=%uMHz\n",
                          cpu_id, gov_name(gov), s_cpus[i].freq_khz / 1000);
             return SIGMA_OK;
         }
@@ -137,7 +137,7 @@ sigma_err_t sigma_cpufreq_set_freq(sigma_u32 cpu_id, sigma_u32 freq_khz) {
             if (freq_khz > s_cpus[i].max_freq_khz) freq_khz = s_cpus[i].max_freq_khz;
             s_cpus[i].freq_khz  = freq_khz;
             s_cpus[i].governor  = CPUFREQ_GOV_USERSPACE;
-            sigma_printf("S [CPUFREQ]: CPU%u freq set to %uMHz (userspace)\n",
+            sigma_sigma_sigma_printf("S [CPUFREQ]: CPU%u freq set to %uMHz (userspace)\n",
                          cpu_id, freq_khz / 1000);
             return SIGMA_OK;
         }
@@ -149,7 +149,7 @@ void sigma_turbo_set(sigma_u32 cpu_id, sigma_bool enable) {
     for (sigma_u32 i = 0; i < s_ncpus; i++) {
         if (s_cpus[i].cpu_id == cpu_id) {
             s_cpus[i].turbo_enabled = enable;
-            sigma_printf("S [CPUFREQ]: CPU%u Turbo Boost %s\n",
+            sigma_sigma_sigma_printf("S [CPUFREQ]: CPU%u Turbo Boost %s\n",
                          cpu_id, enable ? "ENABLED" : "DISABLED");
             return;
         }
@@ -177,7 +177,7 @@ sigma_err_t sigma_thermal_register(const char* name,
                                     sigma_i32 passive_mc) {
     if (s_thermal_count >= MAX_THERMAL_ZONES) return SIGMA_ENOSPC;
     SigmaThermalZone_t* z = &s_thermal[s_thermal_count++];
-    sigma_strcpy(z->name, name, sizeof(z->name));
+    sigma_sigma_sigma_strcpy(z->name, name, sizeof(z->name));
     z->critical_milli_c     = critical_mc;
     z->trip_passive_milli_c = passive_mc;
     z->temp_milli_c         = 40000; /* boot at 40°C */
@@ -190,12 +190,12 @@ void sigma_thermal_update(const char* name, sigma_i32 temp_mc) {
         if (sigma_streq(s_thermal[i].name, name)) {
             s_thermal[i].temp_milli_c = temp_mc;
             if (temp_mc >= s_thermal[i].critical_milli_c) {
-                sigma_printf("S [THERMAL]: CRITICAL! %s = %d°C — EMERGENCY THROTTLE\n",
+                sigma_sigma_sigma_printf("S [THERMAL]: CRITICAL! %s = %d°C — EMERGENCY THROTTLE\n",
                              name, temp_mc / 1000);
                 s_thermal[i].throttled = SIGMA_TRUE;
                 /* Would trigger cpufreq powersave on all CPUs */
             } else if (temp_mc >= s_thermal[i].trip_passive_milli_c) {
-                sigma_printf("S [THERMAL]: PASSIVE trip: %s = %d°C — throttling\n",
+                sigma_sigma_sigma_printf("S [THERMAL]: PASSIVE trip: %s = %d°C — throttling\n",
                              name, temp_mc / 1000);
                 s_thermal[i].throttled = SIGMA_TRUE;
             } else {
@@ -232,7 +232,7 @@ static SigmaBattery_t s_battery = {
 };
 
 void sigma_battery_status(void) {
-    sigma_printf("S [BATTERY]: %u%% | %s | %umV | %dmA | Threshold: %u%%\n",
+    sigma_sigma_sigma_printf("S [BATTERY]: %u%% | %s | %umV | %dmA | Threshold: %u%%\n",
                  s_battery.capacity_pct,
                  s_battery.charging ? "CHARGING" : "DISCHARGING",
                  s_battery.voltage_mv,
@@ -243,7 +243,7 @@ void sigma_battery_status(void) {
 void sigma_battery_set_threshold(sigma_u32 pct) {
     if (pct > 100) pct = 100;
     s_battery.charge_threshold_pct = pct;
-    sigma_printf("S [BATTERY]: Charge threshold set to %u%%\n", pct);
+    sigma_sigma_sigma_printf("S [BATTERY]: Charge threshold set to %u%%\n", pct);
 }
 
 /* -----------------------------------------------------------------------
@@ -264,7 +264,7 @@ static sigma_u32       s_pm_count = 0;
 sigma_err_t sigma_pm_register_device(const char* name, sigma_u32 autosuspend_ms) {
     if (s_pm_count >= MAX_PM_DEVICES) return SIGMA_ENOSPC;
     SigmaPMDevice_t* d = &s_pm_devs[s_pm_count++];
-    sigma_strcpy(d->name, name, sizeof(d->name));
+    sigma_sigma_sigma_strcpy(d->name, name, sizeof(d->name));
     d->active             = SIGMA_TRUE;
     d->autosuspend_delay_ms = autosuspend_ms;
     d->usage_count        = 0;
@@ -286,7 +286,7 @@ void sigma_pm_put(const char* name) {
         if (sigma_streq(s_pm_devs[i].name, name)) {
             if (s_pm_devs[i].usage_count > 0) s_pm_devs[i].usage_count--;
             if (s_pm_devs[i].usage_count == 0) {
-                sigma_printf("S [PM]: Device '%s' idle — autosuspend in %ums\n",
+                sigma_sigma_sigma_printf("S [PM]: Device '%s' idle — autosuspend in %ums\n",
                              name, s_pm_devs[i].autosuspend_delay_ms);
                 s_pm_devs[i].active = SIGMA_FALSE;
             }
@@ -299,7 +299,7 @@ void sigma_pm_put(const char* name) {
  * Public init
  * ----------------------------------------------------------------------- */
 void SovereignPowerManagement_Init(void) {
-    sigma_printf("S [PM]: Initialising Sovereign Power Management Subsystem...\n");
+    sigma_sigma_sigma_printf("S [PM]: Initialising Sovereign Power Management Subsystem...\n");
 
     /* Register CPUs */
     for (sigma_u32 i = 0; i < 8; i++)
@@ -333,7 +333,7 @@ void SovereignPowerManagement_Init(void) {
     sigma_acpi_transition(ACPI_S3);
     sigma_acpi_transition(ACPI_S0);  /* resume */
 
-    sigma_printf("S [PM]: Power management sovereignty achieved.\n");
+    sigma_sigma_sigma_printf("S [PM]: Power management sovereignty achieved.\n");
 }
 
 

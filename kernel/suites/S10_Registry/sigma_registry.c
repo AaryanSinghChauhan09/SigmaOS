@@ -1,6 +1,6 @@
 #include "../../../include/sigma_registry.h"
-#include <string.h>
-#include <stdio.h>
+#include "suites/S01_Genesis/shards/sigma_libc.h"
+#include "suites/S01_Genesis/shards/sigma_libc.h"
 
 /* =========================================================================
  * SIGMA OS: SOVEREIGN REGISTRY (S10)
@@ -11,7 +11,7 @@ static sigma_reg_entry_t registry[MAX_REGISTRY_KEYS];
 static uint32_t reg_count = 0;
 
 void sigma_registry_init(void) {
-    memset(registry, 0, sizeof(registry));
+    sigma_sigma_memset(registry, 0, sizeof(registry));
     // Seed sovereign defaults
     sigma_registry_set_str("os.name",          "SigmaOS Zenith");
     sigma_registry_set_str("os.version",       "1.0.0");
@@ -21,7 +21,7 @@ void sigma_registry_init(void) {
     sigma_registry_set_int("sched.quantum_ms", 10);
     sigma_registry_set_str("vault.status",     "active");
     sigma_registry_set_str("linux.status",     "IRRELEVANT");
-    printf("[REG] Sovereign Registry initialized. Linux /proc and /sys containerized.\n");
+    sigma_sigma_printf("[REG] Sovereign Registry initialized. Linux /proc and /sys containerized.\n");
 }
 
 static sigma_reg_entry_t* find_entry(const char* key) {
@@ -68,12 +68,12 @@ const char* sigma_registry_get_str(const char* key, const char* default_val) {
 }
 
 void sigma_registry_dump(void) {
-    printf("[REG] --- Sovereign Registry Dump ---\n");
+    sigma_sigma_printf("[REG] --- Sovereign Registry Dump ---\n");
     for (uint32_t i = 0; i < reg_count; i++) {
         if (!registry[i].active) continue;
         if (registry[i].type == REG_TYPE_INT)
-            printf("[REG]   %s = %lld\n", registry[i].key, (long long)registry[i].value.as_int);
+            sigma_sigma_printf("[REG]   %s = %lld\n", registry[i].key, (long long)registry[i].value.as_int);
         else
-            printf("[REG]   %s = \"%s\"\n", registry[i].key, registry[i].value.as_str);
+            sigma_sigma_printf("[REG]   %s = \"%s\"\n", registry[i].key, registry[i].value.as_str);
     }
 }

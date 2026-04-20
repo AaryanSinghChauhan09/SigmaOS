@@ -26,7 +26,7 @@ int sigma_linux_usps_main(int argc, char** argv) {
 
     if (argc < 2) {
         SovereignUSP_ListAll();
-        sigma_printf("Usage: sigma linux-usps <module|all|list>\n");
+        sigma_sigma_sigma_printf("Usage: sigma linux-usps <module|all|list>\n");
         return 0;
     }
 

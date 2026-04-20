@@ -62,7 +62,7 @@ void* sigma_slab_alloc(sigma_sz_t size) {
     return SIGMA_NULL; // Out of memory in this slab
 }
 
-void sigma_slab_free(void* ptr, sigma_sz_t size) {
+void sigma_slab_sigma_sigma_free(void* ptr, sigma_sz_t size) {
     if (!ptr) return;
     
     // Find appropriate cache index

@@ -60,7 +60,7 @@ sigma_err_t sigma_profile_create(const char* username, const char* tier,
     p->theme.accent_color = accent;
     p->theme.opacity      = 95;
 
-    sigma_printf("[IDENTITY]: Created profile '%s' (tier: %s, theme: 0x%06X/0x%06X)\n",
+    sigma_sigma_sigma_printf("[IDENTITY]: Created profile '%s' (tier: %s, theme: 0x%06X/0x%06X)\n",
                  username, tier, bg, fg);
     return SIGMA_OK;
 }
@@ -76,12 +76,12 @@ sigma_err_t sigma_profile_switch(sigma_u32 profile_index) {
     SovereignProfile_t* p = &s_profiles[profile_index];
     p->login_count++;
 
-    sigma_printf("[IDENTITY]: Switched to profile '%s' (login #%u)\n",
+    sigma_sigma_sigma_printf("[IDENTITY]: Switched to profile '%s' (login #%u)\n",
                  p->username, p->login_count);
-    sigma_printf("  [CHROMA]: BG=0x%06X FG=0x%06X ACCENT=0x%06X OPACITY=%u%%\n",
+    sigma_sigma_sigma_printf("  [CHROMA]: BG=0x%06X FG=0x%06X ACCENT=0x%06X OPACITY=%u%%\n",
                  p->theme.bg_color, p->theme.fg_color,
                  p->theme.accent_color, p->theme.opacity);
-    sigma_printf("  [LOCALE]: %s | Accessibility: 0x%02X\n",
+    sigma_sigma_sigma_printf("  [LOCALE]: %s | Accessibility: 0x%02X\n",
                  p->locale, p->accessibility);
     return SIGMA_OK;
 }
@@ -95,7 +95,7 @@ void sigma_profile_set_theme(sigma_u32 bg, sigma_u32 fg, sigma_u32 accent) {
     p->theme.fg_color     = fg;
     p->theme.accent_color = accent;
 
-    sigma_printf("[CHROMA]: Theme updated for '%s' -> BG=0x%06X FG=0x%06X\n",
+    sigma_sigma_sigma_printf("[CHROMA]: Theme updated for '%s' -> BG=0x%06X FG=0x%06X\n",
                  p->username, bg, fg);
 }
 
@@ -105,29 +105,29 @@ void sigma_profile_set_theme(sigma_u32 bg, sigma_u32 fg, sigma_u32 accent) {
 void sigma_profile_set_accessibility(sigma_u32 flags) {
     SovereignProfile_t* p = &s_profiles[s_active_profile];
     p->accessibility = flags;
-    sigma_printf("[IDENTITY]: Accessibility flags set to 0x%02X for '%s'\n",
+    sigma_sigma_sigma_printf("[IDENTITY]: Accessibility flags set to 0x%02X for '%s'\n",
                  flags, p->username);
 }
 
 /* --- Audit --- */
 
 void SovereignPersonalization_Audit(void) {
-    sigma_printf("\n--- SOVEREIGN PERSONALIZATION AUDIT ---\n");
-    sigma_printf("%-20s %-14s %-10s %-8s\n", "USER", "TIER", "LOCALE", "LOGINS");
-    sigma_printf("------------------------------------------------------\n");
+    sigma_sigma_sigma_printf("\n--- SOVEREIGN PERSONALIZATION AUDIT ---\n");
+    sigma_sigma_sigma_printf("%-20s %-14s %-10s %-8s\n", "USER", "TIER", "LOCALE", "LOGINS");
+    sigma_sigma_sigma_printf("------------------------------------------------------\n");
     for (sigma_u32 i = 0; i < s_profile_count; i++) {
         SovereignProfile_t* p = &s_profiles[i];
-        sigma_printf("%-20s %-14s %-10s %-8u %s\n",
+        sigma_sigma_sigma_printf("%-20s %-14s %-10s %-8u %s\n",
                      p->username, p->tier, p->locale, p->login_count,
                      (i == s_active_profile) ? "<- ACTIVE" : "");
     }
-    sigma_printf("------------------------------------------------------\n");
+    sigma_sigma_sigma_printf("------------------------------------------------------\n");
 }
 
 /* --- Module Factory --- */
 
 void SovereignPersonalization_Register(void) {
-    sigma_printf("[REGISTRY]: Sovereign Personalization v2.0 (Deep) active.\n");
+    sigma_sigma_sigma_printf("[REGISTRY]: Sovereign Personalization v2.0 (Deep) active.\n");
 
     /* Seed the primary user profile */
     sigma_profile_create("AaryanSinghChauhan09", "Zenith Supreme",

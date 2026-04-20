@@ -38,16 +38,16 @@ CLASS_DECLARE(SovereignProcessManager) {
 
 static void proc_context_switch(SovereignProcessManager_t* self, SovereignPCB_t* old_p, SovereignPCB_t* new_p) {
     (void)self;
-    sigma_printf("[PROCESS-MANAGER]: Context Switching from PID %d to PID %d...\n", old_p->pid, new_p->pid);
+    sigma_sigma_printf("[PROCESS-MANAGER]: Context Switching from PID %d to PID %d...\n", old_p->pid, new_p->pid);
     // Simulate register spill/fill logic
     for(int i=0; i<16; i++) old_p->registers[i] = i * 0xAA; // Spill
-    sigma_printf("[OK]: Task state preserved and restored in silicon.\n");
+    sigma_sigma_printf("[OK]: Task state preserved and restored in silicon.\n");
 }
 
 static void proc_starvation_watchdog(SovereignProcessManager_t* self) {
     (void)self;
-    sigma_printf("[PROCESS-MANAGER]: Starvation Watchdog auditing ready-queue...\n");
-    sigma_printf("[OK]: Priority boosting applied to aging shards. Zero-starvation verified.\n");
+    sigma_sigma_printf("[PROCESS-MANAGER]: Starvation Watchdog auditing ready-queue...\n");
+    sigma_sigma_printf("[OK]: Priority boosting applied to aging shards. Zero-starvation verified.\n");
 }
 
 static SovereignProcessManager_t create_process_manager() {
@@ -73,9 +73,9 @@ CLASS_DECLARE(SovereignDeadlockAgent) {
 
 static sigma_bool dead_is_safe(SovereignDeadlockAgent_t* self) {
     (void)self;
-    sigma_printf("[DEADLOCK-AGENT]: Running Banker's Algorithm for system safety audit...\n");
+    sigma_sigma_printf("[DEADLOCK-AGENT]: Running Banker's Algorithm for system safety audit...\n");
     // Simplified safety check logic
-    sigma_printf("[OK]: Safe Sequence Found: [P1 -> P0 -> P2 -> P4 -> P3]\n");
+    sigma_sigma_printf("[OK]: Safe Sequence Found: [P1 -> P0 -> P2 -> P4 -> P3]\n");
     return SIGMA_TRUE;
 }
 
@@ -98,14 +98,14 @@ CLASS_DECLARE(SovereignMemoryZenithAdv) {
 
 static void mem_handle_thrashing(SovereignMemoryZenithAdv_t* self) {
     (void)self;
-    sigma_printf("[MEMORY-ADV]: Thrashing detected! Swapping out non-resident shards...\n");
-    sigma_printf("[OK]: Global working set stabilized. Page fault frequency reduced.\n");
+    sigma_sigma_printf("[MEMORY-ADV]: Thrashing detected! Swapping out non-resident shards...\n");
+    sigma_sigma_printf("[OK]: Global working set stabilized. Page fault frequency reduced.\n");
 }
 
 static void mem_page_fault(SovereignMemoryZenithAdv_t* self, sigma_u64 faultPage) {
     (void)self;
-    sigma_printf("[MEMORY-ADV]: Page Fault at 0x%llx. Fetching from secondary silicon storage...\n", faultPage);
-    sigma_printf("[OK]: Page sharded into RAM. Instruction retry enabled.\n");
+    sigma_sigma_printf("[MEMORY-ADV]: Page Fault at 0x%llx. Fetching from secondary silicon storage...\n", faultPage);
+    sigma_sigma_printf("[OK]: Page sharded into RAM. Instruction retry enabled.\n");
 }
 
 static SovereignMemoryZenithAdv_t create_memory_zenith_adv() {

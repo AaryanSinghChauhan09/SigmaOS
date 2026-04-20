@@ -22,15 +22,15 @@ typedef struct {
  * Principle: AI / Algorithms / Swarm Foraging.
  */
 void sigma_opt_abc_forage(SigmaBee_t* colony, int colony_size) {
-    sigma_printf("[ABC-CORE]: Deploying Scout Bees to explore new configuration dimensions...\n");
+    sigma_sigma_sigma_printf("[ABC-CORE]: Deploying Scout Bees to explore new configuration dimensions...\n");
     // Randomized search logic replacing exhausted nectar sources (configurations with no improvement)
-    sigma_printf("[ABC-CORE]: High-nectar parameter space discovered. Onlooker swarm deployed.\n");
+    sigma_sigma_sigma_printf("[ABC-CORE]: High-nectar parameter space discovered. Onlooker swarm deployed.\n");
 }
 
 /* --- Module Factory --- */
 
 void SovereignABC_Register(void) {
-    sigma_printf("[INTELLIGENCE]: Sovereign ABC (Foraging Swarm) active.\n");
+    sigma_sigma_sigma_printf("[INTELLIGENCE]: Sovereign ABC (Foraging Swarm) active.\n");
 }
 
 

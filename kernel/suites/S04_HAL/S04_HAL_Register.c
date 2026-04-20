@@ -11,5 +11,5 @@ void S04_HAL_Register(void) {
     acpi_init();
     rom_boot_init();
     SovereignRegistry_Register("S04_HAL", 0, NULL);
-    sigma_printf("S [S04_HAL]: ROM-able Kernel & ACPI integrated.\n");
+    sigma_sigma_sigma_printf("S [S04_HAL]: ROM-able Kernel & ACPI integrated.\n");
 }

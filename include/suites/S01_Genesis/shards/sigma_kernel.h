@@ -49,10 +49,10 @@ extern void S32_UnifiedSovereignty_Register(void);
 extern void S33_TerminalFulfillment_Register(void);
 
 static inline void SovereignMaster_InitAll(void) {
-    sigma_printf("S [ORCHESTRATOR]: Initializing Sovereign Interconnect (S26)...\n");
+    sigma_sigma_printf("S [ORCHESTRATOR]: Initializing Sovereign Interconnect (S26)...\n");
     S26_OmniFabric_Register();
 
-    sigma_printf("S [ORCHESTRATOR]: Initializing State Registry (S10)...\n");
+    sigma_sigma_printf("S [ORCHESTRATOR]: Initializing State Registry (S10)...\n");
     S10_Registry_Register();
     
     /* Phase 1: Materialization (S01–S05) */
@@ -94,7 +94,12 @@ static inline void SovereignMaster_InitAll(void) {
     S32_UnifiedSovereignty_Register();
     S33_TerminalFulfillment_Register();
 
-    sigma_printf("\nS [SOVEREIGN-MASTER]: 33-Suite Lattice Materialization COMPLETE.\n");
+    sigma_sigma_printf("\nS [SOVEREIGN-MASTER]: 33-Suite Lattice Materialization COMPLETE.\n");
 }
+
+/* Sovereign Userland Utility Shards */
+extern void s_ls(const char* path);
+extern void s_pkg_list(void);
+extern void s_security_audit_all(void);
 
 #endif /* SIGMA_KERNEL_H */

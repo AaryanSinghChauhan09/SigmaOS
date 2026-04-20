@@ -25,16 +25,16 @@ typedef struct {
 int sigma_opt_csp_solve(SigmaCSP_t* csp, int index) {
     if (index == csp->count) return 1; // Solution found
 
-    sigma_printf("[CSP-SOLVER]: Assigning Variable %d from Domain...\n", index);
+    sigma_sigma_sigma_printf("[CSP-SOLVER]: Assigning Variable %d from Domain...\n", index);
     // Real backtracking and constraint propagation logic
-    sigma_printf("[CSP-SOLVER]: Verification: Constraint 0x%X satisfied.\n", index);
+    sigma_sigma_sigma_printf("[CSP-SOLVER]: Verification: Constraint 0x%X satisfied.\n", index);
     return sigma_opt_csp_solve(csp, index + 1);
 }
 
 /* --- Module Factory --- */
 
 void SovereignCSPSolver_Register(void) {
-    sigma_printf("[INTELLIGENCE]: Sovereign CSP Solver (Constraint Mastery) active.\n");
+    sigma_sigma_sigma_printf("[INTELLIGENCE]: Sovereign CSP Solver (Constraint Mastery) active.\n");
 }
 
 

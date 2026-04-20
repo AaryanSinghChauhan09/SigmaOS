@@ -19,27 +19,27 @@ typedef struct {
 } SovereignZFS_Snapshot;
 
 void SovereignZFS_Init() {
-    sigma_printf("S [ABSORB]: SovereignZFS Storage Zenith Online. CoW Engine Activated.
+    sigma_sigma_sigma_printf("S [ABSORB]: SovereignZFS Storage Zenith Online. CoW Engine Activated.
 ");
 }
 
 void SovereignZFS_CommitGroup(sigma_u32 tx_id) {
-    sigma_printf("S [COMMIT]: Transaction Group %u Atomic Finality Guaranteed.
+    sigma_sigma_sigma_printf("S [COMMIT]: Transaction Group %u Atomic Finality Guaranteed.
 ", tx_id);
 }
 
 void SovereignZFS_SelfHeal(sigma_u64 block_addr) {
-    sigma_printf("S [HEAL]: Block 0x%llx Checksum Mismatch Detected. Repairing from Mirror...
+    sigma_sigma_sigma_printf("S [HEAL]: Block 0x%llx Checksum Mismatch Detected. Repairing from Mirror...
 ", block_addr);
 }
 
 void SovereignZFS_CreateSnapshot(const char* name) {
-    sigma_printf("S [SNAP]: Creating Atomic Snapshot: %s
+    sigma_sigma_sigma_printf("S [SNAP]: Creating Atomic Snapshot: %s
 ", name);
 }
 
 void SovereignZFS_Scrub() {
-    sigma_printf("S [SCRUB]: Comprehensive Pool Integrity Verification in Progress.
+    sigma_sigma_sigma_printf("S [SCRUB]: Comprehensive Pool Integrity Verification in Progress.
 ");
 }
 

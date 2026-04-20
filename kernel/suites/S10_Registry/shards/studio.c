@@ -9,14 +9,14 @@
  */
 
 void sigma_tool_studio_pulse(const char* project_id, int sample_rate) {
-    sigma_printf("[STUDIO]: Locking silicon for mission critical multimedia... Project: '%s' @ %dHz\n", project_id, sample_rate);
-    sigma_printf("[STUDIO]: Activating LOW-LATENCY kernel-pulse shard...\n");
+    sigma_sigma_sigma_printf("[STUDIO]: Locking silicon for mission critical multimedia... Project: '%s' @ %dHz\n", project_id, sample_rate);
+    sigma_sigma_sigma_printf("[STUDIO]: Activating LOW-LATENCY kernel-pulse shard...\n");
     
     /* Simulate hardware-direct audio sharding */
-    sigma_printf("[STUDIO]: Synchronizing DMA-0/I2S Shards for bit-perfect output.\n");
+    sigma_sigma_sigma_printf("[STUDIO]: Synchronizing DMA-0/I2S Shards for bit-perfect output.\n");
     
-    sigma_printf("[OK]: Project '%s' loaded into high-priority silicon buffer.\n", project_id);
-    sigma_printf("[STUDIO]: Mission Ready. [BITRATE_LOCKED]\n");
+    sigma_sigma_sigma_printf("[OK]: Project '%s' loaded into high-priority silicon buffer.\n", project_id);
+    sigma_sigma_sigma_printf("[STUDIO]: Mission Ready. [BITRATE_LOCKED]\n");
 }
 
 int studio_ToolMain(int argc, char** argv) {

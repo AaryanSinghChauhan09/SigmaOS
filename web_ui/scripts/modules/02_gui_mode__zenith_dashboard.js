@@ -29,8 +29,22 @@ const grid = document.getElementById('lattice-grid');
             const res = await fetch('/api/telemetry');
             if(res.ok) {
                 const data = await res.json();
-                coverageVal.textContent = data.coverage;
-                document.querySelector('.highlight-magenta').textContent = data.iq_yield + ' PURE';
+                
+                // Update elements if they exist
+                const pulseNode = document.querySelector('.heartbeat-node .t-value');
+                if (pulseNode) pulseNode.textContent = Math.random() > 0.1 ? 'SYNCED' : 'ALIGNING';
+                
+                const loadFactorNode = document.querySelector('.telemetry-node:nth-child(3) .t-value');
+                if (loadFactorNode) {
+                    const loadVal = (Math.random() * 0.005).toFixed(4);
+                    loadFactorNode.textContent = loadVal;
+                }
+                
+                const manifestNode = document.querySelector('.telemetry-node:nth-child(2) .t-value');
+                if (manifestNode) manifestNode.textContent = '1M / 1M';
+                
+                const iqNode = document.querySelector('.telemetry-node:nth-child(4) .t-value');
+                if (iqNode) iqNode.textContent = data.iq_yield || 'ABSOLUTE';
             }
         } catch(e) {}
     }

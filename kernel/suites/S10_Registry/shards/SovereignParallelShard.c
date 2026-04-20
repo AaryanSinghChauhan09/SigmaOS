@@ -13,16 +13,16 @@
  * sigma_parallel_for: Distributes a workload across all Sovereign V-Cores.
  */
 void sigma_parallel_for(sigma_u32 start, sigma_u32 end, void (*work)(sigma_u32)) {
-    sigma_printf("[PARALLEL]: Spanning workload [%d -> %d] across 12-Core Zenith Matrix...\n", start, end);
+    sigma_sigma_sigma_printf("[PARALLEL]: Spanning workload [%d -> %d] across 12-Core Zenith Matrix...\n", start, end);
     // Simulated multi-threaded execution
     for (sigma_u32 i = start; i < end; i++) {
         work(i);
     }
-    sigma_printf("[OK]: Parallel convergence reached.\n");
+    sigma_sigma_sigma_printf("[OK]: Parallel convergence reached.\n");
 }
 
 void SovereignParallel_Register() {
-    sigma_printf("[REGISTRY]: Parallel Computing (HPC) active in Orchestration Suite.\n");
+    sigma_sigma_sigma_printf("[REGISTRY]: Parallel Computing (HPC) active in Orchestration Suite.\n");
 }
 
 

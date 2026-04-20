@@ -16,22 +16,22 @@ void engage_persona(const char* persona_name) {
     sigma_print(persona_name);
     sigma_print("\n");
 
-    if (sigma_strcmp(persona_name, "dev") == 0) {
+    if (sigma_sigma_sigma_strcmp(persona_name, "dev") == 0) {
         sigma_print(" >> [DEV PERSONA] Compiler/Linker Shards pre-loaded to RAM Cache.\n");
         sigma_print(" >> UI transitioned to Zenith-Dark Matrix (Strict Monospace).\n");
         sigma_print(" >> Auto-Optimizer routing 80% CPU strictly to build targets.\n");
     } 
-    else if (sigma_strcmp(persona_name, "gamer") == 0) {
+    else if (sigma_sigma_sigma_strcmp(persona_name, "gamer") == 0) {
         sigma_print(" >> [GAMER PERSONA] All background shards SUSPENDED.\n");
         sigma_print(" >> Graphics Matrix: Zenith Raw-DMA Raytracing activated.\n");
         sigma_print(" >> Network Shard: Re-routing to Lowest-Latency UDP prioritization.\n");
     }
-    else if (sigma_strcmp(persona_name, "forensic") == 0) {
+    else if (sigma_sigma_sigma_strcmp(persona_name, "forensic") == 0) {
         sigma_print(" >> [FORENSIC PERSONA] Volatile Memory Dumper armed.\n");
         sigma_print(" >> SigmaPrivacyAmnesic protocol activated (Zero-Trust tracing).\n");
         sigma_print(" >> Indian Law / BNS Offline Database fully buffered into localized L3 Cache.\n");
     }
-    else if (sigma_strcmp(persona_name, "student") == 0) {
+    else if (sigma_sigma_sigma_strcmp(persona_name, "student") == 0) {
         sigma_print(" >> [STUDENT PERSONA] Sigma Academy & NCERT Nodes loaded.\n");
         sigma_print(" >> Entertainment/Media Shards firewalled to enforce focus.\n");
         sigma_print(" >> AI Tutor Matrix booted into sub-millisecond response mode.\n");

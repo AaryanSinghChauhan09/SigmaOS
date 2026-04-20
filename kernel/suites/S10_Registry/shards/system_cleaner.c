@@ -38,14 +38,14 @@ static void sigma_zero_memory(void* dst, int length) {
 }
 
 static void scraper_scrub_method(MemoryScrubber_t* self) {
-    sigma_printf("\n[AMNESIC] -> Initiating DOD 5220.22-M Wipe on Domain: ");
-    sigma_printf(self->target_domain);
-    sigma_printf("\n");
+    sigma_sigma_sigma_printf("\n[AMNESIC] -> Initiating DOD 5220.22-M Wipe on Domain: ");
+    sigma_sigma_sigma_printf(self->target_domain);
+    sigma_sigma_sigma_printf("\n");
     
     // Simulating block wiping
     sigma_u32 p;
     for (p = 1; p <= self->passes; p++) {
-        sigma_printf(" > Pass [%d]: Writing Zeros to VFS RAM Blocks...\n", (int)p);
+        sigma_sigma_sigma_printf(" > Pass [%d]: Writing Zeros to VFS RAM Blocks...\n", (int)p);
         
         // Inline Syscall for sync (SYS_SYNC = 162)
         __asm__ volatile (
@@ -56,9 +56,9 @@ static void scraper_scrub_method(MemoryScrubber_t* self) {
 }
 
 static void scraper_report_method(MemoryScrubber_t* self) {
-    sigma_printf("[REPORT] -> Domain '");
-    sigma_printf(self->target_domain);
-    sigma_printf("' fully destructed. Zero-Trust confirmed.\n");
+    sigma_sigma_sigma_printf("[REPORT] -> Domain '");
+    sigma_sigma_sigma_printf(self->target_domain);
+    sigma_sigma_sigma_printf("' fully destructed. Zero-Trust confirmed.\n");
 }
 
 static MemoryScrubber_t create_scrubber(const char* domain, sigma_u32 wipe_passes) {
@@ -78,7 +78,7 @@ static MemoryScrubber_t create_scrubber(const char* domain, sigma_u32 wipe_passe
 
 __attribute__((section(".text.startup")))
 void _start() {
-    sigma_printf("\n=== SIGMA AMNESIC SYSTEM CLENAR ===\n\n");
+    sigma_sigma_sigma_printf("\n=== SIGMA AMNESIC SYSTEM CLENAR ===\n\n");
     
     // OOP Instantations
     MemoryScrubber_t ram_scrub = create_scrubber("Kernel_Memory_Pages", 3);
@@ -95,7 +95,7 @@ void _start() {
     cache_scrub.scrub(&cache_scrub);
     cache_scrub.report(&cache_scrub);
     
-    sigma_printf("\n[SIGMA-CLEAN]: Host environment totally wiped.\n");
+    sigma_sigma_sigma_printf("\n[SIGMA-CLEAN]: Host environment totally wiped.\n");
     
     // Inline exit syscall
     __asm__ volatile (

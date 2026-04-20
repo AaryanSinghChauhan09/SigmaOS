@@ -19,13 +19,13 @@ static SovereignLVM_t s_main_vol = { "SIGMA_ROOT_ZENITH", 12345678, 42 };
 void sigma_lvm_snapshot(void) {
     s_main_vol.revision++;
     s_main_vol.last_snapshot_ts += 1000;
-    sigma_printf("  [LVM]: Generated Atomic Snapshot (Rev: %d) of Volume [%s]\n", s_main_vol.revision, s_main_vol.volume_id);
+    sigma_sigma_sigma_printf("  [LVM]: Generated Atomic Snapshot (Rev: %d) of Volume [%s]\n", s_main_vol.revision, s_main_vol.volume_id);
 }
 
 void SovereignBackend_Init(void) {
-    sigma_printf("S [BACKEND-SUITE]: Initialising Filesystems and LVM-Sentinel...\n");
+    sigma_sigma_sigma_printf("S [BACKEND-SUITE]: Initialising Filesystems and LVM-Sentinel...\n");
     sigma_lvm_snapshot();
-    sigma_printf("S [BACKEND-SUITE]: Logical Volume [SIGMA_ROOT_ZENITH] is now IMMUTABLE.\n");
+    sigma_sigma_sigma_printf("S [BACKEND-SUITE]: Logical Volume [SIGMA_ROOT_ZENITH] is now IMMUTABLE.\n");
 }
 
 void SovereignBackend_Register(void) {

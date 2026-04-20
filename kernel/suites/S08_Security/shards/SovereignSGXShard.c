@@ -16,15 +16,15 @@
  * Principle: Cyber Security / Hardware Mastery / Absolute Privacy.
  */
 void sigma_sec_sgx_enclave_create(sigma_u32 enclave_size) {
-    sigma_printf("[SGX-VAULT]: Provisioning %u bytes of EPC (Enclave Page Cache)...\n", enclave_size);
+    sigma_sigma_sigma_printf("[SGX-VAULT]: Provisioning %u bytes of EPC (Enclave Page Cache)...\n", enclave_size);
     // x86_64: Utilizing ENCLS (ECREATE/EADD/EINIT) instructions
-    sigma_printf("[SGX-VAULT]: Memory encrypted at silicon level. Host OS cannot read plaintext.\n");
+    sigma_sigma_sigma_printf("[SGX-VAULT]: Memory encrypted at silicon level. Host OS cannot read plaintext.\n");
 }
 
 /* --- Module Factory --- */
 
 void SovereignSGX_Register(void) {
-    sigma_printf("[SECURITY]: Sovereign SGX (Hardware Enclosures) active.\n");
+    sigma_sigma_sigma_printf("[SECURITY]: Sovereign SGX (Hardware Enclosures) active.\n");
 }
 
 

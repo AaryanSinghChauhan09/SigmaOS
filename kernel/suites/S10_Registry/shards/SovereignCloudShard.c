@@ -22,7 +22,7 @@ typedef struct {
  */
 void sigma_cloud_scale(SigmaCloud_t* pool, sigma_u64 requested) {
     if (pool->allocated + requested > pool->total_ram) {
-        sigma_printf("[CLOUD]: Scaling Event: Increasing virtual RAM pool by 20%.\n");
+        sigma_sigma_sigma_printf("[CLOUD]: Scaling Event: Increasing virtual RAM pool by 20%.\n");
         pool->total_ram = (sigma_u64)(pool->total_ram * 1.2);
     }
 }
@@ -30,7 +30,7 @@ void sigma_cloud_scale(SigmaCloud_t* pool, sigma_u64 requested) {
 /* --- Module Factory --- */
 
 void SovereignCloud_Register(void) {
-    sigma_printf("[ORCHESTRATION]: Sovereign Cloud Engine (Elasticity) active.\n");
+    sigma_sigma_sigma_printf("[ORCHESTRATION]: Sovereign Cloud Engine (Elasticity) active.\n");
 }
 
 

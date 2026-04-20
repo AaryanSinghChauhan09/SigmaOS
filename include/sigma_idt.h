@@ -1,7 +1,7 @@
 #ifndef SIGMA_IDT_H
 #define SIGMA_IDT_H
 
-#include <stdint.h>
+#include "suites/S01_Genesis/shards/sigma_types.h"
 
 /* =========================================================================
  * SIGMA OS: INTERRUPT DESCRIPTOR TABLE (IDT) SHARD

@@ -32,25 +32,25 @@ CLASS_DECLARE(SovereignInterferenceGuard) {
 
 static void sig_activate_guard(SovereignInterferenceGuard_t* self) {
     (void)self;
-    sigma_printf("[SIG-GUARD] Activating Zero-Interference Protection...\n");
+    sigma_sigma_printf("[SIG-GUARD] Activating Zero-Interference Protection...\n");
     
     // 1. Partition Protection
-    sigma_printf("[SIG-GUARD] Scanning for non-SigmaOS partitions (NTFS, EXT4, APFS)...\n");
-    sigma_printf("[SIG-GUARD] Found: Windows (Partition 1), Linux (Partition 2).\n");
-    sigma_printf("[SIG-GUARD] Marking external partitions as READ-ONLY/HIDDEN to SigmaOS core.\n");
+    sigma_sigma_printf("[SIG-GUARD] Scanning for non-SigmaOS partitions (NTFS, EXT4, APFS)...\n");
+    sigma_sigma_printf("[SIG-GUARD] Found: Windows (Partition 1), Linux (Partition 2).\n");
+    sigma_sigma_printf("[SIG-GUARD] Marking external partitions as READ-ONLY/HIDDEN to SigmaOS core.\n");
 
     // 2. Resource Quotas
-    sigma_printf("[SIG-GUARD] Calibrating CPU/RAM quotas for host preservation.\n");
-    sigma_printf("[SIG-GUARD] Setting 50%% CPU Core affinity limit for background shards.\n");
+    sigma_sigma_printf("[SIG-GUARD] Calibrating CPU/RAM quotas for host preservation.\n");
+    sigma_sigma_printf("[SIG-GUARD] Setting 50%% CPU Core affinity limit for background shards.\n");
     
     // 3. Bootloader Isolation
-    sigma_printf("[SIG-GUARD] Validating UEFI/ESP integrity.\n");
-    sigma_printf("[SIG-GUARD] SigmaOS Boot-Master will use a non-destructive Shard-Link.\n");
+    sigma_sigma_printf("[SIG-GUARD] Validating UEFI/ESP integrity.\n");
+    sigma_sigma_printf("[SIG-GUARD] SigmaOS Boot-Master will use a non-destructive Shard-Link.\n");
 }
 
 static void sig_monitor_performance(SovereignInterferenceGuard_t* self) {
     (void)self;
-    sigma_printf("[SIG-GUARD] Monitoring Host Impact... Memory Usage: 2.4GB. CPU Load: 1.2%% (Negligible).\n");
+    sigma_sigma_printf("[SIG-GUARD] Monitoring Host Impact... Memory Usage: 2.4GB. CPU Load: 1.2%% (Negligible).\n");
 }
 
 // -------------------------------------------------------------------------

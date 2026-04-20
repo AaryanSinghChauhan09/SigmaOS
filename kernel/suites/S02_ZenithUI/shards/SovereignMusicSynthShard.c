@@ -15,14 +15,14 @@
  * sigma_music_render: Renders a 1337-voice harmonic composition.
  */
 void sigma_music_render() {
-    sigma_printf("\n[MUSIC-SYNTH]: Rendering 1337-Voice Harmonic Cascade...\n");
-    sigma_printf("  - [AUDIO]: Direct silicon-level 384kHz / 32-bit float audio stream.\n");
-    sigma_printf("  - [SYNC]: Aligning phase-coherent oscillators with SovereignProAudioShard.\n");
-    sigma_printf("[OK]: Harmonic manifestation online. SigmaOS is the Instrument.\n");
+    sigma_sigma_sigma_printf("\n[MUSIC-SYNTH]: Rendering 1337-Voice Harmonic Cascade...\n");
+    sigma_sigma_sigma_printf("  - [AUDIO]: Direct silicon-level 384kHz / 32-bit float audio stream.\n");
+    sigma_sigma_sigma_printf("  - [SYNC]: Aligning phase-coherent oscillators with SovereignProAudioShard.\n");
+    sigma_sigma_sigma_printf("[OK]: Harmonic manifestation online. SigmaOS is the Instrument.\n");
 }
 
 void SovereignMusicSynthShard_Init() {
-    sigma_printf("[SOC]: Seating Native Music-Synth Shard (Audio Parity v1.0)...\n");
+    sigma_sigma_sigma_printf("[SOC]: Seating Native Music-Synth Shard (Audio Parity v1.0)...\n");
 }
 
 

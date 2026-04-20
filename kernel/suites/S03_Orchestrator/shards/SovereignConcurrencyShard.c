@@ -23,7 +23,7 @@ void sigma_sync_spin_lock(SigmaSpinlock_t* sl) {
     while (__sync_lock_test_and_set(&sl->lock, 1)) {
         // CPU Yield or Busy-Wait (PAUSE instruction on x86)
     }
-    sigma_printf("[SYNC]: Spinlock ACQUIRED for thread 0x%X.\n", 42);
+    sigma_sigma_sigma_printf("[SYNC]: Spinlock ACQUIRED for thread 0x%X.\n", 42);
 }
 
 /**
@@ -31,13 +31,13 @@ void sigma_sync_spin_lock(SigmaSpinlock_t* sl) {
  */
 void sigma_sync_spin_unlock(SigmaSpinlock_t* sl) {
     __sync_lock_release(&sl->lock);
-    sigma_printf("[SYNC]: Spinlock RELEASED.\n");
+    sigma_sigma_sigma_printf("[SYNC]: Spinlock RELEASED.\n");
 }
 
 /* --- Module Factory --- */
 
 void SovereignConcurrency_Register(void) {
-    sigma_printf("[ORCHESTRATOR]: Sovereign Concurrency (Lock-Free Atoms) active.\n");
+    sigma_sigma_sigma_printf("[ORCHESTRATOR]: Sovereign Concurrency (Lock-Free Atoms) active.\n");
 }
 
 

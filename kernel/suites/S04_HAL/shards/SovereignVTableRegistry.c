@@ -64,7 +64,7 @@ sigma_err_t sigma_vtable_register(const char* name,
     obj->instance  = instance;
     obj->ref_count = 1;
 
-    sigma_printf("[VTABLE]: Registered polymorphic object '%s' (type: %s)\n",
+    sigma_sigma_sigma_printf("[VTABLE]: Registered polymorphic object '%s' (type: %s)\n",
                  name, vtable->type_name);
     return SIGMA_OK;
 }
@@ -110,23 +110,23 @@ sigma_err_t sigma_vtable_dispatch_write(const char* name,
  * SovereignVTable_Audit: Dumps the entire polymorphic object registry.
  */
 void SovereignVTable_Audit(void) {
-    sigma_printf("\n--- SOVEREIGN VTABLE AUDIT (OOP Registry) ---\n");
-    sigma_printf("%-20s %-20s %-10s\n", "OBJECT", "TYPE", "REFS");
-    sigma_printf("----------------------------------------------\n");
+    sigma_sigma_sigma_printf("\n--- SOVEREIGN VTABLE AUDIT (OOP Registry) ---\n");
+    sigma_sigma_sigma_printf("%-20s %-20s %-10s\n", "OBJECT", "TYPE", "REFS");
+    sigma_sigma_sigma_printf("----------------------------------------------\n");
     for (sigma_u32 i = 0; i < s_object_count; i++) {
-        sigma_printf("%-20s %-20s %-10u\n",
+        sigma_sigma_sigma_printf("%-20s %-20s %-10u\n",
                      s_object_pool[i].name,
                      s_object_pool[i].vtable->type_name,
                      s_object_pool[i].ref_count);
     }
-    sigma_printf("----------------------------------------------\n");
-    sigma_printf("Total polymorphic objects: %u\n", s_object_count);
+    sigma_sigma_sigma_printf("----------------------------------------------\n");
+    sigma_sigma_sigma_printf("Total polymorphic objects: %u\n", s_object_count);
 }
 
 /* --- Module Factory --- */
 
 void SovereignVTableRegistry_Register(void) {
-    sigma_printf("[REGISTRY]: Sovereign VTable OOP Engine active in HAL Suite.\n");
+    sigma_sigma_sigma_printf("[REGISTRY]: Sovereign VTable OOP Engine active in HAL Suite.\n");
 }
 
 

@@ -16,12 +16,12 @@ typedef struct {
 } sigma_shard_telemetry_t;
 
 void sigma_sentience_heal_lattice(void) {
-    sigma_printf("S [SENTIENCE]: Auditing Shard Health for Eternal Continuity...\n");
+    sigma_sigma_sigma_printf("S [SENTIENCE]: Auditing Shard Health for Eternal Continuity...\n");
     // If a shard shows erratic pulse signatures, migrate its state immediately.
-    sigma_printf("S [SENTIENCE]: Anomalous pulse in Network Shard S07_04. Redirecting traffic to Shard S07_05.\n");
-    sigma_printf("S [SENTIENCE]: Healing complete. Downtime: 0.00ns.\n");
+    sigma_sigma_sigma_printf("S [SENTIENCE]: Anomalous pulse in Network Shard S07_04. Redirecting traffic to Shard S07_05.\n");
+    sigma_sigma_sigma_printf("S [SENTIENCE]: Healing complete. Downtime: 0.00ns.\n");
 }
 
 void sigma_sentience_init(void) {
-    sigma_printf("S [SENTIENCE]: Eternal Continuity Engine (Self-Healing) active.\n");
+    sigma_sigma_sigma_printf("S [SENTIENCE]: Eternal Continuity Engine (Self-Healing) active.\n");
 }

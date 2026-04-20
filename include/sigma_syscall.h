@@ -1,8 +1,8 @@
 #ifndef SIGMA_SYSCALL_H
 #define SIGMA_SYSCALL_H
 
-#include <stdint.h>
-#include <stddef.h>
+#include "suites/S01_Genesis/shards/sigma_types.h"
+#include "suites/S01_Genesis/shards/sigma_types.h"
 
 /* =========================================================================
  * SIGMA OS: SOVEREIGN SYSCALL DISPATCHER (S25 - ZeroKernel)

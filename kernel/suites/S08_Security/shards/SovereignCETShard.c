@@ -16,15 +16,15 @@
  * Principle: Cyber Security / Hardware Mastery.
  */
 void sigma_sec_cet_enable(void) {
-    sigma_printf("[CET]: Activating Hardware Shadow Stack and ENDBR tracking...\n");
+    sigma_sigma_sigma_printf("[CET]: Activating Hardware Shadow Stack and ENDBR tracking...\n");
     // x86_64: wrmsr(MSR_IA32_S_CET, CET_SHSTK_EN | CET_ENDBR_EN);
-    sigma_printf("[CET]: Hardware CFI SEATED. ROP/JOP attacks neutralized at silicon level.\n");
+    sigma_sigma_sigma_printf("[CET]: Hardware CFI SEATED. ROP/JOP attacks neutralized at silicon level.\n");
 }
 
 /* --- Module Factory --- */
 
 void SovereignCET_Register(void) {
-    sigma_printf("[SECURITY]: Sovereign CET (Hardware CFI) active.\n");
+    sigma_sigma_sigma_printf("[SECURITY]: Sovereign CET (Hardware CFI) active.\n");
 }
 
 

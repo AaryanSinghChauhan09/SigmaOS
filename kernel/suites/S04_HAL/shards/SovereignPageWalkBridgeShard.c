@@ -16,15 +16,15 @@
  * Principle: Performance / Hardware Mastery.
  */
 void sigma_hal_pagewalk_audit(void) {
-    sigma_printf("[PAGE-WALK]: Sampling DTLB-Walk-Cycles via MSR-0x%X...\n", 0x491);
+    sigma_sigma_sigma_printf("[PAGE-WALK]: Sampling DTLB-Walk-Cycles via MSR-0x%X...\n", 0x491);
     // Real tracking of TLB_MISS_PAGE_WALK_CYCLES
-    sigma_printf("[PAGE-WALK]: Translation Latency: 42 cycles. Virtual memory perfectly mapped.\n");
+    sigma_sigma_sigma_printf("[PAGE-WALK]: Translation Latency: 42 cycles. Virtual memory perfectly mapped.\n");
 }
 
 /* --- Module Factory --- */
 
 void SovereignPageWalkBridge_Register(void) {
-    sigma_printf("[HAL]: Sovereign Page-Walk Bridge (Translation Mastery) active.\n");
+    sigma_sigma_sigma_printf("[HAL]: Sovereign Page-Walk Bridge (Translation Mastery) active.\n");
 }
 
 

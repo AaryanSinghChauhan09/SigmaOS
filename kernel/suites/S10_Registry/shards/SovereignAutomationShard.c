@@ -55,7 +55,7 @@ sigma_err_t sigma_cron_register(const char* name, CronHandler_t fn,
     job->fail_count    = 0;
     job->state         = CRON_IDLE;
 
-    sigma_printf("[AUTOMATION]: Registered cron job '%s' (every %llu ms)\n",
+    sigma_sigma_sigma_printf("[AUTOMATION]: Registered cron job '%s' (every %llu ms)\n",
                  name, (unsigned long long)interval_ms);
     return SIGMA_OK;
 }
@@ -87,13 +87,13 @@ void sigma_cron_tick(sigma_u64 current_tick) {
  * any that are in FAILED state — genuine self-correction logic.
  */
 void sigma_automation_self_heal(void) {
-    sigma_printf("[AUTOMATION]: Running Global Health Audit...\n");
+    sigma_sigma_sigma_printf("[AUTOMATION]: Running Global Health Audit...\n");
 
     sigma_u32 healed = 0;
     for (sigma_u32 i = 0; i < s_cron_count; i++) {
         SovereignCronJob_t* job = &s_cron_jobs[i];
         if (job->state == CRON_FAILED) {
-            sigma_printf("  [HEAL]: Restarting failed job '%s' (fails: %u)...\n",
+            sigma_sigma_sigma_printf("  [HEAL]: Restarting failed job '%s' (fails: %u)...\n",
                          job->name, job->fail_count);
             job->state = CRON_IDLE;
             job->fail_count = 0;
@@ -102,46 +102,46 @@ void sigma_automation_self_heal(void) {
     }
 
     if (healed == 0) {
-        sigma_printf("  [HEAL]: All %u jobs healthy. No intervention needed.\n",
+        sigma_sigma_sigma_printf("  [HEAL]: All %u jobs healthy. No intervention needed.\n",
                      s_cron_count);
     } else {
-        sigma_printf("  [HEAL]: Recovered %u failed jobs.\n", healed);
+        sigma_sigma_sigma_printf("  [HEAL]: Recovered %u failed jobs.\n", healed);
     }
 }
 
 /* --- Built-in Cron Handlers --- */
 
 static void handler_log_rotate(void) {
-    sigma_printf("    [CRON]: Rotating kernel logs...\n");
+    sigma_sigma_sigma_printf("    [CRON]: Rotating kernel logs...\n");
 }
 
 static void handler_slab_gc(void) {
-    sigma_printf("    [CRON]: Running slab allocator garbage collection...\n");
+    sigma_sigma_sigma_printf("    [CRON]: Running slab allocator garbage collection...\n");
 }
 
 static void handler_fs_defrag(void) {
-    sigma_printf("    [CRON]: Defragmenting SigmaFS journal...\n");
+    sigma_sigma_sigma_printf("    [CRON]: Defragmenting SigmaFS journal...\n");
 }
 
 /* --- Audit --- */
 
 void SovereignAutomation_Audit(void) {
-    sigma_printf("\n--- SOVEREIGN AUTOMATION AUDIT ---\n");
-    sigma_printf("%-20s %-10s %-12s %-8s\n", "JOB", "STATE", "INTERVAL_MS", "RUNS");
-    sigma_printf("--------------------------------------------------\n");
+    sigma_sigma_sigma_printf("\n--- SOVEREIGN AUTOMATION AUDIT ---\n");
+    sigma_sigma_sigma_printf("%-20s %-10s %-12s %-8s\n", "JOB", "STATE", "INTERVAL_MS", "RUNS");
+    sigma_sigma_sigma_printf("--------------------------------------------------\n");
     for (sigma_u32 i = 0; i < s_cron_count; i++) {
         SovereignCronJob_t* j = &s_cron_jobs[i];
-        sigma_printf("%-20s %-10d %-12llu %-8u\n",
+        sigma_sigma_sigma_printf("%-20s %-10d %-12llu %-8u\n",
                      j->name, j->state,
                      (unsigned long long)j->interval_ms, j->run_count);
     }
-    sigma_printf("--------------------------------------------------\n");
+    sigma_sigma_sigma_printf("--------------------------------------------------\n");
 }
 
 /* --- Module Factory --- */
 
 void SovereignAutomation_Register(void) {
-    sigma_printf("[REGISTRY]: Sovereign Automation Engine v2.0 (Deep) active.\n");
+    sigma_sigma_sigma_printf("[REGISTRY]: Sovereign Automation Engine v2.0 (Deep) active.\n");
 
     /* Seed default cron jobs */
     sigma_cron_register("log-rotate",   handler_log_rotate,  60000);

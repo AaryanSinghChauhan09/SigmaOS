@@ -9,9 +9,9 @@ static sovereign_security_shard_t g_sec_shards[MAX_SECURITY_SHARDS];
 static sigma_u32 g_sec_count = 0;
 
 void SovereignSecurity_InitRegistry(void) {
-    sigma_memset(g_sec_shards, 0, sizeof(g_sec_shards));
+    sigma_sigma_sigma_memset(g_sec_shards, 0, sizeof(g_sec_shards));
     g_sec_count = 0;
-    sigma_printf("S [SEC]: Sovereign Security Registry Operational.\n");
+    sigma_sigma_sigma_printf("S [SEC]: Sovereign Security Registry Operational.\n");
 }
 
 sigma_err_t SovereignSecurity_Register(const char* name, sigma_sec_init_fn init) {
@@ -21,12 +21,12 @@ sigma_err_t SovereignSecurity_Register(const char* name, sigma_sec_init_fn init)
     sigma_strncpy(s->name, name, 32);
     s->init = init;
     
-    sigma_printf("S [SEC]: Registered Security Shard '%s'\n", name);
+    sigma_sigma_sigma_printf("S [SEC]: Registered Security Shard '%s'\n", name);
     return SIGMA_OK;
 }
 
 void SovereignSecurity_ActivateMatrix(void) {
-    sigma_printf("S [SEC]: Hardening System Security Matrix...\n");
+    sigma_sigma_sigma_printf("S [SEC]: Hardening System Security Matrix...\n");
     for (sigma_u32 i = 0; i < g_sec_count; i++) {
         if (g_sec_shards[i].init) g_sec_shards[i].init();
     }

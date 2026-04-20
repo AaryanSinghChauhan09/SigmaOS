@@ -59,8 +59,8 @@ SigmaToken_t sigma_lexer_get_token(SigmaLexer_t* l) {
 /* --- Module Factory --- */
 
 void SovereignLexer_Register(void) {
-    sigma_printf("[INTELLIGENCE]: Sovereign Lexer (Language Core) active.\n");
-    sigma_printf("[AUDIT]: Grammar-Sovereignty Level: COMPLETE.\n");
+    sigma_sigma_sigma_printf("[INTELLIGENCE]: Sovereign Lexer (Language Core) active.\n");
+    sigma_sigma_sigma_printf("[AUDIT]: Grammar-Sovereignty Level: COMPLETE.\n");
 }
 
 #endif /* SOVEREIGN_LEXER_SHARD_H */

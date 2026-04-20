@@ -26,7 +26,7 @@ void coroutine_init(void) {
     for (int i = 0; i < MAX_COROUTINES; i++) {
         g_coroutines[i].active = false;
     }
-    sigma_printf("S [S11]: Co-routine Scheduler Materialized (Apex Idea 95).\n");
+    sigma_sigma_sigma_printf("S [S11]: Co-routine Scheduler Materialized (Apex Idea 95).\n");
 }
 
 int coroutine_create(void (*entry)(void)) {

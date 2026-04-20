@@ -25,13 +25,13 @@ void ecosystem_consensus_init(void) {
     g_local_node.current_term = 0;
     g_local_node.voted_for = 0;
     g_local_node.state = RAFT_FOLLOWER;
-    sigma_printf("S [S12]: Sovereign Raft Consensus Materialized (Apex Idea 586).\n");
+    sigma_sigma_sigma_printf("S [S12]: Sovereign Raft Consensus Materialized (Apex Idea 586).\n");
 }
 
 void raft_election_pulse(void) {
     if (g_local_node.state == RAFT_FOLLOWER) {
         g_local_node.state = RAFT_CANDIDATE;
         g_local_node.current_term++;
-        sigma_printf("S [RAFT]: Transitioned to CANDIDATE. Term: %llu\n", g_local_node.current_term);
+        sigma_sigma_sigma_printf("S [RAFT]: Transitioned to CANDIDATE. Term: %llu\n", g_local_node.current_term);
     }
 }

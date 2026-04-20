@@ -31,18 +31,18 @@ typedef struct {
 // ── Public API ────────────────────────────────────────────────────────────────
 
 void container_init(void) {
-    sigma_printf("S [S11]: Sovereign-Container Engine Online.\n");
-    sigma_printf("  ↳ [DOCKER OBSOLETE]: Eradicating Linux Namespaces & Cgroups.\n");
-    sigma_printf("  ↳ Containers are bound directly to hardware MPU sectors (Zero software overhead).\n");
+    sigma_sigma_sigma_printf("S [S11]: Sovereign-Container Engine Online.\n");
+    sigma_sigma_sigma_printf("  ↳ [DOCKER OBSOLETE]: Eradicating Linux Namespaces & Cgroups.\n");
+    sigma_sigma_sigma_printf("  ↳ Containers are bound directly to hardware MPU sectors (Zero software overhead).\n");
 }
 
 uint32_t container_spawn(const char* sab_id, uint64_t ram_limit) {
-    sigma_printf("  ↳ Spawning Z-Container [%s] at 0-ms idle locking...\n", sab_id);
+    sigma_sigma_sigma_printf("  ↳ Spawning Z-Container [%s] at 0-ms idle locking...\n", sab_id);
     return 1;
 }
 
 void container_scale_to_hive(uint32_t container_id, uint8_t node_count) {
-    sigma_printf("  ↳ [K8s OBSOLETE]: Autoscaling to %u Hive nodes natively without orchestrator lag.\n", node_count);
+    sigma_sigma_sigma_printf("  ↳ [K8s OBSOLETE]: Autoscaling to %u Hive nodes natively without orchestrator lag.\n", node_count);
 }
 
 

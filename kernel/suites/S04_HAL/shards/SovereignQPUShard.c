@@ -16,15 +16,15 @@
  * Principle: Hardware Mastery / Ultimate Velocity.
  */
 void sigma_hal_qpu_superpose(void* tensor_matrix) {
-    sigma_printf("[QPU-FABRIC]: Bridging classical tensor matrix into Qubit logical matrices...\n");
+    sigma_sigma_sigma_printf("[QPU-FABRIC]: Bridging classical tensor matrix into Qubit logical matrices...\n");
     // Evaluates every possible data combination mathematically simultaneously across an integrated topological quantum co-processor
-    sigma_printf("[QPU-FABRIC]: Superposition executed. Exascale calculations collapsed and solved natively.\n");
+    sigma_sigma_sigma_printf("[QPU-FABRIC]: Superposition executed. Exascale calculations collapsed and solved natively.\n");
 }
 
 /* --- Module Factory --- */
 
 void SovereignQPU_Register(void) {
-    sigma_printf("[HAL]: Sovereign QPU (Native Qubit Superposition) active.\n");
+    sigma_sigma_sigma_printf("[HAL]: Sovereign QPU (Native Qubit Superposition) active.\n");
 }
 
 

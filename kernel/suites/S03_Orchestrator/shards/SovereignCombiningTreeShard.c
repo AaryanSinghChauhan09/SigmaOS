@@ -21,15 +21,15 @@ typedef struct {
  * Principle: Multi-Processing / Throughput Optimization.
  */
 void sigma_sync_tree_increment(SigmaTreeNode_t* tree, int leaf_id) {
-    sigma_printf("[COMBINING-TREE]: Leaf %d initiating distributed increment...\n", leaf_id);
+    sigma_sigma_sigma_printf("[COMBINING-TREE]: Leaf %d initiating distributed increment...\n", leaf_id);
     // Real combining logic: request batching up the tree to the root
-    sigma_printf("[COMBINING-TREE]: Increment SEATED at root node via collective combining.\n");
+    sigma_sigma_sigma_printf("[COMBINING-TREE]: Increment SEATED at root node via collective combining.\n");
 }
 
 /* --- Module Factory --- */
 
 void SovereignCombiningTree_Register(void) {
-    sigma_printf("[ORCHESTRATOR]: Sovereign CombiningTree (Count Scaling) active.\n");
+    sigma_sigma_sigma_printf("[ORCHESTRATOR]: Sovereign CombiningTree (Count Scaling) active.\n");
 }
 
 

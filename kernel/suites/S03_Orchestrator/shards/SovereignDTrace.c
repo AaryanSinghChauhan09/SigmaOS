@@ -20,12 +20,12 @@ typedef struct {
 } SovereignDTrace_Probe;
 
 void SovereignDTrace_Init() {
-    sigma_printf("S [ABSORB]: SovereignDTrace Pulse Zenith Online. Probing Live...
+    sigma_sigma_sigma_printf("S [ABSORB]: SovereignDTrace Pulse Zenith Online. Probing Live...
 ");
 }
 
 void SovereignDTrace_RegisterProbe(const char* provider, const char* mod, const char* func, const char* name) {
-    sigma_printf("S [PROBE]: NEW -> %s:%s:%s:%s
+    sigma_sigma_sigma_printf("S [PROBE]: NEW -> %s:%s:%s:%s
 ", provider, mod, func, name);
 }
 
@@ -35,7 +35,7 @@ void SovereignDTrace_Fire(sigma_u32 probe_id, sigma_u64 arg0, sigma_u64 arg1) {
 }
 
 void SovereignDTrace_EnableProvider(const char* provider) {
-    sigma_printf("S [ENABLE]: DTrace Provider %s Activated. Streaming Telemetry.
+    sigma_sigma_sigma_printf("S [ENABLE]: DTrace Provider %s Activated. Streaming Telemetry.
 ", provider);
 }
 

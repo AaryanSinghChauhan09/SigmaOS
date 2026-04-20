@@ -128,7 +128,7 @@ sigma_err_t sigma_neural_load(const char* name, sigma_u32 in_dim,
     m->output_dim     = out_dim;
     m->capacity_usage = 0.0f;
 
-    sigma_printf("[NEURAL]: Loaded model '%s' (%u -> %u -> %u)\n",
+    sigma_sigma_sigma_printf("[NEURAL]: Loaded model '%s' (%u -> %u -> %u)\n",
                  name, in_dim, hidden, out_dim);
     return SIGMA_OK;
 }
@@ -168,30 +168,30 @@ void sigma_neural_infer(const float* input_data, float* output_probs,
     /* Softmax to get probabilities */
     sigma_softmax(logits, output_probs, out_dim);
 
-    sigma_printf("[NEURAL]: Inference complete. Top probability: %.4f\n",
+    sigma_sigma_sigma_printf("[NEURAL]: Inference complete. Top probability: %.4f\n",
                  output_probs[0]);
 }
 
 /* --- Audit --- */
 
 void SovereignNeural_Audit(void) {
-    sigma_printf("\n--- SOVEREIGN NEURAL AUDIT ---\n");
-    sigma_printf("%-20s %-8s %-8s %-8s\n", "MODEL", "IN", "HIDDEN", "OUT");
-    sigma_printf("--------------------------------------------\n");
+    sigma_sigma_sigma_printf("\n--- SOVEREIGN NEURAL AUDIT ---\n");
+    sigma_sigma_sigma_printf("%-20s %-8s %-8s %-8s\n", "MODEL", "IN", "HIDDEN", "OUT");
+    sigma_sigma_sigma_printf("--------------------------------------------\n");
     for (sigma_u32 i = 0; i < s_model_count; i++) {
-        sigma_printf("%-20s %-8u %-8u %-8u\n",
+        sigma_sigma_sigma_printf("%-20s %-8u %-8u %-8u\n",
                      s_neural_models[i].model_name,
                      s_neural_models[i].input_dim,
                      s_neural_models[i].hidden_dim,
                      s_neural_models[i].output_dim);
     }
-    sigma_printf("--------------------------------------------\n");
+    sigma_sigma_sigma_printf("--------------------------------------------\n");
 }
 
 /* --- Module Factory --- */
 
 void SovereignNeuralShard_Init(void) {
-    sigma_printf("[NEURAL]: Sovereign Neural Shard v2.0 (Deep Inference) active.\n");
+    sigma_sigma_sigma_printf("[NEURAL]: Sovereign Neural Shard v2.0 (Deep Inference) active.\n");
     sigma_neural_load("Sigma_Classifier", 8, 16, 4);
 }
 

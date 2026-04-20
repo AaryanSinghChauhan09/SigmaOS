@@ -49,7 +49,7 @@ sigma_f64 sigma_pid_compute(SigmaPID_t* pid, sigma_f64 current_value, sigma_f64 
 /* --- Module Factory --- */
 
 void SovereignControl_Register(void) {
-    sigma_printf("[HAL]: Sovereign Control Engine (PID) active.\n");
+    sigma_sigma_sigma_printf("[HAL]: Sovereign Control Engine (PID) active.\n");
 }
 
 

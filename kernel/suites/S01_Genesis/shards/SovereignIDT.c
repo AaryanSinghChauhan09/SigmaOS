@@ -43,7 +43,7 @@ void idt_set_gate(uint8_t num, uint64_t base, uint16_t sel, uint8_t flags) {
 }
 
 void sigma_isr_handler(uint64_t irq_num) {
-    sigma_printf("S [IDT]: Direct-to-Silicon ISR Triggered -> IRQ %d\n", irq_num);
+    sigma_sigma_sigma_printf("S [IDT]: Direct-to-Silicon ISR Triggered -> IRQ %d\n", irq_num);
     /* [Σ Implementation Note]: This replaces standard generic IRQ dispatchers
        with shard-specific deterministic execution paths. */
 }
@@ -52,7 +52,7 @@ void idt_init(void) {
     g_idtr.limit = (sizeof(idt_entry_t) * IDT_ENTRIES) - 1;
     g_idtr.base  = (uint64_t)&g_idt;
 
-    sigma_memset(&g_idt, 0, sizeof(g_idt));
+    sigma_sigma_sigma_memset(&g_idt, 0, sizeof(g_idt));
 
     /* [Σ Security Note]: Setting up gates for CPU exceptions and hardware IRQs.
        Flags 0x8E = Interrupt Gate (Present, DPL=0, Type=E) */
@@ -60,5 +60,5 @@ void idt_init(void) {
         idt_set_gate(i, (uint64_t)sigma_isr_handler, 0x08, 0x8E);
     }
 
-    sigma_printf("S [S01]: Sovereign IDT Materialized. Silicon linkage complete.\n");
+    sigma_sigma_sigma_printf("S [S01]: Sovereign IDT Materialized. Silicon linkage complete.\n");
 }

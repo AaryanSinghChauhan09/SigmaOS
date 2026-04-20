@@ -17,17 +17,17 @@
 
 static void pquery_connect(SovereignPowerQueryMaster_t* self, const char* connectionString) {
     (void)self;
-    sigma_printf("[POWER-QUERY]: Binding industrial data lake to target node: %s\n", connectionString);
+    sigma_sigma_sigma_printf("[POWER-QUERY]: Binding industrial data lake to target node: %s\n", connectionString);
 }
 
 static void pquery_apply_filter(SovereignPowerQueryMaster_t* self, const char* filterLogic) {
     (void)self;
-    sigma_printf("[POWER-QUERY]: Applying M-Language transformation filter matrix: %s\n", filterLogic);
+    sigma_sigma_sigma_printf("[POWER-QUERY]: Applying M-Language transformation filter matrix: %s\n", filterLogic);
 }
 
 static void pquery_finalize(SovereignPowerQueryMaster_t* self) {
     (void)self;
-    sigma_printf("[POWER-QUERY]: Stream execution completely materialized. Injecting to SovereignDAXEngine...\n");
+    sigma_sigma_sigma_printf("[POWER-QUERY]: Stream execution completely materialized. Injecting to SovereignDAXEngine...\n");
 }
 
 // -------------------------------------------------------------------------

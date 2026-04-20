@@ -1,7 +1,7 @@
 #ifndef SIGMA_PROTO_H
 #define SIGMA_PROTO_H
 
-#include <stdint.h>
+#include "suites/S01_Genesis/shards/sigma_types.h"
 
 /* =========================================================================
  * SIGMA OS: SOVEREIGN NETWORK PROTOCOLS (S07)

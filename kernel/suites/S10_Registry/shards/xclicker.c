@@ -9,14 +9,14 @@
  */
 
 void sigma_tool_xclicker(int interval_ms, int clicks) {
-    sigma_printf("[CLICKER]: Initiating %d clicks at %dms interval...\n", clicks, interval_ms);
+    sigma_sigma_sigma_printf("[CLICKER]: Initiating %d clicks at %dms interval...\n", clicks, interval_ms);
     for (int i = 0; i < clicks; i++) {
         /* Simulate hardware click via IO shard */
         // sigma_outb(0x64, 0xD4); // Mock PS/2 Mouse command
-        sigma_printf("[CLICKER]: Click %d triggered.\n", i + 1);
+        sigma_sigma_sigma_printf("[CLICKER]: Click %d triggered.\n", i + 1);
         sigma_sleep(interval_ms / 1000); 
     }
-    sigma_printf("[OK]: Clicker mission complete.\n");
+    sigma_sigma_sigma_printf("[OK]: Clicker mission complete.\n");
 }
 
 int xclicker_ToolMain(int argc, char** argv) {

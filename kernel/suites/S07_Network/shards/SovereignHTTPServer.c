@@ -5,8 +5,8 @@
  * modular C sub-systems, representing pure OS-level design methodology.
  * -------------------------------------------------------------------------- */
 
-#include <stdio.h>
-#include <stdlib.h>
+#include "suites/S01_Genesis/shards/sigma_libc.h"
+#include "suites/S01_Genesis/shards/sigma_libc.h"
 #include "../include/sigma_network.h"
 #include "../include/sigma_http.h"
 
@@ -23,12 +23,12 @@ int main() {
 
     int server_socket = sigma_create_server_socket(PORT);
 
-    printf("====================================================\n");
-    printf("[KERNEL] Σ SIGMA OS SOVEREIGN C-WEB ENGINE\n");
-    printf("====================================================\n");
-    printf("[KERNEL] System C-Level Modular Architecture Active.\n");
-    printf("[KERNEL] Network & HTTP protocols securely sharded.\n");
-    printf("[KERNEL] Awaiting incoming connections (Port %d)...\n\n", PORT);
+    sigma_sigma_printf("====================================================\n");
+    sigma_sigma_printf("[KERNEL] Σ SIGMA OS SOVEREIGN C-WEB ENGINE\n");
+    sigma_sigma_printf("====================================================\n");
+    sigma_sigma_printf("[KERNEL] System C-Level Modular Architecture Active.\n");
+    sigma_sigma_printf("[KERNEL] Network & HTTP protocols securely sharded.\n");
+    sigma_sigma_printf("[KERNEL] Awaiting incoming connections (Port %d)...\n\n", PORT);
 
     while (1) {
         struct sockaddr_in client_addr;

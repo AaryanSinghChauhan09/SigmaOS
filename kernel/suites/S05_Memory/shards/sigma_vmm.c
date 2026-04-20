@@ -42,8 +42,8 @@ static vmm_u64 aslr_slide(vmm_u64 seed) {
 
 /* ── Init ────────────────────────────────────────────────────────────────── */
 void sigma_vmm_init(void) {
-    sigma_memset(s_spaces, 0, sizeof(s_spaces));
-    sigma_printf("S [VMM] Initialized. Physical pool: 1GB @ 0x%llx\n",
+    sigma_sigma_sigma_memset(s_spaces, 0, sizeof(s_spaces));
+    sigma_sigma_sigma_printf("S [VMM] Initialized. Physical pool: 1GB @ 0x%llx\n",
                  (unsigned long long)s_phys_pool);
 }
 
@@ -51,11 +51,11 @@ void sigma_vmm_init(void) {
 vmm_i32 sigma_vmm_addrspace_create(vmm_u32 pid, vmm_u64 aslr_seed) {
     if (s_space_count >= SIGMA_MAX_PROCS) return VMM_ERR;
     sigma_addrspace_t *as = &s_spaces[s_space_count++];
-    sigma_memset(as, 0, sizeof(*as));
+    sigma_sigma_sigma_memset(as, 0, sizeof(*as));
     as->pid         = pid;
     as->aslr_offset = aslr_slide(aslr_seed);
     as->brk         = 0x400000ULL + as->aslr_offset;
-    sigma_printf("S [VMM] AS created: pid=%u aslr=0x%llx\n",
+    sigma_sigma_sigma_printf("S [VMM] AS created: pid=%u aslr=0x%llx\n",
                  pid, (unsigned long long)as->aslr_offset);
     return VMM_OK;
 }
@@ -63,9 +63,9 @@ vmm_i32 sigma_vmm_addrspace_create(vmm_u32 pid, vmm_u64 aslr_seed) {
 void sigma_vmm_addrspace_destroy(vmm_u32 pid) {
     sigma_addrspace_t *as = get_as(pid);
     if (!as) return;
-    sigma_printf("S [VMM] AS destroyed: pid=%u vmas=%u total_vm=%llu KB\n",
+    sigma_sigma_sigma_printf("S [VMM] AS destroyed: pid=%u vmas=%u total_vm=%llu KB\n",
                  pid, as->vma_count, (unsigned long long)as->total_vm_kb);
-    sigma_memset(as, 0, sizeof(*as));
+    sigma_sigma_sigma_memset(as, 0, sizeof(*as));
 }
 
 /* ── mmap ────────────────────────────────────────────────────────────────── */
@@ -98,7 +98,7 @@ vmm_u64 sigma_mmap(vmm_u32 pid, vmm_u64 hint, vmm_u64 length,
     as->rss_kb      += sz / 1024;
     as->brk          = vma->end;
 
-    sigma_printf("S [VMM] MMAP: pid=%u vaddr=0x%llx len=%llupg prot=%u%s\n",
+    sigma_sigma_sigma_printf("S [VMM] MMAP: pid=%u vaddr=0x%llx len=%llupg prot=%u%s\n",
                  pid, (unsigned long long)vaddr,
                  (unsigned long long)pages, prot,
                  vma->is_huge ? " [HUGE]" : "");
@@ -132,7 +132,7 @@ vmm_i32 sigma_mprotect(vmm_u32 pid, vmm_u64 addr, vmm_u64 length, vmm_u32 new_pr
     for (vmm_u32 i = 0; i < as->vma_count; i++) {
         if (addr >= as->vmas[i].start && addr < as->vmas[i].end) {
             as->vmas[i].prot = new_prot;
-            sigma_printf("S [VMM] MPROTECT: pid=%u addr=0x%llx prot=%u\n",
+            sigma_sigma_sigma_printf("S [VMM] MPROTECT: pid=%u addr=0x%llx prot=%u\n",
                          pid, (unsigned long long)addr, new_prot);
             (void)length;
             return VMM_OK;
@@ -157,13 +157,13 @@ vmm_u64 sigma_brk(vmm_u32 pid, vmm_u64 new_brk) {
 
 /* ── THP / KSM hints ─────────────────────────────────────────────────────── */
 vmm_i32 sigma_madvise_huge(vmm_u32 pid, vmm_u64 addr, vmm_u64 len) {
-    sigma_printf("S [VMM] THP ADVISE: pid=%u addr=0x%llx len=%llu\n",
+    sigma_sigma_sigma_printf("S [VMM] THP ADVISE: pid=%u addr=0x%llx len=%llu\n",
                  pid, (unsigned long long)addr, (unsigned long long)len);
     return VMM_OK;
 }
 
 vmm_i32 sigma_ksm_merge(vmm_u32 pid) {
-    sigma_printf("S [VMM] KSM: page deduplication scan for pid=%u\n", pid);
+    sigma_sigma_sigma_printf("S [VMM] KSM: page deduplication scan for pid=%u\n", pid);
     return VMM_OK;
 }
 
@@ -177,13 +177,13 @@ vmm_u32 sigma_oom_select_victim(void) {
             worst_pid = s_spaces[i].pid;
         }
     }
-    sigma_printf("S [OOM] Selected victim: pid=%u rss=%llu KB\n",
+    sigma_sigma_sigma_printf("S [OOM] Selected victim: pid=%u rss=%llu KB\n",
                  worst_pid, (unsigned long long)worst_rss);
     return worst_pid;
 }
 
 void sigma_oom_kill(vmm_u32 pid) {
-    sigma_printf("S [OOM] KILL: pid=%u\n", pid);
+    sigma_sigma_sigma_printf("S [OOM] KILL: pid=%u\n", pid);
     sigma_vmm_addrspace_destroy(pid);
 }
 
@@ -191,12 +191,12 @@ void sigma_oom_kill(vmm_u32 pid) {
 void sigma_vmm_dump(vmm_u32 pid) {
     sigma_addrspace_t *as = get_as(pid);
     if (!as) return;
-    sigma_printf("\nS VMM MAPS pid=%u (ASLR=0x%llx)\n",
+    sigma_sigma_sigma_printf("\nS VMM MAPS pid=%u (ASLR=0x%llx)\n",
                  pid, (unsigned long long)as->aslr_offset);
-    sigma_printf("%-18s %-18s %s\n", "START", "END", "PROT");
+    sigma_sigma_sigma_printf("%-18s %-18s %s\n", "START", "END", "PROT");
     for (vmm_u32 i = 0; i < as->vma_count; i++) {
         sigma_vma_t *v = &as->vmas[i];
-        sigma_printf("  0x%014llx 0x%014llx %c%c%c%s\n",
+        sigma_sigma_sigma_printf("  0x%014llx 0x%014llx %c%c%c%s\n",
                      (unsigned long long)v->start,
                      (unsigned long long)v->end,
                      (v->prot & PROT_READ)  ? 'r' : '-',

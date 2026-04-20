@@ -26,9 +26,9 @@ void forensic_log(SovereignAuditEvent event, const char* details) {
         case AUDIT_PRIVILEGE_ESC: type_str = "PRIV"; break;
     }
     
-    sigma_printf("S [AUDIT|%llu]: %s -> %s\n", timestamp, type_str, details);
+    sigma_sigma_sigma_printf("S [AUDIT|%llu]: %s -> %s\n", timestamp, type_str, details);
 }
 
 void forensic_logger_init(void) {
-    sigma_printf("S [S13]: Sovereign Forensic Audit Logger Materialized (Apex Idea 314).\n");
+    sigma_sigma_sigma_printf("S [S13]: Sovereign Forensic Audit Logger Materialized (Apex Idea 314).\n");
 }
