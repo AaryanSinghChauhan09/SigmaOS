@@ -2,7 +2,8 @@
 
 [![Purity Gate](https://github.com/AaryanSinghChauhan09/SigmaOS/actions/workflows/sigma_master_ci.yml/badge.svg)](https://github.com/AaryanSinghChauhan09/SigmaOS/actions)
 [![Zenith CI](https://github.com/AaryanSinghChauhan09/SigmaOS/actions/workflows/sigma_ci_zenith.yml/badge.svg)](https://github.com/AaryanSinghChauhan09/SigmaOS/actions)
-[![Web OS CI](https://github.com/AaryanSinghChauhan09/SigmaOS/actions/workflows/sigma_web_ci.yml/badge.svg)](https://github.com/AaryanSinghChauhan09/SigmaOS/actions)
+[![CodeQL Security](https://github.com/AaryanSinghChauhan09/SigmaOS/actions/workflows/codeql-analysis.yml/badge.svg)](https://github.com/AaryanSinghChauhan09/SigmaOS/actions)
+[![Coverage Status](https://coveralls.io/repos/github/AaryanSinghChauhan09/SigmaOS/badge.svg?branch=main)](https://coveralls.io/github/AaryanSinghChauhan09/SigmaOS?branch=main)
 
 SigmaOS is an industrial-grade, sentient silicon operating system designed for absolute bare-metal control and high-fidelity browser-centric virtualization.
 
