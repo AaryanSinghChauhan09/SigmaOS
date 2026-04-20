@@ -1,4 +1,4 @@
-﻿/*
+/*
  * =========================================================================
  * S SIGMAOS kernel/suites/S05_Memory/shards/sigma_vmm.h
  * =========================================================================
@@ -14,16 +14,19 @@
 #define SIGMA_VMM_H
 
 /* Self-contained primitives */
-typedef unsigned long long vmm_u64;
-typedef unsigned int       vmm_u32;
-typedef signed   int       vmm_i32;
-typedef unsigned char      vmm_u8;
-typedef unsigned char      vmm_bool;
-#define VMM_TRUE  ((vmm_bool)1)
-#define VMM_FALSE ((vmm_bool)0)
-#define VMM_NULL  ((void*)0)
-#define VMM_OK    ((vmm_i32) 0)
-#define VMM_ERR   ((vmm_i32)-1)
+#include "suites/S01_Genesis/shards/SovereignCommon.h"
+
+typedef sigma_sz_t  vmm_u64;
+typedef sigma_u32   vmm_u32;
+typedef sigma_i32   vmm_i32;
+typedef sigma_u8    vmm_u8;
+typedef sigma_bool  vmm_bool;
+
+#define VMM_TRUE  SIGMA_TRUE
+#define VMM_FALSE SIGMA_FALSE
+#define VMM_NULL  SIGMA_NULL
+#define VMM_OK    SIGMA_OK
+#define VMM_ERR   -1
 
 /* ── Page size constants ────────────────────────────────────────────────── */
 #define SIGMA_PAGE_SIZE      4096ULL
@@ -59,9 +62,9 @@ typedef struct {
 
 #define SIGMA_VMM_MAX_VMAS 4096
 
-/* ── Process address space ──────────────────────────────────────────────── */
+/* ── Address Space (Object-Oriented) ────────────────────────────────────── */
 typedef struct {
-    vmm_u32      pid;
+    sigma_obj_t  base;         /* Inheritance from SovereignObject */
     sigma_vma_t  vmas[SIGMA_VMM_MAX_VMAS];
     vmm_u32      vma_count;
     vmm_u64      total_vm_kb;

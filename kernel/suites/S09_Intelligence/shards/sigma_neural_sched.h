@@ -1,4 +1,4 @@
-﻿/*
+/*
  * =========================================================================
  * S SIGMAOS kernel/suites/S09_Intelligence/shards/sigma_neural_sched.h
  * =========================================================================
@@ -18,13 +18,16 @@
 #ifndef SIGMA_NEURAL_SCHED_H
 #define SIGMA_NEURAL_SCHED_H
 
-typedef unsigned long long ns_u64;
-typedef unsigned int       ns_u32;
-typedef signed   int       ns_i32;
-typedef unsigned char      ns_u8;
-typedef unsigned char      ns_bool;
-#define NS_TRUE  ((ns_bool)1)
-#define NS_FALSE ((ns_bool)0)
+#include "suites/S01_Genesis/shards/SovereignCommon.h"
+
+typedef sigma_sz_t  ns_u64;
+typedef sigma_u32   ns_u32;
+typedef sigma_i32   ns_i32;
+typedef sigma_u8    ns_u8;
+typedef sigma_bool  ns_bool;
+
+#define NS_TRUE  SIGMA_TRUE
+#define NS_FALSE SIGMA_FALSE
 
 /* ── Pressure levels (Linux PSI equivalent) ─────────────────────────────── */
 typedef enum {
@@ -68,6 +71,13 @@ typedef struct {
     int w2[NS_OUTPUTS][NS_HIDDEN];
     int b2[NS_OUTPUTS];
 } sigma_nn_weights_t;
+
+/* ── Neural Balancer (Object-Oriented) ─────────────────────────────────── */
+typedef struct {
+    sigma_obj_t         base;        /* Inheritance from SovereignObject */
+    sigma_nn_weights_t  weights;
+    ns_u32              history_len;
+} sigma_balancer_t;
 
 /* ── Prediction output ───────────────────────────────────────────────────── */
 typedef struct {

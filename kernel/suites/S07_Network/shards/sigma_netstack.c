@@ -1,4 +1,4 @@
-﻿/*
+/*
  * =========================================================================
  * S SIGMAOS kernel/suites/S07_Network/shards/sigma_netstack.c
  * =========================================================================
@@ -37,7 +37,8 @@ net_i32 sigma_net_if_register(const char *name, const net_u8 *mac,
                                net_u32 ip4, net_u32 netmask) {
     if (s_if_count >= SIGMA_NET_MAX_IFS) return NET_ERR;
     sigma_netif_t *nif = &s_ifaces[s_if_count];
-    sigma_strncpy(nif->name, name, SIGMA_IF_NAME_LEN - 1);
+    nif->base.name = name;
+    nif->base.id   = s_if_count;
     if (mac) sigma_sigma_sigma_memcpy(nif->mac, mac, 6);
     nif->ip4     = ip4;
     nif->netmask = netmask;
@@ -49,13 +50,14 @@ void sigma_net_if_up(net_u32 idx) {
     if (idx >= s_if_count) return;
     s_ifaces[idx].flags |= IFF_UP | IFF_RUNNING;
     sigma_sigma_sigma_printf("S [NET] IF UP: %s ip=%u\n",
-                 s_ifaces[idx].name, s_ifaces[idx].ip4);
+                 s_ifaces[idx].base.name, s_ifaces[idx].ip4);
 }
 
 void sigma_net_if_down(net_u32 idx) {
     if (idx >= s_if_count) return;
     s_ifaces[idx].flags &= ~(IFF_UP | IFF_RUNNING);
-    sigma_sigma_sigma_printf("S [NET] IF DOWN: %s\n", s_ifaces[idx].name);
+    sigma_sigma_sigma_printf("S [NET] IF DOWN: %s\n", s_ifaces[idx].base.name);
+ domestic
 }
 
 void sigma_net_if_status(void) {
@@ -63,7 +65,7 @@ void sigma_net_if_status(void) {
     for (net_u32 i = 0; i < s_if_count; i++) {
         sigma_netif_t *n = &s_ifaces[i];
         sigma_sigma_sigma_printf("  %-8s ip=0x%08x flags=0x%x rx=%llu tx=%llu\n",
-                     n->name, n->ip4, n->flags,
+                     n->base.name, n->ip4, n->flags,
                      (unsigned long long)n->rx_bytes,
                      (unsigned long long)n->tx_bytes);
     }

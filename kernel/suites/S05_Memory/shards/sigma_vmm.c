@@ -1,4 +1,4 @@
-﻿/*
+/*
  * =========================================================================
  * S SIGMAOS kernel/suites/S05_Memory/shards/sigma_vmm.c
  * =========================================================================
@@ -29,7 +29,7 @@ static vmm_u64 phys_alloc(vmm_u64 size) {
 /* ── Helpers ─────────────────────────────────────────────────────────────── */
 static sigma_addrspace_t *get_as(vmm_u32 pid) {
     for (vmm_u32 i = 0; i < s_space_count; i++)
-        if (s_spaces[i].pid == pid) return &s_spaces[i];
+        if (s_spaces[i].base.id == pid) return &s_spaces[i];
     return VMM_NULL;
 }
 
@@ -52,11 +52,12 @@ vmm_i32 sigma_vmm_addrspace_create(vmm_u32 pid, vmm_u64 aslr_seed) {
     if (s_space_count >= SIGMA_MAX_PROCS) return VMM_ERR;
     sigma_addrspace_t *as = &s_spaces[s_space_count++];
     sigma_sigma_sigma_memset(as, 0, sizeof(*as));
-    as->pid         = pid;
+    as->base.id     = pid;
+    as->base.name   = "sigma_address_space";
     as->aslr_offset = aslr_slide(aslr_seed);
     as->brk         = 0x400000ULL + as->aslr_offset;
     sigma_sigma_sigma_printf("S [VMM] AS created: pid=%u aslr=0x%llx\n",
-                 pid, (unsigned long long)as->aslr_offset);
+                 as->base.id, (unsigned long long)as->aslr_offset);
     return VMM_OK;
 }
 
@@ -64,7 +65,7 @@ void sigma_vmm_addrspace_destroy(vmm_u32 pid) {
     sigma_addrspace_t *as = get_as(pid);
     if (!as) return;
     sigma_sigma_sigma_printf("S [VMM] AS destroyed: pid=%u vmas=%u total_vm=%llu KB\n",
-                 pid, as->vma_count, (unsigned long long)as->total_vm_kb);
+                 as->base.id, as->vma_count, (unsigned long long)as->total_vm_kb);
     sigma_sigma_sigma_memset(as, 0, sizeof(*as));
 }
 
@@ -174,7 +175,7 @@ vmm_u32 sigma_oom_select_victim(void) {
     for (vmm_u32 i = 0; i < s_space_count; i++) {
         if (s_spaces[i].rss_kb > worst_rss) {
             worst_rss = s_spaces[i].rss_kb;
-            worst_pid = s_spaces[i].pid;
+            worst_pid = s_spaces[i].base.id;
         }
     }
     sigma_sigma_sigma_printf("S [OOM] Selected victim: pid=%u rss=%llu KB\n",
@@ -192,7 +193,7 @@ void sigma_vmm_dump(vmm_u32 pid) {
     sigma_addrspace_t *as = get_as(pid);
     if (!as) return;
     sigma_sigma_sigma_printf("\nS VMM MAPS pid=%u (ASLR=0x%llx)\n",
-                 pid, (unsigned long long)as->aslr_offset);
+                 as->base.id, (unsigned long long)as->aslr_offset);
     sigma_sigma_sigma_printf("%-18s %-18s %s\n", "START", "END", "PROT");
     for (vmm_u32 i = 0; i < as->vma_count; i++) {
         sigma_vma_t *v = &as->vmas[i];

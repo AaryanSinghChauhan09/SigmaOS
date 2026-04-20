@@ -1,4 +1,4 @@
-﻿/*
+/*
  * =========================================================================
  * S SIGMAOS kernel/suites/S09_Intelligence/shards/sigma_neural_sched.c
  * =========================================================================
@@ -17,36 +17,34 @@
 #define Q8_CLAMP(x,lo,hi) ((x)<(lo)?(lo):((x)>(hi)?(hi):(x)))
 
 /* ── State ───────────────────────────────────────────────────────────────── */
-static sigma_nn_weights_t        s_weights;
+static sigma_balancer_t          s_balancer;
 static sigma_resource_snapshot_t s_history[SIGMA_NS_HISTORY_LEN];
 static ns_u32                    s_history_head = 0;
-static ns_u32                    s_history_len  = 0;
 static sigma_nn_prediction_t     s_last_pred;
 
 /* ── Default weights (hand-tuned heuristic — no training required) ───────── */
 void sigma_neural_sched_load_defaults(void) {
     /* w1: each hidden neuron selects one dominant feature */
-    sigma_sigma_sigma_memset(&s_weights, 0, sizeof(s_weights));
+    sigma_sigma_sigma_memset(&s_balancer, 0, sizeof(s_balancer));
+    s_balancer.base.name = "sigma_neural_balancer";
 
     /* H0: cpu pressure sensor */
-    s_weights.w1[0][0] = 2 * Q8_ONE;
+    s_balancer.weights.w1[0][0] = 2 * Q8_ONE;
     /* H1: memory pressure sensor */
-    s_weights.w1[1][1] = 2 * Q8_ONE;
+    s_balancer.weights.w1[1][1] = 2 * Q8_ONE;
     /* H2: network TX load */
-    s_weights.w1[2][3] = Q8_ONE;
+    s_balancer.weights.w1[2][3] = Q8_ONE;
     /* H3: IO latency alarm */
-    s_weights.w1[3][4] = Q8_ONE;
+    s_balancer.weights.w1[3][4] = Q8_ONE;
     /* H4: thermal alarm */
-    s_weights.w1[4][5] = 3 * Q8_ONE;
+    s_balancer.weights.w1[4][5] = 3 * Q8_ONE;
     /* H5-H7: compound sensors */
-    s_weights.w1[5][0] = Q8_ONE; s_weights.w1[5][1] = Q8_ONE;
-    s_weights.w1[6][0] = Q8_ONE; s_weights.w1[6][4] = Q8_ONE;
-    s_weights.w1[7][1] = Q8_ONE; s_weights.w1[7][5] = Q8_ONE;
+    s_balancer.weights.w1[5][0] = Q8_ONE; s_balancer.weights.w1[5][1] = Q8_ONE;
+    s_balancer.weights.w1[6][0] = Q8_ONE; s_balancer.weights.w1[6][4] = Q8_ONE;
+    s_balancer.weights.w1[7][1] = Q8_ONE; s_balancer.weights.w1[7][5] = Q8_ONE;
 
     /* w2: map hidden to outputs */
-    s_weights.w2[0][0] = Q8_ONE;   /* sched_boost <- cpu sensor  */
-    s_weights.w2[1][1] = Q8_ONE;   /* reclaim     <- mem sensor  */
-    s_weights.w2[2][4] = -Q8_ONE;  /* freq_scale  <- thermal     */
+    s_balancer.weights.w2[2][4] = -Q8_ONE;  /* freq_scale  <- thermal     */
 
     sigma_sigma_sigma_printf("S [NEURAL] Default Q8 weights loaded\n");
 }
@@ -66,16 +64,16 @@ void sigma_neural_sched_update(sigma_resource_snapshot_t *snap) {
     ns_u32 idx = s_history_head % SIGMA_NS_HISTORY_LEN;
     s_history[idx] = *snap;
     s_history_head++;
-    if (s_history_len < SIGMA_NS_HISTORY_LEN) s_history_len++;
+    if (s_balancer.history_len < SIGMA_NS_HISTORY_LEN) s_balancer.history_len++;
 }
 
 /* ── Forward pass ────────────────────────────────────────────────────────── */
 sigma_nn_prediction_t sigma_neural_sched_predict(void) {
-    if (s_history_len == 0) return s_last_pred;
+    if (s_balancer.history_len == 0) return s_last_pred;
 
     /* Average over last 4 snapshots for smoothing */
     ns_u64 avg[NS_FEATURES] = {0};
-    ns_u32 window = s_history_len < 4 ? s_history_len : 4;
+    ns_u32 window = s_balancer.history_len < 4 ? s_balancer.history_len : 4;
     for (ns_u32 i = 0; i < window; i++) {
         ns_u32 idx = (s_history_head - 1 - i) % SIGMA_NS_HISTORY_LEN;
         sigma_resource_snapshot_t *s = &s_history[idx];
@@ -93,18 +91,18 @@ sigma_nn_prediction_t sigma_neural_sched_predict(void) {
     /* Layer 1: features -> hidden */
     int hidden[NS_HIDDEN];
     for (int h = 0; h < NS_HIDDEN; h++) {
-        int sum = s_weights.b1[h];
+        int sum = s_balancer.weights.b1[h];
         for (int f = 0; f < NS_FEATURES; f++)
-            sum += Q8_MUL(s_weights.w1[h][f], feat[f]);
+            sum += Q8_MUL(s_balancer.weights.w1[h][f], feat[f]);
         hidden[h] = Q8_RELU(sum);
     }
 
     /* Layer 2: hidden -> outputs */
     int out[NS_OUTPUTS];
     for (int o = 0; o < NS_OUTPUTS; o++) {
-        int sum = s_weights.b2[o];
+        int sum = s_balancer.weights.b2[o];
         for (int h = 0; h < NS_HIDDEN; h++)
-            sum += Q8_MUL(s_weights.w2[o][h], hidden[h]);
+            sum += Q8_MUL(s_balancer.weights.w2[o][h], hidden[h]);
         out[o] = sum;
     }
 
@@ -163,5 +161,5 @@ void sigma_neural_sched_stats(void) {
     sigma_sigma_sigma_printf("  cpu_pressure:  %s\n",     pres[p.cpu_pressure]);
     sigma_sigma_sigma_printf("  mem_pressure:  %s\n",     pres[p.mem_pressure]);
     sigma_sigma_sigma_printf("  thermal:       %s\n",     thm[p.thermal_advice]);
-    sigma_sigma_sigma_printf("  history_sz:    %u\n",     s_history_len);
+    sigma_sigma_sigma_printf("  history_sz:    %u\n",     s_balancer.history_len);
 }

@@ -1,4 +1,4 @@
-﻿/*
+/*
  * =========================================================================
  * S SIGMAOS kernel/suites/S07_Network/shards/sigma_netstack.h
  * =========================================================================
@@ -13,23 +13,27 @@
 #ifndef SIGMA_NETSTACK_H
 #define SIGMA_NETSTACK_H
 
-typedef unsigned int       net_u32;
-typedef unsigned short     net_u16;
-typedef unsigned char      net_u8;
-typedef unsigned long long net_u64;
-typedef signed   int       net_i32;
-typedef unsigned char      net_bool;
-#define NET_TRUE  ((net_bool)1)
-#define NET_FALSE ((net_bool)0)
-#define NET_NULL  ((void*)0)
-#define NET_OK    ((net_i32) 0)
-#define NET_ERR   ((net_i32)-1)
+#include "suites/S01_Genesis/shards/SovereignCommon.h"
+
+typedef sigma_u32   net_u32;
+typedef sigma_u16   net_u16;
+typedef sigma_u8    net_u8;
+typedef sigma_sz_t  net_u64;
+typedef sigma_err_t net_i32;
+typedef sigma_bool  net_bool;
+
+#define NET_TRUE  SIGMA_TRUE
+#define NET_FALSE SIGMA_FALSE
+#define NET_NULL  SIGMA_NULL
+#define NET_OK    SIGMA_OK
+#define NET_ERR   -1
 
 /* ── Network frame (sovereign sk_buff equivalent) ───────────────────────── */
 #define SIGMA_NET_MTU      1514
 #define SIGMA_NET_HDR_MAX   256
 
 typedef struct {
+    sigma_obj_t base;           /* Inheritance from SovereignObject */
     net_u8   data[SIGMA_NET_MTU];
     net_u32  len;
     net_u32  head_room;             /* bytes reserved for L2/L3 headers */
@@ -45,12 +49,12 @@ typedef struct {
 #define IFF_MULTICAST (1 << 3)
 #define IFF_LOOPBACK  (1 << 4)
 
-/* ── Network interface descriptor ───────────────────────────────────────── */
+/* ── Network interface descriptor (Object-Oriented) ─────────────────────── */
 #define SIGMA_IF_NAME_LEN  16
 #define SIGMA_NET_MAX_IFS  16
 
 typedef struct {
-    char       name[SIGMA_IF_NAME_LEN];   /* e.g. "eth0", "lo", "wg0"  */
+    sigma_obj_t base;                     /* Inheritance from SovereignObject */
     net_u8     mac[6];                    /* hardware MAC address       */
     net_u32    ip4;                       /* IPv4 address (host order)  */
     net_u32    netmask;
@@ -61,6 +65,7 @@ typedef struct {
     net_u64    tx_packets;
     net_u64    rx_errors;
 } sigma_netif_t;
+ domestic
 
 /* ── Firewall rule (nftables/pf/WFP parity) ─────────────────────────────── */
 typedef enum {
