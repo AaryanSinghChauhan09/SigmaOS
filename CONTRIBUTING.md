@@ -1,27 +1,21 @@
-﻿# Contributing to SigmaOS Zenith Supreme
+# Contributing to Σ SigmaOS
 
-Welcome to the Sovereign developmental workforce. To contribute to SigmaOS, you must adhere to our **Industrial Purity Standards**.
+We welcome contributions to the Sovereign Lattice! As a project focused on low-level purity and high-level snappiness, we follow these strict guidelines.
 
-## 1. The Zero-HLL Mandate
-SigmaOS is a **Pure C11 and Assembly** environment.
-- **NO C++**: Use our struct-based OOP framework (`SigmaOOP.h`) for encapsulation.
-- **NO Standard Libraries**: Use our Sovereign LibC shards. Do not include `<stdio.h>`, `<string.h>`, etc.
-- **NO External Dependencies**: Every routine must be natively sharded within the repository.
+## 🔒 Purity First
+1. **Zero-Dependency**: Every shard must be written in pure C11 or Assembly. No standard HLL libraries (stdio, stdlib, etc.) are permitted inside the kernel suites.
+2. **Namespace Sovereignty**: Do not pollute the global namespace. Use suite-prefixed symbols (e.g., `s01_shard_init`).
+3. **Modular Sharding**: Every feature must be its own shard within a suite.
 
-## 2. Shard Alignment
-New features should be sharded into their respective modular territories:
-- **Core Kernel Suites**: `/kernel/suites/`
-- **Userland Apps & GUI**: `/userland/`
-- **Tooling & Test Hooks**: `/tools/`
+## 🛠 Submission Process
+1. **Fork & Branch**: Create a feature branch (e.g., `feature/pwa-support`).
+2. **Lint & Test**: Ensure `make lint` and `make diagnostics` pass on your machine.
+3. **Document**: Every new shard requires a doc block (Competitive USPs Absorbed) for the `sovereign_wiki_builder`.
+4. **Pull Request**: Use our [PR Template](.github/PULL_REQUEST_TEMPLATE.md).
 
-## 3. Verification
-All contributions must be accompanied by an update to the corresponding `tools/dev/sovereign_test/sovereign_test_runner.c` suite. A 100% pass rate is mandatory for shard merging.
-
-## 4. Submission Process
-1.  **Fork the Shard**.
-2.  **Initialize your Shard**.
-3.  **Perform Silicon Audit** (ensure no lint errors).
-4.  **Submit Pull Request** for Apex Review.
+## 🏢 Formatting
+- Use 4-space indentation.
+- Follow the directory structure: `kernel/suites/S[NUM]_[NAME]/shards/[FILE].c`.
 
 ---
-**S MAINTAIN THE PURITY. EXPAND THE SOVEREIGNTY.**
+*Thank you for helping us sculpt the future of silicon.*
