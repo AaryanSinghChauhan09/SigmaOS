@@ -1,68 +1,25 @@
-name: Σ Bug Report (Sovereign Context)
-description: Report system-level regressions in the Sovereign Zenith Core. 
-labels: ["bug", "zenith"]
+name: "🐞 Sovereign Bug Report"
+description: "Report a shard-level anomaly or lattice instability."
 body:
   - type: markdown
     attributes:
-      value: |
-        ### 👑 Sovereignty Check
-        Before reporting, please verify the bug hasn't been resolved via `sigma help` or the `Sigma Academy` mission tracking.
-        **AI Readiness Status**: Ensure `sigma-ai eval` passes for the respective shard.
-
-  - type: textarea
-    id: bug-description
-    attributes:
-      label: Bug Description
-      description: What is the issue?
-      placeholder: Describe the problem...
-    validations:
-      required: true
-
-  - type: textarea
-    id: steps-to-reproduce
-    attributes:
-      label: Steps to Reproduce
-      description: How can we reproduce this bug?
-      placeholder: |
-        1. Open SigmaOS...
-        2. Run command...
-        3. Observe...
-    validations:
-      required: true
-
+      value: "### Σ SigmaOS Forensic Report"
   - type: input
-    id: expected-behavior
+    id: suite_id
     attributes:
-      label: Expected Behavior
-      description: What should have happened?
-      placeholder: What was supposed to happen?
+      label: "Affected Sovereign Suite"
+      placeholder: "e.g., S01_Genesis"
     validations:
       required: true
-
-  - type: input
-    id: actual-behavior
-    attributes:
-      label: Actual Behavior
-      description: What actually happened?
-      placeholder: What occurred instead?
-    validations:
-      required: true
-
   - type: textarea
-    id: environment-info
+    id: description
     attributes:
-      label: Environment Info
-      description: Operating System, Kernel version, Hardware...
-      placeholder: |
-        SigmaOS Version: 150.0
-        Architecture: x86_64
-        Hardware: ...
+      label: "Anomaly Description"
+      placeholder: "What structural instability was observed?"
     validations:
       required: true
-
   - type: textarea
     id: logs
     attributes:
-      label: Logs (if applicable)
-      description: Provide any terminal output or logs.
-      placeholder: Output from OmniShell or Sentinel...
+      label: "Kernel Journal Logs"
+      placeholder: "Output from s_journal_dump()"

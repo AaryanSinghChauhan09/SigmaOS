@@ -16,6 +16,8 @@
     --glow-purple: 0 0 20px rgba(138, 43, 226, 0.6);
     
     --silicon-heartbeat: heartbeat 2s infinite cubic-bezier(0.4, 0, 0.6, 1);
+    
+    --transition-smooth: all 0.4s cubic-bezier(0.23, 1, 0.32, 1);
 }
 
 * {
@@ -23,6 +25,7 @@
     padding: 0;
     box-sizing: border-box;
     font-family: 'Outfit', sans-serif;
+    transition: var(--transition-smooth);
 }
 
 body {

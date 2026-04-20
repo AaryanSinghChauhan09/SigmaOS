@@ -80,7 +80,8 @@ SHARDS := $(C_SOURCES:.c=.o) $(ASM_SOURCES:.asm=.o)
 .PHONY: all clean iso test shard-list lint check web-engine
 
 all: sigma_zenith.bin web-engine
-	@echo "Σ [BUILD]: sigma_zenith.bin & sigma_web_engine ready."
+	@sha256sum sigma_zenith.bin > sigma_zenith.bin.sha256
+	@echo "Σ [BUILD]: sigma_zenith.bin & sigma_web_engine ready. Checksums generated."
 
 sigma_zenith.bin: kernel/boot.o $(SHARDS)
 	$(LD) $(LDFLAGS) -o $@ kernel/boot.o $(SHARDS)
