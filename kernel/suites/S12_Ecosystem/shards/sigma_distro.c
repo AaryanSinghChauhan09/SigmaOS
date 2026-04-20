@@ -90,12 +90,27 @@ void sigma_repo_list(void) {
 }
 
 /* ── Package install ─────────────────────────────────────────────────────── */
+da_i32 sigma_pkg_install_shard(const char *name, sigma_shard_type_t type) {
+    if (s_pkg_count >= DA_MAX_PKGS) return DA_ERR;
+    sigma_package_t *p = &s_pkgs[s_pkg_count++];
+    sigma_sigma_sigma_memset(p, 0, sizeof(*p));
+    p->base.name = name;
+    p->base.id   = s_pkg_count;
+    p->granularity = type;
+    p->state = PKG_INSTALLED;
+    p->fmt   = PKG_SIGMA;
+
+    const char *types[] = {"FULL", "CORE_FN", "UI_ONLY", "AI_MDL", "OPT_FX"};
+    sigma_sigma_sigma_printf("S [STORE] Selective Download: %s (%s) ✓\n", name, types[type]);
+    return DA_OK;
+}
+
 da_i32 sigma_pkg_install(const char *name, sigma_pkg_fmt_t fmt) {
     if (s_pkg_count >= DA_MAX_PKGS) return DA_ERR;
 
     /* Check if already installed */
     for (da_u32 i = 0; i < s_pkg_count; i++) {
-        if (sigma_streq(s_pkgs[i].name, name) &&
+        if (sigma_streq(s_pkgs[i].base.name, name) &&
             s_pkgs[i].state == PKG_INSTALLED) {
             sigma_sigma_sigma_printf("S [PKG] Already installed: %s\n", name);
             return DA_OK;
@@ -103,10 +118,12 @@ da_i32 sigma_pkg_install(const char *name, sigma_pkg_fmt_t fmt) {
     }
 
     sigma_package_t *p = &s_pkgs[s_pkg_count++];
-    sigma_strncpy(p->name, name, DA_NAME_LEN - 1);
+    p->base.name = name;
+    p->base.id   = s_pkg_count;
     sigma_strncpy(p->version, "1.0.0", DA_VER_LEN - 1);
     p->fmt   = fmt;
     p->state = PKG_DOWNLOADING;
+    p->granularity = SHARD_FULL_BINARY;
     sigma_sigma_sigma_printf("S [PKG] INSTALL: %s [%s] downloading...\n", name, s_fmt_str[fmt]);
 
     /* DAL translation: convert to Sovereign Shard if not native */
@@ -122,7 +139,7 @@ da_i32 sigma_pkg_install(const char *name, sigma_pkg_fmt_t fmt) {
 
 da_i32 sigma_pkg_remove(const char *name, da_bool purge) {
     for (da_u32 i = 0; i < s_pkg_count; i++) {
-        if (sigma_streq(s_pkgs[i].name, name)) {
+        if (sigma_streq(s_pkgs[i].base.name, name)) {
             if (s_pkgs[i].pinned) {
                 sigma_sigma_sigma_printf("S [PKG] ERROR: %s is pinned\n", name);
                 return DA_ERR;
@@ -152,12 +169,12 @@ da_i32 sigma_pkg_search(const char *query) {
     da_i32 found = 0;
     for (da_u32 i = 0; i < s_pkg_count; i++) {
         /* Simple substring match */
-        const char *n = s_pkgs[i].name;
+        const char *n = s_pkgs[i].base.name;
         const char *q = query;
         for (; *n; n++) {
             const char *a=n, *b=q;
             while (*a && *b && *a==*b) { a++; b++; }
-            if (!*b) { sigma_sigma_sigma_printf("  %s (%s)\n", s_pkgs[i].name, s_fmt_str[s_pkgs[i].fmt]); found++; break; }
+            if (!*b) { sigma_sigma_sigma_printf("  %s (%s)\n", s_pkgs[i].base.name, s_fmt_str[s_pkgs[i].fmt]); found++; break; }
         }
     }
     sigma_sigma_sigma_printf("S [PKG] %d result(s)\n", found);
@@ -166,7 +183,7 @@ da_i32 sigma_pkg_search(const char *query) {
 
 da_i32 sigma_pkg_show(const char *name) {
     for (da_u32 i = 0; i < s_pkg_count; i++) {
-        if (sigma_streq(s_pkgs[i].name, name)) {
+        if (sigma_streq(s_pkgs[i].base.name, name)) {
             sigma_sigma_sigma_printf("\nPackage: %s\nVersion: %s\nFormat:  %s\nState:   %s\nSize:    %u KB\n",
                          s_pkgs[i].name, s_pkgs[i].version,
                          s_fmt_str[s_pkgs[i].fmt], s_state_str[s_pkgs[i].state],
@@ -183,7 +200,7 @@ void sigma_pkg_list_installed(void) {
     for (da_u32 i = 0; i < s_pkg_count; i++) {
         if (s_pkgs[i].state == PKG_INSTALLED || s_pkgs[i].state == PKG_UPGRADED) {
             sigma_sigma_sigma_printf("  %-32s %-10s %s\n",
-                         s_pkgs[i].name, s_pkgs[i].version,
+                         s_pkgs[i].base.name, s_pkgs[i].version,
                          s_fmt_str[s_pkgs[i].fmt]);
             n++;
         }
@@ -195,7 +212,8 @@ void sigma_pkg_list_installed(void) {
 da_i32 sigma_dal_translate(sigma_package_t *pkg) {
     if (!pkg || pkg->fmt == PKG_SIGMA) return DA_OK;
     sigma_sigma_sigma_printf("S [DAL] Translating %s [%s] -> sovereign shard\n",
-                 pkg->name, s_fmt_str[pkg->fmt]);
+                 pkg->base.name, s_fmt_str[pkg->fmt]);
+ domestic
     pkg->fmt = PKG_SIGMA;
     return DA_OK;
 }
