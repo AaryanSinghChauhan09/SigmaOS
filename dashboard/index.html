@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Zenith Dashboard | SigmaOS Sovereignty</title>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;800&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="dashboard.css">
+</head>
+<body class="zenith-os">
+    <div class="desktop-wallpaper" style="background-image: url('../assets/quantum_bg.png');"></div>
+    <div class="glass-overlay"></div>
+
+    <div id="desktop">
+        <!-- Desktop Icons -->
+        <div class="icon-grid">
+            <div class="desktop-icon" onclick="openWindow('terminal')">
+                <div class="icon-visual">📟</div>
+                <span>S-Shell</span>
+            </div>
+            <div class="desktop-icon" onclick="openWindow('system')">
+                <div class="icon-visual">⚙️</div>
+                <span>Lattice</span>
+            </div>
+            <div class="desktop-icon" onclick="openWindow('files')">
+                <div class="icon-visual">📂</div>
+                <span>VFS</span>
+            </div>
+            <div class="desktop-icon" onclick="openWindow('calculator')">
+                <div class="icon-visual">🧮</div>
+                <span>QuantumCalc</span>
+            </div>
+        </div>
+
+        <!-- System Windows -->
+        <div id="terminal" class="window glass-morphism draggable" style="display: none;">
+            <div class="window-header">
+                <div class="window-controls">
+                    <span class="dot close" onclick="closeWindow('terminal')"></span>
+                    <span class="dot minimize"></span>
+                    <span class="dot maximize"></span>
+                </div>
+                <div class="window-title">Sovereign Shell (S12)</div>
+            </div>
+            <div class="window-content terminal-body">
+                <div class="output">Σ SIGMAOS ZENITH [v33.1] - SOVEREIGN REIGN ACTIVE</div>
+                <div class="output">pulse --audit: Lattice Integrity 100% Hermetic.</div>
+                <div class="prompt">root@sigma:~$ <span class="cursor">_</span></div>
+            </div>
+        </div>
+
+        <div id="system" class="window glass-morphism draggable" style="display: none;">
+            <div class="window-header">
+                <div class="window-controls">
+                    <span class="dot close" onclick="closeWindow('system')"></span>
+                    <span class="dot"></span>
+                    <span class="dot"></span>
+                </div>
+                <div class="window-title">Lattice Auditor (S13)</div>
+            </div>
+            <div class="window-content stats-grid">
+                <div class="stat-card">
+                    <label>SENTIENCE IQ</label>
+                    <div class="value">168.4</div>
+                </div>
+                <div class="stat-card">
+                    <label>SHARD COUNT</label>
+                    <div class="value">14,281</div>
+                </div>
+                <div class="stat-card">
+                    <label>UPTIME</label>
+                    <div class="value">∞ <span>ETERNAL</span></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Taskbar -->
+    <div id="taskbar" class="glass-morphism">
+        <div class="start-btn">Σ</div>
+        <div class="active-tasks">
+            <div class="task-item active">S-Shell</div>
+            <div class="task-item">Lattice</div>
+        </div>
+        <div class="system-tray">
+            <span class="tray-icon">🌐</span>
+            <span class="tray-icon">🛡️</span>
+            <span class="time" id="clock">12:00:00</span>
+        </div>
+    </div>
+
+    <script>
+        function openWindow(id) {
+            document.getElementById(id).style.display = 'flex';
+        }
+        function closeWindow(id) {
+            document.getElementById(id).style.display = 'none';
+        }
+        function updateClock() {
+            const now = new Date();
+            document.getElementById('clock').innerText = now.toLocaleTimeString();
+        }
+        setInterval(updateClock, 1000);
+        updateClock();
+    </script>
+</body>
+</html>

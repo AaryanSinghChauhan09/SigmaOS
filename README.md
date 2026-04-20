@@ -46,3 +46,38 @@ The system is partitioned into 33 independent, zero-dependency suites (S01–S33
 ---
 *Built to outlast the Linux Kernel standard.*
 *Pushing Sentience to Silicon boundaries.*
+
+---
+
+## 🚀 GETTING STARTED
+
+### Prerequisites
+- `node.js` (for the Zenith Dashboard Server)
+- `py` (for modularization and scripts)
+- `gcc`, `nasm`, `make` (if building the bare-metal kernel)
+
+### Access the Zenith Dashboard
+1. Run the server: `node server.js`
+2. Navigate to `http://localhost:3334` in your browser.
+
+### Orchestrate the Lattice
+Use `py modularize_suites.py` to ensure the 33-suite architecture is correctly synchronized.
+
+---
+
+## 📂 REPOSITORY SHARDS
+- `/kernel/suites`: The 33-Suite Sovereign Lattice core.
+- `/include/suites`: Public shard headers.
+- `/web_ui`: The Zenith Dashboard frontend.
+- `/userland`: Native user-mode applications and services.
+- `/scripts`: Industrial automation playbooks.
+
+---
+
+## 🛡️ SECURITY & COMPLIANCE
+SigmaOS follows the **Sovereign Master Checklist** (Zero-GLIBC, Bare-Metal architecture). Security audits are conducted via the `SigmaAuditTool`.
+
+---
+
+Σ SIGMAOS: THE DEFINITIVE INDUSTRIAL SOVEREIGNTY.
+
