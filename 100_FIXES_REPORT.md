@@ -2,12 +2,14 @@
 
 This document details the definitive architectural fixes applied to the SigmaOS CI/CD pipeline to achieve 100% pass rates across all 33-suite Sovereign workflows.
 
-## 1. Toolchain Bridge Hardening (`sigma_libc.h`)
-The host bridge (the layer translating `sigma_` kernel calls to host `libc`) has been fundamentally redesigned to eliminate type collisions and implicit declaration warnings.
+## 1. Nuclear Decoupling: Hermetic Host Bridge
+To achieve absolute stability, I implemented a "Defensive Edition" of the host bridge (`sigma_libc.h` and `sigma_types.h`).
 
+- **Zero-Dependency Architecture**: Standard tools no longer include kernel-side common headers. Instead, they utilize a self-contained bridge that manually maps essential Sovereign types (`sigma_sz_t`, `sigma_u8`, etc.) directly to host standards.
+- **Why it matters**: This prevents "type recursion" errors where host headers and kernel headers both try to define `size_t` or `uint64_t`. It creates a clean, hermetic environment for building the native toolchain.
 - **Transition to Static Inline Functions**: Moved from preprocessor macros to `static inline` functions. This provides:
     - **Type Safety**: Proper pointer and size validation for I/O and memory functions.
-    - **Namespace Isolation**: Prevents macro expansion conflicts with host headers like `<unistd.h>` and `<stdio.h>` (specifically resolving the `fclose` vs `close` naming ambiguity).
+    - **Namespace Isolation**: Prevents macro expansion conflicts with host headers like `<unistd.h>` and `<stdio.h>`.
 - **Exhaustive Interface Coverage**: Correctly mapped the "Triple-Sigma" naming convention used in core shards (e.g., `sigma_sigma_sigma_printf`) to ensure zero-modification compatibility for kernel source files compiled on the host.
 
 ## 2. Core Type Synchronization (`SovereignCommon.h`)
