@@ -1,4 +1,4 @@
-﻿/*
+/*
  * =========================================================================
  * S SIGMAOS: SIGMA KERNEL AGGREGATOR (v2.0 — MASTER)
  * =========================================================================
@@ -11,7 +11,7 @@
 
 #include "suites/S01_Genesis/shards/sigma_base.h"
 #include "suites/S10_Registry/shards/SovereignLatticeRegistry.h"
-#include "suites/S20_GlobalVFS/shards/SovereignInterconnect.h"
+#include "suites/S20_Interconnect/shards/SovereignInterconnect.h"
 
 /* 33-Suite Orchestration Entry Points */
 extern void S01_Genesis_Register(void);
@@ -33,7 +33,7 @@ extern void S16_SoulMolding_Register(void);
 extern void S17_BioNexus_Register(void);
 extern void S18_QuantumLink_Register(void);
 extern void S19_SelfEvolution_Register(void);
-extern void S20_GlobalVFS_Register(void);
+extern void S20_Interconnect_Register(void);
 extern void S21_EternalState_Register(void);
 extern void S22_SimulationNexus_Register(void);
 extern void S23_OmniNexus_Register(void);
@@ -78,7 +78,7 @@ static inline void SovereignMaster_InitAll(void) {
     S17_BioNexus_Register();
     S18_QuantumLink_Register();
     S19_SelfEvolution_Register();
-    S20_GlobalVFS_Register();
+    S20_Interconnect_Register();
     
     /* Phase 4: Supremacy Terminal (S21–S33) */
     S21_EternalState_Register();

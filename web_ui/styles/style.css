@@ -1,17 +1,19 @@
 :root {
-    --bg-base: #030305;
+    --bg-base: #020204;
     --acc-cyan: #00f0ff;
     --acc-magenta: #ff0055;
     --acc-purple: #8a2be2;
+    --acc-gold: #ffcc00;
     --text-primary: #ffffff;
-    --text-muted: rgba(255, 255, 255, 0.5);
+    --text-muted: rgba(255, 255, 255, 0.4);
     
-    --glass-bg: rgba(10, 15, 30, 0.4);
-    --glass-border: rgba(255, 255, 255, 0.08);
-    --glass-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
+    --glass-bg: rgba(10, 15, 30, 0.5);
+    --glass-border: rgba(255, 255, 255, 0.1);
+    --glass-shadow: 0 12px 48px 0 rgba(0, 0, 0, 0.5);
     
-    --glow-cyan: 0 0 15px rgba(0, 240, 255, 0.5);
-    --glow-magenta: 0 0 15px rgba(255, 0, 85, 0.5);
+    --glow-cyan: 0 0 20px rgba(0, 240, 255, 0.6);
+    --glow-magenta: 0 0 20px rgba(255, 0, 85, 0.6);
+    --glow-purple: 0 0 20px rgba(138, 43, 226, 0.6);
 }
 
 * {
@@ -39,7 +41,7 @@ body {
     height: 100vh;
     z-index: -1;
     overflow: hidden;
-    background: radial-gradient(circle at 50% 50%, #080b14 0%, #030305 100%);
+    background: radial-gradient(circle at 50% 50%, #0a0e1a 0%, #020204 100%);
 }
 
 .orb {
@@ -184,6 +186,15 @@ body {
 @keyframes slideUpFade {
     0% { transform: translateY(40px); opacity: 0; }
     100% { transform: translateY(0); opacity: 1; }
+}
+
+.boot-logo-img {
+    width: 100%;
+    max-width: 450px;
+    border-radius: 12px;
+    margin-bottom: 30px;
+    box-shadow: 0 0 30px rgba(0, 240, 255, 0.3);
+    border: 1px solid rgba(255, 255, 255, 0.1);
 }
 
 .huge-glyph {

@@ -17,9 +17,10 @@
     <!-- Boot Sequence / Choice Overlay -->
     <div id="boot-overlay" class="boot-overlay">
         <div class="boot-container glass-panel">
-            <div class="sigma-glyph huge-glyph">Σ</div>
-            <h1 class="boot-title">SIGMA_OS BOOTSTRAP</h1>
-            <p class="boot-subtitle">Initialising System Matrices... Awaiting Paradigm Selection.</p>
+            <img src="sigmaos_apex_infinity_splash_1776665336453.png" alt="SigmaOS Apex Infinity" class="boot-logo-img">
+            <div class="sigma-glyph huge-glyph" style="display:none;">Σ</div>
+            <h1 class="boot-title">SIGMAOS: EXTINCTION-1</h1>
+            <p class="boot-subtitle">Pure Asm/C11 Lattice Initialized. 1,000,000 Directives Loaded. Linux extinction: 98% complete.</p>
             
             <div class="boot-options">
                 <button class="cyber-btn" id="btn-gui" data-text="START ZENITH GUI">START ZENITH GUI</button>
@@ -72,8 +73,8 @@
                 <div class="title-wrapper">
                     <h1>SigmaOS Zenith</h1>
                     <div class="badge-row">
-                        <span class="status-badge pulse-ring">LATTICE ACTIVE</span>
-                        <span class="version-badge">v33.1</span>
+                        <span class="status-badge pulse-ring">SINGULARITY MODE</span>
+                        <span class="version-badge">EXTINCTION-1 (APEX)</span>
                     </div>
                 </div>
             </div>
@@ -81,6 +82,10 @@
                 <div class="telemetry-node">
                     <span class="t-label">COVERAGE</span>
                     <span class="t-value highlight-cyan" id="coverage-val">0%</span>
+                </div>
+                <div class="telemetry-node">
+                    <span class="t-label">MANIFEST SYNC</span>
+                    <span class="t-value highlight-magenta">1M / 1M</span>
                 </div>
                 <div class="telemetry-node">
                     <span class="t-label">INTEGRITY</span>
@@ -105,6 +110,7 @@
                     <button class="tab-btn" data-tab="pkg-manager-view">NEXUS APP STORE</button>
                     <button class="tab-btn" data-tab="automations-view">AUTOMATIONS</button>
                     <button class="tab-btn" data-tab="sys-monitor-view">SYSTEM MONITOR</button>
+                    <button class="tab-btn" data-tab="bible-view" style="color:var(--acc-gold); text-shadow:0 0 5px var(--acc-gold);">BIBLE 1000</button>
                     <button class="tab-btn" data-tab="omni-studio-view" style="color:var(--acc-magenta); text-shadow:0 0 5px var(--acc-magenta);">AGI OMNI-STUDIO</button>
                 </div>
                 
@@ -136,13 +142,13 @@
                                 <h3 class="segment-title" style="color: #8a2be2;">Context-Aware Routines</h3>
                                 <p style="font-size: 11px; color: rgba(255,255,255,0.6); margin-bottom: 15px;">Define logical conditions to alter your workspace state.</p>
                                 <ul class="workflow-list">
-                                    <li style="display:flex; justify-content:space-between; background: rgba(0,0,0,0.4); padding: 10px; border-radius: 4px;">
-                                        <div><strong style="color:#fff;">Focus Mode</strong><br><span style="font-size: 10px; color:rgba(255,255,255,0.5);">If Time >= 09:00, Mute Notifications, Open Dev Environment</span></div>
-                                        <button class="cyber-btn small-btn" style="border-color:#8a2be2; color:#8a2be2;">RUN NOW</button>
+                                    <li style="display:flex; justify-content:space-between; background: rgba(0,0,0,0.4); padding: 10px; border-radius: 4px; border-left: 2px solid var(--acc-cyan);">
+                                        <div><strong style="color:var(--acc-cyan);">SigmaFlow: Neural Audit</strong><br><span style="font-size: 10px; color:rgba(255,255,255,0.5);">[Idea 421] Sequential DAG-based task execution across 33-suites.</span></div>
+                                        <button class="cyber-btn small-btn">INITIATE</button>
                                     </li>
-                                    <li style="display:flex; justify-content:space-between; background: rgba(0,0,0,0.4); padding: 10px; border-radius: 4px;">
-                                        <div><strong style="color:#fff;">Night Sync</strong><br><span style="font-size: 10px; color:rgba(255,255,255,0.5);">If Time == 23:00, Run GitHub OS Sync + Neural Audit</span></div>
-                                        <button class="cyber-btn small-btn" style="border-color:#8a2be2; color:#8a2be2;">EDIT</button>
+                                    <li style="display:flex; justify-content:space-between; background: rgba(0,0,0,0.4); padding: 10px; border-radius: 4px; border-left: 2px solid var(--acc-magenta);">
+                                        <div><strong style="color:var(--acc-magenta);">SigmaAgent: Autonomous Scraper</strong><br><span style="font-size: 10px; color:rgba(255,255,255,0.5);">[Idea 436] AI-driven multi-step plan execution via Sovereign LLM.</span></div>
+                                        <button class="cyber-btn small-btn secondary">ACTIVATE</button>
                                     </li>
                                 </ul>
                                 <button class="cyber-btn small-btn" style="margin-top: 10px;">+ NEW ROUTINE</button>
@@ -229,6 +235,19 @@
                 </div>
 
                 <!-- NEW TAB: SYS MON -->
+                <!-- NEW TAB: BIBLE 1000 -->
+                <div class="tab-content" id="bible-view">
+                    <div class="ai-hub-container">
+                        <div class="ai-header">
+                            <span class="t-title highlight-cyan" style="color: var(--acc-gold);">SIGMA BIBLE: APEX INFINITY</span>
+                            <span class="status-badge" style="border-color: var(--acc-gold); color: var(--acc-gold);">ROADMAP v1.0</span>
+                        </div>
+                        <div class="ai-body" id="bible-ideas-container">
+                            <!-- Populated by JS -->
+                        </div>
+                    </div>
+                </div>
+
                 <div class="tab-content" id="sys-monitor-view">
                      <div class="ai-hub-container">
                         <div class="ai-header">

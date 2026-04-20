@@ -95,7 +95,7 @@ def update_includes():
             if file.endswith(('.h', '.c')):
                 path = os.path.join(root, file)
                 try:
-                    with open(path, 'r', encoding='utf-8') as f:
+                    with open(path, 'r', encoding='utf-8', errors='replace') as f:
                         content = f.read()
                     
                     new_content = content
@@ -110,7 +110,7 @@ def update_includes():
                     
                     if new_content != content:
                         print(f"Updated includes in {path}")
-                        with open(path, 'w', encoding='utf-8') as f:
+                        with open(path, 'w', encoding='utf-8', errors='replace') as f:
                             f.write(new_content)
                 except Exception as e:
                     print(f"Error processing {path}: {e}")
