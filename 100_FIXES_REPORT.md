@@ -2,6 +2,7 @@
 
 All 100 automated heuristic fixes have been staged into respective system patches.
 The fixes span across:
+
 - Kernel Core
 - Memory Management
 - Device Drivers
