@@ -83,6 +83,8 @@ static inline void SovereignMaster_InitAll(void) {
     /* Phase 4: Supremacy Terminal (S21–S33) */
     S21_EternalState_Register();
     S22_SimulationNexus_Register();
+    s_wasm_init();
+    s_posix_init();
     S23_OmniNexus_Register();
     S24_GlobalDebugger_Register();
     S25_ZeroKernel_Register();
@@ -114,6 +116,8 @@ static inline void SovereignMaster_InitAll(void) {
 }
 
 /* Sovereign Core Services Shards */
+extern void s_wasm_init(void);
+extern void s_posix_init(void);
 extern void s_firewall_init(void);
 extern void s_firewall_status(void);
 extern void s_container_spawn(const char* image_shard);
