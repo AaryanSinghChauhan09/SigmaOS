@@ -1,25 +1,28 @@
 :root {
-    --bg-color: #050505;
-    --acc-color: #00ffaa;
-    --sec-color: #8800ff;
-    --glass-bg: rgba(255, 255, 255, 0.03);
-    --glass-border: rgba(255, 255, 255, 0.1);
+    --bg-color: #0b1124;
+    --acc-color: #0078d4; /* True Blue */
+    --sec-color: #4f6bed;
+    --glass-bg: rgba(255, 255, 255, 0.6);
+    --glass-border: rgba(255, 255, 255, 0.2);
+    --glass-dark: rgba(30, 30, 30, 0.7);
+    --mica-bg: rgba(255, 255, 255, 0.05);
 }
 
-* { box-sizing: border-box; transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1); }
+* { box-sizing: border-box; transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); }
 
 body {
     margin: 0; padding: 0;
-    font-family: 'Inter', sans-serif;
-    color: #fff;
+    font-family: 'Segoe UI Variable Display', 'Inter', -apple-system, sans-serif;
+    color: #111;
     overflow: hidden;
     height: 100vh;
-    animation: masterChroma 30s infinite linear;
-    background: radial-gradient(circle at center, #101010 0%, #000 100%);
+    background: url('win11_bg.png') no-repeat center center fixed;
+    background-size: cover;
 }
 
 body.matrix-bg {
-    background: radial-gradient(circle at center, #101010 0%, #000 100%);
+    background: url('win11_bg.png') no-repeat center center fixed;
+    background-size: cover;
 }
 
 body::before {
@@ -37,11 +40,13 @@ body::before {
 
 @keyframes masterChroma { 0% { filter: hue-rotate(0deg); } 100% { filter: hue-rotate(360deg); } }
 
-#particle-canvas, #hologram-overlay {
-    position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: -1; pointer-events: none; opacity: 0.3;
-}
-
 .scene {
+    perspective: 2000px;
+    width: 100%; height: 100vh;
+    display: flex; align-items: center; justify-content: center;
+    position: relative;
+    z-index: 10;
+}
     perspective: 2000px;
     width: 100%; height: 100vh;
     display: flex; align-items: center; justify-content: center;
@@ -68,11 +73,21 @@ body::before {
 
 .glass {
     background: var(--glass-bg);
-    backdrop-filter: blur(30px);
+    backdrop-filter: blur(40px) saturate(150%);
+    -webkit-backdrop-filter: blur(40px) saturate(150%);
     border: 1px solid var(--glass-border);
-    border-radius: 20px;
+    border-radius: var(--win-radius);
     padding: 30px;
-    box-shadow: 0 0 50px rgba(0, 255, 170, 0.05);
+    box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.3);
+}
+
+.glass-dark {
+    background: var(--glass-dark);
+    backdrop-filter: blur(40px) saturate(150%);
+    -webkit-backdrop-filter: blur(40px) saturate(150%);
+    border: 1px solid rgba(255, 255, 255, 0.05);
+    border-radius: var(--win-radius);
+    box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.5);
 }
 
 .stat-card { display: flex; flex-direction: column; gap: 8px; }
@@ -85,18 +100,50 @@ body::before {
 }
 
 .taskbar-container {
-    position: absolute; bottom: 30px; left: 50%; transform: translateX(-50%); z-index: 10000;
+    position: absolute; bottom: 15px; left: 50%; transform: translateX(-50%); z-index: 10000;
 }
 
-.taskbar { display: flex; gap: 20px; padding: 15px; border-radius: 30px; }
-.taskbar-item { font-size: 2rem; cursor: pointer; }
-.taskbar-item:hover { transform: scale(1.5) translateY(-10px); color: var(--acc-color); }
+.taskbar {
+    display: flex; gap: 15px; padding: 10px 20px;
+    border-radius: 24px;
+    background: rgba(255, 255, 255, 0.1);
+    backdrop-filter: blur(40px) saturate(150%);
+    -webkit-backdrop-filter: blur(40px) saturate(150%);
+    border: 1px solid var(--glass-border);
+    box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+}
+.taskbar-item {
+    width: 44px; height: 44px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 1.5rem; cursor: pointer;
+    border-radius: 8px;
+    transition: all 0.2s ease-in-out;
+}
+.taskbar-item:hover {
+    background: rgba(255, 255, 255, 0.15);
+    transform: translateY(-5px);
+}
 
 .window {
     position: absolute; top: 100px; left: 300px; width: 600px; height: 400px;
-    z-index: 5000; border-radius: 20px;
+    z-index: 5000; border-radius: var(--win-radius);
+    display: flex; flex-direction: column;
 }
-.window-header { cursor: move; padding: 10px 20px; font-weight: 800; border-bottom: 1px solid rgba(255,255,255,0.1); }
+.window-header {
+    cursor: move; padding: 12px 20px; font-weight: 600; font-size: 0.95rem;
+    border-bottom: 1px solid rgba(255,255,255,0.05);
+    display: flex; justify-content: space-between; align-items: center;
+    background: rgba(255,255,255,0.02);
+    border-top-left-radius: var(--win-radius);
+    border-top-right-radius: var(--win-radius);
+}
+.window-header button {
+    background: transparent; border: none; color: #fff; font-size: 1.2rem; cursor: pointer;
+    width: 30px; height: 30px; border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+}
+.window-header button:hover { background: rgba(255,0,0,0.6); }
+.window-body { padding: 20px; flex: 1; overflow: auto; }
 
 /* Scanlines & Effects */
 .scanline { position: relative; overflow: hidden; }
@@ -287,3 +334,7 @@ body::before {
 
 @keyframes matrixScroll { from { background-position: 0 0; } to { background-position: 1000px 1000px; } }
 
+. o s - c a r d   {   b a c k g r o u n d :   r g b a ( 2 5 5 , 2 5 5 , 2 5 5 , 0 . 0 5 ) ;   b o r d e r :   1 p x   s o l i d   v a r ( - - g l a s s - b o r d e r ) ;   b o r d e r - r a d i u s :   8 p x ;   p a d d i n g :   1 5 p x ;   t e x t - a l i g n :   c e n t e r ;   c u r s o r :   p o i n t e r ;   t r a n s i t i o n :   a l l   0 . 2 s ;   }  
+ . o s - c a r d : h o v e r   {   b a c k g r o u n d :   r g b a ( 2 5 5 , 2 5 5 , 2 5 5 , 0 . 1 5 ) ;   t r a n s f o r m :   s c a l e ( 1 . 0 5 ) ;   b o x - s h a d o w :   0   4 p x   1 5 p x   r g b a ( 0 , 1 2 0 , 2 1 2 , 0 . 3 ) ;   }  
+ . o s - g r i d   {   d i s p l a y :   g r i d ;   g r i d - t e m p l a t e - c o l u m n s :   r e p e a t ( 2 ,   1 f r ) ;   g a p :   1 5 p x ;   }  
+ 

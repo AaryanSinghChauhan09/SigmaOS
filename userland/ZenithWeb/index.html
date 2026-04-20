@@ -14,15 +14,20 @@
     <div id="hologram-overlay"></div>
     <div id="code-stream-overlay"></div>
     <canvas id="particle-canvas"></canvas>
-    <div class="top-bar auto-hide">
-        <div class="logo">Σ SigmaOS | Sovereign v50.0-SINGULARITY-OMEGA</div>
+    <div class="top-bar">
+        <div class="logo">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="vertical-align: middle; margin-right: 8px;">
+                <path d="M12 2L2 12l10 10 10-10L12 2z"></path>
+                <path d="M2 12h20"></path>
+                <path d="M12 2v20"></path>
+            </svg>
+            SigmaOS | Singular Convergence
+        </div>
         <div class="system-stats">
             <span>MEM: 2.1GB / 64GB</span>
             <span>NET: 10Gbps</span>
-            <span>SHARDS: 450/450 OK</span>
-            <span>PRINCIPLES: 50/50 ✓</span>
         </div>
-        <div class="clock" id="clock">00:00:00</div>
+        <div class="clock" id="clock">00:00</div>
     </div>
 
     <main class="workspace scene">
@@ -121,15 +126,14 @@
 
     <div class="taskbar-container">
         <div class="taskbar glass">
-            <div class="taskbar-item" id="btn-home" title="Home">🏠</div>
-            <div class="taskbar-item" id="btn-verify" title="Verify Integrity">🛡️</div>
-            <div class="taskbar-item" id="btn-explorer" title="Sovereign Explorer">🚀</div>
-            <div class="taskbar-item" id="btn-shell" title="Secure Shell">🧠</div>
-            <div class="taskbar-item" id="btn-ide" title="Sovereign IDE">⚡</div>
-            <div class="taskbar-item" id="btn-sentience" title="Sentience Core">👁️</div>
-            <div class="taskbar-item" id="btn-dissolve" title="Sovereign Dissolve">🌊</div>
-            <div class="taskbar-item" id="btn-portal" title="Multiverse Portal">🌀</div>
-            <div class="taskbar-item" id="btn-save" title="Checkpoint">💾</div>
+            <div class="taskbar-item" id="btn-home" title="Start">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="var(--acc-color)"><path d="M22 2v20h-20v-20h20zm-2 2h-16v16h16v-16zm-12 12h8v2h-8v-2zm0-4h8v2h-8v-2zm0-4h8v2h-8v-2z"/></svg>
+            </div>
+            <div class="taskbar-item" id="btn-explorer" title="Files">📁</div>
+            <div class="taskbar-item" id="btn-shell" title="Terminal">💻</div>
+            <div class="taskbar-item" id="btn-ide" title="Code">⚡</div>
+            <div class="taskbar-item" id="btn-sentience" title="AI Assistant">✨</div>
+            <div class="taskbar-item" id="btn-portal" title="Multiverse Dual-Boot">🔄</div>
         </div>
     </div>
 
@@ -174,11 +178,44 @@
 
     <div id="win-sentience" class="window glass-dark hidden animate-fade-in aura-glow">
         <div class="window-header">
-            <span>Σ Sovereign Sentience Core</span>
+            <span>✨ AI Copilot</span>
             <button onclick="closeWindow('win-sentience')">×</button>
         </div>
         <div class="window-body">
             <div id="sentience-log" class="console-text" style="height: 300px; color: #fff600;"></div>
+        </div>
+    </div>
+
+    <!-- Multiverse Dual-Boot Selector -->
+    <div id="win-portal" class="window glass-dark hidden animate-fade-in">
+        <div class="window-header">
+            <span>🔄 Sovereign Universal Host / Dual-Boot Manager</span>
+            <button onclick="closeWindow('win-portal')">×</button>
+        </div>
+        <div class="window-body">
+            <p style="margin-top:0; color: #ccc;">Select an OS container to initialize natively alongside SigmaOS.</p>
+            <div class="os-grid">
+                <div class="os-card" onclick="alert('Initializing Windows 11 Native Translation Layer...')">
+                    <div style="font-size: 2rem; margin-bottom:10px;">🪟</div>
+                    <strong>Windows 11</strong>
+                    <div style="font-size: 0.8rem; color: var(--acc-color);">PE-COFF & Win32 Active</div>
+                </div>
+                <div class="os-card" onclick="alert('Booting macOS 15 Darwin Shard...')">
+                    <div style="font-size: 2rem; margin-bottom:10px;">🍏</div>
+                    <strong>macOS Darwin</strong>
+                    <div style="font-size: 0.8rem; color: var(--acc-color);">XNU Kernel Mode</div>
+                </div>
+                <div class="os-card" onclick="alert('Enabling Kali Linux Pentest Sphere...')">
+                    <div style="font-size: 2rem; margin-bottom:10px;">🐉</div>
+                    <strong>Kali Linux</strong>
+                    <div style="font-size: 0.8rem; color: var(--acc-color);">Wayland + APT</div>
+                </div>
+                <div class="os-card" onclick="alert('Starting Linux Mint Environment...')">
+                    <div style="font-size: 2rem; margin-bottom:10px;">🌿</div>
+                    <strong>Linux Mint</strong>
+                    <div style="font-size: 0.8rem; color: var(--acc-color);">Debian Core ✓</div>
+                </div>
+            </div>
         </div>
     </div>
 

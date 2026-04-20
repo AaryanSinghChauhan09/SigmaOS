@@ -85,3 +85,6 @@ document.addEventListener('DOMContentLoaded', () => {
 });
 
 // Logic from previous versions remains active for continuous advancement.
+
+if(document.getElementById('btn-portal')) document.getElementById('btn-portal').addEventListener('click', () => { document.getElementById('win-portal').classList.remove('hidden'); });
+
