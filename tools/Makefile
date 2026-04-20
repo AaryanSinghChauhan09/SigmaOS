@@ -1,17 +1,10 @@
 # =============================================================================
 # SigmaOS Tools — Sovereign Native Toolchain Build
-# Replaces ALL Python/JS tooling with zero-dependency static C binaries
-# =============================================================================
-# Usage:
-#   make all          — build every tool
-#   make check        — purity gate: fail if foreign deps in kernel/
-#   make clean        — remove compiled binaries
-#   make install      — install to /usr/local/sigma/bin (on target OS)
+# Replaces ALL Python/JS tooling with zero-dependency C binaries
 # =============================================================================
 
 CC       = gcc
-CFLAGS   = -std=c11 -O2 -Wall -Iinclude
-LDFLAGS  = -static
+CFLAGS   = -std=c11 -O2 -Wall -I../include
 
 BINDIR   = /usr/local/sigma/bin
 
@@ -30,46 +23,43 @@ TOOLS = \
 
 all: $(TOOLS)
 	@echo ""
-	@echo "  ┌──────────────────────────────────────────┐"
-	@echo "  │  SigmaOS Native Toolchain — BUILD OK     │"
-	@echo "  │  All tools: zero glibc runtime linkage   │"
-	@echo "  └──────────────────────────────────────────┘"
+	@echo "  SigmaOS Native Toolchain: BUILD OK"
 	@echo ""
 
 sigma-audit: security/sovereign_audit/sovereign_audit.c
-	$(CC) $(CFLAGS) $(LDFLAGS) $< -o $@
-	@echo "  [✓] sigma-audit    → replaces global_integrated_audit.py"
+	$(CC) $(CFLAGS) $< -o $@
+	@echo "  [OK] sigma-audit    -> sovereign_audit"
 
 sigma-test: dev/sovereign_test/sovereign_test_runner.c
 	$(CC) $(CFLAGS) $< -o $@
-	@echo "  [✓] sigma-test     → replaces sovereign_test_runner.py + logic_tester.py"
+	@echo "  [OK] sigma-test     -> sovereign_test_runner"
 
 sigma-wiki: wiki/sovereign_wiki/sovereign_wiki_builder.c
 	$(CC) $(CFLAGS) $< -o $@
-	@echo "  [OK] sigma-wiki     -> replaces wiki_builder.py"
+	@echo "  [OK] sigma-wiki     -> sovereign_wiki_builder"
 
 sigma-shell: core/sovereign_shell/sovereign_shell.c
 	$(CC) $(CFLAGS) $< -o $@
-	@echo "  [OK] sigma-shell    -> replaces zenith_shell.py"
+	@echo "  [OK] sigma-shell    -> sovereign_shell"
 
 sigma-depgraph: dev/sovereign_depgraph/sovereign_depgraph.c
 	$(CC) $(CFLAGS) $< -o $@
-	@echo "  [OK] sigma-depgraph -> replaces generate_dependency_graph.py"
+	@echo "  [OK] sigma-depgraph -> sovereign_depgraph"
 
 sigpkg: infra/sovereign_pkg/sovereign_pkg_manager.c
 	$(CC) $(CFLAGS) $< -o $@
-	@echo "  [✓] sigpkg             → replaces sigpkg.py"
+	@echo "  [OK] sigpkg         -> sovereign_pkg_manager"
 
 sigma-modularize: dev/sovereign_modularize/sovereign_modularize.c
-	$(CC) $(CFLAGS) $(LDFLAGS) $< -o $@
-	@echo "  [✓] sigma-modularize  → replaces sovereign_modularize_v2.py"
+	$(CC) $(CFLAGS) $< -o $@
+	@echo "  [OK] sigma-modularize -> sovereign_modularize"
 
 sigma-purge: dev/sovereign_purge/sovereign_purge.c
-	$(CC) $(CFLAGS) $(LDFLAGS) $< -o $@
-	@echo "  [✓] sigma-purge       → replaces sovereign_purge.py"
+	$(CC) $(CFLAGS) $< -o $@
+	@echo "  [OK] sigma-purge    -> sovereign_purge"
 
 
-# Dependency purity gate — fail if any .py/.js found inside kernel suites
+# Dependency purity gate
 check:
 	@echo "[sigma-check] Scanning kernel/suites for foreign dependencies..."
 	@FOUND=$$(find ../kernel/suites -name "*.py" -o -name "*.js" 2>/dev/null | wc -l); \
@@ -78,7 +68,7 @@ check:
 	    find ../kernel/suites -name "*.py" -o -name "*.js"; \
 	    exit 1; \
 	else \
-	    echo "  [PASS] Kernel suites S01-S10: zero foreign runtime deps"; \
+	    echo "  [PASS] Zero foreign runtime deps in kernel suites"; \
 	fi
 
 install: all
