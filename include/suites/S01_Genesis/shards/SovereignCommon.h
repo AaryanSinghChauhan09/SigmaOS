@@ -10,7 +10,12 @@
 #define SOVEREIGN_COMMON_H
 
 /* ── Priority Core Types (must be first) ──────────────────────────────── */
+#ifdef SIGMA_EXCLUDE_STD_ALIASES
+#include <stddef.h>
+typedef size_t             sigma_sz_t;
+#else
 typedef unsigned long long sigma_sz_t;
+#endif
 typedef sigma_sz_t         sigma_size_t;
 typedef signed long long   sigma_ssz_t;
 typedef signed int         sigma_err_t;

@@ -14,44 +14,113 @@
 #include <string.h>
 #include <stdbool.h>
 #include <stdint.h>
+#include <stddef.h>
 #include <unistd.h>
+#include <stdarg.h>
+
 #include "suites/S01_Genesis/shards/SovereignCommon.h"
 
-// I/O Mapping
-#define sigma_printf(...)    printf(__VA_ARGS__)
-#define sigma_open(p, m)     fopen(p, m)
-#define sigma_close(f)       fclose(f)
-#define sigma_read(b,s,c,f)  fread(b,s,c,f)
-#define sigma_write(b,s,c,f) fwrite(b,s,c,f)
-#define sigma_sprintf(s,f,...) sprintf(s,f,##__VA_ARGS__)
-#define sigma_snprintf(s,n,f,...) snprintf(s,n,f,##__VA_ARGS__)
-#define sigma_fprintf(f,fm,...) fprintf(f,fm,##__VA_ARGS__)
-#define sigma_exit(c)        exit(c)
-#define sigma_getcwd(b, s)    getcwd(b, s)
+// ── I/O Bridge ───────────────────────────────────────────────────────────
+static inline int sigma_printf(const char* format, ...) {
+    va_list args; va_start(args, format);
+    int ret = vprintf(format, args);
+    va_end(args); return ret;
+}
 
-// Memory Mapping
-#define sigma_malloc(s)      malloc(s)
-#define sigma_free(p)        free(p)
-#define sigma_memset(d,v,n)  memset(d,v,n)
-#define sigma_memcpy(d,s,n)  memcpy(d,s,n)
+static inline FILE* sigma_open(const char* path, const char* mode) {
+    return fopen(path, mode);
+}
 
-// String Mapping
-#define sigma_strcmp(a,b)    strcmp(a,b)
-#define sigma_strncmp(a,b,n) strncmp(a,b,n)
-#define sigma_strlen(s)      strlen(s)
-#define sigma_strcpy(d,s)    strcpy(d,s)
-#define sigma_strncpy(d,s,n) strncpy(d,s,n)
-#define sigma_strrchr(s,c)   strrchr(s,c)
-#define sigma_strstr(h,n)    strstr(h,n)
-#define sigma_strncat(d,s,n) strncat(d,s,n)
+static inline int sigma_close(FILE* stream) {
+    if (!stream) return -1;
+    return fclose(stream);
+}
 
-// Sovereign Types are derived from SovereignCommon.h
-// No redefinitions here to avoid conflicts.
+static inline size_t sigma_read(void* ptr, size_t size, size_t count, FILE* stream) {
+    return fread(ptr, size, count, stream);
+}
 
-#define SIGMA_OK    0
+static inline size_t sigma_write(const void* ptr, size_t size, size_t count, FILE* stream) {
+    return fwrite(ptr, size, count, stream);
+}
 
-// Kernel Compatibility Aliases
-// Recursive Kernel Compatibility Aliases
+static inline int sigma_sprintf(char* str, const char* format, ...) {
+    va_list args; va_start(args, format);
+    int ret = vsprintf(str, format, args);
+    va_end(args); return ret;
+}
+
+static inline int sigma_snprintf(char* str, size_t size, const char* format, ...) {
+    va_list args; va_start(args, format);
+    int ret = vsnprintf(str, size, format, args);
+    va_end(args); return ret;
+}
+
+static inline int sigma_fprintf(FILE* stream, const char* format, ...) {
+    va_list args; va_start(args, format);
+    int ret = vfprintf(stream, format, args);
+    va_end(args); return ret;
+}
+
+static inline void sigma_exit(int status) {
+    exit(status);
+}
+
+static inline char* sigma_getcwd(char* buf, size_t size) {
+    return getcwd(buf, size);
+}
+
+// ── Memory Bridge ────────────────────────────────────────────────────────
+static inline void* sigma_malloc(size_t size) {
+    return malloc(size);
+}
+
+static inline void sigma_free(void* ptr) {
+    free(ptr);
+}
+
+static inline void* sigma_memset(void* s, int c, size_t n) {
+    return memset(s, c, n);
+}
+
+static inline void* sigma_memcpy(void* dest, const void* src, size_t n) {
+    return memcpy(dest, src, n);
+}
+
+// ── String Bridge ────────────────────────────────────────────────────────
+static inline int sigma_strcmp(const char* s1, const char* s2) {
+    return strcmp(s1, s2);
+}
+
+static inline int sigma_strncmp(const char* s1, const char* s2, size_t n) {
+    return strncmp(s1, s2, n);
+}
+
+static inline size_t sigma_strlen(const char* s) {
+    return strlen(s);
+}
+
+static inline char* sigma_strcpy(char* dest, const char* src) {
+    return strcpy(dest, src);
+}
+
+static inline char* sigma_strncpy(char* dest, const char* src, size_t n) {
+    return strncpy(dest, src, n);
+}
+
+static inline char* sigma_strrchr(const char* s, int c) {
+    return (char*)strrchr(s, c);
+}
+
+static inline char* sigma_strstr(const char* haystack, const char* needle) {
+    return (char*)strstr(haystack, needle);
+}
+
+static inline char* sigma_strncat(char* dest, const char* src, size_t n) {
+    return strncat(dest, src, n);
+}
+
+// ── Kernel Compatibility ─────────────────────────────────────────────────
 #define sigma_sigma_sigma_printf sigma_printf
 #define sigma_sigma_printf       sigma_printf
 #define sigma_sigma_malloc       sigma_malloc
@@ -64,4 +133,6 @@
 #define sigma_sigma_strncpy      sigma_strncpy
 #define sigma_sigma_strrchr      sigma_strrchr
 
-#endif
+#define SIGMA_OK    0
+
+#endif // SIGMA_HOST_BRIDGE_H

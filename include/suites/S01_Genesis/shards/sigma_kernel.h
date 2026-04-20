@@ -14,6 +14,7 @@
 #include "suites/S20_Interconnect/shards/SovereignInterconnect.h"
 
 /* 33-Suite Orchestration Entry Points */
+/* 33-Suite Orchestration Entry Points */
 extern void S01_Genesis_Register(void);
 extern void S02_ZenithUI_Register(void);
 extern void S03_Orchestrator_Register(void);
@@ -47,6 +48,35 @@ extern void S30_Supremacy_Register(void);
 extern void S31_GlobalGovernance_Register(void);
 extern void S32_UnifiedSovereignty_Register(void);
 extern void S33_TerminalFulfillment_Register(void);
+
+/* Sovereign Performance & IO Shards */
+extern void s_uring_init(void);
+extern void s_lattice_hibernate_idle(void);
+extern void s_shard_suspend(const char* suite_id);
+extern void s_shard_resume(const char* suite_id);
+
+/* Sovereign Universal Shards */
+extern void s_sync_init(void);
+extern void s_perm_init(void);
+
+/* Sovereign Core Services Shards */
+extern void s_wasm_init(void);
+extern void s_posix_init(void);
+extern void s_firewall_init(void);
+extern void s_firewall_status(void);
+extern void s_container_spawn(const char* image_shard);
+extern void s_journal_log(const char* suite, const char* msg);
+extern void s_journal_dump(void);
+
+/* Sovereign Maintenance & Evolution Shards */
+extern void s_scrub_temp_files(void);
+extern void s_scrub_memory(void);
+extern void s_evolution_heartbeat(void);
+
+/* Sovereign Hardware & Gov Shards */
+extern void s_pci_scan(void);
+extern void s_usb_init(void);
+extern void s_gov_init(void);
 
 static inline void SovereignMaster_InitAll(void) {
     sigma_printf("S [ORCHESTRATOR]: Initializing Sovereign Interconnect (S26)...\n");
@@ -120,35 +150,6 @@ static inline void SovereignMaster_InitAll(void) {
 
     sigma_printf("\nS [SOVEREIGN-MASTER]: 33-Suite Lattice Materialization COMPLETE.\n");
 }
-
-/* Sovereign Performance & IO Shards */
-extern void s_uring_init(void);
-extern void s_lattice_hibernate_idle(void);
-extern void s_shard_suspend(const char* suite_id);
-extern void s_shard_resume(const char* suite_id);
-
-/* Sovereign Universal Shards */
-extern void s_sync_init(void);
-extern void s_perm_init(void);
-
-/* Sovereign Core Services Shards */
-extern void s_wasm_init(void);
-extern void s_posix_init(void);
-extern void s_firewall_init(void);
-extern void s_firewall_status(void);
-extern void s_container_spawn(const char* image_shard);
-extern void s_journal_log(const char* suite, const char* msg);
-extern void s_journal_dump(void);
-
-/* Sovereign Maintenance & Evolution Shards */
-extern void s_scrub_temp_files(void);
-extern void s_scrub_memory(void);
-extern void s_evolution_heartbeat(void);
-
-/* Sovereign Hardware & Gov Shards */
-extern void s_pci_scan(void);
-extern void s_usb_init(void);
-extern void s_gov_init(void);
 
 /* Sovereign Userland Utility Shards */
 extern void s_ls(const char* path);
