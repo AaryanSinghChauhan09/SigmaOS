@@ -1,9 +1,9 @@
-name: SigmaOS Web Sovereign CI
+name: Sovereign Web CI
 on:
   push:
-    branches: ["master", "main"]
+    branches: ["main"]
   pull_request:
-    branches: ["master", "main"]
+    branches: ["main"]
 
 env:
   FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
