@@ -49,10 +49,10 @@ extern void S32_UnifiedSovereignty_Register(void);
 extern void S33_TerminalFulfillment_Register(void);
 
 static inline void SovereignMaster_InitAll(void) {
-    sigma_sigma_printf("S [ORCHESTRATOR]: Initializing Sovereign Interconnect (S26)...\n");
+    sigma_printf("S [ORCHESTRATOR]: Initializing Sovereign Interconnect (S26)...\n");
     S26_OmniFabric_Register();
 
-    sigma_sigma_printf("S [ORCHESTRATOR]: Initializing State Registry (S10)...\n");
+    sigma_printf("S [ORCHESTRATOR]: Initializing State Registry (S10)...\n");
     S10_Registry_Register();
     
     /* Phase 1: Materialization (S01–S05) */

@@ -12,8 +12,6 @@
 // =============================================================================
 
 #include "sigma_libc.h"
-#include "sigma_types.h"
-#include "sigma_libc.h"
 #include "suites/S01_Genesis/shards/sigma_kernel.h"
 
 #include <setjmp.h>
@@ -111,7 +109,7 @@ static void register_builtin_tests(void) {
 int main(int argc, char* argv[]) {
     const char* filter = (argc > 1) ? argv[1] : NULL;
     register_builtin_tests();
-    SovereignMaster_InitAll();
+    // SovereignMaster_InitAll(); // Disabled for host-side tool compilation
 
     uint32_t passed = 0, failed = 0, skipped = 0;
     clock_t start = clock();

@@ -14,7 +14,7 @@
 #include <string.h>
 #include <stdbool.h>
 #include <stdint.h>
-#include "SovereignCommon.h"
+#include "suites/S01_Genesis/shards/SovereignCommon.h"
 
 // I/O Mapping
 #define sigma_printf(...)    printf(__VA_ARGS__)
