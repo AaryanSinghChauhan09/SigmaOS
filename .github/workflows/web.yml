@@ -36,11 +36,11 @@ jobs:
       - name: CSS Integrity Scan
         run: |
           echo "[CI] Auditing CSS for Zenith compliance..."
-          if ! grep -q "backdrop-filter" web_ui/styles/style.css; then
+          if ! grep -qiE "backdrop-filter" web_ui/styles/style.css; then
             echo "[FAIL] Glassmorphism logic missing from style.css."
             exit 1
           fi
-          if ! grep -q "webkit-backdrop-filter" web_ui/styles/style.css; then
+          if ! grep -qiE "webkit-backdrop-filter" web_ui/styles/style.css; then
             echo "[FAIL] Safari webkit prefix missing from style.css."
             exit 1
           fi

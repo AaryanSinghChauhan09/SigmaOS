@@ -24,8 +24,7 @@ jobs:
 
       - name: Compile Sovereign Toolchain
         run: |
-          cd tools
-          make sigma-audit sigma-test sigma-wiki sigma-shell sigma-depgraph sigpkg sigma-modularize sigma-purge
+          make -C tools sigma-audit sigma-test sigma-wiki sigma-shell sigma-depgraph sigpkg sigma-modularize sigma-purge
 
       - name: Foreign Dependency Scan (kernel/suites)
         run: |
