@@ -22,7 +22,21 @@ const cliOutput = document.getElementById('cli-output');
 
             switch (cmd) {
                 case 'help':
-                    renderCli(`<div style="color:#aaa">SigmaOS Shell Commands:<br>ls [dir] - List files<br>cat &lt;file&gt; - Read file contents<br>cd &lt;dir&gt; - Move directory<br>clear - Clear shell<br>gui - Switch to Zenith GUI mode</div><br>`);
+                    renderCli(`<div style="color:#aaa">SigmaOS Sovereign Shell Commands:<br>
+                    - ls [dir] : List directory shards<br>
+                    - cat [file] : Read shard buffer<br>
+                    - cd [dir] : Traverse lattice nodes<br>
+                    - mkdir [name] : Create new shard node<br>
+                    - rm [name] : Neutralize node<br>
+                    - touch [name] : Materialize empty node<br>
+                    - ps : Monitor shard execution<br>
+                    - kill [pid] : Terminate execution<br>
+                    - ping [host] : Network vibration test<br>
+                    - ifconfig : Interface lattice config<br>
+                    - uname : OS identity<br>
+                    - whoami : Entity identity<br>
+                    - clear : Flush shell buffer<br>
+                    - gui : Switch to Zenith GUI mode</div><br>`);
                     break;
                 case 'clear':
                     cliOutput.innerHTML = '';

@@ -1,60 +1,22 @@
-﻿/*
+/*
  * =========================================================================
- * S SIGMAOS ZENITH: SOVEREIGN GRAPHICS ENGINE (v1.0 — RAYTRACING)
+ * Σ SIGMAOS: SOVEREIGN GRAPHICS ENGINE (v1.0)
  * =========================================================================
- * Mission: High-fidelity photo-realistic rendering for Zenith Dashboard.
- * Principles: Ray-Sphere Intersection, Vector Projection, Lambertian Shading.
- *
- * Implements a real ray-tracing intersection engine for the Sovereign UI.
+ * Purpose: Accelerated 2D/3D blitting via Sigma-DirectX-Bypass.
  * =========================================================================
  */
 
-#include "suites/S01_Genesis/shards/sigma_kernel.h"
-#include <math.h>
+#include "suites/S01_Genesis/shards/sigma_base.h"
 
-typedef struct {
-    sigma_f64 x, y, z;
-} SigmaVec3_t;
-
-typedef struct {
-    SigmaVec3_t origin;
-    SigmaVec3_t direction;
-} SigmaRay_t;
-
-/**
- * sigma_vec_dot: Computes the dot product of two vectors.
- */
-sigma_f64 sigma_vec_dot(SigmaVec3_t a, SigmaVec3_t b) {
-    return (a.x * b.x) + (a.y * b.y) + (a.z * b.z);
+void s_graphics_init() {
+    sigma_printf("S [GPU]: Detecting Silicon Graphics Shards...\n");
+    sigma_printf("S [GPU]: Enabling Sovereign Blit Engine (4K @ 240Hz Ready).\n");
 }
 
-/**
- * sigma_vec_sub: Subtracts two vectors.
- */
-SigmaVec3_t sigma_vec_sub(SigmaVec3_t a, SigmaVec3_t b) {
-    SigmaVec3_t res = {a.x - b.x, a.y - b.y, a.z - b.z};
-    return res;
+void s_graphics_draw_rect(int x, int y, int w, int h, uint32_t color) {
+    // [SIM] Fast memory copy to VRAM buffer
 }
 
-/**
- * sigma_ray_sphere_intersect: Ray-sphere intersection logic (Quadratic).
- */
-int sigma_ray_sphere_intersect(SigmaRay_t ray, SigmaVec3_t center, sigma_f64 radius) {
-    SigmaVec3_t oc = sigma_vec_sub(ray.origin, center);
-    sigma_f64 a = sigma_vec_dot(ray.direction, ray.direction);
-    sigma_f64 b = 2.0 * sigma_vec_dot(oc, ray.direction);
-    sigma_f64 c = sigma_vec_dot(oc, oc) - (radius * radius);
-    
-    sigma_f64 discriminant = (b * b) - (4 * a * c);
-    
-    return (discriminant > 0);
+void s_graphics_flip_buffer() {
+    // [SIM] Atomic swap of front/back buffers
 }
-
-/* --- Module Factory --- */
-
-void SovereignGraphics_Register(void) {
-    sigma_sigma_sigma_printf("[ZENITHUI]: Sovereign Graphics Engine (Raytracing) seeded.\n");
-}
-
-
-

@@ -93,13 +93,64 @@ static inline void SovereignMaster_InitAll(void) {
     S31_GlobalGovernance_Register();
     S32_UnifiedSovereignty_Register();
     S33_TerminalFulfillment_Register();
+    
+    /* Phase 5: Autonomous Maintenance */
+    s_scrub_temp_files();
+    s_scrub_memory();
 
-    sigma_sigma_printf("\nS [SOVEREIGN-MASTER]: 33-Suite Lattice Materialization COMPLETE.\n");
+    /* Phase 5: Autonomous Maintenance & Evolution */
+    s_scrub_temp_files();
+    s_scrub_memory();
+    s_evolution_heartbeat();
+
+    /* Phase 6: Hardware & Service Governance */
+    s_pci_scan();
+    s_usb_init();
+    s_gov_init();
+    s_firewall_init();
+    s_journal_log("S01", "Lattice Finalized");
+
+    sigma_printf("\nS [SOVEREIGN-MASTER]: 33-Suite Lattice Materialization COMPLETE.\n");
 }
+
+/* Sovereign Core Services Shards */
+extern void s_firewall_init(void);
+extern void s_firewall_status(void);
+extern void s_container_spawn(const char* image_shard);
+extern void s_journal_log(const char* suite, const char* msg);
+extern void s_journal_dump(void);
+
+/* Sovereign Maintenance & Evolution Shards */
+extern void s_scrub_temp_files(void);
+extern void s_scrub_memory(void);
+extern void s_evolution_heartbeat(void);
+
+/* Sovereign Hardware & Gov Shards */
+extern void s_pci_scan(void);
+extern void s_usb_init(void);
+extern void s_gov_init(void);
 
 /* Sovereign Userland Utility Shards */
 extern void s_ls(const char* path);
+extern void s_cat(const char* filename);
+extern void s_grep(const char* pattern, const char* buffer);
+extern void s_top(void);
+extern void s_ps(void);
+extern void s_kill(int pid);
+extern void s_mkdir(const char* name);
+extern void s_rm(const char* name);
+extern void s_touch(const char* name);
+extern void s_ping(const char* host);
+extern void s_whoami(void);
+extern void s_uname(void);
+extern void s_ifconfig(void);
+extern void s_clear(void);
 extern void s_pkg_list(void);
 extern void s_security_audit_all(void);
+
+/* Sovereign Industrial Shards */
+extern void s_audio_init(void);
+extern void s_graphics_init(void);
+extern int s_auth_verify(const char* username, const char* credentials);
 
 #endif /* SIGMA_KERNEL_H */

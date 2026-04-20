@@ -129,20 +129,31 @@ const grid = document.getElementById('lattice-grid');
         loadDirectory('/' + parts.join('/'));
     };
 
-    // File Viewer Modal
-    const modal = document.getElementById('file-modal');
-    const fileContent = document.getElementById('file-content');
-    
     async function viewFile(filePath) {
-        document.getElementById('modal-filename').textContent = `FILE: ${filePath}`;
-        modal.classList.add('active');
-        fileContent.textContent = 'Loading source buffer...';
+        if (!window.createWindow) {
+            // Fallback to modal if window manager not loaded
+            document.getElementById('modal-filename').textContent = `FILE: ${filePath}`;
+            modal.classList.add('active');
+            fileContent.textContent = 'Loading source buffer...';
+            try {
+                const res = await fetch(`/api/fs?path=${encodeURIComponent(filePath)}`);
+                fileContent.textContent = await res.text();
+            } catch (e) {
+                fileContent.textContent = `Error reading file stream. Server not running?`;
+            }
+            return;
+        }
+
+        const win = window.createWindow(`VIEW: ${filePath.split('/').pop()}`, 'Loading sovereign buffer...', {
+            width: '700px', height: '500px', top: (50 + Math.random() * 50) + 'px', left: (100 + Math.random() * 100) + 'px'
+        });
         
         try {
             const res = await fetch(`/api/fs?path=${encodeURIComponent(filePath)}`);
-            fileContent.textContent = await res.text();
+            const text = await res.text();
+            win.querySelector('.window-content').innerHTML = `<pre style="white-space:pre-wrap; word-break:break-all;">${text.replace(/</g, '&lt;').replace(/>/g, '&gt;')}</pre>`;
         } catch (e) {
-            fileContent.textContent = `Error reading file stream. Server not running?`;
+            win.querySelector('.window-content').textContent = `Error: ${e.message}`;
         }
     }
 

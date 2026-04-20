@@ -5,12 +5,17 @@ on:
   pull_request:
     branches: ["master", "main"]
 
+env:
+  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
+
 jobs:
   web_purity:
     name: "🌊 Web OS Purity Gate"
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
       - name: Verify Zenith Core
         run: |
           echo "Σ [CI]: Verifying Web OS components..."
@@ -24,6 +29,8 @@ jobs:
     needs: [web_purity]
     steps:
       - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
       - name: CSS Integrity Scan
         run: |
           echo "Σ [CI]: Auditing CSS for Zenith compliance..."
@@ -38,4 +45,4 @@ jobs:
     needs: [aesthetic_audit]
     steps:
       - name: Declare Readiness
-        run: echo "Σ SIGMAOS WEB ZENITH: PORTAL SUPREMACY READY."
+        run: echo "SIGMAOS WEB ZENITH: PORTAL SUPREMACY READY."

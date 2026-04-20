@@ -1016,6 +1016,7 @@ textarea.cli-input-box {
     position: fixed;
     top: 0; left: 0; width: 100vw; height: 100vh;
     background: rgba(0, 0, 0, 0.6);
+    -webkit-backdrop-filter: blur(10px);
     backdrop-filter: blur(10px);
     z-index: 2000;
     display: flex;
@@ -1107,4 +1108,74 @@ textarea.cli-input-box {
     color: var(--text-muted);
     text-transform: uppercase;
     letter-spacing: 1px;
+}
+
+/* Sovereign Window System (Puter/OS.js style) */
+.sovereign-window {
+    position: absolute;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    min-width: 200px;
+    min-height: 100px;
+    box-shadow: 0 10px 40px rgba(0,0,0,0.6);
+    border: 1px solid rgba(0, 240, 255, 0.3);
+    animation: winSpawn 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+@keyframes winSpawn {
+    from { transform: scale(0.9) translateY(20px); opacity: 0; }
+    to { transform: scale(1) translateY(0); opacity: 1; }
+}
+
+.window-header {
+    height: 34px;
+    background: rgba(0, 240, 255, 0.05);
+    border-bottom: 1px solid var(--glass-border);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0 12px;
+    cursor: default;
+    user-select: none;
+}
+
+.window-title {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-family: 'Outfit', sans-serif;
+    font-size: 13px;
+    font-weight: 600;
+}
+
+.window-controls {
+    display: flex;
+    gap: 12px;
+}
+
+.window-controls span {
+    cursor: pointer;
+    font-size: 12px;
+    color: var(--text-muted);
+    transition: color 0.2s;
+}
+
+.window-controls .w-close:hover { color: #ff5f56; }
+
+.window-content {
+    flex: 1;
+    padding: 15px;
+    background: rgba(0, 0, 0, 0.2);
+    overflow-y: auto;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 12px;
+}
+
+.window-resizer {
+    position: absolute;
+    bottom: 0; right: 0;
+    width: 15px; height: 15px;
+    cursor: nwse-resize;
+    background: linear-gradient(135deg, transparent 50%, rgba(0, 240, 255, 0.2) 50%);
 }

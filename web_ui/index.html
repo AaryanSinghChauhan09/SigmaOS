@@ -317,15 +317,19 @@
                                 <div><h3 class="segment-title">NETWORK I/O</h3><p style="color:var(--text-muted); margin:0;">Rx: 0 Kbps | Tx: 0 Kbps</p></div>
                             </div>
                             <div class="ai-segment">
-                                <h3 class="segment-title">SILICON HEALTH</h3>
-                                <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px;">
-                                    <div class="glass-panel" style="padding:10px; text-align:center;">
-                                        <div style="font-size:10px; color:var(--text-muted);">CORES</div>
-                                        <div style="font-size:14px; color:var(--acc-cyan);">LATTICE-33</div>
+                                <h3 class="segment-title">DISTRIBUTED LATTICE PEERS</h3>
+                                <div style="display:flex; flex-direction:column; gap:5px; font-size:10px;">
+                                    <div style="display:flex; justify-content:space-between; padding:5px; background:rgba(255,255,255,0.02); border:1px solid rgba(255,255,255,0.05);">
+                                        <span>Peer_L_01 (Local Silicon)</span>
+                                        <span style="color:var(--acc-cyan);">ACTIVE MASTER</span>
                                     </div>
-                                    <div class="glass-panel" style="padding:10px; text-align:center;">
-                                        <div style="font-size:10px; color:var(--text-muted);">TEMP</div>
-                                        <div style="font-size:14px; color:var(--acc-magenta);">0.00K</div>
+                                    <div style="display:flex; justify-content:space-between; padding:5px; opacity:0.5;">
+                                        <span>Peer_R_02 (Remote Shard)</span>
+                                        <span style="color:var(--text-muted);">DISCONNECTED</span>
+                                    </div>
+                                    <div style="display:flex; justify-content:space-between; padding:5px; opacity:0.5;">
+                                        <span>Peer_Q_03 (Quantum Node)</span>
+                                        <span style="color:var(--acc-magenta);">SYNCHRONIZING</span>
                                     </div>
                                 </div>
                             </div>
@@ -397,6 +401,7 @@
     <script src="scripts/modules/02_cli_mode__sovereign_shell.js"></script>
     <script src="scripts/modules/02_omnibox__neural_search.js"></script>
     <script src="scripts/modules/03_nexus_app_store.js"></script>
+    <script src="scripts/modules/04_zenith_window_manager.js"></script>
 
 </body>
 </html>
