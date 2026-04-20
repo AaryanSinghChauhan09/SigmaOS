@@ -1,4 +1,4 @@
-﻿/*
+/*
  * =========================================================================
  * S SIGMAOS kernel/suites/S04_HAL/shards/sigma_hal.c
  * =========================================================================
@@ -27,23 +27,23 @@ void sigma_hal_init(void) {
 /* ── Device registry ─────────────────────────────────────────────────────── */
 hal_i32 sigma_hal_register(sigma_device_t *dev) {
     if (!dev || s_dev_count >= SIGMA_HAL_MAX_DEVICES) return HAL_ERR;
-    dev->id     = s_next_id++;
-    dev->online = HAL_FALSE;
+    dev->base.id     = s_next_id++;
+    dev->online      = HAL_FALSE;
 
     sigma_device_t *slot = &s_devices[s_dev_count++];
     *slot = *dev;
 
     sigma_sigma_sigma_printf("S [HAL] REGISTER: id=%u name=%s bus=%d class=%d irq=%u\n",
-                 slot->id, slot->name, (int)slot->bus, (int)slot->cls, slot->irq);
+                 slot->base.id, slot->base.name, (int)slot->bus, (int)slot->cls, slot->irq);
 
     /* Auto-probe */
     if (slot->ops && slot->ops->probe) {
         if (slot->ops->probe(slot) == HAL_OK) {
             if (slot->ops->init) slot->ops->init(slot);
             slot->online = HAL_TRUE;
-            sigma_sigma_sigma_printf("S [HAL] ONLINE: %s\n", slot->name);
+            sigma_sigma_sigma_printf("S [HAL] ONLINE: %s\n", slot->base.name);
         } else {
-            sigma_sigma_sigma_printf("S [HAL] PROBE FAIL: %s\n", slot->name);
+            sigma_sigma_sigma_printf("S [HAL] PROBE FAIL: %s\n", slot->base.name);
         }
     } else {
         slot->online = HAL_TRUE;  /* no probe = assume always present   */
@@ -54,10 +54,10 @@ hal_i32 sigma_hal_register(sigma_device_t *dev) {
 
 void sigma_hal_unregister(hal_u32 dev_id) {
     for (hal_u32 i = 0; i < s_dev_count; i++) {
-        if (s_devices[i].id == dev_id) {
+        if (s_devices[i].base.id == dev_id) {
             if (s_devices[i].ops && s_devices[i].ops->remove)
                 s_devices[i].ops->remove(&s_devices[i]);
-            sigma_sigma_sigma_printf("S [HAL] UNREGISTER: %s\n", s_devices[i].name);
+            sigma_sigma_sigma_printf("S [HAL] UNREGISTER: %s\n", s_devices[i].base.name);
             for (hal_u32 j = i; j < s_dev_count - 1; j++)
                 s_devices[j] = s_devices[j+1];
             s_dev_count--;
@@ -68,7 +68,7 @@ void sigma_hal_unregister(hal_u32 dev_id) {
 
 sigma_device_t *sigma_hal_find(const char *name) {
     for (hal_u32 i = 0; i < s_dev_count; i++)
-        if (sigma_streq(s_devices[i].name, name))
+        if (sigma_streq(s_devices[i].base.name, name))
             return &s_devices[i];
     return HAL_NULL;
 }
@@ -78,7 +78,7 @@ void sigma_hal_enumerate_bus(sigma_bus_t bus) {
     for (hal_u32 i = 0; i < s_dev_count; i++)
         if (s_devices[i].bus == bus)
             sigma_sigma_sigma_printf("  [%u] %s vid=0x%04x did=0x%04x %s\n",
-                         s_devices[i].id, s_devices[i].name,
+                         s_devices[i].base.id, s_devices[i].base.name,
                          s_devices[i].vendor_id, s_devices[i].device_id,
                          s_devices[i].online ? "[online]" : "[offline]");
 }
@@ -92,7 +92,7 @@ void sigma_hal_device_list(void) {
     for (hal_u32 i = 0; i < s_dev_count; i++) {
         sigma_device_t *d = &s_devices[i];
         sigma_sigma_sigma_printf("  %-2u %-20s %-8s %-8s %-6u %s\n",
-                     d->id, d->name, bus_str[d->bus], cls_str[d->cls],
+                     d->base.id, d->base.name, bus_str[d->bus], cls_str[d->cls],
                      d->irq, d->online ? "online" : "offline");
     }
 }
@@ -167,9 +167,9 @@ void sigma_dma_sigma_sigma_free(sigma_dma_buf_t *buf) {
 /* ── Power management ────────────────────────────────────────────────────── */
 hal_i32 sigma_pm_suspend_device(hal_u32 dev_id) {
     for (hal_u32 i = 0; i < s_dev_count; i++) {
-        if (s_devices[i].id == dev_id && s_devices[i].ops && s_devices[i].ops->suspend) {
+        if (s_devices[i].base.id == dev_id && s_devices[i].ops && s_devices[i].ops->suspend) {
             s_devices[i].online = HAL_FALSE;
-            sigma_sigma_sigma_printf("S [PM] SUSPEND: %s\n", s_devices[i].name);
+            sigma_sigma_sigma_printf("S [PM] SUSPEND: %s\n", s_devices[i].base.name);
             return s_devices[i].ops->suspend(&s_devices[i]);
         }
     }
@@ -178,9 +178,9 @@ hal_i32 sigma_pm_suspend_device(hal_u32 dev_id) {
 
 hal_i32 sigma_pm_resume_device(hal_u32 dev_id) {
     for (hal_u32 i = 0; i < s_dev_count; i++) {
-        if (s_devices[i].id == dev_id && s_devices[i].ops && s_devices[i].ops->resume) {
+        if (s_devices[i].base.id == dev_id && s_devices[i].ops && s_devices[i].ops->resume) {
             s_devices[i].online = HAL_TRUE;
-            sigma_sigma_sigma_printf("S [PM] RESUME: %s\n", s_devices[i].name);
+            sigma_sigma_sigma_printf("S [PM] RESUME: %s\n", s_devices[i].base.name);
             return s_devices[i].ops->resume(&s_devices[i]);
         }
     }

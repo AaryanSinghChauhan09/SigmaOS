@@ -1,4 +1,4 @@
-﻿/*
+/*
  * =========================================================================
  * S SIGMAOS kernel/suites/S04_HAL/shards/sigma_hal.h
  * =========================================================================
@@ -14,17 +14,7 @@
 #ifndef SIGMA_HAL_H
 #define SIGMA_HAL_H
 
-typedef unsigned long long hal_u64;
-typedef unsigned int       hal_u32;
-typedef unsigned short     hal_u16;
-typedef unsigned char      hal_u8;
-typedef signed   int       hal_i32;
-typedef unsigned char      hal_bool;
-#define HAL_TRUE  ((hal_bool)1)
-#define HAL_FALSE ((hal_bool)0)
-#define HAL_NULL  ((void*)0)
-#define HAL_OK    ((hal_i32) 0)
-#define HAL_ERR   ((hal_i32)-1)
+#include "suites/S01_Genesis/shards/SovereignCommon.h"
 
 /* ── Device bus types ────────────────────────────────────────────────────── */
 typedef enum {
@@ -48,6 +38,19 @@ typedef enum {
     DEV_MISC    = 6    /* watchdog, RTC, TPM, PMU                       */
 } sigma_dev_class_t;
 
+typedef sigma_sz_t  hal_u64;
+typedef sigma_u32   hal_u32;
+typedef sigma_u16   hal_u16;
+typedef sigma_u8    hal_u8;
+typedef sigma_err_t hal_i32;
+typedef sigma_bool  hal_bool;
+
+#define HAL_TRUE  SIGMA_TRUE
+#define HAL_FALSE SIGMA_FALSE
+#define HAL_NULL  SIGMA_NULL
+#define HAL_OK    SIGMA_OK
+#define HAL_ERR   -1
+
 /* ── IRQ trigger types ───────────────────────────────────────────────────── */
 typedef enum {
     IRQ_EDGE_RISING  = 0,
@@ -59,7 +62,7 @@ typedef enum {
 
 #define SIGMA_HAL_MAX_DEVICES 256
 #define SIGMA_HAL_MAX_IRQS    512
-#define SIGMA_DEV_NAME_LEN     48
+#define SIGMA_DEV_NAME_LEN    48
 
 /* ── Interrupt handler ───────────────────────────────────────────────────── */
 typedef void (*sigma_irq_handler_t)(hal_u32 irq, void *dev_id);
@@ -85,10 +88,9 @@ typedef struct {
     hal_i32  (*ioctl)(sigma_device_t *dev, hal_u32 cmd, hal_u64 arg);
 } sigma_dev_ops_t;
 
-/* ── Device descriptor ──────────────────────────────────────────────────── */
+/* ── Device (Object-Oriented) ───────────────────────────────────────────── */
 struct sigma_device_s {
-    char               name[SIGMA_DEV_NAME_LEN];
-    hal_u32            id;
+    sigma_obj_t        base;         /* Inheritance from SovereignObject */
     sigma_bus_t        bus;
     sigma_dev_class_t  cls;
     hal_u32            vendor_id;

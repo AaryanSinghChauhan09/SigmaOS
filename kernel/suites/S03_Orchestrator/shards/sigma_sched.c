@@ -1,4 +1,4 @@
-﻿/*
+/*
  * =========================================================================
  * S SIGMAOS kernel/suites/S03_Orchestrator/shards/sigma_sched.c
  * =========================================================================
@@ -36,7 +36,7 @@ static sigma_runqueue_t *get_rq(sc_u32 cpu_id) {
 
 static sigma_task_t *find_task(sigma_runqueue_t *rq, sc_u32 pid) {
     for (sc_u32 i = 0; i < rq->task_count; i++)
-        if (rq->tasks[i].pid == pid) return &rq->tasks[i];
+        if (rq->tasks[i].base.id == pid) return &rq->tasks[i];
     return (sigma_task_t*)0;
 }
 
@@ -60,7 +60,8 @@ void sigma_sched_enqueue(sc_u32 cpu_id, sc_u32 pid,
     if (!rq || rq->task_count >= SIGMA_SCHED_MAX_TASKS) return;
 
     sigma_task_t *t = &rq->tasks[rq->task_count++];
-    t->pid          = pid;
+    t->base.id      = pid;
+    t->base.name    = "sigma_task";
     t->policy       = policy;
     t->qos          = qos;
     t->nice         = nice;
@@ -79,7 +80,7 @@ void sigma_sched_dequeue(sc_u32 cpu_id, sc_u32 pid) {
     sigma_runqueue_t *rq = get_rq(cpu_id);
     if (!rq) return;
     for (sc_u32 i = 0; i < rq->task_count; i++) {
-        if (rq->tasks[i].pid == pid) {
+        if (rq->tasks[i].base.id == pid) {
             for (sc_u32 j = i; j < rq->task_count - 1; j++)
                 rq->tasks[j] = rq->tasks[j+1];
             rq->task_count--;
@@ -99,7 +100,7 @@ sc_u32 sigma_sched_pick_next(sc_u32 cpu_id) {
         if (rq->tasks[i].policy == POLICY_FIFO ||
             rq->tasks[i].policy == POLICY_RR   ||
             rq->tasks[i].qos   == QOS_REALTIME)
-            return rq->tasks[i].pid;
+            return rq->tasks[i].base.id;
     }
 
     /* EDF: pick task with earliest deadline */
@@ -109,7 +110,7 @@ sc_u32 sigma_sched_pick_next(sc_u32 cpu_id) {
         if (rq->tasks[i].policy == POLICY_EDF &&
             rq->tasks[i].deadline_ns < earliest) {
             earliest = rq->tasks[i].deadline_ns;
-            edf_pid  = rq->tasks[i].pid;
+            edf_pid  = rq->tasks[i].base.id;
         }
     }
     if (edf_pid) return edf_pid;
@@ -121,7 +122,7 @@ sc_u32 sigma_sched_pick_next(sc_u32 cpu_id) {
         if (rq->tasks[i].policy == POLICY_IDLE) continue;
         if (rq->tasks[i].vruntime < min_vrt) {
             min_vrt = rq->tasks[i].vruntime;
-            cfs_pid = rq->tasks[i].pid;
+            cfs_pid = rq->tasks[i].base.id;
         }
     }
     if (cfs_pid) {
@@ -130,7 +131,7 @@ sc_u32 sigma_sched_pick_next(sc_u32 cpu_id) {
     }
 
     /* IDLE class fallback */
-    return rq->tasks[0].pid;
+    return rq->tasks[0].base.id;
 }
 
 /* ── Tick ─────────────────────────────────────────────────────────────────── */
@@ -195,7 +196,7 @@ void sigma_sched_balance(void) {
                 sigma_task_t stolen = heavy->tasks[--heavy->task_count];
                 light->tasks[light->task_count++] = stolen;
                 sigma_sigma_sigma_printf("S [SCHED] STEAL: pid=%u cpu%u->cpu%u\n",
-                             stolen.pid, heavy->cpu_id, light->cpu_id);
+                             stolen.base.id, heavy->cpu_id, light->cpu_id);
             }
         }
     }
@@ -212,7 +213,7 @@ void sigma_sched_stats(sc_u32 cpu_id) {
     for (sc_u32 i = 0; i < rq->task_count; i++) {
         sigma_task_t *t = &rq->tasks[i];
         sigma_sigma_sigma_printf("  pid=%-5u vrt=%llu cpu=%llu ns nice=%d%s\n",
-                     t->pid, (unsigned long long)t->vruntime,
+                     t->base.id, (unsigned long long)t->vruntime,
                      (unsigned long long)t->total_cpu_ns,
                      t->nice, t->on_cpu ? " [RUNNING]" : "");
     }

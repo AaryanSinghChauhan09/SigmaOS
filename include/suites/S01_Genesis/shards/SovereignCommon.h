@@ -38,4 +38,22 @@ typedef unsigned char      sigma_bool;
 #define SIGMA_FALSE        ((sigma_bool)0)
 #define SIGMA_NULL         ((void*)0)
 
+/* ── Sovereign Object-Oriented Foundation (SOOF) ─────────────────────── */
+struct sigma_obj;
+typedef void (*sigma_obj_init_f)(struct sigma_obj* obj);
+typedef void (*sigma_obj_deinit_f)(struct sigma_obj* obj);
+typedef int  (*sigma_obj_tostring_f)(struct sigma_obj* obj, char* buf, sigma_sz_t size);
+
+typedef struct sigma_obj {
+    const char*         name;
+    sigma_u32           id;
+    sigma_u32           cls;
+    void*               priv;
+    sigma_obj_init_f    init;
+    sigma_obj_deinit_f  deinit;
+    sigma_obj_tostring_f tostring;
+} sigma_obj_t;
+
+#define SIGMA_OBJ_INIT(n, c) { .name = n, .cls = c, .init = SIGMA_NULL, .deinit = SIGMA_NULL }
+
 #endif /* SOVEREIGN_COMMON_H */

@@ -1,4 +1,4 @@
-﻿/*
+/*
  * =========================================================================
  * S SIGMAOS kernel/suites/S03_Orchestrator/shards/sigma_sched.h
  * =========================================================================
@@ -14,12 +14,15 @@
 #ifndef SIGMA_SCHED_H
 #define SIGMA_SCHED_H
 
-typedef unsigned long long sc_u64;
-typedef unsigned int       sc_u32;
-typedef signed   int       sc_i32;
-typedef unsigned char      sc_bool;
-#define SCHED_TRUE  ((sc_bool)1)
-#define SCHED_FALSE ((sc_bool)0)
+#include "suites/S01_Genesis/shards/SovereignCommon.h"
+
+typedef sigma_sz_t  sc_u64;
+typedef sigma_u32   sc_u32;
+typedef sigma_i32   sc_i32;
+typedef sigma_bool  sc_bool;
+
+#define SCHED_TRUE  SIGMA_TRUE
+#define SCHED_FALSE SIGMA_FALSE
 
 /* ── QoS classes (macOS GCD parity) ────────────────────────────────────── */
 typedef enum {
@@ -44,7 +47,7 @@ typedef enum {
 #define SIGMA_SCHED_TIMESLICE_NS 4000000ULL  /* 4ms default quantum       */
 
 typedef struct {
-    sc_u32              pid;
+    sigma_obj_t         base;           /* Inheritance from SovereignObject */
     sigma_sched_policy_t policy;
     sigma_qos_t         qos;
     sc_i32              nice;           /* -20 to +19 (lower = higher)   */
@@ -55,6 +58,7 @@ typedef struct {
     sc_bool             on_cpu;         /* currently executing           */
     sc_bool             preemptible;    /* can be preempted mid-quantum  */
 } sigma_task_t;
+ domestic
 
 /* ── CPU run-queue ───────────────────────────────────────────────────────── */
 typedef struct {
