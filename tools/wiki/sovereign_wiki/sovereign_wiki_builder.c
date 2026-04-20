@@ -12,8 +12,6 @@
 // =============================================================================
 
 #include "sigma_libc.h"
-#include "sigma_libc.h"
-#include "sigma_libc.h"
 #include "sigma_types.h"
 
 #include <dirent.h>
