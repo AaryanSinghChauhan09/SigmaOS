@@ -25,6 +25,16 @@ jobs:
       - name: Compile Sovereign Toolchain
         run: |
           make -C tools sigma-audit sigma-test sigma-wiki sigma-shell sigma-depgraph sigpkg sigma-modularize sigma-purge
+          mkdir -p bin
+          cp tools/sigma-* bin/ 2>/dev/null || true
+          cp tools/sigpkg bin/ 2>/dev/null || true
+
+      - name: Upload Toolchain Artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: sovereign-toolchain
+          path: bin/
+          retention-days: 1
 
       - name: Foreign Dependency Scan (kernel/suites)
         run: |
@@ -60,6 +70,7 @@ jobs:
           for src in $(find kernel/suites -name "*.c" 2>/dev/null); do
             NAME=$(basename "${src%.*}")
             if x86_64-linux-gnu-gcc -std=c11 -ffreestanding -O2 -m64 \
+                -Wall -Wextra -Wno-unused-function -Wno-unused-parameter \
                 -I. -I./include -I./kernel/suites $INC_FLAGS \
                 -nostdlib -fno-stack-protector \
                 -c "$src" -o "build/${NAME}_shard.o" 2>/dev/null; then
@@ -113,6 +124,15 @@ jobs:
         with:
           fetch-depth: 0
 
+      - name: Download Toolchain
+        uses: actions/download-artifact@v4
+        with:
+          name: sovereign-toolchain
+          path: bin/
+
+      - name: Setup Toolchain Permissions
+        run: chmod +x bin/sigma-* bin/sigpkg || true
+
       - name: Generate Release Stubs
         run: |
           touch SigmaOS_Zenith_Supreme.iso
@@ -120,7 +140,7 @@ jobs:
 
       - name: Build and Deploy Wiki
         run: |
-          python3 scripts/build_wiki.py
+          ./bin/sigma-wiki kernel/suites WIKI/AUTO_SOVEREIGN_WIKI.md
 
           git config user.name  "sigma-bot"
           git config user.email "bot@sigmaos.dev"
