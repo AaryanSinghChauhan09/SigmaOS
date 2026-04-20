@@ -1,8 +1,9 @@
 /*
  * =========================================================================
- * S SIGMAOS: SOVEREIGN HOST BRIDGE
+ * S SIGMAOS: SOVEREIGN HOST BRIDGE (DEFENSIVE EDITION)
  * =========================================================================
- * Maps sigma_ calls to standard C for host-based tools (audit, test, wiki).
+ * Maps sigma_ calls to standard C for host-based tools.
+ * Zero-recursion design (does not include SovereignCommon.h).
  * =========================================================================
  */
 
@@ -18,7 +19,22 @@
 #include <unistd.h>
 #include <stdarg.h>
 
-#include "suites/S01_Genesis/shards/SovereignCommon.h"
+// ── Manual Type Definitions (Avoiding Common Header Recursion) ───────────
+typedef size_t             sigma_sz_t;
+typedef size_t             sigma_size_t;
+typedef uint8_t            sigma_u8;
+typedef uint16_t           sigma_u16;
+typedef uint32_t           sigma_u32;
+typedef uint64_t           sigma_u64;
+typedef int8_t             sigma_i8;
+typedef int16_t            sigma_i16;
+typedef int32_t            sigma_i32;
+typedef int64_t            sigma_i64;
+typedef bool               sigma_bool;
+
+#define SIGMA_TRUE         true
+#define SIGMA_FALSE        false
+#define SIGMA_NULL         NULL
 
 // ── I/O Bridge ───────────────────────────────────────────────────────────
 static inline int sigma_printf(const char* format, ...) {
