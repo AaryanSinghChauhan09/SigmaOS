@@ -112,8 +112,16 @@ static inline void SovereignMaster_InitAll(void) {
     s_firewall_init();
     s_journal_log("S01", "Lattice Finalized");
 
+    /* Phase 7: Universal Sync & Permissions */
+    s_sync_init();
+    s_perm_init();
+
     sigma_printf("\nS [SOVEREIGN-MASTER]: 33-Suite Lattice Materialization COMPLETE.\n");
 }
+
+/* Sovereign Universal Shards */
+extern void s_sync_init(void);
+extern void s_perm_init(void);
 
 /* Sovereign Core Services Shards */
 extern void s_wasm_init(void);
