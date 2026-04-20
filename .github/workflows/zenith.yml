@@ -60,12 +60,11 @@ jobs:
         run: |
           mkdir -p build
           PASS=0; FAIL=0
+          INC_FLAGS=$(find include/suites -name shards -type d 2>/dev/null | sed 's/^/-I./')
           for src in $(find kernel/suites/S01_Genesis/shards -name "*.c"); do
             # Add shard-local include paths to resolve short header references
             if x86_64-linux-gnu-gcc -std=c11 -ffreestanding -O2 -m64 \
-              -I. -I./include -I./include/suites/S01_Genesis/shards \
-              -I./kernel/suites/S01_Genesis/shards \
-              -I./kernel/suites/S01_Genesis/shards/libc \
+              -I. -I./include $INC_FLAGS \
               -nostdlib -fno-stack-protector \
               -c "$src" -o /dev/null 2>/dev/null; then
               PASS=$((PASS+1))

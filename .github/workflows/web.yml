@@ -44,6 +44,18 @@ jobs:
             echo "[FAIL] Safari webkit prefix missing from style.css."
             exit 1
           fi
+          if ! grep -qiE "fonts.googleapis.com" web_ui/index.html; then
+            echo "[FAIL] Premium typography (Google Fonts) missing from index.html."
+            exit 1
+          fi
+          if ! grep -qiE "transition:" web_ui/styles/style.css; then
+            echo "[FAIL] Micro-animations (transitions) missing from style.css."
+            exit 1
+          fi
+          if ! grep -qiE "border-radius:" web_ui/styles/style.css; then
+            echo "[FAIL] Modern rounding (border-radius) missing from style.css."
+            exit 1
+          fi
           echo "[PASS] CSS Zenith compliance verified."
 
   deployment_vitals:

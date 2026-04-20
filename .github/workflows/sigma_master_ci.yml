@@ -55,11 +55,12 @@ jobs:
       - name: Multi-Arch Shard Compilation
         run: |
           echo "[CI] Compiling all kernel shards..."
+          INC_FLAGS=$(find include/suites -name shards -type d 2>/dev/null | sed 's/^/-I./')
           PASS=0; FAIL=0; FAIL_LIST=""
           for src in $(find kernel/suites -name "*.c" 2>/dev/null); do
             NAME=$(basename "${src%.*}")
             if x86_64-linux-gnu-gcc -std=c11 -ffreestanding -O2 -m64 \
-                -I. -I./include -I./kernel/suites \
+                -I. -I./include -I./kernel/suites $INC_FLAGS \
                 -nostdlib -fno-stack-protector \
                 -c "$src" -o "build/${NAME}_shard.o" 2>/dev/null; then
               PASS=$((PASS+1))
