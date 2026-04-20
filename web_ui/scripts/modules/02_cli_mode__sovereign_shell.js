@@ -30,8 +30,8 @@ const cliOutput = document.getElementById('cli-output');
                 case 'gui':
                     cliView.classList.add('hidden');
                     guiView.classList.remove('hidden');
-                    setTimeout(simulateBootProcess, 500);
-                    loadDirectory('/');
+                    setTimeout(window.simulateBootProcess, 500);
+                    window.loadDirectory('/');
                     break;
                 case 'cd': {
                     let dir = args[1] || '/';

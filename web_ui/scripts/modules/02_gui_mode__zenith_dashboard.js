@@ -228,4 +228,7 @@ const grid = document.getElementById('lattice-grid');
         }
     }
     loadBibleIdeas();
+    window.simulateBootProcess = simulateBootProcess;
+    window.loadDirectory = loadDirectory;
+    window.viewFile = viewFile;
 });
