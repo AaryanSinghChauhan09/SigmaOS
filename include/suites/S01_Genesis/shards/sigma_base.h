@@ -1,4 +1,4 @@
-﻿/*
+/*
  * =========================================================================
  * S SIGMAOS: CORE FOUNDATION (v2.0 — ZERO DEPENDENCY)
  * =========================================================================
@@ -11,7 +11,7 @@
 
 #include "sigma_types.h"
 #include "sigma_libc.h"
-#include "suites/S01_Genesis/shards/SovereignModule.h"
+#include "SovereignModule.h"
 
 #ifndef SIGMA_ASSERT
  #ifdef __SIGMAOS__
