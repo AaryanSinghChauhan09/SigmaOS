@@ -4,7 +4,7 @@
 # =============================================================================
 
 CC       = gcc
-CFLAGS   = -std=c11 -O2 -Wall -Iinclude -I../include -I../include/suites/S01_Genesis/shards
+CFLAGS   = -std=c11 -O2 -Wall -DSIGMA_EXCLUDE_STD_ALIASES -Iinclude -I../include -I../include/suites/S01_Genesis/shards
 
 BINDIR   = /usr/local/sigma/bin
 
