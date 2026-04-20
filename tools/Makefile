@@ -45,16 +45,16 @@ sigma-test: dev/sovereign_test/sovereign_test_runner.c
 	@echo "  [✓] sigma-test     → replaces sovereign_test_runner.py + logic_tester.py"
 
 sigma-wiki: wiki/sovereign_wiki/sovereign_wiki_builder.c
-	$(CC) $(CFLAGS) $(LDFLAGS) $< -o $@
-	@echo "  [✓] sigma-wiki     → replaces wiki_builder.py"
+	$(CC) $(CFLAGS) $< -o $@
+	@echo "  [OK] sigma-wiki     -> replaces wiki_builder.py"
 
 sigma-shell: core/sovereign_shell/sovereign_shell.c
 	$(CC) $(CFLAGS) $< -o $@
-	@echo "  [✓] sigma-shell    → replaces zenith_shell.py"
+	@echo "  [OK] sigma-shell    -> replaces zenith_shell.py"
 
 sigma-depgraph: dev/sovereign_depgraph/sovereign_depgraph.c
-	$(CC) $(CFLAGS) $(LDFLAGS) $< -o $@
-	@echo "  [✓] sigma-depgraph → replaces generate_dependency_graph.py"
+	$(CC) $(CFLAGS) $< -o $@
+	@echo "  [OK] sigma-depgraph -> replaces generate_dependency_graph.py"
 
 sigpkg: infra/sovereign_pkg/sovereign_pkg_manager.c
 	$(CC) $(CFLAGS) $< -o $@
