@@ -61,8 +61,12 @@ jobs:
           mkdir -p build
           PASS=0; FAIL=0
           for src in $(find kernel/suites/S01_Genesis/shards -name "*.c"); do
+            # Add shard-local include paths to resolve short header references
             if x86_64-linux-gnu-gcc -std=c11 -ffreestanding -O2 -m64 \
-              -I./include -nostdlib -fno-stack-protector \
+              -I./include -I./include/suites/S01_Genesis/shards \
+              -I./kernel/suites/S01_Genesis/shards \
+              -I./kernel/suites/S01_Genesis/shards/libc \
+              -nostdlib -fno-stack-protector \
               -c "$src" -o /dev/null 2>/dev/null; then
               PASS=$((PASS+1))
             else

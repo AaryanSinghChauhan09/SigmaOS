@@ -51,18 +51,17 @@
 #define SIGMA_OK    0
 
 // Kernel Compatibility Aliases
-#define sigma_sigma_printf    sigma_printf
-#define sigma_sigma_sprintf   sigma_sprintf
-#define sigma_sigma_snprintf  sigma_snprintf
-#define sigma_sigma_fprintf   sigma_fprintf
-#define sigma_sigma_malloc    sigma_malloc
-#define sigma_sigma_free      sigma_free
-#define sigma_sigma_memset    sigma_memset
-#define sigma_sigma_memcpy    sigma_memcpy
-#define sigma_sigma_strlen    sigma_strlen
-#define sigma_sigma_strcmp    sigma_strcmp
-#define sigma_sigma_strcpy    sigma_strcpy
-#define sigma_sigma_strncpy   sigma_strncpy
-#define sigma_sigma_strrchr   sigma_strrchr
+// Recursive Kernel Compatibility Aliases
+#define sigma_sigma_sigma_printf sigma_printf
+#define sigma_sigma_printf       sigma_printf
+#define sigma_sigma_malloc       sigma_malloc
+#define sigma_sigma_free         sigma_free
+#define sigma_sigma_memset       sigma_memset
+#define sigma_sigma_memcpy       sigma_memcpy
+#define sigma_sigma_strlen       sigma_strlen
+#define sigma_sigma_strcmp       sigma_strcmp
+#define sigma_sigma_strcpy       sigma_strcpy
+#define sigma_sigma_strncpy      sigma_strncpy
+#define sigma_sigma_strrchr      sigma_strrchr
 
 #endif
