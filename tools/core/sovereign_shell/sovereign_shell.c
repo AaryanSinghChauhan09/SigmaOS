@@ -1,4 +1,4 @@
-﻿#define SIGMA_EXCLUDE_STD_ALIASES
+#define SIGMA_EXCLUDE_STD_ALIASES
 // =============================================================================
 // SigmaOS — tools/sovereign_shell — sovereign_shell.c
 // Native C Replacement for scripts/zenith_shell.py
@@ -136,7 +136,7 @@ static int builtin_env(int argc, char** argv) {
 static int builtin_pwd(int argc, char** argv) {
     (void)argc; (void)argv;
     char buf[SIGMA_LINE_MAX];
-    if (_getcwd(buf, sizeof(buf))) sigma_printf("  %s\n", buf);
+    if (sigma_getcwd(buf, sizeof(buf))) sigma_printf("  %s\n", buf);
     return 0;
 }
 
