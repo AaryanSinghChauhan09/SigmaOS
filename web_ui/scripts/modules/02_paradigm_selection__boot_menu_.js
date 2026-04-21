@@ -1,14 +1,30 @@
+/**
+ * SigmaOS Paradigm Selection (UI)
+ * Module 02: Booting into the Sovereign Lattice.
+ */
+
 document.addEventListener("DOMContentLoaded", () => {
-    document.getElementById('btn-gui').addEventListener('click', () => {
-        bootOverlay.classList.add('hidden');
-        guiView.classList.remove('hidden');
-        setTimeout(window.simulateBootProcess, 500);
-        window.loadDirectory('/'); // Init GUI Explorer
+    const list = document.querySelector('.paradigm-list');
+    if (!list) return;
+
+    // Render Paradigms from Engine
+    list.innerHTML = '';
+    ParadigmEngine.paradigms.forEach(p => {
+        const item = document.createElement('div');
+        item.className = 'paradigm-item glass-panel';
+        item.innerHTML = `
+            <div class="p-icon">${p.icon}</div>
+            <div class="p-info">
+                <h3>${p.name}</h3>
+                <p>${p.desc}</p>
+            </div>
+        `;
+        item.onclick = () => ParadigmEngine.switchTo(p.id);
+        list.appendChild(item);
     });
 
-    document.getElementById('btn-cli').addEventListener('click', () => {
-        bootOverlay.classList.add('hidden');
-        cliView.classList.remove('hidden');
-        document.getElementById('cli-input').focus();
-    });
+    // Auto-enter logic (Demo)
+    setTimeout(() => {
+        UIUtils.appendLog('audit-log', 'Lattice Ready. Select Paradigm to Transcend.', 'system');
+    }, 1000);
 });
