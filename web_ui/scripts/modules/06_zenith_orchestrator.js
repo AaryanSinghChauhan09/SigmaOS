@@ -3,21 +3,6 @@
  * Hardened to utilize Silicon Primitives (Ʃ), minimizing high-level JS overhead.
  */
 
-class ZenithComponent {
-    constructor(id) {
-        this.id = id;
-        this.element = Sigma.node(id);
-    }
-
-    show() {
-        if (this.element) this.element.classList.remove('hidden');
-    }
-
-    hide() {
-        if (this.element) this.element.classList.add('hidden');
-    }
-}
-
 class MissionControl extends ZenithComponent {
     constructor() {
         super('mission-control-overlay');
