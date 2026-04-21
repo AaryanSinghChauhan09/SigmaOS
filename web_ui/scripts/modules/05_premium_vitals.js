@@ -76,6 +76,6 @@ const PremiumVitals = {
 
 window.addEventListener('load', () => {
     PremiumVitals.init();
-    ZenithAnims.init();
+    CanvasAnims.init();
     setTimeout(() => PremiumVitals.visualizeLattice(), 3000);
 });
