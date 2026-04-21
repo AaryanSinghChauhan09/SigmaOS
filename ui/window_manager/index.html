@@ -46,10 +46,10 @@
                 <div class="settings-sidebar">
                     <ul>
                         <li class="active">Hardware & Drivers</li>
+                        <li>Network & Security</li>
+                        <li>Sovereign Docs (Office)</li>
                         <li>Security & TPM</li>
-                        <li>WASM Plugins</li>
-                        <li>Display Scaling</li>
-                        <li>Updates</li>
+                        <li>Updates & Backups</li>
                     </ul>
                 </div>
                 <div class="settings-main">
@@ -62,6 +62,16 @@
                     <div class="status-card ok">
                         <strong>GPU Subsystem</strong>
                         <span>SOVEREIGN_STATUS_OK</span>
+                    </div>
+
+                    <h2 style="margin-top:20px;">Network & Security Layer</h2>
+                    <div class="status-card ok" style="border-color:var(--accent);">
+                        <strong>Sovereign Firewall</strong>
+                        <span>STATE: STRICT DROP</span>
+                    </div>
+                    <div class="status-card disabled">
+                        <strong>WireGuard VPN Shard</strong>
+                        <span>STATE: DISCONNECTED (TUNNEL 0)</span>
                     </div>
                 </div>
             </div>
