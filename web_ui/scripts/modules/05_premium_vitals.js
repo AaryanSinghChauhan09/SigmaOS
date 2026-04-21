@@ -62,7 +62,28 @@ const PremiumVitals = {
                 orb.style.transform = `translate(${x * speed}px, ${y * speed}px)`;
             });
         });
+    },
+
+    visualizeLattice() {
+        console.log("Σ Rendering Advanced Lattice Connections...");
+        const metrics = [
+            "Quantum-Link: SECURE (QKD-E8)",
+            "Bio-Nexus: SYNCED (72BPM)",
+            "Omni-Fabric: 16Tb/s FLOW"
+        ];
+        
+        metrics.forEach((m, i) => {
+            setTimeout(() => {
+                const entry = document.createElement('div');
+                entry.className = "log-entry system pulse";
+                entry.innerHTML = `<span class="timestamp">[LATTICE]</span> ${m}`;
+                document.getElementById('audit-log').prepend(entry);
+            }, i * 1500);
+        });
     }
 };
 
-window.addEventListener('load', () => PremiumVitals.init());
+window.addEventListener('load', () => {
+    PremiumVitals.init();
+    setTimeout(() => PremiumVitals.visualizeLattice(), 3000);
+});
