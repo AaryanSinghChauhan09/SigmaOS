@@ -1,0 +1,108 @@
+/**
+ * Sovereign Terminal Core (v3.0)
+ * Unified CLI for all OS operations. 
+ * Supports commands for filesystem, themes, sharding, and telemetry.
+ */
+
+class SovereignTerminal extends ZenithComponent {
+    constructor() {
+        super('cli-input-box');
+        this.output = Sigma.node('cli-output');
+        this.commands = {};
+        this.init();
+    }
+
+    init() {
+        this.registerCoreCommands();
+        if (this.element) {
+            this.element.addEventListener('keydown', (e) => {
+                if (e.key === 'Enter') this.processCommand(e.target.value);
+            });
+        }
+    }
+
+    registerCoreCommands() {
+        this.commands = {
+            'help': () => this.write('AVAILABLE: theme, ls, cd, cat, notify, shard, flush, clear, version'),
+            'clear': () => this.output.innerHTML = '',
+            'version': () => this.write('Σ SIGMAOS ZENITH v33.0.4-SINGULARITY'),
+            
+            // Theme Integration
+            'theme': (args) => {
+                if (!args[0]) return this.write('USAGE: theme [MATRIX|GHOST_MICA|SOVEREIGN_GOLD]');
+                window.theme.applyTheme(args[0].toUpperCase());
+                this.write(`THEME SYNCHRONIZED: ${args[0]}`);
+            },
+
+            // Filesystem Integration
+            'ls': () => {
+                const files = window.explorer.vfs[window.explorer.currentPath] || [];
+                Sigma.each(files, f => this.write(`[${f.type.toUpperCase()}] ${f.name}`));
+            },
+            'cd': (args) => {
+                const path = args[0] || '/';
+                window.explorer.navigate(path);
+                this.write(`PATH CHANGED: ${window.explorer.currentPath}`);
+            },
+            'cat': (args) => {
+                const files = window.explorer.vfs[window.explorer.currentPath] || [];
+                const file = files.find(f => f.name === args[0]);
+                if (file) this.write(file.content);
+                else this.write(`ERR: FILE NOT FOUND: ${args[0]}`);
+            },
+
+            // Notification Integration
+            'notify': (args) => {
+                window.zenith.taskbar.notify(args.join(' '), 'OPTIMAL');
+                this.write('NOTIFICATION DISPATCHED.');
+            },
+
+            // Kernel Sharding Integration
+            'shard': (args) => {
+                const sub = args[0];
+                const id = args[1];
+                if (sub === 'kill' && id) {
+                    window.sharding.simulateFailure(id);
+                    this.write(`SIGNAL SENT: PANIC SHARD ${id}`);
+                } else if (sub === 'ls') {
+                    this.write('LATTICE SHARDS: S01-S33 [ARMED]');
+                } else {
+                    this.write('USAGE: shard [ls|kill] [id]');
+                }
+            },
+
+            // System Maintenance
+            'flush': () => {
+                console.log('Σ://KERNEL> Flushing Silicon Primitives...');
+                this.write('MEMORY FLUSH COMPLETE.');
+            }
+        };
+    }
+
+    processCommand(raw) {
+        const parts = raw.trim().split(' ');
+        const cmd = parts[0].toLowerCase();
+        const args = parts.slice(1);
+
+        this.write(`> ${raw}`, 'cmd-echo');
+        
+        if (this.commands[cmd]) {
+            this.commands[cmd](args);
+        } else {
+            this.write(`Σ://ERR> COMMAND UNKNOWN: ${cmd}`);
+        }
+
+        if (this.element) this.element.value = '';
+    }
+
+    write(text, type = 'info') {
+        if (!this.output) return;
+        const line = document.createElement('div');
+        line.className = `cli-line line-${type}`;
+        line.textContent = text;
+        this.output.appendChild(line);
+        this.output.scrollTop = this.output.scrollHeight;
+    }
+}
+
+window.SovereignTerminal = SovereignTerminal;
