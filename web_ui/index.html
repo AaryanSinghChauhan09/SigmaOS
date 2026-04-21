@@ -21,6 +21,7 @@
     <link rel="stylesheet" href="styles/modules/compatibility.css">
     <link rel="stylesheet" href="styles/modules/utilities.css">
     <link rel="stylesheet" href="styles/modules/overrides.css">
+    <link rel="stylesheet" href="styles/modules/micro_interactions.css">
     <link rel="stylesheet" href="styles/modules/lattice_visualizer.css">
     <link rel="stylesheet" href="styles/modules/aether_pulse.css">
     <link rel="stylesheet" href="styles/modules/notifications_v2.css">
@@ -471,6 +472,7 @@
     <script src="scripts/modules/25_sovereign_sandbox.js"></script>
     <script src="scripts/modules/26_multi_tenancy_engine.js"></script>
     <script src="scripts/modules/27_sovereign_profiler.js"></script>
+    <script src="scripts/modules/28_shortcut_orchestrator.js"></script>
 
     <script>
         // Initialize Sovereign Zenith Supremacy Suite
@@ -517,6 +519,7 @@
                 window.sandbox = new SovereignSandbox();
                 window.sessions = new MultiTenancyEngine();
                 window.profiler = new SovereignProfiler();
+                window.shortcuts = new ShortcutOrchestrator();
             }
 
             if ('serviceWorker' in navigator) {

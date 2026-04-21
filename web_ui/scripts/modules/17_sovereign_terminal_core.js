@@ -81,7 +81,15 @@ class SovereignTerminal extends ZenithComponent {
                     this.write(`- ${p.id.padEnd(6)} | ${p.cpu.padStart(5)}% CPU | ${p.mem.toString().padStart(4)}MB`);
                 });
             },
-            'help': () => this.write('AVAILABLE: theme, ls, cd, cat, notify, shard, flush, stats, telemetry, set, get, vault, snapshot, tile, sandbox, session, top, clear, version'),
+            'shortcuts': () => {
+                this.write('Σ://SHORTCUTS> Universal Hotkeys:');
+                this.write('- Ctrl + K: Universal Search');
+                this.write('- Ctrl + `: Focus Terminal');
+                this.write('- Alt  + T: Toggle Tiling');
+                this.write('- Ctrl + S: Create Lattice Snapshot');
+            },
+            'prof': () => this.commands.top(),
+            'help': () => this.write('AVAILABLE: theme, ls, cd, cat, notify, shard, flush, stats, telemetry, set, get, vault, snapshot, tile, sandbox, session, top, prof, shortcuts, clear, version'),
             'clear': () => this.output.innerHTML = '',
             'version': () => this.write('Σ SIGMAOS ZENITH v33.0.4-SINGULARITY'),
             
