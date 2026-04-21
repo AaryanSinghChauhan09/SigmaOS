@@ -80,5 +80,6 @@ window.addEventListener('load', () => {
     MissionControl.init();
     TaskManager.init();
     Notifications.init();
+    EnvEngine.init();
     setTimeout(() => PremiumVitals.visualizeLattice(), 3000);
 });
