@@ -81,5 +81,6 @@ window.addEventListener('load', () => {
     TaskManager.init();
     Notifications.init();
     EnvEngine.init();
+    SettingsEngine.init();
     setTimeout(() => PremiumVitals.visualizeLattice(), 3000);
 });
