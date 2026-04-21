@@ -1,0 +1,46 @@
+{
+  "version": "APEX INFINITY",
+  "author": "SigmaOS Development Intelligence Engine",
+  "categories": [
+    {
+      "name": "CORE ARCHITECTURE (S01-S08)",
+      "ideas": [
+        {"id": 1, "title": "UEFI Protocol Traversal", "description": "Custom bootloader in C without gnu-efi or tianocore."},
+        {"id": 21, "title": "Sovereign Syscall Table", "description": "512 hand-designed syscalls with unique semantic contracts."},
+        {"id": 83, "title": "Neural-Predictive Scheduler", "description": "Train on-device LSTM in C on per-process CPU burst patterns."}
+      ]
+    },
+    {
+      "name": "DEVICE DRIVERS (S03-S14)",
+      "ideas": [
+        {"id": 143, "title": "Native NVMe Engine", "description": "PCIe BAR mapping, admin queue, and I/O queue setup from scratch."},
+        {"id": 166, "title": "VGA Mode 13h Splasher", "description": "Pure Assembly splash screen renderer (320x200, 256 colors)."},
+        {"id": 178, "title": "Intel HDA Subsystem", "description": "Codec enumeration and PCM stream management in pure C."}
+      ]
+    },
+    {
+      "name": "SECURITY & CRYPTO (S08)",
+      "ideas": [
+        {"id": 61, "title": "Post-Quantum Cryptography", "description": "Crystals-Kyber hand-coded in C to defeat quantum adversaries."},
+        {"id": 286, "title": "Zero-Trust TPM Attestation", "description": "Quote platform state and boot measurements to a remote verifier."},
+        {"id": 305, "title": "W^X Hardware Enforcement", "description": "Write XOR Execute enforcement at the silicon level."}
+      ]
+    },
+    {
+      "name": "AUTOMATION & AGENTS (S27-S30)",
+      "ideas": [
+        {"id": 421, "title": "SigmaFlow DAG Engine", "description": "Directed Acyclic Graph automation for lattice-wide tasking."},
+        {"id": 436, "title": "SigmaAgent Runtime", "description": "Autonomous multi-step plan execution with RAG and vector memory."},
+        {"id": 451, "title": "Kernel Event Bus", "description": "Asynchronous process-to-kernel event bridging system."}
+      ]
+    },
+    {
+      "name": "MOONSHOTS & INNOVATION (S60-S62)",
+      "ideas": [
+        {"id": 60, "title": "SigmaISA Custom Silicon", "description": "Design a custom instruction set optimized for agentic computing."},
+        {"id": 801, "title": "Sovereign Continuity", "description": "Snapshot the entire OS state and restore it on any hardware."},
+        {"id": 850, "title": "Interplanetary Mesh", "description": "Delay-tolerant networking stack for deep-space communication."}
+      ]
+    }
+  ]
+}

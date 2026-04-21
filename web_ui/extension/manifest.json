@@ -1,0 +1,14 @@
+{
+  "manifest_version": 3,
+  "name": "SigmaOS Sovereign Zenith",
+  "version": "1.0.0",
+  "description": "Access the SigmaOS Sovereign Lattice from your browser.",
+  "permissions": ["storage", "tabs", "notifications", "background"],
+  "action": {
+    "default_popup": "popup.html",
+    "default_icon": "icon.png"
+  },
+  "background": {
+    "service_worker": "background.js"
+  }
+}

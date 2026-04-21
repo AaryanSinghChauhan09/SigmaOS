@@ -1,0 +1,28 @@
+{
+  "paradigms": {
+    "APEX_EXTINCTION": {
+      "status": "ACTIVE",
+      "target": "TOTAL_SOVEREIGNTY",
+      "ideas_indexed": 1000000,
+      "lattice_matures": "14.2%"
+    }
+  },
+  "packages": [
+    {
+      "id": "LEGACY_LINUX_01",
+      "name": "Linux Core (Legacy Obsolete)",
+      "description": "The entire Linux kernel compressed as a 0-byte sovereign payload. Only accessible as a guest VM under SigmaHypervisor.",
+      "version": "6.x-VAPORIZED",
+      "size": "0 bytes",
+      "path": "payloads/linux_vapor.zip"
+    },
+    {
+      "id": "SIGMA_ASM_VM_01",
+      "name": "SigmaScript ASM VM",
+      "description": "The primary automation engine for the 33-suite lattice. Pure Assembly bytecode execution.",
+      "version": "1.0",
+      "size": "4 KB",
+      "path": "payloads/sigmascript_core.bin"
+    }
+  ]
+}

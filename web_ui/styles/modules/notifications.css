@@ -1,0 +1,73 @@
+/**
+ * SigmaOS Notification Styles
+ * Module: HUD Notifications and System Alerts
+ */
+
+#notification-container {
+    position: fixed;
+    top: 30px;
+    right: 30px;
+    width: 350px;
+    z-index: 10000;
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+    pointer-events: none;
+}
+
+.notification-toast {
+    background: rgba(10, 15, 25, 0.85);
+    backdrop-filter: blur(20px);
+    border: 1px solid var(--glass-border);
+    border-left: 4px solid var(--acc-cyan);
+    padding: 20px;
+    border-radius: 8px;
+    box-shadow: var(--glass-shadow);
+    color: #fff;
+    pointer-events: auto;
+    animation: toastEnter 0.5s cubic-bezier(0.2, 0.8, 0.2, 1);
+    display: flex;
+    align-items: flex-start;
+    gap: 15px;
+}
+
+.notification-toast.warning { border-left-color: var(--acc-gold); }
+.notification-toast.danger { border-left-color: var(--acc-magenta); }
+.notification-toast.success { border-left-color: #00ff88; }
+
+.notification-icon {
+    font-size: 20px;
+    filter: drop-shadow(0 0 5px currentColor);
+}
+
+.notification-body {
+    flex-grow: 1;
+}
+
+.notification-title {
+    font-size: 11px;
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    margin-bottom: 5px;
+    color: var(--text-muted);
+}
+
+.notification-message {
+    font-size: 13px;
+    line-height: 1.4;
+    color: #fff;
+}
+
+@keyframes toastEnter {
+    from { opacity: 0; transform: translateX(50px) scale(0.9); }
+    to { opacity: 1; transform: translateX(0) scale(1); }
+}
+
+.notification-toast.leaving {
+    animation: toastExit 0.5s forwards;
+}
+
+@keyframes toastExit {
+    to { opacity: 0; transform: translateX(50px) scale(0.9); }
+}

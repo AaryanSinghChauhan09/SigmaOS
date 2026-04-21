@@ -1,0 +1,224 @@
+/**
+ * SigmaOS Zenith Dashboard Styles
+ * Module: Dashboard Layout and Componentry
+ */
+
+.zenith-workspace {
+    display: flex;
+    height: 100vh;
+    background: radial-gradient(circle at center, #051015 0%, #000 100%);
+    overflow: hidden;
+    position: relative;
+}
+
+/* Sidebar & Navigation */
+.sovereign-sidebar {
+    width: 250px;
+    background: rgba(10, 20, 25, 0.7);
+    -webkit-backdrop-filter: blur(40px) saturate(180%);
+    backdrop-filter: blur(40px) saturate(180%);
+    border-right: 1px solid rgba(0, 255, 255, 0.1);
+    display: flex;
+    flex-direction: column;
+    z-index: 100;
+    box-shadow: 10px 0 30px rgba(0, 0, 0, 0.5);
+    transition: all 0.5s cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+
+.sidebar-brand {
+    padding: 30px;
+    text-align: center;
+}
+
+.brand-text {
+    font-size: 24px;
+    font-weight: 800;
+    letter-spacing: 5px;
+    background: linear-gradient(90deg, var(--acc-cyan), #fff);
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+    text-shadow: 0 0 20px var(--acc-cyan-low);
+}
+
+/* Tab Management */
+.nav-tabs {
+    flex-grow: 1;
+    padding: 20px 10px;
+}
+
+.tab-btn {
+    width: 100%;
+    padding: 15px;
+    margin-bottom: 10px;
+    background: transparent;
+    border: 1px solid transparent;
+    border-radius: 8px;
+    color: var(--txt-dim);
+    text-align: left;
+    cursor: pointer;
+    transition: all 0.3s;
+    font-family: var(--f-mono);
+    font-size: 13px;
+    display: flex;
+    align-items: center;
+    gap: 15px;
+}
+
+.tab-btn:hover {
+    background: rgba(0, 255, 255, 0.05);
+    color: #fff;
+    border-color: var(--acc-cyan-low);
+}
+
+.tab-btn.active {
+    background: linear-gradient(90deg, var(--acc-cyan-low), transparent);
+    border-left: 3px solid var(--acc-cyan);
+    color: var(--acc-cyan);
+}
+
+/* Main Display Area */
+.sovereign-display {
+    flex-grow: 1;
+    position: relative;
+    display: flex;
+    flex-direction: column;
+}
+
+.display-viewport {
+    flex-grow: 1;
+    position: relative;
+    padding: 30px;
+}
+
+.tab-content {
+    display: none;
+    height: 100%;
+    animation: slideUp 0.6s cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+
+.tab-content.active {
+    display: block;
+}
+
+@keyframes slideUp {
+    from { opacity: 0; transform: translateY(20px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+.dock-item {
+    transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275), background 0.3s;
+}
+
+.dock-item:hover {
+    transform: scale(1.3) translateY(-15px);
+    background: rgba(0, 255, 255, 0.1);
+}
+
+/* --- ZENITH SPOTLIGHT (Competitor Grade) --- */
+#spotlight-overlay {
+    position: fixed;
+    top: 0; left: 0; width: 100vw; height: 100vh;
+    background: rgba(0, 0, 0, 0.2);
+    backdrop-filter: blur(10px);
+    z-index: 10000;
+    display: none;
+    justify-content: center;
+    align-items: flex-start;
+    padding-top: 15vh;
+}
+
+.spotlight-box {
+    width: 600px;
+    background: rgba(15, 25, 30, 0.85);
+    backdrop-filter: blur(50px) saturate(200%);
+    border: 1px solid rgba(255, 255, 255, 0.15);
+    border-radius: 12px;
+    box-shadow: 0 30px 60px rgba(0, 0, 0, 0.8), 0 0 0 1px rgba(0, 255, 255, 0.1);
+    overflow: hidden;
+    animation: spotlightEntry 0.3s cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+
+@keyframes spotlightEntry {
+    from { opacity: 0; transform: scale(0.8) translateY(-20px); }
+    to { opacity: 1; transform: scale(1) translateY(0); }
+}
+
+.spotlight-input-area {
+    padding: 20px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    display: flex;
+    align-items: center;
+    gap: 15px;
+}
+
+.spotlight-input-area span { font-size: 24px; color: var(--acc-cyan); }
+
+#spotlight-input {
+    background: transparent;
+    border: none;
+    color: #fff;
+    font-size: 20px;
+    width: 100%;
+    outline: none;
+    font-family: var(--f-outfit);
+}
+
+.spotlight-results {
+    max-height: 400px;
+    overflow-y: auto;
+}
+
+.spotlight-item {
+    padding: 12px 20px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    cursor: pointer;
+    transition: 0.2s;
+    border-left: 3px solid transparent;
+}
+
+.spotlight-item:hover, .spotlight-item.active {
+    background: rgba(255, 255, 255, 0.05);
+    border-left-color: var(--acc-cyan);
+}
+
+.spotlight-item .item-title { font-weight: 600; color: #fff; }
+.spotlight-item .item-type { font-size: 10px; color: var(--txt-dim); opacity: 0.7; letter-spacing: 1px; }
+
+/* Command results styling for NeuralSearch v3.0 */
+.command-result-item {
+    padding: 12px 20px;
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    cursor: pointer;
+    transition: 0.2s;
+    border-left: 3px solid transparent;
+}
+
+.command-result-item:hover, .command-result-item.active {
+    background: rgba(0, 255, 255, 0.1);
+    border-left-color: var(--acc-cyan);
+}
+
+.res-icon { font-size: 18px; }
+.res-title { font-weight: 600; color: #fff; font-size: 14px; }
+.res-type { font-size: 10px; color: var(--acc-cyan); opacity: 0.7; letter-spacing: 1px; }
+
+.spotlight-msg {
+    padding: 30px;
+    text-align: center;
+    color: var(--txt-dim);
+    font-style: italic;
+}
+
+.spotlight-footer {
+    padding: 10px 20px;
+    background: rgba(0, 0, 0, 0.3);
+    font-size: 10px;
+    color: var(--txt-dim);
+    display: flex;
+    gap: 20px;
+}
