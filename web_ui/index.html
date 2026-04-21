@@ -4,6 +4,9 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Sovereign Zenith | SigmaOS</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
     <link rel="manifest" href="manifest.json">
     <link rel="apple-touch-icon" href="assets/logo.png">
     <meta name="theme-color" content="#00f2ff">
@@ -467,6 +470,7 @@
     <script src="scripts/modules/24_neural_bridge_ai.js"></script>
     <script src="scripts/modules/25_sovereign_sandbox.js"></script>
     <script src="scripts/modules/26_multi_tenancy_engine.js"></script>
+    <script src="scripts/modules/27_sovereign_profiler.js"></script>
 
     <script>
         // Initialize Sovereign Zenith Supremacy Suite
@@ -512,6 +516,7 @@
                 window.neural = new NeuralBridgeAI();
                 window.sandbox = new SovereignSandbox();
                 window.sessions = new MultiTenancyEngine();
+                window.profiler = new SovereignProfiler();
             }
 
             if ('serviceWorker' in navigator) {

@@ -74,7 +74,14 @@ class SovereignTerminal extends ZenithComponent {
                     this.write(`CURRENT SESSION: ${window.sessions.currentUser}`);
                 }
             },
-            'help': () => this.write('AVAILABLE: theme, ls, cd, cat, notify, shard, flush, stats, telemetry, set, get, vault, snapshot, tile, sandbox, session, clear, version'),
+            'top': () => {
+                const top = window.profiler.getTopProcesses();
+                this.write('Σ://PROFILER-TOP> Most Active Shards:');
+                top.forEach(p => {
+                    this.write(`- ${p.id.padEnd(6)} | ${p.cpu.padStart(5)}% CPU | ${p.mem.toString().padStart(4)}MB`);
+                });
+            },
+            'help': () => this.write('AVAILABLE: theme, ls, cd, cat, notify, shard, flush, stats, telemetry, set, get, vault, snapshot, tile, sandbox, session, top, clear, version'),
             'clear': () => this.output.innerHTML = '',
             'version': () => this.write('Σ SIGMAOS ZENITH v33.0.4-SINGULARITY'),
             
