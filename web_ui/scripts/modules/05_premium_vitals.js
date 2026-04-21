@@ -83,5 +83,6 @@ window.addEventListener('load', () => {
     EnvEngine.init();
     SettingsEngine.init();
     EffectsEngine.init();
+    AudioEngine.init();
     setTimeout(() => PremiumVitals.visualizeLattice(), 3000);
 });
