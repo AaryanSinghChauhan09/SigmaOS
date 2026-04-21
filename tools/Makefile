@@ -17,7 +17,8 @@ TOOLS = \
 	sigma-depgraph    \
 	sigpkg            \
 	sigma-modularize  \
-	sigma-purge
+	sigma-purge       \
+	sigma-stress
 
 .PHONY: all clean check install uninstall
 
@@ -57,6 +58,10 @@ sigma-modularize: dev/sovereign_modularize/sovereign_modularize.c
 sigma-purge: dev/sovereign_purge/sovereign_purge.c
 	$(CC) $(CFLAGS) $< -o $@
 	@echo "  [OK] sigma-purge    -> sovereign_purge"
+
+sigma-stress: dev/sovereign_stress/stress_tester.c
+	$(CC) $(CFLAGS) $< -o $@
+	@echo "  [OK] sigma-stress   -> stress_tester"
 
 
 # Dependency purity gate
