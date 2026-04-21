@@ -9,6 +9,7 @@
     <link rel="stylesheet" href="styles/modules/status.css">
     <link rel="stylesheet" href="styles/modules/windows.css">
     <link rel="stylesheet" href="styles/modules/notifications.css">
+    <link rel="stylesheet" href="styles/modules/overrides.css">
 </head>
 <body>
     <div class="sentient-background">
@@ -39,7 +40,7 @@
     <div id="boot-overlay" class="boot-overlay">
         <div class="boot-container glass-panel">
             <img src="splash.png" alt="SigmaOS Apex Infinity" class="boot-logo-img">
-            <div class="sigma-glyph huge-glyph" style="display:none;">Σ</div>
+            <div class="sigma-glyph huge-glyph">Σ</div>
             <h1 class="boot-title">SIGMAOS: EXTINCTION-1</h1>
             <p class="boot-subtitle">Pure Asm/C11 Lattice Initialized. 1,000,000 Directives Loaded. Linux extinction: 98% complete.</p>
             
@@ -51,32 +52,32 @@
     </div>
 
     <!-- macOS Inspired Mission Control Overlay -->
-    <div id="mission-control-overlay" class="view-layer hidden" style="z-index: 1500; background: rgba(0,0,0,0.85); -webkit-backdrop-filter: blur(25px); backdrop-filter: blur(25px); flex-direction: column; padding: 40px;">
-        <div style="display:flex; justify-content:space-between; align-items:center; border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 20px; margin-bottom: 30px;">
-            <h2 class="t-title highlight-cyan" style="font-size: 24px; letter-spacing: 4px;">WORKSPACE MISSION CONTROL</h2>
+    <div id="mission-control-overlay" class="view-layer hidden">
+        <div class="mission-control-header">
+            <h2 class="t-title highlight-cyan mission-control-title">WORKSPACE MISSION CONTROL</h2>
             <button class="cyber-btn" onclick="document.getElementById('mission-control-overlay').classList.add('hidden')">CLOSE</button>
         </div>
-        <div style="flex:1; display:grid; grid-template-columns: repeat(3, 1fr); gap: 30px; max-height: 400px;">
-            <div class="glass-panel" style="padding: 20px; text-align:center; display:flex; flex-direction:column; justify-content:center; transition:all 0.3s; cursor:pointer;" onmouseover="this.style.boxShadow='0 0 15px rgba(0, 240, 255, 0.5)'" onmouseout="this.style.boxShadow='none'">
-                <div style="font-size: 40px; margin-bottom: 15px;">📊</div>
-                <h3 style="color:#fff;">Analytics Dashboard</h3>
-                <p style="color:rgba(255,255,255,0.5); font-size: 12px; margin-top:5px;">3 Apps Open</p>
+        <div class="mission-control-grid">
+            <div class="glass-panel mission-panel" style="--hover-glow: rgba(0, 240, 255, 0.5)">
+                <div class="mission-icon">📊</div>
+                <h3 class="mission-name">Analytics Dashboard</h3>
+                <p class="mission-desc">3 Apps Open</p>
             </div>
-            <div class="glass-panel" style="padding: 20px; text-align:center; display:flex; flex-direction:column; justify-content:center; cursor:pointer;" onmouseover="this.style.boxShadow='0 0 15px rgba(255, 0, 85, 0.5)'" onmouseout="this.style.boxShadow='none'">
-                <div style="font-size: 40px; margin-bottom: 15px;">💻</div>
-                <h3 style="color:#fff;">Dev Environment (WSL Hook)</h3>
-                <p style="color:rgba(255,255,255,0.5); font-size: 12px; margin-top:5px;">VS Code + Docker</p>
+            <div class="glass-panel mission-panel" style="--hover-glow: rgba(255, 0, 85, 0.5)">
+                <div class="mission-icon">💻</div>
+                <h3 class="mission-name">Dev Environment (WSL Hook)</h3>
+                <p class="mission-desc">VS Code + Docker</p>
             </div>
-            <div class="glass-panel" style="padding: 20px; text-align:center; display:flex; flex-direction:column; justify-content:center; cursor:pointer;" onmouseover="this.style.boxShadow='0 0 15px rgba(138, 43, 226, 0.5)'" onmouseout="this.style.boxShadow='none'">
-                <div style="font-size: 40px; margin-bottom: 15px;">📝</div>
-                <h3 style="color:#fff;">Creative Studio</h3>
-                <p style="color:rgba(255,255,255,0.5); font-size: 12px; margin-top:5px;">Notes + Figma</p>
+            <div class="glass-panel mission-panel" style="--hover-glow: rgba(138, 43, 226, 0.5)">
+                <div class="mission-icon">📝</div>
+                <h3 class="mission-name">Creative Studio</h3>
+                <p class="mission-desc">Notes + Figma</p>
             </div>
         </div>
     </div>
     
     <!-- GUI Dashboard View -->
-    <div id="gui-view" class="view-layer hidden" style="flex-direction:row;">
+    <div id="gui-view" class="view-layer hidden">
         
         <!-- BrowserOS Vertical Tabs -->
         <div class="vertical-tabs" id="v-tabs">
@@ -84,10 +85,10 @@
             <div class="v-tab" title="BrowserOS Agent">🤖</div>
             <div class="v-tab" title="Browser-Use Cloud">☁️</div>
             <div class="v-tab" title="SOUL.md Memory">🧠</div>
-            <div class="v-tab" style="margin-top:auto; margin-bottom:20px;" title="Settings">⚙️</div>
+            <div class="v-tab v-tab-settings" title="Settings">⚙️</div>
         </div>
         
-        <div class="main-content-wrapper" style="flex:1; display:flex; flex-direction:column; overflow:hidden;">
+        <div class="main-content-wrapper">
             <header class="glass-panel main-header">
                 <div class="logo-container">
                 <div class="sigma-glyph">Σ</div>

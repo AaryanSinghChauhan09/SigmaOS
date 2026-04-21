@@ -1,0 +1,86 @@
+/**
+ * SigmaOS Interface Overrides
+ * Module: Removal of inline styles to ensure industrial-grade maintainability.
+ */
+
+/* Mission Control Overlay */
+#mission-control-overlay {
+    z-index: 1500;
+    background: rgba(0, 0, 0, 0.85);
+    -webkit-backdrop-filter: blur(25px);
+    backdrop-filter: blur(25px);
+    flex-direction: column;
+    padding: 40px;
+}
+
+.mission-control-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    padding-bottom: 20px;
+    margin-bottom: 30px;
+}
+
+.mission-control-title {
+    font-size: 24px;
+    letter-spacing: 4px;
+}
+
+.mission-control-grid {
+    flex: 1;
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 30px;
+    max-height: 400px;
+}
+
+.mission-panel {
+    padding: 20px;
+    text-align: center;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    transition: all 0.3s;
+    cursor: pointer;
+}
+
+.mission-panel:hover {
+    box-shadow: 0 0 15px var(--hover-glow);
+}
+
+.mission-icon {
+    font-size: 40px;
+    margin-bottom: 15px;
+}
+
+.mission-name {
+    color: #fff;
+}
+
+.mission-desc {
+    color: rgba(255, 255, 255, 0.5);
+    font-size: 12px;
+    margin-top: 5px;
+}
+
+/* GUI View & Vertical Tabs */
+#gui-view {
+    flex-direction: row;
+}
+
+.v-tab-settings {
+    margin-top: auto;
+    margin-bottom: 20px;
+}
+
+.main-content-wrapper {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+}
+
+.huge-glyph {
+    display: none;
+}
