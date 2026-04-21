@@ -89,5 +89,6 @@ window.addEventListener('load', () => {
     RecoveryHub.init();
     NeuralInterface.init();
     Accessibility.init();
+    ZenithDesktop.init();
     setTimeout(() => PremiumVitals.visualizeLattice(), 3000);
 });
