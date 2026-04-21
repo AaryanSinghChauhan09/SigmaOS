@@ -1,111 +1,43 @@
-document.addEventListener("DOMContentLoaded", () => {
-const cliOutput = document.getElementById('cli-output');
-    const cliInput = document.getElementById('cli-input');
-    let cliCurrentDir = '/';
+/**
+ * SigmaOS Sovereign Shell (UI)
+ * Module 02: Terminal emulation and interactive Sovereign CLI.
+ */
 
-    const renderCli = (html) => {
+document.addEventListener("DOMContentLoaded", () => {
+    const output = document.getElementById('shell-output');
+    const input = document.getElementById('shell-input');
+    const terminal = document.getElementById('cli-view');
+
+    const appendOutput = (text, type = 'normal') => {
+        if (!text) return;
         const div = document.createElement('div');
-        div.innerHTML = html;
-        cliOutput.appendChild(div);
-        cliOutput.scrollTop = cliOutput.scrollHeight;
+        div.className = `shell-line ${type}`;
+        div.textContent = text;
+        output.appendChild(div);
+        output.scrollTop = output.scrollHeight;
     };
 
-    cliInput.addEventListener('keydown', async (e) => {
-        if (e.key === 'Enter') {
-            const cmdText = cliInput.value.trim();
-            cliInput.value = '';
-            renderCli(`<div><span style="color:var(--acc-cyan)">root@sigma-zenith:${cliCurrentDir}#</span> ${cmdText}</div>`);
-            
-            if (!cmdText) return;
-            const args = cmdText.split(' ');
-            const cmd = args[0].toLowerCase();
+    const shellInterface = {
+        clear: () => { output.innerHTML = ''; }
+    };
 
-            switch (cmd) {
-                case 'help':
-                    renderCli(`<div style="color:#aaa">SigmaOS Sovereign Shell Commands:<br>
-                    - ls [dir] : List directory shards<br>
-                    - cat [file] : Read shard buffer<br>
-                    - cd [dir] : Traverse lattice nodes<br>
-                    - mkdir [name] : Create new shard node<br>
-                    - rm [name] : Neutralize node<br>
-                    - touch [name] : Materialize empty node<br>
-                    - ps : Monitor shard execution<br>
-                    - kill [pid] : Terminate execution<br>
-                    - ping [host] : Network vibration test<br>
-                    - ifconfig : Interface lattice config<br>
-                    - uname : OS identity<br>
-                    - whoami : Entity identity<br>
-                    - clear : Flush shell buffer<br>
-                    - gui : Switch to Zenith GUI mode</div><br>`);
-                    break;
-                case 'clear':
-                    cliOutput.innerHTML = '';
-                    break;
-                case 'gui':
-                    cliView.classList.add('hidden');
-                    guiView.classList.remove('hidden');
-                    setTimeout(window.simulateBootProcess, 500);
-                    window.loadDirectory('/');
-                    break;
-                case 'cd': {
-                    let dir = args[1] || '/';
-                    if (dir === '..') {
-                        if (cliCurrentDir !== '/') {
-                            const p = cliCurrentDir.split('/').filter(Boolean);
-                            p.pop();
-                            cliCurrentDir = '/' + p.join('/');
-                        }
-                    } else {
-                        if (!dir.startsWith('/')) {
-                            dir = cliCurrentDir === '/' ? `/${dir}` : `${cliCurrentDir}/${dir}`;
-                        }
-                        cliCurrentDir = dir;
-                    }
-                    try {
-                        const res = await fetch(`/api/fs?path=${encodeURIComponent(cliCurrentDir)}`);
-                        if (!res.ok) {
-                            renderCli(`<div style="color:#ff5f56">bash: cd: ${dir}: No such file or directory</div><br>`);
-                            cliCurrentDir = '/';
-                        }
-                    } catch(e) {
-                         renderCli(`<div style="color:#ff5f56">Network error communicating with file orchestrator.</div><br>`);
-                    }
-                    document.querySelector('.cli-prompt').textContent = `root@sigma-zenith:${cliCurrentDir}#`;
-                    break;
-                }
-                case 'clear':
-                    cliOutput.innerHTML = '';
-                    break;
-                default:
-                    // PILLAR 2: Run Real Native Commands
-                    try {
-                        const resp = await fetch('/api/run', {
-                            method: 'POST',
-                            headers: { 'Content-Type': 'application/json' },
-                            body: JSON.stringify({ cmd: cmdText, cwd: cliCurrentDir })
-                        });
-                        
-                        const reader = resp.body.getReader();
-                        const decoder = new TextDecoder("utf-8");
-                        
-                        let currentLine = document.createElement('div');
-                        currentLine.style.whiteSpace = 'pre-wrap';
-                        cliOutput.appendChild(currentLine);
-                        
-                        while(true) {
-                            const { done, value } = await reader.read();
-                            if (done) break;
-                            currentLine.innerHTML += decoder.decode(value).replace(/</g, '&lt;').replace(/>/g, '&gt;');
-                            cliOutput.scrollTop = cliOutput.scrollHeight;
-                        }
-                        renderCli('<br>');
-                    } catch(e) {
-                        renderCli(`<div style="color:#ff5f56">Engine Execution Error: ${e.message}</div><br>`);
-                    }
-            }
+    input.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter' && input.value.trim() !== '') {
+            const val = input.value.trim();
+            appendOutput(`Σ@SigmaOS:~$ ${val}`, 'command-echo');
+            
+            const response = SovereignShell.execute(val, shellInterface);
+            appendOutput(response, 'success');
+            
+            input.value = '';
         }
     });
 
-    // Make sure click on CLI empty space focuses input
-    cliView.addEventListener('click', () => cliInput.focus());
+    // Handle view switches
+    const observer = new MutationObserver(() => {
+        if (!terminal.classList.contains('hidden')) {
+            input.focus();
+        }
+    });
+    observer.observe(terminal, { attributes: true, attributeFilter: ['class'] });
 });
