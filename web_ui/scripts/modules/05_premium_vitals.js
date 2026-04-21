@@ -78,5 +78,6 @@ window.addEventListener('load', () => {
     PremiumVitals.init();
     CanvasAnims.init();
     MissionControl.init();
+    TaskManager.init();
     setTimeout(() => PremiumVitals.visualizeLattice(), 3000);
 });
