@@ -1,7 +1,9 @@
+/**
+ * SigmaOS Sovereign Window Manager (v1.1)
+ * Module 04: High-fidelity window orchestration and interaction.
+ */
+
 document.addEventListener("DOMContentLoaded", () => {
-    // SigmaOS Sovereign Window Manager (v1.0)
-    // Inspiration: Puter.js, OS.js
-    
     const desktop = document.body;
     let zIndexCounter = 1000;
 
@@ -21,9 +23,10 @@ document.addEventListener("DOMContentLoaded", () => {
                     <span>${title}</span>
                 </div>
                 <div class="window-controls">
+                    <span class="w-tile" title="Auto-Tile Layout" style="cursor:pointer; margin-right:8px; font-size:10px;">🔳</span>
                     <span class="w-min">_</span>
                     <span class="w-max">▢</span>
-                    <span class="w-close" onclick="this.closest('.sovereign-window').remove()">✕</span>
+                    <span class="w-close">✕</span>
                 </div>
             </div>
             <div class="window-content">
@@ -33,7 +36,14 @@ document.addEventListener("DOMContentLoaded", () => {
         `;
 
         desktop.appendChild(win);
+        
+        // Control Hooks
+        win.querySelector('.w-close').onclick = () => win.remove();
+        win.querySelector('.w-tile').onclick = () => SovereignLayout.tileWindows();
+        
         makeDraggable(win);
+        UIUtils.appendLog('audit-log', `Window Manifested: ${title}`, 'success');
+        
         return win;
     };
 
@@ -44,6 +54,7 @@ document.addEventListener("DOMContentLoaded", () => {
         header.onmousedown = dragMouseDown;
 
         function dragMouseDown(e) {
+            if (e.target.closest('.window-controls')) return;
             e.preventDefault();
             zIndexCounter++;
             el.style.zIndex = zIndexCounter;
