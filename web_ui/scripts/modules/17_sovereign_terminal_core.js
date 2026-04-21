@@ -118,7 +118,16 @@ class SovereignTerminal extends ZenithComponent {
                     this.write('Σ://ERROR> NEURAL FIREWALL OFFLINE.');
                 }
             },
-            'help': () => this.write('AVAILABLE: theme, ls, cd, cat, ql, notify, shard, flush, stats, telemetry, set, get, vault, snapshot, tile, sandbox, session, top, prof, shortcuts, window, focus, audit, clear, version'),
+            'mem': (args) => {
+                if (window.pager) {
+                    if (args[0]) {
+                        this.write(`Σ://MEMORY> Fetching Page: ${args[0]}`);
+                        window.pager.requestPage(args[0]);
+                    }
+                    this.write(`Σ://MEMORY> ${window.pager.getStats()}`);
+                }
+            },
+            'help': () => this.write('AVAILABLE: theme, ls, cd, cat, ql, notify, shard, flush, stats, telemetry, set, get, vault, snapshot, tile, sandbox, session, top, prof, shortcuts, window, focus, audit, mem, clear, version'),
             'clear': () => this.output.innerHTML = '',
             'version': () => this.write('Σ SIGMAOS ZENITH v33.0.4-SINGULARITY'),
             

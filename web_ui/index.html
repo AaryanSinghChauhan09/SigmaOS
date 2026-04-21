@@ -478,6 +478,7 @@
     <script src="scripts/modules/31_sovereign_focus_mode.js"></script>
     <script src="scripts/modules/32_sovereign_quick_look.js"></script>
     <script src="scripts/modules/33_sentinel_neural_firewall.js"></script>
+    <script src="scripts/modules/34_sovereign_adaptive_pager.js"></script>
 
     <script>
         // Initialize Sovereign Zenith Supremacy Suite
@@ -530,6 +531,7 @@
                 window.focusManager = new SovereignFocusMode();
                 window.quicklook = new SovereignQuickLook();
                 window.firewall = new SentinelNeuralFirewall();
+                window.pager = new SovereignAdaptivePager(8); // Set 8 pages max
             }
 
             if ('serviceWorker' in navigator) {
