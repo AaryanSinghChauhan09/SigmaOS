@@ -476,6 +476,7 @@
     <script src="scripts/modules/29_notification_center.js"></script>
     <script src="scripts/modules/30_sovereign_window_manager.js"></script>
     <script src="scripts/modules/31_sovereign_focus_mode.js"></script>
+    <script src="scripts/modules/32_sovereign_quick_look.js"></script>
 
     <script>
         // Initialize Sovereign Zenith Supremacy Suite
@@ -526,6 +527,7 @@
                 window.notifier = new NotificationCenter();
                 window.wm = new SovereignWindowManager();
                 window.focusManager = new SovereignFocusMode();
+                window.quicklook = new SovereignQuickLook();
             }
 
             if ('serviceWorker' in navigator) {
