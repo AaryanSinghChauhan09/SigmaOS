@@ -15,6 +15,7 @@
 .sovereign-sidebar {
     width: 250px;
     background: rgba(5, 10, 15, 0.8);
+    -webkit-backdrop-filter: blur(20px);
     backdrop-filter: blur(20px);
     border-right: 1px solid var(--acc-cyan-low);
     display: flex;
@@ -34,6 +35,7 @@
     letter-spacing: 5px;
     background: linear-gradient(90deg, var(--acc-cyan), #fff);
     -webkit-background-clip: text;
+    background-clip: text;
     -webkit-text-fill-color: transparent;
     text-shadow: 0 0 20px var(--acc-cyan-low);
 }

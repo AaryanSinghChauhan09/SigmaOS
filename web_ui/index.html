@@ -218,7 +218,7 @@
                         <div class="ai-body">
                             <div class="ai-segment">
                                 <h3 class="segment-title">LLM Synchronization</h3>
-                                <select class="ai-select">
+                                <select class="ai-select" title="LLM Provider Selection">
                                     <option>Local Ollama (Llama 3 8B)</option>
                                     <option>Local LM Studio (DeepSeek)</option>
                                     <option>Claude 3 Opus (Anthropic API)</option>
@@ -248,7 +248,7 @@
                                 <h3 class="segment-title">Browser-Use Autopilot</h3>
                                 <div class="toggle-row">
                                     <span>Target Web Engine: </span>
-                                    <select class="ai-select inline-select">
+                                    <select class="ai-select inline-select" title="Target Web Engine">
                                         <option>Local Open-Source Chromium</option>
                                         <option selected>Browser Use Cloud (Stealth + Captcha)</option>
                                     </select>
@@ -411,6 +411,7 @@
 
     
     <!-- Core Logic Modules -->
+    <script src="scripts/modules/00_accessibility.js"></script>
     <script src="scripts/modules/00_log_processor.js"></script>
     <script src="scripts/modules/00_neural_interface.js"></script>
     <script src="scripts/modules/00_process_manager.js"></script>
