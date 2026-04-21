@@ -93,10 +93,14 @@ class SovereignTerminal extends ZenithComponent {
                 window.notifier.push('CLI_MSG', args.join(' '));
                 this.write(`Σ://NOTIFY> LOGGED: ${args.join(' ')}`);
             },
-            'window': (args) => {
-                window.wm.spawn(args[0], args[1] || 'APP', args.slice(2).join(' ') || 'WORKSPACE_READY');
+            'focus': () => {
+                if (window.focusManager) {
+                    window.focusManager.toggle();
+                } else {
+                    this.write('Σ://ERROR> FOCUS MANAGER OFFLINE.');
+                }
             },
-            'help': () => this.write('AVAILABLE: theme, ls, cd, cat, notify, shard, flush, stats, telemetry, set, get, vault, snapshot, tile, sandbox, session, top, prof, shortcuts, window, clear, version'),
+            'help': () => this.write('AVAILABLE: theme, ls, cd, cat, notify, shard, flush, stats, telemetry, set, get, vault, snapshot, tile, sandbox, session, top, prof, shortcuts, window, focus, clear, version'),
             'clear': () => this.output.innerHTML = '',
             'version': () => this.write('Σ SIGMAOS ZENITH v33.0.4-SINGULARITY'),
             
