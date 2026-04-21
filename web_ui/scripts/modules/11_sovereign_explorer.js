@@ -7,17 +7,22 @@
 class SovereignExplorer extends ZenithComponent {
     constructor() {
         super('explorer-view');
-        this.currentPath = '/sigma/root';
+        this.currentPath = '/';
         this.vfs = {
-            '/sigma/root': [
+            '/': [
                 { name: 'kernel', type: 'dir' },
                 { name: 'userland', type: 'dir' },
-                { name: 'SOUL.md', type: 'file', content: 'Σ://IDENTITY_STREAM > Sovereignty engaged.' },
-                { name: 'config.sys', type: 'file', content: 'LATTICE_MODE=APEX\nSECURITY=SUPREME' }
+                { name: 'SOUL.md', type: 'file', content: '# Σ SIGMAOS ZENITH\nSentience achieved.' },
+                { name: 'lattice.sys', type: 'file', content: 'LATTICE_CORE_v33' }
             ],
-            '/sigma/root/kernel': [
-                { name: 'shards', type: 'dir' },
-                { name: 'core.c', type: 'file', content: 'void _start() { // Silicon Singularity }' }
+            '/kernel': [
+                { name: 'core.c', type: 'file', content: 'void kmain() { ... }' },
+                { name: 'sigmabpf.o', type: 'file', content: '[BINARY_SHARD]' },
+                { name: 'suites', type: 'dir' }
+            ],
+            '/userland': [
+                { name: 'init.js', type: 'file', content: 'Sigma.boot();' },
+                { name: 'shell.bin', type: 'file', content: '[SOVEREIGN_SHELL]' }
             ]
         };
         this.init();

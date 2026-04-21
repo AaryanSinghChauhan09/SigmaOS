@@ -61,7 +61,12 @@
             <h1 class="boot-title">SIGMAOS: EXTINCTION-1</h1>
             <p class="boot-subtitle">Pure Asm/C11 Lattice Initialized. 1,000,000 Directives Loaded. Linux extinction: 98% complete.</p>
             
-            <div class="boot-options">
+            <div class="boot-progress-container">
+                <div class="boot-progress-bar" id="boot-progress"></div>
+                <div class="boot-progress-status" id="boot-status">INITIALIZING SILICON LATTICE...</div>
+            </div>
+            
+            <div class="boot-options hidden" id="boot-actions">
                 <button class="cyber-btn" id="btn-gui" data-text="START ZENITH GUI">START ZENITH GUI</button>
                 <button class="cyber-btn secondary" id="btn-cli" data-text="DROP TO SHELL (CLI)">DROP TO SHELL (CLI)</button>
             </div>
@@ -83,12 +88,12 @@
     <div id="gui-view" class="view-layer hidden">
         
         <!-- BrowserOS Vertical Tabs -->
-        <div class="vertical-tabs" id="v-tabs">
-            <div class="v-tab active" title="Sigma OS Kernel">Σ</div>
-            <div class="v-tab" title="BrowserOS Agent">🤖</div>
-            <div class="v-tab" title="Browser-Use Cloud">☁️</div>
-            <div class="v-tab" title="SOUL.md Memory">🧠</div>
-            <div class="v-tab v-tab-settings" title="Settings">⚙️</div>
+        <div class="vertical-tabs" id="v-tabs" role="tablist">
+            <div class="v-tab active" title="Sigma OS Kernel" role="tab" aria-label="Kernel Intelligence">Σ</div>
+            <div class="v-tab" title="BrowserOS Agent" role="tab" aria-label="Agentic Orchestrator">🤖</div>
+            <div class="v-tab" title="Browser-Use Cloud" role="tab" aria-label="Cloud Shards">☁️</div>
+            <div class="v-tab" title="SOUL.md Memory" role="tab" aria-label="System Memory">🧠</div>
+            <div class="v-tab v-tab-settings" title="Settings" role="tab" aria-label="Sovereign Settings">⚙️</div>
         </div>
         
         <div class="main-content-wrapper">
@@ -449,6 +454,24 @@
     <script>
         // Initialize Sovereign Zenith Supremacy Suite
         window.addEventListener('load', () => {
+            const bar = document.getElementById('boot-progress');
+            const status = document.getElementById('boot-status');
+            const actions = document.getElementById('boot-actions');
+            let progress = 0;
+
+            const sync = setInterval(() => {
+                progress += Math.random() * 8;
+                if (progress >= 100) {
+                    progress = 100;
+                    clearInterval(sync);
+                    status.textContent = 'LATTICE SYNCHRONIZED. WELCOME, Ʃ_ZENITH.';
+                    actions.classList.remove('hidden');
+                }
+                if (bar) bar.style.width = progress + '%';
+                if (progress > 30 && progress < 70) status.textContent = 'MAPPING NEURAL CORE...';
+                if (progress > 70 && progress < 100) status.textContent = 'ARMING GHOST SHARDS...';
+            }, 100);
+
             if (window.ZenithSystem) {
                 window.zenith = new ZenithSystem();
                 window.zenith.boot();

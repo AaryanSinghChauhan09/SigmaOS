@@ -23,7 +23,17 @@ class SovereignTerminal extends ZenithComponent {
 
     registerCoreCommands() {
         this.commands = {
-            'help': () => this.write('AVAILABLE: theme, ls, cd, cat, notify, shard, flush, clear, version'),
+            'stats': () => {
+                this.write('Σ://CORE> Performance Metrics:');
+                this.write(`- SHARDS_ACTIVE: 33/33`);
+                this.write(`- LATENCY: ${Math.random().toFixed(2)}ms`);
+                this.write(`- NEURAL_YIELD: 100%`);
+            },
+            'telemetry': () => {
+                window.zenith.taskbar.notify('BROADCASTING LATTICE TELEMETRY', 'STABLE');
+                this.write('Σ://NET> Packet Stream Initialized...');
+            },
+            'help': () => this.write('AVAILABLE: theme, ls, cd, cat, notify, shard, flush, stats, telemetry, set, get, clear, version'),
             'clear': () => this.output.innerHTML = '',
             'version': () => this.write('Σ SIGMAOS ZENITH v33.0.4-SINGULARITY'),
             
