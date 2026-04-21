@@ -1,22 +1,25 @@
-# SigmaOS Sovereign Lattice Roadmap
+# SigmaOS Sovereign Lattice Roadmap & Triage
 
-To transition SigmaOS from a novel, bare-metal WASM architecture into an industrial-grade competitor against Windows 11, macOS, and mainstream Linux distributions, the following pillars must be structurally integrated into the 33-suite Lattice:
+## 🚨 Phase 1: Critical Must-Haves (Immediate Focus)
+These are essential for SigmaOS to be usable and competitive.
+*   **Driver Support & Hardware Compatibility:** `drivers/` - GPU, Wi-Fi, printers, peripherals.
+*   **Security & Trust:** `core/security/` - Secure Boot, TPM integration, WASM Sandboxing, Sovereign Vault encryption.
+*   **App Ecosystem (WASM):** `plugins/wasm/` - The decentralized shard repository to replace APT/Snaps.
+*   **UI Polish & Accessibility:** `ui/window_manager/` - High-DPI scaling, multi-monitor support, centered glassmorphic taskbar, integrated readers.
+*   **Networking Stack:** `networking/` - VPN (WireGuard), enterprise networking.
+*   **Update & Backup:** `services/` - Atomic OTA updates and timeline restores.
+*   **Core Productivity:** Browser integration and essential WASM applications.
 
-## Phase 1: Zenith Interface & User Experience (UI/UX)
-*   **Epic 1: Polished & Fluent UI:** Bridge the gap with macOS/Windows 11 by finalizing the Zenith Web UI using Mica-effect transparency, fluid micro-animations, and centralized task management.
-*   **Epic 2: Advanced Display & Input:** Implement multi-monitor bridging, display scaling (HiDPI), and touch/pen mapping from the bare-metal kernel right up to the Zenith interface.
-*   **Epic 3: Accessibility Core:** Standardize scaling, high-contrast theming, and an integrated screen reader at the `ui/accessibility` shard level.
+## ⚡ Phase 2: Medium-Term Imperatives (The Polish Phase)
+These make SigmaOS universally appealing but aren’t boot-level blockers.
+*   **Cloud Integration:** Native synchronization for network drives.
+*   **Dual-Boot & Virtualization:** Cross-compatibility for KVM/Proton to ensure Adobe/Gaming functionality.
+*   **Enterprise Tooling:** Provisioning and policy locking via `core/security/`.
+*   **Cross-Architecture Builds:** Ensure the core boots flawlessly on ARM and RISC-V.
+*   **Monitoring & Power:** Task orchestration, battery/ACPI management, and hybrid GPU switching.
 
-## Phase 2: WASM Ecosystem & Security Matrix
-*   **Epic 1: Absolute App Isolation:** Enforce WASM Sandboxing to outperform macOS Gatekeeper and Ubuntu AppArmor. Shards must run in 100% memory-bounded JIT execution.
-*   **Epic 2: The Sovereign App Store:** Define a decentralized or repository-based package mechanism entirely built around WASM payloads instead of traditional thick binaries (.exe, .deb).
-*   **Epic 3: Trust Anchors:** Incorporate TPM 2.0 integration and Enterprise-grade encryption (Sovereign Vault equivalents to BitLocker/LUKS) natively into the `core/security` kernel module.
-
-## Phase 3: Hardware Independence & Virtualization
-*   **Epic 1: Cross-OS Dual-Boot Parity:** Refine the ability to transparently host traditional Linux/Windows hypervisors through the WASM boundary to provide Office, Adobe, and Gaming compatibility out of the box.
-*   **Epic 2: Universal Driver Contracts:** Expand `SovereignDriver.h` to encompass GPU acceleration (critical for the UI), networking, and modern peripheral classes (Bluetooth, VR, Midi).
-*   **Epic 3: Power State Management:** Build out ACPI/power management inside `core/kernel` to handle sleep states and hybrid graphics switching.
-
-## Phase 4: Cloud & Service Orchestration
-*   **Epic 1: Seamless Networking Ecosystem:** Embed Zero-Trust VPN (WireGuard protocol) and enterprise networking directly into the `networking/vpn` layer.
-*   **Epic 2: Sovereign Update Manager:** Write atomic, OTA-style update layers in `services/update` mirroring ChromeOS or immutable Linux designs to ensure unbreakable updates.
+## 🌱 Phase 3: Long-Term Vision (Market Dominance)
+*   **Shard Ecosystem:** A robust developer marketplace for community plugins.
+*   **Enterprise Support & Certifications:** Proving the hardware/software lattice for enterprise adoption.
+*   **Advanced Ergonomics:** Voice, gestures, and fluid macOS-tier aesthetics across all user interactions.
+*   **Deep Cloud-Native Layers:** Built-in orchestration to replace Kubernetes bloat.
