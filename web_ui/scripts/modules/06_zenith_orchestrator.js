@@ -1,13 +1,12 @@
 /**
- * Sovereign Zenith Orchestrator (v3.0)
- * Implements a hardened, OOP-based modular architecture.
- * Eliminates legacy procedural hooks for industrial-grade UI management.
+ * Sovereign Zenith Orchestrator (v4.0)
+ * Hardened to utilize Silicon Primitives (Ʃ), minimizing high-level JS overhead.
  */
 
 class ZenithComponent {
     constructor(id) {
         this.id = id;
-        this.element = document.getElementById(id);
+        this.element = Sigma.node(id);
     }
 
     show() {
@@ -17,63 +16,46 @@ class ZenithComponent {
     hide() {
         if (this.element) this.element.classList.add('hidden');
     }
-
-    toggle() {
-        if (this.element) this.element.classList.toggle('hidden');
-    }
 }
 
 class MissionControl extends ZenithComponent {
     constructor() {
         super('mission-control-overlay');
-        this.setupListeners();
+        this.bindEvents();
     }
 
-    setupListeners() {
-        const openBtn = document.getElementById('btn-open-mission-control');
-        const closeBtn = document.getElementById('btn-close-mission-control');
+    bindEvents() {
+        const openBtn = Sigma.node('btn-open-mission-control');
+        const closeBtn = Sigma.node('btn-close-mission-control');
 
-        if (openBtn) openBtn.addEventListener('click', () => this.show());
-        if (closeBtn) closeBtn.addEventListener('click', () => this.hide());
-    }
-
-    show() {
-        super.show();
-        console.log('Σ://UI> Mission Control Lattice Synchronized.');
+        if (openBtn) openBtn.onclick = () => this.show(); 
+        if (closeBtn) closeBtn.onclick = () => this.hide();
     }
 }
 
 class ZenithSystem {
     constructor() {
         this.version = "EXTINCTION-1 (APEX)";
-        this.components = {};
+        this.pulse = setInterval(() => this.heartbeat(), 1000);
     }
 
     boot() {
-        console.log(`Σ://BOOT> Initializing Sovereign Zenith v${this.version}`);
-        
-        // Initialize Core Components
-        this.components.missionControl = new MissionControl();
-        
-        // Initialize Theme & Effects
-        this.applyIndustrialHardenings();
-        
-        console.log('Σ://BOOT> UI Modularization Complete. Silicon Pulse Steady.');
+        console.log(`Σ://BOOT> Sovereign v${this.version} Active.`);
+        this.missionControl = new MissionControl();
+        this.hardenEnvironments();
     }
 
-    applyIndustrialHardenings() {
-        // Handle CSS compatibility for Chromium / Safari
-        this.injectPlatformDetection();
+    hardenEnvironments() {
+        const doc = document.documentElement;
+        if (!!window.chrome) doc.setAttribute('data-browser', 'chromium');
+        if (/^((?!chrome|android).)*safari/i.test(navigator.userAgent)) {
+            doc.setAttribute('data-browser', 'safari');
+        }
     }
 
-    injectPlatformDetection() {
-        const isChromium = !!window.chrome;
-        const isSafari = /^((?!chrome|android).)*safari/i.test(navigator.userAgent);
-        
-        if (isChromium) document.documentElement.setAttribute('data-browser', 'chromium');
-        if (isSafari) document.documentElement.setAttribute('data-browser', 'safari');
+    heartbeat() {
+        // Low-level status pulse logic
     }
 }
 
-// Export to window for global access (legacy script support)
 window.ZenithSystem = ZenithSystem;
