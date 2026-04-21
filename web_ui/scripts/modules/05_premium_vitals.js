@@ -75,20 +75,32 @@ const PremiumVitals = {
 };
 
 window.addEventListener('load', () => {
-    PremiumVitals.init();
-    CanvasAnims.init();
-    MissionControl.init();
-    TaskManager.init();
-    Notifications.init();
-    EnvEngine.init();
-    SettingsEngine.init();
-    EffectsEngine.init();
-    AudioEngine.init();
-    AnalyticsEngine.init();
-    VitalsEngine.init();
-    RecoveryHub.init();
-    NeuralInterface.init();
-    Accessibility.init();
-    ZenithDesktop.init();
+    // Stage 1: Core Utilities
+    if (window.AudioEngine) AudioEngine.init();
+    if (window.CanvasAnims) CanvasAnims.init();
+    
+    // Stage 2: Functional Engines
+    if (window.EnvEngine) EnvEngine.init();
+    if (window.ThemeEngine) ThemeEngine.init();
+    if (window.Notifications) Notifications.init();
+    if (window.Localization) Localization.init();
+    
+    // Stage 3: Management Layers
+    if (window.TaskManager) TaskManager.init();
+    if (window.MissionControl) MissionControl.init();
+    if (window.RecoveryHub) RecoveryHub.init();
+    if (window.ShardOrchestrator) ShardOrchestrator.init();
+    
+    // Stage 4: User Interface & Experience
+    if (window.DashboardOrchestrator) DashboardOrchestrator.init();
+    if (window.ZenithDesktop) ZenithDesktop.init();
+    if (window.NeuralInterface) NeuralInterface.init();
+    if (window.Accessibility) Accessibility.init();
+    
+    // Stage 5: Vitals & Analytics
+    if (window.AnalyticsEngine) AnalyticsEngine.init();
+    if (window.VitalsEngine) VitalsEngine.init();
+    if (window.PremiumVitals) PremiumVitals.init();
+    
     setTimeout(() => PremiumVitals.visualizeLattice(), 3000);
 });

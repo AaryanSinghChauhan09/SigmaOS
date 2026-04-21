@@ -4,6 +4,9 @@
  */
 
 const ThemeEngine = {
+    init() {
+        console.log("Σ Theme Engine: Silicate Aesthetics Online.");
+    },
     themes: {
         'zenith': { primary: '#00ffea', secondary: '#7000ff', accent: '#ff00ff' },
         'matrix': { primary: '#00ff41', secondary: '#003b00', accent: '#008f11' },

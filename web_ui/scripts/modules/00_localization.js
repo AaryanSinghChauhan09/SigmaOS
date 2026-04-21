@@ -4,6 +4,9 @@
  */
 
 const Localization = {
+    init() {
+        console.log("Σ Localization: Multi-silicate support active.");
+    },
     currentLang: 'en',
     
     strings: {
