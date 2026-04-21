@@ -459,6 +459,9 @@
     <script src="scripts/modules/17_sovereign_terminal_core.js"></script>
     <script src="scripts/modules/18_sovereign_settings.js"></script>
     <script src="scripts/modules/19_apex_telemetry_viz.js"></script>
+    <script src="scripts/modules/20_sigma_vault.js"></script>
+    <script src="scripts/modules/21_lattice_snapshot_engine.js"></script>
+    <script src="scripts/modules/22_tiling_engine.js"></script>
 
     <script>
         // Initialize Sovereign Zenith Supremacy Suite
@@ -497,6 +500,9 @@
                 window.terminal = new SovereignTerminal();
                 window.settings = new SovereignSettings();
                 window.viz = new ApexTelemetryViz();
+                window.vault = new SigmaVault();
+                window.snapshots = new SnapshotEngine();
+                window.tiling = new TilingEngine();
             }
 
             if ('serviceWorker' in navigator) {

@@ -37,17 +37,26 @@ class SovereignTerminal extends ZenithComponent {
 
     registerCoreCommands() {
         this.commands = {
-            'stats': () => {
-                this.write('Σ://CORE> Performance Metrics:');
-                this.write(`- SHARDS_ACTIVE: 33/33`);
-                this.write(`- LATENCY: ${Math.random().toFixed(2)}ms`);
-                this.write(`- NEURAL_YIELD: 100%`);
+            'vault': (args) => {
+                const sub = args[0];
+                if (sub === 'install') {
+                    window.vault.install(args[1]);
+                } else {
+                    this.write('VAULT PACKAGES: S34_MediaNexus, S35_QuantumCrypt, S36_NeuralLink');
+                }
             },
-            'telemetry': () => {
-                window.zenith.taskbar.notify('BROADCASTING LATTICE TELEMETRY', 'STABLE');
-                this.write('Σ://NET> Packet Stream Initialized...');
+            'snapshot': (args) => {
+                const sub = args[0];
+                if (sub === 'create') {
+                    window.snapshots.createSnapshot(args[1]);
+                } else if (sub === 'rollback') {
+                    window.snapshots.rollback(args[1]);
+                } else {
+                    this.write('USAGE: snapshot [create|rollback] [id/label]');
+                }
             },
-            'help': () => this.write('AVAILABLE: theme, ls, cd, cat, notify, shard, flush, stats, telemetry, set, get, clear, version'),
+            'tile': () => window.tiling.toggle(),
+            'help': () => this.write('AVAILABLE: theme, ls, cd, cat, notify, shard, flush, stats, telemetry, set, get, vault, snapshot, tile, clear, version'),
             'clear': () => this.output.innerHTML = '',
             'version': () => this.write('Σ SIGMAOS ZENITH v33.0.4-SINGULARITY'),
             
