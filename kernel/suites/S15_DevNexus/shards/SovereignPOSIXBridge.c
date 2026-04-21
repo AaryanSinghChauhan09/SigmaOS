@@ -17,11 +17,20 @@ void devnexus_translate_posix(uint32_t syscall_id) {
     
     // Symbolic mapping logic
     switch(syscall_id) {
+        case 0: // read
+            sigma_printf("  [MAPPING]: Mapping Linux 'read' to S06_Storage read_shard.\n");
+            break;
         case 1: // write
-            sigma_printf("  [MAPPING]: Mapping Linux 'write' to S05_Storage write shard.\n");
+            sigma_printf("  [MAPPING]: Mapping Linux 'write' to S06_Storage write_shard.\n");
             break;
         case 2: // open
-            sigma_printf("  [MAPPING]: Mapping Linux 'open' to S05_Storage vfs_open shard.\n");
+            sigma_printf("  [MAPPING]: Mapping Linux 'open' to S06_Storage vfs_open shard.\n");
+            break;
+        case 9: // mmap
+            sigma_printf("  [MAPPING]: Mapping Linux 'mmap' to S05_Memory page_alloc shard.\n");
+            break;
+        case 12: // brk
+            sigma_printf("  [MAPPING]: Mapping Linux 'brk' to S05_Memory heap_expand shard.\n");
             break;
         default:
             sigma_printf("  [WARNING]: Unhandled POSIX syscall %d. Emulating via S19 Recovery.\n", syscall_id);
