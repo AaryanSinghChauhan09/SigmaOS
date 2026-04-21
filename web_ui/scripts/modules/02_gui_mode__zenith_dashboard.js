@@ -4,24 +4,10 @@
  */
 
 document.addEventListener("DOMContentLoaded", () => {
-    const grid = document.getElementById('lattice-grid');
     const coverageVal = document.getElementById('coverage-val');
     
-    // 1. Initialize Lattice Grid from SovereignRegistry
-    SovereignRegistry.getAllSuites().forEach(suite => {
-        const card = document.createElement('div');
-        card.className = 'suite-card';
-        card.id = `suite-${suite.id}`;
-        card.innerHTML = `
-            <span class="s-id">SUITE // ${suite.id}</span>
-            <span class="s-name">${suite.name}</span>
-            <div class="s-icon" style="font-size:24px; margin:10px 0;">${suite.icon}</div>
-            <div class="s-status"></div>
-        `;
-        // Tooltip logic
-        card.title = suite.desc;
-        grid.appendChild(card);
-    });
+    // 1. Initialize Lattice Visualizer
+    LatticeVisualizer.init('lattice-grid');
 
     // 2. Start Sub-Systems
     SovereignTelemetry.init();
@@ -34,10 +20,9 @@ document.addEventListener("DOMContentLoaded", () => {
         const suites = SovereignRegistry.getAllSuites();
         for (let i = 0; i < suites.length; i++) {
             const suite = suites[i];
-            await new Promise(r => setTimeout(r, 50 + Math.random() * 100));
+            await new Promise(r => setTimeout(r, 40 + Math.random() * 80));
             
-            const el = document.getElementById(`suite-${suite.id}`);
-            if (el) el.classList.add('loaded');
+            LatticeVisualizer.updateSuiteStatus(suite.id, 'active');
             
             const hash = Math.random().toString(16).substr(2, 8);
             UIUtils.appendLog('audit-log', `Integrity Verified: ${suite.id}_${suite.name} (0x${hash})`, 'success');
