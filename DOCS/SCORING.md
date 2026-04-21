@@ -2,7 +2,7 @@
 
 This document tracks the quantitative maturity of SigmaOS against enterprise-ready operating systems based on a 100-point scale. 
 
-**Current Score:** **59/100** -> *Semi-professional / Developer OS*
+**Current Score:** **66/100** -> *Semi-professional / Developer OS*
 **Target Score (Phase 1):** **70/100** -> *Professional OS*
 
 ## Baseline Score Assessment
@@ -35,11 +35,11 @@ This document tracks the quantitative maturity of SigmaOS against enterprise-rea
 *   **[0]** VPN/firewall/cloud sync (Missing)
 *   **[0]** Remote desktop (Missing)
 
-### 📊 System Management (3/10 pts)
+### 📊 System Management (10/10 pts)
 *   **[+3]** Diagnostics tools (Internal panic state capture)
-*   **[0]** Update manager/rollback (Missing)
+*   **[+3]** Update manager/rollback (A/B Partition Logic Implemented)
 *   **[0]** Backup/restore (Missing)
-*   **[0]** Crash reporting (Missing)
+*   **[+4]** Crash reporting (IDT Fault Telemetry Implemented)
 
 ### 🎮 Multimedia & Gaming (0/5 pts)
 *   **[0]** GPU driver/game mode/codec packs (Missing)
@@ -57,9 +57,9 @@ Executing these 10 items will transition SigmaOS into a competitive "Professiona
 1.  [x] Basic Package Manager CLI (+5 pts) (Implemented `shards-cli`)
 2.  [x] Accessibility Suite Foundation (+5 pts) (Implemented)
 3.  [ ] Basic Office Suite Integration (+5 pts)
-4.  [ ] Crash Reporting System / Telemetry (+4 pts)
+4.  [x] Crash Reporting System / Telemetry (+4 pts) (Implemented `CrashReporter.h`)
 5.  [ ] Documentation Expansion (+3 pts)
-6.  [ ] Update Manager with Rollback (+3 pts)
+6.  [x] Update Manager with Rollback (+3 pts) (Implemented `SovereignUpdater.h`)
 7.  [ ] Backup & Restore Utility (+3 pts)
 8.  [ ] Firewall GUI (+3 pts)
 9.  [ ] VPN Manager GUI (+3 pts)
