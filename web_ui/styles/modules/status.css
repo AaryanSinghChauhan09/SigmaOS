@@ -1,0 +1,68 @@
+/**
+ * SigmaOS System Status Styles
+ * Module: Vitals, Analytics, and Telemetry Componentry
+ */
+
+/* Vitals Cards */
+.vitals-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 20px;
+    margin-bottom: 30px;
+}
+
+.vitals-card {
+    background: rgba(255, 255, 255, 0.03);
+    border: 1px solid var(--glass-border);
+    padding: 20px;
+    border-radius: 12px;
+    position: relative;
+    overflow: hidden;
+    transition: var(--transition-smooth);
+}
+
+.vitals-card::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; width: 3px; height: 100%;
+    background: var(--acc-cyan);
+    box-shadow: var(--glow-cyan);
+}
+
+.vitals-card:hover {
+    background: rgba(255, 255, 255, 0.07);
+    transform: translateY(-5px);
+}
+
+.vitals-label {
+    font-size: 11px;
+    text-transform: uppercase;
+    color: var(--text-muted);
+    margin-bottom: 10px;
+    display: block;
+    letter-spacing: 2px;
+}
+
+.vitals-value {
+    font-size: 28px;
+    font-weight: 800;
+    font-family: var(--f-mono);
+    color: #fff;
+}
+
+/* Analytics Chart Stubs */
+.chart-container {
+    height: 150px;
+    width: 100%;
+    margin-top: 15px;
+    display: flex;
+    align-items: flex-end;
+    gap: 2px;
+}
+
+.chart-bar {
+    flex-grow: 1;
+    background: linear-gradient(to top, var(--acc-cyan-low), var(--acc-cyan));
+    opacity: 0.7;
+    transition: height 0.5s;
+}
