@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SigmaOS: Sovereign Installer</title>
+    <link rel="stylesheet" href="styles/style.css">
+    <link rel="stylesheet" href="styles/modules/dashboard.css">
+    <style>
+        .install-box {
+            max-width: 600px;
+            margin: 100px auto;
+            text-align: center;
+        }
+        .step-indicator {
+            margin: 20px 0;
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+        }
+        .step-dot {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            background: rgba(255,255,255,0.2);
+        }
+        .step-dot.active {
+            background: var(--magenta-primary);
+            box-shadow: 0 0 10px var(--magenta-primary);
+        }
+    </style>
+</head>
+<body class="sentient-background">
+    <div class="sentient-background">
+        <div class="grid-overlay"></div>
+        <div class="vignette"></div>
+    </div>
+
+    <div class="install-box glass-panel">
+        <h1 class="t-title highlight-magenta">SOVEREIGN INSTALLER</h1>
+        <p class="boot-subtitle">Manifesting the 33-Suite Lattice on local silicate.</p>
+        
+        <div class="step-indicator">
+            <div class="step-dot active"></div>
+            <div class="step-dot"></div>
+            <div class="step-dot"></div>
+            <div class="step-dot"></div>
+        </div>
+
+        <div id="install-status" style="margin-top: 30px; font-family: monospace; color: var(--cyan-primary);">
+            READY TO INITIALIZE LATTICE...
+        </div>
+
+        <button class="cyber-btn" onclick="InstallerEngine.nextStep()" style="margin-top: 40px;">PROCEED TO PARTITIONING</button>
+    </div>
+
+    <script src="scripts/modules/00_ui_utils.js"></script>
+    <script src="scripts/modules/00_installer_engine.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', () => InstallerEngine.init());
+    </script>
+</body>
+</html>
