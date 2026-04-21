@@ -16,6 +16,7 @@
     <link rel="stylesheet" href="styles/modules/overrides.css">
     <link rel="stylesheet" href="styles/modules/lattice_visualizer.css">
     <link rel="stylesheet" href="styles/modules/aether_pulse.css">
+    <link rel="stylesheet" href="styles/modules/notifications_v2.css">
 
     <!-- Dependency Virtualization: fonts.googleapis.com (Satisfies CI Gate while maintaining zero-dependency purity) -->
 </head>
@@ -24,6 +25,9 @@
         <!-- Legacy Orbs Neutralized for Canvas Supremacy -->
         <div class="mesh-grid"></div>
     </div>
+
+    <!-- Sovereign Notification Tray -->
+    <div id="system-notifications"></div>
 
     <!-- Sovereign Command Bar (Omnibox) -->
     <div id="command-bar" class="command-bar-overlay hidden">
@@ -427,6 +431,8 @@
     <script src="scripts/modules/07_lattice_visualizer_v2.js"></script>
     <script src="scripts/modules/09_mica_flux.js"></script>
     <script src="scripts/modules/09_aether_pulse.js"></script>
+    <script src="scripts/modules/10_sovereign_taskbar.js"></script>
+    <script src="scripts/modules/11_sovereign_explorer.js"></script>
 
     <script>
         // Initialize Sovereign Zenith Supremacy Suite
@@ -437,6 +443,8 @@
                 window.lattice = new LatticeVisualizer();
                 window.flux = new MicaFluxEngine();
                 window.pulse = new AetherPulse();
+                window.taskbar = new SovereignTaskbar();
+                window.explorer = new SovereignExplorer();
             }
 
             if ('serviceWorker' in navigator) {
