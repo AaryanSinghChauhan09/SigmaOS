@@ -11,6 +11,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
     // 2. Start Sub-Systems
     SovereignTelemetry.init();
+    DashboardOrchestrator.init();
 
     // 3. Sovereign Boot Simulation
     const simulateBootProcess = async () => {
@@ -33,16 +34,6 @@ document.addEventListener("DOMContentLoaded", () => {
         UIUtils.appendLog('audit-log', 'ALL 33 SUITES MATERIALLY HARMONIZED.', 'system');
         UIUtils.appendLog('audit-log', 'SOVEREIGNTY ASCENDED.', 'system');
     };
-
-    // 4. Tab Management
-    document.querySelectorAll('.tab-btn').forEach(btn => {
-        btn.addEventListener('click', () => {
-            document.querySelectorAll('.tab-btn, .tab-content').forEach(el => el.classList.remove('active'));
-            btn.classList.add('active');
-            const content = document.getElementById(btn.dataset.tab);
-            if (content) content.classList.add('active');
-        });
-    });
 
     // 5. Explorer Integration
     const explorerList = document.getElementById('explorer-list');
