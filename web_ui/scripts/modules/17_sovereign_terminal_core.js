@@ -9,6 +9,8 @@ class SovereignTerminal extends ZenithComponent {
         super('cli-input-box');
         this.output = Sigma.node('cli-output');
         this.commands = {};
+        this.history = [];
+        this.historyIndex = -1;
         this.init();
     }
 
@@ -16,9 +18,21 @@ class SovereignTerminal extends ZenithComponent {
         this.registerCoreCommands();
         if (this.element) {
             this.element.addEventListener('keydown', (e) => {
-                if (e.key === 'Enter') this.processCommand(e.target.value);
+                if (e.key === 'Enter') {
+                    this.processCommand(e.target.value);
+                } else if (e.key === 'ArrowUp') {
+                    this.navigateHistory(1);
+                } else if (e.key === 'ArrowDown') {
+                    this.navigateHistory(-1);
+                }
             });
         }
+    }
+
+    navigateHistory(dir) {
+        if (this.history.length === 0) return;
+        this.historyIndex = Math.min(Math.max(this.historyIndex + dir, 0), this.history.length - 1);
+        this.element.value = this.history[this.history.length - 1 - this.historyIndex];
     }
 
     registerCoreCommands() {
@@ -109,6 +123,10 @@ class SovereignTerminal extends ZenithComponent {
     }
 
     processCommand(raw) {
+        if (!raw.trim()) return;
+        this.history.push(raw);
+        this.historyIndex = -1;
+        
         const parts = raw.trim().split(' ');
         const cmd = parts[0].toLowerCase();
         const args = parts.slice(1);

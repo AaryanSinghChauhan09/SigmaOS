@@ -12,6 +12,7 @@ class SovereignSettings extends ZenithComponent {
             opacity: 0.6,
             accent: '#00f0ff',
             fontScale: 1.0,
+            mode: 'DARK',
             privacyShield: true,
             heartbeat: 2000
         };
@@ -42,6 +43,15 @@ class SovereignSettings extends ZenithComponent {
             case 'opacity': root.style.setProperty('--mica-opacity', value); break;
             case 'accent': root.style.setProperty('--acc-cyan', value); break;
             case 'fontScale': root.style.setProperty('font-size', `${value * 16}px`); break;
+            case 'mode': 
+                if (value === 'LIGHT') {
+                    root.style.setProperty('--txt-main', '#000');
+                    root.style.setProperty('--gui-bg', 'rgba(255, 255, 255, 0.1)');
+                } else {
+                    root.style.setProperty('--txt-main', '#fff');
+                    root.style.setProperty('--gui-bg', 'rgba(10, 20, 25, 0.7)');
+                }
+                break;
             case 'privacyShield': Sigma.guard(); break; // Re-fire guard
         }
     }
