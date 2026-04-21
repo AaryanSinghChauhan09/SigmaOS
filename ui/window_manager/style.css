@@ -279,3 +279,41 @@ body {
     font-size: 11px;
     color: var(--text-secondary);
 }
+
+/* === ACCESSIBILITY (HIGH CONTRAST) === */
+body.high-contrast {
+    --bg-wallpaper: #000000;
+    --glass-bg: #000000;
+    --glass-border: #FFFF00;
+    --glass-blur: none;
+    --text-primary: #FFFFFF;
+    --text-secondary: #FFFF00;
+    --accent: #FFFF00;
+    background: var(--bg-wallpaper);
+}
+
+body.high-contrast .window, 
+body.high-contrast .taskbar-inner, 
+body.high-contrast .tray-pill, 
+body.high-contrast .search-box,
+body.high-contrast .settings-sidebar,
+body.high-contrast .status-card {
+    background: #000000 !important;
+    backdrop-filter: none !important;
+    border: 2px solid #FFFF00 !important;
+    box-shadow: none !important;
+}
+
+body.high-contrast p, 
+body.high-contrast .window-title, 
+body.high-contrast .search-hint,
+body.high-contrast li {
+    color: #FFFF00 !important;
+}
+
+body.high-contrast .active, 
+body.high-contrast .launcher-btn {
+    background: #FFFF00 !important;
+    color: #000 !important;
+    border: none !important;
+}

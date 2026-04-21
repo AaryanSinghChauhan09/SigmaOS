@@ -24,6 +24,7 @@
             
             <div class="system-tray">
                 <div class="tray-pill">
+                    <button class="sys-btn" id="a11y-toggle" title="Accessibility (High Contrast & Speech)" style="background:transparent; border:none; cursor:pointer; font-size:16px;">👁️</button>
                     <span class="icon">🔋</span>
                     <span class="icon">📶</span>
                     <span class="time" id="clock">10:42 AM</span>
@@ -107,6 +108,20 @@
             if (e.code === 'Escape' && !searchOverlay.classList.contains('hidden')) {
                 searchOverlay.classList.add('hidden');
                 searchInput.value = '';
+            }
+        });
+
+        // Accessibility Suite Toggle (High Contrast + Speech)
+        document.getElementById('a11y-toggle').addEventListener('click', () => {
+            document.body.classList.toggle('high-contrast');
+            
+            // Screen reader scaffold
+            if(document.body.classList.contains('high-contrast')) {
+                let msg = new SpeechSynthesisUtterance("High contrast accessibility mode enabled");
+                window.speechSynthesis.speak(msg);
+            } else {
+                let msg = new SpeechSynthesisUtterance("Standard display mode enabled");
+                window.speechSynthesis.speak(msg);
             }
         });
     </script>
