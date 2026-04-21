@@ -86,5 +86,6 @@ window.addEventListener('load', () => {
     AudioEngine.init();
     AnalyticsEngine.init();
     VitalsEngine.init();
+    RecoveryHub.init();
     setTimeout(() => PremiumVitals.visualizeLattice(), 3000);
 });
