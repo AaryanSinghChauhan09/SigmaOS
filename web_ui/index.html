@@ -9,6 +9,7 @@
     <meta name="theme-color" content="#00f2ff">
     <meta name="theme-color" content="#00f2ff" media="(prefers-color-scheme: light)">
     <meta name="theme-color" content="#000000" media="(prefers-color-scheme: dark)">
+    <link rel="stylesheet" href="styles/modules/core_tokens.css">
     <link rel="stylesheet" href="styles/style.css">
     <link rel="stylesheet" href="styles/modules/dashboard.css">
     <link rel="stylesheet" href="styles/modules/status.css">
@@ -465,6 +466,7 @@
     <script src="scripts/modules/23_sovereign_handoff.js"></script>
     <script src="scripts/modules/24_neural_bridge_ai.js"></script>
     <script src="scripts/modules/25_sovereign_sandbox.js"></script>
+    <script src="scripts/modules/26_multi_tenancy_engine.js"></script>
 
     <script>
         // Initialize Sovereign Zenith Supremacy Suite
@@ -509,6 +511,7 @@
                 window.handoff = new SovereignHandoff();
                 window.neural = new NeuralBridgeAI();
                 window.sandbox = new SovereignSandbox();
+                window.sessions = new MultiTenancyEngine();
             }
 
             if ('serviceWorker' in navigator) {
