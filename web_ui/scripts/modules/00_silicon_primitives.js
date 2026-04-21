@@ -1,7 +1,7 @@
 /**
  * SigmaOS Silicon Primitives (v1.0)
- * Low-level operational overrides to reduce dependency on high-level JS globals.
- * Industrial-grade performance optimized for the Sovereign Lattice.
+ * LOW-LEVEL OVERRIDES: ELIMINATING HIGH-LEVEL JS DEPENDENCIES.
+ * Minimal reliance on prototype methods (forEach, map) and browser globals.
  */
 
 const Ʃ = {
@@ -14,7 +14,7 @@ const Ʃ = {
         return this._cache[id];
     },
 
-    // Hand-rolled Iteration Logic (Avoiding HOF overhead)
+    // Raw Hand-rolled Iteration (Zero HOF/Callback overhead where possible)
     each: function(arr, fn) {
         if (!arr) return;
         const len = arr.length;
@@ -23,21 +23,48 @@ const Ʃ = {
         }
     },
 
-    // Zero-Dependency Status Mapping
-    statusColor: function(level) {
-        switch(level) {
-            case 'CRITICAL': return '#ff0055';
-            case 'OPTIMAL':  return '#00f2ff';
-            case 'STABLE':   return '#8a2be2';
-            default:         return '#ffffff';
+    // Sovereign Memory Manager (UI Heap)
+    Heap: class {
+        constructor(size) {
+            this.p = new Array(size);
+            this.i = 0;
+            console.log('Σ://HEAP> Allocated ' + size + ' UI slots.');
+        }
+        alloc(o) {
+            if (this.i >= this.p.length) this.i = 0;
+            this.p[this.i++] = o;
+            return this.i - 1;
         }
     },
 
-    // Manual String Concatenation for DOM injection (avoiding costly template parsers)
-    inject: function(targetId, html) {
-        const el = this.node(targetId);
-        if (el) el.innerHTML = html;
+    // RAW Attribute proxy
+    attr: function(el, k, v) {
+        if (v === undefined) return el.getAttribute(k);
+        el.setAttribute(k, v);
     }
 };
 
 window.Sigma = Ʃ;
+window.uiHeap = new Ʃ.Heap(100);
+
+/**
+ * ZenithComponent (Base)
+ * High-performance UI lifecycle primitives.
+ */
+class ZenithComponent {
+    constructor(id) {
+        this.id = id;
+        this.element = Sigma.node(id);
+        this.hIdx = window.uiHeap.alloc(this);
+    }
+
+    show() {
+        if (this.element) this.element.classList.remove('hidden');
+    }
+
+    hide() {
+        if (this.element) this.element.classList.add('hidden');
+    }
+}
+
+window.ZenithComponent = ZenithComponent;
