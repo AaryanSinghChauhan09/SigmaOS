@@ -82,6 +82,15 @@ class SovereignTerminal extends ZenithComponent {
                 this.write('Σ://LOGS> [AUTH] USER Ʃ_ZENITH AUTHENTICATED.');
                 this.write('Σ://LOGS> [LATTICE] 33 SUITES ONLINE.');
             },
+            'set': (args) => {
+                if (args.length < 2) return this.write('USAGE: set [key] [value]');
+                window.settings.set(args[0], args[1]);
+                this.write(`SYSTEM SYNC: ${args[0]} = ${args[1]}`);
+            },
+            'get': (args) => {
+                if (!args[0]) return this.write(JSON.stringify(window.settings.config, null, 2));
+                this.write(`${args[0]}: ${window.settings.config[args[0]]}`);
+            },
             'flush': () => {
                 console.log('Σ://KERNEL> Flushing Silicon Primitives...');
                 this.write('MEMORY FLUSH COMPLETE.');

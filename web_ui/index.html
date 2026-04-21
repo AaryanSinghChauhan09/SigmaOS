@@ -444,6 +444,7 @@
     <script src="scripts/modules/15_local_inference_shard.js"></script>
     <script src="scripts/modules/16_ghost_sharding_sim.js"></script>
     <script src="scripts/modules/17_sovereign_terminal_core.js"></script>
+    <script src="scripts/modules/18_sovereign_settings.js"></script>
 
     <script>
         // Initialize Sovereign Zenith Supremacy Suite
@@ -462,6 +463,7 @@
                 window.ai = new AIInferenceShard();
                 window.sharding = new GhostShardingEngine();
                 window.terminal = new SovereignTerminal();
+                window.settings = new SovereignSettings();
             }
 
             if ('serviceWorker' in navigator) {
