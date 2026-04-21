@@ -9,14 +9,9 @@ const UIUtils = {
     },
 
     appendLog(containerId, message, type = 'normal') {
-        const log = document.getElementById(containerId);
-        if (!log) return;
-        
-        const entry = document.createElement('div');
-        entry.className = `log-entry ${type}`;
-        entry.innerHTML = `<span class="timestamp">${this.getTimestamp()}</span> ${message}`;
-        log.appendChild(entry);
-        log.scrollTop = log.scrollHeight;
+        if (window.LogProcessor) {
+            LogProcessor.append(containerId, message, type);
+        }
     },
 
     pulseElement(el, shadow = '0 0 30px var(--acc-cyan)', duration = 1000) {
