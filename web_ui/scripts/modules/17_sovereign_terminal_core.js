@@ -72,6 +72,16 @@ class SovereignTerminal extends ZenithComponent {
             },
 
             // System Maintenance
+            'vitals': () => {
+                this.write(`LATTICE HEALTH: 98.4% [OPTIMAL]`);
+                this.write(`WASM JIT LOAD: 2.1%`);
+                this.write(`MEMORY USAGE: 144MB / 4G`);
+            },
+            'logs': () => {
+                this.write('Σ://LOGS> [BOOT] SOVEREIGN KERNEL v33.0.4 LOADED.');
+                this.write('Σ://LOGS> [AUTH] USER Ʃ_ZENITH AUTHENTICATED.');
+                this.write('Σ://LOGS> [LATTICE] 33 SUITES ONLINE.');
+            },
             'flush': () => {
                 console.log('Σ://KERNEL> Flushing Silicon Primitives...');
                 this.write('MEMORY FLUSH COMPLETE.');
