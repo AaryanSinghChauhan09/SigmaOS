@@ -4,6 +4,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Sovereign Zenith | SigmaOS</title>
+    <link rel="manifest" href="manifest.json">
+    <meta name="theme-color" content="#00f2ff">
     <link rel="stylesheet" href="styles/style.css">
     <link rel="stylesheet" href="styles/modules/dashboard.css">
     <link rel="stylesheet" href="styles/modules/status.css">
@@ -417,5 +419,14 @@
     <script src="scripts/modules/05_premium_vitals.js"></script>
     <script src="scripts/modules/05_sovereign_stress_tester.js"></script>
 
+    <script>
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', () => {
+                navigator.serviceWorker.register('service-worker.js')
+                    .then(reg => console.log('Σ://BOOT> ServiceWorker Active.', reg.scope))
+                    .catch(err => console.warn('Σ://BOOT> ServiceWorker Failure.', err));
+            });
+        }
+    </script>
 </body>
 </html>
