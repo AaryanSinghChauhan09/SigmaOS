@@ -68,6 +68,15 @@
 
     </div>
 
+    <!-- Universal Search (Spotlight / PowerToys Run style) -->
+    <div id="universal-search" class="hidden">
+        <div class="search-box glass-content">
+            <span class="search-icon">🔍</span>
+            <input type="text" id="search-input" placeholder="Search SigmaOS... (Apps, Files, Settings)">
+            <span class="search-hint">Press Esc to close</span>
+        </div>
+    </div>
+
     <script>
         // Start live clock for UI
         function updateClock() {
@@ -80,6 +89,26 @@
         }
         setInterval(updateClock, 1000);
         updateClock();
+
+        // Universal Search Toggle Logic
+        const searchOverlay = document.getElementById('universal-search');
+        const searchInput = document.getElementById('search-input');
+        
+        document.addEventListener('keydown', (e) => {
+            // Trigger on Ctrl+Space or Meta+Space
+            if ((e.ctrlKey || e.metaKey) && e.code === 'Space') {
+                e.preventDefault();
+                searchOverlay.classList.toggle('hidden');
+                if(!searchOverlay.classList.contains('hidden')) {
+                    searchInput.focus();
+                }
+            }
+            // Close on Escape
+            if (e.code === 'Escape' && !searchOverlay.classList.contains('hidden')) {
+                searchOverlay.classList.add('hidden');
+                searchInput.value = '';
+            }
+        });
     </script>
 </body>
 </html>

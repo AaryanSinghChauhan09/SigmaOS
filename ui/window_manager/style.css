@@ -214,3 +214,68 @@ body {
     justify-content: space-between;
 }
 .status-card.ok span { color: var(--win-max); font-family: monospace; font-size: 12px; }
+
+/* === UNIVERSAL SEARCH (SPOTLIGHT) === */
+#universal-search {
+    position: absolute;
+    top: 0; left: 0; width: 100vw; height: 100vh;
+    background: rgba(0,0,0,0.4);
+    backdrop-filter: blur(8px);
+    display: flex;
+    justify-content: center;
+    align-items: flex-start;
+    padding-top: 15vh;
+    z-index: 1000;
+    transition: opacity 0.2s;
+}
+
+#universal-search.hidden {
+    opacity: 0;
+    pointer-events: none;
+}
+
+.search-box {
+    width: 650px;
+    background: rgba(25, 25, 35, 0.85);
+    backdrop-filter: var(--glass-blur);
+    border: 1px solid var(--glass-border);
+    border-radius: 16px;
+    display: flex;
+    align-items: center;
+    padding: 15px 25px;
+    box-shadow: var(--shadow-heavy);
+    transform: translateY(0);
+    transition: transform 0.3s cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+
+#universal-search.hidden .search-box {
+    transform: translateY(-20px) scale(0.98);
+}
+
+.search-icon {
+    font-size: 24px;
+    margin-right: 15px;
+    opacity: 0.7;
+}
+
+#search-input {
+    flex: 1;
+    background: transparent;
+    border: none;
+    outline: none;
+    color: var(--text-primary);
+    font-size: 20px;
+    font-family: inherit;
+}
+
+#search-input::placeholder {
+    color: var(--text-secondary);
+}
+
+.search-hint {
+    background: rgba(255,255,255,0.1);
+    padding: 4px 8px;
+    border-radius: 6px;
+    font-size: 11px;
+    color: var(--text-secondary);
+}
