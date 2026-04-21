@@ -10,6 +10,14 @@
 #ifndef SIGMA_HOST_BRIDGE_H
 #define SIGMA_HOST_BRIDGE_H
 
+/* Pre-empt kernel headers to avoid redefinition conflicts */
+#ifndef SIGMA_LIBC_H
+#define SIGMA_LIBC_H
+#endif
+#ifndef SOVEREIGN_COMMON_H
+#define SOVEREIGN_COMMON_H
+#endif
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -30,6 +38,9 @@ typedef int8_t             sigma_i8;
 typedef int16_t            sigma_i16;
 typedef int32_t            sigma_i32;
 typedef int64_t            sigma_i64;
+typedef uint64_t           sigma_uptr;
+typedef int64_t            sigma_ssz_t;
+typedef int32_t            sigma_err_t;
 typedef bool               sigma_bool;
 
 #define SIGMA_TRUE         true

@@ -5,9 +5,6 @@ on:
   pull_request:
     branches: ["main"]
 
-env:
-  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
-
 jobs:
   purity_and_toolchain:
     name: "Purity Gate and Native Toolchain"
@@ -24,7 +21,7 @@ jobs:
 
       - name: Compile Sovereign Toolchain
         run: |
-          make -C tools sigma-audit sigma-test sigma-wiki sigma-shell sigma-depgraph sigpkg sigma-modularize sigma-purge
+          make -C tools all
           mkdir -p bin
           cp tools/sigma-* bin/ 2>/dev/null || true
           cp tools/sigpkg bin/ 2>/dev/null || true
@@ -145,4 +142,4 @@ jobs:
           git config user.name  "sigma-bot"
           git config user.email "bot@sigmaos.dev"
           git add WIKI/AUTO_SOVEREIGN_WIKI.md
-          git diff --cached --quiet || (git commit -m "docs(wiki): auto-update sovereign shard index [skip ci]" && git push)
+          git diff --cached --quiet || (git commit -m "docs(wiki): auto-update sovereign shard index [skip ci]" && git push origin main)
