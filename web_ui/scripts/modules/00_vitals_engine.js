@@ -20,7 +20,9 @@ const VitalsEngine = {
     },
 
     calculateHealth() {
-        // Symbolic calculation based on active subsystems
+        if (window.VitalsService) {
+            return VitalsService.computeHealth().stability;
+        }
         return 95 + Math.random() * 5;
     },
 
