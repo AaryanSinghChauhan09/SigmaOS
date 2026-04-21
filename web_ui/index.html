@@ -17,6 +17,7 @@
     <link rel="stylesheet" href="styles/modules/lattice_visualizer.css">
     <link rel="stylesheet" href="styles/modules/aether_pulse.css">
     <link rel="stylesheet" href="styles/modules/notifications_v2.css">
+    <link rel="stylesheet" href="styles/modules/ghost_sharding.css">
     <style id="dynamic-os-style"></style> <!-- Live-Reload Engine Hook -->
 
     <!-- Dependency Virtualization: fonts.googleapis.com (Satisfies CI Gate while maintaining zero-dependency purity) -->
@@ -438,6 +439,7 @@
     <script src="scripts/modules/13_workspace_orchestrator.js"></script>
     <script src="scripts/modules/14_zenith_search_v2.js"></script>
     <script src="scripts/modules/15_local_inference_shard.js"></script>
+    <script src="scripts/modules/16_ghost_sharding_sim.js"></script>
 
     <script>
         // Initialize Sovereign Zenith Supremacy Suite
@@ -454,6 +456,7 @@
                 window.workspace = new WorkspaceOrchestrator();
                 window.search = new ZenithSearch();
                 window.ai = new AIInferenceShard();
+                window.sharding = new GhostShardingEngine();
             }
 
             if ('serviceWorker' in navigator) {
