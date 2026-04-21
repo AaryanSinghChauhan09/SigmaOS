@@ -26,18 +26,25 @@ document.addEventListener('DOMContentLoaded', () => {
         }
 
         const win = document.createElement('div');
-        win.className = 'sovereign-window glass-panel';
+        
+        // Register PID
+        const pid = window.ProcessManager
+            ? ProcessManager.registerShard('S02_ZenithUI', title, 'NORMAL')
+            : (Date.now() % 10000);
+
         win.style.cssText = `
             width: ${options.width || '620px'};
             height: ${options.height || '420px'};
             top: ${options.top || (80 + windowRegistry.size * 30) + 'px'};
             left: ${options.left || (80 + windowRegistry.size * 30) + 'px'};
-            z-index: ${++zIndexCounter};
             position: fixed;
         `;
+        win.className = 'sovereign-window active-window s-scrollbar-styled';
+        win.id = `win-${pid}`;
+        win.style.zIndex = ++zIndexCounter;
 
         win.innerHTML = `
-            <div class="window-header">
+            <div class="window-header s-user-select-none">
                 <div class="window-title">
                     <span class="window-icon">${options.icon || '💠'}</span>
                     <span>${title}</span>
@@ -49,18 +56,13 @@ document.addEventListener('DOMContentLoaded', () => {
                     <span class="w-close" title="Close">✕</span>
                 </div>
             </div>
-            <div class="window-body" style="height: calc(100% - 44px); overflow: auto; padding: 12px; box-sizing: border-box;">
+            <div class="window-body s-scrollbar-styled">
                 ${content}
             </div>
             <div class="window-resizer"></div>
         `;
 
         document.body.appendChild(win);
-
-        // Register PID
-        const pid = window.ProcessManager
-            ? ProcessManager.registerShard('S02_ZenithUI', title, 'NORMAL')
-            : null;
         windowRegistry.set(title, { el: win, pid });
 
         // Controls
@@ -87,8 +89,17 @@ document.addEventListener('DOMContentLoaded', () => {
             win.style.display = (win.style.display === 'none') ? '' : 'none';
         };
 
-        win.querySelector('.w-tile').onclick = () => {
-            tileAllWindows();
+        win.querySelector('.w-tile').onclick = (e) => {
+            if (e.shiftKey) {
+                // Secondary Snap: Right 50%
+                Object.assign(win.style, { width: '50vw', height: '100vh', top: '0', left: '50vw' });
+            } else if (e.ctrlKey) {
+                // Tertiary Snap: Left 50%
+                Object.assign(win.style, { width: '50vw', height: '100vh', top: '0', left: '0' });
+            } else {
+                tileAllWindows();
+            }
+            UIUtils.appendLog('audit-log', `Window: [${title}] snapped to lattice region.`, 'info');
         };
 
         _makeDraggable(win, zIndexCounter);

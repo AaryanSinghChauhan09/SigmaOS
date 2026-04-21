@@ -39,8 +39,9 @@
     background: rgba(255,255,255,0.04);
     border-bottom: 1px solid var(--glass-border);
     cursor: move;
-    user-select: none;
     flex-shrink: 0;
+    -webkit-user-select: none;
+    user-select: none;
 }
 
 .window-title {
@@ -92,6 +93,24 @@
     padding: 16px;
     scrollbar-width: thin;
     scrollbar-color: var(--acc-cyan-low) transparent;
+}
+
+.window-body::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
+}
+
+.window-body::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+.window-body::-webkit-scrollbar-thumb {
+    background: var(--acc-cyan-low);
+    border-radius: 10px;
+}
+
+.window-body::-webkit-scrollbar-thumb:hover {
+    background: var(--acc-cyan);
 }
 
 /* ── Resize Handle ────────────────────────────────────────────── */

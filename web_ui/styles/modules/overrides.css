@@ -3,84 +3,136 @@
  * Module: Removal of inline styles to ensure industrial-grade maintainability.
  */
 
-/* Mission Control Overlay */
-#mission-control-overlay {
-    z-index: 1500;
-    background: rgba(0, 0, 0, 0.85);
-    -webkit-backdrop-filter: blur(25px);
-    backdrop-filter: blur(25px);
-    flex-direction: column;
-    padding: 40px;
+/* Mission Panel Variants */
+.mission-analytics { --hover-glow: rgba(0, 240, 255, 0.5); }
+.mission-dev { --hover-glow: rgba(255, 0, 85, 0.5); }
+.mission-creative { --hover-glow: rgba(138, 43, 226, 0.5); }
+
+/* Telemetry & Header Utilities */
+.telemetry-actions {
+    margin-left: 20px;
+    justify-content: center;
 }
 
-.mission-control-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-    padding-bottom: 20px;
-    margin-bottom: 30px;
-}
+/* Tab Accent Utilities */
+.tab-gold { color: var(--acc-gold); text-shadow: 0 0 5px var(--acc-gold); }
+.tab-magenta { color: var(--acc-magenta); text-shadow: 0 0 5px var(--acc-magenta); }
 
-.mission-control-title {
-    font-size: 24px;
-    letter-spacing: 4px;
-}
-
-.mission-control-grid {
-    flex: 1;
+/* Workspace Orchestrator Utilities */
+.workspace-grid-3 {
     display: grid;
-    grid-template-columns: repeat(3, 1fr);
-    gap: 30px;
-    max-height: 400px;
+    grid-template-columns: 1fr 1fr 1fr;
+    gap: 20px;
 }
 
-.mission-panel {
+.workspace-card {
     padding: 20px;
     text-align: center;
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    transition: all 0.3s;
-    cursor: pointer;
 }
 
-.mission-panel:hover {
-    box-shadow: 0 0 15px var(--hover-glow);
-}
+.workspace-card-cyan { border-color: var(--acc-cyan); }
 
-.mission-icon {
-    font-size: 40px;
+.card-icon-large { font-size: 30px; }
+.card-title-spaced { margin-top: 10px; }
+.card-desc-tiny { font-size: 10px; color: var(--text-muted); }
+.card-action-full { margin-top: 15px; width: 100%; }
+
+/* Automation Theme Utilities */
+.text-purple { color: #8a2be2; }
+.font-size-16 { font-size: 16px; }
+.border-purple { border-color: #8a2be2; }
+.text-purple-bright { color: #8a2be2; }
+
+.routine-segment-desc {
+    font-size: 11px;
+    color: rgba(255, 255, 255, 0.6);
     margin-bottom: 15px;
 }
 
-.mission-name {
-    color: #fff;
+.routine-item {
+    display: flex;
+    justify-content: space-between;
+    background: rgba(0, 0, 0, 0.4);
+    padding: 10px;
+    border-radius: 4px;
 }
 
-.mission-desc {
+.routine-border-cyan { border-left: 2px solid var(--acc-cyan); }
+.routine-border-magenta { border-left: 2px solid var(--acc-magenta); }
+
+.routine-desc-tiny {
+    font-size: 10px;
     color: rgba(255, 255, 255, 0.5);
-    font-size: 12px;
-    margin-top: 5px;
 }
 
-/* GUI View & Vertical Tabs */
-#gui-view {
-    flex-direction: row;
+.mt-10 { margin-top: 10px; }
+.mb-15 { margin-bottom: 15px; }
+
+/* AI Hub & LLM Select Utilities */
+.inline-select {
+    display: inline-block;
+    width: auto;
 }
 
-.v-tab-settings {
-    margin-top: auto;
-    margin-bottom: 20px;
+.toggle-row-spaced {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 10px;
 }
 
-.main-content-wrapper {
-    flex: 1;
+.bytebot-view-hidden { display: none; }
+
+.flex-gap-10 { display: flex; gap: 10px; }
+
+/* System Monitor Utilities */
+.flex-column-gap-10 {
     display: flex;
     flex-direction: column;
-    overflow: hidden;
+    gap: 10px;
 }
 
-.huge-glyph {
-    display: none;
+.monitor-item-spread {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
 }
+
+.m-0 { margin: 0; }
+
+.progress-track-small {
+    width: 100px;
+    height: 10px;
+    background: #111;
+    border: 1px solid #333;
+}
+
+.progress-fill-h100 { height: 100%; }
+
+.peer-list-tiny {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+    font-size: 10px;
+}
+
+.peer-item-spread {
+    display: flex;
+    justify-content: space-between;
+    padding: 5px;
+    background: rgba(255, 255, 255, 0.02);
+    border: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.peer-item-disconnected {
+    opacity: 0.5;
+}
+
+/* Background Highlight Utilities */
+.bg-cyan { background: var(--acc-cyan); }
+.bg-magenta { background: var(--acc-magenta); }
+.bg-gold { background: var(--acc-gold); }
+
+/* Progress Fill Utilities */
+.progress-fill-cyan { background: var(--acc-cyan); }
+.progress-fill-magenta { background: var(--acc-magenta); }
