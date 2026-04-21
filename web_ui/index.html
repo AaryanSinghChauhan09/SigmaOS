@@ -121,8 +121,16 @@
                     <span class="t-value glow-text">0.002</span>
                 </div>
                 <div class="telemetry-node">
-                    <span class="t-label">IQ YIELD</span>
-                    <span class="t-value glow-text">ABSOLUTE</span>
+                    <span class="t-label">CPU LOAD</span>
+                    <span class="t-value" id="telemetry-cpu">1%</span>
+                </div>
+                <div class="telemetry-node">
+                    <span class="t-label">MEMORY</span>
+                    <span class="t-value" id="telemetry-ram">1.2GB</span>
+                </div>
+                <div class="telemetry-node">
+                    <span class="t-label">LATENCY</span>
+                    <span class="t-value" id="telemetry-latency">2ms</span>
                 </div>
                 <div class="telemetry-node telemetry-actions">
                     <button class="cyber-btn small-btn" id="btn-open-mission-control">MISSION CONTROL</button>
@@ -450,6 +458,7 @@
     <script src="scripts/modules/16_ghost_sharding_sim.js"></script>
     <script src="scripts/modules/17_sovereign_terminal_core.js"></script>
     <script src="scripts/modules/18_sovereign_settings.js"></script>
+    <script src="scripts/modules/19_apex_telemetry_viz.js"></script>
 
     <script>
         // Initialize Sovereign Zenith Supremacy Suite
@@ -487,6 +496,7 @@
                 window.sharding = new GhostShardingEngine();
                 window.terminal = new SovereignTerminal();
                 window.settings = new SovereignSettings();
+                window.viz = new ApexTelemetryViz();
             }
 
             if ('serviceWorker' in navigator) {
