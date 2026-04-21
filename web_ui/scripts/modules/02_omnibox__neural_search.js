@@ -59,6 +59,25 @@ document.addEventListener("DOMContentLoaded", () => {
             }
         });
 
+        // 3. SigmaNLP (Natural Language Directives)
+        const nlpShortcuts = [
+            { phrase: 'install', cmd: 'sigpkg install', desc: 'Sovereign Package Installation' },
+            { phrase: 'update',  cmd: 'sigupdate',      desc: 'System Universal Sync' },
+            { phrase: 'firewall',cmd: 'sigwall --gui',  desc: 'Open Firewall Orchestrator' },
+            { phrase: 'audit',   cmd: 'sig-audit',      desc: 'Security Purity Sweep' }
+        ];
+
+        nlpShortcuts.forEach(n => {
+            if (query.includes(n.phrase)) {
+                currentResults.push({ 
+                    type: 'DIRECTIVE', 
+                    icon: '⚡', 
+                    item: { name: `${n.cmd}...`, desc: n.desc },
+                    action: () => alert(`Sovereign NLP Executing: ${n.cmd}`) 
+                });
+            }
+        });
+
         renderResults();
     });
 
@@ -82,8 +101,9 @@ document.addEventListener("DOMContentLoaded", () => {
     };
 
     const executeResult = (res) => {
-        if (res.type === 'ACTION') {
-            res.item.action();
+        if (res.type === 'ACTION' || res.type === 'DIRECTIVE') {
+            if (res.action) res.action();
+            else if (res.item.action) res.item.action();
         } else if (res.type === 'SUITE') {
             // Focus suite in grid
             const el = document.getElementById(`suite-${res.item.id}`);
