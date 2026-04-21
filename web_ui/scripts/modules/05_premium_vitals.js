@@ -77,5 +77,6 @@ const PremiumVitals = {
 window.addEventListener('load', () => {
     PremiumVitals.init();
     CanvasAnims.init();
+    MissionControl.init();
     setTimeout(() => PremiumVitals.visualizeLattice(), 3000);
 });
