@@ -1,10 +1,16 @@
 ; =========================================================================
-; SIGMA OS: BOOTLOADER ENTRY PROTOCOL (Step 3)
+; SIGMA OS: BOOTLOADER ENTRY PROTOCOL (v2.0 — Hardened)
 ; Multiboot 1 Compliant Header. Bypasses GRUB into Bare-Metal Kernel.
+;
+; Changes vs v1.0:
+;  - x87 FPU + SSE2 explicitly initialized before kmain.
+;  - Stack aligned to 16 bytes (required by System V ABI / SSE).
+;  - EFLAGS registers cleared for deterministic startup.
+;  - CPUID guard for SSE2; halts gracefully if unavailable.
 ; =========================================================================
 
-MAGIC equ 0x1BADB002
-FLAGS equ 0x03
+MAGIC    equ 0x1BADB002
+FLAGS    equ 0x03
 CHECKSUM equ -(MAGIC + FLAGS)
 
 section .multiboot
@@ -16,29 +22,55 @@ align 4
 section .bss
 align 16
 stack_bottom:
-    resb 16384          ; Secure 16 KB isolated kernel stack
+    resb 32768          ; 32 KB kernel stack (was 16 KB)
 stack_top:
 
 section .text
 global _start
-extern kmain            ; Declare external C entry protocol
+extern kmain
 
-; -------------------------------------------------------------------------
-; _start : The absolute first instruction executed by the CPU.
-; -------------------------------------------------------------------------
 _start:
-    ; 1. Establish hardware stack to allow C code execution safely
+    ; ── 1. Establish the 16-byte-aligned kernel stack ─────────────
     mov esp, stack_top
-    
-    ; 2. (Optional FPU/SSE init can happen here)
-    
-    ; 3. Transfer control into high-level C Sovereign Execution Matrix
-    push ebx            ; Pass Multiboot info structure
-    push eax            ; Pass Multiboot magic number
+    and esp, 0xFFFFFFF0     ; Align to 16-byte boundary (ABI requirement)
+
+    ; ── 2. Clear EFLAGS to a deterministic state ───────────────────
+    push 0x00000002         ; Reserved bit 1 must be set
+    popf
+
+    ; ── 3. Initialize x87 FPU ──────────────────────────────────────
+    fninit
+
+    ; ── 4. Check for SSE2 via CPUID ────────────────────────────────
+    mov eax, 1
+    cpuid
+    test edx, (1 << 26)     ; EDX bit 26 = SSE2
+    jz  .no_sse2
+
+    ; ── 5. Enable SSE2: CR0 & CR4 bits ────────────────────────────
+    mov eax, cr0
+    and eax, ~(1 << 2)      ; Clear EM (x87 emulation)
+    or  eax, (1 << 1)       ; Set MP (monitor coprocessor)
+    mov cr0, eax
+
+    mov eax, cr4
+    or  eax, (3 << 9)       ; Set OSFXSR (bit 9) + OSXMMEXCPT (bit 10)
+    mov cr4, eax
+
+    ; ── 6. Transfer to C Sovereign Execution Matrix ────────────────
+    push ebx                ; Multiboot info structure
+    push eax                ; Multiboot magic number
     call kmain
 
-    ; 4. Total Halt Loop (If kmain somehow returns)
+    ; ── 7. Total Halt Loop ─────────────────────────────────────────
     cli
 .hang:
     hlt
     jmp .hang
+
+.no_sse2:
+    ; Minimal error display before halt (requires VGA text mode)
+    mov byte [0xB8000], 'E'
+    mov byte [0xB8001], 0x4F   ; White on Red attribute
+    cli
+    hlt

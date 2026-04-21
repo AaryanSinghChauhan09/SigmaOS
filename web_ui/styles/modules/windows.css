@@ -1,77 +1,117 @@
 /**
- * SigmaOS Window Management Styles
- * Module: Window Frames, Controls, and Draggable Components
+ * SigmaOS Window Management Styles (v2.0)
+ * Fixed to match the new 04_zenith_window_manager.js v2.0 DOM structure:
+ *   .window-header (was .window-titlebar)
+ *   .window-body   (was .window-content)
+ *   .window-resizer (new - corner resize handle)
+ * Also changed position to 'fixed' so windows float above all content.
  */
 
 .sovereign-window {
-    position: absolute;
+    position: fixed;
     min-width: 300px;
-    background: rgba(10, 15, 25, 0.7);
-    -webkit-backdrop-filter: blur(25px);
-    backdrop-filter: blur(25px);
+    min-height: 200px;
+    background: rgba(5, 10, 18, 0.82);
+    -webkit-backdrop-filter: blur(28px);
+    backdrop-filter: blur(28px);
     border: 1px solid var(--glass-border);
-    border-radius: 12px;
-    box-shadow: var(--glass-shadow);
-    z-index: 10;
-    overflow: hidden;
+    border-radius: 14px;
+    box-shadow: 0 24px 60px rgba(0,0,0,0.7), 0 0 0 1px rgba(0,255,234,0.08);
     display: flex;
     flex-direction: column;
-    transition: transform 0.1s ease-out, box-shadow 0.3s;
+    overflow: hidden;
+    transition: box-shadow 0.25s ease;
+    will-change: transform;
 }
 
+.sovereign-window:focus-within,
 .sovereign-window:hover {
     border-color: var(--acc-cyan-low);
+    box-shadow: 0 28px 70px rgba(0,0,0,0.8), 0 0 22px rgba(0,255,234,0.12);
 }
 
-.sovereign-window.active {
-    z-index: 50;
-    border-color: var(--acc-cyan);
-    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.8), 0 0 20px var(--acc-cyan-low);
-}
-
-/* Window Titlebar */
-.window-titlebar {
-    padding: 12px 18px;
-    background: rgba(255, 255, 255, 0.05);
+/* ── Header ─────────────────────────────────────────────────── */
+.window-header {
     display: flex;
-    justify-content: space-between;
     align-items: center;
+    justify-content: space-between;
+    padding: 10px 16px;
+    background: rgba(255,255,255,0.04);
+    border-bottom: 1px solid var(--glass-border);
     cursor: move;
+    user-select: none;
+    flex-shrink: 0;
 }
 
-.title-text {
-    font-size: 11px;
+.window-title {
+    display: flex;
+    align-items: center;
+    gap: 8px;
     font-family: var(--f-mono);
-    text-transform: uppercase;
+    font-size: 11px;
     letter-spacing: 2px;
+    text-transform: uppercase;
     color: var(--text-primary);
 }
 
+.window-icon {
+    font-size: 14px;
+}
+
+/* ── Controls ────────────────────────────────────────────────── */
 .window-controls {
     display: flex;
-    gap: 8px;
+    gap: 10px;
+    align-items: center;
 }
 
-.control-dot {
-    width: 10px;
-    height: 10px;
-    border-radius: 50%;
+.window-controls span {
+    width: 22px;
+    height: 22px;
+    border-radius: 6px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
     cursor: pointer;
-    transition: all 0.3s;
+    font-size: 11px;
+    background: rgba(255,255,255,0.06);
+    border: 1px solid rgba(255,255,255,0.08);
+    transition: all 0.2s;
+    color: rgba(255,255,255,0.7);
 }
 
-.control-close { background: var(--acc-magenta); }
-.control-min { background: var(--acc-gold); }
-.control-max { background: var(--acc-cyan); }
+.window-controls .w-close:hover { background: rgba(255,0,80,0.4); color: #fff; }
+.window-controls .w-min:hover   { background: rgba(255,200,0,0.3); color: #fff; }
+.window-controls .w-max:hover   { background: rgba(0,255,234,0.2); color: #fff; }
+.window-controls .w-tile:hover  { background: rgba(160,80,255,0.3); color: #fff; }
 
-.control-dot:hover {
-    transform: scale(1.2);
-    box-shadow: 0 0 10px currentColor;
+/* ── Body ────────────────────────────────────────────────────── */
+.window-body {
+    flex: 1;
+    overflow: auto;
+    padding: 16px;
+    scrollbar-width: thin;
+    scrollbar-color: var(--acc-cyan-low) transparent;
 }
 
-/* Window Content */
-.window-content {
-    flex-grow: 1;
-    padding: 20px;
-    overflow-y: auto;
+/* ── Resize Handle ────────────────────────────────────────────── */
+.window-resizer {
+    position: absolute;
+    right: 0;
+    bottom: 0;
+    width: 18px;
+    height: 18px;
+    cursor: nwse-resize;
+    background: linear-gradient(135deg, transparent 50%, var(--acc-cyan-low) 50%);
+    border-radius: 0 0 14px 0;
+    opacity: 0.5;
+    transition: opacity 0.2s;
 }
+
+.window-resizer:hover {
+    opacity: 1;
+}
+
+/* ── Legacy aliases (backward compat) ─────────────────────────── */
+.window-content { flex: 1; overflow: auto; padding: 20px; }
+.window-titlebar { cursor: move; padding: 12px 18px; background: rgba(255,255,255,0.05); }
