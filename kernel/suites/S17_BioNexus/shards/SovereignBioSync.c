@@ -2,34 +2,33 @@
 #include "sigma_types.h"
 
 /**
- * SigmaOS Sovereign Bio-Sync
+ * SigmaOS Sovereign Bio-Signal Synchronizer
  * Subsystem: S17 (BioNexus)
- * Mission: Real-time synchronization of bio-feedback metadata with the Sovereign Lattice.
+ * Mission: Real-time synchronization of biological telemetry with OS behavioral state.
  */
 
 typedef struct {
-    uint32_t heart_rate;
-    uint32_t focus_level;
-    sigma_bool stress_detected;
-} BioTelemetry;
+    uint32_t state_id;
+    char behavioral_profile[32];
+    sigma_bool sync_active;
+} BioSyncState;
 
-static BioTelemetry current_bio_state;
+static BioSyncState global_biosync;
 
-void bionexus_sync_telemetry(uint32_t bpm, uint32_t focus) {
-    current_bio_state.heart_rate = bpm;
-    current_bio_state.focus_level = focus;
-    current_bio_state.stress_detected = (bpm > 100) ? SIGMA_TRUE : SIGMA_FALSE;
+void bionexus_sync_state(uint32_t bio_pulse) {
+    global_biosync.sync_active = SIGMA_TRUE;
     
-    sigma_printf("S17 [BIONEXUS]: [SYNC] BPM:%u FOCUS:%u%% STRESS:%s\n", 
-                 bpm, focus, current_bio_state.stress_detected ? "DETECTED" : "NORMAL");
-    
-    if (current_bio_state.stress_detected) {
-        sigma_printf("  [BIO-SYNC]: Stress detected. Signaling Zenith for environmental calming...\n");
-        // Symbolic trigger for EnvEngine
+    // Symbolic: Mapping heart-rate / neural jitter to UI responsiveness
+    if (bio_pulse > 100) {
+        sigma_strncpy(global_biosync.behavioral_profile, "STRESS_ADAPTIVE", 31);
+        sigma_printf("S17 [BIONEXUS]: High biological activity detected. Shifting to STRESS_ADAPTIVE silicate.\n");
+    } else {
+        sigma_strncpy(global_biosync.behavioral_profile, "HARMONIC_IDLE", 31);
+        sigma_printf("S17 [BIONEXUS]: Biological state: Nominal. Silicate harmony maintained.\n");
     }
 }
 
 void S17_Register_BioSync(void) {
-    sigma_printf("S17 [BIONEXUS]: Sovereign Bio-Sync Shard Online.\n");
-    sigma_printf("  [SYNC]: Biometric-to-Silicate bridge established.\n");
+    sigma_printf("S17 [BIONEXUS]: Sovereign Bio-Signal Synchronizer Online.\n");
+    sigma_printf("  [LATTICE]: Human-silicon feedback loop established.\n");
 }
