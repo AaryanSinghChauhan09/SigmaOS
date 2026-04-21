@@ -56,7 +56,17 @@ class SovereignTerminal extends ZenithComponent {
                 }
             },
             'tile': () => window.tiling.toggle(),
-            'help': () => this.write('AVAILABLE: theme, ls, cd, cat, notify, shard, flush, stats, telemetry, set, get, vault, snapshot, tile, clear, version'),
+            'sandbox': (args) => {
+                const sub = args[0];
+                if (sub === 'run') {
+                    window.sandbox.runInSandbox(args[1] || 'sh_untrusted_1', '// UNTRUSTED_CODE');
+                } else if (sub === 'kill') {
+                    window.sandbox.terminate(args[1]);
+                } else {
+                    this.write('USAGE: sandbox [run|kill] [id]');
+                }
+            },
+            'help': () => this.write('AVAILABLE: theme, ls, cd, cat, notify, shard, flush, stats, telemetry, set, get, vault, snapshot, tile, sandbox, clear, version'),
             'clear': () => this.output.innerHTML = '',
             'version': () => this.write('Σ SIGMAOS ZENITH v33.0.4-SINGULARITY'),
             
