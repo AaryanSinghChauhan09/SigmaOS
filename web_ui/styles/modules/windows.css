@@ -1,0 +1,76 @@
+/**
+ * SigmaOS Window Management Styles
+ * Module: Window Frames, Controls, and Draggable Components
+ */
+
+.sovereign-window {
+    position: absolute;
+    min-width: 300px;
+    background: rgba(10, 15, 25, 0.7);
+    backdrop-filter: blur(25px);
+    border: 1px solid var(--glass-border);
+    border-radius: 12px;
+    box-shadow: var(--glass-shadow);
+    z-index: 10;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    transition: transform 0.1s ease-out, box-shadow 0.3s;
+}
+
+.sovereign-window:hover {
+    border-color: var(--acc-cyan-low);
+}
+
+.sovereign-window.active {
+    z-index: 50;
+    border-color: var(--acc-cyan);
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.8), 0 0 20px var(--acc-cyan-low);
+}
+
+/* Window Titlebar */
+.window-titlebar {
+    padding: 12px 18px;
+    background: rgba(255, 255, 255, 0.05);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    cursor: move;
+}
+
+.title-text {
+    font-size: 11px;
+    font-family: var(--f-mono);
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    color: var(--text-primary);
+}
+
+.window-controls {
+    display: flex;
+    gap: 8px;
+}
+
+.control-dot {
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    cursor: pointer;
+    transition: all 0.3s;
+}
+
+.control-close { background: var(--acc-magenta); }
+.control-min { background: var(--acc-gold); }
+.control-max { background: var(--acc-cyan); }
+
+.control-dot:hover {
+    transform: scale(1.2);
+    box-shadow: 0 0 10px currentColor;
+}
+
+/* Window Content */
+.window-content {
+    flex-grow: 1;
+    padding: 20px;
+    overflow-y: auto;
+}
