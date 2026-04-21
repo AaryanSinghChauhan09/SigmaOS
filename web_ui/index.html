@@ -14,6 +14,8 @@
     <link rel="stylesheet" href="styles/modules/compatibility.css">
     <link rel="stylesheet" href="styles/modules/utilities.css">
     <link rel="stylesheet" href="styles/modules/overrides.css">
+    <link rel="stylesheet" href="styles/modules/lattice_visualizer.css">
+    <link rel="stylesheet" href="styles/modules/aether_pulse.css">
 
     <!-- Dependency Virtualization: fonts.googleapis.com (Satisfies CI Gate while maintaining zero-dependency purity) -->
 </head>
@@ -422,13 +424,19 @@
     <script src="scripts/modules/05_sovereign_stress_tester.js"></script>
     <script src="scripts/modules/00_silicon_primitives.js"></script>
     <script src="scripts/modules/06_zenith_orchestrator.js"></script>
+    <script src="scripts/modules/07_lattice_visualizer_v2.js"></script>
+    <script src="scripts/modules/09_mica_flux.js"></script>
+    <script src="scripts/modules/09_aether_pulse.js"></script>
 
     <script>
-        // Initialize Sovereign Zenith Modular System
+        // Initialize Sovereign Zenith Supremacy Suite
         window.addEventListener('load', () => {
             if (window.ZenithSystem) {
                 window.zenith = new ZenithSystem();
                 window.zenith.boot();
+                window.lattice = new LatticeVisualizer();
+                window.flux = new MicaFluxEngine();
+                window.pulse = new AetherPulse();
             }
 
             if ('serviceWorker' in navigator) {
