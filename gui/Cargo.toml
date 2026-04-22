@@ -1,0 +1,9 @@
+[package]
+name        = "sigma-gui-backend"
+description = "Zenith GUI backend — zero-dep Rust HTTP server mirroring sigmactl"
+version.workspace = true
+edition.workspace = true
+
+[[bin]]
+name = "sigma-backend"
+path = "backend.rs"

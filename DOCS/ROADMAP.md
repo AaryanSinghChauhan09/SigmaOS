@@ -1,40 +1,65 @@
-# SigmaOS Expanded Sovereign Roadmap
+# SigmaOS Roadmap
 
-This roadmap defines the trajectory of SigmaOS from a bare-metal WASM architecture into a fully polished, enterprise-ready, and future-proof operating system ecosystem.
+## Current: v1.0 — Sovereign Lattice Foundation
 
-## 🟢 Short-Term (Foundational, 0–12 months)
-**Focus on basic usability, hardware abstractions, and system security.**
-*   **Installation:** Smooth installer & setup wizard with guided setup.
-*   **Hardware / Drivers:** Support for GPU, Wi-Fi, printers, and core peripherals.
-*   **Security Core:** Secure Boot, TPM, WASM sandboxing, partition encryption.
-*   **App Ecosystem:** Initialize the Sovereign App Store and package management UI.
-*   **System Integrity:** Implement system restore points (rollbacks after failed updates) and automated patching pipelines.
-*   **Networking Layer:** VPN, SSH, and remote desktop basics.
-*   **UI/UX Polish:** Multi-monitor support, display scaling, screen readers, magnifier, and keyboard shortcuts.
-*   **Core Apps:** Basic GUI file manager (drag-and-drop, search, preview), office suite compatibility, browser integration.
-*   **Optimization:** Energy-efficient kernel tweaks optimizing the scheduler for laptops.
-*   **Community Core:** Crash reporting system (opt-in telemetry), comprehensive Wiki, tutorials, and forums.
+### ✅ Completed
+- 33-suite C11 kernel lattice (S01–S33)
+- Rust memory manager (buddy allocator, C FFI)
+- Rust security shard (sandbox, crypto, firewall)
+- Rust WASM runtime (MVP opcode interpreter)
+- Rust sync shard (fetch/push/pull_rebase)
+- Rust automation daemon (`sigma-daemon` binary)
+- Core orchestrator (heapless shard registry, event bus)
+- IPC ring buffer (lock-free SPSC)
+- Custom config parser (zero-dep key=value + JSON)
+- Lightweight C logger (syscall-direct, serial MMIO)
+- `sigmactl` Python CLI (build/shard/sync/profile/status)
+- `sigmactl` Rust native binary (via `cli/main.rs`)
+- Zenith GUI dashboard (38 JS modules, glassmorphic)
+- Settings panel with live CLI reference
+- Plugin loader (dynamic JS plugin system)
+- Config bridge (GUI ↔ CLI shared state)
+- Shard status dashboard (live CPU/mem, restart/kill)
+- Rust HTTP backend (zero-dep `std::net` only)
+- Frontend components (ShardManager, SyncPanel, Profiles, Status)
+- Shared C utility library (`sigma_utils.h`)
+- WASM FFI bridge (C ↔ Rust ↔ WASM shared memory)
+- Profiles: developer, secure, lightweight, default
+- Devcontainer + GitHub Actions smart CI
+- Install scripts (bash + PowerShell)
+- Integration tests (pytest, 6 test classes)
 
-## 🟡 Mid-Term (Expansion, 12–24 months)
-**Build the ecosystem, advanced features, and cross-compatibility.**
-*   **Advanced GUI Features:** Unified notification center (Action Center style), Universal search (Spotlight-style), and customizable Theme engine.
-*   **Cross-OS Compatibility:** Container-native OS features, Docker/Podman integration, KVM/QEMU virtualization, and Proton/Steam gaming support.
-*   **Cloud & Sync:** Cross-device synchronization of settings/files, and native integrations for OneDrive, iCloud, Google Drive.
-*   **Hardware Optimization:** Hybrid graphics switching for laptops (integrated + discrete GPUs) and advanced battery/sleep state routing.
-*   **Enterprise Integration:** Enterprise policy management, remote provisioning, advanced networking GUIs (firewall, bandwidth monitoring).
-*   **Ecosystem Expansion:** Cross-architecture builds (ARM, RISC-V, x86) and enabling Creative tools compatibility (Photoshop/Blender alternatives).
-*   **UX Enhancements:** Voice assistant integration (Siri/Cortana equivalent) tied into the Zenith UI.
+---
 
-## 🔵 Long-Term (Maturity, 24+ months)
-**Position SigmaOS as a competitive, polished, and innovative powerhouse.**
-*   **Enterprise Grade:** Support contracts (Canonical/Microsoft equivalents), Hardware/software certification programs, and Zero-trust security model.
-*   **Advanced Ergonomics:** AR/VR native integration, Voice navigation, gesture recognition, and haptic feedback.
-*   **Extensibility:** Deep cloud-native integration (Kubernetes/OpenStack), and a thriving App Marketplace / Plugin Ecosystem.
-*   **Cross-Platform Purity:** Native Cross-platform compatibility layer (running Windows/macOS/Linux apps seamlessly).
-*   **Community Scale:** Community-driven OS flavors (variants of the Zenith window manager).
+## v1.1 — Security Hardening (Next 4 weeks)
 
-## ⚡ Forward-Looking Innovation (Next-Gen Features)
-*   **Self-healing OS:** Automatic recovery from crashes or data corruption.
-*   **Hot-Swapping Kernel:** Modular kernel design allowing live swapping of network stacks and filesystems without rebooting.
-*   **Privacy-first:** Minimal telemetry, transparent data policies by default.
-*   **Future Tech:** Edge computing focus for distributed systems, Quantum-ready cryptography, and AI-driven performance tuning (adaptive resource allocation).
+- [ ] Full Ed25519 signature verification in `shards/security`
+- [ ] Capability enforcement on all IPC messages
+- [ ] Neural Firewall integration into Event Bus listener
+- [ ] Encrypted profile storage (XOR cipher from `crypto.c`)
+- [ ] Audit log persistence to disk via `sigma_utils` config
+
+## v1.2 — Hardware Finalization (6-8 weeks)
+
+- [ ] Complete `UefiSupport.c` — UEFI GOP framebuffer init
+- [ ] VirtIO block device driver (`virtio_blk.c`)
+- [ ] VirtIO network driver (`virtio_net.c`)
+- [ ] QEMU boot pipeline passing full CI gate
+- [ ] Real physical memory map from UEFI `GetMemoryMap`
+
+## v1.3 — Developer Experience (8-10 weeks)
+
+- [ ] `cargo install sigma-cli` one-command Rust binary install
+- [ ] Plugin marketplace UI in Zenith dashboard
+- [ ] `sigmactl plugin search` fetching from registry
+- [ ] GUI build log streaming (SSE from backend)
+- [ ] VS Code extension for shard highlighting
+
+## v2.0 — Distributed Lattice (12+ weeks)
+
+- [ ] Mesh sync: distributed SigmaOS nodes via gossip protocol
+- [ ] Neural predictive scheduler (ML-guided process priority)
+- [ ] Full WASI capability enforcement layer
+- [ ] WebAssembly system interface (WASI) compliance
+- [ ] Multi-architecture support (ARM64, RISC-V)
+- [ ] Self-evolving shard registry (hot-reload without reboot)

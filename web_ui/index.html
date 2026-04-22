@@ -26,6 +26,7 @@
     <link rel="stylesheet" href="styles/modules/ghost_sharding.css">
     <link rel="stylesheet" href="styles/modules/settings_panel.css">
     <link rel="stylesheet" href="styles/modules/shard_dashboard.css">
+    <link rel="stylesheet" href="styles/modules/frontend_components.css">
     <style id="dynamic-os-style"></style> <!-- Live-Reload Engine Hook -->
 
     <!-- Dependency Virtualization: fonts.googleapis.com (Satisfies CI Gate while maintaining zero-dependency purity) -->
@@ -464,5 +465,7 @@
             });
         });
     </script>
+    <!-- Zenith Frontend App — mounts ShardManager, SyncPanel, Profiles, Status tabs -->
+    <script type="module" src="../gui/frontend/src/App.js"></script>
 </body>
 </html>
