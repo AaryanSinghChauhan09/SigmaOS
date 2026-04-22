@@ -1,11 +1,10 @@
 {
-  "name": "SigmaOS Zenith",
+  "name": "SigmaOS Sovereign Zenith",
   "short_name": "SigmaOS",
   "start_url": "index.html",
   "display": "standalone",
-  "background_color": "#050a12",
+  "background_color": "#000000",
   "theme_color": "#00f2ff",
-  "description": "The Sovereign Sentient Silicon Operating System Interface.",
   "icons": [
     {
       "src": "splash.png",
