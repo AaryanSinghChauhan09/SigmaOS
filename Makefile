@@ -11,6 +11,7 @@ CC      = gcc
 AS      = nasm
 LD      = ld
 OBJCOPY = objcopy
+RUSTC   = rustc
 
 # Default target
 all: help
@@ -56,6 +57,7 @@ CFLAGS  = -std=c11                  \
 
 ASFLAGS = -f elf64
 LDFLAGS = -T kernel/sigma.ld -m elf_x86_64 -nostdlib
+RUSTFLAGS = --target x86_64-unknown-none --emit=obj -C opt-level=2 -C panic=abort -C no-redzone=y
 
 # ---------------------------------------------------------------------------
 # === INTEGRATED SOVEREIGN SUITES (Industrial Tier - v2) ===
@@ -65,13 +67,15 @@ SUITE_ROOT := kernel/suites
 
 C_SOURCES := $(shell find $(SUITE_ROOT) -name '*.c' 2>/dev/null)
 ASM_SOURCES := $(shell find $(SUITE_ROOT) -name '*.asm' 2>/dev/null)
+RUST_SOURCES := $(shell find $(SUITE_ROOT) -name '*.rs' 2>/dev/null)
 
 # Aggregate all unique sources
 C_SOURCES := $(sort $(C_SOURCES))
+RUST_SOURCES := $(sort $(RUST_SOURCES))
 ASM_SOURCES += $(shell find kernel -name '*.asm' 2>/dev/null)
 ASM_SOURCES := $(sort $(ASM_SOURCES))
 
-SHARDS := $(C_SOURCES:.c=.o) $(ASM_SOURCES:.asm=.o)
+SHARDS := $(C_SOURCES:.c=.o) $(ASM_SOURCES:.asm=.o) $(RUST_SOURCES:.rs=.o)
 
 # ---------------------------------------------------------------------------
 # Build targets
@@ -93,6 +97,10 @@ sigma_zenith.bin: kernel/boot.o $(SHARDS)
 %.o: %.asm
 	@mkdir -p $(dir $@)
 	$(AS) $(ASFLAGS) $< -o $@
+
+%.o: %.rs
+	@mkdir -p $(dir $@)
+	$(RUSTC) $(RUSTFLAGS) $< -o $@
 
 # ---------------------------------------------------------------------------
 # Independent Sovereign Web Engine (Pillar 3/Userland Bridge)
@@ -133,7 +141,7 @@ shard-list:
 		printf "║ %-22s : %3s shards ║\n" "$$name" "$$count"; \
 	done
 	@echo "╚══════════════════════════════════════════╝"
-	@echo "Total Sovereignty: $(words $(C_SOURCES)) C11 / $(words $(ASM_SOURCES)) ASM"
+	@echo "Total Sovereignty: $(words $(C_SOURCES)) C11 / $(words $(ASM_SOURCES)) ASM / $(words $(RUST_SOURCES)) Rust"
 
 # Sovereign resilience audit (High-Fidelity)
 test:
