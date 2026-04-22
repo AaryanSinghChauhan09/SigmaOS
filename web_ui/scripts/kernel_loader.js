@@ -377,6 +377,23 @@ const SYSTEM_MODULES = [
     "scripts/modules/331_sentient_silicon_audit.js",
     "scripts/modules/332_universal_distro_nexus.js",
     "scripts/modules/333_singularity_milestone.js",
+    "scripts/modules/334_raft_consensus_sim.js",
+    "scripts/modules/335_task_migration_relay.js",
+    "scripts/modules/336_multi_tenant_lattice.js",
+    "scripts/modules/337_k3s_lite_orchestrator.js",
+    "scripts/modules/338_load_balanced_shard_bus.js",
+    "scripts/modules/344_runit_service_supervisor.js",
+    "scripts/modules/345_ostree_delta_update.js",
+    "scripts/modules/346_lattice_read_only_core.js",
+    "scripts/modules/347_checksum_purity_verify.js",
+    "scripts/modules/348_environment_trust_boot.js",
+    "scripts/modules/354_web_mpi_parallel_bus.js",
+    "scripts/modules/355_forensic_noise_scrubber.js",
+    "scripts/modules/356_dynamic_theme_loader.js",
+    "scripts/modules/357_manjaro_hw_shim.js",
+    "scripts/modules/358_scientific_data_viz.js",
+    "scripts/modules/359_industrial_grade_nexus.js",
+    "scripts/modules/360_industrial_singularity.js",
     "scripts/audit.js"
 ];
 
