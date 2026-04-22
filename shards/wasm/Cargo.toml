@@ -1,0 +1,9 @@
+[package]
+name = "sigma-wasm"
+description = "SigmaOS WASM Shard — cross-language WASM bridge"
+version.workspace = true
+edition.workspace = true
+
+[lib]
+name = "sigma_wasm"
+crate-type = ["staticlib", "rlib"]

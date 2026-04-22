@@ -1,0 +1,20 @@
+[workspace]
+resolver = "2"
+members = [
+    "core/orchestrator",
+    "shards/virtualization",
+    "shards/security",
+    "shards/wasm",
+    "shards/sync",
+    "shards/automation",
+]
+
+[workspace.package]
+version     = "1.0.0"
+edition     = "2021"
+authors     = ["SigmaOS Contributors"]
+license     = "Apache-2.0"
+repository  = "https://github.com/AaryanSinghChauhan09/SigmaOS"
+
+[workspace.dependencies]
+# Zero external deps philosophy — only these are permitted at workspace level

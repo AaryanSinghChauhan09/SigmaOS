@@ -1,0 +1,14 @@
+[package]
+name        = "sigma-orchestrator"
+description = "SigmaOS Core Orchestrator — shard manager and plugin loader"
+version.workspace = true
+edition.workspace = true
+
+[lib]
+name    = "sigma_orchestrator"
+crate-type = ["staticlib", "rlib"]
+
+[features]
+default = ["hosted"]
+hosted  = []          # std-available host build (tools, tests)
+bare_metal = []       # no_std kernel build

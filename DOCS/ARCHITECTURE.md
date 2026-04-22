@@ -1,65 +1,42 @@
-# SigmaOS Sovereign Architecture Dependency Flow
+# SigmaOS Architecture, Contributing & Roadmap
 
-```text
-                ┌───────────────┐
-                │   UI Module   │
-                │ (Window mgr,  │
-                │ toolkit, UX)  │
-                └───────▲───────┘
-                        │
-                        │
-                ┌───────────────┐
-                │ Plugin System │
-                │ (WASM shards, │
-                │ extensions)   │
-                └───────▲───────┘
-                        │
-                        │
-                ┌───────────────┐
-                │   Services    │
-                │ (logging,     │
-                │ monitoring,   │
-                │ updates)      │
-                └───────▲───────┘
-                        │
-                        │
-                ┌───────────────┐
-                │ Networking    │
-                │ (protocols,   │
-                │ VPN, services)│
-                └───────▲───────┘
-                        │
-                        │
-                ┌───────────────┐
-                │ Storage       │
-                │ (FS, cache,   │
-                │ persistence)  │
-                └───────▲───────┘
-                        │
-                        │
-                ┌───────────────┐
-                │ Drivers       │
-                │ (I/O, display,│
-                │ input, network)│
-                └───────▲───────┘
-                        │
-                        │
-                ┌───────────────┐
-                │ Core Kernel   │
-                │ (scheduler,   │
-                │ memory, sec.) │
-                └───────────────┘
+## Architecture
+
+SigmaOS is organized into the following top-level modules:
+
+```
+SigmaOS/
+├── core/orchestrator/   # Rust — shard registry, event bus, C FFI
+├── shards/              # Independent Rust/C shard suites
+│   ├── virtualization/  # WASM JIT + VirtIO (Rust)
+│   ├── security/        # Zero-trust, crypto, firewall (Rust)
+│   ├── wasm/            # Cross-language WASM bridge (Rust)
+│   ├── sync/            # GitHub + local sync (Rust)
+│   └── automation/      # CI triggers, daemon (Rust)
+├── kernel/suites/       # C11 bare-metal suites S01–S33
+├── cli/ (sigmactl.py)   # Unified CLI — build/sync/shard/profile
+├── gui/ (web_ui/)       # Zenith Dashboard — mirrors CLI
+├── automation/          # CI/CD workflows and build scripts
+└── profiles/            # Personalization JSON templates
 ```
 
-## Key Principles
-*   **Bottom-up dependency**: The Core Kernel is the foundation; everything else builds on it.
-*   **Hardware Abstraction**: Drivers depend on the kernel but expose standardized hardware functionality upward (e.g., via `SovereignDriver_t`).
-*   **Services Layering**: Storage & Networking sit above drivers, providing abstracted services. Services (logging, monitoring, updates) depend on storage/networking.
-*   **Isolation**: Plugins extend services and UI without touching the kernel directly, minimizing risk and surface area.
-*   **Top-level Interaction**: UI is the zenith layer, interacting directly with users and indirectly relying on everything below.
+## Roadmap
 
-## Benefits
-*   Clear separation of responsibilities.
-*   Easy to swap or extend modules/shards (e.g., replace networking stack without touching UI).
-*   Plugins/shards remain isolated via WASM JIT, reducing risk of breaking core functionality.
-*   Testing is highly modular, layered bottom-to-top.
+### v1.1 (Next)
+- [ ] Full Ed25519 in security shard
+- [ ] WASM JIT pipeline (Phase 2)
+- [ ] GUI plugin marketplace UI
+
+### v1.2
+- [ ] Real UEFI boot via S04_HAL
+- [ ] VirtIO block + net drivers
+- [ ] cargo install sigmaos (binary release)
+
+### v2.0
+- [ ] Distributed lattice nodes (mesh sync)
+- [ ] Neural predictive scheduler
+- [ ] Full WASI capability enforcement
+
+## Contributing
+
+See [CONTRIBUTING.md](../CONTRIBUTING.md) for coding standards and PR workflow.
