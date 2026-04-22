@@ -20,6 +20,8 @@ export const sync         = ()     => apiCall("/sync", "POST");
 export const addShard     = (name) => apiCall(`/shard/add/${name}`, "POST");
 export const removeShard  = (name) => apiCall(`/shard/remove/${name}`, "DELETE");
 export const setProfile   = (name) => apiCall(`/profile/set/${name}`, "POST");
+export const createProfile= (name) => apiCall(`/profile/create/${name}`, "POST");
+export const installPlugin= (name) => apiCall(`/plugin/install/${name}`, "POST");
 export const getStatus    = ()     => apiCall("/status");
 export const getShards    = ()     => apiCall("/shards").then(r => { try { r.data = JSON.parse(r.data); } catch{} return r; });
 export const healthCheck  = ()     => apiCall("/health");

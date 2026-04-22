@@ -30,24 +30,28 @@ fn print_help() {
     println!("  shard remove <name>     Remove a shard");
     println!("  shard ls                List all registered shards");
     println!("  profile set <name>      Apply personalization profile");
+    println!("  profile create <name>   Create a new profile");
     println!("  profile list            List available profiles");
+    println!("  plugin install <name>   Install a new plugin");
+    println!("  get [key]               Show config key(s)");
+    println!("  set <key> <val>         Set config key");
     println!("  status                  Show system status");
     println!("  version                 Show version");
     println!("  help                    Show this help");
     println!();
     println!("EXAMPLES:");
     println!("  sigmactl build");
-    println!("  sigmactl shard add analytics");
+    println!("  sigmactl set theme MATRIX");
     println!("  sigmactl profile set developer");
     println!("  sigmactl status");
 }
 
 fn main() {
     let args: Vec<String> = env::args().collect();
-    let root = env::var("SIGMA_ROOT")
-        .unwrap_or_else(|_| ".".to_string());
+    let root_str = env::var("SIGMA_ROOT").unwrap_or_else(|_| ".".to_string());
+    let root = std::path::Path::new(&root_str);
 
-    let mut mgr = ShardManager::with_root(&root);
+    let mut mgr = ShardManager::with_root(&root_str);
 
     if args.len() < 2 {
         print_help();
@@ -126,8 +130,17 @@ fn main() {
                         Err(e) => { eprintln!("Σ [ERR] {e}"); std::process::exit(1); }
                     }
                 }
+                Some("create") => {
+                    let name = args.get(3).map(|s| s.as_str()).unwrap_or_else(|| {
+                        eprintln!("Usage: sigmactl profile create <name>"); std::process::exit(1);
+                    });
+                    match mgr.create_profile(name, "dark") {
+                        Ok(()) => println!("Σ [OK] Profile '{name}' created."),
+                        Err(e) => { eprintln!("Σ [ERR] {e}"); std::process::exit(1); }
+                    }
+                }
                 Some("list") | Some("ls") => {
-                    let profiles_dir = std::path::Path::new(&root).join("profiles");
+                    let profiles_dir = root.join("profiles");
                     if let Ok(entries) = std::fs::read_dir(profiles_dir) {
                         println!("Available profiles:");
                         for e in entries.flatten() {
@@ -138,9 +151,52 @@ fn main() {
                     }
                 }
                 _ => {
-                    eprintln!("Usage: sigmactl profile [set|list] [name]");
+                    eprintln!("Usage: sigmactl profile [set|create|list] [name]");
                     std::process::exit(1);
                 }
+            }
+        }
+
+        "plugin" => {
+            if args.get(2).map(|s| s.as_str()) == Some("install") {
+                let name = args.get(3).map(|s| s.as_str()).unwrap_or_else(|| {
+                    eprintln!("Usage: sigmactl plugin install <name>"); std::process::exit(1);
+                });
+                match mgr.install_plugin(name) {
+                    Ok(()) => println!("Σ [OK] Plugin '{name}' installed."),
+                    Err(e) => { eprintln!("Σ [ERR] {e}"); std::process::exit(1); }
+                }
+            } else {
+                eprintln!("Usage: sigmactl plugin install <name>");
+                std::process::exit(1);
+            }
+        }
+
+        "get" => {
+            let config_path = root.join("sigma_config.json");
+            let cfg = config::Config::load_json(&config_path).unwrap_or_default();
+            if let Some(key) = args.get(2) {
+                if let Some(val) = cfg.get(key) {
+                    println!("{key} = {val}");
+                } else {
+                    eprintln!("Key '{key}' not found.");
+                }
+            } else {
+                for (k, v) in cfg.iter() {
+                    println!("{k} = {v}");
+                }
+            }
+        }
+
+        "set" => {
+            let key = args.get(2).unwrap_or_else(|| { eprintln!("Usage: sigmactl set <key> <val>"); std::process::exit(1); });
+            let val = args.get(3).unwrap_or_else(|| { eprintln!("Usage: sigmactl set <key> <val>"); std::process::exit(1); });
+            let config_path = root.join("sigma_config.json");
+            let mut cfg = config::Config::load_json(&config_path).unwrap_or_default();
+            cfg.set_key(key.to_string(), val.to_string());
+            match cfg.save(&config_path) {
+                Ok(()) => println!("Σ [OK] Updated: {key} = {val}"),
+                Err(e) => { eprintln!("Σ [ERR] {e}"); std::process::exit(1); }
             }
         }
 

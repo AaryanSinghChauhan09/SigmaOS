@@ -126,6 +126,20 @@ fn handle_connection(mut stream: TcpStream, mgr: Arc<Mutex<ShardManager>>) {
             }
         }
 
+        ("POST", ["profile", "create", name]) => {
+            match mgr.create_profile(name, "dark") {
+                Ok(()) => respond(&mut stream, 200, &format!("Profile created: {name}")),
+                Err(e) => respond(&mut stream, 500, &e),
+            }
+        }
+
+        ("POST", ["plugin", "install", name]) => {
+            match mgr.install_plugin(name) {
+                Ok(()) => respond(&mut stream, 200, &format!("Plugin installed: {name}")),
+                Err(e) => respond(&mut stream, 500, &e),
+            }
+        }
+
         _ => respond(&mut stream, 404, "Not found"),
     }
 }

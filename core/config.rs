@@ -47,12 +47,28 @@ impl Config {
         Ok(cfg)
     }
 
-    pub fn get(&self, key: &str) -> Option<&str> {
-        self.map.get(key).map(|s| s.as_str())
+    pub fn get(&self, key: &str) -> Option<&String> {
+        self.map.get(key)
     }
 
     pub fn get_or(&self, key: &str, default: &str) -> String {
         self.map.get(key).cloned().unwrap_or_else(|| default.to_string())
+    }
+
+    pub fn set_key(&mut self, key: String, val: String) {
+        self.map.insert(key, val);
+    }
+
+    pub fn save(&self, path: &Path) -> Result<(), String> {
+        let mut content = String::from("{\n");
+        let mut entries: Vec<_> = self.map.iter().collect();
+        entries.sort_by_key(|e| e.0);
+        for (i, (k, v)) in entries.iter().enumerate() {
+            content.push_str(&format!("  \"{}\": \"{}\"{}", k, v, if i == entries.len() - 1 { "" } else { "," }));
+            content.push('\n');
+        }
+        content.push_str("}\n");
+        fs::write(path, content).map_err(|e| e.to_string())
     }
 
     pub fn set(&mut self, key: &str, value: &str) {
@@ -195,7 +211,7 @@ mod tests {
         let mut cfg = Config::new();
         cfg.set("theme", "MATRIX");
         cfg.set("blur", "25");
-        assert_eq!(cfg.get("theme"), Some("MATRIX"));
+        assert_eq!(cfg.get("theme").map(|s| s.as_str()), Some("MATRIX"));
         assert_eq!(cfg.get_or("blur", "0"), "25");
         assert_eq!(cfg.get("missing"), None);
     }

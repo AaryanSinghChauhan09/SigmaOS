@@ -166,6 +166,32 @@ impl ShardManager {
         Ok(())
     }
 
+    pub fn create_profile(&self, name: &str, theme: &str) -> Result<(), String> {
+        let dir = self.root.join("profiles");
+        if !dir.exists() { fs::create_dir_all(&dir).map_err(|e| e.to_string())?; }
+        let path = dir.join(format!("{name}.json"));
+        let content = format!(r#"{{
+  "name": "{name}",
+  "sync_interval": 300,
+  "shards": ["sync"],
+  "theme": "{theme}",
+  "auto_sync": true
+}}"#);
+        fs::write(path, content).map_err(|e| e.to_string())
+    }
+
+    pub fn install_plugin(&self, name: &str) -> Result<(), String> {
+        let dir = self.root.join("plugins").join(name);
+        if !dir.exists() { fs::create_dir_all(&dir).map_err(|e| e.to_string())?; }
+        let manifest = dir.join("plugin.json");
+        let content = format!(r#"{{
+  "name": "{name}",
+  "version": "1.0.0",
+  "enabled": true
+}}"#);
+        fs::write(manifest, content).map_err(|e| e.to_string())
+    }
+
     pub fn status(&self) -> String {
         let git_branch = Command::new("git").args(["branch", "--show-current"])
             .current_dir(&self.root).output()
