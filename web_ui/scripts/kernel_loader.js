@@ -91,6 +91,11 @@ const SYSTEM_MODULES = [
     "scripts/modules/36_config_bridge.js",
     "scripts/modules/37_settings_panel.js",
     "scripts/modules/38_shard_dashboard.js",
+    "scripts/modules/39_quantum_scheduler.js",
+    "scripts/modules/40_memory_compactor.js",
+    "scripts/modules/41_snap_layouts.js",
+    "scripts/modules/42_time_machine_backup.js",
+    "scripts/modules/43_declarative_state.js",
     "scripts/audit.js"
 ];
 
