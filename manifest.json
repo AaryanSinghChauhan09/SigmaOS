@@ -1,0 +1,15 @@
+{
+  "name": "SigmaOS Sovereign Zenith",
+  "short_name": "SigmaOS",
+  "start_url": "index.html",
+  "display": "standalone",
+  "background_color": "#000000",
+  "theme_color": "#00f2ff",
+  "icons": [
+    {
+      "src": "splash.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
+  ]
+}
