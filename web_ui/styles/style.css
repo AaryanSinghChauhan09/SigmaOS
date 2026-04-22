@@ -6,7 +6,8 @@
     --mica-blur: blur(40px);
     --mica-border: 1px solid rgba(255, 255, 255, 0.12);
     --transition-pro: all 0.5s cubic-bezier(0.19, 1, 0.22, 1);
-}
+}  backdrop-filter: var(--mica-blur);
+
 
 * {
     margin: 0;
