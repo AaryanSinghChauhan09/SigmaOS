@@ -1,11 +1,26 @@
 {
   "name": "default",
-  "created": "2026-04-22T00:00:00Z",
-  "theme": "MATRIX",
+  "description": "Balanced defaults — all panels, MATRIX theme",
+  "sync_interval": 300,
+  "shards": ["virtualization", "security", "wasm", "sync", "automation"],
+  "theme": "dark",
   "accent": "#00f0ff",
   "blur": 25,
-  "opacity": 0.6,
-  "fontScale": 1.0,
-  "mode": "DARK",
-  "privacyShield": true
+  "font_scale": 1.0,
+  "shortcuts": {
+    "build": "Ctrl+B",
+    "sync":  "Ctrl+S",
+    "status":"Ctrl+T"
+  },
+  "layout": {
+    "dashboard_panels": ["shards", "sync", "profiles", "status"],
+    "default_view": "shards"
+  },
+  "preferences": {
+    "auto_sync":      true,
+    "notifications":  true,
+    "self_heal":      true,
+    "privacy_shield": false,
+    "background_fx":  true
+  }
 }

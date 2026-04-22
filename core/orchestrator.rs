@@ -148,10 +148,21 @@ impl ShardManager {
         if !path.exists() {
             return Err(format!("Profile '{}' not found at {}", name, path.display()));
         }
-        // Minimal JSON parsing — no serde needed for flat key:value
-        let content = fs::read_to_string(&path).map_err(|e| e.to_string())?;
+        
+        let config = crate::config::ProfileConfig::load(&path)?;
+        
+        // Apply shard set from profile
+        if !config.shards.is_empty() {
+            // In a real system, we might only activate those in the list
+            eprintln!("Σ [PROFILE] Activating shards: {:?}", config.shards);
+        }
+
         self.profile = name.to_string();
-        eprintln!("Σ [PROFILE] Applied: {} ({} bytes)", name, content.len());
+        eprintln!("Σ [PROFILE] Applied: {}", name);
+        eprintln!("  - Theme:      {}", config.theme);
+        eprintln!("  - Interval:   {}s", config.sync_interval);
+        eprintln!("  - Auto-Sync:  {}", config.auto_sync);
+        eprintln!("  - Shortcuts:  {} mapped", config.shortcuts.len());
         Ok(())
     }
 

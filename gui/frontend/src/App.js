@@ -8,16 +8,61 @@ import { SyncPanel }    from './components/SyncPanel.js';
 import { Profiles }     from './components/Profiles.js';
 import { Status }       from './components/Status.js';
 
+import { useShortcuts } from './hooks/useShortcuts.js';
+import { build, sync, getStatus } from './api.js';
+
 class ZenithApp {
     constructor() {
         this.components = {};
         this.activePanel = null;
+        this.currentProfile = null;
     }
 
-    init() {
+    async init() {
         this._injectTabs();
         this._mountComponents();
+        await this._loadCurrentProfile();
         console.log('Σ://ZENITH_APP> All GUI components mounted.');
+    }
+
+    async _loadCurrentProfile() {
+        // Fetch current status to determine active profile
+        const r = await getStatus();
+        if (r.ok) {
+            const lines = r.data.split('\n');
+            for (const line of lines) {
+                if (line.startsWith('Profile:')) {
+                    this.currentProfile = line.split(':')[1].trim();
+                    break;
+                }
+            }
+        }
+        
+        // Setup shortcuts based on profile (stub — would fetch full config in real app)
+        const shortcuts = {
+            'build': 'Ctrl+B',
+            'sync': 'Ctrl+S',
+            'status': 'Ctrl+T'
+        };
+
+        const actions = {
+            'build': async () => {
+                window.sigmaNotify?.('Initiating build...', 'INFO');
+                const r = await build();
+                window.sigmaNotify?.(r.data, r.ok ? 'OPTIMAL' : 'WARN');
+            },
+            'sync': async () => {
+                window.sigmaNotify?.('Syncing with GitHub...', 'INFO');
+                const r = await sync();
+                window.sigmaNotify?.(r.data, r.ok ? 'OPTIMAL' : 'WARN');
+            },
+            'status': async () => {
+                this._activateTab('panel-status', document.querySelector('[data-tab="panel-status"]'));
+                this.components.status.refresh();
+            }
+        };
+
+        this.cleanupShortcuts = useShortcuts(shortcuts, actions);
     }
 
     _injectTabs() {

@@ -1,16 +1,25 @@
 {
   "name": "lightweight",
-  "created": "2026-04-22T00:00:00Z",
-  "description": "Lightweight mode — minimal blur, max performance",
-  "theme": "SOVEREIGN_GOLD",
+  "description": "Near-zero effects, maximum performance, minimal shards",
+  "sync_interval": 900,
+  "shards": ["sync"],
+  "theme": "dark",
   "accent": "#ffcc00",
   "blur": 2,
-  "opacity": 0.95,
-  "fontScale": 1.05,
-  "mode": "DARK",
-  "privacyShield": false,
-  "auto_sync": false,
-  "shard_layout": "list",
-  "heartbeat": 5000,
-  "backgroundEffects": false
+  "font_scale": 1.05,
+  "shortcuts": {
+    "build": "Ctrl+B",
+    "sync":  "Ctrl+S"
+  },
+  "layout": {
+    "dashboard_panels": ["shards", "status"],
+    "default_view": "status"
+  },
+  "preferences": {
+    "auto_sync":      false,
+    "notifications":  false,
+    "self_heal":      true,
+    "privacy_shield": false,
+    "background_fx":  false
+  }
 }
