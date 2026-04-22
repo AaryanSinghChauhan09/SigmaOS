@@ -1,0 +1,11 @@
+{
+  "name": "minimal",
+  "created": "2026-04-22T00:00:00Z",
+  "theme": "SOVEREIGN_GOLD",
+  "accent": "#ffcc00",
+  "blur": 4,
+  "opacity": 0.9,
+  "fontScale": 1.1,
+  "mode": "DARK",
+  "privacyShield": false
+}

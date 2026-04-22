@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SigmaOS Zenith Interface</title>
+    <link rel="stylesheet" href="style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+</head>
+<body>
+    <!-- The Sovereign Desktop Background -->
+    <div id="desktop">
+        
+        <!-- Center Floating Taskbar (Mica/Glassmorphic) -->
+        <nav id="taskbar">
+            <div class="taskbar-inner">
+                <button class="sys-btn launcher-btn" title="Start Sovereign Lattice">❖</button>
+                <div class="dock-separator"></div>
+                <button class="app-btn active" title="Browser">🌐</button>
+                <button class="app-btn" title="Files">📁</button>
+                <button class="app-btn" title="Terminal">⌨️</button>
+                <button class="app-btn" title="Settings">⚙️</button>
+            </div>
+            
+            <div class="system-tray">
+                <div class="tray-pill">
+                    <button class="sys-btn" id="a11y-toggle" title="Accessibility (High Contrast & Speech)" style="background:transparent; border:none; cursor:pointer; font-size:16px;">👁️</button>
+                    <span class="icon">🔋</span>
+                    <span class="icon">📶</span>
+                    <span class="time" id="clock">10:42 AM</span>
+                </div>
+            </div>
+        </nav>
+
+        <!-- Example App Window -->
+        <div class="window active-window" style="left: 10%; top: 10%; width: 800px; height: 500px;">
+            <div class="window-titlebar">
+                <div class="window-controls">
+                    <button class="win-btn close"></button>
+                    <button class="win-btn min"></button>
+                    <button class="win-btn max"></button>
+                </div>
+                <div class="window-title">System Settings</div>
+            </div>
+            <div class="window-content glass-content">
+                <div class="settings-sidebar">
+                    <ul>
+                        <li class="active">Hardware & Drivers</li>
+                        <li>Network & Security</li>
+                        <li>Sovereign Docs (Office)</li>
+                        <li>Security & TPM</li>
+                        <li>Updates & Backups</li>
+                    </ul>
+                </div>
+                <div class="settings-main">
+                    <h2>Hardware Interfaces (Sovereign_Driver)</h2>
+                    <p>Zero-dependency abstraction layer active.</p>
+                    <div class="status-card ok">
+                        <strong>NVMe Storage</strong>
+                        <span>SOVEREIGN_STATUS_OK</span>
+                    </div>
+                    <div class="status-card ok">
+                        <strong>GPU Subsystem</strong>
+                        <span>SOVEREIGN_STATUS_OK</span>
+                    </div>
+
+                    <h2 style="margin-top:20px;">Network & Security Layer</h2>
+                    <div class="status-card ok" style="border-color:var(--accent);">
+                        <strong>Sovereign Firewall</strong>
+                        <span>STATE: STRICT DROP</span>
+                    </div>
+                    <div class="status-card disabled">
+                        <strong>WireGuard VPN Shard</strong>
+                        <span>STATE: DISCONNECTED (TUNNEL 0)</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- Universal Search (Spotlight / PowerToys Run style) -->
+    <div id="universal-search" class="hidden">
+        <div class="search-box glass-content">
+            <span class="search-icon">🔍</span>
+            <input type="text" id="search-input" placeholder="Search SigmaOS... (Apps, Files, Settings)">
+            <span class="search-hint">Press Esc to close</span>
+        </div>
+    </div>
+
+    <script>
+        // Start live clock for UI
+        function updateClock() {
+            const now = new Date();
+            let hours = now.getHours();
+            let minutes = now.getMinutes() < 10 ? '0' + now.getMinutes() : now.getMinutes();
+            let ampm = hours >= 12 ? 'PM' : 'AM';
+            hours = hours % 12 || 12;
+            document.getElementById('clock').innerText = `${hours}:${minutes} ${ampm}`;
+        }
+        setInterval(updateClock, 1000);
+        updateClock();
+
+        // Universal Search Toggle Logic
+        const searchOverlay = document.getElementById('universal-search');
+        const searchInput = document.getElementById('search-input');
+        
+        document.addEventListener('keydown', (e) => {
+            // Trigger on Ctrl+Space or Meta+Space
+            if ((e.ctrlKey || e.metaKey) && e.code === 'Space') {
+                e.preventDefault();
+                searchOverlay.classList.toggle('hidden');
+                if(!searchOverlay.classList.contains('hidden')) {
+                    searchInput.focus();
+                }
+            }
+            // Close on Escape
+            if (e.code === 'Escape' && !searchOverlay.classList.contains('hidden')) {
+                searchOverlay.classList.add('hidden');
+                searchInput.value = '';
+            }
+        });
+
+        // Accessibility Suite Toggle (High Contrast + Speech)
+        document.getElementById('a11y-toggle').addEventListener('click', () => {
+            document.body.classList.toggle('high-contrast');
+            
+            // Screen reader scaffold
+            if(document.body.classList.contains('high-contrast')) {
+                let msg = new SpeechSynthesisUtterance("High contrast accessibility mode enabled");
+                window.speechSynthesis.speak(msg);
+            } else {
+                let msg = new SpeechSynthesisUtterance("Standard display mode enabled");
+                window.speechSynthesis.speak(msg);
+            }
+        });
+    </script>
+</body>
+</html>

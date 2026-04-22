@@ -1,0 +1,26 @@
+{
+  "name": "secure",
+  "description": "Maximum privacy, crypto active, minimal attack surface",
+  "sync_interval": 600,
+  "shards": ["security", "sync"],
+  "theme": "light",
+  "accent": "#ff0055",
+  "blur": 30,
+  "font_scale": 1.0,
+  "shortcuts": {
+    "build": "Ctrl+B",
+    "sync":  "Ctrl+G",
+    "audit": "Ctrl+A"
+  },
+  "layout": {
+    "dashboard_panels": ["security", "shards", "profiles"],
+    "default_view": "security"
+  },
+  "preferences": {
+    "auto_sync":      false,
+    "notifications":  false,
+    "self_heal":      false,
+    "privacy_shield": true,
+    "background_fx":  false
+  }
+}

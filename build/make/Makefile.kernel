@@ -1,0 +1,3 @@
+# S SIGMAOS: Kernel Build Logic
+KERNEL_OBJS = kernel/suites/*.c
+

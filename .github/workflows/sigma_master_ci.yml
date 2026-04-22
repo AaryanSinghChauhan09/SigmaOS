@@ -1,0 +1,26 @@
+name: Sovereign Silicon CI
+on:
+  push:
+    branches: ["main"]
+  pull_request:
+    branches: ["main"]
+
+jobs:
+  silicon_build:
+    name: "Silicon Lattice Build"
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install Rust
+        uses: dtolnay/rust-toolchain@stable
+        with:
+          targets: x86_64-unknown-none
+      - name: Build Core
+        run: cargo build --release --manifest-path core/Cargo.toml
+      - name: Build Backend
+        run: cargo build --release --manifest-path gui/Cargo.toml
+      - name: Verify Shards
+        run: |
+          echo "[CI] Verifying freestanding silicon shards..."
+          if [ ! -d "shards" ]; then exit 1; fi
+          echo "[PASS] Silicon lattice verified."

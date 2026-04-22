@@ -1,111 +1,40 @@
-# SigmaOS .gitignore — Sovereign Distribution v3
-# =================================================
-# Prevents multi-GB push failures by excluding generated
-# binaries, OS images, secrets, and build intermediates.
+# SigmaOS Git Ignore
 
-# ---- GENERATED BINARIES & IMAGES ----
-*.iso
-*.iso.tmp
-*.img
-*.bin
-*.elf
-*.exe
-*.dll
-*.so
-*.dylib
-*.out
-*.a
-*.lib
+# Rust
+target/
+Cargo.lock
 
-# ---- BUILD INTERMEDIATES ----
-*.o
-*.obj
+# Python
 __pycache__/
 *.py[cod]
 *$py.class
-build/
-dist/
-*.spec
-bootloader/*.bin
-kernel/*.o
-kernel/*.obj
+.pytest_cache/
+.env
 
-# ---- NODE / WEB DEPENDENCIES ----
+# Node/GUI
 node_modules/
-**/node_modules/
-.npm/
-npm-debug.log*
-yarn-debug.log*
-yarn-error.log*
-package-lock.json
-
-# ---- OS RUNTIME / SECRETS ----
-.venv/
-venv/
-env/
-ENV/
-.vagrant/
-Vagrant/
-.sigma_keys/
-sessions/
-SIGMA_VAULT/
-identity_vault/
-*.key
-*.pem
-*.crt
-*.pub
-
-# ---- LOGS & TEMP OUTPUTS ----
-*.log
-logs/
-debug.txt
-out.txt
-out_s.txt
-diag_output*.txt
-test_results.txt
-test_sigmaos_suite_output.txt
-boot_output.txt
-run_error.txt
-dupes.txt
-find_dupes.txt
-singularity_output.txt
-singularity_breaker_output.txt
-status*.json
-test_out.txt
-fix_log.txt
-
-# ---- EDITOR / IDE ----
-.vscode/
-.idea/
-*.swp
-*.swo
+dist/
 .DS_Store
-Thumbs.db
 
-# ---- FORCE-KEEP CRITICAL DOCS & SOURCE ----
-!README.md
-!OS_GUIDE.md
-!requirements.txt
-!*.c
-!*.h
-!*.cpp
-!*.hpp
-!*.rs
-!*.asm
-!*.html
-!*.css
-!*.js
-!*.ts
-!*.bat
-!*.sh
-!*.ps1
-!*.py
-!Makefile
-!Dockerfile
-!Vagrantfile
-!*.json
-!*.md
-!userland/
-!sigma_core/
-!kernel/
-!bootloader/
+# Kernel / Build
+bin/
+*.o
+*.bin
+*.img
+*.iso
+*.log
+
+# Test Artifacts (Temporary)
+profiles/testmode.json
+plugins/myplugin/
+kernel/suites/SXX_*
+include/suites/SXX_*
+!kernel/suites/S01_Kernel
+!kernel/suites/S02_Memory
+!kernel/suites/S03_Scheduler
+# Add specific suites that should stay
+# ...
+
+# System
+sigma_config.json
+*.local

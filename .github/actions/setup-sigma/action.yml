@@ -1,0 +1,10 @@
+name: 'Setup SigmaOS Environment'
+description: 'Install the industrial build toolchain and setup environment for Sovereign Architecture.'
+runs:
+  using: "composite"
+  steps:
+    - name: Install Industrial Build Toolchain
+      shell: bash
+      run: |
+        sudo apt-get update -qq
+        sudo apt-get install -y gcc nasm binutils gcc-x86-64-linux-gnu qemu-system-x86 make mtools grub-pc-bin grub-common xorriso 2>/dev/null

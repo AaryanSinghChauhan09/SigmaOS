@@ -1,0 +1,24 @@
+{
+  "system": "SigmaOS Sovereign",
+  "versioning_model": "TRINITARIAN",
+  "versions": [
+    {
+      "id": "EDGE",
+      "target": "Embedded/RISC-V",
+      "shards": ["ArchCore", "Slab", "9P", "Jail"],
+      "focus": "Minimal Footprint / Real-Time"
+    },
+    {
+      "id": "CLOUD",
+      "target": "Virtual/x86_64",
+      "shards": ["ArchCore", "MagazineSlab", "IORing", "XDP", "Namespace", "IOCP"],
+      "focus": "High-Density I/O / Virtualization"
+    },
+    {
+      "id": "DESKTOP",
+      "target": "Native/ARM64/x86_64",
+      "shards": ["ArchCore", "FS_Ext4", "GPGPU_Accel", "Vantage_UI", "ABI_Translate"],
+      "focus": "Application Compatibility / UX"
+    }
+  ]
+}

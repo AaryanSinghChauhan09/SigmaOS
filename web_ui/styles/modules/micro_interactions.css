@@ -1,0 +1,36 @@
+/**
+ * Sovereign Micro-Interactions
+ * Elevates the OS feel through sentient cursor responses and premium animations.
+ */
+
+:root {
+    --cursor-glow: 0 0 15px rgba(0, 240, 255, 0.4);
+}
+
+* {
+    cursor: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 20 20"><circle cx="10" cy="10" r="4" fill="white" stroke="cyan" stroke-width="2"/></svg>') 10 10, auto;
+}
+
+button:hover, .v-tab:hover, .cyber-btn:hover {
+    transform: translateY(-2px) scale(1.05);
+    box-shadow: var(--glow-cyan);
+    filter: brightness(1.2);
+}
+
+.window-container {
+    transition: var(--transition-pro);
+}
+
+.window-container:hover {
+    box-shadow: 0 40px 100px rgba(0, 0, 0, 0.9), 0 0 0 1px rgba(0, 240, 255, 0.2);
+}
+
+@keyframes silicon-pulse {
+    0% { opacity: 0.8; }
+    50% { opacity: 1; transform: scale(1.005); }
+    100% { opacity: 0.8; }
+}
+
+.sentient-pulse {
+    animation: silicon-pulse 4s infinite ease-in-out;
+}

@@ -1,0 +1,47 @@
+/* ── Flex & Spacing ───────────────────────────────────────── */
+.flex-column-gap-10 { display: flex; flex-direction: column; gap: 10px; }
+.flex-gap-10 { display: flex; gap: 10px; }
+.mt-10 { margin-top: 10px; }
+.m-0 { margin: 0; }
+.p-20 { padding: 20px; }
+
+/* ── Typography & Sizing ─────────────────────────────────── */
+.font-size-16 { font-size: 16px; }
+.font-size-22 { font-size: 22px; }
+.font-size-12 { font-size: 12px; }
+.fw-bold { font-weight: bold; }
+
+/* ── Specific Overrides ──────────────────────────────────── */
+.border-gold { border-color: var(--acc-gold) !important; }
+.border-purple { border-color: var(--acc-purple) !important; }
+.text-gold { color: var(--acc-gold) !important; }
+.text-cyan { color: var(--acc-cyan) !important; }
+.text-magenta { color: var(--acc-magenta) !important; }
+.text-purple { color: var(--acc-purple) !important; }
+.text-purple-bright { color: #d088ff !important; }
+
+/* ── Component Specific ─────────────────────────────────── */
+.inline-select { display: inline-block; width: auto; }
+.progress-fill-h100 { height: 100%; }
+.progress-fill-cyan { background: var(--acc-cyan); }
+.progress-fill-magenta { background: var(--acc-magenta); }
+
+/* Progress Widths */
+.w-3pct { width: 3%; }
+.w-6pct { width: 6%; }
+
+/* ── Border & Text Colors ────────────────────────────────── */
+.border-gold { border-color: var(--acc-gold) !important; }
+.border-purple { border-color: var(--acc-purple) !important; }
+.text-gold { color: var(--acc-gold) !important; }
+.text-cyan { color: var(--acc-cyan) !important; }
+.text-magenta { color: var(--acc-magenta) !important; }
+
+/* ── Miscellaneous ───────────────────────────────────────── */
+.font-size-22 { font-size: 22px; }
+.font-size-12 { font-size: 12px; }
+.fw-bold { font-weight: bold; }
+.inline-select { display: inline-block; width: auto; }
+.flex-gap-10 { display: flex; gap: 10px; }
+.p-20 { padding: 20px; }
+.m-0 { margin: 0; }

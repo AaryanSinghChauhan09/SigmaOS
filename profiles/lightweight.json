@@ -1,0 +1,25 @@
+{
+  "name": "lightweight",
+  "description": "Near-zero effects, maximum performance, minimal shards",
+  "sync_interval": 900,
+  "shards": ["sync"],
+  "theme": "dark",
+  "accent": "#ffcc00",
+  "blur": 2,
+  "font_scale": 1.05,
+  "shortcuts": {
+    "build": "Ctrl+B",
+    "sync":  "Ctrl+S"
+  },
+  "layout": {
+    "dashboard_panels": ["shards", "status"],
+    "default_view": "status"
+  },
+  "preferences": {
+    "auto_sync":      false,
+    "notifications":  false,
+    "self_heal":      true,
+    "privacy_shield": false,
+    "background_fx":  false
+  }
+}

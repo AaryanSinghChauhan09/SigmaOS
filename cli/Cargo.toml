@@ -1,0 +1,9 @@
+[package]
+name        = "sigma-cli"
+description = "sigmactl — SigmaOS Sovereign CLI (native Rust binary)"
+version.workspace = true
+edition.workspace = true
+
+[[bin]]
+name = "sigmactl"
+path = "main.rs"

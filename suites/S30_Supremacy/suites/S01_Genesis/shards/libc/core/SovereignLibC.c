@@ -1,0 +1,6 @@
+#include "sigma_kernel.h"
+#include "shards/sigma_string.c"
+#include "shards/sigma_stdio.c"
+#include "shards/sigma_syscalls.c"
+#include "shards/sigma_malloc.c"
+#include "shards/sigma_security.c"

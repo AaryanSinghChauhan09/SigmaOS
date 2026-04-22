@@ -1,0 +1,6 @@
+CompileFlags:
+  Add: [-Wno-everything, -fno-builtin]
+  Remove: [-include*]
+
+Diagnostics:
+  Suppress: "*"

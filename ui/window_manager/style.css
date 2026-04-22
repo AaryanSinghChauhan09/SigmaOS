@@ -1,0 +1,319 @@
+:root {
+    --bg-wallpaper: linear-gradient(135deg, #120e1f 0%, #1e153b 50%, #111a2f 100%);
+    --glass-bg: rgba(255, 255, 255, 0.03);
+    --glass-border: rgba(255, 255, 255, 0.08);
+    --glass-blur: blur(25px);
+    --text-primary: #f0f0f4;
+    --text-secondary: #9da0ab;
+    --accent: #6c5ce7;
+    --win-close: #ff5f56;
+    --win-min: #ffbd2e;
+    --win-max: #27c93f;
+    --shadow-heavy: 0 20px 40px rgba(0,0,0,0.4);
+}
+
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+    user-select: none;
+}
+
+body {
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+    color: var(--text-primary);
+    overflow: hidden;
+    height: 100vh;
+    background: var(--bg-wallpaper);
+}
+
+#desktop {
+    width: 100vw;
+    height: 100vh;
+    position: relative;
+    /* Optional: background image for wallpaper goes here */
+}
+
+/* === GLASSSMORPHIC TASKBAR === */
+#taskbar {
+    position: absolute;
+    bottom: 15px;
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    pointer-events: none; /* Let clicks pass through empty areas */
+}
+
+.taskbar-inner {
+    background: var(--glass-bg);
+    backdrop-filter: var(--glass-blur);
+    border: 1px solid var(--glass-border);
+    border-radius: 20px;
+    padding: 8px 12px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    box-shadow: var(--shadow-heavy);
+    pointer-events: auto;
+}
+
+.taskbar-inner button {
+    background: transparent;
+    border: none;
+    color: var(--text-primary);
+    font-size: 24px;
+    width: 48px;
+    height: 48px;
+    border-radius: 12px;
+    cursor: pointer;
+    transition: all 0.2s cubic-bezier(0.25, 0.8, 0.25, 1);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.taskbar-inner button:hover {
+    background: rgba(255, 255, 255, 0.1);
+    transform: translateY(-4px) scale(1.05);
+}
+
+.taskbar-inner button.active {
+    background: rgba(108, 92, 231, 0.2);
+    border-bottom: 3px solid var(--accent);
+}
+
+.launcher-btn {
+    font-size: 28px !important;
+    color: var(--accent) !important;
+}
+
+.dock-separator {
+    width: 1px;
+    height: 30px;
+    background: var(--glass-border);
+    margin: 0 4px;
+}
+
+/* === SYSTEM TRAY === */
+.system-tray {
+    position: absolute;
+    right: 20px;
+    bottom: 0;
+    pointer-events: auto;
+}
+
+.tray-pill {
+    background: var(--glass-bg);
+    backdrop-filter: var(--glass-blur);
+    border: 1px solid var(--glass-border);
+    border-radius: 16px;
+    padding: 12px 18px;
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    font-size: 14px;
+    font-weight: 500;
+}
+
+/* === WINDOW MANAGER === */
+.window {
+    position: absolute;
+    background: rgba(15, 15, 25, 0.6);
+    backdrop-filter: var(--glass-blur);
+    border: 1px solid var(--glass-border);
+    border-radius: 16px;
+    display: flex;
+    flex-direction: column;
+    box-shadow: var(--shadow-heavy);
+    overflow: hidden;
+    animation: windowRise 0.4s cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+
+@keyframes windowRise {
+    0% { transform: translateY(30px) scale(0.95); opacity: 0; }
+    100% { transform: translateY(0) scale(1); opacity: 1; }
+}
+
+.window-titlebar {
+    height: 48px;
+    background: rgba(0, 0, 0, 0.2);
+    display: flex;
+    align-items: center;
+    padding: 0 16px;
+    border-bottom: 1px solid var(--glass-border);
+    cursor: grab;
+}
+
+.window-controls {
+    display: flex;
+    gap: 8px;
+    margin-right: 20px;
+}
+
+.win-btn {
+    width: 14px;
+    height: 14px;
+    border-radius: 50%;
+    border: none;
+    cursor: pointer;
+}
+.win-btn.close { background: var(--win-close); }
+.win-btn.min { background: var(--win-min); }
+.win-btn.max { background: var(--win-max); }
+
+.window-title {
+    font-weight: 500;
+    font-size: 14px;
+    color: var(--text-secondary);
+}
+
+.window-content {
+    display: flex;
+    flex: 1;
+    overflow: hidden;
+}
+
+.settings-sidebar {
+    width: 220px;
+    background: rgba(0,0,0,0.15);
+    padding: 20px 10px;
+    border-right: 1px solid var(--glass-border);
+}
+
+.settings-sidebar ul { list-style: none; }
+.settings-sidebar li {
+    padding: 10px 15px;
+    border-radius: 8px;
+    margin-bottom: 5px;
+    font-size: 14px;
+    color: var(--text-secondary);
+    cursor: pointer;
+    transition: background 0.2s;
+}
+.settings-sidebar li:hover { background: rgba(255,255,255,0.05); }
+.settings-sidebar li.active {
+    background: var(--accent);
+    color: white;
+}
+
+.settings-main {
+    flex: 1;
+    padding: 30px;
+}
+.settings-main h2 { margin-bottom: 10px; font-weight: 400; letter-spacing: -0.5px; }
+.settings-main p { color: var(--text-secondary); font-size: 14px; margin-bottom: 30px; }
+
+.status-card {
+    background: rgba(255,255,255,0.03);
+    border: 1px solid var(--glass-border);
+    padding: 15px 20px;
+    border-radius: 12px;
+    margin-bottom: 15px;
+    display: flex;
+    justify-content: space-between;
+}
+.status-card.ok span { color: var(--win-max); font-family: monospace; font-size: 12px; }
+
+/* === UNIVERSAL SEARCH (SPOTLIGHT) === */
+#universal-search {
+    position: absolute;
+    top: 0; left: 0; width: 100vw; height: 100vh;
+    background: rgba(0,0,0,0.4);
+    backdrop-filter: blur(8px);
+    display: flex;
+    justify-content: center;
+    align-items: flex-start;
+    padding-top: 15vh;
+    z-index: 1000;
+    transition: opacity 0.2s;
+}
+
+#universal-search.hidden {
+    opacity: 0;
+    pointer-events: none;
+}
+
+.search-box {
+    width: 650px;
+    background: rgba(25, 25, 35, 0.85);
+    backdrop-filter: var(--glass-blur);
+    border: 1px solid var(--glass-border);
+    border-radius: 16px;
+    display: flex;
+    align-items: center;
+    padding: 15px 25px;
+    box-shadow: var(--shadow-heavy);
+    transform: translateY(0);
+    transition: transform 0.3s cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+
+#universal-search.hidden .search-box {
+    transform: translateY(-20px) scale(0.98);
+}
+
+.search-icon {
+    font-size: 24px;
+    margin-right: 15px;
+    opacity: 0.7;
+}
+
+#search-input {
+    flex: 1;
+    background: transparent;
+    border: none;
+    outline: none;
+    color: var(--text-primary);
+    font-size: 20px;
+    font-family: inherit;
+}
+
+#search-input::placeholder {
+    color: var(--text-secondary);
+}
+
+.search-hint {
+    background: rgba(255,255,255,0.1);
+    padding: 4px 8px;
+    border-radius: 6px;
+    font-size: 11px;
+    color: var(--text-secondary);
+}
+
+/* === ACCESSIBILITY (HIGH CONTRAST) === */
+body.high-contrast {
+    --bg-wallpaper: #000000;
+    --glass-bg: #000000;
+    --glass-border: #FFFF00;
+    --glass-blur: none;
+    --text-primary: #FFFFFF;
+    --text-secondary: #FFFF00;
+    --accent: #FFFF00;
+    background: var(--bg-wallpaper);
+}
+
+body.high-contrast .window, 
+body.high-contrast .taskbar-inner, 
+body.high-contrast .tray-pill, 
+body.high-contrast .search-box,
+body.high-contrast .settings-sidebar,
+body.high-contrast .status-card {
+    background: #000000 !important;
+    backdrop-filter: none !important;
+    border: 2px solid #FFFF00 !important;
+    box-shadow: none !important;
+}
+
+body.high-contrast p, 
+body.high-contrast .window-title, 
+body.high-contrast .search-hint,
+body.high-contrast li {
+    color: #FFFF00 !important;
+}
+
+body.high-contrast .active, 
+body.high-contrast .launcher-btn {
+    background: #FFFF00 !important;
+    color: #000 !important;
+    border: none !important;
+}
