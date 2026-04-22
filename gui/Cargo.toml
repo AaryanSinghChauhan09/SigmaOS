@@ -1,9 +1,11 @@
 [package]
-name        = "sigma-gui-backend"
-description = "Zenith GUI backend — zero-dep Rust HTTP server mirroring sigmactl"
-version.workspace = true
-edition.workspace = true
+name = "sigma-backend"
+version = "1.0.0"
+edition = "2021"
 
 [[bin]]
 name = "sigma-backend"
-path = "backend.rs"
+path = "src/main.rs"
+
+[dependencies]
+sigma-core = { path = "../core" }
