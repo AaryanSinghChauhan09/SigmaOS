@@ -29,8 +29,8 @@ ALL_C_SRCS   := $(shell find $(SUITES_DIR) -name "*.c")
 ALL_CPP_SRCS := $(shell find $(SUITES_DIR) -name "*.cpp")
 ALL_ASM_SRCS := $(shell find $(SUITES_DIR) -name "*.asm")
 
-# Include paths for all suites
-INCLUDES     := -I. $(shell find $(SUITES_DIR) -type d | sed 's/^/-I/')
+# Include paths for all suites and core headers
+INCLUDES     := -I. -Icore/include $(shell find $(SUITES_DIR) -type d | sed 's/^/-I/')
 
 # --- OBJECTS ---
 OBJS := $(patsubst %.c, $(BUILD_DIR)/%.o, $(notdir $(ALL_C_SRCS))) \
