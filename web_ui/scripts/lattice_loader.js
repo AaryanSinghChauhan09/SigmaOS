@@ -81,7 +81,8 @@ const LATTICE_MODULES = [
     "scripts/modules/34_sovereign_adaptive_pager.js",
     "scripts/modules/35_plugin_loader.js",
     "scripts/modules/36_config_bridge.js",
-    "scripts/modules/37_settings_panel.js"
+    "scripts/modules/37_settings_panel.js",
+    "scripts/modules/38_shard_dashboard.js"
 ];
 
 function loadLatticeModules(modules, callback) {

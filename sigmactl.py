@@ -262,6 +262,67 @@ def cmd_auto(args):
     print(f"  {res}")
     log("Automation complete.", "OK")
 
+def cmd_status(args):
+    print(BANNER)
+    cfg = load_config()
+    log("Sovereign Lattice System Status", "SYS")
+    print()
+    git_branch = subprocess.run(["git","branch","--show-current"], capture_output=True, text=True, cwd=ROOT)
+    git_ahead  = subprocess.run(["git","rev-list","HEAD...origin/main","--count"], capture_output=True, text=True, cwd=ROOT)
+    print(f"  {'Branch':<22} {git_branch.stdout.strip() or 'unknown'}")
+    print(f"  {'Commits ahead':<22} {git_ahead.stdout.strip() or '0'}")
+    print(f"  {'Active profile':<22} {cfg.get('profile','default')}")
+    print(f"  {'Theme':<22} {cfg.get('theme','MATRIX')}")
+    print(f"  {'Auto-sync':<22} {'ON' if cfg.get('auto_sync') else 'OFF'}")
+    print()
+    suite_root = ROOT / "kernel" / "suites"
+    if suite_root.exists():
+        suites   = sum(1 for s in suite_root.iterdir() if s.is_dir())
+        total_c  = sum(len(list(s.rglob("*.c")))  for s in suite_root.iterdir() if s.is_dir())
+        total_rs = sum(len(list(s.rglob("*.rs"))) for s in suite_root.iterdir() if s.is_dir())
+        total_asm= sum(len(list(s.rglob("*.asm")))for s in suite_root.iterdir() if s.is_dir())
+        log(f"Suites: {suites}  |  C: {total_c}  Rust: {total_rs}  ASM: {total_asm}", "OK")
+    PLUGIN_DIR.mkdir(exist_ok=True)
+    plugins = [d for d in PLUGIN_DIR.iterdir() if d.is_dir()]
+    log(f"Plugins installed: {len(plugins)}", "INFO")
+    server_status = call_api("telemetry")
+    if "SERVER OFFLINE" in server_status:
+        log("Zenith server: OFFLINE (run: node server.js)", "WARN")
+    else:
+        log("Zenith server: ONLINE", "OK")
+
+def cmd_shard_add(args):
+    name = args.name
+    suite_root  = ROOT / "kernel" / "suites"
+    suite_dir   = suite_root / f"SXX_{name.title()}"
+    include_dir = ROOT / "include" / "suites" / f"SXX_{name.title()}"
+    suite_dir.mkdir(parents=True, exist_ok=True)
+    (suite_dir / "shards").mkdir(exist_ok=True)
+    include_dir.mkdir(parents=True, exist_ok=True)
+    (suite_dir / f"SXX_{name.title()}_Register.c").write_text(
+        f'/* SigmaOS Suite: {name.title()} */\n#include "sigma_utils.h"\n\n'
+        f'void suite_{name.lower()}_init(void) {{\n'
+        f'    SIGMA_INFO("S{name.upper()}", "{name.title()} Suite Initialized.");\n}}\n')
+    (include_dir / f"{name.title()}.h").write_text(
+        f'#ifndef SIGMA_{name.upper()}_H\n#define SIGMA_{name.upper()}_H\n\n'
+        f'void suite_{name.lower()}_init(void);\n\n#endif\n')
+    log(f"Shard suite '{name}' scaffolded at {suite_dir}", "OK")
+    log("Add your .c/.rs shards to the shards/ directory.", "INFO")
+
+def cmd_shard_remove(args):
+    suite_root = ROOT / "kernel" / "suites"
+    matches = [d for d in suite_root.iterdir() if args.name.lower() in d.name.lower()]
+    if not matches:
+        log(f"No suite found matching '{args.name}'", "ERR"); return
+    import shutil
+    for m in matches:
+        confirm = input(f"  Remove {m.name}? [y/N]: ").strip().lower()
+        if confirm == 'y':
+            shutil.rmtree(m)
+            log(f"Removed: {m}", "OK")
+        else:
+            log(f"Skipped: {m.name}", "INFO")
+
 def cmd_wizard(args):
     print(BANNER)
     print("\033[35m  ╔══════════════════════════════════╗")
@@ -335,6 +396,10 @@ Examples:
     sh_k.add_argument("id")
     sh_ip = sh_sub.add_parser("install-plugin", help="Scaffold a new plugin")
     sh_ip.add_argument("id", help="Plugin name")
+    sh_add = sh_sub.add_parser("add", help="Scaffold a new shard suite")
+    sh_add.add_argument("name", help="Suite name (e.g. analytics)")
+    sh_rm = sh_sub.add_parser("remove", help="Remove a shard suite (interactive)")
+    sh_rm.add_argument("name", help="Suite name or partial match")
 
     # plugin
     pl = subs.add_parser("plugin", help="Manage Zenith plugins")
@@ -352,6 +417,8 @@ Examples:
     pr_c.add_argument("--preset", choices=["developer", "secure", "minimal"], default="developer")
     pr_sw = pr_sub.add_parser("switch", help="Switch active profile")
     pr_sw.add_argument("name")
+    pr_set = pr_sub.add_parser("set", help="Alias for profile switch")
+    pr_set.add_argument("name")
 
     # sync
     subs.add_parser("sync", help="Sync local repo to GitHub")
@@ -373,6 +440,9 @@ Examples:
     # telemetry
     subs.add_parser("telemetry", help="Fetch live system telemetry")
 
+    # status
+    subs.add_parser("status", help="Show full system status (git, shards, server, profile)")
+
     args = parser.parse_args()
     if not args.command:
         print(BANNER)
@@ -380,10 +450,21 @@ Examples:
         return
 
     dispatch = {
-        "wizard": cmd_wizard, "build": cmd_build, "shard": cmd_shard,
-        "plugin": lambda a: cmd_plugin_list(a) if a.subcommand == "list" else cmd_plugin_install(a),
-        "profile": cmd_profile, "sync": cmd_sync, "auto-sync": cmd_auto_sync,
-        "auto": cmd_auto, "set": cmd_set, "get": cmd_get, "telemetry": cmd_telemetry,
+        "wizard":    cmd_wizard,   "build":    cmd_build,       "shard": lambda a: {
+            "ls":             lambda: cmd_shard(a),
+            "test":           lambda: cmd_shard(a),
+            "kill":           lambda: cmd_shard(a),
+            "install-plugin": lambda: cmd_shard(a),
+            "add":            lambda: cmd_shard_add(a),
+            "remove":         lambda: cmd_shard_remove(a),
+        }.get(a.subcommand, lambda: cmd_shard(a))(),
+        "plugin":    lambda a: cmd_plugin_list(a) if a.subcommand == "list" else cmd_plugin_install(a),
+        "profile":   lambda a: cmd_profile(a) if a.subcommand not in ('set',) else (
+            setattr(a, 'subcommand', 'switch') or cmd_profile(a)),
+        "sync":      cmd_sync,     "auto-sync": cmd_auto_sync,
+        "auto":      cmd_auto,     "set":        cmd_set,
+        "get":       cmd_get,      "telemetry":  cmd_telemetry,
+        "status":    cmd_status,
     }
     dispatch[args.command](args)
 
