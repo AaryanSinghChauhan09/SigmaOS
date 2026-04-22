@@ -116,6 +116,15 @@ const SYSTEM_MODULES = [
     "scripts/modules/61_api_playground.js",
     "scripts/modules/62_academic_mode.js",
     "scripts/modules/63_offline_continuity.js",
+    "scripts/modules/64_workspace_templates.js",
+    "scripts/modules/65_privacy_layer.js",
+    "scripts/modules/66_utility_sidebar.js",
+    "scripts/modules/67_workflow_scripting.js",
+    "scripts/modules/68_learning_mode.js",
+    "scripts/modules/69_coding_companion.js",
+    "scripts/modules/70_citation_collector.js",
+    "scripts/modules/71_workspace_ai_assistant.js",
+    "scripts/modules/72_live_co_browsing.js",
     "scripts/audit.js"
 ];
 
