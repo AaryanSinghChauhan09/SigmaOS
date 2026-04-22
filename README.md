@@ -1,33 +1,33 @@
-# Σ SigmaOS Zenith | Sovereign Repository
+# Σ SIGMAOS: THE SOVEREIGN SILICON ENTITY
+
+SigmaOS is an industrial-grade, zero-dependency operating system built on the **33-Suite Sovereign Lattice**. It represents absolute architectural finality, bypassing POSIX and legacy abstractions to deliver bare-metal performance via pure silicon memory flows.
+
+## 🏛️ Repository Architecture
+
+The repository is organized for absolute modularity and structural purity:
+
+- **[`core/`](core/)**: Hardened kernel primitives, assembly HAL shards, and language bridges.
+- **[`suites/`](suites/)**: The 33-suite Sovereign Lattice—self-contained functional domains.
+- **[`web_ui/`](web_ui/)**: Zenith Web Dashboard—a modular, PWA-compliant interface.
+- **[`meta/`](meta/)**: Centralized configuration, legal documentation, and historical records.
+
+## 💎 Sovereign Standards
+
+- **Zero-Std Enforcement**: Strictly freestanding (`-ffreestanding`, `-nostdlib`) to eliminate high-level library dependencies.
+- **Pure ASM Core**: Direct syscall-level primitives for bit-perfect hardware control.
+- **Unified Single Branch**: The `main` branch is the exclusive, hardened source of truth.
+
+## 🚀 Getting Started
+
+1. **Build**: Use the Sovereign Build Orchestrator:
+   ```bash
+   powershell -File build_sovereign.ps1
+   ```
+2. **Test**: Certify lattice shards:
+   ```bash
+   powershell -File run_sigma_tests.ps1
+   ```
+3. **Launch**: Open `web_ui/index.html` for the Zenith Experience.
 
 ---
-
-### 🔥 The Mission: Absolute Architectural Purity
-The Sovereign Lattice is a zero-dependency, C11-first architecture designed for absolute industrial-grade sovereignty. By eliminating all external dependencies and enforcing a proprietary C11/Assembly silicon root, SigmaOS achieves bit-perfect parity with global OS standards while introducing quantum-immune security.
-
-## 🏛️ Sovereign UI Framework (v1.0)
-The Zenith interface is now powered by an Object-Oriented Component System designed for high-performance Chromium runtimes.
-- **Component-Driven**: Logic encapsulated in classes (MissionControl, SystemMonitor, etc.).
-- **Zero Inline Styles**: 100% compliant with standard professional Linting requirements.
-- **Chromium-Agnostic**: Engineered to run on any Chromium-based engine (Edge, Chrome, Brave, Opera) with native WebKit fallbacks for legacy/Safari compatibility.
-
-## 🛡️ Modular UI Architecture
-- `index.html`: Clean Component Host Containers.
-- `scripts/kernel_loader.js`: Object-Oriented Shard Orchestrator & Bootloader.
-- `styles/modules/compatibility.css`: Centralized vendor prefix and polyfill registry.
-- `scripts/modules/00_sovereign_framework.js`: The core OOP Component Model.
-
-### 🏛️ The 33-Suite Sovereign Lattice
-The repository is modularized into 33 industrial-grade suites, providing absolute architectural finality:
-1. **S01_Genesis**: Core foundation and boot finality.
-2. **S02_ZenithUI**: Premium high-fidelity interface.
-3. **S03_Orchestrator**: Master process synchronization.
-4. **S04_HAL**: Unified hardware abstraction.
-5. **S05_Memory**: Predictive memory compaction.
-6. **S06_Storage**: NVMe-accelerated storage lattice.
-7. **S07_Network**: Sovereign protocol stacks.
-8. **S08_Security**: Predictive AI-driven firewall.
-9. **S09_Intelligence**: Neural pattern recognition.
-10. **S10_Registry**: Universal object storage.
-... and 23 additional suites covering Virtualization, Sentience, and Transcendence.
-
+*Sovereignty is Absolute. The machine is Unified.*
