@@ -11,11 +11,20 @@ from pathlib import Path
 from datetime import datetime
 import urllib.request, urllib.error
 
-ROOT = Path(__file__).parent
+# Enforce UTF-8 for nice aesthetics on all platforms
+if sys.stdout.encoding.lower() != 'utf-8':
+    try:
+        import io
+        sys.stdout = io.TextIOWrapper(sys.stdout.buffer, encoding='utf-8')
+        sys.stderr = io.TextIOWrapper(sys.stderr.buffer, encoding='utf-8')
+    except Exception:
+        pass
+
+ROOT = Path(os.getenv("SIGMA_ROOT", Path(__file__).parent)).resolve()
 CONFIG_FILE = ROOT / "sigma_config.json"
 PROFILE_DIR = ROOT / "profiles"
 PLUGIN_DIR  = ROOT / "plugins"
-API_BASE    = "http://localhost:8080/api"
+API_BASE    = os.getenv("SIGMA_API", "http://localhost:8080/api")
 
 BANNER = """
 \033[36m  ████████ ████  ██████  ███    ███  █████
@@ -86,7 +95,7 @@ def cmd_shard(args):
         if not suite_root.exists():
             log("kernel/suites directory not found.", "WARN"); return
         print(f"\n{'Suite':<28} {'C':>4} {'ASM':>5} {'Rust':>5}")
-        print("─" * 45)
+        print("-" * 45)
         total = {"c": 0, "asm": 0, "rs": 0}
         for suite in sorted(suite_root.iterdir()):
             if suite.is_dir():
@@ -95,7 +104,7 @@ def cmd_shard(args):
                 rs  = len(list(suite.rglob("*.rs")))
                 total["c"] += c; total["asm"] += asm; total["rs"] += rs
                 print(f"  {suite.name:<26} {c:>4} {asm:>5} {rs:>5}")
-        print("─" * 45)
+        print("-" * 45)
         print(f"  {'TOTAL':<26} {total['c']:>4} {total['asm']:>5} {total['rs']:>5}")
 
     elif sub == "test":
@@ -196,7 +205,7 @@ def cmd_profile(args):
         cfg = load_config()
         active = cfg.get("profile", "default")
         print(f"\n{'Profile':<20} {'Theme':<15} {'Active'}")
-        print("─" * 42)
+        print("-" * 42)
         for p in profiles:
             data = json.loads(p.read_text())
             marker = "\033[32m● ACTIVE\033[0m" if p.stem == active else "  ○"

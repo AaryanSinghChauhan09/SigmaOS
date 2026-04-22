@@ -11,18 +11,32 @@ SIGMACTL = ROOT / "sigmactl.py"
 
 # ── Helpers ────────────────────────────────────────────────────────────────
 
-def run_ctl(*args, cwd=None):
+def run_ctl(*args, cwd=None, env=None):
     """Run sigmactl with given args, return (returncode, stdout, stderr)"""
+    if env is None:
+        env = os.environ.copy()
     result = subprocess.run(
         [sys.executable, str(SIGMACTL)] + list(args),
-        capture_output=True, text=True, cwd=cwd or ROOT
+        capture_output=True, text=True, cwd=cwd or ROOT, env=env
     )
     return result.returncode, result.stdout, result.stderr
 
 
+def robust_rmtree(path):
+    """rmtree that handles read-only files (like .git on Windows)"""
+    def on_error(func, path, exc_info):
+        import stat
+        if not os.access(path, os.W_OK):
+            os.chmod(path, stat.S_IWUSR)
+            func(path)
+        else:
+            raise
+    shutil.rmtree(path, onerror=on_error)
+
+
 def make_temp_root():
     """Create a minimal temp SigmaOS root for isolated tests"""
-    tmp = Path(tempfile.mkdtemp(prefix="sigma_test_"))
+    tmp = Path(tempfile.mkdtemp(prefix="sigma_test_")).resolve()
     (tmp / "profiles").mkdir()
     (tmp / "plugins").mkdir()
     (tmp / "kernel" / "suites").mkdir(parents=True)
@@ -33,7 +47,11 @@ def make_temp_root():
     }))
     # Init git
     subprocess.run(["git", "init"], cwd=tmp, capture_output=True)
-    subprocess.run(["git", "commit", "--allow-empty", "-m", "init"], cwd=tmp, capture_output=True)
+    # Configure git for test environment
+    subprocess.run(["git", "config", "user.email", "test@sigma.os"], cwd=tmp, capture_output=True)
+    subprocess.run(["git", "config", "user.name", "Test Bot"], cwd=tmp, capture_output=True)
+    subprocess.run(["git", "add", "."], cwd=tmp, capture_output=True)
+    subprocess.run(["git", "commit", "-m", "init"], cwd=tmp, capture_output=True)
     return tmp
 
 
@@ -46,16 +64,17 @@ class TestConfig:
         assert "{" in out or "theme" in out
 
     def test_set_and_get(self, tmp_path):
-        cfg = tmp_path / "sigma_config.json"
-        cfg.write_text('{"theme":"MATRIX"}')
-        env = os.environ.copy()
-        env["SIGMA_ROOT"] = str(tmp_path)
-        subprocess.run(
-            [sys.executable, str(SIGMACTL), "set", "theme", "GHOST_MICA"],
-            env=env, cwd=ROOT
-        )
-        data = json.loads(cfg.read_text())
-        assert data.get("theme") == "GHOST_MICA"
+        tmp = make_temp_root()
+        try:
+            cfg = tmp / "sigma_config.json"
+            env = os.environ.copy()
+            env["SIGMA_ROOT"] = str(tmp)
+            rc, out, err = run_ctl("set", "theme", "GHOST_MICA", env=env)
+            assert rc == 0, f"Set failed: {err}"
+            data = json.loads(cfg.read_text())
+            assert data.get("theme") == "GHOST_MICA"
+        finally:
+            robust_rmtree(tmp)
 
     def test_get_specific_key(self):
         rc, out, _ = run_ctl("get", "theme")
@@ -73,19 +92,20 @@ class TestProfiles:
     def test_profile_create_and_switch(self):
         tmp = make_temp_root()
         try:
+            env = os.environ.copy()
+            env["SIGMA_ROOT"] = str(tmp)
             # Create
-            subprocess.run(
-                [sys.executable, str(SIGMACTL), "profile", "create", "testmode", "--preset", "minimal"],
-                cwd=tmp, capture_output=True
-            )
+            rc, out, err = run_ctl("profile", "create", "testmode", "--preset", "minimal", env=env)
+            assert rc == 0, f"Create failed: {err}"
             assert (tmp / "profiles" / "testmode.json").exists()
 
             # Switch
-            rc, out, _ = run_ctl("profile", "switch", "testmode")
-            # Should not error even if server offline
-            assert rc in (0, 1)
+            rc, out, err = run_ctl("profile", "switch", "testmode", env=env)
+            assert rc == 0, f"Switch failed: {err}"
+            cfg = json.loads((tmp / "sigma_config.json").read_text())
+            assert cfg.get("profile") == "testmode"
         finally:
-            shutil.rmtree(tmp)
+            robust_rmtree(tmp)
 
     def test_profile_set_alias(self):
         """profile set <name> should be equivalent to profile switch <name>"""
@@ -104,29 +124,33 @@ class TestShards:
     def test_shard_add_and_verify(self):
         tmp = make_temp_root()
         try:
-            rc, out, err = run_ctl("shard", "add", "analytics", cwd=tmp)
+            env = os.environ.copy()
+            env["SIGMA_ROOT"] = str(tmp)
+            rc, out, err = run_ctl("shard", "add", "analytics", env=env)
             suite_dir = tmp / "kernel" / "suites" / "SXX_Analytics"
             assert suite_dir.exists(), f"Suite dir not created: {err}"
             register_file = suite_dir / "SXX_Analytics_Register.c"
             assert register_file.exists(), "Register .c not created"
         finally:
-            shutil.rmtree(tmp)
+            robust_rmtree(tmp)
 
     def test_shard_remove(self):
         tmp = make_temp_root()
         try:
+            env = os.environ.copy()
+            env["SIGMA_ROOT"] = str(tmp)
             # Create first
-            run_ctl("shard", "add", "removeme", cwd=tmp)
+            run_ctl("shard", "add", "removeme", env=env)
             suite_dir = tmp / "kernel" / "suites" / "SXX_Removeme"
             assert suite_dir.exists()
             # Remove (non-interactive: pipe 'y' as stdin)
             p = subprocess.run(
                 [sys.executable, str(SIGMACTL), "shard", "remove", "removeme"],
-                input="y\n", text=True, capture_output=True, cwd=tmp
+                input="y\n", text=True, capture_output=True, cwd=tmp, env=env
             )
             assert not suite_dir.exists() or p.returncode == 0
         finally:
-            shutil.rmtree(tmp)
+            robust_rmtree(tmp)
 
 
 # ── Plugins ────────────────────────────────────────────────────────────────
@@ -135,22 +159,26 @@ class TestPlugins:
     def test_plugin_list_empty(self):
         tmp = make_temp_root()
         try:
-            rc, out, _ = run_ctl("plugin", "list", cwd=tmp)
+            env = os.environ.copy()
+            env["SIGMA_ROOT"] = str(tmp)
+            rc, out, _ = run_ctl("plugin", "list", env=env)
             assert "No plugins" in out or rc == 0
         finally:
-            shutil.rmtree(tmp)
+            robust_rmtree(tmp)
 
     def test_plugin_install_creates_manifest(self):
         tmp = make_temp_root()
         try:
-            rc, out, err = run_ctl("shard", "install-plugin", "myplugin", cwd=tmp)
+            env = os.environ.copy()
+            env["SIGMA_ROOT"] = str(tmp)
+            rc, out, err = run_ctl("shard", "install-plugin", "myplugin", env=env)
             manifest = tmp / "plugins" / "myplugin" / "plugin.json"
             assert manifest.exists(), f"Manifest not created: {err}"
             data = json.loads(manifest.read_text())
             assert data["name"] == "myplugin"
             assert data["enabled"] is True
         finally:
-            shutil.rmtree(tmp)
+            robust_rmtree(tmp)
 
 
 # ── Status ─────────────────────────────────────────────────────────────────
