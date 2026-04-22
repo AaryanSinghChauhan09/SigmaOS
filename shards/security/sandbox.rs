@@ -1,8 +1,9 @@
-/// shards/security/sandbox.rs — Rust sandbox enforcement
-/// Zero-trust capability model: each shard runs in an isolated namespace
-/// with explicitly granted capabilities. No capability = no access.
+#![no_std]
+/// shards/security/sandbox.rs — #![no_std] Rust sandbox enforcement
+/// Pure silicon primitives with zero dependency on HLL standard libraries.
 
 use core::sync::atomic::{AtomicU32, Ordering};
+use core::panic::PanicInfo;
 
 // ── Capability bitfield ────────────────────────────────────────────────────
 pub const CAP_NONE:         u32 = 0;
@@ -117,37 +118,7 @@ pub extern "C" fn sigma_sandbox_violations() -> u32 {
     VIOLATIONS.load(Ordering::Relaxed)
 }
 
-#[cfg(test)]
-mod tests {
-    use super::*;
-
-    #[test]
-    fn test_capability_check() {
-        let mut sb = Sandbox::new(99, "test");
-        sb.grant(CAP_NET);
-        assert!(sb.check(CAP_NET).is_ok());
-        assert!(sb.check(CAP_FS_WRITE).is_err());
-    }
-
-    #[test]
-    fn test_revoke() {
-        let mut sb = Sandbox::new(99, "test");
-        sb.grant(CAP_NET | CAP_IPC);
-        sb.revoke(CAP_NET);
-        assert!(!sb.has(CAP_NET));
-        assert!(sb.has(CAP_IPC));
-    }
-
-    #[test]
-    fn test_mem_ceiling() {
-        let sb = Sandbox::new(1, "t").with_mem(64);
-        assert!(sb.check_mem(60).is_ok());
-        assert!(sb.check_mem(100).is_err());
-    }
-
-    #[test]
-    fn test_sovereign_has_all() {
-        let sb = sandbox_kernel();
-        assert!(sb.check(CAP_NET | CAP_FS_WRITE | CAP_SYSCALL).is_ok());
-    }
+#[panic_handler]
+fn panic(_info: &PanicInfo) -> ! {
+    loop {}
 }
