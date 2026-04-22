@@ -27,13 +27,29 @@ impl ShardManager {
     }
 
     pub fn spawn_raw(&self, cmd: &str) {
+        if cmd.len() > 2048 { return; } // Loophole: Buffer overflow protection
         #[cfg(windows)]
         unsafe {
-            let mut si = [0u8; 128];
+            let mut si = [0u8; 128]; // Manual zeroing implicitly handled by array init
             let mut pi = [0u8; 32];
-            let mut cmd_buf = cmd.to_string().into_bytes();
+            let mut cmd_buf = Vec::with_capacity(cmd.len() + 1);
+            for c in cmd.chars() {
+                if c == '\0' { break; } // Loophole: Null injection protection
+                cmd_buf.push(c as u8);
+            }
             cmd_buf.push(0);
-            ffi::CreateProcessA(core::ptr::null(), cmd_buf.as_mut_ptr(), core::ptr::null_mut(), core::ptr::null_mut(), 1, 0, core::ptr::null_mut(), core::ptr::null(), si.as_mut_ptr(), pi.as_mut_ptr());
+            
+            ffi::CreateProcessA(
+                core::ptr::null(),
+                cmd_buf.as_mut_ptr(),
+                core::ptr::null_mut(),
+                core::ptr::null_mut(),
+                1, 0,
+                core::ptr::null_mut(),
+                core::ptr::null(),
+                si.as_mut_ptr(),
+                pi.as_mut_ptr(),
+            );
         }
     }
 }

@@ -37,15 +37,19 @@ impl Config {
     fn manual_trim(s: &str) -> &str {
         let b = s.as_bytes();
         let mut start = 0;
-        while start < b.len() && (b[start] == b' ' || b[start] == b'\n') { start += 1; }
+        while start < b.len() && (b[start] == b' ' || b[start] == b'\n' || b[start] == b'\r' || b[start] == b'\t') { start += 1; }
         let mut end = b.len();
-        while end > start && (b[end-1] == b' ' || b[end-1] == b'\n') { end -= 1; }
-        &s[start..end]
+        while end > start && (b[end-1] == b' ' || b[end-1] == b'\n' || b[end-1] == b'\r' || b[end-1] == b'\t') { end -= 1; }
+        if start >= end { "" } else { &s[start..end] }
     }
 
     fn read_string(chars: &mut core::iter::Peekable<core::str::Chars>) -> String {
         let mut s = String::new();
-        while let Some(c) = chars.next() { if c == '"' { break; } s.push(c); }
+        while let Some(c) = chars.next() { 
+            if c == '"' { break; } 
+            if s.len() > 1024 { break; } // Loophole: Prevent memory exhaustion
+            s.push(c); 
+        }
         s
     }
 

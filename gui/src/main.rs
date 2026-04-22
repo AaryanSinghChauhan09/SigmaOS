@@ -6,12 +6,21 @@ use sigma_core::orchestrator::ShardManager;
 
 static mut GLOBAL_MGR: *mut ShardManager = core::ptr::null_mut();
 
+static mut CONNECTION_COUNT: usize = 0;
+
 extern "C" fn client_handler(s: usize) -> u32 {
-    let mut buf = [0u8; 1024];
     unsafe {
+        if CONNECTION_COUNT > 100 { ffi::closesocket(s); return 0; } // Loophole: DOS protection
+        CONNECTION_COUNT += 1;
+        
+        let mut buf = [0u8; 1024];
         let n = ffi::recv(s, buf.as_mut_ptr(), 1024, 0);
-        if n > 0 {
-            let text = core::str::from_utf8(&buf[..n as usize]).unwrap_or("");
+        if n > 0 && n < 1024 {
+            let mut text = String::new();
+            for &b in &buf[..n as usize] {
+                if b == 0 { break; } // Loophole: Null injection protection
+                text.push(b as char);
+            }
             if text.contains("/status") {
                 let status = (*GLOBAL_MGR).status();
                 respond(s, &status);
@@ -20,6 +29,7 @@ extern "C" fn client_handler(s: usize) -> u32 {
             }
         }
         ffi::closesocket(s);
+        CONNECTION_COUNT -= 1;
     }
     0
 }
