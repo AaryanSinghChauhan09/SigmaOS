@@ -22,12 +22,14 @@ impl Config {
         while let Some(c) = chars.next() {
             if c == '"' {
                 let key = Self::read_string(&mut chars);
+                // Manual search for ':'
                 while let Some(&next) = chars.peek() {
                     if next == ':' { chars.next(); break; }
                     chars.next();
                 }
+                // Manual whitespace skip (no .is_whitespace)
                 while let Some(&next) = chars.peek() {
-                    if next.is_whitespace() { chars.next(); } else { break; }
+                    if next == ' ' || next == '\n' || next == '\r' || next == '\t' { chars.next(); } else { break; }
                 }
                 
                 let mut val = String::new();
@@ -42,10 +44,24 @@ impl Config {
                         }
                     }
                 }
-                cfg.set(key.trim(), val.trim());
+                // Manual key/val cleaning (no .trim)
+                cfg.set(Self::manual_trim(&key), Self::manual_trim(&val));
             }
         }
         cfg
+    }
+
+    fn manual_trim(s: &str) -> &str {
+        let bytes = s.as_bytes();
+        let mut start = 0;
+        while start < bytes.len() && (bytes[start] == b' ' || bytes[start] == b'\n' || bytes[start] == b'\r' || bytes[start] == b'\t') {
+            start += 1;
+        }
+        let mut end = bytes.len();
+        while end > start && (bytes[end - 1] == b' ' || bytes[end - 1] == b'\n' || bytes[end - 1] == b'\r' || bytes[end - 1] == b'\t') {
+            end -= 1;
+        }
+        &s[start..end]
     }
 
     fn read_string(chars: &mut core::iter::Peekable<core::str::Chars>) -> String {

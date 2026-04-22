@@ -83,7 +83,12 @@ impl ShardManager {
         let path = format!("{}/shards/{}", self.root, name);
         fs::create_dir_all(format!("{}/src", path)).map_err(|e| e.to_string())?;
         
-        let name_snake = name.replace('-', "_");
+        // Manual snake_case (no .replace)
+        let mut name_snake = String::new();
+        for c in name.chars() {
+            if c == '-' { name_snake.push('_'); } else { name_snake.push(c); }
+        }
+
         fs::write(format!("{}/Cargo.toml", path), format!("[package]\nname=\"sigma-{name}\"\nversion=\"1.0.0\"\nedition=\"2021\"\n\n[lib]\nname=\"sigma_{name_snake}\"\ncrate-type=[\"rlib\"]\n")).map_err(|e| e.to_string())?;
         fs::write(format!("{}/src/lib.rs", path), format!("pub fn init() {{ eprintln!(\"Σ [SHARD] {name} initialized.\"); }}\n")).map_err(|e| e.to_string())?;
 
