@@ -1,1 +1,0 @@
-/* C Shard Template */\n#include "SigmaC11.h"\nvoid shard_init() {\n    // Initialize Sovereign logic...\n}
