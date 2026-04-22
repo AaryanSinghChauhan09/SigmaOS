@@ -1,0 +1,3 @@
+# S SIGMAOS: Tools Build Logic
+TOOLS_OBJS = tools/**/*.c
+

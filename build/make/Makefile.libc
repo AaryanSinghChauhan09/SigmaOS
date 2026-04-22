@@ -1,0 +1,3 @@
+# S SIGMAOS: LibC Build Logic
+LIBC_OBJS = libc/**/*.c
+

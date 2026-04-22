@@ -1,7 +1,0 @@
-{
-  "name": "myplugin",
-  "version": "1.0.0",
-  "enabled": true,
-  "entry": "plugins/myplugin/index.js",
-  "installed": "2026-04-22T09:31:09.231809"
-}
