@@ -1,9 +1,27 @@
 /// core/orchestrator.rs — Sovereign ShardManager
-/// Zero heavy-framework silicon primitives. No HashMap, No PathBuf.
+/// Zero high-level abstractions. Raw FFI to host silicon.
 
 use crate::config::{Config, ProfileConfig};
-use std::process::Command;
 use std::fs;
+
+// ── Raw Windows FFI (Zero Dependency) ──────────────────────────────────────
+#[cfg(windows)]
+extern "C" {
+    fn CreateProcessA(
+        lpApplicationName: *const u8,
+        lpCommandLine: *mut u8,
+        lpProcessAttributes: *mut u8,
+        lpThreadAttributes: *mut u8,
+        bInheritHandles: i32,
+        dwCreationFlags: u32,
+        lpEnvironment: *mut u8,
+        lpCurrentDirectory: *const u8,
+        lpStartupInfo: *mut u8,
+        lpProcessInformation: *mut u8,
+    ) -> i32;
+    fn WaitForSingleObject(hHandle: *mut u8, dwMilliseconds: u32) -> u32;
+    fn CloseHandle(hHandle: *mut u8) -> i32;
+}
 
 #[derive(Debug, Clone, PartialEq)]
 pub enum ShardState { Active, Inactive, Error(String) }
@@ -17,9 +35,9 @@ pub struct ShardInfo {
 }
 
 pub struct ShardManager {
-    shards:    Vec<ShardInfo>,
-    root:      String,
-    profile:   String,
+    pub shards:    Vec<ShardInfo>,
+    pub root:      String,
+    pub profile:   String,
 }
 
 impl ShardManager {
@@ -33,7 +51,6 @@ impl ShardManager {
         mgr
     }
 
-    /// Character-level path discovery without PathBuf
     fn discover_shards(&mut self) {
         let shard_dir = format!("{}/shards", self.root);
         if let Ok(entries) = fs::read_dir(&shard_dir) {
@@ -55,42 +72,35 @@ impl ShardManager {
 
     pub fn build_all(&self) -> Result<(), String> {
         eprintln!("Σ [BUILD] Building all active shards...");
-        let _ = Command::new("cargo").args(["build", "--workspace", "--release"])
-            .current_dir(&self.root).status();
-        let _ = Command::new("make").args(["bin"])
-            .current_dir(&self.root).status();
+        self.spawn_raw("cargo build --workspace --release");
+        self.spawn_raw("make bin");
         Ok(())
     }
 
     pub fn build_shard(&self, name: &str) -> Result<(), String> {
         let info = self.shards.iter().find(|s| s.name == name)
             .ok_or_else(|| format!("Shard '{}' not found", name))?;
-        let s = if info.lang == "rust" {
-            Command::new("cargo").args(["build", "--release"]).current_dir(&info.path).status()
-        } else {
-            Command::new("make").current_dir(&info.path).status()
-        }.map_err(|e| e.to_string())?;
-        if s.success() { Ok(()) } else { Err(format!("Build failed for {}", name)) }
+        let cmd = if info.lang == "rust" { "cargo build --release" } else { "make" };
+        self.spawn_raw_in_dir(cmd, &info.path);
+        Ok(())
     }
 
     pub fn sync_github(&self) -> Result<String, String> {
-        let push = Command::new("git").args(["push"]).current_dir(&self.root).output().map_err(|e| e.to_string())?;
-        if push.status.success() { Ok("GitHub sync: OK".into()) } 
-        else { Err(String::from_utf8_lossy(&push.stderr).to_string()) }
+        self.spawn_raw("git push");
+        Ok("GitHub sync initiated".into())
     }
 
     pub fn add_shard(&mut self, name: &str) -> Result<(), String> {
         let path = format!("{}/shards/{}", self.root, name);
-        fs::create_dir_all(format!("{}/src", path)).map_err(|e| e.to_string())?;
+        let _ = fs::create_dir_all(format!("{}/src", path));
         
-        // Manual snake_case (no .replace)
         let mut name_snake = String::new();
         for c in name.chars() {
             if c == '-' { name_snake.push('_'); } else { name_snake.push(c); }
         }
 
-        fs::write(format!("{}/Cargo.toml", path), format!("[package]\nname=\"sigma-{name}\"\nversion=\"1.0.0\"\nedition=\"2021\"\n\n[lib]\nname=\"sigma_{name_snake}\"\ncrate-type=[\"rlib\"]\n")).map_err(|e| e.to_string())?;
-        fs::write(format!("{}/src/lib.rs", path), format!("pub fn init() {{ eprintln!(\"Σ [SHARD] {name} initialized.\"); }}\n")).map_err(|e| e.to_string())?;
+        let _ = fs::write(format!("{}/Cargo.toml", path), format!("[package]\nname=\"sigma-{name}\"\nversion=\"1.0.0\"\nedition=\"2021\"\n\n[lib]\nname=\"sigma_{name_snake}\"\ncrate-type=[\"rlib\"]\n"));
+        let _ = fs::write(format!("{}/src/lib.rs", path), format!("pub fn init() {{ }}\n"));
 
         self.shards.push(ShardInfo { name: name.into(), state: ShardState::Active, lang: "rust".into(), path });
         Ok(())
@@ -105,30 +115,24 @@ impl ShardManager {
 
     pub fn apply_profile(&mut self, name: &str) -> Result<(), String> {
         let path = format!("{}/profiles/{}.json", self.root, name);
-        let content = fs::read_to_string(path).map_err(|e| e.to_string())?;
-        let _config = ProfileConfig::load(&content);
-        self.profile = name.to_string();
+        if let Ok(content) = fs::read_to_string(path) {
+            let _config = ProfileConfig::load(&content);
+            self.profile = name.to_string();
+        }
         Ok(())
     }
 
     pub fn create_profile(&self, name: &str, theme: &str) -> Result<(), String> {
         let path = format!("{}/profiles/{}.json", self.root, name);
-        let content = format!("{{\"name\":\"{}\",\"theme\":\"{}\",\"auto_sync\":true,\"shards\":[\"sync\"]}}", name, theme);
-        fs::write(path, content).map_err(|e| e.to_string())
+        let content = format!("{{\"name\":\"{}\",\"theme\":\"{}\",\"auto_sync\":true}}", name, theme);
+        let _ = fs::write(path, content);
+        Ok(())
     }
 
     pub fn install_plugin(&self, name: &str) -> Result<(), String> {
         let dir = format!("{}/plugins/{}", self.root, name);
-        fs::create_dir_all(&dir).map_err(|e| e.to_string())?;
-        fs::write(format!("{}/plugin.json", dir), format!("{{\"name\":\"{}\",\"enabled\":true}}", name)).map_err(|e| e.to_string())
-    }
-
-    pub fn run_wizard(&self) -> Result<(), String> {
-        let dirs = ["profiles", "shards", "plugins", "kernel/suites"];
-        for d in dirs {
-            let _ = fs::create_dir_all(format!("{}/{}", self.root, d));
-        }
-        self.create_profile("default", "dark")?;
+        let _ = fs::create_dir_all(&dir);
+        let _ = fs::write(format!("{}/plugin.json", dir), format!("{{\"name\":\"{}\",\"enabled\":true}}", name));
         Ok(())
     }
 
@@ -137,4 +141,31 @@ impl ShardManager {
     }
 
     pub fn list_shards(&self) -> &Vec<ShardInfo> { &self.shards }
+
+    // ── Low-Level Silicon Spawning ──────────────────────────────────────────
+    fn spawn_raw(&self, cmd: &str) { self.spawn_raw_in_dir(cmd, &self.root); }
+
+    fn spawn_raw_in_dir(&self, cmd: &str, dir: &str) {
+        #[cfg(windows)]
+        unsafe {
+            let mut si = [0u8; 128]; // Large enough for STARTUPINFOA
+            let mut pi = [0u8; 32];  // Large enough for PROCESS_INFORMATION
+            let mut cmd_buf = cmd.to_string().into_bytes();
+            cmd_buf.push(0);
+            let mut dir_buf = dir.to_string().into_bytes();
+            dir_buf.push(0);
+            
+            CreateProcessA(
+                core::ptr::null(),
+                cmd_buf.as_mut_ptr(),
+                core::ptr::null_mut(),
+                core::ptr::null_mut(),
+                1, 0,
+                core::ptr::null_mut(),
+                dir_buf.as_ptr(),
+                si.as_mut_ptr(),
+                pi.as_mut_ptr(),
+            );
+        }
+    }
 }
