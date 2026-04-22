@@ -1,0 +1,31 @@
+/**
+ * SigmaOS Sovereign Identity & Privacy Shard 465
+ * Logic: Absorbing Sovereign Identity & Privacy features from Purism / Whonix. (Milestone: 465/500)
+ */
+
+class SovereignIdentityPrivacyShard465 {
+    constructor() {
+        this.shardId = "S" + "465_sovereign_identity___privacy.js".split('_')[0] + "_SovereignIdentityPrivacyShard465";
+        this.active = false;
+        
+        console.log(`Σ://APEX_500> ${this.shardId} Initializing: Sovereign Identity & Privacy Shard 465...`);
+        this.init();
+    }
+
+    init() {
+        window.addEventListener('sigma.core.boot', () => {
+            this.active = true;
+            console.log(`Σ://SINGULARITY_500> ${this.shardId} Online. Absorbing Sovereign Identity & Privacy features from Purism / Whonix. (Milestone: 465/500)`);
+            this.registerCLI();
+        });
+    }
+
+    registerCLI() {
+        if(!window.SigmaCLI) window.SigmaCLI = {};
+        window.SigmaCLI['id-vault-465'] = (args) => {
+            return `[Sovereign Identity & Privacy Shard 465] Apex Command: ${args.join(' ') || 'SINGULARITY'}`;
+        };
+    }
+}
+
+window.SigmaSovereignIdentityPrivacyShard465 = new SovereignIdentityPrivacyShard465();
