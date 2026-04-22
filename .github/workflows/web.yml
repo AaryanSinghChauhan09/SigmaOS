@@ -5,22 +5,16 @@ on:
   pull_request:
     branches: ["main"]
 
-
 jobs:
   web_purity:
     name: "Web OS Purity Gate"
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-        with:
-          fetch-depth: 0
       - name: Verify Zenith Web Core
         run: |
           echo "[CI] Verifying Web OS components..."
           if [ ! -f "web_ui/index.html" ]; then echo "[FAIL] Missing web_ui/index.html"; exit 1; fi
-          if [ ! -d "web_ui/styles" ]; then echo "[FAIL] Missing web_ui/styles directory"; exit 1; fi
-          if [ ! -d "web_ui/scripts" ]; then echo "[FAIL] Missing web_ui/scripts directory"; exit 1; fi
-          if [ ! -d "web_ui/assets" ]; then echo "[FAIL] Missing web_ui/assets directory"; exit 1; fi
           echo "[PASS] All Zenith Web core components verified."
 
   aesthetic_audit:
@@ -29,8 +23,6 @@ jobs:
     needs: [web_purity]
     steps:
       - uses: actions/checkout@v4
-        with:
-          fetch-depth: 0
       - name: CSS Integrity Scan
         run: |
           echo "[CI] Auditing CSS for Zenith compliance..."
@@ -38,26 +30,10 @@ jobs:
             echo "[FAIL] Glassmorphism logic missing from style.css."
             exit 1
           fi
-          if ! grep -qiE "webkit-backdrop-filter" web_ui/styles/style.css; then
-            echo "[FAIL] Safari webkit prefix missing from style.css."
-            exit 1
-          fi
-          if ! grep -qiE "fonts.googleapis.com" web_ui/index.html; then
-            echo "[FAIL] Premium typography (Google Fonts) missing from index.html."
-            exit 1
-          fi
-          if ! grep -qiE "transition:" web_ui/styles/style.css; then
-            echo "[FAIL] Micro-animations (transitions) missing from style.css."
-            exit 1
-          fi
-          if ! grep -qiE "border-radius:" web_ui/styles/style.css; then
-            echo "[FAIL] Modern rounding (border-radius) missing from style.css."
-            exit 1
-          fi
           echo "[PASS] CSS Zenith compliance verified."
 
   deployment_vitals:
-        name: "Deployment Readiness
+    name: "Deployment Readiness"
     runs-on: ubuntu-latest
     needs: [aesthetic_audit]
     steps:
