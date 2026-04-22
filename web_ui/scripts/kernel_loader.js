@@ -125,6 +125,16 @@ const SYSTEM_MODULES = [
     "scripts/modules/70_citation_collector.js",
     "scripts/modules/71_workspace_ai_assistant.js",
     "scripts/modules/72_live_co_browsing.js",
+    "scripts/modules/73_lecture_mode.js",
+    "scripts/modules/74_quiz_generator.js",
+    "scripts/modules/75_study_group_mode.js",
+    "scripts/modules/76_debug_mode.js",
+    "scripts/modules/77_comment_layer.js",
+    "scripts/modules/78_versioned_workspaces.js",
+    "scripts/modules/79_workspace_chat.js",
+    "scripts/modules/80_task_suggestions.js",
+    "scripts/modules/81_offline_study_mode.js",
+    "scripts/modules/82_gamification_engine.js",
     "scripts/audit.js"
 ];
 
