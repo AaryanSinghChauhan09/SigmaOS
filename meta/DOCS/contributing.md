@@ -1,81 +1,35 @@
 # Contributing to SigmaOS
 
-Welcome to the Sovereign Lattice. This document explains how to set up your
-environment, write shards, and submit changes.
+Thank you for your interest in contributing to the Sovereign Lattice! 
 
-## Quick Start
+## Getting Started
 
+### 1. Prerequisites
+- `gcc-x86-64-linux-gnu`
+- `nasm`
+- `make`
+- `python3` (for scripts)
+- `qemu-system-x86` (for local emulation)
+
+*Alternatively, use the provided `Dockerfile` for a zero-setup, cross-platform build environment.*
+
+### 2. Building
+Run the following to compile the entire OS:
 ```bash
-# One-command install
-curl -fsSL https://raw.githubusercontent.com/AaryanSinghChauhan09/SigmaOS/main/install.sh | bash
-
-# Or clone manually
-git clone --recurse-submodules https://github.com/AaryanSinghChauhan09/SigmaOS
-cd SigmaOS
-
-# Run the setup wizard
-python sigmactl.py wizard
-
-# Start Zenith dashboard
-node server.js        # GUI at http://localhost:8080
-
-# Build everything
-sigmactl build        # or: cargo build --workspace && make bin
+make all
 ```
 
-## Devcontainer (Recommended)
+### 3. Architecture Rules
+- **No External Dependencies:** We rely on `sigma_libc.h` and the Sovereign SDK. Do not include standard libraries like `<stdio.h>` in the kernel suites.
+- **Zero-Trust:** Assume other shards are hostile. Verify inputs when exposing handlers to the Sovereign Event Bus.
 
-Open in VS Code with the Remote Containers extension — everything is
-pre-configured in `.devcontainer/devcontainer.json`.
+## Coding Standards
+- Use C11. 
+- Variables should be `snake_case`. Macros must be `UPPER_SNAKE_CASE`.
+- Indentation is 4 spaces.
 
-## Writing a New Shard
-
-```bash
-# Scaffold a new shard via CLI
-sigmactl shard add <name>
-
-# Or manually:
-# 1. Create shards/<name>/src/lib.rs  (Rust shard)
-# 2. Or kernel/suites/SXX_<Name>/    (C11 shard)
-# 3. Add to Cargo.toml workspace members (Rust)
-# 4. Include sigma_utils.h in C shards
-```
-
-### Rust Shard Rules
-- Use `#![no_std]` unless the shard genuinely needs `std`
-- Expose a `C FFI` surface with `#[no_mangle] pub extern "C"`
-- Include unit tests (`#[cfg(test)] mod tests`)
-- No external crate dependencies without approval
-
-### C Shard Rules
-- `#include "sigma_utils.h"` for logging, config, and IPC
-- C11 standard, `-ffreestanding` compatible
-- No `malloc`/`free` — use the Rust memory manager FFI
-
-## Pull Request Checklist
-
-- [ ] New Rust shards have unit tests (`cargo test --workspace`)
-- [ ] C shards compile with `make bin` (no warnings)
-- [ ] `sigmactl status` exits 0
-- [ ] Integration tests pass: `pytest tools/dev/integration_tests/ -v`
-- [ ] `cargo clippy --workspace -- -D warnings` clean
-- [ ] CHANGELOG.md updated (or CI auto-generates it on merge)
-
-## Commit Message Format
-
-```
-<type>(<scope>): <short description>
-
-Types: feat | fix | chore | docs | refactor | test | perf
-Scope: kernel | shard | gui | cli | ci | docs | config
-
-Examples:
-  feat(shard): add analytics suite with event aggregation
-  fix(kernel): resolve IDT alignment fault on x86_64
-  chore(ci): enable cargo clippy gate
-```
-
-## Security
-
-See [SECURITY.md](../SECURITY.md) for the zero-trust policy and
-responsible disclosure process.
+## PR Workflow
+1. Fork the repo and create your branch from `main`.
+2. Add your shard to the appropriate `SXX_` suite directory.
+3. Ensure the CI passes (we check for dependencies and run static analysis).
+4. Issue a PR with a clear description of the shard's purpose.
