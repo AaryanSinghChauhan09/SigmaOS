@@ -106,6 +106,16 @@ const SYSTEM_MODULES = [
     "scripts/modules/51_stage_manager.js",
     "scripts/modules/52_biometric_auth.js",
     "scripts/modules/53_aero_glass.js",
+    "scripts/modules/54_smart_tab_workflows.js",
+    "scripts/modules/55_task_linked_tabs.js",
+    "scripts/modules/56_adaptive_tab_memory.js",
+    "scripts/modules/57_learning_integration.js",
+    "scripts/modules/58_workspace_collaboration.js",
+    "scripts/modules/59_github_integration.js",
+    "scripts/modules/60_code_snippet_manager.js",
+    "scripts/modules/61_api_playground.js",
+    "scripts/modules/62_academic_mode.js",
+    "scripts/modules/63_offline_continuity.js",
     "scripts/audit.js"
 ];
 
