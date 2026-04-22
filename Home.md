@@ -1,38 +1,62 @@
-# SigmaOS Sovereign — THE FACTUAL RECORD (v4.0 Finality)
+# 🌀 Welcome to the SigmaOS Sovereign Wiki
 
-- **[PROJECT_STATUS.md](PROJECT_STATUS.md)**: Current Enclosure Status and Supremacy Metrics.
-- **[AUTO_SOVEREIGN_WIKI.md](AUTO_SOVEREIGN_WIKI.md)**: The 33-Suite Component Auto-Generating Architecture Map.
-- **[MODULAR_REGISTRY_SPEC.md](MODULAR_REGISTRY_SPEC.md)**: Absolute Guide to Shard Registration and GIV.
+SigmaOS is a next-generation, industrial-grade operating system designed for speed, modularity, and innovation. Unlike traditional Linux distros, SigmaOS bypasses POSIX and legacy layers to deliver bare-metal performance with direct silicon memory flows.
 
-Welcome to the definitive, fact-only repository for SigmaOS. This wiki contains strictly verifiable technical specifications, competitive audits, and structural maps.
+## 🏛️ Project Vision
+SigmaOS aims to be the fastest and most secure platform for browser-centric computing, blending the purity of a 33-suite Sovereign Lattice with the flexibility of a Chromium-native ecosystem.
+
+## 📖 Wiki Contents
+- **[Shard Index](AUTO_SOVEREIGN_WIKI.md)**: A complete technical breakdown of all 2,191 shards.
+- **Getting Started**:
+  - [Installation Guide](#installation-guide)
+  - [Developer Setup](#developer-setup)
+- **Features**:
+  - [Sovereign 33-Suite Lattice](AUTO_SOVEREIGN_WIKI.md)
+  - [Zenith Dashboard v33.0.4](Home.md)
+  - **[Sigma Vault]**: Centralized WASM Shard Marketplace.
+  - **[Snapshot Engine]**: Declarative System Rollback (NixOS-grade).
+  - **[Tiling Engine]**: Advanced Window Management (i3/Sway style).
+  - **[Sovereign Handoff]**: Universal State Continuity.
+- **Roadmap**: [Strategic Feature Trajectory](../README.md#roadmap)
+
+## 💻 Installation Guide
+### Bare-Metal (Recommended)
+1. Clone the repository:
+   ```bash
+   git clone https://github.com/AaryanSinghChauhan09/SigmaOS.git
+   cd SigmaOS
+   ```
+2. Build the kernel binary:
+   ```bash
+   make bin
+   ```
+3. Generate the bootable ISO:
+   ```bash
+   make iso
+   ```
+4. Flash to a USB drive or boot in QEMU.
+
+### Web Engine (Simulated Mode)
+1. Build the engine:
+   ```bash
+   make web-engine
+   ```
+2. Launch the local portal:
+   ```bash
+   ./sigma_web_engine
+   ```
+
+## 🛠 Developer Setup
+1. Install **GCC 13+**, **NASM**, and **Node.js**.
+2. Build the system using the modularized builder:
+   ```bash
+   node build.js
+   ```
+3. Boot the Zenith Dashboard:
+   ```bash
+   node server.js
+   ```
+3. Use the **Sovereign Shard Builder** to create new suites.
 
 ---
-
-## 🏛️ 1. Technical Specifications
-- **[SOVEREIGN_FINAL_SPEC.md](SOVEREIGN_FINAL_SPEC.md)**: The terminal technical record (Latency, Throughput, Purity).
-- **[TECHNICAL_SPECIFICATIONS.md](TECHNICAL_SPECIFICATIONS.md)**: Hardware-level silicon alignment and multi-suite specs.
-- **[SPECIFICATION.md](SPECIFICATION.md)**: Detailed architectural requirements and constraints.
-- **[SOVEREIGN_HIVE_SYNTHESIS.md](SOVEREIGN_HIVE_SYNTHESIS.md)**: 4-Phase orchestration and suite materialization.
-- **[PERFORMANCE_ULTIMATUM.md](PERFORMANCE_ULTIMATUM.md)**: Zero-background and demand-shard execution facts.
-
-## 📊 2. Market & Feature Parity
-- **[COMPETITOR_COMPARISON.md](COMPETITOR_COMPARISON.md)**: Industrial feature comparison and implementation conditions.
-- **[MARKET_COMPETITIVE_AUDIT.md](MARKET_COMPETITIVE_AUDIT.md)**: Factual comparison against NT, Darwin, Linux, seL4, and QNX.
-- **[GLOSSARY.md](GLOSSARY.md)**: Essential terminology for the Sovereign Singularity.
-
-## ⚙️ 3. Structural & Developer Records
-- **[SOVEREIGN_LATTICE_ARCH_v4.md](SOVEREIGN_LATTICE_ARCH_v4.md)**: Absolute Guide to the Modularized 33-Suite Architecture.
-- **[GRAND_FINALE_SUPREMACY.md](GRAND_FINALE_SUPREMACY.md)**: Terminal 33-suite modularity map.
-- **[API_REFERENCE.md](API_REFERENCE.md)**: Sovereign Registry and Interconnect API definitions.
-- **[SHARD_GRAPH.md](SHARD_GRAPH.md)**: Visual mapping of inter-suite dependencies.
-- **[PRINCIPLES.md](PRINCIPLES.md)**: The foundational logic of Zero-Dependency Sovereignty.
-- **[DEPENDENCY_POLICY.md](DEPENDENCY_POLICY.md)**: Strict rules for shard-level containment.
-
-## 📜 4. Project History & Certification
-- **[CHANGELOG.md](CHANGELOG.md)**: Complete chronological evolution from v1.0 to Singularity.
-- **[V1_0_0_ASCENDANCE_STATEMENT.md](V1_0_0_ASCENDANCE_STATEMENT.md)**: The historical declaration of SigmaOS modularity.
-- **[SOVEREIGN_FINALITY_CERTIFICATE.md](SOVEREIGN_FINALITY_CERTIFICATE.md)**: Certified project enclosure status.
-- **[SOVEREIGN_CERTIFICATE.md](SOVEREIGN_CERTIFICATE.md)**: Real-time silicon-purity certification log.
-
----
-**ALL LOGIC TRACEABLE. ALL FACTS VERIFIED VIA S13 LATTICE AUDITOR.**
+*Sovereignty is Absolute. The Work continues.*

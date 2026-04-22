@@ -1,13 +1,18 @@
 ## 🧭 Sovereign Navigation
 
 * **[🏠 Home](Home)**
-* **[💠 Hive Synthesis](SOVEREIGN_HIVE_SYNTHESIS)**
+* **[🧠 Neural Bridge AI](SOVEREIGN_AI_ROADMAP)**
+* **[🧠 Adaptive Pager](SOVEREIGN_ADAPTIVE_PAGER)**
+* **[🛡️ Neural Firewall](SENTINEL_NEURAL_FIREWALL)**
+* **[🛡️ Sovereign Sandbox](SOVEREIGN_SANDBOX_SPEC)**
+* **[👥 Multi-Tenancy](SOVEREIGN_MULTI_TENANCY)**
+* **[🎯 Focus Mode](SOVEREIGN_FOCUS_MODE)**
+* **[👁️ Quick Look](SOVEREIGN_QUICK_LOOK)**
+* **[📊 Kernel Profiler](SOVEREIGN_PROFILER_SPEC)**
+* **[📊 Competitor Matrix](COMPETITOR_COMPARISON)**
 * **[💠 33-Shard Automated Wiki](AUTO_SOVEREIGN_WIKI)**
-* **[📊 Competitive Audit](MARKET_COMPETITIVE_AUDIT)**
-* **[📜 Technical Specs](TECHNICAL_SPECIFICATIONS)**
-* **[✨ Final Spec](SOVEREIGN_FINAL_SPEC)**
-* **[📊 Supremacy Index](SOVEREIGN_SUPREMACY_33_INDEX)**
 * **[🏗️ Lattice Architecture](SOVEREIGN_LATTICE_ARCH_v4)**
+* **[📜 Changelog](CHANGELOG)**
 
 ---
 *Absolute Machine Sovereignty Achieved.*

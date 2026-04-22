@@ -1,4 +1,4 @@
-﻿# S SigmaOS: Sovereign Feature Comparison Matrix (v33.1)
+# S SigmaOS: Sovereign Feature Comparison Matrix (v33.1)
 
 This factual record explores the parity and supremacy of SigmaOS Sovereign features relative to industrial competitors (Linux, Windows, Darwin/macOS) and specifies the technical working conditions required for optimal modular performance.
 
@@ -12,7 +12,11 @@ This factual record explores the parity and supremacy of SigmaOS Sovereign featu
 | **Database** | **S06 SQL Shard** | SQLite (Userland), MySQL | **USP**: Kernel-native SQL engine integrated into VFS. |
 | **Audio** | **S31 Audio Engine** | PulseAudio (Linux), CoreAudio (Mac) | **USP**: Spatial mixed-signal grid within the S31 suite. |
 | **Security** | **S08 Sentinel Matrix** | SELinux (Linux), Defender (Win) | **USP**: Native PQC (Kyber-1024) enforcement. |
-| **Power Mgmt** | **S04 Power Shard** | ACPI (Linux), Modern Standby (Win) | **USP**: Lattice-aware frequency scaling based on shard load. |
+| **UI/UX (Motion)** | **Mica-Flux / Aether Pulse** | Fluent (Win), Aqua (Mac) | **USP**: Sentient, breathing UI motion with zero-dependency purity. |
+| **App Management** | **Sigma Vault** | Snap/Flatpak (Linux), App Store (Mac) | **USP**: Direct WASM shard placement into the 33-suite registry. |
+| **Persistence** | **Snapshot Engine** | Time Machine (Mac), Nix Rollback | **USP**: Declarative silicon state capture with sub-100ms restore. |
+| **Continuity** | **Sovereign Handoff** | Universal Clipboard (Win/Mac) | **USP**: Transparent state transfer between local and cloud shards. |
+| **Window Mgmt**| **Sovereign Tiling** | i3/Sway (Linux), Snap Layouts (Win) | **USP**: Integrated grid tiling with lattice-aware window stacking. |
 
 ---
 
