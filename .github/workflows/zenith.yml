@@ -74,9 +74,18 @@ jobs:
           echo "[PASS] $PASS shards synthesized. $FAIL shards use extended libc (expected)."
 
   final_supremacy:
-    name: "Final Supremacy Declaration"
-    runs-on: ubuntu-latest
-    needs: [sovereign_compilation]
-    steps:
-      - name: Declare Finality
-        run: echo "SIGMAOS ZENITH SUPREME: ARCHITECTURAL FINALITY VERIFIED."
+    final_supremacy:
+    final_supremacy:
+      name: "Final Supremacy Declaration"
+        runs-on: ubuntu-latest
+          needs: [sovereign_compilation]
+            steps:
+                - name: Declare Finality
+                      run: echo "SIGMAOS ZENITH SUPREME: ARCHITECTURAL FINALITY VERIFIED."
+                      name: "Final Supremacy Declaration"
+        runs-on: ubuntu-latest
+          needs: [sovereign_compilation]
+            steps:
+                - name: Declare Finality
+                      run: echo "SIGMAOS ZENITH SUPREME: ARCHITECTURAL FINALITY VERIFIED."
+                      
