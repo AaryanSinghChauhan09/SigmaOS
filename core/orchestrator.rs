@@ -1,10 +1,8 @@
-/// core/orchestrator.rs — SigmaOS ShardManager
-/// Zero heavy-framework Rust — uses only std + direct process calls.
-/// Powers both CLI (sigmactl) and GUI backend via the same API.
+/// core/orchestrator.rs — Sovereign ShardManager
+/// Zero heavy-framework silicon primitives. No HashMap, No PathBuf.
 
-use std::collections::HashMap;
+use crate::config::{Config, ProfileConfig};
 use std::process::Command;
-use std::path::{Path, PathBuf};
 use std::fs;
 
 #[derive(Debug, Clone, PartialEq)]
@@ -15,46 +13,40 @@ pub struct ShardInfo {
     pub name:  String,
     pub state: ShardState,
     pub lang:  String,   // "rust", "c", "wasm"
-    pub path:  PathBuf,
+    pub path:  String,
 }
 
 pub struct ShardManager {
-    shards:    HashMap<String, ShardInfo>,
-    root:      PathBuf,
+    shards:    Vec<ShardInfo>,
+    root:      String,
     profile:   String,
 }
 
 impl ShardManager {
-    pub fn new() -> Self {
-        Self::with_root(".")
-    }
-
-    pub fn with_root(root: impl Into<PathBuf>) -> Self {
-        let root = root.into();
+    pub fn with_root(root: &str) -> Self {
         let mut mgr = Self {
-            shards:  HashMap::new(),
-            root:    root.clone(),
+            shards:  Vec::new(),
+            root:    root.to_string(),
             profile: "default".into(),
         };
         mgr.discover_shards();
         mgr
     }
 
-    /// Auto-discover shards from shards/ directory
+    /// Character-level path discovery without PathBuf
     fn discover_shards(&mut self) {
-        let shard_dir = self.root.join("shards");
+        let shard_dir = format!("{}/shards", self.root);
         if let Ok(entries) = fs::read_dir(&shard_dir) {
             for entry in entries.flatten() {
                 let path = entry.path();
                 if path.is_dir() {
-                    let name = path.file_name()
-                        .unwrap_or_default().to_string_lossy().to_string();
-                    let lang = if path.join("Cargo.toml").exists() { "rust" }
-                               else if path.join("Makefile").exists() { "c" }
+                    let name = path.file_name().unwrap().to_string_lossy().to_string();
+                    let lang = if fs::metadata(format!("{}/shards/{}/Cargo.toml", self.root, name)).is_ok() { "rust" }
+                               else if fs::metadata(format!("{}/shards/{}/Makefile", self.root, name)).is_ok() { "c" }
                                else { "unknown" };
-                    self.shards.insert(name.clone(), ShardInfo {
+                    self.shards.push(ShardInfo {
                         name, state: ShardState::Active,
-                        lang: lang.into(), path,
+                        lang: lang.into(), path: path.to_string_lossy().to_string(),
                     });
                 }
             }
@@ -63,226 +55,81 @@ impl ShardManager {
 
     pub fn build_all(&self) -> Result<(), String> {
         eprintln!("Σ [BUILD] Building all active shards...");
-        // Rust workspace
-        let r = Command::new("cargo")
-            .args(["build", "--workspace", "--release"])
-            .current_dir(&self.root)
-            .status();
-        match r {
-            Ok(s) if s.success() => eprintln!("Σ [BUILD] Rust workspace: OK"),
-            _ => eprintln!("Σ [WARN]  Rust workspace build failed — self-healing"),
-        }
-        // C kernel shards
-        let _ = Command::new("make")
-            .args(["bin"])
-            .current_dir(&self.root)
-            .status();
+        let _ = Command::new("cargo").args(["build", "--workspace", "--release"])
+            .current_dir(&self.root).status();
+        let _ = Command::new("make").args(["bin"])
+            .current_dir(&self.root).status();
         Ok(())
     }
 
     pub fn build_shard(&self, name: &str) -> Result<(), String> {
-        let info = self.shards.get(name)
+        let info = self.shards.iter().find(|s| s.name == name)
             .ok_or_else(|| format!("Shard '{}' not found", name))?;
-        match info.lang.as_str() {
-            "rust" => {
-                let s = Command::new("cargo")
-                    .args(["build", "--release"])
-                    .current_dir(&info.path)
-                    .status()
-                    .map_err(|e| e.to_string())?;
-                if s.success() { Ok(()) } else { Err(format!("cargo build failed for {}", name)) }
-            }
-            "c" => {
-                let s = Command::new("make")
-                    .current_dir(&info.path)
-                    .status()
-                    .map_err(|e| e.to_string())?;
-                if s.success() { Ok(()) } else { Err(format!("make failed for {}", name)) }
-            }
-            _ => Err(format!("Unknown lang for shard: {}", name)),
-        }
+        let s = if info.lang == "rust" {
+            Command::new("cargo").args(["build", "--release"]).current_dir(&info.path).status()
+        } else {
+            Command::new("make").current_dir(&info.path).status()
+        }.map_err(|e| e.to_string())?;
+        if s.success() { Ok(()) } else { Err(format!("Build failed for {}", name)) }
     }
 
     pub fn sync_github(&self) -> Result<String, String> {
-        // fetch + rebase + push — no heavy GitHub SDK
-        let fetch = Command::new("git").args(["fetch", "origin"])
-            .current_dir(&self.root).output().map_err(|e| e.to_string())?;
-        let push  = Command::new("git").args(["push"])
-            .current_dir(&self.root).output().map_err(|e| e.to_string())?;
-        let msg = if push.status.success() {
-            "GitHub sync: push OK".into()
-        } else {
-            String::from_utf8_lossy(&push.stderr).trim().to_string()
-        };
-        let _ = fetch;
-        Ok(msg)
+        let push = Command::new("git").args(["push"]).current_dir(&self.root).output().map_err(|e| e.to_string())?;
+        if push.status.success() { Ok("GitHub sync: OK".into()) } 
+        else { Err(String::from_utf8_lossy(&push.stderr).to_string()) }
     }
 
     pub fn add_shard(&mut self, name: &str) -> Result<(), String> {
-        let path = self.root.join("shards").join(name);
-        fs::create_dir_all(path.join("src")).map_err(|e| e.to_string())?;
-
-        // 1. Scaffold Rust Shard (Sovereign Component)
+        let path = format!("{}/shards/{}", self.root, name);
+        fs::create_dir_all(format!("{}/src", path)).map_err(|e| e.to_string())?;
+        
         let name_snake = name.replace('-', "_");
-        let cargo = format!(r#"[package]
-name = "sigma-{name}"
-version = "1.0.0"
-edition = "2021"
+        fs::write(format!("{}/Cargo.toml", path), format!("[package]\nname=\"sigma-{name}\"\nversion=\"1.0.0\"\nedition=\"2021\"\n\n[lib]\nname=\"sigma_{name_snake}\"\ncrate-type=[\"rlib\"]\n")).map_err(|e| e.to_string())?;
+        fs::write(format!("{}/src/lib.rs", path), format!("pub fn init() {{ eprintln!(\"Σ [SHARD] {name} initialized.\"); }}\n")).map_err(|e| e.to_string())?;
 
-[lib]
-name = "sigma_{name_snake}"
-crate-type = ["rlib"]
-"#);
-        fs::write(path.join("Cargo.toml"), cargo).map_err(|e| e.to_string())?;
-        fs::write(path.join("src/lib.rs"), format!(r#"//! SigmaOS Sovereign Shard: {name}
-//! Auto-generated by ShardManager
-
-pub fn init() {{
-    eprintln!("Σ [SHARD] {name} initialized.");
-}}
-
-pub fn process() {{
-    // Shard logic here
-}}
-"#)).map_err(|e| e.to_string())?;
-
-        // 2. Scaffold C Kernel Interface (Silicon Interface)
-        let suite_name = format!("SXX_{}", name.to_uppercase());
-        let suite_dir = self.root.join("kernel").join("suites").join(&suite_name);
-        if !suite_dir.exists() { fs::create_dir_all(&suite_dir).map_err(|e| e.to_string())?; }
-        let c_file = suite_dir.join(format!("{}_Register.c", suite_name));
-        let c_template = format!(r#"#include <sigma/shard.h>
-#include <stdio.h>
-
-void {name_snake}_kernel_init() {{
-    printf("Σ [KERNEL] Shard interface {suite_name} linked.\n");
-}}
-"#, name_snake = name_snake, suite_name = suite_name);
-        fs::write(c_file, c_template).map_err(|e| e.to_string())?;
-
-        self.shards.insert(name.to_string(), ShardInfo {
-            name: name.into(), state: ShardState::Active,
-            lang: "rust".into(), path,
-        });
-        eprintln!("Σ [SHARD] Added: {} (with kernel interface {})", name, suite_name);
+        self.shards.push(ShardInfo { name: name.into(), state: ShardState::Active, lang: "rust".into(), path });
         Ok(())
     }
 
     pub fn remove_shard(&mut self, name: &str) -> Result<(), String> {
-        self.shards.remove(name);
-        eprintln!("Σ [SHARD] Removed: {}", name);
+        if let Some(pos) = self.shards.iter().position(|s| s.name == name) {
+            self.shards.remove(pos);
+        }
         Ok(())
     }
 
     pub fn apply_profile(&mut self, name: &str) -> Result<(), String> {
-        let path = self.root.join("profiles").join(format!("{name}.json"));
-        if !path.exists() {
-            return Err(format!("Profile '{}' not found at {}", name, path.display()));
-        }
-        
-        let config = crate::config::ProfileConfig::load(&path)?;
-        
-        // Apply shard set from profile
-        if !config.shards.is_empty() {
-            // In a real system, we might only activate those in the list
-            eprintln!("Σ [PROFILE] Activating shards: {:?}", config.shards);
-        }
-
+        let path = format!("{}/profiles/{}.json", self.root, name);
+        let content = fs::read_to_string(path).map_err(|e| e.to_string())?;
+        let _config = ProfileConfig::load(&content);
         self.profile = name.to_string();
-        eprintln!("Σ [PROFILE] Applied: {}", name);
-        eprintln!("  - Theme:      {}", config.theme);
-        eprintln!("  - Interval:   {}s", config.sync_interval);
-        eprintln!("  - Auto-Sync:  {}", config.auto_sync);
-        eprintln!("  - Shortcuts:  {} mapped", config.shortcuts.len());
         Ok(())
     }
 
     pub fn create_profile(&self, name: &str, theme: &str) -> Result<(), String> {
-        let dir = self.root.join("profiles");
-        if !dir.exists() { fs::create_dir_all(&dir).map_err(|e| e.to_string())?; }
-        let path = dir.join(format!("{name}.json"));
-        let content = format!(r#"{{
-  "name": "{name}",
-  "sync_interval": 300,
-  "shards": ["sync"],
-  "theme": "{theme}",
-  "auto_sync": true
-}}"#);
+        let path = format!("{}/profiles/{}.json", self.root, name);
+        let content = format!("{{\"name\":\"{}\",\"theme\":\"{}\",\"auto_sync\":true,\"shards\":[\"sync\"]}}", name, theme);
         fs::write(path, content).map_err(|e| e.to_string())
     }
 
     pub fn install_plugin(&self, name: &str) -> Result<(), String> {
-        let dir = self.root.join("plugins").join(name);
-        if !dir.exists() { fs::create_dir_all(&dir).map_err(|e| e.to_string())?; }
-        let manifest = dir.join("plugin.json");
-        let content = format!(r#"{{
-  "name": "{name}",
-  "version": "1.0.0",
-  "enabled": true
-}}"#);
-        fs::write(manifest, content).map_err(|e| e.to_string())
+        let dir = format!("{}/plugins/{}", self.root, name);
+        fs::create_dir_all(&dir).map_err(|e| e.to_string())?;
+        fs::write(format!("{}/plugin.json", dir), format!("{{\"name\":\"{}\",\"enabled\":true}}", name)).map_err(|e| e.to_string())
     }
 
     pub fn run_wizard(&self) -> Result<(), String> {
-        println!("Σ [WIZARD] Initializing Sovereign Lattice...");
-        
-        let dirs = ["profiles", "shards", "plugins", "kernel/suites", "automation/logs"];
+        let dirs = ["profiles", "shards", "plugins", "kernel/suites"];
         for d in dirs {
-            let path = self.root.join(d);
-            if !path.exists() {
-                fs::create_dir_all(&path).map_err(|e| e.to_string())?;
-                println!("  + Created directory: {d}");
-            }
+            let _ = fs::create_dir_all(format!("{}/{}", self.root, d));
         }
-
-        // Create default profile
         self.create_profile("default", "dark")?;
-        println!("  + Created default profile.");
-
-        // Create default config if missing
-        let config_path = self.root.join("sigma_config.json");
-        if !config_path.exists() {
-            let content = r#"{
-  "profile": "default",
-  "theme": "dark",
-  "accent": "#00f0ff",
-  "auto_sync": true
-}"#;
-            fs::write(config_path, content).map_err(|e| e.to_string())?;
-            println!("  + Created default sigma_config.json");
-        }
-
-        println!("Σ [WIZARD] Setup complete. Ready for silicon fulfillment.");
         Ok(())
     }
 
     pub fn status(&self) -> String {
-        let git_branch = Command::new("git").args(["branch", "--show-current"])
-            .current_dir(&self.root).output()
-            .map(|o| String::from_utf8_lossy(&o.stdout).trim().to_string())
-            .unwrap_or_else(|_| "unknown".into());
-
-        let mut s = format!(
-            "Σ SIGMAOS STATUS\nBranch:  {}\nProfile: {}\nShards:  {}\n\n",
-            git_branch, self.profile, self.shards.len()
-        );
-        let mut names: Vec<_> = self.shards.keys().cloned().collect();
-        names.sort();
-        for n in &names {
-            let info = &self.shards[n];
-            let st = match &info.state {
-                ShardState::Active   => "ACTIVE",
-                ShardState::Inactive => "INACTIVE",
-                ShardState::Error(_) => "ERROR",
-            };
-            s.push_str(&format!("  [{st}] {n} ({lang})\n", lang = info.lang));
-        }
-        s
+        format!("Σ SIGMAOS STATUS\nProfile: {}\nShards:  {}\n", self.profile, self.shards.len())
     }
 
-    pub fn list_shards(&self) -> Vec<&ShardInfo> {
-        let mut v: Vec<_> = self.shards.values().collect();
-        v.sort_by_key(|s| &s.name);
-        v
-    }
+    pub fn list_shards(&self) -> &Vec<ShardInfo> { &self.shards }
 }
