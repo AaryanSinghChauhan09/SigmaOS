@@ -96,6 +96,16 @@ const SYSTEM_MODULES = [
     "scripts/modules/41_snap_layouts.js",
     "scripts/modules/42_time_machine_backup.js",
     "scripts/modules/43_declarative_state.js",
+    "scripts/modules/44_dynamic_island.js",
+    "scripts/modules/45_quantum_link_device.js",
+    "scripts/modules/46_fuchsia_sandbox.js",
+    "scripts/modules/47_universal_control.js",
+    "scripts/modules/48_neural_search.js",
+    "scripts/modules/49_quantum_theme_engine.js",
+    "scripts/modules/50_system_vitals_hud.js",
+    "scripts/modules/51_stage_manager.js",
+    "scripts/modules/52_biometric_auth.js",
+    "scripts/modules/53_aero_glass.js",
     "scripts/audit.js"
 ];
 
