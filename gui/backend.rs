@@ -140,6 +140,33 @@ fn handle_connection(mut stream: TcpStream, mgr: Arc<Mutex<ShardManager>>) {
             }
         }
 
+        // ── Static File Serving (Zenith GUI) ──────────────────────────────────
+        ("GET", _) if req.method == "GET" => {
+            let path_str = if req.path == "/" || req.path == "" { "index.html" } else { req.path.trim_start_matches('/') };
+            let full_path = std::path::Path::new("web_ui").join(path_str);
+            
+            if full_path.exists() && full_path.is_file() {
+                if let Ok(content) = std::fs::read(&full_path) {
+                    let mime = if path_str.ends_with(".html") { "text/html" }
+                               else if path_str.ends_with(".css") { "text/css" }
+                               else if path_str.ends_with(".js")  { "application/javascript" }
+                               else if path_str.ends_with(".png") { "image/png" }
+                               else { "text/plain" };
+                    
+                    let resp = format!(
+                        "HTTP/1.1 200 OK\r\nContent-Type: {mime}\r\nAccess-Control-Allow-Origin: *\r\nContent-Length: {}\r\n\r\n",
+                        content.len()
+                    );
+                    let _ = stream.write_all(resp.as_bytes());
+                    let _ = stream.write_all(&content);
+                } else {
+                    respond(&mut stream, 500, "Error reading file");
+                }
+            } else {
+                respond(&mut stream, 404, "Not found");
+            }
+        }
+
         _ => respond(&mut stream, 404, "Not found"),
     }
 }
