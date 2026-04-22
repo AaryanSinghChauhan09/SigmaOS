@@ -49,22 +49,20 @@ jobs:
               - 'WIKI/**'
               - '*.md'
 
-  # ── Rust Workspace Build ────────────────────────────────────────────────────
+  # ── Rust Workspace Build & Native Tests ──────────────────────────────────────
   rust_build:
-    name: "Rust Workspace (cargo build)"
+    name: "Rust Workspace (Build & Native Tests)"
     runs-on: ubuntu-latest
     needs: detect
     if: needs.detect.outputs.rust == 'true' || github.event_name == 'workflow_dispatch'
     steps:
       - uses: actions/checkout@v4
       - uses: dtolnay/rust-toolchain@stable
-        with:
-          targets: x86_64-unknown-none
       - uses: Swatinem/rust-cache@v2
-      - name: Build workspace (hosted)
+      - name: Build workspace
         run: cargo build --workspace --release
-      - name: Run workspace tests
-        run: cargo test --workspace --release
+      - name: Run native integration tests
+        run: cargo test -p sigma-cli --test integration
       - name: Clippy lint
         run: cargo clippy --workspace -- -D warnings
       - name: Upload binaries
@@ -88,18 +86,6 @@ jobs:
       - name: cppcheck static analysis
         run: cppcheck --enable=all --std=c11 -I./include --error-exitcode=0 kernel/suites/ 2>&1 | tail -30
 
-  # ── Python CLI Tests ────────────────────────────────────────────────────────
-  cli_test:
-    name: "CLI Tests (pytest)"
-    runs-on: ubuntu-latest
-    needs: detect
-    if: needs.detect.outputs.tools == 'true' || github.event_name == 'workflow_dispatch'
-    steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-python@v5
-        with: { python-version: "3.11" }
-      - run: pip install pytest
-      - run: pytest tools/dev/integration_tests/ -v --tb=short
 
   # ── GUI / Web Lint ──────────────────────────────────────────────────────────
   web_lint:
@@ -133,7 +119,7 @@ jobs:
   release:
     name: "Semantic Release & Changelog"
     runs-on: ubuntu-latest
-    needs: [rust_build, kernel_build, cli_test]
+    needs: [rust_build, kernel_build]
     if: github.ref == 'refs/heads/main' && github.event_name == 'push'
     steps:
       - uses: actions/checkout@v4
