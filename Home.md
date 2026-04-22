@@ -1,3 +1,5 @@
+* **[Sovereign Architecture](Sovereign-Architecture)**: Absolute machine finality and zero-std primitives.
+
 # 🌀 Welcome to the SigmaOS Sovereign Wiki
 
 SigmaOS is a next-generation, industrial-grade operating system designed for speed, modularity, and innovation. Unlike traditional Linux distros, SigmaOS bypasses POSIX and legacy layers to deliver bare-metal performance with direct silicon memory flows.
