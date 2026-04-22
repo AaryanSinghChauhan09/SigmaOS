@@ -6,19 +6,25 @@ use sigma_core::orchestrator::ShardManager;
 
 static mut GLOBAL_MGR: *mut ShardManager = core::ptr::null_mut();
 
-static mut CONNECTION_COUNT: usize = 0;
+use core::sync::atomic::{AtomicUsize, Ordering};
+
+static CONNECTION_COUNT: AtomicUsize = AtomicUsize::new(0);
 
 extern "C" fn client_handler(s: usize) -> u32 {
     unsafe {
-        if CONNECTION_COUNT > 100 { ffi::closesocket(s); return 0; } // Loophole: DOS protection
-        CONNECTION_COUNT += 1;
+        let count = CONNECTION_COUNT.fetch_add(1, Ordering::SeqCst);
+        if count > 100 { 
+            CONNECTION_COUNT.fetch_sub(1, Ordering::SeqCst);
+            ffi::closesocket(s); 
+            return 0; 
+        }
         
         let mut buf = [0u8; 1024];
         let n = ffi::recv(s, buf.as_mut_ptr(), 1024, 0);
         if n > 0 && n < 1024 {
             let mut text = String::new();
             for &b in &buf[..n as usize] {
-                if b == 0 { break; } // Loophole: Null injection protection
+                if b == 0 { break; } 
                 text.push(b as char);
             }
             if text.contains("/status") {
@@ -29,7 +35,7 @@ extern "C" fn client_handler(s: usize) -> u32 {
             }
         }
         ffi::closesocket(s);
-        CONNECTION_COUNT -= 1;
+        CONNECTION_COUNT.fetch_sub(1, Ordering::SeqCst);
     }
     0
 }
