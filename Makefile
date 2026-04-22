@@ -25,13 +25,13 @@ SUITES_DIR := suites
 BUILD_DIR  := build
 
 # --- SOURCE DISCOVERY (PowerShell powered for Windows compatibility) ---
-# Using powershell to find all sources recursively
-ALL_C_SRCS   := $(shell powershell -Command "Get-ChildItem -Path $(SUITES_DIR) -Filter *.c -Recurse | ForEach-Object { \$$_.FullName }")
-ALL_CPP_SRCS := $(shell powershell -Command "Get-ChildItem -Path $(SUITES_DIR) -Filter *.cpp -Recurse | ForEach-Object { \$$_.FullName }")
-ALL_ASM_SRCS := $(shell powershell -Command "Get-ChildItem -Path $(SUITES_DIR) -Filter *.asm -Recurse | ForEach-Object { \$$_.FullName }")
+# Using powershell to find all sources recursively (Suites + Core Lattice)
+ALL_C_SRCS   := $(shell powershell -Command "Get-ChildItem -Path $(SUITES_DIR), core/lattice -Filter *.c -Recurse | ForEach-Object { \$$_.FullName }")
+ALL_CPP_SRCS := $(shell powershell -Command "Get-ChildItem -Path $(SUITES_DIR), core/lattice -Filter *.cpp -Recurse | ForEach-Object { \$$_.FullName }")
+ALL_ASM_SRCS := $(shell powershell -Command "Get-ChildItem -Path $(SUITES_DIR), core/lattice -Filter *.asm -Recurse | ForEach-Object { \$$_.FullName }")
 
 # Include paths for all suites and core headers
-INCLUDES     := -I. -Icore/include $(shell powershell -Command "Get-ChildItem -Path $(SUITES_DIR) -Directory -Recurse | ForEach-Object { '-I' + \$$_.FullName }")
+INCLUDES     := -I. -Icore/lattice/include $(shell powershell -Command "Get-ChildItem -Path $(SUITES_DIR), core/lattice -Directory -Recurse | ForEach-Object { '-I' + \$$_.FullName }")
 
 # --- OBJECTS ---
 # We map filenames to the build directory to avoid deep path issues on Windows
@@ -57,9 +57,9 @@ kernel: $(OBJS)
 
 # Pattern rules for objects
 # Note: These rules assume flat build dir. VPATH is needed if we use notdir above.
-vpath %.c $(shell powershell -Command "Get-ChildItem -Path $(SUITES_DIR) -Directory -Recurse | ForEach-Object { \$$_.FullName }")
-vpath %.cpp $(shell powershell -Command "Get-ChildItem -Path $(SUITES_DIR) -Directory -Recurse | ForEach-Object { \$$_.FullName }")
-vpath %.asm $(shell powershell -Command "Get-ChildItem -Path $(SUITES_DIR) -Directory -Recurse | ForEach-Object { \$$_.FullName }")
+vpath %.c $(shell powershell -Command "Get-ChildItem -Path $(SUITES_DIR), core/lattice -Directory -Recurse | ForEach-Object { \$$_.FullName }")
+vpath %.cpp $(shell powershell -Command "Get-ChildItem -Path $(SUITES_DIR), core/lattice -Directory -Recurse | ForEach-Object { \$$_.FullName }")
+vpath %.asm $(shell powershell -Command "Get-ChildItem -Path $(SUITES_DIR), core/lattice -Directory -Recurse | ForEach-Object { \$$_.FullName }")
 
 $(BUILD_DIR)/%.o: %.c
 	@echo "[CC]  $<"

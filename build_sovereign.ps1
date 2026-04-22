@@ -3,20 +3,20 @@
 
 $GCC = "C:\msys64\mingw64\bin\gcc.exe"
 $NASM = "nasm"
-$LD = "ld"
+$LD = "C:\msys64\mingw64\bin\ld.exe"
 $BUILD_DIR = "build"
 
-Write-Host "Σ [BUILD] Initiating Sovereign Build v10.0 (Pure Silicon)..." -ForegroundColor Cyan
+Write-Host "Σ [BUILD] Initiating Sovereign Build v23.0 (Absolute Finality)..." -ForegroundColor Cyan
 
 if (!(Test-Path $BUILD_DIR)) { New-Item -ItemType Directory -Path $BUILD_DIR }
 
 # Flags
 $COMMON_FLAGS = "-ffreestanding", "-nostdlib", "-fno-stack-protector", "-mno-red-zone", "-O2", "-Wall", "-Wextra"
-$INCLUDES = "-I.", "-Icore/include"
+$INCLUDES = "-I.", "-Icore/lattice/include"
 
-# Find Sources
-$CSRCS = Get-ChildItem -Path suites -Filter *.c -Recurse
-$ASMSRCS = Get-ChildItem -Path suites -Filter *.asm -Recurse
+# Find Sources (Suites + Core Lattice)
+$CSRCS = Get-ChildItem -Path suites, core/lattice -Filter *.c -Recurse
+$ASMSRCS = Get-ChildItem -Path suites, core/lattice -Filter *.asm -Recurse
 
 $OBJS = @()
 
