@@ -127,7 +127,7 @@ class SovereignTerminal extends ZenithComponent {
                     this.write(`Σ://MEMORY> ${window.pager.getStats()}`);
                 }
             },
-            'help': () => this.write('AVAILABLE: theme, ls, cd, cat, ql, notify, shard, flush, stats, telemetry, set, get, vault, snapshot, tile, sandbox, session, top, prof, shortcuts, window, focus, audit, mem, clear, version'),
+            'help': () => this.write('AVAILABLE: theme, ls, cd, cat, ql, notify, shard, flush, stats, telemetry, set, get, vault, snapshot, tile, sandbox, session, top, prof, shortcuts, window, focus, audit, mem, plugin, profile, config, clear, version'),
             'clear': () => this.output.innerHTML = '',
             'version': () => this.write('Σ SIGMAOS ZENITH v33.0.4-SINGULARITY'),
             
@@ -196,9 +196,64 @@ class SovereignTerminal extends ZenithComponent {
                 this.write(`${args[0]}: ${window.settings.config[args[0]]}`);
             },
             'flush': () => {
-                console.log('Σ://KERNEL> Flushing Silicon Primitives...');
+                console.log('\u03a3://KERNEL> Flushing Silicon Primitives...');
                 this.write('MEMORY FLUSH COMPLETE.');
-            }
+            },
+
+            // ── Plugin Management ──────────────────────────────────────────
+            'plugin': (args) => {
+                const sub = args[0];
+                if (sub === 'ls' || sub === 'list') {
+                    const plugins = window.pluginLoader?.list() || [];
+                    if (!plugins.length) { this.write('No plugins installed. Use: sigmactl plugin install <name>'); return; }
+                    this.write('\u03a3://PLUGINS> Installed:');
+                    plugins.forEach(p => this.write(`  - ${p.name} v${p.version || '?'} [${p.enabled ? 'ON' : 'OFF'}]`));
+                } else if (sub === 'load' && args[1]) {
+                    window.pluginLoader?.load({ name: args[1], entry: `plugins/${args[1]}/index.js`, enabled: true, version: '?' });
+                    this.write(`\u03a3://PLUGIN> Loading: ${args[1]}`);
+                } else if (sub === 'unload' && args[1]) {
+                    window.pluginLoader?.unload(args[1]);
+                    this.write(`\u03a3://PLUGIN> Unloaded: ${args[1]}`);
+                } else {
+                    this.write('USAGE: plugin [ls | load <name> | unload <name>]');
+                }
+            },
+
+            // ── Profile Management ─────────────────────────────────────────
+            'profile': (args) => {
+                const sub = args[0];
+                if (sub === 'switch' && args[1]) {
+                    fetch('/api/profiles/switch', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ name: args[1] })
+                    }).then(r => r.json()).then(data => {
+                        if (data.ok) {
+                            window.sigmaConfig?.applyToGUI();
+                            this.write(`\u03a3://PROFILE> Switched to: ${args[1]}`);
+                            if (window.zenith?.taskbar) window.zenith.taskbar.notify(`PROFILE: ${args[1].toUpperCase()}`, 'OPTIMAL');
+                        } else {
+                            this.write(`\u03a3://ERR> Profile not found: ${args[1]}`);
+                        }
+                    }).catch(() => this.write('\u03a3://ERR> Server offline. Use sigmactl profile switch <name> in terminal.'));
+                } else if (!sub || sub === 'ls') {
+                    fetch('/api/profiles').then(r => r.json()).then(profiles => {
+                        this.write('\u03a3://PROFILES> Available:');
+                        profiles.forEach(p => this.write(`  - ${p.name} [theme: ${p.theme}]`));
+                    }).catch(() => this.write('Server offline. Profiles: default, developer, secure, minimal'));
+                } else {
+                    this.write('USAGE: profile [ls | switch <name>]');
+                }
+            },
+
+            // ── Config Shortcut ────────────────────────────────────────────
+            'config': (args) => {
+                if (!args[0]) {
+                    this.write(JSON.stringify(window.sigmaConfig?.get() || {}, null, 2));
+                } else {
+                    this.write(`${args[0]}: ${window.sigmaConfig?.get(args[0])}`);
+                }
+            },
         };
     }
 

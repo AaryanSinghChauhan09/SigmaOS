@@ -78,7 +78,10 @@ const LATTICE_MODULES = [
     "scripts/modules/31_sovereign_focus_mode.js",
     "scripts/modules/32_sovereign_quick_look.js",
     "scripts/modules/33_sentinel_neural_firewall.js",
-    "scripts/modules/34_sovereign_adaptive_pager.js"
+    "scripts/modules/34_sovereign_adaptive_pager.js",
+    "scripts/modules/35_plugin_loader.js",
+    "scripts/modules/36_config_bridge.js",
+    "scripts/modules/37_settings_panel.js"
 ];
 
 function loadLatticeModules(modules, callback) {

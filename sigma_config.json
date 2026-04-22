@@ -1,0 +1,17 @@
+{
+  "profile": "default",
+  "username": "Ʃ_ZENITH",
+  "api_url": "http://localhost:8080/api",
+  "theme": "MATRIX",
+  "accent": "#00f0ff",
+  "blur": 25,
+  "opacity": 0.6,
+  "fontScale": 1.0,
+  "mode": "DARK",
+  "privacyShield": true,
+  "heartbeat": 2000,
+  "auto_sync": false,
+  "sync_interval": 300,
+  "shard_layout": "grid",
+  "_comment": "This file is shared between sigmactl CLI and the Zenith GUI. Edit either to sync both."
+}

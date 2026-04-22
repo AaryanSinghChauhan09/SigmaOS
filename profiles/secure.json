@@ -1,0 +1,12 @@
+{
+  "name": "secure",
+  "created": "2026-04-22T00:00:00Z",
+  "theme": "GHOST_MICA",
+  "accent": "#ff0055",
+  "blur": 40,
+  "opacity": 0.5,
+  "fontScale": 1.0,
+  "mode": "DARK",
+  "privacyShield": true,
+  "auto_sync": false
+}

@@ -1,0 +1,12 @@
+{
+  "name": "developer",
+  "created": "2026-04-22T00:00:00Z",
+  "theme": "MATRIX",
+  "accent": "#00f0ff",
+  "blur": 12,
+  "opacity": 0.75,
+  "fontScale": 0.95,
+  "mode": "DARK",
+  "privacyShield": false,
+  "shard_layout": "grid"
+}

@@ -1,0 +1,11 @@
+{
+  "name": "default",
+  "created": "2026-04-22T00:00:00Z",
+  "theme": "MATRIX",
+  "accent": "#00f0ff",
+  "blur": 25,
+  "opacity": 0.6,
+  "fontScale": 1.0,
+  "mode": "DARK",
+  "privacyShield": true
+}
