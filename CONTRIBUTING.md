@@ -1,37 +1,35 @@
 # Contributing to SigmaOS
 
-First off, thank you for considering contributing to SigmaOS! It's people like you that make SigmaOS such a great sovereign OS.
+Thank you for your interest in contributing to the Sovereign Lattice! 
 
-## Developer Quickstart
+## Getting Started
 
-1. **Setup Toolchain:** Ensure you have native C11 and Assembly compilers.
-   ```bash
-   make toolchain
-   ```
-2. **Build the Kernel:**
-   ```bash
-   make kernel
-   ```
-3. **Run Sandbox Tests:**
-   ```bash
-   make verify
-   ```
+### 1. Prerequisites
+- `gcc-x86-64-linux-gnu`
+- `nasm`
+- `make`
+- `python3` (for scripts)
+- `qemu-system-x86` (for local emulation)
 
-## Development Guidelines
+*Alternatively, use the provided `Dockerfile` for a zero-setup, cross-platform build environment.*
 
-- **Strict C11/Assembly:** SigmaOS is 100% dependency-free. Do not introduce Python, JS, or external standard libraries into the core kernel lattice (`S01` to `S12`).
-- **Sovereign Object-Oriented Foundation (SOOF):** All new kernel data structures MUST inherit from `sigma_obj_t` for uniform tracking and lifecycle management.
-- **Architectural Purity:** Avoid global state unless strictly defined under `SovereignCommon.h`. Use the `sigma_` prefix for all types and APIs.
+### 2. Building
+Run the following to compile the entire OS:
+```bash
+make all
+```
 
-## Pull Request Process
+### 3. Architecture Rules
+- **No External Dependencies:** We rely on `sigma_libc.h` and the Sovereign SDK. Do not include standard libraries like `<stdio.h>` in the kernel suites.
+- **Zero-Trust:** Assume other shards are hostile. Verify inputs when exposing handlers to the Sovereign Event Bus.
 
+## Coding Standards
+- Use C11. 
+- Variables should be `snake_case`. Macros must be `UPPER_SNAKE_CASE`.
+- Indentation is 4 spaces.
+
+## PR Workflow
 1. Fork the repo and create your branch from `main`.
-2. Write unit tests for your subsystem.
-3. If you've modified APIs or architectural structures, update the Wiki.
-4. Ensure the test suite passes (`make test` / CI).
-5. Ensure your code passes Clang-Tidy and any linting checks.
-6. Submit a PR filling out the provided PR template.
-
-## Bug Reports
-
-Please use the provided GitHub Issue Template for bugs. Include logs, your platform, and a minimum reproducible example.
+2. Add your shard to the appropriate `SXX_` suite directory.
+3. Ensure the CI passes (we check for dependencies and run static analysis).
+4. Issue a PR with a clear description of the shard's purpose.
