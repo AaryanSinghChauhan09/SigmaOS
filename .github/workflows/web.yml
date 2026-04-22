@@ -57,7 +57,7 @@ jobs:
           echo "[PASS] CSS Zenith compliance verified."
 
   deployment_vitals:
-    name: "Deployment Readiness"
+        name: "Deployment Readiness
     runs-on: ubuntu-latest
     needs: [aesthetic_audit]
     steps:
