@@ -23,16 +23,16 @@ SigmaOS aims to be the fastest and most secure platform for browser-centric comp
 
 ## 💻 Installation Guide
 ### Bare-Metal (Recommended)
-1. Clone the repository:
+1. Clone the unified repository (Primary Branch: `main`):
    ```bash
-   git clone https://github.com/AaryanSinghChauhan09/SigmaOS.git
+   git clone https://github.com/AaryanSinghChauhan09/SigmaOS.git -b main
    cd SigmaOS
    ```
-2. Build the kernel binary:
+2. Build the modularized kernel:
    ```bash
-   make bin
+   make all
    ```
-3. Generate the bootable ISO:
+3. Generate the 33-suite Sovereign ISO:
    ```bash
    make iso
    ```
@@ -50,14 +50,13 @@ SigmaOS aims to be the fastest and most secure platform for browser-centric comp
 
 ## 🛠 Developer Setup
 1. Install **GCC 13+**, **NASM**, and **Node.js**.
-2. Build the system using the modularized builder:
+2. Explore the **33-Suite Sovereign Lattice** in the `suites/` directory.
+3. Build the system using the unified orchestrator:
    ```bash
-   node build.js
+   make kernel
    ```
-3. Boot the Zenith Dashboard:
-   ```bash
-   node server.js
-   ```
+4. Launch the **Zenith Dashboard** via `index.html` in the root.
+
 3. Use the **Sovereign Shard Builder** to create new suites.
 
 ---
