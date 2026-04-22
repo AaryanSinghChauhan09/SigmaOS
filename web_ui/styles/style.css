@@ -1277,3 +1277,5 @@ textarea.cli-input-box {
     cursor: nwse-resize;
     background: linear-gradient(135deg, transparent 50%, rgba(0, 240, 255, 0.2) 50%);
 }
+/* Zenith Compliance: Glassmorphism Primitives */ .glass-ci-audit { backdrop-filter: blur(10px); }
+.glass-ci { backdrop-filter: blur(10px); }
