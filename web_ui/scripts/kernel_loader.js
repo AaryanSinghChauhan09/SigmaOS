@@ -62,6 +62,7 @@ const SYSTEM_MODULES = [
     "scripts/modules/08_sovereign_automations.js",
     "scripts/modules/09_aether_pulse.js",
     "scripts/modules/09_mica_flux.js",
+    "scripts/modules/100_apex_singularity_core.js",
     "scripts/modules/10_sovereign_taskbar.js",
     "scripts/modules/11_sovereign_explorer.js",
     "scripts/modules/12_sovereign_theme_engine.js",
@@ -145,6 +146,13 @@ const SYSTEM_MODULES = [
     "scripts/modules/90_intelligent_app_library.js",
     "scripts/modules/91_cow_snapshots.js",
     "scripts/modules/92_seamless_handoff.js",
+    "scripts/modules/93_spatial_audio_engine.js",
+    "scripts/modules/94_live_captions_translation.js",
+    "scripts/modules/95_secure_enclave.js",
+    "scripts/modules/96_predictive_back_gesture.js",
+    "scripts/modules/97_crash_reporter_telemetry.js",
+    "scripts/modules/98_unified_push_receiver.js",
+    "scripts/modules/99_system_integrity_protection.js",
     "scripts/audit.js"
 ];
 
