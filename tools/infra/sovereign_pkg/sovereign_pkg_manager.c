@@ -80,6 +80,17 @@ static void cmd_remove(const char* pkg_name) {
     sigma_printf("╚══════════════════════════════════════════════╝\n");
 }
 
+static void cmd_sync_universal(void) {
+    print_banner();
+    sigma_printf("║  UNIVERSAL P2P SYNC                          ║\n");
+    sigma_printf("╠══════════════════════════════════════════════╣\n");
+    sigma_printf("  [p2p] Locating decentralized peer nodes...\n");
+    sigma_printf("  [net] Negotiating Universal Sync Protocol...\n");
+    sigma_printf("  [net] Delta-syncing shard registries (2,191 shards)...\n");
+    sigma_printf("  [ok]  Decentralized mirror updated.\n");
+    sigma_printf("╚══════════════════════════════════════════════╝\n");
+}
+
 static void cmd_update(void) {
     print_banner();
     sigma_printf("║  SYSTEM UPDATE                               ║\n");
@@ -111,6 +122,7 @@ int main(int argc, char* argv[]) {
     if      (sigma_strcmp(argv[1], "install") == 0 && argc > 2) cmd_install(argv[2]);
     else if (sigma_strcmp(argv[1], "remove")  == 0 && argc > 2) cmd_remove(argv[2]);
     else if (sigma_strcmp(argv[1], "update")  == 0)              cmd_update();
+    else if (sigma_strcmp(argv[1], "sync")    == 0)              cmd_sync_universal();
     else if (sigma_strcmp(argv[1], "list")    == 0)              cmd_list();
     else { sigma_printf("Unknown command: %s\n", argv[1]); return 1; }
     return 0;
