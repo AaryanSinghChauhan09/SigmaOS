@@ -135,6 +135,16 @@ const SYSTEM_MODULES = [
     "scripts/modules/80_task_suggestions.js",
     "scripts/modules/81_offline_study_mode.js",
     "scripts/modules/82_gamification_engine.js",
+    "scripts/modules/83_visual_automator.js",
+    "scripts/modules/84_subsystem_linux.js",
+    "scripts/modules/85_material_monet_engine.js",
+    "scripts/modules/86_community_nexus_repo.js",
+    "scripts/modules/87_mobile_phone_hub.js",
+    "scripts/modules/88_continuity_camera.js",
+    "scripts/modules/89_power_toys_suite.js",
+    "scripts/modules/90_intelligent_app_library.js",
+    "scripts/modules/91_cow_snapshots.js",
+    "scripts/modules/92_seamless_handoff.js",
     "scripts/audit.js"
 ];
 
