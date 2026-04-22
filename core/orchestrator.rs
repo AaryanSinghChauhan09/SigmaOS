@@ -192,6 +192,39 @@ impl ShardManager {
         fs::write(manifest, content).map_err(|e| e.to_string())
     }
 
+    pub fn run_wizard(&self) -> Result<(), String> {
+        println!("Σ [WIZARD] Initializing Sovereign Lattice...");
+        
+        let dirs = ["profiles", "shards", "plugins", "kernel/suites", "automation/logs"];
+        for d in dirs {
+            let path = self.root.join(d);
+            if !path.exists() {
+                fs::create_dir_all(&path).map_err(|e| e.to_string())?;
+                println!("  + Created directory: {d}");
+            }
+        }
+
+        // Create default profile
+        self.create_profile("default", "dark")?;
+        println!("  + Created default profile.");
+
+        // Create default config if missing
+        let config_path = self.root.join("sigma_config.json");
+        if !config_path.exists() {
+            let content = r#"{
+  "profile": "default",
+  "theme": "dark",
+  "accent": "#00f0ff",
+  "auto_sync": true
+}"#;
+            fs::write(config_path, content).map_err(|e| e.to_string())?;
+            println!("  + Created default sigma_config.json");
+        }
+
+        println!("Σ [WIZARD] Setup complete. Ready for silicon fulfillment.");
+        Ok(())
+    }
+
     pub fn status(&self) -> String {
         let git_branch = Command::new("git").args(["branch", "--show-current"])
             .current_dir(&self.root).output()

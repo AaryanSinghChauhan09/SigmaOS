@@ -36,6 +36,7 @@ fn print_help() {
     println!("  get [key]               Show config key(s)");
     println!("  set <key> <val>         Set config key");
     println!("  status                  Show system status");
+    println!("  wizard                  Run setup wizard");
     println!("  version                 Show version");
     println!("  help                    Show this help");
     println!();
@@ -43,6 +44,7 @@ fn print_help() {
     println!("  sigmactl build");
     println!("  sigmactl set theme MATRIX");
     println!("  sigmactl profile set developer");
+    println!("  sigmactl wizard");
     println!("  sigmactl status");
 }
 
@@ -196,6 +198,13 @@ fn main() {
             cfg.set_key(key.to_string(), val.to_string());
             match cfg.save(&config_path) {
                 Ok(()) => println!("Σ [OK] Updated: {key} = {val}"),
+                Err(e) => { eprintln!("Σ [ERR] {e}"); std::process::exit(1); }
+            }
+        }
+
+        "wizard" => {
+            match mgr.run_wizard() {
+                Ok(()) => println!("Σ [OK] Wizard complete."),
                 Err(e) => { eprintln!("Σ [ERR] {e}"); std::process::exit(1); }
             }
         }
