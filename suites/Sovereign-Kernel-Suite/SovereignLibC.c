@@ -1,5 +1,5 @@
-#include "SovereignLibC.h"
-#include "sigma_types.h"
+#include "sigma_libc.h"
+#include <stdarg.h>
 
 // --- sigma_print ---
 void sigma_print(const char* str) {
