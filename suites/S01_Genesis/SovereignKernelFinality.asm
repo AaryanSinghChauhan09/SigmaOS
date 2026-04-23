@@ -9,10 +9,10 @@
 [BITS 64]
 
 global _start
-global sigma_kernel_entry
 global sigma_handler_common
 
-section .text
+extern sigma_kernel_entry
+extern sigma_dispatch_shards
 
 _start:
 ; =========================================================================
@@ -22,19 +22,25 @@ _start:
     xor rax, rax
     mov rsp, stack_top              ; Initial stack for sharding
     
-    call sigma_kernel_setup_paging
-    call sigma_kernel_setup_idt
+    call qword sigma_kernel_setup_paging
+    call qword sigma_kernel_setup_idt
     call sigma_kernel_entry         ; Handover to C++ Sovereign Core
 
     hlt                              ; Halt on absolute completion
 
 sigma_kernel_setup_paging:
     ; Paging sharding logic (x86_64 CR3/PLM4 Handshake)
+    push rbp
+    mov  rbp, rsp
+    pop  rbp
     ret
 
 sigma_kernel_setup_idt:
     ; Interrupt Descriptor Table Sharding
+    push rbp
+    mov  rbp, rsp
     lidt [idt_ptr]
+    pop  rbp
     ret
 
 ; =========================================================================

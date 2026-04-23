@@ -12,6 +12,7 @@
 MAGIC    equ 0x1BADB002
 FLAGS    equ 0x03
 CHECKSUM equ -(MAGIC + FLAGS)
+[BITS 32]
 
 section .multiboot
 align 4

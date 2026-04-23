@@ -1,5 +1,9 @@
 #include "sigma_libc.h"
+#ifndef __GNUC__
 #include <stdarg.h>
+#else
+#include <stdarg.h>
+#endif
 
 // --- sigma_print ---
 void sigma_print(const char* str) {
@@ -81,14 +85,14 @@ void sigma_strcat(char* dest, const char* src) {
 int sigma_fork() {
     // x86_64 rax=57 (fork)
     long res;
-    __asm__ __volatile__ ("syscall" : "=a"(res) : "a"(57) : "rcx", "r11", "memory");
+    __asm__ __volatile__ ("syscall" : "=r"(res) : "a"(57) : "rcx", "r11", "memory");
     return (int)res;
 }
 
 int sigma_pipe(int pipefd[2]) {
     // x86_64 rax=22 (pipe)
     long res;
-    __asm__ __volatile__ ("syscall" : "=a"(res) : "a"(22), "D"(pipefd) : "rcx", "r11", "memory");
+    __asm__ __volatile__ ("syscall" : "=r"(res) : "a"(22), "D"(pipefd) : "rcx", "r11", "memory");
     return (int)res;
 }
 
@@ -101,7 +105,7 @@ unsigned int sigma_sleep(unsigned int seconds) {
     
     long res;
     __asm__ __volatile__ ("syscall" 
-        : "=a"(res) 
+        : "=r"(res) 
         : "a"(35), "D"(&req), "S"(0) 
         : "rcx", "r11", "memory");
     return (unsigned int)res;
@@ -113,7 +117,7 @@ int sigma_wait(int* wstatus) {
     register long r10 __asm__("r10") = 0; // options = 0
     register long r8  __asm__("r8")  = 0; // rusage = NULL
     __asm__ __volatile__ ("syscall" 
-        : "=a"(res) 
+        : "=r"(res) 
         : "a"(61), "D"(-1), "S"(wstatus), "r"(r10), "r"(r8) 
         : "rcx", "r11", "memory");
     return (int)res;
@@ -122,7 +126,7 @@ int sigma_wait(int* wstatus) {
 int sigma_dup(int oldfd) {
     // x86_64 rax=32 (dup)
     long res;
-    __asm__ __volatile__ ("syscall" : "=a"(res) : "a"(32), "D"(oldfd) : "rcx", "r11", "memory");
+    __asm__ __volatile__ ("syscall" : "=r"(res) : "a"(32), "D"(oldfd) : "rcx", "r11", "memory");
     return (int)res;
 }
 

@@ -9,8 +9,10 @@
 [BITS 64]
 
 global _start
-global sigma_kernel_entry
-global sigma_handler_common
+
+
+extern sigma_kernel_entry
+extern sigma_dispatch_shards
 
 section .text
 
