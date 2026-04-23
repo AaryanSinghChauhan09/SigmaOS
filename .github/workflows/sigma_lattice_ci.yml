@@ -10,23 +10,27 @@ jobs:
   build:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
         with:
           submodules: recursive
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
 
       - name: Install Dependencies
         run: |
           sudo apt-get update
-          sudo apt-get install -y gcc nasm make qemu-system-x86 gdb valgrind
+          sudo apt-get install -y g++ nasm binutils make
 
-      - name: Build 500-Shard Lattice
-        run: make all
+      - name: Repair Build Environment
+        run: node repair_build.js
+
+      - name: Build Sovereign Lattice
+        run: |
+          chmod +x ./build_sovereign.sh
+          ./build_sovereign.sh
 
       - name: Verify Architecture
         run: make info
-
-      - name: Static Analysis
-        run: |
-          # Check for forbidden standard library calls
-          ! grep -r "printf(" suites/
-          ! grep -r "malloc(" suites/

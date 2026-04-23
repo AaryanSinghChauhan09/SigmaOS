@@ -148,23 +148,42 @@ const NEEDS = {
     'SigmaOOP.hpp':         /["<](?:\.\.\/)*SigmaOOP\.hpp[">]/,
 };
 
+// Parent-relative patterns (e.g. #include "../sigma_kernel_types.h")
+// For these, also place shim in the parent directory
+const NEEDS_PARENT = {
+    'sigma_kernel_types.h': /["<]\.\.\/sigma_kernel_types\.h[">]/,
+    'sigma_libc.h':         /["<]\.\.\/sigma_libc\.h[">]/,
+    'SovereignLibC.h':      /["<]\.\.\/SovereignLibC\.h[">]/,
+    'SigmaOOP.hpp':         /["<]\.\.\/SigmaOOP\.hpp[">]/,
+};
+
 function walkDir(dir) {
     let entries;
     try { entries = fs.readdirSync(dir, { withFileTypes: true }); }
     catch(e) { return; }
 
-    // Check if this dir has any C/C++/ASM sources that need headers
+    // Check if this dir has any C/C++ sources that need headers
     const needed = new Set();
+    const neededInParent = new Set();
+
     for (const e of entries) {
         if (!e.isFile()) continue;
         const ext = path.extname(e.name);
         if (!['.c', '.cpp', '.h', '.hpp'].includes(ext)) continue;
-        const content = fs.readFileSync(path.join(dir, e.name), 'utf8');
+        let content;
+        try { content = fs.readFileSync(path.join(dir, e.name), 'utf8'); }
+        catch(err) { continue; }
+
         for (const [hdr, pattern] of Object.entries(NEEDS)) {
             if (pattern.test(content)) needed.add(hdr);
         }
+        // Also check for '../header.h' patterns — need shim in parent dir
+        for (const [hdr, pattern] of Object.entries(NEEDS_PARENT)) {
+            if (pattern.test(content)) neededInParent.add(hdr);
+        }
     }
 
+    // Place shims in current directory
     if (needed.size > 0) {
         dirsFixed++;
         for (const hdr of needed) {
@@ -172,6 +191,19 @@ function walkDir(dir) {
             if (!fs.existsSync(dest)) {
                 fs.writeFileSync(dest, HEADERS[hdr]);
                 console.log(`  [SHIM] ${dest}`);
+                filesPlaced++;
+            }
+        }
+    }
+
+    // Place shims in parent directory for '../header.h' patterns
+    if (neededInParent.size > 0) {
+        const parentDir = path.dirname(dir);
+        for (const hdr of neededInParent) {
+            const dest = path.join(parentDir, hdr);
+            if (!fs.existsSync(dest)) {
+                fs.writeFileSync(dest, HEADERS[hdr]);
+                console.log(`  [SHIM-PARENT] ${dest}`);
                 filesPlaced++;
             }
         }
