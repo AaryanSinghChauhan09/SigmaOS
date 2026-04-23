@@ -102,7 +102,7 @@ echo "  → $ASM_OK assembled | $ASM_FAIL failed"
 
 # ── PHASE 2: Compile C/C++ in parallel batches ───────────────────────────────
 echo ""
-echo "Σ [2/3] Compiling sovereign shards (parallel, $JOBS jobs)..."
+echo "Σ [2/3] Compiling sovereign shards (sequential)..."
 
 compile_one() {
     local File="$1"
@@ -155,22 +155,11 @@ while IFS= read -r File; do
     Obj="$BUILD_DIR/$ObjName"
 
     # Launch background job
-    (
-        if $GCC $CXXFLAGS $INCLUDES -c "$File" -o "$Obj" 2>/dev/null \
-           || $GCC $CXXFLAGS_FB $INCLUDES -c "$File" -o "$Obj" 2>/dev/null; then
-            echo "$Obj" >> "$COMPILED_OBJS"
-        fi
-    ) &
-
-    BATCH_SIZE=$((BATCH_SIZE + 1))
-    # Wait when we hit the job limit
-    if [ $BATCH_SIZE -ge $JOBS ]; then
-        wait
-        BATCH_SIZE=0
+    if $GCC $CXXFLAGS $INCLUDES -c "$File" -o "$Obj" 2>/dev/null \
+       || $GCC $CXXFLAGS_FB $INCLUDES -c "$File" -o "$Obj" 2>/dev/null; then
+        echo "$Obj" >> "$COMPILED_OBJS"
     fi
 done < <(find suites core cli userland \( -name "*.c" -o -name "*.cpp" \) 2>/dev/null | sort)
-# Wait for any remaining background jobs
-wait
 
 # Count results
 COMPILED=$(wc -l < "$COMPILED_OBJS" 2>/dev/null | tr -d ' ')

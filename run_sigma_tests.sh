@@ -76,7 +76,7 @@ for hdr in suites/include/sigma_kernel_types.h suites/include/sigma_libc.h suite
 done
 
 # Test 7: Check no remaining broken includes (files still referencing ../libc without shim)
-BROKEN=$(find suites -name "*.c" -o -name "*.cpp" 2>/dev/null | xargs grep -l '#include.*sigma_libc\.h' 2>/dev/null | while read f; do
+BROKEN=$(find suites \( -name "*.c" -o -name "*.cpp" \) -exec grep -l '#include.*sigma_libc\.h' {} + 2>/dev/null | while read f; do
     dir=$(dirname "$f")
     parent=$(dirname "$dir")
     base=$(basename "$f")
