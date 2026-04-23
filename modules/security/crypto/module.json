@@ -1,0 +1,12 @@
+{
+  "module": "crypto",
+  "version": "1.0.0",
+  "type": "security",
+  "arch": ["x86_64", "aarch64", "riscv64"],
+  "dependencies": [],
+  "capabilities_required": [],
+  "capabilities_provided": ["CAP_CRYPTO_SHA256", "CAP_CRYPTO_CHACHA20", "CAP_CRYPTO_ED25519"],
+  "entry_point": null,
+  "author": "SigmaOS Security Team",
+  "description": "libsovereign_crypto: bare-metal SHA-256, ChaCha20, Ed25519 primitives"
+}

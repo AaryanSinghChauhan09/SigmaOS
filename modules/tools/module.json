@@ -1,0 +1,12 @@
+{
+  "module": "tools",
+  "version": "1.0.0",
+  "type": "tools",
+  "arch": ["x86_64", "aarch64", "riscv64"],
+  "dependencies": ["caps_security", "sigmafs"],
+  "capabilities_required": ["CAP_READ"],
+  "capabilities_provided": ["CAP_CLI_EXECUTE"],
+  "entry_point": "shell_main",
+  "author": "SigmaOS Tools Team",
+  "description": "Sovereign Shell, diagnostics, module loader and profiler"
+}

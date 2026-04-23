@@ -91,12 +91,8 @@ jobs:
 
     - name: QEMU Kernel Smoke Test
       run: |
-        echo "[*] Simulating SigmaOS kernel boot in QEMU..."
-        echo "[+] All sovereign capsules initialized. Capability registry verified."
-        # Real command (once kernel is compilable):
-        # timeout 10 qemu-system-x86_64 -kernel build/x86_64/sigmaos.elf \
-        #   -nographic -no-reboot -append "sovereign_boot"
-        echo "[✓] Smoke test passed."
+        echo "[*] Running sovereign smoke test suite..."
+        python3 scripts/qemu_smoke_test.py x86_64
 
   # ── Stage 3: Module Dependency Graph ─────────────────────
   graph:
