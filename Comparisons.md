@@ -34,3 +34,12 @@ SigmaOS now includes the **Sovereign UI Toolkit** (web_ui/scripts/modules/00_ui_
 
 ### 8. Cloud-Native Ecosystem (Puter Inspired)
 Through the **Cloud Explorer** (web_ui/scripts/modules/cloud_explorer.js), SigmaOS allows users to transparently manage remote lattice resources, bridging the gap between local bare-metal performance and cloud-native flexibility.
+
+### 9. Real-Time & Fault Tolerance (QNX/MINIX Inspired)
+SigmaOS integrates deterministic scheduling and self-healing driver logic, ensuring that critical shards remain operational even under extreme hardware stress.
+
+### 10. Enterprise Observability (Illumos Inspired)
+Through **Sovereign Observability** (core/lattice/observability.c), SigmaOS provides real-time tracing of shard interactions, similar to DTrace, but optimized for the lattice architecture.
+
+### 11. Security Hardening (OpenBSD/FreeBSD Inspired)
+SigmaOS adopts proactive security hardening and **Lattice Jails** (core/virtualization/lattice_jails.c) to provide isolated execution domains for untrusted shards, mirroring the security-first philosophy of OpenBSD and FreeBSD.

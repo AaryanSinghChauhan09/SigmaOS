@@ -13,6 +13,10 @@
 - [ ] 500-Shard Modularization (In Progress).
 
 ## Phase 3: Industrial Hardening (Q3 2026)
+- [ ] **Lattice Observability**: Real-time DTrace-inspired tracing (Illumos model).
+- [ ] **Lattice Jails**: Shard-level lightweight virtualization (FreeBSD model).
+- [ ] **IoT Event Engine**: Event-driven concurrency for sensors (TinyOS/RIOT model).
+- [ ] **Self-Healing Drivers**: Deterministic fault isolation (QNX/MINIX model).
 - [ ] **Declarative Lattice State**: Atomic state management via JSON (NixOS model).
 - [ ] **Isolated Shard Domains**: Hardware-backed suite compartmentalization (Qubes model).
 - [ ] **Shard Streaming (S-9P)**: Unified resource access protocol (Plan 9 model).
