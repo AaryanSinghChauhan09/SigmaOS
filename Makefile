@@ -1,7 +1,7 @@
 # =============================================================================
 # Σ SIGMAOS: SOVEREIGN UNIVERSAL MAKEFILE (v10.0 - PURE SILICON EDITION)
 # =============================================================================
-# Architecture: 33-Suite Sovereign Lattice
+# Architecture: 500-Suite Sovereign Lattice
 # Standards: Zero-Std, Freestanding, Pure ASM/C20
 # =============================================================================
 
@@ -13,7 +13,6 @@ LD        := ld
 OBJCOPY   := objcopy
 
 # --- COMPILER FLAGS (Sovereign Hardening) ---
-# We eliminate all high-level dependencies and standard libraries.
 COMMON_FLAGS := -ffreestanding -nostdlib -fno-stack-protector -mno-red-zone -O2 -Wall -Wextra
 CFLAGS       := -std=c11 $(COMMON_FLAGS)
 CXXFLAGS     := -std=c++20 -fno-exceptions -fno-rtti $(COMMON_FLAGS)
@@ -24,26 +23,20 @@ LDFLAGS      := -nostdlib -static -T suites/S01_Genesis/shards/sigma.ld
 SUITES_DIR := suites
 BUILD_DIR  := build
 
-# --- SOURCE DISCOVERY (PowerShell powered for Windows compatibility) ---
-# Using powershell to find all sources recursively (Suites + Core + CLI)
+# --- SOURCE DISCOVERY ---
 ALL_C_SRCS   := $(shell powershell -Command "Get-ChildItem -Path $(SUITES_DIR), core, cli, userland -Filter *.c -Recurse -ErrorAction SilentlyContinue | ForEach-Object { \$$_.FullName }")
 ALL_CPP_SRCS := $(shell powershell -Command "Get-ChildItem -Path $(SUITES_DIR), core, cli, userland -Filter *.cpp -Recurse -ErrorAction SilentlyContinue | ForEach-Object { \$$_.FullName }")
 ALL_ASM_SRCS := $(shell powershell -Command "Get-ChildItem -Path $(SUITES_DIR), core, cli, userland -Filter *.asm -Recurse -ErrorAction SilentlyContinue | ForEach-Object { \$$_.FullName }")
 
-# Include paths for all suites and core headers
+# Include paths
 INCLUDES     := -I. -Iinclude $(shell powershell -Command "Get-ChildItem -Path $(SUITES_DIR), core, cli, userland -Directory -Recurse -ErrorAction SilentlyContinue | ForEach-Object { '-I' + \$$_.FullName }")
 
 # --- OBJECTS ---
-# We map filenames to the build directory to avoid deep path issues on Windows
 OBJS := $(patsubst %.c, $(BUILD_DIR)/%.o, $(notdir $(ALL_C_SRCS))) \
         $(patsubst %.cpp, $(BUILD_DIR)/%.o, $(notdir $(ALL_CPP_SRCS))) \
         $(patsubst %.asm, $(BUILD_DIR)/%.o, $(notdir $(ALL_ASM_SRCS)))
 
-# =============================================================================
-# TARGETS
-# =============================================================================
-
-.PHONY: all clean info verify
+.PHONY: all clean info verify dirs kernel
 
 all: dirs kernel info
 
@@ -55,8 +48,7 @@ kernel: $(OBJS)
 	@$(LD) $(LDFLAGS) $(OBJS) -o $(BUILD_DIR)/sigmaos_zenith
 	@echo "[OK] build/sigmaos_zenith is ready."
 
-# Pattern rules for objects
-# Note: These rules assume flat build dir. VPATH is needed if we use notdir above.
+# VPATH for pattern matching
 vpath %.c $(shell powershell -Command "Get-ChildItem -Path $(SUITES_DIR), core, cli, userland -Directory -Recurse -ErrorAction SilentlyContinue | ForEach-Object { \$$_.FullName }")
 vpath %.cpp $(shell powershell -Command "Get-ChildItem -Path $(SUITES_DIR), core, cli, userland -Directory -Recurse -ErrorAction SilentlyContinue | ForEach-Object { \$$_.FullName }")
 vpath %.asm $(shell powershell -Command "Get-ChildItem -Path $(SUITES_DIR), core, cli, userland -Directory -Recurse -ErrorAction SilentlyContinue | ForEach-Object { \$$_.FullName }")
@@ -80,7 +72,7 @@ clean:
 info:
 	@echo ""
 	@echo "Σ SigmaOS Sovereign Build v10.0 (Pure Silicon)"
-	@echo "  Suites Indexed: 33"
-	@echo "  Sources Found:  $(words $(ALL_C_SRCS) $(ALL_CPP_SRCS) $(ALL_ASM_SRCS))"
-	@echo "  Dependency State: Zero-Std / Freestanding"
+	@echo "  Lattice Suites Indexed: 500"
+	@echo "  Sources Found:          $(words $(ALL_C_SRCS) $(ALL_CPP_SRCS) $(ALL_ASM_SRCS))"
+	@echo "  Dependency State:       Zero-Std / Freestanding"
 	@echo ""
