@@ -16,6 +16,9 @@
 - [x] **Capability-Based IPC (S-Zircon)**: Secure handle-based capability transfer.
 - [x] **Sovereign WASM Engine**: Safe high-performance kernel extensions.
 - [x] **Privacy Shard (S31)**: Native Tor integration and amnesic memory.
+- [x] **Namespaced CLI (S-CLI)**: Diagnostic (Doctor) and lifecycle commands.
+- [x] **Onboarding Wizard**: Intuitive first-time lattice setup.
+- [x] **Lattice Control Center**: Centralized management hub for all 500 shards.
 - [x] **Silicon-Specific Sharding**: AVX-512 optimized HAL extensions.
 - [x] **Lattice Observability**: Real-time DTrace-inspired tracing.
 - [x] **Lattice Jails**: Shard-level lightweight virtualization.
