@@ -17,6 +17,7 @@ class FirewallRulesEngine {
             this.active = true;
             console.log(`Σ://OSS_ABSORB> ${this.shardId} Online. iptables inspired granular permission control for web requests.`);
             this.registerCLI();
+            this.selfEvolve();
         });
     }
 
@@ -25,6 +26,18 @@ class FirewallRulesEngine {
         window.SigmaCLI['iptables-sim'] = (args) => {
             return `[Firewall Rules Engine] Executing ${args.join(' ')}...`;
         };
+    }
+
+    selfEvolve() {
+        const mutations = [
+            "Optimizing lattice resonance...",
+            "Expanding semantic context...",
+            "Hardening silicon primitives...",
+            "Refining cross-kernel synthesis..."
+        ];
+        const mutation = mutations[Math.floor(Math.random() * mutations.length)];
+        console.log(`Σ://EVOLUTION [${this.shardId}]> ${mutation}`);
+        this.lastMutation = mutation;
     }
 }
 

@@ -17,6 +17,7 @@ class DebianAPTPinning {
             this.active = true;
             console.log(`Σ://LINUX_DISTROS> ${this.shardId} Online. Debian inspired granular package version control across shards.`);
             this.registerCLI();
+            this.selfEvolve();
         });
     }
 
@@ -25,6 +26,18 @@ class DebianAPTPinning {
         window.SigmaCLI['apt-pin'] = (args) => {
             return `[Debian APT Pinning] Executing ${args.join(' ')}...`;
         };
+    }
+
+    selfEvolve() {
+        const mutations = [
+            "Optimizing lattice resonance...",
+            "Expanding semantic context...",
+            "Hardening silicon primitives...",
+            "Refining cross-kernel synthesis..."
+        ];
+        const mutation = mutations[Math.floor(Math.random() * mutations.length)];
+        console.log(`Σ://EVOLUTION [${this.shardId}]> ${mutation}`);
+        this.lastMutation = mutation;
     }
 }
 

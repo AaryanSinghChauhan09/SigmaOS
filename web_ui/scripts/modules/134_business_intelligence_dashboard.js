@@ -17,6 +17,7 @@ class BusinessIntelligenceDashboard {
             this.active = true;
             console.log(`Σ://DATA_OS> ${this.shardId} Online. Tableau/Power BI inspired interactive visual analytics.`);
             this.registerCLI();
+            this.selfEvolve();
         });
     }
 
@@ -25,6 +26,18 @@ class BusinessIntelligenceDashboard {
         window.SigmaCLI['bi-render'] = (args) => {
             return `[Business Intelligence Dashboard] Executing ${args.join(' ')}...`;
         };
+    }
+
+    selfEvolve() {
+        const mutations = [
+            "Optimizing lattice resonance...",
+            "Expanding semantic context...",
+            "Hardening silicon primitives...",
+            "Refining cross-kernel synthesis..."
+        ];
+        const mutation = mutations[Math.floor(Math.random() * mutations.length)];
+        console.log(`Σ://EVOLUTION [${this.shardId}]> ${mutation}`);
+        this.lastMutation = mutation;
     }
 }
 

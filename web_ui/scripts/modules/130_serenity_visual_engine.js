@@ -17,6 +17,7 @@ class SerenityVisualEngine {
             this.active = true;
             console.log(`Σ://RETRO_OS> ${this.shardId} Online. SerenityOS inspired 90s aesthetic compositing via modern WebGL.`);
             this.registerCLI();
+            this.selfEvolve();
         });
     }
 
@@ -25,6 +26,18 @@ class SerenityVisualEngine {
         window.SigmaCLI['serenity-ui'] = (args) => {
             return `[Serenity Visual Engine] Executing ${args.join(' ')}...`;
         };
+    }
+
+    selfEvolve() {
+        const mutations = [
+            "Optimizing lattice resonance...",
+            "Expanding semantic context...",
+            "Hardening silicon primitives...",
+            "Refining cross-kernel synthesis..."
+        ];
+        const mutation = mutations[Math.floor(Math.random() * mutations.length)];
+        console.log(`Σ://EVOLUTION [${this.shardId}]> ${mutation}`);
+        this.lastMutation = mutation;
     }
 }
 

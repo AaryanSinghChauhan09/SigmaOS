@@ -17,6 +17,7 @@ class ZeroTrustBus {
             this.active = true;
             console.log(`Σ://SINGULARITY_333> ${this.shardId} Online. Strict zero-trust authentication between all system shards.`);
             this.registerCLI();
+            this.selfEvolve();
         });
     }
 
@@ -25,6 +26,18 @@ class ZeroTrustBus {
         window.SigmaCLI['zt-bus'] = (args) => {
             return `[Zero Trust Bus] Futuristic Call: ${args.join(' ') || 'STATUS'}`;
         };
+    }
+
+    selfEvolve() {
+        const mutations = [
+            "Optimizing lattice resonance...",
+            "Expanding semantic context...",
+            "Hardening silicon primitives...",
+            "Refining cross-kernel synthesis..."
+        ];
+        const mutation = mutations[Math.floor(Math.random() * mutations.length)];
+        console.log(`Σ://EVOLUTION [${this.shardId}]> ${mutation}`);
+        this.lastMutation = mutation;
     }
 }
 

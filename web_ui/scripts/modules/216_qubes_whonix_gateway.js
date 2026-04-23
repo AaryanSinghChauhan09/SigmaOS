@@ -17,6 +17,7 @@ class QubesWhonixGateway {
             this.active = true;
             console.log(`Σ://NEXUS> ${this.shardId} Online. Qubes/Whonix inspired isolated Tor gateway for anonymous workspace traffic.`);
             this.registerCLI();
+            this.selfEvolve();
         });
     }
 
@@ -25,6 +26,18 @@ class QubesWhonixGateway {
         window.SigmaCLI['whonix-gate'] = (args) => {
             return `[Qubes Whonix Gateway] Infrastructure Call: ${args.join(' ') || 'STATUS'}`;
         };
+    }
+
+    selfEvolve() {
+        const mutations = [
+            "Optimizing lattice resonance...",
+            "Expanding semantic context...",
+            "Hardening silicon primitives...",
+            "Refining cross-kernel synthesis..."
+        ];
+        const mutation = mutations[Math.floor(Math.random() * mutations.length)];
+        console.log(`Σ://EVOLUTION [${this.shardId}]> ${mutation}`);
+        this.lastMutation = mutation;
     }
 }
 

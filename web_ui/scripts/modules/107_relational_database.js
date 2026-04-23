@@ -17,6 +17,7 @@ class RelationalDatabase {
             this.active = true;
             console.log(`Σ://OSS_ABSORB> ${this.shardId} Online. PostgreSQL inspired local structured data storage.`);
             this.registerCLI();
+            this.selfEvolve();
         });
     }
 
@@ -25,6 +26,18 @@ class RelationalDatabase {
         window.SigmaCLI['psql-sim'] = (args) => {
             return `[Relational Database] Executing ${args.join(' ')}...`;
         };
+    }
+
+    selfEvolve() {
+        const mutations = [
+            "Optimizing lattice resonance...",
+            "Expanding semantic context...",
+            "Hardening silicon primitives...",
+            "Refining cross-kernel synthesis..."
+        ];
+        const mutation = mutations[Math.floor(Math.random() * mutations.length)];
+        console.log(`Σ://EVOLUTION [${this.shardId}]> ${mutation}`);
+        this.lastMutation = mutation;
     }
 }
 

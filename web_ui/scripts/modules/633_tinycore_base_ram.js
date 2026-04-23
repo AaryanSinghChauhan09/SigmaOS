@@ -17,6 +17,7 @@ class TinyCoreBaseRAM {
             this.active = true;
             console.log(`Σ://LINUX_PARITY> ${this.shardId} Online. TinyCore inspired ultra-minimalist execution entirely from RAM lattices.`);
             this.registerCLI();
+            this.selfEvolve();
         });
     }
 
@@ -25,6 +26,18 @@ class TinyCoreBaseRAM {
         window.SigmaCLI['tce-load'] = (args) => {
             return `[TinyCore Base RAM] Executing ${args.join(' ')}...`;
         };
+    }
+
+    selfEvolve() {
+        const mutations = [
+            "Optimizing lattice resonance...",
+            "Expanding semantic context...",
+            "Hardening silicon primitives...",
+            "Refining cross-kernel synthesis..."
+        ];
+        const mutation = mutations[Math.floor(Math.random() * mutations.length)];
+        console.log(`Σ://EVOLUTION [${this.shardId}]> ${mutation}`);
+        this.lastMutation = mutation;
     }
 }
 

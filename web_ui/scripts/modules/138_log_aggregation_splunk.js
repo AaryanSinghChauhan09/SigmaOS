@@ -17,6 +17,7 @@ class LogAggregationAnalysis {
             this.active = true;
             console.log(`Σ://DATA_OS> ${this.shardId} Online. Splunk inspired searching and monitoring machine-generated data.`);
             this.registerCLI();
+            this.selfEvolve();
         });
     }
 
@@ -25,6 +26,18 @@ class LogAggregationAnalysis {
         window.SigmaCLI['splunk-search'] = (args) => {
             return `[Log Aggregation & Analysis] Executing ${args.join(' ')}...`;
         };
+    }
+
+    selfEvolve() {
+        const mutations = [
+            "Optimizing lattice resonance...",
+            "Expanding semantic context...",
+            "Hardening silicon primitives...",
+            "Refining cross-kernel synthesis..."
+        ];
+        const mutation = mutations[Math.floor(Math.random() * mutations.length)];
+        console.log(`Σ://EVOLUTION [${this.shardId}]> ${mutation}`);
+        this.lastMutation = mutation;
     }
 }
 

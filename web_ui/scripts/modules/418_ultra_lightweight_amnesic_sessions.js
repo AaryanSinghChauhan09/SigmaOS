@@ -17,6 +17,7 @@ class UltraLightweightAmnesicSessionsShard418 {
             this.active = true;
             console.log(`Σ://SINGULARITY_500> ${this.shardId} Online. Absorbing Ultra-Lightweight Amnesic Sessions features from Puppy / Tails. (Milestone: 418/500)`);
             this.registerCLI();
+            this.selfEvolve();
         });
     }
 
@@ -25,6 +26,18 @@ class UltraLightweightAmnesicSessionsShard418 {
         window.SigmaCLI['amnesic-418'] = (args) => {
             return `[Ultra-Lightweight Amnesic Sessions Shard 418] Apex Command: ${args.join(' ') || 'SINGULARITY'}`;
         };
+    }
+
+    selfEvolve() {
+        const mutations = [
+            "Optimizing lattice resonance...",
+            "Expanding semantic context...",
+            "Hardening silicon primitives...",
+            "Refining cross-kernel synthesis..."
+        ];
+        const mutation = mutations[Math.floor(Math.random() * mutations.length)];
+        console.log(`Σ://EVOLUTION [${this.shardId}]> ${mutation}`);
+        this.lastMutation = mutation;
     }
 }
 

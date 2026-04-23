@@ -17,6 +17,7 @@ class StreamingCompositor {
             this.active = true;
             console.log(`Σ://OSS_ABSORB> ${this.shardId} Online. OBS Studio inspired screen recording and broadcasting built-in.`);
             this.registerCLI();
+            this.selfEvolve();
         });
     }
 
@@ -25,6 +26,18 @@ class StreamingCompositor {
         window.SigmaCLI['obs-sim'] = (args) => {
             return `[Streaming Compositor] Executing ${args.join(' ')}...`;
         };
+    }
+
+    selfEvolve() {
+        const mutations = [
+            "Optimizing lattice resonance...",
+            "Expanding semantic context...",
+            "Hardening silicon primitives...",
+            "Refining cross-kernel synthesis..."
+        ];
+        const mutation = mutations[Math.floor(Math.random() * mutations.length)];
+        console.log(`Σ://EVOLUTION [${this.shardId}]> ${mutation}`);
+        this.lastMutation = mutation;
     }
 }
 

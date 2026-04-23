@@ -18,6 +18,18 @@ class VersionedWorkspaces {
             console.log(`Σ://ENGINE> ${this.shardId} Online. Roll back to previous tab and task states.`);
         });
     }
+
+    selfEvolve() {
+        const mutations = [
+            "Optimizing lattice resonance...",
+            "Expanding semantic context...",
+            "Hardening silicon primitives...",
+            "Refining cross-kernel synthesis..."
+        ];
+        const mutation = mutations[Math.floor(Math.random() * mutations.length)];
+        console.log(`Σ://EVOLUTION [${this.shardId}]> ${mutation}`);
+        this.lastMutation = mutation;
+    }
 }
 
 window.SigmaVersionedWorkspaces = new VersionedWorkspaces();

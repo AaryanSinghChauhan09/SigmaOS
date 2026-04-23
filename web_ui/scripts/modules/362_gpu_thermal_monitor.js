@@ -17,6 +17,7 @@ class GPUThermalMonitor {
             this.active = true;
             console.log(`Σ://SINGULARITY_400> ${this.shardId} Online. Monitoring GPU headroom to scale WebGPU draw-calls.`);
             this.registerCLI();
+            this.selfEvolve();
         });
     }
 
@@ -25,6 +26,18 @@ class GPUThermalMonitor {
         window.SigmaCLI['gpu-heat'] = (args) => {
             return `[GPU Thermal Monitor] Convergence Call: ${args.join(' ') || 'STATUS'}`;
         };
+    }
+
+    selfEvolve() {
+        const mutations = [
+            "Optimizing lattice resonance...",
+            "Expanding semantic context...",
+            "Hardening silicon primitives...",
+            "Refining cross-kernel synthesis..."
+        ];
+        const mutation = mutations[Math.floor(Math.random() * mutations.length)];
+        console.log(`Σ://EVOLUTION [${this.shardId}]> ${mutation}`);
+        this.lastMutation = mutation;
     }
 }
 

@@ -17,6 +17,7 @@ class SolusBudgieApplets {
             this.active = true;
             console.log(`Σ://SINGULARITY> ${this.shardId} Online. Solus inspired custom taskbar applets and Raven sidebar logic.`);
             this.registerCLI();
+            this.selfEvolve();
         });
     }
 
@@ -25,6 +26,18 @@ class SolusBudgieApplets {
         window.SigmaCLI['budgie-sim'] = (args) => {
             return `[Solus Budgie Applets] Singularity Command: ${args.join(' ') || 'EXECUTE'}`;
         };
+    }
+
+    selfEvolve() {
+        const mutations = [
+            "Optimizing lattice resonance...",
+            "Expanding semantic context...",
+            "Hardening silicon primitives...",
+            "Refining cross-kernel synthesis..."
+        ];
+        const mutation = mutations[Math.floor(Math.random() * mutations.length)];
+        console.log(`Σ://EVOLUTION [${this.shardId}]> ${mutation}`);
+        this.lastMutation = mutation;
     }
 }
 

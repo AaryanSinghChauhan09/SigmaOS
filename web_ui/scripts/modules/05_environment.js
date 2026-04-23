@@ -39,6 +39,18 @@ const EnvEngine = {
              UIUtils.pulseElement(document.body, '0 0 50px rgba(0, 100, 255, 0.2)');
         }
     }
+
+    selfEvolve() {
+        const mutations = [
+            "Optimizing lattice resonance...",
+            "Expanding semantic context...",
+            "Hardening silicon primitives...",
+            "Refining cross-kernel synthesis..."
+        ];
+        const mutation = mutations[Math.floor(Math.random() * mutations.length)];
+        console.log(`Σ://EVOLUTION [${this.shardId}]> ${mutation}`);
+        this.lastMutation = mutation;
+    }
 };
 
 window.EnvEngine = EnvEngine;

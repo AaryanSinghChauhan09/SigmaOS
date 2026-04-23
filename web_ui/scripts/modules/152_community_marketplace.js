@@ -17,6 +17,7 @@ class CommunityMarketplace {
             this.active = true;
             console.log(`Σ://LINUX_MODULARITY> ${this.shardId} Online. Curated ecosystem repository of third-party tools and plugins.`);
             this.registerCLI();
+            this.selfEvolve();
         });
     }
 
@@ -25,6 +26,18 @@ class CommunityMarketplace {
         window.SigmaCLI['sigma-store'] = (args) => {
             return `[Community Marketplace] Executing ${args.join(' ')}...`;
         };
+    }
+
+    selfEvolve() {
+        const mutations = [
+            "Optimizing lattice resonance...",
+            "Expanding semantic context...",
+            "Hardening silicon primitives...",
+            "Refining cross-kernel synthesis..."
+        ];
+        const mutation = mutations[Math.floor(Math.random() * mutations.length)];
+        console.log(`Σ://EVOLUTION [${this.shardId}]> ${mutation}`);
+        this.lastMutation = mutation;
     }
 }
 

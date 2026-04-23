@@ -17,6 +17,7 @@ class GitVersionControl {
             this.active = true;
             console.log(`Σ://OSS_ABSORB> ${this.shardId} Online. Git inspired snapshotting and branching for workspace states.`);
             this.registerCLI();
+            this.selfEvolve();
         });
     }
 
@@ -25,6 +26,18 @@ class GitVersionControl {
         window.SigmaCLI['git-sim'] = (args) => {
             return `[Git Version Control] Executing ${args.join(' ')}...`;
         };
+    }
+
+    selfEvolve() {
+        const mutations = [
+            "Optimizing lattice resonance...",
+            "Expanding semantic context...",
+            "Hardening silicon primitives...",
+            "Refining cross-kernel synthesis..."
+        ];
+        const mutation = mutations[Math.floor(Math.random() * mutations.length)];
+        console.log(`Σ://EVOLUTION [${this.shardId}]> ${mutation}`);
+        this.lastMutation = mutation;
     }
 }
 

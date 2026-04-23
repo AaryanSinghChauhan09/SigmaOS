@@ -85,6 +85,18 @@ class SovereignExplorer extends ZenithComponent {
         window.zenith.taskbar.notify(`OPENING: ${file.name}`, 'STABLE');
         console.log(`Σ://FS> [READ] ${file.name}: ${file.content}`);
     }
+
+    selfEvolve() {
+        const mutations = [
+            "Optimizing lattice resonance...",
+            "Expanding semantic context...",
+            "Hardening silicon primitives...",
+            "Refining cross-kernel synthesis..."
+        ];
+        const mutation = mutations[Math.floor(Math.random() * mutations.length)];
+        console.log(`Σ://EVOLUTION [${this.shardId}]> ${mutation}`);
+        this.lastMutation = mutation;
+    }
 }
 
 window.SovereignExplorer = SovereignExplorer;

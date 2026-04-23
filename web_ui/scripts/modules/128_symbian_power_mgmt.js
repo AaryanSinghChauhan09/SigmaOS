@@ -17,6 +17,7 @@ class SymbianPowerManagement {
             this.active = true;
             console.log(`Σ://RETRO_OS> ${this.shardId} Online. Symbian inspired extreme power state optimization and hibernation.`);
             this.registerCLI();
+            this.selfEvolve();
         });
     }
 
@@ -25,6 +26,18 @@ class SymbianPowerManagement {
         window.SigmaCLI['symbian-pwr'] = (args) => {
             return `[Symbian Power Management] Executing ${args.join(' ')}...`;
         };
+    }
+
+    selfEvolve() {
+        const mutations = [
+            "Optimizing lattice resonance...",
+            "Expanding semantic context...",
+            "Hardening silicon primitives...",
+            "Refining cross-kernel synthesis..."
+        ];
+        const mutation = mutations[Math.floor(Math.random() * mutations.length)];
+        console.log(`Σ://EVOLUTION [${this.shardId}]> ${mutation}`);
+        this.lastMutation = mutation;
     }
 }
 

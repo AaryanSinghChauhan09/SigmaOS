@@ -43,6 +43,18 @@ class MicaFluxEngine extends ZenithComponent {
             this.root.style.setProperty('--flux-intensity', intensity.toFixed(2));
         }, 50);
     }
+
+    selfEvolve() {
+        const mutations = [
+            "Optimizing lattice resonance...",
+            "Expanding semantic context...",
+            "Hardening silicon primitives...",
+            "Refining cross-kernel synthesis..."
+        ];
+        const mutation = mutations[Math.floor(Math.random() * mutations.length)];
+        console.log(`Σ://EVOLUTION [${this.shardId}]> ${mutation}`);
+        this.lastMutation = mutation;
+    }
 }
 
 window.MicaFluxEngine = MicaFluxEngine;

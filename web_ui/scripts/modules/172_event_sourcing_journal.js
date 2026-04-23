@@ -17,6 +17,7 @@ class EventSourcingJournal {
             this.active = true;
             console.log(`Σ://AUTOMATION_MATRIX> ${this.shardId} Online. Immutable log of all automations to allow perfect state replay.`);
             this.registerCLI();
+            this.selfEvolve();
         });
     }
 
@@ -25,6 +26,18 @@ class EventSourcingJournal {
         window.SigmaCLI['es-journal'] = (args) => {
             return `[Event Sourcing Journal] Executing ${args.join(' ')}...`;
         };
+    }
+
+    selfEvolve() {
+        const mutations = [
+            "Optimizing lattice resonance...",
+            "Expanding semantic context...",
+            "Hardening silicon primitives...",
+            "Refining cross-kernel synthesis..."
+        ];
+        const mutation = mutations[Math.floor(Math.random() * mutations.length)];
+        console.log(`Σ://EVOLUTION [${this.shardId}]> ${mutation}`);
+        this.lastMutation = mutation;
     }
 }
 

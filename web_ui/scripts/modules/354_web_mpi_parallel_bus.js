@@ -17,6 +17,7 @@ class WebMPIParallelBus {
             this.active = true;
             console.log(`Σ://SINGULARITY_360> ${this.shardId} Online. Message passing interface for distributed DOM/AI compute.`);
             this.registerCLI();
+            this.selfEvolve();
         });
     }
 
@@ -25,6 +26,18 @@ class WebMPIParallelBus {
         window.SigmaCLI['mpi-exec'] = (args) => {
             return `[Web-MPI Parallel Bus] Industrial Call: ${args.join(' ') || 'STATUS'}`;
         };
+    }
+
+    selfEvolve() {
+        const mutations = [
+            "Optimizing lattice resonance...",
+            "Expanding semantic context...",
+            "Hardening silicon primitives...",
+            "Refining cross-kernel synthesis..."
+        ];
+        const mutation = mutations[Math.floor(Math.random() * mutations.length)];
+        console.log(`Σ://EVOLUTION [${this.shardId}]> ${mutation}`);
+        this.lastMutation = mutation;
     }
 }
 

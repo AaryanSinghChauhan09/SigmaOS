@@ -19,6 +19,7 @@ class CloudComputeRelay {
             this.detect();
             console.log(`Σ://PLATFORM> ${this.shardId} Online in ${this.environment} context.`);
             this.registerCLI();
+            this.selfEvolve();
         });
     }
 
@@ -36,6 +37,18 @@ class CloudComputeRelay {
         window.SigmaCLI['cloud-offload'] = (args) => {
             return `[Cloud Compute Relay] Environment: ${this.environment.toUpperCase()} | Status: Active`;
         };
+    }
+
+    selfEvolve() {
+        const mutations = [
+            "Optimizing lattice resonance...",
+            "Expanding semantic context...",
+            "Hardening silicon primitives...",
+            "Refining cross-kernel synthesis..."
+        ];
+        const mutation = mutations[Math.floor(Math.random() * mutations.length)];
+        console.log(`Σ://EVOLUTION [${this.shardId}]> ${mutation}`);
+        this.lastMutation = mutation;
     }
 }
 

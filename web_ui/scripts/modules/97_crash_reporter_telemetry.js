@@ -17,6 +17,7 @@ class CrashReporterTelemetry {
             this.active = true;
             console.log(`Σ://APEX> ${this.shardId} Online. Windows Error Reporting inspired automated stack trace dumping.`);
             this.registerCLI();
+            this.selfEvolve();
             
         });
     }
@@ -29,6 +30,18 @@ class CrashReporterTelemetry {
         };
     }
     
+
+    selfEvolve() {
+        const mutations = [
+            "Optimizing lattice resonance...",
+            "Expanding semantic context...",
+            "Hardening silicon primitives...",
+            "Refining cross-kernel synthesis..."
+        ];
+        const mutation = mutations[Math.floor(Math.random() * mutations.length)];
+        console.log(`Σ://EVOLUTION [${this.shardId}]> ${mutation}`);
+        this.lastMutation = mutation;
+    }
 }
 
 window.SigmaCrashReporterTelemetry = new CrashReporterTelemetry();

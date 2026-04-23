@@ -17,6 +17,7 @@ class NetBSDRumpKernel {
             this.active = true;
             console.log(`Σ://PHASE_6> ${this.shardId} Online. NetBSD inspired rump kernels for running drivers in isolated userland sandboxes.`);
             this.registerCLI();
+            this.selfEvolve();
         });
     }
 
@@ -25,6 +26,18 @@ class NetBSDRumpKernel {
         window.SigmaCLI['rump-run'] = (args) => {
             return `[NetBSD Rump Kernel] Cross-Kernel Call: ${args.join(' ') || 'STATUS'}`;
         };
+    }
+
+    selfEvolve() {
+        const mutations = [
+            "Optimizing lattice resonance...",
+            "Expanding semantic context...",
+            "Hardening silicon primitives...",
+            "Refining cross-kernel synthesis..."
+        ];
+        const mutation = mutations[Math.floor(Math.random() * mutations.length)];
+        console.log(`Σ://EVOLUTION [${this.shardId}]> ${mutation}`);
+        this.lastMutation = mutation;
     }
 }
 

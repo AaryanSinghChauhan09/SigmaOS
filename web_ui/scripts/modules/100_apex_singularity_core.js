@@ -17,6 +17,7 @@ class ApexSingularityCore {
             this.active = true;
             console.log(`Σ://APEX> ${this.shardId} Online. The final unifier, orchestrating all 99 shards and automatically generating a CLI command mapping for every single task and module in the OS.`);
             this.registerCLI();
+            this.selfEvolve();
             this.generateGlobalCLI();
         });
     }
@@ -45,6 +46,18 @@ class ApexSingularityCore {
         console.log(`Σ://CLI> ${this.shardId} 100% CLI parity achieved.`);
     }
 
+
+    selfEvolve() {
+        const mutations = [
+            "Optimizing lattice resonance...",
+            "Expanding semantic context...",
+            "Hardening silicon primitives...",
+            "Refining cross-kernel synthesis..."
+        ];
+        const mutation = mutations[Math.floor(Math.random() * mutations.length)];
+        console.log(`Σ://EVOLUTION [${this.shardId}]> ${mutation}`);
+        this.lastMutation = mutation;
+    }
 }
 
 window.SigmaApexSingularityCore = new ApexSingularityCore();

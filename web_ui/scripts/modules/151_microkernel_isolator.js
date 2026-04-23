@@ -17,6 +17,7 @@ class MicrokernelIsolator {
             this.active = true;
             console.log(`Σ://LINUX_MODULARITY> ${this.shardId} Online. Strict memory and privilege separation between Kernel and Userland modules.`);
             this.registerCLI();
+            this.selfEvolve();
         });
     }
 
@@ -25,6 +26,18 @@ class MicrokernelIsolator {
         window.SigmaCLI['isol-sys'] = (args) => {
             return `[Microkernel Isolator] Executing ${args.join(' ')}...`;
         };
+    }
+
+    selfEvolve() {
+        const mutations = [
+            "Optimizing lattice resonance...",
+            "Expanding semantic context...",
+            "Hardening silicon primitives...",
+            "Refining cross-kernel synthesis..."
+        ];
+        const mutation = mutations[Math.floor(Math.random() * mutations.length)];
+        console.log(`Σ://EVOLUTION [${this.shardId}]> ${mutation}`);
+        this.lastMutation = mutation;
     }
 }
 

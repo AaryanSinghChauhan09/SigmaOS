@@ -17,6 +17,7 @@ class ZorinOSChameleon {
             this.active = true;
             console.log(`Σ://LINUX_DISTROS_FINAL> ${this.shardId} Online. Zorin OS inspired shape-shifting UI to mimic Windows or macOS on the fly.`);
             this.registerCLI();
+            this.selfEvolve();
         });
     }
 
@@ -25,6 +26,18 @@ class ZorinOSChameleon {
         window.SigmaCLI['zorin-morph'] = (args) => {
             return `[Zorin OS Chameleon] Executing ${args.join(' ')}...`;
         };
+    }
+
+    selfEvolve() {
+        const mutations = [
+            "Optimizing lattice resonance...",
+            "Expanding semantic context...",
+            "Hardening silicon primitives...",
+            "Refining cross-kernel synthesis..."
+        ];
+        const mutation = mutations[Math.floor(Math.random() * mutations.length)];
+        console.log(`Σ://EVOLUTION [${this.shardId}]> ${mutation}`);
+        this.lastMutation = mutation;
     }
 }
 

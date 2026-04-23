@@ -17,6 +17,7 @@ class SigmaOmnipresence {
             this.active = true;
             console.log(`Σ://AUTOMATION_MATRIX> ${this.shardId} Online. The apex state unifying the 6 automation engines into one workflow.`);
             this.registerCLI();
+            this.selfEvolve();
         });
     }
 
@@ -25,6 +26,18 @@ class SigmaOmnipresence {
         window.SigmaCLI['omnipresence'] = (args) => {
             return `[Sigma Omnipresence] Executing ${args.join(' ')}...`;
         };
+    }
+
+    selfEvolve() {
+        const mutations = [
+            "Optimizing lattice resonance...",
+            "Expanding semantic context...",
+            "Hardening silicon primitives...",
+            "Refining cross-kernel synthesis..."
+        ];
+        const mutation = mutations[Math.floor(Math.random() * mutations.length)];
+        console.log(`Σ://EVOLUTION [${this.shardId}]> ${mutation}`);
+        this.lastMutation = mutation;
     }
 }
 

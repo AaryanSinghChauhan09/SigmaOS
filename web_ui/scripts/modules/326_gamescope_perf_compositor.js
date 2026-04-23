@@ -17,6 +17,7 @@ class GamescopePerfCompositor {
             this.active = true;
             console.log(`Σ://SINGULARITY_333> ${this.shardId} Online. High-performance micro-compositor for research-heavy workloads.`);
             this.registerCLI();
+            this.selfEvolve();
         });
     }
 
@@ -25,6 +26,18 @@ class GamescopePerfCompositor {
         window.SigmaCLI['gs-perf'] = (args) => {
             return `[Gamescope Perf Compositor] Futuristic Call: ${args.join(' ') || 'STATUS'}`;
         };
+    }
+
+    selfEvolve() {
+        const mutations = [
+            "Optimizing lattice resonance...",
+            "Expanding semantic context...",
+            "Hardening silicon primitives...",
+            "Refining cross-kernel synthesis..."
+        ];
+        const mutation = mutations[Math.floor(Math.random() * mutations.length)];
+        console.log(`Σ://EVOLUTION [${this.shardId}]> ${mutation}`);
+        this.lastMutation = mutation;
     }
 }
 

@@ -17,6 +17,7 @@ class The500ShardApexSingularityShard494 {
             this.active = true;
             console.log(`Σ://SINGULARITY_500> ${this.shardId} Online. Absorbing The 500-Shard Apex Singularity features from SigmaOS Singularity. (Milestone: 494/500)`);
             this.registerCLI();
+            this.selfEvolve();
         });
     }
 
@@ -25,6 +26,18 @@ class The500ShardApexSingularityShard494 {
         window.SigmaCLI['apex-494'] = (args) => {
             return `[The 500-Shard Apex Singularity Shard 494] Apex Command: ${args.join(' ') || 'SINGULARITY'}`;
         };
+    }
+
+    selfEvolve() {
+        const mutations = [
+            "Optimizing lattice resonance...",
+            "Expanding semantic context...",
+            "Hardening silicon primitives...",
+            "Refining cross-kernel synthesis..."
+        ];
+        const mutation = mutations[Math.floor(Math.random() * mutations.length)];
+        console.log(`Σ://EVOLUTION [${this.shardId}]> ${mutation}`);
+        this.lastMutation = mutation;
     }
 }
 

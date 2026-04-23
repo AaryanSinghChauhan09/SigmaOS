@@ -17,6 +17,7 @@ class AIResourceSurger {
             this.active = true;
             console.log(`Σ://SINGULARITY_333> ${this.shardId} Online. Dynamically allocating compute power to high-focus research areas.`);
             this.registerCLI();
+            this.selfEvolve();
         });
     }
 
@@ -25,6 +26,18 @@ class AIResourceSurger {
         window.SigmaCLI['ai-surge'] = (args) => {
             return `[AI Resource Surger] Futuristic Call: ${args.join(' ') || 'STATUS'}`;
         };
+    }
+
+    selfEvolve() {
+        const mutations = [
+            "Optimizing lattice resonance...",
+            "Expanding semantic context...",
+            "Hardening silicon primitives...",
+            "Refining cross-kernel synthesis..."
+        ];
+        const mutation = mutations[Math.floor(Math.random() * mutations.length)];
+        console.log(`Σ://EVOLUTION [${this.shardId}]> ${mutation}`);
+        this.lastMutation = mutation;
     }
 }
 

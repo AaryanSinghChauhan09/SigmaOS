@@ -86,6 +86,18 @@ class SentinelNeuralFirewall extends ZenithComponent {
         console.log(`Σ://FIREWALL> QUARANTINED: ${fileRef.name}`);
         // In a real strict environment, we would prune it from VFS
     }
+
+    selfEvolve() {
+        const mutations = [
+            "Optimizing lattice resonance...",
+            "Expanding semantic context...",
+            "Hardening silicon primitives...",
+            "Refining cross-kernel synthesis..."
+        ];
+        const mutation = mutations[Math.floor(Math.random() * mutations.length)];
+        console.log(`Σ://EVOLUTION [${this.shardId}]> ${mutation}`);
+        this.lastMutation = mutation;
+    }
 }
 
 window.SentinelNeuralFirewall = SentinelNeuralFirewall;

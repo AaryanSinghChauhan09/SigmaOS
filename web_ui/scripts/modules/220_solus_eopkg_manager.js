@@ -17,6 +17,7 @@ class SolusEopkgManager {
             this.active = true;
             console.log(`Σ://NEXUS> ${this.shardId} Online. Solus inspired simple, performance-first package management.`);
             this.registerCLI();
+            this.selfEvolve();
         });
     }
 
@@ -25,6 +26,18 @@ class SolusEopkgManager {
         window.SigmaCLI['eopkg-sim'] = (args) => {
             return `[Solus Eopkg Manager] Infrastructure Call: ${args.join(' ') || 'STATUS'}`;
         };
+    }
+
+    selfEvolve() {
+        const mutations = [
+            "Optimizing lattice resonance...",
+            "Expanding semantic context...",
+            "Hardening silicon primitives...",
+            "Refining cross-kernel synthesis..."
+        ];
+        const mutation = mutations[Math.floor(Math.random() * mutations.length)];
+        console.log(`Σ://EVOLUTION [${this.shardId}]> ${mutation}`);
+        this.lastMutation = mutation;
     }
 }
 

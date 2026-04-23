@@ -17,6 +17,7 @@ class PredictiveLatticeWarmer {
             this.active = true;
             console.log(`Σ://SINGULARITY_333> ${this.shardId} Online. Predicting task switches to pre-warm shards and resources.`);
             this.registerCLI();
+            this.selfEvolve();
         });
     }
 
@@ -25,6 +26,18 @@ class PredictiveLatticeWarmer {
         window.SigmaCLI['ai-warm'] = (args) => {
             return `[Predictive Lattice Warmer] Futuristic Call: ${args.join(' ') || 'STATUS'}`;
         };
+    }
+
+    selfEvolve() {
+        const mutations = [
+            "Optimizing lattice resonance...",
+            "Expanding semantic context...",
+            "Hardening silicon primitives...",
+            "Refining cross-kernel synthesis..."
+        ];
+        const mutation = mutations[Math.floor(Math.random() * mutations.length)];
+        console.log(`Σ://EVOLUTION [${this.shardId}]> ${mutation}`);
+        this.lastMutation = mutation;
     }
 }
 

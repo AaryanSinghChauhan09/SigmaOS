@@ -17,6 +17,7 @@ class openSUSEOBSFactory {
             this.active = true;
             console.log(`Σ://NEXUS> ${this.shardId} Online. openSUSE inspired Open Build Service for cross-platform shard compilation.`);
             this.registerCLI();
+            this.selfEvolve();
         });
     }
 
@@ -25,6 +26,18 @@ class openSUSEOBSFactory {
         window.SigmaCLI['obs-build'] = (args) => {
             return `[openSUSE OBS Factory] Infrastructure Call: ${args.join(' ') || 'STATUS'}`;
         };
+    }
+
+    selfEvolve() {
+        const mutations = [
+            "Optimizing lattice resonance...",
+            "Expanding semantic context...",
+            "Hardening silicon primitives...",
+            "Refining cross-kernel synthesis..."
+        ];
+        const mutation = mutations[Math.floor(Math.random() * mutations.length)];
+        console.log(`Σ://EVOLUTION [${this.shardId}]> ${mutation}`);
+        this.lastMutation = mutation;
     }
 }
 

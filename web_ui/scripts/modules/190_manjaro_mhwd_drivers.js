@@ -17,6 +17,7 @@ class ManjaroMHWDDrivers {
             this.active = true;
             console.log(`Σ://LINUX_DISTROS> ${this.shardId} Online. Manjaro inspired MHWD automated hardware detection and configuration.`);
             this.registerCLI();
+            this.selfEvolve();
         });
     }
 
@@ -25,6 +26,18 @@ class ManjaroMHWDDrivers {
         window.SigmaCLI['mhwd-sim'] = (args) => {
             return `[Manjaro MHWD Drivers] Executing ${args.join(' ')}...`;
         };
+    }
+
+    selfEvolve() {
+        const mutations = [
+            "Optimizing lattice resonance...",
+            "Expanding semantic context...",
+            "Hardening silicon primitives...",
+            "Refining cross-kernel synthesis..."
+        ];
+        const mutation = mutations[Math.floor(Math.random() * mutations.length)];
+        console.log(`Σ://EVOLUTION [${this.shardId}]> ${mutation}`);
+        this.lastMutation = mutation;
     }
 }
 

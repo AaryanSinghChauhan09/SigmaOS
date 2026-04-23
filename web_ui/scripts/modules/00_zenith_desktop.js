@@ -25,6 +25,18 @@ const ZenithDesktop = {
     lockInterface() {
         UIUtils.appendLog('audit-log', `Zenith: Locking silicate interface. Sovereign encryption active.`, 'warning');
     }
+
+    selfEvolve() {
+        const mutations = [
+            "Optimizing lattice resonance...",
+            "Expanding semantic context...",
+            "Hardening silicon primitives...",
+            "Refining cross-kernel synthesis..."
+        ];
+        const mutation = mutations[Math.floor(Math.random() * mutations.length)];
+        console.log(`Σ://EVOLUTION [${this.shardId}]> ${mutation}`);
+        this.lastMutation = mutation;
+    }
 };
 
 window.ZenithDesktop = ZenithDesktop;

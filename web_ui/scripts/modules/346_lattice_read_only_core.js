@@ -17,6 +17,7 @@ class LatticeReadOnlyCore {
             this.active = true;
             console.log(`Σ://SINGULARITY_360> ${this.shardId} Online. Hardening the core lattice as a read-only immutable state.`);
             this.registerCLI();
+            this.selfEvolve();
         });
     }
 
@@ -25,6 +26,18 @@ class LatticeReadOnlyCore {
         window.SigmaCLI['lock-core'] = (args) => {
             return `[Lattice Read-Only Core] Industrial Call: ${args.join(' ') || 'STATUS'}`;
         };
+    }
+
+    selfEvolve() {
+        const mutations = [
+            "Optimizing lattice resonance...",
+            "Expanding semantic context...",
+            "Hardening silicon primitives...",
+            "Refining cross-kernel synthesis..."
+        ];
+        const mutation = mutations[Math.floor(Math.random() * mutations.length)];
+        console.log(`Σ://EVOLUTION [${this.shardId}]> ${mutation}`);
+        this.lastMutation = mutation;
     }
 }
 

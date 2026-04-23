@@ -17,6 +17,7 @@ class KaliMetasploitIntegration {
             this.active = true;
             console.log(`Σ://SINGULARITY> ${this.shardId} Online. Kali inspired deep integration for security auditing and penetration tests.`);
             this.registerCLI();
+            this.selfEvolve();
         });
     }
 
@@ -25,6 +26,18 @@ class KaliMetasploitIntegration {
         window.SigmaCLI['msf-sim'] = (args) => {
             return `[Kali Metasploit Integration] Singularity Command: ${args.join(' ') || 'EXECUTE'}`;
         };
+    }
+
+    selfEvolve() {
+        const mutations = [
+            "Optimizing lattice resonance...",
+            "Expanding semantic context...",
+            "Hardening silicon primitives...",
+            "Refining cross-kernel synthesis..."
+        ];
+        const mutation = mutations[Math.floor(Math.random() * mutations.length)];
+        console.log(`Σ://EVOLUTION [${this.shardId}]> ${mutation}`);
+        this.lastMutation = mutation;
     }
 }
 

@@ -17,6 +17,7 @@ class DataTransformationPipeline {
             this.active = true;
             console.log(`Σ://DATA_OS> ${this.shardId} Online. dbt inspired data build tool for transforming OS data.`);
             this.registerCLI();
+            this.selfEvolve();
         });
     }
 
@@ -25,6 +26,18 @@ class DataTransformationPipeline {
         window.SigmaCLI['dbt-run'] = (args) => {
             return `[Data Transformation Pipeline] Executing ${args.join(' ')}...`;
         };
+    }
+
+    selfEvolve() {
+        const mutations = [
+            "Optimizing lattice resonance...",
+            "Expanding semantic context...",
+            "Hardening silicon primitives...",
+            "Refining cross-kernel synthesis..."
+        ];
+        const mutation = mutations[Math.floor(Math.random() * mutations.length)];
+        console.log(`Σ://EVOLUTION [${this.shardId}]> ${mutation}`);
+        this.lastMutation = mutation;
     }
 }
 

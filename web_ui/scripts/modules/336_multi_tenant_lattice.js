@@ -17,6 +17,7 @@ class MultiTenantLattice {
             this.active = true;
             console.log(`Σ://SINGULARITY_360> ${this.shardId} Online. Managing isolated user states within a single browser environment.`);
             this.registerCLI();
+            this.selfEvolve();
         });
     }
 
@@ -25,6 +26,18 @@ class MultiTenantLattice {
         window.SigmaCLI['multi-tenant'] = (args) => {
             return `[Multi-Tenant Lattice] Industrial Call: ${args.join(' ') || 'STATUS'}`;
         };
+    }
+
+    selfEvolve() {
+        const mutations = [
+            "Optimizing lattice resonance...",
+            "Expanding semantic context...",
+            "Hardening silicon primitives...",
+            "Refining cross-kernel synthesis..."
+        ];
+        const mutation = mutations[Math.floor(Math.random() * mutations.length)];
+        console.log(`Σ://EVOLUTION [${this.shardId}]> ${mutation}`);
+        this.lastMutation = mutation;
     }
 }
 

@@ -17,6 +17,7 @@ class IndustrialSingularity {
             this.active = true;
             console.log(`Σ://SINGULARITY_360> ${this.shardId} Online. The 360th Shard: Reaching the Industrial Singularity milestone.`);
             this.registerCLI();
+            this.selfEvolve();
         });
     }
 
@@ -25,6 +26,18 @@ class IndustrialSingularity {
         window.SigmaCLI['singularity-360'] = (args) => {
             return `[Industrial Singularity] Industrial Call: ${args.join(' ') || 'STATUS'}`;
         };
+    }
+
+    selfEvolve() {
+        const mutations = [
+            "Optimizing lattice resonance...",
+            "Expanding semantic context...",
+            "Hardening silicon primitives...",
+            "Refining cross-kernel synthesis..."
+        ];
+        const mutation = mutations[Math.floor(Math.random() * mutations.length)];
+        console.log(`Σ://EVOLUTION [${this.shardId}]> ${mutation}`);
+        this.lastMutation = mutation;
     }
 }
 

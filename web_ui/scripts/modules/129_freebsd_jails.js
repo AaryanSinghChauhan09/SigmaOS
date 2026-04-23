@@ -17,6 +17,7 @@ class FreeBSDJails {
             this.active = true;
             console.log(`Σ://RETRO_OS> ${this.shardId} Online. FreeBSD inspired lightweight containerized system environments.`);
             this.registerCLI();
+            this.selfEvolve();
         });
     }
 
@@ -25,6 +26,18 @@ class FreeBSDJails {
         window.SigmaCLI['jail-mgr'] = (args) => {
             return `[FreeBSD Jails] Executing ${args.join(' ')}...`;
         };
+    }
+
+    selfEvolve() {
+        const mutations = [
+            "Optimizing lattice resonance...",
+            "Expanding semantic context...",
+            "Hardening silicon primitives...",
+            "Refining cross-kernel synthesis..."
+        ];
+        const mutation = mutations[Math.floor(Math.random() * mutations.length)];
+        console.log(`Σ://EVOLUTION [${this.shardId}]> ${mutation}`);
+        this.lastMutation = mutation;
     }
 }
 

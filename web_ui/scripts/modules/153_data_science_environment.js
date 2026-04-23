@@ -17,6 +17,7 @@ class DataScienceEnvironment {
             this.active = true;
             console.log(`Σ://LINUX_MODULARITY> ${this.shardId} Online. Jupyter-like interactive ML playground natively in the browser.`);
             this.registerCLI();
+            this.selfEvolve();
         });
     }
 
@@ -25,6 +26,18 @@ class DataScienceEnvironment {
         window.SigmaCLI['ds-env'] = (args) => {
             return `[Data Science Environment] Executing ${args.join(' ')}...`;
         };
+    }
+
+    selfEvolve() {
+        const mutations = [
+            "Optimizing lattice resonance...",
+            "Expanding semantic context...",
+            "Hardening silicon primitives...",
+            "Refining cross-kernel synthesis..."
+        ];
+        const mutation = mutations[Math.floor(Math.random() * mutations.length)];
+        console.log(`Σ://EVOLUTION [${this.shardId}]> ${mutation}`);
+        this.lastMutation = mutation;
     }
 }
 

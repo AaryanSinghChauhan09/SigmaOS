@@ -17,6 +17,7 @@ class GarudaZenGaming {
             this.active = true;
             console.log(`Σ://LINUX_DISTROS_FINAL> ${this.shardId} Online. Garuda Linux inspired Zen kernel optimizations prioritizing UI responsiveness over throughput.`);
             this.registerCLI();
+            this.selfEvolve();
         });
     }
 
@@ -25,6 +26,18 @@ class GarudaZenGaming {
         window.SigmaCLI['zen-opt'] = (args) => {
             return `[Garuda Zen Gaming] Executing ${args.join(' ')}...`;
         };
+    }
+
+    selfEvolve() {
+        const mutations = [
+            "Optimizing lattice resonance...",
+            "Expanding semantic context...",
+            "Hardening silicon primitives...",
+            "Refining cross-kernel synthesis..."
+        ];
+        const mutation = mutations[Math.floor(Math.random() * mutations.length)];
+        console.log(`Σ://EVOLUTION [${this.shardId}]> ${mutation}`);
+        this.lastMutation = mutation;
     }
 }
 

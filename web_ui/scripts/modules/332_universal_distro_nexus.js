@@ -17,6 +17,7 @@ class UniversalDistroNexus {
             this.active = true;
             console.log(`Σ://SINGULARITY_333> ${this.shardId} Online. The hub for managing all absorbed Linux distro USPs.`);
             this.registerCLI();
+            this.selfEvolve();
         });
     }
 
@@ -25,6 +26,18 @@ class UniversalDistroNexus {
         window.SigmaCLI['distro-hub'] = (args) => {
             return `[Universal Distro Nexus] Futuristic Call: ${args.join(' ') || 'STATUS'}`;
         };
+    }
+
+    selfEvolve() {
+        const mutations = [
+            "Optimizing lattice resonance...",
+            "Expanding semantic context...",
+            "Hardening silicon primitives...",
+            "Refining cross-kernel synthesis..."
+        ];
+        const mutation = mutations[Math.floor(Math.random() * mutations.length)];
+        console.log(`Σ://EVOLUTION [${this.shardId}]> ${mutation}`);
+        this.lastMutation = mutation;
     }
 }
 

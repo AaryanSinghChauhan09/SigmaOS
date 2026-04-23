@@ -17,6 +17,7 @@ class GentooEbuildUSEFlags {
             this.active = true;
             console.log(`Σ://NEXUS> ${this.shardId} Online. Gentoo inspired granular feature toggling during module initialization.`);
             this.registerCLI();
+            this.selfEvolve();
         });
     }
 
@@ -25,6 +26,18 @@ class GentooEbuildUSEFlags {
         window.SigmaCLI['use-flags'] = (args) => {
             return `[Gentoo Ebuild USE Flags] Infrastructure Call: ${args.join(' ') || 'STATUS'}`;
         };
+    }
+
+    selfEvolve() {
+        const mutations = [
+            "Optimizing lattice resonance...",
+            "Expanding semantic context...",
+            "Hardening silicon primitives...",
+            "Refining cross-kernel synthesis..."
+        ];
+        const mutation = mutations[Math.floor(Math.random() * mutations.length)];
+        console.log(`Σ://EVOLUTION [${this.shardId}]> ${mutation}`);
+        this.lastMutation = mutation;
     }
 }
 

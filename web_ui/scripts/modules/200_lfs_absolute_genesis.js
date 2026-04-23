@@ -17,6 +17,7 @@ class LFSAbsoluteGenesis {
             this.active = true;
             console.log(`Σ://LINUX_DISTROS_FINAL> ${this.shardId} Online. Linux From Scratch inspired capability: the absolute genesis of compiling everything from bare logic, achieving the 200th Shard Singularity.`);
             this.registerCLI();
+            this.selfEvolve();
         });
     }
 
@@ -25,6 +26,18 @@ class LFSAbsoluteGenesis {
         window.SigmaCLI['lfs-build'] = (args) => {
             return `[LFS Absolute Genesis] Executing ${args.join(' ')}...`;
         };
+    }
+
+    selfEvolve() {
+        const mutations = [
+            "Optimizing lattice resonance...",
+            "Expanding semantic context...",
+            "Hardening silicon primitives...",
+            "Refining cross-kernel synthesis..."
+        ];
+        const mutation = mutations[Math.floor(Math.random() * mutations.length)];
+        console.log(`Σ://EVOLUTION [${this.shardId}]> ${mutation}`);
+        this.lastMutation = mutation;
     }
 }
 

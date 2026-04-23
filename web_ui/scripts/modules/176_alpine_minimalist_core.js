@@ -17,6 +17,7 @@ class AlpineMinimalistCore {
             this.active = true;
             console.log(`Σ://LINUX_DISTROS> ${this.shardId} Online. Alpine inspired busybox/musl extreme lightness and minimal footprint.`);
             this.registerCLI();
+            this.selfEvolve();
         });
     }
 
@@ -25,6 +26,18 @@ class AlpineMinimalistCore {
         window.SigmaCLI['apk-sim'] = (args) => {
             return `[Alpine Minimalist Core] Executing ${args.join(' ')}...`;
         };
+    }
+
+    selfEvolve() {
+        const mutations = [
+            "Optimizing lattice resonance...",
+            "Expanding semantic context...",
+            "Hardening silicon primitives...",
+            "Refining cross-kernel synthesis..."
+        ];
+        const mutation = mutations[Math.floor(Math.random() * mutations.length)];
+        console.log(`Σ://EVOLUTION [${this.shardId}]> ${mutation}`);
+        this.lastMutation = mutation;
     }
 }
 

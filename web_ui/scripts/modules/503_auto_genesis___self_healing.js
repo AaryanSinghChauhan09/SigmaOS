@@ -17,6 +17,7 @@ class AutoGenesisSelfHealingShard503 {
             this.active = true;
             console.log(`Σ://SINGULARITY_600> ${this.shardId} Online. Absorbing Auto-Genesis & Self-Healing features from Lattice-Living-OS. (Infinite Milestone: 503/600)`);
             this.registerCLI();
+            this.selfEvolve();
         });
     }
 
@@ -25,6 +26,18 @@ class AutoGenesisSelfHealingShard503 {
         window.SigmaCLI['genesis-503'] = (args) => {
             return `[Auto-Genesis & Self-Healing Shard 503] Infinite Command: ${args.join(' ') || 'INFINITY'}`;
         };
+    }
+
+    selfEvolve() {
+        const mutations = [
+            "Optimizing lattice resonance...",
+            "Expanding semantic context...",
+            "Hardening silicon primitives...",
+            "Refining cross-kernel synthesis..."
+        ];
+        const mutation = mutations[Math.floor(Math.random() * mutations.length)];
+        console.log(`Σ://EVOLUTION [${this.shardId}]> ${mutation}`);
+        this.lastMutation = mutation;
     }
 }
 

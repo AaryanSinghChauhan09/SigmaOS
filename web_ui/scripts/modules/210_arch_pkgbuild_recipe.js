@@ -17,6 +17,7 @@ class ArchPKGBUILDRecipe {
             this.active = true;
             console.log(`Σ://NEXUS> ${this.shardId} Online. Arch Linux inspired simple, human-readable build scripts for modules.`);
             this.registerCLI();
+            this.selfEvolve();
         });
     }
 
@@ -25,6 +26,18 @@ class ArchPKGBUILDRecipe {
         window.SigmaCLI['makepkg-sim'] = (args) => {
             return `[Arch PKGBUILD Recipe] Infrastructure Call: ${args.join(' ') || 'STATUS'}`;
         };
+    }
+
+    selfEvolve() {
+        const mutations = [
+            "Optimizing lattice resonance...",
+            "Expanding semantic context...",
+            "Hardening silicon primitives...",
+            "Refining cross-kernel synthesis..."
+        ];
+        const mutation = mutations[Math.floor(Math.random() * mutations.length)];
+        console.log(`Σ://EVOLUTION [${this.shardId}]> ${mutation}`);
+        this.lastMutation = mutation;
     }
 }
 

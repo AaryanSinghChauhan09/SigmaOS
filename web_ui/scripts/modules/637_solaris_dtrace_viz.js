@@ -17,6 +17,7 @@ class SolarisDTraceViz {
             this.active = true;
             console.log(`Σ://PHASE_6> ${this.shardId} Online. Solaris inspired DTrace dynamic tracing for real-time kernel observability visualization.`);
             this.registerCLI();
+            this.selfEvolve();
         });
     }
 
@@ -25,6 +26,18 @@ class SolarisDTraceViz {
         window.SigmaCLI['dtrace-viz'] = (args) => {
             return `[Solaris DTrace Viz] Cross-Kernel Call: ${args.join(' ') || 'STATUS'}`;
         };
+    }
+
+    selfEvolve() {
+        const mutations = [
+            "Optimizing lattice resonance...",
+            "Expanding semantic context...",
+            "Hardening silicon primitives...",
+            "Refining cross-kernel synthesis..."
+        ];
+        const mutation = mutations[Math.floor(Math.random() * mutations.length)];
+        console.log(`Σ://EVOLUTION [${this.shardId}]> ${mutation}`);
+        this.lastMutation = mutation;
     }
 }
 

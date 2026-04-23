@@ -17,6 +17,7 @@ class AutomatedDataSync {
             this.active = true;
             console.log(`Σ://DATA_OS> ${this.shardId} Online. Fivetran inspired automated ELT pipelines from external APIs.`);
             this.registerCLI();
+            this.selfEvolve();
         });
     }
 
@@ -25,6 +26,18 @@ class AutomatedDataSync {
         window.SigmaCLI['fivetran-sync'] = (args) => {
             return `[Automated Data Sync] Executing ${args.join(' ')}...`;
         };
+    }
+
+    selfEvolve() {
+        const mutations = [
+            "Optimizing lattice resonance...",
+            "Expanding semantic context...",
+            "Hardening silicon primitives...",
+            "Refining cross-kernel synthesis..."
+        ];
+        const mutation = mutations[Math.floor(Math.random() * mutations.length)];
+        console.log(`Σ://EVOLUTION [${this.shardId}]> ${mutation}`);
+        this.lastMutation = mutation;
     }
 }
 

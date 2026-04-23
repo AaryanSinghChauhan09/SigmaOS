@@ -17,6 +17,7 @@ class SteamOSGamescopeProxy {
             this.active = true;
             console.log(`Σ://NEXUS> ${this.shardId} Online. Valve inspired micro-compositor for high-performance window scaling.`);
             this.registerCLI();
+            this.selfEvolve();
         });
     }
 
@@ -25,6 +26,18 @@ class SteamOSGamescopeProxy {
         window.SigmaCLI['gamescope-sim'] = (args) => {
             return `[SteamOS Gamescope Proxy] Infrastructure Call: ${args.join(' ') || 'STATUS'}`;
         };
+    }
+
+    selfEvolve() {
+        const mutations = [
+            "Optimizing lattice resonance...",
+            "Expanding semantic context...",
+            "Hardening silicon primitives...",
+            "Refining cross-kernel synthesis..."
+        ];
+        const mutation = mutations[Math.floor(Math.random() * mutations.length)];
+        console.log(`Σ://EVOLUTION [${this.shardId}]> ${mutation}`);
+        this.lastMutation = mutation;
     }
 }
 

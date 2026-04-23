@@ -29,6 +29,18 @@ const InstallerEngine = {
         UIUtils.appendLog('audit-log', 'Installer: LATTICE SUCCESS. Restarting into Apex state...', 'success');
         setTimeout(() => window.location.href = 'index.html', 2000);
     }
+
+    selfEvolve() {
+        const mutations = [
+            "Optimizing lattice resonance...",
+            "Expanding semantic context...",
+            "Hardening silicon primitives...",
+            "Refining cross-kernel synthesis..."
+        ];
+        const mutation = mutations[Math.floor(Math.random() * mutations.length)];
+        console.log(`Σ://EVOLUTION [${this.shardId}]> ${mutation}`);
+        this.lastMutation = mutation;
+    }
 };
 
 window.InstallerEngine = InstallerEngine;

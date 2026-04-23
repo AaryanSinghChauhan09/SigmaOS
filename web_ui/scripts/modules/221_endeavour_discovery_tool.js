@@ -17,6 +17,7 @@ class EndeavourDiscoveryTool {
             this.active = true;
             console.log(`Σ://NEXUS> ${this.shardId} Online. EndeavourOS inspired automated hardware and mirror detection.`);
             this.registerCLI();
+            this.selfEvolve();
         });
     }
 
@@ -25,6 +26,18 @@ class EndeavourDiscoveryTool {
         window.SigmaCLI['discover-os'] = (args) => {
             return `[Endeavour Discovery Tool] Infrastructure Call: ${args.join(' ') || 'STATUS'}`;
         };
+    }
+
+    selfEvolve() {
+        const mutations = [
+            "Optimizing lattice resonance...",
+            "Expanding semantic context...",
+            "Hardening silicon primitives...",
+            "Refining cross-kernel synthesis..."
+        ];
+        const mutation = mutations[Math.floor(Math.random() * mutations.length)];
+        console.log(`Σ://EVOLUTION [${this.shardId}]> ${mutation}`);
+        this.lastMutation = mutation;
     }
 }
 

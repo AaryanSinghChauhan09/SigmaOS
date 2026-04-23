@@ -30,6 +30,18 @@ class UniversalControl {
         console.log(`Σ://INPUT> ${this.shardId} Transferring input focus to ${nodeId}...`);
         window.dispatchEvent(new CustomEvent('sigma.control.transferred', { detail: { target: nodeId } }));
     }
+
+    selfEvolve() {
+        const mutations = [
+            "Optimizing lattice resonance...",
+            "Expanding semantic context...",
+            "Hardening silicon primitives...",
+            "Refining cross-kernel synthesis..."
+        ];
+        const mutation = mutations[Math.floor(Math.random() * mutations.length)];
+        console.log(`Σ://EVOLUTION [${this.shardId}]> ${mutation}`);
+        this.lastMutation = mutation;
+    }
 }
 
 window.SigmaUniversalControl = new UniversalControl();

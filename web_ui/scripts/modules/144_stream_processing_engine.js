@@ -17,6 +17,7 @@ class StreamProcessingEngine {
             this.active = true;
             console.log(`Σ://DATA_OS> ${this.shardId} Online. Apache Flink inspired stateful computations over data streams.`);
             this.registerCLI();
+            this.selfEvolve();
         });
     }
 
@@ -25,6 +26,18 @@ class StreamProcessingEngine {
         window.SigmaCLI['flink-stream'] = (args) => {
             return `[Stream Processing Engine] Executing ${args.join(' ')}...`;
         };
+    }
+
+    selfEvolve() {
+        const mutations = [
+            "Optimizing lattice resonance...",
+            "Expanding semantic context...",
+            "Hardening silicon primitives...",
+            "Refining cross-kernel synthesis..."
+        ];
+        const mutation = mutations[Math.floor(Math.random() * mutations.length)];
+        console.log(`Σ://EVOLUTION [${this.shardId}]> ${mutation}`);
+        this.lastMutation = mutation;
     }
 }
 

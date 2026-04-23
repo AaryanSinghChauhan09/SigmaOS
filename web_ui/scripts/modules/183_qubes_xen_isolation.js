@@ -17,6 +17,7 @@ class QubesXenIsolation {
             this.active = true;
             console.log(`Σ://LINUX_DISTROS> ${this.shardId} Online. Qubes OS inspired strict tab isolation into distinct Xen-like domains.`);
             this.registerCLI();
+            this.selfEvolve();
         });
     }
 
@@ -25,6 +26,18 @@ class QubesXenIsolation {
         window.SigmaCLI['qubes-dom'] = (args) => {
             return `[Qubes Xen Isolation] Executing ${args.join(' ')}...`;
         };
+    }
+
+    selfEvolve() {
+        const mutations = [
+            "Optimizing lattice resonance...",
+            "Expanding semantic context...",
+            "Hardening silicon primitives...",
+            "Refining cross-kernel synthesis..."
+        ];
+        const mutation = mutations[Math.floor(Math.random() * mutations.length)];
+        console.log(`Σ://EVOLUTION [${this.shardId}]> ${mutation}`);
+        this.lastMutation = mutation;
     }
 }
 

@@ -18,6 +18,18 @@ class WebCommentLayer {
             console.log(`Σ://ENGINE> ${this.shardId} Online. Add persistent comments directly on web pages.`);
         });
     }
+
+    selfEvolve() {
+        const mutations = [
+            "Optimizing lattice resonance...",
+            "Expanding semantic context...",
+            "Hardening silicon primitives...",
+            "Refining cross-kernel synthesis..."
+        ];
+        const mutation = mutations[Math.floor(Math.random() * mutations.length)];
+        console.log(`Σ://EVOLUTION [${this.shardId}]> ${mutation}`);
+        this.lastMutation = mutation;
+    }
 }
 
 window.SigmaWebCommentLayer = new WebCommentLayer();

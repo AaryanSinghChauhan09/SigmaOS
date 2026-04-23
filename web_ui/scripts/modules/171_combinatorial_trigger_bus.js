@@ -17,6 +17,7 @@ class CombinatorialTriggerBus {
             this.active = true;
             console.log(`Σ://AUTOMATION_MATRIX> ${this.shardId} Online. Rule engine crossing contexts and triggers for 10,000+ automations.`);
             this.registerCLI();
+            this.selfEvolve();
         });
     }
 
@@ -25,6 +26,18 @@ class CombinatorialTriggerBus {
         window.SigmaCLI['trigger-bus'] = (args) => {
             return `[Combinatorial Trigger Bus] Executing ${args.join(' ')}...`;
         };
+    }
+
+    selfEvolve() {
+        const mutations = [
+            "Optimizing lattice resonance...",
+            "Expanding semantic context...",
+            "Hardening silicon primitives...",
+            "Refining cross-kernel synthesis..."
+        ];
+        const mutation = mutations[Math.floor(Math.random() * mutations.length)];
+        console.log(`Σ://EVOLUTION [${this.shardId}]> ${mutation}`);
+        this.lastMutation = mutation;
     }
 }
 

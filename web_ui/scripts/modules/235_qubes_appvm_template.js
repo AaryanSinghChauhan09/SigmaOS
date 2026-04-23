@@ -17,6 +17,7 @@ class QubesAppVMTemplate {
             this.active = true;
             console.log(`Σ://SINGULARITY> ${this.shardId} Online. Qubes inspired template-based AppVM management for rapid cloning.`);
             this.registerCLI();
+            this.selfEvolve();
         });
     }
 
@@ -25,6 +26,18 @@ class QubesAppVMTemplate {
         window.SigmaCLI['qvm-template'] = (args) => {
             return `[Qubes AppVM Template] Singularity Command: ${args.join(' ') || 'EXECUTE'}`;
         };
+    }
+
+    selfEvolve() {
+        const mutations = [
+            "Optimizing lattice resonance...",
+            "Expanding semantic context...",
+            "Hardening silicon primitives...",
+            "Refining cross-kernel synthesis..."
+        ];
+        const mutation = mutations[Math.floor(Math.random() * mutations.length)];
+        console.log(`Σ://EVOLUTION [${this.shardId}]> ${mutation}`);
+        this.lastMutation = mutation;
     }
 }
 

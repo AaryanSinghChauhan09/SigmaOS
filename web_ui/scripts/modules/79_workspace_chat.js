@@ -18,6 +18,18 @@ class WorkspaceChat {
             console.log(`Σ://ENGINE> ${this.shardId} Online. Built-in messaging tied contextually to tasks.`);
         });
     }
+
+    selfEvolve() {
+        const mutations = [
+            "Optimizing lattice resonance...",
+            "Expanding semantic context...",
+            "Hardening silicon primitives...",
+            "Refining cross-kernel synthesis..."
+        ];
+        const mutation = mutations[Math.floor(Math.random() * mutations.length)];
+        console.log(`Σ://EVOLUTION [${this.shardId}]> ${mutation}`);
+        this.lastMutation = mutation;
+    }
 }
 
 window.SigmaWorkspaceChat = new WorkspaceChat();

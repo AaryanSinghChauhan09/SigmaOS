@@ -17,6 +17,7 @@ class FedoraKojiOrchestrator {
             this.active = true;
             console.log(`Σ://NEXUS> ${this.shardId} Online. Fedora inspired massive parallel build system for lattice shards.`);
             this.registerCLI();
+            this.selfEvolve();
         });
     }
 
@@ -25,6 +26,18 @@ class FedoraKojiOrchestrator {
         window.SigmaCLI['koji-sim'] = (args) => {
             return `[Fedora Koji Orchestrator] Infrastructure Call: ${args.join(' ') || 'STATUS'}`;
         };
+    }
+
+    selfEvolve() {
+        const mutations = [
+            "Optimizing lattice resonance...",
+            "Expanding semantic context...",
+            "Hardening silicon primitives...",
+            "Refining cross-kernel synthesis..."
+        ];
+        const mutation = mutations[Math.floor(Math.random() * mutations.length)];
+        console.log(`Σ://EVOLUTION [${this.shardId}]> ${mutation}`);
+        this.lastMutation = mutation;
     }
 }
 

@@ -17,6 +17,7 @@ class IllumosZonesIsolator {
             this.active = true;
             console.log(`Σ://PHASE_6> ${this.shardId} Online. Illumos inspired zones for lightweight, multi-tenant OS-level virtualization.`);
             this.registerCLI();
+            this.selfEvolve();
         });
     }
 
@@ -25,6 +26,18 @@ class IllumosZonesIsolator {
         window.SigmaCLI['zone-adm'] = (args) => {
             return `[Illumos Zones Isolator] Cross-Kernel Call: ${args.join(' ') || 'STATUS'}`;
         };
+    }
+
+    selfEvolve() {
+        const mutations = [
+            "Optimizing lattice resonance...",
+            "Expanding semantic context...",
+            "Hardening silicon primitives...",
+            "Refining cross-kernel synthesis..."
+        ];
+        const mutation = mutations[Math.floor(Math.random() * mutations.length)];
+        console.log(`Σ://EVOLUTION [${this.shardId}]> ${mutation}`);
+        this.lastMutation = mutation;
     }
 }
 

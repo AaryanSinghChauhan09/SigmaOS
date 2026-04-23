@@ -17,6 +17,7 @@ class DynamicThemeLoader {
             this.active = true;
             console.log(`Σ://SINGULARITY_360> ${this.shardId} Online. elementary OS inspired dynamic loading of UI theme shards.`);
             this.registerCLI();
+            this.selfEvolve();
         });
     }
 
@@ -25,6 +26,18 @@ class DynamicThemeLoader {
         window.SigmaCLI['theme-load'] = (args) => {
             return `[Dynamic Theme Loader] Industrial Call: ${args.join(' ') || 'STATUS'}`;
         };
+    }
+
+    selfEvolve() {
+        const mutations = [
+            "Optimizing lattice resonance...",
+            "Expanding semantic context...",
+            "Hardening silicon primitives...",
+            "Refining cross-kernel synthesis..."
+        ];
+        const mutation = mutations[Math.floor(Math.random() * mutations.length)];
+        console.log(`Σ://EVOLUTION [${this.shardId}]> ${mutation}`);
+        this.lastMutation = mutation;
     }
 }
 

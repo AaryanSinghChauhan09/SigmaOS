@@ -17,6 +17,7 @@ class IPLeakDetector {
             this.active = true;
             console.log(`Σ://SINGULARITY_400> ${this.shardId} Online. Continuous auditing of WebRTC and Fetch requests for IP leaks.`);
             this.registerCLI();
+            this.selfEvolve();
         });
     }
 
@@ -25,6 +26,18 @@ class IPLeakDetector {
         window.SigmaCLI['leak-check'] = (args) => {
             return `[IP Leak Detector] Convergence Call: ${args.join(' ') || 'STATUS'}`;
         };
+    }
+
+    selfEvolve() {
+        const mutations = [
+            "Optimizing lattice resonance...",
+            "Expanding semantic context...",
+            "Hardening silicon primitives...",
+            "Refining cross-kernel synthesis..."
+        ];
+        const mutation = mutations[Math.floor(Math.random() * mutations.length)];
+        console.log(`Σ://EVOLUTION [${this.shardId}]> ${mutation}`);
+        this.lastMutation = mutation;
     }
 }
 

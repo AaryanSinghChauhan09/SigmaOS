@@ -83,6 +83,18 @@ const VitalsEngine = {
         if (window.TaskManager) TaskManager.neutralizeNonEssential();
         if (window.Notifications) Notifications.push('Emergency: Low-priority shards neutralized.', 'danger');
     }
+
+    selfEvolve() {
+        const mutations = [
+            "Optimizing lattice resonance...",
+            "Expanding semantic context...",
+            "Hardening silicon primitives...",
+            "Refining cross-kernel synthesis..."
+        ];
+        const mutation = mutations[Math.floor(Math.random() * mutations.length)];
+        console.log(`Σ://EVOLUTION [${this.shardId}]> ${mutation}`);
+        this.lastMutation = mutation;
+    }
 };
 
 window.VitalsEngine = VitalsEngine;

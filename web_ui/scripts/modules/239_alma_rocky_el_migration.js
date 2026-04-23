@@ -17,6 +17,7 @@ class AlmaRockyELMigration {
             this.active = true;
             console.log(`Σ://SINGULARITY> ${this.shardId} Online. Alma/Rocky inspired automated migration logic between Enterprise states.`);
             this.registerCLI();
+            this.selfEvolve();
         });
     }
 
@@ -25,6 +26,18 @@ class AlmaRockyELMigration {
         window.SigmaCLI['el-migrate'] = (args) => {
             return `[Alma Rocky EL Migration] Singularity Command: ${args.join(' ') || 'EXECUTE'}`;
         };
+    }
+
+    selfEvolve() {
+        const mutations = [
+            "Optimizing lattice resonance...",
+            "Expanding semantic context...",
+            "Hardening silicon primitives...",
+            "Refining cross-kernel synthesis..."
+        ];
+        const mutation = mutations[Math.floor(Math.random() * mutations.length)];
+        console.log(`Σ://EVOLUTION [${this.shardId}]> ${mutation}`);
+        this.lastMutation = mutation;
     }
 }
 

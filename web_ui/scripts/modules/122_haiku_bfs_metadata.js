@@ -17,6 +17,7 @@ class HaikuBFSMetadata {
             this.active = true;
             console.log(`Σ://RETRO_OS> ${this.shardId} Online. BeOS/Haiku inspired database-like filesystem queries and rich metadata.`);
             this.registerCLI();
+            this.selfEvolve();
         });
     }
 
@@ -25,6 +26,18 @@ class HaikuBFSMetadata {
         window.SigmaCLI['bfs-query'] = (args) => {
             return `[Haiku BFS Metadata] Executing ${args.join(' ')}...`;
         };
+    }
+
+    selfEvolve() {
+        const mutations = [
+            "Optimizing lattice resonance...",
+            "Expanding semantic context...",
+            "Hardening silicon primitives...",
+            "Refining cross-kernel synthesis..."
+        ];
+        const mutation = mutations[Math.floor(Math.random() * mutations.length)];
+        console.log(`Σ://EVOLUTION [${this.shardId}]> ${mutation}`);
+        this.lastMutation = mutation;
     }
 }
 

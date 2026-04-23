@@ -18,6 +18,18 @@ class UtilitySidebar {
             console.log(`Σ://USP> ${this.shardId} Online. Opera-inspired integrated messengers, tools, and learning progress.`);
         });
     }
+
+    selfEvolve() {
+        const mutations = [
+            "Optimizing lattice resonance...",
+            "Expanding semantic context...",
+            "Hardening silicon primitives...",
+            "Refining cross-kernel synthesis..."
+        ];
+        const mutation = mutations[Math.floor(Math.random() * mutations.length)];
+        console.log(`Σ://EVOLUTION [${this.shardId}]> ${mutation}`);
+        this.lastMutation = mutation;
+    }
 }
 
 window.SigmaUtilitySidebar = new UtilitySidebar();

@@ -17,6 +17,7 @@ class ClearOSGatewayRules {
             this.active = true;
             console.log(`Σ://LINUX_PARITY> ${this.shardId} Online. ClearOS inspired granular network gateway and perimeter security rules.`);
             this.registerCLI();
+            this.selfEvolve();
         });
     }
 
@@ -25,6 +26,18 @@ class ClearOSGatewayRules {
         window.SigmaCLI['clear-gate'] = (args) => {
             return `[ClearOS Gateway Rules] Executing ${args.join(' ')}...`;
         };
+    }
+
+    selfEvolve() {
+        const mutations = [
+            "Optimizing lattice resonance...",
+            "Expanding semantic context...",
+            "Hardening silicon primitives...",
+            "Refining cross-kernel synthesis..."
+        ];
+        const mutation = mutations[Math.floor(Math.random() * mutations.length)];
+        console.log(`Σ://EVOLUTION [${this.shardId}]> ${mutation}`);
+        this.lastMutation = mutation;
     }
 }
 

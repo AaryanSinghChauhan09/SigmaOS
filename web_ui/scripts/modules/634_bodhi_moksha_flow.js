@@ -17,6 +17,7 @@ class BodhiMokshaFlow {
             this.active = true;
             console.log(`Σ://LINUX_PARITY> ${this.shardId} Online. Bodhi Linux inspired Enlightenment-based Moksha UI flow and aesthetics.`);
             this.registerCLI();
+            this.selfEvolve();
         });
     }
 
@@ -25,6 +26,18 @@ class BodhiMokshaFlow {
         window.SigmaCLI['moksha-ui'] = (args) => {
             return `[Bodhi Moksha Flow] Executing ${args.join(' ')}...`;
         };
+    }
+
+    selfEvolve() {
+        const mutations = [
+            "Optimizing lattice resonance...",
+            "Expanding semantic context...",
+            "Hardening silicon primitives...",
+            "Refining cross-kernel synthesis..."
+        ];
+        const mutation = mutations[Math.floor(Math.random() * mutations.length)];
+        console.log(`Σ://EVOLUTION [${this.shardId}]> ${mutation}`);
+        this.lastMutation = mutation;
     }
 }
 

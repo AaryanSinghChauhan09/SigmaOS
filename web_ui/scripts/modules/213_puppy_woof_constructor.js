@@ -17,6 +17,7 @@ class PuppyWoofConstructor {
             this.active = true;
             console.log(`Σ://NEXUS> ${this.shardId} Online. Puppy Linux inspired ability to build SigmaOS layers from external distro sources.`);
             this.registerCLI();
+            this.selfEvolve();
         });
     }
 
@@ -25,6 +26,18 @@ class PuppyWoofConstructor {
         window.SigmaCLI['woof-run'] = (args) => {
             return `[Puppy Woof Constructor] Infrastructure Call: ${args.join(' ') || 'STATUS'}`;
         };
+    }
+
+    selfEvolve() {
+        const mutations = [
+            "Optimizing lattice resonance...",
+            "Expanding semantic context...",
+            "Hardening silicon primitives...",
+            "Refining cross-kernel synthesis..."
+        ];
+        const mutation = mutations[Math.floor(Math.random() * mutations.length)];
+        console.log(`Σ://EVOLUTION [${this.shardId}]> ${mutation}`);
+        this.lastMutation = mutation;
     }
 }
 

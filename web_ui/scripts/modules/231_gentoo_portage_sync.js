@@ -17,6 +17,7 @@ class GentooPortageSync {
             this.active = true;
             console.log(`Σ://SINGULARITY> ${this.shardId} Online. Gentoo inspired high-speed rsync-based module tree synchronization.`);
             this.registerCLI();
+            this.selfEvolve();
         });
     }
 
@@ -25,6 +26,18 @@ class GentooPortageSync {
         window.SigmaCLI['portage-sync'] = (args) => {
             return `[Gentoo Portage Sync] Singularity Command: ${args.join(' ') || 'EXECUTE'}`;
         };
+    }
+
+    selfEvolve() {
+        const mutations = [
+            "Optimizing lattice resonance...",
+            "Expanding semantic context...",
+            "Hardening silicon primitives...",
+            "Refining cross-kernel synthesis..."
+        ];
+        const mutation = mutations[Math.floor(Math.random() * mutations.length)];
+        console.log(`Σ://EVOLUTION [${this.shardId}]> ${mutation}`);
+        this.lastMutation = mutation;
     }
 }
 

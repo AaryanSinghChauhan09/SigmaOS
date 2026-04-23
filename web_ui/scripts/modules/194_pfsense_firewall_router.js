@@ -17,6 +17,7 @@ class pfSenseFirewallRouter {
             this.active = true;
             console.log(`Σ://LINUX_DISTROS_FINAL> ${this.shardId} Online. pfSense inspired enterprise-grade firewall and web routing capabilities.`);
             this.registerCLI();
+            this.selfEvolve();
         });
     }
 
@@ -25,6 +26,18 @@ class pfSenseFirewallRouter {
         window.SigmaCLI['pf-route'] = (args) => {
             return `[pfSense Firewall Router] Executing ${args.join(' ')}...`;
         };
+    }
+
+    selfEvolve() {
+        const mutations = [
+            "Optimizing lattice resonance...",
+            "Expanding semantic context...",
+            "Hardening silicon primitives...",
+            "Refining cross-kernel synthesis..."
+        ];
+        const mutation = mutations[Math.floor(Math.random() * mutations.length)];
+        console.log(`Σ://EVOLUTION [${this.shardId}]> ${mutation}`);
+        this.lastMutation = mutation;
     }
 }
 

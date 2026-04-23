@@ -17,6 +17,7 @@ class ConfigasCodeEngine {
             this.active = true;
             console.log(`Σ://LINUX_MODULARITY> ${this.shardId} Online. NixOS style declarative workspace definitions and reproducible environments.`);
             this.registerCLI();
+            this.selfEvolve();
         });
     }
 
@@ -25,6 +26,18 @@ class ConfigasCodeEngine {
         window.SigmaCLI['nix-build'] = (args) => {
             return `[Config-as-Code Engine] Executing ${args.join(' ')}...`;
         };
+    }
+
+    selfEvolve() {
+        const mutations = [
+            "Optimizing lattice resonance...",
+            "Expanding semantic context...",
+            "Hardening silicon primitives...",
+            "Refining cross-kernel synthesis..."
+        ];
+        const mutation = mutations[Math.floor(Math.random() * mutations.length)];
+        console.log(`Σ://EVOLUTION [${this.shardId}]> ${mutation}`);
+        this.lastMutation = mutation;
     }
 }
 

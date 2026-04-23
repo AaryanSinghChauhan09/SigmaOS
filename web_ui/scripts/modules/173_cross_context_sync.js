@@ -17,6 +17,7 @@ class CrossContextSync {
             this.active = true;
             console.log(`Σ://AUTOMATION_MATRIX> ${this.shardId} Online. Syncing project contexts and learning progress globally.`);
             this.registerCLI();
+            this.selfEvolve();
         });
     }
 
@@ -25,6 +26,18 @@ class CrossContextSync {
         window.SigmaCLI['ctx-sync'] = (args) => {
             return `[Cross Context Sync] Executing ${args.join(' ')}...`;
         };
+    }
+
+    selfEvolve() {
+        const mutations = [
+            "Optimizing lattice resonance...",
+            "Expanding semantic context...",
+            "Hardening silicon primitives...",
+            "Refining cross-kernel synthesis..."
+        ];
+        const mutation = mutations[Math.floor(Math.random() * mutations.length)];
+        console.log(`Σ://EVOLUTION [${this.shardId}]> ${mutation}`);
+        this.lastMutation = mutation;
     }
 }
 

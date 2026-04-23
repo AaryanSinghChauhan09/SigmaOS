@@ -17,6 +17,7 @@ class ClearLinuxPerformance {
             this.active = true;
             console.log(`Σ://LINUX_DISTROS> ${this.shardId} Online. Clear Linux inspired deep hardware-specific performance tuning.`);
             this.registerCLI();
+            this.selfEvolve();
         });
     }
 
@@ -25,6 +26,18 @@ class ClearLinuxPerformance {
         window.SigmaCLI['clear-opt'] = (args) => {
             return `[Clear Linux Performance] Executing ${args.join(' ')}...`;
         };
+    }
+
+    selfEvolve() {
+        const mutations = [
+            "Optimizing lattice resonance...",
+            "Expanding semantic context...",
+            "Hardening silicon primitives...",
+            "Refining cross-kernel synthesis..."
+        ];
+        const mutation = mutations[Math.floor(Math.random() * mutations.length)];
+        console.log(`Σ://EVOLUTION [${this.shardId}]> ${mutation}`);
+        this.lastMutation = mutation;
     }
 }
 

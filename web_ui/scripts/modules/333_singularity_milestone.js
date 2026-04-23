@@ -17,6 +17,7 @@ class SingularityMilestone {
             this.active = true;
             console.log(`Σ://SINGULARITY_333> ${this.shardId} Online. The 333rd Shard: Reaching the Futuristic Singularity milestone.`);
             this.registerCLI();
+            this.selfEvolve();
         });
     }
 
@@ -25,6 +26,18 @@ class SingularityMilestone {
         window.SigmaCLI['singularity-333'] = (args) => {
             return `[Singularity Milestone] Futuristic Call: ${args.join(' ') || 'STATUS'}`;
         };
+    }
+
+    selfEvolve() {
+        const mutations = [
+            "Optimizing lattice resonance...",
+            "Expanding semantic context...",
+            "Hardening silicon primitives...",
+            "Refining cross-kernel synthesis..."
+        ];
+        const mutation = mutations[Math.floor(Math.random() * mutations.length)];
+        console.log(`Σ://EVOLUTION [${this.shardId}]> ${mutation}`);
+        this.lastMutation = mutation;
     }
 }
 

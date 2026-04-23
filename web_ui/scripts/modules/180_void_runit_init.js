@@ -17,6 +17,7 @@ class VoidRunitInit {
             this.active = true;
             console.log(`Σ://LINUX_DISTROS> ${this.shardId} Online. Void Linux inspired runit ultra-fast parallel service initialization.`);
             this.registerCLI();
+            this.selfEvolve();
         });
     }
 
@@ -25,6 +26,18 @@ class VoidRunitInit {
         window.SigmaCLI['runit-sim'] = (args) => {
             return `[Void Runit Init] Executing ${args.join(' ')}...`;
         };
+    }
+
+    selfEvolve() {
+        const mutations = [
+            "Optimizing lattice resonance...",
+            "Expanding semantic context...",
+            "Hardening silicon primitives...",
+            "Refining cross-kernel synthesis..."
+        ];
+        const mutation = mutations[Math.floor(Math.random() * mutations.length)];
+        console.log(`Σ://EVOLUTION [${this.shardId}]> ${mutation}`);
+        this.lastMutation = mutation;
     }
 }
 

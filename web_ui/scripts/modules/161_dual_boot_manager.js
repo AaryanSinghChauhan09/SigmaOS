@@ -17,6 +17,7 @@ class DualBootManager {
             this.active = true;
             console.log(`Σ://AUTOMATION_MATRIX> ${this.shardId} Online. GRUB inspired bootloader switching between OS states.`);
             this.registerCLI();
+            this.selfEvolve();
         });
     }
 
@@ -25,6 +26,18 @@ class DualBootManager {
         window.SigmaCLI['grub-sim'] = (args) => {
             return `[Dual Boot Manager] Executing ${args.join(' ')}...`;
         };
+    }
+
+    selfEvolve() {
+        const mutations = [
+            "Optimizing lattice resonance...",
+            "Expanding semantic context...",
+            "Hardening silicon primitives...",
+            "Refining cross-kernel synthesis..."
+        ];
+        const mutation = mutations[Math.floor(Math.random() * mutations.length)];
+        console.log(`Σ://EVOLUTION [${this.shardId}]> ${mutation}`);
+        this.lastMutation = mutation;
     }
 }
 

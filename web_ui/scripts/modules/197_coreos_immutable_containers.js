@@ -17,6 +17,7 @@ class CoreOSImmutableContainers {
             this.active = true;
             console.log(`Σ://LINUX_DISTROS_FINAL> ${this.shardId} Online. CoreOS inspired completely immutable states designed strictly for container orchestration.`);
             this.registerCLI();
+            this.selfEvolve();
         });
     }
 
@@ -25,6 +26,18 @@ class CoreOSImmutableContainers {
         window.SigmaCLI['core-img'] = (args) => {
             return `[CoreOS Immutable Containers] Executing ${args.join(' ')}...`;
         };
+    }
+
+    selfEvolve() {
+        const mutations = [
+            "Optimizing lattice resonance...",
+            "Expanding semantic context...",
+            "Hardening silicon primitives...",
+            "Refining cross-kernel synthesis..."
+        ];
+        const mutation = mutations[Math.floor(Math.random() * mutations.length)];
+        console.log(`Σ://EVOLUTION [${this.shardId}]> ${mutation}`);
+        this.lastMutation = mutation;
     }
 }
 

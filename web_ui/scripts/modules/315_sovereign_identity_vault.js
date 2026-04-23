@@ -17,6 +17,7 @@ class SovereignIdentityVault {
             this.active = true;
             console.log(`Σ://SINGULARITY_333> ${this.shardId} Online. Self-sovereign identity (SSI) management for multi-distro access.`);
             this.registerCLI();
+            this.selfEvolve();
         });
     }
 
@@ -25,6 +26,18 @@ class SovereignIdentityVault {
         window.SigmaCLI['ssi-vault'] = (args) => {
             return `[Sovereign Identity Vault] Futuristic Call: ${args.join(' ') || 'STATUS'}`;
         };
+    }
+
+    selfEvolve() {
+        const mutations = [
+            "Optimizing lattice resonance...",
+            "Expanding semantic context...",
+            "Hardening silicon primitives...",
+            "Refining cross-kernel synthesis..."
+        ];
+        const mutation = mutations[Math.floor(Math.random() * mutations.length)];
+        console.log(`Σ://EVOLUTION [${this.shardId}]> ${mutation}`);
+        this.lastMutation = mutation;
     }
 }
 

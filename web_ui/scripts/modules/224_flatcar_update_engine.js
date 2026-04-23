@@ -17,6 +17,7 @@ class FlatcarUpdateEngine {
             this.active = true;
             console.log(`Σ://NEXUS> ${this.shardId} Online. Flatcar inspired automated, atomic A/B partition updates.`);
             this.registerCLI();
+            this.selfEvolve();
         });
     }
 
@@ -25,6 +26,18 @@ class FlatcarUpdateEngine {
         window.SigmaCLI['update-engine'] = (args) => {
             return `[Flatcar Update Engine] Infrastructure Call: ${args.join(' ') || 'STATUS'}`;
         };
+    }
+
+    selfEvolve() {
+        const mutations = [
+            "Optimizing lattice resonance...",
+            "Expanding semantic context...",
+            "Hardening silicon primitives...",
+            "Refining cross-kernel synthesis..."
+        ];
+        const mutation = mutations[Math.floor(Math.random() * mutations.length)];
+        console.log(`Σ://EVOLUTION [${this.shardId}]> ${mutation}`);
+        this.lastMutation = mutation;
     }
 }
 

@@ -17,6 +17,7 @@ class OpenTableFormat {
             this.active = true;
             console.log(`Σ://DATA_OS> ${this.shardId} Online. Apache Iceberg inspired huge analytic tables management.`);
             this.registerCLI();
+            this.selfEvolve();
         });
     }
 
@@ -25,6 +26,18 @@ class OpenTableFormat {
         window.SigmaCLI['iceberg-table'] = (args) => {
             return `[Open Table Format] Executing ${args.join(' ')}...`;
         };
+    }
+
+    selfEvolve() {
+        const mutations = [
+            "Optimizing lattice resonance...",
+            "Expanding semantic context...",
+            "Hardening silicon primitives...",
+            "Refining cross-kernel synthesis..."
+        ];
+        const mutation = mutations[Math.floor(Math.random() * mutations.length)];
+        console.log(`Σ://EVOLUTION [${this.shardId}]> ${mutation}`);
+        this.lastMutation = mutation;
     }
 }
 

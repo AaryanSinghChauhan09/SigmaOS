@@ -17,6 +17,7 @@ class TempleOSHolyC {
             this.active = true;
             console.log(`Σ://RETRO_OS> ${this.shardId} Online. TempleOS inspired HolyC JIT compilation and hardware-based PRNG.`);
             this.registerCLI();
+            this.selfEvolve();
         });
     }
 
@@ -25,6 +26,18 @@ class TempleOSHolyC {
         window.SigmaCLI['holyc-jit'] = (args) => {
             return `[TempleOS HolyC] Executing ${args.join(' ')}...`;
         };
+    }
+
+    selfEvolve() {
+        const mutations = [
+            "Optimizing lattice resonance...",
+            "Expanding semantic context...",
+            "Hardening silicon primitives...",
+            "Refining cross-kernel synthesis..."
+        ];
+        const mutation = mutations[Math.floor(Math.random() * mutations.length)];
+        console.log(`Σ://EVOLUTION [${this.shardId}]> ${mutation}`);
+        this.lastMutation = mutation;
     }
 }
 

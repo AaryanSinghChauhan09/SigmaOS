@@ -17,6 +17,7 @@ class HeapForensicsScanner {
             this.active = true;
             console.log(`Σ://SINGULARITY_333> ${this.shardId} Online. Deep memory inspection for detecting anomalous tab behavior.`);
             this.registerCLI();
+            this.selfEvolve();
         });
     }
 
@@ -25,6 +26,18 @@ class HeapForensicsScanner {
         window.SigmaCLI['mem-audit'] = (args) => {
             return `[Heap Forensics Scanner] Futuristic Call: ${args.join(' ') || 'STATUS'}`;
         };
+    }
+
+    selfEvolve() {
+        const mutations = [
+            "Optimizing lattice resonance...",
+            "Expanding semantic context...",
+            "Hardening silicon primitives...",
+            "Refining cross-kernel synthesis..."
+        ];
+        const mutation = mutations[Math.floor(Math.random() * mutations.length)];
+        console.log(`Σ://EVOLUTION [${this.shardId}]> ${mutation}`);
+        this.lastMutation = mutation;
     }
 }
 

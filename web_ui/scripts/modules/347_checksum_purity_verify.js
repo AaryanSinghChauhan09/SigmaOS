@@ -17,6 +17,7 @@ class ChecksumPurityVerify {
             this.active = true;
             console.log(`Σ://SINGULARITY_360> ${this.shardId} Online. Real-time hashing of shards to detect tampering or corruption.`);
             this.registerCLI();
+            this.selfEvolve();
         });
     }
 
@@ -25,6 +26,18 @@ class ChecksumPurityVerify {
         window.SigmaCLI['hash-verify'] = (args) => {
             return `[Checksum Purity Verify] Industrial Call: ${args.join(' ') || 'STATUS'}`;
         };
+    }
+
+    selfEvolve() {
+        const mutations = [
+            "Optimizing lattice resonance...",
+            "Expanding semantic context...",
+            "Hardening silicon primitives...",
+            "Refining cross-kernel synthesis..."
+        ];
+        const mutation = mutations[Math.floor(Math.random() * mutations.length)];
+        console.log(`Σ://EVOLUTION [${this.shardId}]> ${mutation}`);
+        this.lastMutation = mutation;
     }
 }
 

@@ -17,6 +17,7 @@ class LinuxDistroSingularity {
             this.active = true;
             console.log(`Σ://NEXUS> ${this.shardId} Online. The ultimate synthesis of every major distro infrastructure into the SigmaOS lattice.`);
             this.registerCLI();
+            this.selfEvolve();
         });
     }
 
@@ -25,6 +26,18 @@ class LinuxDistroSingularity {
         window.SigmaCLI['distro-nexus'] = (args) => {
             return `[Linux Distro Singularity] Infrastructure Call: ${args.join(' ') || 'STATUS'}`;
         };
+    }
+
+    selfEvolve() {
+        const mutations = [
+            "Optimizing lattice resonance...",
+            "Expanding semantic context...",
+            "Hardening silicon primitives...",
+            "Refining cross-kernel synthesis..."
+        ];
+        const mutation = mutations[Math.floor(Math.random() * mutations.length)];
+        console.log(`Σ://EVOLUTION [${this.shardId}]> ${mutation}`);
+        this.lastMutation = mutation;
     }
 }
 

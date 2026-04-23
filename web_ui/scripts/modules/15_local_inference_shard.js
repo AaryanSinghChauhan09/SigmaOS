@@ -36,6 +36,18 @@ class AIInferenceShard extends ZenithComponent {
         // Real-time AI context suggestion in the UI
         console.log(`Σ://AI> Suggested Action: ${text}`);
     }
+
+    selfEvolve() {
+        const mutations = [
+            "Optimizing lattice resonance...",
+            "Expanding semantic context...",
+            "Hardening silicon primitives...",
+            "Refining cross-kernel synthesis..."
+        ];
+        const mutation = mutations[Math.floor(Math.random() * mutations.length)];
+        console.log(`Σ://EVOLUTION [${this.shardId}]> ${mutation}`);
+        this.lastMutation = mutation;
+    }
 }
 
 window.AIInferenceShard = AIInferenceShard;

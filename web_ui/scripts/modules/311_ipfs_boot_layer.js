@@ -17,6 +17,7 @@ class IPFSBootLayer {
             this.active = true;
             console.log(`Σ://SINGULARITY_333> ${this.shardId} Online. Enabling SigmaOS to boot and load shards directly from IPFS.`);
             this.registerCLI();
+            this.selfEvolve();
         });
     }
 
@@ -25,6 +26,18 @@ class IPFSBootLayer {
         window.SigmaCLI['ipfs-boot'] = (args) => {
             return `[IPFS Boot Layer] Futuristic Call: ${args.join(' ') || 'STATUS'}`;
         };
+    }
+
+    selfEvolve() {
+        const mutations = [
+            "Optimizing lattice resonance...",
+            "Expanding semantic context...",
+            "Hardening silicon primitives...",
+            "Refining cross-kernel synthesis..."
+        ];
+        const mutation = mutations[Math.floor(Math.random() * mutations.length)];
+        console.log(`Σ://EVOLUTION [${this.shardId}]> ${mutation}`);
+        this.lastMutation = mutation;
     }
 }
 

@@ -33,6 +33,7 @@ class EnvironmentAbstractionLayer {
             document.body.setAttribute('data-env', this.currentEnv);
             console.log(`Σ://BOOT> Environment ${this.currentEnv} locked and optimized.`);
             this.registerCLI();
+            this.selfEvolve();
         });
     }
 
@@ -47,6 +48,18 @@ class EnvironmentAbstractionLayer {
             document.body.setAttribute('data-env', this.currentEnv);
             return `Environment context switched to: ${this.currentEnv.toUpperCase()}`;
         };
+    }
+
+    selfEvolve() {
+        const mutations = [
+            "Optimizing lattice resonance...",
+            "Expanding semantic context...",
+            "Hardening silicon primitives...",
+            "Refining cross-kernel synthesis..."
+        ];
+        const mutation = mutations[Math.floor(Math.random() * mutations.length)];
+        console.log(`Σ://EVOLUTION [${this.shardId}]> ${mutation}`);
+        this.lastMutation = mutation;
     }
 }
 

@@ -17,6 +17,7 @@ class IndustrialGradeNexus {
             this.active = true;
             console.log(`Σ://SINGULARITY_360> ${this.shardId} Online. The bridge to high-availability sovereign computing.`);
             this.registerCLI();
+            this.selfEvolve();
         });
     }
 
@@ -25,6 +26,18 @@ class IndustrialGradeNexus {
         window.SigmaCLI['ha-nexus'] = (args) => {
             return `[Industrial Grade Nexus] Industrial Call: ${args.join(' ') || 'STATUS'}`;
         };
+    }
+
+    selfEvolve() {
+        const mutations = [
+            "Optimizing lattice resonance...",
+            "Expanding semantic context...",
+            "Hardening silicon primitives...",
+            "Refining cross-kernel synthesis..."
+        ];
+        const mutation = mutations[Math.floor(Math.random() * mutations.length)];
+        console.log(`Σ://EVOLUTION [${this.shardId}]> ${mutation}`);
+        this.lastMutation = mutation;
     }
 }
 

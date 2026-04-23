@@ -17,6 +17,7 @@ class RollingReleaseChannel {
             this.active = true;
             console.log(`Σ://LINUX_MODULARITY> ${this.shardId} Online. Opt-in bleeding edge module updates vs stable branch.`);
             this.registerCLI();
+            this.selfEvolve();
         });
     }
 
@@ -25,6 +26,18 @@ class RollingReleaseChannel {
         window.SigmaCLI['os-release'] = (args) => {
             return `[Rolling Release Channel] Executing ${args.join(' ')}...`;
         };
+    }
+
+    selfEvolve() {
+        const mutations = [
+            "Optimizing lattice resonance...",
+            "Expanding semantic context...",
+            "Hardening silicon primitives...",
+            "Refining cross-kernel synthesis..."
+        ];
+        const mutation = mutations[Math.floor(Math.random() * mutations.length)];
+        console.log(`Σ://EVOLUTION [${this.shardId}]> ${mutation}`);
+        this.lastMutation = mutation;
     }
 }
 

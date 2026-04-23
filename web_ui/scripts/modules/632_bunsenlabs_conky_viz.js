@@ -17,6 +17,7 @@ class BunsenLabsConkyViz {
             this.active = true;
             console.log(`Σ://LINUX_PARITY> ${this.shardId} Online. BunsenLabs inspired high-performance system telemetry visualization on desktop.`);
             this.registerCLI();
+            this.selfEvolve();
         });
     }
 
@@ -25,6 +26,18 @@ class BunsenLabsConkyViz {
         window.SigmaCLI['conky-viz'] = (args) => {
             return `[BunsenLabs Conky Viz] Executing ${args.join(' ')}...`;
         };
+    }
+
+    selfEvolve() {
+        const mutations = [
+            "Optimizing lattice resonance...",
+            "Expanding semantic context...",
+            "Hardening silicon primitives...",
+            "Refining cross-kernel synthesis..."
+        ];
+        const mutation = mutations[Math.floor(Math.random() * mutations.length)];
+        console.log(`Σ://EVOLUTION [${this.shardId}]> ${mutation}`);
+        this.lastMutation = mutation;
     }
 }
 

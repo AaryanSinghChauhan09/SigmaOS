@@ -17,6 +17,7 @@ class ConvergenceSingularity {
             this.active = true;
             console.log(`Σ://SINGULARITY_400> ${this.shardId} Online. The 400th Shard: Achieving the Convergence Singularity.`);
             this.registerCLI();
+            this.selfEvolve();
         });
     }
 
@@ -25,6 +26,18 @@ class ConvergenceSingularity {
         window.SigmaCLI['singularity-400'] = (args) => {
             return `[Convergence Singularity] Convergence Call: ${args.join(' ') || 'STATUS'}`;
         };
+    }
+
+    selfEvolve() {
+        const mutations = [
+            "Optimizing lattice resonance...",
+            "Expanding semantic context...",
+            "Hardening silicon primitives...",
+            "Refining cross-kernel synthesis..."
+        ];
+        const mutation = mutations[Math.floor(Math.random() * mutations.length)];
+        console.log(`Σ://EVOLUTION [${this.shardId}]> ${mutation}`);
+        this.lastMutation = mutation;
     }
 }
 

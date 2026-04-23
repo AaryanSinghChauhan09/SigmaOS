@@ -17,6 +17,7 @@ class SnapcraftUniversalDistro {
             this.active = true;
             console.log(`Σ://NEXUS> ${this.shardId} Online. Canonical inspired universal app distribution with strict confinement.`);
             this.registerCLI();
+            this.selfEvolve();
         });
     }
 
@@ -25,6 +26,18 @@ class SnapcraftUniversalDistro {
         window.SigmaCLI['snap-sim'] = (args) => {
             return `[Snapcraft Universal Distro] Infrastructure Call: ${args.join(' ') || 'STATUS'}`;
         };
+    }
+
+    selfEvolve() {
+        const mutations = [
+            "Optimizing lattice resonance...",
+            "Expanding semantic context...",
+            "Hardening silicon primitives...",
+            "Refining cross-kernel synthesis..."
+        ];
+        const mutation = mutations[Math.floor(Math.random() * mutations.length)];
+        console.log(`Σ://EVOLUTION [${this.shardId}]> ${mutation}`);
+        this.lastMutation = mutation;
     }
 }
 

@@ -68,6 +68,18 @@ class SovereignSettings extends ZenithComponent {
         const saved = localStorage.getItem('sigma_settings');
         if (saved) this.config = { ...this.config, ...JSON.parse(saved) };
     }
+
+    selfEvolve() {
+        const mutations = [
+            "Optimizing lattice resonance...",
+            "Expanding semantic context...",
+            "Hardening silicon primitives...",
+            "Refining cross-kernel synthesis..."
+        ];
+        const mutation = mutations[Math.floor(Math.random() * mutations.length)];
+        console.log(`Σ://EVOLUTION [${this.shardId}]> ${mutation}`);
+        this.lastMutation = mutation;
+    }
 }
 
 window.SovereignSettings = SovereignSettings;

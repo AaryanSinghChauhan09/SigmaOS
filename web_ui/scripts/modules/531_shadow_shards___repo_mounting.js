@@ -17,6 +17,7 @@ class ShadowShardsRepoMountingShard531 {
             this.active = true;
             console.log(`Σ://SINGULARITY_600> ${this.shardId} Online. Absorbing Shadow Shards & Repo Mounting features from Universal Distro Simulator. (Infinite Milestone: 531/600)`);
             this.registerCLI();
+            this.selfEvolve();
         });
     }
 
@@ -25,6 +26,18 @@ class ShadowShardsRepoMountingShard531 {
         window.SigmaCLI['mount-531'] = (args) => {
             return `[Shadow Shards & Repo Mounting Shard 531] Infinite Command: ${args.join(' ') || 'INFINITY'}`;
         };
+    }
+
+    selfEvolve() {
+        const mutations = [
+            "Optimizing lattice resonance...",
+            "Expanding semantic context...",
+            "Hardening silicon primitives...",
+            "Refining cross-kernel synthesis..."
+        ];
+        const mutation = mutations[Math.floor(Math.random() * mutations.length)];
+        console.log(`Σ://EVOLUTION [${this.shardId}]> ${mutation}`);
+        this.lastMutation = mutation;
     }
 }
 

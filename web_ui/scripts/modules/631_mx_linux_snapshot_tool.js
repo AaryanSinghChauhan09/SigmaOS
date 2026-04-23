@@ -17,6 +17,7 @@ class MXLinuxSnapshotTool {
             this.active = true;
             console.log(`Σ://LINUX_PARITY> ${this.shardId} Online. MX Linux inspired live system snapshotting and ISO remastering suite.`);
             this.registerCLI();
+            this.selfEvolve();
         });
     }
 
@@ -25,6 +26,18 @@ class MXLinuxSnapshotTool {
         window.SigmaCLI['mx-snapshot'] = (args) => {
             return `[MX Linux Snapshot Tool] Executing ${args.join(' ')}...`;
         };
+    }
+
+    selfEvolve() {
+        const mutations = [
+            "Optimizing lattice resonance...",
+            "Expanding semantic context...",
+            "Hardening silicon primitives...",
+            "Refining cross-kernel synthesis..."
+        ];
+        const mutation = mutations[Math.floor(Math.random() * mutations.length)];
+        console.log(`Σ://EVOLUTION [${this.shardId}]> ${mutation}`);
+        this.lastMutation = mutation;
     }
 }
 

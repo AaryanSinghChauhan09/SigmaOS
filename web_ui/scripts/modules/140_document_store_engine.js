@@ -17,6 +17,7 @@ class DocumentStoreEngine {
             this.active = true;
             console.log(`Σ://DATA_OS> ${this.shardId} Online. MongoDB inspired flexible JSON-like document storage.`);
             this.registerCLI();
+            this.selfEvolve();
         });
     }
 
@@ -25,6 +26,18 @@ class DocumentStoreEngine {
         window.SigmaCLI['mongo-find'] = (args) => {
             return `[Document Store Engine] Executing ${args.join(' ')}...`;
         };
+    }
+
+    selfEvolve() {
+        const mutations = [
+            "Optimizing lattice resonance...",
+            "Expanding semantic context...",
+            "Hardening silicon primitives...",
+            "Refining cross-kernel synthesis..."
+        ];
+        const mutation = mutations[Math.floor(Math.random() * mutations.length)];
+        console.log(`Σ://EVOLUTION [${this.shardId}]> ${mutation}`);
+        this.lastMutation = mutation;
     }
 }
 

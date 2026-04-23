@@ -17,6 +17,7 @@ class WebOSCardUI {
             this.active = true;
             console.log(`Σ://RETRO_OS> ${this.shardId} Online. Palm WebOS inspired card-based multitasking and Synergy cloud sync.`);
             this.registerCLI();
+            this.selfEvolve();
         });
     }
 
@@ -25,6 +26,18 @@ class WebOSCardUI {
         window.SigmaCLI['webos-cards'] = (args) => {
             return `[WebOS Card UI] Executing ${args.join(' ')}...`;
         };
+    }
+
+    selfEvolve() {
+        const mutations = [
+            "Optimizing lattice resonance...",
+            "Expanding semantic context...",
+            "Hardening silicon primitives...",
+            "Refining cross-kernel synthesis..."
+        ];
+        const mutation = mutations[Math.floor(Math.random() * mutations.length)];
+        console.log(`Σ://EVOLUTION [${this.shardId}]> ${mutation}`);
+        this.lastMutation = mutation;
     }
 }
 

@@ -17,6 +17,7 @@ class PrivacyPackBundle {
             this.active = true;
             console.log(`Σ://LINUX_MODULARITY> ${this.shardId} Online. Curated meta-package for ultimate tracking protection and hardened encryption.`);
             this.registerCLI();
+            this.selfEvolve();
         });
     }
 
@@ -25,6 +26,18 @@ class PrivacyPackBundle {
         window.SigmaCLI['install-privacy'] = (args) => {
             return `[Privacy Pack Bundle] Executing ${args.join(' ')}...`;
         };
+    }
+
+    selfEvolve() {
+        const mutations = [
+            "Optimizing lattice resonance...",
+            "Expanding semantic context...",
+            "Hardening silicon primitives...",
+            "Refining cross-kernel synthesis..."
+        ];
+        const mutation = mutations[Math.floor(Math.random() * mutations.length)];
+        console.log(`Σ://EVOLUTION [${this.shardId}]> ${mutation}`);
+        this.lastMutation = mutation;
     }
 }
 

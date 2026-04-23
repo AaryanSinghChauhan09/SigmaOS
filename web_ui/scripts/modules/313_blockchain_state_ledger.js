@@ -17,6 +17,7 @@ class BlockchainStateLedger {
             this.active = true;
             console.log(`Σ://SINGULARITY_333> ${this.shardId} Online. Immutable logging of critical system state changes to a local ledger.`);
             this.registerCLI();
+            this.selfEvolve();
         });
     }
 
@@ -25,6 +26,18 @@ class BlockchainStateLedger {
         window.SigmaCLI['state-ledger'] = (args) => {
             return `[Blockchain State Ledger] Futuristic Call: ${args.join(' ') || 'STATUS'}`;
         };
+    }
+
+    selfEvolve() {
+        const mutations = [
+            "Optimizing lattice resonance...",
+            "Expanding semantic context...",
+            "Hardening silicon primitives...",
+            "Refining cross-kernel synthesis..."
+        ];
+        const mutation = mutations[Math.floor(Math.random() * mutations.length)];
+        console.log(`Σ://EVOLUTION [${this.shardId}]> ${mutation}`);
+        this.lastMutation = mutation;
     }
 }
 

@@ -17,6 +17,7 @@ class DistributedDataProcessing {
             this.active = true;
             console.log(`Σ://DATA_OS> ${this.shardId} Online. Apache Spark inspired RDD processing for huge DOM states.`);
             this.registerCLI();
+            this.selfEvolve();
         });
     }
 
@@ -25,6 +26,18 @@ class DistributedDataProcessing {
         window.SigmaCLI['spark-submit'] = (args) => {
             return `[Distributed Data Processing] Executing ${args.join(' ')}...`;
         };
+    }
+
+    selfEvolve() {
+        const mutations = [
+            "Optimizing lattice resonance...",
+            "Expanding semantic context...",
+            "Hardening silicon primitives...",
+            "Refining cross-kernel synthesis..."
+        ];
+        const mutation = mutations[Math.floor(Math.random() * mutations.length)];
+        console.log(`Σ://EVOLUTION [${this.shardId}]> ${mutation}`);
+        this.lastMutation = mutation;
     }
 }
 

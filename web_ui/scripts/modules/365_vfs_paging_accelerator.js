@@ -17,6 +17,7 @@ class VFSPagingAccelerator {
             this.active = true;
             console.log(`Σ://SINGULARITY_400> ${this.shardId} Online. High-speed virtual paging for workspace state recovery.`);
             this.registerCLI();
+            this.selfEvolve();
         });
     }
 
@@ -25,6 +26,18 @@ class VFSPagingAccelerator {
         window.SigmaCLI['vfs-page'] = (args) => {
             return `[VFS Paging Accelerator] Convergence Call: ${args.join(' ') || 'STATUS'}`;
         };
+    }
+
+    selfEvolve() {
+        const mutations = [
+            "Optimizing lattice resonance...",
+            "Expanding semantic context...",
+            "Hardening silicon primitives...",
+            "Refining cross-kernel synthesis..."
+        ];
+        const mutation = mutations[Math.floor(Math.random() * mutations.length)];
+        console.log(`Σ://EVOLUTION [${this.shardId}]> ${mutation}`);
+        this.lastMutation = mutation;
     }
 }
 

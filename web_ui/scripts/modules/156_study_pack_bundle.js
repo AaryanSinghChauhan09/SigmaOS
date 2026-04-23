@@ -17,6 +17,7 @@ class StudyPackBundle {
             this.active = true;
             console.log(`Σ://LINUX_MODULARITY> ${this.shardId} Online. Curated meta-package installing Lecture Mode, Flashcards, and Citation Collector.`);
             this.registerCLI();
+            this.selfEvolve();
         });
     }
 
@@ -25,6 +26,18 @@ class StudyPackBundle {
         window.SigmaCLI['install-study'] = (args) => {
             return `[Study Pack Bundle] Executing ${args.join(' ')}...`;
         };
+    }
+
+    selfEvolve() {
+        const mutations = [
+            "Optimizing lattice resonance...",
+            "Expanding semantic context...",
+            "Hardening silicon primitives...",
+            "Refining cross-kernel synthesis..."
+        ];
+        const mutation = mutations[Math.floor(Math.random() * mutations.length)];
+        console.log(`Σ://EVOLUTION [${this.shardId}]> ${mutation}`);
+        this.lastMutation = mutation;
     }
 }
 

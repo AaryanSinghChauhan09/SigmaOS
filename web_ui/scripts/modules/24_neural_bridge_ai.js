@@ -30,6 +30,18 @@ class NeuralBridgeAI extends ZenithComponent {
         window.zenith.taskbar.notify(`AI ANALYZING: ${name}`, 'OPTIMAL');
         return `FILE_SCAN: ${name} IS SECURE. TYPE: LATTICE_DATA.`;
     }
+
+    selfEvolve() {
+        const mutations = [
+            "Optimizing lattice resonance...",
+            "Expanding semantic context...",
+            "Hardening silicon primitives...",
+            "Refining cross-kernel synthesis..."
+        ];
+        const mutation = mutations[Math.floor(Math.random() * mutations.length)];
+        console.log(`Σ://EVOLUTION [${this.shardId}]> ${mutation}`);
+        this.lastMutation = mutation;
+    }
 }
 
 window.NeuralBridgeAI = NeuralBridgeAI;

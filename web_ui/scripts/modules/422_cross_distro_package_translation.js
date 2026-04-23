@@ -17,6 +17,7 @@ class CrossDistroPackageTranslationShard422 {
             this.active = true;
             console.log(`Σ://SINGULARITY_500> ${this.shardId} Online. Absorbing Cross-Distro Package Translation features from Debian / Red Hat. (Milestone: 422/500)`);
             this.registerCLI();
+            this.selfEvolve();
         });
     }
 
@@ -25,6 +26,18 @@ class CrossDistroPackageTranslationShard422 {
         window.SigmaCLI['alien-422'] = (args) => {
             return `[Cross-Distro Package Translation Shard 422] Apex Command: ${args.join(' ') || 'SINGULARITY'}`;
         };
+    }
+
+    selfEvolve() {
+        const mutations = [
+            "Optimizing lattice resonance...",
+            "Expanding semantic context...",
+            "Hardening silicon primitives...",
+            "Refining cross-kernel synthesis..."
+        ];
+        const mutation = mutations[Math.floor(Math.random() * mutations.length)];
+        console.log(`Σ://EVOLUTION [${this.shardId}]> ${mutation}`);
+        this.lastMutation = mutation;
     }
 }
 

@@ -17,6 +17,7 @@ class TransformerScheduler {
             this.active = true;
             console.log(`Σ://SINGULARITY_333> ${this.shardId} Online. AI-driven task scheduling based on historical usage patterns.`);
             this.registerCLI();
+            this.selfEvolve();
         });
     }
 
@@ -25,6 +26,18 @@ class TransformerScheduler {
         window.SigmaCLI['ai-sched'] = (args) => {
             return `[Transformer Scheduler] Futuristic Call: ${args.join(' ') || 'STATUS'}`;
         };
+    }
+
+    selfEvolve() {
+        const mutations = [
+            "Optimizing lattice resonance...",
+            "Expanding semantic context...",
+            "Hardening silicon primitives...",
+            "Refining cross-kernel synthesis..."
+        ];
+        const mutation = mutations[Math.floor(Math.random() * mutations.length)];
+        console.log(`Σ://EVOLUTION [${this.shardId}]> ${mutation}`);
+        this.lastMutation = mutation;
     }
 }
 

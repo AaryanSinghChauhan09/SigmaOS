@@ -17,6 +17,7 @@ class RunitServiceSupervisor {
             this.active = true;
             console.log(`Σ://SINGULARITY_360> ${this.shardId} Online. Void inspired parallel service monitoring and auto-restart.`);
             this.registerCLI();
+            this.selfEvolve();
         });
     }
 
@@ -25,6 +26,18 @@ class RunitServiceSupervisor {
         window.SigmaCLI['runit-sim'] = (args) => {
             return `[Runit Service Supervisor] Industrial Call: ${args.join(' ') || 'STATUS'}`;
         };
+    }
+
+    selfEvolve() {
+        const mutations = [
+            "Optimizing lattice resonance...",
+            "Expanding semantic context...",
+            "Hardening silicon primitives...",
+            "Refining cross-kernel synthesis..."
+        ];
+        const mutation = mutations[Math.floor(Math.random() * mutations.length)];
+        console.log(`Σ://EVOLUTION [${this.shardId}]> ${mutation}`);
+        this.lastMutation = mutation;
     }
 }
 

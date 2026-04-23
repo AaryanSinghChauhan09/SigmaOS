@@ -17,6 +17,7 @@ class AlpineLBUBackup {
             this.active = true;
             console.log(`Σ://SINGULARITY> ${this.shardId} Online. Alpine inspired Local Backup Utility for saving state on diskless systems.`);
             this.registerCLI();
+            this.selfEvolve();
         });
     }
 
@@ -25,6 +26,18 @@ class AlpineLBUBackup {
         window.SigmaCLI['lbu-sim'] = (args) => {
             return `[Alpine LBU Backup] Singularity Command: ${args.join(' ') || 'EXECUTE'}`;
         };
+    }
+
+    selfEvolve() {
+        const mutations = [
+            "Optimizing lattice resonance...",
+            "Expanding semantic context...",
+            "Hardening silicon primitives...",
+            "Refining cross-kernel synthesis..."
+        ];
+        const mutation = mutations[Math.floor(Math.random() * mutations.length)];
+        console.log(`Σ://EVOLUTION [${this.shardId}]> ${mutation}`);
+        this.lastMutation = mutation;
     }
 }
 

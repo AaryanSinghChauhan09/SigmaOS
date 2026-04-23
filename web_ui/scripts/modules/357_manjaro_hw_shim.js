@@ -17,6 +17,7 @@ class ManjaroHWShim {
             this.active = true;
             console.log(`Σ://SINGULARITY_360> ${this.shardId} Online. Manjaro inspired automated detection of browser capabilities.`);
             this.registerCLI();
+            this.selfEvolve();
         });
     }
 
@@ -25,6 +26,18 @@ class ManjaroHWShim {
         window.SigmaCLI['hw-detect'] = (args) => {
             return `[Manjaro HW Shim] Industrial Call: ${args.join(' ') || 'STATUS'}`;
         };
+    }
+
+    selfEvolve() {
+        const mutations = [
+            "Optimizing lattice resonance...",
+            "Expanding semantic context...",
+            "Hardening silicon primitives...",
+            "Refining cross-kernel synthesis..."
+        ];
+        const mutation = mutations[Math.floor(Math.random() * mutations.length)];
+        console.log(`Σ://EVOLUTION [${this.shardId}]> ${mutation}`);
+        this.lastMutation = mutation;
     }
 }
 

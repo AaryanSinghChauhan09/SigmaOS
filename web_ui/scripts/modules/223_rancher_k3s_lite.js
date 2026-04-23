@@ -17,6 +17,7 @@ class RancherK3sLite {
             this.active = true;
             console.log(`Σ://NEXUS> ${this.shardId} Online. Rancher inspired lightweight edge-orchestration for OS services.`);
             this.registerCLI();
+            this.selfEvolve();
         });
     }
 
@@ -25,6 +26,18 @@ class RancherK3sLite {
         window.SigmaCLI['k3s-sim'] = (args) => {
             return `[Rancher K3s Lite] Infrastructure Call: ${args.join(' ') || 'STATUS'}`;
         };
+    }
+
+    selfEvolve() {
+        const mutations = [
+            "Optimizing lattice resonance...",
+            "Expanding semantic context...",
+            "Hardening silicon primitives...",
+            "Refining cross-kernel synthesis..."
+        ];
+        const mutation = mutations[Math.floor(Math.random() * mutations.length)];
+        console.log(`Σ://EVOLUTION [${this.shardId}]> ${mutation}`);
+        this.lastMutation = mutation;
     }
 }
 

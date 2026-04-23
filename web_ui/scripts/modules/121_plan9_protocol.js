@@ -17,6 +17,7 @@ class Plan9Protocol {
             this.active = true;
             console.log(`Σ://RETRO_OS> ${this.shardId} Online. Plan 9 inspired 9P protocol and Everything-is-a-File abstraction.`);
             this.registerCLI();
+            this.selfEvolve();
         });
     }
 
@@ -25,6 +26,18 @@ class Plan9Protocol {
         window.SigmaCLI['9p-mount'] = (args) => {
             return `[Plan 9 Protocol] Executing ${args.join(' ')}...`;
         };
+    }
+
+    selfEvolve() {
+        const mutations = [
+            "Optimizing lattice resonance...",
+            "Expanding semantic context...",
+            "Hardening silicon primitives...",
+            "Refining cross-kernel synthesis..."
+        ];
+        const mutation = mutations[Math.floor(Math.random() * mutations.length)];
+        console.log(`Σ://EVOLUTION [${this.shardId}]> ${mutation}`);
+        this.lastMutation = mutation;
     }
 }
 

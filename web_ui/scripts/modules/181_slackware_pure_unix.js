@@ -17,6 +17,7 @@ class SlackwarePureUnix {
             this.active = true;
             console.log(`Σ://LINUX_DISTROS> ${this.shardId} Online. Slackware inspired strict Unix philosophy and simple shell abstractions.`);
             this.registerCLI();
+            this.selfEvolve();
         });
     }
 
@@ -25,6 +26,18 @@ class SlackwarePureUnix {
         window.SigmaCLI['slack-pkg'] = (args) => {
             return `[Slackware Pure Unix] Executing ${args.join(' ')}...`;
         };
+    }
+
+    selfEvolve() {
+        const mutations = [
+            "Optimizing lattice resonance...",
+            "Expanding semantic context...",
+            "Hardening silicon primitives...",
+            "Refining cross-kernel synthesis..."
+        ];
+        const mutation = mutations[Math.floor(Math.random() * mutations.length)];
+        console.log(`Σ://EVOLUTION [${this.shardId}]> ${mutation}`);
+        this.lastMutation = mutation;
     }
 }
 

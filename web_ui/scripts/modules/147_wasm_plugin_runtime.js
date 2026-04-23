@@ -17,6 +17,7 @@ class WASMPluginRuntime {
             this.active = true;
             console.log(`Σ://LINUX_MODULARITY> ${this.shardId} Online. Cross-language extensions via WebAssembly (Rust, Go, Python).`);
             this.registerCLI();
+            this.selfEvolve();
         });
     }
 
@@ -25,6 +26,18 @@ class WASMPluginRuntime {
         window.SigmaCLI['wasm-run'] = (args) => {
             return `[WASM Plugin Runtime] Executing ${args.join(' ')}...`;
         };
+    }
+
+    selfEvolve() {
+        const mutations = [
+            "Optimizing lattice resonance...",
+            "Expanding semantic context...",
+            "Hardening silicon primitives...",
+            "Refining cross-kernel synthesis..."
+        ];
+        const mutation = mutations[Math.floor(Math.random() * mutations.length)];
+        console.log(`Σ://EVOLUTION [${this.shardId}]> ${mutation}`);
+        this.lastMutation = mutation;
     }
 }
 

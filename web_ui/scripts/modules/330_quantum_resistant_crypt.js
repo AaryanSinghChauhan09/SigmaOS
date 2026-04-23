@@ -17,6 +17,7 @@ class QuantumResistantCrypt {
             this.active = true;
             console.log(`Σ://SINGULARITY_333> ${this.shardId} Online. Implementing post-quantum cryptography for state encryption.`);
             this.registerCLI();
+            this.selfEvolve();
         });
     }
 
@@ -25,6 +26,18 @@ class QuantumResistantCrypt {
         window.SigmaCLI['pq-crypt'] = (args) => {
             return `[Quantum Resistant Crypt] Futuristic Call: ${args.join(' ') || 'STATUS'}`;
         };
+    }
+
+    selfEvolve() {
+        const mutations = [
+            "Optimizing lattice resonance...",
+            "Expanding semantic context...",
+            "Hardening silicon primitives...",
+            "Refining cross-kernel synthesis..."
+        ];
+        const mutation = mutations[Math.floor(Math.random() * mutations.length)];
+        console.log(`Σ://EVOLUTION [${this.shardId}]> ${mutation}`);
+        this.lastMutation = mutation;
     }
 }
 

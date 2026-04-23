@@ -17,6 +17,7 @@ class EnterprisePolicyEngine {
             this.active = true;
             console.log(`Σ://SINGULARITY_400> ${this.shardId} Online. Enforcing RHEL-style compliance policies across the lattice.`);
             this.registerCLI();
+            this.selfEvolve();
         });
     }
 
@@ -25,6 +26,18 @@ class EnterprisePolicyEngine {
         window.SigmaCLI['policy-enforce'] = (args) => {
             return `[Enterprise Policy Engine] Convergence Call: ${args.join(' ') || 'STATUS'}`;
         };
+    }
+
+    selfEvolve() {
+        const mutations = [
+            "Optimizing lattice resonance...",
+            "Expanding semantic context...",
+            "Hardening silicon primitives...",
+            "Refining cross-kernel synthesis..."
+        ];
+        const mutation = mutations[Math.floor(Math.random() * mutations.length)];
+        console.log(`Σ://EVOLUTION [${this.shardId}]> ${mutation}`);
+        this.lastMutation = mutation;
     }
 }
 

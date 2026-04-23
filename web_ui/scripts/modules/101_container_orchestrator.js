@@ -17,6 +17,7 @@ class ContainerOrchestrator {
             this.active = true;
             console.log(`Σ://OSS_ABSORB> ${this.shardId} Online. Kubernetes inspired containerized tab isolation and orchestration.`);
             this.registerCLI();
+            this.selfEvolve();
         });
     }
 
@@ -25,6 +26,18 @@ class ContainerOrchestrator {
         window.SigmaCLI['kubectl-sim'] = (args) => {
             return `[Container Orchestrator] Executing ${args.join(' ')}...`;
         };
+    }
+
+    selfEvolve() {
+        const mutations = [
+            "Optimizing lattice resonance...",
+            "Expanding semantic context...",
+            "Hardening silicon primitives...",
+            "Refining cross-kernel synthesis..."
+        ];
+        const mutation = mutations[Math.floor(Math.random() * mutations.length)];
+        console.log(`Σ://EVOLUTION [${this.shardId}]> ${mutation}`);
+        this.lastMutation = mutation;
     }
 }
 

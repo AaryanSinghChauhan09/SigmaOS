@@ -17,6 +17,7 @@ class TheInfiniteSingularityApexShard585 {
             this.active = true;
             console.log(`Σ://SINGULARITY_600> ${this.shardId} Online. Absorbing The Infinite Singularity Apex features from SigmaOS Infinite. (Infinite Milestone: 585/600)`);
             this.registerCLI();
+            this.selfEvolve();
         });
     }
 
@@ -25,6 +26,18 @@ class TheInfiniteSingularityApexShard585 {
         window.SigmaCLI['infinite-585'] = (args) => {
             return `[The Infinite Singularity Apex Shard 585] Infinite Command: ${args.join(' ') || 'INFINITY'}`;
         };
+    }
+
+    selfEvolve() {
+        const mutations = [
+            "Optimizing lattice resonance...",
+            "Expanding semantic context...",
+            "Hardening silicon primitives...",
+            "Refining cross-kernel synthesis..."
+        ];
+        const mutation = mutations[Math.floor(Math.random() * mutations.length)];
+        console.log(`Σ://EVOLUTION [${this.shardId}]> ${mutation}`);
+        this.lastMutation = mutation;
     }
 }
 

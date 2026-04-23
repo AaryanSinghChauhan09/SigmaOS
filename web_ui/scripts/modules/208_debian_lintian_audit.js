@@ -17,6 +17,7 @@ class DebianLintianAudit {
             this.active = true;
             console.log(`Σ://NEXUS> ${this.shardId} Online. Debian inspired static analysis for OS module compliance and policy.`);
             this.registerCLI();
+            this.selfEvolve();
         });
     }
 
@@ -25,6 +26,18 @@ class DebianLintianAudit {
         window.SigmaCLI['lintian-run'] = (args) => {
             return `[Debian Lintian Audit] Infrastructure Call: ${args.join(' ') || 'STATUS'}`;
         };
+    }
+
+    selfEvolve() {
+        const mutations = [
+            "Optimizing lattice resonance...",
+            "Expanding semantic context...",
+            "Hardening silicon primitives...",
+            "Refining cross-kernel synthesis..."
+        ];
+        const mutation = mutations[Math.floor(Math.random() * mutations.length)];
+        console.log(`Σ://EVOLUTION [${this.shardId}]> ${mutation}`);
+        this.lastMutation = mutation;
     }
 }
 

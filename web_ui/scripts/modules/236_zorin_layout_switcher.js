@@ -17,6 +17,7 @@ class ZorinLayoutSwitcher {
             this.active = true;
             console.log(`Σ://SINGULARITY> ${this.shardId} Online. Zorin OS inspired instant desktop layout switching on the fly.`);
             this.registerCLI();
+            this.selfEvolve();
         });
     }
 
@@ -25,6 +26,18 @@ class ZorinLayoutSwitcher {
         window.SigmaCLI['zorin-layout'] = (args) => {
             return `[Zorin Layout Switcher] Singularity Command: ${args.join(' ') || 'EXECUTE'}`;
         };
+    }
+
+    selfEvolve() {
+        const mutations = [
+            "Optimizing lattice resonance...",
+            "Expanding semantic context...",
+            "Hardening silicon primitives...",
+            "Refining cross-kernel synthesis..."
+        ];
+        const mutation = mutations[Math.floor(Math.random() * mutations.length)];
+        console.log(`Σ://EVOLUTION [${this.shardId}]> ${mutation}`);
+        this.lastMutation = mutation;
     }
 }
 

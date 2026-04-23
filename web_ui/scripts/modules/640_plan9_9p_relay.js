@@ -17,6 +17,7 @@ class Plan99PRelay {
             this.active = true;
             console.log(`Σ://PHASE_6> ${this.shardId} Online. Plan 9 inspired 9P resource sharing protocol for distributed lattice nodes.`);
             this.registerCLI();
+            this.selfEvolve();
         });
     }
 
@@ -25,6 +26,18 @@ class Plan99PRelay {
         window.SigmaCLI['9p-relay'] = (args) => {
             return `[Plan 9 9P Relay] Cross-Kernel Call: ${args.join(' ') || 'STATUS'}`;
         };
+    }
+
+    selfEvolve() {
+        const mutations = [
+            "Optimizing lattice resonance...",
+            "Expanding semantic context...",
+            "Hardening silicon primitives...",
+            "Refining cross-kernel synthesis..."
+        ];
+        const mutation = mutations[Math.floor(Math.random() * mutations.length)];
+        console.log(`Σ://EVOLUTION [${this.shardId}]> ${mutation}`);
+        this.lastMutation = mutation;
     }
 }
 

@@ -17,6 +17,7 @@ class KaOSLeanPlasma {
             this.active = true;
             console.log(`Σ://LINUX_PARITY> ${this.shardId} Online. KaOS inspired rolling release focusing strictly on Qt/KDE lean integration.`);
             this.registerCLI();
+            this.selfEvolve();
         });
     }
 
@@ -25,6 +26,18 @@ class KaOSLeanPlasma {
         window.SigmaCLI['kaos-qt'] = (args) => {
             return `[KaOS Lean Plasma] Executing ${args.join(' ')}...`;
         };
+    }
+
+    selfEvolve() {
+        const mutations = [
+            "Optimizing lattice resonance...",
+            "Expanding semantic context...",
+            "Hardening silicon primitives...",
+            "Refining cross-kernel synthesis..."
+        ];
+        const mutation = mutations[Math.floor(Math.random() * mutations.length)];
+        console.log(`Σ://EVOLUTION [${this.shardId}]> ${mutation}`);
+        this.lastMutation = mutation;
     }
 }
 

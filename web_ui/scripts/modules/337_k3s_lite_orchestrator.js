@@ -17,6 +17,7 @@ class K3sLiteOrchestrator {
             this.active = true;
             console.log(`Σ://SINGULARITY_360> ${this.shardId} Online. Lightweight orchestration for distributed OS service shards.`);
             this.registerCLI();
+            this.selfEvolve();
         });
     }
 
@@ -25,6 +26,18 @@ class K3sLiteOrchestrator {
         window.SigmaCLI['k3s-lite'] = (args) => {
             return `[K3s Lite Orchestrator] Industrial Call: ${args.join(' ') || 'STATUS'}`;
         };
+    }
+
+    selfEvolve() {
+        const mutations = [
+            "Optimizing lattice resonance...",
+            "Expanding semantic context...",
+            "Hardening silicon primitives...",
+            "Refining cross-kernel synthesis..."
+        ];
+        const mutation = mutations[Math.floor(Math.random() * mutations.length)];
+        console.log(`Σ://EVOLUTION [${this.shardId}]> ${mutation}`);
+        this.lastMutation = mutation;
     }
 }
 

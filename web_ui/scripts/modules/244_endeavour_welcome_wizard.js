@@ -17,6 +17,7 @@ class EndeavourWelcomeWizard {
             this.active = true;
             console.log(`Σ://SINGULARITY> ${this.shardId} Online. EndeavourOS inspired user-friendly first-boot wizard for setup.`);
             this.registerCLI();
+            this.selfEvolve();
         });
     }
 
@@ -25,6 +26,18 @@ class EndeavourWelcomeWizard {
         window.SigmaCLI['welcome-os'] = (args) => {
             return `[Endeavour Welcome Wizard] Singularity Command: ${args.join(' ') || 'EXECUTE'}`;
         };
+    }
+
+    selfEvolve() {
+        const mutations = [
+            "Optimizing lattice resonance...",
+            "Expanding semantic context...",
+            "Hardening silicon primitives...",
+            "Refining cross-kernel synthesis..."
+        ];
+        const mutation = mutations[Math.floor(Math.random() * mutations.length)];
+        console.log(`Σ://EVOLUTION [${this.shardId}]> ${mutation}`);
+        this.lastMutation = mutation;
     }
 }
 

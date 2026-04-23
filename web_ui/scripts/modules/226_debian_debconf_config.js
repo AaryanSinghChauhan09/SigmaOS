@@ -17,6 +17,7 @@ class DebianDebconfConfig {
             this.active = true;
             console.log(`Σ://SINGULARITY> ${this.shardId} Online. Debian inspired centralized configuration database and frontend.`);
             this.registerCLI();
+            this.selfEvolve();
         });
     }
 
@@ -25,6 +26,18 @@ class DebianDebconfConfig {
         window.SigmaCLI['debconf-sim'] = (args) => {
             return `[Debian Debconf Config] Singularity Command: ${args.join(' ') || 'EXECUTE'}`;
         };
+    }
+
+    selfEvolve() {
+        const mutations = [
+            "Optimizing lattice resonance...",
+            "Expanding semantic context...",
+            "Hardening silicon primitives...",
+            "Refining cross-kernel synthesis..."
+        ];
+        const mutation = mutations[Math.floor(Math.random() * mutations.length)];
+        console.log(`Σ://EVOLUTION [${this.shardId}]> ${mutation}`);
+        this.lastMutation = mutation;
     }
 }
 

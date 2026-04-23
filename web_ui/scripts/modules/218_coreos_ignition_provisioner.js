@@ -17,6 +17,7 @@ class CoreOSIgnitionProvisioner {
             this.active = true;
             console.log(`Σ://NEXUS> ${this.shardId} Online. CoreOS inspired first-boot declarative system provisioning.`);
             this.registerCLI();
+            this.selfEvolve();
         });
     }
 
@@ -25,6 +26,18 @@ class CoreOSIgnitionProvisioner {
         window.SigmaCLI['ignition-run'] = (args) => {
             return `[CoreOS Ignition Provisioner] Infrastructure Call: ${args.join(' ') || 'STATUS'}`;
         };
+    }
+
+    selfEvolve() {
+        const mutations = [
+            "Optimizing lattice resonance...",
+            "Expanding semantic context...",
+            "Hardening silicon primitives...",
+            "Refining cross-kernel synthesis..."
+        ];
+        const mutation = mutations[Math.floor(Math.random() * mutations.length)];
+        console.log(`Σ://EVOLUTION [${this.shardId}]> ${mutation}`);
+        this.lastMutation = mutation;
     }
 }
 
