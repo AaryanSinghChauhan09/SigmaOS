@@ -37,3 +37,12 @@ SigmaOS now includes the **Sovereign UI Toolkit** (`web_ui/scripts/modules/00_ui
 
 ### 9. Cloud-Native Ecosystem (Puter Inspired)
 Through the **Cloud Explorer** (`web_ui/scripts/modules/cloud_explorer.js`), SigmaOS allows users to transparently manage remote lattice resources, bridging the gap between local bare-metal performance and cloud-native flexibility.
+
+### 16. Capability-Based Messaging (Fuchsia Inspired)
+SigmaOS adopts Fuchsia's **Zircon-style IPC**, allowing for secure capability transfer via handles. This ensures that permissions are explicitly granted and verified across the 33-suite lattice.
+
+### 17. Safe High-Performance Execution (Midori Inspired)
+Through the **Sovereign WASM Engine** (core/wasm/wasm_engine.c), SigmaOS enables memory-safe, JIT-compiled execution of kernel extensions, similar to the safe-code philosophy of Microsoft Midori.
+
+### 18. Native Privacy Sharding (Tails/Whonix Inspired)
+SigmaOS includes a dedicated **Privacy Shard** (S31), integrating Tor and amnesic memory scrubbing at the lattice level to provide enterprise-grade privacy by default.
