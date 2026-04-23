@@ -1279,3 +1279,84 @@ textarea.cli-input-box {
 }
 /* Zenith Compliance: Glassmorphism Primitives */ .glass-ci-audit { backdrop-filter: blur(10px); }
 .glass-ci { backdrop-filter: blur(10px); }
+
+/* --- PHASE 6: OMNIPRESENCE UI PRIMITIVES --- */
+
+.holographic-card {
+    position: relative;
+    transform-style: preserve-3d;
+    perspective: 1200px;
+    transition: transform 0.6s cubic-bezier(0.23, 1, 0.32, 1);
+}
+
+.holographic-card:hover {
+    transform: rotateY(15deg) rotateX(5deg) translateZ(30px);
+}
+
+.holographic-card::before {
+    content: '';
+    position: absolute;
+    inset: -2px;
+    background: linear-gradient(135deg, var(--acc-cyan), transparent, var(--acc-magenta));
+    z-index: -1;
+    filter: blur(8px);
+    opacity: 0;
+    transition: opacity 0.4s;
+}
+
+.holographic-card:hover::before {
+    opacity: 0.6;
+}
+
+.zenith-prism {
+    background: linear-gradient(
+        135deg,
+        rgba(255, 255, 255, 0.1),
+        rgba(255, 255, 255, 0.05)
+    );
+    backdrop-filter: blur(40px) saturate(250%) contrast(120%);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    position: relative;
+    overflow: hidden;
+}
+
+.zenith-prism::after {
+    content: '';
+    position: absolute;
+    top: -50%; left: -50%;
+    width: 200%; height: 200%;
+    background: conic-gradient(
+        from 0deg,
+        transparent,
+        rgba(0, 240, 255, 0.1),
+        rgba(255, 0, 85, 0.1),
+        transparent
+    );
+    animation: prismRotate 10s linear infinite;
+    pointer-events: none;
+}
+
+@keyframes prismRotate {
+    100% { transform: rotate(360deg); }
+}
+
+.omnipresence-mesh {
+    background-image: 
+        radial-gradient(var(--acc-cyan) 1px, transparent 1px);
+    background-size: 30px 30px;
+    mask-image: radial-gradient(ellipse at center, black, transparent 80%);
+    opacity: 0.15;
+    animation: meshPulse 4s ease-in-out infinite alternate;
+}
+
+@keyframes meshPulse {
+    from { opacity: 0.05; transform: scale(1); }
+    to { opacity: 0.2; transform: scale(1.05); }
+}
+
+/* 3D Depth HUD Element */
+.hud-3d-node {
+    transform: translateZ(50px);
+    text-shadow: 0 0 15px var(--acc-cyan);
+    font-weight: 800;
+}
