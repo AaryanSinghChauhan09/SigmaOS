@@ -4,33 +4,35 @@ SigmaOS is built on a foundation of extreme modularity, where every system compo
 
 ```mermaid
 graph TD
-    subgraph "Core Layer (Ring 0)"
-        Kernel[Minimal ASM Kernel]
-        HAL[Modular HAL Shards]
+    subgraph "Modular Core Shards (Ring 0)"
+        Genesis[S01 Genesis]
+        Silicon[S02 Silicon HAL]
+        Orch[S03 Orchestrator]
     end
     
     subgraph "Service Layer (Sovereign Lattice)"
-        Orch[S03 Orchestrator]
         Mem[S05 Memory Shard]
         Store[S06 Storage Shard]
+        Net[S07 Network Shard]
     end
     
     subgraph "Plugin Layer (User-Space)"
         UI[Zenith Dashboard]
         Ext[Hot-Swap Plugins]
-        Agents[AI Agents]
+        WASM[S21 SafeCode WASM]
     end
     
-    Kernel --> Orch
+    Genesis --> Orch
+    Silicon --> Orch
     Orch --> Mem
     Orch --> Store
     UI --> Orch
     Ext --> UI
-    Agents --> Orch
+    WASM --> Orch
 ```
 
-## 1. Shard Architecture
-Each of the 33 suites is composed of multiple shards. Shards communicate exclusively via the **S03 Orchestrator** using IPC, ensuring that no single component can compromise the entire lattice.
+## 1. Absolute Shard Architecture
+SigmaOS has achieved **Absolute Modularity**. Every system component, including the bootstrap process, the hardware abstraction layer, and the memory manager, is an isolated **Sovereign Shard**. Shards communicate exclusively via the **S03 Orchestrator** using secure handle-based IPC.
 
 ## 2. Shard Isolation & Sandboxing
 To ensure absolute reliability, SigmaOS treats each shard as a containerized unit.
@@ -53,13 +55,13 @@ graph LR
 ```
 
 ### Container-Like Isolation (Docker Inspired)
-Each shard operates within its own **Lattice Jail** (`core/virtualization/lattice_jails.c`). This provides:
+Each shard operates within its own **Lattice Jail** (`suites/S13_Virtualization/shard_jails.c`). This provides:
 - **Namespace Isolation**: Shards only see their own resources via S-9P.
 - **Resource Limits**: Deterministic memory and CPU allocation per shard.
 - **Independent Lifecycle**: Shards can be updated or restarted without affecting the global lattice state.
 
 ## 3. Fault-Tolerant Supervision (Erlang Inspired)
-We implement **Supervision Trees** (`core/lattice/supervision_tree.c`) to monitor shard health. If a shard crashes, its supervisor can automatically restart it using predefined strategies (One-for-One, One-for-All).
+We implement **Supervision Trees** (`suites/S03_Orchestrator/shard_supervision.c`) to monitor shard health. If a shard crashes, its supervisor can automatically restart it using predefined strategies (One-for-One, One-for-All).
 
 ## 4. Dynamic Service Loading
 Shards can be hot-swapped or loaded on-demand via the **SigmaPKG** manager and the **Sovereign UI Toolkit**. This allows for a system that evolves without reboots.
