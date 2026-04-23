@@ -7,20 +7,39 @@ on:
 
 jobs:
   silicon_build:
-    name: "Silicon Lattice Build"
-    runs-on: windows-latest
+    name: "Lattice Build & Test"
+    strategy:
+      matrix:
+        os: [ubuntu-latest, macos-latest, windows-latest]
+    runs-on: ${{ matrix.os }}
     steps:
       - uses: actions/checkout@v4
-      - name: Install Rust
-        uses: dtolnay/rust-toolchain@stable
-        with:
-          targets: x86_64-unknown-none
-      - name: Build Core
-        run: cargo build --release --manifest-path core/Cargo.toml
-      - name: Build Backend
-        run: cargo build --release --manifest-path gui/Cargo.toml
-      - name: Verify Shards
+
+      - name: Install Build Tools (Linux)
+        if: matrix.os == 'ubuntu-latest'
         run: |
-          echo "[CI] Verifying freestanding silicon shards..."
-          if [ ! -d "shards" ]; then exit 1; fi
-          echo "[PASS] Silicon lattice verified."
+          sudo apt-get update
+          sudo apt-get install -y nasm gcc-multilib ld-linux-x86-64
+
+      - name: Install Build Tools (macOS)
+        if: matrix.os == 'macos-latest'
+        run: |
+          brew install nasm
+
+      - name: Build Sovereign Lattice
+        run: |
+          if [ "${{ matrix.os }}" == "windows-latest" ]; then
+            powershell ./build_sovereign.ps1
+          else
+            chmod +x ./build_sovereign.sh
+            ./build_sovereign.sh
+          fi
+
+      - name: Run Sovereign Atomic Tests
+        run: |
+          if [ "${{ matrix.os }}" == "windows-latest" ]; then
+            powershell ./run_sigma_tests.ps1
+          else
+            chmod +x ./run_sigma_tests.sh
+            ./run_sigma_tests.sh
+          fi

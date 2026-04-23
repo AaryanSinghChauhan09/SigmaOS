@@ -8,6 +8,9 @@
 
 [BITS 64]
 
+extern sigma_hal_load_gdt
+extern sigma_hal_load_idt
+
 global sigma_hal_init
 global sigma_hal_personalized_pulse
 
@@ -15,12 +18,16 @@ section .text
 
 sigma_hal_init:
 ; =========================================================================
-; INIT: HANDSHAKE SILICON ROOTS
+; INIT: HANDSHAKE SILICON ROOTS & LOAD LATTICE DESCRIPTORS
 ; =========================================================================
     push rbp
     mov  rbp, rsp
     
-    ; Direct hardware handshake logic (Simulated for this Zenith shard)
+    ; Load Sovereign Descriptors
+    call sigma_hal_load_gdt
+    call sigma_hal_load_idt
+    
+    ; Direct hardware handshake logic
     mov rax, 0xDEADC0DE
     
     pop rbp
@@ -34,11 +41,9 @@ sigma_hal_personalized_pulse:
     mov  rbp, rsp
     
     ; Pulse hardware color shift (Direct to VGA Framebuffer at 0xA0000)
-    ; In a bare-metal SigmaOS, this would be:
     ; mov rdi, 0xA0000 
     ; mov al, 0x55 ; HSL Alpha Shard
     ; stosb
     
-    sigma_hal_end:
     pop rbp
     ret

@@ -52,6 +52,26 @@
                 <p>All modules successfully absorbed and executing perfectly. View the terminal for live output.</p>
             </div>
 
+            <!-- Real-time Vitals HUD -->
+            <div class="vitals-hud" id="vitalsHud">
+                <div class="vitals-card">
+                    <span class="vitals-label">CPU LOAD</span>
+                    <span class="vitals-value" data-metric="cpu_usage">0%</span>
+                </div>
+                <div class="vitals-card">
+                    <span class="vitals-label">MEMORY</span>
+                    <span class="vitals-value" data-metric="memory_usage">0 KB</span>
+                </div>
+                <div class="vitals-card">
+                    <span class="vitals-label">PROCESSES</span>
+                    <span class="vitals-value" data-metric="process_count">0</span>
+                </div>
+                <div class="vitals-card">
+                    <span class="vitals-label">ACTIVE SHARDS</span>
+                    <span class="vitals-value" data-metric="active_shards">200</span>
+                </div>
+            </div>
+
             <!-- Shard Grid rendered dynamically via JS -->
             <div class="shard-grid" id="shardContainer">
                 <!-- Javascript will inject the 200 shards here -->
