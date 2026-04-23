@@ -6,12 +6,10 @@ on:
     branches: ["main"]
 
 jobs:
-  silicon_build:
-    name: "Lattice Build & Test"
-    strategy:
-      matrix:
-        os: [ubuntu-latest, macos-latest]
-    runs-on: ${{ matrix.os }}
+  # ── Ubuntu: Full ELF kernel build + link ────────────────────────────────
+  kernel_build_linux:
+    name: "Kernel Build (Linux ELF)"
+    runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
         with:
@@ -22,18 +20,20 @@ jobs:
         with:
           node-version: '20'
 
-      - name: Install Build Tools (Linux)
-        if: matrix.os == 'ubuntu-latest'
+      - name: Cache build objects
+        uses: actions/cache@v4
+        with:
+          path: build/
+          key: sovereign-build-linux-${{ hashFiles('suites/**', 'build_sovereign.sh') }}
+          restore-keys: |
+            sovereign-build-linux-
+
+      - name: Install Build Tools
         run: |
-          sudo apt-get update
+          sudo apt-get update -qq
           sudo apt-get install -y nasm g++ binutils
 
-      - name: Install Build Tools (macOS)
-        if: matrix.os == 'macos-latest'
-        run: |
-          brew install nasm gcc
-
-      - name: Repair Build Environment (Sovereign Shim Synthesis)
+      - name: Repair Build Environment
         run: node repair_build.js
 
       - name: Build Sovereign Lattice
@@ -41,7 +41,42 @@ jobs:
           chmod +x ./build_sovereign.sh
           ./build_sovereign.sh
 
+      - name: Upload kernel binary
+        uses: actions/upload-artifact@v4
+        if: success()
+        with:
+          name: sigmaos_zenith_linux
+          path: build/sigmaos_zenith
+          if-no-files-found: warn
+
       - name: Run Sovereign Atomic Tests
         run: |
-          chmod +x ./run_sigma_tests.sh 2>/dev/null || true
-          ./run_sigma_tests.sh 2>/dev/null || echo "Σ [INFO] Tests skipped (no test runner found)"
+          chmod +x ./run_sigma_tests.sh
+          ./run_sigma_tests.sh
+
+  # ── macOS: Compilation validation only (no ELF link) ───────────────────
+  compilation_macos:
+    name: "Compilation Validation (macOS)"
+    runs-on: macos-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          submodules: recursive
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Install Build Tools
+        run: |
+          brew install nasm || brew upgrade nasm || true
+          brew install gcc || true
+
+      - name: Repair Build Environment
+        run: node repair_build.js
+
+      - name: Validate Compilation (macOS)
+        run: |
+          chmod +x ./build_sovereign.sh
+          ./build_sovereign.sh
