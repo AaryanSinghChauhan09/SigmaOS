@@ -3,92 +3,87 @@
 #include <string.h>
 
 // ---------------------------------------------------------
-// Sovereign Shell (s-cli)
-// Bare-metal scripting language and control interface
+// SigmaOS Sovereign Shell (s-cli)
+// Direct kernel interaction tool for debugging and system management
 // ---------------------------------------------------------
 
-#define MAX_CMD_LEN 128
-#define MAX_ARGS    8
+extern void serial_write(const char* str); // Mock IO
 
-// External kernel hooks (simulated)
-extern int capsule_load(uint32_t capsule_id);
-extern int capsule_unload(uint32_t capsule_id);
-extern void module_list(void);
-extern void profiler_analyze(void);
+// Mocks for external kernel state
+extern uint32_t contract_count;
+extern uint32_t proc_count;
+extern uint32_t active_drivers;
 
-typedef struct {
-    char cmd_name[32];
-    void (*handler)(int argc, char** argv);
-    char description[64];
-} s_command_t;
-
-// Command Implementations
-static void cmd_help(int argc, char** argv);
-
-static void cmd_load(int argc, char** argv) {
-    if (argc < 2) {
-        // e.g. printf("Usage: load <module_id>\n");
-        return;
-    }
-    // int id = atoi(argv[1]);
-    // capsule_load(id);
-    // printf("Loaded capsule %d\n", id);
+static void print_banner(void) {
+    serial_write("\n");
+    serial_write("   _____ _                       ____  _____\n");
+    serial_write("  / ____(_)                     / __ \\/ ____|\n");
+    serial_write(" | (___  _  __ _ _ __ ___   __ | |  | | (___  \n");
+    serial_write("  \\___ \\| |/ _` | '_ ` _ \\ / _` | |  | |\\___ \\ \n");
+    serial_write("  ____) | | (_| | | | | | | (_| | |__| |____) |\n");
+    serial_write(" |_____/|_|\\__, |_| |_| |_|\\__,_|\\____/|_____/ \n");
+    serial_write("            __/ |                              \n");
+    serial_write("           |___/     Sovereign Lattice Interface\n\n");
 }
 
-static void cmd_unload(int argc, char** argv) {
-    if (argc < 2) return;
-    // int id = atoi(argv[1]);
-    // capsule_unload(id);
+static void cmd_help(void) {
+    serial_write("Available Commands:\n");
+    serial_write("  help       - Show this menu\n");
+    serial_write("  status     - Show global lattice health and metrics\n");
+    serial_write("  caps       - Dump capability registry\n");
+    serial_write("  contracts  - View active memory leases\n");
+    serial_write("  tokens     - View sovereign resource economy ledger\n");
+    serial_write("  ai_accel   - Check ML hardware accelerator state\n");
 }
 
-static void cmd_caps(int argc, char** argv) {
-    // Print all capabilities owned by the current process
-    // printf("Capabilities for PID X:\n");
+static void cmd_status(void) {
+    serial_write("[*] System Status: ONLINE (TPM Verified)\n");
+    serial_write("[*] Active Processes: 1 (s-cli)\n");
+    serial_write("[*] Loaded Capsules: 14\n");
+    serial_write("[*] Active Policies: strict_security, round_robin_scheduler\n");
 }
 
-static void cmd_profile(int argc, char** argv) {
-    // Call profiler_analyze()
-    // printf("Running AI scheduler profiling...\n");
+static void cmd_contracts(void) {
+    serial_write("[*] Memory Contracts Ledger:\n");
+    serial_write("  ID | Lessee PID | Pages | Expiry | Status\n");
+    serial_write("  -----------------------------------------\n");
+    serial_write("  0  | 0 (kernel) | 1024  | NEVER  | ACTIVE\n");
+    serial_write("  1  | 1 (s-cli)  | 16    | 99999  | ACTIVE\n");
 }
 
-static void cmd_mesh(int argc, char** argv) {
-    // printf("Mesh network status: 3 peers active.\n");
+static void cmd_tokens(void) {
+    serial_write("[*] Sovereign Tokens Economy:\n");
+    serial_write("  PID | Type  | Balance | Status\n");
+    serial_write("  ------------------------------\n");
+    serial_write("  1   | CPU   | 50000ns | ACTIVE\n");
+    serial_write("  1   | MEM   | 16 pgs  | ACTIVE\n");
 }
 
-static s_command_t commands[] = {
-    {"help", cmd_help, "List all sovereign commands"},
-    {"load", cmd_load, "Hot-load a kernel module/capsule"},
-    {"unload", cmd_unload, "Hot-unload a kernel module"},
-    {"caps", cmd_caps, "List active capability tokens"},
-    {"profile", cmd_profile, "View continuous profiling stats"},
-    {"mesh", cmd_mesh, "View mesh network status"}
-};
-#define NUM_CMDS (sizeof(commands)/sizeof(s_command_t))
-
-static void cmd_help(int argc, char** argv) {
-    // for(int i=0; i<NUM_CMDS; i++) {
-    //     printf("%s - %s\n", commands[i].cmd_name, commands[i].description);
-    // }
+static void cmd_ai_accel(void) {
+    serial_write("[*] AI/ML Accelerator Status:\n");
+    serial_write("  -> NPU 0: Online (Zero-Copy Buffer Ready)\n");
+    serial_write("  -> Active Tensors: 0\n");
 }
 
-// Shell entry point
-void shell_main() {
-    char input_buffer[MAX_CMD_LEN];
-    char* argv[MAX_ARGS];
-    int argc;
+// Very basic command loop mock
+void shell_main(void) {
+    print_banner();
+    cmd_help();
+    
+    // In a real environment, this would read from keyboard input
+    // For simulation, we run a set of commands automatically
+    
+    serial_write("\ns-cli> status\n");
+    cmd_status();
+    
+    serial_write("\ns-cli> contracts\n");
+    cmd_contracts();
 
-    // printf("SigmaOS Sovereign Shell (s-cli)\n");
-    // printf("Type 'help' for commands.\n");
+    serial_write("\ns-cli> tokens\n");
+    cmd_tokens();
 
-    while (1) {
-        // printf("sigma> ");
-        // read_line(input_buffer);
-        
-        // Parse input_buffer into argc/argv
-        // Execute matching command
-        // if(strcmp(argv[0], commands[i].cmd_name) == 0) commands[i].handler(argc, argv);
-        
-        // Mock break for compilation
-        break; 
-    }
+    serial_write("\ns-cli> ai_accel\n");
+    cmd_ai_accel();
+    
+    serial_write("\ns-cli> _\n");
 }

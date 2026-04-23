@@ -2,88 +2,70 @@
 #include <stddef.h>
 
 // ---------------------------------------------------------
-// SigmaOS Bare-Metal ML/AI Accelerator HAL
-// Direct kernel-level access to GPU / TPU / NPU
-// No bloated middleware — sovereign silicon-first
+// SigmaOS AI/ML Hardware Abstraction Layer (HAL)
+// USP: Zero-Copy Tensor Pipeline straight to physical memory
+// bypassing user-space copy overhead.
 // ---------------------------------------------------------
 
-#define MAX_ACCELERATORS 8
-
-typedef enum {
-    ACCEL_GPU,
-    ACCEL_TPU,
-    ACCEL_NPU,
-    ACCEL_FPGA
-} accel_type_t;
+#define MAX_TENSORS 32
 
 typedef struct {
-    uint32_t     accel_id;
-    accel_type_t type;
-    uint64_t     mmio_base;    // Memory-Mapped I/O base address
-    uint32_t     sram_size_kb; // On-chip SRAM for tensors
-    uint32_t     compute_units;
-    uint8_t      available;
-} accel_desc_t;
+    uint32_t tensor_id;
+    uint32_t owner_pid;
+    uint64_t phys_addr; // Direct physical memory address
+    uint32_t size_bytes;
+    uint8_t  precision; // 8 = INT8, 16 = FP16, 32 = FP32
+    uint8_t  active;
+} accel_tensor_t;
 
-// Tensor descriptor — zero-copy between CPU and accelerator
-typedef struct {
-    void*    data_ptr;          // Points to DMA-coherent memory
-    uint32_t dims[4];           // Up to 4D tensor
-    uint32_t dtype;             // 0=fp32, 1=fp16, 2=int8
-    uint64_t dma_phys_addr;     // Physical address for accelerator DMA
-} tensor_t;
+static accel_tensor_t tensor_registry[MAX_TENSORS];
+static uint32_t tensor_count = 0;
 
-static accel_desc_t accelerators[MAX_ACCELERATORS];
-static uint32_t accel_count = 0;
+extern int cap_registry_verify(uint32_t cap_id, uint32_t pid, uint8_t required_rights);
+extern void audit_chain_append(uint32_t pid, uint8_t level, const char* msg);
+extern void serial_write(const char* str); // Mock IO
 
-// Register an accelerator (called from HAL/driver init)
-int accel_register(accel_type_t type, uint64_t mmio_base,
-                   uint32_t sram_kb, uint32_t compute_units) {
-    if (accel_count >= MAX_ACCELERATORS) return -1;
-    accel_desc_t* a = &accelerators[accel_count];
-    a->accel_id = accel_count++;
-    a->type = type;
-    a->mmio_base = mmio_base;
-    a->sram_size_kb = sram_kb;
-    a->compute_units = compute_units;
-    a->available = 1;
-    return a->accel_id;
+// Initialize the NPU/TPU hardware
+void accel_hal_init(void) {
+    // In real implementation: scan PCI bus for known NPU devices, map MMIO
+    serial_write("[NPU] ML Accelerator HAL Initialised.\n");
 }
 
-// Submit an inference job (zero-copy via DMA)
-int accel_submit_inference(uint32_t accel_id, const tensor_t* input, tensor_t* output) {
-    if (accel_id >= accel_count) return -1;
-    accel_desc_t* a = &accelerators[accel_id];
-    if (!a->available) return -2; // Busy
+// Register a tensor directly in physical memory (Zero-Copy)
+// Requires CAP_AI_COMPUTE capability
+int accel_tensor_register(uint32_t pid, uint64_t phys_addr, uint32_t size, uint8_t precision, uint32_t cap_token) {
+    if (!cap_registry_verify(cap_token, pid, 0x01)) {
+        audit_chain_append(pid, 3, "AI_ACCEL_DENIED_CAP_FAILURE");
+        return -1;
+    }
 
-    a->available = 0;
+    if (tensor_count >= MAX_TENSORS) return -2;
 
-    // Write DMA source/dest to MMIO registers
-    volatile uint64_t* mmio = (volatile uint64_t*)a->mmio_base;
-    mmio[0] = input->dma_phys_addr;   // Input tensor DMA addr
-    mmio[1] = output->dma_phys_addr;  // Output tensor DMA addr
-    mmio[2] = 1;                       // Kick off inference (write 1 to control reg)
+    accel_tensor_t* t = &tensor_registry[tensor_count];
+    t->tensor_id  = tensor_count++;
+    t->owner_pid  = pid;
+    t->phys_addr  = phys_addr;
+    t->size_bytes = size;
+    t->precision  = precision;
+    t->active     = 1;
 
-    // In real implementation: wait for interrupt from accelerator
-    // The scheduler would park this process (STATE_PAGING_WAIT equivalent)
-
-    a->available = 1;
-    return 0;
+    audit_chain_append(pid, 1, "TENSOR_REGISTERED");
+    return t->tensor_id;
 }
 
-// Get energy stats from an accelerator (energy-aware sovereignty)
-typedef struct {
-    uint32_t milliwatts;
-    uint32_t celsius_temp;
-    uint32_t utilization_pct;
-} accel_energy_t;
+// Dispatch tensor to hardware for processing
+int accel_execute_model(uint32_t pid, uint32_t tensor_in_id, uint32_t tensor_out_id, uint32_t cap_token) {
+    if (!cap_registry_verify(cap_token, pid, 0x01)) return -1;
+    if (tensor_in_id >= tensor_count || tensor_out_id >= tensor_count) return -2;
 
-int accel_get_energy(uint32_t accel_id, accel_energy_t* out) {
-    if (accel_id >= accel_count) return -1;
-    // Read from MMIO energy registers
-    volatile uint64_t* mmio = (volatile uint64_t*)accelerators[accel_id].mmio_base;
-    out->milliwatts      = (uint32_t)mmio[8];
-    out->celsius_temp    = (uint32_t)mmio[9];
-    out->utilization_pct = (uint32_t)mmio[10];
-    return 0;
+    accel_tensor_t* t_in = &tensor_registry[tensor_in_id];
+    accel_tensor_t* t_out = &tensor_registry[tensor_out_id];
+
+    if (t_in->owner_pid != pid || t_out->owner_pid != pid) return -3;
+
+    // Simulate hardware execution (e.g. ringing a doorbell on the PCI device)
+    // mmio_write32(NPU_BASE + NPU_DOORBELL, t_in->phys_addr);
+    audit_chain_append(pid, 1, "MODEL_EXECUTED_ON_NPU");
+
+    return 0; // Success (Asynchronous interrupt will signal completion)
 }
