@@ -1,95 +1,90 @@
-# =============================================================================
-# Σ SIGMAOS: SOVEREIGN UNIVERSAL MAKEFILE (v10.0 - PURE SILICON EDITION)
-# =============================================================================
-# Architecture: 500-Suite Sovereign Lattice
-# Standards: Zero-Std, Freestanding, Pure ASM/C20
-# =============================================================================
+# ============================================================
+# SigmaOS Sovereign Makefile
+# Convenience wrapper around the Python build orchestrator.
+# All targets are architecture-aware and capsule-driven.
+# ============================================================
 
-# --- TOOLCHAIN ---
-GCC       := C:/msys64/mingw64/bin/gcc.exe
-GXX       := C:/msys64/mingw64/bin/g++.exe
-NASM      := nasm
-LD        := ld
-OBJCOPY   := objcopy
+ARCH      ?= x86_64
+PYTHON    := python3
+BUILDER   := scripts/sovereign_builder.py
+ISO_SCRIPT := scripts/build_iso.sh
+BUILD_DIR := build/$(ARCH)
 
-# --- COMPILER FLAGS (Sovereign Hardening) ---
-COMMON_FLAGS := -ffreestanding -nostdlib -fno-stack-protector -mno-red-zone -O2 -Wall -Wextra
-CFLAGS       := -std=c11 $(COMMON_FLAGS)
-CXXFLAGS     := -std=c++20 -fno-exceptions -fno-rtti $(COMMON_FLAGS)
-ASMFLAGS     := -f elf64
-LDFLAGS      := -nostdlib -static -T suites/S01_Genesis/shards/sigma.ld
+.PHONY: all x86_64 aarch64 riscv64 iso clean run test help
 
-# --- DIRECTORIES ---
-SUITES_DIR := suites
-BUILD_DIR  := build
+# Default target
+all: x86_64
 
-# --- SOURCE DISCOVERY ---
-ALL_C_SRCS   := $(shell powershell -Command "Get-ChildItem -Path $(SUITES_DIR), core, cli, userland -Filter *.c -Recurse -ErrorAction SilentlyContinue | ForEach-Object { \$$_.FullName }")
-ALL_CPP_SRCS := $(shell powershell -Command "Get-ChildItem -Path $(SUITES_DIR), core, cli, userland -Filter *.cpp -Recurse -ErrorAction SilentlyContinue | ForEach-Object { \$$_.FullName }")
-ALL_ASM_SRCS := $(shell powershell -Command "Get-ChildItem -Path $(SUITES_DIR), core, cli, userland -Filter *.asm -Recurse -ErrorAction SilentlyContinue | ForEach-Object { \$$_.FullName }")
+## ── Architecture Targets ──────────────────────────────────
 
-# Include paths
-INCLUDES     := -I. -Iinclude $(shell powershell -Command "Get-ChildItem -Path $(SUITES_DIR), core, cli, userland -Directory -Recurse -ErrorAction SilentlyContinue | ForEach-Object { '-I' + \$$_.FullName }")
+x86_64:
+	@echo "[*] Building SigmaOS for x86_64..."
+	@$(PYTHON) $(BUILDER) x86_64
 
-# --- OBJECTS ---
-OBJS := $(patsubst %.c, $(BUILD_DIR)/%.o, $(notdir $(ALL_C_SRCS))) \
-        $(patsubst %.cpp, $(BUILD_DIR)/%.o, $(notdir $(ALL_CPP_SRCS))) \
-        $(patsubst %.asm, $(BUILD_DIR)/%.o, $(notdir $(ALL_ASM_SRCS)))
+aarch64:
+	@echo "[*] Building SigmaOS for ARM64..."
+	@$(PYTHON) $(BUILDER) aarch64
 
-.PHONY: all clean info verify dirs kernel
+riscv64:
+	@echo "[*] Building SigmaOS for RISC-V 64..."
+	@$(PYTHON) $(BUILDER) riscv64
 
-all: dirs kernel info
+## ── Image Packaging ──────────────────────────────────────
 
-dirs:
-	@powershell -Command "if (!(Test-Path $(BUILD_DIR))) { New-Item -ItemType Directory -Path $(BUILD_DIR) }"
+iso:
+	@echo "[*] Building bootable ISO for $(ARCH)..."
+	@bash $(ISO_SCRIPT) $(ARCH)
 
-kernel: $(OBJS)
-	@echo "[LD] Linking Σ SIGMAOS SOVEREIGN LATTICE (Pure Silicon)..."
-	@$(LD) $(LDFLAGS) $(OBJS) -o $(BUILD_DIR)/sigmaos_zenith
-	@echo "[OK] build/sigmaos_zenith is ready."
+## ── QEMU Smoke Testing ───────────────────────────────────
 
-# VPATH for pattern matching
-vpath %.c $(shell powershell -Command "Get-ChildItem -Path $(SUITES_DIR), core, cli, userland -Directory -Recurse -ErrorAction SilentlyContinue | ForEach-Object { \$$_.FullName }")
-vpath %.cpp $(shell powershell -Command "Get-ChildItem -Path $(SUITES_DIR), core, cli, userland -Directory -Recurse -ErrorAction SilentlyContinue | ForEach-Object { \$$_.FullName }")
-vpath %.asm $(shell powershell -Command "Get-ChildItem -Path $(SUITES_DIR), core, cli, userland -Directory -Recurse -ErrorAction SilentlyContinue | ForEach-Object { \$$_.FullName }")
+run: iso
+	@echo "[*] Booting SigmaOS in QEMU ($(ARCH))..."
+	qemu-system-$(ARCH) \
+		-cdrom $(BUILD_DIR)/sigmaos_$(ARCH).iso \
+		-m 512M \
+		-serial stdio \
+		-no-reboot \
+		-display none
 
-$(BUILD_DIR)/%.o: %.c
-	@echo "[CC]  $<"
-	@$(GCC) $(CFLAGS) $(INCLUDES) -c $< -o $@
+## ── Module Scaffolding ───────────────────────────────────
 
-$(BUILD_DIR)/%.o: %.cpp
-	@echo "[CXX] $<"
-	@$(GXX) $(CXXFLAGS) $(INCLUDES) -c $< -o $@
+scaffold:
+	@echo "Usage: make scaffold-<module_name>-<type>"
+scaffold-%:
+	$(eval PARTS := $(subst -, ,$*))
+	@bash scripts/scaffold_module.sh $(word 1,$(PARTS)) $(word 2,$(PARTS))
 
-$(BUILD_DIR)/%.o: %.asm
-	@echo "[ASM] $<"
-	@$(NASM) $(ASMFLAGS) $< -o $@
+## ── Cleanup ──────────────────────────────────────────────
 
 clean:
-	@powershell -Command "if (Test-Path $(BUILD_DIR)) { Remove-Item -Recurse -Force $(BUILD_DIR) }"
-	@echo "[CLEAN] Done."
+	@echo "[*] Cleaning build artifacts..."
+	@rm -rf build/
+	@find modules/ -name "*.o" -delete
+	@echo "[+] Clean complete."
 
-# --- EMULATION & DEBUGGING ---
-QEMU = qemu-system-x86_64
-QEMU_FLAGS = -kernel $(BUILD_DIR)/sigmaos_zenith -m 2G -display none -serial stdio
+## ── Module Graph ─────────────────────────────────────────
 
-run: all
-	@echo "[QEMU] Launching SigmaOS Sovereign Lattice..."
-	@$(QEMU) $(QEMU_FLAGS)
+graph:
+	@echo "[*] Printing module dependency graph..."
+	@$(PYTHON) -c "\
+import json, os; \
+[print(m['module'], '->', m.get('dependencies',[])) \
+ for root,_,files in os.walk('modules') \
+ if 'module.json' in files \
+ for m in [json.load(open(os.path.join(root,'module.json')))]]"
 
-debug: all
-	@echo "[GDB] Starting QEMU in debug mode (port 1234)..."
-	@$(QEMU) $(QEMU_FLAGS) -s -S &
-	@gdb $(BUILD_DIR)/sigmaos_zenith -ex "target remote localhost:1234"
+## ── Help ─────────────────────────────────────────────────
 
-profile: all
-	@echo "[VALGRIND] Profiling lattice shards..."
-	@valgrind --leak-check=full --show-leak-kinds=all ./$(BUILD_DIR)/sigmaos_zenith
-
-info:
+help:
 	@echo ""
-	@echo "Σ SigmaOS Sovereign Build v10.0 (Pure Silicon)"
-	@echo "  Lattice Suites Indexed: 500"
-	@echo "  Sources Found:          $(words $(ALL_C_SRCS) $(ALL_CPP_SRCS) $(ALL_ASM_SRCS))"
-	@echo "  Dependency State:       Zero-Std / Freestanding"
+	@echo "  SigmaOS Sovereign Build System"
+	@echo "  ================================"
+	@echo "  make                - Build for x86_64"
+	@echo "  make aarch64        - Build for ARM64"
+	@echo "  make riscv64        - Build for RISC-V"
+	@echo "  make iso            - Package bootable ISO"
+	@echo "  make run            - Boot in QEMU"
+	@echo "  make scaffold-name-type - Scaffold new module"
+	@echo "  make graph          - Show module dep graph"
+	@echo "  make clean          - Remove build artifacts"
 	@echo ""
