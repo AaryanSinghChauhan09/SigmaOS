@@ -77,3 +77,9 @@ Using the **S-Cap** system, shards are restricted to only the resources they nee
 | Drivers | User-space Modular Drivers | L4 / Redox |
 | Orchestration | Supervision Trees | Erlang / OTP |
 | Config | Declarative JSON | NixOS / Systemd |
+
+## 6. Service Orchestration (Systemd Inspired)
+SigmaOS utilizes **S-Systemd** style unit files (suites/S03_Orchestrator/shard_units.c) to define shard dependencies and lifecycle events. Shards can specify After= and Requires= relationships, ensuring a deterministic and reliable boot sequence across the 500-shard lattice.
+
+## 7. Personalization Widgets (Conky Inspired)
+Through the **Zenith Widget System** (web_ui/widgets/), users can deploy real-time monitoring tools like the conky_widget.js to track lattice performance and system health directly on their dashboard.
