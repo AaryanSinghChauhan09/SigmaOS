@@ -1,38 +1,31 @@
 /**
- * SigmaOS: Sovereign Control Center
- * Inspired by Deepin OS and OpenWrt.
- * USP: Centralized management of all 33 suites and lattice shards.
+ * Zenith Dashboard: Lattice Control Center
+ * Inspired by Deepin and GNOME.
+ * USP: Centralized management hub for shards, plugins, and system health.
  */
 
-const ControlCenter = {
-    toggleShard(shardId, status) {
-        console.log(`Σ://CONTROL> Toggling ${shardId} to ${status ? 'ONLINE' : 'OFFLINE'}`);
-        UIUtils.appendLog('audit-log', `CONTROL: Shard ${shardId} is now ${status ? 'Active' : 'Dormant'}.`, status ? 'success' : 'info');
-    },
-
-    render(container) {
-        const hub = SovereignUI.createComponent('div', { className: 'control-hub mica-effect' }, [
-            SovereignUI.createComponent('h2', {}, ['Lattice Control Center']),
-            this.createToggle('S04_HAL', true),
-            this.createToggle('S05_Memory', true),
-            this.createToggle('S11_CloudExplorer', false),
-            this.createToggle('S30_Supremacy', true)
-        ]);
-        container.appendChild(hub);
-    },
-
-    createToggle(id, initialState) {
-        return SovereignUI.createComponent('div', { className: 'control-item' }, [
-            SovereignUI.createComponent('span', {}, [id]),
-            SovereignUI.createComponent('input', { 
-                type: 'checkbox', 
-                checked: initialState,
-                onchange: (e) => this.toggleShard(id, e.target.checked)
-            })
-        ]);
+const LatticeControlCenter = {
+    render() {
+        SovereignUI.createWindow("Control Center", `
+            <div class='control-center'>
+                <section>
+                    <h4>🛡️ System Health</h4>
+                    <p>Lattice Status: <span style='color: lime;'>SOVEREIGN</span></p>
+                    <button onclick='SovereignDoctor.run()'>Run Sigma Doctor</button>
+                </section>
+                <hr>
+                <section>
+                    <h4>🧩 Shard Management</h4>
+                    <p>Active Shards: 500 / 500</p>
+                    <button onclick='ShardManager.rebalance()'>Rebalance Lattice</button>
+                </section>
+                <hr>
+                <section>
+                    <h4>🎨 Personalization</h4>
+                    <button onclick='ThemingEngine.switchMode("dark")'>Dark Mode</button>
+                    <button onclick='ThemingEngine.switchMode("matrix")'>Matrix Theme</button>
+                </section>
+            </div>
+        `);
     }
 };
-
-if (typeof window !== 'undefined') {
-    window.SigmaControlCenter = ControlCenter;
-}
