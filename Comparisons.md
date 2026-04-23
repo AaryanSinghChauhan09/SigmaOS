@@ -49,3 +49,9 @@ SigmaOS utilizes **Taskfile.yml** for modern, declarative task orchestration, en
 
 ### 13. Deep UI Customization (KDE/GNOME Inspired)
 Through the **Sovereign Theming Engine** and **Widget Engine**, users can personalize the Zenith Dashboard with real-time monitors and dynamic visual profiles, mirroring the flexibility of high-end desktop environments.
+
+### 14. Fault Tolerance & Supervision (Erlang Inspired)
+SigmaOS integrates **Supervision Trees**, allowing the lattice to automatically recover from shard crashes with industrial-grade reliability.
+
+### 15. User Onboarding & Control (Elementary/Deepin Inspired)
+Through the **Sovereign Onboarding Wizard** and **Control Center**, SigmaOS reduces the barrier to entry for complex lattice management, providing an intuitive experience for both beginners and experts.
