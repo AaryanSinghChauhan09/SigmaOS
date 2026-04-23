@@ -1,0 +1,12 @@
+{
+  "module": "caps_security",
+  "version": "1.0.0",
+  "type": "security",
+  "arch": ["x86_64", "aarch64", "riscv64"],
+  "dependencies": ["sha256", "ed25519_stub", "audit_chain"],
+  "capabilities_required": ["CAP_KERNEL_ROOT"],
+  "capabilities_provided": ["CAP_READ", "CAP_WRITE", "CAP_EXECUTE", "CAP_NET_BIND"],
+  "entry_point": "caps_init",
+  "author": "SigmaOS Security Team",
+  "description": "Capability registry and auto-revocation security layer"
+}

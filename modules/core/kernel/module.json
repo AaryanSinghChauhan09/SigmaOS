@@ -1,0 +1,12 @@
+{
+  "module": "kernel_main",
+  "version": "1.0.0",
+  "type": "core",
+  "arch": ["x86_64", "aarch64", "riscv64"],
+  "dependencies": ["paging", "numa_alloc", "scheduler", "ipc", "watchdog", "ai_scheduler"],
+  "capabilities_required": ["CAP_KERNEL_ROOT"],
+  "capabilities_provided": ["CAP_BOOT_CONTEXT"],
+  "entry_point": "kernel_main",
+  "author": "SigmaOS Core Team",
+  "description": "Master kernel boot sequence — wires all sovereign subsystems"
+}

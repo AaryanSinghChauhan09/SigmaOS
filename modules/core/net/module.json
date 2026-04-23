@@ -1,0 +1,12 @@
+{
+  "module": "sovereign_net",
+  "version": "1.0.0",
+  "type": "network",
+  "arch": ["x86_64", "aarch64", "riscv64"],
+  "dependencies": ["chacha20", "tcpip", "mesh_net"],
+  "capabilities_required": ["CAP_NET_BIND"],
+  "capabilities_provided": ["CAP_NET_SEND", "CAP_NET_RECV"],
+  "entry_point": "net_init",
+  "author": "SigmaOS Networking Team",
+  "description": "Encrypted-by-default sovereign network stack with mesh support"
+}
