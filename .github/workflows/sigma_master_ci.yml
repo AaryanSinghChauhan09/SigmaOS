@@ -133,6 +133,11 @@ jobs:
         with:
           submodules: recursive
 
+      - name: Install Build Tools
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y nasm g++ binutils
+
       - name: Initialize CodeQL
         uses: github/codeql-action/init@v3
         with:
@@ -141,6 +146,7 @@ jobs:
 
       - name: Build for CodeQL (Manual Mode)
         run: |
+          node repair_build.js
           chmod +x ./build_sovereign.sh
           ./build_sovereign.sh
 
