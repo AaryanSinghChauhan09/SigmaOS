@@ -24,11 +24,10 @@ mkdir -p $BUILD_DIR
 mkdir -p core/lattice/include
 mkdir -p suites/include
 
-# ── Platform detection ────────────────────────────────────────────────────────
+# ── Compiler detection ────────────────────────────────────────────────────────
 PLATFORM="linux"
 [[ "$(uname -s)" == "Darwin" ]] && PLATFORM="macos"
 
-# ── Compiler detection ────────────────────────────────────────────────────────
 if command -v g++ &>/dev/null; then
     GCC="g++"
 elif command -v clang++ &>/dev/null; then
@@ -40,13 +39,34 @@ fi
 NASM="nasm"
 LD="ld"
 
+# ── Pre-flight Checks ────────────────────────────────────────────────────────
+MISSING=0
+check_tool() {
+    if ! command -v "$1" &>/dev/null; then
+        echo "  [ERR] Tool not found: $1"
+        MISSING=1
+    fi
+}
+check_tool "$NASM"
+check_tool "$GCC"
+if [ "$PLATFORM" == "linux" ]; then check_tool "$LD"; fi
+
+if [ $MISSING -eq 1 ]; then
+    echo "Σ [FAIL] Build environment incomplete. See errors above."
+    exit 1
+fi
+
+mkdir -p $BUILD_DIR
+mkdir -p core/lattice/include
+mkdir -p suites/include
+
 # ── Include Path Synthesis ────────────────────────────────────────────────────
 INCLUDES="-I. -Isuites/include -Isuites -Icore/lattice/include \
           -Isuites/S01_Genesis -Isuites/S01_Genesis/include \
           -Isuites/S01_Genesis/libc -Isuites/S30_Supremacy"
 while IFS= read -r dir; do
     INCLUDES="$INCLUDES -I$dir"
-done < <(find suites core cli userland -type d 2>/dev/null)
+done < <(find suites core cli userland -maxdepth 4 -type d 2>/dev/null | grep -v "\.git" | grep -v "build")
 
 # ── Compiler Flags ────────────────────────────────────────────────────────────
 BARE_FLAGS="-m64 -ffreestanding -nostdlib -fno-stack-protector -mno-red-zone \

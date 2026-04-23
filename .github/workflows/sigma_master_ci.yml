@@ -5,11 +5,16 @@ on:
   pull_request:
     branches: ["main"]
 
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
 jobs:
   # ── Ubuntu: Full ELF kernel build + link ────────────────────────────────
   kernel_build_linux:
     name: "Kernel Build (Linux ELF)"
     runs-on: ubuntu-latest
+    timeout-minutes: 10
     steps:
       - uses: actions/checkout@v4
         with:
@@ -58,6 +63,7 @@ jobs:
   compilation_macos:
     name: "Compilation Validation (macOS)"
     runs-on: macos-latest
+    timeout-minutes: 15
     steps:
       - uses: actions/checkout@v4
         with:
