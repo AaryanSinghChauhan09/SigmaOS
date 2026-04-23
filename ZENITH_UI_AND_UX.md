@@ -18,3 +18,10 @@ Located in `modules/ui/zenith_compositor.c` and `modules/ui/user_profile.c`.
 
 ### 3. Focus Mode UX
 - Built directly into the kernel's automation loop. If Focus Mode is enabled via the user profile, the Zenith UI compositor automatically drops rendering for non-critical notification overlays, and the scheduler deprioritizes background networking tasks.
+
+### 4. Tiling Window Manager & Micro-Animations
+- **Window Manager (`window_manager.c`)**: Supports declarative workspaces with hot-swappable layouts (Floating, BSP Tiling, Monocle). 
+- **Spring Physics (`animations.c`)**: Moving and resizing windows doesn't use static linear interpolation. SigmaOS natively implements Hooke's Law spring physics (tension & friction) in C. Windows bounce, snap, and scale with 120Hz fluidity.
+
+### 5. Global Hotkey Automations
+- **Input Routing (`hotkeys.c`)**: Hotkeys aren't handled by a user-space daemon (like `sxhkd`). They are intercepted directly at the HID driver level. Pressing `SUPER + ENTER` to launch a terminal is processed in Ring 0, executing instantly without context-switch latency.
