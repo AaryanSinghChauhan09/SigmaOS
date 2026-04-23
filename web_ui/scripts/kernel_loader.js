@@ -642,28 +642,45 @@ const SYSTEM_MODULES = [
 ];
 
 async function loadSystem() {
-    console.log("Σ://BOOT> Initiating Modular Lattice Loading...");
+    const startTime = performance.now();
+    console.log("Σ://BOOT> Initiating High-Performance Modular Lattice Loading...");
     
-    for (const module of SYSTEM_MODULES) {
-        try {
-            await loadScript(module);
-        } catch (e) {
-            console.error(`Σ://BOOT_ERR> Failed to load shard: ${module}`, e);
-        }
+    // Batch size of 20 for parallel loading without overwhelming the browser
+    const BATCH_SIZE = 20;
+    for (let i = 0; i < SYSTEM_MODULES.length; i += BATCH_SIZE) {
+        const batch = SYSTEM_MODULES.slice(i, i + BATCH_SIZE);
+        await Promise.all(batch.map(module => 
+            loadScript(module).catch(e => {
+                console.error(`Σ://BOOT_ERR> Failed to load shard: ${module}`, e);
+            })
+        ));
     }
     
-    console.log("Σ://BOOT> All Shards Integrated. Launching Zenith...");
-    if (window.dispatchEvent) {
-        window.dispatchEvent(new Event('load'));
-    }
+    const endTime = performance.now();
+    const loadTime = ((endTime - startTime) / 1000).toFixed(2);
+    console.log(`Σ://BOOT> All Shards Integrated in ${loadTime}s. Dispatching Singularity Event...`);
+    
+    // Core event for shard initialization
+    window.dispatchEvent(new CustomEvent('sigma.core.boot', {
+        detail: { version: '1.2.5', loadTime: loadTime, shardCount: SYSTEM_MODULES.length }
+    }));
 }
 
 function loadScript(src) {
     return new Promise((resolve, reject) => {
         const script = document.createElement('script');
         script.src = src;
+        script.async = true;
         script.onload = resolve;
-        script.onerror = reject;
+        script.onerror = () => {
+            // Simple retry logic
+            console.warn(`Σ://BOOT_RETRY> Retrying shard: ${src}`);
+            const retry = document.createElement('script');
+            retry.src = src;
+            retry.onload = resolve;
+            retry.onerror = reject;
+            document.head.appendChild(retry);
+        };
         document.head.appendChild(script);
     });
 }
