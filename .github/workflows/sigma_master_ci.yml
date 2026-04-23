@@ -4,6 +4,7 @@ on:
     branches: ["main"]
   pull_request:
     branches: ["main"]
+  workflow_dispatch:
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
@@ -29,9 +30,9 @@ jobs:
         uses: actions/cache@v4
         with:
           path: build/
-          key: sovereign-build-linux-${{ hashFiles('suites/**', 'build_sovereign.sh') }}
+          key: build-linux-${{ hashFiles('suites/**', 'build_sovereign.sh') }}
           restore-keys: |
-            sovereign-build-linux-
+            build-linux-
 
       - name: Install Build Tools
         run: |
@@ -59,7 +60,37 @@ jobs:
           chmod +x ./run_sigma_tests.sh
           ./run_sigma_tests.sh
 
-  # ── macOS: Compilation validation only (no ELF link) ───────────────────
+  # ── Windows: Compilation validation (Fixed 100% failure rate) ───────────
+  compilation_windows:
+    name: "Compilation Validation (Windows)"
+    runs-on: windows-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          submodules: recursive
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Install Build Tools (Choco)
+        run: |
+          choco install nasm -y
+          choco install mingw -y
+          echo "C:\Program Files\NASM" >> $GITHUB_PATH
+
+      - name: Repair Build Environment
+        run: node repair_build.js
+
+      - name: Validate Compilation (Windows)
+        shell: bash
+        run: |
+          chmod +x ./build_sovereign.sh
+          ./build_sovereign.sh
+
+  # ── macOS: Compilation validation only ──────────────────────────────────
   compilation_macos:
     name: "Compilation Validation (macOS)"
     runs-on: macos-latest
@@ -86,3 +117,31 @@ jobs:
         run: |
           chmod +x ./build_sovereign.sh
           ./build_sovereign.sh
+
+  # ── Security: CodeQL Audit (Optimized to reduce 2h runtime) ───────────
+  security_audit:
+    name: "Sovereign Security Audit (CodeQL)"
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    permissions:
+      security-events: write
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          submodules: recursive
+
+      - name: Initialize CodeQL
+        uses: github/codeql-action/init@v3
+        with:
+          languages: 'cpp'
+          queries: security-and-quality
+
+      - name: Build for CodeQL (Manual Mode)
+        run: |
+          chmod +x ./build_sovereign.sh
+          ./build_sovereign.sh
+
+      - name: Perform CodeQL Analysis
+        uses: github/codeql-action/analyze@v3
+        with:
+          category: "/language:cpp"
