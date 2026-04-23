@@ -133,3 +133,14 @@ Use the [Feature Request template](.github/ISSUE_TEMPLATE/feature_request.md) an
 - Which Phase (1–7) your feature belongs to
 - Which Suite (S01–S33) it would live in
 - How it maintains the **Zero-Dependency Sovereignty** design principle
+
+
+## SigmaOS Modular Architecture
+When contributing, please place your code in the appropriate module under `modules/`. We follow a strict Microkernel Architecture approach. 
+- Core: `modules/core`
+- Security: `modules/security`
+- Perf: `modules/perf`
+- Ext: `modules/ext`
+- Tools: `modules/tools`
+
+Read our [Design Philosophy](WIKI/DESIGN_PHILOSOPHY.md) before submitting PRs.
