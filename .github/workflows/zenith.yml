@@ -33,4 +33,5 @@ jobs:
     needs: [shard_verification]
     steps:
       - name: Declare Finality
-        run: echo "SIGMAOS ZENITH SUPREME: ARCHITECTURAL FINALITY VERIFIED."
+        run: |
+          echo "SIGMAOS ZENITH SUPREME: ARCHITECTURAL FINALITY VERIFIED."

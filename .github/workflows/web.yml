@@ -14,7 +14,7 @@ jobs:
       - name: Verify Zenith Web Core
         run: |
           echo "[CI] Verifying Web OS components..."
-          if [ ! -f "web_ui/index.html" ]; then echo "[FAIL] Missing web_ui/index.html"; exit 1; fi
+          if [ ! -f "web_ui/index.html" ]; then echo "FAIL: Missing web_ui/index.html"; exit 1; fi
           echo "[PASS] All Zenith Web core components verified."
 
   aesthetic_audit:
@@ -38,4 +38,5 @@ jobs:
     needs: [aesthetic_audit]
     steps:
       - name: Declare Readiness
-        run: echo "SIGMAOS WEB ZENITH: PORTAL SUPREMACY READY."
+        run: |
+          echo "SIGMAOS WEB ZENITH: PORTAL SUPREMACY READY."
