@@ -43,3 +43,9 @@ Through **Sovereign Observability** (core/lattice/observability.c), SigmaOS prov
 
 ### 11. Security Hardening (OpenBSD/FreeBSD Inspired)
 SigmaOS adopts proactive security hardening and **Lattice Jails** (core/virtualization/lattice_jails.c) to provide isolated execution domains for untrusted shards, mirroring the security-first philosophy of OpenBSD and FreeBSD.
+
+### 12. Build & Task Automation (Bazel/Taskfile Inspired)
+SigmaOS utilizes **Taskfile.yml** for modern, declarative task orchestration, ensuring reproducible builds across all development environments.
+
+### 13. Deep UI Customization (KDE/GNOME Inspired)
+Through the **Sovereign Theming Engine** and **Widget Engine**, users can personalize the Zenith Dashboard with real-time monitors and dynamic visual profiles, mirroring the flexibility of high-end desktop environments.
