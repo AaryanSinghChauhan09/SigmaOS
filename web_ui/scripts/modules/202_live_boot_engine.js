@@ -33,10 +33,10 @@ class LiveBootEngine {
 
     registerCLI() {
         if(!window.SigmaCLI) window.SigmaCLI = {};
-        window.SigmaCLI['${m.cli}'] = (args) => {
-            return `[${m.title}] Environment: ${this.environment.toUpperCase()} | Status: Active`;
+        window.SigmaCLI['live-mode'] = (args) => {
+            return `[Live Boot Engine] Environment: ${this.environment.toUpperCase()} | Status: Active`;
         };
     }
 }
 
-window.Sigma${className} = new ${className}();
+window.SigmaLiveBootEngine = new LiveBootEngine();

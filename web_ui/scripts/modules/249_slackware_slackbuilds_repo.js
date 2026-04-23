@@ -1,31 +1,31 @@
 /**
- * SigmaOS ${m.title} Shard
- * Logic: ${m.desc}
+ * SigmaOS Slackware SlackBuilds Repo Shard
+ * Logic: Slackware inspired community build script repository mapping.
  */
 
-class ${className} {
+class SlackwareSlackBuildsRepo {
     constructor() {
-        this.shardId = "S" + "${m.name}".split('_')[0] + "_${className}";
+        this.shardId = "S" + "249_slackware_slackbuilds_repo.js".split('_')[0] + "_SlackwareSlackBuildsRepo";
         this.active = false;
         
-        console.log(`Σ://ULTIMATE> ${this.shardId} Initializing: ${m.title}...`);
+        console.log(`Σ://ULTIMATE> ${this.shardId} Initializing: Slackware SlackBuilds Repo...`);
         this.init();
     }
 
     init() {
         window.addEventListener('sigma.core.boot', () => {
             this.active = true;
-            console.log(`Σ://SINGULARITY> ${this.shardId} Online. ${m.desc}`);
+            console.log(`Σ://SINGULARITY> ${this.shardId} Online. Slackware inspired community build script repository mapping.`);
             this.registerCLI();
         });
     }
 
     registerCLI() {
         if(!window.SigmaCLI) window.SigmaCLI = {};
-        window.SigmaCLI['${m.cli}'] = (args) => {
-            return `[${m.title}] Singularity Command: ${args.join(' ') || 'EXECUTE'}`;
+        window.SigmaCLI['sbo-sim'] = (args) => {
+            return `[Slackware SlackBuilds Repo] Singularity Command: ${args.join(' ') || 'EXECUTE'}`;
         };
     }
 }
 
-window.Sigma${className} = new ${className}();
+window.SigmaSlackwareSlackBuildsRepo = new SlackwareSlackBuildsRepo();

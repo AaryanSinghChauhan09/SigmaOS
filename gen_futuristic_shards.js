@@ -38,36 +38,36 @@ const shardsDir = 'shards';
 futuristicModules.forEach(m => {
     const className = m.title.replace(/[^a-zA-Z0-9]/g, '');
     const content = `/**
- * SigmaOS \${m.title} Futuristic Shard
- * Logic: \${m.desc}
+ * SigmaOS ${m.title} Futuristic Shard
+ * Logic: ${m.desc}
  */
 
-class \${className} {
+class ${className} {
     constructor() {
-        this.shardId = "S" + "\${m.name}".split('_')[0] + "_\${className}";
+        this.shardId = "S" + "${m.name}".split('_')[0] + "_${className}";
         this.active = false;
         
-        console.log(\`Σ://FUTURISTIC> \${this.shardId} Initializing: \${m.title}...\`);
+        console.log(\`Σ://FUTURISTIC> \${this.shardId} Initializing: ${m.title}...\`);
         this.init();
     }
 
     init() {
         window.addEventListener('sigma.core.boot', () => {
             this.active = true;
-            console.log(\`Σ://SINGULARITY_333> \${this.shardId} Online. \${m.desc}\`);
+            console.log(\`Σ://SINGULARITY_333> \${this.shardId} Online. ${m.desc}\`);
             this.registerCLI();
         });
     }
 
     registerCLI() {
         if(!window.SigmaCLI) window.SigmaCLI = {};
-        window.SigmaCLI['\${m.cli}'] = (args) => {
-            return \`[\${m.title}] Futuristic Call: \${args.join(' ') || 'STATUS'}\`;
+        window.SigmaCLI['${m.cli}'] = (args) => {
+            return \`[${m.title}] Futuristic Call: \${args.join(' ') || 'STATUS'}\`;
         };
     }
 }
 
-window.Sigma\${className} = new \${className}();
+window.Sigma${className} = new ${className}();
 `;
     fs.writeFileSync(path.join(dir, m.name), content);
     fs.writeFileSync(path.join(shardsDir, m.name), content);

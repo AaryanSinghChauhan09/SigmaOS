@@ -1,31 +1,31 @@
 /**
- * SigmaOS ${m.title} Industrial Shard
- * Logic: ${m.desc}
+ * SigmaOS Web-MPI Parallel Bus Industrial Shard
+ * Logic: Message passing interface for distributed DOM/AI compute.
  */
 
-class ${className} {
+class WebMPIParallelBus {
     constructor() {
-        this.shardId = "S" + "${m.name}".split('_')[0] + "_${className}";
+        this.shardId = "S" + "354_web_mpi_parallel_bus.js".split('_')[0] + "_WebMPIParallelBus";
         this.active = false;
         
-        console.log(`Σ://INDUSTRIAL> ${this.shardId} Initializing: ${m.title}...`);
+        console.log(`Σ://INDUSTRIAL> ${this.shardId} Initializing: Web-MPI Parallel Bus...`);
         this.init();
     }
 
     init() {
         window.addEventListener('sigma.core.boot', () => {
             this.active = true;
-            console.log(`Σ://SINGULARITY_360> ${this.shardId} Online. ${m.desc}`);
+            console.log(`Σ://SINGULARITY_360> ${this.shardId} Online. Message passing interface for distributed DOM/AI compute.`);
             this.registerCLI();
         });
     }
 
     registerCLI() {
         if(!window.SigmaCLI) window.SigmaCLI = {};
-        window.SigmaCLI['${m.cli}'] = (args) => {
-            return `[${m.title}] Industrial Call: ${args.join(' ') || 'STATUS'}`;
+        window.SigmaCLI['mpi-exec'] = (args) => {
+            return `[Web-MPI Parallel Bus] Industrial Call: ${args.join(' ') || 'STATUS'}`;
         };
     }
 }
 
-window.Sigma${className} = new ${className}();
+window.SigmaWebMPIParallelBus = new WebMPIParallelBus();

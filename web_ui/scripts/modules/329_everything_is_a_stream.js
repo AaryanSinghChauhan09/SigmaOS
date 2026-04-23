@@ -1,31 +1,31 @@
 /**
- * SigmaOS ${m.title} Futuristic Shard
- * Logic: ${m.desc}
+ * SigmaOS Everything is a Stream Futuristic Shard
+ * Logic: Plan 9 inspired absolute abstraction of UI as file streams.
  */
 
-class ${className} {
+class EverythingisaStream {
     constructor() {
-        this.shardId = "S" + "${m.name}".split('_')[0] + "_${className}";
+        this.shardId = "S" + "329_everything_is_a_stream.js".split('_')[0] + "_EverythingisaStream";
         this.active = false;
         
-        console.log(`Σ://FUTURISTIC> ${this.shardId} Initializing: ${m.title}...`);
+        console.log(`Σ://FUTURISTIC> ${this.shardId} Initializing: Everything is a Stream...`);
         this.init();
     }
 
     init() {
         window.addEventListener('sigma.core.boot', () => {
             this.active = true;
-            console.log(`Σ://SINGULARITY_333> ${this.shardId} Online. ${m.desc}`);
+            console.log(`Σ://SINGULARITY_333> ${this.shardId} Online. Plan 9 inspired absolute abstraction of UI as file streams.`);
             this.registerCLI();
         });
     }
 
     registerCLI() {
         if(!window.SigmaCLI) window.SigmaCLI = {};
-        window.SigmaCLI['${m.cli}'] = (args) => {
-            return `[${m.title}] Futuristic Call: ${args.join(' ') || 'STATUS'}`;
+        window.SigmaCLI['9p-stream'] = (args) => {
+            return `[Everything is a Stream] Futuristic Call: ${args.join(' ') || 'STATUS'}`;
         };
     }
 }
 
-window.Sigma${className} = new ${className}();
+window.SigmaEverythingisaStream = new EverythingisaStream();

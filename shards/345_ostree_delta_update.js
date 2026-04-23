@@ -1,31 +1,31 @@
 /**
- * SigmaOS ${m.title} Industrial Shard
- * Logic: ${m.desc}
+ * SigmaOS OSTree Delta Update Industrial Shard
+ * Logic: Fedora Silverblue inspired immutable delta-based updates.
  */
 
-class ${className} {
+class OSTreeDeltaUpdate {
     constructor() {
-        this.shardId = "S" + "${m.name}".split('_')[0] + "_${className}";
+        this.shardId = "S" + "345_ostree_delta_update.js".split('_')[0] + "_OSTreeDeltaUpdate";
         this.active = false;
         
-        console.log(`Σ://INDUSTRIAL> ${this.shardId} Initializing: ${m.title}...`);
+        console.log(`Σ://INDUSTRIAL> ${this.shardId} Initializing: OSTree Delta Update...`);
         this.init();
     }
 
     init() {
         window.addEventListener('sigma.core.boot', () => {
             this.active = true;
-            console.log(`Σ://SINGULARITY_360> ${this.shardId} Online. ${m.desc}`);
+            console.log(`Σ://SINGULARITY_360> ${this.shardId} Online. Fedora Silverblue inspired immutable delta-based updates.`);
             this.registerCLI();
         });
     }
 
     registerCLI() {
         if(!window.SigmaCLI) window.SigmaCLI = {};
-        window.SigmaCLI['${m.cli}'] = (args) => {
-            return `[${m.title}] Industrial Call: ${args.join(' ') || 'STATUS'}`;
+        window.SigmaCLI['delta-up'] = (args) => {
+            return `[OSTree Delta Update] Industrial Call: ${args.join(' ') || 'STATUS'}`;
         };
     }
 }
 
-window.Sigma${className} = new ${className}();
+window.SigmaOSTreeDeltaUpdate = new OSTreeDeltaUpdate();

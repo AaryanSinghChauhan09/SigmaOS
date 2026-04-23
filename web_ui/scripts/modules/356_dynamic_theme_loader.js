@@ -1,31 +1,31 @@
 /**
- * SigmaOS ${m.title} Industrial Shard
- * Logic: ${m.desc}
+ * SigmaOS Dynamic Theme Loader Industrial Shard
+ * Logic: elementary OS inspired dynamic loading of UI theme shards.
  */
 
-class ${className} {
+class DynamicThemeLoader {
     constructor() {
-        this.shardId = "S" + "${m.name}".split('_')[0] + "_${className}";
+        this.shardId = "S" + "356_dynamic_theme_loader.js".split('_')[0] + "_DynamicThemeLoader";
         this.active = false;
         
-        console.log(`Σ://INDUSTRIAL> ${this.shardId} Initializing: ${m.title}...`);
+        console.log(`Σ://INDUSTRIAL> ${this.shardId} Initializing: Dynamic Theme Loader...`);
         this.init();
     }
 
     init() {
         window.addEventListener('sigma.core.boot', () => {
             this.active = true;
-            console.log(`Σ://SINGULARITY_360> ${this.shardId} Online. ${m.desc}`);
+            console.log(`Σ://SINGULARITY_360> ${this.shardId} Online. elementary OS inspired dynamic loading of UI theme shards.`);
             this.registerCLI();
         });
     }
 
     registerCLI() {
         if(!window.SigmaCLI) window.SigmaCLI = {};
-        window.SigmaCLI['${m.cli}'] = (args) => {
-            return `[${m.title}] Industrial Call: ${args.join(' ') || 'STATUS'}`;
+        window.SigmaCLI['theme-load'] = (args) => {
+            return `[Dynamic Theme Loader] Industrial Call: ${args.join(' ') || 'STATUS'}`;
         };
     }
 }
 
-window.Sigma${className} = new ${className}();
+window.SigmaDynamicThemeLoader = new DynamicThemeLoader();

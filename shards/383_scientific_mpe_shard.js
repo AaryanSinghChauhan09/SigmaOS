@@ -1,31 +1,31 @@
 /**
- * SigmaOS ${m.title} Convergence Shard
- * Logic: ${m.desc}
+ * SigmaOS Scientific MPE Shard Convergence Shard
+ * Logic: Multiprocessing engine for massive research data sets.
  */
 
-class ${className} {
+class ScientificMPEShard {
     constructor() {
-        this.shardId = "S" + "${m.name}".split('_')[0] + "_${className}";
+        this.shardId = "S" + "383_scientific_mpe_shard.js".split('_')[0] + "_ScientificMPEShard";
         this.active = false;
         
-        console.log(`Σ://CONVERGENCE> ${this.shardId} Initializing: ${m.title}...`);
+        console.log(`Σ://CONVERGENCE> ${this.shardId} Initializing: Scientific MPE Shard...`);
         this.init();
     }
 
     init() {
         window.addEventListener('sigma.core.boot', () => {
             this.active = true;
-            console.log(`Σ://SINGULARITY_400> ${this.shardId} Online. ${m.desc}`);
+            console.log(`Σ://SINGULARITY_400> ${this.shardId} Online. Multiprocessing engine for massive research data sets.`);
             this.registerCLI();
         });
     }
 
     registerCLI() {
         if(!window.SigmaCLI) window.SigmaCLI = {};
-        window.SigmaCLI['${m.cli}'] = (args) => {
-            return `[${m.title}] Convergence Call: ${args.join(' ') || 'STATUS'}`;
+        window.SigmaCLI['mpe-exec'] = (args) => {
+            return `[Scientific MPE Shard] Convergence Call: ${args.join(' ') || 'STATUS'}`;
         };
     }
 }
 
-window.Sigma${className} = new ${className}();
+window.SigmaScientificMPEShard = new ScientificMPEShard();

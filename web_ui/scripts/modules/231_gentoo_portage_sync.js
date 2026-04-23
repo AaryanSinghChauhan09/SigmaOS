@@ -1,31 +1,31 @@
 /**
- * SigmaOS ${m.title} Shard
- * Logic: ${m.desc}
+ * SigmaOS Gentoo Portage Sync Shard
+ * Logic: Gentoo inspired high-speed rsync-based module tree synchronization.
  */
 
-class ${className} {
+class GentooPortageSync {
     constructor() {
-        this.shardId = "S" + "${m.name}".split('_')[0] + "_${className}";
+        this.shardId = "S" + "231_gentoo_portage_sync.js".split('_')[0] + "_GentooPortageSync";
         this.active = false;
         
-        console.log(`Σ://ULTIMATE> ${this.shardId} Initializing: ${m.title}...`);
+        console.log(`Σ://ULTIMATE> ${this.shardId} Initializing: Gentoo Portage Sync...`);
         this.init();
     }
 
     init() {
         window.addEventListener('sigma.core.boot', () => {
             this.active = true;
-            console.log(`Σ://SINGULARITY> ${this.shardId} Online. ${m.desc}`);
+            console.log(`Σ://SINGULARITY> ${this.shardId} Online. Gentoo inspired high-speed rsync-based module tree synchronization.`);
             this.registerCLI();
         });
     }
 
     registerCLI() {
         if(!window.SigmaCLI) window.SigmaCLI = {};
-        window.SigmaCLI['${m.cli}'] = (args) => {
-            return `[${m.title}] Singularity Command: ${args.join(' ') || 'EXECUTE'}`;
+        window.SigmaCLI['portage-sync'] = (args) => {
+            return `[Gentoo Portage Sync] Singularity Command: ${args.join(' ') || 'EXECUTE'}`;
         };
     }
 }
 
-window.Sigma${className} = new ${className}();
+window.SigmaGentooPortageSync = new GentooPortageSync();

@@ -1,31 +1,31 @@
 /**
- * SigmaOS ${m.title} Shard
- * Logic: ${m.desc}
+ * SigmaOS Parrot AnonSurf Module Shard
+ * Logic: Parrot Sec inspired system-wide anonymous surfing tunnel.
  */
 
-class ${className} {
+class ParrotAnonSurfModule {
     constructor() {
-        this.shardId = "S" + "${m.name}".split('_')[0] + "_${className}";
+        this.shardId = "S" + "248_parrot_anonsurf_module.js".split('_')[0] + "_ParrotAnonSurfModule";
         this.active = false;
         
-        console.log(`Σ://ULTIMATE> ${this.shardId} Initializing: ${m.title}...`);
+        console.log(`Σ://ULTIMATE> ${this.shardId} Initializing: Parrot AnonSurf Module...`);
         this.init();
     }
 
     init() {
         window.addEventListener('sigma.core.boot', () => {
             this.active = true;
-            console.log(`Σ://SINGULARITY> ${this.shardId} Online. ${m.desc}`);
+            console.log(`Σ://SINGULARITY> ${this.shardId} Online. Parrot Sec inspired system-wide anonymous surfing tunnel.`);
             this.registerCLI();
         });
     }
 
     registerCLI() {
         if(!window.SigmaCLI) window.SigmaCLI = {};
-        window.SigmaCLI['${m.cli}'] = (args) => {
-            return `[${m.title}] Singularity Command: ${args.join(' ') || 'EXECUTE'}`;
+        window.SigmaCLI['anonsurf-sim'] = (args) => {
+            return `[Parrot AnonSurf Module] Singularity Command: ${args.join(' ') || 'EXECUTE'}`;
         };
     }
 }
 
-window.Sigma${className} = new ${className}();
+window.SigmaParrotAnonSurfModule = new ParrotAnonSurfModule();

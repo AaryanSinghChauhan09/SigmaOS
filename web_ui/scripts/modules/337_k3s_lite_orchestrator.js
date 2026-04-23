@@ -1,31 +1,31 @@
 /**
- * SigmaOS ${m.title} Industrial Shard
- * Logic: ${m.desc}
+ * SigmaOS K3s Lite Orchestrator Industrial Shard
+ * Logic: Lightweight orchestration for distributed OS service shards.
  */
 
-class ${className} {
+class K3sLiteOrchestrator {
     constructor() {
-        this.shardId = "S" + "${m.name}".split('_')[0] + "_${className}";
+        this.shardId = "S" + "337_k3s_lite_orchestrator.js".split('_')[0] + "_K3sLiteOrchestrator";
         this.active = false;
         
-        console.log(`Σ://INDUSTRIAL> ${this.shardId} Initializing: ${m.title}...`);
+        console.log(`Σ://INDUSTRIAL> ${this.shardId} Initializing: K3s Lite Orchestrator...`);
         this.init();
     }
 
     init() {
         window.addEventListener('sigma.core.boot', () => {
             this.active = true;
-            console.log(`Σ://SINGULARITY_360> ${this.shardId} Online. ${m.desc}`);
+            console.log(`Σ://SINGULARITY_360> ${this.shardId} Online. Lightweight orchestration for distributed OS service shards.`);
             this.registerCLI();
         });
     }
 
     registerCLI() {
         if(!window.SigmaCLI) window.SigmaCLI = {};
-        window.SigmaCLI['${m.cli}'] = (args) => {
-            return `[${m.title}] Industrial Call: ${args.join(' ') || 'STATUS'}`;
+        window.SigmaCLI['k3s-lite'] = (args) => {
+            return `[K3s Lite Orchestrator] Industrial Call: ${args.join(' ') || 'STATUS'}`;
         };
     }
 }
 
-window.Sigma${className} = new ${className}();
+window.SigmaK3sLiteOrchestrator = new K3sLiteOrchestrator();

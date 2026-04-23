@@ -1,31 +1,31 @@
 /**
- * SigmaOS ${m.title} Convergence Shard
- * Logic: ${m.desc}
+ * SigmaOS IP Leak Detector Convergence Shard
+ * Logic: Continuous auditing of WebRTC and Fetch requests for IP leaks.
  */
 
-class ${className} {
+class IPLeakDetector {
     constructor() {
-        this.shardId = "S" + "${m.name}".split('_')[0] + "_${className}";
+        this.shardId = "S" + "372_ip_leak_detector.js".split('_')[0] + "_IPLeakDetector";
         this.active = false;
         
-        console.log(`Σ://CONVERGENCE> ${this.shardId} Initializing: ${m.title}...`);
+        console.log(`Σ://CONVERGENCE> ${this.shardId} Initializing: IP Leak Detector...`);
         this.init();
     }
 
     init() {
         window.addEventListener('sigma.core.boot', () => {
             this.active = true;
-            console.log(`Σ://SINGULARITY_400> ${this.shardId} Online. ${m.desc}`);
+            console.log(`Σ://SINGULARITY_400> ${this.shardId} Online. Continuous auditing of WebRTC and Fetch requests for IP leaks.`);
             this.registerCLI();
         });
     }
 
     registerCLI() {
         if(!window.SigmaCLI) window.SigmaCLI = {};
-        window.SigmaCLI['${m.cli}'] = (args) => {
-            return `[${m.title}] Convergence Call: ${args.join(' ') || 'STATUS'}`;
+        window.SigmaCLI['leak-check'] = (args) => {
+            return `[IP Leak Detector] Convergence Call: ${args.join(' ') || 'STATUS'}`;
         };
     }
 }
 
-window.Sigma${className} = new ${className}();
+window.SigmaIPLeakDetector = new IPLeakDetector();

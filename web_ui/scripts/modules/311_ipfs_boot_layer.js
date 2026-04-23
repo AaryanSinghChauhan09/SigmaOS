@@ -1,31 +1,31 @@
 /**
- * SigmaOS ${m.title} Futuristic Shard
- * Logic: ${m.desc}
+ * SigmaOS IPFS Boot Layer Futuristic Shard
+ * Logic: Enabling SigmaOS to boot and load shards directly from IPFS.
  */
 
-class ${className} {
+class IPFSBootLayer {
     constructor() {
-        this.shardId = "S" + "${m.name}".split('_')[0] + "_${className}";
+        this.shardId = "S" + "311_ipfs_boot_layer.js".split('_')[0] + "_IPFSBootLayer";
         this.active = false;
         
-        console.log(`Σ://FUTURISTIC> ${this.shardId} Initializing: ${m.title}...`);
+        console.log(`Σ://FUTURISTIC> ${this.shardId} Initializing: IPFS Boot Layer...`);
         this.init();
     }
 
     init() {
         window.addEventListener('sigma.core.boot', () => {
             this.active = true;
-            console.log(`Σ://SINGULARITY_333> ${this.shardId} Online. ${m.desc}`);
+            console.log(`Σ://SINGULARITY_333> ${this.shardId} Online. Enabling SigmaOS to boot and load shards directly from IPFS.`);
             this.registerCLI();
         });
     }
 
     registerCLI() {
         if(!window.SigmaCLI) window.SigmaCLI = {};
-        window.SigmaCLI['${m.cli}'] = (args) => {
-            return `[${m.title}] Futuristic Call: ${args.join(' ') || 'STATUS'}`;
+        window.SigmaCLI['ipfs-boot'] = (args) => {
+            return `[IPFS Boot Layer] Futuristic Call: ${args.join(' ') || 'STATUS'}`;
         };
     }
 }
 
-window.Sigma${className} = new ${className}();
+window.SigmaIPFSBootLayer = new IPFSBootLayer();

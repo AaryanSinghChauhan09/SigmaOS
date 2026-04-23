@@ -1,31 +1,31 @@
 /**
- * SigmaOS ${m.title} Convergence Shard
- * Logic: ${m.desc}
+ * SigmaOS Lattice FSR Upscaler Convergence Shard
+ * Logic: Simulating FSR for high-performance UI scaling in complex views.
  */
 
-class ${className} {
+class LatticeFSRUpscaler {
     constructor() {
-        this.shardId = "S" + "${m.name}".split('_')[0] + "_${className}";
+        this.shardId = "S" + "363_lattice_fsr_upscaler.js".split('_')[0] + "_LatticeFSRUpscaler";
         this.active = false;
         
-        console.log(`Σ://CONVERGENCE> ${this.shardId} Initializing: ${m.title}...`);
+        console.log(`Σ://CONVERGENCE> ${this.shardId} Initializing: Lattice FSR Upscaler...`);
         this.init();
     }
 
     init() {
         window.addEventListener('sigma.core.boot', () => {
             this.active = true;
-            console.log(`Σ://SINGULARITY_400> ${this.shardId} Online. ${m.desc}`);
+            console.log(`Σ://SINGULARITY_400> ${this.shardId} Online. Simulating FSR for high-performance UI scaling in complex views.`);
             this.registerCLI();
         });
     }
 
     registerCLI() {
         if(!window.SigmaCLI) window.SigmaCLI = {};
-        window.SigmaCLI['${m.cli}'] = (args) => {
-            return `[${m.title}] Convergence Call: ${args.join(' ') || 'STATUS'}`;
+        window.SigmaCLI['fsr-scale'] = (args) => {
+            return `[Lattice FSR Upscaler] Convergence Call: ${args.join(' ') || 'STATUS'}`;
         };
     }
 }
 
-window.Sigma${className} = new ${className}();
+window.SigmaLatticeFSRUpscaler = new LatticeFSRUpscaler();

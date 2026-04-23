@@ -33,10 +33,10 @@ class DualBootOrchestrator {
 
     registerCLI() {
         if(!window.SigmaCLI) window.SigmaCLI = {};
-        window.SigmaCLI['${m.cli}'] = (args) => {
-            return `[${m.title}] Environment: ${this.environment.toUpperCase()} | Status: Active`;
+        window.SigmaCLI['boot-mgr'] = (args) => {
+            return `[Dual Boot Orchestrator] Environment: ${this.environment.toUpperCase()} | Status: Active`;
         };
     }
 }
 
-window.Sigma${className} = new ${className}();
+window.SigmaDualBootOrchestrator = new DualBootOrchestrator();

@@ -1,31 +1,31 @@
 /**
- * SigmaOS ${m.title} Shard
- * Logic: ${m.desc}
+ * SigmaOS RPi Imager Bridge Shard
+ * Logic: Raspberry Pi inspired bridge for flashing disks from the browser.
  */
 
-class ${className} {
+class RPiImagerBridge {
     constructor() {
-        this.shardId = "S" + "${m.name}".split('_')[0] + "_${className}";
+        this.shardId = "S" + "240_rpi_imager_bridge.js".split('_')[0] + "_RPiImagerBridge";
         this.active = false;
         
-        console.log(`Σ://ULTIMATE> ${this.shardId} Initializing: ${m.title}...`);
+        console.log(`Σ://ULTIMATE> ${this.shardId} Initializing: RPi Imager Bridge...`);
         this.init();
     }
 
     init() {
         window.addEventListener('sigma.core.boot', () => {
             this.active = true;
-            console.log(`Σ://SINGULARITY> ${this.shardId} Online. ${m.desc}`);
+            console.log(`Σ://SINGULARITY> ${this.shardId} Online. Raspberry Pi inspired bridge for flashing disks from the browser.`);
             this.registerCLI();
         });
     }
 
     registerCLI() {
         if(!window.SigmaCLI) window.SigmaCLI = {};
-        window.SigmaCLI['${m.cli}'] = (args) => {
-            return `[${m.title}] Singularity Command: ${args.join(' ') || 'EXECUTE'}`;
+        window.SigmaCLI['rpi-imager'] = (args) => {
+            return `[RPi Imager Bridge] Singularity Command: ${args.join(' ') || 'EXECUTE'}`;
         };
     }
 }
 
-window.Sigma${className} = new ${className}();
+window.SigmaRPiImagerBridge = new RPiImagerBridge();

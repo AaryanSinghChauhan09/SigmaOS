@@ -1,31 +1,31 @@
 /**
- * SigmaOS ${m.title} Industrial Shard
- * Logic: ${m.desc}
+ * SigmaOS Runit Service Supervisor Industrial Shard
+ * Logic: Void inspired parallel service monitoring and auto-restart.
  */
 
-class ${className} {
+class RunitServiceSupervisor {
     constructor() {
-        this.shardId = "S" + "${m.name}".split('_')[0] + "_${className}";
+        this.shardId = "S" + "344_runit_service_supervisor.js".split('_')[0] + "_RunitServiceSupervisor";
         this.active = false;
         
-        console.log(`Σ://INDUSTRIAL> ${this.shardId} Initializing: ${m.title}...`);
+        console.log(`Σ://INDUSTRIAL> ${this.shardId} Initializing: Runit Service Supervisor...`);
         this.init();
     }
 
     init() {
         window.addEventListener('sigma.core.boot', () => {
             this.active = true;
-            console.log(`Σ://SINGULARITY_360> ${this.shardId} Online. ${m.desc}`);
+            console.log(`Σ://SINGULARITY_360> ${this.shardId} Online. Void inspired parallel service monitoring and auto-restart.`);
             this.registerCLI();
         });
     }
 
     registerCLI() {
         if(!window.SigmaCLI) window.SigmaCLI = {};
-        window.SigmaCLI['${m.cli}'] = (args) => {
-            return `[${m.title}] Industrial Call: ${args.join(' ') || 'STATUS'}`;
+        window.SigmaCLI['runit-sim'] = (args) => {
+            return `[Runit Service Supervisor] Industrial Call: ${args.join(' ') || 'STATUS'}`;
         };
     }
 }
 
-window.Sigma${className} = new ${className}();
+window.SigmaRunitServiceSupervisor = new RunitServiceSupervisor();

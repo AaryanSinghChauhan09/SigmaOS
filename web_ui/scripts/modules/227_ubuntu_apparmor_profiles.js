@@ -1,31 +1,31 @@
 /**
- * SigmaOS ${m.title} Shard
- * Logic: ${m.desc}
+ * SigmaOS Ubuntu AppArmor Profiles Shard
+ * Logic: Ubuntu inspired hardened security profiles for shard confinement.
  */
 
-class ${className} {
+class UbuntuAppArmorProfiles {
     constructor() {
-        this.shardId = "S" + "${m.name}".split('_')[0] + "_${className}";
+        this.shardId = "S" + "227_ubuntu_apparmor_profiles.js".split('_')[0] + "_UbuntuAppArmorProfiles";
         this.active = false;
         
-        console.log(`Σ://ULTIMATE> ${this.shardId} Initializing: ${m.title}...`);
+        console.log(`Σ://ULTIMATE> ${this.shardId} Initializing: Ubuntu AppArmor Profiles...`);
         this.init();
     }
 
     init() {
         window.addEventListener('sigma.core.boot', () => {
             this.active = true;
-            console.log(`Σ://SINGULARITY> ${this.shardId} Online. ${m.desc}`);
+            console.log(`Σ://SINGULARITY> ${this.shardId} Online. Ubuntu inspired hardened security profiles for shard confinement.`);
             this.registerCLI();
         });
     }
 
     registerCLI() {
         if(!window.SigmaCLI) window.SigmaCLI = {};
-        window.SigmaCLI['${m.cli}'] = (args) => {
-            return `[${m.title}] Singularity Command: ${args.join(' ') || 'EXECUTE'}`;
+        window.SigmaCLI['apparmor-sim'] = (args) => {
+            return `[Ubuntu AppArmor Profiles] Singularity Command: ${args.join(' ') || 'EXECUTE'}`;
         };
     }
 }
 
-window.Sigma${className} = new ${className}();
+window.SigmaUbuntuAppArmorProfiles = new UbuntuAppArmorProfiles();

@@ -33,10 +33,10 @@ class AppContainerBridge {
 
     registerCLI() {
         if(!window.SigmaCLI) window.SigmaCLI = {};
-        window.SigmaCLI['${m.cli}'] = (args) => {
-            return `[${m.title}] Environment: ${this.environment.toUpperCase()} | Status: Active`;
+        window.SigmaCLI['app-bridge'] = (args) => {
+            return `[App Container Bridge] Environment: ${this.environment.toUpperCase()} | Status: Active`;
         };
     }
 }
 
-window.Sigma${className} = new ${className}();
+window.SigmaAppContainerBridge = new AppContainerBridge();

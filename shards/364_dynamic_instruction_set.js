@@ -1,31 +1,31 @@
 /**
- * SigmaOS ${m.title} Convergence Shard
- * Logic: ${m.desc}
+ * SigmaOS Dynamic Instruction Set Convergence Shard
+ * Logic: Optimizing WASM calls based on browser capabilities.
  */
 
-class ${className} {
+class DynamicInstructionSet {
     constructor() {
-        this.shardId = "S" + "${m.name}".split('_')[0] + "_${className}";
+        this.shardId = "S" + "364_dynamic_instruction_set.js".split('_')[0] + "_DynamicInstructionSet";
         this.active = false;
         
-        console.log(`Σ://CONVERGENCE> ${this.shardId} Initializing: ${m.title}...`);
+        console.log(`Σ://CONVERGENCE> ${this.shardId} Initializing: Dynamic Instruction Set...`);
         this.init();
     }
 
     init() {
         window.addEventListener('sigma.core.boot', () => {
             this.active = true;
-            console.log(`Σ://SINGULARITY_400> ${this.shardId} Online. ${m.desc}`);
+            console.log(`Σ://SINGULARITY_400> ${this.shardId} Online. Optimizing WASM calls based on browser capabilities.`);
             this.registerCLI();
         });
     }
 
     registerCLI() {
         if(!window.SigmaCLI) window.SigmaCLI = {};
-        window.SigmaCLI['${m.cli}'] = (args) => {
-            return `[${m.title}] Convergence Call: ${args.join(' ') || 'STATUS'}`;
+        window.SigmaCLI['instr-opt'] = (args) => {
+            return `[Dynamic Instruction Set] Convergence Call: ${args.join(' ') || 'STATUS'}`;
         };
     }
 }
 
-window.Sigma${className} = new ${className}();
+window.SigmaDynamicInstructionSet = new DynamicInstructionSet();

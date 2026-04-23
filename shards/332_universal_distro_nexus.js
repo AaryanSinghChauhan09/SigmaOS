@@ -1,31 +1,31 @@
 /**
- * SigmaOS ${m.title} Futuristic Shard
- * Logic: ${m.desc}
+ * SigmaOS Universal Distro Nexus Futuristic Shard
+ * Logic: The hub for managing all absorbed Linux distro USPs.
  */
 
-class ${className} {
+class UniversalDistroNexus {
     constructor() {
-        this.shardId = "S" + "${m.name}".split('_')[0] + "_${className}";
+        this.shardId = "S" + "332_universal_distro_nexus.js".split('_')[0] + "_UniversalDistroNexus";
         this.active = false;
         
-        console.log(`Σ://FUTURISTIC> ${this.shardId} Initializing: ${m.title}...`);
+        console.log(`Σ://FUTURISTIC> ${this.shardId} Initializing: Universal Distro Nexus...`);
         this.init();
     }
 
     init() {
         window.addEventListener('sigma.core.boot', () => {
             this.active = true;
-            console.log(`Σ://SINGULARITY_333> ${this.shardId} Online. ${m.desc}`);
+            console.log(`Σ://SINGULARITY_333> ${this.shardId} Online. The hub for managing all absorbed Linux distro USPs.`);
             this.registerCLI();
         });
     }
 
     registerCLI() {
         if(!window.SigmaCLI) window.SigmaCLI = {};
-        window.SigmaCLI['${m.cli}'] = (args) => {
-            return `[${m.title}] Futuristic Call: ${args.join(' ') || 'STATUS'}`;
+        window.SigmaCLI['distro-hub'] = (args) => {
+            return `[Universal Distro Nexus] Futuristic Call: ${args.join(' ') || 'STATUS'}`;
         };
     }
 }
 
-window.Sigma${className} = new ${className}();
+window.SigmaUniversalDistroNexus = new UniversalDistroNexus();

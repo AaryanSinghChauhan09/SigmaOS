@@ -33,10 +33,10 @@ class CloudComputeRelay {
 
     registerCLI() {
         if(!window.SigmaCLI) window.SigmaCLI = {};
-        window.SigmaCLI['${m.cli}'] = (args) => {
-            return `[${m.title}] Environment: ${this.environment.toUpperCase()} | Status: Active`;
+        window.SigmaCLI['cloud-offload'] = (args) => {
+            return `[Cloud Compute Relay] Environment: ${this.environment.toUpperCase()} | Status: Active`;
         };
     }
 }
 
-window.Sigma${className} = new ${className}();
+window.SigmaCloudComputeRelay = new CloudComputeRelay();

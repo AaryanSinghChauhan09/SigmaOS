@@ -1,31 +1,31 @@
 /**
- * SigmaOS ${m.title} Futuristic Shard
- * Logic: ${m.desc}
+ * SigmaOS Sovereign Identity Vault Futuristic Shard
+ * Logic: Self-sovereign identity (SSI) management for multi-distro access.
  */
 
-class ${className} {
+class SovereignIdentityVault {
     constructor() {
-        this.shardId = "S" + "${m.name}".split('_')[0] + "_${className}";
+        this.shardId = "S" + "315_sovereign_identity_vault.js".split('_')[0] + "_SovereignIdentityVault";
         this.active = false;
         
-        console.log(`Σ://FUTURISTIC> ${this.shardId} Initializing: ${m.title}...`);
+        console.log(`Σ://FUTURISTIC> ${this.shardId} Initializing: Sovereign Identity Vault...`);
         this.init();
     }
 
     init() {
         window.addEventListener('sigma.core.boot', () => {
             this.active = true;
-            console.log(`Σ://SINGULARITY_333> ${this.shardId} Online. ${m.desc}`);
+            console.log(`Σ://SINGULARITY_333> ${this.shardId} Online. Self-sovereign identity (SSI) management for multi-distro access.`);
             this.registerCLI();
         });
     }
 
     registerCLI() {
         if(!window.SigmaCLI) window.SigmaCLI = {};
-        window.SigmaCLI['${m.cli}'] = (args) => {
-            return `[${m.title}] Futuristic Call: ${args.join(' ') || 'STATUS'}`;
+        window.SigmaCLI['ssi-vault'] = (args) => {
+            return `[Sovereign Identity Vault] Futuristic Call: ${args.join(' ') || 'STATUS'}`;
         };
     }
 }
 
-window.Sigma${className} = new ${className}();
+window.SigmaSovereignIdentityVault = new SovereignIdentityVault();

@@ -9,7 +9,7 @@ const loaderPath = 'web_ui/scripts/kernel_loader.js';
 const moduleFiles = fs.readdirSync(modulesDir).filter(f => f.endsWith('.js'));
 const shardFiles = fs.readdirSync(shardsDir).filter(f => f.endsWith('.js'));
 
-console.log(`Verification: \${moduleFiles.length} modules in web_ui, \${shardFiles.length} shards in root shards/.`);
+console.log(`Verification: ${moduleFiles.length} modules in web_ui, ${shardFiles.length} shards in root shards/.`);
 
 if (moduleFiles.length !== shardFiles.length) {
     console.warn("WARNING: Module and Shard counts do not match!");
@@ -19,7 +19,7 @@ if (moduleFiles.length !== shardFiles.length) {
 const loaderContent = fs.readFileSync(loaderPath, 'utf8');
 const registeredCount = (loaderContent.match(/scripts\/modules\//g) || []).length;
 
-console.log(`Verification: \${registeredCount} shards registered in kernel_loader.js.`);
+console.log(`Verification: ${registeredCount} shards registered in kernel_loader.js.`);
 
 // 3. Final Polish for EnvironmentManager (S201)
 // Ensuring it knows about the 500-shard scale

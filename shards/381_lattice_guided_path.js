@@ -1,31 +1,31 @@
 /**
- * SigmaOS ${m.title} Convergence Shard
- * Logic: ${m.desc}
+ * SigmaOS Lattice Guided Path Convergence Shard
+ * Logic: Automated workflow templates for Law, CS, and Biology research.
  */
 
-class ${className} {
+class LatticeGuidedPath {
     constructor() {
-        this.shardId = "S" + "${m.name}".split('_')[0] + "_${className}";
+        this.shardId = "S" + "381_lattice_guided_path.js".split('_')[0] + "_LatticeGuidedPath";
         this.active = false;
         
-        console.log(`Σ://CONVERGENCE> ${this.shardId} Initializing: ${m.title}...`);
+        console.log(`Σ://CONVERGENCE> ${this.shardId} Initializing: Lattice Guided Path...`);
         this.init();
     }
 
     init() {
         window.addEventListener('sigma.core.boot', () => {
             this.active = true;
-            console.log(`Σ://SINGULARITY_400> ${this.shardId} Online. ${m.desc}`);
+            console.log(`Σ://SINGULARITY_400> ${this.shardId} Online. Automated workflow templates for Law, CS, and Biology research.`);
             this.registerCLI();
         });
     }
 
     registerCLI() {
         if(!window.SigmaCLI) window.SigmaCLI = {};
-        window.SigmaCLI['${m.cli}'] = (args) => {
-            return `[${m.title}] Convergence Call: ${args.join(' ') || 'STATUS'}`;
+        window.SigmaCLI['path-load'] = (args) => {
+            return `[Lattice Guided Path] Convergence Call: ${args.join(' ') || 'STATUS'}`;
         };
     }
 }
 
-window.Sigma${className} = new ${className}();
+window.SigmaLatticeGuidedPath = new LatticeGuidedPath();

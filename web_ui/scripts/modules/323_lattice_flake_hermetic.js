@@ -1,31 +1,31 @@
 /**
- * SigmaOS ${m.title} Futuristic Shard
- * Logic: ${m.desc}
+ * SigmaOS Lattice Flake Hermetic Futuristic Shard
+ * Logic: NixOS Flake inspired hermetic workspace bundles.
  */
 
-class ${className} {
+class LatticeFlakeHermetic {
     constructor() {
-        this.shardId = "S" + "${m.name}".split('_')[0] + "_${className}";
+        this.shardId = "S" + "323_lattice_flake_hermetic.js".split('_')[0] + "_LatticeFlakeHermetic";
         this.active = false;
         
-        console.log(`Σ://FUTURISTIC> ${this.shardId} Initializing: ${m.title}...`);
+        console.log(`Σ://FUTURISTIC> ${this.shardId} Initializing: Lattice Flake Hermetic...`);
         this.init();
     }
 
     init() {
         window.addEventListener('sigma.core.boot', () => {
             this.active = true;
-            console.log(`Σ://SINGULARITY_333> ${this.shardId} Online. ${m.desc}`);
+            console.log(`Σ://SINGULARITY_333> ${this.shardId} Online. NixOS Flake inspired hermetic workspace bundles.`);
             this.registerCLI();
         });
     }
 
     registerCLI() {
         if(!window.SigmaCLI) window.SigmaCLI = {};
-        window.SigmaCLI['${m.cli}'] = (args) => {
-            return `[${m.title}] Futuristic Call: ${args.join(' ') || 'STATUS'}`;
+        window.SigmaCLI['flake-bundle'] = (args) => {
+            return `[Lattice Flake Hermetic] Futuristic Call: ${args.join(' ') || 'STATUS'}`;
         };
     }
 }
 
-window.Sigma${className} = new ${className}();
+window.SigmaLatticeFlakeHermetic = new LatticeFlakeHermetic();

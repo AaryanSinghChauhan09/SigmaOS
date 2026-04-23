@@ -33,10 +33,10 @@ class EnvironmentManager {
 
     registerCLI() {
         if(!window.SigmaCLI) window.SigmaCLI = {};
-        window.SigmaCLI['${m.cli}'] = (args) => {
-            return `[${m.title}] Environment: ${this.environment.toUpperCase()} | Status: Active`;
+        window.SigmaCLI['env-status'] = (args) => {
+            return `[Environment Manager] Environment: ${this.environment.toUpperCase()} | Status: Active`;
         };
     }
 }
 
-window.Sigma${className} = new ${className}();
+window.SigmaEnvironmentManager = new EnvironmentManager();

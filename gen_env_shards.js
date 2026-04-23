@@ -48,13 +48,13 @@ class ${className} {
 
     registerCLI() {
         if(!window.SigmaCLI) window.SigmaCLI = {};
-        window.SigmaCLI['\${m.cli}'] = (args) => {
-            return \`[\${m.title}] Environment: \${this.environment.toUpperCase()} | Status: Active\`;
+        window.SigmaCLI['${m.cli}'] = (args) => {
+            return \`[${m.title}] Environment: \${this.environment.toUpperCase()} | Status: Active\`;
         };
     }
 }
 
-window.Sigma\${className} = new \${className}();
+window.Sigma${className} = new ${className}();
 `;
     fs.writeFileSync(path.join(dir, m.name), content);
 });

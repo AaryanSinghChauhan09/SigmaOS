@@ -35,36 +35,36 @@ const shardsDir = 'shards';
 finalModules.forEach(m => {
     const className = m.title.replace(/[^a-zA-Z0-9]/g, '');
     const content = `/**
- * SigmaOS \${m.title} Shard
- * Logic: \${m.desc}
+ * SigmaOS ${m.title} Shard
+ * Logic: ${m.desc}
  */
 
-class \${className} {
+class ${className} {
     constructor() {
-        this.shardId = "S" + "\${m.name}".split('_')[0] + "_\${className}";
+        this.shardId = "S" + "${m.name}".split('_')[0] + "_${className}";
         this.active = false;
         
-        console.log(\`Σ://ULTIMATE> \${this.shardId} Initializing: \${m.title}...\`);
+        console.log(\`Σ://ULTIMATE> \${this.shardId} Initializing: ${m.title}...\`);
         this.init();
     }
 
     init() {
         window.addEventListener('sigma.core.boot', () => {
             this.active = true;
-            console.log(\`Σ://SINGULARITY> \${this.shardId} Online. \${m.desc}\`);
+            console.log(\`Σ://SINGULARITY> \${this.shardId} Online. ${m.desc}\`);
             this.registerCLI();
         });
     }
 
     registerCLI() {
         if(!window.SigmaCLI) window.SigmaCLI = {};
-        window.SigmaCLI['\${m.cli}'] = (args) => {
-            return \`[\${m.title}] Singularity Command: \${args.join(' ') || 'EXECUTE'}\`;
+        window.SigmaCLI['${m.cli}'] = (args) => {
+            return \`[${m.title}] Singularity Command: \${args.join(' ') || 'EXECUTE'}\`;
         };
     }
 }
 
-window.Sigma\${className} = new \${className}();
+window.Sigma${className} = new ${className}();
 `;
     fs.writeFileSync(path.join(dir, m.name), content);
     fs.writeFileSync(path.join(shardsDir, m.name), content);
