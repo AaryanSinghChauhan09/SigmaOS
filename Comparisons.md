@@ -14,5 +14,8 @@ SigmaOS draws inspiration from many legendary open-source projects, but maintain
 ### 1. vs. Haiku OS
 Haiku is renowned for its responsive desktop and fast boot. SigmaOS adopts this "latency-first" approach in the **Zenith Dashboard** while using a more modular lattice core than Haiku's modular monolithic design.
 
-### 2. vs. Genode OS Framework
-Genode is the gold standard for component-based isolation. SigmaOS integrates **Capability-Based Security** (S-Cap) inspired by Genode to ensure that shards remain isolated and secure.
+### 3. Language Diversity (Go-dav OS Inspired)
+SigmaOS now supports a **Sovereign Go Bridge** (`include/sigma/go`), allowing developers to build garbage-collected system services without sacrificing the performance of the Pure Silicon core.
+
+### 4. Storage Reliability (DreamOS64 Inspired)
+To ensure robust data persistence, SigmaOS incorporates a **Reference FAT32 Driver** (`drivers/reference/fat_fs.c`), providing a simple and universally compatible storage foundation for industrial applications.
