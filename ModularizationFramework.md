@@ -83,3 +83,9 @@ SigmaOS utilizes **S-Systemd** style unit files (suites/S03_Orchestrator/shard_u
 
 ## 7. Personalization Widgets (Conky Inspired)
 Through the **Zenith Widget System** (web_ui/widgets/), users can deploy real-time monitoring tools like the conky_widget.js to track lattice performance and system health directly on their dashboard.
+
+## 8. Capability-Based Security (Genode Inspired)
+SigmaOS implements the **S-Cap Registry** (suites/S03_Orchestrator/shard_cap_registry.c) to enforce strict hardware isolation. Shards must explicitly request and be granted capabilities (e.g., CAP_DISK_READ) via the Sovereign Orchestrator. This prevents unauthorized shards from accessing sensitive hardware resources.
+
+## 9. Unified Virtual Filesystem (Plan 9 Inspired)
+Through the **S-VFS** (suites/S06_Storage/shard_vfs.c), SigmaOS treats everything as a shard-stream. Hardware drivers (like S04_HAL_Disk), network protocols, and even the system orchestrator are mounted into a unified hierarchical namespace, allowing for seamless resource access via standard file operations.
