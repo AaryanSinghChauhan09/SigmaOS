@@ -2,21 +2,17 @@
 
 SigmaOS draws inspiration from many legendary open-source projects, but maintains its own unique identity through the **33-Suite Sovereign Lattice**.
 
-| Feature | SerenityOS | Redox OS | ReactOS | **SigmaOS** |
-|---------|------------|----------|---------|-------------|
-| **Core** | Monolithic C++ | Microkernel Rust | NT-like C | **Sovereign Lattice (ASM/C/Rust)** |
-| **Philosophy** | Retro-modern | Memory safety | Compatibility | **Absolute Sovereignty** |
-| **Modularity** | High | Extreme | Medium | **Singularity (Shard-based)** |
-| **UI** | Custom C++ Tooling | OrbTk (Rust) | Win32/Explorer | **Zenith (Mica/Glassmorphism)** |
-| **Target** | Desktop use | Systems safety | Legacy apps | **Industrial Autonomy** |
+| Feature | SerenityOS | Redox OS | Haiku OS | Genode | **SigmaOS** |
+|---------|------------|----------|----------|--------|-------------|
+| **Core** | Monolithic C++ | Microkernel Rust | Modular C++ | Component Microkernel | **Sovereign Lattice (ASM/C/Rust)** |
+| **Security** | Traditional | Memory Safe | Traditional | Capability-based | **Capability + Lattice** |
+| **UI** | Retro-modern | Rust OrbTk | BeOS-inspired | Distributed | **Zenith (Mica/Glassmorphism)** |
+| **Speed** | Medium | High | **Extreme** | High | **Silicon Native** |
 
 ## Key Differences
 
-### 1. vs. SerenityOS
-While SerenityOS builds a modern system from a retro aesthetic, SigmaOS focuses on **Industrial Autonomy**. We favor extreme modularity (shards) over a monolithic C++ foundation.
+### 1. vs. Haiku OS
+Haiku is renowned for its responsive desktop and fast boot. SigmaOS adopts this "latency-first" approach in the **Zenith Dashboard** while using a more modular lattice core than Haiku's modular monolithic design.
 
-### 2. vs. Redox OS
-Redox uses a microkernel for safety. SigmaOS achieves similar isolation via the **Sovereign Orchestrator (S03)** but maintains a hybrid lattice model for performance-critical "Pure Silicon" access.
-
-### 3. vs. ReactOS
-ReactOS aims for binary compatibility with Windows. SigmaOS provides a **Compatibility Layer (S32-Sim)** but prioritizes its own native lattice standards over legacy emulation.
+### 2. vs. Genode OS Framework
+Genode is the gold standard for component-based isolation. SigmaOS integrates **Capability-Based Security** (S-Cap) inspired by Genode to ensure that shards remain isolated and secure.

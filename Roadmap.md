@@ -14,6 +14,8 @@
 
 ## Phase 3: Industrial Hardening (Q3 2026)
 - [ ] **Microkernel Modularity**: Transition core services to isolated service-drivers (Redox/Oro model).
+- [ ] **Capability-Based Security**: Implement object-oriented security nodes (Genode model).
+- [ ] **Responsive UI Flow**: Near-zero latency transitions and fast-boot profiles (Haiku model).
 - [ ] **Cloud-Native Zenith**: Integrate browser-based remote workspace access (Puter model).
 - [ ] **Sovereign Compatibility**: Stable Win32/POSIX compatibility layers (ReactOS model).
 - [ ] **Agent Orchestration**: Integrate autonomous task agents (OpenFang model).
