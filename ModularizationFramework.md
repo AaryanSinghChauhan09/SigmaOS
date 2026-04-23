@@ -2,6 +2,33 @@
 
 SigmaOS is built on a foundation of extreme modularity, where every system component is an isolated **Sovereign Shard**.
 
+```mermaid
+graph TD
+    subgraph "Core Layer (Ring 0)"
+        Kernel[Minimal ASM Kernel]
+        HAL[Modular HAL Shards]
+    end
+    
+    subgraph "Service Layer (Sovereign Lattice)"
+        Orch[S03 Orchestrator]
+        Mem[S05 Memory Shard]
+        Store[S06 Storage Shard]
+    end
+    
+    subgraph "Plugin Layer (User-Space)"
+        UI[Zenith Dashboard]
+        Ext[Hot-Swap Plugins]
+        Agents[AI Agents]
+    end
+    
+    Kernel --> Orch
+    Orch --> Mem
+    Orch --> Store
+    UI --> Orch
+    Ext --> UI
+    Agents --> Orch
+```
+
 ## 1. Shard Architecture
 Each of the 33 suites is composed of multiple shards. Shards communicate exclusively via the **S03 Orchestrator** using IPC, ensuring that no single component can compromise the entire lattice.
 

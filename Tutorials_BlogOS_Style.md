@@ -31,5 +31,39 @@ void sigma_init() {
 }
 ```
 
+## Tutorial: Creating a Zenith Plugin
+
+Extending the SigmaOS interface is as simple as creating a plugin module.
+
+### 1. Create the Manifest
+Every plugin needs a `manifest.json` in the `plugins/` directory to define its identity and required capabilities.
+
+```json
+{
+  "plugin_id": "My_Cool_Extension",
+  "entry_point": "index.js",
+  "capabilities": ["CAP_READ"]
+}
+```
+
+### 2. Implement the Logic
+Create an `index.js` file that interacts with the **Sovereign UI Toolkit**.
+
+```javascript
+// index.js
+SigmaPluginLoader.register('My_Cool_Extension', {
+    init() {
+        SovereignUI.createWindow("Cool Extension", "This is a modular plugin.");
+    }
+});
+```
+
+### 3. Hot-Deploy
+Use the **Plugin Loader** to inject your module into the live system without a reboot.
+
+```javascript
+SigmaPluginLoader.loadPlugin('My_Cool_Extension', '/plugins/my_cool_ext/index.js');
+```
+
 ## Next Steps
 In the next tutorial, we will explore **Interrupt Handling** and **Memory Paging** using the Sovereign Lattice primitives.
