@@ -69,6 +69,23 @@ clean:
 	@powershell -Command "if (Test-Path $(BUILD_DIR)) { Remove-Item -Recurse -Force $(BUILD_DIR) }"
 	@echo "[CLEAN] Done."
 
+# --- EMULATION & DEBUGGING ---
+QEMU = qemu-system-x86_64
+QEMU_FLAGS = -kernel $(BUILD_DIR)/sigmaos_zenith -m 2G -display none -serial stdio
+
+run: all
+	@echo "[QEMU] Launching SigmaOS Sovereign Lattice..."
+	@$(QEMU) $(QEMU_FLAGS)
+
+debug: all
+	@echo "[GDB] Starting QEMU in debug mode (port 1234)..."
+	@$(QEMU) $(QEMU_FLAGS) -s -S &
+	@gdb $(BUILD_DIR)/sigmaos_zenith -ex "target remote localhost:1234"
+
+profile: all
+	@echo "[VALGRIND] Profiling lattice shards..."
+	@valgrind --leak-check=full --show-leak-kinds=all ./$(BUILD_DIR)/sigmaos_zenith
+
 info:
 	@echo ""
 	@echo "Σ SigmaOS Sovereign Build v10.0 (Pure Silicon)"

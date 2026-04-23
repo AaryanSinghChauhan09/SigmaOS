@@ -1,0 +1,32 @@
+name: Σ SigmaOS Sovereign CI
+
+on:
+  push:
+    branches: [ main, master ]
+  pull_request:
+    branches: [ main, master ]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+        with:
+          submodules: recursive
+
+      - name: Install Dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y gcc nasm make qemu-system-x86 gdb valgrind
+
+      - name: Build 500-Shard Lattice
+        run: make all
+
+      - name: Verify Architecture
+        run: make info
+
+      - name: Static Analysis
+        run: |
+          # Check for forbidden standard library calls
+          ! grep -r "printf(" suites/
+          ! grep -r "malloc(" suites/
