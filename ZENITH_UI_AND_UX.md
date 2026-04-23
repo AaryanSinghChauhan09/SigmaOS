@@ -19,9 +19,15 @@ Located in `modules/ui/zenith_compositor.c` and `modules/ui/user_profile.c`.
 ### 3. Focus Mode UX
 - Built directly into the kernel's automation loop. If Focus Mode is enabled via the user profile, the Zenith UI compositor automatically drops rendering for non-critical notification overlays, and the scheduler deprioritizes background networking tasks.
 
-### 4. Tiling Window Manager & Micro-Animations
+### 4. Kernel-Native Widget Engine
+- **Dashboard Overlays (`widget_engine.c`)**: Unlike macOS widgets or Conky which run as heavy user-space apps polling system files, SigmaOS widgets run inside the kernel UI compositor. They have direct access to memory structs, providing 0-latency telemetry (CPU, Sovereign Tokens, AI Accelerators) with near-zero overhead.
+
+### 5. Adaptive Typography
+- **Environmental Scaling (`adaptive_typography.c`)**: Fonts don't just scale by screen DPI. The OS reads physical ambient light sensors. In direct sunlight, the kernel dynamically boosts font weight and contrast. In dark rooms, it thins fonts to reduce eye strain.
+
+### 6. Tiling Window Manager & Micro-Animations
 - **Window Manager (`window_manager.c`)**: Supports declarative workspaces with hot-swappable layouts (Floating, BSP Tiling, Monocle). 
 - **Spring Physics (`animations.c`)**: Moving and resizing windows doesn't use static linear interpolation. SigmaOS natively implements Hooke's Law spring physics (tension & friction) in C. Windows bounce, snap, and scale with 120Hz fluidity.
 
-### 5. Global Hotkey Automations
+### 7. Global Hotkey Automations
 - **Input Routing (`hotkeys.c`)**: Hotkeys aren't handled by a user-space daemon (like `sxhkd`). They are intercepted directly at the HID driver level. Pressing `SUPER + ENTER` to launch a terminal is processed in Ring 0, executing instantly without context-switch latency.
