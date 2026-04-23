@@ -28,3 +28,9 @@ SigmaOS now supports a **Sovereign Go Bridge** (`include/sigma/go`), allowing de
 
 ### 6. Storage Reliability (DreamOS64 Inspired)
 To ensure robust data persistence, SigmaOS incorporates a **Reference FAT32 Driver** (`drivers/reference/fat_fs.c`), providing a simple and universally compatible storage foundation for industrial applications.
+
+### 7. Professional UI/UX (SerenityOS Inspired)
+SigmaOS now includes the **Sovereign UI Toolkit** (web_ui/scripts/modules/00_ui_toolkit.js), a modular component-based system that mirrors the developer-friendly GUI tooling of SerenityOS while maintaining modern glassmorphic aesthetics.
+
+### 8. Cloud-Native Ecosystem (Puter Inspired)
+Through the **Cloud Explorer** (web_ui/scripts/modules/cloud_explorer.js), SigmaOS allows users to transparently manage remote lattice resources, bridging the gap between local bare-metal performance and cloud-native flexibility.
