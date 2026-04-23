@@ -1,9 +1,0 @@
-[package]
-name = "sigma-sync"
-description = "SigmaOS Sync Shard — GitHub sync and local state management"
-version.workspace = true
-edition.workspace = true
-
-[lib]
-name = "sigma_sync"
-crate-type = ["rlib"]

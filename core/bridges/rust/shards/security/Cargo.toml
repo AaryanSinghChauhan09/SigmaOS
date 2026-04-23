@@ -1,9 +1,0 @@
-[package]
-name        = "sigma-security"
-description = "SigmaOS S08 Security Shard — Zero-trust crypto and firewall"
-version.workspace = true
-edition.workspace = true
-
-[lib]
-name = "sigma_security"
-crate-type = ["staticlib", "rlib"]
