@@ -1,4 +1,4 @@
-﻿/*
+/*
  * =========================================================================
  * S SIGMAOS ZENITH: SOVEREIGN ACID DATABASE ENGINE (v1.0)
  * =========================================================================
@@ -81,7 +81,7 @@ static SigmaTransaction_t* find_txn(sigma_u64 txn_id) {
 
 /**
  * sigma_txn_write: Appends an operation to the WAL under a transaction.
- * The write is NOT visible until COMMIT — this enforces Isolation.
+ * The write is NOT visible until COMMIT � this enforces Isolation.
  */
 sigma_err_t sigma_txn_write(sigma_u64 txn_id, const char* table,
                             const char* op, const char* key,

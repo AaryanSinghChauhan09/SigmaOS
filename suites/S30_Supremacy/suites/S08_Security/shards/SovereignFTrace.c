@@ -1,6 +1,6 @@
-ï»¿/*
+/*
  * =========================================================================
- * S SIGMAOS: SOVEREIGN FTRACE & EVENT TRACING (v1.0 â€” PURE C11)
+ * S SIGMAOS: SOVEREIGN FTRACE & EVENT TRACING (v1.0 — PURE C11)
  * =========================================================================
  * Competitor Gap Closed: Linux kernel/trace/ (ftrace), Solaris DTrace,
  * Windows Event Tracing for Windows (ETW).
@@ -9,18 +9,18 @@
  * zero overhead when disabled.
  *
  * This shard implements:
- *   Â§ 1  Generic Trace Ring Buffer (Lockless per-CPU writer)
- *   Â§ 2  Function Tracer abstraction (mcount / fentry simulation)
- *   Â§ 3  Tracepoints & Event filtering schemas
- *   Â§ 4  Kernel Probe (kprobe) dynamic breakpoint injection stub
- *   Â§ 5  tracefs virtual file generation (/sys/kernel/tracing)
+ *   § 1  Generic Trace Ring Buffer (Lockless per-CPU writer)
+ *   § 2  Function Tracer abstraction (mcount / fentry simulation)
+ *   § 3  Tracepoints & Event filtering schemas
+ *   § 4  Kernel Probe (kprobe) dynamic breakpoint injection stub
+ *   § 5  tracefs virtual file generation (/sys/kernel/tracing)
  * =========================================================================
  */
 
 #include "suites/S01_Genesis/shards/sigma_kernel.h"
 
 /* -----------------------------------------------------------------------
- * â–‘â–‘ CONSTANTS & MACROS
+ * ¦¦ CONSTANTS & MACROS
  * ----------------------------------------------------------------------- */
 #define TRACE_BUF_SIZE     (1024 * 1024) /* 1MB per CPU */
 #define TRACE_MAX_CPUS     4
@@ -31,7 +31,7 @@
 #define TRACE_TYPE_KPROBE  3
 
 /* -----------------------------------------------------------------------
- * â–‘â–‘ RING BUFFER & TRACE ENTRIES
+ * ¦¦ RING BUFFER & TRACE ENTRIES
  * ----------------------------------------------------------------------- */
 typedef struct {
     sigma_u64 timestamp;
@@ -66,7 +66,7 @@ static SigmaTraceBuffer_t s_trace_buffers[TRACE_MAX_CPUS];
 static sigma_bool s_tracer_enabled = SIGMA_FALSE;
 
 /* -----------------------------------------------------------------------
- * â–‘â–‘ DYNAMIC FUNCTION TRACING (mcount)
+ * ¦¦ DYNAMIC FUNCTION TRACING (mcount)
  * ----------------------------------------------------------------------- */
 /**
  * In a real kernel, the compiler injects a call to mcount at every function prologue.
@@ -98,7 +98,7 @@ void sigma_mcount_tracer(void *ip, void *parent_ip) {
 }
 
 /* -----------------------------------------------------------------------
- * â–‘â–‘ STATIC TRACEPOINTS
+ * ¦¦ STATIC TRACEPOINTS
  * ----------------------------------------------------------------------- */
 typedef struct {
     sigma_u32 id;
@@ -144,7 +144,7 @@ void sigma_trace_event_commit(sigma_u32 event_id, sigma_u64 a1, sigma_u64 a2, si
 }
 
 /* -----------------------------------------------------------------------
- * â–‘â–‘ KPROBES (Kernel Probes for Dynamic Breakpoints)
+ * ¦¦ KPROBES (Kernel Probes for Dynamic Breakpoints)
  * ----------------------------------------------------------------------- */
 typedef struct {
     void *address;
@@ -165,7 +165,7 @@ sigma_err_t sigma_register_kprobe(SigmaKProbe_t *kp) {
 }
 
 /* -----------------------------------------------------------------------
- * â–‘â–‘ INITIALISATION
+ * ¦¦ INITIALISATION
  * ----------------------------------------------------------------------- */
 void SovereignFTrace_Init(void) {
     sigma_sigma_sigma_printf("S [FTRACE]: Initialising Sovereign Function Tracer & ETW...\n");

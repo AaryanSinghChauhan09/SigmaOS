@@ -1,4 +1,4 @@
-﻿/**
+/**
  * @file SovereignPersonalization.c
  * @brief Phase 60: Deep Personalization & Configuration Shard.
  */

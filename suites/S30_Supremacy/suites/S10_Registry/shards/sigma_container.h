@@ -1,8 +1,8 @@
-﻿/*
+/*
  * =========================================================================
  * S SIGMAOS kernel/suites/S10_Registry/shards/sigma_container.h
  * =========================================================================
- * Sovereign Container Runtime — gap-closes:
+ * Sovereign Container Runtime � gap-closes:
  *   Linux  : LXC/Docker namespaces, cgroups v2, seccomp-BPF, overlayfs
  *   macOS  : Virtualization.framework, App Sandbox (per-app containers)
  *   Windows: WSL2/HCS, Windows Containers (WCOW), Hyper-V isolation
@@ -24,16 +24,16 @@ typedef unsigned char      ct_bool;
 #define CT_OK    ((ct_i32) 0)
 #define CT_ERR   ((ct_i32)-1)
 
-/* ── Isolation level ─────────────────────────────────────────────────────── */
+/* -- Isolation level ------------------------------------------------------- */
 typedef enum {
-    ISOLATE_NONE      = 0,  /* no isolation — bare process               */
+    ISOLATE_NONE      = 0,  /* no isolation � bare process               */
     ISOLATE_PROCESS   = 1,  /* PID + IPC namespace only (Android model)  */
     ISOLATE_CONTAINER = 2,  /* full: PID+NET+MNT+UTS+IPC (Docker model)  */
     ISOLATE_VM_LITE   = 3,  /* user-mode kernel (gVisor/microVM)         */
     ISOLATE_WASM      = 4   /* WASI capability model                     */
 } sigma_isolation_t;
 
-/* ── Container state ─────────────────────────────────────────────────────── */
+/* -- Container state ------------------------------------------------------- */
 typedef enum {
     CT_CREATED   = 0,
     CT_RUNNING   = 1,
@@ -42,7 +42,7 @@ typedef enum {
     CT_DEAD      = 4
 } sigma_ct_state_t;
 
-/* ── Resource limits (cgroup v2 parity) ─────────────────────────────────── */
+/* -- Resource limits (cgroup v2 parity) ----------------------------------- */
 typedef struct {
     ct_u64 cpu_quota_us;     /* cpu.max: quota per period              */
     ct_u64 cpu_period_us;
@@ -59,7 +59,7 @@ typedef struct {
 #define CT_IMG_LEN  128
 #define CT_MAX       64
 
-/* ── Container descriptor ───────────────────────────────────────────────── */
+/* -- Container descriptor ------------------------------------------------- */
 typedef struct {
     char               id[CT_NAME_LEN];   /* 12-char hex like Docker    */
     char               name[CT_NAME_LEN];
@@ -76,7 +76,7 @@ typedef struct {
     ct_bool            network_disabled;
 } sigma_container_t;
 
-/* ── Public API ─────────────────────────────────────────────────────────── */
+/* -- Public API ----------------------------------------------------------- */
 void     sigma_ct_init(void);
 ct_i32   sigma_ct_create(const char *name, const char *image,
                           sigma_isolation_t level,

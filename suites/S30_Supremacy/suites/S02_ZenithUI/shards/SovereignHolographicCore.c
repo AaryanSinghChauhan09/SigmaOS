@@ -1,8 +1,8 @@
-﻿/*
+/*
  * =========================================================================
- * S SIGMAOS: S02_ZENITHUI — SovereignHolographicCore.c
+ * S SIGMAOS: S02_ZENITHUI � SovereignHolographicCore.c
  * =========================================================================
- * Mission: 3D-First Terminal UI (超越 Windows/macOS).
+ * Mission: 3D-First Terminal UI (?? Windows/macOS).
  * Capability: Volumetric windowing, Depth-buffered shaders, Sentient Chroma.
  * =========================================================================
  */

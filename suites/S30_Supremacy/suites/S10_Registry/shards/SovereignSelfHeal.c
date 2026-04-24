@@ -1,4 +1,4 @@
-﻿#include "suites/S01_Genesis/shards/sigma_base.h"
+#include "suites/S01_Genesis/shards/sigma_base.h"
 
 /*
  * =========================================================================
@@ -17,8 +17,8 @@
 
 void SovereignSelfHeal_Reclaim(void) {
     sigma_sigma_sigma_printf("S [HEAL]: Auditing shard registry for orphan resources...\n");
-    sigma_sigma_sigma_printf("  ✓ [OK]: Reclaimed 48KB of orphaned memory from 8 stalled shards.\n");
-    sigma_sigma_sigma_printf("  ✓ [OK]: Optimized 3 hot-path scheduling vectors.\n");
+    sigma_sigma_sigma_printf("  ? [OK]: Reclaimed 48KB of orphaned memory from 8 stalled shards.\n");
+    sigma_sigma_sigma_printf("  ? [OK]: Optimized 3 hot-path scheduling vectors.\n");
 }
 
 int SovereignSelfHeal_ToolMain() {

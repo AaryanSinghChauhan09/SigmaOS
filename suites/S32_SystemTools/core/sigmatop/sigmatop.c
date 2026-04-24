@@ -1,6 +1,6 @@
-ï»¿/*
+/*
  * =========================================================================
- * S SIGMAOS: tools/sigmatop â€” sigmatop.c
+ * S SIGMAOS: tools/sigmatop — sigmatop.c
  * =========================================================================
  * Mission: Real-time Sovereign Task and Resource Monitor.
  * Design: High-refresh rate VT100 dashboard for kernel execution shards.
@@ -21,7 +21,7 @@
 
 void print_header(void) {
     sigma_printf(VT_CLEAR VT_HIDE);
-    sigma_printf(VT_BOLD VT_CYAN " S SIGMATOP â€” Sovereign Singularity Monitor\n" VT_RESET);
+    sigma_printf(VT_BOLD VT_CYAN " S SIGMATOP — Sovereign Singularity Monitor\n" VT_RESET);
     sigma_printf(" ------------------------------------------\n");
     sigma_printf("  CPU: %-10s | Uptime: %-10s\n", "98.4% [||||||||| ]", "14d 2h 31m");
     sigma_printf("  MEM: %-10s | Shards: %-10d\n", "12.4 GB / 32 GB", 14023);

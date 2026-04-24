@@ -1,6 +1,6 @@
-﻿/*
+/*
  * =========================================================================
- * S SIGMAOS: S04_HAL — SovereignHAL_x86_64.c
+ * S SIGMAOS: S04_HAL � SovereignHAL_x86_64.c
  * =========================================================================
  * Implementation of Idea 131 (Apex Infinity): Hardware Abstraction Layer.
  * Direct silicon interaction for x86_64 architecture.

@@ -1,6 +1,6 @@
-﻿/*
+/*
  * =========================================================================
- * S SIGMAOS: S07_NETWORK — SovereignNetworkStack.c
+ * S SIGMAOS: S07_NETWORK � SovereignNetworkStack.c
  * =========================================================================
  * Mission: High-Performance TCP/IP Finite State Machine.
  * Design: Zero-Copy Packet processing and sliding window flow control.

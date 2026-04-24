@@ -4,7 +4,7 @@
  * USP: Dynamic CPU-specific sharding to leverage AVX-512 and other silicon-specific primitives.
  */
 
-#include <stdint.h>
+#include "sigma_libc.h"
 
 void sigma_avx_detect() {
     uint32_t eax, ebx, ecx, edx;

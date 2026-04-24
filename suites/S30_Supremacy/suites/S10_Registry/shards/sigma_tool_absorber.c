@@ -1,7 +1,7 @@
-﻿#include "suites/S01_Genesis/shards/sigma_base.h"
+#include "suites/S01_Genesis/shards/sigma_base.h"
 
 /*
- * S SIGMAOS: SOVEREIGN TOOL ABSORBER v3.0 — MODULAR
+ * S SIGMAOS: SOVEREIGN TOOL ABSORBER v3.0 � MODULAR
  * Mission: Unified entry point for all software tool absorption shards.
  * Design: C11 / Zero-Dependency / Registry-Based.
  */

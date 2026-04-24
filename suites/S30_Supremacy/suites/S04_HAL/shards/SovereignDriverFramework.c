@@ -1,5 +1,5 @@
-﻿/*
- * S SIGMAOS: SOVEREIGN DEVICE DRIVER FRAMEWORK (v2.0 — MODULAR)
+/*
+ * S SIGMAOS: SOVEREIGN DEVICE DRIVER FRAMEWORK (v2.0 � MODULAR)
  * Mission: Orchestrate hardware autonomy across sharded drivers.
  * Design: C11 / Zero-Dependency / Registry-Based.
  */

@@ -1,6 +1,6 @@
-﻿/*
+/*
  * =========================================================================
- * S SIGMAOS: SOVEREIGN OMNI-CLI DISPATCHER (v4.0 — MODULAR)
+ * S SIGMAOS: SOVEREIGN OMNI-CLI DISPATCHER (v4.0 � MODULAR)
  * =========================================================================
  * Mission: Lightweight dispatcher. Every command is a modular shard.
  * Design: C11 / Zero-Dependency / Registry-Based.
@@ -20,10 +20,10 @@ extern void SovereignAdvancedCommands_Register(void);
 extern void SovereignAutomationCommands_Register(void);
 
 static void print_modular_help(void) {
-    sigma_sigma_sigma_printf("\n╔══════════════════════════════════════════════════════════════════╗\n");
-    sigma_sigma_sigma_printf("║       S SIGMAOS OMNI-CLI DISPATCHER v4.0 (MODULAR)             ║\n");
-    sigma_sigma_sigma_printf("║       Every tool absorbed. Every distro neutralized.            ║\n");
-    sigma_sigma_sigma_printf("╚══════════════════════════════════════════════════════════════════╝\n");
+    sigma_sigma_sigma_printf("\n+------------------------------------------------------------------+\n");
+    sigma_sigma_sigma_printf("�       S SIGMAOS OMNI-CLI DISPATCHER v4.0 (MODULAR)             �\n");
+    sigma_sigma_sigma_printf("�       Every tool absorbed. Every distro neutralized.            �\n");
+    sigma_sigma_sigma_printf("+------------------------------------------------------------------+\n");
     SovereignCommand_ListAll();
 }
 

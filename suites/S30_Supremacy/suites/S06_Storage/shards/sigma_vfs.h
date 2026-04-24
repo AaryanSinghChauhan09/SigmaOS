@@ -1,8 +1,8 @@
-﻿/*
+/*
  * =========================================================================
  * S SIGMAOS kernel/suites/S06_Storage/shards/sigma_vfs.h
  * =========================================================================
- * Sovereign Virtual Filesystem — gap-closes:
+ * Sovereign Virtual Filesystem � gap-closes:
  *   Linux  : VFS layer (dentry, inode, file, superblock)
  *   macOS  : HFS+/APFS VFS switch layer
  *   Windows: IRP/IoStack, NTFS/ReFS filter drivers
@@ -26,7 +26,7 @@ typedef unsigned char      vfs_bool;
 #define VFS_OK    ((vfs_i32) 0)
 #define VFS_ERR   ((vfs_i32)-1)
 
-/* ── Constants ──────────────────────────────────────────────────────────── */
+/* -- Constants ------------------------------------------------------------ */
 #define VFS_MAX_PATH      512
 #define VFS_MAX_NAME       64
 #define VFS_MAX_INODES   8192
@@ -34,7 +34,7 @@ typedef unsigned char      vfs_bool;
 #define VFS_MAX_FILES     512
 #define VFS_MAX_FS_TYPES   16
 
-/* ── File types (inode mode bits) ───────────────────────────────────────── */
+/* -- File types (inode mode bits) ----------------------------------------- */
 #define VFS_IFMT   0xF000
 #define VFS_IFREG  0x8000   /* regular file   */
 #define VFS_IFDIR  0x4000   /* directory      */
@@ -44,7 +44,7 @@ typedef unsigned char      vfs_bool;
 #define VFS_IFCHR  0x2000   /* char device    */
 #define VFS_IFIFO  0x1000   /* FIFO/pipe      */
 
-/* ── Permission bits ─────────────────────────────────────────────────────── */
+/* -- Permission bits ------------------------------------------------------- */
 #define VFS_PERM_RUSR 0400
 #define VFS_PERM_WUSR 0200
 #define VFS_PERM_XUSR 0100
@@ -53,7 +53,7 @@ typedef unsigned char      vfs_bool;
 #define VFS_PERM_ROTH 0004
 #define VFS_PERM_WOTH 0002
 
-/* ── Open flags ──────────────────────────────────────────────────────────── */
+/* -- Open flags ------------------------------------------------------------ */
 #define VFS_O_RDONLY  0x00
 #define VFS_O_WRONLY  0x01
 #define VFS_O_RDWR    0x02
@@ -62,12 +62,12 @@ typedef unsigned char      vfs_bool;
 #define VFS_O_APPEND  0x400
 #define VFS_O_NONBLOCK 0x800
 
-/* ── Seek whence ─────────────────────────────────────────────────────────── */
+/* -- Seek whence ----------------------------------------------------------- */
 #define VFS_SEEK_SET  0
 #define VFS_SEEK_CUR  1
 #define VFS_SEEK_END  2
 
-/* ── Filesystem type (superblock ops) ───────────────────────────────────── */
+/* -- Filesystem type (superblock ops) ------------------------------------- */
 typedef struct sigma_inode_s sigma_inode_t;
 typedef struct sigma_dentry_s sigma_dentry_t;
 
@@ -79,7 +79,7 @@ typedef struct {
     sigma_inode_t *(*root_inode)(void);
 } sigma_fs_type_t;
 
-/* ── Inode (Linux inode / BSD vnode equivalent) ─────────────────────────── */
+/* -- Inode (Linux inode / BSD vnode equivalent) --------------------------- */
 struct sigma_inode_s {
     vfs_u64  ino;           /* inode number                             */
     vfs_u16  mode;          /* type + permissions                       */
@@ -100,7 +100,7 @@ struct sigma_inode_s {
     void     (*destroy)(sigma_inode_t*);
 };
 
-/* ── Dentry (directory entry cache — Linux dcache / BSD namecache) ──────── */
+/* -- Dentry (directory entry cache � Linux dcache / BSD namecache) -------- */
 struct sigma_dentry_s {
     char             name[VFS_MAX_NAME];
     sigma_inode_t   *inode;
@@ -110,7 +110,7 @@ struct sigma_dentry_s {
     vfs_bool         is_mountpoint;
 };
 
-/* ── Open file descriptor ────────────────────────────────────────────────── */
+/* -- Open file descriptor -------------------------------------------------- */
 typedef struct {
     vfs_u32       fd;
     sigma_inode_t *inode;
@@ -120,7 +120,7 @@ typedef struct {
     vfs_bool      is_open;
 } sigma_file_t;
 
-/* ── Public API ─────────────────────────────────────────────────────────── */
+/* -- Public API ----------------------------------------------------------- */
 void     sigma_vfs_init(void);
 vfs_i32  sigma_vfs_register_fs(sigma_fs_type_t *fs);
 vfs_i32  sigma_vfs_mount(const char *dev, const char *mnt, const char *fs_name);

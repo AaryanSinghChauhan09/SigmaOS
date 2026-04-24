@@ -1,4 +1,4 @@
-﻿#include "suites/S01_Genesis/shards/sigma_base.h"
+#include "suites/S01_Genesis/shards/sigma_base.h"
 
 #include "SovereignToolHeader.h"
 
@@ -15,8 +15,8 @@ void sigma_audit_latency(void) {
     sigma_sigma_sigma_printf("S [AUDIT]: Measuring kernel context-switch latency...\n");
     
     /* Mock latency measurement */
-    sigma_sigma_sigma_printf("  ✓ [TIME]: Context Switch: 140ns (Optimized)\n");
-    sigma_sigma_sigma_printf("  ✓ [TIME]: IRQ Dispatch: 85ns (Priority Path)\n");
+    sigma_sigma_sigma_printf("  ? [TIME]: Context Switch: 140ns (Optimized)\n");
+    sigma_sigma_sigma_printf("  ? [TIME]: IRQ Dispatch: 85ns (Priority Path)\n");
 }
 
 int SovereignLatencyAudit_ToolMain() {

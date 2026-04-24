@@ -1,8 +1,8 @@
-﻿/*
+/*
  * =========================================================================
  * S SIGMAOS kernel/suites/S13_Sentience/shards/sigma_perf.h
  * =========================================================================
- * Sovereign Observability Engine — gap-closes:
+ * Sovereign Observability Engine � gap-closes:
  *   Linux  : perf_events, ftrace, eBPF, kprobes, tracepoints, /proc/pid
  *   macOS  : DTrace, Instruments, kdebug, os_log
  *   Windows: ETW (Event Tracing for Windows), PerfMon, WPR/WPA
@@ -23,7 +23,7 @@ typedef unsigned char      pf_bool;
 #define PF_NULL  ((void*)0)
 #define PF_OK    ((pf_i32) 0)
 
-/* ── Event types (perf_event_type parity) ───────────────────────────────── */
+/* -- Event types (perf_event_type parity) --------------------------------- */
 typedef enum {
     PERF_HW_CPU_CYCLES       = 0,
     PERF_HW_INSTRUCTIONS     = 1,
@@ -44,7 +44,7 @@ typedef enum {
 #define SIGMA_PERF_MAX_SAMPLES  512
 #define SIGMA_PERF_NAME_LEN      48
 
-/* ── Performance counter ─────────────────────────────────────────────────── */
+/* -- Performance counter --------------------------------------------------- */
 typedef struct {
     pf_u32            id;
     char              name[SIGMA_PERF_NAME_LEN];
@@ -57,7 +57,7 @@ typedef struct {
     pf_bool           inherit;       /* inherit across fork()           */
 } sigma_perf_counter_t;
 
-/* ── Profiling sample (perf record parity) ───────────────────────────────── */
+/* -- Profiling sample (perf record parity) --------------------------------- */
 typedef struct {
     pf_u64 timestamp_ns;
     pf_u64 ip;           /* instruction pointer                         */
@@ -68,7 +68,7 @@ typedef struct {
     pf_u32 callchain_len;
 } sigma_perf_sample_t;
 
-/* ── ETW/Perfetto-style trace event ─────────────────────────────────────── */
+/* -- ETW/Perfetto-style trace event --------------------------------------- */
 typedef enum {
     TRACE_BEGIN  = 0,
     TRACE_END    = 1,
@@ -87,7 +87,7 @@ typedef struct {
 
 #define SIGMA_TRACE_MAX 4096
 
-/* ── Public API ─────────────────────────────────────────────────────────── */
+/* -- Public API ----------------------------------------------------------- */
 void   sigma_perf_init(void);
 
 /* Counters (perf_event_open equivalent) */

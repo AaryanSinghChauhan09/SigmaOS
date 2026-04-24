@@ -1,4 +1,4 @@
-﻿/*
+/*
  * =========================================================================
  * S SIGMAOS kernel/suites/S02_ZenithUI/shards/sigma_boot.c
  * =========================================================================
@@ -24,7 +24,7 @@ static const char *s_mem_names[] = {
     "ConvMem","Reserved","ACPI-Recl","ACPI-NVS","MMIO","BootSrvcs","SigmaKern"
 };
 
-/* ── Init ────────────────────────────────────────────────────────────────── */
+/* -- Init ------------------------------------------------------------------ */
 void sigma_boot_init(sigma_boot_config_t *cfg) {
     sigma_sigma_sigma_memset(&s_cfg, 0, sizeof(s_cfg));
     if (cfg) s_cfg = *cfg;
@@ -37,9 +37,9 @@ void sigma_boot_init(sigma_boot_config_t *cfg) {
     s_cfg.kaslr       = BOOT_TRUE;
     s_cfg.pqc_attest  = BOOT_TRUE;
 
-    sigma_sigma_sigma_printf("S ══════════════════════════════════════════════\n");
+    sigma_sigma_sigma_printf("S ----------------------------------------------\n");
     sigma_sigma_sigma_printf("  SIGMA-BOOT v2.0   SOVEREIGN BOOTLOADER\n");
-    sigma_sigma_sigma_printf("S ══════════════════════════════════════════════\n");
+    sigma_sigma_sigma_printf("S ----------------------------------------------\n");
     sigma_sigma_sigma_printf("  CPU: %u cores   RAM: %u MB\n", s_cfg.cpu_count, s_cfg.ram_mb);
     sigma_sigma_sigma_printf("  CMD: %s\n", s_cfg.cmdline);
     sigma_sigma_sigma_printf("  Secure Boot: %s   KASLR: %s   PQC-Attest: %s\n",
@@ -53,10 +53,10 @@ void sigma_boot_init(sigma_boot_config_t *cfg) {
 void sigma_boot_phase_advance(sigma_boot_phase_t to) {
     if (to <= s_phase) return;
     s_phase = to;
-    sigma_sigma_sigma_printf("S [BOOT] ── Phase: %s ──\n", s_phase_names[to]);
+    sigma_sigma_sigma_printf("S [BOOT] -- Phase: %s --\n", s_phase_names[to]);
 }
 
-/* ── Memory map ──────────────────────────────────────────────────────────── */
+/* -- Memory map ------------------------------------------------------------ */
 boot_i32 sigma_boot_add_mem_region(sigma_mem_type_t type,
                                     boot_u64 phys, boot_u64 pages) {
     if (s_mem_count >= SIGMA_MEMMAP_MAX) return BOOT_ERR;
@@ -90,7 +90,7 @@ boot_u64 sigma_boot_total_ram_kb(void) {
     return total;
 }
 
-/* ── Boot entries ────────────────────────────────────────────────────────── */
+/* -- Boot entries ---------------------------------------------------------- */
 boot_i32 sigma_boot_entry_add(const char *desc, boot_u64 load_addr) {
     if (s_entry_count >= SIGMA_BOOT_ENTRIES_MAX) return BOOT_ERR;
     sigma_boot_entry_t *e = &s_entries[s_entry_count++];
@@ -116,21 +116,21 @@ void sigma_boot_entry_select(boot_u32 idx) {
     }
 }
 
-/* ── Secure Boot + PQC attestation ──────────────────────────────────────── */
+/* -- Secure Boot + PQC attestation ---------------------------------------- */
 boot_bool sigma_secure_boot_verify(const boot_u8 *img, boot_u64 img_len,
                                     const boot_u8 *sig, boot_u64 sig_len) {
     (void)img; (void)img_len; (void)sig; (void)sig_len;
-    sigma_sigma_sigma_printf("S [BOOT] Secure Boot: ML-DSA signature verified ✓\n");
+    sigma_sigma_sigma_printf("S [BOOT] Secure Boot: ML-DSA signature verified ?\n");
     return BOOT_TRUE;
 }
 
 void sigma_boot_attest_tpm(void) {
     sigma_sigma_sigma_printf("S [BOOT] TPM2 PCR extend: boot config hash committed\n");
     sigma_sigma_sigma_printf("S [BOOT] PQC attestation: ML-DSA quote generated\n");
-    sigma_sigma_sigma_printf("S [BOOT] Remote verifier: attestation chain valid ✓\n");
+    sigma_sigma_sigma_printf("S [BOOT] Remote verifier: attestation chain valid ?\n");
 }
 
-/* ── kexec ───────────────────────────────────────────────────────────────── */
+/* -- kexec ----------------------------------------------------------------- */
 boot_i32 sigma_kexec_load(boot_u64 new_kernel_phys, boot_u64 new_initrd_phys) {
     sigma_sigma_sigma_printf("S [KEXEC] Loading new kernel at 0x%llx, initrd at 0x%llx\n",
                  (unsigned long long)new_kernel_phys,
@@ -141,12 +141,12 @@ boot_i32 sigma_kexec_load(boot_u64 new_kernel_phys, boot_u64 new_initrd_phys) {
 }
 
 void sigma_kexec_execute(void) {
-    sigma_sigma_sigma_printf("S [KEXEC] Jumping to new kernel — no reboot needed.\n");
+    sigma_sigma_sigma_printf("S [KEXEC] Jumping to new kernel � no reboot needed.\n");
     /* In real implementation: disable IRQs, flush TLB, jump to entry */
     sigma_boot_phase_advance(BOOT_PHASE_KERNEL);
 }
 
-/* ── Boot report ─────────────────────────────────────────────────────────── */
+/* -- Boot report ----------------------------------------------------------- */
 void sigma_boot_report(void) {
     sigma_sigma_sigma_printf("\nS BOOT REPORT\n");
     sigma_sigma_sigma_printf("  Phase:      %s\n", s_phase_names[s_phase]);

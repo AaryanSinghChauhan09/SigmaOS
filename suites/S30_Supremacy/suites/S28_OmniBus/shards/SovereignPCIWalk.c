@@ -1,6 +1,6 @@
-﻿/*
+/*
  * =========================================================================
- * S SIGMAOS: S28_OMNIBUS — SovereignPCIWalk.c
+ * S SIGMAOS: S28_OMNIBUS � SovereignPCIWalk.c
  * =========================================================================
  * Implementation of Idea 196 (Apex Infinity): PCI Configuration Walkthrough.
  * Provides the industrial-grade discovery mechanism for all PCIe devices.

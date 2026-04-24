@@ -4,7 +4,7 @@
  * USP: Real-time, zero-latency tracing of all shard-to-shard interactions.
  */
 
-#include <stdint.h>
+#include "sigma_libc.h"
 
 typedef struct {
     char* probe_name;

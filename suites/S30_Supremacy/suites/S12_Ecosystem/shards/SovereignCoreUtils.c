@@ -1,6 +1,6 @@
-﻿/*
+/*
  * =========================================================================
- * S SIGMAOS: S12_ECOSYSTEM — SovereignCoreUtils.c
+ * S SIGMAOS: S12_ECOSYSTEM � SovereignCoreUtils.c
  * =========================================================================
  * Mission: GNU Coreutils Parity.
  * Capability: ls, cat, rm, mkdir, touch (VFS-backed).

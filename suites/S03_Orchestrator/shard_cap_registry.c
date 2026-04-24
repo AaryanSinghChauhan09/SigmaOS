@@ -4,7 +4,7 @@
  * USP: Strict capability-based access control for shard-to-hardware communication.
  */
 
-#include <stdint.h>
+#include "sigma_libc.h"
 #include <string.h>
 
 typedef struct {

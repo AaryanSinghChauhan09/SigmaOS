@@ -1,8 +1,8 @@
-﻿/*
+/*
  * =========================================================================
  * S SIGMAOS kernel/suites/S02_ZenithUI/shards/sigma_boot.h
  * =========================================================================
- * Sovereign Boot Subsystem — gap-closes:
+ * Sovereign Boot Subsystem � gap-closes:
  *   Linux  : GRUB2, systemd-boot, EFISTUB, kexec, initramfs
  *   Windows: Windows Boot Manager, BCD store, Secure Boot shims
  *   macOS  : Apple Silicon boot (iBoot), OpenFirmware, efibootmgr
@@ -25,7 +25,7 @@ typedef unsigned char      boot_bool;
 #define BOOT_OK    ((boot_i32) 0)
 #define BOOT_ERR   ((boot_i32)-1)
 
-/* ── Boot phases ─────────────────────────────────────────────────────────── */
+/* -- Boot phases ----------------------------------------------------------- */
 typedef enum {
     BOOT_PHASE_FIRMWARE   = 0,  /* UEFI/BIOS/iBoot initialization        */
     BOOT_PHASE_BOOTLOADER = 1,  /* GRUB/systemd-boot/SigmaBoot           */
@@ -35,7 +35,7 @@ typedef enum {
     BOOT_PHASE_COMPLETE   = 5   /* system fully operational              */
 } sigma_boot_phase_t;
 
-/* ── Memory map entry (UEFI EFI_MEMORY_DESCRIPTOR parity) ───────────────── */
+/* -- Memory map entry (UEFI EFI_MEMORY_DESCRIPTOR parity) ----------------- */
 typedef enum {
     MEM_CONVENTIONAL = 0,
     MEM_RESERVED     = 1,
@@ -56,7 +56,7 @@ typedef struct {
 
 #define SIGMA_MEMMAP_MAX 256
 
-/* ── Boot configuration ──────────────────────────────────────────────────── */
+/* -- Boot configuration ---------------------------------------------------- */
 #define BOOT_CMDLINE_LEN 512
 #define BOOT_INITRD_PATH 256
 
@@ -74,14 +74,14 @@ typedef struct {
     boot_bool pqc_attest;               /* TPM+ML-DSA boot attestation */
 } sigma_boot_config_t;
 
-/* ── EFI-style GUID ──────────────────────────────────────────────────────── */
+/* -- EFI-style GUID -------------------------------------------------------- */
 typedef struct {
     boot_u32 data1;
     boot_u16 data2, data3;
     boot_u8  data4[8];
 } sigma_guid_t;
 
-/* ── Boot entry (BCD/EFI BootXXXX variable parity) ─────────────────────── */
+/* -- Boot entry (BCD/EFI BootXXXX variable parity) ----------------------- */
 typedef struct {
     char        description[64];
     boot_u64    load_addr;
@@ -91,7 +91,7 @@ typedef struct {
 
 #define SIGMA_BOOT_ENTRIES_MAX 8
 
-/* ── Public API ─────────────────────────────────────────────────────────── */
+/* -- Public API ----------------------------------------------------------- */
 void sigma_boot_init(sigma_boot_config_t *cfg);
 void sigma_boot_phase_advance(sigma_boot_phase_t to);
 

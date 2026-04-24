@@ -1,4 +1,4 @@
-﻿#include "suites/S01_Genesis/shards/sigma_base.h"
+#include "suites/S01_Genesis/shards/sigma_base.h"
 
 #include "SovereignToolHeader.h"
 
@@ -24,7 +24,7 @@ void sigma_query_constitution(const char* article) {
 
 int indian_law_ToolMain(int argc, char** argv) {
     sigma_sigma_sigma_printf("\n==========================================\n");
-    sigma_sigma_sigma_printf("  ⚖️  SIGMAOS BARE-METAL INDIAN LAW CORE  \n");
+    sigma_sigma_sigma_printf("  ??  SIGMAOS BARE-METAL INDIAN LAW CORE  \n");
     sigma_sigma_sigma_printf("==========================================\n\n");
 
     if (argc < 3) {

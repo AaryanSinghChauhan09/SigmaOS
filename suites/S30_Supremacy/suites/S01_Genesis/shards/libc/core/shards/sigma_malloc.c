@@ -1,4 +1,4 @@
-﻿#include "sigma_kernel.h"
+#include "sigma_kernel.h"
 static void* g_heap_start = SIGMA_NULL;
 static sigma_sz_t g_heap_used = 0;
 static const sigma_sz_t HEAP_SIZE = 1024 * 1024 * 128;

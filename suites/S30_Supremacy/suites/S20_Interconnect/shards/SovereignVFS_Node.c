@@ -1,6 +1,6 @@
-﻿/*
+/*
  * =========================================================================
- * S SIGMAOS: S20_GLOBALVFS — SovereignVFS_Node.c
+ * S SIGMAOS: S20_GLOBALVFS � SovereignVFS_Node.c
  * =========================================================================
  * Implementation of Idea 218 (Apex Infinity): Unified VFS Node.
  * Provides the industrial-grade interface for all Sovereign file systems.

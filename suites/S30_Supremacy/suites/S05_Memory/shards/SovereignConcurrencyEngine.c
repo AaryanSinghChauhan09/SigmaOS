@@ -1,4 +1,4 @@
-﻿/*
+/*
  * =========================================================================
  * S SIGMAOS ZENITH: SOVEREIGN CONCURRENCY ENGINE (v1.0)
  * =========================================================================
@@ -27,7 +27,7 @@ void sigma_spinlock_init(SigmaSpinlock_t* lock, const char* name) {
 void sigma_spinlock_acquire(SigmaSpinlock_t* lock) {
     while (__sync_lock_test_and_set(&lock->locked, 1)) {
         lock->contention_count++;
-        /* Spin — in production, would use PAUSE instruction */
+        /* Spin � in production, would use PAUSE instruction */
     }
 }
 

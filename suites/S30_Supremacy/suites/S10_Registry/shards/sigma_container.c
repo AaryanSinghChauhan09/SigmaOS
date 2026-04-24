@@ -1,4 +1,4 @@
-﻿/*
+/*
  * =========================================================================
  * S SIGMAOS kernel/suites/S10_Registry/shards/sigma_container.c
  * =========================================================================
@@ -24,7 +24,7 @@ static void gen_id(char *out, const char *name) {
     sigma_snsigma_sigma_printf(out, CT_NAME_LEN, "%012llx", (unsigned long long)h);
 }
 
-/* ── Namespace flags from isolation level ────────────────────────────────── */
+/* -- Namespace flags from isolation level ---------------------------------- */
 #define CT_NS_PID  (1<<0)
 #define CT_NS_NET  (1<<1)
 #define CT_NS_MNT  (1<<2)
@@ -78,18 +78,18 @@ ct_i32 sigma_ct_start(const char *name) {
 
     /* Apply cgroup v2 limits */
     if (ct->limits.cpu_quota_us)
-        sigma_sigma_sigma_printf("  ↳ cpu.max: %llu/%llu us\n",
+        sigma_sigma_sigma_printf("  ? cpu.max: %llu/%llu us\n",
                      (unsigned long long)ct->limits.cpu_quota_us,
                      (unsigned long long)ct->limits.cpu_period_us);
     if (ct->limits.mem_limit_kb)
-        sigma_sigma_sigma_printf("  ↳ memory.max: %llu KB\n",
+        sigma_sigma_sigma_printf("  ? memory.max: %llu KB\n",
                      (unsigned long long)ct->limits.mem_limit_kb);
     if (ct->limits.pids_max)
-        sigma_sigma_sigma_printf("  ↳ pids.max: %llu\n",
+        sigma_sigma_sigma_printf("  ? pids.max: %llu\n",
                      (unsigned long long)ct->limits.pids_max);
 
     /* Overlayfs mount for readonly rootfs */
-    sigma_sigma_sigma_printf("  ↳ overlayfs: upper=tmpfs lower=%s\n", ct->image);
+    sigma_sigma_sigma_printf("  ? overlayfs: upper=tmpfs lower=%s\n", ct->image);
     return CT_OK;
 }
 

@@ -1,4 +1,4 @@
-﻿/*
+/*
  * =========================================================================
  * S SIGMAOS ZENITH: SOVEREIGN FUZZY CONTROLLER (v51.4-ABSOLUTE-VOID)
  * =========================================================================
@@ -16,7 +16,7 @@
  * Principle: AI / Algorithms / Embedded.
  */
 void sigma_control_fuzzy_eval(float temp) {
-    sigma_sigma_sigma_printf("[FUZZY]: Evaluating Thermal State (%.2f°C)...\n", temp);
+    sigma_sigma_sigma_printf("[FUZZY]: Evaluating Thermal State (%.2f�C)...\n", temp);
     
     // Fuzzy Sets: COLD, WARM, HOT
     float mu_warm = (temp > 40 && temp < 70) ? 1.0f : 0.0f; 

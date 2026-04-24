@@ -1,7 +1,7 @@
-﻿#include "suites/S01_Genesis/shards/sigma_base.h"
+#include "suites/S01_Genesis/shards/sigma_base.h"
 
 /*
- * S SIGMAOS: SOVEREIGN DISTRO ABSORBER v3.0 — MODULAR
+ * S SIGMAOS: SOVEREIGN DISTRO ABSORBER v3.0 � MODULAR
  * Mission: Unified entry point for all distro personality shards.
  * Design: C11 / Zero-Dependency / Registry-Based.
  */

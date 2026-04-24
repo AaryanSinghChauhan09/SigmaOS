@@ -1,4 +1,4 @@
-﻿#include "sigma_kernel.h"
+#include "sigma_kernel.h"
 int sigma_streq(const char* s1, const char* s2) {
     sigma_sz_t i = 0;
     while(s1[i] != '\0' && s2[i] != '\0') {

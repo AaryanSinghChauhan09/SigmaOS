@@ -1,4 +1,4 @@
-﻿/*
+/*
  * =========================================================================
  * S SIGMAOS: SOVEREIGN PARALLELISM (Suite S19)
  * =========================================================================
@@ -10,7 +10,7 @@
 static gcd_queue_t s_queues[GCD_MAX_QUEUES];
 static sigma_u32   s_queue_count = 0;
 
-/* ── Internal helper for atomic push/pop ──────────────────────────────── */
+/* -- Internal helper for atomic push/pop -------------------------------- */
 static sigma_bool queue_push(gcd_queue_t* q, gcd_task_t t) {
     sigma_u32 next = (q->tail + 1) % GCD_RING_SIZE;
     if (next == q->head) return SIGMA_FALSE; /* Full */
@@ -26,7 +26,7 @@ static sigma_bool queue_pop(gcd_queue_t* q, gcd_task_t* t) {
     return SIGMA_TRUE;
 }
 
-/* ── Initialization ───────────────────────────────────────────────────── */
+/* -- Initialization ----------------------------------------------------- */
 void sigma_gcd_init(void) {
     sigma_sigma_sigma_memset(s_queues, 0, sizeof(s_queues));
     
@@ -39,7 +39,7 @@ void sigma_gcd_init(void) {
     sigma_sigma_sigma_printf("S [GCD] Parity: libdispatch (macOS) | WorkQueues (Linux)\n");
 }
 
-/* ── Queue Management ─────────────────────────────────────────────────── */
+/* -- Queue Management --------------------------------------------------- */
 gcd_queue_t* sigma_gcd_get_main_queue(void) {
     return &s_queues[0];
 }
@@ -64,7 +64,7 @@ gcd_queue_t* sigma_gcd_queue_create(const char* name, gcd_priority_t prio) {
     return q;
 }
 
-/* ── Task Submission ──────────────────────────────────────────────────── */
+/* -- Task Submission ---------------------------------------------------- */
 void sigma_gcd_async(gcd_queue_t* queue, gcd_block_t block, void* context) {
     gcd_task_t task = { block, context };
     if (!queue_push(queue, task)) {
@@ -91,7 +91,7 @@ void sigma_gcd_apply(sigma_u32 iterations, gcd_queue_t* queue, void (*block)(sig
     }
 }
 
-/* ── Statistics ────────────────────────────────────────────────────────── */
+/* -- Statistics ---------------------------------------------------------- */
 void sigma_gcd_stats(void) {
     sigma_sigma_sigma_printf("\nS GCD LATTICE STATS\n");
     sigma_sigma_sigma_printf("%-4s %-20s %-8s %-8s\n", "ID", "NAME", "PRIO", "PENDING");

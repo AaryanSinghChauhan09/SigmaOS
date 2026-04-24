@@ -1,26 +1,26 @@
-ï»¿/*
+/*
  * =========================================================================
  * S SIGMAOS: SOVEREIGN POWER MANAGEMENT SUBSYSTEM (v1.0 - PURE C11)
  * =========================================================================
  * Competitor Gap: Linux (ACPI/cpufreq/runtime PM), macOS (IOKit PMF),
  * Windows (ACPI/WDF) all have power management. SigmaOS had NONE.
  * This shard implements:
- *   â€¢ CPU frequency scaling (performance/powersave/schedutil governors)
- *   â€¢ ACPI state machine (S0 active through S5 soft-off)
- *   â€¢ Intel P-state / AMD AMD-Pstate driver parity
- *   â€¢ Turbo Boost / Precision Boost toggle
- *   â€¢ Battery status & charge threshold management
- *   â€¢ Thermal zone monitoring (ACPI thermal)
- *   â€¢ CPU idle (C-state) management
- *   â€¢ Runtime PM for device power gating
- *   â€¢ System suspend/hibernate/resume pipeline
+ *   • CPU frequency scaling (performance/powersave/schedutil governors)
+ *   • ACPI state machine (S0 active through S5 soft-off)
+ *   • Intel P-state / AMD AMD-Pstate driver parity
+ *   • Turbo Boost / Precision Boost toggle
+ *   • Battery status & charge threshold management
+ *   • Thermal zone monitoring (ACPI thermal)
+ *   • CPU idle (C-state) management
+ *   • Runtime PM for device power gating
+ *   • System suspend/hibernate/resume pipeline
  * =========================================================================
  */
 
 #include "suites/S01_Genesis/shards/sigma_base.h"
 
 /* -----------------------------------------------------------------------
- * Â§ 1. ACPI POWER STATES
+ * § 1. ACPI POWER STATES
  * ----------------------------------------------------------------------- */
 typedef enum {
     ACPI_S0 = 0,  /* Working */
@@ -44,7 +44,7 @@ static const char* acpi_state_name(SigmaACPIState_t s) {
 }
 
 sigma_err_t sigma_acpi_transition(SigmaACPIState_t target) {
-    sigma_sigma_sigma_printf("S [ACPI]: %s â†’ %s\n",
+    sigma_sigma_sigma_printf("S [ACPI]: %s ? %s\n",
                  acpi_state_name(s_system_state),
                  acpi_state_name(target));
     if (target == ACPI_S3)
@@ -54,20 +54,20 @@ sigma_err_t sigma_acpi_transition(SigmaACPIState_t target) {
     else if (target == ACPI_S5)
         sigma_sigma_sigma_printf("S [ACPI]: Powering off (soft-off)...\n");
     else if (target == ACPI_S0 && s_system_state != ACPI_S0)
-        sigma_sigma_sigma_printf("S [ACPI]: Resuming â€” restoring CPU state...\n");
+        sigma_sigma_sigma_printf("S [ACPI]: Resuming — restoring CPU state...\n");
     s_system_state = target;
     return SIGMA_OK;
 }
 
 /* -----------------------------------------------------------------------
- * Â§ 2. CPU FREQUENCY SCALING (cpufreq governors)
+ * § 2. CPU FREQUENCY SCALING (cpufreq governors)
  * ----------------------------------------------------------------------- */
 #define MAX_CPUS 64
 
 typedef enum {
     CPUFREQ_GOV_PERFORMANCE = 0,
     CPUFREQ_GOV_POWERSAVE,
-    CPUFREQ_GOV_SCHEDUTIL,   /* Linux 4.7+ â‰ˆ scales with CPU utilisation */
+    CPUFREQ_GOV_SCHEDUTIL,   /* Linux 4.7+ ˜ scales with CPU utilisation */
     CPUFREQ_GOV_CONSERVATIVE,
     CPUFREQ_GOV_ONDEMAND,
     CPUFREQ_GOV_USERSPACE
@@ -81,7 +81,7 @@ typedef struct {
     SigmaCpufreqGov_t governor;
     sigma_bool        turbo_enabled;
     sigma_u32         util_pct;    /* 0-100 load percentage */
-    sigma_u32         cstate;      /* C0, C1, C2, C3, â€¦ */
+    sigma_u32         cstate;      /* C0, C1, C2, C3, … */
 } SigmaCPUFreq_t;
 
 static SigmaCPUFreq_t s_cpus[MAX_CPUS];
@@ -157,7 +157,7 @@ void sigma_turbo_set(sigma_u32 cpu_id, sigma_bool enable) {
 }
 
 /* -----------------------------------------------------------------------
- * Â§ 3. THERMAL ZONE MONITORING (ACPI thermal tables)
+ * § 3. THERMAL ZONE MONITORING (ACPI thermal tables)
  * ----------------------------------------------------------------------- */
 #define MAX_THERMAL_ZONES 8
 
@@ -180,7 +180,7 @@ sigma_err_t sigma_thermal_register(const char* name,
     sigma_sigma_sigma_strcpy(z->name, name, sizeof(z->name));
     z->critical_milli_c     = critical_mc;
     z->trip_passive_milli_c = passive_mc;
-    z->temp_milli_c         = 40000; /* boot at 40Â°C */
+    z->temp_milli_c         = 40000; /* boot at 40°C */
     z->throttled            = SIGMA_FALSE;
     return SIGMA_OK;
 }
@@ -190,12 +190,12 @@ void sigma_thermal_update(const char* name, sigma_i32 temp_mc) {
         if (sigma_streq(s_thermal[i].name, name)) {
             s_thermal[i].temp_milli_c = temp_mc;
             if (temp_mc >= s_thermal[i].critical_milli_c) {
-                sigma_sigma_sigma_printf("S [THERMAL]: CRITICAL! %s = %dÂ°C â€” EMERGENCY THROTTLE\n",
+                sigma_sigma_sigma_printf("S [THERMAL]: CRITICAL! %s = %d°C — EMERGENCY THROTTLE\n",
                              name, temp_mc / 1000);
                 s_thermal[i].throttled = SIGMA_TRUE;
                 /* Would trigger cpufreq powersave on all CPUs */
             } else if (temp_mc >= s_thermal[i].trip_passive_milli_c) {
-                sigma_sigma_sigma_printf("S [THERMAL]: PASSIVE trip: %s = %dÂ°C â€” throttling\n",
+                sigma_sigma_sigma_printf("S [THERMAL]: PASSIVE trip: %s = %d°C — throttling\n",
                              name, temp_mc / 1000);
                 s_thermal[i].throttled = SIGMA_TRUE;
             } else {
@@ -207,7 +207,7 @@ void sigma_thermal_update(const char* name, sigma_i32 temp_mc) {
 }
 
 /* -----------------------------------------------------------------------
- * Â§ 4. BATTERY MANAGEMENT
+ * § 4. BATTERY MANAGEMENT
  * ----------------------------------------------------------------------- */
 typedef struct {
     sigma_u32  capacity_pct;   /* 0-100 */
@@ -247,7 +247,7 @@ void sigma_battery_set_threshold(sigma_u32 pct) {
 }
 
 /* -----------------------------------------------------------------------
- * Â§ 5. RUNTIME PM â€” device power gating
+ * § 5. RUNTIME PM — device power gating
  * ----------------------------------------------------------------------- */
 #define MAX_PM_DEVICES 64
 
@@ -286,7 +286,7 @@ void sigma_pm_put(const char* name) {
         if (sigma_streq(s_pm_devs[i].name, name)) {
             if (s_pm_devs[i].usage_count > 0) s_pm_devs[i].usage_count--;
             if (s_pm_devs[i].usage_count == 0) {
-                sigma_sigma_sigma_printf("S [PM]: Device '%s' idle â€” autosuspend in %ums\n",
+                sigma_sigma_sigma_printf("S [PM]: Device '%s' idle — autosuspend in %ums\n",
                              name, s_pm_devs[i].autosuspend_delay_ms);
                 s_pm_devs[i].active = SIGMA_FALSE;
             }
@@ -303,7 +303,7 @@ void SovereignPowerManagement_Init(void) {
 
     /* Register CPUs */
     for (sigma_u32 i = 0; i < 8; i++)
-        sigma_cpufreq_register(i, 800000, 5200000); /* 800MHz â€“ 5.2GHz */
+        sigma_cpufreq_register(i, 800000, 5200000); /* 800MHz – 5.2GHz */
 
     /* Set governors */
     sigma_cpufreq_set_governor(0, CPUFREQ_GOV_PERFORMANCE);
@@ -312,11 +312,11 @@ void SovereignPowerManagement_Init(void) {
     sigma_cpufreq_set_freq(2, 2400000); /* pin CPU2 at 2.4GHz */
 
     /* Thermal zones */
-    sigma_thermal_register("CPU",    95000, 80000);  /* critical=95Â°C, passive=80Â°C */
+    sigma_thermal_register("CPU",    95000, 80000);  /* critical=95°C, passive=80°C */
     sigma_thermal_register("GPU",    100000, 85000);
     sigma_thermal_register("BATTERY", 60000, 45000);
-    sigma_thermal_update("CPU",    72000);  /* 72Â°C â€” normal */
-    sigma_thermal_update("GPU",    88000);  /* 88Â°C â€” passive trip */
+    sigma_thermal_update("CPU",    72000);  /* 72°C — normal */
+    sigma_thermal_update("GPU",    88000);  /* 88°C — passive trip */
 
     /* Battery */
     sigma_battery_status();

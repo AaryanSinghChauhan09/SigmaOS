@@ -1,6 +1,6 @@
-﻿/*
+/*
  * =========================================================================
- * S SIGMAOS: S10_REGISTRY — SovereignSystemRegistry.c
+ * S SIGMAOS: S10_REGISTRY � SovereignSystemRegistry.c
  * =========================================================================
  * Mission: Transactional System State & Configuration Nexus.
  * Design: No-Glibc, No-Host-Headers. Zero-Corruption WAL architecture.
@@ -49,16 +49,16 @@ sigma_err_t SovereignRegistry_Register(const char* name, shard_category_t cat, s
  * @brief Audit the entire project lattice for integrity and performance readiness.
  */
 void SovereignRegistry_Audit(void) {
-    sigma_sigma_sigma_printf("\n╔══════════════════════════════════════════════════════════════╗\n");
-    sigma_sigma_sigma_printf("║   SigmaOS Sovereign Lattice Audit (Terminal v33.1)           ║\n");
-    sigma_sigma_sigma_printf("╠══════════════════════════════════════════════════════════════╣\n");
+    sigma_sigma_sigma_printf("\n+--------------------------------------------------------------+\n");
+    sigma_sigma_sigma_printf("�   SigmaOS Sovereign Lattice Audit (Terminal v33.1)           �\n");
+    sigma_sigma_sigma_printf("�--------------------------------------------------------------�\n");
     
     for (sigma_u32 i = 0; i < g_registry.shard_count; i++) {
         sovereign_shard_t* s = &g_registry.shards[i];
-        sigma_sigma_sigma_printf("║ Shard: %-25s | Status: %-10d ║\n", s->name, s->status);
+        sigma_sigma_sigma_printf("� Shard: %-25s | Status: %-10d �\n", s->name, s->status);
     }
     
-    sigma_sigma_sigma_printf("╚══════════════════════════════════════════════════════════════╝\n\n");
+    sigma_sigma_sigma_printf("+--------------------------------------------------------------+\n\n");
 }
 
 /**

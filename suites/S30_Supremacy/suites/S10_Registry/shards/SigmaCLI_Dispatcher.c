@@ -1,6 +1,6 @@
-﻿/*
+/*
  * =========================================================================
- * S SIGMAOS: SOVEREIGN CLI DISPATCHER (v50.2-OMEGA — TRANS-OS SUPREMACY)
+ * S SIGMAOS: SOVEREIGN CLI DISPATCHER (v50.2-OMEGA � TRANS-OS SUPREMACY)
  * =========================================================================
  * The universal user-facing entry point for the Omni-CLI. 
  * Orchestrates thousands of shards via the Sentient Command Matrix.
@@ -45,7 +45,7 @@ void sigma_print_usage(void) {
     sigma_print("  ai           Neural inference & anomaly detection\n\n");
 
     sigma_print("--- DISTRO & TOOL ABSORPTION ---\n");
-    sigma_print("  god-matrix   ∞ ABSOLUTE ABSORPTION: Neutralize ALL competitors ∞\n");
+    sigma_print("  god-matrix   8 ABSOLUTE ABSORPTION: Neutralize ALL competitors 8\n");
     sigma_print("=================================================================\n");
 }
 

@@ -1,6 +1,6 @@
-﻿/*
+/*
  * =========================================================================
- * S SIGMAOS ZENITH: SOVEREIGN EDGE CONSENSUS (v2.0 — RAFT IMPL)
+ * S SIGMAOS ZENITH: SOVEREIGN EDGE CONSENSUS (v2.0 � RAFT IMPL)
  * =========================================================================
  * Mission: Global Distributed State Consensus for Edge Shards.
  * Principles: Raft Parity, Fault Tolerance, Quorum-based Integrity.

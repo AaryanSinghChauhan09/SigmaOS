@@ -1,11 +1,11 @@
-﻿#include "suites/S01_Genesis/shards/sigma_base.h"
+#include "suites/S01_Genesis/shards/sigma_base.h"
 
 #include "suites/S10_Registry/shards/SovereignLatticeRegistry.h"
 #include "sigma_libc.h"
 
 /*
  * Sovereign Init Registry (v1.0).
- * Manages system service lifecycle — start, stop, restart, enable.
+ * Manages system service lifecycle � start, stop, restart, enable.
  * Design: C11 / Zero-Dependency / Registry Pattern.
  */
 

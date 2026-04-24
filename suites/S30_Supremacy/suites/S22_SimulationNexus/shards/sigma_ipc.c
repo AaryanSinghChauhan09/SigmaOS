@@ -1,4 +1,4 @@
-﻿/*
+/*
  * =========================================================================
  * S SIGMAOS: SOVEREIGN IPC (Suite S22)
  * =========================================================================
@@ -10,13 +10,13 @@
 static sigma_u32 s_next_port = 0x1000;
 static sigma_u32 s_port_count = 0;
 
-/* ── Initialization ───────────────────────────────────────────────────── */
+/* -- Initialization ----------------------------------------------------- */
 void sigma_ipc_init(void) {
     sigma_sigma_sigma_printf("S [IPC] Sovereign IPC Subsystem initialized\n");
     sigma_sigma_sigma_printf("S [IPC] Fabric: Mach Ports | Shared Memory | Ring vBus\n");
 }
 
-/* ── Port Management ──────────────────────────────────────────────────── */
+/* -- Port Management ---------------------------------------------------- */
 ipc_port_t sigma_port_allocate(void) {
     ipc_port_t p = s_next_port++;
     s_port_count++;
@@ -30,7 +30,7 @@ sigma_err_t sigma_port_destroy(ipc_port_t port) {
     return SIGMA_OK;
 }
 
-/* ── Messaging ────────────────────────────────────────────────────────── */
+/* -- Messaging ---------------------------------------------------------- */
 sigma_err_t sigma_msg_send(ipc_header_t* header, const void* data) {
     sigma_sigma_sigma_printf("S [IPC] Msg SEND: (remote=0x%x, size=%u)\n", 
                  header->remote_port, header->msg_size);
@@ -46,7 +46,7 @@ sigma_err_t sigma_msg_recv(ipc_port_t port, ipc_header_t* header, void* data, si
     return SIGMA_OK;
 }
 
-/* ── Shared Memory ─────────────────────────────────────────────────────── */
+/* -- Shared Memory ------------------------------------------------------- */
 void* sigma_shm_create(sigma_u32 id, sigma_sz_t size) {
     void* addr = (void*)0xFFFF900000000000ULL; /* Mock SHM range */
     sigma_sigma_sigma_printf("S [SHM] Created segment %u (size=%llu) at %p\n", 

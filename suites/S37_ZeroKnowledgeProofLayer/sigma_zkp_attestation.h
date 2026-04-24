@@ -1,7 +1,7 @@
 #ifndef SIGMA_ZKP_ATTESTATION_H
 #define SIGMA_ZKP_ATTESTATION_H
 
-#include <stdint.h>
+#include "sigma_libc.h"
 
 /* SigmaOS Zero-Knowledge Proof (ZKP) Layer - Phase 7 Sovereign Intelligence
  * Provides primitive structures for zk-SNARK style attestation of

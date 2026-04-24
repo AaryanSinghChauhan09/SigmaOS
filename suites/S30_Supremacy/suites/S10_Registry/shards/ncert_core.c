@@ -1,4 +1,4 @@
-﻿#include "suites/S01_Genesis/shards/sigma_base.h"
+#include "suites/S01_Genesis/shards/sigma_base.h"
 
 #include "SovereignToolHeader.h"
 
@@ -21,7 +21,7 @@ void sigma_load_ncert_syllabus(const char* class_grade, const char* subject) {
 
 int ncert_core_ToolMain(int argc, char** argv) {
     sigma_sigma_sigma_printf("\n============================================\n");
-    sigma_sigma_sigma_printf("  📚 SIGMAOS BARE-METAL NCERT ACADEMY CORE  \n");
+    sigma_sigma_sigma_printf("  ?? SIGMAOS BARE-METAL NCERT ACADEMY CORE  \n");
     sigma_sigma_sigma_printf("============================================\n\n");
 
     if (argc < 3) {

@@ -1,4 +1,4 @@
-﻿#include "SovereignScheduler.h"
+#include "SovereignScheduler.h"
 #include "suites/S01_Genesis/shards/sigma_kernel.h"
 #include "sigma_libc.h"
 

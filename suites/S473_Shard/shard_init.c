@@ -3,7 +3,7 @@
  * Part of the 500-Shard Sovereign Lattice.
  */
 
-#include <stdint.h>
+#include "sigma_libc.h"
 
 void sigma_suite_473_init() {
     // Shard-specific initialization

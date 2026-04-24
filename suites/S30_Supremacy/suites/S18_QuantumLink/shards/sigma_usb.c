@@ -1,4 +1,4 @@
-﻿/*
+/*
  * =========================================================================
  * S SIGMAOS kernel/suites/S18_QuantumLink/shards/sigma_usb.c
  * =========================================================================
@@ -27,14 +27,14 @@ static sigma_usb_dev_t *find_dev(usb_u32 id) {
     return (sigma_usb_dev_t*)0;
 }
 
-/* ── Init ────────────────────────────────────────────────────────────────── */
+/* -- Init ------------------------------------------------------------------ */
 void sigma_usb_init(void) {
     sigma_sigma_sigma_memset(s_devices, 0, sizeof(s_devices));
     sigma_sigma_sigma_printf("S [USB] Sovereign USB subsystem initialized\n");
     sigma_sigma_sigma_printf("S [USB] xHCI host | USB4/TB4 | Gadget mode | ADB parity\n");
 }
 
-/* ── Hot-plug enumeration ────────────────────────────────────────────────── */
+/* -- Hot-plug enumeration -------------------------------------------------- */
 usb_i32 sigma_usb_enumerate(usb_u32 port) {
     if (s_dev_count >= USB_MAX_DEVICES) return USB_ERR;
     if (s_next_addr > 127) return USB_ERR;
@@ -103,7 +103,7 @@ void sigma_usb_device_list(void) {
     }
 }
 
-/* ── Transfer functions ──────────────────────────────────────────────────── */
+/* -- Transfer functions ---------------------------------------------------- */
 usb_i32 sigma_usb_control_msg(usb_u32 dev_id, usb_u8 request_type,
                                usb_u8 request, usb_u16 value, usb_u16 index,
                                void *buf, usb_u16 len) {
@@ -133,7 +133,7 @@ usb_i32 sigma_usb_interrupt_transfer(usb_u32 dev_id, usb_u8 ep,
     return (usb_i32)len;
 }
 
-/* ── Suspend / resume ────────────────────────────────────────────────────── */
+/* -- Suspend / resume ------------------------------------------------------ */
 usb_i32 sigma_usb_suspend(usb_u32 dev_id) {
     sigma_usb_dev_t *d = find_dev(dev_id);
     if (!d) return USB_ERR;
@@ -150,7 +150,7 @@ usb_i32 sigma_usb_resume(usb_u32 dev_id) {
     return USB_OK;
 }
 
-/* ── Gadget mode (ADB endpoint-zero) ─────────────────────────────────────── */
+/* -- Gadget mode (ADB endpoint-zero) --------------------------------------- */
 usb_i32 sigma_usb_gadget_init(sigma_usb_class_t gadget_class) {
     s_gadget_class  = (usb_u32)gadget_class;
     s_gadget_active = USB_TRUE;

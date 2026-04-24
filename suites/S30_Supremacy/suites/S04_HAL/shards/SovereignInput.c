@@ -1,24 +1,24 @@
-ï»¿/*
+/*
  * =========================================================================
- * S SIGMAOS: SOVEREIGN INPUT SUBSYSTEM (v1.0 â€” PURE C11)
+ * S SIGMAOS: SOVEREIGN INPUT SUBSYSTEM (v1.0 — PURE C11)
  * =========================================================================
  * Competitor Gap Closed: Linux drivers/input/ (evdev), macOS IOHIDFamily,
  * Windows HID Class Drivers. SigmaOS had zero generic input handling.
  *
  * This shard implements:
- *   Â§ 1  Generic input event structure (linux/input.h evdev parity)
- *   Â§ 2  Input device registration (keyboards, mice, touchpads, joysticks)
- *   Â§ 3  Event queuing and routing to userland readers (/dev/input/eventX)
- *   Â§ 4  Key state tracking (bitmaps for pressed keys/buttons)
- *   Â§ 5  Absolute and relative axis tracking (EV_ABS, EV_REL)
- *   Â§ 6  Multitouch protocol B (MT_SLOT) minimal support
+ *   § 1  Generic input event structure (linux/input.h evdev parity)
+ *   § 2  Input device registration (keyboards, mice, touchpads, joysticks)
+ *   § 3  Event queuing and routing to userland readers (/dev/input/eventX)
+ *   § 4  Key state tracking (bitmaps for pressed keys/buttons)
+ *   § 5  Absolute and relative axis tracking (EV_ABS, EV_REL)
+ *   § 6  Multitouch protocol B (MT_SLOT) minimal support
  * =========================================================================
  */
 
 #include "suites/S01_Genesis/shards/sigma_kernel.h"
 
 /* -----------------------------------------------------------------------
- * â–‘â–‘ CONSTANTS (Matches Linux ABI for evdev)
+ * ¦¦ CONSTANTS (Matches Linux ABI for evdev)
  * ----------------------------------------------------------------------- */
 /* Event types */
 #define EV_SYN      0x00
@@ -69,7 +69,7 @@
 #define ABS_MT_TRACKING_ID 0x39
 
 /* -----------------------------------------------------------------------
- * â–‘â–‘ EVENT STRUCTURE
+ * ¦¦ EVENT STRUCTURE
  * ----------------------------------------------------------------------- */
 typedef struct {
     sigma_u64 time_sec;
@@ -80,7 +80,7 @@ typedef struct {
 } SIGMA_PACKED SigmaInputEvent_t;
 
 /* -----------------------------------------------------------------------
- * â–‘â–‘ INPUT DEVICE ABSTRACTION
+ * ¦¦ INPUT DEVICE ABSTRACTION
  * ----------------------------------------------------------------------- */
 #define MAX_INPUT_DEVICES 32
 #define EVENT_QUEUE_SIZE 256
@@ -134,7 +134,7 @@ static SigmaInputDevice_t s_input_devices[MAX_INPUT_DEVICES];
 static sigma_u32 s_input_dev_count = 0;
 
 /* -----------------------------------------------------------------------
- * â–‘â–‘ REGISTRATION API
+ * ¦¦ REGISTRATION API
  * ----------------------------------------------------------------------- */
 SigmaInputDevice_t* sigma_input_allocate_device(void) {
     for(int i = 0; i < MAX_INPUT_DEVICES; i++) {
@@ -156,7 +156,7 @@ sigma_err_t sigma_input_register_device(SigmaInputDevice_t *dev) {
 }
 
 /* -----------------------------------------------------------------------
- * â–‘â–‘ EVENT INJECTION (Called by drivers e.g. USB HID)
+ * ¦¦ EVENT INJECTION (Called by drivers e.g. USB HID)
  * ----------------------------------------------------------------------- */
 static void enqueue_event(SigmaInputDevice_t *dev, sigma_u16 type, sigma_u16 code, sigma_i32 value) {
     sigma_u32 next = (dev->queue_tail + 1) % EVENT_QUEUE_SIZE;
@@ -202,7 +202,7 @@ void sigma_input_sync(SigmaInputDevice_t *dev) {
 }
 
 /* -----------------------------------------------------------------------
- * â–‘â–‘ USERSPACE READ API (Mock)
+ * ¦¦ USERSPACE READ API (Mock)
  * ----------------------------------------------------------------------- */
 sigma_ssz_t sigma_input_read_device(sigma_u32 minor, SigmaInputEvent_t *out_ev, sigma_sz_t max_events) {
     if (minor >= MAX_INPUT_DEVICES) return SIGMA_EINVAL;
@@ -219,7 +219,7 @@ sigma_ssz_t sigma_input_read_device(sigma_u32 minor, SigmaInputEvent_t *out_ev, 
 }
 
 /* -----------------------------------------------------------------------
- * â–‘â–‘ INITIALISATION
+ * ¦¦ INITIALISATION
  * ----------------------------------------------------------------------- */
 void SovereignInput_Init(void) {
     sigma_sigma_sigma_printf("S [INPUT]: Initialising Sovereign Input Subsystem (evdev)...\n");

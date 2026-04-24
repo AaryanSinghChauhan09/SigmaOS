@@ -1,5 +1,5 @@
-ï»¿// =============================================================================
-// SigmaOS â€” S25_ZeroKernel â€” SovereignKernelMain.c
+// =============================================================================
+// SigmaOS — S25_ZeroKernel — SovereignKernelMain.c
 // =============================================================================
 #include "suites/S01_Genesis/shards/sigma_base.h"
 #include "suites/S01_Genesis/shards/sigma_kernel.h"

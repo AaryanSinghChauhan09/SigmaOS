@@ -1,6 +1,6 @@
-﻿/*
+/*
  * =========================================================================
- * S SIGMAOS: S04_HAL — SovereignGpuStack.c
+ * S SIGMAOS: S04_HAL � SovereignGpuStack.c
  * =========================================================================
  * Mission: Universal GPU Acceleration (Vulkan/Metal Parity).
  * Capability: Shader compilation, Command buffers, Unified memory.

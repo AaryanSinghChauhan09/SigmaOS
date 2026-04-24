@@ -1,6 +1,6 @@
-﻿/*
+/*
  * =========================================================================
- * S SIGMAOS: S05_MEMORY — SovereignPMM.c
+ * S SIGMAOS: S05_MEMORY � SovereignPMM.c
  * =========================================================================
  * Implementation of Idea 41 (Apex Infinity): Bitmap Physical Memory Manager.
  * Zero external libraries. Direct page-frame management.

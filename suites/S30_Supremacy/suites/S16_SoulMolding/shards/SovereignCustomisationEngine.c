@@ -1,9 +1,9 @@
-ï»¿/*
+/*
  * =========================================================================
  * S SIGMAOS ZENITH: SOVEREIGN CUSTOMISATION ENGINE (v1.0)
  * =========================================================================
  * Mission:  Dynamic System Behavior Tuning & User-Driven Configuration.
- * Principle: Customisation â€” distinct from Personalisation.
+ * Principle: Customisation — distinct from Personalisation.
  *
  * Design:
  *   Personalisation = identity-aware aesthetics (themes, avatars).
@@ -13,7 +13,7 @@
  *
  *   This engine manages a key-value configuration store that any
  *   shard can query at runtime to adapt its behavior to user
- *   preferences â€” without recompilation.
+ *   preferences — without recompilation.
  * =========================================================================
  */
 
@@ -40,7 +40,7 @@ static sigma_u32 s_config_count = 0;
  * the user to tune system behavior at any point.
  */
 sigma_err_t sigma_config_set(const char* key, const char* value, sigma_u32 flags) {
-    /* Check for existing key â€” update in place */
+    /* Check for existing key — update in place */
     for (sigma_u32 i = 0; i < s_config_count; i++) {
         if (sigma_streq(s_config_store[i].key, key)) {
             if (s_config_store[i].flags & 0x01) {
@@ -86,7 +86,7 @@ const char* sigma_config_get(const char* key) {
 void SovereignCustomisation_Init(void) {
     sigma_sigma_sigma_printf("[CUSTOM-ENGINE]: Initializing System Customisation Store...\n");
 
-    /* Default OS behaviors â€” overrideable by user */
+    /* Default OS behaviors — overrideable by user */
     sigma_config_set("shell.prompt",         "sigma>",       0x00);
     sigma_config_set("scheduler.policy",     "CFS",          0x00);
     sigma_config_set("power.profile",        "balanced",     0x00);

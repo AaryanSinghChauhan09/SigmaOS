@@ -1,4 +1,4 @@
-﻿/**
+/**
  * @file SovereignKali_Forensics.c
  * @brief Phase 66: Kali Linux Absorption Shard (Forensics).
  */

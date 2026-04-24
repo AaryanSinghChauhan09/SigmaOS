@@ -1,4 +1,4 @@
-﻿/**
+/**
  * @file SovereignUniversalDistroSuite.c
  * @brief Phase 58: Universal Distro Absorption Shard.
  * 

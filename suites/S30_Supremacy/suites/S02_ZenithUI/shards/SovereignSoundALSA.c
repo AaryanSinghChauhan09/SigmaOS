@@ -1,6 +1,6 @@
-ï»¿/*
+/*
  * =========================================================================
- * S SIGMAOS: SOVEREIGN SOUND SUBSYSTEM (v1.0 â€” PURE C11)
+ * S SIGMAOS: SOVEREIGN SOUND SUBSYSTEM (v1.0 — PURE C11)
  * =========================================================================
  * Competitor Gap Closed: Linux sound/core/ (ALSA), macOS CoreAudio,
  * Windows WASAPI / AudioEndpoint.
@@ -8,18 +8,18 @@
  * audio hardware mixers (volume/mute), or interface with sound cards.
  *
  * This shard implements ALSA parity:
- *   Â§ 1  Sound Card Registration
- *   Â§ 2  PCM (Pulse-Code Modulation) stream abstraction
- *   Â§ 3  Hardware parameter negotiation (hw_params: rate, channels, format)
- *   Â§ 4  ALSA Mixer abstraction (Kcontrols for volume levels)
- *   Â§ 5  Ring Buffer abstractions for ALSA period interrupts
+ *   § 1  Sound Card Registration
+ *   § 2  PCM (Pulse-Code Modulation) stream abstraction
+ *   § 3  Hardware parameter negotiation (hw_params: rate, channels, format)
+ *   § 4  ALSA Mixer abstraction (Kcontrols for volume levels)
+ *   § 5  Ring Buffer abstractions for ALSA period interrupts
  * =========================================================================
  */
 
 #include "suites/S01_Genesis/shards/sigma_kernel.h"
 
 /* -----------------------------------------------------------------------
- * â–‘â–‘ CONSTANTS & MACROS
+ * ¦¦ CONSTANTS & MACROS
  * ----------------------------------------------------------------------- */
 #define SND_MAX_CARDS        8
 #define SND_MAX_DEVICES      4  /* e.g., PCM out, PCM in, MIDI, Mixer */
@@ -39,7 +39,7 @@
 #define SND_CTL_ELEM_TYPE_INTEGER  2
 
 /* -----------------------------------------------------------------------
- * â–‘â–‘ SND STRUCTURES (Matching Linux sound/core)
+ * ¦¦ SND STRUCTURES (Matching Linux sound/core)
  * ----------------------------------------------------------------------- */
 
 typedef struct {
@@ -118,7 +118,7 @@ static SigmaSndCard_t s_snd_cards[SND_MAX_CARDS];
 static sigma_u32 s_snd_card_count = 0;
 
 /* -----------------------------------------------------------------------
- * â–‘â–‘ ALSA CORE API
+ * ¦¦ ALSA CORE API
  * ----------------------------------------------------------------------- */
 
 sigma_err_t sigma_snd_card_new(SigmaSndCard_t **out_card, const char *id, const char *driver) {
@@ -169,7 +169,7 @@ SigmaSndKControl_t* sigma_snd_ctl_new(SigmaSndCard_t *card, const char *name, si
 }
 
 /* -----------------------------------------------------------------------
- * â–‘â–‘ HARDWARE MOCK (Intel HDA / AC97 Proxy)
+ * ¦¦ HARDWARE MOCK (Intel HDA / AC97 Proxy)
  * ----------------------------------------------------------------------- */
 static sigma_err_t mock_pcm_hw_params(SigmaSndPCMSubstream_t *sub, SigmaSndHWParams_t *p) {
     sigma_sigma_sigma_printf("S [ALSA-HW]: HW Params Requested -> Rate: %u Hz, Channels: %u, Format: %u\n",
@@ -199,7 +199,7 @@ static sigma_err_t mock_pcm_trigger(SigmaSndPCMSubstream_t *sub, int cmd) {
 }
 
 /* -----------------------------------------------------------------------
- * â–‘â–‘ INITIALISATION
+ * ¦¦ INITIALISATION
  * ----------------------------------------------------------------------- */
 void SovereignSoundALSA_Init(void) {
     sigma_sigma_sigma_printf("S [ALSA]: Initialising Sovereign Advanced Sound Architecture...\n");

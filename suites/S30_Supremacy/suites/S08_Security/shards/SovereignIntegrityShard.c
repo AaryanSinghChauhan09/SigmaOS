@@ -1,4 +1,4 @@
-﻿#include "suites/S01_Genesis/shards/sigma_base.h"
+#include "suites/S01_Genesis/shards/sigma_base.h"
 
 #include "suites/S10_Registry/shards/SovereignLatticeRegistry.h"
 #include "sigma_libc.h"
@@ -18,8 +18,8 @@ sigma_err_t sigma_integrity_init(void) {
 
 void SovereignIntegrity_Audit(void) {
     sigma_sigma_sigma_printf("S [INTEGRITY-SCAN]: Auditing 446 seated shards...\n");
-    sigma_sigma_sigma_printf("  ✓ [OK]: All crypto sectors verified.\n");
-    sigma_sigma_sigma_printf("  ✓ [OK]: Driver matrix: UNMODIFIED.\n");
+    sigma_sigma_sigma_printf("  ? [OK]: All crypto sectors verified.\n");
+    sigma_sigma_sigma_printf("  ? [OK]: Driver matrix: UNMODIFIED.\n");
     sigma_sigma_sigma_printf("S [INTEGRITY-SCAN]: Health check 100%% successful.\n");
 }
 

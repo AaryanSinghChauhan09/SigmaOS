@@ -1,6 +1,6 @@
-﻿/*
+/*
  * =========================================================================
- * S SIGMAOS: S20_GLOBALVFS — SovereignVFSCore.c
+ * S SIGMAOS: S20_GLOBALVFS � SovereignVFSCore.c
  * =========================================================================
  * Mission: Global Unified Namespace and Shard-Aware File Abstraction.
  * Design: High-performance inode caching and pluggable mount points.

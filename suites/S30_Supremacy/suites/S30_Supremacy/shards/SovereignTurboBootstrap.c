@@ -1,4 +1,4 @@
-﻿/**
+/**
  * @file SovereignTurboBootstrap.c
  * @brief Phase 59: Turbo-Performance & Instant-Deploy.
  * 

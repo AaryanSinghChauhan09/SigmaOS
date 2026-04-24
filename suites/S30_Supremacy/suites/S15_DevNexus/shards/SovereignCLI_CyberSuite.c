@@ -1,4 +1,4 @@
-﻿/*
+/*
  * =========================================================================
  * S SIGMAOS: SOVEREIGN CLI CYBER SUITE (v2.0 - INDUSTRIAL)
  * =========================================================================
@@ -24,12 +24,12 @@ void cmd_sigma_iptables(int argc, char** argv) {
 
 void cmd_sigma_vault(int argc, char** argv) {
     sigma_sigma_sigma_printf("S [VAULT]: Sealed Identity Matrices:\n");
-    sigma_sigma_sigma_printf("  [✓] MASTER_KEY_0: Seated\n");
+    sigma_sigma_sigma_printf("  [?] MASTER_KEY_0: Seated\n");
 }
 
 void cmd_sigma_defender(int argc, char** argv) {
     sigma_sigma_sigma_printf("S [DEFENDER]: Running Real-time Shard Scan...\n");
-    sigma_sigma_sigma_printf("  [✓] 425/425 Shards Integrity Verified.\n");
+    sigma_sigma_sigma_printf("  [?] 425/425 Shards Integrity Verified.\n");
 }
 
 void SovereignCLI_CyberSuite_Register(void) {

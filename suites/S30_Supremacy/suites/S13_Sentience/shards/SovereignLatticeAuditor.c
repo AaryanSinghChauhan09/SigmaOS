@@ -1,6 +1,6 @@
-﻿/*
+/*
  * =========================================================================
- * S SIGMAOS: S13_SENTIENCE — SovereignLatticeAuditor.c
+ * S SIGMAOS: S13_SENTIENCE � SovereignLatticeAuditor.c
  * =========================================================================
  * Implementation of the industrial-grade system integrity monitor.
  * =========================================================================

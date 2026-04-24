@@ -1,8 +1,8 @@
-﻿#include "suites/S01_Genesis/shards/sigma_base.h"
+#include "suites/S01_Genesis/shards/sigma_base.h"
 
 /*
  * =========================================================================
- * S SIGMAOS: SOVEREIGN TOOLCHAIN — ORCHESTRATOR (v1.0)
+ * S SIGMAOS: SOVEREIGN TOOLCHAIN � ORCHESTRATOR (v1.0)
  * =========================================================================
  * Mission: Zero-dependency cross-compilation for embedded devices.
  * Design: C11 / Zero-Dependency / Standalone.
@@ -14,12 +14,12 @@
 
 void SovereignToolchain_SysrootSetup(const char* arch) {
     sigma_sigma_sigma_printf("S [TOOLCHAIN]: Configuring sysroot for %s-sigma-freestanding...\n", arch);
-    sigma_sigma_sigma_printf("  ✓ [OK]: /usr/%s-sigma/include seeded with sigma_types.h.\n", arch);
+    sigma_sigma_sigma_printf("  ? [OK]: /usr/%s-sigma/include seeded with sigma_types.h.\n", arch);
 }
 
 void SovereignToolchain_CompilerHandshake(void) {
     sigma_sigma_sigma_printf("S [TOOLCHAIN]: Verifying GCC/Clang cross-compiler compatibility...\n");
-    sigma_sigma_sigma_printf("  ✓ [OK]: -ffreestanding -nostdlib -mabi=lp64 hooks verified.\n");
+    sigma_sigma_sigma_printf("  ? [OK]: -ffreestanding -nostdlib -mabi=lp64 hooks verified.\n");
 }
 
 int SovereignToolchain_ToolMain(int argc, char** argv) {

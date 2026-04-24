@@ -1,4 +1,4 @@
-﻿/*
+/*
  * =========================================================================
  * S SIGMAOS kernel/suites/S16_SoulMolding/shards/sigma_gpu.c
  * =========================================================================
@@ -23,7 +23,7 @@ static const char *pixfmt_str[] = {
     "RGBA8888","BGRA8888","RGB565","ARGB2101010","RGBA16F","YUV420"
 };
 
-/* ── Init ────────────────────────────────────────────────────────────────── */
+/* -- Init ------------------------------------------------------------------ */
 void sigma_gpu_init(void) {
     sigma_sigma_sigma_memset(s_bos,      0, sizeof(s_bos));
     sigma_sigma_sigma_memset(s_queues,   0, sizeof(s_queues));
@@ -36,7 +36,7 @@ void sigma_gpu_init(void) {
     sigma_connector_probe();
 }
 
-/* ── Buffer Objects ──────────────────────────────────────────────────────── */
+/* -- Buffer Objects -------------------------------------------------------- */
 gpu_i32 sigma_bo_create(gpu_u32 pid, gpu_u64 size, sigma_pixfmt_t fmt,
                          gpu_u32 w, gpu_u32 h) {
     if (s_bo_count >= GPU_MAX_BOS) return GPU_ERR;
@@ -110,7 +110,7 @@ void sigma_bo_list(void) {
     }
 }
 
-/* ── Command Queues ──────────────────────────────────────────────────────── */
+/* -- Command Queues -------------------------------------------------------- */
 gpu_i32 sigma_cmdq_create(void) {
     if (s_queue_count >= GPU_MAX_CMDQUEUES) return GPU_ERR;
     sigma_cmdqueue_t *q = &s_queues[s_queue_count];
@@ -141,7 +141,7 @@ void sigma_cmdq_wait(gpu_u32 qid) {
                  qid, (unsigned long long)q->completed);
 }
 
-/* ── Display / KMS ───────────────────────────────────────────────────────── */
+/* -- Display / KMS --------------------------------------------------------- */
 gpu_i32 sigma_connector_probe(void) {
     /* Simulate probing 2 connectors: eDP-1 (laptop) + HDMI-A-1 */
     if (s_conn_count == 0) {
@@ -202,7 +202,7 @@ void sigma_connector_list(void) {
     }
 }
 
-/* ── Compositing ─────────────────────────────────────────────────────────── */
+/* -- Compositing ----------------------------------------------------------- */
 gpu_i32 sigma_surface_create(gpu_u32 pid, gpu_u32 w, gpu_u32 h, sigma_pixfmt_t fmt) {
     gpu_i32 h_bo = sigma_bo_create(pid, 0, fmt, w, h);
     if (h_bo < 0) return GPU_ERR;
@@ -216,7 +216,7 @@ void sigma_surface_present(gpu_u32 surface_id) {
         sigma_connector_flip(s_connectors[0].connector_id, surface_id);
 }
 
-/* ── Stats ───────────────────────────────────────────────────────────────── */
+/* -- Stats ----------------------------------------------------------------- */
 void sigma_gpu_stats(void) {
     sigma_sigma_sigma_printf("\nS GPU STATS\n");
     sigma_sigma_sigma_printf("  BOs: %u   Queues: %u   Clock: %lluns\n",

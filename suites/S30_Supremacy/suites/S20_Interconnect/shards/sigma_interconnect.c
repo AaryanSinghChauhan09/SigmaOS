@@ -1,4 +1,4 @@
-﻿/*
+/*
  * =========================================================================
  * S SIGMAOS: SOVEREIGN INTERCONNECT (Suite S20)
  * =========================================================================
@@ -10,7 +10,7 @@
 static interconnect_bus_t s_buses[MAX_BUSES];
 static sigma_u32          s_bus_count = 0;
 
-/* ── Initialization ───────────────────────────────────────────────────── */
+/* -- Initialization ----------------------------------------------------- */
 void sigma_interconnect_init(void) {
     sigma_sigma_sigma_memset(s_buses, 0, sizeof(s_buses));
     sigma_sigma_sigma_printf("S [IC] Sovereign Interconnect Subsystem initialized\n");
@@ -28,7 +28,7 @@ void sigma_interconnect_init(void) {
     sigma_interconnect_probe_all();
 }
 
-/* ── Discovery ────────────────────────────────────────────────────────── */
+/* -- Discovery ---------------------------------------------------------- */
 void sigma_interconnect_probe_all(void) {
     sigma_sigma_sigma_printf("S [IC] Probing all interconnect fabrics...\n");
 
@@ -54,7 +54,7 @@ void sigma_interconnect_add_device(sigma_u8 bus_id, interconnect_dev_t dev) {
                  dev.name, bus_id, dev.bus, dev.slot, dev.func);
 }
 
-/* ── Resource Management ──────────────────────────────────────────────── */
+/* -- Resource Management ------------------------------------------------ */
 sigma_u32 sigma_interconnect_get_bar(sigma_u8 bus, sigma_u8 slot, sigma_u8 bar_idx) {
     if (bus >= s_bus_count || bar_idx >= 6) return 0;
     interconnect_bus_t* b = &s_buses[bus];
@@ -64,7 +64,7 @@ sigma_u32 sigma_interconnect_get_bar(sigma_u8 bus, sigma_u8 slot, sigma_u8 bar_i
     return 0;
 }
 
-/* ── Statistics ────────────────────────────────────────────────────────── */
+/* -- Statistics ---------------------------------------------------------- */
 void sigma_interconnect_stats(void) {
     sigma_sigma_sigma_printf("\nS INTERCONNECT LATTICE\n");
     sigma_sigma_sigma_printf("%-8s %-4s %-20s %-12s\n", "TYPE", "BUS", "DEVICE", "LOCATION");

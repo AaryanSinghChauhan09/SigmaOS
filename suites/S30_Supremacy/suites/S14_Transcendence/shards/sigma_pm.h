@@ -1,8 +1,8 @@
-﻿/*
+/*
  * =========================================================================
  * S SIGMAOS kernel/suites/S14_Transcendence/shards/sigma_pm.h
  * =========================================================================
- * Sovereign Power Management — gap-closes:
+ * Sovereign Power Management � gap-closes:
  *   Linux  : ACPI, cpufreq (governors: performance/powersave/schedutil)
  *            suspend-to-RAM (S3), hibernate (S4), runtime PM, wakelock
  *   Windows: Power Plans (Balanced/High/Power-Saver), Modern Standby (S0ix)
@@ -25,7 +25,7 @@ typedef unsigned char      pm_bool;
 #define PM_OK    ((pm_i32) 0)
 #define PM_ERR   ((pm_i32)-1)
 
-/* ── Power states (ACPI Sx + CPU C-states) ───────────────────────────────── */
+/* -- Power states (ACPI Sx + CPU C-states) --------------------------------- */
 typedef enum {
     PM_S0_WORKING    = 0,  /* fully active                              */
     PM_S0IX_STANDBY  = 1,  /* Modern Standby / Connected Standby        */
@@ -38,12 +38,12 @@ typedef enum {
     CPU_C0 = 0,  /* executing                                          */
     CPU_C1 = 1,  /* halt / HLT                                         */
     CPU_C2 = 2,  /* stop-clock                                         */
-    CPU_C3 = 3,  /* sleep — cache flush required                       */
+    CPU_C3 = 3,  /* sleep � cache flush required                       */
     CPU_C6 = 4,  /* deep power-down (Intel)                            */
     CPU_C8 = 5   /* deeper state (Intel Skylake+)                      */
 } sigma_cpu_cstate_t;
 
-/* ── CPU frequency governors (Linux cpufreq parity) ─────────────────────── */
+/* -- CPU frequency governors (Linux cpufreq parity) ----------------------- */
 typedef enum {
     GOV_PERFORMANCE  = 0,  /* always max frequency                     */
     GOV_POWERSAVE    = 1,  /* always min frequency                     */
@@ -53,7 +53,7 @@ typedef enum {
     GOV_USERSPACE    = 5   /* manual via sigma-power CLI               */
 } sigma_cpu_governor_t;
 
-/* ── Wakelock (Android PowerManager parity) ─────────────────────────────── */
+/* -- Wakelock (Android PowerManager parity) ------------------------------- */
 #define PM_WAKELOCK_NAME_LEN 48
 #define PM_MAX_WAKELOCKS     64
 typedef struct {
@@ -64,7 +64,7 @@ typedef struct {
     pm_bool  partial;  /* partial = CPU on, screen off (Android model) */
 } sigma_wakelock_t;
 
-/* ── Per-CPU power info ───────────────────────────────────────────────────── */
+/* -- Per-CPU power info ----------------------------------------------------- */
 #define SIGMA_PM_MAX_CPUS 256
 typedef struct {
     pm_u32              cpu_id;
@@ -80,7 +80,7 @@ typedef struct {
     pm_bool             online;
 } sigma_cpu_power_t;
 
-/* ── System-wide power profile ───────────────────────────────────────────── */
+/* -- System-wide power profile --------------------------------------------- */
 typedef struct {
     sigma_system_state_t sys_state;
     sigma_cpu_governor_t global_governor;
@@ -92,7 +92,7 @@ typedef struct {
     pm_bool              s0ix_capable;   /* Modern Standby supported    */
 } sigma_pm_profile_t;
 
-/* ── Public API ─────────────────────────────────────────────────────────── */
+/* -- Public API ----------------------------------------------------------- */
 void sigma_pm_init(pm_u32 num_cpus);
 
 /* System state transitions */

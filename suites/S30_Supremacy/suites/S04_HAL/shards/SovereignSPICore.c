@@ -1,6 +1,6 @@
-ï»¿/*
+/*
  * =========================================================================
- * S SIGMAOS: SOVEREIGN SPI CORE (v1.0 â€” PURE C11)
+ * S SIGMAOS: SOVEREIGN SPI CORE (v1.0 — PURE C11)
  * =========================================================================
  * Competitor Gap Closed: Linux drivers/spi/ (spi-core),
  * Windows SpbCx (Serial Peripheral Bus Extension).
@@ -9,18 +9,18 @@
  * ADCs, and FPGAs.
  *
  * This shard implements:
- *   Â§ 1  SPI Master / Controller definition
- *   Â§ 2  SPI Device / Slave encapsulation
- *   Â§ 3  SPI Message & Transfer ring queues
- *   Â§ 4  Hardware synchronization (Clock Polarity/Phase logic abstract)
- *   Â§ 5  Data queue framing (Half-duplex and Full-duplex generic)
+ *   § 1  SPI Master / Controller definition
+ *   § 2  SPI Device / Slave encapsulation
+ *   § 3  SPI Message & Transfer ring queues
+ *   § 4  Hardware synchronization (Clock Polarity/Phase logic abstract)
+ *   § 5  Data queue framing (Half-duplex and Full-duplex generic)
  * =========================================================================
  */
 
 #include "suites/S01_Genesis/shards/sigma_kernel.h"
 
 /* -----------------------------------------------------------------------
- * â–‘â–‘ CONSTANTS & MACROS
+ * ¦¦ CONSTANTS & MACROS
  * ----------------------------------------------------------------------- */
 #define SPI_CPHA        0x01
 #define SPI_CPOL        0x02
@@ -34,7 +34,7 @@
 #define SPI_MAX_DEVICES     16
 
 /* -----------------------------------------------------------------------
- * â–‘â–‘ SPI TRANSFERS & MESSAGES
+ * ¦¦ SPI TRANSFERS & MESSAGES
  * ----------------------------------------------------------------------- */
 typedef struct SigmaSPITransfer {
     const void *tx_buf;
@@ -61,7 +61,7 @@ typedef struct SigmaSPIMessage {
 } SigmaSPIMessage_t;
 
 /* -----------------------------------------------------------------------
- * â–‘â–‘ SPI DEVICE & CONTROLLER
+ * ¦¦ SPI DEVICE & CONTROLLER
  * ----------------------------------------------------------------------- */
 struct SigmaSPIController;
 
@@ -92,7 +92,7 @@ static SigmaSPIDevice_t s_spi_devices[SPI_MAX_DEVICES];
 static sigma_u32 s_spi_dev_count = 0;
 
 /* -----------------------------------------------------------------------
- * â–‘â–‘ CORE API
+ * ¦¦ CORE API
  * ----------------------------------------------------------------------- */
 sigma_err_t sigma_spi_register_controller(SigmaSPIController_t *ctrl) {
     if (!ctrl || !ctrl->transfer) return SIGMA_EINVAL;
@@ -146,7 +146,7 @@ sigma_err_t sigma_spi_sync(SigmaSPIDevice_t *spi, SigmaSPIMessage_t *msg) {
 }
 
 /* -----------------------------------------------------------------------
- * â–‘â–‘ UTILITY HELPER
+ * ¦¦ UTILITY HELPER
  * ----------------------------------------------------------------------- */
 sigma_err_t sigma_spi_write_then_read(SigmaSPIDevice_t *spi, 
                                       const void *txbuf, sigma_u32 n_tx,
@@ -173,7 +173,7 @@ sigma_err_t sigma_spi_write_then_read(SigmaSPIDevice_t *spi,
 }
 
 /* -----------------------------------------------------------------------
- * â–‘â–‘ HARDWARE MOCK (BCM2835 style SPI)
+ * ¦¦ HARDWARE MOCK (BCM2835 style SPI)
  * ----------------------------------------------------------------------- */
 static sigma_err_t mock_spi_setup(SigmaSPIDevice_t *spi) {
     sigma_sigma_sigma_printf("S [SPI-HW]: Target config -> Mode: %u, BPW: %u, Max Speed: %u Hz\n",
@@ -202,7 +202,7 @@ static sigma_err_t mock_spi_transfer(SigmaSPIDevice_t *spi, SigmaSPIMessage_t *m
 }
 
 /* -----------------------------------------------------------------------
- * â–‘â–‘ INITIALISATION
+ * ¦¦ INITIALISATION
  * ----------------------------------------------------------------------- */
 void SovereignSPICore_Init(void) {
     sigma_sigma_sigma_printf("S [SPI]: Initialising Sovereign Serial Peripheral Interface Core...\n");

@@ -1,6 +1,6 @@
-﻿/*
+/*
  * =========================================================================
- * S SIGMAOS: S06_STORAGE — SovereignStoragePool.c
+ * S SIGMAOS: S06_STORAGE � SovereignStoragePool.c
  * =========================================================================
  * Mission: ZFS-style Storage Pooling and Snapshots (Solaris parity).
  * Capability: Dynamic pool expansion, RAID-Z emulation, sub-sharding.

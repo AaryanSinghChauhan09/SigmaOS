@@ -1,6 +1,6 @@
-﻿/*
+/*
  * =========================================================================
- * S SIGMAOS: S30_SUPREMACY — SovereignLockdown.c
+ * S SIGMAOS: S30_SUPREMACY � SovereignLockdown.c
  * =========================================================================
  * Mission: Hardened Kernel Lockdown.
  * Capability: Disabling raw I/O, untrusted modules, and JIT shards.

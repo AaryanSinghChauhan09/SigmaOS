@@ -1,6 +1,6 @@
-﻿/*
+/*
  * =========================================================================
- * S SIGMAOS: S15_DEVNEXUS — SovereignCompiler_Frontend.c
+ * S SIGMAOS: S15_DEVNEXUS � SovereignCompiler_Frontend.c
  * =========================================================================
  * Implementation of Idea 48.1 (Apex Infinity): SigmaCC Compiler Frontend.
  * Hand-coded lexer and tokenizer for native SigmaOS self-hosting.

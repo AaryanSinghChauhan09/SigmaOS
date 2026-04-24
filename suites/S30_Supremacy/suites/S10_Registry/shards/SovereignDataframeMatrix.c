@@ -1,12 +1,12 @@
-ï»¿/*
+/*
  * =========================================================================
- * S SIGMAOS: SOVEREIGN DATAFRAME MATRIX (v2.0 â€” DEEP DATA SCIENCE)
+ * S SIGMAOS: SOVEREIGN DATAFRAME MATRIX (v2.0 — DEEP DATA SCIENCE)
  * =========================================================================
- * Mission: Kernel-level tabular data processing â€” R/Pandas parity.
+ * Mission: Kernel-level tabular data processing — R/Pandas parity.
  * Principles: Columnar storage, vectorized aggregation, real statistics.
  *
  * v2.0: Real in-memory columnar store with sum, mean, min, max, filter,
- *       and sort operations â€” not printf stubs.
+ *       and sort operations — not printf stubs.
  * =========================================================================
  */
 

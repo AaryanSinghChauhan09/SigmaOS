@@ -1,6 +1,6 @@
-﻿/*
+/*
  * =========================================================================
- * S SIGMAOS: TOOLS — SovereignTemporalJournal.c
+ * S SIGMAOS: TOOLS � SovereignTemporalJournal.c
  * =========================================================================
  * Implementation of Idea 61.3 (Apex Infinity): Temporal Shell Journaling.
  * Hash-chained command logging for irreversible time-travel and re-execution.

@@ -1,6 +1,6 @@
-﻿/*
+/*
  * =========================================================================
- * S SIGMAOS: S09_INTELLIGENCE — SovereignNeuralBalancer.c
+ * S SIGMAOS: S09_INTELLIGENCE � SovereignNeuralBalancer.c
  * =========================================================================
  * Mission: Predictive Resource Scheduling.
  * Capability: Estimating shard load based on historical pulse signatures.

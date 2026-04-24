@@ -1,4 +1,4 @@
-﻿/**
+/**
  * @file Sovereign_Simulator_Mocks.c
  * @brief Zero-Dependency Simulation Mocks.
  */

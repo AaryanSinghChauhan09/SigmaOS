@@ -1,6 +1,6 @@
-ï»¿/*
+/*
  * =========================================================================
- * S SIGMAOS: SOVEREIGN ZENITH ORCHESTRATOR (v2.0 â€” FINAL FORMAL)
+ * S SIGMAOS: SOVEREIGN ZENITH ORCHESTRATOR (v2.0 — FINAL FORMAL)
  * =========================================================================
  * Mission: Master kernel entry point and unified registry orchestration.
  * Design: C11 / Zero-Dependency / Sector-Based.
@@ -52,7 +52,7 @@ void sigma_kernel_main(void) {
     SovereignInit_StartAll();
 
     sigma_sigma_sigma_printf("\n--- S SIGMAOS ZENITH SUPREME: SYSTEM SOVEREIGNTY VERIFIED --- \n");
-    sigma_sigma_sigma_printf("S [SYNC]: vROADMAP_1005 â€” ARCHITECTURAL ZENITH REACHED.\n");
+    sigma_sigma_sigma_printf("S [SYNC]: vROADMAP_1005 — ARCHITECTURAL ZENITH REACHED.\n");
 }
 
 

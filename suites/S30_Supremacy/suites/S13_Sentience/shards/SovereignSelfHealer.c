@@ -1,6 +1,6 @@
-﻿/*
+/*
  * =========================================================================
- * S SIGMAOS: S13_SENTIENCE — SovereignSelfHealer.c
+ * S SIGMAOS: S13_SENTIENCE � SovereignSelfHealer.c
  * =========================================================================
  * Implementation of Idea 61.10 (Apex Infinity): Self-Healing Kernel.
  * Real-time integrity verification and restoration of critical kernel pages.

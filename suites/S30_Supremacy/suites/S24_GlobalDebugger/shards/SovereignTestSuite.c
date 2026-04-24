@@ -1,4 +1,4 @@
-﻿/*
+/*
  * =========================================================================
  * S SIGMAOS ZENITH: SOVEREIGN TEST SUITE (v1.0)
  * =========================================================================
@@ -38,7 +38,7 @@ extern void SovereignEnclave_Audit(void);
 sigma_err_t sigma_execute_full_test_suite() {
     sigma_sigma_sigma_printf("\n");
     sigma_sigma_sigma_printf("=================================================================\n");
-    sigma_sigma_sigma_printf("S SIGMAOS ZENITH SUPREME — FULL SYSTEM SOVEREIGNTY TEST\n");
+    sigma_sigma_sigma_printf("S SIGMAOS ZENITH SUPREME � FULL SYSTEM SOVEREIGNTY TEST\n");
     sigma_sigma_sigma_printf("=================================================================\n");
     
     sigma_sigma_sigma_printf("[TEST]: 01 - AI_KERNEL_INTEGRITY... "); SovereignAIKernel_Audit();

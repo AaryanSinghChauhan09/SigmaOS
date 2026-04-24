@@ -1,4 +1,4 @@
-﻿#include "suites/S01_Genesis/shards/sigma_kernel.h"
+#include "suites/S01_Genesis/shards/sigma_kernel.h"
 
 // S SovereignPF: Packet Filter Zenith
 // Inspired by FreeBSD PF (Packet Filter): Stateful Firewall & NAT Engine

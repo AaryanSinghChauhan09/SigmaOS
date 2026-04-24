@@ -1,4 +1,4 @@
-﻿/*
+/*
  * =========================================================================
  * S SIGMAOS: SOVEREIGN INTELLIGENCE (Suite S09)
  * =========================================================================
@@ -9,7 +9,7 @@
 
 static system_sentience_t s_sentience;
 
-/* ── Initialization ───────────────────────────────────────────────────── */
+/* -- Initialization ----------------------------------------------------- */
 void sigma_sentience_init(void) {
     s_sentience.uptime_ns = 0;
     s_sentience.entropy_score = 100; /* Perfect order */
@@ -19,7 +19,7 @@ void sigma_sentience_init(void) {
     sigma_sigma_sigma_printf("S [INT] Neural Weight Ingest: Q8 Quantized | Meta-Heuristic\n");
 }
 
-/* ── Lifecycle ────────────────────────────────────────────────────────── */
+/* -- Lifecycle ---------------------------------------------------------- */
 void sigma_sentience_tick(void) {
     s_sentience.uptime_ns += 1000;
     /* Simulated drift towards entropy */
@@ -28,7 +28,7 @@ void sigma_sentience_tick(void) {
     }
 }
 
-/* ── Inference ────────────────────────────────────────────────────────── */
+/* -- Inference ---------------------------------------------------------- */
 sigma_u32 sigma_predict_load(sigma_u32 cpu_id) {
     /* 
      * Mock Q8 Perceptron Inference.
@@ -42,7 +42,7 @@ sigma_bool sigma_detect_anomaly(void) {
     return SIGMA_FALSE;
 }
 
-/* ── Self-Evolution ────────────────────────────────────────────────────── */
+/* -- Self-Evolution ------------------------------------------------------ */
 void sigma_optimize_scheduler(void) {
     sigma_sigma_sigma_printf("S [INT] Sentience Engine: Recalibrating CFS time-slice quotas...\n");
 }

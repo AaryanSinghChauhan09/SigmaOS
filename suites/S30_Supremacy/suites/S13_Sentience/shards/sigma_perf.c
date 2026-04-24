@@ -1,4 +1,4 @@
-﻿/*
+/*
  * =========================================================================
  * S SIGMAOS kernel/suites/S13_Sentience/shards/sigma_perf.c
  * =========================================================================
@@ -19,7 +19,7 @@ static pf_u32               s_trace_head    = 0;
 
 static pf_u64               s_system_clock  = 0;
 
-/* ── Simulated HW counter values (monotonically increasing) ──────────────── */
+/* -- Simulated HW counter values (monotonically increasing) ---------------- */
 static pf_u64 sim_read_hw(sigma_perf_type_t type) {
     s_system_clock += 1000;
     switch (type) {
@@ -36,7 +36,7 @@ static pf_u64 sim_read_hw(sigma_perf_type_t type) {
     }
 }
 
-/* ── Init ────────────────────────────────────────────────────────────────── */
+/* -- Init ------------------------------------------------------------------ */
 void sigma_perf_init(void) {
     sigma_sigma_sigma_memset(s_counters, 0, sizeof(s_counters));
     sigma_sigma_sigma_memset(s_samples,  0, sizeof(s_samples));
@@ -46,7 +46,7 @@ void sigma_perf_init(void) {
                  SIGMA_PERF_MAX_COUNTERS, SIGMA_PERF_MAX_SAMPLES, SIGMA_TRACE_MAX);
 }
 
-/* ── Counter lifecycle ───────────────────────────────────────────────────── */
+/* -- Counter lifecycle ----------------------------------------------------- */
 pf_i32 sigma_perf_counter_open(const char *name, sigma_perf_type_t type, pf_u32 pid) {
     if (s_counter_count >= SIGMA_PERF_MAX_COUNTERS) return -1;
     sigma_perf_counter_t *c = &s_counters[s_counter_count++];
@@ -117,7 +117,7 @@ void sigma_perf_counters_dump(void) {
     }
 }
 
-/* ── Sampling ────────────────────────────────────────────────────────────── */
+/* -- Sampling -------------------------------------------------------------- */
 void sigma_perf_sample_record(pf_u64 ip, pf_u32 pid, pf_u32 cpu) {
     sigma_perf_sample_t *s = &s_samples[s_sample_head % SIGMA_PERF_MAX_SAMPLES];
     s->timestamp_ns = s_system_clock;
@@ -140,7 +140,7 @@ void sigma_perf_samples_dump(void) {
     }
 }
 
-/* ── Trace events ────────────────────────────────────────────────────────── */
+/* -- Trace events ---------------------------------------------------------- */
 static void trace_push(const char *name, const char *cat,
                         sigma_trace_phase_t ph, pf_u32 pid, pf_u64 val) {
     sigma_trace_event_t *e = &s_trace[s_trace_head % SIGMA_TRACE_MAX];
@@ -183,7 +183,7 @@ void sigma_trace_dump_json(void) {
     sigma_sigma_sigma_printf("]}\n");
 }
 
-/* ── /proc stat equivalent ───────────────────────────────────────────────── */
+/* -- /proc stat equivalent ------------------------------------------------- */
 void sigma_proc_stat_print(pf_u32 pid) {
     sigma_sigma_sigma_printf("\n/proc/%u/stat (sigma)\n", pid);
     sigma_sigma_sigma_printf("  cpu_cycles: %llu   instructions: %llu\n",

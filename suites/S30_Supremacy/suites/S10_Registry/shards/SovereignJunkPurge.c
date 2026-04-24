@@ -1,4 +1,4 @@
-﻿#include "suites/S01_Genesis/shards/sigma_base.h"
+#include "suites/S01_Genesis/shards/sigma_base.h"
 
 #include "SovereignToolHeader.h"
 
@@ -15,8 +15,8 @@ void sigma_purge_junk(void) {
     sigma_sigma_sigma_printf("S [PURGE]: Scanning for abandoned build artifacts and rogue logs...\n");
     
     /* Mock purge logic */
-    sigma_sigma_sigma_printf("  ✓ [OK]: Deleted 1.2MB of temporary binary object files.\n");
-    sigma_sigma_sigma_printf("  ✓ [OK]: Cleared 4 orphaned debug lockfiles.\n");
+    sigma_sigma_sigma_printf("  ? [OK]: Deleted 1.2MB of temporary binary object files.\n");
+    sigma_sigma_sigma_printf("  ? [OK]: Cleared 4 orphaned debug lockfiles.\n");
 }
 
 int SovereignJunkPurge_ToolMain() {

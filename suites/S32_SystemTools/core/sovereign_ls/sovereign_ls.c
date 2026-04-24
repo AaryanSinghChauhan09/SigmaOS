@@ -1,6 +1,6 @@
-﻿/*
+/*
  * =========================================================================
- * S SIGMAOS: TOOLS — sovereign_ls.c
+ * S SIGMAOS: TOOLS � sovereign_ls.c
  * =========================================================================
  * Implementation of Idea 361 (Apex Infinity): Native Sovereign LS.
  * Zero dependency on coreutils/stat/libc wrappers.

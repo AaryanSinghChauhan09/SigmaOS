@@ -1,6 +1,6 @@
-﻿/*
+/*
  * =========================================================================
- * S SIGMAOS: S04_HAL — SovereignACPI_Core.c
+ * S SIGMAOS: S04_HAL � SovereignACPI_Core.c
  * =========================================================================
  * Implementation of Idea 49.1 (Apex Infinity): ACPI Table Parser.
  * Hand-coded RSDP/XSDT traversal for hardware power and thermal management.

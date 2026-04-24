@@ -1,6 +1,6 @@
-ï»¿/*
+/*
  * =========================================================================
- * S SIGMAOS: SOVEREIGN MEDIA CODEC + OBS COMPOSITOR â€” IMPLEMENTATION (v1.0)
+ * S SIGMAOS: SOVEREIGN MEDIA CODEC + OBS COMPOSITOR — IMPLEMENTATION (v1.0)
  * =========================================================================
  */
 
@@ -58,7 +58,7 @@ static const char *accel_name(SigmaHWAccel_t a) {
 }
 
 /* =========================================================================
- * Â§1  MEDIA PLAYBACK  (VLC libvlc parity)
+ * §1  MEDIA PLAYBACK  (VLC libvlc parity)
  * ====================================================================== */
 
 sigma_err_t sigma_media_open(const char *url, SigmaMediaInfo_t *out) {
@@ -176,7 +176,7 @@ SigmaMediaState_t sigma_media_state(void) {
 }
 
 /* =========================================================================
- * Â§2  OBS SCENE COMPOSITOR
+ * §2  OBS SCENE COMPOSITOR
  * ====================================================================== */
 
 static SigmaScene_t *scene_find(const char *name) {

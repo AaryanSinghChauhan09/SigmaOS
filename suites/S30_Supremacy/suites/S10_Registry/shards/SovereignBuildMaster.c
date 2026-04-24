@@ -1,4 +1,4 @@
-﻿#include "suites/S01_Genesis/shards/sigma_kernel.h"
+#include "suites/S01_Genesis/shards/sigma_kernel.h"
 
 #define C_BOLD   "\033[1m"
 #define C_RESET  "\033[0m"
@@ -31,7 +31,7 @@ void verify_file(const char* path) {
 
             for (int i = 0; i < 16; i++) {
                 if (sigma_strstr(line, FORBIDDEN[i])) {
-                    sigma_sigma_sigma_printf("  S %s✗%s  %s:%d  →  %s\n", C_RED, C_RESET, path, lineno, line);
+                    sigma_sigma_sigma_printf("  S %s?%s  %s:%d  ?  %s\n", C_RED, C_RESET, path, lineno, line);
                 }
             }
 

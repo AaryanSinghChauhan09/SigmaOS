@@ -1,8 +1,8 @@
-﻿/*
+/*
  * =========================================================================
  * S SIGMAOS kernel/suites/S16_SoulMolding/shards/sigma_gpu.h
  * =========================================================================
- * Sovereign GPU Subsystem — gap-closes:
+ * Sovereign GPU Subsystem � gap-closes:
  *   Linux  : DRM/KMS, GEM/TTM buffer objects, PRIME (dma-buf), Mesa/Gallium
  *   Windows: WDDM (Display Model), DXGI, DirectX 12, D3D resource heaps
  *   macOS  : Metal, IOSurface, CoreAnimation, CAMetalLayer
@@ -25,7 +25,7 @@ typedef unsigned char      gpu_bool;
 #define GPU_OK    ((gpu_i32) 0)
 #define GPU_ERR   ((gpu_i32)-1)
 
-/* ── Display modes ───────────────────────────────────────────────────────── */
+/* -- Display modes --------------------------------------------------------- */
 typedef struct {
     gpu_u32 width;
     gpu_u32 height;
@@ -33,7 +33,7 @@ typedef struct {
     gpu_u32 bpp;           /* bits per pixel                            */
 } sigma_display_mode_t;
 
-/* ── Pixel formats (DXGI/DRM format parity) ─────────────────────────────── */
+/* -- Pixel formats (DXGI/DRM format parity) ------------------------------- */
 typedef enum {
     PIXFMT_RGBA8888 = 0,
     PIXFMT_BGRA8888 = 1,
@@ -43,7 +43,7 @@ typedef enum {
     PIXFMT_YUV420   = 5       /* video decode output                   */
 } sigma_pixfmt_t;
 
-/* ── GEM/PRIME buffer object ─────────────────────────────────────────────── */
+/* -- GEM/PRIME buffer object ----------------------------------------------- */
 #define GPU_MAX_BOS 4096
 typedef struct {
     gpu_u32       handle;
@@ -59,7 +59,7 @@ typedef struct {
     gpu_bool      imported;
 } sigma_bo_t;               /* Buffer Object                            */
 
-/* ── Command queue (Metal MTLCommandQueue / DX12 ID3D12CommandQueue) ─────── */
+/* -- Command queue (Metal MTLCommandQueue / DX12 ID3D12CommandQueue) ------- */
 #define GPU_CMDQ_LEN 256
 typedef struct {
     gpu_u32      queue_id;
@@ -70,7 +70,7 @@ typedef struct {
     gpu_u64      completed;
 } sigma_cmdqueue_t;
 
-/* ── Display connector (KMS CRTC/encoder/connector chain) ────────────────── */
+/* -- Display connector (KMS CRTC/encoder/connector chain) ------------------ */
 typedef struct {
     gpu_u32           connector_id;
     char              name[24];     /* e.g. "HDMI-A-1", "eDP-1"        */
@@ -83,7 +83,7 @@ typedef struct {
 #define GPU_MAX_CONNECTORS 8
 #define GPU_MAX_CMDQUEUES  16
 
-/* ── Public API ─────────────────────────────────────────────────────────── */
+/* -- Public API ----------------------------------------------------------- */
 void   sigma_gpu_init(void);
 
 /* Buffer objects (GEM alloc equivalent) */

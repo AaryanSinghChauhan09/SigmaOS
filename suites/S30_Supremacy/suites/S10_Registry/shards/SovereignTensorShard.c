@@ -1,8 +1,8 @@
-﻿/*
+/*
  * =========================================================================
  * S SIGMAOS ZENITH: SOVEREIGN TENSOR SHARD (v1.0)
  * =========================================================================
- * Mission: Absorb AI USP — High-Performance native Tensor Math.
+ * Mission: Absorb AI USP � High-Performance native Tensor Math.
  * Design: C11 / Zero-Dependency / SIMD-Accelerated (Simulated).
  * Standard: Zenith Industrial Sovereignty.
  * =========================================================================

@@ -1,4 +1,4 @@
-﻿#include "suites/S01_Genesis/shards/sigma_base.h"
+#include "suites/S01_Genesis/shards/sigma_base.h"
 
 #include "SovereignFS.h"
 #include "sigma_libc.h"
@@ -13,7 +13,7 @@
 sigma_err_t sigma_prefetcher_init(void) {
     sigma_sigma_sigma_printf("  S [PREFETCH]: Sovereign Prefetcher Matrix seated.\n");
     sigma_sigma_sigma_printf("  S [PREFETCH]: Pre-loading hot shards into Page Cache...\n");
-    sigma_sigma_sigma_printf("  ✓ [OK]: Shards 'OmmiCLI', 'SovereignNet', 'SovereignUSB' cached.\n");
+    sigma_sigma_sigma_printf("  ? [OK]: Shards 'OmmiCLI', 'SovereignNet', 'SovereignUSB' cached.\n");
     return SIGMA_OK;
 }
 

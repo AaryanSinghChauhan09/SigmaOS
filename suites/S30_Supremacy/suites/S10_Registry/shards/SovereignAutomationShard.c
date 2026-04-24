@@ -1,6 +1,6 @@
-ï»¿/*
+/*
  * =========================================================================
- * S SIGMAOS ZENITH: SOVEREIGN AUTOMATION SHARD (v2.0 â€” DEEP)
+ * S SIGMAOS ZENITH: SOVEREIGN AUTOMATION SHARD (v2.0 — DEEP)
  * =========================================================================
  * Mission: Zero-Touch Self-Healing & Autonomous Task Management.
  * Principles: Determinism, Self-Correction, Atomic Scheduling.
@@ -63,7 +63,7 @@ sigma_err_t sigma_cron_register(const char* name, CronHandler_t fn,
 /**
  * sigma_cron_tick: Called by the kernel timer ISR.
  * Walks the job list and fires any that are due.
- * This is the real scheduling loop â€” not a stub.
+ * This is the real scheduling loop — not a stub.
  */
 void sigma_cron_tick(sigma_u64 current_tick) {
     for (sigma_u32 i = 0; i < s_cron_count; i++) {
@@ -84,7 +84,7 @@ void sigma_cron_tick(sigma_u64 current_tick) {
 
 /**
  * sigma_automation_self_heal: Iterates over cron jobs and restarts
- * any that are in FAILED state â€” genuine self-correction logic.
+ * any that are in FAILED state — genuine self-correction logic.
  */
 void sigma_automation_self_heal(void) {
     sigma_sigma_sigma_printf("[AUTOMATION]: Running Global Health Audit...\n");

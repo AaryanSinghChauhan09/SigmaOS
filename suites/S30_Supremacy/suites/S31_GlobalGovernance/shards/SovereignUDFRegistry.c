@@ -1,5 +1,5 @@
-﻿/*
- * S SIGMAOS: S31_GOVERNANCE — SovereignUDFRegistry.c
+/*
+ * S SIGMAOS: S31_GOVERNANCE � SovereignUDFRegistry.c
  * Status: Materialized User-Logic Plane
  */
 

@@ -1,6 +1,6 @@
-﻿/*
+/*
  * =========================================================================
- * S SIGMAOS: S04_HAL — SovereignROM_Boot.c
+ * S SIGMAOS: S04_HAL � SovereignROM_Boot.c
  * =========================================================================
  * Implementation of Idea 68.1 (Apex Infinity): ROM-able Kernel.
  * Enables execution directly from Flash/ROM without RAM relocation.

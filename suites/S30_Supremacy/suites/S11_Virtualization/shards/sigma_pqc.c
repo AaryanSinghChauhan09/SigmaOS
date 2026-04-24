@@ -1,4 +1,4 @@
-﻿/*
+/*
  * =========================================================================
  * S SIGMAOS kernel/suites/S11_Virtualization/shards/sigma_pqc.c
  * =========================================================================
@@ -17,9 +17,9 @@ void sigma_pqc_init(void) {
     sigma_sigma_sigma_printf("S [PQC] Symmetric:  AES-256-GCM | BLAKE3-KDF\n");
 }
 
-/* ── BLAKE3 (simplified Merkle-tree sponge, real impl is ~1000 LOC) ─────── */
+/* -- BLAKE3 (simplified Merkle-tree sponge, real impl is ~1000 LOC) ------- */
 static void blake3_compress(const pq_u8 *in, pq_u64 len, pq_u8 out[32]) {
-    /* Simplified chained XOR + rotate — replace with actual BLAKE3 in prod */
+    /* Simplified chained XOR + rotate � replace with actual BLAKE3 in prod */
     pq_u64 h[4] = {0x6A09E667ULL,0xBB67AE85ULL,0x3C6EF372ULL,0xA54FF53AULL};
     for (pq_u64 i = 0; i < len; i++) {
         h[i & 3] ^= in[i];
@@ -55,7 +55,7 @@ void sigma_blake3_kdf(const pq_u8 *ikm, pq_u64 ikm_len,
     (void)ikm_len;
 }
 
-/* ── ML-KEM stubs (wire the API; replace with NIST reference code) ────────── */
+/* -- ML-KEM stubs (wire the API; replace with NIST reference code) ---------- */
 pq_i32 sigma_mlkem_keygen(sigma_kem_keypair_t *kp, const pq_u8 *seed32) {
     if (!kp) return PQ_ERR;
     /* Derive pk from seed via BLAKE3, sk = seed || pk-hash */
@@ -82,7 +82,7 @@ pq_i32 sigma_mlkem_decaps(const sigma_kem_keypair_t *kp,
     return PQ_OK;
 }
 
-/* ── ML-DSA stubs ──────────────────────────────────────────────────────────── */
+/* -- ML-DSA stubs ------------------------------------------------------------ */
 pq_i32 sigma_mldsa_keygen(sigma_dsa_keypair_t *kp, const pq_u8 *seed32) {
     if (!kp) return PQ_ERR;
     sigma_blake3(seed32, 32, kp->sk);
@@ -112,12 +112,12 @@ pq_i32 sigma_mldsa_verify(const sigma_dsa_keypair_t *kp,
     return PQ_OK;
 }
 
-/* ── AES-256-GCM stubs ─────────────────────────────────────────────────────── */
+/* -- AES-256-GCM stubs ------------------------------------------------------- */
 pq_i32 sigma_aes256gcm_encrypt(const pq_u8 key[AES_KEY_LEN],
                                 const pq_u8 iv[AES_IV_LEN],
                                 const pq_u8 *pt, pq_u32 pt_len,
                                 pq_u8 *ct, pq_u8 tag[AES_TAG_LEN]) {
-    /* XOR stream cipher stub — replace with AES-NI or bitsliced AES */
+    /* XOR stream cipher stub � replace with AES-NI or bitsliced AES */
     pq_u8 ks[32];
     sigma_blake3_kdf(key, AES_KEY_LEN, iv, AES_IV_LEN, ks, 32);
     for (pq_u32 i = 0; i < pt_len; i++) ct[i] = pt[i] ^ ks[i % 32];
@@ -139,7 +139,7 @@ pq_i32 sigma_aes256gcm_decrypt(const pq_u8 key[AES_KEY_LEN],
     return PQ_OK;
 }
 
-/* ── Hybrid handshake ─────────────────────────────────────────────────────── */
+/* -- Hybrid handshake ------------------------------------------------------- */
 pq_i32 sigma_hybrid_handshake(sigma_kem_keypair_t *local_kp,
                                const pq_u8 *remote_pk,
                                pq_u8 session_key[AES_KEY_LEN]) {
@@ -159,7 +159,7 @@ pq_i32 sigma_hybrid_handshake(sigma_kem_keypair_t *local_kp,
     return PQ_OK;
 }
 
-/* ── Self-test ────────────────────────────────────────────────────────────── */
+/* -- Self-test -------------------------------------------------------------- */
 void sigma_pqc_selftest(void) {
     sigma_sigma_sigma_printf("\nS [PQC] Self-test running...\n");
     pq_u8 seed[32] = {0x01,0x02,0x03};

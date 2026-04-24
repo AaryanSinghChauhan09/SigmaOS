@@ -1,8 +1,8 @@
-﻿/*
+/*
  * =========================================================================
  * S SIGMAOS kernel/suites/S18_QuantumLink/shards/sigma_usb.h
  * =========================================================================
- * Sovereign USB Subsystem — gap-closes:
+ * Sovereign USB Subsystem � gap-closes:
  *   Linux  : USB core, xHCI/EHCI host controller, usb-storage, usbhid
  *            gadget framework, libusb, USB Audio class (UAC)
  *   Windows: WinUSB, KMDF, USB 4.0 / Thunderbolt 4
@@ -24,7 +24,7 @@ typedef unsigned char  usb_bool;
 #define USB_OK    ((usb_i32) 0)
 #define USB_ERR   ((usb_i32)-1)
 
-/* ── USB speed ───────────────────────────────────────────────────────────── */
+/* -- USB speed ------------------------------------------------------------- */
 typedef enum {
     USB_SPEED_LS  = 0,  /* Low speed  1.5 Mb/s (USB 1.0)              */
     USB_SPEED_FS  = 1,  /* Full speed  12 Mb/s (USB 1.1)              */
@@ -34,19 +34,19 @@ typedef enum {
     USB_SPEED_USB4= 5   /* USB4/TB4    40 Gb/s                        */
 } sigma_usb_speed_t;
 
-/* ── Device class ────────────────────────────────────────────────────────── */
+/* -- Device class ---------------------------------------------------------- */
 typedef enum {
     USB_CLASS_HID     = 0x03,  /* Keyboard, mouse, gamepad            */
     USB_CLASS_CDC     = 0x02,  /* Serial, network                     */
     USB_CLASS_MSC     = 0x08,  /* Mass storage (flash drives)         */
     USB_CLASS_HUB     = 0x09,
     USB_CLASS_AUDIO   = 0x01,  /* USB Audio Class (UAC)               */
-    USB_CLASS_VIDEO   = 0x0E,  /* USB Video Class (UVC — webcams)     */
+    USB_CLASS_VIDEO   = 0x0E,  /* USB Video Class (UVC � webcams)     */
     USB_CLASS_PRINTER = 0x07,
     USB_CLASS_VENDOR  = 0xFF   /* vendor-specific (ADB, etc.)         */
 } sigma_usb_class_t;
 
-/* ── Transfer types ──────────────────────────────────────────────────────── */
+/* -- Transfer types -------------------------------------------------------- */
 typedef enum {
     USB_XFER_CONTROL     = 0,
     USB_XFER_ISOCHRONOUS = 1,
@@ -58,7 +58,7 @@ typedef enum {
 #define USB_MAX_ENDPOINTS 16
 #define USB_NAME_LEN      48
 
-/* ── Endpoint descriptor ─────────────────────────────────────────────────── */
+/* -- Endpoint descriptor --------------------------------------------------- */
 typedef struct {
     usb_u8           addr;      /* EP address (MSB = direction)        */
     sigma_usb_xfer_t xfer_type;
@@ -66,7 +66,7 @@ typedef struct {
     usb_u8           interval;  /* polling interval for INT/ISO        */
 } sigma_usb_ep_t;
 
-/* ── USB device descriptor ───────────────────────────────────────────────── */
+/* -- USB device descriptor ------------------------------------------------- */
 typedef struct {
     usb_u32           dev_id;
     usb_u16           vendor_id;
@@ -82,7 +82,7 @@ typedef struct {
     usb_u32           parent_hub;  /* 0 = root hub                    */
 } sigma_usb_dev_t;
 
-/* ── URB — USB Request Block (Linux urb parity) ──────────────────────────── */
+/* -- URB � USB Request Block (Linux urb parity) ---------------------------- */
 typedef struct {
     usb_u32           dev_id;
     usb_u8            ep_addr;
@@ -94,7 +94,7 @@ typedef struct {
     /* callback: void (*complete)(struct urb*); -- simplified         */
 } sigma_urb_t;
 
-/* ── Public API ─────────────────────────────────────────────────────────── */
+/* -- Public API ----------------------------------------------------------- */
 void    sigma_usb_init(void);
 
 /* Host controller */

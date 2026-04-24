@@ -1,8 +1,8 @@
-ï»¿/*
+/*
  * =========================================================================
  * S SIGMAOS GENESIS: SOVEREIGN FPA SHARD (v57.2-SUPREME-GENESIS)
  * =========================================================================
- * Mission: LÃ©vy-flight based global exploration and self-pollination.
+ * Mission: Lévy-flight based global exploration and self-pollination.
  * Principles: AI, Algorithms, Data Science.
  *
  * Implements the Flower Pollination Algorithm (FPA) for configuration search.
@@ -16,7 +16,7 @@
  * Principle: AI / Algorithms / Eco-inspired jump vectors.
  */
 void sigma_opt_fpa_pollinate(float* global_best) {
-    sigma_sigma_sigma_printf("[FPA-CORE]: Executing LÃ©vy flight for global cross-pollination step...\n");
+    sigma_sigma_sigma_printf("[FPA-CORE]: Executing Lévy flight for global cross-pollination step...\n");
     // Heavy-tailed probability distribution causing massive sporadic leaps out of local optima
     sigma_sigma_sigma_printf("[FPA-CORE]: Cross-pollination successful. Global configuration landscape expanded.\n");
 }

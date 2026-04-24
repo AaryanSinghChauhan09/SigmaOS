@@ -1,8 +1,8 @@
-﻿/*
+/*
  * =========================================================================
  * S SIGMAOS kernel/suites/S17_BioNexus/shards/sigma_audio.h
  * =========================================================================
- * Sovereign Audio Subsystem — gap-closes:
+ * Sovereign Audio Subsystem � gap-closes:
  *   Linux  : ALSA (Advanced Linux Sound Architecture), PipeWire, PulseAudio
  *   Windows: WASAPI, WDM audio, DirectSound, ASIO
  *   macOS  : CoreAudio, AudioHAL, AudioUnit, AVAudioEngine
@@ -25,7 +25,7 @@ typedef unsigned char      au_bool;
 #define AU_OK    ((au_i32) 0)
 #define AU_ERR   ((au_i32)-1)
 
-/* ── Sample formats ──────────────────────────────────────────────────────── */
+/* -- Sample formats -------------------------------------------------------- */
 typedef enum {
     AU_FMT_S16LE  = 0,   /* 16-bit signed little-endian (CD quality)   */
     AU_FMT_S24LE  = 1,   /* 24-bit signed                              */
@@ -34,14 +34,14 @@ typedef enum {
     AU_FMT_F64LE  = 4    /* 64-bit float (studio mastering)            */
 } sigma_au_fmt_t;
 
-/* ── Stream direction ────────────────────────────────────────────────────── */
+/* -- Stream direction ------------------------------------------------------ */
 typedef enum {
     AU_PLAYBACK = 0,
     AU_CAPTURE  = 1,
     AU_DUPLEX   = 2
 } sigma_au_dir_t;
 
-/* ── Audio stream parameters ─────────────────────────────────────────────── */
+/* -- Audio stream parameters ----------------------------------------------- */
 typedef struct {
     sigma_au_fmt_t  fmt;
     sigma_au_dir_t  dir;
@@ -52,7 +52,7 @@ typedef struct {
     au_u32          owner_pid;
 } sigma_au_params_t;
 
-/* ── PCM stream (ALSA snd_pcm_t / WASAPI IAudioClient) ─────────────────── */
+/* -- PCM stream (ALSA snd_pcm_t / WASAPI IAudioClient) ------------------- */
 #define AU_MAX_STREAMS   32
 #define AU_BUF_FRAMES  4096
 
@@ -73,16 +73,16 @@ typedef struct {
     au_u64          xruns;      /* underruns (playback) / overruns (cap)*/
 } sigma_au_stream_t;
 
-/* ── Mixer control (ALSA amixer / CoreAudio volume) ─────────────────────── */
+/* -- Mixer control (ALSA amixer / CoreAudio volume) ----------------------- */
 typedef struct {
     char    name[32];
-    au_u32  volume_pct;   /* 0–100                                     */
+    au_u32  volume_pct;   /* 0�100                                     */
     au_bool muted;
 } sigma_au_control_t;
 
 #define AU_MAX_CONTROLS 16
 
-/* ── Public API ─────────────────────────────────────────────────────────── */
+/* -- Public API ----------------------------------------------------------- */
 void   sigma_audio_init(void);
 
 /* Stream lifecycle */

@@ -1,6 +1,6 @@
-﻿/*
+/*
  * =========================================================================
- * S SIGMAOS: S02_ZENITHUI — SovereignTop.c
+ * S SIGMAOS: S02_ZENITHUI � SovereignTop.c
  * =========================================================================
  * Mission: H-Top Parity (System Resource Visualization).
  * Capability: Suite-level CPU/Memory auditing, shard heatmaps.

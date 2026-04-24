@@ -1,4 +1,4 @@
-﻿#include "suites/S01_Genesis/shards/sigma_base.h"
+#include "suites/S01_Genesis/shards/sigma_base.h"
 
 /*
  * =========================================================================
@@ -15,8 +15,8 @@
 
 static void wizard_print_header() {
     sigma_sigma_sigma_printf("\n");
-    sigma_sigma_sigma_printf("  S SIGMAOS ZENITH SUPREME — SOVEREIGN SETUP WIZARD\n");
-    sigma_sigma_sigma_printf("  ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n");
+    sigma_sigma_sigma_printf("  S SIGMAOS ZENITH SUPREME � SOVEREIGN SETUP WIZARD\n");
+    sigma_sigma_sigma_printf("  ?????????????????????????????????????????????????\n");
     sigma_sigma_sigma_printf("  Welcome, Citizen. Let us personalize your silicon.\n");
     sigma_sigma_sigma_printf("\n");
 }

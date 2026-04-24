@@ -1,4 +1,4 @@
-﻿/*
+/*
  * =========================================================================
  * S SIGMAOS kernel/suites/S17_BioNexus/shards/sigma_audio.c
  * =========================================================================
@@ -18,7 +18,7 @@ static const char *fmt_str[]   = {"S16LE","S24LE","S32LE","F32LE","F64LE"};
 static const char *dir_str[]   = {"PLAYBACK","CAPTURE","DUPLEX"};
 static const char *state_str[] = {"IDLE","PREPARED","RUNNING","PAUSED"};
 
-/* ── Init ────────────────────────────────────────────────────────────────── */
+/* -- Init ------------------------------------------------------------------ */
 void sigma_audio_init(void) {
     sigma_sigma_sigma_memset(s_streams,  0, sizeof(s_streams));
     sigma_sigma_sigma_memset(s_controls, 0, sizeof(s_controls));
@@ -39,7 +39,7 @@ void sigma_audio_init(void) {
     sigma_sigma_sigma_printf("S [AUDIO] %u mixer controls registered\n", s_ctrl_count);
 }
 
-/* ── Stream lifecycle ────────────────────────────────────────────────────── */
+/* -- Stream lifecycle ------------------------------------------------------ */
 au_i32 sigma_au_open(sigma_au_params_t *params) {
     if (s_stream_count >= AU_MAX_STREAMS || !params) return AU_ERR;
     sigma_au_stream_t *s = &s_streams[s_stream_count++];
@@ -107,7 +107,7 @@ void sigma_au_close(au_u32 sid) {
     }
 }
 
-/* ── Data transfer ───────────────────────────────────────────────────────── */
+/* -- Data transfer --------------------------------------------------------- */
 static au_u32 bytes_per_frame(sigma_au_stream_t *s) {
     static const au_u32 bps[] = {2, 3, 4, 4, 8}; /* bytes per sample   */
     return bps[s->params.fmt] * s->params.channels;
@@ -156,7 +156,7 @@ au_u32 sigma_au_avail(au_u32 sid) {
     return s ? s->avail_frames : 0;
 }
 
-/* ── Mixer ───────────────────────────────────────────────────────────────── */
+/* -- Mixer ----------------------------------------------------------------- */
 static sigma_au_control_t *find_ctrl(const char *name) {
     for (au_u32 i = 0; i < s_ctrl_count; i++)
         if (sigma_streq(s_controls[i].name, name)) return &s_controls[i];
@@ -185,14 +185,14 @@ void sigma_au_set_mute(const char *ctrl, au_bool muted) {
     }
 }
 
-/* ── Routing (PipeWire/AudioFlinger graph) ───────────────────────────────── */
+/* -- Routing (PipeWire/AudioFlinger graph) --------------------------------- */
 void sigma_au_route(au_u32 src_sid, au_u32 dst_sid) {
     sigma_sigma_sigma_printf("S [AUDIO] Route: stream %u -> stream %u (software mix)\n",
                  src_sid, dst_sid);
     /* Real impl: callback-based mix into dst buffer */
 }
 
-/* ── Stats ───────────────────────────────────────────────────────────────── */
+/* -- Stats ----------------------------------------------------------------- */
 void sigma_audio_stats(void) {
     sigma_sigma_sigma_printf("\nS AUDIO SUBSYSTEM STATS\n");
     sigma_sigma_sigma_printf("  Streams: %u\n", s_stream_count);

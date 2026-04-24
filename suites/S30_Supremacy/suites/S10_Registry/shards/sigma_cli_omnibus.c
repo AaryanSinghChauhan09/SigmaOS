@@ -1,8 +1,8 @@
-﻿#include "suites/S01_Genesis/shards/sigma_base.h"
+#include "suites/S01_Genesis/shards/sigma_base.h"
 
 /*
  * =========================================================================
- * S SIGMAOS: OMNIBUS CLI CONTROLLER (v2.0 — PURE C11)
+ * S SIGMAOS: OMNIBUS CLI CONTROLLER (v2.0 � PURE C11)
  * =========================================================================
  * An industrial-grade Command Line Interface to interact with every 
  * Sovereign Subsystem in the kernel natively via IPC/sysfs.

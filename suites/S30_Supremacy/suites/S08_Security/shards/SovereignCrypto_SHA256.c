@@ -1,6 +1,6 @@
-﻿/*
+/*
  * =========================================================================
- * S SIGMAOS: S08_SECURITY — SovereignCrypto_SHA256.c
+ * S SIGMAOS: S08_SECURITY � SovereignCrypto_SHA256.c
  * =========================================================================
  * Implementation of Idea 292 (Apex Infinity): Native SHA-256 Digest.
  * Hand-coded message schedule and compression function.

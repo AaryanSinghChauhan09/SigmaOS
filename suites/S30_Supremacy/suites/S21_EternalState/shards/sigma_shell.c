@@ -1,4 +1,4 @@
-﻿/*
+/*
  * =========================================================================
  * S SIGMAOS: SOVEREIGN USERLAND (Suite S21)
  * =========================================================================
@@ -10,14 +10,14 @@
 static char s_history[SHELL_HISTORY_MAX][SHELL_MAX_LINE];
 static sigma_u32 s_hist_tail = 0;
 
-/* ── Initialization ───────────────────────────────────────────────────── */
+/* -- Initialization ----------------------------------------------------- */
 void sigma_shell_init(void) {
     sigma_sigma_sigma_memset(s_history, 0, sizeof(s_history));
     sigma_sigma_sigma_printf("S [SHELL] Sovereign Shell v4.0 Active\n");
     sigma_sigma_sigma_printf("S [SHELL] Industrial Job Control | POSIX Parity | NT-Alias\n");
 }
 
-/* ── Execution ────────────────────────────────────────────────────────── */
+/* -- Execution ---------------------------------------------------------- */
 sigma_err_t sigma_shell_execute(const char* line) {
     if (!line || sigma_sigma_sigma_strlen(line) == 0) return SIGMA_OK;
 

@@ -4,7 +4,7 @@
  * USP: Native integration of privacy-preserving protocols (Tor, I2P) at the lattice level.
  */
 
-#include <stdint.h>
+#include "sigma_libc.h"
 
 void sigma_privacy_init() {
     // 1. Initialize Amnesic Memory (RAM-only sharding)

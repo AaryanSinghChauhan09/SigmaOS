@@ -1,6 +1,6 @@
-﻿/*
+/*
  * =========================================================================
- * S SIGMAOS: S01_GENESIS — SovereignSyscallDispatcher.c
+ * S SIGMAOS: S01_GENESIS � SovereignSyscallDispatcher.c
  * =========================================================================
  * Implementation of Idea 121 (Apex Infinity): 512-entry Syscall Table.
  * Provides the industrial-grade gateway between User and Kernel space.

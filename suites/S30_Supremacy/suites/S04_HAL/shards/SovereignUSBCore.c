@@ -1,6 +1,6 @@
-ï»¿/*
+/*
  * =========================================================================
- * S SIGMAOS: SOVEREIGN USB CORE (v1.0 â€” PURE C11)
+ * S SIGMAOS: SOVEREIGN USB CORE (v1.0 — PURE C11)
  * =========================================================================
  * Competitor Gap Closed: Linux drivers/usb/core/ (URB routing, hubs),
  * macOS IOUSBHostFamily, Windows USB Core Stack (usbcore.sys).
@@ -8,18 +8,18 @@
  * abstract routing layer to pair class drivers with endpoint pipes.
  *
  * This shard implements:
- *   Â§ 1  USB Request Block (URB) lifecycle (Alloc, Submit, Complete)
- *   Â§ 2  USB Descriptor Parsing (Device, Configuration, Interface, Endpoint)
- *   Â§ 3  USB Hub abstract tracking & port status
- *   Â§ 4  Endpoint definition (Control, Bulk, Interrupt, Isochronous)
- *   Â§ 5  Device abstraction layer matching interfaces to class drivers
+ *   § 1  USB Request Block (URB) lifecycle (Alloc, Submit, Complete)
+ *   § 2  USB Descriptor Parsing (Device, Configuration, Interface, Endpoint)
+ *   § 3  USB Hub abstract tracking & port status
+ *   § 4  Endpoint definition (Control, Bulk, Interrupt, Isochronous)
+ *   § 5  Device abstraction layer matching interfaces to class drivers
  * =========================================================================
  */
 
 #include "suites/S01_Genesis/shards/sigma_kernel.h"
 
 /* -----------------------------------------------------------------------
- * â–‘â–‘ USB DEFINITIONS & CONSTANTS
+ * ¦¦ USB DEFINITIONS & CONSTANTS
  * ----------------------------------------------------------------------- */
 #define USB_MAXCHILDREN       31
 #define USB_MAX_ENDPOINTS     16
@@ -53,7 +53,7 @@
 #define USB_CLASS_HUB         0x09
 
 /* -----------------------------------------------------------------------
- * â–‘â–‘ DESCRIPTORS
+ * ¦¦ DESCRIPTORS
  * ----------------------------------------------------------------------- */
 typedef struct {
     sigma_u8  bLength;
@@ -94,7 +94,7 @@ typedef struct {
 } SIGMA_PACKED SigmaUSBInterfaceDescriptor_t;
 
 /* -----------------------------------------------------------------------
- * â–‘â–‘ USB DEVICE ABSTRACTION
+ * ¦¦ USB DEVICE ABSTRACTION
  * ----------------------------------------------------------------------- */
 typedef struct SigmaUSBDevice {
     sigma_u32 devnum;          /* Address */
@@ -113,7 +113,7 @@ typedef struct SigmaUSBDevice {
 } SigmaUSBDevice_t;
 
 /* -----------------------------------------------------------------------
- * â–‘â–‘ URB (USB Request Block)
+ * ¦¦ URB (USB Request Block)
  * ----------------------------------------------------------------------- */
 typedef void (*SigmaURBComplete_t)(struct SigmaURB *urb);
 
@@ -139,7 +139,7 @@ typedef struct SigmaURB {
     (((dev_num) << 8) | ((ep_num) << 15) | ((type) << 30) | ((dir)?0x80:0))
 
 /* -----------------------------------------------------------------------
- * â–‘â–‘ USB BUS (Host Controller Abstraction)
+ * ¦¦ USB BUS (Host Controller Abstraction)
  * ----------------------------------------------------------------------- */
 typedef struct SigmaUSBBus {
     sigma_u32 busnum;
@@ -156,7 +156,7 @@ static SigmaUSBBus_t s_usb_buses[MAX_USB_BUSES];
 static sigma_u32 s_usb_bus_count = 0;
 
 /* -----------------------------------------------------------------------
- * â–‘â–‘ CORE FUNCTIONS
+ * ¦¦ CORE FUNCTIONS
  * ----------------------------------------------------------------------- */
 SigmaURB_t* sigma_usb_alloc_urb(void) {
     /* For simplicity in the example, assume a slab allocator exists */
@@ -191,7 +191,7 @@ void sigma_usb_complete_urb(SigmaURB_t *urb, sigma_err_t status, sigma_u32 actua
 }
 
 /* -----------------------------------------------------------------------
- * â–‘â–‘ ENUMERATION MOCK (Hub driver behavior)
+ * ¦¦ ENUMERATION MOCK (Hub driver behavior)
  * ----------------------------------------------------------------------- */
 static void hub_port_connect_change(SigmaUSBDevice_t *hub, int port) {
     sigma_sigma_sigma_printf("S [USB]: Port %d on Hub '%s' state changed.\n", port, hub->devpath);
@@ -216,7 +216,7 @@ static void my_urb_callback(SigmaURB_t *urb) {
 }
 
 /* -----------------------------------------------------------------------
- * â–‘â–‘ INITIALISATION
+ * ¦¦ INITIALISATION
  * ----------------------------------------------------------------------- */
 void SovereignUSBCore_Init(void) {
     sigma_sigma_sigma_printf("S [USB]: Initialising Sovereign USB Core...\n");

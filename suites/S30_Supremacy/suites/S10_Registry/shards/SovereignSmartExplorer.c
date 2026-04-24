@@ -1,4 +1,4 @@
-﻿#include "SovereignToolHeader.h"
+#include "SovereignToolHeader.h"
 
 /*
  * =========================================================================
@@ -17,7 +17,7 @@ void sigma_smart_ls(const char* dir) {
     sigma_sigma_sigma_printf("  [FILE] sigma_types.h\n");
     
     /* The Suggestion Engine */
-    sigma_sigma_sigma_printf("\nS [SUGGESTION]: Based on your current workflow, we recommend entering: 'shards' ★\n");
+    sigma_sigma_sigma_printf("\nS [SUGGESTION]: Based on your current workflow, we recommend entering: 'shards' ?\n");
 }
 
 int SovereignSmartExplorer_ToolMain(int argc, char** argv) {

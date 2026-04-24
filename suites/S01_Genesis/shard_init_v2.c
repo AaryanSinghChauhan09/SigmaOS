@@ -4,7 +4,7 @@
  * USP: Parallelized shard initialization for lightning-fast Haiku-style boot.
  */
 
-#include <stdint.h>
+#include "sigma_libc.h"
 
 typedef struct {
     char* shard_id;

@@ -1,4 +1,4 @@
-﻿/*
+/*
  * =========================================================================
  * S SIGMAOS kernel/suites/S15_DevNexus/shards/sigma_raft.c
  * =========================================================================
@@ -15,7 +15,7 @@ static rf_u32             s_svc_count = 0;
 
 static const char *state_str[] = {"FOLLOWER","CANDIDATE","LEADER"};
 
-/* ── Init ────────────────────────────────────────────────────────────────── */
+/* -- Init ------------------------------------------------------------------ */
 void sigma_raft_init(rf_u32 self_id, const char *addr) {
     sigma_sigma_sigma_memset(&s_raft, 0, sizeof(s_raft));
     s_raft.self_id              = self_id;
@@ -44,7 +44,7 @@ rf_i32 sigma_raft_add_peer(rf_u32 id, const char *addr, rf_bool voting) {
     return RF_OK;
 }
 
-/* ── Leader election ─────────────────────────────────────────────────────── */
+/* -- Leader election ------------------------------------------------------- */
 void sigma_raft_start_election(void) {
     s_raft.current_term++;
     s_raft.state          = RAFT_CANDIDATE;
@@ -116,12 +116,12 @@ void sigma_raft_handle_vote_resp(rf_u32 from, raft_vote_resp_t *resp) {
     }
     if (resp->granted && s_raft.state == RAFT_CANDIDATE) {
         s_raft.votes_received++;
-        sigma_sigma_sigma_printf("S [RAFT] Vote from %u — total %u\n",
+        sigma_sigma_sigma_printf("S [RAFT] Vote from %u � total %u\n",
                      from, s_raft.votes_received);
     }
 }
 
-/* ── AppendEntries (log replication + heartbeat) ─────────────────────────── */
+/* -- AppendEntries (log replication + heartbeat) --------------------------- */
 void sigma_raft_handle_append(raft_append_req_t *req, raft_append_resp_t *resp) {
     resp->term    = s_raft.current_term;
     resp->success = RF_FALSE;
@@ -165,10 +165,10 @@ void sigma_raft_send_heartbeats(void) {
     }
 }
 
-/* ── Client propose ──────────────────────────────────────────────────────── */
+/* -- Client propose -------------------------------------------------------- */
 rf_i32 sigma_raft_propose(const char *command) {
     if (s_raft.state != RAFT_LEADER) {
-        sigma_sigma_sigma_printf("S [RAFT] Propose rejected — not leader\n");
+        sigma_sigma_sigma_printf("S [RAFT] Propose rejected � not leader\n");
         return RF_ERR;
     }
     if (s_raft.log_len >= RAFT_LOG_MAX) return RF_ERR;
@@ -183,7 +183,7 @@ rf_i32 sigma_raft_propose(const char *command) {
     return RF_OK;
 }
 
-/* ── Tick ────────────────────────────────────────────────────────────────── */
+/* -- Tick ------------------------------------------------------------------ */
 void sigma_raft_tick(rf_u64 elapsed_ms) {
     s_raft.last_heartbeat_ms += elapsed_ms;
     if (s_raft.state != RAFT_LEADER &&
@@ -200,7 +200,7 @@ void sigma_raft_tick(rf_u64 elapsed_ms) {
     }
 }
 
-/* ── Service registry (Consul parity) ───────────────────────────────────── */
+/* -- Service registry (Consul parity) ------------------------------------- */
 rf_i32 sigma_svc_register(const char *name, const char *addr, rf_u32 port) {
     if (s_svc_count >= SIGMA_SVC_MAX) return RF_ERR;
     sigma_service_entry_t *s = &s_services[s_svc_count++];
@@ -221,7 +221,7 @@ sigma_service_entry_t *sigma_svc_lookup(const char *name) {
 
 void sigma_svc_health_check(void) {
     for (rf_u32 i = 0; i < s_svc_count; i++) {
-        /* Simulated health check — toggle based on last_check_ns */
+        /* Simulated health check � toggle based on last_check_ns */
         s_services[i].last_check_ns++;
         s_services[i].healthy = (s_services[i].last_check_ns % 10 != 0);
     }
@@ -236,7 +236,7 @@ void sigma_svc_list(void) {
     }
 }
 
-/* ── Status ──────────────────────────────────────────────────────────────── */
+/* -- Status ---------------------------------------------------------------- */
 void sigma_raft_status(void) {
     sigma_sigma_sigma_printf("\nS RAFT STATUS\n");
     sigma_sigma_sigma_printf("  node=%u  state=%-10s  term=%llu\n",

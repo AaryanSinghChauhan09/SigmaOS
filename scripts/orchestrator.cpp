@@ -151,7 +151,7 @@ private:
         std::cout << "[*] Module: " << mod.name << "\n";
         std::vector<std::string> objs;
         
-        std::string base_cflags = "-nostdlib -ffreestanding -O2 -Wall -I. -Iinclude -Isuites/S01_Genesis/include";
+        std::string base_cflags = "-nostdlib -ffreestanding -O2 -Wall -I. -Iinclude -Isuites/S01_Genesis -Isuites/S01_Genesis/include";
         if (arch == "x86_64") base_cflags += " -m64";
         
         for (const auto& src : mod.sources) {

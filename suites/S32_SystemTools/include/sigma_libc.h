@@ -22,7 +22,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <stdbool.h>
-#include <stdint.h>
+#include "sigma_libc.h"
 #include <stddef.h>
 #include <unistd.h>
 #include <stdarg.h>

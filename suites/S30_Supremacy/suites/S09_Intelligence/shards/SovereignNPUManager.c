@@ -1,6 +1,6 @@
-﻿/*
+/*
  * =========================================================================
- * S SIGMAOS: S09_INTELLIGENCE — SovereignNPUManager.c
+ * S SIGMAOS: S09_INTELLIGENCE � SovereignNPUManager.c
  * =========================================================================
  * Mission: Hardware AI Acceleration (CoreML/TensorRT Parity).
  * Capability: Direct-to-Silicon model dispatch, INT8/FP16 quantization.

@@ -1,6 +1,6 @@
-﻿/*
+/*
  * =========================================================================
- * S SIGMAOS: S28_OMNIBUS — SovereignPRU_Drone.c
+ * S SIGMAOS: S28_OMNIBUS � SovereignPRU_Drone.c
  * =========================================================================
  * Implementation of Idea 68.3 (Apex Infinity): Drone PRU Controller.
  * Real-time coprocessor orchestration for safety-critical flight logic.

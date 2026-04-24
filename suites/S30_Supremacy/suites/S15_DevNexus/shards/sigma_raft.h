@@ -1,8 +1,8 @@
-﻿/*
+/*
  * =========================================================================
  * S SIGMAOS kernel/suites/S15_DevNexus/shards/sigma_raft.h
  * =========================================================================
- * Sovereign Distributed Consensus — gap-closes:
+ * Sovereign Distributed Consensus � gap-closes:
  *   etcd    : Raft consensus, leader election, log replication
  *   ZooKeeper: ZAB protocol, ephemeral nodes, watches
  *   Consul  : gossip (SWIM), service discovery, health checks
@@ -27,7 +27,7 @@ typedef unsigned char      rf_bool;
 #define RF_OK    ((rf_i32) 0)
 #define RF_ERR   ((rf_i32)-1)
 
-/* ── Raft node states ────────────────────────────────────────────────────── */
+/* -- Raft node states ------------------------------------------------------ */
 typedef enum {
     RAFT_FOLLOWER  = 0,
     RAFT_CANDIDATE = 1,
@@ -38,14 +38,14 @@ typedef enum {
 #define RAFT_LOG_MAX    512
 #define RAFT_CMD_LEN     64
 
-/* ── Log entry ───────────────────────────────────────────────────────────── */
+/* -- Log entry ------------------------------------------------------------- */
 typedef struct {
     rf_u64 term;
     rf_u64 index;
     char   command[RAFT_CMD_LEN];
 } raft_log_entry_t;
 
-/* ── Node descriptor ─────────────────────────────────────────────────────── */
+/* -- Node descriptor ------------------------------------------------------- */
 typedef struct {
     rf_u32       node_id;
     char         addr[48];    /* host:port                              */
@@ -55,7 +55,7 @@ typedef struct {
     rf_u64       match_index; /* leader: highest log index known replicated */
 } raft_peer_t;
 
-/* ── Raft FSM state ──────────────────────────────────────────────────────── */
+/* -- Raft FSM state -------------------------------------------------------- */
 typedef struct {
     rf_u32          self_id;
     raft_state_t    state;
@@ -83,7 +83,7 @@ typedef struct {
     rf_u64          gossip_seq;
 } raft_node_t;
 
-/* ── RPC messages ────────────────────────────────────────────────────────── */
+/* -- RPC messages ---------------------------------------------------------- */
 typedef struct {
     rf_u64 term;
     rf_u32 candidate_id;
@@ -112,7 +112,7 @@ typedef struct {
     rf_u64  match_index;
 } raft_append_resp_t;
 
-/* ── Service registry entry (Consul parity) ─────────────────────────────── */
+/* -- Service registry entry (Consul parity) ------------------------------- */
 typedef struct {
     char   name[32];
     char   addr[48];
@@ -123,7 +123,7 @@ typedef struct {
 
 #define SIGMA_SVC_MAX 128
 
-/* ── Public API ─────────────────────────────────────────────────────────── */
+/* -- Public API ----------------------------------------------------------- */
 void   sigma_raft_init(rf_u32 self_id, const char *addr);
 rf_i32 sigma_raft_add_peer(rf_u32 id, const char *addr, rf_bool voting);
 rf_i32 sigma_raft_propose(const char *command);   /* client write request */

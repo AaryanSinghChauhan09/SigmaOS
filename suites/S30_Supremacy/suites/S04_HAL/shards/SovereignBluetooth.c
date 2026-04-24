@@ -1,23 +1,23 @@
-ï»¿/*
+/*
  * =========================================================================
- * S SIGMAOS: SOVEREIGN BLUETOOTH STACK (v1.0 â€” PURE C11)
+ * S SIGMAOS: SOVEREIGN BLUETOOTH STACK (v1.0 — PURE C11)
  * =========================================================================
  * Competitor Gap Closed: Linux BlueZ (net/bluetooth/), macOS CoreBluetooth,
  * Windows Bluetooth Driver Stack. SigmaOS had zero Bluetooth capability.
  *
  * This shard implements the core of a modern Bluetooth host stack:
- *   Â§ 1  HCI (Host Controller Interface) commands, events, and ACL data
- *   Â§ 2  L2CAP (Logical Link Control and Adaptation Protocol) multiplexing
- *   Â§ 3  LE (Low Energy) advertising and scanning abstractions
- *   Â§ 4  SMP (Security Manager Protocol) skeletons
- *   Â§ 5  Device inquiry and connection management
+ *   § 1  HCI (Host Controller Interface) commands, events, and ACL data
+ *   § 2  L2CAP (Logical Link Control and Adaptation Protocol) multiplexing
+ *   § 3  LE (Low Energy) advertising and scanning abstractions
+ *   § 4  SMP (Security Manager Protocol) skeletons
+ *   § 5  Device inquiry and connection management
  * =========================================================================
  */
 
 #include "suites/S01_Genesis/shards/sigma_kernel.h"
 
 /* -----------------------------------------------------------------------
- * â–‘â–‘ CONSTANTS & MACROS
+ * ¦¦ CONSTANTS & MACROS
  * ----------------------------------------------------------------------- */
 #define BT_MAX_DEVICES   16
 #define BT_MAX_CONNS     8
@@ -55,7 +55,7 @@ typedef struct {
 } bdaddr_t;
 
 /* -----------------------------------------------------------------------
- * â–‘â–‘ CORE STRUCTURES
+ * ¦¦ CORE STRUCTURES
  * ----------------------------------------------------------------------- */
 typedef enum {
     BT_STATE_STANDBY,
@@ -95,7 +95,7 @@ static SigmaHCIController_t s_hci_ctrl[BT_MAX_DEVICES];
 static sigma_u32 s_hci_count = 0;
 
 /* -----------------------------------------------------------------------
- * â–‘â–‘ HCI COMMAND GENERATION
+ * ¦¦ HCI COMMAND GENERATION
  * ----------------------------------------------------------------------- */
 static inline sigma_u16 hci_opcode_pack(sigma_u16 ogf, sigma_u16 ocf) {
     return (ocf & 0x03ff) | (ogf << 10);
@@ -120,7 +120,7 @@ static sigma_err_t hci_send_cmd(SigmaHCIController_t *ctrl, sigma_u16 ogf, sigma
 }
 
 /* -----------------------------------------------------------------------
- * â–‘â–‘ BASIC OPERATIONS
+ * ¦¦ BASIC OPERATIONS
  * ----------------------------------------------------------------------- */
 void sigma_bt_inquiry_start(SigmaHCIController_t *ctrl) {
     sigma_u8 cp[5];
@@ -140,7 +140,7 @@ void sigma_bt_reset(SigmaHCIController_t *ctrl) {
 }
 
 /* -----------------------------------------------------------------------
- * â–‘â–‘ HCI EVENT PROCESSING
+ * ¦¦ HCI EVENT PROCESSING
  * ----------------------------------------------------------------------- */
 void sigma_hci_rx_event(SigmaHCIController_t *ctrl, const sigma_u8 *data, sigma_sz_t len) {
     if (len < 2) return;
@@ -182,7 +182,7 @@ void sigma_hci_rx_event(SigmaHCIController_t *ctrl, const sigma_u8 *data, sigma_
 }
 
 /* -----------------------------------------------------------------------
- * â–‘â–‘ L2CAP MOCK (Logical Link Control and Adaptation Protocol)
+ * ¦¦ L2CAP MOCK (Logical Link Control and Adaptation Protocol)
  * ----------------------------------------------------------------------- */
 sigma_err_t sigma_l2cap_send(SigmaHCIController_t *ctrl, sigma_u16 handle, sigma_u16 cid, const sigma_u8 *data, sigma_sz_t len) {
     if (!ctrl || !data || len == 0) return SIGMA_EINVAL;
@@ -213,7 +213,7 @@ sigma_err_t sigma_l2cap_send(SigmaHCIController_t *ctrl, sigma_u16 handle, sigma
 }
 
 /* -----------------------------------------------------------------------
- * â–‘â–‘ INIT & REGISTRATION
+ * ¦¦ INIT & REGISTRATION
  * ----------------------------------------------------------------------- */
 static sigma_err_t mock_usb_tx(sigma_u8 type, const sigma_u8 *data, sigma_sz_t len) {
     SIGMA_UNUSED(data); SIGMA_UNUSED(len);

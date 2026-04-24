@@ -1,6 +1,6 @@
-﻿/*
+/*
  * =========================================================================
- * S SIGMAOS: S25_ZEROKERNEL — SovereignISA_Emulator.c
+ * S SIGMAOS: S25_ZEROKERNEL � SovereignISA_Emulator.c
  * =========================================================================
  * Implementation of Idea 60.1/60.2 (Apex Infinity): SigmaISA Emulator.
  * Fetch-Decode-Execute loop for the custom SigmaOS instruction set.

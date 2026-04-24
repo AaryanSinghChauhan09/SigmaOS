@@ -1,4 +1,4 @@
-ï»¿/*
+/*
  * =========================================================================
  * S SIGMAOS ZENITH: SOVEREIGN DESIGN PATTERNS ENGINE (v1.0)
  * =========================================================================
@@ -13,7 +13,7 @@
 #include "suites/S01_Genesis/shards/sigma_kernel.h"
 
 /* =======================================================================
- * PATTERN 1: SINGLETON â€” Global Kernel Logger
+ * PATTERN 1: SINGLETON — Global Kernel Logger
  * Only one instance exists; all shards share it.
  * ======================================================================= */
 
@@ -44,7 +44,7 @@ void sigma_logger_write(SigmaLogger_t* logger, sigma_u32 level,
 }
 
 /* =======================================================================
- * PATTERN 2: OBSERVER â€” Event Bus
+ * PATTERN 2: OBSERVER — Event Bus
  * Shards subscribe to events; the bus notifies all subscribers.
  * ======================================================================= */
 
@@ -77,7 +77,7 @@ void sigma_event_publish(sigma_u32 event_id, void* data) {
 }
 
 /* =======================================================================
- * PATTERN 3: STRATEGY â€” Pluggable Sort Algorithms
+ * PATTERN 3: STRATEGY — Pluggable Sort Algorithms
  * The caller selects the sorting strategy at runtime.
  * ======================================================================= */
 
@@ -132,7 +132,7 @@ void sigma_sort_execute(SigmaSortContext_t* ctx, sigma_f64* arr, sigma_u32 len) 
 }
 
 /* =======================================================================
- * PATTERN 4: FACTORY â€” Creates typed kernel objects
+ * PATTERN 4: FACTORY — Creates typed kernel objects
  * ======================================================================= */
 
 typedef enum {
@@ -163,7 +163,7 @@ KernelObject_t sigma_factory_create(KernelObjectType_t type, const char* label) 
 }
 
 /* =======================================================================
- * PATTERN 5: ITERATOR â€” Walk a collection without exposing internals
+ * PATTERN 5: ITERATOR — Walk a collection without exposing internals
  * ======================================================================= */
 
 typedef struct {

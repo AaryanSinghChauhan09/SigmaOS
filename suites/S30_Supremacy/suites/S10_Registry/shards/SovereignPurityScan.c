@@ -1,4 +1,4 @@
-﻿#include "suites/S01_Genesis/shards/sigma_base.h"
+#include "suites/S01_Genesis/shards/sigma_base.h"
 
 /*
  * =========================================================================
@@ -20,7 +20,7 @@ void sigma_purity_audit(const char* file_path) {
     const char* forbidden[] = {"stdio.h", "stdlib.h", "string.h", "Aaryan"};
     
     /* Logic: sigma_open -> sigma_read -> sigma_strstr */
-    sigma_sigma_sigma_printf("  ✓ [OK]: Shard '%s' verified — 100%% Sovereign Purity.\n", file_path);
+    sigma_sigma_sigma_printf("  ? [OK]: Shard '%s' verified � 100%% Sovereign Purity.\n", file_path);
 }
 
 int SovereignPurityScan_ToolMain(int argc, char** argv) {

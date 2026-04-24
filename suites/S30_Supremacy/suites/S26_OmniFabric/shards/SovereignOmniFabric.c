@@ -1,6 +1,6 @@
-﻿/*
+/*
  * =========================================================================
- * S SIGMAOS: S26_OMNIFABRIC — SovereignOmniFabric.c
+ * S SIGMAOS: S26_OMNIFABRIC � SovereignOmniFabric.c
  * =========================================================================
  * Mission: High-Performance, Zero-Leakage Inter-Shard Communication Bus.
  * Design: Ring-Buffer based, Lock-Free Asynchronous Message Dispatch.

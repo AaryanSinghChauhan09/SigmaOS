@@ -1,7 +1,7 @@
 #ifndef SIGMA_PACKAGE_REGISTRY_H
 #define SIGMA_PACKAGE_REGISTRY_H
 
-#include <stdint.h>
+#include "sigma_libc.h"
 
 /* SigmaOS Sovereign Package Registry - Phase 7 Sovereign Intelligence
  * Implements a content-addressed, decentralized package distribution
