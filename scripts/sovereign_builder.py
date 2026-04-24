@@ -22,6 +22,26 @@ TOOLCHAINS = {
 CFLAGS  = "-nostdlib -ffreestanding -O2 -Wall -std=c11"
 BUILD_DIR = "build"
 HASH_CACHE = os.path.join(BUILD_DIR, ".build_cache.json")
+FEATURES_JSON = "sigma_features.json"
+
+def load_feature_flags():
+    """Read sigma_features.json and return compiler -D flags."""
+    if not os.path.exists(FEATURES_JSON):
+        return ""
+    with open(FEATURES_JSON) as f:
+        cfg = json.load(f)
+    flags = []
+    arch = cfg.get("arch", "x86_64").upper()
+    flags.append(f"-DSIGMA_ARCH_{arch}")
+    for sub in ["display", "storage", "network"]:
+        drv = cfg.get("drivers", {}).get(sub)
+        if drv:
+            flags.append(f"-DSIGMA_DRIVER_{drv.upper()}")
+    for k, v in cfg.get("features", {}).items():
+        flags.append(f"-DSIGMA_FEATURE_{k.upper()}={1 if v else 0}")
+    for k, v in cfg.get("memory", {}).items():
+        flags.append(f"-DSIGMA_{k.upper()}={v}")
+    return " ".join(flags)
 
 def load_cache():
     if os.path.exists(HASH_CACHE):
@@ -112,8 +132,10 @@ def package_iso(arch, kernel_bin):
     print(f"[+] Bootable ISO ready: {iso_path}")
 
 def main():
+    global CFLAGS
     print("=" * 50)
-    print("  SigmaOS Sovereign Build Orchestrator v2")
+    print("  SigmaOS Sovereign Build Orchestrator v3")
+    print("  Feature-Flag-Aware | Multi-Source Discovery")
     print("=" * 50)
 
     arch = sys.argv[1] if len(sys.argv) > 1 else "x86_64"
@@ -121,21 +143,31 @@ def main():
         print(f"[!] Unknown arch '{arch}'. Defaulting to x86_64.")
         arch = "x86_64"
 
-    print(f"\n[*] Target Architecture: {arch}")
+    # Load declarative feature flags
+    ff = load_feature_flags()
+    if ff:
+        CFLAGS = f"{CFLAGS} {ff}"
+        print(f"\n[*] Feature flags loaded from {FEATURES_JSON}")
+    else:
+        print(f"\n[*] No {FEATURES_JSON} found, using defaults.")
+
+    print(f"[*] Target Architecture: {arch}")
+    print(f"[*] CFLAGS: {CFLAGS}\n")
 
     cache = load_cache()
-    modules = discover_modules("modules")
+
+    # Discover modules from BOTH modules/ and suites/
+    modules = discover_modules("modules") + discover_modules("suites")
     ordered = resolve_order(modules)
 
     print(f"[*] {len(ordered)} capsules discovered. Resolving dependency order...\n")
     all_objects = []
 
     for mod in ordered:
-        # Skip modules not targeting this arch
         if arch not in mod.get("arch", [arch]):
             print(f"[--] Skipping '{mod['module']}' (not targeting {arch})")
             continue
-        print(f"[*] Capsule: {mod['module']} v{mod['version']}")
+        print(f"[*] Capsule: {mod['module']} v{mod.get('version','?')}")
         objs = build_module(arch, mod, cache)
         all_objects.extend(objs)
 
@@ -143,7 +175,7 @@ def main():
     package_iso(arch, kernel_bin)
     save_cache(cache)
 
-    print("\n[✓] Sovereign Build Complete. All capsules verified.")
+    print(f"\n[✓] Sovereign Build Complete. {len(all_objects)} objects compiled.")
 
 if __name__ == "__main__":
     main()

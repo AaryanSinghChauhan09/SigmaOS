@@ -37,7 +37,12 @@ typedef sigma_u16          uint16_t;
 #define K_OK         0
 #define K_ERR_NOMEM -1
 #define K_ERR_INVAL -2
+#define K_ERR_NODEV -3
+#define K_ERR_NOTFOUND -4
 typedef int k_status;
+
+#define BIT(n)       (1ULL << (n))
+#define KERNEL_VMA   0xFFFFFFFF80000000ULL
 
 /* Jail type for virtualization shards */
 typedef struct sigma_jail {

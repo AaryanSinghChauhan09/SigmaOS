@@ -1,0 +1,20 @@
+{
+    "module":       "S01_Genesis",
+    "version":      "1.0.0",
+    "type":         "kernel_core",
+    "description":  "Bootstrap, bootloader handoff, early console, kernel entry point, and SovereignLibC.",
+    "dependencies": [],
+    "features_required": [],
+    "features_optional": [],
+    "memory": {
+        "pool_pages":   4,
+        "max_alloc_mb": 2,
+        "heap_type":    "static"
+    },
+    "exports": [
+        "_start", "kernel_main", "kprintf",
+        "sigma_write", "sigma_exit", "sigma_mmap",
+        "hal_discover_hardware"
+    ],
+    "test_targets": ["test_boot_sequence", "test_libc_primitives"]
+}

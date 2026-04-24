@@ -3,7 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>SigmaOS | Sovereign Lattice (634-Suite Infinite Singularity)</title>
+    <title>SigmaOS | Sovereign Lattice Dashboard</title>
+    <meta name="description" content="SigmaOS Zenith Dashboard — Real-time monitoring of the Sovereign Lattice via decoupled Web Components and a versioned kernel API.">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="styles/glassmorphism.css">
 </head>
@@ -13,10 +14,10 @@
     <header class="top-bar">
         <div class="logo-area">
             <h1>Σ SigmaOS</h1>
-            <span class="status-badge">Kernel v12.5 Online (Beyond)</span>
+            <span class="status-badge">Kernel v12.5 Online (Sovereign)</span>
         </div>
         <div class="metrics">
-            <span style="font-size: 0.8rem; color: var(--text-secondary);">634 Suites Active | Pure Silicon Singularity</span>
+            <span style="font-size: 0.8rem; color: var(--text-secondary);">Modular Lattice | Web Component Architecture</span>
         </div>
     </header>
 
@@ -38,81 +39,71 @@
             </div>
             
             <div class="sidebar-section">
-                <h3>Marketplace</h3>
-                <a href="#" class="nav-item">Linux Plugins</a>
-                <a href="#" class="nav-item">Data Tools</a>
-                <a href="#" class="nav-item">Retro Architectures</a>
+                <h3>Observability</h3>
+                <a href="#" class="nav-item">Memory Pools</a>
+                <a href="#" class="nav-item">Kernel Logs</a>
+                <a href="#" class="nav-item">HAL Registry</a>
             </div>
         </nav>
 
         <!-- Main Dashboard -->
         <main class="dashboard">
             <div class="dashboard-header zenith-prism" style="padding: 30px; margin-bottom: 30px; border-radius: 20px;">
-                <h2>The 641-Suite Omnipresence</h2>
-                <p>Cross-kernel synthesis complete. FreeBSD, OpenBSD, and Solaris primitives now executing within the Sovereign Lattice.</p>
+                <h2>Sovereign Lattice — Modular Architecture</h2>
+                <p>Contract-based HAL • Declarative Features • Per-Module Memory Pools • Zero-Trust Capabilities • Decoupled Web Components</p>
             </div>
 
-            <!-- Real-time Vitals HUD -->
-            <div class="vitals-hud" id="vitalsHud">
-                <div class="vitals-card">
-                    <span class="vitals-label">CPU LOAD</span>
-                    <span class="vitals-value" data-metric="cpu_usage">0%</span>
-                </div>
-                <div class="vitals-card">
-                    <span class="vitals-label">MEMORY</span>
-                    <span class="vitals-value" data-metric="memory_usage">0 KB</span>
-                </div>
-                <div class="vitals-card">
-                    <span class="vitals-label">PROCESSES</span>
-                    <span class="vitals-value" data-metric="process_count">0</span>
-                </div>
-                <div class="vitals-card">
-                    <span class="vitals-label">ACTIVE SHARDS</span>
-                    <span class="vitals-value" data-metric="active_shards">634</span>
-                </div>
+            <!-- §1: Real-time Vitals via <sigma-monitor> Web Component -->
+            <sigma-monitor></sigma-monitor>
+
+            <!-- §2: Memory Pool Inspector via <sigma-pool-inspector> Web Component -->
+            <div style="margin-top: 24px;">
+                <sigma-pool-inspector></sigma-pool-inspector>
             </div>
 
-            <!-- Shard Grid rendered dynamically via JS -->
-            <div class="shard-grid" id="shardContainer">
-                <!-- Javascript will inject the 200 shards here -->
+            <!-- §3: Kernel Log Viewer via <sigma-logs> Web Component -->
+            <div style="margin-top: 24px;">
+                <sigma-logs max-entries="150"></sigma-logs>
+            </div>
+
+            <!-- §4: Shard Grid rendered dynamically via JS -->
+            <div class="shard-grid" id="shardContainer" style="margin-top: 24px;">
+                <!-- Populated by kernel_loader.js -->
             </div>
         </main>
     </div>
 
-    <!-- The Kernel Loader pulls in all 200 shards dynamically -->
+    <!-- Versioned Kernel API (data layer — loaded FIRST) -->
+    <script src="scripts/sigma_api_service.js"></script>
+
+    <!-- Decoupled Web Components (self-contained, Shadow DOM isolated) -->
+    <script src="components/sigma-monitor.js"></script>
+    <script src="components/sigma-logs.js"></script>
+    <script src="components/sigma-pool-inspector.js"></script>
+
+    <!-- Legacy shard loader (still populates the grid) -->
     <script src="scripts/kernel_loader.js"></script>
     <script>
-        // Render all active shards onto the dashboard
         window.addEventListener('sigma.core.boot', () => {
             const container = document.getElementById('shardContainer');
-            
-            // Wait a brief moment for all shards to initialize on the window object
             setTimeout(() => {
                 const keys = Object.keys(window).filter(k => k.startsWith('SigmaS'));
-                
                 keys.forEach(key => {
                     const shard = window[key];
                     if (shard && shard.shardId) {
                         const titleMatch = shard.shardId.match(/_([A-Za-z0-9]+)$/);
                         const title = titleMatch ? titleMatch[1] : shard.shardId;
-                        
                         const card = document.createElement('div');
                         card.className = 'shard-card holographic-card';
-                        
-                        // Try to parse out the CLI command from the registered window.SigmaCLI
-                        // For display purposes, we'll just show a generic prompt if not easily inferrable
-                        
-                        card.innerHTML = \`
+                        card.innerHTML = `
                             <div class="shard-header">
-                                <span class="shard-id">\${shard.shardId.split('_')[0]}</span>
+                                <span class="shard-id">${shard.shardId.split('_')[0]}</span>
                                 <span style="font-size: 0.8rem; color: #10b981;">● Active</span>
                             </div>
-                            <h3 class="shard-title">\${title.replace(/([A-Z])/g, ' $1').trim()}</h3>
-                            <p class="shard-desc">Deep OS Integration Module mapped to the central core.</p>
-                            <div class="shard-cli">
-                                CLI: <code>sigma \${shard.shardId.split('_')[0].toLowerCase()}</code>
-                            </div>
-                        \`;
+                            <h3 class="shard-title">${title.replace(/([A-Z])/g, ' $1').trim()}</h3>
+                            <p class="shard-desc">Sovereign Lattice Shard — contract-isolated module.</p>
+                            <div class="shard-cli">CLI: <code>sigma ${shard.shardId.split('_')[0].toLowerCase()}</code></div>
+                        `;
                         container.appendChild(card);
                     }
                 });

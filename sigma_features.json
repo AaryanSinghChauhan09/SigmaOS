@@ -1,0 +1,36 @@
+{
+    "comment": "SigmaOS Declarative Feature Configuration (Kconfig-style)",
+    "version": "1.0.0",
+    "arch": "x86_64",
+
+    "drivers": {
+        "display":  "vga",
+        "storage":  "ata",
+        "network":  "e1000",
+        "comment":  "Options: display={vga|framebuffer}, storage={ata|ahci|nvme}, network={e1000|virtio_net}"
+    },
+
+    "features": {
+        "network":          true,
+        "gui":              true,
+        "ai":               false,
+        "web3":             false,
+        "hypervisor":       false,
+        "zkp":              false,
+        "observability":    true,
+        "slab_pools":       true
+    },
+
+    "memory": {
+        "max_slab_pools":       64,
+        "default_pool_pages":   16,
+        "heap_limit_mb":        256
+    },
+
+    "build": {
+        "version_major":    12,
+        "version_minor":    5,
+        "version_patch":    0,
+        "channel":          "rolling"
+    }
+}

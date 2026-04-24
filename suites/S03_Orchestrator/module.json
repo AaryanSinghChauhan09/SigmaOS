@@ -1,0 +1,18 @@
+{
+    "module":       "S03_Orchestrator",
+    "version":      "1.0.0",
+    "type":         "kernel_core",
+    "description":  "Process lifecycle management, microkernel IPC channels, and service orchestration.",
+    "dependencies": ["S01_Genesis", "S04_HAL", "S05_Memory"],
+    "features_required": [],
+    "features_optional": [],
+    "memory": {
+        "pool_pages":   16,
+        "max_alloc_mb": 8,
+        "heap_type":    "slab"
+    },
+    "exports": [
+        "ipc_create_channel", "ipc_send", "ipc_recv", "ipc_audit"
+    ],
+    "test_targets": ["test_ipc_roundtrip", "test_ipc_overflow", "test_channel_isolation"]
+}
