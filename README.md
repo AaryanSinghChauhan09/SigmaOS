@@ -107,7 +107,7 @@ cargo kani --manifest-path suites/S08_Security/formal_proofs/Cargo.toml
 
 See [CONTRIBUTING.md](CONTRIBUTING.md) for build setup, shard architecture, and PR guidelines.
 
-Contact: [AaryanSinghChauhan09](https://github.com/AaryanSinghChauhan09)
+**Contact**: [aaryansinghchauhan090305@gmail.com](mailto:aaryansinghchauhan090305@gmail.com) | [GitHub @AaryanSinghChauhan09](https://github.com/AaryanSinghChauhan09)
 
 ---
 

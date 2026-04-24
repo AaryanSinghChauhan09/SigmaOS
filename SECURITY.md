@@ -14,13 +14,14 @@
 
 To report a security vulnerability in SigmaOS:
 
-1. **Email**: Open a private [Security Advisory](https://github.com/AaryanSinghChauhan09/SigmaOS/security/advisories/new) on GitHub
-2. **Include**:
+1. **Email**: [aaryansinghchauhan090305@gmail.com](mailto:aaryansinghchauhan090305@gmail.com)
+2. **Or**: Open a private [Security Advisory](https://github.com/AaryanSinghChauhan09/SigmaOS/security/advisories/new) on GitHub
+3. **Include**:
    - A description of the vulnerability
    - Steps to reproduce (PoC if possible)
    - The affected shard(s) or component
    - Potential impact assessment
-3. **Response time**: We aim to acknowledge reports within **72 hours** and provide a fix timeline within **7 days**
+4. **Response time**: We aim to acknowledge reports within **72 hours** and provide a fix timeline within **7 days**
 
 ## Security Architecture
 
