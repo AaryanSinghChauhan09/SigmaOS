@@ -9,7 +9,7 @@ SigmaOS is an industrial-grade, zero-dependency operating system built on the **
 ## 🏛️ Repository Architecture
 
 | Path | Purpose |
-|------|---------|
+| :--- | :--- |
 | `suites/S01_Genesis/` | Kernel entry, UEFI bootloader, HAL primitives |
 | `suites/S03_Orchestrator/` | Decentralized persistence (CRDT), IPC, process management |
 | `suites/S04_HAL/` | AArch64 & RISC-V exception vectors, MMIO drivers |
@@ -25,7 +25,7 @@ SigmaOS is an industrial-grade, zero-dependency operating system built on the **
 ### Prerequisites
 
 | Tool | Version | Purpose |
-|------|---------|---------|
+| :--- | :--- | :--- |
 | `gcc-aarch64-linux-gnu` | 11+ | AArch64 bare-metal compilation |
 | `gcc-riscv64-linux-gnu` | 11+ | RISC-V 64 bare-metal compilation |
 | `rustup` + nightly | 1.75+ | Orchestrator & formal verification |
