@@ -143,6 +143,9 @@ class SigmaKernelAPI {
                     const isNpu = Math.random() < 0.7; // 70% chance NPU is available
                     msg = isNpu ? "Dispatching Tensor OP to Hardware NPU..." : "NPU busy. Falling back to CPU tensor math...";
                     level = isNpu ? 'INFO' : 'WARN';
+                } else if (Math.random() < 0.2) {
+                    msg = `[PROFILE] NPU Dispatches: ${Math.floor(Math.random()*1000)} (Avg 240 ns) | CPU Fallbacks: ${Math.floor(Math.random()*100)} (Avg 4600 ns)`;
+                    level = 'DEBUG';
                 } else {
                     msg = ['Pool audit OK', 'Capability renewed', 'HAL heartbeat', 'Slab compaction', 'Page table walk'][Math.floor(Math.random() * 5)];
                     level = ['INFO', 'DEBUG', 'WARN'][Math.floor(Math.random() * 3)];
