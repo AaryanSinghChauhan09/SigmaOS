@@ -2,12 +2,15 @@
 #include <string>
 #include <vector>
 #include <cstdlib>
-#include <filesystem>
-#include <fstream>
-#include <thread>
-#include <chrono>
-
-namespace fs = std::filesystem;
+#if __has_include(<filesystem>)
+  #include <filesystem>
+  namespace fs = std::filesystem;
+#elif __has_include(<experimental/filesystem>)
+  #include <experimental/filesystem>
+  namespace fs = std::experimental::filesystem;
+#else
+  #error "SigmaOS requires C++17 filesystem support or experimental/filesystem."
+#endif
 
 void print_header(const std::string& text) {
     std::cout << "\n\033[95m\033[1m=== " << text << " ===\033[0m\n";

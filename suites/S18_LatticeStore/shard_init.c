@@ -1,4 +1,4 @@
-#include "sigma_libc.h"
+#include "../sigma_libc.h"
 
 // SigmaOS Lattice Store (S-MARKET)
 // Purpose: Decentralized, manifest-driven distribution of Sovereign Shards.
