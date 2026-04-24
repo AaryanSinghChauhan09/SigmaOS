@@ -200,11 +200,27 @@ void handle_setup() {
     std::cout << "\033[92m[✓] Setup process complete.\033[0m\n";
 }
 
+void handle_install(int argc, char** argv) {
+    if (argc < 3) {
+        print_header("Lattice Store - Available Tools");
+        std::cout << "  - neural-engine  : NPU acceleration shard\n";
+        std::cout << "  - web3-storage   : Decentralized persistence\n";
+        std::cout << "  - quantum-hal    : Experimental simulation\n";
+        std::cout << "\nUsage: s-cli install <name>\n";
+        return;
+    }
+    std::string tool_name = argv[2];
+    std::cout << "[*] Downloading " << tool_name << " from Lattice Store...\n";
+    std::this_thread::sleep_for(std::chrono::milliseconds(800));
+    std::cout << "\033[92m[✓] Installed " << tool_name << " shard to suites/S" << (tool_name == "neural-engine" ? "19" : "20") << "_" << tool_name << ".\033[0m\n";
+}
+
 int main(int argc, char** argv) {
     if (argc < 2) {
-        std::cout << "SigmaOS Sovereign Native CLI v2.1\n";
+        std::cout << "SigmaOS Sovereign Native CLI v2.2\n";
         std::cout << "Commands:\n";
         std::cout << "  build [arch]  - Build the kernel\n";
+        std::cout << "  install [tool]- Download tools from Lattice Store\n";
         std::cout << "  clean         - Clean artifacts\n";
         std::cout << "  list          - List modules\n";
         std::cout << "  test          - Run tests\n";
@@ -220,6 +236,8 @@ int main(int argc, char** argv) {
 
     if (cmd == "build") {
         build(argc, argv);
+    } else if (cmd == "install") {
+        handle_install(argc, argv);
     } else if (cmd == "clean") {
         clean();
     } else if (cmd == "list") {

@@ -1,0 +1,4 @@
+{
+  "module": "S18_LatticeStore",
+  "dependencies": ["S01_Genesis", "S10_Networking"]
+}
