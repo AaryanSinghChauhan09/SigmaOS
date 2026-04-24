@@ -119,8 +119,21 @@ root@sigmaos:~#
 
 ---
 
-## 5. Next Steps for Contributors
+## 5. Running the Zenith UI Neural-Net Demo
 
-With the kernel now booting on commodity hardware, our next major milestone is **Hardware-Native Intelligence**. We are actively looking for contributors to help write hardware-abstraction drivers for specific NPUs (Neural Processing Units) to offload the `S09_Intelligence` tensor operations. 
+SigmaOS features a Zenith Web Dashboard that visually demonstrates the OS's capability to intelligently route workloads.
+
+1. Once the kernel is running, access the Zenith Dashboard (in a full environment, this is served via the `S07_Network` shard to a browser, or viewed via the `S02_ZenithUI` local compositor).
+2. For local testing without compiling the full kernel, simply open `web_ui/index.html` in any modern web browser.
+3. Locate the **Live CNN Inference Demo**.
+4. Click **Run Inference**.
+5. You will see a simulated 4-stage convolutional neural network. The UI communicates with the `sigma_api_service.js` (which mimics the `S07_Scheduling` dispatch logic).
+6. Watch as the OS dynamically decides whether to route the matrix multiplications and convolutions to the **CPU (Fallback)** or the **NPU (Hardware Accelerated)** based on simulated hardware availability, complete with timing metrics.
+
+---
+
+## 6. Next Steps for Contributors
+
+With the kernel now booting on commodity hardware and the visual demo in place, our next major milestone is **Hardware-Native Intelligence**. We are actively looking for contributors to help write hardware-abstraction drivers for specific NPUs (Neural Processing Units) to offload the `S09_Intelligence` tensor operations. 
 
 If you have experience with custom silicon or vendor-specific ML accelerators, check out `suites/S09_Intelligence/tensor_math.c` and join the effort!
