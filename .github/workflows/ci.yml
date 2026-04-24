@@ -19,7 +19,7 @@ jobs:
     runs-on: ${{ matrix.os }}
 
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
 
       # Install AArch64 + RISC-V cross-toolchain on Ubuntu
       - name: Install cross-compilers (Linux)
@@ -52,7 +52,7 @@ jobs:
             riscv64imac-unknown-none-elf
 
       - name: Cache Cargo registry
-        uses: actions/cache@v4
+        uses: actions/cache@v5
         with:
           path: |
             ~/.cargo/registry
@@ -104,7 +104,7 @@ jobs:
       # Upload build logs and kernel binaries as artifacts
       - name: Upload Kernel Binary & Logs
         if: always()
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: sigmaos-artifacts-${{ matrix.os }}
           path: |
@@ -120,7 +120,7 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
 
       - name: Set up Rust (nightly + clippy)
         uses: dtolnay/rust-toolchain@nightly
@@ -129,7 +129,7 @@ jobs:
           targets: aarch64-unknown-none
 
       - name: Cache Cargo registry
-        uses: actions/cache@v4
+        uses: actions/cache@v5
         with:
           path: ~/.cargo/registry
           key: ubuntu-cargo-lint-${{ hashFiles('**/Cargo.toml') }}
@@ -160,7 +160,7 @@ jobs:
             || true
 
       - name: Set up Node.js for ESLint
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@v6
         with:
           node-version: '20'
           cache: 'npm'
@@ -184,7 +184,7 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
 
       - name: Set up Rust (stable for Kani)
         uses: dtolnay/rust-toolchain@stable
@@ -203,7 +203,7 @@ jobs:
 
       - name: Upload Verification Reports
         if: always()
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: kani-verification-report
           path: |

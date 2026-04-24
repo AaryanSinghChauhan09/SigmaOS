@@ -21,10 +21,10 @@ jobs:
 
     steps:
     - name: Checkout SigmaOS Repository
-      uses: actions/checkout@v4
+      uses: actions/checkout@v6
 
     - name: Set up Python
-      uses: actions/setup-python@v5
+      uses: actions/setup-python@v6
       with:
         python-version: ${{ env.PYTHON_VERSION }}
 
@@ -64,7 +64,7 @@ jobs:
         python3 scripts/sovereign_builder.py ${{ matrix.arch }}
 
     - name: Upload Build Artifacts
-      uses: actions/upload-artifact@v4
+      uses: actions/upload-artifact@v7
       with:
         name: sigmaos-${{ matrix.arch }}-build
         path: build/${{ matrix.arch }}/
@@ -78,13 +78,13 @@ jobs:
 
     steps:
     - name: Checkout SigmaOS Repository
-      uses: actions/checkout@v4
+      uses: actions/checkout@v6
 
     - name: Install QEMU
       run: sudo apt-get install -y -q qemu-system-x86
 
     - name: Download x86_64 Build
-      uses: actions/download-artifact@v4
+      uses: actions/download-artifact@v8
       with:
         name: sigmaos-x86_64-build
         path: build/x86_64/
@@ -101,10 +101,10 @@ jobs:
 
     steps:
     - name: Checkout SigmaOS Repository
-      uses: actions/checkout@v4
+      uses: actions/checkout@v6
 
     - name: Set up Python
-      uses: actions/setup-python@v5
+      uses: actions/setup-python@v6
       with:
         python-version: ${{ env.PYTHON_VERSION }}
 
