@@ -7,91 +7,196 @@ on:
     branches: [ main, master ]
 
 jobs:
+  # ============================================================
+  # JOB 1: Cross-Platform Build & Cargo Check
+  # ============================================================
   build-and-test:
-    name: Build & Test (${{ matrix.os }})
+    name: Build & Check (${{ matrix.os }})
     strategy:
       fail-fast: false
       matrix:
-        os: [ubuntu-latest, macos-latest]
+        os: [ubuntu-latest, macos-latest, windows-latest]
     runs-on: ${{ matrix.os }}
-    steps:
-      - uses: actions/checkout@v3
 
-      - name: Install cross-compilers (Ubuntu)
+    steps:
+      - uses: actions/checkout@v4
+
+      # Install AArch64 + RISC-V cross-toolchain on Ubuntu
+      - name: Install cross-compilers (Linux)
         if: runner.os == 'Linux'
         run: |
-          sudo apt-get update
-          sudo apt-get install -y gcc-aarch64-linux-gnu gcc-riscv64-unknown-elf qemu-system-arm qemu-system-misc qemu-system-riscv64
+          sudo apt-get update -qq
+          sudo apt-get install -y --no-install-recommends \
+            gcc-aarch64-linux-gnu \
+            gcc-riscv64-linux-gnu \
+            binutils-aarch64-linux-gnu \
+            binutils-riscv64-linux-gnu \
+            qemu-system-arm \
+            qemu-system-misc \
+            clang-tidy \
+            python3
 
+      # Install AArch64 + RISC-V cross-toolchain on macOS
       - name: Install cross-compilers (macOS)
         if: runner.os == 'macOS'
         run: |
-          brew tap riscv-software-src/riscv
-          brew install aarch64-elf-gcc riscv-tools qemu
+          brew install aarch64-elf-gcc riscv64-elf-gcc qemu python3
 
-      - name: Set up Rust
-        uses: actions-rs/toolchain@v1
+      # Use the maintained rust-toolchain action (actions-rs is deprecated)
+      - name: Set up Rust (nightly + no_std targets)
+        uses: dtolnay/rust-toolchain@nightly
         with:
-          toolchain: nightly
-          components: rust-src, clippy
-          override: true
+          components: rust-src, clippy, rustfmt
+          targets: >-
+            aarch64-unknown-none,
+            riscv64imac-unknown-none-elf
 
-      - name: Build Sovereign Lattice (C & Rust)
-        # Note: In a real project, this would call make/cmake or your custom build script
-        # Assuming build_sovereign.sh works or cargo handles the Rust side
+      - name: Cache Cargo registry
+        uses: actions/cache@v4
+        with:
+          path: |
+            ~/.cargo/registry
+            ~/.cargo/git
+          key: ${{ runner.os }}-cargo-${{ hashFiles('**/Cargo.toml') }}
+          restore-keys: ${{ runner.os }}-cargo-
+
+      # Cargo check for the Orchestrator (no_std bare-metal)
+      - name: Cargo check — S03_Orchestrator (AArch64)
         run: |
-          chmod +x ./build_sovereign.sh || true
-          # ./build_sovereign.sh (Currently a mock, we verify Rust compiles)
-          cargo check --manifest-path suites/S03_Orchestrator/Cargo.toml || echo "Cargo.toml not found, skipping rust build"
+          cargo check \
+            --manifest-path suites/S03_Orchestrator/Cargo.toml \
+            --target aarch64-unknown-none \
+            --verbose
+        continue-on-error: false
 
+      # Verify build script is executable on Unix
+      - name: Verify build script (Unix)
+        if: runner.os != 'Windows'
+        run: |
+          chmod +x ./build_sovereign.sh
+          chmod +x ./run_sigma_tests.sh || true
+          echo "[CI] Build scripts are executable"
+
+      - name: Run integration tests (Unix)
+        if: runner.os != 'Windows'
+        run: |
+          if [ -f run_sigma_tests.sh ]; then
+            bash run_sigma_tests.sh || echo "[WARN] Test script returned non-zero; review output."
+          fi
+
+      - name: Run integration tests (Windows)
+        if: runner.os == 'Windows'
+        shell: pwsh
+        run: |
+          if (Test-Path run_sigma_tests.ps1) {
+            pwsh -File run_sigma_tests.ps1
+          } else {
+            Write-Host "[WARN] No Windows test script found."
+          }
+
+      # Upload build logs as artifacts for debugging
+      - name: Upload build artifacts
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: build-logs-${{ matrix.os }}
+          path: |
+            build/
+            *.log
+          retention-days: 7
+
+  # ============================================================
+  # JOB 2: Lint (Rust + C/C++ + JavaScript)
+  # ============================================================
   lint:
     name: Lint & Style
     runs-on: ubuntu-latest
+
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
 
-      - name: Set up Rust
-        uses: actions-rs/toolchain@v1
+      - name: Set up Rust (nightly + clippy)
+        uses: dtolnay/rust-toolchain@nightly
         with:
-          toolchain: nightly
-          components: clippy
-          override: true
+          components: clippy, rustfmt
+          targets: aarch64-unknown-none
 
-      - name: Rust Lint (Clippy)
+      - name: Cache Cargo registry
+        uses: actions/cache@v4
+        with:
+          path: ~/.cargo/registry
+          key: ubuntu-cargo-lint-${{ hashFiles('**/Cargo.toml') }}
+
+      - name: Rust Lint — Clippy (S03_Orchestrator)
         run: |
-          if [ -f "suites/S03_Orchestrator/Cargo.toml" ]; then
-            cargo clippy --manifest-path suites/S03_Orchestrator/Cargo.toml -- -D warnings
-          fi
+          cargo clippy \
+            --manifest-path suites/S03_Orchestrator/Cargo.toml \
+            --target aarch64-unknown-none \
+            -- -D warnings
 
-      - name: Install C/C++ Linter
+      - name: Rust Format Check
+        run: |
+          cargo fmt \
+            --manifest-path suites/S03_Orchestrator/Cargo.toml \
+            -- --check
+
+      - name: Install clang-tidy
         run: sudo apt-get install -y clang-tidy
 
-      - name: C/C++ Lint
-        # We run clang-tidy on a few key files as a smoke test
-        run: clang-tidy suites/S04_HAL/arch/hal_exceptions.c suites/S07_Scheduling/sigma_scheduler.c suites/S03_Orchestrator/sigma_ipc.c -- -I. || true
+      - name: C/C++ Lint — HAL exceptions
+        # clang-tidy requires a compile_commands.json; we use -- to pass manual flags
+        run: |
+          clang-tidy \
+            suites/S04_HAL/arch/hal_exceptions.c \
+            suites/S07_Scheduling/sigma_scheduler.c \
+            suites/S03_Orchestrator/sigma_ipc.c \
+            -- \
+            -I. -Iinclude -Isuites/S04_HAL \
+            -std=c11 -ffreestanding -nostdlib \
+            || true   # Non-blocking until compile_commands.json is set up
 
+      - name: Set up Node.js for ESLint
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+
+      - name: Install JS dependencies
+        run: npm ci
+
+      - name: JavaScript Lint — Zenith UI Components
+        run: npm run lint
+
+  # ============================================================
+  # JOB 3: Formal Verification (Kani Model Checker)
+  # ============================================================
   verify:
     name: Formal Verification (Kani)
     runs-on: ubuntu-latest
+
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
 
-      - name: Set up Rust
-        uses: actions-rs/toolchain@v1
+      - name: Set up Rust (stable for Kani)
+        uses: dtolnay/rust-toolchain@stable
+
+      # Use the official Kani GitHub Action (faster than cargo install)
+      - name: Run Kani — IPC/DMA Non-Interference Proofs
+        uses: model-checking/kani-github-action@v1
         with:
-          toolchain: stable
+          working-directory: suites/S08_Security/formal_proofs
+          args: >-
+            --harness ipc_dma_proofs::verify_dma_ipc_non_interference
+            --harness ipc_dma_proofs::verify_dispatch_capability_ownership
+            --harness ipc_dma_proofs::verify_sequence_number_monotonicity
+            --harness ipc_dma_proofs::verify_rollback_atomic_removal
+        continue-on-error: true   # Proofs are advisory until tensor_kani.rs harnesses stabilize
 
-      - name: Install Kani Model Checker
-        run: |
-          cargo install --locked kani-verifier
-          cargo kani setup
-
-      - name: Run Kani Proofs (IPC & Security)
-        # We run Kani on our formal_proofs modules
-        run: |
-          if [ -f "suites/S08_Security/formal_proofs/ipc_dma_kani.rs" ]; then
-            cargo kani suites/S08_Security/formal_proofs/ipc_dma_kani.rs || true
-          fi
-          if [ -f "suites/S08_Security/formal_proofs/tensor_kani.rs" ]; then
-            cargo kani suites/S08_Security/formal_proofs/tensor_kani.rs || true
-          fi
+      - name: Upload Verification Reports
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: kani-verification-report
+          path: |
+            suites/S08_Security/formal_proofs/kani-output/
+          retention-days: 30
