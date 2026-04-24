@@ -1,6 +1,6 @@
 #include <iostream>
 #include <string>
-#include <cstdlib>
+#include <string>
 
 // SigmaOS Sovereign Orchestrator v5.3 (The Sovereign Pulse)
 // Philosophy: Real-Time Observability & Dynamic Modulation.
