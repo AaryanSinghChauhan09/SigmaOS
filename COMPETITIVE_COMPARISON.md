@@ -8,10 +8,11 @@ SigmaOS has a strong vision of sovereignty and modularity, but to compete effect
 | :--- | :--- | :--- | :--- | :--- | :--- | :--- |
 | **Bootloader** | Minimal bare-metal loader | GRUB | Boot Manager | EFI | BSD Loader | Minimal loader |
 | **Kernel Services** | Sovereign Microkernel | Mature, modular | NT Kernel | XNU Hybrid | Monolithic | Microkernel |
+| **Toolchain** | **Zero-Dep C++20 Native** | Make/Bash/Python | MSBuild | XcodeBuild | Make | CMake/Python |
 | **Filesystem** | Minimal VFS & FAT32 (WIP) | ext4, Btrfs | NTFS | APFS | ZFS, UFS | Minimal FS |
 | **Networking** | Sovereign Stack (WIP) | Full TCP/IP | Full TCP/IP | Full TCP/IP | Full TCP/IP | Minimal secure |
 | **Security** | Capability-based (WIP) | SELinux/AppArmor | TPM, SecureBoot | Secure Enclave | Jails | Formal verified |
-| **Shell/CLI** | Minimal Sovereign CLI | Bash/Zsh | PowerShell | Terminal | tcsh/sh | Minimal CLI |
+| **Shell/CLI** | **Pure Native S-CLI** | Bash/Zsh | PowerShell | Terminal | tcsh/sh | Minimal CLI |
 | **Module Loader** | Microkernel IPC | Kernel modules | Driver model | Kexts | Loadable mods | Microkernel services |
 | **Performance Tools**| Sovereign Profiler | perf, top | Task Manager | Activity Monitor | dtrace | Verified schedulers |
 | **Documentation** | Extensive Wiki & Blueprint | Extensive | MSDN | Apple Dev Docs | Man pages | Formal proofs |
