@@ -18,11 +18,12 @@ Thank you for your interest in contributing to **SigmaOS** — the world's most 
 ### Prerequisites
 | Tool | Version | Purpose |
 |------|---------|---------|
-| `nasm` | 2.14+ | Assembling sovereign ASM primitives |
-| `g++` / `clang++` | 11+ | Compiling C++ shard modules |
-| `ld` (binutils) | 2.36+ | Linking the kernel binary (Linux) |
-| `node` | 18+ | Running `repair_build.js` (shim synthesis) |
-| `qemu-system-x86_64` | optional | Testing the kernel in a VM |
+| `gcc-aarch64-linux-gnu` | 11+ | AArch64 bare-metal compilation |
+| `gcc-riscv64-linux-gnu` | 11+ | RISC-V 64 bare-metal compilation |
+| `rustup` (nightly) | 1.75+ | Orchestrator & formal verification |
+| `kani-verifier` | Latest | Model-checking safety properties |
+| `node` | 18+ | Running `repair_build.js` & Zenith UI lint |
+| `qemu-system-aarch64` | optional | Bare-metal emulation |
 
 ### Quick Build
 ```bash
@@ -30,8 +31,10 @@ Thank you for your interest in contributing to **SigmaOS** — the world's most 
 git clone https://github.com/AaryanSinghChauhan09/SigmaOS.git
 cd SigmaOS
 
-# 2. Synthesize canonical headers (ALWAYS run before building)
-node repair_build.js
+# 2. Setup Toolchain
+rustup toolchain install nightly
+rustup target add aarch64-unknown-none riscv64imac-unknown-none-elf
+npm ci
 
 # 3. Build the Sovereign Lattice
 chmod +x ./build_sovereign.sh
@@ -142,5 +145,8 @@ When contributing, please place your code in the appropriate module under `modul
 - Perf: `modules/perf`
 - Ext: `modules/ext`
 - Tools: `modules/tools`
+
+## Security Reports
+Please do **NOT** report security vulnerabilities via public GitHub Issues. Email reports privately to [aaryansinghchauhan090305@gmail.com](mailto:aaryansinghchauhan090305@gmail.com).
 
 Read our [Design Philosophy](WIKI/DESIGN_PHILOSOPHY.md) before submitting PRs.
