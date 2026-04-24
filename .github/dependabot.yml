@@ -1,16 +1,11 @@
 version: 2
 updates:
+  # Maintain dependencies for GitHub Actions
   - package-ecosystem: "github-actions"
     directory: "/"
     schedule:
       interval: "weekly"
-    commit-message:
-      prefix: "ci"
-      include: "scope"
-
-  - package-ecosystem: "npm"
-    directory: "/userland/ZenithWeb"
-    schedule:
-      interval: "weekly"
-    commit-message:
-      prefix: "fix(deps)"
+    groups:
+      actions:
+        patterns:
+          - "*"
