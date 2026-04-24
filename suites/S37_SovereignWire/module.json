@@ -1,0 +1,6 @@
+{
+  "module": "S37_SovereignWire",
+  "dependencies": [
+    "S01_Genesis"
+  ]
+}
