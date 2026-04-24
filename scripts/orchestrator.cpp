@@ -1,6 +1,9 @@
 /**
  * @file orchestrator.cpp
- * @brief SigmaOS Sovereign Build Orchestrator (Industrial Native Implementation)
+ * @brief SigmaOS Sovereign Build Orchestrator v4.1 (Industrial Native)
+ * - Declarative Feature-Flag Integration
+ * - Multi-Arch Matrix Support (x86_64, AArch64, RISC-V)
+ * - Topological Shard Resolution
  */
 
 #include <iostream>
@@ -21,9 +24,10 @@ struct Module {
     std::string path;
     std::vector<std::string> dependencies;
     std::vector<std::string> sources;
+    bool enabled = true;
 };
 
-// Simplified JSON parsing
+// Simplified JSON/Config parsing
 std::vector<std::string> parse_array(const std::string& content, const std::string& key) {
     std::vector<std::string> results;
     size_t pos = content.find("\"" + key + "\"");
@@ -49,7 +53,8 @@ std::string parse_string(const std::string& content, const std::string& key) {
     size_t pos = content.find("\"" + key + "\"");
     if (pos == std::string::npos) return "";
 
-    pos = content.find("\"", pos + key.length() + 2);
+    pos = content.find(":", pos);
+    pos = content.find("\"", pos);
     if (pos == std::string::npos) return "";
 
     size_t end = content.find("\"", pos + 1);
@@ -58,6 +63,19 @@ std::string parse_string(const std::string& content, const std::string& key) {
 
 class BuildOrchestrator {
 public:
+    bool verbose = false;
+
+    void load_features(const std::string& path) {
+        if (!fs::exists(path)) return;
+        std::ifstream f(path);
+        std::string content((std::istreambuf_iterator<char>(f)), std::istreambuf_iterator<char>());
+        
+        // Simple feature detection
+        if (content.find("\"networking\": true") != std::string::npos) active_features.insert("networking");
+        if (content.find("\"persistence\": true") != std::string::npos) active_features.insert("persistence");
+        if (content.find("\"intelligence\": true") != std::string::npos) active_features.insert("intelligence");
+    }
+
     void discover_modules(const std::string& dir) {
         if (!fs::exists(dir)) return;
         for (const auto& entry : fs::recursive_directory_iterator(dir)) {
@@ -70,17 +88,25 @@ public:
                 mod.path = entry.path().parent_path().string();
                 mod.dependencies = parse_array(content, "dependencies");
                 
-                for (const auto& p : fs::directory_iterator(mod.path)) {
-                    if (p.path().extension() == ".c" || p.path().extension() == ".cpp" || p.path().extension() == ".asm" || p.path().extension() == ".s") {
-                        mod.sources.push_back(p.path().string());
+                // Feature-based exclusion
+                if (mod.name == "S10_Networking" && !active_features.count("networking")) mod.enabled = false;
+                if (mod.name == "S06_Persistence" && !active_features.count("persistence")) mod.enabled = false;
+
+                if (mod.enabled) {
+                    for (const auto& p : fs::directory_iterator(mod.path)) {
+                        if (p.path().extension() == ".c" || p.path().extension() == ".cpp" || p.path().extension() == ".asm" || p.path().extension() == ".s") {
+                            mod.sources.push_back(p.path().string());
+                        }
                     }
+                    modules[mod.name] = mod;
                 }
-                modules[mod.name] = mod;
             }
         }
     }
 
     void build(const std::string& arch) {
+        std::cout << "[Σ] Target Architecture: " << arch << "\n";
+        
         std::vector<std::string> build_order;
         std::set<std::string> visited;
         std::set<std::string> in_stack;
@@ -99,36 +125,14 @@ public:
     }
 
     void clean() {
-        std::cout << "[*] Cleaning build artifacts...\n";
-        if (fs::exists("build")) {
-            fs::remove_all("build");
-        }
-        std::cout << "[✓] Clean complete.\n";
-    }
-
-    void scaffold_shard(const std::string& name) {
-        std::cout << "[*] Scaffolding new shard: " << name << "\n";
-        std::string path = "suites/" + name;
-        if (fs::exists(path)) {
-            std::cerr << "[!] Shard already exists at " << path << "\n";
-            return;
-        }
-
-        fs::create_directories(path);
-        
-        std::ofstream f(path + "/module.json");
-        f << "{\n  \"module\": \"" << name << "\",\n  \"dependencies\": []\n}\n";
-        f.close();
-
-        std::ofstream src(path + "/shard_init.c");
-        src << "#include \"sigma_libc.h\"\n\nvoid shard_init() {\n    sigma_printf(\"[SHARD] " << name << " initialized.\\n\");\n}\n";
-        src.close();
-
-        std::cout << "[✓] Shard scaffolded successfully.\n";
+        std::cout << "[*] Cleaning lattice artifacts...\n";
+        if (fs::exists("build")) fs::remove_all("build");
+        std::cout << "[✓] Lattice is clean.\n";
     }
 
 private:
     std::map<std::string, Module> modules;
+    std::set<std::string> active_features;
 
     void topological_sort(const std::string& name, std::set<std::string>& visited, std::set<std::string>& in_stack, std::vector<std::string>& order) {
         if (visited.count(name)) return;
@@ -148,31 +152,38 @@ private:
     }
 
     std::vector<std::string> build_module(const Module& mod, const std::string& arch) {
-        std::cout << "[*] Module: " << mod.name << "\n";
+        std::cout << "  -> Shard: " << mod.name << "\n";
         std::vector<std::string> objs;
         
-        std::string base_cflags = "-nostdlib -ffreestanding -O2 -Wall -I. -Iinclude -Isuites/S01_Genesis -Isuites/S01_Genesis/include";
-        if (arch == "x86_64") base_cflags += " -m64";
+        std::string cc = "gcc";
+        std::string base_cflags = "-nostdlib -ffreestanding -O2 -I. -Iinclude -Isuites/S01_Genesis";
+        
+        if (arch == "aarch64") {
+            cc = "aarch64-linux-gnu-gcc";
+            base_cflags += " -march=armv8-a";
+        } else if (arch == "riscv64") {
+            cc = "riscv64-linux-gnu-gcc";
+            base_cflags += " -march=rv64imac -mabi=lp64";
+        } else {
+            base_cflags += " -m64";
+        }
         
         for (const auto& src : mod.sources) {
-            std::string obj = "build/" + fs::path(src).filename().string() + ".o";
+            std::string obj = "build/" + fs::path(src).stem().string() + ".o";
             objs.push_back(obj);
 
-            if (!needs_rebuild(src, obj)) {
-                std::cout << "    [SKIP] " << fs::path(src).filename() << "\n";
-                continue;
-            }
+            if (!needs_rebuild(src, obj)) continue;
 
             std::string cmd;
             if (src.ends_with(".asm") || src.ends_with(".s")) {
                 cmd = "nasm -f elf64 " + src + " -o " + obj;
             } else {
-                cmd = "gcc " + base_cflags + " -c " + src + " -o " + obj;
+                cmd = cc + " " + base_cflags + " -c " + src + " -o " + obj;
             }
             
-            std::cout << "    [CC]   " << fs::path(src).filename() << "\n";
+            if (verbose) std::cout << "     [CC] " << cmd << "\n";
             if (std::system(cmd.c_str()) != 0) {
-                std::cerr << "    [ERR] Failed to build " << src << "\n";
+                std::cerr << "\n[!] Build error in " << src << "\n";
                 std::exit(1);
             }
         }
@@ -180,13 +191,16 @@ private:
     }
 
     void link_image(const std::vector<std::string>& objects, const std::string& arch) {
-        std::cout << "\n[*] Linking Sovereign Kernel Image...\n";
+        std::cout << "[*] Linking Sovereign Lattice Image...\n";
         std::string out = "build/sigmaos_" + arch + ".bin";
-        std::string cmd = "ld -T linker.ld -o " + out;
+        std::string ld = (arch == "aarch64") ? "aarch64-linux-gnu-ld" : 
+                         (arch == "riscv64") ? "riscv64-linux-gnu-ld" : "ld";
+        
+        std::string cmd = ld + " -T linker.ld -o " + out;
         for (const auto& obj : objects) cmd += " " + obj;
         
         if (std::system(cmd.c_str()) == 0) {
-            std::cout << "[✓] Kernel image ready: " << out << "\n";
+            std::cout << "[✓] Sovereign Image: " << out << "\n";
         } else {
             std::cerr << "[✗] Linking failed.\n";
             std::exit(1);
@@ -198,9 +212,10 @@ int main(int argc, char** argv) {
     std::string cmd = (argc > 1) ? argv[1] : "build";
     std::string arch = (argc > 2) ? argv[2] : "x86_64";
     
-    fs::create_directories("build");
+    if (!fs::exists("build")) fs::create_directories("build");
 
     BuildOrchestrator orch;
+    orch.load_features("sigma_features.json");
     orch.discover_modules("modules");
     orch.discover_modules("suites");
 
@@ -209,19 +224,11 @@ int main(int argc, char** argv) {
         orch.build(arch);
         auto end = std::chrono::high_resolution_clock::now();
         std::chrono::duration<double> diff = end - start;
-        std::cout << "\n[Σ] Build successful in " << diff.count() << "s.\n";
+        std::cout << "[Σ] Lattice synchronized in " << diff.count() << "s.\n";
     } else if (cmd == "clean") {
         orch.clean();
-    } else if (cmd == "list") {
-        orch.list();
-    } else if (cmd == "scaffold") {
-        if (argc < 3) {
-            std::cerr << "Usage: orchestrator scaffold <shard_name>\n";
-            return 1;
-        }
-        orch.scaffold_shard(argv[2]);
     } else {
-        std::cerr << "[!] Unknown command: " << cmd << "\n";
+        std::cerr << "[!] Unknown orchestrator command: " << cmd << "\n";
         return 1;
     }
 
