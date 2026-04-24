@@ -5,7 +5,6 @@
  */
 
 #include "sigma_libc.h"
-#include <string.h>
 
 #define MAX_PAGES 1048576 // 4GB of RAM in 4KB pages
 uint8_t memory_bitmap[MAX_PAGES / 8];

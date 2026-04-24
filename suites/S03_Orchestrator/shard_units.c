@@ -4,8 +4,7 @@
  * USP: Declarative service management using .unit files and dependency trees.
  */
 
-#include <stdio.h>
-#include <string.h>
+#include "sigma_libc.h"
 
 typedef struct {
     char* name;
