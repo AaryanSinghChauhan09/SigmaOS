@@ -1,0 +1,4 @@
+{
+  "module": "S17_UAL",
+  "dependencies": ["S01_Genesis", "S04_HAL"]
+}
