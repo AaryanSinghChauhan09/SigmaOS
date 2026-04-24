@@ -85,7 +85,7 @@ k_status sigma_dma_init(void) {
 void* sigma_dma_alloc(u64 size_bytes, paddr_t* out_paddr) {
     if (size_bytes == 0 || !out_paddr) return (void*)0;
 
-    /* Align to page size */
+    /* Enforce strict PAGE_SIZE alignment */
     u64 npages = (size_bytes + PAGE_SIZE - 1) / PAGE_SIZE;
     if (npages == 0) npages = 1;
 
@@ -112,6 +112,24 @@ void* sigma_dma_alloc(u64 size_bytes, paddr_t* out_paddr) {
             u64 offset = va - g_dma_base_vaddr;
             *out_paddr = g_dma_base_paddr + offset;
 
+            /* Hardware Architecture Specific Cache Coherency:
+             * Although the region is mapped UNCACHED, we explicitly invalidate 
+             * and clean the cache lines for this physical range on allocation to
+             * guarantee no stale CPU cache entries from prior usages corrupt the NPU.
+             */
+#ifdef SIGMA_ARCH_AARCH64
+            {
+                u64 start = va;
+                u64 end = va + (npages * PAGE_SIZE);
+                // Clean and Invalidate Data Cache by Virtual Address to Point of Coherency
+                while (start < end) {
+                    __asm__ volatile("dc civac, %0" : : "r" (start) : "memory");
+                    start += 64; // Assuming 64-byte cache line
+                }
+                __asm__ volatile("dsb sy" : : : "memory"); // Data Synchronization Barrier
+            }
+#endif
+
             /* Return virtual address for the CPU */
             return (void*)(usize)va;
         }
@@ -130,6 +148,21 @@ void sigma_dma_free(void* vaddr) {
 
     DmaBlock* block = (DmaBlock*)vaddr;
     block->is_free = TRUE;
+
+    /* Hardware Architecture Specific Cache Coherency:
+     * Flush cache before returning to pool to ensure all CPU writes are flushed to RAM.
+     */
+#ifdef SIGMA_ARCH_AARCH64
+    {
+        u64 start = (u64)vaddr;
+        u64 end = start + (block->size_pages * PAGE_SIZE);
+        while (start < end) {
+            __asm__ volatile("dc civac, %0" : : "r" (start) : "memory");
+            start += 64;
+        }
+        __asm__ volatile("dsb sy" : : : "memory");
+    }
+#endif
 
     /* Coalesce contiguous free blocks */
     DmaBlock* current = g_dma_free_list;
