@@ -19,6 +19,12 @@ jobs:
     steps:
       - uses: actions/checkout@v6
 
+      - name: Purge Legacy Artifacts
+        run: |
+          rm -rf build/
+          rm -rf dist/
+          mkdir -p build/
+
       - name: Repair & Verify Build Environment
         run: |
           mkdir -p build || true
