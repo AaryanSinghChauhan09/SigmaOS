@@ -40,10 +40,14 @@ jobs:
 
   lattice-fuzzing:
     name: Entropy Stress Test (S-FUZZ)
+    strategy:
+      fail-fast: false
+      matrix:
+        profile: [kali, tails, arch]
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v6
       - name: Build S-CLI
         run: g++ -std=c++20 s-cli.cpp -o s-cli
-      - name: Run Lattice Fuzzer
-        run: ./s-cli test --shard S22_LatticeFuzzer
+      - name: Run Profile Fuzzing
+        run: ./s-cli test --shard S22_LatticeFuzzer --profile ${{ matrix.profile }}
