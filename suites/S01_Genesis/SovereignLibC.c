@@ -1,9 +1,9 @@
 #include "sigma_libc.h"
-#ifndef __GNUC__
-#include <stdarg.h>
-#else
-#include <stdarg.h>
-#endif
+// Absolute zero-dependency varargs using compiler built-ins
+typedef __builtin_va_list va_list;
+#define va_start(v,l)   __builtin_va_start(v,l)
+#define va_end(v)       __builtin_va_end(v)
+#define va_arg(v,l)     __builtin_va_arg(v,l)
 
 // --- sigma_print ---
 void sigma_print(const char* str) {
