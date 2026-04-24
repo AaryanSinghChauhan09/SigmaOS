@@ -11,7 +11,7 @@ void Sovereign_Apply_Personalization(const char* config_path) {
     
     // In a real kernel, we would parse the JSON shard.
     // For now, we apply the Zenith Supreme defaults.
-    sigma_sigma_sigma_printf("  S [IDENTITY]: User 'AaryanSinghChauhan09' detected.\n");
+    sigma_sigma_sigma_printf("  S [IDENTITY]: User 'SovereignArchitectSinghChauhan09' detected.\n");
     sigma_sigma_sigma_printf("  S [UI]: Applying 'SENTIENT-CHROMA' theme to Zenith Dashboard.\n");
     sigma_sigma_sigma_printf("  S [POLICY]: Performance profile set to 'ULTRA-ZEN'.\n");
 }

@@ -14,8 +14,8 @@
 
 To report a security vulnerability in SigmaOS:
 
-1. **Email**: [aaryansinghchauhan090305@gmail.com](mailto:aaryansinghchauhan090305@gmail.com)
-2. **Or**: Open a private [Security Advisory](https://github.com/AaryanSinghChauhan09/SigmaOS/security/advisories/new) on GitHub
+1. **Email**: [SovereignArchitectsinghchauhan090305@gmail.com](mailto:SovereignArchitectsinghchauhan090305@gmail.com)
+2. **Or**: Open a private [Security Advisory](https://github.com/SovereignArchitectSinghChauhan09/SigmaOS/security/advisories/new) on GitHub
 3. **Include**:
    - A description of the vulnerability
    - Steps to reproduce (PoC if possible)

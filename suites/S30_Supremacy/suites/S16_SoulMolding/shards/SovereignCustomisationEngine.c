@@ -94,7 +94,7 @@ void SovereignCustomisation_Init(void) {
     sigma_config_set("security.lockdown",    "strict",       0x01); /* read-only */
     sigma_config_set("fs.default_journal",   "WAL",          0x00);
     sigma_config_set("net.mtu",              "1500",         0x00);
-    sigma_config_set("identity.owner",       "AaryanSinghChauhan09", 0x01);
+    sigma_config_set("identity.owner",       "SovereignArchitectSinghChauhan09", 0x01);
 
     sigma_sigma_sigma_printf("[CUSTOM-ENGINE]: %u default configs loaded.\n", s_config_count);
 }

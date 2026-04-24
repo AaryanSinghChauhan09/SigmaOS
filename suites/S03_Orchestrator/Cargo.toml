@@ -2,7 +2,7 @@
 name    = "sigma-orchestrator"
 version = "0.1.0"
 edition = "2021"
-authors = ["AaryanSinghChauhan09"]
+authors = ["SovereignArchitectSinghChauhan09"]
 description = "S03 Decentralized Persistence Layer — CRDT, IPC, Process Orchestration"
 
 # No standard library — bare-metal kernel context

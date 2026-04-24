@@ -530,7 +530,7 @@ static void cmd_heatmap(ParsedCmd* c) {
 static void cmd_sync_gh(ParsedCmd* c) {
     (void)c;
     kprintf("[SYNC-GH]: Initiating synchronization with GitHub repository...\n");
-    kprintf("[SYNC-GH]: Remote: https://github.com/AaryanSinghChauhan09/SigmaOS\n");
+    kprintf("[SYNC-GH]: Remote: https://github.com/SovereignArchitectSinghChauhan09/SigmaOS\n");
     kprintf("[SYNC-GH]: Branch: master\n");
     kprintf("[SYNC-GH]: Status: All shards committed and pushed.\n");
 }

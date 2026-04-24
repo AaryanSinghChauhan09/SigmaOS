@@ -20,7 +20,7 @@
  */
 void sigma_airdrop_scan() {
     sigma_sigma_sigma_printf("[AIRDROP]: Scanning local mesh for BLE Peer Beacons...\n");
-    sigma_sigma_sigma_printf("  - [PEER FOUND]: 'Aaryan-MacBook' (Signal: -45dBm)\n");
+    sigma_sigma_sigma_printf("  - [PEER FOUND]: 'SovereignArchitect-MacBook' (Signal: -45dBm)\n");
     sigma_sigma_sigma_printf("  - [PEER FOUND]: 'Sigma-Phone' (Signal: -60dBm)\n");
     sigma_sigma_sigma_printf("[OK]: Scan complete. 2 Peers ready for point-to-point transfer.\n");
 }

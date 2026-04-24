@@ -1,14 +1,14 @@
 blank_issues_enabled: false
 contact_links:
   - name: 💡 Feature Discussion
-    url: https://github.com/AaryanSinghChauhan09/SigmaOS/discussions
+    url: https://github.com/SovereignArchitectSinghChauhan09/SigmaOS/discussions
     about: Propose new shards, architectural ideas, and OS features
   - name: 🐞 Bug Report
-    url: https://github.com/AaryanSinghChauhan09/SigmaOS/issues/new?template=bug_report.md
+    url: https://github.com/SovereignArchitectSinghChauhan09/SigmaOS/issues/new?template=bug_report.md
     about: Report bugs in kernel code, IPC, persistence, or Zenith UI
   - name: 🔐 Security Vulnerability
-    url: mailto:aaryansinghchauhan090305@gmail.com
+    url: mailto:SovereignArchitectsinghchauhan090305@gmail.com
     about: Please report security issues privately via email, NOT public issues
   - name: 📖 Contributor Roadmap
-    url: https://github.com/AaryanSinghChauhan09/SigmaOS/blob/main/ROADMAP.md
+    url: https://github.com/SovereignArchitectSinghChauhan09/SigmaOS/blob/main/ROADMAP.md
     about: See what's ready to be worked on across all 4 development phases

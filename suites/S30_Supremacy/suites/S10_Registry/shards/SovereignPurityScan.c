@@ -17,7 +17,7 @@ void sigma_purity_audit(const char* file_path) {
     sigma_sigma_sigma_printf("S [PURITY]: Auditing shard '%s' for unauthorized high-level dependencies...\n", file_path);
     
     /* Mock audit logic: searches for forbidden headers */
-    const char* forbidden[] = {"stdio.h", "stdlib.h", "string.h", "Aaryan"};
+    const char* forbidden[] = {"stdio.h", "stdlib.h", "string.h", "SovereignArchitect"};
     
     /* Logic: sigma_open -> sigma_read -> sigma_strstr */
     sigma_sigma_sigma_printf("  ? [OK]: Shard '%s' verified — 100%% Sovereign Purity.\n", file_path);

@@ -130,7 +130,7 @@ void SovereignPersonalization_Register(void) {
     sigma_sigma_sigma_printf("[REGISTRY]: Sovereign Personalization v2.0 (Deep) active.\n");
 
     /* Seed the primary user profile */
-    sigma_profile_create("AaryanSinghChauhan09", "Zenith Supreme",
+    sigma_profile_create("SovereignArchitectSinghChauhan09", "Zenith Supreme",
                          0x0A0A2E, 0xE0E0FF, 0xFF00FF);
     sigma_profile_switch(0);
 }
