@@ -1,12 +1,11 @@
 # ============================================================
 # SigmaOS Sovereign Makefile
-# Convenience wrapper around the Python build orchestrator.
+# Convenience wrapper around the Native build orchestrator.
 # All targets are architecture-aware and capsule-driven.
 # ============================================================
 
 ARCH      ?= x86_64
-PYTHON    := python3
-BUILDER   := ./scripts/orchestrator
+BUILDER   := ./s-cli
 ISO_SCRIPT := scripts/build_iso.sh
 BUILD_DIR := build
 
@@ -19,15 +18,15 @@ all: x86_64
 
 x86_64:
 	@echo "[*] Building SigmaOS for x86_64..."
-	@$(PYTHON) $(BUILDER) build --arch x86_64
+	@$(BUILDER) build x86_64
 
 aarch64:
 	@echo "[*] Building SigmaOS for ARM64..."
-	@$(PYTHON) $(BUILDER) build --arch aarch64
+	@$(BUILDER) build aarch64
 
 riscv64:
 	@echo "[*] Building SigmaOS for RISC-V 64..."
-	@$(PYTHON) $(BUILDER) build --arch riscv64
+	@$(BUILDER) build riscv64
 
 ## ── Image Packaging ──────────────────────────────────────
 
@@ -58,19 +57,14 @@ scaffold-%:
 
 clean:
 	@echo "[*] Cleaning build artifacts..."
-	@$(PYTHON) $(BUILDER) clean
+	@$(BUILDER) clean
 	@echo "[+] Clean complete."
 
 ## ── Module Graph ─────────────────────────────────────────
 
 graph:
 	@echo "[*] Printing module dependency graph..."
-	@$(PYTHON) -c "\
-import json, os; \
-[print(m['module'], '->', m.get('dependencies',[])) \
- for root,_,files in os.walk('modules') \
- if 'module.json' in files \
- for m in [json.load(open(os.path.join(root,'module.json')))]]"
+	@$(BUILDER) list
 
 ## ── Help ─────────────────────────────────────────────────
 
