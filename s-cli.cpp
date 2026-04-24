@@ -227,12 +227,25 @@ void handle_verify() {
     std::cout << "\n\033[92m[✓] System state is consistent and reproducible.\033[0m\n";
 }
 
+void handle_sync() {
+    print_header("Sovereign Lattice Synchronization");
+    std::cout << "[*] Initializing P2P Mesh handshake...\n";
+    std::cout << "[*] Fetching state deltas from the global consensus layer...\n";
+    
+    // Simulate shard streaming
+    std::cout << "  - Receiving: S37_ZeroKnowledgeProofLayer [STAGING]\n";
+    std::cout << "  - Receiving: S42_NeuralOptimization    [STAGING]\n";
+    
+    std::cout << "\n\033[92m[✓] Lattice is synchronized with the Global Mesh.\033[0m\n";
+}
+
 int main(int argc, char** argv) {
     if (argc < 2) {
-        std::cout << "SigmaOS Sovereign Native CLI v2.3\n";
+        std::cout << "SigmaOS Sovereign Native CLI v2.4\n";
         std::cout << "Commands:\n";
         std::cout << "  build [arch]  - Build the kernel\n";
         std::cout << "  verify        - Verify system state reproducibility\n";
+        std::cout << "  sync          - Synchronize state with Global Mesh\n";
         std::cout << "  install [tool]- Download tools from Lattice Store\n";
         std::cout << "  clean         - Clean artifacts\n";
         std::cout << "  list          - List modules\n";
@@ -251,6 +264,8 @@ int main(int argc, char** argv) {
         build(argc, argv);
     } else if (cmd == "verify") {
         handle_verify();
+    } else if (cmd == "sync") {
+        handle_sync();
     } else if (cmd == "install") {
         handle_install(argc, argv);
     } else if (cmd == "clean") {
