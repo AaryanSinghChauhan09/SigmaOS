@@ -62,8 +62,9 @@
             </div>
 
             <!-- §3: Kernel Log Viewer via <sigma-logs> Web Component -->
-            <div style="margin-top: 24px;">
+            <div style="margin-top: 24px; display: grid; grid-template-columns: 2fr 1fr; gap: 24px;">
                 <sigma-logs max-entries="150"></sigma-logs>
+                <sigma-ai-dispatch></sigma-ai-dispatch>
             </div>
 
             <!-- §4: Shard Grid rendered dynamically via JS -->
@@ -80,6 +81,7 @@
     <script src="components/sigma-monitor.js"></script>
     <script src="components/sigma-logs.js"></script>
     <script src="components/sigma-pool-inspector.js"></script>
+    <script src="components/sigma-ai-dispatch.js"></script>
 
     <!-- Legacy shard loader (still populates the grid) -->
     <script src="scripts/kernel_loader.js"></script>

@@ -135,11 +135,24 @@ class SigmaKernelAPI {
 
             // Occasionally push a log entry
             if (Math.random() < 0.3) {
+                const isDispatch = Math.random() < 0.5;
+                let msg = '';
+                let level = 'INFO';
+                
+                if (isDispatch) {
+                    const isNpu = Math.random() < 0.7; // 70% chance NPU is available
+                    msg = isNpu ? "Dispatching Tensor OP to Hardware NPU..." : "NPU busy. Falling back to CPU tensor math...";
+                    level = isNpu ? 'INFO' : 'WARN';
+                } else {
+                    msg = ['Pool audit OK', 'Capability renewed', 'HAL heartbeat', 'Slab compaction', 'Page table walk'][Math.floor(Math.random() * 5)];
+                    level = ['INFO', 'DEBUG', 'WARN'][Math.floor(Math.random() * 3)];
+                }
+                
                 const entry = {
                     ts: new Date().toISOString(),
-                    level: ['INFO', 'DEBUG', 'WARN'][Math.floor(Math.random() * 3)],
-                    module: this._state.shards[Math.floor(Math.random() * this._state.shards.length)].id,
-                    msg: ['Pool audit OK', 'Capability renewed', 'HAL heartbeat', 'Slab compaction', 'Page table walk'][Math.floor(Math.random() * 5)],
+                    level: level,
+                    module: isDispatch ? 'S07_Scheduling' : this._state.shards[Math.floor(Math.random() * this._state.shards.length)].id,
+                    msg: msg,
                 };
                 this._state.logs.push(entry);
                 if (this._state.logs.length > 500) this._state.logs.shift();
