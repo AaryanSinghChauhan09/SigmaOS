@@ -7,7 +7,7 @@
 #ifndef SIGMA_ZIRCON_SIM_H
 #define SIGMA_ZIRCON_SIM_H
 
-#include <stdint.h>
+#include "sigma_libc.h"
 
 typedef uint32_t sigma_handle_t;
 

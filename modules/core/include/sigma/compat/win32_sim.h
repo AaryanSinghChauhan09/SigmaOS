@@ -7,7 +7,7 @@
 #ifndef SIGMA_WIN32_SIM_H
 #define SIGMA_WIN32_SIM_H
 
-#include <stdint.h>
+#include "sigma_libc.h"
 
 typedef void* HANDLE;
 typedef uint32_t DWORD;

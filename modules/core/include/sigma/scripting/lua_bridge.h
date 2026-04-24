@@ -7,7 +7,7 @@
 #ifndef SIGMA_LUA_BRIDGE_H
 #define SIGMA_LUA_BRIDGE_H
 
-#include <stdint.h>
+#include "sigma_libc.h"
 
 // Mock Lua State integration
 typedef struct {

@@ -7,7 +7,7 @@
 #ifndef SIGMA_SHARD_STREAM_H
 #define SIGMA_SHARD_STREAM_H
 
-#include <stdint.h>
+#include "sigma_libc.h"
 
 typedef struct {
     uint32_t msg_type;
