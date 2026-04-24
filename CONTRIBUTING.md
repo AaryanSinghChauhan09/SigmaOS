@@ -1,27 +1,42 @@
-# Contributing to SigmaOS
+# 🛠️ Contributing to the SigmaOS Sovereign Lattice
 
-Welcome to the Sovereign Lattice! We aim to build an industrial-grade, zero-dependency, capability-based microkernel OS.
+Thank you for your interest in expanding the SigmaOS ecosystem! To maintain our status as a **Silicon Sovereign** entity, all contributions must adhere to the following standards.
 
-## Core Philosophy: Zero Dependency
-SigmaOS strictly adheres to a "pure low-level" philosophy.
-- **No high-level interpreters**: Python, JS, and Bash are prohibited for core OS components and build pipelines. We orchestrate entirely in C/C++.
-- **No external frameworks**: The OS must be self-reliant. Do not pull in heavy external dependencies (`npm`, large `cargo` trees, etc.).
-- **No standard library usage in kernel**: The kernel executes purely on bare metal. Do not `#include <stdlib.h>`, `<stdarg.h>`, etc. Use `__builtin` macros and the internal `SovereignLibC`.
+---
 
-## Architecture & Modularisation
-- **Microkernel Isolation**: Every feature (VFS, Networking, Tensor acceleration) must be an isolated shard.
-- **Strict IPC Interfaces**: Shards communicate exclusively via the capability-checked message passing ring buffer. Shared memory is prohibited except for DMA buffers explicitly leased to the NPU/GPU.
-- **Microservices-style Modularity**: Break down complex subsystems into independent modules within `suites/`.
+## 💎 Sovereign Coding Standards
 
-## Coding Standards
-- **C/C++ Standard**: C11 for kernel shards, C++20 for host toolchain (`orchestrator`).
-- **Formatting**: We use a unified formatting style. Avoid inline styles or macros that obscure program flow.
-- **Inline Assembly**: Permitted only for CPU-specific architectures (e.g., interrupt descriptor setup, page table flushing, TLB operations). Confine all inline assembly to `S04_HAL`.
-- **Memory Safety**: Where C is used, allocations must be statically bounded or managed via the custom slab allocator (`sigma_slab_alloc_raw`).
+### 1. Zero-Dependency Mandate
+- **Strictly `no_std`**: Shards must not link against standard libraries (`libc`, `libstdc++`).
+- **Sovereign Primitives**: Use only the primitives defined in `libsigma.h` or `sigma_libc.h`.
+- **Static Memory**: Prefer static or pool-based allocation over dynamic heap usage in kernel shards.
 
-## Development Workflow & Automations
-1. **Build Toolchain**: Use the native `s-cli`. Run `./s-cli build <arch>` to build locally.
-2. **Static Analysis**: Ensure your code passes `clang-tidy`. Our CI automatically rejects code that fails static analysis checks.
-3. **Commit Messages**: Write clear, descriptive commit messages outlining what component was modified.
+### 2. Shard Atomic Modularity
+- Every new feature MUST be its own shard in the `suites/` directory.
+- Each shard must have a `module.json` manifest defining its dependencies.
+- Shards must communicate exclusively via **Capability-Based IPC**.
 
-By contributing to SigmaOS, you agree to uphold the sovereign mandate of architectural purity.
+### 3. Portability via UAL
+- Never include environment-specific assembly (e.g., `asm volatile`) directly in a generic shard.
+- Use the **Universal Abstraction Layer (UAL)** to switch between hardware implementations.
+
+---
+
+## 🚀 Shard Development Workflow
+
+1.  **Scaffold**: Use `./s-cli scaffold <shard_name>` to generate the shard template.
+2.  **Implement**: Write your logic in `shard_init.c`.
+3.  **Verify**:
+    - Run `./s-cli test --shard <name>` for atomic verification.
+    - Run `./s-cli build` to ensure the lattice synchronizes correctly.
+4.  **Audit**: Ensure no external headers are leaked.
+
+---
+
+## 📬 Pull Request Process
+
+1.  **Atomicity**: One feature per PR.
+2.  **Documentation**: Update the Wiki if your shard introduces new system capabilities.
+3.  **Verification**: Ensure all CI/CD jobs (Matrix Build, Kani Proofs, Fuzzing) pass.
+
+*By contributing to SigmaOS, you help build the foundation of a sovereign digital future.*
