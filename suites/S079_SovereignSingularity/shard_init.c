@@ -1,4 +1,4 @@
-#include "sigma_libc.h"
+#include "../sigma_libc.h"
 
 // SigmaOS Sovereign Singularity (S-SINGULARITY)
 // Philosophy: Final Convergence - Absolute Architectural Unity and Native Silicon Mastery.

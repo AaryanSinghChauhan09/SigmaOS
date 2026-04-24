@@ -1,4 +1,4 @@
-#include "sigma_libc.h"
+#include "../sigma_libc.h"
 
 // SigmaOS Lattice Get (S-GET)
 // Philosophy: Sovereign Package Management - Distributed Shard Retrieval and Verification.
