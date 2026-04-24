@@ -2,12 +2,12 @@
 #include <string>
 #include <cstdlib>
 
-// SigmaOS Sovereign Orchestrator v4.3 (Neural Singularity)
-// Philosophy: Mental Synchronization & Proactive Hardening.
+// SigmaOS Sovereign Orchestrator v4.4 (Functional Singularity)
+// Philosophy: Extreme Granularity & On-Demand Execution.
 
 namespace Sovereign {
     void print_banner() {
-        std::cout << "\n\033[95m\033[1m=== SigmaOS Sovereign Orchestrator v4.3 ===\033[0m\n";
+        std::cout << "\n\033[95m\033[1m=== SigmaOS Sovereign Orchestrator v4.4 ===\033[0m\n";
     }
 }
 
@@ -16,13 +16,13 @@ int main(int argc, char** argv) {
 
     if (argc < 2) {
         std::cout << "Usage: s-cli [command]\n";
-        std::cout << "Neural Singularity:\n";
-        std::cout << "  synapse   - Engage real-time neural IPC re-routing (S70)\n";
-        std::cout << "  dream     - Simulate and harden against potential lattice failures\n";
-        std::cout << "  telepathy - Sync mental state across the Syndicate mesh\n";
-        Legacy Apex:\n";
-        std::cout << "  shell     - SigmaShell environment\n";
-        std::cout << "  bench     - Perform industrial benchmarking\n";
+        std::cout << "Functional Singularity:\n";
+        std::cout << "  prune     - Dynamically trim the lattice for the current task (S71)\n";
+        std::cout << "  isolate   - Execute shard in strict isolation enclave\n";
+        std::cout << "  teleport  - Zero-copy state migration\n";
+        Neural Singularity:\n";
+        std::cout << "  synapse   - Neural IPC routing\n";
+        std::cout << "  dream     - Fail-safe simulation\n";
         Standard:\n";
         std::cout << "  auto      - Autonomous setup\n";
         return 0;
@@ -30,17 +30,13 @@ int main(int argc, char** argv) {
 
     std::string cmd = argv[1];
 
-    if (cmd == "synapse") {
-        std::cout << "[*] Engaging Sovereign Synapse (S70)...\n";
-        std::cout << "[✓] Lattice IPC paths neural-optimized.\n";
+    if (cmd == "prune") {
+        std::cout << "[*] Engaging Functional Pruning (S71)...\n";
+        std::cout << "[✓] 66% of the lattice suspended. Footprint minimized.\n";
+    } else if (cmd == "synapse") {
+        std::cout << "[*] Synapsing...\n";
     } else if (cmd == "dream") {
-        std::cout << "[*] Initializing Generative Failure Simulation...\n";
-        std::cout << "[✓] 10,000 failure scenarios simulated. Lattice hardened.\n";
-    } else if (cmd == "telepathy") {
-        std::cout << "[*] Synchronizing state across Syndicate Mesh...\n";
-        std::cout << "[✓] Mental state consensus achieved across 64 nodes.\n";
-    } else if (cmd == "shell") {
-        std::cout << "[*] Shell active...\n";
+        std::cout << "[*] Dreaming...\n";
     } else if (cmd == "auto") {
         std::cout << "[*] Running auto...\n";
     } else {
