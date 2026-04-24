@@ -86,15 +86,12 @@ if (ipc_recv(ch, &msg) == K_OK) {
 ## 🔌 Adding a New Shard
 
 ```bash
-# 1. Scaffold a new shard
-make scaffold-S34_MyShard-c
+# 1. Scaffold a new shard using the native toolchain
+./s-cli scaffold S501_MyNewShard
 
-# 2. Implement your shard init in suites/S34_MyShard/shard_init.c
-# 3. Run header synthesis
-node repair_build.js
-
-# 4. Build — your shard is auto-discovered
-./build_sovereign.sh
+# 2. Implement your logic in suites/S501_MyNewShard/shard_init.c
+# 3. Build — your shard is auto-discovered by the native orchestrator
+./s-cli build x86_64
 ```
 
 ---
