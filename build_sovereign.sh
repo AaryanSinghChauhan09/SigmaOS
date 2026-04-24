@@ -16,7 +16,7 @@ echo "╚═══════════════════════�
 echo ""
 
 # Detect CPU count for parallel jobs
-JOBS=$(nproc 2>/dev/null || sysctl -n hw.ncpu 2>/dev/null || echo 2)
+JOBS=$(nproc 2>/dev/null || sysctl -n hw.ncpu 2>/dev/null || echo "$NUMBER_OF_PROCESSORS" || echo 2)
 echo "  Platform: $(uname -s) | CPUs: $JOBS | Build dir: $BUILD_DIR"
 echo ""
 
@@ -26,7 +26,10 @@ mkdir -p suites/include
 
 # ── Compiler detection ────────────────────────────────────────────────────────
 PLATFORM="linux"
-[[ "$(uname -s)" == "Darwin" ]] && PLATFORM="macos"
+case "$(uname -s)" in
+    Darwin*) PLATFORM="macos" ;;
+    CYGWIN*|MINGW*|MSYS*) PLATFORM="windows" ;;
+esac
 
 if command -v g++ &>/dev/null; then
     GCC="g++"
