@@ -24,7 +24,7 @@ typedef struct SoundShard {
  * ========================================================================= */
 
 void sound_core_init(void) {
-    // kprintf("[SOUND-CORE]: Sovereign Silicon-Native Audio Shard Online.\n");
+    // ksigma_printf("[SOUND-CORE]: Sovereign Silicon-Native Audio Shard Online.\n");
 }
 
 void sound_play_alert(u32 type) {
@@ -34,12 +34,12 @@ void sound_play_alert(u32 type) {
      * 1 -> Shard Fault (Error) 
      * 2 -> Identity Absorbed (Prestige)
      */
-    // kprintf("[SOUND-CORE]: Playing Industrial Alert Type: %u\n", type);
+    // ksigma_printf("[SOUND-CORE]: Playing Industrial Alert Type: %u\n", type);
     
     /* In a real implementation: outb(0x61, ...) to the PC Speaker */
 }
 
 void sound_master_voice(const char* msg) {
     /* Integration with Sovereign-Voice synthesis */
-    // kprintf("[SOUND-CORE]: Sovereign Voice: %s\n", msg);
+    // ksigma_printf("[SOUND-CORE]: Sovereign Voice: %s\n", msg);
 }

@@ -72,7 +72,7 @@ void rcu_on_quiescent_state(u32 cpu_id) {
         }
         g_rcu.pending_reclaim = NULL;
         g_rcu.quiescent_mask = 0;
-        // kprintf("[RCU]: Grace Period Complete. All objects reclaimed.\n");
+        // ksigma_printf("[RCU]: Grace Period Complete. All objects reclaimed.\n");
     }
 }
 
@@ -80,5 +80,5 @@ void rcu_init_core(void) {
     g_rcu.grace_period_start = 0;
     g_rcu.quiescent_mask = 0;
     g_rcu.pending_reclaim = NULL;
-    // kprintf("[RCU]: Quantum RCU Lock-Free Sync Layer Online.\n");
+    // ksigma_printf("[RCU]: Quantum RCU Lock-Free Sync Layer Online.\n");
 }

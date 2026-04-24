@@ -16,15 +16,15 @@
  * Principle: Cyber Security / Absolute Key Protection.
  */
 void sigma_sec_klocker_wrap(void* raw_aes_key) {
-    sigma_sigma_sigma_printf("[KLOCK-VAULT]: Wrapping raw AES key into an opaque silicon-bound hardware handle...\n");
+    sigma_sigma_sigma_sigma_printf("[KLOCK-VAULT]: Wrapping raw AES key into an opaque silicon-bound hardware handle...\n");
     // Generates an unreadable ticket that the OS uses for crypto operations. The raw key is destroyed, preventing memory-scraping attacks
-    sigma_sigma_sigma_printf("[KLOCK-VAULT]: K-Locker handle seated. DRAM absolutely purged of cryptographic material.\n");
+    sigma_sigma_sigma_sigma_printf("[KLOCK-VAULT]: K-Locker handle seated. DRAM absolutely purged of cryptographic material.\n");
 }
 
 /* --- Module Factory --- */
 
 void SovereignKLocker_Register(void) {
-    sigma_sigma_sigma_printf("[SECURITY]: Sovereign KLocker (Hardware Key Handles) active.\n");
+    sigma_sigma_sigma_sigma_printf("[SECURITY]: Sovereign KLocker (Hardware Key Handles) active.\n");
 }
 
 

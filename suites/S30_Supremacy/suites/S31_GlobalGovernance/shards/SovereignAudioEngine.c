@@ -25,7 +25,7 @@ void Sovereign_Audio_Init(void) {
     g_master_out.read_pos = 0;
     g_master_out.write_pos = 0;
     g_master_out.active = SIGMA_TRUE;
-    sigma_sigma_sigma_printf("S [S31]: Sovereign Audio Engine initialized (Sample Rate: %dHz)\n", SAMPLE_RATE);
+    sigma_sigma_sigma_sigma_printf("S [S31]: Sovereign Audio Engine initialized (Sample Rate: %dHz)\n", SAMPLE_RATE);
 }
 
 void Sovereign_Audio_Input(sigma_f32* samples, sigma_sz_t count) {

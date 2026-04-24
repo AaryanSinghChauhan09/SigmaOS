@@ -35,7 +35,7 @@ void health_init(void) {
         g_health[i].active = FALSE;
         g_health[i].error_count = 0;
     }
-    // kprintf("[HEALTH]: Sovereign Silicon-Observability Shard Online.\n");
+    // ksigma_printf("[HEALTH]: Sovereign Silicon-Observability Shard Online.\n");
 }
 
 /* =========================================================================
@@ -44,7 +44,7 @@ void health_init(void) {
 
 void health_reset_shard(u32 shard_id) {
     if (shard_id >= MAX_HEALTH_NODES) return;
-    // kprintf("[HEALTH]: Triggering Self-Healing Pulse for Shard [%u]...\n", shard_id);
+    // ksigma_printf("[HEALTH]: Triggering Self-Healing Pulse for Shard [%u]...\n", shard_id);
     g_health[shard_id].error_count = 0;
     g_health[shard_id].last_pulse = 0;
     /* Re-invoke shard init logic if possible */
@@ -60,5 +60,5 @@ void health_report_error(u32 shard_id) {
 }
 
 void health_audit_system(void) {
-    // kprintf("[HEALTH]: --- SOVEREIGN SHARD AUDIT (SITUATIONAL AWARENESS) ---\n");
+    // ksigma_printf("[HEALTH]: --- SOVEREIGN SHARD AUDIT (SITUATIONAL AWARENESS) ---\n");
 }

@@ -31,7 +31,7 @@ static ZenEditor g_editor;
 
 void zen_editor_init(void) {
     g_editor.active = FALSE;
-    // kprintf("[ZEN-EDITOR]: Sovereign Silicon-Native Zen Editor Online.\n");
+    // ksigma_printf("[ZEN-EDITOR]: Sovereign Silicon-Native Zen Editor Online.\n");
 }
 
 /* =========================================================================
@@ -54,11 +54,11 @@ void zen_editor_highlight(u32 line_idx) {
 }
 
 void zen_editor_open_shard(const char* path) {
-    // kprintf("[ZEN-EDITOR]: Shard Load: %s\n", path);
+    // ksigma_printf("[ZEN-EDITOR]: Shard Load: %s\n", path);
     g_editor.active = TRUE;
 }
 
 void editor_personalize_theme(u32 bg_color, u32 fg_color) {
     /* Personalize the editor interface based on the Sovereign-ID theme */
-    // kprintf("[ZEN-EDITOR]: Sharding Theme: BG=%x FG=%x\n", bg_color, fg_color);
+    // ksigma_printf("[ZEN-EDITOR]: Sharding Theme: BG=%x FG=%x\n", bg_color, fg_color);
 }

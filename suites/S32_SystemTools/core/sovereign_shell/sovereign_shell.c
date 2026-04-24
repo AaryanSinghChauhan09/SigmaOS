@@ -92,17 +92,17 @@ static const ShellBuiltin builtins[] = {
 
 static int builtin_help(int argc, char** argv) {
     (void)argc; (void)argv;
-    sigma_printf(VT_BOLD VT_CYAN "\n  SigmaShell v%s — Built-in Commands\n" VT_RESET, SIGMA_SHELL_VERSION);
-    sigma_printf("  %-14s  %s\n", "─────────────", "──────────────────────────────────");
+    sigma_sigma_printf(VT_BOLD VT_CYAN "\n  SigmaShell v%s — Built-in Commands\n" VT_RESET, SIGMA_SHELL_VERSION);
+    sigma_sigma_printf("  %-14s  %s\n", "─────────────", "──────────────────────────────────");
     for (int i = 0; builtins[i].name; i++)
-        sigma_printf("  " VT_GREEN "%-14s" VT_RESET "  %s\n", builtins[i].name, builtins[i].description);
-    sigma_printf("\n");
+        sigma_sigma_printf("  " VT_GREEN "%-14s" VT_RESET "  %s\n", builtins[i].name, builtins[i].description);
+    sigma_sigma_printf("\n");
     return 0;
 }
 
 static int builtin_exit(int argc, char** argv) {
     (void)argc; (void)argv;
-    sigma_printf(VT_YELLOW "  [sigma] Session terminated.\n" VT_RESET);
+    sigma_sigma_printf(VT_YELLOW "  [sigma] Session terminated.\n" VT_RESET);
     sigma_exit(0);
 }
 
@@ -110,33 +110,33 @@ static int builtin_history(int argc, char** argv) {
     (void)argc; (void)argv;
     uint32_t start = (history_len < SIGMA_HISTORY_SIZE) ? 0 : history_head;
     for (uint32_t i = 0; i < history_len; i++)
-        sigma_printf("  %4u  %s\n", i + 1, history[(start + i) % SIGMA_HISTORY_SIZE]);
+        sigma_sigma_printf("  %4u  %s\n", i + 1, history[(start + i) % SIGMA_HISTORY_SIZE]);
     return 0;
 }
 
 static int builtin_clear(int argc, char** argv) {
     (void)argc; (void)argv;
-    sigma_printf("\033[2J\033[H");
+    sigma_sigma_printf("\033[2J\033[H");
     return 0;
 }
 
 static int builtin_echo(int argc, char** argv) {
     for (int i = 1; i < argc; i++)
-        sigma_printf("%s%s", argv[i], i + 1 < argc ? " " : "\n");
+        sigma_sigma_printf("%s%s", argv[i], i + 1 < argc ? " " : "\n");
     return 0;
 }
 
 static int builtin_env(int argc, char** argv) {
     (void)argc; (void)argv;
     extern char** environ;
-    for (char** e = environ; *e; e++) sigma_printf("  %s\n", *e);
+    for (char** e = environ; *e; e++) sigma_sigma_printf("  %s\n", *e);
     return 0;
 }
 
 static int builtin_pwd(int argc, char** argv) {
     (void)argc; (void)argv;
     char buf[SIGMA_LINE_MAX];
-    if (sigma_getcwd(buf, sizeof(buf))) sigma_printf("  %s\n", buf);
+    if (sigma_getcwd(buf, sizeof(buf))) sigma_sigma_printf("  %s\n", buf);
     return 0;
 }
 
@@ -159,24 +159,24 @@ static int dispatch(int argc, char** argv) {
         if (sigma_strcmp(argv[0], builtins[i].name) == 0) {
             if (builtins[i].handler) return builtins[i].handler(argc, argv);
             // External: spawn from tools/ PATH (static binaries)
-            sigma_printf(VT_YELLOW "  [sigma] Routing to external: %s\n" VT_RESET, argv[0]);
+            sigma_sigma_printf(VT_YELLOW "  [sigma] Routing to external: %s\n" VT_RESET, argv[0]);
             return 127; // Stub: replace with execv() against tools/ binary
         }
     }
-    sigma_printf(VT_RED "  [sigma] Unknown command: %s  (type 'help' for list)\n" VT_RESET, argv[0]);
+    sigma_sigma_printf(VT_RED "  [sigma] Unknown command: %s  (type 'help' for list)\n" VT_RESET, argv[0]);
     return 1;
 }
 
 // ── Prompt renderer ───────────────────────────────────────────────────────────
 static void print_prompt(void) {
-    sigma_printf(VT_BOLD VT_MAGENTA "S" VT_RESET VT_CYAN " sigma" VT_RESET
+    sigma_sigma_printf(VT_BOLD VT_MAGENTA "S" VT_RESET VT_CYAN " sigma" VT_RESET
            VT_GREEN " ❯ " VT_RESET);
     fflush(stdout);
 }
 
 // ── Main REPL ─────────────────────────────────────────────────────────────────
 int main(void) {
-    sigma_printf(VT_BOLD VT_CYAN
+    sigma_sigma_printf(VT_BOLD VT_CYAN
            "\n  ╔═══════════════════════════════════════╗\n"
            "  ║  SigmaShell v%-24s  ║\n"
            "  ║  Type 'help' for command list         ║\n"
@@ -191,9 +191,9 @@ int main(void) {
         if (!fgets(line, sizeof(line), stdin)) break;
 
         // Strip trailing newline
-        size_t len = sigma_strlen(line);
+        size_t len = sigma_sigma_strlen(line);
         if (len > 0 && line[len - 1] == '\n') line[len - 1] = '\0';
-        if (sigma_strlen(line) == 0) continue;
+        if (sigma_sigma_strlen(line) == 0) continue;
 
         history_push(line);
         char line_copy[SIGMA_LINE_MAX];

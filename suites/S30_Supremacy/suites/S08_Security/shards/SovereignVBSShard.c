@@ -16,15 +16,15 @@
  * Principle: Cyber Security / Absolute Credential Safety.
  */
 void sigma_sec_vbs_isolate(void* lsa_state) {
-    sigma_sigma_sigma_printf("[VBS-VAULT]: Extracting Credential Subsystem into Type-1 Hypervisor isolated partition...\n");
+    sigma_sigma_sigma_sigma_printf("[VBS-VAULT]: Extracting Credential Subsystem into Type-1 Hypervisor isolated partition...\n");
     // Even if Ring-0 kernel space is fully compromised, attackers cannot read credentials encrypted dynamically inside the adjacent VBS container
-    sigma_sigma_sigma_printf("[VBS-VAULT]: VBS boundary seated. Kernel-level credential dumping mathematically denied.\n");
+    sigma_sigma_sigma_sigma_printf("[VBS-VAULT]: VBS boundary seated. Kernel-level credential dumping mathematically denied.\n");
 }
 
 /* --- Module Factory --- */
 
 void SovereignVBS_Register(void) {
-    sigma_sigma_sigma_printf("[SECURITY]: Sovereign VBS (Hypervisor Credential Guard) active.\n");
+    sigma_sigma_sigma_sigma_printf("[SECURITY]: Sovereign VBS (Hypervisor Credential Guard) active.\n");
 }
 
 

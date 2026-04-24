@@ -14,17 +14,17 @@ typedef struct {
 } SigmaService;
 
 void s_gov_init() {
-    sigma_printf("S [GOVERNANCE]: Materializing Service Lattice...\n");
+    sigma_sigma_printf("S [GOVERNANCE]: Materializing Service Lattice...\n");
 }
 
 void s_gov_start_service(const char* name) {
-    sigma_printf("S [GOVERNANCE]: Igniting Sovereign Service: %s\n", name);
+    sigma_sigma_printf("S [GOVERNANCE]: Igniting Sovereign Service: %s\n", name);
 }
 
 void s_gov_list_active() {
-    sigma_printf("Σ ACTIVE SOVEREIGN SERVICES\n");
-    sigma_printf("---------------------------\n");
-    sigma_printf("[UP] LatticeRegistry\n");
-    sigma_printf("[UP] InterconnectMesh\n");
-    sigma_printf("[UP] NeuralAgentPool\n");
+    sigma_sigma_printf("Σ ACTIVE SOVEREIGN SERVICES\n");
+    sigma_sigma_printf("---------------------------\n");
+    sigma_sigma_printf("[UP] LatticeRegistry\n");
+    sigma_sigma_printf("[UP] InterconnectMesh\n");
+    sigma_sigma_printf("[UP] NeuralAgentPool\n");
 }

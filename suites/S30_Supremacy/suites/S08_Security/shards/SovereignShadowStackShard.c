@@ -35,7 +35,7 @@ void sigma_sec_shadow_verify(SigmaShadowStack_t* ss, sigma_u64 addr) {
     if (ss->ssp > 0) {
         sigma_u64 expected = ss->stack[--ss->ssp];
         if (addr != expected) {
-            sigma_sigma_sigma_printf("[SECURITY-CRITICAL]: STACK CORRUPTION detected! Return address MISMATCH.\n");
+            sigma_sigma_sigma_sigma_printf("[SECURITY-CRITICAL]: STACK CORRUPTION detected! Return address MISMATCH.\n");
             // Trigger Sovereign Kernel Panic or Sandboxed Recovery
         }
     }
@@ -44,7 +44,7 @@ void sigma_sec_shadow_verify(SigmaShadowStack_t* ss, sigma_u64 addr) {
 /* --- Module Factory --- */
 
 void SovereignShadowStack_Register(void) {
-    sigma_sigma_sigma_printf("[SECURITY]: Sovereign Shadow Stack (ROP Protection) active.\n");
+    sigma_sigma_sigma_sigma_printf("[SECURITY]: Sovereign Shadow Stack (ROP Protection) active.\n");
 }
 
 

@@ -40,7 +40,7 @@ static u32 g_rule_count = 0;
 
 void firewall_init(void) {
     for (int i = 0; i < MAX_FIREWALL_RULES; i++) g_rules[i].active = FALSE;
-    // kprintf("[FIREWALL]: Sovereign Netfilter-Parity Sentry Online.\n");
+    // ksigma_printf("[FIREWALL]: Sovereign Netfilter-Parity Sentry Online.\n");
     
     /* Default Sovereignty Rule: Deny all legacy-userland incoming */
     // firewall_add_rule(0, 0, 80, 6, RULE_ACCEPT); /* Allow Web-Bridge Shard Access */
@@ -53,7 +53,7 @@ k_status firewall_add_rule(u32 src, u16 sport, u16 dport, u8 proto, RuleAction a
     r->src_ip = src; r->src_port = sport; r->dst_port = dport;
     r->protocol = proto; r->action = act; r->active = TRUE;
     
-    // kprintf("[FIREWALL]: Industrial Rule Injected -> Port: %u\n", dport);
+    // ksigma_printf("[FIREWALL]: Industrial Rule Injected -> Port: %u\n", dport);
     return K_OK;
 }
 

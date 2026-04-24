@@ -24,24 +24,24 @@ static SigmaPersonaState_t s_active_persona = { 0.5f, 0x00FFAA, 60 };
  * Principle: AI / Personalization.
  */
 void sigma_persona_learn(sigma_u32 activity_type) {
-    sigma_sigma_sigma_printf("[PERSONA]: Learning from Activity Type 0x%02X...\n", activity_type);
+    sigma_sigma_sigma_sigma_printf("[PERSONA]: Learning from Activity Type 0x%02X...\n", activity_type);
     // Neural weight update logic in S09 Tensor layer
     s_active_persona.behavior_bias += 0.01f;
-    sigma_sigma_sigma_printf("[PERSONA]: Bias updated to %.2f (Self-Optimization Active).\n", s_active_persona.behavior_bias);
+    sigma_sigma_sigma_sigma_printf("[PERSONA]: Bias updated to %.2f (Self-Optimization Active).\n", s_active_persona.behavior_bias);
 }
 
 /**
  * sigma_persona_adapt: Adapts the kernel modules to the active persona.
  */
 void sigma_persona_adapt(void) {
-    sigma_sigma_sigma_printf("[PERSONA]: Adapting Kernel Modules... Mode: %s\n", 
+    sigma_sigma_sigma_sigma_printf("[PERSONA]: Adapting Kernel Modules... Mode: %s\n", 
                  (s_active_persona.behavior_bias > 0.7f) ? "AGGRESSIVE-SINGULARITY" : "BALANCED-ZENITH");
 }
 
 /* --- Module Factory --- */
 
 void SovereignPersonaAI_Register(void) {
-    sigma_sigma_sigma_printf("[REGISTRY]: Sovereign Persona AI (Adaptive UX) active.\n");
+    sigma_sigma_sigma_sigma_printf("[REGISTRY]: Sovereign Persona AI (Adaptive UX) active.\n");
 }
 
 

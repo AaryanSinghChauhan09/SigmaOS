@@ -5,7 +5,7 @@
  */
 
 #include "sigma_libc.h"
-#include <string.h>
+#include "sigma_libc.h"
 
 typedef struct {
     uint32_t shard_id;

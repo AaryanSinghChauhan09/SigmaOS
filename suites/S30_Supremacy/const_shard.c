@@ -24,7 +24,7 @@ typedef struct LawShard {
  * ========================================================================= */
 
 void const_init(void) {
-    // kprintf("[CONST-SHARD]: Sovereign Constitutional & Legal Interface Online.\n");
+    // ksigma_printf("[CONST-SHARD]: Sovereign Constitutional & Legal Interface Online.\n");
 }
 
 k_status law_query_section(const char* act, u32 section) {
@@ -32,7 +32,7 @@ k_status law_query_section(const char* act, u32 section) {
      * Absorb Absolute Law USP: Full coverage of BNS/BNSS/BSA/IPC/CrPC.
      * In a sharded model: retrieve logical section details directly from silicon.
      */
-    // kprintf("[CONST-SHARD]: Industrial Pulse: Act %s, Section %u retrieved (FULL-SUPPORT).\n", act, section);
+    // ksigma_printf("[CONST-SHARD]: Industrial Pulse: Act %s, Section %u retrieved (FULL-SUPPORT).\n", act, section);
     return K_OK;
 }
 
@@ -41,6 +41,6 @@ k_status const_audit_rights(void) {
      * Absorb Fundamental Rights USP: Zero-error audit of constitutional rights.
      * Audit if industrial arrest/search pulses violate sharded constitutional logic.
      */
-    // kprintf("[CONST-SHARD]: Industrial Pulse: Constitutional Rights Audit: (STABLE).\n");
+    // ksigma_printf("[CONST-SHARD]: Industrial Pulse: Constitutional Rights Audit: (STABLE).\n");
     return K_OK;
 }

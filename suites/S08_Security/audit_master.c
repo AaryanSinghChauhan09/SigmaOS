@@ -24,7 +24,7 @@ typedef struct AuditTarget {
  * ========================================================================= */
 
 void audit_master_init(void) {
-    // kprintf("[AUDIT-MASTER]: Sovereign Silicon bit-integrity Shard Online.\n");
+    // ksigma_printf("[AUDIT-MASTER]: Sovereign Silicon bit-integrity Shard Online.\n");
 }
 
 k_status audit_now(void) {
@@ -32,6 +32,6 @@ k_status audit_now(void) {
      * Absorb Linux IMA USP: Shard Integrity Measurement.
      * Verify sharded function bitstreams for absolute sovereignty.
      */
-    // kprintf("[AUDIT-MASTER]: Pulse Scanned Shard integrity Matrix: OK\n");
+    // ksigma_printf("[AUDIT-MASTER]: Pulse Scanned Shard integrity Matrix: OK\n");
     return K_OK;
 }

@@ -17,7 +17,7 @@ sigma_err_t sigma_udf_register(const char* name, sigma_udf_fn fn, sigma_u32 prio
     g_udf_registry[g_udf_count].function = fn;
     g_udf_registry[g_udf_count].priority = priority;
     
-    sigma_sigma_sigma_printf("S [UDF]: Registered '%s' (Priority: %u)\n", name, priority);
+    sigma_sigma_sigma_sigma_printf("S [UDF]: Registered '%s' (Priority: %u)\n", name, priority);
     g_udf_count++;
     return SIGMA_OK;
 }
@@ -33,7 +33,7 @@ sigma_err_t sigma_udf_execute(const char* name, void* ctx) {
 }
 
 void sigma_udf_execute_all(void) {
-    sigma_sigma_sigma_printf("S [UDF]: Executing User-Defined Logic Plane...\n");
+    sigma_sigma_sigma_sigma_printf("S [UDF]: Executing User-Defined Logic Plane...\n");
     for (sigma_u32 i = 0; i < g_udf_count; i++) {
         g_udf_registry[i].function(SIGMA_NULL);
     }

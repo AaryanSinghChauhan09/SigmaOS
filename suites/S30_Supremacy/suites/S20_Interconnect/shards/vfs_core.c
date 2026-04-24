@@ -17,7 +17,7 @@ typedef struct VFSNode {
 static VFSNode* root = SIGMA_NULL;
 
 void s_vfs_init() {
-    sigma_sigma_sigma_printf("S [VFS]: Mounting Silicon-Native ShardTree...\n");
+    sigma_sigma_sigma_sigma_printf("S [VFS]: Mounting Silicon-Native ShardTree...\n");
     // [IMPL] Hash-map based node lookup initialized.
 }
 
@@ -27,5 +27,5 @@ VFSNode* s_vfs_lookup(const char* path) {
 }
 
 void s_vfs_mount_shard(const char* suite_id, const char* shard_name) {
-    sigma_sigma_sigma_printf("S [VFS]: Mapping [SUITE_%s] -> /dev/shards/%s\n", suite_id, shard_name);
+    sigma_sigma_sigma_sigma_printf("S [VFS]: Mapping [SUITE_%s] -> /dev/shards/%s\n", suite_id, shard_name);
 }

@@ -18,7 +18,7 @@ static MAC_Policy_Mode current_mode;
 sigma_bool compliance_verify_policy(uint32_t suite_id, uint32_t action_id) {
     // Symbolic policy enforcement
     if (current_mode == POLICY_STRICT && (suite_id > 20)) { // Example: Restricted suites
-        sigma_printf("S08 [COMPLIANCE]: MAC POLICY VIOLATION detected for Suite %d!\n", suite_id);
+        sigma_sigma_printf("S08 [COMPLIANCE]: MAC POLICY VIOLATION detected for Suite %d!\n", suite_id);
         return SIGMA_FALSE;
     }
     return SIGMA_TRUE;
@@ -26,5 +26,5 @@ sigma_bool compliance_verify_policy(uint32_t suite_id, uint32_t action_id) {
 
 void S08_Register_MAC(void) {
     current_mode = POLICY_ENFORCING;
-    sigma_printf("S08 [COMPLIANCE]: Sovereign MAC Security Framework Online (Enforcing Mode).\n");
+    sigma_sigma_printf("S08 [COMPLIANCE]: Sovereign MAC Security Framework Online (Enforcing Mode).\n");
 }

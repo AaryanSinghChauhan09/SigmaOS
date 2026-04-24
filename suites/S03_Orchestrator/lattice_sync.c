@@ -25,7 +25,7 @@ typedef struct LatticePacket {
  * ========================================================================= */
 
 void lattice_sync_init(void) {
-    // kprintf("[LATTICE-SYNC]: Sovereign Post-Quantum Network Sync Shard Online.\n");
+    // ksigma_printf("[LATTICE-SYNC]: Sovereign Post-Quantum Network Sync Shard Online.\n");
 }
 
 k_status lattice_sync_send_shard(u32 shard_id, const void* buffer, u32 len) {
@@ -33,14 +33,14 @@ k_status lattice_sync_send_shard(u32 shard_id, const void* buffer, u32 len) {
     extern void pqc_encrypt_buffer(u32, void*, u32);
     pqc_encrypt_buffer(shard_id, (void*)buffer, len);
     
-    // kprintf("[LATTICE-SYNC]: Shard [%u] Encrypted and Signed for Sovereignty.\n", shard_id);
-    // kprintf("[LATTICE-SYNC]: Syncing to Lattice Node: 0x93\n");
+    // ksigma_printf("[LATTICE-SYNC]: Shard [%u] Encrypted and Signed for Sovereignty.\n", shard_id);
+    // ksigma_printf("[LATTICE-SYNC]: Syncing to Lattice Node: 0x93\n");
     
     return K_OK;
 }
 
 k_status lattice_sync_process_packet(LatticePacket* pkt) {
     /* Verify signature and decrypt payload */
-    // kprintf("[LATTICE-SYNC]: Processing Inbound Sovereign Packet: ID %llu\n", pkt->seq_id);
+    // ksigma_printf("[LATTICE-SYNC]: Processing Inbound Sovereign Packet: ID %llu\n", pkt->seq_id);
     return K_OK;
 }

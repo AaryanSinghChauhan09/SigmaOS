@@ -16,15 +16,15 @@
  * Principle: Hardware Mastery / NVMe Overdrive / Zero-Amplification.
  */
 void sigma_hal_zns_append(sigma_u32 zone_id, void* raw_data, sigma_u32 size) {
-    sigma_sigma_sigma_printf("[ZNS-FABRIC]: Appending %u bytes into sequential hardware Zone %u...\n", size, zone_id);
+    sigma_sigma_sigma_sigma_printf("[ZNS-FABRIC]: Appending %u bytes into sequential hardware Zone %u...\n", size, zone_id);
     // Writes directly to silicon without an SSD Flash Translation Layer (FTL) hiding it. Eliminates Write Amplification.
-    sigma_sigma_sigma_printf("[ZNS-FABRIC]: Direct flash append complete. Predictable latency mathematically enforced.\n");
+    sigma_sigma_sigma_sigma_printf("[ZNS-FABRIC]: Direct flash append complete. Predictable latency mathematically enforced.\n");
 }
 
 /* --- Module Factory --- */
 
 void SovereignZNS_Register(void) {
-    sigma_sigma_sigma_printf("[HAL]: Sovereign ZNS (Zone Namespace Persistence) active.\n");
+    sigma_sigma_sigma_sigma_printf("[HAL]: Sovereign ZNS (Zone Namespace Persistence) active.\n");
 }
 
 

@@ -4,5 +4,5 @@
 
 void S16_SoulMolding_Register(void) {
     SovereignRegistry_Register("S16_SoulMolding", 0, NULL);
-    sigma_sigma_sigma_printf("S [S16_SoulMolding]: Materialized.\n");
+    sigma_sigma_sigma_sigma_printf("S [S16_SoulMolding]: Materialized.\n");
 }

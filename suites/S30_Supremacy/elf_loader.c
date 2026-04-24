@@ -101,7 +101,7 @@ static u64 elf_seg_to_pte_flags(u32 pflags) {
  * ========================================================================= */
 extern k_status vmm_map(vaddr_t va, paddr_t pa, u64 flags);
 extern paddr_t  pmm_alloc_page(void);
-extern void     kprintf(const char* fmt, ...);
+extern void     ksigma_printf(const char* fmt, ...);
 
 typedef struct ElfLoadResult {
     vaddr_t entry;
@@ -116,7 +116,7 @@ k_status elf_load(const u8* elf_image, usize image_sz,
     const Elf64_Ehdr* ehdr = (const Elf64_Ehdr*)elf_image;
     k_status vs = elf_validate(ehdr);
     if (vs != K_OK) {
-        kprintf("[ELF]: Invalid ELF64 header.\n");
+        ksigma_printf("[ELF]: Invalid ELF64 header.\n");
         return vs;
     }
 
@@ -177,14 +177,14 @@ k_status elf_load(const u8* elf_image, usize image_sz,
             va += PAGE_SIZE;
         }
 
-        kprintf("[ELF]: Loaded PT_LOAD @ %p size=%llu %s%s%s\n",
+        ksigma_printf("[ELF]: Loaded PT_LOAD @ %p size=%llu %s%s%s\n",
                 (void*)seg->p_vaddr, seg->p_memsz,
                 (seg->p_flags & PF_R) ? "R" : "-",
                 (seg->p_flags & PF_W) ? "W" : "-",
                 (seg->p_flags & PF_X) ? "X" : "-");
     }
 
-    kprintf("[ELF]: Entry=%p base=%p end=%p\n",
+    ksigma_printf("[ELF]: Entry=%p base=%p end=%p\n",
             (void*)result->entry,
             (void*)result->load_base,
             (void*)result->load_end);
@@ -196,7 +196,7 @@ k_status elf_load(const u8* elf_image, usize image_sz,
  * (used as a selftest target that runs in-kernel without a filesystem)
  * ========================================================================= */
 void elf_selftest(void) {
-    kprintf("[ELF]: ELF64 loader ready. Awaiting exec() call.\n");
-    kprintf("[ELF]: Supported: ET_EXEC, ET_DYN, x86_64, LBA48, PT_LOAD.\n");
-    kprintf("[ELF]: Competitors: execve(2)/glibc ld-linux = NEUTRALIZED.\n");
+    ksigma_printf("[ELF]: ELF64 loader ready. Awaiting exec() call.\n");
+    ksigma_printf("[ELF]: Supported: ET_EXEC, ET_DYN, x86_64, LBA48, PT_LOAD.\n");
+    ksigma_printf("[ELF]: Competitors: execve(2)/glibc ld-linux = NEUTRALIZED.\n");
 }

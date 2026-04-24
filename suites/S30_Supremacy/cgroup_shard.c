@@ -32,7 +32,7 @@ static u32 g_cgroup_count = 0;
 
 void cgroup_init(void) {
     for (int i = 0; i < MAX_CGROUPS; i++) g_cgroups[i].active = FALSE;
-    // kprintf("[CGROUP]: Sovereign Resource-Isolation Shard Online.\n");
+    // ksigma_printf("[CGROUP]: Sovereign Resource-Isolation Shard Online.\n");
 }
 
 k_status cgroup_create(const char* name, u32 weight, u64 mem_limit) {
@@ -46,7 +46,7 @@ k_status cgroup_create(const char* name, u32 weight, u64 mem_limit) {
     cg->memory_usage = 0;
     cg->active    = TRUE;
     
-    // kprintf("[CGROUP]: Industrial Budget Created: %s (Weight: %u)\n", name, weight);
+    // ksigma_printf("[CGROUP]: Industrial Budget Created: %s (Weight: %u)\n", name, weight);
     return K_OK;
 }
 

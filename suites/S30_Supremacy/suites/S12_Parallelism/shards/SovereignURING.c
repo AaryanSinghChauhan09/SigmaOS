@@ -15,12 +15,12 @@ typedef struct {
 } SigmaRing;
 
 void s_uring_init() {
-    sigma_printf("S [PARALLEL]: Initializing SigmaURING (Zero-Copy I/O)...\n");
+    sigma_sigma_printf("S [PARALLEL]: Initializing SigmaURING (Zero-Copy I/O)...\n");
 }
 
 void s_uring_submit(void* op) {
     // [SIM] Push operation to completion ring without syscall context switch
-    sigma_printf("S [PARALLEL]: Operation submitted to async ring.\n");
+    sigma_sigma_printf("S [PARALLEL]: Operation submitted to async ring.\n");
 }
 
 void s_uring_peek() {

@@ -57,7 +57,7 @@ public:
 
     // --- Core Lifecycle (Custom Native Functions) ---
     sigma_status spawn_native() {
-        sigma_printf("[KERNEL-SOVEREIGN]: Spawning Process Shard: %s (PID: %llu)\n", m_name.c_str(), m_pid);
+        sigma_sigma_printf("[KERNEL-SOVEREIGN]: Spawning Process Shard: %s (PID: %llu)\n", m_name.c_str(), m_pid);
         
         /* 
          * x86_64 CLONE SYSCALL (Simulation of logic)
@@ -70,7 +70,7 @@ public:
     }
 
     void terminate() {
-        sigma_printf("[KERNEL-SOVEREIGN]: Reclaiming Shard Resources for PID %llu...\n", m_pid);
+        sigma_sigma_printf("[KERNEL-SOVEREIGN]: Reclaiming Shard Resources for PID %llu...\n", m_pid);
         m_status = ProcessStatus::ZOMBIE;
     }
 
@@ -87,7 +87,7 @@ private:
 
 public:
     ZenithProcessManager() {
-        sigma_printf("[MANAGER-ZENITH]: Sovereign Process Table Initialized (Zero-Library).\n");
+        sigma_sigma_printf("[MANAGER-ZENITH]: Sovereign Process Table Initialized (Zero-Library).\n");
     }
 
     const char* type_name() const noexcept override { return "ZenithProcessManager"; }
@@ -102,12 +102,12 @@ public:
     }
 
     void audit_all() {
-        sigma_printf("\n--- Σ SOVEREIGN PROCESS AUDIT ---\n");
+        sigma_sigma_printf("\n--- Σ SOVEREIGN PROCESS AUDIT ---\n");
         for (auto& proc : m_process_table) {
-            sigma_printf("| PID: %-8llu | NAME: %-20s | STATUS: %d\n", 
+            sigma_sigma_printf("| PID: %-8llu | NAME: %-20s | STATUS: %d\n", 
                 proc->pid(), proc->name(), (int)proc->status());
         }
-        sigma_printf("----------------------------------\n");
+        sigma_sigma_printf("----------------------------------\n");
     }
 };
 
@@ -125,7 +125,7 @@ extern "C" void start_process_zenith() {
 }
 
 int main() {
-    sigma_printf("[SIGMA_KERNEL]: Transitioning to Sovereign Process Management...\n");
+    sigma_sigma_printf("[SIGMA_KERNEL]: Transitioning to Sovereign Process Management...\n");
     start_process_zenith();
     return 0;
 }

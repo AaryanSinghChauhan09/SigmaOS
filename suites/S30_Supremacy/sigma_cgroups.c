@@ -36,24 +36,24 @@ sigma_cgroup_t* sigma_cgroup_create(const char* name, sigma_cgroup_t* parent) {
     cg->proc_count = 0;
     cg->parent = parent;
     
-    sigma_printf("[KERNEL-CGROUP]: Matrix created: /sys/fs/cgroup/%s\n", name);
+    sigma_sigma_printf("[KERNEL-CGROUP]: Matrix created: /sys/fs/cgroup/%s\n", name);
     return cg;
 }
 
 /* --- cgroup_write_mem (Linux parity: memory.limit_in_bytes) --- */
 void sigma_cgroup_limit_mem(sigma_cgroup_t* cg, sigma_u64 limit) {
     cg->mem_limit = limit;
-    sigma_printf("[KERNEL-CGROUP]: Set memory limit for [%s]: %llu bytes.\n", cg->name, limit);
+    sigma_sigma_printf("[KERNEL-CGROUP]: Set memory limit for [%s]: %llu bytes.\n", cg->name, limit);
 }
 
 /* --- cgroup_attach (Attach process to cgroup) --- */
 void sigma_cgroup_attach(sigma_cgroup_t* cg, sigma_u64 pid) {
     cg->proc_count++;
-    sigma_printf("[KERNEL-CGROUP]: Process %llu attached to matrix [%s].\n", pid, cg->name);
+    sigma_sigma_printf("[KERNEL-CGROUP]: Process %llu attached to matrix [%s].\n", pid, cg->name);
 }
 
 void sigma_cgroup_init(void) {
     g_cgroup_count = 0;
     sigma_cgroup_create("root", SIGMA_NULL);
-    sigma_printf("[KERNEL-CGROUP]: Control Groups Sharding Active (Industrial Linux USP).\n");
+    sigma_sigma_printf("[KERNEL-CGROUP]: Control Groups Sharding Active (Industrial Linux USP).\n");
 }

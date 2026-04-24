@@ -10,9 +10,9 @@
  */
 
 sigma_err_t sigma_hal_cloud_init(void) {
-    sigma_sigma_sigma_printf("  S [HAL-CLOUD]: Sovereign Cloud Hardware Abstraction active.\n");
-    sigma_sigma_sigma_printf("  S [HAL-CLOUD]: NUMA-aware resource mapping: ENGAGED.\n");
-    sigma_sigma_sigma_printf("  S [HAL-CLOUD]: Virt-IO passthrough acceleration: READY.\n");
+    sigma_sigma_sigma_sigma_printf("  S [HAL-CLOUD]: Sovereign Cloud Hardware Abstraction active.\n");
+    sigma_sigma_sigma_sigma_printf("  S [HAL-CLOUD]: NUMA-aware resource mapping: ENGAGED.\n");
+    sigma_sigma_sigma_sigma_printf("  S [HAL-CLOUD]: Virt-IO passthrough acceleration: READY.\n");
     return SIGMA_OK;
 }
 

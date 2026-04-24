@@ -16,15 +16,15 @@
  * Principle: Hardware Mastery / Storage Velocity / Sub-Channel Routing.
  */
 void sigma_hal_hbm_pin(void* tensor_data, sigma_u8 die_layer_id) {
-    sigma_sigma_sigma_printf("[HBM-FABRIC]: Pinning Tensor array strictly to HBM Stack Vertical Die #%u...\n", die_layer_id);
+    sigma_sigma_sigma_sigma_printf("[HBM-FABRIC]: Pinning Tensor array strictly to HBM Stack Vertical Die #%u...\n", die_layer_id);
     // Interrogates the memory fabric to force data into explicit vertical 3D-stacked silicon slices, minimizing horizontal traversal
-    sigma_sigma_sigma_printf("[HBM-FABRIC]: Matrix pinned to vertical die. HBM latency strictly localized.\n");
+    sigma_sigma_sigma_sigma_printf("[HBM-FABRIC]: Matrix pinned to vertical die. HBM latency strictly localized.\n");
 }
 
 /* --- Module Factory --- */
 
 void SovereignHBM_Register(void) {
-    sigma_sigma_sigma_printf("[HAL]: Sovereign HBM (3D-Stacked Sub-Channel Pinning) active.\n");
+    sigma_sigma_sigma_sigma_printf("[HAL]: Sovereign HBM (3D-Stacked Sub-Channel Pinning) active.\n");
 }
 
 

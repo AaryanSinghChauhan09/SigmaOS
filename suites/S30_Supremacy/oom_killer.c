@@ -23,7 +23,7 @@ typedef struct OOMMaster {
  * ========================================================================= */
 
 void oom_killer_init(void) {
-    // kprintf("[OOM-KILLER]: Sovereign Shard-Discipline Engine Online.\n");
+    // ksigma_printf("[OOM-KILLER]: Sovereign Shard-Discipline Engine Online.\n");
 }
 
 k_status oom_execute_industrial_sweep(void) {
@@ -31,6 +31,6 @@ k_status oom_execute_industrial_sweep(void) {
      * Absorb Linux OOM-Killer USP: SBS (Shard Badness Score).
      * Select the most memory-abusive shard and reclaim its silicon life.
      */
-    // kprintf("[OOM-KILLER]: Industrial sweep executed. Evicted 1 rogue shard.\n");
+    // ksigma_printf("[OOM-KILLER]: Industrial sweep executed. Evicted 1 rogue shard.\n");
     return K_OK;
 }

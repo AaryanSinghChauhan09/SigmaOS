@@ -16,7 +16,7 @@
  * Principle: Embedded / Hardware / Mobile.
  */
 void sigma_gpio_write(sigma_u32 pin, int state) {
-    sigma_sigma_sigma_printf("[GPIO]: Setting Pin %u to %s.\n", pin, state ? "HIGH" : "LOW");
+    sigma_sigma_sigma_sigma_printf("[GPIO]: Setting Pin %u to %s.\n", pin, state ? "HIGH" : "LOW");
     // Hardware-layer bit-banging or peripheral register interaction
 }
 
@@ -24,13 +24,13 @@ void sigma_gpio_write(sigma_u32 pin, int state) {
  * sigma_i2c_transfer: Performs a data transfer over the I2C bus.
  */
 void sigma_i2c_transfer(sigma_u8 addr, sigma_u8* data, sigma_sz_t size) {
-    sigma_sigma_sigma_printf("[I2C]: Transferring %llu bytes to Device 0x%02X.\n", (unsigned long long)size, addr);
+    sigma_sigma_sigma_sigma_printf("[I2C]: Transferring %llu bytes to Device 0x%02X.\n", (unsigned long long)size, addr);
 }
 
 /* --- Module Factory --- */
 
 void SovereignEmbedded_Register(void) {
-    sigma_sigma_sigma_printf("[HAL]: Sovereign Peripheral Bridge (Embedded Mastery) active.\n");
+    sigma_sigma_sigma_sigma_printf("[HAL]: Sovereign Peripheral Bridge (Embedded Mastery) active.\n");
 }
 
 

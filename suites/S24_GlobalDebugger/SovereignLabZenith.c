@@ -30,8 +30,8 @@ public:
 class CircuitExperiment : public IZenithExperiment {
 public:
     void Project() override {
-        sigma_printf("[PHYSICS/LAB]: Experiment: Constructing a Simple Electric Circuit.\n");
-        sigma_printf("[PHYSICS/LAB]: Battery Shard connected to Switch & Bulb. Electron flux active.\n");
+        sigma_sigma_printf("[PHYSICS/LAB]: Experiment: Constructing a Simple Electric Circuit.\n");
+        sigma_sigma_printf("[PHYSICS/LAB]: Battery Shard connected to Switch & Bulb. Electron flux active.\n");
     }
 };
 
@@ -39,8 +39,8 @@ public:
 class ElectrolysisExperiment : public IZenithExperiment {
 public:
     void Project() override {
-        sigma_printf("[CHEMISTRY/LAB]: Experiment: Electrolysis of Water (Shard-H2O).\n");
-        sigma_printf("[CHEMISTRY/LAB]: H2:O2 Volume ratio detected as 2:1 at Cathode/Anode.\n");
+        sigma_sigma_printf("[CHEMISTRY/LAB]: Experiment: Electrolysis of Water (Shard-H2O).\n");
+        sigma_sigma_printf("[CHEMISTRY/LAB]: H2:O2 Volume ratio detected as 2:1 at Cathode/Anode.\n");
     }
 };
 
@@ -48,8 +48,8 @@ public:
 class DisplacementExperiment : public IZenithExperiment {
 public:
     void Project() override {
-        sigma_printf("[CHEMISTRY/LAB]: Experiment: Iron Nail in Copper Sulphate Solution.\n");
-        sigma_printf("[CHEMISTRY/LAB]: Result: Blue color fades to green; Brown Copper deposit identified.\n");
+        sigma_sigma_printf("[CHEMISTRY/LAB]: Experiment: Iron Nail in Copper Sulphate Solution.\n");
+        sigma_sigma_printf("[CHEMISTRY/LAB]: Result: Blue color fades to green; Brown Copper deposit identified.\n");
     }
 };
 
@@ -57,8 +57,8 @@ public:
 class PollenExperiment : public IZenithExperiment {
 public:
     void Project() override {
-        sigma_printf("[BIOLOGY/LAB]: Experiment: Germination of Pollen on Stigma Shard.\n");
-        sigma_printf("[BIOLOGY/LAB]: Pollen Tube growth detected via Chemotropism Shard.\n");
+        sigma_sigma_printf("[BIOLOGY/LAB]: Experiment: Germination of Pollen on Stigma Shard.\n");
+        sigma_sigma_printf("[BIOLOGY/LAB]: Pollen Tube growth detected via Chemotropism Shard.\n");
     }
 };
 
@@ -68,8 +68,8 @@ public:
     void Project() override {
         double a = 3.0, b = 4.0;
         double c = std::sqrt(a*a + b*b);
-        sigma_printf("[MATH/LAB]: Experiment: Verification of Pythagoras Theorem.\n");
-        sigma_printf("[MATH/LAB]: Base=3, Perp=4 -> Hypotenuse = " << c << " (Shard-Perfect).\n");
+        sigma_sigma_printf("[MATH/LAB]: Experiment: Verification of Pythagoras Theorem.\n");
+        sigma_sigma_printf("[MATH/LAB]: Base=3, Perp=4 -> Hypotenuse = " << c << " (Shard-Perfect).\n");
     }
 };
 
@@ -86,9 +86,9 @@ public:
     }
 
     void ExecuteFinalAudit() {
-        sigma_printf("--- Σ SIGMA OS SOVEREIGN LABORATORY ZENITH ---\n");
+        sigma_sigma_printf("--- Σ SIGMA OS SOVEREIGN LABORATORY ZENITH ---\n");
         for (const auto& exp : m_lab) {
-            sigma_printf("\n------------------------------------------------\n");
+            sigma_sigma_printf("\n------------------------------------------------\n");
             exp->Project();
         }
     }
@@ -99,7 +99,7 @@ int main() {
     lab.Synthesize();
     lab.ExecuteFinalAudit();
 
-    sigma_printf("\n[SUCCESS]: Competitive Laboratory Zenith Shards (with Animation parity) Active.\n");
+    sigma_sigma_printf("\n[SUCCESS]: Competitive Laboratory Zenith Shards (with Animation parity) Active.\n");
     return 0;
 }
 

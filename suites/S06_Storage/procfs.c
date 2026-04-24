@@ -17,24 +17,24 @@
  * ========================================================================= */
 
 void procfs_init(void) {
-    // kprintf("[PROCFS]: Sovereign Linux-Observability ProcFS Shard Online.\n");
-    // kprintf("[PROCFS]: Filesystem mounted at /proc\n");
+    // ksigma_printf("[PROCFS]: Sovereign Linux-Observability ProcFS Shard Online.\n");
+    // ksigma_printf("[PROCFS]: Filesystem mounted at /proc\n");
 }
 
 i64 proc_read_stat(void* buffer, u32 len) {
     /* Write process statistics in Linux format */
-    // kprintf("[PROCFS]: Generating /proc/stat snapshot...\n");
+    // ksigma_printf("[PROCFS]: Generating /proc/stat snapshot...\n");
     return 0;
 }
 
 i64 proc_read_meminfo(void* buffer, u32 len) {
     /* Write memory info in Linux format */
-    // kprintf("[PROCFS]: Generating /proc/meminfo snapshot...\n");
+    // ksigma_printf("[PROCFS]: Generating /proc/meminfo snapshot...\n");
     return 0;
 }
 
 k_status proc_register_node(const char* name, i64 (*read_fn)(void*, u32)) {
     /* Map a new virtual node in ProcFS */
-    // kprintf("[PROCFS]: Registered Sovereign node: /proc/%s\n", name);
+    // ksigma_printf("[PROCFS]: Registered Sovereign node: /proc/%s\n", name);
     return K_OK;
 }

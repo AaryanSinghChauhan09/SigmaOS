@@ -16,7 +16,7 @@
  * Principle: Cyber Security / Hardware Mastery.
  */
 sigma_u64 sigma_hal_entropy_read(void) {
-    sigma_sigma_sigma_printf("[ENTROPY]: Harvesting Hardware Noise (RDRAND Gateway)...\n");
+    sigma_sigma_sigma_sigma_printf("[ENTROPY]: Harvesting Hardware Noise (RDRAND Gateway)...\n");
     // x86_64: __asm__ volatile("rdrand %0" : "=r"(val));
     return 0xCAFEBABE12345678; // Simulated high-entropy sequence
 }
@@ -25,13 +25,13 @@ sigma_u64 sigma_hal_entropy_read(void) {
  * sigma_hal_entropy_pool: Mixes hardware noise into the system entropy pool.
  */
 void sigma_hal_entropy_pool(void) {
-    sigma_sigma_sigma_printf("[ENTROPY]: Purity Audit: Pool seeded with 256-bits of hardware noise.\n");
+    sigma_sigma_sigma_sigma_printf("[ENTROPY]: Purity Audit: Pool seeded with 256-bits of hardware noise.\n");
 }
 
 /* --- Module Factory --- */
 
 void SovereignEntropy_Register(void) {
-    sigma_sigma_sigma_printf("[HAL]: Sovereign Entropy Bridge (Quantum Purity) active.\n");
+    sigma_sigma_sigma_sigma_printf("[HAL]: Sovereign Entropy Bridge (Quantum Purity) active.\n");
 }
 
 

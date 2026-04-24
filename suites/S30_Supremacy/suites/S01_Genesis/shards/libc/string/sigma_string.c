@@ -6,7 +6,7 @@
 
 #include "sigma_libc.h"
 
-sigma_sz_t sigma_sigma_sigma_strlen(const char* s) {
+sigma_sz_t sigma_sigma_sigma_sigma_strlen(const char* s) {
     if (!s) return 0;
     sigma_sz_t len = 0;
     while (s[len]) len++;

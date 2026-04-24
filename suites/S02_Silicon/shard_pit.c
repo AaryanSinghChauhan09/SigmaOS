@@ -67,8 +67,8 @@ void pit_init(void) {
     u64 tsc_end = cpu_rdtsc();
     g_timer.tsc_per_ms = (tsc_end - tsc_start) / target_ms;
 
-    extern void kprintf(const char* fmt, ...);
-    kprintf("[PIT]: 1000Hz | TSC/ms=%llu | Uptime tracking active.\n",
+    extern void ksigma_printf(const char* fmt, ...);
+    ksigma_printf("[PIT]: 1000Hz | TSC/ms=%llu | Uptime tracking active.\n",
             g_timer.tsc_per_ms);
 }
 

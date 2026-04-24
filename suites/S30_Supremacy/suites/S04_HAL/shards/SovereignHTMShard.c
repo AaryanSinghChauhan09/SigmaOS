@@ -16,7 +16,7 @@
  * Principle: Performance / Computer Science.
  */
 sigma_u32 sigma_hal_htm_begin(void) {
-    sigma_sigma_sigma_printf("[HTM]: Opening Hardware Transaction (Speculative Region)...\n");
+    sigma_sigma_sigma_sigma_printf("[HTM]: Opening Hardware Transaction (Speculative Region)...\n");
     // x86_64: _xbegin();
     return 0xFFFFFFFF; // Simulated success status
 }
@@ -26,13 +26,13 @@ sigma_u32 sigma_hal_htm_begin(void) {
  */
 void sigma_hal_htm_commit(void) {
     // x86_64: _xend();
-    sigma_sigma_sigma_printf("[HTM]: Transaction COMMITTED. Atomic state update SEATED.\n");
+    sigma_sigma_sigma_sigma_printf("[HTM]: Transaction COMMITTED. Atomic state update SEATED.\n");
 }
 
 /* --- Module Factory --- */
 
 void SovereignHTM_Register(void) {
-    sigma_sigma_sigma_printf("[HAL]: Sovereign HTM (Transaction Mastery) active.\n");
+    sigma_sigma_sigma_sigma_printf("[HAL]: Sovereign HTM (Transaction Mastery) active.\n");
 }
 
 

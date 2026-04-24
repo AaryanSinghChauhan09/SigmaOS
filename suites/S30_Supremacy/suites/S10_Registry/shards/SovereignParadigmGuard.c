@@ -51,64 +51,64 @@ extern void SovereignPersonalization_Register(void);
 /* --- Domain Audit Functions --- */
 
 void Domain_OS_Audit(void) {
-    sigma_sigma_sigma_printf("[ZENITH-GUARD]: [OS]  Scheduler + Registry -> ");
+    sigma_sigma_sigma_sigma_printf("[ZENITH-GUARD]: [OS]  Scheduler + Registry -> ");
     /* If we reach here, the symbols linked — proof of existence. */
-    sigma_sigma_sigma_printf("VERIFIED\n");
+    sigma_sigma_sigma_sigma_printf("VERIFIED\n");
 }
 
 void Domain_AI_ML_Audit(void) {
-    sigma_sigma_sigma_printf("[ZENITH-GUARD]: [AI/ML]  NeuralShard + TensorShard -> ");
-    sigma_sigma_sigma_printf("VERIFIED\n");
+    sigma_sigma_sigma_sigma_printf("[ZENITH-GUARD]: [AI/ML]  NeuralShard + TensorShard -> ");
+    sigma_sigma_sigma_sigma_printf("VERIFIED\n");
 }
 
 void Domain_DS_DSA_Audit(void) {
-    sigma_sigma_sigma_printf("[ZENITH-GUARD]: [DS/DSA] DataframeMatrix + BPlusTree -> ");
-    sigma_sigma_sigma_printf("VERIFIED\n");
+    sigma_sigma_sigma_sigma_printf("[ZENITH-GUARD]: [DS/DSA] DataframeMatrix + BPlusTree -> ");
+    sigma_sigma_sigma_sigma_printf("VERIFIED\n");
 }
 
 void Domain_OOP_Audit(void) {
-    sigma_sigma_sigma_printf("[ZENITH-GUARD]: [OOP]  VTableRegistry (encapsulation+polymorphism) -> ");
-    sigma_sigma_sigma_printf("VERIFIED\n");
+    sigma_sigma_sigma_sigma_printf("[ZENITH-GUARD]: [OOP]  VTableRegistry (encapsulation+polymorphism) -> ");
+    sigma_sigma_sigma_sigma_printf("VERIFIED\n");
 }
 
 void Domain_Automation_Audit(void) {
-    sigma_sigma_sigma_printf("[ZENITH-GUARD]: [AUTO] SovereignAutomationShard (self-heal+cron) -> ");
-    sigma_sigma_sigma_printf("VERIFIED\n");
+    sigma_sigma_sigma_sigma_printf("[ZENITH-GUARD]: [AUTO] SovereignAutomationShard (self-heal+cron) -> ");
+    sigma_sigma_sigma_sigma_printf("VERIFIED\n");
 }
 
 void Domain_Customisation_Audit(void) {
-    sigma_sigma_sigma_printf("[ZENITH-GUARD]: [CUSTOM] SovereignCustomisationEngine (key-value config) -> ");
-    sigma_sigma_sigma_printf("VERIFIED\n");
+    sigma_sigma_sigma_sigma_printf("[ZENITH-GUARD]: [CUSTOM] SovereignCustomisationEngine (key-value config) -> ");
+    sigma_sigma_sigma_sigma_printf("VERIFIED\n");
 }
 
 void Domain_Personalisation_Audit(void) {
-    sigma_sigma_sigma_printf("[ZENITH-GUARD]: [PERS] SovereignPersonalizationShard (identity+chroma) -> ");
-    sigma_sigma_sigma_printf("VERIFIED\n");
+    sigma_sigma_sigma_sigma_printf("[ZENITH-GUARD]: [PERS] SovereignPersonalizationShard (identity+chroma) -> ");
+    sigma_sigma_sigma_sigma_printf("VERIFIED\n");
 }
 
 void Domain_UDF_Audit(void) {
-    sigma_sigma_sigma_printf("[ZENITH-GUARD]: [UDF]  SovereignUDFEngine (sandboxed extensions) -> ");
-    sigma_sigma_sigma_printf("VERIFIED\n");
+    sigma_sigma_sigma_sigma_printf("[ZENITH-GUARD]: [UDF]  SovereignUDFEngine (sandboxed extensions) -> ");
+    sigma_sigma_sigma_sigma_printf("VERIFIED\n");
 }
 
 void Domain_Green_Audit(void) {
-    sigma_sigma_sigma_printf("[ZENITH-GUARD]: [GREEN] SovereignGreenShard (power governor) -> ");
-    sigma_sigma_sigma_printf("VERIFIED\n");
+    sigma_sigma_sigma_sigma_printf("[ZENITH-GUARD]: [GREEN] SovereignGreenShard (power governor) -> ");
+    sigma_sigma_sigma_sigma_printf("VERIFIED\n");
 }
 
 void Domain_Consensus_Audit(void) {
-    sigma_sigma_sigma_printf("[ZENITH-GUARD]: [CONSENSUS] SovereignConsensusShard (Raft edge sync) -> ");
-    sigma_sigma_sigma_printf("VERIFIED\n");
+    sigma_sigma_sigma_sigma_printf("[ZENITH-GUARD]: [CONSENSUS] SovereignConsensusShard (Raft edge sync) -> ");
+    sigma_sigma_sigma_sigma_printf("VERIFIED\n");
 }
 
 
 /* --- MASTER ENFORCER --- */
 
 void SovereignParadigmGuard_Enforce(void) {
-    sigma_sigma_sigma_printf("\n");
-    sigma_sigma_sigma_printf("===============================================================\n");
-    sigma_sigma_sigma_printf("  SOVEREIGN PARADIGM GUARD v2.0 — DEEP STRUCTURAL AUDIT\n");
-    sigma_sigma_sigma_printf("===============================================================\n\n");
+    sigma_sigma_sigma_sigma_printf("\n");
+    sigma_sigma_sigma_sigma_printf("===============================================================\n");
+    sigma_sigma_sigma_sigma_printf("  SOVEREIGN PARADIGM GUARD v2.0 — DEEP STRUCTURAL AUDIT\n");
+    sigma_sigma_sigma_sigma_printf("===============================================================\n\n");
 
     Domain_OS_Audit();
     Domain_AI_ML_Audit();
@@ -121,9 +121,9 @@ void SovereignParadigmGuard_Enforce(void) {
     Domain_Green_Audit();
     Domain_Consensus_Audit();
 
-    sigma_sigma_sigma_printf("\n[RESULT]: 10/10 PRINCIPLE DOMAINS STRUCTURALLY VERIFIED.\n");
-    sigma_sigma_sigma_printf("[STATUS]: ZENITH SUPREME — ABSOLUTE SINGULARITY CONFIRMED.\n");
-    sigma_sigma_sigma_printf("===============================================================\n\n");
+    sigma_sigma_sigma_sigma_printf("\n[RESULT]: 10/10 PRINCIPLE DOMAINS STRUCTURALLY VERIFIED.\n");
+    sigma_sigma_sigma_sigma_printf("[STATUS]: ZENITH SUPREME — ABSOLUTE SINGULARITY CONFIRMED.\n");
+    sigma_sigma_sigma_sigma_printf("===============================================================\n\n");
 }
 
 void SovereignParadigmGuard_Register(void) {

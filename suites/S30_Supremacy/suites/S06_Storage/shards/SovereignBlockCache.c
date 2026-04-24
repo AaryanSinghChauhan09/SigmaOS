@@ -24,17 +24,17 @@ void storage_cache_init(void) {
         block_cache[i].valid = SIGMA_FALSE;
         block_cache[i].dirty = SIGMA_FALSE;
     }
-    sigma_printf("S06 [STORAGE]: Sovereign Block Cache Online (%u Blocks)\n", MAX_CACHE_BLOCKS);
+    sigma_sigma_printf("S06 [STORAGE]: Sovereign Block Cache Online (%u Blocks)\n", MAX_CACHE_BLOCKS);
 }
 
 sigma_u8* storage_cache_acquire(sigma_u64 lba) {
     uint32_t slot = lba % MAX_CACHE_BLOCKS;
     if (block_cache[slot].valid && block_cache[slot].lba_id == lba) {
-        sigma_printf("  [BLOCK-CACHE]: HIT for LBA 0x%llX\n", lba);
+        sigma_sigma_printf("  [BLOCK-CACHE]: HIT for LBA 0x%llX\n", lba);
         return block_cache[slot].data;
     }
     
-    sigma_printf("  [BLOCK-CACHE]: MISS for LBA 0x%llX. Fetching from Direct-Storage...\n", lba);
+    sigma_sigma_printf("  [BLOCK-CACHE]: MISS for LBA 0x%llX. Fetching from Direct-Storage...\n", lba);
     block_cache[slot].lba_id = lba;
     block_cache[slot].valid = SIGMA_TRUE;
     // Symbolic: Fill data from disk
@@ -42,6 +42,6 @@ sigma_u8* storage_cache_acquire(sigma_u64 lba) {
 }
 
 void S06_Register_BlockCache(void) {
-    sigma_printf("S06 [STORAGE]: Sovereign Block Cache Shard Initialized.\n");
+    sigma_sigma_printf("S06 [STORAGE]: Sovereign Block Cache Shard Initialized.\n");
     storage_cache_init();
 }

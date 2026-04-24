@@ -16,15 +16,15 @@
  * Principle: Performance / Real-Time / Computer Science.
  */
 void sigma_sched_r3_yield(void) {
-    sigma_sigma_sigma_printf("[R3-SCHED]: Performing zero-trap user-space yield...\n");
+    sigma_sigma_sigma_sigma_printf("[R3-SCHED]: Performing zero-trap user-space yield...\n");
     // Saving and restoring context in user-accessible TLS
-    sigma_sigma_sigma_printf("[R3-SCHED]: User-thread context swapped. Latency: <100ns.\n");
+    sigma_sigma_sigma_sigma_printf("[R3-SCHED]: User-thread context swapped. Latency: <100ns.\n");
 }
 
 /* --- Module Factory --- */
 
 void SovereignR3Sched_Register(void) {
-    sigma_sigma_sigma_printf("[HAL]: Sovereign Ring-3 Scheduler (Trap-less Concurrency) active.\n");
+    sigma_sigma_sigma_sigma_printf("[HAL]: Sovereign Ring-3 Scheduler (Trap-less Concurrency) active.\n");
 }
 
 

@@ -124,8 +124,8 @@ k_status ipc_send(int channel_id, u32 sender_tid, u32 msg_type,
     // If persistence fails, we roll back the transaction and deny IPC delivery
     // to prevent split-brain state between isolated shards.
     if (persist_res < 0) {
-        extern void kprintf(const char* fmt, ...);
-        kprintf("[IPC] FATAL: Persistence write failed (err %ld). Rolling back sequence %llu.\n", persist_res, seq_id);
+        extern void ksigma_printf(const char* fmt, ...);
+        ksigma_printf("[IPC] FATAL: Persistence write failed (err %ld). Rolling back sequence %llu.\n", persist_res, seq_id);
         persistence_rollback_ffi(seq_id);
         return K_ERR_NODEV;
     }
@@ -161,12 +161,12 @@ k_status ipc_recv(int channel_id, SigmaIPCMsg* out) {
  * ========================================================================= */
 
 void ipc_audit(void) {
-    extern void kprintf(const char* fmt, ...);
-    kprintf("[IPC] Channels: %u\n", g_channel_count);
+    extern void ksigma_printf(const char* fmt, ...);
+    ksigma_printf("[IPC] Channels: %u\n", g_channel_count);
     u32 i;
     for (i = 0; i < g_channel_count; i++) {
         SigmaIPCChannel* ch = &g_channels[i];
-        kprintf("  CH[%u] %s: pool %u→%u | queued=%u | sent=%llu recv=%llu drop=%llu\n",
+        ksigma_printf("  CH[%u] %s: pool %u→%u | queued=%u | sent=%llu recv=%llu drop=%llu\n",
                 ch->id, ch->name, ch->owner_pool, ch->target_pool,
                 ch->count, ch->total_sent, ch->total_recv, ch->total_dropped);
     }

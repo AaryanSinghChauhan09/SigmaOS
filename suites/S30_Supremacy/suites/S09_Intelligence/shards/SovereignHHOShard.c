@@ -16,15 +16,15 @@
  * Principle: AI / Algorithms / Coordinated Exploitation.
  */
 void sigma_opt_hho_pounce(float escaping_energy, int pursuit_tactic) {
-    sigma_sigma_sigma_printf("[HHO-CORE]: Engaging cooperative hawk pounce (Escaping Energy: %.2f)...\n", escaping_energy);
+    sigma_sigma_sigma_sigma_printf("[HHO-CORE]: Engaging cooperative hawk pounce (Escaping Energy: %.2f)...\n", escaping_energy);
     // As the optimum's "escaping energy" decreases, the swarm shifts from soft besieging to a coordinated hard pounce
-    sigma_sigma_sigma_printf("[HHO-CORE]: Parameter exhausted and captured. Absolute convergence achieved.\n");
+    sigma_sigma_sigma_sigma_printf("[HHO-CORE]: Parameter exhausted and captured. Absolute convergence achieved.\n");
 }
 
 /* --- Module Factory --- */
 
 void SovereignHHO_Register(void) {
-    sigma_sigma_sigma_printf("[INTELLIGENCE]: Sovereign HHO (Harris Hawks Pounce) active.\n");
+    sigma_sigma_sigma_sigma_printf("[INTELLIGENCE]: Sovereign HHO (Harris Hawks Pounce) active.\n");
 }
 
 

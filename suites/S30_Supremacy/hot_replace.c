@@ -31,7 +31,7 @@ static u32 g_hot_count = 0;
 
 void hot_replace_init(void) {
     for (int i = 0; i < MAX_HOT_SHARDS; i++) g_hot_shards[i].is_active = FALSE;
-    // kprintf("[HOT-REPLACE]: Sovereign Zero-Downtime Patching Shard Online.\n");
+    // ksigma_printf("[HOT-REPLACE]: Sovereign Zero-Downtime Patching Shard Online.\n");
 }
 
 k_status hot_replace_register(const char* name, void* original, void* patched) {
@@ -45,7 +45,7 @@ k_status hot_replace_register(const char* name, void* original, void* patched) {
     s->patched_fn  = patched;
     s->is_active   = FALSE;
     
-    // kprintf("[HOT-REPLACE]: Shard Replacement Registered: %s\n", name);
+    // ksigma_printf("[HOT-REPLACE]: Shard Replacement Registered: %s\n", name);
     return K_OK;
 }
 
@@ -57,5 +57,5 @@ void hot_replace_activate(u32 idx) {
      * In a sharded model: update the registry function pointer.
      */
     g_hot_shards[idx].is_active = TRUE;
-    // kprintf("[HOT-REPLACE]: Master Shard Activation complete: %s\n", g_hot_shards[idx].name);
+    // ksigma_printf("[HOT-REPLACE]: Master Shard Activation complete: %s\n", g_hot_shards[idx].name);
 }

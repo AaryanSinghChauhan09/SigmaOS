@@ -12,7 +12,7 @@ typedef struct {
 } market_listing_t;
 
 void market_install_shard(const char* name) {
-    sigma_printf("[MARKET] Initiating download for shard: %s\n", name);
+    sigma_sigma_printf("[MARKET] Initiating download for shard: %s\n", name);
     
     // In a real implementation, this would:
     // 1. Fetch JSON manifest from a decentralized DHT (Distributed Hash Table).
@@ -20,17 +20,17 @@ void market_install_shard(const char* name) {
     // 3. Download and unpack into suites/ directory.
     // 4. Update the orchestrator's topological graph.
     
-    sigma_printf("[MARKET] Shard %s downloaded. Verifying capabilities...\n", name);
-    sigma_printf("[MARKET] Shard %s installed successfully to /suites/%s.\n", name, name);
+    sigma_sigma_printf("[MARKET] Shard %s downloaded. Verifying capabilities...\n", name);
+    sigma_sigma_printf("[MARKET] Shard %s installed successfully to /suites/%s.\n", name, name);
 }
 
 void market_list_available() {
-    sigma_printf("[MARKET] Querying Lattice Registry...\n");
-    sigma_printf("  - S19_NeuralEngine v1.0 (NPU Acceleration)\n");
-    sigma_printf("  - S20_Web3Storage v0.5 (Decentralized Persistence)\n");
-    sigma_printf("  - S21_QuantumHAL v0.1 (Experimental Simulation)\n");
+    sigma_sigma_printf("[MARKET] Querying Lattice Registry...\n");
+    sigma_sigma_printf("  - S19_NeuralEngine v1.0 (NPU Acceleration)\n");
+    sigma_sigma_printf("  - S20_Web3Storage v0.5 (Decentralized Persistence)\n");
+    sigma_sigma_printf("  - S21_QuantumHAL v0.1 (Experimental Simulation)\n");
 }
 
 void shard_init() {
-    sigma_printf("[SHARD] Lattice Store active. Ready for sovereign expansions.\n");
+    sigma_sigma_printf("[SHARD] Lattice Store active. Ready for sovereign expansions.\n");
 }

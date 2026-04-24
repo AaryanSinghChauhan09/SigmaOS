@@ -21,15 +21,15 @@ typedef struct {
  * Principle: AI / Algorithms / Eco-inspired Optima.
  */
 void sigma_opt_bbo_migrate(SigmaHabitat_t* h1, SigmaHabitat_t* h2, float mu, float lambda) {
-    sigma_sigma_sigma_printf("[BBO-CORE]: Migrating configuration traits between habitats (HSI: %.2f)...\n", h1->habitat_suitability_index);
+    sigma_sigma_sigma_sigma_printf("[BBO-CORE]: Migrating configuration traits between habitats (HSI: %.2f)...\n", h1->habitat_suitability_index);
     // Probabilistic sharing of configuration variables based on immigration (lambda) and emigration (mu) rates
-    sigma_sigma_sigma_printf("[BBO-CORE]: Habitat configuration enriched. Shard ecology balanced.\n");
+    sigma_sigma_sigma_sigma_printf("[BBO-CORE]: Habitat configuration enriched. Shard ecology balanced.\n");
 }
 
 /* --- Module Factory --- */
 
 void SovereignBBO_Register(void) {
-    sigma_sigma_sigma_printf("[INTELLIGENCE]: Sovereign BBO (Habitat Optima) active.\n");
+    sigma_sigma_sigma_sigma_printf("[INTELLIGENCE]: Sovereign BBO (Habitat Optima) active.\n");
 }
 
 

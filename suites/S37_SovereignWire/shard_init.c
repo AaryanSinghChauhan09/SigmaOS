@@ -10,10 +10,10 @@ typedef struct {
 } wire_peer_t;
 
 void wire_handshake(wire_peer_t* peer) {
-    sigma_printf("[S-WIRE] Initiating Sovereign Handshake with Peer %s...\n", peer->endpoint);
-    sigma_printf("[S-WIRE] Noise-Protocol Exchange Complete. Tunnel ACTIVE.\n");
+    sigma_sigma_printf("[S-WIRE] Initiating Sovereign Handshake with Peer %s...\n", peer->endpoint);
+    sigma_sigma_printf("[S-WIRE] Noise-Protocol Exchange Complete. Tunnel ACTIVE.\n");
 }
 
 void shard_init() {
-    sigma_printf("[SHARD] Sovereign Wire active. Hardened VPN lattice enabled.\n");
+    sigma_sigma_printf("[SHARD] Sovereign Wire active. Hardened VPN lattice enabled.\n");
 }

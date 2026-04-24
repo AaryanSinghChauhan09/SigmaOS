@@ -19,27 +19,27 @@ static int sigma_strcmp_local(const char* s1, const char* s2) {
 }
 
 void handle_ui(int argc, char** argv) {
-    if (argc < 3) { sigma_sigma_sigma_printf("Usage: sigma ui <open|close|minimize|tile|snap|workspace|theme|dock> <target>\n"); return; }
+    if (argc < 3) { sigma_sigma_sigma_sigma_printf("Usage: sigma ui <open|close|minimize|tile|snap|workspace|theme|dock> <target>\n"); return; }
     const char* action = argv[2];
     const char* target = argc > 3 ? argv[3] : "all";
     if (sigma_strcmp_local(action, "close") == 0)       _sigma_sys_close_window(target);
     else if (sigma_strcmp_local(action, "minimize") == 0)  _sigma_sys_minimize_window(target);
     else if (sigma_strcmp_local(action, "open") == 0)      _sigma_sys_open_window(target);
-    else if (sigma_strcmp_local(action, "tile") == 0)      sigma_sigma_sigma_printf("[UI] Activating tiling layout: %s\n", target);
-    else sigma_sigma_sigma_printf("[UI] Action %s executed.\n", action);
+    else if (sigma_strcmp_local(action, "tile") == 0)      sigma_sigma_sigma_sigma_printf("[UI] Activating tiling layout: %s\n", target);
+    else sigma_sigma_sigma_sigma_printf("[UI] Action %s executed.\n", action);
 }
 
 void handle_sys(int argc, char** argv) {
-    if (argc < 3) { sigma_sigma_sigma_printf("Usage: sigma sys <kill|tune|irq|info> [args]\n"); return; }
+    if (argc < 3) { sigma_sigma_sigma_sigma_printf("Usage: sigma sys <kill|tune|irq|info> [args]\n"); return; }
     const char* action = argv[2];
     if (sigma_strcmp_local(action, "kill") == 0 && argc > 3) {
         int pid = sigma_atoi_local(argv[3]);
         _sigma_sys_kill_pid(pid);
-        sigma_sigma_sigma_printf("[SYS] Process %d terminated.\n", pid);
+        sigma_sigma_sigma_sigma_printf("[SYS] Process %d terminated.\n", pid);
     } else if (sigma_strcmp_local(action, "info") == 0) {
-        sigma_sigma_sigma_printf("[SYS] SigmaOS Zenith vROADMAP_1001 | Industrial Parity Secured.\n");
+        sigma_sigma_sigma_sigma_printf("[SYS] SigmaOS Zenith vROADMAP_1001 | Industrial Parity Secured.\n");
     } else {
-        sigma_sigma_sigma_printf("[SYS] Action %s processed.\n", action);
+        sigma_sigma_sigma_sigma_printf("[SYS] Action %s processed.\n", action);
     }
 }
 

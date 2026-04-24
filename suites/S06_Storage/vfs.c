@@ -91,7 +91,7 @@ static SigmaVFS g_vfs;
 extern void*  sigma_malloc(usize size);
 extern void   sigma_free_sz(void* ptr, usize size);
 extern u64    timer_get_ns(void);
-extern void   kprintf(const char* fmt, ...);
+extern void   ksigma_printf(const char* fmt, ...);
 
 /* =========================================================================
  * Internal: inode allocation
@@ -223,7 +223,7 @@ void vfs_init(void) {
     }
     dentry_add(sigma_ino, "config", cfg->ino);
 
-    kprintf("[VFS]: ramfs mounted at /. Inodes=%llu Dentries=%llu\n",
+    ksigma_printf("[VFS]: ramfs mounted at /. Inodes=%llu Dentries=%llu\n",
             g_vfs.next_ino, (u64)g_vfs.dentry_count);
 }
 
@@ -365,7 +365,7 @@ i32 vfs_stat(const char* path, VFileStat* st) {
 }
 
 void vfs_audit(void) {
-    kprintf("[VFS]: Inodes=%llu | Dentries=%llu | Reads=%llu | Writes=%llu\n",
+    ksigma_printf("[VFS]: Inodes=%llu | Dentries=%llu | Reads=%llu | Writes=%llu\n",
             g_vfs.next_ino, (u64)g_vfs.dentry_count,
             g_vfs.total_reads, g_vfs.total_writes);
 }

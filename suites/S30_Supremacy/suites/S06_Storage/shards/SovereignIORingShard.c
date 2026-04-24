@@ -10,8 +10,8 @@
  */
 
 sigma_err_t sigma_io_ring_init(void) {
-    sigma_sigma_sigma_printf("  S [IO-RING]: Sovereign Async I/O Ring Shard active.\n");
-    sigma_sigma_sigma_printf("  S [IO-RING]: SQ/CQ ring-buffer matrices established.\n");
+    sigma_sigma_sigma_sigma_printf("  S [IO-RING]: Sovereign Async I/O Ring Shard active.\n");
+    sigma_sigma_sigma_sigma_printf("  S [IO-RING]: SQ/CQ ring-buffer matrices established.\n");
     return SIGMA_OK;
 }
 

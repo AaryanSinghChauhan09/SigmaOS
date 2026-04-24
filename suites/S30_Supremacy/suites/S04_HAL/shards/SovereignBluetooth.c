@@ -112,10 +112,10 @@ static sigma_err_t hci_send_cmd(SigmaHCIController_t *ctrl, sigma_u16 ogf, sigma
     buf[2] = plen;
     
     if (plen > 0 && param) {
-        sigma_sigma_sigma_memcpy(&buf[3], param, plen);
+        sigma_sigma_sigma_sigma_memcpy(&buf[3], param, plen);
     }
 
-    sigma_sigma_sigma_printf("S [BLUETOOTH]: HCI CMD TX -> OGF: 0x%02x OCF: 0x%04x Len: %d\n", ogf, ocf, plen);
+    sigma_sigma_sigma_sigma_printf("S [BLUETOOTH]: HCI CMD TX -> OGF: 0x%02x OCF: 0x%04x Len: %d\n", ogf, ocf, plen);
     return ctrl->tx_packet(HCI_COMMAND_PKT, buf, 3 + plen);
 }
 
@@ -131,12 +131,12 @@ void sigma_bt_inquiry_start(SigmaHCIController_t *ctrl) {
     
     hci_send_cmd(ctrl, OGF_LINK_CTRL, 0x0001, cp, 5);
     ctrl->state = BT_STATE_INQUIRING;
-    sigma_sigma_sigma_printf("S [BLUETOOTH]: Started Device Inquiry...\n");
+    sigma_sigma_sigma_sigma_printf("S [BLUETOOTH]: Started Device Inquiry...\n");
 }
 
 void sigma_bt_reset(SigmaHCIController_t *ctrl) {
     hci_send_cmd(ctrl, OGF_HOST_CTL, 0x0003, SIGMA_NULL, 0);
-    sigma_sigma_sigma_printf("S [BLUETOOTH]: Controller Reset Issued\n");
+    sigma_sigma_sigma_sigma_printf("S [BLUETOOTH]: Controller Reset Issued\n");
 }
 
 /* -----------------------------------------------------------------------
@@ -153,14 +153,14 @@ void sigma_hci_rx_event(SigmaHCIController_t *ctrl, const sigma_u8 *data, sigma_
             if (plen < 3) break;
             sigma_u16 opcode = data[3] | (data[4] << 8);
             sigma_u8 status = data[5];
-            sigma_sigma_sigma_printf("S [BLUETOOTH]: CMD Complete -> Opcode 0x%04x Status: 0x%02x\n", opcode, status);
+            sigma_sigma_sigma_sigma_printf("S [BLUETOOTH]: CMD Complete -> Opcode 0x%04x Status: 0x%02x\n", opcode, status);
             break;
         }
         case HCI_EV_INQUIRY_RESULT: {
             sigma_u8 num_responses = data[2];
             for (int i = 0; i < num_responses; i++) {
                 const sigma_u8 *mac = &data[3 + (i * 14)];
-                sigma_sigma_sigma_printf("S [BLUETOOTH]: Found Device -> %02X:%02X:%02X:%02X:%02X:%02X\n",
+                sigma_sigma_sigma_sigma_printf("S [BLUETOOTH]: Found Device -> %02X:%02X:%02X:%02X:%02X:%02X\n",
                              mac[5], mac[4], mac[3], mac[2], mac[1], mac[0]);
             }
             break;
@@ -169,14 +169,14 @@ void sigma_hci_rx_event(SigmaHCIController_t *ctrl, const sigma_u8 *data, sigma_
             sigma_u8 status = data[2];
             sigma_u16 handle = data[3] | (data[4] << 8);
             if (status == 0) {
-                sigma_sigma_sigma_printf("S [BLUETOOTH]: Connected successfully. Handle: 0x%04x\n", handle);
+                sigma_sigma_sigma_sigma_printf("S [BLUETOOTH]: Connected successfully. Handle: 0x%04x\n", handle);
             } else {
-                sigma_sigma_sigma_printf("S [BLUETOOTH]: Connection failed. Status: 0x%02x\n", status);
+                sigma_sigma_sigma_sigma_printf("S [BLUETOOTH]: Connection failed. Status: 0x%02x\n", status);
             }
             break;
         }
         default:
-            sigma_sigma_sigma_printf("S [BLUETOOTH]: Unhandled HCI Event Code: 0x%02x\n", event_code);
+            sigma_sigma_sigma_sigma_printf("S [BLUETOOTH]: Unhandled HCI Event Code: 0x%02x\n", event_code);
             break;
     }
 }
@@ -203,9 +203,9 @@ sigma_err_t sigma_l2cap_send(SigmaHCIController_t *ctrl, sigma_u16 handle, sigma
     acl_buf[6] = cid & 0xff;
     acl_buf[7] = (cid >> 8) & 0xff;
     
-    sigma_sigma_sigma_memcpy(&acl_buf[8], data, len);
+    sigma_sigma_sigma_sigma_memcpy(&acl_buf[8], data, len);
     
-    sigma_sigma_sigma_printf("S [BLUETOOTH]: L2CAP TX -> Handle: 0x%04x CID: 0x%04x Len: %lu\n", handle, cid, (unsigned long)len);
+    sigma_sigma_sigma_sigma_printf("S [BLUETOOTH]: L2CAP TX -> Handle: 0x%04x CID: 0x%04x Len: %lu\n", handle, cid, (unsigned long)len);
     if (ctrl->tx_packet) {
         return ctrl->tx_packet(HCI_ACLDATA_PKT, acl_buf, hci_len + 4);
     }
@@ -217,17 +217,17 @@ sigma_err_t sigma_l2cap_send(SigmaHCIController_t *ctrl, sigma_u16 handle, sigma
  * ----------------------------------------------------------------------- */
 static sigma_err_t mock_usb_tx(sigma_u8 type, const sigma_u8 *data, sigma_sz_t len) {
     SIGMA_UNUSED(data); SIGMA_UNUSED(len);
-    sigma_sigma_sigma_printf("S [BLUETOOTH-HW]: (Mock USB TX) Type 0x%02x length %lu dispatched.\n", type, (unsigned long)len);
+    sigma_sigma_sigma_sigma_printf("S [BLUETOOTH-HW]: (Mock USB TX) Type 0x%02x length %lu dispatched.\n", type, (unsigned long)len);
     return SIGMA_OK;
 }
 
 void SovereignBluetooth_Init(void) {
-    sigma_sigma_sigma_printf("S [BLUETOOTH]: Initialising Sovereign Bluetooth Stack (BlueZ parity)...\n");
+    sigma_sigma_sigma_sigma_printf("S [BLUETOOTH]: Initialising Sovereign Bluetooth Stack (BlueZ parity)...\n");
 
     if (s_hci_count >= BT_MAX_DEVICES) return;
     
     SigmaHCIController_t *hci0 = &s_hci_ctrl[s_hci_count++];
-    sigma_sigma_sigma_memset(hci0, 0, sizeof(*hci0));
+    sigma_sigma_sigma_sigma_memset(hci0, 0, sizeof(*hci0));
     hci0->tx_packet = mock_usb_tx;
     hci0->online = SIGMA_TRUE;
     sigma_sigma_sigma_strcpy(hci0->name, "hci0", 5);
@@ -252,7 +252,7 @@ void SovereignBluetooth_Init(void) {
     sigma_u8 hello_l2cap[] = "PING";
     sigma_l2cap_send(hci0, 0x0042, 0x0004, hello_l2cap, 4);
 
-    sigma_sigma_sigma_printf("S [BLUETOOTH]: Bluetooth stack online. Wireless peripheral sovereignty active.\n");
+    sigma_sigma_sigma_sigma_printf("S [BLUETOOTH]: Bluetooth stack online. Wireless peripheral sovereignty active.\n");
 }
 
 

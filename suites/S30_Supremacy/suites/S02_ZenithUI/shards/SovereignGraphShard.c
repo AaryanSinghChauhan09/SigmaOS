@@ -55,7 +55,7 @@ void sigma_graph_dijkstra(SigmaGraph_t* g, int start_node, int* dist) {
 /* --- Module Factory --- */
 
 void SovereignGraph_Register(void) {
-    sigma_sigma_sigma_printf("[ALGO]: Sovereign Graph Engine (Dijkstra) seeded.\n");
+    sigma_sigma_sigma_sigma_printf("[ALGO]: Sovereign Graph Engine (Dijkstra) seeded.\n");
 }
 
 

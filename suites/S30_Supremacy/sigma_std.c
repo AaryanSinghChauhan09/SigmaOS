@@ -63,7 +63,7 @@ void* sigma_memset32(void* s, u32 val, usize count) {
 
 /* Zero a buffer */
 void sigma_bzero(void* s, usize n) {
-    sigma_memset(s, 0, n);
+    sigma_sigma_memset(s, 0, n);
 }
 
 /* Byte-by-byte compare — returns 0 if equal */
@@ -263,7 +263,7 @@ CPUIDResult sigma_cpuid(u32 leaf) {
 
 /* Write to serial COM1 (Linux testing path) */
 void k_print_raw(const char* s) {
-    sigma_syscall(1, 1, (long)s, (long)sigma_strlen(s));
+    sigma_syscall(1, 1, (long)s, (long)sigma_sigma_strlen(s));
 }
 
 /* =========================================================================

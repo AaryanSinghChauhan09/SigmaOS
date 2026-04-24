@@ -127,7 +127,7 @@ static CameraDevice g_camera;
 /* =========================================================================
  * External dependencies (kernel functions)
  * ========================================================================= */
-extern void   kprintf(const char* fmt, ...);
+extern void   ksigma_printf(const char* fmt, ...);
 extern u64    os_get_timestamp_ns(void);
 
 /* =========================================================================
@@ -241,7 +241,7 @@ static void filter_engine_init(FilterEngine* fe) {
         0, 0, FIXED(-1),
         FIXED(255));
 
-    kprintf("[CAMERA-FILTER-ENGINE]: %u sovereign filters online.\n", fe->count);
+    ksigma_printf("[CAMERA-FILTER-ENGINE]: %u sovereign filters online.\n", fe->count);
 }
 
 /* =========================================================================
@@ -367,8 +367,8 @@ void camera_init(void) {
     g_camera.total_frames  = 0;
     g_camera.initialised   = TRUE;
 
-    kprintf("[CAMERA-SHARD]: Sovereign Camera Shard v3.0 Online.\n");
-    kprintf("[CAMERA-SHARD]: Resolution %ux%u | Filters: %u | BSA-Evidence: ENABLED.\n",
+    ksigma_printf("[CAMERA-SHARD]: Sovereign Camera Shard v3.0 Online.\n");
+    ksigma_printf("[CAMERA-SHARD]: Resolution %ux%u | Filters: %u | BSA-Evidence: ENABLED.\n",
             CAMERA_DEF_WIDTH, CAMERA_DEF_HEIGHT, g_camera.filter_engine.count);
 }
 
@@ -413,7 +413,7 @@ k_status camera_capture_frame(void* external_buffer) {
         g_camera.session.frames_captured++;
     }
 
-    kprintf("[CAMERA-SHARD]: Frame #%u captured | Hash=0x%08x | TS=%llu ns\n",
+    ksigma_printf("[CAMERA-SHARD]: Frame #%u captured | Hash=0x%08x | TS=%llu ns\n",
             f->seq_num, f->hash_fnv1a, f->timestamp_ns);
     return K_OK;
 }
@@ -442,13 +442,13 @@ k_status camera_apply_filter(void* frame_ptr, const char* filter_name) {
                 /* Re-hash frame after filtering — BSA integrity update */
                 f->hash_fnv1a = sigma_fnv1a(f->data, CAMERA_FRAME_BUFSIZE);
                 eventbus_push(&g_camera.event_bus, SCRATCH_EVT_FILTER, i, f->hash_fnv1a);
-                kprintf("[CAMERA-SHARD]: Filter '%s' applied | New Hash=0x%08x\n",
+                ksigma_printf("[CAMERA-SHARD]: Filter '%s' applied | New Hash=0x%08x\n",
                         filter_name, f->hash_fnv1a);
             }
             return res;
         }
     }
-    kprintf("[CAMERA-SHARD]: Filter '%s' not found!\n", filter_name);
+    ksigma_printf("[CAMERA-SHARD]: Filter '%s' not found!\n", filter_name);
     return K_ERR_INVAL;
 }
 
@@ -468,21 +468,21 @@ k_status camera_scratch_trigger(u32 event_id) {
             break;
         case 2: /* FORENSIC EXPORT BLOCK */
             eventbus_push(&g_camera.event_bus, SCRATCH_EVT_FORENSIC, event_id, 0);
-            kprintf("[CAMERA-SCRATCH]: Forensic Export Block executed. Hash=0x%08x\n",
+            ksigma_printf("[CAMERA-SCRATCH]: Forensic Export Block executed. Hash=0x%08x\n",
                     g_camera.current_frame.hash_fnv1a);
             break;
         case 3: /* EDGE DETECTION BLOCK */
             camera_apply_filter(NULL, "EDGE_DETECTION");
             break;
         case 4: /* BSA SEC 63 CERTIFICATE BLOCK */
-            kprintf("[CAMERA-SCRATCH]: BSA Sec 63 Certificate — Frame #%u | Hash=0x%08x | TS=%llu\n",
+            ksigma_printf("[CAMERA-SCRATCH]: BSA Sec 63 Certificate — Frame #%u | Hash=0x%08x | TS=%llu\n",
                     g_camera.current_frame.seq_num,
                     g_camera.current_frame.hash_fnv1a,
                     g_camera.current_frame.timestamp_ns);
             break;
         default:
             eventbus_push(&g_camera.event_bus, SCRATCH_EVT_CUSTOM, event_id, 0);
-            kprintf("[CAMERA-SCRATCH]: Custom Block [ID:%u] executed.\n", event_id);
+            ksigma_printf("[CAMERA-SCRATCH]: Custom Block [ID:%u] executed.\n", event_id);
             break;
     }
     return K_OK;
@@ -499,7 +499,7 @@ k_status camera_forensic_session_start(const char* evidence_tag) {
     g_camera.session.active          = TRUE;
     if (evidence_tag)
         cam_strncpy(g_camera.session.evidence_tag, evidence_tag, 47);
-    kprintf("[CAMERA-FORENSIC]: Session '%s' STARTED.\n", g_camera.session.evidence_tag);
+    ksigma_printf("[CAMERA-FORENSIC]: Session '%s' STARTED.\n", g_camera.session.evidence_tag);
     return K_OK;
 }
 
@@ -507,7 +507,7 @@ k_status camera_forensic_session_stop(void) {
     if (!g_camera.initialised || !g_camera.session.active) return K_ERR_INVAL;
     g_camera.session.end_ns   = os_get_timestamp_ns();
     g_camera.session.active   = FALSE;
-    kprintf("[CAMERA-FORENSIC]: Session '%s' CLOSED. Frames=%u | Duration=%llu ms\n",
+    ksigma_printf("[CAMERA-FORENSIC]: Session '%s' CLOSED. Frames=%u | Duration=%llu ms\n",
             g_camera.session.evidence_tag,
             g_camera.session.frames_captured,
             (g_camera.session.end_ns - g_camera.session.start_ns) / 1000000ULL);
@@ -518,11 +518,11 @@ k_status camera_forensic_session_stop(void) {
  * Public API — camera_list_filters
  * ========================================================================= */
 void camera_list_filters(void) {
-    kprintf("[CAMERA-SHARD]: Available Filters:\n");
+    ksigma_printf("[CAMERA-SHARD]: Available Filters:\n");
     u32 i;
     for (i = 0; i < g_camera.filter_engine.count; i++) {
         char marker = (g_camera.filter_engine.active_filter == i) ? '*' : ' ';
-        kprintf("  [%c%u] %s\n", marker, i, g_camera.filter_engine.kernels[i].name);
+        ksigma_printf("  [%c%u] %s\n", marker, i, g_camera.filter_engine.kernels[i].name);
     }
 }
 
@@ -532,7 +532,7 @@ void camera_list_filters(void) {
 void camera_process_events(void) {
     ScratchEvent e;
     while (eventbus_pop(&g_camera.event_bus, &e)) {
-        kprintf("[CAMERA-EVT]: type=%u id=%u ts=%llu\n",
+        ksigma_printf("[CAMERA-EVT]: type=%u id=%u ts=%llu\n",
                 (u32)e.type, e.id, e.timestamp_ns);
     }
 }

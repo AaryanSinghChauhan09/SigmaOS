@@ -25,7 +25,7 @@
 #define RTC_REG_STATUS 0x0Au  /* Status register A */
 #define RTC_REG_B      0x0Bu  /* Status register B */
 
-extern void kprintf(const char *fmt, ...);
+extern void ksigma_printf(const char *fmt, ...);
 
 /* =========================================================================
  * RTC State
@@ -102,7 +102,7 @@ const SigmaRTCTime *rtc_read_time(void) {
  * ========================================================================= */
 void rtc_init(void) {
     const SigmaRTCTime *t = rtc_read_time();
-    kprintf("[RTC]: CMOS RTC online. Date: %04u-%02u-%02u  Time: %02u:%02u:%02u\n",
+    ksigma_printf("[RTC]: CMOS RTC online. Date: %04u-%02u-%02u  Time: %02u:%02u:%02u\n",
             (u32)t->year, (u32)t->month, (u32)t->day,
             (u32)t->hour, (u32)t->min,   (u32)t->sec);
 }
@@ -121,7 +121,7 @@ u64 rtc_uptime_seconds(void) {
  * ========================================================================= */
 void rtc_audit(void) {
     const SigmaRTCTime *t = rtc_read_time();
-    kprintf("[RTC]: Current time: %04u-%02u-%02u %02u:%02u:%02u | Uptime: %llu s\n",
+    ksigma_printf("[RTC]: Current time: %04u-%02u-%02u %02u:%02u:%02u | Uptime: %llu s\n",
             (u32)t->year, (u32)t->month, (u32)t->day,
             (u32)t->hour, (u32)t->min,   (u32)t->sec,
             rtc_uptime_seconds());

@@ -42,8 +42,8 @@ class WaveShard : public IShardProcess {
 public:
     WaveShard() : IShardProcess("WAVE_INTERFERENCE") {}
     void Execute() override {
-        sigma_printf("[KERNEL/WAVE]: Projecting Superposition of Shard-A + Shard-B...\n");
-        sigma_printf("[KERNEL/WAVE]: Constructive Interference peak identified at Shard-Center.\n");
+        sigma_sigma_printf("[KERNEL/WAVE]: Projecting Superposition of Shard-A + Shard-B...\n");
+        sigma_sigma_printf("[KERNEL/WAVE]: Constructive Interference peak identified at Shard-Center.\n");
     }
 };
 
@@ -52,8 +52,8 @@ class HeartShard : public IShardProcess {
 public:
     HeartShard() : IShardProcess("DOUBLE_CIRCULATION") {}
     void Execute() override {
-        sigma_printf("[KERNEL/BIO]: Executing Systemic & Pulmonary Shard-Circuit...\n");
-        sigma_printf("[KERNEL/BIO]: O2-Rich Shard flux detected in Left Ventricle.\n");
+        sigma_sigma_printf("[KERNEL/BIO]: Executing Systemic & Pulmonary Shard-Circuit...\n");
+        sigma_sigma_printf("[KERNEL/BIO]: O2-Rich Shard flux detected in Left Ventricle.\n");
     }
 };
 
@@ -63,8 +63,8 @@ public:
     GasShard() : IShardProcess("IDEAL_GAS_LAW") {}
     void Execute() override {
         // Primitive printf doesn't support floating point easily, using fixed-point representation or just symbols
-        sigma_printf("[KERNEL/CHEM]: Validating PV = nRT Shard...\n");
-        sigma_printf("[KERNEL/CHEM]: Result: (P*V)/(n*T) = 0.0821 (R-Parity Confirmed).\n");
+        sigma_sigma_printf("[KERNEL/CHEM]: Validating PV = nRT Shard...\n");
+        sigma_sigma_printf("[KERNEL/CHEM]: Result: (P*V)/(n*T) = 0.0821 (R-Parity Confirmed).\n");
     }
 };
 
@@ -90,12 +90,12 @@ public:
     }
 
     void ExecuteAll() {
-        sigma_printf("\n--- Σ SIGMA OS KERNEL SCHEDULER INITIATED ---\n");
+        sigma_sigma_printf("\n--- Σ SIGMA OS KERNEL SCHEDULER INITIATED ---\n");
         for (unsigned int i = 0; i < m_count; i++) {
             unsigned int idx = (m_head + i) % 32;
             IShardProcess* shard = m_queue[idx];
             
-            sigma_printf("\n[SCHEDULER]: Dispatching Shard-Process: %s\n", shard->GetName());
+            sigma_sigma_printf("\n[SCHEDULER]: Dispatching Shard-Process: %s\n", shard->GetName());
             
             shard->SetState(ShardState::RUNNING);
             shard->Execute();
@@ -118,7 +118,7 @@ extern "C" void kernel_main() {
 
     scheduler.ExecuteAll();
 
-    sigma_printf("\n[SUCCESS]: Kernel Zenith Shards Executed. Zero Simulations detected.\n");
+    sigma_sigma_printf("\n[SUCCESS]: Kernel Zenith Shards Executed. Zero Simulations detected.\n");
 }
 
 int main() {

@@ -30,7 +30,7 @@ static u32 g_mod_count = 0;
 
 void mod_loader_init(void) {
     for (int i = 0; i < MAX_LOADED_MODULES; i++) g_modules[i].loaded = FALSE;
-    // kprintf("[MOD-LOADER]: Sovereign Module Expansion Shard Online.\n");
+    // ksigma_printf("[MOD-LOADER]: Sovereign Module Expansion Shard Online.\n");
 }
 
 k_status ins_shard(const char* name, void* elf_data, usize size) {
@@ -48,7 +48,7 @@ k_status ins_shard(const char* name, void* elf_data, usize size) {
     m->size      = size;
     m->loaded    = TRUE;
     
-    // kprintf("[MOD-LOADER]: Shard Module Injected: %s @ %p\n", name, elf_data);
+    // ksigma_printf("[MOD-LOADER]: Shard Module Injected: %s @ %p\n", name, elf_data);
     return K_OK;
 }
 
@@ -59,7 +59,7 @@ k_status rm_shard(const char* name) {
         while (name[j] && g_modules[i].name[j]) { if (name[j] != g_modules[i].name[j]) { match = FALSE; break; } j++; }
         if (match && g_modules[i].loaded) {
             g_modules[i].loaded = FALSE;
-            // kprintf("[MOD-LOADER]: Shard Module Evicted: %s\n", name);
+            // ksigma_printf("[MOD-LOADER]: Shard Module Evicted: %s\n", name);
             return K_OK;
         }
     }

@@ -12,21 +12,21 @@
 #include "sigma_libc.h"
 
 void sync_suite_docs(void) {
-    sigma_printf("[wiki] Scanning 30 Master Sovereign Suites...\n");
+    sigma_sigma_printf("[wiki] Scanning 30 Master Sovereign Suites...\n");
     // Implementation: Parse Sovereign attribution headers
 }
 
 void build_master_index(void) {
-    sigma_printf("[wiki] Rebuilding SUPREMACY_30_INDEX.md...\n");
+    sigma_sigma_printf("[wiki] Rebuilding SUPREMACY_30_INDEX.md...\n");
 }
 
 int main() {
-    sigma_printf("SigmaOS Sovereign Wiki Syncer v2.0 (Native C)\n");
-    sigma_printf("============================================\n");
+    sigma_sigma_printf("SigmaOS Sovereign Wiki Syncer v2.0 (Native C)\n");
+    sigma_sigma_printf("============================================\n");
 
     sync_suite_docs();
     build_master_index();
 
-    sigma_printf("\nWiki synchronization successful. Registry updated.\n");
+    sigma_sigma_printf("\nWiki synchronization successful. Registry updated.\n");
     return 0;
 }

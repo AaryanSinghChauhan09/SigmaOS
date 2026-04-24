@@ -290,7 +290,7 @@ void ipc_init(void) {
     for (i = 0; i < SHM_MAX; i++)   g_shm[i].valid     = FALSE;
     for (i = 0; i < FUTEX_MAX; i++) g_futexes[i].valid = FALSE;
 
-    extern void kprintf(const char* fmt, ...);
-    kprintf("[IPC]: Pipes(%u) | MQueues(%u) | SHM(%u) | Futexes(%u) online.\n",
+    extern void ksigma_printf(const char* fmt, ...);
+    ksigma_printf("[IPC]: Pipes(%u) | MQueues(%u) | SHM(%u) | Futexes(%u) online.\n",
             PIPE_MAX, MQ_MAX, SHM_MAX, FUTEX_MAX);
 }

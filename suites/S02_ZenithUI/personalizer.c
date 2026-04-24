@@ -30,7 +30,7 @@ static u32 g_identity_count = 0;
 
 void personalizer_init(void) {
     for (int i = 0; i < MAX_PERSONALITIES; i++) g_identities[i].active = FALSE;
-    // kprintf("[PERSONALIZER]: Sovereign Customisation & Identity Shard Online.\n");
+    // ksigma_printf("[PERSONALIZER]: Sovereign Customisation & Identity Shard Online.\n");
 }
 
 void register_identity(const char* tag, u32 color) {
@@ -45,7 +45,7 @@ void register_identity(const char* tag, u32 color) {
     id->user_tag[i] = '\0';
     id->active = TRUE;
     
-    // kprintf("[PERSONALIZER]: Sovereign-ID Registered: %s (Theme: 0x%x)\n", 
+    // ksigma_printf("[PERSONALIZER]: Sovereign-ID Registered: %s (Theme: 0x%x)\n", 
     //         tag, color);
 }
 

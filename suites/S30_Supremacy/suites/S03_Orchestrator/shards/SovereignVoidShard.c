@@ -10,8 +10,8 @@
  */
 
 sigma_err_t sigma_void_init(void) {
-    sigma_sigma_sigma_printf("  S [AMAL-VOID]: Absorbing Void Linux USPs (Runit/XBPS)...\n");
-    sigma_sigma_sigma_printf("  S [AMAL-VOID]: Parallel service supervision engine: ACTIVE.\n");
+    sigma_sigma_sigma_sigma_printf("  S [AMAL-VOID]: Absorbing Void Linux USPs (Runit/XBPS)...\n");
+    sigma_sigma_sigma_sigma_printf("  S [AMAL-VOID]: Parallel service supervision engine: ACTIVE.\n");
     return SIGMA_OK;
 }
 

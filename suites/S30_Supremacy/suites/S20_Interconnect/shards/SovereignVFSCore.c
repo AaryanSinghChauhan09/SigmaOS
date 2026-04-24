@@ -20,7 +20,7 @@ static sigma_u32 g_mount_count = 0;
 
 void Sovereign_VFS_Init(void) {
     g_mount_count = 0;
-    sigma_sigma_sigma_printf("S [S20]: Sovereign Global VFS active. Root path '/' signaled.\n");
+    sigma_sigma_sigma_sigma_printf("S [S20]: Sovereign Global VFS active. Root path '/' signaled.\n");
 }
 
 sigma_err_t Sovereign_VFS_Mount(const char* path, SovereignMountPoint* mp) {
@@ -31,10 +31,10 @@ sigma_err_t Sovereign_VFS_Mount(const char* path, SovereignMountPoint* mp) {
     g_mounts[g_mount_count].write = mp->write;
     
     g_mount_count++;
-    sigma_sigma_sigma_printf("S [S20]: Mounted Sovereign Shard at '%s'\n", path);
+    sigma_sigma_sigma_sigma_printf("S [S20]: Mounted Sovereign Shard at '%s'\n", path);
     return SIGMA_OK;
 }
 
 void Sovereign_VFS_Open(const char* path) {
-    sigma_sigma_sigma_printf("S [S20]: VFS Open: %s\n", path);
+    sigma_sigma_sigma_sigma_printf("S [S20]: VFS Open: %s\n", path);
 }

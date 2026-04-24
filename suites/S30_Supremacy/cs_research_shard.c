@@ -24,7 +24,7 @@ typedef struct ResearchPaperShard {
  * ========================================================================= */
 
 void cs_research_init(void) {
-    // kprintf("[CS-RESEARCH]: Sovereign Academic-Research Shard Online.\n");
+    // ksigma_printf("[CS-RESEARCH]: Sovereign Academic-Research Shard Online.\n");
 }
 
 k_status research_index_paper(const char* title, const char* doi) {
@@ -32,7 +32,7 @@ k_status research_index_paper(const char* title, const char* doi) {
      * Absorb CS Researcher USP: Silicon-Direct Paper Indexing.
      * In a sharded model: index academic metadata directly on silicon shards.
      */
-    // kprintf("[CS-RESEARCH]: Industrial Pulse: Paper indexed: %s\n", title);
+    // ksigma_printf("[CS-RESEARCH]: Industrial Pulse: Paper indexed: %s\n", title);
     return K_OK;
 }
 
@@ -41,6 +41,6 @@ k_status research_audit_complexity(void* shard_ptr) {
      * Absorb Computer Scientist USP: Kernel-Native Complexity Audit.
      * Perform $O(log n)$ complexity analysis on a sharded algorithm pulse.
      */
-    // kprintf("[CS-RESEARCH]: Industrial Pulse: Algorithmic complexity verified: O(log N)\n");
+    // ksigma_printf("[CS-RESEARCH]: Industrial Pulse: Algorithmic complexity verified: O(log N)\n");
     return K_OK;
 }

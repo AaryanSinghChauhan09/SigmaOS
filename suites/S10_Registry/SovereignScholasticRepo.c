@@ -32,8 +32,8 @@ public:
     void Execute() override {
         double mass = 1.0, c = 3.0e8;
         double E = mass * c * c;
-        sigma_printf("[PHYSICS/REPO]: Concept: Mass-Energy Parity (E=mc^2).\n");
-        sigma_printf("[PHYSICS/REPO]: Energy Shard: " << E << " Joules.\n");
+        sigma_sigma_printf("[PHYSICS/REPO]: Concept: Mass-Energy Parity (E=mc^2).\n");
+        sigma_sigma_printf("[PHYSICS/REPO]: Energy Shard: " << E << " Joules.\n");
     }
 };
 
@@ -43,8 +43,8 @@ public:
     void Execute() override {
         double I = 2.0, R = 5.0;
         double V = I * R;
-        sigma_printf("[PHYSICS/REPO]: Concept: Ohm's Law (V=IR).\n");
-        sigma_printf("[PHYSICS/REPO]: Voltage Shard: " << V << " Volts.\n");
+        sigma_sigma_printf("[PHYSICS/REPO]: Concept: Ohm's Law (V=IR).\n");
+        sigma_sigma_printf("[PHYSICS/REPO]: Voltage Shard: " << V << " Volts.\n");
     }
 };
 
@@ -54,8 +54,8 @@ public:
     void Execute() override {
         double mass = 44.0, molar_mass = 44.01; // CO2
         double moles = mass / molar_mass;
-        sigma_printf("[CHEMISTRY/REPO]: Concept: Stoichiometry (Mole Sharding).\n");
-        sigma_printf("[CHEMISTRY/REPO]: Sample (CO2, 44g): " << moles << " Moles.\n");
+        sigma_sigma_printf("[CHEMISTRY/REPO]: Concept: Stoichiometry (Mole Sharding).\n");
+        sigma_sigma_printf("[CHEMISTRY/REPO]: Sample (CO2, 44g): " << moles << " Moles.\n");
     }
 };
 
@@ -63,8 +63,8 @@ public:
 class GeneticsShard : public IScholasticShard {
 public:
     void Execute() override {
-        sigma_printf("[BIOLOGY/REPO]: Concept: Mendelian Genetics (Punnett Shard).\n");
-        sigma_printf("[BIOLOGY/REPO]: Result: 3:1 Phenotypic Ratio (Dominant/Recessive).\n");
+        sigma_sigma_printf("[BIOLOGY/REPO]: Concept: Mendelian Genetics (Punnett Shard).\n");
+        sigma_sigma_printf("[BIOLOGY/REPO]: Result: 3:1 Phenotypic Ratio (Dominant/Recessive).\n");
     }
 };
 
@@ -72,8 +72,8 @@ public:
 class IntegralShard : public IScholasticShard {
 public:
     void Execute() override {
-        sigma_printf("[MATH/REPO]: Concept: Definite Integral of x^2 from 0 to 3.\n");
-        sigma_printf("[MATH/REPO]: Result: [x^3 / 3]_0^3 = 9.0 (Verified).\n");
+        sigma_sigma_printf("[MATH/REPO]: Concept: Definite Integral of x^2 from 0 to 3.\n");
+        sigma_sigma_printf("[MATH/REPO]: Result: [x^3 / 3]_0^3 = 9.0 (Verified).\n");
     }
 };
 
@@ -90,7 +90,7 @@ public:
     }
 
     void ExecuteMasterAudit() {
-        sigma_printf("--- Σ SIGMA OS MASTER SCHOLASTIC REPOSITORY ---\n");
+        sigma_sigma_printf("--- Σ SIGMA OS MASTER SCHOLASTIC REPOSITORY ---\n");
         for (auto it = m_repo.begin(); it != m_repo.end(); ++it) {
             std::cout << "\n[REPOSHADING]: " << it->first << std::endl;
             it->second->Execute();
@@ -103,7 +103,7 @@ int main() {
     repo.Synthesize();
     repo.ExecuteMasterAudit();
 
-    sigma_printf("\n[SUCCESS]: Competitive Scholastic Repository Online. NCERT Sovereignty 100%.\n");
+    sigma_sigma_printf("\n[SUCCESS]: Competitive Scholastic Repository Online. NCERT Sovereignty 100%.\n");
     return 0;
 }
 

@@ -28,7 +28,7 @@ static ZRAMPulse g_zram_pool[MAX_ZRAM_PAGES];
  * ========================================================================= */
 
 void zram_init(void) {
-    // kprintf("[ZRAM]: Sovereign Memory-Compression Shard Online.\n");
+    // ksigma_printf("[ZRAM]: Sovereign Memory-Compression Shard Online.\n");
 }
 
 k_status zram_compress_shard(u64 pfn) {
@@ -36,6 +36,6 @@ k_status zram_compress_shard(u64 pfn) {
      * Absorb Linux zswap USP: Sharded Compression.
      * In a sharded model: compress inactive shards into high-density silicon blocks.
      */
-    // kprintf("[ZRAM]: Industrial Pulse: Compressed shard 0x%llx (Ratio: 2.5:1)\n", pfn);
+    // ksigma_printf("[ZRAM]: Industrial Pulse: Compressed shard 0x%llx (Ratio: 2.5:1)\n", pfn);
     return K_OK;
 }

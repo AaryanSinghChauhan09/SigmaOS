@@ -20,12 +20,12 @@ void hal_gpu_initialize(void) {
     global_gpu.active_cores = 8192;
     global_gpu.acceleration_active = SIGMA_TRUE;
     
-    sigma_printf("S04 [HAL]: Sovereign GPU Accelerator Initialized.\n");
-    sigma_printf("  [LATTICE]: 8,192 Silas-cores active for parallel dispatch.\n");
-    sigma_printf("  [GFX]: Zenith Shell hardware-acceleration: ENABLED.\n");
+    sigma_sigma_printf("S04 [HAL]: Sovereign GPU Accelerator Initialized.\n");
+    sigma_sigma_printf("  [LATTICE]: 8,192 Silas-cores active for parallel dispatch.\n");
+    sigma_sigma_printf("  [GFX]: Zenith Shell hardware-acceleration: ENABLED.\n");
 }
 
 void S04_Register_GPU(void) {
-    sigma_printf("S04 [HAL]: Sovereign GPU Shard Online.\n");
+    sigma_sigma_printf("S04 [HAL]: Sovereign GPU Shard Online.\n");
     hal_gpu_initialize();
 }

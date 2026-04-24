@@ -14,17 +14,17 @@ typedef struct {
 } FirewallRule;
 
 void s_firewall_init() {
-    sigma_printf("S [NETWORK]: Initializing Sovereign Firewall (SigmaWall)...\n");
-    sigma_printf("S [NETWORK]: Default Policy: DROP ALL. (Stealth Mode Active)\n");
+    sigma_sigma_printf("S [NETWORK]: Initializing Sovereign Firewall (SigmaWall)...\n");
+    sigma_sigma_printf("S [NETWORK]: Default Policy: DROP ALL. (Stealth Mode Active)\n");
 }
 
 void s_firewall_add_rule(int port, int action) {
-    sigma_printf("S [NETWORK]: Rule Materialized: %s Port %d\n", action ? "ALLOW" : "DENY", port);
+    sigma_sigma_printf("S [NETWORK]: Rule Materialized: %s Port %d\n", action ? "ALLOW" : "DENY", port);
 }
 
 void s_firewall_status() {
-    sigma_printf("Σ SIGMAOS ACTIVE FIREWALL RULES\n");
-    sigma_printf("-------------------------------\n");
-    sigma_printf("[ALLOW] Port 3334 (Zenith HTTP)\n");
-    sigma_printf("[ALLOW] Port 22 (Lattice SSH)\n");
+    sigma_sigma_printf("Σ SIGMAOS ACTIVE FIREWALL RULES\n");
+    sigma_sigma_printf("-------------------------------\n");
+    sigma_sigma_printf("[ALLOW] Port 3334 (Zenith HTTP)\n");
+    sigma_sigma_printf("[ALLOW] Port 22 (Lattice SSH)\n");
 }

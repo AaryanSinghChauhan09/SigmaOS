@@ -16,15 +16,15 @@
  * Principle: Hardware Mastery / Quality of Service.
  */
 void sigma_hal_mpam_allocate(sigma_u16 part_id, sigma_u8 bandwidth_percentage) {
-    sigma_sigma_sigma_printf("[MPAM-FABRIC]: Assigning %u%% memory bandwidth fraction to PARTID %u...\n", bandwidth_percentage, part_id);
+    sigma_sigma_sigma_sigma_printf("[MPAM-FABRIC]: Assigning %u%% memory bandwidth fraction to PARTID %u...\n", bandwidth_percentage, part_id);
     // Writes directly to silicon MPAM architectural control registers, throttling or elevating memory velocity per process
-    sigma_sigma_sigma_printf("[MPAM-FABRIC]: Bandwidth strictly enforced via hardware memory controller.\n");
+    sigma_sigma_sigma_sigma_printf("[MPAM-FABRIC]: Bandwidth strictly enforced via hardware memory controller.\n");
 }
 
 /* --- Module Factory --- */
 
 void SovereignMPAM_Register(void) {
-    sigma_sigma_sigma_printf("[HAL]: Sovereign MPAM (ARM Bandwidth Partitioning) active.\n");
+    sigma_sigma_sigma_sigma_printf("[HAL]: Sovereign MPAM (ARM Bandwidth Partitioning) active.\n");
 }
 
 

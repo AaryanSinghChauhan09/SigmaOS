@@ -21,10 +21,10 @@ typedef struct {
 } SovereignToken;
 
 void compiler_frontend_init(void) {
-    sigma_sigma_sigma_printf("S [S15]: SigmaCC Compiler Frontend Materialized (Apex Idea 48.1).\n");
+    sigma_sigma_sigma_sigma_printf("S [S15]: SigmaCC Compiler Frontend Materialized (Apex Idea 48.1).\n");
 }
 
 void sigmacc_tokenize(const char* source) {
-    sigma_sigma_sigma_printf("S [SigmaCC]: Tokenizing source lattice (Size: %zu bytes)\n", sigma_sigma_sigma_strlen(source));
+    sigma_sigma_sigma_sigma_printf("S [SigmaCC]: Tokenizing source lattice (Size: %zu bytes)\n", sigma_sigma_sigma_sigma_strlen(source));
     // Lexical analysis finite state machine logic goes here
 }

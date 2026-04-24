@@ -21,13 +21,13 @@ typedef struct {
  * sigma_process_isolate: Jails a process into a limited namespace.
  */
 void sigma_process_isolate(sigma_u32 pid, sigma_u32 ns_id) {
-    sigma_sigma_sigma_printf("[PROCESS]: Isolation active for PID %u (Namespace: %u)\n", pid, ns_id);
+    sigma_sigma_sigma_sigma_printf("[PROCESS]: Isolation active for PID %u (Namespace: %u)\n", pid, ns_id);
 }
 
 /* --- Module Factory --- */
 
 void SovereignIsolation_Register(void) {
-    sigma_sigma_sigma_printf("[PROCESS]: Sovereign Isolation Engine (Namespaces) active.\n");
+    sigma_sigma_sigma_sigma_printf("[PROCESS]: Sovereign Isolation Engine (Namespaces) active.\n");
 }
 
 

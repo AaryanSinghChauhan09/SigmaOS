@@ -16,13 +16,13 @@
 void SovereignDistroAmalgamation_Register(void);
 
 void sigma_kernel_main(void) {
-    sigma_sigma_sigma_printf("--- S SIGMAOS ZENITH SUPREME: SOVEREIGN REIGN INITIATED --- \n");
+    sigma_sigma_sigma_sigma_printf("--- S SIGMAOS ZENITH SUPREME: SOVEREIGN REIGN INITIATED --- \n");
 
     // 1. Initialise Shard Registry
     SovereignRegistry_Init();
 
     // 2. Register and Initialise Amalgamation Shards
-    sigma_sigma_sigma_printf("S [INIT]: Absorbing Linux Goodness Matrix...\n");
+    sigma_sigma_sigma_sigma_printf("S [INIT]: Absorbing Linux Goodness Matrix...\n");
     SovereignDistroAmalgamation_Register();
 
     // 3. Register Platform Parity Shards (Examples)
@@ -31,13 +31,13 @@ void sigma_kernel_main(void) {
     SovereignRegistry_Register("WindowsActiveDirectory", SHARD_CAT_PLATFORM, SovereignActiveDirectory_Init);
 
     // 4. Initialise Core Territories via Master Aggregator
-    sigma_sigma_sigma_printf("S [INIT]: Mounting Core Territories (VFS, Scheduling, Memory)...\n");
+    sigma_sigma_sigma_sigma_printf("S [INIT]: Mounting Core Territories (VFS, Scheduling, Memory)...\n");
     SovereignMaster_InitAll();
 
     // 5. Audit the Registry
     SovereignRegistry_Audit();
 
-    sigma_sigma_sigma_printf("--- S SIGMAOS ZENITH SUPREME: SYSTEM SOVEREIGNTY VERIFIED --- \n");
+    sigma_sigma_sigma_sigma_printf("--- S SIGMAOS ZENITH SUPREME: SYSTEM SOVEREIGNTY VERIFIED --- \n");
 }
 
 

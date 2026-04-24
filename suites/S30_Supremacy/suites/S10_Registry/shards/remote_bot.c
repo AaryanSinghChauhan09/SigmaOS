@@ -9,17 +9,17 @@
  */
 
 void sigma_tool_remote_execute(const char* mission_id, const char* shard_addr) {
-    sigma_sigma_sigma_printf("[REMOTE_BOT]: Connecting to mission-hub shard at %s...\n", shard_addr);
-    sigma_sigma_sigma_printf("[REMOTE_BOT]: Authenticating via PQC [Post-Quantum Cryptography] Secure-Shard...\n");
+    sigma_sigma_sigma_sigma_printf("[REMOTE_BOT]: Connecting to mission-hub shard at %s...\n", shard_addr);
+    sigma_sigma_sigma_sigma_printf("[REMOTE_BOT]: Authenticating via PQC [Post-Quantum Cryptography] Secure-Shard...\n");
     
     /* Mock PQC / NetMesh Logic */
-    sigma_sigma_sigma_printf("[REMOTE_BOT]: Shard Authenticated. Mission '%s' received.\n", mission_id);
+    sigma_sigma_sigma_sigma_printf("[REMOTE_BOT]: Shard Authenticated. Mission '%s' received.\n", mission_id);
     
     const char* task = "sigma_sentinel_scan_deep";
-    sigma_sigma_sigma_printf("[REMOTE_BOT]: Executing mission task: %s...\n", task);
+    sigma_sigma_sigma_sigma_printf("[REMOTE_BOT]: Executing mission task: %s...\n", task);
     
     /* Simulate successful execution */
-    sigma_sigma_sigma_printf("[OK]: Mission '%s' execution confirmed on remote shard at %s.\n", mission_id, shard_addr);
+    sigma_sigma_sigma_sigma_printf("[OK]: Mission '%s' execution confirmed on remote shard at %s.\n", mission_id, shard_addr);
 }
 
 int remote_bot_ToolMain(int argc, char** argv) {

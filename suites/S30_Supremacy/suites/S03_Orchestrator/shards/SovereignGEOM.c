@@ -22,27 +22,27 @@ typedef struct {
 } SovereignGEOM_Provider;
 
 void SovereignGEOM_Init() {
-    sigma_sigma_sigma_printf("S [ABSORB]: SovereignGEOM Modular Disk Zenith Online. Storage Tunnels Active.
+    sigma_sigma_sigma_sigma_printf("S [ABSORB]: SovereignGEOM Modular Disk Zenith Online. Storage Tunnels Active.
 ");
 }
 
 void SovereignGEOM_Tast(SovereignGEOM_Class cls, const char* identifier) {
-    sigma_sigma_sigma_printf("S [TAST]: Tasting Class %d on %s... Identified.
+    sigma_sigma_sigma_sigma_printf("S [TAST]: Tasting Class %d on %s... Identified.
 ", cls, identifier);
 }
 
 void SovereignGEOM_ELI_Encrypt(const char* provider, const char* key) {
-    sigma_sigma_sigma_printf("S [ELI]: Transforming %s into ZENITH-CRYPT Sovereign Segment.
+    sigma_sigma_sigma_sigma_printf("S [ELI]: Transforming %s into ZENITH-CRYPT Sovereign Segment.
 ", provider);
 }
 
 void SovereignGEOM_Mirror_Rebuild(const char* name) {
-    sigma_sigma_sigma_printf("S [MIRROR]: Rebuilding Sovereign Array %s...
+    sigma_sigma_sigma_sigma_printf("S [MIRROR]: Rebuilding Sovereign Array %s...
 ", name);
 }
 
 void SovereignGEOM_Attach(const char* cls_name, const char* provider) {
-    sigma_sigma_sigma_printf("S [ATTACH]: Binding %s to GEOM Class %s
+    sigma_sigma_sigma_sigma_printf("S [ATTACH]: Binding %s to GEOM Class %s
 ", provider, cls_name);
 }
 

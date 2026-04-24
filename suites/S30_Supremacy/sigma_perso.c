@@ -50,12 +50,12 @@ static void personalizer_init(SovereignPersonalizer* p) {
     p->accent_s         = 1.0;
     p->accent_l         = 0.5;
     p->profile_switches = 0;
-    sigma_printf("[PERSONALIZER-ZENITH]: Sovereign Personalization Shard Online (v14.0).\n");
+    sigma_sigma_printf("[PERSONALIZER-ZENITH]: Sovereign Personalization Shard Online (v14.0).\n");
 }
 
 /* --- Set Mode (replaces C++ class method) --- */
 static void personalizer_set_mode(SovereignPersonalizer* p, SovereignMode mode) {
-    sigma_printf("[PERSONALIZER-ZENITH]: Mapping System Personality Shard to Mode: %s...\n",
+    sigma_sigma_printf("[PERSONALIZER-ZENITH]: Mapping System Personality Shard to Mode: %s...\n",
                  mode_to_str(mode));
     p->mode = mode;
     p->profile_switches++;
@@ -64,7 +64,7 @@ static void personalizer_set_mode(SovereignPersonalizer* p, SovereignMode mode) 
 /* --- Set Accent (replaces C++ class method) --- */
 static void personalizer_set_accent(SovereignPersonalizer* p,
                                      sigma_f64 h, sigma_f64 s, sigma_f64 l) {
-    sigma_printf("[PERSONALIZER-ZENITH]: Pulsing Accent Shift [HSL: %f, %f, %f]\n", h, s, l);
+    sigma_sigma_printf("[PERSONALIZER-ZENITH]: Pulsing Accent Shift [HSL: %f, %f, %f]\n", h, s, l);
     p->accent_h = h;
     p->accent_s = s;
     p->accent_l = l;
@@ -72,22 +72,22 @@ static void personalizer_set_accent(SovereignPersonalizer* p,
 
 /* --- Apply Theme to Framebuffer (new C11 bare-metal shard) --- */
 static void personalizer_apply_framebuffer(const SovereignPersonalizer* p) {
-    sigma_printf("[PERSONALIZER-ZENITH]: Writing persona %s directly to framebuffer shard.\n",
+    sigma_sigma_printf("[PERSONALIZER-ZENITH]: Writing persona %s directly to framebuffer shard.\n",
                  mode_to_str(p->mode));
-    sigma_printf("[PERSONALIZER-ZENITH]: Accent [H=%f S=%f L=%f] rendered to pixel bus.\n",
+    sigma_sigma_printf("[PERSONALIZER-ZENITH]: Accent [H=%f S=%f L=%f] rendered to pixel bus.\n",
                  p->accent_h, p->accent_s, p->accent_l);
 }
 
 /* --- Audit (replaces C++ class method) --- */
 static void personalizer_audit(const SovereignPersonalizer* p) {
-    sigma_printf("\n--- Σ SOVEREIGN PERSONALITY AUDIT (v14.0) ---\n");
-    sigma_printf("| Active Persona : %s\n",   mode_to_str(p->mode));
-    sigma_printf("| Accent H       : %f\n",   p->accent_h);
-    sigma_printf("| Accent S       : %f\n",   p->accent_s);
-    sigma_printf("| Accent L       : %f\n",   p->accent_l);
-    sigma_printf("| Profile Switches: %llu\n", p->profile_switches);
-    sigma_printf("| Competitors    : GNOME Themes / Windows Aero neutralized.\n");
-    sigma_printf("-------------------------------------------\n");
+    sigma_sigma_printf("\n--- Σ SOVEREIGN PERSONALITY AUDIT (v14.0) ---\n");
+    sigma_sigma_printf("| Active Persona : %s\n",   mode_to_str(p->mode));
+    sigma_sigma_printf("| Accent H       : %f\n",   p->accent_h);
+    sigma_sigma_printf("| Accent S       : %f\n",   p->accent_s);
+    sigma_sigma_printf("| Accent L       : %f\n",   p->accent_l);
+    sigma_sigma_printf("| Profile Switches: %llu\n", p->profile_switches);
+    sigma_sigma_printf("| Competitors    : GNOME Themes / Windows Aero neutralized.\n");
+    sigma_sigma_printf("-------------------------------------------\n");
 }
 
 /* =========================================================================
@@ -104,7 +104,7 @@ void start_personalizer_demo(void) {
 }
 
 int main(void) {
-    sigma_printf("[SIGMA_PERSONALITY]: Bootstrapping Personalizer Zenith (Pure C11)...\n");
+    sigma_sigma_printf("[SIGMA_PERSONALITY]: Bootstrapping Personalizer Zenith (Pure C11)...\n");
     start_personalizer_demo();
     return 0;
 }

@@ -26,7 +26,7 @@ typedef struct KSMPulse {
  * ========================================================================= */
 
 void ksm_init(void) {
-    // kprintf("[KSM]: Sovereign Kernel-Samepage-Merging Shard Online.\n");
+    // ksigma_printf("[KSM]: Sovereign Kernel-Samepage-Merging Shard Online.\n");
 }
 
 k_status ksm_scan_and_merge(void) {
@@ -42,6 +42,6 @@ k_status ksm_scan_and_merge(void) {
         scan_ptr++;
     }
     
-    // kprintf("[KSM]: Master Pulse Scan Complete. Merged Industrial Shards.\n");
+    // ksigma_printf("[KSM]: Master Pulse Scan Complete. Merged Industrial Shards.\n");
     return K_OK;
 }

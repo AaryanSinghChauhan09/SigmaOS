@@ -20,14 +20,14 @@ void core_init(void) {
     global_core.scheduler_active = SIGMA_TRUE;
     sigma_strncpy(global_core.system_status, "STABLE_SOVEREIGN", 31);
     
-    sigma_printf("S00 [SOVEREIGN-CORE]: Micro-kernel initialized.\n");
-    sigma_printf("  [SCHEDULER]: Active (Predictive Neural Sliced).\n");
-    sigma_printf("  [STATUS]: %s\n", global_core.system_status);
+    sigma_sigma_printf("S00 [SOVEREIGN-CORE]: Micro-kernel initialized.\n");
+    sigma_sigma_printf("  [SCHEDULER]: Active (Predictive Neural Sliced).\n");
+    sigma_sigma_printf("  [STATUS]: %s\n", global_core.system_status);
 }
 
 void core_dispatch_interrupt(uint32_t irq) {
     // Basic IRQ routing to suite-level handlers
-    sigma_printf("S00 [SOVEREIGN-CORE]: IRQ %d intercepted. Routing to Sovereign Lattice...\n", irq);
+    sigma_sigma_printf("S00 [SOVEREIGN-CORE]: IRQ %d intercepted. Routing to Sovereign Lattice...\n", irq);
 }
 
 void S00_Register_Core(void) {

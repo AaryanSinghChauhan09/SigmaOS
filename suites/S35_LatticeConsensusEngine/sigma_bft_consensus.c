@@ -1,7 +1,7 @@
 #include "sigma_bft_consensus.h"
 
 // Simple internal memory copy to avoid libc dependencies
-static void sigma_internal_memcpy(void* dest, const void* src, uint32_t len) {
+static void sigma_internal_sigma_memcpy(void* dest, const void* src, uint32_t len) {
     uint8_t* d = (uint8_t*)dest;
     const uint8_t* s = (const uint8_t*)src;
     while(len--) { *d++ = *s++; }
@@ -59,7 +59,7 @@ void sigma_bft_generate_pre_prepare(sigma_bft_context_t* ctx, sigma_bft_message_
     out_msg->current_state = BFT_STATE_PRE_PREPARE;
     
     uint32_t copy_len = payload_len > SIGMA_BFT_MSG_SIZE ? SIGMA_BFT_MSG_SIZE : payload_len;
-    sigma_internal_memcpy(out_msg->payload, payload, copy_len);
+    sigma_internal_sigma_memcpy(out_msg->payload, payload, copy_len);
     
     // Simplistic digest generation (XOR fold)
     sigma_internal_memzero(out_msg->digest, 32);

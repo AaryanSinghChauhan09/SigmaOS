@@ -29,7 +29,7 @@ int sigma_fault_reconcile(const void* primary, const void* mirror, sigma_sz_t le
 /* --- Module Factory --- */
 
 void SovereignMirror_Register(void) {
-    sigma_sigma_sigma_printf("[TOOLING]: Sovereign Mirror Engine (Fault Tolerance) active.\n");
+    sigma_sigma_sigma_sigma_printf("[TOOLING]: Sovereign Mirror Engine (Fault Tolerance) active.\n");
 }
 
 

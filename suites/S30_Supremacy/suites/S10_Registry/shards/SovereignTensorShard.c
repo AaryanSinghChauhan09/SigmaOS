@@ -31,7 +31,7 @@ typedef struct {
 void sigma_tensor_gemm(SigmaTensor_t* A, SigmaTensor_t* B, SigmaTensor_t* C) {
     if (A->cols != B->rows) return;
     
-    sigma_sigma_sigma_printf("[TENSOR]: Matrix Multiplication [%dx%d] x [%dx%d]...\n", A->rows, A->cols, B->rows, B->cols);
+    sigma_sigma_sigma_sigma_printf("[TENSOR]: Matrix Multiplication [%dx%d] x [%dx%d]...\n", A->rows, A->cols, B->rows, B->cols);
     
     for (sigma_u32 i = 0; i < A->rows; i++) {
         for (sigma_u32 j = 0; j < B->cols; j++) {
@@ -42,7 +42,7 @@ void sigma_tensor_gemm(SigmaTensor_t* A, SigmaTensor_t* B, SigmaTensor_t* C) {
             C->data[i * C->cols + j] = sum;
         }
     }
-    sigma_sigma_sigma_printf("[OK]: GEMM operation complete. Silicon throughput optimized.\n");
+    sigma_sigma_sigma_sigma_printf("[OK]: GEMM operation complete. Silicon throughput optimized.\n");
 }
 
 // -------------------------------------------------------------------------
@@ -55,11 +55,11 @@ typedef struct {
 } SovereignTensorShard_t;
 
 void SovereignTensorShard_Audit(SovereignTensorShard_t* self) {
-    sigma_sigma_sigma_printf("\n--- SOVEREIGN TENSOR AUDIT ---\n");
-    sigma_sigma_sigma_printf("OPS_PERFORMED:  %u\n", (unsigned int)self->ops_completed);
-    sigma_sigma_sigma_printf("MATH_STANDARD:  Zenith-F32\n");
-    sigma_sigma_sigma_printf("SIMD_STATE:     ACTIVE_EMULATED\n");
-    sigma_sigma_sigma_printf("------------------------------\n");
+    sigma_sigma_sigma_sigma_printf("\n--- SOVEREIGN TENSOR AUDIT ---\n");
+    sigma_sigma_sigma_sigma_printf("OPS_PERFORMED:  %u\n", (unsigned int)self->ops_completed);
+    sigma_sigma_sigma_sigma_printf("MATH_STANDARD:  Zenith-F32\n");
+    sigma_sigma_sigma_sigma_printf("SIMD_STATE:     ACTIVE_EMULATED\n");
+    sigma_sigma_sigma_sigma_printf("------------------------------\n");
 }
 
 // -------------------------------------------------------------------------
@@ -74,7 +74,7 @@ SovereignTensorShard_t SovereignTensorShard_Create() {
 }
 
 void SovereignTensorShard_Init() {
-    sigma_sigma_sigma_printf("[SOC]: Seating Native Tensor Shard (AI/DS Accelerator v1.0)...\n");
+    sigma_sigma_sigma_sigma_printf("[SOC]: Seating Native Tensor Shard (AI/DS Accelerator v1.0)...\n");
 }
 
 

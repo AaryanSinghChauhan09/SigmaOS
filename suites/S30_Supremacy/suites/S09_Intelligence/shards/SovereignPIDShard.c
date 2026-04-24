@@ -29,14 +29,14 @@ float sigma_ctrl_pid_update(SigmaPID_t* pid, float setpoint, float measured) {
     float output = (pid->kp * error) + (pid->ki * pid->integral) + (pid->kd * derivative);
     pid->prev_error = error;
     
-    sigma_sigma_sigma_printf("[PID-CONTROL]: Error: %.2f | Output Correction: %.4f\n", error, output);
+    sigma_sigma_sigma_sigma_printf("[PID-CONTROL]: Error: %.2f | Output Correction: %.4f\n", error, output);
     return output;
 }
 
 /* --- Module Factory --- */
 
 void SovereignPID_Register(void) {
-    sigma_sigma_sigma_printf("[INTELLIGENCE]: Sovereign PID Controller (Loop Mastery) active.\n");
+    sigma_sigma_sigma_sigma_printf("[INTELLIGENCE]: Sovereign PID Controller (Loop Mastery) active.\n");
 }
 
 

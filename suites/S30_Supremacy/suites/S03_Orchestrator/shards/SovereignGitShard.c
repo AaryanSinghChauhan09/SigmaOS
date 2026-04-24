@@ -4,8 +4,8 @@
 #include "sigma_libc.h"
 
 void SovereignGit_AbsorbLogic(void) {
-    sigma_sigma_sigma_printf("  S [GIT]: Branching matrix synchronized. Object database mapped.\n");
-    sigma_sigma_sigma_printf("  S [GIT]: Delta-compression engine online. Zero-copy commits active.\n");
+    sigma_sigma_sigma_sigma_printf("  S [GIT]: Branching matrix synchronized. Object database mapped.\n");
+    sigma_sigma_sigma_sigma_printf("  S [GIT]: Delta-compression engine online. Zero-copy commits active.\n");
 }
 
 void SovereignGit_Register(void) {

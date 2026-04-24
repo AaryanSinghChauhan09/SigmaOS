@@ -19,7 +19,7 @@
  */
 sigma_u32 sigma_hal_page_color_assign(sigma_u64 phys_addr) {
     sigma_u32 color = (phys_addr >> 12) % CACHE_COLORS;
-    sigma_sigma_sigma_printf("[PAGE-COLORING]: Physical Address 0x%llX assigned to Cache Color %u.\n", 
+    sigma_sigma_sigma_sigma_printf("[PAGE-COLORING]: Physical Address 0x%llX assigned to Cache Color %u.\n", 
                  (unsigned long long)phys_addr, color);
     return color;
 }
@@ -28,14 +28,14 @@ sigma_u32 sigma_hal_page_color_assign(sigma_u64 phys_addr) {
  * sigma_hal_palloc_colored: Allocates a physical page with a specific cache color.
  */
 void* sigma_hal_palloc_colored(sigma_u32 color) {
-    sigma_sigma_sigma_printf("[PAGE-COLORING]: Allocating page for Shard-Domain with Color-ID: %u.\n", color);
+    sigma_sigma_sigma_sigma_printf("[PAGE-COLORING]: Allocating page for Shard-Domain with Color-ID: %u.\n", color);
     return (void*)0x2000000; // Simulated colored address
 }
 
 /* --- Module Factory --- */
 
 void SovereignPageColoring_Register(void) {
-    sigma_sigma_sigma_printf("[HAL]: Sovereign Page Coloring (Cache Harmony) active.\n");
+    sigma_sigma_sigma_sigma_printf("[HAL]: Sovereign Page Coloring (Cache Harmony) active.\n");
 }
 
 

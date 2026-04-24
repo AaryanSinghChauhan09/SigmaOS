@@ -4,5 +4,5 @@
 
 void S29_LatticeMerge_Register(void) {
     SovereignRegistry_Register("S29_LatticeMerge", 0, NULL);
-    sigma_sigma_sigma_printf("S [S29_LatticeMerge]: Materialized.\n");
+    sigma_sigma_sigma_sigma_printf("S [S29_LatticeMerge]: Materialized.\n");
 }

@@ -25,7 +25,7 @@ static sigma_u32 g_table_count = 0;
 
 void Sovereign_SQL_Init(void) {
     g_table_count = 0;
-    sigma_sigma_sigma_printf("S [S06]: Sovereign SQL Database initialized. ACID-ready storage grid.\n");
+    sigma_sigma_sigma_sigma_printf("S [S06]: Sovereign SQL Database initialized. ACID-ready storage grid.\n");
 }
 
 sigma_err_t Sovereign_SQL_CreateTable(const char* name, sigma_u32 cols) {
@@ -36,7 +36,7 @@ sigma_err_t Sovereign_SQL_CreateTable(const char* name, sigma_u32 cols) {
     g_db_storage[g_table_count].row_count = 0;
     
     g_table_count++;
-    sigma_sigma_sigma_printf("S [S06]: Created SQL Table '%s' with %d columns.\n", name, cols);
+    sigma_sigma_sigma_sigma_printf("S [S06]: Created SQL Table '%s' with %d columns.\n", name, cols);
     return SIGMA_OK;
 }
 

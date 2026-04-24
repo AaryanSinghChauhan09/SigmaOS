@@ -28,7 +28,7 @@ void sigma_sync_barrier_wait(SigmaBarrier_t* barrier) {
     if (current == barrier->threshold - 1) {
         barrier->count = 0;
         barrier->sense = local_sense;
-        sigma_sigma_sigma_printf("[BARRIER]: Threshhold %d reached. Global Release dispatched.\n", barrier->threshold);
+        sigma_sigma_sigma_sigma_printf("[BARRIER]: Threshhold %d reached. Global Release dispatched.\n", barrier->threshold);
     } else {
         while (barrier->sense != local_sense) { /* Spin */ }
     }
@@ -37,7 +37,7 @@ void sigma_sync_barrier_wait(SigmaBarrier_t* barrier) {
 /* --- Module Factory --- */
 
 void SovereignBarrier_Register(void) {
-    sigma_sigma_sigma_printf("[ORCHESTRATOR]: Sovereign Barrier Sync (Rendezvous Mastery) active.\n");
+    sigma_sigma_sigma_sigma_printf("[ORCHESTRATOR]: Sovereign Barrier Sync (Rendezvous Mastery) active.\n");
 }
 
 

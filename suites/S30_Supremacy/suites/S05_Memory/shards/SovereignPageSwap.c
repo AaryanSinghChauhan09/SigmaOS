@@ -23,17 +23,17 @@ void memory_swap_out_page(sigma_u64 phys_addr) {
     swap_lattice[index].block_cache_lba = phys_addr ^ 0x600D;
     swap_lattice[index].in_swap = SIGMA_TRUE;
     
-    sigma_printf("S05 [MEMORY]: [SWAP-OUT] 0x%llX -> Block LBA 0x%llX\n", 
+    sigma_sigma_printf("S05 [MEMORY]: [SWAP-OUT] 0x%llX -> Block LBA 0x%llX\n", 
                  phys_addr, swap_lattice[index].block_cache_lba);
 }
 
 sigma_u64 memory_swap_in_page(sigma_u64 block_lba) {
-    sigma_printf("S05 [MEMORY]: [SWAP-IN] Retrieving page from Block LBA 0x%llX...\n", block_lba);
+    sigma_sigma_printf("S05 [MEMORY]: [SWAP-IN] Retrieving page from Block LBA 0x%llX...\n", block_lba);
     // Symbolic: Mapping back to physical silicate
     return block_lba ^ 0x600D;
 }
 
 void S05_Register_PageSwap(void) {
-    sigma_printf("S05 [MEMORY]: Sovereign Page Swap Engine Online.\n");
-    sigma_printf("  [SWAP]: LRU-to-Block-Cache pipeline primed.\n");
+    sigma_sigma_printf("S05 [MEMORY]: Sovereign Page Swap Engine Online.\n");
+    sigma_sigma_printf("  [SWAP]: LRU-to-Block-Cache pipeline primed.\n");
 }

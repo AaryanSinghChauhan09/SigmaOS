@@ -36,7 +36,7 @@ static u32 g_app_count = 0;
 
 void app_manager_init(void) {
     for (int i = 0; i < MAX_ZENITH_APPS; i++) g_apps[i].active = FALSE;
-    // kprintf("[APP-MANAGER]: Sovereign Industrial Application Shard Online.\n");
+    // ksigma_printf("[APP-MANAGER]: Sovereign Industrial Application Shard Online.\n");
 }
 
 k_status register_app(const char* name) {
@@ -48,18 +48,18 @@ k_status register_app(const char* name) {
     app->state   = APP_CLOSED;
     app->active  = TRUE;
     
-    // kprintf("[APP-MANAGER]: Sovereign App Registered: %s\n", name);
+    // ksigma_printf("[APP-MANAGER]: Sovereign App Registered: %s\n", name);
     return K_OK;
 }
 
 void app_switch_state(u32 idx, AppState state) {
     if (idx >= g_app_count) return;
     g_apps[idx].state = state;
-    // kprintf("[APP-MANAGER]: Sharding App [%s] State -> %d\n", g_apps[idx].name, state);
+    // ksigma_printf("[APP-MANAGER]: Sharding App [%s] State -> %d\n", g_apps[idx].name, state);
 }
 
 void app_personalize(u32 idx, u32 theme) {
     if (idx >= g_app_count) return;
     g_apps[idx].theme_override = theme;
-    // kprintf("[APP-MANAGER]: Theme Tailoring for [%s]: 0x%x\n", g_apps[idx].name, theme);
+    // ksigma_printf("[APP-MANAGER]: Theme Tailoring for [%s]: 0x%x\n", g_apps[idx].name, theme);
 }

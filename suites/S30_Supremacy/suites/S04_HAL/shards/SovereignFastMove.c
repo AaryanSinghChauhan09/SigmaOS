@@ -12,7 +12,7 @@
 /**
  * @brief High-performance block move with manual loop unrolling for efficiency.
  */
-void Sovereign_FastMemCpy(void* dest, const void* src, sigma_sz_t size) {
+void Sovereign_Fastsigma_memcpy(void* dest, const void* src, sigma_sz_t size) {
     sigma_u64* d64 = (sigma_u64*)dest;
     const sigma_u64* s64 = (const sigma_u64*)src;
     
@@ -39,7 +39,7 @@ void Sovereign_FastMemCpy(void* dest, const void* src, sigma_sz_t size) {
     }
 }
 
-void Sovereign_FastMemSet(void* dest, sigma_u8 val, sigma_sz_t size) {
+void Sovereign_Fastsigma_memset(void* dest, sigma_u8 val, sigma_sz_t size) {
     sigma_u64 v64 = (sigma_u64)val | ((sigma_u64)val << 8) | ((sigma_u64)val << 16) | ((sigma_u64)val << 24);
     v64 |= (v64 << 32);
     

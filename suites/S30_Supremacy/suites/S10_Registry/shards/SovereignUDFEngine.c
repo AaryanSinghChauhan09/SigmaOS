@@ -49,7 +49,7 @@ sigma_err_t sovereign_udf_execute(const sigma_u8* bytecode, sigma_sz_t len) {
     SigmaUDF_VM_t vm = {0};
     vm.tick_limit = 10000; // Hard instruction cap
 
-    sigma_sigma_sigma_printf("[UDF-VM]: Executing Sovereign Logic (v50 Singularity)...\n");
+    sigma_sigma_sigma_sigma_printf("[UDF-VM]: Executing Sovereign Logic (v50 Singularity)...\n");
 
     while (vm.pc < len && vm.tick_limit > 0) {
         vm.tick_limit--;
@@ -57,21 +57,21 @@ sigma_err_t sovereign_udf_execute(const sigma_u8* bytecode, sigma_sz_t len) {
 
         switch (op) {
             case OP_HALT:
-                sigma_sigma_sigma_printf("[UDF-VM]: Logic cycle complete.\n");
+                sigma_sigma_sigma_sigma_printf("[UDF-VM]: Logic cycle complete.\n");
                 return SIGMA_OK;
 
             case OP_DISPATCH: {
                 sigma_u32 shard_id = bytecode[vm.pc++];
-                sigma_sigma_sigma_printf("[UDF-VM]: Cross-Shard Dispatch -> ID: %u\n", shard_id);
+                sigma_sigma_sigma_sigma_printf("[UDF-VM]: Cross-Shard Dispatch -> ID: %u\n", shard_id);
                 break;
             }
 
             case OP_NOTIFY:
-                sigma_sigma_sigma_printf("[UDF-VM]: Personalization Alert: User logic triggered notification.\n");
+                sigma_sigma_sigma_sigma_printf("[UDF-VM]: Personalization Alert: User logic triggered notification.\n");
                 break;
 
             case OP_SYNC:
-                sigma_sigma_sigma_printf("[UDF-VM]: Initiating Mesh Sync from UDF...\n");
+                sigma_sigma_sigma_sigma_printf("[UDF-VM]: Initiating Mesh Sync from UDF...\n");
                 // Calling S07_NetworkNexus logic
                 break;
 
@@ -87,7 +87,7 @@ sigma_err_t sovereign_udf_execute(const sigma_u8* bytecode, sigma_sz_t len) {
 /* --- Automation Bridge --- */
 
 void sovereign_auto_heal_trigger(void) {
-    sigma_sigma_sigma_printf("[AUTOMATION]: Anomaly detected. Executing Self-Healing UDF...\n");
+    sigma_sigma_sigma_sigma_printf("[AUTOMATION]: Anomaly detected. Executing Self-Healing UDF...\n");
     // Pseudo-bytecode for healing
     sigma_u8 healing_script[] = { OP_DISPATCH, 0x05, OP_SYNC, OP_HALT };
     sovereign_udf_execute(healing_script, sizeof(healing_script));
@@ -96,8 +96,8 @@ void sovereign_auto_heal_trigger(void) {
 /* --- Module Factory --- */
 
 void SovereignUDF_Register(void) {
-    sigma_sigma_sigma_printf("[REGISTRY]: Sovereign UDF Engine v50 online.\n");
-    sigma_sigma_sigma_printf("[AUDIT]: Personalization Domains verified (High-Entropy).\n");
+    sigma_sigma_sigma_sigma_printf("[REGISTRY]: Sovereign UDF Engine v50 online.\n");
+    sigma_sigma_sigma_sigma_printf("[AUDIT]: Personalization Domains verified (High-Entropy).\n");
 }
 
 

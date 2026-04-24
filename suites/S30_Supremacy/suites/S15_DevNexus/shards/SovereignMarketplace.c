@@ -14,11 +14,11 @@ typedef struct {
 } MarketplaceListing;
 
 void devnexus_fetch_marketplace_shards(void) {
-    sigma_printf("S15 [DEVNEXUS]: Connecting to Sovereign Shard Marketplace...\n");
-    sigma_printf("  [DISCOVERY]: Found 142 Community Shards available for hot-loading.\n");
-    sigma_printf("  [LATTICE]: 'Advanced_Audio_Sovereign' v1.2 status: VERIFIED.\n");
+    sigma_sigma_printf("S15 [DEVNEXUS]: Connecting to Sovereign Shard Marketplace...\n");
+    sigma_sigma_printf("  [DISCOVERY]: Found 142 Community Shards available for hot-loading.\n");
+    sigma_sigma_printf("  [LATTICE]: 'Advanced_Audio_Sovereign' v1.2 status: VERIFIED.\n");
 }
 
 void S15_Register_Marketplace(void) {
-    sigma_printf("S15 [DEVNEXUS]: Shard Marketplace Interface Online.\n");
+    sigma_sigma_printf("S15 [DEVNEXUS]: Shard Marketplace Interface Online.\n");
 }

@@ -35,11 +35,11 @@ void network_purge_redundant_traffic(NetworkPacket* ring, uint32_t count) {
         }
     }
     if (purged > 0) {
-        sigma_printf("S07 [NETWORK]: Purged %u redundant packets from Zero-Copy Ring.\n", purged);
+        sigma_sigma_printf("S07 [NETWORK]: Purged %u redundant packets from Zero-Copy Ring.\n", purged);
     }
 }
 
 void S07_Register_PacketPurge(void) {
-    sigma_printf("S07 [NETWORK]: Sovereign Packet Purge Shard Online.\n");
-    sigma_printf("  [PURGE]: Zero-copy deduplication filter active.\n");
+    sigma_sigma_printf("S07 [NETWORK]: Sovereign Packet Purge Shard Online.\n");
+    sigma_sigma_printf("  [PURGE]: Zero-copy deduplication filter active.\n");
 }

@@ -70,18 +70,18 @@ static bool_t g_v3d_online = FALSE;
  * ========================================================================= */
 
 k_status bcm_v3d_npu_init(void) {
-    extern void kprintf(const char* fmt, ...);
+    extern void ksigma_printf(const char* fmt, ...);
 
     /* 1. Identify Hardware */
     u32 id0 = v3d_read(V3D_IDENT0);
     if (id0 != 0x02443356) { /* "V3D." in ASCII */
-        kprintf("[NPU] Broadcom V3D not found. (ID: 0x%x)\n", id0);
+        ksigma_printf("[NPU] Broadcom V3D not found. (ID: 0x%x)\n", id0);
         return K_ERR_NODEV;
     }
 
     u32 id1 = v3d_read(V3D_IDENT1);
     u32 rev = (id1 >> 28) & 0xF;
-    kprintf("[NPU] Broadcom V3D rev %u Online.\n", rev);
+    ksigma_printf("[NPU] Broadcom V3D rev %u Online.\n", rev);
 
     /* 2. Reset Thread 0 */
     v3d_write(V3D_CT0CS, (1 << 15)); /* Reset bit */
@@ -89,7 +89,7 @@ k_status bcm_v3d_npu_init(void) {
     /* 3. Basic Test - Scratch Register */
     v3d_write(V3D_SCRATCH, 0xDEADBEEF);
     if (v3d_read(V3D_SCRATCH) != 0xDEADBEEF) {
-        kprintf("[NPU] V3D Scratch Register test failed.\n");
+        ksigma_printf("[NPU] V3D Scratch Register test failed.\n");
         return K_ERR_NODEV;
     }
 
@@ -106,11 +106,11 @@ k_status bcm_v3d_npu_init(void) {
  * and submitting it to the CLE via DMA.
  */
 k_status bcm_v3d_matmul(void* out_tensor, const void* tensor_a, const void* tensor_b) {
-    extern void kprintf(const char* fmt, ...);
+    extern void ksigma_printf(const char* fmt, ...);
 
     if (!g_v3d_online) return K_ERR_NODEV;
 
-    kprintf("[NPU] Submitting MatMul via DMA Control List...\n");
+    ksigma_printf("[NPU] Submitting MatMul via DMA Control List...\n");
 
     /* 
      * TODO: Real Implementation Details:
@@ -126,7 +126,7 @@ k_status bcm_v3d_matmul(void* out_tensor, const void* tensor_a, const void* tens
     
     /* Ensure the executor is stopped before starting a new list */
     if (v3d_read(V3D_CT0CS) & 0x20) {
-        kprintf("[NPU] ERROR: Executor thread 0 is busy!\n");
+        ksigma_printf("[NPU] ERROR: Executor thread 0 is busy!\n");
         return K_ERR_NODEV;
     }
 
@@ -138,7 +138,7 @@ k_status bcm_v3d_matmul(void* out_tensor, const void* tensor_a, const void* tens
      * Poll for completion.
      * Bit 5 of V3D_CT0CS is 'Thread Active'. Wait for it to clear.
      */
-    kprintf("[NPU] Waiting for V3D execution...\n");
+    ksigma_printf("[NPU] Waiting for V3D execution...\n");
     while (v3d_read(V3D_CT0CS) & 0x20) {
         __asm__ volatile("nop"); 
         // In v2, this will yield to the scheduler and return via Interrupt.
@@ -146,11 +146,11 @@ k_status bcm_v3d_matmul(void* out_tensor, const void* tensor_a, const void* tens
 
     /* Check for hardware errors */
     if (v3d_read(V3D_ERRSTAT) != 0) {
-        kprintf("[NPU] Hardware execution error: 0x%x\n", v3d_read(V3D_ERRSTAT));
+        ksigma_printf("[NPU] Hardware execution error: 0x%x\n", v3d_read(V3D_ERRSTAT));
         return K_ERR_NODEV;
     }
 
-    kprintf("[NPU] MatMul execution complete.\n");
+    ksigma_printf("[NPU] MatMul execution complete.\n");
     return K_OK;
 }
 

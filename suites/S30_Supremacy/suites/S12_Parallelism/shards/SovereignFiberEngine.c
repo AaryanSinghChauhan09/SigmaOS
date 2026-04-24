@@ -28,7 +28,7 @@ void parallelism_fiber_spawn(fiber_entry_t entry, void* arg) {
             fiber_pool[i].entry = entry;
             fiber_pool[i].arg = arg;
             fiber_pool[i].active = SIGMA_TRUE;
-            sigma_printf("S12 [PARALLELISM]: Spawned Sovereign Fiber PID:%u\n", i);
+            sigma_sigma_printf("S12 [PARALLELISM]: Spawned Sovereign Fiber PID:%u\n", i);
             return;
         }
     }
@@ -38,12 +38,12 @@ void parallelism_fiber_yield(void) {
     // Symbolic: Switch context to next active fiber
     current_fiber_idx = (current_fiber_idx + 1) % MAX_FIBERS;
     if (fiber_pool[current_fiber_idx].active) {
-        sigma_printf("  [FIBER-ENGINE]: Context shift to Fiber %u\n", current_fiber_idx);
+        sigma_sigma_printf("  [FIBER-ENGINE]: Context shift to Fiber %u\n", current_fiber_idx);
         // Execute entry simulation
     }
 }
 
 void S12_Register_FiberEngine(void) {
-    sigma_printf("S12 [PARALLELISM]: Sovereign Fiber Engine Online.\n");
-    sigma_printf("  [FIBERS]: Zero-stack cooperative multitasking enabled.\n");
+    sigma_sigma_printf("S12 [PARALLELISM]: Sovereign Fiber Engine Online.\n");
+    sigma_sigma_printf("  [FIBERS]: Zero-stack cooperative multitasking enabled.\n");
 }

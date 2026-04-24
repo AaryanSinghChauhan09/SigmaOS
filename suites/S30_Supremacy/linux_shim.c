@@ -31,13 +31,13 @@ typedef struct LinuxDriverShim {
  * ========================================================================= */
 
 void linux_shim_init(void) {
-    // kprintf("[LINUX-SHIM]: Sovereign Linux-Driver-Parity Interface Online.\n");
-    // kprintf("[!] Ready to absorb and shard legacy Linux hardware drivers.\n");
+    // ksigma_printf("[LINUX-SHIM]: Sovereign Linux-Driver-Parity Interface Online.\n");
+    // ksigma_printf("[!] Ready to absorb and shard legacy Linux hardware drivers.\n");
 }
 
 k_status linux_register_driver(LinuxDriverShim* drv) {
     if (!drv) return K_ERR_INVAL;
     drv->active = TRUE;
-    // kprintf("[LINUX-SHIM]: Sharding Linux Driver [%s] into Sovereign-ID pool.\n", drv->name);
+    // ksigma_printf("[LINUX-SHIM]: Sharding Linux Driver [%s] into Sovereign-ID pool.\n", drv->name);
     return K_OK;
 }

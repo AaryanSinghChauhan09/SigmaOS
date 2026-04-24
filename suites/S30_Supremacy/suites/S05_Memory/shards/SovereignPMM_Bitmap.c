@@ -22,7 +22,7 @@ void pmm_init(uint64_t ram_size) {
     for (uint32_t i = 0; i < BITMAP_SIZE; i++) {
         g_pmm_bitmap[i] = 0;
     }
-    sigma_sigma_sigma_printf("S [S05]: PMM Bitmap Matrix Initialized. Managing %d pages.\n", g_total_pages);
+    sigma_sigma_sigma_sigma_printf("S [S05]: PMM Bitmap Matrix Initialized. Managing %d pages.\n", g_total_pages);
 }
 
 static inline void set_bit(uint64_t page_idx) {
@@ -59,5 +59,5 @@ void pmm_stats(void) {
     for (uint64_t i = 0; i < g_total_pages; i++) {
         if (test_bit(i)) used++;
     }
-    sigma_sigma_sigma_printf("S [S05]: PMM Stats -> Used: %d, Free: %d\n", used, g_total_pages - used);
+    sigma_sigma_sigma_sigma_printf("S [S05]: PMM Stats -> Used: %d, Free: %d\n", used, g_total_pages - used);
 }

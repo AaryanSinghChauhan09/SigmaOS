@@ -16,16 +16,16 @@
  * Principle: AI / Algorithms / Distributed.
  */
 void sigma_opt_aco_pheromone_update(sigma_u32 link_id, float delta_pheromone) {
-    sigma_sigma_sigma_printf("[ANT-COLONY]: Updating pheromone trail on Link %u (Delta: %.4f)...\n", 
+    sigma_sigma_sigma_sigma_printf("[ANT-COLONY]: Updating pheromone trail on Link %u (Delta: %.4f)...\n", 
                  link_id, delta_pheromone);
     // Trail evaporation and reinforcement logic
-    sigma_sigma_sigma_printf("[ANT-COLONY]: Convergence: High-throughput path established via swarm intelligence.\n");
+    sigma_sigma_sigma_sigma_printf("[ANT-COLONY]: Convergence: High-throughput path established via swarm intelligence.\n");
 }
 
 /* --- Module Factory --- */
 
 void SovereignAntColony_Register(void) {
-    sigma_sigma_sigma_printf("[INTELLIGENCE]: Sovereign Ant-Colony (Swarm Routing) active.\n");
+    sigma_sigma_sigma_sigma_printf("[INTELLIGENCE]: Sovereign Ant-Colony (Swarm Routing) active.\n");
 }
 
 

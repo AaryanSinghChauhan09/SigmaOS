@@ -33,7 +33,7 @@ void sauto_register_workflow(u32 event, u32 action);
 
 void sauto_init(void) {
     for (int i = 0; i < MAX_AUTO_WORKFLOWS; i++) g_workflows[i].active = FALSE;
-    // kprintf("[S-AUTO]: Sovereign Industrial Automation Shard Online.\n");
+    // ksigma_printf("[S-AUTO]: Sovereign Industrial Automation Shard Online.\n");
 }
 
 /* =========================================================================
@@ -69,12 +69,12 @@ void sauto_trigger_event(u32 event_id) {
     for (u32 i = 0; i < g_workflow_count; i++) {
         if (g_workflows[i].active && g_workflows[i].event_id == event_id) {
             /* Execute the shard associated with the action */
-            // kprintf("[S-AUTO]: Industrial Workflow Execution: Shard [%u]\n", 
+            // ksigma_printf("[S-AUTO]: Industrial Workflow Execution: Shard [%u]\n", 
             //         g_workflows[i].action_shard);
         }
     }
 }
 
 void sauto_audit(void) {
-    // kprintf("[S-AUTO]: Workflows=%u | Status=INDUSTRIAL_SOVEREIGN\n", g_workflow_count);
+    // ksigma_printf("[S-AUTO]: Workflows=%u | Status=INDUSTRIAL_SOVEREIGN\n", g_workflow_count);
 }

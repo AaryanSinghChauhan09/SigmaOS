@@ -24,7 +24,7 @@ void persona_apply_focus_mode() {
     g_current_persona.network_enabled = 0; // Block distractions
     g_current_persona.gui_glassmorphism = 1;
     g_current_persona.memory_quota_mb = 1024;
-    kprintf("[PERSONA] Switched to Focus Mode. All neural distrations blocked.\n");
+    ksigma_printf("[PERSONA] Switched to Focus Mode. All neural distrations blocked.\n");
 }
 
 void persona_apply_dev_mode() {
@@ -33,7 +33,7 @@ void persona_apply_dev_mode() {
     g_current_persona.network_enabled = 1;
     g_current_persona.gui_glassmorphism = 0; // Performance first
     g_current_persona.memory_quota_mb = 4096;
-    kprintf("[PERSONA] Switched to Developer Mode. Maximum throughput enabled.\n");
+    ksigma_printf("[PERSONA] Switched to Developer Mode. Maximum throughput enabled.\n");
 }
 
 void persona_init(const char* persona_name) {
@@ -42,6 +42,6 @@ void persona_init(const char* persona_name) {
     } else if (sigma_streq(persona_name, "dev")) {
         persona_apply_dev_mode();
     } else {
-        kprintf("[PERSONA] Unknown persona '%s'. Defaulting to Standard.\n", persona_name);
+        ksigma_printf("[PERSONA] Unknown persona '%s'. Defaulting to Standard.\n", persona_name);
     }
 }

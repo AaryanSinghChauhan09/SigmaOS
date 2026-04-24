@@ -14,13 +14,13 @@ typedef struct {
 } SigmaContainer;
 
 void s_container_spawn(const char* image_shard) {
-    sigma_printf("S [VIRT]: Creating namespaced environment for %s...\n", image_shard);
-    sigma_printf("S [VIRT]: Shard Namespacing: ENFORCED.\n");
-    sigma_printf("S [VIRT]: Container [CTR_01] is now OPERATIONAL.\n");
+    sigma_sigma_printf("S [VIRT]: Creating namespaced environment for %s...\n", image_shard);
+    sigma_sigma_printf("S [VIRT]: Shard Namespacing: ENFORCED.\n");
+    sigma_sigma_printf("S [VIRT]: Container [CTR_01] is now OPERATIONAL.\n");
 }
 
 void s_container_list() {
-    sigma_printf("Σ ACTIVE SOVEREIGN CONTAINERS\n");
-    sigma_printf("-----------------------------\n");
-    sigma_printf("[CTR_01] -> Shard: /apps/quantum_fox\n");
+    sigma_sigma_printf("Σ ACTIVE SOVEREIGN CONTAINERS\n");
+    sigma_sigma_printf("-----------------------------\n");
+    sigma_sigma_printf("[CTR_01] -> Shard: /apps/quantum_fox\n");
 }

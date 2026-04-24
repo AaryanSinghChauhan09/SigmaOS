@@ -38,28 +38,28 @@ private:
 
 public:
     SovereignPersonalizer() : m_mode(Mode::TRANSCENDENCE), m_accent_h(0.55), m_accent_s(1.0), m_accent_l(0.5) {
-        sigma_printf("[PERSONALIZER-ZENITH]: Sovereign Personalization Shard Online (v14.0).\n");
+        sigma_sigma_printf("[PERSONALIZER-ZENITH]: Sovereign Personalization Shard Online (v14.0).\n");
     }
 
     const char* type_name() const noexcept override { return "SovereignPersonalizer"; }
 
     // --- Core Personalization (Custom Native Functions) ---
     void set_mode(Mode mode) {
-        sigma_printf("[PERSONALIZER-ZENITH]: Mapping System Personality Shard to Mode: %d...\n", (int)mode);
+        sigma_sigma_printf("[PERSONALIZER-ZENITH]: Mapping System Personality Shard to Mode: %d...\n", (int)mode);
         m_mode = mode;
     }
 
     void set_accent(sigma_f64 h, sigma_f64 s, sigma_f64 l) {
-        sigma_printf("[PERSONALIZER-ZENITH]: Pulsing Accent Shift [HSL: %f, %f, %f]\n", h, s, l);
+        sigma_sigma_printf("[PERSONALIZER-ZENITH]: Pulsing Accent Shift [HSL: %f, %f, %f]\n", h, s, l);
         m_accent_h = h; m_accent_s = s; m_accent_l = l;
     }
 
     void audit() {
-        sigma_printf("\n--- Σ SOVEREIGN PERSONALITY AUDIT (v14.0) ---\n");
-        sigma_printf("| Active Persona : %d\n", (int)m_mode);
-        sigma_printf("| Accent Shard   : Pulse-Stabilized\n");
-        sigma_printf("| Competitors    : GNOME Themes / Windows Aero neutralized.\n");
-        sigma_printf("-------------------------------------------\n");
+        sigma_sigma_printf("\n--- Σ SOVEREIGN PERSONALITY AUDIT (v14.0) ---\n");
+        sigma_sigma_printf("| Active Persona : %d\n", (int)m_mode);
+        sigma_sigma_printf("| Accent Shard   : Pulse-Stabilized\n");
+        sigma_sigma_printf("| Competitors    : GNOME Themes / Windows Aero neutralized.\n");
+        sigma_sigma_printf("-------------------------------------------\n");
     }
 };
 
@@ -75,7 +75,7 @@ extern "C" void start_personalizer_demo() {
 }
 
 int main() {
-    sigma_printf("[SIGMA_PERSONALITY]: Bootstrapping Personalizer Zenith...\n");
+    sigma_sigma_printf("[SIGMA_PERSONALITY]: Bootstrapping Personalizer Zenith...\n");
     start_personalizer_demo();
     return 0;
 }

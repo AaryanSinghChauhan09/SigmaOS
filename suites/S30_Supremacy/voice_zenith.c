@@ -25,11 +25,11 @@ static VoiceConfig g_voice_config = { .sample_rate = 44100, .pitch = 100, .vol =
  * ========================================================================= */
 
 void voice_init(void) {
-    // kprintf("[VOICE]: Sovereign Silicon-Direct Voice Shard Online.\n");
+    // ksigma_printf("[VOICE]: Sovereign Silicon-Direct Voice Shard Online.\n");
 }
 
 void voice_speak_alert(const char* msg) {
-    // kprintf("[VOICE]: System Alert Shard: '%s'\n", msg);
+    // ksigma_printf("[VOICE]: System Alert Shard: '%s'\n", msg);
     
     /* Simulate Silicon Voice generation via I/O Port */
     // u32 i = 0; while (msg[i]) { outb(0x61, msg[i++]); }

@@ -25,7 +25,7 @@ typedef struct BNSSStep {
  * ========================================================================= */
 
 void bnss_init(void) {
-    // kprintf("[BNSS-SHARD]: Sovereign Judicial Procedural Interface Online (v2.0).\n");
+    // ksigma_printf("[BNSS-SHARD]: Sovereign Judicial Procedural Interface Online (v2.0).\n");
 }
 
 k_status bnss_arrest_audit(void) {
@@ -36,7 +36,7 @@ k_status bnss_arrest_audit(void) {
      * Step 3: Female Arrest Logic (BNSS 51).
      * Step 4: Medical Examination (BNSS 53).
      */
-    // kprintf("[BNSS-SHARD]: Industrial Pulse: Arrest Audit Passed (BNSS 48-62 COMPLIANT).\n");
+    // ksigma_printf("[BNSS-SHARD]: Industrial Pulse: Arrest Audit Passed (BNSS 48-62 COMPLIANT).\n");
     return K_OK;
 }
 
@@ -45,7 +45,7 @@ k_status bnss_remand_audit(u32 days) {
      * Absorb BNSS USP: Section 187 Police/Judicial Custody Logic.
      * Audit if remand pulse follows the new 15/60/90 day sharded thresholds.
      */
-    // kprintf("[BNSS-SHARD]: Industrial Pulse: Remand Audit for %u days (BNSS 187 COMPLIANT).\n", days);
+    // ksigma_printf("[BNSS-SHARD]: Industrial Pulse: Remand Audit for %u days (BNSS 187 COMPLIANT).\n", days);
     return K_OK;
 }
 
@@ -54,7 +54,7 @@ k_status bsa_certificate_gen(void* shard_ptr) {
      * Absorb BSA USP: Section 63 Electronic Evidence Certificate.
      * Generate sharded-integrity certificate for digital forensic evidence.
      */
-    // kprintf("[BNSS-SHARD]: Industrial Pulse: BSA Section 63 Certificate Generated.\n");
+    // ksigma_printf("[BNSS-SHARD]: Industrial Pulse: BSA Section 63 Certificate Generated.\n");
     return K_OK;
 }
 
@@ -63,6 +63,6 @@ k_status bnss_search_audit(void) {
      * Absorb BNSS USP: Section 105-115 Search/Seizure.
      * Audit video-recording pulse requirement (BNSS 105).
      */
-    // kprintf("[BNSS-SHARD]: Industrial Pulse: Search/Seizure audited (BNSS 105 VIDEO-SYNC).\n");
+    // ksigma_printf("[BNSS-SHARD]: Industrial Pulse: Search/Seizure audited (BNSS 105 VIDEO-SYNC).\n");
     return K_OK;
 }

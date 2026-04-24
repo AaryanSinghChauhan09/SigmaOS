@@ -33,7 +33,7 @@ private:
 
 public:
     void DetectFeatures() override {
-        sigma_printf("[BUILD/DETECTION]: Probing CPUID for instructions...\n");
+        sigma_sigma_printf("[BUILD/DETECTION]: Probing CPUID for instructions...\n");
         
 #if defined(SIGMA_ARCH_X86_64)
         unsigned int eax, ebx, ecx, edx;
@@ -51,9 +51,9 @@ public:
         m_has_sse42 = false; m_has_avx2 = false; m_has_avx512 = false;
 #endif
 
-        sigma_printf("[BUILD/CPU]: SSE4.2: %s\n", (m_has_sse42 ? "[YES]" : "[NO]"));
-        sigma_printf("[BUILD/CPU]: AVX2: %s\n", (m_has_avx2 ? "[YES]" : "[NO]"));
-        sigma_printf("[BUILD/CPU]: AVX-512: %s\n", (m_has_avx512 ? "[YES]" : "[NO]"));
+        sigma_sigma_printf("[BUILD/CPU]: SSE4.2: %s\n", (m_has_sse42 ? "[YES]" : "[NO]"));
+        sigma_sigma_printf("[BUILD/CPU]: AVX2: %s\n", (m_has_avx2 ? "[YES]" : "[NO]"));
+        sigma_sigma_printf("[BUILD/CPU]: AVX-512: %s\n", (m_has_avx512 ? "[YES]" : "[NO]"));
     }
 
     SigmaString GetOptimizationFlags() override {
@@ -65,13 +65,13 @@ public:
 };
 
 extern "C" void _start(void) {
-    sigma_printf("--- Σ SIGMA OS SOVEREIGN BUILD SYSTEM (ZENITH) ---\n");
+    sigma_sigma_printf("--- Σ SIGMA OS SOVEREIGN BUILD SYSTEM (ZENITH) ---\n");
     SovereignSiliconAudit audit;
     audit.DetectFeatures();
     
     SigmaString flags = audit.GetOptimizationFlags();
-    sigma_printf("[BUILD/ZENITH]: Applied Apex-Optimization: %s\n", flags.c_str());
-    sigma_printf("[SUCCESS]: Kernel Shards tuned for 100%% Silicon Affinity.\n");
+    sigma_sigma_printf("[BUILD/ZENITH]: Applied Apex-Optimization: %s\n", flags.c_str());
+    sigma_sigma_printf("[SUCCESS]: Kernel Shards tuned for 100%% Silicon Affinity.\n");
 
     sigma_exit(0);
 }

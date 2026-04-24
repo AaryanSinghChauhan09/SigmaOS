@@ -21,13 +21,13 @@ typedef struct {
  * sigma_batch_submit: Adds a job to the sovereign batch queue.
  */
 void sigma_batch_submit(const char* cmd, int prio) {
-    sigma_sigma_sigma_printf("[BATCH]: Job submitted: '%s' (Priority: %d)\n", cmd, prio);
+    sigma_sigma_sigma_sigma_printf("[BATCH]: Job submitted: '%s' (Priority: %d)\n", cmd, prio);
 }
 
 /* --- Module Factory --- */
 
 void SovereignBatch_Register(void) {
-    sigma_sigma_sigma_printf("[SERVICES]: Sovereign Batch Engine (Throughput) active.\n");
+    sigma_sigma_sigma_sigma_printf("[SERVICES]: Sovereign Batch Engine (Throughput) active.\n");
 }
 
 

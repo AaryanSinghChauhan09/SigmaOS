@@ -297,8 +297,8 @@ i32 net_connect(i32 sockfd, u32 dst_ip, u16 dst_port) {
     s->state = SOCK_SYN_SENT;
     s->seq++;
 
-    extern void kprintf(const char* fmt, ...);
-    kprintf("[NET]: TCP SYN → %lu.%lu.%lu.%lu:%u (seq=%u)\n",
+    extern void ksigma_printf(const char* fmt, ...);
+    ksigma_printf("[NET]: TCP SYN → %lu.%lu.%lu.%lu:%u (seq=%u)\n",
             (dst_ip>>24)&0xFF, (dst_ip>>16)&0xFF,
             (dst_ip>>8)&0xFF,  dst_ip&0xFF,
             dst_port, s->seq - 1);
@@ -323,8 +323,8 @@ i64 net_send(i32 sockfd, const void* buf, usize len) {
     net_build_tcp(nb, s, TCP_PSH | TCP_ACK, buf, chunk);
     s->seq += chunk;
 
-    extern void kprintf(const char* fmt, ...);
-    kprintf("[NET]: TCP PSH+ACK %u bytes → port %u\n", chunk, s->remote_port);
+    extern void ksigma_printf(const char* fmt, ...);
+    ksigma_printf("[NET]: TCP PSH+ACK %u bytes → port %u\n", chunk, s->remote_port);
     netbuf_free(nb);
     return (i64)chunk;
 }
@@ -358,17 +358,17 @@ void net_init(void) {
     route_add(0xC0A80100u, 0xFFFFFF00u, 0,          0);  /* 192.168.1.0/24 */
     route_add(0x00000000u, 0x00000000u, 0xC0A801FEu, 0);  /* 0.0.0.0/0 GW */
 
-    extern void kprintf(const char* fmt, ...);
-    kprintf("[NET]: IPv4 stack online. IP=%lu.%lu.%lu.%lu | Socks=%u\n",
+    extern void ksigma_printf(const char* fmt, ...);
+    ksigma_printf("[NET]: IPv4 stack online. IP=%lu.%lu.%lu.%lu | Socks=%u\n",
             (g_my_ip>>24)&0xFF, (g_my_ip>>16)&0xFF,
             (g_my_ip>>8)&0xFF,   g_my_ip&0xFF,
             SOCK_MAX);
 }
 
 void net_audit(void) {
-    extern void kprintf(const char* fmt, ...);
+    extern void ksigma_printf(const char* fmt, ...);
     u32 open = 0, i;
     for (i = 0; i < SOCK_MAX; i++) if (g_socks[i].used) open++;
-    kprintf("[NET]: Open sockets=%u / %u. lwIP/BSD = ZERO dependency.\n",
+    ksigma_printf("[NET]: Open sockets=%u / %u. lwIP/BSD = ZERO dependency.\n",
             open, SOCK_MAX);
 }

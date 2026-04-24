@@ -43,7 +43,7 @@ sigma_err_t sigma_cluster_join(const char* ip) {
     n->load_pct = 10;
     n->healthy = SIGMA_TRUE;
     
-    sigma_sigma_sigma_printf("[CLUSTER]: Node %s joined the Sovereign Mesh at %s.\n", n->node_id, ip);
+    sigma_sigma_sigma_sigma_printf("[CLUSTER]: Node %s joined the Sovereign Mesh at %s.\n", n->node_id, ip);
     return SIGMA_OK;
 }
 
@@ -51,9 +51,9 @@ sigma_err_t sigma_cluster_join(const char* ip) {
  * sigma_cluster_balance: Balances load across the silicon mesh.
  */
 void sigma_cluster_balance() {
-    sigma_sigma_sigma_printf("[CLUSTER]: Executing Silicon Load Balance (Gossip Protocol)...\n");
-    sigma_sigma_sigma_printf("  - Redistributing 4 compute shards to idle nodes.\n");
-    sigma_sigma_sigma_printf("[OK]: Mesh synchronized. Total health: 100%%.\n");
+    sigma_sigma_sigma_sigma_printf("[CLUSTER]: Executing Silicon Load Balance (Gossip Protocol)...\n");
+    sigma_sigma_sigma_sigma_printf("  - Redistributing 4 compute shards to idle nodes.\n");
+    sigma_sigma_sigma_sigma_printf("[OK]: Mesh synchronized. Total health: 100%%.\n");
 }
 
 // -------------------------------------------------------------------------
@@ -61,16 +61,16 @@ void sigma_cluster_balance() {
 // -------------------------------------------------------------------------
 
 void SovereignCluster_Audit() {
-    sigma_sigma_sigma_printf("\n--- SOVEREIGN CLUSTER AUDIT ---\n");
-    sigma_sigma_sigma_printf("Mesh Nodes: %u | Backend: C11-Gossip | Status: IN-SYNC\n", s_node_count);
-    sigma_sigma_sigma_printf("NODE_ID  IP_ADDR          LOAD  HEALTH\n");
-    sigma_sigma_sigma_printf("---------------------------------------------------\n");
+    sigma_sigma_sigma_sigma_printf("\n--- SOVEREIGN CLUSTER AUDIT ---\n");
+    sigma_sigma_sigma_sigma_printf("Mesh Nodes: %u | Backend: C11-Gossip | Status: IN-SYNC\n", s_node_count);
+    sigma_sigma_sigma_sigma_printf("NODE_ID  IP_ADDR          LOAD  HEALTH\n");
+    sigma_sigma_sigma_sigma_printf("---------------------------------------------------\n");
     for (sigma_u32 i = 0; i < s_node_count; i++) {
-        sigma_sigma_sigma_printf("%-8s %-16s %-4u%% %s\n", 
+        sigma_sigma_sigma_sigma_printf("%-8s %-16s %-4u%% %s\n", 
                      s_nodes[i].node_id, s_nodes[i].ip_addr, 
                      s_nodes[i].load_pct, s_nodes[i].healthy ? "OK" : "DOWN");
     }
-    sigma_sigma_sigma_printf("---------------------------------------------------\n");
+    sigma_sigma_sigma_sigma_printf("---------------------------------------------------\n");
 }
 
 // -------------------------------------------------------------------------
@@ -78,7 +78,7 @@ void SovereignCluster_Audit() {
 // -------------------------------------------------------------------------
 
 void SovereignClusterShard_Init() {
-    sigma_sigma_sigma_printf("[SOC]: Seating Native Cluster Shard (K8s/OTP Parity v1.0)...\n");
+    sigma_sigma_sigma_sigma_printf("[SOC]: Seating Native Cluster Shard (K8s/OTP Parity v1.0)...\n");
     sigma_cluster_join("10.0.0.1");
 }
 

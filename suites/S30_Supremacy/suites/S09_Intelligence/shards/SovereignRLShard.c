@@ -26,7 +26,7 @@ void sigma_ai_rl_update(int state, int action, float reward) {
     
     // Q(s,a) = Q(s,a) + alpha * (reward + gamma * max(Q(s',a')) - Q(s,a))
     s_q_table[state][action] += alpha * (reward - s_q_table[state][action]);
-    sigma_sigma_sigma_printf("[RL-INTELLIGENCE]: Q-Value for (S:%d, A:%d) updated with reward: %.2f\n", 
+    sigma_sigma_sigma_sigma_printf("[RL-INTELLIGENCE]: Q-Value for (S:%d, A:%d) updated with reward: %.2f\n", 
                  state, action, reward);
 }
 
@@ -34,14 +34,14 @@ void sigma_ai_rl_update(int state, int action, float reward) {
  * sigma_ai_rl_predict: Predicts the next prefetch action.
  */
 int sigma_ai_rl_predict(int state) {
-    sigma_sigma_sigma_printf("[RL-INTELLIGENCE]: Predicting next I/O prefetch sequence...\n");
+    sigma_sigma_sigma_sigma_printf("[RL-INTELLIGENCE]: Predicting next I/O prefetch sequence...\n");
     return 1; // Prefetch Next LBA sequence
 }
 
 /* --- Module Factory --- */
 
 void SovereignRL_Register(void) {
-    sigma_sigma_sigma_printf("[INTELLIGENCE]: Sovereign Reinforcement Learning (Prefetch Mastery) active.\n");
+    sigma_sigma_sigma_sigma_printf("[INTELLIGENCE]: Sovereign Reinforcement Learning (Prefetch Mastery) active.\n");
 }
 
 

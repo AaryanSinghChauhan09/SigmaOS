@@ -29,7 +29,7 @@ static u32 g_io_count = 0;
  * ========================================================================= */
 
 void io_scheduler_init(void) {
-    // kprintf("[IO-SCHED]: Sovereign Budget-Fair Disk Orchestrator Online.\n");
+    // ksigma_printf("[IO-SCHED]: Sovereign Budget-Fair Disk Orchestrator Online.\n");
 }
 
 k_status io_submit(IORequest* req) {
@@ -40,12 +40,12 @@ k_status io_submit(IORequest* req) {
      * Merge requests into contiguous sharded streams.
      */
     g_io_queue[g_io_count++] = *req;
-    // kprintf("[IO-SCHED]: Industrial Pulse Queued: Sector %llu\n", req->sector);
+    // ksigma_printf("[IO-SCHED]: Industrial Pulse Queued: Sector %llu\n", req->sector);
     return K_OK;
 }
 
 void io_dispatch_pulse(void) {
     /* Absorb Linux Deadline USP: Fairness + Latency Guarantee */
-    // kprintf("[IO-SCHED]: Dispatching %u industrial IO requests to silicon devices.\n", g_io_count);
+    // ksigma_printf("[IO-SCHED]: Dispatching %u industrial IO requests to silicon devices.\n", g_io_count);
     g_io_count = 0;
 }

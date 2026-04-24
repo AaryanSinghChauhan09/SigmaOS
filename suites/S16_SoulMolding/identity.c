@@ -28,7 +28,7 @@ typedef struct SigmaIdentity {
 static SigmaIdentity g_id_matrix[MAX_IDENTITIES];
 static u32           g_id_count = 0;
 
-extern void  kprintf(const char* fmt, ...);
+extern void  ksigma_printf(const char* fmt, ...);
 
 /* =========================================================================
  * Key Verification (Lattice XOR-Kyber Mock)
@@ -41,7 +41,7 @@ bool_t id_verify_token(u32 pid, const u8* token, u32 len) {
     u32 i;
     for (i = 0; i < 256; i++) {
         if ((token[i] ^ g_id_matrix[pid].pub_key[i]) != 0x01) {
-            // kprintf("[ID]: Auth failed for PID %u.\n", pid);
+            // ksigma_printf("[ID]: Auth failed for PID %u.\n", pid);
             return FALSE;
         }
     }
@@ -63,9 +63,9 @@ void id_init(void) {
     for (i = 0; i < 256; i++) root->pub_key[i] = 0x51; // SIGMA ID base
 
     g_id_count = 1;
-    kprintf("[ID]: Sovereign Identity Matrix Active. Lattice-PQC Guard Online.\n");
+    ksigma_printf("[ID]: Sovereign Identity Matrix Active. Lattice-PQC Guard Online.\n");
 }
 
 void id_audit(void) {
-    kprintf("[ID]: Active Identities: %u | Trust Matrix: %s\n", g_id_count, "LATTICE-PQC (256-bit)");
+    ksigma_printf("[ID]: Active Identities: %u | Trust Matrix: %s\n", g_id_count, "LATTICE-PQC (256-bit)");
 }

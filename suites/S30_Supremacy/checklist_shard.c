@@ -35,7 +35,7 @@ static void sigma_strncpy(char* dest, const char* src, u32 n) {
     dest[i] = '\0';
 }
 
-static u32 sigma_strlen(const char* s) {
+static u32 sigma_sigma_strlen(const char* s) {
     u32 i = 0;
     while (s[i]) i++;
     return i;
@@ -127,7 +127,7 @@ static u32           g_template_count = 0;
 /* =========================================================================
  * Forward declarations
  * ========================================================================= */
-extern void kprintf(const char* fmt, ...);
+extern void ksigma_printf(const char* fmt, ...);
 
 /* =========================================================================
  * Helper: Add item to template
@@ -886,7 +886,7 @@ void checklist_init(void) {
     init_consumer_template();
     init_rera_template();
 
-    kprintf("[CHECKLIST-SHARD]: %u Legal Domain Templates Loaded (BNSS/BNS/BSA/POCSO/PMLA/RTI/IBC/DPDP/GST/ARB/IT/LABOUR/CONSUMER/RERA).\n",
+    ksigma_printf("[CHECKLIST-SHARD]: %u Legal Domain Templates Loaded (BNSS/BNS/BSA/POCSO/PMLA/RTI/IBC/DPDP/GST/ARB/IT/LABOUR/CONSUMER/RERA).\n",
             g_template_count);
 }
 
@@ -898,7 +898,7 @@ k_status checklist_query_domain(LawDomain domain, u32* out_count) {
     for (i = 0; i < g_template_count; i++) {
         if (g_templates[i].domain == domain) {
             if (out_count) *out_count = g_templates[i].item_count;
-            kprintf("[CHECKLIST]: Domain Template '%s' has %u items.\n",
+            ksigma_printf("[CHECKLIST]: Domain Template '%s' has %u items.\n",
                     g_templates[i].name, g_templates[i].item_count);
             return K_OK;
         }
@@ -914,12 +914,12 @@ k_status checklist_audit_deadline(u32 filing_date, u32 section_limit) {
             ChecklistItem* ci = &g_templates[i].items[j];
             if (ci->deadline_days > 0 && filing_date > section_limit + ci->deadline_days) {
                 overdue_count++;
-                kprintf("[DEADLINE-AUDIT]: OVERDUE: %s (Ref: %s, Penalty: Rs %u)\n",
+                ksigma_printf("[DEADLINE-AUDIT]: OVERDUE: %s (Ref: %s, Penalty: Rs %u)\n",
                         ci->desc, ci->section_ref, ci->penalty_rs);
             }
         }
     }
-    kprintf("[DEADLINE-AUDIT]: Total overdue items: %u\n", overdue_count);
+    ksigma_printf("[DEADLINE-AUDIT]: Total overdue items: %u\n", overdue_count);
     return (overdue_count == 0) ? K_OK : K_ERR_INVAL;
 }
 
@@ -933,7 +933,7 @@ k_status checklist_generate_report(void) {
             if (g_templates[i].items[j].status == STATUS_COMPLETED) completed++;
         }
     }
-    kprintf("[CHECKLIST-REPORT]: Total=%u | Pending=%u | Completed=%u | Compliance=%.1f%%\n",
+    ksigma_printf("[CHECKLIST-REPORT]: Total=%u | Pending=%u | Completed=%u | Compliance=%.1f%%\n",
             total, pending, completed, completed * 100.0f / (total ? total : 1));
     return K_OK;
 }

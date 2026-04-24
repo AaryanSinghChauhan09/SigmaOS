@@ -65,7 +65,7 @@ u64 sovereign_bpf_exec(u32 prog_id, u64 ctx) {
                 regs[inst.dst] = (u64)inst.imm;
                 break;
             case SBPF_OP_RET:
-                // kprintf("[S-BPF]: Program [%u] returned: %llu\n", prog_id, regs[0]);
+                // ksigma_printf("[S-BPF]: Program [%u] returned: %llu\n", prog_id, regs[0]);
                 return regs[0];
             default:
                 break; // Unknown opcode
@@ -76,7 +76,7 @@ u64 sovereign_bpf_exec(u32 prog_id, u64 ctx) {
 
 void sovereign_bpf_init(void) {
     for (int i = 0; i < MAX_S_BPF_PROGS; i++) g_progs[i].active = FALSE;
-    // kprintf("[S-BPF]: Sovereign BPF Virtual Machine Shard Online.\n");
+    // ksigma_printf("[S-BPF]: Sovereign BPF Virtual Machine Shard Online.\n");
 }
 
 void sovereign_bpf_load(u64 id, SBPFInst* instructions, u32 count) {
@@ -90,5 +90,5 @@ void sovereign_bpf_load(u64 id, SBPFInst* instructions, u32 count) {
     for (u32 i = 0; i < p->inst_count; i++) {
         p->code[i] = instructions[i];
     }
-    // kprintf("[S-BPF]: Loaded Sovereign Program: ID %llu\n", id);
+    // ksigma_printf("[S-BPF]: Loaded Sovereign Program: ID %llu\n", id);
 }

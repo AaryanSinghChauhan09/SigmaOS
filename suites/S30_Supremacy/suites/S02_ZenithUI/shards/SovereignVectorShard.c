@@ -20,14 +20,14 @@ typedef struct {
  */
 void sigma_gfx_draw_curve(SigmaVec2_t p0, SigmaVec2_t p1, SigmaVec2_t p2) {
     /* Logic: De Casteljau subdivision (Principle: Vector Graphics) */
-    sigma_sigma_sigma_printf("[ZENITHUI]: Rasterizing Bezier path (%.1f,%.1f) -> (%.1f,%.1f).\n", 
+    sigma_sigma_sigma_sigma_printf("[ZENITHUI]: Rasterizing Bezier path (%.1f,%.1f) -> (%.1f,%.1f).\n", 
                  p0.x, p0.y, p2.x, p2.y);
 }
 
 /* --- Module Factory --- */
 
 void SovereignVector_Register(void) {
-    sigma_sigma_sigma_printf("[ZENITHUI]: Sovereign Vector Engine (Scalable Art) active.\n");
+    sigma_sigma_sigma_sigma_printf("[ZENITHUI]: Sovereign Vector Engine (Scalable Art) active.\n");
 }
 
 

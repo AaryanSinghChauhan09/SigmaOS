@@ -33,9 +33,9 @@ public:
         double u = 0.0, a = 9.8, t = 5.0;
         double v = u + a * t;
         double s = u * t + 0.5 * a * t * t;
-        sigma_printf("[PHYSICS/SOLVE]: Kinematics (u=0, a=9.8, t=5)\n");
-        sigma_printf("[PHYSICS/SOLVE]: Final Velocity (v): " << v << " m/s\n");
-        sigma_printf("[PHYSICS/SOLVE]: Displacement (s): " << s << " m\n");
+        sigma_sigma_printf("[PHYSICS/SOLVE]: Kinematics (u=0, a=9.8, t=5)\n");
+        sigma_sigma_printf("[PHYSICS/SOLVE]: Final Velocity (v): " << v << " m/s\n");
+        sigma_sigma_printf("[PHYSICS/SOLVE]: Displacement (s): " << s << " m\n");
     }
 };
 
@@ -45,8 +45,8 @@ public:
     void Solve() override {
         double moles = 0.5, volume_litres = 2.0;
         double molarity = moles / volume_litres;
-        sigma_printf("[CHEMISTRY/SOLVE]: Molarity (n=0.5, V=2.0L)\n");
-        sigma_printf("[CHEMISTRY/SOLVE]: Result: " << molarity << " M (mol/L)\n");
+        sigma_sigma_printf("[CHEMISTRY/SOLVE]: Molarity (n=0.5, V=2.0L)\n");
+        sigma_sigma_printf("[CHEMISTRY/SOLVE]: Result: " << molarity << " M (mol/L)\n");
     }
 };
 
@@ -57,8 +57,8 @@ public:
         double a = 3, b = 4, c = 5;
         double s = (a + b + c) / 2.0;
         double area = std::sqrt(s * (s - a) * (s - b) * (s - c));
-        sigma_printf("[MATH/SOLVE]: Heron's Formula (sides 3, 4, 5)\n");
-        sigma_printf("[MATH/SOLVE]: Area Shard: " << area << " sq units (Verified)\n");
+        sigma_sigma_printf("[MATH/SOLVE]: Heron's Formula (sides 3, 4, 5)\n");
+        sigma_sigma_printf("[MATH/SOLVE]: Area Shard: " << area << " sq units (Verified)\n");
     }
 };
 
@@ -68,8 +68,8 @@ public:
     void Solve() override {
         double N0 = 100.0, t = 10.0, T = 3.3; // t=10s, Half-life=3.3s
         double N = N0 * std::pow(0.5, t / T);
-        sigma_printf("[PHYSICS/SOLVE]: Radioactivity (N0=100, t=10, T=3.3)\n");
-        sigma_printf("[PHYSICS/SOLVE]: Remaining Shard (N): " << N << " units.\n");
+        sigma_sigma_printf("[PHYSICS/SOLVE]: Radioactivity (N0=100, t=10, T=3.3)\n");
+        sigma_sigma_printf("[PHYSICS/SOLVE]: Remaining Shard (N): " << N << " units.\n");
     }
 };
 
@@ -85,9 +85,9 @@ public:
     }
 
     void ExecuteSolverAudit() {
-        sigma_printf("--- Σ SIGMA OS MASTER SCHOLASTIC PROBLEM SOLVER ---\n");
+        sigma_sigma_printf("--- Σ SIGMA OS MASTER SCHOLASTIC PROBLEM SOLVER ---\n");
         for (auto const& solver : m_solvers) {
-            sigma_printf("\n[SOLVE-SHADING]: Executing Solution Shard...\n");
+            sigma_sigma_printf("\n[SOLVE-SHADING]: Executing Solution Shard...\n");
             solver->Solve();
         }
     }
@@ -98,7 +98,7 @@ int main() {
     solver.Synthesize();
     solver.ExecuteSolverAudit();
 
-    sigma_printf("\n[SUCCESS]: Competitive Scholastic Problem Solver Online. NCERT Sovereignty 100%.\n");
+    sigma_sigma_printf("\n[SUCCESS]: Competitive Scholastic Problem Solver Online. NCERT Sovereignty 100%.\n");
     return 0;
 }
 

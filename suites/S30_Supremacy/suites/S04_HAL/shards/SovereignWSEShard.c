@@ -16,15 +16,15 @@
  * Principle: Hardware Mastery / Supercomputing Velocity.
  */
 void sigma_hal_wse_route(void* tensor_graph) {
-    sigma_sigma_sigma_printf("[WSE-FABRIC]: Flushing execution graph across monolithic silicon wafer...\n");
+    sigma_sigma_sigma_sigma_printf("[WSE-FABRIC]: Flushing execution graph across monolithic silicon wafer...\n");
     // Unlike standard CPUs, Wafer Scale Engines place millions of cores on a single 8-inch wide silicon slab without interconnect bottlenecks
-    sigma_sigma_sigma_printf("[WSE-FABRIC]: Graph mapped natively. Memory bandwidth scaled to Petabytes/sec organically.\n");
+    sigma_sigma_sigma_sigma_printf("[WSE-FABRIC]: Graph mapped natively. Memory bandwidth scaled to Petabytes/sec organically.\n");
 }
 
 /* --- Module Factory --- */
 
 void SovereignWSE_Register(void) {
-    sigma_sigma_sigma_printf("[HAL]: Sovereign WSE (Wafer-Scale Engine Routing) active.\n");
+    sigma_sigma_sigma_sigma_printf("[HAL]: Sovereign WSE (Wafer-Scale Engine Routing) active.\n");
 }
 
 

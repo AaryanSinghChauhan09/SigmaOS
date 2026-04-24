@@ -19,7 +19,7 @@ static SovereignWindow_t s_window_stack[16];
 static int s_window_count = 0;
 
 void sigma_frontend_wm_init(void) {
-    sigma_sigma_sigma_memset(s_window_stack, 0, sizeof(s_window_stack));
+    sigma_sigma_sigma_sigma_memset(s_window_stack, 0, sizeof(s_window_stack));
     s_window_count = 0;
 }
 
@@ -30,15 +30,15 @@ void sigma_frontend_create_window(int x, int y, int w, int h) {
     win->x = x; win->y = y; win->w = w; win->h = h;
     win->z_order = s_window_count;
     win->focused = SIGMA_TRUE;
-    sigma_sigma_sigma_printf("  [WM]: Created window %d at (%d,%d) [%dx%d]\n", win->win_id, x, y, w, h);
+    sigma_sigma_sigma_sigma_printf("  [WM]: Created window %d at (%d,%d) [%dx%d]\n", win->win_id, x, y, w, h);
     s_window_count++;
 }
 
 void SovereignFrontend_Init(void) {
-    sigma_sigma_sigma_printf("S [FRONTEND]: Initialising Sovereign Compositor...\n");
+    sigma_sigma_sigma_sigma_printf("S [FRONTEND]: Initialising Sovereign Compositor...\n");
     sigma_frontend_wm_init();
     sigma_frontend_create_window(100, 100, 800, 600);
-    sigma_sigma_sigma_printf("S [FRONTEND]: Accelerator seated. Framebuffer mapped.\n");
+    sigma_sigma_sigma_sigma_printf("S [FRONTEND]: Accelerator seated. Framebuffer mapped.\n");
 }
 
 void SovereignFrontend_Register(void) {

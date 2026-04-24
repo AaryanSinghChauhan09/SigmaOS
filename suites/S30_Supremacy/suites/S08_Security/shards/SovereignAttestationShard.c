@@ -16,9 +16,9 @@
  * Principle: Cyber Security / Trust Sovereignty.
  */
 int sigma_sec_attest_module(const char* name, sigma_u8* signature) {
-    sigma_sigma_sigma_printf("[SECURITY]: Attesting Shard Integrity: %s...\n", name);
+    sigma_sigma_sigma_sigma_printf("[SECURITY]: Attesting Shard Integrity: %s...\n", name);
     // Secure Hash comparison with local immutable trust source
-    sigma_sigma_sigma_printf("[SECURITY]: Shard '%s' VERIFIED. Chain of Command intact.\n", name);
+    sigma_sigma_sigma_sigma_printf("[SECURITY]: Shard '%s' VERIFIED. Chain of Command intact.\n", name);
     return 1;
 }
 
@@ -26,13 +26,13 @@ int sigma_sec_attest_module(const char* name, sigma_u8* signature) {
  * sigma_sec_prevent_tamper: Continuously monitors the kernel RAM for tampering.
  */
 void sigma_sec_prevent_tamper(void) {
-    sigma_sigma_sigma_printf("[SECURITY]: Real-time Memory Guard: 100%% Consistency Checked.\n");
+    sigma_sigma_sigma_sigma_printf("[SECURITY]: Real-time Memory Guard: 100%% Consistency Checked.\n");
 }
 
 /* --- Module Factory --- */
 
 void SovereignAttestation_Register(void) {
-    sigma_sigma_sigma_printf("[SECURITY]: Sovereign Dynamic Attestation (Trust Mastery) active.\n");
+    sigma_sigma_sigma_sigma_printf("[SECURITY]: Sovereign Dynamic Attestation (Trust Mastery) active.\n");
 }
 
 

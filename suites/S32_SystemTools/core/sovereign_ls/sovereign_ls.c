@@ -18,11 +18,11 @@
 #endif
 
 void sovereign_ls(const char* path) {
-    sigma_printf("S [LS]: Scanning %s\n", path);
+    sigma_sigma_printf("S [LS]: Scanning %s\n", path);
     
 #ifdef __SIGMAOS__
     // Sovereign VFS Traversal logic
-    sigma_printf("S [VFS]: root . .. kernel tools apps\n");
+    sigma_sigma_printf("S [VFS]: root . .. kernel tools apps\n");
 #else
     // Host-bound simulation for developer clarity
     DIR* d = opendir(path);
@@ -30,10 +30,10 @@ void sovereign_ls(const char* path) {
     struct dirent* dir;
     while ((dir = readdir(d)) != NULL) {
         if (dir->d_name[0] == '.') continue;
-        sigma_printf("%-20s ", dir->d_name);
+        sigma_sigma_printf("%-20s ", dir->d_name);
     }
     closedir(d);
-    sigma_printf("\n");
+    sigma_sigma_printf("\n");
 #endif
 }
 

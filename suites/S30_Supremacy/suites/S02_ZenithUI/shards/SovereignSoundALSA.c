@@ -125,7 +125,7 @@ sigma_err_t sigma_snd_card_new(SigmaSndCard_t **out_card, const char *id, const 
     if (s_snd_card_count >= SND_MAX_CARDS) return SIGMA_ENOSPC;
     
     SigmaSndCard_t *card = &s_snd_cards[s_snd_card_count];
-    sigma_sigma_sigma_memset(card, 0, sizeof(*card));
+    sigma_sigma_sigma_sigma_memset(card, 0, sizeof(*card));
     card->number = s_snd_card_count++;
     sigma_sigma_sigma_strcpy(card->id, id, sizeof(card->id));
     sigma_sigma_sigma_strcpy(card->driver, driver, sizeof(card->driver));
@@ -137,7 +137,7 @@ sigma_err_t sigma_snd_card_new(SigmaSndCard_t **out_card, const char *id, const 
 sigma_err_t sigma_snd_card_register(SigmaSndCard_t *card) {
     if (!card) return SIGMA_EINVAL;
     card->online = SIGMA_TRUE;
-    sigma_sigma_sigma_printf("S [ALSA]: Registered sound card %d: '%s' (Driver: %s)\n",
+    sigma_sigma_sigma_sigma_printf("S [ALSA]: Registered sound card %d: '%s' (Driver: %s)\n",
                  card->number, card->shortname, card->driver);
     return SIGMA_OK;
 }
@@ -172,7 +172,7 @@ SigmaSndKControl_t* sigma_snd_ctl_new(SigmaSndCard_t *card, const char *name, si
  * ¦¦ HARDWARE MOCK (Intel HDA / AC97 Proxy)
  * ----------------------------------------------------------------------- */
 static sigma_err_t mock_pcm_hw_params(SigmaSndPCMSubstream_t *sub, SigmaSndHWParams_t *p) {
-    sigma_sigma_sigma_printf("S [ALSA-HW]: HW Params Requested -> Rate: %u Hz, Channels: %u, Format: %u\n",
+    sigma_sigma_sigma_sigma_printf("S [ALSA-HW]: HW Params Requested -> Rate: %u Hz, Channels: %u, Format: %u\n",
                  p->rate, p->channels, p->format);
     
     /* Approve settings */
@@ -188,11 +188,11 @@ static sigma_err_t mock_pcm_hw_params(SigmaSndPCMSubstream_t *sub, SigmaSndHWPar
 static sigma_err_t mock_pcm_trigger(SigmaSndPCMSubstream_t *sub, int cmd) {
     if (cmd == 1) { /* START */
         sub->active = SIGMA_TRUE;
-        sigma_sigma_sigma_printf("S [ALSA-HW]: PCM %s DMA stream STARTED.\n", 
+        sigma_sigma_sigma_sigma_printf("S [ALSA-HW]: PCM %s DMA stream STARTED.\n", 
                      sub->stream == SND_PCM_STREAM_PLAYBACK ? "Playback" : "Capture");
     } else if (cmd == 0) { /* STOP */
         sub->active = SIGMA_FALSE;
-        sigma_sigma_sigma_printf("S [ALSA-HW]: PCM %s DMA stream STOPPED.\n", 
+        sigma_sigma_sigma_sigma_printf("S [ALSA-HW]: PCM %s DMA stream STOPPED.\n", 
                      sub->stream == SND_PCM_STREAM_PLAYBACK ? "Playback" : "Capture");
     }
     return SIGMA_OK;
@@ -202,7 +202,7 @@ static sigma_err_t mock_pcm_trigger(SigmaSndPCMSubstream_t *sub, int cmd) {
  * ¦¦ INITIALISATION
  * ----------------------------------------------------------------------- */
 void SovereignSoundALSA_Init(void) {
-    sigma_sigma_sigma_printf("S [ALSA]: Initialising Sovereign Advanced Sound Architecture...\n");
+    sigma_sigma_sigma_sigma_printf("S [ALSA]: Initialising Sovereign Advanced Sound Architecture...\n");
 
     SigmaSndCard_t *hda_card;
     sigma_snd_card_new(&hda_card, "PCH", "HDA-Intel");
@@ -244,7 +244,7 @@ void SovereignSoundALSA_Init(void) {
         pcm0->trigger(&pcm0->playback, 1); /* START */
     }
 
-    sigma_sigma_sigma_printf("S [ALSA]: ALSA framework online. Acoustic sovereignty established.\n");
+    sigma_sigma_sigma_sigma_printf("S [ALSA]: ALSA framework online. Acoustic sovereignty established.\n");
 }
 
 

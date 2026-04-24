@@ -19,8 +19,8 @@ typedef struct {
  * sigma_service_discover: Locates a sharded service in the local/mesh cluster.
  */
 void sigma_service_discover(const char* name) {
-    sigma_sigma_sigma_printf("[MICROSERVICE]: Scanning Mesh for service '%s'...\n", name);
-    sigma_sigma_sigma_printf("  [DNS]: Sovereign Mesh Discovery resolved '%s' to SID:0x4102.\n", name);
+    sigma_sigma_sigma_sigma_printf("[MICROSERVICE]: Scanning Mesh for service '%s'...\n", name);
+    sigma_sigma_sigma_sigma_printf("  [DNS]: Sovereign Mesh Discovery resolved '%s' to SID:0x4102.\n", name);
 }
 
 /**
@@ -28,12 +28,12 @@ void sigma_service_discover(const char* name) {
  */
 void sigma_service_heartbeat(SigmaService_t* svc) {
     if (svc->is_healthy) {
-        sigma_sigma_sigma_printf("[MICROSERVICE]: Service '%s' reports GREEN status.\n", svc->service_name);
+        sigma_sigma_sigma_sigma_printf("[MICROSERVICE]: Service '%s' reports GREEN status.\n", svc->service_name);
     }
 }
 
 void SovereignMicroservice_Register() {
-    sigma_sigma_sigma_printf("[REGISTRY]: Microservice Mesh Discovery active in Orchestration Suite.\n");
+    sigma_sigma_sigma_sigma_printf("[REGISTRY]: Microservice Mesh Discovery active in Orchestration Suite.\n");
 }
 
 

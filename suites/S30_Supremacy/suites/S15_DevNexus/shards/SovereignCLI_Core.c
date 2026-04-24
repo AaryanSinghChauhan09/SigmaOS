@@ -38,7 +38,7 @@ static sigma_u32 sigma_cli_hash(const char *str) {
 }
 
 void sigma_cli_init(SigmaCLICtx_t *ctx) {
-    sigma_sigma_sigma_memset(ctx, 0, sizeof(*ctx));
+    sigma_sigma_sigma_sigma_memset(ctx, 0, sizeof(*ctx));
 }
 
 sigma_err_t sigma_cli_register(SigmaCLICtx_t *ctx, const char *name, const char *desc, SigmaCLIHandler_t handler) {
@@ -68,7 +68,7 @@ sigma_err_t sigma_cli_dispatch(SigmaCLICtx_t *ctx, const char *cmdline) {
         h = (h + 1) % SIGMA_CLI_HASH_SIZE;
         if (h == start) break;
     }
-    sigma_sigma_sigma_printf("S [CLI]: Unknown command: '%s'\n", argv[0]);
+    sigma_sigma_sigma_sigma_printf("S [CLI]: Unknown command: '%s'\n", argv[0]);
     return SIGMA_ENOENT;
 }
 

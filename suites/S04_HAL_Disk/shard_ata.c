@@ -279,7 +279,7 @@ k_status ata_write_sectors(u32 drive_idx, u64 lba, u32 count, const void* buf) {
  * Driver Init — probe all 4 drive slots
  * ========================================================================= */
 void ata_init(void) {
-    extern void kprintf(const char* fmt, ...);
+    extern void ksigma_printf(const char* fmt, ...);
 
     u16  channels[2][2] = {
         {ATA_PRIMARY_BASE,   ATA_PRIMARY_CTRL},
@@ -297,7 +297,7 @@ void ata_init(void) {
             d->present = FALSE;
 
             if (ata_identify(d)) {
-                kprintf("[ATA]: Drive %u: %s | %llu sectors (%llu MB) | LBA%s\n",
+                ksigma_printf("[ATA]: Drive %u: %s | %llu sectors (%llu MB) | LBA%s\n",
                         g_drive_count, d->model, d->sectors,
                         (d->sectors * 512ULL) / (1024ULL * 1024ULL),
                         d->lba48 ? "48" : "28");
@@ -307,9 +307,9 @@ void ata_init(void) {
     }
 
     if (g_drive_count == 0)
-        kprintf("[ATA]: No drives found (virtual/QEMU without -hda).\n");
+        ksigma_printf("[ATA]: No drives found (virtual/QEMU without -hda).\n");
     else
-        kprintf("[ATA]: %u drive(s) probed. PIO mode active.\n", g_drive_count);
+        ksigma_printf("[ATA]: %u drive(s) probed. PIO mode active.\n", g_drive_count);
 }
 
 u32 ata_drive_count(void) { return g_drive_count; }

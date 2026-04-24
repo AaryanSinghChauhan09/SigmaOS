@@ -25,22 +25,22 @@ namespace Boot {
 class SovereignLauncher : public SigmaObject {
 public:
     SovereignLauncher() {
-        sigma_printf("[LAUNCHER-ZENITH]: Sovereign Launcher Shard Online (v14.0).\n");
+        sigma_sigma_printf("[LAUNCHER-ZENITH]: Sovereign Launcher Shard Online (v14.0).\n");
     }
 
     const char* type_name() const noexcept override { return "SovereignLauncher"; }
 
     // --- Core Boot Logic (Custom Native Functions) ---
     void ignite_silicon() {
-        sigma_printf("[LAUNCHER-ZENITH]: Handshaking Silicon Root... [SUCCESS]\n");
-        sigma_printf("[LAUNCHER-ZENITH]: | Injecting Sovereign Kernels...\n");
-        sigma_printf("[LAUNCHER-ZENITH]: | Bootstrapping Hypervisor Zenith (The Swallower)...\n");
-        sigma_printf("[LAUNCHER-ZENITH]: | Initializing AI Predictive Sharding...\n");
-        sigma_printf("[LAUNCHER-ZENITH]: | Pulsing Metal-Nexus UI Shards...\n");
+        sigma_sigma_printf("[LAUNCHER-ZENITH]: Handshaking Silicon Root... [SUCCESS]\n");
+        sigma_sigma_printf("[LAUNCHER-ZENITH]: | Injecting Sovereign Kernels...\n");
+        sigma_sigma_printf("[LAUNCHER-ZENITH]: | Bootstrapping Hypervisor Zenith (The Swallower)...\n");
+        sigma_sigma_printf("[LAUNCHER-ZENITH]: | Initializing AI Predictive Sharding...\n");
+        sigma_sigma_printf("[LAUNCHER-ZENITH]: | Pulsing Metal-Nexus UI Shards...\n");
     }
 
     void finalize_sharding() {
-        sigma_printf("[LAUNCHER-ZENITH]: All Shards Paired. System Sovereignty: 100%%. ENTERING ZENITH.\n");
+        sigma_sigma_printf("[LAUNCHER-ZENITH]: All Shards Paired. System Sovereignty: 100%%. ENTERING ZENITH.\n");
     }
 };
 
@@ -55,7 +55,7 @@ extern "C" void start_launcher_zenith() {
 }
 
 int main() {
-    sigma_printf("[SIGMA_BOOT]: Bootstrapping Launcher Zenith...\n");
+    sigma_sigma_printf("[SIGMA_BOOT]: Bootstrapping Launcher Zenith...\n");
     start_launcher_zenith();
     return 0;
 }

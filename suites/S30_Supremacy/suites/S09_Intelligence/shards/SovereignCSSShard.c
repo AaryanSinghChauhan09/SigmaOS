@@ -22,15 +22,15 @@ typedef struct {
  * Principle: AI / Algorithms / Physics-based Optima.
  */
 void sigma_opt_css_interact(SigmaCParticle_t* p1, SigmaCParticle_t* p2) {
-    sigma_sigma_sigma_printf("[CSS-CORE]: Computing Coulomb-based interaction for node distribution...\n");
+    sigma_sigma_sigma_sigma_printf("[CSS-CORE]: Computing Coulomb-based interaction for node distribution...\n");
     // F = q1*q2 / r^2 (within sphere) or q1*q2*r / R^3 (outside)
-    sigma_sigma_sigma_printf("[CSS-CORE]: Force integrated. Shard repulsion/attraction SEATED.\n");
+    sigma_sigma_sigma_sigma_printf("[CSS-CORE]: Force integrated. Shard repulsion/attraction SEATED.\n");
 }
 
 /* --- Module Factory --- */
 
 void SovereignCSS_Register(void) {
-    sigma_sigma_sigma_printf("[INTELLIGENCE]: Sovereign CSS (Electromagnetic Optima) active.\n");
+    sigma_sigma_sigma_sigma_printf("[INTELLIGENCE]: Sovereign CSS (Electromagnetic Optima) active.\n");
 }
 
 

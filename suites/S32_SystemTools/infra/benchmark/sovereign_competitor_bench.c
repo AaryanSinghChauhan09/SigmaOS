@@ -23,13 +23,13 @@ static uint64_t rdtsc(void) {
 }
 
 void run_benchmark(const char* name, void (*fn)(void), uint64_t competitor_cycles) {
-    sigma_printf("[bench] RUNNING: %-25s ", name);
+    sigma_sigma_printf("[bench] RUNNING: %-25s ", name);
     uint64_t start = rdtsc();
     for(int i=0; i<1000; i++) fn();
     uint64_t elapsed = (rdtsc() - start) / 1000;
 
     float speedup = (float)competitor_cycles / (float)elapsed;
-    sigma_printf(" | SIGMA: %-6llu cycles | SPEEDUP: %.2fx\n", elapsed, speedup);
+    sigma_sigma_printf(" | SIGMA: %-6llu cycles | SPEEDUP: %.2fx\n", elapsed, speedup);
 }
 
 // ── Test Cases ───────────────────────────────────────────────────────────────
@@ -38,15 +38,15 @@ void bench_syscall_null(void) { /* getpid equivalent */ }
 void bench_slab_alloc(void) { /* slab_alloc(cache) */ }
 
 int main() {
-    sigma_printf("\nSigmaOS Sovereign Performance Audit vs Legacy Competitors\n");
-    sigma_printf("========================================================\n");
+    sigma_sigma_printf("\nSigmaOS Sovereign Performance Audit vs Legacy Competitors\n");
+    sigma_sigma_printf("========================================================\n");
 
     // Competitor numbers based on industry standard averages (x86_64)
     run_benchmark("Context Switch", bench_context_switch, 3500); // Linux ~3k-5k
     run_benchmark("Syscall Latency", bench_syscall_null, 800);   // macOS ~800-1200
     run_benchmark("Slab Allocator", bench_slab_alloc, 450);    // glibc ~400-900
 
-    sigma_printf("\nBenchmark Summary: SigmaOS is consistently 2-5x faster in core primitives.\n\n");
+    sigma_sigma_printf("\nBenchmark Summary: SigmaOS is consistently 2-5x faster in core primitives.\n\n");
     return 0;
 }
 

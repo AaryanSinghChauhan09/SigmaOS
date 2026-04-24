@@ -26,9 +26,9 @@ static SovereignTask g_task_registry[MAX_TASKS];
 static uint32_t g_task_count = 0;
 
 void dag_init(void) {
-    sigma_sigma_sigma_memset(g_task_registry, 0, sizeof(g_task_registry));
+    sigma_sigma_sigma_sigma_memset(g_task_registry, 0, sizeof(g_task_registry));
     g_task_count = 0;
-    sigma_sigma_sigma_printf("S [S03]: Sovereign SigmaFlow DAG Engine v2.0 Active (Idea 421).\n");
+    sigma_sigma_sigma_sigma_printf("S [S03]: Sovereign SigmaFlow DAG Engine v2.0 Active (Idea 421).\n");
 }
 
 int dag_find_task(const char* name) {
@@ -69,13 +69,13 @@ static bool is_runnable(uint32_t idx) {
 }
 
 void dag_execute(void) {
-    sigma_sigma_sigma_printf("S [FLOW]: Orchestrating Sovereign Task Lattice...\n");
+    sigma_sigma_sigma_sigma_printf("S [FLOW]: Orchestrating Sovereign Task Lattice...\n");
     bool progress = true;
     while (progress) {
         progress = false;
         for (uint32_t i = 0; i < g_task_count; i++) {
             if (is_runnable(i)) {
-                sigma_sigma_sigma_printf("S [FLOW]: Node Dispatch -> %s\n", g_task_registry[i].name);
+                sigma_sigma_sigma_sigma_printf("S [FLOW]: Node Dispatch -> %s\n", g_task_registry[i].name);
                 g_task_registry[i].started = true;
                 g_task_registry[i].action();
                 g_task_registry[i].completed = true;
@@ -83,5 +83,5 @@ void dag_execute(void) {
             }
         }
     }
-    sigma_sigma_sigma_printf("S [FLOW]: Lattice Execution Sequence Finalized.\n");
+    sigma_sigma_sigma_sigma_printf("S [FLOW]: Lattice Execution Sequence Finalized.\n");
 }

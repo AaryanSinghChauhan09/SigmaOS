@@ -16,15 +16,15 @@
  * Principle: Cyber Security / Privilege Mastery / Ring -2 Isolation.
  */
 void sigma_sec_smm_firewall(sigma_u32 smi_code) {
-    sigma_sigma_sigma_printf("[SMM-GUARD]: Intercepting System Management Request (Code: 0x%08X)...\n", smi_code);
+    sigma_sigma_sigma_sigma_printf("[SMM-GUARD]: Intercepting System Management Request (Code: 0x%08X)...\n", smi_code);
     // Verifies architectural safety before allowing hardware to shift into System Management Mode (Ring -2)
-    sigma_sigma_sigma_printf("[SMM-GUARD]: Hardware execution validated. Ring -2 payload authenticated safely.\n");
+    sigma_sigma_sigma_sigma_printf("[SMM-GUARD]: Hardware execution validated. Ring -2 payload authenticated safely.\n");
 }
 
 /* --- Module Factory --- */
 
 void SovereignSMM_Register(void) {
-    sigma_sigma_sigma_printf("[SECURITY]: Sovereign SMM (Hardware Firewall) active.\n");
+    sigma_sigma_sigma_sigma_printf("[SECURITY]: Sovereign SMM (Hardware Firewall) active.\n");
 }
 
 

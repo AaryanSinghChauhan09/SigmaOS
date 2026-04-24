@@ -23,15 +23,15 @@ typedef struct {
  * Principle: Computer Science / Embedded Control.
  */
 void sigma_forth_step(SigmaForthVM_t* vm, const char* word) {
-    sigma_sigma_sigma_printf("[FORTH]: Executing word '%s' on Sovereign Stack...\n", word);
+    sigma_sigma_sigma_sigma_printf("[FORTH]: Executing word '%s' on Sovereign Stack...\n", word);
     // Real stack operations (DUP, SWAP, OVER, ROT, +, -, etc.)
-    sigma_sigma_sigma_printf("[FORTH]: TOS: %llu. Stack Depth: %d.\n", vm->data_stack[vm->dsp], vm->dsp + 1);
+    sigma_sigma_sigma_sigma_printf("[FORTH]: TOS: %llu. Stack Depth: %d.\n", vm->data_stack[vm->dsp], vm->dsp + 1);
 }
 
 /* --- Module Factory --- */
 
 void SovereignForth_Register(void) {
-    sigma_sigma_sigma_printf("[ORCHESTRATOR]: Sovereign Forth Engine (Stack Mastery) active.\n");
+    sigma_sigma_sigma_sigma_printf("[ORCHESTRATOR]: Sovereign Forth Engine (Stack Mastery) active.\n");
 }
 
 

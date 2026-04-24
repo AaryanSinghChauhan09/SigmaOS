@@ -35,7 +35,7 @@ sigma_u64 sigma_crypto_dh_exchange(sigma_u64 priv, sigma_u64 pub_other, sigma_u6
 /* --- Module Factory --- */
 
 void SovereignDH_Register(void) {
-    sigma_sigma_sigma_printf("[SECURITY]: Sovereign Key Exchange (DH) online.\n");
+    sigma_sigma_sigma_sigma_printf("[SECURITY]: Sovereign Key Exchange (DH) online.\n");
 }
 
 

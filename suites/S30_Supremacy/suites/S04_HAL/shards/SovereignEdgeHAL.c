@@ -10,9 +10,9 @@
  */
 
 sigma_err_t sigma_hal_edge_init(void) {
-    sigma_sigma_sigma_printf("  S [HAL-EDGE]: Sovereign Edge Hardware Abstraction active.\n");
-    sigma_sigma_sigma_printf("  S [HAL-EDGE]: Low-power sleep states: OPTIMIZED.\n");
-    sigma_sigma_sigma_printf("  S [HAL-EDGE]: Deterministic interrupt vectoring: SEATED.\n");
+    sigma_sigma_sigma_sigma_printf("  S [HAL-EDGE]: Sovereign Edge Hardware Abstraction active.\n");
+    sigma_sigma_sigma_sigma_printf("  S [HAL-EDGE]: Low-power sleep states: OPTIMIZED.\n");
+    sigma_sigma_sigma_sigma_printf("  S [HAL-EDGE]: Deterministic interrupt vectoring: SEATED.\n");
     return SIGMA_OK;
 }
 

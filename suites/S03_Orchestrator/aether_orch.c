@@ -48,7 +48,7 @@ void aether_init_core(void) {
     }
     g_main_event_queue.read_idx = 0;
     g_main_event_queue.write_idx = 0;
-    // kprintf("[AETHER-CO]: Silicon Aether Trigger Layer Online.\n");
+    // ksigma_printf("[AETHER-CO]: Silicon Aether Trigger Layer Online.\n");
 }
 
 void aether_register_trigger(u32 trigger_id, u64 target_shard_id) {
@@ -59,7 +59,7 @@ void aether_register_trigger(u32 trigger_id, u64 target_shard_id) {
     v->target_shard_id = target_shard_id;
     v->active = TRUE;
     
-    // kprintf("[AETHER-CO]: Trigger [0x%x] mapped to Shard [%llu] - [ZENITH_READY]\n", trigger_id, target_shard_id);
+    // ksigma_printf("[AETHER-CO]: Trigger [0x%x] mapped to Shard [%llu] - [ZENITH_READY]\n", trigger_id, target_shard_id);
 }
 
 /* =========================================================================
@@ -82,7 +82,7 @@ void aether_pulse_trigger(u32 trigger_id) {
                 g_vectors[i].hits++;
             }
             
-            // kprintf("[AETHER-CO]: Silicon Event Fired: Trigger [0x%x] -> Shard [%llu]\n", trigger_id, g_vectors[i].target_shard_id);
+            // ksigma_printf("[AETHER-CO]: Silicon Event Fired: Trigger [0x%x] -> Shard [%llu]\n", trigger_id, g_vectors[i].target_shard_id);
             return;
         }
     }
@@ -92,8 +92,8 @@ void aether_pulse_trigger(u32 trigger_id) {
  * AUDIT & STATUS (Zenith Integration)
  * ========================================================================= */
 void aether_audit(void) {
-    // kprintf("\n--- Σ AETHER ORCHESTRATOR KERNEL AUDIT ---\n");
-    // kprintf("| Vectors Mapped: %u\n", g_vector_count);
-    // kprintf("| Queue Head: %u | Tail: %u\n", g_main_event_queue.read_idx, g_main_event_queue.write_idx);
-    // kprintf("--------------------------------------------\n");
+    // ksigma_printf("\n--- Σ AETHER ORCHESTRATOR KERNEL AUDIT ---\n");
+    // ksigma_printf("| Vectors Mapped: %u\n", g_vector_count);
+    // ksigma_printf("| Queue Head: %u | Tail: %u\n", g_main_event_queue.read_idx, g_main_event_queue.write_idx);
+    // ksigma_printf("--------------------------------------------\n");
 }

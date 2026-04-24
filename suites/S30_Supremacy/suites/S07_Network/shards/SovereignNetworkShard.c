@@ -17,23 +17,23 @@
  * Principle: Distributed Systems / Cloud Sovereignty.
  */
 void sigma_cloud_sync_state(const char* shard_id, sigma_u8* data, sigma_size size) {
-    sigma_sigma_sigma_printf("[NETWORK]: Syncing Shard %s (%zu bytes) to Sovereign Mesh...\n", 
+    sigma_sigma_sigma_sigma_printf("[NETWORK]: Syncing Shard %s (%zu bytes) to Sovereign Mesh...\n", 
                  shard_id, size);
-    sigma_sigma_sigma_printf("[GOSSIP]: Propagating state to 12 active nodes.\n");
+    sigma_sigma_sigma_sigma_printf("[GOSSIP]: Propagating state to 12 active nodes.\n");
 }
 
 /**
  * sigma_network_init: Initializes the zero-dependency Ethernet/TCP stack.
  */
 void sigma_network_init(void) {
-    sigma_sigma_sigma_printf("[NETWORK]: Initializing Hardware-Accelerated Network Stack...\n");
-    sigma_sigma_sigma_printf("[IP]: Assigned Sovereign Address: 10.0.0.1 (Internal Mesh).\n");
+    sigma_sigma_sigma_sigma_printf("[NETWORK]: Initializing Hardware-Accelerated Network Stack...\n");
+    sigma_sigma_sigma_sigma_printf("[IP]: Assigned Sovereign Address: 10.0.0.1 (Internal Mesh).\n");
 }
 
 /* --- Module Factory --- */
 
 void SovereignNetwork_Register(void) {
-    sigma_sigma_sigma_printf("[ZENITHUI]: Sovereign Network Nexus (P2P/Distributed) active.\n");
+    sigma_sigma_sigma_sigma_printf("[ZENITHUI]: Sovereign Network Nexus (P2P/Distributed) active.\n");
 }
 
 #endif /* SOVEREIGN_NETWORK_SHARD_H */

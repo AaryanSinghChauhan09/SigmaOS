@@ -43,14 +43,14 @@ i64 posix_syscall_dispatch(u64 num, u64 a1, u64 a2, u64 a3, u64 a4, u64 a5) {
         case SYS_CLOSE:
             return (i64)vfs_close((i32)a1);
         case SYS_EXIT:
-            // kprintf("[POSIX]: Process Exit Status: %llu\n", a1);
+            // ksigma_printf("[POSIX]: Process Exit Status: %llu\n", a1);
             /* Handle process termination in SigmaTask here */
             return 0;
         case SYS_MMAP:
             /* Return page-aligned memory from slab/vmm */
             return (i64)kmalloc((usize)a2);
         default:
-            // kprintf("[POSIX]: Unsupported Linux Syscall ID: %llu\n", num);
+            // ksigma_printf("[POSIX]: Unsupported Linux Syscall ID: %llu\n", num);
             break;
     }
     return -1;

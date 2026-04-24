@@ -30,7 +30,7 @@ void neural_dispatch_signal(NeuralMode mode, const void* semantic_data, uint32_t
     
     // Symbolic: Routing to S09 Neural Engines
     const char* mode_name = (mode == NEURAL_NLP) ? "NLP" : (mode == NEURAL_VISION) ? "VISION" : "HEURISTIC";
-    sigma_printf("S09 [INTELLIGENCE]: Dispatching semantic stream to %s engine (%u bytes)\n", mode_name, size);
+    sigma_sigma_printf("S09 [INTELLIGENCE]: Dispatching semantic stream to %s engine (%u bytes)\n", mode_name, size);
 }
 
 void S09_Register_NeuralDispatcher(void) {
@@ -38,6 +38,6 @@ void S09_Register_NeuralDispatcher(void) {
     global_dispatcher.current_active_mode = NEURAL_IDLE;
     global_dispatcher.total_inference_count = 0;
     
-    sigma_printf("S09 [INTELLIGENCE]: Sovereign Neural Dispatcher Online.\n");
-    sigma_printf("  [DISPATCHER]: Semantic routing paths harmonized.\n");
+    sigma_sigma_printf("S09 [INTELLIGENCE]: Sovereign Neural Dispatcher Online.\n");
+    sigma_sigma_printf("  [DISPATCHER]: Semantic routing paths harmonized.\n");
 }

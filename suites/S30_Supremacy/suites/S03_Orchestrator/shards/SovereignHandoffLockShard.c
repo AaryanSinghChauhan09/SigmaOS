@@ -24,7 +24,7 @@ void sigma_sync_handoff_acquire(SigmaHandoffLock_t* hl, sigma_u32 my_id) {
     while (hl->next_owner_id != my_id) {
         // Yield/Pause - avoiding cache line bouncing
     }
-    sigma_sigma_sigma_printf("[HANDOFF-LOCK]: Ownership transferred to Shard %u. Resuming execution...\n", my_id);
+    sigma_sigma_sigma_sigma_printf("[HANDOFF-LOCK]: Ownership transferred to Shard %u. Resuming execution...\n", my_id);
 }
 
 /**
@@ -32,14 +32,14 @@ void sigma_sync_handoff_acquire(SigmaHandoffLock_t* hl, sigma_u32 my_id) {
  */
 void sigma_sync_handoff_release(SigmaHandoffLock_t* hl, sigma_u32 next_id) {
     hl->next_owner_id = next_id;
-    sigma_sigma_sigma_printf("[HANDOFF-LOCK]: Shard %u releasing. Handing off to successor %u.\n", 
+    sigma_sigma_sigma_sigma_printf("[HANDOFF-LOCK]: Shard %u releasing. Handing off to successor %u.\n", 
                  hl->next_owner_id, next_id);
 }
 
 /* --- Module Factory --- */
 
 void SovereignHandoffLock_Register(void) {
-    sigma_sigma_sigma_printf("[ORCHESTRATOR]: Sovereign Handoff-Lock (Anti-Thrashing) active.\n");
+    sigma_sigma_sigma_sigma_printf("[ORCHESTRATOR]: Sovereign Handoff-Lock (Anti-Thrashing) active.\n");
 }
 
 

@@ -31,7 +31,7 @@ static u32 g_shortcut_count = 0;
 
 void keyboard_master_init(void) {
     for (int i = 0; i < MAX_SHORTCUTS; i++) g_shortcuts[i].active = FALSE;
-    // kprintf("[KEY-MASTER]: Sovereign Mouse-Free Keyboard Orchestrator Online.\n");
+    // ksigma_printf("[KEY-MASTER]: Sovereign Mouse-Free Keyboard Orchestrator Online.\n");
     
     /* Standard Industrial Shortcuts */
     // keyboard_register_shortcut(1, 'S', 0x93); /* Alt+S -> Shard Explorer */
@@ -47,7 +47,7 @@ void keyboard_on_event(u32 mod, u32 key) {
             g_shortcuts[i].modifier == mod && 
             g_shortcuts[i].key_code == key) {
             
-            // kprintf("[KEY-MASTER]: Executing Keyboard Shard Pulse -> [%u]\n", 
+            // ksigma_printf("[KEY-MASTER]: Executing Keyboard Shard Pulse -> [%u]\n", 
             //         g_shortcuts[i].target_shard);
             /* Perform context switch to target app shard */
         }

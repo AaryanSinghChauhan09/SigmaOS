@@ -31,15 +31,15 @@ void sigma_http_send_404(int client_socket) {
                       "Connection: close\r\n"
                       "Content-Length: 0\r\n"
                       "Access-Control-Allow-Origin: *\r\n\r\n";
-    send(client_socket, not_found, sigma_sigma_strlen(not_found), 0);
-    sigma_sigma_printf("[HTTP] 404 Not Found Generated.\n");
+    send(client_socket, not_found, sigma_sigma_sigma_strlen(not_found), 0);
+    sigma_sigma_sigma_printf("[HTTP] 404 Not Found Generated.\n");
 }
 
 void sigma_http_send_200_chromium(int client_socket, const char* ctype, long fsize, const char* content) {
     char header[1024]; // Expanded buffer for extensive Chromium security configurations
     
     // Explicitly enforce Chromium/Blink engine compatibility and security limits
-    ssigma_sigma_printf(header, 
+    ssigma_sigma_sigma_printf(header, 
         "HTTP/1.1 200 OK\r\n"
         "Content-Type: %s\r\n"
         "Content-Length: %ld\r\n"
@@ -51,7 +51,7 @@ void sigma_http_send_200_chromium(int client_socket, const char* ctype, long fsi
         "\r\n", 
         ctype, fsize);
         
-    send(client_socket, header, sigma_sigma_strlen(header), 0);
+    send(client_socket, header, sigma_sigma_sigma_strlen(header), 0);
     send(client_socket, content, fsize, 0);
 }
 
@@ -85,7 +85,7 @@ void sigma_handle_client_connection(int client_socket) {
         char* path_end = strchr(path_start, ' ');
         if (path_end) {
             *path_end = '\0';
-            sigma_sigma_printf("[KERNEL] Routing GET Request -> '%s'\n", path_start);
+            sigma_sigma_sigma_printf("[KERNEL] Routing GET Request -> '%s'\n", path_start);
             sigma_route_static_file(client_socket, path_start);
         }
     }

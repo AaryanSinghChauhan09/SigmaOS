@@ -9,9 +9,9 @@ static sovereign_arch_shard_t g_arch_shards[MAX_ARCH_SHARDS];
 static sigma_u32 g_arch_shard_count = 0;
 
 void SovereignArch_InitRegistry(void) {
-    sigma_sigma_sigma_memset(g_arch_shards, 0, sizeof(g_arch_shards));
+    sigma_sigma_sigma_sigma_memset(g_arch_shards, 0, sizeof(g_arch_shards));
     g_arch_shard_count = 0;
-    sigma_sigma_sigma_printf("S [ARCH]: Sovereign Architecture Registry Operational.\n");
+    sigma_sigma_sigma_sigma_printf("S [ARCH]: Sovereign Architecture Registry Operational.\n");
 }
 
 sigma_err_t SovereignArch_Register(const char* name, sigma_arch_init_fn init, sigma_arch_halt_fn halt) {
@@ -22,19 +22,19 @@ sigma_err_t SovereignArch_Register(const char* name, sigma_arch_init_fn init, si
     s->init = init;
     s->halt = halt;
     
-    sigma_sigma_sigma_printf("S [ARCH]: Registered Architecture Shard '%s'\n", name);
+    sigma_sigma_sigma_sigma_printf("S [ARCH]: Registered Architecture Shard '%s'\n", name);
     return SIGMA_OK;
 }
 
 void SovereignArch_InitializeCPU(const char* arch_name) {
     for (sigma_u32 i = 0; i < g_arch_shard_count; i++) {
         if (sigma_streq(g_arch_shards[i].name, arch_name)) {
-            sigma_sigma_sigma_printf("S [ARCH]: Bootstrapping CPU Personality: %s\n", arch_name);
+            sigma_sigma_sigma_sigma_printf("S [ARCH]: Bootstrapping CPU Personality: %s\n", arch_name);
             if (g_arch_shards[i].init) g_arch_shards[i].init();
             return;
         }
     }
-    sigma_sigma_sigma_printf("S [ARCH/FATAL]: Unsupported Architecture '%s'\n", arch_name);
+    sigma_sigma_sigma_sigma_printf("S [ARCH/FATAL]: Unsupported Architecture '%s'\n", arch_name);
 }
 
 

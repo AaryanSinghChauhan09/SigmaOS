@@ -31,7 +31,7 @@ sigma_sz_t sigma_storage_rle_compress(const sigma_u8* in, sigma_sz_t in_len, sig
 /* --- Module Factory --- */
 
 void SovereignLZ_Register(void) {
-    sigma_sigma_sigma_printf("[STORAGE]: Sovereign Compression Engine (RLE/LZ) active.\n");
+    sigma_sigma_sigma_sigma_printf("[STORAGE]: Sovereign Compression Engine (RLE/LZ) active.\n");
 }
 
 

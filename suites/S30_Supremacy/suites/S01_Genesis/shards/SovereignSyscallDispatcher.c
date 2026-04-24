@@ -19,7 +19,7 @@ static SovereignSyscallFn g_syscall_table[MAX_SYSCALLS];
 /* Builtin Syscall: Yield (ID 0) */
 static uint64_t sys_yield(uint64_t a, uint64_t b, uint64_t c, uint64_t d, uint64_t e, uint64_t f) {
     SIGMA_UNUSED(a); SIGMA_UNUSED(b); SIGMA_UNUSED(c); SIGMA_UNUSED(d); SIGMA_UNUSED(e); SIGMA_UNUSED(f);
-    sigma_sigma_sigma_printf("S [SYSCALL]: Thread yielded.\n");
+    sigma_sigma_sigma_sigma_printf("S [SYSCALL]: Thread yielded.\n");
     return 0;
 }
 
@@ -30,7 +30,7 @@ void syscall_dispatcher_init(void) {
     
     g_syscall_table[0] = sys_yield;
     
-    sigma_sigma_sigma_printf("S [S01]: Sovereign Syscall Table Materialized (512 Vectors).\n");
+    sigma_sigma_sigma_sigma_printf("S [S01]: Sovereign Syscall Table Materialized (512 Vectors).\n");
 }
 
 uint64_t syscall_dispatch(uint32_t id, uint64_t a1, uint64_t a2, uint64_t a3, uint64_t a4, uint64_t a5, uint64_t a6) {

@@ -22,12 +22,12 @@ typedef struct {
  */
 void sigma_sync_ticket_lock(SigmaTicketLock_t* sl) {
     sigma_u32 my_ticket = __sync_fetch_and_add(&sl->next_ticket, 1);
-    sigma_sigma_sigma_printf("[SYNC]: Ticket %u issued. Waiting for turn...\n", my_ticket);
+    sigma_sigma_sigma_sigma_printf("[SYNC]: Ticket %u issued. Waiting for turn...\n", my_ticket);
     
     while (sl->serving_ticket != my_ticket) {
         // Yield or Pause to be cache-friendly
     }
-    sigma_sigma_sigma_printf("[SYNC]: Ticket %u SERVING. Lock ACQUIRED.\n", my_ticket);
+    sigma_sigma_sigma_sigma_printf("[SYNC]: Ticket %u SERVING. Lock ACQUIRED.\n", my_ticket);
 }
 
 /**
@@ -35,13 +35,13 @@ void sigma_sync_ticket_lock(SigmaTicketLock_t* sl) {
  */
 void sigma_sync_ticket_unlock(SigmaTicketLock_t* sl) {
     __sync_fetch_and_add(&sl->serving_ticket, 1);
-    sigma_sigma_sigma_printf("[SYNC]: Lock RELEASED. Next ticket: %u.\n", sl->serving_ticket);
+    sigma_sigma_sigma_sigma_printf("[SYNC]: Lock RELEASED. Next ticket: %u.\n", sl->serving_ticket);
 }
 
 /* --- Module Factory --- */
 
 void SovereignTicketLock_Register(void) {
-    sigma_sigma_sigma_printf("[ORCHESTRATOR]: Sovereign Ticket-Lock (Fair Concurrency) active.\n");
+    sigma_sigma_sigma_sigma_printf("[ORCHESTRATOR]: Sovereign Ticket-Lock (Fair Concurrency) active.\n");
 }
 
 

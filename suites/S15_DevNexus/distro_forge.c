@@ -26,22 +26,22 @@ typedef struct DistroConfig {
  * ========================================================================= */
 
 void distro_forge_init(void) {
-    // kprintf("[DISTRO-FORGE]: Sovereign Industrial Distribution Forge Online.\n");
+    // ksigma_printf("[DISTRO-FORGE]: Sovereign Industrial Distribution Forge Online.\n");
 }
 
 k_status forge_generate_distro(const char* name, bool_t include_pqc, bool_t include_ai) {
-    // kprintf("[DISTRO-FORGE]: Generating Sovereign Shard Distribution: %s\n", name);
+    // ksigma_printf("[DISTRO-FORGE]: Generating Sovereign Shard Distribution: %s\n", name);
     
     if (include_pqc) {
-        // kprintf("[DISTRO-FORGE]: Embedding Lattice-PQC Security Shard...\n");
+        // ksigma_printf("[DISTRO-FORGE]: Embedding Lattice-PQC Security Shard...\n");
     }
     
     if (include_ai) {
-        // kprintf("[DISTRO-FORGE]: Embedding Aether-Orchestrator AI Shard...\n");
+        // ksigma_printf("[DISTRO-FORGE]: Embedding Aether-Orchestrator AI Shard...\n");
     }
     
-    // kprintf("[DISTRO-FORGE]: Finalizing bit-perfect binary shard (ISO-9660 Parity)...\n");
-    // kprintf("[DISTRO-FORGE]: SUCCESS. %s ISO prepared for silicon pulse.\n", name);
+    // ksigma_printf("[DISTRO-FORGE]: Finalizing bit-perfect binary shard (ISO-9660 Parity)...\n");
+    // ksigma_printf("[DISTRO-FORGE]: SUCCESS. %s ISO prepared for silicon pulse.\n", name);
     
     return K_OK;
 }

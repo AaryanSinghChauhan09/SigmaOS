@@ -230,8 +230,8 @@ vaddr_t vmalloc(u64 npages) {
  * Audit
  * ========================================================================= */
 void vmm_audit(void) {
-    extern void kprintf(const char* fmt, ...);
-    kprintf("[VMM]: PML4=%p | Maps=%llu | Unmaps=%llu | vmalloc_next=%p\n",
+    extern void ksigma_printf(const char* fmt, ...);
+    ksigma_printf("[VMM]: PML4=%p | Maps=%llu | Unmaps=%llu | vmalloc_next=%p\n",
             (void*)(usize)g_vmm.pml4_phys,
             g_vmm.map_calls, g_vmm.unmap_calls,
             (void*)g_vmm.vmalloc_next);

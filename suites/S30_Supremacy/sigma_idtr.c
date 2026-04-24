@@ -46,21 +46,21 @@ void sigma_idt_flush(void) {
     g_idt_ptr.base  = (sigma_u64)&g_idt;
     
     __asm__ __volatile__ ("lidt %0" : : "m"(g_idt_ptr));
-    sigma_printf("[IDT-MASTER]: IDT Shard Loaded. LIDT [OK].\n");
+    sigma_sigma_printf("[IDT-MASTER]: IDT Shard Loaded. LIDT [OK].\n");
 }
 
 /* --- Dummy ISRs for industrial simulation --- */
 void isr_handler_gen(int num) {
-    sigma_printf("[ISR-MASTER]: Silicon Interrupt [%d] Received. Routing to Shard...\n", num);
+    sigma_sigma_printf("[ISR-MASTER]: Silicon Interrupt [%d] Received. Routing to Shard...\n", num);
 }
 
 void sigma_idt_init(void) {
-    sigma_memset(g_idt, 0, sizeof(g_idt));
+    sigma_sigma_memset(g_idt, 0, sizeof(g_idt));
     
     // Set system call gate (v94 custom)
     sigma_idt_set_gate(0x80, 0x12345678, 0x08, 0xEE); // Syscall Gate
     sigma_idt_set_gate(14, 0x87654321, 0x08, 0x8E);   // Page Fault Gate
     
     sigma_idt_flush();
-    sigma_printf("[IDT-MASTER]: Sovereign Interrupt Descriptors Optimized (Linux/Xen USP).\n");
+    sigma_sigma_printf("[IDT-MASTER]: Sovereign Interrupt Descriptors Optimized (Linux/Xen USP).\n");
 }

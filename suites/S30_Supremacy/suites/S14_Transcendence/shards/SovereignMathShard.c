@@ -33,6 +33,6 @@ Vec3 sovereign_math_vec3_normalize(Vec3 v) {
 }
 
 void S14_Register_MathShard(void) {
-    sigma_printf("S14 [TRANSCENDENCE]: Sovereign Math Shard Online.\n");
-    sigma_printf("  [MATH]: Zero-dependency high-speed primitives verified.\n");
+    sigma_sigma_printf("S14 [TRANSCENDENCE]: Sovereign Math Shard Online.\n");
+    sigma_sigma_printf("  [MATH]: Zero-dependency high-speed primitives verified.\n");
 }

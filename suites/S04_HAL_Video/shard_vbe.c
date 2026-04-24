@@ -31,7 +31,7 @@ typedef struct SigmaFB {
 static SigmaFB g_fb;
 
 extern void* sigma_malloc(usize size);
-extern void  kprintf(const char* fmt, ...);
+extern void  ksigma_printf(const char* fmt, ...);
 
 /* =========================================================================
  * Blitting & Drawing
@@ -102,10 +102,10 @@ void fb_init(u32* lfb, u32 w, u32 h, u32 p) {
     /* Allocate back buffer — essential for non-flicker glassmorphism */
     g_fb.back = (u32*)sigma_malloc(g_fb.size * sizeof(u32));
     if (!g_fb.back) {
-        kprintf("[FB]: Failed to allocate backbuffer. Falling back to single-buffer.\n");
+        ksigma_printf("[FB]: Failed to allocate backbuffer. Falling back to single-buffer.\n");
         g_fb.back = lfb;
     } else {
-        kprintf("[FB]: Sovereign LFB initialized %ux%u (Double Buffer @ %p)\n", w, h, g_fb.back);
+        ksigma_printf("[FB]: Sovereign LFB initialized %ux%u (Double Buffer @ %p)\n", w, h, g_fb.back);
     }
 
     /* Clear screen to Sigma Deep Space (Dark Gradient-like base) */
@@ -115,5 +115,5 @@ void fb_init(u32* lfb, u32 w, u32 h, u32 p) {
 }
 
 void fb_audit(void) {
-    kprintf("[FB]: Mode %ux%u | LFB %p | Status: ACTIVE\n", g_fb.width, g_fb.height, g_fb.addr);
+    ksigma_printf("[FB]: Mode %ux%u | LFB %p | Status: ACTIVE\n", g_fb.width, g_fb.height, g_fb.addr);
 }

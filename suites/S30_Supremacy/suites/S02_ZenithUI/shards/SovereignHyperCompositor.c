@@ -17,10 +17,10 @@ typedef struct {
 
 void sigma_ui_zhc_compositing_pulse(void) {
     // Perform 3D volumetric blending of all active UI shards
-    sigma_sigma_sigma_printf("S [ZHC]: Performing Neural Blending at 240FPS (Lattice Sync: ACTIVE).\n");
-    sigma_sigma_sigma_printf("S [ZHC]: Chromatic Aberration & Volumetric Shadows materialized.\n");
+    sigma_sigma_sigma_sigma_printf("S [ZHC]: Performing Neural Blending at 240FPS (Lattice Sync: ACTIVE).\n");
+    sigma_sigma_sigma_sigma_printf("S [ZHC]: Chromatic Aberration & Volumetric Shadows materialized.\n");
 }
 
 void sigma_ui_zhc_init(void) {
-    sigma_sigma_sigma_printf("S [ZENITHUI]: Zenith Hyper-Compositor (ZHC) online. Desktop Parity: SECURED.\n");
+    sigma_sigma_sigma_sigma_printf("S [ZENITHUI]: Zenith Hyper-Compositor (ZHC) online. Desktop Parity: SECURED.\n");
 }

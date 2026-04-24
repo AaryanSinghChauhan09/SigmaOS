@@ -14,11 +14,11 @@ typedef struct {
 } ContainerHandle;
 
 void virtualization_launch_container(const char* image_hash) {
-    sigma_printf("S21 [VIRTUALIZATION]: Launching Sovereign Container [Hash: %s]...\n", image_hash);
-    sigma_printf("  [ISOLATION]: Namespacing memory and networking via S10 Registry.\n");
-    sigma_printf("  [SECURITY]: Container bound to local silicate; no global lattice access.\n");
+    sigma_sigma_printf("S21 [VIRTUALIZATION]: Launching Sovereign Container [Hash: %s]...\n", image_hash);
+    sigma_sigma_printf("  [ISOLATION]: Namespacing memory and networking via S10 Registry.\n");
+    sigma_sigma_printf("  [SECURITY]: Container bound to local silicate; no global lattice access.\n");
 }
 
 void S21_Register_Container(void) {
-    sigma_printf("S21 [VIRTUALIZATION]: Sovereign Container Shard Online.\n");
+    sigma_sigma_printf("S21 [VIRTUALIZATION]: Sovereign Container Shard Online.\n");
 }

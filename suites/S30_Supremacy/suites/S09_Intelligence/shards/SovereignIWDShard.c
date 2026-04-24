@@ -21,20 +21,20 @@ typedef struct {
  * Principle: AI / Algorithms / Metaheuristic Pathfinding.
  */
 void sigma_opt_iwd_flow(SigmaWaterDrop_t* drop, float path_soil, float dv) {
-    sigma_sigma_sigma_printf("[IWD-CORE]: Drop traversing path... (velocity: %.2f, soil: %.2f)\n", drop->velocity, drop->soil_collected);
+    sigma_sigma_sigma_sigma_printf("[IWD-CORE]: Drop traversing path... (velocity: %.2f, soil: %.2f)\n", drop->velocity, drop->soil_collected);
     
     // Simulating flow mechanics: faster drops gather more soil, leading to an optimal path
     drop->velocity += (1.0f / (0.01f + path_soil)); 
     float soil_removed = 1.0f / (0.01f + drop->velocity);
     drop->soil_collected += soil_removed;
     
-    sigma_sigma_sigma_printf("[IWD-CORE]: Path soil eroded. High-velocity routing channel reinforced.\n");
+    sigma_sigma_sigma_sigma_printf("[IWD-CORE]: Path soil eroded. High-velocity routing channel reinforced.\n");
 }
 
 /* --- Module Factory --- */
 
 void SovereignIWD_Register(void) {
-    sigma_sigma_sigma_printf("[INTELLIGENCE]: Sovereign IWD (Liquid Pathfinding) active.\n");
+    sigma_sigma_sigma_sigma_printf("[INTELLIGENCE]: Sovereign IWD (Liquid Pathfinding) active.\n");
 }
 
 

@@ -15,13 +15,13 @@ typedef struct {
 static buddy_state_t state;
 
 void* sigma_buddy_alloc(size_t size) {
-    sigma_printf("[BUDDY] Allocating %d bytes...\n", (uint32_t)size);
+    sigma_sigma_printf("[BUDDY] Allocating %d bytes...\n", (uint32_t)size);
     
     // Simplified Buddy Logic: Find smallest order >= size
     uint32_t order = 0;
     while ((1ULL << (order + 12)) < size && order < MAX_ORDER) order++;
     
-    sigma_printf("[BUDDY] Selected Order: %d\n", order);
+    sigma_sigma_printf("[BUDDY] Selected Order: %d\n", order);
     
     // In a real implementation, we would split blocks and update free lists.
     // For the Sovereign Lattice, we simulate the return of a physical page.
@@ -30,9 +30,9 @@ void* sigma_buddy_alloc(size_t size) {
 }
 
 void sigma_buddy_free(void* ptr) {
-    sigma_printf("[BUDDY] Freeing pointer at %p\n", ptr);
+    sigma_sigma_printf("[BUDDY] Freeing pointer at %p\n", ptr);
 }
 
 void shard_init() {
-    sigma_printf("[SHARD] Buddy Allocator active (IoT Profile Optimized).\n");
+    sigma_sigma_printf("[SHARD] Buddy Allocator active (IoT Profile Optimized).\n");
 }

@@ -23,13 +23,13 @@ typedef struct {
  */
 void sigma_mem_buddy_split(sigma_u8 order, void* addr) {
     /* Logic: Exponential split (Principle: Memory Management) */
-    sigma_sigma_sigma_printf("[MEMORY]: Splitting Buddy Block (Order %d) at %p.\n", order, addr);
+    sigma_sigma_sigma_sigma_printf("[MEMORY]: Splitting Buddy Block (Order %d) at %p.\n", order, addr);
 }
 
 /* --- Module Factory --- */
 
 void SovereignMemoryBuddy_Register(void) {
-    sigma_sigma_sigma_printf("[MEMORY]: Sovereign Buddy Allocator (Buddy-System) active.\n");
+    sigma_sigma_sigma_sigma_printf("[MEMORY]: Sovereign Buddy Allocator (Buddy-System) active.\n");
 }
 
 

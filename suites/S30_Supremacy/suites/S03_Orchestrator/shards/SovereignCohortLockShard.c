@@ -21,17 +21,17 @@ typedef struct {
  * Principle: Multi-Processing / SIMD / Performance.
  */
 void sigma_sync_cohort_acquire(SigmaCohortLock_t* cl, sigma_u32 my_cohort_id) {
-    sigma_sigma_sigma_printf("[COHORT-LOCK]: Requesting access to Vector-Unit for Cohort %u...\n", 
+    sigma_sigma_sigma_sigma_printf("[COHORT-LOCK]: Requesting access to Vector-Unit for Cohort %u...\n", 
                  my_cohort_id);
     while (__sync_lock_test_and_set(&cl->lock, 1)) { /* Spin */ }
     cl->active_cohort_id = my_cohort_id;
-    sigma_sigma_sigma_printf("[COHORT-LOCK]: Vector-Unit ownership SEATED. Thrashing ELIMINATED.\n");
+    sigma_sigma_sigma_sigma_printf("[COHORT-LOCK]: Vector-Unit ownership SEATED. Thrashing ELIMINATED.\n");
 }
 
 /* --- Module Factory --- */
 
 void SovereignCohortLock_Register(void) {
-    sigma_sigma_sigma_printf("[ORCHESTRATOR]: Sovereign Cohort-Lock (SIMD Serialization) active.\n");
+    sigma_sigma_sigma_sigma_printf("[ORCHESTRATOR]: Sovereign Cohort-Lock (SIMD Serialization) active.\n");
 }
 
 

@@ -9,7 +9,7 @@
  * @brief Terminal Entry Point for the Sovereign OS.
  */
 void sigma_kernel_main(void) {
-    sigma_sigma_sigma_printf("--- S SIGMAOS ZENITH SUPREME: SOVEREIGN REIGN INITIATED --- \n");
+    sigma_sigma_sigma_sigma_printf("--- S SIGMAOS ZENITH SUPREME: SOVEREIGN REIGN INITIATED --- \n");
     
     // Materialize the 33-suite lattice
     SovereignMaster_InitAll();
@@ -17,6 +17,6 @@ void sigma_kernel_main(void) {
     // Verify structural finality
     SovereignRegistry_Audit();
     
-    sigma_sigma_sigma_printf("--- S SIGMAOS ZENITH SUPREME: SYSTEM SOVEREIGNTY VERIFIED --- \n");
+    sigma_sigma_sigma_sigma_printf("--- S SIGMAOS ZENITH SUPREME: SYSTEM SOVEREIGNTY VERIFIED --- \n");
 }
 

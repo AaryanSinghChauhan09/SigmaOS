@@ -8,20 +8,20 @@ extern void SovereignIndianLaw_Query(const char* section);
 extern void SovereignDataScience_RunAnalysis(const char* dataset);
 
 void handle_ai(int argc, char** argv) {
-    if (argc < 3) { sigma_sigma_sigma_printf("Usage: sigma ai <prompt|persona|predict|orchestrate>\n"); return; }
+    if (argc < 3) { sigma_sigma_sigma_sigma_printf("Usage: sigma ai <prompt|persona|predict|orchestrate>\n"); return; }
     SovereignAIKernel_ExecutePrompt(argv[2]);
 }
 
 void handle_net(int argc, char** argv) {
-    sigma_sigma_sigma_printf("[NET] Zero-Trust Aether Mesh active.\n");
+    sigma_sigma_sigma_sigma_printf("[NET] Zero-Trust Aether Mesh active.\n");
 }
 
 void handle_fs(int argc, char** argv) {
-    sigma_sigma_sigma_printf("[FS] Sovereign VFS Layer: %s\n", argc > 2 ? argv[2] : "status");
+    sigma_sigma_sigma_sigma_printf("[FS] Sovereign VFS Layer: %s\n", argc > 2 ? argv[2] : "status");
 }
 
 void handle_work(int argc, char** argv) {
-    sigma_sigma_sigma_printf("[WORK] Industrial Workspace: %s\n", argc > 2 ? argv[2] : "terminal");
+    sigma_sigma_sigma_sigma_printf("[WORK] Industrial Workspace: %s\n", argc > 2 ? argv[2] : "terminal");
 }
 
 void SovereignAdvancedCommands_Register(void) {

@@ -34,7 +34,7 @@ SigmaToken_Type sigma_compiler_lex(const char* input, int* pos) {
 /* --- Module Factory --- */
 
 void SovereignLexer_Register(void) {
-    sigma_sigma_sigma_printf("[ORCHESTRATION]: Sovereign Lexer Engine seeded.\n");
+    sigma_sigma_sigma_sigma_printf("[ORCHESTRATION]: Sovereign Lexer Engine seeded.\n");
 }
 
 

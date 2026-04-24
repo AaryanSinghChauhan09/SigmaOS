@@ -10,8 +10,8 @@
  */
 
 sigma_err_t sigma_audio_init(void) {
-    sigma_sigma_sigma_printf("  S [AUDIO]: Sovereign Sound Matrix active.\n");
-    sigma_sigma_sigma_printf("  S [AUDIO]: PCM ring-buffer initialized (48kHz/24-bit).\n");
+    sigma_sigma_sigma_sigma_printf("  S [AUDIO]: Sovereign Sound Matrix active.\n");
+    sigma_sigma_sigma_sigma_printf("  S [AUDIO]: PCM ring-buffer initialized (48kHz/24-bit).\n");
     return SIGMA_OK;
 }
 

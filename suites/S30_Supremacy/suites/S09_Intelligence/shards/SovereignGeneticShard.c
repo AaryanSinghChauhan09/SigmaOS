@@ -23,22 +23,22 @@ typedef struct {
  * Principle: Algorithms / Data Science.
  */
 void sigma_optimizer_evolve(void) {
-    sigma_sigma_sigma_printf("[OPTIMIZER]: Breeding Generation 452 of Kernel Genomes...\n");
+    sigma_sigma_sigma_sigma_printf("[OPTIMIZER]: Breeding Generation 452 of Kernel Genomes...\n");
     // Cross-over and mutation logic for self-healing parameter discovery
-    sigma_sigma_sigma_printf("[OPTIMIZER]: Best Fitness: 0.998. New Optimal Quantum: 12ms discovered.\n");
+    sigma_sigma_sigma_sigma_printf("[OPTIMIZER]: Best Fitness: 0.998. New Optimal Quantum: 12ms discovered.\n");
 }
 
 /**
  * sigma_optimizer_apply: Promotes the best genome to the live kernel registry.
  */
 void sigma_optimizer_apply(void) {
-    sigma_sigma_sigma_printf("[OPTIMIZER]: Applying evolved parameters to Registry S10.\n");
+    sigma_sigma_sigma_sigma_printf("[OPTIMIZER]: Applying evolved parameters to Registry S10.\n");
 }
 
 /* --- Module Factory --- */
 
 void SovereignGenetic_Register(void) {
-    sigma_sigma_sigma_printf("[INTELLIGENCE]: Sovereign Genetic Optimizer (Self-Evolving Code) active.\n");
+    sigma_sigma_sigma_sigma_printf("[INTELLIGENCE]: Sovereign Genetic Optimizer (Self-Evolving Code) active.\n");
 }
 
 

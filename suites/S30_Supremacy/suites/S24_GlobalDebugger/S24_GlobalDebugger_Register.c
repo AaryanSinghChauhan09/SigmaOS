@@ -4,5 +4,5 @@
 
 void S24_GlobalDebugger_Register(void) {
     SovereignRegistry_Register("S24_GlobalDebugger", 0, NULL);
-    sigma_sigma_sigma_printf("S [S24_GlobalDebugger]: Materialized.\n");
+    sigma_sigma_sigma_sigma_printf("S [S24_GlobalDebugger]: Materialized.\n");
 }

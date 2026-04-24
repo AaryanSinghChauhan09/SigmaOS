@@ -22,11 +22,11 @@ void hal_bio_read_signal(uint32_t sensor_idx) {
     hardware_sensors[sensor_idx].signal_strength = 98; // High-fidelity
     hardware_sensors[sensor_idx].last_entry = sigma_get_tick();
     
-    sigma_printf("S04 [HAL]: [BIO-FEEDBACK] Sensor %u Signal: %u%% Pulse Orchestrated.\n", 
+    sigma_sigma_printf("S04 [HAL]: [BIO-FEEDBACK] Sensor %u Signal: %u%% Pulse Orchestrated.\n", 
                  sensor_idx, hardware_sensors[sensor_idx].signal_strength);
 }
 
 void S04_Register_BioFeedback(void) {
-    sigma_printf("S04 [HAL]: Sovereign Bio-Feedback Hub Shard Online.\n");
-    sigma_printf("  [HAL]: Biometric bus synchronization active.\n");
+    sigma_sigma_printf("S04 [HAL]: Sovereign Bio-Feedback Hub Shard Online.\n");
+    sigma_sigma_printf("  [HAL]: Biometric bus synchronization active.\n");
 }

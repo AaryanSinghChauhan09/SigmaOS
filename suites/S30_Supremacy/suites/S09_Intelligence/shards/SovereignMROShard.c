@@ -16,15 +16,15 @@
  * Principle: AI / Algorithms / Dimensional Escapes.
  */
 void sigma_opt_mro_forage(float* node_vector, int generation_cycle) {
-    sigma_sigma_sigma_printf("[MRO-CORE]: Engaging somersault topology inversion (Cycle: %d)...\n", generation_cycle);
+    sigma_sigma_sigma_sigma_printf("[MRO-CORE]: Engaging somersault topology inversion (Cycle: %d)...\n", generation_cycle);
     // Mimics manta ray cyclone feeding: nodes orbit a reference while flipping data vectors 180-degrees to shatter deep local minima
-    sigma_sigma_sigma_printf("[MRO-CORE]: Somersault maneuver executed. Trapped configurations instantly bypassed.\n");
+    sigma_sigma_sigma_sigma_printf("[MRO-CORE]: Somersault maneuver executed. Trapped configurations instantly bypassed.\n");
 }
 
 /* --- Module Factory --- */
 
 void SovereignMRO_Register(void) {
-    sigma_sigma_sigma_printf("[INTELLIGENCE]: Sovereign MRO (Manta Ray Foraging) active.\n");
+    sigma_sigma_sigma_sigma_printf("[INTELLIGENCE]: Sovereign MRO (Manta Ray Foraging) active.\n");
 }
 
 

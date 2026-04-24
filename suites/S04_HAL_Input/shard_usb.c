@@ -15,7 +15,7 @@
 
 #include "sigma_kernel_types.h"
 
-extern void  kprintf(const char *fmt, ...);
+extern void  ksigma_printf(const char *fmt, ...);
 extern void *vmm_map_mmio(u64 phys, usize size);
 extern paddr_t pmm_alloc_page(void);
 
@@ -149,7 +149,7 @@ static void xhci_enumerate_ports(void) {
                 "?", "Full(12Mb)", "Low(1.5Mb)", "High(480Mb)",
                 "Super(5Gb)", "Super+(10Gb)"
             };
-            kprintf("[USB]: Port %u: Connected — %s\n", (u32)i,
+            ksigma_printf("[USB]: Port %u: Connected — %s\n", (u32)i,
                     (speed <= USB_SPEED_SUPER_PLUS) ? spd_str[speed] : "?");
         }
     }
@@ -161,7 +161,7 @@ static void xhci_enumerate_ports(void) {
  *       Here we stub with a fixed MMIO base for QEMU xHCI (0xFEBF0000).
  * ========================================================================= */
 void usb_init(void) {
-    kprintf("[USB]: Initializing xHCI Host Controller...\n");
+    ksigma_printf("[USB]: Initializing xHCI Host Controller...\n");
 
     /* QEMU xHCI controller typical MMIO base */
     const u64 XHCI_MMIO_BASE = 0xFEBF0000ULL;
@@ -170,7 +170,7 @@ void usb_init(void) {
     /* Map MMIO region */
     void *mmio = vmm_map_mmio(XHCI_MMIO_BASE, XHCI_MMIO_SIZE);
     if (!mmio) {
-        kprintf("[USB]: MMIO mapping failed — no xHCI controller found.\n");
+        ksigma_printf("[USB]: MMIO mapping failed — no xHCI controller found.\n");
         return;
     }
 
@@ -183,12 +183,12 @@ void usb_init(void) {
     g_usb.max_slots = (u8)(hcs1 & 0xFFu);
     g_usb.max_ports = (u8)((hcs1 >> 24) & 0xFFu);
 
-    kprintf("[USB]: xHCI cap_len=%u max_slots=%u max_ports=%u\n",
+    ksigma_printf("[USB]: xHCI cap_len=%u max_slots=%u max_ports=%u\n",
             (u32)g_usb.cap_length, (u32)g_usb.max_slots, (u32)g_usb.max_ports);
 
     /* Reset controller */
     if (xhci_reset() != K_OK) {
-        kprintf("[USB]: WARN — xHCI reset timed out.\n");
+        ksigma_printf("[USB]: WARN — xHCI reset timed out.\n");
         return;
     }
 
@@ -204,7 +204,7 @@ void usb_init(void) {
     g_usb.initialized = TRUE;
     xhci_enumerate_ports();
 
-    kprintf("[USB]: xHCI host controller online. Active slots: %u\n", g_usb.active_slots);
+    ksigma_printf("[USB]: xHCI host controller online. Active slots: %u\n", g_usb.active_slots);
 }
 
 /* =========================================================================
@@ -212,13 +212,13 @@ void usb_init(void) {
  * ========================================================================= */
 void usb_audit(void) {
     if (!g_usb.initialized) {
-        kprintf("[USB]: Not initialized (no xHCI detected).\n");
+        ksigma_printf("[USB]: Not initialized (no xHCI detected).\n");
         return;
     }
     u32 connected = 0;
     for (u8 i = 0; i < g_usb.max_ports && i < USB_MAX_PORTS; i++) {
         if (g_usb.ports[i].connected) connected++;
     }
-    kprintf("[USB]: xHCI online | ports=%u connected=%u\n",
+    ksigma_printf("[USB]: xHCI online | ports=%u connected=%u\n",
             (u32)g_usb.max_ports, connected);
 }

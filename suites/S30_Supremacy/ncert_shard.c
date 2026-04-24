@@ -24,7 +24,7 @@ typedef struct LabShard {
  * ========================================================================= */
 
 void ncert_init(void) {
-    // kprintf("[NCERT-SHARD]: Sovereign Science-Student Laboratory Interface Online.\n");
+    // ksigma_printf("[NCERT-SHARD]: Sovereign Science-Student Laboratory Interface Online.\n");
 }
 
 k_status ncert_physics_sim(const char* experiment) {
@@ -32,7 +32,7 @@ k_status ncert_physics_sim(const char* experiment) {
      * Absorb Science Student USP: Kinetic Silicon Simulation.
      * In a sharded model: perform kinematic simulations directly on the silicon shards.
      */
-    // kprintf("[NCERT-SHARD]: Industrial Pulse: Physics simulation: %s (SUCCESS)\n", experiment);
+    // ksigma_printf("[NCERT-SHARD]: Industrial Pulse: Physics simulation: %s (SUCCESS)\n", experiment);
     return K_OK;
 }
 
@@ -41,6 +41,6 @@ k_status ncert_chem_orbit(u32 atomic_num) {
      * Absorb Chemistry Student USP: Valence Orbit Sharding.
      * Visualize and calculate molecular orbits and bonding directly on the silicon.
      */
-    // kprintf("[NCERT-SHARD]: Industrial Pulse: Visualizing Orbit for At-Num %u\n", atomic_num);
+    // ksigma_printf("[NCERT-SHARD]: Industrial Pulse: Visualizing Orbit for At-Num %u\n", atomic_num);
     return K_OK;
 }

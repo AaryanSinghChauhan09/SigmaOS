@@ -44,13 +44,13 @@ extern paddr_t pmm_alloc_contiguous(u64 npages);
  * ========================================================================= */
 
 k_status sigma_dma_init(void) {
-    extern void kprintf(const char* fmt, ...);
+    extern void ksigma_printf(const char* fmt, ...);
 
     /* 1. Allocate a large, physically contiguous chunk of RAM from the PMM */
     u64 npages = DMA_POOL_SIZE / PAGE_SIZE;
     g_dma_base_paddr = pmm_alloc_contiguous(npages);
     if (!g_dma_base_paddr) {
-        kprintf("[DMA] Failed to allocate contiguous physical memory.\n");
+        ksigma_printf("[DMA] Failed to allocate contiguous physical memory.\n");
         return K_ERR_NOMEM;
     }
 
@@ -65,7 +65,7 @@ k_status sigma_dma_init(void) {
     g_dma_free_list->is_free = TRUE;
     g_dma_free_list->next = (void*)0;
 
-    kprintf("[DMA] Coherent Allocator initialized: %u MB at PADDR 0x%llx\n", 
+    ksigma_printf("[DMA] Coherent Allocator initialized: %u MB at PADDR 0x%llx\n", 
             DMA_POOL_SIZE / (1024*1024), g_dma_base_paddr);
 
     return K_OK;

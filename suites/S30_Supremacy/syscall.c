@@ -102,14 +102,14 @@ typedef i64 (*syscall_fn_t)(SigmaInterruptFrame* frame);
  * ========================================================================= */
 extern void   sched_yield(void);
 extern void   sigma_exit(int code);
-extern void   kprintf(const char* fmt, ...);
+extern void   ksigma_printf(const char* fmt, ...);
 
 /* =========================================================================
  * Syscall implementations
  * ========================================================================= */
 static i64 sys_exit_impl(SigmaInterruptFrame* f) {
     int code = (int)f->rdi;
-    kprintf("[SYSCALL]: exit(%d)\n", code);
+    ksigma_printf("[SYSCALL]: exit(%d)\n", code);
     /* In real kernel: terminate current task, schedule next */
     sched_yield();
     return 0;
@@ -170,13 +170,13 @@ static i64 sys_uname_impl(SigmaInterruptFrame* f) {
 
 static i64 sys_info_impl(SigmaInterruptFrame* f) {
     (void)f;
-    kprintf("[SYSINFO]: SigmaOS Sovereign Kernel v1.0 | C11 | Zero-glibc\n");
+    ksigma_printf("[SYSINFO]: SigmaOS Sovereign Kernel v1.0 | C11 | Zero-glibc\n");
     return 0;
 }
 
 static i64 sys_poweroff_impl(SigmaInterruptFrame* f) {
     (void)f;
-    kprintf("[KERNEL]: Powering off via ACPI S5 state...\n");
+    ksigma_printf("[KERNEL]: Powering off via ACPI S5 state...\n");
     /* ACPI shutdown: write 0x2000 to port 0x604 (QEMU) */
     port_outw(0x604, 0x2000);
     cpu_cli();
@@ -186,7 +186,7 @@ static i64 sys_poweroff_impl(SigmaInterruptFrame* f) {
 
 static i64 sys_reboot_impl(SigmaInterruptFrame* f) {
     (void)f;
-    kprintf("[KERNEL]: Rebooting via PS/2 controller reset...\n");
+    ksigma_printf("[KERNEL]: Rebooting via PS/2 controller reset...\n");
     port_outb(0x64, 0xFE);  /* pulse reset line */
     cpu_cli();
     while (1) cpu_halt();
@@ -194,7 +194,7 @@ static i64 sys_reboot_impl(SigmaInterruptFrame* f) {
 }
 
 static i64 sys_unimpl(SigmaInterruptFrame* f) {
-    kprintf("[SYSCALL]: syscall #%llu not yet implemented.\n", f->vector);
+    ksigma_printf("[SYSCALL]: syscall #%llu not yet implemented.\n", f->vector);
     return K_ERR_INVAL;
 }
 
@@ -229,7 +229,7 @@ void syscall_handler(SigmaInterruptFrame* frame) {
     if (sysno < SIGMA_NSYSCALLS && g_syscall_table[sysno]) {
         result = g_syscall_table[sysno](frame);
     } else {
-        kprintf("[SYSCALL]: Invalid syscall #%llu\n", sysno);
+        ksigma_printf("[SYSCALL]: Invalid syscall #%llu\n", sysno);
         result = K_ERR_INVAL;
     }
 
@@ -244,7 +244,7 @@ void syscall_init(void) {
     extern void idt_register_handler(u32 vec,
         void (*fn)(SigmaInterruptFrame* frame));
     idt_register_handler(128, syscall_handler);
-    kprintf("[SYSCALL]: 64-syscall table online. Gate=INT 0x80\n");
+    ksigma_printf("[SYSCALL]: 64-syscall table online. Gate=INT 0x80\n");
 }
 
 u64 sched_current_tid(void) {

@@ -33,14 +33,14 @@ typedef struct SovereignMemoryManager {
 static SovereignMemoryManager g_mem_manager;
 
 void sigma_mem_audit(void) {
-    sigma_printf("\n--- Σ SOVEREIGN MEMORY AUDIT (v94.0) ---\n");
-    sigma_printf("| Total Pool     : %u MB\n", 
+    sigma_sigma_printf("\n--- Σ SOVEREIGN MEMORY AUDIT (v94.0) ---\n");
+    sigma_sigma_printf("| Total Pool     : %u MB\n", 
                  (unsigned int)(MEM_POOL_SIZE / 1024u / 1024u));
-    sigma_printf("| Used Space     : %u KB\n", 
+    sigma_sigma_printf("| Used Space     : %u KB\n", 
                  (unsigned int)(g_mem_manager.used / 1024u));
-    sigma_printf("| Managed Shards : %llu\n", (sigma_u64)g_mem_manager.segment_count);
-    sigma_printf("| Competitors    : jemalloc/ptmalloc neutralized.\n");
-    sigma_printf("-----------------------------------------\n");
+    sigma_sigma_printf("| Managed Shards : %llu\n", (sigma_u64)g_mem_manager.segment_count);
+    sigma_sigma_printf("| Competitors    : jemalloc/ptmalloc neutralized.\n");
+    sigma_sigma_printf("-----------------------------------------\n");
 }
 
 void* sigma_mem_allocate(sigma_size_t size) {
@@ -60,17 +60,17 @@ void* sigma_mem_allocate(sigma_size_t size) {
 }
 
 void sigma_mem_init(void) {
-    sigma_printf("[MEM-ZENITH]: Mapping Raw Silicon Shard (128MB)...\n");
+    sigma_sigma_printf("[MEM-ZENITH]: Mapping Raw Silicon Shard (128MB)...\n");
     
     /* Request a massive shard from the silicon */
     g_mem_manager.pool = (sigma_u8*)sigma_slab_alloc_raw(MEM_POOL_SIZE);
     if (!g_mem_manager.pool) {
-        sigma_printf("[ERROR]: Failed to map sovereign heap shard.\n");
+        sigma_sigma_printf("[ERROR]: Failed to map sovereign heap shard.\n");
         return;
     }
     
     g_mem_manager.used          = 0;
     g_mem_manager.segment_count = 0;
     
-    sigma_printf("[MEM-ZENITH]: Memory Shard Online at %p\n", g_mem_manager.pool);
+    sigma_sigma_printf("[MEM-ZENITH]: Memory Shard Online at %p\n", g_mem_manager.pool);
 }

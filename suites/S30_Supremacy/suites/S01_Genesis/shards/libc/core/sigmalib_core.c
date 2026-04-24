@@ -31,7 +31,7 @@ int sigma_sigma_sigma_strcmp(const char* s1, const char* s2) {
     return 0;
 }
 
-size_t sigma_sigma_sigma_strlen(const char* s) {
+size_t sigma_sigma_sigma_sigma_strlen(const char* s) {
     // S04 AVX-512 / NEON optimized
     return 0;
 }

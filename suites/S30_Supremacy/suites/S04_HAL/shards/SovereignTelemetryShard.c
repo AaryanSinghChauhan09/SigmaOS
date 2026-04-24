@@ -22,16 +22,16 @@ typedef struct {
  * Principle: Mobile / Power Management / Distributed.
  */
 void sigma_mob_telemetry_emit(SigmaTelemetry_t* status) {
-    sigma_sigma_sigma_printf("[TELEMETRY]: Emitting Mobile Heartbeat: Bat: %umV, Sig: %ddBm.\n", 
+    sigma_sigma_sigma_sigma_printf("[TELEMETRY]: Emitting Mobile Heartbeat: Bat: %umV, Sig: %ddBm.\n", 
                  status->battery_mv, status->signal_dbm);
     // Real Anycast-style mesh broadcast with minimal carrier-wake time
-    sigma_sigma_sigma_printf("[TELEMETRY]: Broadcast SUCCESS. Mobile node state synchronized with Mesh-Cloud.\n");
+    sigma_sigma_sigma_sigma_printf("[TELEMETRY]: Broadcast SUCCESS. Mobile node state synchronized with Mesh-Cloud.\n");
 }
 
 /* --- Module Factory --- */
 
 void SovereignTelemetry_Register(void) {
-    sigma_sigma_sigma_printf("[HAL]: Sovereign Mobile Telemetry (Low-Power Sync) active.\n");
+    sigma_sigma_sigma_sigma_printf("[HAL]: Sovereign Mobile Telemetry (Low-Power Sync) active.\n");
 }
 
 

@@ -48,7 +48,7 @@ void shard_init_core(void) {
     for (int i = 0; i < MAX_SYSTEM_SHARDS; i++) {
         g_shards[i].active = FALSE;
     }
-    // kprintf("[SHARD-CORE]: Sovereign Shard Partitioning Online.\n");
+    // ksigma_printf("[SHARD-CORE]: Sovereign Shard Partitioning Online.\n");
 }
 
 u64 shard_create(const char* name, ShardType type, u64 base, u64 limit) {
@@ -68,7 +68,7 @@ u64 shard_create(const char* name, ShardType type, u64 base, u64 limit) {
         s->name[i] = name[i];
     }
     
-    // kprintf("[SHARD-CORE]: Created Shard [%llu]: %s (Base: 0x%llx)\n", s->shard_id, s->name, s->base_addr);
+    // ksigma_printf("[SHARD-CORE]: Created Shard [%llu]: %s (Base: 0x%llx)\n", s->shard_id, s->name, s->base_addr);
     return s->shard_id;
 }
 
@@ -106,6 +106,6 @@ void shard_amnesic_destroy(u64 shard_id) {
     s->shard_id = 0;
     
     // 3. Trigger silicon-level memory wipe of the shard segment
-    // memset((void*)s->base_addr, 0, s->limit_addr - s->base_addr);
-    // kprintf("[SHARD-CORE]: Shard %s destroyed with Amnesic Wipe [SUCCESS]\n", s->name);
+    // sigma_memset((void*)s->base_addr, 0, s->limit_addr - s->base_addr);
+    // ksigma_printf("[SHARD-CORE]: Shard %s destroyed with Amnesic Wipe [SUCCESS]\n", s->name);
 }

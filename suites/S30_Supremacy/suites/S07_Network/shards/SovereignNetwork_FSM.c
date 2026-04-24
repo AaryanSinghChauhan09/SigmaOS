@@ -25,7 +25,7 @@ const char* tcp_state_to_str(SovereignTcpState state) {
 }
 
 void tcp_fsm_init(void) {
-    sigma_sigma_sigma_printf("S [S07]: TCP Finite State Machine Materialized (Apex Idea 251).\n");
+    sigma_sigma_sigma_sigma_printf("S [S07]: TCP Finite State Machine Materialized (Apex Idea 251).\n");
 }
 
 SovereignTcpState tcp_transition(SovereignTcpState current, const char* event) {

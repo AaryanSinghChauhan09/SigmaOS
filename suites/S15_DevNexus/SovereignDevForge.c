@@ -29,14 +29,14 @@ private:
 
 public:
     SovereignDevForge() : m_files_forged(0), m_lint_active(SIGMA_TRUE) {
-        sigma_printf("[DEVFORGE-ZENITH]: Sovereign IDE Shard Online. VS Code is now non-relevant.\n");
+        sigma_sigma_printf("[DEVFORGE-ZENITH]: Sovereign IDE Shard Online. VS Code is now non-relevant.\n");
     }
 
     const char* type_name() const noexcept override { return "SovereignDevForge"; }
 
     // --- Core Forge Logic (Custom Native Function) ---
     void forge_native_binary(const char* source_name) {
-        sigma_printf("[DEVFORGE-ZENITH]: Forge Initiated for %s...\n", source_name);
+        sigma_sigma_printf("[DEVFORGE-ZENITH]: Forge Initiated for %s...\n", source_name);
         
         /* 
          * Direct ELF/PE native sharding logic.
@@ -44,20 +44,20 @@ public:
          */
         
         m_files_forged++;
-        sigma_printf("[DEVFORGE-ZENITH]: | [SUCCESS] Native Shard Emitted: %s.exe\n", source_name);
+        sigma_sigma_printf("[DEVFORGE-ZENITH]: | [SUCCESS] Native Shard Emitted: %s.exe\n", source_name);
     }
 
     void run_omni_lint() {
-        sigma_printf("[DEVFORGE-ZENITH]: Omni-Lint analyzing kernel space...\n");
-        sigma_printf("[DEVFORGE-ZENITH]: | 0 LINT ERRORS. 100%% ARCHITECTURAL PURITY.\n");
+        sigma_sigma_printf("[DEVFORGE-ZENITH]: Omni-Lint analyzing kernel space...\n");
+        sigma_sigma_printf("[DEVFORGE-ZENITH]: | 0 LINT ERRORS. 100%% ARCHITECTURAL PURITY.\n");
     }
 
     void audit() {
-        sigma_printf("\n--- Σ SOVEREIGN DEVFORGE AUDIT ---\n");
-        sigma_printf("| Shards Forged  : %u\n", m_files_forged);
-        sigma_printf("| Linter Status  : %s\n", m_lint_active ? "MASTER-READY" : "OFFLINE");
-        sigma_printf("| Competitors    : Electron-based IDEs deprecated.\n");
-        sigma_printf("--------------------------------------\n");
+        sigma_sigma_printf("\n--- Σ SOVEREIGN DEVFORGE AUDIT ---\n");
+        sigma_sigma_printf("| Shards Forged  : %u\n", m_files_forged);
+        sigma_sigma_printf("| Linter Status  : %s\n", m_lint_active ? "MASTER-READY" : "OFFLINE");
+        sigma_sigma_printf("| Competitors    : Electron-based IDEs deprecated.\n");
+        sigma_sigma_printf("--------------------------------------\n");
     }
 };
 
@@ -75,7 +75,7 @@ extern "C" void start_devforge_demo() {
 }
 
 int main() {
-    sigma_printf("[SIGMA_DEV]: Bootstrapping Dev Forge Zenith...\n");
+    sigma_sigma_printf("[SIGMA_DEV]: Bootstrapping Dev Forge Zenith...\n");
     start_devforge_demo();
     return 0;
 }

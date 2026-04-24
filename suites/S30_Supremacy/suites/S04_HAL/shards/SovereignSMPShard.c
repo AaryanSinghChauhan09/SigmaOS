@@ -16,14 +16,14 @@
  */
 void sigma_smp_barrier(int cpu_id, volatile int* lock) {
     /* Logic: Hardware-atomic fence (Principle: Multi-Processing) */
-    sigma_sigma_sigma_printf("[HAL]: CPU %d reached SMP barrier. Waiting for mesh sync...\n", cpu_id);
+    sigma_sigma_sigma_sigma_printf("[HAL]: CPU %d reached SMP barrier. Waiting for mesh sync...\n", cpu_id);
     /* __sync_synchronize(); */
 }
 
 /* --- Module Factory --- */
 
 void SovereignSMP_Register(void) {
-    sigma_sigma_sigma_printf("[HAL]: Sovereign SMP Engine (Multi-Core) active.\n");
+    sigma_sigma_sigma_sigma_printf("[HAL]: Sovereign SMP Engine (Multi-Core) active.\n");
 }
 
 

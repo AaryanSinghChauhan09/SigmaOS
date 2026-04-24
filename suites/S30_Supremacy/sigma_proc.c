@@ -53,18 +53,18 @@ static void ctx_switch_shard(void) {
 }
 
 void sigma_proc_audit(void) {
-    sigma_printf("\n--- Σ SOVEREIGN PROCESS AUDIT (v94.0) ---\n");
-    sigma_printf("| Active Shards  : %u\n", g_proc_manager.active_count);
-    sigma_printf("| Killed Shards  : %u\n", g_proc_manager.kills);
-    sigma_printf("| Virtualization : [VT-x/SVM SHARDED ACTIVE]\n");
-    sigma_printf("| Isolation      : [CAPABILITY-BASED NAMESPACE]\n");
-    sigma_printf("------------------------------------------\n");
+    sigma_sigma_printf("\n--- Σ SOVEREIGN PROCESS AUDIT (v94.0) ---\n");
+    sigma_sigma_printf("| Active Shards  : %u\n", g_proc_manager.active_count);
+    sigma_sigma_printf("| Killed Shards  : %u\n", g_proc_manager.kills);
+    sigma_sigma_printf("| Virtualization : [VT-x/SVM SHARDED ACTIVE]\n");
+    sigma_sigma_printf("| Isolation      : [CAPABILITY-BASED NAMESPACE]\n");
+    sigma_sigma_printf("------------------------------------------\n");
 }
 
 sigma_status sigma_proc_spawn(const char* image) {
     if (g_proc_manager.active_count >= PROC_TABLE_MAX) return SIGMA_ERROR;
 
-    sigma_printf("[PROC-ZENITH]: Spawning Shard: %s... [EXEC_SHARD]\n", image);
+    sigma_sigma_printf("[PROC-ZENITH]: Spawning Shard: %s... [EXEC_SHARD]\n", image);
 
     SovereignPCB* pcb = &g_proc_manager.process_table[g_proc_manager.active_count];
     pcb->pid   = g_proc_manager.active_count;
@@ -77,8 +77,8 @@ sigma_status sigma_proc_spawn(const char* image) {
 }
 
 void sigma_proc_init(void) {
-    sigma_memset(&g_proc_manager, 0, sizeof(g_proc_manager));
-    sigma_printf("[PROC-ZENITH]: Sovereign Process Manager Online.\n");
+    sigma_sigma_memset(&g_proc_manager, 0, sizeof(g_proc_manager));
+    sigma_sigma_printf("[PROC-ZENITH]: Sovereign Process Manager Online.\n");
     
     /* Spawn initial system shards */
     sigma_proc_spawn("Metal-Nexus-UI");
@@ -86,5 +86,5 @@ void sigma_proc_init(void) {
     
     /* Initial context switch test */
     ctx_switch_shard();
-    sigma_printf("[PROC-ZENITH]: Initial Context Switch Shard [OK].\n");
+    sigma_sigma_printf("[PROC-ZENITH]: Initial Context Switch Shard [OK].\n");
 }

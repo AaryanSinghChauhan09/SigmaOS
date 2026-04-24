@@ -16,15 +16,15 @@
  * Principle: Cyber Security / Safety / Privilege Mastery.
  */
 void sigma_sec_smep_enforce(void) {
-    sigma_sigma_sigma_printf("[SMEP-GUARD]: Engaging Supervisor Mode Execution Prevention (CR4.SMEP)...\n");
+    sigma_sigma_sigma_sigma_printf("[SMEP-GUARD]: Engaging Supervisor Mode Execution Prevention (CR4.SMEP)...\n");
     // x86_64: read CR4, set bit 20 (SMEP), write CR4
-    sigma_sigma_sigma_printf("[SMEP-GUARD]: Privilege boundary sealed. Kernel completely isolated from user executable payloads.\n");
+    sigma_sigma_sigma_sigma_printf("[SMEP-GUARD]: Privilege boundary sealed. Kernel completely isolated from user executable payloads.\n");
 }
 
 /* --- Module Factory --- */
 
 void SovereignSMEP_Register(void) {
-    sigma_sigma_sigma_printf("[SECURITY]: Sovereign SMEP (Execution Defense) active.\n");
+    sigma_sigma_sigma_sigma_printf("[SECURITY]: Sovereign SMEP (Execution Defense) active.\n");
 }
 
 

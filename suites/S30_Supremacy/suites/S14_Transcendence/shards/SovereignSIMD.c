@@ -27,6 +27,6 @@ void transcend_simd_multiply(zmm_reg* dst, const zmm_reg* src1, const zmm_reg* s
 }
 
 void S14_Register_SIMD(void) {
-    sigma_printf("S14 [TRANSCENDENCE]: Sovereign SIMD Accelerator Online.\n");
-    sigma_printf("  [SIMD]: 512-bit vector pipeline primed for neural workloads.\n");
+    sigma_sigma_printf("S14 [TRANSCENDENCE]: Sovereign SIMD Accelerator Online.\n");
+    sigma_sigma_printf("  [SIMD]: 512-bit vector pipeline primed for neural workloads.\n");
 }

@@ -16,15 +16,15 @@
  * Principle: Cyber Security / Absolute Physical Privacy.
  */
 void sigma_sec_sme_enable(void) {
-    sigma_sigma_sigma_printf("[SME-VAULT]: Engaging AES-128 inline memory controller encryption...\n");
+    sigma_sigma_sigma_sigma_printf("[SME-VAULT]: Engaging AES-128 inline memory controller encryption...\n");
     // Memory written to RAM is physically encrypted, memory read is decrypted on the fly by the CPU
-    sigma_sigma_sigma_printf("[SME-VAULT]: RAM physically encrypted. Cold-boot extraction attacks absolutely neutralized.\n");
+    sigma_sigma_sigma_sigma_printf("[SME-VAULT]: RAM physically encrypted. Cold-boot extraction attacks absolutely neutralized.\n");
 }
 
 /* --- Module Factory --- */
 
 void SovereignSME_Register(void) {
-    sigma_sigma_sigma_printf("[SECURITY]: Sovereign SME (Transparent Memory Encryption) active.\n");
+    sigma_sigma_sigma_sigma_printf("[SECURITY]: Sovereign SME (Transparent Memory Encryption) active.\n");
 }
 
 

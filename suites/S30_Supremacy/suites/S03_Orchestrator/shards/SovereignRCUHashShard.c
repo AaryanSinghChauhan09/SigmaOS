@@ -45,7 +45,7 @@ void* sigma_sync_hash_lookup(SigmaRCUHash_t* table, sigma_u64 key) {
 /* --- Module Factory --- */
 
 void SovereignRCUHash_Register(void) {
-    sigma_sigma_sigma_printf("[ORCHESTRATOR]: Sovereign RCU-Hash (Scalable Registry) active.\n");
+    sigma_sigma_sigma_sigma_printf("[ORCHESTRATOR]: Sovereign RCU-Hash (Scalable Registry) active.\n");
 }
 
 

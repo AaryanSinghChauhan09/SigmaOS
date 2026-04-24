@@ -14,12 +14,12 @@ typedef struct {
 } WASMInstance;
 
 void s_wasm_init() {
-    sigma_printf("S [VIRT]: Initializing Sovereign WASM JIT Engine...\n");
-    sigma_printf("S [VIRT]: WASM Sandboxing: HARDWARE ENFORCED.\n");
+    sigma_sigma_printf("S [VIRT]: Initializing Sovereign WASM JIT Engine...\n");
+    sigma_sigma_printf("S [VIRT]: WASM Sandboxing: HARDWARE ENFORCED.\n");
 }
 
 void s_wasm_execute(const char* shard_binary) {
-    sigma_printf("S [VIRT]: Spawning sandboxed WASM shard: %s\n", shard_binary);
+    sigma_sigma_printf("S [VIRT]: Spawning sandboxed WASM shard: %s\n", shard_binary);
     // [SIM] JIT compilation and execution in isolated memory ring
-    sigma_printf("S [VIRT]: Execution status: SUCCESS.\n");
+    sigma_sigma_printf("S [VIRT]: Execution status: SUCCESS.\n");
 }

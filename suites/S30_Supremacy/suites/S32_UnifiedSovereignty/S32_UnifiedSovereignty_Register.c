@@ -4,5 +4,5 @@
 
 void S32_UnifiedSovereignty_Register(void) {
     SovereignRegistry_Register("S32_UnifiedSovereignty", 0, NULL);
-    sigma_sigma_sigma_printf("S [S32_UnifiedSovereignty]: Materialized.\n");
+    sigma_sigma_sigma_sigma_printf("S [S32_UnifiedSovereignty]: Materialized.\n");
 }

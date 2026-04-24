@@ -23,7 +23,7 @@ typedef struct {
 void sigma_sync_read_lock(SigmaRWLock_t* lock) {
     while (lock->writer) { /* Spin while writer is present */ }
     __sync_fetch_and_add(&lock->readers, 1);
-    sigma_sigma_sigma_printf("[SYNC]: Reader Lock ACQUIRED. Active readers: %u\n", lock->readers);
+    sigma_sigma_sigma_sigma_printf("[SYNC]: Reader Lock ACQUIRED. Active readers: %u\n", lock->readers);
 }
 
 /**
@@ -33,13 +33,13 @@ void sigma_sync_read_lock(SigmaRWLock_t* lock) {
 void sigma_sync_write_lock(SigmaRWLock_t* lock) {
     while (__sync_lock_test_and_set(&lock->writer, 1)) { /* Spin */ }
     while (lock->readers > 0) { /* Spin for readers to finish */ }
-    sigma_sigma_sigma_printf("[SYNC]: Writer Lock ACQUIRED (Exclusive).\n");
+    sigma_sigma_sigma_sigma_printf("[SYNC]: Writer Lock ACQUIRED (Exclusive).\n");
 }
 
 /* --- Module Factory --- */
 
 void SovereignRWLock_Register(void) {
-    sigma_sigma_sigma_printf("[ORCHESTRATOR]: Sovereign RW-Spinlock (Concurrency Mastery) active.\n");
+    sigma_sigma_sigma_sigma_printf("[ORCHESTRATOR]: Sovereign RW-Spinlock (Concurrency Mastery) active.\n");
 }
 
 

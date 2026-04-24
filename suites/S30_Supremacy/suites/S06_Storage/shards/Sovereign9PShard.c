@@ -10,8 +10,8 @@
  */
 
 sigma_err_t sigma_9p_init(void) {
-    sigma_sigma_sigma_printf("  S [FS-9P]: Sovereign Plan 9 (9P) Protocol Shard active.\n");
-    sigma_sigma_sigma_printf("  S [FS-9P]: All sharded resources now exportable via 9P interfaces.\n");
+    sigma_sigma_sigma_sigma_printf("  S [FS-9P]: Sovereign Plan 9 (9P) Protocol Shard active.\n");
+    sigma_sigma_sigma_sigma_printf("  S [FS-9P]: All sharded resources now exportable via 9P interfaces.\n");
     return SIGMA_OK;
 }
 

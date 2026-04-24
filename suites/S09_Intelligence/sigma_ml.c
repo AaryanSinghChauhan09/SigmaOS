@@ -42,7 +42,7 @@ static void plotter_init(SovereignGraphPlotter* p) {
 
 static void plotter_scatter(SovereignGraphPlotter* p,
                              sigma_u32 rows, sigma_u32 cols) {
-    sigma_printf("[GRAPH-PLOTTER]: Rasterizing %ux%u scatter -> VRAM framebuffer.\n",
+    sigma_sigma_printf("[GRAPH-PLOTTER]: Rasterizing %ux%u scatter -> VRAM framebuffer.\n",
                  rows, cols);
     /* SFENCE before non-temporal VRAM write */
     __asm__ __volatile__("sfence" ::: "memory");
@@ -50,7 +50,7 @@ static void plotter_scatter(SovereignGraphPlotter* p,
 }
 
 static void plotter_dashboard(SovereignGraphPlotter* p, const char* src) {
-    sigma_printf("[GRAPH-PLOTTER]: Dynamic dashboard from '%s'.\n", src);
+    sigma_sigma_printf("[GRAPH-PLOTTER]: Dynamic dashboard from '%s'.\n", src);
     /* hardware string cross-reference */
     __asm__ __volatile__("xor %%rcx, %%rcx\n\t repz cmpsb"
                          ::: "rcx","rdi","rsi","memory");
@@ -84,7 +84,7 @@ static sigma_f64 neural_forward(SovereignNeuralForge* n,
     for (i = 0; i < N; i++)
         acc += (sigma_f64)inputs[i] * (sigma_f64)n->weights[i];
     n->fwd_passes++;
-    sigma_printf("[NEURAL-FORGE]: Forward pass %llu => acc=%f\n",
+    sigma_sigma_printf("[NEURAL-FORGE]: Forward pass %llu => acc=%f\n",
                  n->fwd_passes, acc);
     return acc;
 }
@@ -94,7 +94,7 @@ static void neural_automl(SovereignNeuralForge* n) {
     for (i = 0; i < NEURAL_N; i++)
         n->weights[i] = (sigma_f32)(n->weights[i] * nr_rcp((sigma_f64)(i+1)) * 0.01);
     n->automl_steps++;
-    sigma_printf("[NEURAL-FORGE]: AutoML step %llu done.\n", n->automl_steps);
+    sigma_sigma_printf("[NEURAL-FORGE]: AutoML step %llu done.\n", n->automl_steps);
 }
 
 /* =========================================================================
@@ -132,9 +132,9 @@ int main(void) {
     neural_automl(&forge);
 
     sigma_f64 data[5] = {2.0, 4.0, 4.0, 4.0, 5.0};
-    sigma_printf("[STATS]: Mean=%f  Variance=%f\n",
+    sigma_sigma_printf("[STATS]: Mean=%f  Variance=%f\n",
                  stats_mean(data, 5), stats_variance(data, 5));
 
-    sigma_printf("[SIGMA_ML]: PyTorch/TF footprint = ZERO.\n");
+    sigma_sigma_printf("[SIGMA_ML]: PyTorch/TF footprint = ZERO.\n");
     return 0;
 }

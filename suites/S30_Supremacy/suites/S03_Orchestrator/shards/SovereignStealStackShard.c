@@ -26,7 +26,7 @@ int sigma_sync_steal_pop(SigmaStealStack_t* stack, sigma_u32* out_val) {
     
     if (__sync_bool_compare_and_swap(&stack->top, t, t - 1)) {
         *out_val = stack->buffer[t - 1];
-        sigma_sigma_sigma_printf("[STEAL-STACK]: Task STOLEN successfully. Top: %u.\n", t - 1);
+        sigma_sigma_sigma_sigma_printf("[STEAL-STACK]: Task STOLEN successfully. Top: %u.\n", t - 1);
         return 1;
     }
     return 0; // Contention or empty
@@ -35,7 +35,7 @@ int sigma_sync_steal_pop(SigmaStealStack_t* stack, sigma_u32* out_val) {
 /* --- Module Factory --- */
 
 void SovereignStealStack_Register(void) {
-    sigma_sigma_sigma_printf("[ORCHESTRATOR]: Sovereign Steal-Stack (Back-end Balancing) active.\n");
+    sigma_sigma_sigma_sigma_printf("[ORCHESTRATOR]: Sovereign Steal-Stack (Back-end Balancing) active.\n");
 }
 
 

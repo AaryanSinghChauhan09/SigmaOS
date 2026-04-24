@@ -12,9 +12,9 @@ static sigma_u32          s_bus_count = 0;
 
 /* -- Initialization ----------------------------------------------------- */
 void sigma_interconnect_init(void) {
-    sigma_sigma_sigma_memset(s_buses, 0, sizeof(s_buses));
-    sigma_sigma_sigma_printf("S [IC] Sovereign Interconnect Subsystem initialized\n");
-    sigma_sigma_sigma_printf("S [IC] Fabric Support: PCIe Gen5 | CXL 3.0 | Thunderbolt 4\n");
+    sigma_sigma_sigma_sigma_memset(s_buses, 0, sizeof(s_buses));
+    sigma_sigma_sigma_sigma_printf("S [IC] Sovereign Interconnect Subsystem initialized\n");
+    sigma_sigma_sigma_sigma_printf("S [IC] Fabric Support: PCIe Gen5 | CXL 3.0 | Thunderbolt 4\n");
 
     /* Register primary buses */
     interconnect_bus_t* pci = &s_buses[s_bus_count++];
@@ -30,7 +30,7 @@ void sigma_interconnect_init(void) {
 
 /* -- Discovery ---------------------------------------------------------- */
 void sigma_interconnect_probe_all(void) {
-    sigma_sigma_sigma_printf("S [IC] Probing all interconnect fabrics...\n");
+    sigma_sigma_sigma_sigma_printf("S [IC] Probing all interconnect fabrics...\n");
 
     /* Simulated PCI Enumeration */
     interconnect_dev_t gpu = { 0x10DE, 0x2204, 0, 1, 0, {0xD0000000}, "NVIDIA GeForce RTLS (Sovereign Ed.)" };
@@ -50,7 +50,7 @@ void sigma_interconnect_add_device(sigma_u8 bus_id, interconnect_dev_t dev) {
     if (b->dev_count >= MAX_DEVICES_PER_BUS) return;
 
     b->devices[b->dev_count++] = dev;
-    sigma_sigma_sigma_printf("S [IC] Attached %s to Bus %d at %02x:%02x.%d\n", 
+    sigma_sigma_sigma_sigma_printf("S [IC] Attached %s to Bus %d at %02x:%02x.%d\n", 
                  dev.name, bus_id, dev.bus, dev.slot, dev.func);
 }
 
@@ -66,8 +66,8 @@ sigma_u32 sigma_interconnect_get_bar(sigma_u8 bus, sigma_u8 slot, sigma_u8 bar_i
 
 /* -- Statistics ---------------------------------------------------------- */
 void sigma_interconnect_stats(void) {
-    sigma_sigma_sigma_printf("\nS INTERCONNECT LATTICE\n");
-    sigma_sigma_sigma_printf("%-8s %-4s %-20s %-12s\n", "TYPE", "BUS", "DEVICE", "LOCATION");
+    sigma_sigma_sigma_sigma_printf("\nS INTERCONNECT LATTICE\n");
+    sigma_sigma_sigma_sigma_printf("%-8s %-4s %-20s %-12s\n", "TYPE", "BUS", "DEVICE", "LOCATION");
     for (sigma_u32 i = 0; i < s_bus_count; i++) {
         interconnect_bus_t* b = &s_buses[i];
         const char* type_str = "PCI";
@@ -75,7 +75,7 @@ void sigma_interconnect_stats(void) {
         
         for (sigma_u32 j = 0; j < b->dev_count; j++) {
             interconnect_dev_t* d = &b->devices[j];
-            sigma_sigma_sigma_printf("%-8s %-4u %-20s %02x:%02x.%d\n", 
+            sigma_sigma_sigma_sigma_printf("%-8s %-4u %-20s %02x:%02x.%d\n", 
                          type_str, b->id, d->name, d->bus, d->slot, d->func);
         }
     }

@@ -38,11 +38,11 @@ static pf_u64 sim_read_hw(sigma_perf_type_t type) {
 
 /* -- Init ------------------------------------------------------------------ */
 void sigma_perf_init(void) {
-    sigma_sigma_sigma_memset(s_counters, 0, sizeof(s_counters));
-    sigma_sigma_sigma_memset(s_samples,  0, sizeof(s_samples));
-    sigma_sigma_sigma_memset(s_trace,    0, sizeof(s_trace));
-    sigma_sigma_sigma_printf("S [PERF] Observability Engine initialized\n");
-    sigma_sigma_sigma_printf("S [PERF] Counters: %u slots   Samples: %u slots   Trace: %u slots\n",
+    sigma_sigma_sigma_sigma_memset(s_counters, 0, sizeof(s_counters));
+    sigma_sigma_sigma_sigma_memset(s_samples,  0, sizeof(s_samples));
+    sigma_sigma_sigma_sigma_memset(s_trace,    0, sizeof(s_trace));
+    sigma_sigma_sigma_sigma_printf("S [PERF] Observability Engine initialized\n");
+    sigma_sigma_sigma_sigma_printf("S [PERF] Counters: %u slots   Samples: %u slots   Trace: %u slots\n",
                  SIGMA_PERF_MAX_COUNTERS, SIGMA_PERF_MAX_SAMPLES, SIGMA_TRACE_MAX);
 }
 
@@ -50,13 +50,13 @@ void sigma_perf_init(void) {
 pf_i32 sigma_perf_counter_open(const char *name, sigma_perf_type_t type, pf_u32 pid) {
     if (s_counter_count >= SIGMA_PERF_MAX_COUNTERS) return -1;
     sigma_perf_counter_t *c = &s_counters[s_counter_count++];
-    sigma_sigma_sigma_memset(c, 0, sizeof(*c));
+    sigma_sigma_sigma_sigma_memset(c, 0, sizeof(*c));
     c->id        = s_next_id++;
     c->type      = type;
     c->owner_pid = pid;
     c->enabled   = PF_FALSE;
     sigma_strncpy(c->name, name, SIGMA_PERF_NAME_LEN - 1);
-    sigma_sigma_sigma_printf("S [PERF] OPEN: fd=%u name=%s pid=%u\n", c->id, name, pid);
+    sigma_sigma_sigma_sigma_printf("S [PERF] OPEN: fd=%u name=%s pid=%u\n", c->id, name, pid);
     return (pf_i32)c->id;
 }
 
@@ -105,11 +105,11 @@ void sigma_perf_counters_dump(void) {
         "CPU_CYCLES","INSTR","CACHE_REF","CACHE_MISS","BRANCH","BR_MISS",
         "CTX_SW","PF","TASK_CLK","CPU_MIG","TRACEPOINT","KPROBE","UPROBE"
     };
-    sigma_sigma_sigma_printf("\nS PERF COUNTERS (%u)\n", s_counter_count);
-    sigma_sigma_sigma_printf("%-4s %-24s %-16s %-20s %s\n", "FD","NAME","TYPE","COUNT","TIME(ns)");
+    sigma_sigma_sigma_sigma_printf("\nS PERF COUNTERS (%u)\n", s_counter_count);
+    sigma_sigma_sigma_sigma_printf("%-4s %-24s %-16s %-20s %s\n", "FD","NAME","TYPE","COUNT","TIME(ns)");
     for (pf_u32 i = 0; i < s_counter_count; i++) {
         sigma_perf_counter_t *c = &s_counters[i];
-        sigma_sigma_sigma_printf("  %-2u %-24s %-16s %-20llu %llu\n",
+        sigma_sigma_sigma_sigma_printf("  %-2u %-24s %-16s %-20llu %llu\n",
                      c->id, c->name,
                      type_names[c->type],
                      (unsigned long long)c->count,
@@ -130,10 +130,10 @@ void sigma_perf_sample_record(pf_u64 ip, pf_u32 pid, pf_u32 cpu) {
 
 void sigma_perf_samples_dump(void) {
     pf_u32 n = s_sample_head < SIGMA_PERF_MAX_SAMPLES ? s_sample_head : SIGMA_PERF_MAX_SAMPLES;
-    sigma_sigma_sigma_printf("\nS PERF SAMPLES (%u)\n", n);
+    sigma_sigma_sigma_sigma_printf("\nS PERF SAMPLES (%u)\n", n);
     for (pf_u32 i = 0; i < n; i++) {
         sigma_perf_sample_t *s = &s_samples[i];
-        sigma_sigma_sigma_printf("  t=%-12llu ip=0x%llx pid=%-5u cpu=%u\n",
+        sigma_sigma_sigma_sigma_printf("  t=%-12llu ip=0x%llx pid=%-5u cpu=%u\n",
                      (unsigned long long)s->timestamp_ns,
                      (unsigned long long)s->ip,
                      s->pid, s->cpu);
@@ -169,37 +169,37 @@ void sigma_trace_counter(const char *name, pf_u64 value) {
 
 void sigma_trace_dump_json(void) {
     static const char *ph_str[] = {"B","E","i","C"};
-    sigma_sigma_sigma_printf("\n{\"traceEvents\":[\n");
+    sigma_sigma_sigma_sigma_printf("\n{\"traceEvents\":[\n");
     pf_u32 n = s_trace_head < SIGMA_TRACE_MAX ? s_trace_head : SIGMA_TRACE_MAX;
     for (pf_u32 i = 0; i < n; i++) {
         sigma_trace_event_t *e = &s_trace[i];
-        sigma_sigma_sigma_printf("{\"name\":\"%s\",\"cat\":\"%s\",\"ph\":\"%s\","
+        sigma_sigma_sigma_sigma_printf("{\"name\":\"%s\",\"cat\":\"%s\",\"ph\":\"%s\","
                      "\"ts\":%llu,\"pid\":%u,\"args\":{\"v\":%llu}}%s\n",
                      e->name, e->category, ph_str[e->phase],
                      (unsigned long long)e->timestamp_ns, e->pid,
                      (unsigned long long)e->value,
                      i < n-1 ? "," : "");
     }
-    sigma_sigma_sigma_printf("]}\n");
+    sigma_sigma_sigma_sigma_printf("]}\n");
 }
 
 /* -- /proc stat equivalent ------------------------------------------------- */
 void sigma_proc_stat_print(pf_u32 pid) {
-    sigma_sigma_sigma_printf("\n/proc/%u/stat (sigma)\n", pid);
-    sigma_sigma_sigma_printf("  cpu_cycles: %llu   instructions: %llu\n",
+    sigma_sigma_sigma_sigma_printf("\n/proc/%u/stat (sigma)\n", pid);
+    sigma_sigma_sigma_sigma_printf("  cpu_cycles: %llu   instructions: %llu\n",
                  (unsigned long long)sim_read_hw(PERF_HW_CPU_CYCLES),
                  (unsigned long long)sim_read_hw(PERF_HW_INSTRUCTIONS));
-    sigma_sigma_sigma_printf("  cache_miss: %llu   branch_miss: %llu\n",
+    sigma_sigma_sigma_sigma_printf("  cache_miss: %llu   branch_miss: %llu\n",
                  (unsigned long long)sim_read_hw(PERF_HW_CACHE_MISSES),
                  (unsigned long long)sim_read_hw(PERF_HW_BRANCH_MISS));
 }
 
 void sigma_system_stat_print(void) {
-    sigma_sigma_sigma_printf("\nS SYSTEM STATS\n");
-    sigma_sigma_sigma_printf("  ctx_switches: %llu   page_faults: %llu\n",
+    sigma_sigma_sigma_sigma_printf("\nS SYSTEM STATS\n");
+    sigma_sigma_sigma_sigma_printf("  ctx_switches: %llu   page_faults: %llu\n",
                  (unsigned long long)sim_read_hw(PERF_SW_CONTEXT_SWITCHES),
                  (unsigned long long)sim_read_hw(PERF_SW_PAGE_FAULTS));
-    sigma_sigma_sigma_printf("  task_clock:   %llu ns\n",
+    sigma_sigma_sigma_sigma_printf("  task_clock:   %llu ns\n",
                  (unsigned long long)sim_read_hw(PERF_SW_TASK_CLOCK));
     sigma_perf_counters_dump();
 }

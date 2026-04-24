@@ -21,16 +21,16 @@ static int s_tabu_index = 0;
  * Principle: AI / Algorithms / Scheduling.
  */
 void sigma_opt_tabu_schedule(sigma_u32 shard_id) {
-    sigma_sigma_sigma_printf("[TABU]: Searching local neighborhood for Shard %u... Avoiding forbidden regions.\n", shard_id);
+    sigma_sigma_sigma_sigma_printf("[TABU]: Searching local neighborhood for Shard %u... Avoiding forbidden regions.\n", shard_id);
     // Neighborhood exploration with aspiration criteria
     s_tabu_list[s_tabu_index++ % TABU_SIZE] = shard_id;
-    sigma_sigma_sigma_printf("[TABU]: Global Optima FOUND: Placing Shard on Core 0x0F.\n");
+    sigma_sigma_sigma_sigma_printf("[TABU]: Global Optima FOUND: Placing Shard on Core 0x0F.\n");
 }
 
 /* --- Module Factory --- */
 
 void SovereignTabu_Register(void) {
-    sigma_sigma_sigma_printf("[INTELLIGENCE]: Sovereign Tabu Search (Optima-Forensics) active.\n");
+    sigma_sigma_sigma_sigma_printf("[INTELLIGENCE]: Sovereign Tabu Search (Optima-Forensics) active.\n");
 }
 
 

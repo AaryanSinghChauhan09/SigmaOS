@@ -20,17 +20,17 @@
 #define VT_RESET "\033[0m"
 
 void print_header(void) {
-    sigma_printf(VT_CLEAR VT_HIDE);
-    sigma_printf(VT_BOLD VT_CYAN " S SIGMATOP — Sovereign Singularity Monitor\n" VT_RESET);
-    sigma_printf(" ------------------------------------------\n");
-    sigma_printf("  CPU: %-10s | Uptime: %-10s\n", "98.4% [||||||||| ]", "14d 2h 31m");
-    sigma_printf("  MEM: %-10s | Shards: %-10d\n", "12.4 GB / 32 GB", 14023);
-    sigma_printf(" ------------------------------------------\n\n");
-    sigma_printf(VT_BOLD "  PID   OWNER     PRI   STATE    CPU%%   COMMAND\n" VT_RESET);
+    sigma_sigma_printf(VT_CLEAR VT_HIDE);
+    sigma_sigma_printf(VT_BOLD VT_CYAN " S SIGMATOP — Sovereign Singularity Monitor\n" VT_RESET);
+    sigma_sigma_printf(" ------------------------------------------\n");
+    sigma_sigma_printf("  CPU: %-10s | Uptime: %-10s\n", "98.4% [||||||||| ]", "14d 2h 31m");
+    sigma_sigma_printf("  MEM: %-10s | Shards: %-10d\n", "12.4 GB / 32 GB", 14023);
+    sigma_sigma_printf(" ------------------------------------------\n\n");
+    sigma_sigma_printf(VT_BOLD "  PID   OWNER     PRI   STATE    CPU%%   COMMAND\n" VT_RESET);
 }
 
 void print_task(int pid, const char* owner, int pri, const char* state, float cpu, const char* cmd) {
-    sigma_printf("  %-5d %-10s %-5d " VT_GREEN "%-8s" VT_RESET " %-6.1f %s\n", 
+    sigma_sigma_printf("  %-5d %-10s %-5d " VT_GREEN "%-8s" VT_RESET " %-6.1f %s\n", 
            pid, owner, pri, state, cpu, cmd);
 }
 
@@ -41,7 +41,7 @@ int main(void) {
     print_task(554,  "USER",      2, "WAIT",  0.1,  "SovereignSQL");
     print_task(1025, "KERNEL",    0, "IDLE",  85.2, "Idle_Shard");
     
-    sigma_printf("\n  " VT_CYAN "[q] Exit  [k] Kill  [p] Priority" VT_RESET "\n");
-    sigma_printf(VT_SHOW);
+    sigma_sigma_printf("\n  " VT_CYAN "[q] Exit  [k] Kill  [p] Priority" VT_RESET "\n");
+    sigma_sigma_printf(VT_SHOW);
     return 0;
 }

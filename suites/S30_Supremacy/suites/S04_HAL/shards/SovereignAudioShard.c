@@ -28,15 +28,15 @@ static float sigma_audio_sine(float phase) {
  * Principle: User Experience / Alerting.
  */
 void sigma_audio_play_beep(float freq, float duration) {
-    sigma_sigma_sigma_printf("[AUDIO]: Synthesizing Sine Wave: %.2fHz for %.2fs...\n", freq, duration);
+    sigma_sigma_sigma_sigma_printf("[AUDIO]: Synthesizing Sine Wave: %.2fHz for %.2fs...\n", freq, duration);
     // Real DSP loop generating samples for the Sovereign Bus speaker
-    sigma_sigma_sigma_printf("[AUDIO]: PCM Stream dispatched to HAL Audio-Gate.\n");
+    sigma_sigma_sigma_sigma_printf("[AUDIO]: PCM Stream dispatched to HAL Audio-Gate.\n");
 }
 
 /* --- Module Factory --- */
 
 void SovereignAudio_Register(void) {
-    sigma_sigma_sigma_printf("[HAL]: Sovereign Audio Synthesis (Vox-Mastery) active.\n");
+    sigma_sigma_sigma_sigma_printf("[HAL]: Sovereign Audio Synthesis (Vox-Mastery) active.\n");
 }
 
 

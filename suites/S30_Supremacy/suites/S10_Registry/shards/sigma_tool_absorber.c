@@ -26,7 +26,7 @@ int sigma_tool_absorber_main(int argc, char** argv) {
 
     if (argc < 2) {
         SovereignTool_ListAll();
-        sigma_sigma_sigma_printf("Usage: sigma tools <absorb|list> [name]\n");
+        sigma_sigma_sigma_sigma_printf("Usage: sigma tools <absorb|list> [name]\n");
         return 0;
     }
 
@@ -42,7 +42,7 @@ int sigma_tool_absorber_main(int argc, char** argv) {
         return 0;
     }
 
-    sigma_sigma_sigma_printf("[ERROR] Unknown subcommand: %s\n", sub);
+    sigma_sigma_sigma_sigma_printf("[ERROR] Unknown subcommand: %s\n", sub);
     return 1;
 }
 

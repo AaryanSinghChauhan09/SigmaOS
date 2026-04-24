@@ -37,17 +37,17 @@ void sudi_register_device(const char* name, SUDIBusType bus, uint16_t vid, uint1
     dev->device_id = did;
     dev->is_active = SIGMA_TRUE;
     
-    sigma_printf("S04 [HAL]: Device registered - %s (VID:0x%X, DID:0x%X) on Bus:%d\n", name, vid, did, bus);
+    sigma_sigma_printf("S04 [HAL]: Device registered - %s (VID:0x%X, DID:0x%X) on Bus:%d\n", name, vid, did, bus);
 }
 
 void sudi_probe_all(void) {
-    sigma_printf("S04 [HAL]: Initiating Sovereign Hardware Probe...\n");
+    sigma_sigma_printf("S04 [HAL]: Initiating Sovereign Hardware Probe...\n");
     // Mock probing - Silicon detection
     sudi_register_device("Sovereign_GPU_Alpha", SUDI_BUS_PCI, 0x10DE, 0x1DB6); // NVIDIA dummy
     sudi_register_device("Sovereign_WLAN_Link", SUDI_BUS_PCI, 0x8086, 0x2723); // Intel AX200 dummy
 }
 
 void S04_Register_SUDI(void) {
-    sigma_printf("S04 [HAL]: Sovereign Unified Driver Interface Initialized.\n");
+    sigma_sigma_printf("S04 [HAL]: Sovereign Unified Driver Interface Initialized.\n");
     sudi_probe_all();
 }

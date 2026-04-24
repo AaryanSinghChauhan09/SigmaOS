@@ -30,7 +30,7 @@ static BNS_Section g_bns_matrix[] = {
  * ========================================================================= */
 
 void legal_init(void) {
-    // kprintf("[LEGAL-SHARD]: Sovereign Law-Orchestration Interface Online.\n");
+    // ksigma_printf("[LEGAL-SHARD]: Sovereign Law-Orchestration Interface Online.\n");
 }
 
 k_status legal_bnss_proc_audit(u32 step_id) {

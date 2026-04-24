@@ -143,7 +143,7 @@ static void kprint_char(char c) {
     vga_putc(c);
 }
 
-void kprintf(const char* fmt, ...) {
+void ksigma_printf(const char* fmt, ...) {
     va_list ap;
     va_start(ap, fmt);
     for (; *fmt; fmt++) {
@@ -179,10 +179,10 @@ void kprintf(const char* fmt, ...) {
 void console_init(void) {
     serial_init();
     vga_init();
-    kprintf("\n");
-    kprintf("Σ ============================================================ Σ\n");
-    kprintf("  SigmaOS Sovereign Kernel v1.0 — Pure C11 + x86_64 Assembly\n");
-    kprintf("  Serial: COM1 @ 115200 baud | VGA: 80x25 Text Mode\n");
-    kprintf("  Language: C11(98%%) | ASM(0.7%%) | Rust(0.3%%)\n");
-    kprintf("Σ ============================================================ Σ\n\n");
+    ksigma_printf("\n");
+    ksigma_printf("Σ ============================================================ Σ\n");
+    ksigma_printf("  SigmaOS Sovereign Kernel v1.0 — Pure C11 + x86_64 Assembly\n");
+    ksigma_printf("  Serial: COM1 @ 115200 baud | VGA: 80x25 Text Mode\n");
+    ksigma_printf("  Language: C11(98%%) | ASM(0.7%%) | Rust(0.3%%)\n");
+    ksigma_printf("Σ ============================================================ Σ\n\n");
 }

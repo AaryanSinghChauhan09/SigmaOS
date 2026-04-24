@@ -18,7 +18,7 @@
 /* =========================================================================
  * External kernel functions
  * ========================================================================= */
-extern void kprintf(const char* fmt, ...);
+extern void ksigma_printf(const char* fmt, ...);
 extern void cpu_cli(void);
 extern void cpu_halt(void);
 extern void cpu_sti(void);
@@ -68,7 +68,7 @@ static OmniShell g_shell;
 /* =========================================================================
  * Utility: zero-dep string functions
  * ========================================================================= */
-static u32 shell_strlen(const char* s) {
+static u32 shell_sigma_strlen(const char* s) {
     u32 i = 0; while (s[i]) i++; return i;
 }
 
@@ -115,7 +115,7 @@ typedef struct ParsedCmd {
 static u32 shell_parse(const char* line, ParsedCmd* cmds, u32 max_cmds) {
     u32 stage = 0;
     u32 i = 0, argc = 0;
-    u32 clen = shell_strlen(line);
+    u32 clen = shell_sigma_strlen(line);
     bool_t in_quote = FALSE;
     char arg_buf[MAX_ARG_LEN];
     u32 arg_pos = 0;
@@ -184,7 +184,7 @@ static u32 shell_parse(const char* line, ParsedCmd* cmds, u32 max_cmds) {
  * History management
  * ========================================================================= */
 static void shell_history_push(const char* cmd) {
-    if (shell_strlen(cmd) == 0) return;
+    if (shell_sigma_strlen(cmd) == 0) return;
     shell_strncpy(g_shell.history[g_shell.hist_tail], cmd, MAX_CMD_LEN);
     g_shell.hist_tail = (g_shell.hist_tail + 1) % MAX_HISTORY;
     if (g_shell.hist_count < MAX_HISTORY) g_shell.hist_count++;
@@ -193,10 +193,10 @@ static void shell_history_push(const char* cmd) {
 
 static void shell_history_print(void) {
     u32 i;
-    kprintf("[HISTORY]: %u commands in OMNI-SHELL buffer:\n", g_shell.hist_count);
+    ksigma_printf("[HISTORY]: %u commands in OMNI-SHELL buffer:\n", g_shell.hist_count);
     for (i = 0; i < g_shell.hist_count; i++) {
         u32 idx = (g_shell.hist_head + i) % MAX_HISTORY;
-        kprintf("  %3u  %s\n", i + 1, g_shell.history[idx]);
+        ksigma_printf("  %3u  %s\n", i + 1, g_shell.history[idx]);
     }
 }
 
@@ -232,152 +232,152 @@ static const char* shell_env_get(const char* key) {
 
 static void cmd_help(ParsedCmd* c) {
     (void)c;
-    kprintf("\n  Σ SIGMAOS OMNI-SHELL v3.0 — SOVEREIGN COMMAND REFERENCE\n");
-    kprintf("  ════════════════════════════════════════════════════════\n");
-    kprintf("  SYSTEM COMMANDS:\n");
-    kprintf("    help          — Display this comprehensive command reference\n");
-    kprintf("    version       — Show SigmaOS kernel version\n");
-    kprintf("    uname [-a]    — Print kernel & system information\n");
-    kprintf("    uptime        — System uptime and load\n");
-    kprintf("    free          — Memory usage (PMM buddy status)\n");
-    kprintf("    df            — Disk/filesystem usage\n");
-    kprintf("    top           — Live process table (MLFQ scheduler)\n");
-    kprintf("    ps            — List all processes with state\n");
-    kprintf("    kill <pid>    — Terminate process by PID\n");
-    kprintf("    nice <pri> <pid> — Adjust process priority\n");
-    kprintf("    lsmod         — List loaded kernel modules\n");
-    kprintf("    insmod <file> — Load kernel module\n");
-    kprintf("    rmmod <name>  — Remove kernel module\n");
-    kprintf("    dmesg         — Print kernel ring buffer\n");
-    kprintf("    history       — Command history\n");
-    kprintf("    export K=V    — Set environment variable\n");
-    kprintf("    env           — List all environment variables\n");
-    kprintf("  FILE SYSTEM:\n");
-    kprintf("    ls [path]     — List directory\n");
-    kprintf("    cat <file>    — Print file contents\n");
-    kprintf("    mkdir <dir>   — Create directory\n");
-    kprintf("    rm <file>     — Remove file/directory\n");
-    kprintf("    cp <src><dst> — Copy file\n");
-    kprintf("    mv <src><dst> — Move/rename file\n");
-    kprintf("    touch <file>  — Create empty file\n");
-    kprintf("    stat <file>   — File statistics\n");
-    kprintf("    find <path> <name> — Find files\n");
-    kprintf("    grep <pat> <f>— Search pattern in file\n");
-    kprintf("    head/tail <f> — First/last N lines\n");
-    kprintf("    wc <file>     — Word/line/byte count\n");
-    kprintf("    hexdump <f>   — Hex dump file\n");
-    kprintf("  NETWORK:\n");
-    kprintf("    ifconfig      — Network interface status\n");
-    kprintf("    ping <host>   — ICMP echo test\n");
-    kprintf("    netstat       — Network connections\n");
-    kprintf("    route         — Routing table\n");
-    kprintf("    fw-add <rule> — Add firewall rule\n");
-    kprintf("    fw-ls         — List firewall rules\n");
-    kprintf("  SECURITY / PQC:\n");
-    kprintf("    pqc-gen       — Generate Lattice-PQC keypair\n");
-    kprintf("    pqc-sign <f>  — Sign file with Dilithium\n");
-    kprintf("    pqc-verify <f>— Verify Dilithium signature\n");
-    kprintf("    hash <file>   — SHA-3 / FNV-1a hash\n");
-    kprintf("    enc <file>    — Encrypt with Lattice key\n");
-    kprintf("    dec <file>    — Decrypt with Lattice key\n");
-    kprintf("  LEGAL / COMPLIANCE:\n");
-    kprintf("    law-query --bnss — BNSS criminal procedures\n");
-    kprintf("    law-query --bsa  — BSA digital evidence rules\n");
-    kprintf("    law-query --bns  — BNS offence matrix\n");
-    kprintf("    law-query --pocso— POCSO child protection\n");
-    kprintf("    law-query --pmla — PMLA money laundering\n");
-    kprintf("    law-query --rti  — RTI procedures\n");
-    kprintf("    law-query --dpdp — DPDP data protection\n");
-    kprintf("    law-query --gst  — GST compliance\n");
-    kprintf("    law-query --rera — RERA real estate\n");
-    kprintf("    law-query --ibc  — IBC insolvency\n");
-    kprintf("    law-query --it   — IT Act / Cyber law\n");
-    kprintf("    law-query --arb  — Arbitration procedures\n");
-    kprintf("    law-query --labour — Labour code compliance\n");
-    kprintf("    law-query --consumer — Consumer protection\n");
-    kprintf("    bsa-cert --gen  — Generate BSA Sec 63 certificate\n");
-    kprintf("    checklist-ls    — List all legal checklist templates\n");
-    kprintf("    checklist-report— Print compliance score report\n");
-    kprintf("    deadline-audit  — Check missed legal deadlines\n");
-    kprintf("    bnss-fir        — Log FIR procedure\n");
-    kprintf("    bnss-arrest     — Arrest compliance audit\n");
-    kprintf("    bnss-bail       — Bail application steps\n");
-    kprintf("    bnss-remand     — Remand tracking\n");
-    kprintf("  FORENSICS:\n");
-    kprintf("    forensic-scan <path> — Digital forensic sector scan\n");
-    kprintf("    forensic-hash <f>    — Compute evidence hash\n");
-    kprintf("    disk-image <dev>     — Bit-perfect disk image\n");
-    kprintf("    chain-of-custody     — Print custody log\n");
-    kprintf("    volatile-dump        — Dump RAM volatile state\n");
-    kprintf("  AI / ML / DATA SCIENCE:\n");
-    kprintf("    ml-train <data> — Train neural shard\n");
-    kprintf("    ml-infer <input>— Run inference shard\n");
-    kprintf("    plot-graph <csv>— ASCII/SVG graph plot\n");
-    kprintf("    data-matrix     — Live kernel performance matrix\n");
-    kprintf("    ncert-sim <ch>  — NCERT chapter simulation\n");
-    kprintf("  CAMERA & VISUAL:\n");
-    kprintf("    cam-cap         — Capture silicon frame\n");
-    kprintf("    cam-filt <name> — Apply filter (sepia/edge/blur/sharpen)\n");
-    kprintf("    cam-filters     — List all available filters\n");
-    kprintf("    cam-forensic-start — Start BSA forensic capture session\n");
-    kprintf("    cam-forensic-stop  — End BSA forensic capture session\n");
-    kprintf("    cam-events      — Process camera event bus\n");
-    kprintf("  AUTOMATION / PERSONALISATION:\n");
-    kprintf("    sigma-auto <if> <then> — Add S-Auto workflow\n");
-    kprintf("    sigma-auto-ls   — List active workflows\n");
-    kprintf("    theme <name>    — Change CLI theme (onyx/cobalt/matrix)\n");
-    kprintf("    mode <name>     — Set OS mode (work/audit/sleep)\n");
-    kprintf("    alias <n> <cmd> — Create command alias\n");
-    kprintf("    unalias <name>  — Remove alias\n");
-    kprintf("  DISTRIBUTION / CONTAINER:\n");
-    kprintf("    container-run <img> — Spawn isolated container\n");
-    kprintf("    container-ps        — List containers\n");
-    kprintf("    namespace-ls        — List kernel namespaces\n");
-    kprintf("    cgroup-ls           — List cgroup trees\n");
-    kprintf("    sigma-deploy <mode> — Deploy (qemu/iso/docker/wsl/cloud)\n");
-    kprintf("  SYNC / REPOSITORY:\n");
-    kprintf("    sync-gh         — Sync with GitHub repository\n");
-    kprintf("    shard-ls        — List all kernel shards\n");
-    kprintf("    heatmap         — Real-time silicon heatmap\n");
-    kprintf("    molt-sync       — Sync Molt-Agent task graph\n");
-    kprintf("    dist-offload <node> — Offload task to cluster node\n");
-    kprintf("  KEYBOARD SHORTCUTS:\n");
-    kprintf("    Ctrl+C     — Interrupt running command\n");
-    kprintf("    Ctrl+D     — End of input / logout\n");
-    kprintf("    Ctrl+L     — Clear screen\n");
-    kprintf("    Ctrl+R     — Reverse history search\n");
-    kprintf("    Tab        — Auto-complete hint\n");
-    kprintf("    Up/Down    — Navigate history\n");
-    kprintf("  Pipeline: cmd1 | cmd2 | cmd3\n");
-    kprintf("  Redirect:  cmd > file  OR  cmd >> file\n\n");
+    ksigma_printf("\n  Σ SIGMAOS OMNI-SHELL v3.0 — SOVEREIGN COMMAND REFERENCE\n");
+    ksigma_printf("  ════════════════════════════════════════════════════════\n");
+    ksigma_printf("  SYSTEM COMMANDS:\n");
+    ksigma_printf("    help          — Display this comprehensive command reference\n");
+    ksigma_printf("    version       — Show SigmaOS kernel version\n");
+    ksigma_printf("    uname [-a]    — Print kernel & system information\n");
+    ksigma_printf("    uptime        — System uptime and load\n");
+    ksigma_printf("    free          — Memory usage (PMM buddy status)\n");
+    ksigma_printf("    df            — Disk/filesystem usage\n");
+    ksigma_printf("    top           — Live process table (MLFQ scheduler)\n");
+    ksigma_printf("    ps            — List all processes with state\n");
+    ksigma_printf("    kill <pid>    — Terminate process by PID\n");
+    ksigma_printf("    nice <pri> <pid> — Adjust process priority\n");
+    ksigma_printf("    lsmod         — List loaded kernel modules\n");
+    ksigma_printf("    insmod <file> — Load kernel module\n");
+    ksigma_printf("    rmmod <name>  — Remove kernel module\n");
+    ksigma_printf("    dmesg         — Print kernel ring buffer\n");
+    ksigma_printf("    history       — Command history\n");
+    ksigma_printf("    export K=V    — Set environment variable\n");
+    ksigma_printf("    env           — List all environment variables\n");
+    ksigma_printf("  FILE SYSTEM:\n");
+    ksigma_printf("    ls [path]     — List directory\n");
+    ksigma_printf("    cat <file>    — Print file contents\n");
+    ksigma_printf("    mkdir <dir>   — Create directory\n");
+    ksigma_printf("    rm <file>     — Remove file/directory\n");
+    ksigma_printf("    cp <src><dst> — Copy file\n");
+    ksigma_printf("    mv <src><dst> — Move/rename file\n");
+    ksigma_printf("    touch <file>  — Create empty file\n");
+    ksigma_printf("    stat <file>   — File statistics\n");
+    ksigma_printf("    find <path> <name> — Find files\n");
+    ksigma_printf("    grep <pat> <f>— Search pattern in file\n");
+    ksigma_printf("    head/tail <f> — First/last N lines\n");
+    ksigma_printf("    wc <file>     — Word/line/byte count\n");
+    ksigma_printf("    hexdump <f>   — Hex dump file\n");
+    ksigma_printf("  NETWORK:\n");
+    ksigma_printf("    ifconfig      — Network interface status\n");
+    ksigma_printf("    ping <host>   — ICMP echo test\n");
+    ksigma_printf("    netstat       — Network connections\n");
+    ksigma_printf("    route         — Routing table\n");
+    ksigma_printf("    fw-add <rule> — Add firewall rule\n");
+    ksigma_printf("    fw-ls         — List firewall rules\n");
+    ksigma_printf("  SECURITY / PQC:\n");
+    ksigma_printf("    pqc-gen       — Generate Lattice-PQC keypair\n");
+    ksigma_printf("    pqc-sign <f>  — Sign file with Dilithium\n");
+    ksigma_printf("    pqc-verify <f>— Verify Dilithium signature\n");
+    ksigma_printf("    hash <file>   — SHA-3 / FNV-1a hash\n");
+    ksigma_printf("    enc <file>    — Encrypt with Lattice key\n");
+    ksigma_printf("    dec <file>    — Decrypt with Lattice key\n");
+    ksigma_printf("  LEGAL / COMPLIANCE:\n");
+    ksigma_printf("    law-query --bnss — BNSS criminal procedures\n");
+    ksigma_printf("    law-query --bsa  — BSA digital evidence rules\n");
+    ksigma_printf("    law-query --bns  — BNS offence matrix\n");
+    ksigma_printf("    law-query --pocso— POCSO child protection\n");
+    ksigma_printf("    law-query --pmla — PMLA money laundering\n");
+    ksigma_printf("    law-query --rti  — RTI procedures\n");
+    ksigma_printf("    law-query --dpdp — DPDP data protection\n");
+    ksigma_printf("    law-query --gst  — GST compliance\n");
+    ksigma_printf("    law-query --rera — RERA real estate\n");
+    ksigma_printf("    law-query --ibc  — IBC insolvency\n");
+    ksigma_printf("    law-query --it   — IT Act / Cyber law\n");
+    ksigma_printf("    law-query --arb  — Arbitration procedures\n");
+    ksigma_printf("    law-query --labour — Labour code compliance\n");
+    ksigma_printf("    law-query --consumer — Consumer protection\n");
+    ksigma_printf("    bsa-cert --gen  — Generate BSA Sec 63 certificate\n");
+    ksigma_printf("    checklist-ls    — List all legal checklist templates\n");
+    ksigma_printf("    checklist-report— Print compliance score report\n");
+    ksigma_printf("    deadline-audit  — Check missed legal deadlines\n");
+    ksigma_printf("    bnss-fir        — Log FIR procedure\n");
+    ksigma_printf("    bnss-arrest     — Arrest compliance audit\n");
+    ksigma_printf("    bnss-bail       — Bail application steps\n");
+    ksigma_printf("    bnss-remand     — Remand tracking\n");
+    ksigma_printf("  FORENSICS:\n");
+    ksigma_printf("    forensic-scan <path> — Digital forensic sector scan\n");
+    ksigma_printf("    forensic-hash <f>    — Compute evidence hash\n");
+    ksigma_printf("    disk-image <dev>     — Bit-perfect disk image\n");
+    ksigma_printf("    chain-of-custody     — Print custody log\n");
+    ksigma_printf("    volatile-dump        — Dump RAM volatile state\n");
+    ksigma_printf("  AI / ML / DATA SCIENCE:\n");
+    ksigma_printf("    ml-train <data> — Train neural shard\n");
+    ksigma_printf("    ml-infer <input>— Run inference shard\n");
+    ksigma_printf("    plot-graph <csv>— ASCII/SVG graph plot\n");
+    ksigma_printf("    data-matrix     — Live kernel performance matrix\n");
+    ksigma_printf("    ncert-sim <ch>  — NCERT chapter simulation\n");
+    ksigma_printf("  CAMERA & VISUAL:\n");
+    ksigma_printf("    cam-cap         — Capture silicon frame\n");
+    ksigma_printf("    cam-filt <name> — Apply filter (sepia/edge/blur/sharpen)\n");
+    ksigma_printf("    cam-filters     — List all available filters\n");
+    ksigma_printf("    cam-forensic-start — Start BSA forensic capture session\n");
+    ksigma_printf("    cam-forensic-stop  — End BSA forensic capture session\n");
+    ksigma_printf("    cam-events      — Process camera event bus\n");
+    ksigma_printf("  AUTOMATION / PERSONALISATION:\n");
+    ksigma_printf("    sigma-auto <if> <then> — Add S-Auto workflow\n");
+    ksigma_printf("    sigma-auto-ls   — List active workflows\n");
+    ksigma_printf("    theme <name>    — Change CLI theme (onyx/cobalt/matrix)\n");
+    ksigma_printf("    mode <name>     — Set OS mode (work/audit/sleep)\n");
+    ksigma_printf("    alias <n> <cmd> — Create command alias\n");
+    ksigma_printf("    unalias <name>  — Remove alias\n");
+    ksigma_printf("  DISTRIBUTION / CONTAINER:\n");
+    ksigma_printf("    container-run <img> — Spawn isolated container\n");
+    ksigma_printf("    container-ps        — List containers\n");
+    ksigma_printf("    namespace-ls        — List kernel namespaces\n");
+    ksigma_printf("    cgroup-ls           — List cgroup trees\n");
+    ksigma_printf("    sigma-deploy <mode> — Deploy (qemu/iso/docker/wsl/cloud)\n");
+    ksigma_printf("  SYNC / REPOSITORY:\n");
+    ksigma_printf("    sync-gh         — Sync with GitHub repository\n");
+    ksigma_printf("    shard-ls        — List all kernel shards\n");
+    ksigma_printf("    heatmap         — Real-time silicon heatmap\n");
+    ksigma_printf("    molt-sync       — Sync Molt-Agent task graph\n");
+    ksigma_printf("    dist-offload <node> — Offload task to cluster node\n");
+    ksigma_printf("  KEYBOARD SHORTCUTS:\n");
+    ksigma_printf("    Ctrl+C     — Interrupt running command\n");
+    ksigma_printf("    Ctrl+D     — End of input / logout\n");
+    ksigma_printf("    Ctrl+L     — Clear screen\n");
+    ksigma_printf("    Ctrl+R     — Reverse history search\n");
+    ksigma_printf("    Tab        — Auto-complete hint\n");
+    ksigma_printf("    Up/Down    — Navigate history\n");
+    ksigma_printf("  Pipeline: cmd1 | cmd2 | cmd3\n");
+    ksigma_printf("  Redirect:  cmd > file  OR  cmd >> file\n\n");
 }
 
 static void cmd_version(ParsedCmd* c) {
     (void)c;
-    kprintf("  SigmaOS Zenith Supreme v2.0 (Kernel 1.0-SOVEREIGN)\n");
-    kprintf("  Built: C11 Freestanding | ASM x86_64 | Rust no_std\n");
-    kprintf("  Shards: 77+ kernel modules | Scheduler: MLFQ-8-level\n");
-    kprintf("  Security: Lattice-PQC Dilithium-v3 | Zero glibc\n");
+    ksigma_printf("  SigmaOS Zenith Supreme v2.0 (Kernel 1.0-SOVEREIGN)\n");
+    ksigma_printf("  Built: C11 Freestanding | ASM x86_64 | Rust no_std\n");
+    ksigma_printf("  Shards: 77+ kernel modules | Scheduler: MLFQ-8-level\n");
+    ksigma_printf("  Security: Lattice-PQC Dilithium-v3 | Zero glibc\n");
 }
 
 static void cmd_uname(ParsedCmd* c) {
     bool_t all = (c->argc > 1 && c->args[1][0] == '-' && c->args[1][1] == 'a');
-    kprintf("SigmaOS");
-    if (all) kprintf(" SigmaOS 1.0-SOVEREIGN #1 SMP x86_64 GNU/SIGMA");
-    kprintf("\n");
+    ksigma_printf("SigmaOS");
+    if (all) ksigma_printf(" SigmaOS 1.0-SOVEREIGN #1 SMP x86_64 GNU/SIGMA");
+    ksigma_printf("\n");
 }
 
 static void cmd_free(ParsedCmd* c) {
     (void)c;
     extern void pmm_audit(void);
-    kprintf("[OMNI-SHELL]: PMM Buddy Allocator Memory Report:\n");
+    ksigma_printf("[OMNI-SHELL]: PMM Buddy Allocator Memory Report:\n");
     pmm_audit();
 }
 
 static void cmd_ps(ParsedCmd* c) {
     (void)c;
     extern void sched_audit(void);
-    kprintf("[OMNI-SHELL]: Process Table:\n");
+    ksigma_printf("[OMNI-SHELL]: Process Table:\n");
     sched_audit();
 }
 
@@ -385,63 +385,63 @@ static void cmd_top(ParsedCmd* c) {
     (void)c;
     extern void sched_audit(void);
     extern void pmm_audit(void);
-    kprintf("[OMNI-SHELL]: SIGMAOS TOP — Real-time View:\n");
+    ksigma_printf("[OMNI-SHELL]: SIGMAOS TOP — Real-time View:\n");
     sched_audit();
     pmm_audit();
 }
 
 static void cmd_ls(ParsedCmd* c) {
     const char* path = (c->argc > 1) ? c->args[1] : g_shell.cwd;
-    kprintf("[VFS]: Contents of '%s':\n", path);
-    kprintf("  drwxr-xr-x  tmp/\n");
-    kprintf("  drwxr-xr-x  bin/\n");
-    kprintf("  drwxr-xr-x  dev/\n");
-    kprintf("  drwxr-xr-x  law/\n");
-    kprintf("  drwxr-xr-x  forensics/\n");
-    kprintf("  drwxr-xr-x  ncert/\n");
-    kprintf("  drwxr-xr-x  sigma_shards/\n");
-    kprintf("  -rw-r--r--  sigma_pid1.txt\n");
+    ksigma_printf("[VFS]: Contents of '%s':\n", path);
+    ksigma_printf("  drwxr-xr-x  tmp/\n");
+    ksigma_printf("  drwxr-xr-x  bin/\n");
+    ksigma_printf("  drwxr-xr-x  dev/\n");
+    ksigma_printf("  drwxr-xr-x  law/\n");
+    ksigma_printf("  drwxr-xr-x  forensics/\n");
+    ksigma_printf("  drwxr-xr-x  ncert/\n");
+    ksigma_printf("  drwxr-xr-x  sigma_shards/\n");
+    ksigma_printf("  -rw-r--r--  sigma_pid1.txt\n");
 }
 
 static void cmd_cat(ParsedCmd* c) {
-    if (c->argc < 2) { kprintf("[ERR]: cat requires a file argument.\n"); return; }
+    if (c->argc < 2) { ksigma_printf("[ERR]: cat requires a file argument.\n"); return; }
     extern i32 vfs_open(const char*, u32, u32);
     extern i64 vfs_read(i32, void*, u32);
     extern i32 vfs_close(i32);
     i32 fd = vfs_open(c->args[1], 0, 0);
-    if (fd < 0) { kprintf("[ERR]: File '%s' not found.\n", c->args[1]); return; }
+    if (fd < 0) { ksigma_printf("[ERR]: File '%s' not found.\n", c->args[1]); return; }
     char buf[256]; i64 n;
     while ((n = vfs_read(fd, buf, 255)) > 0) {
-        buf[n] = '\0'; kprintf("%s", buf);
+        buf[n] = '\0'; ksigma_printf("%s", buf);
     }
     vfs_close(fd);
 }
 
 static void cmd_mkdir(ParsedCmd* c) {
-    if (c->argc < 2) { kprintf("[ERR]: mkdir requires a directory name.\n"); return; }
+    if (c->argc < 2) { ksigma_printf("[ERR]: mkdir requires a directory name.\n"); return; }
     extern i32 vfs_mkdir(const char*);
     if (vfs_mkdir(c->args[1]) == 0)
-        kprintf("[VFS]: Directory '%s' created.\n", c->args[1]);
+        ksigma_printf("[VFS]: Directory '%s' created.\n", c->args[1]);
     else
-        kprintf("[ERR]: Cannot create '%s'.\n", c->args[1]);
+        ksigma_printf("[ERR]: Cannot create '%s'.\n", c->args[1]);
 }
 
 static void cmd_rm(ParsedCmd* c) {
-    if (c->argc < 2) { kprintf("[ERR]: rm requires a file argument.\n"); return; }
+    if (c->argc < 2) { ksigma_printf("[ERR]: rm requires a file argument.\n"); return; }
     extern i32 vfs_unlink(const char*);
     if (vfs_unlink(c->args[1]) == 0)
-        kprintf("[VFS]: '%s' removed.\n", c->args[1]);
+        ksigma_printf("[VFS]: '%s' removed.\n", c->args[1]);
     else
-        kprintf("[ERR]: Cannot remove '%s'.\n", c->args[1]);
+        ksigma_printf("[ERR]: Cannot remove '%s'.\n", c->args[1]);
 }
 
 static void cmd_law_query(ParsedCmd* c) {
     extern k_status checklist_query_domain(u32, u32*);
     extern u32      checklist_total_items(void);
     if (c->argc < 2) {
-        kprintf("[LAW-QUERY]: Total checklist items: %u across all domains.\n",
+        ksigma_printf("[LAW-QUERY]: Total checklist items: %u across all domains.\n",
                 checklist_total_items());
-        kprintf("Usage: law-query --bnss|--bsa|--bns|--pocso|--pmla|--rti|--dpdp|"
+        ksigma_printf("Usage: law-query --bnss|--bsa|--bns|--pocso|--pmla|--rti|--dpdp|"
                 "--gst|--rera|--ibc|--it|--arb|--labour|--consumer\n");
         return;
     }
@@ -461,7 +461,7 @@ static void cmd_law_query(ParsedCmd* c) {
     else if (shell_streq(flag, "--labour")) domain = 8;
     else if (shell_streq(flag, "--consumer")) domain = 13;
     else if (shell_streq(flag, "--rera")) domain = 23;
-    else { kprintf("[ERR]: Unknown domain flag '%s'.\n", flag); return; }
+    else { ksigma_printf("[ERR]: Unknown domain flag '%s'.\n", flag); return; }
     checklist_query_domain(domain, &count);
 }
 
@@ -469,19 +469,19 @@ static void cmd_bsa_cert(ParsedCmd* c) {
     (void)c;
     extern u64 os_get_timestamp_ns(void);
     u64 ts = os_get_timestamp_ns();
-    kprintf("[BSA-SEC63]: Sovereign Electronic Evidence Certificate\n");
-    kprintf("  Timestamp_ns : %llu\n", ts);
-    kprintf("  Hash_algo    : FNV-1a + SHA-3 compatible\n");
-    kprintf("  Signed_by    : SigmaOS-Forensic-Module\n");
-    kprintf("  BSA_Section  : Sec 63 Bharatiya Sakshya Adhiniyam 2023\n");
-    kprintf("  Status       : VALID — ADMISSIBLE IN COURT\n");
+    ksigma_printf("[BSA-SEC63]: Sovereign Electronic Evidence Certificate\n");
+    ksigma_printf("  Timestamp_ns : %llu\n", ts);
+    ksigma_printf("  Hash_algo    : FNV-1a + SHA-3 compatible\n");
+    ksigma_printf("  Signed_by    : SigmaOS-Forensic-Module\n");
+    ksigma_printf("  BSA_Section  : Sec 63 Bharatiya Sakshya Adhiniyam 2023\n");
+    ksigma_printf("  Status       : VALID — ADMISSIBLE IN COURT\n");
 }
 
 static void cmd_cam_cap(ParsedCmd* c) {
     (void)c;
     extern k_status camera_capture_frame(void*);
     k_status s = camera_capture_frame(NULL);
-    kprintf("[CAM-CAP]: %s\n", s == K_OK ? "Frame captured. BSA hash recorded." : "FAIL");
+    ksigma_printf("[CAM-CAP]: %s\n", s == K_OK ? "Frame captured. BSA hash recorded." : "FAIL");
 }
 
 static void cmd_cam_filt(ParsedCmd* c) {
@@ -516,32 +516,32 @@ static void cmd_cam_events(ParsedCmd* c) {
 
 static void cmd_heatmap(ParsedCmd* c) {
     (void)c;
-    kprintf("\n  Σ SIGMA-ZENITH SILICON HEATMAP (Real-Time):\n");
-    kprintf("  ┌────────────────────────────────────────┐\n");
-    kprintf("  │ CPU  ████████░░ 80%%  │ TEMP  45°C     │\n");
-    kprintf("  │ RAM  █████░░░░░ 50%%  │ PMM   BUDDY OK │\n");
-    kprintf("  │ NET  ██░░░░░░░░ 20%%  │ VFS   RAMFS OK │\n");
-    kprintf("  │ I/O  ███░░░░░░░ 30%%  │ SCHED MLFQ-8   │\n");
-    kprintf("  │ PQC  ████████░░ 80%%  │ RING0 SECURE   │\n");
-    kprintf("  └────────────────────────────────────────┘\n");
-    kprintf("  SHARD_ENTROPY: 0.978 | UPTIME: SOVEREIGN | THREAT: ZERO\n\n");
+    ksigma_printf("\n  Σ SIGMA-ZENITH SILICON HEATMAP (Real-Time):\n");
+    ksigma_printf("  ┌────────────────────────────────────────┐\n");
+    ksigma_printf("  │ CPU  ████████░░ 80%%  │ TEMP  45°C     │\n");
+    ksigma_printf("  │ RAM  █████░░░░░ 50%%  │ PMM   BUDDY OK │\n");
+    ksigma_printf("  │ NET  ██░░░░░░░░ 20%%  │ VFS   RAMFS OK │\n");
+    ksigma_printf("  │ I/O  ███░░░░░░░ 30%%  │ SCHED MLFQ-8   │\n");
+    ksigma_printf("  │ PQC  ████████░░ 80%%  │ RING0 SECURE   │\n");
+    ksigma_printf("  └────────────────────────────────────────┘\n");
+    ksigma_printf("  SHARD_ENTROPY: 0.978 | UPTIME: SOVEREIGN | THREAT: ZERO\n\n");
 }
 
 static void cmd_sync_gh(ParsedCmd* c) {
     (void)c;
-    kprintf("[SYNC-GH]: Initiating synchronization with GitHub repository...\n");
-    kprintf("[SYNC-GH]: Remote: https://github.com/SovereignArchitectSinghChauhan09/SigmaOS\n");
-    kprintf("[SYNC-GH]: Branch: master\n");
-    kprintf("[SYNC-GH]: Status: All shards committed and pushed.\n");
+    ksigma_printf("[SYNC-GH]: Initiating synchronization with GitHub repository...\n");
+    ksigma_printf("[SYNC-GH]: Remote: https://github.com/SovereignArchitectSinghChauhan09/SigmaOS\n");
+    ksigma_printf("[SYNC-GH]: Branch: master\n");
+    ksigma_printf("[SYNC-GH]: Status: All shards committed and pushed.\n");
 }
 
 static void cmd_pqc_gen(ParsedCmd* c) {
     (void)c;
     extern void pqc_init(void);
-    kprintf("[PQC-GEN]: Generating Lattice-PQC Dilithium-v3 keypair...\n");
-    kprintf("[PQC-GEN]: Public key: [SIGMA_PQC_PK_2048bit]\n");
-    kprintf("[PQC-GEN]: Private key: [stored in kernel ring-0 vault]\n");
-    kprintf("[PQC-GEN]: Algorithm: CRYSTALS-Dilithium (NIST PQC finalist)\n");
+    ksigma_printf("[PQC-GEN]: Generating Lattice-PQC Dilithium-v3 keypair...\n");
+    ksigma_printf("[PQC-GEN]: Public key: [SIGMA_PQC_PK_2048bit]\n");
+    ksigma_printf("[PQC-GEN]: Private key: [stored in kernel ring-0 vault]\n");
+    ksigma_printf("[PQC-GEN]: Algorithm: CRYSTALS-Dilithium (NIST PQC finalist)\n");
 }
 
 static void cmd_checklist_report(ParsedCmd* c) {
@@ -553,78 +553,78 @@ static void cmd_checklist_report(ParsedCmd* c) {
 static void cmd_checklist_ls(ParsedCmd* c) {
     (void)c;
     extern u32 checklist_total_items(void);
-    kprintf("[CHECKLIST-LS]: Indian Law Domains loaded:\n");
-    kprintf("  1. BNSS 2023 (Criminal Procedure)\n");
-    kprintf("  2. BNS 2023 (Substantive Offences)\n");
-    kprintf("  3. BSA 2023 (Evidence / Forensics)\n");
-    kprintf("  4. POCSO 2012 (Child Protection)\n");
-    kprintf("  5. PMLA 2002 (Money Laundering)\n");
-    kprintf("  6. RTI 2005 (Right to Information)\n");
-    kprintf("  7. IBC 2016 (Insolvency)\n");
-    kprintf("  8. DPDP 2023 (Data Protection)\n");
-    kprintf("  9. GST / Income Tax Compliance\n");
-    kprintf(" 10. Arbitration & Conciliation Act 1996\n");
-    kprintf(" 11. IT Act / Cyber Law / CERT-In\n");
-    kprintf(" 12. Labour Codes 2019-2020\n");
-    kprintf(" 13. Consumer Protection Act 2019\n");
-    kprintf(" 14. RERA 2016 (Real Estate)\n");
-    kprintf("  Total items: %u\n", checklist_total_items());
+    ksigma_printf("[CHECKLIST-LS]: Indian Law Domains loaded:\n");
+    ksigma_printf("  1. BNSS 2023 (Criminal Procedure)\n");
+    ksigma_printf("  2. BNS 2023 (Substantive Offences)\n");
+    ksigma_printf("  3. BSA 2023 (Evidence / Forensics)\n");
+    ksigma_printf("  4. POCSO 2012 (Child Protection)\n");
+    ksigma_printf("  5. PMLA 2002 (Money Laundering)\n");
+    ksigma_printf("  6. RTI 2005 (Right to Information)\n");
+    ksigma_printf("  7. IBC 2016 (Insolvency)\n");
+    ksigma_printf("  8. DPDP 2023 (Data Protection)\n");
+    ksigma_printf("  9. GST / Income Tax Compliance\n");
+    ksigma_printf(" 10. Arbitration & Conciliation Act 1996\n");
+    ksigma_printf(" 11. IT Act / Cyber Law / CERT-In\n");
+    ksigma_printf(" 12. Labour Codes 2019-2020\n");
+    ksigma_printf(" 13. Consumer Protection Act 2019\n");
+    ksigma_printf(" 14. RERA 2016 (Real Estate)\n");
+    ksigma_printf("  Total items: %u\n", checklist_total_items());
 }
 
 static void cmd_forensic_scan(ParsedCmd* c) {
     const char* path = (c->argc > 1) ? c->args[1] : "/dev/silicon0";
-    kprintf("[FORENSIC-SCAN]: Scanning '%s' for digital evidence...\n", path);
-    kprintf("[FORENSIC-SCAN]: Bit-perfect sector analysis in progress...\n");
-    kprintf("[FORENSIC-SCAN]: Hash algorithm: FNV-1a (sector) + SHA-3 (full image)\n");
-    kprintf("[FORENSIC-SCAN]: BSA Sec 62/63 compliant chain-of-custody maintained.\n");
-    kprintf("[FORENSIC-SCAN]: Complete. 0 compromised sectors found.\n");
+    ksigma_printf("[FORENSIC-SCAN]: Scanning '%s' for digital evidence...\n", path);
+    ksigma_printf("[FORENSIC-SCAN]: Bit-perfect sector analysis in progress...\n");
+    ksigma_printf("[FORENSIC-SCAN]: Hash algorithm: FNV-1a (sector) + SHA-3 (full image)\n");
+    ksigma_printf("[FORENSIC-SCAN]: BSA Sec 62/63 compliant chain-of-custody maintained.\n");
+    ksigma_printf("[FORENSIC-SCAN]: Complete. 0 compromised sectors found.\n");
 }
 
 static void cmd_ml_train(ParsedCmd* c) {
     const char* dataset = (c->argc > 1) ? c->args[1] : "default_dataset";
-    kprintf("[ML-TRAIN]: Initiating zero-dependency neural training on '%s'...\n", dataset);
-    kprintf("[ML-TRAIN]: Shard: linear_algebra_shard + gradient_descent_shard\n");
-    kprintf("[ML-TRAIN]: Epoch 1/10 — Loss: 0.452\n");
-    kprintf("[ML-TRAIN]: Epoch 5/10 — Loss: 0.211\n");
-    kprintf("[ML-TRAIN]: Epoch 10/10 — Loss: 0.098\n");
-    kprintf("[ML-TRAIN]: Training complete. Model saved to /sigma_shards/model.bin\n");
+    ksigma_printf("[ML-TRAIN]: Initiating zero-dependency neural training on '%s'...\n", dataset);
+    ksigma_printf("[ML-TRAIN]: Shard: linear_algebra_shard + gradient_descent_shard\n");
+    ksigma_printf("[ML-TRAIN]: Epoch 1/10 — Loss: 0.452\n");
+    ksigma_printf("[ML-TRAIN]: Epoch 5/10 — Loss: 0.211\n");
+    ksigma_printf("[ML-TRAIN]: Epoch 10/10 — Loss: 0.098\n");
+    ksigma_printf("[ML-TRAIN]: Training complete. Model saved to /sigma_shards/model.bin\n");
 }
 
 static void cmd_sigma_deploy(ParsedCmd* c) {
     const char* mode = (c->argc > 1) ? c->args[1] : "qemu";
-    kprintf("[DEPLOY]: SigmaOS deployment mode: %s\n", mode);
+    ksigma_printf("[DEPLOY]: SigmaOS deployment mode: %s\n", mode);
     if (shell_streq(mode, "qemu"))
-        kprintf("[DEPLOY]: Run: qemu-system-x86_64 -kernel build/sigmaos_kernel.elf -m 256M -serial stdio\n");
+        ksigma_printf("[DEPLOY]: Run: qemu-system-x86_64 -kernel build/sigmaos_kernel.elf -m 256M -serial stdio\n");
     else if (shell_streq(mode, "iso"))
-        kprintf("[DEPLOY]: Run: make iso && dd if=build/sigmaos.iso of=/dev/sdX bs=4M && sync\n");
+        ksigma_printf("[DEPLOY]: Run: make iso && dd if=build/sigmaos.iso of=/dev/sdX bs=4M && sync\n");
     else if (shell_streq(mode, "docker"))
-        kprintf("[DEPLOY]: Run: docker build -t sigmaos . && docker run -it sigmaos\n");
+        ksigma_printf("[DEPLOY]: Run: docker build -t sigmaos . && docker run -it sigmaos\n");
     else if (shell_streq(mode, "wsl"))
-        kprintf("[DEPLOY]: Run: wsl --import SigmaOS ./sigmaos_rootfs.tar.gz\n");
+        ksigma_printf("[DEPLOY]: Run: wsl --import SigmaOS ./sigmaos_rootfs.tar.gz\n");
     else if (shell_streq(mode, "cloud"))
-        kprintf("[DEPLOY]: Push to cloud: upload build/sigmaos_kernel.elf to AWS/GCP/Azure disk image\n");
+        ksigma_printf("[DEPLOY]: Push to cloud: upload build/sigmaos_kernel.elf to AWS/GCP/Azure disk image\n");
     else
-        kprintf("[ERR]: Unknown deployment mode '%s'. Options: qemu/iso/docker/wsl/cloud\n", mode);
+        ksigma_printf("[ERR]: Unknown deployment mode '%s'. Options: qemu/iso/docker/wsl/cloud\n", mode);
 }
 
 static void cmd_ncert_sim(ParsedCmd* c) {
     const char* chapter = (c->argc > 1) ? c->args[1] : "physics_class10";
-    kprintf("[NCERT-SIM]: Loading chapter '%s'...\n", chapter);
-    kprintf("[NCERT-SIM]: Native silicon simulation initialized.\n");
-    kprintf("[NCERT-SIM]: Interactive: type equations or reactions for validation.\n");
+    ksigma_printf("[NCERT-SIM]: Loading chapter '%s'...\n", chapter);
+    ksigma_printf("[NCERT-SIM]: Native silicon simulation initialized.\n");
+    ksigma_printf("[NCERT-SIM]: Interactive: type equations or reactions for validation.\n");
 }
 
 static void cmd_alias_set(ParsedCmd* c) {
-    if (c->argc < 3) { kprintf("[ERR]: Usage: alias <name> <command>\n"); return; }
-    if (g_shell.alias_count >= MAX_ALIASES) { kprintf("[ERR]: Alias table full.\n"); return; }
+    if (c->argc < 3) { ksigma_printf("[ERR]: Usage: alias <name> <command>\n"); return; }
+    if (g_shell.alias_count >= MAX_ALIASES) { ksigma_printf("[ERR]: Alias table full.\n"); return; }
     shell_strncpy(g_shell.aliases[g_shell.alias_count].name, c->args[1], 31);
     shell_strncpy(g_shell.aliases[g_shell.alias_count].expansion, c->args[2], MAX_CMD_LEN - 1);
     g_shell.alias_count++;
-    kprintf("[ALIAS]: '%s' = '%s'\n", c->args[1], c->args[2]);
+    ksigma_printf("[ALIAS]: '%s' = '%s'\n", c->args[1], c->args[2]);
 }
 
 static void cmd_export(ParsedCmd* c) {
-    if (c->argc < 2) { kprintf("[ERR]: Usage: export KEY=VALUE\n"); return; }
+    if (c->argc < 2) { ksigma_printf("[ERR]: Usage: export KEY=VALUE\n"); return; }
     /* simple K=V parsing */
     char key[32], val[128];
     const char* kv = c->args[1];
@@ -635,25 +635,25 @@ static void cmd_export(ParsedCmd* c) {
     while (kv[i] && j < 127) val[j++] = kv[i++];
     val[j] = '\0';
     shell_env_set(key, val);
-    kprintf("[EXPORT]: %s=%s\n", key, val);
+    ksigma_printf("[EXPORT]: %s=%s\n", key, val);
 }
 
 static void cmd_env_list(ParsedCmd* c) {
     (void)c;
     u32 i;
     for (i = 0; i < g_shell.env_count; i++)
-        kprintf("  %s=%s\n", g_shell.env[i].key, g_shell.env[i].val);
+        ksigma_printf("  %s=%s\n", g_shell.env[i].key, g_shell.env[i].val);
 }
 
 static void cmd_clear(ParsedCmd* c) {
     (void)c;
     /* Send ANSI clear screen */
-    kprintf("\033[2J\033[H");
+    ksigma_printf("\033[2J\033[H");
 }
 
 static void cmd_exit_shell(ParsedCmd* c) {
     (void)c;
-    kprintf("[OMNI-SHELL]: Sovereign shell exiting. Halting silicon.\n");
+    ksigma_printf("[OMNI-SHELL]: Sovereign shell exiting. Halting silicon.\n");
     cpu_cli();
     cpu_halt();
 }
@@ -733,7 +733,7 @@ static k_status dispatch_one(ParsedCmd* c) {
         i++;
     }
 
-    kprintf("[OMNI-SHELL]: '%s': command not found. Type 'help' for reference.\n", c->args[0]);
+    ksigma_printf("[OMNI-SHELL]: '%s': command not found. Type 'help' for reference.\n", c->args[0]);
     return K_ERR_INVAL;
 }
 
@@ -752,8 +752,8 @@ void omnishell_init(void) {
     shell_env_set("SHELL", "omni-shell");
     shell_env_set("TERM",  "sigma-vga");
     shell_env_set("LANG",  "en_IN.UTF-8");
-    kprintf("[OMNI-SHELL]: Sovereign CLI v3.0 online. 300+ commands. GUI is legacy.\n");
-    kprintf("[OMNI-SHELL]: Type 'help' for full command reference.\n");
+    ksigma_printf("[OMNI-SHELL]: Sovereign CLI v3.0 online. 300+ commands. GUI is legacy.\n");
+    ksigma_printf("[OMNI-SHELL]: Type 'help' for full command reference.\n");
 }
 
 /* =========================================================================
@@ -786,5 +786,5 @@ k_status omnishell_exec(const char* line) {
  * Public API — omnishell_prompt
  * ========================================================================= */
 void omnishell_print_prompt(void) {
-    kprintf("\nΣ %s@sigmaos:%s> ", g_shell.user, g_shell.cwd);
+    ksigma_printf("\nΣ %s@sigmaos:%s> ", g_shell.user, g_shell.cwd);
 }

@@ -44,19 +44,19 @@ typedef struct OmniShellZenith {
  * ========================================================================= */
 static void cmd_shard_rebuild(void* ctx) {
     (void)ctx;
-    sigma_printf("[OMNI-SHELL]: Igniting Sovereign Build System... [BIT-PERFECT FORGE]\n");
-    sigma_printf("[OMNI-SHELL]: CC=gcc CFLAGS=-std=c11,-ffreestanding make zenith\n");
+    sigma_sigma_printf("[OMNI-SHELL]: Igniting Sovereign Build System... [BIT-PERFECT FORGE]\n");
+    sigma_sigma_printf("[OMNI-SHELL]: CC=gcc CFLAGS=-std=c11,-ffreestanding make zenith\n");
 }
 
 static void cmd_lattice_rekey(void* ctx) {
     (void)ctx;
-    sigma_printf("[OMNI-SHELL]: Triggering Lattice-PQC Rekeying... [QUANTUM SECURED]\n");
+    sigma_sigma_printf("[OMNI-SHELL]: Triggering Lattice-PQC Rekeying... [QUANTUM SECURED]\n");
 }
 
 static void cmd_usp_absorb(void* ctx) {
     (void)ctx;
-    sigma_printf("[OMNI-SHELL]: Absorbing legacy OS USPs into Sigma Shard Matrix...\n");
-    sigma_printf("[OMNI-SHELL]: Linux/macOS/Windows feature sets neutralized.\n");
+    sigma_sigma_printf("[OMNI-SHELL]: Absorbing legacy OS USPs into Sigma Shard Matrix...\n");
+    sigma_sigma_printf("[OMNI-SHELL]: Linux/macOS/Windows feature sets neutralized.\n");
 }
 
 static void cmd_ls(void* ctx) {
@@ -67,7 +67,7 @@ static void cmd_ls(void* ctx) {
     if (fd >= 0) {
         sigma_u8 buf[4096];
         int n = sigma_getdents64((unsigned int)fd, buf, sizeof(buf));
-        if (n > 0) sigma_printf("[LS-ZENITH]: Read %d bytes of dirent shards.\n", n);
+        if (n > 0) sigma_sigma_printf("[LS-ZENITH]: Read %d bytes of dirent shards.\n", n);
         sigma_close(fd);
     } else {
         sigma_print("[LS-ZENITH]: Directory shard read (simulated).\n");
@@ -80,39 +80,39 @@ static void cmd_top(void* ctx) {
     __asm__ __volatile__(
         "rdtsc\n\t shl $32,%%rdx\n\t or %%rdx,%%rax"
         : "=a"(tsc) :: "rdx");
-    sigma_printf("[TOP-ZENITH]: CPU TSC Tick = %llu\n", tsc);
-    sigma_printf("[TOP-ZENITH]: htop/top daemon requirement = ZERO.\n");
+    sigma_sigma_printf("[TOP-ZENITH]: CPU TSC Tick = %llu\n", tsc);
+    sigma_sigma_printf("[TOP-ZENITH]: htop/top daemon requirement = ZERO.\n");
 }
 
 static void cmd_fork_test(void* ctx) {
     (void)ctx;
     int pid = sigma_fork();
     if (pid == 0) {
-        sigma_printf("[CHILD]: Sovereign child shard executing...\n");
+        sigma_sigma_printf("[CHILD]: Sovereign child shard executing...\n");
         sigma_exit(0);
     } else if (pid > 0) {
-        sigma_printf("[PARENT]: Child spawned (PID: %d). Absorbing...\n", pid);
+        sigma_sigma_printf("[PARENT]: Child spawned (PID: %d). Absorbing...\n", pid);
         sigma_wait((int*)SIGMA_NULL);
-        sigma_printf("[PARENT]: Child shard re-absorbed.\n");
+        sigma_sigma_printf("[PARENT]: Child shard re-absorbed.\n");
     } else {
-        sigma_printf("[ERROR]: Fork shard failed.\n");
+        sigma_sigma_printf("[ERROR]: Fork shard failed.\n");
     }
 }
 
 static void cmd_pqc_audit(void* ctx) {
     (void)ctx;
-    sigma_printf("[PQC-AUDIT]: Verifying Lattice-PQC Sentinel integrity...\n");
+    sigma_sigma_printf("[PQC-AUDIT]: Verifying Lattice-PQC Sentinel integrity...\n");
     sigma_u64 entropy;
     __asm__ __volatile__("rdrand %0" : "=r"(entropy));
-    sigma_printf("[PQC-AUDIT]: Hardware RDRAND entropy = ");
+    sigma_sigma_printf("[PQC-AUDIT]: Hardware RDRAND entropy = ");
     sigma_print_hex(entropy);
     sigma_print("\n");
 }
 
 static void cmd_gui_toggle(void* ctx) {
     (void)ctx;
-    sigma_printf("[SHIFT]: Transitioning CLI Shard to Native Desktop SHARD...\n");
-    sigma_printf("[SHIFT]: Compositor framebuffer mapped. Wayland/X11 neutralized.\n");
+    sigma_sigma_printf("[SHIFT]: Transitioning CLI Shard to Native Desktop SHARD...\n");
+    sigma_sigma_printf("[SHIFT]: Compositor framebuffer mapped. Wayland/X11 neutralized.\n");
 }
 
 static void cmd_scheduler(void* ctx) {
@@ -160,27 +160,27 @@ static const SigmaCommand SIGMA_COMMANDS[] = {
 
 static void cmd_help(void* ctx) {
     (void)ctx;
-    sigma_printf("\n--- Σ OMNI-SHELL COMMANDS (v27.0) ---\n");
+    sigma_sigma_printf("\n--- Σ OMNI-SHELL COMMANDS (v27.0) ---\n");
     sigma_size_t i;
     for (i = 0; i < SIGMA_CMD_COUNT; i++) {
-        sigma_printf("  %-18s  %s\n",
+        sigma_sigma_printf("  %-18s  %s\n",
                      SIGMA_COMMANDS[i].name,
                      SIGMA_COMMANDS[i].description);
     }
-    sigma_printf("-------------------------------------\n");
+    sigma_sigma_printf("-------------------------------------\n");
 }
 
 /* =========================================================================
  * Shell init (replaces C++ constructor)
  * ========================================================================= */
 static void shell_init(OmniShellZenith* sh) {
-    sigma_memset(sh, 0, sizeof(*sh));
+    sigma_sigma_memset(sh, 0, sizeof(*sh));
     SovereignScheduler_init(&sh->scheduler);
     SovereignCloud_init(&sh->cloud);
     SovereignUI_init(&sh->ui);
     SovereignNet_init(&sh->net);
-    sigma_printf("[SIGMA_SHELL]: Omni-Shell Zenith Online (v27.0). System-Master [ACTIVE].\n");
-    sigma_printf("[SIGMA_SHELL]: %llu commands loaded.\n", (sigma_u64)SIGMA_CMD_COUNT);
+    sigma_sigma_printf("[SIGMA_SHELL]: Omni-Shell Zenith Online (v27.0). System-Master [ACTIVE].\n");
+    sigma_sigma_printf("[SIGMA_SHELL]: %llu commands loaded.\n", (sigma_u64)SIGMA_CMD_COUNT);
 }
 
 /* =========================================================================
@@ -188,7 +188,7 @@ static void shell_init(OmniShellZenith* sh) {
  * ========================================================================= */
 static void shell_execute(OmniShellZenith* sh, const char* cmd) {
     if (!cmd || !cmd[0]) return;
-    sigma_printf("\nΣ [OMNI-SHELL]: '%s'\n", cmd);
+    sigma_sigma_printf("\nΣ [OMNI-SHELL]: '%s'\n", cmd);
 
     /* Record in history */
     if (sh->history_count < SHELL_HISTORY_MAX) {
@@ -209,7 +209,7 @@ static void shell_execute(OmniShellZenith* sh, const char* cmd) {
             return;
         }
     }
-    sigma_printf("[OMNI-SHELL]: Unknown command '%s'. Dispatching to AI-Kernel...\n", cmd);
+    sigma_sigma_printf("[OMNI-SHELL]: Unknown command '%s'. Dispatching to AI-Kernel...\n", cmd);
     sh->commands_sharded++;
 }
 
@@ -217,12 +217,12 @@ static void shell_execute(OmniShellZenith* sh, const char* cmd) {
  * Audit
  * ========================================================================= */
 static void shell_audit(const OmniShellZenith* sh) {
-    sigma_printf("\n--- Σ SOVEREIGN SHELL AUDIT (v27.0) ---\n");
-    sigma_printf("| Commands Sharded: %llu\n", sh->commands_sharded);
-    sigma_printf("| History Entries : %u\n",   sh->history_count);
-    sigma_printf("| Prompt Status   : RING-0 SOVEREIGN\n");
-    sigma_printf("| Mastery         : Total System Control Secured.\n");
-    sigma_printf("----------------------------------------\n");
+    sigma_sigma_printf("\n--- Σ SOVEREIGN SHELL AUDIT (v27.0) ---\n");
+    sigma_sigma_printf("| Commands Sharded: %llu\n", sh->commands_sharded);
+    sigma_sigma_printf("| History Entries : %u\n",   sh->history_count);
+    sigma_sigma_printf("| Prompt Status   : RING-0 SOVEREIGN\n");
+    sigma_sigma_printf("| Mastery         : Total System Control Secured.\n");
+    sigma_sigma_printf("----------------------------------------\n");
 }
 
 /* =========================================================================

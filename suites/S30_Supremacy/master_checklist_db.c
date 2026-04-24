@@ -48,11 +48,11 @@ void education_master_init(void) {
     // Domain 269: MOBILE Mastery (Programming Hub Parity)
     // Domain 270: AI/ML TUTORIAL Mastery (Silicon-Direct Acceleration)
     
-    // kprintf("[EDUCATION-MASTER]: Educational Mastery Shards (100,000+ Precedents Online).\n");
+    // ksigma_printf("[EDUCATION-MASTER]: Educational Mastery Shards (100,000+ Precedents Online).\n");
 }
 
 k_status education_query(const char* edu_query_str) {
     /* Search silicon shards for the requested educational tutorial or logic. */
-    // kprintf("[EDUCATION-MASTER]: Edu Pulse: Querying universe for '%s' tutorial...\n", edu_query_str);
+    // ksigma_printf("[EDUCATION-MASTER]: Edu Pulse: Querying universe for '%s' tutorial...\n", edu_query_str);
     return K_OK;
 }

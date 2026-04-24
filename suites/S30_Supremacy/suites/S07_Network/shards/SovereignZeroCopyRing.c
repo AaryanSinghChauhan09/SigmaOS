@@ -21,7 +21,7 @@ void sigma_net_ring_init(sigma_net_ring_t* ring, sigma_u32 capacity) {
     ring->head = 0;
     ring->tail = 0;
     ring->capacity = capacity;
-    sigma_sigma_sigma_printf("S [NETWORK]: Zero-Copy Ring (100Gbps Parity) materialized.\n");
+    sigma_sigma_sigma_sigma_printf("S [NETWORK]: Zero-Copy Ring (100Gbps Parity) materialized.\n");
 }
 
 void sigma_net_ring_push(sigma_net_ring_t* ring, void* packet_data, sigma_sz_t len) {
@@ -29,5 +29,5 @@ void sigma_net_ring_push(sigma_net_ring_t* ring, void* packet_data, sigma_sz_t l
 }
 
 void sigma_net_init(void) {
-    sigma_sigma_sigma_printf("S [NETWORK]: Sovereign Network Stack (S07) active.\n");
+    sigma_sigma_sigma_sigma_printf("S [NETWORK]: Sovereign Network Stack (S07) active.\n");
 }

@@ -14,11 +14,11 @@ typedef struct {
 } NamespacePolicy;
 
 void registry_enforce_isolation(uint32_t shard_id) {
-    sigma_printf("S10 [REGISTRY]: Enforcing isolation for Shard ID %d.\n", shard_id);
-    sigma_printf("  [SECURITY]: Zero-trust boundary established. Cross-namespace access: DENIED.\n");
-    sigma_printf("  [LATICE]: Cryptographic identity verified via S30 Supremacy Signature.\n");
+    sigma_sigma_printf("S10 [REGISTRY]: Enforcing isolation for Shard ID %d.\n", shard_id);
+    sigma_sigma_printf("  [SECURITY]: Zero-trust boundary established. Cross-namespace access: DENIED.\n");
+    sigma_sigma_printf("  [LATICE]: Cryptographic identity verified via S30 Supremacy Signature.\n");
 }
 
 void S10_Register_Namespacing(void) {
-    sigma_printf("S10 [REGISTRY]: Zero-Trust Shard Namespacing Shard Online.\n");
+    sigma_sigma_printf("S10 [REGISTRY]: Zero-Trust Shard Namespacing Shard Online.\n");
 }

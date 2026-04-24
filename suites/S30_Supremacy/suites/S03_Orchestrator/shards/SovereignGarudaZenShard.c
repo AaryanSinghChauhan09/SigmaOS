@@ -10,9 +10,9 @@
  */
 
 sigma_err_t sigma_zen_perf_init(void) {
-    sigma_sigma_sigma_printf("  S [AMAL-ZEN]: Absorbing Garuda Linux Zen-Kernel USPs...\n");
-    sigma_sigma_sigma_printf("  S [AMAL-ZEN]: Preemptive tasking threshold: AGGRESSIVE.\n");
-    sigma_sigma_sigma_printf("  S [AMAL-ZEN]: CFS latency matrix: OPTIMIZED (sub-0.05ms).\n");
+    sigma_sigma_sigma_sigma_printf("  S [AMAL-ZEN]: Absorbing Garuda Linux Zen-Kernel USPs...\n");
+    sigma_sigma_sigma_sigma_printf("  S [AMAL-ZEN]: Preemptive tasking threshold: AGGRESSIVE.\n");
+    sigma_sigma_sigma_sigma_printf("  S [AMAL-ZEN]: CFS latency matrix: OPTIMIZED (sub-0.05ms).\n");
     return SIGMA_OK;
 }
 

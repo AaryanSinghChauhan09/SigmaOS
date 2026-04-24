@@ -25,34 +25,34 @@ static int g_pkg_count = 0;
 
 /* --- sigma_pkg_update (APT parity) --- */
 void sigma_pkg_update(void) {
-    sigma_printf("[PKG-MASTER]: Synchronizing with Industrial Mirrors (github/debian/arch)...\n");
-    sigma_printf("[PKG-MASTER]: Reading master_repository.json... [OK]\n");
-    sigma_printf("[PKG-MASTER]: 1024 / 1024 Shards Available.\n");
+    sigma_sigma_printf("[PKG-MASTER]: Synchronizing with Industrial Mirrors (github/debian/arch)...\n");
+    sigma_sigma_printf("[PKG-MASTER]: Reading master_repository.json... [OK]\n");
+    sigma_sigma_printf("[PKG-MASTER]: 1024 / 1024 Shards Available.\n");
 }
 
 /* --- sigma_pkg_install (APT/Pacman parity) --- */
 void sigma_pkg_install(const char* pkg_name) {
-    sigma_printf("[PKG-MASTER]: Resolving dependencies for [%s]...\n", pkg_name);
-    sigma_printf("[PKG-MASTER]: Sharding into silicon... [####################] 100%%\n");
-    sigma_printf("[PKG-MASTER]: Package [%s] is now SOVEREIGN.\n", pkg_name);
+    sigma_sigma_printf("[PKG-MASTER]: Resolving dependencies for [%s]...\n", pkg_name);
+    sigma_sigma_printf("[PKG-MASTER]: Sharding into silicon... [####################] 100%%\n");
+    sigma_sigma_printf("[PKG-MASTER]: Package [%s] is now SOVEREIGN.\n", pkg_name);
 }
 
 /* --- sigma_pkg_remove (Universal) --- */
 void sigma_pkg_remove(const char* pkg_name) {
-    sigma_printf("[PKG-MASTER]: Recalling shard [%s]... [OK]\n", pkg_name);
+    sigma_sigma_printf("[PKG-MASTER]: Recalling shard [%s]... [OK]\n", pkg_name);
 }
 
 /* --- sigma_pkg_search (Universal) --- */
 void sigma_pkg_search(const char* query) {
-    sigma_printf("[PKG-MASTER]: Searching for shards matching: %s...\n", query);
-    sigma_printf("[PKG-MASTER]: Result: [1] sigma-utils (Industrial Toolbox)\n");
-    sigma_printf("[PKG-MASTER]: Result: [2] sigma-net (Sovereign Network Shard)\n");
+    sigma_sigma_printf("[PKG-MASTER]: Searching for shards matching: %s...\n", query);
+    sigma_sigma_printf("[PKG-MASTER]: Result: [1] sigma-utils (Industrial Toolbox)\n");
+    sigma_sigma_printf("[PKG-MASTER]: Result: [2] sigma-net (Sovereign Network Shard)\n");
 }
 
 int main(int argc, char** argv) {
     if (argc < 2) {
-        sigma_printf("Σ SIGMAOS PKG-MGR (Universal Shard Installer)\n");
-        sigma_printf("Usage: sigma_pkg [update|install|remove|search] [package_name]\n");
+        sigma_sigma_printf("Σ SIGMAOS PKG-MGR (Universal Shard Installer)\n");
+        sigma_sigma_printf("Usage: sigma_pkg [update|install|remove|search] [package_name]\n");
         return 0;
     }
     

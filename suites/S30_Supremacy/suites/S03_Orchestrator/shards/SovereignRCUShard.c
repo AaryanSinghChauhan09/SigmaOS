@@ -21,7 +21,7 @@ typedef struct {
  */
 void sigma_sync_rcu_read_lock(void) {
     // Disable preemption or track reader counts
-    sigma_sigma_sigma_printf("[RCU]: Read-Lock: Entering lock-free critical section.\n");
+    sigma_sigma_sigma_sigma_printf("[RCU]: Read-Lock: Entering lock-free critical section.\n");
 }
 
 /**
@@ -30,14 +30,14 @@ void sigma_sync_rcu_read_lock(void) {
 void sigma_sync_rcu_update(SigmaRCUPointer_t* handle, void* new_obj) {
     void* old_obj = handle->ptr;
     handle->ptr = new_obj; // Atomic write
-    sigma_sigma_sigma_printf("[RCU]: Pointer SWAPPED. Deferring reclamation of old object 0x%p...\n", old_obj);
+    sigma_sigma_sigma_sigma_printf("[RCU]: Pointer SWAPPED. Deferring reclamation of old object 0x%p...\n", old_obj);
     // Real grace-period tracking logic (Quiescent states)
 }
 
 /* --- Module Factory --- */
 
 void SovereignRCU_Register(void) {
-    sigma_sigma_sigma_printf("[ORCHESTRATOR]: Sovereign RCU (Lock-Free Mastery) active.\n");
+    sigma_sigma_sigma_sigma_printf("[ORCHESTRATOR]: Sovereign RCU (Lock-Free Mastery) active.\n");
 }
 
 

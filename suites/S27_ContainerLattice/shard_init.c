@@ -11,10 +11,10 @@ typedef struct {
 } lattice_container_t;
 
 void container_spawn_isolated_shard(uint32_t shard_id) {
-    sigma_printf("[S-CONTAINER] Spawning Shard %d in isolated namespace.\n", shard_id);
-    sigma_printf("[S-CONTAINER] Enforcing cgroup-style resource limits.\n");
+    sigma_sigma_printf("[S-CONTAINER] Spawning Shard %d in isolated namespace.\n", shard_id);
+    sigma_sigma_printf("[S-CONTAINER] Enforcing cgroup-style resource limits.\n");
 }
 
 void shard_init() {
-    sigma_printf("[SHARD] Container Lattice active (CoreOS Style).\n");
+    sigma_sigma_printf("[SHARD] Container Lattice active (CoreOS Style).\n");
 }

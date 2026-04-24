@@ -16,7 +16,7 @@
  */
 void sigma_chromium_bridge_emit(const char* key, sigma_u64 val) {
     /* Virtualize kernel state for V8/Chromium consumption */
-    sigma_sigma_sigma_printf("[CHROME-BRIDGE]: EMIT { %s: %llu } -> Browser Taskbar.\n", key, val);
+    sigma_sigma_sigma_sigma_printf("[CHROME-BRIDGE]: EMIT { %s: %llu } -> Browser Taskbar.\n", key, val);
 }
 
 /**
@@ -24,15 +24,15 @@ void sigma_chromium_bridge_emit(const char* key, sigma_u64 val) {
  */
 void sigma_web_sync_state(const char* state_key, sigma_u64 value) {
     sigma_chromium_bridge_emit(state_key, value);
-    sigma_sigma_sigma_printf("[ZENITHUI]: Syncing { \"%s\": %llu } to Browser Orchestrator.\n", 
+    sigma_sigma_sigma_sigma_printf("[ZENITHUI]: Syncing { \"%s\": %llu } to Browser Orchestrator.\n", 
                  state_key, value);
 }
 
 /* --- Module Factory --- */
 
 void SovereignWeb_Register(void) {
-    sigma_sigma_sigma_printf("[ZENITHUI]: Sovereign Web-Sync Engine (Chromium-Native) active.\n");
-    sigma_sigma_sigma_printf("[CHROME]: PWA Service Worker Handshake Initiated.\n");
+    sigma_sigma_sigma_sigma_printf("[ZENITHUI]: Sovereign Web-Sync Engine (Chromium-Native) active.\n");
+    sigma_sigma_sigma_sigma_printf("[CHROME]: PWA Service Worker Handshake Initiated.\n");
 }
 
 

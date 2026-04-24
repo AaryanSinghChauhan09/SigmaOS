@@ -179,6 +179,6 @@ void kbd_init(void) {
     idt_register_handler(33, kbd_irq_handler);   /* IRQ1 → vector 33 */
     pic_unmask_irq(1);
 
-    extern void kprintf(const char* fmt, ...);
-    kprintf("[KBD]: PS/2 keyboard driver online. IRQ1 unmasked.\n");
+    extern void ksigma_printf(const char* fmt, ...);
+    ksigma_printf("[KBD]: PS/2 keyboard driver online. IRQ1 unmasked.\n");
 }

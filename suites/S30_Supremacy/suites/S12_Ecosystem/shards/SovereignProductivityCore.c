@@ -21,13 +21,13 @@ typedef struct {
 } SovereignProductiveObject;
 
 void productivity_create_document(const char* title, ProdDocType type) {
-    sigma_printf("S12 [ECOSYSTEM]: Synthesizing Productivity Object - %s (Type: %d)\n", title, type);
+    sigma_sigma_printf("S12 [ECOSYSTEM]: Synthesizing Productivity Object - %s (Type: %d)\n", title, type);
     // In production, this would initialize a persistent VFS object with Sovereign formatting.
 }
 
 void S12_Register_Productivity(void) {
-    sigma_printf("S12 [ECOSYSTEM]: Sovereign Productivity Core Initialized.\n");
-    sigma_printf("  [S12]: Mapping Zenith UI 'Office' hooks to native shards.\n");
+    sigma_sigma_printf("S12 [ECOSYSTEM]: Sovereign Productivity Core Initialized.\n");
+    sigma_sigma_printf("  [S12]: Mapping Zenith UI 'Office' hooks to native shards.\n");
     
     productivity_create_document("SigmaOS Roadmap", DOC_TYPE_SOVEREIGN_TEXT);
 }

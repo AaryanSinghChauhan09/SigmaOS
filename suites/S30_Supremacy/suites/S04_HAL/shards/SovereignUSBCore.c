@@ -165,7 +165,7 @@ SigmaURB_t* sigma_usb_alloc_urb(void) {
     
     if (urb_idx >= 64) urb_idx = 0;
     SigmaURB_t *urb = &static_urb_pool[urb_idx++];
-    sigma_sigma_sigma_memset(urb, 0, sizeof(SigmaURB_t));
+    sigma_sigma_sigma_sigma_memset(urb, 0, sizeof(SigmaURB_t));
     return urb;
 }
 
@@ -173,11 +173,11 @@ sigma_err_t sigma_usb_submit_urb(SigmaURB_t *urb) {
     if (!urb || !urb->dev || !urb->dev->bus) return SIGMA_EINVAL;
     
     if (!urb->dev->bus->submit_urb) {
-        sigma_sigma_sigma_printf("S [USB]: HCD missing submit_urb hook!\n");
+        sigma_sigma_sigma_sigma_printf("S [USB]: HCD missing submit_urb hook!\n");
         return SIGMA_ENOTSUP;
     }
     
-    sigma_sigma_sigma_printf("S [USB]: Submitting URB [Pipe: 0x%08x] Len: %u\n", urb->pipe, urb->transfer_buffer_length);
+    sigma_sigma_sigma_sigma_printf("S [USB]: Submitting URB [Pipe: 0x%08x] Len: %u\n", urb->pipe, urb->transfer_buffer_length);
     return urb->dev->bus->submit_urb(urb);
 }
 
@@ -194,7 +194,7 @@ void sigma_usb_complete_urb(SigmaURB_t *urb, sigma_err_t status, sigma_u32 actua
  * ¦¦ ENUMERATION MOCK (Hub driver behavior)
  * ----------------------------------------------------------------------- */
 static void hub_port_connect_change(SigmaUSBDevice_t *hub, int port) {
-    sigma_sigma_sigma_printf("S [USB]: Port %d on Hub '%s' state changed.\n", port, hub->devpath);
+    sigma_sigma_sigma_sigma_printf("S [USB]: Port %d on Hub '%s' state changed.\n", port, hub->devpath);
     /* In reality: 
      * 1. debounce 
      * 2. reset port 
@@ -212,14 +212,14 @@ static sigma_err_t mock_hcd_submit_urb(SigmaURB_t *urb) {
 }
 
 static void my_urb_callback(SigmaURB_t *urb) {
-    sigma_sigma_sigma_printf("S [USB]: URB completed with status %d, actual_len %u\n", urb->status, urb->actual_length);
+    sigma_sigma_sigma_sigma_printf("S [USB]: URB completed with status %d, actual_len %u\n", urb->status, urb->actual_length);
 }
 
 /* -----------------------------------------------------------------------
  * ¦¦ INITIALISATION
  * ----------------------------------------------------------------------- */
 void SovereignUSBCore_Init(void) {
-    sigma_sigma_sigma_printf("S [USB]: Initialising Sovereign USB Core...\n");
+    sigma_sigma_sigma_sigma_printf("S [USB]: Initialising Sovereign USB Core...\n");
 
     if (s_usb_bus_count >= MAX_USB_BUSES) return;
     
@@ -230,7 +230,7 @@ void SovereignUSBCore_Init(void) {
     
     /* Create Root Hub */
     static SigmaUSBDevice_t root_hub;
-    sigma_sigma_sigma_memset(&root_hub, 0, sizeof(root_hub));
+    sigma_sigma_sigma_sigma_memset(&root_hub, 0, sizeof(root_hub));
     root_hub.devnum = 1;
     sigma_sigma_sigma_strcpy(root_hub.devpath, "usb1", 16);
     root_hub.bus = bus;
@@ -255,7 +255,7 @@ void SovereignUSBCore_Init(void) {
 
     sigma_usb_submit_urb(urb);
 
-    sigma_sigma_sigma_printf("S [USB]: USB Core Online. Hotplug sovereignty established.\n");
+    sigma_sigma_sigma_sigma_printf("S [USB]: USB Core Online. Hotplug sovereignty established.\n");
 }
 
 

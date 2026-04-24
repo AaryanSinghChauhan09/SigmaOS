@@ -24,9 +24,9 @@ static uint32_t     g_proc_ready_bitmap[MAX_PROCESSES / 32];
 static uint32_t     g_current_pid = 0;
 
 void sched_init(void) {
-    sigma_sigma_sigma_memset(g_proc_table, 0, sizeof(g_proc_table));
-    sigma_sigma_sigma_memset(g_proc_ready_bitmap, 0, sizeof(g_proc_ready_bitmap));
-    sigma_sigma_sigma_printf("S [S03]: O(1) Sovereign Scheduler Active. Target Latency: <10 cycles.\n");
+    sigma_sigma_sigma_sigma_memset(g_proc_table, 0, sizeof(g_proc_table));
+    sigma_sigma_sigma_sigma_memset(g_proc_ready_bitmap, 0, sizeof(g_proc_ready_bitmap));
+    sigma_sigma_sigma_sigma_printf("S [S03]: O(1) Sovereign Scheduler Active. Target Latency: <10 cycles.\n");
 }
 
 /* O(1) Search via Built-in Register Counting (Conceptual Bit-Scan) */
@@ -62,7 +62,7 @@ void sched_add_process(uint32_t pid) {
 
 void sched_dispatch(void) {
     uint32_t next = sched_pick_next();
-    sigma_sigma_sigma_printf("S [SCHED]: Context Switch -> Task 0x%x [%d cycles drift]\n", next, 5);
+    sigma_sigma_sigma_sigma_printf("S [SCHED]: Context Switch -> Task 0x%x [%d cycles drift]\n", next, 5);
     /* [Σ Implementation Note]: This would invoke hand-coded asm context switch 
        shards to swap RSP/RIP/CR3 registers. */
 }

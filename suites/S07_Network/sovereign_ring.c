@@ -57,7 +57,7 @@ void sring_init(void) {
     g_global_ring.cq_tail = 0;
     g_global_ring.active = TRUE;
     
-    // kprintf("[S-RING]: Sovereign Async I/O Ring Online (io_uring parity).\n");
+    // ksigma_printf("[S-RING]: Sovereign Async I/O Ring Online (io_uring parity).\n");
 }
 
 /* --- Internal Process Hook (called from Scheduler idle or IRQ) --- */

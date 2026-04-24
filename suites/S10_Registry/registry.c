@@ -33,7 +33,7 @@ static u32 g_reg_count = 0;
 
 void registry_init(void) {
     for (int i = 0; i < MAX_REGISTRY_KEYS; i++) g_reg[i].active = FALSE;
-    // kprintf("[REGISTRY]: Sovereign Persistent Registry Shard Online.\n");
+    // ksigma_printf("[REGISTRY]: Sovereign Persistent Registry Shard Online.\n");
 }
 
 k_status registry_set(const char* key, const char* val) {

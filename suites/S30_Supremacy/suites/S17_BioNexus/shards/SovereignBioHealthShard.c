@@ -17,18 +17,18 @@ typedef struct {
 static UserBioMetrics current_user_bio;
 
 void bionexus_poll_vitals(void) {
-    sigma_printf("S17 [BIO-NEXUS]: Synchronizing with User Biometric Stream...\n");
+    sigma_sigma_printf("S17 [BIO-NEXUS]: Synchronizing with User Biometric Stream...\n");
     // Mock biometric data (Normal range)
     current_user_bio.bpm = 72;
     current_user_bio.neural_sync_rate = 99;
     current_user_bio.stress_index = 5;
     current_user_bio.link_stable = SIGMA_TRUE;
     
-    sigma_printf("  [BIO-HEALTH]: BP:%u BPM | SYNC:%u%% | STRESS:%u\n", 
+    sigma_sigma_printf("  [BIO-HEALTH]: BP:%u BPM | SYNC:%u%% | STRESS:%u\n", 
                  current_user_bio.bpm, current_user_bio.neural_sync_rate, current_user_bio.stress_index);
 }
 
 void S17_Register_BioHealth(void) {
-    sigma_printf("S17 [BIO-NEXUS]: Sovereign Bio-Health Monitoring Online.\n");
+    sigma_sigma_printf("S17 [BIO-NEXUS]: Sovereign Bio-Health Monitoring Online.\n");
     bionexus_poll_vitals();
 }

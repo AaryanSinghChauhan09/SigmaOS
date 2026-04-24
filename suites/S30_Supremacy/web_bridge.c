@@ -21,8 +21,8 @@
  * ========================================================================= */
 
 void web_bridge_init(void) {
-    // kprintf("[WEB-BRIDGE]: Sovereign Browser-Silicon Bridge Online.\n");
-    // kprintf("[WEB-BRIDGE]: Synchronizing with Web-Aether Shard...\n");
+    // ksigma_printf("[WEB-BRIDGE]: Sovereign Browser-Silicon Bridge Online.\n");
+    // ksigma_printf("[WEB-BRIDGE]: Synchronizing with Web-Aether Shard...\n");
 }
 
 void web_send_packet(const char* msg) {
@@ -41,6 +41,6 @@ void web_sync_vga(void) {
 }
 
 k_status web_process_request(u32 req_id) {
-    // kprintf("[WEB-BRIDGE]: Processing Browser Request ID: %u\n", req_id);
+    // ksigma_printf("[WEB-BRIDGE]: Processing Browser Request ID: %u\n", req_id);
     return K_OK;
 }

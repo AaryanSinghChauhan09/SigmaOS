@@ -23,7 +23,7 @@ typedef struct ForensicReport {
  * ========================================================================= */
 
 void forensics_init(void) {
-    // kprintf("[FORENSICS]: Sovereign Digital-Forensics Shard Online.\n");
+    // ksigma_printf("[FORENSICS]: Sovereign Digital-Forensics Shard Online.\n");
 }
 
 k_status forensics_sharded_dump(u64 start_addr, usize size) {
@@ -31,7 +31,7 @@ k_status forensics_sharded_dump(u64 start_addr, usize size) {
      * Absorb Forensic Science USP: Bit-Perfect Imaging.
      * In a sharded model: dump sharded memory states with silicon-direct pulses.
      */
-    // kprintf("[FORENSICS]: Industrial Pulse: Sharded memory dump complete (Size: %u)\n", size);
+    // ksigma_printf("[FORENSICS]: Industrial Pulse: Sharded memory dump complete (Size: %u)\n", size);
     return K_OK;
 }
 
@@ -40,6 +40,6 @@ k_status forensics_carve_artifact(const char* signature) {
      * Absorb Forensic Science USP: Bitstream Carving.
      * Search sharded bitstreams for industrial artifact signatures.
      */
-    // kprintf("[FORENSICS]: Industrial Pulse: Artifact found: %s\n", signature);
+    // ksigma_printf("[FORENSICS]: Industrial Pulse: Artifact found: %s\n", signature);
     return K_OK;
 }

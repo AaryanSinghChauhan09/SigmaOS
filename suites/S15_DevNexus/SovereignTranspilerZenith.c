@@ -28,25 +28,25 @@ private:
 
 public:
     SovereignTranspiler() : m_shards_emitted(0) {
-        sigma_printf("[TRANSPILER-ZENITH]: Sovereign Transpiler Online. Interpreted bloat is now non-relevant.\n");
+        sigma_sigma_printf("[TRANSPILER-ZENITH]: Sovereign Transpiler Online. Interpreted bloat is now non-relevant.\n");
     }
 
     const char* type_name() const noexcept override { return "SovereignTranspiler"; }
 
     // --- Core Transpilation Logic (Custom Native Function) ---
     SigmaString transpile(const char* sigma_script) {
-        sigma_printf("[TRANSPILER-ZENITH]: Analyzing Script Shard...\n");
+        sigma_sigma_printf("[TRANSPILER-ZENITH]: Analyzing Script Shard...\n");
         
         SigmaString input(sigma_script);
         SigmaString output("#include \"SigmaOOP.hpp\"\n\n");
         
         if (input.contains("print")) {
-            sigma_printf("[TRANSPILER-ZENITH]: Mapping 'print' -> 'sigma_printf'\n");
-            output.append("extern \"C\" void sigma_main() { sigma_printf(\"Transpiled Shard Active.\\n\"); }\n");
+            sigma_sigma_printf("[TRANSPILER-ZENITH]: Mapping 'print' -> 'sigma_printf'\n");
+            output.append("extern \"C\" void sigma_main() { sigma_sigma_printf(\"Transpiled Shard Active.\\n\"); }\n");
         }
 
         if (input.contains("mesh_broadcast")) {
-            sigma_printf("[TRANSPILER-ZENITH]: Mapping 'mesh_broadcast' -> 'SovereignNetMesh::broadcast'\n");
+            sigma_sigma_printf("[TRANSPILER-ZENITH]: Mapping 'mesh_broadcast' -> 'SovereignNetMesh::broadcast'\n");
             output.append("// Native Mesh Call injected.\n");
         }
 
@@ -55,10 +55,10 @@ public:
     }
 
     void audit() {
-        sigma_printf("\n--- Σ SOVEREIGN TRANSPILER AUDIT ---\n");
-        sigma_printf("| Shards Emitted : %llu\n", m_shards_emitted);
-        sigma_printf("| Status         : ALL INTERPRETERS NEUTRALIZED\n");
-        sigma_printf("--------------------------------------\n");
+        sigma_sigma_printf("\n--- Σ SOVEREIGN TRANSPILER AUDIT ---\n");
+        sigma_sigma_printf("| Shards Emitted : %llu\n", m_shards_emitted);
+        sigma_sigma_printf("| Status         : ALL INTERPRETERS NEUTRALIZED\n");
+        sigma_sigma_printf("--------------------------------------\n");
     }
 };
 
@@ -71,12 +71,12 @@ extern "C" void start_transpiler_demo() {
     const char* script = "print('Hello Sovereign Zenith'); mesh_broadcast('ALIVE');";
     SigmaString native_code = transpiler.transpile(script);
 
-    sigma_printf("\n[TRANSPILER-ZENITH]: EMITTED NATIVE SHARD:\n%s\n", native_code.c_str());
+    sigma_sigma_printf("\n[TRANSPILER-ZENITH]: EMITTED NATIVE SHARD:\n%s\n", native_code.c_str());
     transpiler.audit();
 }
 
 int main() {
-    sigma_printf("[SIGMA_DEV]: Bootstrapping Transpiler Zenith...\n");
+    sigma_sigma_printf("[SIGMA_DEV]: Bootstrapping Transpiler Zenith...\n");
     start_transpiler_demo();
     return 0;
 }

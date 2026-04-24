@@ -95,7 +95,7 @@ static sigma_bool acpi_checksum(const void *ptr, sigma_u32 len) {
 static SigmaACPIRSDP_t* acpi_find_rsdp(void) {
     /* In a real kernel: scan EBDA (0x80000..0x9ffff) or 0xE0000..0xFFFFF */
     /* Alternatively passed via UEFI or multiboot2 tags. */
-    sigma_sigma_sigma_printf("S [ACPI]: Initiating UEFI / Memory scan for RSDP...\n");
+    sigma_sigma_sigma_sigma_printf("S [ACPI]: Initiating UEFI / Memory scan for RSDP...\n");
     return SIGMA_NULL; /* Simulated; we will inject a fake one in Init */
 }
 
@@ -103,9 +103,9 @@ static SigmaACPIRSDP_t* acpi_find_rsdp(void) {
  * ¦¦ TABLE PARSING
  * ----------------------------------------------------------------------- */
 static void acpi_parse_madt(SigmaACPIMADT_t *madt) {
-    sigma_sigma_sigma_printf("S [ACPI]: Parsing MADT (Multiple APIC Description Table)\n");
+    sigma_sigma_sigma_sigma_printf("S [ACPI]: Parsing MADT (Multiple APIC Description Table)\n");
     sigma_u32 local_apic = madt->local_apic_address;
-    sigma_sigma_sigma_printf("S [ACPI]: Local APIC Base Address = 0x%08X\n", local_apic);
+    sigma_sigma_sigma_sigma_printf("S [ACPI]: Local APIC Base Address = 0x%08X\n", local_apic);
 
     sigma_u8 *ptr = (sigma_u8 *)madt + sizeof(SigmaACPIMADT_t);
     sigma_u8 *end = (sigma_u8 *)madt + madt->header.length;
@@ -126,14 +126,14 @@ static void acpi_parse_madt(SigmaACPIMADT_t *madt) {
         }
         ptr += entry->length;
     }
-    sigma_sigma_sigma_printf("S [ACPI]: Detected %u CPUs, %u I/O APICs.\n", cpu_count, io_apic_count);
+    sigma_sigma_sigma_sigma_printf("S [ACPI]: Detected %u CPUs, %u I/O APICs.\n", cpu_count, io_apic_count);
 }
 
 /* -----------------------------------------------------------------------
  * ¦¦ POWER & THERMAL ABSTRACTIONS
  * ----------------------------------------------------------------------- */
 void sigma_acpi_reboot(void) {
-    sigma_sigma_sigma_printf("S [ACPI]: Executing ACPI reboot via RESET_REG...\n");
+    sigma_sigma_sigma_sigma_printf("S [ACPI]: Executing ACPI reboot via RESET_REG...\n");
     /* Real implementation outwits port 0x64 or FADT reset register */
 }
 
@@ -146,24 +146,24 @@ sigma_i32 sigma_acpi_get_temperature(void) {
  * ¦¦ INITIALISATION
  * ----------------------------------------------------------------------- */
 void SovereignACPI_Init(void) {
-    sigma_sigma_sigma_printf("S [ACPI]: Initialising Sovereign ACPI Core...\n");
+    sigma_sigma_sigma_sigma_printf("S [ACPI]: Initialising Sovereign ACPI Core...\n");
 
     s_rsdp = acpi_find_rsdp();
     if (!s_rsdp) {
-        sigma_sigma_sigma_printf("S [ACPI]: RSDP not physically found. Simulating Virtual ACPI Tree...\n");
+        sigma_sigma_sigma_sigma_printf("S [ACPI]: RSDP not physically found. Simulating Virtual ACPI Tree...\n");
         
         static SigmaACPIMADT_t fake_madt;
-        sigma_sigma_sigma_memset(&fake_madt, 0, sizeof(fake_madt));
+        sigma_sigma_sigma_sigma_memset(&fake_madt, 0, sizeof(fake_madt));
         sigma_sigma_sigma_strcpy(fake_madt.header.signature, "APIC", 4);
         fake_madt.header.length = sizeof(fake_madt);
         fake_madt.local_apic_address = 0xFEE00000;
         
         acpi_parse_madt(&fake_madt);
         
-        sigma_sigma_sigma_printf("S [ACPI]: Thermal Zone Temperature: %d C\n", sigma_acpi_get_temperature());
+        sigma_sigma_sigma_sigma_printf("S [ACPI]: Thermal Zone Temperature: %d C\n", sigma_acpi_get_temperature());
     }
 
-    sigma_sigma_sigma_printf("S [ACPI]: ACPI engine online. Advanced configuration sovereignty achieved.\n");
+    sigma_sigma_sigma_sigma_printf("S [ACPI]: ACPI engine online. Advanced configuration sovereignty achieved.\n");
 }
 
 

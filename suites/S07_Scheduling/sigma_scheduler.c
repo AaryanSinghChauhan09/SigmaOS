@@ -117,14 +117,14 @@ static TaskControlBlock* rq_dequeue(u32 prio) {
  * and prevent the kernel from crashing.
  */
 void sched_kill_current_task(u32 fault_code) {
-    extern void kprintf(const char* fmt, ...);
+    extern void ksigma_printf(const char* fmt, ...);
     
     if (g_current_tid >= g_task_count) return;
     
     TaskControlBlock* t = &g_tasks[g_current_tid];
     t->state = TASK_DEAD;
     
-    kprintf("[SCHED] Task %u gracefully terminated. Fault code: 0x%x\n", g_current_tid, fault_code);
+    ksigma_printf("[SCHED] Task %u gracefully terminated. Fault code: 0x%x\n", g_current_tid, fault_code);
     
     // In a real implementation:
     // 1. Unmap the task's page tables (MMU teardown)
@@ -300,7 +300,7 @@ static SchedProfileStats g_profile_stats = {0, 0, 0, 0, 0};
  * sched_dispatch_tensor_op — Intelligently route tensor ops with profiling and fusion.
  */
 void sched_dispatch_tensor_op(u32 op_type, void* out, const void* a, const void* b) {
-    extern void kprintf(const char* fmt, ...);
+    extern void ksigma_printf(const char* fmt, ...);
     
     // Simulate getting a high-res timestamp (in a real build this calls HAL)
     u64 start_time = 0; // hal_get_timestamp_ns()
@@ -309,12 +309,12 @@ void sched_dispatch_tensor_op(u32 op_type, void* out, const void* a, const void*
     bool_t is_fused = (op_type == 99); // 99 = MATMUL_RELU_FUSED
     if (is_fused) {
         g_profile_stats.total_fused_kernels++;
-        kprintf("[SCHED] Kernel Fusion active. Dispatching Fused MatMul+ReLU...\n");
+        ksigma_printf("[SCHED] Kernel Fusion active. Dispatching Fused MatMul+ReLU...\n");
     }
 
     // Capability Check: if NPU is online and supports the operation
     if (g_npu_available) {
-        kprintf("[SCHED] Dispatching Tensor OP %u to Hardware NPU...\n", op_type);
+        ksigma_printf("[SCHED] Dispatching Tensor OP %u to Hardware NPU...\n", op_type);
         g_profile_stats.total_npu_dispatches++;
         
         // Execute (simulated MMIO delay)
@@ -327,7 +327,7 @@ void sched_dispatch_tensor_op(u32 op_type, void* out, const void* a, const void*
     }
     
     // CPU Fallback Path
-    kprintf("[SCHED] NPU busy or unavailable. Falling back to CPU tensor math...\n");
+    ksigma_printf("[SCHED] NPU busy or unavailable. Falling back to CPU tensor math...\n");
     g_profile_stats.total_cpu_fallbacks++;
     
     if (is_fused) tensor_matmul_relu(out, a, b);
@@ -342,10 +342,10 @@ void sched_dispatch_tensor_op(u32 op_type, void* out, const void* a, const void*
  * ========================================================================= */
 
 void sched_audit(void) {
-    extern void kprintf(const char* fmt, ...);
-    kprintf("[SCHED] Ticks: %llu | Tasks: %u | Current: %u | NPU Offload: %s\n",
+    extern void ksigma_printf(const char* fmt, ...);
+    ksigma_printf("[SCHED] Ticks: %llu | Tasks: %u | Current: %u | NPU Offload: %s\n",
             g_sched_ticks, g_task_count, g_current_tid, g_npu_available ? "READY" : "OFFLINE");
-    kprintf("  [PROFILE] NPU Dispatches: %llu (Avg %llu ns) | CPU Fallbacks: %llu (Avg %llu ns)\n",
+    ksigma_printf("  [PROFILE] NPU Dispatches: %llu (Avg %llu ns) | CPU Fallbacks: %llu (Avg %llu ns)\n",
             g_profile_stats.total_npu_dispatches,
             g_profile_stats.total_npu_dispatches > 0 ? (g_profile_stats.npu_latency_ns_accum / g_profile_stats.total_npu_dispatches) : 0,
             g_profile_stats.total_cpu_fallbacks,
@@ -354,7 +354,7 @@ void sched_audit(void) {
     u32 i;
     for (i = 0; i < g_task_count; i++) {
         TaskControlBlock* t = &g_tasks[i];
-        kprintf("  T%u: prio=%u policy=%u vrt=%llu slice=%u ema=%llu pool=%d\n",
+        ksigma_printf("  T%u: prio=%u policy=%u vrt=%llu slice=%u ema=%llu pool=%d\n",
                 t->tid, t->priority, t->policy, t->vruntime,
                 t->timeslice, t->burst_ema, t->pool_id);
     }

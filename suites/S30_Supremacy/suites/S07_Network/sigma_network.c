@@ -33,8 +33,8 @@ static uint16_t sigma_net_checksum(const void* data, uint32_t len) {
 }
 
 void sigma_net_init(void) {
-    sigma_sigma_memset(arp_table, 0, sizeof(arp_table));
-    sigma_sigma_printf("[NET] Sovereign Network Protocol Stack online. Linux TCP/IP containerized in Vault.\n");
+    sigma_sigma_sigma_memset(arp_table, 0, sizeof(arp_table));
+    sigma_sigma_sigma_printf("[NET] Sovereign Network Protocol Stack online. Linux TCP/IP containerized in Vault.\n");
 }
 
 void sigma_net_handle_packet(void* packet, uint32_t size) {
@@ -48,19 +48,19 @@ void sigma_net_handle_packet(void* packet, uint32_t size) {
 
         uint16_t calc = sigma_net_checksum(ip, (ip->version_ihl & 0x0F) * 4);
         if (calc != 0) {
-            sigma_sigma_printf("[NET] WARN: Dropped packet — bad IP checksum (0x%04x)\n", calc);
+            sigma_sigma_sigma_printf("[NET] WARN: Dropped packet — bad IP checksum (0x%04x)\n", calc);
             return;
         }
 
-        sigma_sigma_printf("[NET] IPv4 Packet: src=0x%08x dst=0x%08x proto=%u\n",
+        sigma_sigma_sigma_printf("[NET] IPv4 Packet: src=0x%08x dst=0x%08x proto=%u\n",
                ip->src_ip, ip->dest_ip, ip->protocol);
 
         if (ip->protocol == 6) { // TCP
             sigma_tcp_header_t* tcp = (sigma_tcp_header_t*)((uint8_t*)ip + (ip->version_ihl & 0xF) * 4);
-            sigma_sigma_printf("[NET] TCP → src_port=%u dst_port=%u seq=%u\n",
+            sigma_sigma_sigma_printf("[NET] TCP → src_port=%u dst_port=%u seq=%u\n",
                    tcp->src_port, tcp->dest_port, tcp->sequence_number);
         }
     } else if (ethertype == 0x0806) { // ARP
-        sigma_sigma_printf("[NET] ARP Frame detected — updating local resolution table.\n");
+        sigma_sigma_sigma_printf("[NET] ARP Frame detected — updating local resolution table.\n");
     }
 }

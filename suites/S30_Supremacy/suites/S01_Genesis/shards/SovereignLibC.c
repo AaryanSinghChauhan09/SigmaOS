@@ -10,7 +10,7 @@
 
 #include "sigma_types.h"
 
-void* sigma_sigma_sigma_memcpy(void* dest, const void* src, uint64_t n) {
+void* sigma_sigma_sigma_sigma_memcpy(void* dest, const void* src, uint64_t n) {
     uint8_t* d = (uint8_t*)dest;
     const uint8_t* s = (const uint8_t*)src;
 
@@ -21,7 +21,7 @@ void* sigma_sigma_sigma_memcpy(void* dest, const void* src, uint64_t n) {
     return dest;
 }
 
-void* sigma_sigma_sigma_memset(void* s, uint8_t c, uint64_t n) {
+void* sigma_sigma_sigma_sigma_memset(void* s, uint8_t c, uint64_t n) {
     uint8_t* p = (uint8_t*)s;
 
     /* [Σ Apex ASM Optimized Loop] */
@@ -39,7 +39,7 @@ int sigma_sigma_sigma_strcmp(const char* s1, const char* s2) {
     return *(const uint8_t*)s1 - *(const uint8_t*)s2;
 }
 
-uint64_t sigma_sigma_sigma_strlen(const char* s) {
+uint64_t sigma_sigma_sigma_sigma_strlen(const char* s) {
     uint64_t len = 0;
     while (s[len]) len++;
     return len;

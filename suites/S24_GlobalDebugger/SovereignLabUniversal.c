@@ -28,8 +28,8 @@ public:
 class BernoulliShard : public IUniversalExp {
 public:
     void Deploy() override {
-        sigma_printf("[PHYSICS/EXP]: Experiment: Verification of Bernoulli's Theorem.\n");
-        sigma_printf("[PHYSICS/EXP]: P + 0.5*rho*v^2 + rho*g*h = Constant [Verified].\n");
+        sigma_sigma_printf("[PHYSICS/EXP]: Experiment: Verification of Bernoulli's Theorem.\n");
+        sigma_sigma_printf("[PHYSICS/EXP]: P + 0.5*rho*v^2 + rho*g*h = Constant [Verified].\n");
     }
 };
 
@@ -37,8 +37,8 @@ public:
 class KineticsShard : public IUniversalExp {
 public:
     void Deploy() override {
-        sigma_printf("[CHEMISTRY/EXP]: Experiment: Effect of Temp on Rate of Reaction.\n");
-        sigma_printf("[CHEMISTRY/EXP]: Arrhenius Shard: Rate doubles every 10K increase.\n");
+        sigma_sigma_printf("[CHEMISTRY/EXP]: Experiment: Effect of Temp on Rate of Reaction.\n");
+        sigma_sigma_printf("[CHEMISTRY/EXP]: Arrhenius Shard: Rate doubles every 10K increase.\n");
     }
 };
 
@@ -46,8 +46,8 @@ public:
 class GerminationShard : public IUniversalExp {
 public:
     void Deploy() override {
-        sigma_printf("[BIOLOGY/EXP]: Experiment: Germination of Gram Seeds.\n");
-        sigma_printf("[BIOLOGY/EXP]: Water absorption -> Radicle emergence synchronized.\n");
+        sigma_sigma_printf("[BIOLOGY/EXP]: Experiment: Germination of Gram Seeds.\n");
+        sigma_sigma_printf("[BIOLOGY/EXP]: Water absorption -> Radicle emergence synchronized.\n");
     }
 };
 
@@ -55,8 +55,8 @@ public:
 class BloodGroupShard : public IUniversalExp {
 public:
     void Deploy() override {
-        sigma_printf("[BIOLOGY/EXP]: Experiment: ABO Blood Grouping & Rh Factor.\n");
-        sigma_printf("[BIOLOGY/EXP]: Agglutination detected for Antigen-A. Result: A+.\n");
+        sigma_sigma_printf("[BIOLOGY/EXP]: Experiment: ABO Blood Grouping & Rh Factor.\n");
+        sigma_sigma_printf("[BIOLOGY/EXP]: Agglutination detected for Antigen-A. Result: A+.\n");
     }
 };
 
@@ -64,8 +64,8 @@ public:
 class VennShard : public IUniversalExp {
 public:
     void Deploy() override {
-        sigma_printf("[MATH/EXP]: Experiment: Verification of De Morgan's Laws.\n");
-        sigma_printf("[MATH/EXP]: (A U B)' = A' n B' Shard confirmed via Venn Projection.\n");
+        sigma_sigma_printf("[MATH/EXP]: Experiment: Verification of De Morgan's Laws.\n");
+        sigma_sigma_printf("[MATH/EXP]: (A U B)' = A' n B' Shard confirmed via Venn Projection.\n");
     }
 };
 
@@ -83,9 +83,9 @@ public:
     }
 
     void ExecuteUniversalAudit() {
-        sigma_printf("--- Σ SIGMA OS SOVEREIGN UNIVERSAL LABORATORY ---\n");
+        sigma_sigma_printf("--- Σ SIGMA OS SOVEREIGN UNIVERSAL LABORATORY ---\n");
         for (sigma_usize i = 0; i < m_count; i++) {
-            sigma_printf("\n------------------------------------------------\n");
+            sigma_sigma_printf("\n------------------------------------------------\n");
             m_zenith[i]->Deploy();
         }
     }
@@ -96,7 +96,7 @@ extern "C" void _start(void) {
     lab.Synthesize();
     lab.ExecuteUniversalAudit();
 
-    sigma_printf("\n[SUCCESS]: Universal NCERT Experiment Cluster Active. 100%% Curricular Sovereignty.\n");
+    sigma_sigma_printf("\n[SUCCESS]: Universal NCERT Experiment Cluster Active. 100%% Curricular Sovereignty.\n");
     sigma_exit(0);
 }
 

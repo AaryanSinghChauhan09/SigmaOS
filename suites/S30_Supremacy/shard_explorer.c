@@ -29,7 +29,7 @@ static ExplorerState g_explorer = { .current_path = "/", .selected_idx = 0 };
  * ========================================================================= */
 
 void shard_explorer_init(void) {
-    // kprintf("[SHARD-EXPLORER]: Sovereign Silicon-Native Shard Explorer Online.\n");
+    // ksigma_printf("[SHARD-EXPLORER]: Sovereign Silicon-Native Shard Explorer Online.\n");
 }
 
 /* =========================================================================
@@ -42,10 +42,10 @@ void explorer_render_tree(void) {
      * Maps /[root] -> /[proc] -> /[sigma] -> /shards
      * This provides a professional tree-view for system orchestration.
      */
-    // kprintf("Σ [SHARD-TREE]: Mapping Absolute Sovereignty Hierarchy...\n");
-    // kprintf("  ┣━ [/proc] (Observation Shards)\n");
-    // kprintf("  ┣━ [/sigma] (Zenith Master Logic)\n");
-    // kprintf("  ┗━ [/shards] (Post-Quantum Data Fragments)\n");
+    // ksigma_printf("Σ [SHARD-TREE]: Mapping Absolute Sovereignty Hierarchy...\n");
+    // ksigma_printf("  ┣━ [/proc] (Observation Shards)\n");
+    // ksigma_printf("  ┣━ [/sigma] (Zenith Master Logic)\n");
+    // ksigma_printf("  ┗━ [/shards] (Post-Quantum Data Fragments)\n");
 }
 
 void explorer_navigate(const char* target) {
@@ -55,6 +55,6 @@ void explorer_navigate(const char* target) {
     u32 i = 0; while (target[i] && i < 255) { g_explorer.current_path[i] = target[i]; i++; }
     g_explorer.current_path[i] = '\0';
     
-    // kprintf("[SHARD-EXPLORER]: Navigating Shard: %s\n", g_explorer.current_path);
+    // ksigma_printf("[SHARD-EXPLORER]: Navigating Shard: %s\n", g_explorer.current_path);
     explorer_render_tree();
 }

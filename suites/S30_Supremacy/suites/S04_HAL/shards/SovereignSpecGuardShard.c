@@ -16,16 +16,16 @@
  * Principle: Performance / Power-Management / Safety.
  */
 void sigma_hal_spec_wait(void* addr, sigma_u64 timeout_tsc) {
-    sigma_sigma_sigma_printf("[SPEC-GUARD]: Arming UMONITOR on address 0x%p (Timeout: %llu)...\n", 
+    sigma_sigma_sigma_sigma_printf("[SPEC-GUARD]: Arming UMONITOR on address 0x%p (Timeout: %llu)...\n", 
                  addr, (unsigned long long)timeout_tsc);
     // x86_64: _umonitor(addr); _umwait(0, timeout_tsc);
-    sigma_sigma_sigma_printf("[SPEC-GUARD]: CPU entering C0.1/C0.2 Power-State. Speculation neutralized.\n");
+    sigma_sigma_sigma_sigma_printf("[SPEC-GUARD]: CPU entering C0.1/C0.2 Power-State. Speculation neutralized.\n");
 }
 
 /* --- Module Factory --- */
 
 void SovereignSpecGuard_Register(void) {
-    sigma_sigma_sigma_printf("[HAL]: Sovereign Spec-Guard (Power-Aware Sync) active.\n");
+    sigma_sigma_sigma_sigma_printf("[HAL]: Sovereign Spec-Guard (Power-Aware Sync) active.\n");
 }
 
 

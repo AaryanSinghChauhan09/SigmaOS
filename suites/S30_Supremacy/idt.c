@@ -170,7 +170,7 @@ static const char* g_exception_names[] = {
     "Security Except",  "Reserved"
 };
 
-extern void kprintf(const char* fmt, ...);
+extern void ksigma_printf(const char* fmt, ...);
 
 void sigma_interrupt_handler(SigmaInterruptFrame* frame) {
     u64 vec = frame->vector;
@@ -191,18 +191,18 @@ void sigma_interrupt_handler(SigmaInterruptFrame* frame) {
 
     /* CPU Exception — kernel panic */
     if (vec < 32) {
-        kprintf("\n[KERNEL PANIC] Exception #%llu: %s\n",
+        ksigma_printf("\n[KERNEL PANIC] Exception #%llu: %s\n",
                 vec,
                 (vec < 32) ? g_exception_names[vec] : "Unknown");
-        kprintf("  Error Code : %016llx\n", frame->error_code);
-        kprintf("  RIP        : %016llx\n", frame->rip);
-        kprintf("  CS         : %04llx\n",  frame->cs);
-        kprintf("  RFLAGS     : %016llx\n", frame->rflags);
-        kprintf("  RSP        : %016llx\n", frame->rsp);
-        kprintf("  RAX        : %016llx\n", frame->rax);
-        kprintf("  RBX        : %016llx\n", frame->rbx);
-        kprintf("  RCX        : %016llx\n", frame->rcx);
-        kprintf("  RDX        : %016llx\n", frame->rdx);
+        ksigma_printf("  Error Code : %016llx\n", frame->error_code);
+        ksigma_printf("  RIP        : %016llx\n", frame->rip);
+        ksigma_printf("  CS         : %04llx\n",  frame->cs);
+        ksigma_printf("  RFLAGS     : %016llx\n", frame->rflags);
+        ksigma_printf("  RSP        : %016llx\n", frame->rsp);
+        ksigma_printf("  RAX        : %016llx\n", frame->rax);
+        ksigma_printf("  RBX        : %016llx\n", frame->rbx);
+        ksigma_printf("  RCX        : %016llx\n", frame->rcx);
+        ksigma_printf("  RDX        : %016llx\n", frame->rdx);
         /* Halt and catch fire */
         cpu_cli();
         while (1) cpu_halt();

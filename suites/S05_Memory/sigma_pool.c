@@ -26,7 +26,7 @@
  * ========================================================================= */
 
 extern vaddr_t vmalloc(u64 npages);
-extern void    kprintf(const char* fmt, ...);
+extern void    ksigma_printf(const char* fmt, ...);
 
 /* =========================================================================
  * Pool structures
@@ -174,13 +174,13 @@ void sigma_pool_set_oom(int pool_id, pool_oom_handler_t handler) {
 void sigma_pool_audit(int pool_id) {
     if (pool_id < 0 || (u32)pool_id >= g_pool_count) return;
     const SigmaMemPool* p = &g_pools[pool_id];
-    kprintf("[POOL:%s] Blocks: %llu/%llu (peak %llu) | Allocs: %llu | Frees: %llu\n",
+    ksigma_printf("[POOL:%s] Blocks: %llu/%llu (peak %llu) | Allocs: %llu | Frees: %llu\n",
             p->name, p->used_blocks, p->total_blocks, p->peak_blocks,
             p->alloc_calls, p->free_calls);
 }
 
 void sigma_pool_audit_all(void) {
-    kprintf("[POOL] === Sovereign Memory Pool Audit (%u pools) ===\n", g_pool_count);
+    ksigma_printf("[POOL] === Sovereign Memory Pool Audit (%u pools) ===\n", g_pool_count);
     u32 i;
     for (i = 0; i < g_pool_count; i++) {
         sigma_pool_audit((int)i);

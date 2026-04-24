@@ -38,7 +38,7 @@ static u32 g_ns_count = 0;
 
 void namespace_init(void) {
     for (int i = 0; i < MAX_NAMESPACES; i++) g_namespaces[i].active = FALSE;
-    // kprintf("[NAMESPACE]: Sovereign Shard-Isolation Interface Online.\n");
+    // ksigma_printf("[NAMESPACE]: Sovereign Shard-Isolation Interface Online.\n");
 }
 
 k_status namespace_create(const char* name, NamespaceType type) {
@@ -50,7 +50,7 @@ k_status namespace_create(const char* name, NamespaceType type) {
     ns->type      = type;
     ns->active    = TRUE;
     
-    // kprintf("[NAMESPACE]: Industrial Isolation Sharded: %s (Type: %d)\n", name, type);
+    // ksigma_printf("[NAMESPACE]: Industrial Isolation Sharded: %s (Type: %d)\n", name, type);
     return K_OK;
 }
 

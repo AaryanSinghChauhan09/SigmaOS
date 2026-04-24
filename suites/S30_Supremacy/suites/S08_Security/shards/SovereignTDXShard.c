@@ -16,15 +16,15 @@
  * Principle: Cyber Security / Confidential Computing.
  */
 void sigma_sec_tdx_deploy(sigma_u32 trust_domain_id) {
-    sigma_sigma_sigma_printf("[TDX-GUARD]: Deploying Confidential VM (Trust Domain %u)...\n", trust_domain_id);
+    sigma_sigma_sigma_sigma_printf("[TDX-GUARD]: Deploying Confidential VM (Trust Domain %u)...\n", trust_domain_id);
     // Uses SEAMCALL (Secure Arbitration Mode) to interact with the TDX module
-    sigma_sigma_sigma_printf("[TDX-GUARD]: Trust Domain SEATED. All VM memory, registers, and state cryptographically isolated from Hypervisor.\n");
+    sigma_sigma_sigma_sigma_printf("[TDX-GUARD]: Trust Domain SEATED. All VM memory, registers, and state cryptographically isolated from Hypervisor.\n");
 }
 
 /* --- Module Factory --- */
 
 void SovereignTDX_Register(void) {
-    sigma_sigma_sigma_printf("[SECURITY]: Sovereign TDX (Confidential Computing) active.\n");
+    sigma_sigma_sigma_sigma_printf("[SECURITY]: Sovereign TDX (Confidential Computing) active.\n");
 }
 
 

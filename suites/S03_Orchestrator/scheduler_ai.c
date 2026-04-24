@@ -69,5 +69,5 @@ void sched_update_predictor(SigmaTaskPredictor* p, u64 duration) {
 
 void sched_predict_audit(void) {
     // Kernel log audit (stub)
-    // kprintf("[SCHED-AI]: Predicted latency: %llu (Score: %u)\n", p->predicted_burst, p->score);
+    // ksigma_printf("[SCHED-AI]: Predicted latency: %llu (Score: %u)\n", p->predicted_burst, p->score);
 }

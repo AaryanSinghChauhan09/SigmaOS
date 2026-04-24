@@ -41,7 +41,7 @@ void user_manager_init(void) {
     g_users[0].active = TRUE;
     
     g_current_uid = 0;
-    // kprintf("[USER-MANAGER]: Sovereign Identity Shard Online: uid=0\n");
+    // ksigma_printf("[USER-MANAGER]: Sovereign Identity Shard Online: uid=0\n");
 }
 
 u32 user_get_current_uid(void) {
@@ -56,6 +56,6 @@ bool_t user_is_sovereign(u32 uid) {
 void user_switch_identity(u32 uid) {
     if (uid < MAX_SOVEREIGN_USERS && g_users[uid].active) {
         g_current_uid = uid;
-        // kprintf("[USER-MANAGER]: Identity Absorbed: %s\n", g_users[uid].name);
+        // ksigma_printf("[USER-MANAGER]: Identity Absorbed: %s\n", g_users[uid].name);
     }
 }

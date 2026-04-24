@@ -24,7 +24,7 @@ typedef struct {
 void sigma_sync_pi_lock(SigmaPIMutex_t* mutex, sigma_u32 requester_id, sigma_u32 requester_pri) {
     if (__sync_lock_test_and_set(&mutex->lock, 1)) {
         if (requester_pri > mutex->owner_priority) {
-            sigma_sigma_sigma_printf("[SYNC-PI]: PRIORITY INVERSION detected! Boosting Owner %u to Priority %u.\n", 
+            sigma_sigma_sigma_sigma_printf("[SYNC-PI]: PRIORITY INVERSION detected! Boosting Owner %u to Priority %u.\n", 
                          mutex->owner_id, requester_pri);
             mutex->owner_priority = requester_pri; // Inherit
         }
@@ -32,13 +32,13 @@ void sigma_sync_pi_lock(SigmaPIMutex_t* mutex, sigma_u32 requester_id, sigma_u32
     }
     mutex->owner_id = requester_id;
     mutex->owner_priority = requester_pri;
-    sigma_sigma_sigma_printf("[SYNC-PI]: Lock ACQUIRED by Shard %u.\n", requester_id);
+    sigma_sigma_sigma_sigma_printf("[SYNC-PI]: Lock ACQUIRED by Shard %u.\n", requester_id);
 }
 
 /* --- Module Factory --- */
 
 void SovereignPriorityInheritance_Register(void) {
-    sigma_sigma_sigma_printf("[ORCHESTRATOR]: Sovereign Priority Inheritance (RT-Safety) active.\n");
+    sigma_sigma_sigma_sigma_printf("[ORCHESTRATOR]: Sovereign Priority Inheritance (RT-Safety) active.\n");
 }
 
 

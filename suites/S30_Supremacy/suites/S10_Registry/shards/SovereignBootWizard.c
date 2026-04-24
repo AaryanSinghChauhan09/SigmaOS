@@ -14,19 +14,19 @@
 #include "SovereignPersonalizer.h"
 
 static void wizard_print_header() {
-    sigma_sigma_sigma_printf("\n");
-    sigma_sigma_sigma_printf("  S SIGMAOS ZENITH SUPREME — SOVEREIGN SETUP WIZARD\n");
-    sigma_sigma_sigma_printf("  ?????????????????????????????????????????????????\n");
-    sigma_sigma_sigma_printf("  Welcome, Citizen. Let us personalize your silicon.\n");
-    sigma_sigma_sigma_printf("\n");
+    sigma_sigma_sigma_sigma_printf("\n");
+    sigma_sigma_sigma_sigma_printf("  S SIGMAOS ZENITH SUPREME — SOVEREIGN SETUP WIZARD\n");
+    sigma_sigma_sigma_sigma_printf("  ?????????????????????????????????????????????????\n");
+    sigma_sigma_sigma_sigma_printf("  Welcome, Citizen. Let us personalize your silicon.\n");
+    sigma_sigma_sigma_sigma_printf("\n");
 }
 
 static void wizard_get_input(const char* prompt, char* buffer, sigma_sz_t max) {
-    sigma_sigma_sigma_printf("  [?] %s: ", prompt);
+    sigma_sigma_sigma_sigma_printf("  [?] %s: ", prompt);
     /* In a real system, we'd use sigma_read(0, ...) here */
     // For demo/shard parity, we simulate input
     sigma_sigma_sigma_strcpy(buffer, "SigmaOSUser"); 
-    sigma_sigma_sigma_printf("%s (AUTO_INPUT)\n", buffer);
+    sigma_sigma_sigma_sigma_printf("%s (AUTO_INPUT)\n", buffer);
 }
 
 int SovereignBootWizard_ToolMain(int argc, char** argv) {
@@ -42,14 +42,14 @@ int SovereignBootWizard_ToolMain(int argc, char** argv) {
     wizard_get_input("Choose Shard Theme (e.g. zenith_dark, plasma_blue)", theme, 32);
     wizard_get_input("Set Automation Level (0-2)", auto_lvl, 8);
     
-    sigma_sigma_sigma_printf("\n[WIZARD]: Synchronizing choices to the Sovereign Personalizer Shard...\n");
+    sigma_sigma_sigma_sigma_printf("\n[WIZARD]: Synchronizing choices to the Sovereign Personalizer Shard...\n");
     
     SovereignPersonalizer_t p = SovereignPersonalizer_Create(name);
     p.apply_theme(&p, theme);
     p.set_automation_policy(&p, (sigma_u32)sigma_atoi(auto_lvl));
     
-    sigma_sigma_sigma_printf("\n[SUCCESS]: System sovereignty personalized for Citizen '%s'.\n", name);
-    sigma_sigma_sigma_printf("[WIZARD]: Booting into industrial desktop matrix...\n\n");
+    sigma_sigma_sigma_sigma_printf("\n[SUCCESS]: System sovereignty personalized for Citizen '%s'.\n", name);
+    sigma_sigma_sigma_sigma_printf("[WIZARD]: Booting into industrial desktop matrix...\n\n");
     
     p.audit_customizations(&p);
     

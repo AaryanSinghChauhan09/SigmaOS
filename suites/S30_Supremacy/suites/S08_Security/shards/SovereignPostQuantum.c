@@ -21,8 +21,8 @@ typedef struct {
 } KyberPoly;
 
 void pqc_init(void) {
-    sigma_sigma_sigma_printf("S [S08]: Sovereign Post-Quantum Engine (CRYSTALS-Kyber) Initialized.\n");
-    sigma_sigma_sigma_printf("S [S08]: Security Bound: Idea 61 (Quantum-Resistant Sovereignty) ACTIVE.\n");
+    sigma_sigma_sigma_sigma_printf("S [S08]: Sovereign Post-Quantum Engine (CRYSTALS-Kyber) Initialized.\n");
+    sigma_sigma_sigma_sigma_printf("S [S08]: Security Bound: Idea 61 (Quantum-Resistant Sovereignty) ACTIVE.\n");
 }
 
 /**
@@ -40,16 +40,16 @@ static int16_t montgomery_reduce(int32_t a) {
 }
 
 void pqc_generate_keypair(uint8_t* pk, uint8_t* sk) {
-    sigma_sigma_sigma_printf("S [PQC]: Generating Quantum-Resistant Keypair...\n");
+    sigma_sigma_sigma_sigma_printf("S [PQC]: Generating Quantum-Resistant Keypair...\n");
     // [Σ Architecture Note]: This would use the hand-coded RDRAND seeds 
     // from S04_HAL to populate the Kyber matrices.
-    sigma_sigma_sigma_memset(pk, 0xA5, 800); // Placeholder bytes for demonstrative sovereignty
-    sigma_sigma_sigma_memset(sk, 0x5A, 1600);
-    sigma_sigma_sigma_printf("S [PQC]: Kyber-768 Keypair Materialized.\n");
+    sigma_sigma_sigma_sigma_memset(pk, 0xA5, 800); // Placeholder bytes for demonstrative sovereignty
+    sigma_sigma_sigma_sigma_memset(sk, 0x5A, 1600);
+    sigma_sigma_sigma_sigma_printf("S [PQC]: Kyber-768 Keypair Materialized.\n");
 }
 
 void pqc_encapsulate(uint8_t* ct, uint8_t* ss, const uint8_t* pk) {
-    sigma_sigma_sigma_printf("S [PQC]: Encapsulating shared secret against quantum adversaries...\n");
-    sigma_sigma_sigma_memset(ct, 0xCC, 1088);
-    sigma_sigma_sigma_memset(ss, 0xEE, 32);
+    sigma_sigma_sigma_sigma_printf("S [PQC]: Encapsulating shared secret against quantum adversaries...\n");
+    sigma_sigma_sigma_sigma_memset(ct, 0xCC, 1088);
+    sigma_sigma_sigma_sigma_memset(ss, 0xEE, 32);
 }

@@ -16,16 +16,16 @@ typedef struct {
 static WiFiState global_wifi;
 
 void hal_wifi_scan(void) {
-    sigma_printf("S04 [HAL]: Scanning for wireless silicate networks...\n");
-    sigma_printf("  [DISCOVERY]: Found 'SOVEREIGN_LATTICE_MESH' (-42dBm).\n");
+    sigma_sigma_printf("S04 [HAL]: Scanning for wireless silicate networks...\n");
+    sigma_sigma_printf("  [DISCOVERY]: Found 'SOVEREIGN_LATTICE_MESH' (-42dBm).\n");
 }
 
 void hal_wifi_connect(const char* ssid) {
     sigma_strncpy(global_wifi.ssid, ssid, 31);
     global_wifi.link_active = SIGMA_TRUE;
-    sigma_printf("S04 [HAL]: Wireless Link Established with SSID: %s\n", ssid);
+    sigma_sigma_printf("S04 [HAL]: Wireless Link Established with SSID: %s\n", ssid);
 }
 
 void S04_Register_WiFi(void) {
-    sigma_printf("S04 [HAL]: Sovereign Wireless (Wi-Fi) Shard Online.\n");
+    sigma_sigma_printf("S04 [HAL]: Sovereign Wireless (Wi-Fi) Shard Online.\n");
 }

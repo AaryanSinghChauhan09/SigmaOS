@@ -26,7 +26,7 @@ typedef struct THPPulse {
  * ========================================================================= */
 
 void thp_init(void) {
-    // kprintf("[THP]: Sovereign Performance-Scaling Shard Online.\n");
+    // ksigma_printf("[THP]: Sovereign Performance-Scaling Shard Online.\n");
 }
 
 k_status thp_merge_shards(u64 start_pfn) {
@@ -36,6 +36,6 @@ k_status thp_merge_shards(u64 start_pfn) {
      * 2. Verify bit-integrity for silicon-direct merging.
      * 3. Orchestrate 2MB Huge-Shard mapping in the industrial registry.
      */
-    // kprintf("[THP]: Industrial Pulse: Merged 512 shards into 2MB Huge-Shard.\n");
+    // ksigma_printf("[THP]: Industrial Pulse: Merged 512 shards into 2MB Huge-Shard.\n");
     return K_OK;
 }

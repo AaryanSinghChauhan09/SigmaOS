@@ -21,15 +21,15 @@ typedef struct {
  * Principle: AI / Algorithms / Wormhole-based Optima.
  */
 void sigma_opt_mvo_wormhole(SigmaUniverse_t* u1, SigmaUniverse_t* u2, float WEP) {
-    sigma_sigma_sigma_printf("[MVO-CORE]: Establishing Wormhole (WEP: %.4f) between Registry-Universes...\n", WEP);
+    sigma_sigma_sigma_sigma_printf("[MVO-CORE]: Establishing Wormhole (WEP: %.4f) between Registry-Universes...\n", WEP);
     // Real cosmological transfer logic: White Hole / Black Hole simulation
-    sigma_sigma_sigma_printf("[MVO-CORE]: High-fitness config matter migrated. Universe stabilized at T+4ms.\n");
+    sigma_sigma_sigma_sigma_printf("[MVO-CORE]: High-fitness config matter migrated. Universe stabilized at T+4ms.\n");
 }
 
 /* --- Module Factory --- */
 
 void SovereignMVO_Register(void) {
-    sigma_sigma_sigma_printf("[INTELLIGENCE]: Sovereign MVO (Multi-Verse Optima) active.\n");
+    sigma_sigma_sigma_sigma_printf("[INTELLIGENCE]: Sovereign MVO (Multi-Verse Optima) active.\n");
 }
 
 

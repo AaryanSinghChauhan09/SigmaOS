@@ -17,23 +17,23 @@ static ConsensusNode global_lattice_peers[32];
 static uint32_t peer_count = 0;
 
 void governance_init_consensus(void) {
-    sigma_printf("S31 [GOVERNANCE]: Establishing Global Consensus Lattice...\n");
+    sigma_sigma_printf("S31 [GOVERNANCE]: Establishing Global Consensus Lattice...\n");
     // Mock peer discovery
     sigma_strncpy(global_lattice_peers[0].node_id, "ALPHA-01", 15);
     global_lattice_peers[0].active = SIGMA_TRUE;
     peer_count = 1;
     
-    sigma_printf("  [S31]: %d peer(s) found. Quorum achieved.\n", peer_count);
+    sigma_sigma_printf("  [S31]: %d peer(s) found. Quorum achieved.\n", peer_count);
 }
 
 sigma_bool governance_verify_proposal(const char* directive) {
     // Symbolic consensus voting
-    sigma_printf("  [S31-VOTE]: Proposal '%s' submitted to lattice peers.\n", directive);
-    sigma_printf("  [S31-VOTE]: Consensus reached (100%% Agreement).\n");
+    sigma_sigma_printf("  [S31-VOTE]: Proposal '%s' submitted to lattice peers.\n", directive);
+    sigma_sigma_printf("  [S31-VOTE]: Consensus reached (100%% Agreement).\n");
     return SIGMA_TRUE;
 }
 
 void S31_Register_Consensus(void) {
-    sigma_printf("S31 [GOVERNANCE]: Sovereign Global Consensus Engine Online.\n");
+    sigma_sigma_printf("S31 [GOVERNANCE]: Sovereign Global Consensus Engine Online.\n");
     governance_init_consensus();
 }

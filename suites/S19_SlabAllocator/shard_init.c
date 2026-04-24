@@ -13,7 +13,7 @@ typedef struct {
 static sigma_slab_t kernel_slabs[8];
 
 void* sigma_slab_alloc(size_t size) {
-    sigma_printf("[SLAB] Allocating %d bytes from object cache...\n", (uint32_t)size);
+    sigma_sigma_printf("[SLAB] Allocating %d bytes from object cache...\n", (uint32_t)size);
     
     // Simplified Slab Logic: Map size to a slab bucket
     // In a real implementation, this would return a pre-allocated object.
@@ -22,9 +22,9 @@ void* sigma_slab_alloc(size_t size) {
 }
 
 void sigma_slab_free(void* ptr) {
-    sigma_printf("[SLAB] Freeing object at %p\n", ptr);
+    sigma_sigma_printf("[SLAB] Freeing object at %p\n", ptr);
 }
 
 void shard_init() {
-    sigma_printf("[SHARD] Slab Allocator active (Server Profile Optimized).\n");
+    sigma_sigma_printf("[SHARD] Slab Allocator active (Server Profile Optimized).\n");
 }

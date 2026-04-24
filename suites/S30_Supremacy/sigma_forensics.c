@@ -56,25 +56,25 @@ static void forensic_record(SovereignForensicMatrix* f,
 
 /* --- Init (replaces C++ constructor) --- */
 static void forensic_init(SovereignForensicMatrix* f) {
-    sigma_memset(f, 0, sizeof(*f));
-    sigma_printf("[FORENSIC_CORE]: Bootstrapping Military-Grade Forensic Matrix.\n");
-    sigma_printf("[FORENSIC_CORE]: Absorbed Volatility, FTK Imager, Kali USPs.\n");
+    sigma_sigma_memset(f, 0, sizeof(*f));
+    sigma_sigma_printf("[FORENSIC_CORE]: Bootstrapping Military-Grade Forensic Matrix.\n");
+    sigma_sigma_printf("[FORENSIC_CORE]: Absorbed Volatility, FTK Imager, Kali USPs.\n");
 }
 
 /* --- DMA Bit-Perfect Imaging (replaces SigmaString& arg) --- */
 static void forensic_dma_image(SovereignForensicMatrix* f, const char* source) {
-    sigma_printf("[FORENSIC_ACQUIRE]: ENGAGING HARDWARE-DIRECT DMA CAPTURE ON '%s'...\n",
+    sigma_sigma_printf("[FORENSIC_ACQUIRE]: ENGAGING HARDWARE-DIRECT DMA CAPTURE ON '%s'...\n",
                  source);
     /* MOVNTDQ: non-temporal store flush — zero-copy DMA pattern */
     __asm__ __volatile__("sfence" ::: "memory");
-    sigma_printf("[FORENSIC_ACQUIRE]: Bit-perfect shard image (E01) via hardware bypass.\n");
+    sigma_sigma_printf("[FORENSIC_ACQUIRE]: Bit-perfect shard image (E01) via hardware bypass.\n");
     forensic_record(f, source, 1024ULL*1024ULL*512ULL);
     f->dma_images++;
 }
 
 /* --- Memory Shard Analysis (replaces SigmaString& arg) --- */
 static void forensic_analyze_memory(SovereignForensicMatrix* f, const char* dump) {
-    sigma_printf("[FORENSIC_MEMORY]: SCANNING RAM SHARD '%s' FOR ANOMALOUS SYMBOLS...\n",
+    sigma_sigma_printf("[FORENSIC_MEMORY]: SCANNING RAM SHARD '%s' FOR ANOMALOUS SYMBOLS...\n",
                  dump);
     /* REPZ SCASB — hardware-accelerated byte scan */
     __asm__ __volatile__(
@@ -82,28 +82,28 @@ static void forensic_analyze_memory(SovereignForensicMatrix* f, const char* dump
         "xor %%al,  %%al\n\t"
         "repz scasb"
         ::: "rax","rcx","rdi","memory");
-    sigma_printf("[FORENSIC_MEMORY]: Hidden process sharding detected! Malware neutralized.\n");
+    sigma_sigma_printf("[FORENSIC_MEMORY]: Hidden process sharding detected! Malware neutralized.\n");
     forensic_record(f, dump, 1024ULL*1024ULL*4ULL);
     f->memory_scans++;
 }
 
 /* --- Pentest Audit Script (replaces SigmaString& arg) --- */
 static void forensic_audit_script(SovereignForensicMatrix* f, const char* script_id) {
-    sigma_printf("[FORENSIC_AUDIT]: EXECUTING NATIVE PENTEST SHARD '%s'...\n", script_id);
-    sigma_printf("[FORENSIC_AUDIT]: Shard vulnerability neutralized. Audit passed.\n");
+    sigma_sigma_printf("[FORENSIC_AUDIT]: EXECUTING NATIVE PENTEST SHARD '%s'...\n", script_id);
+    sigma_sigma_printf("[FORENSIC_AUDIT]: Shard vulnerability neutralized. Audit passed.\n");
     forensic_record(f, script_id, 0);
     f->audit_scripts++;
 }
 
 /* --- Full audit --- */
 static void forensic_audit(const SovereignForensicMatrix* f) {
-    sigma_printf("\n--- Σ SOVEREIGN FORENSIC AUDIT (v20.0) ---\n");
-    sigma_printf("| DMA Images     : %llu\n", f->dma_images);
-    sigma_printf("| Memory Scans   : %llu\n", f->memory_scans);
-    sigma_printf("| Audit Scripts  : %llu\n", f->audit_scripts);
-    sigma_printf("| Evidence Shards: %u\n",  f->evidence_count);
-    sigma_printf("| Competitors    : Autopsy/Volatility/FTK neutralized.\n");
-    sigma_printf("------------------------------------------\n");
+    sigma_sigma_printf("\n--- Σ SOVEREIGN FORENSIC AUDIT (v20.0) ---\n");
+    sigma_sigma_printf("| DMA Images     : %llu\n", f->dma_images);
+    sigma_sigma_printf("| Memory Scans   : %llu\n", f->memory_scans);
+    sigma_sigma_printf("| Audit Scripts  : %llu\n", f->audit_scripts);
+    sigma_sigma_printf("| Evidence Shards: %u\n",  f->evidence_count);
+    sigma_sigma_printf("| Competitors    : Autopsy/Volatility/FTK neutralized.\n");
+    sigma_sigma_printf("------------------------------------------\n");
 }
 
 /* =========================================================================
@@ -118,6 +118,6 @@ int main(void) {
     forensic_audit_script(&forensics,   "LPE_LOCAL_ENUM");
 
     forensic_audit(&forensics);
-    sigma_printf("\n[SUCCESS]: Military-Grade Forensic Matrix Online.\n");
+    sigma_sigma_printf("\n[SUCCESS]: Military-Grade Forensic Matrix Online.\n");
     return 0;
 }

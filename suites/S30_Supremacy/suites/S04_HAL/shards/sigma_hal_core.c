@@ -15,9 +15,9 @@ static sigma_hal_device_t* s_hal_registry[MAX_HAL_DEVICES];
 static sigma_u32 s_hal_device_count = 0;
 
 void sigma_hal_init(void) {
-    sigma_sigma_sigma_memset(s_hal_registry, 0, sizeof(s_hal_registry));
+    sigma_sigma_sigma_sigma_memset(s_hal_registry, 0, sizeof(s_hal_registry));
     s_hal_device_count = 0;
-    sigma_sigma_sigma_printf("S [HAL] Sovereign Hardware Abstraction Layer Initialized.\n");
+    sigma_sigma_sigma_sigma_printf("S [HAL] Sovereign Hardware Abstraction Layer Initialized.\n");
 }
 
 sigma_err_t sigma_hal_register_device(sigma_hal_device_t* device) {
@@ -35,7 +35,7 @@ sigma_err_t sigma_hal_register_device(sigma_hal_device_t* device) {
         case HAL_DEVICE_PERIPHERAL: type_str = "PERIPHERAL"; break;
     }
 
-    sigma_sigma_sigma_printf("S [HAL] Registered %s interface [%s] (ID: %u)\n", 
+    sigma_sigma_sigma_sigma_printf("S [HAL] Registered %s interface [%s] (ID: %u)\n", 
                              type_str, device->base.name, device->base.id);
 
     if (device->init) {

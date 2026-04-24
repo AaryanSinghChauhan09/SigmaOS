@@ -16,15 +16,15 @@
  * Principle: Cyber Security / Fine-grained execution constraint.
  */
 void sigma_sec_sfi_mask(void) {
-    sigma_sigma_sigma_printf("[SFI-SANDBOX]: Instrumenting active thread with bitwise address masking...\n");
+    sigma_sigma_sigma_sigma_printf("[SFI-SANDBOX]: Instrumenting active thread with bitwise address masking...\n");
     // All loaded memory addresses are bitwise-ANDed against a safe boundary region
-    sigma_sigma_sigma_printf("[SFI-SANDBOX]: Software Fault Isolation active. Memory corruption technically impossible.\n");
+    sigma_sigma_sigma_sigma_printf("[SFI-SANDBOX]: Software Fault Isolation active. Memory corruption technically impossible.\n");
 }
 
 /* --- Module Factory --- */
 
 void SovereignSFI_Register(void) {
-    sigma_sigma_sigma_printf("[SECURITY]: Sovereign SFI (Software Address Masking) active.\n");
+    sigma_sigma_sigma_sigma_printf("[SECURITY]: Sovereign SFI (Software Address Masking) active.\n");
 }
 
 

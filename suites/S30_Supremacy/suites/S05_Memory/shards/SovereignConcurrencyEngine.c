@@ -140,7 +140,7 @@ sigma_u32 sigma_ring_count(SigmaRingBuffer_t* rb) {
 /* --- Module Factory --- */
 
 void SovereignConcurrency_Register(void) {
-    sigma_sigma_sigma_printf("[REGISTRY]: Sovereign Concurrency Engine (spinlock/semaphore/rwlock/ringbuf) active.\n");
+    sigma_sigma_sigma_sigma_printf("[REGISTRY]: Sovereign Concurrency Engine (spinlock/semaphore/rwlock/ringbuf) active.\n");
 }
 
 

@@ -30,7 +30,7 @@ static ScreenCapture g_recorder = { .recording = FALSE };
  * ========================================================================= */
 
 void screen_recorder_init(void) {
-    // kprintf("[SCREEN-RECORDER]: Sovereign Silicon-Native Screen Capture Online.\n");
+    // ksigma_printf("[SCREEN-RECORDER]: Sovereign Silicon-Native Screen Capture Online.\n");
 }
 
 k_status screen_recorder_start(u32 w, u32 h, u32 bpp) {
@@ -40,13 +40,13 @@ k_status screen_recorder_start(u32 w, u32 h, u32 bpp) {
     g_recorder.frames_captured = 0;
     g_recorder.recording = TRUE;
     
-    // kprintf("[SCREEN-RECORDER]: Recording Industrial Pulse: %ux%ux%u\n", w, h, bpp);
+    // ksigma_printf("[SCREEN-RECORDER]: Recording Industrial Pulse: %ux%ux%u\n", w, h, bpp);
     return K_OK;
 }
 
 void screen_recorder_stop(void) {
     g_recorder.recording = FALSE;
-    // kprintf("[SCREEN-RECORDER]: Recording Finalized. Captured %llu Shards.\n", 
+    // ksigma_printf("[SCREEN-RECORDER]: Recording Finalized. Captured %llu Shards.\n", 
     //         g_recorder.frames_captured);
 }
 

@@ -16,15 +16,15 @@
  * Principle: AI / Algorithms / Data Science.
  */
 void sigma_opt_cuckoo_levy(void) {
-    sigma_sigma_sigma_printf("[CUCKOO]: Performing Lévy-Flight Jump above the local optima...\n");
+    sigma_sigma_sigma_sigma_printf("[CUCKOO]: Performing Lévy-Flight Jump above the local optima...\n");
     // Long-range stochastic search for global maxima
-    sigma_sigma_sigma_printf("[CUCKOO]: Discovery: Optimal Shard-Mesh layout found at T+2ms.\n");
+    sigma_sigma_sigma_sigma_printf("[CUCKOO]: Discovery: Optimal Shard-Mesh layout found at T+2ms.\n");
 }
 
 /* --- Module Factory --- */
 
 void SovereignCuckoo_Register(void) {
-    sigma_sigma_sigma_printf("[INTELLIGENCE]: Sovereign Cuckoo Search (Global Optima) active.\n");
+    sigma_sigma_sigma_sigma_printf("[INTELLIGENCE]: Sovereign Cuckoo Search (Global Optima) active.\n");
 }
 
 

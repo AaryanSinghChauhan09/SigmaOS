@@ -16,15 +16,15 @@
  * Principle: Cyber Security / Privacy / Computer Science.
  */
 void sigma_sec_oram_access(sigma_u64 addr, int is_write) {
-    sigma_sigma_sigma_printf("[ORAM]: Accessing Virtual Address 0x%llX...\n", (unsigned long long)addr);
-    sigma_sigma_sigma_printf("[ORAM]: Shuffling memory blocks across Path-Tree to mask intent.\n");
-    sigma_sigma_sigma_printf("[ORAM]: Oblivious Access COMPLETE. Pattern Neutralized.\n");
+    sigma_sigma_sigma_sigma_printf("[ORAM]: Accessing Virtual Address 0x%llX...\n", (unsigned long long)addr);
+    sigma_sigma_sigma_sigma_printf("[ORAM]: Shuffling memory blocks across Path-Tree to mask intent.\n");
+    sigma_sigma_sigma_sigma_printf("[ORAM]: Oblivious Access COMPLETE. Pattern Neutralized.\n");
 }
 
 /* --- Module Factory --- */
 
 void SovereignORAM_Register(void) {
-    sigma_sigma_sigma_printf("[SECURITY]: Sovereign ORAM Mastery (Side-Channel Defense) active.\n");
+    sigma_sigma_sigma_sigma_printf("[SECURITY]: Sovereign ORAM Mastery (Side-Channel Defense) active.\n");
 }
 
 

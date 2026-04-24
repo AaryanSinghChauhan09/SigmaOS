@@ -22,16 +22,16 @@ typedef struct {
  * Principle: AI / Algorithms / Distributed Pack Intelligence.
  */
 void sigma_opt_gwo_encircle(float* wolf_pos, float* target_pos, float A, float C) {
-    sigma_sigma_sigma_printf("[GREY-WOLF]: Coordinating pack encircling behavior (A: %.2f, C: %.2f)...\n", A, C);
+    sigma_sigma_sigma_sigma_printf("[GREY-WOLF]: Coordinating pack encircling behavior (A: %.2f, C: %.2f)...\n", A, C);
     // D = |C * X_target(t) - X(t)|
     // X(t+1) = X_target(t) - A * D
-    sigma_sigma_sigma_printf("[GREY-WOLF]: Shard-Pack converges on Global Optima (Alpha detected).\n");
+    sigma_sigma_sigma_sigma_printf("[GREY-WOLF]: Shard-Pack converges on Global Optima (Alpha detected).\n");
 }
 
 /* --- Module Factory --- */
 
 void SovereignGreyWolf_Register(void) {
-    sigma_sigma_sigma_printf("[INTELLIGENCE]: Sovereign Grey-Wolf (Hierarchical Optima) active.\n");
+    sigma_sigma_sigma_sigma_printf("[INTELLIGENCE]: Sovereign Grey-Wolf (Hierarchical Optima) active.\n");
 }
 
 

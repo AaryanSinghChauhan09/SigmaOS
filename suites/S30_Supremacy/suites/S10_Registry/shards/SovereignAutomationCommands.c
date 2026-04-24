@@ -9,17 +9,17 @@ static int sigma_atoi_local(const char* str) {
 }
 
 void handle_gaming(int argc, char** argv) {
-    if (argc < 3) { sigma_sigma_sigma_printf("Usage: sigma gaming <boost|status|profile> [args]\n"); return; }
-    sigma_sigma_sigma_printf("[GAMING]: Optimizing silicon for MISSION-CRITICAL performance... Shard: '%s'\n", argv[2]);
-    sigma_sigma_sigma_printf("[GAMING]: Garuda Zen-Kernel tuning applied. Jitter minimized.\n");
-    sigma_sigma_sigma_printf("[OK]: Peak performance state LOCKED.\n");
+    if (argc < 3) { sigma_sigma_sigma_sigma_printf("Usage: sigma gaming <boost|status|profile> [args]\n"); return; }
+    sigma_sigma_sigma_sigma_printf("[GAMING]: Optimizing silicon for MISSION-CRITICAL performance... Shard: '%s'\n", argv[2]);
+    sigma_sigma_sigma_sigma_printf("[GAMING]: Garuda Zen-Kernel tuning applied. Jitter minimized.\n");
+    sigma_sigma_sigma_sigma_printf("[OK]: Peak performance state LOCKED.\n");
 }
 
 void handle_automate(int argc, char** argv) {
-    if (argc < 4) { sigma_sigma_sigma_printf("Usage: sigma automate click <interval_ms> <clicks>\n"); return; }
+    if (argc < 4) { sigma_sigma_sigma_sigma_printf("Usage: sigma automate click <interval_ms> <clicks>\n"); return; }
     int interval = sigma_atoi_local(argv[2]);
     int clicks = sigma_atoi_local(argv[3]);
-    sigma_sigma_sigma_printf("[AUTOMATE]: XClicker Shard initiating %d events at %dms intervals.\n", clicks, interval);
+    sigma_sigma_sigma_sigma_printf("[AUTOMATE]: XClicker Shard initiating %d events at %dms intervals.\n", clicks, interval);
 }
 
 void SovereignAutomationCommands_Register(void) {

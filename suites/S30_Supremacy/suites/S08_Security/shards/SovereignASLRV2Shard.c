@@ -16,16 +16,16 @@
  * Principle: Cyber Security / Safety / Hardware Mastery.
  */
 void sigma_sec_aslr_permute(sigma_u32 shard_id, sigma_u64 entropy_seed) {
-    sigma_sigma_sigma_printf("[ASLR-V2]: Permuting Shard %u address space (Entropy: 0x%llX)...\n", 
+    sigma_sigma_sigma_sigma_printf("[ASLR-V2]: Permuting Shard %u address space (Entropy: 0x%llX)...\n", 
                  shard_id, (unsigned long long)entropy_seed);
     // Real dynamic page-table remapping with randomized offsets
-    sigma_sigma_sigma_printf("[ASLR-V2]: Shard layout randomized. Exploitation complexity QUADRUPLED.\n");
+    sigma_sigma_sigma_sigma_printf("[ASLR-V2]: Shard layout randomized. Exploitation complexity QUADRUPLED.\n");
 }
 
 /* --- Module Factory --- */
 
 void SovereignASLRV2_Register(void) {
-    sigma_sigma_sigma_printf("[SECURITY]: Sovereign ASLR-v2 (Fine-Grained Randomization) active.\n");
+    sigma_sigma_sigma_sigma_printf("[SECURITY]: Sovereign ASLR-v2 (Fine-Grained Randomization) active.\n");
 }
 
 

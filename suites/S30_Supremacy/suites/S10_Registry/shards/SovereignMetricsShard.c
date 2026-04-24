@@ -32,7 +32,7 @@ void sigma_metrics_increment(const char* name) {
 /* --- Module Factory --- */
 
 void SovereignMetrics_Register(void) {
-    sigma_sigma_sigma_printf("[TOOLING]: Sovereign Metrics Engine (Observability) active.\n");
+    sigma_sigma_sigma_sigma_printf("[TOOLING]: Sovereign Metrics Engine (Observability) active.\n");
 }
 
 

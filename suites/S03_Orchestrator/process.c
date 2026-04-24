@@ -87,7 +87,7 @@ typedef struct SigmaProcTable {
 
 static SigmaProcTable g_proctab;
 
-extern void   kprintf(const char* fmt, ...);
+extern void   ksigma_printf(const char* fmt, ...);
 extern paddr_t pmm_alloc_page(void);
 extern vaddr_t vmalloc(u64 npages);
 extern k_status vmm_map(vaddr_t, paddr_t, u64);
@@ -144,7 +144,7 @@ void proc_init(void) {
     for (i = 0; i < PROC_MAX; i++) g_proctab.procs[i].state = PS_UNUSED;
     g_proctab.next_pid = 0;
     g_proctab.active   = 0;
-    kprintf("[PROC]: Process table online. Capacity=%u\n", PROC_MAX);
+    ksigma_printf("[PROC]: Process table online. Capacity=%u\n", PROC_MAX);
 }
 
 /* =========================================================================
@@ -173,7 +173,7 @@ i32 proc_fork(SigmaProc* parent) {
         child->fds[fd] = parent->fds[fd];
 
     child->state = PS_RUNNABLE;
-    kprintf("[PROC]: fork() pid=%u → child pid=%u\n", parent->pid, child->pid);
+    ksigma_printf("[PROC]: fork() pid=%u → child pid=%u\n", parent->pid, child->pid);
     return (i32)child->pid;
 }
 
@@ -183,7 +183,7 @@ i32 proc_fork(SigmaProc* parent) {
  * ========================================================================= */
 i32 proc_exec(SigmaProc* p, const char* path, const char* argv[]) {
     (void)argv;
-    kprintf("[PROC]: exec() pid=%u path='%s'\n", p->pid, path);
+    ksigma_printf("[PROC]: exec() pid=%u path='%s'\n", p->pid, path);
 
     /* Close all non-inheritable fds (FD_CLOEXEC) */
     u32 fd;
@@ -200,7 +200,7 @@ i32 proc_exec(SigmaProc* p, const char* path, const char* argv[]) {
     proc_copy_name(p, path);
     p->state = PS_RUNNABLE;
 
-    kprintf("[PROC]: exec() image '%s' mapped. Entry @ 0x400000.\n", path);
+    ksigma_printf("[PROC]: exec() image '%s' mapped. Entry @ 0x400000.\n", path);
     return K_OK;
 }
 
@@ -217,7 +217,7 @@ i32 proc_wait(SigmaProc* parent, i32* exit_code) {
                 if (exit_code) *exit_code = p->exit_code;
                 p->state = PS_UNUSED;
                 g_proctab.active--;
-                kprintf("[PROC]: wait() reaped pid=%u exit_code=%d\n",
+                ksigma_printf("[PROC]: wait() reaped pid=%u exit_code=%d\n",
                         pid, p->exit_code);
                 return pid;
             }
@@ -232,7 +232,7 @@ i32 proc_wait(SigmaProc* parent, i32* exit_code) {
 void proc_exit(SigmaProc* p, i32 code) {
     p->exit_code = code;
     p->state     = PS_ZOMBIE;
-    kprintf("[PROC]: exit() pid=%u code=%d → ZOMBIE\n", p->pid, code);
+    ksigma_printf("[PROC]: exit() pid=%u code=%d → ZOMBIE\n", p->pid, code);
     sched_yield();
 }
 
@@ -258,7 +258,7 @@ vaddr_t proc_brk(SigmaProc* p, vaddr_t new_brk) {
  * Audit
  * ========================================================================= */
 void proc_audit(void) {
-    kprintf("[PROC]: Active=%u | Next PID=%u\n",
+    ksigma_printf("[PROC]: Active=%u | Next PID=%u\n",
             g_proctab.active, g_proctab.next_pid);
     u32 i;
     for (i = 0; i < PROC_MAX; i++) {
@@ -273,7 +273,7 @@ void proc_audit(void) {
             case PS_ZOMBIE:   st = "ZOMBIE";    break;
             default: break;
         }
-        kprintf("  PID=%u PPID=%u %-10s %-12s\n",
+        ksigma_printf("  PID=%u PPID=%u %-10s %-12s\n",
                 p->pid, p->ppid, p->name, st);
     }
 }

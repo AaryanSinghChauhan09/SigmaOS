@@ -51,7 +51,7 @@ static inline sigma_f64 sigma_fpu_mul_add(sigma_f64 a, sigma_f64 b, sigma_f64 c)
 
 static void ai_train_model(SovereignAIKernel_t* self, sigma_f64* x, sigma_f64* y, sigma_sz_t n, sigma_u32 epochs) {
     sigma_f64 alpha = 0.01;
-    sigma_sigma_sigma_printf("[AI_KERNEL]: Initiating Pure Silicon SGD Training (%u epochs)...\n", epochs);
+    sigma_sigma_sigma_sigma_printf("[AI_KERNEL]: Initiating Pure Silicon SGD Training (%u epochs)...\n", epochs);
     
     for (sigma_u32 e = 0; e < epochs; e++) {
         sigma_f64 dw = 0, db = 0;
@@ -63,27 +63,27 @@ static void ai_train_model(SovereignAIKernel_t* self, sigma_f64* x, sigma_f64* y
         self->w -= (dw / n) * alpha;
         self->b -= (db / n) * alpha;
     }
-    sigma_sigma_sigma_printf("[AI_KERNEL]: Training complete. Model: y = %.2fx + %.2f\n", self->w, self->b);
+    sigma_sigma_sigma_sigma_printf("[AI_KERNEL]: Training complete. Model: y = %.2fx + %.2f\n", self->w, self->b);
 }
 
 static void ai_predict_intent(SovereignAIKernel_t* self, const char* action) {
     (void)action;
-    sigma_sigma_sigma_printf("[AI_KERNEL-ZENITH]: Predicting based on weight %.4f...\n", self->w);
+    sigma_sigma_sigma_sigma_printf("[AI_KERNEL-ZENITH]: Predicting based on weight %.4f...\n", self->w);
     self->predictions++;
 }
 
 static void ai_shard_resources(SovereignAIKernel_t* self) {
     (void)self;
-    sigma_sigma_sigma_printf("[AI_KERNEL-ZENITH]: Predictive Resource Sharding... Allocation [OPTIMIZED]\n");
+    sigma_sigma_sigma_sigma_printf("[AI_KERNEL-ZENITH]: Predictive Resource Sharding... Allocation [OPTIMIZED]\n");
 }
 
 static void ai_audit(SovereignAIKernel_t* self) {
-    sigma_sigma_sigma_printf("\n--- S SOVEREIGN AI AUDIT (v13.0) ---\n");
-    sigma_sigma_sigma_printf("| Predictions    : %llu\n", self->predictions);
-    sigma_sigma_sigma_printf("| Confidence     : 99.9%%\n");
-    sigma_sigma_sigma_printf("| Architecture   : Pure C11 (Zero HLL Overhead)\n");
-    sigma_sigma_sigma_printf("| Competitors    : Legacy schedulers (BFS/CFS) neutralized.\n");
-    sigma_sigma_sigma_printf("--------------------------------------\n");
+    sigma_sigma_sigma_sigma_printf("\n--- S SOVEREIGN AI AUDIT (v13.0) ---\n");
+    sigma_sigma_sigma_sigma_printf("| Predictions    : %llu\n", self->predictions);
+    sigma_sigma_sigma_sigma_printf("| Confidence     : 99.9%%\n");
+    sigma_sigma_sigma_sigma_printf("| Architecture   : Pure C11 (Zero HLL Overhead)\n");
+    sigma_sigma_sigma_sigma_printf("| Competitors    : Legacy schedulers (BFS/CFS) neutralized.\n");
+    sigma_sigma_sigma_sigma_printf("--------------------------------------\n");
 }
 
 // -------------------------------------------------------------------------
@@ -113,7 +113,7 @@ static SovereignAIKernel_t create_ai_kernel() {
 // -------------------------------------------------------------------------
 
 void start_aikernel_zenith() {
-    sigma_sigma_sigma_printf("[SIGMA_AI]: Bootstrapping AI Kernel Zenith...\n");
+    sigma_sigma_sigma_sigma_printf("[SIGMA_AI]: Bootstrapping AI Kernel Zenith...\n");
     
     SovereignAIKernel_t ai = create_ai_kernel();
 

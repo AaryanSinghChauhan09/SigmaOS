@@ -16,15 +16,15 @@
  * Principle: Distributed / Throughput Optimization / Zero-Copy.
  */
 void sigma_net_rdma_write(sigma_u32 target_node, void* local_addr, void* remote_addr, sigma_u32 size) {
-    sigma_sigma_sigma_printf("[RDMA-FABRIC]: Initiating zero-copy push to Node %u (Size: %u bytes)...\n", target_node, size);
+    sigma_sigma_sigma_sigma_printf("[RDMA-FABRIC]: Initiating zero-copy push to Node %u (Size: %u bytes)...\n", target_node, size);
     // Bypassing local TCP/IP stack; direct NIC-to-NIC interaction via RoCEv2 / Infiniband
-    sigma_sigma_sigma_printf("[RDMA-FABRIC]: Push SUCCESS. CPU overhead avoided entirely.\n");
+    sigma_sigma_sigma_sigma_printf("[RDMA-FABRIC]: Push SUCCESS. CPU overhead avoided entirely.\n");
 }
 
 /* --- Module Factory --- */
 
 void SovereignRDMA_Register(void) {
-    sigma_sigma_sigma_printf("[ORCHESTRATOR]: Sovereign RDMA (Zero-Copy Fabric) active.\n");
+    sigma_sigma_sigma_sigma_printf("[ORCHESTRATOR]: Sovereign RDMA (Zero-Copy Fabric) active.\n");
 }
 
 

@@ -18,13 +18,13 @@ typedef uint64_t pte_t;
 static pte_t* l0_table;
 
 void vmm_init() {
-    sigma_printf("[VMM] Initializing AArch64 4-Level Paging Shard...\n");
+    sigma_sigma_printf("[VMM] Initializing AArch64 4-Level Paging Shard...\n");
     
     // Allocate 4KB for L0 table (Must be 4KB aligned)
     l0_table = (pte_t*)sigma_slab_alloc(PAGE_SIZE);
-    sigma_memset(l0_table, 0, PAGE_SIZE);
+    sigma_sigma_memset(l0_table, 0, PAGE_SIZE);
     
-    sigma_printf("[VMM] L0 Table created at %p\n", l0_table);
+    sigma_sigma_printf("[VMM] L0 Table created at %p\n", l0_table);
 }
 
 // Map a 4KB virtual page to a physical address
@@ -37,7 +37,7 @@ void vmm_map_page(uint64_t vaddr, uint64_t paddr, uint64_t flags) {
     // L0 -> L1
     if (!(l0_table[l0_idx] & ATTR_VALID)) {
         pte_t* l1 = (pte_t*)sigma_slab_alloc(PAGE_SIZE);
-        sigma_memset(l1, 0, PAGE_SIZE);
+        sigma_sigma_memset(l1, 0, PAGE_SIZE);
         l0_table[l0_idx] = (uint64_t)l1 | ATTR_TABLE | ATTR_VALID;
     }
     
@@ -46,7 +46,7 @@ void vmm_map_page(uint64_t vaddr, uint64_t paddr, uint64_t flags) {
     // L1 -> L2
     if (!(l1_table[l1_idx] & ATTR_VALID)) {
         pte_t* l2 = (pte_t*)sigma_slab_alloc(PAGE_SIZE);
-        sigma_memset(l2, 0, PAGE_SIZE);
+        sigma_sigma_memset(l2, 0, PAGE_SIZE);
         l1_table[l1_idx] = (uint64_t)l2 | ATTR_TABLE | ATTR_VALID;
     }
 
@@ -55,7 +55,7 @@ void vmm_map_page(uint64_t vaddr, uint64_t paddr, uint64_t flags) {
     // L2 -> L3 (Leaf Page)
     if (!(l2_table[l2_idx] & ATTR_VALID)) {
         pte_t* l3 = (pte_t*)sigma_slab_alloc(PAGE_SIZE);
-        sigma_memset(l3, 0, PAGE_SIZE);
+        sigma_sigma_memset(l3, 0, PAGE_SIZE);
         l2_table[l2_idx] = (uint64_t)l3 | ATTR_TABLE | ATTR_VALID;
     }
 
@@ -64,7 +64,7 @@ void vmm_map_page(uint64_t vaddr, uint64_t paddr, uint64_t flags) {
     // Final L3 mapping to physical page
     l3_table[l3_idx] = paddr | ATTR_AF | ATTR_SH_INNER | ATTR_MEM_ATTR | ATTR_VALID | (1ULL << 1); // 1<<1 for L3 leaf
     
-    sigma_printf("[VMM] Mapped Virtual %p -> Physical %p\n", vaddr, paddr);
+    sigma_sigma_printf("[VMM] Mapped Virtual %p -> Physical %p\n", vaddr, paddr);
 }
 
 void shard_init() {

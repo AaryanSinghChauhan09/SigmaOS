@@ -16,15 +16,15 @@
  * Principle: AI / Algorithms / Data Science.
  */
 void sigma_opt_gp_cross(void* tree1, void* tree2) {
-    sigma_sigma_sigma_printf("[GP-CORE]: Breeding Functional Trees for Shard optimization...\n");
+    sigma_sigma_sigma_sigma_printf("[GP-CORE]: Breeding Functional Trees for Shard optimization...\n");
     // Swap sub-trees based on fitness scores
-    sigma_sigma_sigma_printf("[GP-CORE]: Code-mutation Success. Evolved function performs 12%% faster.\n");
+    sigma_sigma_sigma_sigma_printf("[GP-CORE]: Code-mutation Success. Evolved function performs 12%% faster.\n");
 }
 
 /* --- Module Factory --- */
 
 void SovereignGeneticProgramming_Register(void) {
-    sigma_sigma_sigma_printf("[INTELLIGENCE]: Sovereign GP-Core (Code Evolution) active.\n");
+    sigma_sigma_sigma_sigma_printf("[INTELLIGENCE]: Sovereign GP-Core (Code Evolution) active.\n");
 }
 
 

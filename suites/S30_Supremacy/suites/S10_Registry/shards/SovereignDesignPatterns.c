@@ -31,7 +31,7 @@ SigmaLogger_t* sigma_logger_get(void) {
         s_logger_instance = &s_logger_storage;
         s_logger_instance->log_level = 1;  /* INFO */
         s_logger_instance->entries_written = 0;
-        sigma_sigma_sigma_printf("[SINGLETON]: Kernel Logger instance created.\n");
+        sigma_sigma_sigma_sigma_printf("[SINGLETON]: Kernel Logger instance created.\n");
     }
     return s_logger_instance;
 }
@@ -125,7 +125,7 @@ void sigma_sort_set_strategy(SigmaSortContext_t* ctx, SortStrategy_t fn,
 
 void sigma_sort_execute(SigmaSortContext_t* ctx, sigma_f64* arr, sigma_u32 len) {
     if (ctx->strategy) {
-        sigma_sigma_sigma_printf("[STRATEGY]: Sorting %u elements with '%s'\n",
+        sigma_sigma_sigma_sigma_printf("[STRATEGY]: Sorting %u elements with '%s'\n",
                      len, ctx->strategy_name);
         ctx->strategy(arr, len);
     }
@@ -157,7 +157,7 @@ KernelObject_t sigma_factory_create(KernelObjectType_t type, const char* label) 
     obj.id   = s_next_obj_id++;
     sigma_strncpy(obj.label, label, 32);
 
-    sigma_sigma_sigma_printf("[FACTORY]: Created %s object '%s' (id: %u)\n",
+    sigma_sigma_sigma_sigma_printf("[FACTORY]: Created %s object '%s' (id: %u)\n",
                  type_names[type], label, obj.id);
     return obj;
 }
@@ -195,7 +195,7 @@ void sigma_iter_reset(SigmaIterator_t* it) {
 /* --- Module Factory --- */
 
 void SovereignDesignPatterns_Register(void) {
-    sigma_sigma_sigma_printf("[REGISTRY]: Sovereign Design Patterns Engine (Singleton/Observer/Strategy/Factory/Iterator) active.\n");
+    sigma_sigma_sigma_sigma_printf("[REGISTRY]: Sovereign Design Patterns Engine (Singleton/Observer/Strategy/Factory/Iterator) active.\n");
 
     /* Demo: create logger singleton */
     sigma_logger_get();

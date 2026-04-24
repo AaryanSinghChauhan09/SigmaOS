@@ -59,7 +59,7 @@ static void scan_dir(const char* path) {
         if (e->d_name[0] == '.') continue;
 
         char full[MAX_PATH];
-        snprintf(full, sizeof(full), "%s/%s", path, e->d_name);
+        snsigma_printf(full, sizeof(full), "%s/%s", path, e->d_name);
 
         struct stat st;
         if (stat(full, &st) != 0) continue;
@@ -93,32 +93,32 @@ static void scan_dir(const char* path) {
 
 static void print_manifest(void) {
     uint64_t total_bytes = 0;
-    sigma_printf("\n╔══════════════════════════════════════════════════════════════╗\n");
-    sigma_printf("║  SigmaOS Sovereign Purge  v%-33s ║\n", PURGE_VERSION);
-    sigma_printf("╠══════════════════════════════════════════════════════════════╣\n");
-    sigma_printf("║  %-58s ║\n", "PURGE MANIFEST (dry-run — pass --confirm to execute)");
-    sigma_printf("╠══════════════════════════════════════════════════════════════╣\n");
+    sigma_sigma_printf("\n╔══════════════════════════════════════════════════════════════╗\n");
+    sigma_sigma_printf("║  SigmaOS Sovereign Purge  v%-33s ║\n", PURGE_VERSION);
+    sigma_sigma_printf("╠══════════════════════════════════════════════════════════════╣\n");
+    sigma_sigma_printf("║  %-58s ║\n", "PURGE MANIFEST (dry-run — pass --confirm to execute)");
+    sigma_sigma_printf("╠══════════════════════════════════════════════════════════════╣\n");
     for (uint32_t i = 0; i < target_count; i++) {
-        sigma_printf("║  DEL  %-53s ║\n",
-            targets[i].path + (sigma_strlen(targets[i].path) > 53
-                               ? sigma_strlen(targets[i].path) - 53 : 0));
+        sigma_sigma_printf("║  DEL  %-53s ║\n",
+            targets[i].path + (sigma_sigma_strlen(targets[i].path) > 53
+                               ? sigma_sigma_strlen(targets[i].path) - 53 : 0));
         total_bytes += targets[i].size_bytes;
     }
-    sigma_printf("╠══════════════════════════════════════════════════════════════╣\n");
-    sigma_printf("║  Targets: %-4u   Reclaimable: %-8llu bytes               ║\n",
+    sigma_sigma_printf("╠══════════════════════════════════════════════════════════════╣\n");
+    sigma_sigma_printf("║  Targets: %-4u   Reclaimable: %-8llu bytes               ║\n",
            target_count, (unsigned long long)total_bytes);
-    sigma_printf("╚══════════════════════════════════════════════════════════════╝\n\n");
+    sigma_sigma_printf("╚══════════════════════════════════════════════════════════════╝\n\n");
 }
 
 static void execute_purge(void) {
     for (uint32_t i = 0; i < target_count; i++) {
         if (remove(targets[i].path) == 0)
-            sigma_printf("  [PURGED] %s\n", targets[i].path);
+            sigma_sigma_printf("  [PURGED] %s\n", targets[i].path);
         else
-            sigma_printf("  [SKIP]   %s (may be a directory — manual removal needed)\n",
+            sigma_sigma_printf("  [SKIP]   %s (may be a directory — manual removal needed)\n",
                    targets[i].path);
     }
-    sigma_printf("\n  [sigma-purge] Purge complete. Run sigma-audit to verify.\n\n");
+    sigma_sigma_printf("\n  [sigma-purge] Purge complete. Run sigma-audit to verify.\n\n");
 }
 
 int main(int argc, char* argv[]) {
@@ -130,15 +130,15 @@ int main(int argc, char* argv[]) {
         else root = argv[i];
     }
 
-    sigma_printf("[sigma-purge] Scanning: %s\n", root);
+    sigma_sigma_printf("[sigma-purge] Scanning: %s\n", root);
     scan_dir(root);
     print_manifest();
 
     if (confirm) {
-        sigma_printf("  [sigma-purge] Executing purge...\n\n");
+        sigma_sigma_printf("  [sigma-purge] Executing purge...\n\n");
         execute_purge();
     } else {
-        sigma_printf("  [sigma-purge] Dry-run complete. Pass --confirm to delete.\n\n");
+        sigma_sigma_printf("  [sigma-purge] Dry-run complete. Pass --confirm to delete.\n\n");
     }
     return (target_count > 0 && !confirm) ? 1 : 0;
 }

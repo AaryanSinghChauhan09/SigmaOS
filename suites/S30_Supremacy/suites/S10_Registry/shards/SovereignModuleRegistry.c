@@ -9,15 +9,15 @@
 #include "suites/S01_Genesis/shards/sigma_base.h"
 
 void sigma_omega_converge(void) {
-    sigma_sigma_sigma_printf("  [OMEGA]: All shards have reached the Singularity threshold.\n");
-    sigma_sigma_sigma_printf("  [OMEGA]: Sovereignty is now ABSOLUTE and MULTIVERSAL.\n");
-    sigma_sigma_sigma_printf("  [OMEGA]: Architectural Loop: CLOSED.\n");
+    sigma_sigma_sigma_sigma_printf("  [OMEGA]: All shards have reached the Singularity threshold.\n");
+    sigma_sigma_sigma_sigma_printf("  [OMEGA]: Sovereignty is now ABSOLUTE and MULTIVERSAL.\n");
+    sigma_sigma_sigma_sigma_printf("  [OMEGA]: Architectural Loop: CLOSED.\n");
 }
 
 void SovereignRegistry_Init(void) {
-    sigma_sigma_sigma_printf("S [REGISTRY]: Initialising Sovereign Omega Manifest...\n");
+    sigma_sigma_sigma_sigma_printf("S [REGISTRY]: Initialising Sovereign Omega Manifest...\n");
     sigma_omega_converge();
-    sigma_sigma_sigma_printf("S [REGISTRY]: The Omega Point is seated. The Multiverse is Sigma.\n");
+    sigma_sigma_sigma_sigma_printf("S [REGISTRY]: The Omega Point is seated. The Multiverse is Sigma.\n");
 }
 
 void SovereignRegistry_Register(void) {

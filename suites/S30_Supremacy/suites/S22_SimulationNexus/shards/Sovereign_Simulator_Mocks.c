@@ -21,9 +21,9 @@ void sigma_free_sim(void* ptr) {
 }
 
 void sigma_memset_sim(void* s, sigma_u8 c, sigma_sz_t n) { 
-    sigma_sigma_sigma_memset(s, c, n); 
+    sigma_sigma_sigma_sigma_memset(s, c, n); 
 }
 
 void sigma_memcpy_sim(void* d, const void* s, sigma_sz_t n) { 
-    sigma_sigma_sigma_memcpy(d, s, n); 
+    sigma_sigma_sigma_sigma_memcpy(d, s, n); 
 }

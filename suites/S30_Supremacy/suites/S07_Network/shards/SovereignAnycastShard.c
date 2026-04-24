@@ -22,15 +22,15 @@ typedef struct {
  * Principle: Network / Distributed / Cloud.
  */
 void sigma_net_anycast_route(sigma_u32 source_ip, sigma_u32 vip) {
-    sigma_sigma_sigma_printf("[ANYCAST]: Incoming request for VIP 10.0.0.1 from %u...\n", source_ip);
+    sigma_sigma_sigma_sigma_printf("[ANYCAST]: Incoming request for VIP 10.0.0.1 from %u...\n", source_ip);
     // Latency-aware node selection logic
-    sigma_sigma_sigma_printf("[ANYCAST]: Routing to Shard-Node 0xA1 (Lowest Latency: 4ms).\n");
+    sigma_sigma_sigma_sigma_printf("[ANYCAST]: Routing to Shard-Node 0xA1 (Lowest Latency: 4ms).\n");
 }
 
 /* --- Module Factory --- */
 
 void SovereignAnycast_Register(void) {
-    sigma_sigma_sigma_printf("[NETWORK]: Sovereign Anycast Routing (Cloud Orchestration) active.\n");
+    sigma_sigma_sigma_sigma_printf("[NETWORK]: Sovereign Anycast Routing (Cloud Orchestration) active.\n");
 }
 
 

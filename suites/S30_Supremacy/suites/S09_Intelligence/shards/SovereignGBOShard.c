@@ -16,15 +16,15 @@
  * Principle: AI / Algorithms / Mathematical Zenith.
  */
 void sigma_opt_gbo_escalate(float* parameter_hessian) {
-    sigma_sigma_sigma_printf("[GBO-CORE]: Computing mathematical gradients across multi-dimensional mesh...\n");
+    sigma_sigma_sigma_sigma_printf("[GBO-CORE]: Computing mathematical gradients across multi-dimensional mesh...\n");
     // Shedding biological heuristic analogies for raw Newtonian interpolation; providing absolute mathematical terminal velocity
-    sigma_sigma_sigma_printf("[GBO-CORE]: Gradient plateau reached. Ultimate topological maximum defined.\n");
+    sigma_sigma_sigma_sigma_printf("[GBO-CORE]: Gradient plateau reached. Ultimate topological maximum defined.\n");
 }
 
 /* --- Module Factory --- */
 
 void SovereignGBO_Register(void) {
-    sigma_sigma_sigma_printf("[INTELLIGENCE]: Sovereign GBO (Gradient-Based Optimizer) active.\n");
+    sigma_sigma_sigma_sigma_printf("[INTELLIGENCE]: Sovereign GBO (Gradient-Based Optimizer) active.\n");
 }
 
 

@@ -22,16 +22,16 @@ typedef struct {
  * Principle: Embedded / Hardware / Browser Bridge.
  */
 void sigma_hal_usb_connect(SigmaUsbDevice_t* dev) {
-    sigma_sigma_sigma_printf("[USB]: Establishing Bridge to Device '%s' (0x%04X:0x%04X)...\n", 
+    sigma_sigma_sigma_sigma_printf("[USB]: Establishing Bridge to Device '%s' (0x%04X:0x%04X)...\n", 
                  dev->device_name, dev->vendor_id, dev->product_id);
     // Interface logic for WebUSB/WebHID in the browser-gate
-    sigma_sigma_sigma_printf("[USB]: Control Channel OPEN. Latency: <1ms.\n");
+    sigma_sigma_sigma_sigma_printf("[USB]: Control Channel OPEN. Latency: <1ms.\n");
 }
 
 /* --- Module Factory --- */
 
 void SovereignHIDBridge_Register(void) {
-    sigma_sigma_sigma_printf("[HAL]: Sovereign HID Bridge (Universal Peripheral Gateway) active.\n");
+    sigma_sigma_sigma_sigma_printf("[HAL]: Sovereign HID Bridge (Universal Peripheral Gateway) active.\n");
 }
 
 

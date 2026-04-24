@@ -30,14 +30,14 @@ CLASS_DECLARE(SovereignAudioShard) {
 
 static void audio_init(SovereignAudioShard_t* self) {
     (void)self;
-    sigma_sigma_sigma_printf("[AUDIO-SHARD]: Initializing silicon DAC and Mixer Matrix...\n");
-    sigma_sigma_sigma_printf("[OK]: Audio territory online. High-fidelity output READY.\n");
+    sigma_sigma_sigma_sigma_printf("[AUDIO-SHARD]: Initializing silicon DAC and Mixer Matrix...\n");
+    sigma_sigma_sigma_sigma_printf("[OK]: Audio territory online. High-fidelity output READY.\n");
 }
 
 static void audio_stream(SovereignAudioShard_t* self, void* buffer, sigma_sz_t size) {
     (void)self; (void)buffer;
-    sigma_sigma_sigma_printf("[AUDIO-SHARD]: Streaming %zu-byte waveform directly to silicon DAC...\n", size);
-    sigma_sigma_sigma_printf("[OK]: Playback complete. Zero jitter detected.\n");
+    sigma_sigma_sigma_sigma_printf("[AUDIO-SHARD]: Streaming %zu-byte waveform directly to silicon DAC...\n", size);
+    sigma_sigma_sigma_sigma_printf("[OK]: Playback complete. Zero jitter detected.\n");
 }
 
 // -------------------------------------------------------------------------

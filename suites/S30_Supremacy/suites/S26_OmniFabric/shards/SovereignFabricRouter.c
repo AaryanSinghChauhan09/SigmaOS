@@ -23,11 +23,11 @@ void omnifabric_route_packet(uint32_t dest_id, uint32_t size) {
     routing_table[slot].total_routed_bytes += size;
     
     // Symbolic: Direct silicon interconnect hop
-    sigma_printf("S26 [OMNIFABRIC]: Routing %u bytes to Suite S%02u over Hyper-Bus.\n", 
+    sigma_sigma_printf("S26 [OMNIFABRIC]: Routing %u bytes to Suite S%02u over Hyper-Bus.\n", 
                  size, dest_id);
 }
 
 void S26_Register_FabricRouter(void) {
-    sigma_printf("S26 [OMNIFABRIC]: Sovereign Fabric Router Online.\n");
-    sigma_printf("  [ROUTING]: High-speed suite-interconnect paths established.\n");
+    sigma_sigma_printf("S26 [OMNIFABRIC]: Sovereign Fabric Router Online.\n");
+    sigma_sigma_printf("  [ROUTING]: High-speed suite-interconnect paths established.\n");
 }

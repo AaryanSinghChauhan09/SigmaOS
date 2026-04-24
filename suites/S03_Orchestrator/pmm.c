@@ -204,8 +204,8 @@ void pmm_free_page(paddr_t pa) { pmm_free(pa, 0); }
  * ========================================================================= */
 void pmm_audit(void) {
     /* kernel serial print shim */
-    extern void kprintf(const char* fmt, ...);
-    kprintf("[PMM]: Free=%llu/%llu pages | Allocs=%llu | Frees=%llu\n",
+    extern void ksigma_printf(const char* fmt, ...);
+    ksigma_printf("[PMM]: Free=%llu/%llu pages | Allocs=%llu | Frees=%llu\n",
             g_pmm.free_pages, g_pmm.total_pages,
             g_pmm.alloc_calls, g_pmm.free_calls);
 }

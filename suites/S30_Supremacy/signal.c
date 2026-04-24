@@ -29,16 +29,16 @@ typedef struct SignalHandler {
  * ========================================================================= */
 
 void signal_init(void) {
-    // kprintf("[SIGNAL]: Sovereign POSIX-Signal Shard Online.\n");
+    // ksigma_printf("[SIGNAL]: Sovereign POSIX-Signal Shard Online.\n");
 }
 
 k_status signal_deliver(u32 tid, u32 signum) {
     /* Dispatch signal to the target task (tid) in the scheduler queue */
-    // kprintf("[SIGNAL]: Delivering POSIX Signal %u to TID %u...\n", signum, tid);
+    // ksigma_printf("[SIGNAL]: Delivering POSIX Signal %u to TID %u...\n", signum, tid);
     
     if (signum == SIGKILL) {
         /* Immediate task termination shard */
-        // kprintf("[SIGNAL]: Shard TID %u Terminated via SIGKILL.\n", tid);
+        // ksigma_printf("[SIGNAL]: Shard TID %u Terminated via SIGKILL.\n", tid);
     }
     
     return K_OK;
@@ -46,5 +46,5 @@ k_status signal_deliver(u32 tid, u32 signum) {
 
 void signal_register_handler(u32 tid, u32 signum, u64 handler) {
     /* Register a userland handler for a specific signal */
-    // kprintf("[SIGNAL]: Registered TID %u Handler for Signal %u @ 0x%llx\n", tid, signum, handler);
+    // ksigma_printf("[SIGNAL]: Registered TID %u Handler for Signal %u @ 0x%llx\n", tid, signum, handler);
 }

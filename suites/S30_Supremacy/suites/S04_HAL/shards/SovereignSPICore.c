@@ -102,7 +102,7 @@ sigma_err_t sigma_spi_register_controller(SigmaSPIController_t *ctrl) {
     s_spi_controllers[s_spi_ctrl_count++] = *ctrl;
     s_spi_controllers[ctrl->bus_num].online = SIGMA_TRUE;
     
-    sigma_sigma_sigma_printf("S [SPI]: Registered SPI Controller spi%u (CS max: %u)\n", 
+    sigma_sigma_sigma_sigma_printf("S [SPI]: Registered SPI Controller spi%u (CS max: %u)\n", 
                  ctrl->bus_num, ctrl->num_chipselect);
     return SIGMA_OK;
 }
@@ -112,12 +112,12 @@ SigmaSPIDevice_t* sigma_spi_new_device(SigmaSPIController_t *ctrl, sigma_u8 cs) 
     if (s_spi_dev_count >= SPI_MAX_DEVICES) return SIGMA_NULL;
     
     SigmaSPIDevice_t *dev = &s_spi_devices[s_spi_dev_count++];
-    sigma_sigma_sigma_memset(dev, 0, sizeof(*dev));
+    sigma_sigma_sigma_sigma_memset(dev, 0, sizeof(*dev));
     dev->controller = ctrl;
     dev->chip_select = cs;
     dev->online = SIGMA_TRUE;
     
-    sigma_sigma_sigma_printf("S [SPI]: Registered SPI Slave spi%u.%u\n", ctrl->bus_num, cs);
+    sigma_sigma_sigma_sigma_printf("S [SPI]: Registered SPI Slave spi%u.%u\n", ctrl->bus_num, cs);
     return dev;
 }
 
@@ -154,8 +154,8 @@ sigma_err_t sigma_spi_write_then_read(SigmaSPIDevice_t *spi,
     SigmaSPIMessage_t msg;
     SigmaSPITransfer_t x[2];
     
-    sigma_sigma_sigma_memset(&msg,  0, sizeof(msg));
-    sigma_sigma_sigma_memset(&x, 0, sizeof(x));
+    sigma_sigma_sigma_sigma_memset(&msg,  0, sizeof(msg));
+    sigma_sigma_sigma_sigma_memset(&x, 0, sizeof(x));
     
     x[0].tx_buf = txbuf;
     x[0].len = n_tx;
@@ -176,7 +176,7 @@ sigma_err_t sigma_spi_write_then_read(SigmaSPIDevice_t *spi,
  * ¦¦ HARDWARE MOCK (BCM2835 style SPI)
  * ----------------------------------------------------------------------- */
 static sigma_err_t mock_spi_setup(SigmaSPIDevice_t *spi) {
-    sigma_sigma_sigma_printf("S [SPI-HW]: Target config -> Mode: %u, BPW: %u, Max Speed: %u Hz\n",
+    sigma_sigma_sigma_sigma_printf("S [SPI-HW]: Target config -> Mode: %u, BPW: %u, Max Speed: %u Hz\n",
                  spi->mode, spi->bits_per_word, spi->max_speed_hz);
     return SIGMA_OK;
 }
@@ -184,15 +184,15 @@ static sigma_err_t mock_spi_setup(SigmaSPIDevice_t *spi) {
 static sigma_err_t mock_spi_transfer(SigmaSPIDevice_t *spi, SigmaSPIMessage_t *msg) {
     SigmaSPITransfer_t *t = msg->transfers;
     while (t) {
-        sigma_sigma_sigma_printf("S [SPI-HW]: Target spi%u.%u -> XFER Len: %u [TX: %p, RX: %p]\n",
+        sigma_sigma_sigma_sigma_printf("S [SPI-HW]: Target spi%u.%u -> XFER Len: %u [TX: %p, RX: %p]\n",
                      spi->controller->bus_num, spi->chip_select, t->len, t->tx_buf, t->rx_buf);
         msg->actual_length += t->len;
         
         /* Simulated loopback for RX */
         if (t->rx_buf && t->tx_buf) {
-            sigma_sigma_sigma_memcpy(t->rx_buf, t->tx_buf, t->len);
+            sigma_sigma_sigma_sigma_memcpy(t->rx_buf, t->tx_buf, t->len);
         } else if (t->rx_buf) {
-            sigma_sigma_sigma_memset(t->rx_buf, 0xAA, t->len);
+            sigma_sigma_sigma_sigma_memset(t->rx_buf, 0xAA, t->len);
         }
 
         t = t->next;
@@ -205,11 +205,11 @@ static sigma_err_t mock_spi_transfer(SigmaSPIDevice_t *spi, SigmaSPIMessage_t *m
  * ¦¦ INITIALISATION
  * ----------------------------------------------------------------------- */
 void SovereignSPICore_Init(void) {
-    sigma_sigma_sigma_printf("S [SPI]: Initialising Sovereign Serial Peripheral Interface Core...\n");
+    sigma_sigma_sigma_sigma_printf("S [SPI]: Initialising Sovereign Serial Peripheral Interface Core...\n");
 
     /* Register Controller */
     SigmaSPIController_t ctrl;
-    sigma_sigma_sigma_memset(&ctrl, 0, sizeof(ctrl));
+    sigma_sigma_sigma_sigma_memset(&ctrl, 0, sizeof(ctrl));
     ctrl.num_chipselect = 2;
     ctrl.setup = mock_spi_setup;
     ctrl.transfer = mock_spi_transfer;
@@ -231,10 +231,10 @@ void SovereignSPICore_Init(void) {
         sigma_u8 cmd = 0x9F;
         sigma_u8 rx[3];
         sigma_spi_write_then_read(flash, &cmd, 1, rx, 3);
-        sigma_sigma_sigma_printf("S [SPI]: Read JEDEC ID: %02X %02X %02X\n", rx[0], rx[1], rx[2]);
+        sigma_sigma_sigma_sigma_printf("S [SPI]: Read JEDEC ID: %02X %02X %02X\n", rx[0], rx[1], rx[2]);
     }
 
-    sigma_sigma_sigma_printf("S [SPI]: SPI Core online. High-speed serial sovereignty achieved.\n");
+    sigma_sigma_sigma_sigma_printf("S [SPI]: SPI Core online. High-speed serial sovereignty achieved.\n");
 }
 
 

@@ -10,9 +10,9 @@
  */
 
 sigma_err_t sigma_power_init(void) {
-    sigma_sigma_sigma_printf("  S [POWER]: Sovereign Power Governor online.\n");
-    sigma_sigma_sigma_printf("  S [POWER]: ACPI/DeviceTree state transitions mapped.\n");
-    sigma_sigma_sigma_printf("  S [POWER]: CPU P-states: dynamic scaling active.\n");
+    sigma_sigma_sigma_sigma_printf("  S [POWER]: Sovereign Power Governor online.\n");
+    sigma_sigma_sigma_sigma_printf("  S [POWER]: ACPI/DeviceTree state transitions mapped.\n");
+    sigma_sigma_sigma_sigma_printf("  S [POWER]: CPU P-states: dynamic scaling active.\n");
     return SIGMA_OK;
 }
 

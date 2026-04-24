@@ -16,15 +16,15 @@
  * Principle: AI / Algorithms / Data Science.
  */
 void sigma_opt_firefly_attract(float* f1, float* f2, float attraction_coeff) {
-    sigma_sigma_sigma_printf("[FIREFLY]: Computing brightness-based attraction (Coeff: %.2f)...\n", attraction_coeff);
+    sigma_sigma_sigma_sigma_printf("[FIREFLY]: Computing brightness-based attraction (Coeff: %.2f)...\n", attraction_coeff);
     // Real bio-inspired movement logic: beta = beta0 * exp(-gamma * r^2)
-    sigma_sigma_sigma_printf("[FIREFLY]: Parameters converging on high-intensity optima.\n");
+    sigma_sigma_sigma_sigma_printf("[FIREFLY]: Parameters converging on high-intensity optima.\n");
 }
 
 /* --- Module Factory --- */
 
 void SovereignFirefly_Register(void) {
-    sigma_sigma_sigma_printf("[INTELLIGENCE]: Sovereign Firefly (Bioluminescent Optima) active.\n");
+    sigma_sigma_sigma_sigma_printf("[INTELLIGENCE]: Sovereign Firefly (Bioluminescent Optima) active.\n");
 }
 
 

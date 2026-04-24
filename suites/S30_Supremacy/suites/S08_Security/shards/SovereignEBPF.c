@@ -33,20 +33,20 @@ CLASS_DECLARE(SovereignEBPF) {
 
 static void ebpf_load_program(SovereignEBPF_t* self, void* bytecode, sigma_sz_t size) {
     (void)self; (void)bytecode;
-    sigma_sigma_sigma_printf("[EBPF-CORE]: Sharding bytecode enclave (%zu bytes) into kernel JIT territory...\n", size);
-    sigma_sigma_sigma_printf("[OK]: Program sharded and verified for safety.\n");
+    sigma_sigma_sigma_sigma_printf("[EBPF-CORE]: Sharding bytecode enclave (%zu bytes) into kernel JIT territory...\n", size);
+    sigma_sigma_sigma_sigma_printf("[OK]: Program sharded and verified for safety.\n");
 }
 
 static void ebpf_run_hook(SovereignEBPF_t* self, int hook_type) {
     (void)self;
-    sigma_sigma_sigma_printf("[EBPF-CORE]: Triggering Hook ID: %d...\n", hook_type);
-    sigma_sigma_sigma_printf("[OK]: Observability data sharded to telemetry dashboard.\n");
+    sigma_sigma_sigma_sigma_printf("[EBPF-CORE]: Triggering Hook ID: %d...\n", hook_type);
+    sigma_sigma_sigma_sigma_printf("[OK]: Observability data sharded to telemetry dashboard.\n");
 }
 
 static void ebpf_jit_compile(SovereignEBPF_t* self) {
     (void)self;
-    sigma_sigma_sigma_printf("[EBPF-CORE]: Initiating JIT compilation to native silicon instructions...\n");
-    sigma_sigma_sigma_printf("[OK]: Native sharding complete. Execution latency minimized.\n");
+    sigma_sigma_sigma_sigma_printf("[EBPF-CORE]: Initiating JIT compilation to native silicon instructions...\n");
+    sigma_sigma_sigma_sigma_printf("[OK]: Native sharding complete. Execution latency minimized.\n");
 }
 
 // -------------------------------------------------------------------------

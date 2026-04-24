@@ -16,16 +16,16 @@
  * Principle: Distributed / Multi-Processing / Throughput.
  */
 void sigma_dist_paling_migrate(sigma_u32 task_id, sigma_u32 target_node_id) {
-    sigma_sigma_sigma_printf("[WORK-PALING]: Migrating Task %u to Node %u via Anycast-Fabric...\n", 
+    sigma_sigma_sigma_sigma_printf("[WORK-PALING]: Migrating Task %u to Node %u via Anycast-Fabric...\n", 
                  task_id, target_node_id);
     // Remote DMA (RDMA) trigger for zero-copy task transfer
-    sigma_sigma_sigma_printf("[WORK-PALING]: Task Seated at distant node. Load-balancing COMPLETE.\n");
+    sigma_sigma_sigma_sigma_printf("[WORK-PALING]: Task Seated at distant node. Load-balancing COMPLETE.\n");
 }
 
 /* --- Module Factory --- */
 
 void SovereignWorkPaling_Register(void) {
-    sigma_sigma_sigma_printf("[ORCHESTRATOR]: Sovereign Work-Paling (Distributed Balancing) active.\n");
+    sigma_sigma_sigma_sigma_printf("[ORCHESTRATOR]: Sovereign Work-Paling (Distributed Balancing) active.\n");
 }
 
 

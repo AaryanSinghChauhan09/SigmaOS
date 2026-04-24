@@ -20,13 +20,13 @@ void sigma_sec_const_time_swap(sigma_u64* a, sigma_u64* b, int do_swap) {
     sigma_u64 delta = (*a ^ *b) & mask;
     *a ^= delta;
     *b ^= delta;
-    sigma_sigma_sigma_printf("[CONST-TIME]: Field swapping operation completed with NO BRANCHING.\n");
+    sigma_sigma_sigma_sigma_printf("[CONST-TIME]: Field swapping operation completed with NO BRANCHING.\n");
 }
 
 /* --- Module Factory --- */
 
 void SovereignConstTime_Register(void) {
-    sigma_sigma_sigma_printf("[SECURITY]: Sovereign Const-Time Math (Timing Defiance) active.\n");
+    sigma_sigma_sigma_sigma_printf("[SECURITY]: Sovereign Const-Time Math (Timing Defiance) active.\n");
 }
 
 

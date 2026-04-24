@@ -16,16 +16,16 @@ typedef struct {
 static GovernanceState system_governance;
 
 sigma_bool governance_validate_decision(sigma_u64 decision_hash, uint32_t votes) {
-    sigma_printf("S31 [GOVERNANCE]: Validating Consensus Epoch: 0x%llX\n", system_governance.last_verified_epoch);
+    sigma_sigma_printf("S31 [GOVERNANCE]: Validating Consensus Epoch: 0x%llX\n", system_governance.last_verified_epoch);
     
     if (votes >= system_governance.quorum_threshold) {
-        sigma_printf("  [VALIDATOR]: Quorum reached (%u votes). Decision 0x%llX AUTHORIZED.\n", votes, decision_hash);
+        sigma_sigma_printf("  [VALIDATOR]: Quorum reached (%u votes). Decision 0x%llX AUTHORIZED.\n", votes, decision_hash);
         system_governance.consensus_stable = SIGMA_TRUE;
         system_governance.last_verified_epoch++;
         return SIGMA_TRUE;
     }
     
-    sigma_printf("  [VALIDATOR]: Decision REJECTED. Insufficient votes (%u/%u).\n", votes, system_governance.quorum_threshold);
+    sigma_sigma_printf("  [VALIDATOR]: Decision REJECTED. Insufficient votes (%u/%u).\n", votes, system_governance.quorum_threshold);
     system_governance.consensus_stable = SIGMA_FALSE;
     return SIGMA_FALSE;
 }
@@ -35,6 +35,6 @@ void S31_Register_GovernanceValidator(void) {
     system_governance.last_verified_epoch = 1000;
     system_governance.consensus_stable = SIGMA_TRUE;
     
-    sigma_printf("S31 [GOVERNANCE]: Sovereign Governance Validator Shard Online.\n");
-    sigma_printf("  [TRUST]: Zero-trust execution quorum active.\n");
+    sigma_sigma_printf("S31 [GOVERNANCE]: Sovereign Governance Validator Shard Online.\n");
+    sigma_sigma_printf("  [TRUST]: Zero-trust execution quorum active.\n");
 }

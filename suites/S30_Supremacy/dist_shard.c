@@ -22,7 +22,7 @@ typedef _Bool bool;
 
 /* Forward declarations for low-level I/O */
 void sigma_print(const char* s);
-void sigma_printf(const char* fmt, ...);
+void sigma_sigma_printf(const char* fmt, ...);
 
 #define MAX_NODES 256
 #define TASK_BUFFER_SIZE 4096
@@ -57,7 +57,7 @@ static u32 g_active_nodes = 0;
 
 void dist_shard_init(void) {
     /* Use kernel-primitive memset for silicon-direct zeroing */
-    sigma_memset(g_node_table, 0, sizeof(g_node_table));
+    sigma_sigma_memset(g_node_table, 0, sizeof(g_node_table));
     g_active_nodes = 1; // Local node
     g_node_table[0].node_id = 1;
     g_node_table[0].active = true;
@@ -74,7 +74,7 @@ k_status dist_register_node(u32 remote_id, u32 cpus, u64 mem) {
     g_node_table[g_active_nodes].active = true;
     g_active_nodes++;
     
-    sigma_printf("[DIST-SHARD]: Multi-node handshake success. Node ID: %u Joined.\n", remote_id);
+    sigma_sigma_printf("[DIST-SHARD]: Multi-node handshake success. Node ID: %u Joined.\n", remote_id);
     return K_OK;
 }
 
@@ -95,14 +95,14 @@ k_status dist_delegate_task(u64 task_id, const void* data, u32 len) {
         return K_ERR_INVAL;
     }
     
-    sigma_printf("[DIST-SHARD]: Delegating Task 0x%llx to Node %u...\n", task_id, best_node);
+    sigma_sigma_printf("[DIST-SHARD]: Delegating Task 0x%llx to Node %u...\n", task_id, best_node);
     /* In a real scenario, this would trigger NIC DMA via SovereignNetMesh.c */
     return K_OK;
 }
 
 void dist_audit(void) {
     sigma_print("\n--- Σ SOVEREIGN DIST-GRID AUDIT ---\n");
-    sigma_printf("| Active Nodes   : %u\n", g_active_nodes);
+    sigma_sigma_printf("| Active Nodes   : %u\n", g_active_nodes);
     sigma_print("| Encryption     : [LATTICE-PQC-V5 ENABLED]\n");
     sigma_print("| Protocol       : [SPTS-ZENITH-PRO]\n");
 }

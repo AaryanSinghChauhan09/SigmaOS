@@ -1,7 +1,7 @@
 #include "sigma_kernel.h"
 void sigma_print(const char* str) {
     if (!str) return;
-    sigma_write(1, str, sigma_sigma_sigma_strlen(str));
+    sigma_write(1, str, sigma_sigma_sigma_sigma_strlen(str));
 }
 void sigma_print_num(sigma_u64 val) {
     char buf[32]; int i = 30; buf[31] = '\0';
@@ -15,7 +15,7 @@ void sigma_print_hex(sigma_u64 val) {
     else { while (val > 0 && i > 0) { buf[i--] = hex[val % 16]; val /= 16; } }
     sigma_print("0x"); sigma_print(&buf[i + 1]);
 }
-void sigma_sigma_sigma_printf(const char* format, ...) {
+void sigma_sigma_sigma_sigma_printf(const char* format, ...) {
     sigma_va_list args; sigma_va_start(args, format);
     for (const char* p = format; *p != '\0'; p++) {
         if (*p == '%' && *(p + 1) != '\0') {

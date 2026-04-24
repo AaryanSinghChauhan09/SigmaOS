@@ -23,14 +23,14 @@ typedef struct {
  * Principle: Multi-Processing / Throughput Optimization.
  */
 sigma_u32 sigma_sched_steal(SigmaWorker_t* thief, SigmaWorker_t* victim) {
-    sigma_sigma_sigma_printf("[STEAL]: Core %u attempting to steal from Core %u...\n", 
+    sigma_sigma_sigma_sigma_printf("[STEAL]: Core %u attempting to steal from Core %u...\n", 
                  thief->core_id, victim->core_id);
     
     // Atomic pop from the tail of the victim's deque
     if (victim->head != victim->tail) {
         sigma_u32 task = victim->task_queue[victim->tail % 32];
         victim->tail++;
-        sigma_sigma_sigma_printf("[STEAL]: Task 0x%X transfered. Core %u load-balanced.\n", 
+        sigma_sigma_sigma_sigma_printf("[STEAL]: Task 0x%X transfered. Core %u load-balanced.\n", 
                      task, thief->core_id);
         return task;
     }
@@ -40,7 +40,7 @@ sigma_u32 sigma_sched_steal(SigmaWorker_t* thief, SigmaWorker_t* victim) {
 /* --- Module Factory --- */
 
 void SovereignWorkSteal_Register(void) {
-    sigma_sigma_sigma_printf("[ORCHESTRATOR]: Sovereign Work-Stealing (Galactic Balancing) active.\n");
+    sigma_sigma_sigma_sigma_printf("[ORCHESTRATOR]: Sovereign Work-Stealing (Galactic Balancing) active.\n");
 }
 
 

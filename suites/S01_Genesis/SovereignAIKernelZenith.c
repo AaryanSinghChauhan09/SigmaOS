@@ -29,26 +29,26 @@ private:
 
 public:
     SovereignAIKernel() : m_predictions(0), m_confidence(0.999) {
-        sigma_printf("[AI_KERNEL-ZENITH]: Sovereign Predictive Engine Online.\n");
+        sigma_sigma_printf("[AI_KERNEL-ZENITH]: Sovereign Predictive Engine Online.\n");
     }
 
     const char* type_name() const noexcept override { return "SovereignAIKernel"; }
 
     void predict_user_intent(const char* action) {
-        sigma_printf("[AI_KERNEL-ZENITH]: Analyzing Intent: %s... Prediction [ZENITH_APP_LOAD]\n", action);
+        sigma_sigma_printf("[AI_KERNEL-ZENITH]: Analyzing Intent: %s... Prediction [ZENITH_APP_LOAD]\n", action);
         m_predictions++;
     }
 
     void shard_resources() {
-        sigma_printf("[AI_KERNEL-ZENITH]: Predictive Resource Sharding... Allocation [OPTIMIZED]\n");
+        sigma_sigma_printf("[AI_KERNEL-ZENITH]: Predictive Resource Sharding... Allocation [OPTIMIZED]\n");
     }
 
     void audit() {
-        sigma_printf("\n--- Σ SOVEREIGN AI AUDIT (v12.0) ---\n");
-        sigma_printf("| Predictions    : %llu\n", m_predictions);
-        sigma_printf("| Confidence     : %f%%\n", m_confidence * 100);
-        sigma_printf("| Competitors    : Legacy schedulers (BFS/CFS) neutralized.\n");
-        sigma_printf("--------------------------------------\n");
+        sigma_sigma_printf("\n--- Σ SOVEREIGN AI AUDIT (v12.0) ---\n");
+        sigma_sigma_printf("| Predictions    : %llu\n", m_predictions);
+        sigma_sigma_printf("| Confidence     : %f%%\n", m_confidence * 100);
+        sigma_sigma_printf("| Competitors    : Legacy schedulers (BFS/CFS) neutralized.\n");
+        sigma_sigma_printf("--------------------------------------\n");
     }
 };
 
@@ -64,7 +64,7 @@ extern "C" void start_aikernel_zenith() {
 }
 
 int main() {
-    sigma_printf("[SIGMA_AI]: Bootstrapping AI Kernel Zenith...\n");
+    sigma_sigma_printf("[SIGMA_AI]: Bootstrapping AI Kernel Zenith...\n");
     start_aikernel_zenith();
     return 0;
 }

@@ -6,7 +6,7 @@
 
 #include "sigma_libc.h"
 
-void* sigma_sigma_sigma_memset(void* s, int c, sigma_sz_t n) {
+void* sigma_sigma_sigma_sigma_memset(void* s, int c, sigma_sz_t n) {
     unsigned char* p = (unsigned char*)s;
     while (n--) *p++ = (unsigned char)c;
     return s;
@@ -25,7 +25,7 @@ void* sigma_memmove(void* dest, const void* src, sigma_sz_t n) {
     return dest;
 }
 
-void* sigma_sigma_sigma_memcpy(void* dest, const void* src, sigma_sz_t n) {
+void* sigma_sigma_sigma_sigma_memcpy(void* dest, const void* src, sigma_sz_t n) {
     unsigned char* d = (unsigned char*)dest;
     const unsigned char* s = (const unsigned char*)src;
     while (n--) *d++ = *s++;

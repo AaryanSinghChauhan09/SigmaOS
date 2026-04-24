@@ -2,8 +2,8 @@
 #include "suites/S10_Registry/shards/SovereignLatticeRegistry.h"
 
 void SovereignNixCore_Init() {
-    sigma_sigma_sigma_printf("S [ABSORB]: SovereignNixCore Integration Complete. Global USP Parity Secured.\n");
-    sigma_sigma_sigma_printf("S [NIX]: Declarative configuration engine established. Immutability verified.\n");
+    sigma_sigma_sigma_sigma_printf("S [ABSORB]: SovereignNixCore Integration Complete. Global USP Parity Secured.\n");
+    sigma_sigma_sigma_sigma_printf("S [NIX]: Declarative configuration engine established. Immutability verified.\n");
 }
 
 void SovereignNixCore_Register() {

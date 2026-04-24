@@ -30,16 +30,16 @@ static SovereignPersona_t s_active_persona = {
  * Principle: Personalization / Customization.
  */
 void sigma_persona_apply(void) {
-    sigma_sigma_sigma_printf("[PERSONA]: Applying Profile: %s\n", s_active_persona.user_alias);
+    sigma_sigma_sigma_sigma_printf("[PERSONA]: Applying Profile: %s\n", s_active_persona.user_alias);
     
     // Dispatch to S03_Orchestrator
     if (s_active_persona.scheduler_mode == 2) {
-        sigma_sigma_sigma_printf("[ORCHESTRATOR]: Switch to Hard Real-Time Determinism.\n");
+        sigma_sigma_sigma_sigma_printf("[ORCHESTRATOR]: Switch to Hard Real-Time Determinism.\n");
     }
     
     // Dispatch to S08_Security
     if (s_active_persona.security_rigor == 2) {
-        sigma_sigma_sigma_printf("[SECURITY]: Zero-Trust Heuristic Scan: ARMED.\n");
+        sigma_sigma_sigma_sigma_printf("[SECURITY]: Zero-Trust Heuristic Scan: ARMED.\n");
     }
 }
 
@@ -55,7 +55,7 @@ void sigma_persona_update(sigma_u32 mode, sigma_u32 rigor) {
 /* --- Module Factory --- */
 
 void SovereignPersona_Register(void) {
-    sigma_sigma_sigma_printf("[REGISTRY]: Sovereign Persona Shard active.\n");
+    sigma_sigma_sigma_sigma_printf("[REGISTRY]: Sovereign Persona Shard active.\n");
 }
 
 

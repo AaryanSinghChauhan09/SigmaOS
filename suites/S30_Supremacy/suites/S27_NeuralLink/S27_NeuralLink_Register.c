@@ -4,5 +4,5 @@
 
 void S27_NeuralLink_Register(void) {
     SovereignRegistry_Register("S27_NeuralLink", 0, NULL);
-    sigma_sigma_sigma_printf("S [S27_NeuralLink]: Materialized.\n");
+    sigma_sigma_sigma_sigma_printf("S [S27_NeuralLink]: Materialized.\n");
 }

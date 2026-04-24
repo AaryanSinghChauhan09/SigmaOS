@@ -16,17 +16,17 @@ typedef struct {
 static UnityState global_unity;
 
 void unified_sovereignty_finalize_lattice(void) {
-    sigma_printf("S32 [UNIFIED-SOVEREIGNTY]: Initiating final materialization handshake...\n");
+    sigma_sigma_printf("S32 [UNIFIED-SOVEREIGNTY]: Initiating final materialization handshake...\n");
     
     global_unity.suite_count = 33;
     global_unity.master_integrity_hash = 0xΣF14A1_2026_APEX;
     global_unity.unification_stable = SIGMA_TRUE;
     
-    sigma_printf("  [UNITY]: All 33 suites harmonized. Master Integrity Verified.\n");
-    sigma_printf("  [UNITY]: SigmaOS is now a Unified Sovereign Entity.\n");
+    sigma_sigma_printf("  [UNITY]: All 33 suites harmonized. Master Integrity Verified.\n");
+    sigma_sigma_printf("  [UNITY]: SigmaOS is now a Unified Sovereign Entity.\n");
 }
 
 void S32_Register_UnityShard(void) {
-    sigma_printf("S32 [UNIFIED-SOVEREIGNTY]: Sovereign Unity Shard Online.\n");
+    sigma_sigma_printf("S32 [UNIFIED-SOVEREIGNTY]: Sovereign Unity Shard Online.\n");
     unified_sovereignty_finalize_lattice();
 }

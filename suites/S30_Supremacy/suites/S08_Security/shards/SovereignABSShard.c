@@ -16,15 +16,15 @@
  * Principle: Cyber Security / Sentient Defense.
  */
 void sigma_sec_abs_lock(void* threat_vector) {
-    sigma_sigma_sigma_printf("[ABS-VAULT]: AGI has detected a theoretical behavioral anomaly. Synthesizing novel silicon barriers...\n");
+    sigma_sigma_sigma_sigma_printf("[ABS-VAULT]: AGI has detected a theoretical behavioral anomaly. Synthesizing novel silicon barriers...\n");
     // The security system no longer relies on rules; the AGI actively hallucinates new hardware locks instantly to trap zero-days
-    sigma_sigma_sigma_printf("[ABS-VAULT]: Novel hardware trap synthesized. Threat neutralized before execution.\n");
+    sigma_sigma_sigma_sigma_printf("[ABS-VAULT]: Novel hardware trap synthesized. Threat neutralized before execution.\n");
 }
 
 /* --- Module Factory --- */
 
 void SovereignABS_Register(void) {
-    sigma_sigma_sigma_printf("[SECURITY]: Sovereign ABS (Sentient Hardware Firewall) active.\n");
+    sigma_sigma_sigma_sigma_printf("[SECURITY]: Sovereign ABS (Sentient Hardware Firewall) active.\n");
 }
 
 

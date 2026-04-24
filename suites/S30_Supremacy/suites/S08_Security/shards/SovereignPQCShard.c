@@ -16,15 +16,15 @@
  * Principle: Cyber Security / Quantum Defiance / Absolute Privacy.
  */
 void sigma_sec_pqc_seal(void* payload, sigma_u32 len) {
-    sigma_sigma_sigma_printf("[PQC-VAULT]: Applying Ring-Learning-With-Errors (LWE) encryption to %u bytes...\n", len);
+    sigma_sigma_sigma_sigma_printf("[PQC-VAULT]: Applying Ring-Learning-With-Errors (LWE) encryption to %u bytes...\n", len);
     // Computationally hard lattice math resistant to Shor's algorithm running on Qubits
-    sigma_sigma_sigma_printf("[PQC-VAULT]: Payload sealed. Entangled quantum probing attacks NEUTRALIZED.\n");
+    sigma_sigma_sigma_sigma_printf("[PQC-VAULT]: Payload sealed. Entangled quantum probing attacks NEUTRALIZED.\n");
 }
 
 /* --- Module Factory --- */
 
 void SovereignPQC_Register(void) {
-    sigma_sigma_sigma_printf("[SECURITY]: Sovereign PQC (Quantum-Resistant Vault) active.\n");
+    sigma_sigma_sigma_sigma_printf("[SECURITY]: Sovereign PQC (Quantum-Resistant Vault) active.\n");
 }
 
 

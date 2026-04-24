@@ -18,14 +18,14 @@ static uint8_t g_memory_bitmap[MAX_PAGES / 8];
 
 void pmm_init(uint64_t mem_size) {
     uint32_t total_pages = mem_size / PAGE_SIZE;
-    sigma_sigma_sigma_memset(g_memory_bitmap, 0xFF, sizeof(g_memory_bitmap)); // Mark all as reserved initially
+    sigma_sigma_sigma_sigma_memset(g_memory_bitmap, 0xFF, sizeof(g_memory_bitmap)); // Mark all as reserved initially
     
     // Unreserve available pages (simulated for now)
     for (uint32_t i = 0; i < total_pages; i++) {
         g_memory_bitmap[i / 8] &= ~(1 << (i % 8));
     }
     
-    sigma_sigma_sigma_printf("S [S05]: Bitmap PMM Materialized. Coverage: %u Pages (%llu MB).\n", 
+    sigma_sigma_sigma_sigma_printf("S [S05]: Bitmap PMM Materialized. Coverage: %u Pages (%llu MB).\n", 
                  total_pages, mem_size / 1024 / 1024);
 }
 

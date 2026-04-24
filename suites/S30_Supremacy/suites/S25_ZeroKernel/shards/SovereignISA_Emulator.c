@@ -28,7 +28,7 @@ void sigma_isa_step(SigmaISACpu* cpu) {
             cpu->registers[(instr >> 8) & 0x1F] += cpu->registers[(instr >> 13) & 0x1F];
             break;
         case 0xFF: // HALT
-            sigma_sigma_sigma_printf("S [SigmaISA]: CPU Halted.\n");
+            sigma_sigma_sigma_sigma_printf("S [SigmaISA]: CPU Halted.\n");
             return;
     }
     
@@ -36,5 +36,5 @@ void sigma_isa_step(SigmaISACpu* cpu) {
 }
 
 void isa_emulator_init(void) {
-    sigma_sigma_sigma_printf("S [S25]: SigmaISA Emulator Materialized (Apex Idea 60.2).\n");
+    sigma_sigma_sigma_sigma_printf("S [S25]: SigmaISA Emulator Materialized (Apex Idea 60.2).\n");
 }
