@@ -11,7 +11,7 @@ jobs:
     name: Static Analysis & Lint
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
 
       - name: Install Analysis Tools
         run: sudo apt-get install -y cppcheck clang-tidy
@@ -28,7 +28,7 @@ jobs:
     name: Formal Proofs (Kani)
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
       - name: Set up Rust (stable)
         uses: dtolnay/rust-toolchain@stable
       - name: Run Kani Proofs
@@ -42,7 +42,7 @@ jobs:
     name: Entropy Stress Test (S-FUZZ)
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
       - name: Build S-CLI
         run: g++ -std=c++20 s-cli.cpp -o s-cli
       - name: Run Lattice Fuzzer
