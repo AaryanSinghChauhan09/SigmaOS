@@ -1,6 +1,6 @@
 # Σ SIGMAOS: THE SOVEREIGN SILICON ENTITY
 
-[![SigmaOS CI](https://github.com/SovereignArchitectSinghChauhan09/SigmaOS/actions/workflows/ci.yml/badge.svg)](https://github.com/SovereignArchitectSinghChauhan09/SigmaOS/actions/workflows/ci.yml)
+[![SigmaOS CI](https://github.com/Sovereign-OS/SigmaOS/actions/workflows/ci.yml/badge.svg)](https://github.com/Sovereign-OS/SigmaOS/actions/workflows/ci.yml)
 
 SigmaOS is an industrial-grade, zero-dependency operating system built on the **Sovereign Lattice**. It runs bare-metal on AArch64 (Raspberry Pi) and RISC-V silicon, bypassing POSIX and legacy abstractions to deliver hardware-native performance.
 
@@ -92,7 +92,7 @@ cargo kani --manifest-path suites/S08_Security/formal_proofs/Cargo.toml
 
 See [CONTRIBUTING.md](CONTRIBUTING.md) for build setup, shard architecture, and PR guidelines.
 
-**Contact**: [SovereignArchitectsinghchauhan090305@gmail.com](mailto:SovereignArchitectsinghchauhan090305@gmail.com) | [GitHub @SovereignArchitectSinghChauhan09](https://github.com/SovereignArchitectSinghChauhan09)
+**Contact**: [Sovereign-OS0305@gmail.com](mailto:Sovereign-OS0305@gmail.com) | [GitHub @Sovereign-OS](https://github.com/Sovereign-OS)
 
 ---
 

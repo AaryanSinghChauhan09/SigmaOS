@@ -16,7 +16,7 @@ version     = "1.0.0"
 edition     = "2021"
 authors     = ["SigmaOS Contributors"]
 license     = "Apache-2.0"
-repository  = "https://github.com/SovereignArchitectSinghChauhan09/SigmaOS"
+repository  = "https://github.com/Sovereign-OS/SigmaOS"
 
 [workspace.dependencies]
 # Zero external deps philosophy — only these are permitted at workspace level
