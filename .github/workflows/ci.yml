@@ -77,12 +77,12 @@ jobs:
           chmod +x ./run_sigma_tests.sh || true
           echo "[CI] Build scripts are executable"
 
-      - name: Run integration tests (Unix)
+      - name: Build Sovereign Lattice (Native)
         if: runner.os != 'Windows'
         run: |
-          if [ -f run_sigma_tests.sh ]; then
-            bash run_sigma_tests.sh || echo "[WARN] Test script returned non-zero; review output."
-          fi
+          g++ -std=c++20 s-cli.cpp -o s-cli
+          ./s-cli build
+          ./s-cli test
 
       - name: Run integration tests (Windows)
         if: runner.os == 'Windows'

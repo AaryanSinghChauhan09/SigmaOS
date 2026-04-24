@@ -34,40 +34,25 @@ SigmaOS is an industrial-grade, zero-dependency operating system built on the **
 
 ---
 
-### Build (Linux / macOS)
+### Unified Workflow (S-CLI)
+
+The **Sigma Sovereign CLI (`s-cli`)** is the recommended tool for managing the Sovereign Lattice.
 
 ```bash
-# 1. Clone
-git clone https://github.com/AaryanSinghChauhan09/SigmaOS.git
-cd SigmaOS
+# 1. Compile Native CLI
+g++ -std=c++20 s-cli.cpp -o s-cli
 
-# 2. Install Rust nightly with bare-metal targets
-rustup toolchain install nightly
-rustup target add aarch64-unknown-none riscv64imac-unknown-none-elf
+# 2. Build the kernel (default x86_64)
+./s-cli build
 
-# 3. Install JS dependencies (Zenith UI linting)
-npm ci
+# 3. Build for a specific architecture
+./s-cli build --arch aarch64
 
-# 4. Build the Sovereign Lattice
-chmod +x ./build_sovereign.sh
-./build_sovereign.sh
-
-# 5. Run integrity tests
-chmod +x ./run_sigma_tests.sh
-./run_sigma_tests.sh
+# 4. Boot in QEMU
+./s-cli run
 ```
 
-### Build (Windows)
-
-```powershell
-# Build
-powershell -File build_sovereign.ps1
-
-# Test
-powershell -File run_sigma_tests.ps1
-```
-
-### Build via Makefile
+### Build via Makefile (Legacy Wrapper)
 
 ```bash
 make              # x86_64

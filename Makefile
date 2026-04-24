@@ -6,9 +6,9 @@
 
 ARCH      ?= x86_64
 PYTHON    := python3
-BUILDER   := scripts/sovereign_builder.py
+BUILDER   := ./scripts/orchestrator
 ISO_SCRIPT := scripts/build_iso.sh
-BUILD_DIR := build/$(ARCH)
+BUILD_DIR := build
 
 .PHONY: all x86_64 aarch64 riscv64 iso clean run test help
 
@@ -19,15 +19,15 @@ all: x86_64
 
 x86_64:
 	@echo "[*] Building SigmaOS for x86_64..."
-	@$(PYTHON) $(BUILDER) x86_64
+	@$(PYTHON) $(BUILDER) build --arch x86_64
 
 aarch64:
 	@echo "[*] Building SigmaOS for ARM64..."
-	@$(PYTHON) $(BUILDER) aarch64
+	@$(PYTHON) $(BUILDER) build --arch aarch64
 
 riscv64:
 	@echo "[*] Building SigmaOS for RISC-V 64..."
-	@$(PYTHON) $(BUILDER) riscv64
+	@$(PYTHON) $(BUILDER) build --arch riscv64
 
 ## ── Image Packaging ──────────────────────────────────────
 
@@ -58,8 +58,7 @@ scaffold-%:
 
 clean:
 	@echo "[*] Cleaning build artifacts..."
-	@rm -rf build/
-	@find modules/ -name "*.o" -delete
+	@$(PYTHON) $(BUILDER) clean
 	@echo "[+] Clean complete."
 
 ## ── Module Graph ─────────────────────────────────────────

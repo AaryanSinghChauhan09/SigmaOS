@@ -1,0 +1,14 @@
+{
+    "arch": "x86_64",
+    "features": {
+        "network": true,
+        "gui": true,
+        "observability": false,
+        "ai": true,
+        "web3": true,
+        "zkp": true
+    },
+    "build": {
+        "channel": "stable"
+    }
+}

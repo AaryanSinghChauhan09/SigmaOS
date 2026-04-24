@@ -26,6 +26,13 @@
         "default_pool_pages":   16,
         "heap_limit_mb":        256
     },
+ 
+    "personalization": {
+        "sovereign_name":   "Aaryan",
+        "theme":            "obsidian",
+        "font_scaling":     1.1,
+        "focus_mode":       false
+    },
 
     "build": {
         "version_major":    12,
