@@ -5,7 +5,8 @@
 //! This is the production persistence backend for distributed shard state.
 //! =============================================================================
 
-#![no_std]
+//! =============================================================================
+//! Σ SIGMAOS: CRDT PERSISTENCE BACKEND
 
 extern crate alloc;
 
@@ -56,11 +57,7 @@ impl PersistenceOps for CrdtPersistenceStore {
         this.checkpoint_counter += 1;
         Ok(CheckpointHandle {
             shard_id: shard_id.clone(),
-            checkpoint_id: {
-                let mut s = String::from("crdt-chkpt-");
-                s.push_str(&this.checkpoint_counter.to_string());
-                s
-            },
+            checkpoint_id: alloc::format!("crdt-chkpt-{}", this.checkpoint_counter),
         })
     }
 

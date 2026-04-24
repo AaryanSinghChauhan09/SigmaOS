@@ -5,10 +5,8 @@
 //! Defines the interface between SigmaOS shards and storage backends (CRDT,
 //! in-memory, disk) to ensure durability and fault-tolerance across the lattice.
 //!
-//! Standard: `#![no_std]`, bare-metal compatible
+//! Standard: bare-metal compatible
 //! =============================================================================
-
-#![no_std]
 
 extern crate alloc;
 

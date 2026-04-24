@@ -11,10 +11,7 @@
 //!
 //! This implements the `PersistenceOps::replicate()` backend.
 //!
-//! Standard: `#![no_std]`, bare-metal compatible
-//! =============================================================================
-
-#![no_std]
+//! Standard: bare-metal compatible
 
 extern crate alloc;
 

@@ -6,7 +6,7 @@
 //! network CRDT log.
 //! =============================================================================
 
-#![no_std]
+//! Standard: bare-metal compatible
 
 extern crate alloc;
 
