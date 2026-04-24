@@ -29,9 +29,13 @@ impl MockPersistenceStore {
 }
 
 impl PersistenceOps for MockPersistenceStore {
-    fn write(&self, _key: &StateKey, _value: &StateValue) -> Result<(), PersistError> {
+    fn write(&self, seq_id: u64, _key: &StateKey, _value: &StateValue) -> Result<u64, PersistError> {
         if !self.is_online { return Err(PersistError::NetworkFailure); }
-        // Simulated write success
+        Ok(seq_id)
+    }
+
+    fn rollback(&self, _seq_id: u64) -> Result<(), PersistError> {
+        if !self.is_online { return Err(PersistError::NetworkFailure); }
         Ok(())
     }
 
@@ -43,7 +47,7 @@ impl PersistenceOps for MockPersistenceStore {
         })
     }
 
-    fn replicate(&self, _key: &StateKey, _target_shards: &[ShardId]) -> Result<(), PersistError> {
+    fn replicate(&self, _seq_id: u64, _key: &StateKey, _target_shards: &[ShardId]) -> Result<(), PersistError> {
         if !self.is_online { return Err(PersistError::NetworkFailure); }
         Ok(())
     }

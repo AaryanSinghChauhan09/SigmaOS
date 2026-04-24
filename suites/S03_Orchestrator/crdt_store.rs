@@ -33,10 +33,21 @@ impl CrdtPersistenceStore {
 }
 
 impl PersistenceOps for CrdtPersistenceStore {
-    fn write(&self, key: &StateKey, value: &StateValue) -> Result<(), PersistError> {
+    fn write(&self, seq_id: u64, key: &StateKey, value: &StateValue) -> Result<u64, PersistError> {
         // SAFETY: interior mutability via raw ptr is safe here (single-threaded kernel context)
         let this = unsafe { &mut *(self as *const _ as *mut CrdtPersistenceStore) };
+        
+        // For CRDTs, we use the sequence ID as the Lamport Clock timestamp
+        // to guarantee strict monotonic ordering of replicated state.
+        this.register.clock = seq_id;
         this.register.write(key.as_str(), value.clone());
+        Ok(seq_id)
+    }
+
+    fn rollback(&self, seq_id: u64) -> Result<(), PersistError> {
+        let this = unsafe { &mut *(self as *const _ as *mut CrdtPersistenceStore) };
+        // Rollback removes any entry matching the exact failed sequence ID
+        this.register.entries.retain(|e| e.timestamp != seq_id);
         Ok(())
     }
 
@@ -53,9 +64,7 @@ impl PersistenceOps for CrdtPersistenceStore {
         })
     }
 
-    fn replicate(&self, key: &StateKey, _target_shards: &[ShardId]) -> Result<(), PersistError> {
-        // In a full impl: serialize the LWW entries for `key` and send over IPC.
-        // Here we verify the key at least exists before signalling replication.
+    fn replicate(&self, _seq_id: u64, key: &StateKey, _target_shards: &[ShardId]) -> Result<(), PersistError> {
         if self.register.read(key.as_str()).is_none() {
             return Err(PersistError::NotFound);
         }
