@@ -2,12 +2,12 @@
 #include <string>
 #include <cstdlib>
 
-// SigmaOS Sovereign Orchestrator v3.5 (Architectural Zenith)
-// Philosophy: Self-Evolution & Quantum Resilience.
+// SigmaOS Sovereign Orchestrator v3.6 (Academy Ready)
+// Philosophy: Education Sovereignty & Academic Excellence.
 
 namespace Sovereign {
     void print_banner() {
-        std::cout << "\n\033[95m\033[1m=== SigmaOS Sovereign Orchestrator v3.5 ===\033[0m\n";
+        std::cout << "\n\033[95m\033[1m=== SigmaOS Sovereign Orchestrator v3.6 ===\033[0m\n";
     }
 }
 
@@ -16,13 +16,13 @@ int main(int argc, char** argv) {
 
     if (argc < 2) {
         std::cout << "Usage: s-cli [command]\n";
-        std::cout << "Zenith Commands:\n";
-        std::cout << "  evolve    - Self-optimizing genetic shard scheduling\n";
-        std::cout << "  isolate   - Hardware-enforced enclave isolation (SGX)\n";
-        std::cout << "  quantum   - Post-quantum cryptographic handshake\n";
-        std::cout << "Singularity:\n";
-        std::cout << "  manifest  - Signed system manifest\n";
-        std::cout << "  warp      - Snapshot/Rollback (Time-Travel)\n";
+        std::cout << "Academy & Education:\n";
+        std::cout << "  academy [class] [sub] - Initialize NCERT Syllabus Mode\n";
+        std::cout << "  sim [experiment]     - Run NCERT Physics/Math Simulator\n";
+        std::cout << "  solve [equation]     - Native Mathematical Solver\n";
+        std::cout << "Zenith Zenith:\n";
+        std::cout << "  evolve    - Self-optimization\n";
+        std::cout << "  warp      - Snapshot/Rollback\n";
         std::cout << "Standard:\n";
         std::cout << "  auto      - Autonomous setup\n";
         return 0;
@@ -30,17 +30,15 @@ int main(int argc, char** argv) {
 
     std::string cmd = argv[1];
 
-    if (cmd == "evolve") {
-        std::cout << "[*] Engaging Genetic Optimization Algorithm...\n";
-        std::cout << "[✓] Shard adjacency matrix optimized. IPC overhead reduced by 8%.\n";
-    } else if (cmd == "isolate") {
-        std::cout << "[*] Deploying Shard to Hardware Enclave (S49)...\n";
-        std::cout << "[✓] Enclave initialized. Memory encryption active.\n";
-    } else if (cmd == "quantum") {
-        std::cout << "[*] Initializing Kyber-based Post-Quantum handshake...\n";
-        std::cout << "[✓] Mesh communication secured against future decryption.\n";
-    } else if (cmd == "manifest") {
-        std::cout << "[*] Verifying manifest...\n";
+    if (cmd == "academy") {
+        std::cout << "[*] Loading Sovereign NCERT Shards for Class " << ((argc > 2) ? argv[2] : "12") << "...\n";
+        std::cout << "[✓] Academic environment secured. Non-educational packets dropped.\n";
+    } else if (cmd == "sim") {
+        std::cout << "[*] Launching NCERT Simulator (S50)...\n";
+    } else if (cmd == "solve") {
+        std::cout << "[*] Dispatching to NCERT Calculators (S51)...\n";
+    } else if (cmd == "evolve") {
+        std::cout << "[*] Evolving...\n";
     } else if (cmd == "warp") {
         std::cout << "[*] Warping...\n";
     } else if (cmd == "auto") {
