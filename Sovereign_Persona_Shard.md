@@ -28,13 +28,16 @@ Context Switch Engine
 
 ---
 
-## CLI Reference — `sigma-persona`
+## CLI Reference — `s-cli profile`
 
-| Sub-command | Action |
+The **Sovereign Persona** system is managed via the `s-cli` tool, which orchestrates both kernel build profiles and runtime personas.
+
+| Command | Action |
 |---|---|
-| `sigma-persona create <name> <theme> <uid> <cap_mask>` | Create a new silicon persona context |
-| `sigma-persona switch <name>` | Atomically switch the active persona |
-| `sigma-persona audit` | Display all personas with UID, theme, cap-mask, and state |
+| `python s-cli.py profile <name>` | Switch the kernel build profile (Focus, Dev, Prod) |
+| `python s-cli.py profile --list` | List available build profiles |
+| `sigma-persona switch <name>` | (Runtime) Atomically switch the active kernel persona |
+| `sigma-persona audit` | (Runtime) Display all active persona contexts |
 
 ---
 

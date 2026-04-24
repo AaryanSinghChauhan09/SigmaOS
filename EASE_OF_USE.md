@@ -30,17 +30,19 @@ Located in `modules/ext/plugins/` and `modules/tools/cli/`.
 ```bash
 git clone https://github.com/AaryanSinghChauhan09/SigmaOS.git
 cd SigmaOS
-rustup toolchain install nightly
-rustup target add aarch64-unknown-none riscv64imac-unknown-none-elf
-npm ci                   # Install Zenith UI dev dependencies
-chmod +x build_sovereign.sh
-./build_sovereign.sh     # Builds all suites
+
+# Native Toolchain Setup
+g++ -std=c++20 s-cli.cpp -o s-cli
+
+# Build Sovereign Lattice
+./s-cli build
 ```
 
 ### 2. Run Tests
 
 ```bash
-./run_sigma_tests.sh     # Sovereign Atomic Test Runner
+./s-cli build x86_64 # Ensure build exists
+./s-cli test         # Sovereign Atomic Test Runner
 ```
 
 ### 3. Boot in QEMU

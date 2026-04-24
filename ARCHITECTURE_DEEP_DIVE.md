@@ -105,4 +105,19 @@ sched_kill_current_task(ec)
 | IPC channel disjointness | Coq | 🔶 Sketch |
 | CRDT merge convergence | Isabelle | 🔶 Sketch |
 
-See [`verification/`](../verification/README.md) for proof sources and instructions.
+## Sovereign Native Toolchain
+
+To minimize dependencies on high-level runtimes (Python, Node), SigmaOS utilizes a **Native C++ Build Orchestrator** (`scripts/orchestrator`).
+
+### Design Principles
+1. **Zero-Dependency**: Written in pure C++20 using only standard headers. No external libraries (e.g., `nlohmann/json`) are permitted.
+2. **Silicon-Native**: Compiled to a native binary for the host architecture, ensuring maximum build performance and "sovereignty".
+3. **Lattice-Aware**: Understands `module.json` metadata and performs topological sorting for correct dependency resolution.
+
+### Build Lifecycle
+1. **Discovery**: Recursively scans `modules/` and `suites/` for `module.json`.
+2. **Resolution**: Generates a dependency graph and calculates the linear build order.
+3. **Incremental Synthesis**: Compiles only modified shards by comparing file timestamps.
+4. **Final Linkage**: Orchestrates `ld` with target-specific linker scripts to produce the final `sigmaos.bin`.
+
+See [`scripts/orchestrator.cpp`](../scripts/orchestrator.cpp) for implementation details.
