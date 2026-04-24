@@ -1,0 +1,6 @@
+{
+  "module": "S24_EphemeralLattice",
+  "dependencies": [
+    "S01_Genesis"
+  ]
+}

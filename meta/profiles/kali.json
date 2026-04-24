@@ -1,0 +1,5 @@
+{
+  "name": "Sovereign Kali (Security)",
+  "shards": ["S01_Genesis", "S04_HAL", "S23_SovereignHardening", "S22_LatticeFuzzer"],
+  "features": ["kernel_hardening", "audit_logging"]
+}

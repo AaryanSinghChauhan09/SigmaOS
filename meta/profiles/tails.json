@@ -1,0 +1,5 @@
+{
+  "name": "Sovereign Tails (Privacy)",
+  "shards": ["S01_Genesis", "S04_HAL", "S24_EphemeralLattice"],
+  "features": ["zero_persistence", "amnesic_wipe"]
+}

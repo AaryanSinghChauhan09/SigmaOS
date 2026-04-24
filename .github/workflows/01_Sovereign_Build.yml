@@ -13,7 +13,7 @@ jobs:
       fail-fast: false
       matrix:
         os: [ubuntu-latest, macos-latest, windows-latest]
-        profile: [server, iot, dev, alpine, ubuntu, arch]
+        profile: [server, iot, dev, alpine, ubuntu, arch, kali, tails]
     runs-on: ${{ matrix.os }}
 
     steps:
