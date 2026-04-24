@@ -21,9 +21,9 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include <stdbool.h>
 #include "sigma_libc.h"
-#include <stddef.h>
+#include "sigma_libc.h"
+#include "sigma_libc.h"
 #include <unistd.h>
 #include <stdarg.h>
 
