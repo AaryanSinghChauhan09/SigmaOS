@@ -1,0 +1,16 @@
+{
+    "name": "server",
+    "arch": "x86_64",
+    "features": {
+        "network": true,
+        "gui": false,
+        "ai": true,
+        "web3": true,
+        "observability": true,
+        "slab_pools": true
+    },
+    "memory": {
+        "max_slab_pools": 256,
+        "heap_limit_mb": 4096
+    }
+}

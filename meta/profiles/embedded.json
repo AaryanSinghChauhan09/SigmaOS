@@ -1,0 +1,16 @@
+{
+    "name": "embedded",
+    "arch": "aarch64",
+    "features": {
+        "network": true,
+        "gui": false,
+        "ai": false,
+        "web3": false,
+        "observability": false,
+        "slab_pools": true
+    },
+    "memory": {
+        "max_slab_pools": 16,
+        "heap_limit_mb": 64
+    }
+}
