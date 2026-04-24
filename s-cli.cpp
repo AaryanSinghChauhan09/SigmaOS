@@ -3,6 +3,7 @@
 #include <vector>
 #include <cstdlib>
 #include <filesystem>
+#include <fstream>
 #include <thread>
 #include <chrono>
 
@@ -65,6 +66,65 @@ void test() {
     run_command("./scripts/test_runner");
 }
 
+void info() {
+    print_header("SigmaOS System Info");
+    std::ifstream f("sigma_features.json");
+    if (f.is_open()) {
+        std::string line;
+        while (std::getline(f, line)) {
+            std::cout << "  " << line << "\n";
+        }
+    } else {
+        std::cout << "  [ERR] sigma_features.json not found.\n";
+    }
+}
+
+void handle_profile(int argc, char** argv) {
+    std::string profile_dir = "meta/profiles";
+    if (argc < 3) {
+        print_header("Available Profiles");
+        for (const auto& entry : fs::directory_iterator(profile_dir)) {
+            if (entry.path().extension() == ".json") {
+                std::cout << "  - " << entry.path().stem().string() << "\n";
+            }
+        }
+        return;
+    }
+
+    std::string profile_name = argv[2];
+    std::string src = profile_dir + "/" + profile_name + ".json";
+    if (fs::exists(src)) {
+        fs::copy_file(src, "sigma_features.json", fs::copy_options::overwrite_existing);
+        std::cout << "\033[92m[✓] Switched to profile: " << profile_name << "\033[0m\n";
+    } else {
+        std::cout << "\033[91m[✗] Profile '" << profile_name << "' not found.\033[0m\n";
+    }
+}
+
+void scaffold(int argc, char** argv) {
+    if (argc < 3) {
+        std::cout << "Usage: s-cli scaffold <shard_name>\n";
+        return;
+    }
+    std::string shard_name = argv[2];
+    std::string path = "suites/" + shard_name;
+    if (fs::exists(path)) {
+        std::cout << "\033[91m[✗] Shard '" << shard_name << "' already exists.\033[0m\n";
+        return;
+    }
+
+    fs::create_directories(path);
+    std::ofstream f(path + "/module.json");
+    f << "{\n  \"module\": \"" << shard_name << "\",\n  \"dependencies\": []\n}\n";
+    f.close();
+
+    std::ofstream src(path + "/shard_init.c");
+    src << "#include \"sigma_libc.h\"\n\nvoid shard_init() {\n    sigma_printf(\"[SHARD] " << shard_name << " initialized.\\n\");\n}\n";
+    src.close();
+
+    std::cout << "\033[92m[✓] Scaffolded shard: " << path << "\033[0m\n";
+}
+
 void run_qemu(int argc, char** argv) {
     print_header("Booting SigmaOS in QEMU");
     std::string arch = (argc > 2) ? argv[2] : "x86_64";
@@ -89,6 +149,9 @@ int main(int argc, char** argv) {
         std::cout << "  list          - List modules\n";
         std::cout << "  test          - Run tests\n";
         std::cout << "  run [arch]    - Run in QEMU\n";
+        std::cout << "  info          - Show system info\n";
+        std::cout << "  profile [name]- List or switch profiles\n";
+        std::cout << "  scaffold [n]  - Create new shard\n";
         return 0;
     }
 
@@ -104,6 +167,12 @@ int main(int argc, char** argv) {
         test();
     } else if (cmd == "run") {
         run_qemu(argc, argv);
+    } else if (cmd == "info") {
+        info();
+    } else if (cmd == "profile") {
+        handle_profile(argc, argv);
+    } else if (cmd == "scaffold") {
+        scaffold(argc, argv);
     } else {
         std::cout << "[!] Unknown command: " << cmd << "\n";
     }

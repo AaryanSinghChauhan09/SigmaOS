@@ -106,11 +106,25 @@ public:
         std::cout << "[✓] Clean complete.\n";
     }
 
-    void list() {
-        std::cout << "[*] Discovered " << modules.size() << " modules:\n";
-        for (const auto& [name, mod] : modules) {
-            std::cout << "  - " << name << " (" << mod.path << ")\n";
+    void scaffold_shard(const std::string& name) {
+        std::cout << "[*] Scaffolding new shard: " << name << "\n";
+        std::string path = "suites/" + name;
+        if (fs::exists(path)) {
+            std::cerr << "[!] Shard already exists at " << path << "\n";
+            return;
         }
+
+        fs::create_directories(path);
+        
+        std::ofstream f(path + "/module.json");
+        f << "{\n  \"module\": \"" << name << "\",\n  \"dependencies\": []\n}\n";
+        f.close();
+
+        std::ofstream src(path + "/shard_init.c");
+        src << "#include \"sigma_libc.h\"\n\nvoid shard_init() {\n    sigma_printf(\"[SHARD] " << name << " initialized.\\n\");\n}\n";
+        src.close();
+
+        std::cout << "[✓] Shard scaffolded successfully.\n";
     }
 
 private:
@@ -200,6 +214,12 @@ int main(int argc, char** argv) {
         orch.clean();
     } else if (cmd == "list") {
         orch.list();
+    } else if (cmd == "scaffold") {
+        if (argc < 3) {
+            std::cerr << "Usage: orchestrator scaffold <shard_name>\n";
+            return 1;
+        }
+        orch.scaffold_shard(argv[2]);
     } else {
         std::cerr << "[!] Unknown command: " << cmd << "\n";
         return 1;

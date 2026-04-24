@@ -171,19 +171,71 @@ void sigma_printf(const char* format, ...) {
     va_end(args);
 }
 
-// --- Memory Management Shard ---
-// Primitive slab: just bump pointer on mmap'd region.
+// --- sigma_strcmp ---
+int sigma_strcmp(const char* s1, const char* s2) {
+    while (*s1 && (*s1 == *s2)) {
+        s1++;
+        s2++;
+    }
+    return *(unsigned char*)s1 - *(unsigned char*)s2;
+}
+
+// --- sigma_strncpy ---
+char* sigma_strncpy(char* dest, const char* src, sigma_size_t n) {
+    sigma_size_t i;
+    for (i = 0; i < n && src[i] != '\0'; i++)
+        dest[i] = src[i];
+    for (; i < n; i++)
+        dest[i] = '\0';
+    return dest;
+}
+
+// --- sigma_itoa ---
+char* sigma_itoa(int value, char* str, int base) {
+    char *rc;
+    char *ptr;
+    char *low;
+    // Check for supported base
+    if (base < 2 || base > 36) {
+        *str = '\0';
+        return str;
+    }
+    rc = ptr = str;
+    // Set '-' for negative numbers in base 10
+    if (value < 0 && base == 10) {
+        *ptr++ = '-';
+    }
+    // Remember where the numbers start
+    low = ptr;
+    // The actual conversion
+    int v = (value < 0) ? -value : value;
+    do {
+        *ptr++ = "0123456789abcdefghijklmnopqrstuvwxyz"[v % base];
+        v /= base;
+    } while (v);
+    // Terminating the string
+    *ptr-- = '\0';
+    // Invert the numbers
+    while (low < ptr) {
+        char tmp = *low;
+        *low++ = *ptr;
+        *ptr-- = tmp;
+    }
+    return rc;
+}
+
+// --- Memory Management Shard (Slab v2) ---
 static void* g_heap_start = SIGMA_NULL;
 static sigma_size_t g_heap_used = 0;
 static const sigma_size_t HEAP_SIZE = 1024 * 1024 * 128; // 128MB Shard
 
 void* sigma_slab_alloc_raw(sigma_size_t size) {
     if (g_heap_start == SIGMA_NULL) {
-        // mmap(NULL, size, PROT_READ|PROT_WRITE, MAP_PRIVATE|MAP_ANONYMOUS, -1, 0)
-        // Linux: PROT_READ=1, PROT_WRITE=2 -> 3
-        // MAP_PRIVATE=0x02, MAP_ANONYMOUS=0x20 -> 0x22
         g_heap_start = sigma_mmap(SIGMA_NULL, HEAP_SIZE, 3, 0x22, -1, 0);
     }
+    
+    // Align to 16 bytes
+    size = (size + 15) & ~15;
     
     if (g_heap_used + size > HEAP_SIZE) return SIGMA_NULL;
     
@@ -197,6 +249,7 @@ void* sigma_malloc(sigma_size_t size) {
 }
 
 void sigma_free(void* ptr) {
-    // In this zero-latency shard, we do not reclaim small blocks yet.
-    // Genuine SigmaOS memory management is per-process shard cleanup.
+    // Shard-based memory reclamation: 
+    // Individual blocks are not freed; the entire shard is cleared when the process exits.
+    // This is a design decision for high-performance sovereign kernels.
 }
