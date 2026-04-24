@@ -25,7 +25,7 @@
 #include "sigma_libc.h"
 #include "sigma_libc.h"
 #include <unistd.h>
-#include <stdarg.h>
+#include "sigma_libc.h"
 
 // ── Manual Type Definitions (Avoiding Common Header Recursion) ───────────
 typedef size_t             sigma_sz_t;

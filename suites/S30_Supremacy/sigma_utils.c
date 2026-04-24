@@ -10,7 +10,7 @@
 #ifdef SIGMA_HOSTED_BUILD
     #include <stdio.h>
     #include <string.h>
-    #include <stdarg.h>
+    #include "sigma_libc.h"
     #define sigma_puts(s) puts(s)
     #define sigma_snprintf snprintf
     #define sigma_strcmp strcmp
