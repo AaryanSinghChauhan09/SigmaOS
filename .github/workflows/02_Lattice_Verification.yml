@@ -37,3 +37,13 @@ jobs:
           working-directory: suites/S08_Security/formal_proofs
           args: "--harness ipc_dma_proofs::verify_dma_ipc_non_interference --harness ipc_dma_proofs::verify_dispatch_capability_ownership"
         continue-on-error: true
+
+  lattice-fuzzing:
+    name: Entropy Stress Test (S-FUZZ)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Build S-CLI
+        run: g++ -std=c++20 s-cli.cpp -o s-cli
+      - name: Run Lattice Fuzzer
+        run: ./s-cli test --shard S22_LatticeFuzzer

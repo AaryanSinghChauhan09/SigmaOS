@@ -1,0 +1,4 @@
+{
+  "module": "S22_LatticeFuzzer",
+  "dependencies": ["S01_Genesis"]
+}
