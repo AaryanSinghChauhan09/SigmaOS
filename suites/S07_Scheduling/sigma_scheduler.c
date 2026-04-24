@@ -111,6 +111,30 @@ static TaskControlBlock* rq_dequeue(u32 prio) {
     return t;
 }
 
+/**
+ * sched_kill_current_task — Safely terminates the currently executing task.
+ * Called by exception handlers (e.g. Data Abort) to isolate hardware faults 
+ * and prevent the kernel from crashing.
+ */
+void sched_kill_current_task(u32 fault_code) {
+    extern void kprintf(const char* fmt, ...);
+    
+    if (g_current_tid >= g_task_count) return;
+    
+    TaskControlBlock* t = &g_tasks[g_current_tid];
+    t->state = TASK_DEAD;
+    
+    kprintf("[SCHED] Task %u gracefully terminated. Fault code: 0x%x\n", g_current_tid, fault_code);
+    
+    // In a real implementation:
+    // 1. Unmap the task's page tables (MMU teardown)
+    // 2. Free its slab allocator pools and DMA buffers
+    // 3. Close open IPC channels
+    
+    // Immediately yield the CPU to the next available process
+    sched_yield();
+}
+
 /* =========================================================================
  * Task creation
  * ========================================================================= */

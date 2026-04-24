@@ -5,37 +5,51 @@
  * High-level C handlers that receive hardware traps from the low-level 
  * AArch64 and RISC-V assembly vector tables.
  *
- * Prevents silent crashes and integrates with the scheduler to gracefully
- * kill offending tasks while keeping the kernel alive.
+ * Prevents silent crashes by gracefully killing the offending task/shard
+ * while keeping the core Microkernel alive and operational.
  * =============================================================================
  */
 
 #include "sigma_kernel_types.h"
 
-/* 
+// External scheduler hook to safely terminate a faulting process
+extern void sched_kill_current_task(u32 fault_code);
+extern u32 g_current_tid;
+
+/* =========================================================================
  * AArch64 C Handler 
- * Called by exceptions.asm
- */
+ * ========================================================================= */
 void aarch64_exception_router(u64 type) {
     extern void kprintf(const char* fmt, ...);
     
+    u64 esr, far, elr;
+    __asm__ volatile("mrs %0, esr_el1" : "=r"(esr));
+    __asm__ volatile("mrs %0, far_el1" : "=r"(far));
+    __asm__ volatile("mrs %0, elr_el1" : "=r"(elr));
+
+    u32 ec = (esr >> 26) & 0x3F; // Exception Class
+
     kprintf("\n[!!!] HARDWARE FAULT (AArch64) [!!!]\n");
-    kprintf("Exception Type: %llu\n", type);
+    kprintf("Type: %llu | Task ID: %u\n", type, g_current_tid);
+    kprintf("ESR: 0x%llx | FAR: 0x%llx | ELR: 0x%llx\n", esr, far, elr);
     
-    // In a full implementation, we would read ESR_EL1 and FAR_EL1 to get the exact fault address
-    
-    if (type == 4) {
-        kprintf("-> Synchronous Abort (Data/Prefetch or Undefined Instruction)\n");
+    switch (ec) {
+        case 0x20: kprintf("-> Instruction Abort (Lower EL)\n"); break;
+        case 0x21: kprintf("-> Instruction Abort (Same EL)\n"); break;
+        case 0x24: kprintf("-> Data Abort (Lower EL) - Potential DMA/Memory Violation\n"); break;
+        case 0x25: kprintf("-> Data Abort (Same EL) - Potential DMA/Memory Violation\n"); break;
+        case 0x26: kprintf("-> SP Alignment Fault\n"); break;
+        case 0x00: kprintf("-> Unknown Reason / Illegal Instruction\n"); break;
+        default:   kprintf("-> Exception Class: 0x%x\n", ec); break;
     }
 
-    kprintf("HALTING KERNEL THREAD.\n");
-    while (1) { __asm__ volatile("wfi"); }
+    kprintf("Terminating offending shard to preserve Lattice stability...\n");
+    sched_kill_current_task(ec); // Graceful recovery
 }
 
-/* 
+/* =========================================================================
  * RISC-V 64 C Handler 
- * Called by exceptions.asm
- */
+ * ========================================================================= */
 void riscv_exception_router(void) {
     extern void kprintf(const char* fmt, ...);
     
@@ -46,7 +60,25 @@ void riscv_exception_router(void) {
     
     kprintf("\n[!!!] HARDWARE TRAP (RISC-V) [!!!]\n");
     kprintf("SCAUSE: 0x%llx | SEPC: 0x%llx | STVAL: 0x%llx\n", scause, sepc, stval);
+    kprintf("Task ID: %u\n", g_current_tid);
     
-    kprintf("HALTING KERNEL THREAD.\n");
-    while (1) { __asm__ volatile("wfi"); }
+    u64 cause_code = scause & ~(1ULL << 63);
+    if ((scause >> 63) == 0) { // Exception
+        switch (cause_code) {
+            case 0: kprintf("-> Instruction Address Misaligned\n"); break;
+            case 1: kprintf("-> Instruction Access Fault\n"); break;
+            case 2: kprintf("-> Illegal Instruction\n"); break;
+            case 5: kprintf("-> Load Access Fault\n"); break;
+            case 7: kprintf("-> Store/AMO Access Fault (DMA Violation)\n"); break;
+            case 12: kprintf("-> Instruction Page Fault\n"); break;
+            case 13: kprintf("-> Load Page Fault\n"); break;
+            case 15: kprintf("-> Store/AMO Page Fault\n"); break;
+            default: kprintf("-> Exception Code: %llu\n", cause_code); break;
+        }
+    } else { // Interrupt
+        kprintf("-> Unhandled Interrupt Code: %llu\n", cause_code);
+    }
+
+    kprintf("Terminating offending shard to preserve Lattice stability...\n");
+    sched_kill_current_task((u32)cause_code); // Graceful recovery
 }
