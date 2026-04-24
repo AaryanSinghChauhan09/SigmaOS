@@ -255,7 +255,7 @@ void sched_init(void) {
 
 // These would bridge to the Rust FFI in a full build
 extern void tensor_add(void* out, const void* a, const void* b);
-extern void tensor_mul(void* out, const void* a, const void* b);
+extern void tensor_matmul_relu(void* out, const void* a, const void* b);
 extern u64 hal_get_timestamp_ns(void); // Hardware high-res timer
 
 // Stub flags for hardware detection
@@ -265,14 +265,15 @@ static bool_t g_npu_available = TRUE;
 typedef struct SchedProfileStats {
     u64 total_npu_dispatches;
     u64 total_cpu_fallbacks;
+    u64 total_fused_kernels;
     u64 npu_latency_ns_accum;
     u64 cpu_latency_ns_accum;
 } SchedProfileStats;
 
-static SchedProfileStats g_profile_stats = {0, 0, 0, 0};
+static SchedProfileStats g_profile_stats = {0, 0, 0, 0, 0};
 
 /**
- * sched_dispatch_tensor_op — Intelligently route tensor ops with profiling.
+ * sched_dispatch_tensor_op — Intelligently route tensor ops with profiling and fusion.
  */
 void sched_dispatch_tensor_op(u32 op_type, void* out, const void* a, const void* b) {
     extern void kprintf(const char* fmt, ...);
@@ -280,16 +281,24 @@ void sched_dispatch_tensor_op(u32 op_type, void* out, const void* a, const void*
     // Simulate getting a high-res timestamp (in a real build this calls HAL)
     u64 start_time = 0; // hal_get_timestamp_ns()
     
+    // Kernel Fusion Detection: If workload requests MatMul + Activation, use fused path
+    bool_t is_fused = (op_type == 99); // 99 = MATMUL_RELU_FUSED
+    if (is_fused) {
+        g_profile_stats.total_fused_kernels++;
+        kprintf("[SCHED] Kernel Fusion active. Dispatching Fused MatMul+ReLU...\n");
+    }
+
     // Capability Check: if NPU is online and supports the operation
     if (g_npu_available) {
         kprintf("[SCHED] Dispatching Tensor OP %u to Hardware NPU...\n", op_type);
         g_profile_stats.total_npu_dispatches++;
         
         // Execute (simulated MMIO delay)
-        tensor_mul(out, a, b); 
+        if (is_fused) tensor_matmul_relu(out, a, b);
+        else tensor_mul(out, a, b); 
         
-        // Simulate ~250ns NPU execution time
-        g_profile_stats.npu_latency_ns_accum += 250; 
+        // Simulate ~250ns NPU execution time (fused operations are faster)
+        g_profile_stats.npu_latency_ns_accum += is_fused ? 200 : 250; 
         return;
     }
     
@@ -297,10 +306,11 @@ void sched_dispatch_tensor_op(u32 op_type, void* out, const void* a, const void*
     kprintf("[SCHED] NPU busy or unavailable. Falling back to CPU tensor math...\n");
     g_profile_stats.total_cpu_fallbacks++;
     
-    tensor_mul(out, a, b);
+    if (is_fused) tensor_matmul_relu(out, a, b);
+    else tensor_mul(out, a, b);
     
-    // Simulate ~4500ns CPU execution time
-    g_profile_stats.cpu_latency_ns_accum += 4500;
+    // Simulate CPU execution time (fused saves ~1000ns of memory bandwidth overhead)
+    g_profile_stats.cpu_latency_ns_accum += is_fused ? 3500 : 4500;
 }
 
 /* =========================================================================

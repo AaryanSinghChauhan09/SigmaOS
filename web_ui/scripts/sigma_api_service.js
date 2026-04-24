@@ -144,7 +144,7 @@ class SigmaKernelAPI {
                     msg = isNpu ? "Dispatching Tensor OP to Hardware NPU..." : "NPU busy. Falling back to CPU tensor math...";
                     level = isNpu ? 'INFO' : 'WARN';
                 } else if (Math.random() < 0.2) {
-                    msg = `[PROFILE] NPU Dispatches: ${Math.floor(Math.random()*1000)} (Avg 240 ns) | CPU Fallbacks: ${Math.floor(Math.random()*100)} (Avg 4600 ns)`;
+                    msg = `[PROFILE] NPU: ${Math.floor(Math.random()*1000)} (240ns) | CPU: ${Math.floor(Math.random()*100)} (4600ns) | Fused Kernels: ${Math.floor(Math.random()*50)}`;
                     level = 'DEBUG';
                 } else {
                     msg = ['Pool audit OK', 'Capability renewed', 'HAL heartbeat', 'Slab compaction', 'Page table walk'][Math.floor(Math.random() * 5)];

@@ -64,6 +64,28 @@ void tensor_relu(SigmaTensor* t) {
     }
 }
 
+/* ── Kernel Fusion ───────────────────────────────────────────────────────── */
+
+/**
+ * Fused Matrix Multiplication + ReLU Activation
+ * Eliminates the need to write the intermediate matrix back to memory, 
+ * drastically improving cache locality and reducing DMA overhead.
+ */
+void tensor_matmul_relu(SigmaTensor* out, const SigmaTensor* a, const SigmaTensor* b) {
+    if (a->cols != b->rows || out->rows != a->rows || out->cols != b->cols) return;
+    u32 i, j, k;
+    for (i = 0; i < a->rows; i++) {
+        for (j = 0; j < b->cols; j++) {
+            int sum = 0;
+            for (k = 0; k < a->cols; k++) {
+                sum += FIXED_MUL(a->data[i * a->cols + k], b->data[k * b->cols + j]);
+            }
+            /* Fused Activation immediately applied before memory write */
+            out->data[i * out->cols + j] = fixed_relu(sum);
+        }
+    }
+}
+
 /* ── Inference Pipeline for Scheduler ────────────────────────────────────── */
 
 /* Predicts the next burst length based on the last N burst history */
