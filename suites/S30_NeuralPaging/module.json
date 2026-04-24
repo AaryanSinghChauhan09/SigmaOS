@@ -1,0 +1,6 @@
+{
+  "module": "S30_NeuralPaging",
+  "dependencies": [
+    "S01_Genesis"
+  ]
+}
