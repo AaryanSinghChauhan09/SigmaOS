@@ -3,7 +3,7 @@
  * USP: Parallelized I/O queues for pure silicon performance.
  */
 
-#include <stdint.h>
+#include "sigma_libc.h"
 
 typedef struct {
     uint64_t cap;

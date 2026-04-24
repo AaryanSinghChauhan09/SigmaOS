@@ -1,4 +1,4 @@
-#include <stdint.h>
+#include "sigma_libc.h"
 
 // ---------------------------------------------------------
 // SigmaOS Hardware Abstraction Layer (HAL) Prototype

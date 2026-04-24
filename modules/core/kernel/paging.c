@@ -1,4 +1,4 @@
-#include <stdint.h>
+#include "sigma_libc.h"
 
 // ---------------------------------------------------------
 // SigmaOS Memory Paging System Prototype (x86_64 inspired)

@@ -4,7 +4,7 @@
  * USP: Simple, robust data persistence for the 33-suite lattice.
  */
 
-#include <stdint.h>
+#include "sigma_libc.h"
 
 typedef struct {
     uint8_t  jmp[3];

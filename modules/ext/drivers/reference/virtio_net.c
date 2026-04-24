@@ -3,7 +3,7 @@
  * USP: Low-latency packet processing for the 33-suite lattice.
  */
 
-#include <stdint.h>
+#include "sigma_libc.h"
 
 typedef struct {
     uint32_t device_features;
