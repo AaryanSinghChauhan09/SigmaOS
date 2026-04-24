@@ -1,0 +1,4 @@
+{
+  "module": "S13_LuaBridge",
+  "dependencies": ["S01_Genesis"]
+}
