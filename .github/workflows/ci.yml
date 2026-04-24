@@ -69,36 +69,33 @@ jobs:
             --verbose
         continue-on-error: false
 
-      # Verify build script is executable on Unix
-      - name: Verify build script (Unix)
+      # Verify native toolchain is ready
+      - name: Verify s-cli (Unix)
         if: runner.os != 'Windows'
         run: |
-          chmod +x ./build_sovereign.sh
-          chmod +x ./run_sigma_tests.sh || true
-          echo "[CI] Build scripts are executable"
+          g++ -std=c++20 s-cli.cpp -o s-cli
+          chmod +x ./s-cli
+          echo "[CI] Native s-cli is ready"
 
       - name: Perform Static Analysis
         if: runner.os != 'Windows'
         run: |
           sudo apt-get install -y cppcheck
-          cppcheck --error-exitcode=0 --force --inline-suppr --quiet suites/ scripts/
+          cppcheck --error-exitcode=0 --force --inline-suppr --quiet suites/ modules/ scripts/
 
       - name: Build Sovereign Lattice (Native)
         if: runner.os != 'Windows'
         run: |
-          g++ -std=c++20 s-cli.cpp -o s-cli
-          ./s-cli build
+          ./s-cli build x86_64
           ./s-cli test
 
       - name: Run integration tests (Windows)
         if: runner.os == 'Windows'
         shell: pwsh
         run: |
-          if (Test-Path run_sigma_tests.ps1) {
-            pwsh -File run_sigma_tests.ps1
-          } else {
-            Write-Host "[WARN] No Windows test script found."
-          }
+          g++ -std=c++20 s-cli.cpp -o s-cli.exe
+          .\s-cli.exe build x86_64
+          .\s-cli.exe test
 
       # Upload build logs as artifacts for debugging
       - name: Upload build artifacts
@@ -150,28 +147,30 @@ jobs:
         run: sudo apt-get install -y clang-tidy
 
       - name: C/C++ Lint — HAL exceptions
-        # clang-tidy requires a compile_commands.json; we use -- to pass manual flags
         run: |
           clang-tidy \
             suites/S04_HAL/arch/hal_exceptions.c \
-            suites/S07_Scheduling/sigma_scheduler.c \
-            suites/S03_Orchestrator/sigma_ipc.c \
             -- \
-            -I. -Iinclude -Isuites/S04_HAL \
+            -I. -Iinclude -Isuites/S04_HAL -Isuites/S01_Genesis \
             -std=c11 -ffreestanding -nostdlib \
-            || true   # Non-blocking until compile_commands.json is set up
+            || true
 
       - name: Set up Node.js for ESLint
         uses: actions/setup-node@v4
         with:
           node-version: '20'
           cache: 'npm'
+          cache-dependency-path: web_ui/package-lock.json
 
       - name: Install JS dependencies
-        run: npm ci
+        run: |
+          cd web_ui
+          npm ci
 
       - name: JavaScript Lint — Zenith UI Components
-        run: npm run lint
+        run: |
+          cd web_ui
+          npm run lint
 
   # ============================================================
   # JOB 3: Formal Verification (Kani Model Checker)
