@@ -14,31 +14,50 @@ void print_header(const std::string& text) {
 }
 
 int run_command(const std::string& cmd) {
+#ifdef _WIN32
+    // Convert forward slashes to backslashes for Windows shell if needed
+    std::string win_cmd = cmd;
+    size_t pos = 0;
+    while ((pos = win_cmd.find("./", pos)) != std::string::npos) {
+        win_cmd.replace(pos, 2, ".\\");
+        pos += 2;
+    }
+    return std::system(win_cmd.c_str());
+#else
     return std::system(cmd.c_str());
+#endif
 }
 
-void ensure_native_orch() {
-    if (!fs::exists("scripts/orchestrator")) {
-        std::cout << "[*] Compiling native orchestrator...\n";
-        run_command("g++ -std=c++20 scripts/orchestrator.cpp -o scripts/orchestrator");
-    }
-}
+bool ensure_binary(const std::string& src, const std::string& bin) {
+    std::string bin_path = bin;
+#ifdef _WIN32
+    bin_path += ".exe";
+#endif
 
-void ensure_native_test() {
-    if (!fs::exists("scripts/test_runner")) {
-        std::cout << "[*] Compiling native test runner...\n";
-        run_command("g++ -std=c++20 scripts/test_runner.cpp -o scripts/test_runner");
+    if (!fs::exists(bin_path)) {
+        std::cout << "[*] Compiling " << bin << "...\n";
+        std::string compile_cmd = "g++ -std=c++20 " + src + " -o " + bin_path;
+        if (run_command(compile_cmd) != 0) {
+            std::cerr << "\033[91m[✗] Failed to compile " << bin << "\033[0m\n";
+            return false;
+        }
+#ifndef _WIN32
+        run_command("chmod +x " + bin_path);
+#endif
     }
+    return true;
 }
 
 void build(int argc, char** argv) {
     print_header("Initializing Sovereign Build");
-    ensure_native_orch();
+    if (!fs::exists("build")) fs::create_directories("build");
+    
+    if (!ensure_binary("scripts/orchestrator.cpp", "scripts/orchestrator")) return;
     
     std::string cmd = "./scripts/orchestrator build";
     if (argc > 2) {
         cmd += " ";
-        cmd += argv[2]; // Architecture
+        cmd += argv[2];
     }
     
     if (run_command(cmd) == 0) {
@@ -50,20 +69,24 @@ void build(int argc, char** argv) {
 
 void clean() {
     print_header("Cleaning Lattice Shards");
-    ensure_native_orch();
-    run_command("./scripts/orchestrator clean");
+    if (ensure_binary("scripts/orchestrator.cpp", "scripts/orchestrator")) {
+        run_command("./scripts/orchestrator clean");
+    }
+    if (fs::exists("build")) fs::remove_all("build");
 }
 
 void list_modules() {
     print_header("SigmaOS Sovereign Modules");
-    ensure_native_orch();
-    run_command("./scripts/orchestrator list");
+    if (ensure_binary("scripts/orchestrator.cpp", "scripts/orchestrator")) {
+        run_command("./scripts/orchestrator list");
+    }
 }
 
 void test() {
     print_header("Running Sovereign Lattice Tests");
-    ensure_native_test();
-    run_command("./scripts/test_runner");
+    if (ensure_binary("scripts/test_runner.cpp", "scripts/test_runner")) {
+        run_command("./scripts/test_runner");
+    }
 }
 
 void info() {
@@ -81,6 +104,11 @@ void info() {
 
 void handle_profile(int argc, char** argv) {
     std::string profile_dir = "meta/profiles";
+    if (!fs::exists(profile_dir)) {
+        std::cout << "[!] Profile directory missing.\n";
+        return;
+    }
+    
     if (argc < 3) {
         print_header("Available Profiles");
         for (const auto& entry : fs::directory_iterator(profile_dir)) {
@@ -135,7 +163,12 @@ void run_qemu(int argc, char** argv) {
         build(argc, argv);
     }
     
-    std::string qemu_cmd = "qemu-system-" + arch + " -cdrom " + iso_path + " -m 512M -serial stdio -no-reboot";
+    std::string qemu_bin = "qemu-system-" + arch;
+#ifdef _WIN32
+    qemu_bin += ".exe";
+#endif
+
+    std::string qemu_cmd = qemu_bin + " -cdrom " + iso_path + " -m 512M -serial stdio -no-reboot";
     std::cout << "[*] Command: " << qemu_cmd << "\n";
     run_command(qemu_cmd);
 }
@@ -143,8 +176,10 @@ void run_qemu(int argc, char** argv) {
 void handle_setup() {
     print_header("SigmaOS Developer Environment Setup");
 #ifdef _WIN32
-    std::cout << "[!] Automatic dependency installation is not yet supported on Windows.\n";
-    std::cout << "    Please ensure 'g++', 'qemu-system', and 'make' are in your PATH.\n";
+    std::cout << "[*] Running Windows setup audit...\n";
+    run_command("where g++");
+    run_command("where make");
+    run_command("where qemu-system-x86_64");
 #else
     const char* os_cmd = "uname -s";
     char buffer[128];
@@ -155,13 +190,11 @@ void handle_setup() {
     std::string os(buffer);
 
     if (os.find("Linux") != std::string::npos) {
-        std::cout << "[*] Detected Linux. Installing dependencies via apt-get...\n";
-        run_command("sudo apt-get update && sudo apt-get install -y build-essential git qemu-system-x86 qemu-system-arm qemu-system-misc qemu-system-riscv64 gcc-aarch64-linux-gnu gcc-riscv64-unknown-elf");
+        std::cout << "[*] Detected Linux. Installing dependencies...\n";
+        run_command("sudo apt-get update && sudo apt-get install -y build-essential git qemu-system-x86 qemu-system-arm qemu-system-misc qemu-system-riscv64 gcc-aarch64-linux-gnu cppcheck");
     } else if (os.find("Darwin") != std::string::npos) {
-        std::cout << "[*] Detected macOS. Installing dependencies via Homebrew...\n";
-        run_command("brew install qemu aarch64-elf-gcc riscv-tools");
-    } else {
-        std::cout << "[!] Unsupported OS for automatic setup: " << os << "\n";
+        std::cout << "[*] Detected macOS. Installing dependencies...\n";
+        run_command("brew install qemu aarch64-elf-gcc cppcheck");
     }
 #endif
     std::cout << "\033[92m[✓] Setup process complete.\033[0m\n";
@@ -169,7 +202,7 @@ void handle_setup() {
 
 int main(int argc, char** argv) {
     if (argc < 2) {
-        std::cout << "SigmaOS Sovereign Native CLI\n";
+        std::cout << "SigmaOS Sovereign Native CLI v2.1\n";
         std::cout << "Commands:\n";
         std::cout << "  build [arch]  - Build the kernel\n";
         std::cout << "  clean         - Clean artifacts\n";
