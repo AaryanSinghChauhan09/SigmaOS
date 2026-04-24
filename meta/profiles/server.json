@@ -1,16 +1,5 @@
 {
-    "name": "server",
-    "arch": "x86_64",
-    "features": {
-        "network": true,
-        "gui": false,
-        "ai": true,
-        "web3": true,
-        "observability": true,
-        "slab_pools": true
-    },
-    "memory": {
-        "max_slab_pools": 256,
-        "heap_limit_mb": 4096
-    }
+  "name": "Sovereign Server Profile",
+  "shards": ["S01_Genesis", "S03_Orchestrator", "S04_HAL", "S06_Persistence", "S10_Networking"],
+  "features": ["ipc_persistence", "high_availability", "net_stack"]
 }

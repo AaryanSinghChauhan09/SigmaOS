@@ -13,6 +13,7 @@ jobs:
       fail-fast: false
       matrix:
         os: [ubuntu-latest, macos-latest, windows-latest]
+        profile: [server, iot, dev]
     runs-on: ${{ matrix.os }}
 
     steps:
@@ -24,6 +25,10 @@ jobs:
           touch build/.gitkeep || true
           g++ -std=c++20 s-cli.cpp -o s-cli || g++ -std=c++20 s-cli.cpp -o s-cli.exe
           echo "[CI] Sovereign Environment Repaired"
+
+      - name: Switch to Sovereign Profile
+        run: |
+          ./s-cli profile ${{ matrix.profile }} || .\s-cli.exe profile ${{ matrix.profile }}
 
       - name: Build Sovereign Lattice
         run: |
@@ -37,7 +42,7 @@ jobs:
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: sigmaos-lattice-${{ matrix.os }}
+          name: sigmaos-${{ matrix.profile }}-${{ matrix.os }}
           path: |
             build/
             *.log

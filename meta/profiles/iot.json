@@ -1,0 +1,5 @@
+{
+  "name": "Sovereign IoT Profile",
+  "shards": ["S01_Genesis", "S04_HAL"],
+  "features": ["low_power", "minimal_footprint"]
+}
