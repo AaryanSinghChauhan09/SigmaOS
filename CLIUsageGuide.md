@@ -1,61 +1,48 @@
+# 📟 SigmaOS: Sovereign CLI Usage Guide (v2.6)
 
-# SigmaOS CLI Usage Guide
+The **S-CLI** is the high-performance, native orchestrator for the Sovereign Lattice. It provides unified control over build, verification, and shard management.
 
+## 🏗️ Core Management
 
-The **SigmaOS Sovereign CLI** (S-CLI) is the primary interface for managing the 500-shard lattice, managing plugins, and performing system diagnostics.
-
-
-## Namespaced Commands
-
-
-
-### 🛡️ System Diagnostics
-
-Check the health of the entire lattice and core primitives.
+### Build the Lattice
 ```bash
-sigma doctor
+./s-cli build [arch]
 ```
+Compiles the core lattice and required shards for the specified architecture.
 
-
-### 🧩 Shard Management
-
-Manage the 500 shards that make up the Sovereign Lattice.
+### Industrial Verification
 ```bash
-sigma shard list
-sigma shard add <name>
+./s-cli verify
 ```
+Performs a cryptographic audit of the shard lattice to ensure state consistency.
 
+## 🧩 Shard Orchestration
 
-### ⚙️ Declarative Configuration
-
-Apply or rollback system states using the JSON-based declarative manifests.
+### Manage Individual Shards
 ```bash
-sigma config apply
-sigma config rollback
+./s-cli shard [list|start|stop|info] [shard_id]
 ```
+Allows for fine-grained control over the lifecycle of individual silicon shards.
 
-
-### 🔌 Plugin Lifecycle
-
-Register and manage Zenith Dashboard extensions.
+### Security Auditing
 ```bash
-sigma plugin list
-sigma plugin install <path>
+./s-cli audit
 ```
+Triggers a deep system-wide security scan, utilizing **S23 (Hardening)** and **S36 (BPF Probes)** to detect vulnerabilities.
 
+## 📊 Observability & Store
 
-## Interactive Mode
-
-To enter the interactive Sovereign Shell:
+### System Telemetry
 ```bash
-sigma shell
+./s-cli telemetry
 ```
+Displays real-time performance metrics, including CPU/Memory usage and IPC throughput across the lattice.
 
-
-## Advanced Usage
-
-For cloud-native deployments:
+### Lattice Store (S-MARKET)
 ```bash
-sigma deploy --remote
-sigma sync cloud
+./s-cli market
 ```
+Connects to the decentralized shard registry to browse and download community-contributed shards.
+
+---
+*Unified Control for a Sovereign Future.*
