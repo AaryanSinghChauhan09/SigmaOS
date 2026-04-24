@@ -82,7 +82,10 @@ int ipc_create_channel(const char* name, u32 owner_pool, u32 target_pool, u32 ca
 
 /* =========================================================================
  * Send (non-blocking, drops if full)
+ * Persistence-Aware: Message is checkpointed before delivery.
  * ========================================================================= */
+
+extern int persistence_write_ffi(u32 shard_id, const void* msg_data, u32 len);
 
 k_status ipc_send(int channel_id, u32 sender_tid, u32 msg_type,
                    const void* payload, u32 payload_len)
@@ -90,25 +93,32 @@ k_status ipc_send(int channel_id, u32 sender_tid, u32 msg_type,
     if (channel_id < 0 || (u32)channel_id >= g_channel_count) return K_ERR_INVAL;
     SigmaIPCChannel* ch = &g_channels[channel_id];
     if (!ch->active) return K_ERR_INVAL;
-
-    if (ch->count >= IPC_QUEUE_DEPTH) {
-        ch->total_dropped++;
-        return K_ERR_NOMEM;  /* queue full */
-    }
-
+    if (ch->count >= IPC_QUEUE_DEPTH) { ch->total_dropped++; return K_ERR_NOMEM; }
     if (payload_len > IPC_MSG_MAX_PAYLOAD) payload_len = IPC_MSG_MAX_PAYLOAD;
 
-    SigmaIPCMsg* msg = &ch->queue[ch->tail % IPC_QUEUE_DEPTH];
-    msg->sender_tid  = sender_tid;
-    msg->msg_type    = msg_type;
-    msg->payload_len = payload_len;
-    msg->_reserved   = 0;
+    /* Build the message in a temp slot */
+    SigmaIPCMsg* slot = &ch->queue[ch->tail % IPC_QUEUE_DEPTH];
+    slot->sender_tid  = sender_tid;
+    slot->msg_type    = msg_type;
+    slot->payload_len = payload_len;
+    slot->_reserved   = 0;
 
     const u8* src = (const u8*)payload;
     u32 i;
-    for (i = 0; i < payload_len; i++) msg->payload[i] = src[i];
-    for (; i < IPC_MSG_MAX_PAYLOAD; i++) msg->payload[i] = 0;
+    for (i = 0; i < payload_len; i++) slot->payload[i] = src[i];
+    for (; i < IPC_MSG_MAX_PAYLOAD; i++) slot->payload[i] = 0;
 
+    /* Persistence Write: Log message durably before committing to the queue.
+     * Non-blocking — a persistence failure issues a warning but does NOT
+     * block delivery (IPC reliability > storage availability). */
+    int persist_res = persistence_write_ffi(sender_tid, slot, sizeof(SigmaIPCMsg));
+    if (persist_res != 0) {
+        extern void kprintf(const char* fmt, ...);
+        kprintf("[IPC] WARN: Persistence failed for CH[%d] msg type %u. Volatile delivery.\n",
+                channel_id, msg_type);
+    }
+
+    /* Commit to queue */
     ch->tail++;
     ch->count++;
     ch->total_sent++;
