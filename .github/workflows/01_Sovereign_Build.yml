@@ -1,0 +1,44 @@
+name: "[01] Sovereign Build & Test"
+
+on:
+  push:
+    branches: [ main, master ]
+  pull_request:
+    branches: [ main, master ]
+
+jobs:
+  native-lattice:
+    name: Build & Check (${{ matrix.os }})
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, macos-latest, windows-latest]
+    runs-on: ${{ matrix.os }}
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Repair & Verify Build Environment
+        run: |
+          mkdir -p build || true
+          touch build/.gitkeep || true
+          g++ -std=c++20 s-cli.cpp -o s-cli || g++ -std=c++20 s-cli.cpp -o s-cli.exe
+          echo "[CI] Sovereign Environment Repaired"
+
+      - name: Build Sovereign Lattice
+        run: |
+          ./s-cli build x86_64 || .\s-cli.exe build x86_64
+
+      - name: Run Sovereign Atomic Tests
+        run: |
+          ./s-cli test || .\s-cli.exe test
+
+      - name: Upload Kernel Binary & Logs
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: sigmaos-lattice-${{ matrix.os }}
+          path: |
+            build/
+            *.log
+          retention-days: 7
