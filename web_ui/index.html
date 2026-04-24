@@ -67,16 +67,14 @@
                 <sigma-ai-dispatch></sigma-ai-dispatch>
             </div>
 
-            <!-- §4: Hardware-Native Intelligence Demo -->
-            <sigma-neural-demo></sigma-neural-demo>
+            <!-- §4–§6: Kernel Telemetry (Auth-Gated) -->
+            <sigma-auth-guard>
+                <sigma-neural-demo></sigma-neural-demo>
+                <sigma-persistence-panel></sigma-persistence-panel>
+                <sigma-perf-metrics></sigma-perf-metrics>
+            </sigma-auth-guard>
 
-            <!-- §5: Decentralized Persistence Layer -->
-            <sigma-persistence-panel></sigma-persistence-panel>
-
-            <!-- §6: Scheduler Performance Profiler -->
-            <sigma-perf-metrics></sigma-perf-metrics>
-
-            <!-- §5: Shard Grid rendered dynamically via JS -->
+            <!-- §7: Shard Grid rendered dynamically via JS -->
             <div class="shard-grid" id="shardContainer" style="margin-top: 24px;">
                 <!-- Populated by kernel_loader.js -->
             </div>
@@ -91,6 +89,7 @@
     <script src="components/sigma-logs.js"></script>
     <script src="components/sigma-pool-inspector.js"></script>
     <script src="components/sigma-ai-dispatch.js"></script>
+    <script src="components/sigma-auth-guard.js"></script>
     <script src="components/sigma-neural-demo.js"></script>
     <script src="components/sigma-persistence-panel.js"></script>
     <script src="components/sigma-perf-metrics.js"></script>
