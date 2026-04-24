@@ -1,0 +1,5 @@
+{
+  "name": "Sovereign Ubuntu (Desktop)",
+  "shards": ["S01_Genesis", "S04_HAL", "S11_ZenithUI", "S13_LuaBridge", "S15_NativeLoader"],
+  "features": ["ui_rich", "user_friendly"]
+}

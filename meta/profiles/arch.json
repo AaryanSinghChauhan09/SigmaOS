@@ -1,0 +1,5 @@
+{
+  "name": "Sovereign Arch (DIY)",
+  "shards": ["S01_Genesis", "S13_LuaBridge", "S18_LatticeStore", "S22_LatticeFuzzer"],
+  "features": ["bleeding_edge", "customizable"]
+}
