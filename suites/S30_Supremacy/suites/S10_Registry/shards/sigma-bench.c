@@ -19,7 +19,7 @@
 
 
 void run_latency_test() {
-    sigma_sigma_sigma_sigma_sigma_printf("S [BENCH]: Initiating Direct-Silicon Latency Test...\n");
+    sigma_sigma_sigma_printf("S [BENCH]: Initiating Direct-Silicon Latency Test...\n");
     
     sigma_u64 start = cpu_rdtsc();
     
@@ -29,13 +29,13 @@ void run_latency_test() {
     sigma_u64 end = cpu_rdtsc();
     sigma_u64 cycles = end - start;
     
-    sigma_sigma_sigma_sigma_sigma_printf("S [BENCH]: Latency: %llu clock cycles.\n", cycles);
+    sigma_sigma_sigma_printf("S [BENCH]: Latency: %llu clock cycles.\n", cycles);
 }
 
 int sigma-bench_ToolMain(int argc, char** argv) {
-    sigma_sigma_sigma_sigma_sigma_printf("--- S SIGMAOS PERFORMANCE BENCHMARK SUITE (SILICON-DIRECT) ---\n");
+    sigma_sigma_sigma_printf("--- S SIGMAOS PERFORMANCE BENCHMARK SUITE (SILICON-DIRECT) ---\n");
     run_latency_test();
-    sigma_sigma_sigma_sigma_sigma_printf("--- BENCHMARK COMPLETED ---\n");
+    sigma_sigma_sigma_printf("--- BENCHMARK COMPLETED ---\n");
     return 0;
 }
 

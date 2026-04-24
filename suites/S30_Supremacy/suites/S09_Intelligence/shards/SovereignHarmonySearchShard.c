@@ -23,15 +23,15 @@ typedef struct {
  * Principle: AI / Algorithms / Personalisation.
  */
 void sigma_opt_harmony_improvise(void) {
-    sigma_sigma_sigma_sigma_printf("[HARMONY]: Improvising new UI aesthetic combination...\n");
+    sigma_sigma_printf("[HARMONY]: Improvising new UI aesthetic combination...\n");
     // Memory consideration Rate (HMCR) and Pitch Adjustment logic
-    sigma_sigma_sigma_sigma_printf("[HARMONY]: Aesthetic Convergence: New Visual Profile SEATED.\n");
+    sigma_sigma_printf("[HARMONY]: Aesthetic Convergence: New Visual Profile SEATED.\n");
 }
 
 /* --- Module Factory --- */
 
 void SovereignHarmonySearch_Register(void) {
-    sigma_sigma_sigma_sigma_printf("[INTELLIGENCE]: Sovereign Harmony Search (Aesthetic Optima) active.\n");
+    sigma_sigma_printf("[INTELLIGENCE]: Sovereign Harmony Search (Aesthetic Optima) active.\n");
 }
 
 

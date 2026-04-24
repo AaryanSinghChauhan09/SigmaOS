@@ -11,8 +11,8 @@
 const char* sigma_vfs_resolve_path(const char* request_path, char* resolved_buffer, int buffer_size) {
     if (buffer_size < 1024) return NULL;
     
-    sigma_sigma_strcpy(resolved_buffer, "../web_ui/");
-    if (sigma_sigma_strcmp(request_path, "/") == 0) {
+    sigma_strcpy(resolved_buffer, "../web_ui/");
+    if (sigma_strcmp(request_path, "/") == 0) {
         strcat(resolved_buffer, "index.html");
     } else {
         strcat(resolved_buffer, request_path + 1); // Ignore leading slash
@@ -37,7 +37,7 @@ char* sigma_vfs_read_file(const char* path, long* out_size) {
         return NULL;
     }
 
-    char* content = (char*)sigma_sigma_malloc(*out_size + 1);
+    char* content = (char*)sigma_malloc(*out_size + 1);
     if (!content) {
         fclose(file);
         *out_size = 0;

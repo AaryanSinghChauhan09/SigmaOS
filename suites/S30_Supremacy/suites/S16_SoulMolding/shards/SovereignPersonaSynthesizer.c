@@ -24,12 +24,12 @@ void soul_synthesize_persona(const char* name, uint32_t emp, uint32_t eff) {
     active_persona.efficiency_bias = eff;
     active_persona.sentient_mode = (emp > 80) ? SIGMA_TRUE : SIGMA_FALSE;
     
-    sigma_sigma_printf("S16 [SOUL-MOLDING]: Synthesized Persona [%s]\n", name);
-    sigma_sigma_printf("  [TRAITS]: Empathy:%u%% Efficiency:%u%% Sentient:%s\n", 
+    sigma_printf("S16 [SOUL-MOLDING]: Synthesized Persona [%s]\n", name);
+    sigma_printf("  [TRAITS]: Empathy:%u%% Efficiency:%u%% Sentient:%s\n", 
                  emp, eff, active_persona.sentient_mode ? "ACTIVE" : "STABLE");
 }
 
 void S16_Register_PersonaSynthesizer(void) {
-    sigma_sigma_printf("S16 [SOUL-MOLDING]: Sovereign Persona Synthesizer Online.\n");
+    sigma_printf("S16 [SOUL-MOLDING]: Sovereign Persona Synthesizer Online.\n");
     soul_synthesize_persona("ZENITH_ALPHA", 90, 85);
 }

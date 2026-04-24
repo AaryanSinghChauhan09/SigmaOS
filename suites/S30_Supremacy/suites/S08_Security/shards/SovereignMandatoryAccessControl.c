@@ -16,14 +16,14 @@ typedef struct {
 static SovereignPolicy_t s_active_policy[128];
 
 void sigma_mac_enforce(sigma_u32 shard_id) {
-    sigma_sigma_sigma_sigma_printf("  [MAC]: Enforcing Sovereign isoloation for Shard: %u\n", shard_id);
-    sigma_sigma_sigma_sigma_printf("  [MAC]: Status: LOCKED. Zero-trust boundary armed.\n");
+    sigma_sigma_printf("  [MAC]: Enforcing Sovereign isoloation for Shard: %u\n", shard_id);
+    sigma_sigma_printf("  [MAC]: Status: LOCKED. Zero-trust boundary armed.\n");
 }
 
 void SovereignSecurity_Init(void) {
-    sigma_sigma_sigma_sigma_printf("S [SECURITY-SUITE]: Initialising Sovereign MAC and Shielding...\n");
+    sigma_sigma_printf("S [SECURITY-SUITE]: Initialising Sovereign MAC and Shielding...\n");
     sigma_mac_enforce(425);
-    sigma_sigma_sigma_sigma_printf("S [SECURITY-SUITE]: Sentinel Shunt active. Access restricted to ZENITH.\n");
+    sigma_sigma_printf("S [SECURITY-SUITE]: Sentinel Shunt active. Access restricted to ZENITH.\n");
 }
 
 void SovereignSecurity_Register(void) {

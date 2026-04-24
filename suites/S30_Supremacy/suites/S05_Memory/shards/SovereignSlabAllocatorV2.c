@@ -50,7 +50,7 @@ SigmaSlabCache* slab_cache_create(const char* name, uint32_t obj_size);
 void* slab_alloc(SigmaSlabCache* cache);
 
 // Return an object to the cache magazine (O(1))
-void  slab_sigma_sigma_free(SigmaSlabCache* cache, void* obj);
+void  slab_sigma_free(SigmaSlabCache* cache, void* obj);
 
 // Shrink all caches by reclaiming empty slabs back to the buddy allocator
 void  slab_trim_all(void);

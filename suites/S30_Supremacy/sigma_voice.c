@@ -25,7 +25,7 @@ typedef struct SovereignAudioCapture {
 } SovereignAudioCapture;
 
 static void audio_init(SovereignAudioCapture* a) {
-    sigma_sigma_memset(a->buffer, 0, AUDIO_BUF_SIZE);
+    sigma_memset(a->buffer, 0, AUDIO_BUF_SIZE);
     a->head      = 0;
     a->tail      = 0;
     a->capturing = SIGMA_FALSE;
@@ -36,7 +36,7 @@ static void audio_start_capture(SovereignAudioCapture* a) {
     sigma_print("[VOICE/HDA]: Opening PCM stream via direct HDA MMIO (no ALSA).\n");
     a->capturing = SIGMA_TRUE;
     /* Simulate PCM capture: fill buffer with silence pattern */
-    sigma_sigma_memset(a->buffer, 0x00, AUDIO_BUF_SIZE);
+    sigma_memset(a->buffer, 0x00, AUDIO_BUF_SIZE);
 }
 
 static void audio_stop_capture(SovereignAudioCapture* a) {
@@ -54,7 +54,7 @@ typedef struct SovereignTranscriptionEngine {
 
 static void transcribe_init(SovereignTranscriptionEngine* t) {
     t->frames_processed = 0;
-    sigma_sigma_memset(t->last_transcript, 0, VOICE_TEXT_MAX);
+    sigma_memset(t->last_transcript, 0, VOICE_TEXT_MAX);
     sigma_print("[VOICE/ENGINE]: Sovereign Offline Transcription Engine Online.\n");
 }
 
@@ -77,7 +77,7 @@ static void postprocess_text(char* text) {
 
 static void transcribe_run(SovereignTranscriptionEngine* t,
                              const sigma_u8* pcm_buf, sigma_u32 samples) {
-    sigma_sigma_printf("[VOICE/ENGINE]: Transcribing %u PCM samples (offline Whisper-shard)...\n",
+    sigma_printf("[VOICE/ENGINE]: Transcribing %u PCM samples (offline Whisper-shard)...\n",
                  samples);
     /* Fixed demo transcript — in production: MFCC + Viterbi lattice shard */
     const char* raw = "sigmaos has achieved sovereign voice sovereignty no 3rd-party apis needed";
@@ -102,14 +102,14 @@ typedef struct SovereignHIDBridge {
 static void hid_init(SovereignHIDBridge* h, sigma_bool use_evdev) {
     h->chars_injected   = 0;
     h->linux_evdev_mode = use_evdev;
-    sigma_sigma_printf("[VOICE/HID]: HID Bridge Online. Mode: %s\n",
+    sigma_printf("[VOICE/HID]: HID Bridge Online. Mode: %s\n",
                  use_evdev ? "linux/evdev" : "mmio-direct");
 }
 
 /* Inject text via /dev/uinput IOCTL (replaces Win32 SendInput) */
 static void hid_inject(SovereignHIDBridge* h, const char* text) {
-    sigma_size_t len = sigma_sigma_strlen(text);
-    sigma_sigma_printf("[VOICE/HID]: Injecting %llu chars into active window shard...\n",
+    sigma_size_t len = sigma_strlen(text);
+    sigma_printf("[VOICE/HID]: Injecting %llu chars into active window shard...\n",
                  (sigma_u64)len);
     /* Write to stdout as proxy — production: sigma_open("/dev/uinput", ...) */
     sigma_write(1, text, len);
@@ -134,11 +134,11 @@ static void voice_init(SovereignVoiceShard* v) {
     hid_init(&v->hid, SIGMA_TRUE);
     v->wake_active       = SIGMA_FALSE;
     v->events_processed  = 0;
-    sigma_sigma_printf("[VOICE/KERNEL]: Sovereign Voice Shard Online (v20.0). Zero-3rdParty.\n");
+    sigma_printf("[VOICE/KERNEL]: Sovereign Voice Shard Online (v20.0). Zero-3rdParty.\n");
 }
 
 static void voice_activate_wake_key(SovereignVoiceShard* v) {
-    sigma_sigma_printf("[VOICE/KERNEL]: Monitoring for Global Wake-Key (Caps Lock) via evdev...\n");
+    sigma_printf("[VOICE/KERNEL]: Monitoring for Global Wake-Key (Caps Lock) via evdev...\n");
     v->wake_active = SIGMA_TRUE;
 }
 
@@ -152,19 +152,19 @@ static void voice_process_event(SovereignVoiceShard* v) {
     transcribe_run(&v->engine, v->audio.buffer, AUDIO_BUF_SIZE / 2);
     audio_stop_capture(&v->audio);
 
-    sigma_sigma_printf("[VOICE/CORE]: Transcript: \"%s\"\n", v->engine.last_transcript);
+    sigma_printf("[VOICE/CORE]: Transcript: \"%s\"\n", v->engine.last_transcript);
     hid_inject(&v->hid, v->engine.last_transcript);
     v->events_processed++;
 }
 
 static void voice_audit(const SovereignVoiceShard* v) {
-    sigma_sigma_printf("\n--- Σ SOVEREIGN VOICE AUDIT (v20.0) ---\n");
-    sigma_sigma_printf("| Events Processed : %llu\n", v->events_processed);
-    sigma_sigma_printf("| Frames Transcribed: %llu\n", v->engine.frames_processed);
-    sigma_sigma_printf("| Chars Injected   : %llu\n", v->hid.chars_injected);
-    sigma_sigma_printf("| Wake Active      : %s\n", v->wake_active ? "YES" : "NO");
-    sigma_sigma_printf("| Competitors      : Whisper-API/Win32/ALSA neutralized.\n");
-    sigma_sigma_printf("----------------------------------------\n");
+    sigma_printf("\n--- Σ SOVEREIGN VOICE AUDIT (v20.0) ---\n");
+    sigma_printf("| Events Processed : %llu\n", v->events_processed);
+    sigma_printf("| Frames Transcribed: %llu\n", v->engine.frames_processed);
+    sigma_printf("| Chars Injected   : %llu\n", v->hid.chars_injected);
+    sigma_printf("| Wake Active      : %s\n", v->wake_active ? "YES" : "NO");
+    sigma_printf("| Competitors      : Whisper-API/Win32/ALSA neutralized.\n");
+    sigma_printf("----------------------------------------\n");
 }
 
 /* =========================================================================
@@ -174,10 +174,10 @@ int main(void) {
     SovereignVoiceShard voice;
     voice_init(&voice);
 
-    sigma_sigma_printf("--- Σ SIGMAOS VOICE-TO-TYPE SOVEREIGN INITIALIZED ---\n");
+    sigma_printf("--- Σ SIGMAOS VOICE-TO-TYPE SOVEREIGN INITIALIZED ---\n");
     voice_activate_wake_key(&voice);
 
-    sigma_sigma_printf("\n[EVENT]: Global Wake-Key Triggered.\n");
+    sigma_printf("\n[EVENT]: Global Wake-Key Triggered.\n");
     voice_process_event(&voice);
     voice_audit(&voice);
 

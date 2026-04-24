@@ -30,8 +30,8 @@ public:
     void Project() override {
         double I = 5.0, r = 0.1, mu0 = 4 * 3.14e-7;
         double B = (mu0 * I) / (2 * 12.56e-1 * r); // Simplified
-        sigma_sigma_printf("[PHYSICS/ENCY]: Concept: Magnetic Field (B) near wire.\n");
-        sigma_sigma_printf("[PHYSICS/ENCY]: B Shard: %f Tesla.\n", B);
+        sigma_printf("[PHYSICS/ENCY]: Concept: Magnetic Field (B) near wire.\n");
+        sigma_printf("[PHYSICS/ENCY]: B Shard: %f Tesla.\n", B);
     }
 };
 
@@ -43,8 +43,8 @@ public:
         double rad = theta * 3.14 / 180.0;
         // In bare-metal, we would use a lookup table for sin, but here we just simulate.
         double range = (v * v * 1.0) / g; // sin(2 * 45) = 1.0
-        sigma_sigma_printf("[PHYSICS/ENCY]: Concept: Projectile Range (v=20m/s, 45deg).\n");
-        sigma_sigma_printf("[PHYSICS/ENCY]: Range Shard: %f Meters.\n", range);
+        sigma_printf("[PHYSICS/ENCY]: Concept: Projectile Range (v=20m/s, 45deg).\n");
+        sigma_printf("[PHYSICS/ENCY]: Range Shard: %f Meters.\n", range);
     }
 };
 
@@ -52,8 +52,8 @@ public:
 class EvolutionShard : public IEncycloShard {
 public:
     void Project() override {
-        sigma_sigma_printf("[BIOLOGY/ENCY]: Concept: Natural Selection (Darwin Shard).\n");
-        sigma_sigma_printf("[BIOLOGY/ENCY]: Survival of the Fittest (Adaptivity = 100%%).\n");
+        sigma_printf("[BIOLOGY/ENCY]: Concept: Natural Selection (Darwin Shard).\n");
+        sigma_printf("[BIOLOGY/ENCY]: Survival of the Fittest (Adaptivity = 100%%).\n");
     }
 };
 
@@ -61,8 +61,8 @@ public:
 class NeutralShard : public IEncycloShard {
 public:
     void Project() override {
-        sigma_sigma_printf("[CHEMISTRY/ENCY]: Concept: HCl + NaOH -> NaCl + H2O.\n");
-        sigma_sigma_printf("[CHEMISTRY/ENCY]: Exothermic Shard: Delta-H detected.\n");
+        sigma_printf("[CHEMISTRY/ENCY]: Concept: HCl + NaOH -> NaCl + H2O.\n");
+        sigma_printf("[CHEMISTRY/ENCY]: Exothermic Shard: Delta-H detected.\n");
     }
 };
 
@@ -72,8 +72,8 @@ public:
     void Project() override {
         int n = 3;
         int p = (int)sigma_pow(2, n);
-        sigma_sigma_printf("[MATH/ENCY]: Concept: Power Set: P(S) cardinality for |S|=3.\n");
-        sigma_sigma_printf("[MATH/ENCY]: Card(P(S)) = %d (Shard-Perfect).\n", p);
+        sigma_printf("[MATH/ENCY]: Concept: Power Set: P(S) cardinality for |S|=3.\n");
+        sigma_printf("[MATH/ENCY]: Card(P(S)) = %d (Shard-Perfect).\n", p);
     }
 };
 
@@ -90,9 +90,9 @@ public:
     }
 
     void ExecuteEncycloAudit() {
-        sigma_sigma_printf("--- Σ SIGMA OS MASTER SCHOLASTIC ENCYCLOPEDIA ---\n");
+        sigma_printf("--- Σ SIGMA OS MASTER SCHOLASTIC ENCYCLOPEDIA ---\n");
         for (sigma_usize i = 0; i < m_ency.size(); i++) {
-            sigma_sigma_printf("\n[ENCY-SHADING]: Executing Shard\n");
+            sigma_printf("\n[ENCY-SHADING]: Executing Shard\n");
             m_ency.at_index(i)->Project();
         }
     }
@@ -103,7 +103,7 @@ extern "C" void _start(void) {
     ency.Synthesize();
     ency.ExecuteEncycloAudit();
 
-    sigma_sigma_printf("\n[SUCCESS]: Competitive Scholastic Encyclopedia Online. NCERT Sovereignty 100%%.\n");
+    sigma_printf("\n[SUCCESS]: Competitive Scholastic Encyclopedia Online. NCERT Sovereignty 100%%.\n");
     sigma_exit(0);
 }
 

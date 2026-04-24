@@ -16,16 +16,16 @@
  * Principle: Cyber Security / Pointer Defiance.
  */
 void* sigma_sec_pac_sign(void* ptr, sigma_u64 modifier) {
-    sigma_sigma_sigma_sigma_printf("[PAC-GUARD]: Signing pointer 0x%p (Modifier: 0x%llX)...\n", ptr, (unsigned long long)modifier);
+    sigma_sigma_printf("[PAC-GUARD]: Signing pointer 0x%p (Modifier: 0x%llX)...\n", ptr, (unsigned long long)modifier);
     // PAC logic: Insert cryptographic signature into the top 16 bits of the 64-bit address space
-    sigma_sigma_sigma_sigma_printf("[PAC-GUARD]: Pointer Cryptographically Sealed. Tampering will trigger fault.\n");
+    sigma_sigma_printf("[PAC-GUARD]: Pointer Cryptographically Sealed. Tampering will trigger fault.\n");
     return ptr; // In native ASM, this returns the signed pointer
 }
 
 /* --- Module Factory --- */
 
 void SovereignPAC_Register(void) {
-    sigma_sigma_sigma_sigma_printf("[SECURITY]: Sovereign PAC (Cryptographic Pointers) active.\n");
+    sigma_sigma_printf("[SECURITY]: Sovereign PAC (Cryptographic Pointers) active.\n");
 }
 
 

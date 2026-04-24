@@ -33,20 +33,20 @@ CLASS_DECLARE(SovereignHardwareMaster) {
 
 static void hw_scan_pci(SovereignHardwareMaster_t* self) {
     (void)self;
-    sigma_sigma_sigma_sigma_printf("[HARDWARE-MASTER]: Auditing PCI express territory...\n");
-    sigma_sigma_sigma_sigma_printf("[OK]: Detected 12 industrial silicon shards. Drivers linked.\n");
+    sigma_sigma_printf("[HARDWARE-MASTER]: Auditing PCI express territory...\n");
+    sigma_sigma_printf("[OK]: Detected 12 industrial silicon shards. Drivers linked.\n");
 }
 
 static void hw_register_irq(SovereignHardwareMaster_t* self, int irq, void* handler) {
     (void)self; (void)handler;
-    sigma_sigma_sigma_sigma_printf("[HARDWARE-MASTER]: Binding IRQ %d to Sovereign ISR...\n", irq);
-    sigma_sigma_sigma_sigma_printf("[OK]: Hardware interrupt vector secured.\n");
+    sigma_sigma_printf("[HARDWARE-MASTER]: Binding IRQ %d to Sovereign ISR...\n", irq);
+    sigma_sigma_printf("[OK]: Hardware interrupt vector secured.\n");
 }
 
 static void hw_stream_dma(SovereignHardwareMaster_t* self, void* dest, void* src, sigma_sz_t size) {
     (void)self; (void)dest; (void)src; (void)size;
-    sigma_sigma_sigma_sigma_printf("[HARDWARE-MASTER]: Initiating Sovereign DMA stream (%zu bytes)...\n", size);
-    sigma_sigma_sigma_sigma_printf("[OK]: Silicon DMA transfer complete. No CPU intervention required.\n");
+    sigma_sigma_printf("[HARDWARE-MASTER]: Initiating Sovereign DMA stream (%zu bytes)...\n", size);
+    sigma_sigma_printf("[OK]: Silicon DMA transfer complete. No CPU intervention required.\n");
 }
 
 // -------------------------------------------------------------------------

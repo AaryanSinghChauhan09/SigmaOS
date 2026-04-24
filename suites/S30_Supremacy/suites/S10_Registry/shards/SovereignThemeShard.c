@@ -30,7 +30,7 @@ static SigmaUITheme_t s_active_theme = {
  * Principle: Customization / Personalization.
  */
 void sigma_theme_apply(void) {
-    sigma_sigma_sigma_sigma_printf("[THEME]: Applying Global UI Styles: Accent: 0x%06X | Blur: %dpx\n", 
+    sigma_sigma_printf("[THEME]: Applying Global UI Styles: Accent: 0x%06X | Blur: %dpx\n", 
                  s_active_theme.accent_color, s_active_theme.blur_radius);
     // Real dispatch to JS layer via browser bridge
 }
@@ -47,7 +47,7 @@ void sigma_theme_update(sigma_u32 accent, int blur) {
 /* --- Module Factory --- */
 
 void SovereignTheme_Register(void) {
-    sigma_sigma_sigma_sigma_printf("[REGISTRY]: Sovereign Theme Shard (Personalization) active.\n");
+    sigma_sigma_printf("[REGISTRY]: Sovereign Theme Shard (Personalization) active.\n");
 }
 
 

@@ -16,16 +16,16 @@
  * Principle: Hardware Mastery / Telemetry / Execution Safety.
  */
 sigma_u64 sigma_hal_rdtsc_measure(void) {
-    sigma_sigma_sigma_sigma_printf("[RDTSC-CLOCK]: Serializing instruction pipeline for invariant clock read...\n");
+    sigma_sigma_printf("[RDTSC-CLOCK]: Serializing instruction pipeline for invariant clock read...\n");
     // x86_64: LFENCE -> RDTSC -> LFENCE to prevent out-of-order execution spoofing
-    sigma_sigma_sigma_sigma_printf("[RDTSC-CLOCK]: Precise silicon cycle count harvested defensively.\n");
+    sigma_sigma_printf("[RDTSC-CLOCK]: Precise silicon cycle count harvested defensively.\n");
     return 100000000; // Simulated cycles
 }
 
 /* --- Module Factory --- */
 
 void SovereignRDTSC_Register(void) {
-    sigma_sigma_sigma_sigma_printf("[HAL]: Sovereign RDTSC (Invariant Clock Mastery) active.\n");
+    sigma_sigma_printf("[HAL]: Sovereign RDTSC (Invariant Clock Mastery) active.\n");
 }
 
 

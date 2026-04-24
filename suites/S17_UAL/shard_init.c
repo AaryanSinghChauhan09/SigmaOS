@@ -29,21 +29,21 @@ void ual_load_hal() {
     
     switch (env) {
         case ENV_BROWSER_WASM:
-            sigma_sigma_printf("[UAL] Context: Browser Sandbox (WASM). Loading JS-Bridge HAL...\n");
+            sigma_printf("[UAL] Context: Browser Sandbox (WASM). Loading JS-Bridge HAL...\n");
             break;
         case ENV_VIRTUALIZED:
-            sigma_sigma_printf("[UAL] Context: Virtual Machine (QEMU). Loading VirtIO HAL...\n");
+            sigma_printf("[UAL] Context: Virtual Machine (QEMU). Loading VirtIO HAL...\n");
             break;
         case ENV_EMBEDDED_IOT:
-            sigma_sigma_printf("[UAL] Context: Embedded IoT. Loading Minimal Static HAL...\n");
+            sigma_printf("[UAL] Context: Embedded IoT. Loading Minimal Static HAL...\n");
             break;
         case ENV_BARE_METAL:
-            sigma_sigma_printf("[UAL] Context: Bare-Metal Silicon. Loading Sovereign HAL...\n");
+            sigma_printf("[UAL] Context: Bare-Metal Silicon. Loading Sovereign HAL...\n");
             break;
     }
 }
 
 void shard_init() {
-    sigma_sigma_printf("[SHARD] Universal Abstraction Layer (UAL) Active.\n");
+    sigma_printf("[SHARD] Universal Abstraction Layer (UAL) Active.\n");
     ual_load_hal();
 }

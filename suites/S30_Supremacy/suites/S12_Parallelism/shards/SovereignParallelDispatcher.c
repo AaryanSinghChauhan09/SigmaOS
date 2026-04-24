@@ -25,17 +25,17 @@ void parallelism_dispatch_task(uint32_t core_id, void (*task)(void)) {
     uint32_t pos = queue_heads[core_id]++;
     core_queues[core_id][pos % TASK_QUEUE_DEPTH].handler = task;
     
-    sigma_sigma_printf("S12 [PARALLEL]: Task dispatched to Core %u (Queue Depth: %u)\n", 
+    sigma_printf("S12 [PARALLEL]: Task dispatched to Core %u (Queue Depth: %u)\n", 
                  core_id, queue_heads[core_id]);
 }
 
 void parallelism_sync_all(void) {
-    sigma_sigma_printf("S12 [PARALLEL]: Synchronizing tasks across %u silicon cores...\n", MAX_CORES);
+    sigma_printf("S12 [PARALLEL]: Synchronizing tasks across %u silicon cores...\n", MAX_CORES);
     // Symbolic: Memory barrier and spinlock release
-    sigma_sigma_printf("  [S12]: Lattice synchronization achieved (0.00ns Jitter)\n");
+    sigma_printf("  [S12]: Lattice synchronization achieved (0.00ns Jitter)\n");
 }
 
 void S12_Register_ParallelDispatcher(void) {
-    sigma_sigma_printf("S12 [PARALLEL]: Sovereign Parallel Dispatcher Online.\n");
+    sigma_printf("S12 [PARALLEL]: Sovereign Parallel Dispatcher Online.\n");
     parallelism_sync_all();
 }

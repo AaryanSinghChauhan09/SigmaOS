@@ -23,24 +23,24 @@ typedef struct {
  * Principle: ACID / Storage / Real-Time Resilience.
  */
 void sigma_journal_checkpoint(SigmaJournalEntry_t* entry) {
-    sigma_sigma_sigma_sigma_printf("[JOURNAL]: Checkpointing Transaction %llu for %s...\n", 
+    sigma_sigma_printf("[JOURNAL]: Checkpointing Transaction %llu for %s...\n", 
                  entry->txn_id, entry->path);
     // Atomic disk write to the journal partition
-    sigma_sigma_sigma_sigma_printf("[JOURNAL]: Sync complete. Transaction COMMITTED.\n");
+    sigma_sigma_printf("[JOURNAL]: Sync complete. Transaction COMMITTED.\n");
 }
 
 /**
  * sigma_journal_recover: Replays the journal after a sudden power loss.
  */
 void sigma_journal_recover(void) {
-    sigma_sigma_sigma_sigma_printf("[JOURNAL]: Integrity Scan: 12 pending transactions found. Replaying WAL...\n");
-    sigma_sigma_sigma_sigma_printf("[JOURNAL]: Recovery SUCCESS. System state RECONCILED.\n");
+    sigma_sigma_printf("[JOURNAL]: Integrity Scan: 12 pending transactions found. Replaying WAL...\n");
+    sigma_sigma_printf("[JOURNAL]: Recovery SUCCESS. System state RECONCILED.\n");
 }
 
 /* --- Module Factory --- */
 
 void SovereignJournal_Register(void) {
-    sigma_sigma_sigma_sigma_printf("[STORAGE]: Sovereign Journaling (ACID Mastery) active.\n");
+    sigma_sigma_printf("[STORAGE]: Sovereign Journaling (ACID Mastery) active.\n");
 }
 
 

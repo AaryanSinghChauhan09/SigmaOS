@@ -85,35 +85,35 @@ static void print_report(void) {
     uint32_t py_count = 0, js_count = 0, sh_count = 0;
     uint64_t total_foreign_bytes = 0;
 
-    sigma_sigma_printf("\n");
-    sigma_sigma_printf("╔══════════════════════════════════════════════════════════════╗\n");
-    sigma_sigma_printf("║   SigmaOS Sovereign Dependency Audit   v%-21s ║\n", AUDIT_VERSION);
-    sigma_sigma_printf("╠══════════════════════════════════════════════════════════════╣\n");
-    sigma_sigma_printf("║ %-12s │ %-45s ║\n", "LANG", "FILE");
-    sigma_sigma_printf("╠══════════════════════════════════════════════════════════════╣\n");
+    sigma_printf("\n");
+    sigma_printf("╔══════════════════════════════════════════════════════════════╗\n");
+    sigma_printf("║   SigmaOS Sovereign Dependency Audit   v%-21s ║\n", AUDIT_VERSION);
+    sigma_printf("╠══════════════════════════════════════════════════════════════╣\n");
+    sigma_printf("║ %-12s │ %-45s ║\n", "LANG", "FILE");
+    sigma_printf("╠══════════════════════════════════════════════════════════════╣\n");
 
     for (uint32_t i = 0; i < foreign_count; i++) {
         ForeignFileRecord* r = &foreign_files[i];
         const char* tag = r->has_replacement ? "[REPLACED]" : "[PENDING] ";
-        sigma_sigma_printf("║ %-12s │ %-35s %s ║\n", r->lang,
-            r->path + (sigma_sigma_strlen(r->path) > 35 ? sigma_sigma_strlen(r->path) - 35 : 0), tag);
+        sigma_printf("║ %-12s │ %-35s %s ║\n", r->lang,
+            r->path + (sigma_strlen(r->path) > 35 ? sigma_strlen(r->path) - 35 : 0), tag);
         total_foreign_bytes += r->size_bytes;
         if (sigma_strcmp(r->lang, "python") == 0) py_count++;
         if (sigma_strcmp(r->lang, "javascript") == 0) js_count++;
         if (sigma_strcmp(r->lang, "shell") == 0) sh_count++;
     }
 
-    sigma_sigma_printf("╠══════════════════════════════════════════════════════════════╣\n");
-    sigma_sigma_printf("║ Python: %-5u   JavaScript: %-5u   Shell: %-5u             ║\n",
+    sigma_printf("╠══════════════════════════════════════════════════════════════╣\n");
+    sigma_printf("║ Python: %-5u   JavaScript: %-5u   Shell: %-5u             ║\n",
            py_count, js_count, sh_count);
-    sigma_sigma_printf("║ Total foreign files: %-5u   Total size: %-8llu bytes    ║\n",
+    sigma_printf("║ Total foreign files: %-5u   Total size: %-8llu bytes    ║\n",
            foreign_count, (unsigned long long)total_foreign_bytes);
-    sigma_sigma_printf("╚══════════════════════════════════════════════════════════════╝\n\n");
+    sigma_printf("╚══════════════════════════════════════════════════════════════╝\n\n");
 }
 
 int main(int argc, char* argv[]) {
     const char* scan_path = (argc > 1) ? argv[1] : ".";
-    sigma_sigma_printf("[sigma-audit] Scanning: %s\n", scan_path);
+    sigma_printf("[sigma-audit] Scanning: %s\n", scan_path);
     walk_dir(scan_path);
     print_report();
     return (foreign_count > 0) ? 1 : 0; // Non-zero exit if foreign files found

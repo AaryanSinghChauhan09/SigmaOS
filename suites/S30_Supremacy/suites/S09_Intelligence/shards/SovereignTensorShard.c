@@ -32,12 +32,12 @@ static float sigma_math_sigmoid(float x) {
  * Principle: AI / Machine Learning / Calculus.
  */
 void sigma_ml_backprop(SigmaNeuralLayer_t* layer, float loss_gradient, float lr) {
-    sigma_sigma_sigma_sigma_printf("[AI]: Backpropagating loss gradient: %f...\n", loss_gradient);
+    sigma_sigma_printf("[AI]: Backpropagating loss gradient: %f...\n", loss_gradient);
     for (sigma_u32 i = 0; i < layer->size; i++) {
         layer->gradients[i] = loss_gradient * 0.1f; // Simplified partial derivative
         layer->weights[i] -= lr * layer->gradients[i];
     }
-    sigma_sigma_sigma_sigma_printf("[AI]: Neural weights updated (Learning Rate: %f).\n", lr);
+    sigma_sigma_printf("[AI]: Neural weights updated (Learning Rate: %f).\n", lr);
 }
 
 /**
@@ -54,7 +54,7 @@ float sigma_ml_infer(SigmaNeuralLayer_t* layer, float input) {
 /* --- Module Factory --- */
 
 void SovereignTensor_Register(void) {
-    sigma_sigma_sigma_sigma_printf("[INTELLIGENCE]: Sovereign Tensor Shard (Ultron-ML) active.\n");
+    sigma_sigma_printf("[INTELLIGENCE]: Sovereign Tensor Shard (Ultron-ML) active.\n");
 }
 
 

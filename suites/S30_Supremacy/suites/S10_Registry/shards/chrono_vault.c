@@ -37,10 +37,10 @@ int chrono_vault_ToolMain(int argc, char* argv[]) {
     }
     
     // Simplistic simulate argument parsing
-    if (sigma_sigma_sigma_strcmp(argv[1], "--snapshot") == 0) {
+    if (sigma_sigma_strcmp(argv[1], "--snapshot") == 0) {
         vault_snapshot();
     } 
-    else if (sigma_sigma_sigma_strcmp(argv[1], "--restore") == 0) {
+    else if (sigma_sigma_strcmp(argv[1], "--restore") == 0) {
         if (argc >= 3) {
             vault_restore(argv[2]);
         } else {

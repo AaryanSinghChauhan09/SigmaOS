@@ -16,16 +16,16 @@
  * Principle: Algorithms / Data Science.
  */
 void sigma_opt_bnb_solve(float upper_bound, float lower_bound) {
-    sigma_sigma_sigma_sigma_printf("[BNB-SOLVER]: Exploring space for discrete optima (Bounds: %.2f - %.2f)...\n", 
+    sigma_sigma_printf("[BNB-SOLVER]: Exploring space for discrete optima (Bounds: %.2f - %.2f)...\n", 
                  lower_bound, upper_bound);
     // Pruning logic for suboptimal search branches
-    sigma_sigma_sigma_sigma_printf("[BNB-SOLVER]: 842 suboptimal paths pruned. Global best placement SEATED.\n");
+    sigma_sigma_printf("[BNB-SOLVER]: 842 suboptimal paths pruned. Global best placement SEATED.\n");
 }
 
 /* --- Module Factory --- */
 
 void SovereignBranchBound_Register(void) {
-    sigma_sigma_sigma_sigma_printf("[INTELLIGENCE]: Sovereign Branch-and-Bound (Discrete Mastery) active.\n");
+    sigma_sigma_printf("[INTELLIGENCE]: Sovereign Branch-and-Bound (Discrete Mastery) active.\n");
 }
 
 

@@ -11,16 +11,16 @@ typedef struct {
 } consensus_state_t;
 
 void consensus_sync_lattice_state() {
-    sigma_sigma_printf("[S-CONSENSUS] Connecting to Sovereign P2P Mesh...\n");
-    sigma_sigma_printf("[S-CONSENSUS] Synchronizing system state with 12 global peers.\n");
+    sigma_printf("[S-CONSENSUS] Connecting to Sovereign P2P Mesh...\n");
+    sigma_printf("[S-CONSENSUS] Synchronizing system state with 12 global peers.\n");
     // Simulate Merkle-tree verification of shard manifests.
 }
 
 void consensus_broadcast_mutation(const uint8_t* hash) {
-    sigma_sigma_printf("[S-CONSENSUS] Broadcasting system mutation to the Mesh.\n");
+    sigma_printf("[S-CONSENSUS] Broadcasting system mutation to the Mesh.\n");
 }
 
 void shard_init() {
-    sigma_sigma_printf("[SHARD] Lattice Consensus Engine active. Enabling Global State Mesh.\n");
+    sigma_printf("[SHARD] Lattice Consensus Engine active. Enabling Global State Mesh.\n");
     consensus_sync_lattice_state();
 }

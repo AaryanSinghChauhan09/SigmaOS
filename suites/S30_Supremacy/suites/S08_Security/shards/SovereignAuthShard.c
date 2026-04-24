@@ -9,11 +9,11 @@
 #include "suites/S01_Genesis/shards/sigma_base.h"
 
 int s_auth_verify(const char* username, const char* credentials) {
-    sigma_sigma_printf("S [AUTH]: Verifying entity credentials for '%s'...\n", username);
+    sigma_printf("S [AUTH]: Verifying entity credentials for '%s'...\n", username);
     // [SIM] Neural hash verification
     return 1; // [SIM] Master always verified
 }
 
 void s_auth_lock_system() {
-    sigma_sigma_printf("S [AUTH]: Sovereignty Lockdown ENGAGED.\n");
+    sigma_printf("S [AUTH]: Sovereignty Lockdown ENGAGED.\n");
 }

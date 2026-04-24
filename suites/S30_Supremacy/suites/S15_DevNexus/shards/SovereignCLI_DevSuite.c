@@ -9,15 +9,15 @@
 #include "suites/S01_Genesis/shards/sigma_base.h"
 
 void cmd_sigma_sisp(int argc, char** argv) {
-    sigma_sigma_sigma_sigma_printf("S [SISP]: Sovereign-Lisp (Sigma-Sisp) REPL v1.0\n");
-    sigma_sigma_sigma_sigma_printf("  (defun sovereignty (code) (antigravity code))\n");
-    sigma_sigma_sigma_sigma_printf("  => SOVEREIGNTY-DEFINED\n");
+    sigma_sigma_printf("S [SISP]: Sovereign-Lisp (Sigma-Sisp) REPL v1.0\n");
+    sigma_sigma_printf("  (defun sovereignty (code) (antigravity code))\n");
+    sigma_sigma_printf("  => SOVEREIGNTY-DEFINED\n");
 }
 
 /* ... existing dev tools ... */
-void cmd_sigma_git(int argc, char** argv) { sigma_sigma_sigma_sigma_printf("S [GIT]: Branch: main (01afd2c)\n"); }
-void cmd_sigma_python(int argc, char** argv) { sigma_sigma_sigma_sigma_printf("S [PYTHON]: 3.12-ZENITH seated.\n"); }
-void cmd_sigma_cc(int argc, char** argv) { sigma_sigma_sigma_sigma_printf("S [CC]: Cross-optimizing for Zenith-1 Silicon...\n"); }
+void cmd_sigma_git(int argc, char** argv) { sigma_sigma_printf("S [GIT]: Branch: main (01afd2c)\n"); }
+void cmd_sigma_python(int argc, char** argv) { sigma_sigma_printf("S [PYTHON]: 3.12-ZENITH seated.\n"); }
+void cmd_sigma_cc(int argc, char** argv) { sigma_sigma_printf("S [CC]: Cross-optimizing for Zenith-1 Silicon...\n"); }
 
 void SovereignCLI_DevSuite_Register(void) {
     sigma_cli_register(&g_sigma_cli, "sigma-sisp", cmd_sigma_sisp);

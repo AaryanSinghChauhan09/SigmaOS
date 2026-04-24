@@ -56,13 +56,13 @@ void sigma_cli_execute(char* raw_cmd) {
             return;
         }
     }
-    sigma_sigma_sigma_sigma_printf("[CLI]: Unknown command '%s'.\n", argv[0]);
+    sigma_sigma_printf("[CLI]: Unknown command '%s'.\n", argv[0]);
 }
 
 /* --- Module Factory --- */
 
 void SovereignCommand_Register(void) {
-    sigma_sigma_sigma_sigma_printf("[ZENITH]: Sovereign CLI Engine (Kernel Shell) active.\n");
+    sigma_sigma_printf("[ZENITH]: Sovereign CLI Engine (Kernel Shell) active.\n");
 }
 
 

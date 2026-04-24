@@ -52,11 +52,11 @@ const char* sigma_i18n_get(const char* key) {
 
 void sigma_i18n_set_locale(SovereignLocale locale) {
     current_locale = locale;
-    sigma_sigma_printf("[I18n]: Locale set to %d\n", locale);
+    sigma_printf("[I18n]: Locale set to %d\n", locale);
 }
 
 void S12_Register_I18n(void) {
-    sigma_sigma_printf("S12 [ECOSYSTEM]: Initializing Sovereign I18n Engine...\n");
-    sigma_sigma_printf("  [I18n]: Default locale: EN_US\n");
-    sigma_sigma_printf("  [I18n]: Test String: %s\n", sigma_i18n_get("SYS_WELCOME"));
+    sigma_printf("S12 [ECOSYSTEM]: Initializing Sovereign I18n Engine...\n");
+    sigma_printf("  [I18n]: Default locale: EN_US\n");
+    sigma_printf("  [I18n]: Test String: %s\n", sigma_i18n_get("SYS_WELCOME"));
 }

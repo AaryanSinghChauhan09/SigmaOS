@@ -15,16 +15,16 @@
  * sigma_hal_dsa_memcpy: Offloads massive memory block copies and CRC checks directly to silicon.
  * Principle: Hardware Mastery / Memory Velocity / Latency Eradication.
  */
-void sigma_hal_dsa_sigma_sigma_sigma_memcpy(void* dest, void* src, sigma_u64 bytes) {
-    sigma_sigma_sigma_sigma_printf("[DSA-FABRIC]: Enqueuing %llu bytes to the hardware Data Streaming Accelerator...\n", bytes);
+void sigma_hal_dsa_sigma_sigma_memcpy(void* dest, void* src, sigma_u64 bytes) {
+    sigma_sigma_printf("[DSA-FABRIC]: Enqueuing %llu bytes to the hardware Data Streaming Accelerator...\n", bytes);
     // Bypasses the CPU cache pipeline entirely, executing extreme-speed scatter-gather operations directly in memory
-    sigma_sigma_sigma_sigma_printf("[DSA-FABRIC]: Offload complete. CPU cache pollution avoided. Operations executed synchronously.\n");
+    sigma_sigma_printf("[DSA-FABRIC]: Offload complete. CPU cache pollution avoided. Operations executed synchronously.\n");
 }
 
 /* --- Module Factory --- */
 
 void SovereignDSA_Register(void) {
-    sigma_sigma_sigma_sigma_printf("[HAL]: Sovereign DSA (Data Streaming Acceleration) active.\n");
+    sigma_sigma_printf("[HAL]: Sovereign DSA (Data Streaming Acceleration) active.\n");
 }
 
 

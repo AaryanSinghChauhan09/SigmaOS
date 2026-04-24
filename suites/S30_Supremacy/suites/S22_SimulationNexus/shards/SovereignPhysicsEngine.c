@@ -21,5 +21,5 @@ void sigma_physics_apply_gravity(sigma_rigid_body_t* body, sigma_f32 dt) {
 }
 
 void sigma_physics_init(void) {
-    sigma_sigma_sigma_sigma_printf("S [PHYSICS]: High-Fidelity Simulation Engine (S22) active.\n");
+    sigma_sigma_printf("S [PHYSICS]: High-Fidelity Simulation Engine (S22) active.\n");
 }

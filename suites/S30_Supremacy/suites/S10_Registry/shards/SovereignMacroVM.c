@@ -17,13 +17,13 @@
 
 static void vm_load_bytecode(SovereignMacroVM_t* self, const sigma_u8* bytecode, sigma_sz_t size) {
     (void)self; (void)bytecode;
-    sigma_sigma_sigma_sigma_printf("[EXCEL-VM]: Loading %llu bytes of automated business logic bytecode...\n", (unsigned long long)size);
+    sigma_sigma_printf("[EXCEL-VM]: Loading %llu bytes of automated business logic bytecode...\n", (unsigned long long)size);
 }
 
 static void vm_execute_macro(SovereignMacroVM_t* self) {
     (void)self;
-    sigma_sigma_sigma_sigma_printf("[EXCEL-VM]: JIT-Compiling Sovereign Macro instructions...\n");
-    sigma_sigma_sigma_sigma_printf("[OK]: Business logic workflow accelerated natively on silicon.\n");
+    sigma_sigma_printf("[EXCEL-VM]: JIT-Compiling Sovereign Macro instructions...\n");
+    sigma_sigma_printf("[OK]: Business logic workflow accelerated natively on silicon.\n");
 }
 
 // -------------------------------------------------------------------------

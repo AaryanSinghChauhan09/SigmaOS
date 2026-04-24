@@ -8,7 +8,7 @@ static uint8_t* wasm_heap_start = (uint8_t*)0x1000000;
 static size_t   wasm_heap_ptr = 0;
 
 void* sigma_wasm_alloc(size_t size) {
-    sigma_sigma_printf("[WASM-ALLOC] Growing linear memory by %d bytes...\n", (uint32_t)size);
+    sigma_printf("[WASM-ALLOC] Growing linear memory by %d bytes...\n", (uint32_t)size);
     
     // Simulate WASM memory.grow
     void* ptr = wasm_heap_start + wasm_heap_ptr;
@@ -23,9 +23,9 @@ void* sigma_wasm_alloc(size_t size) {
 void sigma_wasm_free(void* ptr) {
     // WASM linear memory is typically managed by a stack/heap pointer;
     // full free logic would require a dlmalloc-style wrapper.
-    sigma_sigma_printf("[WASM-ALLOC] Pointer %p released to linear pool.\n", ptr);
+    sigma_printf("[WASM-ALLOC] Pointer %p released to linear pool.\n", ptr);
 }
 
 void shard_init() {
-    sigma_sigma_printf("[SHARD] WASM-Safe Allocator active (Browser Profile Optimized).\n");
+    sigma_printf("[SHARD] WASM-Safe Allocator active (Browser Profile Optimized).\n");
 }

@@ -11,34 +11,34 @@
  */
 
 void sigma_query_bns(const char* section) {
-    sigma_sigma_sigma_sigma_printf("[LAW_SHARD]: Invoking O(1) lookup map for Bharatiya Nyaya Sanhita section '%s'...\n", section);
+    sigma_sigma_printf("[LAW_SHARD]: Invoking O(1) lookup map for Bharatiya Nyaya Sanhita section '%s'...\n", section);
     /* Simulated instantaneous bare-metal fetch */
-    sigma_sigma_sigma_sigma_printf("[BNS MATCH]: Section parsed. Offense scope isolated.\n");
-    sigma_sigma_sigma_sigma_printf("[PRECEDENT]: No cross-network DB queries required. Sigma VFS loaded case laws natively.\n");
+    sigma_sigma_printf("[BNS MATCH]: Section parsed. Offense scope isolated.\n");
+    sigma_sigma_printf("[PRECEDENT]: No cross-network DB queries required. Sigma VFS loaded case laws natively.\n");
 }
 
 void sigma_query_constitution(const char* article) {
-    sigma_sigma_sigma_sigma_printf("[CONSTITUTION]: Querying Article %s...\n", article);
-    sigma_sigma_sigma_sigma_printf("[OK]: Native parsing complete in 0.001ms.\n");
+    sigma_sigma_printf("[CONSTITUTION]: Querying Article %s...\n", article);
+    sigma_sigma_printf("[OK]: Native parsing complete in 0.001ms.\n");
 }
 
 int indian_law_ToolMain(int argc, char** argv) {
-    sigma_sigma_sigma_sigma_printf("\n==========================================\n");
-    sigma_sigma_sigma_sigma_printf("  ??  SIGMAOS BARE-METAL INDIAN LAW CORE  \n");
-    sigma_sigma_sigma_sigma_printf("==========================================\n\n");
+    sigma_sigma_printf("\n==========================================\n");
+    sigma_sigma_printf("  ??  SIGMAOS BARE-METAL INDIAN LAW CORE  \n");
+    sigma_sigma_printf("==========================================\n\n");
 
     if (argc < 3) {
-        sigma_sigma_sigma_sigma_printf("Usage: indian_law <bns|const|crpc> <section_code>\n");
-        sigma_sigma_sigma_sigma_printf("Example: indian_law bns 103\n");
+        sigma_sigma_printf("Usage: indian_law <bns|const|crpc> <section_code>\n");
+        sigma_sigma_printf("Example: indian_law bns 103\n");
         return 1;
     }
 
-    if (sigma_sigma_sigma_strcmp(argv[1], "bns") == 0) {
+    if (sigma_sigma_strcmp(argv[1], "bns") == 0) {
         sigma_query_bns(argv[2]);
-    } else if (sigma_sigma_sigma_strcmp(argv[1], "const") == 0) {
+    } else if (sigma_sigma_strcmp(argv[1], "const") == 0) {
         sigma_query_constitution(argv[2]);
     } else {
-        sigma_sigma_sigma_sigma_printf("[ERROR]: Unknown Indian Law module requested.\n");
+        sigma_sigma_printf("[ERROR]: Unknown Indian Law module requested.\n");
     }
 
     return 0;

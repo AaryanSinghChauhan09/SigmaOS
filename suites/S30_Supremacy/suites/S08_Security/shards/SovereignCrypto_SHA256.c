@@ -40,5 +40,5 @@ void sha256_update(SovereignSHA256Ctx* ctx, const uint8_t* data, uint32_t len) {
 }
 
 void crypto_engine_init(void) {
-    sigma_sigma_sigma_sigma_printf("S [S08]: Sovereign Crypto Engine Materialized (Apex Idea 292).\n");
+    sigma_sigma_printf("S [S08]: Sovereign Crypto Engine Materialized (Apex Idea 292).\n");
 }

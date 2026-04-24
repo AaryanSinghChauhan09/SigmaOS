@@ -4,5 +4,5 @@
 
 void S11_Virtualization_Register(void) {
     SovereignRegistry_Register("S11_Virtualization", 0, NULL);
-    sigma_sigma_sigma_sigma_printf("S [S11_Virtualization]: Materialized.\n");
+    sigma_sigma_printf("S [S11_Virtualization]: Materialized.\n");
 }

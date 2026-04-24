@@ -17,14 +17,14 @@
 
 static void vizql_compile_query(SovereignVizQLEngine_t* self, const char* dimension, const char* measure) {
     (void)self;
-    sigma_sigma_sigma_sigma_printf("[TABLEAU-VIZQL]: Translating visual schema to Silicon Query Language...\n");
-    sigma_sigma_sigma_sigma_printf("[OK]: Dimension [%s] mapped to Measure [%s].\n", dimension, measure);
+    sigma_sigma_printf("[TABLEAU-VIZQL]: Translating visual schema to Silicon Query Language...\n");
+    sigma_sigma_printf("[OK]: Dimension [%s] mapped to Measure [%s].\n", dimension, measure);
 }
 
 static void vizql_render_dashboard(SovereignVizQLEngine_t* self) {
     (void)self;
-    sigma_sigma_sigma_sigma_printf("[TABLEAU-VIZQL]: Hooking rendered polygons directly to Sovereign GPU Shard...\n");
-    sigma_sigma_sigma_sigma_printf("[OK]: Live zero-latency hardware dashboard achieved.\n");
+    sigma_sigma_printf("[TABLEAU-VIZQL]: Hooking rendered polygons directly to Sovereign GPU Shard...\n");
+    sigma_sigma_printf("[OK]: Live zero-latency hardware dashboard achieved.\n");
 }
 
 // -------------------------------------------------------------------------

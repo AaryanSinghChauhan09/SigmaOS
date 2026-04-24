@@ -21,15 +21,15 @@ typedef struct {
  * Principle: AI / Algorithms / Social-inspired Optima.
  */
 void sigma_opt_eho_clan_update(SigmaElephant_t* elephant, float* matriarch_pos, float alpha) {
-    sigma_sigma_sigma_sigma_printf("[EHO-CORE]: Updating Clan member position towards Matriarch (Alpha: %.2f)...\n", alpha);
+    sigma_sigma_printf("[EHO-CORE]: Updating Clan member position towards Matriarch (Alpha: %.2f)...\n", alpha);
     // X_new = X_old + alpha * (Matriarch - X_old)
-    sigma_sigma_sigma_sigma_printf("[EHO-CORE]: Clan social convergence updated. Matriarch lead SEATED.\n");
+    sigma_sigma_printf("[EHO-CORE]: Clan social convergence updated. Matriarch lead SEATED.\n");
 }
 
 /* --- Module Factory --- */
 
 void SovereignEHO_Register(void) {
-    sigma_sigma_sigma_sigma_printf("[INTELLIGENCE]: Sovereign EHO (Clan-Social Optima) active.\n");
+    sigma_sigma_printf("[INTELLIGENCE]: Sovereign EHO (Clan-Social Optima) active.\n");
 }
 
 

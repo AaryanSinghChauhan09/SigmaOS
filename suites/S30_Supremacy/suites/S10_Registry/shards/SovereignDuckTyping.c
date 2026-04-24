@@ -17,14 +17,14 @@
 
 static sigma_bool duck_check_attribute(SovereignDuckTyping_t* self, SigmaObject_t* target, const char* attrName) {
     (void)self;
-    sigma_sigma_sigma_sigma_printf("[PYTHON-DUCK]: Inspecting object %s for behavioral attribute '%s'\n", target->class_name, attrName);
+    sigma_sigma_printf("[PYTHON-DUCK]: Inspecting object %s for behavioral attribute '%s'\n", target->class_name, attrName);
     return SIGMA_TRUE; // "If it walks like a duck..."
 }
 
 static void duck_dynamic_dispatch(SovereignDuckTyping_t* self, SigmaObject_t* target, const char* method) {
     (void)self;
-    sigma_sigma_sigma_sigma_printf("[PYTHON-DUCK]: Polymorphic invoke of '%s' on %s memory block.\n", method, target->class_name);
-    sigma_sigma_sigma_sigma_printf("[OK]: Validated and executed in O(1) time.\n");
+    sigma_sigma_printf("[PYTHON-DUCK]: Polymorphic invoke of '%s' on %s memory block.\n", method, target->class_name);
+    sigma_sigma_printf("[OK]: Validated and executed in O(1) time.\n");
 }
 
 // -------------------------------------------------------------------------

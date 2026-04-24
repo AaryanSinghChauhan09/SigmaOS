@@ -1,9 +1,6 @@
 #include <iostream>
 #include <string>
-#include <vector>
 #include <cstdlib>
-#include <fstream>
-#include <sstream>
 
 // SigmaOS Sovereign Native CLI v2.5
 // Philosophy: Absolute Portability. 

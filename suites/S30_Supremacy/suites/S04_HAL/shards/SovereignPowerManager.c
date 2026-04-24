@@ -18,18 +18,18 @@ typedef enum {
 } sigma_pwr_state_t;
 
 void sigma_hal_pwr_transition(sigma_pwr_state_t target) {
-    sigma_sigma_sigma_sigma_printf("S [HAL]: Transitioning Silicon to state S%u...\n", (sigma_u32)target);
+    sigma_sigma_printf("S [HAL]: Transitioning Silicon to state S%u...\n", (sigma_u32)target);
     
     switch(target) {
         case PWR_STATE_S5:
-            sigma_sigma_sigma_sigma_printf("S [HAL]: ACPI Shutdown command sent to hardware.\n");
+            sigma_sigma_printf("S [HAL]: ACPI Shutdown command sent to hardware.\n");
             for(;;); // Halt
         default:
-            sigma_sigma_sigma_sigma_printf("S [HAL]: Power state optimized for Sovereign efficiency.\n");
+            sigma_sigma_printf("S [HAL]: Power state optimized for Sovereign efficiency.\n");
             break;
     }
 }
 
 void sigma_hal_pwr_init(void) {
-    sigma_sigma_sigma_sigma_printf("S [HAL]: Power Management Shard (ACPI Parity) materialized.\n");
+    sigma_sigma_printf("S [HAL]: Power Management Shard (ACPI Parity) materialized.\n");
 }

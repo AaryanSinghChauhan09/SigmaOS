@@ -12,17 +12,17 @@
  */
 
 void sigma_purge_junk(void) {
-    sigma_sigma_sigma_sigma_printf("S [PURGE]: Scanning for abandoned build artifacts and rogue logs...\n");
+    sigma_sigma_printf("S [PURGE]: Scanning for abandoned build artifacts and rogue logs...\n");
     
     /* Mock purge logic */
-    sigma_sigma_sigma_sigma_printf("  ? [OK]: Deleted 1.2MB of temporary binary object files.\n");
-    sigma_sigma_sigma_sigma_printf("  ? [OK]: Cleared 4 orphaned debug lockfiles.\n");
+    sigma_sigma_printf("  ? [OK]: Deleted 1.2MB of temporary binary object files.\n");
+    sigma_sigma_printf("  ? [OK]: Cleared 4 orphaned debug lockfiles.\n");
 }
 
 int SovereignJunkPurge_ToolMain() {
-    sigma_sigma_sigma_sigma_printf("S [PURGE]: Initiating Sovereign System Maintenance Orbit...\n\n");
+    sigma_sigma_printf("S [PURGE]: Initiating Sovereign System Maintenance Orbit...\n\n");
     sigma_purge_junk();
-    sigma_sigma_sigma_sigma_printf("\nS [DONE]: System environment scrubbed. Build parity: PURE.\n");
+    sigma_sigma_printf("\nS [DONE]: System environment scrubbed. Build parity: PURE.\n");
     return 0;
 }
 

@@ -21,15 +21,15 @@ typedef struct {
  * Principle: Multi-Processing / Throughput Optimization.
  */
 void sigma_sync_fcpq_submit(SigmaTask_t* task) {
-    sigma_sigma_sigma_sigma_printf("[FC-PQUEUE]: Accumulating task (Pri: %u) into combining lane...\n", task->priority);
+    sigma_sigma_printf("[FC-PQUEUE]: Accumulating task (Pri: %u) into combining lane...\n", task->priority);
     // Flat-Combining phase: Leader shard sorts and inserts all concurrent requests
-    sigma_sigma_sigma_sigma_printf("[FC-PQUEUE]: Task HEAPED. Distributed priority tree updated at L3 speed.\n");
+    sigma_sigma_printf("[FC-PQUEUE]: Task HEAPED. Distributed priority tree updated at L3 speed.\n");
 }
 
 /* --- Module Factory --- */
 
 void SovereignFCPQ_Register(void) {
-    sigma_sigma_sigma_sigma_printf("[ORCHESTRATOR]: Sovereign FC-PQueue (Hyper-Throughput Priority) active.\n");
+    sigma_sigma_printf("[ORCHESTRATOR]: Sovereign FC-PQueue (Hyper-Throughput Priority) active.\n");
 }
 
 

@@ -18,17 +18,17 @@ static SovereignService_t s_lattice[32];
 static int s_service_count = 0;
 
 void sigma_service_start(const char* name) {
-    sigma_sigma_sigma_sigma_printf("  [LATTICE]: Starting service [%s]...\n", name);
+    sigma_sigma_printf("  [LATTICE]: Starting service [%s]...\n", name);
     /* Dependency walk simulation */
-    sigma_sigma_sigma_sigma_printf("  [LATTICE]: Service [%s] dependency check: PASSED\n", name);
-    sigma_sigma_sigma_sigma_printf("  [LATTICE]: Service [%s] is now RUNNING.\n", name);
+    sigma_sigma_printf("  [LATTICE]: Service [%s] dependency check: PASSED\n", name);
+    sigma_sigma_printf("  [LATTICE]: Service [%s] is now RUNNING.\n", name);
 }
 
 void SovereignServiceControl_Init(void) {
-    sigma_sigma_sigma_sigma_printf("S [SERVICE]: Initialising Sovereign Lattice...\n");
+    sigma_sigma_printf("S [SERVICE]: Initialising Sovereign Lattice...\n");
     sigma_service_start("network-stack");
     sigma_service_start("secure-shell");
-    sigma_sigma_sigma_sigma_printf("S [SERVICE]: All critical units initialized.\n");
+    sigma_sigma_printf("S [SERVICE]: All critical units initialized.\n");
 }
 
 void SovereignServiceControl_Register(void) {

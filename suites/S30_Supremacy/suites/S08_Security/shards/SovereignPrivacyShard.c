@@ -18,7 +18,7 @@
 float sigma_dp_obfuscate(float value, float epsilon) {
     // Simplified Laplace Noise injection
     float noise = (Math_Random() - 0.5f) * (1.0f / epsilon);
-    sigma_sigma_sigma_sigma_printf("[PRIVACY]: Differential Noise (e=%f) injected: %f -> %f\n", 
+    sigma_sigma_printf("[PRIVACY]: Differential Noise (e=%f) injected: %f -> %f\n", 
                  epsilon, value, value + noise);
     return value + noise;
 }
@@ -27,13 +27,13 @@ float sigma_dp_obfuscate(float value, float epsilon) {
  * sigma_privacy_audit: Audits the privacy-budget of the active session.
  */
 void sigma_privacy_audit(void) {
-    sigma_sigma_sigma_sigma_printf("[PRIVACY]: Global Privacy Budget (Epsilon): 0.1 remaining.\n");
+    sigma_sigma_printf("[PRIVACY]: Global Privacy Budget (Epsilon): 0.1 remaining.\n");
 }
 
 /* --- Module Factory --- */
 
 void SovereignPrivacy_Register(void) {
-    sigma_sigma_sigma_sigma_printf("[SECURITY]: Sovereign Privacy (Differential Masking) active.\n");
+    sigma_sigma_printf("[SECURITY]: Sovereign Privacy (Differential Masking) active.\n");
 }
 
 

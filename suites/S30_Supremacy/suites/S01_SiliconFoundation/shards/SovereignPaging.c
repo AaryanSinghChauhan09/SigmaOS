@@ -8,9 +8,9 @@
  */
 
 void silicon_foundation_init_paging(void) {
-    sigma_sigma_printf("S01 [SILICON-FOUNDATION]: Initializing 4-Level Paging (IA-32e Mode/Long Mode).\n");
-    sigma_sigma_printf("  [LATTICE]: Direct-map 1:1 for kernel space established.\n");
-    sigma_sigma_printf("  [LATTICE]: Sovereign page faults routed to S19 Recovery.\n");
+    sigma_printf("S01 [SILICON-FOUNDATION]: Initializing 4-Level Paging (IA-32e Mode/Long Mode).\n");
+    sigma_printf("  [LATTICE]: Direct-map 1:1 for kernel space established.\n");
+    sigma_printf("  [LATTICE]: Sovereign page faults routed to S19 Recovery.\n");
 }
 
 uint64_t silicon_foundation_alloc_page(void) {
@@ -21,6 +21,6 @@ uint64_t silicon_foundation_alloc_page(void) {
 }
 
 void S01_Register_Paging(void) {
-    sigma_sigma_printf("S01 [SILICON-FOUNDATION]: Sovereign Paging Shard Online.\n");
+    sigma_printf("S01 [SILICON-FOUNDATION]: Sovereign Paging Shard Online.\n");
     silicon_foundation_init_paging();
 }

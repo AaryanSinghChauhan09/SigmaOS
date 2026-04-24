@@ -21,10 +21,10 @@ typedef struct {
  * Principle: AI / Machine Learning.
  */
 void sigma_ai_tuner_update(float quantum, float latency) {
-    sigma_sigma_sigma_sigma_printf("[TUNER]: Observing State: (Quantum: %.2fms, Latency: %.2fms)...\n", 
+    sigma_sigma_printf("[TUNER]: Observing State: (Quantum: %.2fms, Latency: %.2fms)...\n", 
                  quantum, latency);
     // Probabilistic update of the Gaussian Process model
-    sigma_sigma_sigma_sigma_printf("[TUNER]: Predictive Mean: %.2fms. Exploration factor: Active.\n", 
+    sigma_sigma_printf("[TUNER]: Predictive Mean: %.2fms. Exploration factor: Active.\n", 
                  quantum + 0.5f);
 }
 
@@ -32,14 +32,14 @@ void sigma_ai_tuner_update(float quantum, float latency) {
  * sigma_ai_tuner_suggest: Suggests the next optimal parameter based on history.
  */
 float sigma_ai_tuner_suggest(void) {
-    sigma_sigma_sigma_sigma_printf("[TUNER]: Solving Acquisition Function (Expected Improvement)...\n");
+    sigma_sigma_printf("[TUNER]: Solving Acquisition Function (Expected Improvement)...\n");
     return 15.0f; // Suggested Quantum for current load
 }
 
 /* --- Module Factory --- */
 
 void SovereignBayesian_Register(void) {
-    sigma_sigma_sigma_sigma_printf("[INTELLIGENCE]: Sovereign Bayesian Optimizer (Oracle-Tuning) active.\n");
+    sigma_sigma_printf("[INTELLIGENCE]: Sovereign Bayesian Optimizer (Oracle-Tuning) active.\n");
 }
 
 

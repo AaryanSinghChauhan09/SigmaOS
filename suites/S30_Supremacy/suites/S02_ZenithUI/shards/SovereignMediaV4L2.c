@@ -124,7 +124,7 @@ sigma_err_t sigma_v4l2_register_device(SigmaV4L2Device_t *dev) {
     s_vdevs[s_vdev_count++] = *dev;
     s_vdevs[dev->minor].online = SIGMA_TRUE;
 
-    sigma_sigma_sigma_sigma_printf("S [V4L2]: Registered Video Device /dev/video%u ('%s')\n", dev->minor, dev->name);
+    sigma_sigma_printf("S [V4L2]: Registered Video Device /dev/video%u ('%s')\n", dev->minor, dev->name);
     return SIGMA_OK;
 }
 
@@ -139,7 +139,7 @@ SigmaV4L2Device_t* sigma_v4l2_get_device(sigma_u32 minor) {
 sigma_err_t sigma_v4l2_vidioc_s_fmt(SigmaV4L2Device_t *dev, SigmaV4L2Format_t *f) {
     if (dev->streaming) return SIGMA_EBUSY; /* Can't change format while active */
     
-    sigma_sigma_sigma_sigma_printf("S [V4L2]: VIDIOC_S_FMT requested: %ux%u (Format: %c%c%c%c)\n",
+    sigma_sigma_printf("S [V4L2]: VIDIOC_S_FMT requested: %ux%u (Format: %c%c%c%c)\n",
                  f->pix.width, f->pix.height,
                  (f->pix.pixelformat & 0xFF),
                  ((f->pix.pixelformat >> 8) & 0xFF),
@@ -175,7 +175,7 @@ sigma_err_t sigma_v4l2_reqbufs(SigmaV4L2Device_t *dev, sigma_u32 count, sigma_u3
         
         /* Ideally map pseudo-physical frames here */
     }
-    sigma_sigma_sigma_sigma_printf("S [V4L2]: Allocated %u buffers of %u bytes each.\n", count, frame_size);
+    sigma_sigma_printf("S [V4L2]: Allocated %u buffers of %u bytes each.\n", count, frame_size);
     return SIGMA_OK;
 }
 
@@ -190,7 +190,7 @@ sigma_err_t sigma_v4l2_streamon(SigmaV4L2Device_t *dev) {
     
     dev->streaming = SIGMA_TRUE;
     dev->sequence = 0;
-    sigma_sigma_sigma_sigma_printf("S [V4L2]: Stream ON -> Video capture active.\n");
+    sigma_sigma_printf("S [V4L2]: Stream ON -> Video capture active.\n");
     return SIGMA_OK;
 }
 
@@ -200,7 +200,7 @@ sigma_err_t sigma_v4l2_streamon(SigmaV4L2Device_t *dev) {
 static sigma_err_t mock_uvc_start(SigmaV4L2Device_t *dev) {
     SIGMA_UNUSED(dev);
     /* Would negotiate isochronous ALT settings on USB Core here */
-    sigma_sigma_sigma_sigma_printf("S [V4L2-UVC]: UVC Driver started isochronous bandwidth allocation.\n");
+    sigma_sigma_printf("S [V4L2-UVC]: UVC Driver started isochronous bandwidth allocation.\n");
     return SIGMA_OK;
 }
 
@@ -208,12 +208,12 @@ static sigma_err_t mock_uvc_start(SigmaV4L2Device_t *dev) {
  * ¦¦ INITIALISATION
  * ----------------------------------------------------------------------- */
 void SovereignMediaV4L2_Init(void) {
-    sigma_sigma_sigma_sigma_printf("S [V4L2]: Initialising Sovereign Video4Linux2 Media Core...\n");
+    sigma_sigma_printf("S [V4L2]: Initialising Sovereign Video4Linux2 Media Core...\n");
 
     /* Register a USB Webcam */
     SigmaV4L2Device_t webcam;
-    sigma_sigma_sigma_sigma_memset(&webcam, 0, sizeof(webcam));
-    sigma_sigma_sigma_strcpy(webcam.name, "Sigma HD Pro Webcam", sizeof(webcam.name));
+    sigma_sigma_memset(&webcam, 0, sizeof(webcam));
+    sigma_sigma_strcpy(webcam.name, "Sigma HD Pro Webcam", sizeof(webcam.name));
     webcam.capabilities = V4L2_CAP_VIDEO_CAPTURE | V4L2_CAP_STREAMING;
     webcam.start_streaming = mock_uvc_start;
     
@@ -234,7 +234,7 @@ void SovereignMediaV4L2_Init(void) {
         sigma_v4l2_streamon(dev);
     }
     
-    sigma_sigma_sigma_sigma_printf("S [V4L2]: Media framing online. Optical sensor sovereignty established.\n");
+    sigma_sigma_printf("S [V4L2]: Media framing online. Optical sensor sovereignty established.\n");
 }
 
 

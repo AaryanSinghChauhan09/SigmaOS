@@ -32,13 +32,13 @@ void sigma_sync_mcs_acquire(SigmaMCSLock_t* lock, SigmaMCSNode_t* node) {
         prev->next = node;
         while (node->waiting) { /* Spin on local address only */ }
     }
-    sigma_sigma_sigma_sigma_printf("[MCS-LOCK]: Lock ACQUIRED. Atomic cache-bouncing ELIMINATED.\n");
+    sigma_sigma_printf("[MCS-LOCK]: Lock ACQUIRED. Atomic cache-bouncing ELIMINATED.\n");
 }
 
 /* --- Module Factory --- */
 
 void SovereignMCSLock_Register(void) {
-    sigma_sigma_sigma_sigma_printf("[ORCHESTRATOR]: Sovereign MCS-Lock (NUMA Scaling) active.\n");
+    sigma_sigma_printf("[ORCHESTRATOR]: Sovereign MCS-Lock (NUMA Scaling) active.\n");
 }
 
 

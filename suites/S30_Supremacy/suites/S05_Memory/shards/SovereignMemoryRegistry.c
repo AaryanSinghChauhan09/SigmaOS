@@ -9,9 +9,9 @@ static sovereign_memory_shard_t g_mem_shards[MAX_MEM_SHARDS];
 static sigma_u32 g_mem_shard_count = 0;
 
 void SovereignMemory_InitRegistry(void) {
-    sigma_sigma_sigma_sigma_memset(g_mem_shards, 0, sizeof(g_mem_shards));
+    sigma_sigma_memset(g_mem_shards, 0, sizeof(g_mem_shards));
     g_mem_shard_count = 0;
-    sigma_sigma_sigma_sigma_printf("S [MEM]: Sovereign Memory Registry Operational.\n");
+    sigma_sigma_printf("S [MEM]: Sovereign Memory Registry Operational.\n");
 }
 
 sigma_err_t SovereignMemory_Register(const char* name, sigma_malloc_fn malloc, sigma_free_fn free) {
@@ -22,14 +22,14 @@ sigma_err_t SovereignMemory_Register(const char* name, sigma_malloc_fn malloc, s
     s->malloc = malloc;
     s->free = free;
     
-    sigma_sigma_sigma_sigma_printf("S [MEM]: Registered Memory Shard '%s'\n", name);
+    sigma_sigma_printf("S [MEM]: Registered Memory Shard '%s'\n", name);
     return SIGMA_OK;
 }
 
 void* SovereignMemory_Alloc(const char* shard_name, sigma_sz_t size) {
     for (sigma_u32 i = 0; i < g_mem_shard_count; i++) {
         if (sigma_streq(g_mem_shards[i].name, shard_name)) {
-            return g_mem_shards[i].sigma_sigma_sigma_malloc(size);
+            return g_mem_shards[i].sigma_sigma_malloc(size);
         }
     }
     return SIGMA_NULL;
@@ -38,7 +38,7 @@ void* SovereignMemory_Alloc(const char* shard_name, sigma_sz_t size) {
 void SovereignMemory_Free(const char* shard_name, void* ptr, sigma_sz_t size) {
     for (sigma_u32 i = 0; i < g_mem_shard_count; i++) {
         if (sigma_streq(g_mem_shards[i].name, shard_name)) {
-            g_mem_shards[i].sigma_sigma_sigma_free(ptr, size);
+            g_mem_shards[i].sigma_sigma_free(ptr, size);
             return;
         }
     }

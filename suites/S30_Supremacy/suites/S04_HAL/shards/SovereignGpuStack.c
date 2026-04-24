@@ -19,5 +19,5 @@ void sigma_gpu_push_command(void* buffer, sigma_sz_t size) {
 }
 
 void sigma_gpu_init(void) {
-    sigma_sigma_sigma_sigma_printf("S [HAL]: Sovereign GPU Stack materialized (Shader Core 1.0).\n");
+    sigma_sigma_printf("S [HAL]: Sovereign GPU Stack materialized (Shader Core 1.0).\n");
 }

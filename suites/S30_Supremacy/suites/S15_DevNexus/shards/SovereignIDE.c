@@ -9,15 +9,15 @@
 #include "suites/S01_Genesis/shards/sigma_base.h"
 
 void sigma_kernel_patch(const char* asm_code) {
-    sigma_sigma_sigma_sigma_printf("  [IDE]: Synthesizing machine-code from Eternal Source...\n");
-    sigma_sigma_sigma_sigma_printf("  [IDE]: Hot-patching kernel shard at address: 0x%X\n", (sigma_u64)asm_code);
-    sigma_sigma_sigma_sigma_printf("  [IDE]: Status: SHARD-SYNTHESIS COMPLETE.\n");
+    sigma_sigma_printf("  [IDE]: Synthesizing machine-code from Eternal Source...\n");
+    sigma_sigma_printf("  [IDE]: Hot-patching kernel shard at address: 0x%X\n", (sigma_u64)asm_code);
+    sigma_sigma_printf("  [IDE]: Status: SHARD-SYNTHESIS COMPLETE.\n");
 }
 
 void SovereignIDE_Init(void) {
-    sigma_sigma_sigma_sigma_printf("S [IDE-SUITE]: Initialising Sovereign Integrated Dimensional Environment...\n");
+    sigma_sigma_printf("S [IDE-SUITE]: Initialising Sovereign Integrated Dimensional Environment...\n");
     sigma_kernel_patch("; Eternal Patch v1.0\nMOV ZENITH, 1");
-    sigma_sigma_sigma_sigma_printf("S [IDE-SUITE]: IDE is now bridged to the Eternal Source.\n");
+    sigma_sigma_printf("S [IDE-SUITE]: IDE is now bridged to the Eternal Source.\n");
 }
 
 void SovereignIDE_Register(void) {

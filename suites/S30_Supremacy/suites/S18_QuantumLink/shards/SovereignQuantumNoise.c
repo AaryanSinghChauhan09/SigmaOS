@@ -22,7 +22,7 @@ void quantum_noise_generate_seed(void) {
     global_entropy.entropy_pool[global_entropy.head % NOISE_BUFFER_SIZE] = seed;
     global_entropy.head++;
     
-    sigma_sigma_printf("S18 [QUANTUM-LINK]: Generated high-entropy seed: 0x%llX\n", seed);
+    sigma_printf("S18 [QUANTUM-LINK]: Generated high-entropy seed: 0x%llX\n", seed);
 }
 
 sigma_u64 quantum_noise_get_distilled_key(void) {
@@ -34,7 +34,7 @@ sigma_u64 quantum_noise_get_distilled_key(void) {
 }
 
 void S18_Register_QuantumNoise(void) {
-    sigma_sigma_printf("S18 [QUANTUM-LINK]: Sovereign Quantum Noise Shard Online.\n");
-    sigma_sigma_printf("  [ENTROPY]: Atmospheric-silicon noise harvesting active.\n");
+    sigma_printf("S18 [QUANTUM-LINK]: Sovereign Quantum Noise Shard Online.\n");
+    sigma_printf("  [ENTROPY]: Atmospheric-silicon noise harvesting active.\n");
     quantum_noise_generate_seed();
 }

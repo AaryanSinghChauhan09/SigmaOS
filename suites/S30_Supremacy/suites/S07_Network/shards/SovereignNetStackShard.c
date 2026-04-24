@@ -86,7 +86,7 @@ sigma_u32 sigma_socket(SigmaSockType_t type) {
     s->bytes_tx   = 0; s->bytes_rx    = 0;
     s->cwnd       = 65536;  /* Initial TCP window           */
     s->rtt_us     = 500;   /* 0.5ms default RTT            */
-    sigma_sigma_sigma_sigma_printf("[NET]: Socket fd=%u created (type=%s)\n",
+    sigma_sigma_printf("[NET]: Socket fd=%u created (type=%s)\n",
                  s->sock_fd, (type==SOCK_SIGMA_TCP)?"TCP":
                               (type==SOCK_SIGMA_UDP)?"UDP":"RAW");
     return s->sock_fd;
@@ -100,7 +100,7 @@ sigma_err_t sigma_bind(sigma_u32 fd, sigma_u32 addr, sigma_u16 port) {
         if (s_sock_table[i].sock_fd == fd) {
             s_sock_table[i].local_addr = addr;
             s_sock_table[i].local_port = port;
-            sigma_sigma_sigma_sigma_printf("[NET]: fd=%u bound to %u.%u.%u.%u:%u\n",
+            sigma_sigma_printf("[NET]: fd=%u bound to %u.%u.%u.%u:%u\n",
                          fd,
                          (addr>>24)&0xFF, (addr>>16)&0xFF,
                          (addr>>8)&0xFF,  addr&0xFF, port);
@@ -118,7 +118,7 @@ sigma_err_t sigma_listen(sigma_u32 fd, sigma_u32 backlog) {
         if (s_sock_table[i].sock_fd == fd &&
             s_sock_table[i].type == SOCK_SIGMA_TCP) {
             s_sock_table[i].state = SOCK_STATE_LISTEN;
-            sigma_sigma_sigma_sigma_printf("[NET]: fd=%u LISTEN (backlog=%u)\n", fd, backlog);
+            sigma_sigma_printf("[NET]: fd=%u LISTEN (backlog=%u)\n", fd, backlog);
             return SIGMA_OK;
         }
     }
@@ -134,12 +134,12 @@ sigma_err_t sigma_connect(sigma_u32 fd, sigma_u32 dst_addr, sigma_u16 dst_port) 
             s_sock_table[i].remote_addr = dst_addr;
             s_sock_table[i].remote_port = dst_port;
             s_sock_table[i].state = SOCK_STATE_SYN_SENT;
-            sigma_sigma_sigma_sigma_printf("[NET]: fd=%u SYN -> %u.%u.%u.%u:%u\n",
+            sigma_sigma_printf("[NET]: fd=%u SYN -> %u.%u.%u.%u:%u\n",
                          fd, (dst_addr>>24)&0xFF,(dst_addr>>16)&0xFF,
                          (dst_addr>>8)&0xFF, dst_addr&0xFF, dst_port);
             /* Simulate SYN-ACK arrival → ESTABLISHED */
             s_sock_table[i].state = SOCK_STATE_ESTABLISHED;
-            sigma_sigma_sigma_sigma_printf("[NET]: fd=%u ESTABLISHED (RTT=%uus)\n",
+            sigma_sigma_printf("[NET]: fd=%u ESTABLISHED (RTT=%uus)\n",
                          fd, s_sock_table[i].rtt_us);
             s_pkt_tx++;
             return SIGMA_OK;
@@ -197,8 +197,8 @@ sigma_err_t sigma_route_add(sigma_u32 dest, sigma_u32 mask,
     r->mask    = mask;
     r->gateway = gw;
     r->metric  = metric;
-    sigma_sigma_sigma_strcpy(r->iface, iface);
-    sigma_sigma_sigma_sigma_printf("[NET]: route add %u.%u.%u.%u/%u via %u.%u.%u.%u dev %s metric %u\n",
+    sigma_sigma_strcpy(r->iface, iface);
+    sigma_sigma_printf("[NET]: route add %u.%u.%u.%u/%u via %u.%u.%u.%u dev %s metric %u\n",
                  (dest>>24)&0xFF,(dest>>16)&0xFF,(dest>>8)&0xFF,dest&0xFF,
                  __builtin_popcount(mask),
                  (gw>>24)&0xFF,(gw>>16)&0xFF,(gw>>8)&0xFF,gw&0xFF,
@@ -213,25 +213,25 @@ sigma_err_t sigma_route_add(sigma_u32 dest, sigma_u32 mask,
 void SovereignNetStack_Audit() {
     static const char* tnames[] = {"TCP","UDP","RAW"};
     static const char* snames[] = {"CLOSED","LISTEN","SYN_SENT","SYN_RCV","ESTAB","FIN_W1","CLOSE_W","TIME_W"};
-    sigma_sigma_sigma_sigma_printf("\n--- SOVEREIGN NETWORK STACK AUDIT ---\n");
-    sigma_sigma_sigma_sigma_printf("Global: RX=%llu pkts  TX=%llu pkts\n",
+    sigma_sigma_printf("\n--- SOVEREIGN NETWORK STACK AUDIT ---\n");
+    sigma_sigma_printf("Global: RX=%llu pkts  TX=%llu pkts\n",
                  (unsigned long long)s_pkt_rx,
                  (unsigned long long)s_pkt_tx);
-    sigma_sigma_sigma_sigma_printf("FD   TYPE LPORT  RPORT  STATE       CWND   RTT_US  TX_B       RX_B\n");
-    sigma_sigma_sigma_sigma_printf("-----------------------------------------------------------------------\n");
+    sigma_sigma_printf("FD   TYPE LPORT  RPORT  STATE       CWND   RTT_US  TX_B       RX_B\n");
+    sigma_sigma_printf("-----------------------------------------------------------------------\n");
     for (sigma_u32 i = 0; i < s_sock_count; i++) {
         SigmaSocket_t* s = &s_sock_table[i];
-        sigma_sigma_sigma_sigma_printf("%-4u %-4s %-6u %-6u %-11s %-6u %-7u %-10llu %llu\n",
+        sigma_sigma_printf("%-4u %-4s %-6u %-6u %-11s %-6u %-7u %-10llu %llu\n",
                      s->sock_fd, tnames[s->type],
                      s->local_port, s->remote_port,
                      snames[s->state], s->cwnd, s->rtt_us,
                      (unsigned long long)s->bytes_tx,
                      (unsigned long long)s->bytes_rx);
     }
-    sigma_sigma_sigma_sigma_printf("-----------------------------------------------------------------------\n");
-    sigma_sigma_sigma_sigma_printf("ROUTE TABLE: %u entries\n", s_route_count);
+    sigma_sigma_printf("-----------------------------------------------------------------------\n");
+    sigma_sigma_printf("ROUTE TABLE: %u entries\n", s_route_count);
     for (sigma_u32 i = 0; i < s_route_count; i++) {
-        sigma_sigma_sigma_sigma_printf("  %u.%u.%u.%u via %u.%u.%u.%u dev %s metric %u\n",
+        sigma_sigma_printf("  %u.%u.%u.%u via %u.%u.%u.%u dev %s metric %u\n",
                      (s_route_table[i].dest>>24)&0xFF,(s_route_table[i].dest>>16)&0xFF,
                      (s_route_table[i].dest>>8)&0xFF,  s_route_table[i].dest&0xFF,
                      (s_route_table[i].gateway>>24)&0xFF,(s_route_table[i].gateway>>16)&0xFF,
@@ -249,10 +249,10 @@ void SovereignNetStack_Audit() {
 // -------------------------------------------------------------------------
 
 void SovereignNetStackShard_Init() {
-    sigma_sigma_sigma_sigma_printf("[SOC]: Seating Native Network Stack Shard "
+    sigma_sigma_printf("[SOC]: Seating Native Network Stack Shard "
                  "(Linux TCP/BSD/WinSock2 Parity v1.0)...\n");
-    sigma_sigma_sigma_sigma_printf("  ↳ [SKYMESH ZERO-COPY]: Linux Epoll & Socket-Buffers Obsoleted.\n");
-    sigma_sigma_sigma_sigma_printf("  ↳ Packets bypass kernel-space buffers entirely; direct DMA-to-SovereignZMem routing.\n");
+    sigma_sigma_printf("  ↳ [SKYMESH ZERO-COPY]: Linux Epoll & Socket-Buffers Obsoleted.\n");
+    sigma_sigma_printf("  ↳ Packets bypass kernel-space buffers entirely; direct DMA-to-SovereignZMem routing.\n");
 
     /* Default route table */
     sigma_route_add(0x00000000, 0x00000000, 0xC0A80101, "sigma-eth0", 100);  /* default GW  */

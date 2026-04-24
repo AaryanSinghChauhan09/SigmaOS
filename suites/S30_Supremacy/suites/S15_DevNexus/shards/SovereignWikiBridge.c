@@ -15,17 +15,17 @@ typedef struct {
 static WikiMetadata documentation_state;
 
 void devnexus_sync_wiki_metadata(void) {
-    sigma_sigma_printf("S15 [DEV-NEXUS]: [WIKI-BRIDGE] Synchronizing shard metadata to external fabric...\n");
+    sigma_printf("S15 [DEV-NEXUS]: [WIKI-BRIDGE] Synchronizing shard metadata to external fabric...\n");
     
     // Symbolic: Package shard descriptions for README and Wiki updates
     documentation_state.active_shard_count = 1024; // Simulated aggregate
     documentation_state.last_documentation_sync = 20260421;
     
-    sigma_sigma_printf("  [BRIDGE]: 33 suites and 1024 shards cataloged. Syncing with GitHub Wiki...\n");
-    sigma_sigma_printf("  [BRIDGE]: Documentation integrity: 100/100 (Supreme).\n");
+    sigma_printf("  [BRIDGE]: 33 suites and 1024 shards cataloged. Syncing with GitHub Wiki...\n");
+    sigma_printf("  [BRIDGE]: Documentation integrity: 100/100 (Supreme).\n");
 }
 
 void S15_Register_WikiBridge(void) {
-    sigma_sigma_printf("S15 [DEV-NEXUS]: Sovereign Wiki Bridge Shard Online.\n");
+    sigma_printf("S15 [DEV-NEXUS]: Sovereign Wiki Bridge Shard Online.\n");
     devnexus_sync_wiki_metadata();
 }

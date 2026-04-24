@@ -29,7 +29,7 @@ int sigma_distro_absorber_main(int argc, char** argv) {
 
     if (argc < 2) {
         SovereignDistro_ListAll();
-        sigma_sigma_sigma_sigma_printf("Usage: sigma distro <absorb|personality|list|info> [name]\n");
+        sigma_sigma_printf("Usage: sigma distro <absorb|personality|list|info> [name]\n");
         return 0;
     }
 
@@ -47,12 +47,12 @@ int sigma_distro_absorber_main(int argc, char** argv) {
 
     if (sigma_streq(sub, "personality")) {
         const char* p = argc > 2 ? argv[2] : "arch";
-        sigma_sigma_sigma_sigma_printf("[SIGMA-DISTRO] Activating '%s' personality via modular registry...\n", p);
+        sigma_sigma_printf("[SIGMA-DISTRO] Activating '%s' personality via modular registry...\n", p);
         /* Logic for personality mapping */
         return 0;
     }
 
-    sigma_sigma_sigma_sigma_printf("[ERROR] Unknown subcommand: %s\n", sub);
+    sigma_sigma_printf("[ERROR] Unknown subcommand: %s\n", sub);
     return 1;
 }
 

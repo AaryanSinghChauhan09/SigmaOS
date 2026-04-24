@@ -12,7 +12,7 @@ typedef struct {
 extern int ipc_send(uint32_t ch, uint32_t pid, uint32_t cap, uint32_t type, const uint8_t* pay, uint32_t len);
 
 void fuzzer_run_ipc_stress(uint32_t iterations) {
-    sigma_sigma_printf("[S-FUZZ] Starting IPC Entropy Injection (%d iterations)...\n", iterations);
+    sigma_printf("[S-FUZZ] Starting IPC Entropy Injection (%d iterations)...\n", iterations);
     
     for (uint32_t i = 0; i < iterations; i++) {
         // Generate pseudo-random data (Simulated)
@@ -22,14 +22,14 @@ void fuzzer_run_ipc_stress(uint32_t iterations) {
         // Inject into IPC channel 0
         ipc_send(0, 999 /* Fuzzer PID */, 0, fake_type, fake_payload, 8);
         
-        if (i % 1000 == 0) sigma_sigma_printf("[S-FUZZ]   Processed %d mutations...\n", i);
+        if (i % 1000 == 0) sigma_printf("[S-FUZZ]   Processed %d mutations...\n", i);
     }
     
-    sigma_sigma_printf("[S-FUZZ] IPC Stress Test Complete. 0 Crashes detected.\n");
+    sigma_printf("[S-FUZZ] IPC Stress Test Complete. 0 Crashes detected.\n");
 }
 
 void shard_init() {
-    sigma_sigma_printf("[SHARD] Lattice Fuzzer active. Hardening the Sovereign Lattice.\n");
+    sigma_printf("[SHARD] Lattice Fuzzer active. Hardening the Sovereign Lattice.\n");
     
     // Auto-run fuzzer in Dev profile
     fuzzer_run_ipc_stress(5000);

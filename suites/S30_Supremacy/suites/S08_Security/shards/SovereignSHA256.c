@@ -23,7 +23,7 @@ sigma_u32 sigma_security_sha_core(sigma_u32 x) {
 /* --- Module Factory --- */
 
 void SovereignSHA256_Register(void) {
-    sigma_sigma_sigma_sigma_printf("[SECURITY]: Sovereign SHA-256 (Integrity) online.\n");
+    sigma_sigma_printf("[SECURITY]: Sovereign SHA-256 (Integrity) online.\n");
 }
 
 

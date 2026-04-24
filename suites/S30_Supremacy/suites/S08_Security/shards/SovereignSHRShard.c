@@ -16,15 +16,15 @@
  * Principle: Cyber Security / Threshold Distributed Privacy.
  */
 void sigma_sec_shr_split(sigma_u8* secret, int n_shares, int threshold_k) {
-    sigma_sigma_sigma_sigma_printf("[SHR-VAULT]: Splitting master key into %d isolated shards (Threshold: %d)...\n", n_shares, threshold_k);
+    sigma_sigma_printf("[SHR-VAULT]: Splitting master key into %d isolated shards (Threshold: %d)...\n", n_shares, threshold_k);
     // Evaluates a random polynomial of degree k-1 at N points. Any K pieces can reconstruct.
-    sigma_sigma_sigma_sigma_printf("[SHR-VAULT]: Key fragmented successfully. Distributed quorum required for decryption.\n");
+    sigma_sigma_printf("[SHR-VAULT]: Key fragmented successfully. Distributed quorum required for decryption.\n");
 }
 
 /* --- Module Factory --- */
 
 void SovereignSHR_Register(void) {
-    sigma_sigma_sigma_sigma_printf("[SECURITY]: Sovereign SHR (Threshold Secret Sharing) active.\n");
+    sigma_sigma_printf("[SECURITY]: Sovereign SHR (Threshold Secret Sharing) active.\n");
 }
 
 

@@ -21,17 +21,17 @@ typedef struct {
 static uint64_t g_asq_base = 0xFE000000; // Conceptual MMIO Base
 
 void ssd_direct_init(void) {
-    sigma_sigma_sigma_sigma_printf("S [S06]: Initiating Sovereign NVMe Handshake (Idea 151001)...\n");
+    sigma_sigma_printf("S [S06]: Initiating Sovereign NVMe Handshake (Idea 151001)...\n");
     
     /* [Σ Apex Direct MMIO Poking] */
     // Writing Admin Submission Queue Base
     *(volatile uint64_t*)(g_asq_base + NVME_ASQ_OFFSET) = 0x80000000;
     
-    sigma_sigma_sigma_sigma_printf("S [S06]: SSD Queues Materialized. Zero overhead storage active.\n");
+    sigma_sigma_printf("S [S06]: SSD Queues Materialized. Zero overhead storage active.\n");
 }
 
 void ssd_write_block(uint64_t lba, void* buffer) {
-    sigma_sigma_sigma_sigma_printf("S [S06]: Direct Silicon Write -> LBA 0x%x\n", lba);
+    sigma_sigma_printf("S [S06]: Direct Silicon Write -> LBA 0x%x\n", lba);
     /* [Σ Implementation Note]: This replaces standard block drivers with 
        hand-coded submission entries to the NVMe SQ doorbell registers. */
 }

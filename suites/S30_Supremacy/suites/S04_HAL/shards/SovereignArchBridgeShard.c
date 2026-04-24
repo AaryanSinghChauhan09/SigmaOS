@@ -10,15 +10,15 @@
  */
 
 sigma_err_t sigma_arch_bridge_init(void) {
-    sigma_sigma_sigma_sigma_printf("  S [ARCH-BRIDGE]: Sovereign Multi-Arch Matrix seated.\n");
+    sigma_sigma_printf("  S [ARCH-BRIDGE]: Sovereign Multi-Arch Matrix seated.\n");
     
     /* Mock detection */
     #ifdef __aarch64__
-        sigma_sigma_sigma_sigma_printf("  S [ARCH-BRIDGE]: Silicon: ARM64 (Zenith-Alpha path).\n");
+        sigma_sigma_printf("  S [ARCH-BRIDGE]: Silicon: ARM64 (Zenith-Alpha path).\n");
     #elif defined(__riscv)
-        sigma_sigma_sigma_sigma_printf("  S [ARCH-BRIDGE]: Silicon: RISC-V (Zenith-Beta path).\n");
+        sigma_sigma_printf("  S [ARCH-BRIDGE]: Silicon: RISC-V (Zenith-Beta path).\n");
     #else
-        sigma_sigma_sigma_sigma_printf("  S [ARCH-BRIDGE]: Silicon: x86_64 (Zenith-Standard path).\n");
+        sigma_sigma_printf("  S [ARCH-BRIDGE]: Silicon: x86_64 (Zenith-Standard path).\n");
     #endif
     
     return SIGMA_OK;

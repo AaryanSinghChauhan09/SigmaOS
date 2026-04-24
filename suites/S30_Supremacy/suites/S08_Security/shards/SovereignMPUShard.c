@@ -16,15 +16,15 @@
  * Principle: Cyber Security / Embedded Mastery / Absolute Determinism.
  */
 void sigma_sec_mpu_lock(sigma_u32 region_number, void* base_addr, sigma_u32 size) {
-    sigma_sigma_sigma_sigma_printf("[MPU-GUARD]: Locking Silicon Region %u (Size: %u)...\n", region_number, size);
+    sigma_sigma_printf("[MPU-GUARD]: Locking Silicon Region %u (Size: %u)...\n", region_number, size);
     // Configures dedicated CPU MPU registers to isolate memory without MMU page-table overhead
-    sigma_sigma_sigma_sigma_printf("[MPU-GUARD]: Memory strictly isolated. Hard-Real-time compliance guaranteed.\n");
+    sigma_sigma_printf("[MPU-GUARD]: Memory strictly isolated. Hard-Real-time compliance guaranteed.\n");
 }
 
 /* --- Module Factory --- */
 
 void SovereignMPU_Register(void) {
-    sigma_sigma_sigma_sigma_printf("[SECURITY]: Sovereign MPU (Embedded Isolation) active.\n");
+    sigma_sigma_printf("[SECURITY]: Sovereign MPU (Embedded Isolation) active.\n");
 }
 
 

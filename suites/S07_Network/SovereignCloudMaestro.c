@@ -46,7 +46,7 @@ public:
     }
 
     void DeployToCloud(const SigmaString& shardName) override {
-        sigma_sigma_printf("[SOVEREIGN/CLOUD]: Initiating Native Cloud-Shard Projection for '%s'...\n", shardName.c_str());
+        sigma_printf("[SOVEREIGN/CLOUD]: Initiating Native Cloud-Shard Projection for '%s'...\n", shardName.c_str());
         
         for (sigma_usize i = 0; i < 3; ++i) {
             SigmaString shardId = shardName;
@@ -60,23 +60,23 @@ public:
             CloudShard shard = {regions[i], "PROVISIONED", ip_buf};
             activeShards.insert(shardId, shard);
             
-            sigma_sigma_printf("[SOVEREIGN/CLOUD]: %s -> [DEPLOYED] @ %s (Silicon Latency: <1ms via RDMA)\n", shardId.c_str(), regions[i].c_str());
+            sigma_printf("[SOVEREIGN/CLOUD]: %s -> [DEPLOYED] @ %s (Silicon Latency: <1ms via RDMA)\n", shardId.c_str(), regions[i].c_str());
         }
     }
 
     void ShowCloudMatrix() const override {
-        sigma_sigma_printf("\n--- Σ SIGMA OS SOVEREIGN CLOUD SHARD MATRIX ---\n");
-        sigma_sigma_printf("%-30s | %-15s | %-15s | %s\n", "Shard ID", "Region", "Node IP", "Status");
-        sigma_sigma_printf("---------------------------------------------------------------------------\n");
+        sigma_printf("\n--- Σ SIGMA OS SOVEREIGN CLOUD SHARD MATRIX ---\n");
+        sigma_printf("%-30s | %-15s | %-15s | %s\n", "Shard ID", "Region", "Node IP", "Status");
+        sigma_printf("---------------------------------------------------------------------------\n");
         
         for (sigma_usize i = 0; i < activeShards.size(); i++) {
             const SigmaString& sid = activeShards.key_at(i);
             const CloudShard* info = activeShards.at_index(i);
-            sigma_sigma_printf("%-30s | %-15s | %-15s | [ACTIVE]\n", sid.c_str(), info->region.c_str(), info->ip.c_str());
+            sigma_printf("%-30s | %-15s | %-15s | [ACTIVE]\n", sid.c_str(), info->region.c_str(), info->ip.c_str());
         }
         
-        sigma_sigma_printf("---------------------------------------------------------------------------\n");
-        sigma_sigma_printf("Cloud Sovereignty: [ENABLED] | Redundancy: 3x | Protocol: Sovereign-RDMA\n\n");
+        sigma_printf("---------------------------------------------------------------------------\n");
+        sigma_printf("Cloud Sovereignty: [ENABLED] | Redundancy: 3x | Protocol: Sovereign-RDMA\n\n");
     }
 };
 
@@ -86,7 +86,7 @@ extern "C" void _start(void) {
     maestro.DeployToCloud("APEX_AI_FUSION");
     maestro.ShowCloudMatrix();
     
-    sigma_sigma_printf("\n[SUCCESS]: Competitive Cloud Maestro Online. Zero-STL Sovereignty 100%%.\n");
+    sigma_printf("\n[SUCCESS]: Competitive Cloud Maestro Online. Zero-STL Sovereignty 100%%.\n");
     sigma_exit(0);
 }
 

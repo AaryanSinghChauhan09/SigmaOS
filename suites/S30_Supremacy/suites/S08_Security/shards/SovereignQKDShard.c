@@ -16,15 +16,15 @@
  * Principle: Cyber Security / Absolute Intercept Detection.
  */
 void sigma_sec_qkd_entangle(void) {
-    sigma_sigma_sigma_sigma_printf("[QKD-VAULT]: Firing optical polarization states across quantum network channel...\n");
+    sigma_sigma_printf("[QKD-VAULT]: Firing optical polarization states across quantum network channel...\n");
     // Standard physics guarantees that any external observation/measurement of the photon collapses the state, instantly alerting the OS
-    sigma_sigma_sigma_sigma_printf("[QKD-VAULT]: Keys successfully distributed. No wave-function collapse detected. Channel 100%% secure.\n");
+    sigma_sigma_printf("[QKD-VAULT]: Keys successfully distributed. No wave-function collapse detected. Channel 100%% secure.\n");
 }
 
 /* --- Module Factory --- */
 
 void SovereignQKD_Register(void) {
-    sigma_sigma_sigma_sigma_printf("[SECURITY]: Sovereign QKD (Quantum Key Distribution) active.\n");
+    sigma_sigma_printf("[SECURITY]: Sovereign QKD (Quantum Key Distribution) active.\n");
 }
 
 

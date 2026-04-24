@@ -22,12 +22,12 @@ typedef struct {
 } SovereignKqueue_Event;
 
 void SovereignKqueue_Init() {
-    sigma_sigma_sigma_sigma_printf("S [ABSORB]: SovereignKqueue Event Zenith Online. Monitoring All Filters.
+    sigma_sigma_printf("S [ABSORB]: SovereignKqueue Event Zenith Online. Monitoring All Filters.
 ");
 }
 
 int SovereignKqueue_Create() {
-    sigma_sigma_sigma_sigma_printf("S [KQUEUE]: New Event Queue Initialized.
+    sigma_sigma_printf("S [KQUEUE]: New Event Queue Initialized.
 ");
     return 1; // Sovereign KQ Handle
 }

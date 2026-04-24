@@ -22,23 +22,23 @@ typedef struct {
  * Principle: Distributed / Multi-Processing / Cloud.
  */
 void sigma_dist_map_reduce(const char* job_name, void* data, sigma_sz_t size) {
-    sigma_sigma_sigma_sigma_printf("[DISTRIBUTED]: Mapping Job '%s' to 16 mesh nodes...\n", job_name);
-    sigma_sigma_sigma_sigma_printf("[DISTRIBUTED]: Offloading tensor workload to Server-Shard 0xF1.\n");
+    sigma_sigma_printf("[DISTRIBUTED]: Mapping Job '%s' to 16 mesh nodes...\n", job_name);
+    sigma_sigma_printf("[DISTRIBUTED]: Offloading tensor workload to Server-Shard 0xF1.\n");
     // Interface with S07 Network Nexus for P2P transport
-    sigma_sigma_sigma_sigma_printf("[DISTRIBUTED]: Reduction complete. Aggregated result verified.\n");
+    sigma_sigma_printf("[DISTRIBUTED]: Reduction complete. Aggregated result verified.\n");
 }
 
 /**
  * sigma_cluster_heartbeat: Broadcasts node status to the cloud mesh.
  */
 void sigma_cluster_heartbeat(void) {
-    sigma_sigma_sigma_sigma_printf("[MESH]: Heartbeat broadcast to Sovereign Discovery Layer (DHT).\n");
+    sigma_sigma_printf("[MESH]: Heartbeat broadcast to Sovereign Discovery Layer (DHT).\n");
 }
 
 /* --- Module Factory --- */
 
 void SovereignDistributed_Register(void) {
-    sigma_sigma_sigma_sigma_printf("[NETWORK]: Sovereign Distributed Mastery (MapReduce) active.\n");
+    sigma_sigma_printf("[NETWORK]: Sovereign Distributed Mastery (MapReduce) active.\n");
 }
 
 

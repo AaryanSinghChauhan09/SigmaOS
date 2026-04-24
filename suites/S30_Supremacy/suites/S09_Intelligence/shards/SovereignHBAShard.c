@@ -16,15 +16,15 @@
  * Principle: AI / Algorithms / Unrelenting Exploitation.
  */
 void sigma_opt_hba_dig(float* local_best, float smell_intensity) {
-    sigma_sigma_sigma_sigma_printf("[HBA-CORE]: Engaging hyper-aggressive digging phase near maximum scent (Intensity: %.4f)...\n", smell_intensity);
+    sigma_sigma_printf("[HBA-CORE]: Engaging hyper-aggressive digging phase near maximum scent (Intensity: %.4f)...\n", smell_intensity);
     // Honey badgers dynamically scale their digging radius, brutally excavating configurations around the scent source
-    sigma_sigma_sigma_sigma_printf("[HBA-CORE]: Local optima excavated and shattered. True global maximum secured.\n");
+    sigma_sigma_printf("[HBA-CORE]: Local optima excavated and shattered. True global maximum secured.\n");
 }
 
 /* --- Module Factory --- */
 
 void SovereignHBA_Register(void) {
-    sigma_sigma_sigma_sigma_printf("[INTELLIGENCE]: Sovereign HBA (Honey Badger Digging) active.\n");
+    sigma_sigma_printf("[INTELLIGENCE]: Sovereign HBA (Honey Badger Digging) active.\n");
 }
 
 

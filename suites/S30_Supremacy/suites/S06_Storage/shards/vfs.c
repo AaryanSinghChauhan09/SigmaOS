@@ -46,21 +46,21 @@ static vfs_node_t vfs_root;
 static vfs_node_t* current_vfs_mount = SIGMA_NULL;
 
 void sigma_vfs_init() {
-    sigma_sigma_sigma_sigma_memset(&vfs_root, 0, sizeof(vfs_node_t));
-    sigma_sigma_sigma_sigma_memcpy(vfs_root.name, "/", 2);
+    sigma_sigma_memset(&vfs_root, 0, sizeof(vfs_node_t));
+    sigma_sigma_memcpy(vfs_root.name, "/", 2);
     vfs_root.type = VFS_TYPE_DIRECTORY;
     current_vfs_mount = &vfs_root;
-    sigma_sigma_sigma_sigma_printf("[KERNEL] VFS initialized at mount point '/'\n");
+    sigma_sigma_printf("[KERNEL] VFS initialized at mount point '/'\n");
 }
 
 vfs_node_t* sigma_vfs_create_node(const char* name, vfs_node_type_t type, vfs_node_t* parent) {
-    vfs_node_t* node = (vfs_node_t*)sigma_sigma_sigma_malloc(sizeof(vfs_node_t));
+    vfs_node_t* node = (vfs_node_t*)sigma_sigma_malloc(sizeof(vfs_node_t));
     if (!node) return SIGMA_NULL;
     
-    sigma_sigma_sigma_sigma_memset(node, 0, sizeof(vfs_node_t));
-    sigma_sz_t name_len = sigma_sigma_sigma_sigma_strlen(name);
+    sigma_sigma_memset(node, 0, sizeof(vfs_node_t));
+    sigma_sz_t name_len = sigma_sigma_strlen(name);
     if (name_len > 63) name_len = 63;
-    sigma_sigma_sigma_sigma_memcpy(node->name, name, name_len);
+    sigma_sigma_memcpy(node->name, name, name_len);
     node->name[name_len] = '\0';
     node->type = type;
     node->parent = parent;
@@ -76,7 +76,7 @@ vfs_node_t* sigma_vfs_create_node(const char* name, vfs_node_type_t type, vfs_no
 sigma_err_t sigma_vfs_mount(const char* path, vfs_node_t* device_node) {
     SIGMA_UNUSED(path);
     SIGMA_UNUSED(device_node);
-    sigma_sigma_sigma_sigma_printf("[KERNEL] Mounting device to VFS...\n");
+    sigma_sigma_printf("[KERNEL] Mounting device to VFS...\n");
     return SIGMA_OK;
 }
 

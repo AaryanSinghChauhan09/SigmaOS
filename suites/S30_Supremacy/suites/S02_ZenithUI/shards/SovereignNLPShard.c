@@ -29,7 +29,7 @@ void sigma_nlp_parse(const char* input, char* output_cmd) {
             sigma_strcpy(output_cmd, nlp_table[i].command);
             
             // Append the rest of the arguments if any
-            const char* args = sigma_strstr(input, nlp_table[i].phrase) + sigma_sigma_strlen(nlp_table[i].phrase);
+            const char* args = sigma_strstr(input, nlp_table[i].phrase) + sigma_strlen(nlp_table[i].phrase);
             sigma_strncat(output_cmd, args, 32);
             return;
         }
@@ -39,5 +39,5 @@ void sigma_nlp_parse(const char* input, char* output_cmd) {
 }
 
 void S02_Register_NLP(void) {
-    sigma_sigma_printf("S02 [ZENITH UI]: SigmaNLP (Natural Language Parser) Online.\n");
+    sigma_printf("S02 [ZENITH UI]: SigmaNLP (Natural Language Parser) Online.\n");
 }

@@ -21,15 +21,15 @@ typedef struct {
  * Principle: AI / Algorithms / Eco-inspired Optima.
  */
 void sigma_opt_bfo_chemotaxis(SigmaBacterium_t* bacterium, float nutrient_gradient) {
-    sigma_sigma_sigma_sigma_printf("[BFO-CORE]: Evaluating Chemotactic step (Gradient: %.2f)...\n", nutrient_gradient);
+    sigma_sigma_printf("[BFO-CORE]: Evaluating Chemotactic step (Gradient: %.2f)...\n", nutrient_gradient);
     // Tumble to find direction, then swim repeatedly if nutrient concentration increases
-    sigma_sigma_sigma_sigma_printf("[BFO-CORE]: Bacterium swam to high-nutrient node. Swarm health maximized.\n");
+    sigma_sigma_printf("[BFO-CORE]: Bacterium swam to high-nutrient node. Swarm health maximized.\n");
 }
 
 /* --- Module Factory --- */
 
 void SovereignBFO_Register(void) {
-    sigma_sigma_sigma_sigma_printf("[INTELLIGENCE]: Sovereign BFO (Bacterial Foraging) active.\n");
+    sigma_sigma_printf("[INTELLIGENCE]: Sovereign BFO (Bacterial Foraging) active.\n");
 }
 
 

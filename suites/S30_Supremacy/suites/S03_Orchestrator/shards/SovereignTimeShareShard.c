@@ -27,7 +27,7 @@ typedef struct {
  */
 void sigma_sched_preempt(SigmaTask_t* current, SigmaTask_t* next) {
     if (current->priority > SIGMA_RT_PRIORITY_LIMIT && current->runtime_ms >= SIGMA_QUANTUM_MS) {
-        sigma_sigma_sigma_sigma_printf("[SCHEDULER]: Quantum Expired for PID %u. Preempting for PID %u.\n", 
+        sigma_sigma_printf("[SCHEDULER]: Quantum Expired for PID %u. Preempting for PID %u.\n", 
                      current->pid, next->pid);
         // Dispatch context switch to S03_Orchestrator architecture layer
     }
@@ -39,14 +39,14 @@ void sigma_sched_preempt(SigmaTask_t* current, SigmaTask_t* next) {
  */
 void sigma_sched_fair_share(sigma_u32 uid_count) {
     sigma_u32 share = 100 / uid_count;
-    sigma_sigma_sigma_sigma_printf("[SCHEDULER]: Multi-Sharing Active. Each user allocated %u%% CPU bandwidth.\n", share);
+    sigma_sigma_printf("[SCHEDULER]: Multi-Sharing Active. Each user allocated %u%% CPU bandwidth.\n", share);
 }
 
 /* --- Module Factory --- */
 
 void SovereignTimeShare_Register(void) {
-    sigma_sigma_sigma_sigma_printf("[ORCHESTRATOR]: Sovereign Time-Sharing & Multi-Tasking active.\n");
-    sigma_sigma_sigma_sigma_printf("[AUDIT]: Real-Time Determinism Threshold: %u ms.\n", SIGMA_QUANTUM_MS);
+    sigma_sigma_printf("[ORCHESTRATOR]: Sovereign Time-Sharing & Multi-Tasking active.\n");
+    sigma_sigma_printf("[AUDIT]: Real-Time Determinism Threshold: %u ms.\n", SIGMA_QUANTUM_MS);
 }
 
 

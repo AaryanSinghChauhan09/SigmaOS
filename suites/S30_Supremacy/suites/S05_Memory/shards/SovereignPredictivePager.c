@@ -25,12 +25,12 @@ void memory_predictive_track(sigma_u64 address) {
     sigma_u64 stride = address - global_oracle.access_history[(global_oracle.head - 2) % HISTORY_DEPTH];
     if (stride != 0 && stride < 0x1000000) { // Confidence in linear access
         sigma_u64 predicted_next = address + stride;
-        sigma_sigma_printf("S05 [MEMORY]: [ORACLE] Predicting next access at 0x%llX. Pre-fetching...\n", predicted_next);
+        sigma_printf("S05 [MEMORY]: [ORACLE] Predicting next access at 0x%llX. Pre-fetching...\n", predicted_next);
         // Symbolic: Force page-in of the predicted address
     }
 }
 
 void S05_Register_PredictivePager(void) {
-    sigma_sigma_printf("S05 [MEMORY]: Sovereign Predictive Pager Online.\n");
-    sigma_sigma_printf("  [ORACLE]: Access pattern heuristics calibrated.\n");
+    sigma_printf("S05 [MEMORY]: Sovereign Predictive Pager Online.\n");
+    sigma_printf("  [ORACLE]: Access pattern heuristics calibrated.\n");
 }

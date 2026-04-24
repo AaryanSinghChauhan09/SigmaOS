@@ -15,14 +15,14 @@ typedef struct {
 static ImmutabilityState global_guard;
 
 void core_verify_immutability(void) {
-    sigma_sigma_printf("S00 [SOVEREIGN-CORE]: Verifying core immutability checksum...\n");
+    sigma_printf("S00 [SOVEREIGN-CORE]: Verifying core immutability checksum...\n");
     // Symbolic check against S30 Supremacy Signature
-    sigma_sigma_printf("  [LATTICE]: Core signature MATCH. Silicon protection locked.\n");
-    sigma_sigma_printf("  [SECURITY]: Direct kernel modification: PHYSICALLY BLOCKED.\n");
+    sigma_printf("  [LATTICE]: Core signature MATCH. Silicon protection locked.\n");
+    sigma_printf("  [SECURITY]: Direct kernel modification: PHYSICALLY BLOCKED.\n");
 }
 
 void S00_Register_Immutability(void) {
     global_guard.protection_locked = SIGMA_TRUE;
-    sigma_sigma_printf("S00 [SOVEREIGN-CORE]: Sovereign Immutability Guard Online.\n");
+    sigma_printf("S00 [SOVEREIGN-CORE]: Sovereign Immutability Guard Online.\n");
     core_verify_immutability();
 }

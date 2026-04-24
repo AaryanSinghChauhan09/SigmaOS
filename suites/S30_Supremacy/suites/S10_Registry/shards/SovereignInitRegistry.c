@@ -24,12 +24,12 @@ static sigma_u32 g_init_count = 0;
 
 void SovereignInit_InitRegistry(void) {
     g_init_count = 0;
-    sigma_sigma_sigma_sigma_printf("S [REGISTRY]: Sovereign Init Service Registry initialized.\n");
+    sigma_sigma_printf("S [REGISTRY]: Sovereign Init Service Registry initialized.\n");
 }
 
 sigma_err_t SovereignInit_Register(const char* name, SovereignInitFn start) {
     if (g_init_count >= SIGMA_MAX_INIT_SERVICES) return SIGMA_ERR;
-    sigma_sigma_sigma_strcpy(g_init_registry[g_init_count].name, name, 32);
+    sigma_sigma_strcpy(g_init_registry[g_init_count].name, name, 32);
     g_init_registry[g_init_count].start = start;
     g_init_registry[g_init_count].enabled = SIGMA_TRUE;
     g_init_count++;
@@ -39,7 +39,7 @@ sigma_err_t SovereignInit_Register(const char* name, SovereignInitFn start) {
 void SovereignInit_StartAll(void) {
     for (sigma_u32 i = 0; i < g_init_count; i++) {
         if (g_init_registry[i].enabled && g_init_registry[i].start) {
-            sigma_sigma_sigma_sigma_printf("S [INIT]: Starting service '%s'...\n", g_init_registry[i].name);
+            sigma_sigma_printf("S [INIT]: Starting service '%s'...\n", g_init_registry[i].name);
             g_init_registry[i].start();
         }
     }

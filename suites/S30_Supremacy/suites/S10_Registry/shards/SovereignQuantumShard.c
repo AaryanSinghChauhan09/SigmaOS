@@ -68,7 +68,7 @@ int sigma_quantum_measure(SigmaQubit_t* q, sigma_f64 random_val) {
 /* --- Module Factory --- */
 
 void SovereignQuantum_Register(void) {
-    sigma_sigma_sigma_sigma_printf("[ORCHESTRATION]: Sovereign Quantum Simulator active.\n");
+    sigma_sigma_printf("[ORCHESTRATION]: Sovereign Quantum Simulator active.\n");
 }
 
 

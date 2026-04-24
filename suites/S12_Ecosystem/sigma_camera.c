@@ -11,10 +11,10 @@
 #include "sigma_camera.h"
 
 void sigma_camera_init(sigma_camera_state_t* cam) {
-    sigma_sigma_memset(cam, 0, sizeof(*cam));
+    sigma_memset(cam, 0, sizeof(*cam));
     cam->current_filter = FILTER_NONE;
     cam->active = SIGMA_TRUE;
-    sigma_sigma_printf("[CAMERA-MASTER]: Sovereign Visual Bridge Initialized (V4L2 USP).\n");
+    sigma_printf("[CAMERA-MASTER]: Sovereign Visual Bridge Initialized (V4L2 USP).\n");
 }
 
 void sigma_camera_apply_filter(sigma_camera_state_t* cam, sigma_filter_t filter) {
@@ -29,14 +29,14 @@ void sigma_camera_apply_filter(sigma_camera_state_t* cam, sigma_filter_t filter)
         default: break;
     }
     
-    sigma_sigma_printf("[CAMERA-MASTER]: Filter Applied: %s. Sharding frame... [OK]\n", filter_name);
+    sigma_printf("[CAMERA-MASTER]: Filter Applied: %s. Sharding frame... [OK]\n", filter_name);
 }
 
 void sigma_camera_capture(sigma_camera_state_t* cam) {
     cam->frame_count++;
-    sigma_sigma_printf("[CAMERA-MASTER]: Captured Shard Frame #%u into Silicon Buffer.\n", cam->frame_count);
+    sigma_printf("[CAMERA-MASTER]: Captured Shard Frame #%u into Silicon Buffer.\n", cam->frame_count);
     
     if (cam->current_filter == FILTER_BLOCK_LOGIC) {
-        sigma_sigma_printf("[CAMERA-MASTER (SCRATCH)]: Logic: IF [sharded] THEN [capture].\n");
+        sigma_printf("[CAMERA-MASTER (SCRATCH)]: Logic: IF [sharded] THEN [capture].\n");
     }
 }

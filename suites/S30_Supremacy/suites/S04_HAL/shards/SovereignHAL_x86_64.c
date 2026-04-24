@@ -46,6 +46,6 @@ void hal_wrmsr(uint32_t msr, uint64_t val) {
 void hal_init(void) {
     uint32_t eax, ebx, ecx, edx;
     hal_get_cpuid(0, &eax, &ebx, &ecx, &edx);
-    sigma_sigma_sigma_sigma_printf("S [S04]: x86_64 HAL Materialized. CPU: %4.4s%4.4s%4.4s\n", 
+    sigma_sigma_printf("S [S04]: x86_64 HAL Materialized. CPU: %4.4s%4.4s%4.4s\n", 
                  (char*)&ebx, (char*)&edx, (char*)&ecx);
 }

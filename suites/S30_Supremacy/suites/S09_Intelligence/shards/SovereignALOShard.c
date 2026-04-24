@@ -16,15 +16,15 @@
  * Principle: AI / Algorithms / Eco-inspired Trapping.
  */
 void sigma_opt_alo_trap(float* search_matrix, float trap_radius) {
-    sigma_sigma_sigma_sigma_printf("[ALO-CORE]: Decreasing random walk boundary based on Ant Lion trap dynamics (Radius: %.4f)...\n", trap_radius);
+    sigma_sigma_printf("[ALO-CORE]: Decreasing random walk boundary based on Ant Lion trap dynamics (Radius: %.4f)...\n", trap_radius);
     // Boundary of random walks iteratively shrinks, guaranteeing global exploitation at the trap center
-    sigma_sigma_sigma_sigma_printf("[ALO-CORE]: Target configuration localized. Swarm successfully trapped at optimal minimum.\n");
+    sigma_sigma_printf("[ALO-CORE]: Target configuration localized. Swarm successfully trapped at optimal minimum.\n");
 }
 
 /* --- Module Factory --- */
 
 void SovereignALO_Register(void) {
-    sigma_sigma_sigma_sigma_printf("[INTELLIGENCE]: Sovereign ALO (Ant Lion Optimization) active.\n");
+    sigma_sigma_printf("[INTELLIGENCE]: Sovereign ALO (Ant Lion Optimization) active.\n");
 }
 
 

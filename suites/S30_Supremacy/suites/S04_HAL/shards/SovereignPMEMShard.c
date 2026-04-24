@@ -16,15 +16,15 @@
  * Principle: Performance / Storage Mastery / DAX.
  */
 void sigma_hal_pmem_flush(void* addr, sigma_u32 size) {
-    sigma_sigma_sigma_sigma_printf("[PMEM]: Flushing %u bytes directly to NVDIMM via CLWB/SFENCE...\n", size);
+    sigma_sigma_printf("[PMEM]: Flushing %u bytes directly to NVDIMM via CLWB/SFENCE...\n", size);
     // x86_64: Optane-optimized cache line write back
-    sigma_sigma_sigma_sigma_printf("[PMEM]: Data persistent at DRAM speeds. Zero block-layer overhead.\n");
+    sigma_sigma_printf("[PMEM]: Data persistent at DRAM speeds. Zero block-layer overhead.\n");
 }
 
 /* --- Module Factory --- */
 
 void SovereignPMEM_Register(void) {
-    sigma_sigma_sigma_sigma_printf("[HAL]: Sovereign PMEM (Persistent DAX Mastery) active.\n");
+    sigma_sigma_printf("[HAL]: Sovereign PMEM (Persistent DAX Mastery) active.\n");
 }
 
 

@@ -14,17 +14,17 @@ typedef struct {
 } AuthSession;
 
 sigma_bool compliance_verify_identity(const char* username, const char* token) {
-    sigma_sigma_printf("S08 [COMPLIANCE]: Initiating identity handshake for user '%s'...\n", username);
-    sigma_sigma_printf("  [LATTICE]: Cryptographic challenge dispatched via S30 Supremacy.\n");
+    sigma_printf("S08 [COMPLIANCE]: Initiating identity handshake for user '%s'...\n", username);
+    sigma_printf("  [LATTICE]: Cryptographic challenge dispatched via S30 Supremacy.\n");
     
     // Symbolic verification
     if (sigma_strcmp(token, "SIGMA-ALPHA-01") == 0) {
-        sigma_sigma_printf("  [SUCCESS]: Identity verified. Access granted to Sovereign Lattice.\n");
+        sigma_printf("  [SUCCESS]: Identity verified. Access granted to Sovereign Lattice.\n");
         return SIGMA_TRUE;
     }
     return SIGMA_FALSE;
 }
 
 void S08_Register_Auth(void) {
-    sigma_sigma_printf("S08 [COMPLIANCE]: Sovereign Authentication Engine Online.\n");
+    sigma_printf("S08 [COMPLIANCE]: Sovereign Authentication Engine Online.\n");
 }

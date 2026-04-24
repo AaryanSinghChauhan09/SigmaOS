@@ -21,17 +21,17 @@ typedef struct {
  * Principle: Multi-Processing / Throughput Optimization / Zero-Copy.
  */
 void sigma_sync_handoff_delegate(SigmaHandoffSlot_t* slot, void* data) {
-    sigma_sigma_sigma_sigma_printf("[HANDOFF-QUEUE]: Preparing zero-copy delegation to successor...\n");
+    sigma_sigma_printf("[HANDOFF-QUEUE]: Preparing zero-copy delegation to successor...\n");
     slot->delegate_data = data;
     __sync_synchronize(); // StoreStore barrier
     slot->ready = 1;
-    sigma_sigma_sigma_sigma_printf("[HANDOFF-QUEUE]: Task handed off. Successor shard NOTIFIED.\n");
+    sigma_sigma_printf("[HANDOFF-QUEUE]: Task handed off. Successor shard NOTIFIED.\n");
 }
 
 /* --- Module Factory --- */
 
 void SovereignHandoffQueue_Register(void) {
-    sigma_sigma_sigma_sigma_printf("[ORCHESTRATOR]: Sovereign Handoff-Queue (Direct Delegation) active.\n");
+    sigma_sigma_printf("[ORCHESTRATOR]: Sovereign Handoff-Queue (Direct Delegation) active.\n");
 }
 
 

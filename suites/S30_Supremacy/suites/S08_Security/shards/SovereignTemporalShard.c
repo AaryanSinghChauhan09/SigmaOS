@@ -24,7 +24,7 @@ typedef struct {
  * Principle: Cyber Security / Forensics.
  */
 void sigma_forensic_snapshot(void) {
-    sigma_sigma_sigma_sigma_printf("[TEMPORAL]: Capturing Kernel State Snapshot (Shard T-%u)...\n", 42);
+    sigma_sigma_printf("[TEMPORAL]: Capturing Kernel State Snapshot (Shard T-%u)...\n", 42);
     // Interface with S05_Memory for copy-on-write page mirroring
 }
 
@@ -32,15 +32,15 @@ void sigma_forensic_snapshot(void) {
  * sigma_forensic_replay: Replays a sequence of snapshots to find anomalies.
  */
 void sigma_forensic_replay(sigma_u64 start_t, sigma_u64 end_t) {
-    sigma_sigma_sigma_sigma_printf("[TEMPORAL]: Replaying kernel logic from T-%llu to T-%llu...\n", 
+    sigma_sigma_printf("[TEMPORAL]: Replaying kernel logic from T-%llu to T-%llu...\n", 
                  (unsigned long long)start_t, (unsigned long long)end_t);
-    sigma_sigma_sigma_sigma_printf("[TEMPORAL]: Anomaly detected at T-105: Buffer Overflow attempt neutralized.\n");
+    sigma_sigma_printf("[TEMPORAL]: Anomaly detected at T-105: Buffer Overflow attempt neutralized.\n");
 }
 
 /* --- Module Factory --- */
 
 void SovereignTemporal_Register(void) {
-    sigma_sigma_sigma_sigma_printf("[SECURITY]: Sovereign Temporal Forensics (Time-Travel Audit) active.\n");
+    sigma_sigma_printf("[SECURITY]: Sovereign Temporal Forensics (Time-Travel Audit) active.\n");
 }
 
 

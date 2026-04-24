@@ -21,15 +21,15 @@ typedef struct {
  * Principle: AI / Algorithms / Eco-inspired Optima.
  */
 void sigma_opt_kha_motion(SigmaKrill_t* krill) {
-    sigma_sigma_sigma_sigma_printf("[KHA-CORE]: Computing Krill motion (Foraging, Swarm Density, Diffusion)...\n");
+    sigma_sigma_printf("[KHA-CORE]: Computing Krill motion (Foraging, Swarm Density, Diffusion)...\n");
     // Motion vector = induced_by_others + foraging_activity + physical_diffusion
-    sigma_sigma_sigma_sigma_printf("[KHA-CORE]: Swarm density increased towards local resource peak.\n");
+    sigma_sigma_printf("[KHA-CORE]: Swarm density increased towards local resource peak.\n");
 }
 
 /* --- Module Factory --- */
 
 void SovereignKHA_Register(void) {
-    sigma_sigma_sigma_sigma_printf("[INTELLIGENCE]: Sovereign KHA (Krill Herd Foraging) active.\n");
+    sigma_sigma_printf("[INTELLIGENCE]: Sovereign KHA (Krill Herd Foraging) active.\n");
 }
 
 

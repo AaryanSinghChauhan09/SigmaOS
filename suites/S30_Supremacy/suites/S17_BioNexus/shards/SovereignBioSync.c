@@ -21,14 +21,14 @@ void bionexus_sync_state(uint32_t bio_pulse) {
     // Symbolic: Mapping heart-rate / neural jitter to UI responsiveness
     if (bio_pulse > 100) {
         sigma_strncpy(global_biosync.behavioral_profile, "STRESS_ADAPTIVE", 31);
-        sigma_sigma_printf("S17 [BIONEXUS]: High biological activity detected. Shifting to STRESS_ADAPTIVE silicate.\n");
+        sigma_printf("S17 [BIONEXUS]: High biological activity detected. Shifting to STRESS_ADAPTIVE silicate.\n");
     } else {
         sigma_strncpy(global_biosync.behavioral_profile, "HARMONIC_IDLE", 31);
-        sigma_sigma_printf("S17 [BIONEXUS]: Biological state: Nominal. Silicate harmony maintained.\n");
+        sigma_printf("S17 [BIONEXUS]: Biological state: Nominal. Silicate harmony maintained.\n");
     }
 }
 
 void S17_Register_BioSync(void) {
-    sigma_sigma_printf("S17 [BIONEXUS]: Sovereign Bio-Signal Synchronizer Online.\n");
-    sigma_sigma_printf("  [LATTICE]: Human-silicon feedback loop established.\n");
+    sigma_printf("S17 [BIONEXUS]: Sovereign Bio-Signal Synchronizer Online.\n");
+    sigma_printf("  [LATTICE]: Human-silicon feedback loop established.\n");
 }

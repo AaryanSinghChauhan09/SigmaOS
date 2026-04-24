@@ -16,15 +16,15 @@
  * Principle: Performance / Hardware Mastery / Silicon Sovereignty.
  */
 void sigma_hal_hcp_pin(sigma_u32 physical_core_id) {
-    sigma_sigma_sigma_sigma_printf("[HCP]: Hard-pinning Shard to Physical Core %u...\n", physical_core_id);
+    sigma_sigma_printf("[HCP]: Hard-pinning Shard to Physical Core %u...\n", physical_core_id);
     // x86_64: __asm__ volatile("mov %0, %%cr3" : : "r"(page_table_of_core));
-    sigma_sigma_sigma_sigma_printf("[HCP]: Shard fixed to Silicon-Lane %u. Cache-locality WARMED.\n", physical_core_id);
+    sigma_sigma_printf("[HCP]: Shard fixed to Silicon-Lane %u. Cache-locality WARMED.\n", physical_core_id);
 }
 
 /* --- Module Factory --- */
 
 void SovereignHCP_Register(void) {
-    sigma_sigma_sigma_sigma_printf("[HAL]: Sovereign HCP (Hardware Core-Pinning) active.\n");
+    sigma_sigma_printf("[HAL]: Sovereign HCP (Hardware Core-Pinning) active.\n");
 }
 
 

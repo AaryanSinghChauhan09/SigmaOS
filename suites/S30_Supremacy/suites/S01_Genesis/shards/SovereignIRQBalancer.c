@@ -25,7 +25,7 @@ void genesis_irq_balance_init(void) {
         irq_routes[i].target_core = i % num_cores;
         irq_routes[i].total_hits = 0;
     }
-    sigma_sigma_printf("S01 [GENESIS]: Sovereign IRQ Balancer Online (%u Cores Detected)\n", num_cores);
+    sigma_printf("S01 [GENESIS]: Sovereign IRQ Balancer Online (%u Cores Detected)\n", num_cores);
 }
 
 void genesis_irq_dispatch_optimized(uint32_t vector) {
@@ -35,11 +35,11 @@ void genesis_irq_dispatch_optimized(uint32_t vector) {
     // Logic: If one core gets too many hits, shift to a less busy core
     if (route->total_hits % 1000 == 0) {
         route->target_core = (route->target_core + 1) % num_cores;
-        sigma_sigma_printf("  [IRQ-BALANCER]: Vector 0x%02X re-balanced to Core %u\n", vector, route->target_core);
+        sigma_printf("  [IRQ-BALANCER]: Vector 0x%02X re-balanced to Core %u\n", vector, route->target_core);
     }
 }
 
 void S01_Register_IRQBalancer(void) {
-    sigma_sigma_printf("S01 [GENESIS]: Sovereign IRQ Balancer Shard Initialized.\n");
+    sigma_printf("S01 [GENESIS]: Sovereign IRQ Balancer Shard Initialized.\n");
     genesis_irq_balance_init();
 }

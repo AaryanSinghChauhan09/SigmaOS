@@ -30,26 +30,26 @@ private:
 
 public:
     SovereignAutomationShard() {
-        sigma_sigma_printf("[AUTOMATION_CORE]: Bootstrapping Behavioral Zenith Automation Engine.\n");
-        sigma_sigma_printf("[AUTOMATION_CORE]: Absorbed AutoHotkey, Zapier, IFTTT USPs.\n");
+        sigma_printf("[AUTOMATION_CORE]: Bootstrapping Behavioral Zenith Automation Engine.\n");
+        sigma_printf("[AUTOMATION_CORE]: Absorbed AutoHotkey, Zapier, IFTTT USPs.\n");
     }
 
     // USP: Behavioral Trigger-Action (usp: IFTTT)
     void AddRule(const const char*& trigger, const const char*& action) {
         rules.push_back({trigger, action});
-        sigma_sigma_printf("[AUTO_RULE]: NEW RULE: '" << trigger << "' -> '" << action << "'.\n");
+        sigma_printf("[AUTO_RULE]: NEW RULE: '" << trigger << "' -> '" << action << "'.\n");
     }
 
     // USP: Automated Legal/Scholastic Retrieval (usp: Zapier/Sovereign)
     void ExecuteAutomatedWorkflows() {
-        sigma_sigma_printf("[AUTO_RUN]: SCANNING TRIGGER SHARDS...\n");
-        sigma_sigma_printf("[AUTO_RUN]: Trigger detected in 'NCERT_SEARCH' Shard!\n");
-        sigma_sigma_printf("[AUTO_RUN]: Executing Action 'AUTOMATE_GRAPH_PLOTTING' Shard... SUCCESS.\n");
+        sigma_printf("[AUTO_RUN]: SCANNING TRIGGER SHARDS...\n");
+        sigma_printf("[AUTO_RUN]: Trigger detected in 'NCERT_SEARCH' Shard!\n");
+        sigma_printf("[AUTO_RUN]: Executing Action 'AUTOMATE_GRAPH_PLOTTING' Shard... SUCCESS.\n");
     }
 
     // USP: Global Hotkey Injection (usp: AutoHotkey)
     void SimulateKeyboardShard(const const char*& keystrokes) {
-          sigma_sigma_printf("[AUTO_HID]: INJECTING KEYSTROKES '" << keystrokes << "' DIRECTLY INTO KERNEL HID BUFFER...\n");
+          sigma_printf("[AUTO_HID]: INJECTING KEYSTROKES '" << keystrokes << "' DIRECTLY INTO KERNEL HID BUFFER...\n");
     }
 };
 
@@ -59,7 +59,7 @@ int main() {
     auto_shard.ExecuteAutomatedWorkflows();
     auto_shard.SimulateKeyboardShard("Ctrl+Shift+L"); // Simulated Legal Search hotkey
     
-    sigma_sigma_printf("\n[SUCCESS]: Competitive Automation Zenith Online. Zero-Manual repetition.\n");
+    sigma_printf("\n[SUCCESS]: Competitive Automation Zenith Online. Zero-Manual repetition.\n");
     return 0;
 }
 

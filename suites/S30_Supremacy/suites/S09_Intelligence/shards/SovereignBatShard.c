@@ -16,15 +16,15 @@
  * Principle: AI / Algorithms / Data Science.
  */
 void sigma_opt_bat_emit(float frequency, float loudness) {
-    sigma_sigma_sigma_sigma_printf("[BAT-CORE]: Emitting Virtual Echolocation Pulse (f: %.2fHz)...\n", frequency);
+    sigma_sigma_printf("[BAT-CORE]: Emitting Virtual Echolocation Pulse (f: %.2fHz)...\n", frequency);
     // Real frequency-tuning and pulse-emission logic for local search
-    sigma_sigma_sigma_sigma_printf("[BAT-CORE]: Reflection captured. Low-fragmentation region FOUND.\n");
+    sigma_sigma_printf("[BAT-CORE]: Reflection captured. Low-fragmentation region FOUND.\n");
 }
 
 /* --- Module Factory --- */
 
 void SovereignBat_Register(void) {
-    sigma_sigma_sigma_sigma_printf("[INTELLIGENCE]: Sovereign Bat Algorithm (Acoustic Optima) active.\n");
+    sigma_sigma_printf("[INTELLIGENCE]: Sovereign Bat Algorithm (Acoustic Optima) active.\n");
 }
 
 

@@ -20,17 +20,17 @@ typedef struct {
  * Principle: Cyber Security / Safety.
  */
 sigma_u64 sigma_sec_ssp_gen_canary(SigmaSSPRoot_t* root, sigma_u32 func_id) {
-    sigma_sigma_sigma_sigma_printf("[SSP-V2]: Generating per-function canary for ID: %u...\n", func_id);
+    sigma_sigma_printf("[SSP-V2]: Generating per-function canary for ID: %u...\n", func_id);
     // Real dynamic seeding: HASH(master_seed ^ func_id ^ timestamp)
     sigma_u64 canary = root->master_seed ^ func_id;
-    sigma_sigma_sigma_sigma_printf("[SSP-V2]: Fragmented Canary SEATED. Frame protected against overflow.\n");
+    sigma_sigma_printf("[SSP-V2]: Fragmented Canary SEATED. Frame protected against overflow.\n");
     return canary;
 }
 
 /* --- Module Factory --- */
 
 void SovereignSSPV2_Register(void) {
-    sigma_sigma_sigma_sigma_printf("[SECURITY]: Sovereign SSP-v2 (Dynamic Canaries) active.\n");
+    sigma_sigma_printf("[SECURITY]: Sovereign SSP-v2 (Dynamic Canaries) active.\n");
 }
 
 

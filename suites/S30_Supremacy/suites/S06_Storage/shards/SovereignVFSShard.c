@@ -13,10 +13,10 @@ typedef struct {
 } VFSHandle;
 
 void storage_mount_shard(const char* mount_point, const char* suite_id) {
-    sigma_sigma_printf("S06 [STORAGE]: Mounting Suite %s to lattice path '%s'...\n", suite_id, mount_point);
-    sigma_sigma_printf("  [PLAN-9-PARITY]: All interactions at '%s' now route to Suite %s via S00 Syscalls.\n", mount_point, suite_id);
+    sigma_printf("S06 [STORAGE]: Mounting Suite %s to lattice path '%s'...\n", suite_id, mount_point);
+    sigma_printf("  [PLAN-9-PARITY]: All interactions at '%s' now route to Suite %s via S00 Syscalls.\n", mount_point, suite_id);
 }
 
 void S06_Register_VFSShard(void) {
-    sigma_sigma_printf("S06 [STORAGE]: Sovereign VFS Shard Online (Everything is a Shard).\n");
+    sigma_printf("S06 [STORAGE]: Sovereign VFS Shard Online (Everything is a Shard).\n");
 }

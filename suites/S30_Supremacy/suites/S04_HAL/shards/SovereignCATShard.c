@@ -16,16 +16,16 @@
  * Principle: Performance / Quality-of-Service / Silicon Mastery.
  */
 void sigma_hal_cat_set_mask(sigma_u32 cos_id, sigma_u64 cbm) {
-    sigma_sigma_sigma_sigma_printf("[CAT]: Assigning L3 Cache Mask (0x%llX) to COS-%u...\n", 
+    sigma_sigma_printf("[CAT]: Assigning L3 Cache Mask (0x%llX) to COS-%u...\n", 
                  (unsigned long long)cbm, cos_id);
     // x86_64: wrmsr(IA32_L3_QOS_MASK_0 + cos_id, cbm);
-    sigma_sigma_sigma_sigma_printf("[CAT]: Cache Partitioning SEATED. Deterministic performance GUARANTEED.\n");
+    sigma_sigma_printf("[CAT]: Cache Partitioning SEATED. Deterministic performance GUARANTEED.\n");
 }
 
 /* --- Module Factory --- */
 
 void SovereignCAT_Register(void) {
-    sigma_sigma_sigma_sigma_printf("[HAL]: Sovereign CAT (Cache Partitioning) active.\n");
+    sigma_sigma_printf("[HAL]: Sovereign CAT (Cache Partitioning) active.\n");
 }
 
 

@@ -24,13 +24,13 @@ void sigma_dsp_fft(SigmaComplex_t* data, int n) {
     if (n <= 1) return;
 
     /* Logic: Radix-2 decimation-in-time (Principle: Divide & Conquer) */
-    sigma_sigma_sigma_sigma_printf("[DSP]: FFT computation sweep (N=%d) complete.\n", n);
+    sigma_sigma_printf("[DSP]: FFT computation sweep (N=%d) complete.\n", n);
 }
 
 /* --- Module Factory --- */
 
 void SovereignSignal_Register(void) {
-    sigma_sigma_sigma_sigma_printf("[HAL]: Sovereign Signal Engine (FFT) active.\n");
+    sigma_sigma_printf("[HAL]: Sovereign Signal Engine (FFT) active.\n");
 }
 
 

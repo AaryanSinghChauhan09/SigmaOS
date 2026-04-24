@@ -29,7 +29,7 @@ void hal_io_hub_init(void) {
         hub_channels[i].status = IO_READY;
         hub_channels[i].total_bytes_transferred = 0;
     }
-    sigma_sigma_printf("S04 [HAL]: Sovereign Parallel IO Hub Initialized (%d Channels)\n", MAX_IO_CHANNELS);
+    sigma_printf("S04 [HAL]: Sovereign Parallel IO Hub Initialized (%d Channels)\n", MAX_IO_CHANNELS);
 }
 
 void hal_io_hub_dispatch(uint32_t channel, uint32_t byte_count) {
@@ -39,11 +39,11 @@ void hal_io_hub_dispatch(uint32_t channel, uint32_t byte_count) {
     hub_channels[channel].total_bytes_transferred += byte_count;
     
     // Symbolic: Async transfer trigger
-    sigma_sigma_printf("  [IO-HUB]: Channel %u dispatching %u bytes parallel stream.\n", channel, byte_count);
+    sigma_printf("  [IO-HUB]: Channel %u dispatching %u bytes parallel stream.\n", channel, byte_count);
     hub_channels[channel].status = IO_READY;
 }
 
 void S04_Register_IOHub(void) {
-    sigma_sigma_printf("S04 [HAL]: Sovereign IO Hub Online.\n");
+    sigma_printf("S04 [HAL]: Sovereign IO Hub Online.\n");
     hal_io_hub_init();
 }

@@ -80,7 +80,7 @@ static void diag_probe_cpu(SovereignDiagnosticsZenith* d) {
     d->last_tsc = rdtsc_now();
     d->hardware_probes++;
 
-    sigma_sigma_printf("[RAW FREQ=%llu MHz | TSC=%llu]\n", d->cpu_freq_mhz, d->last_tsc);
+    sigma_printf("[RAW FREQ=%llu MHz | TSC=%llu]\n", d->cpu_freq_mhz, d->last_tsc);
 }
 
 /* --- Thermal Probe (replaces opcode-cast MSR thermal read) --- */
@@ -92,7 +92,7 @@ static void diag_probe_thermal(SovereignDiagnosticsZenith* d) {
 
     /* bits 22:16 = digital readout (offset from Tjunction) */
     sigma_u32 offset = (d->thermal_lo >> 16) & 0x7F;
-    sigma_sigma_printf("[THERMAL JUNCTION STABLE | TJ_offset=%u]\n", offset);
+    sigma_printf("[THERMAL JUNCTION STABLE | TJ_offset=%u]\n", offset);
 }
 
 /* --- Kernel Ring Buffer slice (replaces opcode-cast mov) --- */
@@ -106,7 +106,7 @@ static void diag_extract_kernel_ring(SovereignDiagnosticsZenith* d) {
         : "=r"(val) :: "rax");
 
     d->hardware_probes++;
-    sigma_sigma_printf("[RING SLICED O(1) | First64=%lu]\n", val);
+    sigma_printf("[RING SLICED O(1) | First64=%lu]\n", val);
 }
 
 /* --- Full audit (replaces C++ audit_all() method) --- */
@@ -115,9 +115,9 @@ static void diag_audit_all(SovereignDiagnosticsZenith* d) {
     diag_probe_cpu(d);
     diag_probe_thermal(d);
     diag_extract_kernel_ring(d);
-    sigma_sigma_printf("| Total Probes   : %u\n", d->hardware_probes);
-    sigma_sigma_printf("| CPU Freq       : %llu MHz\n", d->cpu_freq_mhz);
-    sigma_sigma_printf("| Competitors    : htop/lm-sensors/dmesg neutralized.\n");
+    sigma_printf("| Total Probes   : %u\n", d->hardware_probes);
+    sigma_printf("| CPU Freq       : %llu MHz\n", d->cpu_freq_mhz);
+    sigma_printf("| Competitors    : htop/lm-sensors/dmesg neutralized.\n");
     sigma_print("------------------------------------------------------\n");
 }
 

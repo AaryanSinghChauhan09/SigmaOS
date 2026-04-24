@@ -15,11 +15,11 @@ typedef struct {
 } AuditEvent;
 
 void compliance_audit_ipc(uint32_t src, uint32_t dst, const char* op) {
-    sigma_sigma_printf("S08 [COMPLIANCE]: Audit Log Recorded.\n");
-    sigma_sigma_printf("  [FLOW]: Suite %d -> Suite %d | Operation: %s\n", src, dst, op);
-    sigma_sigma_printf("  [SECURITY]: Integrity check: PASSED.\n");
+    sigma_printf("S08 [COMPLIANCE]: Audit Log Recorded.\n");
+    sigma_printf("  [FLOW]: Suite %d -> Suite %d | Operation: %s\n", src, dst, op);
+    sigma_printf("  [SECURITY]: Integrity check: PASSED.\n");
 }
 
 void S08_Register_Audit(void) {
-    sigma_sigma_printf("S08 [COMPLIANCE]: Sovereign Audit Tooling Online.\n");
+    sigma_printf("S08 [COMPLIANCE]: Sovereign Audit Tooling Online.\n");
 }

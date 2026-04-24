@@ -15,7 +15,7 @@ void genesis_prefetch_instruction(sigma_u64 current_ip) {
     sigma_u64 predicted_target = branch_history[index];
     
     if (predicted_target != 0) {
-        sigma_sigma_printf("S01 [GENESIS]: [PREFETCH] IP:0x%llX -> Predicting jump to 0x%llX. Pre-loading L1i...\n", 
+        sigma_printf("S01 [GENESIS]: [PREFETCH] IP:0x%llX -> Predicting jump to 0x%llX. Pre-loading L1i...\n", 
                      current_ip, predicted_target);
         // Symbolic: Signal hardware to pre-fetch instructions at predicted_target
     }
@@ -26,6 +26,6 @@ void genesis_record_branch(sigma_u64 source_ip, sigma_u64 target_ip) {
 }
 
 void S01_Register_InstructionPrefetcher(void) {
-    sigma_sigma_printf("S01 [GENESIS]: Sovereign Instruction Prefetcher Online.\n");
-    sigma_sigma_printf("  [PREFETCH]: Branch history table calibrated for linear execution.\n");
+    sigma_printf("S01 [GENESIS]: Sovereign Instruction Prefetcher Online.\n");
+    sigma_printf("  [PREFETCH]: Branch history table calibrated for linear execution.\n");
 }

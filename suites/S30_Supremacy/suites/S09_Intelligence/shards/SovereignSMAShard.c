@@ -16,15 +16,15 @@
  * Principle: AI / Algorithms / Organic Shortest Path.
  */
 void sigma_opt_sma_oscillate(float resource_concentration) {
-    sigma_sigma_sigma_sigma_printf("[SMA-CORE]: Emitting biological oscillator feedback into network topology...\n");
+    sigma_sigma_printf("[SMA-CORE]: Emitting biological oscillator feedback into network topology...\n");
     // Tubes connecting to high-quality configurations expand via positive feedback, while poor paths naturally atrophy
-    sigma_sigma_sigma_sigma_printf("[SMA-CORE]: Venous network stabilized. Absolute shortest mathematical path mapped.\n");
+    sigma_sigma_printf("[SMA-CORE]: Venous network stabilized. Absolute shortest mathematical path mapped.\n");
 }
 
 /* --- Module Factory --- */
 
 void SovereignSMA_Register(void) {
-    sigma_sigma_sigma_sigma_printf("[INTELLIGENCE]: Sovereign SMA (Slime Mould Intelligence) active.\n");
+    sigma_sigma_printf("[INTELLIGENCE]: Sovereign SMA (Slime Mould Intelligence) active.\n");
 }
 
 

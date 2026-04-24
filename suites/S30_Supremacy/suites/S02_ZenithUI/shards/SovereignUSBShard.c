@@ -11,8 +11,8 @@
  */
 
 sigma_err_t sigma_usb_init(void) {
-    sigma_sigma_sigma_sigma_printf("  S [USB]: Sovereign USB 3.x/4.0 stack initialized.\n");
-    sigma_sigma_sigma_sigma_printf("  S [USB]: xHCI and Thunderbolt data-matrices loaded with zero overhead.\n");
+    sigma_sigma_printf("  S [USB]: Sovereign USB 3.x/4.0 stack initialized.\n");
+    sigma_sigma_printf("  S [USB]: xHCI and Thunderbolt data-matrices loaded with zero overhead.\n");
     return SIGMA_OK;
 }
 

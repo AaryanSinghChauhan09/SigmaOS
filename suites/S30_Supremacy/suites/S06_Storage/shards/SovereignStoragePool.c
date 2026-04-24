@@ -16,14 +16,14 @@ typedef struct {
 } sigma_storage_pool_t;
 
 void sigma_storage_pool_init(void) {
-    sigma_sigma_sigma_sigma_printf("S [STORAGE]: ZFS-style Storage Pool Orchestrator active.\n");
+    sigma_sigma_printf("S [STORAGE]: ZFS-style Storage Pool Orchestrator active.\n");
 }
 
 sigma_err_t sigma_storage_pool_create(const char* name, sigma_u64 capacity) {
-    sigma_sigma_sigma_sigma_printf("S [STORAGE]: Materializing pool '%s' with %llu bytes...\n", name, capacity);
+    sigma_sigma_printf("S [STORAGE]: Materializing pool '%s' with %llu bytes...\n", name, capacity);
     return SIGMA_OK;
 }
 
 void sigma_storage_snapshot_create(const char* pool_name) {
-    sigma_sigma_sigma_sigma_printf("S [STORAGE]: Post-initialization snapshot sealed for pool '%s'.\n", pool_name);
+    sigma_sigma_printf("S [STORAGE]: Post-initialization snapshot sealed for pool '%s'.\n", pool_name);
 }

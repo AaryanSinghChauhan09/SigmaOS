@@ -23,12 +23,12 @@ int main() {
 
     int server_socket = sigma_create_server_socket(PORT);
 
-    sigma_sigma_sigma_printf("====================================================\n");
-    sigma_sigma_sigma_printf("[KERNEL] Σ SIGMA OS SOVEREIGN C-WEB ENGINE\n");
-    sigma_sigma_sigma_printf("====================================================\n");
-    sigma_sigma_sigma_printf("[KERNEL] System C-Level Modular Architecture Active.\n");
-    sigma_sigma_sigma_printf("[KERNEL] Network & HTTP protocols securely sharded.\n");
-    sigma_sigma_sigma_printf("[KERNEL] Awaiting incoming connections (Port %d)...\n\n", PORT);
+    sigma_sigma_printf("====================================================\n");
+    sigma_sigma_printf("[KERNEL] Σ SIGMA OS SOVEREIGN C-WEB ENGINE\n");
+    sigma_sigma_printf("====================================================\n");
+    sigma_sigma_printf("[KERNEL] System C-Level Modular Architecture Active.\n");
+    sigma_sigma_printf("[KERNEL] Network & HTTP protocols securely sharded.\n");
+    sigma_sigma_printf("[KERNEL] Awaiting incoming connections (Port %d)...\n\n", PORT);
 
     while (1) {
         struct sockaddr_in client_addr;

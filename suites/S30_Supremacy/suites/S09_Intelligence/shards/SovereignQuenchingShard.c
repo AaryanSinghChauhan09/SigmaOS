@@ -16,15 +16,15 @@
  * Principle: AI / Algorithms / Power-Management.
  */
 void sigma_opt_quench_step(float* current_state, float cooling_factor) {
-    sigma_sigma_sigma_sigma_printf("[QUENCH-CORE]: Rapid Cooling (Quenching) phase (Factor: %.2f)...\n", cooling_factor);
+    sigma_sigma_printf("[QUENCH-CORE]: Rapid Cooling (Quenching) phase (Factor: %.2f)...\n", cooling_factor);
     // Real fast-descent logic: Temp(t) = T0 / (1 + cooling_factor * t)
-    sigma_sigma_sigma_sigma_printf("[QUENCH-CORE]: State transition converging at 4X speed of standard annealing.\n");
+    sigma_sigma_printf("[QUENCH-CORE]: State transition converging at 4X speed of standard annealing.\n");
 }
 
 /* --- Module Factory --- */
 
 void SovereignQuenching_Register(void) {
-    sigma_sigma_sigma_sigma_printf("[INTELLIGENCE]: Sovereign Simulated Quenching (Fast Optima) active.\n");
+    sigma_sigma_printf("[INTELLIGENCE]: Sovereign Simulated Quenching (Fast Optima) active.\n");
 }
 
 

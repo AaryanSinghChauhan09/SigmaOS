@@ -16,15 +16,15 @@
  * Principle: Hardware Mastery / Sub-Millimeter Latency / Inter-Die Execution.
  */
 void sigma_hal_uci_bridge(sigma_u16 source_die, sigma_u16 target_die) {
-    sigma_sigma_sigma_sigma_printf("[UCI-FABRIC]: Initializing bare-metal UCIe bridge between Silicon Die %u and Die %u...\n", source_die, target_die);
+    sigma_sigma_printf("[UCI-FABRIC]: Initializing bare-metal UCIe bridge between Silicon Die %u and Die %u...\n", source_die, target_die);
     // Directly programs the substrate interconnects unifying discrete IP blocks enclosed within a single multi-chip package
-    sigma_sigma_sigma_sigma_printf("[UCI-FABRIC]: Inter-Die link established. Multi-Chiplet coherence seated synchronously.\n");
+    sigma_sigma_printf("[UCI-FABRIC]: Inter-Die link established. Multi-Chiplet coherence seated synchronously.\n");
 }
 
 /* --- Module Factory --- */
 
 void SovereignUCI_Register(void) {
-    sigma_sigma_sigma_sigma_printf("[HAL]: Sovereign UCI (Chiplet Substrate Interconnect) active.\n");
+    sigma_sigma_printf("[HAL]: Sovereign UCI (Chiplet Substrate Interconnect) active.\n");
 }
 
 

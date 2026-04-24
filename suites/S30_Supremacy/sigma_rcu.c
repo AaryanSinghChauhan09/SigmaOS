@@ -44,7 +44,7 @@ void sigma_synchronize_rcu(void) {
         __asm__ __volatile__ ("pause");
     }
     
-    sigma_sigma_printf("[KERNEL-RCU]: Grace period synchronized. Shard stable.\n");
+    sigma_printf("[KERNEL-RCU]: Grace period synchronized. Shard stable.\n");
 }
 
 /* --- call_rcu (Queue callback after grace period) --- */
@@ -59,5 +59,5 @@ void sigma_call_rcu(sigma_rcu_head_t* head, void (*func)(sigma_rcu_head_t* head)
 void sigma_rcu_init(void) {
     atomic_init(&g_rcu_master.active_readers, 0);
     atomic_init(&g_rcu_master.generation, 0);
-    sigma_sigma_printf("[KERNEL-RCU]: Read-Copy-Update Initialized (Linux Master-RCU USP).\n");
+    sigma_printf("[KERNEL-RCU]: Read-Copy-Update Initialized (Linux Master-RCU USP).\n");
 }

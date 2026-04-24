@@ -15,20 +15,20 @@
  * sigma_orch_map: Processes a shard into intermediate KV pairs.
  */
 void sigma_orch_map(const void* input, void* output) {
-    sigma_sigma_sigma_sigma_printf("[ORCH]: Mapping shard memory... (Principle: Sharding)\n");
+    sigma_sigma_printf("[ORCH]: Mapping shard memory... (Principle: Sharding)\n");
 }
 
 /**
  * sigma_orch_reduce: Merges intermediate data into the final result.
  */
 void sigma_orch_reduce(const void* mapped, void* result) {
-    sigma_sigma_sigma_sigma_printf("[ORCH]: Reducing intermediate results... (Principle: Consolidation)\n");
+    sigma_sigma_printf("[ORCH]: Reducing intermediate results... (Principle: Consolidation)\n");
 }
 
 /* --- Module Factory --- */
 
 void SovereignMapReduce_Register(void) {
-    sigma_sigma_sigma_sigma_printf("[ORCHESTRATION]: Sovereign MapReduce (Distributed) active.\n");
+    sigma_sigma_printf("[ORCHESTRATION]: Sovereign MapReduce (Distributed) active.\n");
 }
 
 

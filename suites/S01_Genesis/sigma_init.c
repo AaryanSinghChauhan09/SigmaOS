@@ -31,7 +31,7 @@ static sigma_u32 service_count = 0;
 void sigma_init_register(const char* name, void (*entry)()) {
     if (service_count >= MAX_SERVICES) return;
     
-    sigma_sigma_memcpy(system_services[service_count].name, name, sigma_sigma_strlen(name));
+    sigma_memcpy(system_services[service_count].name, name, sigma_strlen(name));
     system_services[service_count].entry = entry;
     system_services[service_count].state = SERVICE_STOPPED;
     system_services[service_count].pid = 0;
@@ -39,17 +39,17 @@ void sigma_init_register(const char* name, void (*entry)()) {
 }
 
 void sigma_init_start_all() {
-    sigma_sigma_printf("[INIT] Starting Sovereign System Services...\n");
+    sigma_printf("[INIT] Starting Sovereign System Services...\n");
     for (sigma_u32 i = 0; i < service_count; i++) {
-        sigma_sigma_printf("[INIT] Launching Service: %s... ", system_services[i].name);
+        sigma_printf("[INIT] Launching Service: %s... ", system_services[i].name);
         system_services[i].state = SERVICE_RUNNING;
         // In a real kernel, we would fork/exec here.
-        sigma_sigma_printf("OK (PID: %d)\n", 100 + i);
+        sigma_printf("OK (PID: %d)\n", 100 + i);
     }
 }
 
 void sigma_init_main() {
-    sigma_sigma_printf("[INIT] Sovereign Init Shard Sequence Initialized.\n");
+    sigma_printf("[INIT] Sovereign Init Shard Sequence Initialized.\n");
     // Register default services
     sigma_init_register("sigma_network", SIGMA_NULL);
     sigma_init_register("sigma_fs_mount", SIGMA_NULL);

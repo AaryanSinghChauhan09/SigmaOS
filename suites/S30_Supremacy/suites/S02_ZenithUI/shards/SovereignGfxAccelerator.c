@@ -51,13 +51,13 @@ sigma_u32 sigma_blend_rgba(sigma_u32 background, sigma_u32 foreground) {
 }
 
 void SovereignGfxAccelerator_BlitWindow(void* screen, void* window, sigma_u32 width, sigma_u32 height) {
-    sigma_sigma_sigma_sigma_printf("[GFX-ACCEL]: Silicon-Level Blit: %ux%u pixels via rep-movsq...\n", width, height);
+    sigma_sigma_printf("[GFX-ACCEL]: Silicon-Level Blit: %ux%u pixels via rep-movsq...\n", width, height);
     sigma_asm_blit(screen, window, (sigma_sz_t)width * height * 4);
-    sigma_sigma_sigma_sigma_printf("[OK]: Blit complete. Frame latency: 0.1ms (NATIVE).\n");
+    sigma_sigma_printf("[OK]: Blit complete. Frame latency: 0.1ms (NATIVE).\n");
 }
 
 void SovereignGfxAccelerator_Init() {
-    sigma_sigma_sigma_sigma_printf("[SOC]: Initializing Sovereign GFX Silicon Pulse (v1.0)...\n");
+    sigma_sigma_printf("[SOC]: Initializing Sovereign GFX Silicon Pulse (v1.0)...\n");
 }
 
 

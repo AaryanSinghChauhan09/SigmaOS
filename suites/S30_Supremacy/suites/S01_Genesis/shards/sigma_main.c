@@ -199,11 +199,11 @@ static void sigma_userspace_phase(void) {
 
 /* ── 5. Final Report ─────────────────────────────────────────────────────── */
 static void sigma_final_report(void) {
-    sigma_sigma_sigma_sigma_printf("\n");
-    sigma_sigma_sigma_sigma_printf("S ══════════════════════════════════════════════════════\n");
-    sigma_sigma_sigma_sigma_printf("  SIGMAOS SOVEREIGN v4.0 — SYSTEM UP\n");
-    sigma_sigma_sigma_sigma_printf("  26 Suites | GIV Verified | PQC Hardened | Neural-Driven\n");
-    sigma_sigma_sigma_sigma_printf("S ══════════════════════════════════════════════════════\n\n");
+    sigma_sigma_printf("\n");
+    sigma_sigma_printf("S ══════════════════════════════════════════════════════\n");
+    sigma_sigma_printf("  SIGMAOS SOVEREIGN v4.0 — SYSTEM UP\n");
+    sigma_sigma_printf("  26 Suites | GIV Verified | PQC Hardened | Neural-Driven\n");
+    sigma_sigma_printf("S ══════════════════════════════════════════════════════\n\n");
 
     sigma_boot_report();
     sigma_hal_device_list();
@@ -223,7 +223,7 @@ static void sigma_final_report(void) {
     sigma_usb_stats();
     sigma_omnifabric_stats();
 
-    sigma_sigma_sigma_sigma_printf("\nS SOVEREIGNTY IS ABSOLUTE.\n");
+    sigma_sigma_printf("\nS SOVEREIGNTY IS ABSOLUTE.\n");
 }
 
 /* ── kernel_main: The one entry point ───────────────────────────────────── */

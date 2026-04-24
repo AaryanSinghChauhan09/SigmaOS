@@ -26,11 +26,11 @@ void sovereign_register_shard(const char* name, void (*entry)(void)) {
     g_shard_table[g_shard_count].shard_name = name;
     g_shard_table[g_shard_count].shard_entry = entry;
     g_shard_count++;
-    sigma_sigma_printf("[KERNEL-ZENITH]: Registered Shard [%llu]: %s\n", g_shard_count-1, name);
+    sigma_printf("[KERNEL-ZENITH]: Registered Shard [%llu]: %s\n", g_shard_count-1, name);
 }
 
 void sovereign_register_shard_system(void) {
-    sigma_sigma_printf("[SHARD-ZENITH]: Initializing Shard System Registry...\n");
+    sigma_printf("[SHARD-ZENITH]: Initializing Shard System Registry...\n");
     sovereign_register_shard("SovereignAI", 0);
     sovereign_register_shard("SovereignStorage", 0);
     sovereign_register_shard("SovereignNetwork", 0);

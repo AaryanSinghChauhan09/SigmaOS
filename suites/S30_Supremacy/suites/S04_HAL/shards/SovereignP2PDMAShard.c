@@ -16,15 +16,15 @@
  * Principle: Hardware Mastery / Host Memory Bypass / Zero-Copy Storage.
  */
 void sigma_hal_p2pdma_stream(sigma_u32 nvme_id, sigma_u32 nic_id) {
-    sigma_sigma_sigma_sigma_printf("[P2PDMA-FABRIC]: Bridging PCI Controller Memory Buffer (CMB) from NVMe %u to NIC %u...\n", nvme_id, nic_id);
+    sigma_sigma_printf("[P2PDMA-FABRIC]: Bridging PCI Controller Memory Buffer (CMB) from NVMe %u to NIC %u...\n", nvme_id, nic_id);
     // Files are read directly from physical flash chips out to ethernet physical wire, completely skipping CPU DRAM routing
-    sigma_sigma_sigma_sigma_printf("[P2PDMA-FABRIC]: Endpoint bridge established. Host memory bus latency extinguished.\n");
+    sigma_sigma_printf("[P2PDMA-FABRIC]: Endpoint bridge established. Host memory bus latency extinguished.\n");
 }
 
 /* --- Module Factory --- */
 
 void SovereignP2PDMA_Register(void) {
-    sigma_sigma_sigma_sigma_printf("[HAL]: Sovereign P2PDMA (PCIe Endpoint Fabric) active.\n");
+    sigma_sigma_printf("[HAL]: Sovereign P2PDMA (PCIe Endpoint Fabric) active.\n");
 }
 
 

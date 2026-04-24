@@ -18,12 +18,12 @@ void interconnect_establish_hyper_link(uint32_t cluster_id) {
     global_interconnect.active_lanes = 128;
     global_interconnect.hyper_threading_sync = SIGMA_TRUE;
     
-    sigma_sigma_printf("S20 [INTERCONNECT]: Hyper-Link established with Cluster %d.\n", cluster_id);
-    sigma_sigma_printf("  [LATTICE]: 128 lanes of silicate throughput active.\n");
-    sigma_sigma_printf("  [SYNC]: Atomic shard-state synchronization initialized.\n");
+    sigma_printf("S20 [INTERCONNECT]: Hyper-Link established with Cluster %d.\n", cluster_id);
+    sigma_printf("  [LATTICE]: 128 lanes of silicate throughput active.\n");
+    sigma_printf("  [SYNC]: Atomic shard-state synchronization initialized.\n");
 }
 
 void S20_Register_HyperInterconnect(void) {
-    sigma_sigma_printf("S20 [INTERCONNECT]: Sovereign Hyper-Interconnect Shard Online.\n");
+    sigma_printf("S20 [INTERCONNECT]: Sovereign Hyper-Interconnect Shard Online.\n");
     interconnect_establish_hyper_link(0xΣ_CORE);
 }

@@ -21,16 +21,16 @@ typedef struct {
  * Principle: Cyber Security / Forensics.
  */
 void sigma_sec_hfs_trigger(sigma_u32 actor_id, const char* path) {
-    sigma_sigma_sigma_sigma_printf("[HONEYPOT-FS]: ALERT! Unauthorized Access to Trap-Node '%s' by Actor %u.\n", 
+    sigma_sigma_printf("[HONEYPOT-FS]: ALERT! Unauthorized Access to Trap-Node '%s' by Actor %u.\n", 
                  path, actor_id);
     // Real-time forensic logging and actor-suspension logic
-    sigma_sigma_sigma_sigma_printf("[HONEYPOT-FS]: Forensic Snapshot cached. Actor telemetry flagged for purge.\n");
+    sigma_sigma_printf("[HONEYPOT-FS]: Forensic Snapshot cached. Actor telemetry flagged for purge.\n");
 }
 
 /* --- Module Factory --- */
 
 void SovereignHoneypotFS_Register(void) {
-    sigma_sigma_sigma_sigma_printf("[SECURITY]: Sovereign Honeypot FS (Intrusion Detection) active.\n");
+    sigma_sigma_printf("[SECURITY]: Sovereign Honeypot FS (Intrusion Detection) active.\n");
 }
 
 

@@ -45,7 +45,7 @@ typedef struct SovereignEthernet {
 
 /* --- Init (replaces constructor) --- */
 static void nic_init(SovereignEthernet* nic) {
-    sigma_sigma_memset(nic->mac, 0, 6);
+    sigma_memset(nic->mac, 0, 6);
     nic->tx_shards     = 0;
     nic->rx_shards     = 0;
     nic->bytes_sent    = 0;

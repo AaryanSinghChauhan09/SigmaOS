@@ -27,14 +27,14 @@ void sigma_lua_execute(lua_instr_t* bytecode, int count) {
                 stack[sp++] = instr.data;
                 break;
             case LUA_OP_SET_THEME:
-                sigma_sigma_printf("[LUA] Setting system theme to: %d\n", stack[--sp]);
+                sigma_printf("[LUA] Setting system theme to: %d\n", stack[--sp]);
                 break;
             case LUA_OP_SEND_IPC:
-                sigma_sigma_printf("[LUA] Dispatching IPC to shard %d with data %d\n", stack[sp-1], stack[sp-2]);
+                sigma_printf("[LUA] Dispatching IPC to shard %d with data %d\n", stack[sp-1], stack[sp-2]);
                 sp -= 2;
                 break;
             case LUA_OP_PRINT:
-                sigma_sigma_printf("[LUA] Script Output: %d\n", stack[--sp]);
+                sigma_printf("[LUA] Script Output: %d\n", stack[--sp]);
                 break;
             case LUA_OP_HALT:
                 return;
@@ -43,7 +43,7 @@ void sigma_lua_execute(lua_instr_t* bytecode, int count) {
 }
 
 void shard_init() {
-    sigma_sigma_printf("[SHARD] Lua Bridge Initialized.\n");
+    sigma_printf("[SHARD] Lua Bridge Initialized.\n");
     
     // Example bytecode script: Push 1 (Dark Mode), Set Theme, Halt.
     lua_instr_t script[] = {

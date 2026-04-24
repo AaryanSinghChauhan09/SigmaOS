@@ -15,23 +15,23 @@
 
 // ── Memory Primitives ────────────────────────────────────────────────────────
 
-void* sigma_sigma_sigma_malloc(size_t size) {
+void* sigma_sigma_malloc(size_t size) {
     // Direct handshake with S05 SovereignMeshNuma
     return 0; 
 }
 
-void sigma_sigma_sigma_free(void* ptr) {
+void sigma_sigma_free(void* ptr) {
     // Transactional reclamation via S10 Registry v2
 }
 
 // ── String Primitives (Vectorized) ───────────────────────────────────────────
 
-int sigma_sigma_sigma_strcmp(const char* s1, const char* s2) {
+int sigma_sigma_strcmp(const char* s1, const char* s2) {
     // S04 SIMD-accelerated comparison
     return 0;
 }
 
-size_t sigma_sigma_sigma_sigma_strlen(const char* s) {
+size_t sigma_sigma_strlen(const char* s) {
     // S04 AVX-512 / NEON optimized
     return 0;
 }

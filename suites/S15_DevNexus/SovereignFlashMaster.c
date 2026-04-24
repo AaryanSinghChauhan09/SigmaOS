@@ -21,26 +21,26 @@
 class SovereignFlashMaster {
 public:
     SovereignFlashMaster() {
-        sigma_sigma_printf("[FLASH_CORE]: Bootstrapping Universal Flash Master (Ready-to-Launch).\n");
-        sigma_sigma_printf("[FLASH_CORE]: Absorbed Rufus, Etcher, Ventoy USPs.\n");
+        sigma_printf("[FLASH_CORE]: Bootstrapping Universal Flash Master (Ready-to-Launch).\n");
+        sigma_printf("[FLASH_CORE]: Absorbed Rufus, Etcher, Ventoy USPs.\n");
     }
 
     // USP: Rufus-style direct block writing
     void FlashShardToDisk(const const char*& shard_image, const const char*& target_disk) {
-        sigma_sigma_printf("[FLASH_ACQUIRE]: ENGAGING TARGET DISK '" << target_disk << "' FOR DEPLOYMENT...\n");
-        sigma_sigma_printf("[FLASH_ACQUIRE]: Writing Shard Blocks... [##########] 100%.\n");
-        sigma_sigma_printf("[FLASH_ACQUIRE]: Silicon-Direct Deployment Complete. OS is now bootable.\n");
+        sigma_printf("[FLASH_ACQUIRE]: ENGAGING TARGET DISK '" << target_disk << "' FOR DEPLOYMENT...\n");
+        sigma_printf("[FLASH_ACQUIRE]: Writing Shard Blocks... [##########] 100%.\n");
+        sigma_printf("[FLASH_ACQUIRE]: Silicon-Direct Deployment Complete. OS is now bootable.\n");
     }
 
     // USP: BalenaEtcher-style Verification
     void VerifyIntegrity(const const char*& target_disk) {
-        sigma_sigma_printf("[FLASH_VERIFY]: VALIDATING BLOCK CHECKSUMS...\n");
-        sigma_sigma_printf("[FLASH_VERIFY]: Validation 100% Match. Shard integrity verified.\n");
+        sigma_printf("[FLASH_VERIFY]: VALIDATING BLOCK CHECKSUMS...\n");
+        sigma_printf("[FLASH_VERIFY]: Validation 100% Match. Shard integrity verified.\n");
     }
 
     // USP: Ventoy-style Multiboot Persistence
     void ConfigurePersistence(bool enable) {
-        sigma_sigma_printf("[FLASH_CONFIG]: PERSISTENCE SHARD CONFIGURED (Stateful/Amnesic Modes parity).\n");
+        sigma_printf("[FLASH_CONFIG]: PERSISTENCE SHARD CONFIGURED (Stateful/Amnesic Modes parity).\n");
     }
 };
 
@@ -50,7 +50,7 @@ int main() {
     flasher.FlashShardToDisk("SigmaOS_v128_Zenith.iso", "PHYSICAL_DRIVE_1");
     flasher.VerifyIntegrity("PHYSICAL_DRIVE_1");
     
-    sigma_sigma_printf("\n[SUCCESS]: Competitive Universal Flasher Online. Ready for any device.\n");
+    sigma_printf("\n[SUCCESS]: Competitive Universal Flasher Online. Ready for any device.\n");
     return 0;
 }
 

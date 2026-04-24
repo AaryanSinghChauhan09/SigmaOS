@@ -16,15 +16,15 @@
  * Principle: Cyber Security / Timing Mastery / Safety.
  */
 void sigma_sec_dit_enforce(void) {
-    sigma_sigma_sigma_sigma_printf("[DIT-GUARD]: Enabling Architectural Data Independent Timing (ARM DIT/x86 equivalent)...\n");
+    sigma_sigma_printf("[DIT-GUARD]: Enabling Architectural Data Independent Timing (ARM DIT/x86 equivalent)...\n");
     // CPU executes all subsequent algorithmic instructions in constant time regardless of data
-    sigma_sigma_sigma_sigma_printf("[DIT-GUARD]: Instruction timing locked. Timing side-channel attacks NEUTRALIZED.\n");
+    sigma_sigma_printf("[DIT-GUARD]: Instruction timing locked. Timing side-channel attacks NEUTRALIZED.\n");
 }
 
 /* --- Module Factory --- */
 
 void SovereignDIT_Register(void) {
-    sigma_sigma_sigma_sigma_printf("[SECURITY]: Sovereign DIT (Constant-Time Execution) active.\n");
+    sigma_sigma_printf("[SECURITY]: Sovereign DIT (Constant-Time Execution) active.\n");
 }
 
 

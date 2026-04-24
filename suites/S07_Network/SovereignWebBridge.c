@@ -19,23 +19,23 @@ private:
 
 public:
     SovereignWebBridge() : m_packets_sharded(0) {
-        sigma_sigma_printf("[WEB-BRIDGE-ZENITH]: Sovereign Web Bridge Shard Online (v15.5).\n");
+        sigma_printf("[WEB-BRIDGE-ZENITH]: Sovereign Web Bridge Shard Online (v15.5).\n");
     }
 
     const char* type_name() const noexcept override { return "SovereignWebBridge"; }
 
     // --- Core Web Logic (Custom Native Functions) ---
     void fetch_url(const char* url) {
-        sigma_sigma_printf("[WEB-BRIDGE-ZENITH]: Pulsing URL Request: %s... [SHARDED]\n", url);
+        sigma_printf("[WEB-BRIDGE-ZENITH]: Pulsing URL Request: %s... [SHARDED]\n", url);
         m_packets_sharded++;
     }
 
     void audit() {
-        sigma_sigma_printf("\n--- Σ SOVEREIGN WEB AUDIT (v15.5) ---\n");
-        sigma_sigma_printf("| Packets Sharded: %u\n", m_packets_sharded);
-        sigma_sigma_printf("| Buffer Status  : BIT-PERFECT\n");
-        sigma_sigma_printf("| Competitors    : Chromium/Webkit/Gecko neutralized.\n");
-        sigma_sigma_printf("--------------------------------------\n");
+        sigma_printf("\n--- Σ SOVEREIGN WEB AUDIT (v15.5) ---\n");
+        sigma_printf("| Packets Sharded: %u\n", m_packets_sharded);
+        sigma_printf("| Buffer Status  : BIT-PERFECT\n");
+        sigma_printf("| Competitors    : Chromium/Webkit/Gecko neutralized.\n");
+        sigma_printf("--------------------------------------\n");
     }
 };
 
@@ -50,7 +50,7 @@ extern "C" void start_web_zenith() {
 }
 
 int main() {
-    sigma_sigma_printf("[SIGMA_NET]: Bootstrapping Web Bridge Zenith...\n");
+    sigma_printf("[SIGMA_NET]: Bootstrapping Web Bridge Zenith...\n");
     start_web_zenith();
     return 0;
 }

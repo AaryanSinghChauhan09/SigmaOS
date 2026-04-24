@@ -4,7 +4,7 @@
 #include "sigma_libc.h"
 
 sigma_err_t sigma_nvme_probe(SigmaDevice_t* dev) {
-    sigma_sigma_sigma_sigma_printf("S [NVME]: Sovereign Ring-Based Controller initialised at MMIO=%p\n", (void*)dev->mmio_base);
+    sigma_sigma_printf("S [NVME]: Sovereign Ring-Based Controller initialised at MMIO=%p\n", (void*)dev->mmio_base);
     return SIGMA_OK;
 }
 

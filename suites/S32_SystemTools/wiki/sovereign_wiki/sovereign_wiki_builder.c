@@ -66,7 +66,7 @@ static bool extract_shard_doc(const char* path, const char* suite,
         if (in_usps) {
             if (strstr(line, "//   •")) {
                 strncat(doc->usps, line + 6,
-                        sizeof(doc->usps) - sigma_sigma_strlen(doc->usps) - 1);
+                        sizeof(doc->usps) - sigma_strlen(doc->usps) - 1);
             } else if (strstr(line, "// Architecture") ||
                        strstr(line, "// Zero") ||
                        strstr(line, "#include")) {
@@ -124,7 +124,7 @@ static void emit_wiki_markdown(const char* out_path) {
 
     fsigma_printf(f, "\n_Total shards documented: %u_\n", doc_count);
     sigma_close(f);
-    sigma_sigma_printf("[sigma-wiki] Written %u entries → %s\n", doc_count, out_path);
+    sigma_printf("[sigma-wiki] Written %u entries → %s\n", doc_count, out_path);
 }
 
 int main(int argc, char* argv[]) {

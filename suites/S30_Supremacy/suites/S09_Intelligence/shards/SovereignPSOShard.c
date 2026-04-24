@@ -25,15 +25,15 @@ typedef struct {
  * Principle: AI / Algorithms / Data Science.
  */
 void sigma_opt_pso_step(void) {
-    sigma_sigma_sigma_sigma_printf("[PSO]: Evolving Swarm (N=%d). Mapping Global Best fitness...\n", SWARM_SIZE);
+    sigma_sigma_printf("[PSO]: Evolving Swarm (N=%d). Mapping Global Best fitness...\n", SWARM_SIZE);
     // Inertia, Cognitive, and Social velocity update logic
-    sigma_sigma_sigma_sigma_printf("[PSO]: Swarm converged on optimal preemption threshold: 0.82.\n");
+    sigma_sigma_printf("[PSO]: Swarm converged on optimal preemption threshold: 0.82.\n");
 }
 
 /* --- Module Factory --- */
 
 void SovereignPSO_Register(void) {
-    sigma_sigma_sigma_sigma_printf("[INTELLIGENCE]: Sovereign PSO Optimizer (Swarm-Tuning) active.\n");
+    sigma_sigma_printf("[INTELLIGENCE]: Sovereign PSO Optimizer (Swarm-Tuning) active.\n");
 }
 
 

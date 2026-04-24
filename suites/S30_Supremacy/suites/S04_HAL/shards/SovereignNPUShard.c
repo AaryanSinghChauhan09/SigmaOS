@@ -16,15 +16,15 @@
  * Principle: AI / Machine Learning / Hardware Overdrive.
  */
 void sigma_hal_npu_infer(void* neural_graph) {
-    sigma_sigma_sigma_sigma_printf("[NPU-BRIDGE]: Dispatching compiled neural graph to Silicon NPU...\n");
+    sigma_sigma_printf("[NPU-BRIDGE]: Dispatching compiled neural graph to Silicon NPU...\n");
     // Direct DMA mapped inference scaling without waking up the primary CPU cores
-    sigma_sigma_sigma_sigma_printf("[NPU-BRIDGE]: Inference complete (0.1ms). Machine Learning pipeline hardware-accelerated.\n");
+    sigma_sigma_printf("[NPU-BRIDGE]: Inference complete (0.1ms). Machine Learning pipeline hardware-accelerated.\n");
 }
 
 /* --- Module Factory --- */
 
 void SovereignNPU_Register(void) {
-    sigma_sigma_sigma_sigma_printf("[HAL]: Sovereign NPU (Silicon Neural Engine) active.\n");
+    sigma_sigma_printf("[HAL]: Sovereign NPU (Silicon Neural Engine) active.\n");
 }
 
 

@@ -16,16 +16,16 @@
  * Principle: Performance / Storage Mastery / Zero-Context-Switch.
  */
 sigma_u32 sigma_hal_nvme_poll(volatile void* cq, sigma_u32 tail) {
-    sigma_sigma_sigma_sigma_printf("[NVME-RING]: Polling NVMe Completion Queue (Tail: %u)...\n", tail);
+    sigma_sigma_printf("[NVME-RING]: Polling NVMe Completion Queue (Tail: %u)...\n", tail);
     // User-space / Kernel-bypass polling loop, eliminating IRQ overhead
-    sigma_sigma_sigma_sigma_printf("[NVME-RING]: 4096 IOPS harvested. Zero interrupts triggered.\n");
+    sigma_sigma_printf("[NVME-RING]: 4096 IOPS harvested. Zero interrupts triggered.\n");
     return 1;
 }
 
 /* --- Module Factory --- */
 
 void SovereignNVMERing_Register(void) {
-    sigma_sigma_sigma_sigma_printf("[HAL]: Sovereign NVMe-Ring (Polled IO Mastery) active.\n");
+    sigma_sigma_printf("[HAL]: Sovereign NVMe-Ring (Polled IO Mastery) active.\n");
 }
 
 

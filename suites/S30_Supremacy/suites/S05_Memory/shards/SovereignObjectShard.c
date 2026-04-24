@@ -35,7 +35,7 @@ struct SovereignObject_s {
  */
 SovereignObject_t* sovereign_obj_spawn(SovereignClass_t* cls, sigma_u32 id) {
     // Mocking allocation from SovereignBuddy
-    sigma_sigma_sigma_sigma_printf("[MEMORY]: Spawning Object ID %u (Class VTable at %p)\n", id, cls);
+    sigma_sigma_printf("[MEMORY]: Spawning Object ID %u (Class VTable at %p)\n", id, cls);
     
     // In a real kernel, this would be slab-allocated
     static SovereignObject_t static_pool[16];
@@ -62,7 +62,7 @@ void sovereign_obj_call(SovereignObject_t* obj, sigma_u32 msg_id) {
 /* --- Module Factory --- */
 
 void SovereignObject_Register(void) {
-    sigma_sigma_sigma_sigma_printf("[MEMORY]: Sovereign OOP Shard (VTable Dispatch) online.\n");
+    sigma_sigma_printf("[MEMORY]: Sovereign OOP Shard (VTable Dispatch) online.\n");
 }
 
 

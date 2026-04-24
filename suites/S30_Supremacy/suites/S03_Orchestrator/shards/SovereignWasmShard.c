@@ -22,15 +22,15 @@ typedef struct {
  * Principle: Computer Science / Portability.
  */
 void sigma_wasm_execute(SigmaWasmVM_t* vm, sigma_u8 opcode) {
-    sigma_sigma_sigma_sigma_printf("[WASM]: Executing Opcode 0x%02X in Sovereign VM...\n", opcode);
+    sigma_sigma_printf("[WASM]: Executing Opcode 0x%02X in Sovereign VM...\n", opcode);
     // Stack-machine logic (Push, Pop, I32_ADD, etc.)
-    sigma_sigma_sigma_sigma_printf("[WASM]: Transactional isolation maintained. Memory safety: VERIFIED.\n");
+    sigma_sigma_printf("[WASM]: Transactional isolation maintained. Memory safety: VERIFIED.\n");
 }
 
 /* --- Module Factory --- */
 
 void SovereignWasm_Register(void) {
-    sigma_sigma_sigma_sigma_printf("[ORCHESTRATOR]: Sovereign Wasm Runtime (Portable Bytecode) active.\n");
+    sigma_sigma_printf("[ORCHESTRATOR]: Sovereign Wasm Runtime (Portable Bytecode) active.\n");
 }
 
 

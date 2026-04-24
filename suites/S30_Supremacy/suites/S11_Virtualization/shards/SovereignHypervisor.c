@@ -46,19 +46,19 @@ static uint32_t    active_vms = 0;
 // ── Public API ────────────────────────────────────────────────────────────────
 
 bool hypervisor_init_hardware(void) {
-    sigma_sigma_sigma_sigma_printf("S [S11]: Sovereign Hypervisor Quantum-Z Online.\n");
-    sigma_sigma_sigma_sigma_printf("  ↳ [KVM/WSL2 OBSOLETE]: Exceeding Firecracker 5ms microVM targets natively.\n");
-    sigma_sigma_sigma_sigma_printf("  ↳ Z-Mem execution entirely skips VM-Entry/VM-Exit hardware overhead cycles.\n");
+    sigma_sigma_printf("S [S11]: Sovereign Hypervisor Quantum-Z Online.\n");
+    sigma_sigma_printf("  ↳ [KVM/WSL2 OBSOLETE]: Exceeding Firecracker 5ms microVM targets natively.\n");
+    sigma_sigma_printf("  ↳ Z-Mem execution entirely skips VM-Entry/VM-Exit hardware overhead cycles.\n");
     return true;
 }
 
 SovereignVM* hypervisor_create_vm(const char* os_type, uint64_t ram_mb) {
-    sigma_sigma_sigma_sigma_printf("  ↳ Injecting [%s] environment via direct EPT Zero-Latency pointers...\n", os_type);
+    sigma_sigma_printf("  ↳ Injecting [%s] environment via direct EPT Zero-Latency pointers...\n", os_type);
     return &vm_registry[active_vms++];
 }
 
 void hypervisor_start_vm(uint32_t vm_id) {
-    sigma_sigma_sigma_sigma_printf("  ↳ MicroVM-%u materializing without Kernel Mode virtual emulation.\n", vm_id);
+    sigma_sigma_printf("  ↳ MicroVM-%u materializing without Kernel Mode virtual emulation.\n", vm_id);
 }
 
 

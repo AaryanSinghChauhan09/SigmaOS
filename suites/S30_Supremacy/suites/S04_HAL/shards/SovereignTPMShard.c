@@ -16,15 +16,15 @@
  * Principle: Hardware Mastery / Cryptographic Boot Seating.
  */
 void sigma_hal_tpm_extend(sigma_u32 pcr_index, sigma_u8* sha256_hash) {
-    sigma_sigma_sigma_sigma_printf("[TPM-VAULT]: Extending Silicon PCR-%u with cryptographic state hash...\n", pcr_index);
+    sigma_sigma_printf("[TPM-VAULT]: Extending Silicon PCR-%u with cryptographic state hash...\n", pcr_index);
     // Communicates via SPI/I2C to the discrete TPM 2.0 to permanently lock the boot chain hash
-    sigma_sigma_sigma_sigma_printf("[TPM-VAULT]: PCR extended. Root-of-Trust absolute.\n");
+    sigma_sigma_printf("[TPM-VAULT]: PCR extended. Root-of-Trust absolute.\n");
 }
 
 /* --- Module Factory --- */
 
 void SovereignTPM_Register(void) {
-    sigma_sigma_sigma_sigma_printf("[HAL]: Sovereign TPM (Hardware Root of Trust) active.\n");
+    sigma_sigma_printf("[HAL]: Sovereign TPM (Hardware Root of Trust) active.\n");
 }
 
 

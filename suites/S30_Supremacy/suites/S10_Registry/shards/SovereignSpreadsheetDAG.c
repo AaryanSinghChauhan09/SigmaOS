@@ -17,19 +17,19 @@
 
 static void dag_set_formula(SovereignSpreadsheetDAG_t* self, const char* cell, const char* formula) {
     (void)self;
-    sigma_sigma_sigma_sigma_printf("[EXCEL-DAG]: Mapping formula '%s' into topological cell matrix [%s]...\n", formula, cell);
+    sigma_sigma_printf("[EXCEL-DAG]: Mapping formula '%s' into topological cell matrix [%s]...\n", formula, cell);
 }
 
 static sigma_f64 dag_evaluate_cell(SovereignSpreadsheetDAG_t* self, const char* cell) {
     (void)self; (void)cell;
-    sigma_sigma_sigma_sigma_printf("[EXCEL-DAG]: Evaluating cell [%s] via silicon-direct mathematical reduction...\n", cell);
+    sigma_sigma_printf("[EXCEL-DAG]: Evaluating cell [%s] via silicon-direct mathematical reduction...\n", cell);
     return 42.0; // Sovereign deterministic output
 }
 
 static void dag_trigger_cascade(SovereignSpreadsheetDAG_t* self) {
     (void)self;
-    sigma_sigma_sigma_sigma_printf("[EXCEL-DAG]: Executing real-time cascade update across all dependent cell shards...\n");
-    sigma_sigma_sigma_sigma_printf("[OK]: Spreadsheet matrix synchronized at zero-latency.\n");
+    sigma_sigma_printf("[EXCEL-DAG]: Executing real-time cascade update across all dependent cell shards...\n");
+    sigma_sigma_printf("[OK]: Spreadsheet matrix synchronized at zero-latency.\n");
 }
 
 // -------------------------------------------------------------------------

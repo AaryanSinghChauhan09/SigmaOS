@@ -16,14 +16,14 @@ typedef struct {
 
 void ipc_send_message(SovereignMessage* msg) {
     // Symbolic zero-copy transfer logic
-    sigma_sigma_printf("IPC [BUS]: Message 0x%X sent from Suite %d to Suite %d.\n", 
+    sigma_printf("IPC [BUS]: Message 0x%X sent from Suite %d to Suite %d.\n", 
                  msg->message_type, msg->sender_id, msg->receiver_id);
 }
 
 void ipc_broadcast_state(uint32_t suite_id, uint32_t state) {
-    sigma_sigma_printf("IPC [BUS]: Suite %d broadcasting state: 0x%X.\n", suite_id, state);
+    sigma_printf("IPC [BUS]: Suite %d broadcasting state: 0x%X.\n", suite_id, state);
 }
 
 void S00_Register_MessageBus(void) {
-    sigma_sigma_printf("S00 [SOVEREIGN-CORE]: Sovereign Message Bus Online (IPC Enabled).\n");
+    sigma_printf("S00 [SOVEREIGN-CORE]: Sovereign Message Bus Online (IPC Enabled).\n");
 }

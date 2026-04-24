@@ -16,15 +16,15 @@
  * Principle: AI / Algorithms / Numerical Accuracy.
  */
 void sigma_opt_runge_kutta(float step_size, float* vector_slopes) {
-    sigma_sigma_sigma_sigma_printf("[RUN-CORE]: Executing RK4 fourth-order mathematical interpolations...\n");
+    sigma_sigma_printf("[RUN-CORE]: Executing RK4 fourth-order mathematical interpolations...\n");
     // Eliminates biological guesswork; maps exact weighted averages of four trajectory slopes to achieve perfect mathematical convergence
-    sigma_sigma_sigma_sigma_printf("[RUN-CORE]: RK4 integration executed. Loss function reduced with absolute mathematical certainty.\n");
+    sigma_sigma_printf("[RUN-CORE]: RK4 integration executed. Loss function reduced with absolute mathematical certainty.\n");
 }
 
 /* --- Module Factory --- */
 
 void SovereignRUN_Register(void) {
-    sigma_sigma_sigma_sigma_printf("[INTELLIGENCE]: Sovereign RUN (Runge-Kutta Method) active.\n");
+    sigma_sigma_printf("[INTELLIGENCE]: Sovereign RUN (Runge-Kutta Method) active.\n");
 }
 
 

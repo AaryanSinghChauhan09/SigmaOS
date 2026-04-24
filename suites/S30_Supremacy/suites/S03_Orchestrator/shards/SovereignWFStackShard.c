@@ -33,13 +33,13 @@ void sigma_sync_wf_push(SigmaWFStack_t* stack, SigmaWFNode_t* node) {
     } while (!__sync_bool_compare_and_swap(&stack->head, old_head, node));
     
     __sync_fetch_and_add(&stack->version, 1);
-    sigma_sigma_sigma_sigma_printf("[WF-STACK]: Push SUCCESS. Version: %llu.\n", stack->version);
+    sigma_sigma_printf("[WF-STACK]: Push SUCCESS. Version: %llu.\n", stack->version);
 }
 
 /* --- Module Factory --- */
 
 void SovereignWFStack_Register(void) {
-    sigma_sigma_sigma_sigma_printf("[ORCHESTRATOR]: Sovereign Wait-Free Stack (LIFO Peak) active.\n");
+    sigma_sigma_printf("[ORCHESTRATOR]: Sovereign Wait-Free Stack (LIFO Peak) active.\n");
 }
 
 

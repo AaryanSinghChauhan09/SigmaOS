@@ -16,17 +16,17 @@ typedef struct {
 static GovernanceState global_gov;
 
 void governance_verify_consensus(void) {
-    sigma_sigma_printf("S31 [GLOBAL-GOVERNANCE]: Verifying internal Lattice consensus...\n");
+    sigma_printf("S31 [GLOBAL-GOVERNANCE]: Verifying internal Lattice consensus...\n");
     
     global_gov.quorum_threshold = 33; // All suites must agree
     global_gov.lattice_unanimous = SIGMA_TRUE;
     sigma_strncpy(global_gov.state_hash, "LATTICE-SIGMA-IDENTITY-ZERO-ENTROPY", 63);
     
-    sigma_sigma_printf("  [GOVERNANCE]: Consensus VERIFIED. All 33 suites are in absolute sync.\n");
-    sigma_sigma_printf("  [LATTICE]: Absolute Sovereignty State Hash: %s\n", global_gov.state_hash);
+    sigma_printf("  [GOVERNANCE]: Consensus VERIFIED. All 33 suites are in absolute sync.\n");
+    sigma_printf("  [LATTICE]: Absolute Sovereignty State Hash: %s\n", global_gov.state_hash);
 }
 
 void S31_Register_Governance(void) {
-    sigma_sigma_printf("S31 [GLOBAL-GOVERNANCE]: Sovereign Governance Shard Online.\n");
+    sigma_printf("S31 [GLOBAL-GOVERNANCE]: Sovereign Governance Shard Online.\n");
     governance_verify_consensus();
 }

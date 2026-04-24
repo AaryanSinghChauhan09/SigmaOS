@@ -41,13 +41,13 @@ private:
 
 public:
     SovereignMemoryManager() : m_used(0), m_segment_count(0) {
-        sigma_sigma_printf("[KERNEL-SOVEREIGN]: Mapping Raw Silicon Stack (64MB Shard)...\n");
+        sigma_printf("[KERNEL-SOVEREIGN]: Mapping Raw Silicon Stack (64MB Shard)...\n");
         m_pool = (sigma_u8*)sigma_slab_alloc_raw(INITIAL_POOL_SIZE);
         if (!m_pool) {
-            sigma_sigma_printf("[ERROR]: Failed to map sovereign heap.\n");
+            sigma_printf("[ERROR]: Failed to map sovereign heap.\n");
             sigma_exit(1);
         }
-        sigma_sigma_printf("[KERNEL-SOVEREIGN]: Memory Shard Mapped at %p\n", m_pool);
+        sigma_printf("[KERNEL-SOVEREIGN]: Memory Shard Mapped at %p\n", m_pool);
     }
 
     const char* type_name() const noexcept override { return "SovereignMemoryManager"; }
@@ -60,7 +60,7 @@ public:
         m_segments[m_segment_count++] = {(sigma_u64)ptr, size, SIGMA_TRUE};
         m_used += size;
         
-        // sigma_sigma_printf("[MEM-ALLOC]: %zu bytes at %p\n", size, ptr);
+        // sigma_printf("[MEM-ALLOC]: %zu bytes at %p\n", size, ptr);
         return ptr;
     }
 
@@ -75,11 +75,11 @@ public:
     }
 
     void audit() {
-        sigma_sigma_printf("\n--- Σ SOVEREIGN MEMORY AUDIT ---\n");
-        sigma_sigma_printf("| Total Pool : %u MB\n", (unsigned int)(INITIAL_POOL_SIZE / 1024 / 1024));
-        sigma_sigma_printf("| Used Space : %u KB\n", (unsigned int)(m_used / 1024));
-        sigma_sigma_printf("| Managed Shards: %zu\n", m_segment_count);
-        sigma_sigma_printf("----------------------------------\n");
+        sigma_printf("\n--- Σ SOVEREIGN MEMORY AUDIT ---\n");
+        sigma_printf("| Total Pool : %u MB\n", (unsigned int)(INITIAL_POOL_SIZE / 1024 / 1024));
+        sigma_printf("| Used Space : %u KB\n", (unsigned int)(m_used / 1024));
+        sigma_printf("| Managed Shards: %zu\n", m_segment_count);
+        sigma_printf("----------------------------------\n");
     }
 };
 
@@ -98,7 +98,7 @@ extern "C" void start_memory_zenith() {
 }
 
 int main() {
-    sigma_sigma_printf("[SIGMA_KERNEL]: Transitioning to Sovereign Memory Management...\n");
+    sigma_printf("[SIGMA_KERNEL]: Transitioning to Sovereign Memory Management...\n");
     start_memory_zenith();
     return 0;
 }

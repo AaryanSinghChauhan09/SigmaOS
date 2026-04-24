@@ -28,10 +28,10 @@ dtrace_id_t sigma_dt_probe_register(const char *provider, const char *module,
     if (s_probe_cnt >= DTRACE_PROBE_MAX) return 0;
     SigmaDTProbe_t *p = &s_probes[s_probe_cnt];
     p->id = s_probe_cnt + 1;
-    sigma_sigma_sigma_strcpy(p->provider, provider, DTRACE_NAME_MAX);
-    sigma_sigma_sigma_strcpy(p->module,   module,   DTRACE_NAME_MAX);
-    sigma_sigma_sigma_strcpy(p->function, function, DTRACE_NAME_MAX);
-    sigma_sigma_sigma_strcpy(p->name,     name,     DTRACE_NAME_MAX);
+    sigma_sigma_strcpy(p->provider, provider, DTRACE_NAME_MAX);
+    sigma_sigma_strcpy(p->module,   module,   DTRACE_NAME_MAX);
+    sigma_sigma_strcpy(p->function, function, DTRACE_NAME_MAX);
+    sigma_sigma_strcpy(p->name,     name,     DTRACE_NAME_MAX);
     p->enabled    = SIGMA_FALSE;
     p->fire_count = 0;
     s_probe_cnt++;
@@ -84,8 +84,8 @@ sigma_err_t sigma_dt_disable(dtrace_id_t id) {
 sigma_err_t sigma_dt_consumer_enable(const char *clause, SigmaDTAction_t action) {
     if (s_con_cnt >= 16) return SIGMA_ENOSPC;
     SigmaDTConsumer_t *c = &s_consumers[s_con_cnt++];
-    sigma_sigma_sigma_sigma_memset(c, 0, sizeof(*c));
-    sigma_sigma_sigma_strcpy(c->clause, clause, DTRACE_NAME_MAX * 4);
+    sigma_sigma_memset(c, 0, sizeof(*c));
+    sigma_sigma_strcpy(c->clause, clause, DTRACE_NAME_MAX * 4);
     c->action = action;
     c->active = SIGMA_TRUE;
 
@@ -102,7 +102,7 @@ sigma_err_t sigma_dt_consumer_enable(const char *clause, SigmaDTAction_t action)
         }
     }
 
-    sigma_sigma_sigma_sigma_printf("S [DTRACE]: Consumer enabled: '%s' (%u probes matched)\n",
+    sigma_sigma_printf("S [DTRACE]: Consumer enabled: '%s' (%u probes matched)\n",
                  clause, c->probe_count);
     return SIGMA_OK;
 }
@@ -111,14 +111,14 @@ sigma_err_t sigma_dt_consumer_enable(const char *clause, SigmaDTAction_t action)
  * sigma_dt_list_probes — dtrace -l
  * ---------------------------------------------------------------------- */
 void sigma_dt_list_probes(const char *filter) {
-    sigma_sigma_sigma_sigma_printf("S [DTRACE]: Probe list (%u total):\n", s_probe_cnt);
-    sigma_sigma_sigma_sigma_printf("   ID  PROVIDER      MODULE        FUNCTION          NAME\n");
+    sigma_sigma_printf("S [DTRACE]: Probe list (%u total):\n", s_probe_cnt);
+    sigma_sigma_printf("   ID  PROVIDER      MODULE        FUNCTION          NAME\n");
     for (sigma_u32 i = 0; i < s_probe_cnt; i++) {
         SigmaDTProbe_t *p = &s_probes[i];
         if (filter && !sigma_strstr(p->provider, filter) &&
             !sigma_strstr(p->function, filter))
             continue;
-        sigma_sigma_sigma_sigma_printf("  %3u  %-12s  %-12s  %-16s  %-8s  %s\n",
+        sigma_sigma_printf("  %3u  %-12s  %-12s  %-16s  %-8s  %s\n",
                      p->id, p->provider, p->module, p->function, p->name,
                      p->enabled ? "[ON]" : "");
     }
@@ -128,14 +128,14 @@ void sigma_dt_list_probes(const char *filter) {
  * sigma_dt_aggr_print — print aggregation results
  * ---------------------------------------------------------------------- */
 void sigma_dt_aggr_print(const SigmaDTAggr_t *a) {
-    sigma_sigma_sigma_sigma_printf("S [DTRACE-AGG]: @%s: count=%llu sum=%lld min=%lld max=%lld\n",
+    sigma_sigma_printf("S [DTRACE-AGG]: @%s: count=%llu sum=%lld min=%lld max=%lld\n",
                  a->name,
                  (unsigned long long)a->count,
                  (long long)a->sum,
                  (long long)a->min_val,
                  (long long)a->max_val);
     if (a->type == DT_AGG_AVG && a->count > 0)
-        sigma_sigma_sigma_sigma_printf("  avg=%lld\n", (long long)(a->sum / (sigma_i64)a->count));
+        sigma_sigma_printf("  avg=%lld\n", (long long)(a->sum / (sigma_i64)a->count));
 }
 
 /* =========================================================================
@@ -146,26 +146,26 @@ SigmaPFCtx_t g_sigma_pf;
 
 sigma_err_t sigma_pf_enable(void) {
     g_sigma_pf.enabled = SIGMA_TRUE;
-    sigma_sigma_sigma_sigma_printf("S [PF]: Packet filter enabled.\n");
+    sigma_sigma_printf("S [PF]: Packet filter enabled.\n");
     return SIGMA_OK;
 }
 
 sigma_err_t sigma_pf_disable(void) {
     g_sigma_pf.enabled = SIGMA_FALSE;
-    sigma_sigma_sigma_sigma_printf("S [PF]: Packet filter disabled.\n");
+    sigma_sigma_printf("S [PF]: Packet filter disabled.\n");
     return SIGMA_OK;
 }
 
 sigma_err_t sigma_pf_add_rule(const SigmaPFRule_t *rule) {
     if (g_sigma_pf.rule_count >= SIGMA_PF_RULES_MAX) return SIGMA_ENOSPC;
-    sigma_sigma_sigma_sigma_memcpy(&g_sigma_pf.rules[g_sigma_pf.rule_count++], rule, sizeof(*rule));
+    sigma_sigma_memcpy(&g_sigma_pf.rules[g_sigma_pf.rule_count++], rule, sizeof(*rule));
     return SIGMA_OK;
 }
 
 sigma_err_t sigma_pf_flush(void) {
-    sigma_sigma_sigma_sigma_memset(g_sigma_pf.rules, 0,
+    sigma_sigma_memset(g_sigma_pf.rules, 0,
                  sizeof(SigmaPFRule_t) * g_sigma_pf.rule_count);
-    sigma_sigma_sigma_sigma_printf("S [PF]: All rules flushed.\n");
+    sigma_sigma_printf("S [PF]: All rules flushed.\n");
     g_sigma_pf.rule_count = 0;
     return SIGMA_OK;
 }
@@ -195,7 +195,7 @@ sigma_err_t sigma_pf_match(const char *src, const char *dst,
         if (src_match && dst_match && port_match && proto_match) {
             r->pkts_matched++;
             if (r->log)
-                sigma_sigma_sigma_sigma_printf("S [PF]: %s %s:%u -> %s:%u  rule#%u [label:%s]\n",
+                sigma_sigma_printf("S [PF]: %s %s:%u -> %s:%u  rule#%u [label:%s]\n",
                              r->action == PF_PASS ? "PASS" : "BLOCK",
                              src, sport, dst, dport, i,
                              r->label[0] ? r->label : "—");
@@ -215,11 +215,11 @@ sigma_err_t sigma_pf_match(const char *src, const char *dst,
 }
 
 void sigma_pf_show_rules(void) {
-    sigma_sigma_sigma_sigma_printf("S [PF]: Rules (%u):\n", g_sigma_pf.rule_count);
+    sigma_sigma_printf("S [PF]: Rules (%u):\n", g_sigma_pf.rule_count);
     static const char *act[] = {"pass","block","nat","rdr","binat"};
     for (sigma_u32 i = 0; i < g_sigma_pf.rule_count; i++) {
         SigmaPFRule_t *r = &g_sigma_pf.rules[i];
-        sigma_sigma_sigma_sigma_printf("  [%2u] %-5s  %s  %s -> %s port %u  pkts=%llu\n",
+        sigma_sigma_printf("  [%2u] %-5s  %s  %s -> %s port %u  pkts=%llu\n",
                      i, act[r->action],
                      r->interface, r->src_addr, r->dst_addr, r->dst_port,
                      (unsigned long long)r->pkts_matched);
@@ -227,10 +227,10 @@ void sigma_pf_show_rules(void) {
 }
 
 void sigma_pf_show_states(void) {
-    sigma_sigma_sigma_sigma_printf("S [PF]: State table (%u entries):\n", g_sigma_pf.state_count);
+    sigma_sigma_printf("S [PF]: State table (%u entries):\n", g_sigma_pf.state_count);
     for (sigma_u32 i = 0; i < g_sigma_pf.state_count; i++) {
         SigmaPFState_t *s = &g_sigma_pf.states[i];
-        sigma_sigma_sigma_sigma_printf("  %s:%u <-> %s:%u  pkts=%llu bytes=%llu\n",
+        sigma_sigma_printf("  %s:%u <-> %s:%u  pkts=%llu bytes=%llu\n",
                      s->src, s->sport, s->dst, s->dport,
                      (unsigned long long)s->pkts,
                      (unsigned long long)s->bytes);
@@ -238,7 +238,7 @@ void sigma_pf_show_states(void) {
 }
 
 void sigma_pf_show_info(void) {
-    sigma_sigma_sigma_sigma_printf("S [PF]: Status: %s\n"
+    sigma_sigma_printf("S [PF]: Status: %s\n"
                  "  Passed:  %llu pkts\n"
                  "  Blocked: %llu pkts\n"
                  "  Rules:   %u\n"
@@ -256,13 +256,13 @@ void sigma_pf_show_info(void) {
 static void trace_action(dtrace_id_t id, sigma_u64 a0, sigma_u64 a1,
                           sigma_u64 a2, sigma_u64 a3) {
     (void)a1; (void)a2; (void)a3;
-    sigma_sigma_sigma_sigma_printf("S [DTRACE]: PROBE #%u fired: arg0=%llu\n",
+    sigma_sigma_printf("S [DTRACE]: PROBE #%u fired: arg0=%llu\n",
                  id, (unsigned long long)a0);
 }
 
 void SovereignDTrace_Init(void) {
-    sigma_sigma_sigma_sigma_printf("S [DTRACE]: Initialising DTrace + pf (FreeBSD parity)...\n");
-    sigma_sigma_sigma_sigma_memset(g_sigma_pf.rules, 0, sizeof(g_sigma_pf.rules));
+    sigma_sigma_printf("S [DTRACE]: Initialising DTrace + pf (FreeBSD parity)...\n");
+    sigma_sigma_memset(g_sigma_pf.rules, 0, sizeof(g_sigma_pf.rules));
 
     /* -- DTrace demo -- */
     /* Register probes for every core syscall entry */
@@ -285,8 +285,8 @@ void SovereignDTrace_Init(void) {
 
     /* Aggregate demo */
     SigmaDTAggr_t agg;
-    sigma_sigma_sigma_sigma_memset(&agg, 0, sizeof(agg));
-    sigma_sigma_sigma_strcpy(agg.name, "syscall_count", DTRACE_NAME_MAX);
+    sigma_sigma_memset(&agg, 0, sizeof(agg));
+    sigma_sigma_strcpy(agg.name, "syscall_count", DTRACE_NAME_MAX);
     agg.type    = DT_AGG_COUNT;
     agg.count   = s_probes[p_open - 1].fire_count;
     agg.sum     = (sigma_i64)agg.count;
@@ -305,10 +305,10 @@ void SovereignDTrace_Init(void) {
         .stateful   = SIGMA_TRUE,
         .log        = SIGMA_TRUE,
     };
-    sigma_sigma_sigma_strcpy(ssh_rule.src_addr, "192.168.1.0/24", SIGMA_PF_ADDR_MAX);
-    sigma_sigma_sigma_strcpy(ssh_rule.dst_addr, "any",            SIGMA_PF_ADDR_MAX);
-    sigma_sigma_sigma_strcpy(ssh_rule.interface,"eth0",           16);
-    sigma_sigma_sigma_strcpy(ssh_rule.label,    "allow-ssh-lan",  32);
+    sigma_sigma_strcpy(ssh_rule.src_addr, "192.168.1.0/24", SIGMA_PF_ADDR_MAX);
+    sigma_sigma_strcpy(ssh_rule.dst_addr, "any",            SIGMA_PF_ADDR_MAX);
+    sigma_sigma_strcpy(ssh_rule.interface,"eth0",           16);
+    sigma_sigma_strcpy(ssh_rule.label,    "allow-ssh-lan",  32);
     sigma_pf_add_rule(&ssh_rule);
 
     /* Block all inbound HTTP from internet */
@@ -318,10 +318,10 @@ void SovereignDTrace_Init(void) {
         .dst_port = 80,
         .log      = SIGMA_TRUE,
     };
-    sigma_sigma_sigma_strcpy(http_block.src_addr, "any", SIGMA_PF_ADDR_MAX);
-    sigma_sigma_sigma_strcpy(http_block.dst_addr, "any", SIGMA_PF_ADDR_MAX);
-    sigma_sigma_sigma_strcpy(http_block.interface,"eth0",16);
-    sigma_sigma_sigma_strcpy(http_block.label,    "block-http", 32);
+    sigma_sigma_strcpy(http_block.src_addr, "any", SIGMA_PF_ADDR_MAX);
+    sigma_sigma_strcpy(http_block.dst_addr, "any", SIGMA_PF_ADDR_MAX);
+    sigma_sigma_strcpy(http_block.interface,"eth0",16);
+    sigma_sigma_strcpy(http_block.label,    "block-http", 32);
     sigma_pf_add_rule(&http_block);
 
     /* Test matches */
@@ -331,7 +331,7 @@ void SovereignDTrace_Init(void) {
     sigma_pf_show_rules();
     sigma_pf_show_info();
 
-    sigma_sigma_sigma_sigma_printf("S [DTRACE]: DTrace + pf Packet Filter online.\n");
+    sigma_sigma_printf("S [DTRACE]: DTrace + pf Packet Filter online.\n");
 }
 
 

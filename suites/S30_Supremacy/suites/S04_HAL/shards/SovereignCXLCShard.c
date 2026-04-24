@@ -16,15 +16,15 @@
  * Principle: Hardware Mastery / Infinite DRAM Expansion.
  */
 void sigma_hal_cxlc_fabric(sigma_u64 total_petabytes) {
-    sigma_sigma_sigma_sigma_printf("[CXL-FABRIC]: Bridging Dynamic Capacity memory switch (Petabytes: %llu)...\n", total_petabytes);
+    sigma_sigma_printf("[CXL-FABRIC]: Bridging Dynamic Capacity memory switch (Petabytes: %llu)...\n", total_petabytes);
     // Breaks the motherboard silo. CPU A on Server 1 can dynamically borrow 500GB of RAM physically installed on Server 2 natively
-    sigma_sigma_sigma_sigma_printf("[CXL-FABRIC]: DCD pool attached. Motherboard DRAM boundaries mathematically dissolved.\n");
+    sigma_sigma_printf("[CXL-FABRIC]: DCD pool attached. Motherboard DRAM boundaries mathematically dissolved.\n");
 }
 
 /* --- Module Factory --- */
 
 void SovereignCXLC_Register(void) {
-    sigma_sigma_sigma_sigma_printf("[HAL]: Sovereign CXLC (CXL Dynamic Capacity Fabric) active.\n");
+    sigma_sigma_printf("[HAL]: Sovereign CXLC (CXL Dynamic Capacity Fabric) active.\n");
 }
 
 

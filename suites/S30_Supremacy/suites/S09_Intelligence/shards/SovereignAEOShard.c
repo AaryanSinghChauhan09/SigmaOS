@@ -16,15 +16,15 @@
  * Principle: AI / Algorithms / Cyclic Stability.
  */
 void sigma_opt_aeo_consume(float* producers, float* consumers, float* decomposers) {
-    sigma_sigma_sigma_sigma_printf("[AEO-CORE]: Executing ecological energy flow dynamic (Production/Consumption/Decomposition)...\n");
+    sigma_sigma_printf("[AEO-CORE]: Executing ecological energy flow dynamic (Production/Consumption/Decomposition)...\n");
     // Parameters are treated as biological entities; stagnant algorithms "die" and provide raw entropy back to new producers
-    sigma_sigma_sigma_sigma_printf("[AEO-CORE]: Ecosystem decomposed and reformed. Parameter life-cycle successfully closed.\n");
+    sigma_sigma_printf("[AEO-CORE]: Ecosystem decomposed and reformed. Parameter life-cycle successfully closed.\n");
 }
 
 /* --- Module Factory --- */
 
 void SovereignAEO_Register(void) {
-    sigma_sigma_sigma_sigma_printf("[INTELLIGENCE]: Sovereign AEO (Ecological Breakdown) active.\n");
+    sigma_sigma_printf("[INTELLIGENCE]: Sovereign AEO (Ecological Breakdown) active.\n");
 }
 
 

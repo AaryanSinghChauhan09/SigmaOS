@@ -10,8 +10,8 @@
  */
 
 sigma_err_t sigma_lbu_init(void) {
-    sigma_sigma_sigma_sigma_printf("  S [FS-LBU]: Sovereign Alpine-style local backup utility active.\n");
-    sigma_sigma_sigma_sigma_printf("  S [FS-LBU]: Persistent shard archives committed to /etc/apkovl.\n");
+    sigma_sigma_printf("  S [FS-LBU]: Sovereign Alpine-style local backup utility active.\n");
+    sigma_sigma_printf("  S [FS-LBU]: Persistent shard archives committed to /etc/apkovl.\n");
     return SIGMA_OK;
 }
 

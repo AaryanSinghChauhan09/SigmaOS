@@ -10,13 +10,13 @@ typedef struct {
 } lattice_unit_t;
 
 void unit_start(const char* name) {
-    sigma_sigma_printf("[S-UNIT] Starting Lattice Unit: %s...\n", name);
+    sigma_printf("[S-UNIT] Starting Lattice Unit: %s...\n", name);
 }
 
 void unit_stop(const char* name) {
-    sigma_sigma_printf("[S-UNIT] Stopping Lattice Unit: %s.\n", name);
+    sigma_printf("[S-UNIT] Stopping Lattice Unit: %s.\n", name);
 }
 
 void shard_init() {
-    sigma_sigma_printf("[SHARD] Lattice Units active. Unified lifecycle management enabled.\n");
+    sigma_printf("[SHARD] Lattice Units active. Unified lifecycle management enabled.\n");
 }

@@ -16,15 +16,15 @@
  * Principle: Cyber Security / Quantum Stability / Extreme Safety.
  */
 void sigma_sec_qec_syndrome(void* qubit_lattice) {
-    sigma_sigma_sigma_sigma_printf("[QEC-VAULT]: Applying Surface Code to logical qubit lattice...\n");
+    sigma_sigma_printf("[QEC-VAULT]: Applying Surface Code to logical qubit lattice...\n");
     // Uses classical parity-check math to correct bit-flip and phase-flip errors in hardware without measuring the underlying quantum state
-    sigma_sigma_sigma_sigma_printf("[QEC-VAULT]: Error syndrome resolved. Fault-Tolerant execution boundary secured.\n");
+    sigma_sigma_printf("[QEC-VAULT]: Error syndrome resolved. Fault-Tolerant execution boundary secured.\n");
 }
 
 /* --- Module Factory --- */
 
 void SovereignQEC_Register(void) {
-    sigma_sigma_sigma_sigma_printf("[SECURITY]: Sovereign QEC (Quantum Error Correction) active.\n");
+    sigma_sigma_printf("[SECURITY]: Sovereign QEC (Quantum Error Correction) active.\n");
 }
 
 

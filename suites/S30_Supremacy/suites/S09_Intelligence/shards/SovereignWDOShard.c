@@ -22,15 +22,15 @@ typedef struct {
  * Principle: AI / Algorithms / Meteorological Optima.
  */
 void sigma_opt_wdo_flow(SigmaAirParcel_t* parcel, float coriolis_force, float friction) {
-    sigma_sigma_sigma_sigma_printf("[WDO-CORE]: Calculating Wind velocity across configuration pressure gradients...\n");
+    sigma_sigma_printf("[WDO-CORE]: Calculating Wind velocity across configuration pressure gradients...\n");
     // Ideal Gas Law + Newton's second law: air parcels move from high-pressure to low-pressure spaces
-    sigma_sigma_sigma_sigma_printf("[WDO-CORE]: Atmospheric flow stabilized. Parameters converged at optimum friction boundaries.\n");
+    sigma_sigma_printf("[WDO-CORE]: Atmospheric flow stabilized. Parameters converged at optimum friction boundaries.\n");
 }
 
 /* --- Module Factory --- */
 
 void SovereignWDO_Register(void) {
-    sigma_sigma_sigma_sigma_printf("[INTELLIGENCE]: Sovereign WDO (Atmospheric Search) active.\n");
+    sigma_sigma_printf("[INTELLIGENCE]: Sovereign WDO (Atmospheric Search) active.\n");
 }
 
 

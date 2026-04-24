@@ -20,7 +20,7 @@ void Sovereign_Heartbeat_Step(void) {
     OmniMessage msg;
     if (OmniFabric_Poll(&msg)) {
         if (msg.msg_type == MSG_TYPE_SYS_PANIC) {
-            sigma_sigma_sigma_sigma_printf("S [HALT]: Critical Shard Failure Detected (Suite S%02d)\n", msg.sender_id);
+            sigma_sigma_printf("S [HALT]: Critical Shard Failure Detected (Suite S%02d)\n", msg.sender_id);
             // In a sentient system, we would trigger self-healing (S16) here.
         }
     }
@@ -28,5 +28,5 @@ void Sovereign_Heartbeat_Step(void) {
 
 void S03_Orchestrator_Register(void) {
     SovereignRegistry_Register("S03_Orchestrator", 0, NULL);
-    sigma_sigma_sigma_sigma_printf("S [S03]: Master Orchestrator Heartbeat synchronized.\n");
+    sigma_sigma_printf("S [S03]: Master Orchestrator Heartbeat synchronized.\n");
 }

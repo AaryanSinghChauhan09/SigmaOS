@@ -16,23 +16,23 @@
  * Principle: Distributed / Cloud / Storage.
  */
 void sigma_net_storage_connect(const char* target_ip, sigma_u16 nqn_port) {
-    sigma_sigma_sigma_sigma_printf("[NVME-oF]: Establishing Fabric Connection to %s:%u...\n", target_ip, nqn_port);
-    sigma_sigma_sigma_sigma_printf("[NVME-oF]: Performing RDMA/RoCE Handshake... Queue pairs established.\n");
-    sigma_sigma_sigma_sigma_printf("[NVME-oF]: Remote Block Device '/dev/snvme0' mapped to VFS.\n");
+    sigma_sigma_printf("[NVME-oF]: Establishing Fabric Connection to %s:%u...\n", target_ip, nqn_port);
+    sigma_sigma_printf("[NVME-oF]: Performing RDMA/RoCE Handshake... Queue pairs established.\n");
+    sigma_sigma_printf("[NVME-oF]: Remote Block Device '/dev/snvme0' mapped to VFS.\n");
 }
 
 /**
  * sigma_net_storage_io: Dispatches an I/O request over the fabric.
  */
 void sigma_net_storage_io(sigma_u64 lba, sigma_sz_t size, int is_write) {
-    sigma_sigma_sigma_sigma_printf("[NVME-oF]: Fabric I/O: %s %llu bytes at LBA 0x%llX.\n", 
+    sigma_sigma_printf("[NVME-oF]: Fabric I/O: %s %llu bytes at LBA 0x%llX.\n", 
                  is_write ? "WRITE" : "READ", (unsigned long long)size, (unsigned long long)lba);
 }
 
 /* --- Module Factory --- */
 
 void SovereignNVMeFabrics_Register(void) {
-    sigma_sigma_sigma_sigma_printf("[NETWORK]: Sovereign NVMe-over-Fabrics (Fabric Mastery) active.\n");
+    sigma_sigma_printf("[NETWORK]: Sovereign NVMe-over-Fabrics (Fabric Mastery) active.\n");
 }
 
 

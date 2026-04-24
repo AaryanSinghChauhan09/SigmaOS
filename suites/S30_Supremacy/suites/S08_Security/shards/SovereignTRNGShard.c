@@ -16,16 +16,16 @@
  * Principle: Cyber Security / Cryptographic Purity.
  */
 sigma_u64 sigma_sec_trng_harvest(void) {
-    sigma_sigma_sigma_sigma_printf("[TRNG-VAULT]: Harvesting true entropy from underlying silicon diode fluctuations...\n");
+    sigma_sigma_printf("[TRNG-VAULT]: Harvesting true entropy from underlying silicon diode fluctuations...\n");
     // Hardware instruction (e.g. RDSEED) pulling from physical semiconductor noise sources
-    sigma_sigma_sigma_sigma_printf("[TRNG-VAULT]: 64-bit true random vector generated. Predictive modeling impossible.\n");
+    sigma_sigma_printf("[TRNG-VAULT]: 64-bit true random vector generated. Predictive modeling impossible.\n");
     return 0xA1B2C3D4E5F67890; // Simulated true random integer
 }
 
 /* --- Module Factory --- */
 
 void SovereignTRNG_Register(void) {
-    sigma_sigma_sigma_sigma_printf("[SECURITY]: Sovereign TRNG (True Silicon Entropy) active.\n");
+    sigma_sigma_printf("[SECURITY]: Sovereign TRNG (True Silicon Entropy) active.\n");
 }
 
 

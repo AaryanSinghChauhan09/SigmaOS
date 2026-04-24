@@ -36,7 +36,7 @@ private:
 
 public:
     SovereignHypervisor() : m_active_shards(0), m_ring_minus_1_active(SIGMA_TRUE) {
-        sigma_sigma_printf("[HYPERVISOR-ZENITH]: Sovereign Hypervisor Shard Online (v13.0).\n");
+        sigma_printf("[HYPERVISOR-ZENITH]: Sovereign Hypervisor Shard Online (v13.0).\n");
     }
 
     const char* type_name() const noexcept override { return "SovereignHypervisor"; }
@@ -47,17 +47,17 @@ public:
         if(type == GuestType::LINUX) guest_name = "Linux Distro";
         if(type == GuestType::WINDOWS) guest_name = "Windows Subsystem";
         
-        sigma_sigma_printf("[HYPERVISOR-ZENITH]: Swallowing %s Shard...\n", guest_name);
-        sigma_sigma_printf("[HYPERVISOR-ZENITH]: | Guest Ring-0 mapped to Sigma-Ring-3 (Isolated).\n");
+        sigma_printf("[HYPERVISOR-ZENITH]: Swallowing %s Shard...\n", guest_name);
+        sigma_printf("[HYPERVISOR-ZENITH]: | Guest Ring-0 mapped to Sigma-Ring-3 (Isolated).\n");
         m_active_shards++;
     }
 
     void audit() {
-        sigma_sigma_printf("\n--- Σ SOVEREIGN HYPERVISOR AUDIT (v13.0) ---\n");
-        sigma_sigma_printf("| Guest Shards   : %u\n", m_active_shards);
-        sigma_sigma_printf("| Hardware VT-x  : [CAPTURED/ACTIVE]\n");
-        sigma_sigma_printf("| Competitors    : KVM/Xen/Hyper-V neutralized.\n");
-        sigma_sigma_printf("--------------------------------------------\n");
+        sigma_printf("\n--- Σ SOVEREIGN HYPERVISOR AUDIT (v13.0) ---\n");
+        sigma_printf("| Guest Shards   : %u\n", m_active_shards);
+        sigma_printf("| Hardware VT-x  : [CAPTURED/ACTIVE]\n");
+        sigma_printf("| Competitors    : KVM/Xen/Hyper-V neutralized.\n");
+        sigma_printf("--------------------------------------------\n");
     }
 };
 
@@ -73,7 +73,7 @@ extern "C" void start_hypervisor_zenith() {
 }
 
 int main() {
-    sigma_sigma_printf("[SIGMA_VMM]: Bootstrapping Hypervisor Zenith...\n");
+    sigma_printf("[SIGMA_VMM]: Bootstrapping Hypervisor Zenith...\n");
     start_hypervisor_zenith();
     return 0;
 }

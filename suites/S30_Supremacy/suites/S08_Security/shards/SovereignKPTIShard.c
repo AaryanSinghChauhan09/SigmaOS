@@ -16,15 +16,15 @@
  * Principle: Cyber Security / Hardware Mastery / Silicon Invincibility.
  */
 void sigma_sec_kpti_switch(sigma_u32 target_ring) {
-    sigma_sigma_sigma_sigma_printf("[KPTI-ISOLATION]: Transitioning to Ring %u. Swapping CR3...\n", target_ring);
+    sigma_sigma_printf("[KPTI-ISOLATION]: Transitioning to Ring %u. Swapping CR3...\n", target_ring);
     // x86_64: Flush PCID and swap CR3 to completely unmap kernel memory from user-space
-    sigma_sigma_sigma_sigma_printf("[KPTI-ISOLATION]: Page tables isolated. Speculative execution boundary SEALED.\n");
+    sigma_sigma_printf("[KPTI-ISOLATION]: Page tables isolated. Speculative execution boundary SEALED.\n");
 }
 
 /* --- Module Factory --- */
 
 void SovereignKPTI_Register(void) {
-    sigma_sigma_sigma_sigma_printf("[SECURITY]: Sovereign KPTI (Silicon Isolation) active.\n");
+    sigma_sigma_printf("[SECURITY]: Sovereign KPTI (Silicon Isolation) active.\n");
 }
 
 

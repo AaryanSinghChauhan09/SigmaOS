@@ -24,14 +24,14 @@ typedef struct {
 static uint8_t g_backbuffer[FB_WIDTH * FB_HEIGHT * FB_BPP];
 
 void display_server_init(void) {
-    sigma_sigma_sigma_sigma_memset(g_backbuffer, 0, sizeof(g_backbuffer));
-    sigma_sigma_sigma_sigma_printf("S [S02]: SigmaDisplay Server Materialized (Apex Idea 506).\n");
-    sigma_sigma_sigma_sigma_printf("  ↳ [SIGMA-DIRECT]: X11 & Wayland protocols bypassed.\n");
-    sigma_sigma_sigma_sigma_printf("  ↳ Display commands bound directly to underlying GPU registers (0-IPC Latency).\n");
+    sigma_sigma_memset(g_backbuffer, 0, sizeof(g_backbuffer));
+    sigma_sigma_printf("S [S02]: SigmaDisplay Server Materialized (Apex Idea 506).\n");
+    sigma_sigma_printf("  ↳ [SIGMA-DIRECT]: X11 & Wayland protocols bypassed.\n");
+    sigma_sigma_printf("  ↳ Display commands bound directly to underlying GPU registers (0-IPC Latency).\n");
 }
 
 void display_blit(SovereignSurface* src, uint32_t x, uint32_t y) {
-    sigma_sigma_sigma_sigma_printf("S [S02]: Blitting surface -> (%u, %u) Size: (%ux%u)\n", 
+    sigma_sigma_printf("S [S02]: Blitting surface -> (%u, %u) Size: (%ux%u)\n", 
                  x, y, src->width, src->height);
     // Compositor logic for alpha-blending goes here
 }

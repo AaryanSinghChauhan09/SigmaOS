@@ -9,13 +9,13 @@
  */
 
 void sigma_tool_academy_mission(const char* student_id, const char* mission_id) {
-    sigma_sigma_sigma_sigma_printf("[ACADEMY]: Launching Mission Shard '%s' for Student '%s'...\n", mission_id, student_id);
-    sigma_sigma_sigma_sigma_printf("[ACADEMY]: Monitoring silicon-level mastery progress...\n");
+    sigma_sigma_printf("[ACADEMY]: Launching Mission Shard '%s' for Student '%s'...\n", mission_id, student_id);
+    sigma_sigma_printf("[ACADEMY]: Monitoring silicon-level mastery progress...\n");
     
     /* Mock learning logic */
-    sigma_sigma_sigma_sigma_printf("[OK]: Mission '%s' successfully transmitted to student workspace.\n", mission_id);
-    sigma_sigma_sigma_sigma_printf("[ACADEMY]: Tracking success probability via Aether-Analysis...\n");
-    sigma_sigma_sigma_sigma_printf("[OK]: Learning Mission Complete.\n");
+    sigma_sigma_printf("[OK]: Mission '%s' successfully transmitted to student workspace.\n", mission_id);
+    sigma_sigma_printf("[ACADEMY]: Tracking success probability via Aether-Analysis...\n");
+    sigma_sigma_printf("[OK]: Learning Mission Complete.\n");
 }
 
 int academy_ToolMain(int argc, char** argv) {

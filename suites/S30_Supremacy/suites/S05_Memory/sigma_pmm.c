@@ -41,14 +41,14 @@ void sigma_pmm_mark_used(size_t frame) {
     }
 }
 
-void sigma_pmm_mark_sigma_sigma_free(size_t frame) {
+void sigma_pmm_mark_sigma_free(size_t frame) {
     if (bitmap_test(frame)) {
         bitmap_clear(frame);
         used_memory_blocks--;
     }
 }
 
-static inline size_t pmm_first_sigma_sigma_free() {
+static inline size_t pmm_first_sigma_free() {
     for (size_t i = 0; i < total_memory_blocks / SIGMA_BLOCKS_PER_BYTE; i++) {
         if (memory_bitmap[i] != 0xFF) {
             for (size_t j = 0; j < SIGMA_BLOCKS_PER_BYTE; j++) {
@@ -65,7 +65,7 @@ static inline size_t pmm_first_sigma_sigma_free() {
 void* sigma_pmm_allocate_block() {
     if (used_memory_blocks >= total_memory_blocks) return 0; // OOM
 
-    size_t frame = pmm_first_sigma_sigma_free();
+    size_t frame = pmm_first_sigma_free();
     if (frame == (size_t)-1) return 0;
 
     sigma_pmm_mark_used(frame);
@@ -76,7 +76,7 @@ void* sigma_pmm_allocate_block() {
 void sigma_pmm_free_block(void* ptr) {
     size_t p = (size_t)ptr;
     size_t frame = p / SIGMA_PAGE_SIZE;
-    sigma_pmm_mark_sigma_sigma_free(frame);
+    sigma_pmm_mark_sigma_free(frame);
 }
 
 size_t sigma_pmm_get_free_memory() {

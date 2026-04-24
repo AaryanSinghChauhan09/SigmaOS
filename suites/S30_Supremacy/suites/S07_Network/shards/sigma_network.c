@@ -15,7 +15,7 @@ void sigma_network_init() {
     #ifdef _WIN32
         WSADATA wsa;
         if (WSAStartup(MAKEWORD(2, 2), &wsa) != 0) {
-            sigma_sigma_sigma_printf("[FATAL] Kernel failed to initialize Winsock.\n");
+            sigma_sigma_printf("[FATAL] Kernel failed to initialize Winsock.\n");
             exit(1);
         }
     #endif
@@ -38,7 +38,7 @@ void sigma_close_socket(int socket_fd) {
 int sigma_create_server_socket(int port) {
     int server_fd = socket(AF_INET, SOCK_STREAM, 0);
     if (server_fd < 0) {
-        sigma_sigma_sigma_printf("[FATAL] Sovereign Engine failed to acquire raw socket descriptor.\n");
+        sigma_sigma_printf("[FATAL] Sovereign Engine failed to acquire raw socket descriptor.\n");
         exit(1);
     }
 
@@ -56,7 +56,7 @@ int sigma_create_server_socket(int port) {
     #endif
 
     if (listen(server_fd, 10) < 0) {
-        sigma_sigma_sigma_printf("[FATAL] Sovereign Engine failed to listen on Port %d.\n", port);
+        sigma_sigma_printf("[FATAL] Sovereign Engine failed to listen on Port %d.\n", port);
         exit(1);
     }
 

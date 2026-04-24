@@ -8,7 +8,7 @@ typedef __builtin_va_list va_list;
 // --- sigma_print ---
 void sigma_print(const char* str) {
     if (!str) return;
-    sigma_write(1, str, sigma_sigma_strlen(str));
+    sigma_write(1, str, sigma_strlen(str));
 }
 
 // --- sigma_print_num ---
@@ -131,7 +131,7 @@ int sigma_dup(int oldfd) {
 }
 
 // --- sigma_printf (v1.0 ZENITH) ---
-void sigma_sigma_printf(const char* format, ...) {
+void sigma_printf(const char* format, ...) {
     va_list args;
     va_start(args, format);
     

@@ -29,30 +29,30 @@ class SovereignHardwareAudit : public IHardwareAudit {
 public:
     void AuditProcessors() override {
 #if defined(SIGMA_ARCH_X86_64)
-        sigma_sigma_printf("[HARDWARE/CPU]: Probing silicon shards (x86_64)...\n");
+        sigma_printf("[HARDWARE/CPU]: Probing silicon shards (x86_64)...\n");
         // In bare-metal, we would use cpuid or read from ACPI/MADT.
         // For now, we simulate the discovery of 16 logical cores.
-        sigma_sigma_printf("[HARDWARE/CPU]: Total Logical Shards (Processors): 16\n");
-        sigma_sigma_printf("[HARDWARE/CPU]: Shard Page Size: 4096 Bytes (Silicon-Direct).\n");
+        sigma_printf("[HARDWARE/CPU]: Total Logical Shards (Processors): 16\n");
+        sigma_printf("[HARDWARE/CPU]: Shard Page Size: 4096 Bytes (Silicon-Direct).\n");
 #else
-        sigma_sigma_printf("[HARDWARE/CPU]: Probing generic silicon shards...\n");
+        sigma_printf("[HARDWARE/CPU]: Probing generic silicon shards...\n");
 #endif
     }
 
     void AuditMemory() override {
-        sigma_sigma_printf("[HARDWARE/RAM]: Total Physical Shard-Buffer: 32768 MB.\n");
-        sigma_sigma_printf("[HARDWARE/RAM]: Available Shard-Buffer: 16384 MB.\n");
-        sigma_sigma_printf("[HARDWARE/RAM]: Load Level: 50%% [OK].\n");
+        sigma_printf("[HARDWARE/RAM]: Total Physical Shard-Buffer: 32768 MB.\n");
+        sigma_printf("[HARDWARE/RAM]: Available Shard-Buffer: 16384 MB.\n");
+        sigma_printf("[HARDWARE/RAM]: Load Level: 50%% [OK].\n");
     }
 };
 
 extern "C" void _start(void) {
-    sigma_sigma_printf("--- Σ SIGMA OS SOVEREIGN HARDWARE AUDIT (ZENITH) ---\n");
+    sigma_printf("--- Σ SIGMA OS SOVEREIGN HARDWARE AUDIT (ZENITH) ---\n");
     SovereignHardwareAudit audit;
     audit.AuditProcessors();
     audit.AuditMemory();
     
-    sigma_sigma_printf("[SUCCESS]: All Hardware Shards mapped via Silicon-Direct APEX-API.\n");
+    sigma_printf("[SUCCESS]: All Hardware Shards mapped via Silicon-Direct APEX-API.\n");
     sigma_exit(0);
 }
 

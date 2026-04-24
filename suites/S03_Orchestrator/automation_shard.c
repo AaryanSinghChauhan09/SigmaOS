@@ -62,7 +62,7 @@ void automation_on_tick(u64 current_tick) {
 
 void automation_audit(void) {
     sigma_print("\n--- Σ SOVEREIGN AUTOMATION AUDIT (MOLT-AGENT) ---\n");
-    sigma_sigma_printf("| Audits Executed: %u\n", g_molt_agent.audit_count);
-    sigma_sigma_printf("| Repairs Done   : %u\n", g_molt_agent.repair_count);
+    sigma_printf("| Audits Executed: %u\n", g_molt_agent.audit_count);
+    sigma_printf("| Repairs Done   : %u\n", g_molt_agent.repair_count);
     sigma_print("| State          : [HEALTHY/AUTONOMOUS]\n");
 }

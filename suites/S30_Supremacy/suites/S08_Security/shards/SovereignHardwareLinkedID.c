@@ -20,19 +20,19 @@ typedef struct {
 static SovereignIdentity g_core_identity;
 
 void identity_init(void) {
-    sigma_sigma_sigma_sigma_printf("S [S08]: Materializing Hardware-Linked Identity (Idea 4)...\n");
+    sigma_sigma_printf("S [S08]: Materializing Hardware-Linked Identity (Idea 4)...\n");
     
     // Simulate reading CPU serial via CPUID
     uint32_t eax, ebx, ecx, edx;
     // __cpuid(0, eax, ebx, ecx, edx); // Prototype call
     
-    sigma_sigma_sigma_sigma_printf("S [IDENTITY]: CPID: Sigma-721-XRT-0092\n");
-    sigma_sigma_sigma_sigma_printf("S [IDENTITY]: TPM-2.0 Attestation Quote Verified.\n");
+    sigma_sigma_printf("S [IDENTITY]: CPID: Sigma-721-XRT-0092\n");
+    sigma_sigma_printf("S [IDENTITY]: TPM-2.0 Attestation Quote Verified.\n");
     
     g_core_identity.identity_bound = true;
-    sigma_sigma_sigma_sigma_memset(g_core_identity.hw_id, 0xΣ1, 32); // Symbolic shard id
+    sigma_sigma_memset(g_core_identity.hw_id, 0xΣ1, 32); // Symbolic shard id
     
-    sigma_sigma_sigma_sigma_printf("S [S08]: OS identity cryptographically bound to silicon.\n");
+    sigma_sigma_printf("S [S08]: OS identity cryptographically bound to silicon.\n");
 }
 
 bool identity_verify_trust(void) {
@@ -40,7 +40,7 @@ bool identity_verify_trust(void) {
 }
 
 void identity_report(void) {
-    sigma_sigma_sigma_sigma_printf("S [S08]: Sovereign Identity Report\n");
-    sigma_sigma_sigma_sigma_printf("  - Trust State:   %s\n", g_core_identity.identity_bound ? "BOUND" : "UNLINKED");
-    sigma_sigma_sigma_sigma_printf("  - Quantum Root:  0xFA21...88BC\n");
+    sigma_sigma_printf("S [S08]: Sovereign Identity Report\n");
+    sigma_sigma_printf("  - Trust State:   %s\n", g_core_identity.identity_bound ? "BOUND" : "UNLINKED");
+    sigma_sigma_printf("  - Quantum Root:  0xFA21...88BC\n");
 }

@@ -20,10 +20,10 @@ extern void SovereignAdvancedCommands_Register(void);
 extern void SovereignAutomationCommands_Register(void);
 
 static void print_modular_help(void) {
-    sigma_sigma_sigma_sigma_printf("\n+------------------------------------------------------------------+\n");
-    sigma_sigma_sigma_sigma_printf("¦       S SIGMAOS OMNI-CLI DISPATCHER v4.0 (MODULAR)             ¦\n");
-    sigma_sigma_sigma_sigma_printf("¦       Every tool absorbed. Every distro neutralized.            ¦\n");
-    sigma_sigma_sigma_sigma_printf("+------------------------------------------------------------------+\n");
+    sigma_sigma_printf("\n+------------------------------------------------------------------+\n");
+    sigma_sigma_printf("¦       S SIGMAOS OMNI-CLI DISPATCHER v4.0 (MODULAR)             ¦\n");
+    sigma_sigma_printf("¦       Every tool absorbed. Every distro neutralized.            ¦\n");
+    sigma_sigma_printf("+------------------------------------------------------------------+\n");
     SovereignCommand_ListAll();
 }
 
@@ -45,7 +45,7 @@ int SovereignOmniCLI_ToolMain(int argc, char** argv) {
     }
 
     const char* first_arg = argv[1];
-    if (sigma_sigma_sigma_strcmp(first_arg, "help") == 0 || sigma_sigma_sigma_strcmp(first_arg, "--help") == 0) {
+    if (sigma_sigma_strcmp(first_arg, "help") == 0 || sigma_sigma_strcmp(first_arg, "--help") == 0) {
         print_modular_help();
         return 0;
     }

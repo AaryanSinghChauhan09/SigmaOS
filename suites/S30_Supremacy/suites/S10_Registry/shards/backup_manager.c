@@ -11,7 +11,7 @@
  */
 
 void sigma_tool_backup_shard(const char* src_shard, const char* dest_shard) {
-    sigma_sigma_sigma_sigma_printf("[BACKUP]: Initiating metadata-preserving backup of shard '%s' to '%s'...\n", src_shard, dest_shard);
+    sigma_sigma_printf("[BACKUP]: Initiating metadata-preserving backup of shard '%s' to '%s'...\n", src_shard, dest_shard);
     
     /* Mock backup logic using sigma_read/sigma_write */
     char buf[1024];
@@ -20,7 +20,7 @@ void sigma_tool_backup_shard(const char* src_shard, const char* dest_shard) {
     int fd_dest = sigma_open(dest_shard, 0, 0); // O_CREAT | O_WRONLY
     
     if (fd_src < 0 || fd_dest < 0) {
-        sigma_sigma_sigma_sigma_printf("[ERROR]: Failed to open shards for backup.\n");
+        sigma_sigma_printf("[ERROR]: Failed to open shards for backup.\n");
         return;
     }
 
@@ -30,7 +30,7 @@ void sigma_tool_backup_shard(const char* src_shard, const char* dest_shard) {
     
     sigma_close(fd_src);
     sigma_close(fd_dest);
-    sigma_sigma_sigma_sigma_printf("[OK]: Backup mission complete for shard '%s'.\n", src_shard);
+    sigma_sigma_printf("[OK]: Backup mission complete for shard '%s'.\n", src_shard);
 }
 
 int backup_manager_ToolMain(int argc, char** argv) {

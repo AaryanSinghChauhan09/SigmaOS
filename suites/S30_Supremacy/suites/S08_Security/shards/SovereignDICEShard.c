@@ -16,15 +16,15 @@
  * Principle: Cyber Security / Ephemeral Boot Trust.
  */
 void sigma_sec_dice_compound(void* boot_layer_hash) {
-    sigma_sigma_sigma_sigma_printf("[DICE-VAULT]: Cryptographically hashing Boot Stage N+1 into hardware CDI register...\n");
+    sigma_sigma_printf("[DICE-VAULT]: Cryptographically hashing Boot Stage N+1 into hardware CDI register...\n");
     // If any firmware layer is tampered with prior to OS loading, the resulting cryptographic compound key inherently fails
-    sigma_sigma_sigma_sigma_printf("[DICE-VAULT]: Composition engine seated. Immutable boot trust cryptographically verified.\n");
+    sigma_sigma_printf("[DICE-VAULT]: Composition engine seated. Immutable boot trust cryptographically verified.\n");
 }
 
 /* --- Module Factory --- */
 
 void SovereignDICE_Register(void) {
-    sigma_sigma_sigma_sigma_printf("[SECURITY]: Sovereign DICE (Compound Hardware Identity) active.\n");
+    sigma_sigma_printf("[SECURITY]: Sovereign DICE (Compound Hardware Identity) active.\n");
 }
 
 

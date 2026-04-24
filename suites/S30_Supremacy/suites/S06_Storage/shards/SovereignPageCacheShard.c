@@ -66,7 +66,7 @@ static int sigma_page_cache_evict(void) {
     }
 
     if (s_cache[lru_idx].is_dirty) {
-        sigma_sigma_sigma_sigma_printf("[CACHE]: Cleaning dirty page %llu before eviction.\n",
+        sigma_sigma_printf("[CACHE]: Cleaning dirty page %llu before eviction.\n",
                      s_cache[lru_idx].page_id);
     }
     
@@ -86,7 +86,7 @@ sigma_err_t sigma_page_cache_insert(sigma_u64 page_id, const void* data) {
     s_cache[idx].is_valid = 1;
     s_cache[idx].is_dirty = 0;
     s_cache[idx].last_access_tick = s_current_tick;
-    sigma_sigma_sigma_sigma_memcpy(s_cache[idx].data, data, 4096);
+    sigma_sigma_memcpy(s_cache[idx].data, data, 4096);
 
     return SIGMA_OK;
 }
@@ -94,7 +94,7 @@ sigma_err_t sigma_page_cache_insert(sigma_u64 page_id, const void* data) {
 /* --- Module Factory --- */
 
 void SovereignPageCache_Register(void) {
-    sigma_sigma_sigma_sigma_printf("[REGISTRY]: Sovereign Page Cache v2.0 (LRU) active.\n");
+    sigma_sigma_printf("[REGISTRY]: Sovereign Page Cache v2.0 (LRU) active.\n");
     sigma_page_cache_init();
 }
 

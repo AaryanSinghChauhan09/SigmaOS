@@ -31,7 +31,7 @@ int sigma_security_lsm_hook(const char* path) {
 /* --- Module Factory --- */
 
 void SovereignLSM_Register(void) {
-    sigma_sigma_sigma_sigma_printf("[SECURITY]: Sovereign LSM (Security Hooks) active.\n");
+    sigma_sigma_printf("[SECURITY]: Sovereign LSM (Security Hooks) active.\n");
 }
 
 

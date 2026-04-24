@@ -29,18 +29,18 @@ sigma_result_t sigma_safe_shard_access(const char* shard_id) {
 }
 
 void sigma_safety_audit() {
-    sigma_sigma_printf("\nΣ SOVEREIGN RUST-PARITY SAFETY AUDIT\n");
-    sigma_sigma_printf("-------------------------------------------\n");
+    sigma_printf("\nΣ SOVEREIGN RUST-PARITY SAFETY AUDIT\n");
+    sigma_printf("-------------------------------------------\n");
     sigma_result_t check = sigma_safe_shard_access("Sovereign-Core-01");
     if (check.is_error) {
-        sigma_sigma_printf("[PANIC] %s\n", check.data);
+        sigma_printf("[PANIC] %s\n", check.data);
     } else {
-        sigma_sigma_printf("[SAFE] %s\n", check.data);
+        sigma_printf("[SAFE] %s\n", check.data);
     }
-    sigma_sigma_printf("-------------------------------------------\n\n");
+    sigma_printf("-------------------------------------------\n\n");
 }
 
 void sigma_safety_shard_init() {
-    sigma_sigma_printf("[SAFETY] Initializing Rust-Parity Logic Shards (ENABLED)...\n");
-    sigma_sigma_printf("[SAFETY] Memory Isolation & Bounds Checking: ACTIVE\n");
+    sigma_printf("[SAFETY] Initializing Rust-Parity Logic Shards (ENABLED)...\n");
+    sigma_printf("[SAFETY] Memory Isolation & Bounds Checking: ACTIVE\n");
 }

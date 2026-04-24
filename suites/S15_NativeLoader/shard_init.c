@@ -25,17 +25,17 @@ int sldr_load_binary(const uint8_t* buffer, size_t size) {
     sbn_header_t* header = (sbn_header_t*)buffer;
     
     if (sigma_strncmp(header->signature, "SBN", 3) != 0) {
-        sigma_sigma_printf("[SLDR] Error: Invalid SBN signature.\n");
+        sigma_printf("[SLDR] Error: Invalid SBN signature.\n");
         return -1;
     }
 
-    sigma_sigma_printf("[SLDR] Loading Sigma-Native Binary | Entry: %p\n", header->entry_point);
+    sigma_printf("[SLDR] Loading Sigma-Native Binary | Entry: %p\n", header->entry_point);
     
     const sbn_segment_t* segments = (const sbn_segment_t*)(buffer + sizeof(sbn_header_t));
     
     for (uint32_t i = 0; i < header->segment_count; i++) {
         const sbn_segment_t* seg = &segments[i];
-        sigma_sigma_printf("[SLDR]   Mapping Segment %d: VAddr %p | Size %d\n", i, seg->p_vaddr, seg->p_memsz);
+        sigma_printf("[SLDR]   Mapping Segment %d: VAddr %p | Size %d\n", i, seg->p_vaddr, seg->p_memsz);
         
         // Allocate physical pages for the segment
         for (uint32_t offset = 0; offset < seg->p_memsz; offset += 4096) {
@@ -45,17 +45,17 @@ int sldr_load_binary(const uint8_t* buffer, size_t size) {
             // Copy segment data if available
             if (offset < seg->p_filesz) {
                 uint32_t copy_len = (seg->p_filesz - offset > 4096) ? 4096 : (seg->p_filesz - offset);
-                sigma_sigma_memcpy(phys_page, buffer + seg->p_offset + offset, copy_len);
+                sigma_memcpy(phys_page, buffer + seg->p_offset + offset, copy_len);
             }
         }
     }
     
-    sigma_sigma_printf("[SLDR] Binary loaded successfully. Ready for dispatch.\n");
+    sigma_printf("[SLDR] Binary loaded successfully. Ready for dispatch.\n");
     return 0;
 }
 
 void shard_init() {
-    sigma_sigma_printf("[SHARD] Native Loader Initialized.\n");
+    sigma_printf("[SHARD] Native Loader Initialized.\n");
     
     // Mock SBN Binary: "Hello Sigma"
     // In a real system, this would be read from the Sovereign VFS.

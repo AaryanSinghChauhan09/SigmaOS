@@ -39,7 +39,7 @@ void scad_log_event(AuditEventType type, const char* suite, const char* actor, c
     sigma_strncpy(record->description, desc, 127);
     record->severity = sev;
 
-    sigma_sigma_printf("[SCAD]: Secure log generated for %s (Severity: %d)\n", suite, sev);
+    sigma_printf("[SCAD]: Secure log generated for %s (Severity: %d)\n", suite, sev);
     
     audit_head++;
     
@@ -47,21 +47,21 @@ void scad_log_event(AuditEventType type, const char* suite, const char* actor, c
 }
 
 void S08_Register_AuditDaemon(void) {
-    sigma_sigma_printf("S08 [SECURITY]: Initializing Sovereign Compliance & Audit Daemon...\n");
+    sigma_printf("S08 [SECURITY]: Initializing Sovereign Compliance & Audit Daemon...\n");
     scad_log_event(AUDIT_EVENT_INTEGRITY_SUCCESS, "S08", "KERNEL", "SCAD Subsystem Online", 0);
 }
 
 // Enterprise Compliance Report Generator
 void scad_generate_report(void) {
-    sigma_sigma_printf("\n╔═══════════════════════════════════════════╗\n");
-    sigma_sigma_printf("║   Sovereign Compliance & Audit Report     ║\n");
-    sigma_sigma_printf("╠═══════════════════════════════════════════╣\n");
+    sigma_printf("\n╔═══════════════════════════════════════════╗\n");
+    sigma_printf("║   Sovereign Compliance & Audit Report     ║\n");
+    sigma_printf("╠═══════════════════════════════════════════╣\n");
     
     uint32_t count = (audit_head > 1024) ? 1024 : audit_head;
     for(uint32_t i = 0; i < count; i++) {
         SovereignAuditRecord* r = &audit_ring_buffer[i % 1024];
-        sigma_sigma_printf("║ [%s] EV:%d | %-20s ║\n", r->suite_id, r->event_id, r->description);
+        sigma_printf("║ [%s] EV:%d | %-20s ║\n", r->suite_id, r->event_id, r->description);
     }
     
-    sigma_sigma_printf("╚═══════════════════════════════════════════╝\n");
+    sigma_printf("╚═══════════════════════════════════════════╝\n");
 }

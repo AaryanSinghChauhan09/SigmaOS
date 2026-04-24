@@ -24,7 +24,7 @@ void storage_prefetch_track(sigma_u64 lba) {
     if (current_stride == hints[index].stride && current_stride != 0) {
         hints[index].confidence++;
         if (hints[index].confidence > 2) {
-            sigma_sigma_printf("S06 [STORAGE]: [PREFETCH-OPT] High confidence stride %u detected. Pre-loading LBA 0x%llX\n", 
+            sigma_printf("S06 [STORAGE]: [PREFETCH-OPT] High confidence stride %u detected. Pre-loading LBA 0x%llX\n", 
                          current_stride, lba + current_stride);
         }
     } else {
@@ -36,6 +36,6 @@ void storage_prefetch_track(sigma_u64 lba) {
 }
 
 void S06_Register_PrefetchOptimizer(void) {
-    sigma_sigma_printf("S06 [STORAGE]: Sovereign Prefetch Optimizer Online.\n");
-    sigma_sigma_printf("  [OPT]: Ahead-of-time data loading heuristics active.\n");
+    sigma_printf("S06 [STORAGE]: Sovereign Prefetch Optimizer Online.\n");
+    sigma_printf("  [OPT]: Ahead-of-time data loading heuristics active.\n");
 }

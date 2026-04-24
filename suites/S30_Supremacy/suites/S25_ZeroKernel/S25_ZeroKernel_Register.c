@@ -7,5 +7,5 @@ extern void isa_emulator_init(void);
 void S25_ZeroKernel_Register(void) {
     isa_emulator_init();
     SovereignRegistry_Register("S25_ZeroKernel", 0, NULL);
-    sigma_sigma_sigma_sigma_printf("S [S25_ZeroKernel]: SigmaISA Emulator integrated.\n");
+    sigma_sigma_printf("S [S25_ZeroKernel]: SigmaISA Emulator integrated.\n");
 }

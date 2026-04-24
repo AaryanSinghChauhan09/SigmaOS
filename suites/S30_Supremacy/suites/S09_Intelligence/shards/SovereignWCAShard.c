@@ -21,15 +21,15 @@ typedef struct {
  * Principle: AI / Algorithms / Hydrological Optima.
  */
 void sigma_opt_wca_flow(SigmaStream_t* stream, float* sea_pos, float C) {
-    sigma_sigma_sigma_sigma_printf("[WCA-CORE]: Routing resource flow towards global 'Sea' optima (C: %.2f)...\n", C);
+    sigma_sigma_printf("[WCA-CORE]: Routing resource flow towards global 'Sea' optima (C: %.2f)...\n", C);
     // X_stream(t+1) = X_stream(t) + rand * C * (X_sea(t) - X_stream(t))
-    sigma_sigma_sigma_sigma_printf("[WCA-CORE]: Fluid convergence: Shard state successfully streamed.\n");
+    sigma_sigma_printf("[WCA-CORE]: Fluid convergence: Shard state successfully streamed.\n");
 }
 
 /* --- Module Factory --- */
 
 void SovereignWCA_Register(void) {
-    sigma_sigma_sigma_sigma_printf("[INTELLIGENCE]: Sovereign WCA (Hydrological Optima) active.\n");
+    sigma_sigma_printf("[INTELLIGENCE]: Sovereign WCA (Hydrological Optima) active.\n");
 }
 
 

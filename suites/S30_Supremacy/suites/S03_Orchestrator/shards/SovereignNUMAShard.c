@@ -26,11 +26,11 @@ static int s_numa_count = 0;
  * Principle: Multi-Processing / Computer Science.
  */
 void sigma_numa_discover(void) {
-    sigma_sigma_sigma_sigma_printf("[NUMA]: Mapping CPU Topology... Multi-Node configuration detected.\n");
+    sigma_sigma_printf("[NUMA]: Mapping CPU Topology... Multi-Node configuration detected.\n");
     // Interface with ACPI SRAT table logic in S04_HAL
     s_numa_nodes[0] = (SigmaNumaNode_t){ .node_id = 0, .cpu_mask = 0xFF, .memory_size = 32768 };
     s_numa_count = 1;
-    sigma_sigma_sigma_sigma_printf("[NUMA]: Node 0: CPUs [0-7] | Memory: 32GB (Local Affinity Optimized).\n");
+    sigma_sigma_printf("[NUMA]: Node 0: CPUs [0-7] | Memory: 32GB (Local Affinity Optimized).\n");
 }
 
 /**
@@ -38,13 +38,13 @@ void sigma_numa_discover(void) {
  * Principle: Performance Optimization.
  */
 void sigma_numa_bind(sigma_u32 pid, sigma_u32 node_id) {
-    sigma_sigma_sigma_sigma_printf("[NUMA]: Binding PID %u to Node %u. Locality enforcement ARMED.\n", pid, node_id);
+    sigma_sigma_printf("[NUMA]: Binding PID %u to Node %u. Locality enforcement ARMED.\n", pid, node_id);
 }
 
 /* --- Module Factory --- */
 
 void SovereignNUMA_Register(void) {
-    sigma_sigma_sigma_sigma_printf("[ORCHESTRATOR]: Sovereign NUMA Mastery (Topology Awareness) active.\n");
+    sigma_sigma_printf("[ORCHESTRATOR]: Sovereign NUMA Mastery (Topology Awareness) active.\n");
 }
 
 

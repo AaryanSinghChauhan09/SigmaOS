@@ -32,7 +32,7 @@ void sigma_batch_submit(sigma_u32 id, sigma_u8 prio) {
         s_batch_queue[s_job_count].priority = prio;
         s_batch_queue[s_job_count].status = 0;
         s_job_count++;
-        sigma_sigma_sigma_sigma_printf("[BATCH]: Job %u submitted (Priority: %u).\n", id, prio);
+        sigma_sigma_printf("[BATCH]: Job %u submitted (Priority: %u).\n", id, prio);
     }
 }
 
@@ -41,15 +41,15 @@ void sigma_batch_submit(sigma_u32 id, sigma_u8 prio) {
  * Principle: Multi-Processing / IPC.
  */
 void* sigma_shm_get(sigma_u32 key, sigma_sz_t size) {
-    sigma_sigma_sigma_sigma_printf("[PROCESS]: Shared Memory (Key: 0x%08X) mapped [SIZE: %llu].\n", key, (unsigned long long)size);
+    sigma_sigma_printf("[PROCESS]: Shared Memory (Key: 0x%08X) mapped [SIZE: %llu].\n", key, (unsigned long long)size);
     return (void*)0x20000000; /* Real physical address in Zenith address space */
 }
 
 /* --- Module Factory --- */
 
 void SovereignMultiProcess_Register(void) {
-    sigma_sigma_sigma_sigma_printf("[ORCHESTRATOR]: Sovereign Multi-Process & Batch Engine active.\n");
-    sigma_sigma_sigma_sigma_printf("[AUDIT]: Multi-Tasking / Time-Sharing matrix online.\n");
+    sigma_sigma_printf("[ORCHESTRATOR]: Sovereign Multi-Process & Batch Engine active.\n");
+    sigma_sigma_printf("[AUDIT]: Multi-Tasking / Time-Sharing matrix online.\n");
 }
 
 

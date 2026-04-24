@@ -9,8 +9,8 @@
 #include "suites/S01_Genesis/shards/sigma_base.h"
 
 void s_graphics_init() {
-    sigma_sigma_printf("S [GPU]: Detecting Silicon Graphics Shards...\n");
-    sigma_sigma_printf("S [GPU]: Enabling Sovereign Blit Engine (4K @ 240Hz Ready).\n");
+    sigma_printf("S [GPU]: Detecting Silicon Graphics Shards...\n");
+    sigma_printf("S [GPU]: Enabling Sovereign Blit Engine (4K @ 240Hz Ready).\n");
 }
 
 void s_graphics_draw_rect(int x, int y, int w, int h, uint32_t color) {

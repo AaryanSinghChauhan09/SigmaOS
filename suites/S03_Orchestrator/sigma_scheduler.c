@@ -35,10 +35,10 @@ static int current_task_idx = -1;
 static int total_tasks = 0;
 
 void sigma_scheduler_init() {
-    sigma_sigma_memset(task_list, 0, sizeof(task_list));
+    sigma_memset(task_list, 0, sizeof(task_list));
     current_task_idx = -1;
     total_tasks = 0;
-    sigma_sigma_printf("[KERNEL] Scheduler initialized (MAX_TASKS: %d)\n", MAX_TASKS);
+    sigma_printf("[KERNEL] Scheduler initialized (MAX_TASKS: %d)\n", MAX_TASKS);
 }
 
 sigma_err_t sigma_task_create(virt_addr_t entry, sigma_u32 priority) {
@@ -51,7 +51,7 @@ sigma_err_t sigma_task_create(virt_addr_t entry, sigma_u32 priority) {
     task_list[idx].priority = priority;
     task_list[idx].cpu_time = 0;
     
-    sigma_sigma_printf("[KERNEL] Task created (PID: %d, Entry: 0x%llx)\n", task_list[idx].pid, entry);
+    sigma_printf("[KERNEL] Task created (PID: %d, Entry: 0x%llx)\n", task_list[idx].pid, entry);
     return SIGMA_OK;
 }
 
@@ -74,12 +74,12 @@ void sigma_schedule() {
     task_list[current_task_idx].state = TASK_STATE_RUNNING;
     
     // In a real kernel, we would trigger a context switch here (SovereignTaskSwitch)
-    // sigma_sigma_printf("[KERNEL] Context switch to PID: %d\n", task_list[current_task_idx].pid);
+    // sigma_printf("[KERNEL] Context switch to PID: %d\n", task_list[current_task_idx].pid);
 }
 
 SIGMA_NORETURN void sigma_panic(const char* message) {
-    sigma_sigma_printf("\nΣ SIGMAOS KERNEL PANIC: %s\n", message);
-    sigma_sigma_printf("SYSTEM HALTED. SOVEREIGN SHUTDOWN INITIATED.\n");
+    sigma_printf("\nΣ SIGMAOS KERNEL PANIC: %s\n", message);
+    sigma_printf("SYSTEM HALTED. SOVEREIGN SHUTDOWN INITIATED.\n");
     while(1) {
         // Absolute halt
     }

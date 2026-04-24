@@ -20,7 +20,7 @@ static uint32_t threat_count = 0;
 void security_spf_analyze(sigma_u32 ip, uint16_t port, const char* data_burst) {
     // Predictive AI Logic - Mock Pattern Match
     if (sigma_strstr(data_burst, "EXPL") != SIGMA_NULL) {
-        sigma_sigma_printf("S08 [SECURITY]: [SPF-BLOCK] Predictive logic identified exploit signature from 0x%X:%d\n", ip, port);
+        sigma_printf("S08 [SECURITY]: [SPF-BLOCK] Predictive logic identified exploit signature from 0x%X:%d\n", ip, port);
         // Instant Shard Isolation - Quarantine the network stack
     } else {
         // High-speed pass-through
@@ -28,6 +28,6 @@ void security_spf_analyze(sigma_u32 ip, uint16_t port, const char* data_burst) {
 }
 
 void S08_Register_PredictiveFirewall(void) {
-    sigma_sigma_printf("S08 [SECURITY]: Sovereign Predictive Firewall (SPF) Online.\n");
-    sigma_sigma_printf("  [SPF]: Neural heuristics loaded. Zero-day latency: < 1ns.\n");
+    sigma_printf("S08 [SECURITY]: Sovereign Predictive Firewall (SPF) Online.\n");
+    sigma_printf("  [SPF]: Neural heuristics loaded. Zero-day latency: < 1ns.\n");
 }

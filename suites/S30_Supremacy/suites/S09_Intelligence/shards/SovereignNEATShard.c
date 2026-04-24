@@ -16,15 +16,15 @@
  * Principle: AI / Algorithms / Data Science.
  */
 void sigma_opt_neat_evolve(void* mesh) {
-    sigma_sigma_sigma_sigma_printf("[NEAT-CORE]: Augmenting Neural Topologies... Mapping innovation IDs.\n");
+    sigma_sigma_printf("[NEAT-CORE]: Augmenting Neural Topologies... Mapping innovation IDs.\n");
     // Structural mutation: adding hidden nodes and connections
-    sigma_sigma_sigma_sigma_printf("[NEAT-CORE]: Topology specialized. Efficiency +18%% achieved via pruning.\n");
+    sigma_sigma_printf("[NEAT-CORE]: Topology specialized. Efficiency +18%% achieved via pruning.\n");
 }
 
 /* --- Module Factory --- */
 
 void SovereignNEAT_Register(void) {
-    sigma_sigma_sigma_sigma_printf("[INTELLIGENCE]: Sovereign NEAT-Core (Structural Evolution) active.\n");
+    sigma_sigma_printf("[INTELLIGENCE]: Sovereign NEAT-Core (Structural Evolution) active.\n");
 }
 
 

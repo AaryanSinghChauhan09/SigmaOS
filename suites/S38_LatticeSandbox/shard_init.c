@@ -5,10 +5,10 @@
 // USP: Creates a strictly isolated execution environment with no access to the global shard lattice by default.
 
 void sandbox_create_context(uint32_t shard_id) {
-    sigma_sigma_printf("[S-SANDBOX] Creating isolated sandbox context for Shard %d...\n", shard_id);
-    sigma_sigma_printf("[S-SANDBOX] Denying access to S06_Persistence and S07_Network.\n");
+    sigma_printf("[S-SANDBOX] Creating isolated sandbox context for Shard %d...\n", shard_id);
+    sigma_printf("[S-SANDBOX] Denying access to S06_Persistence and S07_Network.\n");
 }
 
 void shard_init() {
-    sigma_sigma_printf("[SHARD] Lattice Sandbox active. Unprivileged execution enabled.\n");
+    sigma_printf("[SHARD] Lattice Sandbox active. Unprivileged execution enabled.\n");
 }

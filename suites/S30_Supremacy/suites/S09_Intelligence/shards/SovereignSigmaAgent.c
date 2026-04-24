@@ -24,12 +24,12 @@ void agent_init(void) {
     sigma_strncpy(g_primary_agent.current_mission, "Neural Lattice Optimization", 127);
     g_primary_agent.plan_steps = 3;
     g_primary_agent.current_step = 0;
-    sigma_sigma_sigma_sigma_printf("S [S09]: SigmaAgent Runtime Online (Idea 436).\n");
+    sigma_sigma_printf("S [S09]: SigmaAgent Runtime Online (Idea 436).\n");
 }
 
 void agent_execute_step(void) {
     if (g_primary_agent.current_step >= g_primary_agent.plan_steps) {
-        sigma_sigma_sigma_sigma_printf("S [AGENT]: Current Mission '%s' Accomplished.\n", g_primary_agent.current_mission);
+        sigma_sigma_printf("S [AGENT]: Current Mission '%s' Accomplished.\n", g_primary_agent.current_mission);
         return;
     }
 
@@ -39,7 +39,7 @@ void agent_execute_step(void) {
         "Applying hot-patches to the 33-suite lattice..."
     };
 
-    sigma_sigma_sigma_sigma_printf("S [AGENT]: Executing Step %d/%d -> %s\n", 
+    sigma_sigma_printf("S [AGENT]: Executing Step %d/%d -> %s\n", 
         g_primary_agent.current_step + 1, g_primary_agent.plan_steps, steps[g_primary_agent.current_step]);
     
     g_primary_agent.current_step++;
@@ -48,5 +48,5 @@ void agent_execute_step(void) {
 void agent_dispatch_mission(const char* mission) {
     sigma_strncpy(g_primary_agent.current_mission, mission, 127);
     g_primary_agent.current_step = 0;
-    sigma_sigma_sigma_sigma_printf("S [AGENT]: New Primary Mission Dispatched: %s\n", mission);
+    sigma_sigma_printf("S [AGENT]: New Primary Mission Dispatched: %s\n", mission);
 }

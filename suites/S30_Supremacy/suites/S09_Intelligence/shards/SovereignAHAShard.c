@@ -16,15 +16,15 @@
  * Principle: AI / Algorithms / Zero-Friction Movement.
  */
 void sigma_opt_aha_flight(float* source_flower, float vector_angle) {
-    sigma_sigma_sigma_sigma_printf("[AHA-CORE]: Engaging omni-directional configuration flight (Vector: %.2f)...\n", vector_angle);
+    sigma_sigma_printf("[AHA-CORE]: Engaging omni-directional configuration flight (Vector: %.2f)...\n", vector_angle);
     // Hummingbirds traverse data planes identically in X, Y, and Z axes natively, eliminating linear constraints
-    sigma_sigma_sigma_sigma_printf("[AHA-CORE]: Nectar extracted. Multi-dimensional global optimum mapped successfully.\n");
+    sigma_sigma_printf("[AHA-CORE]: Nectar extracted. Multi-dimensional global optimum mapped successfully.\n");
 }
 
 /* --- Module Factory --- */
 
 void SovereignAHA_Register(void) {
-    sigma_sigma_sigma_sigma_printf("[INTELLIGENCE]: Sovereign AHA (Hummingbird Omni-Flight) active.\n");
+    sigma_sigma_printf("[INTELLIGENCE]: Sovereign AHA (Hummingbird Omni-Flight) active.\n");
 }
 
 

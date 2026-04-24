@@ -23,14 +23,14 @@ typedef struct {
  */
 int sigma_net_route_lookup(sigma_u32 ip) {
     /* Logic: Longest Prefix Match (Principle: Routing) */
-    sigma_sigma_sigma_sigma_printf("[NETWORK]: Routing packet to 0x%08X (L3 Dispatch).\n", ip);
+    sigma_sigma_printf("[NETWORK]: Routing packet to 0x%08X (L3 Dispatch).\n", ip);
     return 0; /* Interface 0 */
 }
 
 /* --- Module Factory --- */
 
 void SovereignL3_Register(void) {
-    sigma_sigma_sigma_sigma_printf("[NETWORK]: Sovereign L3 Routing Engine active.\n");
+    sigma_sigma_printf("[NETWORK]: Sovereign L3 Routing Engine active.\n");
 }
 
 

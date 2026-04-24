@@ -16,16 +16,16 @@
  * Principle: Hardware Mastery / Quality-of-Service / Virtualization.
  */
 void sigma_hal_sriov_split(sigma_u32 pci_physical_func, sigma_u16 num_virtual_funcs) {
-    sigma_sigma_sigma_sigma_printf("[SR-IOV-FABRIC]: Splitting Physical Function %04X into %u Virtual Functions...\n", 
+    sigma_sigma_printf("[SR-IOV-FABRIC]: Splitting Physical Function %04X into %u Virtual Functions...\n", 
                  pci_physical_func, num_virtual_funcs);
     // Enumerates Virtual Functions dynamically on the PCI bus, equipping child OS instances with native drivers
-    sigma_sigma_sigma_sigma_printf("[SR-IOV-FABRIC]: Hardware successfully split. Native QoS allocated identically to all VMs.\n");
+    sigma_sigma_printf("[SR-IOV-FABRIC]: Hardware successfully split. Native QoS allocated identically to all VMs.\n");
 }
 
 /* --- Module Factory --- */
 
 void SovereignSRIOV_Register(void) {
-    sigma_sigma_sigma_sigma_printf("[HAL]: Sovereign SR-IOV (Hardware Scaling Fabric) active.\n");
+    sigma_sigma_printf("[HAL]: Sovereign SR-IOV (Hardware Scaling Fabric) active.\n");
 }
 
 

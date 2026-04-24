@@ -16,15 +16,15 @@
  * Principle: Hardware Mastery / Sub-Nanosecond Optics.
  */
 void sigma_hal_lpo_drive(void* packet_stream) {
-    sigma_sigma_sigma_sigma_printf("[LPO-FABRIC]: Driving direct analog modulation into Linear Pluggable Optics...\n");
+    sigma_sigma_printf("[LPO-FABRIC]: Driving direct analog modulation into Linear Pluggable Optics...\n");
     // Bypasses massive Digital Signal Processor (DSP) chips in the transceiver. The host directly modulates the laser analog signal
-    sigma_sigma_sigma_sigma_printf("[LPO-FABRIC]: DSP pipeline eradicated. Sub-nanosecond photonic fabric established.\n");
+    sigma_sigma_printf("[LPO-FABRIC]: DSP pipeline eradicated. Sub-nanosecond photonic fabric established.\n");
 }
 
 /* --- Module Factory --- */
 
 void SovereignLPO_Register(void) {
-    sigma_sigma_sigma_sigma_printf("[HAL]: Sovereign LPO (Linear-Drive Pluggable Optics) active.\n");
+    sigma_sigma_printf("[HAL]: Sovereign LPO (Linear-Drive Pluggable Optics) active.\n");
 }
 
 

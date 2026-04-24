@@ -25,17 +25,17 @@ void kmain(uint32_t multiboot_magic, uint32_t multiboot_addr) {
     s_audio_init();
     s_graphics_init();
 
-    sigma_sigma_printf("\n  =========================================\n");
-    sigma_sigma_printf("  ALL 33 SUITES HARMONIZED. BOOT COMPLETE.\n");
-    sigma_sigma_printf("  =========================================\n\n");
+    sigma_printf("\n  =========================================\n");
+    sigma_printf("  ALL 33 SUITES HARMONIZED. BOOT COMPLETE.\n");
+    sigma_printf("  =========================================\n\n");
     
     // Demonstrate Userland & System Parity
     s_security_audit_all();
     s_pkg_list();
     s_ls("/");
 
-    sigma_sigma_printf("\n  Zenith Web Engine -> http://localhost:3334\n");
-    sigma_sigma_printf("  Linux is irrelevant. SigmaOS is sovereign.\n\n");
+    sigma_printf("\n  Zenith Web Engine -> http://localhost:3334\n");
+    sigma_printf("  Linux is irrelevant. SigmaOS is sovereign.\n\n");
 
     /* Kernel enters interrupt-driven idle loop */
     __asm__ __volatile__("sti");

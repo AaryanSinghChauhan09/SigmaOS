@@ -18,17 +18,17 @@ typedef struct {
 static SupremacyProclamation global_supremacy;
 
 void supremacy_embed_signature(void) {
-    sigma_sigma_printf("S30 [SUPREMACY]: Materializing Master Supremacy Signature...\n");
+    sigma_printf("S30 [SUPREMACY]: Materializing Master Supremacy Signature...\n");
     
     sigma_strncpy(global_supremacy.signature, MASTER_SIGNATURE, 63);
     global_supremacy.finalization_timestamp = 202604211130; // Symbolic
     global_supremacy.immutable_state = SIGMA_TRUE;
     
-    sigma_sigma_printf("  [SIGNATURE]: '%s' EMBEDDED.\n", global_supremacy.signature);
-    sigma_sigma_printf("  [FINALITY]: SigmaOS is now declared an Immutable Sovereign Entity.\n");
+    sigma_printf("  [SIGNATURE]: '%s' EMBEDDED.\n", global_supremacy.signature);
+    sigma_printf("  [FINALITY]: SigmaOS is now declared an Immutable Sovereign Entity.\n");
 }
 
 void S30_Register_SupremacySignature(void) {
-    sigma_sigma_printf("S30 [SUPREMACY]: Sovereign Supremacy Signature Shard Online.\n");
+    sigma_printf("S30 [SUPREMACY]: Sovereign Supremacy Signature Shard Online.\n");
     supremacy_embed_signature();
 }

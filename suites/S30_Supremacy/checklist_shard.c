@@ -35,7 +35,7 @@ static void sigma_strncpy(char* dest, const char* src, u32 n) {
     dest[i] = '\0';
 }
 
-static u32 sigma_sigma_strlen(const char* s) {
+static u32 sigma_strlen(const char* s) {
     u32 i = 0;
     while (s[i]) i++;
     return i;

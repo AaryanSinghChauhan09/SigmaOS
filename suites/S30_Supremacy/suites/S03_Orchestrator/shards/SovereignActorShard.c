@@ -22,9 +22,9 @@ typedef struct {
  * Principle: Distributed / Multi-Processing / Safety.
  */
 void sigma_actor_send(sigma_u32 target_id, sigma_u32 message) {
-    sigma_sigma_sigma_sigma_printf("[ACTOR]: Dispatching message 0x%X to Actor %u...\n", message, target_id);
+    sigma_sigma_printf("[ACTOR]: Dispatching message 0x%X to Actor %u...\n", message, target_id);
     // Atomic mailbox insertion logic (MPSC)
-    sigma_sigma_sigma_sigma_printf("[ACTOR]: Message queued. Target actor will process in local context.\n");
+    sigma_sigma_printf("[ACTOR]: Message queued. Target actor will process in local context.\n");
 }
 
 /**
@@ -32,14 +32,14 @@ void sigma_actor_send(sigma_u32 target_id, sigma_u32 message) {
  */
 void sigma_actor_process(SigmaActor_t* actor) {
     if (actor->msg_count > 0) {
-        sigma_sigma_sigma_sigma_printf("[ACTOR]: Actor %u processing message 0x%X.\n", actor->actor_id, actor->mailbox[0]);
+        sigma_sigma_printf("[ACTOR]: Actor %u processing message 0x%X.\n", actor->actor_id, actor->mailbox[0]);
     }
 }
 
 /* --- Module Factory --- */
 
 void SovereignActorModel_Register(void) {
-    sigma_sigma_sigma_sigma_printf("[ORCHESTRATOR]: Sovereign Actor Model (Message-Passing Mastery) active.\n");
+    sigma_sigma_printf("[ORCHESTRATOR]: Sovereign Actor Model (Message-Passing Mastery) active.\n");
 }
 
 

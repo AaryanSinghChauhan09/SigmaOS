@@ -10,16 +10,16 @@ typedef struct {
 } browser_state_t;
 
 void browser_activate_v8_shims() {
-    sigma_sigma_printf("[S-BROWSER] Detecting Chromium Environment...\n");
-    sigma_sigma_printf("[S-BROWSER] Activating V8-Native Acceleration Shims.\n");
+    sigma_printf("[S-BROWSER] Detecting Chromium Environment...\n");
+    sigma_printf("[S-BROWSER] Activating V8-Native Acceleration Shims.\n");
     // Simulate JIT-friendly memory alignment and JS-bridge speedups.
 }
 
 void browser_inject_native_cli_ui() {
-    sigma_sigma_printf("[S-BROWSER] Injecting High-Fidelity Web-Terminal Widget.\n");
+    sigma_printf("[S-BROWSER] Injecting High-Fidelity Web-Terminal Widget.\n");
 }
 
 void shard_init() {
-    sigma_sigma_printf("[SHARD] Browser Lattice active. Optimizing for Chromium Runtime.\n");
+    sigma_printf("[SHARD] Browser Lattice active. Optimizing for Chromium Runtime.\n");
     browser_activate_v8_shims();
 }
