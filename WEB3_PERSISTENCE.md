@@ -1,10 +1,14 @@
+
 # Web3 Persistence Layer
+
 
 SigmaOS treats local storage as ephemeral and disposable. The true system state is securely backed up to a decentralised mesh network natively at the kernel level.
 
 Located in `modules/core/fs/web3_persistence.c`.
 
+
 ## Competitive Advantages (USPs)
+
 
 1. **Bare-Metal IPFS Integration**:
    - Standard operating systems require heavy user-space daemons (like `ipfs` or `syncthing`) to backup data.

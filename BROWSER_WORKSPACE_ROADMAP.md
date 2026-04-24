@@ -1,4 +1,6 @@
+
 # 🌟 Competitive Positioning
+
 
 | Feature / USP | SigmaOS (Your OS) | Arc | Brave | Opera | Vivaldi | Sidekick |
 | :--- | :--- | :--- | :--- | :--- | :--- | :--- |
@@ -12,7 +14,9 @@
 | **Customization** | Modular lattice, sovereign standards | Moderate | Low | Moderate | Extreme | Moderate |
 | **USP** | **“Browser that thinks in tasks, not tabs”** | “Browser as workspace” | “Privacy-first browsing” | “All-in-one sidebar utilities” | “Most customizable browser” | “Collaboration-first browser” |
 
+
 ## 🌟 SigmaOS Differentiation Opportunities
+
 
 * **Learning-First USP:** Unlike competitors, SigmaOS targets students, coders, and researchers with study/coding utilities.
 * **Task-Centric Browsing:** Position tabs as tasks with context, notes, and progress — not just pages.
@@ -22,23 +26,31 @@
 
 ---
 
+
 # 📅 SigmaOS Feature Roadmap
 
+
+
 ## Short-Term (0–6 months)
+
 * **Task-Centric Browsing:** Replace “tabs” with “tasks” that include context, notes, and progress.
 * **Smart Tab Grouping:** Auto-cluster tabs by domain (coding, study, entertainment).
 * **Focus Mode:** Hide distractions, surface only study/coding tabs.
 * **Privacy Layer:** Hardened kernel primitives + tracker blocking (competitive with Brave).
 * **Workspace Templates:** Prebuilt setups (Coding Workspace, Study Workspace, Research Workspace).
 
+
 ## Mid-Term (6–18 months)
+
 * **Learning Mode:** Auto-detect educational content (YouTube lectures, Sololearn) → generate summaries, flashcards, quizzes.
 * **Coding Companion:** Inline snippet manager + GitHub integration + API playground.
 * **Citation Collector:** Auto-generate references from academic/legal tabs.
 * **Shared Workspaces:** Share tab groups with teammates, complete with annotations.
 * **AI Summaries:** Summarize long docs, repos, or lectures into digestible notes.
 
+
 ## Long-Term (18+ months)
+
 * **Cross-Context Sync:** Sync not just tabs, but learning progress and project context across devices.
 * **Workspace AI Assistant:** Suggest next steps (e.g., “You watched Doctrine of Election — want flashcards?”).
 * **Offline Continuity:** Notes and highlights sync later when online.

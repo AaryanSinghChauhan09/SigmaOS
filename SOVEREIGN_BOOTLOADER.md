@@ -1,10 +1,14 @@
+
 # Sovereign Bootloader
+
 
 SigmaOS bypasses legacy dependency on generic bootloaders (like GRUB or systemd-boot) by implementing its own **UEFI Native Sovereign Bootloader**.
 
 Located in `modules/core/boot/sovereign_boot.c`.
 
+
 ## Competitive Advantages (USPs) over Linux Distros
+
 
 1. **Zero-Trust Cryptographic Boot (macOS/Windows Parity)**:
    - Standard Linux often boots any kernel placed in `/boot`. 

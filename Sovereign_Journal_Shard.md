@@ -1,4 +1,6 @@
+
 # Sovereign Journal Shard
+
 
 **Parity:** systemd-journal · syslog · Windows Event Log · macOS ASL  
 **Location:** `kernel/modules/core/SovereignJournalShard.c`  
@@ -6,13 +8,17 @@
 
 ---
 
+
 ## Overview
+
 
 The Sovereign Journal Shard provides native, zero-dependency structured kernel event logging for SigmaOS. It absorbs the systemd-journal, syslog, and Windows Event Log USPs by implementing a lock-free circular ring buffer with 8-level priority filtering, ANSI-coloured severity output, and `journalctl -f`-style streaming.
 
 ---
 
+
 ## Architecture
+
 
 ```
 Ring Buffer: 64 entries (circular, auto-overwrite oldest)
@@ -30,7 +36,9 @@ Boot Entries (pre-seeded):
 
 ---
 
+
 ## CLI Reference — `sigma-journal`
+
 
 | Sub-command | Action |
 |---|---|
@@ -40,7 +48,9 @@ Boot Entries (pre-seeded):
 
 ---
 
+
 ## Design Philosophy
+
 
 - **Lock-Free Ring**: Circular overwrite eliminates allocation and mutex overhead.
 - **CRIT+ Immediate**: `EMERG`, `ALERT`, `CRIT` entries bypass the buffer and print immediately.
@@ -48,6 +58,8 @@ Boot Entries (pre-seeded):
 
 ---
 
+
 ## Synchronization State
 
-`GLOBAL MESH ACTIVE` — Synchronized with `AaryanSinghChauhan09/SigmaOS`.
+
+`GLOBAL MESH ACTIVE` — Synchronized with `Sovereign-OS/SigmaOS`.

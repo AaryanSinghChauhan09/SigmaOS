@@ -1,6 +1,10 @@
+
 # SigmaOS Module Loader, Diagnostics & Sandboxing
 
+
+
 ## Dynamic Module Loader
+
 Located at `modules/tools/loader/module_loader.c`.
 
 Allows drivers and services to be **hot-swapped without rebooting** the kernel — one of SigmaOS's key USPs over legacy monolithic kernels.
@@ -9,7 +13,9 @@ Allows drivers and services to be **hot-swapped without rebooting** the kernel �
 - `module_load(name)` — Dynamically initialize and activate a module at runtime.
 - `module_unload(name)` — Cleanly tear down a module, freeing all resources.
 
+
 ## Tamper-Proof Audit Logger
+
 Located at `modules/tools/diag/logger.c`.
 
 Every log entry is protected by an **FNV-1a integrity hash**, ensuring any tampering is immediately detectable — surpassing typical Linux `syslog` mechanisms.
@@ -18,7 +24,9 @@ Every log entry is protected by an **FNV-1a integrity hash**, ensuring any tampe
 - `verify_log_integrity()` — Scans all buffered entries for hash mismatches.
 - `trace_syscall()` — Emits an audit-level trace event for every system call.
 
+
 ## Process Sandboxing
+
 Located at `modules/security/isolation/sandbox.c`.
 
 Provides BSD-jail style and Docker-inspired **container isolation** for untrusted processes.
@@ -27,7 +35,9 @@ Provides BSD-jail style and Docker-inspired **container isolation** for untruste
 - `sandbox_check_syscall()` — Enforced at the syscall dispatcher level to intercept blocked calls.
 - `sandbox_check_memory()` — Hard memory page cap per-sandbox; prevents denial-of-service attacks.
 
+
 ## Encrypted Sovereign Network Stack
+
 Located at `modules/core/net/sovereign_net.c`.
 
 Implements **encrypted-by-default packet transmission** — every packet leaving or entering a SigmaOS node is encrypted at the network layer.

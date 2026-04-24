@@ -1,4 +1,6 @@
-﻿# S SOVEREIGN SUPREMACY 33 INDEX
+
+# S SOVEREIGN SUPREMACY 33 INDEX
+
 
 The definitive registry of all sharded entities within the SigmaOS Singularity.
 

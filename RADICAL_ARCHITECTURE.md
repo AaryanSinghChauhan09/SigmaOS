@@ -1,10 +1,14 @@
+
 # SigmaOS Radical Architecture — Implementation Guide
+
 
 This document covers the cutting-edge innovations that push SigmaOS beyond a "Linux clone" into **sovereign-first innovation** territory.
 
 ---
 
+
 ## 🧩 Self-Healing Kernel (`modules/core/kernel/watchdog.c`)
+
 
 Inspired by transactional databases and fault-tolerant distributed systems.
 
@@ -20,7 +24,9 @@ watchdog_register("eth0_driver", 3, &eth_init, &eth_cleanup);
 
 ---
 
+
 ## ⚡ AI-Assisted Adaptive Scheduler (`modules/core/kernel/ai_scheduler.c`)
+
 
 Uses **Exponential Moving Average (EMA)** to predict workload patterns and pre-allocate CPU time intelligently.
 
@@ -31,7 +37,9 @@ Uses **Exponential Moving Average (EMA)** to predict workload patterns and pre-a
 
 ---
 
+
 ## 🔒 Tamper-Proof Audit Chain (`modules/security/access_control/audit_chain.c`)
+
 
 A **blockchain-style immutable log** baked into the kernel. Every audit event is chained by hash.
 
@@ -41,7 +49,9 @@ A **blockchain-style immutable log** baked into the kernel. Every audit event is
 
 ---
 
+
 ## 🌐 Mesh Networking (`modules/core/net/mesh_net.c`)
+
 
 SigmaOS nodes auto-discover each other and form **peer-to-peer sovereign networks** with no central server.
 
@@ -52,7 +62,9 @@ SigmaOS nodes auto-discover each other and form **peer-to-peer sovereign network
 
 ---
 
+
 ## 🤖 Bare-Metal ML Accelerator HAL (`modules/ext/hal/accel_hal.c`)
+
 
 Direct **kernel-level access** to GPU / TPU / NPU / FPGA accelerators — zero middleware bloat.
 
@@ -62,7 +74,9 @@ Direct **kernel-level access** to GPU / TPU / NPU / FPGA accelerators — zero m
 
 ---
 
+
 ## 💾 SigmaFS Sovereign Filesystem (`modules/core/fs/sigmafs.c`)
+
 
 A cryptographically verifiable filesystem where **every block is signed and every write is journaled**.
 
@@ -75,7 +89,9 @@ A cryptographically verifiable filesystem where **every block is signed and ever
 
 ---
 
+
 ## 🔗 Zero-Trust IPC (`modules/core/kernel/ipc.c`)
+
 
 Every inter-process message is **cryptographically signed** by the sender and **verified before delivery**.
 

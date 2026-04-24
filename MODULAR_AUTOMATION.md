@@ -1,10 +1,14 @@
+
 # SigmaOS Modularization & Automation
+
 
 This document details the systems that make SigmaOS self-configuring, self-optimizing, and modular by design.
 
 ---
 
+
 ## 🧩 Service Capsules (`modules/ext/plugins/capsule.c`)
+
 
 SigmaOS subsystems are treated as independent, versioned capsules.
 
@@ -14,7 +18,9 @@ SigmaOS subsystems are treated as independent, versioned capsules.
 
 ---
 
+
 ## 🛡️ Capability Registry & Auto-Revocation (`modules/security/capabilities/cap_registry.c`)
+
 
 A central registry for tracking capability ownership across processes and modules.
 
@@ -23,7 +29,9 @@ A central registry for tracking capability ownership across processes and module
 
 ---
 
+
 ## ⚙️ Hardware Auto-Detection (`modules/ext/hal/hw_detect.c`)
+
 
 A sovereign alternative to complex udev systems.
 
@@ -33,7 +41,9 @@ A sovereign alternative to complex udev systems.
 
 ---
 
+
 ## 📈 Continuous Profiling & AI Hooks (`modules/tools/diag/profiler.c`)
+
 
 The kernel constantly monitors its own performance.
 
@@ -42,14 +52,18 @@ The kernel constantly monitors its own performance.
 
 ---
 
+
 ## 🚀 Future Roadmap: Security & Modular Supremacy
+
 - [ ] **Sovereign Module Store**: Automated dependency resolution from remote signed repositories.
 - [ ] **Consensus-Driven Updates**: Nodes in a cluster verify module integrity before allowing an update.
 - [ ] **Memory-as-Contracts**: Cryptographic leasing of memory blocks between capsules.
 
 ---
 
+
 ## Source Files
+
 - `modules/security/capabilities/cap_registry.c`
 - `modules/ext/plugins/capsule.c`
 - `modules/ext/hal/hw_detect.c`

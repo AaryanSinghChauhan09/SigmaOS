@@ -1,6 +1,10 @@
+
 # Σ SigmaOS — Architecture Deep Dive
 
+
+
 ## Sovereign Lattice Overview
+
 
 ```
 ┌─────────────────────────────────────────────────────────┐
@@ -28,7 +32,9 @@
 
 ---
 
+
 ## IPC + Persistence Flow
+
 
 Every IPC message is **durably persisted before delivery**, preventing message loss on crash:
 
@@ -49,7 +55,9 @@ On restart, the Orchestrator replays messages in ascending `seq_id` order — gu
 
 ---
 
+
 ## DMA + Cache Coherency
+
 
 ```
 sigma_dma_alloc(size, &paddr)
@@ -70,7 +78,9 @@ sigma_dma_alloc(size, &paddr)
 
 ---
 
+
 ## Exception Handling Flow
+
 
 ```
 Hardware Fault (e.g. Data Abort / DMA Violation)
@@ -93,7 +103,9 @@ sched_kill_current_task(ec)
 
 ---
 
+
 ## Formal Verification Status
+
 
 | Property | Tool | Status |
 |----------|------|--------|
@@ -105,16 +117,22 @@ sched_kill_current_task(ec)
 | IPC channel disjointness | Coq | 🔶 Sketch |
 | CRDT merge convergence | Isabelle | 🔶 Sketch |
 
+
 ## Sovereign Native Toolchain
+
 
 To minimize dependencies on high-level runtimes (Python, Node), SigmaOS utilizes a **Native C++ Build Orchestrator** (`scripts/orchestrator`).
 
+
 ### Design Principles
+
 1. **Zero-Dependency**: Written in pure C++20 using only standard headers. No external libraries (e.g., `nlohmann/json`) are permitted.
 2. **Silicon-Native**: Compiled to a native binary for the host architecture, ensuring maximum build performance and "sovereignty".
 3. **Lattice-Aware**: Understands `module.json` metadata and performs topological sorting for correct dependency resolution.
 
+
 ### Build Lifecycle
+
 1. **Discovery**: Recursively scans `modules/` and `suites/` for `module.json`.
 2. **Resolution**: Generates a dependency graph and calculates the linear build order.
 3. **Incremental Synthesis**: Compiles only modified shards by comparing file timestamps.

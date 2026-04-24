@@ -1,10 +1,14 @@
+
 # 🌐 SigmaOS Sovereign Deployment Matrix
+
 
 SigmaOS is a **Universal Silicon Lattice** designed for absolute portability across diverse execution environments. By utilizing the **Universal Abstraction Layer (UAL)**, the system adapts its hardware-facing logic while maintaining a consistent, high-performance kernel.
 
 ---
 
+
 ## 🏗️ 1. Deployment Formats
+
 
 | Format | Target Environment | Key Shards | Build Target |
 |--------|-------------------|------------|--------------|
@@ -15,7 +19,9 @@ SigmaOS is a **Universal Silicon Lattice** designed for absolute portability acr
 
 ---
 
+
 ## 🍱 2. Build Profiles
+
 
 Profiles allow you to tune the OS footprint for your specific use case. Toggle them via `./s-cli profile <name>`.
 
@@ -26,22 +32,34 @@ Profiles allow you to tune the OS footprint for your specific use case. Toggle t
 
 ---
 
+
 ## 🚀 3. Cross-Platform Workflow
 
+
+
 ### Native Toolchain
+
 All deployments are managed via the native **S-CLI**:
 ```bash
+
 # 1. Select deployment profile
+
 ./s-cli profile server
 
+
 # 2. Build for target architecture
+
 ./s-cli build aarch64
 
+
 # 3. Verify in QEMU
+
 ./s-cli run aarch64
 ```
 
+
 ### Browser Deployment
+
 For browser-based simulation, the core kernel shards are cross-compiled to WASM and served alongside the `web_ui`:
 ```bash
 cd web_ui
@@ -50,7 +68,9 @@ npm run dev # Launches the Zenith Dashboard with WASM-bridged kernel logic
 
 ---
 
+
 ## 🛠️ 4. Troubleshooting
+
 
 - **Linker Issues**: Ensure `-nostdlib` and `-ffreestanding` are used for bare-metal builds.
 - **WASM Incompatibility**: Avoid using any MMIO or Assembly shards when targeting `wasm32`. Use the **UAL** to switch to the WASM-Bridge HAL.
@@ -58,4 +78,4 @@ npm run dev # Launches the Zenith Dashboard with WASM-bridged kernel logic
 
 ---
 
-*Questions? Email [aaryansinghchauhan090305@gmail.com](mailto:aaryansinghchauhan090305@gmail.com)*
+*Questions? Email [Sovereign-OS0305@gmail.com](mailto:Sovereign-OS0305@gmail.com)*

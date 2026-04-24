@@ -1,4 +1,6 @@
+
 # Sovereign Persona Shard
+
 
 **Parity:** macOS Configuration Profiles · Android Work Profiles · Linux PAM  
 **Location:** `kernel/modules/core/SovereignPersonaShard.c`  
@@ -6,13 +8,17 @@
 
 ---
 
+
 ## Overview
+
 
 The Sovereign Persona Shard provides native, zero-dependency multi-user personalisation for SigmaOS. Each Persona is a full silicon context — encompassing a unique `UID`, capability bitmask, aesthetic theme, and ANSI shell prompt — that can be atomically switched without process restart. This absorbs the USPs of macOS Configuration Profiles, Android Work Profiles, and Linux PAM.
 
 ---
 
+
 ## Architecture
+
 
 ```
 Sovereign Persona Matrix (up to 8 concurrent contexts)
@@ -28,7 +34,9 @@ Context Switch Engine
 
 ---
 
+
 ## CLI Reference — `s-cli profile`
+
 
 The **Sovereign Persona** system is managed via the `s-cli` tool, which orchestrates both kernel build profiles and runtime personas.
 
@@ -41,7 +49,9 @@ The **Sovereign Persona** system is managed via the `s-cli` tool, which orchestr
 
 ---
 
+
 ## Built-in Personas
+
 
 | Name | UID | Theme | Cap Mask |
 |---|---|---|---|
@@ -51,7 +61,9 @@ The **Sovereign Persona** system is managed via the `s-cli` tool, which orchestr
 
 ---
 
+
 ## Design Philosophy
+
 
 - **Zero External Dependency**: No PAM modules, no dbus, no uid-map userspace tools.
 - **Atomic Context Switching**: Single-instruction deactivate/activate cycle.
@@ -60,6 +72,8 @@ The **Sovereign Persona** system is managed via the `s-cli` tool, which orchestr
 
 ---
 
+
 ## Synchronization State
 
-`GLOBAL MESH ACTIVE` — Synchronized with `AaryanSinghChauhan09/SigmaOS`.
+
+`GLOBAL MESH ACTIVE` — Synchronized with `Sovereign-OS/SigmaOS`.

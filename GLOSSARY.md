@@ -1,4 +1,6 @@
+
 # SigmaOS Glossary: Sovereign Terms
+
 
 - **Sovereign Lattice**: The non-hierarchical interconnection of all 33 SigmaOS suites.
 - **Shard**: An atomic unit of logic or functionality within the lattice.

@@ -1,8 +1,12 @@
+
 # Competitive Comparison Snapshot
+
 
 SigmaOS has a strong vision of sovereignty and modularity, but to compete effectively with established operating systems, it must build its core architectural scaffolds. Below is a snapshot of how SigmaOS compares to legacy systems and where we are directing our engineering efforts.
 
+
 ## Area-by-Area Comparison
+
 
 | Component | SigmaOS (Current Focus) | Linux | Windows | macOS | BSD | seL4/QNX |
 | :--- | :--- | :--- | :--- | :--- | :--- | :--- |
@@ -17,7 +21,9 @@ SigmaOS has a strong vision of sovereignty and modularity, but to compete effect
 | **Performance Tools**| Sovereign Profiler | perf, top | Task Manager | Activity Monitor | dtrace | Verified schedulers |
 | **Documentation** | Extensive Wiki & Blueprint | Extensive | MSDN | Apple Dev Docs | Man pages | Formal proofs |
 
+
 ## ✅ Key Takeaway
+
 While SigmaOS is still in its initial implementation phases across core subsystems, its USP is clear: **absolute sovereignty, capability-based security, and microkernel modularity**. 
 
 To compete, SigmaOS is currently focusing on catching up on the essentials: bootloader, kernel core, FS, networking, security, shell, and developer tooling. Once these scaffolds mature, SigmaOS will differentiate itself through cryptographic trust, modular independence, and hardware-native performance that legacy monoliths cannot offer.

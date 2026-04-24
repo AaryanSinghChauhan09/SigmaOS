@@ -1,4 +1,6 @@
+
 # Minimalist Compiler Toolchain
+
 
 A self-hosted, lightweight compiler optimized for bare-metal development.
 - Built around LLVM/Clang stripped of unnecessary overhead.

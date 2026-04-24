@@ -1,4 +1,6 @@
+
 # Sovereign Trace Shard
+
 
 **Parity:** strace · ptrace · DTrace · Frida · Windows ETW  
 **Location:** `kernel/modules/core/SovereignTraceShard.c`  
@@ -6,13 +8,17 @@
 
 ---
 
+
 ## Overview
+
 
 The Sovereign Trace Shard provides native, zero-dependency syscall interception and mission forensics for SigmaOS. It absorbs the strace, ptrace, DTrace, Frida, and Windows ETW USPs by providing per-PID syscall recording with full argument dumps, nanosecond-resolution elapsed timing, and a syscall summary histogram.
 
 ---
 
+
 ## Architecture
+
 
 ```
 Trace Buffer: 128-entry circular ring (per-PID or all-PID)
@@ -26,7 +32,9 @@ Workflow:
 
 ---
 
+
 ## CLI Reference — `sigma-trace`
+
 
 | Sub-command | Action |
 |---|---|
@@ -36,7 +44,9 @@ Workflow:
 
 ---
 
+
 ## Sample Output
+
 
 ```
 [   120ns] PID:1 sigma_read(0x100, 0x1000, 0x0) = 4096
@@ -47,7 +57,9 @@ Workflow:
 
 ---
 
+
 ## Design Philosophy
+
 
 - **Zero External Dependency**: No ptrace syscall, no LD_PRELOAD tricks — pure C11 intercept table.
 - **Per-PID or Global**: Attach to a single mission or trace all silicon missions simultaneously.
@@ -55,6 +67,8 @@ Workflow:
 
 ---
 
+
 ## Synchronization State
 
-`GLOBAL MESH ACTIVE` — Synchronized with `AaryanSinghChauhan09/SigmaOS`.
+
+`GLOBAL MESH ACTIVE` — Synchronized with `Sovereign-OS/SigmaOS`.

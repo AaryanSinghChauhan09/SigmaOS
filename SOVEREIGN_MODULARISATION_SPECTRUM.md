@@ -1,10 +1,14 @@
+
 # 🌌 SigmaOS Sovereign Modularisation Spectrum
+
 
 SigmaOS is designed as a **Universal Silicon Lattice**, where every subsystem is a swappable, sovereign shard. This document outlines the roadmap for the **1000+ Modular Shards** that will form the complete Sovereign Ecosystem.
 
 ---
 
+
 ## 🔧 1. Core System (Kernel & Hardware)
+
 The heart of the lattice, split into micro-modules for absolute isolation.
 
 | Shard Class | Description | Key Modules |
@@ -17,7 +21,9 @@ The heart of the lattice, split into micro-modules for absolute isolation.
 
 ---
 
+
 ## 📚 2. Libraries & Utilities (`libsigma`)
+
 Reusable sovereign primitives that empower third-party shards.
 
 - **`libsigma_core`**: String operations, math, and custom allocators.
@@ -27,7 +33,9 @@ Reusable sovereign primitives that empower third-party shards.
 
 ---
 
+
 ## 🧩 3. User Space & Tooling
+
 A programmable userland driven by native Lua scripting.
 
 - **Sovereign Shells**: `sh_basic` (C), `sh_zenith` (Lua-driven).
@@ -37,7 +45,9 @@ A programmable userland driven by native Lua scripting.
 
 ---
 
+
 ## 🔒 4. Security & Isolation
+
 Zero-trust enforcement at every lattice intersection.
 
 - **Capability Handshaking**: Zero-trust protocol for cross-shard resource access.
@@ -47,7 +57,9 @@ Zero-trust enforcement at every lattice intersection.
 
 ---
 
+
 ## 🧪 5. Experimental Frontiers
+
 Integrating next-generation research into the sovereign fabric.
 
 - **Intelligence**: Low-level NPU inference hooks (`S09_Intelligence`).

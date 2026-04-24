@@ -1,14 +1,20 @@
+
 # SigmaFS — Sovereign Filesystem
+
 
 SigmaFS is SigmaOS's flagship cryptographically verifiable filesystem, implemented in `modules/core/fs/sigmafs.c`.
 
+
 ## Design Goals
+
 - **Zero Silent Corruption**: Every block stores a hash of its own data. Any bit-flip is immediately detected.
 - **Tamper-Proof Directories**: Directory entries carry Merkle hashes of their children.
 - **Versioned Rollback**: Snapshot any filesystem state, roll back without data loss.
 - **Crash Recovery**: Full journaling ensures atomic writes — no half-written state survives a power loss.
 
+
 ## Superblock
+
 
 ```c
 typedef struct {
@@ -21,7 +27,9 @@ typedef struct {
 } sigmafs_superblock_t;
 ```
 
+
 ## Operations
+
 
 | Operation | Function | Description |
 | :--- | :--- | :--- |
@@ -31,7 +39,9 @@ typedef struct {
 | Journal begin | `journal_begin()` | Saves pre-write hash |
 | Journal commit | `journal_commit()` | Records post-write hash |
 
+
 ## Roadmap
+
 - [ ] Real SHA-256 via `libsovereign_crypto`
 - [ ] Merkle tree root computation across all blocks
 - [ ] IPFS-style distributed block references
