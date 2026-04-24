@@ -6,17 +6,26 @@
 
 ---
 
-## 🔴 Phase 1 — Foundation Hardening (Active)
+## ✅ Phase 1 — Foundation Hardening (COMPLETE)
 
-Issues that are blocking further hardware work. Pick these up first.
+The core sovereign lattice foundation is now finalized.
+- **Native Toolchain**: Migrated from Python/Node to a purely native C++20 `s-cli` orchestrator.
+- **Zero-Dependency Core**: Eradicated all standard headers (`stdint.h`, etc.) from kernel space.
+- **CI/CD Hardened**: Fully stabilized matrix builds for x86_64, AArch64, and RISC-V.
+- **Lattice Consolidation**: Root directories modularized into `modules/` and `suites/`.
+
+---
+
+## 🔴 Phase 2 — IPC, Persistence & Scripting (Active)
+
+Focusing on the native communication layer and user-space personalization.
 
 | # | Task | Skill | Files |
 |---|------|-------|-------|
-| 1 | Fix CI/CD — ensure all 3 jobs pass on ubuntu + macOS + windows | DevOps, Rust | `.github/workflows/ci.yml` |
-| 2 | Generate `package-lock.json` by running `npm install` | Node.js | `package.json` |
-| 3 | Add `Cargo.lock` to version control for reproducible Rust builds | Rust | `suites/S03_Orchestrator/` |
-| 4 | Add `compile_commands.json` so `clang-tidy` can lint C files properly | C, CMake | `suites/S04_HAL/`, `suites/S07_Scheduling/` |
-| 5 | Document C/ASM compiler versions in `CONTRIBUTING.md` | Docs | `CONTRIBUTING.md` |
+| 1 | **Native Lua Bridge**: Integrate a minimal Lua VM as a sovereign shard for personalization. | C, Lua | `modules/ext/scripting/` |
+| 2 | **IPC Persistence**: Implement `ipc_recv` recovery from persistence logs. | C, Systems | `modules/core/kernel/ipc.c` |
+| 3 | **Capability Registry**: Finalize the zero-trust capability handshake protocol. | C, Security | `modules/security/capabilities/` |
+| 4 | **Sovereign Dashboard**: Port Zenith UI telemetry to direct kernel FFI calls. | JS, WASM | `web_ui/` |
 
 ---
 
