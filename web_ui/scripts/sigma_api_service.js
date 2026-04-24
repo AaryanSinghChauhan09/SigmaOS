@@ -128,6 +128,8 @@ class SigmaKernelAPI {
                 process_count: 24 + Math.floor(Math.random() * 6),
                 uptime_ms:     Date.now() - startTime,
                 active_shards: this._state.shards.length,
+                ai_burst_pred: Math.floor(8 + Math.random() * 14),
+                ai_confidence: Math.floor(85 + Math.random() * 14),
             };
             this._emit('vitals', this._state.vitals);
 

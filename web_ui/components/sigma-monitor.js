@@ -88,6 +88,11 @@ class SigmaMonitor extends HTMLElement {
                 <div class="label">Uptime</div>
                 <div class="value" id="uptimeVal">0s</div>
             </div>
+            <div class="card" id="aiPred">
+                <div class="label">AI Burst Pred.</div>
+                <div class="value" id="aiPredVal">0ms</div>
+                <div style="font-size: 0.6rem; color: #10b981; margin-top: 4px;" id="aiConfVal">Conf: 0%</div>
+            </div>
         `;
 
         // Subscribe to real-time vitals via the versioned API
@@ -120,6 +125,11 @@ class SigmaMonitor extends HTMLElement {
         const m = Math.floor(secs / 60);
         const s = secs % 60;
         $('uptimeVal').textContent = m > 0 ? `${m}m ${s}s` : `${s}s`;
+        
+        if (v.ai_burst_pred !== undefined) {
+            $('aiPredVal').textContent = `${v.ai_burst_pred} ticks`;
+            $('aiConfVal').textContent = `Conf: ${v.ai_confidence}%`;
+        }
     }
 }
 

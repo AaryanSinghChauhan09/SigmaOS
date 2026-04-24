@@ -1,0 +1,18 @@
+{
+    "module":       "S09_Intelligence",
+    "version":      "1.0.0",
+    "type":         "kernel_core",
+    "description":  "Bare-metal machine learning primitives for neural-heuristic scheduling and predictive memory paging.",
+    "dependencies": ["S01_Genesis", "S05_Memory"],
+    "features_required": ["ai"],
+    "features_optional": [],
+    "memory": {
+        "pool_pages":   32,
+        "max_alloc_mb": 16,
+        "heap_type":    "slab"
+    },
+    "exports": [
+        "tensor_add", "tensor_mul", "tensor_relu", "ai_predict_burst"
+    ],
+    "test_targets": ["test_fixed_math", "test_burst_prediction"]
+}
