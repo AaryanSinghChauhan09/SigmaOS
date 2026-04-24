@@ -1,0 +1,21 @@
+[package]
+name    = "sigma-orchestrator"
+version = "0.1.0"
+edition = "2021"
+
+# No standard library — bare-metal kernel context
+[lib]
+name       = "sigma_orchestrator"
+path       = "lib.rs"
+crate-type = ["staticlib", "rlib"]
+
+[dependencies]
+# No external deps; bare-metal no_std only
+
+[profile.release]
+opt-level = "z"   # Optimize for size (kernel binary)
+lto       = true
+panic     = "abort"
+
+[profile.dev]
+panic = "abort"
