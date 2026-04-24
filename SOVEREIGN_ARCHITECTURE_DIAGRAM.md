@@ -20,6 +20,10 @@ graph TD
         Sch[AI-Native Scheduler]
         IPC[Persistence-Backed IPC]
         Mem[VMM / Page Table Manager]
+        Alloc{Modular Allocators}
+        Slab[S-SLAB]
+        Buddy[S-BUDDY]
+        WasmAlloc[S-WASM-ALLOC]
         Sec[Zero-Trust Security Shards]
     end
 
@@ -38,6 +42,10 @@ graph TD
     CLI --> Init
     Init -->|Loads Profile| Kernel
     Userland -->|Syscalls| Kernel
+    Kernel --> Alloc
+    Alloc -.-> Slab
+    Alloc -.-> Buddy
+    Alloc -.-> WasmAlloc
     Kernel --> UAL
     UAL --> BM
     UAL --> VM
