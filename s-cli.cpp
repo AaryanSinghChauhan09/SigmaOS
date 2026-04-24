@@ -140,6 +140,33 @@ void run_qemu(int argc, char** argv) {
     run_command(qemu_cmd);
 }
 
+void handle_setup() {
+    print_header("SigmaOS Developer Environment Setup");
+#ifdef _WIN32
+    std::cout << "[!] Automatic dependency installation is not yet supported on Windows.\n";
+    std::cout << "    Please ensure 'g++', 'qemu-system', and 'make' are in your PATH.\n";
+#else
+    const char* os_cmd = "uname -s";
+    char buffer[128];
+    FILE* pipe = popen(os_cmd, "r");
+    if (!pipe) return;
+    fgets(buffer, 128, pipe);
+    pclose(pipe);
+    std::string os(buffer);
+
+    if (os.find("Linux") != std::string::npos) {
+        std::cout << "[*] Detected Linux. Installing dependencies via apt-get...\n";
+        run_command("sudo apt-get update && sudo apt-get install -y build-essential git qemu-system-x86 qemu-system-arm qemu-system-misc qemu-system-riscv64 gcc-aarch64-linux-gnu gcc-riscv64-unknown-elf");
+    } else if (os.find("Darwin") != std::string::npos) {
+        std::cout << "[*] Detected macOS. Installing dependencies via Homebrew...\n";
+        run_command("brew install qemu aarch64-elf-gcc riscv-tools");
+    } else {
+        std::cout << "[!] Unsupported OS for automatic setup: " << os << "\n";
+    }
+#endif
+    std::cout << "\033[92m[✓] Setup process complete.\033[0m\n";
+}
+
 int main(int argc, char** argv) {
     if (argc < 2) {
         std::cout << "SigmaOS Sovereign Native CLI\n";
@@ -152,6 +179,7 @@ int main(int argc, char** argv) {
         std::cout << "  info          - Show system info\n";
         std::cout << "  profile [name]- List or switch profiles\n";
         std::cout << "  scaffold [n]  - Create new shard\n";
+        std::cout << "  setup         - Install dev dependencies\n";
         return 0;
     }
 
@@ -173,6 +201,8 @@ int main(int argc, char** argv) {
         handle_profile(argc, argv);
     } else if (cmd == "scaffold") {
         scaffold(argc, argv);
+    } else if (cmd == "setup") {
+        handle_setup();
     } else {
         std::cout << "[!] Unknown command: " << cmd << "\n";
     }
