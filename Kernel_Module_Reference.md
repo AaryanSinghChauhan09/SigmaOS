@@ -19,7 +19,11 @@
 | `sigma_net_core.h` | Ethernet frame primitives — header, payload, checksum, stats |
 | `sigma_types.h` | Sovereign type definitions (`sigma_u32`, `sigma_u64`, etc.) |
 | `sigma_libc.h` | Zero-dependency libc: `sigma_kprint`, `sigma_memcpy`, `sigma_strlen` |
-| `SovereignLibC.c` | Implementation of Sigma-Libc primitives |
+| `sigma_libc_mem.hpp` | OOP encapsulation for memory management with bounds checking |
+| `sigma_libc_string.hpp` | OOP string operations avoiding undefined behavior paths |
+| `sigma_libc_io.hpp` | Pluggable OOP I/O backend for kernel print routines |
+| `sigma_libc_syscall.hpp` | Direct inline assembly syscall invocation dispatcher |
+| `SovereignLibC.c` | Legacy monolith (partially modularised → see sigma_libc_*.hpp) |
 | `SovereignProcessManager.c` | Legacy monolith (partially modularised → see sigma_proc_*.h) |
 | `SovereignMemoryZenith.c` | Legacy monolith (partially modularised → see sigma_mem_*.h) |
 | `SovereignNetMesh.c` | Legacy monolith (partially modularised → see sigma_net_core.h) |
@@ -248,7 +252,7 @@
 
 | Category | Count |
 |----------|-------|
-| S01_Genesis kernel headers | 17 |
+| S01_Genesis kernel headers | 21 |
 | S04_HAL hardware modules | 10 |
 | S08_Security shards | 18 |
 | DevTools/Ecosystem/UI/Tools | 12 |
@@ -259,7 +263,7 @@
 | Self-Healing & Boot | 4 |
 | IPC/AIO | 2 |
 | Core OOP atomic modules | 24 |
-| **Total Native Modules** | **110+** |
+| **Total Native Modules** | **114+** |
 
 ---
 
