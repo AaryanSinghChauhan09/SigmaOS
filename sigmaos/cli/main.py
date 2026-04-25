@@ -22,7 +22,7 @@ class SigmaCLI:
 
     def _setup_perf(self):
         parser_perf = self.subparsers.add_parser('s-perf', help="Performance Scheduler")
-        parser_perf.add_argument("action", choices=["boost", "monitor", "isolate", "cache"])
+        parser_perf.add_argument("action", choices=["boost", "monitor", "isolate", "cache", "tensor-monitor"])
 
     def _setup_deps(self):
         parser_deps = self.subparsers.add_parser('s-deps', help="Dependency Management")
