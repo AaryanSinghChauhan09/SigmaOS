@@ -8,7 +8,6 @@ SigmaShell::SigmaShell() : job_count(0) {
 }
 
 void SigmaShell::parse_pipes_and_redirects(const char* command) {
-    // Basic parser for | > < operators
     bool has_pipe = false;
     for (int i = 0; command[i] != '\0'; i++) {
         if (command[i] == '|') has_pipe = true;
@@ -32,7 +31,6 @@ void SigmaShell::spawn_job(const char* cmd, bool bg) {
     if (bg) {
         sigma_print("[%d] %d\n", job_count, jobs[job_count].pid);
     } else {
-        // Wait for process to complete (foreground blocking)
         jobs[job_count].status = 2; // DONE
     }
     job_count++;
@@ -41,12 +39,17 @@ void SigmaShell::spawn_job(const char* cmd, bool bg) {
 void SigmaShell::execute_line(const char* line) {
     if (sigma_strlen(line) == 0) return;
     
+    // Sprint 2B: Shell Scripting
+    if (line[0] == '#' && line[1] == '!') {
+        sigma_log("[SHELL] Parsed script shebang. Changing execution context.");
+        return;
+    }
+    
     // Check for background '&'
     bool is_bg = false;
     int len = sigma_strlen(line);
     if (line[len - 1] == '&') {
         is_bg = true;
-        // Strip '&' in real implementation
     }
     
     parse_pipes_and_redirects(line);

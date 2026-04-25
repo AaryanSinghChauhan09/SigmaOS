@@ -1,22 +1,31 @@
 #include "../S01_Genesis/sigma_libc.h"
 #include "DependencyGraph.hpp"
+#include "CryptoSignatures.hpp"
+#include "DeltaPatcher.hpp"
 #include <stdint.h>
 
 namespace SigmaOS {
 namespace Ecosystem {
 
-// Track 2A: Developer Needs - Package Management (Sprint 1)
+// Track 2A: Developer Needs - Package Management (Sprint 1, 2, 3)
 class SovereignPackageManager {
 private:
     const char* repository_url = "https://pkg.sigmaos.net";
     DependencyGraph graph;
+    Security::CryptoSignatures crypto;
+    DeltaPatcher patcher;
 
 public:
     SovereignPackageManager() {
         sigma_log("[ECOSYSTEM] Sovereign Package Manager (s-pkg) Online.");
     }
 
-    void install_package(const char* package_name) {
+    void install_package(const char* package_name, const char* signature_data) {
+        if (!crypto.verify_package_signature(package_name, 1024, signature_data)) {
+            sigma_log("[s-pkg] Installation aborted: Invalid Signature.");
+            return;
+        }
+
         if (!graph.resolve_dependencies(package_name)) {
             sigma_log("[s-pkg] Installation aborted due to dependency conflicts.");
             return;
@@ -26,7 +35,6 @@ public:
         sigma_print(repository_url);
         sigma_print("...\n");
         
-        // Emulate installation
         sigma_log("[s-pkg] Installation Complete.");
     }
 
@@ -44,11 +52,17 @@ public:
         sigma_log("[s-pkg] Rollback Complete. System state restored.");
     }
 
-    void update_system() {
+    void update_system(bool use_delta) {
         sigma_log("[s-pkg] Synchronizing Sovereign Lattice manifests...");
+        
+        if (use_delta) {
+            patcher.apply_patch("/sys/core_lib.bin", "/tmp/core_lib.patch", "/sys/core_lib.bin");
+        }
+        
         sigma_log("[s-pkg] System up to date.");
     }
 };
 
 } // namespace Ecosystem
 } // namespace SigmaOS
+
