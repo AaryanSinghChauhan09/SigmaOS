@@ -17,6 +17,17 @@ class SigmaCLI:
         self._setup_deps()
         self._setup_ui()
         self._setup_mem()
+        self._setup_net()
+        self._setup_sys()
+
+    def _setup_net(self):
+        parser_net = self.subparsers.add_parser('s-net', help="Networking Subsystem")
+        parser_net.add_argument("action", choices=["secure", "audit", "status"])
+
+    def _setup_sys(self):
+        parser_sys = self.subparsers.add_parser('s-sys', help="System Management")
+        parser_sys.add_argument("action", choices=["update", "rollback", "snapshot", "load", "unload"])
+        parser_sys.add_argument("--subsystem", type=str, help="Name of the subsystem")
 
     def _setup_ui(self):
         parser_ui = self.subparsers.add_parser('s-ui', help="Morphic UI Control")
