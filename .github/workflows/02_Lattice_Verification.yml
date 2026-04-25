@@ -48,6 +48,6 @@ jobs:
     steps:
       - uses: actions/checkout@v6
       - name: Build S-CLI
-        run: g++ -std=c++20 s-cli.cpp -o s-cli
+        run: g++ -std=c++20 orchestrator/main.cpp -o s-cli
       - name: Run Profile Fuzzing
         run: ./s-cli test --shard S22_LatticeFuzzer --profile ${{ matrix.profile }}
