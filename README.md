@@ -1,10 +1,10 @@
 # SigmaOS v1: Sovereign Release
 
 🎉 **Overview**
-SigmaOS v1 is the first stable release of the world’s most advanced sovereign, bare‑metal operating system. Built for silicon sovereignty, modular resilience, and community ownership, this release delivers a foundation that is secure, extensible, performant, and user‑friendly.
+SigmaOS v1 is the first stable release of the sovereign, bare‑metal operating system designed for silicon sovereignty, modular resilience, and community ownership. This release establishes a foundation that is secure, extensible, performant, and user‑friendly.
 
 ## 🚀 Key Features
-- **Kernel & HAL:** Modular sovereign kernel (`sigma-core`) with NUMA-aware hardware abstraction.
+- **Kernel & HAL:** Modular sovereign kernel (`sigma-core`) with hardware abstraction.
 - **Package Management:** `s-pkg` with `SpkgTranslator` for Flatpak/AppImage/Snap auto‑conversion.
 - **Zenith UI:** Minimalist desktop environment with dashboards, profiles, and themes.
 - **App Store:** One‑click installs, community ratings, and automated CI/CD pipelines.
@@ -14,33 +14,67 @@ SigmaOS v1 is the first stable release of the world’s most advanced sovereign,
 - **Multimedia:** H.264, H.265/HEVC, VP9, AV1 video; FLAC, AAC, Opus, MP3 audio; GPU acceleration.
 
 ## 🔧 Modularisation
-- **Subsystem Isolation:** `sigma-net-wifi`, `sigma-media-audio`, `sigma-sec-crypto`, etc.
+- **Subsystem Isolation:**
+  - Networking split into `sigma-net-wifi`, `sigma-net-vpn`, `sigma-net-bluetooth`.
+  - Multimedia split into `sigma-media-audio`, `sigma-media-video`, `sigma-media-codecs`.
+  - Security split into `sigma-sec-auth`, `sigma-sec-crypto`, `sigma-sec-audit`.
 - **Micro‑Modules:** Codec manager, updater, telemetry collector.
-- **Containerised Services:** Each subsystem isolated for resilience.
-- **Unified API Layer:** Stable interfaces for apps/extensions via `SigmaRPC`.
-- **Dependency Reduction:** Minimal base system with optional add‑ons, modular drivers, lightweight libraries.
+- **Containerised Services:** Each subsystem isolated for resilience and hot‑swapping.
+- **Unified API Layer:** Stable interfaces for apps/extensions.
+- **Dependency Reduction:**
+  - Predefined functions modularized to avoid duplication.
+  - Replace heavy libraries with lightweight equivalents.
+  - Modular drivers (load only what’s needed).
+  - Minimal base system with optional add‑ons.
+  - Third‑party libraries sandboxed to reduce attack surface.
 
-## ⚙️ Automations & AI
-- **Self-Healing:** Automatic rollbacks with immutable Web3 logs.
-- **Predictive Maintenance:** AI monitors SSD wear, battery cycles, hardware alerts.
-- **Energy Optimization:** Balance performance vs. battery life dynamically.
-- **Sigma Assistant:** AI-driven scheduler for CPU/GPU allocation, adaptive caching, and telemetry optimizations.
+## ⚙️ Automations
+- **Self-healing:** Updates with automatic rollback.
+- **Predictive maintenance:** AI monitors SSD wear, battery cycles.
+- **Adaptive networking:** Prioritization for critical apps.
+- **Energy optimization:** Balancing performance vs. battery life.
+- **Workflow bundles:** (DevOps, Creative, Gaming).
+- **Nightly backups:** Automated snapshots with rollback hooks.
+- **Dependency auto-pruning:** For unused packages and libraries.
 
-## 💻 CLI Mastery
+## 🎨 Customisation & Personalisation
+- Dynamic themes (time‑based wallpapers, icon packs).
+- User dashboards (Work, Gaming, Study, Accessibility).
+- Community sharing of themes and automation templates.
+- Adaptive UI for desktop, tablet, VR.
+- Voice‑driven customization.
+- Minimalist mode for focus and speed.
+- AI‑driven personalization via Sigma Assistant.
+
+## 💻 Command Line Interface (CLI)
 ```bash
-./s-cli singularity # Activate final architectural convergence
-./s-cli sync        # Synchronize manifest across Syndicate Mesh
+s-assist status          # System health dashboard
+s-assist suggest         # AI recommendations
+s-profile switch work    # Instant profile swap
+s-net secure             # Enable zero‑trust networking
+s-media codecs list      # Manage codecs
+s-rollback last          # Revert snapshot
+s-assist optimize <task> # Auto‑tune system
+s-assist explain         # Transparency on AI suggestions
+s-deps prune             # Remove unused dependencies
+s-perf boost             # Maximize performance temporarily
 ```
 
----
+## ⚡ Ease of Use & Performance
+- Unified Control Center (GUI + CLI parity).
+- Accessibility shortcuts (voice, hotkeys, gestures).
+- Simplified installers with dependency transparency.
+- Onboarding wizard for new users.
+- AI‑driven scheduler for CPU/GPU allocation.
+- Adaptive caching for instant app launch.
+- Fast boot profiles (minimal services).
+- Lightweight containers for subsystems.
+- Resource isolation to prevent slowdowns.
+- Smaller footprint via dependency reduction.
 
-## 💎 Sovereign Standards
+## 🎯 Next Directions
+- **Sprint 16:** Multimedia codecs + accessibility suite.
+- **Sprint 17:** Sigma Assistant refinements, CLI parity, performance modules, dependency reduction.
+- **Phase 5:** Community sovereignty, governance council, global adoption strategies.
 
-- **Absolute Sovereignty**: 100% self-hosting; eradicates legacy host dependencies.
-- **Atomic Granularity**: Only executes the absolute minimum logic required for a job.
-- **Quantum-Safe**: Future-proofed against quantum-scale decryption.
-- **Anti-Forensic**: Engineered for zero-trace silent execution.
-
----
-
-*Sovereignty is Absolute. The Singularity is Unified.*
+✨ *This release note commemorates SigmaOS v1 as a monumental milestone — the foundation of a sovereign digital nation OS.*
