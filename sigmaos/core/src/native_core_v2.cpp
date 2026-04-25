@@ -1,21 +1,17 @@
 #include "sigma_core.h"
-#include <iostream>
-#include <string>
-#include <unordered_map>
-#include <vector>
+#include "sigma_libc.h"
 
 namespace sigma {
 namespace core {
 
 class NativeSubsystemManager {
-private:
-    std::unordered_map<std::string, bool> active_shards;
-
 public:
-    void load(const std::string& name) {
-        std::cout << "[NativeCore] Loading shard: " << name << std::endl;
-        active_shards[name] = true;
+    void load(const char* name) {
+        sigma_kprint("[SigmaCore] Loading shard: ");
+        sigma_kprint(name);
+        sigma_kprint("\n");
     }
+};
 
     void unload(const std::string& name) {
         std::cout << "[NativeCore] Unloading shard: " << name << std::endl;
