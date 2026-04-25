@@ -54,8 +54,9 @@ void media_list_codecs();
 
 // Component Management Signatures
 void comp_split(const char* component_name);
-void comp_audit();
+void comp_audit_suites(const char* suite_path);
 void comp_optimize(const char* component_name);
+int comp_get_total_shards();
 
 // Automation Signatures
 void* auto_init();

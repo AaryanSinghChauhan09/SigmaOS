@@ -13,7 +13,9 @@ if os.name == 'nt':
 try:
     _native_core = ctypes.CDLL(lib_path)
     _native_core.comp_split.argtypes = [ctypes.c_char_p]
+    _native_core.comp_audit_suites.argtypes = [ctypes.c_char_p]
     _native_core.comp_optimize.argtypes = [ctypes.c_char_p]
+    _native_core.comp_get_total_shards.restype = ctypes.c_int
     NATIVE_AVAILABLE = True
 except OSError:
     NATIVE_AVAILABLE = False
@@ -25,11 +27,12 @@ class ComponentManager:
         else:
             print(f"[Comp-Stub] Splitting {name}...")
 
-    def audit(self):
+    def audit(self, path: str = "suites/"):
         if NATIVE_AVAILABLE:
-            _native_core.comp_audit()
+            _native_core.comp_audit_suites(path.encode('utf-8'))
+            print(f"[Comp] Total modular shards: {_native_core.comp_get_total_shards()}")
         else:
-            print("[Comp-Stub] Running modularization audit...")
+            print(f"[Comp-Stub] Auditing {path}...")
 
     def optimize(self, name: str):
         if NATIVE_AVAILABLE:
