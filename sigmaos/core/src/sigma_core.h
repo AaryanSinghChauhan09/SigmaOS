@@ -24,6 +24,14 @@ int subsystem_is_active(const char* name);
 void sec_audit();
 void sec_encrypt_file(const char* filename);
 
+// Networking Signatures
+void net_secure_connect();
+void net_audit();
+
+// Multimedia Signatures
+void media_load_codec(const char* codec);
+void media_list_codecs();
+
 // Automation Signatures
 void* auto_init();
 void auto_run_all(void* ptr);

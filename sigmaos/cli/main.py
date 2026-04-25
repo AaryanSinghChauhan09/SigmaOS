@@ -22,6 +22,12 @@ class SigmaCLI:
         self._setup_sys()
         self._setup_auto()
         self._setup_sec()
+        self._setup_media()
+
+    def _setup_media(self):
+        parser_media = self.subparsers.add_parser('s-media', help="Multimedia Subsystem")
+        parser_media.add_argument("action", choices=["codecs", "optimize"])
+        parser_media.add_argument("--load", type=str, help="Codec to load")
 
     def _setup_auto(self):
         parser_auto = self.subparsers.add_parser('s-auto', help="Automation Engine")
