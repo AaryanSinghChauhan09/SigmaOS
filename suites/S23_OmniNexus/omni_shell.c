@@ -632,7 +632,7 @@ static void cmd_export(ParsedCmd* c) {
     while (kv[i] && kv[i] != '=') { if (i < 31) key[i] = kv[i]; i++; }
     key[i] = '\0';
     if (kv[i] == '=') i++;
-    while (kv[i] && j < 127) val[j++] = kv[i++];
+    while (j < 127 && kv[i]) val[j++] = kv[i++];
     val[j] = '\0';
     shell_env_set(key, val);
     ksigma_printf("[EXPORT]: %s=%s\n", key, val);

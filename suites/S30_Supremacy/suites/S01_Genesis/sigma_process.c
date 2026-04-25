@@ -51,7 +51,7 @@ int sigma_process_spawn(void (*entry_point)(), const char* name, uint32_t priori
     
     // Hard-copy process name bounds 
     int name_len = 0;
-    while(name[name_len] != '\0' && name_len < 31) {
+    while(name_len < 31 && name[name_len] != '\0') {
         p->name[name_len] = name[name_len];
         name_len++;
     }
