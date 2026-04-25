@@ -2,25 +2,34 @@
 #include "DependencyGraph.hpp"
 #include "CryptoSignatures.hpp"
 #include "DeltaPatcher.hpp"
+#include "../S47_DistroAssimilator/SpkgTranslator.hpp"
 #include <stdint.h>
 
 namespace SigmaOS {
 namespace Ecosystem {
 
-// Track 2A: Developer Needs - Package Management (Sprint 1, 2, 3)
+// Track 2A: Developer Needs - Package Management (Sprint 1, 2, 3, 4)
 class SovereignPackageManager {
 private:
     const char* repository_url = "https://pkg.sigmaos.net";
     DependencyGraph graph;
     Security::CryptoSignatures crypto;
     DeltaPatcher patcher;
+    Assimilation::SpkgTranslator translator;
 
 public:
     SovereignPackageManager() {
         sigma_log("[ECOSYSTEM] Sovereign Package Manager (s-pkg) Online.");
     }
 
-    void install_package(const char* package_name, const char* signature_data) {
+    void install_package(const char* package_name, const char* signature_data, bool is_foreign) {
+        if (is_foreign) {
+            if (!translator.translate_package(package_name)) {
+                sigma_log("[s-pkg] Foreign package translation failed.");
+                return;
+            }
+        }
+
         if (!crypto.verify_package_signature(package_name, 1024, signature_data)) {
             sigma_log("[s-pkg] Installation aborted: Invalid Signature.");
             return;
