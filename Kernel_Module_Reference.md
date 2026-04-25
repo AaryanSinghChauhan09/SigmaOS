@@ -15,6 +15,7 @@
 | `sigma_proc_spawn.h` | Process spawning — PCB init + x86 RIP jump |
 | `sigma_proc_kill.h` | Process termination + zombie reaping |
 | `sigma_proc_scheduler.hpp` | OOP Process Scheduler supporting class hierarchies |
+| `sigma_proc_scheduler_ai.hpp` | Adaptive AI Scheduler modulating CPU C-states by workload |
 | `sigma_proc_fork.hpp` | Native process cloner and thread spawner |
 | `sigma_proc_signal.hpp` | OOP IPC Signal Dispatcher |
 | `sigma_proc_trace.hpp` | Process Tracer for debugging and introspection |
@@ -43,6 +44,7 @@
 | `sigma_ui_shader_morph.h` | Vulkan Morphic Shaders pushing constants for glassmorphism |
 | `sigma_ui_theme_loader.h` | Binary theme loader for instant zero-copy UI theme switching |
 | `sigma_ui_profile_switcher.h` | UI profile switcher for toggling Work, Gaming, VR modes |
+| `sigma_os_adaptive_profile.hpp` | Profile-driven sovereignty encapsulating settings per user |
 
 ---
 
@@ -203,6 +205,7 @@
 | `sigma_auto_watchdog.hpp` | OOP Self-healing daemon integrating with ICallback |
 | `sigma_auto_rollback.hpp` | OOP Rollback automation logic triggering CPU IDT faults |
 | `sigma_auto_update.hpp` | OOP Seamless update engine managing A/B boot slots |
+| `sigma_auto_userfn.hpp` | User-Defined automation hooks (auto-backup, etc.) |
 | `sigma_auto_watchdog.h` | Legacy C bindings for watchdog |
 | `sigma_auto_rollback.h` | Legacy C bindings for rollback |
 | `sigma_fw_update.h` | Legacy C bindings for firmware updates |
@@ -262,18 +265,18 @@
 
 | Category | Count |
 |----------|-------|
-| S01_Genesis kernel headers | 25 |
+| S01_Genesis kernel headers | 26 |
 | S04_HAL hardware modules | 10 |
 | S08_Security shards | 18 |
-| DevTools/Ecosystem/UI/Tools | 12 |
+| DevTools/Ecosystem/UI/Tools | 13 |
 | Container/Perf/NUMA | 6 |
 | Storage/FS | 2 |
 | Networking | 12 |
 | Security (ZKP/Caps/BPF/PKG) | 6 |
-| Self-Healing & Boot | 7 |
+| Self-Healing & Boot | 8 |
 | IPC/AIO | 2 |
 | Core OOP atomic modules | 24 |
-| **Total Native Modules** | **124+** |
+| **Total Native Modules** | **127+** |
 
 ---
 
