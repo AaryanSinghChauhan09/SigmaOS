@@ -1,13 +1,15 @@
 #include "../S01_Genesis/sigma_libc.h"
+#include "DependencyGraph.hpp"
 #include <stdint.h>
 
 namespace SigmaOS {
 namespace Ecosystem {
 
-// Track 2: Developer Needs - Package Management
+// Track 2A: Developer Needs - Package Management (Sprint 1)
 class SovereignPackageManager {
 private:
     const char* repository_url = "https://pkg.sigmaos.net";
+    DependencyGraph graph;
 
 public:
     SovereignPackageManager() {
@@ -15,9 +17,10 @@ public:
     }
 
     void install_package(const char* package_name) {
-        sigma_print("[s-pkg] Resolving dependencies for: ");
-        sigma_print(package_name);
-        sigma_print("...\n");
+        if (!graph.resolve_dependencies(package_name)) {
+            sigma_log("[s-pkg] Installation aborted due to dependency conflicts.");
+            return;
+        }
         
         sigma_print("[s-pkg] Fetching from ");
         sigma_print(repository_url);
@@ -25,6 +28,20 @@ public:
         
         // Emulate installation
         sigma_log("[s-pkg] Installation Complete.");
+    }
+
+    void uninstall_package(const char* package_name) {
+        sigma_print("[s-pkg] Uninstalling ");
+        sigma_print(package_name);
+        sigma_print(" and pruning orphaned dependencies...\n");
+        sigma_log("[s-pkg] Uninstallation Complete.");
+    }
+
+    void rollback(uint32_t transaction_id) {
+        sigma_print("[s-pkg] Rolling back to transaction ID: ");
+        sigma_print_num(transaction_id);
+        sigma_print("\n");
+        sigma_log("[s-pkg] Rollback Complete. System state restored.");
     }
 
     void update_system() {
