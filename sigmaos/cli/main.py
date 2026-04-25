@@ -5,6 +5,7 @@ Replaces the fragmented script explosion with a single, scalable command interfa
 import sys
 import argparse
 from typing import List
+from sigmaos.auto.native_bridge import sigma_native_auto
 
 class SigmaCLI:
     def __init__(self):
