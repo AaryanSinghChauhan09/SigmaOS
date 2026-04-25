@@ -290,7 +290,7 @@ static k_status camera_apply_filter_internal(Frame* frame, const FilterKernel3x3
     /* Special-case: Passthrough — no-op */
     u32 name_is_passthrough = 1;
     u32 k;
-    for (k = 0; kernel->name[k] && k < 4; k++) {
+    for (k = 0; k < 4 && kernel->name[k]; k++) {
         if (kernel->name[k] != "PASS"[k]) { name_is_passthrough = 0; break; }
     }
     if (name_is_passthrough) return K_OK;
