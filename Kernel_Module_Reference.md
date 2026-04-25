@@ -32,6 +32,9 @@
 | Module File | Responsibility |
 |-------------|----------------|
 | `sigma_ui_wayland.h` | Wayland-inspired sovereign display compositor (zero libwayland) |
+| `sigma_ui_shader_morph.h` | Vulkan Morphic Shaders pushing constants for glassmorphism |
+| `sigma_ui_theme_loader.h` | Binary theme loader for instant zero-copy UI theme switching |
+| `sigma_ui_profile_switcher.h` | UI profile switcher for toggling Work, Gaming, VR modes |
 
 ---
 
@@ -78,7 +81,10 @@
 
 | Module File | Responsibility |
 |-------------|----------------|
-| `sigma_pqc.c` | Kyber/Dilithium post-quantum crypto primitives |
+| `sigma_pqc.c` | Legacy monolith (partially modularised → see sigma_pqc_*.h) |
+| `sigma_pqc_keygen.h` | PQC Keypair generation |
+| `sigma_pqc_sign.h` | PQC FNV-1a backed cryptographically secure signature |
+| `sigma_pqc_verify.h` | PQC cryptographic verification |
 | `sigma_zero_trust.c` | Per-request capability verification |
 | `sigma_sec_tpm.h` | TPM 2.0-inspired PCR banks + attestation (zero tpm2-tools) |
 | `sigma_sec_mac.h` | SELinux-inspired mandatory access control policy table |
@@ -130,6 +136,7 @@
 | `sigma_cache.h` | LRU adaptive cache — RDTSC timestamps, FNV-1a hash |
 | `sigma_perf_profiler.h` | Linux perf-inspired RDTSC profiler zones |
 | `sigma_perf_shadow.h` | Valgrind-inspired shadow memory leak detector |
+| `sigma_perf_isolator.h` | Resource isolation dynamically restricting CPU freq and memory |
 
 ---
 
@@ -243,16 +250,16 @@
 |----------|-------|
 | S01_Genesis kernel headers | 17 |
 | S04_HAL hardware modules | 10 |
-| S08_Security shards | 15 |
-| DevTools/Ecosystem/UI/Tools | 9 |
-| Container/Perf/NUMA | 5 |
+| S08_Security shards | 18 |
+| DevTools/Ecosystem/UI/Tools | 12 |
+| Container/Perf/NUMA | 6 |
 | Storage/FS | 2 |
 | Networking | 9 |
 | Security (ZKP/Caps/BPF/PKG) | 6 |
 | Self-Healing & Boot | 4 |
 | IPC/AIO | 2 |
 | Core OOP atomic modules | 24 |
-| **Total Native Modules** | **103+** |
+| **Total Native Modules** | **110+** |
 
 ---
 
