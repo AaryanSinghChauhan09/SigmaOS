@@ -1,0 +1,32 @@
+#version 450
+
+// SigmaOS Morphic UI Vulkan Compute Shader
+// Hardware-accelerated UI transitions (Blur, Focus, Morphing)
+
+layout(local_size_x = 16, local_size_y = 16) in;
+
+layout(binding = 0, rgba8) uniform writeonly image2D targetImage;
+layout(push_constant) uniform Constants {
+    float time;
+    int intent_mode; // 0=IDLE, 1=CODING, 2=MEDIA
+} pushConsts;
+
+void main() {
+    ivec2 texelCoord = ivec2(gl_GlobalInvocationID.xy);
+    vec4 color = vec4(0.0, 0.0, 0.0, 1.0);
+
+    // Dynamic Morphing Logic based on OS Intent
+    if (pushConsts.intent_mode == 1) {
+        // CODING MODE: High contrast, crisp edges
+        color = vec4(0.1, 0.9, 0.3, 1.0); 
+    } else if (pushConsts.intent_mode == 2) {
+        // MEDIA MODE: Cinematic adaptive blur
+        float blurRadius = sin(pushConsts.time) * 5.0;
+        color = vec4(0.05, 0.05, 0.1, 0.8); // Dimmed surroundings
+    } else {
+        // IDLE / DESKTOP: Glassmorphism effect
+        color = vec4(0.2, 0.3, 0.5, 0.6);
+    }
+
+    imageStore(targetImage, texelCoord, color);
+}

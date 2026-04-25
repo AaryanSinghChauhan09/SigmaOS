@@ -15,6 +15,18 @@ class SigmaCLI:
         self._setup_assist()
         self._setup_perf()
         self._setup_deps()
+        self._setup_ui()
+        self._setup_mem()
+
+    def _setup_ui(self):
+        parser_ui = self.subparsers.add_parser('s-ui', help="Morphic UI Control")
+        parser_ui.add_argument("action", choices=["morph", "adaptive"])
+        parser_ui.add_argument("--profile", type=str, help="Target profile for morphing")
+
+    def _setup_mem(self):
+        parser_mem = self.subparsers.add_parser('s-mem', help="Vector Memory Layer")
+        parser_mem.add_argument("action", choices=["store", "query", "prune", "audit"])
+        parser_mem.add_argument("--data", type=str, help="Data payload")
 
     def _setup_assist(self):
         parser_assist = self.subparsers.add_parser('s-assist', help="Sigma Assistant AI Hooks")
