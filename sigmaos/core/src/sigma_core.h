@@ -43,6 +43,11 @@ void net_audit();
 void media_load_codec(const char* codec);
 void media_list_codecs();
 
+// Component Management Signatures
+void comp_split(const char* component_name);
+void comp_audit();
+void comp_optimize(const char* component_name);
+
 // Automation Signatures
 void* auto_init();
 void auto_run_all(void* ptr);

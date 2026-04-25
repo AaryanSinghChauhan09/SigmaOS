@@ -23,6 +23,12 @@ class SigmaCLI:
         self._setup_auto()
         self._setup_sec()
         self._setup_media()
+        self._setup_comp()
+
+    def _setup_comp(self):
+        parser_comp = self.subparsers.add_parser('s-comp', help="Component Modularisation")
+        parser_comp.add_argument("action", choices=["split", "audit", "optimize"])
+        parser_comp.add_argument("--name", type=str, help="Name of the component")
 
     def _setup_media(self):
         parser_media = self.subparsers.add_parser('s-media', help="Multimedia Subsystem")
