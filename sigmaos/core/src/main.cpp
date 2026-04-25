@@ -1,29 +1,28 @@
 #include "sigma_core.h"
-#include <iostream>
-#include <string>
+#include "sigma_libc.h"
 
-int main(int argc, char** argv) {
-    std::cout << "========================================" << std::endl;
-    std::cout << "   SigmaOS Sovereign Native Entrypoint  " << std::endl;
-    std::cout << "========================================" << std::endl;
+extern "C" int main(int argc, char** argv) {
+    sigma_kprint("========================================\n");
+    sigma_kprint("   SigmaOS Sovereign Native Shell       \n");
+    sigma_kprint("========================================\n");
 
     if (argc < 2) {
-        std::cout << "Usage: s-os-native <command> [args]" << std::endl;
+        sigma_kprint("Usage: s-os <command> [args]\n");
         return 1;
     }
 
-    std::string cmd = argv[1];
+    const char* cmd = argv[1];
 
-    if (cmd == "boot") {
-        std::cout << "[NativeOS] Initializing subsystems..." << std::endl;
+    if (sigma_strcmp(cmd, "boot") == 0) {
+        sigma_kprint("[NativeOS] Initializing atomic subsystems...\n");
         ui_init();
         sec_audit();
-        auto_run_all(auto_init());
-    } else if (cmd == "audit") {
-        ledger_audit();
-        comp_audit();
+    } else if (sigma_strcmp(cmd, "net-secure") == 0) {
+        net_secure_connect();
+    } else if (sigma_strcmp(cmd, "media-load") == 0) {
+        if (argc > 2) media_load_codec(argv[2]);
     } else {
-        std::cout << "[NativeOS] Unknown command: " << cmd << std::endl;
+        sigma_kprint("[NativeOS] Unknown atomic command.\n");
     }
 
     return 0;
