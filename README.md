@@ -1,85 +1,44 @@
-# SigmaOS v1: Sovereign Release
+# SigmaOS: The Sovereign Lattice
 
-🎉 **Overview**
-SigmaOS v1 is the first stable release of the sovereign, bare‑metal operating system designed for silicon sovereignty, modular resilience, and community ownership. This release establishes a foundation that is secure, extensible, performant, and user‑friendly.
+SigmaOS is a next-generation, sovereign operating system. By combining bare-metal C++ optimizations with Python-based AI orchestration, SigmaOS is designed to be so compelling that users will never feel the need to switch to another operating system. 
 
-## 🚀 Key Features
-- **Kernel & HAL:** Modular sovereign kernel (`sigma-core`) with hardware abstraction.
-- **Package Management:** `s-pkg` with `SpkgTranslator` for Flatpak/AppImage/Snap auto‑conversion.
-- **Zenith UI:** Minimalist desktop environment with dashboards, profiles, and themes.
-- **App Store:** One‑click installs, community ratings, and automated CI/CD pipelines.
-- **Security:** Quantum‑safe signatures, zero‑trust networking, immutable Web3 persistence.
-- **Sigma Assistant:** AI‑driven personalization, predictive automations, and an explainability layer.
-- **Accessibility Suite:** Screen reader, voice control, high‑contrast themes, magnifier.
-- **Multimedia:** H.264, H.265/HEVC, VP9, AV1 video; FLAC, AAC, Opus, MP3 audio; GPU acceleration.
+It is built upon a strategic framework designed to eliminate dependency bloat, maximize GPU-accelerated performance, and introduce unprecedented levels of automation.
 
-## 🔧 Modularisation
-- **Subsystem Isolation:**
-  - Networking split into `sigma-net-wifi`, `sigma-net-vpn`, `sigma-net-bluetooth`.
-  - Multimedia split into `sigma-media-audio`, `sigma-media-video`, `sigma-media-codecs`.
-  - Security split into `sigma-sec-auth`, `sigma-sec-crypto`, `sigma-sec-audit`.
-- **Micro‑Modules:** Codec manager, updater, telemetry collector.
-- **Containerised Services:** Each subsystem isolated for resilience and hot‑swapping.
-- **Unified API Layer:** Stable interfaces for apps/extensions.
-- **Dependency Reduction:**
-  - Predefined functions modularized to avoid duplication.
-  - Replace heavy libraries with lightweight equivalents.
-  - Modular drivers (load only what’s needed).
-  - Minimal base system with optional add‑ons.
-  - Third‑party libraries sandboxed to reduce attack surface.
+## 🔧 Architectural Sovereignty
+*   **Bare-Metal Optimization:** Critical subsystems (Process Control, Intent Scheduling, Memory Allocation) are written in strict `no_std` C/C++ to eradicate interpreted language overhead.
+*   **Minimal Dependencies:** We actively ban the use of heavy third-party frameworks, replacing them with our strict `vendor/manifest.toml` policy and modular micro-equivalents.
+*   **Micro-Modules:** Networking, multimedia, security, and storage are split into distinct, loadable/unloadable isolated shards (`sigma-net`, `sigma-sec`, etc.).
+*   **Vector Memory Layer:** The OS possesses queryable, persistent AI memory (backed by SQLite), enabling extreme personalization without relying on external cloud APIs.
 
-## ⚙️ Automations
-- **Self-healing:** Updates with automatic rollback.
-- **Predictive maintenance:** AI monitors SSD wear, battery cycles.
-- **Adaptive networking:** Prioritization for critical apps.
-- **Energy optimization:** Balancing performance vs. battery life.
-- **Workflow bundles:** (DevOps, Creative, Gaming).
-- **Nightly backups:** Automated snapshots with rollback hooks.
-- **Dependency auto-pruning:** For unused packages and libraries.
+## ⚙️ Automation Superiority
+*   **Self-Healing Updates:** Featuring automatic rollback if the Web3 State Ledger detects instability during an update.
+*   **Profile-Based Automation:** Instant context switching. The OS morphs between "Work", "Gaming", and "Study" profiles autonomously based on the user's workflow.
+*   **Dependency Auto-Pruning:** Background watchdogs (`s-deps prune`) actively scan for and remove unused libraries and fossilized code.
 
-## 🎨 Customisation & Personalisation
-- Dynamic themes (time‑based wallpapers, icon packs).
-- User dashboards (Work, Gaming, Study, Accessibility).
-- Community sharing of themes and automation templates.
-- Adaptive UI for desktop, tablet, VR.
-- Voice‑driven customization.
-- Minimalist mode for focus and speed.
-- AI‑driven personalization via Sigma Assistant.
+## 🎨 Morphic UI & Customisation
+*   **Vulkan Compute Shaders:** The Zenith UI abandons heavy DOM trees in favor of native GPU-accelerated Morphic UI shaders. Windows and dashboards fluidly morph, blur, and focus in real-time.
+*   **AI-Driven Personalization:** The Sigma Assistant analyzes usage patterns to natively tailor screen layouts and app suggestions.
+*   **Absolute Focus:** A minimalist mode strips the UI to its bare essentials, dedicating 99% of CPU cycles to the active task.
 
-## 💻 CLI Mastery & Namespace Design
-Instead of flat commands, SigmaOS utilizes a highly scalable, modular namespace system to prevent bloat while maximizing control:
-- **`s-assist`**: AI assistant functions (`status`, `suggest`, `optimize`, `explain`).
-- **`s-profile`**: Personalization management (`switch`, `create`, `delete`).
-- **`s-net`**: Networking modules (`secure`, `connect`, `scan`, `vpn`).
-- **`s-deps`**: Dependency & library control (`prune`, `reduce`, `tree`).
-- **`s-perf`**: Performance tuning (`boost`, `monitor`, `isolate`, `cache`).
-- **`s-sys`**: Core system utilities (`update`, `rollback`, `snapshot`).
+## 💻 The Unified CLI (`sigma_cli`)
+SigmaOS replaces 99,999 fragmented commands with an elegant namespace architecture, providing 1:1 parity with the GUI:
+*   `s-sys`: Core operations (update, rollback, snapshot).
+*   `s-perf`: Performance tuning (boost, isolate, cache, tensor-monitor).
+*   `s-ui`: Morphic UI control (morph profile, adaptive rendering).
+*   `s-deps`: Dependency management (audit, prune, tree).
+*   `s-mem`: Vector memory access (store, query, audit).
+*   `s-func` / `s-lib` / `s-comp`: Granular control over OS components.
 
-### Example Usage:
-```bash
-s-assist status          # System health dashboard
-s-profile switch work    # Auto-switch to work profile
-s-net secure             # Enable zero‑trust networking
-s-deps prune             # Remove unused dependencies
-s-perf cache adaptive    # Enable adaptive caching
-s-sys rollback last      # Revert to stable snapshot
-```
+## ⚡ Extreme Performance & Dependency Reduction
+*   **Custom Allocators:** The OS bypasses standard `malloc` with highly optimized C++ Memory Pools and Lock-Free Queues to prevent heap fragmentation and mutex contention.
+*   **Lightweight Containers:** Third-party applications do not run on bare metal; they are executed in near-instantaneous WebAssembly (WASM) micro-VMs for absolute security isolation.
 
-## ⚡ Ease of Use & Performance
-- Unified Control Center (GUI + CLI parity).
-- Accessibility shortcuts (voice, hotkeys, gestures).
-- Simplified installers with dependency transparency.
-- Onboarding wizard for new users.
-- AI‑driven scheduler for CPU/GPU allocation.
-- Adaptive caching for instant app launch.
-- Fast boot profiles (minimal services).
-- Lightweight containers for subsystems.
-- Resource isolation to prevent slowdowns.
-- Smaller footprint via dependency reduction.
+## 🌍 Absorbed Distro Philosophies
+SigmaOS stands on the shoulders of giants, absorbing:
+*   **Arch Linux:** Rolling updates and absolute dependency transparency.
+*   **NixOS:** Declarative reproducibility via `sigma_profile.toml`.
+*   **Alpine Linux:** A hyper-minimalist base system with explicit opt-in modules.
+*   **Fedora Silverblue:** Immutable OS layers combined with state overlays.
 
-## 🎯 Next Directions
-- **Sprint 16:** Multimedia codecs + accessibility suite.
-- **Sprint 17:** Sigma Assistant refinements, CLI parity, performance modules, dependency reduction.
-- **Phase 5:** Community sovereignty, governance council, global adoption strategies.
-
-✨ *This release note commemorates SigmaOS v1 as a monumental milestone — the foundation of a sovereign digital nation OS.*
+---
+*SigmaOS is not just software. It is a completely sovereign digital nation.*
