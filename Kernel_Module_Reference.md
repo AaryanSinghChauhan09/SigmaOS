@@ -101,6 +101,10 @@
 | `sigma_pqc_sign.h` | PQC FNV-1a backed cryptographically secure signature |
 | `sigma_pqc_verify.h` | PQC cryptographic verification |
 | `sigma_formal_proof.hpp` | Mathematical native Design-by-Contract invariant checker |
+| `sigma_sec_audit_runtime.hpp` | Runtime zero-trust auditing Engine |
+| `sigma_sec_sandbox_quantum.hpp` | Quantum-safe micro-VM app isolation via ASM MSR hooks |
+| `sigma_sec_firewall_adaptive.hpp` | Adaptive Mesh Firewall responding to global threat levels |
+| `sigma_sec_integrity.hpp` | Continuous Integrity Verification hashing |
 | `sigma_zero_trust.c` | Per-request capability verification |
 | `sigma_sec_tpm.h` | TPM 2.0-inspired PCR banks + attestation (zero tpm2-tools) |
 | `sigma_sec_mac.h` | SELinux-inspired mandatory access control policy table |
@@ -207,6 +211,7 @@
 | Module File | Responsibility |
 |-------------|----------------|
 | `sigma_boot_init.hpp` | Sovereign Bootloader native long-mode transition |
+| `sigma_boot_handoff.hpp` | Clean handoff from bootloader to kernel main |
 | `sigma_boot_securecheck.hpp` | Post-quantum boot image signature verification |
 | `sigma_boot_driverload.hpp` | Native PCI bus scanning and driver injection engine |
 | `sigma_auto_watchdog.hpp` | OOP Self-healing daemon integrating with ICallback |
@@ -275,16 +280,16 @@
 |----------|-------|
 | S01_Genesis kernel headers | 27 |
 | S04_HAL hardware modules | 10 |
-| S08_Security shards | 19 |
+| S08_Security shards | 23 |
 | DevTools/Ecosystem/UI/Tools | 14 |
 | Container/Perf/NUMA | 7 |
 | Storage/FS | 2 |
 | Networking | 12 |
 | Security (ZKP/Caps/BPF/PKG) | 6 |
-| Self-Healing & Boot | 11 |
+| Self-Healing & Boot | 12 |
 | IPC/AIO | 3 |
 | Core OOP atomic modules | 24 |
-| **Total Native Modules** | **135+** |
+| **Total Native Modules** | **140+** |
 
 ---
 
