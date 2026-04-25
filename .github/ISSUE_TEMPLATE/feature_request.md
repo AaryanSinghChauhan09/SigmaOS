@@ -1,19 +1,21 @@
 ---
-name: Feature request
-about: Suggest an idea for the SigmaOS Zenith ecosystem
-title: '[FEAT] '
+name: Feature Request
+about: Suggest an idea for SigmaOS
+title: '[FEATURE] '
 labels: enhancement
 assignees: ''
+
 ---
 
-**Is your feature request related to a problem? Please describe.**
-A clear and concise description of what the problem is. Ex. I'm always frustrated when [...]
+## Modularity Context
+**Which subsystem would this feature extend?** (e.g., Kernel, HAL, Userland Utilities, Zenith UI)
+[Subsystem Name]
 
-**Describe the solution you'd like**
-A clear and concise description of what you want to happen. Consider the 33-suite Sovereign architecture.
+## Is your feature request related to a problem? Please describe.
+A clear and concise description of what the problem is.
 
-**Describe alternatives you've considered**
+## Describe the solution you'd like
+A clear and concise description of what you want to happen. Keep the principles of Separation of Concerns and Minimal Core + Extensions in mind.
+
+## Describe alternatives you've considered
 A clear and concise description of any alternative solutions or features you've considered.
-
-**Additional context**
-Add any other context or screenshots about the feature request here.

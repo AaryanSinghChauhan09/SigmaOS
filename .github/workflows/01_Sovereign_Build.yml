@@ -8,12 +8,12 @@ on:
 
 jobs:
   native-lattice:
-    name: Build & Check (${{ matrix.os }})
+    name: Build & Modular Test (${{ matrix.os }})
     strategy:
       fail-fast: false
       matrix:
         os: [ubuntu-latest, macos-latest, windows-latest]
-        profile: [server, iot, dev, alpine, ubuntu, arch, kali, tails]
+        profile: [server, iot, dev]
     runs-on: ${{ matrix.os }}
 
     steps:
@@ -29,20 +29,29 @@ jobs:
         run: |
           mkdir -p build || true
           touch build/.gitkeep || true
-          g++ -std=c++20 s-cli.cpp -o s-cli || g++ -std=c++20 s-cli.cpp -o s-cli.exe
+          g++ -std=c++20 orchestrator/main.cpp -o s-cli || g++ -std=c++20 orchestrator/main.cpp -o s-cli.exe
           echo "[CI] Sovereign Environment Repaired"
 
       - name: Switch to Sovereign Profile
         run: |
           ./s-cli profile ${{ matrix.profile }} || .\s-cli.exe profile ${{ matrix.profile }}
 
-      - name: Build Sovereign Lattice
+      - name: Build Sovereign Lattice (Modular)
         run: |
           ./s-cli build x86_64 || .\s-cli.exe build x86_64
 
-      - name: Run Sovereign Atomic Tests
+      - name: Run Subsystem Regression Tests
         run: |
-          ./s-cli test || .\s-cli.exe test
+          echo "Running Kernel Tests..."
+          ./s-cli test --subsystem genesis
+          echo "Running HAL Driver Tests..."
+          ./s-cli test --subsystem hal
+          echo "Running Userland Utilities Tests (sigma-fm, sigma-editor)..."
+          ./s-cli test --subsystem userland
+
+      - name: Security & Performance Benchmarks
+        run: |
+          ./s-cli benchmark --run-all
 
       - name: Upload Kernel Binary & Logs
         if: always()
@@ -53,3 +62,4 @@ jobs:
             build/
             *.log
           retention-days: 7
+
