@@ -43,6 +43,9 @@ int subsystem_is_active(const char* name);
 // Security Signatures
 void sec_audit();
 void sec_encrypt_file(const char* filename);
+void sec_firewall_enable(int adaptive_mode);
+void sec_intrusion_detect();
+void sec_sandbox_process(int pid);
 
 // Networking Signatures
 void net_secure_connect();

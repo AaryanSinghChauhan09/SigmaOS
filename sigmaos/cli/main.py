@@ -43,8 +43,10 @@ class SigmaCLI:
 
     def _setup_sec(self):
         parser_sec = self.subparsers.add_parser('s-sec', help="Security Subsystem")
-        parser_sec.add_argument("action", choices=["audit", "encrypt", "firewall", "sandbox"])
+        parser_sec.add_argument("action", choices=["audit", "encrypt", "firewall", "sandbox", "detect"])
         parser_sec.add_argument("--file", type=str, help="Target file for encryption")
+        parser_sec.add_argument("--pid", type=int, help="Target PID for sandboxing")
+        parser_sec.add_argument("--adaptive", action="store_true", help="Enable adaptive mode")
 
     def _setup_net(self):
         parser_net = self.subparsers.add_parser('s-net', help="Networking Subsystem")
