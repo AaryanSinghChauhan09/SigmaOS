@@ -1,44 +1,33 @@
-# Σ SIGMAOS: THE SOVEREIGN SILICON ENTITY (v5.3)
+# SigmaOS v1: Sovereign Release
 
-[![SigmaOS CI](https://github.com/Sovereign-OS/SigmaOS/actions/workflows/ci.yml/badge.svg)](https://github.com/Sovereign-OS/SigmaOS/actions/workflows/ci.yml)
+🎉 **Overview**
+SigmaOS v1 is the first stable release of the world’s most advanced sovereign, bare‑metal operating system. Built for silicon sovereignty, modular resilience, and community ownership, this release delivers a foundation that is secure, extensible, performant, and user‑friendly.
 
-SigmaOS is an industrial-grade, self-hosting silicon singularity built on the **Sovereign Lattice**. It is currently undergoing a massive structural maturation to transform from a visionary 500-shard architecture into a fully usable, bare-metal operating system.
+## 🚀 Key Features
+- **Kernel & HAL:** Modular sovereign kernel (`sigma-core`) with NUMA-aware hardware abstraction.
+- **Package Management:** `s-pkg` with `SpkgTranslator` for Flatpak/AppImage/Snap auto‑conversion.
+- **Zenith UI:** Minimalist desktop environment with dashboards, profiles, and themes.
+- **App Store:** One‑click installs, community ratings, and automated CI/CD pipelines.
+- **Security:** Quantum‑safe signatures, zero‑trust networking, immutable Web3 persistence.
+- **Sigma Assistant:** AI‑driven personalization, predictive automations, and an explainability layer.
+- **Accessibility Suite:** Screen reader, voice control, high‑contrast themes, magnifier.
+- **Multimedia:** H.264, H.265/HEVC, VP9, AV1 video; FLAC, AAC, Opus, MP3 audio; GPU acceleration.
 
----
+## 🔧 Modularisation
+- **Subsystem Isolation:** `sigma-net-wifi`, `sigma-media-audio`, `sigma-sec-crypto`, etc.
+- **Micro‑Modules:** Codec manager, updater, telemetry collector.
+- **Containerised Services:** Each subsystem isolated for resilience.
+- **Unified API Layer:** Stable interfaces for apps/extensions via `SigmaRPC`.
+- **Dependency Reduction:** Minimal base system with optional add‑ons, modular drivers, lightweight libraries.
 
-## 📚 Documentation & Getting Started
-* **[Getting Started Guide](WIKI/GettingStarted.md)**: How to compile, emulate (QEMU), and deploy SigmaOS to bare metal.
-* **[Maturity Roadmap](ROADMAP.md)**: Our path to full Kernel maturity, Hardware Support (HAL), Developer Toolchains, and Userland Applications.
+## ⚙️ Automations & AI
+- **Self-Healing:** Automatic rollbacks with immutable Web3 logs.
+- **Predictive Maintenance:** AI monitors SSD wear, battery cycles, hardware alerts.
+- **Energy Optimization:** Balance performance vs. battery life dynamically.
+- **Sigma Assistant:** AI-driven scheduler for CPU/GPU allocation, adaptive caching, and telemetry optimizations.
 
----
-
-## 🏛️ Singularity Architecture (v5.3)
-
-| Component | Status | Description |
-| :--- | :--- | :--- |
-| **Sovereign Lattice** | Absolute | 500+ atomic shards coordinating in a unified silicon entity. |
-| **Zenith UI** | Verified | Kernel-native dashboard with real-time observability panels. |
-| **Sovereign Pulse** | Active | Real-time telemetry (S82) and dynamic resource modulation. |
-| **Quantum Resilience**| Hardened | Lattice-based signatures (S81) for post-quantum security. |
-| **Amnesic Execution**| Silent | Zero-trace bit-level memory erasure (S80) for anti-forensics. |
-| **Lattice-Get** | Global | Distributed shard retrieval and mesh-wide synchronization (S78). |
-
----
-
-## 🚀 The Sovereign CLI (s-cli v5.3)
-
-The **Sovereign Pulse Orchestrator** is the central command interface for the singularity.
-
+## 💻 CLI Mastery
 ```bash
-# Real-Time Observability
-./s-cli heartbeat   # Stream status from all 500+ shards
-./s-cli modulate    # Fine-tune resource quotas at runtime
-
-# Security & Resilience
-./s-cli quantum     # Engage Post-Quantum signatures
-./s-cli amnesia     # Wipe all execution traces from RAM/Cache
-
-# Deployment & Convergence
 ./s-cli singularity # Activate final architectural convergence
 ./s-cli sync        # Synchronize manifest across Syndicate Mesh
 ```
