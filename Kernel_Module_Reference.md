@@ -27,6 +27,14 @@
 
 ---
 
+## S02_ZenithUI — UI & Compositor (`suites/S02_ZenithUI/`)
+
+| Module File | Responsibility |
+|-------------|----------------|
+| `sigma_ui_wayland.h` | Wayland-inspired sovereign display compositor (zero libwayland) |
+
+---
+
 ## S04_HAL — Hardware Abstraction Layer (`suites/S04_HAL/`)
 
 | Module File | Responsibility |
@@ -44,12 +52,32 @@
 
 ---
 
+## S05_Memory — Memory Management (`suites/S05_Memory/`)
+
+| Module File | Responsibility |
+|-------------|----------------|
+| `sigma_mem_tcache.h` | jemalloc-inspired thread cache — per-size-class free lists |
+
+---
+
+## S07_Network — Networking Stack (`suites/S07_Network/`)
+
+| Module File | Responsibility |
+|-------------|----------------|
+| `sigma_net_tcp.h` | lwIP-inspired lightweight TCP stack (zero heap allocation) |
+| `sigma_net_vpn.h` | WireGuard-inspired sovereign VPN tunnel (ZKP handshake) |
+| `sigma_net_dns.h` | Unbound-inspired DNS resolver (DNSSEC-aware, TTL expiry) |
+
+---
+
 ## S08_Security — Security Shards (`suites/S08_Security/`)
 
 | Module File | Responsibility |
 |-------------|----------------|
 | `sigma_pqc.c` | Kyber/Dilithium post-quantum crypto primitives |
 | `sigma_zero_trust.c` | Per-request capability verification |
+| `sigma_sec_tpm.h` | TPM 2.0-inspired PCR banks + attestation (zero tpm2-tools) |
+| `sigma_sec_mac.h` | SELinux-inspired mandatory access control policy table |
 | `pqc_core.c` | PQC key generation core |
 | `audit_master.c` | Silicon-level security event logger |
 | `shard_isolation.c` | Process shard isolation enforcer |
@@ -58,6 +86,24 @@
 | `SovereignHardwareAudit.cpp` | Hardware attestation auditor |
 | `ZeroTrustAuthenticator.hpp` | Zero-trust auth interface |
 | `formal_proofs/` | Kani-verified IPC/DMA non-interference proofs |
+
+---
+
+## S12_Ecosystem — Multimedia & Extensions (`suites/S12_Ecosystem/`)
+
+| Module File | Responsibility |
+|-------------|----------------|
+| `sigma_media_codec.h` | FFmpeg-inspired codec registry (plugin-free C functions) |
+
+---
+
+## S15_DevNexus — Developer Tools (`suites/S15_DevNexus/`)
+
+| Module File | Responsibility |
+|-------------|----------------|
+| `sigma_dev_test.h` | Catch2-inspired native unit test framework |
+| `sigma_dev_build.h` | Make/Ninja-inspired dependency graph builder |
+| `sigma_dev_gdb.h` | GDB-inspired debug stub (INT3 software breakpoints) |
 
 ---
 
@@ -75,6 +121,8 @@
 |-------------|----------------|
 | `sigma_worksteal.h` | GCD/TBB-inspired work-stealing thread pool |
 | `sigma_cache.h` | LRU adaptive cache — RDTSC timestamps, FNV-1a hash |
+| `sigma_perf_profiler.h` | Linux perf-inspired RDTSC profiler zones |
+| `sigma_perf_shadow.h` | Valgrind-inspired shadow memory leak detector |
 
 ---
 
@@ -94,45 +142,43 @@
 
 ---
 
-## S36_SovereignBPF — Programmable Filters (`suites/S36_SovereignBPF/`)
+## S32_SystemTools — Standard Utilities (`suites/S32_SystemTools/`)
+
+| Module File | Responsibility |
+|-------------|----------------|
+| `sigma_sys_busybox.h` | BusyBox-inspired UNIX utilities (cat, grep, wc, etc.) |
+| `sigma_sec_musl.h` | musl-inspired hardened libc extensions (safe memcpy, etc.) |
+
+---
+
+## S36_SovereignBPF & Package Registry (`suites/S36_*/`)
 
 | Module File | Responsibility |
 |-------------|----------------|
 | `sigma_bpf.h` | eBPF-inspired programmable filter chain (no JIT) |
-
----
-
-## S36_SovereignPackageRegistry — Package Manager (`suites/S36_SovereignPackageRegistry/`)
-
-| Module File | Responsibility |
-|-------------|----------------|
 | `sigma_pkg.h` | Capability-gated, hash-verified package install/remove |
 | `sigma_package_registry.h` | Package registry index and lookup |
 
 ---
 
-## S37_ZeroKnowledgeProofLayer — ZKP (`suites/S37_ZeroKnowledgeProofLayer/`)
+## S37_SovereignWire & ZKP (`suites/S37_*/`)
 
 | Module File | Responsibility |
 |-------------|----------------|
 | `sigma_zkp.h` | Fiat-Shamir sigma protocol — commit/challenge/respond/verify |
 | `sigma_zkp_attestation.h` | ZKP-based attestation for capability tokens |
+| `sigma_netfilter.h` | iptables-inspired zero-copy packet firewall |
 
 ---
 
-## S37_SovereignWire — Networking (`suites/S37_SovereignWire/`)
-
-| Module File | Responsibility |
-|-------------|----------------|
-| `sigma_netfilter.h` | Zero-copy packet firewall — wildcard bitmask rules |
-
----
-
-## S41_SiliconBoot — Self-Healing Boot (`suites/S41_SiliconBoot/`)
+## S41_SiliconBoot — Boot & Self-Healing (`suites/S41_SiliconBoot/`)
 
 | Module File | Responsibility |
 |-------------|----------------|
 | `sigma_auto_rollback.h` | RDTSC-timestamped snapshots + capability-gated restore |
+| `sigma_auto_watchdog.h` | systemd-inspired service watchdog & self-healing |
+| `sigma_fw_update.h` | fwupd-inspired firmware update framework |
+| `sigma_sys_cron.h` | cron-inspired sovereign task scheduler |
 
 ---
 
@@ -190,15 +236,16 @@
 |----------|-------|
 | S01_Genesis kernel headers | 17 |
 | S04_HAL hardware modules | 10 |
-| S08_Security shards | 10 |
-| Container/Perf/NUMA | 3 |
+| S08_Security shards | 12 |
+| DevTools/Ecosystem/UI/Tools | 9 |
+| Container/Perf/NUMA | 5 |
 | Storage/FS | 2 |
-| Networking | 2 |
+| Networking | 5 |
 | Security (ZKP/Caps/BPF/PKG) | 6 |
-| Self-Healing | 1 |
+| Self-Healing & Boot | 4 |
 | IPC/AIO | 2 |
 | Core OOP atomic modules | 24 |
-| **Total** | **77+** |
+| **Total Native Modules** | **96+** |
 
 ---
 
