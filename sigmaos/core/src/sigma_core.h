@@ -15,6 +15,11 @@ void* scheduler_init();
 void scheduler_add_goal(void* ptr, const char* goal);
 void scheduler_process(void* ptr);
 
+// Performance Signatures
+void perf_balance();
+void perf_cache_adaptive();
+void perf_isolate(int pid);
+
 // Subsystem Signatures
 void subsystem_load(const char* name);
 void subsystem_unload(const char* name);

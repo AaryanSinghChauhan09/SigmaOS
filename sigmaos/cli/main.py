@@ -62,8 +62,9 @@ class SigmaCLI:
         parser_assist.add_argument("action", choices=["status", "suggest", "optimize", "explain"])
 
     def _setup_perf(self):
-        parser_perf = self.subparsers.add_parser('s-perf', help="Performance Scheduler")
-        parser_perf.add_argument("action", choices=["boost", "monitor", "isolate", "cache", "tensor-monitor"])
+        parser_perf = self.subparsers.add_parser('s-perf', help="Performance Optimization")
+        parser_perf.add_argument("action", choices=["balance", "cache", "isolate", "boost"])
+        parser_perf.add_argument("--pid", type=int, help="Target PID for isolation")
 
     def _setup_deps(self):
         parser_deps = self.subparsers.add_parser('s-deps', help="Dependency Management")
