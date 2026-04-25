@@ -1,46 +1,41 @@
 """
 SigmaOS Subsystem Manager
-Handles the dynamic loading and unloading of isolated OS shards.
-Ensures that modules like networking, media, and security are only active when needed.
+FFI Wrapper. Core logic has been moved to bare-metal C++ for absolute performance.
 """
-from typing import Dict, Any, Type
-import importlib
+import ctypes
+import os
 
-class Subsystem:
-    """Base class for all SigmaOS modular subsystems."""
-    def __init__(self, name: str):
-        self.name = name
-        self.is_loaded = False
+# Load the native core library
+lib_path = os.path.join(os.path.dirname(__file__), "..", "core", "build", "sigma_core.so")
+if os.name == 'nt':
+    lib_path = os.path.join(os.path.dirname(__file__), "..", "core", "build", "sigma_core.dll")
 
-    def load(self):
-        print(f"[Subsystem] Loading {self.name}...")
-        self.is_loaded = True
-
-    def unload(self):
-        print(f"[Subsystem] Unloading {self.name}...")
-        self.is_loaded = False
+try:
+    _native_core = ctypes.CDLL(lib_path)
+    _native_core.subsystem_load.argtypes = [ctypes.c_char_p]
+    _native_core.subsystem_unload.argtypes = [ctypes.c_char_p]
+    _native_core.subsystem_is_active.restype = ctypes.c_int
+    _native_core.subsystem_is_active.argtypes = [ctypes.c_char_p]
+    NATIVE_AVAILABLE = True
+except OSError:
+    NATIVE_AVAILABLE = False
 
 class SubsystemManager:
-    def __init__(self):
-        self.registry: Dict[str, Subsystem] = {}
-
-    def register(self, name: str, subsystem: Subsystem):
-        self.registry[name] = subsystem
-
     def load_subsystem(self, name: str):
-        if name in self.registry:
-            self.registry[name].load()
+        if NATIVE_AVAILABLE:
+            _native_core.subsystem_load(name.encode('utf-8'))
         else:
-            print(f"[SubsystemManager] Error: Subsystem {name} not found.")
+            print(f"[Subsystem-Stub] Loading {name}...")
 
     def unload_subsystem(self, name: str):
-        if name in self.registry:
-            self.registry[name].unload()
+        if NATIVE_AVAILABLE:
+            _native_core.subsystem_unload(name.encode('utf-8'))
         else:
-            print(f"[SubsystemManager] Error: Subsystem {name} not found.")
+            print(f"[Subsystem-Stub] Unloading {name}...")
 
-    def list_active(self):
-        return [name for name, sub in self.registry.items() if sub.is_loaded]
+    def is_active(self, name: str) -> bool:
+        if NATIVE_AVAILABLE:
+            return _native_core.subsystem_is_active(name.encode('utf-8')) == 1
+        return False
 
-# Canonical Global Manager
 manager = SubsystemManager()
