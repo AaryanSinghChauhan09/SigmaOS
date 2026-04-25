@@ -2,7 +2,13 @@
 
 [![SigmaOS CI](https://github.com/Sovereign-OS/SigmaOS/actions/workflows/ci.yml/badge.svg)](https://github.com/Sovereign-OS/SigmaOS/actions/workflows/ci.yml)
 
-SigmaOS is an industrial-grade, self-hosting silicon singularity built on the **Sovereign Lattice**. It has achieved absolute architectural finality, providing neural-native scheduling, quantum-safe resilience, and zero-trace amnesic execution.
+SigmaOS is an industrial-grade, self-hosting silicon singularity built on the **Sovereign Lattice**. It is currently undergoing a massive structural maturation to transform from a visionary 500-shard architecture into a fully usable, bare-metal operating system.
+
+---
+
+## 📚 Documentation & Getting Started
+* **[Getting Started Guide](WIKI/GettingStarted.md)**: How to compile, emulate (QEMU), and deploy SigmaOS to bare metal.
+* **[Maturity Roadmap](ROADMAP.md)**: Our path to full Kernel maturity, Hardware Support (HAL), Developer Toolchains, and Userland Applications.
 
 ---
 
