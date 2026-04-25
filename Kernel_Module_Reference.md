@@ -54,6 +54,9 @@
 
 | Module File | Responsibility |
 |-------------|----------------|
+| `sigma_hal_core.hpp` | Core HAL abstracting CPU architectures (x86_64, ARM64, RISC-V) |
+| `sigma_hal_driver_gpu.hpp` | GPU Hardware Abstraction Layer for discrete accelerators |
+| `sigma_hal_driver_storage.hpp` | Unified Storage HAL for NVMe, SATA, and eMMC interfaces |
 | `sigma_hal_drivers.hpp` | OOP NVMe + USB HID drivers (ISigmaDriver) |
 | `dma_controller.cpp` | DMA ring management |
 | `hal_registry.c` | Driver probe + registration |
@@ -173,6 +176,9 @@
 
 | Module File | Responsibility |
 |-------------|----------------|
+| `sigma_fs_ext.hpp` | Legacy EXT2/3/4 filesystem compatibility wrapper |
+| `sigma_fs_btrfs.hpp` | BTRFS subvolume and snapshot compatibility |
+| `sigma_fs_sovereign.hpp` | Native Sovereign Immutable Filesystem for cryptographically verified persistence |
 | `sigma_immutable_fs.h` | A/B slot OTA swap + FNV-1a integrity + auto-rollback |
 
 ---
@@ -279,17 +285,17 @@
 | Category | Count |
 |----------|-------|
 | S01_Genesis kernel headers | 27 |
-| S04_HAL hardware modules | 10 |
+| S04_HAL hardware modules | 13 |
 | S08_Security shards | 23 |
 | DevTools/Ecosystem/UI/Tools | 14 |
 | Container/Perf/NUMA | 7 |
-| Storage/FS | 2 |
+| Storage/FS | 5 |
 | Networking | 12 |
 | Security (ZKP/Caps/BPF/PKG) | 6 |
 | Self-Healing & Boot | 12 |
 | IPC/AIO | 3 |
 | Core OOP atomic modules | 24 |
-| **Total Native Modules** | **140+** |
+| **Total Native Modules** | **146+** |
 
 ---
 
