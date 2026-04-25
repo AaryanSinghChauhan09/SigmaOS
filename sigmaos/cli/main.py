@@ -19,6 +19,17 @@ class SigmaCLI:
         self._setup_mem()
         self._setup_net()
         self._setup_sys()
+        self._setup_auto()
+        self._setup_sec()
+
+    def _setup_auto(self):
+        parser_auto = self.subparsers.add_parser('s-auto', help="Automation Engine")
+        parser_auto.add_argument("action", choices=["backup", "prune", "monitor", "rollback", "update"])
+
+    def _setup_sec(self):
+        parser_sec = self.subparsers.add_parser('s-sec', help="Security Subsystem")
+        parser_sec.add_argument("action", choices=["audit", "encrypt", "firewall", "sandbox"])
+        parser_sec.add_argument("--file", type=str, help="Target file for encryption")
 
     def _setup_net(self):
         parser_net = self.subparsers.add_parser('s-net', help="Networking Subsystem")
