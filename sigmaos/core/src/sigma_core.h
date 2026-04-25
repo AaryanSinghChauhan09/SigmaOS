@@ -10,6 +10,12 @@ void* apcb_create(int pid, const char* intent);
 void apcb_handle_crash(void* ptr, const char* traceback);
 void apcb_destroy(void* ptr);
 
+// UI Signatures
+void ui_init();
+void ui_render_frame();
+void ui_set_morph_profile(const char* profile);
+void ui_toggle_shader(const char* effect, int enabled);
+
 // Scheduler Signatures
 void* scheduler_init();
 void scheduler_add_goal(void* ptr, const char* goal);
