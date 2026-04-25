@@ -163,7 +163,7 @@ static i64 sys_uname_impl(SigmaInterruptFrame* f) {
     if (!buf) return K_ERR_INVAL;
     const char* info = "SigmaOS 1.0 SovereignKernel x86_64";
     usize i = 0;
-    while (info[i] && i < 127) { buf[i] = info[i]; i++; }
+    while (i < 127 && info[i]) { buf[i] = info[i]; i++; }
     buf[i] = '\0';
     return 0;
 }
