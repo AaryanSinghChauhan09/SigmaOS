@@ -12,11 +12,13 @@ const char* sigma_vfs_resolve_path(const char* request_path, char* resolved_buff
     if (buffer_size < 1024) return NULL;
     
     sigma_strcpy(resolved_buffer, "../web_ui/");
+    int len = 0; while (resolved_buffer[len]) len++;
     if (sigma_strcmp(request_path, "/") == 0) {
-        strcat(resolved_buffer, "index.html");
+        strncat(resolved_buffer, "index.html", buffer_size - len - 1);
     } else {
-        strcat(resolved_buffer, request_path + 1); // Ignore leading slash
+        strncat(resolved_buffer, request_path + 1, buffer_size - len - 1); // Ignore leading slash
     }
+    resolved_buffer[buffer_size - 1] = '\0';
     return resolved_buffer;
 }
 
