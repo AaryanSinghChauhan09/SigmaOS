@@ -200,9 +200,12 @@
 
 | Module File | Responsibility |
 |-------------|----------------|
-| `sigma_auto_rollback.h` | RDTSC-timestamped snapshots + capability-gated restore |
-| `sigma_auto_watchdog.h` | systemd-inspired service watchdog & self-healing |
-| `sigma_fw_update.h` | fwupd-inspired firmware update framework |
+| `sigma_auto_watchdog.hpp` | OOP Self-healing daemon integrating with ICallback |
+| `sigma_auto_rollback.hpp` | OOP Rollback automation logic triggering CPU IDT faults |
+| `sigma_auto_update.hpp` | OOP Seamless update engine managing A/B boot slots |
+| `sigma_auto_watchdog.h` | Legacy C bindings for watchdog |
+| `sigma_auto_rollback.h` | Legacy C bindings for rollback |
+| `sigma_fw_update.h` | Legacy C bindings for firmware updates |
 | `sigma_sys_cron.h` | cron-inspired sovereign task scheduler |
 
 ---
@@ -267,10 +270,10 @@
 | Storage/FS | 2 |
 | Networking | 12 |
 | Security (ZKP/Caps/BPF/PKG) | 6 |
-| Self-Healing & Boot | 4 |
+| Self-Healing & Boot | 7 |
 | IPC/AIO | 2 |
 | Core OOP atomic modules | 24 |
-| **Total Native Modules** | **121+** |
+| **Total Native Modules** | **124+** |
 
 ---
 
