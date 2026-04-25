@@ -5,7 +5,7 @@
 namespace SigmaOS {
 namespace UI {
 
-// Phase 3: Zenith UI Integration & User Experience
+// Phase 3: Zenith UI Integration & User Experience (Sprint 4 & 5)
 class ZenithDashboard {
 private:
     bool dark_mode_enabled;
@@ -27,6 +27,13 @@ public:
         sigma_print("[TOGGLE] Enable Nightly Secure Updates [ON]\n");
         sigma_print("[TOGGLE] Enable Weekly Cleanup [OFF]\n");
         sigma_print("[DROPDOWN] Add Custom Task...\n");
+    }
+    
+    void render_security_profiles() {
+        sigma_print("\n[ZENITH UI] --- Security & Networking Profiles ---\n");
+        sigma_print("[PROFILE] Stealth Mode (VPN + Strict Firewall) [ACTIVE]\n");
+        sigma_print("[PROFILE] Developer Mode (Open Ports, Debugging) [INACTIVE]\n");
+        sigma_print("[TOGGLE] Enable Quantum-Safe Cryptography (Kyber/Dilithium) [ON]\n");
     }
     
     void render_system_health() {
