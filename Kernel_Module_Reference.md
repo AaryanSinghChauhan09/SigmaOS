@@ -57,6 +57,7 @@
 | `sigma_hal_core.hpp` | Core HAL abstracting CPU architectures (x86_64, ARM64, RISC-V) |
 | `sigma_hal_driver_gpu.hpp` | GPU Hardware Abstraction Layer for discrete accelerators |
 | `sigma_hal_driver_storage.hpp` | Unified Storage HAL for NVMe, SATA, and eMMC interfaces |
+| `sigma_hal_driver_network.hpp` | Universal Network HAL for Ethernet, Wi-Fi, and 5G modems |
 | `sigma_hal_drivers.hpp` | OOP NVMe + USB HID drivers (ISigmaDriver) |
 | `dma_controller.cpp` | DMA ring management |
 | `hal_registry.c` | Driver probe + registration |
@@ -143,10 +144,13 @@
 
 ---
 
-## S27_ContainerLattice — Container Isolation (`suites/S27_ContainerLattice/`)
+## S27_ContainerLattice — Container Isolation & Virtualisation (`suites/S27_ContainerLattice/`)
 
 | Module File | Responsibility |
 |-------------|----------------|
+| `sigma_virt_core.hpp` | Hypervisor abstraction layer natively mapping to VT-x/AMD-V |
+| `sigma_virt_vm.hpp` | OOP Virtual Machine orchestration via Guest EPT isolation |
+| `sigma_virt_container.hpp` | Lightweight capability-based container runtime (Docker killer) |
 | `sigma_cgroup.h` | CPU/mem/IO resource group — O(1) admission control |
 
 ---
@@ -285,17 +289,17 @@
 | Category | Count |
 |----------|-------|
 | S01_Genesis kernel headers | 27 |
-| S04_HAL hardware modules | 13 |
+| S04_HAL hardware modules | 14 |
 | S08_Security shards | 23 |
 | DevTools/Ecosystem/UI/Tools | 14 |
-| Container/Perf/NUMA | 7 |
+| Container/Virt/Perf/NUMA | 10 |
 | Storage/FS | 5 |
 | Networking | 12 |
 | Security (ZKP/Caps/BPF/PKG) | 6 |
 | Self-Healing & Boot | 12 |
 | IPC/AIO | 3 |
 | Core OOP atomic modules | 24 |
-| **Total Native Modules** | **146+** |
+| **Total Native Modules** | **150+** |
 
 ---
 
