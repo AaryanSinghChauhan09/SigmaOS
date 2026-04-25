@@ -14,6 +14,10 @@
 | `sigma_proc_pcb.h` | Process Control Block struct + table alloc/find/free |
 | `sigma_proc_spawn.h` | Process spawning — PCB init + x86 RIP jump |
 | `sigma_proc_kill.h` | Process termination + zombie reaping |
+| `sigma_proc_scheduler.hpp` | OOP Process Scheduler supporting class hierarchies |
+| `sigma_proc_fork.hpp` | Native process cloner and thread spawner |
+| `sigma_proc_signal.hpp` | OOP IPC Signal Dispatcher |
+| `sigma_proc_trace.hpp` | Process Tracer for debugging and introspection |
 | `sigma_mem_pool.h` | 64 MB static arena — alloc/free/used-KB |
 | `sigma_mem_audit.h` | Memory stats reporter + leak detector |
 | `sigma_net_core.h` | Ethernet frame primitives — header, payload, checksum, stats |
@@ -24,9 +28,9 @@
 | `sigma_libc_io.hpp` | Pluggable OOP I/O backend for kernel print routines |
 | `sigma_libc_syscall.hpp` | Direct inline assembly syscall invocation dispatcher |
 | `SovereignLibC.c` | Legacy monolith (partially modularised → see sigma_libc_*.hpp) |
-| `SovereignProcessManager.c` | Legacy monolith (partially modularised → see sigma_proc_*.h) |
+| `SovereignProcessManager.c` | Legacy monolith (partially modularised → see sigma_proc_*.h/hpp) |
 | `SovereignMemoryZenith.c` | Legacy monolith (partially modularised → see sigma_mem_*.h) |
-| `SovereignNetMesh.c` | Legacy monolith (partially modularised → see sigma_net_core.h) |
+| `SovereignNetMesh.c` | Legacy monolith (partially modularised → see sigma_netmesh_*.hpp) |
 | `SovereignShardKernel.c` | Shard kernel bootstrap |
 
 ---
@@ -78,6 +82,9 @@
 | `sigma_net_driver_wifi.hpp` | OOP Wi-Fi driver interface + AP scanning/auth abstraction |
 | `sigma_net_core_socket.h` | POSIX-like zero-copy socket API implementation |
 | `sigma_net_firewall.h` | O(N) stateless IP matching firewall rule engine |
+| `sigma_netmesh_routing.hpp` | OOP Mesh Router utilizing Optimized Link State Routing |
+| `sigma_netmesh_topology.hpp` | OOP Mesh Topology Discoverer via Layer 2 Heartbeats |
+| `sigma_netmesh_security.hpp` | Zero-Trust Mesh Security Enforcer utilizing ZKP caps |
 
 ---
 
@@ -252,18 +259,18 @@
 
 | Category | Count |
 |----------|-------|
-| S01_Genesis kernel headers | 21 |
+| S01_Genesis kernel headers | 25 |
 | S04_HAL hardware modules | 10 |
 | S08_Security shards | 18 |
 | DevTools/Ecosystem/UI/Tools | 12 |
 | Container/Perf/NUMA | 6 |
 | Storage/FS | 2 |
-| Networking | 9 |
+| Networking | 12 |
 | Security (ZKP/Caps/BPF/PKG) | 6 |
 | Self-Healing & Boot | 4 |
 | IPC/AIO | 2 |
 | Core OOP atomic modules | 24 |
-| **Total Native Modules** | **114+** |
+| **Total Native Modules** | **121+** |
 
 ---
 
