@@ -17,49 +17,82 @@ jobs:
     runs-on: ${{ matrix.os }}
 
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v4
 
-      - name: Purge Legacy Artifacts
+      - name: Purge Legacy Artifacts (Unix)
+        if: runner.os != 'Windows'
         run: |
-          rm -rf build/
-          rm -rf dist/
+          rm -rf build/ dist/
           mkdir -p build/
 
-      - name: Repair & Verify Build Environment
+      - name: Purge Legacy Artifacts (Windows)
+        if: runner.os == 'Windows'
         run: |
-          mkdir -p build || true
-          touch build/.gitkeep || true
-          g++ -std=c++20 orchestrator/main.cpp -o s-cli || g++ -std=c++20 orchestrator/main.cpp -o s-cli.exe
-          echo "[CI] Sovereign Environment Repaired"
+          if (Test-Path build/) { Remove-Item -Recurse -Force build/ }
+          if (Test-Path dist/) { Remove-Item -Recurse -Force dist/ }
+          New-Item -ItemType Directory -Force -Path build/ | Out-Null
 
-      - name: Switch to Sovereign Profile
+      - name: Build Sovereign Orchestrator (Unix)
+        if: runner.os != 'Windows'
         run: |
-          ./s-cli profile ${{ matrix.profile }} || .\s-cli.exe profile ${{ matrix.profile }}
+          g++ -std=c++20 orchestrator/main.cpp -o s-cli
+          echo "[CI] Sovereign Orchestrator built successfully."
 
-      - name: Build Sovereign Lattice (Modular)
+      - name: Build Sovereign Orchestrator (Windows)
+        if: runner.os == 'Windows'
         run: |
-          ./s-cli build x86_64 || .\s-cli.exe build x86_64
+          g++ -std=c++20 orchestrator/main.cpp -o s-cli.exe
+          Write-Output "[CI] Sovereign Orchestrator built successfully."
 
-      - name: Run Subsystem Regression Tests
+      - name: Switch to Sovereign Profile (Unix)
+        if: runner.os != 'Windows'
+        run: ./s-cli profile ${{ matrix.profile }}
+
+      - name: Switch to Sovereign Profile (Windows)
+        if: runner.os == 'Windows'
+        run: .\s-cli.exe profile ${{ matrix.profile }}
+
+      - name: Build Sovereign Lattice (Unix)
+        if: runner.os != 'Windows'
+        run: ./s-cli build x86_64
+
+      - name: Build Sovereign Lattice (Windows)
+        if: runner.os == 'Windows'
+        run: .\s-cli.exe build x86_64
+
+      - name: Run Subsystem Regression Tests (Unix)
+        if: runner.os != 'Windows'
         run: |
           echo "Running Kernel Tests..."
           ./s-cli test --subsystem genesis
           echo "Running HAL Driver Tests..."
           ./s-cli test --subsystem hal
-          echo "Running Userland Utilities Tests (sigma-fm, sigma-editor)..."
+          echo "Running Userland Tests..."
           ./s-cli test --subsystem userland
 
-      - name: Security & Performance Benchmarks
+      - name: Run Subsystem Regression Tests (Windows)
+        if: runner.os == 'Windows'
         run: |
-          ./s-cli benchmark --run-all
+          Write-Output "Running Kernel Tests..."
+          .\s-cli.exe test --subsystem genesis
+          Write-Output "Running HAL Driver Tests..."
+          .\s-cli.exe test --subsystem hal
+          Write-Output "Running Userland Tests..."
+          .\s-cli.exe test --subsystem userland
+
+      - name: Security & Performance Benchmarks (Unix)
+        if: runner.os != 'Windows'
+        run: ./s-cli benchmark --run-all
+
+      - name: Security & Performance Benchmarks (Windows)
+        if: runner.os == 'Windows'
+        run: .\s-cli.exe benchmark --run-all
 
       - name: Upload Kernel Binary & Logs
         if: always()
-        uses: actions/upload-artifact@v7
+        uses: actions/upload-artifact@v4
         with:
           name: sigmaos-${{ matrix.profile }}-${{ matrix.os }}
           path: |
             build/
-            *.log
           retention-days: 7
-
