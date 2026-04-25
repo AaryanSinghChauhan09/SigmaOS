@@ -67,6 +67,10 @@
 | `sigma_net_tcp.h` | lwIP-inspired lightweight TCP stack (zero heap allocation) |
 | `sigma_net_vpn.h` | WireGuard-inspired sovereign VPN tunnel (ZKP handshake) |
 | `sigma_net_dns.h` | Unbound-inspired DNS resolver (DNSSEC-aware, TTL expiry) |
+| `sigma_net_driver_ethernet.hpp` | OOP Ethernet driver base class + DMA inline ASM hooks |
+| `sigma_net_driver_wifi.hpp` | OOP Wi-Fi driver interface + AP scanning/auth abstraction |
+| `sigma_net_core_socket.h` | POSIX-like zero-copy socket API implementation |
+| `sigma_net_firewall.h` | O(N) stateless IP matching firewall rule engine |
 
 ---
 
@@ -78,6 +82,9 @@
 | `sigma_zero_trust.c` | Per-request capability verification |
 | `sigma_sec_tpm.h` | TPM 2.0-inspired PCR banks + attestation (zero tpm2-tools) |
 | `sigma_sec_mac.h` | SELinux-inspired mandatory access control policy table |
+| `sigma_sec_crypto_quantum.h` | Quantum-safe primitives via Montgomery Reduction ASM |
+| `sigma_sec_audit.h` | Automated silicon-level security event logger |
+| `sigma_sec_sandbox.h` | Capability-based app isolation container (IProcess wrapper) |
 | `pqc_core.c` | PQC key generation core |
 | `audit_master.c` | Silicon-level security event logger |
 | `shard_isolation.c` | Process shard isolation enforcer |
@@ -236,16 +243,16 @@
 |----------|-------|
 | S01_Genesis kernel headers | 17 |
 | S04_HAL hardware modules | 10 |
-| S08_Security shards | 12 |
+| S08_Security shards | 15 |
 | DevTools/Ecosystem/UI/Tools | 9 |
 | Container/Perf/NUMA | 5 |
 | Storage/FS | 2 |
-| Networking | 5 |
+| Networking | 9 |
 | Security (ZKP/Caps/BPF/PKG) | 6 |
 | Self-Healing & Boot | 4 |
 | IPC/AIO | 2 |
 | Core OOP atomic modules | 24 |
-| **Total Native Modules** | **96+** |
+| **Total Native Modules** | **103+** |
 
 ---
 
