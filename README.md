@@ -46,18 +46,23 @@ SigmaOS v1 is the first stable release of the sovereign, bare‑metal operating 
 - Minimalist mode for focus and speed.
 - AI‑driven personalization via Sigma Assistant.
 
-## 💻 Command Line Interface (CLI)
+## 💻 CLI Mastery & Namespace Design
+Instead of flat commands, SigmaOS utilizes a highly scalable, modular namespace system to prevent bloat while maximizing control:
+- **`s-assist`**: AI assistant functions (`status`, `suggest`, `optimize`, `explain`).
+- **`s-profile`**: Personalization management (`switch`, `create`, `delete`).
+- **`s-net`**: Networking modules (`secure`, `connect`, `scan`, `vpn`).
+- **`s-deps`**: Dependency & library control (`prune`, `reduce`, `tree`).
+- **`s-perf`**: Performance tuning (`boost`, `monitor`, `isolate`, `cache`).
+- **`s-sys`**: Core system utilities (`update`, `rollback`, `snapshot`).
+
+### Example Usage:
 ```bash
 s-assist status          # System health dashboard
-s-assist suggest         # AI recommendations
-s-profile switch work    # Instant profile swap
+s-profile switch work    # Auto-switch to work profile
 s-net secure             # Enable zero‑trust networking
-s-media codecs list      # Manage codecs
-s-rollback last          # Revert snapshot
-s-assist optimize <task> # Auto‑tune system
-s-assist explain         # Transparency on AI suggestions
 s-deps prune             # Remove unused dependencies
-s-perf boost             # Maximize performance temporarily
+s-perf cache adaptive    # Enable adaptive caching
+s-sys rollback last      # Revert to stable snapshot
 ```
 
 ## ⚡ Ease of Use & Performance
