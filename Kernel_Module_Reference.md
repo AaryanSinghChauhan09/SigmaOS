@@ -46,6 +46,7 @@
 | `sigma_ui_theme_loader.h` | Binary theme loader for instant zero-copy UI theme switching |
 | `sigma_ui_profile_switcher.h` | UI profile switcher for toggling Work, Gaming, VR modes |
 | `sigma_os_adaptive_profile.hpp` | Profile-driven sovereignty encapsulating settings per user |
+| `sigma_ui_shader_holographic.hpp` | Holographic transparency and adaptive blur physics shaders |
 
 ---
 
@@ -205,6 +206,9 @@
 
 | Module File | Responsibility |
 |-------------|----------------|
+| `sigma_boot_init.hpp` | Sovereign Bootloader native long-mode transition |
+| `sigma_boot_securecheck.hpp` | Post-quantum boot image signature verification |
+| `sigma_boot_driverload.hpp` | Native PCI bus scanning and driver injection engine |
 | `sigma_auto_watchdog.hpp` | OOP Self-healing daemon integrating with ICallback |
 | `sigma_auto_rollback.hpp` | OOP Rollback automation logic triggering CPU IDT faults |
 | `sigma_auto_update.hpp` | OOP Seamless update engine managing A/B boot slots |
@@ -272,15 +276,15 @@
 | S01_Genesis kernel headers | 27 |
 | S04_HAL hardware modules | 10 |
 | S08_Security shards | 19 |
-| DevTools/Ecosystem/UI/Tools | 13 |
+| DevTools/Ecosystem/UI/Tools | 14 |
 | Container/Perf/NUMA | 7 |
 | Storage/FS | 2 |
 | Networking | 12 |
 | Security (ZKP/Caps/BPF/PKG) | 6 |
-| Self-Healing & Boot | 8 |
+| Self-Healing & Boot | 11 |
 | IPC/AIO | 3 |
 | Core OOP atomic modules | 24 |
-| **Total Native Modules** | **131+** |
+| **Total Native Modules** | **135+** |
 
 ---
 
