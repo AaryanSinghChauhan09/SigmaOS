@@ -47,6 +47,9 @@ void media_list_codecs();
 void* auto_init();
 void auto_run_all(void* ptr);
 void auto_trigger_rollback();
+void auto_watchdog_start(const char* shard_name);
+void auto_watchdog_status();
+void auto_patch_nightly();
 
 #ifdef __cplusplus
 }

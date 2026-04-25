@@ -16,6 +16,9 @@ try:
     _native_auto.auto_init.restype = ctypes.c_void_p
     _native_auto.auto_run_all.argtypes = [ctypes.c_void_p]
     _native_auto.auto_trigger_rollback.restype = None
+    _native_auto.auto_watchdog_start.argtypes = [ctypes.c_char_p]
+    _native_auto.auto_watchdog_status.restype = None
+    _native_auto.auto_patch_nightly.restype = None
     NATIVE_AUTO_AVAILABLE = True
 except OSError:
     print("[Warning] Native Automation Core not found. Falling back to Python stubs.")
@@ -38,6 +41,24 @@ class NativeAutomatorWrapper:
             _native_auto.auto_trigger_rollback()
         else:
             print("[Auto-Stub] Triggering high-level rollback.")
+
+    def monitor(self, shard: str):
+        if NATIVE_AUTO_AVAILABLE:
+            _native_auto.auto_watchdog_start(shard.encode('utf-8'))
+        else:
+            print(f"[Auto-Stub] Monitoring shard: {shard}")
+
+    def status(self):
+        if NATIVE_AUTO_AVAILABLE:
+            _native_auto.auto_watchdog_status()
+        else:
+            print("[Auto-Stub] Checking automation status...")
+
+    def patch(self):
+        if NATIVE_AUTO_AVAILABLE:
+            _native_auto.auto_patch_nightly()
+        else:
+            print("[Auto-Stub] Running nightly patch...")
 
 # Canonical Native Automator
 sigma_native_auto = NativeAutomatorWrapper()

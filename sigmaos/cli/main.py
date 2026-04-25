@@ -31,7 +31,8 @@ class SigmaCLI:
 
     def _setup_auto(self):
         parser_auto = self.subparsers.add_parser('s-auto', help="Automation Engine")
-        parser_auto.add_argument("action", choices=["backup", "prune", "monitor", "rollback", "update"])
+        parser_auto.add_argument("action", choices=["backup", "prune", "monitor", "rollback", "update", "status", "patch"])
+        parser_auto.add_argument("--shard", type=str, help="Target shard for monitoring")
 
     def _setup_sec(self):
         parser_sec = self.subparsers.add_parser('s-sec', help="Security Subsystem")
