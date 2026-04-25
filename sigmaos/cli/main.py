@@ -57,7 +57,7 @@ class SigmaCLI:
 
     def _setup_ui(self):
         parser_ui = self.subparsers.add_parser('s-ui', help="Morphic UI Control")
-        parser_ui.add_argument("action", choices=["morph", "demo", "shader"])
+        parser_ui.add_argument("action", choices=["morph", "demo", "shader", "adaptive"])
         parser_ui.add_argument("--profile", type=str, help="UI profile (work|gaming|vr)")
         parser_ui.add_argument("--effect", type=str, help="Shader effect (blur|transparency)")
         parser_ui.add_argument("--enable", action="store_true", help="Enable effect")
