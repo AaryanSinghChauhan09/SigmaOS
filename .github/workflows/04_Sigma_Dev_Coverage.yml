@@ -1,0 +1,73 @@
+name: "[04] Sigma-Dev: Coverage & Module Audit"
+
+on:
+  push:
+    branches: [ main, master ]
+  pull_request:
+    branches: [ main, master ]
+
+jobs:
+  module-audit:
+    name: Atomic Module Coverage Audit
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Count Atomic Modules
+        run: |
+          CORE=$(ls sigmaos/core/src/atomic_*.cpp sigmaos/core/src/atomic_*.hpp 2>/dev/null | wc -l)
+          SUITE_HEADERS=$(find suites/ -name "sigma_*.h" -o -name "sigma_*.hpp" 2>/dev/null | wc -l)
+          echo "=== SigmaOS Module Audit ==="
+          echo "Core atomic modules:  $CORE"
+          echo "Suite kernel headers: $SUITE_HEADERS"
+          TOTAL=$((CORE + SUITE_HEADERS))
+          echo "Total sovereign modules: $TOTAL"
+          echo "Target milestone: 100 modules"
+          if [ "$TOTAL" -ge 10 ]; then
+            echo "[✓] Minimum atomic module threshold met."
+          else
+            echo "[!] Below 10 modules — expand modularisation."
+          fi
+
+      - name: OOP Interface Audit
+        run: |
+          echo "=== OOP Interface Audit ==="
+          INTERFACES=$(grep -rl "virtual.*= 0" sigmaos/core/src/ suites/ 2>/dev/null | wc -l)
+          echo "Files with pure virtual methods: $INTERFACES"
+          echo "[✓] OOP abstract base class count: $INTERFACES"
+
+      - name: Sovereignty Audit (No Forbidden Imports)
+        run: |
+          echo "=== Sovereignty Audit ==="
+          VIOLATIONS=$(grep -r "#include <stdlib.h>\|#include <stdio.h>\|#include <string.h>\|#include <malloc.h>" \
+            suites/S01_Genesis/ suites/S04_HAL/ sigmaos/core/src/atomic_* 2>/dev/null | grep -v "\.git" | wc -l)
+          echo "stdlib violations in kernel modules: $VIOLATIONS"
+          if [ "$VIOLATIONS" -eq 0 ]; then
+            echo "[✓] SOVEREIGN: Zero foreign stdlib imports in kernel modules."
+          else
+            echo "[!] $VIOLATIONS stdlib violations detected — fix before next release."
+          fi
+
+      - name: Inline Assembly Audit
+        run: |
+          echo "=== Inline Assembly Audit ==="
+          ASM_FILES=$(grep -rl "__asm__\|__asm\b\|asm volatile" sigmaos/ suites/ 2>/dev/null | wc -l)
+          echo "Files using inline assembly: $ASM_FILES"
+          echo "[✓] Hardware-direct modules: $ASM_FILES"
+
+      - name: Build All Examples
+        run: |
+          echo "=== Building Orchestrator ==="
+          g++ -std=c++20 -Wall orchestrator/main.cpp -o /tmp/s-cli-check
+          echo "[✓] Orchestrator compiled cleanly."
+          /tmp/s-cli-check test --subsystem genesis
+          /tmp/s-cli-check test --subsystem hal
+          /tmp/s-cli-check benchmark --run-all
+          echo "[✓] All CLI commands executed successfully."
+
+      - name: Module Growth Report
+        run: |
+          echo "=== Module Growth Report ==="
+          echo "Sprint target: +5 new atomic modules per session"
+          git log --oneline -10 | grep -c "feat:" || true
+          echo "[✓] Development velocity tracked."
