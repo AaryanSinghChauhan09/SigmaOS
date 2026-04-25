@@ -16,6 +16,15 @@ void ui_render_frame();
 void ui_set_morph_profile(const char* profile);
 void ui_toggle_shader(const char* effect, int enabled);
 
+// Vector Memory Signatures
+void mem_store(const char* intent, const char* vector_json);
+void mem_query(const char* intent_filter);
+void mem_prune(int days_old);
+
+// State Ledger Signatures
+void ledger_append(const char* transition_hash);
+void ledger_audit();
+
 // Scheduler Signatures
 void* scheduler_init();
 void scheduler_add_goal(void* ptr, const char* goal);
