@@ -16,6 +16,7 @@
 | `sigma_proc_kill.h` | Process termination + zombie reaping |
 | `sigma_proc_scheduler.hpp` | OOP Process Scheduler supporting class hierarchies |
 | `sigma_proc_scheduler_ai.hpp` | Adaptive AI Scheduler modulating CPU C-states by workload |
+| `sigma_rtos_deadline.hpp` | Hard Real-Time EDF Scheduler with microsecond guarantees |
 | `sigma_proc_fork.hpp` | Native process cloner and thread spawner |
 | `sigma_proc_signal.hpp` | OOP IPC Signal Dispatcher |
 | `sigma_proc_trace.hpp` | Process Tracer for debugging and introspection |
@@ -98,6 +99,7 @@
 | `sigma_pqc_keygen.h` | PQC Keypair generation |
 | `sigma_pqc_sign.h` | PQC FNV-1a backed cryptographically secure signature |
 | `sigma_pqc_verify.h` | PQC cryptographic verification |
+| `sigma_formal_proof.hpp` | Mathematical native Design-by-Contract invariant checker |
 | `sigma_zero_trust.c` | Per-request capability verification |
 | `sigma_sec_tpm.h` | TPM 2.0-inspired PCR banks + attestation (zero tpm2-tools) |
 | `sigma_sec_mac.h` | SELinux-inspired mandatory access control policy table |
@@ -150,6 +152,7 @@
 | `sigma_perf_profiler.h` | Linux perf-inspired RDTSC profiler zones |
 | `sigma_perf_shadow.h` | Valgrind-inspired shadow memory leak detector |
 | `sigma_perf_isolator.h` | Resource isolation dynamically restricting CPU freq and memory |
+| `sigma_os_behavior_adaptive.hpp` | Behavior-adaptive OS caching heuristics |
 
 ---
 
@@ -217,6 +220,7 @@
 
 | Module File | Responsibility |
 |-------------|----------------|
+| `sigma_ipc_channel.hpp` | Zircon-slayer capability-handle zero-copy asynchronous channel |
 | `sigma_ring_buffer.h` | Lock-free SPSC ring buffer |
 | `sigma_aio.h` | io_uring-inspired async I/O SQ/CQ ring |
 
@@ -265,18 +269,18 @@
 
 | Category | Count |
 |----------|-------|
-| S01_Genesis kernel headers | 26 |
+| S01_Genesis kernel headers | 27 |
 | S04_HAL hardware modules | 10 |
-| S08_Security shards | 18 |
+| S08_Security shards | 19 |
 | DevTools/Ecosystem/UI/Tools | 13 |
-| Container/Perf/NUMA | 6 |
+| Container/Perf/NUMA | 7 |
 | Storage/FS | 2 |
 | Networking | 12 |
 | Security (ZKP/Caps/BPF/PKG) | 6 |
 | Self-Healing & Boot | 8 |
-| IPC/AIO | 2 |
+| IPC/AIO | 3 |
 | Core OOP atomic modules | 24 |
-| **Total Native Modules** | **127+** |
+| **Total Native Modules** | **131+** |
 
 ---
 
