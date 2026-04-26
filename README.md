@@ -1,8 +1,28 @@
 # SigmaOS — The Sovereign Silicon Entity
 
+![Build Status](https://github.com/Sovereign-OS/SigmaOS/actions/workflows/01_Sovereign_Build.yml/badge.svg)
+![Test Coverage](https://github.com/Sovereign-OS/SigmaOS/actions/workflows/04_Sigma_Dev_Coverage.yml/badge.svg)
+![License](https://img.shields.io/badge/License-MIT-blue.svg)
+
 > **One OS. Zero Dependencies. Infinite Sovereignty.**
 
-SigmaOS is an industrial-grade, bare-metal operating system built entirely from atomic, zero-dependency C/C++ modules. Every subsystem — from memory allocation to security — is implemented in a single-function, hardware-native module with no reliance on high-level languages, pre-defined libraries, or external runtimes.
+SigmaOS is an industrial-grade, bare-metal operating system built entirely from atomic, zero-dependency C/C++ modules. Every subsystem — from memory allocation to security — is implemented in a single-function, hardware-native module.
+
+---
+
+## 🏗️ Architecture Overview
+
+SigmaOS utilizes a unique **Atomic Architecture**, where the system is decomposed into highly specialized, isolated shards.
+
+```mermaid
+graph TD;
+    Hardware-->HAL[S04_HAL: Hardware Abstraction Layer];
+    HAL-->KernelCore[S01_Genesis: Memory, VMM, Scheduler];
+    KernelCore-->Security[S08_Security: Capability Access Control];
+    KernelCore-->IPC[S42_RawIPC: Lock-Free Ring Buffers];
+    Security-->Userland[Sovereign Userland];
+    IPC-->Userland;
+```
 
 ---
 
@@ -44,6 +64,8 @@ Every OS capability lives in a self-contained C/C++ file. No monoliths. No casca
 - **Adaptive Windowing Engine** — GPU profiles: Work / Gaming / VR
 - **Fragment Shader Shards** — each visual effect is its own atomic module
 - **CLI-driven**: `s-cli profile gaming` morphs the UI in real time
+
+*(Note: See the `web_ui/` directory for a WebGL-based demonstration of the Morphic interface concepts).*
 
 ---
 
@@ -121,6 +143,8 @@ SigmaOS/
 
 ## 🏗️ Build & Test
 
+For detailed build instructions across different architectures, please see the [Wiki Build Guide](WIKI/BuildGuide.md).
+
 ```bash
 # Build the CLI orchestrator
 g++ -std=c++20 orchestrator/main.cpp -o s-cli
@@ -133,6 +157,11 @@ g++ -std=c++20 orchestrator/main.cpp -o s-cli
 # Run full benchmark
 ./s-cli benchmark --run-all
 ```
+
+---
+
+## 📊 Benchmarks & Performance
+*(Coming Soon: Comparative benchmarks against seL4 and Linux bare-metal instances highlighting memory footprint, context switch times, and I/O latency).*
 
 ---
 
