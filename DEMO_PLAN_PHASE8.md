@@ -15,6 +15,7 @@ This document outlines the demonstration strategy for **Phase 8: Adaptive Intell
    - One-click handover of a shard from the desktop Morphic UI to a simulated "Mobile Node" in the cloud.
 
 ### Showcase Script
+
 - **Action**: Drag the 'Kernel Core' shard across the workspace.
 - **Visual**: A blue dashed ghost shard follows the cursor, snapping to grid boundaries ahead of the actual movement.
 - **Action**: Click the 'Handover' button.

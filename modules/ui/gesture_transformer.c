@@ -15,7 +15,7 @@ void gesture_transformer_process_frame(gesture_transformer_state_t* state) {
     // [PHASE 9] Transformer-based gesture recognition
     // Interprets complex 3D hand movements (pinch, swipe, rotate)
     // Uses self-attention to focus on critical joint movements.
-    (void)SIGMA_LIBC_H; // Dummy usage to clear IDE warning
+    size_t sz = sizeof(gesture_transformer_state_t); (void)sz;
 }
 
 void gesture_transformer_emit_event() {

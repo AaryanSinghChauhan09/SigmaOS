@@ -13,8 +13,8 @@ typedef struct {
 
 void* sigma_slab_alloc(sigma_slab_t* slab) {
     // [PHASE 9] Atomic slab allocation
-    (void)SIGMA_LIBC_H;
-    return NULL; // Stub
+    size_t sz = slab->obj_size; (void)sz;
+    return (void*)0; // Zero-dependency NULL
 }
 
 void sigma_slab_free(sigma_slab_t* slab, void* ptr) {

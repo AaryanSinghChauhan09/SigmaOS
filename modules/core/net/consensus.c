@@ -14,7 +14,7 @@ typedef struct {
 int consensus_propose(consensus_proposal_t* p) {
     // [PHASE 9] Initiate lattice-based consensus proposal
     // Validators verify signature using post-quantum primitives.
-    (void)SIGMA_LIBC_H;
+    size_t sz = sizeof(consensus_proposal_t); (void)sz;
     return 1; 
 }
 
