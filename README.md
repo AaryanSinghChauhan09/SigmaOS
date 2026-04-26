@@ -1,8 +1,10 @@
-# SigmaOS — The Sovereign Silicon Entity
+# 🌌 SigmaOS — The Sovereign Silicon Entity
 
-![Build Status](https://github.com/Sovereign-OS/SigmaOS/actions/workflows/01_Sovereign_Build.yml/badge.svg)
-![Test Coverage](https://github.com/Sovereign-OS/SigmaOS/actions/workflows/04_Sigma_Dev_Coverage.yml/badge.svg)
-![License](https://img.shields.io/badge/License-MIT-blue.svg)
+[![Sovereign Build](https://github.com/AaryanSinghChauhan09/SigmaOS/actions/workflows/01_Sovereign_Build.yml/badge.svg)](https://github.com/AaryanSinghChauhan09/SigmaOS/actions)
+[![License](https://img.shields.io/badge/License-MIT-blue.svg)](https://github.com/AaryanSinghChauhan09/SigmaOS/blob/main/LICENSE)
+
+**Repository:** [AaryanSinghChauhan09/SigmaOS](https://github.com/AaryanSinghChauhan09/SigmaOS)  
+**Wiki:** [SigmaOS Wiki](https://github.com/AaryanSinghChauhan09/SigmaOS/wiki)
 
 > **One OS. Zero Dependencies. Infinite Sovereignty.**
 
@@ -10,13 +12,23 @@ SigmaOS is an industrial-grade, bare-metal operating system built entirely from 
 
 ---
 
-## 🚧 Current Project Status: Building the Foundation
-*SigmaOS is currently in **Phase 1** of its [Roadmap](ROADMAP.md). We have established the visionary architecture and are actively building the core components needed to turn this into a fully performant OS.*
 
-- **Bootloader & Kernel Core**: In progress. Initial memory allocation (Slab) and round-robin scheduling exist in the `genesis` module, but are being stabilized for multi-core.
-- **Hardware Drivers (HAL)**: Currently under active development. Foundational abstractions exist, but concrete drivers (Keyboard, Display, Storage, Network) are missing.
-- **Networking & File System**: Planned for Phase 2. There is currently no native TCP/IP stack or persistent file system.
-- **Security & Isolation**: The architecture defines capability-based access and zero-trust sandboxing, but these are pending formal verification and implementation.
+
+
+## 🚧 Current Project Status: User Experience Maturity
+
+*SigmaOS is currently in **Phase 4** of its [Roadmap](ROADMAP.md). We have matured the core architecture and are now focusing on the Morphic UI, advanced CLI tools, and bare-metal distribution.*
+
+
+
+- **Bootloader & Kernel Core**: Advanced features are implemented including a Priority-Based Preemptive Scheduler (`priority_scheduler.c`), Virtual Memory Management with paging (`vmm.c`), and an ELF Binary Loader (`elf_loader.c`) for POSIX compatibility.
+- **Hardware Drivers (HAL)**: Essential hardware interfaces are implemented. This includes PCI bus enumeration (`pci.c`), Universal Serial Bus controllers (`usb.c`), Wi-Fi 802.11 stubs (`wifi.c`), Intel HDA Audio (`audio.c`), and basic GPU Kernel Mode Setting (`gpu.c`).
+- **Networking & TCP/IP Stack**: A modular TCP/IP Networking Stack is active. It features ARP resolution, ICMP Ping (`icmp.c`), and a Shard-Level Socket API with an integrated firewall (`socket.c`).
+- **Security & Isolation**: The cornerstone of SigmaOS — Shard Isolation & Sandboxing (`shard_isolation.c`) — is complete. It enforces memory boundaries via Virtual Memory namespaces, and strictly mediates all IPC and networking via Capability Tokens. Cryptography primitives (`crypto.c`) including AES/TLS stubs are also integrated.
+- **Performance & Profiling**: To validate performance supremacy, SigmaOS features built-in RDTSC-powered System Profiling (`profiler.c`) to measure context-switch latency, page faults, and IPC throughput via microbenchmark suites.
+- **Virtualization & Cloud-Native**: The native lightweight hypervisor, `SigmaVM` (`sigmavm.c`), manages guest OS lifecycles (create, start, stop, snapshot) leveraging VMX extensions, accompanied by a KVM/Xen API compatibility hook.
+- **User Experience**: A native CLI shell (`shell.c`) is available alongside an expanded CLI orchestrator featuring a fully-fledged package manager (`pkg`) and hypervisor initialization (`hypervisor`).
+- **CI/CD Automation**: Fully automated pipelines for cross-compilation (x86, ARM, RISC-V), bootable ISO generation, security scanning (cppcheck, race condition checks), and automated Doxygen API documentation are live.
 
 ---
 
@@ -39,16 +51,17 @@ graph TD;
 ## 🧬 Unique Selling Points (USPs)
 
 ### ⚛️ Atomic Architecture — One Module = One Function
+
 Every OS capability lives in a self-contained C/C++ file. No monoliths. No cascading failures. Each shard can be independently compiled, tested, upgraded, or replaced without touching anything else.
 
-| Module | Responsibility |
-|--------|----------------|
-| `sigma_slab_alloc.h` | O(1) kernel slab allocator — no malloc, no runtime |
-| `sigma_spinlock.h` | x86 XCHG-based spinlock via inline assembly |
-| `sigma_ring_buffer.h` | Lock-free SPSC ring for IPC / DMA events |
-| `sigma_vmm.h` | 2-level page table VMM — map, unmap, translate |
-| `sigma_scheduler.h` | RDTSC-timed round-robin task scheduler |
-| `sigma_caps.h` | Zero-trust capability tokens — mint, check, revoke |
+| Module                | Responsibility                                   |
+| --------------------- | ------------------------------------------------ |
+| `sigma_slab_alloc.h`  | O(1) kernel slab allocator — no malloc, no runtime |
+| `sigma_spinlock.h`    | x86 XCHG-based spinlock via inline assembly        |
+| `sigma_ring_buffer.h` | Lock-free SPSC ring for IPC / DMA events         |
+| `sigma_vmm.h`         | 2-level page table VMM — map, unmap, translate   |
+| `sigma_scheduler.h`   | RDTSC-timed round-robin task scheduler             |
+| `sigma_caps.h`        | Zero-trust capability tokens — mint, check, revoke |
 
 ---
 
@@ -61,6 +74,7 @@ Every OS capability lives in a self-contained C/C++ file. No monoliths. No casca
 ---
 
 ### 🔐 Native Security Shards
+
 - **Quantum-Safe Cryptography** (`sigma_pqc.c`) — Kyber/Dilithium primitives
 - **Zero-Trust Capability System** — every process access is token-gated
 - **Adaptive Firewall** — native packet filtering with zero-copy DMA
@@ -69,17 +83,25 @@ Every OS capability lives in a self-contained C/C++ file. No monoliths. No casca
 
 ---
 
-### 🎨 Morphic UI — GPU-Accelerated, No Browser
-- **Vulkan Compute Shaders** — blur, glass, morph, flux effects
-- **Adaptive Windowing Engine** — GPU profiles: Work / Gaming / VR
+### 🎨 Morphic UI — WebGL Hardware Acceleration
+- **Vulkan/WebGL Shaders** — blur, glass, morph, flux effects
+- **Adaptive Windowing Engine** — Shards act as dynamic, draggable tiles.
 - **Fragment Shader Shards** — each visual effect is its own atomic module
 - **CLI-driven**: `s-cli profile gaming` morphs the UI in real time
 
-*(Note: See the `web_ui/` directory for a WebGL-based demonstration of the Morphic interface concepts).*
+**Morphic UI Visual Demonstration:**
+*(The glassmorphism shard interaction showcasing decoupled kernel panels).*
+
+![Morphic Desktop Environment](file:///C:/Users/Aaryan/.gemini/antigravity/brain/502f7a0a-05af-46d2-914a-22b191ff5328/morphic_ui_desktop_1777186491571.png)
+
+![Shard Interaction](file:///C:/Users/Aaryan/.gemini/antigravity/brain/502f7a0a-05af-46d2-914a-22b191ff5328/morphic_ui_shard_interaction_1777186541846.png)
+
+*(Note: You can run the interactive WebGL/HTML window manager prototype locally by opening `web_ui/morphic_demo.html` in your browser).*
 
 ---
 
 ### ⚙️ Self-Healing Automations
+
 - `s-cli benchmark` — live performance telemetry via RDTSC inline ASM
 - `s-cli test --subsystem hal` — validates hardware drivers at the silicon level
 - Auto-rollback daemons detect crashes and restore last known good state
@@ -88,6 +110,7 @@ Every OS capability lives in a self-contained C/C++ file. No monoliths. No casca
 ---
 
 ### 🧩 OOP Hardware Abstraction Layer
+
 - `ISigmaModule` / `ISigmaDriver` abstract interfaces
 - Concrete drivers: **NVMe**, **USB HID**, **Ethernet NIC**, **IRQ Dispatcher**
 - Polymorphic dispatch — add any driver without modifying the HAL core
@@ -96,13 +119,14 @@ Every OS capability lives in a self-contained C/C++ file. No monoliths. No casca
 ---
 
 ### 🚀 Scaling to 1,000,000+ Tools
-| Source | Multiplier | Tools |
-|--------|-----------|-------|
-| 5,000 components × 20 utilities | 1× | 100,000 |
-| 1,000 high-level refactors × 20 | 1× | 20,000 |
-| 5,000 bugs fixed × 10 diagnostics | 1× | 50,000 |
-| Automation chains | 10× | 1,700,000+ |
-| Community contributions | ∞ | Exponential |
+
+| Source                            | Multiplier | Tools       |
+| --------------------------------- | ---------- | ----------- |
+| 5,000 components × 20 utilities   | 1×         | 100,000     |
+| 1,000 high-level refactors × 20   | 1×         | 20,000      |
+| 5,000 bugs fixed × 10 diagnostics | 1×         | 50,000      |
+| Automation chains                 | 10×        | 1,700,000+  |
+| Community contributions           | ∞          | Exponential |
 
 ---
 
@@ -115,15 +139,23 @@ s-cli test --subsystem <name>      Run regression tests for a subsystem
 s-cli benchmark --run-all          Full perf + security benchmark suite
 s-cli forge                        Generate a new silicon shard on-demand
 s-cli link                         Sync OS scheduler with bio-telemetry
+s-cli pkg <install|update>         Manage sovereign userland packages
+s-cli hypervisor                   Initialize lightweight KVM/Xen hypervisor
 ```
 
 ---
 
 ## 📁 Repository Structure
 
-```
 SigmaOS/
 ├── orchestrator/          # Native CLI (pure C++ OOP, zero deps)
+├── modules/
+│   ├── core/
+│   │   ├── kernel/        # Paging, Virtual Memory, IPC, Scheduling
+│   │   ├── drivers/       # PCI Bus, NIC Drivers
+│   │   ├── fs/            # VFS, Ext4, FAT32 Persistent Storage
+│   │   ├── net/           # TCP/IP Stack, Sockets
+│   │   └── security/      # User Authentication, Access Control
 ├── sigmaos/core/src/      # Atomic silicon modules (one fn/file)
 │   ├── atomic_*.cpp       # Bare-metal subsystem shards
 │   └── atomic_*.hpp       # OOP interfaces & abstract drivers
@@ -133,21 +165,20 @@ SigmaOS/
 │   ├── S08_Security/      # PQC, zero-trust, audit, sandbox
 │   ├── S42_RawIPC/        # Lock-free ring buffer, IPC primitives
 │   └── S43_SovereignCaps/ # Capability token system
-└── .github/workflows/     # CI: cross-platform build, lint, fuzzing
-```
+└── .github/workflows/     # CI: Cross-arch build, ISO Gen, Security Scans, Docs Gen
 
 ---
 
 ## ⚡ Why SigmaOS?
 
-| Feature | SigmaOS | Traditional OS |
-|---------|---------|---------------|
-| Memory allocator | Custom Slab (O(1)) | glibc malloc (non-deterministic) |
-| Sync primitive | Inline ASM XCHG spinlock | POSIX pthread_mutex |
-| Security model | Capability tokens + PQC | ACL + legacy crypto |
-| UI rendering | Vulkan native shaders | X11 / Wayland compositor |
-| Dependency count | **0 external** | Thousands |
-| Module granularity | **1 function = 1 file** | Monolithic subsystems |
+| Feature            | SigmaOS                 | Traditional OS                 |
+| ------------------ | ----------------------- | ------------------------------ |
+| Memory allocator   | Custom Slab (O(1))      | glibc malloc (non-deterministic) |
+| Sync primitive     | Inline ASM XCHG spinlock| POSIX pthread_mutex            |
+| Security model     | Capability tokens + PQC | ACL + legacy crypto            |
+| UI rendering       | Vulkan native shaders   | X11 / Wayland compositor       |
+| Dependency count   | **0 external**          | Thousands                      |
+| Module granularity | **1 function = 1 file** | Monolithic subsystems          |
 
 ---
 

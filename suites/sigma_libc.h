@@ -2,6 +2,17 @@
 #ifndef SIGMA_LIBC_H
 #define SIGMA_LIBC_H
 #include "sigma_kernel_types.h"
+
+// Standard integer equivalents for Sovereign Silicon
+typedef unsigned char      uint8_t;
+typedef unsigned short     uint16_t;
+typedef unsigned int       uint32_t;
+typedef unsigned long long uint64_t;
+
+// Standard string functions shim
+char* strncpy(char* dest, const char* src, sigma_size_t n);
+int   strncmp(const char* s1, const char* s2, sigma_size_t n);
+int   strcmp(const char* s1, const char* s2);
 void          sigma_exit(int code);
 sigma_ssize_t sigma_write(int fd, const void* buf, sigma_size_t count);
 sigma_ssize_t sigma_read(int fd, void* buf, sigma_size_t count);
