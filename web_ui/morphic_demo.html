@@ -56,7 +56,7 @@
             display: flex;
             flex-direction: column;
             overflow: hidden;
-            transition: opacity 0.3s ease, box-shadow 0.3s ease, transform 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            transition: all 0.6s cubic-bezier(0.19, 1, 0.22, 1);
             box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
             cursor: default;
         }
@@ -341,6 +341,7 @@
         <button onclick="spawnShard()">+ Spawn Shard</button>
         <button onclick="arrangeGrid()">Arrange Grid</button>
         <button onclick="tileShards()">Tile All</button>
+        <button onclick="applyMosaic()">Mosaic Layout</button>
         <div style="color: rgba(255,255,255,0.5); display: flex; align-items: center; padding-left: 10px; border-left: 1px solid rgba(255,255,255,0.2);">
             SigmaOS Morphic UI Demo
         </div>
@@ -572,6 +573,32 @@
             });
         }
 
+        function applyMosaic() {
+            const shards = document.querySelectorAll('.shard');
+            const count = shards.length;
+            if (count === 0) return;
+
+            const cols = Math.ceil(Math.sqrt(count));
+            const rows = Math.ceil(count / cols);
+            
+            const padding = 20;
+            const availableWidth = window.innerWidth - (padding * (cols + 1));
+            const availableHeight = window.innerHeight - (padding * (rows + 1)) - 60;
+            
+            const shardWidth = availableWidth / cols;
+            const shardHeight = availableHeight / rows;
+
+            shards.forEach((shard, index) => {
+                const r = Math.floor(index / cols);
+                const c = index % cols;
+                
+                shard.style.left = snap(padding + c * (shardWidth + padding)) + 'px';
+                shard.style.top = snap(padding + r * (shardHeight + padding)) + 'px';
+                shard.style.width = snap(shardWidth) + 'px';
+                shard.style.height = snap(shardHeight) + 'px';
+            });
+        }
+
         function arrangeGrid() {
             const shards = document.querySelectorAll('.shard');
             let x = 50, y = 50;
@@ -583,8 +610,7 @@
                 if (x > window.innerWidth - 300) {
                     x = 50;
                     y += parseInt(shard.style.height) + 30 || 200;
-                }
-                setTimeout(() => { shard.style.transition = 'transform 0.2s cubic-bezier(0.2, 0.8, 0.2, 1), box-shadow 0.2s'; }, 500);
+                setTimeout(() => { shard.style.transition = 'all 0.5s ease-out'; }, 500);
             });
         }
 
