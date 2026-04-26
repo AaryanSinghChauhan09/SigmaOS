@@ -1,0 +1,457 @@
+﻿[
+    {
+        "directory":  "c:\\Users\\Aaryan\\.gemini\\antigravity\\scratch\\SigmaOS",
+        "file":  "C:\\Users\\Aaryan\\.gemini\\antigravity\\scratch\\SigmaOS\\modules\\cloud\\kube_shard.c",
+        "command":  "gcc -Imodules/core/include -I. -ffreestanding -nostdlib -c C:\\Users\\Aaryan\\.gemini\\antigravity\\scratch\\SigmaOS\\modules\\cloud\\kube_shard.c -o C:\\Users\\Aaryan\\.gemini\\antigravity\\scratch\\SigmaOS\\modules\\cloud\\kube_shard.c.o"
+    },
+    {
+        "directory":  "c:\\Users\\Aaryan\\.gemini\\antigravity\\scratch\\SigmaOS",
+        "file":  "C:\\Users\\Aaryan\\.gemini\\antigravity\\scratch\\SigmaOS\\modules\\core\\arch\\aarch64\\boot.c",
+        "command":  "gcc -Imodules/core/include -I. -ffreestanding -nostdlib -c C:\\Users\\Aaryan\\.gemini\\antigravity\\scratch\\SigmaOS\\modules\\core\\arch\\aarch64\\boot.c -o C:\\Users\\Aaryan\\.gemini\\antigravity\\scratch\\SigmaOS\\modules\\core\\arch\\aarch64\\boot.c.o"
+    },
+    {
+        "directory":  "c:\\Users\\Aaryan\\.gemini\\antigravity\\scratch\\SigmaOS",
+        "file":  "C:\\Users\\Aaryan\\.gemini\\antigravity\\scratch\\SigmaOS\\modules\\core\\arch\\riscv64\\boot.c",
+        "command":  "gcc -Imodules/core/include -I. -ffreestanding -nostdlib -c C:\\Users\\Aaryan\\.gemini\\antigravity\\scratch\\SigmaOS\\modules\\core\\arch\\riscv64\\boot.c -o C:\\Users\\Aaryan\\.gemini\\antigravity\\scratch\\SigmaOS\\modules\\core\\arch\\riscv64\\boot.c.o"
+    },
+    {
+        "directory":  "c:\\Users\\Aaryan\\.gemini\\antigravity\\scratch\\SigmaOS",
+        "file":  "C:\\Users\\Aaryan\\.gemini\\antigravity\\scratch\\SigmaOS\\modules\\core\\arch\\riscv64\\plic.c",
+        "command":  "gcc -Imodules/core/include -I. -ffreestanding -nostdlib -c C:\\Users\\Aaryan\\.gemini\\antigravity\\scratch\\SigmaOS\\modules\\core\\arch\\riscv64\\plic.c -o C:\\Users\\Aaryan\\.gemini\\antigravity\\scratch\\SigmaOS\\modules\\core\\arch\\riscv64\\plic.c.o"
+    },
+    {
+        "directory":  "c:\\Users\\Aaryan\\.gemini\\antigravity\\scratch\\SigmaOS",
+        "file":  "C:\\Users\\Aaryan\\.gemini\\antigravity\\scratch\\SigmaOS\\modules\\core\\boot\\bootloader.c",
+        "command":  "gcc -Imodules/core/include -I. -ffreestanding -nostdlib -c C:\\Users\\Aaryan\\.gemini\\antigravity\\scratch\\SigmaOS\\modules\\core\\boot\\bootloader.c -o C:\\Users\\Aaryan\\.gemini\\antigravity\\scratch\\SigmaOS\\modules\\core\\boot\\bootloader.c.o"
+    },
+    {
+        "directory":  "c:\\Users\\Aaryan\\.gemini\\antigravity\\scratch\\SigmaOS",
+        "file":  "C:\\Users\\Aaryan\\.gemini\\antigravity\\scratch\\SigmaOS\\modules\\core\\boot\\installer.c",
+        "command":  "gcc -Imodules/core/include -I. -ffreestanding -nostdlib -c C:\\Users\\Aaryan\\.gemini\\antigravity\\scratch\\SigmaOS\\modules\\core\\boot\\installer.c -o C:\\Users\\Aaryan\\.gemini\\antigravity\\scratch\\SigmaOS\\modules\\core\\boot\\installer.c.o"
+    },
+    {
+        "directory":  "c:\\Users\\Aaryan\\.gemini\\antigravity\\scratch\\SigmaOS",
+        "file":  "C:\\Users\\Aaryan\\.gemini\\antigravity\\scratch\\SigmaOS\\modules\\core\\boot\\sovereign_boot.c",
+        "command":  "gcc -Imodules/core/include -I. -ffreestanding -nostdlib -c C:\\Users\\Aaryan\\.gemini\\antigravity\\scratch\\SigmaOS\\modules\\core\\boot\\sovereign_boot.c -o C:\\Users\\Aaryan\\.gemini\\antigravity\\scratch\\SigmaOS\\modules\\core\\boot\\sovereign_boot.c.o"
+    },
+    {
+        "directory":  "c:\\Users\\Aaryan\\.gemini\\antigravity\\scratch\\SigmaOS",
+        "file":  "C:\\Users\\Aaryan\\.gemini\\antigravity\\scratch\\SigmaOS\\modules\\core\\drivers\\audio.c",
+        "command":  "gcc -Imodules/core/include -I. -ffreestanding -nostdlib -c C:\\Users\\Aaryan\\.gemini\\antigravity\\scratch\\SigmaOS\\modules\\core\\drivers\\audio.c -o C:\\Users\\Aaryan\\.gemini\\antigravity\\scratch\\SigmaOS\\modules\\core\\drivers\\audio.c.o"
+    },
+    {
+        "directory":  "c:\\Users\\Aaryan\\.gemini\\antigravity\\scratch\\SigmaOS",
+        "file":  "C:\\Users\\Aaryan\\.gemini\\antigravity\\scratch\\SigmaOS\\modules\\core\\drivers\\gpu.c",
+        "command":  "gcc -Imodules/core/include -I. -ffreestanding -nostdlib -c C:\\Users\\Aaryan\\.gemini\\antigravity\\scratch\\SigmaOS\\modules\\core\\drivers\\gpu.c -o C:\\Users\\Aaryan\\.gemini\\antigravity\\scratch\\SigmaOS\\modules\\core\\drivers\\gpu.c.o"
+    },
+    {
+        "directory":  "c:\\Users\\Aaryan\\.gemini\\antigravity\\scratch\\SigmaOS",
+        "file":  "C:\\Users\\Aaryan\\.gemini\\antigravity\\scratch\\SigmaOS\\modules\\core\\drivers\\pci.c",
+        "command":  "gcc -Imodules/core/include -I. -ffreestanding -nostdlib -c C:\\Users\\Aaryan\\.gemini\\antigravity\\scratch\\SigmaOS\\modules\\core\\drivers\\pci.c -o C:\\Users\\Aaryan\\.gemini\\antigravity\\scratch\\SigmaOS\\modules\\core\\drivers\\pci.c.o"
+    },
+    {
+        "directory":  "c:\\Users\\Aaryan\\.gemini\\antigravity\\scratch\\SigmaOS",
+        "file":  "C:\\Users\\Aaryan\\.gemini\\antigravity\\scratch\\SigmaOS\\modules\\core\\drivers\\usb.c",
+        "command":  "gcc -Imodules/core/include -I. -ffreestanding -nostdlib -c C:\\Users\\Aaryan\\.gemini\\antigravity\\scratch\\SigmaOS\\modules\\core\\drivers\\usb.c -o C:\\Users\\Aaryan\\.gemini\\antigravity\\scratch\\SigmaOS\\modules\\core\\drivers\\usb.c.o"
+    },
+    {
+        "directory":  "c:\\Users\\Aaryan\\.gemini\\antigravity\\scratch\\SigmaOS",
+        "file":  "C:\\Users\\Aaryan\\.gemini\\antigravity\\scratch\\SigmaOS\\modules\\core\\drivers\\wifi.c",
+        "command":  "gcc -Imodules/core/include -I. -ffreestanding -nostdlib -c C:\\Users\\Aaryan\\.gemini\\antigravity\\scratch\\SigmaOS\\modules\\core\\drivers\\wifi.c -o C:\\Users\\Aaryan\\.gemini\\antigravity\\scratch\\SigmaOS\\modules\\core\\drivers\\wifi.c.o"
+    },
+    {
+        "directory":  "c:\\Users\\Aaryan\\.gemini\\antigravity\\scratch\\SigmaOS",
+        "file":  "C:\\Users\\Aaryan\\.gemini\\antigravity\\scratch\\SigmaOS\\modules\\core\\fs\\ext4.c",
+        "command":  "gcc -Imodules/core/include -I. -ffreestanding -nostdlib -c C:\\Users\\Aaryan\\.gemini\\antigravity\\scratch\\SigmaOS\\modules\\core\\fs\\ext4.c -o C:\\Users\\Aaryan\\.gemini\\antigravity\\scratch\\SigmaOS\\modules\\core\\fs\\ext4.c.o"
+    },
+    {
+        "directory":  "c:\\Users\\Aaryan\\.gemini\\antigravity\\scratch\\SigmaOS",
+        "file":  "C:\\Users\\Aaryan\\.gemini\\antigravity\\scratch\\SigmaOS\\modules\\core\\fs\\fat32.c",
+        "command":  "gcc -Imodules/core/include -I. -ffreestanding -nostdlib -c C:\\Users\\Aaryan\\.gemini\\antigravity\\scratch\\SigmaOS\\modules\\core\\fs\\fat32.c -o C:\\Users\\Aaryan\\.gemini\\antigravity\\scratch\\SigmaOS\\modules\\core\\fs\\fat32.c.o"
+    },
+    {
+        "directory":  "c:\\Users\\Aaryan\\.gemini\\antigravity\\scratch\\SigmaOS",
+        "file":  "C:\\Users\\Aaryan\\.gemini\\antigravity\\scratch\\SigmaOS\\modules\\core\\fs\\self_opt_fs.c",
+        "command":  "gcc -Imodules/core/include -I. -ffreestanding -nostdlib -c C:\\Users\\Aaryan\\.gemini\\antigravity\\scratch\\SigmaOS\\modules\\core\\fs\\self_opt_fs.c -o C:\\Users\\Aaryan\\.gemini\\antigravity\\scratch\\SigmaOS\\modules\\core\\fs\\self_opt_fs.c.o"
+    },
+    {
+        "directory":  "c:\\Users\\Aaryan\\.gemini\\antigravity\\scratch\\SigmaOS",
+        "file":  "C:\\Users\\Aaryan\\.gemini\\antigravity\\scratch\\SigmaOS\\modules\\core\\fs\\sigmafs.c",
+        "command":  "gcc -Imodules/core/include -I. -ffreestanding -nostdlib -c C:\\Users\\Aaryan\\.gemini\\antigravity\\scratch\\SigmaOS\\modules\\core\\fs\\sigmafs.c -o C:\\Users\\Aaryan\\.gemini\\antigravity\\scratch\\SigmaOS\\modules\\core\\fs\\sigmafs.c.o"
+    },
+    {
+        "directory":  "c:\\Users\\Aaryan\\.gemini\\antigravity\\scratch\\SigmaOS",
+        "file":  "C:\\Users\\Aaryan\\.gemini\\antigravity\\scratch\\SigmaOS\\modules\\core\\fs\\vfs.c",
+        "command":  "gcc -Imodules/core/include -I. -ffreestanding -nostdlib -c C:\\Users\\Aaryan\\.gemini\\antigravity\\scratch\\SigmaOS\\modules\\core\\fs\\vfs.c -o C:\\Users\\Aaryan\\.gemini\\antigravity\\scratch\\SigmaOS\\modules\\core\\fs\\vfs.c.o"
+    },
+    {
+        "directory":  "c:\\Users\\Aaryan\\.gemini\\antigravity\\scratch\\SigmaOS",
+        "file":  "C:\\Users\\Aaryan\\.gemini\\antigravity\\scratch\\SigmaOS\\modules\\core\\fs\\web3_persistence.c",
+        "command":  "gcc -Imodules/core/include -I. -ffreestanding -nostdlib -c C:\\Users\\Aaryan\\.gemini\\antigravity\\scratch\\SigmaOS\\modules\\core\\fs\\web3_persistence.c -o C:\\Users\\Aaryan\\.gemini\\antigravity\\scratch\\SigmaOS\\modules\\core\\fs\\web3_persistence.c.o"
+    },
+    {
+        "directory":  "c:\\Users\\Aaryan\\.gemini\\antigravity\\scratch\\SigmaOS",
+        "file":  "C:\\Users\\Aaryan\\.gemini\\antigravity\\scratch\\SigmaOS\\modules\\core\\kernel\\elf_loader.c",
+        "command":  "gcc -Imodules/core/include -I. -ffreestanding -nostdlib -c C:\\Users\\Aaryan\\.gemini\\antigravity\\scratch\\SigmaOS\\modules\\core\\kernel\\elf_loader.c -o C:\\Users\\Aaryan\\.gemini\\antigravity\\scratch\\SigmaOS\\modules\\core\\kernel\\elf_loader.c.o"
+    },
+    {
+        "directory":  "c:\\Users\\Aaryan\\.gemini\\antigravity\\scratch\\SigmaOS",
+        "file":  "C:\\Users\\Aaryan\\.gemini\\antigravity\\scratch\\SigmaOS\\modules\\core\\kernel\\interrupts.c",
+        "command":  "gcc -Imodules/core/include -I. -ffreestanding -nostdlib -c C:\\Users\\Aaryan\\.gemini\\antigravity\\scratch\\SigmaOS\\modules\\core\\kernel\\interrupts.c -o C:\\Users\\Aaryan\\.gemini\\antigravity\\scratch\\SigmaOS\\modules\\core\\kernel\\interrupts.c.o"
+    },
+    {
+        "directory":  "c:\\Users\\Aaryan\\.gemini\\antigravity\\scratch\\SigmaOS",
+        "file":  "C:\\Users\\Aaryan\\.gemini\\antigravity\\scratch\\SigmaOS\\modules\\core\\kernel\\ipc.c",
+        "command":  "gcc -Imodules/core/include -I. -ffreestanding -nostdlib -c C:\\Users\\Aaryan\\.gemini\\antigravity\\scratch\\SigmaOS\\modules\\core\\kernel\\ipc.c -o C:\\Users\\Aaryan\\.gemini\\antigravity\\scratch\\SigmaOS\\modules\\core\\kernel\\ipc.c.o"
+    },
+    {
+        "directory":  "c:\\Users\\Aaryan\\.gemini\\antigravity\\scratch\\SigmaOS",
+        "file":  "C:\\Users\\Aaryan\\.gemini\\antigravity\\scratch\\SigmaOS\\modules\\core\\kernel\\kernel.c",
+        "command":  "gcc -Imodules/core/include -I. -ffreestanding -nostdlib -c C:\\Users\\Aaryan\\.gemini\\antigravity\\scratch\\SigmaOS\\modules\\core\\kernel\\kernel.c -o C:\\Users\\Aaryan\\.gemini\\antigravity\\scratch\\SigmaOS\\modules\\core\\kernel\\kernel.c.o"
+    },
+    {
+        "directory":  "c:\\Users\\Aaryan\\.gemini\\antigravity\\scratch\\SigmaOS",
+        "file":  "C:\\Users\\Aaryan\\.gemini\\antigravity\\scratch\\SigmaOS\\modules\\core\\kernel\\kernel_main.c",
+        "command":  "gcc -Imodules/core/include -I. -ffreestanding -nostdlib -c C:\\Users\\Aaryan\\.gemini\\antigravity\\scratch\\SigmaOS\\modules\\core\\kernel\\kernel_main.c -o C:\\Users\\Aaryan\\.gemini\\antigravity\\scratch\\SigmaOS\\modules\\core\\kernel\\kernel_main.c.o"
+    },
+    {
+        "directory":  "c:\\Users\\Aaryan\\.gemini\\antigravity\\scratch\\SigmaOS",
+        "file":  "C:\\Users\\Aaryan\\.gemini\\antigravity\\scratch\\SigmaOS\\modules\\core\\kernel\\syscalls.c",
+        "command":  "gcc -Imodules/core/include -I. -ffreestanding -nostdlib -c C:\\Users\\Aaryan\\.gemini\\antigravity\\scratch\\SigmaOS\\modules\\core\\kernel\\syscalls.c -o C:\\Users\\Aaryan\\.gemini\\antigravity\\scratch\\SigmaOS\\modules\\core\\kernel\\syscalls.c.o"
+    },
+    {
+        "directory":  "c:\\Users\\Aaryan\\.gemini\\antigravity\\scratch\\SigmaOS",
+        "file":  "C:\\Users\\Aaryan\\.gemini\\antigravity\\scratch\\SigmaOS\\modules\\core\\kernel\\hypervisor\\sigmavm.c",
+        "command":  "gcc -Imodules/core/include -I. -ffreestanding -nostdlib -c C:\\Users\\Aaryan\\.gemini\\antigravity\\scratch\\SigmaOS\\modules\\core\\kernel\\hypervisor\\sigmavm.c -o C:\\Users\\Aaryan\\.gemini\\antigravity\\scratch\\SigmaOS\\modules\\core\\kernel\\hypervisor\\sigmavm.c.o"
+    },
+    {
+        "directory":  "c:\\Users\\Aaryan\\.gemini\\antigravity\\scratch\\SigmaOS",
+        "file":  "C:\\Users\\Aaryan\\.gemini\\antigravity\\scratch\\SigmaOS\\modules\\core\\kernel\\memory\\memory_manager.c",
+        "command":  "gcc -Imodules/core/include -I. -ffreestanding -nostdlib -c C:\\Users\\Aaryan\\.gemini\\antigravity\\scratch\\SigmaOS\\modules\\core\\kernel\\memory\\memory_manager.c -o C:\\Users\\Aaryan\\.gemini\\antigravity\\scratch\\SigmaOS\\modules\\core\\kernel\\memory\\memory_manager.c.o"
+    },
+    {
+        "directory":  "c:\\Users\\Aaryan\\.gemini\\antigravity\\scratch\\SigmaOS",
+        "file":  "C:\\Users\\Aaryan\\.gemini\\antigravity\\scratch\\SigmaOS\\modules\\core\\kernel\\memory\\mem_balancer.c",
+        "command":  "gcc -Imodules/core/include -I. -ffreestanding -nostdlib -c C:\\Users\\Aaryan\\.gemini\\antigravity\\scratch\\SigmaOS\\modules\\core\\kernel\\memory\\mem_balancer.c -o C:\\Users\\Aaryan\\.gemini\\antigravity\\scratch\\SigmaOS\\modules\\core\\kernel\\memory\\mem_balancer.c.o"
+    },
+    {
+        "directory":  "c:\\Users\\Aaryan\\.gemini\\antigravity\\scratch\\SigmaOS",
+        "file":  "C:\\Users\\Aaryan\\.gemini\\antigravity\\scratch\\SigmaOS\\modules\\core\\kernel\\memory\\mem_contracts.c",
+        "command":  "gcc -Imodules/core/include -I. -ffreestanding -nostdlib -c C:\\Users\\Aaryan\\.gemini\\antigravity\\scratch\\SigmaOS\\modules\\core\\kernel\\memory\\mem_contracts.c -o C:\\Users\\Aaryan\\.gemini\\antigravity\\scratch\\SigmaOS\\modules\\core\\kernel\\memory\\mem_contracts.c.o"
+    },
+    {
+        "directory":  "c:\\Users\\Aaryan\\.gemini\\antigravity\\scratch\\SigmaOS",
+        "file":  "C:\\Users\\Aaryan\\.gemini\\antigravity\\scratch\\SigmaOS\\modules\\core\\kernel\\memory\\mem_delegation.c",
+        "command":  "gcc -Imodules/core/include -I. -ffreestanding -nostdlib -c C:\\Users\\Aaryan\\.gemini\\antigravity\\scratch\\SigmaOS\\modules\\core\\kernel\\memory\\mem_delegation.c -o C:\\Users\\Aaryan\\.gemini\\antigravity\\scratch\\SigmaOS\\modules\\core\\kernel\\memory\\mem_delegation.c.o"
+    },
+    {
+        "directory":  "c:\\Users\\Aaryan\\.gemini\\antigravity\\scratch\\SigmaOS",
+        "file":  "C:\\Users\\Aaryan\\.gemini\\antigravity\\scratch\\SigmaOS\\modules\\core\\kernel\\memory\\numa_alloc.c",
+        "command":  "gcc -Imodules/core/include -I. -ffreestanding -nostdlib -c C:\\Users\\Aaryan\\.gemini\\antigravity\\scratch\\SigmaOS\\modules\\core\\kernel\\memory\\numa_alloc.c -o C:\\Users\\Aaryan\\.gemini\\antigravity\\scratch\\SigmaOS\\modules\\core\\kernel\\memory\\numa_alloc.c.o"
+    },
+    {
+        "directory":  "c:\\Users\\Aaryan\\.gemini\\antigravity\\scratch\\SigmaOS",
+        "file":  "C:\\Users\\Aaryan\\.gemini\\antigravity\\scratch\\SigmaOS\\modules\\core\\kernel\\memory\\paging.c",
+        "command":  "gcc -Imodules/core/include -I. -ffreestanding -nostdlib -c C:\\Users\\Aaryan\\.gemini\\antigravity\\scratch\\SigmaOS\\modules\\core\\kernel\\memory\\paging.c -o C:\\Users\\Aaryan\\.gemini\\antigravity\\scratch\\SigmaOS\\modules\\core\\kernel\\memory\\paging.c.o"
+    },
+    {
+        "directory":  "c:\\Users\\Aaryan\\.gemini\\antigravity\\scratch\\SigmaOS",
+        "file":  "C:\\Users\\Aaryan\\.gemini\\antigravity\\scratch\\SigmaOS\\modules\\core\\kernel\\memory\\vmm.c",
+        "command":  "gcc -Imodules/core/include -I. -ffreestanding -nostdlib -c C:\\Users\\Aaryan\\.gemini\\antigravity\\scratch\\SigmaOS\\modules\\core\\kernel\\memory\\vmm.c -o C:\\Users\\Aaryan\\.gemini\\antigravity\\scratch\\SigmaOS\\modules\\core\\kernel\\memory\\vmm.c.o"
+    },
+    {
+        "directory":  "c:\\Users\\Aaryan\\.gemini\\antigravity\\scratch\\SigmaOS",
+        "file":  "C:\\Users\\Aaryan\\.gemini\\antigravity\\scratch\\SigmaOS\\modules\\core\\kernel\\scheduling\\ai_scheduler.c",
+        "command":  "gcc -Imodules/core/include -I. -ffreestanding -nostdlib -c C:\\Users\\Aaryan\\.gemini\\antigravity\\scratch\\SigmaOS\\modules\\core\\kernel\\scheduling\\ai_scheduler.c -o C:\\Users\\Aaryan\\.gemini\\antigravity\\scratch\\SigmaOS\\modules\\core\\kernel\\scheduling\\ai_scheduler.c.o"
+    },
+    {
+        "directory":  "c:\\Users\\Aaryan\\.gemini\\antigravity\\scratch\\SigmaOS",
+        "file":  "C:\\Users\\Aaryan\\.gemini\\antigravity\\scratch\\SigmaOS\\modules\\core\\kernel\\scheduling\\ai_scheduler_v2.c",
+        "command":  "gcc -Imodules/core/include -I. -ffreestanding -nostdlib -c C:\\Users\\Aaryan\\.gemini\\antigravity\\scratch\\SigmaOS\\modules\\core\\kernel\\scheduling\\ai_scheduler_v2.c -o C:\\Users\\Aaryan\\.gemini\\antigravity\\scratch\\SigmaOS\\modules\\core\\kernel\\scheduling\\ai_scheduler_v2.c.o"
+    },
+    {
+        "directory":  "c:\\Users\\Aaryan\\.gemini\\antigravity\\scratch\\SigmaOS",
+        "file":  "C:\\Users\\Aaryan\\.gemini\\antigravity\\scratch\\SigmaOS\\modules\\core\\kernel\\scheduling\\priority_scheduler.c",
+        "command":  "gcc -Imodules/core/include -I. -ffreestanding -nostdlib -c C:\\Users\\Aaryan\\.gemini\\antigravity\\scratch\\SigmaOS\\modules\\core\\kernel\\scheduling\\priority_scheduler.c -o C:\\Users\\Aaryan\\.gemini\\antigravity\\scratch\\SigmaOS\\modules\\core\\kernel\\scheduling\\priority_scheduler.c.o"
+    },
+    {
+        "directory":  "c:\\Users\\Aaryan\\.gemini\\antigravity\\scratch\\SigmaOS",
+        "file":  "C:\\Users\\Aaryan\\.gemini\\antigravity\\scratch\\SigmaOS\\modules\\core\\kernel\\scheduling\\scheduler.c",
+        "command":  "gcc -Imodules/core/include -I. -ffreestanding -nostdlib -c C:\\Users\\Aaryan\\.gemini\\antigravity\\scratch\\SigmaOS\\modules\\core\\kernel\\scheduling\\scheduler.c -o C:\\Users\\Aaryan\\.gemini\\antigravity\\scratch\\SigmaOS\\modules\\core\\kernel\\scheduling\\scheduler.c.o"
+    },
+    {
+        "directory":  "c:\\Users\\Aaryan\\.gemini\\antigravity\\scratch\\SigmaOS",
+        "file":  "C:\\Users\\Aaryan\\.gemini\\antigravity\\scratch\\SigmaOS\\modules\\core\\kernel\\scheduling\\scheduler_core.c",
+        "command":  "gcc -Imodules/core/include -I. -ffreestanding -nostdlib -c C:\\Users\\Aaryan\\.gemini\\antigravity\\scratch\\SigmaOS\\modules\\core\\kernel\\scheduling\\scheduler_core.c -o C:\\Users\\Aaryan\\.gemini\\antigravity\\scratch\\SigmaOS\\modules\\core\\kernel\\scheduling\\scheduler_core.c.o"
+    },
+    {
+        "directory":  "c:\\Users\\Aaryan\\.gemini\\antigravity\\scratch\\SigmaOS",
+        "file":  "C:\\Users\\Aaryan\\.gemini\\antigravity\\scratch\\SigmaOS\\modules\\core\\kernel\\security\\app_sandbox.c",
+        "command":  "gcc -Imodules/core/include -I. -ffreestanding -nostdlib -c C:\\Users\\Aaryan\\.gemini\\antigravity\\scratch\\SigmaOS\\modules\\core\\kernel\\security\\app_sandbox.c -o C:\\Users\\Aaryan\\.gemini\\antigravity\\scratch\\SigmaOS\\modules\\core\\kernel\\security\\app_sandbox.c.o"
+    },
+    {
+        "directory":  "c:\\Users\\Aaryan\\.gemini\\antigravity\\scratch\\SigmaOS",
+        "file":  "C:\\Users\\Aaryan\\.gemini\\antigravity\\scratch\\SigmaOS\\modules\\core\\kernel\\security\\shard_isolation.c",
+        "command":  "gcc -Imodules/core/include -I. -ffreestanding -nostdlib -c C:\\Users\\Aaryan\\.gemini\\antigravity\\scratch\\SigmaOS\\modules\\core\\kernel\\security\\shard_isolation.c -o C:\\Users\\Aaryan\\.gemini\\antigravity\\scratch\\SigmaOS\\modules\\core\\kernel\\security\\shard_isolation.c.o"
+    },
+    {
+        "directory":  "c:\\Users\\Aaryan\\.gemini\\antigravity\\scratch\\SigmaOS",
+        "file":  "C:\\Users\\Aaryan\\.gemini\\antigravity\\scratch\\SigmaOS\\modules\\core\\kernel\\security\\sovereign_tokens.c",
+        "command":  "gcc -Imodules/core/include -I. -ffreestanding -nostdlib -c C:\\Users\\Aaryan\\.gemini\\antigravity\\scratch\\SigmaOS\\modules\\core\\kernel\\security\\sovereign_tokens.c -o C:\\Users\\Aaryan\\.gemini\\antigravity\\scratch\\SigmaOS\\modules\\core\\kernel\\security\\sovereign_tokens.c.o"
+    },
+    {
+        "directory":  "c:\\Users\\Aaryan\\.gemini\\antigravity\\scratch\\SigmaOS",
+        "file":  "C:\\Users\\Aaryan\\.gemini\\antigravity\\scratch\\SigmaOS\\modules\\core\\kernel\\security\\watchdog.c",
+        "command":  "gcc -Imodules/core/include -I. -ffreestanding -nostdlib -c C:\\Users\\Aaryan\\.gemini\\antigravity\\scratch\\SigmaOS\\modules\\core\\kernel\\security\\watchdog.c -o C:\\Users\\Aaryan\\.gemini\\antigravity\\scratch\\SigmaOS\\modules\\core\\kernel\\security\\watchdog.c.o"
+    },
+    {
+        "directory":  "c:\\Users\\Aaryan\\.gemini\\antigravity\\scratch\\SigmaOS",
+        "file":  "C:\\Users\\Aaryan\\.gemini\\antigravity\\scratch\\SigmaOS\\modules\\core\\net\\consensus_updater.c",
+        "command":  "gcc -Imodules/core/include -I. -ffreestanding -nostdlib -c C:\\Users\\Aaryan\\.gemini\\antigravity\\scratch\\SigmaOS\\modules\\core\\net\\consensus_updater.c -o C:\\Users\\Aaryan\\.gemini\\antigravity\\scratch\\SigmaOS\\modules\\core\\net\\consensus_updater.c.o"
+    },
+    {
+        "directory":  "c:\\Users\\Aaryan\\.gemini\\antigravity\\scratch\\SigmaOS",
+        "file":  "C:\\Users\\Aaryan\\.gemini\\antigravity\\scratch\\SigmaOS\\modules\\core\\net\\icmp.c",
+        "command":  "gcc -Imodules/core/include -I. -ffreestanding -nostdlib -c C:\\Users\\Aaryan\\.gemini\\antigravity\\scratch\\SigmaOS\\modules\\core\\net\\icmp.c -o C:\\Users\\Aaryan\\.gemini\\antigravity\\scratch\\SigmaOS\\modules\\core\\net\\icmp.c.o"
+    },
+    {
+        "directory":  "c:\\Users\\Aaryan\\.gemini\\antigravity\\scratch\\SigmaOS",
+        "file":  "C:\\Users\\Aaryan\\.gemini\\antigravity\\scratch\\SigmaOS\\modules\\core\\net\\mesh_net.c",
+        "command":  "gcc -Imodules/core/include -I. -ffreestanding -nostdlib -c C:\\Users\\Aaryan\\.gemini\\antigravity\\scratch\\SigmaOS\\modules\\core\\net\\mesh_net.c -o C:\\Users\\Aaryan\\.gemini\\antigravity\\scratch\\SigmaOS\\modules\\core\\net\\mesh_net.c.o"
+    },
+    {
+        "directory":  "c:\\Users\\Aaryan\\.gemini\\antigravity\\scratch\\SigmaOS",
+        "file":  "C:\\Users\\Aaryan\\.gemini\\antigravity\\scratch\\SigmaOS\\modules\\core\\net\\socket.c",
+        "command":  "gcc -Imodules/core/include -I. -ffreestanding -nostdlib -c C:\\Users\\Aaryan\\.gemini\\antigravity\\scratch\\SigmaOS\\modules\\core\\net\\socket.c -o C:\\Users\\Aaryan\\.gemini\\antigravity\\scratch\\SigmaOS\\modules\\core\\net\\socket.c.o"
+    },
+    {
+        "directory":  "c:\\Users\\Aaryan\\.gemini\\antigravity\\scratch\\SigmaOS",
+        "file":  "C:\\Users\\Aaryan\\.gemini\\antigravity\\scratch\\SigmaOS\\modules\\core\\net\\sovereign_net.c",
+        "command":  "gcc -Imodules/core/include -I. -ffreestanding -nostdlib -c C:\\Users\\Aaryan\\.gemini\\antigravity\\scratch\\SigmaOS\\modules\\core\\net\\sovereign_net.c -o C:\\Users\\Aaryan\\.gemini\\antigravity\\scratch\\SigmaOS\\modules\\core\\net\\sovereign_net.c.o"
+    },
+    {
+        "directory":  "c:\\Users\\Aaryan\\.gemini\\antigravity\\scratch\\SigmaOS",
+        "file":  "C:\\Users\\Aaryan\\.gemini\\antigravity\\scratch\\SigmaOS\\modules\\core\\net\\tcp.c",
+        "command":  "gcc -Imodules/core/include -I. -ffreestanding -nostdlib -c C:\\Users\\Aaryan\\.gemini\\antigravity\\scratch\\SigmaOS\\modules\\core\\net\\tcp.c -o C:\\Users\\Aaryan\\.gemini\\antigravity\\scratch\\SigmaOS\\modules\\core\\net\\tcp.c.o"
+    },
+    {
+        "directory":  "c:\\Users\\Aaryan\\.gemini\\antigravity\\scratch\\SigmaOS",
+        "file":  "C:\\Users\\Aaryan\\.gemini\\antigravity\\scratch\\SigmaOS\\modules\\core\\net\\tcpip.c",
+        "command":  "gcc -Imodules/core/include -I. -ffreestanding -nostdlib -c C:\\Users\\Aaryan\\.gemini\\antigravity\\scratch\\SigmaOS\\modules\\core\\net\\tcpip.c -o C:\\Users\\Aaryan\\.gemini\\antigravity\\scratch\\SigmaOS\\modules\\core\\net\\tcpip.c.o"
+    },
+    {
+        "directory":  "c:\\Users\\Aaryan\\.gemini\\antigravity\\scratch\\SigmaOS",
+        "file":  "C:\\Users\\Aaryan\\.gemini\\antigravity\\scratch\\SigmaOS\\modules\\core\\security\\auth.c",
+        "command":  "gcc -Imodules/core/include -I. -ffreestanding -nostdlib -c C:\\Users\\Aaryan\\.gemini\\antigravity\\scratch\\SigmaOS\\modules\\core\\security\\auth.c -o C:\\Users\\Aaryan\\.gemini\\antigravity\\scratch\\SigmaOS\\modules\\core\\security\\auth.c.o"
+    },
+    {
+        "directory":  "c:\\Users\\Aaryan\\.gemini\\antigravity\\scratch\\SigmaOS",
+        "file":  "C:\\Users\\Aaryan\\.gemini\\antigravity\\scratch\\SigmaOS\\modules\\core\\security\\crypto.c",
+        "command":  "gcc -Imodules/core/include -I. -ffreestanding -nostdlib -c C:\\Users\\Aaryan\\.gemini\\antigravity\\scratch\\SigmaOS\\modules\\core\\security\\crypto.c -o C:\\Users\\Aaryan\\.gemini\\antigravity\\scratch\\SigmaOS\\modules\\core\\security\\crypto.c.o"
+    },
+    {
+        "directory":  "c:\\Users\\Aaryan\\.gemini\\antigravity\\scratch\\SigmaOS",
+        "file":  "C:\\Users\\Aaryan\\.gemini\\antigravity\\scratch\\SigmaOS\\modules\\ext\\drivers\\modular\\service_driver_template.c",
+        "command":  "gcc -Imodules/core/include -I. -ffreestanding -nostdlib -c C:\\Users\\Aaryan\\.gemini\\antigravity\\scratch\\SigmaOS\\modules\\ext\\drivers\\modular\\service_driver_template.c -o C:\\Users\\Aaryan\\.gemini\\antigravity\\scratch\\SigmaOS\\modules\\ext\\drivers\\modular\\service_driver_template.c.o"
+    },
+    {
+        "directory":  "c:\\Users\\Aaryan\\.gemini\\antigravity\\scratch\\SigmaOS",
+        "file":  "C:\\Users\\Aaryan\\.gemini\\antigravity\\scratch\\SigmaOS\\modules\\ext\\drivers\\reference\\fat_fs.c",
+        "command":  "gcc -Imodules/core/include -I. -ffreestanding -nostdlib -c C:\\Users\\Aaryan\\.gemini\\antigravity\\scratch\\SigmaOS\\modules\\ext\\drivers\\reference\\fat_fs.c -o C:\\Users\\Aaryan\\.gemini\\antigravity\\scratch\\SigmaOS\\modules\\ext\\drivers\\reference\\fat_fs.c.o"
+    },
+    {
+        "directory":  "c:\\Users\\Aaryan\\.gemini\\antigravity\\scratch\\SigmaOS",
+        "file":  "C:\\Users\\Aaryan\\.gemini\\antigravity\\scratch\\SigmaOS\\modules\\ext\\drivers\\reference\\gpu_vbe.c",
+        "command":  "gcc -Imodules/core/include -I. -ffreestanding -nostdlib -c C:\\Users\\Aaryan\\.gemini\\antigravity\\scratch\\SigmaOS\\modules\\ext\\drivers\\reference\\gpu_vbe.c -o C:\\Users\\Aaryan\\.gemini\\antigravity\\scratch\\SigmaOS\\modules\\ext\\drivers\\reference\\gpu_vbe.c.o"
+    },
+    {
+        "directory":  "c:\\Users\\Aaryan\\.gemini\\antigravity\\scratch\\SigmaOS",
+        "file":  "C:\\Users\\Aaryan\\.gemini\\antigravity\\scratch\\SigmaOS\\modules\\ext\\drivers\\reference\\nvme_storage.c",
+        "command":  "gcc -Imodules/core/include -I. -ffreestanding -nostdlib -c C:\\Users\\Aaryan\\.gemini\\antigravity\\scratch\\SigmaOS\\modules\\ext\\drivers\\reference\\nvme_storage.c -o C:\\Users\\Aaryan\\.gemini\\antigravity\\scratch\\SigmaOS\\modules\\ext\\drivers\\reference\\nvme_storage.c.o"
+    },
+    {
+        "directory":  "c:\\Users\\Aaryan\\.gemini\\antigravity\\scratch\\SigmaOS",
+        "file":  "C:\\Users\\Aaryan\\.gemini\\antigravity\\scratch\\SigmaOS\\modules\\ext\\drivers\\reference\\virtio_net.c",
+        "command":  "gcc -Imodules/core/include -I. -ffreestanding -nostdlib -c C:\\Users\\Aaryan\\.gemini\\antigravity\\scratch\\SigmaOS\\modules\\ext\\drivers\\reference\\virtio_net.c -o C:\\Users\\Aaryan\\.gemini\\antigravity\\scratch\\SigmaOS\\modules\\ext\\drivers\\reference\\virtio_net.c.o"
+    },
+    {
+        "directory":  "c:\\Users\\Aaryan\\.gemini\\antigravity\\scratch\\SigmaOS",
+        "file":  "C:\\Users\\Aaryan\\.gemini\\antigravity\\scratch\\SigmaOS\\modules\\ext\\drivers\\reference\\zfs_stub.c",
+        "command":  "gcc -Imodules/core/include -I. -ffreestanding -nostdlib -c C:\\Users\\Aaryan\\.gemini\\antigravity\\scratch\\SigmaOS\\modules\\ext\\drivers\\reference\\zfs_stub.c -o C:\\Users\\Aaryan\\.gemini\\antigravity\\scratch\\SigmaOS\\modules\\ext\\drivers\\reference\\zfs_stub.c.o"
+    },
+    {
+        "directory":  "c:\\Users\\Aaryan\\.gemini\\antigravity\\scratch\\SigmaOS",
+        "file":  "C:\\Users\\Aaryan\\.gemini\\antigravity\\scratch\\SigmaOS\\modules\\ext\\hal\\accel_hal.c",
+        "command":  "gcc -Imodules/core/include -I. -ffreestanding -nostdlib -c C:\\Users\\Aaryan\\.gemini\\antigravity\\scratch\\SigmaOS\\modules\\ext\\hal\\accel_hal.c -o C:\\Users\\Aaryan\\.gemini\\antigravity\\scratch\\SigmaOS\\modules\\ext\\hal\\accel_hal.c.o"
+    },
+    {
+        "directory":  "c:\\Users\\Aaryan\\.gemini\\antigravity\\scratch\\SigmaOS",
+        "file":  "C:\\Users\\Aaryan\\.gemini\\antigravity\\scratch\\SigmaOS\\modules\\ext\\hal\\hal.c",
+        "command":  "gcc -Imodules/core/include -I. -ffreestanding -nostdlib -c C:\\Users\\Aaryan\\.gemini\\antigravity\\scratch\\SigmaOS\\modules\\ext\\hal\\hal.c -o C:\\Users\\Aaryan\\.gemini\\antigravity\\scratch\\SigmaOS\\modules\\ext\\hal\\hal.c.o"
+    },
+    {
+        "directory":  "c:\\Users\\Aaryan\\.gemini\\antigravity\\scratch\\SigmaOS",
+        "file":  "C:\\Users\\Aaryan\\.gemini\\antigravity\\scratch\\SigmaOS\\modules\\ext\\hal\\hw_detect.c",
+        "command":  "gcc -Imodules/core/include -I. -ffreestanding -nostdlib -c C:\\Users\\Aaryan\\.gemini\\antigravity\\scratch\\SigmaOS\\modules\\ext\\hal\\hw_detect.c -o C:\\Users\\Aaryan\\.gemini\\antigravity\\scratch\\SigmaOS\\modules\\ext\\hal\\hw_detect.c.o"
+    },
+    {
+        "directory":  "c:\\Users\\Aaryan\\.gemini\\antigravity\\scratch\\SigmaOS",
+        "file":  "C:\\Users\\Aaryan\\.gemini\\antigravity\\scratch\\SigmaOS\\modules\\ext\\plugins\\auto_driver_builder.c",
+        "command":  "gcc -Imodules/core/include -I. -ffreestanding -nostdlib -c C:\\Users\\Aaryan\\.gemini\\antigravity\\scratch\\SigmaOS\\modules\\ext\\plugins\\auto_driver_builder.c -o C:\\Users\\Aaryan\\.gemini\\antigravity\\scratch\\SigmaOS\\modules\\ext\\plugins\\auto_driver_builder.c.o"
+    },
+    {
+        "directory":  "c:\\Users\\Aaryan\\.gemini\\antigravity\\scratch\\SigmaOS",
+        "file":  "C:\\Users\\Aaryan\\.gemini\\antigravity\\scratch\\SigmaOS\\modules\\ext\\plugins\\capsule.c",
+        "command":  "gcc -Imodules/core/include -I. -ffreestanding -nostdlib -c C:\\Users\\Aaryan\\.gemini\\antigravity\\scratch\\SigmaOS\\modules\\ext\\plugins\\capsule.c -o C:\\Users\\Aaryan\\.gemini\\antigravity\\scratch\\SigmaOS\\modules\\ext\\plugins\\capsule.c.o"
+    },
+    {
+        "directory":  "c:\\Users\\Aaryan\\.gemini\\antigravity\\scratch\\SigmaOS",
+        "file":  "C:\\Users\\Aaryan\\.gemini\\antigravity\\scratch\\SigmaOS\\modules\\ext\\plugins\\extension_api.c",
+        "command":  "gcc -Imodules/core/include -I. -ffreestanding -nostdlib -c C:\\Users\\Aaryan\\.gemini\\antigravity\\scratch\\SigmaOS\\modules\\ext\\plugins\\extension_api.c -o C:\\Users\\Aaryan\\.gemini\\antigravity\\scratch\\SigmaOS\\modules\\ext\\plugins\\extension_api.c.o"
+    },
+    {
+        "directory":  "c:\\Users\\Aaryan\\.gemini\\antigravity\\scratch\\SigmaOS",
+        "file":  "C:\\Users\\Aaryan\\.gemini\\antigravity\\scratch\\SigmaOS\\modules\\ext\\plugins\\policy_modules.c",
+        "command":  "gcc -Imodules/core/include -I. -ffreestanding -nostdlib -c C:\\Users\\Aaryan\\.gemini\\antigravity\\scratch\\SigmaOS\\modules\\ext\\plugins\\policy_modules.c -o C:\\Users\\Aaryan\\.gemini\\antigravity\\scratch\\SigmaOS\\modules\\ext\\plugins\\policy_modules.c.o"
+    },
+    {
+        "directory":  "c:\\Users\\Aaryan\\.gemini\\antigravity\\scratch\\SigmaOS",
+        "file":  "C:\\Users\\Aaryan\\.gemini\\antigravity\\scratch\\SigmaOS\\modules\\perf\\profiler.c",
+        "command":  "gcc -Imodules/core/include -I. -ffreestanding -nostdlib -c C:\\Users\\Aaryan\\.gemini\\antigravity\\scratch\\SigmaOS\\modules\\perf\\profiler.c -o C:\\Users\\Aaryan\\.gemini\\antigravity\\scratch\\SigmaOS\\modules\\perf\\profiler.c.o"
+    },
+    {
+        "directory":  "c:\\Users\\Aaryan\\.gemini\\antigravity\\scratch\\SigmaOS",
+        "file":  "C:\\Users\\Aaryan\\.gemini\\antigravity\\scratch\\SigmaOS\\modules\\security\\access_control\\audit_chain.c",
+        "command":  "gcc -Imodules/core/include -I. -ffreestanding -nostdlib -c C:\\Users\\Aaryan\\.gemini\\antigravity\\scratch\\SigmaOS\\modules\\security\\access_control\\audit_chain.c -o C:\\Users\\Aaryan\\.gemini\\antigravity\\scratch\\SigmaOS\\modules\\security\\access_control\\audit_chain.c.o"
+    },
+    {
+        "directory":  "c:\\Users\\Aaryan\\.gemini\\antigravity\\scratch\\SigmaOS",
+        "file":  "C:\\Users\\Aaryan\\.gemini\\antigravity\\scratch\\SigmaOS\\modules\\security\\capabilities\\caps.c",
+        "command":  "gcc -Imodules/core/include -I. -ffreestanding -nostdlib -c C:\\Users\\Aaryan\\.gemini\\antigravity\\scratch\\SigmaOS\\modules\\security\\capabilities\\caps.c -o C:\\Users\\Aaryan\\.gemini\\antigravity\\scratch\\SigmaOS\\modules\\security\\capabilities\\caps.c.o"
+    },
+    {
+        "directory":  "c:\\Users\\Aaryan\\.gemini\\antigravity\\scratch\\SigmaOS",
+        "file":  "C:\\Users\\Aaryan\\.gemini\\antigravity\\scratch\\SigmaOS\\modules\\security\\capabilities\\cap_registry.c",
+        "command":  "gcc -Imodules/core/include -I. -ffreestanding -nostdlib -c C:\\Users\\Aaryan\\.gemini\\antigravity\\scratch\\SigmaOS\\modules\\security\\capabilities\\cap_registry.c -o C:\\Users\\Aaryan\\.gemini\\antigravity\\scratch\\SigmaOS\\modules\\security\\capabilities\\cap_registry.c.o"
+    },
+    {
+        "directory":  "c:\\Users\\Aaryan\\.gemini\\antigravity\\scratch\\SigmaOS",
+        "file":  "C:\\Users\\Aaryan\\.gemini\\antigravity\\scratch\\SigmaOS\\modules\\security\\crypto\\cap_registry.c",
+        "command":  "gcc -Imodules/core/include -I. -ffreestanding -nostdlib -c C:\\Users\\Aaryan\\.gemini\\antigravity\\scratch\\SigmaOS\\modules\\security\\crypto\\cap_registry.c -o C:\\Users\\Aaryan\\.gemini\\antigravity\\scratch\\SigmaOS\\modules\\security\\crypto\\cap_registry.c.o"
+    },
+    {
+        "directory":  "c:\\Users\\Aaryan\\.gemini\\antigravity\\scratch\\SigmaOS",
+        "file":  "C:\\Users\\Aaryan\\.gemini\\antigravity\\scratch\\SigmaOS\\modules\\security\\crypto\\chacha20.c",
+        "command":  "gcc -Imodules/core/include -I. -ffreestanding -nostdlib -c C:\\Users\\Aaryan\\.gemini\\antigravity\\scratch\\SigmaOS\\modules\\security\\crypto\\chacha20.c -o C:\\Users\\Aaryan\\.gemini\\antigravity\\scratch\\SigmaOS\\modules\\security\\crypto\\chacha20.c.o"
+    },
+    {
+        "directory":  "c:\\Users\\Aaryan\\.gemini\\antigravity\\scratch\\SigmaOS",
+        "file":  "C:\\Users\\Aaryan\\.gemini\\antigravity\\scratch\\SigmaOS\\modules\\security\\crypto\\ed25519_stub.c",
+        "command":  "gcc -Imodules/core/include -I. -ffreestanding -nostdlib -c C:\\Users\\Aaryan\\.gemini\\antigravity\\scratch\\SigmaOS\\modules\\security\\crypto\\ed25519_stub.c -o C:\\Users\\Aaryan\\.gemini\\antigravity\\scratch\\SigmaOS\\modules\\security\\crypto\\ed25519_stub.c.o"
+    },
+    {
+        "directory":  "c:\\Users\\Aaryan\\.gemini\\antigravity\\scratch\\SigmaOS",
+        "file":  "C:\\Users\\Aaryan\\.gemini\\antigravity\\scratch\\SigmaOS\\modules\\security\\crypto\\sha256.c",
+        "command":  "gcc -Imodules/core/include -I. -ffreestanding -nostdlib -c C:\\Users\\Aaryan\\.gemini\\antigravity\\scratch\\SigmaOS\\modules\\security\\crypto\\sha256.c -o C:\\Users\\Aaryan\\.gemini\\antigravity\\scratch\\SigmaOS\\modules\\security\\crypto\\sha256.c.o"
+    },
+    {
+        "directory":  "c:\\Users\\Aaryan\\.gemini\\antigravity\\scratch\\SigmaOS",
+        "file":  "C:\\Users\\Aaryan\\.gemini\\antigravity\\scratch\\SigmaOS\\modules\\security\\isolation\\sandbox.c",
+        "command":  "gcc -Imodules/core/include -I. -ffreestanding -nostdlib -c C:\\Users\\Aaryan\\.gemini\\antigravity\\scratch\\SigmaOS\\modules\\security\\isolation\\sandbox.c -o C:\\Users\\Aaryan\\.gemini\\antigravity\\scratch\\SigmaOS\\modules\\security\\isolation\\sandbox.c.o"
+    },
+    {
+        "directory":  "c:\\Users\\Aaryan\\.gemini\\antigravity\\scratch\\SigmaOS",
+        "file":  "C:\\Users\\Aaryan\\.gemini\\antigravity\\scratch\\SigmaOS\\modules\\tools\\cli\\manifest_parser.c",
+        "command":  "gcc -Imodules/core/include -I. -ffreestanding -nostdlib -c C:\\Users\\Aaryan\\.gemini\\antigravity\\scratch\\SigmaOS\\modules\\tools\\cli\\manifest_parser.c -o C:\\Users\\Aaryan\\.gemini\\antigravity\\scratch\\SigmaOS\\modules\\tools\\cli\\manifest_parser.c.o"
+    },
+    {
+        "directory":  "c:\\Users\\Aaryan\\.gemini\\antigravity\\scratch\\SigmaOS",
+        "file":  "C:\\Users\\Aaryan\\.gemini\\antigravity\\scratch\\SigmaOS\\modules\\tools\\cli\\shell.c",
+        "command":  "gcc -Imodules/core/include -I. -ffreestanding -nostdlib -c C:\\Users\\Aaryan\\.gemini\\antigravity\\scratch\\SigmaOS\\modules\\tools\\cli\\shell.c -o C:\\Users\\Aaryan\\.gemini\\antigravity\\scratch\\SigmaOS\\modules\\tools\\cli\\shell.c.o"
+    },
+    {
+        "directory":  "c:\\Users\\Aaryan\\.gemini\\antigravity\\scratch\\SigmaOS",
+        "file":  "C:\\Users\\Aaryan\\.gemini\\antigravity\\scratch\\SigmaOS\\modules\\tools\\cli\\sovereign_shell.c",
+        "command":  "gcc -Imodules/core/include -I. -ffreestanding -nostdlib -c C:\\Users\\Aaryan\\.gemini\\antigravity\\scratch\\SigmaOS\\modules\\tools\\cli\\sovereign_shell.c -o C:\\Users\\Aaryan\\.gemini\\antigravity\\scratch\\SigmaOS\\modules\\tools\\cli\\sovereign_shell.c.o"
+    },
+    {
+        "directory":  "c:\\Users\\Aaryan\\.gemini\\antigravity\\scratch\\SigmaOS",
+        "file":  "C:\\Users\\Aaryan\\.gemini\\antigravity\\scratch\\SigmaOS\\modules\\tools\\cli_root\\sigma.c",
+        "command":  "gcc -Imodules/core/include -I. -ffreestanding -nostdlib -c C:\\Users\\Aaryan\\.gemini\\antigravity\\scratch\\SigmaOS\\modules\\tools\\cli_root\\sigma.c -o C:\\Users\\Aaryan\\.gemini\\antigravity\\scratch\\SigmaOS\\modules\\tools\\cli_root\\sigma.c.o"
+    },
+    {
+        "directory":  "c:\\Users\\Aaryan\\.gemini\\antigravity\\scratch\\SigmaOS",
+        "file":  "C:\\Users\\Aaryan\\.gemini\\antigravity\\scratch\\SigmaOS\\modules\\tools\\cli_root\\sigma_pkg.c",
+        "command":  "gcc -Imodules/core/include -I. -ffreestanding -nostdlib -c C:\\Users\\Aaryan\\.gemini\\antigravity\\scratch\\SigmaOS\\modules\\tools\\cli_root\\sigma_pkg.c -o C:\\Users\\Aaryan\\.gemini\\antigravity\\scratch\\SigmaOS\\modules\\tools\\cli_root\\sigma_pkg.c.o"
+    },
+    {
+        "directory":  "c:\\Users\\Aaryan\\.gemini\\antigravity\\scratch\\SigmaOS",
+        "file":  "C:\\Users\\Aaryan\\.gemini\\antigravity\\scratch\\SigmaOS\\modules\\tools\\diag\\logger.c",
+        "command":  "gcc -Imodules/core/include -I. -ffreestanding -nostdlib -c C:\\Users\\Aaryan\\.gemini\\antigravity\\scratch\\SigmaOS\\modules\\tools\\diag\\logger.c -o C:\\Users\\Aaryan\\.gemini\\antigravity\\scratch\\SigmaOS\\modules\\tools\\diag\\logger.c.o"
+    },
+    {
+        "directory":  "c:\\Users\\Aaryan\\.gemini\\antigravity\\scratch\\SigmaOS",
+        "file":  "C:\\Users\\Aaryan\\.gemini\\antigravity\\scratch\\SigmaOS\\modules\\tools\\diag\\profiler.c",
+        "command":  "gcc -Imodules/core/include -I. -ffreestanding -nostdlib -c C:\\Users\\Aaryan\\.gemini\\antigravity\\scratch\\SigmaOS\\modules\\tools\\diag\\profiler.c -o C:\\Users\\Aaryan\\.gemini\\antigravity\\scratch\\SigmaOS\\modules\\tools\\diag\\profiler.c.o"
+    },
+    {
+        "directory":  "c:\\Users\\Aaryan\\.gemini\\antigravity\\scratch\\SigmaOS",
+        "file":  "C:\\Users\\Aaryan\\.gemini\\antigravity\\scratch\\SigmaOS\\modules\\tools\\diag\\syscall_tracer.c",
+        "command":  "gcc -Imodules/core/include -I. -ffreestanding -nostdlib -c C:\\Users\\Aaryan\\.gemini\\antigravity\\scratch\\SigmaOS\\modules\\tools\\diag\\syscall_tracer.c -o C:\\Users\\Aaryan\\.gemini\\antigravity\\scratch\\SigmaOS\\modules\\tools\\diag\\syscall_tracer.c.o"
+    },
+    {
+        "directory":  "c:\\Users\\Aaryan\\.gemini\\antigravity\\scratch\\SigmaOS",
+        "file":  "C:\\Users\\Aaryan\\.gemini\\antigravity\\scratch\\SigmaOS\\modules\\tools\\explorer\\explorer.c",
+        "command":  "gcc -Imodules/core/include -I. -ffreestanding -nostdlib -c C:\\Users\\Aaryan\\.gemini\\antigravity\\scratch\\SigmaOS\\modules\\tools\\explorer\\explorer.c -o C:\\Users\\Aaryan\\.gemini\\antigravity\\scratch\\SigmaOS\\modules\\tools\\explorer\\explorer.c.o"
+    },
+    {
+        "directory":  "c:\\Users\\Aaryan\\.gemini\\antigravity\\scratch\\SigmaOS",
+        "file":  "C:\\Users\\Aaryan\\.gemini\\antigravity\\scratch\\SigmaOS\\modules\\tools\\loader\\module_loader.c",
+        "command":  "gcc -Imodules/core/include -I. -ffreestanding -nostdlib -c C:\\Users\\Aaryan\\.gemini\\antigravity\\scratch\\SigmaOS\\modules\\tools\\loader\\module_loader.c -o C:\\Users\\Aaryan\\.gemini\\antigravity\\scratch\\SigmaOS\\modules\\tools\\loader\\module_loader.c.o"
+    },
+    {
+        "directory":  "c:\\Users\\Aaryan\\.gemini\\antigravity\\scratch\\SigmaOS",
+        "file":  "C:\\Users\\Aaryan\\.gemini\\antigravity\\scratch\\SigmaOS\\modules\\ui\\window_manager.c",
+        "command":  "gcc -Imodules/core/include -I. -ffreestanding -nostdlib -c C:\\Users\\Aaryan\\.gemini\\antigravity\\scratch\\SigmaOS\\modules\\ui\\window_manager.c -o C:\\Users\\Aaryan\\.gemini\\antigravity\\scratch\\SigmaOS\\modules\\ui\\window_manager.c.o"
+    },
+    {
+        "directory":  "c:\\Users\\Aaryan\\.gemini\\antigravity\\scratch\\SigmaOS",
+        "file":  "C:\\Users\\Aaryan\\.gemini\\antigravity\\scratch\\SigmaOS\\modules\\ui\\experience\\hotkeys.c",
+        "command":  "gcc -Imodules/core/include -I. -ffreestanding -nostdlib -c C:\\Users\\Aaryan\\.gemini\\antigravity\\scratch\\SigmaOS\\modules\\ui\\experience\\hotkeys.c -o C:\\Users\\Aaryan\\.gemini\\antigravity\\scratch\\SigmaOS\\modules\\ui\\experience\\hotkeys.c.o"
+    },
+    {
+        "directory":  "c:\\Users\\Aaryan\\.gemini\\antigravity\\scratch\\SigmaOS",
+        "file":  "C:\\Users\\Aaryan\\.gemini\\antigravity\\scratch\\SigmaOS\\modules\\ui\\experience\\user_profile.c",
+        "command":  "gcc -Imodules/core/include -I. -ffreestanding -nostdlib -c C:\\Users\\Aaryan\\.gemini\\antigravity\\scratch\\SigmaOS\\modules\\ui\\experience\\user_profile.c -o C:\\Users\\Aaryan\\.gemini\\antigravity\\scratch\\SigmaOS\\modules\\ui\\experience\\user_profile.c.o"
+    },
+    {
+        "directory":  "c:\\Users\\Aaryan\\.gemini\\antigravity\\scratch\\SigmaOS",
+        "file":  "C:\\Users\\Aaryan\\.gemini\\antigravity\\scratch\\SigmaOS\\modules\\ui\\experience\\ux_heuristics.c",
+        "command":  "gcc -Imodules/core/include -I. -ffreestanding -nostdlib -c C:\\Users\\Aaryan\\.gemini\\antigravity\\scratch\\SigmaOS\\modules\\ui\\experience\\ux_heuristics.c -o C:\\Users\\Aaryan\\.gemini\\antigravity\\scratch\\SigmaOS\\modules\\ui\\experience\\ux_heuristics.c.o"
+    },
+    {
+        "directory":  "c:\\Users\\Aaryan\\.gemini\\antigravity\\scratch\\SigmaOS",
+        "file":  "C:\\Users\\Aaryan\\.gemini\\antigravity\\scratch\\SigmaOS\\modules\\ui\\shell\\shell.c",
+        "command":  "gcc -Imodules/core/include -I. -ffreestanding -nostdlib -c C:\\Users\\Aaryan\\.gemini\\antigravity\\scratch\\SigmaOS\\modules\\ui\\shell\\shell.c -o C:\\Users\\Aaryan\\.gemini\\antigravity\\scratch\\SigmaOS\\modules\\ui\\shell\\shell.c.o"
+    },
+    {
+        "directory":  "c:\\Users\\Aaryan\\.gemini\\antigravity\\scratch\\SigmaOS",
+        "file":  "C:\\Users\\Aaryan\\.gemini\\antigravity\\scratch\\SigmaOS\\modules\\ui\\zenith\\adaptive_typography.c",
+        "command":  "gcc -Imodules/core/include -I. -ffreestanding -nostdlib -c C:\\Users\\Aaryan\\.gemini\\antigravity\\scratch\\SigmaOS\\modules\\ui\\zenith\\adaptive_typography.c -o C:\\Users\\Aaryan\\.gemini\\antigravity\\scratch\\SigmaOS\\modules\\ui\\zenith\\adaptive_typography.c.o"
+    },
+    {
+        "directory":  "c:\\Users\\Aaryan\\.gemini\\antigravity\\scratch\\SigmaOS",
+        "file":  "C:\\Users\\Aaryan\\.gemini\\antigravity\\scratch\\SigmaOS\\modules\\ui\\zenith\\animations.c",
+        "command":  "gcc -Imodules/core/include -I. -ffreestanding -nostdlib -c C:\\Users\\Aaryan\\.gemini\\antigravity\\scratch\\SigmaOS\\modules\\ui\\zenith\\animations.c -o C:\\Users\\Aaryan\\.gemini\\antigravity\\scratch\\SigmaOS\\modules\\ui\\zenith\\animations.c.o"
+    },
+    {
+        "directory":  "c:\\Users\\Aaryan\\.gemini\\antigravity\\scratch\\SigmaOS",
+        "file":  "C:\\Users\\Aaryan\\.gemini\\antigravity\\scratch\\SigmaOS\\modules\\ui\\zenith\\widget_engine.c",
+        "command":  "gcc -Imodules/core/include -I. -ffreestanding -nostdlib -c C:\\Users\\Aaryan\\.gemini\\antigravity\\scratch\\SigmaOS\\modules\\ui\\zenith\\widget_engine.c -o C:\\Users\\Aaryan\\.gemini\\antigravity\\scratch\\SigmaOS\\modules\\ui\\zenith\\widget_engine.c.o"
+    },
+    {
+        "directory":  "c:\\Users\\Aaryan\\.gemini\\antigravity\\scratch\\SigmaOS",
+        "file":  "C:\\Users\\Aaryan\\.gemini\\antigravity\\scratch\\SigmaOS\\modules\\ui\\zenith\\zenith_compositor.c",
+        "command":  "gcc -Imodules/core/include -I. -ffreestanding -nostdlib -c C:\\Users\\Aaryan\\.gemini\\antigravity\\scratch\\SigmaOS\\modules\\ui\\zenith\\zenith_compositor.c -o C:\\Users\\Aaryan\\.gemini\\antigravity\\scratch\\SigmaOS\\modules\\ui\\zenith\\zenith_compositor.c.o"
+    }
+]

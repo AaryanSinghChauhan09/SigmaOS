@@ -48,20 +48,27 @@
 
         .shard {
             position: absolute;
-            background: var(--shard-bg);
-            backdrop-filter: blur(16px);
-            -webkit-backdrop-filter: blur(16px);
-            border: 1px solid var(--shard-border);
-            border-radius: 16px;
-            padding: 20px;
-            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
-            pointer-events: auto;
-            transition: transform 0.2s cubic-bezier(0.2, 0.8, 0.2, 1), box-shadow 0.2s;
+            background: rgba(15, 15, 25, 0.7);
+            backdrop-filter: blur(15px) saturate(180%);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 12px;
             display: flex;
             flex-direction: column;
             overflow: hidden;
-            min-width: 200px;
-            min-height: 150px;
+            transition: opacity 0.3s ease, box-shadow 0.3s ease, transform 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+            cursor: default;
+        }
+
+        .shard:hover {
+            border: 1px solid rgba(59, 130, 246, 0.4);
+            transform: scale(1.01);
+        }
+
+        .shard.active {
+            border: 1px solid var(--accent);
+            box-shadow: 0 20px 40px rgba(0,0,0,0.4), 0 0 20px rgba(59, 130, 246, 0.2);
+            opacity: 1 !important;
         }
 
         .shard.dragging {
@@ -355,10 +362,9 @@
         }
 
         function startDrag(e, id) {
-            if (e.target.className === 'resizer') return;
+            if (e.target.className === 'resizer' || e.target.className === 'shard-action') return;
             draggedElement = document.getElementById(id);
-            zIndexCounter++;
-            draggedElement.style.zIndex = zIndexCounter;
+            bringToFront(draggedElement);
             draggedElement.classList.add('dragging');
             
             const rect = draggedElement.getBoundingClientRect();
@@ -367,6 +373,19 @@
             
             document.addEventListener('mousemove', drag);
             document.addEventListener('mouseup', stopDrag);
+        }
+
+        function bringToFront(el) {
+            zIndexCounter++;
+            el.style.zIndex = zIndexCounter;
+            
+            // Manage active state
+            document.querySelectorAll('.shard').forEach(s => {
+                s.classList.remove('active');
+                s.style.opacity = '0.8';
+            });
+            el.classList.add('active');
+            el.style.opacity = '1';
         }
 
         function drag(e) {
@@ -389,8 +408,7 @@
         function startResize(e, id) {
             e.stopPropagation();
             resizingElement = document.getElementById(id);
-            zIndexCounter++;
-            resizingElement.style.zIndex = zIndexCounter;
+            bringToFront(resizingElement);
             
             const rect = resizingElement.getBoundingClientRect();
             startWidth = rect.width;

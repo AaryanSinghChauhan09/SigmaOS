@@ -1,4 +1,4 @@
-#include "sigma_libc.h" // IDE Rescan Forced
+#include "sigma_libc.h"
 
 // ---------------------------------------------------------
 // SigmaVM: Lightweight Virtualization Hypervisor (Phase 3)

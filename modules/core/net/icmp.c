@@ -1,4 +1,4 @@
-#include "sigma_libc.h" // IDE Rescan Forced
+#include "sigma_libc.h"
 
 // ---------------------------------------------------------
 // SigmaOS ICMP & ARP Protocol Stubs (Phase 2)

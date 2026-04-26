@@ -1,4 +1,4 @@
-#include "sigma_libc.h" // IDE Rescan Forced
+#include "sigma_libc.h"
 
 // ---------------------------------------------------------
 // SigmaOS Shard-Level Socket API & Firewall (Phase 2)
