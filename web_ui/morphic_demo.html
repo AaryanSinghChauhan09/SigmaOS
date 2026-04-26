@@ -343,6 +343,7 @@
         <button onclick="arrangeGrid()">Arrange Grid</button>
         <button onclick="tileShards()">Tile All</button>
         <button onclick="applyMosaic()">Mosaic Layout</button>
+        <button onclick="triggerHandover()" title="Handover to Mobile/Cloud">🌐 Handover</button>
         <div style="color: rgba(255,255,255,0.5); display: flex; align-items: center; padding-left: 10px; border-left: 1px solid rgba(255,255,255,0.2);">
             SigmaOS Morphic UI Demo
         </div>
@@ -514,6 +515,21 @@
             document.removeEventListener('mouseup', stopResize);
             document.removeEventListener('touchmove', resize);
             document.removeEventListener('touchend', stopResize);
+        }
+
+        function triggerHandover() {
+            const activeShard = document.querySelector('.shard.active');
+            if (!activeShard) {
+                alert("Select a shard to handover.");
+                return;
+            }
+            activeShard.style.transform = 'scale(1.1) translateY(-100px)';
+            activeShard.style.opacity = '0';
+            setTimeout(() => {
+                alert(`Shard ${activeShard.id} handed over to Sovereign Cloud Node.`);
+                activeShard.remove();
+                applyMosaic();
+            }, 800);
         }
 
         let shardCounter = 4;
