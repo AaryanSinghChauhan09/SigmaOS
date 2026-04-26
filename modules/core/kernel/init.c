@@ -3,6 +3,7 @@
 // ---------------------------------------------------------
 // SigmaOS Core Modular Initialization Implementation
 // ---------------------------------------------------------
+const uint32_t SIGMA_CORE_READY = 1;
 
 void sigma_core_init(void) {
     // [PHASE 11] Modular initialization logic.
