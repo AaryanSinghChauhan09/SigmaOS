@@ -1,4 +1,5 @@
-# SigmaOS — Kernel Module Reference
+# SigmaOS — Kernel Module Reference
+
 > **Auto-audited**: This document reflects the actual files in the repository. Last synced: 2026-04-25.
 
 ---
@@ -93,6 +94,7 @@
 | `sigma_netmesh_routing.hpp` | OOP Mesh Router utilizing Optimized Link State Routing |
 | `sigma_netmesh_topology.hpp` | OOP Mesh Topology Discoverer via Layer 2 Heartbeats |
 | `sigma_netmesh_security.hpp` | Zero-Trust Mesh Security Enforcer utilizing ZKP caps |
+| `sigma_net_mobile.hpp` | Native Cellular Stack parsing 5G/LTE AT/QMI protocols |
 
 ---
 
@@ -131,6 +133,8 @@
 | Module File | Responsibility |
 |-------------|----------------|
 | `sigma_media_codec.h` | FFmpeg-inspired codec registry (plugin-free C functions) |
+| `sigma_i18n_core.hpp` | Universal multilingual support via O(1) static string interning |
+| `sigma_accessibility.hpp` | Native screen reader abstractions and high-contrast UI profiles |
 
 ---
 
@@ -155,7 +159,7 @@
 
 ---
 
-## S28_PerformanceLattice — Performance (`suites/S28_PerformanceLattice/`)
+## S28_PerformanceLattice — Performance & Power (`suites/S28_PerformanceLattice/`)
 
 | Module File | Responsibility |
 |-------------|----------------|
@@ -165,6 +169,8 @@
 | `sigma_perf_shadow.h` | Valgrind-inspired shadow memory leak detector |
 | `sigma_perf_isolator.h` | Resource isolation dynamically restricting CPU freq and memory |
 | `sigma_os_behavior_adaptive.hpp` | Behavior-adaptive OS caching heuristics |
+| `sigma_power_core.hpp` | Advanced Battery Management executing ACPI MSR power states |
+| `sigma_power_scheduler.hpp` | Mobile Workload Throttling for thermal/battery preservation |
 
 ---
 
@@ -213,6 +219,9 @@
 | `sigma_zkp.h` | Fiat-Shamir sigma protocol — commit/challenge/respond/verify |
 | `sigma_zkp_attestation.h` | ZKP-based attestation for capability tokens |
 | `sigma_netfilter.h` | iptables-inspired zero-copy packet firewall |
+| `sigma_cloud_sync.hpp` | Distributed State Replication utilizing Sovereign NetMesh |
+| `sigma_cloud_orchestrator.hpp` | Decentralized Swarm Orchestrator replacing Kubernetes |
+| `sigma_edge_cache.hpp` | Edge Workload Optimization for reduced central cloud latency |
 
 ---
 
@@ -291,15 +300,15 @@
 | S01_Genesis kernel headers | 27 |
 | S04_HAL hardware modules | 14 |
 | S08_Security shards | 23 |
-| DevTools/Ecosystem/UI/Tools | 14 |
-| Container/Virt/Perf/NUMA | 10 |
+| DevTools/Ecosystem/UI/Tools | 16 |
+| Container/Virt/Perf/Power | 12 |
 | Storage/FS | 5 |
-| Networking | 12 |
-| Security (ZKP/Caps/BPF/PKG) | 6 |
+| Networking | 13 |
+| Security (ZKP/Caps/BPF/PKG) | 9 |
 | Self-Healing & Boot | 12 |
 | IPC/AIO | 3 |
 | Core OOP atomic modules | 24 |
-| **Total Native Modules** | **150+** |
+| **Total Native Modules** | **158+** |
 
 ---
 
@@ -311,3 +320,5 @@
 | Lattice Verification | `02_Lattice_Verification.yml` | cppcheck + Kani proofs + fuzzing |
 | Native Quality Gate | `03_Web_Zenith.yml` | Compile check + sovereignty audit |
 | Dev Coverage | `04_Sigma_Dev_Coverage.yml` | Module count + OOP audit + ASM count |
+
+

@@ -133,3 +133,5 @@ SigmaOS/
 | Inline ASM modules | 6+ |
 | OOP abstract interfaces | 5 |
 | Zero stdlib violations | ✅ 0 in atomic core |
+
+
