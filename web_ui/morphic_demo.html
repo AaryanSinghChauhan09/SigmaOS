@@ -221,6 +221,14 @@
         .text-vm { color: #ec4899; }
         .vm-console { margin-top: 10px; height: 60px; background: rgba(0,0,0,0.5); border: 1px solid rgba(255,255,255,0.1); border-radius: 4px; padding: 5px; font-family: monospace; font-size: 0.8em; overflow: hidden; }
         .shard-canvas { margin-top: 10px; }
+        .metric-container { margin-bottom: 15px; }
+        .metric-label-row { display: flex; justify-content: space-between; font-size: 0.8rem; margin-bottom: 4px; }
+        .metric-progress-bg { width: 100%; height: 6px; background: rgba(255,255,255,0.1); border-radius: 3px; overflow: hidden; }
+        .metric-progress-fill { height: 100%; }
+        .metric-success { color: #10b981; background-color: #10b981; }
+        .metric-warning { color: #f59e0b; background-color: #f59e0b; }
+        .full-width { width: 100%; }
+        .footer-info { color: rgba(255,255,255,0.5); display: flex; align-items: center; padding-left: 10px; border-left: 1px solid rgba(255,255,255,0.2); }
     </style>
 </head>
 <body>
@@ -319,37 +327,37 @@
         </div>
 
         <!-- Shard 5: CI/CD Pipeline (Phase 5) -->
-        <div class="shard" id="shard_cicd" role="region" aria-label="CI/CD Pipeline" style="top: 380px; left: 820px; width: 320px; height: 240px;">
+        <div class="shard" id="shard_cicd" role="region" aria-label="CI/CD Pipeline">
             <div class="shard-header" onmousedown="startDrag(event, 'shard_cicd')" ontouchstart="startDrag(event, 'shard_cicd')">
                 <div class="shard-title">
-                    <div class="shard-status" style="background-color: #3b82f6; box-shadow: 0 0 8px #3b82f6;"></div>
+                    <div class="shard-status status-net"></div>
                     CI/CD Pipeline (Lattice Sync)
                 </div>
             </div>
             <div class="shard-content">
-                <div style="margin-bottom: 15px;">
-                    <div style="display: flex; justify-content: space-between; font-size: 0.8rem; margin-bottom: 4px;">
+                <div class="metric-container">
+                    <div class="metric-label-row">
                         <span>ARM64 Build</span>
-                        <span style="color: #10b981;">SUCCESS</span>
+                        <span class="metric-success">SUCCESS</span>
                     </div>
-                    <div style="width: 100%; height: 6px; background: rgba(255,255,255,0.1); border-radius: 3px; overflow: hidden;">
-                        <div style="width: 100%; height: 100%; background: #10b981;"></div>
+                    <div class="metric-progress-bg">
+                        <div class="metric-progress-fill metric-success full-width"></div>
                     </div>
                 </div>
-                <div style="margin-bottom: 15px;">
-                    <div style="display: flex; justify-content: space-between; font-size: 0.8rem; margin-bottom: 4px;">
+                <div class="metric-container">
+                    <div class="metric-label-row">
                         <span>RISC-V Build</span>
-                        <span style="color: #f59e0b;">BUILDING...</span>
+                        <span class="metric-warning">BUILDING...</span>
                     </div>
-                    <div style="width: 100%; height: 6px; background: rgba(255,255,255,0.1); border-radius: 3px; overflow: hidden;">
-                        <div id="riscv-progress" style="width: 45%; height: 100%; background: #f59e0b; transition: width 1s linear;"></div>
+                    <div class="metric-progress-bg">
+                        <div id="riscv-progress" class="metric-progress-fill metric-warning"></div>
                     </div>
                 </div>
-                <div id="cicd-logs" style="margin-top: 10px; height: 80px; background: rgba(0,0,0,0.5); border: 1px solid rgba(255,255,255,0.1); border-radius: 4px; padding: 5px; font-family: monospace; font-size: 0.75em; overflow-y: auto; color: #94a3b8;">
+                <div id="cicd-logs" class="shard-log full-width">
                     [INIT] Lattice Sync Active...<br>
                     [WAIT] Pulling latest runs...
                 </div>
-                <button class="shard-action" style="width: 100%; margin-top: 8px;" onclick="showLogs()">FORCE RESYNC</button>
+                <button class="shard-action full-width" onclick="showLogs()">FORCE RESYNC</button>
             </div>
             <div class="resizer" onmousedown="startResize(event, 'shard_cicd')" ontouchstart="startResize(event, 'shard_cicd')"></div>
         </div>
@@ -363,7 +371,7 @@
         <button onclick="triggerHandover()" title="Handover to Mobile/Cloud">🌐 Handover</button>
         <button onclick="toggleHolographic()" title="Toggle 3D Holographic Mode">🔮 Holographic</button>
         <button onclick="toggleCollab()" title="Toggle Shared Workspace Mode">👥 Collaborate</button>
-        <div style="color: rgba(255,255,255,0.5); display: flex; align-items: center; padding-left: 10px; border-left: 1px solid rgba(255,255,255,0.2);">
+        <div class="footer-info">
             SigmaOS Morphic UI Demo
         </div>
     </div>
