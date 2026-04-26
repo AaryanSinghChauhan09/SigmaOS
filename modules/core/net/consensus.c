@@ -11,6 +11,9 @@ typedef struct {
     uint8_t votes[16];      // Bitmask of validator votes
 } consensus_proposal_t;
 
+// Prototype to prevent implicit declaration
+void consensus_commit(consensus_proposal_t* p);
+
 int consensus_propose(consensus_proposal_t* p) {
     SIGMA_SHARD_INIT();
     // [PHASE 9] Lattice-Based BFT Logic

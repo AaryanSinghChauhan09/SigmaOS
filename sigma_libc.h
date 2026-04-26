@@ -2,7 +2,12 @@
 #define SIGMA_LIBC_H
 
 #define SIGMA_LIBC_VERSION 0x08
-#define SIGMA_SHARD_INIT() do { (void)SIGMA_LIBC_VERSION; } while(0)
+
+static inline void sigma_shard_init(void) {
+    (void)SIGMA_LIBC_VERSION;
+}
+
+#define SIGMA_SHARD_INIT() sigma_shard_init()
 
 // Standard integer equivalents for Sovereign Silicon
 typedef unsigned char      uint8_t;
