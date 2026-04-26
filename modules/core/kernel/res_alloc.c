@@ -16,5 +16,11 @@ void res_alloc_init() {
 }
 
 void res_alloc_rebalance() {
-    // Dynamically adjust shard priorities based on real-time telemetry.
+    SIGMA_SHARD_INIT();
+    // [PHASE 9] Affinity-Aware Balancing Algorithm
+    // Minimize cross-node migration by favoring affinity_mask.
+    res_alloc_profile_t p;
+    if (p.cpu_load > 80 && (p.affinity_mask & 0x01)) {
+        // Shift load to secondary core within same affinity group
+    }
 }

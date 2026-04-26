@@ -23,8 +23,12 @@ typedef enum {
 } morphic_ai_event_type_t;
 
 void morphic_ai_process_event(shard_usage_metrics_t* metrics, morphic_ai_event_type_t event) {
+    SIGMA_SHARD_INIT();
     uint32_t now = 1000; // Mock current timestamp
     metrics->last_focused_timestamp = now;
+
+    // [PHASE 9] Decaying Temporal Focus Algorithm
+    float decay = 0.95f;
 
     switch(event) {
         case AI_EVENT_FOCUS: 
@@ -42,7 +46,7 @@ void morphic_ai_process_event(shard_usage_metrics_t* metrics, morphic_ai_event_t
     }
     
     // Recalculate focus score with decay logic
-    metrics->focus_score = (metrics->usage_frequency * layout_weights[0]);
+    metrics->focus_score = (metrics->focus_score * decay) + (metrics->usage_frequency * layout_weights[1]);
 }
 
 void morphic_ai_generate_heatmap(uint8_t* heatmap_out, uint32_t width, uint32_t height) {
