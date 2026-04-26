@@ -3,7 +3,9 @@
 This document outlines the demonstration strategy for **Phase 8: Adaptive Intelligence & Quantum Mesh**.
 
 ## 🖥 Morphic UI — Adaptive Intelligence
+
 ### Demo Deliverables
+
 1. **Visual Predictive Placement**:
    - **Ghost Overlays**: Shards display dashed ghost overlays as they are dragged, showing where the AI predicts the user wants to snap them.
    - **Predictive Highlights**: Active zones glow slightly when a shard is moved toward them, guiding user intent.
@@ -19,7 +21,9 @@ This document outlines the demonstration strategy for **Phase 8: Adaptive Intell
 - **Visual**: The shard scales out and fades, simulating its transfer to a remote sovereign node.
 
 ## 🔐 Quantum-Safe Infrastructure — Sovereign Security
-### Demo Deliverables
+
+### Demo Deliverables Security
+
 1. **PQFS (Post-Quantum File System)**:
    - Demonstration of Lattice-based (Kyber) file encryption. Shard storage is XOR-encrypted with a post-quantum shared secret.
 2. **3-Way Lattice Handshake**:
@@ -27,7 +31,8 @@ This document outlines the demonstration strategy for **Phase 8: Adaptive Intell
 3. **Secure Boot Parity**:
    - Verification that the PQFS storage is only accessible if the secure boot signature matches the lattice public key.
 
-### Showcase Script
+### Showcase Script Security
+
 - **Action**: Run `pqfs_write_secure("config.shard", data)`.
 - **Logic**: The system generates a Kyber-768 keypair, encapsulates a secret, and encrypts the shard data.
 - **Action**: Attempt unauthorized access from a non-federated node.

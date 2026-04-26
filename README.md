@@ -82,6 +82,18 @@ Every OS capability lives in a self-contained C/C++ file. No monoliths. No casca
 - **Fragment Shader Shards** — each visual effect is its own atomic module
 - **CLI-driven**: `s-cli profile gaming` morphs the UI in real time
 
+### Phase 1: Foundations (Completed)
+
+- **Kernel Core**: Scheduler, Memory Management, Interrupts.
+- **HAL**: Essential drivers (Keyboard, Display, Storage).
+- **Boot**: Bare-metal bootstrap sequence.
+
+### Phase 2: Networking & Security (Completed)
+
+- **TCP/IP Stack**: Modular ICMP, UDP, TCP shards.
+- **Shard Isolation**: Capability-based memory and I/O sandboxing.
+- **Permissions**: Zero-Trust shard interaction model.
+
 **Morphic UI Visual Demonstration:**
 *(The glassmorphism shard interaction showcasing decoupled kernel panels).*
 
