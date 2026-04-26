@@ -215,6 +215,9 @@
     <div class="grid-bg"></div>
     <div id="snap-preview" style="position: absolute; background: rgba(59, 130, 246, 0.2); border: 2px solid var(--accent); border-radius: 12px; pointer-events: none; opacity: 0; transition: all 0.2s cubic-bezier(0.19, 1, 0.22, 1); z-index: 50;"></div>
     <div id="predictive-overlay" style="position: absolute; border: 2px dashed rgba(59, 130, 246, 0.4); border-radius: 12px; pointer-events: none; opacity: 0; transition: all 0.3s ease; z-index: 50; background: rgba(59, 130, 246, 0.05);"></div>
+    <svg id="gesture-layer" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; z-index: 60; filter: drop-shadow(0 0 8px var(--accent));">
+        <path id="gesture-path" d="" fill="none" stroke="var(--accent)" stroke-width="3" stroke-linecap="round" opacity="0.6" stroke-dasharray="5,5" />
+    </svg>
     <div id="fps-overlay">SOV_CORE: 60.0 FPS | LATENCY: 1.2ms</div>
 
     <div id="ui-layer" role="application" aria-label="Morphic UI Window Manager">
@@ -433,6 +436,13 @@
             overlay.style.width = (parseInt(draggedElement.style.width) - 10) + 'px';
             overlay.style.height = (parseInt(draggedElement.style.height) - 10) + 'px';
 
+            // Gesture Path Visualization (Phase 9)
+            if (holographic) {
+                const path = document.getElementById('gesture-path');
+                const d = path.getAttribute('d') || `M ${clientX} ${clientY}`;
+                path.setAttribute('d', `${d} L ${clientX} ${clientY}`);
+            }
+
             // Aero Snap Detection
             const preview = document.getElementById('snap-preview');
             if (clientX < 50) {
@@ -463,6 +473,7 @@
 
         function stopDrag(e) {
             document.getElementById('predictive-overlay').style.opacity = '0';
+            document.getElementById('gesture-path').setAttribute('d', ''); // Clear path
             if (draggedElement) {
                 const touch = e.type === 'touchend';
                 const preview = document.getElementById('snap-preview');
