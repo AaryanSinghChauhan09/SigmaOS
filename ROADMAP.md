@@ -1,53 +1,46 @@
-# SigmaOS: Sovereign Roadmap
+# 🗺️ SigmaOS Evolutionary Roadmap
 
-SigmaOS is transitioning from a modular concept into an industrially hardened, performant operating system. To bridge our visionary claims with tangible deliverables, we have structured our roadmap into 5 core phases:
+This document outlines the industrial trajectory of SigmaOS from a visionary concept to a hardware-native computing singularity.
 
-## 🚀 Phase 1: Foundations (0–3 months)
+## Phase 1: Foundations (Completed)
+- **Kernel Core**: Scheduler, Memory Management, Interrupts.
+- **HAL**: Essential drivers (Keyboard, Display, Storage).
+- **Boot**: Bare-metal bootstrap sequence.
 
-*The backbone of performance and bare-metal execution.*
+## Phase 2: Networking & Security (Completed)
+- **TCP/IP Stack**: Modular ICMP, UDP, TCP shards.
+- **Shard Isolation**: Capability-based memory and I/O sandboxing.
+- **Permissions**: Zero-Trust shard interaction model.
 
-- **Kernel Core:** Scheduler, memory management (paging, vmm), and interrupts.
-- **File System:** Basic file system (ext2/FAT).
-- **Driver Ecosystem:** Essential drivers (keyboard, display, storage, Wi-Fi, Audio, USB, GPU).
-- **Installer:** Bootable ISO/VM image for testing.
+## Phase 3: Performance & Optimization (Completed)
+- **Profiling**: RDTSC-powered metrics integrated into the core.
+- **Benchmarks**: Formal performance verification against legacy kernels.
+- **Optimization**: Context-switch and IPC latency hardening.
 
-## 🔐 Phase 2: Networking & Security (3–6 months)
+## Phase 4: User Experience Maturity (Completed)
+- **Morphic UI**: WebGL-native window manager prototype.
+- **CLI Shell**: Shard-aware command orchestrator.
+- **Package Manager**: Atomic shard registry and dependency resolution.
 
-*Establishing isolation and communication.*
+## Phase 5: Ecosystem & Cross-Arch (Completed)
+- **ARM64/RISC-V**: Boot parity and MMU/PLIC implementations.
+- **Lattice Sync**: Live CI/CD logs integrated into the UI.
+- **Industrial Sync**: GitHub and Wiki professionalization.
 
-- **Networking Stack:** TCP/IP stack + IPv6 support and secure communication protocols.
-- **Access Control:** Role-based authentication & permissions.
-- **Isolation Mechanisms:** Shard isolation and sandboxing mechanisms.
-- **Resilience:** Logging, auditing, and crash recovery systems.
+## Phase 6: Advanced UI & PQC (Completed)
+- **Morphic Mosaic**: Intelligent auto-layout engine.
+- **Aero Snap**: Edge-based snapping and tiling logic.
+- **Kyber Cryptography**: NIST-standard post-quantum key exchange for shards.
 
-## ⚡ Phase 3: Performance & Optimization (6–9 months)
+## Phase 7: Intuitive Sovereignty (Active)
+- **Gestures**: Touch, trackpad, and multi-finger gesture control.
+- **Adaptive Focus**: Focus-based shard expansion and workload highlighting.
+- **Quantum-Resilient Boot**: Hardware-native PQC verification at startup.
 
-*Validating the "most advanced" and performant claims.*
-
-- **Benchmarks:** Benchmarks vs Linux/seL4.
-- **Profiling Tools:** Profiling tools for CPU/memory/I/O.
-- **Virtualization:** Lightweight hypervisor (KVM/Xen compatible) for testing workloads.
-- **Stability:** Error handling and fault tolerance improvements.
-
-## 🎨 Phase 4: User Experience (9–12 months)
-
-*Making the system accessible to end users.*
-
-- **Morphic UI Expansion:** Build out the Morphic UI beyond the prototype to support real window management.
-- **CLI Shell Development:** Provide a command-line interface for shard management and system control.
-- **Installer & Bootloader:** Create a bootable ISO and VM image for broader adoption.
-- **Package Manager:** Design a shard-based package manager for installing and updating software.
-- **Localization & Accessibility:** Add support for multiple languages and accessibility features.
-
-## 🌍 Phase 5: Ecosystem & Expansion (12–18 months)
-
-*Scaling to a global sovereign community.*
-
-- **Cross-Architecture:** Support for ARM, RISC-V, MIPS.
-- **Interoperability:** POSIX compliance & ELF binary loader.
-- **Cloud & Enterprise:** Cloud-native APIs (Kubernetes/OpenStack integration).
-- **IoT Support:** IoT shard for embedded devices and sensor drivers.
-- **Community:** Contributor guidelines & governance model.
-
----
-*SigmaOS: Proving sovereignty through engineering, working demos, benchmarks, and developer adoption.*
+## Phase 8: Adaptive Intelligence & Quantum Mesh (Upcoming)
+- **Track A: Adaptive Intelligence (Morphic AI)**
+  - Predictive shard placement based on user workload.
+  - AI-driven auto-tiling and layout optimization.
+- **Track B: Quantum-Safe Infrastructure**
+  - Lattice-based distributed authentication for mesh networking.
+  - Post-quantum secure file system encryption.
