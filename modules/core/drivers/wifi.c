@@ -1,4 +1,4 @@
-#include "./sigma_libc.h"
+#include "sigma_libc.h"
 
 // ---------------------------------------------------------
 // SigmaOS Wi-Fi Driver Prototype (802.11 Stub)
