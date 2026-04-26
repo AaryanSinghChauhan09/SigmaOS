@@ -1,4 +1,4 @@
-#include "./sigma_libc.h"
+#include "sigma_libc.h" // IDE Rescan Forced
 
 // ---------------------------------------------------------
 // SigmaOS Universal Serial Bus (USB) Controller Stub
