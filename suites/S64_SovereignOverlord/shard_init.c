@@ -11,6 +11,6 @@ void overlord_subjugate_host() {
 }
 
 void shard_init() {
-    SIGMA_SHARD_INIT();
+    sigma_shard_init();
     sigma_printf("[SHARD] Sovereign Overlord active. Total market dominance initiated.\n");
 }

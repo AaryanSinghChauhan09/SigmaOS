@@ -10,6 +10,6 @@ void sigma_pledge(const char* promises) {
 }
 
 void shard_init() {
-    SIGMA_SHARD_INIT();
+    sigma_shard_init();
     sigma_printf("[SHARD] Sovereign Pledge active. Least-privilege enforcement enabled.\n");
 }

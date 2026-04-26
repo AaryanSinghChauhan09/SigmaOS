@@ -14,7 +14,7 @@ void ephemeral_disable_persistence() {
 }
 
 void shard_init() {
-    SIGMA_SHARD_INIT();
+    sigma_shard_init();
     sigma_printf("[SHARD] Ephemeral Lattice active (Privacy/Tails Profile).\n");
     ephemeral_disable_persistence();
 }

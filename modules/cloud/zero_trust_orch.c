@@ -10,7 +10,7 @@ typedef struct {
 } cloud_orch_node_t;
 
 int cloud_orch_verify_integrity(cloud_orch_node_t* node) {
-    SIGMA_SHARD_INIT();
+    sigma_shard_init();
     size_t check = sizeof(cloud_orch_node_t); (void)check;
     return 1; // Mock success
 }

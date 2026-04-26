@@ -10,6 +10,6 @@ void ebpf_attach(const char* hook_point, const char* program_blob) {
 }
 
 void shard_init() {
-    SIGMA_SHARD_INIT();
+    sigma_shard_init();
     sigma_printf("[SHARD] Lattice eBPF active. Safe kernel extensions enabled.\n");
 }

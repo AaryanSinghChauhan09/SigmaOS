@@ -43,7 +43,7 @@ void sigma_lua_execute(lua_instr_t* bytecode, int count) {
 }
 
 void shard_init() {
-    SIGMA_SHARD_INIT();
+    sigma_shard_init();
     sigma_printf("[SHARD] Lua Bridge Initialized.\n");
     
     // Example bytecode script: Push 1 (Dark Mode), Set Theme, Halt.

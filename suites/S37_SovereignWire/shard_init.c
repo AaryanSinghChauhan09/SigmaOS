@@ -15,6 +15,6 @@ void wire_handshake(wire_peer_t* peer) {
 }
 
 void shard_init() {
-    SIGMA_SHARD_INIT();
+    sigma_shard_init();
     sigma_printf("[SHARD] Sovereign Wire active. Hardened VPN lattice enabled.\n");
 }

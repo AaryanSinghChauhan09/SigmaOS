@@ -26,6 +26,6 @@ void sigma_slab_free(void* ptr) {
 }
 
 void shard_init() {
-    SIGMA_SHARD_INIT();
+    sigma_shard_init();
     sigma_printf("[SHARD] Slab Allocator active (Server Profile Optimized).\n");
 }

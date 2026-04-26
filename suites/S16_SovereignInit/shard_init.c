@@ -37,7 +37,7 @@ void s_init_load_profile(const char* profile_name) {
 }
 
 void shard_init() {
-    SIGMA_SHARD_INIT();
+    sigma_shard_init();
     sigma_printf("[SHARD] Sovereign Init System Active.\n");
     
     // Default boot profile (can be overridden by bootloader command line)

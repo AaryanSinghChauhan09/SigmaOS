@@ -11,6 +11,6 @@ void forge_create_shard(const char* description) {
 }
 
 void shard_init() {
-    SIGMA_SHARD_INIT();
+    sigma_shard_init();
     sigma_printf("[SHARD] Sovereign Forge active. Infinite extensibility enabled.\n");
 }

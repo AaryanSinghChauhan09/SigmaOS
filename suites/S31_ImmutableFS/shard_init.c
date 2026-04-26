@@ -14,7 +14,7 @@ void immutable_initiate_atomic_update(const uint8_t* state_hash) {
 }
 
 void shard_init() {
-    SIGMA_SHARD_INIT();
+    sigma_shard_init();
     sigma_printf("[SHARD] Immutable FS active. Kernel lattice protected from mutation.\n");
     immutable_lock_kernel_shards();
 }

@@ -11,7 +11,7 @@ typedef struct {
 } spatial_audio_source_t;
 
 void spatial_audio_init() {
-    SIGMA_SHARD_INIT();
+    sigma_shard_init();
     // [PHASE 10] Initialize immersive audio lattice.
 }
 

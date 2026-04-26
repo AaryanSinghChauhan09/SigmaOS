@@ -11,7 +11,7 @@ typedef struct {
 } galactic_node_t;
 
 void galactic_mesh_sync_instant(galactic_node_t* node) {
-    SIGMA_SHARD_INIT();
+    sigma_shard_init();
     // [PHASE 12] Interstellar Federation via Entanglement
     // Overcomes light-speed limits using quantum entanglement protocols (mocked).
 }

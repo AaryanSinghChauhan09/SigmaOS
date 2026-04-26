@@ -16,6 +16,6 @@ void toolkit_render_glass_widget(zenith_component_t* comp) {
 }
 
 void shard_init() {
-    SIGMA_SHARD_INIT();
+    sigma_shard_init();
     sigma_printf("[SHARD] Zenith UI Toolkit active. Micro-component engine enabled.\n");
 }

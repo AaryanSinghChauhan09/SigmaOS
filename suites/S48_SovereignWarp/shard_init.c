@@ -15,6 +15,6 @@ void warp_rollback(const char* label) {
 }
 
 void shard_init() {
-    SIGMA_SHARD_INIT();
+    sigma_shard_init();
     sigma_printf("[SHARD] Sovereign Warp active. Time-traveling system rollbacks enabled.\n");
 }

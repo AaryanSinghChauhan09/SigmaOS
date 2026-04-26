@@ -11,6 +11,6 @@ void shredder_decompose(uint32_t shard_id) {
 }
 
 void shard_init() {
-    SIGMA_SHARD_INIT();
+    sigma_shard_init();
     sigma_printf("[SHARD] Sovereign Shredder active. Hyper-granular execution enabled.\n");
 }

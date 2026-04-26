@@ -23,7 +23,7 @@ typedef enum {
 } morphic_ai_event_type_t;
 
 void morphic_ai_process_event(shard_usage_metrics_t* metrics, morphic_ai_event_type_t event) {
-    SIGMA_SHARD_INIT();
+    sigma_shard_init();
     uint32_t now = 1000; // Mock current timestamp
     metrics->last_focused_timestamp = now;
 

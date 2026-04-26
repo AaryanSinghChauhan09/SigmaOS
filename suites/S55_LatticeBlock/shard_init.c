@@ -10,6 +10,6 @@ void block_filter_packet(const char* host) {
 }
 
 void shard_init() {
-    SIGMA_SHARD_INIT();
+    sigma_shard_init();
     sigma_printf("[SHARD] Lattice Block active. Global ad-eradication enabled.\n");
 }

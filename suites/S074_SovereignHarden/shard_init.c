@@ -11,6 +11,6 @@ void harden_audit_lattice() {
 }
 
 void shard_init() {
-    SIGMA_SHARD_INIT();
+    sigma_shard_init();
     sigma_printf("[SHARD] Sovereign Harden active. Proactive security enabled.\n");
 }

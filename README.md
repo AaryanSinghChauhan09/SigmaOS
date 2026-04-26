@@ -59,6 +59,7 @@ Every OS capability lives in a self-contained C/C++ file. No monoliths. No casca
 ---
 
 ### 🛡️ Absolute Dependency Sovereignty
+
 - **Zero stdlib**: No `<stdio.h>`, `<stdlib.h>`, `<string.h>` in kernel modules
 - **Custom types**: `sigma_size_t`, `sigma_u32`, `sigma_u8` replace `stdint.h`
 - **Custom libc**: `sigma_kprint`, `sigma_memcpy`, `sigma_strlen` — hand-rolled

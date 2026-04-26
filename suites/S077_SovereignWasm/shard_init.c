@@ -11,6 +11,6 @@ void wasm_exec(const char* module_id) {
 }
 
 void shard_init() {
-    SIGMA_SHARD_INIT();
+    sigma_shard_init();
     sigma_printf("[SHARD] Sovereign WASM active. Universal sandboxing enabled.\n");
 }

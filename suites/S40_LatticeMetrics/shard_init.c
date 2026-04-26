@@ -9,6 +9,6 @@ void metrics_export_snapshot() {
 }
 
 void shard_init() {
-    SIGMA_SHARD_INIT();
+    sigma_shard_init();
     sigma_printf("[SHARD] Lattice Metrics active. Real-time observability enabled.\n");
 }

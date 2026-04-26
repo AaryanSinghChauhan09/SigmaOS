@@ -18,7 +18,7 @@ void silicon_init_hw() {
 }
 
 void shard_init() {
-    SIGMA_SHARD_INIT();
+    sigma_shard_init();
     sigma_printf("[SHARD] Silicon Boot active. Raw hardware control enabled.\n");
     silicon_init_hw();
 }

@@ -5,7 +5,7 @@
 // ---------------------------------------------------------
 
 int compliance_verify_shard(const char* shard_id) {
-    SIGMA_SHARD_INIT();
+    sigma_shard_init();
     // [PHASE 10] Verify shard compliance with sovereign policies.
     return 1;
 }

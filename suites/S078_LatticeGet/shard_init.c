@@ -12,6 +12,6 @@ void lattice_get_install(const char* shard_id) {
 }
 
 void shard_init() {
-    SIGMA_SHARD_INIT();
+    sigma_shard_init();
     sigma_printf("[SHARD] Lattice Get active. Distributed package management enabled.\n");
 }

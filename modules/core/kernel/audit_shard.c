@@ -5,6 +5,6 @@
 // ---------------------------------------------------------
 
 void audit_log_event(const char* event_desc) {
-    SIGMA_SHARD_INIT();
+    sigma_shard_init();
     // [PHASE 10] Immutable audit logging for shard activities.
 }

@@ -5,6 +5,6 @@
 // ---------------------------------------------------------
 
 void syscall_trace_log(uint32_t syscall_id, uint64_t* args) {
-    SIGMA_SHARD_INIT();
+    sigma_shard_init();
     // [PHASE 10] Trace kernel-native syscalls for observability.
 }

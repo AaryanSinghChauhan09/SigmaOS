@@ -11,7 +11,7 @@ typedef struct {
 } shard_council_state_t;
 
 void shard_council_negotiate_resources() {
-    SIGMA_SHARD_INIT();
+    sigma_shard_init();
     // [PHASE 11] Autonomous Shard Negotiation
     // Shards propose and vote on resource re-balancing.
     // If a shard's compliance score is low, its vote is weight-reduced.

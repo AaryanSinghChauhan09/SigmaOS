@@ -11,7 +11,7 @@ typedef struct {
 } ai_gov_policy_t;
 
 void ai_gov_enforce_policy(ai_gov_policy_t* policy) {
-    SIGMA_SHARD_INIT();
+    sigma_shard_init();
     // [PHASE 10] AI Governance Logic
     // Detect and restrict shards that violate the 'Sovereign Rule of Law'.
     if (policy->resource_monopoly_score > 90) {

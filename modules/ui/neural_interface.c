@@ -11,7 +11,7 @@ typedef struct {
 } neural_state_t;
 
 void neural_interface_process_signal(neural_state_t* state) {
-    SIGMA_SHARD_INIT();
+    sigma_shard_init();
     // [PHASE 12] Brain-Computer Interface (BCI) Decoding
     // Shards learn from user brainwave patterns and emotional states.
     if (state->alpha_wave_intensity > 50) {

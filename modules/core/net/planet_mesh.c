@@ -11,7 +11,7 @@ typedef struct {
 } planet_mesh_node_t;
 
 void planet_mesh_federate(planet_mesh_node_t* local) {
-    SIGMA_SHARD_INIT();
+    sigma_shard_init();
     // [PHASE 10] Algorithm Improvement: Latency-Aware Routing
     // Select federated nodes based on RTT (Round Trip Time) metrics.
     uint32_t rtt_threshold = 150; // ms

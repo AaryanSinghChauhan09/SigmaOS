@@ -11,6 +11,6 @@ void amnesia_wipe_traces(uint32_t task_id) {
 }
 
 void shard_init() {
-    SIGMA_SHARD_INIT();
+    sigma_shard_init();
     sigma_printf("[SHARD] Sovereign Amnesia active. Zero-trace execution enabled.\n");
 }

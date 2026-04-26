@@ -10,6 +10,6 @@ void sentinel_scan_lattice() {
 }
 
 void shard_init() {
-    SIGMA_SHARD_INIT();
+    sigma_shard_init();
     sigma_printf("[SHARD] Sovereign Sentinel active. Autonomous neural defense enabled.\n");
 }

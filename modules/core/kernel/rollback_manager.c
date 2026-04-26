@@ -5,7 +5,7 @@
 // ---------------------------------------------------------
 
 void rollback_manager_init() {
-    SIGMA_SHARD_INIT();
+    sigma_shard_init();
     // [PHASE 10] Initialize state rollback for sovereign updates.
 }
 

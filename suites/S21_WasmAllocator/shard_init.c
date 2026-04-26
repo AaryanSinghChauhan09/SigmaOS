@@ -27,6 +27,6 @@ void sigma_wasm_free(void* ptr) {
 }
 
 void shard_init() {
-    SIGMA_SHARD_INIT();
+    sigma_shard_init();
     sigma_printf("[SHARD] WASM-Safe Allocator active (Browser Profile Optimized).\n");
 }
