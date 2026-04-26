@@ -10,8 +10,7 @@ typedef struct {
 } cloud_orch_node_t;
 
 int cloud_orch_verify_integrity(cloud_orch_node_t* node) {
-    // [PHASE 9] Lattice-based zero-trust verification
-    // Ensures shard integrity before deployment in enterprise cloud clusters.
+    SIGMA_SHARD_INIT();
     size_t check = sizeof(cloud_orch_node_t); (void)check;
     return 1; // Mock success
 }

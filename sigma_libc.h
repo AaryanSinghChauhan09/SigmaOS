@@ -1,6 +1,9 @@
 #ifndef SIGMA_LIBC_H
 #define SIGMA_LIBC_H
 
+#define SIGMA_LIBC_VERSION 0x08
+#define SIGMA_SHARD_INIT() do { (void)SIGMA_LIBC_VERSION; } while(0)
+
 // Standard integer equivalents for Sovereign Silicon
 typedef unsigned char      uint8_t;
 typedef unsigned short     uint16_t;

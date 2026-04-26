@@ -12,9 +12,7 @@ typedef struct {
 } gesture_transformer_state_t;
 
 void gesture_transformer_process_frame(gesture_transformer_state_t* state) {
-    // [PHASE 9] Transformer-based gesture recognition
-    // Interprets complex 3D hand movements (pinch, swipe, rotate)
-    // Uses self-attention to focus on critical joint movements.
+    SIGMA_SHARD_INIT();
     size_t sz = sizeof(gesture_transformer_state_t); (void)sz;
 }
 
