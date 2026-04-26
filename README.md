@@ -10,6 +10,16 @@ SigmaOS is an industrial-grade, bare-metal operating system built entirely from 
 
 ---
 
+## 🚧 Current Project Status: Building the Foundation
+*SigmaOS is currently in **Phase 1** of its [Roadmap](ROADMAP.md). We have established the visionary architecture and are actively building the core components needed to turn this into a fully performant OS.*
+
+- **Bootloader & Kernel Core**: In progress. Initial memory allocation (Slab) and round-robin scheduling exist in the `genesis` module, but are being stabilized for multi-core.
+- **Hardware Drivers (HAL)**: Currently under active development. Foundational abstractions exist, but concrete drivers (Keyboard, Display, Storage, Network) are missing.
+- **Networking & File System**: Planned for Phase 2. There is currently no native TCP/IP stack or persistent file system.
+- **Security & Isolation**: The architecture defines capability-based access and zero-trust sandboxing, but these are pending formal verification and implementation.
+
+---
+
 ## 🏗️ Architecture Overview
 
 SigmaOS utilizes a unique **Atomic Architecture**, where the system is decomposed into highly specialized, isolated shards.

@@ -1,25 +1,46 @@
-name: "🐞 Sovereign Bug Report"
-description: "Report a shard-level anomaly or lattice instability."
+name: Bug Report
+description: Report a bug in the SigmaOS kernel or shards
+title: "[Bug]: "
+labels: ["bug", "triage"]
+assignees: []
+
 body:
   - type: markdown
     attributes:
-      value: "### Σ SigmaOS Forensic Report"
+      value: |
+        Thanks for taking the time to fill out this bug report!
   - type: input
-    id: suite_id
+    id: component
     attributes:
-      label: "Affected Sovereign Suite"
-      placeholder: "e.g., S01_Genesis"
+      label: Affected Component / Shard
+      description: Which shard or subsystem is affected? (e.g., S01_Genesis, S04_HAL)
     validations:
       required: true
   - type: textarea
     id: description
     attributes:
-      label: "Anomaly Description"
-      placeholder: "What structural instability was observed?"
+      label: Description
+      description: A clear and concise description of what the bug is.
     validations:
       required: true
   - type: textarea
-    id: logs
+    id: reproduction
     attributes:
-      label: "Kernel Journal Logs"
-      placeholder: "Output from s_journal_dump()"
+      label: Steps to Reproduce
+      description: Steps to reproduce the behavior.
+    validations:
+      required: true
+  - type: textarea
+    id: expected
+    attributes:
+      label: Expected Behavior
+      description: A clear and concise description of what you expected to happen.
+    validations:
+      required: true
+  - type: input
+    id: version
+    attributes:
+      label: SigmaOS Version
+      description: Which version or commit hash of SigmaOS are you using?
+    validations:
+      required: true

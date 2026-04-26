@@ -1,47 +1,32 @@
 name: Feature Request
-description: Propose a new feature for SigmaOS.
-labels: ["enhancement"]
+description: Suggest an idea for SigmaOS
+title: "[Feature]: "
+labels: ["enhancement", "triage"]
+assignees: []
+
 body:
   - type: markdown
     attributes:
       value: |
-        We want to hear your ideas for evolving the SigmaOS sovereign landscape. 
-
+        Thanks for helping improve the Sovereign Silicon Entity!
   - type: textarea
-    id: feature-description
+    id: problem
     attributes:
-      label: Feature Description
-      description: What is the proposed feature?
-      placeholder: Describe the new feature...
+      label: Is your feature request related to a problem? Please describe.
+      description: A clear and concise description of what the problem is. Ex. I'm always frustrated when [...]
     validations:
       required: true
-
   - type: textarea
-    id: use-case
+    id: solution
     attributes:
-      label: Use Case
-      description: Why is this feature needed?
-      placeholder: Describe the scenario or benefit...
+      label: Describe the solution you'd like
+      description: A clear and concise description of what you want to happen.
     validations:
       required: true
-
   - type: textarea
-    id: implementation-ideas
+    id: alternatives
     attributes:
-      label: Implementation Ideas
-      description: How could this feature be implemented?
-      placeholder: |
-        Is it a new shard? 
-        Does it use existing syscalls?
-        ASM or C?
-    validations:
-      required: false
-
-  - type: textarea
-    id: additional-context
-    attributes:
-      label: Additional Context
-      description: Provide any further details, screenshots, or examples.
-      placeholder: Any more info...
+      label: Describe alternatives you've considered
+      description: A clear and concise description of any alternative solutions or features you've considered.
     validations:
       required: false
