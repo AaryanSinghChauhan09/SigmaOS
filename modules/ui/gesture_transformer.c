@@ -12,7 +12,7 @@ typedef struct {
 } gesture_transformer_state_t;
 
 void gesture_transformer_process_frame(gesture_transformer_state_t* state) {
-    sigma_shard_init();
+    SIGMA_SHARD_INIT();
     size_t sz = sizeof(gesture_transformer_state_t); (void)sz;
 }
 

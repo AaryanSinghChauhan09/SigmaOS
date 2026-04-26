@@ -55,7 +55,7 @@ int sldr_load_binary(const uint8_t* buffer, size_t size) {
 }
 
 void shard_init() {
-    sigma_shard_init();
+    SIGMA_SHARD_INIT();
     sigma_printf("[SHARD] Native Loader Initialized.\n");
     
     // Mock SBN Binary: "Hello Sigma"

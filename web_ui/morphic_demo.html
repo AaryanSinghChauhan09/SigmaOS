@@ -208,14 +208,27 @@
             z-index: 1;
             perspective: 1000px;
         }
+        #snap-preview { position: absolute; background: rgba(59, 130, 246, 0.2); border: 2px solid var(--accent); border-radius: 12px; pointer-events: none; opacity: 0; transition: all 0.2s cubic-bezier(0.19, 1, 0.22, 1); z-index: 50; }
+        #predictive-overlay { position: absolute; border: 2px dashed rgba(59, 130, 246, 0.4); border-radius: 12px; pointer-events: none; opacity: 0; transition: all 0.3s ease; z-index: 50; background: rgba(59, 130, 246, 0.05); }
+        #gesture-layer { position: absolute; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; z-index: 60; filter: drop-shadow(0 0 8px var(--accent)); }
+        .shard-actions { display: flex; gap: 5px; align-items: center; }
+        .shard-lang { font-size: 0.8rem; opacity: 0.5; }
+        .shard-log { margin-top: 15px; padding: 10px; background: rgba(0,0,0,0.3); border-radius: 8px; font-family: monospace; font-size: 0.85em; }
+        .shard-log-warn { color: #f59e0b; }
+        .status-warn { background-color: #f59e0b; box-shadow: 0 0 8px #f59e0b; }
+        .status-vm { background-color: #ec4899; box-shadow: 0 0 8px #ec4899; }
+        .status-net { background-color: #3b82f6; box-shadow: 0 0 8px #3b82f6; }
+        .text-vm { color: #ec4899; }
+        .vm-console { margin-top: 10px; height: 60px; background: rgba(0,0,0,0.5); border: 1px solid rgba(255,255,255,0.1); border-radius: 4px; padding: 5px; font-family: monospace; font-size: 0.8em; overflow: hidden; }
+        .shard-canvas { margin-top: 10px; }
     </style>
 </head>
 <body>
 
     <div class="grid-bg"></div>
-    <div id="snap-preview" style="position: absolute; background: rgba(59, 130, 246, 0.2); border: 2px solid var(--accent); border-radius: 12px; pointer-events: none; opacity: 0; transition: all 0.2s cubic-bezier(0.19, 1, 0.22, 1); z-index: 50;"></div>
-    <div id="predictive-overlay" style="position: absolute; border: 2px dashed rgba(59, 130, 246, 0.4); border-radius: 12px; pointer-events: none; opacity: 0; transition: all 0.3s ease; z-index: 50; background: rgba(59, 130, 246, 0.05);"></div>
-    <svg id="gesture-layer" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; z-index: 60; filter: drop-shadow(0 0 8px var(--accent));">
+    <div id="snap-preview"></div>
+    <div id="predictive-overlay"></div>
+    <svg id="gesture-layer">
         <path id="gesture-path" d="" fill="none" stroke="var(--accent)" stroke-width="3" stroke-linecap="round" opacity="0.6" stroke-dasharray="5,5" />
     </svg>
     <div id="fps-overlay">SOV_CORE: 60.0 FPS | LATENCY: 1.2ms</div>
@@ -228,16 +241,16 @@
                     <div class="shard-status"></div>
                     S01_Genesis Kernel
                 </div>
-                <div style="display: flex; gap: 5px; align-items: center;">
+                <div class="shard-actions">
                     <button class="shard-action" onclick="splitShard('shard1')">SPLIT</button>
-                    <div style="font-size: 0.8rem; opacity: 0.5;">en-US</div>
+                    <div class="shard-lang">en-US</div>
                 </div>
             </div>
             <div class="shard-content">
                 <strong>Status:</strong> Active (Ring 0)<br>
                 <strong>Memory:</strong> 14.2 MB Slab Pool<br>
                 <strong>Scheduler:</strong> Priority Preemptive<br>
-                <div style="margin-top: 15px; padding: 10px; background: rgba(0,0,0,0.3); border-radius: 8px; font-family: monospace; font-size: 0.85em;">
+                <div class="shard-log">
                     [OK] VMM Init<br>
                     [OK] IDT Loaded<br>
                     [OK] Morphic UI Bound
@@ -250,7 +263,7 @@
         <div class="shard" id="shard_prof" role="region" aria-label="System Profiler Benchmarks" style="top: 80px; left: 450px; width: 350px; height: 260px;">
             <div class="shard-header" onmousedown="startDrag(event, 'shard_prof')" ontouchstart="startDrag(event, 'shard_prof')">
                 <div class="shard-title">
-                    <div class="shard-status" style="background-color: #f59e0b; box-shadow: 0 0 8px #f59e0b;"></div>
+                    <div class="shard-status status-warn"></div>
                     S_Profiler (Benchmarking)
                 </div>
             </div>
@@ -258,7 +271,7 @@
                 <strong>Mode:</strong> Live Telemetry (RDTSC)<br>
                 <strong>Syscall Latency:</strong> 42 cycles/call<br>
                 <strong>IPC Throughput:</strong> 14M msg/sec<br>
-                <div style="margin-top: 15px; padding: 10px; background: rgba(0,0,0,0.3); border-radius: 8px; font-family: monospace; font-size: 0.85em; color: #f59e0b;">
+                <div class="shard-log shard-log-warn">
                     vs Linux Process: +310% Speedup<br>
                     Page Faults: 0<br>
                     Context Switches: 14,203/s
@@ -271,15 +284,15 @@
         <div class="shard" id="shard_vm" role="region" aria-label="SigmaVM Hypervisor" style="top: 380px; left: 80px; width: 380px; height: 240px;">
             <div class="shard-header" onmousedown="startDrag(event, 'shard_vm')" ontouchstart="startDrag(event, 'shard_vm')">
                 <div class="shard-title">
-                    <div class="shard-status" style="background-color: #ec4899; box-shadow: 0 0 8px #ec4899;"></div>
+                    <div class="shard-status status-vm"></div>
                     SigmaVM Hypervisor
                 </div>
             </div>
             <div class="shard-content">
                 <strong>Guest:</strong> Ubuntu 24.04 LTS (Linux)<br>
-                <strong>State:</strong> <span style="color: #ec4899;">RUNNING</span> (VMX Active)<br>
+                <strong>State:</strong> <span class="text-vm">RUNNING</span> (VMX Active)<br>
                 <strong>vCPUs:</strong> 4 | <strong>Memory:</strong> 2048 MB<br>
-                <div style="margin-top: 10px; height: 60px; background: rgba(0,0,0,0.5); border: 1px solid rgba(255,255,255,0.1); border-radius: 4px; padding: 5px; font-family: monospace; font-size: 0.8em; overflow: hidden;">
+                <div class="vm-console">
                     root@guest-linux:~# uname -a<br>
                     Linux guest-linux 6.8.0-generic x86_64...<br>
                     root@guest-linux:~# apt update
@@ -292,7 +305,7 @@
         <div class="shard" id="shard2" role="region" aria-label="Network HAL" style="top: 380px; left: 500px; width: 300px; height: 240px;">
             <div class="shard-header" onmousedown="startDrag(event, 'shard2')" ontouchstart="startDrag(event, 'shard2')">
                 <div class="shard-title">
-                    <div class="shard-status" style="background-color: #3b82f6; box-shadow: 0 0 8px #3b82f6;"></div>
+                    <div class="shard-status status-net"></div>
                     S04_HAL Network
                 </div>
             </div>
@@ -300,7 +313,7 @@
                 <strong>Driver:</strong> wifi.c (802.11 ax)<br>
                 <strong>Throughput:</strong> 450 Mbps<br>
                 <strong>Sandboxed:</strong> YES (Token: CAP_NET)<br>
-                <canvas id="netGraph" width="260" height="60" style="margin-top: 10px;"></canvas>
+                <canvas id="netGraph" width="260" height="60" class="shard-canvas"></canvas>
             </div>
             <div class="resizer" onmousedown="startResize(event, 'shard2')" ontouchstart="startResize(event, 'shard2')"></div>
         </div>

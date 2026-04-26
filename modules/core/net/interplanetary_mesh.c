@@ -11,7 +11,7 @@ typedef struct {
 } interplanetary_node_t;
 
 void interplanetary_mesh_sync(interplanetary_node_t* node) {
-    sigma_shard_init();
+    SIGMA_SHARD_INIT();
     // [PHASE 11] Light-Speed Delay Compensation Logic
     // Adjust consensus timeouts based on celestial distance (e.g., Earth-Mars 20m).
     if (node->celestial_body_id == 2) {

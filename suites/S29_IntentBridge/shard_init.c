@@ -16,6 +16,6 @@ void intent_resolve_and_dispatch(intent_request_t* req) {
 }
 
 void shard_init() {
-    sigma_shard_init();
+    SIGMA_SHARD_INIT();
     sigma_printf("[SHARD] Intent Bridge active (Service Mesh Enabled).\n");
 }

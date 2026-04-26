@@ -11,6 +11,6 @@ void biolink_sync_telemetry() {
 }
 
 void shard_init() {
-    sigma_shard_init();
+    SIGMA_SHARD_INIT();
     sigma_printf("[SHARD] Sovereign Bio-Link active. Biological synergy enabled.\n");
 }

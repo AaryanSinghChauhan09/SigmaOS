@@ -11,7 +11,7 @@ typedef enum {
 } chrono_domain_t;
 
 void chrono_scheduler_sync(chrono_domain_t domain) {
-    sigma_shard_init();
+    SIGMA_SHARD_INIT();
     // [PHASE 14] Chrono-Sovereignty Logic
     // Shards adapt to different time domains (rewind/fast-forward).
 }

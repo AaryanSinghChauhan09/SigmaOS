@@ -68,7 +68,7 @@ void vmm_map_page(uint64_t vaddr, uint64_t paddr, uint64_t flags) {
 }
 
 void shard_init() {
-    sigma_shard_init();
+    SIGMA_SHARD_INIT();
     vmm_init();
     
     // Test mapping: Map virtual 0xFFFF0000 to physical 0x80000000

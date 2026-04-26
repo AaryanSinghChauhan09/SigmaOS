@@ -10,6 +10,6 @@ void sandbox_create_context(uint32_t shard_id) {
 }
 
 void shard_init() {
-    sigma_shard_init();
+    SIGMA_SHARD_INIT();
     sigma_printf("[SHARD] Lattice Sandbox active. Unprivileged execution enabled.\n");
 }

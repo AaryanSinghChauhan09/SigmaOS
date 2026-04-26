@@ -11,6 +11,6 @@ void optimizer_prune_lattice(const char* task_id) {
 }
 
 void shard_init() {
-    sigma_shard_init();
+    SIGMA_SHARD_INIT();
     sigma_printf("[SHARD] Sovereign Optimizer active. Functional pruning enabled.\n");
 }

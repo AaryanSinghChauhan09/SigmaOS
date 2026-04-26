@@ -78,6 +78,7 @@ Every OS capability lives in a self-contained C/C++ file. No monoliths. No casca
 ---
 
 ### 🎨 Morphic UI — WebGL Hardware Acceleration
+
 - **Vulkan/WebGL Shaders** — blur, glass, morph, flux effects
 - **Adaptive Windowing Engine** — Shards act as dynamic, draggable tiles.
 - **Fragment Shader Shards** — each visual effect is its own atomic module

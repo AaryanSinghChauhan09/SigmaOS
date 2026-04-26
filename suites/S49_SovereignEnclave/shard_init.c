@@ -15,6 +15,6 @@ void enclave_attest() {
 }
 
 void shard_init() {
-    sigma_shard_init();
+    SIGMA_SHARD_INIT();
     sigma_printf("[SHARD] Sovereign Enclave active. Hardware-enforced isolation enabled.\n");
 }

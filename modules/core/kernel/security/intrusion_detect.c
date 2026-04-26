@@ -5,7 +5,7 @@
 // ---------------------------------------------------------
 
 void intrusion_detect_scan() {
-    sigma_shard_init(); // Phase 11 Modular initialization
+    SIGMA_SHARD_INIT(); // Phase 11 Modular initialization
     // [PHASE 11] Modular threat analysis in the distributed mesh.
 }
 

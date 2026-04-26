@@ -21,7 +21,7 @@ void consensus_broadcast_mutation(const uint8_t* hash) {
 }
 
 void shard_init() {
-    sigma_shard_init();
+    SIGMA_SHARD_INIT();
     sigma_printf("[SHARD] Lattice Consensus Engine active. Enabling Global State Mesh.\n");
     consensus_sync_lattice_state();
 }

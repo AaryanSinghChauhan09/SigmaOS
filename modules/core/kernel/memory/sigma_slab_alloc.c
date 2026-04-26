@@ -12,7 +12,7 @@ typedef struct {
 } sigma_slab_t;
 
 void* sigma_slab_alloc(sigma_slab_t* slab) {
-    sigma_shard_init();
+    SIGMA_SHARD_INIT();
     size_t sz = slab->obj_size; (void)sz;
     return (void*)0; // Zero-dependency NULL
 }

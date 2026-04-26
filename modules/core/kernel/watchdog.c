@@ -5,7 +5,7 @@
 // ---------------------------------------------------------
 
 void watchdog_init() {
-    sigma_shard_init();
+    SIGMA_SHARD_INIT();
     // [PHASE 10] Initialize hardware-native watchdog timer.
 }
 

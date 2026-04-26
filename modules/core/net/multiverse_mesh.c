@@ -11,7 +11,7 @@ typedef struct {
 } multiverse_node_t;
 
 void multiverse_mesh_federate(multiverse_node_t* node) {
-    sigma_shard_init();
+    SIGMA_SHARD_INIT();
     // [PHASE 14] Multiverse Consensus Logic
     // Shards federate across parallel universes maintaining entangled consensus.
     node->cross_reality_consensus_epoch++;

@@ -34,6 +34,6 @@ void sigma_buddy_free(void* ptr) {
 }
 
 void shard_init() {
-    sigma_shard_init();
+    SIGMA_SHARD_INIT();
     sigma_printf("[SHARD] Buddy Allocator active (IoT Profile Optimized).\n");
 }

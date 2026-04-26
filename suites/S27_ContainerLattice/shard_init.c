@@ -16,6 +16,6 @@ void container_spawn_isolated_shard(uint32_t shard_id) {
 }
 
 void shard_init() {
-    sigma_shard_init();
+    SIGMA_SHARD_INIT();
     sigma_printf("[SHARD] Container Lattice active (CoreOS Style).\n");
 }

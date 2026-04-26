@@ -14,6 +14,6 @@ void lambda_scale_down() {
 }
 
 void shard_init() {
-    sigma_shard_init();
+    SIGMA_SHARD_INIT();
     sigma_printf("[SHARD] Serverless Lattice active. Elastic resource scaling enabled.\n");
 }

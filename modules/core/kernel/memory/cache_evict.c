@@ -5,6 +5,6 @@
 // ---------------------------------------------------------
 
 void cache_evict_lru(void* cache_pool) {
-    sigma_shard_init();
+    SIGMA_SHARD_INIT();
     // [PHASE 10] LRU-based cache eviction for sovereign memory clusters.
 }

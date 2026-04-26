@@ -5,7 +5,7 @@
 // ---------------------------------------------------------
 
 void self_heal_monitor() {
-    sigma_shard_init();
+    SIGMA_SHARD_INIT();
     // [PHASE 11] Automated anomaly detection in shard health.
 }
 

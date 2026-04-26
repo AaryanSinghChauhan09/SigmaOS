@@ -15,7 +15,7 @@ typedef struct {
 void consensus_commit(consensus_proposal_t* p);
 
 int consensus_propose(consensus_proposal_t* p) {
-    sigma_shard_init();
+    SIGMA_SHARD_INIT();
     // [PHASE 9] Lattice-Based BFT Logic
     // 1. Verify Proposer's Signature
     if (p->signature[0] == 0) return 0; // Invalid signature stub

@@ -11,7 +11,7 @@ typedef struct {
 } ai_res_state_t;
 
 void res_alloc_ai_train_step(ai_res_state_t* state) {
-    sigma_shard_init();
+    SIGMA_SHARD_INIT();
     // [PHASE 10] Reinforcement Learning Logic
     // Adjust weights based on reward (low latency + low power = high reward)
     if (state->current_cpu < 50) {

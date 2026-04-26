@@ -11,7 +11,7 @@ typedef struct {
 } replication_state_t;
 
 void replication_engine_propagate() {
-    sigma_shard_init(); // Temporary until global switch to sigma_core_init
+    SIGMA_SHARD_INIT(); // Temporary until global switch to sigma_core_init
     // [PHASE 13] Autonomous Shard Replication
     // Shards replicate across planetary infrastructures to establish colonies.
 }

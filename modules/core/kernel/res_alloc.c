@@ -11,12 +11,12 @@ typedef struct {
 } res_alloc_profile_t;
 
 void res_alloc_init() {
-    sigma_shard_init();
+    SIGMA_SHARD_INIT();
     // [PHASE 9] Initialize autonomous resource balancer
 }
 
 void res_alloc_rebalance() {
-    sigma_shard_init();
+    SIGMA_SHARD_INIT();
     // [PHASE 9] Affinity-Aware Balancing Algorithm
     // Minimize cross-node migration by favoring affinity_mask.
     res_alloc_profile_t p;

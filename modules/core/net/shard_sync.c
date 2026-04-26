@@ -12,7 +12,7 @@ typedef struct {
 } shard_sync_packet_t;
 
 void shard_sync_broadcast_state(const char* shard_id, uint8_t* state, uint32_t size) {
-    sigma_shard_init();
+    SIGMA_SHARD_INIT();
     shard_sync_packet_t packet;
     // [PHASE 8] Vector Clock increment for causal consistency
     packet.vector_clock++;
