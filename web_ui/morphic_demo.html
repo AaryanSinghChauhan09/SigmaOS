@@ -349,6 +349,7 @@
         <button onclick="applyMosaic()">Mosaic Layout</button>
         <button onclick="triggerHandover()" title="Handover to Mobile/Cloud">🌐 Handover</button>
         <button onclick="toggleHolographic()" title="Toggle 3D Holographic Mode">🔮 Holographic</button>
+        <button onclick="toggleCollab()" title="Toggle Shared Workspace Mode">👥 Collaborate</button>
         <div style="color: rgba(255,255,255,0.5); display: flex; align-items: center; padding-left: 10px; border-left: 1px solid rgba(255,255,255,0.2);">
             SigmaOS Morphic UI Demo
         </div>
@@ -580,6 +581,32 @@
                     s.style.filter = '';
                 });
                 document.body.style.background = '';
+            }
+        }
+
+        let collabMode = false;
+        function toggleCollab() {
+            collabMode = !collabMode;
+            const shards = document.querySelectorAll('.shard');
+            if (collabMode) {
+                alert("Shared Workspace Active. Multiple users joined the mesh.");
+                shards.forEach(s => {
+                    s.style.borderStyle = 'double';
+                    s.style.borderWidth = '4px';
+                    s.setAttribute('title', 'Shared with 2 other users');
+                });
+                // Simulate remote cursors
+                const cursor = document.createElement('div');
+                cursor.id = 'remote-cursor-1';
+                cursor.style.cssText = 'position:absolute; width:15px; height:15px; background:rgba(236, 72, 153, 0.8); border-radius:50%; z-index:100; pointer-events:none; transition: all 0.5s ease; box-shadow: 0 0 10px #ec4899;';
+                cursor.style.left = '400px'; cursor.style.top = '300px';
+                document.body.appendChild(cursor);
+            } else {
+                document.getElementById('remote-cursor-1')?.remove();
+                shards.forEach(s => {
+                    s.style.borderStyle = '';
+                    s.style.borderWidth = '';
+                });
             }
         }
 
