@@ -84,6 +84,8 @@ Every OS capability lives in a self-contained C/C++ file. No monoliths. No casca
 - **Fragment Shader Shards** — each visual effect is its own atomic module
 - **CLI-driven**: `s-cli profile gaming` morphs the UI in real time
 
+---
+
 ### Phase 1: Foundations (Completed)
 
 - **Kernel Core**: Scheduler, Memory Management, Interrupts.
@@ -209,7 +211,9 @@ g++ -std=c++20 orchestrator/main.cpp -o s-cli
 ---
 
 ## 📊 Benchmarks & Performance
+
 *(Coming Soon: Comparative benchmarks against seL4 and Linux bare-metal instances highlighting memory footprint, context switch times, and I/O latency).*
+
 
 ---
 

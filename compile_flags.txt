@@ -1,6 +1,8 @@
+# compile_flags.txt
+# Tells clangd (the IDE language server) to add the root directory
+# to the include search path, so that #include "sigma_libc.h" resolves
+# correctly from all subdirectories.
 -I.
--Imodules/core/include
--ffreestanding
--nostdlib
+-std=c99
 -Wall
 -Wextra

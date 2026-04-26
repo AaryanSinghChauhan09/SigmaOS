@@ -1,0 +1,9 @@
+---
+CompileFlags:
+  Add:
+    - "-I."
+    - "-std=c99"
+    - "-Wall"
+    - "-Wextra"
+Diagnostics:
+  UnusedIncludes: Strict
