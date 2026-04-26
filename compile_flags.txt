@@ -1,0 +1,6 @@
+-I.
+-Imodules/core/include
+-ffreestanding
+-nostdlib
+-Wall
+-Wextra

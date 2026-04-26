@@ -29,10 +29,28 @@ void plic_complete(uint32_t context, uint32_t irq) {
     *addr = irq;
 }
 
+typedef void (*plic_handler_t)(void);
+plic_handler_t plic_handlers[1024];
+
+void plic_register_handler(uint32_t irq, plic_handler_t handler, uint32_t priority) {
+    if (irq < 1024) {
+        plic_handlers[irq] = handler;
+        plic_set_priority(irq, priority);
+        plic_enable(0, irq);
+    }
+}
+
+void plic_handle_irq(uint32_t context) {
+    uint32_t irq = plic_claim(context);
+    if (irq > 0 && irq < 1024 && plic_handlers[irq]) {
+        plic_handlers[irq]();
+    }
+    plic_complete(context, irq);
+}
+
 void arch_riscv64_plic_init() {
     // Initial PLIC setup for sovereign context
     for(uint32_t i = 1; i < 32; i++) {
-        plic_set_priority(i, 1);
-        plic_enable(0, i); // Enable for Context 0 (Machine Mode / Supervisor)
+        plic_set_priority(i, 0); // Default zero priority (disabled)
     }
 }

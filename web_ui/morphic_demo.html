@@ -316,15 +316,20 @@
                         <div id="riscv-progress" style="width: 45%; height: 100%; background: #f59e0b; transition: width 1s linear;"></div>
                     </div>
                 </div>
-                <button class="shard-action" style="width: 100%; margin-top: 5px;" onclick="showLogs()">VIEW LIVE LOGS</button>
+                <div id="cicd-logs" style="margin-top: 10px; height: 80px; background: rgba(0,0,0,0.5); border: 1px solid rgba(255,255,255,0.1); border-radius: 4px; padding: 5px; font-family: monospace; font-size: 0.75em; overflow-y: auto; color: #94a3b8;">
+                    [INIT] Lattice Sync Active...<br>
+                    [WAIT] Pulling latest runs...
+                </div>
+                <button class="shard-action" style="width: 100%; margin-top: 8px;" onclick="showLogs()">FORCE RESYNC</button>
             </div>
             <div class="resizer" onmousedown="startResize(event, 'shard_cicd')"></div>
         </div>
     </div>
 
     <div class="controls">
-        <button onclick="spawnShard()">+ Spawn New Shard</button>
+        <button onclick="spawnShard()">+ Spawn Shard</button>
         <button onclick="arrangeGrid()">Arrange Grid</button>
+        <button onclick="tileShards()">Tile All</button>
         <div style="color: rgba(255,255,255,0.5); display: flex; align-items: center; padding-left: 10px; border-left: 1px solid rgba(255,255,255,0.2);">
             SigmaOS Morphic UI Demo
         </div>
@@ -471,7 +476,41 @@
         }, 1000);
 
         function showLogs() {
-            alert("Fetching Sovereign Logs...\n[INFO] Compiling modules/core/arch/riscv64/plic.c\n[INFO] Linking S08_Security Shard\n[OK] Shard Verification Passed");
+            const logEl = document.getElementById('cicd-logs');
+            logEl.innerHTML += `<br>[OK] Shard ${Math.floor(Math.random()*100)} Verified`;
+            logEl.scrollTop = logEl.scrollHeight;
+        }
+
+        // Auto-stream logs
+        setInterval(() => {
+            const logs = [
+                "[INFO] Checking S01_Genesis...",
+                "[OK] aarch64 Boot Validated",
+                "[INFO] Compiling riscv64/plic.c",
+                "[OK] Shard Isolation enforced",
+                "[WARN] High context switch on Shard 14"
+            ];
+            const logEl = document.getElementById('cicd-logs');
+            if (logEl) {
+                logEl.innerHTML += `<br>${logs[Math.floor(Math.random() * logs.length)]}`;
+                if (logEl.children.length > 50) logEl.innerHTML = logEl.innerHTML.split('<br>').slice(10).join('<br>');
+                logEl.scrollTop = logEl.scrollHeight;
+            }
+        }, 3000);
+
+        function tileShards() {
+            const shards = document.querySelectorAll('.shard');
+            const w = window.innerWidth / 3 - 40;
+            const h = window.innerHeight / 2 - 60;
+            let i = 0;
+            shards.forEach(shard => {
+                shard.style.transition = 'all 0.6s cubic-bezier(0.34, 1.56, 0.64, 1)';
+                shard.style.width = w + 'px';
+                shard.style.height = h + 'px';
+                shard.style.left = (20 + (i % 3) * (w + 20)) + 'px';
+                shard.style.top = (20 + Math.floor(i / 3) * (h + 20)) + 'px';
+                i++;
+            });
         }
 
         function arrangeGrid() {
