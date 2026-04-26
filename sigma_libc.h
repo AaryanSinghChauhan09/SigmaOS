@@ -4,7 +4,7 @@
 #define SIGMA_LIBC_VERSION 0x08
 
 void sigma_core_init(void);
-#define SIGMA_SHARD_INIT() sigma_core_init()
+#define SIGMA_SHARD_INIT sigma_core_init
 
 // Standard integer equivalents for Sovereign Silicon
 typedef unsigned char      uint8_t;
