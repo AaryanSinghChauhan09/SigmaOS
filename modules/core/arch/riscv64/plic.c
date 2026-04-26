@@ -10,22 +10,22 @@
 #define PLIC_CONTEXT_BASE  0x0c200000
 
 void plic_set_priority(uint32_t irq, uint32_t priority) {
-    uint32_t* addr = (uint32_t*)(PLIC_PRIORITY_BASE + irq * 4);
+    uint32_t* addr = (uint32_t*)((uintptr_t)PLIC_PRIORITY_BASE + irq * 4);
     *addr = priority;
 }
 
 void plic_enable(uint32_t context, uint32_t irq) {
-    uint32_t* addr = (uint32_t*)(PLIC_ENABLE_BASE + context * 0x80 + (irq / 32) * 4);
+    uint32_t* addr = (uint32_t*)((uintptr_t)PLIC_ENABLE_BASE + context * 0x80 + (irq / 32) * 4);
     *addr |= (1 << (irq % 32));
 }
 
 uint32_t plic_claim(uint32_t context) {
-    uint32_t* addr = (uint32_t*)(PLIC_CONTEXT_BASE + context * 0x1000 + 4);
+    uint32_t* addr = (uint32_t*)((uintptr_t)PLIC_CONTEXT_BASE + context * 0x1000 + 4);
     return *addr;
 }
 
 void plic_complete(uint32_t context, uint32_t irq) {
-    uint32_t* addr = (uint32_t*)(PLIC_CONTEXT_BASE + context * 0x1000 + 4);
+    uint32_t* addr = (uint32_t*)((uintptr_t)PLIC_CONTEXT_BASE + context * 0x1000 + 4);
     *addr = irq;
 }
 

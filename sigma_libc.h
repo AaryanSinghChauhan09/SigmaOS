@@ -7,6 +7,13 @@ typedef unsigned short     uint16_t;
 typedef unsigned int       uint32_t;
 typedef unsigned long long uint64_t;
 
+typedef signed char        int8_t;
+typedef signed short       int16_t;
+typedef signed int         int32_t;
+typedef signed long long   int64_t;
+
+typedef unsigned long long uintptr_t;
+
 // Standard string functions shim
 char* strncpy(char* dest, const char* src, unsigned long long n);
 int   strncmp(const char* s1, const char* s2, unsigned long long n);

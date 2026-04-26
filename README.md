@@ -12,14 +12,9 @@ SigmaOS is an industrial-grade, bare-metal operating system built entirely from 
 
 ---
 
-
-
-
 ## 🚧 Current Project Status: User Experience Maturity
 
 *SigmaOS is currently in **Phase 4** of its [Roadmap](ROADMAP.md). We have matured the core architecture and are now focusing on the Morphic UI, advanced CLI tools, and bare-metal distribution.*
-
-
 
 - **Bootloader & Kernel Core**: Advanced features are implemented including a Priority-Based Preemptive Scheduler (`priority_scheduler.c`), Virtual Memory Management with paging (`vmm.c`), and an ELF Binary Loader (`elf_loader.c`) for POSIX compatibility.
 - **Hardware Drivers (HAL)**: Essential hardware interfaces are implemented. This includes PCI bus enumeration (`pci.c`), Universal Serial Bus controllers (`usb.c`), Wi-Fi 802.11 stubs (`wifi.c`), Intel HDA Audio (`audio.c`), and basic GPU Kernel Mode Setting (`gpu.c`).
@@ -55,7 +50,7 @@ graph TD;
 Every OS capability lives in a self-contained C/C++ file. No monoliths. No cascading failures. Each shard can be independently compiled, tested, upgraded, or replaced without touching anything else.
 
 | Module                | Responsibility                                     |
-| --------------------- | -------------------------------------------------- |
+| :-------------------- | :------------------------------------------------- |
 | `sigma_slab_alloc.h`  | O(1) kernel slab allocator — no malloc, no runtime |
 | `sigma_spinlock.h`    | x86 XCHG-based spinlock via inline assembly        |
 | `sigma_ring_buffer.h` | Lock-free SPSC ring for IPC / DMA events           |
