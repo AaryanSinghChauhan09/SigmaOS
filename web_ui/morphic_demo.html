@@ -59,6 +59,7 @@
             transition: all 0.6s cubic-bezier(0.19, 1, 0.22, 1);
             box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
             cursor: default;
+            touch-action: none; /* Disable default touch actions for gestures */
         }
 
         .shard:hover {
@@ -218,7 +219,7 @@
     <div id="ui-layer" role="application" aria-label="Morphic UI Window Manager">
         <!-- Shard 1: Kernel Core -->
         <div class="shard" id="shard1" role="region" aria-label="Genesis Kernel Status" style="top: 80px; left: 80px; width: 320px; height: 260px;">
-            <div class="shard-header" onmousedown="startDrag(event, 'shard1')">
+            <div class="shard-header" onmousedown="startDrag(event, 'shard1')" ontouchstart="startDrag(event, 'shard1')">
                 <div class="shard-title">
                     <div class="shard-status"></div>
                     S01_Genesis Kernel
@@ -238,12 +239,12 @@
                     [OK] Morphic UI Bound
                 </div>
             </div>
-            <div class="resizer" onmousedown="startResize(event, 'shard1')"></div>
+            <div class="resizer" onmousedown="startResize(event, 'shard1')" ontouchstart="startResize(event, 'shard1')"></div>
         </div>
 
         <!-- Shard 2: System Profiler (Benchmarks) -->
         <div class="shard" id="shard_prof" role="region" aria-label="System Profiler Benchmarks" style="top: 80px; left: 450px; width: 350px; height: 260px;">
-            <div class="shard-header" onmousedown="startDrag(event, 'shard_prof')">
+            <div class="shard-header" onmousedown="startDrag(event, 'shard_prof')" ontouchstart="startDrag(event, 'shard_prof')">
                 <div class="shard-title">
                     <div class="shard-status" style="background-color: #f59e0b; box-shadow: 0 0 8px #f59e0b;"></div>
                     S_Profiler (Benchmarking)
@@ -259,12 +260,12 @@
                     Context Switches: 14,203/s
                 </div>
             </div>
-            <div class="resizer" onmousedown="startResize(event, 'shard_prof')"></div>
+            <div class="resizer" onmousedown="startResize(event, 'shard_prof')" ontouchstart="startResize(event, 'shard_prof')"></div>
         </div>
 
         <!-- Shard 3: SigmaVM Virtualization -->
         <div class="shard" id="shard_vm" role="region" aria-label="SigmaVM Hypervisor" style="top: 380px; left: 80px; width: 380px; height: 240px;">
-            <div class="shard-header" onmousedown="startDrag(event, 'shard_vm')">
+            <div class="shard-header" onmousedown="startDrag(event, 'shard_vm')" ontouchstart="startDrag(event, 'shard_vm')">
                 <div class="shard-title">
                     <div class="shard-status" style="background-color: #ec4899; box-shadow: 0 0 8px #ec4899;"></div>
                     SigmaVM Hypervisor
@@ -280,12 +281,12 @@
                     root@guest-linux:~# apt update
                 </div>
             </div>
-            <div class="resizer" onmousedown="startResize(event, 'shard_vm')"></div>
+            <div class="resizer" onmousedown="startResize(event, 'shard_vm')" ontouchstart="startResize(event, 'shard_vm')"></div>
         </div>
         
         <!-- Shard 4: Network Isolation -->
         <div class="shard" id="shard2" role="region" aria-label="Network HAL" style="top: 380px; left: 500px; width: 300px; height: 240px;">
-            <div class="shard-header" onmousedown="startDrag(event, 'shard2')">
+            <div class="shard-header" onmousedown="startDrag(event, 'shard2')" ontouchstart="startDrag(event, 'shard2')">
                 <div class="shard-title">
                     <div class="shard-status" style="background-color: #3b82f6; box-shadow: 0 0 8px #3b82f6;"></div>
                     S04_HAL Network
@@ -297,12 +298,12 @@
                 <strong>Sandboxed:</strong> YES (Token: CAP_NET)<br>
                 <canvas id="netGraph" width="260" height="60" style="margin-top: 10px;"></canvas>
             </div>
-            <div class="resizer" onmousedown="startResize(event, 'shard2')"></div>
+            <div class="resizer" onmousedown="startResize(event, 'shard2')" ontouchstart="startResize(event, 'shard2')"></div>
         </div>
 
         <!-- Shard 5: CI/CD Pipeline (Phase 5) -->
         <div class="shard" id="shard_cicd" role="region" aria-label="CI/CD Pipeline" style="top: 380px; left: 820px; width: 320px; height: 240px;">
-            <div class="shard-header" onmousedown="startDrag(event, 'shard_cicd')">
+            <div class="shard-header" onmousedown="startDrag(event, 'shard_cicd')" ontouchstart="startDrag(event, 'shard_cicd')">
                 <div class="shard-title">
                     <div class="shard-status" style="background-color: #3b82f6; box-shadow: 0 0 8px #3b82f6;"></div>
                     CI/CD Pipeline (Lattice Sync)
@@ -333,7 +334,7 @@
                 </div>
                 <button class="shard-action" style="width: 100%; margin-top: 8px;" onclick="showLogs()">FORCE RESYNC</button>
             </div>
-            <div class="resizer" onmousedown="startResize(event, 'shard_cicd')"></div>
+            <div class="resizer" onmousedown="startResize(event, 'shard_cicd')" ontouchstart="startResize(event, 'shard_cicd')"></div>
         </div>
     </div>
 
@@ -366,18 +367,31 @@
             return Math.round(val / GRID_SIZE) * GRID_SIZE;
         }
 
+        window.addEventListener('resize', () => {
+            if (document.querySelector('.shard')) applyMosaic();
+        });
+
         function startDrag(e, id) {
             if (e.target.className === 'resizer' || e.target.className === 'shard-action') return;
+            const touch = e.type === 'touchstart';
+            const clientX = touch ? e.touches[0].clientX : e.clientX;
+            const clientY = touch ? e.touches[0].clientY : e.clientY;
+            
             draggedElement = document.getElementById(id);
             bringToFront(draggedElement);
             draggedElement.classList.add('dragging');
             
             const rect = draggedElement.getBoundingClientRect();
-            offsetX = e.clientX - rect.left;
-            offsetY = e.clientY - rect.top;
+            offsetX = clientX - rect.left;
+            offsetY = clientY - rect.top;
             
-            document.addEventListener('mousemove', drag);
-            document.addEventListener('mouseup', stopDrag);
+            if (touch) {
+                document.addEventListener('touchmove', drag, { passive: false });
+                document.addEventListener('touchend', stopDrag);
+            } else {
+                document.addEventListener('mousemove', drag);
+                document.addEventListener('mouseup', stopDrag);
+            }
         }
 
         function bringToFront(el) {
@@ -387,22 +401,30 @@
             // Manage active state
             document.querySelectorAll('.shard').forEach(s => {
                 s.classList.remove('active');
-                s.style.opacity = '0.8';
+                s.style.opacity = '0.7';
+                s.style.transform = 'scale(0.98)';
             });
             el.classList.add('active');
             el.style.opacity = '1';
+            el.style.transform = 'scale(1.02)'; // Adaptive Focus expansion
         }
 
         function drag(e) {
             if (!draggedElement) return;
-            const x = e.clientX - offsetX;
-            const y = e.clientY - offsetY;
+            const touch = e.type === 'touchmove';
+            const clientX = touch ? e.touches[0].clientX : e.clientX;
+            const clientY = touch ? e.touches[0].clientY : e.clientY;
+
+            if (touch) e.preventDefault(); // Prevent scrolling while dragging
+
+            const x = clientX - offsetX;
+            const y = clientY - offsetY;
             draggedElement.style.left = snap(x) + 'px';
             draggedElement.style.top = snap(y) + 'px';
             
             // Aero Snap Detection
             const preview = document.getElementById('snap-preview');
-            if (e.clientX < 50) {
+            if (clientX < 50) {
                 // Snap Left
                 preview.style.opacity = '1';
                 preview.style.left = '10px';
@@ -430,14 +452,13 @@
 
         function stopDrag(e) {
             if (draggedElement) {
+                const touch = e.type === 'touchend';
                 const preview = document.getElementById('snap-preview');
                 if (preview.style.opacity === '1') {
-                    draggedElement.style.transition = 'all 0.4s cubic-bezier(0.19, 1, 0.22, 1)';
                     draggedElement.style.left = preview.style.left;
                     draggedElement.style.top = preview.style.top;
                     draggedElement.style.width = preview.style.width;
                     draggedElement.style.height = preview.style.height;
-                    setTimeout(() => draggedElement.style.transition = '', 400);
                 }
                 preview.style.opacity = '0';
                 draggedElement.classList.remove('dragging');
@@ -445,9 +466,15 @@
             }
             document.removeEventListener('mousemove', drag);
             document.removeEventListener('mouseup', stopDrag);
+            document.removeEventListener('touchmove', drag);
+            document.removeEventListener('touchend', stopDrag);
         }
 
         function startResize(e, id) {
+            const touch = e.type === 'touchstart';
+            const clientX = touch ? e.touches[0].clientX : e.clientX;
+            const clientY = touch ? e.touches[0].clientY : e.clientY;
+
             e.stopPropagation();
             resizingElement = document.getElementById(id);
             bringToFront(resizingElement);
@@ -455,17 +482,28 @@
             const rect = resizingElement.getBoundingClientRect();
             startWidth = rect.width;
             startHeight = rect.height;
-            startX = e.clientX;
-            startY = e.clientY;
+            startX = clientX;
+            startY = clientY;
             
-            document.addEventListener('mousemove', resize);
-            document.addEventListener('mouseup', stopResize);
+            if (touch) {
+                document.addEventListener('touchmove', resize, { passive: false });
+                document.addEventListener('touchend', stopResize);
+            } else {
+                document.addEventListener('mousemove', resize);
+                document.addEventListener('mouseup', stopResize);
+            }
         }
 
         function resize(e) {
             if (!resizingElement) return;
-            const newWidth = startWidth + (e.clientX - startX);
-            const newHeight = startHeight + (e.clientY - startY);
+            const touch = e.type === 'touchmove';
+            const clientX = touch ? e.touches[0].clientX : e.clientX;
+            const clientY = touch ? e.touches[0].clientY : e.clientY;
+            
+            if (touch) e.preventDefault();
+
+            const newWidth = startWidth + (clientX - startX);
+            const newHeight = startHeight + (clientY - startY);
             if (newWidth > 200) resizingElement.style.width = snap(newWidth) + 'px';
             if (newHeight > 150) resizingElement.style.height = snap(newHeight) + 'px';
         }
@@ -474,6 +512,8 @@
             resizingElement = null;
             document.removeEventListener('mousemove', resize);
             document.removeEventListener('mouseup', stopResize);
+            document.removeEventListener('touchmove', resize);
+            document.removeEventListener('touchend', stopResize);
         }
 
         let shardCounter = 4;
@@ -492,7 +532,7 @@
             const color = ['#f59e0b', '#ec4899', '#06b6d4'][Math.floor(Math.random() * 3)];
             
             newShard.innerHTML = `
-                <div class="shard-header" onmousedown="startDrag(event, '${id}')">
+                <div class="shard-header" onmousedown="startDrag(event, '${id}')" ontouchstart="startDrag(event, '${id}')">
                     <div class="shard-title">
                         <div class="shard-status" style="background-color: ${color}; box-shadow: 0 0 8px ${color};"></div>
                         User Shard ${shardCounter-1}
@@ -503,7 +543,7 @@
                     Dynamic isolated application shard.<br>
                     Sandboxed execution.
                 </div>
-                <div class="resizer" onmousedown="startResize(event, '${id}')"></div>
+                <div class="resizer" onmousedown="startResize(event, '${id}')" ontouchstart="startResize(event, '${id}')"></div>
             `;
             document.getElementById('ui-layer').appendChild(newShard);
             return newShard;

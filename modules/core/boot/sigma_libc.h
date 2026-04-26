@@ -25,4 +25,3 @@ void* memset(void* s, int c, unsigned long long n);
 unsigned long long strlen(const char* s);
 
 #endif // SIGMA_LIBC_H
-
