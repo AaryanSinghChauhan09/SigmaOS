@@ -1,40 +1,7 @@
-# SigmaOS Git Ignore
-
-# Rust
-target/
-Cargo.lock
-
-# Python
-__pycache__/
-*.py[cod]
-*$py.class
-.pytest_cache/
-.env
-
-# Node/GUI
-node_modules/
+.cache/
+*.o
+*.iso
+*.bin
+build/
 dist/
 .DS_Store
-
-# Kernel / Build
-bin/
-*.o
-*.bin
-*.img
-*.iso
-*.log
-
-# Test Artifacts (Temporary)
-profiles/testmode.json
-plugins/myplugin/
-kernel/suites/SXX_*
-include/suites/SXX_*
-!kernel/suites/S01_Kernel
-!kernel/suites/S02_Memory
-!kernel/suites/S03_Scheduler
-# Add specific suites that should stay
-# ...
-
-# System
-sigma_config.json
-*.local
