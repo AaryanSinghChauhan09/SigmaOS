@@ -11,5 +11,6 @@ void container_spawn(const char* image_id) {
 }
 
 void shard_init() {
+    SIGMA_SHARD_INIT();
     sigma_printf("[SHARD] Sovereign Container active. Zero-overhead isolation enabled.\n");
 }

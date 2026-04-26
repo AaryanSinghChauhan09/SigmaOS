@@ -10,5 +10,6 @@ void tensor_map_memory(uint64_t addr, uint32_t size) {
 }
 
 void shard_init() {
+    SIGMA_SHARD_INIT();
     sigma_printf("[SHARD] Tensor Direct active. Hardware-accelerated AI enabled.\n");
 }

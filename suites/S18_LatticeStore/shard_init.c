@@ -32,5 +32,6 @@ void market_list_available() {
 }
 
 void shard_init() {
+    SIGMA_SHARD_INIT();
     sigma_printf("[SHARD] Lattice Store active. Ready for sovereign expansions.\n");
 }

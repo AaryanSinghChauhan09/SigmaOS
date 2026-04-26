@@ -11,6 +11,7 @@ void performance_optimize_dispatch() {
 }
 
 void shard_init() {
+    SIGMA_SHARD_INIT();
     sigma_printf("[SHARD] Performance Lattice active (Clear-Linux Style).\n");
     performance_optimize_dispatch();
 }

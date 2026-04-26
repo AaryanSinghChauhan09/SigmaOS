@@ -20,6 +20,7 @@ void browser_inject_native_cli_ui() {
 }
 
 void shard_init() {
+    SIGMA_SHARD_INIT();
     sigma_printf("[SHARD] Browser Lattice active. Optimizing for Chromium Runtime.\n");
     browser_activate_v8_shims();
 }

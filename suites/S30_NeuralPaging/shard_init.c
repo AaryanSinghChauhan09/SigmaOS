@@ -10,5 +10,6 @@ void neural_predict_next_pages(uint32_t pid) {
 }
 
 void shard_init() {
+    SIGMA_SHARD_INIT();
     sigma_printf("[SHARD] Neural Paging active. AI-Driven VMM Acceleration Enabled.\n");
 }

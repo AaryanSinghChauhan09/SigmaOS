@@ -13,5 +13,6 @@ void mesh_sync_delta(uint32_t shard_id) {
 }
 
 void shard_init() {
+    SIGMA_SHARD_INIT();
     sigma_printf("[SHARD] Lattice Mesh active. Decentralized synchronization enabled.\n");
 }

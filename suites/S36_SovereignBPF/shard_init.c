@@ -18,5 +18,6 @@ void bpf_collect_telemetry() {
 }
 
 void shard_init() {
+    SIGMA_SHARD_INIT();
     sigma_printf("[SHARD] Sovereign BPF active. Programmable observability enabled.\n");
 }

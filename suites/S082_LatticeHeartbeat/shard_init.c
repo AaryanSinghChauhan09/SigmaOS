@@ -11,5 +11,6 @@ void heartbeat_stream_metrics() {
 }
 
 void shard_init() {
+    SIGMA_SHARD_INIT();
     sigma_printf("[SHARD] Lattice Heartbeat active. Real-time observability enabled.\n");
 }

@@ -9,5 +9,6 @@ void journal_append(const char* tag, const char* msg) {
 }
 
 void shard_init() {
+    SIGMA_SHARD_INIT();
     sigma_printf("[SHARD] Sovereign Journal active. Structured binary logging enabled.\n");
 }

@@ -44,6 +44,7 @@ void ual_load_hal() {
 }
 
 void shard_init() {
+    SIGMA_SHARD_INIT();
     sigma_printf("[SHARD] Universal Abstraction Layer (UAL) Active.\n");
     ual_load_hal();
 }

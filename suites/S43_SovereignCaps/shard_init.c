@@ -18,5 +18,6 @@ void cap_revoke(uint32_t token_id) {
 }
 
 void shard_init() {
+    SIGMA_SHARD_INIT();
     sigma_printf("[SHARD] Sovereign Capabilities active. Zero-Trust access enabled.\n");
 }

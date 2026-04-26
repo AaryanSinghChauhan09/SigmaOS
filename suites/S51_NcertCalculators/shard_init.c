@@ -11,5 +11,6 @@ void ncert_calc_solve(const char* equation) {
 }
 
 void shard_init() {
+    SIGMA_SHARD_INIT();
     sigma_printf("[SHARD] NCERT Calculators active. Precision mathematical solvers enabled.\n");
 }

@@ -12,5 +12,6 @@ void singularity_converge() {
 }
 
 void shard_init() {
+    SIGMA_SHARD_INIT();
     sigma_printf("[SHARD] Sovereign Singularity active. Absolute architectural unity achieved.\n");
 }

@@ -11,5 +11,6 @@ void ncert_sim_run(const char* experiment) {
 }
 
 void shard_init() {
+    SIGMA_SHARD_INIT();
     sigma_printf("[SHARD] NCERT Simulator active. Sovereign education enabled.\n");
 }

@@ -18,5 +18,6 @@ void raw_ipc_send(uint32_t target_pid, uint64_t msg) {
 }
 
 void shard_init() {
+    SIGMA_SHARD_INIT();
     sigma_printf("[SHARD] Raw IPC active. Register-based communication enabled.\n");
 }

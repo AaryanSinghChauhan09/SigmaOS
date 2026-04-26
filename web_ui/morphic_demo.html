@@ -568,6 +568,7 @@
                     s.style.transform += ' rotateX(15deg) rotateY(-5deg) translateZ(50px)';
                     s.style.boxShadow = '0 30px 60px rgba(59, 130, 246, 0.4), 0 0 20px rgba(59, 130, 246, 0.2)';
                     s.style.borderColor = 'rgba(59, 130, 246, 0.8)';
+                    s.style.filter = 'blur(1px) contrast(1.1)'; // Depth effect
                 });
                 document.body.style.background = 'radial-gradient(circle at center, #0f172a 0%, #020617 100%)';
             } else {
@@ -576,6 +577,7 @@
                     s.style.transform = s.style.transform.replace(' rotateX(15deg) rotateY(-5deg) translateZ(50px)', '');
                     s.style.boxShadow = '';
                     s.style.borderColor = '';
+                    s.style.filter = '';
                 });
                 document.body.style.background = '';
             }

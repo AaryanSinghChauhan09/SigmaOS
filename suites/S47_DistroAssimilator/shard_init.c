@@ -11,5 +11,6 @@ void assimilate_binary(const char* path) {
 }
 
 void shard_init() {
+    SIGMA_SHARD_INIT();
     sigma_printf("[SHARD] Distro Assimilator active. Linux obsolescence sequence initiated.\n");
 }

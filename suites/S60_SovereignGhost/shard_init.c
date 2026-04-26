@@ -11,5 +11,6 @@ void ghost_engage() {
 }
 
 void shard_init() {
+    SIGMA_SHARD_INIT();
     sigma_printf("[SHARD] Sovereign Ghost active. Amnesic execution mode ready.\n");
 }

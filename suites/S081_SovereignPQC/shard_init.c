@@ -11,5 +11,6 @@ void pqc_sign_shard(uint32_t shard_id) {
 }
 
 void shard_init() {
+    SIGMA_SHARD_INIT();
     sigma_printf("[SHARD] Sovereign PQC active. Post-quantum resilience enabled.\n");
 }

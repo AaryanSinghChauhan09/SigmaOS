@@ -10,5 +10,6 @@ void fabric_offload(uint32_t shard_id, const char* logic_blob) {
 }
 
 void shard_init() {
+    SIGMA_SHARD_INIT();
     sigma_printf("[SHARD] Sovereign Fabric active. Hardware-native offloading enabled.\n");
 }

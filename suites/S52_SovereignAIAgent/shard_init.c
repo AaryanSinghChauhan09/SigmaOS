@@ -11,5 +11,6 @@ void ai_agent_summarize(const char* content) {
 }
 
 void shard_init() {
+    SIGMA_SHARD_INIT();
     sigma_printf("[SHARD] Sovereign AI Agent active. Global intelligence enabled.\n");
 }

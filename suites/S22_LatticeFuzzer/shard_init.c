@@ -29,6 +29,7 @@ void fuzzer_run_ipc_stress(uint32_t iterations) {
 }
 
 void shard_init() {
+    SIGMA_SHARD_INIT();
     sigma_printf("[SHARD] Lattice Fuzzer active. Hardening the Sovereign Lattice.\n");
     
     // Auto-run fuzzer in Dev profile
