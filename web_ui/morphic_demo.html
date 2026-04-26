@@ -50,6 +50,7 @@
             position: absolute;
             background: rgba(15, 15, 25, 0.7);
             backdrop-filter: blur(15px) saturate(180%);
+            -webkit-backdrop-filter: blur(15px) saturate(180%);
             border: 1px solid rgba(255, 255, 255, 0.1);
             border-radius: 12px;
             display: flex;
@@ -87,6 +88,7 @@
             margin-bottom: 15px;
             cursor: grab;
             user-select: none;
+            -webkit-user-select: none;
         }
 
         .shard-header:active {
@@ -136,6 +138,7 @@
             transform: translateX(-50%);
             background: rgba(10, 10, 15, 0.8);
             backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
             padding: 10px 20px;
             border-radius: 30px;
             border: 1px solid rgba(255, 255, 255, 0.1);
@@ -209,6 +212,7 @@
 <body>
 
     <div class="grid-bg"></div>
+    <div id="snap-preview" style="position: absolute; background: rgba(59, 130, 246, 0.2); border: 2px solid var(--accent); border-radius: 12px; pointer-events: none; opacity: 0; transition: all 0.2s cubic-bezier(0.19, 1, 0.22, 1); z-index: 50;"></div>
     <div id="fps-overlay">SOV_CORE: 60.0 FPS | LATENCY: 1.2ms</div>
 
     <div id="ui-layer" role="application" aria-label="Morphic UI Window Manager">
@@ -394,10 +398,47 @@
             const y = e.clientY - offsetY;
             draggedElement.style.left = snap(x) + 'px';
             draggedElement.style.top = snap(y) + 'px';
+            
+            // Aero Snap Detection
+            const preview = document.getElementById('snap-preview');
+            if (e.clientX < 50) {
+                // Snap Left
+                preview.style.opacity = '1';
+                preview.style.left = '10px';
+                preview.style.top = '10px';
+                preview.style.width = 'calc(50% - 15px)';
+                preview.style.height = 'calc(100% - 20px)';
+            } else if (e.clientX > window.innerWidth - 50) {
+                // Snap Right
+                preview.style.opacity = '1';
+                preview.style.left = 'calc(50% + 5px)';
+                preview.style.top = '10px';
+                preview.style.width = 'calc(50% - 15px)';
+                preview.style.height = 'calc(100% - 20px)';
+            } else if (e.clientY < 50) {
+                // Snap Top (Maximize)
+                preview.style.opacity = '1';
+                preview.style.left = '10px';
+                preview.style.top = '10px';
+                preview.style.width = 'calc(100% - 20px)';
+                preview.style.height = 'calc(100% - 20px)';
+            } else {
+                preview.style.opacity = '0';
+            }
         }
 
-        function stopDrag() {
+        function stopDrag(e) {
             if (draggedElement) {
+                const preview = document.getElementById('snap-preview');
+                if (preview.style.opacity === '1') {
+                    draggedElement.style.transition = 'all 0.4s cubic-bezier(0.19, 1, 0.22, 1)';
+                    draggedElement.style.left = preview.style.left;
+                    draggedElement.style.top = preview.style.top;
+                    draggedElement.style.width = preview.style.width;
+                    draggedElement.style.height = preview.style.height;
+                    setTimeout(() => draggedElement.style.transition = '', 400);
+                }
+                preview.style.opacity = '0';
                 draggedElement.classList.remove('dragging');
                 draggedElement = null;
             }

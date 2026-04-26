@@ -1,4 +1,4 @@
-#include "../../include/sigma_libc.h"
+#include "sigma_libc.h"
 
 // ---------------------------------------------------------
 // SigmaOS Kubernetes-native Kube-Shard (Cloud-Native Expansion)

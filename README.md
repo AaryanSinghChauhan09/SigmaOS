@@ -54,12 +54,12 @@ graph TD;
 
 Every OS capability lives in a self-contained C/C++ file. No monoliths. No cascading failures. Each shard can be independently compiled, tested, upgraded, or replaced without touching anything else.
 
-| Module                | Responsibility                                   |
-| --------------------- | ------------------------------------------------ |
+| Module                | Responsibility                                     |
+| --------------------- | -------------------------------------------------- |
 | `sigma_slab_alloc.h`  | O(1) kernel slab allocator — no malloc, no runtime |
 | `sigma_spinlock.h`    | x86 XCHG-based spinlock via inline assembly        |
-| `sigma_ring_buffer.h` | Lock-free SPSC ring for IPC / DMA events         |
-| `sigma_vmm.h`         | 2-level page table VMM — map, unmap, translate   |
+| `sigma_ring_buffer.h` | Lock-free SPSC ring for IPC / DMA events           |
+| `sigma_vmm.h`         | 2-level page table VMM — map, unmap, translate     |
 | `sigma_scheduler.h`   | RDTSC-timed round-robin task scheduler             |
 | `sigma_caps.h`        | Zero-trust capability tokens — mint, check, revoke |
 
