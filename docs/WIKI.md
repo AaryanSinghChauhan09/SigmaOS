@@ -14,8 +14,12 @@ SigmaOS is built on the **Sovereign Micro-Shard Lattice**. Unlike monolithic ker
 - **PMM (Bitmap)**: Manages physical RAM with a 4KB-page bitmap allocator.
 - **VMM (Paging)**: Hardware-enforced isolation via multi-level page tables.
 - **Slab Allocator**: Optimized for small object reuse to ensure zero fragmentation.
+- **Atomic Input Queue**: Lock-free asynchronous buffer for zero-latency keyboard processing.
 
-## 💾 SIGMAFS (LOG-STRUCTURED STORAGE)
+## 🏛️ PERFORMANCE SHARDS
+SigmaOS uses industrial-grade optimizations to ensure bare-metal superiority:
+- **Fast VGA Scrolling**: Memory-block transfers for instantaneous screen updates.
+- **Asynchronous IO**: Decoupled input handling to prevent kernel-wait states.
 The **SigmaFS** shard uses a log-structured append-only mechanism to ensure crash resilience.
 - **Atomic Writes**: No data corruption during power loss.
 - **Sequential Performance**: Optimized for bare-metal silicon endurance.

@@ -15,8 +15,7 @@ static const char kbd_us[128] = {
     0,  ' '
 };
 
-extern u8 port_inb(u16 port);
-extern void vga_putc(char c, u8 color);
+extern void kbd_queue_push(char c);
 
 void keyboard_handler() {
     u8 scancode = port_inb(0x60);
@@ -28,10 +27,7 @@ void keyboard_handler() {
 
     char c = kbd_us[scancode];
     if (c) {
-        /* Print to VGA Buffer */
-        vga_putc(c, 0x0F);
-        
-        /* Forward to Shell (Future implementation) */
-        /* shell_buffer_push(c); */
+        /* Atomic push to Sovereign Input Queue */
+        kbd_queue_push(c);
     }
 }

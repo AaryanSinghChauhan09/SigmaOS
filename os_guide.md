@@ -14,6 +14,8 @@ SigmaOS provides a premium, industrial-grade user experience that rivals or exce
 - **Human Input**: Native PS/2 keyboard driver with zero-abstract ASCII mapping.
 - **Storage Persistence**: Log-Structured **SigmaFS** for crash-resilient data security.
 - **Global Connectivity**: Bare-metal **Intel e1000** driver and UDP stack for agentic communication.
+- **High-Half Performance**: Industrial **Slab Allocator** and optimized VGA scrolling logic.
+- **Sovereign Documentation**: Comprehensive **GitHub Wiki** covering all 500+ micro-shards.
 - **Unified Experience**: Seamlessly switch between the ultra-advanced Sovereign CLI and the polished Zenith Dashboard.
 
 ---
