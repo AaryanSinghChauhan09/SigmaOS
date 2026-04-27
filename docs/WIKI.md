@@ -81,6 +81,7 @@ The **SigmaFS** shard uses a log-structured append-only mechanism to ensure cras
 SigmaOS is rapidly evolving toward full-scale industrial maturity. Current shard status for the 99 critical building blocks:
 
 ### 🧩 Kernel & Core
+
 - [x] Process Scheduler (Round-Robin)
 - [x] IPC Framework (Asynchronous Messages)
 - [x] Virtual Memory Manager (Paging)
@@ -92,6 +93,7 @@ SigmaOS is rapidly evolving toward full-scale industrial maturity. Current shard
 - [x] Secure Boot Integration (Chain-of-Trust)
 
 ### 🔒 Security
+
 - [x] Intrusion Detection System (Behavioral Audit)
 - [x] Shard Isolation (VMM Enforced)
 - [x] Zero-Trust Networking (Sovereign Firewall)

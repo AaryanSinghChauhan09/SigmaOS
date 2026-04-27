@@ -146,4 +146,13 @@ void sigma_panic(const char* msg, u64 rip, u64 rsp);
 #define SIGMA_ASSERT(cond, msg) \
     do { if (!(cond)) sigma_panic(msg, 0, 0); } while (0)
 
+/* ---- Common Kernel Function Declarations ---- */
+void kprintf(const char* fmt, ...);
+u32  cpu_get_id(void);
+void serial_init(void);
+void serial_putc(char c);
+void serial_puts(const char* s);
+void vga_clear(u8 color);
+void vga_putc_at(u8 x, u8 y, char c, u8 color);
+
 #endif /* SIGMA_KERNEL_TYPES_H */
