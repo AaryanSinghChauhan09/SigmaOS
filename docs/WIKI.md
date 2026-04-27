@@ -3,39 +3,50 @@
 Welcome to the **SigmaOS Sovereign Wiki**, the technical repository for the world's first micro-shard microkernel architecture.
 
 ## 🏛️ CORE ARCHITECTURE
+
 SigmaOS is built on the **Sovereign Micro-Shard Lattice**. Unlike monolithic kernels, SigmaOS breaks every system service into atomic, isolated shards.
 
 ### Sharding Principles
+
 - **Isolation**: Every shard (driver, FS, net) operates in its own memory space.
 - **Zero-Dependency**: No external C libraries. Every byte is custom-engineered.
 - **Lazy Activation**: Shards are loaded into memory only when summoned by the Sovereign Orchestrator.
 
 ## 🧠 MEMORY MANAGEMENT
+
 - **PMM (Bitmap)**: Manages physical RAM with a 4KB-page bitmap allocator.
 - **VMM (Paging)**: Hardware-enforced isolation via multi-level page tables.
 - **Slab Allocator**: Optimized for small object reuse to ensure zero fragmentation.
 - **Atomic Input Queue**: Lock-free asynchronous buffer for zero-latency keyboard processing.
 
 ## 🏛️ PERFORMANCE SHARDS
+
 SigmaOS uses industrial-grade optimizations to ensure bare-metal superiority:
+
 - **Fast VGA Scrolling**: Memory-block transfers for instantaneous screen updates.
 - **VMM Performance Shard**: Assembly-optimized `movsq` page duplication for zero-latency memory management.
 - **Asynchronous IO**: Decoupled input handling to prevent kernel-wait states.
 
 ## 🧪 INDUSTRIAL VERIFICATION
+
 SigmaOS undergoes rigorous testing to ensure architectural finality:
+
 - **Multiboot Compliance**: Automatic verification of binary headers against the Multiboot-2 standard.
 - **Atomic Linkage**: Linker script (`sigma.ld`) enforces strict separation of code and data segments.
 - **Shard Integrity**: Independent verification of each of the 500+ micro-shards.
+
 The **SigmaFS** shard uses a log-structured append-only mechanism to ensure crash resilience.
+
 - **Atomic Writes**: No data corruption during power loss.
 - **Sequential Performance**: Optimized for bare-metal silicon endurance.
 
 ## 🌐 SOVEREIGN NETWORKING
+
 - **Bare-Metal e1000**: Direct hardware communication with the Intel NIC.
 - **Sharded UDP Stack**: Connectionless, zero-copy packet transmission for agentic pulses.
 
 ## 🛠️ DEVELOPMENT WORKFLOW
+
 1. **Modular Build**: Run `make` to compile independent shards.
 2. **Industrial Verification**: Build system enforces Multiboot-2 compliance.
 3. **Sovereign Sync**: Use the integrated `git` automation to maintain repository integrity.
@@ -45,16 +56,19 @@ The **SigmaFS** shard uses a log-structured append-only mechanism to ensure cras
 ## 🗺️ SIGMAOS ROADMAP (2026-2027)
 
 ### Phase 1: Core Stability (2026 Q2)
+
 - **Kernel Hardening**: Implement Slab Allocators and Round-Robin scheduling. [COMPLETED]
 - **Driver Expansion**: Basic VGA, Keyboard, and Serial UART support. [COMPLETED]
 - **VMM Isolation**: High-half mapping and identity paging. [COMPLETED]
 
 ### Phase 2: System Maturity (2026 Q3-Q4)
+
 - **Aesthetic Zenith**: Glassmorphic GUI compositor and window management.
 - **Networking**: Full TCP/IP stack and sharded VPN agents.
 - **Community Growth**: Automated documentation and SDK for shard developers.
 
 ### Phase 3: Mainstream Readiness (2027)
+
 - **Enterprise Sovereignty**: Secure boot, encrypted state, and identity modules.
 - **AI-Native Layer**: Integrated tensor pipelines and autonomous system agents.
 - **Sovereign Computing**: Global mesh synchronization for government/corporate adoption.
@@ -84,6 +98,7 @@ To contribute a new driver or service to SigmaOS, follow the **Atomic Sharding P
 1. **Header Inclusion**: Always include `../../include/sigma_kernel_types.h`.
 2. **Zero-Dependency**: Never use standard library functions. Use the `sigma_*` primitives.
 3. **VFS Registration**:
+
    ```c
    vfs_node_t my_driver = {
        .name = "my_shard",
@@ -92,4 +107,5 @@ To contribute a new driver or service to SigmaOS, follow the **Atomic Sharding P
    };
    vfs_register(&my_driver);
    ```
+
 4. **Linkage**: Add your object to the `OBJS` list in the root `Makefile`.

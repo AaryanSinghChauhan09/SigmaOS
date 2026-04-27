@@ -45,4 +45,4 @@ jobs:
     needs: [aesthetic_audit]
     steps:
       - name: Declare Readiness
-        run: echo "Σ SIGMAOS WEB ZENITH: PORTAL SUPREMACY READY."
+        run: 'echo "Σ SIGMAOS WEB ZENITH: PORTAL SUPREMACY READY."'
