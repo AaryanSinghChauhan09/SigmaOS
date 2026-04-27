@@ -42,6 +42,7 @@ OBJS = $(OBJ_DIR)/main.o \
        $(OBJ_DIR)/neural_lattice.o \
        $(OBJ_DIR)/sigmapm.o \
        $(OBJ_DIR)/zenith_theme.o \
+       $(OBJ_DIR)/sigma_calc.o \
        $(OBJ_DIR)/zenith_gui.o \
        $(OBJ_DIR)/ids_shard.o \
        $(OBJ_DIR)/firewall_shard.o \

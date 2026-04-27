@@ -7,6 +7,8 @@
  */
 #include "../../include/sigma_kernel_types.h"
 
+extern void kprintf(const char* fmt, ...);
+
 typedef struct Shard {
     char    name[32];
     u64     entry_point;

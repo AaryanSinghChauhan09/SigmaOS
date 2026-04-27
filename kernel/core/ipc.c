@@ -7,6 +7,8 @@
  */
 #include "../../include/sigma_kernel_types.h"
 
+extern u32 cpu_get_id(void);
+
 typedef struct Message {
     u64     sender_id;
     u64     receiver_id;

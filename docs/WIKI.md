@@ -101,6 +101,7 @@ SigmaOS is rapidly evolving toward full-scale industrial maturity. Current shard
 - [x] Kernel Integrity Verification
 
 ### 🌐 Networking
+
 - [x] Intel e1000 Driver (Bare-Metal)
 - [x] Zero-Copy Network Buffer
 - [x] Sovereign Firewall
@@ -124,6 +125,8 @@ SigmaOS is rapidly evolving toward full-scale industrial maturity. Current shard
 - [x] AI-Native Orchestration Layer
 - [x] Predictive Resource Allocation
 - [x] Smart Caching (LRU ML-Hybrid)
+- [x] Sovereign NCERT Calculator (Physics/Math)
+- [x] Sovereign Indian Law Engine (Timelines/Fines)
 
 ---
 
