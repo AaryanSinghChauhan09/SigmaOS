@@ -14,8 +14,8 @@
  * =============================================================================
  */
 
-#include "../include/sigma_kernel_types.h"
-#include "../include/legal_shards.h"
+#include "../../include/sigma_kernel_types.h"
+#include "../../include/legal_shards.h"
 
 /* =========================================================================
  * Constants

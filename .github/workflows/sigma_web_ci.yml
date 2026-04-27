@@ -17,6 +17,13 @@ jobs:
           if [ ! -f "index.html" ]; then echo "❌ Missing index.html"; exit 1; fi
           if [ ! -f "dashboard/index.html" ]; then echo "❌ Missing dashboard/index.html"; exit 1; fi
           if [ ! -d "assets" ]; then echo "❌ Missing assets directory"; exit 1; fi
+      - name: Modular Integrity Check
+        run: |
+          echo "Σ [CI]: Verifying Shard Lattice Structure..."
+          if [ ! -d "kernel/core" ]; then echo "❌ Missing kernel/core"; exit 1; fi
+          if [ ! -d "kernel/drivers" ]; then echo "❌ Missing kernel/drivers"; exit 1; fi
+          if [ ! -d "kernel/orchestration" ]; then echo "❌ Missing kernel/orchestration"; exit 1; fi
+          if [ ! -d "kernel/diagnostics" ]; then echo "❌ Missing kernel/diagnostics"; exit 1; fi
 
   aesthetic_audit:
     name: "🎨 Aesthetic & UX Audit"

@@ -9,7 +9,7 @@
  *   - Atomic shard hot-swapping.
  * =============================================================================
  */
-#include "../include/sigma_kernel_types.h"
+#include "../../include/sigma_kernel_types.h"
 
 typedef struct ShardMetadata {
     u32     shard_id;

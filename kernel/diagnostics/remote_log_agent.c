@@ -5,7 +5,7 @@
  * Principles: Autonomous Telemetry & Distributed Persistence.
  * =============================================================================
  */
-#include "../include/sigma_kernel_types.h"
+#include "../../include/sigma_kernel_types.h"
 
 extern void net_send_udp(u32 dst_ip, u16 dst_port, void* data, u16 len);
 extern void sigmafs_append(const char* name, u8* data, u32 len);

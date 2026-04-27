@@ -58,3 +58,38 @@ The **SigmaFS** shard uses a log-structured append-only mechanism to ensure cras
 - **Enterprise Sovereignty**: Secure boot, encrypted state, and identity modules.
 - **AI-Native Layer**: Integrated tensor pipelines and autonomous system agents.
 - **Sovereign Computing**: Global mesh synchronization for government/corporate adoption.
+
+---
+
+## 📐 ARCHITECTURE VISUALIZATION
+
+```mermaid
+graph TD
+    User["Sovereign User"] --> Shell["Zenith Shell / GUI"]
+    Shell --> Orchestrator["Shard Orchestrator"]
+    Orchestrator --> VFS["Sovereign VFS"]
+    VFS --> Drivers["Hardware Shards (Keyboard, Disk, Net)"]
+    VFS --> FS["SigmaFS"]
+    Core["Hardened Micro-Kernel"] --- Orchestrator
+    Core --- PMM["Bitmap PMM"]
+    Core --- VMM["Paging / VMM"]
+```
+
+---
+
+## 🛠️ DEVELOPER ONBOARDING: WRITING A SHARD
+
+To contribute a new driver or service to SigmaOS, follow the **Atomic Sharding Pattern**:
+
+1. **Header Inclusion**: Always include `../../include/sigma_kernel_types.h`.
+2. **Zero-Dependency**: Never use standard library functions. Use the `sigma_*` primitives.
+3. **VFS Registration**:
+   ```c
+   vfs_node_t my_driver = {
+       .name = "my_shard",
+       .read = my_read_logic,
+       .write = my_write_logic
+   };
+   vfs_register(&my_driver);
+   ```
+4. **Linkage**: Add your object to the `OBJS` list in the root `Makefile`.

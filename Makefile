@@ -12,8 +12,9 @@ LDFLAGS = -T kernel/sigma.ld -m elf_x86_64
 # Modular Directories
 SRC_DIR  = kernel
 CORE_DIR = kernel/core
-DRV_DIR  = kernel/drivers
-FS_DIR   = kernel/fs
+DIAG_DIR = kernel/diagnostics
+ORCH_DIR = kernel/orchestration
+SHELL_DIR = kernel/shell
 OBJ_DIR  = obj
 
 # Objects
@@ -29,6 +30,8 @@ OBJS = $(OBJ_DIR)/main.o \
        $(OBJ_DIR)/vga.o \
        $(OBJ_DIR)/keyboard.o \
        $(OBJ_DIR)/serial.o \
+       $(OBJ_DIR)/multi_core.o \
+       $(OBJ_DIR)/zenith_gui.o \
        $(OBJ_DIR)/e1000.o \
        $(OBJ_DIR)/ide.o \
        $(OBJ_DIR)/sigmafs.o
@@ -40,6 +43,18 @@ $(OBJ_DIR)/%.o: $(SRC_DIR)/%.c
 	$(CC) $(CFLAGS) -c $< -o $@
 
 $(OBJ_DIR)/%.o: $(CORE_DIR)/%.c
+	@mkdir -p $(OBJ_DIR)
+	$(CC) $(CFLAGS) -c $< -o $@
+
+$(OBJ_DIR)/%.o: $(DIAG_DIR)/%.c
+	@mkdir -p $(OBJ_DIR)
+	$(CC) $(CFLAGS) -c $< -o $@
+
+$(OBJ_DIR)/%.o: $(ORCH_DIR)/%.c
+	@mkdir -p $(OBJ_DIR)
+	$(CC) $(CFLAGS) -c $< -o $@
+
+$(OBJ_DIR)/%.o: $(SHELL_DIR)/%.c
 	@mkdir -p $(OBJ_DIR)
 	$(CC) $(CFLAGS) -c $< -o $@
 
