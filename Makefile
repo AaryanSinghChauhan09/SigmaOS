@@ -26,6 +26,8 @@ OBJS = $(OBJ_DIR)/main.o \
        $(OBJ_DIR)/idt.o \
        $(OBJ_DIR)/vfs.o \
        $(OBJ_DIR)/hotpatch.o \
+       $(OBJ_DIR)/checkpoint.o \
+       $(OBJ_DIR)/energy.o \
        $(OBJ_DIR)/slab.o \
        $(OBJ_DIR)/input_queue.o \
        $(OBJ_DIR)/vga.o \
