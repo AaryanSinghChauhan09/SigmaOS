@@ -2,7 +2,7 @@
  * =============================================================================
  * Σ SIGMAOS KERNEL: SERIAL DRIVER + EARLY CONSOLE (v1.0 - PURE C11)
  * =============================================================================
- * COM1 (0x3F8) 16550A UART — used for kernel printf before VGA/GPU init.
+ * COM1 (0x3F8) 16550A UART — used for kernel kprintf before VGA/GPU init.
  * Baud: 115200 | 8N1 | No FIFO threshold for maximum throughput.
  * Standard: C11, freestanding
  * =============================================================================
@@ -119,7 +119,7 @@ static void serial_puts(const char* s) {
 }
 
 /* =========================================================================
- * kprintf — kernel variadic printf (serial + VGA)
+ * kprintf — kernel variadic kprintf (serial + VGA)
  * ========================================================================= */
 
 static void kprint_u64(u64 v, int base) {

@@ -39,7 +39,7 @@ void registry_init(void) {
 k_status registry_set(const char* key, const char* val) {
     /* If key exists, update value */
     for (u32 i = 0; i < g_reg_count; i++) {
-        // Simple strcmp replacement
+        // Simple sigma_strcmp replacement
         bool_t match = TRUE;
         u32 j = 0;
         while (g_reg[i].key[j] && key[j]) {

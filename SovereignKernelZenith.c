@@ -43,7 +43,7 @@ void sigma_hw_wipe_page(sigma_u64 addr) {
     
     // Simulate high-speed zeroing
     char* p = (char*)addr;
-    /* Normally: memset(p, 0, 4096); plus clflush */
+    /* Normally: sigma_memset(p, 0, 4096); plus clflush */
 }
 
 /* =========================================================================

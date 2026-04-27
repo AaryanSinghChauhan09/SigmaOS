@@ -138,7 +138,7 @@ static u64 dentry_lookup(u64 parent_ino, const char* name) {
     for (i = 0; i < g_vfs.dentry_count; i++) {
         VDentry* d = &g_vfs.dentries[i];
         if (!d->valid || d->parent_ino != parent_ino) continue;
-        /* strcmp */
+        /* sigma_strcmp */
         usize j = 0;
         while (d->name[j] && name[j] && d->name[j] == name[j]) j++;
         if (d->name[j] == '\0' && name[j] == '\0') return d->ino;

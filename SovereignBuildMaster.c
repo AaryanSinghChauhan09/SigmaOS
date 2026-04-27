@@ -50,7 +50,7 @@ void scan_dir(const char* dir_path) {
     if (hFind == INVALID_HANDLE_VALUE) return;
 
     do {
-        if (strcmp(find_data.cFileName, ".") == 0 || strcmp(find_data.cFileName, "..") == 0)
+        if (sigma_strcmp(find_data.cFileName, ".") == 0 || sigma_strcmp(find_data.cFileName, "..") == 0)
             continue;
 
         char path[MAX_PATH];
@@ -60,7 +60,7 @@ void scan_dir(const char* dir_path) {
             scan_dir(path);
         } else {
             const char* ext = strrchr(find_data.cFileName, '.');
-            if (ext && (strcmp(ext, ".c") == 0 || strcmp(ext, ".h") == 0)) {
+            if (ext && (sigma_strcmp(ext, ".c") == 0 || sigma_strcmp(ext, ".h") == 0)) {
                 verify_file(path);
             }
         }

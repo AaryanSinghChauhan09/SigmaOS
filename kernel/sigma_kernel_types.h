@@ -125,6 +125,19 @@ static inline usize sigma_strlen(const char* s) {
     return len;
 }
 
+static inline int sigma_strcmp(const char* s1, const char* s2) {
+    while (*s1 && (*s1 == *s2)) {
+        s1++; s2++;
+    }
+    return *(u8*)s1 - *(u8*)s2;
+}
+
+static inline void sigma_strncpy(char* dest, const char* src, usize n) {
+    usize i;
+    for (i = 0; i < n - 1 && src[i] != '\0'; i++) dest[i] = src[i];
+    dest[i] = '\0';
+}
+
 /* =========================================================================
  * SOVEREIGN-FAULT: Industrial Recovery & Assertion
  * ========================================================================= */

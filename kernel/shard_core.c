@@ -106,6 +106,6 @@ void shard_amnesic_destroy(u64 shard_id) {
     s->shard_id = 0;
     
     // 3. Trigger silicon-level memory wipe of the shard segment
-    // memset((void*)s->base_addr, 0, s->limit_addr - s->base_addr);
+    // sigma_memset((void*)s->base_addr, 0, s->limit_addr - s->base_addr);
     // kprintf("[SHARD-CORE]: Shard %s destroyed with Amnesic Wipe [SUCCESS]\n", s->name);
 }

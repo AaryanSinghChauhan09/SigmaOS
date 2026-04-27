@@ -56,7 +56,7 @@ static u32 g_active_nodes = 0;
  * ========================================================================= */
 
 void dist_shard_init(void) {
-    /* Use kernel-primitive memset for silicon-direct zeroing */
+    /* Use kernel-primitive sigma_memset for silicon-direct zeroing */
     sigma_memset(g_node_table, 0, sizeof(g_node_table));
     g_active_nodes = 1; // Local node
     g_node_table[0].node_id = 1;

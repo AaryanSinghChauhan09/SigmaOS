@@ -452,7 +452,7 @@ k_status camera_apply_filter(void* frame_ptr, const char* filter_name) {
     FilterEngine* fe = &g_camera.filter_engine;
     u32 i;
     for (i = 0; i < fe->count; i++) {
-        /* name match (case-sensitive, manual strcmp) */
+        /* name match (case-sensitive, manual sigma_strcmp) */
         const char* a = fe->kernels[i].name;
         const char* b = filter_name;
         u32 j = 0;
