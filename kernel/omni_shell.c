@@ -386,6 +386,10 @@ static void cmd_help(ParsedCmd* c) {
     kprintf("  NETWORK DIAG:\n");
     kprintf("    ping <host>     — Send ICMP ECHO_REQUEST to network hosts\n");
     kprintf("    curl/wget <url> — Transfer data from or to a server\n");
+    kprintf("  AI & AGENTIC CODING (Zenith USP):\n");
+    kprintf("    sigma-code <f>  — Agentic AI coding assistant (Claude-Code USP)\n");
+    kprintf("    claw-analyze    — Deep architectural analysis (Claw-Code USP)\n");
+    kprintf("    open-forge      — Collaborative sovereign development\n");
     kprintf("  KEYBOARD SHORTCUTS:\n");
     kprintf("    Ctrl+C     — Interrupt running command\n");
     kprintf("    Ctrl+D     — End of input / logout\n");
@@ -866,6 +870,8 @@ static const CmdEntry g_cmds[] = {
     { "free",                  cmd_top,                   "Memory monitor" },
     { "uptime",                cmd_top,                   "System uptime" },
     { "ping",                  cmd_ping,                  "Network ping" },
+    { "sigma-code",            cmd_sigma_code,            "AI Coding Assistant" },
+    { "claw-analyze",          cmd_sigma_code,            "Deep Code Analysis" },
     { "pqc-gen",               cmd_pqc_gen,               "Generate PQC keypair" },
     { "ml-train",              cmd_ml_train,              "Train ML model" },
     { "ncert-sim",             cmd_ncert_sim,             "NCERT simulation" },

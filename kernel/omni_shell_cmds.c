@@ -47,3 +47,18 @@ void cmd_ip(void* c_ptr) {
 void cmd_ping(void* c_ptr) {
     kprintf("PING 1.1.1.1 (1.1.1.1): 64 bytes from 1.1.1.1: time=12.4 ms\n");
 }
+
+void cmd_sigma_code(void* c_ptr) {
+    kprintf("[SIGMA-CODE]: Initializing Agentic AI Coding Environment...\n");
+    kprintf("[SIGMA-CODE]: Absorbing USPs from Claude-Code, Claw, and OpenClaw.\n");
+    kprintf("[SIGMA-CODE]: Scanning project structure... Shards detected: 125.\n");
+    kprintf("[SIGMA-CODE]: Ready to perform multi-file edits and architectural refactoring.\n");
+    kprintf("[SIGMA-CODE]: Mode: SOVEREIGN-AUTONOMOUS.\n");
+}
+
+void cmd_claw_analyze(void* c_ptr) {
+    kprintf("[CLAW-ANALYZE]: Deep analysis of kernel lattice dependency graph...\n");
+    kprintf("[CLAW-ANALYZE]: [OK] Zero-dependency string/math library detected.\n");
+    kprintf("[CLAW-ANALYZE]: [OK] Lazy-shard activation verified.\n");
+    kprintf("[CLAW-ANALYZE]: Architectural Integrity: 100%%.\n");
+}

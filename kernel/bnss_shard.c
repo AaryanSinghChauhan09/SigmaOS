@@ -15,7 +15,7 @@ void init_bnss_template(void* t) {
         "PREREQ: Arrest without warrant.", 
         "STEP 1: Physical production. STEP 2: Remand application if needed.", 1, 0);
     add_item(t, "Police Custody Remand (Max 15 days)", "Sec 187 BNSS", 
-        "PREREQ: Investigation requires custody.", 
+        "PREREQ: Investigation requires custody. *V. Senthil Balaji v. State (2023 SC)* - Police custody can be granted even after first 15 days of judicial remand.", 
         "STEP 1: Written application. STEP 2: Magistrate order. STEP 3: Medical exam every 48 hrs.", 15, 0);
     add_item(t, "Search and Seizure (Video Mandatory)", "Sec 105 BNSS", 
         "PREREQ: Search warrant or emergency.", 
