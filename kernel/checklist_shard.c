@@ -75,12 +75,6 @@ static u32           g_template_count = 0;
 
 extern void kprintf(const char* fmt, ...);
 
-static void sigma_strncpy(char* dest, const char* src, u32 n) {
-    u32 i;
-    for (i = 0; i < n - 1 && src[i] != '\0'; i++) dest[i] = src[i];
-    dest[i] = '\0';
-}
-
 void add_item(void* t_ptr,
                       const char* desc,
                       const char* ref,
@@ -116,8 +110,8 @@ static void create_template(LawDomain domain, const char* name, const char* desc
 /* =========================================================================
  * Consumer Protection Template
  * ========================================================================= */
-static void init_consumer_template(void) {
-    LegalTemplate* t = &g_templates[g_template_count++];
+void init_consumer_template(void* t_ptr) {
+    LegalTemplate* t = (LegalTemplate*)t_ptr;
     t->domain = DOMAIN_CONSUMER_PROTECTION;
     sigma_strncpy(t->name, "CONSUMER_PROTECTION_ACT_2019", 63);
     sigma_strncpy(t->description,
@@ -153,10 +147,10 @@ static void init_consumer_template(void) {
 }
 
 /* =========================================================================
- * Cyber Crime Template (standalone)
+ * RERA Template
  * ========================================================================= */
-static void init_rera_template(void) {
-    LegalTemplate* t = &g_templates[g_template_count++];
+void init_rera_template(void* t_ptr) {
+    LegalTemplate* t = (LegalTemplate*)t_ptr;
     t->domain = DOMAIN_RERA;
     sigma_strncpy(t->name, "RERA_2016_REAL_ESTATE_COMPLIANCE", 63);
     sigma_strncpy(t->description,

@@ -5,7 +5,7 @@
  * Principles: Zero-Copy Networking, Silicon-Direct Communication.
  * =============================================================================
  */
-#include "../include/sigma_kernel_types.h"
+#include "../../include/sigma_kernel_types.h"
 
 #define E1000_REG_TDT   0x3818 /* Transmit Descriptor Tail */
 #define E1000_REG_STATUS 0x0008
@@ -28,7 +28,7 @@ extern u32 mmio_read32(u64 addr);
 
 void e1000_send_packet(void* data, u16 len) {
     tx_desc_t* desc = &tx_ring[tx_tail];
-    desc->addr = (u64)data;
+    desc->addr = (u64)(usize)data;
     desc->length = len;
     desc->cmd = (1 << 0) | (1 << 3); /* EOP | RS */
     desc->status = 0;
