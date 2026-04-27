@@ -24,6 +24,22 @@ SigmaOS is a **Sovereign Micro-Shard Microkernel**. It is designed to operate at
 
 ### 1.1 Atomic Sharding (ROWN Principle)
 
+SigmaOS follows the **Run-Only-What-is-Necessary** (ROWN) principle. Every system component, from the keyboard driver to the legal audit engine, is an independent atomic shard.
+
+### 1.2 Modular Virtual File System (VFS)
+
+In SigmaOS, everything is a shard. The **Sovereign VFS** abstracts hardware devices and storage nodes into a unified interface:
+
+- **Unified Access**: Interact with `keyboard`, `disk`, and `network` using the same `read/write` primitives.
+- **Hardware Agnostic**: Drivers register themselves as VFS nodes, allowing for hot-swappable hardware support.
+
+### 1.3 Industrial Build Orchestration
+
+The SigmaOS build system is now modular and recursive:
+
+- **Modular Compilation**: Drivers, File Systems, and Kernel Core are compiled as independent object shards.
+- **Strict Compliance**: The build pipeline enforces Multiboot-2 and x86_64 industrial standards.
+
 Unlike monolithic kernels (Linux) or hybrid kernels (Windows/NT), SigmaOS uses the **Run-Only-What-is-Necessary** principle.
 
 - **Micro-Shards**: 500+ isolated modules (`kernel/shell`, `kernel/legal`, `kernel/net`).

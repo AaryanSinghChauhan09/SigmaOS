@@ -5,7 +5,7 @@
  * Principles: Zero-Abstract Visualization.
  * =============================================================================
  */
-#include "../include/sigma_kernel_types.h"
+#include "../../include/sigma_kernel_types.h"
 
 #define VGA_ADDR 0xB8000
 #define COLS     80

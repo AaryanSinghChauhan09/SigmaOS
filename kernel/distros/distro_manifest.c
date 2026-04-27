@@ -3,7 +3,7 @@
  * Σ SIGMAOS KERNEL: DISTRO-MANIFEST (Universal Linux Absorption)
  * =============================================================================
  */
-#include "../sigma_kernel_types.h"
+#include "../../include/sigma_kernel_types.h"
 
 extern void kprintf(const char* fmt, ...);
 

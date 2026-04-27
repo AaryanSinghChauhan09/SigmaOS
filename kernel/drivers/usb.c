@@ -13,7 +13,7 @@
  * =============================================================================
  */
 
-#include "../include/sigma_kernel_types.h"
+#include "../../include/sigma_kernel_types.h"
 
 extern void  kprintf(const char *fmt, ...);
 extern void *vmm_map_mmio(u64 phys, usize size);

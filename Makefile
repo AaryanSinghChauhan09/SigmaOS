@@ -1,38 +1,54 @@
-# =============================================================================
-# Σ SIGMAOS SOVEREIGN BUILD SYSTEM
-# =============================================================================
+# ==============================================================================
+# Σ SIGMAOS: INDUSTRIAL BUILD ORCHESTRATOR (v6.4)
+# ==============================================================================
 
 CC = gcc
 AS = nasm
-CFLAGS = -ffreestanding -O2 -Wall -Wextra -I./kernel
-LDFLAGS = -nostdlib -T kernel/linker.ld
+LD = ld
 
-# Shards
-SHELL_SHARDS = kernel/shell/shell_engine.c kernel/shell/shell_parser.c
-DISTRO_SHARDS = kernel/distros/distro_manifest.c
-LIBC_SHARDS = kernel/libc/sigma_libc.c
-BOOT_SHARDS = kernel/boot/multiboot_header.asm kernel/boot/sovereign_boot.asm
+CFLAGS = -m64 -ffreestanding -O2 -Wall -Wextra -Iinclude -nostdlib -fno-stack-protector
+LDFLAGS = -T kernel/sigma.ld -m elf_x86_64
+
+# Modular Directories
+SRC_DIR = kernel
+DRV_DIR = kernel/drivers
+FS_DIR  = kernel/fs
+OBJ_DIR = obj
+
+# Objects
+OBJS = $(OBJ_DIR)/main.o \
+       $(OBJ_DIR)/scheduler.o \
+       $(OBJ_DIR)/pmm.o \
+       $(OBJ_DIR)/vmm.o \
+       $(OBJ_DIR)/idt.o \
+       $(OBJ_DIR)/vfs.o \
+       $(OBJ_DIR)/vga.o \
+       $(OBJ_DIR)/keyboard.o \
+       $(OBJ_DIR)/e1000.o \
+       $(OBJ_DIR)/ide.o \
+       $(OBJ_DIR)/sigmafs.o
 
 all: sigmaos.bin
 
-sigmaos.bin: $(BOOT_SHARDS) $(SHELL_SHARDS) $(DISTRO_SHARDS) $(LIBC_SHARDS)
-	@echo "[BUILD]: Compiling Sovereign Shards..."
-	# Real compilation commands here
-	@touch sigmaos.bin
+$(OBJ_DIR)/%.o: $(SRC_DIR)/%.c
+	@mkdir -p $(OBJ_DIR)
+	$(CC) $(CFLAGS) -c $< -o $@
 
-# Deployment Targets
-vbox: all
-	@echo "[DEPLOY]: Creating VirtualBox ISO..."
+$(OBJ_DIR)/%.o: $(DRV_DIR)/%.c
+	@mkdir -p $(OBJ_DIR)
+	$(CC) $(CFLAGS) -c $< -o $@
 
-browser: all
-	@echo "[DEPLOY]: Compiling to WASM for Browser execution..."
-	# emcc ...
+$(OBJ_DIR)/%.o: $(FS_DIR)/%.c
+	@mkdir -p $(OBJ_DIR)
+	$(CC) $(CFLAGS) -c $< -o $@
 
-wsl: all
-	@echo "[DEPLOY]: Packaging RootFS for WSL2..."
-
-live-usb: all
-	@echo "[DEPLOY]: Creating Live USB image..."
+sigmaos.bin: $(OBJS)
+	$(LD) $(LDFLAGS) $(OBJS) -o sigmaos.bin
 
 clean:
-	rm -f sigmaos.bin
+	rm -rf $(OBJ_DIR) sigmaos.bin
+
+# Verification
+verify:
+	@echo "Σ [BUILD]: Verifying Multiboot Compliance..."
+	@grub-file --is-x86-multiboot sigmaos.bin && echo "Multiboot OK" || echo "Fail"

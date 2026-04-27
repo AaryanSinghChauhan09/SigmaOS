@@ -3,7 +3,6 @@
  * Σ SIGMAOS KERNEL: OMNI-SHELL-COMMANDS (Modularised)
  * =============================================================================
  */
-#include "../include/sigma_kernel_types.h"
 
 extern void kprintf(const char* fmt, ...);
 
