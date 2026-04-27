@@ -882,6 +882,8 @@ static const CmdEntry g_cmds[] = {
     { "emerge-optim",          cmd_nix_rebuild,           "Gentoo Optimization" },
     { "amnesia-seal",          cmd_nix_rebuild,           "Tails Memory Wipe" },
     { "sigma-agent",           cmd_sigma_agent,           "Autonomous OS Agent" },
+    { "git-viz",               cmd_git_viz,               "Visualize Git History" },
+    { "tree-analyze",          cmd_tree_analyze,          "Analyze File Tree" },
     { "pqc-gen",               cmd_pqc_gen,               "Generate PQC keypair" },
     { "ml-train",              cmd_ml_train,              "Train ML model" },
     { "ncert-sim",             cmd_ncert_sim,             "NCERT simulation" },

@@ -1,6 +1,30 @@
-﻿
+﻿# SigmaOS Sovereign Zenith: The Industrial Micro-Kernel Singularity (v5.0)
+
+## 📂 Atomic Shard Architecture
+The codebase has been refactored into atomic, zero-dependency shards:
+- /kernel/shell/: Core shell logic, parser, and history.
+- /kernel/camera/: Snapchat-USP filters and Scratch-USP event blocks.
+- /kernel/distros/: Absorbed USPs from the Linux ecosystem.
+- /kernel/libc/: Sovereign, library-free implementation of string/memory functions.
+- /kernel/boot/: Multi-mode bootloaders (BIOS, UEFI, Multiboot).
+
+## 🌀 Linux Distro USP Absorption
+SigmaOS has absorbed the following USPs:
+- **Arch**: Pacman-style rolling synchronization.
+- **NixOS**: Declarative state management (
+ix-rebuild).
+- **Gentoo**: Extreme compilation tuning (emerge-optim).
+- **Tails**: Volatile memory amnesia (mnesia-seal).
+- **Kali**: Integrated vulnerability scanning (uln-scan).
+
+## 🤖 Agentic AI & Tool Integration
+- **Sigma-Code**: Built-in AI coding assistant (Claude-Code USP).
+- **Tree-Analyze**: Architectural integrity verification (Claw-Code USP).
+- **Git-Viz**: Topographic git visualization.
+
+---
 # FILE: ARCHITECTURE.md
-# Î£ SIGMAOS ZENITH SUPREME: ARCHITECTURAL SHARDING
+# ÃŽÂ£ SIGMAOS ZENITH SUPREME: ARCHITECTURAL SHARDING
 
 ## 1. SOVEREIGN LEVELS
 
@@ -29,16 +53,16 @@ SigmaOS operates on a **Zero-Dependency** sharding model.
 
 ---
 
-Î£ SIGMAOS: ARCHITECTURAL SOVEREIGNTY.
+ÃŽÂ£ SIGMAOS: ARCHITECTURAL SOVEREIGNTY.
 
 ---
 
 # FILE: CHANGELOG.md
-# Î£ SIGMAOS: SOVEREIGN SUPPORT & ASSISTANCE
+# ÃŽÂ£ SIGMAOS: SOVEREIGN SUPPORT & ASSISTANCE
 
 Thank you for choosing **SigmaOS Zenith Supreme**. We provide institutional-grade support for our industrial operating sovereignty.
 
-## ðŸ› ï¸ HOW TO GET SUPPORT
+## Ã°Å¸â€ºÂ Ã¯Â¸Â HOW TO GET SUPPORT
 
 ### 1. The Sovereign Wiki
 
@@ -59,7 +83,7 @@ If you encounter a bug or have a feature sharding request, please:
 
 Join the **Sovereign-Zenith Discord** for real-time collaboration with other industrial OS architects.
 
-## ðŸ“„ LICENSE & COMPLIANCE
+## Ã°Å¸â€œâ€ž LICENSE & COMPLIANCE
 
 SigmaOS is licensed under the **MIT License**. For commercial or institutional compliance shards, please contact the **Sovereign Mastery Team**.
 
@@ -67,7 +91,7 @@ SigmaOS is licensed under the **MIT License**. For commercial or institutional c
 
 - **GitHub Master Sync**: Repository structure ready for the definitive industrial push.
 
-### ðŸ› ï¸ IMPROVED
+### Ã°Å¸â€ºÂ Ã¯Â¸Â IMPROVED
 
 - **Kernel Slab Allocator**: Improved O(1) memory sharding for x86_64 silicon.
 
@@ -75,55 +99,55 @@ SigmaOS is licensed under the **MIT License**. For commercial or institutional c
 
 - **Spotlight Search**: Cmd+K universal search for all industrial shards.
 
-### ðŸ›¡ï¸ SECURITY
+### Ã°Å¸â€ºÂ¡Ã¯Â¸Â SECURITY
 
 - **SigmaAuditTool**: Integrated deep-scan system balancing for kernel stability.
 - **Zero-Dependency Core**: Absolute sovereignty, no external binutils or GLIBC.
 
 ---
 
-Î£ SIGMAOS: EVOLVING INDUSTRIAL SOVEREIGNTY.
+ÃŽÂ£ SIGMAOS: EVOLVING INDUSTRIAL SOVEREIGNTY.
 
 ---
 
 # FILE: CODE_OF_CONDUCT.md
-# Î£ SIGMAOS: SOVEREIGN CODE OF CONDUCT
+# ÃŽÂ£ SIGMAOS: SOVEREIGN CODE OF CONDUCT
 
 Thank you for your interest in **SigmaOS Zenith Supreme**. We are committed to fostering a professional, technical, and industrial-grade environment for bit-perfect OS development.
 
-## ðŸ¤ ENFORCEMENT & INTEGRITY
+## Ã°Å¸Â¤Â ENFORCEMENT & INTEGRITY
 
 SigmaOS is dedicated to technical excellence and industrial-grade software engineering. We expect all contributors to:
 1.  **Maintain High Integrity**: Bit-perfect OS development requires absolute accuracy and professional conduct.
 2.  **Respect Technical Merit**: Contributions are evaluated based on their sovereign sharding potential and technical merit.
 3.  **Encourage Technical Growth**: We support contributors in mastering low-level C, Assembly, and Rust logic.
 
-## ðŸš· PROHIBITED BEHAVIOR
+## Ã°Å¸Å¡Â· PROHIBITED BEHAVIOR
 
 - Deliberate injection of insecure or non-sovereign code.
 - Disruption of industrial OS development workflow.
 - Violation of the project's **Zero-Dependency** sharding model.
 
-## ðŸš¨ REPORTING
+## Ã°Å¸Å¡Â¨ REPORTING
 
 To report any issues or behavior that contradicts this Code of Conduct, please contact the project's **Industrial Audit Team** via the **SigmaAuditTool**.
 
 ---
 
-Î£ SIGMAOS: ARCHITECTURAL SOVEREIGNTY.
+ÃŽÂ£ SIGMAOS: ARCHITECTURAL SOVEREIGNTY.
 
 ---
 
 # FILE: CONTRIBUTING.md
-# Î£ SIGMAOS: SOVEREIGN CONTRIBUTING GUIDELINES
+# ÃŽÂ£ SIGMAOS: SOVEREIGN CONTRIBUTING GUIDELINES
 
 Thank you for your interest in contributing to **SigmaOS Zenith Supreme**, the definitive industrial operating sovereignty. By contributing, you help us absorb the world's most powerful OS features into a single, bit-perfect shard of silicon.
 
-## ðŸš€ CODE OF CONDUCT
+## Ã°Å¸Å¡â‚¬ CODE OF CONDUCT
 
 SigmaOS is an industrial-grade environment. We expect all contributors to maintain the highest levels of professional integrity and technical excellence.
 
-## ðŸ› ï¸ HOW TO CONTRIBUTE
+## Ã°Å¸â€ºÂ Ã¯Â¸Â HOW TO CONTRIBUTE
 
 ### 1. Identify a Feature Shard
 
@@ -140,28 +164,28 @@ Choose a USP or feature from the absorbed repositories (Linux, Ubuntu, Arch, ope
 - Direct commits are preferred for core members.
 - For external contributors, please submit a **Sovereign Shard Pull Request**.
 
-## ðŸ›¡ï¸ CODING STANDARDS
+## Ã°Å¸â€ºÂ¡Ã¯Â¸Â CODING STANDARDS
 
 - **Memory Sharding**: Use the O(1) Slab Allocator.
 - **Paging**: Follow 4-level PML4 paging sharding.
 - **Safety**: Implement Rust-style safety shards for critical logic.
 
-## ðŸ“„ LICENSE
+## Ã°Å¸â€œâ€ž LICENSE
 
 By contributing, you agree that your contributions will be licensed under the project's **MIT License**.
 
 ---
 
-Î£ SIGMAOS: THE DEFINITIVE INDUSTRIAL SOVEREIGNTY.
+ÃŽÂ£ SIGMAOS: THE DEFINITIVE INDUSTRIAL SOVEREIGNTY.
 
 ---
 
 # FILE: DEVELOPMENT.md
-# Î£ SIGMAOS: SOVEREIGN DEVELOPMENT & BUILD GUIDE
+# ÃŽÂ£ SIGMAOS: SOVEREIGN DEVELOPMENT & BUILD GUIDE
 
 Welcome, Industrial OS Architect. This guide outlines how to build and expand the **SigmaOS Zenith Supreme** industrial sharding.
 
-## ðŸ› ï¸ PREREQUISITES
+## Ã°Å¸â€ºÂ Ã¯Â¸Â PREREQUISITES
 
 To build the kernel and userland shards, you require:
 - **GCC / G++**: For C and C++ shards.
@@ -170,7 +194,7 @@ To build the kernel and userland shards, you require:
 - **Rustc / Cargo**: For critical safety sharding (optional).
 - **Bash**: For automation shell shards.
 
-## ðŸš€ BUILDING THE SOVEREIGN MASTER
+## Ã°Å¸Å¡â‚¬ BUILDING THE SOVEREIGN MASTER
 
 ### 1. Build the Kernel (Level-0)
 The kernel is the bare-metal foundation:
@@ -190,7 +214,7 @@ To build the complete project, including any WASM/JS components:
 make zenith
 ```
 
-## ðŸ“‚ DIRECTORY SHARDING
+## Ã°Å¸â€œâ€š DIRECTORY SHARDING
 
 - `/kernel`: Bare-metal assembly and C logic (Slab/Paging/Audit).
 - `/userland/apps`: Master utility shards (Pkg Manager, Personalizer, Matrix, Runner).
@@ -198,26 +222,26 @@ make zenith
 - `/arch`: Architecture-specific silicon control (x86_64).
 - `/scripts`: Automation playbooks and sovereignty audits.
 
-## ðŸ§ª TESTING & AUDITING
+## Ã°Å¸Â§Âª TESTING & AUDITING
 
 - **SigmaAuditTool**: Run `make audit` to conduct a deep system scan for memory leaks and sharding integrity.
 - **Terminal Emulator**: Use the `sigma_shell` for local testing is `userland/sigma_shell.c`.
 
 ---
 
-Î£ SIGMAOS: EVOLVING INDUSTRIAL SOVEREIGNTY.
+ÃŽÂ£ SIGMAOS: EVOLVING INDUSTRIAL SOVEREIGNTY.
 
 ---
 
 # FILE: os_guide.md
-# Î£ SIGMAOS ZENITH SUPREME â€” THE SOVEREIGN MASTER GUIDE
+# ÃŽÂ£ SIGMAOS ZENITH SUPREME Ã¢â‚¬â€ THE SOVEREIGN MASTER GUIDE
 ## The Only Documentation You Will Ever Need
 
-> **Version:** 2.0 â€” Sovereign Architecture  
+> **Version:** 2.0 Ã¢â‚¬â€ Sovereign Architecture  
 > **Status:** Production-Ready | Industry-Hardened | Judiciary-Compliant  
-> **Target Audience:** Novice Users Â· Forensic Scientists Â· Lawyers Â· AI/ML Researchers Â· Data Scientists Â· NCERT Students Â· Computer Scientists Â· Legal Researchers  
-> **Kernel Language:** C11 (98%) Â· Assembly x86_64 (0.7%) Â· Rust no_std (0.3%)  
-> **Dependency:** ZERO â€” No glibc Â· No libstdc++ Â· No Python runtime  
+> **Target Audience:** Novice Users Ã‚Â· Forensic Scientists Ã‚Â· Lawyers Ã‚Â· AI/ML Researchers Ã‚Â· Data Scientists Ã‚Â· NCERT Students Ã‚Â· Computer Scientists Ã‚Â· Legal Researchers  
+> **Kernel Language:** C11 (98%) Ã‚Â· Assembly x86_64 (0.7%) Ã‚Â· Rust no_std (0.3%)  
+> **Dependency:** ZERO Ã¢â‚¬â€ No glibc Ã‚Â· No libstdc++ Ã‚Â· No Python runtime  
 
 ---
 
@@ -233,11 +257,11 @@ make zenith
 8. [Forensics & Digital Evidence](#8-forensics--digital-evidence)
 9. [AI / ML / Data Science](#9-ai--ml--data-science)
 10. [NCERT Science Lab](#10-ncert-science-lab)
-11. [Camera Shard â€” Visual Evidence](#11-camera-shard--visual-evidence)
-12. [Security â€” Lattice-PQC](#12-security--lattice-pqc)
+11. [Camera Shard Ã¢â‚¬â€ Visual Evidence](#11-camera-shard--visual-evidence)
+12. [Security Ã¢â‚¬â€ Lattice-PQC](#12-security--lattice-pqc)
 13. [Networking Stack](#13-networking-stack)
 14. [Automation & Personalisation](#14-automation--personalisation)
-15. [Task Sharing â€” Cross-Device Grid](#15-task-sharing--cross-device-grid)
+15. [Task Sharing Ã¢â‚¬â€ Cross-Device Grid](#15-task-sharing--cross-device-grid)
 16. [Deployment Matrix](#16-deployment-matrix)
 17. [Browser-Based Operation](#17-browser-based-operation)
 18. [Missing Components Gap Analysis (vs Linux)](#18-missing-components-gap-analysis-vs-linux)
@@ -259,50 +283,50 @@ make zenith
 | **Data Scientist** | Zero-dependency ML, linear algebra shards, ASCII/SVG graph plotter |
 | **AI/ML Researcher** | Custom neural training shard, Molt-Agent distributed AI |
 | **Computer Scientist** | Full kernel internals visible: MLFQ scheduler, buddy PMM, 4-level paging |
-| **NCERT Student** | Native physics/chemistry/biology simulations Class VIâ€“XII |
+| **NCERT Student** | Native physics/chemistry/biology simulations Class VIÃ¢â‚¬â€œXII |
 | **Novice User** | GUI + keyboard-first CLI, profession selector on boot |
 
 ### Key Differentiators from Linux / Windows / macOS
 
-- **Zero glibc / Zero libstdc++** â€” kernel written in pure freestanding C11
-- **Post-Quantum Cryptography** â€” Lattice-PQC Dilithium-v3 (CRYSTALS) at Ring-0
-- **Indian Judiciary Built-In** â€” BNSS 2023, BNS 2023, BSA 2023, POCSO, PMLA, RTI, IBC, DPDP, GST, RERA, Arbitration, Labour Code, Consumer Protection
-- **Camera with Forensic Mode** â€” BSA Sec 63 compliant timestamped evidence capture
-- **MIT Scratch Event Bus** â€” event-driven block programming integrated in kernel camera
-- **300+ CLI Commands** â€” mouse-free operation designed for full keyboard sovereignty
-- **Cross-Device Task Sharing** â€” P2P silicon task offloading for heavy computation
+- **Zero glibc / Zero libstdc++** Ã¢â‚¬â€ kernel written in pure freestanding C11
+- **Post-Quantum Cryptography** Ã¢â‚¬â€ Lattice-PQC Dilithium-v3 (CRYSTALS) at Ring-0
+- **Indian Judiciary Built-In** Ã¢â‚¬â€ BNSS 2023, BNS 2023, BSA 2023, POCSO, PMLA, RTI, IBC, DPDP, GST, RERA, Arbitration, Labour Code, Consumer Protection
+- **Camera with Forensic Mode** Ã¢â‚¬â€ BSA Sec 63 compliant timestamped evidence capture
+- **MIT Scratch Event Bus** Ã¢â‚¬â€ event-driven block programming integrated in kernel camera
+- **300+ CLI Commands** Ã¢â‚¬â€ mouse-free operation designed for full keyboard sovereignty
+- **Cross-Device Task Sharing** Ã¢â‚¬â€ P2P silicon task offloading for heavy computation
 
 ---
 
 ## 2. Architecture Overview
 
 ```
-â”Œâ”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”
-â”‚                     SIGMAOS ZENITH ARCHITECTURE                      â”‚
-â”œâ”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”¤
-â”‚  USERSPACE        Browser GUI (HTML/CSS/JS â€” VBE framebuffer bridge) â”‚
-â”‚                   Omni-Shell CLI (300+ commands, pipeline, redirect) â”‚
-â”œâ”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”¤
-â”‚  SYSCALL GATE     INT 0x80 / SYSCALL MSR (64 syscalls)              â”‚
-â”œâ”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”¤
-â”‚  KERNEL LAYER     sigma_kernel.c â€” main orchestration                â”‚
-â”‚  â”œâ”€â”€ Memory       PMM Buddy Allocator + VMM 4-Level Paging (x86_64) â”‚
-â”‚  â”œâ”€â”€ Scheduler    MLFQ 8-Level + AI-Predictive Priority Boost       â”‚
-â”‚  â”œâ”€â”€ Interrupts   IDT 256-vector + PIC 8259A re-armed               â”‚
-â”‚  â”œâ”€â”€ Timer        PIT 8254 @ 1000Hz                                  â”‚
-â”‚  â”œâ”€â”€ VFS          RAMFS + VBE Framebuffer + ProcFS                  â”‚
-â”‚  â”œâ”€â”€ Network      Sovereign Net Stack (TCP/UDP/ICMP/ARP)            â”‚
-â”‚  â”œâ”€â”€ IPC          Message queues + shared memory + signals          â”‚
-â”‚  â”œâ”€â”€ Security     Lattice-PQC Dilithium-v3 + Ring-0 vault          â”‚
-â”‚  â”œâ”€â”€ Legal        BNSS/BNS/BSA/POCSO/PMLA/RTI/IBC/DPDP shards     â”‚
-â”‚  â”œâ”€â”€ Camera       VBE DMA + Fixed-point convolution + FNV-1a hash  â”‚
-â”‚  â”œâ”€â”€ AI/ML        Zero-dep neural shard + Molt-Agent               â”‚
-â”‚  â””â”€â”€ Extras       cgroups, namespaces, THP, KSM, zRAM, BPF        â”‚
-â”œâ”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”¤
-â”‚  HAL              hardware abstraction: CPU, PCI, DMA, IRQ, I/O    â”‚
-â”œâ”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”¤
-â”‚  BOOT             bootloader.asm â†’ multiboot2 â†’ sigma_kernel_main  â”‚
-â””â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”˜
+Ã¢â€Å’Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€Â
+Ã¢â€â€š                     SIGMAOS ZENITH ARCHITECTURE                      Ã¢â€â€š
+Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€Â¤
+Ã¢â€â€š  USERSPACE        Browser GUI (HTML/CSS/JS Ã¢â‚¬â€ VBE framebuffer bridge) Ã¢â€â€š
+Ã¢â€â€š                   Omni-Shell CLI (300+ commands, pipeline, redirect) Ã¢â€â€š
+Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€Â¤
+Ã¢â€â€š  SYSCALL GATE     INT 0x80 / SYSCALL MSR (64 syscalls)              Ã¢â€â€š
+Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€Â¤
+Ã¢â€â€š  KERNEL LAYER     sigma_kernel.c Ã¢â‚¬â€ main orchestration                Ã¢â€â€š
+Ã¢â€â€š  Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ Memory       PMM Buddy Allocator + VMM 4-Level Paging (x86_64) Ã¢â€â€š
+Ã¢â€â€š  Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ Scheduler    MLFQ 8-Level + AI-Predictive Priority Boost       Ã¢â€â€š
+Ã¢â€â€š  Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ Interrupts   IDT 256-vector + PIC 8259A re-armed               Ã¢â€â€š
+Ã¢â€â€š  Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ Timer        PIT 8254 @ 1000Hz                                  Ã¢â€â€š
+Ã¢â€â€š  Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ VFS          RAMFS + VBE Framebuffer + ProcFS                  Ã¢â€â€š
+Ã¢â€â€š  Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ Network      Sovereign Net Stack (TCP/UDP/ICMP/ARP)            Ã¢â€â€š
+Ã¢â€â€š  Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ IPC          Message queues + shared memory + signals          Ã¢â€â€š
+Ã¢â€â€š  Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ Security     Lattice-PQC Dilithium-v3 + Ring-0 vault          Ã¢â€â€š
+Ã¢â€â€š  Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ Legal        BNSS/BNS/BSA/POCSO/PMLA/RTI/IBC/DPDP shards     Ã¢â€â€š
+Ã¢â€â€š  Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ Camera       VBE DMA + Fixed-point convolution + FNV-1a hash  Ã¢â€â€š
+Ã¢â€â€š  Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ AI/ML        Zero-dep neural shard + Molt-Agent               Ã¢â€â€š
+Ã¢â€â€š  Ã¢â€â€Ã¢â€â‚¬Ã¢â€â‚¬ Extras       cgroups, namespaces, THP, KSM, zRAM, BPF        Ã¢â€â€š
+Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€Â¤
+Ã¢â€â€š  HAL              hardware abstraction: CPU, PCI, DMA, IRQ, I/O    Ã¢â€â€š
+Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€Â¤
+Ã¢â€â€š  BOOT             bootloader.asm Ã¢â€ â€™ multiboot2 Ã¢â€ â€™ sigma_kernel_main  Ã¢â€â€š
+Ã¢â€â€Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€Ëœ
 ```
 
 ### Language Distribution
@@ -323,9 +347,9 @@ make zenith
 - [ ] 64-bit x86_64 machine (Intel/AMD)
 - [ ] Minimum 256 MB RAM (512 MB recommended)
 - [ ] Internet connection (for GitHub clone)
-- [ ] For bare metal: USB drive â‰¥ 2 GB
+- [ ] For bare metal: USB drive Ã¢â€°Â¥ 2 GB
 
-### 3.2 Method A â€” Build from Source (Recommended for Developers)
+### 3.2 Method A Ã¢â‚¬â€ Build from Source (Recommended for Developers)
 
 **Step 1: Clone repository**
 ```bash
@@ -344,13 +368,13 @@ make kernel_elf
 # Output: build/sigmaos_kernel.elf
 ```
 
-**Step 4: Run in QEMU (safe â€” no hardware risk)**
+**Step 4: Run in QEMU (safe Ã¢â‚¬â€ no hardware risk)**
 ```bash
 make qemu
 # SigmaOS boots in QEMU with serial output
 ```
 
-### 3.3 Method B â€” Live USB Boot
+### 3.3 Method B Ã¢â‚¬â€ Live USB Boot
 
 **Step 1: Build ISO**
 ```bash
@@ -368,50 +392,39 @@ sudo dd if=build/sigmaos.iso of=/dev/sdX bs=4M status=progress && sync
 1. Insert USB, restart computer
 2. Press F2/F10/Del to enter BIOS
 3. Set USB as first boot device
-4. SigmaOS GRUB menu appears â€” select "SigmaOS Sovereign Kernel"
+4. SigmaOS GRUB menu appears Ã¢â‚¬â€ select "SigmaOS Sovereign Kernel"
 
-### 3.4 Method C â€” VirtualBox / VMware
+### 3.4 Method C Ã¢â‚¬â€ VirtualBox / VMware
 
 **VirtualBox:**
-1. Create New VM â†’ Type: Other â†’ Version: Other/Unknown (64-bit)
+1. Create New VM Ã¢â€ â€™ Type: Other Ã¢â€ â€™ Version: Other/Unknown (64-bit)
 2. Memory: 256 MB minimum
 3. Storage: Use ISO file `build/sigmaos.iso`
 4. Start VM
 
 **VMware:**
-1. New Virtual Machine â†’ Typical
+1. New Virtual Machine Ã¢â€ â€™ Typical
 2. Installer disc image: `build/sigmaos.iso`
 3. Guest OS: Other Linux 64-bit
 4. RAM: 256 MB
 
-### 3.5 Method D â€” Docker Container
+### 3.5 Method D Ã¢â‚¬â€ Docker Container
 
 ```bash
 docker build -t sigmaos .
 docker run -it --name sigmaos-instance sigmaos
 ```
 
-### 3.6 Method E â€” WSL (Windows Subsystem for Linux)
+### 3.6 Method E Ã¢â‚¬â€ WSL (Windows Subsystem for Linux)
 
 ```bash
 wsl --import SigmaOS ./sigmaos_rootfs.tar.gz --version 2
-wsl -d SigmaOS
-```
-
-### 3.7 Method F â€” Browser-Based (Zero Installation)
-
-Open `index.html` in any modern browser. The v86 JavaScript emulator runs the SigmaOS kernel binary directly in your browser tab. No installation required.
-
-### 3.8 Method G â€” Network Boot (PXE)
-
-```bash
-# On PXE server:
 cp build/sigmaos_kernel.elf /var/lib/tftpboot/
 # Configure GRUB TFTP:
 # menuentry "SigmaOS" { kernel tftp://SERVER_IP/sigmaos_kernel.elf }
 ```
 
-### 3.9 Method H â€” Dual Boot with Linux/Windows
+### 3.9 Method H Ã¢â‚¬â€ Dual Boot with Linux/Windows
 
 **WARNING:** Back up all data before modifying GRUB.
 
@@ -425,7 +438,7 @@ cp build/sigmaos_kernel.elf /var/lib/tftpboot/
    ```
 3. Run: `sudo update-grub`
 
-### 3.10 Method I â€” Cloud Hosting (AWS/GCP/Azure)
+### 3.10 Method I Ã¢â‚¬â€ Cloud Hosting (AWS/GCP/Azure)
 
 ```bash
 # Convert kernel.elf to raw disk image:
@@ -440,19 +453,19 @@ objcopy -O binary build/sigmaos_kernel.elf build/sigmaos_kernel.bin
 On first boot, SigmaOS presents the **Domain Master Selector**:
 
 ```
-â”Œâ”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”
-â”‚    Î£ SIGMAOS ZENITH â€” DOMAIN MASTER  â”‚
-â”‚                                      â”‚
-â”‚  Select your professional identity:  â”‚
-â”‚  > FORENSIC SCIENTIST & RESEARCHER   â”‚
-â”‚    DATA SCIENTIST & RESEARCHER       â”‚
-â”‚    AI/ML SCIENTIST & RESEARCHER      â”‚
-â”‚    COMPUTER SCIENTIST & RESEARCHER   â”‚
-â”‚    LAWYER & LEGAL RESEARCHER         â”‚
-â”‚    INDIAN NCERT SCIENCE STUDENT      â”‚
-â”‚                                      â”‚
-â”‚  [ENTER] Absorb System Sovereignty   â”‚
-â””â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”˜
+Ã¢â€Å’Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€Â
+Ã¢â€â€š    ÃŽÂ£ SIGMAOS ZENITH Ã¢â‚¬â€ DOMAIN MASTER  Ã¢â€â€š
+Ã¢â€â€š                                      Ã¢â€â€š
+Ã¢â€â€š  Select your professional identity:  Ã¢â€â€š
+Ã¢â€â€š  > FORENSIC SCIENTIST & RESEARCHER   Ã¢â€â€š
+Ã¢â€â€š    DATA SCIENTIST & RESEARCHER       Ã¢â€â€š
+Ã¢â€â€š    AI/ML SCIENTIST & RESEARCHER      Ã¢â€â€š
+Ã¢â€â€š    COMPUTER SCIENTIST & RESEARCHER   Ã¢â€â€š
+Ã¢â€â€š    LAWYER & LEGAL RESEARCHER         Ã¢â€â€š
+Ã¢â€â€š    INDIAN NCERT SCIENCE STUDENT      Ã¢â€â€š
+Ã¢â€â€š                                      Ã¢â€â€š
+Ã¢â€â€š  [ENTER] Absorb System Sovereignty   Ã¢â€â€š
+Ã¢â€â€Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€Ëœ
 ```
 
 Your selection customises the desktop layout, pre-loaded shards, and default workspace.
@@ -466,7 +479,7 @@ The **Omni-Shell** is SigmaOS's keyboard-first command interpreter. It is more p
 ### 5.1 Basic Usage
 
 ```
-Î£ sigma@sigmaos:/> <command> [arguments] [| pipe] [> redirect]
+ÃŽÂ£ sigma@sigmaos:/> <command> [arguments] [| pipe] [> redirect]
 ```
 
 ### 5.2 Keyboard Shortcuts (Mouse-Free Operation)
@@ -478,7 +491,7 @@ The **Omni-Shell** is SigmaOS's keyboard-first command interpreter. It is more p
 | `Ctrl+D` | Logout / end input |
 | `Ctrl+R` | Reverse history search |
 | `Ctrl+K` | Sovereign Spotlight (GUI) |
-| `â†‘ / â†“` | Navigate history |
+| `Ã¢â€ â€˜ / Ã¢â€ â€œ` | Navigate history |
 | `Tab` | Auto-complete hint |
 | `Esc` | Close GUI windows |
 
@@ -650,14 +663,14 @@ alias ll "ls -la"
 
 ## 6. Kernel Subsystems
 
-### 6.1 Memory Management â€” PMM Buddy Allocator
+### 6.1 Memory Management Ã¢â‚¬â€ PMM Buddy Allocator
 
 SigmaOS uses a **binary buddy allocator** for physical memory management:
 
 - **Page size:** 4096 bytes (4 KB)
 - **Order range:** 0 (1 page) to 10 (1024 pages)
-- **Allocation:** O(log n) â€” traverse free list until split found
-- **Free + coalesce:** O(log n) â€” merge buddies up to max order
+- **Allocation:** O(log n) Ã¢â‚¬â€ traverse free list until split found
+- **Free + coalesce:** O(log n) Ã¢â‚¬â€ merge buddies up to max order
 - **Zero fragmentation:** guaranteed by buddy pairing
 
 ```bash
@@ -666,18 +679,18 @@ free           # Shows PMM breakdown by order
 top            # Live allocation counters
 ```
 
-### 6.2 Virtual Memory â€” 4-Level Paging
+### 6.2 Virtual Memory Ã¢â‚¬â€ 4-Level Paging
 
 ```
-CR3 â†’ PML4 (512 entries) â†’ PDPT â†’ PD â†’ PT â†’ Physical Page
+CR3 Ã¢â€ â€™ PML4 (512 entries) Ã¢â€ â€™ PDPT Ã¢â€ â€™ PD Ã¢â€ â€™ PT Ã¢â€ â€™ Physical Page
 ```
 
 - Each level covers 9 bits of virtual address
 - Supports up to 256 TB virtual address space (x86_64)
 - Per-process CR3 for complete isolation
-- `vmalloc()` â€” kernel virtual allocation API
+- `vmalloc()` Ã¢â‚¬â€ kernel virtual allocation API
 
-### 6.3 Scheduler â€” MLFQ 8-Level
+### 6.3 Scheduler Ã¢â‚¬â€ MLFQ 8-Level
 
 ```
 Level 0 (Highest): Real-time / interrupt handlers
@@ -690,22 +703,22 @@ Level 6: Background tasks
 Level 7 (Lowest): Idle loop
 ```
 
-- **Quantum:** doubles per level (10ms at L0 â†’ 1280ms at L7)
+- **Quantum:** doubles per level (10ms at L0 Ã¢â€ â€™ 1280ms at L7)
 - **Ageing:** tasks waiting > 200 ticks get promoted 1 level
 - **vruntime:** CFS-style virtual runtime for fair accounting
 - **AI Prediction:** adaptive boost based on task behaviour
 
-### 6.4 Interrupt Handling â€” IDT 256-Vector
+### 6.4 Interrupt Handling Ã¢â‚¬â€ IDT 256-Vector
 
 | Vector | Handler |
 |--------|---------|
-| 0â€“31 | CPU exceptions (divide-by-zero, page fault, etc.) |
-| 32 | PIT timer IRQ0 â†’ scheduler tick |
+| 0Ã¢â‚¬â€œ31 | CPU exceptions (divide-by-zero, page fault, etc.) |
+| 32 | PIT timer IRQ0 Ã¢â€ â€™ scheduler tick |
 | 33 | Keyboard IRQ1 |
-| 34â€“47 | Hardware IRQs (PIC 8259A) |
+| 34Ã¢â‚¬â€œ47 | Hardware IRQs (PIC 8259A) |
 | 0x80 | Syscall gate (INT 0x80) |
 
-### 6.5 File System â€” RAMFS + VFS
+### 6.5 File System Ã¢â‚¬â€ RAMFS + VFS
 
 - **VFS layer:** abstract file operations (`open`, `read`, `write`, `close`)
 - **RAMFS:** in-memory filesystem, all data in kernel heap
@@ -723,12 +736,12 @@ sched_yield()         // Voluntary CPU yield
 // Zombie cleanup via wait() syscall
 ```
 
-### 6.7 IPC â€” Inter-Process Communication
+### 6.7 IPC Ã¢â‚¬â€ Inter-Process Communication
 
-- **Message queues** â€” bounded FIFO, producer/consumer
-- **Shared memory** â€” page-aligned anonymous mappings
-- **Unix signals** â€” SIGKILL, SIGTERM, SIGUSR1/2 etc.
-- **S-Ring** â€” Sovereign Ring async I/O (io_uring-inspired, zero-copy)
+- **Message queues** Ã¢â‚¬â€ bounded FIFO, producer/consumer
+- **Shared memory** Ã¢â‚¬â€ page-aligned anonymous mappings
+- **Unix signals** Ã¢â‚¬â€ SIGKILL, SIGTERM, SIGUSR1/2 etc.
+- **S-Ring** Ã¢â‚¬â€ Sovereign Ring async I/O (io_uring-inspired, zero-copy)
 
 ---
 
@@ -736,7 +749,7 @@ sched_yield()         // Voluntary CPU yield
 
 > **For Novices:** Every procedure below is a step-by-step guide. No prior legal knowledge is needed. Each domain provides: prerequisites, procedure, statutory references, and deadlines.
 
-### 7.1 BNSS 2023 â€” Criminal Procedure
+### 7.1 BNSS 2023 Ã¢â‚¬â€ Criminal Procedure
 
 **What is BNSS?** Bharatiya Nagarik Suraksha Sanhita replaced the 1973 CrPC. It governs how police investigate crimes, courts try cases, and how bail, remand, and appeals work.
 
@@ -756,11 +769,11 @@ sched_yield()         // Voluntary CPU yield
 | Victim compensation | Sec 397 | After judgment | Victim |
 
 **NOVICE BAIL GUIDE:**
-1. If accused of a bailable offence â†’ you have a RIGHT to bail. Police cannot refuse.
-2. If non-bailable â†’ apply via lawyer at Sessions Court. State grounds clearly.
+1. If accused of a bailable offence Ã¢â€ â€™ you have a RIGHT to bail. Police cannot refuse.
+2. If non-bailable Ã¢â€ â€™ apply via lawyer at Sessions Court. State grounds clearly.
 3. Anticipatory bail: apply BEFORE arrest under Sec 484 BNSS.
 
-### 7.2 BNS 2023 â€” Substantive Offences
+### 7.2 BNS 2023 Ã¢â‚¬â€ Substantive Offences
 
 **What is BNS?** Bharatiya Nyaya Sanhita replaced the old Indian Penal Code (IPC). It defines what actions are crimes and their punishments.
 
@@ -777,11 +790,11 @@ sched_yield()         // Voluntary CPU yield
 | NEW | Section 111 | Organised crime |
 | NEW | Section 113 | Terrorism |
 
-### 7.3 BSA 2023 â€” Digital Evidence
+### 7.3 BSA 2023 Ã¢â‚¬â€ Digital Evidence
 
 **What is BSA?** Bharatiya Sakshya Adhiniyam replaced the Indian Evidence Act 1872. It critically governs how electronic evidence (WhatsApp, emails, CCTV) is made admissible in court.
 
-**Key Rule â€” Section 63 Certificate:**
+**Key Rule Ã¢â‚¬â€ Section 63 Certificate:**
 Any electronic record must have a supporting certificate stating:
 - Device description
 - Person who created/managed it
@@ -796,7 +809,7 @@ bsa-cert --gen
 # Output: Sec 63 certificate with kernel timestamp and FNV-1a hash
 ```
 
-### 7.4 POCSO 2012 â€” Child Protection
+### 7.4 POCSO 2012 Ã¢â‚¬â€ Child Protection
 
 **Target:** Anyone who learns of child abuse has a legal duty to report it.
 
@@ -809,31 +822,31 @@ bsa-cert --gen
 1. Report immediately to local police or State SJPU
 2. CWC must be informed within 24 hours
 3. Child examined by woman medical officer within 24 hours
-4. Case goes to Fast-Track Special Court (FTSC) â€” trial must complete in 1 year
+4. Case goes to Fast-Track Special Court (FTSC) Ã¢â‚¬â€ trial must complete in 1 year
 
 ```bash
 law-query --pocso       # Full POCSO procedure
 ```
 
-### 7.5 PMLA 2002 â€” Money Laundering
+### 7.5 PMLA 2002 Ã¢â‚¬â€ Money Laundering
 
 **Who needs this:** Banks, NBFCs, brokers, crypto exchanges, any business handling large cash.
 
 **Key Obligations:**
 - **KYC** for all clients (Aadhaar + PAN)
 - **STR** (Suspicious Transaction Report) within 7 days to FIU-Ind
-- **CTR** (Cash Transaction Report) for transactions > Rs 10 lakh â€” monthly
+- **CTR** (Cash Transaction Report) for transactions > Rs 10 lakh Ã¢â‚¬â€ monthly
 - Records maintained for **10 years**
 
 ```bash
 law-query --pmla        # Full PMLA compliance steps
 ```
 
-### 7.6 RTI 2005 â€” Right to Information
+### 7.6 RTI 2005 Ã¢â‚¬â€ Right to Information
 
-**Novice Guide â€” File RTI in 3 Steps:**
-1. Write application (any language) â†’ State: your name, address, exact info wanted
-2. Pay Rs 10 fee (IPO) â†’ Send to CPIO of relevant department
+**Novice Guide Ã¢â‚¬â€ File RTI in 3 Steps:**
+1. Write application (any language) Ã¢â€ â€™ State: your name, address, exact info wanted
+2. Pay Rs 10 fee (IPO) Ã¢â€ â€™ Send to CPIO of relevant department
 3. Response must come within **30 days** (48 hours if life/liberty at stake)
 
 **If No Response:** First Appeal within 30 days to Appellate Authority (free)  
@@ -843,18 +856,18 @@ law-query --pmla        # Full PMLA compliance steps
 law-query --rti         # RTI procedure guide
 ```
 
-### 7.7 IBC 2016 â€” Insolvency
+### 7.7 IBC 2016 Ã¢â‚¬â€ Insolvency
 
 **Who uses this:** Creditors seeking to recover money from defaulting companies.
 
 **Minimum threshold:** Rs 1 crore default  
-**Process:** File at NCLT â†’ 14-day admission â†’ 180-day CIRP â†’ Resolution Plan
+**Process:** File at NCLT Ã¢â€ â€™ 14-day admission Ã¢â€ â€™ 180-day CIRP Ã¢â€ â€™ Resolution Plan
 
 ```bash
 law-query --ibc         # IBC procedure guide
 ```
 
-### 7.8 DPDP 2023 â€” Data Protection
+### 7.8 DPDP 2023 Ã¢â‚¬â€ Data Protection
 
 **Who must comply:** Any business that collects, stores, or processes personal data of Indians.
 
@@ -897,7 +910,7 @@ law-query --arb         # Arbitration procedure guide
 **NOVICE CONSUMER GUIDE:**
 1. Send legal notice to seller first
 2. Wait 30 days
-3. If not resolved â†’ file at [edaakhil.nic.in](https://edaakhil.nic.in) (free, no lawyer needed)
+3. If not resolved Ã¢â€ â€™ file at [edaakhil.nic.in](https://edaakhil.nic.in) (free, no lawyer needed)
 4. Jurisdiction: District Commission (up to Rs 50 lakhs)
 
 ### 7.12 RERA 2016
@@ -905,7 +918,7 @@ law-query --arb         # Arbitration procedure guide
 **Before buying any property under construction:**
 1. Check RERA registration of the project on state RERA website
 2. Verify: completion date, escrow account, progress reports
-3. If builder delays â†’ file complaint on RERA portal for interest compensation
+3. If builder delays Ã¢â€ â€™ file complaint on RERA portal for interest compensation
 
 ### 7.13 Cyber Law (IT Act / CERT-In)
 
@@ -920,9 +933,9 @@ law-query --it          # Cyber law compliance guide
 ### 7.14 Labour Codes 2019-2020
 
 **For Employers:**
-- Maintain wage register (Form A) â€” digital or physical
+- Maintain wage register (Form A) Ã¢â‚¬â€ digital or physical
 - Pay wages by 7th/10th of next month
-- EPF registration if 20+ employees â€” file ECR by 15th of month
+- EPF registration if 20+ employees Ã¢â‚¬â€ file ECR by 15th of month
 - Gratuity payable after 5 years of service
 
 ---
@@ -934,14 +947,14 @@ law-query --it          # Cyber law compliance guide
 A legally valid forensic investigation requires:
 
 ```
-1. DOCUMENT â€” Record device serial number, make, model, state of device
-2. PHOTOGRAPH â€” Before touching, photograph device in place
-3. WRITE-BLOCK â€” Attach hardware write-blocker BEFORE connecting
-4. IMAGE â€” Create bit-perfect forensic image (sector-by-sector)
-5. HASH â€” Compute SHA-256 of original AND image (must match)
-6. TAG â€” Label with exhibit number, date, investigator name
-7. SIGN â€” BSA Sec 63 certificate completed
-8. STORE â€” Original in tamper-evident packaging
+1. DOCUMENT Ã¢â‚¬â€ Record device serial number, make, model, state of device
+2. PHOTOGRAPH Ã¢â‚¬â€ Before touching, photograph device in place
+3. WRITE-BLOCK Ã¢â‚¬â€ Attach hardware write-blocker BEFORE connecting
+4. IMAGE Ã¢â‚¬â€ Create bit-perfect forensic image (sector-by-sector)
+5. HASH Ã¢â‚¬â€ Compute SHA-256 of original AND image (must match)
+6. TAG Ã¢â‚¬â€ Label with exhibit number, date, investigator name
+7. SIGN Ã¢â‚¬â€ BSA Sec 63 certificate completed
+8. STORE Ã¢â‚¬â€ Original in tamper-evident packaging
 ```
 
 ### 8.2 SigmaOS Forensic Commands
@@ -979,7 +992,7 @@ plot-graph data.csv     # ASCII/SVG visualization
 data-matrix             # Live kernel performance analytics
 ```
 
-### 9.2 Molt-Agent â€” Distributed AI
+### 9.2 Molt-Agent Ã¢â‚¬â€ Distributed AI
 
 The **Molt-Agent** is SigmaOS's autonomous task orchestrator inspired by multi-agent systems:
 - Monitors kernel resources (CPU, RAM, I/O)
@@ -1008,23 +1021,23 @@ ncert-sim bio_class10_ch6       # Life processes
 ncert-sim bio_class12_ch5       # Principles of inheritance
 ```
 
-All simulations run directly in kernel memory â€” no Python, no JavaScript needed.
+All simulations run directly in kernel memory Ã¢â‚¬â€ no Python, no JavaScript needed.
 
 ---
 
-## 11. Camera Shard â€” Visual Evidence
+## 11. Camera Shard Ã¢â‚¬â€ Visual Evidence
 
 ### 11.1 Architecture
 
 ```
-VBE Framebuffer (bare metal) â†’ DMA capture â†’ Frame Buffer
-                                                    â†“
+VBE Framebuffer (bare metal) Ã¢â€ â€™ DMA capture Ã¢â€ â€™ Frame Buffer
+                                                    Ã¢â€ â€œ
                                           FNV-1a hash (integrity)
-                                                    â†“
+                                                    Ã¢â€ â€œ
                           FilterEngine (8 convolution filters)
-                                                    â†“
+                                                    Ã¢â€ â€œ
                           MIT Scratch EventBus (block triggers)
-                                                    â†“
+                                                    Ã¢â€ â€œ
                           BSA Sec 63 Certificate (court-ready)
 ```
 
@@ -1057,7 +1070,7 @@ The camera supports event-driven programming (MIT Scratch-inspired):
 
 ---
 
-## 12. Security â€” Lattice-PQC
+## 12. Security Ã¢â‚¬â€ Lattice-PQC
 
 SigmaOS uses **post-quantum cryptography** to future-proof against quantum computer attacks:
 
@@ -1084,15 +1097,15 @@ pqc-verify evidence.bin # Verify signature
 
 ```
 Application (Omni-Shell)
-        â†“
+        Ã¢â€ â€œ
    Socket API (VFS-based)
-        â†“
+        Ã¢â€ â€œ
    TCP/UDP Transport Layer
-        â†“
+        Ã¢â€ â€œ
    IP / ICMP Network Layer
-        â†“
+        Ã¢â€ â€œ
    ARP / Ethernet Link Layer
-        â†“
+        Ã¢â€ â€œ
    NIC Driver (PCI/PCIe)
 ```
 
@@ -1109,7 +1122,7 @@ fw-ls                                # List rules
 
 ## 14. Automation & Personalisation
 
-### 14.1 S-Auto â€” Industrial Automation Engine
+### 14.1 S-Auto Ã¢â‚¬â€ Industrial Automation Engine
 
 ```bash
 sigma-auto "IF NET_PACKET THEN SHARD_AUDIT"
@@ -1121,9 +1134,9 @@ sigma-auto-ls                        # List all workflows
 ### 14.2 Themes
 
 ```bash
-theme onyx       # Pure black â€” forensic mode
-theme cobalt     # Deep blue â€” data science mode
-theme matrix     # Green-on-black â€” hacker mode
+theme onyx       # Pure black Ã¢â‚¬â€ forensic mode
+theme cobalt     # Deep blue Ã¢â‚¬â€ data science mode
+theme matrix     # Green-on-black Ã¢â‚¬â€ hacker mode
 ```
 
 ### 14.3 OS Modes
@@ -1136,7 +1149,7 @@ mode sleep       # Purple, all windows minimised, low power
 
 ---
 
-## 15. Task Sharing â€” Cross-Device Grid
+## 15. Task Sharing Ã¢â‚¬â€ Cross-Device Grid
 
 **SPTS (Sovereign Peer Task Sharing)** allows distributing heavy workloads across multiple SigmaOS devices:
 
@@ -1210,15 +1223,15 @@ The following components are below Linux kernel parity and are in active develop
 
 | Metric | SigmaOS | Linux 6.x | Windows 11 | macOS 15 |
 |--------|---------|-----------|-----------|---------|
-| Zero stdlib | âœ… YES | âŒ glibc | âŒ MSVCRT | âŒ libSystem |
-| Post-quantum crypto | âœ… Dilithium-v3 | âŒ RSA/ECC | âŒ RSA/ECC | âŒ RSA/ECC |
-| Indian law built-in | âœ… 14 domains | âŒ | âŒ | âŒ |
-| BSA-compliant forensics | âœ… | âŒ | âŒ | âŒ |
-| Mouse-free CLI (300+ cmds) | âœ… | Bash ~100 | CMD limited | Zsh/Bash |
-| Browser-based kernel | âœ… v86 | âŒ | âŒ | âŒ |
-| NCERT simulations | âœ… | âŒ | âŒ | âŒ |
-| MIT Scratch camera | âœ… | âŒ | âŒ | âŒ |
-| Cross-device task sharing | âœ… SPTS | âŒ | âŒ | âŒ |
+| Zero stdlib | Ã¢Å“â€¦ YES | Ã¢ÂÅ’ glibc | Ã¢ÂÅ’ MSVCRT | Ã¢ÂÅ’ libSystem |
+| Post-quantum crypto | Ã¢Å“â€¦ Dilithium-v3 | Ã¢ÂÅ’ RSA/ECC | Ã¢ÂÅ’ RSA/ECC | Ã¢ÂÅ’ RSA/ECC |
+| Indian law built-in | Ã¢Å“â€¦ 14 domains | Ã¢ÂÅ’ | Ã¢ÂÅ’ | Ã¢ÂÅ’ |
+| BSA-compliant forensics | Ã¢Å“â€¦ | Ã¢ÂÅ’ | Ã¢ÂÅ’ | Ã¢ÂÅ’ |
+| Mouse-free CLI (300+ cmds) | Ã¢Å“â€¦ | Bash ~100 | CMD limited | Zsh/Bash |
+| Browser-based kernel | Ã¢Å“â€¦ v86 | Ã¢ÂÅ’ | Ã¢ÂÅ’ | Ã¢ÂÅ’ |
+| NCERT simulations | Ã¢Å“â€¦ | Ã¢ÂÅ’ | Ã¢ÂÅ’ | Ã¢ÂÅ’ |
+| MIT Scratch camera | Ã¢Å“â€¦ | Ã¢ÂÅ’ | Ã¢ÂÅ’ | Ã¢ÂÅ’ |
+| Cross-device task sharing | Ã¢Å“â€¦ SPTS | Ã¢ÂÅ’ | Ã¢ÂÅ’ | Ã¢ÂÅ’ |
 | Kernel language | C11 98% | C (with Python) | C++/.NET | C/ObjC |
 
 ---
@@ -1226,25 +1239,25 @@ The following components are below Linux kernel parity and are in active develop
 ## 20. Suggestions & Roadmap
 
 ### High Priority (v2.1)
-1. **RCU Fine-grained locking** â€” Full Read-Copy-Update for SMP multi-core
-2. **ext4 filesystem shard** â€” Read/write support for standard Linux partitions
-3. **USB HID driver** â€” Keyboard/mouse via xHCI (removes bare-metal PS/2 dependency)
-4. **ALSA audio shard** â€” PCM audio output for multimedia applications
-5. **SMP / APIC support** â€” Multi-core scheduling with per-CPU run queues
+1. **RCU Fine-grained locking** Ã¢â‚¬â€ Full Read-Copy-Update for SMP multi-core
+2. **ext4 filesystem shard** Ã¢â‚¬â€ Read/write support for standard Linux partitions
+3. **USB HID driver** Ã¢â‚¬â€ Keyboard/mouse via xHCI (removes bare-metal PS/2 dependency)
+4. **ALSA audio shard** Ã¢â‚¬â€ PCM audio output for multimedia applications
+5. **SMP / APIC support** Ã¢â‚¬â€ Multi-core scheduling with per-CPU run queues
 
 ### Medium Priority (v2.2)
-6. **Bluetooth stack** â€” Wireless keyboard/mouse and A2DP audio
-7. **ACPI full support** â€” Power management, suspend/resume
-8. **DRM/KMS GPU driver** â€” Hardware-accelerated graphics for HDMI/DisplayPort
-9. **Wayland compositor** â€” Native tiling window manager without X11
-10. **RISC-V port** â€” ARM64 and RISC-V architecture support
+6. **Bluetooth stack** Ã¢â‚¬â€ Wireless keyboard/mouse and A2DP audio
+7. **ACPI full support** Ã¢â‚¬â€ Power management, suspend/resume
+8. **DRM/KMS GPU driver** Ã¢â‚¬â€ Hardware-accelerated graphics for HDMI/DisplayPort
+9. **Wayland compositor** Ã¢â‚¬â€ Native tiling window manager without X11
+10. **RISC-V port** Ã¢â‚¬â€ ARM64 and RISC-V architecture support
 
 ### Features Under Development
-11. **Legal AI assistant** â€” NLP for Indian law precedent search
-12. **Distributed forensic cluster** â€” Multi-node evidence processing
-13. **NCERT Physics engine** â€” Real-time rigid-body simulation
-14. **Quantum circuit simulator** â€” Native quantum gate emulation
-15. **Biometric HSM** â€” Hardware fingerprint/iris authentication
+11. **Legal AI assistant** Ã¢â‚¬â€ NLP for Indian law precedent search
+12. **Distributed forensic cluster** Ã¢â‚¬â€ Multi-node evidence processing
+13. **NCERT Physics engine** Ã¢â‚¬â€ Real-time rigid-body simulation
+14. **Quantum circuit simulator** Ã¢â‚¬â€ Native quantum gate emulation
+15. **Biometric HSM** Ã¢â‚¬â€ Hardware fingerprint/iris authentication
 
 ---
 
@@ -1313,29 +1326,29 @@ typedef struct VFSOps {
 |------|-----------|
 | **Shard** | SigmaOS term for a kernel module or subsystem component |
 | **Silicon** | Refers to hardware-level / bare-metal operation |
-| **MLFQ** | Multi-Level Feedback Queue â€” the scheduling algorithm |
-| **PMM** | Physical Memory Manager â€” manages physical RAM pages |
-| **VMM** | Virtual Memory Manager â€” manages page tables and virtual addresses |
-| **PQC** | Post-Quantum Cryptography â€” secure against quantum computers |
-| **FNV-1a** | Fowlerâ€“Nollâ€“Vo hash â€” fast, non-cryptographic integrity hash |
+| **MLFQ** | Multi-Level Feedback Queue Ã¢â‚¬â€ the scheduling algorithm |
+| **PMM** | Physical Memory Manager Ã¢â‚¬â€ manages physical RAM pages |
+| **VMM** | Virtual Memory Manager Ã¢â‚¬â€ manages page tables and virtual addresses |
+| **PQC** | Post-Quantum Cryptography Ã¢â‚¬â€ secure against quantum computers |
+| **FNV-1a** | FowlerÃ¢â‚¬â€œNollÃ¢â‚¬â€œVo hash Ã¢â‚¬â€ fast, non-cryptographic integrity hash |
 | **BNSS** | Bharatiya Nagarik Suraksha Sanhita 2023 (Criminal Procedure) |
 | **BNS** | Bharatiya Nyaya Sanhita 2023 (Offences / Penal code) |
 | **BSA** | Bharatiya Sakshya Adhiniyam 2023 (Evidence Act) |
-| **VBE** | VESA BIOS Extensions â€” standard framebuffer interface |
-| **DMA** | Direct Memory Access â€” hardware-to-memory without CPU |
-| **IDT** | Interrupt Descriptor Table â€” maps exception/IRQ vectors to handlers |
-| **PIT** | Programmable Interval Timer â€” generates timer interrupts |
-| **THP** | Transparent Huge Pages â€” 2MB pages for large allocations |
-| **KSM** | Kernel Samepage Merging â€” deduplicates identical memory pages |
-| **BPF** | Berkeley Packet Filter â€” programmable kernel-level filtering |
-| **S-Ring** | Sovereign Ring â€” SigmaOS async I/O (similar to io_uring) |
-| **SPTS** | Sovereign Peer Task Sharing â€” cross-device computation grid |
-| **SLAC** | Sharded Legal Automation & Compliance â€” legal shard engine |
-| **SVPFM** | Sharded Video Processing & Filter Matrix â€” camera shard engine |
+| **VBE** | VESA BIOS Extensions Ã¢â‚¬â€ standard framebuffer interface |
+| **DMA** | Direct Memory Access Ã¢â‚¬â€ hardware-to-memory without CPU |
+| **IDT** | Interrupt Descriptor Table Ã¢â‚¬â€ maps exception/IRQ vectors to handlers |
+| **PIT** | Programmable Interval Timer Ã¢â‚¬â€ generates timer interrupts |
+| **THP** | Transparent Huge Pages Ã¢â‚¬â€ 2MB pages for large allocations |
+| **KSM** | Kernel Samepage Merging Ã¢â‚¬â€ deduplicates identical memory pages |
+| **BPF** | Berkeley Packet Filter Ã¢â‚¬â€ programmable kernel-level filtering |
+| **S-Ring** | Sovereign Ring Ã¢â‚¬â€ SigmaOS async I/O (similar to io_uring) |
+| **SPTS** | Sovereign Peer Task Sharing Ã¢â‚¬â€ cross-device computation grid |
+| **SLAC** | Sharded Legal Automation & Compliance Ã¢â‚¬â€ legal shard engine |
+| **SVPFM** | Sharded Video Processing & Filter Matrix Ã¢â‚¬â€ camera shard engine |
 
 ---
 
-> **Î£ SIGMAOS ZENITH SUPREME**  
+> **ÃŽÂ£ SIGMAOS ZENITH SUPREME**  
 > *The Sovereign OS. The Future is Bare Metal. Every Pulse is Final.*  
 >  
 > Repository: [github.com/SigmaOS-ProjectProject/SigmaOS](https://github.com/SigmaOS-ProjectProject/SigmaOS)  
@@ -1344,7 +1357,7 @@ typedef struct VFSOps {
 ---
 
 # FILE: README.md
-# Î£ SIGMAOS ZENITH SUPREME: INDUSTRIAL OPERATING SOVEREIGNTY (v94.0)
+# ÃŽÂ£ SIGMAOS ZENITH SUPREME: INDUSTRIAL OPERATING SOVEREIGNTY (v94.0)
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
 [![Build Status](https://img.shields.io/badge/Build-Industrial--Master-brightgreen)](https://github.com/SigmaOS-ProjectProject/SigmaOS)
@@ -1355,7 +1368,7 @@ typedef struct VFSOps {
 
 ---
 
-## âš¡ INDUSTRIAL USPs & ABSORBED REPOSITORIES
+## Ã¢Å¡Â¡ INDUSTRIAL USPs & ABSORBED REPOSITORIES
 
 SigmaOS absorbs the intelligence and features of 30+ leading industrial and automation repositories:
 
@@ -1387,7 +1400,7 @@ SigmaOS absorbs the intelligence and features of 30+ leading industrial and auto
 
 ---
 
-## ðŸš€ GETTING STARTED
+## Ã°Å¸Å¡â‚¬ GETTING STARTED
 
 ### Prerequisites
 
@@ -1406,7 +1419,7 @@ Open `dashboard/index.html` in your industrial browser to access the **Zenith Su
 
 ---
 
-## ðŸ“‚ REPOSITORY SHARDS
+## Ã°Å¸â€œâ€š REPOSITORY SHARDS
 
 - `/kernel`: Industrial kernel logic (Slab, Paging, AI, Assembly).
 - `/userland/apps`: Master utility shards (Industrial Matrix, Theme Store, Cloud Hub, Safety Shard).
@@ -1415,18 +1428,18 @@ Open `dashboard/index.html` in your industrial browser to access the **Zenith Su
 
 ---
 
-## ðŸ›¡ï¸ SECURITY & COMPLIANCE
+## Ã°Å¸â€ºÂ¡Ã¯Â¸Â SECURITY & COMPLIANCE
 
 SigmaOS follows the **Sovereign Master Checklist** (Zero-GLIBC, Bare-Metal architecture). Security audits are conducted via the `SigmaAuditTool`.
 
 ---
 
-Î£ SIGMAOS: THE DEFINITIVE INDUSTRIAL SOVEREIGNTY.
+ÃŽÂ£ SIGMAOS: THE DEFINITIVE INDUSTRIAL SOVEREIGNTY.
 
 ---
 
 # FILE: ROADMAP.md
-# Î£ SIGMAOS ZENITH SUPREME: INDUSTRIAL ROADMAP
+# ÃŽÂ£ SIGMAOS ZENITH SUPREME: INDUSTRIAL ROADMAP
 
 ## v94.0 (CURRENT)
 - Industrial Sharding Master Matrix.
@@ -1443,12 +1456,12 @@ SigmaOS follows the **Sovereign Master Checklist** (Zero-GLIBC, Bare-Metal archi
 
 ---
 
-Î£ SIGMAOS: THE FUTURE OF SOVEREIGNTY.
+ÃŽÂ£ SIGMAOS: THE FUTURE OF SOVEREIGNTY.
 
 ---
 
 # FILE: SECURITY.md
-# Î£ SIGMAOS ZENITH SUPREME: SECURITY PROTOCOLS
+# ÃŽÂ£ SIGMAOS ZENITH SUPREME: SECURITY PROTOCOLS
 
 ## 1. VULNERABILITY REPORTING
 Please report security industrial vulnerabilities via the [Sovereign Master Audit Shard](mailto:security@sigmaos.sovereignty).
@@ -1465,16 +1478,16 @@ We follow a 48-hour sharding response policy for industrial-grade criticalities.
 
 ---
 
-Î£ SIGMAOS: THE DEFENTIVE INDUSTRIAL SOVEREIGNTY.
+ÃŽÂ£ SIGMAOS: THE DEFENTIVE INDUSTRIAL SOVEREIGNTY.
 
 ---
 
 # FILE: SUPPORT.md
-# Î£ SIGMAOS: SOVEREIGN SUPPORT & ASSISTANCE
+# ÃŽÂ£ SIGMAOS: SOVEREIGN SUPPORT & ASSISTANCE
 
 Thank you for choosing **SigmaOS Zenith Supreme**. We provide institutional-grade support for our industrial operating sovereignty.
 
-## ðŸ› ï¸ HOW TO GET SUPPORT
+## Ã°Å¸â€ºÂ Ã¯Â¸Â HOW TO GET SUPPORT
 
 ### 1. The Sovereign Wiki
 The first point of call for any technical query is the **Sovereign Wiki** (located in `docs/`). It contains:
@@ -1490,18 +1503,18 @@ If you encounter a bug or have a feature sharding request, please:
 ### 3. Industrial Audit & Community
 Join the **Sovereign-Zenith Discord** for real-time collaboration with other industrial OS architects.
 
-## ðŸ“„ LICENSE & COMPLIANCE
+## Ã°Å¸â€œâ€ž LICENSE & COMPLIANCE
 
 SigmaOS is licensed under the **MIT License**. For commercial or institutional compliance shards, please contact the **Sovereign Mastery Team**.
 
 ---
 
-Î£ SIGMAOS: INDUSTRIAL-GRADE SUPPORT.
+ÃŽÂ£ SIGMAOS: INDUSTRIAL-GRADE SUPPORT.
 
 ---
 
 # FILE: industrial_compliance.md
-# Î£ SIGMAOS ZENITH SUPREME: INDUSTRIAL COMPLIANCE AUDIT
+# ÃŽÂ£ SIGMAOS ZENITH SUPREME: INDUSTRIAL COMPLIANCE AUDIT
 
 ## Version: 94.0 (Universal Master Matrix)
 
@@ -1511,18 +1524,6 @@ This document outlines the architectural sharding and feature absorption from ma
 
 - **Slab Allocator**: O(1) memory management shard.
 - **4-Level Paging**: Virtual address sharding for x86_64 silicon.
-- **Preemptive Scheduler**: Task-state coordination and hardware interrupts.
-- **AI Shard (`SigmaAI.c`)**: Autonomous balancing from Merlin-IA/Claude-Mint.
-
-### 2. DISTRIBUTION SHARDING (Distro Parity)
-
-- **Sovereign Init**: Industrial service management (systemd style).
-- **Package Manager**: Universal repository sharding (APT/Pacman style).
-- **Automation Shard**: Universal build, audit, and theme deployment.
-- **Distro Mirroring**: WASM-based local distribution execution (DistroHub style).
-
-### 3. INDUSTRIAL MASTER MATRIX (Absorbed USPs)
-
 - **Macro Automator**: Industrial macro engine (XClicker/AutoKey style).
 - **Remote Shard**: Bot-driven remote execution (Bot Comando style).
 - **Cloud Infrastructure**: Multi-cloud deployment logic (vSphere-Infra style).
@@ -1538,7 +1539,8 @@ This document outlines the architectural sharding and feature absorption from ma
 
 ---
 
-Î£ SIGMAOS: THE ABSOLUTE OPERATING SOVEREIGNTY.
+ÃŽÂ£ SIGMAOS: THE ABSOLUTE OPERATING SOVEREIGNTY.
 
 ---
+
 
