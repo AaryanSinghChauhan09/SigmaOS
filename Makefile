@@ -32,6 +32,7 @@ OBJS = $(OBJ_DIR)/main.o \
        $(OBJ_DIR)/keyboard.o \
        $(OBJ_DIR)/serial.o \
        $(OBJ_DIR)/multi_core.o \
+       $(OBJ_DIR)/summoner.o \
        $(OBJ_DIR)/zenith_gui.o \
        $(OBJ_DIR)/ids_shard.o \
        $(OBJ_DIR)/firewall_shard.o \
