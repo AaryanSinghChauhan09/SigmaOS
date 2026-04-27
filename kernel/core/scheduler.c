@@ -5,7 +5,7 @@
  * Principles: Preemptive Round-Robin, Zero-Latency Context Switching.
  * =============================================================================
  */
-#include "../include/sigma_kernel_types.h"
+#include "../../include/sigma_kernel_types.h"
 
 typedef struct Task {
     u64     rsp;            /* Stack Pointer */

@@ -5,7 +5,7 @@
  * Principles: Zero-Abstract Communication Onion.
  * =============================================================================
  */
-#include "../include/sigma_kernel_types.h"
+#include "../../include/sigma_kernel_types.h"
 
 typedef struct {
     u16 src_port;
