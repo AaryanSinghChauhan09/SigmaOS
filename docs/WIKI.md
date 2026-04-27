@@ -89,11 +89,14 @@ SigmaOS is rapidly evolving toward full-scale industrial maturity. Current shard
 - [x] Hot-Patching System
 - [x] Energy-Aware Scheduling
 - [x] Process Checkpointing
+- [x] Secure Boot Integration (Chain-of-Trust)
 
 ### 🔒 Security
 - [x] Intrusion Detection System (Behavioral Audit)
 - [x] Shard Isolation (VMM Enforced)
 - [x] Zero-Trust Networking (Sovereign Firewall)
+- [x] Role-Based Access Control (RBAC)
+- [x] Kernel Integrity Verification
 
 ### 🌐 Networking
 - [x] Intel e1000 Driver (Bare-Metal)

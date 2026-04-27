@@ -27,6 +27,8 @@ OBJS = $(OBJ_DIR)/main.o \
        $(OBJ_DIR)/vfs.o \
        $(OBJ_DIR)/ipc.o \
        $(OBJ_DIR)/panic.o \
+       $(OBJ_DIR)/secure_boot.o \
+       $(OBJ_DIR)/rbac.o \
        $(OBJ_DIR)/hotpatch.o \
        $(OBJ_DIR)/checkpoint.o \
        $(OBJ_DIR)/energy.o \
