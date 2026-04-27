@@ -117,7 +117,7 @@
 
 **Step 1: Clone repository**
 ```bash
-git clone https://github.com/AaryanSinghChauhan09/SigmaOS.git
+git clone https://github.com/SigmaOS-ProjectProject/SigmaOS.git
 cd SigmaOS
 ```
 
@@ -1126,5 +1126,5 @@ typedef struct VFSOps {
 > **Σ SIGMAOS ZENITH SUPREME**  
 > *The Sovereign OS. The Future is Bare Metal. Every Pulse is Final.*  
 >  
-> Repository: [github.com/AaryanSinghChauhan09/SigmaOS](https://github.com/AaryanSinghChauhan09/SigmaOS)  
+> Repository: [github.com/SigmaOS-ProjectProject/SigmaOS](https://github.com/SigmaOS-ProjectProject/SigmaOS)  
 > License: See LICENSE file  

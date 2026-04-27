@@ -1,7 +1,7 @@
 # Σ SIGMAOS ZENITH SUPREME: INDUSTRIAL OPERATING SOVEREIGNTY (v94.0)
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
-[![Build Status](https://img.shields.io/badge/Build-Industrial--Master-brightgreen)](https://github.com/AaryanSinghChauhan09/SigmaOS)
+[![Build Status](https://img.shields.io/badge/Build-Industrial--Master-brightgreen)](https://github.com/SigmaOS-ProjectProject/SigmaOS)
 [![Parity: Linux Kernel](https://img.shields.io/badge/Parity-Linux--Kernel-orange)](https://github.com/torvalds/linux)
 [![Distro: Universal Mirror](https://img.shields.io/badge/Distro-Universal--Mirror-purple)](https://sigmaos.com)
 

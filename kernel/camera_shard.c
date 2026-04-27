@@ -97,6 +97,15 @@ typedef struct FilterEngine {
     u32             active_filter;  /* index of currently applied filter */
 } FilterEngine;
 
+/* --- Snapchat-USP AR Filters --- */
+typedef enum ARFilterType {
+    AR_GHOST_MODE       = 9,
+    AR_RAINBOW_VOMIT    = 10,
+    AR_FACE_DISTORT     = 11,
+    AR_CYBER_ZENITH     = 12,
+    AR_NIGHT_VISION     = 13
+} ARFilterType;
+
 /* --- CaptureSession (BSA forensic session) --- */
 typedef struct CaptureSession {
     u32  session_id;
@@ -240,6 +249,20 @@ static void filter_engine_init(FilterEngine* fe) {
         0, FIXED(-1), 0,
         0, 0, FIXED(-1),
         FIXED(255));
+
+    /* --- Filter 9: AR GHOST MODE (Snapchat style) --- */
+    filter_set_3x3(&fe->kernels[fe->count++], "AR_GHOST_MODE",
+        FIXED(1), FIXED(0), FIXED(1),
+        FIXED(0), FIXED(-2), FIXED(0),
+        FIXED(1), FIXED(0), FIXED(1),
+        FIXED(64));
+
+    /* --- Filter 10: NIGHT VISION (Green luminance) --- */
+    filter_set_3x3(&fe->kernels[fe->count++], "AR_NIGHT_VISION",
+        0, FIXED(1), 0,
+        0, FIXED(1), 0,
+        0, FIXED(1), 0,
+        FIXED(32));
 
     kprintf("[CAMERA-FILTER-ENGINE]: %u sovereign filters online.\n", fe->count);
 }
@@ -460,29 +483,25 @@ k_status camera_scratch_trigger(u32 event_id) {
     if (!g_camera.initialised) return K_ERR_INVAL;
 
     switch (event_id) {
-        case 0: /* CAPTURE BLOCK */
+        case 0: /* WHEN CLICKED: CAPTURE */
             camera_capture_frame(NULL);
             break;
-        case 1: /* SEPIA FILTER BLOCK */
+        case 1: /* WHEN FILTER CHANGED: SEPIA */
             camera_apply_filter(NULL, "SEPIA_ZENITH");
             break;
-        case 2: /* FORENSIC EXPORT BLOCK */
+        case 2: /* WHEN FORENSIC FLAG: BSA SIGN */
             eventbus_push(&g_camera.event_bus, SCRATCH_EVT_FORENSIC, event_id, 0);
-            kprintf("[CAMERA-SCRATCH]: Forensic Export Block executed. Hash=0x%08x\n",
-                    g_camera.current_frame.hash_fnv1a);
+            kprintf("[CAMERA-SCRATCH]: Block: 'Sovereign BSA Sign' executed.\n");
             break;
-        case 3: /* EDGE DETECTION BLOCK */
-            camera_apply_filter(NULL, "EDGE_DETECTION");
+        case 3: /* AR SNAPCHAT: GHOST MODE */
+            camera_apply_filter(NULL, "AR_GHOST_MODE");
             break;
-        case 4: /* BSA SEC 63 CERTIFICATE BLOCK */
-            kprintf("[CAMERA-SCRATCH]: BSA Sec 63 Certificate — Frame #%u | Hash=0x%08x | TS=%llu\n",
-                    g_camera.current_frame.seq_num,
-                    g_camera.current_frame.hash_fnv1a,
-                    g_camera.current_frame.timestamp_ns);
+        case 4: /* MIT SCRATCH: BROADCAST 'CAPTURE_SYNC' */
+            eventbus_push(&g_camera.event_bus, SCRATCH_EVT_CUSTOM, 999, 0);
+            kprintf("[CAMERA-SCRATCH]: Block: 'Broadcast CaptureSync' triggered.\n");
             break;
         default:
             eventbus_push(&g_camera.event_bus, SCRATCH_EVT_CUSTOM, event_id, 0);
-            kprintf("[CAMERA-SCRATCH]: Custom Block [ID:%u] executed.\n", event_id);
             break;
     }
     return K_OK;

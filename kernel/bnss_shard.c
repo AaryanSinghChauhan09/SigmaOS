@@ -1,68 +1,33 @@
 /*
  * =============================================================================
- * Σ SIGMAOS KERNEL: SOVEREIGN-BNSS-SHARD (v2.0 - BNS/BNSS/BSA PARITY)
- * =============================================================================
- * Algorithm: Sovereign Judicial Lifecycle (SJL)
- * Principles:
- *   - Kernel-native BNSS/BNS/BSA orchestration (Procedure Checklists).
- *   - Absolute industrial sovereignty in Indian Court Proceedings.
- *   - $O(1)$ BNSS-procedure-step retrieval and sharded BSA certification.
- * Reference: BNSS 2023 / BNS 2023 / BSA 2023 / Indian Court Reforms.
+ * Σ SIGMAOS KERNEL: SOVEREIGN-BNSS-SHARD (Bharatiya Nagarik Suraksha Sanhita 2023)
  * =============================================================================
  */
-
 #include "sigma_kernel_types.h"
 
-typedef struct BNSSStep {
-    u32         bnss_section;
-    char        mnemonic[16];
-    char        desc[64];
-    bool_t      mandatory;
-} BNSSStep;
+extern void add_item(void* t, const char* desc, const char* ref, const char* prereq, const char* proc, u32 days, u32 penalty_rs);
 
-/* =========================================================================
- * BNSS Engine: Detailed Procedural Checklists (2024 Parity)
- * ========================================================================= */
-
-void bnss_init(void) {
-    // kprintf("[BNSS-SHARD]: Sovereign Judicial Procedural Interface Online (v2.0).\n");
+void init_bnss_template(void* t) {
+    add_item(t, "Register FIR (Mandatory)", "Sec 173 BNSS", 
+        "PREREQ: Information of cognizable offence.", 
+        "STEP 1: Report to SHO. STEP 2: SHO enters in FIR book. STEP 3: Mandatory e-FIR/Audio-Video recording.", 0, 0);
+    add_item(t, "Production before Magistrate within 24 hours", "Sec 58 BNSS", 
+        "PREREQ: Arrest without warrant.", 
+        "STEP 1: Physical production. STEP 2: Remand application if needed.", 1, 0);
+    add_item(t, "Police Custody Remand (Max 15 days)", "Sec 187 BNSS", 
+        "PREREQ: Investigation requires custody.", 
+        "STEP 1: Written application. STEP 2: Magistrate order. STEP 3: Medical exam every 48 hrs.", 15, 0);
+    add_item(t, "Search and Seizure (Video Mandatory)", "Sec 105 BNSS", 
+        "PREREQ: Search warrant or emergency.", 
+        "STEP 1: Presence of 2 witnesses. STEP 2: Audio-Video recording of process. STEP 3: Inventory list.", 0, 0);
+    add_item(t, "Arrest of Female (Sunrise/Sunset rule)", "Sec 43(2) BNSS", 
+        "PREREQ: Female accused.", 
+        "STEP 1: Arrest only by female officer. STEP 2: Only between sunrise and sunset (unless magistrate permit).", 0, 0);
+    add_item(t, "Default Bail (60/90 days)", "Sec 187(5) BNSS", 
+        "PREREQ: Charge-sheet not filed in time.", 
+        "STEP 1: Application for bail. STEP 2: Mandatory release if criteria met.", 60, 0);
+    add_item(t, "Zero FIR (Jurisdiction no bar)", "Sec 173(1) BNSS", 
+        "PREREQ: Offence occurred outside station limits.", 
+        "STEP 1: Register Zero FIR. STEP 2: Transfer to relevant station.", 0, 0);
 }
 
-k_status bnss_arrest_audit(void) {
-    /* 
-     * Absorb BNSS USP: Section 48-62 Detailed Checklist.
-     * Step 1: Grounds of Arrest (BNSS 48).
-     * Step 2: Information to Nominated Person (BNSS 50).
-     * Step 3: Female Arrest Logic (BNSS 51).
-     * Step 4: Medical Examination (BNSS 53).
-     */
-    // kprintf("[BNSS-SHARD]: Industrial Pulse: Arrest Audit Passed (BNSS 48-62 COMPLIANT).\n");
-    return K_OK;
-}
-
-k_status bnss_remand_audit(u32 days) {
-    /*
-     * Absorb BNSS USP: Section 187 Police/Judicial Custody Logic.
-     * Audit if remand pulse follows the new 15/60/90 day sharded thresholds.
-     */
-    // kprintf("[BNSS-SHARD]: Industrial Pulse: Remand Audit for %u days (BNSS 187 COMPLIANT).\n", days);
-    return K_OK;
-}
-
-k_status bsa_certificate_gen(void* shard_ptr) {
-    /*
-     * Absorb BSA USP: Section 63 Electronic Evidence Certificate.
-     * Generate sharded-integrity certificate for digital forensic evidence.
-     */
-    // kprintf("[BNSS-SHARD]: Industrial Pulse: BSA Section 63 Certificate Generated.\n");
-    return K_OK;
-}
-
-k_status bnss_search_audit(void) {
-    /*
-     * Absorb BNSS USP: Section 105-115 Search/Seizure.
-     * Audit video-recording pulse requirement (BNSS 105).
-     */
-    // kprintf("[BNSS-SHARD]: Industrial Pulse: Search/Seizure audited (BNSS 105 VIDEO-SYNC).\n");
-    return K_OK;
-}
