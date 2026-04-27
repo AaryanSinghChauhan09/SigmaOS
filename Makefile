@@ -40,7 +40,8 @@ OBJS = $(OBJ_DIR)/main.o \
        $(OBJ_DIR)/net_buf.o \
        $(OBJ_DIR)/e1000.o \
        $(OBJ_DIR)/ide.o \
-       $(OBJ_DIR)/sigmafs.o
+       $(OBJ_DIR)/sigmafs.o \
+       $(OBJ_DIR)/fs_cache.o
 
 all: sigmaos.bin
 
@@ -61,6 +62,10 @@ $(OBJ_DIR)/%.o: $(ORCH_DIR)/%.c
 	$(CC) $(CFLAGS) -c $< -o $@
 
 $(OBJ_DIR)/%.o: $(SHELL_DIR)/%.c
+	@mkdir -p $(OBJ_DIR)
+	$(CC) $(CFLAGS) -c $< -o $@
+
+$(OBJ_DIR)/%.o: $(FS_DIR)/%.c
 	@mkdir -p $(OBJ_DIR)
 	$(CC) $(CFLAGS) -c $< -o $@
 
