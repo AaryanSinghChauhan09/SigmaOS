@@ -21,6 +21,7 @@ OBJS = $(OBJ_DIR)/main.o \
        $(OBJ_DIR)/scheduler.o \
        $(OBJ_DIR)/pmm.o \
        $(OBJ_DIR)/vmm.o \
+       $(OBJ_DIR)/vmm_perf.o \
        $(OBJ_DIR)/idt.o \
        $(OBJ_DIR)/vfs.o \
        $(OBJ_DIR)/slab.o \

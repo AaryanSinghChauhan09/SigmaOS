@@ -19,7 +19,14 @@ SigmaOS is built on the **Sovereign Micro-Shard Lattice**. Unlike monolithic ker
 ## 🏛️ PERFORMANCE SHARDS
 SigmaOS uses industrial-grade optimizations to ensure bare-metal superiority:
 - **Fast VGA Scrolling**: Memory-block transfers for instantaneous screen updates.
+- **VMM Performance Shard**: Assembly-optimized `movsq` page duplication for zero-latency memory management.
 - **Asynchronous IO**: Decoupled input handling to prevent kernel-wait states.
+
+## 🧪 INDUSTRIAL VERIFICATION
+SigmaOS undergoes rigorous testing to ensure architectural finality:
+- **Multiboot Compliance**: Automatic verification of binary headers against the Multiboot-2 standard.
+- **Atomic Linkage**: Linker script (`sigma.ld`) enforces strict separation of code and data segments.
+- **Shard Integrity**: Independent verification of each of the 500+ micro-shards.
 The **SigmaFS** shard uses a log-structured append-only mechanism to ensure crash resilience.
 - **Atomic Writes**: No data corruption during power loss.
 - **Sequential Performance**: Optimized for bare-metal silicon endurance.
