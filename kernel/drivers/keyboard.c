@@ -1,8 +1,8 @@
 /*
  * =============================================================================
- * Σ SIGMAOS KERNEL: PS/2 KEYBOARD DRIVER (v1.0)
+ * Σ SIGMAOS KERNEL: PS/2 KEYBOARD DRIVER (v1.1)
  * =============================================================================
- * Principles: Zero-Abstract Human Input.
+ * Principles: Zero-Abstract Human Input & ASCII Mapping.
  * =============================================================================
  */
 #include "../include/sigma_kernel_types.h"
@@ -21,10 +21,17 @@ extern void vga_putc(char c, u8 color);
 void keyboard_handler() {
     u8 scancode = port_inb(0x60);
     
-    if (!(scancode & 0x80)) {
-        char c = kbd_us[scancode];
-        if (c) {
-            vga_putc(c, 0x0F);
-        }
+    /* Key release has high bit set */
+    if (scancode & 0x80) {
+        return;
+    }
+
+    char c = kbd_us[scancode];
+    if (c) {
+        /* Print to VGA Buffer */
+        vga_putc(c, 0x0F);
+        
+        /* Forward to Shell (Future implementation) */
+        /* shell_buffer_push(c); */
     }
 }

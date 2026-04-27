@@ -10,6 +10,8 @@ SigmaOS provides a premium, industrial-grade user experience that rivals or exce
 
 - **Glassmorphic UI**: High-fidelity, translucent dashboard with hardware-accelerated animations.
 - **Window Management**: Fully functional minimize, maximize, and close controls for all sovereign shards.
+- **Memory Protection**: Hardware-enforced **Paging** and isolation (Ring 3 ready).
+- **Human Input**: Native PS/2 keyboard driver with zero-abstract ASCII mapping.
 - **Storage Persistence**: Log-Structured **SigmaFS** for crash-resilient data security.
 - **Global Connectivity**: Bare-metal **Intel e1000** driver and UDP stack for agentic communication.
 - **Unified Experience**: Seamlessly switch between the ultra-advanced Sovereign CLI and the polished Zenith Dashboard.

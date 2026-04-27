@@ -1,6 +1,6 @@
 /*
  * =============================================================================
- * Σ SIGMAOS KERNEL: VIRTUAL MEMORY MANAGER (v1.0 - PAGING)
+ * Σ SIGMAOS KERNEL: VIRTUAL MEMORY MANAGER (v1.1 - PAGING)
  * =============================================================================
  * Principles: Silicon-Level Isolation & High-Half Mapping.
  * =============================================================================
@@ -10,7 +10,8 @@
 static u64 page_directory[512] __attribute__((aligned(4096)));
 static u64 kernel_page_table[512] __attribute__((aligned(4096)));
 
-extern void cpu_write_cr3(u64 v);
+extern void load_page_directory(u64* pd);
+extern void enable_paging();
 extern void kprintf(const char* fmt, ...);
 
 void vmm_init() {
@@ -18,15 +19,17 @@ void vmm_init() {
     sigma_memset(page_directory, 0, 4096);
 
     /* 2. Identity Map first 2MB (Simple x86_64 huge page or table mapping) */
+    /* Attributes: 0x3 = Present + Writable */
     for (u64 i = 0; i < 512; i++) {
-        kernel_page_table[i] = (i * 4096) | 3; /* Present, Writable */
+        kernel_page_table[i] = (i * 4096) | 3;
     }
 
-    /* 3. Map into Page Directory */
+    /* 3. Map Table into Directory */
     page_directory[0] = ((u64)kernel_page_table) | 3;
 
-    /* 4. Activate */
-    cpu_write_cr3((u64)page_directory);
+    /* 4. Load and Enable */
+    load_page_directory(page_directory);
+    enable_paging();
     
-    kprintf("Σ [VMM]: Paging active. Kernel isolated.\n");
+    kprintf("Σ [VMM]: Paging active. Memory protected.\n");
 }
