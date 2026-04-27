@@ -11,7 +11,7 @@
  * =============================================================================
  */
 
-#include "sigma_kernel_types.h"
+#include "../include/sigma_kernel_types.h"
 
 #define MAX_FIREWALL_RULES 64
 

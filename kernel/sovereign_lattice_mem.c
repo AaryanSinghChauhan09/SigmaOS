@@ -9,7 +9,7 @@
  *   - $O(1)$ memory isolation via hardware-enforced Shard-Keys.
  * =============================================================================
  */
-#include "sigma_kernel_types.h"
+#include "../include/sigma_kernel_types.h"
 
 typedef struct MemShard {
     u64     uuid;

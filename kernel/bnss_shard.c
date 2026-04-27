@@ -3,7 +3,7 @@
  * Σ SIGMAOS KERNEL: SOVEREIGN-BNSS-SHARD (Bharatiya Nagarik Suraksha Sanhita 2023)
  * =============================================================================
  */
-#include "sigma_kernel_types.h"
+#include "../include/sigma_kernel_types.h"
 
 extern void add_item(void* t, const char* desc, const char* ref, const char* prereq, const char* proc, u32 days, u32 penalty_rs);
 

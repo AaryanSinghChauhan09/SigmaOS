@@ -12,7 +12,7 @@
  * =============================================================================
  */
 
-#include "sigma_kernel_types.h"
+#include "../include/sigma_kernel_types.h"
 
 /* =========================================================================
  * Network byte-order (big-endian) helpers

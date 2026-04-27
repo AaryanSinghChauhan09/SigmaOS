@@ -21,5 +21,7 @@ void init_gst_template(void* t);
 void init_pocso_template(void* t);
 void init_arbitration_template(void* t);
 void init_labour_template(void* t);
+void init_consumer_template(void* t);
+void init_rera_template(void* t);
 
 #endif

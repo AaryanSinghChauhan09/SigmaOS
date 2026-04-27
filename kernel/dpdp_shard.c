@@ -3,7 +3,7 @@
  * Σ SIGMAOS KERNEL: SOVEREIGN-DPDP-SHARD (Digital Personal Data Protection Act 2023)
  * =============================================================================
  */
-#include "sigma_kernel_types.h"
+#include "../include/sigma_kernel_types.h"
 
 extern void add_item(void* t, const char* desc, const char* ref, const char* prereq, const char* proc, u32 days, u32 penalty_rs);
 

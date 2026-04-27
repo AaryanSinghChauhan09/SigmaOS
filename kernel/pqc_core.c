@@ -11,7 +11,7 @@
  * =============================================================================
  */
 
-#include "sigma_kernel_types.h"
+#include "../include/sigma_kernel_types.h"
 
 #define PQC_KEY_SIZE 1024u
 #define MAX_SECURE_SHARDS 64

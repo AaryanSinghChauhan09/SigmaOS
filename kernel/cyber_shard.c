@@ -3,7 +3,7 @@
  * Σ SIGMAOS KERNEL: SOVEREIGN-CYBER-SHARD (IT Act 2000 / Cyber Law)
  * =============================================================================
  */
-#include "sigma_kernel_types.h"
+#include "../include/sigma_kernel_types.h"
 
 extern void add_item(void* t, const char* desc, const char* ref, const char* prereq, const char* proc, u32 days, u32 penalty_rs);
 
