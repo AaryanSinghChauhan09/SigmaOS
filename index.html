@@ -3,207 +3,173 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>SigmaOS | The Definitive Industrial Sovereignty</title>
-    <meta name="description" content="SigmaOS is an industrial-grade, sovereign operating system for x86_64, engineered with C, Rust, and Assembly. Absolute performance, zero bloat.">
-    
-    <!-- Premium Fonts -->
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;800&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
-    
-    <link rel="stylesheet" href="site.css">
+    <title>Σ SigmaOS Sovereign Zenith</title>
+    <style>
+        :root {
+            --glass: rgba(255, 255, 255, 0.1);
+            --glass-border: rgba(255, 255, 255, 0.2);
+            --accent: #e95420; /* Ubuntu Orange */
+            --bg-gradient: linear-gradient(135deg, #2c001e 0%, #772953 100%);
+        }
+
+        body, html {
+            margin: 0;
+            padding: 0;
+            height: 100%;
+            font-family: 'Inter', sans-serif;
+            background: var(--bg-gradient);
+            overflow: hidden;
+            color: white;
+        }
+
+        /* Top Bar */
+        #top-bar {
+            height: 30px;
+            background: rgba(0, 0, 0, 0.5);
+            backdrop-filter: blur(10px);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0 15px;
+            font-size: 14px;
+            z-index: 1000;
+        }
+
+        /* Desktop */
+        #desktop {
+            height: calc(100% - 30px);
+            position: relative;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        .icon {
+            width: 80px;
+            text-align: center;
+            cursor: pointer;
+            transition: transform 0.2s;
+        }
+
+        .icon:hover { transform: scale(1.1); }
+        .icon img { width: 48px; filter: drop-shadow(0 4px 6px rgba(0,0,0,0.3)); }
+        .icon span { display: block; margin-top: 5px; font-size: 12px; text-shadow: 0 2px 4px rgba(0,0,0,0.5); }
+
+        /* Window System */
+        .window {
+            position: absolute;
+            width: 800px;
+            height: 500px;
+            background: rgba(20, 20, 20, 0.85);
+            backdrop-filter: blur(15px);
+            border: 1px solid var(--glass-border);
+            border-radius: 12px;
+            box-shadow: 0 20px 50px rgba(0,0,0,0.5);
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+            animation: window-open 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+
+        @keyframes window-open {
+            from { opacity: 0; transform: scale(0.9); }
+            to { opacity: 1; transform: scale(1); }
+        }
+
+        .title-bar {
+            height: 35px;
+            background: rgba(255, 255, 255, 0.05);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0 15px;
+            cursor: move;
+        }
+
+        .window-controls {
+            display: flex;
+            gap: 8px;
+        }
+
+        .control {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            cursor: pointer;
+        }
+
+        .close { background: #ff5f56; }
+        .min { background: #ffbd2e; }
+        .max { background: #27c93f; }
+
+        .terminal-content {
+            flex-grow: 1;
+            padding: 15px;
+            font-family: 'Fira Code', monospace;
+            font-size: 14px;
+            overflow-y: auto;
+            color: #00ff00;
+        }
+
+        /* Sovereign Prompt */
+        .prompt { color: var(--accent); font-weight: bold; }
+
+    </style>
 </head>
-<body class="dark-theme">
-    <div id="loader" class="loader-overlay">
-        <div class="loader-content">
-            <span class="sigma-symbol">Σ</span>
-            <div class="loader-line"></div>
+<body>
+    <div id="top-bar">
+        <span>Σ SigmaOS Activities</span>
+        <span id="clock">12:34 PM</span>
+        <span>Sovereign Zenith v6.3</span>
+    </div>
+
+    <div id="desktop">
+        <div class="icon" onclick="openTerminal('SLAC v3.0')">
+            <img src="https://cdn-icons-png.flaticon.com/512/1048/1048953.png" alt="Legal">
+            <span>Legal Engine</span>
+        </div>
+        <div class="icon" onclick="openTerminal('Sovereign CLI')">
+            <img src="https://cdn-icons-png.flaticon.com/512/906/906334.png" alt="Shell">
+            <span>Omni Shell</span>
         </div>
     </div>
 
-    <!-- Navigation -->
-    <nav id="main-nav">
-        <div class="nav-container">
-            <div class="logo">
-                <img src="assets/logo.png" alt="Σ">
-                <span>SIGMAOS</span>
-            </div>
-            <ul class="nav-links">
-                <li><a href="#features">Features</a></li>
-                <li><a href="#editions">Editions</a></li>
-                <li><a href="https://github.com/SigmaOS-ProjectProject/SigmaOS" target="_blank">GitHub</a></li>
-                <li><a href="dashboard/index.html" class="cta-nav">Launch Dashboard</a></li>
-            </ul>
-            <div class="menu-toggle">
-                <span></span>
-                <span></span>
-                <span></span>
-            </div>
-        </div>
-    </nav>
+    <div id="windows-container"></div>
 
-    <!-- Hero Section -->
-    <header class="hero">
-        <div class="hero-bg" style="background-image: url('assets/hero_bg.png');"></div>
-        <div class="hero-overlay"></div>
-        <div class="hero-content container">
-            <h1 class="fade-in">SOVEREIGNTY <br><span class="accent">DEFINED</span>.</h1>
-            <p class="hero-subtitle fade-in">The definitive industrial operating system for the next generation of computing. Zero-dependency, bare-metal, and absolute performance.</p>
-            <div class="hero-ctas fade-in">
-                <a href="#download" class="btn btn-primary">Get SigmaOS</a>
-                <a href="dashboard/index.html" class="btn btn-outline">Preview Zenith</a>
-            </div>
-            <div class="system-status fade-in">
-                <span class="status-item"><span class="pulse orange"></span> KERNEL: ACTIVE</span>
-                <span class="status-item"><span class="pulse green"></span> PARITY: UNIFIED</span>
-                <span class="status-item"><span class="pulse blue"></span> SHARDING: ZENITH</span>
-            </div>
-        </div>
-    </header>
+    <script>
+        function updateClock() {
+            const now = new Date();
+            document.getElementById('clock').innerText = now.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
+        }
+        setInterval(updateClock, 1000);
+        updateClock();
 
-    <!-- Features Section -->
-    <section id="features" class="features container">
-        <div class="section-header">
-            <h2>INDUSTRIAL <span class="accent">POWER</span></h2>
-            <p>SigmaOS absorbs the intelligence of 30+ leading repositories into a single, unified shard.</p>
-        </div>
-        <div class="feature-grid">
-            <div class="feature-card reveal">
-                <div class="feature-icon">⚙️</div>
-                <h3>Kernel Master</h3>
-                <p>O(1) Slab Allocator and 4-level PML4 paging. Built on torvalds/linux parity for uncompromising stability.</p>
-            </div>
-            <div class="feature-card reveal">
-                <div class="feature-icon">⚡</div>
-                <h3>Distro Streamer</h3>
-                <p>Zero-download execution. Stream Ubuntu, Arch, or Debian locally with high-performance WASM sharding.</p>
-            </div>
-            <div class="feature-card reveal">
-                <div class="feature-icon">🛡️</div>
-                <h3>Safety Shard</h3>
-                <p>Rust-parity safety logic ensures memory isolation and security at the industrial level.</p>
-            </div>
-            <div class="feature-card reveal">
-                <div class="feature-icon">🤖</div>
-                <h3>Sovereign AI</h3>
-                <p>Autonomous system balancing and reasoning engine for predictive performance optimization.</p>
-            </div>
-        </div>
-    </section>
-
-    <!-- Motivation Section -->
-    <section class="motivation">
-        <div class="container reveal">
-            <div class="motivation-content">
-                <div class="motivation-text">
-                    <h2>WHY <span class="accent">SIGMAOS</span>?</h2>
-                    <p>In a world of bloated distributions and fragmented ecosystems, SigmaOS stands as a beacon of absolute sovereignty. We don't just build an OS; we craft a bit-perfect environment for industrial supremacy.</p>
-                    <ul class="checklist">
-                        <li><span>✔</span> Zero-GLIBC Bare-Metal Architecture</li>
-                        <li><span>✔</span> Integrated Macro Automation</li>
-                        <li><span>✔</span> Multicloud VM Provisioning</li>
-                        <li><span>✔</span> Real-time Aesthetic Sharding</li>
-                    </ul>
+        function openTerminal(title) {
+            const container = document.getElementById('windows-container');
+            const win = document.createElement('div');
+            win.className = 'window';
+            win.style.left = '200px';
+            win.style.top = '100px';
+            win.innerHTML = `
+                <div class="title-bar">
+                    <span>${title}</span>
+                    <div class="window-controls">
+                        <div class="control min"></div>
+                        <div class="control max"></div>
+                        <div class="control close" onclick="this.closest('.window').remove()"></div>
+                    </div>
                 </div>
-                <div class="motivation-visual">
-                    <!-- This will have a cool animated UI snippet -->
-                     <div class="code-preview">
-<pre><code><span class="comment">// Sovereign Init Logic</span>
-<span class="keyword">void</span> <span class="function">omega_core_init</span>() {
-    <span class="function">slab_alloc_shard</span>(SHARD_O1);
-    <span class="function">pml4_activate_sovereignty</span>();
-    <span class="function">printf</span>(<span class="string">"Σ SigmaOS: Zenith Online.\n"</span>);
-}</code></pre>
-                     </div>
+                <div class="terminal-content">
+                    <p>Σ [SOVEREIGN-BOOT]: Initializing Zenith v6.3...</p>
+                    <p>Σ [ID-CHECK]: Identity verified. Welcome, Sovereign.</p>
+                    <p><span class="prompt">Σ-CLI ></span> help</p>
+                    <p>... Loading Omni-Shell Shards ...</p>
                 </div>
-            </div>
-        </div>
-    </section>
-
-    <!-- Editions Section -->
-    <section id="editions" class="editions container">
-        <div class="section-header">
-            <h2>CHOOSE YOUR <span class="accent">EDITION</span></h2>
-            <p>Select the SigmaOS shard that matches your mission profile.</p>
-        </div>
-        <div class="edition-grid">
-            <div class="edition-card reveal">
-                <div class="edition-badge">Standard</div>
-                <h3>Zenith Basic</h3>
-                <p>Lightweight workstation for developers and enthusiasts. Pure SigmaOS core.</p>
-                <div class="price">Free</div>
-                <ul class="edition-features">
-                    <li>Kernel Master Core</li>
-                    <li>Basic Distro Streaming</li>
-                    <li>Spotlight Search</li>
-                </ul>
-                <a href="#download" class="btn btn-secondary">Download ISO</a>
-            </div>
-            <div class="edition-card feature-highlight reveal">
-                <div class="edition-badge badge-accent">Industrial</div>
-                <h3>Zenith Developer</h3>
-                <p>The complete industrial toolkit. Pre-configured for mass-scale automation.</p>
-                <div class="price">Enterprise</div>
-                <ul class="edition-features">
-                    <li>All Standard Features</li>
-                    <li>AI Orchestrator Shard</li>
-                    <li>Multi-cloud VM Hub</li>
-                    <li>Sovereign Audit Tools</li>
-                </ul>
-                <a href="#download" class="btn btn-primary">Get Industrial</a>
-            </div>
-            <div class="edition-card reveal">
-                <div class="edition-badge">Sovereign</div>
-                <h3>Zenith Enterprise</h3>
-                <p>Air-gapped security, custom sharding, and dedicated sovereignty support.</p>
-                <div class="price">Custom</div>
-                <ul class="edition-features">
-                    <li>Lattice PQC Encryption</li>
-                    <li>Hardware-level Isolation</li>
-                    <li>24/7 Sovereign Pulse</li>
-                </ul>
-                <a href="#contact" class="btn btn-secondary">Contact Sales</a>
-            </div>
-        </div>
-    </section>
-
-    <!-- Footer -->
-    <footer class="main-footer">
-        <div class="container footer-content">
-            <div class="footer-brand">
-                <div class="logo">
-                    <img src="assets/logo.png" alt="Σ">
-                    <span>SIGMAOS</span>
-                </div>
-                <p>Definitive industrial sovereignty for the x86_64 silicon era.</p>
-            </div>
-            <div class="footer-links">
-                <div class="link-group">
-                    <h4>Project</h4>
-                    <ul>
-                        <li><a href="#features">Features</a></li>
-                        <li><a href="#editions">Editions</a></li>
-                        <li><a href="https://github.com/SigmaOS-ProjectProject/SigmaOS">GitHub</a></li>
-                    </ul>
-                </div>
-                <div class="link-group">
-                    <h4>Community</h4>
-                    <ul>
-                        <li><a href="#">Discussions</a></li>
-                        <li><a href="#">Documentation</a></li>
-                        <li><a href="#">Sovereign Hub</a></li>
-                    </ul>
-                </div>
-            </div>
-        </div>
-        <div class="footer-bottom container">
-            <p>&copy; 2026 Sovereign-Zenith-Developer. All rights sharded.</p>
-            <div class="social-icons">
-                <!-- SVG icons would go here -->
-            </div>
-        </div>
-    </footer>
-
-    <script src="site.js"></script>
+            `;
+            container.appendChild(win);
+            // Draggable logic can be added here
+        }
+    </script>
 </body>
 </html>

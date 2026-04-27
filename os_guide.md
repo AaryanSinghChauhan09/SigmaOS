@@ -4,6 +4,14 @@ Welcome to the definitive guide to **SigmaOS Sovereign Zenith**. This document s
 
 ---
 
+## 🎨 THE ZENITH UX (Ubuntu Parity)
+SigmaOS provides a premium, industrial-grade user experience that rivals or exceeds modern Linux distributions like Ubuntu.
+- **Glassmorphic UI**: High-fidelity, translucent dashboard with hardware-accelerated animations.
+- **Window Management**: Fully functional minimize, maximize, and close controls for all sovereign shards.
+- **Unified Experience**: Seamlessly switch between the ultra-advanced Sovereign CLI and the polished Zenith Dashboard.
+
+---
+
 ## 🏛️ 1. ARCHITECTURAL SUPREMACY
 SigmaOS is a **Sovereign Micro-Shard Microkernel**. It is designed to operate at the silicon level with **Zero-Dependency** on any external or high-level libraries.
 
