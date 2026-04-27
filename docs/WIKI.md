@@ -106,8 +106,17 @@ SigmaOS is rapidly evolving toward full-scale industrial maturity. Current shard
 - [x] Sovereign Firewall
 
 ### 💾 Storage & Filesystem
+
 - [x] SigmaFS (Log-Structured Persistence)
 - [x] Smart Block Cache (LRU)
+- [x] Metadata Indexing Engine
+
+### 🎨 User Experience
+
+- [x] Zenith GUI (Modular Compositor)
+- [x] Zenith Theme Engine (Glassmorphism)
+- [x] SigmaPM (Package Manager)
+- [x] High-Contrast Aesthetics
 
 ---
 
