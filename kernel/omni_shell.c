@@ -396,6 +396,13 @@ static void cmd_help(ParsedCmd* c) {
     kprintf("    amnesia-seal    — Complete volatile memory wipe (Tails USP)\n");
     kprintf("    vuln-scan       — Integrated pen-testing suite (Kali USP)\n");
     kprintf("    sigma-agent     — Autonomous OS maintenance AI (Zenith Special)\n");
+    kprintf("  NO-MOUSE / ACCESSIBILITY (Keyboard Sovereign):\n");
+    kprintf("    Alt + N         — Next active shard\n");
+    kprintf("    Alt + P         — Previous active shard\n");
+    kprintf("    Ctrl + Shift + F— Global Sovereign Search\n");
+    kprintf("    :q, :w, :wq     — Vim-style session management\n");
+    kprintf("    tab-complete    — Intelligent context-aware completion\n");
+    kprintf("    mesh-sync <id>  — Share current task with peer device\n");
     kprintf("  KEYBOARD SHORTCUTS:\n");
     kprintf("    Ctrl+C     — Interrupt running command\n");
     kprintf("    Ctrl+D     — End of input / logout\n");
@@ -882,6 +889,7 @@ static const CmdEntry g_cmds[] = {
     { "emerge-optim",          cmd_nix_rebuild,           "Gentoo Optimization" },
     { "amnesia-seal",          cmd_nix_rebuild,           "Tails Memory Wipe" },
     { "sigma-agent",           cmd_sigma_agent,           "Autonomous OS Agent" },
+    { "mesh-sync",             cmd_mesh_sync,             "Share task with device" },
     { "git-viz",               cmd_git_viz,               "Visualize Git History" },
     { "tree-analyze",          cmd_tree_analyze,          "Analyze File Tree" },
     { "pqc-gen",               cmd_pqc_gen,               "Generate PQC keypair" },

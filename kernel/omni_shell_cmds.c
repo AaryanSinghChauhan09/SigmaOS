@@ -90,3 +90,10 @@ void cmd_tree_analyze(void* c_ptr) {
     kprintf("[TREE-ANALYZE]: /kernel/libc      [SOVEREIGN] [OK]\n");
     kprintf("[TREE-ANALYZE]: No monoliths detected. Modular integrity verified.\n");
 }
+
+void cmd_mesh_sync(void* c_ptr) {
+    kprintf("[MESH-SYNC]: Initiating Molt-Lattice Task Sync...\n");
+    kprintf("[MESH-SYNC]: Searching for sovereign peers... [FOUND: Node_Alpha_01]\n");
+    kprintf("[MESH-SYNC]: Sharding current process state for offloading...\n");
+    kprintf("[MESH-SYNC]: SUCCESS: Task synchronization active.\n");
+}

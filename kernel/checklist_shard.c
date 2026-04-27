@@ -110,20 +110,7 @@ static void create_template(LawDomain domain, const char* name, const char* desc
     init_fn(t);
 }
 
-void checklist_init(void) {
-    g_template_count = 0;
-    create_template(DOMAIN_CRIMINAL_BNSS, "BNSS_2023", "Criminal Procedure", init_bnss_template);
-    create_template(DOMAIN_SUBSTANTIVE_BNS, "BNS_2023", "Substantive Offences", init_bns_template);
-    create_template(DOMAIN_EVIDENCE_BSA, "BSA_2023", "Evidence & Forensics", init_bsa_template);
-    create_template(DOMAIN_PMLA, "PMLA_2002", "Money Laundering", init_pmla_template);
-    create_template(DOMAIN_DPDP_ACT, "DPDP_2023", "Data Protection", init_dpdp_template);
-    create_template(DOMAIN_CYBER_IT_ACT, "IT_ACT_2000", "Cyber Law", init_cyber_template);
-    create_template(DOMAIN_RTI, "RTI_2005", "Right to Information", init_rti_template);
-    create_template(DOMAIN_INSOLVENCY_IBC, "IBC_2016", "Insolvency", init_ibc_template);
-    create_template(DOMAIN_TAX_GST, "GST_TAX", "GST & Income Tax", init_gst_template);
-
-    kprintf("[CHECKLIST-SHARD]: Modular Legal Engine Zenith v3.0 Online. %u domains sharded.\n", g_template_count);
-}
+/* Removed redundant checklist_init */
 
 
 /* =========================================================================
@@ -207,23 +194,24 @@ static void init_rera_template(void) {
 void checklist_init(void) {
     g_template_count = 0;
 
-    init_bnss_template();
-    init_bns_template();
-    init_bsa_template();
-    init_pocso_template();
-    init_pmla_template();
-    init_rti_template();
-    init_ibc_template();
-    init_dpdp_template();
-    init_gst_template();
-    init_arbitration_template();
-    init_cyber_template();
-    init_labour_template();
-    init_consumer_template();
-    init_rera_template();
+    create_template(DOMAIN_CRIMINAL_BNSS, "BNSS_2023", "Criminal Procedure", init_bnss_template);
+    create_template(DOMAIN_SUBSTANTIVE_BNS, "BNS_2023", "Substantive Offences", init_bns_template);
+    create_template(DOMAIN_EVIDENCE_BSA, "BSA_2023", "Evidence & Forensics", init_bsa_template);
+    create_template(DOMAIN_PMLA, "PMLA_2002", "Money Laundering", init_pmla_template);
+    create_template(DOMAIN_DPDP_ACT, "DPDP_2023", "Data Protection", init_dpdp_template);
+    create_template(DOMAIN_CYBER_IT_ACT, "IT_ACT_2000", "Cyber Law", init_cyber_template);
+    create_template(DOMAIN_RTI, "RTI_2005", "Right to Information", init_rti_template);
+    create_template(DOMAIN_INSOLVENCY_IBC, "IBC_2016", "Insolvency", init_ibc_template);
+    create_template(DOMAIN_TAX_GST, "GST_TAX", "GST & Income Tax", init_gst_template);
+    
+    /* Internal templates */
+    create_template(DOMAIN_POCSO, "POCSO_2012", "Child Protection", (void (*)(void*))init_pocso_template);
+    create_template(DOMAIN_ARBITRATION, "ARBITRATION", "Arbitration Law", (void (*)(void*))init_arbitration_template);
+    create_template(DOMAIN_LABOUR_CODE, "LABOUR_CODE", "Labour Compliance", (void (*)(void*))init_labour_template);
+    create_template(DOMAIN_CONSUMER_PROTECTION, "CONSUMER", "Consumer Rights", (void (*)(void*))init_consumer_template);
+    create_template(DOMAIN_RERA, "RERA_2016", "Real Estate Law", (void (*)(void*))init_rera_template);
 
-    kprintf("[CHECKLIST-SHARD]: %u Legal Domain Templates Loaded (BNSS/BNS/BSA/POCSO/PMLA/RTI/IBC/DPDP/GST/ARB/IT/LABOUR/CONSUMER/RERA).\n",
-            g_template_count);
+    kprintf("[CHECKLIST-SHARD]: Modular Legal Engine Zenith v3.0 Online. %u domains sharded.\n", g_template_count);
 }
 
 /* =========================================================================
