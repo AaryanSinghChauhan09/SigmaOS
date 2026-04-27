@@ -28,6 +28,7 @@ OBJS = $(OBJ_DIR)/main.o \
        $(OBJ_DIR)/input_queue.o \
        $(OBJ_DIR)/vga.o \
        $(OBJ_DIR)/keyboard.o \
+       $(OBJ_DIR)/serial.o \
        $(OBJ_DIR)/e1000.o \
        $(OBJ_DIR)/ide.o \
        $(OBJ_DIR)/sigmafs.o

@@ -39,3 +39,22 @@ The **SigmaFS** shard uses a log-structured append-only mechanism to ensure cras
 1. **Modular Build**: Run `make` to compile independent shards.
 2. **Industrial Verification**: Build system enforces Multiboot-2 compliance.
 3. **Sovereign Sync**: Use the integrated `git` automation to maintain repository integrity.
+
+---
+
+## 🗺️ SIGMAOS ROADMAP (2026-2027)
+
+### Phase 1: Core Stability (2026 Q2)
+- **Kernel Hardening**: Implement Slab Allocators and Round-Robin scheduling. [COMPLETED]
+- **Driver Expansion**: Basic VGA, Keyboard, and Serial UART support. [COMPLETED]
+- **VMM Isolation**: High-half mapping and identity paging. [COMPLETED]
+
+### Phase 2: System Maturity (2026 Q3-Q4)
+- **Aesthetic Zenith**: Glassmorphic GUI compositor and window management.
+- **Networking**: Full TCP/IP stack and sharded VPN agents.
+- **Community Growth**: Automated documentation and SDK for shard developers.
+
+### Phase 3: Mainstream Readiness (2027)
+- **Enterprise Sovereignty**: Secure boot, encrypted state, and identity modules.
+- **AI-Native Layer**: Integrated tensor pipelines and autonomous system agents.
+- **Sovereign Computing**: Global mesh synchronization for government/corporate adoption.
