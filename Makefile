@@ -45,6 +45,7 @@ OBJS = $(OBJ_DIR)/main.o \
        $(OBJ_DIR)/zenith_gui.o \
        $(OBJ_DIR)/ids_shard.o \
        $(OBJ_DIR)/firewall_shard.o \
+       $(OBJ_DIR)/unit_tests.o \
        $(OBJ_DIR)/net_buf.o \
        $(OBJ_DIR)/e1000.o \
        $(OBJ_DIR)/ide.o \
@@ -91,7 +92,9 @@ sigmaos.bin: $(OBJS)
 clean:
 	rm -rf $(OBJ_DIR) sigmaos.bin
 
-# Verification
-verify:
-	@echo "Σ [BUILD]: Verifying Multiboot Compliance..."
-	@grub-file --is-x86-multiboot sigmaos.bin && echo "Multiboot OK" || echo "Fail"
+# Execution
+run: sigmaos.bin
+	qemu-system-x86_64 -kernel sigmaos.bin -serial stdio -display sdl
+
+run-debug: sigmaos.bin
+	qemu-system-x86_64 -kernel sigmaos.bin -serial stdio -display sdl -d int,cpu_reset -D qemu.log

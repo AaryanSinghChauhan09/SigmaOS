@@ -3,173 +3,102 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Σ SigmaOS Sovereign Zenith</title>
+    <title>Σ SIGMAOS: SOVEREIGN ZENITH PORTAL</title>
     <style>
         :root {
-            --glass: rgba(255, 255, 255, 0.1);
-            --glass-border: rgba(255, 255, 255, 0.2);
-            --accent: #e95420; /* Ubuntu Orange */
-            --bg-gradient: linear-gradient(135deg, #2c001e 0%, #772953 100%);
+            --bg: #050505;
+            --terminal: #00ff00;
+            --accent: #0088ff;
+            --glass: rgba(255, 255, 255, 0.05);
         }
-
-        body, html {
+        body {
             margin: 0;
-            padding: 0;
-            height: 100%;
-            font-family: 'Inter', sans-serif;
-            background: var(--bg-gradient);
-            overflow: hidden;
-            color: white;
-        }
-
-        /* Top Bar */
-        #top-bar {
-            height: 30px;
-            background: rgba(0, 0, 0, 0.5);
-            backdrop-filter: blur(10px);
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 0 15px;
-            font-size: 14px;
-            z-index: 1000;
-        }
-
-        /* Desktop */
-        #desktop {
-            height: calc(100% - 30px);
-            position: relative;
-            padding: 20px;
+            background: var(--bg);
+            color: var(--terminal);
+            font-family: 'Courier New', Courier, monospace;
             display: flex;
             flex-direction: column;
-            gap: 20px;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+            overflow: hidden;
         }
-
-        .icon {
-            width: 80px;
-            text-align: center;
-            cursor: pointer;
-            transition: transform 0.2s;
-        }
-
-        .icon:hover { transform: scale(1.1); }
-        .icon img { width: 48px; filter: drop-shadow(0 4px 6px rgba(0,0,0,0.3)); }
-        .icon span { display: block; margin-top: 5px; font-size: 12px; text-shadow: 0 2px 4px rgba(0,0,0,0.5); }
-
-        /* Window System */
-        .window {
-            position: absolute;
+        #vga-buffer {
             width: 800px;
-            height: 500px;
-            background: rgba(20, 20, 20, 0.85);
-            backdrop-filter: blur(15px);
-            border: 1px solid var(--glass-border);
-            border-radius: 12px;
-            box-shadow: 0 20px 50px rgba(0,0,0,0.5);
-            display: flex;
-            flex-direction: column;
-            overflow: hidden;
-            animation: window-open 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            height: 600px;
+            background: #000;
+            border: 2px solid #333;
+            box-shadow: 0 0 50px rgba(0, 136, 255, 0.2);
+            padding: 20px;
+            overflow-y: auto;
+            position: relative;
+            backdrop-filter: blur(10px);
         }
-
-        @keyframes window-open {
-            from { opacity: 0; transform: scale(0.9); }
-            to { opacity: 1; transform: scale(1); }
-        }
-
-        .title-bar {
-            height: 35px;
-            background: rgba(255, 255, 255, 0.05);
+        .line { margin-bottom: 5px; opacity: 0; animation: fadeIn 0.1s forwards; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateX(-10px); } to { opacity: 1; transform: translateX(0); } }
+        .success { color: #00ff00; font-weight: bold; }
+        .info { color: #0088ff; }
+        .warning { color: #ffff00; }
+        .panic { color: #ff0000; background: #200; font-weight: bold; padding: 2px; }
+        #status-bar {
+            width: 840px;
             display: flex;
             justify-content: space-between;
-            align-items: center;
-            padding: 0 15px;
-            cursor: move;
+            margin-top: 10px;
+            font-size: 12px;
+            color: #666;
         }
-
-        .window-controls {
-            display: flex;
-            gap: 8px;
-        }
-
-        .control {
-            width: 12px;
-            height: 12px;
-            border-radius: 50%;
-            cursor: pointer;
-        }
-
-        .close { background: #ff5f56; }
-        .min { background: #ffbd2e; }
-        .max { background: #27c93f; }
-
-        .terminal-content {
-            flex-grow: 1;
-            padding: 15px;
-            font-family: 'Fira Code', monospace;
-            font-size: 14px;
-            overflow-y: auto;
-            color: #00ff00;
-        }
-
-        /* Sovereign Prompt */
-        .prompt { color: var(--accent); font-weight: bold; }
-
     </style>
 </head>
 <body>
-    <div id="top-bar">
-        <span>Σ SigmaOS Activities</span>
-        <span id="clock">12:34 PM</span>
-        <span>Sovereign Zenith v6.3</span>
+    <h1 style="color: #fff; font-size: 18px; margin-bottom: 20px;">Σ SIGMAOS SOVEREIGN ZENITH v8.8</h1>
+    <div id="vga-buffer"></div>
+    <div id="status-bar">
+        <span>Lattice: 500 Shards</span>
+        <span>Mode: Sovereign Bare-Metal</span>
+        <span id="clock">00:00:00</span>
     </div>
-
-    <div id="desktop">
-        <div class="icon" onclick="openTerminal('SLAC v3.0')">
-            <img src="https://cdn-icons-png.flaticon.com/512/1048/1048953.png" alt="Legal">
-            <span>Legal Engine</span>
-        </div>
-        <div class="icon" onclick="openTerminal('Sovereign CLI')">
-            <img src="https://cdn-icons-png.flaticon.com/512/906/906334.png" alt="Shell">
-            <span>Omni Shell</span>
-        </div>
-    </div>
-
-    <div id="windows-container"></div>
 
     <script>
-        function updateClock() {
-            const now = new Date();
-            document.getElementById('clock').innerText = now.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
-        }
-        setInterval(updateClock, 1000);
-        updateClock();
+        const buffer = document.getElementById('vga-buffer');
+        const logs = [
+            { t: "Σ [BOOT]: Multiboot-2 Header Detected at 0x100000", c: "info" },
+            { t: "Σ [CORE]: Initializing Bitmap PMM (Physical Memory Manager)...", c: "info" },
+            { t: "Σ [CORE]: PMM OK. 32GB RAM mapped into 4KB pages.", c: "success" },
+            { t: "Σ [CORE]: Initializing Multi-Level Paging (VMM)...", c: "info" },
+            { t: "Σ [CORE]: VMM OK. High-Half Kernel mapped at 0xFFFFFFFF80000000.", c: "success" },
+            { t: "Σ [CORE]: Initializing Industrial GDT/IDT...", c: "info" },
+            { t: "Σ [CORE]: IDT OK. System traps active.", c: "success" },
+            { t: "Σ [ORCH]: Summoning Shard Lattice...", c: "info" },
+            { t: "Σ [ORCH]: Shard 'keyboard' summoned at 0x200000", c: "success" },
+            { t: "Σ [ORCH]: Shard 'vga' summoned at 0x300000", c: "success" },
+            { t: "Σ [ORCH]: Shard 'net_e1000' summoned at 0x400000", c: "success" },
+            { t: "Σ [SECURE]: Auditing Shard Signatures...", c: "info" },
+            { t: "Σ [SECURE]: All Shards VERIFIED (Chain-of-Trust).", c: "success" },
+            { t: "Σ [NET]: Intel NIC active. DHCP pulse broadcasted.", c: "info" },
+            { t: "Σ [UX]: Launching Zenith Shell v8.8...", c: "info" },
+            { t: "Σ [ZENITH]: Welcome to SigmaOS Sovereign Zenith.", c: "success" },
+            { t: "zenith_shell> _", c: "" }
+        ];
 
-        function openTerminal(title) {
-            const container = document.getElementById('windows-container');
-            const win = document.createElement('div');
-            win.className = 'window';
-            win.style.left = '200px';
-            win.style.top = '100px';
-            win.innerHTML = `
-                <div class="title-bar">
-                    <span>${title}</span>
-                    <div class="window-controls">
-                        <div class="control min"></div>
-                        <div class="control max"></div>
-                        <div class="control close" onclick="this.closest('.window').remove()"></div>
-                    </div>
-                </div>
-                <div class="terminal-content">
-                    <p>Σ [SOVEREIGN-BOOT]: Initializing Zenith v6.3...</p>
-                    <p>Σ [ID-CHECK]: Identity verified. Welcome, Sovereign.</p>
-                    <p><span class="prompt">Σ-CLI ></span> help</p>
-                    <p>... Loading Omni-Shell Shards ...</p>
-                </div>
-            `;
-            container.appendChild(win);
-            // Draggable logic can be added here
+        let index = 0;
+        function printLog() {
+            if (index < logs.length) {
+                const div = document.createElement('div');
+                div.className = 'line ' + logs[index].c;
+                div.textContent = logs[index].t;
+                buffer.appendChild(div);
+                buffer.scrollTop = buffer.scrollHeight;
+                index++;
+                setTimeout(printLog, index === logs.length - 1 ? 2000 : 400);
+            }
         }
+
+        setInterval(() => {
+            document.getElementById('clock').textContent = new Date().toLocaleTimeString();
+        }, 1000);
+
+        setTimeout(printLog, 1000);
     </script>
 </body>
 </html>
