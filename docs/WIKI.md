@@ -25,6 +25,7 @@ SigmaOS uses industrial-grade optimizations to ensure bare-metal superiority:
 
 - **Fast VGA Scrolling**: Memory-block transfers for instantaneous screen updates.
 - **VMM Performance Shard**: Assembly-optimized `movsq` page duplication for zero-latency memory management.
+- **Kernel Hot-Patching**: Dynamic redirection of function calls for zero-downtime shard updates.
 - **Asynchronous IO**: Decoupled input handling to prevent kernel-wait states.
 
 ## 🧪 INDUSTRIAL VERIFICATION
