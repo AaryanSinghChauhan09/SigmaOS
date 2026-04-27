@@ -10,10 +10,11 @@ CFLAGS = -m64 -ffreestanding -O2 -Wall -Wextra -Iinclude -nostdlib -fno-stack-pr
 LDFLAGS = -T kernel/sigma.ld -m elf_x86_64
 
 # Modular Directories
-SRC_DIR = kernel
-DRV_DIR = kernel/drivers
-FS_DIR  = kernel/fs
-OBJ_DIR = obj
+SRC_DIR  = kernel
+CORE_DIR = kernel/core
+DRV_DIR  = kernel/drivers
+FS_DIR   = kernel/fs
+OBJ_DIR  = obj
 
 # Objects
 OBJS = $(OBJ_DIR)/main.o \
@@ -31,6 +32,10 @@ OBJS = $(OBJ_DIR)/main.o \
 all: sigmaos.bin
 
 $(OBJ_DIR)/%.o: $(SRC_DIR)/%.c
+	@mkdir -p $(OBJ_DIR)
+	$(CC) $(CFLAGS) -c $< -o $@
+
+$(OBJ_DIR)/%.o: $(CORE_DIR)/%.c
 	@mkdir -p $(OBJ_DIR)
 	$(CC) $(CFLAGS) -c $< -o $@
 

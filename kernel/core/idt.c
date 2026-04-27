@@ -5,7 +5,7 @@
  * Principles: Event-Driven Sovereignty.
  * =============================================================================
  */
-#include "../include/sigma_kernel_types.h"
+#include "../../include/sigma_kernel_types.h"
 
 typedef struct {
     u16 offset_low;
