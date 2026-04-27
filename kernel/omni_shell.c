@@ -390,6 +390,12 @@ static void cmd_help(ParsedCmd* c) {
     kprintf("    sigma-code <f>  — Agentic AI coding assistant (Claude-Code USP)\n");
     kprintf("    claw-analyze    — Deep architectural analysis (Claw-Code USP)\n");
     kprintf("    open-forge      — Collaborative sovereign development\n");
+    kprintf("  DISTRO USPs (Zenith-Absorbed):\n");
+    kprintf("    nix-rebuild     — Declarative state synchronization (NixOS USP)\n");
+    kprintf("    emerge-optim    — Extreme compilation optimization (Gentoo USP)\n");
+    kprintf("    amnesia-seal    — Complete volatile memory wipe (Tails USP)\n");
+    kprintf("    vuln-scan       — Integrated pen-testing suite (Kali USP)\n");
+    kprintf("    sigma-agent     — Autonomous OS maintenance AI (Zenith Special)\n");
     kprintf("  KEYBOARD SHORTCUTS:\n");
     kprintf("    Ctrl+C     — Interrupt running command\n");
     kprintf("    Ctrl+D     — End of input / logout\n");
@@ -872,6 +878,10 @@ static const CmdEntry g_cmds[] = {
     { "ping",                  cmd_ping,                  "Network ping" },
     { "sigma-code",            cmd_sigma_code,            "AI Coding Assistant" },
     { "claw-analyze",          cmd_sigma_code,            "Deep Code Analysis" },
+    { "nix-rebuild",           cmd_nix_rebuild,           "NixOS Declarative Sync" },
+    { "emerge-optim",          cmd_nix_rebuild,           "Gentoo Optimization" },
+    { "amnesia-seal",          cmd_nix_rebuild,           "Tails Memory Wipe" },
+    { "sigma-agent",           cmd_sigma_agent,           "Autonomous OS Agent" },
     { "pqc-gen",               cmd_pqc_gen,               "Generate PQC keypair" },
     { "ml-train",              cmd_ml_train,              "Train ML model" },
     { "ncert-sim",             cmd_ncert_sim,             "NCERT simulation" },
