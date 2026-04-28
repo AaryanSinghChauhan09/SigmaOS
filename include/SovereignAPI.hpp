@@ -15,8 +15,10 @@ namespace API {
  * polymorphic interfaces to core system services with zero-latency 
  * silicon-native bindings.
  */
-class SovereignAPI {
+class SovereignAPI : public SigmaObject {
 public:
+    const char* type_name() const noexcept override { return "SovereignAPI"; }
+
     // Core Lattice Primitives
     static void Log(const char* message);
     static void* AllocateShard(sigma_size_t size);
