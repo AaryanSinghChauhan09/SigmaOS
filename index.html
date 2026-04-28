@@ -3,102 +3,144 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Σ SIGMAOS: SOVEREIGN ZENITH PORTAL</title>
-    <style>
-        :root {
-            --bg: #050505;
-            --terminal: #00ff00;
-            --accent: #0088ff;
-            --glass: rgba(255, 255, 255, 0.05);
-        }
-        body {
-            margin: 0;
-            background: var(--bg);
-            color: var(--terminal);
-            font-family: 'Courier New', Courier, monospace;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            height: 100vh;
-            overflow: hidden;
-        }
-        #vga-buffer {
-            width: 800px;
-            height: 600px;
-            background: #000;
-            border: 2px solid #333;
-            box-shadow: 0 0 50px rgba(0, 136, 255, 0.2);
-            padding: 20px;
-            overflow-y: auto;
-            position: relative;
-            backdrop-filter: blur(10px);
-        }
-        .line { margin-bottom: 5px; opacity: 0; animation: fadeIn 0.1s forwards; }
-        @keyframes fadeIn { from { opacity: 0; transform: translateX(-10px); } to { opacity: 1; transform: translateX(0); } }
-        .success { color: #00ff00; font-weight: bold; }
-        .info { color: #0088ff; }
-        .warning { color: #ffff00; }
-        .panic { color: #ff0000; background: #200; font-weight: bold; padding: 2px; }
-        #status-bar {
-            width: 840px;
-            display: flex;
-            justify-content: space-between;
-            margin-top: 10px;
-            font-size: 12px;
-            color: #666;
-        }
-    </style>
+    <title>Σ SIGMAOS: SOVEREIGN ZENITH</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@200;400;600;800&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="zenith_desktop.css">
 </head>
 <body>
-    <h1 style="color: #fff; font-size: 18px; margin-bottom: 20px;">Σ SIGMAOS SOVEREIGN ZENITH v8.8</h1>
-    <div id="vga-buffer"></div>
-    <div id="status-bar">
-        <span>Lattice: 500 Shards</span>
-        <span>Mode: Sovereign Bare-Metal</span>
-        <span id="clock">00:00:00</span>
+    <div class="desktop-overlay"></div>
+
+    <!-- Central Clock -->
+    <div class="clock-container">
+        <div id="clock-time">00:00</div>
+        <div id="clock-date">Tuesday, April 28</div>
+    </div>
+
+    <!-- Notification Center / Kernel Logs -->
+    <div class="notification-center" id="kernel-logs">
+        <!-- Logs will be injected here -->
+    </div>
+
+    <!-- Widgets -->
+    <div class="widgets-container">
+        <div class="widget">
+            <div class="widget-title">
+                <span>Silicon Audit</span>
+                <span class="accent">16 Cores</span>
+            </div>
+            <div class="stat-value" id="cpu-load">12%</div>
+            <div class="stat-bar">
+                <div class="stat-progress" id="cpu-progress" style="width: 12%"></div>
+            </div>
+        </div>
+
+        <div class="widget">
+            <div class="widget-title">
+                <span>Memory Zenith</span>
+                <span class="accent">Slab Alloc</span>
+            </div>
+            <div class="stat-value" id="mem-load">4.2 GB</div>
+            <div class="stat-bar">
+                <div class="stat-progress" id="mem-progress" style="width: 25%"></div>
+            </div>
+        </div>
+
+        <div class="widget">
+            <div class="widget-title">
+                <span>Quantum Shield</span>
+                <span class="accent">PQC Active</span>
+            </div>
+            <div class="stat-value">SHIELDED</div>
+            <div style="font-size: 10px; color: var(--success); margin-top: 5px;">Entropy Level: Critical</div>
+        </div>
+    </div>
+
+    <!-- Desktop Icons -->
+    <div class="desktop-icons">
+        <div class="app-icon">
+            <div class="app-img">📚</div>
+            <div class="app-label">Scholar Zenith</div>
+        </div>
+        <div class="app-icon">
+            <div class="app-img">🛡️</div>
+            <div class="app-label">Lattice Security</div>
+        </div>
+        <div class="app-icon">
+            <div class="app-img">☁️</div>
+            <div class="app-label">Cloud Maestro</div>
+        </div>
+        <div class="app-icon">
+            <div class="app-img">⚙️</div>
+            <div class="app-label">Core Orchestrator</div>
+        </div>
+    </div>
+
+    <!-- Taskbar -->
+    <div class="taskbar">
+        <div class="task-icon active">Σ</div>
+        <div class="task-icon">📂</div>
+        <div class="task-icon">🌐</div>
+        <div class="task-icon">🧠</div>
+        <div class="task-icon">🔌</div>
+        <div style="width: 1px; height: 30px; background: var(--glass-border); margin: 0 10px;"></div>
+        <div class="task-icon">🔔</div>
+        <div class="task-icon">🔋</div>
     </div>
 
     <script>
-        const buffer = document.getElementById('vga-buffer');
+        // Update Clock
+        function updateClock() {
+            const now = new Date();
+            const time = now.toLocaleTimeString('en-US', { hour12: false, hour: '2-digit', minute: '2-digit' });
+            const date = now.toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric' });
+            document.getElementById('clock-time').textContent = time;
+            document.getElementById('clock-date').textContent = date;
+        }
+        setInterval(updateClock, 1000);
+        updateClock();
+
+        // Simulate Kernel Logs
+        const logContainer = document.getElementById('kernel-logs');
         const logs = [
-            { t: "Σ [BOOT]: Multiboot-2 Header Detected at 0x100000", c: "info" },
-            { t: "Σ [CORE]: Initializing Bitmap PMM (Physical Memory Manager)...", c: "info" },
-            { t: "Σ [CORE]: PMM OK. 32GB RAM mapped into 4KB pages.", c: "success" },
-            { t: "Σ [CORE]: Initializing Multi-Level Paging (VMM)...", c: "info" },
-            { t: "Σ [CORE]: VMM OK. High-Half Kernel mapped at 0xFFFFFFFF80000000.", c: "success" },
-            { t: "Σ [CORE]: Initializing Industrial GDT/IDT...", c: "info" },
-            { t: "Σ [CORE]: IDT OK. System traps active.", c: "success" },
-            { t: "Σ [ORCH]: Summoning Shard Lattice...", c: "info" },
-            { t: "Σ [ORCH]: Shard 'keyboard' summoned at 0x200000", c: "success" },
-            { t: "Σ [ORCH]: Shard 'vga' summoned at 0x300000", c: "success" },
-            { t: "Σ [ORCH]: Shard 'net_e1000' summoned at 0x400000", c: "success" },
-            { t: "Σ [SECURE]: Auditing Shard Signatures...", c: "info" },
-            { t: "Σ [SECURE]: All Shards VERIFIED (Chain-of-Trust).", c: "success" },
-            { t: "Σ [NET]: Intel NIC active. DHCP pulse broadcasted.", c: "info" },
-            { t: "Σ [UX]: Launching Zenith Shell v8.8...", c: "info" },
-            { t: "Σ [ZENITH]: Welcome to SigmaOS Sovereign Zenith.", c: "success" },
-            { t: "zenith_shell> _", c: "" }
+            { t: "Σ [BOOT]: Sovereign Lattice Online.", c: "" },
+            { t: "Σ [SECURE]: PQC Shard Initialized (Lattice-V5).", c: "success" },
+            { t: "Σ [NET]: Cloud Maestro projected to EU-WEST-1.", c: "" },
+            { t: "Σ [KERN]: Memory Slab Shard mapped (64MB).", c: "success" },
+            { t: "Σ [AUDIT]: CPU Silicon Discovery: 16 Zenith Cores.", c: "" },
+            { t: "Σ [VGA]: Direct Framebuffer Projector Online.", c: "success" },
+            { t: "Σ [ZENITH]: Desktop Environment Absorbed.", c: "success" }
         ];
 
-        let index = 0;
-        function printLog() {
-            if (index < logs.length) {
-                const div = document.createElement('div');
-                div.className = 'line ' + logs[index].c;
-                div.textContent = logs[index].t;
-                buffer.appendChild(div);
-                buffer.scrollTop = buffer.scrollHeight;
-                index++;
-                setTimeout(printLog, index === logs.length - 1 ? 2000 : 400);
-            }
+        function addLog(text, type) {
+            const div = document.createElement('div');
+            div.className = `log-item ${type}`;
+            div.textContent = text;
+            logContainer.prepend(div);
+            if (logContainer.children.length > 10) logContainer.lastChild.remove();
         }
 
-        setInterval(() => {
-            document.getElementById('clock').textContent = new Date().toLocaleTimeString();
-        }, 1000);
+        let logIdx = 0;
+        function cycleLogs() {
+            if (logIdx < logs.length) {
+                addLog(logs[logIdx].t, logs[logIdx].c);
+                logIdx++;
+                setTimeout(cycleLogs, 1000);
+            }
+        }
+        cycleLogs();
 
-        setTimeout(printLog, 1000);
+        // Simulate Hardware Stats
+        setInterval(() => {
+            const cpu = Math.floor(Math.random() * 15) + 5;
+            document.getElementById('cpu-load').textContent = cpu + "%";
+            document.getElementById('cpu-progress').style.width = cpu + "%";
+            
+            const mem = (Math.random() * 0.5 + 4.1).toFixed(1);
+            document.getElementById('mem-load').textContent = mem + " GB";
+            document.getElementById('mem-progress').style.width = (mem / 16 * 100) + "%";
+        }, 3000);
     </script>
 </body>
 </html>

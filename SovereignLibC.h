@@ -66,6 +66,8 @@ void*         sigma_memcpy(void* dest, const void* src, sigma_size_t n);
 int   sigma_streq(const char* s1, const char* s2);
 int   sigma_compare(const char* s1, const char* s2);
 void  sigma_strcat(char* dest, const char* src);
+void  sigma_strcpy(char* dest, const char* src);
+int   sigma_strcmp(const char* s1, const char* s2);
 int   sigma_atoi(const char* s);
 
 void  sigma_print(const char* str);

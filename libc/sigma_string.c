@@ -20,13 +20,27 @@ int sigma_streq(const char* s1, const char* s2) {
     return (s1[i] == s2[i]) ? SIGMA_TRUE : SIGMA_FALSE;
 }
 
-int sigma_compare(const char* s1, const char* s2) {
-    return sigma_streq(s1, s2);
-}
 
 void sigma_strcat(char* dest, const char* src) {
     char* rd = dest;
     while (*rd) rd++;
     while (*src) { *rd++ = *src++; }
     *rd = '\0';
+}
+
+void sigma_strcpy(char* dest, const char* src) {
+    while (*src) { *dest++ = *src++; }
+    *dest = '\0';
+}
+
+int sigma_strcmp(const char* s1, const char* s2) {
+    while (*s1 && (*s1 == *s2)) {
+        s1++;
+        s2++;
+    }
+    return *(unsigned char*)s1 - *(unsigned char*)s2;
+}
+
+int sigma_compare(const char* s1, const char* s2) {
+    return sigma_strcmp(s1, s2);
 }
