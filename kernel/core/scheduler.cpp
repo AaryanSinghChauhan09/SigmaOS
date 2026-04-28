@@ -29,7 +29,7 @@ void SovereignScheduler::Dispatch() {
     current->state = TaskState::RUNNING;
     current->cpu_time += 100; // Simulate quantum consumption
 
-    sigma_printf("[SCHED]: Context Switch -> %s\n", current->name);
+    sigma_printf("[SCHED]: Context Switch -> %s\n", current->name.c_str());
     
     // Simulate return to READY for next cycle
     current->state = TaskState::READY;
@@ -48,7 +48,7 @@ void SovereignScheduler::Audit() {
     sigma_printf("| Active Tasks   : %d\n", m_task_count);
     for(sigma_u32 i = 0; i < m_task_count; ++i) {
         sigma_printf("| Task [%d]: %-15s | Time: %llu ms\n", 
-            m_tasks[i]->id, m_tasks[i]->name, m_tasks[i]->cpu_time);
+            m_tasks[i]->id, m_tasks[i]->name.c_str(), m_tasks[i]->cpu_time);
     }
     sigma_printf("----------------------------------\n");
 }

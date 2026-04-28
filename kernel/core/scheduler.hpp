@@ -3,6 +3,7 @@
 
 #include "../../include/sigma_types.h"
 #include "../../include/SigmaOOP.hpp"
+#include "../../include/SovereignString.hpp"
 
 namespace SigmaOS {
 namespace Kernel {
@@ -17,7 +18,7 @@ enum class TaskState { READY, RUNNING, WAITING, TERMINATED };
 class SovereignTask : public SigmaObject {
 public:
     sigma_u32 id;
-    const char* name;
+    SigmaOS::Core::SovereignString name;
     TaskState state;
     sigma_u64 cpu_time;
     void (*entry_point)();

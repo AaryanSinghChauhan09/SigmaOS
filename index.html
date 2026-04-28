@@ -8,6 +8,20 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@200;400;600;800&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="zenith_desktop.css">
+    <script>
+        function toggleStart() {
+            const menu = document.getElementById('start-menu');
+            menu.classList.toggle('active');
+        }
+        function minimizeWindow(id) {
+            const win = document.getElementById(id);
+            win.style.display = 'none';
+        }
+        function closeWindow(id) {
+            const win = document.getElementById(id);
+            win.remove();
+        }
+    </script>
 </head>
 <body class="zenith-sovereign">
     <!-- Start Menu -->

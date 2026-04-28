@@ -407,7 +407,8 @@ body {
 .win-btn { width: 12px; height: 12px; border-radius: 50%; cursor: pointer; transition: filter 0.2s; }
 .win-btn.minimize { background: #ffbd2e; border: 1px solid rgba(0,0,0,0.1); }
 .win-btn.close { background: #ff5f56; border: 1px solid rgba(0,0,0,0.1); }
-.win-btn:hover { filter: brightness(1.2); }
+.win-btn:hover { filter: brightness(1.2); transform: scale(1.1); }
+.win-btn:active { transform: scale(0.9); }
 .start-content { padding: 15px; flex-grow: 1; }
 .start-section { margin-bottom: 20px; }
 .section-title { font-size: 11px; font-weight: 800; text-transform: uppercase; letter-spacing: 1px; color: var(--text-muted); margin-bottom: 10px; }
