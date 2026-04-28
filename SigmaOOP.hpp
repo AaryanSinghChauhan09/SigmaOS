@@ -36,13 +36,28 @@ public:
     virtual const char* type_name() const noexcept = 0;
 };
 
-// --- Low-Level Print Sharding ---
-inline void sigma_log(const char* msg) {
-    sigma_print("[SIGMA_LOG]: ");
-    sigma_print(msg);
-    sigma_print("\n");
+} // namespace SigmaOS
+
+/* Global overrides for zero-dependency C++ support */
+inline void* operator new(sigma_size_t size) {
+    return sigma_malloc(size);
 }
 
-} // namespace SigmaOS
+inline void* operator new[](sigma_size_t size) {
+    return sigma_malloc(size);
+}
+
+inline void operator delete(void* ptr) noexcept {
+    sigma_free(ptr);
+}
+
+inline void operator delete(void* ptr, sigma_size_t size) noexcept {
+    (void)size;
+    sigma_free(ptr);
+}
+
+inline void operator delete[](void* ptr) noexcept {
+    sigma_free(ptr);
+}
 
 #endif

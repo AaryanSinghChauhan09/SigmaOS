@@ -2,56 +2,15 @@
  * =========================================================================
  * Σ SIGMAOS: SOVEREIGN COSMIC GOVERNANCE (v1.0 - GALAXY POLICY)
  * =========================================================================
- * Mission: Establish governance policies for cosmic-scale computing nodes.
- * Capability: Ethics enforcement, cultural preservation, and resource law.
- * Principle: Absolute. Universal. Sovereign.
+ * Refactored into modular policies for industrial galactic order.
  * =========================================================================
  */
 
 #include "SovereignLibC.h"
 #include "SigmaOOP.hpp"
+#include "userland/apps/cosmic_governance/policies.hpp"
 
 using namespace SigmaOS;
-
-/**
- * Σ SIGMA OS: SOVEREIGN COSMIC GOVERNANCE SHARD
- * ==============================================
- * This shard enforces the high-level policy lattice for decentralized
- * SigmaOS nodes across multi-planetary and cosmic deployments.
- */
-
-class IGovernanceModule : public SigmaObject {
-public:
-    virtual void Enforce() = 0;
-    virtual const char* PolicyID() = 0;
-};
-
-class EthicalProtocolModule : public IGovernanceModule {
-public:
-    const char* type_name() const noexcept override { return "EthicalProtocolModule"; }
-    const char* PolicyID() override { return "ETHICS-X1"; }
-    void Enforce() override {
-        sigma_printf("[GOVERNANCE/ETHICS]: Enforcing non-destructive neural optimization protocols.\n");
-    }
-};
-
-class CulturalPreservationModule : public IGovernanceModule {
-public:
-    const char* type_name() const noexcept override { return "CulturalPreservationModule"; }
-    const char* PolicyID() override { return "CULTURE-V9"; }
-    void Enforce() override {
-        sigma_printf("[GOVERNANCE/CULTURE]: Protecting shard heritage and local linguistic markers.\n");
-    }
-};
-
-class CosmicResourceLawModule : public IGovernanceModule {
-public:
-    const char* type_name() const noexcept override { return "CosmicResourceLawModule"; }
-    const char* PolicyID() override { return "RESOURCE-LAW-Z"; }
-    void Enforce() override {
-        sigma_printf("[GOVERNANCE/RESOURCE]: Auditing entropy distribution across interstellar links.\n");
-    }
-};
 
 class SovereignCosmicGovernance {
 private:

@@ -58,3 +58,19 @@ Performs a cryptographic audit of a shard binary before activation.
 
 ### `rbac_check(u64 shard_id, bool_t net_req, bool_t fs_req)`
 Enforces zero-trust capability grants at the shard level.
+
+---
+
+## 💎 SOVEREIGN OOP FRAMEWORK (C++)
+
+SigmaOS supports high-level OOP sharding with zero standard library dependencies.
+
+### 🏛️ SIGMA OBJECT MODEL
+*   **`SigmaOS::SigmaObject`**: The base class for all sovereign shards. Provides a unified `type_name()` interface for neural synchronization.
+*   **Zero-Dependency `new` / `delete`**: The framework provides global overrides for `new` and `delete` that interface directly with the `sigma_malloc` and `sigma_free` shards.
+
+### 🧩 MODULAR SHARD CLUSTERS
+*   **Scholar Zenith**: Modular NCERT simulation shards for Physics, Chemistry, Biology, and Math.
+*   **Problem Solver**: Analytical solution shards for scholastic competitive advantage.
+*   **Collective Conscious**: Neural synchronization agents for mesh-level awareness.
+*   **Cosmic Governance**: Policy enforcement modules for interstellar deployment.
