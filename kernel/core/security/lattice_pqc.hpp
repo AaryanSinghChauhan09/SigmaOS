@@ -34,8 +34,8 @@ public:
     const char* type_name() const noexcept override { return "SovereignLatticePQC"; }
 
     void generate_sovereign_key();
-    void EncryptShard(const void* data, sigma_size_t size);
-    void Audit();
+    void encrypt_shard(const void* data, sigma_size_t size);
+    void audit();
 };
 
 } // namespace Security

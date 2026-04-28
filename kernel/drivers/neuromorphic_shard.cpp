@@ -1,7 +1,7 @@
-#include "neuromorphic_shard.hpp"
+#include "../../include/sigma_types.h"
 #include "../../include/SovereignLibC.h"
+#include "neuromorphic_shard.hpp"
 
-namespace SigmaOS {
 namespace Drivers {
 
 void NeuromorphicShard::IgniteLattice() {

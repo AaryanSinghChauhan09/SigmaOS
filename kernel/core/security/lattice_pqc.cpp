@@ -31,7 +31,7 @@ void SovereignLatticePQC::generate_sovereign_key() {
     sigma_printf("[PQC]: Sovereign Lattice Key Generated. ID: %llx\n", m_key_id);
 }
 
-void SovereignLatticePQC::EncryptShard(const void* data, sigma_size_t size) {
+void SovereignLatticePQC::encrypt_shard(const void* data, sigma_size_t size) {
     if (!m_shard.valid) generate_sovereign_key();
     
     sigma_printf("[PQC]: Encrypting Silicon Shard (%llu bytes) with Lattice-PQC...\n", size);
@@ -39,7 +39,7 @@ void SovereignLatticePQC::EncryptShard(const void* data, sigma_size_t size) {
     m_encryptions++;
 }
 
-void SovereignLatticePQC::Audit() {
+void SovereignLatticePQC::audit() {
     sigma_printf("\n--- Σ SOVEREIGN PQC AUDIT ---\n");
     sigma_printf("| Encryption Engine : LATTICE-RING-LWE\n");
     sigma_printf("| Key ID            : %llx\n", m_key_id);
