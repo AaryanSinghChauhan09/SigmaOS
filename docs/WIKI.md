@@ -102,4 +102,25 @@ SigmaOS is an open-governance silicon singularity. Developers can contribute to 
 
 ---
 
-*Σ SIGMAOS: Absolute Mastery. Silicon-Direct. Zero-Dependency. Contributable.*
+## 🌐 Global Shard Index
+
+The following core shards form the foundation of the Sovereign Lattice:
+- **`SovereignCore`**: The root orchestrator shard.
+- **`SovereignNetMesh`**: PQC-hardened distributed networking.
+- **`SovereignZenith`**: Morphic UI and hardware-accelerated graphics.
+- **`SovereignIDS`**: Real-time silicon anomaly detection.
+- **`SovereignLatticePQC`**: Quantum-resistant cryptographic nexus.
+
+## 🏆 Competitive Dominance Analysis
+
+| Feature | SigmaOS | Legacy OS (Linux/NT) | Competitor Shards |
+| :--- | :--- | :--- | :--- |
+| **Architecture** | 500-Shard Lattice | Monolithic/Hybrid | Experimental |
+| **Security** | Post-Quantum (PQC) | Pre-Quantum (AES/RSA) | Limited |
+| **Resilience** | Self-Healing Shadow Lattice | Manual Recovery | basic |
+| **AI Integration** | Silicon-Native TPU Shards | Userspace Libraries | N/A |
+| **Governance** | Sovereign Decentralized | Centralized Corporate | Community-only |
+
+---
+
+*Σ SIGMAOS: Absolute Mastery. Silicon-Direct. Zero-Dependency. Dominant.*

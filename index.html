@@ -1,12 +1,15 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Σ SIGMAOS: SOVEREIGN ZENITH</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@200;400;600;800&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
+    <link
+        href="https://fonts.googleapis.com/css2?family=Outfit:wght@200;400;600;800&family=JetBrains+Mono:wght@400;700&display=swap"
+        rel="stylesheet">
     <link rel="stylesheet" href="zenith_desktop.css">
     <script>
         function toggleStart() {
@@ -23,6 +26,7 @@
         }
     </script>
 </head>
+
 <body class="zenith-sovereign">
     <!-- Start Menu -->
     <div class="start-menu" id="start-menu">
@@ -84,8 +88,10 @@
         <div class="command-results" id="cmd-results">
             <div class="command-item" onclick="setTheme('cyan')"><span>Theme: Neon Cyan</span><kbd>Alt+1</kbd></div>
             <div class="command-item" onclick="setTheme('gold')"><span>Theme: Solar Gold</span><kbd>Alt+2</kbd></div>
-            <div class="command-item" onclick="setTheme('crimson')"><span>Theme: Crimson Shard</span><kbd>Alt+3</kbd></div>
-            <div class="command-item" onclick="addLog('Σ [AUTO]: Optimizing Shard Lattice...', 'success')"><span>Optimize Lattice</span><kbd>Alt+O</kbd></div>
+            <div class="command-item" onclick="setTheme('crimson')"><span>Theme: Crimson Shard</span><kbd>Alt+3</kbd>
+            </div>
+            <div class="command-item" onclick="addLog('Σ [AUTO]: Optimizing Shard Lattice...', 'success')">
+                <span>Optimize Lattice</span><kbd>Alt+O</kbd></div>
         </div>
     </div>
 
@@ -109,7 +115,8 @@
             </div>
             <div class="stat-value" id="cpu-load">12%</div>
             <svg viewBox="0 0 300 40" class="widget-graph">
-                <polyline id="cpu-graph" fill="none" stroke="var(--accent)" stroke-width="2" points="0,40 30,30 60,35 90,20 120,25 150,10 180,15 210,5 240,12 270,8 300,20" />
+                <polyline id="cpu-graph" fill="none" stroke="var(--accent)" stroke-width="2"
+                    points="0,40 30,30 60,35 90,20 120,25 150,10 180,15 210,5 240,12 270,8 300,20" />
             </svg>
             <div class="stat-bar">
                 <div class="stat-progress" id="cpu-progress"></div>
@@ -243,19 +250,6 @@
             <div class="stat-label">Glassmorphism: 2.0</div>
             <div class="stat-bar">
                 <div class="stat-progress ui" id="ui-progress"></div>
-            </div>
-        </div>
-        
-        <!-- Orchestration Nexus -->
-        <div class="widget">
-            <div class="widget-title">
-                <span>Orchestration Nexus</span>
-                <span class="accent">Lattice Sync</span>
-            </div>
-            <div class="stat-value" id="orch-status">SYNCED</div>
-            <div class="orch-controls">
-                <button class="orch-btn" onclick="toggleStart()">📦 Container</button>
-                <button class="orch-btn" onclick="toggleStart()">☁️ VM Nexus</button>
             </div>
         </div>
 
@@ -408,7 +402,11 @@
                 <span class="accent" id="voice-status">Idle</span>
             </div>
             <div class="voice-wave" id="voice-wave">
-                <div class="wave-bar"></div><div class="wave-bar"></div><div class="wave-bar"></div><div class="wave-bar"></div><div class="wave-bar"></div>
+                <div class="wave-bar"></div>
+                <div class="wave-bar"></div>
+                <div class="wave-bar"></div>
+                <div class="wave-bar"></div>
+                <div class="wave-bar"></div>
             </div>
             <div class="stat-label">Wake-Key: Caps Lock</div>
         </div>
@@ -478,7 +476,7 @@
         // Command Palette Logic
         const cmdPalette = document.getElementById('cmd-palette');
         const cmdInput = document.getElementById('cmd-input');
-        
+
         window.addEventListener('keydown', (e) => {
             if ((e.metaKey || e.ctrlKey) && e.key === 'k') {
                 e.preventDefault();
@@ -497,7 +495,7 @@
         // SVG Graph Logic
         const cpuGraph = document.getElementById('cpu-graph');
         const points = [40, 40, 40, 40, 40, 40, 40, 40, 40, 40, 40];
-        
+
         function updateGraph(val) {
             points.shift();
             points.push(40 - (val / 100 * 40));
@@ -569,11 +567,11 @@
             document.getElementById('cpu-load').textContent = cpu + "%";
             document.getElementById('cpu-progress').style.width = cpu + "%";
             updateGraph(cpu);
-            
+
             const mem = (Math.random() * 0.5 + 4.1).toFixed(1);
             document.getElementById('mem-load').textContent = (4.0 + Math.random() * 0.5).toFixed(1) + " GB";
             document.getElementById('mem-progress').style.width = (40 + Math.random() * 5) + "%";
-            
+
             const cacheHit = (99.0 + Math.random() * 0.9).toFixed(1);
             document.getElementById('cache-hit').textContent = cacheHit + "% Hit";
             document.getElementById('cache-progress').style.width = cacheHit + "%";
@@ -583,7 +581,7 @@
                 document.getElementById('voice-status').textContent = "Listening...";
                 document.getElementById('voice-status').style.color = "var(--success)";
                 addLog("Σ [VOICE]: Wake-word 'Sigma' detected. Listening...", "success");
-                
+
                 setTimeout(() => {
                     document.getElementById('voice-status').textContent = "Processing";
                     document.getElementById('voice-status').style.color = "var(--accent)";
@@ -605,7 +603,7 @@
                 document.getElementById('vault-status').textContent = "Syncing";
                 document.getElementById('vault-status').style.color = "var(--accent)";
                 addLog("Σ [STORAGE]: Synchronizing state with decentralized lattice...", "success");
-                
+
                 setTimeout(() => {
                     document.getElementById('vault-status').textContent = "Pinned";
                     document.getElementById('vault-status').style.color = "var(--text-muted)";
@@ -681,7 +679,7 @@
                 document.getElementById('legal-status').textContent = "AUDITING";
                 document.getElementById('legal-status').style.color = "var(--accent)";
                 addLog("Σ [LEGAL]: Performing BNSS/BNS/BSA silicon-to-statute audit...", "success");
-                
+
                 setTimeout(() => {
                     document.getElementById('legal-status').textContent = "Compliant";
                     document.getElementById('legal-status').style.color = "var(--success)";
@@ -711,7 +709,7 @@
                 document.getElementById('test-status').textContent = "Auditing";
                 document.getElementById('test-status').style.color = "var(--accent)";
                 addLog("Σ [AUDIT]: Running 500-shard integrity verification...", "success");
-                
+
                 setTimeout(() => {
                     document.getElementById('test-status').textContent = "Verified";
                     document.getElementById('test-status').style.color = "var(--success)";
@@ -721,7 +719,7 @@
             document.getElementById('test-progress').style.width = "100%";
 
             // Entropy Simulation
-            const entropyHex = Array.from({length: 4}, () => Math.floor(Math.random() * 256).toString(16).padStart(2, '0')).join('').toUpperCase();
+            const entropyHex = Array.from({ length: 4 }, () => Math.floor(Math.random() * 256).toString(16).padStart(2, '0')).join('').toUpperCase();
             document.getElementById('entropy-val').textContent = `0x${entropyHex}...`;
             document.getElementById('entropy-progress').style.width = (85 + Math.random() * 15) + "%";
 
@@ -731,7 +729,7 @@
             document.getElementById('healing-info').textContent = `Last Audit: ${auditTime}ms ago`;
             const healingProgress = Math.floor(Math.random() * 20) + 80;
             document.getElementById('healing-progress').style.width = healingProgress + "%";
-            
+
             if (Math.random() > 0.95) {
                 document.getElementById('healing-status').textContent = "RESTORING";
                 document.getElementById('healing-status').style.color = "var(--error)";
@@ -783,13 +781,13 @@
                     dot.classList.toggle('active');
                 }
             });
-            
+
             if (Math.random() > 0.99) {
                 const faultIdx = Math.floor(Math.random() * 500);
                 dots[faultIdx].classList.add('error');
                 document.getElementById('shard-status').textContent = "Integrity: 99.8% (Fault Detected)";
                 document.getElementById('shard-status').style.color = "var(--error)";
-                
+
                 setTimeout(() => {
                     dots[faultIdx].classList.remove('error');
                     dots[faultIdx].classList.add('healing');
@@ -809,4 +807,5 @@
         }
     </script>
 </body>
+
 </html>
