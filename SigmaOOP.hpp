@@ -58,9 +58,34 @@ public:
     const char* c_str() const { return m_data; }
 };
 
+// --- Sovereign Map Shard ---
+template<typename K, typename V>
+class SigmaMap {
+private:
+    K m_keys[64];
+    V m_values[64];
+    sigma_size_t m_size;
+public:
+    SigmaMap() : m_size(0) {}
+    void insert(const K& key, const V& value) {
+        if (m_size < 64) {
+            m_keys[m_size] = key;
+            m_values[m_size] = value;
+            m_size++;
+        }
+    }
+    sigma_size_t size() const { return m_size; }
+    const K& key_at(sigma_size_t index) const { return m_keys[index]; }
+    const V* at_index(sigma_size_t index) const { return &m_values[index]; }
+};
+
 #if defined(__x86_64__) || defined(_M_X64)
     #define SIGMA_ARCH_X86_64
 #endif
+
+extern "C" {
+    int sigma_snprintf(char* str, sigma_size_t size, const char* format, ...);
+}
 
 } // namespace SigmaOS
 

@@ -107,3 +107,39 @@ void sigma_printf(const char* format, ...) {
     }
     va_end(args);
 }
+
+int sigma_snprintf(char* str, sigma_size_t size, const char* format, ...) {
+    if (!str || size == 0) return 0;
+    va_list args;
+    va_start(args, format);
+    sigma_size_t written = 0;
+    for (const char* p = format; *p != '\0' && written < size - 1; p++) {
+        if (*p == '%' && *(p + 1) != '\0') {
+            p++;
+            if (*p == 's') {
+                const char* s = va_arg(args, const char*);
+                while (*s && written < size - 1) str[written++] = *s++;
+            } else if (*p == 'd') {
+                int v = va_arg(args, int);
+                if (v < 0) {
+                    if (written < size - 1) str[written++] = '-';
+                    v = -v;
+                }
+                char buf[16];
+                int i = 0;
+                if (v == 0) buf[i++] = '0';
+                else {
+                    while (v > 0) { buf[i++] = (char)((v % 10) + '0'); v /= 10; }
+                }
+                for (int j = i - 1; j >= 0 && written < size - 1; j--) str[written++] = buf[j];
+            } else {
+                str[written++] = *p;
+            }
+        } else {
+            str[written++] = *p;
+        }
+    }
+    str[written] = '\0';
+    va_end(args);
+    return (int)written;
+}
