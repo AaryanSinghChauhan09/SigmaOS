@@ -88,24 +88,24 @@ extern "C" {
 } // namespace SigmaOS
 
 /* Global overrides for zero-dependency C++ support */
-void* operator new(sigma_size_t size) {
+inline void* operator new(sigma_size_t size) {
     return sigma_malloc(size);
 }
 
-void* operator new[](sigma_size_t size) {
+inline void* operator new[](sigma_size_t size) {
     return sigma_malloc(size);
 }
 
-void operator delete(void* ptr) noexcept {
+inline void operator delete(void* ptr) noexcept {
     sigma_free(ptr);
 }
 
-void operator delete(void* ptr, sigma_size_t size) noexcept {
+inline void operator delete(void* ptr, sigma_size_t size) noexcept {
     (void)size;
     sigma_free(ptr);
 }
 
-void operator delete[](void* ptr) noexcept {
+inline void operator delete[](void* ptr) noexcept {
     sigma_free(ptr);
 }
 

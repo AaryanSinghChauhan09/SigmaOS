@@ -1,5 +1,4 @@
 #include "SovereignLibC.h"
-#include "../include/sigma_types.h"
 
 #ifndef va_list
 #define va_list __builtin_va_list

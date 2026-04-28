@@ -9,18 +9,21 @@ This document provides a comprehensive technical reference for the **SigmaOS Mic
 The Sovereign LibC is a modular, zero-dependency implementation of essential C primitives, optimized for direct hardware interaction and memory sharding.
 
 ### 📡 I/O PRIMITIVES
-*   `sigma_printf(const char* format, ...)`: Industrial-grade formatted output with support for `%s`, `%d`, `%u`, `%llu`, `%llx`, `%p`, and improved `%f` (bare-metal float handling).
-*   `sigma_print(const char* str)`: Direct syscall-backed string print.
-*   `sigma_log(const char* msg)`: Labeled system logging shard.
+
+* `sigma_printf(const char* format, ...)`: Industrial-grade formatted output with support for `%s`, `%d`, `%u`, `%llu`, `%llx`, `%p`, and improved `%f` (bare-metal float handling).
+* `sigma_print(const char* str)`: Direct syscall-backed string print.
+* `sigma_log(const char* msg)`: Labeled system logging shard.
 
 ### 🧵 STRING PRIMITIVES
-*   `sigma_strlen(const char* s)`: ASM-optimized string length calculation.
-*   `sigma_streq(const char* s1, const char* s2)`: Sovereign string equality check.
-*   `sigma_atoi(const char* s)`: String to integer conversion shard.
+
+* `sigma_strlen(const char* s)`: ASM-optimized string length calculation.
+* `sigma_streq(const char* s1, const char* s2)`: Sovereign string equality check.
+* `sigma_atoi(const char* s)`: String to integer conversion shard.
 
 ### 🧠 MEMORY MANAGEMENT
-*   `sigma_malloc(sigma_size_t size)`: Bump-pointer slab allocator (128 MB default shard).
-*   `sigma_free(void* ptr)`: Per-process shard cleanup (no-op by design for speed).
+
+* `sigma_malloc(sigma_size_t size)`: Bump-pointer slab allocator (128 MB default shard).
+* `sigma_free(void* ptr)`: Per-process shard cleanup (no-op by design for speed).
 
 ---
 
