@@ -20,7 +20,7 @@ public:
     sigma_bool is_directory;
 
     ShardNode(const char* _name, sigma_bool _is_dir) 
-        : name(_name), size(0), data(SIGMA_NULL), is_directory(_is_dir) {}
+        : name(_name), size(0), data((sigma_u8*)SIGMA_NULL), is_directory(_is_dir) {}
 
     const char* type_name() const noexcept override { return "ShardNode"; }
 };

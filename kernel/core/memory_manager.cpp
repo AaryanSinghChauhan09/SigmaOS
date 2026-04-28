@@ -4,7 +4,7 @@
 namespace SigmaOS {
 namespace Kernel {
 
-SovereignMemoryManager::SovereignMemoryManager() : m_pool(SIGMA_NULL), m_used(0), m_segment_count(0) {
+SovereignMemoryManager::SovereignMemoryManager() : m_pool(reinterpret_cast<sigma_u8*>(SIGMA_NULL)), m_used(0), m_segment_count(0) {
     // Industrial Slab Initialization
     m_pool = (sigma_u8*)sigma_malloc(INITIAL_POOL_SIZE);
     if (m_pool) {
