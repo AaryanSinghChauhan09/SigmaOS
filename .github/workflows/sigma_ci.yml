@@ -1,0 +1,65 @@
+name: Σ SIGMAOS SOVEREIGN CI
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  forge:
+    name: Shard Forge (Build)
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v4
+    
+    - name: Install Industrial Toolchain
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y nasm gcc-multilib g++-multilib make
+        
+    - name: Build Sovereign Kernel (x86_64)
+      run: make zenith_x86_64
+      
+    - name: Build Sovereign Shards
+      run: make shards
+
+  sentinel:
+    name: Shard Sentinel (Audit)
+    runs-on: ubuntu-latest
+    permissions:
+      security-events: write
+    steps:
+    - uses: actions/checkout@v4
+    
+    - name: Initialize CodeQL
+      uses: github/codeql-action/init@v3
+      with:
+        languages: c-cpp
+        
+    - name: Run Modularity Sentinel
+      run: python3 scripts/check_modularity.py
+        
+    - name: Run Clang-Tidy Static Analysis
+      run: |
+        # Run clang-tidy on core directories
+        clang-tidy kernel/*.c drivers/*.cpp -- -Iinclude
+        
+    - name: Build for Audit
+      run: make audit_build
+      
+    - name: Perform CodeQL Analysis
+      uses: github/codeql-action/analyze@v3
+
+  nexus:
+    name: Package Nexus (Deploy)
+    needs: [forge, sentinel]
+    if: github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v4
+    
+    - name: Sync Wiki Documentation
+      run: |
+        echo "Syncing documentation shards to Wiki Nexus..."
+        # In a real environment, this would push docs/ to the wiki repository

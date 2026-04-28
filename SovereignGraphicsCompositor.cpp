@@ -1,18 +1,28 @@
 /*
  * =========================================================================
- * Σ SIGMAOS: SOVEREIGN GRAPHICS COMPOSITOR (v3.0 - RAW SILICON)
+ * Σ SIGMAOS: SOVEREIGN GRAPHICS COMPOSITOR (v21.0)
  * =========================================================================
- * Refactored into modular graphics shards for industrial rendering dominance.
+ * Refactored into modular graphics shards for high-performance visualization.
  * =========================================================================
  */
 
 #include "kernel/drivers/graphics/compositor.hpp"
+#include "kernel/drivers/graphics/widget_orchestrator.hpp"
+
+extern "C" void _start(void) {
+    SigmaOS::Graphics::SovereignGraphicsCompositor compositor;
+    SigmaOS::Graphics::SovereignWidgetOrchestrator widgets;
+
+    compositor.CommitFrameShard("DESKTOP_MAIN", "0xFF00FF");
+    compositor.ExecuteAlphaBlend("NOTIFICATION_LAYER");
+    
+    widgets.ProjectToZenithUI();
+    
+    sigma_exit(0);
+}
 
 int main() {
-    SigmaOS::Graphics::SovereignGraphicsCompositor graphics;
-    graphics.ExecuteAlphaBlend("ZENITH_MINIMAP");
-    graphics.CommitFrameShard("SIGMA_DASHBOARD", "RAW_BITSTREAM_V3");
-    
-    sigma_printf("\n[SUCCESS]: Competitive Graphics Compositor Online. Absolute Frame Sovereignty achieved.\n");
+    sigma_printf("[SIGMA_GRAPHICS]: Initiating Sovereign Compositor Nexus...\n");
+    _start();
     return 0;
 }
