@@ -1,6 +1,6 @@
 /*
  * =============================================================================
- * Σ SIGMAOS KERNEL: SOVEREIGN-FORENSICS-SHARD (v1.0 - DIGITAL FORENSICS)
+ * Î£ SIGMAOS KERNEL: SOVEREIGN-FORENSICS-SHARD (v1.0 - DIGITAL FORENSICS)
  * =============================================================================
  * Algorithm: Bit-Perfect Artifact Carving (BPAC)
  * Principles:
@@ -11,11 +11,11 @@
  * =============================================================================
  */
 
-#include "../include/sigma_kernel_types.h"
+#include "../../include/sigma_kernel_types.h"
 
 typedef struct ForensicReport {
-    u32  artifacts_found;
-    u64  last_dump_addr;
+    sigma_u32  artifacts_found;
+    sigma_u64  last_dump_addr;
 } ForensicReport;
 
 /* =========================================================================
@@ -26,7 +26,7 @@ void forensics_init(void) {
     // kprintf("[FORENSICS]: Sovereign Digital-Forensics Shard Online.\n");
 }
 
-k_status forensics_sharded_dump(u64 start_addr, usize size) {
+sigma_status forensics_sharded_dump(sigma_u64 start_addr, sigma_usize size) {
     /* 
      * Absorb Forensic Science USP: Bit-Perfect Imaging.
      * In a sharded model: dump sharded memory states with silicon-direct pulses.
@@ -35,7 +35,7 @@ k_status forensics_sharded_dump(u64 start_addr, usize size) {
     return K_OK;
 }
 
-k_status forensics_carve_artifact(const char* signature) {
+sigma_status forensics_carve_artifact(const char* signature) {
     /* 
      * Absorb Forensic Science USP: Bitstream Carving.
      * Search sharded bitstreams for industrial artifact signatures.

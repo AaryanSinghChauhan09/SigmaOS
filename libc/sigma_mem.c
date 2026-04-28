@@ -1,4 +1,4 @@
-#include "SovereignLibC.h"
+#include "../include/SovereignLibC.h"
 
 static void*       g_heap_start = SIGMA_NULL;
 static sigma_size_t g_heap_used  = 0;
@@ -10,7 +10,7 @@ void* sigma_slab_alloc_raw(sigma_size_t size) {
         g_heap_start = sigma_mmap(SIGMA_NULL, SIGMA_HEAP_SIZE, 3, 0x22, -1, 0);
     }
     if (g_heap_used + size > SIGMA_HEAP_SIZE) return SIGMA_NULL;
-    void* ptr = (sigma_u8*)g_heap_start + g_heap_used;
+    void* ptr = (void*)((sigma_u8*)g_heap_start + g_heap_used);
     g_heap_used += size;
     return ptr;
 }

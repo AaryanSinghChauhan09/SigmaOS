@@ -1,6 +1,6 @@
 /*
  * =============================================================================
- * Σ SIGMAOS KERNEL: QUANTUM RCU (v1.0 - LOCK-FREE SYNC)
+ * Î£ SIGMAOS KERNEL: QUANTUM RCU (v1.0 - LOCK-FREE SYNC)
  * =============================================================================
  * Algorithm: Read-Copy-Update (RCU) - Zero-overhead Read Scaling.
  * Principles:
@@ -11,9 +11,9 @@
  * =============================================================================
  */
 
-#include "../include/sigma_kernel_types.h"
+#include "../../include/sigma_kernel_types.h"
 
-extern vaddr_t vmalloc(u64 npages);
+extern sigma_vaddr_t vmalloc(sigma_u64 npages);
 
 #define MAX_RCU_CALLBACKS 1024
 
@@ -24,10 +24,10 @@ typedef struct RCUCallback {
 } RCUCallback;
 
 typedef struct SigmaRCU {
-    _Atomic u64 grace_period_start;
-    _Atomic u64 quiescent_mask;
+    _Atomic sigma_u64 grace_period_start;
+    _Atomic sigma_u64 quiescent_mask;
     RCUCallback* pending_reclaim;
-    u64 last_tick;
+    sigma_u64 last_tick;
 } SigmaRCU;
 
 static SigmaRCU g_rcu;
@@ -56,7 +56,7 @@ void rcu_call(void* ptr, void (*reclaim)(void*)) {
 }
 
 /* --- The Grace Period Synchronization --- */
-void rcu_on_quiescent_state(u32 cpu_id) {
+void rcu_on_quiescent_state(sigma_u32 cpu_id) {
     // Current bit-mask of CPUs that passed a context switch
     g_rcu.quiescent_mask |= (1ULL << cpu_id);
     
@@ -70,7 +70,7 @@ void rcu_on_quiescent_state(u32 cpu_id) {
             // vfree(curr); // placeholder deallocation
             curr = next;
         }
-        g_rcu.pending_reclaim = NULL;
+        g_rcu.pending_reclaim = SIGMA_NULL;
         g_rcu.quiescent_mask = 0;
         // kprintf("[RCU]: Grace Period Complete. All objects reclaimed.\n");
     }
@@ -79,6 +79,6 @@ void rcu_on_quiescent_state(u32 cpu_id) {
 void rcu_init_core(void) {
     g_rcu.grace_period_start = 0;
     g_rcu.quiescent_mask = 0;
-    g_rcu.pending_reclaim = NULL;
+    g_rcu.pending_reclaim = SIGMA_NULL;
     // kprintf("[RCU]: Quantum RCU Lock-Free Sync Layer Online.\n");
 }

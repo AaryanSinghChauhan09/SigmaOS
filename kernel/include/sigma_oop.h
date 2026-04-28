@@ -1,6 +1,6 @@
 /*
  * =============================================================================
- * Σ SIGMAOS KERNEL: SOVEREIGN-OOP (v1.0)
+ * Î£ SIGMAOS KERNEL: SOVEREIGN-OOP (v1.0)
  * =============================================================================
  * Principles: Encapsulation, Polymorphism, and Abstraction in Pure C.
  * =============================================================================
@@ -11,11 +11,11 @@
 #include "../../include/sigma_kernel_types.h"
 
 typedef struct SovereignObject {
-    u32     id;
-    u32     type;
+    sigma_u32     id;
+    sigma_u32     type;
     void    (*init)(struct SovereignObject* self);
     void    (*destroy)(struct SovereignObject* self);
-    char    (*to_string)(struct SovereignObject* self, char* buf, u32 len);
+    char    (*to_string)(struct SovereignObject* self, char* buf, sigma_u32 len);
 } SovereignObject;
 
 /* Macro for simple inheritance */

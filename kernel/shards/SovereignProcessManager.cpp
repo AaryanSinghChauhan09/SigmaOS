@@ -1,6 +1,6 @@
 /*
  * =========================================================================
- * Σ SIGMAOS: SOVEREIGN PROCESS MANAGER (v25.0 - SOLID FINALITY)
+ * Î£ SIGMAOS: SOVEREIGN PROCESS MANAGER (v25.0 - SOLID FINALITY)
  * =========================================================================
  * Mission: Absolute Process Sovereignty. Virtualization & Containerization.
  * Principles: SOLID (Single Responsibility, Open/Closed, Dependency Inv).
@@ -9,7 +9,7 @@
  * =========================================================================
  */
 
-#include "SigmaOOP.hpp"
+#include "../../include/SigmaOOP.hpp"
 
 namespace SigmaOS {
 namespace Kernel {
@@ -106,7 +106,7 @@ public:
     }
 
     void audit() {
-        sigma_print("\n--- Σ SOVEREIGN PROCESS AUDIT (v25.0) ---\n");
+        sigma_print("\n--- Î£ SOVEREIGN PROCESS AUDIT (v25.0) ---\n");
         sigma_print("| Active Shards  : "); sigma_print_num(m_active_count); sigma_print("\n");
         sigma_print("| Virtualization : [VT-x/SVM SHARDED ACTIVE]\n");
         sigma_print("| Isolation      : [CAPABILITY-BASED]\n");

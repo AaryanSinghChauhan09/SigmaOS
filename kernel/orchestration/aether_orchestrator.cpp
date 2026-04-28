@@ -45,7 +45,7 @@ void SovereignAetherOrchestrator::pulse_silicon_events() {
 }
 
 void SovereignAetherOrchestrator::audit() {
-    sigma_print("\n--- Σ SOVEREIGN AUTOMATION AUDIT (v94.0) ---\n");
+    sigma_print("\n--- Î£ SOVEREIGN AUTOMATION AUDIT (v94.0) ---\n");
     sigma_print("--------------------------------------------\n");
     sigma_print("[ABSORBED]: AI Orchestrator v2.0 Platform Support.\n");
     sigma_print("[ABSORBED]: Spectrum AI Terminal v18 Neural Logic.\n");

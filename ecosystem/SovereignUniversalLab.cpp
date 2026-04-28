@@ -1,6 +1,7 @@
+#include "../include/SovereignLibC.h"
 /*
  * =========================================================================
- * Σ SIGMAOS: SOVEREIGN ZENITH (v15.0 - ABSOLUTE FINALITY)
+ * Î£ SIGMAOS: SOVEREIGN ZENITH (v15.0 - ABSOLUTE FINALITY)
  * =========================================================================
  * Author: Sovereign-Zenith-Developer
  * Principles: Zero-Library, Bit-Perfect, Silicon-Integrity, USP-Absorbed.
@@ -13,7 +14,7 @@
 
 
 /**
- * Σ SIGMA OS: SOVEREIGN UNIVERSAL LAB (v128.0 - MASTER LABORATORY)
+ * Î£ SIGMA OS: SOVEREIGN UNIVERSAL LAB (v128.0 - MASTER LABORATORY)
  * ===============================================================
  * USP: Exhaustive "Every Experiment" Repository for NCERT (1-12).
  * Capability: Thermal Expansion, Capacitance, Faraday's Law, Matrix Determinants.

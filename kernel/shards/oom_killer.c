@@ -1,6 +1,6 @@
 /*
  * =============================================================================
- * Σ SIGMAOS KERNEL: SOVEREIGN-OOM-KILLER (v1.0 - INDUSTRIAL DISCIPLINE)
+ * Î£ SIGMAOS KERNEL: SOVEREIGN-OOM-KILLER (v1.0 - INDUSTRIAL DISCIPLINE)
  * =============================================================================
  * Algorithm: Shard Badness Score (SBS)
  * Principles:
@@ -11,11 +11,11 @@
  * =============================================================================
  */
 
-#include "../include/sigma_kernel_types.h"
+#include "../../include/sigma_kernel_types.h"
 
 typedef struct OOMMaster {
-    u32 total_pills;
-    u32 killed_shards;
+    sigma_u32 total_pills;
+    sigma_u32 killed_shards;
 } OOMMaster;
 
 /* =========================================================================
@@ -26,7 +26,7 @@ void oom_killer_init(void) {
     // kprintf("[OOM-KILLER]: Sovereign Shard-Discipline Engine Online.\n");
 }
 
-k_status oom_execute_industrial_sweep(void) {
+sigma_status oom_execute_industrial_sweep(void) {
     /* 
      * Absorb Linux OOM-Killer USP: SBS (Shard Badness Score).
      * Select the most memory-abusive shard and reclaim its silicon life.

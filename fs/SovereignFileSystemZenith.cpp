@@ -1,6 +1,6 @@
 /*
  * =========================================================================
- * Σ SIGMAOS: SOVEREIGN ZENITH (v15.0 - ABSOLUTE FINALITY)
+ * Î£ SIGMAOS: SOVEREIGN ZENITH (v15.0 - ABSOLUTE FINALITY)
  * =========================================================================
  * Author: Sovereign-Zenith-Developer
  * Principles: Zero-Library, Bit-Perfect, Silicon-Integrity, USP-Absorbed.
@@ -9,7 +9,7 @@
 
 /*
  * =========================================================================
- * Σ SIGMAOS: SOVEREIGN VFS ZENITH (v10.0 - ZERO-DEPENDENCY)
+ * Î£ SIGMAOS: SOVEREIGN VFS ZENITH (v10.0 - ZERO-DEPENDENCY)
  * =========================================================================
  * Mission: Absolute Storage Sovereignty via In-Memory Peer-Sharded VFS.
  * Principles: 
@@ -19,7 +19,7 @@
  * =========================================================================
  */
 
-#include "SigmaOOP.hpp"
+#include "../include/SigmaOOP.hpp"
 
 namespace SigmaOS {
 namespace Storage {
@@ -59,7 +59,7 @@ public:
     }
 
     void list_files() {
-        sigma_print("\n--- Σ SOVEREIGN VFS LISTING ---\n");
+        sigma_print("\n--- Î£ SOVEREIGN VFS LISTING ---\n");
         for (unsigned long i = 0; i < m_node_count; i++) {
             sigma_print("| NATIVE SHARD: ");
             sigma_print(m_nodes[i].name);

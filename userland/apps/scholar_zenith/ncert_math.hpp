@@ -1,6 +1,8 @@
 #ifndef NCERT_MATH_HPP
 #define NCERT_MATH_HPP
 
+#include "../../../include/SovereignLibC.h"
+
 #include "ncert_base.hpp"
 
 class MatrixSim : public INCERTSim {

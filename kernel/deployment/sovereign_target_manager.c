@@ -1,6 +1,6 @@
 /*
  * =============================================================================
- * Σ SIGMAOS KERNEL: SOVEREIGN-TARGET-MANAGER (Multi-Platform Parity)
+ * Î£ SIGMAOS KERNEL: SOVEREIGN-TARGET-MANAGER (Multi-Platform Parity)
  * =============================================================================
  * Algorithm: Adaptive Runtime Detection (ARD)
  * Platforms:

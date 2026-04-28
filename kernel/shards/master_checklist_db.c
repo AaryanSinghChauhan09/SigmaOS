@@ -1,6 +1,6 @@
 /*
  * =============================================================================
- * Σ SIGMAOS KERNEL: SOVEREIGN-MASTER-CHECKLIST-DATABASE (v14.0 - EDUCATIONAL)
+ * Î£ SIGMAOS KERNEL: SOVEREIGN-MASTER-CHECKLIST-DATABASE (v14.0 - EDUCATIONAL)
  * =============================================================================
  * Algorithm: Sovereign Universal Educational Mastery (SUEM)
  * Content: 100,000+ Case/Tutorial Shards (W3S, GFG, FCC, MDN, TutorialsPoint)
@@ -13,7 +13,7 @@
  * =============================================================================
  */
 
-#include "../include/sigma_kernel_types.h"
+#include "../../include/sigma_kernel_types.h"
 
 #define TOTAL_DOMAINS 262144
 #define MAX_TUTORIAL_STEPS 2048
@@ -22,17 +22,17 @@ typedef struct TutorialStep {
     char        source_site[32];
     char        topic_name[64];
     char        tutorial_logic[256];
-    u32         educational_integrity;
+    sigma_u32         educational_integrity;
 } TutorialStep;
 
 typedef struct EducationShard {
     char        category_name[32];
-    u32         tutorial_count;
+    sigma_u32         tutorial_count;
     TutorialStep steps[MAX_TUTORIAL_STEPS];
 } EducationShard;
 
 static EducationShard g_edu_universe[TOTAL_DOMAINS];
-static u32 g_edu_shard_count = 0;
+static sigma_u32 g_edu_shard_count = 0;
 
 /* =========================================================================
  * EDUCATIONAL Engine (Educational Site Absorption & Offline Auto-Sync)
@@ -51,7 +51,7 @@ void education_master_init(void) {
     // kprintf("[EDUCATION-MASTER]: Educational Mastery Shards (100,000+ Precedents Online).\n");
 }
 
-k_status education_query(const char* edu_query_str) {
+sigma_status education_query(const char* edu_query_str) {
     /* Search silicon shards for the requested educational tutorial or logic. */
     // kprintf("[EDUCATION-MASTER]: Edu Pulse: Querying universe for '%s' tutorial...\n", edu_query_str);
     return K_OK;

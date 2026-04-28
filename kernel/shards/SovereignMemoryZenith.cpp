@@ -1,6 +1,6 @@
 /*
  * =========================================================================
- * Σ SIGMAOS: SOVEREIGN ZENITH (v15.0 - ABSOLUTE FINALITY)
+ * Î£ SIGMAOS: SOVEREIGN ZENITH (v15.0 - ABSOLUTE FINALITY)
  * =========================================================================
  * Author: Sovereign-Zenith-Developer
  * Principles: Zero-Library, Bit-Perfect, Silicon-Integrity, USP-Absorbed.
@@ -9,7 +9,7 @@
 
 /*
  * =========================================================================
- * Σ SIGMAOS: SOVEREIGN MEMORY ZENITH (v10.0 - ZERO-DEPENDENCY)
+ * Î£ SIGMAOS: SOVEREIGN MEMORY ZENITH (v10.0 - ZERO-DEPENDENCY)
  * =========================================================================
  * Mission: Absolute Memory Sovereignty via Direct Hardware Control.
  * Principles: 
@@ -20,7 +20,8 @@
  * =========================================================================
  */
 
-#include "SigmaOOP.hpp"
+#include "../../include/SigmaOOP.hpp"
+#include "../../include/SovereignLibC.h"
 
 namespace SigmaOS {
 namespace Kernel {
@@ -54,13 +55,15 @@ public:
 
     // --- Slab Allocation (Custom Native Function) ---
     void* allocate(sigma_usize size) {
-        if (m_used + size > INITIAL_POOL_SIZE) return nullptr;
+        if (m_used + size > INITIAL_POOL_SIZE) return SIGMA_NULL;
         
         void* ptr = m_pool + m_used;
-        m_segments[m_segment_count++] = {(sigma_u64)ptr, size, SIGMA_TRUE};
-        m_used += size;
+        m_segments[m_segment_count].start_addr = (sigma_u64)ptr;
+        m_segments[m_segment_count].size = (sigma_u64)size;
+        m_segments[m_segment_count].allocated = SIGMA_TRUE;
+        m_segment_count++;
         
-        // sigma_printf("[MEM-ALLOC]: %zu bytes at %p\n", size, ptr);
+        m_used += size;
         return ptr;
     }
 
@@ -68,17 +71,16 @@ public:
         for (sigma_usize i = 0; i < m_segment_count; i++) {
             if (m_segments[i].start_addr == (sigma_u64)ptr) {
                 m_segments[i].allocated = SIGMA_FALSE;
-                // No actual reclamation in this primitive slab for zenith speed
                 return;
             }
         }
     }
 
     void audit() {
-        sigma_printf("\n--- Σ SOVEREIGN MEMORY AUDIT ---\n");
+        sigma_printf("\n--- Î£ SOVEREIGN MEMORY AUDIT ---\n");
         sigma_printf("| Total Pool : %u MB\n", (unsigned int)(INITIAL_POOL_SIZE / 1024 / 1024));
         sigma_printf("| Used Space : %u KB\n", (unsigned int)(m_used / 1024));
-        sigma_printf("| Managed Shards: %zu\n", m_segment_count);
+        sigma_printf("| Managed Shards: %u\n", (unsigned int)m_segment_count);
         sigma_printf("----------------------------------\n");
     }
 };
@@ -95,6 +97,7 @@ extern "C" void start_memory_zenith() {
 
     manager.audit();
     manager.deallocate(b1);
+    manager.deallocate(b2);
 }
 
 int main() {
@@ -102,4 +105,3 @@ int main() {
     start_memory_zenith();
     return 0;
 }
-

@@ -1,6 +1,6 @@
 /*
  * =============================================================================
- * Σ SIGMAOS KERNEL: VIRTUAL FILE SYSTEM (VFS) (v1.0)
+ * Î£ SIGMAOS KERNEL: VIRTUAL FILE SYSTEM (VFS) (v1.0)
  * =============================================================================
  * Principles: Everything is a Shard. Zero-Abstract Hardware Abstraction.
  * =============================================================================
@@ -12,13 +12,13 @@
 
 typedef struct vfs_node {
     char name[128];
-    u32  flags;
-    u32  size;
+    sigma_u32  flags;
+    sigma_u32  size;
     void* private_data;
     
     /* Function Pointers (Sovereign Interface) */
-    u32 (*read)(struct vfs_node* node, u32 offset, u32 size, u8* buffer);
-    u32 (*write)(struct vfs_node* node, u32 offset, u32 size, u8* buffer);
+    sigma_u32 (*read)(struct vfs_node* node, sigma_u32 offset, sigma_u32 size, sigma_u8* buffer);
+    sigma_u32 (*write)(struct vfs_node* node, sigma_u32 offset, sigma_u32 size, sigma_u8* buffer);
     void (*open)(struct vfs_node* node);
     void (*close)(struct vfs_node* node);
     

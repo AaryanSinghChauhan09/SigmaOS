@@ -1,116 +1,54 @@
 # ==============================================================================
-# Σ SIGMAOS: INDUSTRIAL BUILD ORCHESTRATOR (v6.4)
+# Σ SIGMAOS: INDUSTRIAL BUILD ORCHESTRATOR (v6.5 - MODULAR ZENITH)
 # ==============================================================================
 
 CC = gcc
+CXX = g++
 AS = nasm
 LD = ld
 
 CFLAGS = -m64 -ffreestanding -O2 -Wall -Wextra -Iinclude -nostdlib -fno-stack-protector
+CXXFLAGS = $(CFLAGS) -fno-exceptions -fno-rtti
 LDFLAGS = -T kernel/sigma.ld -m elf_x86_64
 
 # Modular Directories
-SRC_DIR  = kernel
-CORE_DIR = kernel/core
-DIAG_DIR = kernel/diagnostics
-ORCH_DIR = kernel/orchestration
-SHELL_DIR = kernel/shell
-OBJ_DIR  = obj
+SRC_DIRS = kernel/core kernel/drivers kernel/orchestration kernel/shards userland
+OBJ_DIR = obj
 
-# Objects
-OBJS = $(OBJ_DIR)/main.o \
-       $(OBJ_DIR)/scheduler.o \
-       $(OBJ_DIR)/pmm.o \
-       $(OBJ_DIR)/vmm.o \
-       $(OBJ_DIR)/vmm_perf.o \
-       $(OBJ_DIR)/idt.o \
-       $(OBJ_DIR)/vfs.o \
-       $(OBJ_DIR)/ipc.o \
-       $(OBJ_DIR)/panic.o \
-       $(OBJ_DIR)/secure_boot.o \
-       $(OBJ_DIR)/rbac.o \
-       $(OBJ_DIR)/hotpatch.o \
-       $(OBJ_DIR)/checkpoint.o \
-       $(OBJ_DIR)/energy.o \
-       $(OBJ_DIR)/slab.o \
-       $(OBJ_DIR)/input_queue.o \
-       $(OBJ_DIR)/vga.o \
-       $(OBJ_DIR)/keyboard.o \
-       $(OBJ_DIR)/serial.o \
-       $(OBJ_DIR)/multi_core.o \
-       $(OBJ_DIR)/summoner.o \
-       $(OBJ_DIR)/neural_lattice.o \
-       $(OBJ_DIR)/sigmapm.o \
-       $(OBJ_DIR)/zenith_theme.o \
-       $(OBJ_DIR)/sigma_calc.o \
-       $(OBJ_DIR)/zenith_gui.o \
-       $(OBJ_DIR)/ids_shard.o \
-       $(OBJ_DIR)/firewall_shard.o \
-       $(OBJ_DIR)/unit_tests.o \
-       $(OBJ_DIR)/net_buf.o \
-       $(OBJ_DIR)/e1000.o \
-       $(OBJ_DIR)/ide.o \
-       $(OBJ_DIR)/sigmafs.o \
-       $(OBJ_DIR)/fs_cache.o
+# Discover all source files
+C_SRCS   = $(shell find $(SRC_DIRS) -name "*.c")
+CXX_SRCS = $(shell find $(SRC_DIRS) -name "*.cpp")
+ASM_SRCS = $(shell find $(SRC_DIRS) -name "*.asm")
 
-all: sigmaos.bin
+# Generate object file paths
+OBJS = $(C_SRCS:%.c=$(OBJ_DIR)/%.o) \
+       $(CXX_SRCS:%.cpp=$(OBJ_DIR)/%.o) \
+       $(ASM_SRCS:%.asm=$(OBJ_DIR)/%.o)
 
-$(OBJ_DIR)/%.o: $(SRC_DIR)/%.c
-	@mkdir -p $(OBJ_DIR)
+.PHONY: all clean kernel
+
+all: kernel
+
+kernel: $(OBJ_DIR)/sigma_os_master
+
+$(OBJ_DIR)/sigma_os_master: $(OBJS)
+	@echo "Σ [LINK]: Finalizing Sovereign Lattice..."
+	$(LD) $(LDFLAGS) -o $@ $(OBJS)
+
+$(OBJ_DIR)/%.o: %.c
+	@mkdir -p $(dir $@)
+	@echo "Σ [C]: Compiling $<..."
 	$(CC) $(CFLAGS) -c $< -o $@
 
-$(OBJ_DIR)/%.o: $(CORE_DIR)/%.c
-	@mkdir -p $(OBJ_DIR)
-	$(CC) $(CFLAGS) -c $< -o $@
+$(OBJ_DIR)/%.o: %.cpp
+	@mkdir -p $(dir $@)
+	@echo "Σ [C++]: Compiling $<..."
+	$(CXX) $(CXXFLAGS) -c $< -o $@
 
-$(OBJ_DIR)/%.o: $(DIAG_DIR)/%.c
-	@mkdir -p $(OBJ_DIR)
-	$(CC) $(CFLAGS) -c $< -o $@
-
-$(OBJ_DIR)/%.o: $(ORCH_DIR)/%.c
-	@mkdir -p $(OBJ_DIR)
-	$(CC) $(CFLAGS) -c $< -o $@
-
-$(OBJ_DIR)/%.o: $(SHELL_DIR)/%.c
-	@mkdir -p $(OBJ_DIR)
-	$(CC) $(CFLAGS) -c $< -o $@
-
-$(OBJ_DIR)/%.o: $(FS_DIR)/%.c
-	@mkdir -p $(OBJ_DIR)
-	$(CC) $(CFLAGS) -c $< -o $@
-
-$(OBJ_DIR)/%.o: $(DRV_DIR)/%.c
-	@mkdir -p $(OBJ_DIR)
-	$(CC) $(CFLAGS) -c $< -o $@
-
-$(OBJ_DIR)/%.o: $(FS_DIR)/%.c
-	@mkdir -p $(OBJ_DIR)
-	$(CC) $(CFLAGS) -c $< -o $@
-
-sigmaos.bin: $(OBJS)
-	$(LD) $(LDFLAGS) $(OBJS) -o sigmaos.bin
-
-# CI/CD & Industrial Sync
-zenith_x86_64: sigmaos.bin
-
-shards: $(OBJS)
-	@echo "[FORGE]: All sovereign shards forged."
-
-audit_build: clean sigmaos.bin
-	@echo "[SENTINEL]: Build complete for CodeQL audit."
-
-industrial_sync: industrial_sync_check clean sigmaos.bin
-	@echo "[SYNC]: Industrial synchronization complete."
-
-industrial_sync_check:
-	@echo "[CHECK]: Verifying shard lattice integrity..."
+$(OBJ_DIR)/%.o: %.asm
+	@mkdir -p $(dir $@)
+	@echo "Σ [ASM]: Assembling $<..."
+	$(AS) -f elf64 $< -o $@
 
 clean:
-	rm -rf $(OBJ_DIR) sigmaos.bin
-
-# Execution
-run: sigmaos.bin
-	qemu-system-x86_64 -kernel sigmaos.bin -serial stdio -display sdl
-
-run-debug: sigmaos.bin
-	qemu-system-x86_64 -kernel sigmaos.bin -serial stdio -display sdl -d int,cpu_reset -D qemu.log
+	rm -rf $(OBJ_DIR)

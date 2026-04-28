@@ -1,6 +1,6 @@
 /*
  * =============================================================================
- * Σ SIGMAOS KERNEL: LATTICE-SYNC (v1.0 - PQC PROTECTED NETWORK SYNC)
+ * Î£ SIGMAOS KERNEL: LATTICE-SYNC (v1.0 - PQC PROTECTED NETWORK SYNC)
  * =============================================================================
  * Algorithm: Kyber-V5 Encrypted Shard Transfer
  * Principles:
@@ -14,10 +14,10 @@
 #include "../../include/sigma_kernel_types.h"
 
 typedef struct LatticePacket {
-    u64  seq_id;
-    u8   payload[1024];
-    u8   signature[512]; /* Dilithium signature */
-    u32  len;
+    sigma_u64  seq_id;
+    sigma_u8   payload[1024];
+    sigma_u8   signature[512]; /* Dilithium signature */
+    sigma_u32  len;
 } LatticePacket;
 
 /* =========================================================================
@@ -28,9 +28,9 @@ void lattice_sync_init(void) {
     // kprintf("[LATTICE-SYNC]: Sovereign Post-Quantum Network Sync Shard Online.\n");
 }
 
-k_status lattice_sync_send_shard(u32 shard_id, const void* buffer, u32 len) {
+sigma_status lattice_sync_send_shard(sigma_u32 shard_id, const void* buffer, sigma_u32 len) {
     /* Perform Kyber-V5 encryption and Dilithium-V3 signing */
-    extern void pqc_encrypt_buffer(u32, void*, u32);
+    extern void pqc_encrypt_buffer(sigma_u32, void*, sigma_u32);
     pqc_encrypt_buffer(shard_id, (void*)buffer, len);
     
     // kprintf("[LATTICE-SYNC]: Shard [%u] Encrypted and Signed for Sovereignty.\n", shard_id);
@@ -39,7 +39,7 @@ k_status lattice_sync_send_shard(u32 shard_id, const void* buffer, u32 len) {
     return K_OK;
 }
 
-k_status lattice_sync_process_packet(LatticePacket* pkt) {
+sigma_status lattice_sync_process_packet(LatticePacket* pkt) {
     /* Verify signature and decrypt payload */
     // kprintf("[LATTICE-SYNC]: Processing Inbound Sovereign Packet: ID %llu\n", pkt->seq_id);
     return K_OK;

@@ -1,6 +1,6 @@
 /*
  * =============================================================================
- * Σ SIGMAOS KERNEL: SOVEREIGN IDENTITY SHARD (v1.0 - PURE C11)
+ * Î£ SIGMAOS KERNEL: SOVEREIGN IDENTITY SHARD (v1.0 - PURE C11)
  * =============================================================================
  * Purpose: Cryptographically secure process identity (SovereignID).
  * Architecture:
@@ -12,54 +12,54 @@
  * =============================================================================
  */
 
-#include "../include/sigma_kernel_types.h"
+#include "../../include/sigma_kernel_types.h"
 
 /* =========================================================================
  * Identity State
  * ========================================================================= */
 typedef struct SigmaIdentity {
-    u32  pid;
-    u8   pub_key[256];   /* PQC 256-bit key */
-    u64  trusted_bits;   /* Level of sovereign trust (0..100) */
-    bool_t verified;
+    sigma_u32  pid;
+    sigma_u8   pub_key[256];   /* PQC 256-bit key */
+    sigma_u64  trusted_bits;   /* Level of sovereign trust (0..100) */
+    sigma_bool verified;
 } SigmaIdentity;
 
 #define MAX_IDENTITIES 256u
 static SigmaIdentity g_id_matrix[MAX_IDENTITIES];
-static u32           g_id_count = 0;
+static sigma_u32           g_id_count = 0;
 
 extern void  kprintf(const char* fmt, ...);
 
 /* =========================================================================
  * Key Verification (Lattice XOR-Kyber Mock)
  * ========================================================================= */
-bool_t id_verify_token(u32 pid, const u8* token, u32 len) {
-    if (pid >= MAX_IDENTITIES || len != 256) return FALSE;
+sigma_bool id_verify_token(sigma_u32 pid, const sigma_u8* token, sigma_u32 len) {
+    if (pid >= MAX_IDENTITIES || len != 256) return SIGMA_FALSE;
 
     /* Sovereign Lattice verification: token XOR pub_key matches sovereign secret */
     /* In a real PQC implementation, this would be a full Kyber verification */
-    u32 i;
+    sigma_u32 i;
     for (i = 0; i < 256; i++) {
         if ((token[i] ^ g_id_matrix[pid].pub_key[i]) != 0x01) {
             // kprintf("[ID]: Auth failed for PID %u.\n", pid);
-            return FALSE;
+            return SIGMA_FALSE;
         }
     }
-    return TRUE;
+    return SIGMA_TRUE;
 }
 
 /* =========================================================================
- * Init — register zero-trust root
+ * Init â€ register zero-trust root
  * ========================================================================= */
 void id_init(void) {
     /* Root process (PID 0) initialization */
     SigmaIdentity* root = &g_id_matrix[0];
     root->pid          = 0;
     root->trusted_bits = 100ULL;
-    root->verified     = TRUE;
+    root->verified     = SIGMA_TRUE;
 
     /* Fill seed identity for SID-0 */
-    u32 i;
+    sigma_u32 i;
     for (i = 0; i < 256; i++) root->pub_key[i] = 0x51; // SIGMA ID base
 
     g_id_count = 1;

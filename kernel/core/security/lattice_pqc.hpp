@@ -1,7 +1,8 @@
 #ifndef LATTICE_PQC_HPP
 #define LATTICE_PQC_HPP
 
-#include "../../../SigmaOOP.hpp"
+#include "../../../include/SigmaOOP.hpp"
+#include "../../../include/SovereignLibC.h"
 
 namespace SigmaOS {
 namespace Security {

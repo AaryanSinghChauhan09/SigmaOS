@@ -1,6 +1,6 @@
 /*
  * =============================================================================
- * Σ SIGMAOS KERNEL: SOVEREIGN-ML-CORE (v1.0 - AI/ML ACCELERATION)
+ * Î£ SIGMAOS KERNEL: SOVEREIGN-ML-CORE (v1.0 - AI/ML ACCELERATION)
  * =============================================================================
  * Algorithm: Sharded-Tensor-Flow Engine ($STFE$)
  * Principles:
@@ -11,11 +11,11 @@
  * =============================================================================
  */
 
-#include "../include/sigma_kernel_types.h"
+#include "../../include/sigma_kernel_types.h"
 
 typedef struct MatrixShard {
-    u32 rows;
-    u32 cols;
+    sigma_u32 rows;
+    sigma_u32 cols;
     void* data;
 } MatrixShard;
 
@@ -27,7 +27,7 @@ void ml_init(void) {
     // kprintf("[ML-CORE]: Sovereign AI/ML Shard Orchestrator Online.\n");
 }
 
-k_status ml_matrix_multiply(MatrixShard* A, MatrixShard* B, MatrixShard* C) {
+sigma_status ml_matrix_multiply(MatrixShard* A, MatrixShard* B, MatrixShard* C) {
     /* 
      * Absorb AI/ML USP: Direct Silicon Tensor Flow.
      * In a sharded model: perform matrix multiplication across silicon shards.
@@ -36,7 +36,7 @@ k_status ml_matrix_multiply(MatrixShard* A, MatrixShard* B, MatrixShard* C) {
     return K_OK;
 }
 
-k_status ml_train_shard(void* tensor_data, u32 epochs) {
+sigma_status ml_train_shard(void* tensor_data, sigma_u32 epochs) {
     /* 
      * Absorb ML Scientist USP: Kernel-Native Training.
      * Accelerate neural training directly within the sharded memory space.

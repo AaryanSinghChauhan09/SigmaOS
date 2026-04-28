@@ -1,15 +1,15 @@
 /*
  * =============================================================================
- * Σ SIGMAOS KERNEL: SERIAL DRIVER + EARLY CONSOLE (v1.0 - PURE C11)
+ * Î£ SIGMAOS KERNEL: SERIAL DRIVER + EARLY CONSOLE (v1.0 - PURE C11)
  * =============================================================================
- * COM1 (0x3F8) 16550A UART — used for kernel kprintf before VGA/GPU init.
+ * COM1 (0x3F8) 16550A UART â€ used for kernel kprintf before VGA/GPU init.
  * Baud: 115200 | 8N1 | No FIFO threshold for maximum throughput.
  * Standard: C11, freestanding
  * =============================================================================
  */
 
 #include "../../include/sigma_kernel_types.h"
-#include "sigma_types.h"   /* compiler built-in — no libc */
+#include "../../include/sigma_types.h"   /* compiler built-in â€ no libc */
 
 /* =========================================================================
  * COM1 Port Map
@@ -29,27 +29,27 @@
 #define LSR_RX_READY   BIT(0)            /* Data ready */
 
 /* =========================================================================
- * VGA Text Mode (80×25, at physical 0xB8000)
+ * VGA Text Mode (80Ã—25, at physical 0xB8000)
  * ========================================================================= */
 #define VGA_BASE    0xB8000
 #define VGA_COLS    80u
 #define VGA_ROWS    25u
 
 typedef struct VGAConsole {
-    u16* buf;
-    u32  col;
-    u32  row;
-    u8   attr;  /* colour attributes (high=bg, low=fg) */
+    sigma_u16* buf;
+    sigma_u32  col;
+    sigma_u32  row;
+    sigma_u8   attr;  /* colour attributes (high=bg, low=fg) */
 } VGAConsole;
 
 static VGAConsole g_vga;
 
 static void vga_scroll(void) {
-    u32 i;
+    sigma_u32 i;
     for (i = 0; i < (VGA_ROWS - 1) * VGA_COLS; i++)
         g_vga.buf[i] = g_vga.buf[i + VGA_COLS];
     for (i = (VGA_ROWS - 1) * VGA_COLS; i < VGA_ROWS * VGA_COLS; i++)
-        g_vga.buf[i] = (u16)((u16)g_vga.attr << 8 | ' ');
+        g_vga.buf[i] = (sigma_u16)((sigma_u16)g_vga.attr << 8 | ' ');
     g_vga.row = VGA_ROWS - 1;
 }
 
@@ -62,7 +62,7 @@ static void vga_putc(char c) {
     if (c == '\r') { g_vga.col = 0; return; }
     if (c == '\t') { vga_putc(' '); vga_putc(' '); vga_putc(' '); vga_putc(' '); return; }
     g_vga.buf[g_vga.row * VGA_COLS + g_vga.col] =
-        (u16)((u16)g_vga.attr << 8 | (u8)c);
+        (sigma_u16)((sigma_u16)g_vga.attr << 8 | (sigma_u8)c);
     if (++g_vga.col >= VGA_COLS) {
         g_vga.col = 0;
         if (++g_vga.row >= VGA_ROWS) vga_scroll();
@@ -70,19 +70,19 @@ static void vga_putc(char c) {
 }
 
 static void vga_init(void) {
-    g_vga.buf  = (u16*)(usize)VGA_BASE;
+    g_vga.buf  = (sigma_u16*)(sigma_usize)VGA_BASE;
     g_vga.col  = 0;
     g_vga.row  = 0;
     g_vga.attr = 0x0F;   /* bright white on black */
-    u32 i;
+    sigma_u32 i;
     for (i = 0; i < VGA_ROWS * VGA_COLS; i++)
-        g_vga.buf[i] = (u16)((u16)g_vga.attr << 8 | ' ');
+        g_vga.buf[i] = (sigma_u16)((sigma_u16)g_vga.attr << 8 | ' ');
 }
 
 /* =========================================================================
  * Serial UART Init
  * ========================================================================= */
-static bool_t g_serial_ok = FALSE;
+static sigma_bool g_serial_ok = SIGMA_FALSE;
 
 void serial_init(void) {
     port_outb(COM1_IER, 0x00);   /* Disable all interrupts */
@@ -97,18 +97,18 @@ void serial_init(void) {
     port_outb(COM1_MCR, 0x1E);
     port_outb(COM1_DATA, 0xAE);
     if (port_inb(COM1_DATA) != 0xAE) {
-        g_serial_ok = FALSE;
+        g_serial_ok = SIGMA_FALSE;
         return;
     }
     port_outb(COM1_MCR, 0x0F);
-    g_serial_ok = TRUE;
+    g_serial_ok = SIGMA_TRUE;
 }
 
 void serial_putc(char c) {
     if (!g_serial_ok) return;
     /* Wait for TX register empty */
     while (!(port_inb(COM1_LSR) & LSR_TX_EMPTY)) cpu_pause();
-    port_outb(COM1_DATA, (u8)c);
+    port_outb(COM1_DATA, (sigma_u8)c);
 }
 
 static void serial_puts(const char* s) {
@@ -119,15 +119,15 @@ static void serial_puts(const char* s) {
 }
 
 /* =========================================================================
- * kprintf — kernel variadic kprintf (serial + VGA)
+ * kprintf â€ kernel variadic kprintf (serial + VGA)
  * ========================================================================= */
 
-static void kprint_u64(u64 v, int base) {
+static void kprint_u64(sigma_u64 v, int base) {
     const char* digits = "0123456789ABCDEF";
     char buf[20]; int i = 19;
     buf[i] = '\0';
     if (v == 0) { buf[--i] = '0'; }
-    else while (v && i > 0) { buf[--i] = digits[v % (u64)base]; v /= (u64)base; }
+    else while (v && i > 0) { buf[--i] = digits[v % (sigma_u64)base]; v /= (sigma_u64)base; }
     serial_puts(&buf[i]);
     char c2;
     for (c2 = buf[i]; c2; c2 = buf[++i]) vga_putc(c2);
@@ -151,21 +151,21 @@ void kprintf(const char* fmt, ...) {
         fmt++;
         switch (*fmt) {
             case 'd': {
-                i64 v = va_arg(ap, i64);
+                sigma_i64 v = va_arg(ap, sigma_i64);
                 if (v < 0) { kprint_char('-'); v = -v; }
-                kprint_u64((u64)v, 10);
+                kprint_u64((sigma_u64)v, 10);
                 break;
             }
-            case 'u': kprint_u64(va_arg(ap, u64), 10); break;
-            case 'x': kprint_u64(va_arg(ap, u64), 16); break;
-            case 'p': kprint_str("0x"); kprint_u64((u64)(usize)va_arg(ap, void*), 16); break;
+            case 'u': kprint_u64(va_arg(ap, sigma_u64), 10); break;
+            case 'x': kprint_u64(va_arg(ap, sigma_u64), 16); break;
+            case 'p': kprint_str("0x"); kprint_u64((sigma_u64)(sigma_usize)va_arg(ap, void*), 16); break;
             case 's': kprint_str(va_arg(ap, const char*)); break;
             case 'c': kprint_char((char)va_arg(ap, int)); break;
             case 'l':
                 fmt++;
                 if (*fmt == 'l') { fmt++; } /* skip 'll' */
-                if (*fmt == 'u') kprint_u64(va_arg(ap, u64), 10);
-                else if (*fmt == 'd') { i64 v = va_arg(ap, i64); if(v<0){kprint_char('-');v=-v;} kprint_u64((u64)v,10); }
+                if (*fmt == 'u') kprint_u64(va_arg(ap, sigma_u64), 10);
+                else if (*fmt == 'd') { sigma_i64 v = va_arg(ap, sigma_i64); if(v<0){kprint_char('-');v=-v;} kprint_u64((sigma_u64)v,10); }
                 break;
             default:  kprint_char('%'); kprint_char(*fmt); break;
         }
@@ -180,9 +180,9 @@ void console_init(void) {
     serial_init();
     vga_init();
     kprintf("\n");
-    kprintf("Σ ============================================================ Σ\n");
-    kprintf("  SigmaOS Sovereign Kernel v1.0 — Pure C11 + x86_64 Assembly\n");
+    kprintf("Î£ ============================================================ Î£\n");
+    kprintf("  SigmaOS Sovereign Kernel v1.0 â€ Pure C11 + x86_64 Assembly\n");
     kprintf("  Serial: COM1 @ 115200 baud | VGA: 80x25 Text Mode\n");
     kprintf("  Language: C11(98%%) | ASM(0.7%%) | Rust(0.3%%)\n");
-    kprintf("Σ ============================================================ Σ\n\n");
+    kprintf("Î£ ============================================================ Î£\n\n");
 }

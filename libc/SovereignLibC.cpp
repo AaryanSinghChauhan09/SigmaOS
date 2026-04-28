@@ -1,5 +1,5 @@
-#include "SovereignLibC.h"
-#include "sigma_types.h"
+#include "../include/SovereignLibC.h"
+#include "../include/sigma_types.h"
 
 // --- sigma_print ---
 void sigma_print(const char* str) {
@@ -102,7 +102,7 @@ int sigma_wait(int* wstatus) {
     // x86_64 rax=61 (wait4(pid_t pid, int *status, int options, struct rusage *usage))
     long res;
     register long r10 __asm__("r10") = 0; // options = 0
-    register long r8  __asm__("r8")  = 0; // rusage = NULL
+    register long r8  __asm__("r8")  = 0; // rusage = SIGMA_NULL
     __asm__ __volatile__ ("syscall" 
         : "=a"(res) 
         : "a"(61), "D"(-1), "S"(wstatus), "r"(r10), "r"(r8) 
@@ -160,7 +160,7 @@ static const sigma_size_t HEAP_SIZE = 1024 * 1024 * 128; // 128MB Shard
 
 void* sigma_slab_alloc_raw(sigma_size_t size) {
     if (g_heap_start == SIGMA_NULL) {
-        // mmap(NULL, size, PROT_READ|PROT_WRITE, MAP_PRIVATE|MAP_ANONYMOUS, -1, 0)
+        // mmap(SIGMA_NULL, size, PROT_READ|PROT_WRITE, MAP_PRIVATE|MAP_ANONYMOUS, -1, 0)
         // Linux: PROT_READ=1, PROT_WRITE=2 -> 3
         // MAP_PRIVATE=0x02, MAP_ANONYMOUS=0x20 -> 0x22
         g_heap_start = sigma_mmap(SIGMA_NULL, HEAP_SIZE, 3, 0x22, -1, 0);

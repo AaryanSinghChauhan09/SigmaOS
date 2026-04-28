@@ -1,6 +1,6 @@
 /*
  * =============================================================================
- * Σ SIGMAOS KERNEL: SOVEREIGN-VOICE-ZENITH (v1.0 - SILICON-DIRECT AUDIO)
+ * Î£ SIGMAOS KERNEL: SOVEREIGN-VOICE-ZENITH (v1.0 - SILICON-DIRECT AUDIO)
  * =============================================================================
  * Algorithm: Delta-Modulation Phased Array
  * Principles:
@@ -10,12 +10,12 @@
  * =============================================================================
  */
 
-#include "../include/sigma_kernel_types.h"
+#include "../../include/sigma_kernel_types.h"
 
 typedef struct VoiceConfig {
-    u32 sample_rate;
-    u16 pitch;
-    u8  vol;
+    sigma_u32 sample_rate;
+    sigma_u16 pitch;
+    sigma_u8  vol;
 } VoiceConfig;
 
 static VoiceConfig g_voice_config = { .sample_rate = 44100, .pitch = 100, .vol = 127 };
@@ -32,10 +32,10 @@ void voice_speak_alert(const char* msg) {
     // kprintf("[VOICE]: System Alert Shard: '%s'\n", msg);
     
     /* Simulate Silicon Voice generation via I/O Port */
-    // u32 i = 0; while (msg[i]) { outb(0x61, msg[i++]); }
+    // sigma_u32 i = 0; while (msg[i]) { outb(0x61, msg[i++]); }
 }
 
-k_status voice_configure(u32 rate, u16 pitch, u8 vol) {
+sigma_status voice_configure(sigma_u32 rate, sigma_u16 pitch, sigma_u8 vol) {
     g_voice_config.sample_rate = rate;
     g_voice_config.pitch = pitch;
     g_voice_config.vol = vol;

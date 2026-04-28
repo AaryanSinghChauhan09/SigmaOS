@@ -1,16 +1,17 @@
+#include "../include/SovereignLibC.h"
 /*
  * =========================================================================
- * Σ SIGMAOS: SOVEREIGN ZENITH (v15.0 - ABSOLUTE FINALITY)
+ * Î£ SIGMAOS: SOVEREIGN ZENITH (v15.0 - ABSOLUTE FINALITY)
  * =========================================================================
  * Author: Sovereign-Zenith-Developer
  * Principles: Zero-Library, Bit-Perfect, Silicon-Integrity, USP-Absorbed.
  * =========================================================================
  */
 
-#include "SigmaOOP.hpp"
+#include "../include/SigmaOOP.hpp"
 
 /**
- * Σ SIGMA OS: SOVEREIGN CONTAINER RUNTIME (v128.0 - ZERO-STD NATIVE)
+ * Î£ SIGMA OS: SOVEREIGN CONTAINER RUNTIME (v128.0 - ZERO-STD NATIVE)
  * =================================================================
  * USP: Independent native containerization using Silicon-Direct Job Objects.
  * Capability: Hard resource limits and namespace isolation without 3rd-party engines.
@@ -39,7 +40,7 @@ public:
 };
 
 extern "C" void _start(void) {
-    sigma_printf("--- Σ SIGMA OS SOVEREIGN CONTAINER RUNTIME (ZENITH) ---\n");
+    sigma_printf("--- Î£ SIGMA OS SOVEREIGN CONTAINER RUNTIME (ZENITH) ---\n");
     SovereignContainer container;
     
     // In bare-metal _start, we don't have argc/argv from the shell yet,

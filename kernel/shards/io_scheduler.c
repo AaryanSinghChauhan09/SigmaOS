@@ -1,6 +1,6 @@
 /*
  * =============================================================================
- * Σ SIGMAOS KERNEL: SOVEREIGN-IO-SCHEDULER (v1.0 - DISK ORCHESTRATION)
+ * Î£ SIGMAOS KERNEL: SOVEREIGN-IO-SCHEDULER (v1.0 - DISK ORCHESTRATION)
  * =============================================================================
  * Algorithm: Budget-Fair Shard Queuing (BFSQ)
  * Principles:
@@ -11,18 +11,18 @@
  * =============================================================================
  */
 
-#include "../include/sigma_kernel_types.h"
+#include "../../include/sigma_kernel_types.h"
 
 typedef struct IORequest {
-    u64 sector;
-    u32 length;
-    bool_t is_write;
-    u32 shard_priority;
+    sigma_u64 sector;
+    sigma_u32 length;
+    sigma_bool is_write;
+    sigma_u32 shard_priority;
 } IORequest;
 
 #define IO_QUEUE_LEN 128
 static IORequest g_io_queue[IO_QUEUE_LEN];
-static u32 g_io_count = 0;
+static sigma_u32 g_io_count = 0;
 
 /* =========================================================================
  * IO SCHEDULER Engine (The Throughput Shard)
@@ -32,7 +32,7 @@ void io_scheduler_init(void) {
     // kprintf("[IO-SCHED]: Sovereign Budget-Fair Disk Orchestrator Online.\n");
 }
 
-k_status io_submit(IORequest* req) {
+sigma_status io_submit(IORequest* req) {
     if (g_io_count >= IO_QUEUE_LEN) return K_ERR_NOMEM;
     
     /* 

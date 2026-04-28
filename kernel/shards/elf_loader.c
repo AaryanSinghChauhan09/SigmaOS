@@ -1,6 +1,6 @@
 /*
  * =============================================================================
- * Σ SIGMAOS KERNEL: ELF64 LOADER (v1.0 - PURE C11)
+ * Î£ SIGMAOS KERNEL: ELF64 LOADER (v1.0 - PURE C11)
  * =============================================================================
  * Parses and loads ELF64 executables into a process address space.
  * Supports:
@@ -13,7 +13,7 @@
  * =============================================================================
  */
 
-#include "../include/sigma_kernel_types.h"
+#include "../../include/sigma_kernel_types.h"
 
 /* =========================================================================
  * ELF64 Structures (per SysV ABI)
@@ -39,37 +39,37 @@
 #define PF_R  BIT(2)   /* Segment read */
 
 typedef struct __attribute__((packed)) Elf64_Ehdr {
-    u8  e_ident[16];
-    u16 e_type;
-    u16 e_machine;
-    u32 e_version;
-    u64 e_entry;
-    u64 e_phoff;
-    u64 e_shoff;
-    u32 e_flags;
-    u16 e_ehsize;
-    u16 e_phentsize;
-    u16 e_phnum;
-    u16 e_shentsize;
-    u16 e_shnum;
-    u16 e_shstrndx;
+    sigma_u8  e_ident[16];
+    sigma_u16 e_type;
+    sigma_u16 e_machine;
+    sigma_u32 e_version;
+    sigma_u64 e_entry;
+    sigma_u64 e_phoff;
+    sigma_u64 e_shoff;
+    sigma_u32 e_flags;
+    sigma_u16 e_ehsize;
+    sigma_u16 e_phentsize;
+    sigma_u16 e_phnum;
+    sigma_u16 e_shentsize;
+    sigma_u16 e_shnum;
+    sigma_u16 e_shstrndx;
 } Elf64_Ehdr;
 
 typedef struct __attribute__((packed)) Elf64_Phdr {
-    u32 p_type;
-    u32 p_flags;
-    u64 p_offset;   /* offset in file */
-    u64 p_vaddr;    /* virtual address */
-    u64 p_paddr;    /* physical address (ignore) */
-    u64 p_filesz;   /* size in file */
-    u64 p_memsz;    /* size in memory (>= filesz; rest = BSS) */
-    u64 p_align;
+    sigma_u32 p_type;
+    sigma_u32 p_flags;
+    sigma_u64 p_offset;   /* offset in file */
+    sigma_u64 p_vaddr;    /* virtual address */
+    sigma_u64 p_paddr;    /* physical address (ignore) */
+    sigma_u64 p_filesz;   /* size in file */
+    sigma_u64 p_memsz;    /* size in memory (>= filesz; rest = BSS) */
+    sigma_u64 p_align;
 } Elf64_Phdr;
 
 /* =========================================================================
  * ELF Validation
  * ========================================================================= */
-static k_status elf_validate(const Elf64_Ehdr* ehdr) {
+static sigma_status elf_validate(const Elf64_Ehdr* ehdr) {
     if (ehdr->e_ident[0] != ELF_MAGIC0 ||
         ehdr->e_ident[1] != ELF_MAGIC1 ||
         ehdr->e_ident[2] != ELF_MAGIC2 ||
@@ -86,35 +86,35 @@ static k_status elf_validate(const Elf64_Ehdr* ehdr) {
 }
 
 /* =========================================================================
- * Segment permission flags → VMM page flags
+ * Segment permission flags â†’ VMM page flags
  * ========================================================================= */
-static u64 elf_seg_to_pte_flags(u32 pflags) {
-    u64 f = BIT(2);   /* USER */
+static sigma_u64 elf_seg_to_pte_flags(sigma_u32 pflags) {
+    sigma_u64 f = BIT(2);   /* USER */
     if (pflags & PF_W) f |= BIT(1);    /* WRITABLE */
     if (!(pflags & PF_X)) f |= BIT(63); /* NX if not executable */
     return f;
 }
 
 /* =========================================================================
- * ELF64 Load — map PT_LOAD segments into given address space (cr3)
+ * ELF64 Load â€ map PT_LOAD segments into given address space (cr3)
  * Returns entry point or 0 on error
  * ========================================================================= */
-extern k_status vmm_map(vaddr_t va, paddr_t pa, u64 flags);
-extern paddr_t  pmm_alloc_page(void);
+extern sigma_status vmm_map(sigma_vaddr_t va, sigma_paddr_t pa, sigma_u64 flags);
+extern sigma_paddr_t  pmm_alloc_page(void);
 extern void     kprintf(const char* fmt, ...);
 
 typedef struct ElfLoadResult {
-    vaddr_t entry;
-    vaddr_t load_base;
-    vaddr_t load_end;
+    sigma_vaddr_t entry;
+    sigma_vaddr_t load_base;
+    sigma_vaddr_t load_end;
 } ElfLoadResult;
 
-k_status elf_load(const u8* elf_image, usize image_sz,
+sigma_status elf_load(const sigma_u8* elf_image, sigma_usize image_sz,
                    ElfLoadResult* result) {
     if (!elf_image || image_sz < sizeof(Elf64_Ehdr)) return K_ERR_INVAL;
 
     const Elf64_Ehdr* ehdr = (const Elf64_Ehdr*)elf_image;
-    k_status vs = elf_validate(ehdr);
+    sigma_status vs = elf_validate(ehdr);
     if (vs != K_OK) {
         kprintf("[ELF]: Invalid ELF64 header.\n");
         return vs;
@@ -123,52 +123,52 @@ k_status elf_load(const u8* elf_image, usize image_sz,
     if (ehdr->e_phentsize != sizeof(Elf64_Phdr)) return K_ERR_INVAL;
 
     result->entry     = ehdr->e_entry;
-    result->load_base = (vaddr_t)-1ULL;
+    result->load_base = (sigma_vaddr_t)-1ULL;
     result->load_end  = 0;
 
     /* Process each program header */
     const Elf64_Phdr* phdrs =
         (const Elf64_Phdr*)(elf_image + ehdr->e_phoff);
 
-    u16 ph;
+    sigma_u16 ph;
     for (ph = 0; ph < ehdr->e_phnum; ph++) {
         const Elf64_Phdr* seg = &phdrs[ph];
         if (seg->p_type != PT_LOAD) continue;
         if (seg->p_memsz == 0) continue;
 
-        vaddr_t va_start = ALIGN_DOWN(seg->p_vaddr, PAGE_SIZE);
-        vaddr_t va_end   = ALIGN_UP(seg->p_vaddr + seg->p_memsz, PAGE_SIZE);
-        u64 pte_flags    = elf_seg_to_pte_flags(seg->p_flags);
+        sigma_vaddr_t va_start = ALIGN_DOWN(seg->p_vaddr, PAGE_SIZE);
+        sigma_vaddr_t va_end   = ALIGN_UP(seg->p_vaddr + seg->p_memsz, PAGE_SIZE);
+        sigma_u64 pte_flags    = elf_seg_to_pte_flags(seg->p_flags);
 
         if (va_start < result->load_base) result->load_base = va_start;
         if (va_end   > result->load_end)  result->load_end  = va_end;
 
         /* Allocate and map physical pages for this segment */
-        vaddr_t va = va_start;
+        sigma_vaddr_t va = va_start;
         while (va < va_end) {
-            paddr_t pa = pmm_alloc_page();
+            sigma_paddr_t pa = pmm_alloc_page();
             if (!pa) return K_ERR_NOMEM;
 
             /* Zero the page */
-            u8* pg = (u8*)(usize)pa;
-            usize zi;
+            sigma_u8* pg = (sigma_u8*)(sigma_usize)pa;
+            sigma_usize zi;
             for (zi = 0; zi < PAGE_SIZE; zi++) pg[zi] = 0;
 
             /* Copy file data into page */
-            usize page_offset = (va > seg->p_vaddr) ?
-                                0 : (usize)(seg->p_vaddr - va_start);
-            usize file_off    = (usize)(seg->p_offset +
+            sigma_usize page_offset = (va > seg->p_vaddr) ?
+                                0 : (sigma_usize)(seg->p_vaddr - va_start);
+            sigma_usize file_off    = (sigma_usize)(seg->p_offset +
                                 (va - va_start > page_offset ?
                                  va - va_start - page_offset :
                                  0));
-            usize file_remaining = (file_off < seg->p_filesz) ?
-                                   (usize)seg->p_filesz - file_off : 0;
-            usize copy_sz = (file_remaining < PAGE_SIZE) ?
+            sigma_usize file_remaining = (file_off < seg->p_filesz) ?
+                                   (sigma_usize)seg->p_filesz - file_off : 0;
+            sigma_usize copy_sz = (file_remaining < PAGE_SIZE) ?
                              file_remaining : PAGE_SIZE;
 
             if (copy_sz > 0 && file_off < image_sz) {
-                const u8* src = elf_image + file_off;
-                usize ci;
+                const sigma_u8* src = elf_image + file_off;
+                sigma_usize ci;
                 for (ci = 0; ci < copy_sz && (file_off + ci) < image_sz; ci++)
                     pg[ci] = src[ci];
             }
@@ -192,7 +192,7 @@ k_status elf_load(const u8* elf_image, usize image_sz,
 }
 
 /* =========================================================================
- * Minimal ELF header builder — produce a tiny "Hello Sigma" executable
+ * Minimal ELF header builder â€ produce a tiny "Hello Sigma" executable
  * (used as a selftest target that runs in-kernel without a filesystem)
  * ========================================================================= */
 void elf_selftest(void) {

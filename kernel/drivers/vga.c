@@ -1,6 +1,6 @@
 /*
  * =============================================================================
- * Σ SIGMAOS KERNEL: OPTIMIZED VGA TEXT DRIVER (v1.2)
+ * Î£ SIGMAOS KERNEL: OPTIMIZED VGA TEXT DRIVER (v1.2)
  * =============================================================================
  * Principles: Zero-Abstract Visualization & High-Performance Scrolling.
  * =============================================================================
@@ -11,9 +11,9 @@
 #define COLS     80
 #define ROWS     25
 
-static u16* vga_buffer = (u16*)VGA_ADDR;
-static u8  cursor_x = 0;
-static u8  cursor_y = 0;
+static sigma_u16* vga_buffer = (sigma_u16*)VGA_ADDR;
+static sigma_u8  cursor_x = 0;
+static sigma_u8  cursor_y = 0;
 
 /* Fast Scroll using sigma_memcpy (Industrial Optimization) */
 static void vga_scroll() {
@@ -22,7 +22,7 @@ static void vga_scroll() {
     cursor_y = ROWS - 1;
 }
 
-void vga_putc(char c, u8 color) {
+void vga_putc(char c, sigma_u8 color) {
     if (c == '\n') {
         cursor_x = 0;
         cursor_y++;
@@ -31,8 +31,8 @@ void vga_putc(char c, u8 color) {
     } else if (c == '\b') {
         if (cursor_x > 0) cursor_x--;
     } else {
-        u32 idx = cursor_y * COLS + cursor_x;
-        vga_buffer[idx] = (u16)c | ((u16)color << 8);
+        sigma_u32 idx = cursor_y * COLS + cursor_x;
+        vga_buffer[idx] = (sigma_u16)c | ((sigma_u16)color << 8);
         cursor_x++;
     }
 

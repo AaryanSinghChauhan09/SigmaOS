@@ -1,6 +1,6 @@
 /*
  * =============================================================================
- * Σ SIGMAOS KERNEL: GENERIC-LINUX-DRIVER-SHIM (v1.0 - DRIVER PARITY)
+ * Î£ SIGMAOS KERNEL: GENERIC-LINUX-DRIVER-SHIM (v1.0 - DRIVER PARITY)
  * =============================================================================
  * Algorithm: Sharded-Linux-Device Mapping (SLDM)
  * Principles:
@@ -11,19 +11,19 @@
  * =============================================================================
  */
 
-#include "../include/sigma_kernel_types.h"
+#include "../../include/sigma_kernel_types.h"
 
 typedef struct LinuxDeviceShim {
     char name[64];
-    u32  id;
-    bool_t is_ready;
+    sigma_u32  id;
+    sigma_bool is_ready;
 } LinuxDeviceShim;
 
 typedef struct LinuxDriverShim {
     char name[64];
     int (*probe)(LinuxDeviceShim* dev);
     void (*remove)(LinuxDeviceShim* dev);
-    bool_t active;
+    sigma_bool active;
 } LinuxDriverShim;
 
 /* =========================================================================
@@ -35,9 +35,9 @@ void linux_shim_init(void) {
     // kprintf("[!] Ready to absorb and shard legacy Linux hardware drivers.\n");
 }
 
-k_status linux_register_driver(LinuxDriverShim* drv) {
+sigma_status linux_register_driver(LinuxDriverShim* drv) {
     if (!drv) return K_ERR_INVAL;
-    drv->active = TRUE;
+    drv->active = SIGMA_TRUE;
     // kprintf("[LINUX-SHIM]: Sharding Linux Driver [%s] into Sovereign-ID pool.\n", drv->name);
     return K_OK;
 }

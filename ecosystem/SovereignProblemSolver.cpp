@@ -1,6 +1,7 @@
+#include "../include/SovereignLibC.h"
 /*
  * =========================================================================
- * Σ SIGMAOS: SOVEREIGN ZENITH (v15.0 - ABSOLUTE FINALITY)
+ * Î£ SIGMAOS: SOVEREIGN ZENITH (v15.0 - ABSOLUTE FINALITY)
  * =========================================================================
  * Author: Sovereign-Zenith-Developer
  * Principles: Zero-Library, Bit-Perfect, Silicon-Integrity, USP-Absorbed.
@@ -13,7 +14,7 @@
 
 
 /**
- * Σ SIGMA OS: SOVEREIGN PROBLEM SOLVER (v128.0 - SCHOLASTIC SOLVER)
+ * Î£ SIGMA OS: SOVEREIGN PROBLEM SOLVER (v128.0 - SCHOLASTIC SOLVER)
  * ================================================================
  * USP: Analytical NCERT Problem Shards for Physics, Chem, and Math.
  * Capability: Kinematics, Molarity, Heron's Formula, and Half-Life.
@@ -85,7 +86,7 @@ public:
     }
 
     void ExecuteSolverAudit() {
-        sigma_printf("--- Σ SIGMA OS MASTER SCHOLASTIC PROBLEM SOLVER ---\n");
+        sigma_printf("--- Î£ SIGMA OS MASTER SCHOLASTIC PROBLEM SOLVER ---\n");
         for (auto const& solver : m_solvers) {
             sigma_printf("\n[SOLVE-SHADING]: Executing Solution Shard...\n");
             solver->Solve();

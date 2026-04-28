@@ -1,6 +1,6 @@
 /*
  * =============================================================================
- * Σ SIGMAOS KERNEL: SOVEREIGN-QUANTUM-ENTROPY (v1.0)
+ * Î£ SIGMAOS KERNEL: SOVEREIGN-QUANTUM-ENTROPY (v1.0)
  * =============================================================================
  * Algorithm: Silicon Jitter Harvesting (SJH)
  * Principles:
@@ -9,13 +9,13 @@
  *   - PQC-compliant entropy pool for Dilithium keys.
  * =============================================================================
  */
-#include "../include/sigma_kernel_types.h"
+#include "../../include/sigma_kernel_types.h"
 
-static u64 g_entropy_pool = 0x5164AA55;
+static sigma_u64 g_entropy_pool = 0x5164AA55;
 
-u64 sovereign_harvest_entropy(void) {
+sigma_u64 sovereign_harvest_entropy(void) {
     /* Simulate thermal jitter via RDTSC + XOR fold */
-    u64 tsc;
+    sigma_u64 tsc;
     __asm__ volatile ("rdtsc" : "=A"(tsc));
     g_entropy_pool ^= (tsc << 32) | (tsc >> 32);
     g_entropy_pool *= 0xBF58476D1CE4E5B9ULL;
@@ -23,7 +23,7 @@ u64 sovereign_harvest_entropy(void) {
 }
 
 void entropy_init(void) {
-    u32 i;
+    sigma_u32 i;
     for (i = 0; i < 64; i++) sovereign_harvest_entropy();
     // kprintf("[ENTROPY]: Sovereign Silicon Jitter Harvest active.\n");
 }

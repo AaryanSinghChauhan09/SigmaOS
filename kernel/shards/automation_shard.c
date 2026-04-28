@@ -1,6 +1,6 @@
 /*
  * =============================================================================
- * Σ SIGMAOS KERNEL: SOVEREIGN AUTOMATION SHARD (v7.0 - INDUSTRIAL FINALITY)
+ * Î£ SIGMAOS KERNEL: SOVEREIGN AUTOMATION SHARD (v7.0 - INDUSTRIAL FINALITY)
  * =============================================================================
  * Origin Idea: Moltbot-USP (Autonomous Maintenance Agent)
  * Principles:
@@ -11,15 +11,14 @@
  * =============================================================================
  */
 
-#include "../include/sigma_kernel_types.h"
-#include "SovereignLibC.h"
+#include "../../include/SovereignLibC.h"
 
 #define AUTOMATION_TICK_THRESHOLD 60000 // Every 60s @ 1kHz
 
 typedef struct AutomationAgent {
-    u64 last_maintenance;
-    u32 audit_count;
-    u32 repair_count;
+    sigma_u64 last_maintenance;
+    sigma_u32 audit_count;
+    sigma_u32 repair_count;
     bool active;
 } AutomationAgent;
 
@@ -40,7 +39,7 @@ void automation_shard_init(void) {
     sigma_print("[AUTOMATION-SHARD]: Molt-Agent Autonomous Engine (v7.0) Online.\n");
 }
 
-void automation_on_tick(u64 current_tick) {
+void automation_on_tick(sigma_u64 current_tick) {
     if (!g_molt_agent.active) return;
     
     /* Simulate periodic background maintenance check */
@@ -61,7 +60,7 @@ void automation_on_tick(u64 current_tick) {
 }
 
 void automation_audit(void) {
-    sigma_print("\n--- Σ SOVEREIGN AUTOMATION AUDIT (MOLT-AGENT) ---\n");
+    sigma_print("\n--- Î£ SOVEREIGN AUTOMATION AUDIT (MOLT-AGENT) ---\n");
     sigma_printf("| Audits Executed: %u\n", g_molt_agent.audit_count);
     sigma_printf("| Repairs Done   : %u\n", g_molt_agent.repair_count);
     sigma_print("| State          : [HEALTHY/AUTONOMOUS]\n");

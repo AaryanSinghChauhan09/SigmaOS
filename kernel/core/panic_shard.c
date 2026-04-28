@@ -1,6 +1,6 @@
 /*
  * =============================================================================
- * Σ SIGMAOS KERNEL: SOVEREIGN-PANIC-SHARD (v1.0 - FAULT RECOVERY)
+ * Î£ SIGMAOS KERNEL: SOVEREIGN-PANIC-SHARD (v1.0 - FAULT RECOVERY)
  * =============================================================================
  * Algorithm: Shard Trace-Dump (STD)
  * Principles:
@@ -17,14 +17,14 @@
  * PANIC Engine (The Final Sentry)
  * ========================================================================= */
 
-void sigma_panic(const char* msg, u64 rip, u64 rsp) {
+void sigma_panic(const char* msg, sigma_u64 rip, sigma_u64 rsp) {
     /* 
      * Absorb Linux Panic USP: Shard State Visualization.
      * In a sharded model: dump all active shard identifiers and faulting rip.
      */
     
     // kprintf("\n!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!\n");
-    // kprintf("Σ SIGMAOS KERNEL PANIC: SOVEREIGN FINALITY BREACHED\n");
+    // kprintf("Î£ SIGMAOS KERNEL PANIC: SOVEREIGN FINALITY BREACHED\n");
     // kprintf("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!\n");
     // kprintf("MESSAGE: %s\n", msg);
     // kprintf("FAULTING RIP: %p | RSP: %p\n", rip, rsp);
@@ -37,7 +37,7 @@ void sigma_panic(const char* msg, u64 rip, u64 rsp) {
     }
 }
 
-void sigma_assert(bool_t condition, const char* msg) {
+void sigma_assert(sigma_bool condition, const char* msg) {
     if (!condition) {
         sigma_panic(msg, 0, 0);
     }

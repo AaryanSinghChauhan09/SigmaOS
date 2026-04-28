@@ -1,13 +1,13 @@
 /*
  * =============================================================================
- * Σ SIGMAOS KERNEL: OMNI-SHELL-ZENITH (v3.0 - ADVANCED SOVEREIGN CLI)
+ * Î£ SIGMAOS KERNEL: OMNI-SHELL-ZENITH (v3.0 - ADVANCED SOVEREIGN CLI)
  * =============================================================================
  * Algorithm: Trie-indexed Command Dispatch (O(k) where k = command length)
  * Principles:
  *   - Keyboard-first: full mouse-less operation.
  *   - 300+ commands across all domains (legal, forensic, AI/ML, system, automation).
  *   - Piping, redirection (|, >, >>), command history, tab-completion hints.
- *   - SOLID: each command is an isolated function — Open for extension.
+ *   - SOLID: each command is an isolated function â€ Open for extension.
  *   - Zero-dependency: no libc, no stdlib.
  * Feature: CLI so advanced that GUI is only needed for Visual frame display.
  * =============================================================================
@@ -49,18 +49,18 @@ typedef struct ShellAlias {
 
 typedef struct OmniShell {
     char        history[MAX_HISTORY][MAX_CMD_LEN];
-    u32         hist_head;
-    u32         hist_tail;
-    u32         hist_count;
+    sigma_u32         hist_head;
+    sigma_u32         hist_tail;
+    sigma_u32         hist_count;
     char        cwd[256];
     char        user[32];
-    u32         exit_code;      /* last command exit code */
+    sigma_u32         exit_code;      /* last command exit code */
     ShellEnvVar env[MAX_ENV_VARS];
-    u32         env_count;
+    sigma_u32         env_count;
     ShellAlias  aliases[MAX_ALIASES];
-    u32         alias_count;
-    bool_t      verbose;
-    u32         cmd_count;      /* total commands executed */
+    sigma_u32         alias_count;
+    sigma_bool      verbose;
+    sigma_u32         cmd_count;      /* total commands executed */
 } OmniShell;
 
 static OmniShell g_shell;
@@ -68,27 +68,27 @@ static OmniShell g_shell;
 /* =========================================================================
  * Utility: zero-dep string functions
  * ========================================================================= */
-static u32 shell_strlen(const char* s) {
-    u32 i = 0; while (s[i]) i++; return i;
+static sigma_u32 shell_strlen(const char* s) {
+    sigma_u32 i = 0; while (s[i]) i++; return i;
 }
 
-static bool_t shell_streq(const char* a, const char* b) {
-    u32 i = 0;
+static sigma_bool shell_streq(const char* a, const char* b) {
+    sigma_u32 i = 0;
     while (a[i] && b[i] && a[i] == b[i]) i++;
-    return (a[i] == '\0' && b[i] == '\0') ? TRUE : FALSE;
+    return (a[i] == '\0' && b[i] == '\0') ? SIGMA_TRUE : SIGMA_FALSE;
 }
 
-static bool_t shell_startswith(const char* s, const char* prefix) {
-    u32 i = 0;
+static sigma_bool shell_startswith(const char* s, const char* prefix) {
+    sigma_u32 i = 0;
     while (prefix[i]) {
-        if (s[i] != prefix[i]) return FALSE;
+        if (s[i] != prefix[i]) return SIGMA_FALSE;
         i++;
     }
-    return TRUE;
+    return SIGMA_TRUE;
 }
 
-static void shell_strncpy(char* dst, const char* src, u32 n) {
-    u32 i;
+static void shell_strncpy(char* dst, const char* src, sigma_u32 n) {
+    sigma_u32 i;
     for (i = 0; i < n - 1 && src[i]; i++) dst[i] = src[i];
     dst[i] = '\0';
 }
@@ -105,25 +105,25 @@ static int shell_atoi(const char* s) {
  * ========================================================================= */
 typedef struct ParsedCmd {
     char   args[MAX_ARGS][MAX_ARG_LEN];
-    u32    argc;
-    bool_t pipe_next;     /* command ends with | */
-    bool_t redir_out;     /* > redirection */
-    bool_t redir_append;  /* >> redirection */
+    sigma_u32    argc;
+    sigma_bool pipe_next;     /* command ends with | */
+    sigma_bool redir_out;     /* > redirection */
+    sigma_bool redir_append;  /* >> redirection */
     char   redir_file[128];
 } ParsedCmd;
 
-static u32 shell_parse(const char* line, ParsedCmd* cmds, u32 max_cmds) {
-    u32 stage = 0;
-    u32 i = 0, argc = 0;
-    u32 clen = shell_strlen(line);
-    bool_t in_quote = FALSE;
+static sigma_u32 shell_parse(const char* line, ParsedCmd* cmds, sigma_u32 max_cmds) {
+    sigma_u32 stage = 0;
+    sigma_u32 i = 0, argc = 0;
+    sigma_u32 clen = shell_strlen(line);
+    sigma_bool in_quote = SIGMA_FALSE;
     char arg_buf[MAX_ARG_LEN];
-    u32 arg_pos = 0;
-    u32 n = 0;
+    sigma_u32 arg_pos = 0;
+    sigma_u32 n = 0;
 
     if (stage >= max_cmds) return 0;
     cmds[stage].argc = 0;
-    cmds[stage].pipe_next = cmds[stage].redir_out = cmds[stage].redir_append = FALSE;
+    cmds[stage].pipe_next = cmds[stage].redir_out = cmds[stage].redir_append = SIGMA_FALSE;
     cmds[stage].redir_file[0] = '\0';
 
 #define FLUSH_ARG() do { \
@@ -142,30 +142,30 @@ static u32 shell_parse(const char* line, ParsedCmd* cmds, u32 max_cmds) {
         } else if (!in_quote && c == '|') {
             FLUSH_ARG();
             cmds[stage].argc = argc;
-            cmds[stage].pipe_next = TRUE;
+            cmds[stage].pipe_next = SIGMA_TRUE;
             stage++;
             if (stage >= max_cmds) break;
             argc = 0;
             cmds[stage].argc = 0;
-            cmds[stage].pipe_next = FALSE;
-            cmds[stage].redir_out = FALSE;
-            cmds[stage].redir_append = FALSE;
+            cmds[stage].pipe_next = SIGMA_FALSE;
+            cmds[stage].redir_out = SIGMA_FALSE;
+            cmds[stage].redir_append = SIGMA_FALSE;
             cmds[stage].redir_file[0] = '\0';
         } else if (!in_quote && c == '>' && line[i+1] == '>') {
             FLUSH_ARG();
-            cmds[stage].redir_append = TRUE;
+            cmds[stage].redir_append = SIGMA_TRUE;
             i += 2;
             while (line[i] == ' ') i++;
-            u32 j = 0;
+            sigma_u32 j = 0;
             while (line[i] && line[i] != ' ') cmds[stage].redir_file[j++] = line[i++];
             cmds[stage].redir_file[j] = '\0';
             continue;
         } else if (!in_quote && c == '>') {
             FLUSH_ARG();
-            cmds[stage].redir_out = TRUE;
+            cmds[stage].redir_out = SIGMA_TRUE;
             i++;
             while (line[i] == ' ') i++;
-            u32 j = 0;
+            sigma_u32 j = 0;
             while (line[i] && line[i] != ' ') cmds[stage].redir_file[j++] = line[i++];
             cmds[stage].redir_file[j] = '\0';
             continue;
@@ -192,10 +192,10 @@ static void shell_history_push(const char* cmd) {
 }
 
 static void shell_history_print(void) {
-    u32 i;
+    sigma_u32 i;
     kprintf("[HISTORY]: %u commands in OMNI-SHELL buffer:\n", g_shell.hist_count);
     for (i = 0; i < g_shell.hist_count; i++) {
-        u32 idx = (g_shell.hist_head + i) % MAX_HISTORY;
+        sigma_u32 idx = (g_shell.hist_head + i) % MAX_HISTORY;
         kprintf("  %3u  %s\n", i + 1, g_shell.history[idx]);
     }
 }
@@ -204,7 +204,7 @@ static void shell_history_print(void) {
  * Environment variable management
  * ========================================================================= */
 static void shell_env_set(const char* key, const char* val) {
-    u32 i;
+    sigma_u32 i;
     for (i = 0; i < g_shell.env_count; i++) {
         if (shell_streq(g_shell.env[i].key, key)) {
             shell_strncpy(g_shell.env[i].val, val, 127);
@@ -219,7 +219,7 @@ static void shell_env_set(const char* key, const char* val) {
 }
 
 static const char* shell_env_get(const char* key) {
-    u32 i;
+    sigma_u32 i;
     for (i = 0; i < g_shell.env_count; i++)
         if (shell_streq(g_shell.env[i].key, key))
             return g_shell.env[i].val;
@@ -232,184 +232,184 @@ static const char* shell_env_get(const char* key) {
 
 static void cmd_help(ParsedCmd* c) {
     (void)c;
-    kprintf("\n  Σ SIGMAOS OMNI-SHELL v3.0 — SOVEREIGN COMMAND REFERENCE\n");
-    kprintf("  ════════════════════════════════════════════════════════\n");
+    kprintf("\n  Î£ SIGMAOS OMNI-SHELL v3.0 â€ SOVEREIGN COMMAND REFERENCE\n");
+    kprintf("  â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•\n");
     kprintf("  SYSTEM COMMANDS:\n");
-    kprintf("    help          — Display this comprehensive command reference\n");
-    kprintf("    version       — Show SigmaOS kernel version\n");
-    kprintf("    uname [-a]    — Print kernel & system information\n");
-    kprintf("    uptime        — System uptime and load\n");
-    kprintf("    free          — Memory usage (PMM buddy status)\n");
-    kprintf("    df            — Disk/filesystem usage\n");
-    kprintf("    top           — Live process table (MLFQ scheduler)\n");
-    kprintf("    ps            — List all processes with state\n");
-    kprintf("    kill <pid>    — Terminate process by PID\n");
-    kprintf("    nice <pri> <pid> — Adjust process priority\n");
-    kprintf("    lsmod         — List loaded kernel modules\n");
-    kprintf("    insmod <file> — Load kernel module\n");
-    kprintf("    rmmod <name>  — Remove kernel module\n");
-    kprintf("    dmesg         — Print kernel ring buffer\n");
-    kprintf("    history       — Command history\n");
-    kprintf("    export K=V    — Set environment variable\n");
-    kprintf("    env           — List all environment variables\n");
+    kprintf("    help          â€ Display this comprehensive command reference\n");
+    kprintf("    version       â€ Show SigmaOS kernel version\n");
+    kprintf("    uname [-a]    â€ Print kernel & system information\n");
+    kprintf("    uptime        â€ System uptime and load\n");
+    kprintf("    free          â€ Memory usage (PMM buddy status)\n");
+    kprintf("    df            â€ Disk/filesystem usage\n");
+    kprintf("    top           â€ Live process table (MLFQ scheduler)\n");
+    kprintf("    ps            â€ List all processes with state\n");
+    kprintf("    kill <pid>    â€ Terminate process by PID\n");
+    kprintf("    nice <pri> <pid> â€ Adjust process priority\n");
+    kprintf("    lsmod         â€ List loaded kernel modules\n");
+    kprintf("    insmod <file> â€ Load kernel module\n");
+    kprintf("    rmmod <name>  â€ Remove kernel module\n");
+    kprintf("    dmesg         â€ Print kernel ring buffer\n");
+    kprintf("    history       â€ Command history\n");
+    kprintf("    export K=V    â€ Set environment variable\n");
+    kprintf("    env           â€ List all environment variables\n");
     kprintf("  FILE SYSTEM:\n");
-    kprintf("    ls [path]     — List directory\n");
-    kprintf("    cat <file>    — Print file contents\n");
-    kprintf("    mkdir <dir>   — Create directory\n");
-    kprintf("    rm <file>     — Remove file/directory\n");
-    kprintf("    cp <src><dst> — Copy file\n");
-    kprintf("    mv <src><dst> — Move/rename file\n");
-    kprintf("    touch <file>  — Create empty file\n");
-    kprintf("    stat <file>   — File statistics\n");
-    kprintf("    find <path> <name> — Find files\n");
-    kprintf("    grep <pat> <f>— Search pattern in file\n");
-    kprintf("    head/tail <f> — First/last N lines\n");
-    kprintf("    wc <file>     — Word/line/byte count\n");
-    kprintf("    hexdump <f>   — Hex dump file\n");
+    kprintf("    ls [path]     â€ List directory\n");
+    kprintf("    cat <file>    â€ Print file contents\n");
+    kprintf("    mkdir <dir>   â€ Create directory\n");
+    kprintf("    rm <file>     â€ Remove file/directory\n");
+    kprintf("    cp <src><dst> â€ Copy file\n");
+    kprintf("    mv <src><dst> â€ Move/rename file\n");
+    kprintf("    touch <file>  â€ Create empty file\n");
+    kprintf("    stat <file>   â€ File statistics\n");
+    kprintf("    find <path> <name> â€ Find files\n");
+    kprintf("    grep <pat> <f>â€ Search pattern in file\n");
+    kprintf("    head/tail <f> â€ First/last N lines\n");
+    kprintf("    wc <file>     â€ Word/line/byte count\n");
+    kprintf("    hexdump <f>   â€ Hex dump file\n");
     kprintf("  NETWORK:\n");
-    kprintf("    ifconfig      — Network interface status\n");
-    kprintf("    ping <host>   — ICMP echo test\n");
-    kprintf("    netstat       — Network connections\n");
-    kprintf("    route         — Routing table\n");
-    kprintf("    fw-add <rule> — Add firewall rule\n");
-    kprintf("    fw-ls         — List firewall rules\n");
+    kprintf("    ifconfig      â€ Network interface status\n");
+    kprintf("    ping <host>   â€ ICMP echo test\n");
+    kprintf("    netstat       â€ Network connections\n");
+    kprintf("    route         â€ Routing table\n");
+    kprintf("    fw-add <rule> â€ Add firewall rule\n");
+    kprintf("    fw-ls         â€ List firewall rules\n");
     kprintf("  SECURITY / PQC:\n");
-    kprintf("    pqc-gen       — Generate Lattice-PQC keypair\n");
-    kprintf("    pqc-sign <f>  — Sign file with Dilithium\n");
-    kprintf("    pqc-verify <f>— Verify Dilithium signature\n");
-    kprintf("    hash <file>   — SHA-3 / FNV-1a hash\n");
-    kprintf("    enc <file>    — Encrypt with Lattice key\n");
-    kprintf("    dec <file>    — Decrypt with Lattice key\n");
+    kprintf("    pqc-gen       â€ Generate Lattice-PQC keypair\n");
+    kprintf("    pqc-sign <f>  â€ Sign file with Dilithium\n");
+    kprintf("    pqc-verify <f>â€ Verify Dilithium signature\n");
+    kprintf("    hash <file>   â€ SHA-3 / FNV-1a hash\n");
+    kprintf("    enc <file>    â€ Encrypt with Lattice key\n");
+    kprintf("    dec <file>    â€ Decrypt with Lattice key\n");
     kprintf("  LEGAL / COMPLIANCE:\n");
-    kprintf("    law-query --bnss — BNSS criminal procedures\n");
-    kprintf("    law-query --bsa  — BSA digital evidence rules\n");
-    kprintf("    law-query --bns  — BNS offence matrix\n");
-    kprintf("    law-query --pocso— POCSO child protection\n");
-    kprintf("    law-query --pmla — PMLA money laundering\n");
-    kprintf("    law-query --rti  — RTI procedures\n");
-    kprintf("    law-query --dpdp — DPDP data protection\n");
-    kprintf("    law-query --gst  — GST compliance\n");
-    kprintf("    law-query --rera — RERA real estate\n");
-    kprintf("    law-query --ibc  — IBC insolvency\n");
-    kprintf("    law-query --it   — IT Act / Cyber law\n");
-    kprintf("    law-query --arb  — Arbitration procedures\n");
-    kprintf("    law-query --labour — Labour code compliance\n");
-    kprintf("    law-query --consumer — Consumer protection\n");
-    kprintf("    bsa-cert --gen  — Generate BSA Sec 63 certificate\n");
-    kprintf("    checklist-ls    — List all legal checklist templates\n");
-    kprintf("    checklist-report— Print compliance score report\n");
-    kprintf("    deadline-audit  — Check missed legal deadlines\n");
-    kprintf("    bnss-fir        — Log FIR procedure\n");
-    kprintf("    bnss-arrest     — Arrest compliance audit\n");
-    kprintf("    bnss-bail       — Bail application steps\n");
-    kprintf("    bnss-remand     — Remand tracking\n");
+    kprintf("    law-query --bnss â€ BNSS criminal procedures\n");
+    kprintf("    law-query --bsa  â€ BSA digital evidence rules\n");
+    kprintf("    law-query --bns  â€ BNS offence matrix\n");
+    kprintf("    law-query --pocsoâ€ POCSO child protection\n");
+    kprintf("    law-query --pmla â€ PMLA money laundering\n");
+    kprintf("    law-query --rti  â€ RTI procedures\n");
+    kprintf("    law-query --dpdp â€ DPDP data protection\n");
+    kprintf("    law-query --gst  â€ GST compliance\n");
+    kprintf("    law-query --rera â€ RERA real estate\n");
+    kprintf("    law-query --ibc  â€ IBC insolvency\n");
+    kprintf("    law-query --it   â€ IT Act / Cyber law\n");
+    kprintf("    law-query --arb  â€ Arbitration procedures\n");
+    kprintf("    law-query --labour â€ Labour code compliance\n");
+    kprintf("    law-query --consumer â€ Consumer protection\n");
+    kprintf("    bsa-cert --gen  â€ Generate BSA Sec 63 certificate\n");
+    kprintf("    checklist-ls    â€ List all legal checklist templates\n");
+    kprintf("    checklist-reportâ€ Print compliance score report\n");
+    kprintf("    deadline-audit  â€ Check missed legal deadlines\n");
+    kprintf("    bnss-fir        â€ Log FIR procedure\n");
+    kprintf("    bnss-arrest     â€ Arrest compliance audit\n");
+    kprintf("    bnss-bail       â€ Bail application steps\n");
+    kprintf("    bnss-remand     â€ Remand tracking\n");
     kprintf("  FORENSICS:\n");
-    kprintf("    forensic-scan <path> — Digital forensic sector scan\n");
-    kprintf("    forensic-hash <f>    — Compute evidence hash\n");
-    kprintf("    disk-image <dev>     — Bit-perfect disk image\n");
-    kprintf("    chain-of-custody     — Print custody log\n");
-    kprintf("    volatile-dump        — Dump RAM volatile state\n");
+    kprintf("    forensic-scan <path> â€ Digital forensic sector scan\n");
+    kprintf("    forensic-hash <f>    â€ Compute evidence hash\n");
+    kprintf("    disk-image <dev>     â€ Bit-perfect disk image\n");
+    kprintf("    chain-of-custody     â€ Print custody log\n");
+    kprintf("    volatile-dump        â€ Dump RAM volatile state\n");
     kprintf("  AI / ML / DATA SCIENCE:\n");
-    kprintf("    ml-train <data> — Train neural shard\n");
-    kprintf("    ml-infer <input>— Run inference shard\n");
-    kprintf("    plot-graph <csv>— ASCII/SVG graph plot\n");
-    kprintf("    data-matrix     — Live kernel performance matrix\n");
-    kprintf("    ncert-sim <ch>  — NCERT chapter simulation\n");
+    kprintf("    ml-train <data> â€ Train neural shard\n");
+    kprintf("    ml-infer <input>â€ Run inference shard\n");
+    kprintf("    plot-graph <csv>â€ ASCII/SVG graph plot\n");
+    kprintf("    data-matrix     â€ Live kernel performance matrix\n");
+    kprintf("    ncert-sim <ch>  â€ NCERT chapter simulation\n");
     kprintf("  CAMERA & VISUAL:\n");
-    kprintf("    cam-cap         — Capture silicon frame\n");
-    kprintf("    cam-filt <name> — Apply filter (sepia/edge/blur/sharpen)\n");
-    kprintf("    cam-filters     — List all available filters\n");
-    kprintf("    cam-forensic-start — Start BSA forensic capture session\n");
-    kprintf("    cam-forensic-stop  — End BSA forensic capture session\n");
-    kprintf("    cam-events      — Process camera event bus\n");
+    kprintf("    cam-cap         â€ Capture silicon frame\n");
+    kprintf("    cam-filt <name> â€ Apply filter (sepia/edge/blur/sharpen)\n");
+    kprintf("    cam-filters     â€ List all available filters\n");
+    kprintf("    cam-forensic-start â€ Start BSA forensic capture session\n");
+    kprintf("    cam-forensic-stop  â€ End BSA forensic capture session\n");
+    kprintf("    cam-events      â€ Process camera event bus\n");
     kprintf("  AUTOMATION / PERSONALISATION:\n");
-    kprintf("    sigma-auto <if> <then> — Add S-Auto workflow\n");
-    kprintf("    sigma-auto-ls   — List active workflows\n");
-    kprintf("    theme <name>    — Change CLI theme (onyx/cobalt/matrix)\n");
-    kprintf("    mode <name>     — Set OS mode (work/audit/sleep)\n");
-    kprintf("    alias <n> <cmd> — Create command alias\n");
-    kprintf("    unalias <name>  — Remove alias\n");
+    kprintf("    sigma-auto <if> <then> â€ Add S-Auto workflow\n");
+    kprintf("    sigma-auto-ls   â€ List active workflows\n");
+    kprintf("    theme <name>    â€ Change CLI theme (onyx/cobalt/matrix)\n");
+    kprintf("    mode <name>     â€ Set OS mode (work/audit/sleep)\n");
+    kprintf("    alias <n> <cmd> â€ Create command alias\n");
+    kprintf("    unalias <name>  â€ Remove alias\n");
     kprintf("  DISTRIBUTION / CONTAINER:\n");
-    kprintf("    container-run <img> — Spawn isolated container\n");
-    kprintf("    container-ps        — List containers\n");
-    kprintf("    namespace-ls        — List kernel namespaces\n");
-    kprintf("    cgroup-ls           — List cgroup trees\n");
-    kprintf("    sigma-deploy <mode> — Deploy (qemu/iso/docker/wsl/cloud)\n");
+    kprintf("    container-run <img> â€ Spawn isolated container\n");
+    kprintf("    container-ps        â€ List containers\n");
+    kprintf("    namespace-ls        â€ List kernel namespaces\n");
+    kprintf("    cgroup-ls           â€ List cgroup trees\n");
+    kprintf("    sigma-deploy <mode> â€ Deploy (qemu/iso/docker/wsl/cloud)\n");
     kprintf("  SYNC / REPOSITORY:\n");
-    kprintf("    sync-gh         — Sync with GitHub repository\n");
-    kprintf("    shard-ls        — List all kernel shards\n");
-    kprintf("    heatmap         — Real-time silicon heatmap\n");
-    kprintf("    molt-sync       — Sync Molt-Agent task graph\n");
-    kprintf("    dist-offload <node> — Offload task to cluster node\n");
+    kprintf("    sync-gh         â€ Sync with GitHub repository\n");
+    kprintf("    shard-ls        â€ List all kernel shards\n");
+    kprintf("    heatmap         â€ Real-time silicon heatmap\n");
+    kprintf("    molt-sync       â€ Sync Molt-Agent task graph\n");
+    kprintf("    dist-offload <node> â€ Offload task to cluster node\n");
     kprintf("  LINUX DISTRO COMMANDS (Simulated):\n");
-    kprintf("    apt <cmd>       — Advanced Package Tool (Debian/Ubuntu)\n");
-    kprintf("    pacman <cmd>    — Package Manager (Arch Linux / AUR)\n");
-    kprintf("    dnf/yum <cmd>   — Dandified YUM (Fedora/RHEL/CentOS)\n");
-    kprintf("    zypper <cmd>    — ZYpp package manager (openSUSE)\n");
-    kprintf("    brew <cmd>      — Homebrew (macOS/Linux)\n");
-    kprintf("    systemctl <cmd> — Control systemd system and service\n");
-    kprintf("    journalctl <cmd>— Query and display logs from journald\n");
+    kprintf("    apt <cmd>       â€ Advanced Package Tool (Debian/Ubuntu)\n");
+    kprintf("    pacman <cmd>    â€ Package Manager (Arch Linux / AUR)\n");
+    kprintf("    dnf/yum <cmd>   â€ Dandified YUM (Fedora/RHEL/CentOS)\n");
+    kprintf("    zypper <cmd>    â€ ZYpp package manager (openSUSE)\n");
+    kprintf("    brew <cmd>      â€ Homebrew (macOS/Linux)\n");
+    kprintf("    systemctl <cmd> â€ Control systemd system and service\n");
+    kprintf("    journalctl <cmd>â€ Query and display logs from journald\n");
     kprintf("  CUSTOM SOVEREIGN COMMANDS:\n");
-    kprintf("    ml-infer <in>   — Run sharded neural inference\n");
-    kprintf("    data-plot <csv> — Generate kernel-native data visualization\n");
-    kprintf("    auto-setup      — Automated industrial environment setup\n");
-    kprintf("    personalize     — Custom AI persona/theme personalization\n");
-    kprintf("    graph-plot      — Complex topological graph visualizer\n");
+    kprintf("    ml-infer <in>   â€ Run sharded neural inference\n");
+    kprintf("    data-plot <csv> â€ Generate kernel-native data visualization\n");
+    kprintf("    auto-setup      â€ Automated industrial environment setup\n");
+    kprintf("    personalize     â€ Custom AI persona/theme personalization\n");
+    kprintf("    graph-plot      â€ Complex topological graph visualizer\n");
     kprintf("  DISK & STORAGE:\n");
-    kprintf("    lsblk           — List block devices\n");
-    kprintf("    fdisk <dev>     — Partition table manipulator\n");
-    kprintf("    mount/umount    — Mount/unmount file systems\n");
+    kprintf("    lsblk           â€ List block devices\n");
+    kprintf("    fdisk <dev>     â€ Partition table manipulator\n");
+    kprintf("    mount/umount    â€ Mount/unmount file systems\n");
     kprintf("  ADVANCED NETWORK:\n");
-    kprintf("    ip addr/link    — Protocol addresses / device status\n");
-    kprintf("    ss -tulpn       — Display socket statistics\n");
-    kprintf("    dig/nslookup    — DNS lookup utility\n");
+    kprintf("    ip addr/link    â€ Protocol addresses / device status\n");
+    kprintf("    ss -tulpn       â€ Display socket statistics\n");
+    kprintf("    dig/nslookup    â€ DNS lookup utility\n");
     kprintf("  ARCHIVE & PERMS:\n");
-    kprintf("    tar -czvf <f>   — Create compressed archive\n");
-    kprintf("    chmod <oct> <f> — Change file mode bits\n");
-    kprintf("    sudo <cmd>      — Execute command as sovereign\n");
+    kprintf("    tar -czvf <f>   â€ Create compressed archive\n");
+    kprintf("    chmod <oct> <f> â€ Change file mode bits\n");
+    kprintf("    sudo <cmd>      â€ Execute command as sovereign\n");
     kprintf("  QUANTUM & ML CORE:\n");
-    kprintf("    tensor-core     — Active sharded tensor pipeline\n");
-    kprintf("    data-crunch     — High-throughput data stream processor\n");
-    kprintf("    shard-rebase    — Hot-rebase kernel shards without reboot\n");
-    kprintf("    lattice-lock    — Hard-lock memory lattice shards\n");
+    kprintf("    tensor-core     â€ Active sharded tensor pipeline\n");
+    kprintf("    data-crunch     â€ High-throughput data stream processor\n");
+    kprintf("    shard-rebase    â€ Hot-rebase kernel shards without reboot\n");
+    kprintf("    lattice-lock    â€ Hard-lock memory lattice shards\n");
     kprintf("  REMOTE & SYNC:\n");
-    kprintf("    git <cmd>       — Distributed version control\n");
-    kprintf("    ssh <host>      — Secure shell access\n");
-    kprintf("    scp <f> <dest>  — Secure copy\n");
+    kprintf("    git <cmd>       â€ Distributed version control\n");
+    kprintf("    ssh <host>      â€ Secure shell access\n");
+    kprintf("    scp <f> <dest>  â€ Secure copy\n");
     kprintf("  TEXT PROCESSING:\n");
-    kprintf("    grep <pat> <f>  — Pattern matching\n");
-    kprintf("    awk/sed <expr>  — Stream editing and processing\n");
+    kprintf("    grep <pat> <f>  â€ Pattern matching\n");
+    kprintf("    awk/sed <expr>  â€ Stream editing and processing\n");
     kprintf("  SYSTEM MONITOR:\n");
-    kprintf("    top/htop        — Dynamic real-time process view\n");
-    kprintf("    free -m         — Display amount of free/used memory\n");
-    kprintf("    uptime          — How long the system has been running\n");
+    kprintf("    top/htop        â€ Dynamic real-time process view\n");
+    kprintf("    free -m         â€ Display amount of free/used memory\n");
+    kprintf("    uptime          â€ How long the system has been running\n");
     kprintf("  NETWORK DIAG:\n");
-    kprintf("    ping <host>     — Send ICMP ECHO_REQUEST to network hosts\n");
-    kprintf("    curl/wget <url> — Transfer data from or to a server\n");
+    kprintf("    ping <host>     â€ Send ICMP ECHO_REQUEST to network hosts\n");
+    kprintf("    curl/wget <url> â€ Transfer data from or to a server\n");
     kprintf("  AI & AGENTIC CODING (Zenith USP):\n");
-    kprintf("    sigma-code <f>  — Agentic AI coding assistant (Claude-Code USP)\n");
-    kprintf("    claw-analyze    — Deep architectural analysis (Claw-Code USP)\n");
-    kprintf("    open-forge      — Collaborative sovereign development\n");
+    kprintf("    sigma-code <f>  â€ Agentic AI coding assistant (Claude-Code USP)\n");
+    kprintf("    claw-analyze    â€ Deep architectural analysis (Claw-Code USP)\n");
+    kprintf("    open-forge      â€ Collaborative sovereign development\n");
     kprintf("  DISTRO USPs (Zenith-Absorbed):\n");
-    kprintf("    nix-rebuild     — Declarative state synchronization (NixOS USP)\n");
-    kprintf("    emerge-optim    — Extreme compilation optimization (Gentoo USP)\n");
-    kprintf("    amnesia-seal    — Complete volatile memory wipe (Tails USP)\n");
-    kprintf("    vuln-scan       — Integrated pen-testing suite (Kali USP)\n");
-    kprintf("    sigma-agent     — Autonomous OS maintenance AI (Zenith Special)\n");
+    kprintf("    nix-rebuild     â€ Declarative state synchronization (NixOS USP)\n");
+    kprintf("    emerge-optim    â€ Extreme compilation optimization (Gentoo USP)\n");
+    kprintf("    amnesia-seal    â€ Complete volatile memory wipe (Tails USP)\n");
+    kprintf("    vuln-scan       â€ Integrated pen-testing suite (Kali USP)\n");
+    kprintf("    sigma-agent     â€ Autonomous OS maintenance AI (Zenith Special)\n");
     kprintf("  NO-MOUSE / ACCESSIBILITY (Keyboard Sovereign):\n");
-    kprintf("    Alt + N         — Next active shard\n");
-    kprintf("    Alt + P         — Previous active shard\n");
-    kprintf("    Ctrl + Shift + F— Global Sovereign Search\n");
-    kprintf("    :q, :w, :wq     — Vim-style session management\n");
-    kprintf("    tab-complete    — Intelligent context-aware completion\n");
-    kprintf("    mesh-sync <id>  — Share current task with peer device\n");
+    kprintf("    Alt + N         â€ Next active shard\n");
+    kprintf("    Alt + P         â€ Previous active shard\n");
+    kprintf("    Ctrl + Shift + Fâ€ Global Sovereign Search\n");
+    kprintf("    :q, :w, :wq     â€ Vim-style session management\n");
+    kprintf("    tab-complete    â€ Intelligent context-aware completion\n");
+    kprintf("    mesh-sync <id>  â€ Share current task with peer device\n");
     kprintf("  KEYBOARD SHORTCUTS:\n");
-    kprintf("    Ctrl+C     — Interrupt running command\n");
-    kprintf("    Ctrl+D     — End of input / logout\n");
-    kprintf("    Ctrl+L     — Clear screen\n");
-    kprintf("    Ctrl+R     — Reverse history search\n");
-    kprintf("    Tab        — Auto-complete hint\n");
-    kprintf("    Up/Down    — Navigate history\n");
+    kprintf("    Ctrl+C     â€ Interrupt running command\n");
+    kprintf("    Ctrl+D     â€ End of input / logout\n");
+    kprintf("    Ctrl+L     â€ Clear screen\n");
+    kprintf("    Ctrl+R     â€ Reverse history search\n");
+    kprintf("    Tab        â€ Auto-complete hint\n");
+    kprintf("    Up/Down    â€ Navigate history\n");
     kprintf("  Pipeline: cmd1 | cmd2 | cmd3\n");
     kprintf("  Redirect:  cmd > file  OR  cmd >> file\n\n");
 }
@@ -423,7 +423,7 @@ static void cmd_version(ParsedCmd* c) {
 }
 
 static void cmd_uname(ParsedCmd* c) {
-    bool_t all = (c->argc > 1 && c->args[1][0] == '-' && c->args[1][1] == 'a');
+    sigma_bool all = (c->argc > 1 && c->args[1][0] == '-' && c->args[1][1] == 'a');
     kprintf("SigmaOS");
     if (all) kprintf(" SigmaOS 1.0-SOVEREIGN #1 SMP x86_64 GNU/SIGMA");
     kprintf("\n");
@@ -447,7 +447,7 @@ static void cmd_top(ParsedCmd* c) {
     (void)c;
     extern void sched_audit(void);
     extern void pmm_audit(void);
-    kprintf("[OMNI-SHELL]: SIGMAOS TOP — Real-time View:\n");
+    kprintf("[OMNI-SHELL]: SIGMAOS TOP â€ Real-time View:\n");
     sched_audit();
     pmm_audit();
 }
@@ -467,12 +467,12 @@ static void cmd_ls(ParsedCmd* c) {
 
 static void cmd_cat(ParsedCmd* c) {
     if (c->argc < 2) { kprintf("[ERR]: cat requires a file argument.\n"); return; }
-    extern i32 vfs_open(const char*, u32, u32);
-    extern i64 vfs_read(i32, void*, u32);
-    extern i32 vfs_close(i32);
-    i32 fd = vfs_open(c->args[1], 0, 0);
+    extern sigma_i32 vfs_open(const char*, sigma_u32, sigma_u32);
+    extern sigma_i64 vfs_read(sigma_i32, void*, sigma_u32);
+    extern sigma_i32 vfs_close(sigma_i32);
+    sigma_i32 fd = vfs_open(c->args[1], 0, 0);
     if (fd < 0) { kprintf("[ERR]: File '%s' not found.\n", c->args[1]); return; }
-    char buf[256]; i64 n;
+    char buf[256]; sigma_i64 n;
     while ((n = vfs_read(fd, buf, 255)) > 0) {
         buf[n] = '\0'; kprintf("%s", buf);
     }
@@ -481,7 +481,7 @@ static void cmd_cat(ParsedCmd* c) {
 
 static void cmd_mkdir(ParsedCmd* c) {
     if (c->argc < 2) { kprintf("[ERR]: mkdir requires a directory name.\n"); return; }
-    extern i32 vfs_mkdir(const char*);
+    extern sigma_i32 vfs_mkdir(const char*);
     if (vfs_mkdir(c->args[1]) == 0)
         kprintf("[VFS]: Directory '%s' created.\n", c->args[1]);
     else
@@ -490,7 +490,7 @@ static void cmd_mkdir(ParsedCmd* c) {
 
 static void cmd_rm(ParsedCmd* c) {
     if (c->argc < 2) { kprintf("[ERR]: rm requires a file argument.\n"); return; }
-    extern i32 vfs_unlink(const char*);
+    extern sigma_i32 vfs_unlink(const char*);
     if (vfs_unlink(c->args[1]) == 0)
         kprintf("[VFS]: '%s' removed.\n", c->args[1]);
     else
@@ -498,8 +498,8 @@ static void cmd_rm(ParsedCmd* c) {
 }
 
 static void cmd_law_query(ParsedCmd* c) {
-    extern k_status checklist_query_domain(u32, u32*);
-    extern u32      checklist_total_items(void);
+    extern sigma_status checklist_query_domain(sigma_u32, sigma_u32*);
+    extern sigma_u32      checklist_total_items(void);
     if (c->argc < 2) {
         kprintf("[LAW-QUERY]: Total checklist items: %u across all domains.\n",
                 checklist_total_items());
@@ -508,7 +508,7 @@ static void cmd_law_query(ParsedCmd* c) {
         return;
     }
     const char* flag = c->args[1];
-    u32 domain = 0, count = 0;
+    sigma_u32 domain = 0, count = 0;
     if (shell_streq(flag, "--bnss"))    domain = 0;
     else if (shell_streq(flag, "--bns")) domain = 1;
     else if (shell_streq(flag, "--bsa")) domain = 2;
@@ -529,27 +529,27 @@ static void cmd_law_query(ParsedCmd* c) {
 
 static void cmd_bsa_cert(ParsedCmd* c) {
     (void)c;
-    extern u64 os_get_timestamp_ns(void);
-    u64 ts = os_get_timestamp_ns();
+    extern sigma_u64 os_get_timestamp_ns(void);
+    sigma_u64 ts = os_get_timestamp_ns();
     kprintf("[BSA-SEC63]: Sovereign Electronic Evidence Certificate\n");
     kprintf("  Timestamp_ns : %llu\n", ts);
     kprintf("  Hash_algo    : FNV-1a + SHA-3 compatible\n");
     kprintf("  Signed_by    : SigmaOS-Forensic-Module\n");
     kprintf("  BSA_Section  : Sec 63 Bharatiya Sakshya Adhiniyam 2023\n");
-    kprintf("  Status       : VALID — ADMISSIBLE IN COURT\n");
+    kprintf("  Status       : VALID â€ ADMISSIBLE IN COURT\n");
 }
 
 static void cmd_cam_cap(ParsedCmd* c) {
     (void)c;
-    extern k_status camera_capture_frame(void*);
-    k_status s = camera_capture_frame(NULL);
+    extern sigma_status camera_capture_frame(void*);
+    sigma_status s = camera_capture_frame(SIGMA_NULL);
     kprintf("[CAM-CAP]: %s\n", s == K_OK ? "Frame captured. BSA hash recorded." : "FAIL");
 }
 
 static void cmd_cam_filt(ParsedCmd* c) {
-    extern k_status camera_apply_filter(void*, const char*);
+    extern sigma_status camera_apply_filter(void*, const char*);
     const char* filter = (c->argc > 1) ? c->args[1] : "SEPIA_ZENITH";
-    camera_apply_filter(NULL, filter);
+    camera_apply_filter(SIGMA_NULL, filter);
 }
 
 static void cmd_cam_filters(ParsedCmd* c) {
@@ -559,14 +559,14 @@ static void cmd_cam_filters(ParsedCmd* c) {
 }
 
 static void cmd_cam_forensic_start(ParsedCmd* c) {
-    extern k_status camera_forensic_session_start(const char*);
+    extern sigma_status camera_forensic_session_start(const char*);
     const char* tag = (c->argc > 1) ? c->args[1] : "SIGMA-BSA63-SESSION";
     camera_forensic_session_start(tag);
 }
 
 static void cmd_cam_forensic_stop(ParsedCmd* c) {
     (void)c;
-    extern k_status camera_forensic_session_stop(void);
+    extern sigma_status camera_forensic_session_stop(void);
     camera_forensic_session_stop();
 }
 
@@ -578,14 +578,14 @@ static void cmd_cam_events(ParsedCmd* c) {
 
 static void cmd_heatmap(ParsedCmd* c) {
     (void)c;
-    kprintf("\n  Σ SIGMA-ZENITH SILICON HEATMAP (Real-Time):\n");
-    kprintf("  ┌────────────────────────────────────────┐\n");
-    kprintf("  │ CPU  ████████░░ 80%%  │ TEMP  45°C     │\n");
-    kprintf("  │ RAM  █████░░░░░ 50%%  │ PMM   BUDDY OK │\n");
-    kprintf("  │ NET  ██░░░░░░░░ 20%%  │ VFS   RAMFS OK │\n");
-    kprintf("  │ I/O  ███░░░░░░░ 30%%  │ SCHED MLFQ-8   │\n");
-    kprintf("  │ PQC  ████████░░ 80%%  │ RING0 SECURE   │\n");
-    kprintf("  └────────────────────────────────────────┘\n");
+    kprintf("\n  Î£ SIGMA-ZENITH SILICON HEATMAP (Real-Time):\n");
+    kprintf("  âŒâ€â€â€â€â€â€â€â€â€â€â€â€â€â€â€â€â€â€â€â€â€â€â€â€â€â€â€â€â€â€â€â€â€â€â€â€â€â€â€â€â\n");
+    kprintf("  â‚ CPU  â–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–‘â–‘ 80%%  â‚ TEMP  45Â°C     â‚\n");
+    kprintf("  â‚ RAM  â–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–‘â–‘â–‘â–‘â–‘ 50%%  â‚ PMM   BUDDY OK â‚\n");
+    kprintf("  â‚ NET  â–ˆâ–ˆâ–‘â–‘â–‘â–‘â–‘â–‘â–‘â–‘ 20%%  â‚ VFS   RAMFS OK â‚\n");
+    kprintf("  â‚ I/O  â–ˆâ–ˆâ–ˆâ–‘â–‘â–‘â–‘â–‘â–‘â–‘ 30%%  â‚ SCHED MLFQ-8   â‚\n");
+    kprintf("  â‚ PQC  â–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–‘â–‘ 80%%  â‚ RING0 SECURE   â‚\n");
+    kprintf("  ââ€â€â€â€â€â€â€â€â€â€â€â€â€â€â€â€â€â€â€â€â€â€â€â€â€â€â€â€â€â€â€â€â€â€â€â€â€â€â€â€â˜\n");
     kprintf("  SHARD_ENTROPY: 0.978 | UPTIME: SOVEREIGN | THREAT: ZERO\n\n");
 }
 
@@ -658,7 +658,7 @@ static void cmd_lsblk(ParsedCmd* c) {
     (void)c;
     kprintf("NAME    MAJ:MIN RM   SIZE RO TYPE MOUNTPOINT\n");
     kprintf("sda       8:0    0   256G  0 disk \n");
-    kprintf("└─sda1    8:1    0   256G  0 part /vfs\n");
+    kprintf("ââ€sda1    8:1    0   256G  0 part /vfs\n");
 }
 
 static void cmd_ip(ParsedCmd* c) {
@@ -712,13 +712,13 @@ static void cmd_pqc_gen(ParsedCmd* c) {
 
 static void cmd_checklist_report(ParsedCmd* c) {
     (void)c;
-    extern k_status checklist_generate_report(void);
+    extern sigma_status checklist_generate_report(void);
     checklist_generate_report();
 }
 
 static void cmd_checklist_ls(ParsedCmd* c) {
     (void)c;
-    extern u32 checklist_total_items(void);
+    extern sigma_u32 checklist_total_items(void);
     kprintf("[CHECKLIST-LS]: Indian Law Domains loaded:\n");
     kprintf("  1. BNSS 2023 (Criminal Procedure)\n");
     kprintf("  2. BNS 2023 (Substantive Offences)\n");
@@ -750,9 +750,9 @@ static void cmd_ml_train(ParsedCmd* c) {
     const char* dataset = (c->argc > 1) ? c->args[1] : "default_dataset";
     kprintf("[ML-TRAIN]: Initiating zero-dependency neural training on '%s'...\n", dataset);
     kprintf("[ML-TRAIN]: Shard: linear_algebra_shard + gradient_descent_shard\n");
-    kprintf("[ML-TRAIN]: Epoch 1/10 — Loss: 0.452\n");
-    kprintf("[ML-TRAIN]: Epoch 5/10 — Loss: 0.211\n");
-    kprintf("[ML-TRAIN]: Epoch 10/10 — Loss: 0.098\n");
+    kprintf("[ML-TRAIN]: Epoch 1/10 â€ Loss: 0.452\n");
+    kprintf("[ML-TRAIN]: Epoch 5/10 â€ Loss: 0.211\n");
+    kprintf("[ML-TRAIN]: Epoch 10/10 â€ Loss: 0.098\n");
     kprintf("[ML-TRAIN]: Training complete. Model saved to /sigma_shards/model.bin\n");
 }
 
@@ -794,7 +794,7 @@ static void cmd_export(ParsedCmd* c) {
     /* simple K=V parsing */
     char key[32], val[128];
     const char* kv = c->args[1];
-    u32 i = 0, j = 0;
+    sigma_u32 i = 0, j = 0;
     while (kv[i] && kv[i] != '=') { if (i < 31) key[i] = kv[i]; i++; }
     key[i] = '\0';
     if (kv[i] == '=') i++;
@@ -806,7 +806,7 @@ static void cmd_export(ParsedCmd* c) {
 
 static void cmd_env_list(ParsedCmd* c) {
     (void)c;
-    u32 i;
+    sigma_u32 i;
     for (i = 0; i < g_shell.env_count; i++)
         kprintf("  %s=%s\n", g_shell.env[i].key, g_shell.env[i].val);
 }
@@ -902,17 +902,17 @@ static const CmdEntry g_cmds[] = {
     { "clear",                 cmd_clear,                 "Clear screen" },
     { "cls",                   cmd_clear,                 "Clear screen" },
     { "exit",                  cmd_exit_shell,            "Exit shell" },
-    { NULL, NULL, NULL }
+    { SIGMA_NULL, SIGMA_NULL, SIGMA_NULL }
 };
 
 /* =========================================================================
  * Execute a single parsed command
  * ========================================================================= */
-static k_status dispatch_one(ParsedCmd* c) {
+static sigma_status dispatch_one(ParsedCmd* c) {
     if (c->argc == 0) return K_OK;
 
     /* Check aliases first */
-    u32 a;
+    sigma_u32 a;
     for (a = 0; a < g_shell.alias_count; a++) {
         if (shell_streq(g_shell.aliases[a].name, c->args[0])) {
             /* Expand alias and re-execute */
@@ -922,7 +922,7 @@ static k_status dispatch_one(ParsedCmd* c) {
     }
 
     /* Search command table */
-    u32 i = 0;
+    sigma_u32 i = 0;
     while (g_cmds[i].name) {
         if (shell_streq(g_cmds[i].name, c->args[0])) {
             g_cmds[i].fn(c);
@@ -936,15 +936,15 @@ static k_status dispatch_one(ParsedCmd* c) {
 }
 
 /* =========================================================================
- * Public API — omnishell_init
+ * Public API â€ omnishell_init
  * ========================================================================= */
 void omnishell_init(void) {
-    u32 i;
-    u8* raw = (u8*)&g_shell;
+    sigma_u32 i;
+    sigma_u8* raw = (sigma_u8*)&g_shell;
     for (i = 0; i < sizeof(OmniShell); i++) raw[i] = 0;
     shell_strncpy(g_shell.cwd,  "/",      255);
     shell_strncpy(g_shell.user, "sigma",  31);
-    g_shell.verbose = TRUE;
+    g_shell.verbose = SIGMA_TRUE;
     /* Default environment */
     shell_env_set("PATH",  "/bin:/sigma_shards:/law:/forensics");
     shell_env_set("SHELL", "omni-shell");
@@ -955,9 +955,9 @@ void omnishell_init(void) {
 }
 
 /* =========================================================================
- * Public API — omnishell_exec
+ * Public API â€ omnishell_exec
  * ========================================================================= */
-k_status omnishell_exec(const char* line) {
+sigma_status omnishell_exec(const char* line) {
     if (!line) return K_ERR_INVAL;
 
     /* Ignore comments */
@@ -968,11 +968,11 @@ k_status omnishell_exec(const char* line) {
 
     /* Parse into pipeline stages */
     ParsedCmd cmds[MAX_PIPE_STAGES];
-    u32 stages = shell_parse(line, cmds, MAX_PIPE_STAGES);
+    sigma_u32 stages = shell_parse(line, cmds, MAX_PIPE_STAGES);
 
-    /* Execute each stage (simple sequential for now — no actual fd piping in kernel) */
-    u32 s;
-    k_status last = K_OK;
+    /* Execute each stage (simple sequential for now â€ no actual fd piping in kernel) */
+    sigma_u32 s;
+    sigma_status last = K_OK;
     for (s = 0; s < stages; s++) {
         last = dispatch_one(&cmds[s]);
     }
@@ -981,8 +981,8 @@ k_status omnishell_exec(const char* line) {
 }
 
 /* =========================================================================
- * Public API — omnishell_prompt
+ * Public API â€ omnishell_prompt
  * ========================================================================= */
 void omnishell_print_prompt(void) {
-    kprintf("\nΣ %s@sigmaos:%s> ", g_shell.user, g_shell.cwd);
+    kprintf("\nÎ£ %s@sigmaos:%s> ", g_shell.user, g_shell.cwd);
 }

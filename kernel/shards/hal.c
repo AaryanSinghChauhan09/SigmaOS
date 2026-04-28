@@ -1,6 +1,6 @@
 /*
  * =============================================================================
- * Σ SIGMAOS KERNEL: SOVEREIGN HAL (v1.0 - SILICON ABSTRACTION)
+ * Î£ SIGMAOS KERNEL: SOVEREIGN HAL (v1.0 - SILICON ABSTRACTION)
  * =============================================================================
  * Algorithm: Dynamic Hardware Device Discovery
  * Principles:
@@ -11,18 +11,18 @@
  * =============================================================================
  */
 
-#include "../include/sigma_kernel_types.h"
+#include "../../include/sigma_kernel_types.h"
 
 typedef struct SigmaDevice {
-    u16 vendor_id;
-    u16 device_id;
-    u32 class_id;
-    u64 base_addr;
+    sigma_u16 vendor_id;
+    sigma_u16 device_id;
+    sigma_u32 class_id;
+    sigma_u64 base_addr;
 } SigmaDevice;
 
 #define MAX_HAL_DEVICES 256
 static SigmaDevice g_hal_devices[MAX_HAL_DEVICES];
-static u32 g_dev_count = 0;
+static sigma_u32 g_dev_count = 0;
 
 /* =========================================================================
  * HAL Discovery (The Hardware Audit)
@@ -42,11 +42,11 @@ void hal_discover_hardware(void) {
     // kprintf("[HAL]: Hardware Discovery Complete. %u Shards Identified.\n", g_dev_count);
 }
 
-SigmaDevice* hal_find_device(u16 vendor, u16 device) {
-    for (u32 i = 0; i < g_dev_count; i++) {
+SigmaDevice* hal_find_device(sigma_u16 vendor, sigma_u16 device) {
+    for (sigma_u32 i = 0; i < g_dev_count; i++) {
         if (g_hal_devices[i].vendor_id == vendor && g_hal_devices[i].device_id == device) {
             return &g_hal_devices[i];
         }
     }
-    return NULL;
+    return SIGMA_NULL;
 }

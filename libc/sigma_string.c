@@ -1,4 +1,4 @@
-#include "SovereignLibC.h"
+#include "../include/SovereignLibC.h"
 
 int sigma_atoi(const char* s) {
     int res = 0;
@@ -28,9 +28,21 @@ void sigma_strcat(char* dest, const char* src) {
     *rd = '\0';
 }
 
+void sigma_strncat(char* dest, const char* src, sigma_size_t n) {
+    char* rd = dest;
+    while (*rd) rd++;
+    while (n-- && *src) { *rd++ = *src++; }
+    *rd = '\0';
+}
+
 void sigma_strcpy(char* dest, const char* src) {
     while (*src) { *dest++ = *src++; }
     *dest = '\0';
+}
+
+void sigma_strncpy(char* dest, const char* src, sigma_size_t n) {
+    while (n-- && *src) { *dest++ = *src++; }
+    if (n > 0) { while (n--) *dest++ = '\0'; }
 }
 
 int sigma_strcmp(const char* s1, const char* s2) {

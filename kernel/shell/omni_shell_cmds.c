@@ -1,6 +1,6 @@
 /*
  * =============================================================================
- * Σ SIGMAOS KERNEL: OMNI-SHELL-COMMANDS (Modularised)
+ * Î£ SIGMAOS KERNEL: OMNI-SHELL-COMMANDS (Modularised)
  * =============================================================================
  */
 

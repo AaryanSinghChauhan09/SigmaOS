@@ -1,6 +1,6 @@
 /*
  * =============================================================================
- * Σ SIGMAOS KERNEL: WEB-BRIDGE SHARD (v1.0 - BROWSER-SILICON SYNC)
+ * Î£ SIGMAOS KERNEL: WEB-BRIDGE SHARD (v1.0 - BROWSER-SILICON SYNC)
  * =============================================================================
  * Algorithm: Virtual-Serial Frame Orchestration
  * Principles:
@@ -11,7 +11,7 @@
  * =============================================================================
  */
 
-#include "../include/sigma_kernel_types.h"
+#include "../../include/sigma_kernel_types.h"
 
 #define WEB_SERIAL_PORT 0x3F8  /* COM1 */
 #define WEB_SIGNAL_VGA  0x100  /* Custom MMIO signal for VGA sync */
@@ -27,7 +27,7 @@ void web_bridge_init(void) {
 
 void web_send_packet(const char* msg) {
     /* Send data to the browser via serial (COM1) */
-    u32 i = 0;
+    sigma_u32 i = 0;
     while (msg[i]) {
         // while (!(inb(WEB_SERIAL_PORT + 5) & 0x20)); // wait for empty
         // outb(WEB_SERIAL_PORT, msg[i++]);
@@ -40,7 +40,7 @@ void web_sync_vga(void) {
     // outb(0x80, 0x93); // Post code specifically for browser-vga-sync
 }
 
-k_status web_process_request(u32 req_id) {
+sigma_status web_process_request(sigma_u32 req_id) {
     // kprintf("[WEB-BRIDGE]: Processing Browser Request ID: %u\n", req_id);
     return K_OK;
 }

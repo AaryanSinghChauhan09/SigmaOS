@@ -1,6 +1,6 @@
 /*
  * =============================================================================
- * Σ SIGMAOS KERNEL: INTEL E1000 DRIVER (v1.0)
+ * Î£ SIGMAOS KERNEL: INTEL E1000 DRIVER (v1.0)
  * =============================================================================
  * Principles: Zero-Copy Networking, Silicon-Direct Communication.
  * =============================================================================
@@ -11,24 +11,24 @@
 #define E1000_REG_STATUS 0x0008
 
 typedef struct {
-    u64 addr;
-    u16 length;
-    u8  cso;
-    u8  cmd;
-    u8  status;
-    u8  css;
-    u16 special;
+    sigma_u64 addr;
+    sigma_u16 length;
+    sigma_u8  cso;
+    sigma_u8  cmd;
+    sigma_u8  status;
+    sigma_u8  css;
+    sigma_u16 special;
 } __attribute__((packed)) tx_desc_t;
 
 static tx_desc_t* tx_ring;
-static u32 tx_tail = 0;
+static sigma_u32 tx_tail = 0;
 
-extern void mmio_write32(u64 addr, u32 val);
-extern u32 mmio_read32(u64 addr);
+extern void mmio_write32(sigma_u64 addr, sigma_u32 val);
+extern sigma_u32 mmio_read32(sigma_u64 addr);
 
-void e1000_send_packet(void* data, u16 len) {
+void e1000_send_packet(void* data, sigma_u16 len) {
     tx_desc_t* desc = &tx_ring[tx_tail];
-    desc->addr = (u64)(usize)data;
+    desc->addr = (sigma_u64)(sigma_usize)data;
     desc->length = len;
     desc->cmd = (1 << 0) | (1 << 3); /* EOP | RS */
     desc->status = 0;

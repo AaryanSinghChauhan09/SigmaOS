@@ -1,6 +1,6 @@
 /*
  * =============================================================================
- * Σ SIGMAOS KERNEL: SOVEREIGN-SOUND-CORE (v1.0 - INDUSTRIAL ALERTS)
+ * Î£ SIGMAOS KERNEL: SOVEREIGN-SOUND-CORE (v1.0 - INDUSTRIAL ALERTS)
  * =============================================================================
  * Algorithm: PWM/PCM Shard Streaming
  * Principles:
@@ -11,12 +11,12 @@
  * =============================================================================
  */
 
-#include "../include/sigma_kernel_types.h"
+#include "../../include/sigma_kernel_types.h"
 
 typedef struct SoundShard {
-    u32 frequency;
-    u32 duration_ms;
-    u32 volume;
+    sigma_u32 frequency;
+    sigma_u32 duration_ms;
+    sigma_u32 volume;
 } SoundShard;
 
 /* =========================================================================
@@ -27,7 +27,7 @@ void sound_core_init(void) {
     // kprintf("[SOUND-CORE]: Sovereign Silicon-Native Audio Shard Online.\n");
 }
 
-void sound_play_alert(u32 type) {
+void sound_play_alert(sigma_u32 type) {
     /* 
      * Types: 
      * 0 -> Industrial Pulse (Success)

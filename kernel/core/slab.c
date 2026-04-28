@@ -1,6 +1,6 @@
 /*
  * =============================================================================
- * Σ SIGMAOS KERNEL: SLAB ALLOCATOR (v1.0)
+ * Î£ SIGMAOS KERNEL: SLAB ALLOCATOR (v1.0)
  * =============================================================================
  * Principles: Zero-Fragmentation & Cache-Efficient Object Reuse.
  * =============================================================================
@@ -8,18 +8,18 @@
 #include "../../include/sigma_kernel_types.h"
 
 typedef struct slab {
-    u32 object_size;
-    u32 total_objects;
-    u32 free_objects;
+    sigma_u32 object_size;
+    sigma_u32 total_objects;
+    sigma_u32 free_objects;
     void* first_free;
     struct slab* next;
 } slab_t;
 
-static slab_t* slab_list = NULL;
+static slab_t* slab_list = SIGMA_NULL;
 
 extern void* pmm_alloc_page();
 
-void* slab_alloc(u32 size) {
+void* slab_alloc(sigma_u32 size) {
     /* 1. Find existing slab with matching size */
     slab_t* curr = slab_list;
     while (curr) {
@@ -42,14 +42,14 @@ void* slab_alloc(u32 size) {
     slab_list = new_slab;
 
     /* 3. Chain free objects */
-    u8* start = (u8*)page + sizeof(slab_t);
+    sigma_u8* start = (sigma_u8*)page + sizeof(slab_t);
     new_slab->first_free = start + size;
     void** ptr = (void**)new_slab->first_free;
-    for (u32 i = 0; i < new_slab->free_objects - 1; i++) {
-        *ptr = (u8*)ptr + size;
+    for (sigma_u32 i = 0; i < new_slab->free_objects - 1; i++) {
+        *ptr = (sigma_u8*)ptr + size;
         ptr = (void**)*ptr;
     }
-    *ptr = NULL;
+    *ptr = SIGMA_NULL;
 
     return start;
 }

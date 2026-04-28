@@ -1,6 +1,6 @@
 /*
  * =============================================================================
- * Σ SIGMAOS KERNEL: SOVEREIGN-KEYBOARD-MASTER (v1.0 - MOUSE-FREE PREEMINENCE)
+ * Î£ SIGMAOS KERNEL: SOVEREIGN-KEYBOARD-MASTER (v1.0 - MOUSE-FREE PREEMINENCE)
  * =============================================================================
  * Algorithm: Atomic Key-to-Shard Mapping
  * Principles:
@@ -11,26 +11,26 @@
  * =============================================================================
  */
 
-#include "../include/sigma_kernel_types.h"
+#include "../../include/sigma_kernel_types.h"
 
 #define MAX_SHORTCUTS 32
 
 typedef struct KeyboardShortcut {
-    u32 modifier;   /* 0: None, 1: Alt, 2: Ctrl, 3: Shift */
-    u32 key_code;
-    u32 target_shard;
-    bool_t active;
+    sigma_u32 modifier;   /* 0: None, 1: Alt, 2: Ctrl, 3: Shift */
+    sigma_u32 key_code;
+    sigma_u32 target_shard;
+    sigma_bool active;
 } KeyboardShortcut;
 
 static KeyboardShortcut g_shortcuts[MAX_SHORTCUTS];
-static u32 g_shortcut_count = 0;
+static sigma_u32 g_shortcut_count = 0;
 
 /* =========================================================================
  * KEYBOARD MASTER Engine (The No-Mouse Orchestrator)
  * ========================================================================= */
 
 void keyboard_master_init(void) {
-    for (int i = 0; i < MAX_SHORTCUTS; i++) g_shortcuts[i].active = FALSE;
+    for (int i = 0; i < MAX_SHORTCUTS; i++) g_shortcuts[i].active = SIGMA_FALSE;
     // kprintf("[KEY-MASTER]: Sovereign Mouse-Free Keyboard Orchestrator Online.\n");
     
     /* Standard Industrial Shortcuts */
@@ -40,9 +40,9 @@ void keyboard_master_init(void) {
     // keyboard_register_shortcut(1, 'C', 0x77); /* Alt+C -> Omni Shell */
 }
 
-void keyboard_on_event(u32 mod, u32 key) {
+void keyboard_on_event(sigma_u32 mod, sigma_u32 key) {
     /* Industry-leading shortcut matching */
-    for (u32 i = 0; i < g_shortcut_count; i++) {
+    for (sigma_u32 i = 0; i < g_shortcut_count; i++) {
         if (g_shortcuts[i].active && 
             g_shortcuts[i].modifier == mod && 
             g_shortcuts[i].key_code == key) {

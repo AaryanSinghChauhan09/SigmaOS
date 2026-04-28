@@ -1,8 +1,8 @@
 /*
  * =============================================================================
- * Σ SIGMAOS KERNEL: NETWORK STACK (v1.0 - PURE C11)
+ * Î£ SIGMAOS KERNEL: NETWORK STACK (v1.0 - PURE C11)
  * =============================================================================
- * Minimal zero-dependency TCP/IP stack — no lwIP, no BSD sockets lib.
+ * Minimal zero-dependency TCP/IP stack â€ no lwIP, no BSD sockets lib.
  * Layers:
  *   L2: Ethernet II framing
  *   L3: IPv4 (fragmentation, checksum, routing table)
@@ -17,10 +17,10 @@
 /* =========================================================================
  * Network byte-order (big-endian) helpers
  * ========================================================================= */
-static inline u16 htons(u16 x) {
-    return (u16)((x >> 8) | (x << 8));
+static inline sigma_u16 htons(sigma_u16 x) {
+    return (sigma_u16)((x >> 8) | (x << 8));
 }
-static inline u32 htonl(u32 x) {
+static inline sigma_u32 htonl(sigma_u32 x) {
     return ((x & 0xFF000000u) >> 24) |
            ((x & 0x00FF0000u) >>  8) |
            ((x & 0x0000FF00u) <<  8) |
@@ -37,9 +37,9 @@ static inline u32 htonl(u32 x) {
 #define ETH_TYPE_ARP  0x0806u
 
 typedef struct __attribute__((packed)) EtherHeader {
-    u8  dst[ETH_ALEN];
-    u8  src[ETH_ALEN];
-    u16 type;        /* network byte order */
+    sigma_u8  dst[ETH_ALEN];
+    sigma_u8  src[ETH_ALEN];
+    sigma_u16 type;        /* network byte order */
 } EtherHeader;
 
 /* =========================================================================
@@ -50,40 +50,40 @@ typedef struct __attribute__((packed)) EtherHeader {
 #define IP_PROTO_ICMP 1u
 
 typedef struct __attribute__((packed)) IPv4Header {
-    u8  ver_ihl;     /* version=4 | IHL=5 for minimal */
-    u8  dscp_ecn;
-    u16 total_len;
-    u16 ident;
-    u16 flags_frag;
-    u8  ttl;
-    u8  proto;
-    u16 checksum;
-    u32 src_ip;
-    u32 dst_ip;
+    sigma_u8  ver_ihl;     /* version=4 | IHL=5 for minimal */
+    sigma_u8  dscp_ecn;
+    sigma_u16 total_len;
+    sigma_u16 ident;
+    sigma_u16 flags_frag;
+    sigma_u8  ttl;
+    sigma_u8  proto;
+    sigma_u16 checksum;
+    sigma_u32 src_ip;
+    sigma_u32 dst_ip;
 } IPv4Header;
 
-static u16 ip_checksum(const void* hdr, usize len) {
-    const u16* p = (const u16*)hdr;
-    u32 sum = 0;
+static sigma_u16 ip_checksum(const void* hdr, sigma_usize len) {
+    const sigma_u16* p = (const sigma_u16*)hdr;
+    sigma_u32 sum = 0;
     while (len > 1) { sum += *p++; len -= 2; }
-    if (len) sum += *(const u8*)p;
+    if (len) sum += *(const sigma_u8*)p;
     while (sum >> 16) sum = (sum & 0xFFFF) + (sum >> 16);
-    return (u16)~sum;
+    return (sigma_u16)~sum;
 }
 
 /* =========================================================================
  * TCP Header (20 bytes minimum)
  * ========================================================================= */
 typedef struct __attribute__((packed)) TCPHeader {
-    u16 src_port;
-    u16 dst_port;
-    u32 seq;
-    u32 ack;
-    u8  data_off;   /* (offset << 4) | reserved */
-    u8  flags;      /* SYN=0x02, ACK=0x10, FIN=0x01, RST=0x04 */
-    u16 window;
-    u16 checksum;
-    u16 urgent;
+    sigma_u16 src_port;
+    sigma_u16 dst_port;
+    sigma_u32 seq;
+    sigma_u32 ack;
+    sigma_u8  data_off;   /* (offset << 4) | reserved */
+    sigma_u8  flags;      /* SYN=0x02, ACK=0x10, FIN=0x01, RST=0x04 */
+    sigma_u16 window;
+    sigma_u16 checksum;
+    sigma_u16 urgent;
 } TCPHeader;
 
 #define TCP_SYN  0x02u
@@ -96,10 +96,10 @@ typedef struct __attribute__((packed)) TCPHeader {
  * UDP Header (8 bytes)
  * ========================================================================= */
 typedef struct __attribute__((packed)) UDPHeader {
-    u16 src_port;
-    u16 dst_port;
-    u16 length;
-    u16 checksum;
+    sigma_u16 src_port;
+    sigma_u16 dst_port;
+    sigma_u16 length;
+    sigma_u16 checksum;
 } UDPHeader;
 
 /* =========================================================================
@@ -109,27 +109,27 @@ typedef struct __attribute__((packed)) UDPHeader {
 #define NETBUF_MAX    32u
 
 typedef struct NetBuf {
-    u8     data[NETBUF_SIZE];
-    u32    len;
-    bool_t used;
+    sigma_u8     data[NETBUF_SIZE];
+    sigma_u32    len;
+    sigma_bool used;
 } NetBuf;
 
 static NetBuf g_netbufs[NETBUF_MAX];
 
 static NetBuf* netbuf_alloc(void) {
-    u32 i;
+    sigma_u32 i;
     for (i = 0; i < NETBUF_MAX; i++) {
         if (!g_netbufs[i].used) {
-            g_netbufs[i].used = TRUE;
+            g_netbufs[i].used = SIGMA_TRUE;
             g_netbufs[i].len  = 0;
             return &g_netbufs[i];
         }
     }
-    return NULL;
+    return SIGMA_NULL;
 }
 
 static void netbuf_free(NetBuf* nb) {
-    if (nb) nb->used = FALSE;
+    if (nb) nb->used = SIGMA_FALSE;
 }
 
 /* =========================================================================
@@ -138,33 +138,33 @@ static void netbuf_free(NetBuf* nb) {
 #define ROUTE_MAX 8u
 
 typedef struct RouteEntry {
-    u32    dest;        /* network address */
-    u32    mask;        /* subnet mask */
-    u32    gateway;
-    u8     iface;       /* NIC interface index */
-    bool_t valid;
+    sigma_u32    dest;        /* network address */
+    sigma_u32    mask;        /* subnet mask */
+    sigma_u32    gateway;
+    sigma_u8     iface;       /* NIC interface index */
+    sigma_bool valid;
 } RouteEntry;
 
 static RouteEntry g_routes[ROUTE_MAX];
-static u32        g_my_ip   = 0xC0A80101u; /* 192.168.1.1 */
-static u8         g_my_mac[ETH_ALEN] = {0x53, 0x49, 0x47, 0x4D, 0x41, 0x4F}; /* "SIGMAO" */
+static sigma_u32        g_my_ip   = 0xC0A80101u; /* 192.168.1.1 */
+static sigma_u8         g_my_mac[ETH_ALEN] = {0x53, 0x49, 0x47, 0x4D, 0x41, 0x4F}; /* "SIGMAO" */
 
-static void route_add(u32 dest, u32 mask, u32 gw, u8 iface) {
-    u32 i;
+static void route_add(sigma_u32 dest, sigma_u32 mask, sigma_u32 gw, sigma_u8 iface) {
+    sigma_u32 i;
     for (i = 0; i < ROUTE_MAX; i++) {
         if (!g_routes[i].valid) {
             g_routes[i].dest    = dest;
             g_routes[i].mask    = mask;
             g_routes[i].gateway = gw;
             g_routes[i].iface   = iface;
-            g_routes[i].valid   = TRUE;
+            g_routes[i].valid   = SIGMA_TRUE;
             return;
         }
     }
 }
 
-static u32 route_lookup(u32 dst_ip) {
-    u32 i;
+static sigma_u32 route_lookup(sigma_u32 dst_ip) {
+    sigma_u32 i;
     for (i = 0; i < ROUTE_MAX; i++) {
         RouteEntry* r = &g_routes[i];
         if (r->valid && (dst_ip & r->mask) == (r->dest & r->mask))
@@ -190,26 +190,26 @@ typedef enum SockState {
 } SockState;
 
 typedef struct SigmaSocket {
-    u8        proto;        /* IP_PROTO_TCP or IP_PROTO_UDP */
-    u16       local_port;
-    u16       remote_port;
-    u32       local_ip;
-    u32       remote_ip;
+    sigma_u8        proto;        /* IP_PROTO_TCP or IP_PROTO_UDP */
+    sigma_u16       local_port;
+    sigma_u16       remote_port;
+    sigma_u32       local_ip;
+    sigma_u32       remote_ip;
     SockState state;
-    u32       seq;          /* TCP sequence number */
-    u32       ack;          /* TCP ack number */
-    u16       window;
-    u8        rx_buf[4096];
-    u32       rx_head;
-    u32       rx_count;
-    bool_t    used;
+    sigma_u32       seq;          /* TCP sequence number */
+    sigma_u32       ack;          /* TCP ack number */
+    sigma_u16       window;
+    sigma_u8        rx_buf[4096];
+    sigma_u32       rx_head;
+    sigma_u32       rx_count;
+    sigma_bool    used;
 } SigmaSocket;
 
 static SigmaSocket g_socks[SOCK_MAX];
-static u16         g_ephemeral_port = 49152u;
+static sigma_u16         g_ephemeral_port = 49152u;
 
-i32 net_socket(u8 proto) {
-    u32 i;
+sigma_i32 net_socket(sigma_u8 proto) {
+    sigma_u32 i;
     for (i = 0; i < SOCK_MAX; i++) {
         if (!g_socks[i].used) {
             SigmaSocket* s = &g_socks[i];
@@ -224,24 +224,24 @@ i32 net_socket(u8 proto) {
             s->window      = 8192u;
             s->rx_head     = 0;
             s->rx_count    = 0;
-            s->used        = TRUE;
-            return (i32)i;
+            s->used        = SIGMA_TRUE;
+            return (sigma_i32)i;
         }
     }
     return K_ERR_BUSY;
 }
 
 /* =========================================================================
- * TCP 3-Way Handshake (SYN → SYN-ACK → ACK)
+ * TCP 3-Way Handshake (SYN â†’ SYN-ACK â†’ ACK)
  * ========================================================================= */
-static void net_build_tcp(NetBuf* nb, SigmaSocket* s, u8 flags,
-                            const void* payload, u32 plen) {
+static void net_build_tcp(NetBuf* nb, SigmaSocket* s, sigma_u8 flags,
+                            const void* payload, sigma_u32 plen) {
     EtherHeader* eth = (EtherHeader*)nb->data;
     IPv4Header*  ip  = (IPv4Header*)(nb->data + sizeof(EtherHeader));
-    TCPHeader*   tcp = (TCPHeader*)((u8*)ip + 20);
+    TCPHeader*   tcp = (TCPHeader*)((sigma_u8*)ip + 20);
 
     /* Ethernet */
-    u32 mi;
+    sigma_u32 mi;
     for (mi = 0; mi < ETH_ALEN; mi++) {
         eth->dst[mi] = 0xFF;          /* broadcast (ARP would resolve in real impl) */
         eth->src[mi] = g_my_mac[mi];
@@ -251,8 +251,8 @@ static void net_build_tcp(NetBuf* nb, SigmaSocket* s, u8 flags,
     /* IPv4 */
     ip->ver_ihl    = 0x45;
     ip->dscp_ecn   = 0;
-    ip->total_len  = htons((u16)(20 + 20 + plen));
-    ip->ident      = htons((u16)s->seq);
+    ip->total_len  = htons((sigma_u16)(20 + 20 + plen));
+    ip->ident      = htons((sigma_u16)s->seq);
     ip->flags_frag = htons(0x4000);   /* Don't Fragment */
     ip->ttl        = 64;
     ip->proto      = IP_PROTO_TCP;
@@ -266,7 +266,7 @@ static void net_build_tcp(NetBuf* nb, SigmaSocket* s, u8 flags,
     tcp->dst_port = htons(s->remote_port);
     tcp->seq      = htonl(s->seq);
     tcp->ack      = htonl(s->ack);
-    tcp->data_off = 0x50;   /* 5 × 4 = 20 bytes header, no options */
+    tcp->data_off = 0x50;   /* 5 Ã— 4 = 20 bytes header, no options */
     tcp->flags    = flags;
     tcp->window   = htons(s->window);
     tcp->checksum = 0;
@@ -274,17 +274,17 @@ static void net_build_tcp(NetBuf* nb, SigmaSocket* s, u8 flags,
 
     /* Copy payload */
     if (payload && plen) {
-        u8* dst_payload = (u8*)tcp + 20;
-        const u8* src = (const u8*)payload;
-        u32 pi;
+        sigma_u8* dst_payload = (sigma_u8*)tcp + 20;
+        const sigma_u8* src = (const sigma_u8*)payload;
+        sigma_u32 pi;
         for (pi = 0; pi < plen; pi++) dst_payload[pi] = src[pi];
     }
 
-    nb->len = (u32)(sizeof(EtherHeader) + 20 + 20 + plen);
+    nb->len = (sigma_u32)(sizeof(EtherHeader) + 20 + 20 + plen);
 }
 
-i32 net_connect(i32 sockfd, u32 dst_ip, u16 dst_port) {
-    if (sockfd < 0 || (u32)sockfd >= SOCK_MAX || !g_socks[sockfd].used)
+sigma_i32 net_connect(sigma_i32 sockfd, sigma_u32 dst_ip, sigma_u16 dst_port) {
+    if (sockfd < 0 || (sigma_u32)sockfd >= SOCK_MAX || !g_socks[sockfd].used)
         return K_ERR_INVAL;
     SigmaSocket* s = &g_socks[sockfd];
     s->remote_ip   = dst_ip;
@@ -293,12 +293,12 @@ i32 net_connect(i32 sockfd, u32 dst_ip, u16 dst_port) {
     /* Send SYN */
     NetBuf* nb = netbuf_alloc();
     if (!nb) return K_ERR_NOMEM;
-    net_build_tcp(nb, s, TCP_SYN, NULL, 0);
+    net_build_tcp(nb, s, TCP_SYN, SIGMA_NULL, 0);
     s->state = SOCK_SYN_SENT;
     s->seq++;
 
     extern void kprintf(const char* fmt, ...);
-    kprintf("[NET]: TCP SYN → %lu.%lu.%lu.%lu:%u (seq=%u)\n",
+    kprintf("[NET]: TCP SYN â†’ %lu.%lu.%lu.%lu:%u (seq=%u)\n",
             (dst_ip>>24)&0xFF, (dst_ip>>16)&0xFF,
             (dst_ip>>8)&0xFF,  dst_ip&0xFF,
             dst_port, s->seq - 1);
@@ -310,8 +310,8 @@ i32 net_connect(i32 sockfd, u32 dst_ip, u16 dst_port) {
     return K_OK;
 }
 
-i64 net_send(i32 sockfd, const void* buf, usize len) {
-    if (sockfd < 0 || (u32)sockfd >= SOCK_MAX || !g_socks[sockfd].used)
+sigma_i64 net_send(sigma_i32 sockfd, const void* buf, sigma_usize len) {
+    if (sockfd < 0 || (sigma_u32)sockfd >= SOCK_MAX || !g_socks[sockfd].used)
         return K_ERR_INVAL;
     SigmaSocket* s = &g_socks[sockfd];
     if (s->state != SOCK_ESTABLISHED) return K_ERR_BUSY;
@@ -319,29 +319,29 @@ i64 net_send(i32 sockfd, const void* buf, usize len) {
     NetBuf* nb = netbuf_alloc();
     if (!nb) return K_ERR_NOMEM;
 
-    u32 chunk = (len > 1400) ? 1400 : (u32)len;   /* MSS = 1400 */
+    sigma_u32 chunk = (len > 1400) ? 1400 : (sigma_u32)len;   /* MSS = 1400 */
     net_build_tcp(nb, s, TCP_PSH | TCP_ACK, buf, chunk);
     s->seq += chunk;
 
     extern void kprintf(const char* fmt, ...);
-    kprintf("[NET]: TCP PSH+ACK %u bytes → port %u\n", chunk, s->remote_port);
+    kprintf("[NET]: TCP PSH+ACK %u bytes â†’ port %u\n", chunk, s->remote_port);
     netbuf_free(nb);
-    return (i64)chunk;
+    return (sigma_i64)chunk;
 }
 
-i32 net_close(i32 sockfd) {
-    if (sockfd < 0 || (u32)sockfd >= SOCK_MAX) return K_ERR_INVAL;
+sigma_i32 net_close(sigma_i32 sockfd) {
+    if (sockfd < 0 || (sigma_u32)sockfd >= SOCK_MAX) return K_ERR_INVAL;
     SigmaSocket* s = &g_socks[sockfd];
     if (!s->used) return K_ERR_INVAL;
 
     /* Send FIN */
     NetBuf* nb = netbuf_alloc();
     if (nb) {
-        net_build_tcp(nb, s, TCP_FIN | TCP_ACK, NULL, 0);
+        net_build_tcp(nb, s, TCP_FIN | TCP_ACK, SIGMA_NULL, 0);
         netbuf_free(nb);
     }
     s->state = SOCK_CLOSED;
-    s->used  = FALSE;
+    s->used  = SIGMA_FALSE;
     return K_OK;
 }
 
@@ -349,10 +349,10 @@ i32 net_close(i32 sockfd) {
  * Network Init
  * ========================================================================= */
 void net_init(void) {
-    u32 i;
-    for (i = 0; i < NETBUF_MAX; i++) g_netbufs[i].used = FALSE;
-    for (i = 0; i < SOCK_MAX;   i++) g_socks[i].used   = FALSE;
-    for (i = 0; i < ROUTE_MAX;  i++) g_routes[i].valid = FALSE;
+    sigma_u32 i;
+    for (i = 0; i < NETBUF_MAX; i++) g_netbufs[i].used = SIGMA_FALSE;
+    for (i = 0; i < SOCK_MAX;   i++) g_socks[i].used   = SIGMA_FALSE;
+    for (i = 0; i < ROUTE_MAX;  i++) g_routes[i].valid = SIGMA_FALSE;
 
     /* Default route: 192.168.1.0/24 local, 0.0.0.0 default GW */
     route_add(0xC0A80100u, 0xFFFFFF00u, 0,          0);  /* 192.168.1.0/24 */
@@ -367,7 +367,7 @@ void net_init(void) {
 
 void net_audit(void) {
     extern void kprintf(const char* fmt, ...);
-    u32 open = 0, i;
+    sigma_u32 open = 0, i;
     for (i = 0; i < SOCK_MAX; i++) if (g_socks[i].used) open++;
     kprintf("[NET]: Open sockets=%u / %u. lwIP/BSD = ZERO dependency.\n",
             open, SOCK_MAX);

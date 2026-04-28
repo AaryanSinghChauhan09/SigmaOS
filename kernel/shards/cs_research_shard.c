@@ -1,6 +1,6 @@
 /*
  * =============================================================================
- * Σ SIGMAOS KERNEL: SOVEREIGN-CS-RESEARCH-SHARD (v1.0 - ACADEMIC MASTER)
+ * Î£ SIGMAOS KERNEL: SOVEREIGN-CS-RESEARCH-SHARD (v1.0 - ACADEMIC MASTER)
  * =============================================================================
  * Algorithm: Sharded-Algorithmic complexity Audit (SACA)
  * Principles:
@@ -11,12 +11,12 @@
  * =============================================================================
  */
 
-#include "../include/sigma_kernel_types.h"
+#include "../../include/sigma_kernel_types.h"
 
 typedef struct ResearchPaperShard {
     char        title[64];
     char        doi[32];
-    bool_t      indexed;
+    sigma_bool      indexed;
 } ResearchPaperShard;
 
 /* =========================================================================
@@ -27,7 +27,7 @@ void cs_research_init(void) {
     // kprintf("[CS-RESEARCH]: Sovereign Academic-Research Shard Online.\n");
 }
 
-k_status research_index_paper(const char* title, const char* doi) {
+sigma_status research_index_paper(const char* title, const char* doi) {
     /* 
      * Absorb CS Researcher USP: Silicon-Direct Paper Indexing.
      * In a sharded model: index academic metadata directly on silicon shards.
@@ -36,7 +36,7 @@ k_status research_index_paper(const char* title, const char* doi) {
     return K_OK;
 }
 
-k_status research_audit_complexity(void* shard_ptr) {
+sigma_status research_audit_complexity(void* shard_ptr) {
     /* 
      * Absorb Computer Scientist USP: Kernel-Native Complexity Audit.
      * Perform $O(log n)$ complexity analysis on a sharded algorithm pulse.

@@ -1,6 +1,6 @@
 /*
  * =============================================================================
- * Σ SIGMAOS KERNEL: SOVEREIGN-FIREWALL-SHARD (v1.0 - NETFILTER PARITY)
+ * Î£ SIGMAOS KERNEL: SOVEREIGN-FIREWALL-SHARD (v1.0 - NETFILTER PARITY)
  * =============================================================================
  * Algorithm: Chain-State Rule Matching (CSRM)
  * Principles:
@@ -23,43 +23,43 @@ typedef enum {
 } RuleAction;
 
 typedef struct FirewallRule {
-    u32 src_ip;
-    u16 src_port;
-    u16 dst_port;
-    u8  protocol; /* 6:TCP, 17:UDP */
+    sigma_u32 src_ip;
+    sigma_u16 src_port;
+    sigma_u16 dst_port;
+    sigma_u8  protocol; /* 6:TCP, 17:UDP */
     RuleAction action;
-    bool_t active;
+    sigma_bool active;
 } FirewallRule;
 
 static FirewallRule g_rules[MAX_FIREWALL_RULES];
-static u32 g_rule_count = 0;
+static sigma_u32 g_rule_count = 0;
 
 /* =========================================================================
  * FIREWALL Engine (The Sharded Sentry)
  * ========================================================================= */
 
 void firewall_init(void) {
-    for (int i = 0; i < MAX_FIREWALL_RULES; i++) g_rules[i].active = FALSE;
+    for (int i = 0; i < MAX_FIREWALL_RULES; i++) g_rules[i].active = SIGMA_FALSE;
     // kprintf("[FIREWALL]: Sovereign Netfilter-Parity Sentry Online.\n");
     
     /* Default Sovereignty Rule: Deny all legacy-userland incoming */
     // firewall_add_rule(0, 0, 80, 6, RULE_ACCEPT); /* Allow Web-Bridge Shard Access */
 }
 
-k_status firewall_add_rule(u32 src, u16 sport, u16 dport, u8 proto, RuleAction act) {
+sigma_status firewall_add_rule(sigma_u32 src, sigma_u16 sport, sigma_u16 dport, sigma_u8 proto, RuleAction act) {
     if (g_rule_count >= MAX_FIREWALL_RULES) return K_ERR_NOMEM;
     
     FirewallRule* r = &g_rules[g_rule_count++];
     r->src_ip = src; r->src_port = sport; r->dst_port = dport;
-    r->protocol = proto; r->action = act; r->active = TRUE;
+    r->protocol = proto; r->action = act; r->active = SIGMA_TRUE;
     
     // kprintf("[FIREWALL]: Industrial Rule Injected -> Port: %u\n", dport);
     return K_OK;
 }
 
-RuleAction firewall_process_packet(u32 src, u16 sport, u16 dport, u8 proto) {
+RuleAction firewall_process_packet(sigma_u32 src, sigma_u16 sport, sigma_u16 dport, sigma_u8 proto) {
     /* Absorb Linux Netfilter USP: Multi-Chain Matching */
-    for (u32 i = 0; i < g_rule_count; i++) {
+    for (sigma_u32 i = 0; i < g_rule_count; i++) {
         if (g_rules[i].active && 
             (g_rules[i].src_ip == 0 || g_rules[i].src_ip == src) &&
             (g_rules[i].dst_port == dport) &&

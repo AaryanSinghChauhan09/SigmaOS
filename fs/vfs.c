@@ -1,14 +1,14 @@
 /*
  * =========================================================================
- * Σ SIGMAOS ZENITH SUPREME: VIRTUAL FILE SYSTEM (VFS) SHARD
+ * Î£ SIGMAOS ZENITH SUPREME: VIRTUAL FILE SYSTEM (VFS) SHARD
  * =========================================================================
  * Mission: Abstract storage and sharding for modular filesystem support.
  * Capability: Inodes, File Descriptors, Mount Points, Path Resolution.
  * =========================================================================
  */
 
-#include "../libc/sigma_libc.h"
-#include "../libc/sigma_types.h"
+#include "../include/SovereignLibC.h"
+#include "../include/sigma_types.h"
 
 #define MAX_FILES 128
 #define MAX_PATH_LEN 256

@@ -1,11 +1,11 @@
 /*
  * =============================================================================
- * Σ SIGMAOS KERNEL: SOVEREIGN-POCSO-SHARD (POCSO Act 2012)
+ * Î£ SIGMAOS KERNEL: SOVEREIGN-POCSO-SHARD (POCSO Act 2012)
  * =============================================================================
  */
-#include "../include/sigma_kernel_types.h"
+#include "../../include/sigma_kernel_types.h"
 
-extern void add_item(void* t, const char* desc, const char* ref, const char* prereq, const char* proc, u32 days, u32 penalty_rs);
+extern void add_item(void* t, const char* desc, const char* ref, const char* prereq, const char* proc, sigma_u32 days, sigma_u32 penalty_rs);
 
 void init_pocso_template(void* t) {
     add_item(t, "Mandatory Reporting of POCSO offence", "Sec 19 POCSO", 

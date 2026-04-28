@@ -1,6 +1,6 @@
 /*
  * =============================================================================
- * Σ SIGMAOS KERNEL: SOVEREIGN-SCHEDULER (v1.1)
+ * Î£ SIGMAOS KERNEL: SOVEREIGN-SCHEDULER (v1.1)
  * =============================================================================
  * Principles: Preemptive Round-Robin, Zero-Latency Context Switching.
  * =============================================================================
@@ -8,20 +8,20 @@
 #include "../../include/sigma_kernel_types.h"
 
 typedef struct Task {
-    u64     rsp;            /* Stack Pointer */
-    u64     id;             /* Task ID */
-    u32     priority;       /* Execution Priority */
-    u32     state;          /* 0: Running, 1: Ready, 2: Blocked */
+    sigma_u64     rsp;            /* Stack Pointer */
+    sigma_u64     id;             /* Task ID */
+    sigma_u32     priority;       /* Execution Priority */
+    sigma_u32     state;          /* 0: Running, 1: Ready, 2: Blocked */
     struct Task* next;      /* Circular List */
 } Task;
 
 static Task* current_task = 0;
 static Task* task_list = 0;
-static u64   next_task_id = 1;
+static sigma_u64   next_task_id = 1;
 
-extern void switch_to_task(u64* old_rsp, u64 new_rsp);
+extern void switch_to_task(sigma_u64* old_rsp, sigma_u64 new_rsp);
 extern void kprintf(const char* fmt, ...);
-extern void* slab_alloc(u32 size);
+extern void* slab_alloc(sigma_u32 size);
 
 void scheduler_init() {
     /* Initialize kernel task (Main) */
@@ -31,7 +31,7 @@ void scheduler_init() {
     current_task->next = current_task;
     task_list = current_task;
     
-    kprintf("Σ [SCHEDULER]: Sovereign kernel task active.\n");
+    kprintf("Î£ [SCHEDULER]: Sovereign kernel task active.\n");
 }
 
 void yield() {
@@ -48,10 +48,10 @@ void schedule_task(void (*entry)(void)) {
     Task* new_task = (Task*)slab_alloc(sizeof(Task));
     void* stack = slab_alloc(4096); /* Allocate 4KB stack */
     
-    u64* stack_ptr = (u64*)((u8*)stack + 4096);
+    sigma_u64* stack_ptr = (sigma_u64*)((sigma_u8*)stack + 4096);
     
     /* Setup initial stack for switch_to_task (x86_64 ABI) */
-    *(--stack_ptr) = (u64)entry; /* Return address */
+    *(--stack_ptr) = (sigma_u64)entry; /* Return address */
     *(--stack_ptr) = 0;         /* RBP */
     *(--stack_ptr) = 0;         /* RBX */
     *(--stack_ptr) = 0;         /* R12 */
@@ -59,7 +59,7 @@ void schedule_task(void (*entry)(void)) {
     *(--stack_ptr) = 0;         /* R14 */
     *(--stack_ptr) = 0;         /* R15 */
     
-    new_task->rsp = (u64)stack_ptr;
+    new_task->rsp = (sigma_u64)stack_ptr;
     new_task->id = next_task_id++;
     new_task->state = 1; /* Ready */
     
@@ -67,5 +67,5 @@ void schedule_task(void (*entry)(void)) {
     new_task->next = current_task->next;
     current_task->next = new_task;
     
-    kprintf("Σ [SCHEDULER]: Shard task %d spawned.\n", new_task->id);
+    kprintf("Î£ [SCHEDULER]: Shard task %d spawned.\n", new_task->id);
 }

@@ -1,6 +1,8 @@
 #ifndef NCERT_BIOLOGY_HPP
 #define NCERT_BIOLOGY_HPP
 
+#include "../../../include/SovereignLibC.h"
+
 #include "ncert_base.hpp"
 
 class GeneticsSim : public INCERTSim {

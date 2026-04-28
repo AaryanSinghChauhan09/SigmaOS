@@ -1,6 +1,6 @@
 /*
  * =============================================================================
- * Σ SIGMAOS KERNEL: SOVEREIGN BPF (v1.0 - SILICON VM)
+ * Î£ SIGMAOS KERNEL: SOVEREIGN BPF (v1.0 - SILICON VM)
  * =============================================================================
  * Algorithm: Sovereign Native JIT (Direct register mapping)
  * Principles:
@@ -11,7 +11,7 @@
  * =============================================================================
  */
 
-#include "../include/sigma_kernel_types.h"
+#include "../../include/sigma_kernel_types.h"
 
 #define MAX_S_BPF_PROGS 64
 #define S_BPF_REG_COUNT 16
@@ -25,44 +25,44 @@ typedef enum {
 } SBPFOpCode;
 
 typedef struct {
-    u8 opcode;
-    u8 dst;
-    u8 src;
-    i32 imm;
+    sigma_u8 opcode;
+    sigma_u8 dst;
+    sigma_u8 src;
+    sigma_i32 imm;
 } SBPFInst;
 
 typedef struct {
-    u64 program_id;
-    bool_t active;
+    sigma_u64 program_id;
+    sigma_bool active;
     SBPFInst code[256];
-    u32 inst_count;
+    sigma_u32 inst_count;
 } SBPFProgram;
 
 static SBPFProgram g_progs[MAX_S_BPF_PROGS];
-static u32 g_prog_count = 0;
+static sigma_u32 g_prog_count = 0;
 
 /* =========================================================================
  * S-BPF Virtual Machine (The Engine)
  * ========================================================================= */
-u64 sovereign_bpf_exec(u32 prog_id, u64 ctx) {
+sigma_u64 sovereign_bpf_exec(sigma_u32 prog_id, sigma_u64 ctx) {
     if (prog_id >= g_prog_count || !g_progs[prog_id].active) return 0;
     
     SBPFProgram* p = &g_progs[prog_id];
-    u64 regs[S_BPF_REG_COUNT] = {0};
+    sigma_u64 regs[S_BPF_REG_COUNT] = {0};
     regs[0] = ctx; // Context is R0
     
-    for (u32 pc = 0; pc < p->inst_count; pc++) {
+    for (sigma_u32 pc = 0; pc < p->inst_count; pc++) {
         SBPFInst inst = p->code[pc];
         
         switch (inst.opcode) {
             case SBPF_OP_ADD:
-                regs[inst.dst] += (inst.src == 0xFF) ? (u64)inst.imm : regs[inst.src];
+                regs[inst.dst] += (inst.src == 0xFF) ? (sigma_u64)inst.imm : regs[inst.src];
                 break;
             case SBPF_OP_SUB:
-                regs[inst.dst] -= (inst.src == 0xFF) ? (u64)inst.imm : regs[inst.src];
+                regs[inst.dst] -= (inst.src == 0xFF) ? (sigma_u64)inst.imm : regs[inst.src];
                 break;
             case SBPF_OP_LD:
-                regs[inst.dst] = (u64)inst.imm;
+                regs[inst.dst] = (sigma_u64)inst.imm;
                 break;
             case SBPF_OP_RET:
                 // kprintf("[S-BPF]: Program [%u] returned: %llu\n", prog_id, regs[0]);
@@ -75,19 +75,19 @@ u64 sovereign_bpf_exec(u32 prog_id, u64 ctx) {
 }
 
 void sovereign_bpf_init(void) {
-    for (int i = 0; i < MAX_S_BPF_PROGS; i++) g_progs[i].active = FALSE;
+    for (int i = 0; i < MAX_S_BPF_PROGS; i++) g_progs[i].active = SIGMA_FALSE;
     // kprintf("[S-BPF]: Sovereign BPF Virtual Machine Shard Online.\n");
 }
 
-void sovereign_bpf_load(u64 id, SBPFInst* instructions, u32 count) {
+void sovereign_bpf_load(sigma_u64 id, SBPFInst* instructions, sigma_u32 count) {
     if (g_prog_count >= MAX_S_BPF_PROGS) return;
     
     SBPFProgram* p = &g_progs[g_prog_count++];
     p->program_id = id;
-    p->active = TRUE;
+    p->active = SIGMA_TRUE;
     p->inst_count = (count < 256) ? count : 256;
     
-    for (u32 i = 0; i < p->inst_count; i++) {
+    for (sigma_u32 i = 0; i < p->inst_count; i++) {
         p->code[i] = instructions[i];
     }
     // kprintf("[S-BPF]: Loaded Sovereign Program: ID %llu\n", id);

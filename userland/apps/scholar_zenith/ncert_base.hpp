@@ -1,7 +1,9 @@
 #ifndef NCERT_BASE_HPP
 #define NCERT_BASE_HPP
 
-#include "../../../SigmaOOP.hpp"
+#include "../../../include/SovereignLibC.h"
+
+#include "../../../include/SigmaOOP.hpp"
 
 namespace SigmaOS {
 namespace Scholastic {
@@ -35,7 +37,7 @@ public:
     }
 
     void audit_knowledge() override {
-        sigma_printf("\n--- Σ SCHOLASTIC AUDIT: %s ---\n", m_subject.c_str());
+        sigma_printf("\n--- Î£ SCHOLASTIC AUDIT: %s ---\n", m_subject.c_str());
         sigma_printf("| Chapters Sharded: %u\n", m_chapters_sharded);
         sigma_printf("| Parity Level: NCERT Standard v21\n");
         sigma_printf("------------------------------------\n");

@@ -9,7 +9,49 @@
     <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@200;400;600;800&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="zenith_desktop.css">
 </head>
-<body>
+<body class="zenith-sovereign">
+    <!-- Start Menu -->
+    <div class="start-menu" id="start-menu">
+        <div class="start-header">
+            <div class="user-avatar">Σ</div>
+            <div class="user-info">
+                <div class="user-name" id="menu-user-name">Sovereign_User</div>
+                <div class="user-status">Authorized Shard Master</div>
+            </div>
+        </div>
+        <div class="start-content">
+            <div class="start-section">
+                <div class="section-title">Pinned Shards</div>
+                <div class="start-item" onclick="toggleStart()">
+                    <span class="icon">⌨️</span>
+                    <span>OmniShell v5.1</span>
+                </div>
+                <div class="start-item" onclick="toggleStart()">
+                    <span class="icon">📝</span>
+                    <span>Zenith Editor</span>
+                </div>
+                <div class="start-item" onclick="toggleStart()">
+                    <span class="icon">🛡️</span>
+                    <span>Quantum Shield</span>
+                </div>
+            </div>
+            <div class="start-section">
+                <div class="section-title">System Shards</div>
+                <div class="start-item">
+                    <span class="icon">⚙️</span>
+                    <span>Lattice Settings</span>
+                </div>
+                <div class="start-item">
+                    <span class="icon">📈</span>
+                    <span>Performance Matrix</span>
+                </div>
+            </div>
+        </div>
+        <div class="start-footer">
+            <div class="footer-item" onclick="location.reload()">Reboot</div>
+            <div class="footer-item" onclick="toggleStart()">Lock</div>
+        </div>
+    </div>
     <!-- Command Palette -->
     <div class="command-palette" id="cmd-palette">
         <input type="text" class="command-input" placeholder="Summon Shard or Execute Command..." id="cmd-input">
@@ -44,7 +86,7 @@
                 <polyline id="cpu-graph" fill="none" stroke="var(--accent)" stroke-width="2" points="0,40 30,30 60,35 90,20 120,25 150,10 180,15 210,5 240,12 270,8 300,20" />
             </svg>
             <div class="stat-bar">
-                <div class="stat-progress" id="cpu-progress" style="width: 12%"></div>
+                <div class="stat-progress" id="cpu-progress"></div>
             </div>
         </div>
 
@@ -55,17 +97,292 @@
             </div>
             <div class="stat-value" id="mem-load">4.2 GB</div>
             <div class="stat-bar">
-                <div class="stat-progress" id="mem-progress" style="width: 25%"></div>
+                <div class="stat-progress" id="mem-progress"></div>
+            </div>
+        </div>
+
+        <div class="widget">
+            <div class="widget-title">
+                <span>Cache Matrix</span>
+                <span class="accent">L1/L2/L3 Shards</span>
+            </div>
+            <div class="stat-value" id="cache-hit">99.2% Hit</div>
+            <div class="stat-bar">
+                <div class="stat-progress cache" id="cache-progress"></div>
             </div>
         </div>
 
         <div class="widget">
             <div class="widget-title">
                 <span>Quantum Shield</span>
-                <span class="accent">PQC Active</span>
+                <span class="accent">Zero-Trust Active</span>
             </div>
-            <div class="stat-value">SHIELDED</div>
-            <div class="entropy-label">Entropy Level: Critical</div>
+            <div class="stat-value" id="security-status">SHIELDED</div>
+            <div class="audit-info" id="security-info">Scanning Shards...</div>
+            <div class="stat-bar">
+                <div class="stat-progress security" id="security-progress"></div>
+            </div>
+        </div>
+
+        <div class="widget">
+            <div class="widget-title">
+                <span>Self-Healing Shard</span>
+                <span class="accent">Auto-Restore</span>
+            </div>
+            <div class="stat-value" id="healing-status">OPTIMAL</div>
+            <div class="audit-info" id="healing-info">Last Audit: 12ms ago</div>
+            <div class="stat-bar">
+                <div class="stat-progress healing" id="healing-progress"></div>
+            </div>
+        </div>
+
+        <div class="widget">
+            <div class="widget-title">
+                <span>Quantum Entropy</span>
+                <span class="accent" id="entropy-rate">High</span>
+            </div>
+            <div class="stat-value" id="entropy-val">0x8F2E...</div>
+            <div class="stat-label">Source: RDRAND Shard</div>
+            <div class="stat-bar">
+                <div class="stat-progress entropy" id="entropy-progress"></div>
+            </div>
+        </div>
+
+        <div class="widget">
+            <div class="widget-title">
+                <span>Automation Matrix</span>
+                <span class="accent" id="auto-efficiency">Efficiency: 98%</span>
+            </div>
+            <div class="stat-value" id="auto-recipes">3 Recipes</div>
+            <div class="stat-label">Active: Thermal-Balance</div>
+            <div class="stat-bar">
+                <div class="stat-progress auto" id="auto-progress"></div>
+            </div>
+        </div>
+
+        <div class="widget">
+            <div class="widget-title">
+                <span>Cold Storage Vault</span>
+                <span class="accent" id="vault-status">Pinned</span>
+            </div>
+            <div class="stat-value" id="vault-blocks">2 Blocks</div>
+            <div class="stat-label">CID: QmXoypiz...</div>
+            <div class="stat-bar">
+                <div class="stat-progress vault" id="vault-progress"></div>
+            </div>
+        </div>
+
+        <div class="widget">
+            <div class="widget-title">
+                <span>VFS Shard Map</span>
+                <span class="accent" id="vfs-nodes">12 Nodes</span>
+            </div>
+            <div class="stat-value" id="vfs-mounts">3 Mounts</div>
+            <div class="stat-label">Root: /sovereign/shards</div>
+            <div class="stat-bar">
+                <div class="stat-progress vfs" id="vfs-progress"></div>
+            </div>
+        </div>
+
+        <div class="widget">
+            <div class="widget-title">
+                <span>Memory Matrix</span>
+                <span class="accent" id="mem-pages">4096 Pages</span>
+            </div>
+            <div class="stat-value" id="mem-usage">25% Used</div>
+            <div class="stat-label">Mode: Demand Paging</div>
+            <div class="stat-bar">
+                <div class="stat-progress memory" id="memory-progress"></div>
+            </div>
+        </div>
+
+        <div class="widget">
+            <div class="widget-title">
+                <span>Sync Matrix</span>
+                <span class="accent" id="sync-locks">3 Active Locks</span>
+            </div>
+            <div class="stat-value" id="sync-latency">12ms Latency</div>
+            <div class="stat-label">Distributed Mutex: ON</div>
+            <div class="stat-bar">
+                <div class="stat-progress sync" id="sync-progress"></div>
+            </div>
+        </div>
+
+        <div class="widget">
+            <div class="widget-title">
+                <span>UI Design Matrix</span>
+                <span class="accent" id="ui-frametime">8.3ms</span>
+            </div>
+            <div class="stat-value" id="ui-fps">120 FPS</div>
+            <div class="stat-label">Glassmorphism: 2.0</div>
+            <div class="stat-bar">
+                <div class="stat-progress ui" id="ui-progress"></div>
+            </div>
+        </div>
+
+        <div class="widget">
+            <div class="widget-title">
+                <span>Silicon Matrix</span>
+                <span class="accent" id="pci-devices">4 Devices</span>
+            </div>
+            <div class="stat-value" id="pci-status">Enum Complete</div>
+            <div class="stat-label">Bus: 02 | Slot: 00 | Func: 00</div>
+            <div class="stat-bar">
+                <div class="stat-progress silicon" id="silicon-progress"></div>
+            </div>
+        </div>
+
+        <div class="widget">
+            <div class="widget-title">
+                <span>Scholar Zenith</span>
+                <span class="accent" id="lab-accuracy">99.9% Accuracy</span>
+            </div>
+            <div class="stat-value" id="lab-active">Physics: Magnetism</div>
+            <div class="stat-label">NCERT Standards: DIKSHA-Sync</div>
+            <div class="stat-bar">
+                <div class="stat-progress scholar" id="scholar-progress"></div>
+            </div>
+        </div>
+
+        <div class="widget persona">
+            <div class="widget-title">
+                <span>Sovereign Persona</span>
+                <span class="accent" id="persona-name">User_01</span>
+            </div>
+            <div class="stat-value" id="persona-theme">Theme: Glass</div>
+            <div class="stat-label">Automation: Active</div>
+            <div class="stat-label" id="persona-sync">Lattice Sync: 100%</div>
+            <div class="stat-bar">
+                <div class="stat-progress persona" id="persona-progress"></div>
+            </div>
+        </div>
+
+        <div class="widget">
+            <div class="widget-title">
+                <span>Security Sentinel</span>
+                <span class="accent" id="log-status">Anonymizing</span>
+            </div>
+            <div class="stat-value" id="log-scrubs">12 Scrubs</div>
+            <div class="stat-label">Mode: Amnesic Logging</div>
+            <div class="stat-bar">
+                <div class="stat-progress amnesic" id="amnesic-progress"></div>
+            </div>
+        </div>
+
+        <div class="widget">
+            <div class="widget-title">
+                <span>Healing Nexus</span>
+                <span class="accent" id="healing-status">Monitoring</span>
+            </div>
+            <div class="stat-value" id="healing-restores">0 Restores</div>
+            <div class="stat-label">Shard Health: 100%</div>
+            <div class="stat-bar">
+                <div class="stat-progress healing" id="healing-progress"></div>
+            </div>
+        </div>
+
+        <div class="widget">
+            <div class="widget-title">
+                <span>Judicial Matrix</span>
+                <span class="accent" id="legal-status">Compliant</span>
+            </div>
+            <div class="stat-value" id="legal-statutes">BNSS/BNS/BSA</div>
+            <div class="stat-label">Audit: Zero FIR Ready</div>
+            <div class="stat-bar">
+                <div class="stat-progress legal" id="legal-progress"></div>
+            </div>
+        </div>
+
+        <div class="widget">
+            <div class="widget-title">
+                <span>Colonization Matrix</span>
+                <span class="accent" id="node-count">3 Nodes</span>
+            </div>
+            <div class="stat-value" id="mesh-status">Expanding</div>
+            <div class="stat-label">Target: 0x8F2E... (Remote)</div>
+            <div class="stat-bar">
+                <div class="stat-progress mesh" id="mesh-progress"></div>
+            </div>
+        </div>
+
+        <div class="widget">
+            <div class="widget-title">
+                <span>VRAM Matrix</span>
+                <span class="accent" id="vram-res">1920x1080</span>
+            </div>
+            <div class="stat-value" id="vram-usage">12MB / 256MB</div>
+            <div class="stat-label">Aperture: 0xFD000000</div>
+            <div class="stat-bar">
+                <div class="stat-progress vram" id="vram-progress"></div>
+            </div>
+        </div>
+
+        <div class="widget">
+            <div class="widget-title">
+                <span>Boot Matrix</span>
+                <span class="accent" id="boot-status">Handshake</span>
+            </div>
+            <div class="stat-value" id="boot-progress">98% Complete</div>
+            <div class="stat-label">UEFI: Secure | Mode: Sovereign</div>
+            <div class="stat-bar">
+                <div class="stat-progress boot" id="boot-progress-bar"></div>
+            </div>
+        </div>
+
+        <div class="widget">
+            <div class="widget-title">
+                <span>Lattice Integrity</span>
+                <span class="accent" id="test-status">Verified</span>
+            </div>
+            <div class="stat-value" id="test-pass">5/5 Shards</div>
+            <div class="stat-label">Self-Audit Active</div>
+            <div class="stat-bar">
+                <div class="stat-progress test" id="test-progress"></div>
+            </div>
+        </div>
+
+        <div class="widget">
+            <div class="widget-title">
+                <span>Lattice Growth</span>
+                <span class="accent">Colonizing</span>
+            </div>
+            <div class="stat-value" id="node-count">1 Node</div>
+            <div class="stat-bar">
+                <div class="stat-progress colonization" id="col-progress"></div>
+            </div>
+            <div class="stat-label" id="col-target">Target: Scanning...</div>
+        </div>
+
+        <div class="widget persona">
+            <div class="widget-title">
+                <span>Sovereign Persona</span>
+                <span class="accent" id="persona-name">User_01</span>
+            </div>
+            <div class="stat-value">ACTIVE</div>
+            <div class="stat-label">Automation: Enabled</div>
+            <div class="stat-label">Cognitive Sync: 12ms</div>
+        </div>
+
+        <div class="widget voice">
+            <div class="widget-title">
+                <span>Sovereign Voice</span>
+                <span class="accent" id="voice-status">Idle</span>
+            </div>
+            <div class="voice-wave" id="voice-wave">
+                <div class="wave-bar"></div><div class="wave-bar"></div><div class="wave-bar"></div><div class="wave-bar"></div><div class="wave-bar"></div>
+            </div>
+            <div class="stat-label">Wake-Key: Caps Lock</div>
+        </div>
+
+        <div class="widget lattice-viz">
+            <div class="widget-title">
+                <span>Lattice Shard Matrix</span>
+                <span class="accent">500 Modules</span>
+            </div>
+            <div class="shard-grid" id="shard-matrix">
+                <!-- 500 Shards injected here -->
+            </div>
+            <div class="stat-label" id="shard-status">Integrity: 100.0%</div>
         </div>
     </div>
 
@@ -95,6 +412,7 @@
         <div class="task-icon">📂</div>
         <div class="task-icon">🌐</div>
         <div class="task-icon">🧠</div>
+        <div class="task-icon">🖥️</div>
         <div class="task-icon">🔌</div>
         <div class="taskbar-divider"></div>
         <div class="task-icon">🔔</div>
@@ -175,6 +493,33 @@
         cycleLogs();
 
         // Simulate Hardware Stats
+        // UI Interactions
+        function toggleStart() {
+            const menu = document.getElementById('start-menu');
+            menu.classList.toggle('active');
+            if (menu.classList.contains('active')) {
+                addLog("Σ [ZENITH]: Start Menu Shard ACTIVE.", "success");
+            }
+        }
+
+        function launchApp(app) {
+            addLog(`Σ [ZENITH]: Launching ${app} Shard...`, "success");
+            toggleStart();
+        }
+
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Meta' || e.key === 'Control') {
+                // Potential Start Menu shortcut
+            }
+            if (e.key === 'Escape') {
+                document.getElementById('start-menu').classList.remove('active');
+                document.getElementById('cmd-palette').classList.remove('active');
+            }
+        });
+
+        // Update Start Menu Click
+        document.querySelector('.taskbar-start').onclick = toggleStart;
+
         setInterval(() => {
             const cpu = Math.floor(Math.random() * 20) + 10;
             document.getElementById('cpu-load').textContent = cpu + "%";
@@ -182,9 +527,242 @@
             updateGraph(cpu);
             
             const mem = (Math.random() * 0.5 + 4.1).toFixed(1);
-            document.getElementById('mem-load').textContent = mem + " GB";
-            document.getElementById('mem-progress').style.width = (mem / 16 * 100) + "%";
+            document.getElementById('mem-load').textContent = (4.0 + Math.random() * 0.5).toFixed(1) + " GB";
+            document.getElementById('mem-progress').style.width = (40 + Math.random() * 5) + "%";
+            
+            const cacheHit = (99.0 + Math.random() * 0.9).toFixed(1);
+            document.getElementById('cache-hit').textContent = cacheHit + "% Hit";
+            document.getElementById('cache-progress').style.width = cacheHit + "%";
+
+            // Voice Simulation
+            if (Math.random() > 0.98) {
+                document.getElementById('voice-status').textContent = "Listening...";
+                document.getElementById('voice-status').style.color = "var(--success)";
+                addLog("Σ [VOICE]: Wake-word 'Sigma' detected. Listening...", "success");
+                
+                setTimeout(() => {
+                    document.getElementById('voice-status').textContent = "Processing";
+                    document.getElementById('voice-status').style.color = "var(--accent)";
+                    setTimeout(() => {
+                        document.getElementById('voice-status').textContent = "Idle";
+                        document.getElementById('voice-status').style.color = "var(--text-muted)";
+                        addLog("Σ [VOICE]: Transcription: 'Initialize neural lattice'. Executing...", "success");
+                    }, 1500);
+                }, 2000);
+            }
+
+            // Automation Simulation
+            const efficiency = (97.0 + Math.random() * 2.5).toFixed(1);
+            document.getElementById('auto-efficiency').textContent = `Efficiency: ${efficiency}%`;
+            document.getElementById('auto-progress').style.width = efficiency + "%";
+
+            // Vault Simulation
+            if (Math.random() > 0.99) {
+                document.getElementById('vault-status').textContent = "Syncing";
+                document.getElementById('vault-status').style.color = "var(--accent)";
+                addLog("Σ [STORAGE]: Synchronizing state with decentralized lattice...", "success");
+                
+                setTimeout(() => {
+                    document.getElementById('vault-status').textContent = "Pinned";
+                    document.getElementById('vault-status').style.color = "var(--text-muted)";
+                    addLog("Σ [STORAGE]: State Shard pinned. CID: Qm... finalized.", "success");
+                }, 2500);
+            }
+            document.getElementById('vault-progress').style.width = (60 + Math.random() * 10) + "%";
+
+            // VFS Simulation
+            if (Math.random() > 0.96) {
+                const nodes = Math.floor(Math.random() * 5) + 10;
+                document.getElementById('vfs-nodes').textContent = `${nodes} Nodes`;
+                addLog(`Σ [VFS]: Registered ${nodes} active shard nodes.`, "success");
+            }
+            document.getElementById('vfs-progress').style.width = (75 + Math.random() * 10) + "%";
+
+            // Memory Simulation
+            const memUsage = (20 + Math.random() * 10).toFixed(0);
+            document.getElementById('mem-usage').textContent = `${memUsage}% Used`;
+            document.getElementById('memory-progress').style.width = memUsage + "%";
+
+            // Sync Simulation
+            if (Math.random() > 0.95) {
+                const latency = (5 + Math.random() * 15).toFixed(0);
+                document.getElementById('sync-latency').textContent = `${latency}ms Latency`;
+                addLog(`Σ [SYNC]: Distributed lock cycle complete. Latency: ${latency}ms.`, "success");
+            }
+            document.getElementById('sync-progress').style.width = (90 + Math.random() * 10) + "%";
+
+            // UI Simulation
+            const frameTime = (8.0 + Math.random() * 0.5).toFixed(1);
+            document.getElementById('ui-frametime').textContent = `${frameTime}ms`;
+            document.getElementById('ui-progress').style.width = "100%";
+
+            // Silicon Simulation
+            if (Math.random() > 0.98) {
+                const bus = Math.floor(Math.random() * 10).toString().padStart(2, '0');
+                const slot = Math.floor(Math.random() * 32).toString().padStart(2, '0');
+                document.getElementById('pci-devices').textContent = `Bus: ${bus} | Slot: ${slot}`;
+                addLog(`Σ [PCI]: Hardware Shard detected on Bus ${bus}, Slot ${slot}. Auditing...`, "success");
+            }
+            document.getElementById('silicon-progress').style.width = "100%";
+
+            // Scholar Simulation
+            const labs = ["Physics: Magnetism", "Chemistry: Titration", "Biology: Microscopy", "Math: Geometry"];
+            if (Math.random() > 0.95) {
+                const lab = labs[Math.floor(Math.random() * labs.length)];
+                document.getElementById('lab-active').textContent = lab;
+                addLog(`Σ [SCHOLAR]: Executing Virtual Lab Shard: ${lab}. Procedure synced.`, "success");
+            }
+            document.getElementById('scholar-progress').style.width = (95 + Math.random() * 5) + "%";
+
+            // Persona Simulation
+            if (Math.random() > 0.99) {
+                const names = ["Sovereign_Alpha", "Lattice_Master", "Silicon_Savant"];
+                const name = names[Math.floor(Math.random() * names.length)];
+                document.getElementById('persona-name').textContent = name;
+                document.getElementById('menu-user-name').textContent = name;
+                addLog(`Σ [PERSONA]: Identity Shard adapted. New Alias: ${name}.`, "success");
+            }
+            document.getElementById('persona-progress').style.width = "100%";
+
+            // Sentinel Simulation
+            if (Math.random() > 0.94) {
+                const scrubs = Math.floor(Math.random() * 20) + 10;
+                document.getElementById('log-scrubs').textContent = `${scrubs} Scrubs`;
+                addLog(`Σ [SENTINEL]: Amnesic audit complete. ${scrubs} traces neutralized.`, "success");
+            }
+            document.getElementById('amnesic-progress').style.width = (80 + Math.random() * 20) + "%";
+
+            // Judicial Simulation
+            if (Math.random() > 0.98) {
+                document.getElementById('legal-status').textContent = "AUDITING";
+                document.getElementById('legal-status').style.color = "var(--accent)";
+                addLog("Σ [LEGAL]: Performing BNSS/BNS/BSA silicon-to-statute audit...", "success");
+                
+                setTimeout(() => {
+                    document.getElementById('legal-status').textContent = "Compliant";
+                    document.getElementById('legal-status').style.color = "var(--success)";
+                    addLog("Σ [LEGAL]: Judicial integrity verified. Compliance: 100%.", "success");
+                }, 2000);
+            }
+            document.getElementById('legal-progress').style.width = "100%";
+
+            // Colonization Simulation
+            if (Math.random() > 0.99) {
+                const nodes = parseInt(document.getElementById('node-count').textContent) + 1;
+                document.getElementById('node-count').textContent = `${nodes} Nodes`;
+                addLog(`Σ [COLONIZER]: Shard projection successful. New node colonized in the mesh.`, "success");
+            }
+            document.getElementById('mesh-progress').style.width = (40 + Math.random() * 60) + "%";
+
+            // VRAM Simulation
+            const vramUsage = (10 + Math.random() * 10).toFixed(0);
+            document.getElementById('vram-usage').textContent = `${vramUsage}MB / 256MB`;
+            document.getElementById('vram-progress').style.width = (vramUsage / 2.56) + "%";
+
+            // Boot Simulation
+            document.getElementById('boot-progress-bar').style.width = "98%";
+
+            // Integrity Simulation
+            if (Math.random() > 0.97) {
+                document.getElementById('test-status').textContent = "Auditing";
+                document.getElementById('test-status').style.color = "var(--accent)";
+                addLog("Σ [AUDIT]: Running 500-shard integrity verification...", "success");
+                
+                setTimeout(() => {
+                    document.getElementById('test-status').textContent = "Verified";
+                    document.getElementById('test-status').style.color = "var(--success)";
+                    addLog("Σ [AUDIT]: All shards verified. Integrity: BIT-PERFECT.", "success");
+                }, 1800);
+            }
+            document.getElementById('test-progress').style.width = "100%";
+
+            // Entropy Simulation
+            const entropyHex = Array.from({length: 4}, () => Math.floor(Math.random() * 256).toString(16).padStart(2, '0')).join('').toUpperCase();
+            document.getElementById('entropy-val').textContent = `0x${entropyHex}...`;
+            document.getElementById('entropy-progress').style.width = (85 + Math.random() * 15) + "%";
+
+            // UI Interactions
+            // Self-Healing Simulation
+            const auditTime = Math.floor(Math.random() * 15) + 5;
+            document.getElementById('healing-info').textContent = `Last Audit: ${auditTime}ms ago`;
+            const healingProgress = Math.floor(Math.random() * 20) + 80;
+            document.getElementById('healing-progress').style.width = healingProgress + "%";
+            
+            if (Math.random() > 0.95) {
+                document.getElementById('healing-status').textContent = "RESTORING";
+                document.getElementById('healing-status').style.color = "var(--error)";
+                addLog("Σ [SELF-HEAL]: Entropy spike detected in VFS shard. Restoring...", "error");
+                setTimeout(() => {
+                    document.getElementById('healing-status').textContent = "OPTIMAL";
+                    document.getElementById('healing-status').style.color = "var(--success)";
+                    addLog("Σ [SELF-HEAL]: VFS Shard restored to bit-perfect state.", "success");
+                }, 1500);
+            }
+
+            // Security Audit Simulation
+            const secProgress = (parseFloat(document.getElementById('security-progress').style.width) || 0) + (Math.random() * 10);
+            if (secProgress >= 100) {
+                document.getElementById('security-progress').style.width = "0%";
+                document.getElementById('security-info').textContent = "Scanning Lattice...";
+                if (Math.random() > 0.8) {
+                    addLog("Σ [SEC-AUDIT]: Architectural drift detected. Hardening lattice...", "error");
+                    document.getElementById('security-status').textContent = "HARDENING";
+                    document.getElementById('security-status').style.color = "var(--error)";
+                    setTimeout(() => {
+                        document.getElementById('security-status').textContent = "SHIELDED";
+                        document.getElementById('security-status').style.color = "var(--accent)";
+                        addLog("Σ [SEC-AUDIT]: Lattice-PQC parity restored.", "success");
+                    }, 2000);
+                }
+            } else {
+                document.getElementById('security-progress').style.width = secProgress + "%";
+                document.getElementById('security-info').textContent = `Auditing Shard ${Math.floor(Math.random() * 500)}...`;
+            }
+
+            // Colonization Simulation
+            const colProgress = (parseFloat(document.getElementById('col-progress').style.width) || 0) + (Math.random() * 5);
+            if (colProgress >= 100) {
+                const nodes = parseInt(document.getElementById('node-count').textContent) + 1;
+                document.getElementById('node-count').textContent = `${nodes} Nodes`;
+                document.getElementById('col-progress').style.width = "0%";
+                const newIp = `192.168.1.${Math.floor(Math.random() * 254) + 1}`;
+                document.getElementById('col-target').textContent = `Target: ${newIp}`;
+                addLog(`Σ [COLONIZER]: Shard projected to ${newIp}. Node synchronized.`, "success");
+            } else {
+                document.getElementById('col-progress').style.width = colProgress + "%";
+            }
+
+            // Shard Matrix Animation
+            const dots = document.querySelectorAll('.shard-dot');
+            dots.forEach(dot => {
+                if (Math.random() > 0.98) {
+                    dot.classList.toggle('active');
+                }
+            });
+            
+            if (Math.random() > 0.99) {
+                const faultIdx = Math.floor(Math.random() * 500);
+                dots[faultIdx].classList.add('error');
+                document.getElementById('shard-status').textContent = "Integrity: 99.8% (Fault Detected)";
+                document.getElementById('shard-status').style.color = "var(--error)";
+                
+                setTimeout(() => {
+                    dots[faultIdx].classList.remove('error');
+                    dots[faultIdx].classList.add('healing');
+                    document.getElementById('shard-status').textContent = "Integrity: 100.0% (Self-Healed)";
+                    document.getElementById('shard-status').style.color = "var(--success)";
+                    setTimeout(() => dots[faultIdx].classList.remove('healing'), 2000);
+                }, 1500);
+            }
         }, 2000);
+
+        // Inject 500 Shards
+        const matrix = document.getElementById('shard-matrix');
+        for (let i = 0; i < 500; i++) {
+            const dot = document.createElement('div');
+            dot.className = 'shard-dot';
+            matrix.appendChild(dot);
+        }
     </script>
 </body>
 </html>

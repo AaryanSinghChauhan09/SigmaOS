@@ -1,7 +1,9 @@
 #ifndef WIDGET_ORCHESTRATOR_HPP
 #define WIDGET_ORCHESTRATOR_HPP
 
-#include "../../../SigmaOOP.hpp"
+#include "../../../include/SovereignLibC.h"
+
+#include "../../../include/SigmaOOP.hpp"
 
 namespace SigmaOS {
 namespace Graphics {

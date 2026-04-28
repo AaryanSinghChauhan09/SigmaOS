@@ -1,6 +1,6 @@
 /*
  * =============================================================================
- * Σ SIGMAOS KERNEL: LOCK-FREE INPUT QUEUE (v1.0)
+ * Î£ SIGMAOS KERNEL: LOCK-FREE INPUT QUEUE (v1.0)
  * =============================================================================
  * Principles: Zero-Latency Interrupt Handling & Atomic Synchronization.
  * =============================================================================
@@ -10,12 +10,12 @@
 #define KBD_QUEUE_SIZE 256
 
 static char kbd_queue[KBD_QUEUE_SIZE];
-static u32  kbd_head = 0;
-static u32  kbd_tail = 0;
+static sigma_u32  kbd_head = 0;
+static sigma_u32  kbd_tail = 0;
 
 /* Atomic push (Interrupt Context) */
 void kbd_queue_push(char c) {
-    u32 next = (kbd_head + 1) % KBD_QUEUE_SIZE;
+    sigma_u32 next = (kbd_head + 1) % KBD_QUEUE_SIZE;
     if (next != kbd_tail) {
         kbd_queue[kbd_head] = c;
         kbd_head = next;

@@ -1,6 +1,6 @@
 /*
  * =============================================================================
- * Σ SIGMAOS KERNEL: PIT TIMER + PIT/HPET DRIVER (v1.0 - PURE C11)
+ * Î£ SIGMAOS KERNEL: PIT TIMER + PIT/HPET DRIVER (v1.0 - PURE C11)
  * =============================================================================
  * PIT 8253/8254: generates IRQ0 at configurable Hz (default 1000Hz = 1ms)
  * HPET fallback reading for high-resolution timestamps.
@@ -13,7 +13,7 @@
  * =============================================================================
  */
 
-#include "../include/sigma_kernel_types.h"
+#include "../../include/sigma_kernel_types.h"
 
 /* =========================================================================
  * PIT Constants
@@ -38,33 +38,33 @@
  * Timer State
  * ========================================================================= */
 typedef struct SigmaTimer {
-    volatile u64 ticks;       /* total IRQ0 ticks since boot */
-    volatile u64 ms;          /* milliseconds since boot */
-    u64          tsc_per_ms;  /* TSC ticks per millisecond (calibrated) */
-    u64          boot_tsc;    /* TSC at boot */
+    volatile sigma_u64 ticks;       /* total IRQ0 ticks since boot */
+    volatile sigma_u64 ms;          /* milliseconds since boot */
+    sigma_u64          tsc_per_ms;  /* TSC ticks per millisecond (calibrated) */
+    sigma_u64          boot_tsc;    /* TSC at boot */
 } SigmaTimer;
 
 static SigmaTimer g_timer;
 
 /* =========================================================================
- * PIT Init — program to 1000 Hz square wave
+ * PIT Init â€ program to 1000 Hz square wave
  * ========================================================================= */
 void pit_init(void) {
     /* Command: channel 0, lobyte+hibyte, mode 2 (rate generator), binary */
     port_outb(PIT_CMD, PIT_CMD_CHAN0 | PIT_CMD_LOHI | PIT_CMD_MODE2 | PIT_CMD_BIN);
-    port_outb(PIT_CHANNEL0, (u8)(PIT_DIVISOR & 0xFF));        /* lo byte */
-    port_outb(PIT_CHANNEL0, (u8)((PIT_DIVISOR >> 8) & 0xFF)); /* hi byte */
+    port_outb(PIT_CHANNEL0, (sigma_u8)(PIT_DIVISOR & 0xFF));        /* lo byte */
+    port_outb(PIT_CHANNEL0, (sigma_u8)((PIT_DIVISOR >> 8) & 0xFF)); /* hi byte */
 
     g_timer.ticks    = 0;
     g_timer.ms       = 0;
     g_timer.boot_tsc = cpu_rdtsc();
 
     /* Calibrate TSC: measure TSC ticks in 10ms using PIT */
-    u64 tsc_start = cpu_rdtsc();
-    u64 target_ms = 10;
+    sigma_u64 tsc_start = cpu_rdtsc();
+    sigma_u64 target_ms = 10;
     /* Spin until 10 ticks pass */
     while (g_timer.ticks < target_ms) cpu_pause();
-    u64 tsc_end = cpu_rdtsc();
+    sigma_u64 tsc_end = cpu_rdtsc();
     g_timer.tsc_per_ms = (tsc_end - tsc_start) / target_ms;
 
     extern void kprintf(const char* fmt, ...);
@@ -90,20 +90,20 @@ void pit_irq_handler(SigmaInterruptFrame* frame) {
 /* =========================================================================
  * Accessors
  * ========================================================================= */
-u64 timer_get_ticks(void) { return g_timer.ticks; }
-u64 timer_get_ms(void)    { return g_timer.ms;    }
+sigma_u64 timer_get_ticks(void) { return g_timer.ticks; }
+sigma_u64 timer_get_ms(void)    { return g_timer.ms;    }
 
-u64 timer_get_ns(void) {
-    u64 tsc_delta = cpu_rdtsc() - g_timer.boot_tsc;
+sigma_u64 timer_get_ns(void) {
+    sigma_u64 tsc_delta = cpu_rdtsc() - g_timer.boot_tsc;
     if (g_timer.tsc_per_ms == 0) return 0;
     return (tsc_delta * 1000000ULL) / g_timer.tsc_per_ms;
 }
 
 /* =========================================================================
- * Sleep — busy-wait on tick counter (kernel-mode only)
+ * Sleep â€ busy-wait on tick counter (kernel-mode only)
  * ========================================================================= */
-void timer_sleep_ms(u64 ms) {
-    u64 wake = g_timer.ms + ms;
+void timer_sleep_ms(sigma_u64 ms) {
+    sigma_u64 wake = g_timer.ms + ms;
     while (g_timer.ms < wake) cpu_pause();
 }
 
@@ -111,9 +111,9 @@ void timer_sleep_ms(u64 ms) {
  * Register PIT handler and unmask IRQ0
  * ========================================================================= */
 void timer_init(void) {
-    extern void idt_register_handler(u32, void(*)(SigmaInterruptFrame*));
-    extern void pic_unmask_irq(u8);
-    idt_register_handler(32, pit_irq_handler);  /* IRQ0 → vector 32 */
+    extern void idt_register_handler(sigma_u32, void(*)(SigmaInterruptFrame*));
+    extern void pic_unmask_irq(sigma_u8);
+    idt_register_handler(32, pit_irq_handler);  /* IRQ0 â†’ vector 32 */
     pic_unmask_irq(0);
     pit_init();
 }

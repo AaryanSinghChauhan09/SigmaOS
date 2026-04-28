@@ -1,16 +1,17 @@
+#include "../include/SovereignLibC.h"
 /*
  * =========================================================================
- * Σ SIGMAOS: SOVEREIGN ZENITH (v15.0 - ABSOLUTE FINALITY)
+ * Î£ SIGMAOS: SOVEREIGN ZENITH (v15.0 - ABSOLUTE FINALITY)
  * =========================================================================
  * Author: Sovereign-Zenith-Developer
  * Principles: Zero-Library, Bit-Perfect, Silicon-Integrity, USP-Absorbed.
  * =========================================================================
  */
 
-#include "SigmaOOP.hpp"
+#include "../include/SigmaOOP.hpp"
 
 /**
- * Σ SIGMA OS: SOVEREIGN CONCEPT GENERATOR (v128.0 - ZERO-STD NATIVE)
+ * Î£ SIGMA OS: SOVEREIGN CONCEPT GENERATOR (v128.0 - ZERO-STD NATIVE)
  * =================================================================
  * USP: Universal Sharding of every NCERT Concept (PCM+B).
  * Capability: Advanced simulations for Relativity, Enthalpy, and 3D Geometry.
@@ -96,7 +97,7 @@ public:
     }
 
     void RunFullScholasticAudit() {
-        sigma_printf("--- Σ SIGMA OS SOVEREIGN KNOWLEDGE ZENITH ---\n");
+        sigma_printf("--- Î£ SIGMA OS SOVEREIGN KNOWLEDGE ZENITH ---\n");
         for (sigma_usize i = 0; i < m_registry.size(); i++) {
             sigma_printf("\n------------------------------------------------\n");
             m_registry.at_index(i)->Simulate();

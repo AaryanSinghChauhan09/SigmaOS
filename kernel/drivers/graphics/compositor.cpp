@@ -1,3 +1,4 @@
+#include "../../../include/SovereignLibC.h"
 #include "compositor.hpp"
 
 namespace SigmaOS {

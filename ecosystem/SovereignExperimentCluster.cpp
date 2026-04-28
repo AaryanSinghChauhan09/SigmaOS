@@ -1,6 +1,7 @@
+#include "../include/SovereignLibC.h"
 /*
  * =========================================================================
- * Σ SIGMAOS: SOVEREIGN ZENITH (v15.0 - ABSOLUTE FINALITY)
+ * Î£ SIGMAOS: SOVEREIGN ZENITH (v15.0 - ABSOLUTE FINALITY)
  * =========================================================================
  * Author: Sovereign-Zenith-Developer
  * Principles: Zero-Library, Bit-Perfect, Silicon-Integrity, USP-Absorbed.
@@ -12,7 +13,7 @@
 
 
 /**
- * Σ SIGMA OS: SOVEREIGN EXPERIMENT CLUSTER (v128.0 - LAB ZENITH)
+ * Î£ SIGMA OS: SOVEREIGN EXPERIMENT CLUSTER (v128.0 - LAB ZENITH)
  * ============================================================
  * USP: Comprehensive "Small & Big" experiment simulations (1-12).
  * Capability: Ohm's Law, Acids/Metals, Transpiration, and Geometry.
@@ -106,7 +107,7 @@ public:
     }
 
     void ExecuteFullLaboratoryAudit() {
-        sigma_printf("--- Σ SIGMA OS SOVEREIGN EXPERIMENT CLUSTER ---\n");
+        sigma_printf("--- Î£ SIGMA OS SOVEREIGN EXPERIMENT CLUSTER ---\n");
         for (const auto& exp : m_cluster) {
             sigma_printf("\n------------------------------------------------\n");
             exp->Execute();

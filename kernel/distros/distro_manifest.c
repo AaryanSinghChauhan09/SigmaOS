@@ -1,6 +1,6 @@
 /*
  * =============================================================================
- * Σ SIGMAOS KERNEL: DISTRO-MANIFEST (Universal Linux Absorption)
+ * Î£ SIGMAOS KERNEL: DISTRO-MANIFEST (Universal Linux Absorption)
  * =============================================================================
  */
 #include "../../include/sigma_kernel_types.h"

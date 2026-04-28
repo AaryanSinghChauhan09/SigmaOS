@@ -1,6 +1,6 @@
 /*
  * =============================================================================
- * Σ SIGMAOS KERNEL: SOVEREIGN-NCERT-SHARD (v1.0 - CURRICULUM SIMULATION)
+ * Î£ SIGMAOS KERNEL: SOVEREIGN-NCERT-SHARD (v1.0 - CURRICULUM SIMULATION)
  * =============================================================================
  * Algorithm: Silicon-Direct Physics/Chemistry Simulation (SDPCS)
  * Principles:
@@ -11,12 +11,12 @@
  * =============================================================================
  */
 
-#include "../include/sigma_kernel_types.h"
+#include "../../include/sigma_kernel_types.h"
 
 typedef struct LabShard {
     char        subject[32];
-    u32         chapter_id;
-    u64         simulation_pulse;
+    sigma_u32         chapter_id;
+    sigma_u64         simulation_pulse;
 } LabShard;
 
 /* =========================================================================
@@ -27,7 +27,7 @@ void ncert_init(void) {
     // kprintf("[NCERT-SHARD]: Sovereign Science-Student Laboratory Interface Online.\n");
 }
 
-k_status ncert_physics_sim(const char* experiment) {
+sigma_status ncert_physics_sim(const char* experiment) {
     /* 
      * Absorb Science Student USP: Kinetic Silicon Simulation.
      * In a sharded model: perform kinematic simulations directly on the silicon shards.
@@ -36,7 +36,7 @@ k_status ncert_physics_sim(const char* experiment) {
     return K_OK;
 }
 
-k_status ncert_chem_orbit(u32 atomic_num) {
+sigma_status ncert_chem_orbit(sigma_u32 atomic_num) {
     /* 
      * Absorb Chemistry Student USP: Valence Orbit Sharding.
      * Visualize and calculate molecular orbits and bonding directly on the silicon.

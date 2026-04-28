@@ -1,7 +1,9 @@
 #ifndef DASHBOARD_GENERATOR_HPP
 #define DASHBOARD_GENERATOR_HPP
 
-#include "../../SigmaOOP.hpp"
+#include "../../include/SovereignLibC.h"
+
+#include "../../include/SigmaOOP.hpp"
 
 namespace SigmaOS {
 namespace Dashboard {

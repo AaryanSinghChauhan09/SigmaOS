@@ -1,6 +1,6 @@
 /*
  * =============================================================================
- * Σ SIGMAOS KERNEL: SOVEREIGN-CAMERA-SHARD (v3.0 - VISUAL ZENITH)
+ * Î£ SIGMAOS KERNEL: SOVEREIGN-CAMERA-SHARD (v3.0 - VISUAL ZENITH)
  * =============================================================================
  * Algorithm: Sharded Video Processing & Filter Matrix (SVPFM v3)
  * Principles:
@@ -8,20 +8,20 @@
  *   - Snapchat-USP: O(1) kernel-native 3x3 convolution filter matrices.
  *   - MIT Scratch-USP: Event-driven block logic for frame triggering/animation.
  *   - BSA-USP: Bit-perfect timestamped forensic evidence capture.
- *   - Zero-dependency: no float.h, no math.h — custom fixed-point arithmetic.
+ *   - Zero-dependency: no float.h, no math.h â€ custom fixed-point arithmetic.
  *   - OOP via composition: Frame, FilterEngine, EventBus, CaptureSession.
  * =============================================================================
  */
 
-#include "../include/sigma_kernel_types.h"
+#include "../../include/sigma_kernel_types.h"
 
 /* =========================================================================
- * Fixed-point arithmetic (16.16 format — zero libm dependency)
+ * Fixed-point arithmetic (16.16 format â€ zero libm dependency)
  * ========================================================================= */
-typedef i32 fixed_t;   /* 16.16 fixed point */
+typedef sigma_i32 fixed_t;   /* 16.16 fixed point */
 #define FIXED_SHIFT  16
 #define FIXED(x)     ((fixed_t)((x) << FIXED_SHIFT))
-#define FIXED_MUL(a,b) (((i64)(a) * (b)) >> FIXED_SHIFT)
+#define FIXED_MUL(a,b) (((sigma_i64)(a) * (b)) >> FIXED_SHIFT)
 #define FIXED_CLAMP(v, lo, hi) ((v) < (lo) ? (lo) : (v) > (hi) ? (hi) : (v))
 
 /* =========================================================================
@@ -44,18 +44,18 @@ typedef i32 fixed_t;   /* 16.16 fixed point */
 
 /* --- Pixel (value object) --- */
 typedef struct Pixel {
-    u8 r, g, b;
+    sigma_u8 r, g, b;
 } Pixel;
 
 /* --- Frame (encapsulates raw buffer) --- */
 typedef struct Frame {
-    u8*  data;          /* raw RGB24 pixel buffer */
-    u32  width;
-    u32  height;
-    u64  timestamp_ns;  /* BSA-timestamping */
-    u32  hash_fnv1a;    /* evidence integrity hash */
-    u32  seq_num;       /* capture sequence number */
-    bool_t valid;
+    sigma_u8*  data;          /* raw RGB24 pixel buffer */
+    sigma_u32  width;
+    sigma_u32  height;
+    sigma_u64  timestamp_ns;  /* BSA-timestamping */
+    sigma_u32  hash_fnv1a;    /* evidence integrity hash */
+    sigma_u32  seq_num;       /* capture sequence number */
+    sigma_bool valid;
 } Frame;
 
 /* --- Filter kernel (3x3 convolution) --- */
@@ -77,24 +77,24 @@ typedef enum ScratchEventType {
 
 typedef struct ScratchEvent {
     ScratchEventType type;
-    u32              id;
-    u64              timestamp_ns;
-    u32              payload[4];    /* flexible payload */
+    sigma_u32              id;
+    sigma_u64              timestamp_ns;
+    sigma_u32              payload[4];    /* flexible payload */
 } ScratchEvent;
 
 /* --- Event Bus (MIT Scratch-USP: message passing) --- */
 typedef struct EventBus {
     ScratchEvent queue[CAMERA_MAX_EVENTS];
-    u32          head;
-    u32          tail;
-    u32          count;
+    sigma_u32          head;
+    sigma_u32          tail;
+    sigma_u32          count;
 } EventBus;
 
 /* --- FilterEngine (Snapchat-USP: kernel-native filter pipeline) --- */
 typedef struct FilterEngine {
     FilterKernel3x3 kernels[CAMERA_MAX_FILTERS];
-    u32             count;
-    u32             active_filter;  /* index of currently applied filter */
+    sigma_u32             count;
+    sigma_u32             active_filter;  /* index of currently applied filter */
 } FilterEngine;
 
 /* --- Snapchat-USP AR Filters --- */
@@ -108,24 +108,24 @@ typedef enum ARFilterType {
 
 /* --- CaptureSession (BSA forensic session) --- */
 typedef struct CaptureSession {
-    u32  session_id;
-    u64  start_ns;
-    u64  end_ns;
-    u32  frames_captured;
-    u32  frames_exported;
+    sigma_u32  session_id;
+    sigma_u64  start_ns;
+    sigma_u64  end_ns;
+    sigma_u32  frames_captured;
+    sigma_u32  frames_exported;
     char evidence_tag[48];  /* BSA Sec 63 evidence identifier */
-    bool_t active;
+    sigma_bool active;
 } CaptureSession;
 
 /* --- CameraDevice (top-level composition) --- */
 typedef struct CameraDevice {
     Frame          current_frame;
-    u8             frame_buffer[CAMERA_FRAME_BUFSIZE];
+    sigma_u8             frame_buffer[CAMERA_FRAME_BUFSIZE];
     FilterEngine   filter_engine;
     EventBus       event_bus;
     CaptureSession session;
-    u32            total_frames;
-    bool_t         initialised;
+    sigma_u32            total_frames;
+    sigma_bool         initialised;
 } CameraDevice;
 
 /* =========================================================================
@@ -137,16 +137,16 @@ static CameraDevice g_camera;
  * External dependencies (kernel functions)
  * ========================================================================= */
 extern void   kprintf(const char* fmt, ...);
-extern u64    os_get_timestamp_ns(void);
+extern sigma_u64    os_get_timestamp_ns(void);
 
 /* =========================================================================
- * Utility: FNV-1a hash (evidence integrity — zero dependency)
+ * Utility: FNV-1a hash (evidence integrity â€ zero dependency)
  * ========================================================================= */
-static u32 sigma_fnv1a(const u8* data, u32 len) {
-    u32 hash = CAMERA_HASH_INIT;
-    u32 i;
+static sigma_u32 sigma_fnv1a(const sigma_u8* data, sigma_u32 len) {
+    sigma_u32 hash = CAMERA_HASH_INIT;
+    sigma_u32 i;
     for (i = 0; i < len; i++) {
-        hash ^= (u32)data[i];
+        hash ^= (sigma_u32)data[i];
         hash *= CAMERA_HASH_PRIME;
     }
     return hash;
@@ -155,8 +155,8 @@ static u32 sigma_fnv1a(const u8* data, u32 len) {
 /* =========================================================================
  * Utility: string copy (zero dependency)
  * ========================================================================= */
-static void cam_strncpy(char* dst, const char* src, u32 n) {
-    u32 i;
+static void cam_strncpy(char* dst, const char* src, sigma_u32 n) {
+    sigma_u32 i;
     for (i = 0; i < n - 1 && src[i]; i++) dst[i] = src[i];
     dst[i] = '\0';
 }
@@ -192,7 +192,7 @@ static void filter_engine_init(FilterEngine* fe) {
 
     /* --- Filter 1: SEPIA (Snapchat classic sepia, fixed-point 16.16) --- */
     /* Sepia: R'=0.393R+0.769G+0.189B, G'=0.349R+0.686G+0.168B, B'=0.272R+0.534G+0.131B */
-    /* Stored as luminance kernel — applied per-channel via separate weighting */
+    /* Stored as luminance kernel â€ applied per-channel via separate weighting */
     filter_set_3x3(&fe->kernels[fe->count++], "SEPIA_ZENITH",
         25750, 50397, 12386,   /* 0.393, 0.769, 0.189 in 16.16 */
         22872, 44957, 11010,   /* 0.349, 0.686, 0.168 */
@@ -271,34 +271,34 @@ static void filter_engine_init(FilterEngine* fe) {
  * Apply 3x3 convolution to a single pixel (operates on grayscale luminance)
  * Input: 3x3 neighbourhood, kernel; Output: single channel result clamped [0,255]
  * ========================================================================= */
-static u8 convolve_pixel(const u8 nb[3][3], const FilterKernel3x3* k) {
+static sigma_u8 convolve_pixel(const sigma_u8 nb[3][3], const FilterKernel3x3* k) {
     fixed_t acc = k->bias;
-    u32 r, c;
+    sigma_u32 r, c;
     for (r = 0; r < 3; r++)
         for (c = 0; c < 3; c++)
             acc += FIXED_MUL(FIXED(nb[r][c]), k->w[r][c]);
     acc >>= FIXED_SHIFT;
     if (acc < 0) acc = 0;
     if (acc > 255) acc = 255;
-    return (u8)acc;
+    return (sigma_u8)acc;
 }
 
 /* =========================================================================
  * Frame pixel accessor (bounds-checked)
  * ========================================================================= */
-static Pixel frame_get_pixel(const Frame* f, u32 x, u32 y) {
+static Pixel frame_get_pixel(const Frame* f, sigma_u32 x, sigma_u32 y) {
     Pixel p = {0,0,0};
     if (!f->valid || x >= f->width || y >= f->height) return p;
-    u32 idx = (y * f->width + x) * CAMERA_BYTES_PER_PIXEL;
+    sigma_u32 idx = (y * f->width + x) * CAMERA_BYTES_PER_PIXEL;
     p.r = f->data[idx];
     p.g = f->data[idx+1];
     p.b = f->data[idx+2];
     return p;
 }
 
-static void frame_set_pixel(Frame* f, u32 x, u32 y, Pixel p) {
+static void frame_set_pixel(Frame* f, sigma_u32 x, sigma_u32 y, Pixel p) {
     if (!f->valid || x >= f->width || y >= f->height) return;
-    u32 idx = (y * f->width + x) * CAMERA_BYTES_PER_PIXEL;
+    sigma_u32 idx = (y * f->width + x) * CAMERA_BYTES_PER_PIXEL;
     f->data[idx]   = p.r;
     f->data[idx+1] = p.g;
     f->data[idx+2] = p.b;
@@ -307,31 +307,31 @@ static void frame_set_pixel(Frame* f, u32 x, u32 y, Pixel p) {
 /* =========================================================================
  * Apply filter to a frame (in-place)
  * ========================================================================= */
-static k_status camera_apply_filter_internal(Frame* frame, const FilterKernel3x3* kernel) {
+static sigma_status camera_apply_filter_internal(Frame* frame, const FilterKernel3x3* kernel) {
     if (!frame || !frame->valid || !kernel) return K_ERR_INVAL;
 
-    /* Special-case: Passthrough — no-op */
-    u32 name_is_passthrough = 1;
-    u32 k;
+    /* Special-case: Passthrough â€ no-op */
+    sigma_u32 name_is_passthrough = 1;
+    sigma_u32 k;
     for (k = 0; kernel->name[k] && k < 4; k++) {
         if (kernel->name[k] != "PASS"[k]) { name_is_passthrough = 0; break; }
     }
     if (name_is_passthrough) return K_OK;
 
-    u32 x, y;
+    sigma_u32 x, y;
     for (y = 1; y < frame->height - 1; y++) {
         for (x = 1; x < frame->width - 1; x++) {
             /* Extract 3x3 neighbourhood (grayscale via BT.601 approximation) */
-            u8 nb[3][3];
-            u32 nr, nc;
+            sigma_u8 nb[3][3];
+            sigma_u32 nr, nc;
             for (nr = 0; nr < 3; nr++) {
                 for (nc = 0; nc < 3; nc++) {
                     Pixel px = frame_get_pixel(frame, x + nc - 1, y + nr - 1);
                     /* Luminance = 0.299R + 0.587G + 0.114B (BT.601, integer approx) */
-                    nb[nr][nc] = (u8)(((u32)px.r * 77 + (u32)px.g * 150 + (u32)px.b * 29) >> 8);
+                    nb[nr][nc] = (sigma_u8)(((sigma_u32)px.r * 77 + (sigma_u32)px.g * 150 + (sigma_u32)px.b * 29) >> 8);
                 }
             }
-            u8 out = convolve_pixel(nb, kernel);
+            sigma_u8 out = convolve_pixel(nb, kernel);
             Pixel result = { out, out, out };
             frame_set_pixel(frame, x, y, result);
         }
@@ -342,7 +342,7 @@ static k_status camera_apply_filter_internal(Frame* frame, const FilterKernel3x3
 /* =========================================================================
  * EventBus operations (MIT Scratch-USP: event-driven execution)
  * ========================================================================= */
-static void eventbus_push(EventBus* bus, ScratchEventType type, u32 id, u32 p0) {
+static void eventbus_push(EventBus* bus, ScratchEventType type, sigma_u32 id, sigma_u32 p0) {
     if (bus->count >= CAMERA_MAX_EVENTS) return;
     ScratchEvent* e = &bus->queue[bus->tail];
     e->type        = type;
@@ -353,28 +353,28 @@ static void eventbus_push(EventBus* bus, ScratchEventType type, u32 id, u32 p0) 
     bus->count++;
 }
 
-static bool_t eventbus_pop(EventBus* bus, ScratchEvent* out) {
-    if (bus->count == 0) return FALSE;
+static sigma_bool eventbus_pop(EventBus* bus, ScratchEvent* out) {
+    if (bus->count == 0) return SIGMA_FALSE;
     *out = bus->queue[bus->head];
     bus->head = (bus->head + 1) % CAMERA_MAX_EVENTS;
     bus->count--;
-    return TRUE;
+    return SIGMA_TRUE;
 }
 
 /* =========================================================================
- * Public API — camera_init
+ * Public API â€ camera_init
  * ========================================================================= */
 void camera_init(void) {
-    u32 i;
+    sigma_u32 i;
     /* Zero-initialise camera device */
-    u8* raw = (u8*)&g_camera;
+    sigma_u8* raw = (sigma_u8*)&g_camera;
     for (i = 0; i < sizeof(CameraDevice); i++) raw[i] = 0;
 
     /* Wire frame buffer */
     g_camera.current_frame.data   = g_camera.frame_buffer;
     g_camera.current_frame.width  = CAMERA_DEF_WIDTH;
     g_camera.current_frame.height = CAMERA_DEF_HEIGHT;
-    g_camera.current_frame.valid  = FALSE;
+    g_camera.current_frame.valid  = SIGMA_FALSE;
 
     /* Initialise filter engine */
     filter_engine_init(&g_camera.filter_engine);
@@ -384,11 +384,11 @@ void camera_init(void) {
 
     /* Forensic session setup */
     g_camera.session.session_id = 0x5347ADC0u;   /* "SGADC0" Silicon Camera */
-    g_camera.session.active     = FALSE;
+    g_camera.session.active     = SIGMA_FALSE;
     cam_strncpy(g_camera.session.evidence_tag, "SIGMAOS_CAMERA_SHARD_BSA63", 47);
 
     g_camera.total_frames  = 0;
-    g_camera.initialised   = TRUE;
+    g_camera.initialised   = SIGMA_TRUE;
 
     kprintf("[CAMERA-SHARD]: Sovereign Camera Shard v3.0 Online.\n");
     kprintf("[CAMERA-SHARD]: Resolution %ux%u | Filters: %u | BSA-Evidence: ENABLED.\n",
@@ -396,29 +396,29 @@ void camera_init(void) {
 }
 
 /* =========================================================================
- * Public API — camera_capture_frame
+ * Public API â€ camera_capture_frame
  *   Simulates VBE framebuffer DMA read (will bind to hardware driver on bare metal)
  * ========================================================================= */
-k_status camera_capture_frame(void* external_buffer) {
+sigma_status camera_capture_frame(void* external_buffer) {
     if (!g_camera.initialised) return K_ERR_INVAL;
 
     Frame* f = &g_camera.current_frame;
-    u8* dst  = f->data;
-    u32 i;
+    sigma_u8* dst  = f->data;
+    sigma_u32 i;
 
     if (external_buffer) {
         /* Copy from external VBE/DMA buffer */
-        u8* src = (u8*)external_buffer;
+        sigma_u8* src = (sigma_u8*)external_buffer;
         for (i = 0; i < CAMERA_FRAME_BUFSIZE; i++) dst[i] = src[i];
     } else {
         /* Synthetic frame: fill with procedural test pattern */
-        u32 x, y;
+        sigma_u32 x, y;
         for (y = 0; y < f->height; y++) {
             for (x = 0; x < f->width; x++) {
-                u32 idx = (y * f->width + x) * CAMERA_BYTES_PER_PIXEL;
-                dst[idx]   = (u8)(x % 256);             /* R: horizontal gradient */
-                dst[idx+1] = (u8)(y % 256);             /* G: vertical gradient */
-                dst[idx+2] = (u8)((x + y) % 256);       /* B: diagonal */
+                sigma_u32 idx = (y * f->width + x) * CAMERA_BYTES_PER_PIXEL;
+                dst[idx]   = (sigma_u8)(x % 256);             /* R: horizontal gradient */
+                dst[idx+1] = (sigma_u8)(y % 256);             /* G: vertical gradient */
+                dst[idx+2] = (sigma_u8)((x + y) % 256);       /* B: diagonal */
             }
         }
     }
@@ -426,7 +426,7 @@ k_status camera_capture_frame(void* external_buffer) {
     f->timestamp_ns = os_get_timestamp_ns();
     f->hash_fnv1a   = sigma_fnv1a(f->data, CAMERA_FRAME_BUFSIZE);
     f->seq_num      = ++g_camera.total_frames;
-    f->valid        = TRUE;
+    f->valid        = SIGMA_TRUE;
 
     /* Push capture event to MIT Scratch event bus */
     eventbus_push(&g_camera.event_bus, SCRATCH_EVT_CAPTURE, f->seq_num, f->hash_fnv1a);
@@ -442,27 +442,27 @@ k_status camera_capture_frame(void* external_buffer) {
 }
 
 /* =========================================================================
- * Public API — camera_apply_filter (by name)
+ * Public API â€ camera_apply_filter (by name)
  * ========================================================================= */
-k_status camera_apply_filter(void* frame_ptr, const char* filter_name) {
+sigma_status camera_apply_filter(void* frame_ptr, const char* filter_name) {
     if (!g_camera.initialised) return K_ERR_INVAL;
     Frame* f = frame_ptr ? (Frame*)frame_ptr : &g_camera.current_frame;
     if (!f->valid) return K_ERR_INVAL;
 
     FilterEngine* fe = &g_camera.filter_engine;
-    u32 i;
+    sigma_u32 i;
     for (i = 0; i < fe->count; i++) {
         /* name match (case-sensitive, manual sigma_strcmp) */
         const char* a = fe->kernels[i].name;
         const char* b = filter_name;
-        u32 j = 0;
+        sigma_u32 j = 0;
         while (a[j] && b[j] && a[j] == b[j]) j++;
         if (!a[j] && !b[j]) {
             /* Match found */
             fe->active_filter = i;
-            k_status res = camera_apply_filter_internal(f, &fe->kernels[i]);
+            sigma_status res = camera_apply_filter_internal(f, &fe->kernels[i]);
             if (res == K_OK) {
-                /* Re-hash frame after filtering — BSA integrity update */
+                /* Re-hash frame after filtering â€ BSA integrity update */
                 f->hash_fnv1a = sigma_fnv1a(f->data, CAMERA_FRAME_BUFSIZE);
                 eventbus_push(&g_camera.event_bus, SCRATCH_EVT_FILTER, i, f->hash_fnv1a);
                 kprintf("[CAMERA-SHARD]: Filter '%s' applied | New Hash=0x%08x\n",
@@ -476,25 +476,25 @@ k_status camera_apply_filter(void* frame_ptr, const char* filter_name) {
 }
 
 /* =========================================================================
- * Public API — camera_scratch_trigger (MIT Scratch-USP)
+ * Public API â€ camera_scratch_trigger (MIT Scratch-USP)
  *   Triggers block-based execution sequences (event + associated action)
  * ========================================================================= */
-k_status camera_scratch_trigger(u32 event_id) {
+sigma_status camera_scratch_trigger(sigma_u32 event_id) {
     if (!g_camera.initialised) return K_ERR_INVAL;
 
     switch (event_id) {
         case 0: /* WHEN CLICKED: CAPTURE */
-            camera_capture_frame(NULL);
+            camera_capture_frame(SIGMA_NULL);
             break;
         case 1: /* WHEN FILTER CHANGED: SEPIA */
-            camera_apply_filter(NULL, "SEPIA_ZENITH");
+            camera_apply_filter(SIGMA_NULL, "SEPIA_ZENITH");
             break;
         case 2: /* WHEN FORENSIC FLAG: BSA SIGN */
             eventbus_push(&g_camera.event_bus, SCRATCH_EVT_FORENSIC, event_id, 0);
             kprintf("[CAMERA-SCRATCH]: Block: 'Sovereign BSA Sign' executed.\n");
             break;
         case 3: /* AR SNAPCHAT: GHOST MODE */
-            camera_apply_filter(NULL, "AR_GHOST_MODE");
+            camera_apply_filter(SIGMA_NULL, "AR_GHOST_MODE");
             break;
         case 4: /* MIT SCRATCH: BROADCAST 'CAPTURE_SYNC' */
             eventbus_push(&g_camera.event_bus, SCRATCH_EVT_CUSTOM, 999, 0);
@@ -508,24 +508,24 @@ k_status camera_scratch_trigger(u32 event_id) {
 }
 
 /* =========================================================================
- * Public API — camera_forensic_session_start / stop
+ * Public API â€ camera_forensic_session_start / stop
  * ========================================================================= */
-k_status camera_forensic_session_start(const char* evidence_tag) {
+sigma_status camera_forensic_session_start(const char* evidence_tag) {
     if (!g_camera.initialised) return K_ERR_INVAL;
     g_camera.session.start_ns        = os_get_timestamp_ns();
     g_camera.session.frames_captured = 0;
     g_camera.session.frames_exported = 0;
-    g_camera.session.active          = TRUE;
+    g_camera.session.active          = SIGMA_TRUE;
     if (evidence_tag)
         cam_strncpy(g_camera.session.evidence_tag, evidence_tag, 47);
     kprintf("[CAMERA-FORENSIC]: Session '%s' STARTED.\n", g_camera.session.evidence_tag);
     return K_OK;
 }
 
-k_status camera_forensic_session_stop(void) {
+sigma_status camera_forensic_session_stop(void) {
     if (!g_camera.initialised || !g_camera.session.active) return K_ERR_INVAL;
     g_camera.session.end_ns   = os_get_timestamp_ns();
-    g_camera.session.active   = FALSE;
+    g_camera.session.active   = SIGMA_FALSE;
     kprintf("[CAMERA-FORENSIC]: Session '%s' CLOSED. Frames=%u | Duration=%llu ms\n",
             g_camera.session.evidence_tag,
             g_camera.session.frames_captured,
@@ -534,11 +534,11 @@ k_status camera_forensic_session_stop(void) {
 }
 
 /* =========================================================================
- * Public API — camera_list_filters
+ * Public API â€ camera_list_filters
  * ========================================================================= */
 void camera_list_filters(void) {
     kprintf("[CAMERA-SHARD]: Available Filters:\n");
-    u32 i;
+    sigma_u32 i;
     for (i = 0; i < g_camera.filter_engine.count; i++) {
         char marker = (g_camera.filter_engine.active_filter == i) ? '*' : ' ';
         kprintf("  [%c%u] %s\n", marker, i, g_camera.filter_engine.kernels[i].name);
@@ -546,12 +546,12 @@ void camera_list_filters(void) {
 }
 
 /* =========================================================================
- * Public API — camera_process_events (MIT Scratch event loop)
+ * Public API â€ camera_process_events (MIT Scratch event loop)
  * ========================================================================= */
 void camera_process_events(void) {
     ScratchEvent e;
     while (eventbus_pop(&g_camera.event_bus, &e)) {
         kprintf("[CAMERA-EVT]: type=%u id=%u ts=%llu\n",
-                (u32)e.type, e.id, e.timestamp_ns);
+                (sigma_u32)e.type, e.id, e.timestamp_ns);
     }
 }

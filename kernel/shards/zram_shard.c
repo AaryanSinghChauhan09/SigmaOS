@@ -1,6 +1,6 @@
 /*
  * =============================================================================
- * Σ SIGMAOS KERNEL: SOVEREIGN-ZRAM-SHARD (v1.0 - MEMORY COMPRESSION)
+ * Î£ SIGMAOS KERNEL: SOVEREIGN-ZRAM-SHARD (v1.0 - MEMORY COMPRESSION)
  * =============================================================================
  * Algorithm: Sharded-LZO Compression (SLZC)
  * Principles:
@@ -11,13 +11,13 @@
  * =============================================================================
  */
 
-#include "../include/sigma_kernel_types.h"
+#include "../../include/sigma_kernel_types.h"
 
 typedef struct ZRAMPulse {
-    u64 raw_pfn;
+    sigma_u64 raw_pfn;
     void* compressed_data;
-    usize compressed_size;
-    bool_t is_compressed;
+    sigma_usize compressed_size;
+    sigma_bool is_compressed;
 } ZRAMPulse;
 
 #define MAX_ZRAM_PAGES 1024
@@ -31,7 +31,7 @@ void zram_init(void) {
     // kprintf("[ZRAM]: Sovereign Memory-Compression Shard Online.\n");
 }
 
-k_status zram_compress_shard(u64 pfn) {
+sigma_status zram_compress_shard(sigma_u64 pfn) {
     /* 
      * Absorb Linux zswap USP: Sharded Compression.
      * In a sharded model: compress inactive shards into high-density silicon blocks.

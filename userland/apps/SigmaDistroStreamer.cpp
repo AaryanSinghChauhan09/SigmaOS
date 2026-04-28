@@ -1,6 +1,6 @@
 /*
  * =========================================================================
- * Σ SIGMAOS ZENITH SUPREME: SOVEREIGN DISTRO STREAMER (v2.0)
+ * Î£ SIGMAOS ZENITH SUPREME: SOVEREIGN DISTRO STREAMER (v2.0)
  * =========================================================================
  * Mission: Zero-download, local execution of universal Linux distributions.
  * USP: WASM-based sharding and remote streaming via Sovereign APIs.
@@ -8,8 +8,8 @@
  * =========================================================================
  */
 
-#include "../../libc/sigma_libc.h"
-#include "../../libc/sigma_types.h"
+#include "../../include/SovereignLibC.h"
+#include "../../include/sigma_types.h"
 
 typedef struct {
     char name[32];
@@ -49,7 +49,7 @@ void sigma_distro_stream(const char* name) {
 }
 
 void sigma_distro_list() {
-    sigma_printf("\nΣ SOVEREIGN DISTRO-STREAM REPOSITORY (Industrial Mirror)\n");
+    sigma_printf("\nÎ£ SOVEREIGN DISTRO-STREAM REPOSITORY (Industrial Mirror)\n");
     sigma_printf("-----------------------------------------------------------------------\n");
     sigma_printf("NAME              PARITY        WASM-READY   MEM REQ (MB)\n");
     sigma_printf("-----------------------------------------------------------------------\n");

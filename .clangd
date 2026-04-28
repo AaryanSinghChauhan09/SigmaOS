@@ -1,0 +1,23 @@
+CompileFlags:
+  Add: [
+    "-Ic:/Users/Aaryan/.gemini/antigravity/scratch/SigmaOS-Site/include",
+    "-Ic:/Users/Aaryan/.gemini/antigravity/scratch/SigmaOS-Site/kernel/core",
+    "-Ic:/Users/Aaryan/.gemini/antigravity/scratch/SigmaOS-Site/kernel/drivers",
+    "-Ic:/Users/Aaryan/.gemini/antigravity/scratch/SigmaOS-Site/kernel/orchestration",
+    "-m64",
+    "-ffreestanding",
+    "-fno-stack-protector",
+    "-nostdlib",
+    "-fno-exceptions",
+    "-fno-rtti"
+  ]
+---
+If:
+  PathMatch: .*\.cpp
+CompileFlags:
+  Add: ["-std=c++11"]
+---
+If:
+  PathMatch: .*\.c
+CompileFlags:
+  Add: ["-std=c11"]

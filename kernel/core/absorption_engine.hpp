@@ -1,7 +1,9 @@
 #ifndef ABSORPTION_ENGINE_HPP
 #define ABSORPTION_ENGINE_HPP
 
-#include "../../SigmaOOP.hpp"
+#include "../../include/SovereignLibC.h"
+
+#include "../../include/SigmaOOP.hpp"
 
 namespace SigmaOS {
 

@@ -1,6 +1,7 @@
+#include "../include/SovereignLibC.h"
 /*
  * =========================================================================
- * Σ SIGMAOS: SOVEREIGN ZENITH (v15.0 - ABSOLUTE FINALITY)
+ * Î£ SIGMAOS: SOVEREIGN ZENITH (v15.0 - ABSOLUTE FINALITY)
  * =========================================================================
  * Author: Sovereign-Zenith-Developer
  * Principles: Zero-Library, Bit-Perfect, Silicon-Integrity, USP-Absorbed.
@@ -12,7 +13,7 @@
 
 
 /**
- * Σ SIGMA OS: SOVEREIGN NCERT ZENITH (v128.0 - SCHOLAR ZENITH)
+ * Î£ SIGMA OS: SOVEREIGN NCERT ZENITH (v128.0 - SCHOLAR ZENITH)
  * ==========================================================
  * USP: Eradication of educational debt via autonomous NCERT Concept Sharding.
  * Capability: Multi-Class Physics, Chemistry, Biology, and Math simulations.
@@ -121,7 +122,7 @@ public:
 };
 
 int main() {
-    sigma_printf("--- Σ SIGMA OS SOVEREIGN NCERT ZENITH SHARD ENGINE (v128.0) ---\n");
+    sigma_printf("--- Î£ SIGMA OS SOVEREIGN NCERT ZENITH SHARD ENGINE (v128.0) ---\n");
     
     void* simulations = { 
         new GravitationSim(), 

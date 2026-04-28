@@ -1,6 +1,7 @@
+#include "../include/SovereignLibC.h"
 /*
  * =========================================================================
- * Σ SIGMAOS: SOVEREIGN ZENITH (v15.0 - ABSOLUTE FINALITY)
+ * Î£ SIGMAOS: SOVEREIGN ZENITH (v15.0 - ABSOLUTE FINALITY)
  * =========================================================================
  * Author: Sovereign-Zenith-Developer
  * Principles: Zero-Library, Bit-Perfect, Silicon-Integrity, USP-Absorbed.
@@ -15,7 +16,7 @@
 
 
 /**
- * Σ SIGMA OS: SOVEREIGN RESEARCH MATRIX (v128.0 - RESEARCH ZENITH)
+ * Î£ SIGMA OS: SOVEREIGN RESEARCH MATRIX (v128.0 - RESEARCH ZENITH)
  * ==============================================================
  * USP: Eradication of manual research via autonomous shard-mining.
  * Capability: Automated literature synthesis, data correlation, and hypothesis generation.
@@ -58,7 +59,7 @@ public:
 };
 
 int main() {
-    sigma_printf("--- Σ SIGMA OS SOVEREIGN RESEARCH MATRIX (ZENITH) ---\n");
+    sigma_printf("--- Î£ SIGMA OS SOVEREIGN RESEARCH MATRIX (ZENITH) ---\n");
     SovereignResearchMatrix matrix;
     
     matrix.MineData("Arxiv Technical Shards");

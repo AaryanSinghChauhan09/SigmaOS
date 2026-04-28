@@ -1,3 +1,4 @@
+#include "../../../include/SovereignLibC.h"
 #include "lattice_pqc.hpp"
 
 namespace SigmaOS {
@@ -66,7 +67,7 @@ SigmaString SovereignLatticePQC::encrypt(const char* plaintext) {
 }
 
 void SovereignLatticePQC::audit() {
-    sigma_printf("\n--- Σ SOVEREIGN SECURITY AUDIT (v20.0) ---\n");
+    sigma_printf("\n--- Î£ SOVEREIGN SECURITY AUDIT (v20.0) ---\n");
     sigma_printf("| PQC Status     : %s\n", m_quantum_shield_active ? "ACTIVE (SHIELDED)" : "IDLE");
     sigma_printf("| Key ID         : "); sigma_print_hex(m_key_id); sigma_print("\n");
     sigma_printf("| Encryptions    : %llu\n", m_encryptions);

@@ -1,6 +1,6 @@
 /*
  * =============================================================================
- * Σ SIGMAOS KERNEL: SOVEREIGN-REGISTRY (v1.0 - PERSISTENT CONFIG SHARD)
+ * Î£ SIGMAOS KERNEL: SOVEREIGN-REGISTRY (v1.0 - PERSISTENT CONFIG SHARD)
  * =============================================================================
  * Algorithm: Atomic Sharded Key-Value Store (O(1) Map)
  * Principles:
@@ -21,29 +21,29 @@
 typedef struct RegistryEntry {
     char key[MAX_KEY_LEN];
     char val[MAX_VAL_LEN];
-    bool_t active;
+    sigma_bool active;
 } RegistryEntry;
 
 static RegistryEntry g_reg[MAX_REGISTRY_KEYS];
-static u32 g_reg_count = 0;
+static sigma_u32 g_reg_count = 0;
 
 /* =========================================================================
  * REGISTRY Engine (The Sovereign Config Store)
  * ========================================================================= */
 
 void registry_init(void) {
-    for (int i = 0; i < MAX_REGISTRY_KEYS; i++) g_reg[i].active = FALSE;
+    for (int i = 0; i < MAX_REGISTRY_KEYS; i++) g_reg[i].active = SIGMA_FALSE;
     // kprintf("[REGISTRY]: Sovereign Persistent Registry Shard Online.\n");
 }
 
-k_status registry_set(const char* key, const char* val) {
+sigma_status registry_set(const char* key, const char* val) {
     /* If key exists, update value */
-    for (u32 i = 0; i < g_reg_count; i++) {
+    for (sigma_u32 i = 0; i < g_reg_count; i++) {
         // Simple sigma_strcmp replacement
-        bool_t match = TRUE;
-        u32 j = 0;
+        sigma_bool match = SIGMA_TRUE;
+        sigma_u32 j = 0;
         while (g_reg[i].key[j] && key[j]) {
-            if (g_reg[i].key[j] != key[j]) { match = FALSE; break; }
+            if (g_reg[i].key[j] != key[j]) { match = SIGMA_FALSE; break; }
             j++;
         }
         if (match && g_reg[i].key[j] == '\0' && key[j] == '\0') {
@@ -57,26 +57,26 @@ k_status registry_set(const char* key, const char* val) {
     if (g_reg_count >= MAX_REGISTRY_KEYS) return K_ERR_NOMEM;
     
     RegistryEntry* e = &g_reg[g_reg_count++];
-    u32 k = 0; while (k < MAX_KEY_LEN - 1 && key[k]) { e->key[k] = key[k]; k++; }
+    sigma_u32 k = 0; while (k < MAX_KEY_LEN - 1 && key[k]) { e->key[k] = key[k]; k++; }
     e->key[k] = '\0';
     k = 0; while (k < MAX_VAL_LEN - 1 && val[k]) { e->val[k] = val[k]; k++; }
     e->val[k] = '\0';
-    e->active = TRUE;
+    e->active = SIGMA_TRUE;
     
     return K_OK;
 }
 
 const char* registry_get(const char* key) {
-    for (u32 i = 0; i < g_reg_count; i++) {
-        bool_t match = TRUE;
-        u32 j = 0;
+    for (sigma_u32 i = 0; i < g_reg_count; i++) {
+        sigma_bool match = SIGMA_TRUE;
+        sigma_u32 j = 0;
         while (g_reg[i].key[j] && key[j]) {
-            if (g_reg[i].key[j] != key[j]) { match = FALSE; break; }
+            if (g_reg[i].key[j] != key[j]) { match = SIGMA_FALSE; break; }
             j++;
         }
         if (match && g_reg[i].key[j] == '\0' && key[j] == '\0') {
             return g_reg[i].val;
         }
     }
-    return NULL;
+    return SIGMA_NULL;
 }

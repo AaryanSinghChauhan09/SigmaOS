@@ -91,9 +91,8 @@ body {
     font-family: 'Outfit', sans-serif;
     height: 100vh;
     overflow: hidden;
-    background-image: url('zenith_wallpaper_abstract_1777347761007.png');
+    background: url('zenith_professional_wallpaper_1777356063201.png') no-repeat center center fixed;
     background-size: cover;
-    background-position: center;
 }
 
 /* Background Overlay */
@@ -322,7 +321,144 @@ body {
     text-shadow: 0 2px 4px rgba(0,0,0,0.5);
 }
 
+/* Widget System */
+.widgets-container {
+    position: fixed;
+    bottom: 120px;
+    left: 50%;
+    transform: translateX(-50%);
+    display: flex;
+    gap: 20px;
+    z-index: 50;
+}
+
+.widget {
+    background: var(--glass);
+    -webkit-backdrop-filter: var(--glass-blur);
+    backdrop-filter: var(--glass-blur);
+    border: 1px solid var(--glass-border);
+    border-radius: 20px;
+    padding: 20px;
+    width: 260px;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+}
+
+.widget-title {
+    display: flex;
+    justify-content: space-between;
+    font-size: 11px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    color: var(--text-muted);
+    margin-bottom: 10px;
+}
+
+.stat-value {
+    font-size: 24px;
+    font-weight: 600;
+    margin-bottom: 10px;
+}
+
+.stat-bar {
+    height: 6px;
+    background: rgba(255,255,255,0.05);
+    border-radius: 3px;
+    overflow: hidden;
+}
+
+.stat-progress {
+    height: 100%;
+    background: var(--accent);
+    box-shadow: 0 0 10px var(--accent-glow);
+    transition: width 1s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+#cpu-progress { width: 12%; }
+#mem-progress { width: 25%; }
+
 /* Utility Shards */
 .widget-graph { width: 100%; height: 40px; margin-top: 10px; }
 .taskbar-divider { width: 1px; height: 30px; background: var(--glass-border); margin: 0 10px; }
-.entropy-label { font-size: 10px; color: var(--success); margin-top: 5px; }
+/* Start Menu */
+.start-menu {
+    position: absolute;
+    bottom: 80px;
+    left: 20px;
+    width: 320px;
+    background: var(--glass-bg);
+    -webkit-backdrop-filter: var(--blur);
+    backdrop-filter: var(--blur);
+    border: 1px solid var(--glass-border);
+    border-radius: 12px;
+    display: none;
+    flex-direction: column;
+    z-index: 1000;
+    box-shadow: 0 20px 40px rgba(0,0,0,0.5);
+    transform: translateY(20px);
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+.start-menu.active { display: flex; transform: translateY(0); }
+.start-header { padding: 20px; border-bottom: 1px solid var(--glass-border); display: flex; align-items: center; gap: 15px; }
+.user-avatar { width: 40px; height: 40px; background: var(--accent-glow); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: 800; border: 1px solid var(--accent); }
+.user-name { font-weight: 600; font-size: 14px; }
+.user-status { font-size: 10px; color: var(--text-muted); }
+.start-content { padding: 15px; flex-grow: 1; }
+.start-section { margin-bottom: 20px; }
+.section-title { font-size: 11px; font-weight: 800; text-transform: uppercase; letter-spacing: 1px; color: var(--text-muted); margin-bottom: 10px; }
+.start-item { padding: 10px; display: flex; align-items: center; gap: 12px; cursor: pointer; border-radius: 6px; transition: background 0.2s; }
+.start-item:hover { background: rgba(255,255,255,0.1); }
+.start-item .icon { font-size: 16px; }
+.start-footer { padding: 10px 20px; background: rgba(0,0,0,0.2); border-top: 1px solid var(--glass-border); display: flex; justify-content: space-between; font-size: 12px; border-radius: 0 0 12px 12px; }
+.footer-item { cursor: pointer; opacity: 0.7; }
+.footer-item:hover { opacity: 1; color: var(--accent); }
+
+/* Glassmorphism 2.0 Overrides */
+:root {
+    --glass-bg: rgba(15, 15, 15, 0.75);
+    --glass-border: rgba(255, 255, 255, 0.1);
+    --blur: blur(25px) saturate(180%);
+}
+.stat-progress.healing { background: var(--success); box-shadow: 0 0 10px rgba(0, 255, 157, 0.3); }
+.stat-progress.entropy { background: #ff00ff; box-shadow: 0 0 10px rgba(255, 0, 255, 0.3); }
+.stat-progress.auto { background: #ff8800; box-shadow: 0 0 10px rgba(255, 136, 0, 0.3); }
+.stat-progress.vault { background: #6600ff; box-shadow: 0 0 10px rgba(102, 0, 255, 0.3); }
+.stat-progress.vfs { background: #00ffcc; box-shadow: 0 0 10px rgba(0, 255, 204, 0.3); }
+.stat-progress.memory { background: #00ccff; box-shadow: 0 0 10px rgba(0, 204, 255, 0.3); }
+.stat-progress.sync { background: #ffcc00; box-shadow: 0 0 10px rgba(255, 204, 0, 0.3); }
+.stat-progress.ui { background: #ff0077; box-shadow: 0 0 10px rgba(255, 0, 119, 0.3); }
+.stat-progress.silicon { background: #00ff88; box-shadow: 0 0 10px rgba(0, 255, 136, 0.3); }
+.stat-progress.scholar { background: #8800ff; box-shadow: 0 0 10px rgba(136, 0, 255, 0.3); }
+.stat-progress.persona { background: #aa00ff; box-shadow: 0 0 10px rgba(170, 0, 255, 0.3); }
+.stat-progress.amnesic { background: #ff0044; box-shadow: 0 0 10px rgba(255, 0, 68, 0.3); }
+.stat-progress.healing { background: #00ff99; box-shadow: 0 0 10px rgba(0, 255, 153, 0.3); }
+.stat-progress.legal { background: #ffd700; box-shadow: 0 0 10px rgba(255, 215, 0, 0.3); }
+.stat-progress.mesh { background: #ff6600; box-shadow: 0 0 10px rgba(255, 102, 0, 0.3); }
+.stat-progress.test { background: #ccff00; box-shadow: 0 0 10px rgba(204, 255, 0, 0.3); }
+.stat-progress.security { background: #0088ff; box-shadow: 0 0 10px rgba(0, 136, 255, 0.3); }
+.stat-progress.cache { background: #ffcc00; box-shadow: 0 0 10px rgba(255, 204, 0, 0.3); }
+.stat-progress.colonization { background: #bf00ff; box-shadow: 0 0 10px rgba(191, 0, 255, 0.3); }
+.stat-progress.vram { background: #00ccff; box-shadow: 0 0 10px rgba(0, 204, 255, 0.3); }
+.stat-progress.boot { background: #0088ff; box-shadow: 0 0 10px rgba(0, 136, 255, 0.3); }
+.widget.persona { border-color: var(--accent); box-shadow: inset 0 0 20px var(--accent-glow); }
+.audit-info, .stat-label { font-size: 10px; color: var(--text-muted); margin-bottom: 5px; }
+.widget.lattice-viz { width: 320px; }
+.shard-grid { display: grid; grid-template-columns: repeat(25, 1fr); gap: 2px; margin: 10px 0; }
+.shard-dot { width: 4px; height: 4px; background: var(--accent); border-radius: 1px; opacity: 0.3; transition: all 0.5s ease; }
+.shard-dot.active { opacity: 1; box-shadow: 0 0 5px var(--accent); }
+.shard-dot.healing { background: var(--success); opacity: 1; }
+.shard-dot.error { background: var(--error); opacity: 1; }
+.accent { color: var(--accent); }
+
+/* Voice Wave Animation */
+.voice-wave { display: flex; align-items: center; justify-content: center; gap: 4px; height: 30px; margin: 10px 0; }
+.wave-bar { width: 3px; height: 10px; background: var(--accent); border-radius: 2px; animation: wave 1s infinite ease-in-out; }
+.wave-bar:nth-child(2) { animation-delay: 0.1s; }
+.wave-bar:nth-child(3) { animation-delay: 0.2s; }
+.wave-bar:nth-child(4) { animation-delay: 0.3s; }
+.wave-bar:nth-child(5) { animation-delay: 0.4s; }
+
+@keyframes wave {
+    0%, 100% { height: 10px; opacity: 0.3; }
+    50% { height: 25px; opacity: 1; }
+}

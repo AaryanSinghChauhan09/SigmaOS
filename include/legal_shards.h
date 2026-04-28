@@ -1,6 +1,6 @@
 /*
  * =============================================================================
- * Σ SIGMAOS KERNEL: LEGAL-SHARDS-MANIFEST (v3.0)
+ * Î£ SIGMAOS KERNEL: LEGAL-SHARDS-MANIFEST (v3.0)
  * =============================================================================
  */
 #ifndef SIGMA_LEGAL_SHARDS_H

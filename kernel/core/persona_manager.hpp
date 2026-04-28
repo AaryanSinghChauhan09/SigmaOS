@@ -1,33 +1,57 @@
 #ifndef PERSONA_MANAGER_HPP
 #define PERSONA_MANAGER_HPP
 
-#include "../../SigmaOOP.hpp"
+#include "../../include/SovereignLibC.h"
+
+#include "../../include/SigmaOOP.hpp"
 
 namespace SigmaOS {
-namespace Core {
+namespace Kernel {
 
-class SovereignPersonaManager : public SigmaOS::SigmaObject {
+struct PersonaConfig {
+    char name[32];
+    sigma_u32 accent_color;
+    sigma_bool entropy_protection;
+    sigma_u8  clearance_level;
+};
+
+class SovereignPersonaManager : public SigmaObject {
 private:
-    SigmaString m_current_user;
-    sigma_bool m_is_personalizing;
+    PersonaConfig m_current;
+    sigma_bool    m_morphic_sync;
 
 public:
-    SovereignPersonaManager() : m_current_user("Sovereign_Admin"), m_is_personalizing(SIGMA_FALSE) {}
+    SovereignPersonaManager() : m_morphic_sync(SIGMA_FALSE) {
+        sigma_memcpy(m_current.name, "ROOT_SHARD", 11);
+        m_current.accent_color = 0x00F2FF; // Neon Cyan
+        m_current.entropy_protection = SIGMA_TRUE;
+        m_current.clearance_level = 0xFF;
+    }
 
     const char* type_name() const noexcept override { return "SovereignPersonaManager"; }
 
-    void ApplyProfile(const char* profile_name) {
-        sigma_printf("[PERSONA]: Applying Customization Profile: %s...\n", profile_name);
-        sigma_printf("[OK]: Zenith Theme, Automation Rules, and Privacy Policies synchronized.\n");
+    void SwitchPersona(const char* name, sigma_u32 color) {
+        sigma_printf("[PERSONA-ZENITH]: Hot-swapping System State to: %s\n", name);
+        sigma_strncpy(m_current.name, name, 31);
+        m_current.accent_color = color;
+        sigma_printf("[PERSONA-ZENITH]: Accent Shard updated to 0x%x\n", color);
     }
 
-    void TogglePersonalization() {
-        m_is_personalizing = !m_is_personalizing;
-        sigma_printf("[PERSONA]: AI-Driven Personalization is now %s.\n", m_is_personalizing ? "ACTIVE" : "INACTIVE");
+    void EnableMorphicSync() {
+        m_morphic_sync = SIGMA_TRUE;
+        sigma_printf("[PERSONA-ZENITH]: Morphic Sync ACTIVE. System adaptation enabled.\n");
+    }
+
+    void AuditPersona() {
+        sigma_printf("\n--- Î£ SOVEREIGN PERSONA AUDIT ---\n");
+        sigma_printf("| Current Persona: %s\n", m_current.name);
+        sigma_printf("| Clearance Level: %u\n", m_current.clearance_level);
+        sigma_printf("| Morphic Sync   : %s\n", m_morphic_sync ? "ENABLED" : "DISABLED");
+        sigma_printf("----------------------------------\n");
     }
 };
 
-} // namespace Core
+} // namespace Kernel
 } // namespace SigmaOS
 
 #endif

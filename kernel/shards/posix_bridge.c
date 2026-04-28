@@ -1,6 +1,6 @@
 /*
  * =============================================================================
- * Σ SIGMAOS KERNEL: POSIX-BRIDGE (v1.0 - LINUX BINARY COMPATIBILITY)
+ * Î£ SIGMAOS KERNEL: POSIX-BRIDGE (v1.0 - LINUX BINARY COMPATIBILITY)
  * =============================================================================
  * Algorithm: Linux x86_64 Syscall Mapping
  * Principles:
@@ -10,7 +10,7 @@
  * =============================================================================
  */
 
-#include "../include/sigma_kernel_types.h"
+#include "../../include/sigma_kernel_types.h"
 
 /* Linux x86_64 Syscall IDs */
 #define SYS_READ      0
@@ -26,29 +26,29 @@
  * POSIX BRIDGE Engine (The Linux Compatibility Shard)
  * ========================================================================= */
 
-i64 posix_syscall_dispatch(u64 num, u64 a1, u64 a2, u64 a3, u64 a4, u64 a5) {
-    extern i64 vfs_read(i32, void*, usize);
-    extern i64 vfs_write(i32, const void*, usize);
-    extern i32 vfs_open(const char*, u32, u32);
-    extern i32 vfs_close(i32);
-    extern void* kmalloc(usize);
+sigma_i64 posix_syscall_dispatch(sigma_u64 num, sigma_u64 a1, sigma_u64 a2, sigma_u64 a3, sigma_u64 a4, sigma_u64 a5) {
+    extern sigma_i64 vfs_read(sigma_i32, void*, sigma_usize);
+    extern sigma_i64 vfs_write(sigma_i32, const void*, sigma_usize);
+    extern sigma_i32 vfs_open(const char*, sigma_u32, sigma_u32);
+    extern sigma_i32 vfs_close(sigma_i32);
+    extern void* kmalloc(sigma_usize);
 
     switch (num) {
         case SYS_READ:
-            return vfs_read((i32)a1, (void*)a2, (usize)a3);
+            return vfs_read((sigma_i32)a1, (void*)a2, (sigma_usize)a3);
         case SYS_WRITE:
-            return vfs_write((i32)a1, (const void*)a2, (usize)a3);
+            return vfs_write((sigma_i32)a1, (const void*)a2, (sigma_usize)a3);
         case SYS_OPEN:
-            return (i64)vfs_open((const char*)a1, (u32)a2, (u32)a3);
+            return (sigma_i64)vfs_open((const char*)a1, (sigma_u32)a2, (sigma_u32)a3);
         case SYS_CLOSE:
-            return (i64)vfs_close((i32)a1);
+            return (sigma_i64)vfs_close((sigma_i32)a1);
         case SYS_EXIT:
             // kprintf("[POSIX]: Process Exit Status: %llu\n", a1);
             /* Handle process termination in SigmaTask here */
             return 0;
         case SYS_MMAP:
             /* Return page-aligned memory from slab/vmm */
-            return (i64)kmalloc((usize)a2);
+            return (sigma_i64)kmalloc((sigma_usize)a2);
         default:
             // kprintf("[POSIX]: Unsupported Linux Syscall ID: %llu\n", num);
             break;

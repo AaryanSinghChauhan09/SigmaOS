@@ -139,6 +139,7 @@ body {
 
 #main-nav.scrolled {
     background: var(--bg-glass);
+    -webkit-backdrop-filter: blur(15px);
     backdrop-filter: blur(15px);
     height: 60px;
     border-bottom: 1px solid var(--border-glass);

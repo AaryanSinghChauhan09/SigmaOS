@@ -1,6 +1,6 @@
 /*
  * =============================================================================
- * Σ SIGMAOS KERNEL: UNIVERSAL-AUDIT-MASTER (v1.0 - SILICON INTEGRITY)
+ * Î£ SIGMAOS KERNEL: UNIVERSAL-AUDIT-MASTER (v1.0 - SILICON INTEGRITY)
  * =============================================================================
  * Algorithm: Shard Bit-Integrity Pulse (SBIP)
  * Principles:
@@ -11,12 +11,12 @@
  * =============================================================================
  */
 
-#include "../include/sigma_kernel_types.h"
+#include "../../include/sigma_kernel_types.h"
 
 typedef struct AuditTarget {
     char        name[32];
     void*       ptr;
-    usize       size;
+    sigma_usize       size;
 } AuditTarget;
 
 /* =========================================================================
@@ -27,7 +27,7 @@ void audit_master_init(void) {
     // kprintf("[AUDIT-MASTER]: Sovereign Silicon bit-integrity Shard Online.\n");
 }
 
-k_status audit_now(void) {
+sigma_status audit_now(void) {
     /* 
      * Absorb Linux IMA USP: Shard Integrity Measurement.
      * Verify sharded function bitstreams for absolute sovereignty.

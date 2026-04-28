@@ -1,14 +1,14 @@
 /*
  * =========================================================================
- * Σ SIGMAOS ZENITH SUPREME: INDUSTRIAL PLUGIN SHARD (v1.0)
+ * Î£ SIGMAOS ZENITH SUPREME: INDUSTRIAL PLUGIN SHARD (v1.0)
  * =========================================================================
  * Mission: Hot-swappable kernel and userland modules (LKM style).
  * Capability: Dynamic loading, Symbol resolution, Integrity auditing.
  * =========================================================================
  */
 
-#include "../libc/sigma_libc.h"
-#include "../libc/sigma_types.h"
+#include "../../include/SovereignLibC.h"
+#include "../../include/sigma_types.h"
 
 typedef struct {
     char name[32];
@@ -40,7 +40,7 @@ sigma_bool sigma_plugin_load(const char* name, void (*on_load)(), void (*on_unlo
 }
 
 void sigma_plugin_list() {
-    sigma_printf("\nΣ SOVEREIGN PLUGIN REGISTRY\n");
+    sigma_printf("\nÎ£ SOVEREIGN PLUGIN REGISTRY\n");
     sigma_printf("-------------------------------------------\n");
     for (sigma_u32 i = 0; i < plugin_count; i++) {
         sigma_printf("[%d] %-15s v%d.%d  %s\n", 

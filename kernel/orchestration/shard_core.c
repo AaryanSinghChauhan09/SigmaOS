@@ -1,6 +1,6 @@
 /*
  * =============================================================================
- * Σ SIGMAOS KERNEL: SOVEREIGN SHARD CORE (v1.0 - ABSOLUTE ISOLATION)
+ * Î£ SIGMAOS KERNEL: SOVEREIGN SHARD CORE (v1.0 - ABSOLUTE ISOLATION)
  * =============================================================================
  * Mission: Hard-Partitioned Kernel Services (Beyond Cgroups/Namespaces).
  * Algorithm: Hardware-Enforced Shard Boundaries (HESB).
@@ -8,7 +8,7 @@
  *   - Each shard (Driver, FS, Network) gets a dedicated silicon segment.
  *   - Inter-shard communication (Shared-Memory Zenith) is lock-free.
  *   - Zero-overhead partition switching using VMX/SVM intercept logic.
- * Comparison: Linux context switch = 2..10µs, Zenith Shard Switch = <500ns.
+ * Comparison: Linux context switch = 2..10Âµs, Zenith Shard Switch = <500ns.
  * =============================================================================
  */
 
@@ -25,19 +25,19 @@ typedef enum {
 } ShardType;
 
 typedef struct SigmaShard {
-    u64 shard_id;
+    sigma_u64 shard_id;
     ShardType type;
     char name[32];
-    u64 base_addr;
-    u64 limit_addr;
-    u64 stack_ptr;
-    u32 priority;
-    bool_t active;
+    sigma_u64 base_addr;
+    sigma_u64 limit_addr;
+    sigma_u64 stack_ptr;
+    sigma_u32 priority;
+    sigma_bool active;
 } SigmaShard;
 
 /* --- Internal Storage --- */
 static SigmaShard g_shards[MAX_SYSTEM_SHARDS];
-static u32 g_shard_count = 0;
+static sigma_u32 g_shard_count = 0;
 
 /* =========================================================================
  * Shard Management (Better than Linux LSMs)
@@ -46,22 +46,22 @@ static u32 g_shard_count = 0;
 void shard_init_core(void) {
     // Zero out the shard table
     for (int i = 0; i < MAX_SYSTEM_SHARDS; i++) {
-        g_shards[i].active = FALSE;
+        g_shards[i].active = SIGMA_FALSE;
     }
     // kprintf("[SHARD-CORE]: Sovereign Shard Partitioning Online.\n");
 }
 
-u64 shard_create(const char* name, ShardType type, u64 base, u64 limit) {
+sigma_u64 shard_create(const char* name, ShardType type, sigma_u64 base, sigma_u64 limit) {
     if (g_shard_count >= MAX_SYSTEM_SHARDS) return 0;
 
-    u32 id = g_shard_count++;
+    sigma_u32 id = g_shard_count++;
     SigmaShard* s = &g_shards[id];
     
     s->shard_id = id;
     s->type = type;
     s->base_addr = base;
     s->limit_addr = limit;
-    s->active = TRUE;
+    s->active = SIGMA_TRUE;
     
     // Copy name
     for (int i = 0; i < 31 && name[i]; i++) {
@@ -76,9 +76,9 @@ u64 shard_create(const char* name, ShardType type, u64 base, u64 limit) {
  * SHARD-SWITCH (The Zenith Context Switch)
  * Better than Linux task_switch because it uses Silicon-Direct Mapping.
  * ========================================================================= */
-extern void shard_switch_asm(u64 from_stack, u64 to_stack);
+extern void shard_switch_asm(sigma_u64 from_stack, sigma_u64 to_stack);
 
-void shard_isolate_and_switch(u64 next_shard_id) {
+void shard_isolate_and_switch(sigma_u64 next_shard_id) {
     if (next_shard_id >= g_shard_count) return;
     
     SigmaShard* next = &g_shards[next_shard_id];
@@ -95,12 +95,12 @@ void shard_isolate_and_switch(u64 next_shard_id) {
 /* =========================================================================
  * AMNESIC-WIPE INTEGRATION (Tails-Style)
  * ========================================================================= */
-void shard_amnesic_destroy(u64 shard_id) {
+void shard_amnesic_destroy(sigma_u64 shard_id) {
     if (shard_id >= g_shard_count) return;
     SigmaShard* s = &g_shards[shard_id];
     
     // 1. Mark inactive
-    s->active = FALSE;
+    s->active = SIGMA_FALSE;
     
     // 2. Erase Metadata
     s->shard_id = 0;

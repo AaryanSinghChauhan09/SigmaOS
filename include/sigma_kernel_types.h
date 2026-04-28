@@ -1,9 +1,9 @@
 /*
  * =============================================================================
- * Σ SIGMAOS: SOVEREIGN KERNEL TYPES (v1.0 - C11 ZERO-DEPENDENCY)
+ * Î£ SIGMAOS: SOVEREIGN KERNEL TYPES (v1.0 - C11 ZERO-DEPENDENCY)
  * =============================================================================
  * All kernel-internal types, constants, and primitive definitions.
- * Standard: C11 (ISO/IEC 9899:2011) — no external headers.
+ * Standard: C11 (ISO/IEC 9899:2011) â€� no external headers.
  * =============================================================================
  */
 
@@ -11,23 +11,23 @@
 #define SIGMA_KERNEL_TYPES_H
 
 /* ---- primitive types ---- */
-typedef unsigned char      u8;
-typedef unsigned short     u16;
-typedef unsigned int       u32;
-typedef unsigned long long u64;
-typedef signed char        i8;
-typedef signed short       i16;
-typedef signed int         i32;
-typedef signed long long   i64;
-typedef unsigned long long usize;
-typedef long long          isize;
-typedef u64                paddr_t;   /* physical address */
-typedef u64                vaddr_t;   /* virtual  address */
-typedef int                bool_t;
+typedef unsigned char      sigma_u8;
+typedef unsigned short     sigma_u16;
+typedef unsigned int       sigma_u32;
+typedef unsigned long long sigma_u64;
+typedef signed char        sigma_i8;
+typedef signed short       sigma_i16;
+typedef signed int         sigma_i32;
+typedef signed long long   sigma_i64;
+typedef unsigned long long sigma_usize;
+typedef long long          sigma_isize;
+typedef sigma_u64                sigma_paddr_t;   /* physical address */
+typedef sigma_u64                sigma_vaddr_t;   /* virtual  address */
+typedef int                sigma_bool;
 
-#define TRUE   1
-#define FALSE  0
-#define NULL   ((void*)0)
+#define SIGMA_TRUE   1
+#define SIGMA_FALSE  0
+#define SIGMA_NULL   ((void*)0)
 
 /* ---- page constants ---- */
 #define PAGE_SIZE       4096ULL
@@ -53,7 +53,7 @@ typedef int                bool_t;
 #define K_ERR_NOTFOUND   -4
 #define K_ERR_PERM       -5
 
-typedef i32 k_status;
+typedef sigma_i32 sigma_status;
 
 /* ---- intrinsics ---- */
 static inline void cpu_halt(void)  { __asm__ __volatile__("cli; hlt"); }
@@ -62,39 +62,39 @@ static inline void cpu_fence(void) { __asm__ __volatile__("mfence" ::: "memory")
 static inline void cpu_sti(void)   { __asm__ __volatile__("sti"); }
 static inline void cpu_cli(void)   { __asm__ __volatile__("cli"); }
 
-static inline u64 cpu_rdtsc(void) {
-    u64 v;
+static inline sigma_u64 cpu_rdtsc(void) {
+    sigma_u64 v;
     __asm__ __volatile__(
         "rdtsc\n\t shl $32,%%rdx\n\t or %%rdx,%%rax"
         : "=a"(v) :: "rdx");
     return v;
 }
 
-static inline u64 cpu_read_cr3(void) {
-    u64 v;
+static inline sigma_u64 cpu_read_cr3(void) {
+    sigma_u64 v;
     __asm__ __volatile__("mov %%cr3, %0" : "=r"(v));
     return v;
 }
 
-static inline void cpu_write_cr3(u64 v) {
+static inline void cpu_write_cr3(sigma_u64 v) {
     __asm__ __volatile__("mov %0, %%cr3" :: "r"(v) : "memory");
 }
 
-static inline void cpu_invlpg(vaddr_t va) {
+static inline void cpu_invlpg(sigma_vaddr_t va) {
     __asm__ __volatile__("invlpg (%0)" :: "r"(va) : "memory");
 }
 
-static inline u8 port_inb(u16 port) {
-    u8 v;
+static inline sigma_u8 port_inb(sigma_u16 port) {
+    sigma_u8 v;
     __asm__ __volatile__("inb %1, %0" : "=a"(v) : "dN"(port));
     return v;
 }
 
-static inline void port_outb(u16 port, u8 val) {
+static inline void port_outb(sigma_u16 port, sigma_u8 val) {
     __asm__ __volatile__("outb %0, %1" :: "a"(val), "dN"(port));
 }
 
-static inline void port_outw(u16 port, u16 val) {
+static inline void port_outw(sigma_u16 port, sigma_u16 val) {
     __asm__ __volatile__("outw %0, %1" :: "a"(val), "dN"(port));
 }
 
@@ -102,7 +102,7 @@ static inline void port_outw(u16 port, u16 val) {
  * SOVEREIGN-ASM: Silicon-Direct Memory Orchestration (No Pre-Defined Functions)
  * ========================================================================= */
 
-static inline void sigma_memcpy(void* dst, const void* src, usize n) {
+static inline void sigma_memcpy(void* dst, const void* src, sigma_usize n) {
     __asm__ __volatile__ (
         "rep movsb"
         : "+D"(dst), "+S"(src), "+c"(n)
@@ -110,17 +110,17 @@ static inline void sigma_memcpy(void* dst, const void* src, usize n) {
     );
 }
 
-static inline void sigma_memset(void* s, int c, usize n) {
+static inline void sigma_memset(void* s, int c, sigma_usize n) {
     __asm__ __volatile__ (
         "rep stosb"
         : "+D"(s), "+c"(n)
-        : "a"((u8)c)
+        : "a"((sigma_u8)c)
         : "memory"
     );
 }
 
-static inline usize sigma_strlen(const char* s) {
-    usize len = 0;
+static inline sigma_usize sigma_strlen(const char* s) {
+    sigma_usize len = 0;
     while (s[len]) len++;
     return len;
 }
@@ -129,11 +129,11 @@ static inline int sigma_strcmp(const char* s1, const char* s2) {
     while (*s1 && (*s1 == *s2)) {
         s1++; s2++;
     }
-    return *(u8*)s1 - *(u8*)s2;
+    return *(sigma_u8*)s1 - *(sigma_u8*)s2;
 }
 
-static inline void sigma_strncpy(char* dest, const char* src, usize n) {
-    usize i;
+static inline void sigma_strncpy(char* dest, const char* src, sigma_usize n) {
+    sigma_usize i;
     for (i = 0; i < n - 1 && src[i] != '\0'; i++) dest[i] = src[i];
     dest[i] = '\0';
 }
@@ -141,18 +141,18 @@ static inline void sigma_strncpy(char* dest, const char* src, usize n) {
 /* =========================================================================
  * SOVEREIGN-FAULT: Industrial Recovery & Assertion
  * ========================================================================= */
-void sigma_panic(const char* msg, u64 rip, u64 rsp);
+void sigma_panic(const char* msg, sigma_u64 rip, sigma_u64 rsp);
 
 #define SIGMA_ASSERT(cond, msg) \
     do { if (!(cond)) sigma_panic(msg, 0, 0); } while (0)
 
 /* ---- Common Kernel Function Declarations ---- */
 void kprintf(const char* fmt, ...);
-u32  cpu_get_id(void);
+sigma_u32  cpu_get_id(void);
 void serial_init(void);
 void serial_putc(char c);
 void serial_puts(const char* s);
-void vga_clear(u8 color);
-void vga_putc_at(u8 x, u8 y, char c, u8 color);
+void vga_clear(sigma_u8 color);
+void vga_putc_at(sigma_u8 x, sigma_u8 y, char c, sigma_u8 color);
 
 #endif /* SIGMA_KERNEL_TYPES_H */

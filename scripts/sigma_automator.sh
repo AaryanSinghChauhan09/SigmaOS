@@ -9,7 +9,7 @@
 #   - EzLinux: One-click setup and personalization
 # =============================================================================
 
-VERSION="2.0.1-Zenith"
+VERSION="2.1.0-Zenith-Forge"
 LOG_FILE="/tmp/sigma_automator.log"
 
 # --- UI Helpers ---
@@ -60,7 +60,7 @@ autokey_shard() {
     esac
 }
 
-# --- 3. EzLinux Shard (One-Click Setup) ---
+# --- 4. EzLinux Shard (One-Click Setup) ---
 ezlinux_shard() {
     echo "[EZLINUX] Initiating Sovereign One-Click Personalization..."
     log_action "EzLinux setup initiated"
@@ -68,9 +68,18 @@ ezlinux_shard() {
     echo "  - Sharding mirror lists (Arch/Debian style)..."
     echo "  - Injecting glassmorphism tokens (LupusOS style)..."
     echo "  - Harmonizing user provisioning (Linux-provisioning style)..."
-    echo "  - Configuring transmission VPN (Automation style)..."
     
     echo "[EZLINUX] System Sovereignty: HARMONIZED."
+}
+
+# --- 5. Sovereign Forge (Build Orchestration) ---
+forge_shard() {
+    echo "[FORGE] Initiating Industrial Make Forge..."
+    log_action "Forge build initiated"
+    make clean >/dev/null 2>&1
+    make -j$(nproc) all
+    make verify
+    make unit_test
 }
 
 # --- 4. System Maintenance (Automation Scripts) ---
@@ -93,6 +102,9 @@ case "$1" in
     "--setup")
         ezlinux_shard
         ;;
+    "--forge")
+        forge_shard
+        ;;
     "--clean")
         sys_maint
         ;;
@@ -106,6 +118,7 @@ case "$1" in
         echo "  --click [delay] [count]  Run XClicker auto-click shard"
         echo "  --macro [name]           Run AutoKey macro expansion"
         echo "  --setup                  Run EzLinux industrial setup"
+        echo "  --forge                  Run industrial build & test forge"
         echo "  --clean                  Run system maintenance"
         ;;
 esac

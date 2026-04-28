@@ -1,6 +1,6 @@
 /*
  * =============================================================================
- * Σ SIGMAOS KERNEL: DYNAMIC HOT-PATCHING SHARD (v1.0)
+ * Î£ SIGMAOS KERNEL: DYNAMIC HOT-PATCHING SHARD (v1.0)
  * =============================================================================
  * Principles: Zero-Downtime Updates & Shard Redirection.
  * =============================================================================
@@ -10,12 +10,12 @@
 typedef struct Patch {
     void** target_func_ptr;
     void*  new_func_addr;
-    bool_t active;
+    sigma_bool active;
 } patch_t;
 
 #define MAX_PATCHES 32
 static patch_t patch_lattice[MAX_PATCHES];
-static u32 patch_count = 0;
+static sigma_u32 patch_count = 0;
 
 /* Hot-swap a kernel shard function at runtime */
 void kernel_hotpatch(void** original, void* replacement) {
@@ -25,7 +25,7 @@ void kernel_hotpatch(void** original, void* replacement) {
         
         patch_lattice[patch_count].target_func_ptr = original;
         patch_lattice[patch_count].new_func_addr = replacement;
-        patch_lattice[patch_count].active = TRUE;
+        patch_lattice[patch_count].active = SIGMA_TRUE;
         patch_count++;
     }
 }

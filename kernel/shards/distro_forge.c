@@ -1,6 +1,6 @@
 /*
  * =============================================================================
- * Σ SIGMAOS KERNEL: SOVEREIGN-DISTRO-FORGE (v1.0 - INDUSTRIAL GENERATION)
+ * Î£ SIGMAOS KERNEL: SOVEREIGN-DISTRO-FORGE (v1.0 - INDUSTRIAL GENERATION)
  * =============================================================================
  * Algorithm: Bit-Perfect Shard Packaging
  * Principles:
@@ -10,15 +10,15 @@
  * =============================================================================
  */
 
-#include "../include/sigma_kernel_types.h"
+#include "../../include/sigma_kernel_types.h"
 
 #define MAX_DISTRO_SHARDS 256
 
 typedef struct DistroConfig {
     char distro_name[64];
-    u32  included_shards[MAX_DISTRO_SHARDS];
-    u32  shard_count;
-    bool_t compress_final;
+    sigma_u32  included_shards[MAX_DISTRO_SHARDS];
+    sigma_u32  shard_count;
+    sigma_bool compress_final;
 } DistroConfig;
 
 /* =========================================================================
@@ -29,7 +29,7 @@ void distro_forge_init(void) {
     // kprintf("[DISTRO-FORGE]: Sovereign Industrial Distribution Forge Online.\n");
 }
 
-k_status forge_generate_distro(const char* name, bool_t include_pqc, bool_t include_ai) {
+sigma_status forge_generate_distro(const char* name, sigma_bool include_pqc, sigma_bool include_ai) {
     // kprintf("[DISTRO-FORGE]: Generating Sovereign Shard Distribution: %s\n", name);
     
     if (include_pqc) {

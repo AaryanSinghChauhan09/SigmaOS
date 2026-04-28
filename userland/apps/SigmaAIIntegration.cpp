@@ -1,14 +1,14 @@
 /*
  * =========================================================================
- * Σ SIGMAOS ZENITH SUPREME: SOVEREIGN AI INTEGRATION (v1.0)
+ * Î£ SIGMAOS ZENITH SUPREME: SOVEREIGN AI INTEGRATION (v1.0)
  * =========================================================================
  * Mission: Autonomous system balancing and reasoning.
  * USP: N1ghthill/merlin-ia, AgriciDaniel/claude-mint parity.
  * =========================================================================
  */
 
-#include "../../libc/sigma_libc.h"
-#include "../../libc/sigma_types.h"
+#include "../../include/SovereignLibC.h"
+#include "../../include/sigma_types.h"
 
 typedef struct {
     char model_name[32];

@@ -1,6 +1,6 @@
 /*
  * =============================================================================
- * Σ SIGMAOS KERNEL: SYSTEM CALL INTERFACE (v1.0 - PURE C11)
+ * Î£ SIGMAOS KERNEL: SYSTEM CALL INTERFACE (v1.0 - PURE C11)
  * =============================================================================
  * Syscall numbers and kernel-side dispatch.
  * Method: software interrupt vector 0x80 (sigma_trap instruction for userland)
@@ -92,10 +92,10 @@ typedef struct SigmaInterruptFrame SigmaInterruptFrame;
 
 /* =========================================================================
  * Syscall handler function type
- * Args: (frame*) → reads rdi, rsi, rdx, r10, r8, r9 as args
- * Returns: i64 result written back to frame->rax
+ * Args: (frame*) â†’ reads rdi, rsi, rdx, r10, r8, r9 as args
+ * Returns: sigma_i64 result written back to frame->rax
  * ========================================================================= */
-typedef i64 (*syscall_fn_t)(SigmaInterruptFrame* frame);
+typedef sigma_i64 (*syscall_fn_t)(SigmaInterruptFrame* frame);
 
 /* =========================================================================
  * External kernel services
@@ -107,7 +107,7 @@ extern void   kprintf(const char* fmt, ...);
 /* =========================================================================
  * Syscall implementations
  * ========================================================================= */
-static i64 sys_exit_impl(SigmaInterruptFrame* f) {
+static sigma_i64 sys_exit_impl(SigmaInterruptFrame* f) {
     int code = (int)f->rdi;
     kprintf("[SYSCALL]: exit(%d)\n", code);
     /* In real kernel: terminate current task, schedule next */
@@ -115,66 +115,66 @@ static i64 sys_exit_impl(SigmaInterruptFrame* f) {
     return 0;
 }
 
-static i64 sys_write_impl(SigmaInterruptFrame* f) {
+static sigma_i64 sys_write_impl(SigmaInterruptFrame* f) {
     int fd            = (int)f->rdi;
-    const char* buf   = (const char*)(usize)f->rsi;
-    usize count       = (usize)f->rdx;
+    const char* buf   = (const char*)(sigma_usize)f->rsi;
+    sigma_usize count       = (sigma_usize)f->rdx;
     if (fd == 1 || fd == 2) {
-        /* stdout/stderr → serial + VGA */
-        usize i;
+        /* stdout/stderr â†’ serial + VGA */
+        sigma_usize i;
         for (i = 0; i < count; i++) {
             /* Write to COM1 (serial) */
             extern void serial_putc(char c);
             serial_putc(buf[i]);
         }
-        return (i64)count;
+        return (sigma_i64)count;
     }
     return K_ERR_INVAL;
 }
 
-static i64 sys_read_impl(SigmaInterruptFrame* f) {
+static sigma_i64 sys_read_impl(SigmaInterruptFrame* f) {
     (void)f;
     /* TODO: VFS read dispatch */
     return K_ERR_INVAL;
 }
 
-static i64 sys_getpid_impl(SigmaInterruptFrame* f) {
+static sigma_i64 sys_getpid_impl(SigmaInterruptFrame* f) {
     (void)f;
-    extern u64 sched_current_tid(void);
-    return (i64)sched_current_tid();
+    extern sigma_u64 sched_current_tid(void);
+    return (sigma_i64)sched_current_tid();
 }
 
-static i64 sys_yield_impl(SigmaInterruptFrame* f) {
+static sigma_i64 sys_yield_impl(SigmaInterruptFrame* f) {
     (void)f;
     sched_yield();
     return 0;
 }
 
-static i64 sys_mmap_impl(SigmaInterruptFrame* f) {
-    usize length = (usize)f->rsi;
-    extern vaddr_t vmalloc(u64 npages);
-    u64 npages = (length + PAGE_SIZE - 1) / PAGE_SIZE;
-    vaddr_t va = vmalloc(npages);
-    return va ? (i64)va : K_ERR_NOMEM;
+static sigma_i64 sys_mmap_impl(SigmaInterruptFrame* f) {
+    sigma_usize length = (sigma_usize)f->rsi;
+    extern sigma_vaddr_t vmalloc(sigma_u64 npages);
+    sigma_u64 npages = (length + PAGE_SIZE - 1) / PAGE_SIZE;
+    sigma_vaddr_t va = vmalloc(npages);
+    return va ? (sigma_i64)va : K_ERR_NOMEM;
 }
 
-static i64 sys_uname_impl(SigmaInterruptFrame* f) {
-    char* buf = (char*)(usize)f->rdi;
+static sigma_i64 sys_uname_impl(SigmaInterruptFrame* f) {
+    char* buf = (char*)(sigma_usize)f->rdi;
     if (!buf) return K_ERR_INVAL;
     const char* info = "SigmaOS 1.0 SovereignKernel x86_64";
-    usize i = 0;
+    sigma_usize i = 0;
     while (info[i] && i < 127) { buf[i] = info[i]; i++; }
     buf[i] = '\0';
     return 0;
 }
 
-static i64 sys_info_impl(SigmaInterruptFrame* f) {
+static sigma_i64 sys_info_impl(SigmaInterruptFrame* f) {
     (void)f;
     kprintf("[SYSINFO]: SigmaOS Sovereign Kernel v1.0 | C11 | Zero-glibc\n");
     return 0;
 }
 
-static i64 sys_poweroff_impl(SigmaInterruptFrame* f) {
+static sigma_i64 sys_poweroff_impl(SigmaInterruptFrame* f) {
     (void)f;
     kprintf("[KERNEL]: Powering off via ACPI S5 state...\n");
     /* ACPI shutdown: write 0x2000 to port 0x604 (QEMU) */
@@ -184,7 +184,7 @@ static i64 sys_poweroff_impl(SigmaInterruptFrame* f) {
     return 0;
 }
 
-static i64 sys_reboot_impl(SigmaInterruptFrame* f) {
+static sigma_i64 sys_reboot_impl(SigmaInterruptFrame* f) {
     (void)f;
     kprintf("[KERNEL]: Rebooting via PS/2 controller reset...\n");
     port_outb(0x64, 0xFE);  /* pulse reset line */
@@ -193,7 +193,7 @@ static i64 sys_reboot_impl(SigmaInterruptFrame* f) {
     return 0;
 }
 
-static i64 sys_unimpl(SigmaInterruptFrame* f) {
+static sigma_i64 sys_unimpl(SigmaInterruptFrame* f) {
     kprintf("[SYSCALL]: syscall #%llu not yet implemented.\n", f->vector);
     return K_ERR_INVAL;
 }
@@ -213,18 +213,18 @@ static const syscall_fn_t g_syscall_table[SIGMA_NSYSCALLS] = {
     [SYS_INFO]          = sys_info_impl,
     [SYS_POWEROFF]      = sys_poweroff_impl,
     [SYS_REBOOT]        = sys_reboot_impl,
-    /* All others → unimplemented */
+    /* All others â†’ unimplemented */
 };
 
 /* =========================================================================
  * Syscall gate handler (called when vector 128 fires)
  * Convention: syscall number in rax, args in rdi,rsi,rdx,r10,r8,r9
  * ========================================================================= */
-static u64 g_syscall_count = 0;
+static sigma_u64 g_syscall_count = 0;
 
 void syscall_handler(SigmaInterruptFrame* frame) {
-    u64 sysno = frame->rax;
-    i64 result;
+    sigma_u64 sysno = frame->rax;
+    sigma_i64 result;
 
     if (sysno < SIGMA_NSYSCALLS && g_syscall_table[sysno]) {
         result = g_syscall_table[sysno](frame);
@@ -233,23 +233,23 @@ void syscall_handler(SigmaInterruptFrame* frame) {
         result = K_ERR_INVAL;
     }
 
-    frame->rax = (u64)result;
+    frame->rax = (sigma_u64)result;
     g_syscall_count++;
 }
 
 /* =========================================================================
- * Init — register syscall handler on vector 128
+ * Init â€ register syscall handler on vector 128
  * ========================================================================= */
 void syscall_init(void) {
-    extern void idt_register_handler(u32 vec,
+    extern void idt_register_handler(sigma_u32 vec,
         void (*fn)(SigmaInterruptFrame* frame));
     idt_register_handler(128, syscall_handler);
     kprintf("[SYSCALL]: 64-syscall table online. Gate=INT 0x80\n");
 }
 
-u64 sched_current_tid(void) {
+sigma_u64 sched_current_tid(void) {
     /* Forward to scheduler */
     extern SigmaTask* sched_get_current(void);
-    /* stub — return 0 if not yet scheduled */
+    /* stub â€ return 0 if not yet scheduled */
     return 0;
 }

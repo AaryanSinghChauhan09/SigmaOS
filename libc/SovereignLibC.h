@@ -1,6 +1,6 @@
 /*
  * =========================================================================
- * Σ SIGMAOS: SOVEREIGN LIBC (v19.0 - ZERO-DEPENDENCY)
+ * Î£ SIGMAOS: SOVEREIGN LIBC (v19.0 - ZERO-DEPENDENCY)
  * =========================================================================
  * Mission: Neutralize all high-level language runtimes (glibc, msvcrt).
  * Capability: Direct x86_64 Syscall Integration.
@@ -10,6 +10,8 @@
 
 #ifndef SOVEREIGN_LIBC_H
 #define SOVEREIGN_LIBC_H
+
+#include "../include/SovereignLibC.h"
 
 typedef unsigned long long sigma_size_t;
 typedef long long          sigma_ssize_t;

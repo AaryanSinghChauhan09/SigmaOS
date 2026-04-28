@@ -1,6 +1,6 @@
 /*
  * =============================================================================
- * Σ SIGMAOS KERNEL: SOVEREIGN-KSM-SHARD (v1.0 - MEMORY DEDUPLICATION)
+ * Î£ SIGMAOS KERNEL: SOVEREIGN-KSM-SHARD (v1.0 - MEMORY DEDUPLICATION)
  * =============================================================================
  * Algorithm: Red-Black Tree Page Hashing (RBPH)
  * Principles:
@@ -11,14 +11,14 @@
  * =============================================================================
  */
 
-#include "../include/sigma_kernel_types.h"
+#include "../../include/sigma_kernel_types.h"
 
 #define KSM_SCAN_PAGES 128
 
 typedef struct KSMPulse {
-    u64 page_hash;
-    u64 pfn;
-    bool_t is_merged;
+    sigma_u64 page_hash;
+    sigma_u64 pfn;
+    sigma_bool is_merged;
 } KSMPulse;
 
 /* =========================================================================
@@ -29,15 +29,15 @@ void ksm_init(void) {
     // kprintf("[KSM]: Sovereign Kernel-Samepage-Merging Shard Online.\n");
 }
 
-k_status ksm_scan_and_merge(void) {
+sigma_status ksm_scan_and_merge(void) {
     /* 
      * Absorb Linux KSM Logic:
      * 1. Scan sharded memory pages for identical bitstreams.
      * 2. Hash and verify page content finality.
      * 3. Merge identical pages into a single 'Sovereign-Shared' shard.
      */
-    static u32 scan_ptr = 0;
-    for (u32 i = 0; i < KSM_SCAN_PAGES; i++) {
+    static sigma_u32 scan_ptr = 0;
+    for (sigma_u32 i = 0; i < KSM_SCAN_PAGES; i++) {
         /* Simulation of page-sharding deduplication */
         scan_ptr++;
     }

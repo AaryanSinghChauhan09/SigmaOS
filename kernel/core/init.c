@@ -1,14 +1,14 @@
 /*
  * =========================================================================
- * Σ SIGMAOS ZENITH SUPREME: SOVEREIGN INIT SYSTEM (v1.0)
+ * Î£ SIGMAOS ZENITH SUPREME: SOVEREIGN INIT SYSTEM (v1.0)
  * =========================================================================
  * Mission: Orchestrate system services and runlevels (init/systemd style).
  * Capability: Service management, Dependency resolution, Process respawn.
  * =========================================================================
  */
 
-#include "../libc/sigma_libc.h"
-#include "../libc/sigma_types.h"
+#include "../../include/SovereignLibC.h"
+#include "../../include/sigma_types.h"
 
 typedef enum {
     SERVICE_STOPPED,

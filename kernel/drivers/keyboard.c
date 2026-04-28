@@ -1,6 +1,6 @@
 /*
  * =============================================================================
- * Σ SIGMAOS KERNEL: PS/2 KEYBOARD DRIVER (v1.1)
+ * Î£ SIGMAOS KERNEL: PS/2 KEYBOARD DRIVER (v1.1)
  * =============================================================================
  * Principles: Zero-Abstract Human Input & ASCII Mapping.
  * =============================================================================
@@ -18,7 +18,7 @@ static const char kbd_us[128] = {
 extern void kbd_queue_push(char c);
 
 void keyboard_handler() {
-    u8 scancode = port_inb(0x60);
+    sigma_u8 scancode = port_inb(0x60);
     
     /* Key release has high bit set */
     if (scancode & 0x80) {

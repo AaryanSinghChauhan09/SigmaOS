@@ -1,3 +1,4 @@
+#include "../../include/SovereignLibC.h"
 #include "cloud_maestro.hpp"
 
 namespace SigmaOS {
@@ -29,7 +30,7 @@ void CloudMaestro::DeployToCloud(const SigmaString& shardName) {
 }
 
 void CloudMaestro::ShowCloudMatrix() const {
-    sigma_printf("\n--- Σ SIGMA OS SOVEREIGN CLOUD SHARD MATRIX ---\n");
+    sigma_printf("\n--- Î£ SIGMA OS SOVEREIGN CLOUD SHARD MATRIX ---\n");
     sigma_printf("%-30s | %-15s | %-15s | %s\n", "Shard ID", "Region", "Node IP", "Status");
     sigma_printf("---------------------------------------------------------------------------\n");
     

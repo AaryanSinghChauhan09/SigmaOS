@@ -1,6 +1,6 @@
 /*
  * =============================================================================
- * Σ SIGMAOS KERNEL: PREDICTIVE SCHEDULER ANALYST (v1.0 - PURE C11)
+ * Î£ SIGMAOS KERNEL: PREDICTIVE SCHEDULER ANALYST (v1.0 - PURE C11)
  * =============================================================================
  * Algorithm: Burst-Predictive Multi-Level Queue (BP-MLQ)
  * Principles:
@@ -12,7 +12,7 @@
  * =============================================================================
  */
 
-#include "../include/sigma_kernel_types.h"
+#include "../../include/sigma_kernel_types.h"
 
 /* =========================================================================
  * Constants
@@ -22,15 +22,15 @@
 
 /* Task analytical history */
 typedef struct SigmaTaskPredictor {
-    u64 last_burst[SCHED_PREDICT_SLOTS];
-    u32 slot_idx;
-    u64 predicted_burst;
-    u64 total_time;
-    u32 score;          /* Reliability score (0..100) */
+    sigma_u64 last_burst[SCHED_PREDICT_SLOTS];
+    sigma_u32 slot_idx;
+    sigma_u64 predicted_burst;
+    sigma_u64 total_time;
+    sigma_u32 score;          /* Reliability score (0..100) */
 } SigmaTaskPredictor;
 
 /* Pre-emptive Priority Heuristic */
-u8 sched_predict_priority(u64 last_dur, u8 current_prio) {
+sigma_u8 sched_predict_priority(sigma_u64 last_dur, sigma_u8 current_prio) {
     /* If task is predictable, boost it 1 level for responsiveness */
     if (last_dur < 1000) {
         if (current_prio > 0) return current_prio - 1;
@@ -39,16 +39,16 @@ u8 sched_predict_priority(u64 last_dur, u8 current_prio) {
 }
 
 /* =========================================================================
- * EMA Algorithm (Exponential Moving Average) — Fixed Point
+ * EMA Algorithm (Exponential Moving Average) â€ Fixed Point
  * ========================================================================= */
-u64 ema_predict(u64 last, u64 current) {
+sigma_u64 ema_predict(sigma_u64 last, sigma_u64 current) {
     // Prediction = (Alpha * current + (256 - Alpha) * last) / 256
-    u64 next = ((u64)ALPHA_FIXED * current + (256 - (u64)ALPHA_FIXED) * last) >> 8;
+    sigma_u64 next = ((sigma_u64)ALPHA_FIXED * current + (256 - (sigma_u64)ALPHA_FIXED) * last) >> 8;
     return next;
 }
 
 /* Update task predictor on context switch */
-void sched_update_predictor(SigmaTaskPredictor* p, u64 duration) {
+void sched_update_predictor(SigmaTaskPredictor* p, sigma_u64 duration) {
     p->last_burst[p->slot_idx % SCHED_PREDICT_SLOTS] = duration;
     p->slot_idx++;
     p->total_time += duration;
@@ -57,7 +57,7 @@ void sched_update_predictor(SigmaTaskPredictor* p, u64 duration) {
     p->predicted_burst = ema_predict(p->predicted_burst, duration);
 
     /* Heuristic Score Update */
-    u64 delta = (duration > p->predicted_burst) ?
+    sigma_u64 delta = (duration > p->predicted_burst) ?
                 (duration - p->predicted_burst) : (p->predicted_burst - duration);
 
     if (delta < (duration / 8)) {

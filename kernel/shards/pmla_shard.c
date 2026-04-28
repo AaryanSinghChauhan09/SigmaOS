@@ -1,11 +1,11 @@
 /*
  * =============================================================================
- * Σ SIGMAOS KERNEL: SOVEREIGN-PMLA-SHARD (Prevention of Money Laundering Act 2002)
+ * Î£ SIGMAOS KERNEL: SOVEREIGN-PMLA-SHARD (Prevention of Money Laundering Act 2002)
  * =============================================================================
  */
-#include "../include/sigma_kernel_types.h"
+#include "../../include/sigma_kernel_types.h"
 
-extern void add_item(void* t, const char* desc, const char* ref, const char* prereq, const char* proc, u32 days, u32 penalty_rs);
+extern void add_item(void* t, const char* desc, const char* ref, const char* prereq, const char* proc, sigma_u32 days, sigma_u32 penalty_rs);
 
 void init_pmla_template(void* t) {
     add_item(t, "Arrest under PMLA", "Sec 19 PMLA", 

@@ -1,6 +1,6 @@
 /*
  * =============================================================================
- * Σ SIGMAOS KERNEL: SOVEREIGN-NAMESPACE-SHARD (v1.0 - SHARD ISOLATION)
+ * Î£ SIGMAOS KERNEL: SOVEREIGN-NAMESPACE-SHARD (v1.0 - SHARD ISOLATION)
  * =============================================================================
  * Algorithm: Shard-Identity Isolation (SII)
  * Principles:
@@ -11,7 +11,7 @@
  * =============================================================================
  */
 
-#include "../include/sigma_kernel_types.h"
+#include "../../include/sigma_kernel_types.h"
 
 #define MAX_NAMESPACES 16
 
@@ -25,36 +25,36 @@ typedef enum NamespaceType {
 typedef struct SovereignNamespace {
     char        name[32];
     NamespaceType type;
-    u32         isolation_id;
-    bool_t      active;
+    sigma_u32         isolation_id;
+    sigma_bool      active;
 } SovereignNamespace;
 
 static SovereignNamespace g_namespaces[MAX_NAMESPACES];
-static u32 g_ns_count = 0;
+static sigma_u32 g_ns_count = 0;
 
 /* =========================================================================
  * NAMESPACE Engine (The Isolation Shard)
  * ========================================================================= */
 
 void namespace_init(void) {
-    for (int i = 0; i < MAX_NAMESPACES; i++) g_namespaces[i].active = FALSE;
+    for (int i = 0; i < MAX_NAMESPACES; i++) g_namespaces[i].active = SIGMA_FALSE;
     // kprintf("[NAMESPACE]: Sovereign Shard-Isolation Interface Online.\n");
 }
 
-k_status namespace_create(const char* name, NamespaceType type) {
+sigma_status namespace_create(const char* name, NamespaceType type) {
     if (g_ns_count >= MAX_NAMESPACES) return K_ERR_NOMEM;
     
     SovereignNamespace* ns = &g_namespaces[g_ns_count++];
-    usize i = 0; while (i < 31 && name[i]) { ns->name[i] = name[i]; i++; }
+    sigma_usize i = 0; while (i < 31 && name[i]) { ns->name[i] = name[i]; i++; }
     ns->name[i]   = '\0';
     ns->type      = type;
-    ns->active    = TRUE;
+    ns->active    = SIGMA_TRUE;
     
     // kprintf("[NAMESPACE]: Industrial Isolation Sharded: %s (Type: %d)\n", name, type);
     return K_OK;
 }
 
-bool_t namespace_visible(u32 ns_id, u32 target_id) {
-    if (ns_id >= MAX_NAMESPACES || !g_namespaces[ns_id].active) return TRUE;
+sigma_bool namespace_visible(sigma_u32 ns_id, sigma_u32 target_id) {
+    if (ns_id >= MAX_NAMESPACES || !g_namespaces[ns_id].active) return SIGMA_TRUE;
     return (ns_id == target_id); /* Absolute Industrial Shard Isolation */
 }

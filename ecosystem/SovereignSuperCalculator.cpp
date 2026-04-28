@@ -1,6 +1,6 @@
 /*
  * =========================================================================
- * Σ SIGMAOS: SOVEREIGN ZENITH (v15.0 - ABSOLUTE FINALITY)
+ * Î£ SIGMAOS: SOVEREIGN ZENITH (v15.0 - ABSOLUTE FINALITY)
  * =========================================================================
  * Author: Sovereign-Zenith-Developer
  * Principles: Zero-Library, Bit-Perfect, Silicon-Integrity, USP-Absorbed.
@@ -9,7 +9,7 @@
 
 /*
  * =========================================================================
- * Σ SIGMAOS: SOVEREIGN SUPER CALCULATOR (v12.0 - ZERO-DEPENDENCY)
+ * Î£ SIGMAOS: SOVEREIGN SUPER CALCULATOR (v12.0 - ZERO-DEPENDENCY)
  * =========================================================================
  * Mission: Absolute Math Sovereignty. Neutralizes all specialized calculators.
  * Capability: 
@@ -20,7 +20,7 @@
  * =========================================================================
  */
 
-#include "SigmaOOP.hpp"
+#include "../include/SigmaOOP.hpp"
 
 namespace SigmaOS {
 namespace Science {

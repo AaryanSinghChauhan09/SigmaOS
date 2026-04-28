@@ -1,6 +1,6 @@
 /*
  * =============================================================================
- * Σ SIGMAOS KERNEL: SOVEREIGN-LEGAL-SHARD (v1.0 - LEGAL ORCHESTRATION)
+ * Î£ SIGMAOS KERNEL: SOVEREIGN-LEGAL-SHARD (v1.0 - LEGAL ORCHESTRATION)
  * =============================================================================
  * Algorithm: Sovereign Case-Law Indexing (SCLI)
  * Principles:
@@ -11,18 +11,18 @@
  * =============================================================================
  */
 
-#include "../include/sigma_kernel_types.h"
+#include "../../include/sigma_kernel_types.h"
 
 typedef struct BNS_Section {
-    u32         section_id;
+    sigma_u32         section_id;
     const char* punishment;
-    bool_t      cognizable;
+    sigma_bool      cognizable;
 } BNS_Section;
 
 static BNS_Section g_bns_matrix[] = {
-    {103, "Death or Life Imprisonment (Murder)", TRUE},
-    {303, "Up to 7 years (Theft)", TRUE},
-    {115, "Up to 10 years (Grievous Hurt)", TRUE}
+    {103, "Death or Life Imprisonment (Murder)", SIGMA_TRUE},
+    {303, "Up to 7 years (Theft)", SIGMA_TRUE},
+    {115, "Up to 10 years (Grievous Hurt)", SIGMA_TRUE}
 };
 
 /* =========================================================================
@@ -33,7 +33,7 @@ void legal_init(void) {
     // kprintf("[LEGAL-SHARD]: Sovereign Law-Orchestration Interface Online.\n");
 }
 
-k_status legal_bnss_proc_audit(u32 step_id) {
+sigma_status legal_bnss_proc_audit(sigma_u32 step_id) {
     /* BNSS Procedural Flow: 
      * 1: FIR (Sec 173) 
      * 2: Arrest (Sec 35) 
@@ -42,10 +42,10 @@ k_status legal_bnss_proc_audit(u32 step_id) {
     return K_OK;
 }
 
-k_status legal_ipc_search(const char* section) {
+sigma_status legal_ipc_search(const char* section) {
     return K_OK;
 }
 
-k_status legal_citation_audit(const char* cite) {
+sigma_status legal_citation_audit(const char* cite) {
     return K_OK;
 }

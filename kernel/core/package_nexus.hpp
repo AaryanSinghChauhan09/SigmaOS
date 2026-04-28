@@ -1,7 +1,7 @@
 #ifndef PACKAGE_NEXUS_HPP
 #define PACKAGE_NEXUS_HPP
 
-#include "../../SigmaOOP.hpp"
+#include "../../include/SigmaOOP.hpp"
 
 namespace SigmaOS {
 namespace PackageForge {

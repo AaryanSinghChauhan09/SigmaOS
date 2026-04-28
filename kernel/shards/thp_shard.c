@@ -1,6 +1,6 @@
 /*
  * =============================================================================
- * Σ SIGMAOS KERNEL: SOVEREIGN-THP-SHARD (v1.0 - PERFORMANCE SCALING)
+ * Î£ SIGMAOS KERNEL: SOVEREIGN-THP-SHARD (v1.0 - PERFORMANCE SCALING)
  * =============================================================================
  * Algorithm: Sharded-Huge-Page Merging (SHPM)
  * Principles:
@@ -11,14 +11,14 @@
  * =============================================================================
  */
 
-#include "../include/sigma_kernel_types.h"
+#include "../../include/sigma_kernel_types.h"
 
 #define HUGE_PAGE_SIZE (2u * 1024u * 1024u) /* 2MB Shard */
 
 typedef struct THPPulse {
-    u64 base_pfn;
-    u32 page_count;
-    bool_t is_huge;
+    sigma_u64 base_pfn;
+    sigma_u32 page_count;
+    sigma_bool is_huge;
 } THPPulse;
 
 /* =========================================================================
@@ -29,7 +29,7 @@ void thp_init(void) {
     // kprintf("[THP]: Sovereign Performance-Scaling Shard Online.\n");
 }
 
-k_status thp_merge_shards(u64 start_pfn) {
+sigma_status thp_merge_shards(sigma_u64 start_pfn) {
     /* 
      * Absorb Linux THP Logic:
      * 1. Scan 512 contiguous 4KB shards.

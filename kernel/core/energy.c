@@ -1,6 +1,6 @@
 /*
  * =============================================================================
- * Σ SIGMAOS KERNEL: ENERGY-AWARE SCHEDULING SHARD (v1.0)
+ * Î£ SIGMAOS KERNEL: ENERGY-AWARE SCHEDULING SHARD (v1.0)
  * =============================================================================
  * Principles: Power-Efficient Tasking & Silicon Longevity.
  * =============================================================================
@@ -17,7 +17,7 @@ static power_state_t current_power_policy = POWER_BALANCED;
 
 void energy_init() {
     current_power_policy = POWER_BALANCED;
-    kprintf("Σ [ENERGY]: Power-efficient sharding active.\n");
+    kprintf("Î£ [ENERGY]: Power-efficient sharding active.\n");
 }
 
 /* Adjust CPU frequency/policy based on task priority */

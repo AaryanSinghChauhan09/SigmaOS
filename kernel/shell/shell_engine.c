@@ -1,13 +1,13 @@
 /*
  * =============================================================================
- * Σ SIGMAOS KERNEL: SHELL-ENGINE (Atomic Shard)
+ * Î£ SIGMAOS KERNEL: SHELL-ENGINE (Atomic Shard)
  * =============================================================================
  */
 #include "../../include/sigma_kernel_types.h"
 
 typedef struct OmniShell {
     char        history[100][256];
-    u32         hist_count;
+    sigma_u32         hist_count;
     char        cwd[256];
     char        user[32];
 } OmniShell;

@@ -1,13 +1,13 @@
 /*
  * =========================================================================
- * Σ SIGMAOS ZENITH SUPREME: SOVEREIGN AUDIT TOOL (v1.0)
+ * Î£ SIGMAOS ZENITH SUPREME: SOVEREIGN AUDIT TOOL (v1.0)
  * =========================================================================
  * Absorbing Features from: muhibarshad/Linux-Automation-Scripts, baseline-security.
  * Mission: Autonomous Security Hardening & Industrial Compliance Sharding.
  * =========================================================================
  */
 
-#include "../../libc/sigma_libc.h"
+#include "../../include/SovereignLibC.h"
 
 typedef struct {
     char audit_id[32];
@@ -23,7 +23,7 @@ static sigma_audit_report_t audit_items[] = {
 };
 
 void sigma_audit_full_scan() {
-    sigma_printf("\nΣ SOVEREIGN INDUSTRIAL SECURITY AUDIT\n");
+    sigma_printf("\nÎ£ SOVEREIGN INDUSTRIAL SECURITY AUDIT\n");
     sigma_printf("-------------------------------------------\n");
     for (int i = 0; i < 4; i++) {
         sigma_printf("[%s] %-20s -> %s\n", 
