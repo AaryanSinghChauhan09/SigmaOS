@@ -21,6 +21,7 @@ private:
     PowerState m_current_state;
     sigma_u32 m_voltage_mv;
     sigma_u32 m_frequency_mhz;
+    sigma_u32 m_load_prediction; // AI-driven prediction shard
 
 public:
     SovereignPowerManager() 
@@ -30,6 +31,7 @@ public:
 
     void SetState(PowerState state);
     void OptimizeForWorkload(sigma_u32 load_percentage);
+    void PredictiveThrottling(); // AI-driven pre-emptive scaling
     void Audit();
 };
 

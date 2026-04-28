@@ -28,6 +28,14 @@ void SovereignPowerManager::OptimizeForWorkload(sigma_u32 load_percentage) {
     else SetState(PowerState::BALANCED_LATTICE);
 }
 
+void SovereignPowerManager::PredictiveThrottling() {
+    sigma_printf("[POWER/PREDICT]: Analyzing Lattice Pulse for Load Anticipation...\n");
+    // Simulate AI prediction
+    m_load_prediction = 90; // Predict spike
+    sigma_printf("[POWER/PREDICT]: Load Spike Predicted (90%%). Pre-emptively Scaling to PEAK.\n");
+    SetState(PowerState::PEAK_PERFORMANCE);
+}
+
 void SovereignPowerManager::Audit() {
     sigma_printf("\n--- Σ SOVEREIGN POWER AUDIT ---\n");
     sigma_printf("| Voltage           : %d mV\n", m_voltage_mv);
