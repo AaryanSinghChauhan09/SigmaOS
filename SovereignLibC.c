@@ -8,7 +8,7 @@
  */
 
 #include "SovereignLibC.h"
-#include "sigma_types.h"   /* va_list — compiler built-in, not glibc */
+#include "include/sigma_types.h"   /* va_list — compiler built-in, not glibc */
 
 /* =========================================================================
  * sigma_log — minimal labelled print (replaces SigmaOOP.hpp sigma_log)
