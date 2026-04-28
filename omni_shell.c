@@ -190,14 +190,26 @@ static void shell_execute(OmniShellZenith* sh, const char* cmd) {
     if (!cmd || !cmd[0]) return;
     sigma_printf("\nΣ [OMNI-SHELL]: '%s'\n", cmd);
 
-    /* Record in history */
+    /* Record in history with strict bounds check */
     if (sh->history_count < SHELL_HISTORY_MAX) {
         sigma_size_t i = 0;
-        while (i < SHELL_CMD_MAXLEN-1 && cmd[i]) {
-            sh->history[sh->history_count][i] = cmd[i]; i++;
+        while (i < SHELL_CMD_MAXLEN - 1 && cmd[i]) {
+            sh->history[sh->history_count][i] = cmd[i];
+            i++;
         }
         sh->history[sh->history_count][i] = '\0';
         sh->history_count++;
+    } else {
+        /* Shift history or rotate (simple shift for now) */
+        for (sigma_u32 j = 1; j < SHELL_HISTORY_MAX; j++) {
+            sigma_memcpy(sh->history[j-1], sh->history[j], SHELL_CMD_MAXLEN);
+        }
+        sigma_size_t i = 0;
+        while (i < SHELL_CMD_MAXLEN - 1 && cmd[i]) {
+            sh->history[SHELL_HISTORY_MAX - 1][i] = cmd[i];
+            i++;
+        }
+        sh->history[SHELL_HISTORY_MAX - 1][i] = '\0';
     }
 
     /* Dispatch via table */

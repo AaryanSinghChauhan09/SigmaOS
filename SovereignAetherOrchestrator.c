@@ -57,7 +57,11 @@ static void aether_init(SovereignAetherOrchestrator* a) {
 static void aether_register_interrupt(SovereignAetherOrchestrator* a,
                                        const char* trigger,
                                        const char* shard) {
-    if (a->registered_count >= SIGMA_MAX_VECTORS) return;
+    sigma_u32 current_idx = a->registered_count;
+    if (current_idx >= SIGMA_MAX_VECTORS) {
+        sigma_print("[ERROR]: Aether Interrupt Table Full. Shard rejected.\n");
+        return;
+    }
 
     sigma_print("[AETHER-ORCH]: Splicing Silicon Trigger: ");
     sigma_print(trigger);
@@ -65,10 +69,10 @@ static void aether_register_interrupt(SovereignAetherOrchestrator* a,
     sigma_print(shard);
     sigma_print("\n");
 
-    a->vectors[a->registered_count].trigger      = trigger;
-    a->vectors[a->registered_count].target_shard = shard;
-    a->vectors[a->registered_count].active       = SIGMA_TRUE;
-    a->registered_count++;
+    a->vectors[current_idx].trigger      = trigger;
+    a->vectors[current_idx].target_shard = shard;
+    a->vectors[current_idx].active       = SIGMA_TRUE;
+    a->registered_count = current_idx + 1;
 }
 
 /* --- Pulse Silicon Events (replaces C++ class method) --- */

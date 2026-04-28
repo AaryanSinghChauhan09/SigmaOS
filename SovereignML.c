@@ -51,9 +51,10 @@ static void plotter_scatter(SovereignGraphPlotter* p,
 
 static void plotter_dashboard(SovereignGraphPlotter* p, const char* src) {
     sigma_printf("[GRAPH-PLOTTER]: Dynamic dashboard from '%s'.\n", src);
-    /* hardware string cross-reference */
-    __asm__ __volatile__("xor %%rcx, %%rcx\n\t repz cmpsb"
-                         ::: "rcx","rdi","rsi","memory");
+    /* Safe comparison using Sovereign LibC */
+    if (sigma_strcmp(src, "sigma://live") == 0) {
+        sigma_print("[GRAPH-PLOTTER]: Live Silicon Data Stream active.\n");
+    }
     p->dashboards++;
 }
 
