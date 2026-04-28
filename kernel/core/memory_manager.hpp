@@ -14,17 +14,17 @@ struct MemorySegment {
 
 class SovereignMemoryManager : public SigmaObject {
 private:
-    static constexpr sigma_usize INITIAL_POOL_SIZE = 1024 * 1024 * 64; 
+    static constexpr sigma_size_t INITIAL_POOL_SIZE = 1024 * 1024 * 64; 
     sigma_u8* m_pool;
-    sigma_usize m_used;
+    sigma_size_t m_used;
     MemorySegment m_segments[1024];
-    sigma_usize m_segment_count;
+    sigma_size_t m_segment_count;
 
 public:
     SovereignMemoryManager();
     const char* type_name() const noexcept override { return "SovereignMemoryManager"; }
 
-    void* allocate(sigma_usize size);
+    void* allocate(sigma_size_t size);
     void deallocate(void* ptr);
     void audit();
 };

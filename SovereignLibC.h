@@ -12,26 +12,9 @@
 #ifndef SOVEREIGN_LIBC_H
 #define SOVEREIGN_LIBC_H
 
-/* C11-native type definitions — no <stdint.h>, no <stddef.h> */
-typedef unsigned long long  sigma_size_t;
-typedef long long           sigma_ssize_t;
-typedef unsigned char       sigma_u8;
-typedef unsigned short      sigma_u16;
-typedef unsigned int        sigma_u32;
-typedef unsigned long long  sigma_u64;
-typedef long long           sigma_i64;
-typedef int                 sigma_i32;
-typedef double              sigma_f64;
-typedef float               sigma_f32;
-typedef int                 sigma_bool;
+#include "include/sigma_types.h"
 
-#define SIGMA_TRUE   1
-#define SIGMA_FALSE  0
-#define SIGMA_NULL   ((void*)0)
-#define SIGMA_OK     0x00000000u
-#define SIGMA_ERROR  0xFFFFFFFFu
-
-typedef sigma_u32 sigma_status;
+typedef sigma_status sigma_status_t; /* Compatibility shard */
 
 /* =========================================================================
  * DIRECT SYSCALL DECLARATIONS (x86_64 Linux — no libc wrapper)

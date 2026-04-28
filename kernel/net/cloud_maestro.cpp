@@ -12,7 +12,7 @@ CloudMaestro::CloudMaestro() {
 void CloudMaestro::DeployToCloud(const SigmaString& shardName) {
     sigma_printf("[SOVEREIGN/CLOUD]: Initiating Native Cloud-Shard Projection for '%s'...\n", shardName.c_str());
     
-    for (sigma_usize i = 0; i < 3; ++i) {
+    for (sigma_size_t i = 0; i < 3; ++i) {
         SigmaString shardId = shardName;
         shardId.append("-");
         shardId.append(m_regions[i].c_str());
@@ -33,7 +33,7 @@ void CloudMaestro::ShowCloudMatrix() const {
     sigma_printf("%-30s | %-15s | %-15s | %s\n", "Shard ID", "Region", "Node IP", "Status");
     sigma_printf("---------------------------------------------------------------------------\n");
     
-    for (sigma_usize i = 0; i < m_active_shards.size(); i++) {
+    for (sigma_size_t i = 0; i < m_active_shards.size(); i++) {
         const SigmaString& sid = m_active_shards.key_at(i);
         const CloudShard* info = m_active_shards.at_index(i);
         sigma_printf("%-30s | %-15s | %-15s | [ACTIVE]\n", sid.c_str(), info->region.c_str(), info->ip.c_str());

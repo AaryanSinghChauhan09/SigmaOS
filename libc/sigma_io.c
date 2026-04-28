@@ -1,5 +1,12 @@
 #include "SovereignLibC.h"
-#include "include/sigma_types.h"
+#include "../include/sigma_types.h"
+
+#ifndef va_list
+#define va_list __builtin_va_list
+#define va_start(ap, last) __builtin_va_start(ap, last)
+#define va_arg(ap, type) __builtin_va_arg(ap, type)
+#define va_end(ap) __builtin_va_end(ap)
+#endif
 
 void sigma_log(const char* msg) {
     sigma_print("[SIGMA_LOG]: ");
