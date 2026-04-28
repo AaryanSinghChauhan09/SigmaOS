@@ -11,6 +11,7 @@
 
 #include "SovereignLibC.h"
 #include "SovereignOmniShard.h"   /* C11 scheduler/cloud/ui/net structs */
+#include "SovereignPersona.h"     /* C11 Persona/Dashboard structs */
 
 /* =========================================================================
  * Command dispatch table entry (replaces C++ if-else chain with data table)
@@ -37,6 +38,7 @@ typedef struct OmniShellZenith {
     SovereignCloudOrchestrator cloud;
     SovereignUIEngine     ui;
     SovereignNetZenith    net;
+    SovereignPersona      current_persona;
 } OmniShellZenith;
 
 /* =========================================================================
@@ -135,6 +137,20 @@ static void cmd_net(void* ctx) {
     SovereignNet_ZeroTrustHandshake(&sh->net);
 }
 
+static void cmd_dashboard_apply(void* ctx) {
+    OmniShellZenith* sh = (OmniShellZenith*)ctx;
+    sigma_printf("[DASHBOARD]: Applying layout '%s' to Zenith Desktop...\n", sh->current_persona.dashboard_layout);
+    sigma_printf("[DASHBOARD]: Widgets projected: [CPU_AUDIT, MEM_MATRIX, PQC_SENTINEL]\n");
+}
+
+static void cmd_persona_swap(void* ctx) {
+    OmniShellZenith* sh = (OmniShellZenith*)ctx;
+    sigma_printf("[PERSONA]: Swapping to profile: ZENITH_ELITE\n");
+    sigma_strcpy(sh->current_persona.name, "Sovereign_Elite");
+    sigma_strcpy(sh->current_persona.theme, "neon-cyan");
+    sigma_printf("[PERSONA]: Theme updated -> %s\n", sh->current_persona.theme);
+}
+
 static void cmd_help(void* ctx);   /* forward decl */
 
 /* =========================================================================
@@ -153,6 +169,8 @@ static const SigmaCommand SIGMA_COMMANDS[] = {
     { "CLOUD_FORGE",    "Elastic cloud shard scaling",          cmd_cloud         },
     { "UI_ZENITH",      "Render DOM to GPU framebuffer",        cmd_ui            },
     { "NET_ZENITH",     "Zero-Trust handshake shard",           cmd_net           },
+    { "DASHBOARD_APPLY","Apply current dashboard layout",      cmd_dashboard_apply },
+    { "PERSONA_SWAP",   "Swap to premium personalization",      cmd_persona_swap  },
     { "HELP",           "List available commands",              cmd_help          },
 };
 
@@ -179,6 +197,7 @@ static void shell_init(OmniShellZenith* sh) {
     SovereignCloud_init(&sh->cloud);
     SovereignUI_init(&sh->ui);
     SovereignNet_init(&sh->net);
+    persona_init(&sh->current_persona, "Sovereign_Admin", "neon-cyan");
     sigma_printf("[SIGMA_SHELL]: Omni-Shell Zenith Online (v27.0). System-Master [ACTIVE].\n");
     sigma_printf("[SIGMA_SHELL]: %llu commands loaded.\n", (sigma_u64)SIGMA_CMD_COUNT);
 }
