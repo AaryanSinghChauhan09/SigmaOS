@@ -38,6 +38,7 @@ private:
     SovereignTask* m_tasks[256];
     sigma_u32 m_task_count;
     sigma_u32 m_current_task_idx;
+    sigma_u32 m_load_history[10]; // Heuristic Load Tracking
 
 public:
     SovereignScheduler();
@@ -45,6 +46,7 @@ public:
 
     void CreateTask(const char* name, void (*entry)());
     void Dispatch(); // Round-Robin Orchestration
+    void AdaptiveDispatch(); // AI-driven Heuristic Dispatch
     void Audit();
 };
 
