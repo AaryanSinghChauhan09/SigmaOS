@@ -34,8 +34,8 @@ public:
     const char* type_name() const noexcept override { return "SovereignLatticePQC"; }
 
     void generate_sovereign_key();
-    SigmaString encrypt(const char* plaintext);
-    void audit();
+    void EncryptShard(const void* data, sigma_size_t size);
+    void Audit();
 };
 
 } // namespace Security
