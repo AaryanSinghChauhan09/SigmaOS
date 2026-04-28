@@ -21,6 +21,14 @@ In clustered environments, SigmaOS maintains state agreement via the **Sovereign
 ### 4. Mathematical Sovereignty: Formal Verification
 Unlike legacy operating systems, SigmaOS utilizes **Runtime Formal Verification**. Every shard is mathematically proven safe against memory corruption and logic invariants before execution.
 
+### 5. AI-Native Silicon Orchestration
+The **Sovereign Neural Coprocessor** leverages TPU/NPU silicon shards for real-time lattice optimization.
+- **Predictive Scaling**: Anticipates silicon pressure.
+- **Inference Shards**: Native AI support for kernel-level decisions.
+
+### 6. Self-Healing Security Fabric
+The **Sovereign Recovery Agent** automates lattice restoration. If a shard is compromised or experiences relativistic drift, the system automatically rolls back to a known-good state from the **Shadow Lattice Mirror**.
+
 ---
 
 ## ⚡ Deployment Paradigms
