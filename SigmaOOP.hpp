@@ -36,6 +36,32 @@ public:
     virtual const char* type_name() const noexcept = 0;
 };
 
+// --- Sovereign String Shard ---
+class SigmaString {
+private:
+    char*        m_data;
+    sigma_size_t m_len;
+public:
+    SigmaString(const char* s = "") {
+        m_len = sigma_strlen(s);
+        m_data = (char*)sigma_malloc(m_len + 1);
+        sigma_memcpy(m_data, s, m_len + 1);
+    }
+    void append(const char* s) {
+        sigma_size_t slen = sigma_strlen(s);
+        char* next = (char*)sigma_malloc(m_len + slen + 1);
+        sigma_memcpy(next, m_data, m_len);
+        sigma_memcpy(next + m_len, s, slen + 1);
+        m_data = next;
+        m_len += slen;
+    }
+    const char* c_str() const { return m_data; }
+};
+
+#if defined(__x86_64__) || defined(_M_X64)
+    #define SIGMA_ARCH_X86_64
+#endif
+
 } // namespace SigmaOS
 
 /* Global overrides for zero-dependency C++ support */
