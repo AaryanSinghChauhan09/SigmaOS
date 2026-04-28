@@ -1,10 +1,10 @@
-#ifndef SIGMA_SYSTEM_SHARDS_H
+﻿#ifndef SIGMA_SYSTEM_SHARDS_H
 #define SIGMA_SYSTEM_SHARDS_H
 
 #include "sigma_types.h"
 
 /* Sovereign Net Mesh Shard */
-typedef struct {
+typedef struct SovereignNetZenith {
     const char* type_name;
     sigma_u64   handshakes;
     sigma_u64   dns_queries;
@@ -14,7 +14,7 @@ typedef struct {
 } SovereignNetZenith;
 
 /* Sovereign Scheduler Shard */
-typedef struct {
+typedef struct SovereignScheduler {
     const char* type_name;
     sigma_u32 task_count;
     sigma_u32 context_switches;
@@ -22,7 +22,7 @@ typedef struct {
 } SovereignScheduler;
 
 /* Sovereign UI Engine Shard */
-typedef struct {
+typedef struct SovereignUIEngine {
     const char* type_name;
     sigma_u32 layers_composited;
     sigma_u32 fps_zenith;
@@ -30,4 +30,4 @@ typedef struct {
     sigma_u64   frames_rendered;
 } SovereignUIEngine;
 
-#endif
+#endif /* SIGMA_SYSTEM_SHARDS_H */

@@ -4,6 +4,9 @@
 namespace SigmaOS {
 namespace Graphics {
 
+// Explicit usage to satisfy IDE symbol tracking
+static_assert(sizeof(SovereignSVGRenderer) > 0, "SovereignSVGRenderer must be defined in header");
+
 void SovereignSVGRenderer::RasterizePath(const char* path_shard) {
     sigma_printf("[SVG-RENDERER]: Rasterizing BÃ©zier Shard: %s\n", path_shard);
     sigma_printf("[SVG-RENDERER]: Applying Sub-pixel Shard Anti-Aliasing (SSA-A v2)...\n");
