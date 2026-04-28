@@ -7,9 +7,10 @@
  * =========================================================================
  */
 
+#include "SovereignLibC.h"
+#include "SigmaOOP.hpp"
 
-
-
+using namespace SigmaOS;
 
 /**
  * Σ SIGMA OS: SOVEREIGN NCERT ZENITH (v128.0 - SCHOLAR ZENITH)
@@ -19,9 +20,8 @@
  * Principle: OOPS, Abstraction, Encapsulation, SOLID.
  */
 
-class INCERTSim {
+class INCERTSim : public SigmaObject {
 public:
-    virtual ~INCERTSim() = default;
     virtual void Simulate() = 0;
     virtual const char* GetConcept() = 0;
 };
@@ -29,6 +29,7 @@ public:
 // --- Physics Shard Cluster ---
 class GravitationSim : public INCERTSim {
 public:
+    const char* type_name() const noexcept override { return "GravitationSim"; }
     void Simulate() override {
         sigma_printf("[PHYSICS/NCERT]: Concept: Universal Gravitation (Class 11).\n");
         sigma_printf("[PHYSICS/NCERT]: G*m1*m2/r^2 = 1.98e20 N (Earth-Moon).\n");
@@ -38,6 +39,7 @@ public:
 
 class ProjectileSim : public INCERTSim {
 public:
+    const char* type_name() const noexcept override { return "ProjectileSim"; }
     void Simulate() override {
         sigma_printf("[PHYSICS/NCERT]: Concept: Motion in a Plane (Class 11).\n");
         sigma_printf("[PHYSICS/NCERT]: Range (45 deg, 20m/s) = 40.8 Meters.\n");
@@ -47,6 +49,7 @@ public:
 
 class OpticsSim : public INCERTSim {
 public:
+    const char* type_name() const noexcept override { return "OpticsSim"; }
     void Simulate() override {
         sigma_printf("[PHYSICS/NCERT]: Concept: Reflection & Refraction (Class 10).\n");
         sigma_printf("[PHYSICS/NCERT]: Snell's Law (n1 sin i = n2 sin r) Verified.\n");
@@ -57,6 +60,7 @@ public:
 // --- Chemistry Shard Cluster ---
 class IdealGasSim : public INCERTSim {
 public:
+    const char* type_name() const noexcept override { return "IdealGasSim"; }
     void Simulate() override {
         sigma_printf("[CHEMISTRY/NCERT]: Concept: States of Matter (Class 11).\n");
         sigma_printf("[CHEMISTRY/NCERT]: 1 mole at STP = 22.4 Liters (Verified).\n");
@@ -66,6 +70,7 @@ public:
 
 class BohrModelSim : public INCERTSim {
 public:
+    const char* type_name() const noexcept override { return "BohrModelSim"; }
     void Simulate() override {
         sigma_printf("[CHEMISTRY/NCERT]: Concept: Structure of Atom (Class 11).\n");
         sigma_printf("[CHEMISTRY/NCERT]: Energy in State n=1 = -13.6 eV.\n");
@@ -75,6 +80,7 @@ public:
 
 class OrganicSim : public INCERTSim {
 public:
+    const char* type_name() const noexcept override { return "OrganicSim"; }
     void Simulate() override {
         sigma_printf("[CHEMISTRY/NCERT]: Concept: Alcohols, Phenols & Ethers (Class 12).\n");
         sigma_printf("[CHEMISTRY/NCERT]: Functional Shard Identified: -OH (Hydroxyl).\n");
@@ -85,6 +91,7 @@ public:
 // --- Biology Shard Cluster ---
 class GeneticsSim : public INCERTSim {
 public:
+    const char* type_name() const noexcept override { return "GeneticsSim"; }
     void Simulate() override {
         sigma_printf("[BIOLOGY/NCERT]: Concept: Molecular Basis of Inheritance (Class 12).\n");
         sigma_printf("[BIOLOGY/NCERT]: Complementary DNA Shard: TACG (Silicon-Direct).\n");
@@ -94,6 +101,7 @@ public:
 
 class PlantSim : public INCERTSim {
 public:
+    const char* type_name() const noexcept override { return "PlantSim"; }
     void Simulate() override {
         sigma_printf("[BIOLOGY/NCERT]: Concept: Photosynthesis in Higher Plants (Class 11).\n");
         sigma_printf("[BIOLOGY/NCERT]: CO2 + H2O + Light -> Glucose + O2 (Active).\n");
@@ -104,6 +112,7 @@ public:
 // --- Math Shard Cluster ---
 class MatrixSim : public INCERTSim {
 public:
+    const char* type_name() const noexcept override { return "MatrixSim"; }
     void Simulate() override {
         sigma_printf("[MATH/NCERT]: Concept: Matrices & Determinants (Class 12).\n");
         sigma_printf("[MATH/NCERT]: Solving 2x2 Shard Matrix... [DET: 1.0]\n");
@@ -113,6 +122,7 @@ public:
 
 class CalculusSim : public INCERTSim {
 public:
+    const char* type_name() const noexcept override { return "CalculusSim"; }
     void Simulate() override {
         sigma_printf("[MATH/NCERT]: Concept: Continuity & Differentiability (Class 12).\n");
         sigma_printf("[MATH/NCERT]: d/dx (x^2) at x=5 = 10.0 (Calculus Shard Active).\n");
@@ -123,7 +133,7 @@ public:
 int main() {
     sigma_printf("--- Σ SIGMA OS SOVEREIGN NCERT ZENITH SHARD ENGINE (v128.0) ---\n");
     
-    void* simulations = { 
+    INCERTSim* simulations[] = { 
         new GravitationSim(), 
         new ProjectileSim(),
         new OpticsSim(),
@@ -136,13 +146,13 @@ int main() {
         new CalculusSim()
     };
     
-    for (auto sim : simulations) {
+    for (int i = 0; i < 10; i++) {
         sigma_printf("\n------------------------------------------------------------\n");
-        sim->Simulate();
-        delete sim;
+        sigma_printf("[SHARD-INIT]: Summoning %s (%s)...\n", simulations[i]->type_name(), simulations[i]->GetConcept());
+        simulations[i]->Simulate();
+        delete simulations[i];
     }
 
     sigma_printf("\n[SUCCESS]: Competitive NCERT Shard Cluster Verified. Eradication Level: [APEX].\n");
     return 0;
 }
-
