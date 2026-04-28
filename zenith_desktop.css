@@ -11,6 +11,70 @@
     --error: #ff4757;
 }
 
+/* Theme Shards */
+body.theme-gold {
+    --accent: #ffcc00;
+    --accent-glow: rgba(255, 204, 0, 0.3);
+}
+body.theme-crimson {
+    --accent: #ff4757;
+    --accent-glow: rgba(255, 71, 87, 0.3);
+}
+
+/* Command Palette */
+.command-palette {
+    position: fixed;
+    top: 20%;
+    left: 50%;
+    transform: translate(-50%, -20%) scale(0.95);
+    width: 600px;
+    background: rgba(10, 10, 15, 0.8);
+    backdrop-filter: blur(30px);
+    border: 1px solid var(--glass-border);
+    border-radius: 20px;
+    z-index: 1000;
+    padding: 20px;
+    display: none;
+    box-shadow: 0 30px 60px rgba(0,0,0,0.8);
+    transition: all 0.2s ease;
+}
+
+.command-palette.active {
+    display: block;
+    transform: translate(-50%, -20%) scale(1);
+}
+
+.command-input {
+    width: 100%;
+    background: transparent;
+    border: none;
+    border-bottom: 1px solid var(--glass-border);
+    color: var(--text);
+    font-size: 20px;
+    padding: 10px;
+    font-family: 'Outfit', sans-serif;
+    outline: none;
+}
+
+.command-results {
+    margin-top: 15px;
+    max-height: 300px;
+    overflow-y: auto;
+}
+
+.command-item {
+    padding: 12px 15px;
+    border-radius: 10px;
+    display: flex;
+    justify-content: space-between;
+    transition: background 0.2s;
+}
+
+.command-item:hover {
+    background: var(--glass);
+    color: var(--accent);
+}
+
 * {
     margin: 0;
     padding: 0;

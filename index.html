@@ -10,7 +10,16 @@
     <link rel="stylesheet" href="zenith_desktop.css">
 </head>
 <body>
-    <div class="desktop-overlay"></div>
+    <!-- Command Palette -->
+    <div class="command-palette" id="cmd-palette">
+        <input type="text" class="command-input" placeholder="Summon Shard or Execute Command..." id="cmd-input">
+        <div class="command-results" id="cmd-results">
+            <div class="command-item" onclick="setTheme('cyan')"><span>Theme: Neon Cyan</span><kbd>Alt+1</kbd></div>
+            <div class="command-item" onclick="setTheme('gold')"><span>Theme: Solar Gold</span><kbd>Alt+2</kbd></div>
+            <div class="command-item" onclick="setTheme('crimson')"><span>Theme: Crimson Shard</span><kbd>Alt+3</kbd></div>
+            <div class="command-item" onclick="addLog('Σ [AUTO]: Optimizing Shard Lattice...', 'success')"><span>Optimize Lattice</span><kbd>Alt+O</kbd></div>
+        </div>
+    </div>
 
     <!-- Central Clock -->
     <div class="clock-container">
@@ -31,6 +40,9 @@
                 <span class="accent">16 Cores</span>
             </div>
             <div class="stat-value" id="cpu-load">12%</div>
+            <svg viewBox="0 0 300 40" style="width: 100%; height: 40px; margin-top: 10px;">
+                <polyline id="cpu-graph" fill="none" stroke="var(--accent)" stroke-width="2" points="0,40 30,30 60,35 90,20 120,25 150,10 180,15 210,5 240,12 270,8 300,20" />
+            </svg>
             <div class="stat-bar">
                 <div class="stat-progress" id="cpu-progress" style="width: 12%"></div>
             </div>
@@ -101,16 +113,47 @@
         setInterval(updateClock, 1000);
         updateClock();
 
+        // Command Palette Logic
+        const cmdPalette = document.getElementById('cmd-palette');
+        const cmdInput = document.getElementById('cmd-input');
+        
+        window.addEventListener('keydown', (e) => {
+            if ((e.metaKey || e.ctrlKey) && e.key === 'k') {
+                e.preventDefault();
+                cmdPalette.classList.toggle('active');
+                if (cmdPalette.classList.contains('active')) cmdInput.focus();
+            }
+            if (e.key === 'Escape') cmdPalette.classList.remove('active');
+        });
+
+        function setTheme(name) {
+            document.body.className = name === 'cyan' ? '' : 'theme-' + name;
+            addLog(`Σ [CONFIG]: Theme switched to ${name.toUpperCase()}.`, 'success');
+            cmdPalette.classList.remove('active');
+        }
+
+        // SVG Graph Logic
+        const cpuGraph = document.getElementById('cpu-graph');
+        const points = [40, 40, 40, 40, 40, 40, 40, 40, 40, 40, 40];
+        
+        function updateGraph(val) {
+            points.shift();
+            points.push(40 - (val / 100 * 40));
+            const path = points.map((p, i) => `${i * 30},${p}`).join(' ');
+            cpuGraph.setAttribute('points', path);
+        }
+
         // Simulate Kernel Logs
         const logContainer = document.getElementById('kernel-logs');
         const logs = [
             { t: "Σ [BOOT]: Sovereign Lattice Online.", c: "" },
             { t: "Σ [SECURE]: PQC Shard Initialized (Lattice-V5).", c: "success" },
+            { t: "Σ [AUTO]: Neural Personalization active.", c: "" },
             { t: "Σ [NET]: Cloud Maestro projected to EU-WEST-1.", c: "" },
             { t: "Σ [KERN]: Memory Slab Shard mapped (64MB).", c: "success" },
             { t: "Σ [AUDIT]: CPU Silicon Discovery: 16 Zenith Cores.", c: "" },
             { t: "Σ [VGA]: Direct Framebuffer Projector Online.", c: "success" },
-            { t: "Σ [ZENITH]: Desktop Environment Absorbed.", c: "success" }
+            { t: "Σ [ZENITH]: Command Palette (Ctrl+K) ready.", c: "success" }
         ];
 
         function addLog(text, type) {
@@ -118,7 +161,7 @@
             div.className = `log-item ${type}`;
             div.textContent = text;
             logContainer.prepend(div);
-            if (logContainer.children.length > 10) logContainer.lastChild.remove();
+            if (logContainer.children.length > 15) logContainer.lastChild.remove();
         }
 
         let logIdx = 0;
@@ -126,21 +169,22 @@
             if (logIdx < logs.length) {
                 addLog(logs[logIdx].t, logs[logIdx].c);
                 logIdx++;
-                setTimeout(cycleLogs, 1000);
+                setTimeout(cycleLogs, 800);
             }
         }
         cycleLogs();
 
         // Simulate Hardware Stats
         setInterval(() => {
-            const cpu = Math.floor(Math.random() * 15) + 5;
+            const cpu = Math.floor(Math.random() * 20) + 10;
             document.getElementById('cpu-load').textContent = cpu + "%";
             document.getElementById('cpu-progress').style.width = cpu + "%";
+            updateGraph(cpu);
             
             const mem = (Math.random() * 0.5 + 4.1).toFixed(1);
             document.getElementById('mem-load').textContent = mem + " GB";
             document.getElementById('mem-progress').style.width = (mem / 16 * 100) + "%";
-        }, 3000);
+        }, 2000);
     </script>
 </body>
 </html>
