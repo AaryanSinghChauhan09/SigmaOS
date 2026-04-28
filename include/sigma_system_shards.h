@@ -1,4 +1,4 @@
-#ifndef SIGMA_SYSTEM_SHARDS_H
+﻿#ifndef SIGMA_SYSTEM_SHARDS_H
 #define SIGMA_SYSTEM_SHARDS_H
 
 #include "sigma_types.h"
@@ -24,3 +24,4 @@ typedef struct SovereignScheduler {
 #include "sigma_ui_types.h"
 
 #endif /* SIGMA_SYSTEM_SHARDS_H */
+

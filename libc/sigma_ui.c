@@ -1,8 +1,20 @@
 #include "../include/sigma_system_shards.h"
 #include "../include/SovereignLibC.h"
 
-// Forward declaration of low-level primitive
+// Forward declarations of low-level primitives
 void sigma_ui_atomic_inc_frames(sigma_u64* frames);
+sigma_u64 sigma_ui_get_frames(const SovereignUIEngine* u);
+
+void sigma_ui_clear_glass_buffer(void* buffer, sigma_size_t size) {
+    // Low-level buffer clearing
+    for (sigma_size_t i = 0; i < size; ++i) {
+        ((sigma_u8*)buffer)[i] = 0;
+    }
+}
+
+sigma_u64 sigma_ui_get_frames(const SovereignUIEngine* u) {
+    return u ? u->frames_rendered : 0;
+}
 
 void SovereignUI_init(SovereignUIEngine* u) {
     u->type_name = "SovereignUIEngine";
@@ -26,7 +38,7 @@ void SovereignUI_Notify(SovereignUIEngine* u, const char* msg, const char* type)
 
 void SovereignUI_audit(const SovereignUIEngine* u) {
     sigma_printf("\n--- Î£ SOVEREIGN UI AUDIT ---\n");
-    sigma_printf("| Frames Rendered   : %llu\n", u->frames_rendered);
+    sigma_printf("| Frames Rendered   : %llu\n", sigma_ui_get_frames(u));
     sigma_printf("| Experience Layer  : ZENITH-GLASS (v15.0)\n");
     sigma_printf("| FPS Stability     : 120Hz FIXED\n");
     sigma_printf("------------------------------------\n");

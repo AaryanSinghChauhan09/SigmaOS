@@ -1,4 +1,4 @@
-#include "../include/sigma_types.h"
+﻿#include "../include/sigma_types.h"
 
 /* 
  * =========================================================================
@@ -21,3 +21,4 @@ void sigma_ui_clear_glass_buffer(void* buffer, sigma_size_t size) {
         ((sigma_u8*)buffer)[i] = 0;
     }
 }
+

@@ -1,4 +1,4 @@
-#ifndef SVG_RENDERER_HPP
+﻿#ifndef SVG_RENDERER_HPP
 #define SVG_RENDERER_HPP
 
 #include "../../../include/SigmaOOP.hpp"
@@ -18,3 +18,4 @@ public:
 } // namespace SigmaOS
 
 #endif
+
