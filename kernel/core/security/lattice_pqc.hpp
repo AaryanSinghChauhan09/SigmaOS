@@ -2,7 +2,7 @@
 #define LATTICE_PQC_HPP
 
 #include "../../../include/SigmaOOP.hpp"
-#include "../../../include/SovereignLibC.h"
+// SovereignLibC.h removed
 
 namespace SigmaOS {
 namespace Security {
