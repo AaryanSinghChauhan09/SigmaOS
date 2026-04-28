@@ -17,6 +17,8 @@
 /* Legacy / Core Syscall Shims */
 unsigned int sigma_sleep(unsigned int seconds) {
     sigma_printf("[ZENITH-LIBC]: Pulse sleep for %u seconds...\n", seconds);
-    /* TODO: Implement via nanosleep syscall (35) in ASM */
+    sigma_i64 req[2] = { (sigma_i64)seconds, 0 };
+    sigma_nanosleep(req, SIGMA_NULL);
     return 0;
 }
+

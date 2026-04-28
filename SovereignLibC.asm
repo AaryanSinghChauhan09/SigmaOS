@@ -23,6 +23,7 @@ global sigma_fork
 global sigma_pipe
 global sigma_wait
 global sigma_dup
+global sigma_nanosleep
 
 section .text
 
@@ -129,5 +130,11 @@ sigma_wait:
 ; --- sigma_dup (int oldfd) ---
 sigma_dup:
     mov rax, 32     ; sys_dup
+    syscall
+    ret
+
+; --- sigma_nanosleep (const void* req, void* rem) ---
+sigma_nanosleep:
+    mov rax, 35     ; sys_nanosleep
     syscall
     ret

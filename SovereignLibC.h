@@ -51,6 +51,7 @@ int           sigma_pipe(int pipefd[2]);
 unsigned int  sigma_sleep(unsigned int seconds);
 int           sigma_wait(int* wstatus);
 int           sigma_dup(int oldfd);
+int           sigma_nanosleep(const void* req, void* rem);
 
 /* =========================================================================
  * STRING / MEMORY PRIMITIVES (implemented in SovereignLibC.asm)
