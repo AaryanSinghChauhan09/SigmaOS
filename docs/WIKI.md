@@ -84,4 +84,22 @@ The **Sovereign Industrial API** provides a clean, C++ OOP interface for develop
 
 ---
 
-*Σ SIGMAOS: Absolute Mastery. Silicon-Direct. Zero-Dependency. Extensible.*
+## 📦 Shard Contribution Guide
+
+SigmaOS is an open-governance silicon singularity. Developers can contribute to the lattice by creating custom **Silicon Shards**.
+
+### 1. Development Environment
+- Use the **Sovereign Industrial API** (`include/SovereignAPI.hpp`).
+- Ensure all code is **Zero-Dependency** and adheres to **Silicon-Native** performance standards.
+
+### 2. Verification & PQC Signing
+- Every shard must be signed with a **Post-Quantum Key**.
+- Use the `VerifyShardPQC` protocol to ensure shard integrity before submission to the global nexus.
+
+### 3. Hot-Loading & Integration
+- Shards are integrated via the **Sovereign Shard Manager**.
+- Use the `HotLoadShard` method for real-time integration without system reset.
+
+---
+
+*Σ SIGMAOS: Absolute Mastery. Silicon-Direct. Zero-Dependency. Contributable.*
