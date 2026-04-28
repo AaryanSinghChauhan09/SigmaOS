@@ -1,6 +1,9 @@
 #include "../include/sigma_system_shards.h"
 #include "../include/SovereignLibC.h"
 
+// Forward declaration of low-level primitive
+void sigma_ui_atomic_inc_frames(sigma_u64* frames);
+
 void SovereignUI_init(SovereignUIEngine* u) {
     u->type_name = "SovereignUIEngine";
     u->frames_rendered = 0;
@@ -9,7 +12,7 @@ void SovereignUI_init(SovereignUIEngine* u) {
 void SovereignUI_RenderSovereignDOM(SovereignUIEngine* u, const char* markup) {
     (void)markup;
     sigma_printf("[UI]: Rasterizing Sovereign DOM Shard (W3C/Zenith Parity)...\n");
-    u->frames_rendered++;
+    sigma_ui_atomic_inc_frames(&u->frames_rendered);
 }
 
 void SovereignUI_ApplyZenithCSS(SovereignUIEngine* u, const char* styling) {

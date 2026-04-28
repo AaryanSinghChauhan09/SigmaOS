@@ -15,6 +15,8 @@ The SigmaOS Sovereign Lattice has achieved absolute architectural maturity. The 
 - **Entropy-Aware Boot Shard**: Sub-millisecond silicon validation with quantum clock sync.
 - **Amnesic Memory Reclamation**: Security-first memory sharding with automatic zero-wipe.
 - **SSA-A v2 (Sub-pixel Shard Anti-Aliasing)**: Professional vector rasterization for zenith widgets.
+- **Modular Type Sovereignty**: Dedicated type shards for UI and Graphics parity.
+- **Low-Level User Primitives**: Direct silicon-native functions for atomic frame orchestration and Bézier math.
 
 ## 🏛️ Core Architecture
 

@@ -1,4 +1,4 @@
-﻿#ifndef SIGMA_SYSTEM_SHARDS_H
+#ifndef SIGMA_SYSTEM_SHARDS_H
 #define SIGMA_SYSTEM_SHARDS_H
 
 #include "sigma_types.h"
@@ -21,13 +21,6 @@ typedef struct SovereignScheduler {
     sigma_u8  cpu_affinity;
 } SovereignScheduler;
 
-/* Sovereign UI Engine Shard */
-typedef struct SovereignUIEngine {
-    const char* type_name;
-    sigma_u32 layers_composited;
-    sigma_u32 fps_zenith;
-    sigma_bool glass_blur_active;
-    sigma_u64   frames_rendered;
-} SovereignUIEngine;
+#include "sigma_ui_types.h"
 
 #endif /* SIGMA_SYSTEM_SHARDS_H */
