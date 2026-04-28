@@ -1,5 +1,5 @@
 #ifndef SOVEREIGN_VISION_ENGINE_HPP
-#define SOVEREIGN_NEURAL_VISION_ENGINE_HPP
+#define SOVEREIGN_VISION_ENGINE_HPP
 
 #include "../../include/sigma_types.h"
 #include "../../include/SigmaOOP.hpp"
