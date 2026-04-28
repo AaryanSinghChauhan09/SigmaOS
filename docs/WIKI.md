@@ -67,4 +67,21 @@ For large-scale data center deployment:
 
 ---
 
-*Σ SIGMAOS: Absolute Mastery. Silicon-Direct. Zero-Dependency. Deployed.*
+## 🛠️ Industrial API Reference
+
+The **Sovereign Industrial API** provides a clean, C++ OOP interface for developing and integrating custom silicon shards into the lattice.
+
+### Core Primitives
+- `SovereignAPI::Log(const char*)`: Industrial-grade diagnostic logging.
+- `SovereignAPI::AllocateShard(sigma_size_t)`: Allocates memory in protected RAM-phantom space.
+- `SovereignAPI::ReleaseShard(void*)`: Wipes and releases shard memory using the **S80 Amnesia** protocol.
+
+### Distributed & Consensus
+- `SovereignAPI::ProposeState(const char* id, const void* data, sigma_size_t)`: Initiates a lattice-wide agreement for state transitions.
+
+### Security
+- `SovereignAPI::EncryptPQC(const void*, void*, sigma_size_t)`: High-performance post-quantum lattice encryption for shard-to-shard communication.
+
+---
+
+*Σ SIGMAOS: Absolute Mastery. Silicon-Direct. Zero-Dependency. Extensible.*
