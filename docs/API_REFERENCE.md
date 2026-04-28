@@ -1,6 +1,26 @@
-# Σ SIGMAOS SOVEREIGN API REFERENCE (v1.0)
+# Σ SIGMAOS SOVEREIGN API REFERENCE (v20.0)
 
 This document provides a comprehensive technical reference for the **SigmaOS Micro-Shard API**. All functions listed here are zero-dependency primitives engineered for bare-metal silicon control.
+
+---
+
+## 🧩 SOVEREIGN LIBC (ZENITH)
+
+The Sovereign LibC is a modular, zero-dependency implementation of essential C primitives, optimized for direct hardware interaction and memory sharding.
+
+### 📡 I/O PRIMITIVES
+*   `sigma_printf(const char* format, ...)`: Industrial-grade formatted output with support for `%s`, `%d`, `%u`, `%llu`, `%llx`, `%p`, and improved `%f` (bare-metal float handling).
+*   `sigma_print(const char* str)`: Direct syscall-backed string print.
+*   `sigma_log(const char* msg)`: Labeled system logging shard.
+
+### 🧵 STRING PRIMITIVES
+*   `sigma_strlen(const char* s)`: ASM-optimized string length calculation.
+*   `sigma_streq(const char* s1, const char* s2)`: Sovereign string equality check.
+*   `sigma_atoi(const char* s)`: String to integer conversion shard.
+
+### 🧠 MEMORY MANAGEMENT
+*   `sigma_malloc(sigma_size_t size)`: Bump-pointer slab allocator (128 MB default shard).
+*   `sigma_free(void* ptr)`: Per-process shard cleanup (no-op by design for speed).
 
 ---
 
@@ -10,10 +30,6 @@ This document provides a comprehensive technical reference for the **SigmaOS Mic
 Industrial-grade formatted output to the primary VGA buffer and serial UART.
 - **Parameters**: `fmt` (Format string), `...` (Arguments).
 - **Mode**: Sovereign Sync.
-
-### `cpu_get_id()`
-Retrieves the unique identifier for the current processing core.
-- **Returns**: `u32` (CPU ID).
 
 ---
 
@@ -32,9 +48,6 @@ Sends an asynchronous message to a target micro-shard.
 
 ### `summon_shard(const char* name, void* buffer, u32 size)`
 Linguistically summons a dormant shard from the filesystem into the active lattice.
-- **name**: Shard name.
-- **buffer**: Memory destination.
-- **size**: Shard binary size.
 
 ---
 
@@ -42,8 +55,6 @@ Linguistically summons a dormant shard from the filesystem into the active latti
 
 ### `secure_boot_verify(void* shard_data, u32 size, shard_sig_t* sig)`
 Performs a cryptographic audit of a shard binary before activation.
-- **Returns**: `bool_t` (TRUE if verified).
 
 ### `rbac_check(u64 shard_id, bool_t net_req, bool_t fs_req)`
 Enforces zero-trust capability grants at the shard level.
-- **Returns**: `bool_t` (TRUE if permitted).

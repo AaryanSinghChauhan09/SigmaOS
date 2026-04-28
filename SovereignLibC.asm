@@ -19,6 +19,10 @@ global sigma_execve
 global sigma_strlen
 global sigma_memset
 global sigma_memcpy
+global sigma_fork
+global sigma_pipe
+global sigma_wait
+global sigma_dup
 
 section .text
 
@@ -85,15 +89,45 @@ sigma_strlen:
 
 ; --- sigma_memset (void* s, int c, size_t n) ---
 sigma_memset:
-    mov rax, rsi    ; rax = c (value to set)
-    mov rcx, rdx    ; rcx = n (count)
-    mov rdi, rdi    ; rdi = s (destination)
-    rep stosb       ; set n bytes
-    mov rax, rdi    ; return original s? Actually rep stosb modifies rdi.
+    mov rax, rdi    ; Store original pointer in rax to return it
+    push rax        ; Save it on stack just in case
+    mov al, sil     ; Lower byte of second param (c)
+    mov rcx, rdx    ; count (n)
+    rep stosb       ; set n bytes starting at rdi
+    pop rax         ; Restore original pointer to rax
     ret
+
 
 ; --- sigma_memcpy (void* dest, const void* src, size_t n) ---
 sigma_memcpy:
     mov rcx, rdx    ; count
     rep movsb       ; copy bytes
+    ret
+
+; --- sigma_fork () ---
+sigma_fork:
+    mov rax, 57     ; sys_fork
+    syscall
+    ret
+
+; --- sigma_pipe (int pipefd[2]) ---
+sigma_pipe:
+    mov rax, 22     ; sys_pipe
+    syscall
+    ret
+
+; --- sigma_wait (int* wstatus) ---
+sigma_wait:
+    mov rsi, rdi    ; wstatus is 1st arg in C, but 2nd arg in wait4 syscall
+    mov rdi, -1     ; pid = -1 (any child)
+    xor rdx, rdx    ; options = 0
+    xor r10, r10    ; rusage = NULL
+    mov rax, 61     ; sys_wait4
+    syscall
+    ret
+
+; --- sigma_dup (int oldfd) ---
+sigma_dup:
+    mov rax, 32     ; sys_dup
+    syscall
     ret
