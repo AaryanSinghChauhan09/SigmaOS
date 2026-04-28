@@ -3,7 +3,7 @@
 
 #include "../../include/sigma_types.h"
 #include "../../include/SigmaOOP.hpp"
-#include "../drivers/graphics/display_driver.hpp"
+// display_driver.hpp removed (not used directly)
 
 namespace SigmaOS {
 namespace Kernel {
