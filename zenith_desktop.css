@@ -129,6 +129,11 @@ body {
     box-shadow: 0 20px 40px rgba(0,0,0,0.4);
 }
 
+.status-indicator-wasm { display: flex; align-items: center; gap: 8px; font-size: 10px; font-weight: 800; color: #00ffa3; margin-left: 10px; opacity: 0.8; transition: opacity 0.3s; }
+.status-indicator-wasm:hover { opacity: 1; }
+.pulse-dot { width: 8px; height: 8px; background: #00ffa3; border-radius: 50%; box-shadow: 0 0 10px #00ffa3; animation: sigma-pulse 2s infinite; }
+@keyframes sigma-pulse { 0% { transform: scale(0.9); opacity: 0.5; } 50% { transform: scale(1.1); opacity: 1; } 100% { transform: scale(0.9); opacity: 0.5; } }
+
 .task-icon {
     width: 44px;
     height: 44px;
