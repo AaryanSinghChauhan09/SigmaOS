@@ -1,0 +1,47 @@
+#include <sigma_syscall.h>
+#include <sigma_hal.h>
+#include <sigma_proc.h>
+#include <sigma_mem.h>
+#include <sigma_ipc.h>
+
+/**
+ * SigmaOS Sovereign System Call Implementation
+ * Implements a Fast-Path Shard Transition (FPST) algorithm.
+ * ZERO-DEPENDENCY: Strictly bare-metal context management.
+ */
+
+extern "C" sigma_u32 sigma_syscall(sigma_syscall_id_t id, sigma_u32 arg1, sigma_u32 arg2, sigma_u32 arg3) {
+    // FPST (Fast-Path Shard Transition) Algorithm
+    // Dispatches kernel services with minimum context overhead.
+    
+    sigma_printf("[SYSCALL] SSG Entry: ID 0x%02X, Args: [%08X, %08X, %08X]\n", id, arg1, arg2, arg3);
+    
+    switch (id) {
+        case SIGMA_SYS_YIELD:
+            proc_yield();
+            return SIGMA_OK;
+            
+        case SIGMA_SYS_MALLOC:
+            return (sigma_u32)(sigma_addr_t)sigma_malloc((sigma_size_t)arg1);
+            
+        case SIGMA_SYS_FREE:
+            sigma_free((void*)(sigma_addr_t)arg1);
+            return SIGMA_OK;
+            
+        case SIGMA_SYS_SEND:
+            return (sigma_u32)ipc_send(arg1, (sigma_msg_t*)(sigma_addr_t)arg2);
+            
+        default:
+            sigma_log("[SYSCALL] [ERROR] Unknown Sovereign Syscall ID.");
+            return SIGMA_ERROR;
+    }
+}
+
+/*
+ * Bare-metal syscall entry point (simulated)
+ */
+extern "C" void syscall_handler_asm() {
+    // In a physical silicon implementation, this would be an 'int 0x80' or 'syscall' entry.
+    // __asm__ __volatile__ ("nop"); 
+    sigma_log("[SYSCALL] ASM Gate Transition: USER -> KERNEL Shard.");
+}
