@@ -1,6 +1,7 @@
 #include "sigma_types.h"
 #include "sigma_hal.h"
 #include "sigma_libc.h"
+#include "sigma_transpiler.h"
 
 /**
  * SigmaOS Sovereign Self-Learning Hardware Transpiler
@@ -8,13 +9,7 @@
  * ZERO-DEPENDENCY: Universal hardware sharding for x86_64, ARM, RISC-V.
  */
 
-typedef struct {
-    uint32_t hardware_id;
-    char target_architecture[16];
-    bool transpilation_active;
-} transpiler_state_t;
-
-static transpiler_state_t SovereignTranspilerState = {
+static sigma_transpiler_state_t SovereignTranspilerState = {
     .transpilation_active = false
 };
 
