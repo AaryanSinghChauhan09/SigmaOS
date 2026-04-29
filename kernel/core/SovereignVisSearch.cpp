@@ -17,6 +17,11 @@ extern "C" void vissearch_index_image(const void* pixel_data, uint32_t width, ui
     // Evaluates pixel buffers using on-chip NPU to extract text and object semantics.
     
     sigma_log("[VISSEARCH] NPE: Processing raw pixel buffer natively...");
+    
+    // Simulate Neural Offload
+    uint32_t simulated_vector_output[16];
+    neural_infer_shard(0x01, pixel_data, simulated_vector_output);
+    
     sigma_log("[VISSEARCH] NPE: Embedded objects and OCR text into the Semantic Vector space.");
 }
 
