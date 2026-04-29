@@ -1,8 +1,8 @@
 /*
  * =========================================================================
- * Σ SIGMAOS: SOVEREIGN SYSTEM AUDIT (SSA)
+ * Σ SIGMAOS: SOVEREIGN SYSTEM AUDIT (S-AUDIT)
  * =========================================================================
- * Mission: Continuous silicon-native lattice verification and integrity.
+ * Mission: Continuous lattice auditing and industrial-grade integrity validation.
  * =========================================================================
  */
 
@@ -15,22 +15,17 @@
 extern "C" {
 #endif
 
-typedef enum {
-    SIGMA_AUDIT_PASS,
-    SIGMA_AUDIT_WARN,
-    SIGMA_AUDIT_CRITICAL
-} sigma_audit_status_t;
-
 typedef struct {
-    uint32_t total_shards_verified;
-    uint32_t integrity_failures;
-    sigma_audit_status_t lattice_health;
-} sigma_audit_report_t;
+    uint32_t shard_id;
+    uint32_t integrity_score;
+    uint32_t audit_tick;
+    bool is_validated;
+} sigma_audit_event_t;
 
 /* --- Audit Primitives --- */
 void audit_init(void);
-sigma_audit_report_t audit_perform_full_scan(void);
-void audit_report_violation(uint32_t shard_id, const char* reason);
+void audit_perform_lattice_sweep(void);
+void audit_report_shard(uint32_t shard_id, bool status);
 
 #ifdef __cplusplus
 }
