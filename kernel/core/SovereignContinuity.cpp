@@ -1,4 +1,4 @@
-
+#include "sigma_types.h"
 #include "sigma_continuity.h"
 #include "sigma_hal.h"
 
