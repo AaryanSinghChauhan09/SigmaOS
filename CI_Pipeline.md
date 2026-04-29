@@ -4,7 +4,8 @@ SigmaOS utilizes a deterministic, multi-architecture CI/CD pipeline to ensure ev
 
 ## 🧪 Testing Layers
 
-### 1. Static Analysis (Sovereignty Check)
+### 1. Static Analysis (Sovereignty Check)
+
 
 We use `nm` and `objdump` to verify that no shard links against external standard libraries.
 
@@ -14,23 +15,24 @@ Automated scripts (`fix_includes.py` and `sovereign_hardener.py`) enforce root-r
 ### 3. Modularity Integrity Check
 The `check_modularity.py` tool scans for monolith violations, maintaining 100% modular purity across the 600 shards.
 
-### 2. Cross-Compilation
+### 2. Cross-Compilation
 
-Every commit triggers a parallel build for:
 
+Every commit triggers a parallel build for:
 - **x86_64**: Standard server/workstation baseline.
 - **aarch64 (ARM64)**: Mobile, SBC (Raspberry Pi), and Cloud-native ARM.
 - **riscv64**: The future of open-silicon sovereignty.
 
-### 3. Emulated Boot (QEMU)
+### 3. Emulated Boot (QEMU)
 
-We boot the compiled ISO in QEMU environments to verify:
 
+We boot the compiled ISO in QEMU environments to verify:
 - MMU setup and page table consistency.
 - Interrupt routing (GIC for ARM, PLIC for RISC-V).
 - Morphic UI frame-buffer initialization.
 
-## 📊 Dashboard Integration
+## 📊 Dashboard Integration
+
 
 The **Morphic UI** features a live Lattice Sync widget that pulls the latest build results directly from GitHub Actions, providing developers with immediate feedback on shard stability.
 

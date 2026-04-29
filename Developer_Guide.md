@@ -100,29 +100,36 @@ extern "C" {
 
 ## 🧪 Testing Your Module Locally
 
-```bash
+```bash
 
-# 1. Build the orchestrator
+
+# 1. Build the orchestrator
+
 
 g++ -std=c++20 orchestrator/main.cpp -o s-cli
 
-# 2. Run subsystem tests
+# 2. Run subsystem tests
+
 
 ./s-cli test --subsystem genesis
 ./s-cli test --subsystem hal
 ./s-cli test --subsystem security
 
-# 3. Run full benchmark
+# 3. Run full benchmark
+
 
 ./s-cli benchmark --run-all
 
-# 4. Check sovereignty (no forbidden imports)
+# 4. Check sovereignty (no forbidden imports)
 
-grep -r "#include <stdlib.h>" suites/S01_Genesis/ sigmaos/core/src/atomic_*
+
+grep -r "#include <stdlib.h>" suites/S01_Genesis/ sigmaos/core/src/atomic_*
+
 
 # Should return nothing
 
-# 5. Count your new modules
+# 5. Count your new modules
+
 
 ls sigmaos/core/src/atomic_* | wc -l
 find suites/ -name "sigma_*.h" | wc -l
@@ -131,8 +138,6 @@ find suites/ -name "sigma_*.h" | wc -l
 ---
 
 ## 📋 Checklist Before Submitting
-
-
 - [ ] File is self-contained (no includes except other `sigma_*.h`)
 - [ ] Uses `sigma_size_t`, `sigma_u32` etc. — not `size_t`, `uint32_t`
 - [ ] Has a one-line module description comment at the top
@@ -145,7 +150,6 @@ find suites/ -name "sigma_*.h" | wc -l
 ---
 
 ## 🚀 Contributing
-
 1. Fork the repo
 2. Create `suites/S<NN>_<Name>/sigma_<module>.h`
 3. Add a `extern "C"` wrapper for CLI integration

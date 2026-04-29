@@ -14,19 +14,16 @@ sudo apt install build-essential g++ make qemu-system-x86 nasm mtools
 ## Building from Source
 
 SigmaOS uses the `s-cli` orchestrator for all build operations.
-
 1. **Compile the Orchestrator:**
    If you haven't already, compile the CLI:
    ```bash
    g++ -std=c++20 orchestrator/main.cpp -o s-cli
    ```
-
 2. **Select a Build Profile:**
    Configure the system for your target environment:
    ```bash
    ./s-cli profile dev
    ```
-
 3. **Compile the Lattice:**
    Build the kernel and all enabled shards for the x86_64 architecture:
    ```bash
@@ -47,7 +44,6 @@ qemu-system-x86_64 -cdrom build/sigmaos-x86_64.iso -m 2G -serial stdio
 ### On Bare Metal
 
 To run SigmaOS on actual hardware:
-
 1. Insert a USB flash drive.
 2. Flash the ISO to the drive using `dd` (Linux/macOS) or Rufus (Windows).
    **Warning: This will erase all data on the USB drive.**

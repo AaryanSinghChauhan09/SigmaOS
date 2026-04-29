@@ -52,24 +52,28 @@ Find the right `suites/S<NN>_*` directory:
 
 ## 🧩 Step-by-Step: Adding a New Module
 
-### 1. Create the header
+### 1. Create the header
 
-```bash
 
-# Example: adding a VPN tunnel module
+```bash
+
+
+# Example: adding a VPN tunnel module
+
 
 touch suites/S37_SovereignWire/sigma_vpn.h
 ```
 
-### 2. Write the module
+### 2. Write the module
 
-Follow the **Atomic Module Contract** (see Developer Guide):
 
+Follow the **Atomic Module Contract** (see Developer Guide):
 - One `#ifndef` guard
 - One primary struct + 3–5 static inline functions
 - Zero external includes
 
-### 3. Wire into CI tests
+### 3. Wire into CI tests
+
 
 Edit `orchestrator/main.cpp`, find `TestCommand::run_subsystem_test()`:
 ```cpp
@@ -79,7 +83,8 @@ static void run_subsystem_test(const char* subsystem) {
 }
 ```
 
-### 4. Add a CLI command (optional)
+### 4. Add a CLI command (optional)
+
 
 ```cpp
 // In orchestrator/main.cpp, add a new ICommand subclass:
@@ -94,14 +99,16 @@ public:
 // Then register in CommandDispatcher constructor
 ```
 
-### 5. Test locally
+### 5. Test locally
+
 
 ```bash
 g++ -std=c++20 orchestrator/main.cpp -o s-cli
 ./s-cli test --subsystem networking
 ```
 
-### 6. Push & watch CI
+### 6. Push & watch CI
+
 
 ```bash
 git add suites/S37_SovereignWire/sigma_vpn.h orchestrator/main.cpp

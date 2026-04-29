@@ -80,7 +80,6 @@ OS evolves into planetary ecosystems — shards replicate autonomously.
 | `quantum_conscious_gov.c` | `modules/core/kernel/` | Quantum awareness state-machine governance |
 
 ## Impact
-
 - First OS to achieve **ecological, temporal, and quantum sovereignty** simultaneously.
 - Establishes SigmaOS as a **planetary nervous system**.
 - Enables **marketplace of minds** — redefining what software distribution means.
