@@ -26,7 +26,7 @@ extern "C" void panicrecov_handle_panic(uint32_t fault_code, const void* registe
         sigma_log("[PANICRECOV] RSR: Recovery SUCCESSFUL. System continues.");
     } else {
         sigma_log("[PANICRECOV] RSR: Recovery FAILED. Triggering S-Rollback to last known-good state...");
-        rollback_execute();
+        rollback_execute_to_last_stable();
     }
 }
 

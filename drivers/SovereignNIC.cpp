@@ -25,7 +25,7 @@ extern "C" void nic_init() {
     master_nic.mac[5] = 0x01;
     master_nic.link_up = true;
 
-    sigma_log("[NIC] Link established. MAC: %02X:%02X:%02X:%02X:%02X:%02X", 
+    sigma_printf("[NIC] Link established. MAC: %02X:%02X:%02X:%02X:%02X:%02X\n", 
               master_nic.mac[0], master_nic.mac[1], master_nic.mac[2],
               master_nic.mac[3], master_nic.mac[4], master_nic.mac[5]);
 }

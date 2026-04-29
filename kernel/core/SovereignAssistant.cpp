@@ -25,7 +25,7 @@ extern "C" void assistant_init() {
 }
 
 extern "C" void assistant_query(const char* prompt) {
-    sigma_log("[ASSISTANT] Prompt received: %s", prompt);
+    sigma_printf("[ASSISTANT] Prompt received: %s\n", prompt);
     // Logic for automated lattice reconfiguration based on user intent
     sigma_log("[ASSISTANT] Intent processed. Reconfiguring lattice shards for maximum harmony.");
 }

@@ -19,7 +19,8 @@ extern "C" {
 typedef enum {
     UI_THEME_DARK_NEON,
     UI_THEME_LIGHT_GLASS,
-    UI_THEME_HOLO_HUD
+    UI_THEME_HOLO_HUD,
+    UI_THEME_COOL_GLASS
 } sigma_ui_theme_t;
 
 /* --- Universal UI Primitives --- */

@@ -23,7 +23,7 @@ extern "C" void tuner_init() {
     current_silicon.amx_supported = true;
     current_silicon.thermal_ceiling = 100; // Celsius
 
-    sigma_log("[TUNER] Detected %s. Activating Silicon-Specific Optimization Lattice.", current_silicon.cpu_model);
+    sigma_printf("[TUNER] Detected %s. Activating Silicon-Specific Optimization Lattice.\n", current_silicon.cpu_model);
 }
 
 extern "C" void tuner_apply_performance_governor() {

@@ -18,7 +18,8 @@ extern "C" {
 typedef enum {
     SIGMA_RECOVER_HEALTHY,
     SIGMA_RECOVER_HEALING,
-    SIGMA_RECOVER_FAILSAFE
+    SIGMA_RECOVER_FAILSAFE,
+    SIGMA_RECOVER_CRITICAL
 } sigma_recovery_state_t;
 
 /* --- Recovery Primitives --- */

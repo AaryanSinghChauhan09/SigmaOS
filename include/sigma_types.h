@@ -46,7 +46,11 @@ typedef unsigned char bool;
 
 #define SIGMA_TRUE  1u
 #define SIGMA_FALSE 0u
+#ifdef __cplusplus
+#define SIGMA_NULL  nullptr
+#else
 #define SIGMA_NULL  ((void*)0)
+#endif
 #define SIGMA_OK    0x00000000u
 #define SIGMA_ERROR 0xFFFFFFFFu
 

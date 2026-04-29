@@ -23,13 +23,15 @@ extern "C" void visscript_register_node(const sigma_visscript_node_t* node) {
     }
 }
 
-extern "C" void visscript_execute_graph(uint32_t entry_node_id) {
+extern "C" void visscript_execute_graph(const sigma_visscript_node_t* start_node) {
+    if (!start_node) return;
+
     // GBLI (Graph-Based Logic Interpreter) Algorithm
     // Traverses visually-built node graphs and executes them natively.
     
     sigma_log("[VISSCRIPT] GBLI: Parsing visual node graph...");
     
-    uint32_t current_id = entry_node_id;
+    uint32_t current_id = start_node->node_id;
     while (current_id != 0) {
         bool found = false;
         for (uint32_t i = 0; i < registered_nodes; i++) {
