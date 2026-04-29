@@ -59,6 +59,12 @@ void  sigma_printf(const char* format, ...);
 void  sigma_log(const char* msg);
 
 /* =========================================================================
+ * SECURITY-HARDENED PRIMITIVES (Inspired by Alpine/musl)
+ * ========================================================================= */
+void* sigma_secure_memset(void* s, int c, sigma_size_t n); // Prevents compiler optimization removals
+void  sigma_hardened_strcpy(char* dest, const char* src, sigma_size_t dest_size); // Bounds-checked strcpy
+
+/* =========================================================================
  * SOVEREIGN MEMORY MANAGEMENT (bump-pointer slab, 128 MB shard)
  * ========================================================================= */
 void* sigma_slab_alloc_raw(sigma_size_t size);
