@@ -61,7 +61,11 @@ extern "C" void proc_yield() {
     sigma_process_t* next = (sigma_process_t*)SIGMA_NULL;
     uint32_t highest_priority = 0xFFFFFFFF;
     
-    for (uint32_t i = 0; i < SovereignScheduler.active_count; i++) {
+    // Circular scan to prevent starvation (Round-Robin within same priority)
+    uint32_t start_idx = SovereignScheduler.current_pid; 
+    for (uint32_t offset = 0; offset < SovereignScheduler.active_count; offset++) {
+        uint32_t i = (start_idx + offset) % SovereignScheduler.active_count;
+        
         if (SovereignScheduler.table[i].state == SIGMA_PROC_READY && 
             SovereignScheduler.table[i].priority < highest_priority) {
             highest_priority = SovereignScheduler.table[i].priority;
