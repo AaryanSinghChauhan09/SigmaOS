@@ -8,7 +8,7 @@
  * =========================================================================
  */
 
-#include "../../include/SovereignLibC.h"
+#include "SovereignLibC.h"
 
 /* =========================================================================
  * Sovereign Hex Dump (replaces C++ class utility)

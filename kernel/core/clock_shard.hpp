@@ -1,9 +1,9 @@
 #ifndef CLOCK_SHARD_HPP
 #define CLOCK_SHARD_HPP
 
-#include "../../include/SovereignLibC.h"
+#include "SovereignLibC.h"
 
-#include "../../include/SigmaOOP.hpp"
+#include "SigmaOOP.hpp"
 #include "port_shard.hpp"
 
 namespace SigmaOS {

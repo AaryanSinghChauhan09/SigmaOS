@@ -1,3 +1,4 @@
+#include "Lattice.h"
 /*
  * =========================================================================
  * Î£ SIGMAOS: SOVEREIGN ZENITH (v15.0 - ABSOLUTE FINALITY)
@@ -20,8 +21,8 @@
  * =========================================================================
  */
 
-#include "../../include/SigmaOOP.hpp"
-#include "../../include/SovereignLibC.h"
+#include "SigmaOOP.hpp"
+#include "SovereignLibC.h"
 
 namespace SigmaOS {
 namespace Kernel {

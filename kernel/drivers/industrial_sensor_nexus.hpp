@@ -1,8 +1,10 @@
 #ifndef SOVEREIGN_SENSOR_NEXUS_HPP
 #define SOVEREIGN_SENSOR_NEXUS_HPP
 
-#include "../../include/sigma_types.h"
-#include "../../include/SigmaOOP.hpp"
+#include "SovereignLibC.h"
+
+#include "sigma_types.h"
+#include "SigmaOOP.hpp"
 
 namespace SigmaOS {
 namespace Drivers {

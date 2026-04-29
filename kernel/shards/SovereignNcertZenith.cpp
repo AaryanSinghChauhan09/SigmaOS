@@ -1,4 +1,5 @@
-#include "../../include/SovereignLibC.h"
+#include "Lattice.h"
+#include "SovereignLibC.h"
 /*
  * =========================================================================
  * Î£ SIGMAOS: SOVEREIGN NCERT ZENITH (v128.0 - SCHOLAR ZENITH)
@@ -7,7 +8,7 @@
  * =========================================================================
  */
 
-#include "../../include/SigmaOOP.hpp"
+#include "SigmaOOP.hpp"
 #include "userland/apps/scholar_zenith/ncert_base.hpp"
 #include "userland/apps/scholar_zenith/ncert_physics.hpp"
 #include "userland/apps/scholar_zenith/ncert_chemistry.hpp"

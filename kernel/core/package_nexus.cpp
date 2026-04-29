@@ -1,3 +1,4 @@
+#include "Lattice.h"
 #include "package_nexus.hpp"
 
 namespace SigmaOS {

@@ -1,4 +1,5 @@
-#include "../../include/SovereignLibC.h"
+#include "Lattice.h"
+#include "SovereignLibC.h"
 /*
  * =========================================================================
  * Î£ SIGMAOS: SOVEREIGN CLOUD MAESTRO (v128.0 - ZERO-STD NATIVE)

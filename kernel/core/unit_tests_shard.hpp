@@ -1,9 +1,9 @@
 #ifndef UNIT_TESTS_SHARD_HPP
 #define UNIT_TESTS_SHARD_HPP
 
-#include "../../include/SovereignLibC.h"
+#include "SovereignLibC.h"
 
-#include "../../include/SigmaOOP.hpp"
+#include "SigmaOOP.hpp"
 
 namespace SigmaOS {
 namespace Kernel {

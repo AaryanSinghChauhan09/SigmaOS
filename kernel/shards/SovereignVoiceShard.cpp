@@ -1,5 +1,6 @@
-#include "../../include/SigmaOOP.hpp"
-#include "../../include/SovereignLibC.h"
+#include "Lattice.h"
+#include "SigmaOOP.hpp"
+#include "SovereignLibC.h"
 
 namespace SigmaOS {
 namespace Audio {

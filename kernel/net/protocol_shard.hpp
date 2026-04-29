@@ -1,8 +1,10 @@
 #ifndef PROTOCOL_SHARD_HPP
 #define PROTOCOL_SHARD_HPP
 
-#include "../../include/sigma_types.h"
-#include "../../include/SigmaOOP.hpp"
+#include "SovereignLibC.h"
+
+#include "sigma_types.h"
+#include "SigmaOOP.hpp"
 
 namespace SigmaOS {
 namespace Net {

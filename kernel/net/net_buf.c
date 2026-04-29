@@ -5,7 +5,7 @@
  * Principles: Zero-Allocation Packet Processing & Silicon-Direct IO.
  * =============================================================================
  */
-#include "../../include/sigma_kernel_types.h"
+#include "sigma_kernel_types.h"
 
 #define NET_BUF_SIZE 2048
 #define MAX_PACKETS  128

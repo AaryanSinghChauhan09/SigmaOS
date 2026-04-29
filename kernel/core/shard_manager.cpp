@@ -1,5 +1,6 @@
+#include "Lattice.h"
 #include "shard_manager.hpp"
-#include "../../include/SovereignLibC.h"
+#include "SovereignLibC.h"
 
 namespace SigmaOS {
 namespace Core {

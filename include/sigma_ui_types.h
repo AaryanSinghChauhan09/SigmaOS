@@ -1,4 +1,4 @@
-﻿#ifndef SIGMA_UI_TYPES_H
+#ifndef SIGMA_UI_TYPES_H
 #define SIGMA_UI_TYPES_H
 
 #include "sigma_types.h"

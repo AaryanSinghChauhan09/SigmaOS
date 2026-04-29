@@ -1,4 +1,5 @@
-#include "../../include/SigmaOOP.hpp"
+#include "Lattice.h"
+#include "SigmaOOP.hpp"
 
 void* operator new(sigma_size_t size) {
     return sigma_malloc(size);

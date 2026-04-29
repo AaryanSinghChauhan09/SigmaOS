@@ -1,3 +1,4 @@
+#include "Lattice.h"
 /*
  * =========================================================================
  * Σ SIGMAOS: MORPHIC UI DESIGNER (v1.0 - INDUSTRIAL SHARD)
@@ -7,8 +8,8 @@
  * =========================================================================
  */
 
-#include "../../include/SigmaOOP.hpp"
-#include "../../include/SovereignLibC.h"
+#include "SigmaOOP.hpp"
+#include "SovereignLibC.h"
 
 namespace SigmaOS {
 namespace Design {

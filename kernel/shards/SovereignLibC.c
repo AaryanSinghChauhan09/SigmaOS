@@ -1,13 +1,13 @@
 /*
  * =========================================================================
- * Î£ SIGMAOS: SOVEREIGN LIBC MASTER SHARD (v20.0)
+ * Σ SIGMAOS: SOVEREIGN LIBC MASTER SHARD (v20.0)
  * =========================================================================
  * This is the unified entry point for the modularized Sovereign LibC.
  * Modularized for industrial-grade maintainability.
  * =========================================================================
  */
 
-#include "../../include/SovereignLibC.h"
+#include "SovereignLibC.h"
 
 /* Modular implementations */
 #include "libc/sigma_io.c"

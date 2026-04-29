@@ -11,7 +11,7 @@
  * =============================================================================
  */
 
-#include "../../include/SovereignLibC.h"
+#include "SovereignLibC.h"
 
 #ifndef __cplusplus
 typedef _Bool bool;

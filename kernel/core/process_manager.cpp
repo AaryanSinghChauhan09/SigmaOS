@@ -1,3 +1,4 @@
+#include "Lattice.h"
 #include "process_manager.hpp"
 
 namespace SigmaOS {

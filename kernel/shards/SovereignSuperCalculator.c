@@ -9,7 +9,7 @@
  * =========================================================================
  */
 
-#include "../../include/SovereignLibC.h"
+#include "SovereignLibC.h"
 
 /* =========================================================================
  * Native math shards (inline asm â€ replaces x87 opcode casts)

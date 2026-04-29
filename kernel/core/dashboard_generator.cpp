@@ -1,3 +1,4 @@
+#include "Lattice.h"
 #include "dashboard_generator.hpp"
 
 namespace SigmaOS {

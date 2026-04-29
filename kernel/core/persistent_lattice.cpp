@@ -1,5 +1,6 @@
+#include "Lattice.h"
 #include "persistent_lattice.hpp"
-#include "../../include/SovereignLibC.h"
+#include "SovereignLibC.h"
 
 namespace SigmaOS {
 namespace Kernel {

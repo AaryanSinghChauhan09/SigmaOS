@@ -1,8 +1,10 @@
 #ifndef IDS_SHARD_HPP
 #define IDS_SHARD_HPP
 
-#include "../../include/sigma_types.h"
-#include "../../include/SigmaOOP.hpp"
+#include "../../../include/SovereignLibC.h"
+
+#include "sigma_types.h"
+#include "../../../include/SigmaOOP.hpp"
 
 namespace SigmaOS {
 namespace Security {

@@ -1,5 +1,6 @@
+#include "Lattice.h"
 #include "industrial_vito.hpp"
-#include "../../include/SovereignLibC.h"
+#include "SovereignLibC.h"
 
 namespace SigmaOS {
 namespace Virtualization {

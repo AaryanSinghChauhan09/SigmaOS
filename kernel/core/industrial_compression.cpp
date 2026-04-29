@@ -1,5 +1,6 @@
+#include "Lattice.h"
 #include "industrial_compression.hpp"
-#include "../../include/SovereignLibC.h"
+#include "SovereignLibC.h"
 
 namespace SigmaOS {
 namespace Storage {

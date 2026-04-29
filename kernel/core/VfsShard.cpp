@@ -1,3 +1,4 @@
+#include "Lattice.h"
 #include "VfsShard.hpp"
 
 // Implementation for SovereignVFS could go here if needed, 

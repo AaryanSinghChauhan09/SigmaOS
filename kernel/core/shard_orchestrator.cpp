@@ -1,5 +1,6 @@
+#include "Lattice.h"
 #include "shard_orchestrator.hpp"
-#include "../../include/SovereignLibC.h"
+#include "SovereignLibC.h"
 
 namespace SigmaOS {
 namespace Kernel {

@@ -5,7 +5,7 @@
  * Principles: Crash Resilience, Sequential Write Performance.
  * =============================================================================
  */
-#include "../../include/sigma_kernel_types.h"
+#include "sigma_kernel_types.h"
 
 typedef struct {
     sigma_u32 id;

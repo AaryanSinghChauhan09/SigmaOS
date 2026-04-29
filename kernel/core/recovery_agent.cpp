@@ -1,5 +1,6 @@
+#include "Lattice.h"
 #include "recovery_agent.hpp"
-#include "../../include/SovereignLibC.h"
+#include "SovereignLibC.h"
 
 namespace SigmaOS {
 namespace Core {

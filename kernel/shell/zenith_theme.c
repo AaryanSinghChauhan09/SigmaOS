@@ -5,7 +5,7 @@
  * Principles: Glassmorphism & High-Contrast Aesthetics.
  * =============================================================================
  */
-#include "../../include/sigma_kernel_types.h"
+#include "sigma_kernel_types.h"
 
 typedef struct Theme {
     sigma_u8      primary_color;

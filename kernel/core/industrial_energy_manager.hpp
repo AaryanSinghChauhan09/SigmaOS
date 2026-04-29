@@ -1,8 +1,10 @@
 #ifndef SOVEREIGN_ENERGY_MANAGER_HPP
 #define SOVEREIGN_ENERGY_MANAGER_HPP
 
-#include "../../include/sigma_types.h"
-#include "../../include/SigmaOOP.hpp"
+#include "SovereignLibC.h"
+
+#include "sigma_types.h"
+#include "SigmaOOP.hpp"
 
 namespace SigmaOS {
 namespace Power {

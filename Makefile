@@ -11,6 +11,18 @@ CFLAGS = -m64 -ffreestanding -O2 -Wall -Wextra -Iinclude -nostdlib -fno-stack-pr
 CXXFLAGS = $(CFLAGS) -fno-exceptions -fno-rtti
 LDFLAGS = -T kernel/sigma.ld -m elf_x86_64
 
+# --- Developer Workflow & Memory Safety ---
+ifeq ($(DEBUG), 1)
+    CFLAGS += -g -O0 -DDEBUG
+endif
+
+ifeq ($(SANITIZE), 1)
+    # Enable AddressSanitizer and UndefinedBehaviorSanitizer
+    CFLAGS += -fsanitize=address,undefined -fno-omit-frame-pointer
+    LDFLAGS += -fsanitize=address,undefined
+endif
+# ----------------------------------------
+
 # Modular Directories
 SRC_DIRS = kernel/core kernel/drivers kernel/orchestration kernel/shards userland
 OBJ_DIR = obj
