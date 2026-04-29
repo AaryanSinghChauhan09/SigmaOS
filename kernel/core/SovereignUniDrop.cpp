@@ -1,7 +1,7 @@
-#include <sigma_unidrop.h>
-#include <sigma_hal.h>
-#include <sigma_ipc.h>
-#include <sigma_continuity.h>
+#include "sigma_unidrop.h"
+#include "sigma_hal.h"
+#include "sigma_ipc.h"
+#include "sigma_continuity.h"
 
 /**
  * SigmaOS Sovereign Universal Drag & Drop

@@ -1,7 +1,7 @@
-#include <sigma_emotion.h>
-#include <sigma_hal.h>
-#include <sigma_universal_ui.h>
-#include <sigma_focus.h>
+#include "sigma_emotion.h"
+#include "sigma_hal.h"
+#include "sigma_universal_ui.h"
+#include "sigma_focus.h"
 
 /**
  * SigmaOS Sovereign Emotion UX

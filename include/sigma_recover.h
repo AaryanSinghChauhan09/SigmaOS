@@ -9,7 +9,7 @@
 #ifndef SIGMA_RECOVER_H
 #define SIGMA_RECOVER_H
 
-#include <sigma_types.h>
+#include "sigma_types.h"
 
 #ifdef __cplusplus
 extern "C" {

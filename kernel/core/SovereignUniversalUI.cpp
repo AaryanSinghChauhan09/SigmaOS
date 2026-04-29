@@ -1,6 +1,6 @@
-#include <sigma_universal_ui.h>
-#include <sigma_hal.h>
-#include <sigma_telemetry.h>
+#include "sigma_universal_ui.h"
+#include "sigma_hal.h"
+#include "sigma_telemetry.h"
 
 /**
  * SigmaOS Sovereign Universal UI

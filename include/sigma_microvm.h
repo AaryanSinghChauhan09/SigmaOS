@@ -11,7 +11,7 @@
 #ifndef SIGMA_MICROVM_H
 #define SIGMA_MICROVM_H
 
-#include <sigma_types.h>
+#include "sigma_types.h"
 
 #ifdef __cplusplus
 extern "C" {

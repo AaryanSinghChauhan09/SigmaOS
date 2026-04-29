@@ -1,6 +1,6 @@
-#include <sigma_gesture.h>
-#include <sigma_hal.h>
-#include <sigma_neural.h>
+#include "sigma_gesture.h"
+#include "sigma_hal.h"
+#include "sigma_neural.h"
 
 /**
  * SigmaOS Sovereign Gestural UX

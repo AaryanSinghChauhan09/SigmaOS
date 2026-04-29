@@ -1,7 +1,7 @@
-#include <sigma_wellbeing.h>
-#include <sigma_hal.h>
-#include <sigma_ergo.h>
-#include <sigma_notifyiq.h>
+#include "sigma_wellbeing.h"
+#include "sigma_hal.h"
+#include "sigma_ergo.h"
+#include "sigma_notifyiq.h"
 
 /**
  * SigmaOS Sovereign Digital Wellbeing

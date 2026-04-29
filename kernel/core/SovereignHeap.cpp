@@ -1,5 +1,5 @@
-#include <sigma_mem.h>
-#include <sigma_hal.h>
+#include "sigma_mem.h"
+#include "sigma_hal.h"
 
 /**
  * SigmaOS Sovereign Heap Manager

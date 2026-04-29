@@ -1,6 +1,6 @@
-#include <sigma_power.h>
-#include <sigma_hal.h>
-#include <sigma_telemetry.h>
+#include "sigma_power.h"
+#include "sigma_hal.h"
+#include "sigma_telemetry.h"
 
 /**
  * SigmaOS Sovereign Power Implementation

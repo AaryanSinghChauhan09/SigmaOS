@@ -10,7 +10,7 @@
 #ifndef SIGMA_ALLOCATOR_H
 #define SIGMA_ALLOCATOR_H
 
-#include <sigma_types.h>
+#include "sigma_types.h"
 
 #ifdef __cplusplus
 extern "C" {

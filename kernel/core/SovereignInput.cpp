@@ -1,5 +1,5 @@
-#include <sigma_input.h>
-#include <sigma_hal.h>
+#include "sigma_input.h"
+#include "sigma_hal.h"
 
 /**
  * SigmaOS Sovereign Input Implementation

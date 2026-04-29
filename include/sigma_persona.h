@@ -10,7 +10,7 @@
 #ifndef SIGMA_PERSONA_H
 #define SIGMA_PERSONA_H
 
-#include <sigma_types.h>
+#include "sigma_types.h"
 
 #ifdef __cplusplus
 extern "C" {

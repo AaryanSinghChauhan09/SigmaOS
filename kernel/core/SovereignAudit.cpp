@@ -1,6 +1,6 @@
-#include <sigma_audit.h>
-#include <sigma_hal.h>
-#include <sigma_time.h>
+#include "sigma_audit.h"
+#include "sigma_hal.h"
+#include "sigma_time.h"
 
 /**
  * SigmaOS Sovereign Audit Implementation

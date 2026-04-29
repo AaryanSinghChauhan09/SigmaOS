@@ -7,8 +7,6 @@
 #ifndef SOVEREIGN_LIBC_H
 #define SOVEREIGN_LIBC_H
 
-#include "SovereignLibC.h"
-
 #include "sigma_types.h"
 
 #ifdef __cplusplus

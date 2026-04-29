@@ -1,6 +1,6 @@
-#include <sigma_config.h>
-#include <sigma_hal.h>
-#include <sigma_libc.h>
+#include "sigma_config.h"
+#include "sigma_hal.h"
+#include "sigma_libc.h"
 
 /**
  * SigmaOS Sovereign Config Implementation

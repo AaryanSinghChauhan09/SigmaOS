@@ -1,6 +1,6 @@
-#include <sigma_spatialaudio.h>
-#include <sigma_hal.h>
-#include <sigma_audio.h>
+#include "sigma_spatialaudio.h"
+#include "sigma_hal.h"
+#include "sigma_audio.h"
 
 /**
  * SigmaOS Sovereign Spatial Audio

@@ -1,7 +1,7 @@
-#include <sigma_appeco.h>
-#include <sigma_hal.h>
-#include <sigma_sandbox.h>
-#include <sigma_pkg.h>
+#include "sigma_appeco.h"
+#include "sigma_hal.h"
+#include "sigma_sandbox.h"
+#include "sigma_pkg.h"
 
 /**
  * SigmaOS Sovereign App Ecosystem

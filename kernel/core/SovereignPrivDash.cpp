@@ -1,7 +1,7 @@
-#include <sigma_privdash.h>
-#include <sigma_hal.h>
-#include <sigma_telemetry.h>
-#include <sigma_sentinel.h>
+#include "sigma_privdash.h"
+#include "sigma_hal.h"
+#include "sigma_telemetry.h"
+#include "sigma_sentinel.h"
 
 /**
  * SigmaOS Sovereign Privacy Dashboard

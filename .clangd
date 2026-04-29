@@ -1,9 +1,10 @@
 CompileFlags:
   Add: [
-    "-Ic:/Users/Aaryan/.gemini/antigravity/scratch/SigmaOS-Site/include",
-    "-Ic:/Users/Aaryan/.gemini/antigravity/scratch/SigmaOS-Site/kernel/core",
-    "-Ic:/Users/Aaryan/.gemini/antigravity/scratch/SigmaOS-Site/kernel/drivers",
-    "-Ic:/Users/Aaryan/.gemini/antigravity/scratch/SigmaOS-Site/kernel/orchestration",
+    "-Iinclude",
+    "-Ikernel/core",
+    "-Ikernel/drivers",
+    "-Ikernel/orchestration",
+    "-Ikernel/shards",
     "-m64",
     "-ffreestanding",
     "-fno-stack-protector",

@@ -1,5 +1,5 @@
-#include <sigma_audio.h>
-#include <sigma_hal.h>
+#include "sigma_audio.h"
+#include "sigma_hal.h"
 
 /**
  * SigmaOS Sovereign Audio Implementation

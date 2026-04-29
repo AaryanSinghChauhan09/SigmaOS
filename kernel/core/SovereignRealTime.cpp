@@ -1,6 +1,6 @@
-#include <sigma_realtime.h>
-#include <sigma_hal.h>
-#include <sigma_time.h>
+#include "sigma_realtime.h"
+#include "sigma_hal.h"
+#include "sigma_time.h"
 
 /**
  * SigmaOS Sovereign Real-Time Core

@@ -9,7 +9,7 @@
 #ifndef SIGMA_NEURAL_H
 #define SIGMA_NEURAL_H
 
-#include <sigma_types.h>
+#include "sigma_types.h"
 
 #ifdef __cplusplus
 extern "C" {

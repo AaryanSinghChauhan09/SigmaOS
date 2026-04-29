@@ -1,6 +1,6 @@
-#include <sigma_init.h>
-#include <sigma_hal.h>
-#include <sigma_telemetry.h>
+#include "sigma_init.h"
+#include "sigma_hal.h"
+#include "sigma_telemetry.h"
 
 /**
  * SigmaOS Sovereign Init Implementation

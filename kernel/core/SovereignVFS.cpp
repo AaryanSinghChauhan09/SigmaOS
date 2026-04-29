@@ -1,6 +1,6 @@
-#include <sigma_hal.h>
-#include <sigma_libc.h>
-#include <sigma_vfs.h>
+#include "sigma_hal.h"
+#include "sigma_libc.h"
+#include "sigma_vfs.h"
 
 /**
  * SigmaOS Sovereign VFS Implementation
@@ -17,7 +17,7 @@ extern "C" void vfs_init() {
     vfs_mount("/", 1); // Genesis Shard
 }
 
-#include <sigma_mem.h>
+#include "sigma_mem.h"
 
 extern "C" bool vfs_mount(const char* path, uint32_t shard_id) {
     sigma_vnode_t* node = (sigma_vnode_t*)sigma_malloc(sizeof(sigma_vnode_t));

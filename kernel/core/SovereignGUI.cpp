@@ -1,5 +1,5 @@
-#include <sigma_gui.h>
-#include <sigma_hal.h>
+#include "sigma_gui.h"
+#include "sigma_hal.h"
 
 /**
  * SigmaOS Sovereign GUI Implementation

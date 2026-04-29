@@ -1,6 +1,6 @@
-#include <sigma_visscript.h>
-#include <sigma_hal.h>
-#include <sigma_taskautomator.h>
+#include "sigma_visscript.h"
+#include "sigma_hal.h"
+#include "sigma_taskautomator.h"
 
 /**
  * SigmaOS Sovereign Visual Scripting

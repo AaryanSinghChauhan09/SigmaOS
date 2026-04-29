@@ -1,6 +1,6 @@
-#include <sigma_mmu.h>
-#include <sigma_hal.h>
-#include <sigma_proc.h>
+#include "sigma_mmu.h"
+#include "sigma_hal.h"
+#include "sigma_proc.h"
 
 /**
  * SigmaOS Sovereign MMU Implementation

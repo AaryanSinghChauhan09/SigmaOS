@@ -1,8 +1,8 @@
-#include <sigma_smartshot.h>
-#include <sigma_hal.h>
-#include <sigma_vissearch.h>
-#include <sigma_memorypalace.h>
-#include <sigma_clipboard.h>
+#include "sigma_smartshot.h"
+#include "sigma_hal.h"
+#include "sigma_vissearch.h"
+#include "sigma_memorypalace.h"
+#include "sigma_clipboard.h"
 
 /**
  * SigmaOS Sovereign Smart Screenshot

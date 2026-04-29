@@ -1,7 +1,7 @@
-#include <sigma_focus.h>
-#include <sigma_hal.h>
-#include <sigma_zeronet.h>
-#include <sigma_ipc.h>
+#include "sigma_focus.h"
+#include "sigma_hal.h"
+#include "sigma_zeronet.h"
+#include "sigma_ipc.h"
 
 /**
  * SigmaOS Sovereign Focus Mode

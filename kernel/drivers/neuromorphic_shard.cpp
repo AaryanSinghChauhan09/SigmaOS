@@ -1,4 +1,4 @@
-#include "../../include/sigma_types.h"
+#include "sigma_types.h"
 #include "../../include/SovereignLibC.h"
 #include "neuromorphic_shard.hpp"
 

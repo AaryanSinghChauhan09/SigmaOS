@@ -1,7 +1,7 @@
-#include <sigma_contextmenu.h>
-#include <sigma_hal.h>
-#include <sigma_neural.h>
-#include <sigma_universal_ui.h>
+#include "sigma_contextmenu.h"
+#include "sigma_hal.h"
+#include "sigma_neural.h"
+#include "sigma_universal_ui.h"
 
 /**
  * SigmaOS Sovereign Contextual Menus

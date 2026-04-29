@@ -1,6 +1,6 @@
-#include <sigma_diag.h>
-#include <sigma_hal.h>
-#include <sigma_time.h>
+#include "sigma_diag.h"
+#include "sigma_hal.h"
+#include "sigma_time.h"
 
 /**
  * SigmaOS Sovereign Diag Implementation

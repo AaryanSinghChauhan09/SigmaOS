@@ -11,7 +11,7 @@
 #ifndef SIGMA_SMARTSHOT_H
 #define SIGMA_SMARTSHOT_H
 
-#include <sigma_types.h>
+#include "sigma_types.h"
 
 #ifdef __cplusplus
 extern "C" {

@@ -1,5 +1,5 @@
-#include <sigma_haptic.h>
-#include <sigma_hal.h>
+#include "sigma_haptic.h"
+#include "sigma_hal.h"
 
 /**
  * SigmaOS Sovereign Haptic Engine

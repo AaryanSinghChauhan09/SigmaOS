@@ -9,7 +9,7 @@
 #ifndef SIGMA_TIME_H
 #define SIGMA_TIME_H
 
-#include <sigma_types.h>
+#include "sigma_types.h"
 
 #ifdef __cplusplus
 extern "C" {

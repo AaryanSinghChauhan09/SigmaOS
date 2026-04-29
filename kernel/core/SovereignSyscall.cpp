@@ -1,8 +1,8 @@
-#include <sigma_syscall.h>
-#include <sigma_hal.h>
-#include <sigma_proc.h>
-#include <sigma_mem.h>
-#include <sigma_ipc.h>
+#include "sigma_syscall.h"
+#include "sigma_hal.h"
+#include "sigma_proc.h"
+#include "sigma_mem.h"
+#include "sigma_ipc.h"
 
 /**
  * SigmaOS Sovereign System Call Implementation

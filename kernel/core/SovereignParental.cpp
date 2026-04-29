@@ -1,7 +1,7 @@
-#include <sigma_parental.h>
-#include <sigma_hal.h>
-#include <sigma_crypto.h>
-#include <sigma_wellbeing.h>
+#include "sigma_parental.h"
+#include "sigma_hal.h"
+#include "sigma_crypto.h"
+#include "sigma_wellbeing.h"
 
 /**
  * SigmaOS Sovereign Parental Controls

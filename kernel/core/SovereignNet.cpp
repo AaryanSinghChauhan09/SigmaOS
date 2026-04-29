@@ -1,6 +1,6 @@
-#include <sigma_hal.h>
-#include <sigma_libc.h>
-#include <sigma_net.h>
+#include "sigma_hal.h"
+#include "sigma_libc.h"
+#include "sigma_net.h"
 
 /**
  * SigmaOS Sovereign Networking Implementation

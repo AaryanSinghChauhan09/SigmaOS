@@ -1,7 +1,7 @@
-#include <sigma_deeplink.h>
-#include <sigma_hal.h>
-#include <sigma_process.h>
-#include <sigma_lazyload.h>
+#include "sigma_deeplink.h"
+#include "sigma_hal.h"
+#include "sigma_process.h"
+#include "sigma_lazyload.h"
 
 /**
  * SigmaOS Sovereign Deep Linking

@@ -11,7 +11,7 @@
 #ifndef SIGMA_NANOLIB_H
 #define SIGMA_NANOLIB_H
 
-#include <sigma_types.h>
+#include "sigma_types.h"
 
 #ifdef __cplusplus
 extern "C" {

@@ -1,6 +1,6 @@
-#include <sigma_thermaliq.h>
-#include <sigma_hal.h>
-#include <sigma_energysched.h>
+#include "sigma_thermaliq.h"
+#include "sigma_hal.h"
+#include "sigma_energysched.h"
 
 /**
  * SigmaOS Sovereign Thermal Intelligence

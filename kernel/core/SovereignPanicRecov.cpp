@@ -1,7 +1,7 @@
-#include <sigma_panicrecov.h>
-#include <sigma_hal.h>
-#include <sigma_rollback.h>
-#include <sigma_diag.h>
+#include "sigma_panicrecov.h"
+#include "sigma_hal.h"
+#include "sigma_rollback.h"
+#include "sigma_diag.h"
 
 /**
  * SigmaOS Sovereign Panic Recovery

@@ -1,6 +1,6 @@
-#include <sigma_omnisync.h>
-#include <sigma_hal.h>
-#include <sigma_zeronet.h>
+#include "sigma_omnisync.h"
+#include "sigma_hal.h"
+#include "sigma_zeronet.h"
 
 /**
  * SigmaOS Sovereign Omni-Sync Engine

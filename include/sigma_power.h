@@ -9,7 +9,7 @@
 #ifndef SIGMA_POWER_H
 #define SIGMA_POWER_H
 
-#include <sigma_types.h>
+#include "sigma_types.h"
 
 #ifdef __cplusplus
 extern "C" {

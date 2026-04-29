@@ -1,6 +1,6 @@
-#include <sigma_observe.h>
-#include <sigma_hal.h>
-#include <sigma_telemetry.h>
+#include "sigma_observe.h"
+#include "sigma_hal.h"
+#include "sigma_telemetry.h"
 
 /**
  * SigmaOS Sovereign Observability Matrix

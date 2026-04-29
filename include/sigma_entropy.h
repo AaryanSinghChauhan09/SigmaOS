@@ -9,7 +9,7 @@
 #ifndef SIGMA_ENTROPY_H
 #define SIGMA_ENTROPY_H
 
-#include <sigma_types.h>
+#include "sigma_types.h"
 
 #ifdef __cplusplus
 extern "C" {

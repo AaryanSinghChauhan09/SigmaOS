@@ -1,6 +1,6 @@
-#include <sigma_rust.h>
-#include <sigma_hal.h>
-#include <sigma_telemetry.h>
+#include "sigma_rust.h"
+#include "sigma_hal.h"
+#include "sigma_telemetry.h"
 
 /**
  * SigmaOS Sovereign Rust Interop

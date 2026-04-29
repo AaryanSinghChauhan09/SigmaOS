@@ -1,6 +1,6 @@
-#include <sigma_hal.h>
-#include <sigma_libc.h>
-#include <sigma_proc.h>
+#include "sigma_hal.h"
+#include "sigma_libc.h"
+#include "sigma_proc.h"
 
 /**
  * SigmaOS Sovereign Process Manager

@@ -1,7 +1,5 @@
-#include <sigma_access.h>
-#include <sigma_hal.h>
-#include <sigma_universal_ui.h>
-#include <sigma_voice.h> // For TTS
+#include "sigma_access.h"
+#include "sigma_hal.h"
 
 /**
  * SigmaOS Sovereign Accessibility Core

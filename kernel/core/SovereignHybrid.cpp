@@ -1,6 +1,6 @@
-#include <sigma_hybrid.h>
-#include <sigma_hal.h>
-#include <sigma_libc.h>
+#include "sigma_hybrid.h"
+#include "sigma_hal.h"
+#include "sigma_libc.h"
 
 /**
  * SigmaOS Sovereign Hybrid Kernel

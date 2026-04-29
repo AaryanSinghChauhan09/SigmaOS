@@ -1,5 +1,5 @@
-#include <sigma_crypto.h>
-#include <sigma_hal.h>
+#include "sigma_crypto.h"
+#include "sigma_hal.h"
 
 /**
  * SigmaOS Sovereign Cryptography Implementation

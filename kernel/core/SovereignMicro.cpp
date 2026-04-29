@@ -1,6 +1,6 @@
-#include <sigma_micro.h>
-#include <sigma_hal.h>
-#include <sigma_telemetry.h>
+#include "sigma_micro.h"
+#include "sigma_hal.h"
+#include "sigma_telemetry.h"
 
 /**
  * SigmaOS Sovereign Micro Implementation

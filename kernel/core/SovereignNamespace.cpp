@@ -1,6 +1,6 @@
-#include <sigma_namespace.h>
-#include <sigma_hal.h>
-#include <sigma_libc.h>
+#include "sigma_namespace.h"
+#include "sigma_hal.h"
+#include "sigma_libc.h"
 
 /**
  * SigmaOS Sovereign Universal Namespace
