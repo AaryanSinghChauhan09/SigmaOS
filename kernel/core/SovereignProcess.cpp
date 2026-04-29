@@ -38,6 +38,19 @@ extern "C" void proc_yield() {
     // PATS (Priority-Aware Task Switching) Algorithm
     // Selects the next READY process with the highest priority (lowest value).
     
+    // Task Watchdog: Check for runaway processes
+    sigma_process_t* current = (current_pid > 0) ? &process_table[current_pid - 1] : SIGMA_NULL;
+    if (current && current->state == SIGMA_PROC_RUNNING) {
+        current->cpu_time++;
+        if (current->cpu_time > 1000) { // Quota exceeded
+            sigma_printf("[PROC] [WATCHDOG] PID %d ('%s') exceeded silicon quota. Throttling.\n", 
+                         current->pid, current->name);
+            current->priority++; // Deprioritize
+            current->cpu_time = 0;
+        }
+        current->state = SIGMA_PROC_READY;
+    }
+
     sigma_process_t* next = SIGMA_NULL;
     uint32_t highest_priority = 0xFFFFFFFF;
     
