@@ -117,6 +117,8 @@ SigmaOS/
 | `SovereignProcessManager.c` | 🔄 Partially split | `sigma_proc_pcb.h`, `sigma_proc_spawn.h`, `sigma_proc_kill.h` |
 | `SovereignMemoryZenith.c` | 🔄 Partially split | `sigma_mem_pool.h`, `sigma_mem_audit.h` |
 | `SovereignNetMesh.c` | 🔄 Partially split | `sigma_net_core.h` |
+| `SovereignLibC.c` | ✅ Finalized | `sigma_io.c`, `sigma_string.c`, `sigma_mem.c` |
+| `MODULAR_ARCHITECTURE_BLUEPRINT` | ✅ Finalized | `CORE`, `ESSENTIAL`, `OPTIONAL`, `THIRD_PARTY`, `INFINITE` |
 | `SovereignShardKernel.c` | ⏳ Queued | `sigma_shard_init.h`, `sigma_shard_load.h` |
 | `sigma_pqc.c` | ⏳ Queued | `sigma_pqc_keygen.h`, `sigma_pqc_sign.h`, `sigma_pqc_verify.h` |
 
@@ -133,5 +135,16 @@ SigmaOS/
 | Inline ASM modules | 6+ |
 | OOP abstract interfaces | 5 |
 | Zero stdlib violations | ✅ 0 in atomic core |
+
+---
+
+## 🧠 Core Algorithms
+
+### 🌀 Quantum Scheduler: Predictive Priority Weighting (PPW)
+The **Quantum Scheduler (S39)** utilizes the **PPW Algorithm** to manage task execution across the 600-shard lattice. 
+
+- **Algorithm**: `Priority = Max(1, Floor(Complexity + LoadFactor))`
+- **Goal**: Prevent priority inversion and ensure that high-complexity background tasks don't starve the real-time UI flow.
+- **Implementation**: JS Shard `S39_QuantumScheduler.js`
 
 
