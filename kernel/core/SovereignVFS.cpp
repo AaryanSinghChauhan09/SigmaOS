@@ -8,8 +8,13 @@
  * Implements a high-performance Shard-Mapped Lookup (SML) algorithm.
  */
 
-static sigma_vnode_t vfs_lattice[100];
-static uint32_t vnode_count = 0;
+/* --- Sovereign VFS Manager (OOPS Isolation) --- */
+static struct {
+    sigma_vnode_t lattice[100];
+    uint32_t node_count;
+} SovereignVFSManager = {
+    .node_count = 0
+};
 
 extern "C" void vfs_init() {
     sigma_log("[VFS] Initializing Sovereign Virtual File System (Shard-Mapped)...");
@@ -19,9 +24,9 @@ extern "C" void vfs_init() {
 }
 
 extern "C" bool vfs_mount(const char* path, uint32_t shard_id) {
-    if (vnode_count >= 100) return false;
+    if (SovereignVFSManager.node_count >= 100) return false;
     
-    sigma_vnode_t* node = &vfs_lattice[vnode_count++];
+    sigma_vnode_t* node = &SovereignVFSManager.lattice[SovereignVFSManager.node_count++];
     sigma_hardened_strcpy(node->name, path, 64);
     node->shard_id = shard_id;
     node->type = SIGMA_FS_SHARD;
@@ -32,21 +37,20 @@ extern "C" bool vfs_mount(const char* path, uint32_t shard_id) {
 
 extern "C" sigma_vnode_t* vfs_lookup(const char* path) {
     // SML (Shard-Mapped Lookup) Algorithm
-    // Complexity: O(N) for simulation, would be O(log N) with radix tree.
     
-    for (uint32_t i = 0; i < vnode_count; i++) {
+    for (uint32_t i = 0; i < SovereignVFSManager.node_count; i++) {
         // Hardened string comparison simulation
         bool match = true;
-        for(int k=0; path[k] != '\0' && vfs_lattice[i].name[k] != '\0'; k++) {
-            if(path[k] != vfs_lattice[i].name[k]) {
+        for(int k=0; path[k] != '\0' && SovereignVFSManager.lattice[i].name[k] != '\0'; k++) {
+            if(path[k] != SovereignVFSManager.lattice[i].name[k]) {
                 match = false;
                 break;
             }
         }
         
         if (match) {
-            sigma_printf("[VFS] Path RESOLVED: %s -> Shard S%02d\n", path, vfs_lattice[i].shard_id);
-            return &vfs_lattice[i];
+            sigma_printf("[VFS] Path RESOLVED: %s -> Shard S%02d\n", path, SovereignVFSManager.lattice[i].shard_id);
+            return &SovereignVFSManager.lattice[i];
         }
     }
     

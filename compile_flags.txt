@@ -10,4 +10,3 @@
 -nostdlib
 -fno-exceptions
 -fno-rtti
--std=c++11
