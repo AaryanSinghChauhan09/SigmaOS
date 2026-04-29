@@ -6,7 +6,13 @@ SigmaOS utilizes a deterministic, multi-architecture CI/CD pipeline to ensure ev
 
 ### 1. Static Analysis (Sovereignty Check)
 
-We use `nm` and `objdump` to verify that no shard links against external standard libraries (libc, libm, etc.). If a shard has an "U" (undefined) symbol that isn't provided by our Genesis Kernel, the build fails.
+We use `nm` and `objdump` to verify that no shard links against external standard libraries.
+
+### 2. Modular Hardening (Lattice Alignment)
+Automated scripts (`fix_includes.py` and `sovereign_hardener.py`) enforce root-relative includes, ensuring the lattice remains sovereign and modular.
+
+### 3. Modularity Integrity Check
+The `check_modularity.py` tool scans for monolith violations, maintaining 100% modular purity across the 600 shards.
 
 ### 2. Cross-Compilation
 
