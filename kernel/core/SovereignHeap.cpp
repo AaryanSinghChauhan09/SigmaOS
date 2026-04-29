@@ -29,10 +29,13 @@ extern "C" void* sigma_malloc(sigma_size_t size) {
     
     if (size == 0) return SIGMA_NULL;
     
+    // Add space for canary
+    sigma_size_t total_needed = size + 4;
+    
     // Find the next power of two
-    sigma_size_t alloc_size = SIGMA_MIN_ALLOC_SIZE;
+    sigma_size_t alloc_size = 16; // Simulated min size
     sigma_u8 order = 0;
-    while (alloc_size < size && order < SIGMA_MAX_BUDDY_ORDER) {
+    while (alloc_size < total_needed && order < 16) {
         alloc_size <<= 1;
         order++;
     }
@@ -48,11 +51,26 @@ extern "C" void* sigma_malloc(sigma_size_t size) {
     
     void* ptr = (void*)((sigma_u8*)heap_base + offset);
     offset += alloc_size;
+
+    // Poisoning and Canary
+    sigma_u32* canary = (sigma_u32*)ptr;
+    *canary = 0xDEADC0DE;
     
-    return ptr;
+    void* user_ptr = (void*)((sigma_u8*)ptr + 4);
+    sigma_memset(user_ptr, 0, size); // Poison with zero
+    
+    return user_ptr;
 }
 
 extern "C" void sigma_free(void* ptr) {
-    // In a full IBA implementation, this would merge free blocks.
-    sigma_printf("[HEAP] IBA: Block released to silicon pool: %p\n", ptr);
+    if (!ptr) return;
+    
+    // Verify canary
+    sigma_u32* canary = (sigma_u32*)((sigma_u8*)ptr - 4);
+    if (*canary != 0xDEADC0DE) {
+        sigma_log("[HEAP] [SECURITY] Buffer overflow detected! Memory corruption at canary.");
+        // Engagement of Sovereign Recover would go here
+    } else {
+        sigma_printf("[HEAP] IBA: Block released to silicon pool: %p\n", ptr);
+    }
 }
