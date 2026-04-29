@@ -1,6 +1,7 @@
 #include "sigma_types.h"
 #include "sigma_hal.h"
 #include "sigma_libc.h"
+#include "sigma_neural.h"
 
 /**
  * SigmaOS Sovereign Neural Hardware Acceleration
@@ -8,12 +9,7 @@
  * ZERO-DEPENDENCY: Silicon-native tensor orchestration.
  */
 
-typedef struct {
-    uint32_t ops_per_sec;
-    bool npu_engaged;
-} neural_state_t;
-
-static neural_state_t SovereignNeuralState = {0};
+static sigma_neural_state_t SovereignNeuralState = {0};
 
 extern "C" void neural_init() {
     sigma_log("[NEURAL] Initializing Neural Hardware Acceleration Shard...");

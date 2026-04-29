@@ -1,11 +1,3 @@
-/*
- * =========================================================================
- * Σ SIGMAOS: SOVEREIGN SYSTEM RECOVERY (S-RECOVER)
- * =========================================================================
- * Mission: Self-healing shard restoration and automated lattice recovery.
- * =========================================================================
- */
-
 #ifndef SIGMA_RECOVER_H
 #define SIGMA_RECOVER_H
 
@@ -16,11 +8,16 @@ extern "C" {
 #endif
 
 typedef enum {
-    SIGMA_RECOVER_HEALTHY,
-    SIGMA_RECOVER_HEALING,
-    SIGMA_RECOVER_FAILSAFE,
-    SIGMA_RECOVER_CRITICAL
+    SIGMA_RECOVER_HEALTHY = 0,
+    SIGMA_RECOVER_HEALING = 1,
+    SIGMA_RECOVER_CRITICAL = 2
 } sigma_recovery_state_t;
+
+typedef struct {
+    uint32_t shard_id;
+    uint32_t heal_count;
+    bool permanent_failure;
+} sigma_recovery_record_t;
 
 /* --- Recovery Primitives --- */
 void recover_init(void);
