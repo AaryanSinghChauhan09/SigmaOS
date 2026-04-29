@@ -28,8 +28,8 @@ extern "C" void lazyload_init() {
 }
 
 extern "C" void lazyload_register_service(uint32_t shard_id, sigma_trigger_type_t trigger) {
-    if (dsi_count < 32) {
-        dsi_table[dsi_count++] = {shard_id, trigger, false};
+    if (SovereignLazyLoadManager.dsi_count < 32) {
+        SovereignLazyLoadManager.dsi_table[SovereignLazyLoadManager.dsi_count++] = {shard_id, trigger, false};
         sigma_printf("[LAZYLOAD] DSI: Service Shard S%02d registered for trigger %d.\n", 
                      shard_id, (int)trigger);
     }
@@ -41,10 +41,10 @@ extern "C" void lazyload_trigger_event(sigma_trigger_type_t trigger, uint32_t co
     
     sigma_printf("[LAZYLOAD] DSI: Event Trigger %d fired on context %d.\n", (int)trigger, context_id);
     
-    for (uint32_t i = 0; i < dsi_count; i++) {
-        if (dsi_table[i].trigger == trigger && !dsi_table[i].is_ignited) {
-            sigma_printf("[LAZYLOAD] DSI: Hot-loading Service Shard S%02d...\n", dsi_table[i].shard_id);
-            dsi_table[i].is_ignited = true;
+    for (uint32_t i = 0; i < SovereignLazyLoadManager.dsi_count; i++) {
+        if (SovereignLazyLoadManager.dsi_table[i].trigger == trigger && !SovereignLazyLoadManager.dsi_table[i].is_ignited) {
+            sigma_printf("[LAZYLOAD] DSI: Hot-loading Service Shard S%02d...\n", SovereignLazyLoadManager.dsi_table[i].shard_id);
+            SovereignLazyLoadManager.dsi_table[i].is_ignited = true;
         }
     }
     

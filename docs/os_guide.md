@@ -8,7 +8,6 @@ Welcome to the definitive guide to **SigmaOS Sovereign Zenith**. This document s
 
 SigmaOS provides a premium, industrial-grade user experience that rivals or exceeds modern Linux distributions like Ubuntu.
 
-
 - **Glassmorphic UI**: High-fidelity, translucent dashboard with hardware-accelerated animations.
 - **Window Management**: Fully functional minimize, maximize, and close controls for all sovereign shards.
 - **Memory Protection**: Hardware-enforced **Paging** and isolation (Ring 3 ready).
@@ -35,14 +34,12 @@ SigmaOS follows the **Run-Only-What-is-Necessary** (ROWN) principle. Every syste
 In SigmaOS, everything is a shard. The **Sovereign VFS** abstracts hardware devices and storage nodes into a unified interface:
 
 
-- **Unified Access**: Interact with `keyboard`, `disk`, and `network` using the same `read/write` primitives.
-- **Hardware Agnostic**: Drivers register themselves as VFS nodes, allowing for hot-swappable hardware support.
+- **Unified Access**: Interact with `keyboard`, `disk`, and `network` using the same `read/write` primitives.- **Hardware Agnostic**: Drivers register themselves as VFS nodes, allowing for hot-swappable hardware support.
 
 
 ### 1.3 Industrial Build Orchestration
 
 The SigmaOS build system is now modular and recursive:
-
 
 - **Modular Compilation**: Drivers, File Systems, and Kernel Core are compiled as independent object shards.
 - **Strict Compliance**: The build pipeline enforces Multiboot-2 and x86_64 industrial standards.
@@ -86,9 +83,9 @@ SigmaOS is the first OS to integrate the law into the kernel.
 
 Designed for **100% Keyboard Sovereignty**.
 
--   **Shard Switching**: `Alt+N` (Next), `Alt+P` (Prev).
--   **Navigation**: `Vim`-style keybindings (`:w`, `:q`, `:wq`).
--   **Distributed Compute**: `mesh-sync` offloads tasks to peer SigmaOS devices via the Molt-Lattice protocol.
+- **Shard Switching**: `Alt+N` (Next), `Alt+P` (Prev).
+- **Navigation**: `Vim`-style keybindings (`:w`, `:q`, `:wq`).
+- **Distributed Compute**: `mesh-sync` offloads tasks to peer SigmaOS devices via the Molt-Lattice protocol.
 
 ---
 
