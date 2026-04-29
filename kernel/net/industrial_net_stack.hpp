@@ -1,6 +1,8 @@
 #ifndef SOVEREIGN_NET_STACK_HPP
 #define SOVEREIGN_NET_STACK_HPP
 
+#include "../../include/SovereignLibC.h"
+
 #include "../../include/sigma_types.h"
 #include "../../include/SigmaOOP.hpp"
 

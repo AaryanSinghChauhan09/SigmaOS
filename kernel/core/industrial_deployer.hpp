@@ -1,6 +1,8 @@
 #ifndef SOVEREIGN_DEPLOYER_HPP
 #define SOVEREIGN_DEPLOYER_HPP
 
+#include "../../include/SovereignLibC.h"
+
 #include "../../include/sigma_types.h"
 #include "../../include/SigmaOOP.hpp"
 

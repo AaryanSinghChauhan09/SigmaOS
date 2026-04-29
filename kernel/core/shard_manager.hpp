@@ -1,6 +1,8 @@
 #ifndef SHARD_MANAGER_HPP
 #define SHARD_MANAGER_HPP
 
+#include "../../include/SovereignLibC.h"
+
 #include "../../include/sigma_types.h"
 #include "../../include/SigmaOOP.hpp"
 

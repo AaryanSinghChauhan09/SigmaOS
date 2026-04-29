@@ -1,6 +1,8 @@
 #ifndef SOVEREIGN_NEURAL_ENGINE_HPP
 #define SOVEREIGN_NEURAL_ENGINE_HPP
 
+#include "../../include/SovereignLibC.h"
+
 #include "../../include/sigma_types.h"
 #include "../../include/SigmaOOP.hpp"
 

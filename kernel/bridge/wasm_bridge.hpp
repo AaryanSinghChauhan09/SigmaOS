@@ -1,6 +1,8 @@
 #ifndef WASM_BRIDGE_HPP
 #define WASM_BRIDGE_HPP
 
+#include "../../include/SovereignLibC.h"
+
 #include "../../include/sigma_types.h"
 #include "../../include/SigmaOOP.hpp"
 

@@ -1,6 +1,8 @@
 #ifndef SOVEREIGN_COMPRESSION_HPP
 #define SOVEREIGN_COMPRESSION_HPP
 
+#include "../../include/SovereignLibC.h"
+
 #include "../../include/sigma_types.h"
 #include "../../include/SigmaOOP.hpp"
 

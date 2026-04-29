@@ -1,6 +1,8 @@
 #ifndef SECURITY_FABRIC_HPP
 #define SECURITY_FABRIC_HPP
 
+#include "../../../include/SovereignLibC.h"
+
 #include "../../include/sigma_types.h"
 #include "../../include/SigmaOOP.hpp"
 

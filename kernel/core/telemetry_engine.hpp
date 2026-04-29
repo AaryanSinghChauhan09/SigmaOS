@@ -1,6 +1,8 @@
 #ifndef TELEMETRY_ENGINE_HPP
 #define TELEMETRY_ENGINE_HPP
 
+#include "../../include/SovereignLibC.h"
+
 #include "../../include/sigma_types.h"
 #include "../../include/SigmaOOP.hpp"
 

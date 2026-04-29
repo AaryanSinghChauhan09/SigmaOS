@@ -1,6 +1,8 @@
 #ifndef ORCHESTRATOR_UI_HPP
 #define ORCHESTRATOR_UI_HPP
 
+#include "../../include/SovereignLibC.h"
+
 #include "../../include/sigma_types.h"
 #include "../../include/SigmaOOP.hpp"
 
