@@ -20,16 +20,21 @@ extern "C" void log_emit(uint32_t severity, const char* message) {
     // WFCSL (Wait-Free Circular Shard Logging) Algorithm
     // Uses atomic pointer increments to allow non-blocking log emission.
     
-    uint32_t current_ptr = write_ptr;
+    // Atomically increment and fetch write pointer
+    uint32_t current_ptr = __atomic_fetch_add(&write_ptr, 1, __ATOMIC_SEQ_CST);
     sigma_log_entry_t* entry = &circular_buffer[current_ptr % LOG_BUFFER_SIZE];
     
     entry->timestamp = 0; // Simulated timestamp
     entry->severity = severity;
     sigma_hardened_strcpy(entry->message, message, 128);
     
-    write_ptr++;
-    
-    sigma_printf("[LOG] [%d] %s\n", severity, message);
+    // Tiered display logic
+    const char* tag = "INFO";
+    if (severity >= 3) tag = "CRITICAL";
+    else if (severity == 2) tag = "WARN";
+    else if (severity == 0) tag = "DEBUG";
+
+    sigma_printf("[LOG] [%s] %s\n", tag, message);
 }
 
 extern "C" void log_dump_lattice() {
