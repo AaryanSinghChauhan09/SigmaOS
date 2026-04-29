@@ -44,10 +44,11 @@ SigmaOS is engineered using a philosophy deeply inspired by robust Linux distrib
 *   **Config-as-Code (NixOS-inspired):** Define your SigmaOS setup declaratively in a config file for highly reproducible environments.
 *   **Rolling vs. Stable Branches (Arch-inspired):** Users can opt into a "stable" branch for everyday workflow reliability, or a "rolling" branch for bleeding-edge module updates.
 *   **Hardware Auto-Probe (Manjaro MHWD-inspired):** Intelligent silicon detection and driver matching during the boot lattice phase.
-*   **Native Paradigm Switching (Zorin OS-inspired):** The **Sovereign Layout Manager** allows the Zenith interface to morph between Windows, Mac, and Linux-like paradigms natively.
+*   **Memory Deduplication (Linux KSM-inspired):** The **Sovereign KSM** engine merges identical memory shards, reducing silicon pressure by up to 15%.
+*   **Native Paradigm Switching (Zorin OS-inspired):** Morph between Windows, Mac, and Linux-like paradigms natively.
 *   **Enterprise Integrity (RHEL/CentOS-inspired):** Rigorous shard signing and master signature verification.
-*   **Minimalist Service Management (Void Linux-inspired):** The **Sovereign Runit** layer provides fast, simple, and dependency-free shard lifecycle supervision.
-*   **Amnesic Memory (Tails-inspired):** Optional "Phantom Mode" that wipes all memory artifacts upon session termination.
+*   **Minimalist Service Management (Void Linux-inspired):** Fast, simple, and dependency-free shard lifecycle supervision.
+*   **Amnesic Memory (Tails-inspired):** Zero-artifact memory wiping upon session termination.
 *   **Isolated Sandboxing (Qubes-inspired):** Every shard execution is sandboxed at the silicon level.
 *   **Silicon Performance Tuning (Clear Linux-inspired):** Automated optimization for detected AVX-512 and AMX instruction sets.
 *   **Gaming Optimization (SteamOS-inspired):** Native Gamescope integration and prioritized resource allocation.
