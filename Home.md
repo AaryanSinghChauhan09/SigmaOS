@@ -64,19 +64,19 @@ git clone https://github.com/AaryanSinghChauhan09/SigmaOS.git -b main
 cd SigmaOS
 ```
 
-2. Build the modularized kernel:
+1. Build the modularized kernel:
 
 ```bash
 make all
 ```
 
-3. Generate the 600-shard Sovereign ISO:
+1. Generate the 600-shard Sovereign ISO:
 
 ```bash
 make iso
 ```
 
-4. Flash to a USB drive or boot in QEMU.
+1. Flash to a USB drive or boot in QEMU.
 
 ### Web Engine (Simulated Mode)
 
@@ -86,7 +86,7 @@ make iso
 make web-engine
 ```
 
-2. Launch the local portal:
+1. Launch the local portal:
 
 ```bash
 ./sigma_web_engine
@@ -102,8 +102,8 @@ make web-engine
 make kernel
 ```
 
-4. Launch the **Zenith Dashboard** via `index.html` in the root.
-5. Use the **Sovereign Shard Builder** to create new suites.
+1. Launch the **Zenith Dashboard** via `index.html` in the root.
+1. Use the **Sovereign Shard Builder** to create new suites.
 
 ---
 

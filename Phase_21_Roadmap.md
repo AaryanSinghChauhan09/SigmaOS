@@ -44,6 +44,7 @@ Cryptographic Isolation Boundaries (CIB) enforced at the micro-shard level.
 | `audit_sentinel.cpp` | `kernel/shards/` | Real-time legal and security audit |
 
 ## Impact
+
 - **Autonomous Ubiquity**: SigmaOS can now deploy itself across heterogeneous hardware clusters.
 - **Cognitive Symmetry**: The OS finally understands the user's emotional and mental state.
 - **Hardened Sovereignty**: 100% isolation between critical system shards.
