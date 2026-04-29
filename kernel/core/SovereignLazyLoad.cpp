@@ -12,9 +12,21 @@ extern "C" void lazyload_init() {
     sigma_log("[LAZYLOAD] Initializing Sovereign Lazy-Load Activator (DSI Algorithm)...");
 }
 
+typedef struct {
+    uint32_t shard_id;
+    sigma_trigger_type_t trigger;
+    bool is_ignited;
+} dsi_registration_t;
+
+static dsi_registration_t dsi_table[32];
+static uint32_t dsi_count = 0;
+
 extern "C" void lazyload_register_service(uint32_t shard_id, sigma_trigger_type_t trigger) {
-    sigma_printf("[LAZYLOAD] DSI: Service Shard S%02d registered for deferred trigger %d.\n", 
-                 shard_id, (int)trigger);
+    if (dsi_count < 32) {
+        dsi_table[dsi_count++] = {shard_id, trigger, false};
+        sigma_printf("[LAZYLOAD] DSI: Service Shard S%02d registered for trigger %d.\n", 
+                     shard_id, (int)trigger);
+    }
 }
 
 extern "C" void lazyload_trigger_event(sigma_trigger_type_t trigger, uint32_t context_id) {
@@ -22,6 +34,13 @@ extern "C" void lazyload_trigger_event(sigma_trigger_type_t trigger, uint32_t co
     // Instantly maps the required service into memory only when its specific event fires.
     
     sigma_printf("[LAZYLOAD] DSI: Event Trigger %d fired on context %d.\n", (int)trigger, context_id);
-    sigma_log("[LAZYLOAD] DSI: Hot-loading required service shards...");
+    
+    for (uint32_t i = 0; i < dsi_count; i++) {
+        if (dsi_table[i].trigger == trigger && !dsi_table[i].is_ignited) {
+            sigma_printf("[LAZYLOAD] DSI: Hot-loading Service Shard S%02d...\n", dsi_table[i].shard_id);
+            dsi_table[i].is_ignited = true;
+        }
+    }
+    
     sigma_log("[LAZYLOAD] DSI: Services ignited. Routing traffic...");
 }
