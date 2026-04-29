@@ -1,5 +1,6 @@
-
+#include "sigma_types.h"
 #include "sigma_hal.h"
+#include "sigma_nvme.h"
 
 
 /**
@@ -7,13 +8,7 @@
  * High-performance, zero-copy block storage interface.
  */
 
-typedef struct {
-    uint64_t base_addr;
-    uint32_t irq;
-    bool initialized;
-} nvme_device_t;
-
-static nvme_device_t master_nvme;
+static sigma_nvme_device_t master_nvme;
 
 extern "C" void nvme_init() {
     sigma_log("[NVMe] Initializing Sovereign Storage Controller...");

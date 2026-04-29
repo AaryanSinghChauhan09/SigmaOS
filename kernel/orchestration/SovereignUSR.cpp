@@ -1,6 +1,7 @@
 #include "sigma_types.h"
 #include "sigma_hal.h"
 #include "sigma_libc.h"
+#include "sigma_usr.h"
 
 /**
  * SigmaOS Sovereign Unified Shard Registry (USR)
@@ -8,15 +9,8 @@
  * Inspired by systemctl / apt-get / dbus.
  */
 
-typedef struct {
-    uint32_t shard_id;
-    char name[64];
-    bool is_active;
-    uint32_t quantum_key; // For amnesic-protected discovery
-} usr_entry_t;
-
 static struct {
-    usr_entry_t registry[512];
+    sigma_usr_entry_t registry[512];
     uint32_t count;
 } SovereignUSRManager = {
     .count = 0

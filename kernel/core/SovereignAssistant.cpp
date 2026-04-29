@@ -1,5 +1,6 @@
-
+#include "sigma_types.h"
 #include "sigma_hal.h"
+#include "sigma_assistant.h"
 
 
 /**
@@ -8,13 +9,7 @@
  * Inspired by Deepin Intelligent Assistant.
  */
 
-typedef struct {
-    char user_name[32];
-    bool voice_active;
-    uint32_t intelligence_level;
-} assistant_config_t;
-
-static assistant_config_t sovereign_assistant;
+static sigma_assistant_config_t sovereign_assistant;
 
 extern "C" void assistant_init() {
     sigma_log("[ASSISTANT] Initializing Sovereign Intelligent Lattice Assistant (Deepin Parity)...");
