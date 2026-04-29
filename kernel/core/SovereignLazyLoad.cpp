@@ -9,18 +9,23 @@
  * ZERO-DEPENDENCY: Strictly bare-metal event-driven orchestration.
  */
 
-extern "C" void lazyload_init() {
-    sigma_log("[LAZYLOAD] Initializing Sovereign Lazy-Load Activator (DSI Algorithm)...");
-}
-
 typedef struct {
     uint32_t shard_id;
     sigma_trigger_type_t trigger;
     bool is_ignited;
 } dsi_registration_t;
 
-static dsi_registration_t dsi_table[32];
-static uint32_t dsi_count = 0;
+/* --- Sovereign LazyLoad Manager (OOPS Isolation) --- */
+static struct {
+    dsi_registration_t dsi_table[32];
+    uint32_t dsi_count;
+} SovereignLazyLoadManager = {
+    .dsi_count = 0
+};
+
+extern "C" void lazyload_init() {
+    sigma_log("[LAZYLOAD] Initializing Sovereign Lazy-Load Activator (OOPS Isolation)...");
+}
 
 extern "C" void lazyload_register_service(uint32_t shard_id, sigma_trigger_type_t trigger) {
     if (dsi_count < 32) {

@@ -1,8 +1,6 @@
-#include "Lattice.h"
 #include "sigma_panicrecov.h"
 #include "sigma_hal.h"
 #include "sigma_rollback.h"
-#include "sigma_diag.h"
 
 /**
  * SigmaOS Sovereign Panic Recovery
@@ -18,6 +16,7 @@ extern "C" void panicrecov_handle_panic(uint32_t fault_code, const void* registe
     // RSR (Resilient State Resurrection) Algorithm
     // Captures full CPU context and attempts graceful recovery before cold reboot.
     
+    SovereignRecoveryManager.lattice_state = (sigma_recovery_state_t)SIGMA_RECOVER_CRITICAL;
     sigma_printf("[PANICRECOV] RSR: !!! KERNEL PANIC INTERCEPTED (Fault: 0x%08X) !!!\n", fault_code);
     sigma_log("[PANICRECOV] RSR: Capturing full register state to sovereign diagnostic log...");
     

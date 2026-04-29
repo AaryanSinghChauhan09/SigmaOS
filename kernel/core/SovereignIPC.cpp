@@ -16,45 +16,48 @@ typedef struct {
     uint32_t payload[8];
 } sigma_ipc_msg_t;
 
-#define IPC_QUEUE_SIZE 256
-static sigma_ipc_msg_t ipc_queue[IPC_QUEUE_SIZE];
-static uint32_t head = 0;
-static uint32_t tail = 0;
+/* --- Sovereign IPC Manager (OOPS Isolation) --- */
+static struct {
+    sigma_ipc_msg_t queue[256];
+    uint32_t head;
+    uint32_t tail;
+    uint32_t queue_size;
+} SovereignIPCManager = {
+    .head = 0,
+    .tail = 0,
+    .queue_size = 256
+};
 
 extern "C" void ipc_init() {
-    sigma_log("[IPC] Initializing Optimized Sovereign Communication Lattice (WFAE Algorithm)...");
+    sigma_log("[IPC] Initializing Sovereign Communication Lattice (OOPS Isolation)...");
 }
 
 extern "C" bool ipc_send_optimized(uint32_t target, uint32_t type, uint32_t* data) {
-    // WFAE (Wait-Free Atomic Exchange) Algorithm
-    // Uses atomic head/tail increments to avoid mutexes/spins.
+    uint32_t current_head = SovereignIPCManager.head;
+    uint32_t next_head = (current_head + 1) % SovereignIPCManager.queue_size;
     
-    uint32_t current_head = head;
-    uint32_t next_head = (current_head + 1) % IPC_QUEUE_SIZE;
-    
-    if (next_head == tail) {
-        sigma_log("[IPC] [WARNING] WFAE: Queue saturation. Message dropped.");
+    if (next_head == SovereignIPCManager.tail) {
+        sigma_log("[IPC] [WARNING] WFAE: Queue saturation.");
         return SIGMA_FALSE;
     }
     
-    sigma_ipc_msg_t* msg = &ipc_queue[current_head];
+    sigma_ipc_msg_t* msg = &SovereignIPCManager.queue[current_head];
     msg->target_shard = target;
     msg->message_type = type;
     for(int i=0; i<8; i++) msg->payload[i] = data[i];
     
-    // Atomic update using GCC built-ins for bare-metal safety
-    __atomic_store_n(&head, next_head, __ATOMIC_SEQ_CST);
+    __atomic_store_n(&SovereignIPCManager.head, next_head, __ATOMIC_SEQ_CST);
     
-    sigma_printf("[IPC] WFAE: Shard -> S%02d (Type: %08X) DISPATCHED.\n", target, type);
+    sigma_printf("[IPC] WFAE: Message -> S%02d dispatched.\n", target);
     return SIGMA_TRUE;
 }
 
 extern "C" bool ipc_receive_optimized(sigma_ipc_msg_t* out_msg) {
-    if (head == tail) return SIGMA_FALSE;
+    if (SovereignIPCManager.head == SovereignIPCManager.tail) return SIGMA_FALSE;
     
-    *out_msg = ipc_queue[tail];
-    uint32_t next_tail = (tail + 1) % IPC_QUEUE_SIZE;
-    __atomic_store_n(&tail, next_tail, __ATOMIC_SEQ_CST);
+    *out_msg = SovereignIPCManager.queue[SovereignIPCManager.tail];
+    uint32_t next_tail = (SovereignIPCManager.tail + 1) % SovereignIPCManager.queue_size;
+    __atomic_store_n(&SovereignIPCManager.tail, next_tail, __ATOMIC_SEQ_CST);
     
     return SIGMA_TRUE;
 }

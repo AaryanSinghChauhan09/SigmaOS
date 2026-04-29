@@ -6,8 +6,8 @@ Welcome to the SigmaOS debugging guide! Since SigmaOS targets bare-metal executi
 
 Memory safety is a core priority. When compiling the kernel or individual shards for testing on a host OS (e.g., Linux/macOS), we enforce AddressSanitizer and UndefinedBehaviorSanitizer.
 
-- **Enable via Make:** Run `make DEBUG=1 SANITIZE=1`. This appends `-fsanitize=address,undefined -g -O0` to the compilation flags.
-- **Interpreting output:** If the kernel panics or crashes, ASAN will output a detailed memory trace to stdout/stderr.
+- [Enable via Make]: Run `make DEBUG=1 SANITIZE=1`. This appends `-fsanitize=address,undefined -g -O0` to the compilation flags.
+- [Interpreting output]: If the kernel panics or crashes, ASAN will output a detailed memory trace to stdout/stderr.
 
 ## 2. Using the Shard Logger
 

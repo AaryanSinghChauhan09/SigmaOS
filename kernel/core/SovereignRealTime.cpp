@@ -9,18 +9,25 @@
  * ZERO-DEPENDENCY: Strictly bare-metal deterministic execution.
  */
 
+/* --- Sovereign Real-Time Manager (OOPS Isolation) --- */
+static struct {
+    sigma_realtime_task_t task_queue[16];
+    uint32_t active_tasks;
+} SovereignRealTimeManager = {
+    .active_tasks = 0
+};
+
 extern "C" void realtime_init() {
-    sigma_log("[REALTIME] Initializing Sovereign Real-Time Core (EDFC Algorithm)...");
+    sigma_log("[REALTIME] Initializing Sovereign Real-Time Core (OOPS Isolation)...");
 }
 
 extern "C" bool realtime_schedule_task(const sigma_realtime_task_t* task, void (*task_func)(void)) {
-    // EDFC (Earliest-Deadline-First Critical) Algorithm
-    // Schedules tasks directly to the highest priority silicon ring.
+    if (SovereignRealTimeManager.active_tasks >= 16) return false;
     
-    sigma_printf("[REALTIME] EDFC: Scheduling Task %d with %d us deadline (Priority: %d)...\n", 
-                 task->task_id, task->deadline_us, task->priority);
+    SovereignRealTimeManager.task_queue[SovereignRealTimeManager.active_tasks++] = *task;
+    sigma_printf("[REALTIME] EDFC: Scheduled Task %d (Priority: %d).\n", 
+                 task->task_id, task->priority);
                  
-    sigma_log("[REALTIME] EDFC: Task registered to Real-Time Scheduler Queue.");
     return true;
 }
 

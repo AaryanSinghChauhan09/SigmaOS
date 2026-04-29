@@ -1,7 +1,5 @@
-#include "Lattice.h"
-#include "sigma_hal.h"
-#include "sigma_libc.h"
 #include "sigma_proc.h"
+#include "sigma_hal.h"
 
 /**
  * SigmaOS Sovereign Process Manager
@@ -60,7 +58,7 @@ extern "C" void proc_yield() {
         }
     }
 
-    sigma_process_t* next = SIGMA_NULL;
+    sigma_process_t* next = (sigma_process_t*)SIGMA_NULL;
     uint32_t highest_priority = 0xFFFFFFFF;
     
     for (uint32_t i = 0; i < SovereignScheduler.active_count; i++) {
@@ -73,13 +71,13 @@ extern "C" void proc_yield() {
     
     if (next) {
         sigma_printf("[PROC] PATS Context Switch: PID %d -> PID %d (%s)\n", 
-                     SovereignScheduler.current_pid, next->pid, next->name);
+                     (int)SovereignScheduler.current_pid, (int)next->pid, next->name);
         SovereignScheduler.current_pid = next->pid;
         next->state = SIGMA_PROC_RUNNING;
     }
 }
 
 extern "C" sigma_process_t* proc_get_current() {
-    if (SovereignScheduler.current_pid == 0) return SIGMA_NULL;
+    if (SovereignScheduler.current_pid == 0) return (sigma_process_t*)SIGMA_NULL;
     return &SovereignScheduler.table[SovereignScheduler.current_pid - 1];
 }

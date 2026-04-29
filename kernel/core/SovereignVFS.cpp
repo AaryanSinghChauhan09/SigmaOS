@@ -1,7 +1,5 @@
-#include "Lattice.h"
-#include "sigma_hal.h"
-#include "sigma_libc.h"
 #include "sigma_vfs.h"
+#include "sigma_hal.h"
 
 /**
  * SigmaOS Sovereign VFS Implementation
@@ -55,5 +53,5 @@ extern "C" sigma_vnode_t* vfs_lookup(const char* path) {
     }
     
     sigma_printf("[VFS] Path NOT FOUND: %s\n", path);
-    return SIGMA_NULL;
+    return (sigma_vnode_t*)SIGMA_NULL;
 }
