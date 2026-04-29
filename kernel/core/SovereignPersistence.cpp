@@ -1,6 +1,7 @@
 #include "sigma_types.h"
 #include "sigma_hal.h"
 #include "sigma_libc.h"
+#include "sigma_persistence.h"
 
 /**
  * SigmaOS Sovereign Decentralized Persistence
@@ -8,14 +9,8 @@
  * Uses decentralized protocols (Arweave/IPFS inspired) for state integrity.
  */
 
-typedef struct {
-    uint32_t state_id;
-    uint8_t state_hash[32];
-    bool is_verified;
-} persistent_state_t;
-
 static struct {
-    persistent_state_t lattice_state[128];
+    sigma_persistent_state_t lattice_state[128];
     uint32_t active_shards;
 } SovereignPersistenceManager = {
     .active_shards = 0
