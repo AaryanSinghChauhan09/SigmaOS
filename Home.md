@@ -8,13 +8,12 @@ SigmaOS is a next-generation, industrial-grade operating system designed for spe
 SigmaOS aims to be the fastest and most secure platform for browser-centric computing, blending the purity of a 33-suite Sovereign Lattice with the flexibility of a Chromium-native ecosystem.
 
 ## 📖 Wiki Contents
-- **[Shard Index](AUTO_SOVEREIGN_WIKI.md)**: A complete technical breakdown of all 2,191 shards.
-- **Getting Started**:
-  - [Installation Guide](#installation-guide)
-  - [Developer Setup](#developer-setup)
+- **[Shard Index](AUTO_SOVEREIGN_WIKI.md)**: A complete technical breakdown of the 600 hierarchical shards.
+- **[Modular Architecture](MODULAR_ARCHITECTURE_BLUEPRINT.md)**: Details on the Core, Essential, Optional, Third-Party, and Infinite layers.
 - **Features**:
   - [Sovereign 33-Suite Lattice](AUTO_SOVEREIGN_WIKI.md)
   - [Zenith Dashboard v33.0.4](Home.md)
+  - **[600-Shard Kernel]**: Hierarchical modularization for absolute scale.
   - **[Sigma Vault]**: Centralized WASM Shard Marketplace.
   - **[Snapshot Engine]**: Declarative System Rollback (NixOS-grade).
   - **[Tiling Engine]**: Advanced Window Management (i3/Sway style).

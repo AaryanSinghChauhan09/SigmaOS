@@ -2,32 +2,30 @@
 
 SigmaOS is engineered using a philosophy deeply inspired by robust Linux distributions. Instead of a monolithic codebase, SigmaOS splits features into **Kernel**, **Essential Userland**, **Optional Plugins**, and **Third-Party Extensions**.
 
-## 1. Core Kernel (Microkernel)
+## 1. Core Shards (1-50)
 *Think of this like the Linux kernel — minimal, stable, secure.*
-*   **Task Lattice Manager:** Replaces tabs with "tasks", holding state, memory, and context.
-*   **Privacy Shield:** Tracker and ad-blocking at the execution level, hardened primitives.
-*   **Sync Engine:** Cross-device continuity abstraction.
-*   **Resource Manager:** Memory constraints, performance telemetry, and WASM sandboxing.
+*   **Shard Range:** 00 - 50.
+*   **Key Modules:** Task Lattice Manager, Privacy Shield, Sync Engine, Resource Manager.
 
-## 2. Essential Modules (Userland)
+## 2. Essential Shards (51-150)
 *Comparable to the Linux "base system" packages (e.g., coreutils).*
-*   **Workspace Manager:** Create, save, and switch visual workspace layouts.
-*   **Session Memory:** Persist scroll positions, highlights, and annotations automatically.
-*   **Focus Mode:** Distraction-free execution environments.
-*   **Sigma Package Manager:** Install/remove modules dynamically (inspired by `apt` / `pacman`).
+*   **Shard Range:** 51 - 150.
+*   **Key Modules:** Workspace Manager, Session Memory, Focus Mode, Sigma Package Manager.
 
-## 3. Optional Plugins
+## 3. Optional Shards (151-300)
 *Like Linux desktop environments (GNOME/KDE) or optional utility packages.*
-*   **Learning Tools:** Lecture Mode, Citation Collector, Learning Dashboard.
-*   **Developer Tools:** GitHub Integration, Snippet Manager, API Playground.
-*   **Data Science Tools:** Jupyter-like environments, ML model hosting.
-*   **Collaboration Tools:** Shared Workspaces, Live Co-Browsing, DOM Comment Layers.
+*   **Shard Range:** 151 - 300.
+*   **Key Modules:** Learning Tools, Developer Tools, Data Science Tools, Collaboration Tools.
 
-## 4. Third-Party Extensions
+## 4. Third-Party Shards (301-450)
 *Inspired by Linux distros' package repositories (like the AUR).*
-*   **Community Modules:** External developers build deeply integrated OS plugins.
-*   **WASM Support:** Polyglot modules written in Rust, Go, Python, C++.
-*   **Marketplace:** A curated ecosystem of tools spanning study packs, coding packs, and privacy packs.
+*   **Shard Range:** 301 - 450.
+*   **Key Modules:** Community Modules, WASM Support, Marketplace integration.
+
+## 5. Infinite Shards (451+)
+*Experimental, futuristic, and self-evolving modules.*
+*   **Shard Range:** 451 - 600+.
+*   **Key Modules:** Neural Ascension, Quantum-safe networking, Self-propagating colonization shards.
 
 ---
 
