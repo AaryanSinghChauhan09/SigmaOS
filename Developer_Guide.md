@@ -1,159 +1,227 @@
-# SigmaOS — Developer Guide
+# 🏗️ SigmaOS Developer Guide
 
-> How to write, test, and contribute atomic silicon modules to SigmaOS.
-
----
-
-## 🧬 The Atomic Module Contract
-
-Every module in SigmaOS follows one strict rule:
-
-> **One file = One function = Zero external dependencies**
-
-### ✅ What a valid atomic module looks like
-
-```c
-// SigmaOS — sigma-sys-example
-// Module: one-sentence description of what it does
-// Dependencies: NONE (or only other sigma_*.h headers)
-
-#ifndef SIGMA_EXAMPLE_H
-#define SIGMA_EXAMPLE_H
-
-// Only sigma types — never stdint, stdlib, stdio
-typedef unsigned long sigma_size_t;
-
-static inline int example_do_thing(unsigned int param) {
-    // Direct silicon logic
-    return param * 2;
-}
-
-#endif /* SIGMA_EXAMPLE_H */
-```
-
-### ❌ What is NOT allowed
-
-```c
-#include <stdlib.h>    // ❌ forbidden
-#include <stdio.h>     // ❌ forbidden
-#include <string.h>    // ❌ forbidden
-using namespace std;   // ❌ forbidden
-```
+> **The definitive guide for contributing to the SigmaOS Sovereign Lattice.**
 
 ---
 
-## 🏗️ Module Locations
-
-| Subsystem | Directory | Examples |
-|-----------|-----------|---------|
-| Kernel core | `suites/S01_Genesis/` | allocator, VMM, spinlock, scheduler |
-| Hardware drivers | `suites/S04_HAL/` | NVMe, USB HID, IRQ dispatcher |
-| Security | `suites/S08_Security/` | PQC, zero-trust, sandbox, audit |
-| IPC / Async IO | `suites/S42_RawIPC/` | ring buffer, AIO |
-| Performance | `suites/S28_PerformanceLattice/` | cache, work-stealing |
-| Package Manager | `suites/S36_SovereignPackageRegistry/` | sigma_pkg |
-| Networking | `suites/S37_SovereignWire/` | netfilter, BPF |
-| Self-Healing | `suites/S41_SiliconBoot/` | auto_rollback |
-| Core OOP | `sigmaos/core/src/atomic_*.hpp` | base interfaces |
-| CLI | `orchestrator/main.cpp` | OOP command dispatcher |
+## 📋 Table of Contents
+- [Prerequisites](#prerequisites)
+- [Quick Setup](#quick-setup)
+- [Architecture Overview](#architecture-overview)
+- [Coding Standards](#coding-standards)
+- [Creating a New Shard](#creating-a-new-shard)
+- [Security Requirements](#security-requirements)
+- [Testing Your Shard](#testing-your-shard)
+- [Submitting a Pull Request](#submitting-a-pull-request)
 
 ---
 
-## 🔧 Writing a New OOP Module (C++)
+## Prerequisites
 
-```cpp
-// sigma_my_driver.hpp
-#pragma once
-#include "atomic_sigma_oop_base.hpp"
-#include "sigma_libc.h"
-
-namespace sigma { namespace hal {
-
-class MyDriver : public sigma::core::ISigmaDriver,
-                 public sigma::core::ISigmaModule {
-private:
-    bool ready;
-public:
-    MyDriver() : ready(false) {}
-
-    void initialize() override {
-        sigma_kprint("[MyDriver] Init\n");
-        ready = true;
-    }
-    void execute()  override { /* hot path */ }
-    void shutdown() override { ready = false; }
-    int  probe_hardware() override { return 1; }
-    void enable_dma()     override { }
-};
-
-}} // namespace sigma::hal
-
-extern "C" {
-    void my_driver_run() {
-        sigma::hal::MyDriver d;
-        d.probe_hardware(); d.initialize(); d.execute(); d.shutdown();
-    }
-}
-```
+| Tool | Version | Purpose |
+|------|---------|---------|
+| GCC / G++ | 13+ | Primary kernel compiler |
+| NASM | 2.15+ | x86_64 assembly |
+| Make | 4.0+ | Build orchestration |
+| Python 3 | 3.10+ | Lattice coverage tools |
+| Git | 2.40+ | Version control |
+| Clang-Tidy | 16+ | Static analysis |
+| CppCheck | 2.10+ | Security audit |
 
 ---
 
-## 🧪 Testing Your Module Locally
+## Quick Setup
 
 ```bash
+# 1. Clone the repository
+git clone https://github.com/AaryanSinghChauhan09/SigmaOS.git -b main
+cd SigmaOS
 
+# 2. Install toolchain (Ubuntu/Debian)
+sudo apt-get install -y gcc g++ nasm make python3 clang-tidy cppcheck
 
-# 1. Build the orchestrator
+# 3. Build the sovereign kernel
+make -j$(nproc)
 
+# 4. Run the lattice coverage report
+python3 scripts/lattice_coverage.py
 
-g++ -std=c++20 orchestrator/main.cpp -o s-cli
-
-# 2. Run subsystem tests
-
-
-./s-cli test --subsystem genesis
-./s-cli test --subsystem hal
-./s-cli test --subsystem security
-
-# 3. Run full benchmark
-
-
-./s-cli benchmark --run-all
-
-# 4. Check sovereignty (no forbidden imports)
-
-
-grep -r "#include <stdlib.h>" suites/S01_Genesis/ sigmaos/core/src/atomic_*
-
-
-# Should return nothing
-
-# 5. Count your new modules
-
-
-ls sigmaos/core/src/atomic_* | wc -l
-find suites/ -name "sigma_*.h" | wc -l
+# 5. Run static analysis
+cppcheck --enable=warning,style,performance -Iinclude kernel/
 ```
 
 ---
 
-## 📋 Checklist Before Submitting
-- [ ] File is self-contained (no includes except other `sigma_*.h`)
-- [ ] Uses `sigma_size_t`, `sigma_u32` etc. — not `size_t`, `uint32_t`
-- [ ] Has a one-line module description comment at the top
-- [ ] `#ifndef` guard present
-- [ ] Function names follow `subsystem_verb_noun` pattern
-- [ ] No dynamic allocation (`new`, `malloc`) — use slab allocator
-- [ ] OOP class (if any) inherits from `ISigmaModule` or `ISigmaDriver`
-- [ ] `extern "C"` wrapper provided for C-ABI compatibility
+## Architecture Overview
+
+```
+SigmaOS Sovereign Lattice (500+ Shards)
+│
+├── kernel/
+│   ├── core/               ← Sovereign Shards (C++11, zero-dependency)
+│   │   ├── SovereignSched.cpp     ← AI Scheduler (NPWO)
+│   │   ├── SovereignSecHardener.cpp ← Security Hardener (PLPE)
+│   │   ├── SovereignAllocator.cpp  ← Memory Allocator (QBMP)
+│   │   └── ...500+ shards
+│   ├── ui/                 ← Universal UI Layer (DFO algorithm)
+│   └── drivers/            ← Silicon-native hardware drivers
+│
+├── include/                ← Shard header files (sigma_*.h)
+│
+├── shards/                 ← Optional/third-party shard packages
+│
+├── scripts/
+│   ├── lattice_coverage.py ← Shard count and modularity metrics
+│   └── check_modularity.py ← Zero-dependency enforcement
+│
+├── .github/workflows/
+│   └── sigma_ci.yml        ← Full 6-stage CI/CD pipeline
+│
+└── SigmaOS.wiki/           ← Documentation submodule
+```
 
 ---
 
-## 🚀 Contributing
-1. Fork the repo
-2. Create `suites/S<NN>_<Name>/sigma_<module>.h`
-3. Add a `extern "C"` wrapper for CLI integration
-4. Wire into `orchestrator/main.cpp` `TestCommand::run_subsystem_test()`
-5. Open a PR — CI will automatically audit your module
+## Coding Standards
 
+### 1. Zero-Dependency Rule ⚡
+```cpp
+// ❌ FORBIDDEN — HLL libraries
+#include <iostream>
+#include <vector>
+#include <string>
 
+// ✅ REQUIRED — Sovereign headers only
+#include <sigma_types.h>
+#include <sigma_hal.h>
+```
+
+### 2. Secure String Operations 🔒
+> All string operations MUST use the hardened wrappers from `sigma_sechardener.h`
+
+```cpp
+// ❌ UNSAFE — Triggers CWE-119
+strcpy(dest, src);
+sprintf(buf, fmt, ...);
+
+// ✅ SAFE — Bounds-enforced sovereign primitives
+sigma_hardened_strcpy(dest, src, MAX_LEN);
+sigma_hardened_snprintf(buf, MAX_LEN, fmt, ...);
+```
+
+### 3. Input Validation at Every API Boundary 🛡️
+```cpp
+// Every public function MUST validate inputs (CWE-20 fix)
+extern "C" void my_shard_function(const void* data, uint32_t size) {
+    if (!data || size == 0) return;  // Guard clause first
+    sechardener_validate_buffer(data, size, BUFFER_CAPACITY);
+    // ... proceed with logic
+}
+```
+
+### 4. Shard Naming Convention
+| Component | Convention | Example |
+|-----------|-----------|---------|
+| Header file | `sigma_<name>.h` | `sigma_neural.h` |
+| Implementation | `Sovereign<Name>.cpp` | `SovereignNeural.cpp` |
+| Init function | `<name>_init()` | `neural_init()` |
+| Public APIs | `<name>_<verb>()` | `neural_predict()` |
+
+### 5. Documentation Block
+Every shard implementation MUST include:
+```cpp
+/**
+ * SigmaOS Sovereign <Name>
+ * Implements a <Algorithm Full Name> (<ACRONYM>) algorithm.
+ * ZERO-DEPENDENCY: Strictly bare-metal <description>.
+ */
+```
+
+---
+
+## Creating a New Shard
+
+### Step 1 — Create the header
+```bash
+touch include/sigma_myshard.h
+```
+
+```cpp
+#ifndef SIGMA_MYSHARD_H
+#define SIGMA_MYSHARD_H
+
+#include <sigma_types.h>
+
+#ifdef __cplusplus
+extern "C" {
+#endif
+
+void myshard_init(void);
+void myshard_execute(const void* input, uint32_t size);
+
+#ifdef __cplusplus
+}
+#endif
+
+#endif /* SIGMA_MYSHARD_H */
+```
+
+### Step 2 — Create the implementation
+```bash
+touch kernel/core/SovereignMyShard.cpp
+```
+
+### Step 3 — Verify the shard is detected
+```bash
+python3 scripts/lattice_coverage.py
+```
+
+### Step 4 — Run security audit
+```bash
+cppcheck --enable=warning -Iinclude kernel/core/SovereignMyShard.cpp
+```
+
+---
+
+## Security Requirements
+
+All shards **MUST** comply with the following before merging:
+
+- [ ] No `strcpy`, `sprintf`, `gets`, or `scanf` usage
+- [ ] All public APIs validate `NULL` inputs
+- [ ] No forbidden HLL includes (`<iostream>`, `<string>`, etc.)
+- [ ] Buffer sizes explicitly passed — never assumed
+- [ ] Shard applies `sechardener_apply_to_shard()` at init
+- [ ] No global mutable state unless protected by atomic ops
+
+---
+
+## Testing Your Shard
+
+```bash
+# Run the full CI suite locally
+make test
+
+# Run lattice coverage
+python3 scripts/lattice_coverage.py
+
+# Run CppCheck on your shard
+cppcheck --enable=all --suppress=missingInclude -Iinclude \
+         kernel/core/SovereignMyShard.cpp
+```
+
+---
+
+## Submitting a Pull Request
+
+1. Fork the repository
+2. Create a branch: `git checkout -b feat/s-myshard`
+3. Implement your shard following the coding standards above
+4. Run `python3 scripts/lattice_coverage.py` — verify shard count increases
+5. Push and open a PR against `main`
+6. The CI pipeline will automatically run all 6 jobs
+7. All jobs must pass ✅ before merging
+
+---
+
+*SigmaOS is sovereign. So is your contribution.*
