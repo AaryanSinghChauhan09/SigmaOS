@@ -1,4 +1,4 @@
-#include "../../include/SovereignLibC.h"
+#include "SovereignLibC.h"
 /*
  * =========================================================================
  * Î£ SIGMAOS: SOVEREIGN PERSONA MANAGER (v21.0)

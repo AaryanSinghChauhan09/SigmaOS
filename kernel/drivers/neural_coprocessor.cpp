@@ -1,5 +1,5 @@
 #include "neural_coprocessor.hpp"
-#include "../../include/SovereignLibC.h"
+#include "SovereignLibC.h"
 
 namespace SigmaOS {
 namespace Drivers {

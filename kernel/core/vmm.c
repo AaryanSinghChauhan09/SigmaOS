@@ -5,7 +5,7 @@
  * Principles: Silicon-Level Isolation & High-Half Mapping.
  * =============================================================================
  */
-#include "../../include/sigma_kernel_types.h"
+#include "sigma_kernel_types.h"
 
 static sigma_u64 page_directory[512] __attribute__((aligned(4096)));
 static sigma_u64 kernel_page_table[512] __attribute__((aligned(4096)));

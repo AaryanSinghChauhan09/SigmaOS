@@ -1,5 +1,5 @@
 #include "hardware_transpiler.hpp"
-#include "../../include/SovereignLibC.h"
+#include "SovereignLibC.h"
 
 namespace SigmaOS {
 namespace Kernel {

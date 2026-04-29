@@ -1,9 +1,9 @@
 #ifndef RDMA_SHARD_HPP
 #define RDMA_SHARD_HPP
 
-#include "../../include/SovereignLibC.h"
+#include "SovereignLibC.h"
 
-#include "../../include/SigmaOOP.hpp"
+#include "SigmaOOP.hpp"
 
 namespace SigmaOS {
 namespace Net {

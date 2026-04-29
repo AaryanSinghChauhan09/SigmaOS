@@ -1,4 +1,4 @@
-#include "../../include/SovereignLibC.h"
+#include "SovereignLibC.h"
 /*
  * =========================================================================
  * Î£ SIGMAOS: SOVEREIGN COSMIC GOVERNANCE (v1.0 - GALAXY POLICY)
@@ -7,7 +7,7 @@
  * =========================================================================
  */
 
-#include "../../include/SigmaOOP.hpp"
+#include "SigmaOOP.hpp"
 #include "userland/apps/cosmic_governance/policies.hpp"
 
 using namespace SigmaOS;

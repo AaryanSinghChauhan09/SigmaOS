@@ -5,7 +5,7 @@
  * Principles: Zero-Latency Interrupt Handling & Atomic Synchronization.
  * =============================================================================
  */
-#include "../../include/sigma_kernel_types.h"
+#include "sigma_kernel_types.h"
 
 #define KBD_QUEUE_SIZE 256
 

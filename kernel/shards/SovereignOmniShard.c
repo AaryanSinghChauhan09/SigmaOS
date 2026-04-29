@@ -8,7 +8,7 @@
  * =========================================================================
  */
 
-#include "../../include/SovereignLibC.h"
+#include "SovereignLibC.h"
 
 /* =========================================================================
  * DOMAIN: OS KERNEL & ADVANCED SCHEDULING

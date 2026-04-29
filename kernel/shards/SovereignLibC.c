@@ -7,7 +7,7 @@
  * =========================================================================
  */
 
-#include "../../include/SovereignLibC.h"
+#include "SovereignLibC.h"
 
 /* Modular implementations */
 #include "libc/sigma_io.c"

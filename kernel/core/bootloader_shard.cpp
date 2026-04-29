@@ -1,5 +1,5 @@
 #include "bootloader_shard.hpp"
-#include "../../include/SovereignLibC.h"
+#include "SovereignLibC.h"
 
 namespace SigmaOS {
 namespace Kernel {

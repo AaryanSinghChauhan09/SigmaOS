@@ -11,7 +11,7 @@
  * =============================================================================
  */
 
-#include "../../include/SovereignLibC.h"
+#include "SovereignLibC.h"
 
 #define AUTOMATION_TICK_THRESHOLD 60000 // Every 60s @ 1kHz
 

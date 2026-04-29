@@ -1,10 +1,10 @@
 #ifndef SOVEREIGN_DEBUGGER_HPP
 #define SOVEREIGN_DEBUGGER_HPP
 
-#include "../../include/SovereignLibC.h"
+#include "SovereignLibC.h"
 
-#include "../../include/sigma_types.h"
-#include "../../include/SigmaOOP.hpp"
+#include "sigma_types.h"
+#include "SigmaOOP.hpp"
 
 namespace SigmaOS {
 namespace Debug {

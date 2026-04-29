@@ -10,7 +10,7 @@
  * =========================================================================
  */
 
-#include "../../include/SovereignLibC.h"
+#include "SovereignLibC.h"
 
 /* =========================================================================
  * Zenith Interrupt Vector (struct replaces C++ struct with bool)

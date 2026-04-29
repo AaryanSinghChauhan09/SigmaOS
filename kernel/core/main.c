@@ -7,8 +7,8 @@
  * =========================================================================
  */
 
-#include "../../include/SovereignLibC.h"
-#include "../../include/sigma_types.h"
+#include "SovereignLibC.h"
+#include "sigma_types.h"
 
 // --- Subsystem Initializers ---
 extern void sigma_scheduler_init();

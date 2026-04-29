@@ -1,4 +1,4 @@
-#include "../../include/SovereignLibC.h"
+#include "SovereignLibC.h"
 /*
  * =========================================================================
  * Î£ SIGMAOS: SOVEREIGN HARDWARE AUDIT (v128.0 - ZERO-STD NATIVE)

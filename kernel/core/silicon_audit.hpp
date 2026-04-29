@@ -1,7 +1,7 @@
 #ifndef SILICON_AUDIT_HPP
 #define SILICON_AUDIT_HPP
 
-#include "../../include/SigmaOOP.hpp"
+#include "SigmaOOP.hpp"
 
 namespace SigmaOS {
 namespace Build {

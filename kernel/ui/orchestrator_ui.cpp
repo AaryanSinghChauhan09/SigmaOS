@@ -1,5 +1,5 @@
 #include "orchestrator_ui.hpp"
-#include "../../include/SovereignLibC.h"
+#include "SovereignLibC.h"
 
 namespace SigmaOS {
 namespace UI {

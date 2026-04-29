@@ -1,5 +1,5 @@
 #include "industrial_vision_engine.hpp"
-#include "../../include/SovereignLibC.h"
+#include "SovereignLibC.h"
 
 namespace SigmaOS {
 namespace AI {

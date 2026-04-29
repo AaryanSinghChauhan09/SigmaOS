@@ -1,5 +1,5 @@
 #include "industrial_energy_manager.hpp"
-#include "../../include/SovereignLibC.h"
+#include "SovereignLibC.h"
 
 namespace SigmaOS {
 namespace Power {

@@ -1,5 +1,5 @@
 #include "industrial_audio_engine.hpp"
-#include "../../include/SovereignLibC.h"
+#include "SovereignLibC.h"
 
 namespace SigmaOS {
 namespace Media {

@@ -5,7 +5,7 @@
  * Principles: Lazy Shard Activation & Hot-Swappable Silicon Services.
  * =============================================================================
  */
-#include "../../include/sigma_kernel_types.h"
+#include "sigma_kernel_types.h"
 
 extern void kprintf(const char* fmt, ...);
 

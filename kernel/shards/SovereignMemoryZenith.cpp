@@ -20,8 +20,8 @@
  * =========================================================================
  */
 
-#include "../../include/SigmaOOP.hpp"
-#include "../../include/SovereignLibC.h"
+#include "SigmaOOP.hpp"
+#include "SovereignLibC.h"
 
 namespace SigmaOS {
 namespace Kernel {

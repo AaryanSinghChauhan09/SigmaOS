@@ -13,7 +13,7 @@
  * =========================================================================
  */
 
-#include "../../include/SovereignLibC.h"
+#include "SovereignLibC.h"
 
 /* =========================================================================
  * Memory Segment Descriptor (replaces C++ struct with bool)

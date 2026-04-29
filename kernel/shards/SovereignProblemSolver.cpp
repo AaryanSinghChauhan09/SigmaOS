@@ -1,4 +1,4 @@
-#include "../../include/SovereignLibC.h"
+#include "SovereignLibC.h"
 /*
  * =========================================================================
  * Î£ SIGMAOS: SOVEREIGN PROBLEM SOLVER (v128.0 - SCHOLASTIC SOLVER)
@@ -7,7 +7,7 @@
  * =========================================================================
  */
 
-#include "../../include/SigmaOOP.hpp"
+#include "SigmaOOP.hpp"
 #include "userland/apps/scholar_zenith/solvers.hpp"
 
 using namespace SigmaOS;

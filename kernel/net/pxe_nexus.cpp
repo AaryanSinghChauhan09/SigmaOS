@@ -1,5 +1,5 @@
 #include "pxe_nexus.hpp"
-#include "../../include/SovereignLibC.h"
+#include "SovereignLibC.h"
 
 namespace SigmaOS {
 namespace Net {

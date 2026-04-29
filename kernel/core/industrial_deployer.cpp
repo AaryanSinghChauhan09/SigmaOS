@@ -1,5 +1,5 @@
 #include "industrial_deployer.hpp"
-#include "../../include/SovereignLibC.h"
+#include "SovereignLibC.h"
 
 extern "C" void gatekeeper_init();
 extern "C" void assistant_init();

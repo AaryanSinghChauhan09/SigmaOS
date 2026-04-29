@@ -12,7 +12,7 @@
  * =============================================================================
  */
 
-#include "../../include/sigma_kernel_types.h"
+#include "sigma_kernel_types.h"
 
 #define MAX_AETHER_VECTORS 512
 #define VECTOR_MAGIC       0x41455448 // "AETH"

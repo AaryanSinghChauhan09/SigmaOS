@@ -1,4 +1,4 @@
-#include "../../include/SovereignLibC.h"
+#include "SovereignLibC.h"
 /* =========================================================================
  * Σ SIGMAOS: PERSONA SHARD (v1.0 - DECLARATIVE PERSONALIZATION)
  * =========================================================================
@@ -7,7 +7,7 @@
  * =========================================================================
  */
 
-#include "../../include/SigmaOOP.hpp"
+#include "SigmaOOP.hpp"
 
 namespace SigmaOS {
 namespace Personalization {

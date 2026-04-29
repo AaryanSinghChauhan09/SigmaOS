@@ -1,5 +1,5 @@
 #include "browser_renderer.hpp"
-#include "../../include/SovereignLibC.h"
+#include "SovereignLibC.h"
 
 namespace SigmaOS {
 namespace Bridge {

@@ -1,4 +1,4 @@
-#include "../../include/SovereignLibC.h"
+#include "SovereignLibC.h"
 #include "SovereignSyncZenith.h"
 #include "SovereignDiskZenith.h"
 #include "SovereignOSBasicsZenith.h"

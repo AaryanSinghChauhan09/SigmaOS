@@ -13,19 +13,26 @@ extern "C" void biometrics_init() {
     sigma_log("[BIOMETRICS] Initializing Sovereign Biometrics Engine (CIM Algorithm)...");
 }
 
+static bool enclave_locked = true;
+
 extern "C" bool biometrics_authenticate(sigma_bio_type_t type, const void* sensor_data) {
     // CIM (Cryptographic Identity Mapping) Algorithm
     // Matches raw sensor data directly against isolated hardware secure enclaves.
     
     sigma_printf("[BIOMETRICS] CIM: Validating biometric signature type %d...\n", (int)type);
     
-    // Simulate secure match
-    sigma_log("[BIOMETRICS] CIM: Match VERIFIED. Unlocking user sovereign enclave.");
+    // Simulate secure hardware match
+    if (sensor_data != SIGMA_NULL) {
+        sigma_log("[BIOMETRICS] CIM: Match VERIFIED. Accessing Secure Enclave...");
+        enclave_locked = false;
+        
+        // Seamlessly load user persona upon login
+        persona_set_mode(PERSONA_MODE_DEVELOPER); 
+        return true;
+    }
     
-    // Seamlessly load user persona upon login
-    persona_set_mode(PERSONA_MODE_DEVELOPER); 
-    
-    return true;
+    sigma_log("[BIOMETRICS] [CRITICAL] CIM: Biometric mismatch. Enclave remains locked.");
+    return false;
 }
 
 extern "C" void biometrics_enroll(sigma_bio_type_t type, const void* sensor_data) {

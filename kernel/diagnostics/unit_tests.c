@@ -5,7 +5,7 @@
  * Principles: Shard Validation & Silicon-Native Regression Testing.
  * =============================================================================
  */
-#include "../../include/sigma_kernel_types.h"
+#include "sigma_kernel_types.h"
 
 typedef struct TestCase {
     const char* name;

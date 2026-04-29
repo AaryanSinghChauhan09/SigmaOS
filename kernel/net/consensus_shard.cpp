@@ -1,5 +1,5 @@
 #include "consensus_shard.hpp"
-#include "../../include/SovereignLibC.h"
+#include "SovereignLibC.h"
 
 namespace SigmaOS {
 namespace Net {

@@ -5,7 +5,7 @@
  * Principles: Zero-Abstract Page Orchestration.
  * =============================================================================
  */
-#include "../../include/sigma_kernel_types.h"
+#include "sigma_kernel_types.h"
 
 #define BITMAP_SIZE (1024 * 1024 / 8) /* Supports 4GB of RAM */
 

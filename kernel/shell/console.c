@@ -8,8 +8,8 @@
  * =============================================================================
  */
 
-#include "../../include/sigma_kernel_types.h"
-#include "../../include/sigma_types.h"   /* compiler built-in â€ no libc */
+#include "sigma_kernel_types.h"
+#include "sigma_types.h"   /* compiler built-in â€ no libc */
 
 /* =========================================================================
  * COM1 Port Map

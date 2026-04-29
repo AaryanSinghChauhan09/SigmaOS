@@ -1,5 +1,5 @@
 #include "industrial_registry.hpp"
-#include "../../include/SovereignLibC.h"
+#include "SovereignLibC.h"
 
 namespace SigmaOS {
 namespace Net {
