@@ -10,10 +10,14 @@ def fix_md030(directory):
                 with open(path, 'r', encoding='utf-8') as f:
                     content = f.read()
                 
-                # Fix list markers: *   or 1.   or -   to exactly 1 space
-                # Regex: ^(\s*[*1.-])\s{2,}(\S)
-                # We use re.MULTILINE
-                new_content = re.sub(r'^(\s*[*1.-]|\s*\d+\.)\s{2,}(\S)', r'\1 \2', content, flags=re.MULTILINE)
+                # Aggressive MD030 Fix: Remove ALL leading whitespace and force exactly 1 space after marker
+                # Matches: (optional spaces)(marker)(multiple spaces)(non-space)
+                # Group 1: marker (including digits.)
+                # Group 2: actual content
+                new_content = re.sub(r'^\s*([*1.-]|\d+\.)\s{2,}(\S)', r'\1 \2', content, flags=re.MULTILINE)
+                
+                # Also handle cases where there is only 1 space but leading whitespace exists
+                new_content = re.sub(r'^\s+([*1.-]|\d+\.)\s(\S)', r'\1 \2', new_content, flags=re.MULTILINE)
                 
                 if new_content != content:
                     with open(path, 'w', encoding='utf-8') as f:
