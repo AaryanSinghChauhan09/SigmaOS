@@ -41,9 +41,11 @@ SigmaOS is engineered using a philosophy deeply inspired by robust Linux distrib
 
 ### 🌟 Ultimate Distro-Level Features Absorbed
 
+*   **Automated Auto-Tiling (Pop!_OS-inspired):** The **Sovereign Tiling Engine** provides keyboard-driven, automated lattice layout management for maximum developer velocity.
+*   **Universal Shard Store (Ubuntu-inspired):** A high-fidelity, one-click installation interface for expanding the 600-shard lattice.
 *   **Config-as-Code (NixOS-inspired):** Define your SigmaOS setup declaratively in a config file.
-*   **Automated Shard Orchestration (Terraform-inspired):** The **Sovereign Orchestrator** manages automated shard deployment patterns and lattice self-healing.
-*   **Personalization Engine (KDE-inspired):** The **Sovereign Theme Engine** allows for silicon-native accent colors, background blur, and paradigm-shifting desktop layouts.
+*   **Automated Shard Orchestration (Terraform-inspired):** Automated shard deployment patterns and lattice self-healing.
+*   **Personalization Engine (KDE-inspired):** Silicon-native accent colors, background blur, and paradigm-shifting desktop layouts.
 *   **Rolling vs. Stable Branches (Arch-inspired):** Opt into stability or bleeding-edge module updates.
 *   **Hardware Auto-Probe (Manjaro MHWD-inspired):** Intelligent silicon detection and driver matching.
 *   **Memory Deduplication (Linux KSM-inspired):** Merging identical memory shards to reduce silicon pressure.
