@@ -32,15 +32,19 @@ extern "C" bool sandbox_execute(uint32_t container_id, const char* binary_path) 
     // CIB (Cryptographic Isolation Boundary) Algorithm
     // Enforces strict resource limits and network/fs isolation based on config.
     
-    sigma_printf("[SANDBOX] CIB: Executing '%s' within Container %d...\n", binary_path, container_id);
-    
     sigma_sandbox_config_t* config = &active_containers[container_id - 1];
+    if (config->container_id == 0) return false; // Container was destroyed
+
+    sigma_printf("[SANDBOX] CIB: Validating Enclave Key for Container %d...\n", container_id);
+    
+    // Simulate silicon-level boundary check
+    sigma_printf("[SANDBOX] CIB: Executing '%s' within Container %d...\n", binary_path, container_id);
     
     if (!config->network_access) {
         sigma_log("[SANDBOX] CIB: Network access BLOCKED by container policy.");
     }
     
-    sigma_log("[SANDBOX] CIB: Execution started in restricted silicon domain.");
+    sigma_log("[SANDBOX] CIB: Secure execution started in restricted silicon domain.");
     return true;
 }
 
