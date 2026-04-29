@@ -1,7 +1,7 @@
-#include "Lattice.h"
+
 #include "sigma_ide.h"
 #include "sigma_hal.h"
-#include "sigma_libc.h"
+
 
 /**
  * SigmaOS Sovereign IDE Implementation

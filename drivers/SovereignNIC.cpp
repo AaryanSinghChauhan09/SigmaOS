@@ -1,6 +1,6 @@
-#include "Lattice.h"
+
 #include "sigma_hal.h"
-#include "sigma_libc.h"
+
 
 /**
  * SigmaOS Sovereign Network Driver (Generic Intel e1000/VirtIO Stub)

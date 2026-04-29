@@ -1,8 +1,8 @@
-#include "Lattice.h"
+
 #include "sigma_modules.h"
 #include "sigma_hal.h"
-#include "sigma_mem.h"
-#include "sigma_libc.h"
+
+
 
 /**
  * SigmaOS Sovereign Module Implementation

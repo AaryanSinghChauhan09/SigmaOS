@@ -1,8 +1,8 @@
-#include "Lattice.h"
+
 #include "sigma_collab.h"
 #include "sigma_hal.h"
-#include "sigma_zeronet.h"
-#include "sigma_crypto.h"
+
+
 
 /**
  * SigmaOS Sovereign Collaborative Workspace

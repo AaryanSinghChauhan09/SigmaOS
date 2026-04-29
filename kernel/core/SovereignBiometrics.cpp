@@ -1,7 +1,7 @@
-#include "Lattice.h"
+
 #include "sigma_biometrics.h"
 #include "sigma_hal.h"
-#include "sigma_crypto.h"
+
 #include "sigma_persona.h"
 
 /**

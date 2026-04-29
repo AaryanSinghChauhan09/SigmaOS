@@ -1,6 +1,6 @@
-#include "Lattice.h"
+
 #include "sigma_aisched.h"
-#include "sigma_telemetry.h"
+
 
 /**
  * SigmaOS Sovereign AI-Optimized Scheduler

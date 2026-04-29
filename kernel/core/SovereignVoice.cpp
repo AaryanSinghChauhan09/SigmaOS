@@ -1,7 +1,7 @@
-#include "Lattice.h"
+
 #include "sigma_voice.h"
 #include "sigma_hal.h"
-#include "sigma_neural.h" // Integrates with our AI stack
+ // Integrates with our AI stack
 
 /**
  * SigmaOS Sovereign Voice Orchestrator

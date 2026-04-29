@@ -1,7 +1,7 @@
-#include "Lattice.h"
+
 #include "sigma_batteryiq.h"
 #include "sigma_hal.h"
-#include "sigma_energysched.h"
+
 
 /**
  * SigmaOS Sovereign Battery Intelligence

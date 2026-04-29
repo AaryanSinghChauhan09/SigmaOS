@@ -1,4 +1,4 @@
-#include "Lattice.h"
+
 #include "sigma_omnisense.h"
 #include "sigma_hal.h"
 #include "sigma_universal_ui.h"

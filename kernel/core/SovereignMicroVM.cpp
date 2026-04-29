@@ -1,7 +1,7 @@
-#include "Lattice.h"
+
 #include "sigma_microvm.h"
 #include "sigma_hal.h"
-#include "sigma_telemetry.h"
+
 
 /**
  * SigmaOS Sovereign MicroVM

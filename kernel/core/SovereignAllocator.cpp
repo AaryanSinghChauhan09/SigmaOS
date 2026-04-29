@@ -1,7 +1,7 @@
 #include "Lattice.h"
 #include "sigma_allocator.h"
 #include "sigma_hal.h"
-#include "sigma_telemetry.h"
+
 
 /**
  * SigmaOS Sovereign Custom Allocator

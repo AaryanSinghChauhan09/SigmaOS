@@ -1,7 +1,7 @@
-#include "Lattice.h"
+
 #include "sigma_holospace.h"
 #include "sigma_hal.h"
-#include "sigma_universal_ui.h"
+
 
 /**
  * SigmaOS Sovereign Holographic Workspace

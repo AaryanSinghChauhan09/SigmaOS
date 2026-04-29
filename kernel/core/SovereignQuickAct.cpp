@@ -1,9 +1,9 @@
-#include "Lattice.h"
+
 #include "sigma_quickact.h"
 #include "sigma_hal.h"
 #include "sigma_neuralsearch.h"
-#include "sigma_deeplink.h"
-#include "sigma_taskautomator.h"
+
+
 
 /**
  * SigmaOS Sovereign Quick Actions Bar

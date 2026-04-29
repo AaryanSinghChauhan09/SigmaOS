@@ -1,7 +1,7 @@
-#include "Lattice.h"
+
 #include "sigma_taskautomator.h"
 #include "sigma_hal.h"
-#include "sigma_neural.h"
+
 
 /**
  * SigmaOS Sovereign Task Automator

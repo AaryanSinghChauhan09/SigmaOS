@@ -1,4 +1,4 @@
-#include "Lattice.h"
+
 #include "sigma_haptic.h"
 #include "sigma_hal.h"
 

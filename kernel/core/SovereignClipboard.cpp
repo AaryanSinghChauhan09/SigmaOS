@@ -1,4 +1,4 @@
-#include "Lattice.h"
+
 #include "sigma_clipboard.h"
 #include "sigma_hal.h"
 #include "sigma_continuity.h"

@@ -1,7 +1,7 @@
-#include "Lattice.h"
+
 #include "sigma_neuralsearch.h"
 #include "sigma_hal.h"
-#include "sigma_neural.h"
+
 
 /**
  * SigmaOS Sovereign Neural Search
