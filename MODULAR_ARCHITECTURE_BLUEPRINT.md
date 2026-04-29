@@ -2,57 +2,24 @@
 
 SigmaOS is engineered using a philosophy deeply inspired by robust Linux distributions. Instead of a monolithic codebase, SigmaOS splits features into **Kernel**, **Essential Userland**, **Optional Plugins**, and **Third-Party Extensions**.
 
-## 1. Core Shards (1-50)
+## 🛡️ Sovereign Shard Lattice
 
-*Think of this like the Linux kernel — minimal, stable, secure.*
+The architecture is divided into the following modular domains:
 
-*   **Shard Range:** 00 - 50.
-*   **Key Modules:** Task Lattice Manager, Privacy Shield, Sync Engine, Resource Manager.
-
-## 2. Essential Shards (51-150)
-
-*Comparable to the Linux "base system" packages (e.g., coreutils).*
-
-*   **Shard Range:** 51 - 150.
-*   **Key Modules:** Workspace Manager, Session Memory, Focus Mode, Sigma Package Manager.
-
-## 3. Optional Shards (151-300)
-
-*Like Linux desktop environments (GNOME/KDE) or optional utility packages.*
-
-*   **Shard Range:** 151 - 300.
-*   **Key Modules:** Learning Tools, Developer Tools, Data Science Tools, Collaboration Tools.
-
-## 4. Third-Party Shards (301-450)
-
-*Inspired by Linux distros' package repositories (like the AUR).*
-
-*   **Shard Range:** 301 - 450.
-*   **Key Modules:** Community Modules, WASM Support, Marketplace integration.
-
-## 5. Infinite Shards (451+)
-
-*Experimental, futuristic, and self-evolving modules.*
-
-*   **Shard Range:** 451 - 600+.
-*   **Key Modules:** Neural Ascension, Quantum-safe networking, Self-propagating colonization shards.
+1. **[Core Shards (1-50)](shards/CORE_SHARDS.md)** - Minimal, stable, and secure kernel primitives.
+2. **[Essential Shards (51-150)](shards/ESSENTIAL_SHARDS.md)** - Base system packages and workspace management.
+3. **[Optional Shards (151-300)](shards/OPTIONAL_SHARDS.md)** - Productivity, developer, and collaboration tools.
+4. **[Third-Party Shards (301-450)](shards/THIRD_PARTY_SHARDS.md)** - Community modules and WASM support.
+5. **[Infinite Shards (451+)](shards/INFINITE_SHARDS.md)** - Futuristic, experimental, and self-evolving modules.
 
 ---
 
-### 🌟 Ultimate Distro-Level Features Absorbed
+### 🌟 Advanced Architectural Integrations
 
-*   **Privacy Gatekeeper (Whonix-inspired):** The **Sovereign Gatekeeper** enforces zero-trust shard communication and direct Tor-native network routing for absolute anonymity.
-*   **Intelligent Lattice Assistant (Deepin-inspired):** AI-native lattice configuration and intent processing.
-*   **Automated Auto-Tiling (Pop!_OS-inspired):** Keyboard-driven lattice layout management.
-*   **Universal Shard Store (Ubuntu-inspired):** One-click installation interface.
-*   **Config-as-Code (NixOS-inspired):** Define your SigmaOS setup declaratively.
-*   **Automated Shard Orchestration (Terraform-inspired):** Automated shard deployment patterns and lattice self-healing.
-*   **Personalization Engine (KDE-inspired):** Silicon-native aesthetics and high-fidelity themes.
-*   **Rolling vs. Stable Branches (Arch-inspired):** Opt into stability or bleeding-edge updates.
-*   **Hardware Auto-Probe (Manjaro MHWD-inspired):** Intelligent silicon detection and driver matching.
-*   **Memory Deduplication (Linux KSM-inspired):** Merging identical memory shards.
-*   **Native Paradigm Switching (Zorin OS-inspired):** Switch between paradigms natively.
-*   **Enterprise Integrity (RHEL/CentOS-inspired):** Rigorous shard signing and signature verification.
-*   **Amnesic Memory (Tails-inspired):** Zero-artifact memory wiping.
-*   **Isolated Sandboxing (Qubes-inspired):** Every shard execution is sandboxed at the silicon level.
-*   **Security-Hardened Minimal LibC (Alpine/musl-inspired):** A security-first "Sovereign Musl" layer.
+SigmaOS absorbs industry-leading features from top-tier distributions to ensure technical supremacy:
+
+* **[Ultimate Distro-Level Features](shards/DISTRO_FEATURES.md)** - High-fidelity privacy, orchestration, and UI paradigms.
+
+---
+
+*“The SigmaOS lattice is not just an operating system; it is a self-healing, modular silicon singularity.”*
