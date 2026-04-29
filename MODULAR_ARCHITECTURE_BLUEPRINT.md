@@ -41,18 +41,18 @@ SigmaOS is engineered using a philosophy deeply inspired by robust Linux distrib
 
 ### 🌟 Ultimate Distro-Level Features Absorbed
 
-*   **Intelligent Lattice Assistant (Deepin-inspired):** The **Sovereign Assistant** provides AI-native lattice configuration, system auditing, and user intent processing for absolute personalization.
-*   **Automated Auto-Tiling (Pop!_OS-inspired):** Keyboard-driven, automated lattice layout management.
-*   **Universal Shard Store (Ubuntu-inspired):** One-click installation interface for expanding the 600-shard lattice.
+*   **Privacy Gatekeeper (Whonix-inspired):** The **Sovereign Gatekeeper** enforces zero-trust shard communication and direct Tor-native network routing for absolute anonymity.
+*   **Intelligent Lattice Assistant (Deepin-inspired):** AI-native lattice configuration and intent processing.
+*   **Automated Auto-Tiling (Pop!_OS-inspired):** Keyboard-driven lattice layout management.
+*   **Universal Shard Store (Ubuntu-inspired):** One-click installation interface.
 *   **Config-as-Code (NixOS-inspired):** Define your SigmaOS setup declaratively.
 *   **Automated Shard Orchestration (Terraform-inspired):** Automated shard deployment patterns and lattice self-healing.
-*   **Personalization Engine (DDE/KDE-inspired):** Silicon-native accent colors, background blur, and high-fidelity aesthetics.
-*   **Rolling vs. Stable Branches (Arch-inspired):** Opt into stability or bleeding-edge module updates.
+*   **Personalization Engine (KDE-inspired):** Silicon-native aesthetics and high-fidelity themes.
+*   **Rolling vs. Stable Branches (Arch-inspired):** Opt into stability or bleeding-edge updates.
 *   **Hardware Auto-Probe (Manjaro MHWD-inspired):** Intelligent silicon detection and driver matching.
-*   **Memory Deduplication (Linux KSM-inspired):** Merging identical memory shards to reduce silicon pressure.
-*   **Native Paradigm Switching (Zorin OS-inspired):** Switch between Windows, Mac, and Linux-like paradigms natively.
-*   **Enterprise Integrity (RHEL/CentOS-inspired):** Rigorous shard signing and master signature verification.
-*   **Minimalist Service Management (Void Linux-inspired):** Fast, simple shard lifecycle supervision.
-*   **Amnesic Memory (Tails-inspired):** Zero-artifact memory wiping upon session termination.
+*   **Memory Deduplication (Linux KSM-inspired):** Merging identical memory shards.
+*   **Native Paradigm Switching (Zorin OS-inspired):** Switch between paradigms natively.
+*   **Enterprise Integrity (RHEL/CentOS-inspired):** Rigorous shard signing and signature verification.
+*   **Amnesic Memory (Tails-inspired):** Zero-artifact memory wiping.
 *   **Isolated Sandboxing (Qubes-inspired):** Every shard execution is sandboxed at the silicon level.
 *   **Security-Hardened Minimal LibC (Alpine/musl-inspired):** A security-first "Sovereign Musl" layer.
