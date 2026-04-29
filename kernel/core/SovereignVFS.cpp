@@ -17,10 +17,12 @@ extern "C" void vfs_init() {
     vfs_mount("/", 1); // Genesis Shard
 }
 
+#include <sigma_mem.h>
+
 extern "C" bool vfs_mount(const char* path, uint32_t shard_id) {
-    if (vnode_count >= 100) return false;
+    sigma_vnode_t* node = (sigma_vnode_t*)sigma_malloc(sizeof(sigma_vnode_t));
+    if (!node) return false;
     
-    sigma_vnode_t* node = &vfs_lattice[vnode_count++];
     sigma_hardened_strcpy(node->name, path, 64);
     node->shard_id = shard_id;
     node->type = SIGMA_FS_SHARD;
