@@ -18,16 +18,23 @@ extern "C" uint32_t thermaliq_get_package_temp() {
     return 62; // 62°C simulated
 }
 
+static uint32_t temp_history[4] = {60, 60, 60, 60};
+static uint32_t history_ptr = 0;
+
 extern "C" void thermaliq_apply_thermal_policy() {
     // PTR (Predictive Thermal Regulation) Algorithm
     // Uses trend analysis to throttle before hitting critical temp zones.
     
-    uint32_t temp = thermaliq_get_package_temp();
-    sigma_printf("[THERMALIQ] PTR: Package temp: %d°C.\n", temp);
+    uint32_t current_temp = thermaliq_get_package_temp();
+    temp_history[history_ptr % 4] = current_temp;
+    history_ptr++;
     
-    if (temp > 80) {
-        sigma_log("[THERMALIQ] PTR: Thermal pressure detected. Pre-emptively reducing core clock via S-EnergySched.");
-        energysched_set_shard_state(0, ENERGY_STATE_PERFORMANCE);
+    uint32_t avg_temp = (temp_history[0] + temp_history[1] + temp_history[2] + temp_history[3]) / 4;
+    sigma_printf("[THERMALIQ] PTR: Current: %d°C, 4-sample average: %d°C.\n", current_temp, avg_temp);
+    
+    if (avg_temp > 75) {
+        sigma_log("[THERMALIQ] PTR: Thermal trend upwards. Engaging predictive silicon throttling via S-EnergySched.");
+        energysched_set_shard_state(0, ENERGY_STATE_THROTTLED);
     }
 }
 
