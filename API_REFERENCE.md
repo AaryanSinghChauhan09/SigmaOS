@@ -55,5 +55,12 @@ This document details the primary C11 exported functions across the Sovereign Ke
 - `sigma_green_transition(state)`: Changes DVFS p-state (Turbo/Eco/Idle).
 - `sigma_green_thermal_check(temp)`: Automatic thermal throttling trigger.
 
+## 🌐 Web Dashboard Shard Loader (`kernel_loader.js`)
+
+### Modular Loading API
+- `loadSystem()`: Asynchronously initiates the hierarchical loading of all 600 shards (Core -> Essential -> Optional -> Third-Party -> Infinite).
+- `loadScript(src)`: Low-level promise-based script injector for dynamic shard activation.
+- `SYSTEM_MODULES`: Constant array containing the prioritized path list of all active shards.
+
 ---
 *For full implementation details, refer to the corresponding `.c` files in `kernel/suites/`.*
