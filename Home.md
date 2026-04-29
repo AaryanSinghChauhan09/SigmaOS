@@ -1,6 +1,6 @@
 # 🌀 Welcome to the SigmaOS Sovereign Wiki
 
-*   **[Sovereign Architecture](Sovereign-Architecture)**: Absolute machine finality and zero-std primitives.
+* **[Sovereign Architecture](Sovereign-Architecture)**: Absolute machine finality and zero-std primitives.
 
 SigmaOS is a next-generation, industrial-grade operating system designed for speed, modularity, and innovation. Unlike traditional Linux distros, SigmaOS bypasses POSIX and legacy layers to deliver bare-metal performance with direct silicon memory flows.
 
@@ -10,22 +10,22 @@ SigmaOS aims to be the fastest and most secure platform for browser-centric comp
 
 ## 📖 Wiki Contents
 
-*   **[Shard Index](AUTO_SOVEREIGN_WIKI.md)**: A complete technical breakdown of the 600 hierarchical shards.
-*   **[Modular Architecture](MODULAR_ARCHITECTURE_BLUEPRINT.md)**: Details on the Core, Essential, Optional, Third-Party, and Infinite layers.
-*   **Features**:
-    *   [Sovereign 33-Suite Lattice](AUTO_SOVEREIGN_WIKI.md)
-    *   [Zenith Dashboard v33.0.4](Home.md)
-    *   **[600-Shard Kernel]**: Hierarchical modularization for absolute scale.
-    *   **[Sigma Vault]**: Centralized WASM Shard Marketplace (Inspired by Arch AUR).
-    *   **[Privacy Gatekeeper]**: Hardened network routing and isolation (Inspired by Whonix).
-    *   **[Intelligent Assistant]**: Lattice-native AI for automation (Inspired by Deepin).
-    *   **[Tiling Engine]**: Automated keyboard-driven window management (Inspired by Pop!_OS).
-    *   **[Universal Store]**: One-click shard installation (Inspired by Ubuntu).
-    *   **[Orchestrator]**: Automated shard deployment (Inspired by Terraform).
-    *   **[Theme Engine]**: Silicon-native accent colors and blur (Inspired by KDE).
-    *   **[Memory Deduplication]**: Kernel Shard Merging (Inspired by Linux KSM).
-    *   **[Layout Manager]**: Native paradigm switching (Inspired by Zorin OS).
-    *   **[Sovereign Musl]**: Security-hardened LibC layer (Inspired by Alpine).
+* **[Shard Index](AUTO_SOVEREIGN_WIKI.md)**: A complete technical breakdown of the 600 hierarchical shards.
+* **[Modular Architecture](MODULAR_ARCHITECTURE_BLUEPRINT.md)**: Details on the Core, Essential, Optional, Third-Party, and Infinite layers.
+* **Features**:
+    * [Sovereign 33-Suite Lattice](AUTO_SOVEREIGN_WIKI.md)
+    * [Zenith Dashboard v33.0.4](Home.md)
+    * **[600-Shard Kernel]**: Hierarchical modularization for absolute scale.
+    * **[Sigma Vault]**: Centralized WASM Shard Marketplace (Inspired by Arch AUR).
+    * **[Privacy Gatekeeper]**: Hardened network routing and isolation (Inspired by Whonix).
+    * **[Intelligent Assistant]**: Lattice-native AI for automation (Inspired by Deepin).
+    * **[Tiling Engine]**: Automated keyboard-driven window management (Inspired by Pop!_OS).
+    * **[Universal Store]**: One-click shard installation (Inspired by Ubuntu).
+    * **[Orchestrator]**: Automated shard deployment (Inspired by Terraform).
+    * **[Theme Engine]**: Silicon-native accent colors and blur (Inspired by KDE).
+    * **[Memory Deduplication]**: Kernel Shard Merging (Inspired by Linux KSM).
+    * **[Layout Manager]**: Native paradigm switching (Inspired by Zorin OS).
+    * **[Sovereign Musl]**: Security-hardened LibC layer (Inspired by Alpine).
 *   **Roadmap**: [Strategic Feature Trajectory](../README.md#roadmap)
 
 ## 💻 Installation Guide
