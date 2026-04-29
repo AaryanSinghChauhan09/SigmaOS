@@ -48,3 +48,4 @@ SigmaOS is engineered using a philosophy deeply inspired by robust Linux distrib
 *   **Isolated Sandboxing (Qubes-inspired):** Every shard execution is sandboxed at the silicon level, preventing cross-module contamination.
 *   **Silicon Performance Tuning (Clear Linux-inspired):** Automated optimization of system binaries for detected AVX-512 and AMX instruction sets.
 *   **Gaming Optimization (SteamOS-inspired):** Native Gamescope integration and prioritized CPU/GPU allocation for ultra-low latency gaming.
+*   **Security-Hardened Minimal LibC (Alpine/musl-inspired):** A security-first "Sovereign Musl" layer that prioritizes auditability and memory safety over legacy compatibility.

@@ -20,8 +20,8 @@ SigmaOS aims to be the fastest and most secure platform for browser-centric comp
     *   **[Sovereign Sandbox]**: Silicon-level isolation for every execution (Inspired by Qubes).
     *   **[Amnesic Mode]**: Zero-artifact memory wiping (Inspired by Tails).
     *   **[Silicon Tuner]**: Clear Linux-grade performance optimization.
+    *   **[Sovereign Musl]**: Security-hardened, ultra-minimal LibC layer (Inspired by Alpine).
     *   **[Snapshot Engine]**: Declarative System Rollback (NixOS-grade).
-    *   **[Tiling Engine]**: Advanced Window Management (i3/Sway style).
 *   **Roadmap**: [Strategic Feature Trajectory](../README.md#roadmap)
 
 ## 💻 Installation Guide
