@@ -32,6 +32,13 @@ typedef unsigned long long sigma_bool;
 #define SIGMA_OK    0x00000000u
 #define SIGMA_ERROR 0xFFFFFFFFu
 
+#define SIGMA_PACKED __attribute__((packed))
+#define SIGMA_ALIGNED(x) __attribute__((aligned(x)))
+
 typedef sigma_u32 sigma_status;
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif
