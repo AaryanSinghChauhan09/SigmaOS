@@ -1,3 +1,4 @@
+#include "Lattice.h"
 /*
  * =========================================================================
  * Σ SIGMAOS: MORPHIC AUTOMATION ENGINE (v1.0 - INDUSTRIAL SHARD)

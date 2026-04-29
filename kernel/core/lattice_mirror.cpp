@@ -1,3 +1,4 @@
+#include "Lattice.h"
 #include "lattice_mirror.hpp"
 #include "SovereignLibC.h"
 

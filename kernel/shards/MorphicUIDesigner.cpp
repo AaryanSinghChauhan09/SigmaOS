@@ -1,3 +1,4 @@
+#include "Lattice.h"
 /*
  * =========================================================================
  * Σ SIGMAOS: MORPHIC UI DESIGNER (v1.0 - INDUSTRIAL SHARD)

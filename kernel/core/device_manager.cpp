@@ -1,3 +1,4 @@
+#include "Lattice.h"
 #include "device_manager.hpp"
 #include "SovereignLibC.h"
 

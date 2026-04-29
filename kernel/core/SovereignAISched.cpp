@@ -1,5 +1,5 @@
+#include "Lattice.h"
 #include "sigma_aisched.h"
-#include "sigma_hal.h"
 #include "sigma_telemetry.h"
 
 /**

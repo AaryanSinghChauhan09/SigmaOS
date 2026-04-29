@@ -1,3 +1,4 @@
+#include "Lattice.h"
 #include "svg_renderer.hpp"
 #include "../../../include/SovereignLibC.h"
 

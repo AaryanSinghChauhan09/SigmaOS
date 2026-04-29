@@ -1,3 +1,4 @@
+#include "Lattice.h"
 #include "orchestrator_ui.hpp"
 #include "SovereignLibC.h"
 

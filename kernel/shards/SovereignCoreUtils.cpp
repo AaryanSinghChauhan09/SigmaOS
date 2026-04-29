@@ -1,3 +1,4 @@
+#include "Lattice.h"
 #include "SovereignLibC.h"
 #include "SovereignCoreUtils.h"
 

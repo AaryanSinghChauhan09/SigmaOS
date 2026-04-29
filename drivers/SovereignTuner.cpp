@@ -1,5 +1,4 @@
-#include "sigma_hal.h"
-#include "sigma_libc.h"
+#include "Lattice.h"
 
 /**
  * SigmaOS Sovereign Silicon Tuner

@@ -1,3 +1,4 @@
+#include "Lattice.h"
 #include "telemetry_engine.hpp"
 #include "SovereignLibC.h"
 

@@ -1,3 +1,4 @@
+#include "Lattice.h"
 #include "sigma_lazyload.h"
 #include "sigma_hal.h"
 #include "sigma_telemetry.h"

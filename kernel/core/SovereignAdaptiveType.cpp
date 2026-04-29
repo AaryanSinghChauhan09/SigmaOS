@@ -1,3 +1,4 @@
+#include "Lattice.h"
 #include "sigma_adaptivetype.h"
 #include "sigma_hal.h"
 

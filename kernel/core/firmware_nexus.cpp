@@ -1,3 +1,4 @@
+#include "Lattice.h"
 #include "firmware_nexus.hpp"
 #include "SovereignLibC.h"
 

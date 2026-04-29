@@ -1,3 +1,4 @@
+#include "Lattice.h"
 #include "SovereignLibC.h"
 /* =========================================================================
  * Σ SIGMAOS: COLONIZATION SHARD (v1.0 - SOVEREIGN EXPANSION)

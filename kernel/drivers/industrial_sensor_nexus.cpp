@@ -1,3 +1,4 @@
+#include "Lattice.h"
 #include "industrial_sensor_nexus.hpp"
 #include "SovereignLibC.h"
 

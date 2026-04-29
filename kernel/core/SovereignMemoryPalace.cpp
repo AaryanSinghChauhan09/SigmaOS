@@ -1,3 +1,4 @@
+#include "Lattice.h"
 #include "sigma_memorypalace.h"
 #include "sigma_hal.h"
 #include "sigma_vfs.h"

@@ -1,3 +1,4 @@
+#include "Lattice.h"
 #include "vfs.hpp"
 #include "SovereignLibC.h"
 

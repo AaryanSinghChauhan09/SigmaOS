@@ -1,3 +1,4 @@
+#include "Lattice.h"
 #include "cloud_nexus.hpp"
 #include "SovereignLibC.h"
 

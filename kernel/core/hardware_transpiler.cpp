@@ -1,3 +1,4 @@
+#include "Lattice.h"
 #include "hardware_transpiler.hpp"
 #include "SovereignLibC.h"
 

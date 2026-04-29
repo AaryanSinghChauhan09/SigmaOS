@@ -1,3 +1,4 @@
+#include "Lattice.h"
 #include "boot_orchestrator.hpp"
 #include "SovereignLibC.h"
 

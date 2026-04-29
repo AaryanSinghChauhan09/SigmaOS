@@ -1,3 +1,4 @@
+#include "Lattice.h"
 #include "lattice_pqc.hpp"
 #include "../../../include/SovereignLibC.h"
 

@@ -1,3 +1,4 @@
+#include "Lattice.h"
 #include "browser_renderer.hpp"
 #include "SovereignLibC.h"
 

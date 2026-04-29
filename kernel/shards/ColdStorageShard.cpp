@@ -1,3 +1,4 @@
+#include "Lattice.h"
 /*
  * =========================================================================
  * Σ SIGMAOS: COLD STORAGE PERSISTENT LATTICE (v1.0 - INDUSTRIAL SHARD)

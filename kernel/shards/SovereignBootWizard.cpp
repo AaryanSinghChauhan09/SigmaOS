@@ -1,3 +1,4 @@
+#include "Lattice.h"
 /*
  * =========================================================================
  * Î£ SIGMAOS: SOVEREIGN BOOT-WIZARD (v37.0 - ZENITH FINALITY)

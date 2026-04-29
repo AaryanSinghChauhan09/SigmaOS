@@ -1,3 +1,4 @@
+#include "Lattice.h"
 #include "digital_twin.hpp"
 #include "SovereignLibC.h"
 

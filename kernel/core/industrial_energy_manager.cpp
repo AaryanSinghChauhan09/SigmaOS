@@ -1,3 +1,4 @@
+#include "Lattice.h"
 #include "industrial_energy_manager.hpp"
 #include "SovereignLibC.h"
 

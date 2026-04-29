@@ -1,3 +1,4 @@
+#include "Lattice.h"
 #include "sigma_pkg.h"
 #include "sigma_hal.h"
 #include "sigma_libc.h"

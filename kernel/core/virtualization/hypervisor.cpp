@@ -1,3 +1,4 @@
+#include "Lattice.h"
 #include "hypervisor.hpp"
 #include "../../../include/SovereignLibC.h"
 

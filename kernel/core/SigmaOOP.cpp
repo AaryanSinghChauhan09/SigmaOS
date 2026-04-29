@@ -1,3 +1,4 @@
+#include "Lattice.h"
 #include "SigmaOOP.hpp"
 
 void* operator new(sigma_size_t size) {

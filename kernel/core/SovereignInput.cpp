@@ -1,3 +1,4 @@
+#include "Lattice.h"
 #include "sigma_input.h"
 #include "sigma_hal.h"
 

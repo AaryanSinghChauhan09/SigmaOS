@@ -1,3 +1,4 @@
+#include "Lattice.h"
 #include "sigma_dynmodule.h"
 #include "sigma_hal.h"
 #include "sigma_libc.h"

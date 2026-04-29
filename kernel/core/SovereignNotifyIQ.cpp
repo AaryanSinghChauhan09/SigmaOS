@@ -1,3 +1,4 @@
+#include "Lattice.h"
 #include "sigma_notifyiq.h"
 #include "sigma_hal.h"
 #include "sigma_neural.h"

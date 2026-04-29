@@ -1,3 +1,4 @@
+#include "Lattice.h"
 #include "recovery_agent.hpp"
 #include "SovereignLibC.h"
 

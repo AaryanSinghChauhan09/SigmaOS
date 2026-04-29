@@ -1,3 +1,4 @@
+#include "Lattice.h"
 #include "bootloader_shard.hpp"
 #include "SovereignLibC.h"
 

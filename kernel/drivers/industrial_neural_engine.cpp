@@ -1,3 +1,4 @@
+#include "Lattice.h"
 #include "industrial_neural_engine.hpp"
 #include "SovereignLibC.h"
 

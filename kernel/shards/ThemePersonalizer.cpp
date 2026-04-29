@@ -1,3 +1,4 @@
+#include "Lattice.h"
 /*
  * =========================================================================
  * Σ SIGMAOS: THEME PERSONALIZER SHARD (v1.0 - INDUSTRIAL SHARD)

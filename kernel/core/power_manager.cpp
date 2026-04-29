@@ -1,3 +1,4 @@
+#include "Lattice.h"
 #include "power_manager.hpp"
 #include "SovereignLibC.h"
 

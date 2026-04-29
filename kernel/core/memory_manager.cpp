@@ -1,3 +1,4 @@
+#include "Lattice.h"
 #include "memory_manager.hpp"
 #include "SovereignLibC.h"
 

@@ -1,3 +1,4 @@
+#include "Lattice.h"
 #include "identity.hpp"
 #include "../../../include/SovereignLibC.h"
 

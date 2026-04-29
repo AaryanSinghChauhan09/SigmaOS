@@ -1,3 +1,4 @@
+#include "Lattice.h"
 #include "live_boot.hpp"
 #include "SovereignLibC.h"
 

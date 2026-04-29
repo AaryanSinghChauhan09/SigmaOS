@@ -1,3 +1,4 @@
+#include "Lattice.h"
 #include "neural_coprocessor.hpp"
 #include "SovereignLibC.h"
 

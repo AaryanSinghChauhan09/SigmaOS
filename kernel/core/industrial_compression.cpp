@@ -1,3 +1,4 @@
+#include "Lattice.h"
 #include "industrial_compression.hpp"
 #include "SovereignLibC.h"
 

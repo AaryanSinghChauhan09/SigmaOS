@@ -1,3 +1,4 @@
+#include "Lattice.h"
 #include "industrial_identity.hpp"
 #include "SovereignLibC.h"
 

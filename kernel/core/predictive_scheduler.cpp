@@ -1,3 +1,4 @@
+#include "Lattice.h"
 #include "predictive_scheduler.hpp"
 #include "SovereignLibC.h"
 

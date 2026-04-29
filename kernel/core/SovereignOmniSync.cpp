@@ -1,3 +1,4 @@
+#include "Lattice.h"
 #include "sigma_omnisync.h"
 #include "sigma_hal.h"
 #include "sigma_zeronet.h"

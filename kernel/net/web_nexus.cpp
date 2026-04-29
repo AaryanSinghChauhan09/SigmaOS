@@ -1,3 +1,4 @@
+#include "Lattice.h"
 #include "web_nexus.hpp"
 #include "SovereignLibC.h"
 

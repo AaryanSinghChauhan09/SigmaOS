@@ -1,3 +1,4 @@
+#include "Lattice.h"
 #include "wasm_bridge.hpp"
 #include "SovereignLibC.h"
 

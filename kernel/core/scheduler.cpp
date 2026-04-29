@@ -1,3 +1,4 @@
+#include "Lattice.h"
 #include "scheduler.hpp"
 #include "SovereignLibC.h"
 

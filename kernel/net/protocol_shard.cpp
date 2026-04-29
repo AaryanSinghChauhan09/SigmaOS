@@ -1,3 +1,4 @@
+#include "Lattice.h"
 #include "protocol_shard.hpp"
 #include "SovereignLibC.h"
 

@@ -1,3 +1,4 @@
+#include "Lattice.h"
 #include "SigmaOOP.hpp"
 #include "SovereignLibC.h"
 

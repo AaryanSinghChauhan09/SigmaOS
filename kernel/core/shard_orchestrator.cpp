@@ -1,3 +1,4 @@
+#include "Lattice.h"
 #include "shard_orchestrator.hpp"
 #include "SovereignLibC.h"
 

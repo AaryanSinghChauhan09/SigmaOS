@@ -1,3 +1,4 @@
+#include "Lattice.h"
 #include "cloud_orchestrator.hpp"
 #include "SovereignLibC.h"
 

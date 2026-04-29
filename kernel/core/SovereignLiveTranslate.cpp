@@ -1,3 +1,4 @@
+#include "Lattice.h"
 #include "sigma_livetranslate.h"
 #include "sigma_hal.h"
 #include "sigma_neural.h"
