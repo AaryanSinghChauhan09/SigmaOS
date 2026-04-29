@@ -1,5 +1,7 @@
 #include "sigma_vfs.h"
 #include "sigma_hal.h"
+#include "sigma_types.h"
+
 
 /**
  * SigmaOS Sovereign VFS Implementation

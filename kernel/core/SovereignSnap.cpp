@@ -2,6 +2,9 @@
 #include "sigma_hal.h"
 #include "sigma_universal_ui.h"
 #include "sigma_persona.h"
+#include "sigma_types.h"
+
+
 
 /**
  * SigmaOS Sovereign Window Snapping
