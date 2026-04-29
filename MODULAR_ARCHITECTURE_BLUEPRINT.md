@@ -6,11 +6,11 @@ SigmaOS is engineered using a philosophy deeply inspired by robust Linux distrib
 
 The architecture is divided into the following modular domains:
 
-1. **[Core Shards (1-50)](shards/CORE_SHARDS.md)** - Minimal, stable, and secure kernel primitives.
-2. **[Essential Shards (51-150)](shards/ESSENTIAL_SHARDS.md)** - Base system packages and workspace management.
-3. **[Optional Shards (151-300)](shards/OPTIONAL_SHARDS.md)** - Productivity, developer, and collaboration tools.
-4. **[Third-Party Shards (301-450)](shards/THIRD_PARTY_SHARDS.md)** - Community modules and WASM support.
-5. **[Infinite Shards (451+)](shards/INFINITE_SHARDS.md)** - Futuristic, experimental, and self-evolving modules.
+* **[Core Shards (1-50)](shards/CORE_SHARDS.md)** - Minimal, stable, and secure kernel primitives.
+* **[Essential Shards (51-150)](shards/ESSENTIAL_SHARDS.md)** - Base system packages and workspace management.
+* **[Optional Shards (151-300)](shards/OPTIONAL_SHARDS.md)** - Productivity, developer, and collaboration tools.
+* **[Third-Party Shards (301-450)](shards/THIRD_PARTY_SHARDS.md)** - Community modules and WASM support.
+* **[Infinite Shards (451+)](shards/INFINITE_SHARDS.md)** - Futuristic, experimental, and self-evolving modules.
 
 ---
 
