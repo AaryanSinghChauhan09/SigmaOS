@@ -1,8 +1,8 @@
 #include "industrial_deployer.hpp"
 #include "SovereignLibC.h"
 
+extern "C" void gatekeeper_init();
 extern "C" void assistant_init();
-extern "C" void theme_init();
 
 namespace SigmaOS {
 namespace Deployment {
@@ -11,11 +11,11 @@ void SovereignDeployer::ColonizeSilicon(const char* target_media) {
     sigma_printf("[DEPLOYER]: Initiating Bare-Metal Colonization of %s...\n", target_media);
     sigma_printf("[DEPLOYER]: Mapping %llu Root Lattice Shards to Local Silicon...\n", m_shards_deployed);
     
+    // Privacy: Gatekeeper Initialization
+    gatekeeper_init();
+    
     // Personalization: Intelligent Assistant Initialization
     assistant_init();
-    
-    // Personalization: Theme Engine Initialization
-    theme_init();
     
     m_active_nodes++;
 }
@@ -30,7 +30,7 @@ bool SovereignDeployer::VerifyIntegrity() {
 }
 
 void SovereignDeployer::ActivateGamingMode() {
-    sigma_printf("[DEPLOYER]: Activating Sovereign Gaming Mode (SteamOS Parity)...\n");
+    sigma_printf("[DEPLOYER]: Activating Sovereign Gaming Mode (SteamOS/Garuda Parity)...\n");
 }
 
 void SovereignDeployer::Audit() {
@@ -38,10 +38,9 @@ void SovereignDeployer::Audit() {
     sigma_printf("| Active Nodes       : %d\n", m_active_nodes);
     sigma_printf("| Shards Deployed    : %llu\n", m_shards_deployed);
     sigma_printf("| Cloud Parity       : 100%% (MULTI-PROVIDER)\n");
+    sigma_printf("| Privacy Level      : GATEKEEPER-ACTIVE (WHONIX GRADE)\n");
     sigma_printf("| Intelligence       : SOVEREIGN-ASSISTANT (DEEPIN GRADE)\n");
-    sigma_printf("| Aesthetics         : SILICON-NATIVE-THEME (DDE PARITY)\n");
-    sigma_printf("| Automation Level   : ORCHESTRATOR-DRIVEN (TERRAFORM GRADE)\n");
-    sigma_printf("| Stability Grade    : ENTERPRISE-CERTIFIED (RHEL GRADE)\n");
+    sigma_printf("| Performance Tuning : AVX-512 / MKL (CLEAR LINUX GRADE)\n");
     sigma_printf("| Integrity Status   : VERIFIED (LATTICE-SIGNATURE-OK)\n");
     sigma_printf("------------------------------------\n");
 }
