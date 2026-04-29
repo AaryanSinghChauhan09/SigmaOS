@@ -12,20 +12,35 @@ extern "C" void visscript_init() {
     sigma_log("[VISSCRIPT] Initializing Sovereign Visual Scripting Engine (GBLI Algorithm)...");
 }
 
-extern "C" void visscript_execute_graph(const sigma_visscript_node_t* start_node) {
+static sigma_visscript_node_t node_registry[64];
+static uint32_t registered_nodes = 0;
+
+extern "C" void visscript_register_node(const sigma_visscript_node_t* node) {
+    if (registered_nodes < 64) {
+        node_registry[registered_nodes++] = *node;
+        sigma_printf("[VISSCRIPT] GBLI: Registered node %d.\n", node->node_id);
+    }
+}
+
+extern "C" void visscript_execute_graph(uint32_t entry_node_id) {
     // GBLI (Graph-Based Logic Interpreter) Algorithm
-    // Traverses visually-built node graphs and compiles them to native machine code on-the-fly.
+    // Traverses visually-built node graphs and executes them natively.
     
     sigma_log("[VISSCRIPT] GBLI: Parsing visual node graph...");
     
-    const sigma_visscript_node_t* current = start_node;
-    while (current != nullptr) {
-        sigma_printf("[VISSCRIPT] GBLI: Executing Node %d: '%s'\n", current->node_id, current->operation);
-        
-        if (current->next_node_id == 0) break; // End of graph
-        
-        // In a real implementation, we would resolve the pointer to the next node
-        current = nullptr; 
+    uint32_t current_id = entry_node_id;
+    while (current_id != 0) {
+        bool found = false;
+        for (uint32_t i = 0; i < registered_nodes; i++) {
+            if (node_registry[i].node_id == current_id) {
+                sigma_printf("[VISSCRIPT] GBLI: Executing Node %d: '%s'\n", 
+                             node_registry[i].node_id, node_registry[i].operation);
+                current_id = node_registry[i].next_node_id;
+                found = true;
+                break;
+            }
+        }
+        if (!found) break;
     }
     
     sigma_log("[VISSCRIPT] GBLI: Graph execution COMPLETE.");
