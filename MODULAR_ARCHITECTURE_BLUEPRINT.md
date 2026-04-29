@@ -43,5 +43,8 @@ SigmaOS is engineered using a philosophy deeply inspired by robust Linux distrib
 
 *   **Config-as-Code (NixOS-inspired):** Define your SigmaOS setup declaratively in a config file for highly reproducible environments.
 *   **Rolling vs. Stable Branches (Arch-inspired):** Users can opt into a "stable" branch for everyday workflow reliability, or a "rolling" branch for bleeding-edge module updates.
-*   **Kernel + Userland Separation:** The `Microkernel Isolator` enforces strict memory boundaries between what SigmaOS considers "kernel space" and what it considers "userland".
 *   **Hardware Auto-Probe (Manjaro MHWD-inspired):** Intelligent silicon detection and driver matching during the boot lattice phase.
+*   **Amnesic Memory (Tails-inspired):** Optional "Phantom Mode" that wipes all memory artifacts upon session termination (S80 Amnesia).
+*   **Isolated Sandboxing (Qubes-inspired):** Every shard execution is sandboxed at the silicon level, preventing cross-module contamination.
+*   **Silicon Performance Tuning (Clear Linux-inspired):** Automated optimization of system binaries for detected AVX-512 and AMX instruction sets.
+*   **Gaming Optimization (SteamOS-inspired):** Native Gamescope integration and prioritized CPU/GPU allocation for ultra-low latency gaming.

@@ -17,9 +17,11 @@ SigmaOS aims to be the fastest and most secure platform for browser-centric comp
     *   [Zenith Dashboard v33.0.4](Home.md)
     *   **[600-Shard Kernel]**: Hierarchical modularization for absolute scale.
     *   **[Sigma Vault]**: Centralized WASM Shard Marketplace (Inspired by Arch AUR).
+    *   **[Sovereign Sandbox]**: Silicon-level isolation for every execution (Inspired by Qubes).
+    *   **[Amnesic Mode]**: Zero-artifact memory wiping (Inspired by Tails).
+    *   **[Silicon Tuner]**: Clear Linux-grade performance optimization.
     *   **[Snapshot Engine]**: Declarative System Rollback (NixOS-grade).
     *   **[Tiling Engine]**: Advanced Window Management (i3/Sway style).
-    *   **[Sovereign Handoff]**: Universal State Continuity.
 *   **Roadmap**: [Strategic Feature Trajectory](../README.md#roadmap)
 
 ## 💻 Installation Guide
