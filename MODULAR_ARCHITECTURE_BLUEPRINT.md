@@ -19,6 +19,13 @@ The architecture is divided into the following modular domains:
 SigmaOS absorbs industry-leading features from top-tier distributions to ensure technical supremacy:
 
 - [Ultimate Distro-Level Features](shards/DISTRO_FEATURES.md) - High-fidelity privacy, orchestration, and UI paradigms.
+- **Industrial Core Shards**:
+  - `SovereignUSR`: Unified Shard Registry for dynamic discovery.
+  - `SovereignTranspiler`: Self-learning hardware mapping.
+  - `SovereignPersistence`: Decentralized state integrity.
+  - `SovereignSInstall`: Bare-metal autonomous deployment.
+  - `SovereignStack`: Silicon-native zero-buffer networking.
+  - `SovereignNeuralAccel`: NPU-driven UI morphing and predictive UX.
 
 ---
 
