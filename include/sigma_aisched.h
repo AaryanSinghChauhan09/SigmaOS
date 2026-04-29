@@ -1,0 +1,33 @@
+/*
+ * =========================================================================
+ * Σ SIGMAOS: SOVEREIGN AI-OPTIMIZED SCHEDULER (S-AISCHED)
+ * =========================================================================
+ * Mission: Dynamic workload prediction and CPU/GPU scheduling using built-in ML.
+ * =========================================================================
+ */
+
+#ifndef SIGMA_AISCHED_H
+#define SIGMA_AISCHED_H
+
+#include <sigma_types.h>
+
+#ifdef __cplusplus
+extern "C" {
+#endif
+
+typedef enum {
+    AISCHED_MODE_BALANCED,
+    AISCHED_MODE_PERFORMANCE,
+    AISCHED_MODE_ENERGY_EFFICIENT
+} sigma_aisched_mode_t;
+
+/* --- AI Scheduler Primitives --- */
+void aisched_init(void);
+void aisched_predict_workload(uint32_t process_id);
+void aisched_set_mode(sigma_aisched_mode_t mode);
+
+#ifdef __cplusplus
+}
+#endif
+
+#endif /* SIGMA_AISCHED_H */
