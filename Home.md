@@ -26,42 +26,42 @@ SigmaOS aims to be the fastest and most secure platform for browser-centric comp
     * **[Memory Deduplication]**: Kernel Shard Merging (Inspired by Linux KSM).
     * **[Layout Manager]**: Native paradigm switching (Inspired by Zorin OS).
     * **[Sovereign Musl]**: Security-hardened LibC layer (Inspired by Alpine).
-*   **Roadmap**: [Strategic Feature Trajectory](../README.md#roadmap)
+* **Roadmap**: [Strategic Feature Trajectory](../README.md#roadmap)
 
 ## 💻 Installation Guide
 
 ### Bare-Metal (Recommended)
 
-1.  Clone the unified repository (Primary Branch: `main`):
+1. Clone the unified repository (Primary Branch: `main`):
 
     ```bash
     git clone https://github.com/AaryanSinghChauhan09/SigmaOS.git -b main
     cd SigmaOS
     ```
 
-2.  Build the modularized kernel:
+2. Build the modularized kernel:
 
     ```bash
     make all
     ```
 
-3.  Generate the 33-suite Sovereign ISO:
+3. Generate the 33-suite Sovereign ISO:
 
     ```bash
     make iso
     ```
 
-4.  Flash to a USB drive or boot in QEMU.
+4. Flash to a USB drive or boot in QEMU.
 
 ### Web Engine (Simulated Mode)
 
-1.  Build the engine:
+1. Build the engine:
 
     ```bash
     make web-engine
     ```
 
-2.  Launch the local portal:
+2. Launch the local portal:
 
     ```bash
     ./sigma_web_engine
@@ -69,16 +69,16 @@ SigmaOS aims to be the fastest and most secure platform for browser-centric comp
 
 ## 🛠 Developer Setup
 
-1.  Install **GCC 13+**, **NASM**, and **Node.js**.
-2.  Explore the **33-Suite Sovereign Lattice** in the `suites/` directory.
-3.  Build the system using the unified orchestrator:
+1. Install **GCC 13+**, **NASM**, and **Node.js**.
+2. Explore the **33-Suite Sovereign Lattice** in the `suites/` directory.
+3. Build the system using the unified orchestrator:
 
     ```bash
     make kernel
     ```
 
-4.  Launch the **Zenith Dashboard** via `index.html` in the root.
-5.  Use the **Sovereign Shard Builder** to create new suites.
+4. Launch the **Zenith Dashboard** via `index.html` in the root.
+5. Use the **Sovereign Shard Builder** to create new suites.
 
 ---
 
