@@ -1,3 +1,4 @@
+#include "sigma_types.h"
 #include "Lattice.h"
 #include "sigma_pqc.h"
 #include "sigma_hal.h"

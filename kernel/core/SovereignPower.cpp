@@ -1,4 +1,4 @@
-
+#include "sigma_types.h"
 #include "sigma_power.h"
 #include "sigma_hal.h"
 #include "sigma_telemetry.h"
