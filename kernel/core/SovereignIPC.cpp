@@ -41,8 +41,8 @@ extern "C" bool ipc_send_optimized(uint32_t target, uint32_t type, uint32_t* dat
     msg->message_type = type;
     for(int i=0; i<8; i++) msg->payload[i] = data[i];
     
-    // Atomic update
-    head = next_head;
+    // Atomic update using GCC built-ins for bare-metal safety
+    __atomic_store_n(&head, next_head, __ATOMIC_SEQ_CST);
     
     sigma_printf("[IPC] WFAE: Shard -> S%02d (Type: %08X) DISPATCHED.\n", target, type);
     return SIGMA_TRUE;
@@ -52,7 +52,8 @@ extern "C" bool ipc_receive_optimized(sigma_ipc_msg_t* out_msg) {
     if (head == tail) return SIGMA_FALSE;
     
     *out_msg = ipc_queue[tail];
-    tail = (tail + 1) % IPC_QUEUE_SIZE;
+    uint32_t next_tail = (tail + 1) % IPC_QUEUE_SIZE;
+    __atomic_store_n(&tail, next_tail, __ATOMIC_SEQ_CST);
     
     return SIGMA_TRUE;
 }
