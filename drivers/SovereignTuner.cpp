@@ -19,7 +19,7 @@ extern "C" void tuner_init() {
     sigma_log("[TUNER] Probing silicon for performance USPs (Clear Linux Parity)...");
     
     // In a real OS, we'd use CPUID here
-    strcpy(current_silicon.cpu_model, "Intel(R) Core(TM) i9-13900K");
+    sigma_hardened_strcpy(current_silicon.cpu_model, "Intel(R) Core(TM) i9-13900K", 64);
     current_silicon.avx512_supported = true;
     current_silicon.amx_supported = true;
     current_silicon.thermal_ceiling = 100; // Celsius

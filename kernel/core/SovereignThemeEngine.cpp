@@ -21,7 +21,7 @@ extern "C" void theme_init() {
     active_theme.accent_color = 0x00A0FF; // Sigma Blue
     active_theme.background_blur_sigma = 20;
     active_theme.dark_mode = true;
-    strcpy(active_theme.font_family, "Outfit");
+    sigma_hardened_strcpy(active_theme.font_family, "Outfit", 32);
 }
 
 extern "C" void theme_apply_accent(uint32_t color) {

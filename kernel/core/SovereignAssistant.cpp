@@ -18,7 +18,7 @@ static assistant_config_t sovereign_assistant;
 extern "C" void assistant_init() {
     sigma_log("[ASSISTANT] Initializing Sovereign Intelligent Lattice Assistant (Deepin Parity)...");
     
-    strcpy(sovereign_assistant.user_name, "Sovereign User");
+    sigma_hardened_strcpy(sovereign_assistant.user_name, "Sovereign User", 32);
     sovereign_assistant.voice_active = false;
     sovereign_assistant.intelligence_level = 100; // Singularity grade
 }
