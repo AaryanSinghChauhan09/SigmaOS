@@ -41,15 +41,15 @@ SigmaOS is engineered using a philosophy deeply inspired by robust Linux distrib
 
 ### 🌟 Ultimate Distro-Level Features Absorbed
 
-*   **Config-as-Code (NixOS-inspired):** Define your SigmaOS setup declaratively in a config file for highly reproducible environments.
-*   **Rolling vs. Stable Branches (Arch-inspired):** Users can opt into a "stable" branch for everyday workflow reliability, or a "rolling" branch for bleeding-edge module updates.
-*   **Hardware Auto-Probe (Manjaro MHWD-inspired):** Intelligent silicon detection and driver matching during the boot lattice phase.
-*   **Memory Deduplication (Linux KSM-inspired):** The **Sovereign KSM** engine merges identical memory shards, reducing silicon pressure by up to 15%.
-*   **Native Paradigm Switching (Zorin OS-inspired):** Morph between Windows, Mac, and Linux-like paradigms natively.
+*   **Config-as-Code (NixOS-inspired):** Define your SigmaOS setup declaratively in a config file.
+*   **Automated Shard Orchestration (Terraform-inspired):** The **Sovereign Orchestrator** manages automated shard deployment patterns and lattice self-healing.
+*   **Personalization Engine (KDE-inspired):** The **Sovereign Theme Engine** allows for silicon-native accent colors, background blur, and paradigm-shifting desktop layouts.
+*   **Rolling vs. Stable Branches (Arch-inspired):** Opt into stability or bleeding-edge module updates.
+*   **Hardware Auto-Probe (Manjaro MHWD-inspired):** Intelligent silicon detection and driver matching.
+*   **Memory Deduplication (Linux KSM-inspired):** Merging identical memory shards to reduce silicon pressure.
+*   **Native Paradigm Switching (Zorin OS-inspired):** Switch between Windows, Mac, and Linux-like paradigms natively.
 *   **Enterprise Integrity (RHEL/CentOS-inspired):** Rigorous shard signing and master signature verification.
-*   **Minimalist Service Management (Void Linux-inspired):** Fast, simple, and dependency-free shard lifecycle supervision.
+*   **Minimalist Service Management (Void Linux-inspired):** Fast, simple shard lifecycle supervision.
 *   **Amnesic Memory (Tails-inspired):** Zero-artifact memory wiping upon session termination.
 *   **Isolated Sandboxing (Qubes-inspired):** Every shard execution is sandboxed at the silicon level.
-*   **Silicon Performance Tuning (Clear Linux-inspired):** Automated optimization for detected AVX-512 and AMX instruction sets.
-*   **Gaming Optimization (SteamOS-inspired):** Native Gamescope integration and prioritized resource allocation.
 *   **Security-Hardened Minimal LibC (Alpine/musl-inspired):** A security-first "Sovereign Musl" layer.
