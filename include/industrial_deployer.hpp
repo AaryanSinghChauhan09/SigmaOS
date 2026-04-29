@@ -28,6 +28,11 @@ public:
      */
     bool VerifyIntegrity();
 
+    /**
+     * @brief Activate specialized gaming optimizations (SteamOS/Gamescope parity).
+     */
+    void ActivateGamingMode();
+
 private:
     uint32_t m_active_nodes;
     uint64_t m_shards_deployed;
