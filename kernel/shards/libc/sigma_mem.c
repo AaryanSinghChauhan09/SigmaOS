@@ -4,7 +4,7 @@
  * =========================================================================
  */
 
-#include "../../include/SovereignLibC.h"
+#include "../../../include/SovereignLibC.h"
 
 void* sigma_secure_memset(void* s, int c, sigma_size_t n) {
     volatile unsigned char *p = (volatile unsigned char *)s;

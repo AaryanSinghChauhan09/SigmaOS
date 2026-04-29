@@ -1,5 +1,5 @@
 #include "hypervisor.hpp"
-#include "../../include/SovereignLibC.h"
+#include "../../../include/SovereignLibC.h"
 
 namespace SigmaOS {
 namespace Kernel {

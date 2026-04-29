@@ -4,7 +4,7 @@
  * =========================================================================
  */
 
-#include "../../include/SovereignLibC.h"
+#include "../../../include/SovereignLibC.h"
 
 int sigma_atoi(const char* s) {
     int res = 0;

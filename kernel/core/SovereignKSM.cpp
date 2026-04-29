@@ -1,3 +1,4 @@
+#include "../../include/SovereignLibC.h"
 #include "sigma_hal.h"
 #include "sigma_libc.h"
 
@@ -20,11 +21,26 @@ extern "C" void ksm_init() {
 }
 
 extern "C" void ksm_scan_and_merge() {
-    sigma_log("[KSM] Scanning 600-shard lattice for redundant machine state...");
+    sigma_log("[KSM] Initiating Deep Scan of 600-shard memory lattice...");
     
-    // Simulate finding 15% redundancy
-    uint32_t merged_count = 90; 
-    sigma_log("[KSM] Merged %d redundant memory shards. Silicon overhead reduced by 15%%.", merged_count);
+    uint32_t merged_count = 0;
+    uint32_t scanned_shards = 600;
+
+    for (uint32_t i = 0; i < scanned_shards; i++) {
+        if (memory_lattice[i].is_merged) continue;
+        
+        // Simulating hash collision detection for deduplication
+        for (uint32_t j = i + 1; j < scanned_shards; j++) {
+            if (!memory_lattice[j].is_merged && memory_lattice[i].hash == memory_lattice[j].hash) {
+                memory_lattice[j].is_merged = true;
+                memory_lattice[j].actual_ptr = memory_lattice[i].actual_ptr; // Shard Merging
+                merged_count++;
+            }
+        }
+    }
+    
+    sigma_log("[KSM] Scan Complete.");
+    sigma_printf("[KSM] Merged %d redundant shards. Sovereign memory pressure optimized.\n", merged_count);
 }
 
 extern "C" void* ksm_access_shard(uint32_t shard_id) {

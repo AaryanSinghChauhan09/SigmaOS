@@ -4,7 +4,7 @@
  * =========================================================================
  */
 
-#include "../../include/SovereignLibC.h"
+#include "../../../include/SovereignLibC.h"
 #include <stdarg.h>
 
 void sigma_print(const char* str) {
