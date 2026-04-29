@@ -8,7 +8,7 @@
 
 ```
 ┌─────────────────────────────────────────────────────────┐
-│                  CLI ORCHESTRATOR                        │
+│                  CLI ORCHESTRATOR                       │
 │         orchestrator/main.cpp (OOP ICommand)            │
 │  profile | build | test | benchmark | forge | link       │
 └─────────────────┬───────────────────────────────────────┘
@@ -141,9 +141,9 @@ SigmaOS/
 ## 🧠 Core Algorithms
 
 ### 🌀 Quantum Scheduler: Predictive Priority Weighting (PPW)
-The **Quantum Scheduler (S39)** utilizes the **PPW Algorithm** to manage task execution across the 600-shard lattice. 
+
+The **Quantum Scheduler (S39)** utilizes the **PPW Algorithm** to manage task execution across the 600-shard lattice.
+
 - **Algorithm**: `Priority = Max(1, Floor(Complexity + LoadFactor))`
 - **Goal**: Prevent priority inversion and ensure that high-complexity background tasks don't starve the real-time UI flow.
 - **Implementation**: JS Shard `S39_QuantumScheduler.js`
-
-
