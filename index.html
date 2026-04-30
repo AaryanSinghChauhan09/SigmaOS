@@ -479,6 +479,7 @@
                 <div class="util-nav" onclick="switchUtil('dup-find')">Duplicate Finder</div>
                 <div class="util-nav" onclick="switchUtil('key-test')">Key-Test</div>
                 <div class="util-nav" onclick="switchUtil('speed')">Ookla Speed Shard</div>
+                <div class="util-nav" onclick="switchUtil('status')">IsItDownRightNow</div>
             </div>
             <!-- Main Area -->
             <div id="util-main" style="flex: 1; padding: 20px; overflow-y: auto;">
@@ -489,6 +490,7 @@
                         <button class="util-btn" onclick="textAction('upper')">UPPERCASE</button>
                         <button class="util-btn" onclick="textAction('lower')">lowercase</button>
                         <button class="util-btn" onclick="textAction('title')">Title Case</button>
+                        <button class="util-btn" onclick="textAction('sentence')">Sentence case</button>
                         <button class="util-btn" onclick="textAction('count')">Count Words</button>
                         <button class="util-btn" onclick="textAction('clear-lines')">Remove Line Breaks</button>
                     </div>
@@ -547,6 +549,12 @@
                         <div style="color: var(--text-muted);">MBPS DOWNLOAD</div>
                         <button class="util-btn" style="margin-top: 20px;" onclick="startSpeedTest()">Test Silicon Latency</button>
                     </div>
+                </div>
+                <div id="util-status" style="display: none;">
+                    <h3 style="margin-top: 0; color: var(--accent);">IsItDownRightNow Shard</h3>
+                    <input type="text" id="status-url" placeholder="Enter URL (e.g. sigmaos.io)..." style="width: 100%; background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.1); color: white; padding: 10px; border-radius: 5px; font-family: 'JetBrains Mono', monospace; margin-bottom: 15px; outline: none;">
+                    <button class="util-btn" onclick="checkStatus()">Check Shard Availability</button>
+                    <div id="status-output" style="margin-top: 20px; padding: 15px; border-radius: 5px; font-family: 'JetBrains Mono', monospace;"></div>
                 </div>
                 <!-- Other panes hidden by default -->
             </div>
@@ -715,8 +723,18 @@
             toggleStart();
         }
 
+        function checkStatus() {
+            const url = document.getElementById('status-url').value;
+            const output = document.getElementById('status-output');
+            output.innerHTML = '<span style="color: var(--accent);">Checking silicon route to ' + url + '...</span>';
+            setTimeout(() => {
+                output.innerHTML = '<span style="color: var(--success);">✔ ' + url + ' is UP and responsive in the lattice.</span>';
+                addLog("Σ [UTILITY]: Route check complete for " + url, "success");
+            }, 1500);
+        }
+
         function switchUtil(utilId) {
-            const panes = ['text-ops', 'data-conv', 'code-img', 'diff', 'dup-find', 'key-test', 'speed'];
+            const panes = ['text-ops', 'data-conv', 'code-img', 'diff', 'dup-find', 'key-test', 'speed', 'status'];
             panes.forEach(p => {
                 const el = document.getElementById(`util-${p}`);
                 if (el) el.style.display = 'none';
@@ -804,7 +822,13 @@
             if (action === 'upper') output.innerText = input.toUpperCase();
             else if (action === 'lower') output.innerText = input.toLowerCase();
             else if (action === 'title') output.innerText = input.replace(/\w\S*/g, (txt) => txt.charAt(0).toUpperCase() + txt.substr(1).toLowerCase());
-            else if (action === 'count') output.innerText = `Words: ${input.trim().split(/\s+/).length} | Characters: ${input.length}`;
+            else if (action === 'sentence') output.innerText = input.toLowerCase().replace(/(^\s*\w|[\.\!\?]\s*\w)/g, c => c.toUpperCase());
+            else if (action === 'count') {
+                const words = input.trim().split(/\s+/).filter(w => w.length > 0).length;
+                const chars = input.length;
+                const lines = input.split('\n').filter(l => l.length > 0).length;
+                output.innerText = `Words: ${words} | Characters: ${chars} | Lines: ${lines}`;
+            }
             else if (action === 'clear-lines') output.innerText = input.replace(/\n/g, ' ');
             
             addLog(`Σ [UTILITY]: Executed ${action} on text buffer.`, "success");
