@@ -1,4 +1,5 @@
-#include "Lattice.h"
+#include "sigma_hal.h"
+#include "sigma_types.h"
 #include "sigma_hal.h"
 
 /**
@@ -6,19 +7,19 @@
  * Automated shard deployment and lattice configuration patterns.
  * ZERO-DEPENDENCY: Direct silicon-native orchestration.
  *
- * Design: OOP-isolated singleton — SovereignOrchestraEngine.
+ * Design: OOP-isolated singleton — SovereignOrchestratorEngine.
  *         Lattice Dependency Resolution (LDR) and self-healing.
  */
 
 
 /* --- Sovereign Orchestra Engine (OOP Isolation) --- */
 
-void SovereignOrchestraEngine::init() {
+void SovereignOrchestratorEngine::init() {
     sigma_log("[ORCHESTRATOR] Initializing Sovereign Automated Deployment Engine (LDR Algorithm)...");
     this->initialized = 1u;
 }
 
-void SovereignOrchestraEngine::applyPattern(const char* name) {
+void SovereignOrchestratorEngine::applyPattern(const char* name) {
     sigma_printf("[ORCHESTRATOR] LDR: Applying Pattern: %s\n", name);
     this->patterns_applied++;
     
@@ -32,7 +33,7 @@ void SovereignOrchestraEngine::applyPattern(const char* name) {
     sigma_log("[ORCHESTRATOR] LDR: Lattice Pattern Deployment: 100% Verified.");
 }
 
-void SovereignOrchestraEngine::selfHeal() {
+void SovereignOrchestratorEngine::selfHeal() {
     sigma_log("[ORCHESTRATOR] Initiating Lattice Integrity Audit...");
     
     sigma_u32 corrupted_shards = 0u;
@@ -54,18 +55,18 @@ void SovereignOrchestraEngine::selfHeal() {
 
 /* --- C Wrappers --- */
 extern "C" void orchestrator_init() {
-    SovereignOrchestraEngine::getInstance().init();
+    SovereignOrchestratorEngine::getInstance().init();
 }
 
 extern "C" void orchestrator_apply_pattern(const char* name) {
-    SovereignOrchestraEngine::getInstance().applyPattern(name);
+    SovereignOrchestratorEngine::getInstance().applyPattern(name);
 }
 
 extern "C" void orchestrator_self_heal() {
-    SovereignOrchestraEngine::getInstance().selfHeal();
+    SovereignOrchestratorEngine::getInstance().selfHeal();
 }
 
 extern "C" sigma_u64 orchestrator_get_heal_count() {
-    return SovereignOrchestraEngine::getInstance().getHealCount();
+    return SovereignOrchestratorEngine::getInstance().getHealCount();
 }
 

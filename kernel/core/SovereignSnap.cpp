@@ -1,3 +1,5 @@
+#include "sigma_types.h"
+#include "sigma_hal.h"
 /*
  * =========================================================================
  * SIGMAOS: SOVEREIGN SNAP LAYOUTS (SovereignSnapEngine)

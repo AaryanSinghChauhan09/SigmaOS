@@ -1,4 +1,5 @@
-#include "Lattice.h"
+#include "sigma_hal.h"
+#include "sigma_types.h"
 /**
  * =========================================================================
  * Σ SIGMAOS: SOVEREIGN SECURITY HARDENER (S-SECHARDENER) — SHARD #500

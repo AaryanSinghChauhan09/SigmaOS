@@ -1,4 +1,5 @@
-﻿#include "sigma_init.h"
+#include "sigma_types.h"
+#include "sigma_init.h"
 #include "sigma_hal.h"
 
 /**
@@ -6,7 +7,7 @@
  * Implements an Asynchronous Shard Ignition (ASI) algorithm.
  * ZERO-DEPENDENCY: Strictly bare-metal machine-state ignition.
  *
- * Design: OOP-isolated singleton â€” SovereignInitEngine.
+ * Design: OOP-isolated singleton — SovereignInitEngine.
  */
 
 class SovereignInitEngine {

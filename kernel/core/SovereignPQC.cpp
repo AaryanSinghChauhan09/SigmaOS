@@ -1,4 +1,5 @@
-﻿#include "sigma_pqc.h"
+#include "sigma_types.h"
+#include "sigma_pqc.h"
 #include "sigma_hal.h"
 
 /**
@@ -6,7 +7,7 @@
  * Implements a Lattice-Based Shard Verification (LBSV) algorithm.
  * ZERO-DEPENDENCY: Strictly bare-metal quantum resistance.
  *
- * Design: OOP-isolated singleton â€” SovereignPQCEngine.
+ * Design: OOP-isolated singleton — SovereignPQCEngine.
  */
 
 class SovereignPQCEngine {

@@ -1,3 +1,4 @@
+#include "sigma_types.h"
 #include "SovereignLibC.h"
 #include "sigma_log.h"
 #include "sigma_hal.h"

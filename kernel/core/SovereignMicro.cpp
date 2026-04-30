@@ -1,4 +1,5 @@
-﻿#include "sigma_micro.h"
+#include "sigma_types.h"
+#include "sigma_micro.h"
 #include "sigma_hal.h"
 
 /**
@@ -6,7 +7,7 @@
  * Implements an Isolated Service Mediation (ISM) algorithm.
  * ZERO-DEPENDENCY: Strictly bare-metal micro-service isolation.
  *
- * Design: OOP-isolated singleton â€” SovereignMicroEngine.
+ * Design: OOP-isolated singleton — SovereignMicroEngine.
  */
 
 class SovereignMicroEngine {

@@ -1,4 +1,5 @@
-﻿#include "sigma_compat.h"
+#include "sigma_types.h"
+#include "sigma_compat.h"
 #include "sigma_hal.h"
 
 /**
@@ -6,7 +7,7 @@
  * Implements a Binary Instruction Translation (BIT) algorithm.
  * ZERO-DEPENDENCY: Strictly bare-metal foreign binary execution.
  *
- * Design: OOP-isolated singleton â€” SovereignCompatEngine.
+ * Design: OOP-isolated singleton — SovereignCompatEngine.
  */
 
 class SovereignCompatEngine {

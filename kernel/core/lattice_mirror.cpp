@@ -1,4 +1,5 @@
-#include "Lattice.h"
+#include "sigma_hal.h"
+#include "sigma_types.h"
 #include "lattice_mirror.hpp"
 #include "SovereignLibC.h"
 

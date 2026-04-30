@@ -1,3 +1,4 @@
+#include "sigma_types.h"
 #include "sigma_diag.h"
 #include "sigma_hal.h"
 #include "sigma_time.h"

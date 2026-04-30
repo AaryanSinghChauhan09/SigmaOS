@@ -9,7 +9,8 @@
  * ZERO-DEPENDENCY: Strictly bare-metal silicon temperature management.
  */
 
-#include "Lattice.h"
+#include "sigma_hal.h"
+#include "sigma_types.h"
 #include "sigma_thermaliq.h"
 #include "sigma_energysched.h"
 

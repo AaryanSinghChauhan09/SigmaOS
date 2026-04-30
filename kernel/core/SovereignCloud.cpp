@@ -1,3 +1,4 @@
+#include "sigma_types.h"
 
 #include "sigma_cloud.h"
 #include "sigma_hal.h"

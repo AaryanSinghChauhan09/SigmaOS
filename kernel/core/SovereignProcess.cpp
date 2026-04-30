@@ -1,4 +1,5 @@
-﻿#include "sigma_proc.h"
+#include "sigma_types.h"
+#include "sigma_proc.h"
 #include "sigma_hal.h"
 
 /**
@@ -6,7 +7,7 @@
  * Implements a Priority-Aware Task Switching (PATS) algorithm.
  * ZERO-DEPENDENCY: Strictly bare-metal process orchestration.
  *
- * Design: OOP-isolated singleton â€” SovereignProcessEngine.
+ * Design: OOP-isolated singleton — SovereignProcessEngine.
  */
 
 class SovereignProcessEngine {

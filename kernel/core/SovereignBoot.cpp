@@ -1,4 +1,5 @@
-﻿#include "sigma_boot.h"
+#include "sigma_types.h"
+#include "sigma_boot.h"
 #include "sigma_hal.h"
 
 /**
@@ -6,7 +7,7 @@
  * Implements a Secure Shard Bootstrapping (SSB) algorithm.
  * ZERO-DEPENDENCY: Strictly bare-metal system ignition.
  *
- * Design: OOP-isolated singleton â€” SovereignBootEngine.
+ * Design: OOP-isolated singleton — SovereignBootEngine.
  */
 
 class SovereignBootEngine {

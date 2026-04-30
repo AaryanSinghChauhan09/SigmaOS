@@ -1,34 +1,14 @@
-/*
- * =========================================================================
- * Σ SIGMAOS: SOVEREIGN SYSTEM BOOT (S-BOOT)
- * =========================================================================
- * Mission: Secure, silicon-native shard bootstrapping and lattice ignition.
- * =========================================================================
- */
-
 #ifndef SIGMA_BOOT_H
 #define SIGMA_BOOT_H
-
 #include "sigma_types.h"
-
 #ifdef __cplusplus
 extern "C" {
 #endif
-
-typedef enum {
-    SIGMA_BOOT_GENESIS,
-    SIGMA_BOOT_LATTICE_IGNITION,
-    SIGMA_BOOT_USERLAND_READY
-} sigma_boot_stage_t;
-
-/* --- Boot Primitives --- */
-void               boot_init(void);
-void               boot_ignite_lattice(void);
-sigma_boot_stage_t boot_get_current_stage(void);
-sigma_u32          boot_get_ignited_count(void);
-
+typedef enum { SIGMA_BOOT_STAGE_INIT, SIGMA_BOOT_STAGE_KERNEL, SIGMA_BOOT_STAGE_USERLAND } sigma_boot_stage_t;
+#define SIGMA_BOOT_GENESIS 0
+#define SIGMA_BOOT_LATTICE_IGNITION 1
+#define SIGMA_BOOT_USERLAND_READY 2
 #ifdef __cplusplus
 }
 #endif
-
-#endif /* SIGMA_BOOT_H */
+#endif

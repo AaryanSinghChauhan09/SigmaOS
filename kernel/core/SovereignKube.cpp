@@ -1,3 +1,4 @@
+#include "sigma_types.h"
 #include "sigma_kube.h"
 #include "sigma_hal.h"
 

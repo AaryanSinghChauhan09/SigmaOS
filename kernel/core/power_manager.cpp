@@ -1,4 +1,5 @@
-#include "Lattice.h"
+#include "sigma_hal.h"
+#include "sigma_types.h"
 #include "power_manager.hpp"
 #include "SovereignLibC.h"
 

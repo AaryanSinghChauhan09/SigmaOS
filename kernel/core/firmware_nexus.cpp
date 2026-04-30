@@ -1,4 +1,5 @@
-#include "Lattice.h"
+#include "sigma_hal.h"
+#include "sigma_types.h"
 #include "firmware_nexus.hpp"
 #include "SovereignLibC.h"
 

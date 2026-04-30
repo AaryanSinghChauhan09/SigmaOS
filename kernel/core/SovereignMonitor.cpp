@@ -1,4 +1,5 @@
-﻿#include "sigma_monitor.h"
+#include "sigma_types.h"
+#include "sigma_monitor.h"
 #include "sigma_hal.h"
 
 /**
@@ -6,7 +7,7 @@
  * Implements a Hardware-Accelerated Load Balancing (HALB) algorithm.
  * ZERO-DEPENDENCY: Strictly bare-metal system observability.
  *
- * Design: OOP-isolated singleton â€” SovereignMonitorEngine.
+ * Design: OOP-isolated singleton — SovereignMonitorEngine.
  */
 
 class SovereignMonitorEngine {

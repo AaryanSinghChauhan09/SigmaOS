@@ -1,4 +1,5 @@
-#include "Lattice.h"
+#include "sigma_hal.h"
+#include "sigma_types.h"
 #include "VfsShard.hpp"
 
 // Implementation for SovereignVFS could go here if needed, 
