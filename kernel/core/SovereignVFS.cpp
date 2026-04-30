@@ -1,6 +1,6 @@
 #include "sigma_vfs.h"
 #include "sigma_hal.h"
-#include "sigma_libc.h"
+
 
 /**
  * SigmaOS Sovereign VFS (v28.0 Zenith)

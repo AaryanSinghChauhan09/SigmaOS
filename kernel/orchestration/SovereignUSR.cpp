@@ -1,5 +1,6 @@
 #include "sigma_hal.h"
 #include "sigma_usr.h"
+#include "sigma_libc.h"
 
 /**
  * SigmaOS Sovereign Unified Shard Registry (USR)

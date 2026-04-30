@@ -1,6 +1,6 @@
 #include "sigma_hal.h"
 #include "sigma_transpiler.h"
-#include "sigma_libc.h"
+
 
 /**
  * SigmaOS Sovereign Self-Learning Hardware Transpiler

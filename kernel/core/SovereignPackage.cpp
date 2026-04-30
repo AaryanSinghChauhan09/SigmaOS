@@ -1,6 +1,6 @@
 #include "sigma_pkg.h"
 #include "sigma_hal.h"
-#include "sigma_libc.h"
+
 
 /**
  * SigmaOS Sovereign Package Manager (S-PKG)

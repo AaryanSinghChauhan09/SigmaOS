@@ -52,9 +52,6 @@ private:
     sigma_u32 active_zone_count;
     sigma_u32 initialized;
 };
-
-#ifdef __cplusplus
-}
 #endif
 
 #endif /* SIGMA_SNAP_H */

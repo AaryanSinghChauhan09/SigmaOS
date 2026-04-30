@@ -478,3 +478,176 @@ body {
     0%, 100% { height: 10px; opacity: 0.3; }
     50% { height: 25px; opacity: 1; }
 }
+
+/* =========================================================================
+   SOVEREIGN WINDOW SYSTEM (v2.0)
+   ========================================================================= */
+.window {
+    display: none;
+    position: absolute;
+    z-index: 1000;
+    border: 1px solid var(--accent);
+    border-radius: 12px;
+    overflow: hidden;
+    box-shadow: 0 10px 40px rgba(0,0,0,0.6);
+    background: rgba(10, 10, 15, 0.4);
+    backdrop-filter: blur(25px) saturate(180%);
+    -webkit-backdrop-filter: blur(25px) saturate(180%);
+    transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.3s ease;
+}
+
+.window-header {
+    background: rgba(255,255,255,0.05);
+    padding: 12px 18px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 1px solid rgba(255,255,255,0.1);
+    cursor: move;
+}
+
+.window-title {
+    font-size: 0.85rem;
+    font-weight: 700;
+    color: var(--accent);
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+
+.window-controls {
+    display: flex;
+    gap: 10px;
+}
+
+.win-btn {
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    cursor: pointer;
+    transition: transform 0.2s, filter 0.2s;
+}
+
+.win-btn.minimize { background: #ffbd2e; }
+.win-btn.close { background: #ff5f56; }
+.win-btn:hover { transform: scale(1.2); filter: brightness(1.2); }
+
+.window-content {
+    display: flex;
+    height: calc(100% - 45px);
+}
+
+/* Utility Nexus Specifics */
+.util-sidebar {
+    width: 200px;
+    border-right: 1px solid rgba(255,255,255,0.1);
+    padding: 15px;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    background: rgba(0,0,0,0.2);
+}
+
+.util-nav {
+    padding: 10px 14px;
+    border-radius: 8px;
+    font-size: 0.85rem;
+    color: var(--text-muted);
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.util-nav:hover {
+    background: rgba(255,255,255,0.05);
+    color: var(--text);
+}
+
+.util-nav.active {
+    background: var(--accent-glow);
+    color: var(--accent);
+    border: 1px solid var(--accent);
+}
+
+.util-main {
+    flex: 1;
+    padding: 24px;
+    overflow-y: auto;
+    background: rgba(0,0,0,0.3);
+}
+
+.util-btn {
+    background: rgba(255,255,255,0.05);
+    border: 1px solid var(--glass-border);
+    color: var(--text);
+    padding: 8px 16px;
+    border-radius: 6px;
+    font-size: 0.8rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.util-btn:hover {
+    background: var(--accent);
+    color: #000;
+    border-color: var(--accent);
+}
+
+.util-input {
+    width: 100%;
+    background: rgba(255,255,255,0.03);
+    border: 1px solid var(--glass-border);
+    color: var(--text);
+    padding: 12px;
+    border-radius: 8px;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.9rem;
+    outline: none;
+    transition: border-color 0.2s;
+}
+
+.util-input:focus {
+    border-color: var(--accent);
+}
+
+.util-output {
+    margin-top: 20px;
+    padding: 18px;
+    background: rgba(0,0,0,0.4);
+    border: 1px solid rgba(255,255,255,0.05);
+    border-radius: 10px;
+    font-family: 'JetBrains Mono', monospace;
+    white-space: pre-wrap;
+    font-size: 0.9rem;
+}
+
+/* Markup Forge Specifics */
+.forge-container {
+    display: flex;
+    flex-direction: column;
+    padding: 20px;
+    gap: 15px;
+    height: 100%;
+}
+
+.forge-split {
+    flex: 1;
+    display: flex;
+    gap: 20px;
+    min-height: 0;
+}
+
+.forge-area {
+    flex: 1;
+    background: rgba(0,0,0,0.3);
+    border: 1px solid var(--glass-border);
+    border-radius: 10px;
+    padding: 15px;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.85rem;
+    overflow-y: auto;
+}
+
+.forge-actions {
+    display: flex;
+    gap: 12px;
+}

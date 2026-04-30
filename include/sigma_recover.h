@@ -46,9 +46,6 @@ private:
     sigma_recovery_record_t healing_registry[32];
     uint32_t registry_ptr;
 };
-
-#ifdef __cplusplus
-}
 #endif
 
 #endif /* SIGMA_RECOVER_H */

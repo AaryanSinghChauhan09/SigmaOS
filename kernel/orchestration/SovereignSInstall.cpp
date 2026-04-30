@@ -1,5 +1,5 @@
 #include "sigma_hal.h"
-#include "sigma_libc.h"
+
 
 /**
  * SigmaOS Sovereign S-Install

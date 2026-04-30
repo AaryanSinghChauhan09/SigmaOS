@@ -1,5 +1,5 @@
 #include "sigma_hal.h"
-#include "sigma_libc.h"
+
 
 /**
  * S-SPOT: Sovereign Spotlight (v28.0 Zenith)

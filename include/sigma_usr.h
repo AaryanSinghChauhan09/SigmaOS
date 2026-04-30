@@ -39,9 +39,6 @@ private:
     sigma_usr_entry_t registry[512];
     uint32_t count;
 };
-
-#ifdef __cplusplus
-}
 #endif
 
 #endif /* SIGMA_USR_H */

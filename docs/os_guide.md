@@ -96,7 +96,6 @@ Designed for **100% Keyboard Sovereignty**.
    - `make vbox` -> Generates `sigmaos.iso` for VirtualBox/QEMU.
 3. **Hardware Boot**: Use `dd` to write the ISO to a Live USB. The `multiboot_header.asm` handles BIOS/GRUB handover.
 
-
 ---
 
 ## 📉 6. COMPETITIVE ANALYSIS (Vs Linux Distros)
@@ -116,7 +115,6 @@ Designed for **100% Keyboard Sovereignty**.
 - **UAC (Universal App Container)**: Running Linux binaries via OCI shards (In Progress).
 - **GPU Lattice**: CUDA-direct legal auditing.
 - **Holographic Shell**: VR/AR terminal integration.
-
 
 ---
 

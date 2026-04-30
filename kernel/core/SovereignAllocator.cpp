@@ -1,4 +1,4 @@
-#include "Lattice.h"
+
 #include "sigma_allocator.h"
 #include "sigma_hal.h"
 
