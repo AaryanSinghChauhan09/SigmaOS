@@ -6,7 +6,7 @@
 
 ## 💎 Core Design Philosophy
 
-SigmaOS is engineered for **Architectural Supremacy**, adhering to five inviolable 
+SigmaOS is engineered for **Architectural Supremacy**, adhering to five inviolable
 sovereign principles:
 
 | Principle | Technical Manifestation | Legacy OS Equivalence |
@@ -14,7 +14,7 @@ sovereign principles:
 | **Zero-Dependency** | Direct Metal Handshake | POSIX / Glibc Bloat |
 | **Silicon-Native** | Zero-Abstraction Pathing | HAL / Driver Latency |
 | **Least Privilege** | Shard-Level RBAC | Root Vulnerability |
-| **Cryptographic Isolation**| CIB / Internal Tunneling | Global Page Mapping |
+| **Cryptographic Isolation** | CIB / Internal Tunneling | Global Page Mapping |
 | **Modular Atomicity** | 600-Shard Atomic Lattice | Monolithic Kernel |
 
 ---
@@ -40,24 +40,25 @@ graph TD
 
 ## 🚀 Sovereign Zenith (v28.0 Singularity)
 
-As of v28.0, SigmaOS has achieved the **Parity Singularity**. This milestone 
-marks the complete modularization of 600 independent shards, enabling 
-zero-latency context switching between legacy OS paradigms and advanced 
+As of v28.0, SigmaOS has achieved the **Parity Singularity**. This milestone
+marks the complete modularization of 600 independent shards, enabling
+zero-latency context switching between legacy OS paradigms and advanced
 silicon-native AI orchestration.
 
-### Key Singularity Breakthroughs:
-- **Neural Lattice Optimization (NLO):** Automated shard health monitoring and 
+### Key Singularity Breakthroughs
+
+- **Neural Lattice Optimization (NLO):** Automated shard health monitoring and
   self-healing without kernel interrupts.
-- **Shard-Isolated Virtualization (SIV):** Type-1 hypervisor hooks directly 
+- **Shard-Isolated Virtualization (SIV):** Type-1 hypervisor hooks directly
   integrated into the silicon lattice for near-zero guest overhead.
-- **Post-Quantum Identity (RLSA):** Lattice-based identity attestation rooted 
+- **Post-Quantum Identity (RLSA):** Lattice-based identity attestation rooted
   in hardware TPM/Silicon.
 
 ---
 
 ## Data Flow: How Shards Communicate
 
-```
+```text
 App Request
     │
     ▼
