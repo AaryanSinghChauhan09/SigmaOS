@@ -1,86 +1,65 @@
-# 🏛️ SigmaOS: Sovereign Zenith Lattice
+# 🏛️ SigmaOS: A Modular, Experimental Operating System
 
-SigmaOS is a next-generation, zero-dependency, bare-metal operating system. Built around a 600-shard modular lattice architecture, SigmaOS discards legacy POSIX and Glibc bloat in favor of a silicon-native, mathematically proven execution environment.
+SigmaOS is an experimental, bare-metal operating system kernel built to explore extreme modularity using C++ singleton patterns. While currently in a conceptual phase (v29.0), its goal is to provide a clean, zero-dependency alternative to legacy monolithic kernels.
 
-## 🚀 Why SigmaOS?
+## 🚀 Current Status (What SigmaOS Does Today)
 
-Traditional operating systems are constrained by decades of legacy abstractions. SigmaOS reimagines the Silicon-to-Logic handshake:
-- **Zero-Dependency:** Runs directly on silicon without legacy HALs.
-- **Modular Atomicity:** A 600-shard micro-kernel architecture allows unprecedented scalability and parallel execution.
-- **Amnesic Memory:** Stateless execution boundaries for enhanced security.
-- **Silicon-Native Performance:** Near-zero latency context switching via Wait-Free Atomic Exchange (WFAE).
+SigmaOS is **not** a daily-driver operating system. Currently, the kernel can:
+- **Boot reliably in QEMU:** Using a Multiboot2 compliant binary and GRUB.
+- **Initialize Hardware:** Basic probing of the CPU and establishing serial output (COM1) for debugging.
+- **Allocate Memory:** A simple bare-metal bump allocator (QBMP) with basic guard checks.
+- **Execute Minimal Userland:** A barebones interactive shell (`sigma_sh`) is in development to provide basic I/O.
+- **Demonstrate Architecture:** The entire kernel is divided into isolated C++ singletons ("Shards") that communicate via strict C-linkage interfaces.
 
-## 🛠️ Quick Start
+SigmaOS currently lacks a fully functional filesystem, robust device drivers (e.g., USB, GPU), and a mature networking stack, though stubs exist.
+
+## 🛠️ Building & Running
+
+### Dependencies
+- `make`
+- `nasm`
+- `g++` (multilib / cross-compiler)
+- `qemu-system-x86_64`
+- `grub-mkrescue` and `xorriso` (for ISO generation)
 
 ### 1. Build the Kernel
 ```bash
+make clean
 make singularity
 ```
+*This generates `sigmaos.bin`, the core Multiboot2 executable.*
 
-### 2. Run in QEMU (Boot Demo)
-To see the sovereign lattice ignite and watch the serial boot trace:
+### 2. Generate a Bootable ISO
+```bash
+make zenith-iso
+```
+*Creates a GRUB-bootable ISO image for testing on hardware or VMs.*
+
+### 3. Run in Emulator
 ```bash
 make qemu
 ```
-*Note: This requires `qemu-system-x86_64` installed.*
+*Boots the kernel in QEMU and pipes the internal kernel logs directly to your terminal.*
 
-## 🌌 Architecture Overview
+## 📚 Glossary: Translating the Vision
 
-SigmaOS operates on a Sovereign Lattice architecture where every service is an independent "Shard".
+SigmaOS uses unique terminology for its architectural concepts. Here is what they mean in standard OS engineering terms:
 
-```mermaid
-graph TD
-    A[Silicon Metal] --> B[S-HAL Hardware Audit]
-    B --> C{Sovereign Lattice Core}
-    C --> D[S-AISched AI Scheduler]
-    C --> E[S-MMU Memory Sharder]
-    C --> F[S-IPC Atomic Exchange]
-    D --> G[Zenith Desktop UI]
-    E --> H[Amnesic RAM Shards]
-    F --> I[Distributed Lattice Sync]
-    G --> J((SINGULARITY))
-    H --> J
-    I --> J
-```
-
-## 🧩 Defining a Shard
-
-Every shard in SigmaOS follows a strict C++ singleton pattern. Here is a minimal example:
-
-```cpp
-#include "sigma_hal.h"
-
-// 1. Shard Definition
-class MyShardEngine {
-public:
-    static MyShardEngine& getInstance() {
-        static MyShardEngine instance;
-        return instance;
-    }
-    void ignite() {
-        sigma_log("[MY-SHARD] Ignition sequence start.");
-    }
-};
-
-// 2. Sovereign Entry Point
-extern "C" void myshard_init() {
-    MyShardEngine::getInstance().ignite();
-}
-```
-
-## 📚 Glossary
-
-| Term | Technical Explanation |
+| SigmaOS Term | Standard Technical Meaning |
 | :--- | :--- |
-| **Amnesic Memory** | Stateless RAM allocation that scrubs data immediately after use. |
-| **Singularity** | The state where all 600 shards are synchronized and operational. |
-| **Sovereign Lattice** | The distributed, modular graph of all system services. |
-| **Shard** | A standalone, zero-dependency binary module (singleton). |
+| **Sovereign Lattice** | The operating system architecture as a whole. |
+| **Shard** | A distinct subsystem or driver encapsulated as a C++ Singleton class. |
+| **Amnesic Memory** | Stateless RAM allocation; memory buffers that are eagerly zeroed out after use to prevent leaks. |
+| **Zenith** | The target milestone version denoting a stable, complete foundation. |
+| **ZCLN (Zero-Copy Lattice Net)** | A zero-copy networking stack (bypassing redundant buffer copies between kernel and userland). |
 
-## 🗺️ Roadmap & Stability
+## 🤝 Contributing
 
-See [ROADMAP.md](ROADMAP.md) for detailed phase tracking and [BUILD.md](BUILD.md) for build instructions.
+We welcome contributions to help evolve SigmaOS from an experimental kernel into a fully usable distribution. 
+- Please read [CONTRIBUTING.md](CONTRIBUTING.md) for our PR process and coding standards.
+- Check out the **Good First Issues** label on GitHub if you want to implement missing features (like expanding the FAT32 driver or adding shell commands).
+- For a detailed look at our immediate goals, refer to [ROADMAP.md](ROADMAP.md).
 
 ---
 
-*Σ SIGMAOS: Beyond Linux. Absolute Sovereignty.*
+*Σ SIGMAOS: Building a modular foundation from the silicon up.*

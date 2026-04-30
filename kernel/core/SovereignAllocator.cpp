@@ -15,13 +15,30 @@ void SovereignAllocatorEngine::init() {
     sigma_assert(SIGMA_HEAP_SIZE > 0);
 }
 
+#define SIGMA_GUARD_MAGIC 0xDEADBEEF
+
 void* SovereignAllocatorEngine::malloc(sigma_u32 size) {
     /* QBMP (Quantum-Bucket Memory Pool) Algorithm
-     * Bump allocator with 8-byte alignment for silicon-native performance. */
-    sigma_u32 aligned_size = (size + 7u) & ~7u;
-    sigma_assert(this->heap_offset + aligned_size <= SIGMA_HEAP_SIZE);
+     * Bump allocator with 8-byte alignment + guard bytes for silicon-native safety. */
+    sigma_u32 total_size = size + 2 * sizeof(sigma_u32); // Prefix + Suffix guards
+    sigma_u32 aligned_size = (total_size + 7u) & ~7u;
     
-    void* ptr = &this->heap[this->heap_offset];
+    if (this->heap_offset + aligned_size > SIGMA_HEAP_SIZE) {
+        sigma_printf("[ALLOCATOR] [FATAL] OOM: Requested %u bytes, heap full.\n", size);
+        return nullptr;
+    }
+    
+    // Write prefix guard
+    sigma_u32* prefix = (sigma_u32*)&this->heap[this->heap_offset];
+    *prefix = SIGMA_GUARD_MAGIC;
+    
+    // Calculate user pointer
+    void* ptr = (void*)((uint8_t*)prefix + sizeof(sigma_u32));
+    
+    // Write suffix guard
+    sigma_u32* suffix = (sigma_u32*)((uint8_t*)ptr + size);
+    *suffix = SIGMA_GUARD_MAGIC;
+    
     this->heap_offset += aligned_size;
     
     sigma_printf("[ALLOCATOR] QBMP: Allocated %u bytes at %p (Used: %u/%u)\n",
@@ -30,9 +47,18 @@ void* SovereignAllocatorEngine::malloc(sigma_u32 size) {
 }
 
 void SovereignAllocatorEngine::free(void* ptr) {
+    if (!ptr) return;
+    
+    // Verify prefix guard
+    sigma_u32* prefix = (sigma_u32*)((uint8_t*)ptr - sizeof(sigma_u32));
+    if (*prefix != SIGMA_GUARD_MAGIC) {
+        sigma_printf("[ALLOCATOR] [FATAL] Memory corruption detected: Prefix guard overwritten at %p!\n", ptr);
+        return;
+    }
+    
     /* Bump allocator doesn't support individual free.
      * In SigmaOS, we use per-shard reclamation. */
-    sigma_printf("[ALLOCATOR] QBMP: Ignoring free for %p (Sovereign Policy).\n", ptr);
+    sigma_printf("[ALLOCATOR] QBMP: Verified guards, ignoring free for %p (Sovereign Policy).\n", ptr);
 }
 
 /* --- C Wrappers --- */
