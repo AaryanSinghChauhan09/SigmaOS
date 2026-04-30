@@ -10,7 +10,6 @@
 #ifndef SIGMA_THERMALIQ_H
 #define SIGMA_THERMALIQ_H
 
-#include "sigma_types.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -18,9 +17,9 @@ extern "C" {
 
 /* --- Thermal Intelligence Primitives --- */
 void thermaliq_init(void);
-uint32_t thermaliq_get_package_temp(void);
+sigma_u32 thermaliq_get_package_temp(void);
 void thermaliq_apply_thermal_policy(void);
-void thermaliq_emergency_throttle(uint32_t threshold_celsius);
+void thermaliq_emergency_throttle(sigma_u32 threshold_celsius);
 
 #ifdef __cplusplus
 }

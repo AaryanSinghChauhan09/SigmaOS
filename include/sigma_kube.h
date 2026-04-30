@@ -12,7 +12,6 @@
 #define SIGMA_KUBE_H
 
 #include "sigma_types.h"
-#include "sigma_container.h"
 
 #ifdef __cplusplus
 extern "C" {
