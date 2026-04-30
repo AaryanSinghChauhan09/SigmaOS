@@ -49,12 +49,13 @@ public:
     void reportStats() const;
 
 private:
-    SovereignNetStackEngine() : packets_sent(0), packets_received(0), initialized(0) {}
+    SovereignNetStackEngine() : packets_sent(0), packets_received(0), initialized(0), firewall_enabled(true) {}
     
     sigma_net_config_t config;
     sigma_u32          packets_sent;
     sigma_u32          packets_received;
     sigma_u32          initialized;
+    bool               firewall_enabled;
 };
 #endif
 
