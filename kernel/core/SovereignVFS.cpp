@@ -1,15 +1,15 @@
-#include "Lattice.h"
 #include "sigma_vfs.h"
 #include "sigma_hal.h"
 #include "sigma_types.h"
 
 /**
- * SigmaOS Sovereign VFS Implementation (v28.0 Zenith)
+ * SigmaOS Sovereign VFS (v28.0 Zenith)
  * Implements a high-performance Shard-Mapped Lookup (SML) algorithm.
  * ZERO-DEPENDENCY: Strictly bare-metal silicon-native VFS.
  *
  * Design: OOP-isolated singleton — SovereignVFSEngine.
  */
+
 
 
 /* --- Sovereign VFS Engine (OOP Isolation) --- */
