@@ -480,6 +480,8 @@
                 <div class="util-nav" onclick="switchUtil('key-test')">Key-Test</div>
                 <div class="util-nav" onclick="switchUtil('speed')">Ookla Speed Shard</div>
                 <div class="util-nav" onclick="switchUtil('status')">IsItDownRightNow</div>
+                <div class="util-nav" onclick="switchUtil('bootable')">Bootable Creator</div>
+                <div class="util-nav" onclick="switchUtil('table')">Table Convert</div>
             </div>
             <!-- Main Area -->
             <div id="util-main" style="flex: 1; padding: 20px; overflow-y: auto;">
@@ -555,6 +557,22 @@
                     <input type="text" id="status-url" placeholder="Enter URL (e.g. sigmaos.io)..." style="width: 100%; background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.1); color: white; padding: 10px; border-radius: 5px; font-family: 'JetBrains Mono', monospace; margin-bottom: 15px; outline: none;">
                     <button class="util-btn" onclick="checkStatus()">Check Shard Availability</button>
                     <div id="status-output" style="margin-top: 20px; padding: 15px; border-radius: 5px; font-family: 'JetBrains Mono', monospace;"></div>
+                </div>
+                <div id="util-bootable" style="display: none;">
+                    <h3 style="margin-top: 0; color: var(--accent);">Bootable Shard Creator (Etcher/Rufus)</h3>
+                    <div style="background: rgba(0,0,0,0.3); padding: 20px; border-radius: 10px;">
+                        <div style="margin-bottom: 10px;">Target: <span id="boot-target" style="color: var(--accent);">NO DEVICE DETECTED</span></div>
+                        <button class="util-btn" onclick="flashBootable()">Flash Sovereign Image</button>
+                        <div id="flash-progress" style="margin-top: 15px; height: 10px; background: rgba(255,255,255,0.1); border-radius: 5px; overflow: hidden; display: none;">
+                            <div id="flash-bar" style="width: 0%; height: 100%; background: var(--success); transition: 0.3s;"></div>
+                        </div>
+                    </div>
+                </div>
+                <div id="util-table" style="display: none;">
+                    <h3 style="margin-top: 0; color: var(--accent);">Table Convert Shard</h3>
+                    <textarea id="table-input" placeholder="Enter CSV data..." style="width: 100%; height: 100px; background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.1); color: white; padding: 10px; border-radius: 5px; font-family: 'JetBrains Mono', monospace; margin-bottom: 15px; outline: none;"></textarea>
+                    <button class="util-btn" onclick="convertTable()">Forge HTML Table</button>
+                    <div id="table-output" style="margin-top: 20px; overflow-x: auto; background: rgba(255,255,255,0.05); padding: 10px; border-radius: 5px;"></div>
                 </div>
                 <!-- Other panes hidden by default -->
             </div>
@@ -733,8 +751,40 @@
             }, 1500);
         }
 
+        function flashBootable() {
+            document.getElementById('boot-target').innerText = "SiliconDrive (64GB) [LOCKED]";
+            const barContainer = document.getElementById('flash-progress');
+            const bar = document.getElementById('flash-bar');
+            barContainer.style.display = 'block';
+            let progress = 0;
+            const interval = setInterval(() => {
+                progress += 5;
+                bar.style.width = progress + '%';
+                if (progress >= 100) {
+                    clearInterval(interval);
+                    addLog("Σ [FLASH]: Bootable shard written successfully.", "success");
+                }
+            }, 100);
+        }
+
+        function convertTable() {
+            const csv = document.getElementById('table-input').value;
+            const rows = csv.split('\n');
+            let html = '<table style="width: 100%; border-collapse: collapse; font-size: 0.8em; color: white;">';
+            rows.forEach((row, i) => {
+                html += '<tr>';
+                row.split(',').forEach(col => {
+                    html += `<td style="border: 1px solid rgba(255,255,255,0.1); padding: 8px; ${i===0?'background: rgba(0,255,255,0.1); font-weight: 800;':''}">${col.trim()}</td>`;
+                });
+                html += '</tr>';
+            });
+            html += '</table>';
+            document.getElementById('table-output').innerHTML = html;
+            addLog("Σ [UTILITY]: CSV-to-Table conversion complete.", "success");
+        }
+
         function switchUtil(utilId) {
-            const panes = ['text-ops', 'data-conv', 'code-img', 'diff', 'dup-find', 'key-test', 'speed', 'status'];
+            const panes = ['text-ops', 'data-conv', 'code-img', 'diff', 'dup-find', 'key-test', 'speed', 'status', 'bootable', 'table'];
             panes.forEach(p => {
                 const el = document.getElementById(`util-${p}`);
                 if (el) el.style.display = 'none';
