@@ -2,13 +2,13 @@
 
 ## 🌌 Sovereign Security Model
 
-SigmaOS implements a **Zero-Trust Architectural Model**. Every shard resides 
-within a **Cryptographic Isolation Boundary (CIB)** and communicates via 
+SigmaOS implements a **Zero-Trust Architectural Model**. Every shard resides
+within a **Cryptographic Isolation Boundary (CIB)** and communicates via
 **Internal Cryptographic Tunneling (ICT)**.
 
 ## Reporting a Vulnerability
 
-If you identify a breach in the sovereign lattice or a silicon-to-logic 
+If you identify a breach in the sovereign lattice or a silicon-to-logic
 handshake vulnerability:
 
 1. **Do not open a public issue.**

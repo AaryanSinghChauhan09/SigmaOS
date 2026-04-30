@@ -18,7 +18,6 @@ SigmaOS provides a premium, industrial-grade user experience that rivals or exce
 - **Sovereign Documentation**: Comprehensive **GitHub Wiki** covering all 500+ micro-shards.
 - **Unified Experience**: Seamlessly switch between the ultra-advanced Sovereign CLI and the polished Zenith Dashboard.
 
-
 ---
 
 ## 🏛️ 1. ARCHITECTURAL SUPREMACY
@@ -33,8 +32,8 @@ SigmaOS follows the **Run-Only-What-is-Necessary** (ROWN) principle. Every syste
 
 In SigmaOS, everything is a shard. The **Sovereign VFS** abstracts hardware devices and storage nodes into a unified interface:
 
-
-- **Unified Access**: Interact with `keyboard`, `disk`, and `network` using the same `read/write` primitives.- **Hardware Agnostic**: Drivers register themselves as VFS nodes, allowing for hot-swappable hardware support.
+- **Unified Access**: Interact with `keyboard`, `disk`, and `network` using the same `read/write` primitives.
+- **Hardware Agnostic**: Drivers register themselves as VFS nodes, allowing for hot-swappable hardware support.
 
 
 ### 1.3 Industrial Build Orchestration
@@ -44,9 +43,7 @@ The SigmaOS build system is now modular and recursive:
 - **Modular Compilation**: Drivers, File Systems, and Kernel Core are compiled as independent object shards.
 - **Strict Compliance**: The build pipeline enforces Multiboot-2 and x86_64 industrial standards.
 
-
 Unlike monolithic kernels (Linux) or hybrid kernels (Windows/NT), SigmaOS uses the **Run-Only-What-is-Necessary** principle.
-
 
 - **Micro-Shards**: 500+ isolated modules (`kernel/shell`, `kernel/legal`, `kernel/net`).
 - **Lazy-Load**: Shards are activated on-demand, reducing the attack surface and memory footprint.
@@ -68,14 +65,13 @@ SigmaOS is the first OS to integrate the law into the kernel.
   3. `checklist-generate-report` — Perform an industrial audit of your compliance status.
 
 
-
 ---
 
 ## 🧪 3. RESEARCHER & SCIENTIST TOOLS
 
--   **Forensic Scientists**: Use the `camera-shard` for Sec 63 digital signing of evidence.
--   **Data Scientists**: High-performance `tensor-core` and `graph-plot` tools for topological analysis.
--   **AI Researchers**: `sigma-code` (Agentic AI Assistant) and `sigma-agent` (Autonomous OS maintenance).
+- **Forensic Scientists**: Use the `camera-shard` for Sec 63 digital signing of evidence.
+- **Data Scientists**: High-performance `tensor-core` and `graph-plot` tools for topological analysis.
+- **AI Researchers**: `sigma-code` (Agentic AI Assistant) and `sigma-agent` (Autonomous OS maintenance).
 
 ---
 
@@ -93,12 +89,11 @@ Designed for **100% Keyboard Sovereignty**.
 
 ### 5.1 Environment Requirements
 
--   **Hardware**: x86_64 or ARMv8 Silicon.
--   **Memory**: 128MB RAM minimum.
--   **Display**: High-pixel density support for Zenith UI dashboard.
+- **Hardware**: x86_64 or ARMv8 Silicon.
+- **Memory**: 128MB RAM minimum.
+- **Display**: High-pixel density support for Zenith UI dashboard.
 
 ### 5.2 Step-by-Step Installation
-
 
 1. **Source**: `git clone https://github.com/SigmaOS-Project/SigmaOS.git`
 2. **Build Selection**:

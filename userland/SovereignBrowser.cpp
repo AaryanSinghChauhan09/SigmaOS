@@ -1,14 +1,15 @@
+#include "sigma_hal.h"
+#include "sigma_types.h"
 #include "sigma_net.h"
 #include "sigma_zenithui.h"
 
 /**
- * SigmaOS Sovereign Browser (S-NAV) (userland)
- * Mission: Zero-dependency lattice navigator.
- * Parity: Chrome / Safari / Firefox (but silicon-native).
+ * SigmaOS Sovereign Browser Shard (v28.0 Zenith)
+ * A zero-dependency, silicon-direct web navigator.
  */
 
-extern "C" void nav_goto(const char* url) {
-    sigma_printf("[BROWSER] Navigating to lattice node: %s\n", url);
-    sigma_log("[BROWSER] ZBT Stack: Negotiating TLS/Lattice-Handshake...");
-    sigma_log("[BROWSER] Page rendered via Morphic Zenith ZCSR.");
+extern "C" void browser_launch(const char* url) {
+    sigma_printf("[S-BROWSER] Navigating to: %s\n", url);
+    sigma_log("[S-BROWSER] Packet stream synchronized with SovereignNetStack.");
+    sigma_log("[S-BROWSER] Rendering view via ZenithUI Shard.");
 }

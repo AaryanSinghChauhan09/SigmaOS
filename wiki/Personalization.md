@@ -36,7 +36,7 @@ The Omni-Shell provides several features to improve the user experience:
 
 ## 💎 Persona Shard (v1.0)
 
-The **Persona Shard** enables declarative identity management. 
+The **Persona Shard** enables declarative identity management.
 
 - **Cognitive Sync**: Real-time alignment between user intent and system policy.
 - **Lattice Synchronization**: Profiles are mirrored across all distributed nodes via PQC-encrypted shards.

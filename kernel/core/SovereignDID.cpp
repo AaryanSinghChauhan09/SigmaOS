@@ -1,5 +1,4 @@
 #include "sigma_hal.h"
-#include "sigma_pqc.h"
 
 /**
  * SigmaOS Sovereign Decentralized Identity (DID) (v28.0 Zenith)
@@ -9,23 +8,37 @@
  * Design: OOP-isolated singleton — SovereignDIDEngine.
  */
 
-/* --- Sovereign DID Engine (OOP Isolation) --- */
-static struct {
+class SovereignDIDEngine {
+public:
+    static SovereignDIDEngine& getInstance() {
+        static SovereignDIDEngine instance;
+        return instance;
+    }
+
+    void init() {
+        sigma_log("[DID] Initializing Sovereign Identity Lattice (SIL)...");
+        this->initialized = 1u;
+    }
+
+    void attestIdentity(const char* identity_shard) {
+        sigma_printf("[DID] SIL: Attesting sovereign identity for '%s'...\n", identity_shard);
+        /* SIL Algorithm: Cryptographic proof of identity without centralized authority */
+        this->total_attestations++;
+        sigma_log("[DID] SIL: Attestation SUCCESS. Identity integrated into the lattice.");
+    }
+
+private:
+    SovereignDIDEngine() : total_attestations(0), initialized(0) {}
+    
     sigma_u64 total_attestations;
     sigma_u32 initialized;
-} SovereignDIDEngine = {
-    .total_attestations = 0ULL,
-    .initialized = 0u
 };
 
+/* --- C Wrappers --- */
 extern "C" void did_init() {
-    sigma_log("[DID] Initializing Sovereign Identity Lattice (SIL)...");
-    SovereignDIDEngine.initialized = 1u;
+    SovereignDIDEngine::getInstance().init();
 }
 
 extern "C" void did_attest_identity(const char* identity_shard) {
-    sigma_printf("[DID] SIL: Attesting sovereign identity for '%s'...\n", identity_shard);
-    /* SIL Algorithm: Cryptographic proof of identity without centralized authority */
-    SovereignDIDEngine.total_attestations++;
-    sigma_log("[DID] SIL: Attestation SUCCESS. Identity integrated into the lattice.");
+    SovereignDIDEngine::getInstance().attestIdentity(identity_shard);
 }

@@ -14,7 +14,9 @@ assignees: ''
 A clear and concise description of what the bug is.
 
 **To Reproduce:**
+
 Steps to reproduce the behavior:
+
 1. Ignite shard...
 2. Trigger syscall...
 3. See error.
@@ -23,6 +25,7 @@ Steps to reproduce the behavior:
 A clear and concise description of what you expected to happen.
 
 **Silicon Context:**
+
 - Target Architecture: (x86_64, ARM64, RISC-V)
 - Zenith Version: v28.0
 

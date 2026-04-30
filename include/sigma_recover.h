@@ -26,6 +26,29 @@ sigma_recovery_state_t recover_get_lattice_state(void);
 
 #ifdef __cplusplus
 }
+
+class SovereignRecover {
+public:
+    static SovereignRecover& getInstance() {
+        static SovereignRecover instance;
+        return instance;
+    }
+
+    void init();
+    void triggerHealing(uint32_t shard_id);
+    sigma_recovery_state_t getLatticeState() const;
+    void setLatticeState(sigma_recovery_state_t state);
+
+private:
+    SovereignRecover() : lattice_state(SIGMA_RECOVER_HEALTHY), registry_ptr(0) {}
+    
+    sigma_recovery_state_t lattice_state;
+    sigma_recovery_record_t healing_registry[32];
+    uint32_t registry_ptr;
+};
+
+#ifdef __cplusplus
+}
 #endif
 
 #endif /* SIGMA_RECOVER_H */

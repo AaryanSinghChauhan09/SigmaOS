@@ -1,5 +1,4 @@
 #include "sigma_hal.h"
-#include "sigma_fs.h"
 
 /**
  * SigmaOS Sovereign Installer (S-Install) (v28.0 Zenith)
@@ -9,36 +8,51 @@
  * Design: OOP-isolated singleton — SovereignInstallerEngine.
  */
 
-/* --- Sovereign Installer Engine (OOP Isolation) --- */
-static struct {
+class SovereignInstallerEngine {
+public:
+    static SovereignInstallerEngine& getInstance() {
+        static SovereignInstallerEngine instance;
+        return instance;
+    }
+
+    void init() {
+        sigma_log("[INSTALL] Initializing Sovereign Autonomous Deployment Engine (ABMD)...");
+        this->initialized = 1u;
+    }
+
+    void execute() {
+        sigma_log("[INSTALL] ABMD: Scanning for silicon targets...");
+        sigma_log("[INSTALL] ABMD: Target disk identified (0x80). Preparing sovereign partition...");
+        
+        for (sigma_u32 i = 0u; i <= 100u; i += 25u) {
+            this->progress = i;
+            sigma_printf("[INSTALL] ABMD: Shard deployment progress: %u%%\n", i);
+            // Simulate shard deployment
+        }
+        
+        sigma_log("[INSTALL] ABMD: 600-shard modular lattice IGNTIED on target hardware.");
+        sigma_log("[INSTALL] ABMD: Installation SUCCESS. Sovereignty established.");
+    }
+
+    sigma_u32 getProgress() const { return this->progress; }
+
+private:
+    SovereignInstallerEngine() : progress(0), target_disk(0), initialized(0) {}
+    
     sigma_u32 progress;
     sigma_u32 target_disk;
     sigma_u32 initialized;
-} SovereignInstallerEngine = {
-    .progress = 0u,
-    .target_disk = 0u,
-    .initialized = 0u
 };
 
+/* --- C Wrappers --- */
 extern "C" void install_init() {
-    sigma_log("[INSTALL] Initializing Sovereign Autonomous Deployment Engine (ABMD)...");
-    SovereignInstallerEngine.initialized = 1u;
+    SovereignInstallerEngine::getInstance().init();
 }
 
 extern "C" void install_execute() {
-    sigma_log("[INSTALL] ABMD: Scanning for silicon targets...");
-    sigma_log("[INSTALL] ABMD: Target disk identified (0x80). Preparing sovereign partition...");
-    
-    for (sigma_u32 i = 0u; i <= 100u; i += 25u) {
-        SovereignInstallerEngine.progress = i;
-        sigma_printf("[INSTALL] ABMD: Shard deployment progress: %u%%\n", i);
-        // Simulate shard deployment
-    }
-    
-    sigma_log("[INSTALL] ABMD: 600-shard modular lattice IGNTIED on target hardware.");
-    sigma_log("[INSTALL] ABMD: Installation SUCCESS. Sovereignty established.");
+    SovereignInstallerEngine::getInstance().execute();
 }
 
 extern "C" sigma_u32 install_get_progress() {
-    return SovereignInstallerEngine.progress;
+    return SovereignInstallerEngine::getInstance().getProgress();
 }

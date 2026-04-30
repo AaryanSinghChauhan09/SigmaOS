@@ -1,4 +1,3 @@
-#include "sigma_usb.h"
 #include "sigma_hal.h"
 
 /**
@@ -9,29 +8,43 @@
  * Design: OOP-isolated singleton — SovereignMouseEngine.
  */
 
-/* --- Sovereign Mouse Engine (OOP Isolation) --- */
-static struct {
+class SovereignMouseEngine {
+public:
+    static SovereignMouseEngine& getInstance() {
+        static SovereignMouseEngine instance;
+        return instance;
+    }
+
+    void init() {
+        sigma_log("[MOUSE] Initializing Sovereign HID Mouse Orchestration (HMO)...");
+        this->initialized = 1u;
+    }
+
+    void handleReport(const sigma_u8* report) {
+        if (!report) return;
+        /* HMO Algorithm: Decodes USB HID mouse reports into lattice coordinates */
+        this->x += (sigma_u32)report[1];
+        this->y += (sigma_u32)report[2];
+        this->buttons = report[0];
+        
+        sigma_printf("[MOUSE] HMO: Position (%u, %u) | Buttons: 0x%02X\n", 
+                     this->x, this->y, this->buttons);
+    }
+
+private:
+    SovereignMouseEngine() : x(0), y(0), buttons(0), initialized(0) {}
+    
     sigma_u32 x;
     sigma_u32 y;
     sigma_u32 buttons;
     sigma_u32 initialized;
-} SovereignMouseEngine = {
-    .x = 0u, .y = 0u, .buttons = 0u,
-    .initialized = 0u
 };
 
+/* --- C Wrappers --- */
 extern "C" void mouse_init() {
-    sigma_log("[MOUSE] Initializing Sovereign HID Mouse Orchestration (HMO)...");
-    SovereignMouseEngine.initialized = 1u;
+    SovereignMouseEngine::getInstance().init();
 }
 
 extern "C" void mouse_handle_report(const sigma_u8* report) {
-    if (!report) return;
-    /* HMO Algorithm: Decodes USB HID mouse reports into lattice coordinates */
-    SovereignMouseEngine.x += (sigma_u32)report[1];
-    SovereignMouseEngine.y += (sigma_u32)report[2];
-    SovereignMouseEngine.buttons = report[0];
-    
-    sigma_printf("[MOUSE] HMO: Position (%u, %u) | Buttons: 0x%02X\n", 
-                 SovereignMouseEngine.x, SovereignMouseEngine.y, SovereignMouseEngine.buttons);
+    SovereignMouseEngine::getInstance().handleReport(report);
 }

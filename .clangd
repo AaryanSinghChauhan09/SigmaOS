@@ -1,6 +1,6 @@
 CompileFlags:
   Add: [
-    "-Ic:/Users/Aaryan/.gemini/antigravity/scratch/SigmaOS-Repo/include",
+    "-Ic:/Users/Sovereign/.gemini/antigravity/scratch/SigmaOS-Repo/include",
     "-Iinclude",
     "-Ikernel/core",
     "-Ikernel/drivers",

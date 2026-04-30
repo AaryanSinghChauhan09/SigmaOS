@@ -9,36 +9,28 @@
  * ZERO-DEPENDENCY: Strictly bare-metal system resilience.
  */
 
-/* --- Sovereign Recovery Manager (OOPS Isolation) --- */
-static struct {
-    sigma_recovery_state_t lattice_state;
-    sigma_recovery_record_t healing_registry[32];
-    uint32_t registry_ptr;
-} SovereignRecoveryManager = {
-    .lattice_state = SIGMA_RECOVER_HEALTHY,
-    .registry_ptr = 0
-};
+/* --- Sovereign Recovery Implementation --- */
 
-extern "C" void recover_init() {
+void SovereignRecover::init() {
     sigma_log("[RECOVER] Initializing Sovereign System Recovery Lattice (OOPS Isolation)...");
 }
 
-extern "C" void recover_trigger_healing(uint32_t shard_id) {
+void SovereignRecover::triggerHealing(uint32_t shard_id) {
     // SHSR (Self-Healing Shard Restoration) Algorithm
     // Automatically hot-swaps corrupted shards with verified silicon-cache snapshots.
     
-    SovereignRecoveryManager.lattice_state = SIGMA_RECOVER_HEALING;
+    this->lattice_state = SIGMA_RECOVER_HEALING;
     
     sigma_recovery_record_t* record = (sigma_recovery_record_t*)SIGMA_NULL;
-    for(uint32_t i=0; i<SovereignRecoveryManager.registry_ptr; i++) {
-        if(SovereignRecoveryManager.healing_registry[i].shard_id == shard_id) {
-            record = &SovereignRecoveryManager.healing_registry[i];
+    for(uint32_t i=0; i<this->registry_ptr; i++) {
+        if(this->healing_registry[i].shard_id == shard_id) {
+            record = &this->healing_registry[i];
             break;
         }
     }
 
-    if(!record && SovereignRecoveryManager.registry_ptr < 32) {
-        record = &SovereignRecoveryManager.healing_registry[SovereignRecoveryManager.registry_ptr++];
+    if(!record && this->registry_ptr < 32) {
+        record = &this->healing_registry[this->registry_ptr++];
         record->shard_id = shard_id;
         record->heal_count = 0;
         record->permanent_failure = false;
@@ -49,7 +41,7 @@ extern "C" void recover_trigger_healing(uint32_t shard_id) {
         if(record->heal_count > 3) {
             sigma_printf("[RECOVER] SHSR: Shard S%02d reached CRITICAL failure threshold. Isolation engaged.\n", (int)shard_id);
             record->permanent_failure = true;
-            SovereignRecoveryManager.lattice_state = (sigma_recovery_state_t)SIGMA_RECOVER_CRITICAL;
+            this->lattice_state = (sigma_recovery_state_t)SIGMA_RECOVER_CRITICAL;
             return;
         }
     }
@@ -58,9 +50,26 @@ extern "C" void recover_trigger_healing(uint32_t shard_id) {
                  (int)shard_id, record ? (int)record->heal_count : 1);
     
     sigma_log("[RECOVER] SHSR: Shard binary parity verified. Hot-swap COMPLETE.");
-    SovereignRecoveryManager.lattice_state = SIGMA_RECOVER_HEALTHY;
+    this->lattice_state = SIGMA_RECOVER_HEALTHY;
+}
+
+sigma_recovery_state_t SovereignRecover::getLatticeState() const {
+    return this->lattice_state;
+}
+
+void SovereignRecover::setLatticeState(sigma_recovery_state_t state) {
+    this->lattice_state = state;
+}
+
+/* --- C Wrappers --- */
+extern "C" void recover_init() {
+    SovereignRecover::getInstance().init();
+}
+
+extern "C" void recover_trigger_healing(uint32_t shard_id) {
+    SovereignRecover::getInstance().triggerHealing(shard_id);
 }
 
 extern "C" sigma_recovery_state_t recover_get_lattice_state() {
-    return SovereignRecoveryManager.lattice_state;
+    return SovereignRecover::getInstance().getLatticeState();
 }

@@ -2,13 +2,13 @@
 
 ## Our Pledge
 
-In the interest of fostering an open and welcoming environment, we as 
-contributors and maintainers pledge to make participation in our project 
+In the interest of fostering an open and welcoming environment, we as
+contributors and maintainers pledge to make participation in our project
 and our community a harassment-free experience for everyone.
 
 ## Our Standards
 
-Examples of behavior that contributes to creating a positive environment 
+Examples of behavior that contributes to creating a positive environment
 include:
 
 - Using welcoming and inclusive language.
@@ -19,8 +19,8 @@ include:
 
 ## Enforcement
 
-Maintainers have the right and responsibility to remove, edit, or reject 
-comments, commits, code, wiki edits, issues, and other contributions 
+Maintainers have the right and responsibility to remove, edit, or reject
+comments, commits, code, wiki edits, issues, and other contributions
 that are not aligned to this Code of Conduct.
 
 ---

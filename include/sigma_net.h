@@ -1,11 +1,3 @@
-/*
- * =========================================================================
- * Σ SIGMAOS: SOVEREIGN NETWORKING STACK (SILICON-DIRECT)
- * =========================================================================
- * Mission: Zero-buffer, shard-mapped packet processing.
- * =========================================================================
- */
-
 #ifndef SIGMA_NET_H
 #define SIGMA_NET_H
 
@@ -14,6 +6,12 @@
 #ifdef __cplusplus
 extern "C" {
 #endif
+
+typedef struct {
+    sigma_u32 interface_id;
+    sigma_u32 mtu;
+    sigma_u32 flags;
+} sigma_net_config_t;
 
 typedef struct {
     sigma_u8 mac[6];
@@ -30,18 +28,34 @@ typedef struct {
 } sigma_packet_t;
 
 /* --- Networking Primitives --- */
-void net_init(void);
+/* --- Networking Primitives --- */
+void net_init(const sigma_net_config_t* config);
 void net_process_packet(sigma_packet_t* pkt);
 bool net_transmit_shard(uint32_t target_ip, uint32_t shard_id);
 
-/* --- Sovereign Stack (ZBPA) Primitives --- */
-void     netstack_init(void);
-void     netstack_process_packet(const void* buffer, sigma_u32 size);
-void     netstack_send_packet(const void* buffer, sigma_u32 size);
-sigma_u32 netstack_is_link_active(void);
-
 #ifdef __cplusplus
 }
+
+class SovereignNetStackEngine {
+public:
+    static SovereignNetStackEngine& getInstance() {
+        static SovereignNetStackEngine instance;
+        return instance;
+    }
+
+    void init(const sigma_net_config_t* config);
+    void sendPacket(const void* data, sigma_u32 len);
+    void receivePacket(void* buffer, sigma_u32* len);
+    void reportStats() const;
+
+private:
+    SovereignNetStackEngine() : packets_sent(0), packets_received(0), initialized(0) {}
+    
+    sigma_net_config_t config;
+    sigma_u32          packets_sent;
+    sigma_u32          packets_received;
+    sigma_u32          initialized;
+};
 #endif
 
 #endif /* SIGMA_NET_H */

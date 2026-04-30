@@ -1,6 +1,4 @@
-#include "sigma_types.h"
 #include "sigma_hal.h"
-#include "sigma_libc.h"
 #include "sigma_usr.h"
 
 /**
@@ -9,22 +7,17 @@
  * Inspired by systemctl / apt-get / dbus.
  */
 
-static struct {
-    sigma_usr_entry_t registry[512];
-    uint32_t count;
-} SovereignUSRManager = {
-    .count = 0
-};
+/* --- Sovereign USR Implementation --- */
 
-extern "C" void usr_init() {
+void SovereignUSRManager::init() {
     sigma_log("[USR] Initializing Sovereign Unified Shard Registry...");
 }
 
-extern "C" uint32_t usr_register_shard(const char* name, uint32_t quantum_key) {
-    if (SovereignUSRManager.count >= 512) return 0;
+uint32_t SovereignUSRManager::registerShard(const char* name, uint32_t quantum_key) {
+    if (this->count >= 512) return 0;
     
-    uint32_t id = ++SovereignUSRManager.count;
-    usr_entry_t* entry = &SovereignUSRManager.registry[id - 1];
+    uint32_t id = ++this->count;
+    sigma_usr_entry_t* entry = &this->registry[id - 1];
     
     entry->shard_id = id;
     sigma_hardened_strcpy(entry->name, name, 64);
@@ -35,9 +28,22 @@ extern "C" uint32_t usr_register_shard(const char* name, uint32_t quantum_key) {
     return id;
 }
 
-extern "C" bool usr_activate_shard(uint32_t shard_id) {
-    if (shard_id == 0 || shard_id > SovereignUSRManager.count) return false;
-    SovereignUSRManager.registry[shard_id - 1].is_active = true;
+bool SovereignUSRManager::activateShard(uint32_t shard_id) {
+    if (shard_id == 0 || shard_id > this->count) return false;
+    this->registry[shard_id - 1].is_active = true;
     sigma_printf("[USR] Shard S%02d Activated.\n", shard_id);
     return true;
+}
+
+/* --- C Wrappers --- */
+extern "C" void usr_init() {
+    SovereignUSRManager::getInstance().init();
+}
+
+extern "C" uint32_t usr_register_shard(const char* name, uint32_t quantum_key) {
+    return SovereignUSRManager::getInstance().registerShard(name, quantum_key);
+}
+
+extern "C" bool usr_activate_shard(uint32_t shard_id) {
+    return SovereignUSRManager::getInstance().activateShard(shard_id);
 }

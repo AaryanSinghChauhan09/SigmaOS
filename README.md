@@ -6,9 +6,9 @@
 
 ## 🌌 What is SigmaOS?
 
-SigmaOS is an industrial-grade, bare-metal operating system engineered for 
-**Architectural Supremacy**. Unlike monolithic legacy kernels (Linux, Windows, 
-macOS), SigmaOS is built on a **600-shard modular lattice** where every 
+SigmaOS is an industrial-grade, bare-metal operating system engineered for
+**Architectural Supremacy**. Unlike monolithic legacy kernels (Linux, Windows,
+macOS), SigmaOS is built on a **600-shard modular lattice** where every
 component is a sovereign, OOP-isolated singleton engine.
 
 ---
@@ -16,6 +16,7 @@ component is a sovereign, OOP-isolated singleton engine.
 ## 🏛️ System Architecture
 
 ### Core Lattice Orchestration
+
 ```mermaid
 graph TD
     A[Silicon Metal] --> B[S-HAL]
@@ -26,7 +27,7 @@ graph TD
     C --> G[S-SMP SPE]
     D --> H[Cognitive UX Layer]
     H --> I((SINGULARITY))
-    
+
     subgraph "Sovereign Ecosystem"
     J[S-Install]
     K[USR Registry]
@@ -36,6 +37,7 @@ graph TD
 ```
 
 ### Sovereign IPC (WFAE Algorithm)
+
 ```mermaid
 sequenceDiagram
     participant S1 as Shard Alpha
@@ -61,18 +63,21 @@ SigmaOS uses the **S-Install** engine for autonomous deployment.
 
 ## 🛠️ Developer Quick-Start
 
-### Build System:
+### Build System
+
 ```bash
 make singularity  # Ignite the core lattice
 make zenith-iso   # Generate production deployment image
 ```
 
-### Coding Standards:
+### Coding Standards
+
 - **Zero-Dependency**: No external headers.
 - **Singleton Pattern**: Shards must be isolated engines.
 - **Wait-Free**: Use atomic primitives only.
 
 ### Example Workflow: Boot Sequence
+
 1. **S-HAL**: Hardware discovery and silicon mapping.
 2. **S-SMP**: Multicore ignition (SPE).
 3. **Lattice Core**: Shard ignition via USR.
