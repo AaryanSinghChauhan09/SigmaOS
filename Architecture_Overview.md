@@ -1,93 +1,57 @@
-# 🏛️ SigmaOS Architecture Overview
+# 🏛️ SigmaOS Architecture Overview (v28.0 — ZENITH)
 
-> A technical deep-dive into the 600-shard Sovereign Lattice kernel architecture (v28.0 SINGULARITY).
-
----
-
-## Core Design Philosophy
-
-SigmaOS is built on **five inviolable principles**:
-
-| Principle | Description |
-|-----------|-------------|
-| **Zero-Dependency** | No HLL libraries in kernel lattice (`<iostream>`, `<vector>`, etc.) |
-| **Silicon-Native** | Direct hardware access — no abstraction layers between kernel and silicon |
-| **Least Privilege** | Every shard runs with minimum required permissions |
-| **Cryptographic Isolation** | Inter-shard communication encrypted and authenticated |
-| **Modular Atomicity** | Every feature is an independent, hot-swappable shard |
+> "Sovereignty is the absolute control of the silicon-to-logic handshake."
 
 ---
 
-## Lattice Architecture Diagram
+## 💎 Core Design Philosophy
 
-```
-╔══════════════════════════════════════════════════════════════════╗
-║                  SIGMAOS SOVEREIGN LATTICE (600 SHARDS)         ║
-╠══════════════════════════════════════════════════════════════════╣
-║  USER LAYER                                                      ║
-║  ┌─────────────┐  ┌──────────────┐  ┌──────────────────────┐    ║
-║  │  S-Persona  │  │  S-QuickAct  │  │   S-UniversalUI (DFO)│    ║
-║  │  S-Onboard  │  │  S-ContextM  │  │   S-HoloSpace (VSC)  │    ║
-║  │  S-Wellbeing│  │  S-Canvas    │  │   S-AdaptiveType     │    ║
-║  └─────────────┘  └──────────────┘  └──────────────────────┘    ║
-╠═════════════════════════════════╦════════════════════════════════╣
-║  COGNITIVE UX LAYER             ║  AUTOMATION LAYER              ║
-║  ┌──────────┐  ┌─────────────┐  ║  ┌──────────┐  ┌───────────┐  ║
-║  │ S-Voice  │  │ S-EyeTrack  │  ║  │S-TaskAuto│  │ S-VisScript│  ║
-║  │ S-Gesture│  │ S-Emotion   │  ║  │S-Focus   │  │ S-DeepLink │  ║
-║  │ S-Predict│  │ S-OmniSense │  ║  │S-NotifyIQ│  │ S-OmniSync │  ║
-║  └──────────┘  └─────────────┘  ║  └──────────┘  └───────────┘  ║
-╠══════════════════════╦══════════╩══════════════════════════════╣
-║  SECURITY LAYER      ║  NETWORK LAYER                           ║
-║  ┌────────────────┐  ║  ┌──────────────┐  ┌────────────────┐   ║
-║  │ S-SecHardener  │  ║  │ S-ZeroNet    │  │ S-NetMonitor   │   ║
-║  │ S-Sandbox (CIB)│  ║  │ S-PQC        │  │ S-Collab       │   ║
-║  │ S-Vault (ZKEP) │  ║  │ S-Privacy    │  │ S-OmniSync     │   ║
-║  │ S-Sentinel     │  ║  └──────────────┘  └────────────────┘   ║
-║  └────────────────┘  ║                                          ║
-╠══════════════════════╩══════════════════════════════════════════╣
-║  KERNEL CORE LAYER                                               ║
-║  ┌──────────────┐  ┌──────────────┐  ┌───────────────────────┐  ║
-║  │ S-AISched    │  │ S-Allocator  │  │ S-HybridKernel        │  ║
-║  │  (NPWO)      │  │  (QBMP)      │  │  (DCS)                │  ║
-║  └──────────────┘  └──────────────┘  └───────────────────────┘  ║
-║  ┌──────────────┐  ┌──────────────┐  ┌───────────────────────┐  ║
-║  │ S-RealTime   │  │ S-DynModule  │  │ S-LiveKernel          │  ║
-║  │  (EDFC)      │  │  (AHSL)      │  │  (AFR)                │  ║
-║  └──────────────┘  └──────────────┘  └───────────────────────┘  ║
-╠══════════════════════════════════════════════════════════════════╣
-║  HARDWARE ABSTRACTION LAYER (sigma_hal.h)                        ║
-╠══════════════════════════════════════════════════════════════════╣
-║  SILICON  │  x86_64  │  ARM  │  RISC-V  │  Neural Accelerators  ║
-╚══════════════════════════════════════════════════════════════════╝
+SigmaOS is engineered for **Architectural Supremacy**, adhering to five inviolable 
+sovereign principles:
+
+| Principle | Technical Manifestation | Legacy OS Equivalence |
+| :--- | :--- | :--- |
+| **Zero-Dependency** | Direct Metal Handshake | POSIX / Glibc Bloat |
+| **Silicon-Native** | Zero-Abstraction Pathing | HAL / Driver Latency |
+| **Least Privilege** | Shard-Level RBAC | Root Vulnerability |
+| **Cryptographic Isolation**| CIB / Internal Tunneling | Global Page Mapping |
+| **Modular Atomicity** | 600-Shard Atomic Lattice | Monolithic Kernel |
+
+---
+
+## 🌌 The Sovereign Lattice (600 Shards)
+
+```mermaid
+graph TD
+    A[Silicon Metal] --> B[S-HAL]
+    B --> C{Sovereign Lattice Core}
+    C --> D[S-AISched NPWO]
+    C --> E[S-MMU APFR]
+    C --> F[S-IPC WFAE]
+    D --> G[Cognitive UX Layer]
+    E --> H[S-Hyper SIV]
+    F --> I[S-Sync SCR]
+    G --> J((SINGULARITY))
+    H --> J
+    I --> J
 ```
 
 ---
 
-## Shard Categories
+## 🚀 Sovereign Zenith (v28.0 Singularity)
 
-### Core Shards (1–50) — Kernel Primitives
-Minimal, stable, secure kernel primitives that form the absolute foundation.
+As of v28.0, SigmaOS has achieved the **Parity Singularity**. This milestone 
+marks the complete modularization of 600 independent shards, enabling 
+zero-latency context switching between legacy OS paradigms and advanced 
+silicon-native AI orchestration.
 
-| Shard | Algorithm | Purpose |
-|-------|-----------|---------|
-| S-AISched | NPWO | Neural predictive workload scheduling |
-| S-Allocator | QBMP | O(1) quantum-bucket memory allocation |
-| S-HybridKernel | DCS | Dynamic micro/mono context switching |
-| S-SecHardener | PLPE | Principle of least privilege enforcement |
-| S-PQC | — | Post-quantum cryptography primitives |
-
-### Essential Shards (51–150) — Base System
-Core system packages enabling a fully functional OS environment.
-
-### Optional Shards (151–300) — Developer & Productivity
-Tools like S-IDE, S-NeuralSearch, S-VisScript for power users.
-
-### Third-Party Shards (301–450) — Ecosystem Extensions
-Community modules, WASM packages, and Linux compatibility shims.
-
-### Infinite Shards (451–600+) — Frontier & Cognitive
-AI-driven UX, spatial computing, emotional adaptation, and beyond.
+### Key Singularity Breakthroughs:
+- **Neural Lattice Optimization (NLO):** Automated shard health monitoring and 
+  self-healing without kernel interrupts.
+- **Shard-Isolated Virtualization (SIV):** Type-1 hypervisor hooks directly 
+  integrated into the silicon lattice for near-zero guest overhead.
+- **Post-Quantum Identity (RLSA):** Lattice-based identity attestation rooted 
+  in hardware TPM/Silicon.
 
 ---
 
@@ -131,18 +95,17 @@ SigmaOS implements a **Defense-in-Depth** security model:
 
 ---
 
-## Build System
+## Build System (Zenith Edition)
 
-```
-make             ← Build everything
-make kernel      ← Build kernel only
-make test        ← Run unit tests
-make audit_build ← Build with full debug symbols for CodeQL
-make iso         ← Generate bootable ISO
-make web-engine  ← Build web simulation engine
+```bash
+make singularity ← Ignite the 600-shard sovereign lattice
+make zenith      ← Activate Cognitive UX & AI Orchestration
+make zenith-iso  ← Generate the production-grade Singularity ISO
 ```
 
 ---
+
+*Σ SIGMAOS: Beyond Linux. Absolute Sovereignty. Singularity Achieved.*
 
 *For contribution guidelines, see [CONTRIBUTING.md](CONTRIBUTING.md).*
 *For developer setup, see [DEVELOPER_GUIDE.md](DEVELOPER_GUIDE.md).*
