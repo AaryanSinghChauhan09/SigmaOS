@@ -23,19 +23,20 @@ typedef enum {
 } sigma_proc_state_t;
 
 typedef struct {
-    uint32_t pid;
-    char name[32];
+    sigma_u32 pid;
+    char      name[32];
     sigma_proc_state_t state;
-    uint32_t priority;
-    uint64_t cpu_time;
-    uint32_t capability_mask;
+    sigma_u32 priority;
+    sigma_u64 cpu_time;
+    sigma_u32 capability_mask;
 } sigma_process_t;
 
 /* --- Process Primitives --- */
-void proc_init(void);
-uint32_t proc_spawn(const char* name, uint32_t priority);
-void proc_yield(void);
+void             proc_init(void);
+sigma_u32        proc_spawn(const char* name, sigma_u32 priority);
+void             proc_yield(void);
 sigma_process_t* proc_get_current(void);
+sigma_u64        proc_get_switch_count(void);
 
 #ifdef __cplusplus
 }

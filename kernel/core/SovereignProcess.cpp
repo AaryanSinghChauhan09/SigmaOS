@@ -6,82 +6,101 @@
  * Implements a Priority-Aware Task Switching (PATS) algorithm.
  */
 
-/* --- Sovereign Scheduler Object (OOPS Isolation) --- */
+#include "Lattice.h"
+#include "sigma_proc.h"
+
+/**
+ * SigmaOS Sovereign Process Manager
+ * Implements a Priority-Aware Task Switching (PATS) algorithm.
+ * ZERO-DEPENDENCY: Strictly bare-metal process orchestration.
+ *
+ * Design: OOP-isolated singleton — SovereignProcessEngine.
+ */
+
+/* --- Sovereign Process Engine (OOP Isolation) --- */
 static struct {
     sigma_process_t table[64];
-    uint32_t active_count;
-    uint32_t current_pid;
-    uint32_t quantum_limit;
-} SovereignScheduler = {
-    .active_count = 0,
-    .current_pid = 0,
-    .quantum_limit = 1000
+    sigma_u32 active_count;
+    sigma_u32 current_pid;
+    sigma_u32 quantum_limit;
+    sigma_u64 switches_performed;
+    sigma_u32 initialized;
+} SovereignProcessEngine = {
+    .active_count = 0u,
+    .current_pid = 0u,
+    .quantum_limit = 1000u,
+    .switches_performed = 0u,
+    .initialized = 0u
 };
 
 extern "C" void proc_init() {
-    sigma_log("[PROC] Initializing Sovereign Scheduler (OOPS Isolation)...");
+    sigma_log("[PROC] Initializing Sovereign Scheduler (PATS Algorithm)...");
     
     // Spawn PID 0: Sovereign Genesis Task
-    proc_spawn("SovereignGenesis", 0);
+    proc_spawn("SovereignGenesis", 0u);
+    SovereignProcessEngine.initialized = 1u;
 }
 
-extern "C" uint32_t proc_spawn(const char* name, uint32_t priority) {
-    if (SovereignScheduler.active_count >= 64) return 0;
+extern "C" sigma_u32 proc_spawn(const char* name, sigma_u32 priority) {
+    if (SovereignProcessEngine.active_count >= 64u) return 0u;
     
-    sigma_process_t* proc = &SovereignScheduler.table[SovereignScheduler.active_count++];
-    proc->pid = SovereignScheduler.active_count;
+    sigma_process_t* proc = &SovereignProcessEngine.table[SovereignProcessEngine.active_count++];
+    proc->pid = SovereignProcessEngine.active_count;
     sigma_hardened_strcpy(proc->name, name, 32);
     proc->state = SIGMA_PROC_READY;
     proc->priority = priority;
-    proc->cpu_time = 0;
-    proc->capability_mask = 0xFFFFFFFF; // Full sovereignty by default
+    proc->cpu_time = 0u;
+    proc->capability_mask = 0xFFFFFFFFu; // Full sovereignty by default
     
-    sigma_printf("[PROC] Spawned Task: %s (PID: %d, Priority: %d)\n", name, proc->pid, priority);
+    sigma_printf("[PROC] Spawned Task: %s (PID: %u, Priority: %u)\n", name, (unsigned)proc->pid, (unsigned)priority);
     return proc->pid;
 }
 
 extern "C" void proc_yield() {
-    // PATS (Priority-Aware Task Switching) Algorithm
+    /* PATS (Priority-Aware Task Switching) Algorithm */
     
-    // Watchdog: Check current process
-    if (SovereignScheduler.current_pid > 0) {
-        sigma_process_t* current = &SovereignScheduler.table[SovereignScheduler.current_pid - 1];
+    if (SovereignProcessEngine.current_pid > 0u) {
+        sigma_process_t* current = &SovereignProcessEngine.table[SovereignProcessEngine.current_pid - 1u];
         if (current->state == SIGMA_PROC_RUNNING) {
             current->cpu_time++;
-            if (current->cpu_time > SovereignScheduler.quantum_limit) {
-                sigma_printf("[PROC] [WATCHDOG] PID %d ('%s') exceeded quota. Deprioritizing.\n", 
-                             current->pid, current->name);
+            if (current->cpu_time > SovereignProcessEngine.quantum_limit) {
+                sigma_printf("[PROC] [WATCHDOG] PID %u ('%s') exceeded quota. Deprioritizing.\n", 
+                             (unsigned)current->pid, current->name);
                 current->priority++;
-                current->cpu_time = 0;
+                current->cpu_time = 0u;
             }
             current->state = SIGMA_PROC_READY;
         }
     }
 
     sigma_process_t* next = (sigma_process_t*)SIGMA_NULL;
-    uint32_t highest_priority = 0xFFFFFFFF;
+    sigma_u32 highest_priority = 0xFFFFFFFFu;
     
-    // Circular scan to prevent starvation (Round-Robin within same priority)
-    uint32_t start_idx = SovereignScheduler.current_pid; 
-    for (uint32_t offset = 0; offset < SovereignScheduler.active_count; offset++) {
-        uint32_t i = (start_idx + offset) % SovereignScheduler.active_count;
+    uint32_t start_idx = SovereignProcessEngine.current_pid; 
+    for (uint32_t offset = 0u; offset < SovereignProcessEngine.active_count; offset++) {
+        uint32_t i = (start_idx + offset) % SovereignProcessEngine.active_count;
         
-        if (SovereignScheduler.table[i].state == SIGMA_PROC_READY && 
-            SovereignScheduler.table[i].priority < highest_priority) {
-            highest_priority = SovereignScheduler.table[i].priority;
-            next = &SovereignScheduler.table[i];
+        if (SovereignProcessEngine.table[i].state == SIGMA_PROC_READY && 
+            SovereignProcessEngine.table[i].priority < highest_priority) {
+            highest_priority = SovereignProcessEngine.table[i].priority;
+            next = &SovereignProcessEngine.table[i];
         }
     }
     
     if (next) {
-        sigma_printf("[PROC] PATS Context Switch: PID %d -> PID %d (%s)\n", 
-                     (int)SovereignScheduler.current_pid, (int)next->pid, next->name);
-        SovereignScheduler.current_pid = next->pid;
+        sigma_printf("[PROC] PATS Context Switch: PID %u -> PID %u (%s)\n", 
+                     (unsigned)SovereignProcessEngine.current_pid, (unsigned)next->pid, next->name);
+        SovereignProcessEngine.current_pid = next->pid;
         next->state = SIGMA_PROC_RUNNING;
+        SovereignProcessEngine.switches_performed++;
     }
 }
 
 extern "C" sigma_process_t* proc_get_current() {
-    if (SovereignScheduler.current_pid == 0) return (sigma_process_t*)SIGMA_NULL;
-    return &SovereignScheduler.table[SovereignScheduler.current_pid - 1];
+    if (SovereignProcessEngine.current_pid == 0u) return (sigma_process_t*)SIGMA_NULL;
+    return &SovereignProcessEngine.table[SovereignProcessEngine.current_pid - 1u];
+}
+
+extern "C" sigma_u64 proc_get_switch_count() {
+    return SovereignProcessEngine.switches_performed;
 }

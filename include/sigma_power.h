@@ -23,10 +23,11 @@ typedef enum {
 } sigma_power_profile_t;
 
 /* --- Power Primitives --- */
-void power_init(void);
-void power_set_profile(sigma_power_profile_t profile);
+void      power_init(void);
+void      power_set_profile(sigma_power_profile_t profile);
 sigma_u32 power_get_battery_pct(void);
-void power_reboot(void);
+void      power_reboot(void);
+sigma_u64 power_get_switch_count(void);
 
 #ifdef __cplusplus
 }

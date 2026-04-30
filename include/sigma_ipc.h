@@ -16,17 +16,16 @@ extern "C" {
 #endif
 
 typedef struct {
-    uint32_t sender_pid;
-    uint32_t receiver_pid;
-    uint32_t shard_id; // Passing a shard as a message
-    uint32_t size;
-    char payload[128];
-} sigma_msg_t;
+    sigma_u32 target_shard;
+    sigma_u32 message_type;
+    sigma_u32 payload[8];
+} sigma_ipc_msg_t;
 
 /* --- IPC Primitives --- */
-void ipc_init(void);
-bool ipc_send(uint32_t to_pid, sigma_msg_t* msg);
-bool ipc_receive(sigma_msg_t* out_msg);
+void      ipc_init(void);
+bool      ipc_send_optimized(sigma_u32 target, sigma_u32 type, sigma_u32* data);
+bool      ipc_receive_optimized(sigma_ipc_msg_t* out_msg);
+sigma_u64 ipc_get_dispatched_count(void);
 
 #ifdef __cplusplus
 }

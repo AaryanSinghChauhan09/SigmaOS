@@ -23,9 +23,10 @@ typedef struct {
 } sigma_audit_event_t;
 
 /* --- Audit Primitives --- */
-void audit_init(void);
-void audit_perform_lattice_sweep(void);
-void audit_report_shard(uint32_t shard_id, bool status);
+void      audit_init(void);
+void      audit_perform_lattice_sweep(void);
+void      audit_report_shard(sigma_u32 shard_id, bool status);
+sigma_u64 audit_get_sweep_count(void);
 
 #ifdef __cplusplus
 }

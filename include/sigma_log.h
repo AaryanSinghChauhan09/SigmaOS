@@ -22,9 +22,10 @@ typedef struct {
 } sigma_log_entry_t;
 
 /* --- Log Primitives --- */
-void log_init(void);
-void log_emit(uint32_t severity, const char* message);
-void log_dump_lattice(void);
+void      log_init(void);
+void      log_emit(sigma_u32 severity, const char* message);
+void      log_dump_lattice(void);
+sigma_u64 log_get_total_emitted(void);
 
 #ifdef __cplusplus
 }

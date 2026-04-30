@@ -22,9 +22,10 @@ typedef enum {
 } sigma_aisched_mode_t;
 
 /* --- AI Scheduler Primitives --- */
-void aisched_init(void);
-void aisched_predict_workload(uint32_t process_id);
-void aisched_set_mode(sigma_aisched_mode_t mode);
+void      aisched_init(void);
+void      aisched_predict_workload(sigma_u32 process_id);
+void      aisched_set_mode(sigma_aisched_mode_t mode);
+sigma_u64 aisched_get_prediction_count(void);
 
 #ifdef __cplusplus
 }

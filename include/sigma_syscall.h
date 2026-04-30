@@ -26,7 +26,9 @@ typedef enum {
 } sigma_syscall_id_t;
 
 /* --- System Call Primitives --- */
+void      syscall_init(void);
 sigma_u32 sigma_syscall(sigma_syscall_id_t id, sigma_u32 arg1, sigma_u32 arg2, sigma_u32 arg3);
+sigma_u64 syscall_get_total_calls(void);
 
 #ifdef __cplusplus
 }
