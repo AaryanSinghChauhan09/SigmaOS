@@ -4,7 +4,6 @@
 
 ---
 
-
 ## 📋 Table of Contents
 
 - [Prerequisites](#prerequisites)
@@ -20,7 +19,6 @@
 
 ## Prerequisites
 
-| Tool | Version | Purpose |
 | Tool | Version | Purpose |
 | :--- | :--- | :--- |
 | GCC / G++ | 13+ | Primary kernel compiler |
@@ -57,16 +55,15 @@ cppcheck --enable=warning,style,performance -Iinclude kernel/
 
 ## Architecture Overview
 
-
 ```text
-SigmaOS Sovereign Lattice (500+ Shards)
+SigmaOS Sovereign Lattice (600+ Shards)
 │
 ├── kernel/
-│   ├── core/               ← Sovereign Shards (C++11, zero-dependency)
+│   ├── core/               ← Sovereign Shards (C++17, zero-dependency)
 │   │   ├── SovereignSched.cpp     ← AI Scheduler (NPWO)
 │   │   ├── SovereignSecHardener.cpp ← Security Hardener (PLPE)
 │   │   ├── SovereignAllocator.cpp  ← Memory Allocator (QBMP)
-│   │   └── ...500+ shards
+│   │   └── ...600+ shards
 │   ├── ui/                 ← Universal UI Layer (DFO algorithm)
 │   └── drivers/            ← Silicon-native hardware drivers
 │
@@ -88,7 +85,6 @@ SigmaOS Sovereign Lattice (500+ Shards)
 
 ## Coding Standards
 
-
 ### 1. Zero-Dependency Rule ⚡
 
 ```cpp
@@ -98,13 +94,13 @@ SigmaOS Sovereign Lattice (500+ Shards)
 #include <string>
 
 // ✅ REQUIRED — Sovereign headers only
-#include <sigma_types.h>
-#include <sigma_hal.h>
+#include "sigma_types.h"
+#include "SovereignLibC.h"
 ```
 
 ### 2. Secure String Operations 🔒
-> All string operations MUST use the hardened wrappers from `sigma_sechardener.h`
 
+> All string operations MUST use the hardened wrappers from `SovereignLibC.h`
 
 ```cpp
 // ❌ UNSAFE — Triggers CWE-119
@@ -116,18 +112,15 @@ sigma_hardened_strcpy(dest, src, MAX_LEN);
 sigma_hardened_snprintf(buf, MAX_LEN, fmt, ...);
 ```
 
-
 ### 3. Input Validation at Every API Boundary 🛡️
 
 ```cpp
 // Every public function MUST validate inputs (CWE-20 fix)
-extern "C" void my_shard_function(const void* data, uint32_t size) {
-    if (!data || size == 0) return;  // Guard clause first
-    sechardener_validate_buffer(data, size, BUFFER_CAPACITY);
+extern "C" void my_shard_function(const void* data, sigma_u32 size) {
+    if (!data || size == 0u) return;  // Guard clause first
     // ... proceed with logic
 }
 ```
-
 
 ### 4. Shard Naming Convention
 
@@ -138,7 +131,6 @@ extern "C" void my_shard_function(const void* data, uint32_t size) {
 | Init function | `<name>_init()` | `neural_init()` |
 | Public APIs | `<name>_<verb>()` | `neural_predict()` |
 
-
 ### 5. Documentation Block
 
 Every shard implementation MUST include:
@@ -148,13 +140,14 @@ Every shard implementation MUST include:
  * SigmaOS Sovereign <Name>
  * Implements a <Algorithm Full Name> (<ACRONYM>) algorithm.
  * ZERO-DEPENDENCY: Strictly bare-metal <description>.
+ *
+ * Design: OOP-isolated singleton -- Sovereign<Name>Engine.
  */
 ```
 
 ---
 
 ## Creating a New Shard
-
 
 ### Step 1 — Create the header
 
@@ -166,14 +159,14 @@ touch include/sigma_myshard.h
 #ifndef SIGMA_MYSHARD_H
 #define SIGMA_MYSHARD_H
 
-#include <sigma_types.h>
+#include "sigma_types.h"
 
 #ifdef __cplusplus
 extern "C" {
 #endif
 
 void myshard_init(void);
-void myshard_execute(const void* input, uint32_t size);
+void myshard_execute(const void* input, sigma_u32 size);
 
 #ifdef __cplusplus
 }
@@ -182,20 +175,17 @@ void myshard_execute(const void* input, uint32_t size);
 #endif /* SIGMA_MYSHARD_H */
 ```
 
-
 ### Step 2 — Create the implementation
 
 ```bash
 touch kernel/core/SovereignMyShard.cpp
 ```
 
-
 ### Step 3 — Verify the shard is detected
 
 ```bash
 python3 scripts/lattice_coverage.py
 ```
-
 
 ### Step 4 — Run security audit
 
@@ -213,20 +203,23 @@ All shards **MUST** comply with the following before merging:
 - [ ] All public APIs validate `NULL` inputs
 - [ ] No forbidden HLL includes (`<iostream>`, `<string>`, etc.)
 - [ ] Buffer sizes explicitly passed — never assumed
-- [ ] Shard applies `sechardener_apply_to_shard()` at init
 - [ ] No global mutable state unless protected by atomic ops
 
 ---
 
 ## Testing Your Shard
 
+SigmaOS uses a built-in Sovereign Test Lattice for automated regression testing.
+
+1. **Add your test case** to `kernel/core/SovereignTests.cpp`.
+2. **Run the tests** by booting the kernel in QEMU:
 ```bash
-# Run the full CI suite locally
-make test
+make qemu
+```
+3. **Verify the serial output** for the `[TEST]` tags and the `✅ ALL CORE TESTS PASSED` finality message.
 
-# Run lattice coverage
-python3 scripts/lattice_coverage.py
-
+You can also run static analysis locally:
+```bash
 # Run CppCheck on your shard
 cppcheck --enable=all --suppress=missingInclude -Iinclude \
          kernel/core/SovereignMyShard.cpp
@@ -236,13 +229,13 @@ cppcheck --enable=all --suppress=missingInclude -Iinclude \
 
 ## Submitting a Pull Request
 
-1. Fork the repository
-2. Create a branch: `git checkout -b feat/s-myshard`
-3. Implement your shard following the coding standards above
-4. Run `python3 scripts/lattice_coverage.py` — verify shard count increases
-5. Push and open a PR against `main`
-6. The CI pipeline will automatically run all 6 jobs
-7. All jobs must pass ✅ before merging
+1. Fork the repository.
+2. Create a branch: `git checkout -b feat/s-myshard`.
+3. Implement your shard following the coding standards above.
+4. Add automated tests in `SovereignTests.cpp`.
+5. Push and open a PR against `lattice-dev`.
+6. The GitHub Actions CI pipeline (`.github/workflows/sigma_ci.yml`) will automatically verify your build and run security audits.
+7. All checks must pass ✅ before merging.
 
 ---
 
