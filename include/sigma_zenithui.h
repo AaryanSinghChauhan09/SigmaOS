@@ -13,6 +13,10 @@
 
 #include "sigma_types.h"
 
+/**
+ * SigmaOS Morphic Zenith UI Header
+ */
+
 #ifdef __cplusplus
 extern "C" {
 #endif

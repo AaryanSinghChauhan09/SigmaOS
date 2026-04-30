@@ -10,10 +10,9 @@
 #ifndef SIGMA_THERMALIQ_H
 #define SIGMA_THERMALIQ_H
 
-
-#ifdef __cplusplus
-extern "C" {
-#endif
+/**
+ * SigmaOS ThermalIQ Orchestration Header
+ */
 
 /* --- Thermal Intelligence Primitives --- */
 void thermaliq_init(void);
