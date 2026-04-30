@@ -34,6 +34,12 @@ void net_init(void);
 void net_process_packet(sigma_packet_t* pkt);
 bool net_transmit_shard(uint32_t target_ip, uint32_t shard_id);
 
+/* --- Sovereign Stack (ZBPA) Primitives --- */
+void     netstack_init(void);
+void     netstack_process_packet(const void* buffer, sigma_u32 size);
+void     netstack_send_packet(const void* buffer, sigma_u32 size);
+sigma_u32 netstack_is_link_active(void);
+
 #ifdef __cplusplus
 }
 #endif

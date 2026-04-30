@@ -14,9 +14,10 @@ typedef struct {
 } sigma_assistant_config_t;
 
 /* --- Assistant Primitives --- */
-void assistant_init(void);
-void assistant_query(const char* prompt);
-void assistant_report_status(void);
+void     assistant_init(void);
+void     assistant_query(const char* prompt);
+void     assistant_report_status(void);
+sigma_u32 assistant_get_query_count(void);
 
 #ifdef __cplusplus
 }
