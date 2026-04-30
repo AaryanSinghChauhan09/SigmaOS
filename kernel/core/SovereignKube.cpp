@@ -1,8 +1,8 @@
-#include "Lattice.h"
 #include "sigma_kube.h"
+#include "sigma_hal.h"
 
 /**
- * SigmaOS Sovereign Kernel-Native Orchestrator Implementation
+ * SigmaOS Sovereign Kernel-Native Orchestrator (v28.0 Zenith)
  * Implements a Lattice Reconciliation Loop (LRL) algorithm.
  * ZERO-DEPENDENCY: No etcd, no kubelet; direct lattice state management.
  * Competitor parity: Kubernetes, Docker Swarm, Nomad.
@@ -10,6 +10,7 @@
  * Design: OOP-isolated singleton — SovereignKubeEngine.
  *         Manages container shards across silicon cores with self-healing.
  */
+
 
 /* --- Sovereign Kube Engine (OOP Isolation) --- */
 static struct {
