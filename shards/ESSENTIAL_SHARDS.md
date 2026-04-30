@@ -8,4 +8,3 @@
     * **Session Memory:** Persistent machine state and session recovery.
     * **Focus Mode:** Silicon-level notification filtering and priority tasking.
     * **Sigma Package Manager:** Atomic shard updates and dependency resolution.
-
