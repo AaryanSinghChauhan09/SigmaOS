@@ -9,36 +9,55 @@
  * Design: OOP-isolated singleton — SovereignSMPEngine.
  */
 
-#define MAX_CORES 256u
+class SovereignSMPEngine {
+public:
+    static SovereignSMPEngine& getInstance() {
+        static SovereignSMPEngine instance;
+        return instance;
+    }
 
-/* --- Sovereign SMP Engine (OOP Isolation) --- */
-static struct {
+    void init() {
+        sigma_log("[SMP] Initializing Sovereign Silicon-Parallel Execution (SPE)...");
+        this->active_cores = 1u;
+        this->bsp_id = 0u;
+        this->initialized = 1u;
+    }
+
+    void igniteCores() {
+        sigma_log("[SMP] SPE: Broadcasting Startup IPI (SIPI) to all silicon cores...");
+        /* SPE Algorithm: Parallel ignition of APs (Application Processors) */
+        this->active_cores = 16u; // Simulated 16-core ignition
+        sigma_printf("[SMP] SPE: %u cores successfully synchronized in the lattice.\n", 
+                     this->active_cores);
+    }
+
+    void broadcastIPI(sigma_u32 vector) {
+        sigma_printf("[SMP] SPE: Dispatching Inter-Processor Interrupt (Vector: 0x%02X).\n", vector);
+    }
+
+    sigma_u32 getCoreCount() const { return this->active_cores; }
+
+private:
+    SovereignSMPEngine() : active_cores(0), bsp_id(0), initialized(0) {}
+    
     sigma_u32 active_cores;
     sigma_u32 bsp_id;
     sigma_u32 initialized;
-} SovereignSMPEngine = {
-    .active_cores = 1u,
-    .bsp_id = 0u,
-    .initialized = 0u
 };
 
+/* --- C Wrappers --- */
 extern "C" void smp_init() {
-    sigma_log("[SMP] Initializing Sovereign Silicon-Parallel Execution (SPE)...");
-    SovereignSMPEngine.initialized = 1u;
+    SovereignSMPEngine::getInstance().init();
 }
 
 extern "C" void smp_ignite_cores() {
-    sigma_log("[SMP] SPE: Broadcasting Startup IPI (SIPI) to all silicon cores...");
-    /* SPE Algorithm: Parallel ignition of APs (Application Processors) */
-    SovereignSMPEngine.active_cores = 16u; // Simulated 16-core ignition
-    sigma_printf("[SMP] SPE: %u cores successfully synchronized in the lattice.\n", 
-                 SovereignSMPEngine.active_cores);
+    SovereignSMPEngine::getInstance().igniteCores();
 }
 
 extern "C" void smp_broadcast_ipi(sigma_u32 vector) {
-    sigma_printf("[SMP] SPE: Dispatching Inter-Processor Interrupt (Vector: 0x%02X).\n", vector);
+    SovereignSMPEngine::getInstance().broadcastIPI(vector);
 }
 
 extern "C" sigma_u32 smp_get_core_count() {
-    return SovereignSMPEngine.active_cores;
+    return SovereignSMPEngine::getInstance().getCoreCount();
 }

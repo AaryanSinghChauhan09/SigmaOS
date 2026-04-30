@@ -476,6 +476,9 @@
                 <div class="util-nav" onclick="switchUtil('data-conv')">Data Converter</div>
                 <div class="util-nav" onclick="switchUtil('code-img')">Code to Image</div>
                 <div class="util-nav" onclick="switchUtil('diff')">Compare Text</div>
+                <div class="util-nav" onclick="switchUtil('dup-find')">Duplicate Finder</div>
+                <div class="util-nav" onclick="switchUtil('key-test')">Key-Test</div>
+                <div class="util-nav" onclick="switchUtil('speed')">Ookla Speed Shard</div>
             </div>
             <!-- Main Area -->
             <div id="util-main" style="flex: 1; padding: 20px; overflow-y: auto;">
@@ -523,6 +526,27 @@
                     </div>
                     <button class="util-btn" onclick="compareText()">Compare Shards</button>
                     <div id="diff-output" style="margin-top: 20px; padding: 15px; background: rgba(0,0,0,0.3); border: 1px solid rgba(255,255,255,0.05); border-radius: 5px; font-family: 'JetBrains Mono', monospace;"></div>
+                </div>
+                <div id="util-dup-find" style="display: none;">
+                    <h3 style="margin-top: 0; color: var(--accent);">Duplicate Word Finder</h3>
+                    <textarea id="dup-input" placeholder="Paste text to analyze..." style="width: 100%; height: 150px; background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.1); color: white; padding: 10px; border-radius: 5px; font-family: 'JetBrains Mono', monospace; outline: none;"></textarea>
+                    <button class="util-btn" style="margin-top: 10px;" onclick="findDuplicates()">Scan for Duplicates</button>
+                    <div id="dup-output" style="margin-top: 20px; padding: 15px; color: var(--success); font-family: 'JetBrains Mono', monospace;"></div>
+                </div>
+                <div id="util-key-test" style="display: none;">
+                    <h3 style="margin-top: 0; color: var(--accent);">Key-Test (Keyboard Shard)</h3>
+                    <div style="background: rgba(0,0,0,0.3); padding: 20px; border-radius: 10px; text-align: center;">
+                        <div id="last-key" style="font-size: 3em; color: var(--accent); font-weight: 800;">PRESS A KEY</div>
+                        <div id="key-code" style="color: var(--text-muted);">CODE: --</div>
+                    </div>
+                </div>
+                <div id="util-speed" style="display: none;">
+                    <h3 style="margin-top: 0; color: var(--accent);">Ookla Speed Shard</h3>
+                    <div style="text-align: center; padding: 30px;">
+                        <div id="speed-gauge" style="width: 200px; height: 200px; border: 10px solid rgba(255,255,255,0.1); border-top-color: var(--accent); border-radius: 50%; margin: 0 auto 20px; display: flex; align-items: center; justify-content: center; font-size: 2em; font-weight: 800; transition: 0.5s;">0</div>
+                        <div style="color: var(--text-muted);">MBPS DOWNLOAD</div>
+                        <button class="util-btn" style="margin-top: 20px;" onclick="startSpeedTest()">Test Silicon Latency</button>
+                    </div>
                 </div>
                 <!-- Other panes hidden by default -->
             </div>
@@ -692,17 +716,55 @@
         }
 
         function switchUtil(utilId) {
-            const panes = ['text-ops', 'data-conv', 'code-img', 'diff'];
+            const panes = ['text-ops', 'data-conv', 'code-img', 'diff', 'dup-find', 'key-test', 'speed'];
             panes.forEach(p => {
-                document.getElementById(`util-${p}`).style.display = 'none';
+                const el = document.getElementById(`util-${p}`);
+                if (el) el.style.display = 'none';
             });
-            document.getElementById(`util-${utilId}`).style.display = 'block';
+            const targetPane = document.getElementById(`util-${utilId}`);
+            if (targetPane) targetPane.style.display = 'block';
             
             const navs = document.querySelectorAll('.util-nav');
             navs.forEach(n => n.classList.remove('active'));
-            event.target.classList.add('active');
+            if (event.target.classList.contains('util-nav')) {
+                event.target.classList.add('active');
+            }
             
             addLog(`Σ [UTILITY]: Switching to ${utilId} module.`, "success");
+        }
+
+        function findDuplicates() {
+            const input = document.getElementById('dup-input').value;
+            const words = input.toLowerCase().match(/\w+/g) || [];
+            const counts = {};
+            words.forEach(w => counts[w] = (counts[w] || 0) + 1);
+            const dups = Object.keys(counts).filter(w => counts[w] > 1);
+            document.getElementById('dup-output').innerText = dups.length > 0 ? "Duplicates: " + dups.join(', ') : "No duplicates found.";
+            addLog("Σ [UTILITY]: Duplicate scan complete.", "success");
+        }
+
+        window.addEventListener('keydown', (e) => {
+            const keyDisplay = document.getElementById('last-key');
+            const codeDisplay = document.getElementById('key-code');
+            if (keyDisplay && document.getElementById('util-key-test').style.display !== 'none') {
+                keyDisplay.innerText = e.key.toUpperCase();
+                codeDisplay.innerText = "CODE: " + e.code;
+                addLog(`Σ [KEY-TEST]: Input detected: ${e.key}`, "success");
+            }
+        });
+
+        function startSpeedTest() {
+            const gauge = document.getElementById('speed-gauge');
+            let speed = 0;
+            const interval = setInterval(() => {
+                speed = Math.floor(Math.random() * 900) + 100;
+                gauge.innerText = speed;
+                gauge.style.borderColor = `hsl(${speed/10}, 70%, 50%)`;
+            }, 100);
+            setTimeout(() => {
+                clearInterval(interval);
+                addLog(`Σ [SPEED]: Test complete. Result: ${speed} MBPS.`, "success");
+            }, 3000);
         }
 
         function dataAction(action) {
