@@ -1,15 +1,15 @@
-#include "Lattice.h"
 #include "sigma_identity.h"
 #include "sigma_pqc.h"
 
 /**
- * SigmaOS Sovereign Identity Nexus Implementation
+ * SigmaOS Sovereign Identity Nexus (v28.0 Zenith)
  * Implements a Ring-LWE Sovereign Attestation (RLSA) algorithm.
  * ZERO-DEPENDENCY: Strictly bare-metal identity orchestration.
  *
  * Design: OOP-isolated singleton — SovereignIdentityEngine.
  *         Consolidates industrial-identity logic with PQC hardening.
  */
+
 
 /* --- Sovereign Identity Engine (OOP Isolation) --- */
 static struct {

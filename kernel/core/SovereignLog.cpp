@@ -1,14 +1,14 @@
-#include "Lattice.h"
 #include "sigma_log.h"
 #include "sigma_hal.h"
 
 /**
- * SigmaOS Sovereign Log Implementation
+ * SigmaOS Sovereign Log Implementation (v28.0 Zenith)
  * Implements a Wait-Free Circular Shard Logging (WFCSL) algorithm.
  * ZERO-DEPENDENCY: Strictly bare-metal machine-state tracing.
  *
  * Design: OOP-isolated singleton — SovereignLogEngine.
  */
+
 
 #define LOG_BUFFER_SIZE 256u
 
