@@ -22,16 +22,17 @@ typedef enum {
 } sigma_fs_type_t;
 
 typedef struct {
-    char name[64];
-    uint32_t shard_id;
+    char            name[64];
+    sigma_u32       shard_id;
     sigma_fs_type_t type;
-    void* private_data;
+    void*           private_data;
 } sigma_vnode_t;
 
 /* --- VFS Primitives --- */
-void vfs_init(void);
+void           vfs_init(void);
 sigma_vnode_t* vfs_lookup(const char* path);
-bool vfs_mount(const char* path, uint32_t shard_id);
+bool           vfs_mount(const char* path, sigma_u32 shard_id);
+sigma_u64      vfs_get_lookup_count(void);
 
 #ifdef __cplusplus
 }
