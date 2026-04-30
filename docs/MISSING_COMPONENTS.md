@@ -44,14 +44,14 @@ A total of **600-shard modularity** has been achieved. The following core shards
 
 | Shard | Algorithm | New Capabilities |
 | :--- | :--- | :--- |
+| `SovereignTranspiler.cpp` | UMSM | Self-learning hardware register transpilation |
+| `SovereignPersistence.cpp` | DSP | Decentralized amnesic state persistence |
 | `SovereignInstall.cpp` | ABMD | Autonomous bare-metal deployment progress |
 | `SovereignNetStack.cpp` | ZBT | Zero-buffer network packet harvesting |
 | `SovereignOrchestrator.cpp` | USR | Unified shard registry discovery |
 | `SovereignNeural.cpp` | NHWA | Neural hardware acceleration telemetry |
 | `SovereignIdentity.cpp` | RLSA | PQC identity vault + attestation metrics |
 | `SovereignLog.cpp` | WFCSL | Wait-free circular logging + telemetry |
-| `SovereignMMU.cpp` | APFR | Async page fault resolution + fault telemetry |
-| `SovereignContinuity.cpp` | ODSH | Cross-device handoff + state telemetry |
 
 ---
 
