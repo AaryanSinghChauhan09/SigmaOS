@@ -1,6 +1,6 @@
-#include "Lattice.h"
 #include "sigma_ipc.h"
 #include "sigma_hal.h"
+
 
 /**
  * SigmaOS Sovereign IPC Implementation (Optimized)

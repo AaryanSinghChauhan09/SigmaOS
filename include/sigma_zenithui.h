@@ -12,7 +12,6 @@
 #define SIGMA_ZENITHUI_H
 
 #include "sigma_types.h"
-#include "sigma_displayserver.h"
 
 #ifdef __cplusplus
 extern "C" {

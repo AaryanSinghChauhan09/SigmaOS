@@ -1,14 +1,14 @@
-#include "Lattice.h"
 #include "sigma_snap.h"
 #include "sigma_hal.h"
 
 /**
- * SigmaOS Sovereign Window Snapping Implementation
+ * SigmaOS Sovereign Window Snapping (v28.0 Zenith)
  * Implements a Predictive Layout Engine (PLE) algorithm.
  * ZERO-DEPENDENCY: Strictly bare-metal window management.
  *
  * Design: OOP-isolated singleton — SovereignSnapManager.
  */
+
 
 typedef struct {
     sigma_u32         window_id;
