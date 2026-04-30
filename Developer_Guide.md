@@ -4,7 +4,9 @@
 
 ---
 
+
 ## 📋 Table of Contents
+
 - [Prerequisites](#prerequisites)
 - [Quick Setup](#quick-setup)
 - [Architecture Overview](#architecture-overview)
@@ -19,7 +21,8 @@
 ## Prerequisites
 
 | Tool | Version | Purpose |
-|------|---------|---------|
+| Tool | Version | Purpose |
+| :--- | :--- | :--- |
 | GCC / G++ | 13+ | Primary kernel compiler |
 | NASM | 2.15+ | x86_64 assembly |
 | Make | 4.0+ | Build orchestration |
@@ -54,7 +57,8 @@ cppcheck --enable=warning,style,performance -Iinclude kernel/
 
 ## Architecture Overview
 
-```
+
+```text
 SigmaOS Sovereign Lattice (500+ Shards)
 │
 ├── kernel/
@@ -84,7 +88,9 @@ SigmaOS Sovereign Lattice (500+ Shards)
 
 ## Coding Standards
 
+
 ### 1. Zero-Dependency Rule ⚡
+
 ```cpp
 // ❌ FORBIDDEN — HLL libraries
 #include <iostream>
@@ -99,6 +105,7 @@ SigmaOS Sovereign Lattice (500+ Shards)
 ### 2. Secure String Operations 🔒
 > All string operations MUST use the hardened wrappers from `sigma_sechardener.h`
 
+
 ```cpp
 // ❌ UNSAFE — Triggers CWE-119
 strcpy(dest, src);
@@ -109,7 +116,9 @@ sigma_hardened_strcpy(dest, src, MAX_LEN);
 sigma_hardened_snprintf(buf, MAX_LEN, fmt, ...);
 ```
 
+
 ### 3. Input Validation at Every API Boundary 🛡️
+
 ```cpp
 // Every public function MUST validate inputs (CWE-20 fix)
 extern "C" void my_shard_function(const void* data, uint32_t size) {
@@ -119,16 +128,21 @@ extern "C" void my_shard_function(const void* data, uint32_t size) {
 }
 ```
 
+
 ### 4. Shard Naming Convention
+
 | Component | Convention | Example |
-|-----------|-----------|---------|
+| :--- | :--- | :--- |
 | Header file | `sigma_<name>.h` | `sigma_neural.h` |
 | Implementation | `Sovereign<Name>.cpp` | `SovereignNeural.cpp` |
 | Init function | `<name>_init()` | `neural_init()` |
 | Public APIs | `<name>_<verb>()` | `neural_predict()` |
 
+
 ### 5. Documentation Block
+
 Every shard implementation MUST include:
+
 ```cpp
 /**
  * SigmaOS Sovereign <Name>
@@ -141,7 +155,9 @@ Every shard implementation MUST include:
 
 ## Creating a New Shard
 
+
 ### Step 1 — Create the header
+
 ```bash
 touch include/sigma_myshard.h
 ```
@@ -166,17 +182,23 @@ void myshard_execute(const void* input, uint32_t size);
 #endif /* SIGMA_MYSHARD_H */
 ```
 
+
 ### Step 2 — Create the implementation
+
 ```bash
 touch kernel/core/SovereignMyShard.cpp
 ```
 
+
 ### Step 3 — Verify the shard is detected
+
 ```bash
 python3 scripts/lattice_coverage.py
 ```
 
+
 ### Step 4 — Run security audit
+
 ```bash
 cppcheck --enable=warning -Iinclude kernel/core/SovereignMyShard.cpp
 ```
