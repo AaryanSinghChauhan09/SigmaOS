@@ -27,7 +27,7 @@ jobs:
         sudo apt-get install -y nasm gcc-multilib g++-multilib make cppcheck clang-tidy
 
     - name: "📦 Cache Shard Objects"
-      uses: actions/cache@v4
+      uses: actions/cache@v5
       with:
         path: obj
         key: ${{ runner.os }}-sigma-shard-${{ hashFiles('**/*.c', '**/*.cpp', '**/*.asm') }}
