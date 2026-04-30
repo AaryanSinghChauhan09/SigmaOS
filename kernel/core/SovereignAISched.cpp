@@ -5,14 +5,8 @@
 #include "sigma_aisched.h"
 
 
-/**
- * SigmaOS Sovereign AI-Optimized Scheduler
- * Implements a Neural Predictive Workload Orchestration (NPWO) algorithm.
- * ZERO-DEPENDENCY: Strictly bare-metal ML-driven scheduling.
- */
-
-#include "Lattice.h"
 #include "sigma_aisched.h"
+
 
 /**
  * SigmaOS Sovereign AI-Optimized Scheduler

@@ -1,4 +1,3 @@
-#include "Lattice.h"
 #include "sigma_neural.h"
 
 /**
