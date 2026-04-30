@@ -2,13 +2,11 @@
 #include "sigma_net.h"
 
 /**
- * SigmaOS Sovereign Silicon-Native Network Stack
+ * SigmaOS Sovereign Silicon-Native Network Stack (Zenith v28.0)
  * Implements a Zero-Buffer Packet Arbitration (ZBPA) algorithm.
- * ZERO-DEPENDENCY: Directly orchestrates the Intel e1000 and virtual NICs.
- * Competitor parity: Linux net_device / FreeBSD mbuf / Zircon netstack.
+ * ZERO-DEPENDENCY: Directly orchestrates hardware NICs.
  *
  * Design: OOP-isolated singleton — SovereignNetStackEngine.
- *         Replaces raw C struct with encapsulated metrics object.
  */
 
 /* --- Sovereign Network Stack Engine (OOP Isolation) --- */
