@@ -35,7 +35,6 @@ In SigmaOS, everything is a shard. The **Sovereign VFS** abstracts hardware devi
 - **Unified Access**: Interact with `keyboard`, `disk`, and `network` using the same `read/write` primitives.
 - **Hardware Agnostic**: Drivers register themselves as VFS nodes, allowing for hot-swappable hardware support.
 
-
 ### 1.3 Industrial Build Orchestration
 
 The SigmaOS build system is now modular and recursive:
@@ -49,21 +48,17 @@ Unlike monolithic kernels (Linux) or hybrid kernels (Windows/NT), SigmaOS uses t
 - **Lazy-Load**: Shards are activated on-demand, reducing the attack surface and memory footprint.
 - **Sovereign-LibC**: All memory and string orchestration is done via custom Assembly-direct functions (`sigma_memcpy`, `sigma_memset`).
 
-
 ---
 
 ## ⚖️ 2. THE LEGAL RESEARCH ENGINE (SLAC v3.0)
 
 SigmaOS is the first OS to integrate the law into the kernel.
 
-
-
 - **Domain Coverage**: Full procedural logic for **BNSS, BNS, BSA (2023-2024)**, POCSO, PMLA, DPDP, and Arbitration.
 - **Novice Workflow**:
   1. `checklist-init` — Activate the compliance shards.
   2. `checklist-query <DOMAIN>` — Get step-by-step guidance for legal procedures.
   3. `checklist-generate-report` — Perform an industrial audit of your compliance status.
-
 
 ---
 
@@ -117,7 +112,6 @@ Designed for **100% Keyboard Sovereignty**.
 ---
 
 ## 🚀 7. ROADMAP & SUGGESTIONS
-
 
 - **UAC (Universal App Container)**: Running Linux binaries via OCI shards (In Progress).
 - **GPU Lattice**: CUDA-direct legal auditing.
