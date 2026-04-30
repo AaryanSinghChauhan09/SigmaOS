@@ -498,7 +498,7 @@
                     </div>
                     <div id="util-text-output" class="util-output">Results will appear here...</div>
                 </div>
-                <div id="util-data-conv" style="display: none;">
+                <div id="util-data-conv" class="hidden-shard">
                     <h3>Data Converter</h3>
                     <textarea id="util-data-input" class="util-input" placeholder="Enter JSON or CSV data..."></textarea>
                     <div class="util-actions">
@@ -507,7 +507,7 @@
                     </div>
                     <div id="util-data-output" class="util-output">Converted data will appear here...</div>
                 </div>
-                <div id="util-code-img" style="display: none;">
+                <div id="util-code-img" class="hidden-shard">
                     <h3>Code to Image</h3>
                     <textarea id="util-code-input" class="util-input" placeholder="Paste code here..."></textarea>
                     <div class="code-preview-canvas">
@@ -522,7 +522,7 @@
                     </div>
                     <button class="util-btn" onclick="renderCode()">Render Preview</button>
                 </div>
-                <div id="util-diff" style="display: none;">
+                <div id="util-diff" class="hidden-shard">
                     <h3>Compare Text</h3>
                     <div class="forge-split">
                         <textarea id="diff-left" class="util-input" placeholder="Original text..."></textarea>
@@ -531,20 +531,20 @@
                     <button class="util-btn" onclick="compareText()">Compare Shards</button>
                     <div id="diff-output" class="util-output"></div>
                 </div>
-                <div id="util-dup-find" style="display: none;">
+                <div id="util-dup-find" class="hidden-shard">
                     <h3>Duplicate Word Finder</h3>
                     <textarea id="dup-input" class="util-input" placeholder="Paste text to analyze..."></textarea>
                     <button class="util-btn" onclick="findDuplicates()">Scan for Duplicates</button>
                     <div id="dup-output" class="util-output"></div>
                 </div>
-                <div id="util-key-test" style="display: none;">
+                <div id="util-key-test" class="hidden-shard">
                     <h3>Key-Test (Keyboard Shard)</h3>
                     <div class="key-monitor">
                         <div id="last-key">PRESS A KEY</div>
                         <div id="key-code">CODE: --</div>
                     </div>
                 </div>
-                <div id="util-speed" style="display: none;">
+                <div id="util-speed" class="hidden-shard">
                     <h3>Ookla Speed Shard</h3>
                     <div class="speed-container">
                         <div id="speed-gauge">0</div>
@@ -552,23 +552,23 @@
                         <button class="util-btn" onclick="startSpeedTest()">Test Silicon Latency</button>
                     </div>
                 </div>
-                <div id="util-status" style="display: none;">
+                <div id="util-status" class="hidden-shard">
                     <h3>IsItDownRightNow Shard</h3>
                     <input type="text" id="status-url" class="util-input" placeholder="Enter URL (e.g. sigmaos.io)...">
                     <button class="util-btn" onclick="checkStatus()">Check Shard Availability</button>
                     <div id="status-output" class="util-output"></div>
                 </div>
-                <div id="util-bootable" style="display: none;">
+                <div id="util-bootable" class="hidden-shard">
                     <h3>Bootable Shard Creator</h3>
                     <div class="bootable-pane">
                         <div class="target-info">Target: <span id="boot-target">NO DEVICE DETECTED</span></div>
                         <button class="util-btn" onclick="flashBootable()">Flash Sovereign Image</button>
-                        <div id="flash-progress" class="progress-container" style="display: none;">
+                        <div id="flash-progress" class="progress-container hidden-shard">
                             <div id="flash-bar" class="progress-bar"></div>
                         </div>
                     </div>
                 </div>
-                <div id="util-table" style="display: none;">
+                <div id="util-table" class="hidden-shard">
                     <h3>Table Convert Shard</h3>
                     <textarea id="table-input" class="util-input" placeholder="Enter CSV data..."></textarea>
                     <button class="util-btn" onclick="convertTable()">Forge HTML Table</button>

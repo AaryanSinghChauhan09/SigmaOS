@@ -491,8 +491,8 @@ body {
     overflow: hidden;
     box-shadow: 0 10px 40px rgba(0,0,0,0.6);
     background: rgba(10, 10, 15, 0.4);
-    backdrop-filter: blur(25px) saturate(180%);
     -webkit-backdrop-filter: blur(25px) saturate(180%);
+    backdrop-filter: blur(25px) saturate(180%);
     transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.3s ease;
 }
 
@@ -650,4 +650,9 @@ body {
 .forge-actions {
     display: flex;
     gap: 12px;
+}
+
+/* --- Utility Modularization --- */
+.hidden-shard {
+    display: none;
 }

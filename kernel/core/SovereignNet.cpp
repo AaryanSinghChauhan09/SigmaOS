@@ -72,7 +72,8 @@ private:
 };
 
 /* --- C Wrappers --- */
-extern "C" void net_init() {
+extern "C" void net_init(const sigma_net_config_t* config) {
+    (void)config;
     SovereignNetEngine::getInstance().init();
 }
 

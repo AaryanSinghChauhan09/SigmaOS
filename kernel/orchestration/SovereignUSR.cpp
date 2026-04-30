@@ -1,11 +1,12 @@
 #include "sigma_hal.h"
 #include "sigma_usr.h"
-#include "sigma_libc.h"
 
 /**
  * SigmaOS Sovereign Unified Shard Registry (USR)
  * Implements a Quantum-Safe Shard Orchestrator for dynamic discovery.
- * Inspired by systemctl / apt-get / dbus.
+ * ZERO-DEPENDENCY: Strictly bare-metal shard registry.
+ *
+ * Design: OOP-isolated singleton — SovereignUSRManager.
  */
 
 /* --- Sovereign USR Implementation --- */
@@ -16,16 +17,24 @@ void SovereignUSRManager::init() {
 
 uint32_t SovereignUSRManager::registerShard(const char* name, uint32_t quantum_key) {
     if (this->count >= 512) return 0;
-    
+
     uint32_t id = ++this->count;
     sigma_usr_entry_t* entry = &this->registry[id - 1];
-    
-    entry->shard_id = id;
-    sigma_hardened_strcpy(entry->name, name, 64);
-    entry->is_active = true;
+
+    entry->shard_id    = id;
+    entry->is_active   = true;
     entry->quantum_key = quantum_key;
-    
-    sigma_printf("[USR] Registered Shard: %s (ID: %d, Key: 0x%08X)\n", name, id, quantum_key);
+
+    /* Hardened string copy: bounded, null-terminated */
+    uint32_t i = 0;
+    while (i < 63 && name[i] != '\0') {
+        entry->name[i] = name[i];
+        i++;
+    }
+    entry->name[i] = '\0';
+
+    sigma_printf("[USR] Registered Shard: %s (ID: %d, Key: 0x%08X)\n",
+                 entry->name, id, quantum_key);
     return id;
 }
 

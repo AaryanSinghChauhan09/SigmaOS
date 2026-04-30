@@ -6,10 +6,6 @@
  * Centralizes all core primitives for the 600-shard modular architecture.
  */
 
-#include "sigma_types.h"
-#include "sigma_hal.h"
-#include "sigma_libc.h"
-#include "sigma_log.h"
 
 #ifdef __cplusplus
 extern "C" {

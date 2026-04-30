@@ -1,21 +1,37 @@
-# Σ SIGMAOS: THE SOVEREIGN SILICON SINGULARITY (v28.0)
+# 🏛️ SigmaOS: Sovereign Zenith Lattice
 
-> "Beyond Linux. Absolute Sovereignty. The 600-Shard Modular Zenith."
+SigmaOS is a next-generation, zero-dependency, bare-metal operating system. Built around a 600-shard modular lattice architecture, SigmaOS discards legacy POSIX and Glibc bloat in favor of a silicon-native, mathematically proven execution environment.
 
----
+## 🚀 Why SigmaOS?
 
-## 🌌 What is SigmaOS?
+Traditional operating systems are constrained by decades of legacy abstractions. SigmaOS reimagines the Silicon-to-Logic handshake:
+- **Zero-Dependency:** Runs directly on silicon without legacy HALs.
+- **Modular Atomicity:** A 600-shard micro-kernel architecture allows unprecedented scalability and parallel execution.
+- **Cryptographic Isolation:** Every shard runs in a Zero-Trust Cryptographic Isolation Boundary (CIB).
+- **Silicon-Native Performance:** Achieve near-zero latency for context switching and IPC.
 
-SigmaOS is an industrial-grade, bare-metal operating system engineered for
-**Architectural Supremacy**. Unlike monolithic legacy kernels (Linux, Windows,
-macOS), SigmaOS is built on a **600-shard modular lattice** where every
-component is a sovereign, OOP-isolated singleton engine.
+## 🛠️ Getting Started (Experimental)
 
----
+SigmaOS is currently in its `v28.0 Zenith` experimental phase. To build the lattice:
 
-## 🏛️ System Architecture
+```bash
+# 1. Clone the repository
+git clone https://github.com/AaryanSinghChauhan09/SigmaOS.git
+cd SigmaOS
 
-### Core Lattice Orchestration
+# 2. Ignite the Sovereign Lattice
+make singularity
+
+# 3. Build the Cognitive UX
+make zenith
+
+# 4. Generate the Bootable ISO
+make zenith-iso
+```
+
+## 🌌 Architecture
+
+SigmaOS operates on a Sovereign Lattice architecture. 
 
 ```mermaid
 graph TD
@@ -24,95 +40,25 @@ graph TD
     C --> D[S-AISched NPWO]
     C --> E[S-MMU APFR]
     C --> F[S-IPC WFAE]
-    C --> G[S-SMP SPE]
-    D --> H[Cognitive UX Layer]
-    H --> I((SINGULARITY))
-
-    subgraph "Sovereign Ecosystem"
-    J[S-Install]
-    K[USR Registry]
-    L[ZBT Network]
-    M[DSP Persistence]
-    end
+    D --> G[Cognitive UX Layer]
+    E --> H[S-Hyper SIV]
+    F --> I[S-Sync SCR]
+    G --> J((SINGULARITY))
+    H --> J
+    I --> J
 ```
 
-### Sovereign IPC (WFAE Algorithm)
+## 🗺️ Feature Roadmap
 
-```mermaid
-sequenceDiagram
-    participant S1 as Shard Alpha
-    participant IPC as Sovereign IPC Engine
-    participant S2 as Shard Beta
-    S1->>IPC: Dispatch Atomic Message (WFAE)
-    IPC-->>IPC: Ring Buffer Enqueue (No Lock)
-    IPC->>S2: Async Notification
-    S2->>IPC: Shard State Harvest
-```
+- [x] Phase 1: Bare-Metal Bootstrapping
+- [x] Phase 2: Multi-Core Shard Orchestration (S-SMP)
+- [x] Phase 3: Zero-Trust Cryptographic Isolation (CIB)
+- [x] Phase 4: Glassmorphic Zenith Desktop UI
+- [ ] Phase 5: Post-Quantum Identity Integration (RLSA)
+- [ ] Phase 6: Neural Lattice Self-Healing Automation
 
----
+## 🤝 Contributing
+We welcome contributions from kernel engineers, UI/UX designers, and security researchers. Please read our [Contribution Guidelines](CONTRIBUTING.md) to get started.
 
-## 🚀 Installation (Bare-Metal ABMD)
-
-SigmaOS uses the **S-Install** engine for autonomous deployment.
-
-1. **Download** the `zenith-singularity.iso`.
-2. **Flash** to a silicon-native target (USB/SSD).
-3. **Boot**. The **ABMD** algorithm will automatically map your hardware.
-
----
-
-## 🛠️ Developer Quick-Start
-
-### Build System
-
-```bash
-make singularity  # Ignite the core lattice
-make zenith-iso   # Generate production deployment image
-```
-
-### Coding Standards
-
-- **Zero-Dependency**: No external headers.
-- **Singleton Pattern**: Shards must be isolated engines.
-- **Wait-Free**: Use atomic primitives only.
-
-### Example Workflow: Boot Sequence
-
-1. **S-HAL**: Hardware discovery and silicon mapping.
-2. **S-SMP**: Multicore ignition (SPE).
-3. **Lattice Core**: Shard ignition via USR.
-4. **Morphic Zenith**: UX layer glassmorphism compositor online.
-
----
-
-## 💻 Hardware Requirements
-
-| Component | Minimum | Recommended |
-| :--- | :--- | :--- |
-| **CPU** | x86_64 / ARM64 (1 Core) | 16+ Cores (SMP SPE) |
-| **RAM** | 256 MB (Amnesic) | 8 GB+ (Lattice Mirroring) |
-| **Storage** | 100 MB (DSP) | NVMe / SSD (Silicon Native) |
-| **Network** | 10/100 NIC | Gigabit NIC (ZBT) |
-
----
-
-## 📖 Glossary of Terms
-
-- **Lattice**: The decentralized web of 600+ sovereign shards.
-- **Shard**: An atomic, modular unit of OS logic (e.g., S09_NEURAL).
-- **Ignition**: The process of activating a shard within the lattice.
-- **Amnesic**: Stateless execution where memory is wiped per context.
-- **Singularity**: The state where SigmaOS achieves 100% technical parity.
-
----
-
-## 🤝 Community & Governance
-
-- [CONTRIBUTING.md](CONTRIBUTING.md) - Join the collective.
-- [ROADMAP.md](ROADMAP.md) - See the future.
-- [SECURITY.md](SECURITY.md) - Report vulnerabilities.
-- [CODE_OF_CONDUCT.md](CODE_OF_CONDUCT.md) - Standards of respect.
-
----
-
-*Σ SIGMAOS: Beyond Linux. Absolute Sovereignty. Singularity Achieved.*
+## 📜 License
+This project is proprietary and confidential. All rights reserved.

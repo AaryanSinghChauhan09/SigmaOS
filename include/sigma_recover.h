@@ -1,3 +1,11 @@
+/*
+ * =========================================================================
+ * Σ SIGMAOS: SOVEREIGN PANIC RECOVERY HEADER (sigma_recover.h)
+ * =========================================================================
+ * Mission: Resilient State Resurrection (RSR) for kernel-level faults.
+ * =========================================================================
+ */
+
 #ifndef SIGMA_RECOVER_H
 #define SIGMA_RECOVER_H
 
@@ -8,24 +16,24 @@ extern "C" {
 #endif
 
 typedef enum {
-    SIGMA_RECOVER_HEALTHY = 0,
-    SIGMA_RECOVER_HEALING = 1,
+    SIGMA_RECOVER_HEALTHY  = 0,
+    SIGMA_RECOVER_HEALING  = 1,
     SIGMA_RECOVER_CRITICAL = 2
 } sigma_recovery_state_t;
 
 typedef struct {
     uint32_t shard_id;
     uint32_t heal_count;
-    bool permanent_failure;
+    bool     permanent_failure;
 } sigma_recovery_record_t;
 
 /* --- Recovery Primitives --- */
-void recover_init(void);
-void recover_trigger_healing(uint32_t shard_id);
+void                   recover_init(void);
+void                   recover_trigger_healing(uint32_t shard_id);
 sigma_recovery_state_t recover_get_lattice_state(void);
 
 #ifdef __cplusplus
-}
+} /* extern "C" */
 
 class SovereignRecover {
 public:
@@ -41,11 +49,12 @@ public:
 
 private:
     SovereignRecover() : lattice_state(SIGMA_RECOVER_HEALTHY), registry_ptr(0) {}
-    
-    sigma_recovery_state_t lattice_state;
+
+    sigma_recovery_state_t  lattice_state;
     sigma_recovery_record_t healing_registry[32];
-    uint32_t registry_ptr;
+    uint32_t                registry_ptr;
 };
-#endif
+
+#endif /* __cplusplus */
 
 #endif /* SIGMA_RECOVER_H */

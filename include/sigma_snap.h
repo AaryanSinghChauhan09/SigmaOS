@@ -1,3 +1,11 @@
+/*
+ * =========================================================================
+ * Σ SIGMAOS: SOVEREIGN SNAP LAYOUTS HEADER (sigma_snap.h)
+ * =========================================================================
+ * Mission: Dynamic Shard-Snapping (DSS) window management primitives.
+ * =========================================================================
+ */
+
 #ifndef SIGMA_SNAP_H
 #define SIGMA_SNAP_H
 
@@ -21,7 +29,7 @@ typedef enum {
 } sigma_snap_zone_id_t;
 
 typedef struct {
-    sigma_u32 x, y, w, h;
+    sigma_u32            x, y, w, h;
     sigma_snap_zone_id_t zone_id;
 } sigma_snap_zone_t;
 
@@ -32,7 +40,7 @@ void snap_auto_arrange(void);
 void snap_register_zone(sigma_u32 x, sigma_u32 y, sigma_u32 w, sigma_u32 h);
 
 #ifdef __cplusplus
-}
+} /* extern "C" */
 
 class SovereignSnapEngine {
 public:
@@ -47,11 +55,12 @@ public:
 
 private:
     SovereignSnapEngine() : active_zone_count(0), initialized(0) {}
-    
+
     sigma_snap_zone_t zones[8];
-    sigma_u32 active_zone_count;
-    sigma_u32 initialized;
+    sigma_u32         active_zone_count;
+    sigma_u32         initialized;
 };
-#endif
+
+#endif /* __cplusplus */
 
 #endif /* SIGMA_SNAP_H */

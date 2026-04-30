@@ -1,7 +1,5 @@
-#include "Lattice.h"
 #include "sigma_fs.h"
 #include "sigma_hal.h"
-#include "sigma_libc.h"
 
 /**
  * SigmaOS Sovereign File System Implementation
@@ -9,7 +7,6 @@
  * ZERO-DEPENDENCY: Strictly bare-metal data persistence.
  */
 
-#include "Lattice.h"
 #include "sigma_fs.h"
 
 /**
