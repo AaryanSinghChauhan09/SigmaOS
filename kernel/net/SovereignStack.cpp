@@ -1,61 +1,77 @@
-#include "Lattice.h"
 #include "sigma_net.h"
+#include "sigma_hal.h"
 
 /**
  * SigmaOS Sovereign Silicon-Native Network Stack (Zenith v28.0)
  * Implements a Zero-Buffer Packet Arbitration (ZBPA) algorithm.
  * ZERO-DEPENDENCY: Directly orchestrates hardware NICs.
  *
- * Design: OOP-isolated singleton — SovereignNetStackEngine.
+ * Design: OOP-isolated singleton — SovereignPacketArbiter.
  */
 
-/* --- Sovereign Network Stack Engine (OOP Isolation) --- */
-static struct {
+class SovereignPacketArbiter {
+public:
+    static SovereignPacketArbiter& getInstance() {
+        static SovereignPacketArbiter instance;
+        return instance;
+    }
+
+    void init() {
+        sigma_log("[NETSTACK] Initializing Sovereign Zero-Buffer Network Stack (ZBPA)...");
+        this->link_active = 1u;
+        this->initialized = 1u;
+        sigma_log("[NETSTACK] ZBPA: NIC arbitration ONLINE. Kernel buffer bypass ACTIVE.");
+    }
+
+    void processPacket(const void* buffer, sigma_u32 size) {
+        /* ZBPA Algorithm: Ingress path bypasses the kernel socket buffer.
+         * Packets are zero-copy DMA'd directly to the consuming shard.      */
+        this->packets_in++;
+        this->bytes_in += size;
+        sigma_printf("[NETSTACK] ZBPA Ingress: %d bytes (total pkts=%llu bytes=%llu).\n",
+                     (int)size,
+                     (unsigned long long)this->packets_in,
+                     (unsigned long long)this->bytes_in);
+        (void)buffer;
+    }
+
+    void sendPacket(const void* buffer, sigma_u32 size) {
+        /* ZBPA Algorithm: Egress path zero-copies frame to NIC TX ring.      */
+        this->packets_out++;
+        this->bytes_out += size;
+        sigma_printf("[NETSTACK] ZBPA Egress: %d bytes (total pkts=%llu bytes=%llu).\n",
+                     (int)size,
+                     (unsigned long long)this->packets_out,
+                     (unsigned long long)this->bytes_out);
+        (void)buffer;
+    }
+
+    sigma_u32 isLinkActive() const { return this->link_active; }
+
+private:
+    SovereignPacketArbiter() : packets_in(0), packets_out(0), bytes_in(0), bytes_out(0), link_active(0), initialized(0) {}
+    
     sigma_u64 packets_in;
     sigma_u64 packets_out;
     sigma_u64 bytes_in;
     sigma_u64 bytes_out;
     sigma_u32 link_active;
     sigma_u32 initialized;
-} SovereignNetStackEngine = {
-    .packets_in  = 0u,
-    .packets_out = 0u,
-    .bytes_in    = 0u,
-    .bytes_out   = 0u,
-    .link_active = 0u,
-    .initialized = 0u
 };
 
+/* --- C Wrappers --- */
 extern "C" void netstack_init() {
-    sigma_log("[NETSTACK] Initializing Sovereign Zero-Buffer Network Stack (ZBPA)...");
-    SovereignNetStackEngine.link_active  = 1u;
-    SovereignNetStackEngine.initialized  = 1u;
-    sigma_log("[NETSTACK] ZBPA: NIC arbitration ONLINE. Kernel buffer bypass ACTIVE.");
+    SovereignPacketArbiter::getInstance().init();
 }
 
 extern "C" void netstack_process_packet(const void* buffer, sigma_u32 size) {
-    /* ZBPA Algorithm: Ingress path bypasses the kernel socket buffer.
-     * Packets are zero-copy DMA'd directly to the consuming shard.      */
-    SovereignNetStackEngine.packets_in++;
-    SovereignNetStackEngine.bytes_in += size;
-    sigma_printf("[NETSTACK] ZBPA Ingress: %d bytes (total pkts=%llu bytes=%llu).\n",
-                 (int)size,
-                 (unsigned long long)SovereignNetStackEngine.packets_in,
-                 (unsigned long long)SovereignNetStackEngine.bytes_in);
-    (void)buffer;
+    SovereignPacketArbiter::getInstance().processPacket(buffer, size);
 }
 
 extern "C" void netstack_send_packet(const void* buffer, sigma_u32 size) {
-    /* ZBPA Algorithm: Egress path zero-copies frame to NIC TX ring.      */
-    SovereignNetStackEngine.packets_out++;
-    SovereignNetStackEngine.bytes_out += size;
-    sigma_printf("[NETSTACK] ZBPA Egress: %d bytes (total pkts=%llu bytes=%llu).\n",
-                 (int)size,
-                 (unsigned long long)SovereignNetStackEngine.packets_out,
-                 (unsigned long long)SovereignNetStackEngine.bytes_out);
-    (void)buffer;
+    SovereignPacketArbiter::getInstance().sendPacket(buffer, size);
 }
 
 extern "C" sigma_u32 netstack_is_link_active() {
-    return SovereignNetStackEngine.link_active;
+    return SovereignPacketArbiter::getInstance().isLinkActive();
 }
