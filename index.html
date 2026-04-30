@@ -56,6 +56,10 @@
                     <span class="icon">🛡️</span>
                     <span>Quantum Shield</span>
                 </div>
+                <div class="start-item" onclick="launchApp('Markup Forge')">
+                    <span class="icon">📝</span>
+                    <span>Markup Forge</span>
+                </div>
             </div>
             <div class="start-section">
                 <div class="section-title">System Shards</div>
@@ -423,6 +427,27 @@
         </div>
     </div>
 
+    <!-- Markup Forge Window -->
+    <div class="window" id="markup-forge-win" style="display: none; position: absolute; top: 15%; left: 25%; width: 600px; height: 500px; z-index: 1000; border: 1px solid var(--accent); border-radius: 8px; overflow: hidden; box-shadow: 0 10px 30px rgba(0,0,0,0.5); backdrop-filter: blur(20px);">
+        <div class="window-header" style="background: rgba(255,255,255,0.05); padding: 10px 15px; display: flex; justify-content: space-between; align-items: center; cursor: move; border-bottom: 1px solid rgba(255,255,255,0.1);">
+            <div class="window-title" style="font-size: 0.9em; font-weight: 600; color: var(--accent);">Σ Markup Forge v1.0</div>
+            <div class="window-controls" style="display: flex; gap: 8px;">
+                <div class="win-btn minimize" style="width: 12px; height: 12px; border-radius: 50%; background: #ffbd2e; cursor: pointer;" onclick="minimizeWindow('markup-forge-win')"></div>
+                <div class="win-btn close" style="width: 12px; height: 12px; border-radius: 50%; background: #ff5f56; cursor: pointer;" onclick="closeWindow('markup-forge-win')"></div>
+            </div>
+        </div>
+        <div class="window-content" style="display: flex; flex-direction: column; padding: 15px; gap: 10px; height: calc(100% - 40px); background: rgba(0,0,0,0.4);">
+            <div style="flex: 1; display: flex; gap: 15px; min-height: 0;">
+                <textarea id="markup-input" placeholder="Input sovereign text here..." style="flex: 1; background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.1); color: white; padding: 10px; border-radius: 5px; font-family: 'JetBrains Mono', monospace; font-size: 0.85em; resize: none; outline: none;"></textarea>
+                <div id="markup-output" style="flex: 1; background: rgba(0,0,0,0.2); border: 1px solid rgba(0,255,255,0.1); color: var(--success); padding: 10px; border-radius: 5px; overflow-y: auto; font-family: 'JetBrains Mono', monospace; font-size: 0.85em; white-space: pre-wrap;"></div>
+            </div>
+            <div style="display: flex; gap: 10px; padding-top: 10px;">
+                <button onclick="forgeHTML()" style="background: var(--accent); color: black; border: none; padding: 8px 20px; border-radius: 4px; font-weight: bold; cursor: pointer; font-size: 0.8em; transition: 0.3s;">Forge HTML Shard</button>
+                <button onclick="clearMarkup()" style="background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.2); color: white; padding: 8px 15px; border-radius: 4px; cursor: pointer; font-size: 0.8em; transition: 0.3s;">Purge Buffer</button>
+            </div>
+        </div>
+    </div>
+
     <!-- Desktop Icons -->
     <div class="desktop-icons">
         <div class="app-icon">
@@ -437,6 +462,10 @@
             <div class="app-img">☁️</div>
             <div class="app-label">Cloud Maestro</div>
         </div>
+        <div class="app-icon" onclick="launchApp('Markup Forge')">
+            <div class="app-img">📄</div>
+            <div class="app-label">Markup Forge</div>
+        </div>
         <div class="app-icon">
             <div class="app-img">⚙️</div>
             <div class="app-label">Core Orchestrator</div>
@@ -450,6 +479,7 @@
         <div class="task-icon">🌐</div>
         <div class="task-icon">🧠</div>
         <div class="task-icon">🖥️</div>
+        <div class="task-icon" onclick="launchApp('Markup Forge')">📄</div>
         <div class="task-icon">🔌</div>
         <div class="taskbar-divider"></div>
         <div class="task-icon">🔔</div>
@@ -546,7 +576,38 @@
 
         function launchApp(app) {
             addLog(`Σ [ZENITH]: Launching ${app} Shard...`, "success");
+            if (app === 'Markup Forge') {
+                const win = document.getElementById('markup-forge-win');
+                win.style.display = 'block';
+                win.style.zIndex = '2000';
+            }
             toggleStart();
+        }
+
+        function forgeHTML() {
+            const input = document.getElementById('markup-input').value;
+            const output = document.getElementById('markup-output');
+            
+            // Simple Text-to-HTML conversion logic
+            let html = input
+                .replace(/&/g, "&amp;")
+                .replace(/</g, "&lt;")
+                .replace(/>/g, "&gt;")
+                .replace(/"/g, "&quot;")
+                .replace(/'/g, "&#039;")
+                .replace(/\n/g, "<br>\n");
+            
+            // Add some "sovereign" tags
+            html = html.replace(/Σ/g, '<span style="color: cyan;">Σ</span>');
+            
+            output.innerText = html;
+            addLog("Σ [MARKUP]: HTML Shard forged successfully.", "success");
+        }
+
+        function clearMarkup() {
+            document.getElementById('markup-input').value = '';
+            document.getElementById('markup-output').innerText = '';
+            addLog("Σ [MARKUP]: Buffer purged.", "success");
         }
 
         document.addEventListener('keydown', (e) => {
