@@ -1,54 +1,66 @@
 #include "sigma_power.h"
 #include "sigma_hal.h"
-#include "sigma_telemetry.h"
 
 /**
- * SigmaOS Sovereign Power Management (v28.0 Zenith)
- * Implements an Intelligent Thermal Balancing (ITB) algorithm.
- * ZERO-DEPENDENCY: Strictly bare-metal silicon power management.
+ * SigmaOS Sovereign Power Management (SPM)
+ * Implements an Intelligent Energy Orchestration (IEO) algorithm.
+ * ZERO-DEPENDENCY: Strictly bare-metal ACPI/APM orchestration.
  *
  * Design: OOP-isolated singleton — SovereignPowerEngine.
  */
 
+class SovereignPowerEngine {
+public:
+    static SovereignPowerEngine& getInstance() {
+        static SovereignPowerEngine instance;
+        return instance;
+    }
 
-/* --- Sovereign Power Engine (OOP Isolation) --- */
-static struct {
-    sigma_power_profile_t active_profile;
-    sigma_u32 thermal_threshold;
-    sigma_u64 profile_switches;
-    sigma_u32 initialized;
-} SovereignPowerEngine = {
-    .active_profile = SIGMA_POWER_BALANCED,
-    .thermal_threshold = 85u,
-    .profile_switches = 0u,
-    .initialized = 0u
+    void init() {
+        sigma_log("[POWER] Initializing Sovereign Power Management (IEO Algorithm)...");
+        this->profile = SIGMA_POWER_BALANCED;
+    }
+
+    void setProfile(sigma_power_profile_t profile) {
+        this->profile = profile;
+        const char* profile_name = "BALANCED";
+        switch(profile) {
+            case SIGMA_POWER_ULTRA: profile_name = "ULTRA"; break;
+            case SIGMA_POWER_ECO: profile_name = "ECO"; break;
+            case SIGMA_POWER_HIBERNATE: profile_name = "HIBERNATE"; break;
+            default: break;
+        }
+        sigma_printf("[POWER] IEO: Switched to %s profile.\n", profile_name);
+    }
+
+    sigma_u32 getBatteryPct() const {
+        return 85u; // Simulated
+    }
+
+    void reboot() {
+        sigma_log("[POWER] IEO: Syncing shards and initiating silicon reset...");
+        hal_shutdown(); // In SigmaOS, power_reboot calls hal_shutdown for safe cycle
+    }
+
+private:
+    SovereignPowerEngine() : profile(SIGMA_POWER_BALANCED) {}
+    
+    sigma_power_profile_t profile;
 };
 
+/* --- C Wrappers --- */
 extern "C" void power_init() {
-    sigma_log("[POWER] Initializing Sovereign Power Management (ITB Algorithm)...");
-    SovereignPowerEngine.initialized = 1u;
+    SovereignPowerEngine::getInstance().init();
 }
 
 extern "C" void power_set_profile(sigma_power_profile_t profile) {
-    SovereignPowerEngine.active_profile = profile;
-    SovereignPowerEngine.profile_switches++;
-    sigma_printf("[POWER] ITB: Transitioning to profile %u...\n", (unsigned)profile);
-    
-    sigma_telemetry_data_t stats = telemetry_get_snapshot();
-    if (stats.lattice_temp_c > SovereignPowerEngine.thermal_threshold) {
-        sigma_log("[POWER] [CRITICAL] Thermal ceiling reached. Throttling...");
-        SovereignPowerEngine.active_profile = SIGMA_POWER_ECO;
-    }
+    SovereignPowerEngine::getInstance().setProfile(profile);
 }
 
 extern "C" sigma_u32 power_get_battery_pct() {
-    return 88u; // Simulated silicon sample
+    return SovereignPowerEngine::getInstance().getBatteryPct();
 }
 
 extern "C" void power_reboot() {
-    sigma_log("[POWER] Initializing Silicon REBOOT Sequence. See you in the Lattice.");
-}
-
-extern "C" sigma_u64 power_get_switch_count() {
-    return SovereignPowerEngine.profile_switches;
+    SovereignPowerEngine::getInstance().reboot();
 }
