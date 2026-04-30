@@ -1,18 +1,25 @@
-#include "sigma_snap.h"
-#include "sigma_hal.h"
-
-/**
- * SigmaOS Sovereign Snap Layouts (v28.0 Zenith)
- * Implements a Dynamic Shard-Snapping (DSS) algorithm for window management.
+/*
+ * =========================================================================
+ * SIGMAOS: SOVEREIGN SNAP LAYOUTS (SovereignSnapEngine)
+ * =========================================================================
+ * Implements the Dynamic Shard-Snapping (DSS) algorithm for silicon-native
+ * multi-window spatial management.
  * ZERO-DEPENDENCY: Strictly bare-metal layout orchestration.
  *
- * Design: OOP-isolated singleton — SovereignSnapEngine.
+ * Design: OOP-isolated singleton -- SovereignSnapEngine.
+ * =========================================================================
  */
 
-/* --- Sovereign Snap Engine Implementation --- */
+#include "sigma_snap.h"
+#include "SovereignLibC.h"
+
+/* =========================================================================
+ * SovereignSnapEngine Method Implementations
+ * ========================================================================= */
 
 void SovereignSnapEngine::init() {
     sigma_log("[SNAP] Initializing Sovereign Dynamic Shard-Snapping (DSS)...");
+    this->active_zone_count = 0u;
     this->initialized = 1u;
     sigma_log("[SNAP] DSS: Multi-window spatial lattice ACTIVE.");
 }
@@ -24,7 +31,8 @@ void SovereignSnapEngine::applyLayout(sigma_u32 layout_id) {
     sigma_log("[SNAP] DSS: Viewport reconciliation complete.");
 }
 
-void SovereignSnapEngine::registerZone(sigma_u32 x, sigma_u32 y, sigma_u32 w, sigma_u32 h) {
+void SovereignSnapEngine::registerZone(sigma_u32 x, sigma_u32 y,
+                                        sigma_u32 w, sigma_u32 h) {
     if (this->active_zone_count < 8u) {
         sigma_snap_zone_t* zone = &this->zones[this->active_zone_count++];
         zone->x = x;
@@ -36,12 +44,16 @@ void SovereignSnapEngine::registerZone(sigma_u32 x, sigma_u32 y, sigma_u32 w, si
     }
 }
 
-/* --- C Wrappers --- */
+/* =========================================================================
+ * C-Linkage Wrappers (ABI compatibility)
+ * ========================================================================= */
+
 extern "C" void snap_init() {
     SovereignSnapEngine::getInstance().init();
 }
 
-extern "C" void snap_window_to_zone(uint32_t window_id, sigma_snap_zone_id_t zone) {
+extern "C" void snap_window_to_zone(uint32_t window_id,
+                                     sigma_snap_zone_id_t zone) {
     SovereignSnapEngine::getInstance().applyLayout((sigma_u32)zone);
     (void)window_id;
 }
@@ -50,6 +62,7 @@ extern "C" void snap_auto_arrange() {
     SovereignSnapEngine::getInstance().applyLayout(0u);
 }
 
-extern "C" void snap_register_zone(sigma_u32 x, sigma_u32 y, sigma_u32 w, sigma_u32 h) {
+extern "C" void snap_register_zone(sigma_u32 x, sigma_u32 y,
+                                    sigma_u32 w, sigma_u32 h) {
     SovereignSnapEngine::getInstance().registerZone(x, y, w, h);
 }
