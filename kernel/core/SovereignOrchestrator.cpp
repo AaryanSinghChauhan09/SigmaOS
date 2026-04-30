@@ -1,24 +1,15 @@
-
-#include <SovereignLibC.h>
+#include "Lattice.h"
 #include "sigma_hal.h"
 
-
 /**
- * SigmaOS Sovereign Orchestrator
- * Automated shard deployment and lattice configuration patterns.
- * Inspired by Terraform/Ansible.
- */
-
-#include "Lattice.h"
-
-/**
- * SigmaOS Sovereign Orchestrator
+ * SigmaOS Sovereign Orchestrator (v28.0 Singularity Edition)
  * Automated shard deployment and lattice configuration patterns.
  * ZERO-DEPENDENCY: Direct silicon-native orchestration.
  *
  * Design: OOP-isolated singleton — SovereignOrchestraEngine.
  *         Lattice Dependency Resolution (LDR) and self-healing.
  */
+
 
 /* --- Sovereign Orchestra Engine (OOP Isolation) --- */
 static struct {

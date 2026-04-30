@@ -1,24 +1,16 @@
-
+#include "Lattice.h"
 #include "sigma_audit.h"
 #include "sigma_hal.h"
 #include "sigma_time.h"
 
 /**
- * SigmaOS Sovereign Audit Implementation
- * Implements a Continuous Lattice Auditing (CLA) algorithm.
- * ZERO-DEPENDENCY: Strictly bare-metal system integrity validation.
- */
-
-#include "Lattice.h"
-#include "sigma_audit.h"
-
-/**
- * SigmaOS Sovereign Audit Implementation
+ * SigmaOS Sovereign Audit Implementation (v28.0 Zenith)
  * Implements a Continuous Lattice Auditing (CLA) algorithm.
  * ZERO-DEPENDENCY: Strictly bare-metal system integrity validation.
  *
  * Design: OOP-isolated singleton — SovereignAuditEngine.
  */
+
 
 /* --- Sovereign Audit Engine (OOP Isolation) --- */
 static struct {

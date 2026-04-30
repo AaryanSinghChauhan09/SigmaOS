@@ -1,12 +1,6 @@
-
 #include "sigma_types.h"
 #include "sigma_hal.h"
-#include "sigma_libc.h"
 #include "sigma_aisched.h"
-
-
-#include "sigma_aisched.h"
-
 
 /**
  * SigmaOS Sovereign AI-Optimized Scheduler
@@ -15,6 +9,7 @@
  *
  * Design: OOP-isolated singleton — SovereignAISchedEngine.
  */
+
 
 /* --- Sovereign AI Scheduler Engine (OOP Isolation) --- */
 static struct {
