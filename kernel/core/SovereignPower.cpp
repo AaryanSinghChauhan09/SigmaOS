@@ -1,25 +1,15 @@
-#include "sigma_types.h"
 #include "sigma_power.h"
 #include "sigma_hal.h"
 #include "sigma_telemetry.h"
 
 /**
- * SigmaOS Sovereign Power Implementation
- * Implements an Intelligent Thermal Balancing (ITB) algorithm.
- * ZERO-DEPENDENCY: Strictly bare-metal silicon power management.
- */
-
-#include "Lattice.h"
-#include "sigma_power.h"
-#include "sigma_telemetry.h"
-
-/**
- * SigmaOS Sovereign Power Implementation
+ * SigmaOS Sovereign Power Management (v28.0 Zenith)
  * Implements an Intelligent Thermal Balancing (ITB) algorithm.
  * ZERO-DEPENDENCY: Strictly bare-metal silicon power management.
  *
  * Design: OOP-isolated singleton — SovereignPowerEngine.
  */
+
 
 /* --- Sovereign Power Engine (OOP Isolation) --- */
 static struct {
