@@ -4,7 +4,7 @@
 
 * **Shard Range:** 00 - 50.
 * **Key Modules:**
-    * **Task Lattice Manager:** Orchestrates concurrent execution across silicon threads.
-    * **Privacy Shield:** Hardened memory protection and encryption at rest.
-    * **Sync Engine:** Real-time state synchronization across the lattice (v28.0 SCR).
-    * **Resource Manager:** Intelligent silicon allocation and thermal management.
+  * **Task Lattice Manager:** Orchestrates concurrent execution across silicon threads.
+  * **Privacy Shield:** Hardened memory protection and encryption at rest.
+  * **Sync Engine:** Real-time state synchronization across the lattice (v28.0 SCR).
+  * **Resource Manager:** Intelligent silicon allocation and thermal management.
