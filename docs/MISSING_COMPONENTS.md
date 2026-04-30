@@ -13,15 +13,12 @@ This document tracks the architectural advantages of SigmaOS and the remaining i
 | **Automation** | Bash/Python Scripts (High Interference) | **Low-Level C/ASM Shard Recipes** | ✅ 100% |
 | **Security** | Capability-based (Root Vulnerable) | **Zero-Trust Sovereign Identity** | ✅ 100% |
 | **Deployment** | ISO/USB (Hardware Dependent) | **Browser/Cloud/Bare-Metal Lattice** | ✅ 100% |
-| **Accessibility** | GNOME Orca / Narrator (Daemon-heavy) | **Sovereign USR-A Engine** | ✅ 100% |
-| **Display Server** | Wayland/X11 (Compositor Overhead) | **Sovereign ZCSR Protocol** | ✅ 100% |
-| **Print Subsystem** | CUPS / WinPrint (Daemon/Service) | **Sovereign S-PRINT Spooler** | ✅ 100% |
-| **GPU Compute Driver** | DRM / Metal / DX12 (Complex Stack) | **Sovereign S-GPU Driver** | ✅ 100% |
-| **Container Runtime** | Docker / Podman (Daemon-heavy) | **Sovereign S-CTR Runtime** | ✅ 100% |
-| **Orchestration** | Kubernetes / K8s (Massive Overhead) | **Sovereign S-KUBE LRL** | ✅ 100% |
-| **Virtualization** | KVM / ESXi (Type-1/2) | **Sovereign S-HYPER SIV** | ✅ 100% |
-| **Identity** | Windows Hello / FaceID / PAM | **Sovereign S-IDENTITY RLSA** | ✅ 100% |
-| **Global Sync** | Chrony / NTP / Cloud Sync | **Sovereign S-SYNC SCR** | ✅ 100% |
+| **Installer** | Anaconda / Calamares (Heavyweight) | **Sovereign S-Install (ABMD)** | ✅ 100% |
+| **Network Stack** | Linux Net Stack / WinSock (Complex) | **Silicon-Native ZBT Stack** | ✅ 100% |
+| **Registry** | Windows Registry / `/etc` (Flat/Legacy) | **Unified Shard Registry (USR)** | ✅ 100% |
+| **Hardware** | KMOD / Drivers (Legacy Bloat) | **Universal Hardware Sharding** | ✅ 100% |
+| **Persistence** | File Systems (Fixed/Vulnerable) | **Amnesic State Persistence** | ✅ 100% |
+| **AI Acceleration** | CUDA / Metal / ROCm (Proprietary) | **Neural Hardware Acceleration** | ✅ 100% |
 
 ---
 
@@ -47,11 +44,11 @@ A total of **600-shard modularity** has been achieved. The following core shards
 
 | Shard | Algorithm | New Capabilities |
 | :--- | :--- | :--- |
-| `SovereignHypervisor.cpp` | SIV Zenith | Nested Paging (NP) + VMCS sharding |
-| `SovereignKernelFinality.asm` | Singularity | MSR sharding + IA32_LSTAR orchestration |
-| `SovereignCognitive.cpp` | NLO | Neural lattice optimization + healing metrics |
+| `SovereignInstall.cpp` | ABMD | Autonomous bare-metal deployment progress |
+| `SovereignNetStack.cpp` | ZBT | Zero-buffer network packet harvesting |
+| `SovereignOrchestrator.cpp` | USR | Unified shard registry discovery |
+| `SovereignNeural.cpp` | NHWA | Neural hardware acceleration telemetry |
 | `SovereignIdentity.cpp` | RLSA | PQC identity vault + attestation metrics |
-| `SovereignGlobalSync.cpp` | SCR | Zero-latency sync + drift telemetry |
 | `SovereignLog.cpp` | WFCSL | Wait-free circular logging + telemetry |
 | `SovereignMMU.cpp` | APFR | Async page fault resolution + fault telemetry |
 | `SovereignContinuity.cpp` | ODSH | Cross-device handoff + state telemetry |
