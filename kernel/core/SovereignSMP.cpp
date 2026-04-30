@@ -1,5 +1,5 @@
 #include "sigma_hal.h"
-#include "sigma_proc.h"
+#include "SovereignLibC.h"
 
 /**
  * SigmaOS Symmetric Multi-Processing (SMP) Orchestrator (v28.0 Zenith)

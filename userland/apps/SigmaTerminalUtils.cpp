@@ -1,19 +1,19 @@
-/*
+﻿/*
  * =========================================================================
- * Î£ SIGMAOS ZENITH SUPREME: INDUSTRIAL TERMINAL UTILS (v1.0)
+ * ÃŽÂ£ SIGMAOS ZENITH SUPREME: INDUSTRIAL TERMINAL UTILS (v1.0)
  * =========================================================================
  * Absorbing Features from: cpdata/Ubuntu-Linux-CLI-Tools, bash-scripting-practices.
  * Mission: Autonomous CLI Sharding & Industrial Utility Playbooks.
  * =========================================================================
  */
 
-#include "../../include/SovereignLibC.h"
+#include "SovereignLibC.h"
 
 // --- Sys-Info Sharding ---
 void sigma_tool_sysinfo() {
-    sigma_printf("\nÎ£ SOVEREIGN SYSTEM SHARD INFO\n");
+    sigma_printf("\nÃŽÂ£ SOVEREIGN SYSTEM SHARD INFO\n");
     sigma_printf("-------------------------------------------\n");
-    sigma_printf("OS: Î£ SIGMAOS ZENITH SUPREME (v94.0)\n");
+    sigma_printf("OS: ÃŽÂ£ SIGMAOS ZENITH SUPREME (v94.0)\n");
     sigma_printf("SILICON: x86_64 Industrial Shard\n");
     sigma_printf("SOVEREIGNTY: 100%% (Zero-Dependency)\n");
     sigma_printf("-------------------------------------------\n\n");

@@ -15,12 +15,22 @@ extern void sigma_scheduler_init();
 extern void sigma_vfs_init();
 extern void sigma_slab_init(); // New Slab sharder init
 
+extern "C" void kernel_io_init();
+extern "C" void allocator_init();
+extern "C" void run_sovereign_tests();
+
 void sigma_kernel_main() {
+    // 0. Initialize Kernel I/O (Step 3: Serial Debugging)
+    kernel_io_init();
+
+    // 1. Run Sovereign Automated Verification (Step 1 parity)
+    run_sovereign_tests();
+
     sigma_printf("\nÎ£ SIGMAOS ZENITH SUPREME (v94.0) BOOTING...\n");
     sigma_printf("--------------------------------------------------\n");
 
-    // 1. Initialize Memory Sharding (Slab Allocator)
-    // sigma_slab_init(); 
+    // 1. Initialize Memory Sharding (Sovereign Allocator)
+    allocator_init(); 
     sigma_printf("[INIT] Memory Sharding Shard... OK\n");
 
     // 2. Initialize File System (VFS)

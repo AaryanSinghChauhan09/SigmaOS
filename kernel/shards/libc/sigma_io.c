@@ -1,10 +1,10 @@
-/*
+﻿/*
  * =========================================================================
- * Σ SIGMAOS: SOVEREIGN LIBC - I/O SHARD (v20.0)
+ * Î£ SIGMAOS: SOVEREIGN LIBC - I/O SHARD (v20.0)
  * =========================================================================
  */
 
-#include "../../../include/SovereignLibC.h"
+#include "SovereignLibC.h"
 #include <stdarg.h>
 
 void sigma_print(const char* str) {

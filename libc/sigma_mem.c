@@ -1,4 +1,4 @@
-#include "../include/SovereignLibC.h"
+﻿#include "SovereignLibC.h"
 
 static void*       g_heap_start = SIGMA_NULL;
 static sigma_size_t g_heap_used  = 0;

@@ -7,7 +7,8 @@
 
 CXX      = g++
 AS       = nasm
-CXXFLAGS = -ffreestanding -O2 -Wall -Wextra -fno-exceptions -fno-rtti -std=c++17 \
+QEMU     = qemu-system-x86_64
+CXXFLAGS = -ffreestanding -O2 -Wall -Wextra -Werror -fno-exceptions -fno-rtti -std=c++17 \
            -I./include -fno-stack-protector -mno-red-zone
 ASFLAGS  = -f elf64
 
@@ -22,16 +23,24 @@ KERNEL_SHARDS = kernel/core/SovereignInit.o \
                 kernel/core/SovereignInstall.o \
                 kernel/core/SovereignNeural.o \
                 kernel/core/SovereignBT.o \
-                kernel/core/SovereignPersistence.o
+                kernel/core/SovereignPersistence.o \
+                kernel/core/SovereignKernelIO.o \
+                kernel/core/SovereignAllocator.o \
+                kernel/shards/SovereignLibC.o \
+                kernel/core/SovereignTests.o
 
-.PHONY: all singularity zenith-iso clean
+.PHONY: all singularity zenith-iso qemu clean
 
 all: singularity
+
+# Runs the sovereign kernel in QEMU (Step 1 parity)
+qemu: singularity
+	$(QEMU) -kernel sigmaos.bin -serial stdio -m 2G
 
 # Reaches the 600-shard modularity zenith
 singularity: $(KERNEL_SHARDS)
 	@echo "[BUILD] Igniting 600-shard modular lattice..."
-	$(CXX) $(CXXFLAGS) -T kernel/linker.ld -o sigmaos.bin $^
+	$(CXX) $(CXXFLAGS) -T kernel/sigma.ld -o sigmaos.bin $^
 	@echo "[STATUS] SINGULARITY ACHIEVED. SigmaOS kernel ready."
 
 # Generates the production-grade deployment image

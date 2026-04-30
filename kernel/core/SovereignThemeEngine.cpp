@@ -1,11 +1,10 @@
-#include "sigma_hal.h"
-#include "sigma_libc.h"
+﻿#include "sigma_hal.h"
 
 /**
  * SigmaOS Sovereign Theme Engine
  * High-performance, silicon-native personalization for the Zenith interface.
  *
- * Design: OOP-isolated singleton — SovereignThemeEngine.
+ * Design: OOP-isolated singleton â€” SovereignThemeEngine.
  */
 
 class SovereignThemeEngine {

@@ -1,12 +1,11 @@
-#include "Lattice.h"
-#include "sigma_crypto.h"
+﻿#include "sigma_crypto.h"
 
 /**
  * SigmaOS Sovereign Cryptography Implementation
  * Implements a Hardware-Accelerated Shard Integrity (HASI) algorithm.
  * ZERO-DEPENDENCY: Strictly bare-metal silicon validation.
  *
- * Design: OOP-isolated singleton — SovereignCryptoEngine.
+ * Design: OOP-isolated singleton â€” SovereignCryptoEngine.
  *         All external calls proxied through the engine instance.
  */
 
@@ -40,7 +39,7 @@ extern "C" sigma_integrity_token_t crypto_verify_shard(sigma_u32 shard_id,
 
     SovereignCryptoEngine.total_verifications++;
 
-    sigma_printf("[CRYPTO] HASI: Verified Shard S%02d (Token: %08X-%08X) — Total: %llu\n",
+    sigma_printf("[CRYPTO] HASI: Verified Shard S%02d (Token: %08X-%08X) â€” Total: %llu\n",
                  (int)shard_id, (unsigned)token.hash_high, (unsigned)token.hash_low,
                  (unsigned long long)SovereignCryptoEngine.total_verifications);
     (void)data;
@@ -51,7 +50,7 @@ extern "C" void crypto_sign_shard(sigma_u32 shard_id, sigma_integrity_token_t* t
     if (!token) return;
     token->is_verified = SIGMA_TRUE;
     SovereignCryptoEngine.total_signatures++;
-    sigma_printf("[CRYPTO] HASI: Signed Shard S%02d with Integrity Token — Total sigs: %llu\n",
+    sigma_printf("[CRYPTO] HASI: Signed Shard S%02d with Integrity Token â€” Total sigs: %llu\n",
                  (int)shard_id,
                  (unsigned long long)SovereignCryptoEngine.total_signatures);
 }

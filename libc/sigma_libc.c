@@ -1,7 +1,7 @@
-#include "../include/SovereignLibC.h"
+﻿#include "SovereignLibC.h"
 /*
  * =========================================================================
- * Î£ SIGMAOS ZENITH SUPREME: SOVEREIGN LIBC CORE (v20.0)
+ * ÃŽÂ£ SIGMAOS ZENITH SUPREME: SOVEREIGN LIBC CORE (v20.0)
  * =========================================================================
  * Mission: Zero-dependency, bit-perfect logic. No external symbols.
  * Capability: String manipulation, formatted I/O, memory management.
@@ -9,7 +9,7 @@
  */
 
 #include "sigma_libc.h"
-#include "../include/sigma_types.h"
+#include "sigma_types.h"
 
 // --- Syscall Wrappers (defined in SovereignLibC.asm) ---
 extern sigma_ssize_t sigma_write(int fd, const void* buf, sigma_size_t count);

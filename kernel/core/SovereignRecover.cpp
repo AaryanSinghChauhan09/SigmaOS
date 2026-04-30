@@ -1,7 +1,6 @@
-#include "sigma_recover.h"
+﻿#include "sigma_recover.h"
 #include "sigma_hal.h"
 #include "sigma_types.h"
-#include "sigma_libc.h"
 
 /**
  * SigmaOS Sovereign Recover Implementation

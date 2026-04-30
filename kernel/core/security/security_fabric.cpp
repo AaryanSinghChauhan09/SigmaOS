@@ -1,6 +1,6 @@
-#include "Lattice.h"
+﻿#include "Lattice.h"
 #include "security_fabric.hpp"
-#include "../../../include/SovereignLibC.h"
+#include "SovereignLibC.h"
 
 namespace SigmaOS {
 namespace Security {
@@ -19,7 +19,7 @@ void SovereignSecurityFabric::RollbackShard(const char* shard_id) {
 }
 
 void SovereignSecurityFabric::Audit() {
-    sigma_printf("\n--- Σ SOVEREIGN SECURITY FABRIC AUDIT ---\n");
+    sigma_printf("\n--- Î£ SOVEREIGN SECURITY FABRIC AUDIT ---\n");
     sigma_printf("| Sentinel Status   : ACTIVE\n");
     sigma_printf("| Anomalies Blocked : %d\n", m_anomalies_detected);
     sigma_printf("| Auto-Rollbacks    : %d\n", m_auto_rollbacks);

@@ -1,5 +1,5 @@
-#include "../include/SovereignLibC.h"
-#include "../include/sigma_system_shards.h"
+﻿#include "SovereignLibC.h"
+#include "sigma_system_shards.h"
 
 void SovereignNet_init(SovereignNetZenith* n) {
     n->type_name = "SovereignNetZenith";
@@ -18,7 +18,7 @@ void SovereignNet_RecursiveDNSNode(SovereignNetZenith* n, const char* domain) {
 }
 
 void SovereignNet_audit(const SovereignNetZenith* n) {
-    sigma_printf("\n--- Î£ SOVEREIGN NETWORKING AUDIT ---\n");
+    sigma_printf("\n--- ÃŽÂ£ SOVEREIGN NETWORKING AUDIT ---\n");
     sigma_printf("| Active Handshakes : %llu\n", n->handshakes);
     sigma_printf("| DNS Shard Queries : %llu\n", n->dns_queries);
     sigma_printf("| Encryption Mode   : PQC LATTICE-ONLY\n");

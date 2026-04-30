@@ -1,9 +1,9 @@
-/*
+﻿/*
  * =============================================================================
- * Î£ SIGMAOS KERNEL: SOVEREIGN-LIBC (Zero-Dependency)
+ * ÃŽÂ£ SIGMAOS KERNEL: SOVEREIGN-LIBC (Zero-Dependency)
  * =============================================================================
  */
-#include "../../include/sigma_kernel_types.h"
+#include "sigma_kernel_types.h"
 
 void sigma_memcpy(void* dest, const void* src, sigma_u32 n) {
     sigma_u8* d = (sigma_u8*)dest;

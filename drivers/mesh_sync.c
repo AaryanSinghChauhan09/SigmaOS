@@ -1,6 +1,6 @@
-/*
+﻿/*
  * =============================================================================
- * Î£ SIGMAOS KERNEL: SOVEREIGN-MESH-SYNC (Task Sharing & Distributed Compute)
+ * ÃŽÂ£ SIGMAOS KERNEL: SOVEREIGN-MESH-SYNC (Task Sharing & Distributed Compute)
  * =============================================================================
  * Algorithm: Molt-Lattice Task Offloading (MLTO)
  * Principles:
@@ -9,7 +9,7 @@
  *   - Consensus-based result verification.
  * =============================================================================
  */
-#include "../include/sigma_kernel_types.h"
+#include "sigma_kernel_types.h"
 
 typedef struct TaskPacket {
     sigma_u32     task_id;

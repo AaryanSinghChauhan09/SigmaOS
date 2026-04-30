@@ -1,6 +1,6 @@
-#include "Lattice.h"
+﻿#include "Lattice.h"
 #include "sovereign_container.hpp"
-#include "../../../include/SovereignLibC.h"
+#include "SovereignLibC.h"
 
 namespace SigmaOS {
 namespace Kernel {
@@ -30,7 +30,7 @@ void ContainerManager::Deploy(const char* shard_path, sigma_size_t memory_quota)
 }
 
 void ContainerManager::Audit() {
-    sigma_printf("\n--- Σ SOVEREIGN CONTAINER AUDIT ---\n");
+    sigma_printf("\n--- Î£ SOVEREIGN CONTAINER AUDIT ---\n");
     sigma_printf("| Managed Containers: %d\n", m_count);
     for (sigma_u32 i = 0; i < m_count; ++i) {
         m_active_containers[i]->Audit();

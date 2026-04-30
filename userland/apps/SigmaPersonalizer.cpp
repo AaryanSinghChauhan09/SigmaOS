@@ -1,14 +1,14 @@
-/*
+﻿/*
  * =========================================================================
- * Î£ SIGMAOS ZENITH SUPREME: SOVEREIGN PERSONALIZER (v1.0)
+ * ÃŽÂ£ SIGMAOS ZENITH SUPREME: SOVEREIGN PERSONALIZER (v1.0)
  * =========================================================================
  * Mission: Universal customization and personalization (USP: KDE/GNOME style).
  * Capability: Theme management, Font sharding, Desktop layout configuration.
  * =========================================================================
  */
 
-#include "../../include/SovereignLibC.h"
-#include "../../include/sigma_types.h"
+#include "SovereignLibC.h"
+#include "sigma_types.h"
 
 typedef struct {
     char name[32];
@@ -42,7 +42,7 @@ void sigma_personalize_apply(const char* theme_name) {
 }
 
 void sigma_personalize_list() {
-    sigma_printf("\nÎ£ SOVEREIGN THEME REPOSITORY\n");
+    sigma_printf("\nÃŽÂ£ SOVEREIGN THEME REPOSITORY\n");
     sigma_printf("-------------------------------------------\n");
     for (int i = 0; i < 4; i++) {
         sigma_printf("[%d] %-15s (Blur: %dpx%s)\n", 

@@ -1,14 +1,14 @@
-/*
+﻿/*
  * =========================================================================
- * Î£ SIGMAOS ZENITH SUPREME: RUST-PARITY SAFETY SHARD (v1.0)
+ * ÃŽÂ£ SIGMAOS ZENITH SUPREME: RUST-PARITY SAFETY SHARD (v1.0)
  * =========================================================================
  * Mission: Zero-Vulnerability Industrial Logic (Rust style).
  * Based on: Industrial safety-critical OS sharding.
  * =========================================================================
  */
 
-#include "../include/SovereignLibC.h"
-#include "../include/sigma_types.h"
+#include "SovereignLibC.h"
+#include "sigma_types.h"
 
 // --- Safe Wrapper Sharding (Option/Result style) ---
 typedef struct {
@@ -29,7 +29,7 @@ sigma_result_t sigma_safe_shard_access(const char* shard_id) {
 }
 
 void sigma_safety_audit() {
-    sigma_printf("\nÎ£ SOVEREIGN RUST-PARITY SAFETY AUDIT\n");
+    sigma_printf("\nÃŽÂ£ SOVEREIGN RUST-PARITY SAFETY AUDIT\n");
     sigma_printf("-------------------------------------------\n");
     sigma_result_t check = sigma_safe_shard_access("Sovereign-Core-01");
     if (check.is_error) {

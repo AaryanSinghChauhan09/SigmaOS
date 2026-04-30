@@ -1,6 +1,6 @@
-/*
+﻿/*
  * =============================================================================
- * Î£ SIGMAOS BROWSER-BRIDGE (v1.0)
+ * ÃŽÂ£ SIGMAOS BROWSER-BRIDGE (v1.0)
  * =============================================================================
  * Algorithm: WASM-Inter-Op Sharding
  * Principles:
@@ -9,7 +9,7 @@
  *   - LocalStorage for sovereign state persistence.
  * =============================================================================
  */
-#include "../include/sigma_kernel_types.h"
+#include "sigma_kernel_types.h"
 
 /* Emscripten-style exports */
 #ifdef __EMSCRIPTEN__

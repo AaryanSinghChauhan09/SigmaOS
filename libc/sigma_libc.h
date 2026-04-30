@@ -1,15 +1,15 @@
-/*
+﻿/*
  * =========================================================================
- * Î£ SIGMAOS: SOVEREIGN LIBC HEADER (v2.0)
+ * ÃŽÂ£ SIGMAOS: SOVEREIGN LIBC HEADER (v2.0)
  * =========================================================================
  */
 
 #ifndef SIGMA_LIBC_H
 #define SIGMA_LIBC_H
 
-#include "../include/SovereignLibC.h"
+#include "SovereignLibC.h"
 
-#include "../include/sigma_types.h"
+#include "sigma_types.h"
 
 // --- Syscall Wrappers ---
 void          sigma_exit(int code);

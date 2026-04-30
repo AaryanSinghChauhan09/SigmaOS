@@ -1,5 +1,5 @@
-#include "../include/SovereignLibC.h"
-#include "../include/sigma_system_shards.h"
+﻿#include "SovereignLibC.h"
+#include "sigma_system_shards.h"
 
 void SovereignScheduler_init(SovereignScheduler* s) {
     s->type_name = "SovereignScheduler";
@@ -18,7 +18,7 @@ void SovereignScheduler_RealTimeDeadlineSchedule(SovereignScheduler* s) {
 }
 
 void SovereignScheduler_audit(const SovereignScheduler* s) {
-    sigma_printf("\n--- Î£ SOVEREIGN SCHEDULER AUDIT ---\n");
+    sigma_printf("\n--- ÃŽÂ£ SOVEREIGN SCHEDULER AUDIT ---\n");
     sigma_printf("| Context Switches  : %llu\n", s->ctx_switches);
     sigma_printf("| Deadline Misses   : %llu [ZERO TOLERANCE]\n", s->deadline_misses);
     sigma_printf("| Strategy          : MLFQ + EDF HYBRID\n");

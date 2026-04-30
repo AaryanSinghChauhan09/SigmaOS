@@ -18,4 +18,10 @@ Thank you for your interest in contributing to the SigmaOS Sovereign Lattice!
 3. Run the automated linting and IDE checks.
 4. Submit a PR against `lattice-dev` and tag a maintainer.
 
+## 🐞 Reporting Bugs
+If you encounter an "off" issue or a kernel-level bug:
+1. **Log it:** Open a GitHub Issue with the label `bug`.
+2. **Reproduce:** Provide clear steps to reproduce the issue (e.g., QEMU command and boot logs).
+3. **Trace:** Include serial output logs from Step 3 debugging.
+
 We label beginner-friendly issues as `good first issue` and `help wanted`.

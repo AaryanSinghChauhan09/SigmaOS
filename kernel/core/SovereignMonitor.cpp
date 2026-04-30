@@ -1,13 +1,12 @@
-#include "sigma_monitor.h"
+﻿#include "sigma_monitor.h"
 #include "sigma_hal.h"
-#include "sigma_telemetry.h"
 
 /**
  * SigmaOS Sovereign Monitor Implementation
  * Implements a Hardware-Accelerated Load Balancing (HALB) algorithm.
  * ZERO-DEPENDENCY: Strictly bare-metal system observability.
  *
- * Design: OOP-isolated singleton — SovereignMonitorEngine.
+ * Design: OOP-isolated singleton â€” SovereignMonitorEngine.
  */
 
 class SovereignMonitorEngine {

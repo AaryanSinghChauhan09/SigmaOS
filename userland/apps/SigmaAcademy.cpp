@@ -1,16 +1,16 @@
-/*
+﻿/*
  * =========================================================================
- * Î£ SIGMAOS ZENITH SUPREME: SOVEREIGN ACADEMY (v1.0)
+ * ÃŽÂ£ SIGMAOS ZENITH SUPREME: SOVEREIGN ACADEMY (v1.0)
  * =========================================================================
  * Mission: Educational command practice and industrial mastery sharding.
  * USP: labex-labs/linux-basic-commands-practice-online parity.
  * =========================================================================
  */
 
-#include "../../include/SovereignLibC.h"
+#include "SovereignLibC.h"
 
 void sigma_academy_lesson_list() {
-    sigma_printf("\nÎ£ SOVEREIGN ACADEMY: COMMAND MASTERY\n");
+    sigma_printf("\nÃŽÂ£ SOVEREIGN ACADEMY: COMMAND MASTERY\n");
     sigma_printf("-------------------------------------------\n");
     sigma_printf("[1] Basic VFS Sharding (ls, cd, mkdir)\n");
     sigma_printf("[2] Industrial Process Control (ps, kill)\n");

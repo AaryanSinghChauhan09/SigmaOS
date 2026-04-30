@@ -1,6 +1,6 @@
-/*
+﻿/*
  * =========================================================================
- * Î£ SIGMAOS: SOVEREIGN ZENITH (v15.0 - ABSOLUTE FINALITY)
+ * ÃŽÂ£ SIGMAOS: SOVEREIGN ZENITH (v15.0 - ABSOLUTE FINALITY)
  * =========================================================================
  * Author: Sovereign-Zenith-Developer
  * Principles: Zero-Library, Bit-Perfect, Silicon-Integrity, USP-Absorbed.
@@ -9,7 +9,7 @@
 
 /*
  * =========================================================================
- * Î£ SIGMAOS: SOVEREIGN DIAGNOSTICS ZENITH (v12.0 - ZERO-DEPENDENCY)
+ * ÃŽÂ£ SIGMAOS: SOVEREIGN DIAGNOSTICS ZENITH (v12.0 - ZERO-DEPENDENCY)
  * =========================================================================
  * Mission: Absolute Self-Healing & Silicon Integrity Validation.
  * Capability: Sub-ms Silicon Probe, Shard Reconstruction, Integrity: 100%.
@@ -17,7 +17,7 @@
  * =========================================================================
  */
 
-#include "../include/SigmaOOP.hpp"
+#include "SigmaOOP.hpp"
 
 namespace SigmaOS {
 namespace Kernel {
@@ -83,7 +83,7 @@ public:
     }
 
     void audit_all() {
-        sigma_print("\n--- Î£ SOVEREIGN HARDWARE DIAGNOSTIC AUDIT (v96.0) ---\n");
+        sigma_print("\n--- ÃŽÂ£ SOVEREIGN HARDWARE DIAGNOSTIC AUDIT (v96.0) ---\n");
         probe_cpu_telemetry();
         probe_thermal_nodes();
         extract_kernel_ring();

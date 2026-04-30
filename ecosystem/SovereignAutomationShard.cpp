@@ -1,7 +1,7 @@
-#include "../include/SovereignLibC.h"
+﻿#include "SovereignLibC.h"
 /*
  * =========================================================================
- * Î£ SIGMAOS: SOVEREIGN ZENITH (v15.0 - ABSOLUTE FINALITY)
+ * ÃŽÂ£ SIGMAOS: SOVEREIGN ZENITH (v15.0 - ABSOLUTE FINALITY)
  * =========================================================================
  * Author: Sovereign-Zenith-Developer
  * Principles: Zero-Library, Bit-Perfect, Silicon-Integrity, USP-Absorbed.
@@ -13,7 +13,7 @@
 
 
 /**
- * Î£ SIGMA OS: SOVEREIGN AUTOMATION SHARD (v3.0 - BEHAVIORAL ZENITH)
+ * ÃŽÂ£ SIGMA OS: SOVEREIGN AUTOMATION SHARD (v3.0 - BEHAVIORAL ZENITH)
  * ================================================================
  * USP Absorbed: AutoHotkey (Hotkeys), Zapier (Workflow), IFTTT (Trigger-Action).
  * Capability: Behavior-based Shard Automation, Automated Legal/Scholastic Retrieval.

@@ -1,14 +1,14 @@
-/*
+﻿/*
  * =========================================================================
- * Î£ SIGMAOS ZENITH SUPREME: SOVEREIGN REMOTE MANAGER (v1.0)
+ * ÃŽÂ£ SIGMAOS ZENITH SUPREME: SOVEREIGN REMOTE MANAGER (v1.0)
  * =========================================================================
  * Absorbing Features from: bot_comando_remoto, remote-commands-practice.
  * Mission: Autonomous Remote Command Routing & Secure Node Sharding.
  * =========================================================================
  */
 
-#include "../../include/SovereignLibC.h"
-#include "../../include/sigma_types.h"
+#include "SovereignLibC.h"
+#include "sigma_types.h"
 
 typedef struct {
     char node_id[32];
@@ -23,7 +23,7 @@ static sigma_remote_node_t master_nodes[] = {
 };
 
 void sigma_remote_broadcast(const char* cmd) {
-    sigma_printf("\nÎ£ SOVEREIGN REMOTE NODE BROADCAST\n");
+    sigma_printf("\nÃŽÂ£ SOVEREIGN REMOTE NODE BROADCAST\n");
     sigma_printf("-------------------------------------------\n");
     sigma_printf("[REMOTE] Routing Sovereignty Protocol: %s\n", cmd);
     for (int i = 0; i < 3; i++) {

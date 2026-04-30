@@ -1,6 +1,6 @@
-#include "Lattice.h"
+﻿#include "Lattice.h"
 #include "identity.hpp"
-#include "../../../include/SovereignLibC.h"
+#include "SovereignLibC.h"
 
 namespace SigmaOS {
 namespace Security {
@@ -20,7 +20,7 @@ sigma_bool SovereignIdentity::VerifyLatticeIdentity(const sigma_u8* key, const s
 }
 
 void SovereignIdentity::Audit() {
-    sigma_printf("\n--- Σ SOVEREIGN IDENTITY AUDIT ---\n");
+    sigma_printf("\n--- Î£ SOVEREIGN IDENTITY AUDIT ---\n");
     sigma_printf("| Identity Type     : DECENTRALIZED-BLOCKCHAIN\n");
     sigma_printf("| Verification State: %s\n", m_verified ? "SECURE-VERIFIED" : "PENDING");
     sigma_printf("| Lattice Nonce     : %llu\n", m_nonce);

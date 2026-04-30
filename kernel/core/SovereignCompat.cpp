@@ -1,13 +1,12 @@
-#include "sigma_compat.h"
+﻿#include "sigma_compat.h"
 #include "sigma_hal.h"
-#include "sigma_libc.h"
 
 /**
  * SigmaOS Sovereign Compatibility Implementation
  * Implements a Binary Instruction Translation (BIT) algorithm.
  * ZERO-DEPENDENCY: Strictly bare-metal foreign binary execution.
  *
- * Design: OOP-isolated singleton — SovereignCompatEngine.
+ * Design: OOP-isolated singleton â€” SovereignCompatEngine.
  */
 
 class SovereignCompatEngine {

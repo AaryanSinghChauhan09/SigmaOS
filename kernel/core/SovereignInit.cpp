@@ -1,13 +1,12 @@
-#include "sigma_init.h"
+﻿#include "sigma_init.h"
 #include "sigma_hal.h"
-#include "sigma_telemetry.h"
 
 /**
  * SigmaOS Sovereign Init Implementation
  * Implements an Asynchronous Shard Ignition (ASI) algorithm.
  * ZERO-DEPENDENCY: Strictly bare-metal machine-state ignition.
  *
- * Design: OOP-isolated singleton — SovereignInitEngine.
+ * Design: OOP-isolated singleton â€” SovereignInitEngine.
  */
 
 class SovereignInitEngine {

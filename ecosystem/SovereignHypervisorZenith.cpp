@@ -1,7 +1,7 @@
-#include "../include/SovereignLibC.h"
+﻿#include "SovereignLibC.h"
 /*
  * =========================================================================
- * Î£ SIGMAOS: SOVEREIGN ZENITH (v15.0 - ABSOLUTE FINALITY)
+ * ÃŽÂ£ SIGMAOS: SOVEREIGN ZENITH (v15.0 - ABSOLUTE FINALITY)
  * =========================================================================
  * Author: Sovereign-Zenith-Developer
  * Principles: Zero-Library, Bit-Perfect, Silicon-Integrity, USP-Absorbed.
@@ -10,7 +10,7 @@
 
 /*
  * =========================================================================
- * Î£ SIGMAOS: SOVEREIGN HYPERVISOR ZENITH (v13.0 - THE SWALLOWER)
+ * ÃŽÂ£ SIGMAOS: SOVEREIGN HYPERVISOR ZENITH (v13.0 - THE SWALLOWER)
  * =========================================================================
  * Mission: Neutralize all guest operating systems (Linux, Windows, macOS).
  * Capability: Ring -1 Hardware-Accelerated Micro-Virtualization.
@@ -18,7 +18,7 @@
  * =========================================================================
  */
 
-#include "../include/SigmaOOP.hpp"
+#include "SigmaOOP.hpp"
 
 namespace SigmaOS {
 namespace Virt {
@@ -54,7 +54,7 @@ public:
     }
 
     void audit() {
-        sigma_printf("\n--- Î£ SOVEREIGN HYPERVISOR AUDIT (v13.0) ---\n");
+        sigma_printf("\n--- ÃŽÂ£ SOVEREIGN HYPERVISOR AUDIT (v13.0) ---\n");
         sigma_printf("| Guest Shards   : %u\n", m_active_shards);
         sigma_printf("| Hardware VT-x  : [CAPTURED/ACTIVE]\n");
         sigma_printf("| Competitors    : KVM/Xen/Hyper-V neutralized.\n");

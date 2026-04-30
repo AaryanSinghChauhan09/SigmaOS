@@ -1,5 +1,4 @@
-#include "Lattice.h"
-#include "sigma_mmu.h"
+﻿#include "sigma_mmu.h"
 #include "sigma_hal.h"
 
 /**
@@ -7,7 +6,7 @@
  * Implements an Asynchronous Page Fault Resolution (APFR) algorithm.
  * ZERO-DEPENDENCY: Strictly bare-metal silicon isolation.
  *
- * Design: OOP-isolated singleton — SovereignMMUEngine.
+ * Design: OOP-isolated singleton â€” SovereignMMUEngine.
  */
 
 /* --- Sovereign MMU Engine (OOP Isolation) --- */

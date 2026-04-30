@@ -1,13 +1,13 @@
-/*
+﻿/*
  * =========================================================================
- * Î£ SIGMAOS: SOVEREIGN ZENITH (v15.0 - ABSOLUTE FINALITY)
+ * ÃŽÂ£ SIGMAOS: SOVEREIGN ZENITH (v15.0 - ABSOLUTE FINALITY)
  * =========================================================================
  * Author: Sovereign-Zenith-Developer
  * Principles: Zero-Library, Bit-Perfect, Silicon-Integrity, USP-Absorbed.
  * =========================================================================
  */
 
-#include "../include/SigmaOOP.hpp"
+#include "SigmaOOP.hpp"
 
 namespace SigmaOS {
 namespace PackageForge {

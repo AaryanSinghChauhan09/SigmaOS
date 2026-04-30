@@ -1,13 +1,12 @@
-#include "sigma_micro.h"
+﻿#include "sigma_micro.h"
 #include "sigma_hal.h"
-#include "sigma_telemetry.h"
 
 /**
  * SigmaOS Sovereign Micro Implementation
  * Implements an Isolated Service Mediation (ISM) algorithm.
  * ZERO-DEPENDENCY: Strictly bare-metal micro-service isolation.
  *
- * Design: OOP-isolated singleton — SovereignMicroEngine.
+ * Design: OOP-isolated singleton â€” SovereignMicroEngine.
  */
 
 class SovereignMicroEngine {

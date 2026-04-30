@@ -1,5 +1,5 @@
-#include "../include/SovereignLibC.h"
-#include "../include/sigma_cloud.h"
+﻿#include "SovereignLibC.h"
+#include "sigma_cloud.h"
 
 void SovereignCloud_init(SovereignCloudOrchestrator* c) {
     c->type_name = "SovereignCloudOrchestrator";
@@ -18,7 +18,7 @@ void SovereignCloud_VirtualVPCIsolation(SovereignCloudOrchestrator* c, const cha
 }
 
 void SovereignCloud_audit(const SovereignCloudOrchestrator* c) {
-    sigma_printf("\n--- Î£ SOVEREIGN CLOUD AUDIT ---\n");
+    sigma_printf("\n--- ÃŽÂ£ SOVEREIGN CLOUD AUDIT ---\n");
     sigma_printf("| Active Nodes      : %u\n", c->active_nodes);
     sigma_printf("| Isolated VPCs     : %u\n", c->isolated_vpcs);
     sigma_printf("| Orchestration     : HYPER-SHARDED ACTIVE\n");

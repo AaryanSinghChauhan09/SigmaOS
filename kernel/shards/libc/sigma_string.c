@@ -1,10 +1,10 @@
-/*
+﻿/*
  * =========================================================================
- * Σ SIGMAOS: SOVEREIGN LIBC - STRING SHARD (v20.0)
+ * Î£ SIGMAOS: SOVEREIGN LIBC - STRING SHARD (v20.0)
  * =========================================================================
  */
 
-#include "../../../include/SovereignLibC.h"
+#include "SovereignLibC.h"
 
 int sigma_atoi(const char* s) {
     int res = 0;

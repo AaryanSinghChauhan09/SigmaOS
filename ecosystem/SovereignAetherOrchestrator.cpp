@@ -1,6 +1,6 @@
-/*
+﻿/*
  * =========================================================================
- * Î£ SIGMAOS: SOVEREIGN ZENITH (v15.0 - ABSOLUTE FINALITY)
+ * ÃŽÂ£ SIGMAOS: SOVEREIGN ZENITH (v15.0 - ABSOLUTE FINALITY)
  * =========================================================================
  * Author: Sovereign-Zenith-Developer
  * Principles: Zero-Library, Bit-Perfect, Silicon-Integrity, USP-Absorbed.
@@ -9,7 +9,7 @@
 
 /*
  * =========================================================================
- * Î£ SIGMAOS: AETHER ORCHESTRATOR ZENITH (v14.0 - THE AUTOMATOR)
+ * ÃŽÂ£ SIGMAOS: AETHER ORCHESTRATOR ZENITH (v14.0 - THE AUTOMATOR)
  * =========================================================================
  * Mission: Neutralize all automation frameworks (Zapier, n8n, Selenium).
  * Capability: Native Event-Driven Sharding. Silicon-level workflow triggers.
@@ -17,7 +17,7 @@
  * =========================================================================
  */
 
-#include "../include/SigmaOOP.hpp"
+#include "SigmaOOP.hpp"
 
 namespace SigmaOS {
 namespace Automation {
@@ -80,7 +80,7 @@ public:
     }
 
     void audit() {
-        sigma_print("\n--- Î£ SOVEREIGN AUTOMATION AUDIT (v93.0) ---\n");
+        sigma_print("\n--- ÃŽÂ£ SOVEREIGN AUTOMATION AUDIT (v93.0) ---\n");
         sigma_print("--------------------------------------------\n");
     }
 };

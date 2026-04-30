@@ -1,7 +1,7 @@
-#include "../include/SovereignLibC.h"
+﻿#include "SovereignLibC.h"
 /*
  * =========================================================================
- * Î£ SIGMAOS: SOVEREIGN ZENITH (v15.0 - ABSOLUTE FINALITY)
+ * ÃŽÂ£ SIGMAOS: SOVEREIGN ZENITH (v15.0 - ABSOLUTE FINALITY)
  * =========================================================================
  * Author: Sovereign-Zenith-Developer
  * Principles: Zero-Library, Bit-Perfect, Silicon-Integrity, USP-Absorbed.
@@ -10,7 +10,7 @@
 
 /*
  * =========================================================================
- * Î£ SIGMAOS: SOVEREIGN DEV FORGE (v11.0 - THE IDE SHARD)
+ * ÃŽÂ£ SIGMAOS: SOVEREIGN DEV FORGE (v11.0 - THE IDE SHARD)
  * =========================================================================
  * Mission: Neutralize external IDEs (VSCode/Neovim).
  * Capability: Native syntax-highlighted sharding, Zero-Latency editing.
@@ -18,7 +18,7 @@
  * =========================================================================
  */
 
-#include "../include/SigmaOOP.hpp"
+#include "SigmaOOP.hpp"
 
 namespace SigmaOS {
 namespace Dev {
@@ -54,7 +54,7 @@ public:
     }
 
     void audit() {
-        sigma_printf("\n--- Î£ SOVEREIGN DEVFORGE AUDIT ---\n");
+        sigma_printf("\n--- ÃŽÂ£ SOVEREIGN DEVFORGE AUDIT ---\n");
         sigma_printf("| Shards Forged  : %u\n", m_files_forged);
         sigma_printf("| Linter Status  : %s\n", m_lint_active ? "MASTER-READY" : "OFFLINE");
         sigma_printf("| Competitors    : Electron-based IDEs deprecated.\n");

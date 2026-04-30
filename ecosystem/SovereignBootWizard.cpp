@@ -1,6 +1,6 @@
-/*
+﻿/*
  * =========================================================================
- * Î£ SIGMAOS: SOVEREIGN BOOT-WIZARD (v37.0 - ZENITH FINALITY)
+ * ÃŽÂ£ SIGMAOS: SOVEREIGN BOOT-WIZARD (v37.0 - ZENITH FINALITY)
  * =========================================================================
  * Mission: Absolute Ease of Use. Automated Sharding Setup.
  * Capability: Automated Kernel Ignition, VFS Sharding, and PQC Rekeying.
@@ -8,7 +8,7 @@
  * =========================================================================
  */
 
-#include "../include/SigmaOOP.hpp"
+#include "SigmaOOP.hpp"
 
 namespace SigmaOS {
 namespace Wizard {
@@ -23,7 +23,7 @@ public:
 
     // --- STEP-BY-STEP SHARDING ---
     void execute_setup() {
-        sigma_print("\n--- Î£ SIGMAOS SOVEREIGN BOOT-WIZARD (v37.0) ---\n");
+        sigma_print("\n--- ÃŽÂ£ SIGMAOS SOVEREIGN BOOT-WIZARD (v37.0) ---\n");
         
         sigma_print("[WIZARD]: Phase 1: Silicon Handshake... ");
         sigma_delay(500); // Simulate shard alignment

@@ -1,5 +1,5 @@
-#include "SovereignAPI.hpp"
-#include "../include/SovereignLibC.h"
+﻿#include "SovereignAPI.hpp"
+#include "SovereignLibC.h"
 
 namespace SigmaOS {
 namespace API {

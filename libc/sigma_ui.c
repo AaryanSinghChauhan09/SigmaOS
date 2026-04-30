@@ -1,5 +1,5 @@
-#include "../include/sigma_ui_types.h"
-#include "../include/SovereignLibC.h"
+﻿#include "sigma_ui_types.h"
+#include "SovereignLibC.h"
 
 // Forward declarations of low-level primitives
 void sigma_ui_atomic_inc_frames(sigma_u64* frames);
@@ -37,7 +37,7 @@ void SovereignUI_Notify(SovereignUIEngine* u, const char* msg, const char* type)
 }
 
 void SovereignUI_audit(const SovereignUIEngine* u) {
-    sigma_printf("\n--- Î£ SOVEREIGN UI AUDIT ---\n");
+    sigma_printf("\n--- ÃŽÂ£ SOVEREIGN UI AUDIT ---\n");
     sigma_printf("| Frames Rendered   : %llu\n", sigma_ui_get_frames(u));
     sigma_printf("| Experience Layer  : ZENITH-GLASS (v15.0)\n");
     sigma_printf("| FPS Stability     : 120Hz FIXED\n");

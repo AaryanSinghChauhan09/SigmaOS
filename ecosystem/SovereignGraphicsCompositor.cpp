@@ -1,7 +1,7 @@
-#include "../include/SovereignLibC.h"
+﻿#include "SovereignLibC.h"
 /*
  * =========================================================================
- * Î£ SIGMAOS: SOVEREIGN ZENITH (v15.0 - ABSOLUTE FINALITY)
+ * ÃŽÂ£ SIGMAOS: SOVEREIGN ZENITH (v15.0 - ABSOLUTE FINALITY)
  * =========================================================================
  * Author: Sovereign-Zenith-Developer
  * Principles: Zero-Library, Bit-Perfect, Silicon-Integrity, USP-Absorbed.
@@ -12,7 +12,7 @@
 
 
 /**
- * Î£ SIGMA OS: SOVEREIGN GRAPHICS COMPOSITOR (v3.0 - RAW SILICON)
+ * ÃŽÂ£ SIGMA OS: SOVEREIGN GRAPHICS COMPOSITOR (v3.0 - RAW SILICON)
  * ============================================================
  * USP Absorbed: Wayland (Compositing), GDI/DirectX (Draw-Calls), X11 (Window-Scaling).
  * Capability: Silicon-Direct Framebuffer Swap, Zero-Latency Shard Projection.

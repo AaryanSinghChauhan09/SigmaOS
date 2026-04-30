@@ -1,30 +1,26 @@
-# 📜 SigmaOS Changelog
+# 📜 SigmaOS Change Log
 
-## [v28.0] - SINGULARITY ZENITH (2026-04-30)
+All notable changes to the SigmaOS Sovereign Lattice will be documented in this file.
 
-### 🚀 Added
+## [v28.0 Zenith] - 2026-04-30
+### Added
+- **QEMU Emulation Support**: Added `make qemu` target for kernel verification.
+- **Serial Boot Tracing**: Direct silicon logging to COM1 for kernel-level debugging.
+- **QBMP Allocator**: Functional bump allocator with 8-byte alignment and assertions.
+- **CI/CD Pipeline**: GitHub Actions workflow for automated build and security auditing.
+- **Architecture Documentation**: New `docs/architecture.md` explaining the lattice sharding model.
+- **Verification Assertions**: Added `sigma_assert` for kernel-level sanity checks.
 
-- **600-Shard Modular Lattice**: Fully decoupled the kernel into 600 atomic
-  singleton shards.
-- **S-BT (Direct HCI)**: Silicon-native Bluetooth stack with SDHO algorithm.
-- **S-Install (ABMD)**: Autonomous Bare-Metal Deployment engine.
-- **ZBT Network Stack**: Zero-buffer silicon-native TCP/UDP orchestration.
-- **USR (Unified Shard Registry)**: Centralized discovery for the lattice.
-- **UMSM (Hardware Transpiler)**: Universal hardware register virtualization.
-- **DSP (Amnesic Persistence)**: Decentralized shard persistence (IPFS/Arweave).
+### Changed
+- **Build System**: Standardized on `kernel/sigma.ld` and enabled `-Werror` for strict compilation.
+- **Documentation**: Updated README with boot instructions and architecture diagrams.
+- **Include Strategy**: Consolidated include paths to use flat `include/` directory.
 
-### 🛠️ Fixed
-
-- **Header Bloat**: Removed `Lattice.h` and redundant includes globally.
-- **Type Safety**: Standardized `sigma_types.h` across all 600 shards.
-- **Documentation**: Resolved all Markdown linting errors (MD030, MD032).
-
-### 🔒 Security
-
-- **RLSA (Identity)**: Post-quantum identity vault (Ring-LWE).
-- **Zero-Trust CIB**: Every shard now resides in a Cryptographic Isolation
-  Boundary.
+### Fixed
+- Resolved `sigma_hardened_strcpy` undeclared error in `SovereignTuner.cpp`.
+- Fixed various markdown linting violations (MD012, MD022, MD058) in developer guides.
+- Removed stale/unused header includes across 15+ kernel files.
 
 ---
 
-*Σ SIGMAOS: Singularity Achieved.*
+*Σ SIGMAOS: Sovereign Versioning. Absolute Continuity.*

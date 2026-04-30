@@ -1,7 +1,7 @@
-#include "../include/SovereignLibC.h"
+﻿#include "SovereignLibC.h"
 /*
  * =========================================================================
- * Î£ SIGMAOS: SOVEREIGN ZENITH (v15.0 - ABSOLUTE FINALITY)
+ * ÃŽÂ£ SIGMAOS: SOVEREIGN ZENITH (v15.0 - ABSOLUTE FINALITY)
  * =========================================================================
  * Author: Sovereign-Zenith-Developer
  * Principles: Zero-Library, Bit-Perfect, Silicon-Integrity, USP-Absorbed.
@@ -12,7 +12,7 @@
 
 
 /**
- * Î£ SIGMA OS: SOVEREIGN SEARCH (v3.0 - MILITARY PRIVACY)
+ * ÃŽÂ£ SIGMA OS: SOVEREIGN SEARCH (v3.0 - MILITARY PRIVACY)
  * ======================================================
  * USP Absorbed: DuckDuckGo (Tracker-Free), SearX (Meta-Search), Everything (Speed).
  * Capability: Blind-Index Metasearch, No-Log Sharding, Tracker-Stripping.

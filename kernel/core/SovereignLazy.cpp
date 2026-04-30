@@ -1,12 +1,11 @@
-#include "sigma_hal.h"
-#include "sigma_fs.h"
+﻿#include "sigma_hal.h"
 
 /**
  * SigmaOS Lazy Shard Loader (v28.0 Zenith)
  * Implements an On-Demand Shard Ignition (ODSI) algorithm.
  * ZERO-DEPENDENCY: Dynamic ELF-lite loading without heavy linking.
  *
- * Design: OOP-isolated singleton — SovereignLazyEngine.
+ * Design: OOP-isolated singleton â€” SovereignLazyEngine.
  */
 
 class SovereignLazyEngine {

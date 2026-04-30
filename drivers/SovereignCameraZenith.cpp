@@ -1,9 +1,9 @@
-#include "Lattice.h"
-// Î£ SIGMAOS: SOVEREIGN CAMERA ZENITH (v92.1)
+﻿#include "Lattice.h"
+// ÃŽÂ£ SIGMAOS: SOVEREIGN CAMERA ZENITH (v92.1)
 // Zero-Dependency, Hardware-Native Image Pipeline with UI Sharding
 // Absorbing Snapchat (Neural Tracking) & MIT Scratch (Visual Logic) USPs
 
-#include "../include/SigmaOOP.hpp"
+#include "SigmaOOP.hpp"
 
 namespace SigmaOS {
 namespace Multimedia {

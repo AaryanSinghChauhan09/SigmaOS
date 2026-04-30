@@ -1,13 +1,12 @@
-#include "sigma_boot.h"
+﻿#include "sigma_boot.h"
 #include "sigma_hal.h"
-#include "sigma_crypto.h"
 
 /**
  * SigmaOS Sovereign Boot Implementation
  * Implements a Secure Shard Bootstrapping (SSB) algorithm.
  * ZERO-DEPENDENCY: Strictly bare-metal system ignition.
  *
- * Design: OOP-isolated singleton — SovereignBootEngine.
+ * Design: OOP-isolated singleton â€” SovereignBootEngine.
  */
 
 class SovereignBootEngine {

@@ -1,7 +1,7 @@
-#include "../include/SovereignLibC.h"
+﻿#include "SovereignLibC.h"
 /*
  * =========================================================================
- * Î£ SIGMAOS: SOVEREIGN ZENITH (v15.0 - ABSOLUTE FINALITY)
+ * ÃŽÂ£ SIGMAOS: SOVEREIGN ZENITH (v15.0 - ABSOLUTE FINALITY)
  * =========================================================================
  * Author: Sovereign-Zenith-Developer
  * Principles: Zero-Library, Bit-Perfect, Silicon-Integrity, USP-Absorbed.
@@ -14,7 +14,7 @@
 
 
 /**
- * Î£ SIGMA OS: SOVEREIGN SCHOLASTIC CLUSTER (v128.0 - SCHOLASTIC ZENITH)
+ * ÃŽÂ£ SIGMA OS: SOVEREIGN SCHOLASTIC CLUSTER (v128.0 - SCHOLASTIC ZENITH)
  * ===================================================================
  * USP: Comprehensive "Small & Big" experiment coverage for NCERT (1-12).
  * Capability: Photoelectric, Logic Gates, DNA Replication, and Quadratics.
@@ -89,7 +89,7 @@ public:
     }
 
     void ExecuteFinalAudit() {
-        sigma_printf("--- Î£ SIGMA OS SOVEREIGN SCHOLASTIC CLUSTER ---\n");
+        sigma_printf("--- ÃŽÂ£ SIGMA OS SOVEREIGN SCHOLASTIC CLUSTER ---\n");
         for (const auto& exp : m_zenith) {
             sigma_printf("\n------------------------------------------------\n");
             exp->Execute();

@@ -1,219 +1,34 @@
-name: Σ SIGMAOS SOVEREIGN CI/CD PIPELINE
+name: SigmaOS Sovereign CI
 
 on:
   push:
-    branches: [ main, master ]
+    branches: [ main, lattice-dev ]
   pull_request:
-    branches: [ main, master ]
-
-permissions:
-  contents: write
-  security-events: write
-  pull-requests: read
+    branches: [ main ]
 
 jobs:
-  # =========================================================================
-  # JOB 1: BUILD — Forge the Sovereign Kernel
-  # =========================================================================
-  forge:
-    name: "🛠️ Shard Forge (Build)"
+  build-and-verify:
     runs-on: ubuntu-latest
+
     steps:
     - uses: actions/checkout@v4
 
-    - name: "⚙️ Install Industrial Toolchain"
+    - name: Install Toolchain
       run: |
-        sudo apt-get update -qq
-        sudo apt-get install -y nasm gcc-multilib g++-multilib make cppcheck clang-tidy
+        sudo apt-get update
+        sudo apt-get install -y gcc-multilib g++-multilib nasm make cppcheck
 
-    - name: "📦 Cache Shard Objects"
-      uses: actions/cache@v4
-      with:
-        path: obj
-        key: ${{ runner.os }}-sigma-shard-${{ hashFiles('**/*.c', '**/*.cpp', '**/*.asm') }}
-        restore-keys: |
-          ${{ runner.os }}-sigma-shard-
-
-    - name: "🔨 Build Sovereign Kernel"
+    - name: Clean & Ignite Lattice
       run: |
-        mkdir -p obj
-        make -j$(nproc) || echo "Build step completed (non-fatal in CI simulation)"
-
-    - name: "🌐 Web OS Purity Audit"
-      run: |
-        echo "Σ [CI]: Verifying Web OS components..."
-        [ -f "index.html" ] && echo "✅ index.html found" || echo "⚠️ index.html not found"
-        [ -f "dashboard/index.html" ] && echo "✅ dashboard/index.html found" || echo "⚠️ dashboard/index.html not found"
-        [ -d "assets" ] && echo "✅ assets/ found" || echo "⚠️ assets/ not found"
-
-  # =========================================================================
-  # JOB 2: SECURITY AUDIT — Sentinel Analysis
-  # =========================================================================
-  sentinel:
-    name: "🛡️ Shard Sentinel (Static Analysis)"
-    runs-on: ubuntu-latest
-    steps:
-    - uses: actions/checkout@v4
-
-    - name: "⚙️ Install Analysis Toolchain"
-      run: |
-        sudo apt-get update -qq
-        sudo apt-get install -y cppcheck clang-tidy
-
-    - name: "🔍 Zero-Library Dependency Audit"
-      run: |
-        echo "Σ [AUDIT]: Verifying Zero-Dependency Shard Linkage..."
-        if grep -rnE "include <(iostream|vector|string|thread|chrono|memory|map|list)>" kernel/ shards/ 2>/dev/null; then
-          echo "❌ [FAIL]: HLL Residues detected in kernel lattice."
-          exit 1
-        fi
-        echo "✅ [SUCCESS]: Silicon Linkage Pure."
-
-    - name: "🤖 CppCheck Static Analysis"
-      run: |
-        cppcheck --enable=warning,style,performance,portability \
-                 --std=c11 \
-                 --suppress=missingInclude \
-                 --suppress=missingIncludeSystem \
-                 --suppress=unusedFunction \
-                 -Iinclude \
-                 --output-file=cppcheck_report.txt \
-                 kernel/ include/ 2>&1 || true
-        cat cppcheck_report.txt || true
-        echo "✅ [AUDIT]: CppCheck complete."
-
-    - name: "📊 Upload CppCheck Report"
-      uses: actions/upload-artifact@v4
-      with:
-        name: cppcheck-report
-        path: cppcheck_report.txt
-      if: always()
-
-    - name: "📐 Lattice Coverage Verification"
-      run: |
-        echo "Σ [COVERAGE]: Running Lattice Coverage Report..."
-        python3 scripts/lattice_coverage.py || echo "Coverage check completed."
-
-  # =========================================================================
-  # JOB 3: CODEQL — Advanced Security Scanning
-  # =========================================================================
-  codeql:
-    name: "🔬 CodeQL Security Scan"
-    runs-on: ubuntu-latest
-    needs: [forge]
-    permissions:
-      security-events: write
-      actions: read
-      contents: read
-    strategy:
-      fail-fast: false
-      matrix:
-        language: ['c-cpp', 'javascript-typescript', 'python']
-    steps:
-    - uses: actions/checkout@v4
-
-    - name: "🔬 Initialize CodeQL"
-      uses: github/codeql-action/init@v3
-      with:
-        languages: ${{ matrix.language }}
-        queries: security-and-quality
-
-    - name: "🔨 Autobuild for CodeQL"
-      uses: github/codeql-action/autobuild@v3
-
-    - name: "📊 Perform CodeQL Analysis"
-      uses: github/codeql-action/analyze@v3
-      with:
-        category: "/language:${{ matrix.language }}"
-
-  # =========================================================================
-  # JOB 4: UNIT TESTS — Shard Test Nexus
-  # =========================================================================
-  test_nexus:
-    name: "🧪 Shard Test Nexus (Unit & Integration Tests)"
-    needs: [forge]
-    runs-on: ubuntu-latest
-    steps:
-    - uses: actions/checkout@v4
-
-    - name: "⚙️ Install Test Toolchain"
-      run: sudo apt-get update -qq && sudo apt-get install -y python3 make gcc g++
-
-    - name: "🧪 Sovereign Unit Tests"
-      run: |
-        echo "Σ [TEST]: Running Sovereign Shard Unit Tests..."
-        python3 scripts/lattice_coverage.py
-        echo "✅ Shard 0 (Memory/Allocator):    PASS"
-        echo "✅ Shard 1 (Security/PQC):         PASS"
-        echo "✅ Shard 2 (AI Scheduler):          PASS"
-        echo "✅ All unit tests PASSED."
-
-    - name: "🛠️ Memory Safety Check (ASAN/UBSAN)"
-      run: |
-        echo "Σ [TEST]: Building Kernel with AddressSanitizer and UndefinedBehaviorSanitizer..."
         make clean
-        make -j$(nproc) DEBUG=1 SANITIZE=1 || echo "Simulation: ASAN build successful."
-        
-    - name: "🔬 Integration Tests"
+        make singularity
+
+    - name: Static Security Audit (CppCheck)
       run: |
-        echo "Σ [TEST]: Simulating Cross-Shard Integration Interactions..."
-        echo "✅ VFS <-> Network Shard Integration: PASS"
-        echo "✅ Process Manager <-> Access Shard Integration: PASS"
-        echo "✅ All Integration tests PASSED."
+        cppcheck --enable=warning,style,performance --error-exitcode=1 -Iinclude kernel/ core/ drivers/
 
-  # =========================================================================
-  # JOB 5: WIKI SYNC — Auto-update docs on main push
-  # =========================================================================
-  wiki_sync:
-    name: "📚 Wiki Auto-Sync"
-    runs-on: ubuntu-latest
-    needs: [forge, sentinel]
-    if: github.ref == 'refs/heads/main' && github.event_name == 'push'
-    steps:
-    - uses: actions/checkout@v4
-      with:
-        fetch-depth: 0
-
-    - name: "📝 Auto-generate CHANGELOG entry"
+    - name: Verify Shard Count
       run: |
-        echo "Σ [WIKI]: Generating changelog entry..."
-        COMMIT_MSG=$(git log -1 --pretty=%s)
-        COMMIT_HASH=$(git log -1 --pretty=%h)
-        DATE=$(date -u '+%Y-%m-%d')
-        echo "- **${DATE}** \`${COMMIT_HASH}\`: ${COMMIT_MSG}" >> /tmp/new_entry.txt
-        cat /tmp/new_entry.txt
-        echo "✅ Changelog entry generated."
-
-    - name: "📊 Upload Lattice Coverage Badge Data"
-      run: |
-        echo "Σ [CI]: Updating coverage badge..."
-        python3 scripts/lattice_coverage.py > /tmp/coverage_report.txt 2>&1 || true
-        cat /tmp/coverage_report.txt
-
-  # =========================================================================
-  # JOB 6: PACKAGE — Release Artifacts on main
-  # =========================================================================
-  package_nexus:
-    name: "📦 Package Nexus (Deploy)"
-    needs: [forge, sentinel, test_nexus, codeql]
-    if: github.ref == 'refs/heads/main' && github.event_name == 'push'
-    runs-on: ubuntu-latest
-    steps:
-    - uses: actions/checkout@v4
-
-    - name: "📦 Package Sovereign Artifacts"
-      run: |
-        mkdir -p release
-        [ -f "obj/sigma_os_master" ] && cp obj/sigma_os_master release/ || true
-        [ -d "docs" ] && cp -r docs release/ || true
-        [ -d "scripts" ] && cp -r scripts release/ || true
-        echo "Version: $(git log -1 --pretty=%h)" > release/BUILD_INFO.txt
-        echo "Shards: 500+" >> release/BUILD_INFO.txt
-        echo "Built: $(date -u)" >> release/BUILD_INFO.txt
-
-    - name: "🛰️ Upload Sovereign Nexus Artifact"
-      uses: actions/upload-artifact@v4
-      with:
-        name: sigma-os-sovereign-v52-500shard
-        path: release/
-        retention-days: 90
+        # Simple check to ensure critical shards are present
+        ls -l sigmaos.bin
+        [ -f sigmaos.bin ] || exit 1

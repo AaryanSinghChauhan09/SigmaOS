@@ -1,9 +1,9 @@
-#include "../include/SovereignLibC.h"
-#include "../include/sigma_types.h"
+﻿#include "SovereignLibC.h"
+#include "sigma_types.h"
 
 /*
  * =========================================================================
- * Σ SIGMAOS: S-INSTALL (v5.5 - SOVEREIGN COLONIZER)
+ * Î£ SIGMAOS: S-INSTALL (v5.5 - SOVEREIGN COLONIZER)
  * =========================================================================
  * Industrial-grade bare-metal autonomous deployment tool.
  * Handles silicon partitioning, lattice formatting, and shard deployment.
@@ -11,7 +11,7 @@
 
 void print_banner() {
     sigma_printf("=========================================================================\n");
-    sigma_printf("Σ SIGMAOS: S-INSTALL v5.5 (SOVEREIGN COLONIZATION UTILITY)\n");
+    sigma_printf("Î£ SIGMAOS: S-INSTALL v5.5 (SOVEREIGN COLONIZATION UTILITY)\n");
     sigma_printf("=========================================================================\n\n");
 }
 
