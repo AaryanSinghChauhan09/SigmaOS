@@ -106,6 +106,34 @@ make zenith-iso  ← Generate the production-grade Singularity ISO
 
 ---
 
+## 🧩 The SovereignEngine Pattern (Modular Singleton)
+
+To ensure **Modular Atomicity** and **Zero-Dependency** integrity, SigmaOS employs
+the `SovereignEngine` pattern. Each major kernel subsystem (MMU, SMP, Kube, AISched, IPC, Process, Orchestrator, Boot, Bluetooth, Dash, Syscall, Recover, Monitor, Entropy, Audit, etc.) is
+encapsulated within a C++ Singleton class.
+
+### Pattern Benefits:
+- **State Isolation**: Subsystem state is private and strictly controlled.
+- **ABI Stability**: C-Linkage wrappers provide a stable interface for low-level ASM and legacy C shards.
+- **Lazy Ignition**: Shards are only initialized when first accessed via `getInstance()`.
+
+### Implementation Example:
+```cpp
+class SovereignExampleEngine {
+public:
+    static SovereignExampleEngine& getInstance() {
+        static SovereignExampleEngine instance;
+        return instance;
+    }
+    void ignite();
+private:
+    SovereignExampleEngine() : initialized(false) {}
+    bool initialized;
+};
+```
+
+---
+
 *Σ SIGMAOS: Beyond Linux. Absolute Sovereignty. Singularity Achieved.*
 
 *For contribution guidelines, see [CONTRIBUTING.md](CONTRIBUTING.md).*
