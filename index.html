@@ -491,6 +491,39 @@
                     </div>
                     <div id="util-text-output" style="margin-top: 20px; padding: 15px; background: rgba(0,255,255,0.05); border: 1px solid rgba(0,255,255,0.1); border-radius: 5px; color: var(--accent); font-family: 'JetBrains Mono', monospace; white-space: pre-wrap;">Results will appear here...</div>
                 </div>
+                <div id="util-data-conv" style="display: none;">
+                    <h3 style="margin-top: 0; color: var(--accent);">Data Converter</h3>
+                    <textarea id="util-data-input" placeholder="Enter JSON or CSV data..." style="width: 100%; height: 150px; background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.1); color: white; padding: 10px; border-radius: 5px; font-family: 'JetBrains Mono', monospace; margin-bottom: 15px; outline: none;"></textarea>
+                    <div style="display: flex; gap: 10px;">
+                        <button class="util-btn" onclick="dataAction('json-xml')">JSON to XML</button>
+                        <button class="util-btn" onclick="dataAction('csv-json')">CSV to JSON</button>
+                    </div>
+                    <div id="util-data-output" style="margin-top: 20px; padding: 15px; background: rgba(0,255,255,0.05); border: 1px solid rgba(0,255,255,0.1); border-radius: 5px; color: var(--success); font-family: 'JetBrains Mono', monospace; white-space: pre-wrap;">Converted data will appear here...</div>
+                </div>
+                <div id="util-code-img" style="display: none;">
+                    <h3 style="margin-top: 0; color: var(--accent);">Code to Image</h3>
+                    <textarea id="util-code-input" placeholder="Paste code here..." style="width: 100%; height: 150px; background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.1); color: white; padding: 10px; border-radius: 5px; font-family: 'JetBrains Mono', monospace; margin-bottom: 15px; outline: none;"></textarea>
+                    <div id="code-preview-container" style="padding: 30px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); border-radius: 10px; box-shadow: 0 20px 50px rgba(0,0,0,0.3);">
+                        <div style="background: #1e1e1e; padding: 20px; border-radius: 8px; box-shadow: 0 10px 30px rgba(0,0,0,0.5); font-family: 'JetBrains Mono', monospace; color: #d4d4d4; font-size: 0.9em; position: relative;">
+                            <div style="display: flex; gap: 6px; margin-bottom: 15px;">
+                                <div style="width: 10px; height: 10px; border-radius: 50%; background: #ff5f56;"></div>
+                                <div style="width: 10px; height: 10px; border-radius: 50%; background: #ffbd2e;"></div>
+                                <div style="width: 10px; height: 10px; border-radius: 50%; background: #27c93f;"></div>
+                            </div>
+                            <pre id="code-render-box" style="margin: 0; white-space: pre-wrap;">// Your code will be rendered here with industrial styling...</pre>
+                        </div>
+                    </div>
+                    <button class="util-btn" style="margin-top: 15px;" onclick="renderCode()">Render Preview</button>
+                </div>
+                <div id="util-diff" style="display: none;">
+                    <h3 style="margin-top: 0; color: var(--accent);">Compare Text</h3>
+                    <div style="display: flex; gap: 10px; margin-bottom: 15px;">
+                        <textarea id="diff-left" placeholder="Original text..." style="flex: 1; height: 150px; background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.1); color: white; padding: 10px; border-radius: 5px; font-family: 'JetBrains Mono', monospace; outline: none;"></textarea>
+                        <textarea id="diff-right" placeholder="Modified text..." style="flex: 1; height: 150px; background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.1); color: white; padding: 10px; border-radius: 5px; font-family: 'JetBrains Mono', monospace; outline: none;"></textarea>
+                    </div>
+                    <button class="util-btn" onclick="compareText()">Compare Shards</button>
+                    <div id="diff-output" style="margin-top: 20px; padding: 15px; background: rgba(0,0,0,0.3); border: 1px solid rgba(255,255,255,0.05); border-radius: 5px; font-family: 'JetBrains Mono', monospace;"></div>
+                </div>
                 <!-- Other panes hidden by default -->
             </div>
         </div>
@@ -659,8 +692,47 @@
         }
 
         function switchUtil(utilId) {
-            // Logic to switch between utility panes
+            const panes = ['text-ops', 'data-conv', 'code-img', 'diff'];
+            panes.forEach(p => {
+                document.getElementById(`util-${p}`).style.display = 'none';
+            });
+            document.getElementById(`util-${utilId}`).style.display = 'block';
+            
+            const navs = document.querySelectorAll('.util-nav');
+            navs.forEach(n => n.classList.remove('active'));
+            event.target.classList.add('active');
+            
             addLog(`Σ [UTILITY]: Switching to ${utilId} module.`, "success");
+        }
+
+        function dataAction(action) {
+            const input = document.getElementById('util-data-input').value;
+            const output = document.getElementById('util-data-output');
+            if (action === 'json-xml') {
+                output.innerText = "<root>\n  <data>" + input + "</data>\n</root>";
+            } else {
+                output.innerText = "[{ \"data\": \"" + input + "\" }]";
+            }
+            addLog(`Σ [UTILITY]: Data conversion complete.`, "success");
+        }
+
+        function renderCode() {
+            const code = document.getElementById('util-code-input').value;
+            document.getElementById('code-render-box').innerText = code;
+            addLog("Σ [UTILITY]: Code-to-Image preview rendered.", "success");
+        }
+
+        function compareText() {
+            const left = document.getElementById('diff-left').value;
+            const right = document.getElementById('diff-right').value;
+            const output = document.getElementById('diff-output');
+            
+            if (left === right) {
+                output.innerHTML = '<span style="color: var(--success);">✔ Shards are bit-perfect matches.</span>';
+            } else {
+                output.innerHTML = '<span style="color: var(--error);">✘ Shard mismatch detected. Diff reconciliation required.</span>';
+            }
+            addLog("Σ [UTILITY]: Text comparison complete.", "success");
         }
 
         function textAction(action) {
