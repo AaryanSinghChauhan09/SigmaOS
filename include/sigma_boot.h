@@ -22,9 +22,10 @@ typedef enum {
 } sigma_boot_stage_t;
 
 /* --- Boot Primitives --- */
-void boot_init(void);
-void boot_ignite_lattice(void);
+void               boot_init(void);
+void               boot_ignite_lattice(void);
 sigma_boot_stage_t boot_get_current_stage(void);
+sigma_u32          boot_get_ignited_count(void);
 
 #ifdef __cplusplus
 }
