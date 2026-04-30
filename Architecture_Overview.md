@@ -1,6 +1,6 @@
 # 🏛️ SigmaOS Architecture Overview
 
-> A technical deep-dive into the 500-shard Sovereign Lattice kernel architecture.
+> A technical deep-dive into the 600-shard Sovereign Lattice kernel architecture (v28.0 SINGULARITY).
 
 ---
 
@@ -22,7 +22,7 @@ SigmaOS is built on **five inviolable principles**:
 
 ```
 ╔══════════════════════════════════════════════════════════════════╗
-║                  SIGMAOS SOVEREIGN LATTICE (500 SHARDS)         ║
+║                  SIGMAOS SOVEREIGN LATTICE (600 SHARDS)         ║
 ╠══════════════════════════════════════════════════════════════════╣
 ║  USER LAYER                                                      ║
 ║  ┌─────────────┐  ┌──────────────┐  ┌──────────────────────┐    ║
