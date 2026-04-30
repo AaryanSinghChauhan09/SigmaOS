@@ -2,14 +2,14 @@
 #include "sigma_continuity.h"
 
 /**
- * SigmaOS Sovereign Cross-Device Continuity Implementation
+ * SigmaOS Sovereign Cross-Device Continuity (v28.0 Zenith)
  * Implements an Omni-Device State Handoff (ODSH) algorithm.
  * ZERO-DEPENDENCY: Strictly bare-metal continuity; no cloud SDK required.
- * Competitor parity: Apple Handoff, Windows Timeline, Android Nearby Share.
  *
  * Design: OOP-isolated singleton — SovereignContinuityEngine.
  *         Encapsulates push/pull state log for deterministic handoff audits.
  */
+
 
 #define SIGMA_CONTINUITY_LOG_DEPTH 16u
 
