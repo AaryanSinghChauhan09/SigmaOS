@@ -1,17 +1,6 @@
 #include "Lattice.h"
 #include "sigma_mmu.h"
 #include "sigma_hal.h"
-#include "sigma_proc.h"
-
-/**
- * SigmaOS Sovereign MMU Implementation
- * Implements an Asynchronous Page Fault Resolution (APFR) algorithm.
- * ZERO-DEPENDENCY: Strictly bare-metal silicon isolation.
- */
-
-#include "Lattice.h"
-#include "sigma_mmu.h"
-#include "sigma_proc.h"
 
 /**
  * SigmaOS Sovereign MMU Implementation
@@ -24,9 +13,9 @@
 /* --- Sovereign MMU Engine (OOP Isolation) --- */
 static struct {
     sigma_page_entry_t page_directory[1024];
-    sigma_u32 entry_count;
-    sigma_u64 faults_resolved;
-    sigma_u32 initialized;
+    sigma_u32          entry_count;
+    sigma_u64          faults_resolved;
+    sigma_u32          initialized;
 } SovereignMMUEngine = {
     .entry_count = 0u,
     .faults_resolved = 0u,

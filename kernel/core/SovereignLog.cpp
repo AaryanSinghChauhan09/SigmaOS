@@ -1,16 +1,6 @@
-
-#include "sigma_log.h"
-#include "sigma_hal.h"
-
-
-/**
- * SigmaOS Sovereign Log Implementation
- * Implements a Wait-Free Circular Shard Logging (WFCSL) algorithm.
- * ZERO-DEPENDENCY: Strictly bare-metal machine-state tracing.
- */
-
 #include "Lattice.h"
 #include "sigma_log.h"
+#include "sigma_hal.h"
 
 /**
  * SigmaOS Sovereign Log Implementation
@@ -20,14 +10,14 @@
  * Design: OOP-isolated singleton — SovereignLogEngine.
  */
 
-#define LOG_BUFFER_SIZE 256
+#define LOG_BUFFER_SIZE 256u
 
 /* --- Sovereign Log Engine (OOP Isolation) --- */
 static struct {
     sigma_log_entry_t circular_buffer[LOG_BUFFER_SIZE];
-    sigma_u32 write_ptr;
-    sigma_u64 total_emitted;
-    sigma_u32 initialized;
+    sigma_u32         write_ptr;
+    sigma_u64         total_emitted;
+    sigma_u32         initialized;
 } SovereignLogEngine = {
     .write_ptr = 0u,
     .total_emitted = 0u,

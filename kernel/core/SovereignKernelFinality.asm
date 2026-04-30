@@ -1,8 +1,8 @@
 ; =========================================================================
-; Σ SIGMAOS: SOVEREIGN KERNEL FINALITY (v25.0 - ABSOLUTE FINALITY)
+; Σ SIGMAOS: SOVEREIGN KERNEL FINALITY (v28.0 - SINGULARITY)
 ; =========================================================================
 ; Mission: Direct Metal Control (No Library). Ring-0 Sovereignty.
-; Capability: Interrupt Handlers, Paging, Task-Switching, Syscalls.
+; Capability: Interrupt Handlers, Paging, Task-Switching, Syscalls, MSRs.
 ; Principle: 100% Zero-Library. Direct silicon-to-logic sharding.
 ; =========================================================================
 
@@ -11,6 +11,7 @@
 global _start
 global sigma_kernel_entry
 global sigma_handler_common
+global sigma_singularity_handshake
 
 section .text
 
@@ -24,6 +25,7 @@ _start:
     
     call sigma_kernel_setup_paging
     call sigma_kernel_setup_idt
+    call sigma_singularity_handshake ; Final Technical Parity Handshake
     call sigma_kernel_entry         ; Handover to C++ Sovereign Core
 
     hlt                              ; Halt on absolute completion
@@ -35,6 +37,16 @@ sigma_kernel_setup_paging:
 sigma_kernel_setup_idt:
     ; Interrupt Descriptor Table Sharding
     lidt [idt_ptr]
+    ret
+
+sigma_singularity_handshake:
+    ; Achieve Total Technical Parity (v28.0)
+    ; Sharding MSR_LSTAR for zero-latency syscall orchestration.
+    mov ecx, 0xC0000082            ; IA32_LSTAR
+    lea rax, [rel sigma_handler_common]
+    mov rdx, rax
+    shr rdx, 32
+    wrmsr
     ret
 
 ; =========================================================================
@@ -62,5 +74,6 @@ idt_ptr:
 
 section .bss
 stack_bottom:
-    resb 16384          ; 16KB Sovereign Stack
+    resb 32768          ; 32KB Sovereign Stack (SINGULARITY Grade)
 stack_top:
+
