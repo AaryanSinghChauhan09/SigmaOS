@@ -83,7 +83,7 @@ jobs:
         echo "✅ [AUDIT]: CppCheck complete."
 
     - name: "📊 Upload CppCheck Report"
-      uses: actions/upload-artifact@v4
+      uses: actions/upload-artifact@v7
       with:
         name: cppcheck-report
         path: cppcheck_report.txt
@@ -212,7 +212,7 @@ jobs:
         echo "Built: $(date -u)" >> release/BUILD_INFO.txt
 
     - name: "🛰️ Upload Sovereign Nexus Artifact"
-      uses: actions/upload-artifact@v4
+      uses: actions/upload-artifact@v7
       with:
         name: sigma-os-sovereign-v52-500shard
         path: release/
