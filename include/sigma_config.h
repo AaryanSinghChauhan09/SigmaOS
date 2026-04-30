@@ -30,6 +30,25 @@ void config_atomic_swap(void);
 
 #ifdef __cplusplus
 }
+
+class SovereignConfigEngine {
+public:
+    static SovereignConfigEngine& getInstance() {
+        static SovereignConfigEngine instance;
+        return instance;
+    }
+
+    void init();
+    bool set(const char* key, const char* value, uint32_t shard_id);
+    const char* get(const char* key) const;
+    void atomicSwap();
+
+private:
+    SovereignConfigEngine() : entry_count(0) {}
+
+    sigma_config_entry_t lattice[256];
+    uint32_t             entry_count;
+};
 #endif
 
 #endif /* SIGMA_CONFIG_H */

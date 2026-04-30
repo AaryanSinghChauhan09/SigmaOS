@@ -53,6 +53,35 @@ const sigma_bt_config_t* bt_get_config(void);
 
 #ifdef __cplusplus
 }
+
+class SovereignBTManager {
+public:
+    static SovereignBTManager& getInstance() {
+        static SovereignBTManager instance;
+        return instance;
+    }
+
+    void init();
+    void enable();
+    void disable();
+    void startScan(sigma_u32 duration_ms);
+    void stopScan();
+    void pair(const sigma_u8* addr);
+    void disconnect(const sigma_u8* addr);
+    sigma_u32 getPairedCount() const { return this->config.paired_count; }
+    const sigma_bt_config_t* getConfig() const { return &this->config; }
+
+private:
+    SovereignBTManager() : initialized(0) {
+        this->config.controller_state = SIGMA_BT_OFF;
+        this->config.paired_count = 0u;
+        this->config.scan_interval_ms = 100u;
+    }
+    
+    sigma_bt_config_t  config;
+    sigma_bt_device_t  paired[32];
+    sigma_u32          initialized;
+};
 #endif
 
 #endif /* SIGMA_BLUETOOTH_H */

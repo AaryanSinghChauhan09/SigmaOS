@@ -32,6 +32,24 @@ sigma_u64 syscall_get_total_calls(void);
 
 #ifdef __cplusplus
 }
+
+class SovereignSyscallEngine {
+public:
+    static SovereignSyscallEngine& getInstance() {
+        static SovereignSyscallEngine instance;
+        return instance;
+    }
+
+    void init();
+    sigma_u32 dispatch(sigma_syscall_id_t id, sigma_u32 arg1, sigma_u32 arg2, sigma_u32 arg3);
+    sigma_u64 getTotalCalls() const { return this->total_calls; }
+
+private:
+    SovereignSyscallEngine() : total_calls(0), initialized(0) {}
+    
+    sigma_u64 total_calls;
+    sigma_u32 initialized;
+};
 #endif
 
 #endif /* SIGMA_SYSCALL_H */

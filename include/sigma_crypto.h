@@ -28,6 +28,25 @@ void crypto_sign_shard(uint32_t shard_id, sigma_integrity_token_t* token);
 
 #ifdef __cplusplus
 }
+
+class SovereignCryptoEngine {
+public:
+    static SovereignCryptoEngine& getInstance() {
+        static SovereignCryptoEngine instance;
+        return instance;
+    }
+
+    void init();
+    sigma_integrity_token_t verifyShard(sigma_u32 shard_id, const void* data, sigma_size_t size);
+    void signShard(sigma_u32 shard_id, sigma_integrity_token_t* token);
+
+private:
+    SovereignCryptoEngine() : total_verifications(0), total_signatures(0), initialized(0) {}
+    
+    sigma_u64 total_verifications;
+    sigma_u64 total_signatures;
+    sigma_u32 initialized;
+};
 #endif
 
 #endif /* SIGMA_CRYPTO_H */

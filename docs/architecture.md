@@ -24,6 +24,16 @@ SigmaOS is built on the principle of **Atomic Sharding**. Instead of a monolithi
 2. **Stateless**: Shards are designed for "Amnesic Execution" (see below).
 3. **Reactive**: Shards communicate via the Wait-Free Atomic Exchange (WFAE) IPC.
 
+## 🧩 The SovereignEngine Pattern (Modular Singleton)
+
+To ensure **Modular Atomicity** and **Zero-Dependency** integrity, SigmaOS employs the `SovereignEngine` pattern. Each major kernel subsystem (MMU, SMP, Kube, AISched, IPC, Process, Orchestrator, Boot, Bluetooth, Dash, Syscall, Recover, Monitor, Entropy, Audit, etc.) is encapsulated within a C++ Singleton class.
+
+### Pattern Benefits:
+- **State Encapsulation**: Internal tracking variables (like counts, flags, registries) are kept private.
+- **Thread-Safe Initialization**: The `getInstance()` method guarantees safe instantiation.
+- **ABI Stability**: We expose standard C-linkage (`extern "C"`) wrapper functions to allow legacy Assembly or C components to interact with the Engine without needing C++ name mangling.
+
+
 ## ⚡ Technical Core
 
 ### 🛡️ Hardware Abstraction Layer (HAL)

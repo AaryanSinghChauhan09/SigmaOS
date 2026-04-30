@@ -29,6 +29,25 @@ void* clipboard_paste(sigma_clip_type_t* out_type, uint32_t* out_size);
 
 #ifdef __cplusplus
 }
+
+class SovereignClipboardEngine {
+public:
+    static SovereignClipboardEngine& getInstance() {
+        static SovereignClipboardEngine instance;
+        return instance;
+    }
+
+    void init();
+    void copy(sigma_clip_type_t type, const void* data, uint32_t size);
+    void* paste(sigma_clip_type_t* out_type, uint32_t* out_size);
+
+private:
+    SovereignClipboardEngine() : data(nullptr), type(CLIP_TYPE_TEXT), size(0) {}
+
+    void*            data;
+    sigma_clip_type_t type;
+    uint32_t         size;
+};
 #endif
 
 #endif /* SIGMA_CLIPBOARD_H */

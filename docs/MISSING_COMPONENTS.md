@@ -48,10 +48,18 @@ A total of **600-shard modularity** has been achieved. The following core shards
 | `SovereignPersistence.cpp` | DSP | Decentralized amnesic state persistence |
 | `SovereignInstall.cpp` | ABMD | Autonomous bare-metal deployment progress |
 | `SovereignNetStack.cpp` | ZBT | Zero-buffer network packet harvesting |
-| `SovereignOrchestrator.cpp` | USR | Unified shard registry discovery |
+| `SovereignOrchestrator.cpp` | LDR | Lattice Dependency Resolution + self-healing |
 | `SovereignNeural.cpp` | NHWA | Neural hardware acceleration telemetry |
 | `SovereignIdentity.cpp` | RLSA | PQC identity vault + attestation metrics |
 | `SovereignLog.cpp` | WFCSL | Wait-free circular logging + telemetry |
+| `SovereignCrypto.cpp` | HASI | Hardware-Accelerated Shard Integrity (OOP singleton) |
+| `SovereignEntropy.cpp` | QREP | Quantum-Resistant Entropy Pooling (OOP singleton) |
+| `SovereignAudit.cpp` | CLA | Continuous Lattice Auditing (OOP singleton) |
+| `SovereignGUI.cpp` | PFR | Predictive Frame-Buffer Rendering (OOP singleton) |
+| `SovereignAllocator.cpp` | QBMP | Quantum-Bucket Memory Pool (OOP singleton) |
+| `SovereignDash.cpp` | Telemetry | Real-time silicon telemetry shard (OOP singleton) |
+| `SovereignEdit.cpp` | VFS | Atomic editor with SovereignVFS integration (OOP singleton) |
+| `SovereignTuner.cpp` | Silicon | Clear Linux parity — CPU silicon optimization (OOP singleton) |
 
 ---
 

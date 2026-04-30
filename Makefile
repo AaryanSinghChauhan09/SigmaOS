@@ -22,10 +22,20 @@ KERNEL_SHARDS = kernel/core/SovereignInit.o \
                 kernel/core/SovereignKube.o \
                 kernel/core/SovereignInstall.o \
                 kernel/core/SovereignNeural.o \
-                kernel/core/SovereignBT.o \
+                kernel/core/SovereignBluetooth.o \
                 kernel/core/SovereignPersistence.o \
                 kernel/core/SovereignKernelIO.o \
                 kernel/core/SovereignAllocator.o \
+                kernel/core/SovereignLog.o \
+                kernel/core/SovereignProcess.o \
+                kernel/core/SovereignHypervisor.o \
+                kernel/core/SovereignOrchestrator.o \
+                kernel/core/SovereignDiag.o \
+                kernel/core/SovereignBoot.o \
+                kernel/core/SovereignSecHardener.o \
+                kernel/core/SovereignVFS.o \
+                kernel/core/SovereignEntropy.o \
+                kernel/core/SovereignAudit.o \
                 kernel/shards/SovereignLibC.o \
                 kernel/core/SovereignTests.o
 

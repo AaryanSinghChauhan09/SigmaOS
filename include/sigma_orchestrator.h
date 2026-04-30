@@ -24,6 +24,26 @@ sigma_u64 orchestrator_get_heal_count(void);
 
 #ifdef __cplusplus
 }
+
+class SovereignOrchestraEngine {
+public:
+    static SovereignOrchestraEngine& getInstance() {
+        static SovereignOrchestraEngine instance;
+        return instance;
+    }
+
+    void init();
+    void applyPattern(const char* name);
+    void selfHeal();
+    sigma_u64 getHealCount() const { return this->heal_actions; }
+
+private:
+    SovereignOrchestraEngine() : patterns_applied(0), heal_actions(0), initialized(0) {}
+    
+    sigma_u64 patterns_applied;
+    sigma_u64 heal_actions;
+    sigma_u32 initialized;
+};
 #endif
 
 #endif /* SIGMA_ORCHESTRATOR_H */

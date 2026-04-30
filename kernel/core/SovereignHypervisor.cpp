@@ -11,71 +11,93 @@
  */
 
 /* --- Sovereign Hypervisor Engine (OOP Isolation) --- */
-static struct {
-    sigma_vm_t vms[8];
-    sigma_u32  vm_count;
-    sigma_u64  exits_handled;
-    sigma_u64  nested_page_faults;
-    sigma_u32  initialized;
-} SovereignHyperEngine = {
-    .vm_count = 0u,
-    .exits_handled = 0u,
-    .nested_page_faults = 0u,
-    .initialized = 0u
-};
 
-extern "C" void hyper_init() {
+void SovereignHyperEngine::init() {
     sigma_log("[HYPER] Initializing Sovereign Silicon-Native Hypervisor (SIV Zenith)...");
-    SovereignHyperEngine.initialized = 1u;
+    this->initialized = 1u;
     sigma_log("[HYPER] SIV: Hardware VT-x/AMD-V extensions ARMED. Nested Paging ENABLED.");
 }
 
-extern "C" sigma_u32 hyper_create_vm(sigma_u32 vcpus, sigma_u64 memory_mb) {
-    if (SovereignHyperEngine.vm_count >= 8u) {
+sigma_u32 SovereignHyperEngine::createVM(sigma_u32 vcpus, sigma_u64 memory_mb) {
+    if (this->vm_count >= 8u) {
         sigma_log("[HYPER] SIV: [WARN] VM registry FULL.");
         return 0u;
     }
 
-    sigma_vm_t* vm = &SovereignHyperEngine.vms[SovereignHyperEngine.vm_count++];
-    vm->vm_id      = SovereignHyperEngine.vm_count;
+    sigma_vm_t* vm = &this->vms[this->vm_count++];
+    vm->vm_id      = this->vm_count;
     vm->vcpus      = vcpus;
     vm->memory_mb  = memory_mb;
     vm->state      = SIGMA_VM_STATE_IDLE;
     vm->total_runtime_ms = 0u;
 
-    /* Zenith VMCS Sharding: Allocating silicon-isolated context for guest. */
-    sigma_printf("[HYPER] SIV Zenith: VM #%d CREATED (%d vCPUs, %d MB RAM).\n", 
-                 (int)vm->vm_id, (int)vcpus, (int)memory_mb);
+    sigma_printf("[HYPER] SIV Zenith: VM #%u CREATED (%u vCPUs, %llu MB RAM).\n", 
+                 vm->vm_id, vcpus, memory_mb);
     return vm->vm_id;
 }
 
-extern "C" void hyper_start_vm(sigma_u32 vm_id) {
-    if (vm_id == 0u || vm_id > SovereignHyperEngine.vm_count) return;
+void SovereignHyperEngine::startVM(sigma_u32 vm_id) {
+    if (vm_id == 0u || vm_id > this->vm_count) return;
     
-    sigma_vm_t* vm = &SovereignHyperEngine.vms[vm_id - 1u];
+    sigma_vm_t* vm = &this->vms[vm_id - 1u];
     vm->state = SIGMA_VM_STATE_RUNNING;
-    sigma_printf("[HYPER] SIV Zenith: VM #%d TRANSITION -> RUNNING. Launching guest shard.\n", (int)vm_id);
+    sigma_printf("[HYPER] SIV Zenith: VM #%u TRANSITION -> RUNNING. Launching guest shard.\n", vm_id);
 }
 
-extern "C" void hyper_handle_vmexit() {
-    /* Zenith SIV Handling: Process VM-exits with zero-latency shard context. */
-    SovereignHyperEngine.exits_handled++;
+void SovereignHyperEngine::handleVMExit() {
+    this->exits_handled++;
     
-    // Resolve Nested Page Fault (NPF) if detected via Zenith Paging Sharding.
-    if (SovereignHyperEngine.exits_handled % 42 == 0) {
-        SovereignHyperEngine.nested_page_faults++;
+    if (this->exits_handled % 42 == 0) {
+        this->nested_page_faults++;
         sigma_log("[HYPER] SIV Zenith: Nested Page Fault (NPF) reconciled via silicon hooks.");
     }
 }
 
-extern "C" void hyper_stop_vm(sigma_u32 vm_id) {
-    if (vm_id == 0u || vm_id > SovereignHyperEngine.vm_count) return;
+void SovereignHyperEngine::stopVM(sigma_u32 vm_id) {
+    if (vm_id == 0u || vm_id > this->vm_count) return;
     
-    sigma_vm_t* vm = &SovereignHyperEngine.vms[vm_id - 1u];
+    sigma_vm_t* vm = &this->vms[vm_id - 1u];
     vm->state = SIGMA_VM_STATE_IDLE;
-    sigma_printf("[HYPER] SIV Zenith: VM #%d TRANSITION -> IDLE.\n", (int)vm_id);
+    sigma_printf("[HYPER] SIV Zenith: VM #%u TRANSITION -> IDLE.\n", vm_id);
+}
+
+void SovereignHyperEngine::getState(sigma_hypervisor_state_t* out_state) const {
+    if (!out_state) return;
+    out_state->active_vms = this->vm_count;
+    out_state->total_vcpus_allocated = 0;
+    out_state->total_vm_memory_mb = 0;
+    for (sigma_u32 i = 0; i < this->vm_count; i++) {
+        out_state->total_vcpus_allocated += this->vms[i].vcpus;
+        out_state->total_vm_memory_mb += this->vms[i].memory_mb;
+    }
+}
+
+/* --- C Wrappers --- */
+extern "C" void hyper_init() {
+    SovereignHyperEngine::getInstance().init();
+}
+
+extern "C" sigma_u32 hyper_create_vm(sigma_u32 vcpus, sigma_u64 memory_mb) {
+    return SovereignHyperEngine::getInstance().createVM(vcpus, memory_mb);
+}
+
+extern "C" void hyper_start_vm(sigma_u32 vm_id) {
+    SovereignHyperEngine::getInstance().startVM(vm_id);
+}
+
+extern "C" void hyper_handle_vmexit() {
+    SovereignHyperEngine::getInstance().handleVMExit();
+}
+
+extern "C" void hyper_stop_vm(sigma_u32 vm_id) {
+    SovereignHyperEngine::getInstance().stopVM(vm_id);
+}
+
+extern "C" void hyper_get_state(sigma_hypervisor_state_t* out_state) {
+    SovereignHyperEngine::getInstance().getState(out_state);
 }
 
 extern "C" sigma_u64 hypervisor_get_exit_count() {
-    return SovereignHyperEngine.exits_handled;
+    return SovereignHyperEngine::getInstance().getExitCount();
 }
+

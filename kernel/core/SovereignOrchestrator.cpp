@@ -12,29 +12,15 @@
 
 
 /* --- Sovereign Orchestra Engine (OOP Isolation) --- */
-static struct {
-    sigma_u64 patterns_applied;
-    sigma_u64 heal_actions;
-    sigma_u32 initialized;
-} SovereignOrchestraEngine = {
-    .patterns_applied = 0u,
-    .heal_actions = 0u,
-    .initialized = 0u
-};
 
-extern "C" void orchestrator_init() {
+void SovereignOrchestraEngine::init() {
     sigma_log("[ORCHESTRATOR] Initializing Sovereign Automated Deployment Engine (LDR Algorithm)...");
-    SovereignOrchestraEngine.initialized = 1u;
+    this->initialized = 1u;
 }
 
-extern "C" void orchestrator_apply_pattern(const char* name) {
+void SovereignOrchestraEngine::applyPattern(const char* name) {
     sigma_printf("[ORCHESTRATOR] LDR: Applying Pattern: %s\n", name);
-    SovereignOrchestraEngine.patterns_applied++;
-    
-    /* Lattice Dependency Resolution (LDR) Algorithm
-     * 1. Map Shard Dependencies
-     * 2. Perform Topological Sort
-     * 3. Ignite in Order */
+    this->patterns_applied++;
     
     sigma_log("[ORCHESTRATOR] LDR: Resolving 600-shard dependency graph...");
     
@@ -46,16 +32,16 @@ extern "C" void orchestrator_apply_pattern(const char* name) {
     sigma_log("[ORCHESTRATOR] LDR: Lattice Pattern Deployment: 100% Verified.");
 }
 
-extern "C" void orchestrator_self_heal() {
+void SovereignOrchestraEngine::selfHeal() {
     sigma_log("[ORCHESTRATOR] Initiating Lattice Integrity Audit...");
     
     sigma_u32 corrupted_shards = 0u;
     for (sigma_u32 i = 1u; i <= 600u; i++) {
         if (i % 150u == 0u) {
             sigma_printf("[ORCHESTRATOR] [CRITICAL] Corruption in Shard S%02u. Re-igniting...\n", i);
-            orchestrator_apply_pattern("RECOVERY_SHARD");
+            this->applyPattern("RECOVERY_SHARD");
             corrupted_shards++;
-            SovereignOrchestraEngine.heal_actions++;
+            this->heal_actions++;
         }
     }
     
@@ -66,6 +52,20 @@ extern "C" void orchestrator_self_heal() {
     }
 }
 
-extern "C" sigma_u64 orchestrator_get_heal_count() {
-    return SovereignOrchestraEngine.heal_actions;
+/* --- C Wrappers --- */
+extern "C" void orchestrator_init() {
+    SovereignOrchestraEngine::getInstance().init();
 }
+
+extern "C" void orchestrator_apply_pattern(const char* name) {
+    SovereignOrchestraEngine::getInstance().applyPattern(name);
+}
+
+extern "C" void orchestrator_self_heal() {
+    SovereignOrchestraEngine::getInstance().selfHeal();
+}
+
+extern "C" sigma_u64 orchestrator_get_heal_count() {
+    return SovereignOrchestraEngine::getInstance().getHealCount();
+}
+

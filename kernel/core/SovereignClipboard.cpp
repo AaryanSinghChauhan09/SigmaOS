@@ -9,34 +9,45 @@
  * ZERO-DEPENDENCY: Strictly bare-metal clipboard management.
  */
 
-static void* current_clipboard_data = nullptr;
-static sigma_clip_type_t current_clipboard_type = CLIP_TYPE_TEXT;
-static uint32_t current_clipboard_size = 0;
+/* --- Sovereign Clipboard Engine (OOP Isolation) --- */
 
-extern "C" void clipboard_init() {
+void SovereignClipboardEngine::init() {
     sigma_log("[CLIPBOARD] Initializing Sovereign Smart Clipboard (USC Algorithm)...");
 }
 
-extern "C" void clipboard_copy(sigma_clip_type_t type, const void* data, uint32_t size) {
-    // USC (Universal Semantic Copy) Algorithm
-    // Evaluates data semantics and instantly broadcasts state to S-Continuity.
-    
-    current_clipboard_type = type;
-    current_clipboard_data = (void*)data; // Simulated allocation/copy
-    current_clipboard_size = size;
-    
-    sigma_printf("[CLIPBOARD] USC: Copied %d bytes (Type: %d) to global buffer.\n", size, (int)type);
-    
-    // Auto-sync via continuity
+void SovereignClipboardEngine::copy(sigma_clip_type_t type, const void* data, uint32_t size) {
+    /* USC (Universal Semantic Copy) Algorithm
+     * Evaluates data semantics and broadcasts state to S-Continuity. */
+    this->type = type;
+    this->data = (void*)data; /* Simulated allocation/copy */
+    this->size = size;
+
+    sigma_printf("[CLIPBOARD] USC: Copied %d bytes (Type: %d) to global buffer.\n",
+                 size, (int)type);
+
+    /* Auto-sync via continuity */
     continuity_push_state(0xDEADBEEF);
 }
 
-extern "C" void* clipboard_paste(sigma_clip_type_t* out_type, uint32_t* out_size) {
-    if (current_clipboard_size == 0) return nullptr;
-    
-    *out_type = current_clipboard_type;
-    *out_size = current_clipboard_size;
-    
+void* SovereignClipboardEngine::paste(sigma_clip_type_t* out_type, uint32_t* out_size) {
+    if (this->size == 0) return nullptr;
+
+    *out_type = this->type;
+    *out_size = this->size;
+
     sigma_log("[CLIPBOARD] USC: Pasting data from global buffer.");
-    return current_clipboard_data;
+    return this->data;
+}
+
+/* --- C Wrappers --- */
+extern "C" void clipboard_init() {
+    SovereignClipboardEngine::getInstance().init();
+}
+
+extern "C" void clipboard_copy(sigma_clip_type_t type, const void* data, uint32_t size) {
+    SovereignClipboardEngine::getInstance().copy(type, data, size);
+}
+
+extern "C" void* clipboard_paste(sigma_clip_type_t* out_type, uint32_t* out_size) {
+    return SovereignClipboardEngine::getInstance().paste(out_type, out_size);
 }

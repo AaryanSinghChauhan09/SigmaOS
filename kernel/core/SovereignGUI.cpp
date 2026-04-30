@@ -9,25 +9,41 @@
  * ZERO-DEPENDENCY: Strictly uses bare-metal silicon primitives.
  */
 
-static sigma_fb_config_t active_fb;
+/* --- Sovereign GUI Engine (OOP Isolation) --- */
 
-extern "C" void gui_init(sigma_fb_config_t* config) {
-    active_fb = *config;
+void SovereignGUIEngine::init(const sigma_fb_config_t* config) {
+    if (config) {
+        this->active_fb = *config;
+    }
+    this->initialized = 1u;
     sigma_log("[GUI] Sovereign SGI Initialized. Frame-buffer mapped to silicon.");
 }
 
+void SovereignGUIEngine::drawPixel(sigma_u32 x, sigma_u32 y, sigma_u32 color) {
+    /* PFR (Predictive Frame-Buffer Rendering) Algorithm
+     * Direct silicon memory access for pixel placement. */
+    if (!this->initialized) return;
+    if (x >= this->active_fb.width || y >= this->active_fb.height) return;
+    
+    sigma_u32* fb = (sigma_u32*)this->active_fb.frame_buffer;
+    fb[y * this->active_fb.width + x] = color;
+}
+
+void SovereignGUIEngine::flush() {
+    /* Coalescing Graphics Update (CGU) Algorithm
+     * Simulates a bare-metal DMA flush to the physical display device. */
+    sigma_log("[GUI] CGU Flush: Silicon state synchronized with display.");
+}
+
+/* --- C Wrappers --- */
+extern "C" void gui_init(sigma_fb_config_t* config) {
+    SovereignGUIEngine::getInstance().init(config);
+}
+
 extern "C" void gui_draw_pixel(sigma_u32 x, sigma_u32 y, sigma_u32 color) {
-    // PFR (Predictive Frame-Buffer Rendering) Algorithm
-    // Direct silicon memory access for pixel placement.
-    
-    if (x >= active_fb.width || y >= active_fb.height) return;
-    
-    sigma_u32* fb = (sigma_u32*)active_fb.frame_buffer;
-    fb[y * active_fb.width + x] = color;
+    SovereignGUIEngine::getInstance().drawPixel(x, y, color);
 }
 
 extern "C" void gui_flush() {
-    // Coalescing Graphics Update (CGU) Algorithm
-    // Simulates a bare-metal DMA flush to the physical display device.
-    sigma_log("[GUI] CGU Flush: Silicon state synchronized with display.");
+    SovereignGUIEngine::getInstance().flush();
 }

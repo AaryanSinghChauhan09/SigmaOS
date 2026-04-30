@@ -12,29 +12,20 @@
 
 
 /* --- Sovereign AI Scheduler Engine (OOP Isolation) --- */
-static struct {
-    sigma_aisched_mode_t current_mode;
-    sigma_u64 prediction_count;
-    sigma_u32 initialized;
-} SovereignAISchedEngine = {
-    .current_mode = AISCHED_MODE_BALANCED,
-    .prediction_count = 0u,
-    .initialized = 0u
-};
 
-extern "C" void aisched_init() {
+void SovereignAISchedEngine::init() {
     sigma_log("[AISCHED] Initializing Sovereign AI-Optimized Scheduler (NPWO Algorithm)...");
-    SovereignAISchedEngine.initialized = 1u;
+    this->initialized = 1u;
 }
 
-extern "C" void aisched_predict_workload(sigma_u32 process_id) {
+void SovereignAISchedEngine::predictWorkload(sigma_u32 process_id) {
     /* NPWO (Neural Predictive Workload Orchestration) Algorithm
      * Uses lightweight on-device ML to predict process resource needs. */
     
     sigma_printf("[AISCHED] NPWO: Analyzing workload patterns for PID %u...\n", process_id);
-    SovereignAISchedEngine.prediction_count++;
+    this->prediction_count++;
     
-    switch (SovereignAISchedEngine.current_mode) {
+    switch (this->current_mode) {
         case AISCHED_MODE_ENERGY_EFFICIENT:
             sigma_log("[AISCHED] NPWO: Throttling non-critical threads for energy efficiency.");
             break;
@@ -47,11 +38,25 @@ extern "C" void aisched_predict_workload(sigma_u32 process_id) {
     }
 }
 
-extern "C" void aisched_set_mode(sigma_aisched_mode_t mode) {
-    SovereignAISchedEngine.current_mode = mode;
+void SovereignAISchedEngine::setMode(sigma_aisched_mode_t mode) {
+    this->current_mode = mode;
     sigma_printf("[AISCHED] Scheduler mode updated to %u\n", (unsigned)mode);
 }
 
-extern "C" sigma_u64 aisched_get_prediction_count() {
-    return SovereignAISchedEngine.prediction_count;
+/* --- C Wrappers --- */
+extern "C" void aisched_init() {
+    SovereignAISchedEngine::getInstance().init();
 }
+
+extern "C" void aisched_predict_workload(sigma_u32 process_id) {
+    SovereignAISchedEngine::getInstance().predictWorkload(process_id);
+}
+
+extern "C" void aisched_set_mode(sigma_aisched_mode_t mode) {
+    SovereignAISchedEngine::getInstance().setMode(mode);
+}
+
+extern "C" sigma_u64 aisched_get_prediction_count() {
+    return SovereignAISchedEngine::getInstance().getPredictionCount();
+}
+

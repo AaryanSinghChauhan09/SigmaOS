@@ -14,23 +14,46 @@ typedef struct {
     sigma_u32 thermal_ceiling;
 } silicon_profile_t;
 
-static silicon_profile_t current_silicon;
+class SovereignTunerEngine {
+public:
+    static SovereignTunerEngine& getInstance() {
+        static SovereignTunerEngine instance;
+        return instance;
+    }
+
+    void init() {
+        sigma_log("[TUNER] Probing silicon for performance USPs (Clear Linux Parity)...");
+
+        /* CPUID-direct silicon profiling would go here in a real kernel. */
+        sigma_hardened_strcpy(this->current_silicon.cpu_model,
+                              "Intel(R) Core(TM) i9-13900K", 64u);
+        this->current_silicon.avx512_supported = true;
+        this->current_silicon.amx_supported    = true;
+        this->current_silicon.thermal_ceiling  = 100u; /* Celsius */
+
+        sigma_printf("[TUNER] Detected %s. Activating Silicon-Specific Optimization Lattice.\n",
+                     this->current_silicon.cpu_model);
+    }
+
+    void applyPerformanceGovernor() const {
+        sigma_log("[TUNER] Setting Silicon Governor to 'ULTRA-SOVEREIGN' (Zero-Latency).");
+        /* Directly write MSRs / power management registers for bare-metal control. */
+    }
+
+private:
+    SovereignTunerEngine() {
+        current_silicon.avx512_supported = false;
+        current_silicon.amx_supported = false;
+        current_silicon.thermal_ceiling = 0u;
+    }
+    
+    silicon_profile_t current_silicon;
+};
 
 extern "C" void tuner_init() {
-    sigma_log("[TUNER] Probing silicon for performance USPs (Clear Linux Parity)...");
-
-    /* CPUID-direct silicon profiling would go here in a real kernel. */
-    sigma_hardened_strcpy(current_silicon.cpu_model,
-                          "Intel(R) Core(TM) i9-13900K", 64u);
-    current_silicon.avx512_supported = true;
-    current_silicon.amx_supported    = true;
-    current_silicon.thermal_ceiling  = 100u; /* Celsius */
-
-    sigma_printf("[TUNER] Detected %s. Activating Silicon-Specific Optimization Lattice.\n",
-                 current_silicon.cpu_model);
+    SovereignTunerEngine::getInstance().init();
 }
 
 extern "C" void tuner_apply_performance_governor() {
-    sigma_log("[TUNER] Setting Silicon Governor to 'ULTRA-SOVEREIGN' (Zero-Latency).");
-    /* Directly write MSRs / power management registers for bare-metal control. */
+    SovereignTunerEngine::getInstance().applyPerformanceGovernor();
 }

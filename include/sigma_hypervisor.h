@@ -46,6 +46,31 @@ void      hyper_get_state(sigma_hypervisor_state_t* out_state);
 
 #ifdef __cplusplus
 }
+
+class SovereignHyperEngine {
+public:
+    static SovereignHyperEngine& getInstance() {
+        static SovereignHyperEngine instance;
+        return instance;
+    }
+
+    void init();
+    sigma_u32 createVM(sigma_u32 vcpus, sigma_u64 memory_mb);
+    void startVM(sigma_u32 vm_id);
+    void stopVM(sigma_u32 vm_id);
+    void handleVMExit();
+    sigma_u64 getExitCount() const { return this->exits_handled; }
+    void getState(sigma_hypervisor_state_t* out_state) const;
+
+private:
+    SovereignHyperEngine() : vm_count(0), exits_handled(0), nested_page_faults(0), initialized(0) {}
+    
+    sigma_vm_t vms[8];
+    sigma_u32  vm_count;
+    sigma_u64  exits_handled;
+    sigma_u64  nested_page_faults;
+    sigma_u32  initialized;
+};
 #endif
 
 #endif /* SIGMA_HYPERVISOR_H */

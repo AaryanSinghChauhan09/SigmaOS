@@ -30,6 +30,25 @@ sigma_u64 audit_get_sweep_count(void);
 
 #ifdef __cplusplus
 }
+
+class SovereignAuditEngine {
+public:
+    static SovereignAuditEngine& getInstance() {
+        static SovereignAuditEngine instance;
+        return instance;
+    }
+
+    void init();
+    void performLatticeSweep();
+    void reportShard(sigma_u32 shard_id, bool status);
+    sigma_u64 getSweepCount() const { return this->sweep_count; }
+
+private:
+    SovereignAuditEngine() : sweep_count(0), initialized(0) {}
+    
+    sigma_u64 sweep_count;
+    sigma_u32 initialized;
+};
 #endif
 
 #endif /* SIGMA_AUDIT_H */

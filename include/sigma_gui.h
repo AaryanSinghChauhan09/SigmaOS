@@ -35,6 +35,29 @@ void gui_flush(void);
 
 #ifdef __cplusplus
 }
+
+class SovereignGUIEngine {
+public:
+    static SovereignGUIEngine& getInstance() {
+        static SovereignGUIEngine instance;
+        return instance;
+    }
+
+    void init(const sigma_fb_config_t* config);
+    void drawPixel(sigma_u32 x, sigma_u32 y, sigma_u32 color);
+    void flush();
+
+private:
+    SovereignGUIEngine() : initialized(0) {
+        active_fb.width = 0;
+        active_fb.height = 0;
+        active_fb.bpp = 0;
+        active_fb.frame_buffer = (void*)0;
+    }
+    
+    sigma_fb_config_t active_fb;
+    sigma_u32 initialized;
+};
 #endif
 
 #endif /* SIGMA_GUI_H */

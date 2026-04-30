@@ -9,41 +9,22 @@
  * SigmaOS Sovereign System Call Implementation
  * Implements a Fast-Path Shard Transition (FPST) algorithm.
  * ZERO-DEPENDENCY: Strictly bare-metal context management.
- */
-
-#include "Lattice.h"
-#include "sigma_syscall.h"
-#include "sigma_proc.h"
-#include "sigma_mem.h"
-#include "sigma_ipc.h"
-
-/**
- * SigmaOS Sovereign System Call Implementation
- * Implements a Fast-Path Shard Transition (FPST) algorithm.
- * ZERO-DEPENDENCY: Strictly bare-metal context management.
  *
  * Design: OOP-isolated singleton — SovereignSyscallEngine.
  */
 
 /* --- Sovereign Syscall Engine (OOP Isolation) --- */
-static struct {
-    sigma_u64 total_calls;
-    sigma_u32 initialized;
-} SovereignSyscallEngine = {
-    .total_calls = 0u,
-    .initialized = 0u
-};
 
-extern "C" void syscall_init() {
+void SovereignSyscallEngine::init() {
     sigma_log("[SYSCALL] Initializing Sovereign FPST Gate...");
-    SovereignSyscallEngine.initialized = 1u;
+    this->initialized = 1u;
 }
 
-extern "C" sigma_u32 sigma_syscall(sigma_syscall_id_t id, sigma_u32 arg1, sigma_u32 arg2, sigma_u32 arg3) {
+sigma_u32 SovereignSyscallEngine::dispatch(sigma_syscall_id_t id, sigma_u32 arg1, sigma_u32 arg2, sigma_u32 arg3) {
     /* FPST (Fast-Path Shard Transition) Algorithm
      * Dispatches kernel services with minimum context overhead. */
     
-    SovereignSyscallEngine.total_calls++;
+    this->total_calls++;
     sigma_printf("[SYSCALL] SSG Entry: ID 0x%02X, Args: [%08X, %08X, %08X]\n", (unsigned)id, (unsigned)arg1, (unsigned)arg2, (unsigned)arg3);
     
     switch (id) {
@@ -68,11 +49,21 @@ extern "C" sigma_u32 sigma_syscall(sigma_syscall_id_t id, sigma_u32 arg1, sigma_
     }
 }
 
+/* --- C Wrappers --- */
+extern "C" void syscall_init() {
+    SovereignSyscallEngine::getInstance().init();
+}
+
+extern "C" sigma_u32 sigma_syscall(sigma_syscall_id_t id, sigma_u32 arg1, sigma_u32 arg2, sigma_u32 arg3) {
+    return SovereignSyscallEngine::getInstance().dispatch(id, arg1, arg2, arg3);
+}
+
 extern "C" void syscall_handler_asm() {
     /* Bare-metal syscall entry point (simulated) */
     sigma_log("[SYSCALL] ASM Gate Transition: USER -> KERNEL Shard.");
 }
 
 extern "C" sigma_u64 syscall_get_total_calls() {
-    return SovereignSyscallEngine.total_calls;
+    return SovereignSyscallEngine::getInstance().getTotalCalls();
 }
+

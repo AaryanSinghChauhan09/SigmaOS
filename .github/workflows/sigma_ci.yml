@@ -25,7 +25,7 @@ jobs:
 
     - name: Static Security Audit (CppCheck)
       run: |
-        cppcheck --enable=warning,style,performance --error-exitcode=1 -Iinclude kernel/ core/ drivers/
+        cppcheck --enable=warning,style,performance --error-exitcode=1 -Iinclude kernel/ drivers/ core/ fs/ libc/ lib/
 
     - name: Verify Shard Count
       run: |

@@ -29,6 +29,26 @@ sigma_u64 aisched_get_prediction_count(void);
 
 #ifdef __cplusplus
 }
+
+class SovereignAISchedEngine {
+public:
+    static SovereignAISchedEngine& getInstance() {
+        static SovereignAISchedEngine instance;
+        return instance;
+    }
+
+    void init();
+    void predictWorkload(sigma_u32 process_id);
+    void setMode(sigma_aisched_mode_t mode);
+    sigma_u64 getPredictionCount() const { return this->prediction_count; }
+
+private:
+    SovereignAISchedEngine() : current_mode(AISCHED_MODE_BALANCED), prediction_count(0), initialized(0) {}
+    
+    sigma_aisched_mode_t current_mode;
+    sigma_u64            prediction_count;
+    sigma_u32            initialized;
+};
 #endif
 
 #endif /* SIGMA_AISCHED_H */

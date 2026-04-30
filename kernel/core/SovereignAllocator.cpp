@@ -7,38 +7,43 @@
  * ZERO-DEPENDENCY: Strictly bare-metal custom memory management.
  */
 
-#define HEAP_SIZE (1024 * 1024 * 16) // 16MB Heap
-static sigma_u8 g_heap[HEAP_SIZE];
-static sigma_u32 g_heap_offset = 0;
+/* --- Sovereign Allocator Engine (OOP Isolation) --- */
 
-extern "C" void allocator_init() {
+void SovereignAllocatorEngine::init() {
     sigma_log("[ALLOCATOR] Initializing Sovereign Custom Allocator (QBMP Algorithm)...");
-    g_heap_offset = 0;
-    
-    // Step 3: Assertions
-    sigma_assert(HEAP_SIZE > 0);
+    this->heap_offset = 0u;
+    sigma_assert(SIGMA_HEAP_SIZE > 0);
 }
 
-extern "C" void* allocator_malloc(sigma_u32 size) {
-    // QBMP (Quantum-Bucket Memory Pool) Algorithm
-    // For this verification stage, we use a bump allocator with alignment checks.
+void* SovereignAllocatorEngine::malloc(sigma_u32 size) {
+    /* QBMP (Quantum-Bucket Memory Pool) Algorithm
+     * Bump allocator with 8-byte alignment for silicon-native performance. */
+    sigma_u32 aligned_size = (size + 7u) & ~7u;
+    sigma_assert(this->heap_offset + aligned_size <= SIGMA_HEAP_SIZE);
     
-    sigma_u32 aligned_size = (size + 7) & ~7; // 8-byte alignment
+    void* ptr = &this->heap[this->heap_offset];
+    this->heap_offset += aligned_size;
     
-    // Step 3: Assertions
-    sigma_assert(g_heap_offset + aligned_size <= HEAP_SIZE);
-    
-    void* ptr = &g_heap[g_heap_offset];
-    g_heap_offset += aligned_size;
-    
-    sigma_printf("[ALLOCATOR] QBMP: Allocated %u bytes at %p (Used: %u/%u)\n", 
-                 size, ptr, g_heap_offset, HEAP_SIZE);
-    
+    sigma_printf("[ALLOCATOR] QBMP: Allocated %u bytes at %p (Used: %u/%u)\n",
+                 size, ptr, this->heap_offset, SIGMA_HEAP_SIZE);
     return ptr;
 }
 
-extern "C" void allocator_free(void* ptr) {
-    // Bump allocator doesn't support individual free.
-    // In SigmaOS, we use per-shard reclamation.
+void SovereignAllocatorEngine::free(void* ptr) {
+    /* Bump allocator doesn't support individual free.
+     * In SigmaOS, we use per-shard reclamation. */
     sigma_printf("[ALLOCATOR] QBMP: Ignoring free for %p (Sovereign Policy).\n", ptr);
+}
+
+/* --- C Wrappers --- */
+extern "C" void allocator_init() {
+    SovereignAllocatorEngine::getInstance().init();
+}
+
+extern "C" void* allocator_malloc(sigma_u32 size) {
+    return SovereignAllocatorEngine::getInstance().malloc(size);
+}
+
+extern "C" void allocator_free(void* ptr) {
+    SovereignAllocatorEngine::getInstance().free(ptr);
 }
