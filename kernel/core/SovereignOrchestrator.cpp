@@ -3,8 +3,28 @@
 
 /**
  * SigmaOS Sovereign Orchestrator — LDR Implementation
- * Class declared in sigma_orchestrator.h — only method bodies here.
+ * OOP-isolated singleton — SovereignOrchestratorEngine.
  */
+
+class SovereignOrchestratorEngine {
+public:
+    static SovereignOrchestratorEngine& getInstance() {
+        static SovereignOrchestratorEngine instance;
+        return instance;
+    }
+
+    void init();
+    void applyPattern(const char* name);
+    void selfHeal();
+    sigma_u64 getHealCount() const { return this->heal_actions; }
+
+private:
+    SovereignOrchestratorEngine() : patterns_applied(0), heal_actions(0), initialized(0) {}
+    
+    sigma_u64 patterns_applied;
+    sigma_u64 heal_actions;
+    sigma_u32 initialized;
+};
 
 void SovereignOrchestratorEngine::init() {
     sigma_log("[ORCHESTRATOR] Initializing Sovereign Automated Deployment Engine (LDR Algorithm)...");

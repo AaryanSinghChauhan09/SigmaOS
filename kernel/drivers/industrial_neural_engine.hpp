@@ -25,7 +25,7 @@ private:
     bool m_learning_enabled;
 
 public:
-    SovereignNeuralEngine() : m_neuron_count(1024 * 1024), m_synaptic_updates(0), m_learning_enabled(SIGMA_TRUE) {
+    SovereignNeuralEngine() : m_neuron_count(1024 * 1024), m_synaptic_updates(0), m_learning_enabled(true) {
         sigma_printf("[NEURAL-ENGINE]: Sovereign SNN Shard [IGNITED].\n");
     }
 

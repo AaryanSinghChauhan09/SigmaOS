@@ -2,6 +2,7 @@
 #include "sigma_pqc.h"
 #include "sigma_mem.h"
 #include "sigma_hal.h"
+#include "SovereignLibC.h"
 
 /**
  * SigmaOS Sovereign PQC Implementation

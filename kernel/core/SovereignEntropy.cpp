@@ -5,8 +5,30 @@ extern "C" uint32_t time_get_uptime_ms(void);
 
 /**
  * SigmaOS Sovereign Entropy Engine — QREP Implementation
- * Class declared in sigma_entropy.h — only method bodies here.
+ * OOP-isolated singleton — SovereignEntropyEngine.
  */
+
+class SovereignEntropyEngine {
+public:
+    static SovereignEntropyEngine& getInstance() {
+        static SovereignEntropyEngine instance;
+        return instance;
+    }
+
+    void init();
+    void poolSample(uint32_t sample);
+    uint32_t getRandomU32();
+    sigma_entropy_stats_t getStats() const;
+
+private:
+    SovereignEntropyEngine() : pool_ptr(0), total_samples(0) {
+        for(int i=0; i<1024; i++) entropy_pool[i] = 0;
+    }
+    
+    uint32_t entropy_pool[1024];
+    uint32_t pool_ptr;
+    uint32_t total_samples;
+};
 
 void SovereignEntropyEngine::init() {
     sigma_log("[ENTROPY] Initializing Sovereign Entropy Nexus (QREP Algorithm)...");

@@ -29,24 +29,6 @@ void diag_localize_fault(void);
 
 #ifdef __cplusplus
 }
-
-class SovereignDiagEngine {
-public:
-    static SovereignDiagEngine& getInstance() {
-        static SovereignDiagEngine instance;
-        return instance;
-    }
-
-    void init();
-    void reportFault(uint32_t component_id, uint32_t error_code);
-    void localizeFault();
-
-private:
-    SovereignDiagEngine() : fault_count(0) {}
-    
-    sigma_diag_event_t fault_lattice[256];
-    uint32_t fault_count;
-};
 #endif
 
 #endif /* SIGMA_DIAG_H */
