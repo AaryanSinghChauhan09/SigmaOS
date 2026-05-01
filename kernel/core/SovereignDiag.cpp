@@ -11,10 +11,7 @@ extern "C" uint32_t time_get_uptime_ms(void);
 
 class SovereignDiagEngine {
 public:
-    static SovereignDiagEngine& getInstance() {
-        static SovereignDiagEngine instance;
-        return instance;
-    }
+    static SovereignDiagEngine& getInstance();
 
     void init();
     void reportFault(uint32_t component_id, uint32_t error_code);
@@ -26,6 +23,11 @@ private:
     sigma_diag_event_t fault_lattice[256];
     uint32_t fault_count;
 };
+
+SovereignDiagEngine& SovereignDiagEngine::getInstance() {
+    static SovereignDiagEngine instance;
+    return instance;
+}
 
 void SovereignDiagEngine::init() {
     sigma_log("[DIAG] Initializing Sovereign System Diagnostics Nexus...");
