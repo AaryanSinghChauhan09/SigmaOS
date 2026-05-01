@@ -12,33 +12,33 @@ CXXFLAGS = -ffreestanding -O2 -Wall -Wextra -Werror -fno-exceptions -fno-rtti -s
            -I./include -fno-stack-protector -mno-red-zone
 ASFLAGS  = -f elf64
 
-KERNEL_SHARDS = kernel/core/SovereignMain.o \
-                kernel/core/SovereignInit.o \
-                kernel/core/SovereignIPC.o \
-                kernel/core/SovereignMMU.o \
-                kernel/core/SovereignAISched.o \
-                kernel/core/SovereignSMP.o \
-                kernel/core/SovereignLazy.o \
-                kernel/core/SovereignSnap.o \
-                kernel/core/SovereignKube.o \
-                kernel/core/SovereignInstall.o \
-                kernel/core/SovereignBluetooth.o \
-                kernel/core/SovereignPersistence.o \
-                kernel/core/SovereignKernelIO.o \
-                kernel/core/SovereignAllocator.o \
-                kernel/core/SovereignLog.o \
-                kernel/core/SovereignProcess.o \
-                kernel/core/SovereignHypervisor.o \
-                kernel/core/SovereignOrchestrator.o \
-                kernel/core/SovereignDiag.o \
-                kernel/core/SovereignBoot.o \
-                kernel/core/SovereignSecHardener.o \
-                kernel/core/SovereignVFS.o \
-                kernel/core/SovereignEntropy.o \
-                kernel/core/SovereignAudit.o \
-                kernel/core/SovereignNeuralNexus.o \
+KERNEL_SHARDS = kernel/core/system/SovereignMain.o \
+                kernel/core/system/SovereignInit.o \
+                kernel/core/system/SovereignIPC.o \
+                kernel/core/memory/SovereignMMU.o \
+                kernel/core/ai/SovereignAISched.o \
+                kernel/core/system/SovereignSMP.o \
+                kernel/core/misc/SovereignLazy.o \
+                kernel/core/misc/SovereignSnap.o \
+                kernel/core/ai/SovereignKube.o \
+                kernel/core/system/SovereignInstall.o \
+                kernel/core/network/SovereignBluetooth.o \
+                kernel/core/fs/SovereignPersistence.o \
+                kernel/core/system/SovereignKernelIO.o \
+                kernel/core/memory/SovereignAllocator.o \
+                kernel/core/system/SovereignLog.o \
+                kernel/core/system/SovereignProcess.o \
+                kernel/core/system/SovereignHypervisor.o \
+                kernel/core/system/SovereignOrchestrator.o \
+                kernel/core/system/SovereignDiag.o \
+                kernel/core/system/SovereignBoot.o \
+                kernel/core/security/SovereignSecHardener.o \
+                kernel/core/fs/SovereignVFS.o \
+                kernel/core/security/SovereignEntropy.o \
+                kernel/core/security/SovereignAudit.o \
+                kernel/core/ai/SovereignNeuralNexus.o \
                 kernel/shards/SovereignLibC.o \
-                kernel/core/SovereignTests.o
+                kernel/core/misc/SovereignTests.o
 
 .PHONY: all singularity zenith-iso qemu clean
 
