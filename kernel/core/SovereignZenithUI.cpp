@@ -19,6 +19,7 @@ static struct {
     sigma_u32            initialized;
 } SovereignZenithEngine = {
     .state = {
+        .elements     = {},
         .count        = 0u,
         .frame_count  = 0u,
         .active_glass = 0u
