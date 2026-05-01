@@ -2,6 +2,8 @@
 #include "sigma_hal.h"
 #include "SovereignLibC.h"
 
+extern "C" void energysched_set_shard_state(sigma_u32 shard_id, sigma_u32 state);
+
 /**
  * SigmaOS Sovereign ThermalIQ — PTR Algorithm
  * ZERO-DEPENDENCY: Strictly bare-metal thermal regulation.
