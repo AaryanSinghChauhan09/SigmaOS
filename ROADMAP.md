@@ -26,16 +26,16 @@ These items address the core gap: SigmaOS must boot reliably and run programs.
 
 ### 🥾 Bootloader
 
-- [ ] **GRUB2 integration**: Finalize `iso_root/` GRUB config so `make zenith-iso` produces a bootable ISO
-- [ ] **Multiboot2 header**: Ensure the kernel binary is recognized by GRUB/QEMU directly
-- [ ] **Boot verification**: Confirm serial output appears on `make qemu` with no manual flags
+- [x] **GRUB2 integration**: Finalize `iso_root/` GRUB config so `make zenith-iso` produces a bootable ISO
+- [x] **Multiboot2 header**: Ensure the kernel binary is recognized by GRUB/QEMU directly
+- [x] **Boot verification**: Confirm serial output appears on `make qemu` with no manual flags
 
 ### 🐚 Minimal Shell (`sigma_sh`)
 
-- [ ] **sigma_sh**: A minimal interactive shell reading from keyboard input
+- [x] **sigma_sh**: A minimal interactive shell reading from keyboard input
   - Commands: `help`, `echo`, `clear`, `halt`, `ls`, `exec`
   - Runs as the first userland process after kernel init
-- [ ] **stdio routing**: Hook `sigma_write` → serial + framebuffer so shell output is visible
+- [x] **stdio routing**: Hook `sigma_write` → serial + framebuffer so shell output is visible
 
 ### 📁 Filesystem
 
