@@ -3,6 +3,7 @@
 This document serves as the master backlog for future development, categorized into OS Core, UI, UX, Automation, Customization, and Personalization.
 
 ## ⚙️ OS Core
+
 - Improve kernel scheduling algorithms
 - Add microkernel option for modularity
 - Optimize memory paging
@@ -54,6 +55,7 @@ This document serves as the master backlog for future development, categorized i
 - Add kernel‑level predictive resource allocation
 
 ## 🎨 UI
+
 - Introduce adaptive themes
 - Add dark/light auto‑switch
 - Support high‑DPI scaling
@@ -104,6 +106,7 @@ This document serves as the master backlog for future development, categorized i
 - Add customizable UI automation
 
 ## 🖥️ UX
+
 - Simplify onboarding wizard
 - Add contextual help overlays
 - Introduce guided setup flows
@@ -136,6 +139,7 @@ This document serves as the master backlog for future development, categorized i
 - Add customizable UX accessibility options
 
 ## 🤖 Automation
+
 - Add task scheduler
 - Introduce workflow automation engine
 - Add macro recording
@@ -148,6 +152,7 @@ This document serves as the master backlog for future development, categorized i
 - Introduce modular automation scripting
 
 ## 🎛️ Customization
+
 - Theme marketplace
 - Customizable boot splash
 - Customizable login screen
@@ -163,6 +168,7 @@ This document serves as the master backlog for future development, categorized i
 - Customizable quick settings
 
 ## 🧑‍💻 Personalization
+
 - AI‑driven theme suggestions
 - Personalized app recommendations
 - Personalized workflow suggestions
