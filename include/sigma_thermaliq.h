@@ -4,7 +4,7 @@
 #ifdef __cplusplus
 extern "C" {
 #endif
-#define ENERGY_STATE_THROTTLED 1
+
 #ifdef __cplusplus
 }
 #endif

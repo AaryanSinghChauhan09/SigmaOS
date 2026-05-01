@@ -47,6 +47,7 @@ public:
     }
 
     void inferAnomaly(const void* system_telemetry, sigma_u32 size) {
+        (void)system_telemetry;
         if (!this->initialized) return;
         sigma_printf("[NEURAL] Executing O(1) Anomaly Detection on %u bytes of telemetry...\n", size);
         /* Hardware accelerated tensor multiplication simulated here */

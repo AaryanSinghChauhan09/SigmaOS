@@ -22,6 +22,7 @@ public:
     }
 
     bool scheduleTask(const sigma_realtime_task_t* task, void (*task_func)(void)) {
+        (void)task_func;
         if (this->active_tasks >= 16) return false;
         
         this->task_queue[this->active_tasks++] = *task;

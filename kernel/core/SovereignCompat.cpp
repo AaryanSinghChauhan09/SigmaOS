@@ -35,6 +35,7 @@ public:
     }
 
     void mediateSyscall(uint32_t foreign_id, void* args) {
+        (void)args;
         // Mediates between foreign syscall IDs and native Sovereign kernel services.
         sigma_printf("[COMPAT] BIT: Mediating Foreign Syscall 0x%02X -> S-Kernel.\n", foreign_id);
     }
