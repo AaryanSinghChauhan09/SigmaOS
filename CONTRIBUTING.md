@@ -21,19 +21,27 @@ Thank you for considering a contribution to the **SigmaOS Sovereign Lattice**!
 
 All contributions must adhere to the **Sovereign Shard Standard**:
 
-- ✅ Every new kernel component must be a **C++ OOP Singleton** with `extern "C"` wrappers.
-- ✅ Zero external library dependencies — strictly `sigma_types.h`, `sigma_hal.h`, `SovereignLibC.h`.
-- ✅ All functions must emit structured log output via `sigma_log()` / `sigma_printf()`.
-- ✅ No raw pointers without bounds checks via `sigma_hardened_strcpy()`.
-- ✅ New shards must be registered in `SovereignUSR` at init.
+- ✅ Every new kernel component must be a **C++ OOP Singleton** with `extern "C"` wrappers
+
+
+
+ ✅ All functions must emit structured log output via `sigma_log()` / `sigma_printf()`
+
+
+
+ ✅ New shards must be registered in `SovereignUSR` at init.
 
 ## Pull Request Checklist
 
-- [ ] Code compiles with `-Wall -Wextra -Werror`
-- [ ] `cppcheck` reports zero warnings
-- [ ] New shard has a `_init()`, at least one primary function, and C wrappers
-- [ ] Relevant wiki page created or updated in `SigmaOS.wiki`
-- [ ] `MISSING_COMPONENTS.md` updated if a gap is closed
+- [ ] Code compiles with `-Wall -Wextra -Werror
+
+
+
+ [ ] New shard has a `_init()`, at least one primary function, and C wrapper
+
+
+
+ [ ] `MISSING_COMPONENTS.md` updated if a gap is closed
 
 ## Security Issues
 

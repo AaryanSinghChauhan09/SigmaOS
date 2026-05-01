@@ -30,9 +30,11 @@ assignees: ''
 
 ## Build Environment
 
-- Architecture: `[ ] x86_64  [ ] ARM64  [ ] RISC-V`
-- Compiler: `clang++ --version` output
-- sigma-build output: paste here
+- Architecture: `[ ] x86_64  [ ] ARM64  [ ] RISC-V
+
+
+
+ sigma-build output: paste here
 
 ## Logs
 
