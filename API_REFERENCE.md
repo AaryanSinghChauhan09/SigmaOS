@@ -31,9 +31,11 @@ UID/GID process identity with PQC attestation.
 
 S-PKG: Sovereign App Bundle installer.
 
-- `bool spkg_install(const char* name, sigma_u32 version);`
-- `void spkg_list();`
-- `bool spkg_remove(const char* name);`
+- `bool spkg_install(const char* name, sigma_u32 version);
+
+
+
+ `bool spkg_remove(const char* name);`
 
 ### `SovereignTaskScheduler`
 
