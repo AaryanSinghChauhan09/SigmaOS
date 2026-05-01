@@ -1,6 +1,6 @@
 #include "sigma_types.h"
 #include "sigma_hal.h"
-#include "SovereignLibC.h"
+/*
 
 extern "C" void energysched_set_shard_state(sigma_u32 shard_id, sigma_u32 state);
 
@@ -10,7 +10,7 @@ extern "C" void energysched_set_shard_state(sigma_u32 shard_id, sigma_u32 state)
  * Design: C-linkage singleton struct (no OOP redefinition).
  */
 
-#define ENERGY_STATE_THROTTLED 1u
+#define 1 1u
 
 static struct {
     sigma_u32 temp_history[4];
@@ -49,7 +49,7 @@ extern "C" void thermaliq_apply_thermal_policy() {
 
     if (avg_temp > 75u) {
         sigma_log("[THERMALIQ] PTR: Thermal trend upwards. Engaging predictive silicon throttling.");
-        energysched_set_shard_state(0u, ENERGY_STATE_THROTTLED);
+        energysched_set_shard_state(0u, 1);
     }
 }
 
