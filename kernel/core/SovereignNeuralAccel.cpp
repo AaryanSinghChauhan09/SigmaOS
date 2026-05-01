@@ -10,8 +10,8 @@
 
 class SovereignNeuralAccelEngine {
 public:
-    static SovereignNeuralEngine& getInstance() {
-        static SovereignNeuralEngine instance;
+    static SovereignNeuralAccelEngine& getInstance() {
+        static SovereignNeuralAccelEngine instance;
         return instance;
     }
 
@@ -20,8 +20,8 @@ public:
         this->state.npu_engaged = true;
     }
 
-    void morphUI(uint32_t widget_id, uint32_t cognitive_load) {
-        sigma_printf("[NEURAL] Morphing Widget %d based on cognitive load %d...\n", widget_id, cognitive_load);
+    void morphUI(sigma_u32 widget_id, sigma_u32 cognitive_load) {
+        sigma_printf("[NEURAL] Morphing Widget %u based on cognitive load %u...\n", (unsigned)widget_id, (unsigned)cognitive_load);
         // Perform tensor calculations for glassmorphic transitions
         sigma_log("[NEURAL] UI Transition optimized by silicon-native predictive model.");
     }
@@ -29,6 +29,7 @@ public:
 private:
     SovereignNeuralAccelEngine() {
         state.npu_engaged = false;
+        state.ops_per_sec = 0;
     }
     
     sigma_neural_state_t state;
@@ -39,6 +40,6 @@ extern "C" void neural_init() {
     SovereignNeuralAccelEngine::getInstance().init();
 }
 
-extern "C" void neural_morph_ui(uint32_t widget_id, uint32_t cognitive_load) {
+extern "C" void neural_morph_ui(sigma_u32 widget_id, sigma_u32 cognitive_load) {
     SovereignNeuralAccelEngine::getInstance().morphUI(widget_id, cognitive_load);
 }
