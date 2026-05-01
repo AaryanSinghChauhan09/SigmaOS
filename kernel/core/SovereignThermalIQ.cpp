@@ -1,23 +1,5 @@
-
-#include "sigma_thermaliq.h"
-#include "sigma_hal.h"
-#include "sigma_energysched.h"
-
-/**
- * SigmaOS Sovereign Thermal Intelligence
- * Implements a Predictive Thermal Regulation (PTR) algorithm.
- * ZERO-DEPENDENCY: Strictly bare-metal silicon temperature management.
- */
-
-#include "sigma_hal.h"
 #include "sigma_types.h"
-#include "sigma_thermaliq.h"
-#include "sigma_energysched.h"
-
-/**
- * SigmaOS Sovereign Thermal Intelligence
- * Implements a Predictive Thermal Regulation (PTR) algorithm.
- * ZERO-DEPENDENCY: Strictly bare-metal silicon temperature management.
+#include "sigma_hal.h"
  *
  * Design: OOP-isolated singleton — SovereignThermalEngine.
  */
