@@ -60,7 +60,7 @@ SigmaOS aims to be the fastest and most secure platform for sovereign computing,
 1. Clone the unified repository (Primary Branch: `main`):
 
 ```bash
-git clone https://github.com/AaryanSinghChauhan09/SigmaOS.git -b main
+git clone https://github.com/AaryanSinghChauhan09/SigmaOS -b main
 cd SigmaOS
 ```
 
