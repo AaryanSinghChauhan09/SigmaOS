@@ -8,7 +8,7 @@
  * ZERO-DEPENDENCY: Silicon-native tensor orchestration.
  */
 
-class SovereignNeuralEngine {
+class SovereignNeuralAccelEngine {
 public:
     static SovereignNeuralEngine& getInstance() {
         static SovereignNeuralEngine instance;
@@ -27,7 +27,7 @@ public:
     }
 
 private:
-    SovereignNeuralEngine() {
+    SovereignNeuralAccelEngine() {
         state.npu_engaged = false;
     }
     
@@ -36,9 +36,9 @@ private:
 
 /* --- C Wrappers --- */
 extern "C" void neural_init() {
-    SovereignNeuralEngine::getInstance().init();
+    SovereignNeuralAccelEngine::getInstance().init();
 }
 
 extern "C" void neural_morph_ui(uint32_t widget_id, uint32_t cognitive_load) {
-    SovereignNeuralEngine::getInstance().morphUI(widget_id, cognitive_load);
+    SovereignNeuralAccelEngine::getInstance().morphUI(widget_id, cognitive_load);
 }

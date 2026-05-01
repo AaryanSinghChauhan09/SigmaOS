@@ -2,11 +2,11 @@
 
 ## Supported Versions
 
-| Version | Supported          |
-| ------- | ------------------ |
-| v29.x   | ✅ Actively supported |
+| Version | Supported               |
+| ------- | ----------------------- |
+| v29.x   | ✅ Actively supported   |
 | v28.x   | ⚠️  Security fixes only |
-| < v28   | ❌ Not supported |
+| < v28   | ❌ Not supported        |
 
 ## Reporting a Vulnerability
 

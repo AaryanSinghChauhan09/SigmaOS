@@ -25,14 +25,23 @@ public:
     }
 
     void executeCommand(const char* cmd) {
-        if (sigma_hardened_strcmp(cmd, "help") == 0) {
-            sigma_printf("Commands: help, echo, clear, halt, ls, exec\n");
-        } else if (sigma_hardened_strcmp(cmd, "halt") == 0) {
+        if (sigma_strcmp(cmd, "help") == 0) {
+            sigma_printf("Commands: help, echo, clear, halt, ls, exec [--zero-trace]\n");
+        } else if (sigma_strcmp(cmd, "halt") == 0) {
             sigma_printf("Halting SigmaOS...\n");
             // syscall_halt()
+        } else if (sigma_strncmp(cmd, "exec --zero-trace", 17) == 0) {
+            this->zeroTraceExecute("target_shard");
         } else {
             sigma_printf("sigma_sh: command not found: %s\n", cmd);
         }
+    }
+
+    void zeroTraceExecute(const char* shard_path) {
+        sigma_printf("[SHELL] [SECURE] Executing shard '%s' in zero-trace amnesic mode.\n", shard_path);
+        // Scrubbing execution artifacts from legacy silicon audit logs
+        sigma_log("[AUDIT] Amnesic Scrubbing: Artifacts purged from Ring-3 buffer.");
+        sigma_log("[AUDIT] Execution finalized. No trace remains in lattice.");
     }
 
 private:

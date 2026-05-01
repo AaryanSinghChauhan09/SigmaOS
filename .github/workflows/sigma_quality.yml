@@ -14,23 +14,26 @@ jobs:
     - name: Checkout repository
       uses: actions/checkout@v3
 
-    - name: Install cppcheck
-      run: sudo apt-get install -y cppcheck
+    - name: Install clang-tidy and markdownlint
+      run: |
+        sudo apt-get install -y clang-tidy npm
+        sudo npm install -g markdownlint-cli
+
+    - name: Run clang-tidy
+      run: |
+        clang-tidy kernel/core/*.cpp userland/*.cpp -- -I./include -std=c++17
 
     - name: Run cppcheck on kernel shards
       run: |
-        cppcheck --enable=warning,style,performance \
+        cppcheck --enable=all --inconclusive --library=std \
                  --suppress=missingIncludeSystem \
                  --error-exitcode=1 \
-                 kernel/core/ userland/ \
+                 kernel/core/ kernel/shards/ userland/ \
                  2>&1 | tee cppcheck_report.txt
 
     - name: Check Markdown linting
       run: |
-        echo "Checking docs/ for standard markdown structure..."
-        for f in docs/*.md; do
-          echo "Validated: $f"
-        done
+        markdownlint docs/*.md *.md
 
     - name: Upload cppcheck report
       uses: actions/upload-artifact@v3

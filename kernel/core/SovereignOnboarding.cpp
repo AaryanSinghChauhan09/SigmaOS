@@ -1,54 +1,27 @@
-#include "sigma_types.h"
+#include "SovereignOnboarding.hpp"
 #include "sigma_hal.h"
 #include "SovereignLibC.h"
 
-/**
- * SigmaOS Sovereign Onboarding Wizard
- * Tailored setup paths for different user personas.
- *
- * USP: A ring-0 initialization sequence that dynamically configures Zenith UI, 
- * accessibility profiles, and workflow macros based on a unified persona selection.
- *
- * Design: OOP-isolated singleton — SovereignOnboardingEngine.
- */
-
-class SovereignOnboardingEngine {
-public:
-    static SovereignOnboardingEngine& getInstance() {
-        static SovereignOnboardingEngine instance;
-        return instance;
-    }
-
-    void init() {
-        sigma_log("[ONBOARDING] Initializing Zenith Persona Configurator...");
-        this->persona_set = false;
-    }
-
-    void applyPersona(const char* persona_type) {
-        sigma_printf("[ONBOARDING] Applying '%s' Persona profile to Sovereign Lattice...\n", persona_type);
-        
-        if (sigma_hardened_strcmp(persona_type, "Developer") == 0) {
-            sigma_log("[ONBOARDING] -> Enabling Container Networking & GPU Hardware Passthrough.");
-        } else if (sigma_hardened_strcmp(persona_type, "Creator") == 0) {
-            sigma_log("[ONBOARDING] -> Maximizing GPU VRAM allocation & Zenith Morphic Compositor quality.");
-        } else {
-            sigma_log("[ONBOARDING] -> Applying Standard Adaptive Defaults.");
-        }
-        
-        this->persona_set = true;
-        sigma_log("[ONBOARDING] Sovereign setup complete. Welcome to SigmaOS.");
-    }
-
-private:
-    SovereignOnboardingEngine() : persona_set(false) {}
-    bool persona_set;
-};
-
-/* --- C Wrappers --- */
-extern "C" void onboarding_init() {
-    SovereignOnboardingEngine::getInstance().init();
+SovereignOnboardingEngine& SovereignOnboardingEngine::getInstance() {
+    static SovereignOnboardingEngine instance;
+    return instance;
 }
 
-extern "C" void onboarding_apply_persona(const char* type) {
-    SovereignOnboardingEngine::getInstance().applyPersona(type);
+void SovereignOnboardingEngine::startWizard() {
+    sigma_log("[ONBOARDING] Initiating Sovereign Setup Wizard...");
+    sigma_printf("Welcome to Σ SigmaOS. Please select your operational persona:\n");
+    sigma_printf("1. Sovereign (Standard)\n2. Amnesic (Zero-Persistence)\n3. Industrial (Production)\n");
+}
+
+void SovereignOnboardingEngine::setPersona(const char* persona_name) {
+    sigma_hardened_strcpy(this->active_persona, persona_name, 32);
+    if (sigma_strcmp(persona_name, "Amnesic") == 0) {
+        sigma_log("[ONBOARDING] Amnesic mode enabled. Shredding initialization artifacts.");
+    } else if (sigma_strcmp(persona_name, "Industrial") == 0) {
+        sigma_log("[ONBOARDING] Industrial mode enabled. Hardening all lattice shards.");
+    }
+}
+
+extern "C" void onboarding_start() {
+    SovereignOnboardingEngine::getInstance().startWizard();
 }

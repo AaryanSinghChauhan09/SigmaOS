@@ -6,6 +6,7 @@
 typedef struct {
     sigma_u32 id;
     sigma_u32 capacity;
+    sigma_u32 x, y, w, h;
 } sigma_snap_zone_t;
 
 #endif

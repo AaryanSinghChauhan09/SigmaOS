@@ -1,68 +1,47 @@
-#include "sigma_types.h"
+#include "SovereignThemeMarket.hpp"
 #include "sigma_hal.h"
 #include "SovereignLibC.h"
 
-/**
- * SigmaOS Sovereign Theme Marketplace
- * Distributed sovereign theme registry and live-swap engine.
- *
- * USP: Themes are distributed as cryptographically signed `.sab` bundles 
- * via the SovereignProtocol mesh. Any node in the lattice can publish or
- * subscribe to themes without a central server.
- *
- * Design: OOP-isolated singleton — SovereignThemeMarketEngine.
- */
+SovereignThemeMarketEngine& SovereignThemeMarketEngine::getInstance() {
+    static SovereignThemeMarketEngine instance;
+    return instance;
+}
 
-class SovereignThemeMarketEngine {
-public:
-    static SovereignThemeMarketEngine& getInstance() {
-        static SovereignThemeMarketEngine instance;
-        return instance;
-    }
+void SovereignThemeMarketEngine::init() {
+    sigma_log("[THEME-MKT] Initializing Sovereign Theme Marketplace...");
+    this->available_themes = 0;
+    this->active_theme_idx = 0;
+}
 
-    void init() {
-        sigma_log("[THEME-MKT] Initializing Sovereign Theme Marketplace...");
-        this->available_themes = 0;
-        this->active_theme_idx = 0;
-    }
+void SovereignThemeMarketEngine::publishTheme(const char* theme_name, const char* author) {
+    if (this->available_themes >= 64) return;
+    sigma_hardened_strcpy(this->theme_names[this->available_themes], theme_name, 48);
+    sigma_hardened_strcpy(this->theme_authors[this->available_themes], author, 32);
+    this->available_themes++;
+    sigma_printf("[THEME-MKT] Published: '%s' by %s — SAB hash verified.\n", theme_name, author);
+}
 
-    void publishTheme(const char* theme_name, const char* author) {
-        if (this->available_themes >= 64) return;
-        sigma_hardened_strcpy(this->theme_names[this->available_themes], theme_name, 48);
-        sigma_hardened_strcpy(this->theme_authors[this->available_themes], author, 32);
-        this->available_themes++;
-        sigma_printf("[THEME-MKT] Published: '%s' by %s — SAB hash verified.\n", theme_name, author);
-    }
-
-    bool applyTheme(const char* theme_name) {
-        for (sigma_u32 i = 0; i < this->available_themes; i++) {
-            if (sigma_hardened_strcmp(this->theme_names[i], theme_name) == 0) {
-                this->active_theme_idx = i;
-                sigma_printf("[THEME-MKT] Live-swapping to theme '%s'...\n", theme_name);
-                sigma_log("[THEME-MKT] Zenith MLC compositor notified. Recompositing...");
-                return true;
-            }
-        }
-        sigma_log("[THEME-MKT] Theme not found.");
-        return false;
-    }
-
-    void listThemes() {
-        sigma_printf("[THEME-MKT] %u themes available:\n", this->available_themes);
-        for (sigma_u32 i = 0; i < this->available_themes; i++) {
-            sigma_printf("  [%s] %s — by %s\n",
-                         i == this->active_theme_idx ? "ACTIVE" : "     ",
-                         this->theme_names[i], this->theme_authors[i]);
+bool SovereignThemeMarketEngine::applyTheme(const char* theme_name) {
+    for (sigma_u32 i = 0; i < this->available_themes; i++) {
+        if (sigma_strcmp(this->theme_names[i], theme_name) == 0) {
+            this->active_theme_idx = i;
+            sigma_printf("[THEME-MKT] Live-swapping to theme '%s'...\n", theme_name);
+            sigma_log("[THEME-MKT] Zenith MLC compositor notified. Recompositing...");
+            return true;
         }
     }
+    sigma_log("[THEME-MKT] Theme not found.");
+    return false;
+}
 
-private:
-    SovereignThemeMarketEngine() : available_themes(0), active_theme_idx(0) {}
-    char theme_names[64][48];
-    char theme_authors[64][32];
-    sigma_u32 available_themes;
-    sigma_u32 active_theme_idx;
-};
+void SovereignThemeMarketEngine::listThemes() {
+    sigma_printf("[THEME-MKT] %u themes available:\n", this->available_themes);
+    for (sigma_u32 i = 0; i < this->available_themes; i++) {
+        sigma_printf("  [%s] %s — by %s\n",
+                     i == this->active_theme_idx ? "ACTIVE" : "     ",
+                     this->theme_names[i], this->theme_authors[i]);
+    }
+}
 
 extern "C" void theme_market_init() { SovereignThemeMarketEngine::getInstance().init(); }
 extern "C" void theme_market_publish(const char* name, const char* author) { SovereignThemeMarketEngine::getInstance().publishTheme(name, author); }

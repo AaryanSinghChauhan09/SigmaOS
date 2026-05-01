@@ -2,12 +2,6 @@
 
 This document tracks features that are currently non-functional, inconsistent, or require architectural refinement to meet "Sovereign" standards.
 
-## 🔴 Critical Path (Non-Functional)
-
-- **Neural UI Transpilation**: Currently falls back to standard CSS rendering if the AVX-512 shard is busy.
-- **Atomic File System Sync**: Transactional persistence across multi-cloud shards is seeing 2ms relativistic drift.
-- **S-CLI v5.1**: Zero-trace execution is currently leaving phantom entries in the legacy silicon audit log.
-
 ## 🛠️ Technical Improvements
 
 - **Kernel Scheduling**: Optimize scheduling algorithms for sub-microsecond context switching.

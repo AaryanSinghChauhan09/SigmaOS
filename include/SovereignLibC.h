@@ -63,6 +63,8 @@ void  sigma_log(const char* msg);
  * ========================================================================= */
 void* sigma_secure_memset(void* s, int c, sigma_size_t n); // Prevents compiler optimization removals
 void  sigma_hardened_strcpy(char* dest, const char* src, sigma_size_t dest_size); // Bounds-checked strcpy
+int   sigma_hardened_strcmp(const char* s1, const char* s2);
+int   sigma_hardened_strncmp(const char* s1, const char* s2, sigma_size_t n);
 
 /* =========================================================================
  * SOVEREIGN MEMORY MANAGEMENT (bump-pointer slab, 128 MB shard)

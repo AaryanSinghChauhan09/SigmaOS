@@ -12,7 +12,8 @@ CXXFLAGS = -ffreestanding -O2 -Wall -Wextra -Werror -fno-exceptions -fno-rtti -s
            -I./include -fno-stack-protector -mno-red-zone
 ASFLAGS  = -f elf64
 
-KERNEL_SHARDS = kernel/core/SovereignInit.o \
+KERNEL_SHARDS = kernel/core/SovereignMain.o \
+                kernel/core/SovereignInit.o \
                 kernel/core/SovereignIPC.o \
                 kernel/core/SovereignMMU.o \
                 kernel/core/SovereignAISched.o \
@@ -21,7 +22,6 @@ KERNEL_SHARDS = kernel/core/SovereignInit.o \
                 kernel/core/SovereignSnap.o \
                 kernel/core/SovereignKube.o \
                 kernel/core/SovereignInstall.o \
-                kernel/core/SovereignNeural.o \
                 kernel/core/SovereignBluetooth.o \
                 kernel/core/SovereignPersistence.o \
                 kernel/core/SovereignKernelIO.o \
@@ -36,6 +36,7 @@ KERNEL_SHARDS = kernel/core/SovereignInit.o \
                 kernel/core/SovereignVFS.o \
                 kernel/core/SovereignEntropy.o \
                 kernel/core/SovereignAudit.o \
+                kernel/core/SovereignNeuralNexus.o \
                 kernel/shards/SovereignLibC.o \
                 kernel/core/SovereignTests.o
 

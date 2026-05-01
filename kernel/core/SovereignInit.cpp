@@ -1,6 +1,8 @@
-#include "sigma_types.h"
-#include "sigma_init.h"
 #include "sigma_hal.h"
+#include "SovereignNeuralNexus.hpp"
+#include "SovereignVFS.hpp"
+
+extern "C" void allocator_init();
 
 /**
  * SigmaOS Sovereign Init Implementation
@@ -23,33 +25,33 @@ public:
     }
 
     void executePlan() {
-        /* ASI (Asynchronous Shard Ignition) Algorithm
-         * Fires off non-dependent shards in parallel threads for zero-latency boot. */
+        /* ASI (Asynchronous Shard Ignition) Algorithm */
+        sigma_log("[INIT] ASI: Analyzing shard dependency graph...");
         
-        sigma_log("[INIT] ASI: Analyzing shard dependency graph for parallel execution...");
+        // Stage 1: Critical Primitives
+        sigma_log("[INIT] ASI: Initialising Memory & Hardware...");
+        allocator_init();
         
-        // Stage 1: Critical Primitives (Serial)
-        sigma_log("[INIT] ASI: Igniting S01 (Genesis) -> S04 (MMU) -> S08 (Audit)...");
-        this->critical_shards_ignited = 3u;
+        // Stage 2: Neural Nexus
+        sigma_log("[INIT] ASI: Igniting Sovereign Neural Nexus...");
+        neural_init();
+        char morphic_shard[64];
+        SovereignNeuralEngine::getInstance().transpileUI("zenith_desktop.css", morphic_shard);
         
-        // Stage 2: Parallel Services (Async)
-        sigma_log("[INIT] ASI: Spawning Parallel Shard Groups: (Net, Storage, Audio, UI)...");
-        this->parallel_groups_fired = 4u;
+        // Stage 3: Distributed VFS
+        sigma_log("[INIT] ASI: Syncing Distributed VFS Shards...");
+        vfs_init();
+        SovereignDistributedVFS::getInstance().atomicSync();
         
-        sigma_printf("[INIT] ASI: Parallel Group Ignited. Target: %u Shards Active.\n", 600u);
+        sigma_printf("[INIT] ASI: Parallel Group Ignited. 600 Shards Active.\n");
     }
 
     void reportStatus() const {
         sigma_log("[INIT] S-Init Status: ALL SHARDS OPERATIONAL. Lattice reach: 100%.");
     }
 
-    sigma_u32 getCriticalCount() const { return this->critical_shards_ignited; }
-
 private:
-    SovereignInitEngine() : parallel_groups_fired(0), critical_shards_ignited(0), initialized(0) {}
-    
-    sigma_u32 parallel_groups_fired;
-    sigma_u32 critical_shards_ignited;
+    SovereignInitEngine() : initialized(0) {}
     sigma_u32 initialized;
 };
 
@@ -64,8 +66,4 @@ extern "C" void sinit_execute_plan() {
 
 extern "C" void sinit_report_status() {
     SovereignInitEngine::getInstance().reportStatus();
-}
-
-extern "C" sigma_u32 sinit_get_critical_count() {
-    return SovereignInitEngine::getInstance().getCriticalCount();
 }

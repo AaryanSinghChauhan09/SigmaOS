@@ -27,6 +27,7 @@ public:
     }
 
     void routeWrite(const char* buffer, sigma_u32 length) {
+        (void)length;
         if (this->echo_to_serial) {
             // Simulated write to COM1
             sigma_printf("[COM1] %s", buffer);

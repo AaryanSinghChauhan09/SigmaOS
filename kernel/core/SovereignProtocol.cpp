@@ -34,6 +34,7 @@ public:
     }
 
     void broadcast(const char* payload) {
+        (void)payload;
         sigma_printf("[SCP] Broadcasting SCP payload to %u active mesh peers.\n", this->active_mesh_peers);
         // Emulate ultra-low latency UDP broadcast
     }
