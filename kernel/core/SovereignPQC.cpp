@@ -28,7 +28,7 @@ public:
          * Generates high-entropy signatures based on silicon-native lattice noise. */
         
         sigma_printf("[PQC] LBSV: Signing Shard S%02u...\n", (unsigned)shard_id);
-        sigma_memset(signature, 0xA5, 64); // Simulated PQC signature
+        sigma_secure_memset(signature, 0xA5, 64); // Simulated PQC signature
         this->total_signatures++;
     }
 

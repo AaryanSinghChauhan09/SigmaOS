@@ -30,7 +30,7 @@ public:
         } else if (sigma_strcmp(cmd, "halt") == 0) {
             sigma_printf("Halting SigmaOS...\n");
             // syscall_halt()
-        } else if (sigma_strncmp(cmd, "exec --zero-trace", 17) == 0) {
+        } else if (sigma_hardened_strncmp(cmd, "exec --zero-trace", 17) == 0) {
             this->zeroTraceExecute("target_shard");
         } else {
             sigma_printf("sigma_sh: command not found: %s\n", cmd);

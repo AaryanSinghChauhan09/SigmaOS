@@ -13,7 +13,7 @@ extern "C" uint32_t time_get_uptime_ms(void);
  * Design: OOP-isolated singleton — SovereignEntropyEngine.
  */
 
-class SovereignEntropyEngine {
+class SovereignEntropyEngineImpl {
 public:
     static SovereignEntropyEngine& getInstance() {
         static SovereignEntropyEngine instance;
@@ -49,7 +49,7 @@ public:
     }
 
 private:
-    SovereignEntropyEngine() : pool_ptr(0), total_samples(0) {}
+    SovereignEntropyEngineImpl() : pool_ptr(0), total_samples(0) {}
     
     uint32_t entropy_pool[1024];
     uint32_t pool_ptr;
@@ -58,17 +58,17 @@ private:
 
 /* --- C Wrappers --- */
 extern "C" void entropy_init() {
-    SovereignEntropyEngine::getInstance().init();
+    SovereignEntropyEngineImpl::getInstance().init();
 }
 
 extern "C" void entropy_pool_sample(uint32_t sample) {
-    SovereignEntropyEngine::getInstance().poolSample(sample);
+    SovereignEntropyEngineImpl::getInstance().poolSample(sample);
 }
 
 extern "C" uint32_t entropy_get_random_u32() {
-    return SovereignEntropyEngine::getInstance().getRandomU32();
+    return SovereignEntropyEngineImpl::getInstance().getRandomU32();
 }
 
 extern "C" sigma_entropy_stats_t entropy_get_stats() {
-    return SovereignEntropyEngine::getInstance().getStats();
+    return SovereignEntropyEngineImpl::getInstance().getStats();
 }

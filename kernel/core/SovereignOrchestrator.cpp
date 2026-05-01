@@ -12,7 +12,7 @@
  */
 
 
-/* --- Sovereign Orchestra Engine (OOP Isolation) --- */
+class SovereignOrchestratorEngine { public: static SovereignOrchestratorEngine& getInstance() { static SovereignOrchestratorEngine instance; return instance; } void init(); void applyPattern(const char* name); void selfHeal(); sigma_u64 getHealCount() { return heal_actions; } private: SovereignOrchestratorEngine() : initialized(0), patterns_applied(0), heal_actions(0) {} sigma_u32 initialized; sigma_u32 patterns_applied; sigma_u64 heal_actions; };
 
 void SovereignOrchestratorEngine::init() {
     sigma_log("[ORCHESTRATOR] Initializing Sovereign Automated Deployment Engine (LDR Algorithm)...");

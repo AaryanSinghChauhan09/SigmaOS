@@ -13,7 +13,7 @@ extern "C" uint32_t time_get_uptime_ms(void);
  * Design: OOP-isolated singleton — SovereignDiagEngine.
  */
 
-class SovereignDiagEngine {
+class SovereignDiagEngineImpl {
 public:
     static SovereignDiagEngine& getInstance() {
         static SovereignDiagEngine instance;
@@ -50,7 +50,7 @@ public:
     }
 
 private:
-    SovereignDiagEngine() : fault_count(0) {}
+    SovereignDiagEngineImpl() : fault_count(0) {}
     
     sigma_diag_event_t fault_lattice[256];
     uint32_t fault_count;
@@ -58,13 +58,13 @@ private:
 
 /* --- C Wrappers --- */
 extern "C" void diag_init() {
-    SovereignDiagEngine::getInstance().init();
+    SovereignDiagEngineImpl::getInstance().init();
 }
 
 extern "C" void diag_report_fault(uint32_t component_id, uint32_t error_code) {
-    SovereignDiagEngine::getInstance().reportFault(component_id, error_code);
+    SovereignDiagEngineImpl::getInstance().reportFault(component_id, error_code);
 }
 
 extern "C" void diag_localize_fault() {
-    SovereignDiagEngine::getInstance().localizeFault();
+    SovereignDiagEngineImpl::getInstance().localizeFault();
 }

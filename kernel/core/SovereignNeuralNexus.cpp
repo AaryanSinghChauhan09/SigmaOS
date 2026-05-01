@@ -77,7 +77,7 @@ bool SovereignNeuralEngine::transpileUI(const char* css_shard, char* out_morphic
     }
 
     sigma_printf("[NEURAL] Neural UI (AVX-512 Dedicated): Optimising %s...\n", css_shard);
-    sigma_hardened_strcpy(out_morphic_shard, "morphic_zenith_v2.5_singularity", 64);
+    sigma_strcpy(out_morphic_shard, "morphic_zenith_v2.5_singularity", 64);
     
     sigma_log("[NEURAL] Transpilation Complete. Zero-latency Glassmorphism ACTIVE.");
     return true;

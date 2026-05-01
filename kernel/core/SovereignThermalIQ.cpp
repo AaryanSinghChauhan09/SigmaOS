@@ -1,6 +1,6 @@
 #include "sigma_types.h"
 #include "sigma_hal.h"
- *
+/*
  * Design: OOP-isolated singleton — SovereignThermalEngine.
  */
 
@@ -43,7 +43,7 @@ extern "C" void thermaliq_apply_thermal_policy() {
     
     if (avg_temp > 75u) {
         sigma_log("[THERMALIQ] PTR: Thermal trend upwards. Engaging predictive silicon throttling via S-EnergySched.");
-        energysched_set_shard_state(0u, ENERGY_STATE_THROTTLED);
+        energysched_set_shard_state(0u, 1);
     }
 }
 

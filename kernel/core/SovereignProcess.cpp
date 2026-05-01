@@ -29,7 +29,7 @@ public:
         
         sigma_process_t* proc = &this->table[this->active_count++];
         proc->pid = this->active_count;
-        sigma_hardened_strcpy(proc->name, name, 32);
+        sigma_strcpy(proc->name, name, 32);
         proc->state = SIGMA_PROC_READY;
         proc->priority = priority;
         proc->cpu_time = 0u;

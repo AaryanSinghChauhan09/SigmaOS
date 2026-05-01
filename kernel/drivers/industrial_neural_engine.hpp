@@ -22,7 +22,7 @@ class SovereignNeuralEngine : public SigmaObject {
 private:
     sigma_u32 m_neuron_count;
     sigma_u64 m_synaptic_updates;
-    sigma_bool m_learning_enabled;
+    bool m_learning_enabled;
 
 public:
     SovereignNeuralEngine() : m_neuron_count(1024 * 1024), m_synaptic_updates(0), m_learning_enabled(SIGMA_TRUE) {
