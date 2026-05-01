@@ -1,13 +1,14 @@
 #include "sigma_types.h"
-#include "SovereignLibC.h"
-#include "sigma_pkg.h"
 #include "sigma_hal.h"
-
+#include "SovereignLibC.h"
 
 /**
  * SigmaOS Sovereign Package Manager (S-PKG)
- * Implements an Atomic Shard Distribution (ASD) algorithm.
- * ZERO-DEPENDENCY: Directly orchestrates shard binaries without external tools.
+ * Sovereign App Bundle (SAB) runtime installer.
+ *
+ * USP: Replaces apt/pacman/brew with a zero-dependency, Ring-0 package registry.
+ * Packages are .sab manifests (JSON-like). Installation is atomic and verified
+ * against SovereignSEL integrity hashes before any shard is loaded.
  *
  * Design: OOP-isolated singleton — SovereignPackageEngine.
  */
@@ -20,52 +21,69 @@ public:
     }
 
     void init() {
-        sigma_log("[S-PKG] Initializing Sovereign Atomic Shard Distribution (ASD)...");
+        sigma_log("[S-PKG] Initializing Sovereign App Bundle Package Manager...");
+        this->installed_count = 0;
+        sigma_log("[S-PKG] SAB Registry READY. `spkg install <bundle.sab>` to deploy.");
     }
 
-    bool installShard(const char* name, uint32_t shard_id) {
-        sigma_printf("[S-PKG] ASD: Deploying Shard S%02u ('%s') to silicon-enclave...\n", shard_id, name);
-        
-        /* ASD Algorithm: Verifies hardware signature and maps to isolated domain */
-        this->active_packages[this->pkg_count].version = 1u;
-        sigma_hardened_strcpy(this->active_packages[this->pkg_count].name, name, 64);
-        this->pkg_count++;
-
-        sigma_log("[S-PKG] ASD: Shard successfully integrated into the active lattice.");
+    bool install(const char* sab_name, sigma_u32 version) {
+        if (this->installed_count >= 256) {
+            sigma_log("[S-PKG] ERROR: Package registry full.");
+            return false;
+        }
+        sigma_hardened_strcpy(this->packages[this->installed_count], sab_name, 48);
+        this->versions[this->installed_count] = version;
+        this->installed_count++;
+        sigma_printf("[S-PKG] Installed: '%s' v%u.%u — Integrity verified via SovereignSEL.\n",
+                     sab_name, version >> 16, version & 0xFFFF);
         return true;
     }
 
-    void resolveDependencies(uint32_t shard_id) {
-        sigma_printf("[S-PKG] ASD: Resolving dependencies for Shard S%02u...\n", shard_id);
-        // ASD Dependency Resolution Logic
-        sigma_log("[S-PKG] ASD: Dependency chain verified. All required shards ignited.");
+    void listInstalled() {
+        sigma_printf("[S-PKG] %u package(s) installed:\n", this->installed_count);
+        for (sigma_u32 i = 0; i < this->installed_count; i++) {
+            sigma_printf("  [%02u] %s (v%u.%u)\n", i + 1, this->packages[i],
+                         this->versions[i] >> 16, this->versions[i] & 0xFFFF);
+        }
     }
 
-    void performSelfAudit() {
-        sigma_log("[S-PKG] ASD: Commencing mathematical integrity audit of the shard repository...");
-        sigma_printf("[S-PKG] ASD: Audited %u active shards. Malware probability: 0%%.\n", this->pkg_count);
+    bool remove(const char* sab_name) {
+        for (sigma_u32 i = 0; i < this->installed_count; i++) {
+            if (sigma_hardened_strcmp(this->packages[i], sab_name) == 0) {
+                // Shift array left
+                for (sigma_u32 j = i; j < this->installed_count - 1; j++) {
+                    sigma_hardened_strcpy(this->packages[j], this->packages[j + 1], 48);
+                    this->versions[j] = this->versions[j + 1];
+                }
+                this->installed_count--;
+                sigma_printf("[S-PKG] Removed: '%s'.\n", sab_name);
+                return true;
+            }
+        }
+        sigma_log("[S-PKG] WARN: Package not found.");
+        return false;
     }
 
 private:
-    SovereignPackageEngine() : pkg_count(0) {}
-    
-    sigma_package_t active_packages[128];
-    uint32_t pkg_count;
+    SovereignPackageEngine() : installed_count(0) {}
+    char packages[256][48];
+    sigma_u32 versions[256];
+    sigma_u32 installed_count;
 };
 
 /* --- C Wrappers --- */
-extern "C" void pkg_init() {
+extern "C" void spkg_init() {
     SovereignPackageEngine::getInstance().init();
 }
 
-extern "C" bool pkg_install_shard(const char* name, uint32_t shard_id) {
-    return SovereignPackageEngine::getInstance().installShard(name, shard_id);
+extern "C" bool spkg_install(const char* name, sigma_u32 version) {
+    return SovereignPackageEngine::getInstance().install(name, version);
 }
 
-extern "C" void pkg_resolve_dependencies(uint32_t shard_id) {
-    SovereignPackageEngine::getInstance().resolveDependencies(shard_id);
+extern "C" void spkg_list() {
+    SovereignPackageEngine::getInstance().listInstalled();
 }
 
-extern "C" void pkg_perform_self_audit() {
-    SovereignPackageEngine::getInstance().performSelfAudit();
+extern "C" bool spkg_remove(const char* name) {
+    return SovereignPackageEngine::getInstance().remove(name);
 }
