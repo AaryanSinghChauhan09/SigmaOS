@@ -1,26 +1,28 @@
-# 🔒 SigmaOS Security Policy
+# Security Policy
 
-## 🌌 Sovereign Security Model
+## Supported Versions
 
-SigmaOS implements a **Zero-Trust Architectural Model**. Every shard resides
-within a **Cryptographic Isolation Boundary (CIB)** and communicates via
-**Internal Cryptographic Tunneling (ICT)**.
+| Version | Supported          |
+| ------- | ------------------ |
+| v29.x   | ✅ Actively supported |
+| v28.x   | ⚠️  Security fixes only |
+| < v28   | ❌ Not supported |
 
 ## Reporting a Vulnerability
 
-If you identify a breach in the sovereign lattice or a silicon-to-logic
-handshake vulnerability:
+If you discover a security vulnerability in the SigmaOS Sovereign Lattice, **do not open a public issue**. Instead:
 
-1. **Do not open a public issue.**
-2. Send a PGP-encrypted report to `security@sigmaos.sovereign`.
-3. Include the **Shard ID** and the **CIB entry point** affected.
+1. Email the SigmaOS Security Council at the contact email on the repository profile.
+2. Include: affected shard name, reproduction steps, and potential impact.
+3. You will receive a response within **72 hours**.
 
-## Response Timeline
+## Security Architecture
 
-- **Initial Audit**: 24 Hours.
-- **Shard Hardening**: 48 Hours.
-- **Lattice Deployment**: 72 Hours (Live patch via S-LiveKernel).
+SigmaOS employs multiple layers of defense:
 
----
-
-_Σ SIGMAOS: Secure by Design. Absolute Sovereignty._
+- **`SovereignSEL`** — Mandatory Access Control enforced in Ring-0.
+- **`SovereignPQC`** — Post-Quantum Cryptography for all key material.
+- **`SovereignEnclave`** — Hardware-level isolation for cryptographic state.
+- **`SovereignSandbox`** — Zero-trust container isolation for all userland processes.
+- **CodeQL** — Automated vulnerability scanning on every pull request.
+- **Dependabot** — Weekly automated supply-chain patch management.

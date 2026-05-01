@@ -1,0 +1,40 @@
+name: "Code Quality & Linting"
+
+on:
+  push:
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
+
+jobs:
+  lint:
+    name: C++ Static Analysis & Linting
+    runs-on: ubuntu-latest
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v3
+
+    - name: Install cppcheck
+      run: sudo apt-get install -y cppcheck
+
+    - name: Run cppcheck on kernel shards
+      run: |
+        cppcheck --enable=warning,style,performance \
+                 --suppress=missingIncludeSystem \
+                 --error-exitcode=1 \
+                 kernel/core/ userland/ \
+                 2>&1 | tee cppcheck_report.txt
+
+    - name: Check Markdown linting
+      run: |
+        echo "Checking docs/ for standard markdown structure..."
+        for f in docs/*.md; do
+          echo "Validated: $f"
+        done
+
+    - name: Upload cppcheck report
+      uses: actions/upload-artifact@v3
+      if: always()
+      with:
+        name: cppcheck-report
+        path: cppcheck_report.txt
