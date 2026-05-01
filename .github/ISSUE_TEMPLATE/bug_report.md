@@ -1,32 +1,34 @@
 ---
-name: Bug report
-about: Create a report to help us improve the sovereign lattice.
-title: "[BUG] <Short description>"
-labels: bug, shard-issue
-assignees: ""
+name: Bug Report
+about: Report a kernel shard malfunction or build failure
+title: "[BUG] <shard_name>: <short description>"
+labels: bug, triage
+assignees: ''
 ---
 
-**Shard ID affected:**
-(e.g., S09_NEURAL_ACCEL)
+## Affected Shard
+<!-- Which kernel shard is affected? e.g. SovereignNetStack, SovereignGPU -->
 
-**Describe the bug:**
-A clear and concise description of what the bug is.
+## Description
+<!-- A clear description of the bug -->
 
-**To Reproduce:**
+## Reproduction Steps
+1. 
+2. 
+3. 
 
-Steps to reproduce the behavior:
+## Expected Behavior
+<!-- What should happen -->
 
-1. Ignite shard...
-2. Trigger syscall...
-3. See error.
+## Actual Behavior
+<!-- What actually happens -->
 
-**Expected behavior:**
-A clear and concise description of what you expected to happen.
+## Build Environment
+- Architecture: [ ] x86_64 [ ] ARM64 [ ] RISC-V
+- Compiler: `clang++ --version` output
+- sigma-build output:
 
-**Silicon Context:**
-
-- Target Architecture: (x86_64, ARM64, RISC-V)
-- Zenith Version: v28.0
-
-**Additional context:**
-Add any other context about the problem here.
+## Logs
+```
+<!-- Paste sigma_log / serial output here -->
+```

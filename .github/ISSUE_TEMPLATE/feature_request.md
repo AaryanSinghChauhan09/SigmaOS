@@ -1,22 +1,25 @@
 ---
-name: Feature request
-about: Propose a new shard or industrial parity expansion.
-title: "[FEAT] <Short description>"
+name: Feature Request / New Shard
+about: Propose a new Sovereign Shard or architectural improvement
+title: "[SHARD] <SovereignNewName>: <short description>"
 labels: enhancement, new-shard
-assignees: ""
+assignees: ''
 ---
 
-**Industrial Parity Target:**
-(e.g., Linux Kernel v6.8, macOS CoreUI)
+## Shard Name
+<!-- e.g. SovereignQuantumCache -->
 
-**Is your feature request related to a problem? Please describe.**
-A clear and concise description of what the problem is. Ex. I'm always frustrated when [...]
+## Problem Statement
+<!-- What gap does this close? Reference MISSING_COMPONENTS.md if applicable -->
 
-**Describe the solution you'd like:**
-A clear and concise description of what you want to happen.
+## Proposed Solution
+<!-- Describe the sovereign singleton design and USP -->
 
-**Sovereign Shard Implementation:**
-How will this be implemented as an OOP-isolated singleton?
+## Linux Equivalent
+<!-- What does this replace? e.g. `systemctl`, `/proc`, `iptables` -->
 
-**Additional context:**
-Add any other context or screenshots about the feature request here.
+## Algorithm / USP
+<!-- Name the algorithm (e.g. QREP, UMSM, ZBT) and explain its advantage -->
+
+## Dependencies
+<!-- Which existing shards does this require? -->

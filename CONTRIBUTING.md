@@ -1,32 +1,37 @@
 # Contributing to SigmaOS
 
-Thank you for your interest in contributing to the SigmaOS Sovereign Lattice!
+Thank you for considering a contribution to the **SigmaOS Sovereign Lattice**!
 
-## 🛡️ Core Development Philosophy
+## Getting Started
 
-1. **Zero-Dependency:** Do not introduce external libraries or dependencies.
-2. **Silicon-Native:** All drivers must communicate directly with S-HAL.
-3. **Type-Safety First:** Use strict typing and avoid unsafe memory operations.
+1. **Fork** the repository and create a branch from `main`.
+2. **Build** the project using the deterministic build pipeline:
+   ```bash
+   python3 tools/sigma-build.py
+   ```
+3. **Run static analysis** before submitting:
+   ```bash
+   cppcheck --enable=warning,style,performance kernel/core/
+   ```
 
-## 🌿 Branching Strategy
+## Code Standards
 
-- `main`: The stable, production-ready zenith release.
-- `lattice-dev`: The active development branch.
-- Feature branches should be named `feature/<shard-name>` or `fix/<component-name>`.
+All contributions must adhere to the **Sovereign Shard Standard**:
 
-## 🛠️ Submitting a Pull Request
+- ✅ Every new kernel component must be a **C++ OOP Singleton** with `extern "C"` wrappers.
+- ✅ Zero external library dependencies — strictly `sigma_types.h`, `sigma_hal.h`, `SovereignLibC.h`.
+- ✅ All functions must emit structured log output via `sigma_log()` / `sigma_printf()`.
+- ✅ No raw pointers without bounds checks via `sigma_hardened_strcpy()`.
+- ✅ New shards must be registered in `SovereignUSR` at init.
 
-1. Fork the repository and create your feature branch.
-2. Ensure your code strictly adheres to the 600-shard modular architecture.
-3. Run the automated linting and IDE checks.
-4. Submit a PR against `lattice-dev` and tag a maintainer.
+## Pull Request Checklist
 
-## 🐞 Reporting Bugs
+- [ ] Code compiles with `-Wall -Wextra -Werror`
+- [ ] `cppcheck` reports zero warnings
+- [ ] New shard has a `_init()`, at least one primary function, and C wrappers
+- [ ] Relevant wiki page created or updated in `SigmaOS.wiki`
+- [ ] `MISSING_COMPONENTS.md` updated if a gap is closed
 
-If you encounter an "off" issue or a kernel-level bug:
+## Security Issues
 
-1. **Log it:** Open a GitHub Issue with the label `bug`.
-2. **Reproduce:** Provide clear steps to reproduce the issue (e.g., QEMU command and boot logs).
-3. **Trace:** Include serial output logs from Step 3 debugging.
-
-We label beginner-friendly issues as `good first issue` and `help wanted`.
+Please **do not** open public issues for security vulnerabilities. Read [SECURITY.md](../SECURITY.md) for responsible disclosure guidelines.
