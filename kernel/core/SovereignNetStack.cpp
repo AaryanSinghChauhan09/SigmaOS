@@ -33,8 +33,8 @@ public:
         sigma_printf("[NET] Network interface %s registered.\n", mac_addr);
     }
 
-    bool dispatchPacket(const char* payload, sigma_u32 length) {
-        (void)payload;
+    bool dispatchPacket(const char* /*payload*/, sigma_u32 length) {
+
         // Deep Packet Inspection simulation
         if (length > 1500) {
             this->packets_filtered++;

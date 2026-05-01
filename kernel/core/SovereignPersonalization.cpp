@@ -25,8 +25,8 @@ public:
         sigma_log("[PERSONALIZE] AI-driven local workflow prediction ACTIVE.");
     }
 
-    void processUserEvent(sigma_u32 event_id, const char* context) {
-        (void)event_id;
+    void processUserEvent(sigma_u32 /*event_id*/, const char* context) {
+
         this->telemetry_events_processed++;
         // Simulate local AI predicting the user's next action
         if (this->telemetry_events_processed % 10 == 0) {
