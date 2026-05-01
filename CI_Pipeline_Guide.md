@@ -23,6 +23,7 @@
 | Benchmarks | `s-cli benchmark --run-all` | Perf + crypto benchmarks pass |
 
 ### Reading results
+
 - ✅ Green across all 9 matrix jobs = sovereign build verified
 - ❌ Any red = check the failing step output; usually a compile error in `orchestrator/main.cpp`
 
@@ -35,8 +36,8 @@
 
 ### Static Analysis (cppcheck)
 
-
 Scans `sigmaos/core/src/`, `suites/S01_Genesis/`, `suites/S04_HAL/`, `suites/S08_Security/` for:
+
 - Memory errors (buffer overflows, use-after-free)
 - Null pointer dereferences
 - Undefined behavior
@@ -45,8 +46,8 @@ Scans `sigmaos/core/src/`, `suites/S01_Genesis/`, `suites/S04_HAL/`, `suites/S08
 
 ### Formal Proofs (Kani)
 
-
 Runs Rust Kani model checker on `suites/S08_Security/formal_proofs/`:
+
 - `verify_dma_ipc_non_interference` — proves DMA and IPC cannot corrupt each other
 - `verify_dispatch_capability_ownership` — proves capability tokens cannot be forged
 
@@ -54,8 +55,8 @@ Runs Rust Kani model checker on `suites/S08_Security/formal_proofs/`:
 
 ### Entropy Fuzzing
 
-
 Builds `orchestrator/main.cpp` and fuzzes with profiles: `kali`, `tails`, `arch`
+
 - Verifies the CLI handles all profile strings without crashing
 
 ---
@@ -65,6 +66,7 @@ Builds `orchestrator/main.cpp` and fuzzes with profiles: `kali`, `tails`, `arch`
 **File**: `.github/workflows/03_Web_Zenith.yml`
 
 ### Steps
+
 1. **cppcheck** — full static analysis on core + HAL + security
 2. **Compiler verification** — orchestrator compiles with `-Wall -Wextra -Wpedantic`
 3. **Atomic module count** — reports how many `atomic_*.cpp/.hpp` files exist
@@ -81,9 +83,8 @@ Builds `orchestrator/main.cpp` and fuzzes with profiles: `kali`, `tails`, `arch`
 ```
 
 ## 📈 Key Metrics Tracked Per CI Run
+
 - Atomic module count (target: grows every sprint)
 - Zero stdlib imports in atomic modules (must stay at 0)
 - Orchestrator compile time (target: < 2s)
 - All 9 matrix jobs green (target: 100%)
-
-

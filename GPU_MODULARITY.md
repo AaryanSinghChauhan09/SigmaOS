@@ -6,11 +6,8 @@ SigmaOS achieves heterogeneous compute sovereignty via the `SovereignGPUEngine` 
 
 Traditional OS kernels (Linux, Windows) rely on massive proprietary binary blobs supplied by NVIDIA, AMD, and Intel. These blobs:
 
-- Operate with root-level trust but zero kernel-level isolatio
-
-
-
- Cannot be audited or patched for security vulnerabilities
+- Operate with root-level trust but zero kernel-level isolation
+- Cannot be audited or patched for security vulnerabilities
 
 ## Sovereign Solution: Abstracted Vendor Execution
 

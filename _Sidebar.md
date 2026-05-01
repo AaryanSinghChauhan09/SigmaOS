@@ -1,6 +1,7 @@
 # _Sidebar
 
 ## 🏗️ Architecture
+
 - [The Sovereign Lattice](Architecture.md)
 - [Architecture Overview](Architecture_Overview.md)
 - [Architecture Update](Architecture_Update.md)
@@ -9,12 +10,14 @@
 - [Modular Blueprint](MODULAR_ARCHITECTURE_BLUEPRINT.md)
 
 ## 🔒 Security & Governance
+
 - [Security Model](SECURITY.md)
 - [Code of Conduct](CODE_OF_CONDUCT.md)
 - [Governance](GOVERNANCE.md)
 - [Legal Engine](Legal_Engine.md)
 
 ## 🚀 Roadmap
+
 - [Expansion Roadmap](EXPANSION_ROADMAP.md)
 - [Future Suggestions](FUTURE_SUGGESTIONS.md)
 - [Ideas Backlog](IDEAS_BACKLOG.md)
@@ -22,6 +25,7 @@
 - [Personalization](Personalization.md)
 
 ## 🛠️ Development
+
 - [Build Guide](BUILD.md)
 - [Hacking Guide](HACKING.md)
 - [Shard Development](Shard_Development.md)
@@ -34,12 +38,14 @@
 - [Sovereign Tools](SOVEREIGN_TOOLS.md)
 
 ## 🏛️ Implementation History
+
 - [Changelog](CHANGELOG.md)
 - [Implemented Ideas](IDEAS_IMPLEMENTED.md)
 - [Gap Resolution Log](INDUSTRIAL_GAP_RESOLUTION.md)
 - [Anomaly Resolution Log](ANOMALY_RESOLUTION_LOG.md)
 
 ## 🌍 Community
+
 - [Contributing](CONTRIBUTING.md)
 - [Contribution Guide](Contribution_Guide.md)
 - [Competitor Analysis](Competitor_Analysis.md)

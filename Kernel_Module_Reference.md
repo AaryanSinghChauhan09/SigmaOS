@@ -1,6 +1,5 @@
 # SigmaOS — Kernel Module Reference
 
-
 > **Auto-audited**: This document reflects the actual files in the repository. Last synced: 2026-04-25.
 
 ---
@@ -321,5 +320,3 @@
 | Lattice Verification | `02_Lattice_Verification.yml` | cppcheck + Kani proofs + fuzzing |
 | Native Quality Gate | `03_Web_Zenith.yml` | Compile check + sovereignty audit |
 | Dev Coverage | `04_Sigma_Dev_Coverage.yml` | Module count + OOP audit + ASM count |
-
-

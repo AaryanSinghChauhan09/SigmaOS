@@ -54,7 +54,6 @@ Find the right `suites/S<NN>_*` directory:
 
 ### 1. Create the header
 
-
 ```bash
 
 
@@ -66,16 +65,16 @@ touch suites/S37_SovereignWire/sigma_vpn.h
 
 ### 2. Write the module
 
-
 Follow the **Atomic Module Contract** (see Developer Guide):
+
 - One `#ifndef` guard
 - One primary struct + 3–5 static inline functions
 - Zero external includes
 
 ### 3. Wire into CI tests
 
-
 Edit `orchestrator/main.cpp`, find `TestCommand::run_subsystem_test()`:
+
 ```cpp
 static void run_subsystem_test(const char* subsystem) {
     // Add your new subsystem here:
@@ -84,7 +83,6 @@ static void run_subsystem_test(const char* subsystem) {
 ```
 
 ### 4. Add a CLI command (optional)
-
 
 ```cpp
 // In orchestrator/main.cpp, add a new ICommand subclass:
@@ -101,14 +99,12 @@ public:
 
 ### 5. Test locally
 
-
 ```bash
 g++ -std=c++20 orchestrator/main.cpp -o s-cli
 ./s-cli test --subsystem networking
 ```
 
 ### 6. Push & watch CI
-
 
 ```bash
 git add suites/S37_SovereignWire/sigma_vpn.h orchestrator/main.cpp
@@ -130,5 +126,3 @@ CI will automatically run all 4 workflows and report results.
 | `sigma_dns_resolver.h` | Unbound DNS | 🟡 Medium |
 | `sigma_thermal.h` | Linux ACPI | 🟢 Low |
 | `sigma_power_mgmt.h` | Windows ACPI | 🟢 Low |
-
-

@@ -13,4 +13,3 @@ The global namespace array supports zero-dependency mounting and natively integr
 - **Vision NPE**: Neural Pixel Extraction directly captures framebuffers and routes them through the Neural engine to build semantic vector arrays.
 
 All elements are fully modularized and integrated into the `kernel/core` subsystem.
-

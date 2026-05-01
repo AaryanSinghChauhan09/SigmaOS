@@ -19,7 +19,4 @@ Our `SovereignTelemetryUI` exposes deep kernel insights at 120fps. It aggregates
 Thanks to `SovereignPersonalization` and `SovereignAccessibility`, Zenith effortlessly supports:
 
 - Smart contrast auto-scaling
-
-
-
- Predictive app layouts based on user history.
+- Predictive app layouts based on user history.

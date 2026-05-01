@@ -7,6 +7,7 @@ SigmaOS Phase 19 marks the transition from computational sovereignty to **mind-a
 ### Overview
 
 Shards are modularised into three core layers:
+
 - **Thought-Stream Acquisition** — captures neural signals, emotional valence, and resonance strength
 - **Collective Cognition Engine** — merges individual thought-streams into a shared sovereign state
 - **Shared-State Orchestration** — coordinates shard clusters based on group harmony index
@@ -28,6 +29,7 @@ When `group_harmony_index > 80`, the engine automatically halves `shared_cogniti
 ### Overview
 
 Shards evolve into **cultural councils** that enforce sovereign ethics across civilizations, traditions, and planetary societies.
+
 - **Cultural Council Shards** — weighted voting across civilizations
 - **Heritage Preservation Modules** — cryptographic artifact archival
 - **Adaptive Ethics Engine** — compliance scoring against universal standards
@@ -41,6 +43,7 @@ Shards evolve into **cultural councils** that enforce sovereign ethics across ci
 | `universal_ethics.c` | `modules/core/kernel/` | Cross-civilization ethics enforcement |
 
 ## Impact
+
 - Positions SigmaOS as the **first OS with mind-adaptive sovereignty**.
 - Establishes **culture-sovereign governance** across planetary societies.
 - Opens new frontiers in accessibility, education, and collective creativity.
