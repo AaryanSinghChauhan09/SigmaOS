@@ -453,7 +453,7 @@
             </div>
             <div class="stat-value" id="auto-task-count">3 Tasks Active</div>
             <div class="stat-label">Next: Lattice Sync in 4m</div>
-            <div class="stat-bar"><div class="stat-progress" style="width: 75%"></div></div>
+            <div class="stat-bar"><div class="stat-progress stat-progress--automator"></div></div>
         </div>
 
         <div class="widget voice">
@@ -491,7 +491,7 @@
             <div class="stat-label">Neural UI: <span id="ui-status" class="status-success">AVX-512 DEDICATED</span></div>
             <div class="stat-label">VFS Sync: <span id="vfs-status" class="status-success">ZERO DRIFT (PQC)</span></div>
             <div class="stat-label">S-CLI: <span id="cli-status" class="status-success">AMNESIC (CLEAN)</span></div>
-            <div class="stat-bar"><div class="stat-progress" style="width: 100%"></div></div>
+            <div class="stat-bar"><div class="stat-progress stat-progress--full"></div></div>
         </div>
     </div>
 
@@ -645,7 +645,7 @@
                 <div class="win-btn close" onclick="closeWindow('marketplace-win')"></div>
             </div>
         </div>
-        <div class="window-content" style="padding: 24px; overflow-y: auto;">
+        <div class="window-content window-content--padded">
             <h3>Sovereign Shard Exchange</h3>
             <p class="stat-label">Verified PQC bundles ready for lattice injection.</p>
             <div class="mkt-grid">
@@ -680,7 +680,7 @@
                 <div class="win-btn close" onclick="closeWindow('customization-win')"></div>
             </div>
         </div>
-        <div class="window-content" style="padding: 24px; overflow-y: auto; background: rgba(0,0,0,0.3);">
+        <div class="window-content window-content--customization">
             <h3>Sovereign Personalization</h3>
             <p class="stat-label">Tune the lattice AI-driven aesthetics and automation.</p>
             <div class="mkt-grid">
@@ -704,7 +704,7 @@
     </div>
 
     <!-- Onboarding Wizard -->
-    <div class="wizard-overlay" id="wizard-overlay" style="display: none;">
+    <div class="wizard-overlay wizard-overlay--hidden" id="wizard-overlay">
         <div class="wizard-box">
             <div class="wizard-step active" id="step-1">
                 <div class="wizard-title">Lattice Ignition</div>

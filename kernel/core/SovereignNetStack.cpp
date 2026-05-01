@@ -34,6 +34,7 @@ public:
     }
 
     bool dispatchPacket(const char* payload, sigma_u32 length) {
+        (void)payload;
         // Deep Packet Inspection simulation
         if (length > 1500) {
             this->packets_filtered++;

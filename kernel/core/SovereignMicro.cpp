@@ -22,6 +22,7 @@ public:
     }
 
     bool spawnIsolatedShard(uint32_t shard_id, sigma_micro_context_t context) {
+        (void)context;
         // ISM (Isolated Service Mediation) Algorithm
         // Orchestrates shard execution within restricted silicon memory domains.
         

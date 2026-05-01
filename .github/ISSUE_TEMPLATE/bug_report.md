@@ -7,28 +7,35 @@ assignees: ''
 ---
 
 ## Affected Shard
+
 <!-- Which kernel shard is affected? e.g. SovereignNetStack, SovereignGPU -->
 
 ## Description
+
 <!-- A clear description of the bug -->
 
 ## Reproduction Steps
-1. 
-2. 
-3. 
+
+1. Step one
+2. Step two
+3. Step three
 
 ## Expected Behavior
+
 <!-- What should happen -->
 
 ## Actual Behavior
+
 <!-- What actually happens -->
 
 ## Build Environment
-- Architecture: [ ] x86_64 [ ] ARM64 [ ] RISC-V
+
+- Architecture: `[ ] x86_64  [ ] ARM64  [ ] RISC-V`
 - Compiler: `clang++ --version` output
-- sigma-build output:
+- sigma-build output: paste here
 
 ## Logs
-```
+
+```text
 <!-- Paste sigma_log / serial output here -->
 ```

@@ -55,6 +55,7 @@ void SovereignDistributedVFS::close(sigma_u32 fd) {
 }
 
 void SovereignDistributedVFS::writeReplicatedFile(const char* filepath, const char* data) {
+    (void)data;
     this->files_tracked++;
     sigma_printf("[VFS] File '%s' written and replicated across %u distributed shards.\n", 
                  filepath, this->active_shards > 0 ? this->active_shards : 1);

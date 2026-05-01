@@ -686,7 +686,7 @@ body {
 .mkt-desc { font-size: 10px; color: var(--text-muted); margin-bottom: 12px; height: 30px; overflow: hidden; }
 
 /* Wizard Styles */
-.wizard-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); z-index: 5000; display: flex; align-items: center; justify-content: center; -webkit-backdrop-filter: blur(20px); }
+.wizard-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); z-index: 5000; display: flex; align-items: center; justify-content: center; -webkit-backdrop-filter: blur(20px); backdrop-filter: blur(20px); }
 .wizard-box { width: 500px; background: var(--glass-bg); border: 1px solid var(--accent); border-radius: 20px; padding: 40px; text-align: center; box-shadow: 0 0 50px var(--accent-glow); }
 .wizard-step { display: none; }
 .wizard-step.active { display: block; }
@@ -747,6 +747,7 @@ body {
     padding: 20px 40px;
     background: var(--glass-bg);
     -webkit-backdrop-filter: blur(40px);
+    backdrop-filter: blur(40px);
     border: 1px solid var(--accent);
     border-radius: 100px;
     color: white;
@@ -759,4 +760,36 @@ body {
 .search-box:focus {
     width: 700px;
     box-shadow: 0 0 80px var(--accent-glow);
+}
+
+/* =========================================================================
+ * UTILITY CLASSES — extracted from inline styles (index.html)
+ * ========================================================================= */
+
+/* Automator widget progress bar — 75% fill */
+.stat-progress--automator {
+    width: 75%;
+}
+
+/* Hardened status widget progress bar — 100% fill */
+.stat-progress--full {
+    width: 100%;
+}
+
+/* Marketplace / Shard Exchange window content */
+.window-content--padded {
+    padding: 24px;
+    overflow-y: auto;
+}
+
+/* Quantum Customization window content (darker tint) */
+.window-content--customization {
+    padding: 24px;
+    overflow-y: auto;
+    background: rgba(0, 0, 0, 0.3);
+}
+
+/* Onboarding wizard overlay — hidden by default via JS toggle */
+.wizard-overlay--hidden {
+    display: none;
 }

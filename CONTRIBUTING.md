@@ -6,10 +6,13 @@ Thank you for considering a contribution to the **SigmaOS Sovereign Lattice**!
 
 1. **Fork** the repository and create a branch from `main`.
 2. **Build** the project using the deterministic build pipeline:
+
    ```bash
    python3 tools/sigma-build.py
    ```
+
 3. **Run static analysis** before submitting:
+
    ```bash
    cppcheck --enable=warning,style,performance kernel/core/
    ```
