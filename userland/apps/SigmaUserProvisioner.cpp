@@ -1,6 +1,6 @@
-﻿/*
+/*
  * =========================================================================
- * ÃŽÂ£ SIGMAOS ZENITH SUPREME: SOVEREIGN USER PROVISIONER (v1.0)
+ * Î£ SIGMAOS ZENITH SUPREME: SOVEREIGN USER PROVISIONER (v1.0)
  * =========================================================================
  * Mission: Industrial-grade user management and sharding.
  * USP: th-hoffmann/linux-user-provisioning parity.
@@ -26,7 +26,7 @@ void sigma_user_provision(const char* username, sigma_bool make_root) {
 }
 
 void sigma_user_list() {
-    sigma_printf("\nÃŽÂ£ SOVEREIGN USER SHARDS\n");
+    sigma_printf("\nÎ£ SOVEREIGN USER SHARDS\n");
     sigma_printf("-------------------------------------------\n");
     sigma_printf("UID    USERNAME    ROLE    SHARD_ACTIVE\n");
     sigma_printf("-------------------------------------------\n");

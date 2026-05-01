@@ -1,6 +1,6 @@
-﻿/*
+/*
  * =============================================================================
- * ÃŽÂ£ SIGMAOS KERNEL: SOVEREIGN-LIBC (Zero-Dependency)
+ * Î£ SIGMAOS KERNEL: SOVEREIGN-LIBC (Zero-Dependency)
  * =============================================================================
  */
 #include "sigma_kernel_types.h"

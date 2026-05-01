@@ -1,4 +1,4 @@
-﻿#include "Lattice.h"
+#include "Lattice.h"
 #include "ids_shard.hpp"
 #include "SovereignLibC.h"
 
@@ -19,7 +19,7 @@ void SovereignIDS::TriageAnomaly(const char* shard_id, sigma_u32 risk_score) {
 }
 
 void SovereignIDS::Audit() {
-    sigma_printf("\n--- Î£ SOVEREIGN IDS AUDIT ---\n");
+    sigma_printf("\n--- Σ SOVEREIGN IDS AUDIT ---\n");
     sigma_printf("| Threat Level      : %d (Green)\n", m_threat_level);
     sigma_printf("| Alerts Triaged    : %llu\n", m_alerts_triaged);
     sigma_printf("| Mitigation Shard  : AUTO-ACTIVE\n");

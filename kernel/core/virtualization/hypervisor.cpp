@@ -1,4 +1,4 @@
-﻿#include "Lattice.h"
+#include "Lattice.h"
 #include "hypervisor.hpp"
 #include "SovereignLibC.h"
 
@@ -16,7 +16,7 @@ void SovereignHypervisor::PassthroughDevice(const char* device_shard) {
 }
 
 void SovereignHypervisor::Audit() {
-    sigma_printf("\n--- Î£ SOVEREIGN HYPERVISOR AUDIT ---\n");
+    sigma_printf("\n--- Σ SOVEREIGN HYPERVISOR AUDIT ---\n");
     sigma_printf("| Active Guests     : %d\n", m_guest_count);
     sigma_printf("| Hardware VT Shard : ACTIVE\n");
     sigma_printf("| Isolation Mode    : SILICON-HARDENED\n");

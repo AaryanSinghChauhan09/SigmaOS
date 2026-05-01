@@ -1,4 +1,4 @@
-﻿#include "SovereignLibC.h"
+#include "SovereignLibC.h"
 
 namespace SigmaOS {
 namespace Desktop {
@@ -6,14 +6,14 @@ namespace Desktop {
 // --- TERMINAL WINDOW RENDERER ---
 void SovereignTerminalWindow::OnRender() {
     sigma_printf("[UI-ZENITH]: Rasterizing Terminal Shard at (%d, %d)...\n", m_x, m_y);
-    sigma_printf("[UI-ZENITH]: Terminal: ÃŽÂ£://zenith> READY\n");
+    sigma_printf("[UI-ZENITH]: Terminal: Î£://zenith> READY\n");
 }
 
 // --- DESKTOP RENDERER ---
 void SovereignZenithDesktop::RenderDesktop() {
     if (!m_gui_active) return;
     
-    sigma_printf("\n--- ÃŽÂ£ SIGMAOS ZENITH DESKTOP (%s) ---\n", "SOVEREIGN_ZENITH");
+    sigma_printf("\n--- Î£ SIGMAOS ZENITH DESKTOP (%s) ---\n", "SOVEREIGN_ZENITH");
     sigma_printf("[GUI]: Rendering Workspace: [MEMORY] [PROCESS] [CLOUD] [NETWORK]\n");
     sigma_printf("[GUI]: Drawing Icons: [Silberschatz Shard] [Tanenbaum Shard] [xv6 Bridge]\n");
     

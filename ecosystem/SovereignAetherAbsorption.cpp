@@ -1,4 +1,4 @@
-﻿#include "SigmaOOP.hpp"
+#include "SigmaOOP.hpp"
 #include "SovereignLibC.h"
 
 namespace SigmaOS {

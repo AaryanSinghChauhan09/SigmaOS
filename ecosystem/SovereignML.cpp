@@ -1,4 +1,4 @@
-﻿// ÃŽÂ£ SIGMAOS: SOVEREIGN MACHINE LEARNING & DATA SCIENCE (v91.0)
+// Î£ SIGMAOS: SOVEREIGN MACHINE LEARNING & DATA SCIENCE (v91.0)
 // Zero-Dependency Neural & Statistical Matrix Solver (Silicon-Native NPU Sharding)
 
 #include "SigmaOOP.hpp"

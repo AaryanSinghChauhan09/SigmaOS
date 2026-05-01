@@ -52,6 +52,7 @@ public:
 
     bool transmit(const char* payload, sigma_u32 length) {
         if (this->nic_type == NIC_TYPE_UNKNOWN) return false;
+        (void)payload;
         this->tx_packets++;
         sigma_printf("[NIC] TX Packet #%u (%u bytes) sent via DMA ring.\n", this->tx_packets, length);
         return true;

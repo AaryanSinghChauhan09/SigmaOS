@@ -1,4 +1,4 @@
-﻿#include "Lattice.h"
+#include "Lattice.h"
 #include "lattice_pqc.hpp"
 #include "SovereignLibC.h"
 
@@ -41,7 +41,7 @@ void SovereignLatticePQC::encrypt_shard(const void* data, sigma_size_t size) {
 }
 
 void SovereignLatticePQC::audit() {
-    sigma_printf("\n--- Î£ SOVEREIGN PQC AUDIT ---\n");
+    sigma_printf("\n--- Σ SOVEREIGN PQC AUDIT ---\n");
     sigma_printf("| Encryption Engine : LATTICE-RING-LWE\n");
     sigma_printf("| Key ID            : %llx\n", m_key_id);
     sigma_printf("| Total Shards      : %llu\n", m_encryptions);

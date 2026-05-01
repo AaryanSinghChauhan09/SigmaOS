@@ -1,7 +1,7 @@
-﻿#include "SovereignLibC.h"
+#include "SovereignLibC.h"
 /*
  * =========================================================================
- * ÃŽÂ£ SIGMAOS: SOVEREIGN ZENITH (v15.0 - ABSOLUTE FINALITY)
+ * Î£ SIGMAOS: SOVEREIGN ZENITH (v15.0 - ABSOLUTE FINALITY)
  * =========================================================================
  * Author: Sovereign-Zenith-Developer
  * Principles: Zero-Library, Bit-Perfect, Silicon-Integrity, USP-Absorbed.
@@ -12,7 +12,7 @@
 
 
 /**
- * ÃŽÂ£ SIGMA OS: SOVEREIGN SHARD AUR (v3.0 - ROLLING RELEASE BUILD)
+ * Î£ SIGMA OS: SOVEREIGN SHARD AUR (v3.0 - ROLLING RELEASE BUILD)
  * ==============================================================
  * USP Absorbed: Arch Linux (AUR), Pacman (Binary Package), Gentoo (Ports).
  * Capability: Source-to-Shard Binary Synthesis, Shard-Script Metadata.

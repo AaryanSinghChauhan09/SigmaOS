@@ -18,3 +18,4 @@ The pipeline is automatically triggered on every push to the `main` branch. Manu
 ```bash
 make industrial_sync
 ```
+

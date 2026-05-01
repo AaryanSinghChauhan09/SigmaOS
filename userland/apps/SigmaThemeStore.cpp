@@ -1,6 +1,6 @@
-﻿/*
+/*
  * =========================================================================
- * ÃŽÂ£ SIGMAOS ZENITH SUPREME: SOVEREIGN THEME STORE (v1.0)
+ * Î£ SIGMAOS ZENITH SUPREME: SOVEREIGN THEME STORE (v1.0)
  * =========================================================================
  * Absorbing Aesthetics from: LupusOS, EzLinux, and Plasma.
  * Mission: Universal Aesthetic Sharding & Personalization.
@@ -38,7 +38,7 @@ void sigma_theme_apply(const char* name) {
 }
 
 void sigma_theme_list() {
-    sigma_printf("\nÃŽÂ£ SOVEREIGN THEME & PERSONALIZATION STORE\n");
+    sigma_printf("\nÎ£ SOVEREIGN THEME & PERSONALIZATION STORE\n");
     sigma_printf("-------------------------------------------\n");
     for (int i = 0; i < 5; i++) {
         sigma_printf("%-17s %-12s %s\n", 

@@ -90,7 +90,7 @@ Designed for **100% Keyboard Sovereignty**.
 
 ### 5.2 Step-by-Step Installation
 
-1. **Source**: `git clone https://github.com/SigmaOS-Project/SigmaOS.git`
+1. **Source**: `git clone https://github.com/AaryanSinghChauhan09/SigmaOS
 2. **Build Selection**:
    - `make browser` -> Open `index.html` (Zero installation WASM mode).
    - `make vbox` -> Generates `sigmaos.iso` for VirtualBox/QEMU.
@@ -119,3 +119,4 @@ Designed for **100% Keyboard Sovereignty**.
 ---
 
 **Σ SIGMAOS: THE LAW, THE SILICON, THE SOVEREIGN.**
+

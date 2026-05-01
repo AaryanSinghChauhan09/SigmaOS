@@ -1,4 +1,4 @@
-﻿#ifndef SOVEREIGN_OMNI_SHARD_H
+#ifndef SOVEREIGN_OMNI_SHARD_H
 #define SOVEREIGN_OMNI_SHARD_H
 
 #include "SigmaOOP.hpp"

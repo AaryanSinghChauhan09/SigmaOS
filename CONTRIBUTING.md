@@ -23,11 +23,7 @@ All contributions must adhere to the **Sovereign Shard Standard**:
 
 - ✅ Every new kernel component must be a **C++ OOP Singleton** with `extern "C"` wrappers
 
-
-
  ✅ All functions must emit structured log output via `sigma_log()` / `sigma_printf()`
-
-
 
  ✅ New shards must be registered in `SovereignUSR` at init.
 
@@ -35,14 +31,11 @@ All contributions must adhere to the **Sovereign Shard Standard**:
 
 - [ ] Code compiles with `-Wall -Wextra -Werror
 
-
-
  [ ] New shard has a `_init()`, at least one primary function, and C wrapper
-
-
 
  [ ] `MISSING_COMPONENTS.md` updated if a gap is closed
 
 ## Security Issues
 
 Please **do not** open public issues for security vulnerabilities. Read [SECURITY.md](../SECURITY.md) for responsible disclosure guidelines.
+

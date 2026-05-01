@@ -1,4 +1,4 @@
-﻿#ifndef SOVEREIGN_DISK_ZENITH_H
+#ifndef SOVEREIGN_DISK_ZENITH_H
 #define SOVEREIGN_DISK_ZENITH_H
 
 #include "SigmaOOP.hpp"

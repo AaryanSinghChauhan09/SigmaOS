@@ -1,7 +1,7 @@
-﻿#include "SovereignLibC.h"
+#include "SovereignLibC.h"
 /*
  * =========================================================================
- * ÃŽÂ£ SIGMAOS: SOVEREIGN ZENITH (v15.0 - ABSOLUTE FINALITY)
+ * Î£ SIGMAOS: SOVEREIGN ZENITH (v15.0 - ABSOLUTE FINALITY)
  * =========================================================================
  * Author: Sovereign-Zenith-Developer
  * Principles: Zero-Library, Bit-Perfect, Silicon-Integrity, USP-Absorbed.
@@ -10,7 +10,7 @@
 
 /*
  * =========================================================================
- * ÃŽÂ£ SIGMAOS: SOVEREIGN PROCESS ZENITH (v10.0 - ZERO-DEPENDENCY)
+ * Î£ SIGMAOS: SOVEREIGN PROCESS ZENITH (v10.0 - ZERO-DEPENDENCY)
  * =========================================================================
  * Mission: Absolute Process Sovereignty via Ring-0 Native Logic.
  * Principles: 
@@ -103,7 +103,7 @@ public:
     }
 
     void audit_all() {
-        sigma_printf("\n--- ÃŽÂ£ SOVEREIGN PROCESS AUDIT ---\n");
+        sigma_printf("\n--- Î£ SOVEREIGN PROCESS AUDIT ---\n");
         for (auto& proc : m_process_table) {
             sigma_printf("| PID: %-8llu | NAME: %-20s | STATUS: %d\n", 
                 proc->pid(), proc->name(), (int)proc->status());

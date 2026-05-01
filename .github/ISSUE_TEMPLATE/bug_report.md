@@ -32,8 +32,6 @@ assignees: ''
 
 - Architecture: `[ ] x86_64  [ ] ARM64  [ ] RISC-V
 
-
-
  sigma-build output: paste here
 
 ## Logs
@@ -41,3 +39,4 @@ assignees: ''
 ```text
 <!-- Paste sigma_log / serial output here -->
 ```
+

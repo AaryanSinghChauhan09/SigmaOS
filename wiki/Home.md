@@ -38,3 +38,4 @@ The SigmaOS Sovereign Lattice has achieved absolute architectural maturity. The 
 ---
 
 _Σ SIGMAOS: Absolute Mastery. Silicon-Direct. Zero-Dependency._
+

@@ -25,7 +25,7 @@ void SovereignSnapEngine::applyLayout(sigma_u32 layout_id) {
 void SovereignSnapEngine::registerZone(sigma_u32 x, sigma_u32 y,
                                         sigma_u32 w, sigma_u32 h) {
     if (this->active_zone_count < 8u) {
-        void** zone = &this->zones[this->active_zone_count++];
+        sigma_snap_zone_t* zone = &this->zones[this->active_zone_count++];
         zone->id       = this->active_zone_count;
         zone->x        = x;
         zone->y        = y;

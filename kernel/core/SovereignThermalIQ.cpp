@@ -1,7 +1,5 @@
 #include "sigma_types.h"
 #include "sigma_hal.h"
-/*
-
 extern "C" void energysched_set_shard_state(sigma_u32 shard_id, sigma_u32 state);
 
 /**
@@ -10,7 +8,6 @@ extern "C" void energysched_set_shard_state(sigma_u32 shard_id, sigma_u32 state)
  * Design: C-linkage singleton struct (no OOP redefinition).
  */
 
-#define 1 1u
 
 static struct {
     sigma_u32 temp_history[4];

@@ -1,6 +1,6 @@
-﻿/*
+/*
  * =========================================================================
- * ÃŽÂ£ SIGMAOS: SOVEREIGN OMNI-TOOL ZENITH (v26.0 - THE ULTIMATE ABSORPTION)
+ * Î£ SIGMAOS: SOVEREIGN OMNI-TOOL ZENITH (v26.0 - THE ULTIMATE ABSORPTION)
  * =========================================================================
  * Mission: Absorb EVERY competitor USP (Windows, Mac, Linux, Specialized).
  * Capability: Computational Knowledge, Workflow Automation, AR, Financials.
@@ -90,7 +90,7 @@ public:
     }
 
     void audit() {
-        sigma_print("\n--- ÃŽÂ£ SOVEREIGN OMNI-AUDIT (v94.0) ---\n");
+        sigma_print("\n--- Î£ SOVEREIGN OMNI-AUDIT (v94.0) ---\n");
         sigma_print("---------------------------------------\n");
     }
 };

@@ -1,7 +1,7 @@
-﻿#include "SovereignLibC.h"
+#include "SovereignLibC.h"
 /*
  * =========================================================================
- * ÃŽÂ£ SIGMAOS: SOVEREIGN ZENITH (v15.0 - ABSOLUTE FINALITY)
+ * Î£ SIGMAOS: SOVEREIGN ZENITH (v15.0 - ABSOLUTE FINALITY)
  * =========================================================================
  * Author: Sovereign-Zenith-Developer
  * Principles: Zero-Library, Bit-Perfect, Silicon-Integrity, USP-Absorbed.
@@ -11,7 +11,7 @@
 #include "SigmaOOP.hpp"
 
 /**
- * ÃŽÂ£ SIGMA OS: SOVEREIGN CLOUD MAESTRO (v128.0 - ZERO-STD NATIVE)
+ * Î£ SIGMA OS: SOVEREIGN CLOUD MAESTRO (v128.0 - ZERO-STD NATIVE)
  * ==========================================================
  * USP: Shard-to-Cloud Distributed Execution Logic.
  * Capability: Native C++ orchestrator for cross-region "Cloud-Shard Projection".
@@ -66,7 +66,7 @@ public:
     }
 
     void ShowCloudMatrix() const override {
-        sigma_printf("\n--- ÃŽÂ£ SIGMA OS SOVEREIGN CLOUD SHARD MATRIX ---\n");
+        sigma_printf("\n--- Î£ SIGMA OS SOVEREIGN CLOUD SHARD MATRIX ---\n");
         sigma_printf("%-30s | %-15s | %-15s | %s\n", "Shard ID", "Region", "Node IP", "Status");
         sigma_printf("---------------------------------------------------------------------------\n");
         

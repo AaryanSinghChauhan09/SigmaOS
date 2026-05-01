@@ -64,3 +64,4 @@ Ensure your PR description references:
 - The `IDEAS_BACKLOG.md` item or `ROADMAP.md` milestone it closes
 - The `cppcheck` output (zero warnings)
 - A wiki page update in `SigmaOS.wiki/`
+

@@ -1,4 +1,4 @@
-﻿#include "Lattice.h"
+#include "Lattice.h"
 #include "SovereignLibC.h"
 #include "compositor.hpp"
 

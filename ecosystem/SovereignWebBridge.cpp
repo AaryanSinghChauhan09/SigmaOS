@@ -1,7 +1,7 @@
-﻿#include "SovereignLibC.h"
+#include "SovereignLibC.h"
 /*
  * =========================================================================
- * ÃŽÂ£ SIGMAOS: SOVEREIGN WEB BRIDGE (v15.5 - EXTREME FINALITY)
+ * Î£ SIGMAOS: SOVEREIGN WEB BRIDGE (v15.5 - EXTREME FINALITY)
  * =========================================================================
  * Mission: Neutralize all web stacks (Chrome, Firefox, Safari).
  * Capability: Ring-0 Direct-to-Socket Web Sharding. No JS Engine needed.
@@ -32,7 +32,7 @@ public:
     }
 
     void audit() {
-        sigma_printf("\n--- ÃŽÂ£ SOVEREIGN WEB AUDIT (v15.5) ---\n");
+        sigma_printf("\n--- Î£ SOVEREIGN WEB AUDIT (v15.5) ---\n");
         sigma_printf("| Packets Sharded: %u\n", m_packets_sharded);
         sigma_printf("| Buffer Status  : BIT-PERFECT\n");
         sigma_printf("| Competitors    : Chromium/Webkit/Gecko neutralized.\n");

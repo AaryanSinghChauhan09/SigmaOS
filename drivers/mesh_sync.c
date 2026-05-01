@@ -1,6 +1,6 @@
-﻿/*
+/*
  * =============================================================================
- * ÃŽÂ£ SIGMAOS KERNEL: SOVEREIGN-MESH-SYNC (Task Sharing & Distributed Compute)
+ * Î£ SIGMAOS KERNEL: SOVEREIGN-MESH-SYNC (Task Sharing & Distributed Compute)
  * =============================================================================
  * Algorithm: Molt-Lattice Task Offloading (MLTO)
  * Principles:
