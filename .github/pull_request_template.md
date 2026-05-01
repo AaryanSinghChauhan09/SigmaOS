@@ -1,20 +1,36 @@
-# 🌌 Sovereign Pull Request
+---
+name: Pull Request
+about: Submit a new Sovereign Shard or bug fix
+---
 
-**Description:**
-Describe the purpose of this PR and which shard it modifies.
+## Summary
+<!-- One-line description of what this PR does -->
 
-**Industrial Parity Link:**
-Link to the competitor component this PR achieves parity with.
+## Type
+- [ ] New Shard
+- [ ] Bug Fix
+- [ ] Documentation Update
+- [ ] GitHub Actions / CI improvement
 
-**Checklist:**
+## Closes
+<!-- Reference the ROADMAP.md milestone, IDEAS_BACKLOG.md item, or issue number -->
+Closes #
 
-- [ ] **Zero-Dependency Verified**: No external libraries introduced.
-- [ ] **OOP Isolation**: Component is a singleton engine.
-- [ ] **Lint Compliance**: Markdown and Code lints passed.
-- [ ] **Singularity Test**: `make singularity` returns status: ZENITH.
+## Shard Checklist (New Shards Only)
+- [ ] C++ OOP Singleton with `getInstance()`
+- [ ] `extern "C"` wrappers for all public functions
+- [ ] Registered in `SovereignUSR` via `usr_register_shard()`
+- [ ] `cppcheck` passes with zero warnings
+- [ ] Wiki page created or updated in `SigmaOS.wiki/`
+- [ ] `IDEAS_BACKLOG.md` or `MISSING_COMPONENTS.md` updated
 
-**Silicon Architecture Tested:**
+## Bug Fix Checklist
+- [ ] Root cause identified and documented
+- [ ] Regression test described
+- [ ] No new `cppcheck` warnings introduced
 
-- [ ] x86_64
-- [ ] ARM64
-- [ ] RISC-V
+## Testing
+<!-- Describe how you tested this change -->
+
+## Screenshots / Serial Output
+<!-- Paste sigma_log output or screenshots if applicable -->
