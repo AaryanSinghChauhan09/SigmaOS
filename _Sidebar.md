@@ -7,9 +7,9 @@
 - [Security Model](Security.md)
 
 ## 🚀 Roadmap
+- [Expansion Roadmap](EXPANSION_ROADMAP.md)
+- [Future Suggestions](FUTURE_SUGGESTIONS.md)
 - [Phase 4: UX Maturity](Phase_4_UX.md)
-- [Phase 19: Collective Consciousness](Phase_19_Roadmap.md)
-- [Phase 20: Biosphere & Chrono-Sovereignty](Phase_20_Roadmap.md)
 
 ## 🛠️ Development
 - [Shard Development](Shard_Development.md)
@@ -19,6 +19,11 @@
 - [Kernel Module Reference](Kernel_Module_Reference.md)
 - [Developer Guide](Developer_Guide.md)
 - [CLI Reference](CLI_Reference.md)
+
+## 🏛️ Implementation History
+- [Implemented Ideas](IDEAS_IMPLEMENTED.md)
+- [Gap Resolution Log](INDUSTRIAL_GAP_RESOLUTION.md)
+- [Anomaly Resolution Log](ANOMALY_RESOLUTION_LOG.md)
 
 ## 🌍 Community
 - [Contribution](Contribution_Guide.md)
