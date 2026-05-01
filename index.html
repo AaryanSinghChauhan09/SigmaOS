@@ -132,10 +132,22 @@
         </div>
     </div>
 
-    <!-- Central Clock -->
-    <div class="clock-container">
-        <div id="clock-time">00:00</div>
-        <div id="clock-date">Tuesday, April 28</div>
+    <!-- Central Clock & Theme Selector -->
+    <div class="zenith-top-panel">
+        <div class="theme-shards">
+            <div class="theme-shard cyan" onclick="setTheme('cyan')" title="Neon Cyan"></div>
+            <div class="theme-shard gold" onclick="setTheme('gold')" title="Solar Gold"></div>
+            <div class="theme-shard crimson" onclick="setTheme('crimson')" title="Crimson Shard"></div>
+            <div class="theme-shard solar" onclick="setTheme('solar')" title="Adaptive Solar"></div>
+        </div>
+        <div class="clock-container">
+            <div id="clock-time">00:00</div>
+            <div id="clock-date">Tuesday, April 28</div>
+        </div>
+        <div class="persona-indicator" onclick="launchApp('Lattice Settings')">
+            <div class="persona-avatar">Σ</div>
+            <span id="top-user-name">Sovereign_User</span>
+        </div>
     </div>
 
     <!-- Notification Center / Kernel Logs -->
@@ -433,6 +445,17 @@
             <div class="stat-label">Cognitive Sync: 12ms</div>
         </div>
 
+        <!-- NEW: Morphic Automation Widget -->
+        <div class="widget automation" onclick="toggleUtilityNexus()">
+            <div class="widget-title">
+                <span>Morphic Automation</span>
+                <span class="pulse-dot"></span>
+            </div>
+            <div class="stat-value" id="auto-task-count">3 Tasks Active</div>
+            <div class="stat-label">Next: Lattice Sync in 4m</div>
+            <div class="stat-bar"><div class="stat-progress" style="width: 75%"></div></div>
+        </div>
+
         <div class="widget voice">
             <div class="widget-title">
                 <span>Sovereign Voice</span>
@@ -454,9 +477,21 @@
                 <span class="accent">500 Modules</span>
             </div>
             <div class="shard-grid" id="shard-matrix">
-                <!-- 500 Shards injected here -->
+                <!-- Script will inject 600 shards here -->
             </div>
             <div class="stat-label" id="shard-status">Integrity: 100.0%</div>
+        </div>
+
+        <!-- Hardened Status Shard -->
+        <div class="widget">
+            <div class="widget-title">
+                <span>Hardened Status</span>
+                <span class="accent">Lattice v29.0</span>
+            </div>
+            <div class="stat-label">Neural UI: <span id="ui-status" class="status-success">AVX-512 DEDICATED</span></div>
+            <div class="stat-label">VFS Sync: <span id="vfs-status" class="status-success">ZERO DRIFT (PQC)</span></div>
+            <div class="stat-label">S-CLI: <span id="cli-status" class="status-success">AMNESIC (CLEAN)</span></div>
+            <div class="stat-bar"><div class="stat-progress" style="width: 100%"></div></div>
         </div>
     </div>
 
@@ -601,6 +636,103 @@
         </div>
     </div>
 
+    <!-- Marketplace Window -->
+    <div class="window" id="marketplace-win">
+        <div class="window-header">
+            <div class="window-title">Σ Sovereign Marketplace</div>
+            <div class="window-controls">
+                <div class="win-btn minimize" onclick="minimizeWindow('marketplace-win')"></div>
+                <div class="win-btn close" onclick="closeWindow('marketplace-win')"></div>
+            </div>
+        </div>
+        <div class="window-content" style="padding: 24px; overflow-y: auto;">
+            <h3>Sovereign Shard Exchange</h3>
+            <p class="stat-label">Verified PQC bundles ready for lattice injection.</p>
+            <div class="mkt-grid">
+                <div class="mkt-item">
+                    <div class="mkt-icon">🚀</div>
+                    <div class="mkt-name">HyperBoost</div>
+                    <div class="mkt-desc">Sub-10ms context switching shard.</div>
+                    <button class="util-btn" onclick="installShard('HyperBoost')">INJECT</button>
+                </div>
+                <div class="mkt-item">
+                    <div class="mkt-icon">🛡️</div>
+                    <div class="mkt-name">Amnesic-X</div>
+                    <div class="mkt-desc">Zero-trace artifact scrubbing engine.</div>
+                    <button class="util-btn" onclick="installShard('Amnesic-X')">INJECT</button>
+                </div>
+                <div class="mkt-item">
+                    <div class="mkt-icon">🎨</div>
+                    <div class="mkt-name">Glass-Pro</div>
+                    <div class="mkt-desc">Advanced HSL-tailored blurring.</div>
+                    <button class="util-btn" onclick="installShard('Glass-Pro')">INJECT</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Customization Window -->
+    <div class="window" id="customization-win">
+        <div class="window-header">
+            <div class="window-title">✨ Quantum Customization</div>
+            <div class="window-controls">
+                <div class="win-btn minimize" onclick="minimizeWindow('customization-win')"></div>
+                <div class="win-btn close" onclick="closeWindow('customization-win')"></div>
+            </div>
+        </div>
+        <div class="window-content" style="padding: 24px; overflow-y: auto; background: rgba(0,0,0,0.3);">
+            <h3>Sovereign Personalization</h3>
+            <p class="stat-label">Tune the lattice AI-driven aesthetics and automation.</p>
+            <div class="mkt-grid">
+                <div class="mkt-item" onclick="setTheme('gold')">
+                    <div class="mkt-icon">🌞</div>
+                    <div class="mkt-name">Solar Zenith</div>
+                    <div class="mkt-desc">Daylight-adaptive energetic UI.</div>
+                </div>
+                <div class="mkt-item" onclick="setTheme('cyan')">
+                    <div class="mkt-icon">🌌</div>
+                    <div class="mkt-name">Neon Cyber</div>
+                    <div class="mkt-desc">Deep-focus cyan glassmorphism.</div>
+                </div>
+                <div class="mkt-item" onclick="addLog('Σ [AUTO]: Morphic Automation Enabled!', 'success')">
+                    <div class="mkt-icon">🤖</div>
+                    <div class="mkt-name">AI Automator</div>
+                    <div class="mkt-desc">Enable predictive scheduling.</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Onboarding Wizard -->
+    <div class="wizard-overlay" id="wizard-overlay" style="display: none;">
+        <div class="wizard-box">
+            <div class="wizard-step active" id="step-1">
+                <div class="wizard-title">Lattice Ignition</div>
+                <div class="wizard-text">Welcome to the Zenith Supreme Singularity. Choose your operational persona to begin the sovereign handshake.</div>
+                <div class="wizard-options">
+                    <div class="wizard-option" onclick="selectPersona('Sovereign')">
+                        <strong>Sovereign</strong>
+                        <div class="stat-label">Full administrative lattice control.</div>
+                    </div>
+                    <div class="wizard-option" onclick="selectPersona('Amnesic')">
+                        <strong>Amnesic</strong>
+                        <div class="stat-label">Zero-persistence, secure execution.</div>
+                    </div>
+                    <div class="wizard-option" onclick="selectPersona('Industrial')">
+                        <strong>Industrial</strong>
+                        <div class="stat-label">Hardened production stability.</div>
+                    </div>
+                </div>
+                <button class="util-btn" onclick="nextStep(2)">INITIALIZE HANDSHAKE</button>
+            </div>
+            <div class="wizard-step" id="step-2">
+                <div class="wizard-title">Handshake Complete</div>
+                <div class="wizard-text">The silicon lattice is now aligned with your persona. 600 shards are active.</div>
+                <button class="util-btn" onclick="completeWizard()">ENTER SINGULARITY</button>
+            </div>
+        </div>
+    </div>
+
     <!-- Desktop Icons -->
     <div class="desktop-icons">
         <div class="app-icon">
@@ -634,7 +766,8 @@
         <div class="task-icon">🖥️</div>
         <div class="task-icon" onclick="launchApp('Markup Forge')">📄</div>
         <div class="task-icon" onclick="launchApp('Utility Nexus')">🛠️</div>
-        <div class="task-icon">🔌</div>
+        <div class="task-icon" onclick="launchApp('Marketplace')">🛒</div>
+        <div class="task-icon" onclick="launchApp('Customization Panel')">✨</div>
         <div class="taskbar-divider"></div>
         <div class="task-icon">🔔</div>
         <div class="task-icon">🔋</div>
@@ -672,7 +805,13 @@
 
         function setTheme(name) {
             document.body.className = name === 'cyan' ? '' : 'theme-' + name;
-            addLog(`Σ [CONFIG]: Theme switched to ${name.toUpperCase()}.`, 'success');
+            const status = name.toUpperCase();
+            addLog(`Σ [CONFIG]: Shard Theme switched to ${status}.`, 'success');
+            
+            // Sync Persona Indicator
+            const personaLabel = document.getElementById('persona-theme');
+            if (personaLabel) personaLabel.textContent = `Theme: ${status}`;
+            
             cmdPalette.classList.remove('active');
         }
 
@@ -738,9 +877,56 @@
                 const win = document.getElementById('utility-nexus-win');
                 win.style.display = 'block';
                 win.style.zIndex = '2000';
+            } else if (app === 'Marketplace') {
+                const win = document.getElementById('marketplace-win');
+                win.style.display = 'block';
+                win.style.zIndex = '2000';
+            } else if (app === 'Customization Panel') {
+                const win = document.getElementById('customization-win');
+                win.style.display = 'block';
+                win.style.zIndex = '2000';
             }
             toggleStart();
         }
+
+        // Marketplace Logic
+        function installShard(name) {
+            addLog(`Σ [PKG]: Fetching ${name} bundle...`, "success");
+            setTimeout(() => {
+                addLog(`Σ [PKG]: ${name} injected into lattice.`, "success");
+                if (name === 'Glass-Pro') {
+                    document.body.style.backdropFilter = 'blur(40px)';
+                    addLog("Σ [CONFIG]: AVX-512 Shard Preempted for Glass-Pro.", "success");
+                }
+            }, 1000);
+        }
+
+        // Wizard Logic
+        function selectPersona(p) {
+            document.querySelectorAll('.wizard-option').forEach(opt => opt.classList.remove('selected'));
+            event.currentTarget.classList.add('selected');
+            document.getElementById('top-user-name').textContent = p + '_User';
+            document.getElementById('menu-user-name').textContent = p + '_User';
+            addLog(`Σ [IDENTITY]: Persona set to ${p}.`, "success");
+        }
+
+        function nextStep(s) {
+            document.querySelectorAll('.wizard-step').forEach(step => step.classList.remove('active'));
+            document.getElementById('step-' + s).classList.add('active');
+        }
+
+        function completeWizard() {
+            document.getElementById('wizard-overlay').style.display = 'none';
+            addLog("Σ [ZENITH]: Zenith Singularity Fully Initialized.", "success");
+        }
+
+        // Auto-show wizard if not shown
+        window.addEventListener('load', () => {
+            if (!localStorage.getItem('sigma_onboarded')) {
+                document.getElementById('wizard-overlay').style.display = 'flex';
+                localStorage.setItem('sigma_onboarded', 'true');
+            }
+        });
 
         function checkStatus() {
             const url = document.getElementById('status-url').value;
@@ -1160,11 +1346,12 @@
             }
         }, 2000);
 
-        // Inject 500 Shards
+        // Inject 600 Shards for Zenith Singularity
         const matrix = document.getElementById('shard-matrix');
-        for (let i = 0; i < 500; i++) {
+        for (let i = 0; i < 600; i++) {
             const dot = document.createElement('div');
             dot.className = 'shard-dot';
+            if (Math.random() > 0.95) dot.classList.add('active');
             matrix.appendChild(dot);
         }
     </script>
