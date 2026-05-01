@@ -37,7 +37,7 @@ KERNEL_SHARDS = kernel/core/system/SovereignMain.o \
                 kernel/core/security/SovereignEntropy.o \
                 kernel/core/security/SovereignAudit.o \
                 kernel/core/ai/SovereignNeuralNexus.o \
-                kernel/shards/SovereignLibC.o \
+                kernel/shards/system/SovereignLibC.o \
                 kernel/core/misc/SovereignTests.o
 
 .PHONY: all singularity zenith-iso qemu clean
