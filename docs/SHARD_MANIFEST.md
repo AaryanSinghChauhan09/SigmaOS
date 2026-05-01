@@ -46,4 +46,4 @@ This document indexes the atomic silicon shards that compose the **SigmaOS Sover
 
 ---
 
-*Σ SIGMAOS: 100% Modular. 100% Sovereign. 100% Industrial.*
+_Σ SIGMAOS: 100% Modular. 100% Sovereign. 100% Industrial._

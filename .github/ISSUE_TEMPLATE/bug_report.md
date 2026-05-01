@@ -3,8 +3,7 @@ name: Bug report
 about: Create a report to help us improve the sovereign lattice.
 title: "[BUG] <Short description>"
 labels: bug, shard-issue
-assignees: ''
-
+assignees: ""
 ---
 
 **Shard ID affected:**

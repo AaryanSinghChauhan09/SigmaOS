@@ -36,4 +36,5 @@ The SigmaOS Sovereign Lattice has achieved absolute architectural maturity. The 
 - [Legal Engine Shard](Legal-Engine)
 
 ---
-*Σ SIGMAOS: Absolute Mastery. Silicon-Direct. Zero-Dependency.*
+
+_Σ SIGMAOS: Absolute Mastery. Silicon-Direct. Zero-Dependency._

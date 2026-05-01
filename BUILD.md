@@ -16,20 +16,25 @@ To build and run SigmaOS, you need the following tools:
 ## 🛠️ Build Instructions
 
 ### 1. Clean previous builds
+
 ```bash
 make clean
 ```
 
 ### 2. Build the kernel singularity
+
 ```bash
 make singularity
 ```
+
 This will generate `sigmaos.bin` in the root directory.
 
 ### 3. Generate a bootable ISO
+
 ```bash
 make zenith-iso
 ```
+
 This requires an `iso_root` directory with the appropriate GRUB configuration.
 
 ## 🚀 Running in Emulation
@@ -41,6 +46,7 @@ make qemu
 ```
 
 ### Serial Debugging
+
 Kernel logs are piped to `stdio` (serial port 0). You can monitor the boot sequence and shard initialization directly in your terminal.
 
 ## 🔍 Static Analysis
@@ -53,4 +59,4 @@ cppcheck --enable=warning,style,performance -Iinclude kernel/
 
 ---
 
-*Σ SIGMAOS: Sovereign Build System. Absolute Integrity.*
+_Σ SIGMAOS: Sovereign Build System. Absolute Integrity._

@@ -11,36 +11,59 @@
 
 #define INPUT_BUFFER_SIZE 64
 
-static sigma_key_event_t event_queue[INPUT_BUFFER_SIZE];
-static sigma_u32 queue_head = 0;
-static sigma_u32 queue_tail = 0;
+class SovereignInputEngine {
+public:
+    static SovereignInputEngine& getInstance() {
+        static SovereignInputEngine instance;
+        return instance;
+    }
+
+    void init() {
+        sigma_log("[INPUT] Sovereign SII Initialized. Interrupt vectors mapped.");
+    }
+
+    void pushEvent(sigma_key_event_t* event) {
+        // PKB (Predictive Key-Event Buffering) Algorithm
+        // Uses a wait-free ring buffer for interrupt-safe event ingestion.
+        
+        sigma_u32 next_head = (this->queue_head + 1) % INPUT_BUFFER_SIZE;
+        if (next_head == this->queue_tail) {
+            sigma_log("[INPUT] [WARNING] Input queue overflow. Event dropped.");
+            return;
+        }
+        
+        this->event_queue[this->queue_head] = *event;
+        this->queue_head = next_head;
+        
+        sigma_printf("[INPUT] SII: Key Event Captured (Scancode: %02X, State: %d)\n", 
+                     event->scancode, event->state);
+    }
+
+    bool popEvent(sigma_key_event_t* out_event) {
+        if (this->queue_head == this->queue_tail) return SIGMA_FALSE;
+        
+        *out_event = this->event_queue[this->queue_tail];
+        this->queue_tail = (this->queue_tail + 1) % INPUT_BUFFER_SIZE;
+        
+        return SIGMA_TRUE;
+    }
+
+private:
+    SovereignInputEngine() : queue_head(0), queue_tail(0) {}
+    
+    sigma_key_event_t event_queue[INPUT_BUFFER_SIZE];
+    sigma_u32 queue_head;
+    sigma_u32 queue_tail;
+};
 
 extern "C" void input_init() {
-    sigma_log("[INPUT] Sovereign SII Initialized. Interrupt vectors mapped.");
+    SovereignInputEngine::getInstance().init();
 }
 
 extern "C" void input_push_event(sigma_key_event_t* event) {
-    // PKB (Predictive Key-Event Buffering) Algorithm
-    // Uses a wait-free ring buffer for interrupt-safe event ingestion.
-    
-    sigma_u32 next_head = (queue_head + 1) % INPUT_BUFFER_SIZE;
-    if (next_head == queue_tail) {
-        sigma_log("[INPUT] [WARNING] Input queue overflow. Event dropped.");
-        return;
-    }
-    
-    event_queue[queue_head] = *event;
-    queue_head = next_head;
-    
-    sigma_printf("[INPUT] SII: Key Event Captured (Scancode: %02X, State: %d)\n", 
-                 event->scancode, event->state);
+    SovereignInputEngine::getInstance().pushEvent(event);
 }
 
 extern "C" bool input_pop_event(sigma_key_event_t* out_event) {
-    if (queue_head == queue_tail) return SIGMA_FALSE;
-    
-    *out_event = event_queue[queue_tail];
-    queue_tail = (queue_tail + 1) % INPUT_BUFFER_SIZE;
-    
-    return SIGMA_TRUE;
+    return SovereignInputEngine::getInstance().popEvent(out_event);
 }

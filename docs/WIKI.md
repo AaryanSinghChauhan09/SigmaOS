@@ -139,13 +139,13 @@ The following core shards form the foundation of the Sovereign Lattice:
 
 ## 🏆 Competitive Dominance Analysis
 
-| Feature | SigmaOS | Legacy OS (Linux/NT) | Competitor Shards |
-| :--- | :--- | :--- | :--- |
-| **Architecture** | 500-Shard Lattice | Monolithic/Hybrid | Experimental |
-| **Security** | Post-Quantum (PQC) | Pre-Quantum (AES/RSA) | Limited |
-| **Resilience** | Self-Healing Shadow Lattice | Manual Recovery | basic |
-| **AI Integration** | Silicon-Native TPU Shards | Userspace Libraries | N/A |
-| **Governance** | Sovereign Decentralized | Centralized Corporate | Community-only |
+| Feature            | SigmaOS                     | Legacy OS (Linux/NT)  | Competitor Shards |
+| :----------------- | :-------------------------- | :-------------------- | :---------------- |
+| **Architecture**   | 500-Shard Lattice           | Monolithic/Hybrid     | Experimental      |
+| **Security**       | Post-Quantum (PQC)          | Pre-Quantum (AES/RSA) | Limited           |
+| **Resilience**     | Self-Healing Shadow Lattice | Manual Recovery       | basic             |
+| **AI Integration** | Silicon-Native TPU Shards   | Userspace Libraries   | N/A               |
+| **Governance**     | Sovereign Decentralized     | Centralized Corporate | Community-only    |
 
 ---
 
@@ -293,4 +293,4 @@ Integrated with the **Sovereign Neural Engine**, the vision system provides real
 
 ---
 
-*Σ SIGMAOS: Absolute Mastery. Silicon-Direct. Zero-Dependency. Aware.*
+_Σ SIGMAOS: Absolute Mastery. Silicon-Direct. Zero-Dependency. Aware._

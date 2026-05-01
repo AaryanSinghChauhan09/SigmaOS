@@ -3,8 +3,7 @@ name: Feature request
 about: Propose a new shard or industrial parity expansion.
 title: "[FEAT] <Short description>"
 labels: enhancement, new-shard
-assignees: ''
-
+assignees: ""
 ---
 
 **Industrial Parity Target:**

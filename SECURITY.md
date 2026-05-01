@@ -23,4 +23,4 @@ handshake vulnerability:
 
 ---
 
-*Σ SIGMAOS: Secure by Design. Absolute Sovereignty.*
+_Σ SIGMAOS: Secure by Design. Absolute Sovereignty._

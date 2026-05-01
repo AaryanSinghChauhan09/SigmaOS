@@ -100,13 +100,13 @@ Designed for **100% Keyboard Sovereignty**.
 
 ## 📉 6. COMPETITIVE ANALYSIS (Vs Linux Distros)
 
-| Feature | Linux (Ubuntu/Arch) | SigmaOS Sovereign |
-| :--- | :--- | :--- |
-| **Kernel Type** | Monolithic | Atomic Micro-Shard |
-| **Dependency** | High (Glibc/Std) | Zero (Sovereign-LibC) |
-| **Legal Logic** | None | Kernel-Native SLAC v3.0 |
-| **Task Sharing** | External (P2P) | Kernel-Native Mesh-Sync |
-| **Privacy** | App-Level | Silicon-Level (Amnesia) |
+| Feature          | Linux (Ubuntu/Arch) | SigmaOS Sovereign       |
+| :--------------- | :------------------ | :---------------------- |
+| **Kernel Type**  | Monolithic          | Atomic Micro-Shard      |
+| **Dependency**   | High (Glibc/Std)    | Zero (Sovereign-LibC)   |
+| **Legal Logic**  | None                | Kernel-Native SLAC v3.0 |
+| **Task Sharing** | External (P2P)      | Kernel-Native Mesh-Sync |
+| **Privacy**      | App-Level           | Silicon-Level (Amnesia) |
 
 ---
 

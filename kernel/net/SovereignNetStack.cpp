@@ -22,7 +22,7 @@ void SovereignNetStackEngine::init(const sigma_net_config_t* config) {
     sigma_log("[NET] TCP/IP Stack: ACTIVE. S-Firewall: ENFORCING.");
 }
 
-void SovereignNetStackEngine::sendPacket(const void* data, sigma_u32 len) {
+void SovereignNetStackEngine::sendPacket(const void* data, sigma_u32 len) { (void)data; {
     if (!this->initialized) return;
     
     // Simulate TCP/IP encapsulation
@@ -33,7 +33,7 @@ void SovereignNetStackEngine::sendPacket(const void* data, sigma_u32 len) {
     this->packets_sent++;
 }
 
-void SovereignNetStackEngine::receivePacket(void* buffer, sigma_u32* len) {
+void SovereignNetStackEngine::receivePacket(void* buffer, sigma_u32* len) { (void)buffer; {
     if (!this->initialized) return;
     
     // Firewall packet filtering
@@ -61,11 +61,11 @@ extern "C" void net_init(const sigma_net_config_t* config) {
     SovereignNetStackEngine::getInstance().init(config);
 }
 
-extern "C" void net_send_packet(const void* data, sigma_u32 len) {
+extern "C" void net_send_packet(const void* data, sigma_u32 len) { (void)data; {
     SovereignNetStackEngine::getInstance().sendPacket(data, len);
 }
 
-extern "C" void net_receive_packet(void* buffer, sigma_u32* len) {
+extern "C" void net_receive_packet(void* buffer, sigma_u32* len) { (void)buffer; {
     SovereignNetStackEngine::getInstance().receivePacket(buffer, len);
 }
 

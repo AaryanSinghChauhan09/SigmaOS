@@ -17,12 +17,12 @@ The GitHub Wiki uses a specific slug format. All relative links must point to th
 
 ## 📄 Page Population Matrix
 
-| Wiki Page Name | Source File (Main Repo) |
-| :--- | :--- |
-| **Home** | `README.md` (Modularized) |
-| **API Reference** | `docs/API_REFERENCE.md` |
-| **CI Pipeline** | `docs/CI_PIPELINE.md` |
-| **Sovereign Shards** | `os_guide.md` |
+| Wiki Page Name       | Source File (Main Repo)   |
+| :------------------- | :------------------------ |
+| **Home**             | `README.md` (Modularized) |
+| **API Reference**    | `docs/API_REFERENCE.md`   |
+| **CI Pipeline**      | `docs/CI_PIPELINE.md`     |
+| **Sovereign Shards** | `os_guide.md`             |
 
 ## 🚀 Automation Shard
 
