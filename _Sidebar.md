@@ -28,3 +28,4 @@
 ## 🌍 Community
 - [Contribution](Contribution_Guide.md)
 - [Competitor Analysis](Competitor_Analysis.md)
+- [daedalOS Inspiration](daedalOS_INSPIRATION.md)
