@@ -9,6 +9,7 @@
 
 extern "C" sigma_ssize_t sigma_write(int fd, const void* buf, sigma_size_t count) {
     const char* data = (const char*)buf;
+    (void)fd;
     
     // We ignore fd for now and send everything to COM1
     for (sigma_size_t i = 0; i < count; i++) {

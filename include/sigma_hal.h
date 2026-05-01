@@ -77,10 +77,6 @@ static inline void serial_putc(char c) {
 #endif
 
 
-sigma_u32 time_get_uptime_ms(void);
-
-
-bool sigma_streq(const char* s1, const char* s2);
 
 #endif /* SIGMA_HAL_H */
 

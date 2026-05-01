@@ -25,7 +25,7 @@ public:
         // ISM (Isolated Service Mediation) Algorithm
         // Orchestrates shard execution within restricted silicon memory domains.
         
-        sigma_printf("[MICRO] ISM: Spawning Isolated Shard S%02d in Context %d...\n", shard_id, (int)context);
+        sigma_printf("[MICRO] ISM: Spawning Isolated Shard S%02d...\n", shard_id);
         
         // Simulate silicon-native domain setup
         sigma_log("[MICRO] ISM: Page Directory Isolation COMPLETE.");
@@ -36,6 +36,7 @@ public:
 
     void mediateIPC(uint32_t source_id, uint32_t target_id, void* msg) {
         // ISM: Mediates all cross-shard communication to ensure zero-bypass security.
+        (void)msg;
         sigma_printf("[MICRO] ISM: Mediating IPC (S%02d -> S%02d) [SECURE].\n", source_id, target_id);
     }
 

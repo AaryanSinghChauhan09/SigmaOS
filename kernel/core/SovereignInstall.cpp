@@ -24,6 +24,7 @@ public:
     void execute() {
         sigma_log("[INSTALL] ABMD: Scanning for silicon targets...");
         sigma_log("[INSTALL] ABMD: Target disk identified (0x80). Preparing sovereign partition...");
+        this->target_disk = 0x80;
         
         for (sigma_u32 i = 0u; i <= 100u; i += 25u) {
             this->progress = i;

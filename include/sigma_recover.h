@@ -4,7 +4,7 @@
 #ifdef __cplusplus
 extern "C" {
 #endif
-typedef struct { sigma_u32 error_code; sigma_u32 recovery_attempts; } sigma_recovery_state_t;
+typedef sigma_u32 sigma_recovery_state_t;
 #ifdef __cplusplus
 }
 #endif

@@ -1,5 +1,6 @@
 #include "sigma_types.h"
 #include "sigma_pqc.h"
+#include "sigma_mem.h"
 #include "sigma_hal.h"
 
 /**
@@ -34,6 +35,7 @@ public:
     bool verifyShard(sigma_u32 shard_id, const sigma_u8* signature) {
         sigma_printf("[PQC] LBSV: Verifying Shard S%02u integrity...\n", (unsigned)shard_id);
         
+        (void)signature;
         /* Simulate complex lattice-math verification */
         sigma_log("[PQC] LBSV: Quantum-Resistant Integrity VERIFIED.");
         this->verified_shards++;

@@ -41,7 +41,7 @@ public:
         this->mounted = false;
     }
 
-    int readFile(const char* path, void* buffer, uint32_t size) { (void)buffer; {
+    int readFile(const char* path, void* buffer, uint32_t size) { (void)buffer;
         if (!this->mounted) {
             sigma_log("[FAT32] [ERROR] Cannot read file: volume not mounted.");
             return -1;
@@ -76,6 +76,6 @@ extern "C" void fat32_unmount() {
     SovereignFAT32Engine::getInstance().unmount();
 }
 
-extern "C" int fat32_read_file(const char* path, void* buffer, uint32_t size) { (void)buffer; {
+extern "C" int fat32_read_file(const char* path, void* buffer, uint32_t size) { (void)buffer;
     return SovereignFAT32Engine::getInstance().readFile(path, buffer, size);
 }

@@ -19,7 +19,7 @@ public:
 
     void init() {
         sigma_log("[BOOT] Initializing Sovereign System Boot Nexus (SSB Algorithm)...");
-        this->current_stage = SIGMA_BOOT_GENESIS;
+        this->current_stage = SIGMA_BOOT_STAGE_INIT;
         this->initialized = 1u;
     }
 
@@ -27,7 +27,7 @@ public:
         /* SSB (Secure Shard Bootstrapping) Algorithm
          * Verifies and ignites the 600-shard modular lattice in topological order. */
         
-        this->current_stage = SIGMA_BOOT_LATTICE_IGNITION;
+        this->current_stage = SIGMA_BOOT_STAGE_KERNEL;
         sigma_log("[BOOT] SSB: Commencing Secure Shard Ignition sequence...");
         
         for (sigma_u32 i = 1u; i <= 600u; i++) {
@@ -39,14 +39,14 @@ public:
         }
         
         sigma_log("[BOOT] SSB: Global Lattice Ignition COMPLETE.");
-        this->current_stage = SIGMA_BOOT_USERLAND_READY;
+        this->current_stage = SIGMA_BOOT_STAGE_USERLAND;
     }
 
     sigma_boot_stage_t getCurrentStage() const { return this->current_stage; }
     sigma_u32 getIgnitedCount() const { return this->ignited_shards; }
 
 private:
-    SovereignBootEngine() : current_stage(SIGMA_BOOT_GENESIS), ignited_shards(0), initialized(0) {}
+    SovereignBootEngine() : current_stage(SIGMA_BOOT_STAGE_INIT), ignited_shards(0), initialized(0) {}
     
     sigma_boot_stage_t current_stage;
     sigma_u32          ignited_shards;

@@ -1,5 +1,6 @@
 #include "sigma_types.h"
 #include "sigma_hal.h"
+#include "SovereignLibC.h"
 
 /**
  * SigmaOS Sovereign Theme Engine
