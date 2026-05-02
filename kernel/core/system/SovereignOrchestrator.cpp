@@ -38,6 +38,7 @@ extern "C" {
     void webapp_bridge_init();
     void posix_init();
     void cloud_orch_init();
+    void cloud_init_shard();
     void driver_transpiler_init();
     void perf_init();
     void snap_init();
@@ -112,6 +113,7 @@ public:
         webapp_bridge_init(); // Orbital WebApp Injection active
         posix_init(); // POSIX Emulation active
         cloud_orch_init(); // Multi-Node Cloud Orchestration active
+        cloud_init_shard(); // Sovereign Cloud Extension active
         driver_transpiler_init(); // Legacy Driver Translation active
         perf_init(); // Performance Profiling active
         snap_init(); // Dynamic Shard-Snapping active
