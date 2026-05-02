@@ -27,6 +27,7 @@ extern "C" {
     void diag_init();
     void ipc_init();
     void shmem_init();
+    void virtio_init();
     void hyper_init();
     void peripheral_init();
     void neural_init();
@@ -99,6 +100,7 @@ public:
         persistence_init();
         ipc_init(); // Initialize IPC before neural systems
         shmem_init(); // Initialize Zero-Copy Shared Memory
+        virtio_init(); // Initialize High-Speed Virtualization
         peripheral_init(); // Initialize Hot-Swap Orchestrator
         hyper_init(); // Initialize Hypervisor for shard isolation
         neural_init(); // Initialize Neural Nexus (S-NPU)
