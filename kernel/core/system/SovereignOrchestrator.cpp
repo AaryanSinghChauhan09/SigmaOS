@@ -40,6 +40,7 @@ extern "C" {
     void driver_transpiler_init();
     void perf_init();
     void snap_init();
+    void power_init();
 }
 
 /**
@@ -75,6 +76,7 @@ public:
         diag_init(); // Initialize diagnostics early
         allocator_init();
         silicon_init_transpiler(); // Initialize native ISA translation
+        power_init(); // Initialize Power Management
         pmm_init_shard(128 * 1024 * 1024); 
         vmm_init_shard();
         

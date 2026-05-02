@@ -137,6 +137,16 @@ Despite achieving the Sovereign Singularity, SigmaOS currently faces severe disa
 - **SigmaOS Status**: SigmaOS is "Sovereign-Centric," optimized for a single owner via the `SovereignIdentityManager`.
 - **Impact**: While providing superior privacy, the absence of a **"Sovereign identity management"** (Item 13) framework for multi-user, multi-tenant enterprise environments remains a significant barrier for adoption in large-scale corporate IT departments.
 
+### 3.23 Lack of Dynamic Power Scaling (DVFS/P-States Gap)
+- **The Disadvantage**: Industrial OSs like Linux and Windows support sophisticated Dynamic Voltage and Frequency Scaling (DVFS) and Intel/AMD P-States to optimize performance-per-watt.
+- **SigmaOS Status**: The `SovereignPowerManager` currently provides static ACPI-lite sleep state control.
+- **Impact**: Without native **"Silicon sleep states"** (Item 37) and active frequency scaling, SigmaOS may suffer from higher energy consumption in mobile or edge-computing scenarios compared to mature competitors.
+
+### 3.24 Lack of Standardized Peripheral ABI (CUPS/USB-HID Gap)
+- **The Disadvantage**: Support for the vast ecosystem of printers, scanners, and legacy USB-HID devices depends on mature stacks like CUPS and universal HID drivers.
+- **SigmaOS Status**: Peripherals must be re-implemented as specific shards.
+- **Impact**: The absence of a **"Universal Peripheral Shard"** means that hardware compatibility for consumer-grade electronics remains significantly behind industrial distributions.
+
 ## 4. Mitigation Strategies for Phase 50+
 
 To evolve from a theoretical Sovereign Lattice into a viable industrial competitor, the following mitigations are mandatory:
