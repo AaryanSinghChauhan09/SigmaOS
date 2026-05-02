@@ -12,6 +12,14 @@
         rel="stylesheet">
     <link rel="stylesheet" href="zenith_desktop.css">
     <style>
+        @keyframes shatter {
+            0% { transform: scale(1) rotate(0); opacity: 1; filter: blur(0); }
+            100% { transform: scale(1.2) rotate(10deg); opacity: 0; filter: blur(20px); }
+        }
+        .shattering {
+            animation: shatter 0.4s forwards ease-in;
+            pointer-events: none;
+        }
         .focus-mode-active .desktop-overlay {
             background: rgba(0,0,0,0.8);
             backdrop-filter: grayscale(1);
@@ -75,8 +83,36 @@
         }
         function closeWindow(id) {
             const win = document.getElementById(id);
-            win.remove();
+            win.classList.add('shattering');
+            setTimeout(() => win.remove(), 400);
         }
+
+        /* Σ Zenith Window Manager (ZenithWM) Logic */
+        class ZenithWM {
+            constructor() {
+                this.windows = [];
+                this.topZ = 1000;
+            }
+            register(id) {
+                const win = document.getElementById(id);
+                if (!win) return;
+                this.windows.push(win);
+                win.addEventListener('mousedown', () => this.bringToFront(win));
+            }
+            bringToFront(win) {
+                this.topZ++;
+                win.style.zIndex = this.topZ;
+            }
+            tileAll() {
+                const width = window.innerWidth / this.windows.length;
+                this.windows.forEach((win, i) => {
+                    win.style.width = `${width - 20}px`;
+                    win.style.left = `${i * width + 10}px`;
+                    win.style.top = '100px';
+                });
+            }
+        }
+        const wm = new ZenithWM();
     </script>
 </head>
 
