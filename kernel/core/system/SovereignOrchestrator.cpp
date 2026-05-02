@@ -26,6 +26,7 @@ extern "C" {
     void ipc_init();
     void hyper_init();
     void neural_init();
+    void pqc_init();
 }
 
 /**
@@ -77,6 +78,7 @@ public:
         sigma_log("Σ [ORCHESTRATOR]: Initiating Lattice Phase 3 (Security)...");
         vault_init();
         sel_init();
+        pqc_init(); // Post-Quantum Cryptography active
         qkd_init(); // Quantum-Key Distribution active
         mesh_init(); // Mesh-First Protocol active
         
