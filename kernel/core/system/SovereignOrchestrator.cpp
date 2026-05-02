@@ -30,6 +30,7 @@ extern "C" {
     void hyper_init();
     void neural_init();
     void pqc_init();
+    void qkd_init();
     void netstack_init();
     void cryptostack_init();
     void audit_init();
@@ -109,6 +110,7 @@ public:
         sechardener_init();
         identity_init(); // Identity and Access Management active
         cryptostack_init(); // Legacy Cryptographic Parity active
+        qkd_init(); // Quantum Key Distribution active
         audit_init(); // Tamper-Proof Auditing active
         verifier_init(); // Formal Verification active
         pqc_init(); // Post-Quantum Cryptography active
