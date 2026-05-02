@@ -40,12 +40,13 @@ public:
         sigma_log("Σ [DNA-COMP]: Integrity Verified. Shard is 100.0% Sovereign.");
     }
 
-    sigma_size_t compress(const void* input, sigma_size_t in_size, void* output) {
+    sigma_size_t encode(const void* input, sigma_size_t in_size, void* output, sigma_usize* out_size) {
         sigma_log("Σ [DNA-COMP]: Sequencing data into nucleotide shards...");
         // Simulated DNA-encoding (4:1 compression ratio)
-        sigma_size_t out_size = in_size / 4;
-        sigma_memcpy(output, input, out_size); 
-        return out_size;
+        sigma_size_t res = in_size / 4;
+        if (output) sigma_memcpy(output, input, res); 
+        if (out_size) *out_size = res;
+        return res;
     }
 
     void audit() {
