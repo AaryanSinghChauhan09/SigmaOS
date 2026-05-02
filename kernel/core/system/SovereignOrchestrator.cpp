@@ -26,6 +26,7 @@ extern "C" {
     void time_init();
     void diag_init();
     void ipc_init();
+    void shmem_init();
     void hyper_init();
     void neural_init();
     void pqc_init();
@@ -91,6 +92,7 @@ public:
         dna_init();
         persistence_init();
         ipc_init(); // Initialize IPC before neural systems
+        shmem_init(); // Initialize Zero-Copy Shared Memory
         hyper_init(); // Initialize Hypervisor for shard isolation
         neural_init(); // Initialize Neural Nexus (S-NPU)
         netstack_init(); // Initialize Sovereign Network Stack

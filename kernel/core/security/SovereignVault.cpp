@@ -42,19 +42,14 @@ public:
     void store(const char* key, const void* secret, sigma_usize size) {
         (void)secret;
         (void)size;
-        sigma_printf("Î£ [VAULT]: Storing Shard Secret '%s' in PQC-Vault...\n", key);
+        sigma_printf("Σ [VAULT]: Storing Shard Secret '%s' in PQC-Vault...\n", key);
     }
 
     void* retrieve(const char* key, sigma_usize* out_size) {
-        (void)out_size;
-        sigma_printf("Î£ [VAULT]: Retrieving Shard Secret '%s'...\n", key);
-        return SIGMA_NULL;
-    }
-
-    const void* retrieve(const char* key, sigma_u32* out_size) {
         if (!m_is_unlocked) return SIGMA_NULL;
-        sigma_printf("[VAULT] ZKEP: Decrypting '%s' from enclave.\n", key);
-        return SIGMA_NULL; 
+        sigma_printf("Σ [VAULT]: Retrieving Shard Secret '%s'...\n", key);
+        if (out_size) *out_size = 0;
+        return SIGMA_NULL;
     }
 
 private:
