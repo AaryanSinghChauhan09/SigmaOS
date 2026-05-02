@@ -43,6 +43,7 @@ extern "C" {
     void webapp_bridge_init();
     void posix_init();
     void media_init();
+    void accessibility_init();
     void cloud_orch_init();
     void cloud_init_shard();
     void driver_transpiler_init();
@@ -122,6 +123,7 @@ public:
         ai_persona_init(); // Neural Adaptation active
         model_man_init(); // AI Model Orchestration active
         media_init(); // Hardware-Accelerated Media active
+        accessibility_init(); // Inclusive Orchestration active
         webapp_bridge_init(); // Orbital WebApp Injection active
         posix_init(); // POSIX Emulation active
         cloud_orch_init(); // Multi-Node Cloud Orchestration active
