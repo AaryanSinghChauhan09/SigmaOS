@@ -1,6 +1,8 @@
 #include "../../../include/sigma_types.h"
-#include "sigma_hal.h"
+#include "../../../include/sigma_hal.h"
 #include "../../../include/SovereignLibC.h"
+#include "../../../include/SigmaOOP.hpp"
+#include "SovereignDNACompression.hpp"
 
 /**
  * SigmaOS Sovereign Persistence Engine
@@ -8,50 +10,64 @@
  *
  * USP: State snapshots are cryptographically sharded and stored across the
  * distributed SovereignVFS nodes, surviving hardware memory wipes and power loss.
- *
- * Design: OOP-isolated singleton — SovereignPersistenceEngine.
  */
 
-class SovereignPersistenceEngine {
+namespace SigmaOS {
+namespace Kernel {
+namespace FS {
+
+class SovereignPersistence : public SigmaObject {
 public:
-    static SovereignPersistenceEngine& getInstance() {
-        static SovereignPersistenceEngine instance;
+    static SovereignPersistence& getInstance() {
+        static SovereignPersistence instance;
         return instance;
     }
 
+    const char* type_name() const noexcept override { return "SovereignPersistence"; }
+
     void init() {
-        sigma_log("[PERSISTENCE] Initializing Decentralized Persistence Lattice...");
-        this->snapshots_stored = 0;
+        sigma_log("Σ [PERSISTENCE]: Initializing Decentralized Persistence Lattice...");
+        m_snapshots_stored = 0;
+        sigma_log("Σ [PERSISTENCE]: DNA-Backed Storage Backend ACTIVE.");
     }
 
     void snapshotState(const char* component_name) {
-        if (this->snapshots_stored >= 64) return;
-        sigma_hardened_strcpy(this->snapshot_ids[this->snapshots_stored], component_name, 32);
-        this->snapshots_stored++;
-        sigma_printf("[PERSISTENCE] DSP: State snapshot of '%s' committed to distributed lattice.\n",
+        if (m_snapshots_stored >= 64) return;
+        sigma_hardened_strcpy(m_snapshot_ids[m_snapshots_stored], component_name, 32);
+        m_snapshots_stored++;
+        
+        // Connect to DNA Compression
+        sigma_usize compressed_size = 0;
+        SovereignDNACompression::getInstance().encode(component_name, 1024, SIGMA_NULL, &compressed_size);
+
+        sigma_printf("Σ [PERSISTENCE]: State snapshot of '%s' compressed via DNA and committed to lattice.\n",
                      component_name);
     }
 
     void restoreState(const char* component_name) {
-        sigma_printf("[PERSISTENCE] DSP: Restoring '%s' from distributed lattice...\n", component_name);
+        sigma_printf("Σ [PERSISTENCE]: Restoring '%s' from DNA-compressed distributed lattice...\n", component_name);
     }
 
 private:
-    SovereignPersistenceEngine() : snapshots_stored(0) {}
+    SovereignPersistence() : m_snapshots_stored(0) {}
 
-    char snapshot_ids[64][32];
-    sigma_u32 snapshots_stored;
+    char m_snapshot_ids[64][32];
+    sigma_u32 m_snapshots_stored;
 };
+
+} // namespace FS
+} // namespace Kernel
+} // namespace SigmaOS
 
 /* --- C Wrappers --- */
 extern "C" void persistence_init() {
-    SovereignPersistenceEngine::getInstance().init();
+    SigmaOS::Kernel::FS::SovereignPersistence::getInstance().init();
 }
 
 extern "C" void persistence_snapshot(const char* component) {
-    SovereignPersistenceEngine::getInstance().snapshotState(component);
+    SigmaOS::Kernel::FS::SovereignPersistence::getInstance().snapshotState(component);
 }
 
 extern "C" void persistence_restore(const char* component) {
-    SovereignPersistenceEngine::getInstance().restoreState(component);
+    SigmaOS::Kernel::FS::SovereignPersistence::getInstance().restoreState(component);
 }

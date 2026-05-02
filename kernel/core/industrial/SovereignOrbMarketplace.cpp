@@ -1,6 +1,7 @@
 #include "../../../include/sigma_kernel_types.h"
 #include "../../../include/SovereignLibC.h"
 #include "../../../include/SigmaOOP.hpp"
+#include "../security/SovereignQKD.hpp"
 
 /**
  * SigmaOS Sovereign Orb Marketplace Shard
@@ -36,8 +37,19 @@ public:
     }
 
     void summonOrb(const char* id) {
-        sigma_printf("Î£ [MARKET]: Summoning Orb Shard '%s' from Mesh Lattice...\n", id);
+        sigma_printf("Σ [MARKET]: Summoning Orb Shard '%s' from Mesh Lattice...\n", id);
+        
+        // Zero-Trust Enforcement: Verify Quantum Signature before download
+        bool is_secure = SovereignQKD::getInstance().verifyQuantumIntegrity();
+        
+        if (!is_secure) {
+            sigma_printf("Σ [MARKET]: [ERROR] Orb '%s' failed QKD verification. Summoning ABORTED.\n", id);
+            return;
+        }
+
+        sigma_log("Σ [MARKET]: Orb cryptographically verified. Initiating P2P Mesh transfer...");
         // Interact with MeshLattice to fetch
+        sigma_log("Σ [MARKET]: Orb Shard integrated into local lattice.");
     }
 
     void audit() {

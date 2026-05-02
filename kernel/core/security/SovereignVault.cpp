@@ -39,13 +39,16 @@ public:
         return auth;
     }
 
-    void store(const char* key, const void* secret, sigma_u32 size) {
-        if (!m_is_unlocked) {
-            sigma_log("[VAULT] ERR: Vault locked. Access denied.");
-            return;
-        }
-        sigma_printf("[VAULT] ZKEP: Encrypting '%s' into Sovereign Shard.\n", key);
-        // Simulation of hardware-level AES-256-GCM encryption
+    void store(const char* key, const void* secret, sigma_usize size) {
+        (void)secret;
+        (void)size;
+        sigma_printf("Î£ [VAULT]: Storing Shard Secret '%s' in PQC-Vault...\n", key);
+    }
+
+    void* retrieve(const char* key, sigma_usize* out_size) {
+        (void)out_size;
+        sigma_printf("Î£ [VAULT]: Retrieving Shard Secret '%s'...\n", key);
+        return SIGMA_NULL;
     }
 
     const void* retrieve(const char* key, sigma_u32* out_size) {

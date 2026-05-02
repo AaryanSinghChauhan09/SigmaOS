@@ -37,8 +37,9 @@ void* pmm_alloc_page() {
     return SIGMA_NULL;
 }
 
-void pmm_init(sigma_u64 mem_size) {
-    sigma_memset(bitmap, 0, BITMAP_SIZE * sizeof(sigma_u32));
+void pmm_init(sigma_u32 mem_size) {
+    (void)mem_size;
+    sigma_log("Î£ [PMM]: Initializing Physical Memory Manager...");
     /* Lock first 1MB and kernel area */
     for (sigma_u64 addr = 0; addr < (sigma_u64)&_kernel_end; addr += PAGE_SIZE) {
         pmm_lock_page(addr);

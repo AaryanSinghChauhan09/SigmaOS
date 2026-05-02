@@ -27,7 +27,9 @@ public:
         sigma_log("Î£ [ENCLAVE]: Hardware Attestation SUCCESS. Silicon ID: 0x8F2E-99A1.");
     }
 
-    void sealSecret(const char* label, const void* data, sigma_size_t size) {
+    void sealSecret(const char* label, const void* data, sigma_usize size) {
+        (void)data;
+        (void)size;
         sigma_printf("Î£ [ENCLAVE]: Sealing Shard Secret: %s...\n", label);
         // Simulated TPM/SGX/TEE write
         m_sealed_secrets++;

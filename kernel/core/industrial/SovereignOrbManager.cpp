@@ -29,6 +29,7 @@ public:
     }
 
     void installOrb(const char* orb_name, const char* signature) {
+        (void)signature;
         sigma_printf("Î£ [ORB-MAN]: Deploying Orb: %s...\n", orb_name);
         // Verify signature via PQC Shard
         bool verified = true; // Simulated PQC verification

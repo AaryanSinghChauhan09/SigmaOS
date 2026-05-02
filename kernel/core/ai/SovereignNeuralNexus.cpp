@@ -1,28 +1,29 @@
-#include "sigma_hal.h"
-#include "SovereignNeuralNexus.hpp"
+#include "../../../include/sigma_kernel_types.h"
 #include "../../../include/SovereignLibC.h"
+#include "../../../include/SigmaOOP.hpp"
+#include "SovereignNeuralNexus.hpp"
+
+namespace SigmaOS {
+namespace Kernel {
+namespace AI {
 
 /**
  * SigmaOS Sovereign Neural Nexus (S-NPU)
  * Zero-dependency, kernel-level Neural Processing Unit orchestrator.
- * 
- * USP (Unique Selling Proposition): Native AI execution built directly into the 
- * OS kernel. Unlike Linux/Windows where AI models run in userland with heavy drivers,
- * SigmaOS maps NPU memory directly to bare-metal shards.
- * Result: 0-latency inference, instant predictive scheduling, and real-time 
- * deep-learning anomaly detection. Crushes all existing desktop OS competitors.
- *
- * Design: OOP-isolated singleton — SovereignNeuralEngine.
  */
 
-SovereignNeuralEngine& SovereignNeuralEngine::getInstance() {
-    static SovereignNeuralEngine instance;
-    return instance;
-}
+class SovereignNeuralEngine : public SigmaObject {
+public:
+    static SovereignNeuralEngine& getInstance() {
+        static SovereignNeuralEngine instance;
+        return instance;
+    }
 
-void SovereignNeuralEngine::init() {
-    sigma_log("[NEURAL] Initializing Sovereign Neural Nexus (S-NPU Orchestrator)...");
-    this->npu_available = this->probeNPUHardware();
+    const char* type_name() const noexcept override { return "SovereignNeuralEngine"; }
+
+    void init() {
+        sigma_log("Σ [NEURAL]: Initializing Sovereign Neural Nexus (S-NPU Orchestrator)...");
+        this->npu_available = this->probeNPUHardware();
     if (this->npu_available) {
         sigma_log("[NEURAL] NPU Hardware Detected. Allocating Zero-Copy Memory Pages.");
         this->active_models = 0;
@@ -84,30 +85,41 @@ bool SovereignNeuralEngine::transpileUI(const char* css_shard, char* out_morphic
     return true;
 }
 
-SovereignNeuralEngine::SovereignNeuralEngine() : npu_available(false), active_models(0), initialized(false), avx512_busy(true) {}
+    bool probeNPUHardware() {
+        /* Direct PCI Express probing for NPUs (Intel VPU, Apple Neural Engine, etc.) */
+        return true; // Simulate NPU presence
+    }
 
-bool SovereignNeuralEngine::probeNPUHardware() {
-    /* Direct PCI Express probing for NPUs (Intel VPU, Apple Neural Engine, etc.) */
-    return true; // Simulate NPU presence
-}
+private:
+    SovereignNeuralEngine() : npu_available(false), active_models(0), initialized(false), avx512_busy(true) {}
+
+    bool npu_available;
+    sigma_u32 active_models;
+    bool initialized;
+    bool avx512_busy;
+};
+
+} // namespace AI
+} // namespace Kernel
+} // namespace SigmaOS
 
 /* --- C Wrappers --- */
 extern "C" void neural_init() {
-    SovereignNeuralEngine::getInstance().init();
+    SigmaOS::Kernel::AI::SovereignNeuralEngine::getInstance().init();
 }
 
 extern "C" bool neural_load_model(const char* model_name, sigma_u32 parameters_mb) {
-    return SovereignNeuralEngine::getInstance().loadModel(model_name, parameters_mb);
+    return SigmaOS::Kernel::AI::SovereignNeuralEngine::getInstance().loadModel(model_name, parameters_mb);
 }
 
 extern "C" void neural_infer_anomaly(const void* system_telemetry, sigma_u32 size) {
-    SovereignNeuralEngine::getInstance().inferAnomaly(system_telemetry, size);
+    SigmaOS::Kernel::AI::SovereignNeuralEngine::getInstance().inferAnomaly(system_telemetry, size);
 }
 
 extern "C" void neural_predict(const void* input_tensor, void* output_tensor) {
-    SovereignNeuralEngine::getInstance().predict(input_tensor, output_tensor);
+    SigmaOS::Kernel::AI::SovereignNeuralEngine::getInstance().predict(input_tensor, output_tensor);
 }
 
 extern "C" void neural_report_status() {
-    SovereignNeuralEngine::getInstance().reportStatus();
+    SigmaOS::Kernel::AI::SovereignNeuralEngine::getInstance().reportStatus();
 }

@@ -1,15 +1,17 @@
 #include "../../../include/sigma_kernel_types.h"
 #include "../../../include/SovereignLibC.h"
 #include "../../../include/SigmaOOP.hpp"
-
-/**
- * SigmaOS Sovereign SEL (Security Enforcement Lattice)
- * Principles: Micro-VM Isolation, Amnesic Sandbox, Zero-Trust.
- */
+#include "../security/SovereignQKD.hpp"
 
 namespace SigmaOS {
 namespace Kernel {
 namespace Security {
+
+/**
+ * SigmaOS Sovereign SEL (Security Enforcement Lattice)
+ * Principles: Micro-VM Isolation, Amnesic Sandbox, Zero-Trust.
+ * Mission: Securing shard execution via QKD-verified sandboxing.
+ */
 
 class SovereignSEL : public SigmaObject {
 public:
@@ -26,8 +28,19 @@ public:
         sigma_log("[SEL] Micro-VM Isolation Shards (Intel VT-x) READY.");
     }
 
+    bool verifyShardTrust(const char* shard_id) {
+        (void)shard_id;
+        // Cross-reference with SovereignQKD trust fabric
+        return SovereignQKD::getInstance().verifyQuantumIntegrity();
+    }
+
     void spawnSandbox(const char* name) {
-        sigma_printf("[SEL] Spawning Amnesic Sandbox Shard: %s\n", name);
+        if (!verifyShardTrust(name)) {
+            sigma_printf("[SEL] ERR: Shard '%s' failed QKD-Verification. Ignition ABORTED.\n", name);
+            return;
+        }
+        
+        sigma_printf("[SEL] Spawning QKD-Verified Sandbox Shard: %s\n", name);
         m_active_sandboxes++;
     }
 
@@ -38,7 +51,7 @@ public:
     void audit() {
         sigma_printf("\n--- Σ SOVEREIGN SEL AUDIT ---\n");
         sigma_printf("| Sandboxes Active : %u\n", m_active_sandboxes);
-        sigma_printf("| Policy Engine     : ZERO-TRUST\n");
+        sigma_printf("| Trust Fabric     : QKD-ENFORCED\n");
         sigma_printf("-------------------------------\n");
     }
 

@@ -35,8 +35,15 @@ KERNEL_SHARDS = kernel/core/system/SovereignMain.o \
                 kernel/core/security/SovereignSecHardener.o \
                 kernel/core/fs/SovereignVFS.o \
                 kernel/core/security/SovereignEntropy.o \
-                kernel/core/security/SovereignAudit.o \
+                kernel/core/memory/SovereignPMM.o \
+                kernel/core/memory/SovereignVMM.o \
+                kernel/core/system/SovereignAppShard.o \
+                kernel/core/fs/SovereignDNACompression.o \
+                kernel/core/security/SovereignQKD.o \
+                kernel/core/hardware/SovereignHWTranspiler.o \
                 kernel/core/ai/SovereignNeuralNexus.o \
+                kernel/core/ai/SovereignNeuralAutomator.o \
+                kernel/core/community/SovereignGovernance.o \
                 kernel/shards/system/SovereignLibC.o \
                 kernel/core/misc_utils/SovereignTests.o
 
