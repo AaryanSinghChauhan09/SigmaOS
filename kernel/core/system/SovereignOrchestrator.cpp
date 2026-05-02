@@ -35,6 +35,7 @@ extern "C" {
     void pqc_init();
     void qkd_init();
     void netstack_init();
+    void hft_nexus_init();
     void cryptostack_init();
     void audit_init();
     void verifier_init();
@@ -109,6 +110,7 @@ public:
         hyper_init(); // Initialize Hypervisor for shard isolation
         neural_init(); // Initialize Neural Nexus (S-NPU)
         netstack_init(); // Initialize Sovereign Network Stack
+        hft_nexus_init(); // Initialize Ultra-Low-Latency HFT Path
         monitor_init(); // Initialize System Monitor
         neural_automator_init(); // Activate Cognitive Task Queue
         
