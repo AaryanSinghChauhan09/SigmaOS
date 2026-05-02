@@ -52,6 +52,21 @@ Despite achieving the Sovereign Singularity, SigmaOS currently faces severe disa
 - **SigmaOS Status**: SigmaOS relies entirely on the newly implemented `SovereignGovernance` decentralized registry.
 - **Impact**: Enterprises will not deploy an OS that lacks a centralized 24/7 support SLA and relies on mesh-weighted community voting for security patches.
 
+### 3.6 Orchestration Fragility & Shard Dependencies
+- **The Disadvantage**: The 600-shard lattice requires a perfectly orchestrated boot cascade.
+- **SigmaOS Status**: The `SovereignOrchestrator` performs a rigid 4-phase ignition.
+- **Impact**: If a Phase 1 shard (like `SovereignVMM`) exhibits a race condition or silicon-level fault, the entire lattice collapses during boot. Monolithic kernels often have more robust "degraded" boot paths that can provide a shell even if major subsystems fail.
+
+### 3.7 Toolchain & Observability Isolation
+- **The Disadvantage**: Decades of work have gone into tools like `gdb`, `valgrind`, `strace`, and `perf`.
+- **SigmaOS Status**: SigmaOS rejects standard ELF/DWARF observability in favor of the `SovereignAudit` telemetry shard.
+- **Impact**: Debugging performance bottlenecks or memory leaks requires proprietary SigmaOS toolchains. External developers cannot bring their existing expertise or scripts to the platform, creating a steep "learning cliff" for industrial adoption.
+
+### 3.8 Shard Coordination Latency (IPC)
+- **The Disadvantage**: In a monolithic kernel, a filesystem call is a function pointer jump. 
+- **SigmaOS Status**: In SigmaOS, even "local" shard communication often goes through the `SovereignIPC` layer to ensure cryptographic isolation.
+- **Impact**: This adds nanoseconds of overhead to every primitive operation. While negligible for UI tasks, this "coordination tax" accumulates in high-throughput database or network-intensive workloads, putting SigmaOS at a raw throughput disadvantage against optimized C kernels.
+
 ## 4. Mitigation Strategies for Phase 50+
 
 To evolve from a theoretical Sovereign Lattice into a viable industrial competitor, the following mitigations are mandatory:
