@@ -147,6 +147,11 @@ Despite achieving the Sovereign Singularity, SigmaOS currently faces severe disa
 - **SigmaOS Status**: Peripherals must be re-implemented as specific shards.
 - **Impact**: The absence of a **"Universal Peripheral Shard"** means that hardware compatibility for consumer-grade electronics remains significantly behind industrial distributions.
 
+### 3.25 Lack of Hard Real-Time Certification (QNX/FreeRTOS Gap)
+- **The Disadvantage**: Safety-critical industries (aerospace, medical, automotive) require hard-real-time guarantees and formal safety certifications (ISO 26262, DO-178C).
+- **SigmaOS Status**: The `SovereignPredictiveScheduler` is optimized for UI and general-purpose lattice workload prediction.
+- **Impact**: Without native **"Sovereign real-time determinism"** (Item 54) and formal safety certs, SigmaOS cannot currently compete for placement in flight controllers or autonomous braking systems where legacy RTOSs dominate.
+
 ## 4. Mitigation Strategies for Phase 50+
 
 To evolve from a theoretical Sovereign Lattice into a viable industrial competitor, the following mitigations are mandatory:

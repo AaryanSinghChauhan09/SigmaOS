@@ -45,7 +45,7 @@ void SovereignAISchedEngine::setMode(sigma_aisched_mode_t mode) {
 }
 
 /* --- C Wrappers --- */
-extern "C" void scheduler_init() {
+extern "C" void aisched_init() {
     SovereignAISchedEngine::getInstance().init();
 }
 

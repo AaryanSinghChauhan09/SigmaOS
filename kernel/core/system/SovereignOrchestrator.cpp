@@ -9,7 +9,8 @@ extern "C" {
     void pmm_init_shard(sigma_u64 mem_size);
     void vmm_init_shard();
     void vfs_init();
-    void scheduler_init();
+    void sched_init();
+    void aisched_init();
     void vault_init();
     void sel_init_shard();
     void sechardener_init();
@@ -82,7 +83,8 @@ public:
         
         sigma_log("Σ [ORCHESTRATOR]: Initiating Lattice Phase 2 (Interaction)...");
         vfs_init();
-        scheduler_init();
+        sched_init();
+        aisched_init();
         dna_init();
         persistence_init();
         ipc_init(); // Initialize IPC before neural systems
