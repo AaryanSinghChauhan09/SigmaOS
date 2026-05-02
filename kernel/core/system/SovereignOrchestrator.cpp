@@ -29,6 +29,7 @@ extern "C" {
     void pqc_init();
     void monitor_init();
     void sandbox_init();
+    void ai_persona_init();
 }
 
 /**
@@ -89,6 +90,7 @@ public:
         sigma_log("Σ [ORCHESTRATOR]: Initiating Lattice Phase 4 (Ecosystem)...");
         market_init_shard(); // Decentralized Orb Exchange active
         orb_manager_init(); // Local Orb verification and execution active
+        ai_persona_init(); // Neural Adaptation active
         governance_init_shard(); // Community Contributor Registry active
         
         sigma_log("Σ [ORCHESTRATOR]: Lattice Singularity Achieved. System LIVE.");
