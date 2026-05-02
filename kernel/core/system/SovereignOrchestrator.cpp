@@ -25,6 +25,7 @@ extern "C" {
     void diag_init();
     void ipc_init();
     void hyper_init();
+    void neural_init();
 }
 
 /**
@@ -70,6 +71,7 @@ public:
         persistence_init();
         ipc_init(); // Initialize IPC before neural systems
         hyper_init(); // Initialize Hypervisor for shard isolation
+        neural_init(); // Initialize Neural Nexus (S-NPU)
         neural_automator_init(); // Activate Cognitive Task Queue
         
         sigma_log("Σ [ORCHESTRATOR]: Initiating Lattice Phase 3 (Security)...");
