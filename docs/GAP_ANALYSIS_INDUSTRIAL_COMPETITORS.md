@@ -102,6 +102,21 @@ Despite achieving the Sovereign Singularity, SigmaOS currently faces severe disa
 - **SigmaOS Status**: The `SovereignNeuralNexus` and `NeuralAutomator` are currently optimized for local NPU/CPU acceleration.
 - **Impact**: SigmaOS lacks the **"Sovereign edge computing"** and **"Distributed automation orchestration"** (Items 99 and 60 in Roadmap) required to function as a unified industrial mesh. Competitors currently own the "Cloud-to-Edge" telemetry pipeline that SigmaOS must challenge to achieve total ecosystem sovereignty.
 
+### 3.16 Power Management & Silicon Sleep States (S3/S4 Gap)
+- **The Disadvantage**: Established OS kernels have deep integration with ACPI and vendor-specific power profiles for extreme battery life and thermal management.
+- **SigmaOS Status**: The `SovereignHAL` provides basic hardware abstraction but lacks the sophisticated **"Energy-aware resource allocation"** (Item 72 in Roadmap) of Linux or Windows.
+- **Impact**: On portable industrial devices, SigmaOS may suffer from significantly higher power consumption and heat generation, making it less viable for field operations where battery life is mission-critical.
+
+### 3.17 Documentation Depth & Community Knowledge Base
+- **The Disadvantage**: Legacy OSs benefit from millions of forum posts, StackOverflow answers, and decades of official documentation.
+- **SigmaOS Status**: SigmaOS documentation is strictly repository-internal and Wiki-based.
+- **Impact**: A developer encountering a "Lattice Desync" or "PQC Handshake Failure" has no external community resource to consult. This creates a high "TCO" (Total Cost of Ownership) for institutions due to the steep learning curve and lack of a **"Sovereign community portal"** (Item 89 in Roadmap).
+
+### 3.18 Lack of Standardized Driver ABI
+- **The Disadvantage**: Linux and Windows have stable (or at least well-defined) driver ABIs and massive hardware vendor support.
+- **SigmaOS Status**: Every driver in SigmaOS must be a "Sovereign Shard" written in the specific C++ singleton pattern.
+- **Impact**: Porting a legacy driver for a specialized industrial sensor requires a complete re-architecting of the driver's logic. Without **"Modular repos for drivers"** (Item 83 in Roadmap), hardware support will remain the primary bottleneck for industrial adoption.
+
 ## 4. Mitigation Strategies for Phase 50+
 
 To evolve from a theoretical Sovereign Lattice into a viable industrial competitor, the following mitigations are mandatory:

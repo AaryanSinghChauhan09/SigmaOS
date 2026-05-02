@@ -42,6 +42,11 @@ public:
     void scheduleCognitiveTask(const char* task_name) {
         if (m_active_tasks >= 16) return;
         sigma_printf("Σ [NEURAL-AUTOMATOR]: Scheduling Preemptive Action -> '%s'\n", task_name);
+        
+        // Link to AISched for actual workload orchestration
+        extern "C" void aisched_predict_workload(sigma_u32 process_id);
+        aisched_predict_workload(m_active_tasks + 1000u); // Simulate process mapping
+        
         m_active_tasks++;
         sigma_log("Σ [NEURAL-AUTOMATOR]: Task injected into Silicon-Direct Scheduler.");
     }
