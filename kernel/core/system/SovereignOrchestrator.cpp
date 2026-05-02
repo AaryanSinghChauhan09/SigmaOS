@@ -49,6 +49,7 @@ extern "C" {
     void media_init();
     void accessibility_init();
     void cloud_orch_init();
+    void consensus_init();
     void cloud_init_shard();
     void driver_transpiler_init();
     void perf_init();
@@ -135,6 +136,7 @@ public:
         webapp_bridge_init(); // Orbital WebApp Injection active
         posix_init(); // POSIX Emulation active
         cloud_orch_init(); // Multi-Node Cloud Orchestration active
+        consensus_init(); // Distributed State Consensus active
         cloud_init_shard(); // Sovereign Cloud Extension active
         driver_transpiler_init(); // Legacy Driver Translation active
         perf_init(); // Performance Profiling active
