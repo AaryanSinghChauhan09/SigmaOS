@@ -27,6 +27,8 @@ extern "C" {
     void hyper_init();
     void neural_init();
     void pqc_init();
+    void monitor_init();
+    void sandbox_init();
 }
 
 /**
@@ -73,12 +75,14 @@ public:
         ipc_init(); // Initialize IPC before neural systems
         hyper_init(); // Initialize Hypervisor for shard isolation
         neural_init(); // Initialize Neural Nexus (S-NPU)
+        monitor_init(); // Initialize System Monitor
         neural_automator_init(); // Activate Cognitive Task Queue
         
         sigma_log("Σ [ORCHESTRATOR]: Initiating Lattice Phase 3 (Security)...");
         vault_init();
         sel_init();
         pqc_init(); // Post-Quantum Cryptography active
+        sandbox_init(); // Secure container isolation active
         qkd_init(); // Quantum-Key Distribution active
         mesh_init(); // Mesh-First Protocol active
         
