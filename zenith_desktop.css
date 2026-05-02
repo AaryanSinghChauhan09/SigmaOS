@@ -938,3 +938,5 @@ body {
     0% { transform: scale(1); opacity: 1; }
     100% { transform: scale(3); opacity: 0; }
 }
+. l o c k d o w n - m o d e   {   f i l t e r :   h u e - r o t a t e ( 3 4 0 d e g )   s a t u r a t e ( 2 )   c o n t r a s t ( 1 . 2 ) ;   t r a n s i t i o n :   f i l t e r   0 . 5 s   e a s e - i n - o u t ;   }   . l o c k d o w n - m o d e   . d e s k t o p - o v e r l a y   {   b a c k g r o u n d :   r g b a ( 5 0 ,   0 ,   0 ,   0 . 4 ) ;   }  
+ 

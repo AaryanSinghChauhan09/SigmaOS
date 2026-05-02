@@ -1912,6 +1912,27 @@ https://chatgpt.com/?q={{prompt}}</textarea>
             }
         }, 5000);
 
+        // Trust Fabric Lockdown Mode
+        setInterval(() => {
+            if(Math.random() > 0.95) {
+                // Trigger Lockdown
+                document.body.classList.add('lockdown-mode');
+                document.getElementById('qkd-status').innerText = "ANOMALY DETECTED";
+                document.getElementById('qkd-status').style.color = "var(--error)";
+                document.getElementById('orb-trust').innerText = "LOCKDOWN ACTIVE";
+                document.getElementById('orb-trust').className = "accent";
+                
+                // Heal after 5 seconds
+                setTimeout(() => {
+                    document.body.classList.remove('lockdown-mode');
+                    document.getElementById('qkd-status').innerText = "Entangled";
+                    document.getElementById('qkd-status').style.color = "var(--text-light)";
+                    document.getElementById('orb-trust').innerText = "QKD-VERIFIED";
+                    document.getElementById('orb-trust').className = "status-success";
+                }, 5000);
+            }
+        }, 8000);
+
     </script>
 </body>
 </html>

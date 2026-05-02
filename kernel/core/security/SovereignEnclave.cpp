@@ -1,6 +1,7 @@
 #include "../../../include/sigma_kernel_types.h"
 #include "../../../include/SovereignLibC.h"
 #include "../../../include/SigmaOOP.hpp"
+#include "SovereignQKD.hpp"
 
 /**
  * SigmaOS Sovereign Silicon Enclave (Hardware Root-of-Trust)
@@ -22,15 +23,23 @@ public:
     const char* type_name() const noexcept override { return "SovereignEnclave"; }
 
     void init() {
-        sigma_log("Î£ [ENCLAVE]: Initializing Silicon Root-of-Trust...");
+        sigma_log("Σ [ENCLAVE]: Initializing Silicon Root-of-Trust...");
         m_sealed_secrets = 0;
-        sigma_log("Î£ [ENCLAVE]: Hardware Attestation SUCCESS. Silicon ID: 0x8F2E-99A1.");
+        sigma_log("Σ [ENCLAVE]: Hardware Attestation SUCCESS. Silicon ID: 0x8F2E-99A1.");
     }
 
     void sealSecret(const char* label, const void* data, sigma_usize size) {
         (void)data;
         (void)size;
-        sigma_printf("Î£ [ENCLAVE]: Sealing Shard Secret: %s...\n", label);
+        sigma_printf("Σ [ENCLAVE]: Attempting to Seal Shard Secret: %s...\n", label);
+        
+        // Hardlink Enclave to QKD validation
+        if (!SovereignQKD::getInstance().verifyQuantumIntegrity()) {
+            sigma_printf("Σ [ENCLAVE]: [CRITICAL] QKD Verification Failed! Enclave sealing aborted for '%s'.\n", label);
+            return;
+        }
+
+        sigma_log("Σ [ENCLAVE]: Quantum Signature verified. Proceeding with hardware seal.");
         // Simulated TPM/SGX/TEE write
         m_sealed_secrets++;
     }
