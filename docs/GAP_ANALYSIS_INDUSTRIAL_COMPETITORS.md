@@ -157,6 +157,11 @@ Despite achieving the Sovereign Singularity, SigmaOS currently faces severe disa
 - **SigmaOS Status**: SigmaOS provides the `NeuralNexus` (S-NPU) for adaptive inference, but lacks a general-purpose GPGPU compute framework.
 - **Impact**: Without a **"Sovereign GPU compute"** suite (Item 82), SigmaOS cannot currently compete for high-performance computing (HPC) workloads or local large-language model (LLM) training that depends on legacy GPU acceleration.
 
+### 3.27 Lack of Legacy Cryptographic Parity (OpenSSL/mbedTLS Gap)
+- **The Disadvantage**: The vast majority of existing encrypted infrastructure relies on standard ciphers like AES, RSA, and ECC, supported by mature libraries like OpenSSL.
+- **SigmaOS Status**: The `SovereignPQC` shard provides superior post-quantum protection, while the `SovereignCryptoStack` provides silicon-native mapping for legacy ciphers.
+- **Impact**: Without a **"Sovereign cryptographic stack"** (Item 42) that provides bit-perfect parity and ABI compatibility with OpenSSL, porting legacy encrypted applications to the Sovereign Lattice remains a complex engineering task.
+
 ## 4. Mitigation Strategies for Phase 50+
 
 To evolve from a theoretical Sovereign Lattice into a viable industrial competitor, the following mitigations are mandatory:
