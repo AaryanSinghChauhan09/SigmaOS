@@ -25,6 +25,7 @@ extern "C" {
     void dna_init();
     void time_init();
     void diag_init();
+    void tracer_init();
     void ipc_init();
     void shmem_init();
     void virtio_init();
@@ -86,6 +87,7 @@ public:
         hal_init();
         time_init(); // Initialize timekeeping early
         diag_init(); // Initialize diagnostics early
+        tracer_init(); // Initialize instruction-level tracing
         allocator_init();
         silicon_init_transpiler(); // Initialize native ISA translation
         power_init(); // Initialize Power Management
