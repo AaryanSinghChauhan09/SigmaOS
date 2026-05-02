@@ -102,6 +102,28 @@
         }
         const neural = new NeuralLayoutEngine();
 
+        /* Σ Personalization & Theme Orchestration */
+        class PersonalizationEngine {
+            constructor() {
+                this.registry = JSON.parse(localStorage.getItem('sigma_registry') || '{}');
+                this.apply();
+            }
+            setTheme(name) {
+                this.registry.theme = name;
+                this.save();
+                this.apply();
+            }
+            save() {
+                localStorage.setItem('sigma_registry', JSON.stringify(this.registry));
+            }
+            apply() {
+                const theme = this.registry.theme || 'cyan';
+                document.body.setAttribute('data-theme', theme);
+                addLog(`Σ [PERSONAL]: Shifting lattice hue to ${theme}...`, 'success');
+            }
+        }
+        const persona = new PersonalizationEngine();
+
         function toggleStart() {
             const menu = document.getElementById('start-menu');
             menu.classList.toggle('active');
