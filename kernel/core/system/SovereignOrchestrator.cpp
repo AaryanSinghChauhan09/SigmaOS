@@ -33,6 +33,8 @@ extern "C" {
     void enclave_init_shard();
     void webapp_bridge_init();
     void posix_init();
+    void driver_transpiler_init();
+    void perf_init();
 }
 
 /**
@@ -97,6 +99,8 @@ public:
         ai_persona_init(); // Neural Adaptation active
         webapp_bridge_init(); // Orbital WebApp Injection active
         posix_init(); // POSIX Emulation active
+        driver_transpiler_init(); // Legacy Driver Translation active
+        perf_init(); // Performance Profiling active
         governance_init_shard(); // Community Contributor Registry active
         
         sigma_log("Σ [ORCHESTRATOR]: Lattice Singularity Achieved. System LIVE.");
