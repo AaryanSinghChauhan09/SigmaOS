@@ -30,6 +30,7 @@ extern "C" {
     void monitor_init();
     void sandbox_init();
     void ai_persona_init();
+    void enclave_init_shard();
 }
 
 /**
@@ -84,6 +85,7 @@ public:
         sel_init();
         pqc_init(); // Post-Quantum Cryptography active
         sandbox_init(); // Secure container isolation active
+        enclave_init_shard(); // Hardware Root-of-Trust active
         qkd_init(); // Quantum-Key Distribution active
         mesh_init(); // Mesh-First Protocol active
         
