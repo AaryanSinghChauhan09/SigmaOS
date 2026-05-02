@@ -21,6 +21,7 @@ extern "C" {
     void market_init_shard();
     void orb_manager_init();
     void governance_init_shard();
+    void cron_init();
     void persistence_init();
     void dna_init();
     void time_init();
@@ -41,6 +42,7 @@ extern "C" {
     void qkd_init();
     void netstack_init();
     void vpn_init();
+    void sovereign_dns_init();
     void hft_nexus_init();
     void cryptostack_init();
     void audit_init();
@@ -62,6 +64,7 @@ extern "C" {
     void webapp_bridge_init();
     void posix_init();
     void marketplace_init();
+    void ci_pipeline_init();
     void media_init();
     void streamer_init();
     void accessibility_init();
@@ -132,6 +135,7 @@ public:
         hyper_init(); // Initialize Hypervisor for shard isolation
         neural_init(); // Initialize Neural Nexus (S-NPU)
         netstack_init(); // Initialize Sovereign Network Stack
+        sovereign_dns_init(); // Initialize Decentralized DNS
         vpn_init(); // Initialize WireGuard-parity VPN tunnels
         hft_nexus_init(); // Initialize Ultra-Low-Latency HFT Path
         monitor_init(); // Initialize System Monitor
@@ -161,6 +165,7 @@ public:
         
         sigma_log("Σ [ORCHESTRATOR]: Initiating Lattice Phase 4 (Ecosystem)...");
         marketplace_init(); // Decentralized Orb Registry active
+        ci_pipeline_init(); // Native CI/CD Pipeline active
         market_init_shard(); // Decentralized Orb Exchange active
         orb_manager_init(); // Local Orb verification and execution active
         ai_persona_init(); // Neural Adaptation active
@@ -168,6 +173,7 @@ public:
         media_init(); // Hardware-Accelerated Media active
         streamer_init(); // Low-Latency Spatial Streaming active
         accessibility_init(); // Inclusive Orchestration active
+        cron_init(); // Distributed Task Automation active
         webapp_bridge_init(); // Orbital WebApp Injection active
         posix_init(); // POSIX Emulation active
         cloud_orch_init(); // Multi-Node Cloud Orchestration active
