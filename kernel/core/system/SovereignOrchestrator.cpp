@@ -60,12 +60,15 @@ extern "C" {
     void atomic_os_init();
     void live_patch_init();
     void fuzzer_init();
+    void threat_hunter_init();
     void ai_persona_init();
     void model_man_init();
     void snapshot_init();
     void enclave_init_shard();
     void webapp_bridge_init();
     void posix_init();
+    void container_manager_init();
+    void configurator_init();
     void marketplace_init();
     void ci_pipeline_init();
     void media_init();
@@ -163,6 +166,7 @@ public:
         atomic_os_init(); // Atomic declarative updates active
         live_patch_init(); // Zero-downtime hot-patching active
         fuzzer_init(); // Continuous ML fuzzing active
+        threat_hunter_init(); // Offensive Security Validation active
         pqc_init(); // Post-Quantum Cryptography active
         sandbox_init(); // Secure container isolation active
         enclave_init_shard(); // Hardware Root-of-Trust active
@@ -183,6 +187,8 @@ public:
         cron_init(); // Distributed Task Automation active
         webapp_bridge_init(); // Orbital WebApp Injection active
         posix_init(); // POSIX Emulation active
+        container_manager_init(); // Alpine-style Immutable Containers active
+        configurator_init(); // YaST-style Enterprise Management active
         cloud_orch_init(); // Multi-Node Cloud Orchestration active
         edge_node_init(); // Sovereign Edge Computing active
         consensus_init(); // Distributed State Consensus active
