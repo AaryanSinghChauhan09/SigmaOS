@@ -28,6 +28,7 @@ extern "C" {
     void hyper_init();
     void neural_init();
     void pqc_init();
+    void netstack_init();
     void monitor_init();
     void sandbox_init();
     void ai_persona_init();
@@ -84,6 +85,7 @@ public:
         ipc_init(); // Initialize IPC before neural systems
         hyper_init(); // Initialize Hypervisor for shard isolation
         neural_init(); // Initialize Neural Nexus (S-NPU)
+        netstack_init(); // Initialize Sovereign Network Stack
         monitor_init(); // Initialize System Monitor
         neural_automator_init(); // Activate Cognitive Task Queue
         
