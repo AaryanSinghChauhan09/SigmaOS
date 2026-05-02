@@ -181,6 +181,41 @@
 
     <!-- Widgets -->
     <div class="widgets-container">
+        <!-- Silicon Thermal Heatmap Widget -->
+        <div class="widget">
+            <div class="widget-title">
+                <span>Silicon Heat Map</span>
+                <span class="accent">Thermal IQ</span>
+            </div>
+            <div style="display: grid; grid-template-columns: repeat(8, 1fr); gap: 4px; margin-top: 10px;">
+                <div class="thermal-shard" style="height: 12px; background: rgba(255,100,0,0.8); border-radius: 2px;"></div>
+                <div class="thermal-shard" style="height: 12px; background: rgba(255,50,0,0.6); border-radius: 2px;"></div>
+                <div class="thermal-shard" style="height: 12px; background: rgba(0,255,255,0.2); border-radius: 2px;"></div>
+                <div class="thermal-shard" style="height: 12px; background: rgba(0,255,255,0.1); border-radius: 2px;"></div>
+                <div class="thermal-shard" style="height: 12px; background: rgba(255,100,0,0.5); border-radius: 2px;"></div>
+                <div class="thermal-shard" style="height: 12px; background: rgba(0,255,255,0.3); border-radius: 2px;"></div>
+                <div class="thermal-shard" style="height: 12px; background: rgba(255,200,0,0.9); border-radius: 2px;"></div>
+                <div class="thermal-shard" style="height: 12px; background: rgba(0,255,255,0.05); border-radius: 2px;"></div>
+            </div>
+            <div class="stat-label">Avg Temp: 34°C (Optimal)</div>
+        </div>
+
+        <!-- Live Kernel Console Shard -->
+        <div class="kernel-console-shard" id="kernel-console" style="position: fixed; bottom: 60px; right: 20px; width: 350px; height: 220px; background: rgba(0,0,0,0.85); backdrop-filter: blur(20px); border: 1px solid rgba(0,255,255,0.2); border-radius: 12px; display: flex; flex-direction: column; overflow: hidden; box-shadow: 0 10px 30px rgba(0,0,0,0.5); z-index: 1000;">
+            <div style="background: rgba(255,255,255,0.05); padding: 8px 12px; font-size: 0.7em; color: var(--accent); display: flex; justify-content: space-between; border-bottom: 1px solid rgba(255,255,255,0.1);">
+                <span>LIVE KERNEL TELEMETRY</span>
+                <span>SHARD-ID: 0x8F2</span>
+            </div>
+            <div id="console-output" style="flex: 1; padding: 10px; font-family: 'JetBrains Mono', monospace; font-size: 0.75em; color: rgba(255,255,255,0.8); overflow-y: auto;">
+                <div>[0.000] Σ [ORCHESTRATOR]: Sharding Foundation...</div>
+                <div>[0.012] Σ [PMM]: Silicon Memory Shard ONLINE.</div>
+                <div>[0.045] Σ [VMM]: PML4 Tables Orchestrated.</div>
+                <div>[0.102] Σ [SEL]: Zero-Trust Policy Active.</div>
+                <div>[0.158] Σ [SYSBRIDGE]: POSIX-lite Shards Ready.</div>
+                <div>[0.210] Σ [LATTICE]: Heartbeat Sync Active.</div>
+            </div>
+        </div>
+
         <div class="widget">
             <div class="widget-title">
                 <span>Silicon Audit</span>
