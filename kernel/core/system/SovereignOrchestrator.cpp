@@ -33,6 +33,7 @@ extern "C" {
     void hyper_init();
     void peripheral_init();
     void gpgpu_init();
+    void hil_sim_init();
     void neural_init();
     void pqc_init();
     void qkd_init();
@@ -45,6 +46,8 @@ extern "C" {
     void federation_init();
     void monitor_init();
     void sandbox_init();
+    void zta_enforcer_init();
+    void anomaly_detector_init();
     void ai_persona_init();
     void model_man_init();
     void enclave_init_shard();
@@ -113,6 +116,7 @@ public:
         virtio_init(); // Initialize High-Speed Virtualization
         peripheral_init(); // Initialize Hot-Swap Orchestrator
         gpgpu_init(); // Initialize High-Performance GPU Compute
+        hil_sim_init(); // Initialize Hardware-In-The-Loop Simulation
         hyper_init(); // Initialize Hypervisor for shard isolation
         neural_init(); // Initialize Neural Nexus (S-NPU)
         netstack_init(); // Initialize Sovereign Network Stack
@@ -130,6 +134,8 @@ public:
         qkd_init(); // Quantum Key Distribution active
         audit_init(); // Tamper-Proof Auditing active
         verifier_init(); // Formal Verification active
+        zta_enforcer_init(); // Zero-Trust continuous auth active
+        anomaly_detector_init(); // AI-driven threat hunting active
         pqc_init(); // Post-Quantum Cryptography active
         sandbox_init(); // Secure container isolation active
         enclave_init_shard(); // Hardware Root-of-Trust active
