@@ -99,6 +99,10 @@
                     else if (el) el.classList.remove('neural-active');
                 });
             }
+            setMindfulness(active) {
+                document.body.classList.toggle('focus-mode-active', active);
+                addLog(active ? 'Î£ [NEURAL]: Mindfulness Mode ACTIVE. Filtering noise...' : 'Î£ [NEURAL]: Mindfulness Mode DISABLED.');
+            }
         }
         const neural = new NeuralLayoutEngine();
 
@@ -299,6 +303,25 @@
                 <div class="stat-progress security" id="trust-progress" style="width: 100%;"></div>
             </div>
             <div class="audit-info">Lattice Entropy: OPTIMAL</div>
+        </div>
+
+        <!-- Sovereign Orb Marketplace Widget -->
+        <div class="widget">
+            <div class="widget-title">
+                <span>Orb Marketplace</span>
+                <span class="accent">Mesh-Live</span>
+            </div>
+            <div style="margin-top: 10px; display: flex; flex-direction: column; gap: 8px;">
+                <div class="market-item" style="background: rgba(255,255,255,0.05); padding: 8px; border-radius: 6px; font-size: 0.8em; display: flex; justify-content: space-between; align-items: center;">
+                    <span>NeuralVisualizer-v2</span>
+                    <button class="cyber-btn small-btn primary" onclick="addLog('Σ [MARKET]: Summoning Shard...')">SUMMON</button>
+                </div>
+                <div class="market-item" style="background: rgba(255,255,255,0.05); padding: 8px; border-radius: 6px; font-size: 0.8em; display: flex; justify-content: space-between; align-items: center;">
+                    <span>BioFS-DNA-Module</span>
+                    <button class="cyber-btn small-btn primary" onclick="addLog('Σ [MARKET]: Summoning Shard...')">SUMMON</button>
+                </div>
+            </div>
+            <div class="audit-info">Trending: QuantumSieve-PQC</div>
         </div>
 
         <!-- Live Kernel Console Shard -->
