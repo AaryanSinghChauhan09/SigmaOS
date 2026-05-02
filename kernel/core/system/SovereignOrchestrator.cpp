@@ -33,6 +33,7 @@ extern "C" {
     void netstack_init();
     void cryptostack_init();
     void audit_init();
+    void verifier_init();
     void identity_init();
     void monitor_init();
     void sandbox_init();
@@ -107,6 +108,7 @@ public:
         identity_init(); // Identity and Access Management active
         cryptostack_init(); // Legacy Cryptographic Parity active
         audit_init(); // Tamper-Proof Auditing active
+        verifier_init(); // Formal Verification active
         pqc_init(); // Post-Quantum Cryptography active
         sandbox_init(); // Secure container isolation active
         enclave_init_shard(); // Hardware Root-of-Trust active
