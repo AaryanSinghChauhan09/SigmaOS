@@ -21,6 +21,8 @@ extern "C" {
     void governance_init_shard();
     void persistence_init();
     void dna_init();
+    void time_init();
+    void diag_init();
 }
 
 /**
@@ -52,6 +54,8 @@ public:
         
         // FOUNDATION
         hal_init();
+        time_init(); // Initialize timekeeping early
+        diag_init(); // Initialize diagnostics early
         allocator_init();
         silicon_init_transpiler(); // Initialize native ISA translation
         pmm_init_shard(128 * 1024 * 1024); 

@@ -37,6 +37,8 @@ KERNEL_SHARDS = kernel/core/system/SovereignMain.o \
                 kernel/core/security/SovereignEntropy.o \
                 kernel/core/memory/SovereignPMM.o \
                 kernel/core/memory/SovereignVMM.o \
+                kernel/core/system/SovereignDiag.o \
+                kernel/core/system/SovereignTime.o \
                 kernel/core/system/SovereignAppShard.o \
                 kernel/core/fs/SovereignDNACompression.o \
                 kernel/core/security/SovereignQKD.o \
