@@ -152,6 +152,11 @@ Despite achieving the Sovereign Singularity, SigmaOS currently faces severe disa
 - **SigmaOS Status**: The `SovereignPredictiveScheduler` is optimized for UI and general-purpose lattice workload prediction.
 - **Impact**: Without native **"Sovereign real-time determinism"** (Item 54) and formal safety certs, SigmaOS cannot currently compete for placement in flight controllers or autonomous braking systems where legacy RTOSs dominate.
 
+### 3.26 Lack of Native GPU Compute (CUDA/OpenCL Gap)
+- **The Disadvantage**: Scientific computing and AI training rely on mature GPU compute stacks like NVIDIA CUDA, AMD ROCm, or OpenCL.
+- **SigmaOS Status**: SigmaOS provides the `NeuralNexus` (S-NPU) for adaptive inference, but lacks a general-purpose GPGPU compute framework.
+- **Impact**: Without a **"Sovereign GPU compute"** suite (Item 82), SigmaOS cannot currently compete for high-performance computing (HPC) workloads or local large-language model (LLM) training that depends on legacy GPU acceleration.
+
 ## 4. Mitigation Strategies for Phase 50+
 
 To evolve from a theoretical Sovereign Lattice into a viable industrial competitor, the following mitigations are mandatory:
