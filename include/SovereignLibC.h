@@ -14,7 +14,7 @@ extern "C" {
 #endif
 
 /* =========================================================================
- * DIRECT SYSCALL DECLARATIONS (x86_64 Linux â€” no libc wrapper)
+ * DIRECT SYSCALL DECLARATIONS (x86_64 Linux - no libc wrapper)
  * ========================================================================= */
 void          sigma_exit(int code);
 sigma_ssize_t sigma_write(int fd, const void* buf, sigma_size_t count);
@@ -41,7 +41,7 @@ void*         sigma_memset(void* s, int c, sigma_size_t n);
 void*         sigma_memcpy(void* dest, const void* src, sigma_size_t n);
 
 /* =========================================================================
- * HIGH-LEVEL PRIMITIVES (implemented in SovereignLibC.c â€” pure C11)
+ * HIGH-LEVEL PRIMITIVES (implemented in SovereignLibC.c - pure C11)
  * ========================================================================= */
 int   sigma_streq(const char* s1, const char* s2);
 int   sigma_compare(const char* s1, const char* s2);

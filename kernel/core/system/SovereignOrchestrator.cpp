@@ -25,6 +25,7 @@ extern "C" {
     void dna_init();
     void time_init();
     void diag_init();
+    void telemetry_init();
     void tracer_init();
     void ipc_init();
     void shmem_init();
@@ -92,6 +93,7 @@ public:
         hal_init();
         time_init(); // Initialize timekeeping early
         diag_init(); // Initialize diagnostics early
+        telemetry_init(); // Initialize Bare-Metal Telemetry
         tracer_init(); // Initialize instruction-level tracing
         allocator_init();
         silicon_init_transpiler(); // Initialize native ISA translation
