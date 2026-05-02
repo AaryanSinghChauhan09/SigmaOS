@@ -37,6 +37,7 @@ extern "C" {
     void cloud_orch_init();
     void driver_transpiler_init();
     void perf_init();
+    void snap_init();
 }
 
 /**
@@ -105,6 +106,7 @@ public:
         cloud_orch_init(); // Multi-Node Cloud Orchestration active
         driver_transpiler_init(); // Legacy Driver Translation active
         perf_init(); // Performance Profiling active
+        snap_init(); // Dynamic Shard-Snapping active
         governance_init_shard(); // Community Contributor Registry active
         
         sigma_log("Σ [ORCHESTRATOR]: Lattice Singularity Achieved. System LIVE.");
