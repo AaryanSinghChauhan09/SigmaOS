@@ -13,7 +13,7 @@ extern "C" {
 #endif
 
 /* Standard POSIX-like types parity - only if not already defined */
-#ifndef uint8_t
+#if !defined(_UINT8_T_DECLARED) && !defined(_STDINT_H) && !defined(_SYS_TYPES_H)
 typedef sigma_u8  uint8_t;
 typedef sigma_u16 uint16_t;
 typedef sigma_u32 uint32_t;
@@ -23,6 +23,15 @@ typedef sigma_i8  int8_t;
 typedef sigma_i16 int16_t;
 typedef sigma_i32 int32_t;
 typedef sigma_i64 int64_t;
+
+#define _UINT8_T_DECLARED
+#define _UINT16_T_DECLARED
+#define _UINT32_T_DECLARED
+#define _UINT64_T_DECLARED
+#define _INT8_T_DECLARED
+#define _INT16_T_DECLARED
+#define _INT32_T_DECLARED
+#define _INT64_T_DECLARED
 #endif
 
 typedef sigma_i64 sigma_ssize_t;

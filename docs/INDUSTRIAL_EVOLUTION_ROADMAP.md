@@ -30,8 +30,9 @@ Achieving the "Lattice Singularity" through distributed connectivity.
 | Shard | Gap | Action | Status |
 | :--- | :--- | :--- | :--- |
 | **SMP Shard** | Multicore race conditions. | Implement distributed spinlocks. | [FIXED] |
-| **VFS-Sync** | Cache invalidation drift. | Lattice-wide TTL enforcement. | [IN-PROGRESS] |
+| **VFS-Sync** | Cache invalidation drift. | Lattice-wide TTL enforcement. | [FIXED] |
 | **PQC-Bridge** | Handshake latency. | Silicon-level pre-computation. | [FIXED] |
+| **Init-Shard** | Orchestrator name mismatches. | Standardize Phase 1-4 initializers. | [FIXED] |
 
 ---
 
