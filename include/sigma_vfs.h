@@ -1,11 +1,3 @@
-/*
- * =========================================================================
- * Σ SIGMAOS: SOVEREIGN VIRTUAL FILE SYSTEM (VFS)
- * =========================================================================
- * Mission: Zero-latency shard-mapped path resolution.
- * =========================================================================
- */
-
 #ifndef SIGMA_VFS_H
 #define SIGMA_VFS_H
 
@@ -15,24 +7,18 @@
 extern "C" {
 #endif
 
-typedef enum {
-    SIGMA_FS_SHARD,
-    SIGMA_FS_VIRTUAL,
-    SIGMA_FS_HARDWARE
-} sigma_fs_type_t;
+typedef struct sigma_file {
+    char name[128];
+    sigma_u32 size;
+    sigma_u32 flags;
+    void* buffer;
+} sigma_file_t;
 
-typedef struct {
-    char            name[64];
-    sigma_u32       shard_id;
-    sigma_fs_type_t type;
-    void*           private_data;
-} sigma_vnode_t;
-
-/* --- VFS Primitives --- */
-void           vfs_init(void);
-sigma_vnode_t* vfs_lookup(const char* path);
-bool           vfs_mount(const char* path, sigma_u32 shard_id);
-sigma_u64      vfs_get_lookup_count(void);
+void vfs_init(void);
+sigma_file_t* vfs_open(const char* path);
+sigma_status vfs_read(sigma_file_t* file, void* buf, sigma_u32 size);
+sigma_status vfs_write(sigma_file_t* file, const void* buf, sigma_u32 size);
+void vfs_close(sigma_file_t* file);
 
 #ifdef __cplusplus
 }

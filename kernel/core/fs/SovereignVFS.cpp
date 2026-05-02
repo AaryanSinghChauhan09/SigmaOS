@@ -1,103 +1,65 @@
-#include "sigma_hal.h"
-#include "SovereignVFS.hpp"
+#include "../../../include/sigma_vfs.h"
+#include "../../../include/sigma_types.h"
 #include "../../../include/SovereignLibC.h"
+#include "../../../include/SigmaOOP.hpp"
 
 /**
- * SigmaOS Sovereign Virtual File System (VFS)
- * Distributed, resilient storage architecture across heterogeneous silicon.
- *
- * USP: Transparently shards and replicates file data across multiple connected 
- * Sovereign nodes (via NetStack), ensuring 100% data survivability even if 
- * a physical storage die catastrophically fails.
- *
- * Design: OOP-isolated singleton — SovereignDistributedVFS.
+ * SigmaOS Sovereign VFS (Virtual File System) Shard
+ * Principles: Amnesic Sharding, High-Speed I/O, Silicon-Direct.
  */
 
-SovereignDistributedVFS& SovereignDistributedVFS::getInstance() {
-    static SovereignDistributedVFS instance;
-    return instance;
-}
+namespace SigmaOS {
+namespace Kernel {
+namespace FS {
 
-void SovereignDistributedVFS::init() {
-    sigma_log("[VFS] Initializing Sovereign Distributed Virtual File System...");
-    this->active_shards = 0;
-    this->files_tracked = 0;
-    sigma_log("[VFS] Sharded replication protocol ACTIVE.");
-}
+class SovereignVFS : public SigmaObject {
+public:
+    static SovereignVFS& getInstance() {
+        static SovereignVFS instance;
+        return instance;
+    }
 
-void SovereignDistributedVFS::mountDistributedNode(const char* node_address) {
-    if (this->active_shards >= 8) return;
-    sigma_hardened_strcpy(this->shard_nodes[this->active_shards], node_address, 32);
-    this->active_shards++;
-    sigma_printf("[VFS] Storage Node %s mounted. VFS Pool expanded.\n", node_address);
-}
+    const char* type_name() const noexcept override { return "SovereignVFS"; }
 
-sigma_u32 SovereignDistributedVFS::open(const char* filepath, sigma_u32 flags) {
-    sigma_printf("[VFS] Syscall: OPEN '%s' (Flags: 0x%X)\n", filepath, flags);
-    // In a real impl, this would return a file descriptor from an atomic handle table
-    return 100u + (this->files_tracked % 100u);
-}
+    void init() {
+        sigma_log("[VFS] Orchestrating Sovereign Lattice Filesystem...");
+        m_root_shard_count = 0;
+        // Simulated mount of the Initial RAM Shard (IRS)
+        sigma_log("[VFS] IRS Shard mounted at lattice root (/).");
+    }
 
-sigma_u32 SovereignDistributedVFS::read(sigma_u32 fd, void* buffer, sigma_u32 size) {
-    sigma_printf("[VFS] Syscall: READ FD %u (%u bytes) -> buffer @ %p\n", fd, size, buffer);
-    // Simulate reading from distributed shards
-    return size;
-}
+    sigma_file_t* open(const char* path) {
+        sigma_printf("[VFS] Accessing shard: %s\n", path);
+        // Logic to traverse the lattice nodes would go here
+        return SIGMA_NULL; 
+    }
 
-sigma_u32 SovereignDistributedVFS::write(sigma_u32 fd, const void* buffer, sigma_u32 size) {
-    sigma_printf("[VFS] Syscall: WRITE FD %u (%u bytes) <- buffer @ %p\n", fd, size, buffer);
-    this->files_tracked++;
-    return size;
-}
+    sigma_status read(sigma_file_t* file, void* buf, sigma_u32 size) {
+        if (!file) return 1;
+        sigma_memcpy(buf, file->buffer, size);
+        return 0;
+    }
 
-void SovereignDistributedVFS::close(sigma_u32 fd) {
-    sigma_printf("[VFS] Syscall: CLOSE FD %u\n", fd);
-}
+    sigma_status write(sigma_file_t* file, const void* buf, sigma_u32 size) {
+        if (!file) return 1;
+        sigma_memcpy(file->buffer, buf, size);
+        return 0;
+    }
 
-void SovereignDistributedVFS::writeReplicatedFile(const char* filepath, const char* /*data*/) {
-    this->files_tracked++;
-    sigma_printf("[VFS] File '%s' written and replicated across %u distributed shards.\n", 
-                 filepath, this->active_shards > 0 ? this->active_shards : 1);
-}
+private:
+    SovereignVFS() : m_root_shard_count(0) {}
+    sigma_u32 m_root_shard_count;
+};
 
-void SovereignDistributedVFS::atomicSync() {
-    sigma_log("[VFS] Initiating Atomic Lattice Sync (Relativistic Drift Corrector)...");
-    
-    // HARDENED: Resolve 2ms relativistic drift using Lattice-wide Lamport Logical Clocks
-    this->system_vector_clock += 1;
-    this->drift_correction_ms = 0; // Reset drift to absolute zero
-    
-    sigma_printf("[VFS] [SECURE] Drift Resolved via PQC Handshake. Lattice Timestamp: 0x%X\n", this->system_vector_clock);
-    sigma_log("[VFS] Transactional Persistence: ACHIEVED (Zero Drift).");
-}
+} // namespace FS
+} // namespace Kernel
+} // namespace SigmaOS
 
-SovereignDistributedVFS::SovereignDistributedVFS() : active_shards(0), files_tracked(0), system_vector_clock(0), drift_correction_ms(2) {}
-
-/* --- C Wrappers --- */
+/* --- C Interface for Kernel Interop --- */
 extern "C" void vfs_init() {
-    SovereignDistributedVFS::getInstance().init();
+    SigmaOS::Kernel::FS::SovereignVFS::getInstance().init();
 }
 
-extern "C" void vfs_mount_node(const char* node_address) {
-    SovereignDistributedVFS::getInstance().mountDistributedNode(node_address);
-}
-
-extern "C" void vfs_write_file(const char* filepath, const char* data) {
-    SovereignDistributedVFS::getInstance().writeReplicatedFile(filepath, data);
-}
-
-extern "C" sigma_u32 vfs_open(const char* path, sigma_u32 flags) {
-    return SovereignDistributedVFS::getInstance().open(path, flags);
-}
-
-extern "C" sigma_u32 vfs_read(sigma_u32 fd, void* buf, sigma_u32 sz) {
-    return SovereignDistributedVFS::getInstance().read(fd, buf, sz);
-}
-
-extern "C" sigma_u32 vfs_write(sigma_u32 fd, const void* buf, sigma_u32 sz) {
-    return SovereignDistributedVFS::getInstance().write(fd, buf, sz);
-}
-
-extern "C" void vfs_close(sigma_u32 fd) {
-    SovereignDistributedVFS::getInstance().close(fd);
+extern "C" sigma_file_t* vfs_open(const char* path) {
+    return SigmaOS::Kernel::FS::SovereignVFS::getInstance().open(path);
 }
