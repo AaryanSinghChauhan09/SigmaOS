@@ -49,6 +49,7 @@ extern "C" {
     void webapp_bridge_init();
     void posix_init();
     void media_init();
+    void streamer_init();
     void accessibility_init();
     void cloud_orch_init();
     void consensus_init();
@@ -136,6 +137,7 @@ public:
         ai_persona_init(); // Neural Adaptation active
         model_man_init(); // AI Model Orchestration active
         media_init(); // Hardware-Accelerated Media active
+        streamer_init(); // Low-Latency Spatial Streaming active
         accessibility_init(); // Inclusive Orchestration active
         webapp_bridge_init(); // Orbital WebApp Injection active
         posix_init(); // POSIX Emulation active

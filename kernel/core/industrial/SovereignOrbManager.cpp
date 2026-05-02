@@ -23,10 +23,10 @@ public:
     const char* type_name() const noexcept override { return "SovereignOrbManager"; }
 
     void init() {
-        sigma_log("Î£ [ORB-MAN]: Initializing Sovereign Package Ecosystem...");
+        sigma_log("Σ [ORB-MAN]: Initializing Sovereign Package Ecosystem...");
         m_installed_orbs = 0;
         // Verify local Orb-Lattice registry
-        sigma_log("Î£ [ORB-MAN]: Orb-Lattice Registry ONLINE (Zero-Dependency).");
+        sigma_log("Σ [ORB-MAN]: Orb-Lattice Registry ONLINE (Zero-Dependency).");
     }
 
     void installOrb(const char* orb_name, const char* signature) {
@@ -45,7 +45,7 @@ public:
     }
 
     void listOrbs() {
-        sigma_printf("\n--- Î£ SOVEREIGN ORB REGISTRY ---\n");
+        sigma_printf("\n--- Σ SOVEREIGN ORB REGISTRY ---\n");
         sigma_printf("| Active Orbs     : %u\n", m_installed_orbs);
         sigma_printf("| Parity Level    : INDUSTRIAL\n");
         sigma_printf("--------------------------------\n");

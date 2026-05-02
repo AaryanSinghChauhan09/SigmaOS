@@ -227,6 +227,11 @@ Despite achieving the Sovereign Singularity, SigmaOS currently faces severe disa
 - **SigmaOS Status**: The `SovereignHFTNexus` shard provides the orchestration logic for kernel-bypass and FPGA-mapped networking.
 - **Impact**: Without a comprehensive **"Sovereign HFT framework"** (Item 31) that provides out-of-the-box support for specialized HFT NICs and silicon-direct packet paths, SigmaOS remains slightly behind the raw performance of specialized HFT-optimized Linux distributions or proprietary HFT kernels.
 
+### 3.41 Low-Latency Spatial Streaming (RDP Gap)
+- **The Disadvantage**: Modern enterprise and creative workflows require high-performance remote desktop protocols (RDP, ICA, Teradici) for 4K/60fps streaming with minimal input lag.
+- **SigmaOS Status**: The `SovereignSpatialStreamer` shard provides the orchestration logic for low-latency, 3D-aware orbital lattice streaming.
+- **Impact**: Without a comprehensive **"Sovereign spatial streaming"** (Item 77) framework that provides 1:1 parity with industrial remote display ecosystems, SigmaOS remains a challenge to position for remote high-end workstations or distributed creative studios.
+
 ## 4. Mitigation Strategies for Phase 50+
 
 To evolve from a theoretical Sovereign Lattice into a viable industrial competitor, the following mitigations are mandatory:
