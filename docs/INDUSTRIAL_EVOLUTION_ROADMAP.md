@@ -33,3 +33,23 @@ Achieving the "Lattice Singularity" through distributed connectivity.
 | **Interaction** | Usability | **VFS Shard**: Create an Initrd to load userland apps. | ⏳ Planned |
 | **Expansion** | Hardware | **PCI Shard**: Automatic bus-scanner for device discovery. | ⏳ Planned |
 | **Zenith** | Security | **Identity Vault**: Hardware-backed amnesic encryption keys. | ⏳ Planned |
+
+---
+
+## 5. The 500-Feature Singularity
+To achieve total sovereignty, SigmaOS is evolving through 50 thematic clusters, each containing 10 specific functional shards. For the full list of planned features, refer to the [SOVEREIGN_LATTICE_MANIFEST_500.md](SOVEREIGN_LATTICE_MANIFEST_500.md).
+
+### Primary Thematic Clusters:
+- **Lattice Core**: Silicon-aware scheduling and predictive memory.
+- **Morphic Zenith**: Fluid graphics and adaptive UI layouts.
+- **Aether Net**: Zero-trust mesh networking and hardware firewalls.
+- **Sovereign FS**: Infinite snapshots and DNA-inspired compression.
+- **Sovereign DevTools**: Bare-metal IDEs and Rust shard integration.
+
+---
+
+## Next Steps: Priority Shards
+Following the "Sovereign Silicon" philosophy, the immediate development focus is directed toward:
+1.  **Aether Firewall**: Kernel-level NIC filter orchestration.
+2.  **Multitasking Shard**: Hardware-level round-robin scheduler implementation.
+3.  **Identity Vault**: Secure Element integration for amnesic secrets.
