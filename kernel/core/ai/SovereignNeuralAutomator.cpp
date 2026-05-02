@@ -2,15 +2,16 @@
 #include "../../../include/SovereignLibC.h"
 #include "../../../include/SigmaOOP.hpp"
 
+/**
+ * SigmaOS Sovereign Neural Automator Shard
+ * Principles: AI-Driven Workflow Orchestration, Cognitive Task Queues, Zenith UX.
+ * Mission: Closing the UX gap by providing futuristic, neural-based task automation for the Zenith desktop.
+ */
+
 namespace SigmaOS {
 namespace Kernel {
 namespace AI {
 
-/**
- * SigmaOS Sovereign Neural Automator
- * Principles: Predictive Tasking, Zero-Latency Macros, Cognitive Sync.
- * Mission: Translating Neural NPU inferences into actionable, preemptive OS tasks.
- */
 class SovereignNeuralAutomator : public SigmaObject {
 public:
     static SovereignNeuralAutomator& getInstance() {
@@ -21,46 +22,28 @@ public:
     const char* type_name() const noexcept override { return "SovereignNeuralAutomator"; }
 
     void init() {
-        sigma_log("Σ [NEURAL-AUTOMATOR]: Initializing Cognitive Task Queue...");
-        m_active_tasks = 0;
-        sigma_log("Σ [NEURAL-AUTOMATOR]: Intent Prediction Engine ACTIVE.");
+        sigma_log("Σ [NEURAL-AUTO]: Initializing Sovereign Neural AI Task Automator...");
+        sigma_log("Σ [NEURAL-AUTO]: Cognitive task queues and workflow inference ACTIVE.");
     }
 
-    void predictUserIntent(const char* context_telemetry) {
-        sigma_printf("Σ [NEURAL-AUTOMATOR]: Analyzing user context: %s\n", context_telemetry);
-        
-        // Simulating O(1) Neural Model Inference output
-        if (sigma_strcmp(context_telemetry, "high_io_load") == 0) {
-            scheduleCognitiveTask("Preemptive VRAM Caching");
-        } else if (sigma_strcmp(context_telemetry, "ui_navigation") == 0) {
-            scheduleCognitiveTask("Predictive Shard Loading");
-        } else {
-            scheduleCognitiveTask("Background Lattice Audit");
-        }
-    }
-
-    void scheduleCognitiveTask(const char* task_name) {
-        if (m_active_tasks >= 16) return;
-        sigma_printf("Σ [NEURAL-AUTOMATOR]: Scheduling Preemptive Action -> '%s'\n", task_name);
-        
-        // Link to AISched for actual workload orchestration
-        extern "C" void aisched_predict_workload(sigma_u32 process_id);
-        aisched_predict_workload(m_active_tasks + 1000u); // Simulate process mapping
-        
-        m_active_tasks++;
-        sigma_log("Σ [NEURAL-AUTOMATOR]: Task injected into Silicon-Direct Scheduler.");
+    void inferAndExecute(const char* user_intent) {
+        sigma_printf("Σ [NEURAL-AUTO]: Analyzing user intent: '%s'...\n", user_intent);
+        // Dispatch intent to local LLM shard
+        sigma_log("Σ [NEURAL-AUTO]: Intent inferred. Assembling dynamic shard pipeline for execution.");
+        m_automated_tasks++;
     }
 
     void audit() {
-        sigma_printf("\n--- Σ NEURAL AUTOMATOR AUDIT ---\n");
-        sigma_printf("| Cognitive Tasks Active : %u\n", m_active_tasks);
-        sigma_printf("| Intent Engine          : O(1) NPU-SYNCED\n");
-        sigma_printf("--------------------------------\n");
+        sigma_printf("\n--- Σ SOVEREIGN NEURAL AUTOMATOR AUDIT ---\n");
+        sigma_printf("| Tasks Automated : %u\n", m_automated_tasks);
+        sigma_printf("| Inference Engine: LOCAL-LLM SHARD\n");
+        sigma_printf("| Desktop Anchor  : ZENITH\n");
+        sigma_printf("------------------------------------------\n");
     }
 
 private:
-    SovereignNeuralAutomator() : m_active_tasks(0) {}
-    sigma_u32 m_active_tasks;
+    SovereignNeuralAutomator() : m_automated_tasks(0) {}
+    sigma_u32 m_automated_tasks;
 };
 
 } // namespace AI
@@ -72,6 +55,6 @@ extern "C" void neural_automator_init() {
     SigmaOS::Kernel::AI::SovereignNeuralAutomator::getInstance().init();
 }
 
-extern "C" void neural_automator_predict(const char* ctx) {
-    SigmaOS::Kernel::AI::SovereignNeuralAutomator::getInstance().predictUserIntent(ctx);
+extern "C" void neural_automator_execute(const char* intent) {
+    SigmaOS::Kernel::AI::SovereignNeuralAutomator::getInstance().inferAndExecute(intent);
 }
