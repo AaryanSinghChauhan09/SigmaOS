@@ -287,6 +287,20 @@
             <div class="stat-label">Avg Temp: 34°C (Optimal)</div>
         </div>
 
+        <!-- Sovereign Trust Fabric Widget -->
+        <div class="widget">
+            <div class="widget-title">
+                <span>Trust Fabric</span>
+                <span class="accent">Quantum-Synced</span>
+            </div>
+            <div class="stat-value" id="trust-level">99.9%</div>
+            <div class="stat-label">Keys Active: <span id="qkd-keys">128</span></div>
+            <div class="stat-bar">
+                <div class="stat-progress security" id="trust-progress" style="width: 100%;"></div>
+            </div>
+            <div class="audit-info">Lattice Entropy: OPTIMAL</div>
+        </div>
+
         <!-- Live Kernel Console Shard -->
         <div class="kernel-console-shard" id="kernel-console" style="position: fixed; bottom: 60px; right: 20px; width: 350px; height: 220px; background: rgba(0,0,0,0.85); backdrop-filter: blur(20px); border: 1px solid rgba(0,255,255,0.2); border-radius: 12px; display: flex; flex-direction: column; overflow: hidden; box-shadow: 0 10px 30px rgba(0,0,0,0.5); z-index: 1000;">
             <div style="background: rgba(255,255,255,0.05); padding: 8px 12px; font-size: 0.7em; color: var(--accent); display: flex; justify-content: space-between; border-bottom: 1px solid rgba(255,255,255,0.1);">
@@ -300,6 +314,8 @@
                 <div>[0.102] Σ [SEL]: Zero-Trust Policy Active.</div>
                 <div>[0.158] Σ [SYSBRIDGE]: POSIX-lite Shards Ready.</div>
                 <div>[0.210] Σ [LATTICE]: Heartbeat Sync Active.</div>
+                <div>[0.255] Σ [QKD]: BB84 Quantum Lattice Established.</div>
+                <div>[0.312] Σ [TRUST]: Fabric Unified & Sealed.</div>
             </div>
         </div>
 
