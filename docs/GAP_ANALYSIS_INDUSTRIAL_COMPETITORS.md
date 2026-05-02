@@ -257,6 +257,16 @@ Despite achieving the Sovereign Singularity, SigmaOS currently faces severe disa
 - **SigmaOS Status**: The `SovereignHILSimulator` provides the orchestration logic for deterministic microsecond-granularity sensor emulation and zero-latency injection.
 - **Impact**: Without a specialized **"Sovereign HIL platform"** (Item 84) providing certified determinism for physical control systems, SigmaOS remains slightly behind embedded commercial OS platforms used in autonomous vehicles and satellites.
 
+### 3.47 Atomic Rollbacks & Declarative State (Atomic OS Gap)
+- **The Disadvantage**: Modern immutable Linux distributions (Fedora Silverblue via OSTree, NixOS) treat the OS state declaratively, allowing for atomic, zero-risk rollbacks to a previous system generation.
+- **SigmaOS Status**: The `SovereignAtomicUpdater` provides the orchestration logic for immutable snapshotting and A/B partition flipping.
+- **Impact**: Without a standardized **"Sovereign declarative state manager"** (Item 10) providing atomic rollbacks of the entire lattice configuration, SigmaOS remains slightly behind modern immutable server operating systems.
+
+### 3.48 Live Kernel Patching (Live Patch Gap)
+- **The Disadvantage**: High-availability industrial environments require critical security updates to be applied without system reboots (kpatch, kGraft).
+- **SigmaOS Status**: The `SovereignLivePatcher` provides the orchestration logic for zero-downtime function trampolines and live execution redirection.
+- **Impact**: Without an integrated **"Sovereign hot-patching framework"** (Item 12) for the silicon transpiler layer, SigmaOS remains a challenge to position for 99.999% uptime Tier-1 workloads.
+
 ## 4. Mitigation Strategies for Phase 50+
 
 To evolve from a theoretical Sovereign Lattice into a viable industrial competitor, the following mitigations are mandatory:

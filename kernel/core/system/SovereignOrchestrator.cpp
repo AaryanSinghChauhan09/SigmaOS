@@ -48,6 +48,8 @@ extern "C" {
     void sandbox_init();
     void zta_enforcer_init();
     void anomaly_detector_init();
+    void atomic_os_init();
+    void live_patch_init();
     void ai_persona_init();
     void model_man_init();
     void enclave_init_shard();
@@ -136,6 +138,8 @@ public:
         verifier_init(); // Formal Verification active
         zta_enforcer_init(); // Zero-Trust continuous auth active
         anomaly_detector_init(); // AI-driven threat hunting active
+        atomic_os_init(); // Atomic declarative updates active
+        live_patch_init(); // Zero-downtime hot-patching active
         pqc_init(); // Post-Quantum Cryptography active
         sandbox_init(); // Secure container isolation active
         enclave_init_shard(); // Hardware Root-of-Trust active
