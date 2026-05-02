@@ -27,6 +27,8 @@ extern "C" {
     void diag_init();
     void telemetry_init();
     void tracer_init();
+    void ebpf_init();
+    void watchdog_init();
     void ipc_init();
     void shmem_init();
     void virtio_init();
@@ -38,6 +40,7 @@ extern "C" {
     void pqc_init();
     void qkd_init();
     void netstack_init();
+    void vpn_init();
     void hft_nexus_init();
     void cryptostack_init();
     void audit_init();
@@ -48,13 +51,17 @@ extern "C" {
     void sandbox_init();
     void zta_enforcer_init();
     void anomaly_detector_init();
+    void apparmor_init();
     void atomic_os_init();
     void live_patch_init();
+    void fuzzer_init();
     void ai_persona_init();
     void model_man_init();
+    void snapshot_init();
     void enclave_init_shard();
     void webapp_bridge_init();
     void posix_init();
+    void marketplace_init();
     void media_init();
     void streamer_init();
     void accessibility_init();
@@ -101,6 +108,8 @@ public:
         diag_init(); // Initialize diagnostics early
         telemetry_init(); // Initialize Bare-Metal Telemetry
         tracer_init(); // Initialize instruction-level tracing
+        ebpf_init(); // Initialize dynamic observability
+        watchdog_init(); // Initialize automated resilience
         allocator_init();
         silicon_init_transpiler(); // Initialize native ISA translation
         power_init(); // Initialize Power Management
@@ -112,6 +121,7 @@ public:
         sched_init();
         aisched_init();
         dna_init();
+        snapshot_init(); // Copy-On-Write filesystem snapshotting active
         persistence_init();
         ipc_init(); // Initialize IPC before neural systems
         shmem_init(); // Initialize Zero-Copy Shared Memory
@@ -122,6 +132,7 @@ public:
         hyper_init(); // Initialize Hypervisor for shard isolation
         neural_init(); // Initialize Neural Nexus (S-NPU)
         netstack_init(); // Initialize Sovereign Network Stack
+        vpn_init(); // Initialize WireGuard-parity VPN tunnels
         hft_nexus_init(); // Initialize Ultra-Low-Latency HFT Path
         monitor_init(); // Initialize System Monitor
         neural_automator_init(); // Activate Cognitive Task Queue
@@ -138,8 +149,10 @@ public:
         verifier_init(); // Formal Verification active
         zta_enforcer_init(); // Zero-Trust continuous auth active
         anomaly_detector_init(); // AI-driven threat hunting active
+        apparmor_init(); // Mandatory Access Control active
         atomic_os_init(); // Atomic declarative updates active
         live_patch_init(); // Zero-downtime hot-patching active
+        fuzzer_init(); // Continuous ML fuzzing active
         pqc_init(); // Post-Quantum Cryptography active
         sandbox_init(); // Secure container isolation active
         enclave_init_shard(); // Hardware Root-of-Trust active
@@ -147,6 +160,7 @@ public:
         mesh_init(); // Mesh-First Protocol active
         
         sigma_log("Σ [ORCHESTRATOR]: Initiating Lattice Phase 4 (Ecosystem)...");
+        marketplace_init(); // Decentralized Orb Registry active
         market_init_shard(); // Decentralized Orb Exchange active
         orb_manager_init(); // Local Orb verification and execution active
         ai_persona_init(); // Neural Adaptation active
