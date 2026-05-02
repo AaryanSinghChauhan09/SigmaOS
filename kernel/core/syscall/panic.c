@@ -5,7 +5,7 @@
  * Principles: Industrial Logging & Post-Mortem Diagnostics.
  * =============================================================================
  */
-#include "sigma_kernel_types.h"
+#include "../../../include/sigma_kernel_types.h"
 
 extern void vga_clear(sigma_u8 color);
 extern void kprintf(const char* fmt, ...);

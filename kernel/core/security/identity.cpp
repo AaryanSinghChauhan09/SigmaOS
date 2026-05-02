@@ -1,6 +1,6 @@
 #include "Lattice.h"
 #include "identity.hpp"
-#include "SovereignLibC.h"
+#include "../../../include/SovereignLibC.h"
 
 namespace SigmaOS {
 namespace Security {

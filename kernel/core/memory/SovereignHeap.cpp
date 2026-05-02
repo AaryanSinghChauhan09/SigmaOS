@@ -1,5 +1,5 @@
-#include "sigma_types.h"
-#include "SovereignLibC.h"
+#include "../../../include/sigma_types.h"
+#include "../../../include/SovereignLibC.h"
 #include "sigma_mem.h"
 #include "sigma_hal.h"
 

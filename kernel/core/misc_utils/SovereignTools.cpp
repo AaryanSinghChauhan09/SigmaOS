@@ -1,5 +1,6 @@
+#include "../../../include/SovereignLibC.h"
 #include "sigma_hal.h"
-#include "sigma_types.h"
+#include "../../../include/sigma_types.h"
 
 /**
  * S-TOOLS: Sovereign Utility Engine (v28.0 Zenith)

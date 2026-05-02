@@ -1,8 +1,8 @@
 #ifndef SCHEDULER_HPP
 #define SCHEDULER_HPP
 
-#include "sigma_types.h"
-#include "SigmaOOP.hpp"
+#include "../../../include/sigma_types.h"
+#include "../../../include/SigmaOOP.hpp"
 #include "SovereignString.hpp"
 
 namespace SigmaOS {

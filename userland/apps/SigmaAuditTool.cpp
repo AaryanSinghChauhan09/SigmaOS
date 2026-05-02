@@ -7,7 +7,7 @@
  * =========================================================================
  */
 
-#include "SovereignLibC.h"
+#include "../../include/SovereignLibC.h"
 
 typedef struct {
     char audit_id[32];

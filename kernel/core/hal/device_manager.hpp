@@ -1,10 +1,10 @@
 #ifndef DEVICE_MANAGER_HPP
 #define DEVICE_MANAGER_HPP
 
-#include "SovereignLibC.h"
+#include "../../../include/SovereignLibC.h"
 
-#include "sigma_types.h"
-#include "SigmaOOP.hpp"
+#include "../../../include/sigma_types.h"
+#include "../../../include/SigmaOOP.hpp"
 // display_driver.hpp removed (not used directly)
 
 namespace SigmaOS {

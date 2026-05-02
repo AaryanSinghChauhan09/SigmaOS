@@ -7,7 +7,7 @@
  * =========================================================================
  */
 
-#include "SovereignLibC.h"
+#include "../../include/SovereignLibC.h"
 
 // --- Macro Automation (XClicker / AutoKey style) ---
 void sigma_macro_trigger(const char* name) {

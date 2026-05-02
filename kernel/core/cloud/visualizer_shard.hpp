@@ -1,9 +1,9 @@
 #ifndef VISUALIZER_SHARD_HPP
 #define VISUALIZER_SHARD_HPP
 
-#include "SovereignLibC.h"
+#include "../../../include/SovereignLibC.h"
 
-#include "SigmaOOP.hpp"
+#include "../../../include/SigmaOOP.hpp"
 
 namespace SigmaOS {
 namespace Kernel {

@@ -1,5 +1,5 @@
 #include "Lattice.h"
-#include "SovereignLibC.h"
+#include "../../../include/SovereignLibC.h"
 /* =========================================================================
  * Σ SIGMAOS: COLONIZATION SHARD (v1.0 - SOVEREIGN EXPANSION)
  * =========================================================================
@@ -8,7 +8,7 @@
  * =========================================================================
  */
 
-#include "SigmaOOP.hpp"
+#include "../../../include/SigmaOOP.hpp"
 
 namespace SigmaOS {
 namespace Expansion {

@@ -7,7 +7,7 @@
  * =========================================================================
  */
 
-#include "SovereignLibC.h"
+#include "../../include/SovereignLibC.h"
 
 // --- Sys-Info Sharding ---
 void sigma_tool_sysinfo() {

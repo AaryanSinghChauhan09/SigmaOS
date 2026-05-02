@@ -1,7 +1,7 @@
 #include "sigma_hal.h"
-#include "sigma_types.h"
+#include "../../../include/sigma_types.h"
 #include "industrial_hypervisor.hpp"
-#include "SovereignLibC.h"
+#include "../../../include/SovereignLibC.h"
 
 namespace SigmaOS {
 namespace Core {

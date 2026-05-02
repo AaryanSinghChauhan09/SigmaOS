@@ -1,6 +1,6 @@
 #include "SovereignSnap.hpp"
 #include "sigma_hal.h"
-#include "SovereignLibC.h"
+#include <SovereignLibC.h>
 
 /**
  * SigmaOS Sovereign Snap Layouts (SovereignSnapEngine)

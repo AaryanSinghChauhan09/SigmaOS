@@ -9,7 +9,7 @@
  * =========================================================================
  */
 
-#include "SovereignLibC.h"
+#include "../../../include/SovereignLibC.h"
 
 /* =========================================================================
  * Evidence record (replaces SigmaString& args)

@@ -10,7 +10,7 @@
  * =============================================================================
  */
 
-#include "sigma_kernel_types.h"
+#include "../../../include/sigma_kernel_types.h"
 
 #define MAX_ZENITH_APPS 16
 

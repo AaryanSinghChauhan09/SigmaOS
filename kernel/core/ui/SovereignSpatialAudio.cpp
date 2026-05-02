@@ -1,5 +1,6 @@
+#include "../../../include/SovereignLibC.h"
 #include "sigma_hal.h"
-#include "sigma_types.h"
+#include "../../../include/sigma_types.h"
 #include "sigma_spatialaudio.h"
 #include "sigma_hal.h"
 #include "sigma_audio.h"

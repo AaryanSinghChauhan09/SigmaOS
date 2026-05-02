@@ -1,5 +1,5 @@
 #include "Lattice.h"
-#include "SovereignLibC.h"
+#include "../../../include/SovereignLibC.h"
 /*
  * =========================================================================
  * Î£ SIGMAOS: SOVEREIGN COSMIC GOVERNANCE (v1.0 - GALAXY POLICY)
@@ -8,7 +8,7 @@
  * =========================================================================
  */
 
-#include "SigmaOOP.hpp"
+#include "../../../include/SigmaOOP.hpp"
 #include "userland/apps/cosmic_governance/policies.hpp"
 
 using namespace SigmaOS;

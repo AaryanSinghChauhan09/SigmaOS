@@ -5,7 +5,7 @@
  * Principles: Shard-Native Packages & Dependency Integrity.
  * =============================================================================
  */
-#include "sigma_kernel_types.h"
+#include "../../include/sigma_kernel_types.h"
 
 typedef struct Package {
     char    name[32];

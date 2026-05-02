@@ -1,5 +1,5 @@
 #include "Lattice.h"
-#include "SovereignLibC.h"
+#include "../../../include/SovereignLibC.h"
 /*
  * =========================================================================
  * Î£ SIGMAOS: SOVEREIGN AETHER ABSORPTION (v94.0)

@@ -9,7 +9,7 @@
  * =========================================================================
  */
 
-#include "SovereignLibC.h"
+#include "../../../include/SovereignLibC.h"
 
 /* =========================================================================
  * Audio ring-buffer (replaces IAudioSource interface)

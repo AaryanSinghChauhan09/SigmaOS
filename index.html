@@ -12,6 +12,14 @@
         rel="stylesheet">
     <link rel="stylesheet" href="zenith_desktop.css">
     <style>
+        .focus-mode-active .desktop-overlay {
+            background: rgba(0,0,0,0.8);
+            backdrop-filter: grayscale(1);
+        }
+        .focus-mode-active .widgets-container, .focus-mode-active .desktop-icons {
+            opacity: 0.1;
+            pointer-events: none;
+        }
         .util-nav {
             padding: 10px;
             cursor: pointer;
@@ -517,6 +525,8 @@
                 <div class="util-nav" onclick="switchUtil('status')">IsItDownRightNow</div>
                 <div class="util-nav" onclick="switchUtil('bootable')">Bootable Creator</div>
                 <div class="util-nav" onclick="switchUtil('table')">Table Convert</div>
+                <div class="util-nav" onclick="switchUtil('broadcaster')">Prompt Broadcaster</div>
+                <div class="util-nav" onclick="switchUtil('firewall')">Aether Firewall</div>
             </div>
             <!-- Main Area -->
             <div id="util-main" class="util-main">
@@ -609,6 +619,27 @@
                     <button class="util-btn" onclick="convertTable()">Forge HTML Table</button>
                     <div id="table-output" class="util-output"></div>
                 </div>
+                <div id="util-broadcaster" class="hidden-shard">
+                    <h3>Prompt Broadcaster</h3>
+                    <textarea id="util-broadcast-prompt" class="util-input" placeholder="Enter prompt to broadcast..." style="height: 100px !important;"></textarea>
+                    <textarea id="util-broadcast-sites" class="util-input" placeholder="Enter site URLs (one per line, use {{prompt}} as placeholder)..." style="height: 120px !important;">https://www.perplexity.ai/search?q={{prompt}}
+https://www.google.com/search?q={{prompt}}
+https://chatgpt.com/?q={{prompt}}</textarea>
+                    <div class="util-actions">
+                        <button class="util-btn" onclick="broadcastPromptUtility()">BROADCAST PROMPT</button>
+                    </div>
+                </div>
+                <div id="util-firewall" class="hidden-shard">
+                    <h3>Aether Firewall (Site Blocker)</h3>
+                    <p class="stat-label">Block domains at the lattice level to preserve focus.</p>
+                    <div style="display: flex; gap: 10px; margin-bottom: 15px;">
+                        <input type="text" id="firewall-input" class="util-input" placeholder="Enter domain (e.g. twitter.com)..." style="height: 45px !important; margin: 0;">
+                        <button class="util-btn" onclick="addBlockRule()" style="height: 45px;">BLOCK</button>
+                    </div>
+                    <ul id="blocked-list" class="workflow-list" style="max-height: 200px; overflow-y: auto;">
+                        <li class="routine-item routine-border-magenta"><strong>facebook.com</strong> <button class="cyber-btn small-btn" onclick="this.parentElement.remove()">UNBLOCK</button></li>
+                    </ul>
+                </div>
             </div>
         </div>
     </div>
@@ -694,10 +725,24 @@
                     <div class="mkt-name">Neon Cyber</div>
                     <div class="mkt-desc">Deep-focus cyan glassmorphism.</div>
                 </div>
-                <div class="mkt-item" onclick="addLog('Σ [AUTO]: Morphic Automation Enabled!', 'success')">
-                    <div class="mkt-icon">🤖</div>
-                    <div class="mkt-name">AI Automator</div>
-                    <div class="mkt-desc">Enable predictive scheduling.</div>
+                <div class="mkt-item" onclick="setTheme('crimson')">
+                    <div class="mkt-icon">🩸</div>
+                    <div class="mkt-name">Crimson Shard</div>
+                    <div class="mkt-desc">High-alert, performance-driven red.</div>
+                </div>
+            </div>
+            <h3 style="margin-top: 30px;">Personalization Parameters</h3>
+            <div class="ai-segment" style="background: rgba(255,255,255,0.02); padding: 20px; border-radius: 12px; margin-top: 15px;">
+                <div class="stat-label">Accent Hue (PQC-Sync)</div>
+                <input type="range" min="0" max="360" value="180" class="stat-bar" style="width: 100%; height: 10px; appearance: none; background: var(--glass); border-radius: 5px; outline: none;" oninput="updateAccentHue(this.value)">
+                
+                <div class="stat-label" style="margin-top: 20px;">Glass Blur Intensity</div>
+                <input type="range" min="0" max="50" value="25" class="stat-bar" style="width: 100%; height: 10px; appearance: none; background: var(--glass); border-radius: 5px; outline: none;" oninput="updateGlassBlur(this.value)">
+                
+                <div class="stat-label" style="margin-top: 20px;">Sovereign Wallpaper</div>
+                <div class="flex-gap-10 mt-10" style="display: flex; gap: 10px;">
+                    <div class="theme-shard" style="background: url('zenith_professional_wallpaper_1777356063201.png'); background-size: cover; width: 40px; height: 40px; border-radius: 8px; border: 1px solid var(--glass-border); cursor: pointer;" onclick="setWallpaper('zenith_professional_wallpaper_1777356063201.png')"></div>
+                    <div class="theme-shard" style="background: #111; width: 40px; height: 40px; border-radius: 8px; border: 1px solid var(--glass-border); cursor: pointer;" onclick="setWallpaper('none')"></div>
                 </div>
             </div>
         </div>
@@ -971,7 +1016,7 @@
         }
 
         function switchUtil(utilId) {
-            const panes = ['text-ops', 'data-conv', 'code-img', 'diff', 'dup-find', 'key-test', 'speed', 'status', 'bootable', 'table'];
+            const panes = ['text-ops', 'data-conv', 'code-img', 'diff', 'dup-find', 'key-test', 'speed', 'status', 'bootable', 'table', 'broadcaster', 'firewall'];
             panes.forEach(p => {
                 const el = document.getElementById(`util-${p}`);
                 if (el) el.style.display = 'none';
@@ -996,6 +1041,64 @@
             const dups = Object.keys(counts).filter(w => counts[w] > 1);
             document.getElementById('dup-output').innerText = dups.length > 0 ? "Duplicates: " + dups.join(', ') : "No duplicates found.";
             addLog("Σ [UTILITY]: Duplicate scan complete.", "success");
+        }
+
+        function broadcastPromptUtility() {
+            const promptInput = document.getElementById('util-broadcast-prompt');
+            const sitesInput = document.getElementById('util-broadcast-sites');
+            
+            if (!promptInput.value.trim()) {
+                addLog("Σ [ERR]: Broadcast failed - No prompt.", "error");
+                return;
+            }
+
+            const prompt = encodeURIComponent(promptInput.value.trim());
+            const sites = sitesInput.value.split('\n').map(s => s.trim()).filter(s => s.length > 0);
+
+            if (sites.length === 0) {
+                addLog("Σ [ERR]: Broadcast failed - No sites.", "error");
+                return;
+            }
+
+            addLog(`Σ [ZENITH]: Broadcasting to ${sites.length} shards...`, "success");
+            
+            sites.forEach(site => {
+                const url = site.replace('{{prompt}}', prompt);
+                window.open(url, '_blank');
+            });
+        }
+
+        function addBlockRule() {
+            const input = document.getElementById('firewall-input');
+            const list = document.getElementById('blocked-list');
+            if (!input.value.trim()) return;
+            
+            const li = document.createElement('li');
+            li.className = "routine-item routine-border-magenta";
+            li.innerHTML = `<strong>${input.value.trim()}</strong> <button class="cyber-btn small-btn" onclick="this.parentElement.remove()">UNBLOCK</button>`;
+            list.prepend(li);
+            addLog(`Σ [FIREWALL]: Blocked access to ${input.value.trim()}.`, "error");
+            input.value = '';
+        }
+
+        function updateAccentHue(val) {
+            document.documentElement.style.setProperty('--accent', `hsl(${val}, 100%, 50%)`);
+            document.documentElement.style.setProperty('--accent-glow', `hsla(${val}, 100%, 50%, 0.3)`);
+        }
+
+        function updateGlassBlur(val) {
+            document.documentElement.style.setProperty('--glass-blur', `blur(${val}px)`);
+            addLog(`Σ [CONFIG]: Glass Intensity set to ${val}px.`, "success");
+        }
+
+        function setWallpaper(src) {
+            if (src === 'none') {
+                document.body.style.backgroundImage = 'none';
+                document.body.style.backgroundColor = '#030305';
+            } else {
+                document.body.style.backgroundImage = `url('${src}')`;
+            }
+            addLog(`Σ [CONFIG]: Wallpaper Shard updated.`, "success");
         }
 
         window.addEventListener('keydown', (e) => {

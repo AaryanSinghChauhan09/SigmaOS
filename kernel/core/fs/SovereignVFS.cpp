@@ -1,6 +1,6 @@
 #include "sigma_hal.h"
 #include "SovereignVFS.hpp"
-#include "SovereignLibC.h"
+#include "../../../include/SovereignLibC.h"
 
 /**
  * SigmaOS Sovereign Virtual File System (VFS)

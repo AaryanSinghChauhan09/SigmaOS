@@ -11,7 +11,7 @@
  * =============================================================================
  */
 
-#include "sigma_kernel_types.h"
+#include "../../include/sigma_kernel_types.h"
 
 typedef struct LatticePacket {
     sigma_u64  seq_id;

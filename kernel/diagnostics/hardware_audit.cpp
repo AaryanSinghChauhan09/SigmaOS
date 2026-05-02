@@ -1,5 +1,5 @@
 #include "Lattice.h"
-#include "SovereignLibC.h"
+#include "../../include/SovereignLibC.h"
 #include "hardware_audit.hpp"
 
 namespace SigmaOS {

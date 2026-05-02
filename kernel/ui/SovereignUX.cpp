@@ -1,3 +1,4 @@
+#include "../../include/SovereignLibC.h"
 #include "sigma_ux.h"
 #include "sigma_gui.h"
 #include "sigma_hal.h"

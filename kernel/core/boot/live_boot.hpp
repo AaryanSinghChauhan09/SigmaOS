@@ -1,8 +1,8 @@
 #ifndef LIVE_BOOT_HPP
 #define LIVE_BOOT_HPP
 
-#include "sigma_types.h"
-#include "SigmaOOP.hpp"
+#include "../../../include/sigma_types.h"
+#include "../../../include/SigmaOOP.hpp"
 
 namespace SigmaOS {
 namespace Kernel {

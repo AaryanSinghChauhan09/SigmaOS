@@ -1,6 +1,6 @@
 #include "SovereignPackage.hpp"
 #include "sigma_hal.h"
-#include "SovereignLibC.h"
+#include "../../../include/SovereignLibC.h"
 
 SovereignPackageEngine& SovereignPackageEngine::getInstance() {
     static SovereignPackageEngine instance;

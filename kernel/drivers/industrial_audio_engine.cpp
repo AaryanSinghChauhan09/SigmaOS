@@ -1,6 +1,6 @@
 #include "Lattice.h"
 #include "industrial_audio_engine.hpp"
-#include "SovereignLibC.h"
+#include "../../include/SovereignLibC.h"
 
 namespace SigmaOS {
 namespace Media {

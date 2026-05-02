@@ -3,7 +3,7 @@
 // Zero-Dependency, Hardware-Native Image Pipeline with UI Sharding
 // Absorbing Snapchat (Neural Tracking) & MIT Scratch (Visual Logic) USPs
 
-#include "SigmaOOP.hpp"
+#include "../include/SigmaOOP.hpp"
 
 namespace SigmaOS {
 namespace Multimedia {

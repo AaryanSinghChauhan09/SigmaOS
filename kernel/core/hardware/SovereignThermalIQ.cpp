@@ -1,4 +1,5 @@
-#include "sigma_types.h"
+#include "../../../include/SovereignLibC.h"
+#include "../../../include/sigma_types.h"
 #include "sigma_hal.h"
 extern "C" void energysched_set_shard_state(sigma_u32 shard_id, sigma_u32 state);
 

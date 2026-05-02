@@ -1,6 +1,7 @@
+#include "../../include/SovereignLibC.h"
 #include "sigma_net.h"
 #include "sigma_hal.h"
-#include "sigma_types.h"
+#include "../../include/sigma_types.h"
 
 /**
  * SigmaOS Sovereign Network Stack (S-NET)

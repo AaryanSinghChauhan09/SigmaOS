@@ -5,7 +5,7 @@
  * Principles: Zero-Fragmentation & Cache-Efficient Object Reuse.
  * =============================================================================
  */
-#include "sigma_kernel_types.h"
+#include "../../../include/sigma_kernel_types.h"
 
 typedef struct slab {
     sigma_u32 object_size;

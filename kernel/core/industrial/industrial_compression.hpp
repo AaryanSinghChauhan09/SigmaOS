@@ -1,10 +1,10 @@
 #ifndef SOVEREIGN_COMPRESSION_HPP
 #define SOVEREIGN_COMPRESSION_HPP
 
-#include "SovereignLibC.h"
+#include "../../../include/SovereignLibC.h"
 
-#include "sigma_types.h"
-#include "SigmaOOP.hpp"
+#include "../../../include/sigma_types.h"
+#include "../../../include/SigmaOOP.hpp"
 
 namespace SigmaOS {
 namespace Storage {

@@ -1,6 +1,6 @@
 #include "Lattice.h"
 #include "orchestrator_ui.hpp"
-#include "SovereignLibC.h"
+#include "../../include/SovereignLibC.h"
 
 namespace SigmaOS {
 namespace UI {

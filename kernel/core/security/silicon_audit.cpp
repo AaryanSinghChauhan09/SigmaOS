@@ -1,6 +1,6 @@
 #include "sigma_hal.h"
-#include "sigma_types.h"
-#include "SovereignLibC.h"
+#include "../../../include/sigma_types.h"
+#include "../../../include/SovereignLibC.h"
 #include "silicon_audit.hpp"
 
 namespace SigmaOS {

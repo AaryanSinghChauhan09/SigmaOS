@@ -1,6 +1,6 @@
 #include "sigma_diag.h"
 #include "sigma_hal.h"
-#include "SovereignLibC.h"
+#include "../../../include/SovereignLibC.h"
 
 extern "C" uint32_t time_get_uptime_ms(void);
 

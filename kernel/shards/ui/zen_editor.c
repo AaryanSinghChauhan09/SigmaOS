@@ -11,7 +11,7 @@
  * =============================================================================
  */
 
-#include "sigma_kernel_types.h"
+#include "../../../include/sigma_kernel_types.h"
 
 #define MAX_EDITOR_LINES 4096u
 #define MAX_LINE_LEN 256u

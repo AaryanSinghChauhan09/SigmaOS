@@ -1,9 +1,9 @@
 #ifndef MEMORY_MATRIX_HPP
 #define MEMORY_MATRIX_HPP
 
-#include "SovereignLibC.h"
+#include "../../../include/SovereignLibC.h"
 
-#include "SigmaOOP.hpp"
+#include "../../../include/SigmaOOP.hpp"
 
 namespace SigmaOS {
 namespace Kernel {

@@ -1,7 +1,7 @@
 #ifndef SOVEREIGN_VFS_HPP
 #define SOVEREIGN_VFS_HPP
 
-#include "sigma_types.h"
+#include "../../../include/sigma_types.h"
 
 class SovereignDistributedVFS {
 public:

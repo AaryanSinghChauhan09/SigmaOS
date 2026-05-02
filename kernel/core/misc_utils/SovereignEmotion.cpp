@@ -1,4 +1,5 @@
-#include "sigma_types.h"
+#include "../../../include/SovereignLibC.h"
+#include "../../../include/sigma_types.h"
 #include "sigma_emotion.h"
 #include "sigma_hal.h"
 #include "sigma_universal_ui.h"

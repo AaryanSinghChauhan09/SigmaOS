@@ -1,4 +1,4 @@
-#include "sigma_types.h"
+#include "../../../include/sigma_types.h"
 #include "sigma_thermaliq.h"
 #include "sigma_hal.h"
 

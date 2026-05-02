@@ -1,7 +1,7 @@
 #ifndef TIMER_SHARD_HPP
 #define TIMER_SHARD_HPP
 
-#include "SigmaOOP.hpp"
+#include "../../../include/SigmaOOP.hpp"
 
 namespace SigmaOS {
 namespace Kernel {

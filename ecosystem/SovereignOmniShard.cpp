@@ -1,4 +1,4 @@
-#include "SovereignLibC.h"
+#include "../include/SovereignLibC.h"
 
 namespace SigmaOS {
 namespace Omni {

@@ -1,9 +1,9 @@
 #ifndef POWER_SHARD_HPP
 #define POWER_SHARD_HPP
 
-#include "SovereignLibC.h"
+#include "../../../include/SovereignLibC.h"
 
-#include "SigmaOOP.hpp"
+#include "../../../include/SigmaOOP.hpp"
 #include "port_shard.hpp"
 
 namespace SigmaOS {

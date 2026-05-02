@@ -5,7 +5,7 @@
  * Principles: Asynchronous Message Passing & Shard-Isolation Integrity.
  * =============================================================================
  */
-#include "sigma_kernel_types.h"
+#include "../../../include/sigma_kernel_types.h"
 
 extern sigma_u32 cpu_get_id(void);
 

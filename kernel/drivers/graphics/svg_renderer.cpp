@@ -1,6 +1,6 @@
 #include "Lattice.h"
 #include "svg_renderer.hpp"
-#include "SovereignLibC.h"
+#include "../../../include/SovereignLibC.h"
 
 // Forward declaration of low-level primitive
 extern "C" void sigma_graphics_rasterize_bezier_lowlevel(const char* path);

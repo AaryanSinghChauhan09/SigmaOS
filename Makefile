@@ -18,8 +18,8 @@ KERNEL_SHARDS = kernel/core/system/SovereignMain.o \
                 kernel/core/memory/SovereignMMU.o \
                 kernel/core/ai/SovereignAISched.o \
                 kernel/core/system/SovereignSMP.o \
-                kernel/core/misc/SovereignLazy.o \
-                kernel/core/misc/SovereignSnap.o \
+                kernel/core/misc_utils/SovereignLazy.o \
+                kernel/core/misc_utils/SovereignSnap.o \
                 kernel/core/ai/SovereignKube.o \
                 kernel/core/system/SovereignInstall.o \
                 kernel/core/network/SovereignBluetooth.o \
@@ -38,7 +38,7 @@ KERNEL_SHARDS = kernel/core/system/SovereignMain.o \
                 kernel/core/security/SovereignAudit.o \
                 kernel/core/ai/SovereignNeuralNexus.o \
                 kernel/shards/system/SovereignLibC.o \
-                kernel/core/misc/SovereignTests.o
+                kernel/core/misc_utils/SovereignTests.o
 
 .PHONY: all singularity zenith-iso qemu clean
 

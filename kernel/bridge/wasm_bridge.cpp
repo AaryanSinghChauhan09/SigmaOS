@@ -1,6 +1,6 @@
 #include "Lattice.h"
 #include "wasm_bridge.hpp"
-#include "SovereignLibC.h"
+#include "../../include/SovereignLibC.h"
 
 namespace SigmaOS {
 namespace Bridge {

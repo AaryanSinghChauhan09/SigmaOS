@@ -9,8 +9,8 @@
  * =========================================================================
  */
 
-#include "SovereignLibC.h"
-#include "SovereignLibC.h"   /* C11 scheduler/cloud/ui/net structs */
+#include "../include/SovereignLibC.h"
+#include "../include/SovereignLibC.h"   /* C11 scheduler/cloud/ui/net structs */
 #include "SovereignPersona.h"     /* C11 Persona/Dashboard structs */
 
 /* =========================================================================

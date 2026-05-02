@@ -8,11 +8,11 @@
  * =========================================================================
  */
 
-#include "SigmaOOP.hpp"
-#include "SovereignLibC.h"
+#include "../include/SigmaOOP.hpp"
+#include "../include/SovereignLibC.h"
 #include "SovereignDistroForge.h"
 #include "SovereignCoreUtils.h"
-#include "SovereignLibC.h"
+#include "../include/SovereignLibC.h"
 #include "SovereignSyncZenith.h"
 #include "SovereignDiskZenith.h"
 #include "SovereignOSBasicsZenith.h"

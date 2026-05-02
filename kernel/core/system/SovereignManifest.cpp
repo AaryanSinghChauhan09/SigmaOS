@@ -1,5 +1,5 @@
 #include "sigma_hal.h"
-#include "sigma_types.h"
+#include "../../../include/sigma_types.h"
 #include "sigma_manifest.h"
 #include "sigma_hal.h"
 #include "sigma_libc.h"

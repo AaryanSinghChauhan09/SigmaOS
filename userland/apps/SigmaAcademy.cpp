@@ -7,7 +7,7 @@
  * =========================================================================
  */
 
-#include "SovereignLibC.h"
+#include "../../include/SovereignLibC.h"
 
 void sigma_academy_lesson_list() {
     sigma_printf("\nÎ£ SOVEREIGN ACADEMY: COMMAND MASTERY\n");

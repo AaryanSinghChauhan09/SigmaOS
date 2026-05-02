@@ -5,7 +5,7 @@
  * Principles: Predictive Resource Allocation & AI-Native Scheduling.
  * =============================================================================
  */
-#include "sigma_kernel_types.h"
+#include "../../include/sigma_kernel_types.h"
 
 typedef struct NeuralState {
     sigma_u32     last_cpu_load;

@@ -1,6 +1,6 @@
-#include "sigma_types.h"
+#include "../../../include/sigma_types.h"
 #include "sigma_hal.h"
-#include "SovereignLibC.h"
+#include "../../../include/SovereignLibC.h"
 #include "sigma_time.h"
 
 /**

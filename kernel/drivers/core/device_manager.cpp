@@ -1,6 +1,6 @@
 #include "Lattice.h"
 #include "device_manager.hpp"
-#include "SovereignLibC.h"
+#include "../../../include/SovereignLibC.h"
 
 namespace SigmaOS {
 namespace Drivers {

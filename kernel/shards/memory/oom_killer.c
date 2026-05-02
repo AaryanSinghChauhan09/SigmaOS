@@ -11,7 +11,7 @@
  * =============================================================================
  */
 
-#include "sigma_kernel_types.h"
+#include "../../../include/sigma_kernel_types.h"
 
 typedef struct OOMMaster {
     sigma_u32 total_pills;
