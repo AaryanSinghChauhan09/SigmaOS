@@ -12,7 +12,8 @@
 extern "C" {
 #endif
 
-/* Standard POSIX-like types parity */
+/* Standard POSIX-like types parity - only if not already defined */
+#ifndef uint8_t
 typedef sigma_u8  uint8_t;
 typedef sigma_u16 uint16_t;
 typedef sigma_u32 uint32_t;
@@ -22,30 +23,41 @@ typedef sigma_i8  int8_t;
 typedef sigma_i16 int16_t;
 typedef sigma_i32 int32_t;
 typedef sigma_i64 int64_t;
+#endif
 
 typedef sigma_i64 sigma_ssize_t;
 typedef sigma_u64 sigma_size_t;
-typedef sigma_u64 sigma_usize;
 typedef sigma_u64 sigma_addr_t;
 
 typedef float  sigma_f32;
 typedef double sigma_f64;
 
+#ifndef SIGMA_STATUS_DEFINED
+#define SIGMA_STATUS_DEFINED
 typedef sigma_i32 sigma_status;
+#endif
 
 #ifndef __cplusplus
+#ifndef bool
 typedef unsigned char bool;
 #define true  1
 #define false 0
 #endif
+#endif
 
 /* Industrial Constants */
+#ifndef SIGMA_TRUE
 #define SIGMA_TRUE  1u
+#endif
+#ifndef SIGMA_FALSE
 #define SIGMA_FALSE 0u
+#endif
+#ifndef SIGMA_NULL
 #ifdef __cplusplus
 #define SIGMA_NULL  nullptr
 #else
 #define SIGMA_NULL  ((void*)0)
+#endif
 #endif
 
 #define SIGMA_OK    0x00000000u

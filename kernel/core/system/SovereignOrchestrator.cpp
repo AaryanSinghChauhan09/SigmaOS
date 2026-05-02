@@ -2,6 +2,26 @@
 #include "../../../include/SovereignLibC.h"
 #include "../../../include/SigmaOOP.hpp"
 
+/* --- External Shard Endpoints --- */
+extern "C" {
+    void hal_init();
+    void pmm_init_shard(sigma_u64 mem_size);
+    void vmm_init_shard();
+    void vfs_init();
+    void scheduler_init();
+    void vault_init();
+    void sel_init();
+    void qkd_init();
+    void mesh_init();
+    void silicon_init_transpiler();
+    void neural_automator_init();
+    void market_init_shard();
+    void orb_manager_init();
+    void governance_init_shard();
+    void persistence_init();
+    void dna_init();
+}
+
 /**
  * SigmaOS Sovereign Orchestrator Shard
  * Principles: Deterministic Startup, Shard Dependency Resolution.
@@ -64,25 +84,6 @@ private:
 } // namespace Kernel
 } // namespace SigmaOS
 
-/* --- External Shard Endpoints --- */
-extern "C" {
-    void hal_init();
-    void pmm_init_shard(sigma_u64 mem_size);
-    void vmm_init_shard();
-    void vfs_init();
-    void scheduler_init();
-    void vault_init();
-    void sel_init();
-    void qkd_init();
-    void mesh_init();
-    void silicon_init_transpiler();
-    void neural_automator_init();
-    void market_init_shard();
-    void orb_manager_init();
-    void governance_init_shard();
-    void persistence_init();
-    void dna_init();
-}
 
 /* --- C Bridge --- */
 extern "C" void sigma_bootstrap_lattice() {

@@ -33,7 +33,7 @@ public:
     }
 }
 
-bool SovereignNeuralEngine::loadModel(const char* model_name, sigma_u32 parameters_mb) {
+    bool loadModel(const char* model_name, sigma_u32 parameters_mb) {
     if (!this->initialized) return false;
     if (this->active_models >= 8) {
         sigma_log("[NEURAL] [ERROR] NPU model limit reached.");
@@ -46,7 +46,7 @@ bool SovereignNeuralEngine::loadModel(const char* model_name, sigma_u32 paramete
     return true;
 }
 
-void SovereignNeuralEngine::inferAnomaly(const void* system_telemetry, sigma_u32 size) {
+    void inferAnomaly(const void* system_telemetry, sigma_u32 size) {
     (void)system_telemetry;
     (void)size;
     if (!this->initialized) return;
@@ -55,20 +55,20 @@ void SovereignNeuralEngine::inferAnomaly(const void* system_telemetry, sigma_u32
     sigma_log("[NEURAL] Inference Complete: 0 anomalies detected. System is 100% Sovereign.");
 }
 
-void SovereignNeuralEngine::predict(const void* input_tensor, void* output_tensor) {
+    void predict(const void* input_tensor, void* output_tensor) {
     (void)input_tensor;
     (void)output_tensor;
     sigma_log("[NEURAL] Routing PTO inference to silicon-native NPU...");
     sigma_log("[NEURAL] Prediction complete.");
 }
 
-void SovereignNeuralEngine::reportStatus() {
+    void reportStatus() {
     sigma_printf("[NEURAL] Models: %u | Hardware: %s\n", 
                  this->active_models, 
                  this->npu_available ? "ACTIVE" : "EMULATED");
 }
 
-bool SovereignNeuralEngine::transpileUI(const char* css_shard, char* out_morphic_shard) {
+    bool transpileUI(const char* css_shard, char* out_morphic_shard) {
     sigma_log("[NEURAL] Transpiling CSS Shard to Morphic Zenith...");
     if (!this->initialized) return false;
     
@@ -79,7 +79,7 @@ bool SovereignNeuralEngine::transpileUI(const char* css_shard, char* out_morphic
     }
 
     sigma_printf("[NEURAL] Neural UI (AVX-512 Dedicated): Optimising %s...\n", css_shard);
-    sigma_strcpy(out_morphic_shard, "morphic_zenith_v2.5_singularity", 64);
+    sigma_hardened_strcpy(out_morphic_shard, "morphic_zenith_v2.5_singularity", 64);
     
     sigma_log("[NEURAL] Transpilation Complete. Zero-latency Glassmorphism ACTIVE.");
     return true;

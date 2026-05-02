@@ -23,6 +23,7 @@
         .focus-mode-active .desktop-overlay {
             background: rgba(0,0,0,0.8);
             backdrop-filter: grayscale(1);
+            -webkit-backdrop-filter: grayscale(1);
         }
         .focus-mode-active .widgets-container, .focus-mode-active .desktop-icons {
             opacity: 0.1;
@@ -278,15 +279,15 @@
                 <span>Silicon Heat Map</span>
                 <span class="accent">Thermal IQ</span>
             </div>
-            <div style="display: grid; grid-template-columns: repeat(8, 1fr); gap: 4px; margin-top: 10px;">
-                <div class="thermal-shard" style="height: 12px; background: rgba(255,100,0,0.8); border-radius: 2px;"></div>
-                <div class="thermal-shard" style="height: 12px; background: rgba(255,50,0,0.6); border-radius: 2px;"></div>
-                <div class="thermal-shard" style="height: 12px; background: rgba(0,255,255,0.2); border-radius: 2px;"></div>
-                <div class="thermal-shard" style="height: 12px; background: rgba(0,255,255,0.1); border-radius: 2px;"></div>
-                <div class="thermal-shard" style="height: 12px; background: rgba(255,100,0,0.5); border-radius: 2px;"></div>
-                <div class="thermal-shard" style="height: 12px; background: rgba(0,255,255,0.3); border-radius: 2px;"></div>
-                <div class="thermal-shard" style="height: 12px; background: rgba(255,200,0,0.9); border-radius: 2px;"></div>
-                <div class="thermal-shard" style="height: 12px; background: rgba(0,255,255,0.05); border-radius: 2px;"></div>
+            <div class="thermal-grid">
+                <div class="thermal-shard ts-1"></div>
+                <div class="thermal-shard ts-2"></div>
+                <div class="thermal-shard ts-3"></div>
+                <div class="thermal-shard ts-4"></div>
+                <div class="thermal-shard ts-5"></div>
+                <div class="thermal-shard ts-6"></div>
+                <div class="thermal-shard ts-7"></div>
+                <div class="thermal-shard ts-8"></div>
             </div>
             <div class="stat-label">Avg Temp: 34°C (Optimal)</div>
         </div>
@@ -300,7 +301,7 @@
             <div class="stat-value" id="trust-level">99.9%</div>
             <div class="stat-label">Keys Active: <span id="qkd-keys">128</span></div>
             <div class="stat-bar">
-                <div class="stat-progress security" id="trust-progress" style="width: 100%;"></div>
+                <div class="stat-progress security" id="trust-progress" class="full-width"></div>
             </div>
             <div class="audit-info">Lattice Entropy: OPTIMAL</div>
         </div>

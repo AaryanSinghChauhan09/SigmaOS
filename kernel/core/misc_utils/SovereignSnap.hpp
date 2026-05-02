@@ -2,7 +2,7 @@
 #define SOVEREIGN_SNAP_HPP
 
 #include "../../../include/sigma_types.h"
-#include "sigma_snap.h"
+#include "../../include/sigma_snap_types.h"
 
 class SovereignSnapEngine {
 public:

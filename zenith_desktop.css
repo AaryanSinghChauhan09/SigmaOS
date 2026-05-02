@@ -249,6 +249,7 @@ body {
     border-radius: 28px;
     background: linear-gradient(45deg, transparent, var(--accent-glow), transparent) border-box;
     -webkit-mask: linear-gradient(#fff 0 0) padding-box, linear-gradient(#fff 0 0);
+    mask: linear-gradient(#fff 0 0) padding-box, linear-gradient(#fff 0 0);
     -webkit-mask-composite: xor;
     mask-composite: exclude;
     opacity: 0;
@@ -937,6 +938,40 @@ body {
 @keyframes mesh-pulse {
     0% { transform: scale(1); opacity: 1; }
     100% { transform: scale(3); opacity: 0; }
+.lockdown-mode {
+    filter: hue-rotate(340deg) saturate(2) contrast(1.2);
+    transition: filter 0.5s ease-in-out;
 }
-. l o c k d o w n - m o d e   {   f i l t e r :   h u e - r o t a t e ( 3 4 0 d e g )   s a t u r a t e ( 2 )   c o n t r a s t ( 1 . 2 ) ;   t r a n s i t i o n :   f i l t e r   0 . 5 s   e a s e - i n - o u t ;   }   . l o c k d o w n - m o d e   . d e s k t o p - o v e r l a y   {   b a c k g r o u n d :   r g b a ( 5 0 ,   0 ,   0 ,   0 . 4 ) ;   }  
- 
+
+.lockdown-mode .desktop-overlay {
+    background: rgba(50, 0, 0, 0.4);
+}
+
+/* Thermal IQ Shard Lattice */
+.thermal-grid {
+    display: grid;
+    grid-template-columns: repeat(8, 1fr);
+    gap: 4px;
+    margin-top: 10px;
+}
+
+.thermal-shard {
+    height: 12px;
+    border-radius: 2px;
+}
+
+.ts-1 { background: rgba(255, 100, 0, 0.8); }
+.ts-2 { background: rgba(255, 50, 0, 0.6); }
+.ts-3 { background: rgba(0, 255, 255, 0.2); }
+.ts-4 { background: rgba(0, 255, 255, 0.1); }
+.ts-5 { background: rgba(255, 100, 0, 0.5); }
+.ts-6 { background: rgba(0, 255, 255, 0.3); }
+.ts-7 { background: rgba(255, 200, 0, 0.9); }
+.ts-8 { background: rgba(0, 255, 255, 0.05); }
+
+/* Status Utilities */
+.flex-between { display: flex; justify-content: space-between; align-items: center; }
+.text-muted-small { font-size: 0.85em; color: var(--text-muted); }
+.full-width { width: 100%; }
+.stat-progress-container { width: 100%; height: 6px; background: rgba(255,255,255,0.05); border-radius: 10px; margin-top: 10px; overflow: hidden; }
+.stat-bar { height: 6px; background: rgba(255,255,255,0.05); border-radius: 3px; margin-top: 10px; overflow: hidden; }
