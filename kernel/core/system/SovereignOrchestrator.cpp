@@ -11,7 +11,8 @@ extern "C" {
     void vfs_init();
     void scheduler_init();
     void vault_init();
-    void sel_init();
+    void sel_init_shard();
+    void sechardener_init();
     void qkd_init();
     void mesh_init();
     void silicon_init_transpiler();
@@ -86,7 +87,8 @@ public:
         
         sigma_log("Σ [ORCHESTRATOR]: Initiating Lattice Phase 3 (Security)...");
         vault_init();
-        sel_init();
+        sel_init_shard();
+        sechardener_init();
         pqc_init(); // Post-Quantum Cryptography active
         sandbox_init(); // Secure container isolation active
         enclave_init_shard(); // Hardware Root-of-Trust active
