@@ -39,6 +39,7 @@ extern "C" {
     void audit_init();
     void verifier_init();
     void identity_init();
+    void federation_init();
     void monitor_init();
     void sandbox_init();
     void ai_persona_init();
@@ -116,6 +117,7 @@ public:
         sel_init_shard();
         sechardener_init();
         identity_init(); // Identity and Access Management active
+        federation_init(); // Enterprise SSO Federation active
         cryptostack_init(); // Legacy Cryptographic Parity active
         qkd_init(); // Quantum Key Distribution active
         audit_init(); // Tamper-Proof Auditing active

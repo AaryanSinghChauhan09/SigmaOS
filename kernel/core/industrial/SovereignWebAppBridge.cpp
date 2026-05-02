@@ -23,20 +23,20 @@ public:
     const char* type_name() const noexcept override { return "SovereignWebAppBridge"; }
 
     void init() {
-        sigma_log("Î£ [WEBAPP-BRIDGE]: Initializing Orbital Injection Shard...");
+        sigma_log("Σ [WEBAPP-BRIDGE]: Initializing Orbital Injection Shard...");
         m_active_webapps = 0;
-        sigma_log("Î£ [WEBAPP-BRIDGE]: SSB isolation fabric ACTIVE.");
+        sigma_log("Σ [WEBAPP-BRIDGE]: SSB isolation fabric ACTIVE.");
     }
 
     void injectWebApp(const char* name, const char* url) {
-        sigma_printf("Î£ [WEBAPP-BRIDGE]: Injecting Web-Orb '%s' from URL: %s...\n", name, url);
+        sigma_printf("Σ [WEBAPP-BRIDGE]: Injecting Web-Orb '%s' from URL: %s...\n", name, url);
         // Bind URL to an isolated Sovereign Sandbox
         m_active_webapps++;
-        sigma_log("Î£ [WEBAPP-BRIDGE]: Shard successfully isolated and pinned to Sigma-Shelf.");
+        sigma_log("Σ [WEBAPP-BRIDGE]: Shard successfully isolated and pinned to Sigma-Shelf.");
     }
 
     void audit() {
-        sigma_printf("\n--- Î£ SOVEREIGN WEBAPP AUDIT ---\n");
+        sigma_printf("\n--- Σ SOVEREIGN WEBAPP AUDIT ---\n");
         sigma_printf("| Active Web-Orbs : %u\n", m_active_webapps);
         sigma_printf("| Isolation Mode  : SANDBOX-SILICON\n");
         sigma_printf("| Runtime Integrity: VERIFIED\n");
