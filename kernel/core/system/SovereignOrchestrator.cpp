@@ -27,6 +27,7 @@ extern "C" {
     void storage_ai_init();
     void time_init();
     void diag_init();
+    void forensics_init();
     void telemetry_init();
     void tracer_init();
     void ebpf_init();
@@ -61,6 +62,8 @@ extern "C" {
     void live_patch_init();
     void fuzzer_init();
     void threat_hunter_init();
+    void incognito_init();
+    void compartmentalization_init();
     void ai_persona_init();
     void model_man_init();
     void snapshot_init();
@@ -115,6 +118,7 @@ public:
         hal_init();
         time_init(); // Initialize timekeeping early
         diag_init(); // Initialize diagnostics early
+        forensics_init(); // Initialize native digital forensics
         telemetry_init(); // Initialize Bare-Metal Telemetry
         tracer_init(); // Initialize instruction-level tracing
         ebpf_init(); // Initialize dynamic observability
@@ -167,8 +171,10 @@ public:
         live_patch_init(); // Zero-downtime hot-patching active
         fuzzer_init(); // Continuous ML fuzzing active
         threat_hunter_init(); // Offensive Security Validation active
+        incognito_init(); // Amnesic Tor-routed execution active
         pqc_init(); // Post-Quantum Cryptography active
         sandbox_init(); // Secure container isolation active
+        compartmentalization_init(); // Hardware-backed Extreme Isolation active
         enclave_init_shard(); // Hardware Root-of-Trust active
         ha_core_init(); // High-Availability Active-Active Cluster active
         mesh_init(); // Mesh-First Protocol active
