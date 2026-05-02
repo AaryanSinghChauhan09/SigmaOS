@@ -197,6 +197,11 @@ Despite achieving the Sovereign Singularity, SigmaOS currently faces severe disa
 - **SigmaOS Status**: The `SovereignQKDManager` provides the orchestration logic for entanglement-based trust fabrics and BB84 handshaking.
 - **Impact**: Without a standardized **"Sovereign quantum trust fabric"** (Item 29) that provides out-of-the-box support for the latest QKD hardware and protocol basis alignment, SigmaOS remains slightly behind specialized state-actor security experiments.
 
+### 3.35 Dynamic Peripheral Hot-Swap (Udev Gap)
+- **The Disadvantage**: Consumer OSs (Windows, Linux via Udev) handle hundreds of peripheral events (USB, Thunderbolt, PCIe) per second with sophisticated rule-based orchestration and dynamic mounting.
+- **SigmaOS Status**: The `SovereignPeripheralManager` provides basic hot-swap event handling and rule-based lattice mapping.
+- **Impact**: Without a comprehensive **"Sovereign peripheral manager"** (Item 61) that provides 1:1 parity with legacy device management ecosystems, SigmaOS remains a challenge to position for hardware-intensive workstation or mobile deployments.
+
 ## 4. Mitigation Strategies for Phase 50+
 
 To evolve from a theoretical Sovereign Lattice into a viable industrial competitor, the following mitigations are mandatory:
