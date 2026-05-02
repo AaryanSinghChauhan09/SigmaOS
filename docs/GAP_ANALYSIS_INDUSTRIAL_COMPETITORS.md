@@ -112,10 +112,20 @@ Despite achieving the Sovereign Singularity, SigmaOS currently faces severe disa
 - **SigmaOS Status**: SigmaOS documentation is strictly repository-internal and Wiki-based.
 - **Impact**: A developer encountering a "Lattice Desync" or "PQC Handshake Failure" has no external community resource to consult. This creates a high "TCO" (Total Cost of Ownership) for institutions due to the steep learning curve and lack of a **"Sovereign community portal"** (Item 89 in Roadmap).
 
-### 3.18 Lack of Standardized Driver ABI
-- **The Disadvantage**: Linux and Windows have stable (or at least well-defined) driver ABIs and massive hardware vendor support.
-- **SigmaOS Status**: Every driver in SigmaOS must be a "Sovereign Shard" written in the specific C++ singleton pattern.
-- **Impact**: Porting a legacy driver for a specialized industrial sensor requires a complete re-architecting of the driver's logic. Without **"Modular repos for drivers"** (Item 83 in Roadmap), hardware support will remain the primary bottleneck for industrial adoption.
+### 3.18 Native POSIX-Signal & Exception Handling Gap
+- **The Disadvantage**: POSIX OSs rely on a robust signal handling architecture (`SIGKILL`, `SIGSEGV`, etc.) for process control and error recovery.
+- **SigmaOS Status**: SigmaOS utilizes a shard-event listener model via the `onShardEvent` interface.
+- **Impact**: Porting existing Linux utilities requires a complete re-implementation of their signal-handling logic into the SigmaOS event-lattice, significantly increasing the complexity of ports for mission-critical tools like `systemd` or `bash`.
+
+### 3.19 Lack of Standardized Packaging (deb/rpm Parity)
+- **The Disadvantage**: Linux distributions benefit from standardized package formats (deb, rpm, pacman) and vast global mirror networks.
+- **SigmaOS Status**: SigmaOS uses the "Orb" format, managed by the `SovereignOrbManager`.
+- **Impact**: Without a **"Sovereign package registry"** (Item 84) and a global mirror network, distributing and updating software remains a manual, shard-by-shard process, lacking the automated dependency resolution of industrial competitors.
+
+### 3.20 Immature Debugging & Introspection Tooling
+- **The Disadvantage**: Developers on Windows and Linux have access to highly mature debuggers (GDB, LLDB, WinDbg) and profiling tools (Perf, VTune).
+- **SigmaOS Status**: SigmaOS relies on internal telemetry shards and the `SovereignDiag` engine.
+- **Impact**: The lack of a native **"Sovereign performance profiling"** suite (Item 76) means that deep-kernel performance bottlenecks or memory leaks are significantly harder to isolate and fix compared to industrial competitors with mature DWARF-based toolchains.
 
 ## 4. Mitigation Strategies for Phase 50+
 
