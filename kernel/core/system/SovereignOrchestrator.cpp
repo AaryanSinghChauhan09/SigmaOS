@@ -24,6 +24,7 @@ extern "C" {
     void cron_init();
     void persistence_init();
     void dna_init();
+    void storage_ai_init();
     void time_init();
     void diag_init();
     void telemetry_init();
@@ -42,8 +43,10 @@ extern "C" {
     void qkd_init();
     void netstack_init();
     void vpn_init();
+    void routing_init();
     void sovereign_dns_init();
     void hft_nexus_init();
+    void crypto_accel_init();
     void cryptostack_init();
     void audit_init();
     void verifier_init();
@@ -124,6 +127,7 @@ public:
         sched_init();
         aisched_init();
         dna_init();
+        storage_ai_init(); // ML-Driven Predictive Tiering active
         snapshot_init(); // Copy-On-Write filesystem snapshotting active
         persistence_init();
         ipc_init(); // Initialize IPC before neural systems
@@ -135,9 +139,11 @@ public:
         hyper_init(); // Initialize Hypervisor for shard isolation
         neural_init(); // Initialize Neural Nexus (S-NPU)
         netstack_init(); // Initialize Sovereign Network Stack
+        routing_init(); // Initialize Mesh-Aware Routing Tables
         sovereign_dns_init(); // Initialize Decentralized DNS
         vpn_init(); // Initialize WireGuard-parity VPN tunnels
         hft_nexus_init(); // Initialize Ultra-Low-Latency HFT Path
+        crypto_accel_init(); // Hardware Crypto Acceleration active
         monitor_init(); // Initialize System Monitor
         neural_automator_init(); // Activate Cognitive Task Queue
         
@@ -173,10 +179,12 @@ public:
         media_init(); // Hardware-Accelerated Media active
         streamer_init(); // Low-Latency Spatial Streaming active
         accessibility_init(); // Inclusive Orchestration active
+        zenith_desktop_init(); // Neural AI-driven Desktop active
         cron_init(); // Distributed Task Automation active
         webapp_bridge_init(); // Orbital WebApp Injection active
         posix_init(); // POSIX Emulation active
         cloud_orch_init(); // Multi-Node Cloud Orchestration active
+        edge_node_init(); // Sovereign Edge Computing active
         consensus_init(); // Distributed State Consensus active
         cloud_init_shard(); // Sovereign Cloud Extension active
         driver_transpiler_init(); // Legacy Driver Translation active
