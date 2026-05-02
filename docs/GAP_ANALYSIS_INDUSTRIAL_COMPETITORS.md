@@ -82,10 +82,15 @@ Despite achieving the Sovereign Singularity, SigmaOS currently faces severe disa
 - **SigmaOS Status**: Zenith UI uses a custom Morphic Layer Composition (MLC) protocol.
 - **Impact**: There is zero binary or protocol compatibility with existing graphical applications. Porting a browser or a professional suite (like Blender or CAD tools) requires a ground-up rewrite of the application's UI logic to the Zenith API, creating a massive barrier to entry for creative professionals.
 
-### 3.12 Native Virtualization (Hypervisor) Gap
-- **The Disadvantage**: Modern industrial OSs (Linux via KVM, Windows via Hyper-V) are built to host virtual machines.
-- **SigmaOS Status**: SigmaOS lacks a native Type-1 or Type-2 hypervisor shard.
-- **Impact**: SigmaOS cannot currently function as a cloud host or a development environment that requires running isolated VM guest OSs. This limits its industrial application in data centers where virtualization is the baseline requirement.
+### 3.12 Virtualization Scope & Guest Isolation
+- **The Disadvantage**: Modern industrial OSs (Linux via KVM, Windows via Hyper-V) are built to host arbitrary full-system guest OSs (Linux, Windows, BSD).
+- **SigmaOS Status**: SigmaOS utilizes the `SovereignHypervisor` for "Shard-Isolated Virtualization" (SIV).
+- **Impact**: While SIV provides silicon-native isolation for lattice shards, it currently lacks the device emulation and BIOS/UEFI translation required to run legacy ISOs as guest machines. This limits SigmaOS to being a "Hyper-Microkernel" for its own ecosystem rather than a general-purpose cloud host.
+
+### 3.13 Lack of Dynamic Shared Libraries (DLL/SO)
+- **The Disadvantage**: Established OSs use dynamic linking (DLLs on Windows, .so files on Linux) to share code and update components without rebooting.
+- **SigmaOS Status**: SigmaOS relies on a "Singular Binary" architecture where shards are statically linked into the lattice.
+- **Impact**: Updating a core system library requires a full kernel rebuild and lattice reset. While the `SovereignOrbManager` provides a path for hot-patching, it lacks the decades of tooling and stable ABI (Application Binary Interface) that make dynamic linking the industrial standard for modular software distribution.
 
 ## 4. Mitigation Strategies for Phase 50+
 
