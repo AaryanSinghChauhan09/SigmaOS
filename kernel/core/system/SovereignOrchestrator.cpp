@@ -32,6 +32,7 @@ extern "C" {
     void virtio_init();
     void hyper_init();
     void peripheral_init();
+    void gpgpu_init();
     void neural_init();
     void pqc_init();
     void qkd_init();
@@ -111,6 +112,7 @@ public:
         shmem_init(); // Initialize Zero-Copy Shared Memory
         virtio_init(); // Initialize High-Speed Virtualization
         peripheral_init(); // Initialize Hot-Swap Orchestrator
+        gpgpu_init(); // Initialize High-Performance GPU Compute
         hyper_init(); // Initialize Hypervisor for shard isolation
         neural_init(); // Initialize Neural Nexus (S-NPU)
         netstack_init(); // Initialize Sovereign Network Stack
