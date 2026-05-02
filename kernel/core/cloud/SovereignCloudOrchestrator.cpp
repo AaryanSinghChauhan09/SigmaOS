@@ -22,20 +22,20 @@ public:
     const char* type_name() const noexcept override { return "SovereignCloudOrchestrator"; }
 
     void init() {
-        sigma_log("Î£ [CLOUD-ORCH]: Initializing Multi-Node Orchestrator...");
+        sigma_log("Σ [CLOUD-ORCH]: Initializing Multi-Node Orchestrator...");
         m_coordinated_nodes = 0;
-        sigma_log("Î£ [CLOUD-ORCH]: Cloud-to-Lattice Handshake Protocol ACTIVE.");
+        sigma_log("Σ [CLOUD-ORCH]: Cloud-to-Lattice Handshake Protocol ACTIVE.");
     }
 
     void orchestrate(const char* task_id) {
-        sigma_printf("Î£ [CLOUD-ORCH]: Distributing task '%s' across Cloud-Lattice nodes...\n", task_id);
+        sigma_printf("Σ [CLOUD-ORCH]: Distributing task '%s' across Cloud-Lattice nodes...\n", task_id);
         // Delegate to CloudBridge and MeshLattice
         m_coordinated_nodes++;
-        sigma_log("Î£ [CLOUD-ORCH]: Task distribution consensus achieved.");
+        sigma_log("Σ [CLOUD-ORCH]: Task distribution consensus achieved.");
     }
 
     void audit() {
-        sigma_printf("\n--- Î£ SOVEREIGN CLOUD ORCHESTRATION AUDIT ---\n");
+        sigma_printf("\n--- Σ SOVEREIGN CLOUD ORCHESTRATION AUDIT ---\n");
         sigma_printf("| Coordinated Nodes : %u\n", m_coordinated_nodes);
         sigma_printf("| Consensus Mode    : LATTICE-RAFT\n");
         sigma_printf("| Sync Integrity    : QUANTUM-VERIFIED\n");
