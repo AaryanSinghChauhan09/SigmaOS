@@ -1,14 +1,13 @@
 :root {
-    --accent: #6366f1;
-    --accent-glow: rgba(99, 102, 241, 0.4);
-    --bg: #0a0a0f;
-    --panel-bg: rgba(20, 20, 30, 0.6);
-    --glass: rgba(255, 255, 255, 0.03);
-    --glass-border: rgba(255, 255, 255, 0.08);
-    --text: #e2e8f0;
-    --text-muted: #64748b;
-    --morphic-shadow: 10px 10px 20px rgba(0,0,0,0.5), -5px -5px 15px rgba(255,255,255,0.02);
-    --spring-ease: cubic-bezier(0.34, 1.56, 0.64, 1);
+    --accent: #fbbf24;
+    --accent-blue: #3b82f6;
+    --accent-gradient: linear-gradient(135deg, #fbbf24 0%, #3b82f6 100%);
+    --bg: #0c0c0e;
+    --panel-bg: rgba(255, 255, 255, 0.05);
+    --glass-border: rgba(255, 255, 255, 0.15);
+    --text: #ffffff;
+    --text-muted: #94a3b8;
+    --studio-shadow: 0 30px 60px -12px rgba(0, 0, 0, 0.8), 0 18px 36px -18px rgba(0, 0, 0, 0.9);
 }
 
 /* Theme Shards */
@@ -116,24 +115,32 @@ body {
     pointer-events: none;
 }
 
-/* Taskbar (Sigma-Shelf) */
+/* Taskbar (Sigma-Dock) */
 .taskbar {
     position: fixed;
-    bottom: 0;
-    left: 0;
-    width: 100%;
-    height: 48px;
+    bottom: 20px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: auto;
+    min-width: 450px;
+    height: 64px;
     background: var(--panel-bg);
-    -webkit-backdrop-filter: blur(30px);
-    backdrop-filter: blur(30px);
-    border-top: 1px solid var(--glass-border);
+    -webkit-backdrop-filter: blur(40px) saturate(180%);
+    backdrop-filter: blur(40px) saturate(180%);
+    border: 1px solid var(--glass-border);
+    border-radius: 24px;
     display: flex;
     align-items: center;
     justify-content: center;
-    padding: 0 25px;
+    padding: 10px 30px;
+    gap: 15px;
     z-index: 500;
-    box-shadow: var(--morphic-shadow);
-    transition: all 0.4s var(--spring-ease);
+    box-shadow: var(--studio-shadow);
+    transition: all 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+.taskbar:hover {
+    transform: translateX(-50%) scale(1.02);
+    border-color: var(--accent);
 }
 .shelf-icons {
     display: flex;
@@ -219,20 +226,19 @@ body {
 }
 
 .widget {
-    background: var(--glass);
-    -webkit-backdrop-filter: blur(20px);
-    backdrop-filter: blur(20px);
+    background: var(--panel-bg);
+    -webkit-backdrop-filter: blur(30px) saturate(150%);
+    backdrop-filter: blur(30px) saturate(150%);
     border: 1px solid var(--glass-border);
-    border-radius: 20px;
-    padding: 24px;
-    transition: all 0.5s var(--spring-ease);
-    box-shadow: var(--morphic-shadow);
-    transform: perspective(1000px) translateZ(0);
+    border-radius: 24px;
+    padding: 30px;
+    transition: all 0.5s cubic-bezier(0.19, 1, 0.22, 1);
+    box-shadow: var(--studio-shadow);
 }
 .widget:hover {
-    transform: perspective(1000px) translateZ(20px) rotateX(2deg);
+    transform: translateY(-5px);
+    background: rgba(255, 255, 255, 0.08);
     border-color: var(--accent);
-    box-shadow: 15px 15px 30px rgba(0,0,0,0.6);
 }
 
 .widget::before {
