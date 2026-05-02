@@ -1,12 +1,13 @@
 :root {
-    --accent: #00f2ff;
-    --accent-glow: rgba(0, 242, 255, 0.25);
-    --bg: #050507;
-    --panel-bg: rgba(10, 10, 12, 0.95);
+    --accent: #3b82f6;
+    --accent-glow: rgba(59, 130, 246, 0.4);
+    --bg: #0f172a;
+    --dock-bg: rgba(15, 23, 42, 0.8);
+    --panel-bg: rgba(30, 41, 59, 0.7);
     --panel-border: rgba(255, 255, 255, 0.1);
-    --text: #ffffff;
-    --text-muted: #4a5568;
-    --panel-shadow: 0 50px 100px -20px rgba(0, 0, 0, 0.95);
+    --text: #f8fafc;
+    --text-muted: #94a3b8;
+    --window-shadow: 0 20px 50px rgba(0, 0, 0, 0.4);
     --spring-ease: cubic-bezier(0.175, 0.885, 0.32, 1.275);
 }
 
@@ -115,7 +116,7 @@ body {
     pointer-events: none;
 }
 
-/* Taskbar */
+/* Taskbar (Sovereign Dock) */
 .taskbar {
     position: fixed;
     bottom: 20px;
@@ -124,17 +125,35 @@ body {
     width: auto;
     min-width: 400px;
     height: 64px;
-    background: var(--panel-bg);
+    background: var(--dock-bg);
+    -webkit-backdrop-filter: blur(20px);
+    backdrop-filter: blur(20px);
     border: 1px solid var(--panel-border);
-    border-radius: 100px;
+    border-radius: 20px;
     display: flex;
     align-items: center;
     justify-content: center;
-    padding: 0 40px;
-    gap: 30px;
+    padding: 10px 20px;
+    gap: 12px;
     z-index: 100;
-    box-shadow: var(--panel-shadow);
-    transition: all 0.5s var(--spring-ease);
+    box-shadow: 0 10px 40px rgba(0,0,0,0.5);
+    transition: transform 0.3s var(--spring-ease);
+}
+.task-icon {
+    width: 48px;
+    height: 48px;
+    border-radius: 12px;
+    background: rgba(255,255,255,0.05);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 24px;
+    transition: all 0.2s ease;
+    cursor: pointer;
+}
+.task-icon:hover {
+    transform: translateY(-10px) scale(1.2);
+    background: var(--accent-glow);
 }
 
 .status-indicator-wasm { display: flex; align-items: center; gap: 8px; font-size: 10px; font-weight: 800; color: #00ffa3; margin-left: 10px; opacity: 0.8; transition: opacity 0.3s; }
