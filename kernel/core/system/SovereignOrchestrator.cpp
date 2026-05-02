@@ -29,6 +29,7 @@ extern "C" {
     void neural_init();
     void pqc_init();
     void netstack_init();
+    void identity_init();
     void monitor_init();
     void sandbox_init();
     void ai_persona_init();
@@ -93,6 +94,7 @@ public:
         vault_init();
         sel_init_shard();
         sechardener_init();
+        identity_init(); // Identity and Access Management active
         pqc_init(); // Post-Quantum Cryptography active
         sandbox_init(); // Secure container isolation active
         enclave_init_shard(); // Hardware Root-of-Trust active
