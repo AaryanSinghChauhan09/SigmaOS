@@ -48,5 +48,5 @@
 
 - [Contributing](CONTRIBUTING.md)
 - [Contribution Guide](Contribution_Guide.md)
-- [Competitor Analysis](Competitor_Analysis.md)
+- [Competitor Analysis & Disadvantages](GAP_ANALYSIS_INDUSTRIAL_COMPETITORS.md)
 - [daedalOS Inspiration](daedalOS_INSPIRATION.md)
