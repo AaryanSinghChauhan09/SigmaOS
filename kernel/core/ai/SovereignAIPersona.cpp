@@ -22,22 +22,22 @@ public:
     const char* type_name() const noexcept override { return "SovereignAIPersona"; }
 
     void init() {
-        sigma_log("Î£ [AI-PERSONA]: Initializing Neural Adaptation Shard...");
+        sigma_log("Σ [AI-PERSONA]: Initializing Neural Adaptation Shard...");
         m_adaptation_level = 100;
-        sigma_log("Î£ [AI-PERSONA]: Cognitive Sync Established. Persona: SOVEREIGN-ZENITH.");
+        sigma_log("Σ [AI-PERSONA]: Cognitive Sync Established. Persona: SOVEREIGN-ZENITH.");
     }
 
     void adapt(const char* context) {
-        sigma_printf("Î£ [AI-PERSONA]: Adapting UI lattice to context: %s...\n", context);
+        sigma_printf("Σ [AI-PERSONA]: Adapting UI lattice to context: %s...\n", context);
         // Logic to shift UI hues, layout density, and focus mode
         m_adaptation_level++;
     }
 
     void audit() {
-        sigma_printf("\n--- Î£ SOVEREIGN AI-PERSONA AUDIT ---\n");
+        sigma_printf("\n--- Σ SOVEREIGN AI-PERSONA AUDIT ---\n");
         sigma_printf("| Adaptation Lvl : %u%%\n", m_adaptation_level);
         sigma_printf("| Neural Mode     : COGNITIVE-FLOW\n");
-        sigma_printf("| Persona ID      : Î£-0x8F2\n");
+        sigma_printf("| Persona ID      : Σ-0x8F2\n");
         sigma_printf("------------------------------------\n");
     }
 
