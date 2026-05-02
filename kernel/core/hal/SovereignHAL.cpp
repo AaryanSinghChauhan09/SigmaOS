@@ -1,40 +1,60 @@
-#include "../../../include/sigma_types.h"
-#include "sigma_hal.h"
+#include "../../../include/sigma_kernel_types.h"
 #include "../../../include/SovereignLibC.h"
+#include "../../../include/SigmaOOP.hpp"
 
 /**
- * SigmaOS Sovereign Hardware Abstraction Layer (HAL)
- * Unifies x86_64, ARM64, and RISC-V under a single ABI layer.
- *
- * USP: Transparently handles architecture-specific CPU dispatching and IO mapping.
- *
- * Design: OOP-isolated singleton — SovereignHALEngine.
+ * SigmaOS Sovereign Hardware Abstraction Layer (HAL) Shard
+ * Principles: Silicon-Direct, Ring-0 Hardware Sharding.
  */
 
-class SovereignHALEngine {
+namespace SigmaOS {
+namespace Kernel {
+namespace HAL {
+
+class SovereignHAL : public SigmaObject {
 public:
-    static SovereignHALEngine& getInstance() {
-        static SovereignHALEngine instance;
+    static SovereignHAL& getInstance() {
+        static SovereignHAL instance;
         return instance;
     }
 
+    const char* type_name() const noexcept override { return "SovereignHAL"; }
+
     void init() {
-        sigma_log("[HAL] Initializing Unified Sovereign Hardware Abstraction Layer...");
+        sigma_log("[HAL] Orchestrating Hardware Lattice Shards...");
+        serial_init();
+        sigma_log("[HAL] Serial IO Shard ONLINE.");
     }
 
-    void mapHardwareIO(sigma_u32 device_id) {
-        sigma_printf("[HAL] Device IO dynamically mapped for hardware ID: 0x%04X.\n", device_id);
+    void outb(sigma_u16 port, sigma_u8 val) {
+        __asm__ volatile ("outb %0, %1" : : "a"(val), "Nd"(port));
+    }
+
+    sigma_u8 inb(sigma_u16 port) {
+        sigma_u8 ret;
+        __asm__ volatile ("inb %1, %0" : "=a"(ret) : "Nd"(port));
+        return ret;
+    }
+
+    void reboot() {
+        sigma_log("[HAL] TR-G-00: Initiating Silicon Lattice Reset...");
+        // Fast reboot via PS/2 controller
+        outb(0x64, 0xFE);
     }
 
 private:
-    SovereignHALEngine() {}
+    SovereignHAL() {}
 };
 
-/* --- C Wrappers --- */
-extern "C" void hal_init() {
-    SovereignHALEngine::getInstance().init();
+} // namespace HAL
+} // namespace Kernel
+} // namespace SigmaOS
+
+/* --- C Bridge --- */
+extern "C" void hal_init_shard() {
+    SigmaOS::Kernel::HAL::SovereignHAL::getInstance().init();
 }
 
-extern "C" void hal_map_io(sigma_u32 id) {
-    SovereignHALEngine::getInstance().mapHardwareIO(id);
+extern "C" void hal_reboot() {
+    SigmaOS::Kernel::HAL::SovereignHAL::getInstance().reboot();
 }
