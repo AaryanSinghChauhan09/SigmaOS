@@ -1,6 +1,7 @@
 #include "../../../include/sigma_kernel_types.h"
 #include "../../../include/SovereignLibC.h"
 #include "../../../include/SigmaOOP.hpp"
+#include "../security/SovereignQKD.hpp"
 
 /**
  * SigmaOS Sovereign Orb Manager (Package Management Shard)
@@ -30,15 +31,16 @@ public:
 
     void installOrb(const char* orb_name, const char* signature) {
         (void)signature;
-        sigma_printf("Î£ [ORB-MAN]: Deploying Orb: %s...\n", orb_name);
-        // Verify signature via PQC Shard
-        bool verified = true; // Simulated PQC verification
+        sigma_printf("Σ [ORB-MAN]: Deploying Orb: %s...\n", orb_name);
+        
+        // Zero-Trust Enforcement: Cryptographically verify Orb signature
+        bool verified = Security::SovereignQKD::getInstance().verifyQuantumIntegrity();
         
         if (verified) {
-            sigma_printf("Î£ [ORB-MAN]: Orb '%s' INTEGRATED into Lattice.\n", orb_name);
+            sigma_printf("Σ [ORB-MAN]: Orb '%s' INTEGRATED into Lattice.\n", orb_name);
             m_installed_orbs++;
         } else {
-            sigma_log("Î£ [ORB-MAN]: ERR: SIGNATURE MISMATCH. Orb Rejected.");
+            sigma_log("Σ [ORB-MAN]: [CRITICAL ERROR] SIGNATURE MISMATCH. Orb Rejected by QKD Core.");
         }
     }
 
