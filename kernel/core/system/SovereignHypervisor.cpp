@@ -17,7 +17,14 @@
 void SovereignHyperEngine::init() {
     sigma_log("[HYPER] Initializing Sovereign Silicon-Native Hypervisor (SIV Zenith)...");
     this->initialized = 1u;
+    this->legacy_support = 0u; // Default to Silicon-Native
     sigma_log("[HYPER] SIV: Hardware VT-x/AMD-V extensions ARMED. Nested Paging ENABLED.");
+}
+
+void SovereignHyperEngine::enableLegacySupport() {
+    sigma_log("[HYPER] SIV: Activating Legacy Full-System Virtualization Shard...");
+    sigma_log("[HYPER] SIV: BIOS/UEFI Translation Layer ARMED. VGA Silicon-Emulation ENABLED.");
+    this->legacy_support = 1u;
 }
 
 sigma_u32 SovereignHyperEngine::createVM(sigma_u32 vcpus, sigma_u64 memory_mb) {

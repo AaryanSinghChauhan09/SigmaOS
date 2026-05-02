@@ -32,6 +32,7 @@ extern "C" {
     void ai_persona_init();
     void enclave_init_shard();
     void webapp_bridge_init();
+    void posix_init();
 }
 
 /**
@@ -95,6 +96,7 @@ public:
         orb_manager_init(); // Local Orb verification and execution active
         ai_persona_init(); // Neural Adaptation active
         webapp_bridge_init(); // Orbital WebApp Injection active
+        posix_init(); // POSIX Emulation active
         governance_init_shard(); // Community Contributor Registry active
         
         sigma_log("Σ [ORCHESTRATOR]: Lattice Singularity Achieved. System LIVE.");

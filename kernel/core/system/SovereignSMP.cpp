@@ -10,6 +10,30 @@
  * Design: OOP-isolated singleton — SovereignSMPEngine.
  */
 
+/**
+ * SovereignTicketLock: Industrial-grade, fair spinlock.
+ * Prevents starvation and reduces cache-line bouncing on high-core systems.
+ */
+class SovereignTicketLock {
+public:
+    SovereignTicketLock() : next_ticket(0), now_serving(0) {}
+
+    void lock() {
+        sigma_u32 ticket = __atomic_fetch_add(&next_ticket, 1, __ATOMIC_SEQ_CST);
+        while (__atomic_load_n(&now_serving, __ATOMIC_SEQ_CST) != ticket) {
+            __builtin_ia32_pause(); // Low-power wait
+        }
+    }
+
+    void unlock() {
+        __atomic_fetch_add(&now_serving, 1, __ATOMIC_SEQ_CST);
+    }
+
+private:
+    sigma_u32 next_ticket;
+    sigma_u32 now_serving;
+};
+
 class SovereignSMPEngine {
 public:
     static SovereignSMPEngine& getInstance() {
@@ -22,6 +46,7 @@ public:
         this->active_cores = 1u;
         this->bsp_id = 0u;
         this->initialized = 1u;
+        sigma_log("[SMP] Industrial Primitives: Ticket Locks ARMED.");
     }
 
     void igniteCores() {
@@ -38,12 +63,16 @@ public:
 
     sigma_u32 getCoreCount() const { return this->active_cores; }
 
+    void globalLock() { m_global_lattice_lock.lock(); }
+    void globalUnlock() { m_global_lattice_lock.unlock(); }
+
 private:
     SovereignSMPEngine() : active_cores(0), bsp_id(0), initialized(0) {}
     
     sigma_u32 active_cores;
     sigma_u32 bsp_id;
     sigma_u32 initialized;
+    SovereignTicketLock m_global_lattice_lock;
 };
 
 /* --- C Wrappers --- */
