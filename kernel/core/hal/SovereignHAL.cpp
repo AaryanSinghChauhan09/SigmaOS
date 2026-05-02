@@ -51,7 +51,7 @@ private:
 } // namespace SigmaOS
 
 /* --- C Bridge --- */
-extern "C" void hal_init_shard() {
+extern "C" void hal_init() {
     SigmaOS::Kernel::HAL::SovereignHAL::getInstance().init();
 }
 

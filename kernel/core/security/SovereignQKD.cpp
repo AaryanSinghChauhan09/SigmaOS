@@ -44,7 +44,7 @@ void SovereignQKD::audit() {
 } // namespace SigmaOS
 
 /* --- C Bridge --- */
-extern "C" void qkd_init_shard() {
+extern "C" void qkd_init() {
     SigmaOS::Kernel::Security::SovereignQKD::getInstance().init();
 }
 

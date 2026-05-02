@@ -3,9 +3,7 @@
 #include "../../../include/SovereignLibC.h"
 
 // Engine Initialisers (Extern C)
-extern "C" void sinit_init();
-extern "C" void sinit_execute_plan();
-extern "C" void sinit_report_status();
+extern "C" void sigma_bootstrap_lattice();
 
 /**
  * SigmaOS Sovereign Main Entry Point
@@ -25,9 +23,8 @@ public:
         sigma_printf("\nΣ SIGMAOS ZENITH SUPREME (v94.0) IGNITING...\n");
         sigma_printf("--------------------------------------------------\n");
 
-        sinit_init();
-        sinit_execute_plan();
-        sinit_report_status();
+        // Sovereign 4-Phase Shard Orchestration
+        sigma_bootstrap_lattice();
 
         sigma_printf("--------------------------------------------------\n");
         sigma_printf("Σ SYSTEM SOVEREIGNTY ACHIEVED. LATTICE READY.\n\n");

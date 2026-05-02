@@ -40,7 +40,12 @@ KERNEL_SHARDS = kernel/core/system/SovereignMain.o \
                 kernel/core/system/SovereignAppShard.o \
                 kernel/core/fs/SovereignDNACompression.o \
                 kernel/core/security/SovereignQKD.o \
+                kernel/core/security/SovereignVault.o \
                 kernel/core/hardware/SovereignHWTranspiler.o \
+                kernel/core/hal/SovereignHAL.o \
+                kernel/core/network/SovereignMeshLattice.o \
+                kernel/core/industrial/SovereignOrbMarketplace.o \
+                kernel/core/industrial/SovereignOrbManager.o \
                 kernel/core/ai/SovereignNeuralNexus.o \
                 kernel/core/ai/SovereignNeuralAutomator.o \
                 kernel/core/community/SovereignGovernance.o \
@@ -71,6 +76,9 @@ clean:
 	rm -f $(KERNEL_SHARDS) sigmaos.bin zenith-singularity.iso
 
 %.o: %.cpp
+	$(CXX) $(CXXFLAGS) -c $< -o $@
+
+%.o: %.c
 	$(CXX) $(CXXFLAGS) -c $< -o $@
 
 %.o: %.asm

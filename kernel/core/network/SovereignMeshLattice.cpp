@@ -80,7 +80,7 @@ private:
 } // namespace SigmaOS
 
 /* --- C Bridge --- */
-extern "C" void mesh_init_shard() {
+extern "C" void mesh_init() {
     SigmaOS::Kernel::Network::SovereignMeshLattice::getInstance().init();
 }
 

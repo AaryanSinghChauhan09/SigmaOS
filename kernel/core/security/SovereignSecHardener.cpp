@@ -44,7 +44,7 @@ extern "C" int sigma_hardened_snprintf(char* dest, uint32_t max_len, const char*
     return 0;
 }
 
-extern "C" void sechardener_init() {
+extern "C" void sel_init() {
     sigma_log("[SECHARDENER] *** SHARD #500 ONLINE *** Sovereign Security Hardener (PLPE Algorithm)...");
     sigma_log("[SECHARDENER] PLPE: Enforcing Principle of Least Privilege across all 500 shards.");
 }

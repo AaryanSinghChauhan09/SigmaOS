@@ -22,9 +22,9 @@ public:
     const char* type_name() const noexcept override { return "SovereignDNACompression"; }
 
     void init() {
-        sigma_log("Î£ [DNA-COMP]: Initializing Biologically Inspired Compression Shard...");
+        sigma_log("Σ [DNA-COMP]: Initializing Biologically Inspired Compression Shard...");
         m_compression_ratio = 0;
-        sigma_log("Î£ [DNA-COMP]: Nucleotide Encoding (A:00, C:01, G:10, T:11) ACTIVE.");
+        sigma_log("Σ [DNA-COMP]: Nucleotide Encoding (A:00, C:01, G:10, T:11) ACTIVE.");
     }
 
     sigma_status decode(const void* input, sigma_usize size, void* output, sigma_usize* out_size) {
@@ -41,7 +41,7 @@ public:
     }
 
     sigma_size_t compress(const void* input, sigma_size_t in_size, void* output) {
-        sigma_log("Î£ [DNA-COMP]: Sequencing data into nucleotide shards...");
+        sigma_log("Σ [DNA-COMP]: Sequencing data into nucleotide shards...");
         // Simulated DNA-encoding (4:1 compression ratio)
         sigma_size_t out_size = in_size / 4;
         sigma_memcpy(output, input, out_size); 
@@ -49,7 +49,7 @@ public:
     }
 
     void audit() {
-        sigma_printf("\n--- Î£ SOVEREIGN DNA-COMP AUDIT ---\n");
+        sigma_printf("\n--- Σ SOVEREIGN DNA-COMP AUDIT ---\n");
         sigma_printf("| Encoding Mode   : NUCLEOTIDE-4x\n");
         sigma_printf("| Shard Integrity : BIOMETRIC-VERIFIED\n");
         sigma_printf("----------------------------------\n");
@@ -65,7 +65,7 @@ private:
 } // namespace SigmaOS
 
 /* --- C Bridge --- */
-extern "C" void dna_comp_init() {
+extern "C" void dna_init() {
     SigmaOS::Kernel::FS::SovereignDNACompression::getInstance().init();
 }
 

@@ -5,6 +5,7 @@
 /* --- External Shard Endpoints --- */
 extern "C" {
     void hal_init();
+    void allocator_init();
     void pmm_init_shard(sigma_u64 mem_size);
     void vmm_init_shard();
     void vfs_init();
@@ -51,6 +52,7 @@ public:
         
         // FOUNDATION
         hal_init();
+        allocator_init();
         silicon_init_transpiler(); // Initialize native ISA translation
         pmm_init_shard(128 * 1024 * 1024); 
         vmm_init_shard();
