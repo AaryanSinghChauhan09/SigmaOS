@@ -67,6 +67,16 @@ Despite achieving the Sovereign Singularity, SigmaOS currently faces severe disa
 - **SigmaOS Status**: In SigmaOS, even "local" shard communication often goes through the `SovereignIPC` layer to ensure cryptographic isolation.
 - **Impact**: This adds nanoseconds of overhead to every primitive operation. While negligible for UI tasks, this "coordination tax" accumulates in high-throughput database or network-intensive workloads, putting SigmaOS at a raw throughput disadvantage against optimized C kernels.
 
+### 3.9 Binary Bloat via Shard-Level OOP
+- **The Disadvantage**: Lean C kernels (like Linux) minimize binary size by avoiding object-oriented overhead.
+- **SigmaOS Status**: Every shard in SigmaOS inherits from `SigmaObject`, utilizing virtual tables and C++ runtime type information.
+- **Impact**: In a 600-shard system, the cumulative metadata overhead (V-Tables, RTTI) results in a larger memory footprint for the kernel image itself. This can be a disadvantage in embedded environments with extreme memory constraints (e.g., small microcontrollers or satellites).
+
+### 3.10 SMP Primitive Maturity Gap
+- **The Disadvantage**: Linux and BSD have 30+ years of optimization for Symmetric Multiprocessing (SMP) primitives like RCU (Read-Copy-Update) and ticket spinlocks.
+- **SigmaOS Status**: SigmaOS uses a newly developed distributed locking mechanism for the Sovereign Lattice.
+- **Impact**: Under extreme multicore contention (e.g., 128+ cores), the SigmaOS lattice may suffer from cache-line bouncing or sub-optimal lock distribution that established kernels have already solved.
+
 ## 4. Mitigation Strategies for Phase 50+
 
 To evolve from a theoretical Sovereign Lattice into a viable industrial competitor, the following mitigations are mandatory:

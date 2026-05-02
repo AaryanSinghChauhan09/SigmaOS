@@ -19,6 +19,7 @@
 ## 🚀 Roadmap
 
 - [Expansion Roadmap](EXPANSION_ROADMAP.md)
+- [Industrial Evolution Roadmap](INDUSTRIAL_EVOLUTION_ROADMAP.md)
 - [Future Suggestions](FUTURE_SUGGESTIONS.md)
 - [Ideas Backlog](IDEAS_BACKLOG.md)
 - [Phase 4: UX Maturity](Phase_4_UX.md)

@@ -20,3 +20,7 @@ Thanks to `SovereignPersonalization` and `SovereignAccessibility`, Zenith effort
 
 - Smart contrast auto-scaling
 - Predictive app layouts based on user history.
+
+## Spatial Shard Snapping (DSS)
+
+The `SovereignSnapEngine` provides industrial-grade multi-window spatial organization. By utilizing a 2D spatial lattice, it allows shards to "snap" into optimized Golden Ratio layouts, maximizing information density for high-concurrency monitoring and development tasks.
