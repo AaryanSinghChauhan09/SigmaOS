@@ -1,14 +1,14 @@
 :root {
-    --accent: #3b82f6;
-    --accent-glow: rgba(59, 130, 246, 0.4);
-    --bg: #0f172a;
-    --dock-bg: rgba(15, 23, 42, 0.8);
-    --panel-bg: rgba(30, 41, 59, 0.7);
-    --panel-border: rgba(255, 255, 255, 0.1);
-    --text: #f8fafc;
-    --text-muted: #94a3b8;
-    --window-shadow: 0 20px 50px rgba(0, 0, 0, 0.4);
-    --spring-ease: cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    --accent: #6366f1;
+    --accent-glow: rgba(99, 102, 241, 0.4);
+    --bg: #0a0a0f;
+    --panel-bg: rgba(20, 20, 30, 0.6);
+    --glass: rgba(255, 255, 255, 0.03);
+    --glass-border: rgba(255, 255, 255, 0.08);
+    --text: #e2e8f0;
+    --text-muted: #64748b;
+    --morphic-shadow: 10px 10px 20px rgba(0,0,0,0.5), -5px -5px 15px rgba(255,255,255,0.02);
+    --spring-ease: cubic-bezier(0.34, 1.56, 0.64, 1);
 }
 
 /* Theme Shards */
@@ -123,16 +123,17 @@ body {
     left: 0;
     width: 100%;
     height: 48px;
-    background: rgba(10, 10, 15, 0.9);
-    -webkit-backdrop-filter: blur(25px);
-    backdrop-filter: blur(25px);
-    border-top: 1px solid var(--panel-border);
+    background: var(--panel-bg);
+    -webkit-backdrop-filter: blur(30px);
+    backdrop-filter: blur(30px);
+    border-top: 1px solid var(--glass-border);
     display: flex;
     align-items: center;
     justify-content: center;
-    padding: 0 20px;
+    padding: 0 25px;
     z-index: 500;
-    box-shadow: 0 -10px 30px rgba(0,0,0,0.3);
+    box-shadow: var(--morphic-shadow);
+    transition: all 0.4s var(--spring-ease);
 }
 .shelf-icons {
     display: flex;
@@ -218,14 +219,20 @@ body {
 }
 
 .widget {
-    background: var(--panel-bg);
-    border: 1px solid var(--panel-border);
-    border-radius: 16px;
-    padding: 30px;
-    transition: all 0.6s var(--spring-ease);
-    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
-    position: relative;
-    overflow: hidden;
+    background: var(--glass);
+    -webkit-backdrop-filter: blur(20px);
+    backdrop-filter: blur(20px);
+    border: 1px solid var(--glass-border);
+    border-radius: 20px;
+    padding: 24px;
+    transition: all 0.5s var(--spring-ease);
+    box-shadow: var(--morphic-shadow);
+    transform: perspective(1000px) translateZ(0);
+}
+.widget:hover {
+    transform: perspective(1000px) translateZ(20px) rotateX(2deg);
+    border-color: var(--accent);
+    box-shadow: 15px 15px 30px rgba(0,0,0,0.6);
 }
 
 .widget::before {
