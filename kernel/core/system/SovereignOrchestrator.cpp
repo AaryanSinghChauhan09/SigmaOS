@@ -37,6 +37,7 @@ extern "C" {
     void monitor_init();
     void sandbox_init();
     void ai_persona_init();
+    void model_man_init();
     void enclave_init_shard();
     void webapp_bridge_init();
     void posix_init();
@@ -116,6 +117,7 @@ public:
         market_init_shard(); // Decentralized Orb Exchange active
         orb_manager_init(); // Local Orb verification and execution active
         ai_persona_init(); // Neural Adaptation active
+        model_man_init(); // AI Model Orchestration active
         webapp_bridge_init(); // Orbital WebApp Injection active
         posix_init(); // POSIX Emulation active
         cloud_orch_init(); // Multi-Node Cloud Orchestration active
