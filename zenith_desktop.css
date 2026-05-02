@@ -1,15 +1,13 @@
 :root {
-    --accent: #00e5ff;
-    --accent-glow: rgba(0, 229, 255, 0.2);
-    --bg: #000000;
-    --glass: rgba(255, 255, 255, 0.02);
-    --glass-border: rgba(255, 255, 255, 0.1);
-    --glass-blur: blur(40px) saturate(220%);
+    --accent: #00f2ff;
+    --accent-glow: rgba(0, 242, 255, 0.25);
+    --bg: #050507;
+    --panel-bg: rgba(10, 10, 12, 0.95);
+    --panel-border: rgba(255, 255, 255, 0.1);
     --text: #ffffff;
-    --text-muted: #64748b;
-    --success: #00ffaa;
-    --error: #ff3344;
-    --panel-shadow: 0 40px 100px -20px rgba(0, 0, 0, 0.9);
+    --text-muted: #4a5568;
+    --panel-shadow: 0 50px 100px -20px rgba(0, 0, 0, 0.95);
+    --spring-ease: cubic-bezier(0.175, 0.885, 0.32, 1.275);
 }
 
 /* Theme Shards */
@@ -126,11 +124,9 @@ body {
     width: auto;
     min-width: 400px;
     height: 64px;
-    background: rgba(0, 0, 0, 0.4);
-    -webkit-backdrop-filter: var(--glass-blur);
-    backdrop-filter: var(--glass-blur);
-    border: 0.5px solid var(--glass-border);
-    border-radius: 40px;
+    background: var(--panel-bg);
+    border: 1px solid var(--panel-border);
+    border-radius: 100px;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -138,6 +134,7 @@ body {
     gap: 30px;
     z-index: 100;
     box-shadow: var(--panel-shadow);
+    transition: all 0.5s var(--spring-ease);
 }
 
 .status-indicator-wasm { display: flex; align-items: center; gap: 8px; font-size: 10px; font-weight: 800; color: #00ffa3; margin-left: 10px; opacity: 0.8; transition: opacity 0.3s; }
@@ -193,14 +190,12 @@ body {
 }
 
 .widget {
-    background: rgba(255, 255, 255, 0.01);
-    -webkit-backdrop-filter: var(--glass-blur);
-    backdrop-filter: var(--glass-blur);
-    border: 0.5px solid var(--glass-border);
-    border-radius: 20px;
-    padding: 32px;
-    transition: all 0.7s cubic-bezier(0.19, 1, 0.22, 1);
-    box-shadow: 0 20px 50px rgba(0, 0, 0, 0.4);
+    background: var(--panel-bg);
+    border: 1px solid var(--panel-border);
+    border-radius: 16px;
+    padding: 30px;
+    transition: all 0.6s var(--spring-ease);
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
     position: relative;
     overflow: hidden;
 }
