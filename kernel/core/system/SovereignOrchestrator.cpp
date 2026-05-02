@@ -54,6 +54,7 @@ extern "C" {
     void cloud_orch_init();
     void consensus_init();
     void cloud_init_shard();
+    void ha_core_init();
     void driver_transpiler_init();
     void perf_init();
     void snap_init();
@@ -128,7 +129,7 @@ public:
         pqc_init(); // Post-Quantum Cryptography active
         sandbox_init(); // Secure container isolation active
         enclave_init_shard(); // Hardware Root-of-Trust active
-        qkd_init(); // Quantum-Key Distribution active
+        ha_core_init(); // High-Availability Active-Active Cluster active
         mesh_init(); // Mesh-First Protocol active
         
         sigma_log("Σ [ORCHESTRATOR]: Initiating Lattice Phase 4 (Ecosystem)...");

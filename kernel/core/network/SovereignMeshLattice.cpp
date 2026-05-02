@@ -91,3 +91,11 @@ extern "C" void mesh_discover() {
 extern "C" void mesh_sync_orb(const char* id) {
     SigmaOS::Kernel::Network::SovereignMeshLattice::getInstance().syncOrb(id);
 }
+
+extern "C" void mesh_initiate_stream(const char* target, const char* data_id) {
+    SigmaOS::Kernel::Network::SovereignMeshLattice::getInstance().initiateStream(target, data_id);
+}
+
+extern "C" void mesh_receive_chunk(const char* source, sigma_u32 chunk_id, sigma_usize size) {
+    SigmaOS::Kernel::Network::SovereignMeshLattice::getInstance().receiveChunk(source, chunk_id, size);
+}
