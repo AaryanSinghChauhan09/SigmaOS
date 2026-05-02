@@ -23,32 +23,50 @@ public:
 
     void init() {
         sigma_log("[VFS] Orchestrating Sovereign Lattice Filesystem...");
-        m_root_shard_count = 0;
+        m_nodes = new SigmaMap<const char*, sigma_file_t*>();
         // Simulated mount of the Initial RAM Shard (IRS)
         sigma_log("[VFS] IRS Shard mounted at lattice root (/).");
     }
 
     sigma_file_t* open(const char* path) {
         sigma_printf("[VFS] Accessing shard: %s\n", path);
-        // Logic to traverse the lattice nodes would go here
+        for (sigma_u32 i = 0; i < m_nodes->size(); i++) {
+            if (sigma_streq(m_nodes->key_at(i), path)) {
+                return *m_nodes->at_index(i);
+            }
+        }
         return SIGMA_NULL; 
     }
 
+    void registerShard(const char* path, sigma_file_t* file) {
+        m_nodes->insert(path, file);
+    }
+
     sigma_status read(sigma_file_t* file, void* buf, sigma_u32 size) {
-        if (!file) return 1;
-        sigma_memcpy(buf, file->buffer, size);
+        if (!file || !file->buffer) return 1;
+        sigma_u32 read_size = (size > file->size) ? file->size : size;
+        sigma_memcpy(buf, file->buffer, read_size);
         return 0;
     }
 
     sigma_status write(sigma_file_t* file, const void* buf, sigma_u32 size) {
-        if (!file) return 1;
+        if (!file || !file->buffer) return 1;
         sigma_memcpy(file->buffer, buf, size);
+        file->size = size;
         return 0;
     }
 
+    void audit() {
+        sigma_printf("\n--- Σ SOVEREIGN VFS AUDIT ---\n");
+        sigma_printf("| Mounted Shards : %d\n", m_nodes->size());
+        for (sigma_u32 i = 0; i < m_nodes->size(); i++) {
+            sigma_printf("| [%d] %-15s | Size: %u bytes\n", i, m_nodes->key_at(i), (*m_nodes->at_index(i))->size);
+        }
+    }
+
 private:
-    SovereignVFS() : m_root_shard_count(0) {}
-    sigma_u32 m_root_shard_count;
+    SovereignVFS() : m_nodes(SIGMA_NULL) {}
+    SigmaMap<const char*, sigma_file_t*>* m_nodes;
 };
 
 } // namespace FS
