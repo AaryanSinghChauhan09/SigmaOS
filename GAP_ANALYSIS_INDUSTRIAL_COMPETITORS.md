@@ -77,6 +77,16 @@ Despite achieving the Sovereign Singularity, SigmaOS currently faces severe disa
 - **SigmaOS Status**: SigmaOS uses a newly developed distributed locking mechanism for the Sovereign Lattice.
 - **Impact**: Under extreme multicore contention (e.g., 128+ cores), the SigmaOS lattice may suffer from cache-line bouncing or sub-optimal lock distribution that established kernels have already solved.
 
+### 3.11 UI Ecosystem & Legacy Window Parity
+- **The Disadvantage**: Desktop OSs rely on established windowing protocols (X11, Wayland, Win32).
+- **SigmaOS Status**: Zenith UI uses a custom Morphic Layer Composition (MLC) protocol.
+- **Impact**: There is zero binary or protocol compatibility with existing graphical applications. Porting a browser or a professional suite (like Blender or CAD tools) requires a ground-up rewrite of the application's UI logic to the Zenith API, creating a massive barrier to entry for creative professionals.
+
+### 3.12 Native Virtualization (Hypervisor) Gap
+- **The Disadvantage**: Modern industrial OSs (Linux via KVM, Windows via Hyper-V) are built to host virtual machines.
+- **SigmaOS Status**: SigmaOS lacks a native Type-1 or Type-2 hypervisor shard.
+- **Impact**: SigmaOS cannot currently function as a cloud host or a development environment that requires running isolated VM guest OSs. This limits its industrial application in data centers where virtualization is the baseline requirement.
+
 ## 4. Mitigation Strategies for Phase 50+
 
 To evolve from a theoretical Sovereign Lattice into a viable industrial competitor, the following mitigations are mandatory:
