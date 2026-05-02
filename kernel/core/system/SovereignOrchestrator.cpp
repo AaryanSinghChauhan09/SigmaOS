@@ -64,6 +64,8 @@ extern "C" {
     void threat_hunter_init();
     void incognito_init();
     void compartmentalization_init();
+    void declarative_state_init();
+    void rolling_release_init();
     void ai_persona_init();
     void model_man_init();
     void snapshot_init();
@@ -82,6 +84,7 @@ extern "C" {
     void cloud_init_shard();
     void ha_core_init();
     void driver_transpiler_init();
+    void gaming_perf_init();
     void perf_init();
     void snap_init();
     void power_init();
@@ -168,7 +171,9 @@ public:
         anomaly_detector_init(); // AI-driven threat hunting active
         apparmor_init(); // Mandatory Access Control active
         atomic_os_init(); // Atomic declarative updates active
+        declarative_state_init(); // NixOS-style Pure Reproducibility active
         live_patch_init(); // Zero-downtime hot-patching active
+        rolling_release_init(); // Arch-style Frictionless Updates active
         fuzzer_init(); // Continuous ML fuzzing active
         threat_hunter_init(); // Offensive Security Validation active
         incognito_init(); // Amnesic Tor-routed execution active
@@ -200,7 +205,8 @@ public:
         consensus_init(); // Distributed State Consensus active
         cloud_init_shard(); // Sovereign Cloud Extension active
         driver_transpiler_init(); // Legacy Driver Translation active
-        perf_init(); // Performance Profiling active
+        gaming_perf_init(); // ClearLinux/SteamOS Rendering Throughput active
+        perf_init(); // Hardware Performance Monitors active
         snap_init(); // Dynamic Shard-Snapping active
         governance_init_shard(); // Community Contributor Registry active
         
