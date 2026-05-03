@@ -10,3 +10,5 @@ build/
 *.log
 tmp/
 *.tmp
+.cache/
+*.idx

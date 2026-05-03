@@ -82,97 +82,15 @@
             border-color: var(--accent) !important;
         }
     </style>
-    <script>
-        /* Σ Neural UI Layout Engine (NeuralWM) */
-        class NeuralLayoutEngine {
-            constructor() {
-                this.interactions = {};
-            }
-            track(shardId) {
-                this.interactions[shardId] = (this.interactions[shardId] || 0) + 1;
-                this.reorganize();
-            }
-            reorganize() {
-                const sorted = Object.entries(this.interactions).sort((a,b) => b[1] - a[1]);
-                sorted.forEach(([id, count], i) => {
-                    const el = document.getElementById(id);
-                    if (el && i === 0) el.classList.add('neural-active');
-                    else if (el) el.classList.remove('neural-active');
-                });
-            }
-            setMindfulness(active) {
-                document.body.classList.toggle('focus-mode-active', active);
-                addLog(active ? 'Î£ [NEURAL]: Mindfulness Mode ACTIVE. Filtering noise...' : 'Î£ [NEURAL]: Mindfulness Mode DISABLED.');
-            }
-        }
-        const neural = new NeuralLayoutEngine();
-
-        /* Σ Personalization & Theme Orchestration */
-        class PersonalizationEngine {
-            constructor() {
-                this.registry = JSON.parse(localStorage.getItem('sigma_registry') || '{}');
-                this.apply();
-            }
-            setTheme(name) {
-                this.registry.theme = name;
-                this.save();
-                this.apply();
-            }
-            save() {
-                localStorage.setItem('sigma_registry', JSON.stringify(this.registry));
-            }
-            apply() {
-                const theme = this.registry.theme || 'cyan';
-                document.body.setAttribute('data-theme', theme);
-                addLog(`Σ [PERSONAL]: Shifting lattice hue to ${theme}...`, 'success');
-            }
-        }
-        const persona = new PersonalizationEngine();
-
-        function toggleStart() {
-            const menu = document.getElementById('start-menu');
-            menu.classList.toggle('active');
-        }
-        function minimizeWindow(id) {
-            const win = document.getElementById(id);
-            win.style.display = 'none';
-        }
-        function closeWindow(id) {
-            const win = document.getElementById(id);
-            win.classList.add('shattering');
-            setTimeout(() => win.remove(), 400);
-        }
-
-        /* Σ Zenith Window Manager (ZenithWM) Logic */
-        class ZenithWM {
-            constructor() {
-                this.windows = [];
-                this.topZ = 1000;
-            }
-            register(id) {
-                const win = document.getElementById(id);
-                if (!win) return;
-                this.windows.push(win);
-                win.addEventListener('mousedown', () => this.bringToFront(win));
-            }
-            bringToFront(win) {
-                this.topZ++;
-                win.style.zIndex = this.topZ;
-            }
-            tileAll() {
-                const width = window.innerWidth / this.windows.length;
-                this.windows.forEach((win, i) => {
-                    win.style.width = `${width - 20}px`;
-                    win.style.left = `${i * width + 10}px`;
-                    win.style.top = '100px';
-                });
-            }
-        }
-        const wm = new ZenithWM();
-    </script>
+    <script src="zenith_desktop.js" defer></script>
 </head>
 
 <body class="zenith-sovereign">
+    <noscript>
+        <div style="min-height:100vh;display:flex;align-items:center;justify-content:center;background:#0c0c0e;color:#fff;font-family:system-ui;padding:2rem;text-align:center;">
+            <p>Σ SigmaOS Zenith requires JavaScript. Enable scripts to boot the sovereign lattice.</p>
+        </div>
+    </noscript>
     <!-- Start Menu -->
     <div class="start-menu" id="start-menu">
         <div class="start-header">
@@ -235,16 +153,22 @@
             <div class="footer-item" onclick="toggleStart()">Lock</div>
         </div>
     </div>
-    <!-- Command Palette -->
+    <!-- Command Palette (Ctrl+K / Ctrl+Space) -->
     <div class="command-palette" id="cmd-palette">
-        <input type="text" class="command-input" placeholder="Summon Shard or Execute Command..." id="cmd-input">
+        <input type="text" class="command-input" placeholder="Filter commands…" id="cmd-input" autocomplete="off">
         <div class="command-results" id="cmd-results">
-            <div class="command-item" onclick="setTheme('cyan')"><span>Theme: Neon Cyan</span><kbd>Alt+1</kbd></div>
-            <div class="command-item" onclick="setTheme('gold')"><span>Theme: Solar Gold</span><kbd>Alt+2</kbd></div>
-            <div class="command-item" onclick="setTheme('crimson')"><span>Theme: Crimson Shard</span><kbd>Alt+3</kbd>
-            </div>
-            <div class="command-item" onclick="addLog('Σ [AUTO]: Optimizing Shard Lattice...', 'success')">
-                <span>Optimize Lattice</span><kbd>Alt+O</kbd></div>
+            <div class="command-item" onclick="launchApp('File Manager')"><span>File Manager</span><kbd>Files</kbd></div>
+            <div class="command-item" onclick="launchApp('Sigma Browser')"><span>Sigma Browser</span><kbd>Web</kbd></div>
+            <div class="command-item" onclick="launchApp('AI Assistant')"><span>AI Assistant</span><kbd>AI</kbd></div>
+            <div class="command-item" onclick="launchApp('Utility Nexus')"><span>Utility Nexus</span><kbd>Utils</kbd></div>
+            <div class="command-item" onclick="launchApp('Markup Forge')"><span>Markup Forge</span><kbd>MD</kbd></div>
+            <div class="command-item" onclick="launchApp('Marketplace')"><span>Marketplace</span><kbd>Store</kbd></div>
+            <div class="command-item" onclick="launchApp('Lattice Settings')"><span>Lattice Settings</span><kbd>Set</kbd></div>
+            <div class="command-item" onclick="setTheme('cyan')"><span>Theme: Neon Cyan</span><kbd>Th+1</kbd></div>
+            <div class="command-item" onclick="setTheme('gold')"><span>Theme: Solar Gold</span><kbd>Th+2</kbd></div>
+            <div class="command-item" onclick="setTheme('crimson')"><span>Theme: Crimson Shard</span><kbd>Th+3</kbd></div>
+            <div class="command-item" onclick="setTheme('solar')"><span>Theme: Adaptive Solar</span><kbd>Th+4</kbd></div>
+            <div class="command-item" onclick="addLog('Σ [AUTO]: Optimizing Shard Lattice...', 'success')"><span>Optimize Lattice</span><kbd>Opt</kbd></div>
         </div>
     </div>
 
@@ -271,6 +195,7 @@
         <!-- Logs will be injected here -->
     </div>
 
+    <div id="zenith-desktop" class="zenith-desktop-root">
     <!-- Widgets -->
     <div class="widgets-container">
         <!-- Silicon Thermal Heatmap Widget -->
@@ -786,7 +711,7 @@
         <div class="widget">
             <div class="widget-title">
                 <span>Hardened Status</span>
-                <span class="accent">Lattice v29.0</span>
+                <span class="accent">Lattice v30.0</span>
             </div>
             <div class="stat-label">Neural UI: <span id="ui-status" class="status-success">AVX-512 DEDICATED</span></div>
             <div class="stat-label">VFS Sync: <span id="vfs-status" class="status-success">ZERO DRIFT (PQC)</span></div>
@@ -834,18 +759,18 @@
         <div class="window-content">
             <!-- Sidebar -->
             <div class="util-sidebar">
-                <div class="util-nav active" onclick="switchUtil('text-ops')">Text Operations</div>
-                <div class="util-nav" onclick="switchUtil('data-conv')">Data Converter</div>
-                <div class="util-nav" onclick="switchUtil('code-img')">Code to Image</div>
-                <div class="util-nav" onclick="switchUtil('diff')">Compare Text</div>
-                <div class="util-nav" onclick="switchUtil('dup-find')">Duplicate Finder</div>
-                <div class="util-nav" onclick="switchUtil('key-test')">Key-Test</div>
-                <div class="util-nav" onclick="switchUtil('speed')">Ookla Speed Shard</div>
-                <div class="util-nav" onclick="switchUtil('status')">IsItDownRightNow</div>
-                <div class="util-nav" onclick="switchUtil('bootable')">Bootable Creator</div>
-                <div class="util-nav" onclick="switchUtil('table')">Table Convert</div>
-                <div class="util-nav" onclick="switchUtil('broadcaster')">Prompt Broadcaster</div>
-                <div class="util-nav" onclick="switchUtil('firewall')">Aether Firewall</div>
+                <div class="util-nav active" onclick="switchUtil('text-ops', event)">Text Operations</div>
+                <div class="util-nav" onclick="switchUtil('data-conv', event)">Data Converter</div>
+                <div class="util-nav" onclick="switchUtil('code-img', event)">Code to Image</div>
+                <div class="util-nav" onclick="switchUtil('diff', event)">Compare Text</div>
+                <div class="util-nav" onclick="switchUtil('dup-find', event)">Duplicate Finder</div>
+                <div class="util-nav" onclick="switchUtil('key-test', event)">Key-Test</div>
+                <div class="util-nav" onclick="switchUtil('speed', event)">Ookla Speed Shard</div>
+                <div class="util-nav" onclick="switchUtil('status', event)">IsItDownRightNow</div>
+                <div class="util-nav" onclick="switchUtil('bootable', event)">Bootable Creator</div>
+                <div class="util-nav" onclick="switchUtil('table', event)">Table Convert</div>
+                <div class="util-nav" onclick="switchUtil('broadcaster', event)">Prompt Broadcaster</div>
+                <div class="util-nav" onclick="switchUtil('firewall', event)">Aether Firewall</div>
             </div>
             <!-- Main Area -->
             <div id="util-main" class="util-main">
@@ -999,23 +924,23 @@ https://chatgpt.com/?q={{prompt}}</textarea>
             <h3>Sovereign Shard Exchange</h3>
             <p class="stat-label">Verified PQC bundles ready for lattice injection.</p>
             <div class="mkt-grid">
-                <div class="mkt-item">
+                <div class="mkt-item" data-mkt-shard="HyperBoost">
                     <div class="mkt-icon">🚀</div>
                     <div class="mkt-name">HyperBoost</div>
                     <div class="mkt-desc">Sub-10ms context switching shard.</div>
-                    <button class="util-btn" onclick="installShard('HyperBoost')">INJECT</button>
+                    <button type="button" class="util-btn" onclick="installShard('HyperBoost')">INJECT</button>
                 </div>
-                <div class="mkt-item">
+                <div class="mkt-item" data-mkt-shard="Amnesic-X">
                     <div class="mkt-icon">🛡️</div>
                     <div class="mkt-name">Amnesic-X</div>
                     <div class="mkt-desc">Zero-trace artifact scrubbing engine.</div>
-                    <button class="util-btn" onclick="installShard('Amnesic-X')">INJECT</button>
+                    <button type="button" class="util-btn" onclick="installShard('Amnesic-X')">INJECT</button>
                 </div>
-                <div class="mkt-item">
+                <div class="mkt-item" data-mkt-shard="Glass-Pro">
                     <div class="mkt-icon">🎨</div>
                     <div class="mkt-name">Glass-Pro</div>
                     <div class="mkt-desc">Advanced HSL-tailored blurring.</div>
-                    <button class="util-btn" onclick="installShard('Glass-Pro')">INJECT</button>
+                    <button type="button" class="util-btn" onclick="installShard('Glass-Pro')">INJECT</button>
                 </div>
             </div>
         </div>
@@ -1071,6 +996,86 @@ https://chatgpt.com/?q={{prompt}}</textarea>
         </div>
     </div>
 
+    <!-- Lattice Settings -->
+    <div class="window" id="lattice-settings-win" style="display:none;">
+        <div class="window-header">
+            <div class="window-title">🖥️ Lattice Settings</div>
+            <div class="window-controls">
+                <div class="win-btn minimize" onclick="minimizeWindow('lattice-settings-win')"></div>
+                <div class="win-btn close" onclick="closeWindow('lattice-settings-win')"></div>
+            </div>
+        </div>
+        <div class="window-content window-content--padded">
+            <p class="stat-label">Sovereign identity and lattice metadata.</p>
+            <p class="stat-label mt-10">Repo: <a href="https://github.com/AaryanSinghChauhan09/SigmaOS" target="_blank" rel="noopener" class="zenith-link">github.com/AaryanSinghChauhan09/SigmaOS</a></p>
+            <p class="stat-label">Zenith build: v30 (Neural UI)</p>
+        </div>
+    </div>
+
+    <!-- File Manager -->
+    <div class="window" id="file-manager-win" style="display:none;">
+        <div class="window-header">
+            <div class="window-title">📂 Sovereign File Manager</div>
+            <div class="window-controls">
+                <div class="win-btn minimize" onclick="minimizeWindow('file-manager-win')"></div>
+                <div class="win-btn close" onclick="closeWindow('file-manager-win')"></div>
+            </div>
+        </div>
+        <div class="window-content window-content--padded file-manager-body">
+            <div class="fm-sidebar">
+                <div class="fm-dir">/home/sovereign</div>
+                <div class="fm-dir">/kernel</div>
+                <div class="fm-dir">/lattice</div>
+                <div class="fm-dir">/vault</div>
+                <div class="fm-dir">/mesh</div>
+            </div>
+            <div class="fm-main">
+                <div class="fm-row" ondblclick="addLog('Σ [VFS]: Opened manifest.sig','success')">manifest.sig</div>
+                <div class="fm-row" ondblclick="addLog('Σ [VFS]: Opened shardmap.json','success')">shardmap.json</div>
+                <div class="fm-row" ondblclick="addLog('Σ [VFS]: Opened boot.nsh','success')">boot.nsh</div>
+            </div>
+        </div>
+        <div class="fm-status">3 objects · PQC-sealed VFS</div>
+    </div>
+
+    <!-- Sigma Browser -->
+    <div class="window" id="browser-win" style="display:none;">
+        <div class="window-header">
+            <div class="window-title">🌐 Sigma Browser</div>
+            <div class="window-controls">
+                <div class="win-btn minimize" onclick="minimizeWindow('browser-win')"></div>
+                <div class="win-btn close" onclick="closeWindow('browser-win')"></div>
+            </div>
+        </div>
+        <div class="window-content browser-body">
+            <div class="browser-toolbar">
+                <button type="button" class="util-btn" onclick="sigmaBrowseBack()">←</button>
+                <button type="button" class="util-btn" onclick="sigmaBrowseForward()">→</button>
+                <input type="text" id="browser-url" class="browser-url" value="sigma://lattice" />
+                <button type="button" class="util-btn" onclick="sigmaBrowseGo()">Go</button>
+            </div>
+            <iframe id="browser-frame" class="browser-frame" title="Sigma browser" srcdoc="&lt;!DOCTYPE html&gt;&lt;html&gt;&lt;body style=background:#0a0a0f;color:#7dd3fc;font-family:system-ui;padding:2rem&gt;&lt;h1&gt;σ Lattice Home&lt;/h1&gt;&lt;p&gt;Simulated sigma:// page.&lt;/p&gt;&lt;a href=&quot;https://github.com/AaryanSinghChauhan09/SigmaOS&quot; style=color:#fbbf24&gt;GitHub — SigmaOS&lt;/a&gt;&lt;/body&gt;&lt;/html&gt;"></iframe>
+        </div>
+    </div>
+
+    <!-- AI Assistant -->
+    <div class="window" id="ai-assistant-win" style="display:none;">
+        <div class="window-header">
+            <div class="window-title">🧠 Neural Assistant</div>
+            <div class="window-controls">
+                <div class="win-btn minimize" onclick="minimizeWindow('ai-assistant-win')"></div>
+                <div class="win-btn close" onclick="closeWindow('ai-assistant-win')"></div>
+            </div>
+        </div>
+        <div class="window-content ai-chat-body">
+            <div id="ai-chat-log" class="ai-chat-log"></div>
+            <div class="ai-chat-input-row">
+                <input type="text" id="ai-chat-input" class="ai-chat-input" placeholder="Ask the lattice…" onkeydown="if(event.key==='Enter')sendAiChat()" />
+                <button type="button" class="util-btn" onclick="sendAiChat()">Send</button>
+            </div>
+        </div>
+    </div>
+
     <!-- Onboarding Wizard -->
     <div class="wizard-overlay wizard-overlay--hidden" id="wizard-overlay">
         <div class="wizard-box">
@@ -1078,15 +1083,15 @@ https://chatgpt.com/?q={{prompt}}</textarea>
                 <div class="wizard-title">Lattice Ignition</div>
                 <div class="wizard-text">Welcome to the Zenith Supreme Singularity. Choose your operational persona to begin the sovereign handshake.</div>
                 <div class="wizard-options">
-                    <div class="wizard-option" onclick="selectPersona('Sovereign')">
+                    <div class="wizard-option" onclick="selectPersona('Sovereign', this)">
                         <strong>Sovereign</strong>
                         <div class="stat-label">Full administrative lattice control.</div>
                     </div>
-                    <div class="wizard-option" onclick="selectPersona('Amnesic')">
+                    <div class="wizard-option" onclick="selectPersona('Amnesic', this)">
                         <strong>Amnesic</strong>
                         <div class="stat-label">Zero-persistence, secure execution.</div>
                     </div>
-                    <div class="wizard-option" onclick="selectPersona('Industrial')">
+                    <div class="wizard-option" onclick="selectPersona('Industrial', this)">
                         <strong>Industrial</strong>
                         <div class="stat-label">Hardened production stability.</div>
                     </div>
@@ -1124,21 +1129,22 @@ https://chatgpt.com/?q={{prompt}}</textarea>
             <div class="app-label">Core Orchestrator</div>
         </div>
     </div>
+    </div>
 
     <!-- Taskbar -->
     <div class="taskbar">
-        <div class="task-icon active">Σ</div>
-        <div class="task-icon">📂</div>
-        <div class="task-icon">🌐</div>
-        <div class="task-icon">🧠</div>
-        <div class="task-icon">🖥️</div>
-        <div class="task-icon" onclick="launchApp('Markup Forge')">📄</div>
-        <div class="task-icon" onclick="launchApp('Utility Nexus')">🛠️</div>
-        <div class="task-icon" onclick="launchApp('Marketplace')">🛒</div>
-        <div class="task-icon" onclick="launchApp('Customization Panel')">✨</div>
+        <div class="task-icon active" onclick="toggleStart()" title="Start">Σ</div>
+        <div class="task-icon" onclick="launchApp('File Manager')" title="Files">📂</div>
+        <div class="task-icon" onclick="launchApp('Sigma Browser')" title="Browser">🌐</div>
+        <div class="task-icon" onclick="launchApp('AI Assistant')" title="AI">🧠</div>
+        <div class="task-icon" onclick="launchApp('Lattice Settings')" title="Settings">🖥️</div>
+        <div class="task-icon" onclick="launchApp('Markup Forge')" title="Markup Forge">📄</div>
+        <div class="task-icon" onclick="launchApp('Utility Nexus')" title="Utility Nexus">🛠️</div>
+        <div class="task-icon" onclick="launchApp('Marketplace')" title="Marketplace">🛒</div>
+        <div class="task-icon" onclick="launchApp('Customization Panel')" title="Customization">✨</div>
         <div class="taskbar-divider"></div>
-        <div class="task-icon">🔔</div>
-        <div class="task-icon">🔋</div>
+        <div class="task-icon task-icon--notif" onclick="toggleNotifications()" title="Notifications">🔔<span class="notif-badge" id="notif-badge" style="display:none;">0</span></div>
+        <div class="task-icon" onclick="toggleBatteryPanel()" title="Power">🔋</div>
         <div class="taskbar-divider"></div>
         <div class="status-indicator-wasm" title="Silicon-WASM Nexus">
             <div class="pulse-dot"></div>
@@ -1146,821 +1152,33 @@ https://chatgpt.com/?q={{prompt}}</textarea>
         </div>
     </div>
 
-    <script>
-        // Update Clock
-        function updateClock() {
-            const now = new Date();
-            const time = now.toLocaleTimeString('en-US', { hour12: false, hour: '2-digit', minute: '2-digit' });
-            const date = now.toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric' });
-            document.getElementById('clock-time').textContent = time;
-            document.getElementById('clock-date').textContent = date;
-        }
-        setInterval(updateClock, 1000);
-        updateClock();
+    <div id="notif-panel" class="zenith-flyout zenith-flyout--notifications">
+        <div class="zenith-flyout__head">
+            <span>Notifications</span>
+            <button type="button" class="util-btn" onclick="clearAllNotifications()">Clear all</button>
+        </div>
+        <div id="notif-list" class="zenith-flyout__body"></div>
+    </div>
+
+    <div id="battery-panel" class="zenith-flyout zenith-flyout--battery">
+        <div class="zenith-flyout__head"><span>Power</span></div>
+        <div class="battery-meter"><div id="battery-fill" class="battery-meter__fill" style="width:87%"></div></div>
+        <div id="battery-pct" class="battery-pct">87%</div>
+        <div class="stat-label">Mode: <span id="power-mode-label">Balanced</span></div>
+        <div class="power-actions">
+            <button type="button" class="util-btn" onclick="setPowerMode('Performance')">Performance</button>
+            <button type="button" class="util-btn" onclick="setPowerMode('Balanced')">Balanced</button>
+            <button type="button" class="util-btn" onclick="setPowerMode('Power Saver')">Saver</button>
+        </div>
+    </div>
+
+    <nav id="context-menu" class="context-menu" aria-hidden="true">
+        <button type="button" class="context-menu__item" onclick="ctxAction('palette')">Command Palette</button>
+        <button type="button" class="context-menu__item" onclick="ctxAction('settings')">Lattice Settings</button>
+        <button type="button" class="context-menu__item" onclick="ctxAction('reload')">Reload Shell</button>
+        <button type="button" class="context-menu__item" onclick="ctxAction('repo')">Open GitHub Repo</button>
+        <button type="button" class="context-menu__item" onclick="ctxAction('widgets')">Toggle Widget Focus</button>
+    </nav>
 
-        // Command Palette Logic
-        const cmdPalette = document.getElementById('cmd-palette');
-        const cmdInput = document.getElementById('cmd-input');
-
-        window.addEventListener('keydown', (e) => {
-            if ((e.metaKey || e.ctrlKey) && e.key === 'k') {
-                e.preventDefault();
-                cmdPalette.classList.toggle('active');
-                if (cmdPalette.classList.contains('active')) cmdInput.focus();
-            }
-            if (e.key === 'Escape') cmdPalette.classList.remove('active');
-        });
-
-        function setTheme(name) {
-            document.body.className = name === 'cyan' ? '' : 'theme-' + name;
-            const status = name.toUpperCase();
-            addLog(`Σ [CONFIG]: Shard Theme switched to ${status}.`, 'success');
-            
-            // Sync Persona Indicator
-            const personaLabel = document.getElementById('persona-theme');
-            if (personaLabel) personaLabel.textContent = `Theme: ${status}`;
-            
-            cmdPalette.classList.remove('active');
-        }
-
-        // SVG Graph Logic
-        const cpuGraph = document.getElementById('cpu-graph');
-        const points = [40, 40, 40, 40, 40, 40, 40, 40, 40, 40, 40];
-
-        function updateGraph(val) {
-            points.shift();
-            points.push(40 - (val / 100 * 40));
-            const path = points.map((p, i) => `${i * 30},${p}`).join(' ');
-            cpuGraph.setAttribute('points', path);
-        }
-
-        // Simulate Kernel Logs
-        const logContainer = document.getElementById('kernel-logs');
-        const logs = [
-            { t: "Σ [BOOT]: Sovereign Lattice Online.", c: "" },
-            { t: "Σ [SECURE]: PQC Shard Initialized (Lattice-V5).", c: "success" },
-            { t: "Σ [AUTO]: Neural Personalization active.", c: "" },
-            { t: "Σ [NET]: Cloud Maestro projected to EU-WEST-1.", c: "" },
-            { t: "Σ [KERN]: Memory Slab Shard mapped (64MB).", c: "success" },
-            { t: "Σ [AUDIT]: CPU Silicon Discovery: 16 Zenith Cores.", c: "" },
-            { t: "Σ [VGA]: Direct Framebuffer Projector Online.", c: "success" },
-            { t: "Σ [ZENITH]: Command Palette (Ctrl+K) ready.", c: "success" }
-        ];
-
-        function addLog(text, type) {
-            const div = document.createElement('div');
-            div.className = `log-item ${type}`;
-            div.textContent = text;
-            logContainer.prepend(div);
-            if (logContainer.children.length > 15) logContainer.lastChild.remove();
-        }
-
-        let logIdx = 0;
-        function cycleLogs() {
-            if (logIdx < logs.length) {
-                addLog(logs[logIdx].t, logs[logIdx].c);
-                logIdx++;
-                setTimeout(cycleLogs, 800);
-            }
-        }
-        cycleLogs();
-
-        // Simulate Hardware Stats
-        // UI Interactions
-        function toggleStart() {
-            const menu = document.getElementById('start-menu');
-            menu.classList.toggle('active');
-            if (menu.classList.contains('active')) {
-                addLog("Σ [ZENITH]: Start Menu Shard ACTIVE.", "success");
-            }
-        }
-
-        function launchApp(app) {
-            addLog(`Σ [ZENITH]: Launching ${app} Shard...`, "success");
-            if (app === 'Markup Forge') {
-                const win = document.getElementById('markup-forge-win');
-                win.style.display = 'block';
-                win.style.zIndex = '2000';
-            } else if (app === 'Utility Nexus') {
-                const win = document.getElementById('utility-nexus-win');
-                win.style.display = 'block';
-                win.style.zIndex = '2000';
-            } else if (app === 'Marketplace') {
-                const win = document.getElementById('marketplace-win');
-                win.style.display = 'block';
-                win.style.zIndex = '2000';
-            } else if (app === 'Customization Panel') {
-                const win = document.getElementById('customization-win');
-                win.style.display = 'block';
-                win.style.zIndex = '2000';
-            }
-            toggleStart();
-        }
-
-        // Marketplace Logic
-        function installShard(name) {
-            addLog(`Σ [PKG]: Fetching ${name} bundle...`, "success");
-            setTimeout(() => {
-                addLog(`Σ [PKG]: ${name} injected into lattice.`, "success");
-                if (name === 'Glass-Pro') {
-                    document.body.style.backdropFilter = 'blur(40px)';
-                    addLog("Σ [CONFIG]: AVX-512 Shard Preempted for Glass-Pro.", "success");
-                }
-            }, 1000);
-        }
-
-        // Wizard Logic
-        function selectPersona(p) {
-            document.querySelectorAll('.wizard-option').forEach(opt => opt.classList.remove('selected'));
-            event.currentTarget.classList.add('selected');
-            document.getElementById('top-user-name').textContent = p + '_User';
-            document.getElementById('menu-user-name').textContent = p + '_User';
-            addLog(`Σ [IDENTITY]: Persona set to ${p}.`, "success");
-        }
-
-        function nextStep(s) {
-            document.querySelectorAll('.wizard-step').forEach(step => step.classList.remove('active'));
-            document.getElementById('step-' + s).classList.add('active');
-        }
-
-        function completeWizard() {
-            document.getElementById('wizard-overlay').style.display = 'none';
-            addLog("Σ [ZENITH]: Zenith Singularity Fully Initialized.", "success");
-        }
-
-        // Auto-show wizard if not shown
-        window.addEventListener('load', () => {
-            if (!localStorage.getItem('sigma_onboarded')) {
-                document.getElementById('wizard-overlay').style.display = 'flex';
-                localStorage.setItem('sigma_onboarded', 'true');
-            }
-        });
-
-        function checkStatus() {
-            const url = document.getElementById('status-url').value;
-            const output = document.getElementById('status-output');
-            output.innerHTML = '<span style="color: var(--accent);">Checking silicon route to ' + url + '...</span>';
-            setTimeout(() => {
-                output.innerHTML = '<span style="color: var(--success);">✔ ' + url + ' is UP and responsive in the lattice.</span>';
-                addLog("Σ [UTILITY]: Route check complete for " + url, "success");
-            }, 1500);
-        }
-
-        function flashBootable() {
-            document.getElementById('boot-target').innerText = "SiliconDrive (64GB) [LOCKED]";
-            const barContainer = document.getElementById('flash-progress');
-            const bar = document.getElementById('flash-bar');
-            barContainer.style.display = 'block';
-            let progress = 0;
-            const interval = setInterval(() => {
-                progress += 5;
-                bar.style.width = progress + '%';
-                if (progress >= 100) {
-                    clearInterval(interval);
-                    addLog("Σ [FLASH]: Bootable shard written successfully.", "success");
-                }
-            }, 100);
-        }
-
-        function convertTable() {
-            const csv = document.getElementById('table-input').value;
-            const rows = csv.split('\n');
-            let html = '<table style="width: 100%; border-collapse: collapse; font-size: 0.8em; color: white;">';
-            rows.forEach((row, i) => {
-                html += '<tr>';
-                row.split(',').forEach(col => {
-                    html += `<td style="border: 1px solid rgba(255,255,255,0.1); padding: 8px; ${i===0?'background: rgba(0,255,255,0.1); font-weight: 800;':''}">${col.trim()}</td>`;
-                });
-                html += '</tr>';
-            });
-            html += '</table>';
-            document.getElementById('table-output').innerHTML = html;
-            addLog("Σ [UTILITY]: CSV-to-Table conversion complete.", "success");
-        }
-
-        function switchUtil(utilId) {
-            const panes = ['text-ops', 'data-conv', 'code-img', 'diff', 'dup-find', 'key-test', 'speed', 'status', 'bootable', 'table', 'broadcaster', 'firewall'];
-            panes.forEach(p => {
-                const el = document.getElementById(`util-${p}`);
-                if (el) el.style.display = 'none';
-            });
-            const targetPane = document.getElementById(`util-${utilId}`);
-            if (targetPane) targetPane.style.display = 'block';
-            
-            const navs = document.querySelectorAll('.util-nav');
-            navs.forEach(n => n.classList.remove('active'));
-            if (event.target.classList.contains('util-nav')) {
-                event.target.classList.add('active');
-            }
-            
-            addLog(`Σ [UTILITY]: Switching to ${utilId} module.`, "success");
-        }
-
-        function findDuplicates() {
-            const input = document.getElementById('dup-input').value;
-            const words = input.toLowerCase().match(/\w+/g) || [];
-            const counts = {};
-            words.forEach(w => counts[w] = (counts[w] || 0) + 1);
-            const dups = Object.keys(counts).filter(w => counts[w] > 1);
-            document.getElementById('dup-output').innerText = dups.length > 0 ? "Duplicates: " + dups.join(', ') : "No duplicates found.";
-            addLog("Σ [UTILITY]: Duplicate scan complete.", "success");
-        }
-
-        function broadcastPromptUtility() {
-            const promptInput = document.getElementById('util-broadcast-prompt');
-            const sitesInput = document.getElementById('util-broadcast-sites');
-            
-            if (!promptInput.value.trim()) {
-                addLog("Σ [ERR]: Broadcast failed - No prompt.", "error");
-                return;
-            }
-
-            const prompt = encodeURIComponent(promptInput.value.trim());
-            const sites = sitesInput.value.split('\n').map(s => s.trim()).filter(s => s.length > 0);
-
-            if (sites.length === 0) {
-                addLog("Σ [ERR]: Broadcast failed - No sites.", "error");
-                return;
-            }
-
-            addLog(`Σ [ZENITH]: Broadcasting to ${sites.length} shards...`, "success");
-            
-            sites.forEach(site => {
-                const url = site.replace('{{prompt}}', prompt);
-                window.open(url, '_blank');
-            });
-        }
-
-        function addBlockRule() {
-            const input = document.getElementById('firewall-input');
-            const list = document.getElementById('blocked-list');
-            if (!input.value.trim()) return;
-            
-            const li = document.createElement('li');
-            li.className = "routine-item routine-border-magenta";
-            li.innerHTML = `<strong>${input.value.trim()}</strong> <button class="cyber-btn small-btn" onclick="this.parentElement.remove()">UNBLOCK</button>`;
-            list.prepend(li);
-            addLog(`Σ [FIREWALL]: Blocked access to ${input.value.trim()}.`, "error");
-            input.value = '';
-        }
-
-        function updateAccentHue(val) {
-            document.documentElement.style.setProperty('--accent', `hsl(${val}, 100%, 50%)`);
-            document.documentElement.style.setProperty('--accent-glow', `hsla(${val}, 100%, 50%, 0.3)`);
-        }
-
-        function updateGlassBlur(val) {
-            document.documentElement.style.setProperty('--glass-blur', `blur(${val}px)`);
-            addLog(`Σ [CONFIG]: Glass Intensity set to ${val}px.`, "success");
-        }
-
-        function setWallpaper(src) {
-            if (src === 'none') {
-                document.body.style.backgroundImage = 'none';
-                document.body.style.backgroundColor = '#030305';
-            } else {
-                document.body.style.backgroundImage = `url('${src}')`;
-            }
-            addLog(`Σ [CONFIG]: Wallpaper Shard updated.`, "success");
-        }
-
-        window.addEventListener('keydown', (e) => {
-            const keyDisplay = document.getElementById('last-key');
-            const codeDisplay = document.getElementById('key-code');
-            if (keyDisplay && document.getElementById('util-key-test').style.display !== 'none') {
-                keyDisplay.innerText = e.key.toUpperCase();
-                codeDisplay.innerText = "CODE: " + e.code;
-                addLog(`Σ [KEY-TEST]: Input detected: ${e.key}`, "success");
-            }
-        });
-
-        function startSpeedTest() {
-            const gauge = document.getElementById('speed-gauge');
-            let speed = 0;
-            const interval = setInterval(() => {
-                speed = Math.floor(Math.random() * 900) + 100;
-                gauge.innerText = speed;
-                gauge.style.borderColor = `hsl(${speed/10}, 70%, 50%)`;
-            }, 100);
-            setTimeout(() => {
-                clearInterval(interval);
-                addLog(`Σ [SPEED]: Test complete. Result: ${speed} MBPS.`, "success");
-            }, 3000);
-        }
-
-        function dataAction(action) {
-            const input = document.getElementById('util-data-input').value;
-            const output = document.getElementById('util-data-output');
-            if (action === 'json-xml') {
-                output.innerText = "<root>\n  <data>" + input + "</data>\n</root>";
-            } else {
-                output.innerText = "[{ \"data\": \"" + input + "\" }]";
-            }
-            addLog(`Σ [UTILITY]: Data conversion complete.`, "success");
-        }
-
-        function renderCode() {
-            const code = document.getElementById('util-code-input').value;
-            document.getElementById('code-render-box').innerText = code;
-            addLog("Σ [UTILITY]: Code-to-Image preview rendered.", "success");
-        }
-
-        function compareText() {
-            const left = document.getElementById('diff-left').value;
-            const right = document.getElementById('diff-right').value;
-            const output = document.getElementById('diff-output');
-            
-            if (left === right) {
-                output.innerHTML = '<span style="color: var(--success);">✔ Shards are bit-perfect matches.</span>';
-            } else {
-                output.innerHTML = '<span style="color: var(--error);">✘ Shard mismatch detected. Diff reconciliation required.</span>';
-            }
-            addLog("Σ [UTILITY]: Text comparison complete.", "success");
-        }
-
-        function textAction(action) {
-            const input = document.getElementById('util-text-input').value;
-            const output = document.getElementById('util-text-output');
-            
-            if (action === 'upper') output.innerText = input.toUpperCase();
-            else if (action === 'lower') output.innerText = input.toLowerCase();
-            else if (action === 'title') output.innerText = input.replace(/\w\S*/g, (txt) => txt.charAt(0).toUpperCase() + txt.substr(1).toLowerCase());
-            else if (action === 'sentence') output.innerText = input.toLowerCase().replace(/(^\s*\w|[\.\!\?]\s*\w)/g, c => c.toUpperCase());
-            else if (action === 'count') {
-                const words = input.trim().split(/\s+/).filter(w => w.length > 0).length;
-                const chars = input.length;
-                const lines = input.split('\n').filter(l => l.length > 0).length;
-                output.innerText = `Words: ${words} | Characters: ${chars} | Lines: ${lines}`;
-            }
-            else if (action === 'clear-lines') output.innerText = input.replace(/\n/g, ' ');
-            
-            addLog(`Σ [UTILITY]: Executed ${action} on text buffer.`, "success");
-        }
-
-        function forgeHTML() {
-            const input = document.getElementById('markup-input').value;
-            const output = document.getElementById('markup-output');
-            
-            // Simple Text-to-HTML conversion logic
-            let html = input
-                .replace(/&/g, "&amp;")
-                .replace(/</g, "&lt;")
-                .replace(/>/g, "&gt;")
-                .replace(/"/g, "&quot;")
-                .replace(/'/g, "&#039;")
-                .replace(/\n/g, "<br>\n");
-            
-            // Add some "sovereign" tags
-            html = html.replace(/Σ/g, '<span style="color: cyan;">Σ</span>');
-            
-            output.innerText = html;
-            addLog("Σ [MARKUP]: HTML Shard forged successfully.", "success");
-        }
-
-        function clearMarkup() {
-            document.getElementById('markup-input').value = '';
-            document.getElementById('markup-output').innerText = '';
-            addLog("Σ [MARKUP]: Buffer purged.", "success");
-        }
-
-        document.addEventListener('keydown', (e) => {
-            if (e.key === 'Meta' || e.key === 'Control') {
-                // Potential Start Menu shortcut
-            }
-            if (e.key === 'Escape') {
-                document.getElementById('start-menu').classList.remove('active');
-                document.getElementById('cmd-palette').classList.remove('active');
-            }
-        });
-
-        // Update Start Menu Click
-        document.querySelector('.taskbar-start').onclick = toggleStart;
-
-        setInterval(() => {
-            const cpu = Math.floor(Math.random() * 20) + 10;
-            document.getElementById('cpu-load').textContent = cpu + "%";
-            document.getElementById('cpu-progress').style.width = cpu + "%";
-            updateGraph(cpu);
-
-            const mem = (Math.random() * 0.5 + 4.1).toFixed(1);
-            document.getElementById('mem-load').textContent = (4.0 + Math.random() * 0.5).toFixed(1) + " GB";
-            document.getElementById('mem-progress').style.width = (40 + Math.random() * 5) + "%";
-
-            const cacheHit = (99.0 + Math.random() * 0.9).toFixed(1);
-            document.getElementById('cache-hit').textContent = cacheHit + "% Hit";
-            document.getElementById('cache-progress').style.width = cacheHit + "%";
-
-            // Voice Simulation
-            if (Math.random() > 0.98) {
-                document.getElementById('voice-status').textContent = "Listening...";
-                document.getElementById('voice-status').style.color = "var(--success)";
-                addLog("Σ [VOICE]: Wake-word 'Sigma' detected. Listening...", "success");
-
-                setTimeout(() => {
-                    document.getElementById('voice-status').textContent = "Processing";
-                    document.getElementById('voice-status').style.color = "var(--accent)";
-                    setTimeout(() => {
-                        document.getElementById('voice-status').textContent = "Idle";
-                        document.getElementById('voice-status').style.color = "var(--text-muted)";
-                        addLog("Σ [VOICE]: Transcription: 'Initialize neural lattice'. Executing...", "success");
-                    }, 1500);
-                }, 2000);
-            }
-
-            // Automation Simulation
-            const efficiency = (97.0 + Math.random() * 2.5).toFixed(1);
-            document.getElementById('auto-efficiency').textContent = `Efficiency: ${efficiency}%`;
-            document.getElementById('auto-progress').style.width = efficiency + "%";
-
-            // Vault Simulation
-            if (Math.random() > 0.99) {
-                document.getElementById('vault-status').textContent = "Syncing";
-                document.getElementById('vault-status').style.color = "var(--accent)";
-                addLog("Σ [STORAGE]: Synchronizing state with decentralized lattice...", "success");
-
-                setTimeout(() => {
-                    document.getElementById('vault-status').textContent = "Pinned";
-                    document.getElementById('vault-status').style.color = "var(--text-muted)";
-                    addLog("Σ [STORAGE]: State Shard pinned. CID: Qm... finalized.", "success");
-                }, 2500);
-            }
-            document.getElementById('vault-progress').style.width = (60 + Math.random() * 10) + "%";
-
-            // VFS Simulation
-            if (Math.random() > 0.96) {
-                const nodes = Math.floor(Math.random() * 5) + 10;
-                document.getElementById('vfs-nodes').textContent = `${nodes} Nodes`;
-                addLog(`Σ [VFS]: Registered ${nodes} active shard nodes.`, "success");
-            }
-            document.getElementById('vfs-progress').style.width = (75 + Math.random() * 10) + "%";
-
-            // Memory Simulation
-            const memUsage = (20 + Math.random() * 10).toFixed(0);
-            document.getElementById('mem-usage').textContent = `${memUsage}% Used`;
-            document.getElementById('memory-progress').style.width = memUsage + "%";
-
-            // Sync Simulation
-            if (Math.random() > 0.95) {
-                const latency = (5 + Math.random() * 15).toFixed(0);
-                document.getElementById('sync-latency').textContent = `${latency}ms Latency`;
-                addLog(`Σ [SYNC]: Distributed lock cycle complete. Latency: ${latency}ms.`, "success");
-            }
-            document.getElementById('sync-progress').style.width = (90 + Math.random() * 10) + "%";
-
-            // UI Simulation
-            const frameTime = (8.0 + Math.random() * 0.5).toFixed(1);
-            document.getElementById('ui-frametime').textContent = `${frameTime}ms`;
-            document.getElementById('ui-progress').style.width = "100%";
-
-            // Silicon Simulation
-            if (Math.random() > 0.98) {
-                const bus = Math.floor(Math.random() * 10).toString().padStart(2, '0');
-                const slot = Math.floor(Math.random() * 32).toString().padStart(2, '0');
-                document.getElementById('pci-devices').textContent = `Bus: ${bus} | Slot: ${slot}`;
-                addLog(`Σ [PCI]: Hardware Shard detected on Bus ${bus}, Slot ${slot}. Auditing...`, "success");
-            }
-            document.getElementById('silicon-progress').style.width = "100%";
-
-            // Scholar Simulation
-            const labs = ["Physics: Magnetism", "Chemistry: Titration", "Biology: Microscopy", "Math: Geometry"];
-            if (Math.random() > 0.95) {
-                const lab = labs[Math.floor(Math.random() * labs.length)];
-                document.getElementById('lab-active').textContent = lab;
-                addLog(`Σ [SCHOLAR]: Executing Virtual Lab Shard: ${lab}. Procedure synced.`, "success");
-            }
-            document.getElementById('scholar-progress').style.width = (95 + Math.random() * 5) + "%";
-
-            // Persona Simulation
-            if (Math.random() > 0.99) {
-                const names = ["Sovereign_Alpha", "Lattice_Master", "Silicon_Savant"];
-                const name = names[Math.floor(Math.random() * names.length)];
-                document.getElementById('persona-name').textContent = name;
-                document.getElementById('menu-user-name').textContent = name;
-                addLog(`Σ [PERSONA]: Identity Shard adapted. New Alias: ${name}.`, "success");
-            }
-            document.getElementById('persona-progress').style.width = "100%";
-
-            // Sentinel Simulation
-            if (Math.random() > 0.94) {
-                const scrubs = Math.floor(Math.random() * 20) + 10;
-                document.getElementById('log-scrubs').textContent = `${scrubs} Scrubs`;
-                addLog(`Σ [SENTINEL]: Amnesic audit complete. ${scrubs} traces neutralized.`, "success");
-            }
-            document.getElementById('amnesic-progress').style.width = (80 + Math.random() * 20) + "%";
-
-            // Judicial Simulation
-            if (Math.random() > 0.98) {
-                document.getElementById('legal-status').textContent = "AUDITING";
-                document.getElementById('legal-status').style.color = "var(--accent)";
-                addLog("Σ [LEGAL]: Performing BNSS/BNS/BSA silicon-to-statute audit...", "success");
-
-                setTimeout(() => {
-                    document.getElementById('legal-status').textContent = "Compliant";
-                    document.getElementById('legal-status').style.color = "var(--success)";
-                    addLog("Σ [LEGAL]: Judicial integrity verified. Compliance: 100%.", "success");
-                }, 2000);
-            }
-            document.getElementById('legal-progress').style.width = "100%";
-
-            // Colonization Simulation
-            if (Math.random() > 0.99) {
-                const nodes = parseInt(document.getElementById('node-count').textContent) + 1;
-                document.getElementById('node-count').textContent = `${nodes} Nodes`;
-                addLog(`Σ [COLONIZER]: Shard projection successful. New node colonized in the mesh.`, "success");
-            }
-            document.getElementById('mesh-progress').style.width = (40 + Math.random() * 60) + "%";
-
-            // VRAM Simulation
-            const vramUsage = (10 + Math.random() * 10).toFixed(0);
-            document.getElementById('vram-usage').textContent = `${vramUsage}MB / 256MB`;
-            document.getElementById('vram-progress').style.width = (vramUsage / 2.56) + "%";
-
-            // Boot Simulation
-            document.getElementById('boot-progress-bar').style.width = "98%";
-
-            // Integrity Simulation
-            if (Math.random() > 0.97) {
-                document.getElementById('test-status').textContent = "Auditing";
-                document.getElementById('test-status').style.color = "var(--accent)";
-                addLog("Σ [AUDIT]: Running 500-shard integrity verification...", "success");
-
-                setTimeout(() => {
-                    document.getElementById('test-status').textContent = "Verified";
-                    document.getElementById('test-status').style.color = "var(--success)";
-                    addLog("Σ [AUDIT]: All shards verified. Integrity: BIT-PERFECT.", "success");
-                }, 1800);
-            }
-            document.getElementById('test-progress').style.width = "100%";
-
-            // Entropy Simulation
-            const entropyHex = Array.from({ length: 4 }, () => Math.floor(Math.random() * 256).toString(16).padStart(2, '0')).join('').toUpperCase();
-            document.getElementById('entropy-val').textContent = `0x${entropyHex}...`;
-            document.getElementById('entropy-progress').style.width = (85 + Math.random() * 15) + "%";
-
-            // UI Interactions
-            // Self-Healing Simulation
-            const auditTime = Math.floor(Math.random() * 15) + 5;
-            document.getElementById('healing-info').textContent = `Last Audit: ${auditTime}ms ago`;
-            const healingProgress = Math.floor(Math.random() * 20) + 80;
-            document.getElementById('healing-progress').style.width = healingProgress + "%";
-
-            if (Math.random() > 0.95) {
-                document.getElementById('healing-status').textContent = "RESTORING";
-                document.getElementById('healing-status').style.color = "var(--error)";
-                addLog("Σ [SELF-HEAL]: Entropy spike detected in VFS shard. Restoring...", "error");
-                setTimeout(() => {
-                    document.getElementById('healing-status').textContent = "OPTIMAL";
-                    document.getElementById('healing-status').style.color = "var(--success)";
-                    addLog("Σ [SELF-HEAL]: VFS Shard restored to bit-perfect state.", "success");
-                }, 1500);
-            }
-
-            // Security Audit Simulation
-            const secProgress = (parseFloat(document.getElementById('security-progress').style.width) || 0) + (Math.random() * 10);
-            if (secProgress >= 100) {
-                document.getElementById('security-progress').style.width = "0%";
-                document.getElementById('security-info').textContent = "Scanning Lattice...";
-                if (Math.random() > 0.8) {
-                    addLog("Σ [SEC-AUDIT]: Architectural drift detected. Hardening lattice...", "error");
-                    document.getElementById('security-status').textContent = "HARDENING";
-                    document.getElementById('security-status').style.color = "var(--error)";
-                    setTimeout(() => {
-                        document.getElementById('security-status').textContent = "SHIELDED";
-                        document.getElementById('security-status').style.color = "var(--accent)";
-                        addLog("Σ [SEC-AUDIT]: Lattice-PQC parity restored.", "success");
-                    }, 2000);
-                }
-            } else {
-                document.getElementById('security-progress').style.width = secProgress + "%";
-                document.getElementById('security-info').textContent = `Auditing Shard ${Math.floor(Math.random() * 500)}...`;
-            }
-
-            // Colonization Simulation
-            const colProgress = (parseFloat(document.getElementById('col-progress').style.width) || 0) + (Math.random() * 5);
-            if (colProgress >= 100) {
-                const nodes = parseInt(document.getElementById('node-count').textContent) + 1;
-                document.getElementById('node-count').textContent = `${nodes} Nodes`;
-                document.getElementById('col-progress').style.width = "0%";
-                const newIp = `192.168.1.${Math.floor(Math.random() * 254) + 1}`;
-                document.getElementById('col-target').textContent = `Target: ${newIp}`;
-                addLog(`Σ [COLONIZER]: Shard projected to ${newIp}. Node synchronized.`, "success");
-            } else {
-                document.getElementById('col-progress').style.width = colProgress + "%";
-            }
-
-            // Shard Matrix Animation
-            const dots = document.querySelectorAll('.shard-dot');
-            dots.forEach(dot => {
-                if (Math.random() > 0.98) {
-                    dot.classList.toggle('active');
-                }
-            });
-
-            if (Math.random() > 0.99) {
-                const faultIdx = Math.floor(Math.random() * 500);
-                dots[faultIdx].classList.add('error');
-                document.getElementById('shard-status').textContent = "Integrity: 99.8% (Fault Detected)";
-                document.getElementById('shard-status').style.color = "var(--error)";
-
-                setTimeout(() => {
-                    dots[faultIdx].classList.remove('error');
-                    dots[faultIdx].classList.add('healing');
-                    document.getElementById('shard-status').textContent = "Integrity: 100.0% (Self-Healed)";
-                    document.getElementById('shard-status').style.color = "var(--success)";
-                    setTimeout(() => dots[faultIdx].classList.remove('healing'), 2000);
-                }, 1500);
-            }
-        }, 2000);
-
-        // Inject 999 Shards for 999+ Singularity
-        const matrix = document.getElementById('shard-matrix');
-        for (let i = 0; i < 999; i++) {
-            const dot = document.createElement('div');
-            dot.className = 'shard-dot';
-            if (Math.random() > 0.95) dot.classList.add('active');
-            matrix.appendChild(dot);
-        }
-
-        // DNA Telemetry Sync
-        let totalSaved = 0;
-        setInterval(() => {
-            totalSaved += Math.floor(Math.random() * 500);
-            document.getElementById('dna-savings').innerText = (totalSaved / 1024).toFixed(2) + " MB";
-        }, 2000);
-
-        // Lattice Mesh Discovery & Streaming
-        let peers = 0;
-        const meshView = document.getElementById('mesh-view');
-        const meshSvg = document.getElementById('mesh-svg');
-        const meshNodes = [];
-
-        function discoverPeer() {
-            peers++;
-            document.getElementById('peer-count').innerText = peers;
-            const node = document.createElement('div');
-            node.className = 'mesh-node mesh-node-pulse';
-            
-            const x = Math.random() * 90;
-            const y = Math.random() * 90;
-            node.style.left = x + '%';
-            node.style.top = y + '%';
-            
-            if (meshView) meshView.appendChild(node);
-            meshNodes.push({x, y});
-
-            // Simulate Data Stream to a random previous node
-            if (peers > 1 && meshSvg) {
-                const targetIdx = Math.floor(Math.random() * (peers - 1));
-                const target = meshNodes[targetIdx];
-                
-                const line = document.createElementNS('http://www.w3.org/2000/svg', 'line');
-                line.setAttribute('x1', x + '%');
-                line.setAttribute('y1', y + '%');
-                line.setAttribute('x2', target.x + '%');
-                line.setAttribute('y2', target.y + '%');
-                line.setAttribute('stroke', 'var(--accent)');
-                line.setAttribute('stroke-width', '1');
-                line.setAttribute('stroke-dasharray', '5,5');
-                line.style.opacity = '0.5';
-                
-                // Animate stream
-                let offset = 0;
-                setInterval(() => {
-                    offset -= 1;
-                    line.setAttribute('stroke-dashoffset', offset);
-                }, 50);
-
-                meshSvg.appendChild(line);
-            }
-        }
-        setInterval(() => { if (peers < 12) discoverPeer(); }, 5000);
-        // Silicon-Direct Transpiler Telemetry
-        let transpiledDrivers = 0;
-        const driverElement = document.getElementById('transpiled-count');
-        const isaElement = document.getElementById('silicon-isa');
-        
-        setInterval(() => {
-            if(transpiledDrivers < 24) {
-                transpiledDrivers += Math.floor(Math.random() * 3);
-                if (driverElement) driverElement.innerText = transpiledDrivers;
-            }
-            if(Math.random() > 0.98) {
-                isaElement.innerText = "ARM (AArch64)";
-            } else if (Math.random() > 0.98) {
-                isaElement.innerText = "RISC-V (RV64GC)";
-            }
-        }, 3000);
-        // Neural Automator Telemetry
-        const cognitiveTasks = ["Preemptive VRAM Caching", "Predictive Shard Loading", "Background Lattice Audit", "DNA Re-indexing", "Quantum Key Rotation"];
-        const queueElement = document.getElementById('cognitive-queue');
-        const currentTaskElement = document.getElementById('auto-current-task');
-        const countElement = document.getElementById('auto-task-count');
-        const autoProgress = document.getElementById('auto-progress');
-        let activeTasks = 0;
-
-        setInterval(() => {
-            if (Math.random() > 0.6) {
-                // Schedule new cognitive task
-                const task = cognitiveTasks[Math.floor(Math.random() * cognitiveTasks.length)];
-                const taskEl = document.createElement('div');
-                taskEl.innerText = ">> " + task;
-                taskEl.style.opacity = '0';
-                taskEl.style.transition = 'opacity 0.5s';
-                queueElement.prepend(taskEl);
-                setTimeout(() => taskEl.style.opacity = '1', 50);
-                
-                activeTasks++;
-                countElement.innerText = activeTasks + " Tasks Active";
-                currentTaskElement.innerText = "Running: " + task;
-                
-                // Animate progress bar
-                autoProgress.style.transition = 'width 2s linear';
-                autoProgress.style.width = '100%';
-                
-                // Task completion
-                setTimeout(() => {
-                    activeTasks--;
-                    countElement.innerText = activeTasks + " Tasks Active";
-                    if (queueElement.contains(taskEl)) {
-                        queueElement.removeChild(taskEl);
-                    }
-                    if (activeTasks === 0) {
-                        currentTaskElement.innerText = "Next: Idle";
-                    }
-                    autoProgress.style.transition = 'none';
-                    autoProgress.style.width = '0%';
-                }, 2000);
-            }
-        }, 3500);
-
-        // Orb Exchange Telemetry
-        const orbList = ["NeuralVisualizer-v2", "QuantumSieve-PQC", "BioFS-DNA-Module", "CryptoLedger-X"];
-        const orbStatus = document.getElementById('orb-active');
-        const orbProgress = document.getElementById('orb-progress');
-        
-        setInterval(() => {
-            if (Math.random() > 0.8) {
-                const orb = orbList[Math.floor(Math.random() * orbList.length)];
-                orbStatus.innerText = "Summoning: " + orb;
-                orbProgress.style.transition = 'width 1.5s linear';
-                orbProgress.style.width = '100%';
-                
-                setTimeout(() => {
-                    orbStatus.innerText = "Idle";
-                    orbProgress.style.transition = 'none';
-                    orbProgress.style.width = '0%';
-                }, 1600);
-            }
-        }, 4000);
-        
-        // Community Governance Telemetry
-        let activeProposals = 0;
-        const propElement = document.getElementById('gov-active');
-        const voteElement = document.getElementById('gov-vote');
-        const govProgress = document.getElementById('gov-progress');
-        
-        setInterval(() => {
-            if(Math.random() > 0.7) {
-                activeProposals = Math.floor(Math.random() * 12) + 1;
-                propElement.innerText = activeProposals + " Active Proposals";
-                
-                if(Math.random() > 0.5) {
-                    voteElement.innerText = "YEA (QKD-VERIFIED)";
-                    voteElement.className = "status-success";
-                    govProgress.style.width = (50 + Math.random() * 40) + '%';
-                    govProgress.style.background = 'var(--success)';
-                    govProgress.style.boxShadow = '0 0 10px var(--success)';
-                } else {
-                    voteElement.innerText = "NAY (QKD-VERIFIED)";
-                    voteElement.className = "accent";
-                    govProgress.style.width = (10 + Math.random() * 40) + '%';
-                    govProgress.style.background = 'var(--error)';
-                    govProgress.style.boxShadow = '0 0 10px var(--error)';
-                }
-            }
-        }, 5000);
-
-        // Trust Fabric Lockdown Mode
-        setInterval(() => {
-            if(Math.random() > 0.95) {
-                // Trigger Lockdown
-                document.body.classList.add('lockdown-mode');
-                document.getElementById('qkd-status').innerText = "ANOMALY DETECTED";
-                document.getElementById('qkd-status').style.color = "var(--error)";
-                document.getElementById('orb-trust').innerText = "LOCKDOWN ACTIVE";
-                document.getElementById('orb-trust').className = "accent";
-                
-                // Heal after 5 seconds
-                setTimeout(() => {
-                    document.body.classList.remove('lockdown-mode');
-                    document.getElementById('qkd-status').innerText = "Entangled";
-                    document.getElementById('qkd-status').style.color = "var(--text-light)";
-                    document.getElementById('orb-trust').innerText = "QKD-VERIFIED";
-                    document.getElementById('orb-trust').className = "status-success";
-                }, 5000);
-            }
-        }, 8000);
-
-    </script>
 </body>
 </html>
