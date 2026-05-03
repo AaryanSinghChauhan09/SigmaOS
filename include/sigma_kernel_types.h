@@ -70,7 +70,7 @@ typedef sigma_i32 sigma_status;
 
 /* ---- intrinsics ---- */
 static inline void cpu_halt(void)  { __asm__ __volatile__("cli; hlt"); }
-static inline void cpu_pause(void) { __asm__ __volatile__("pause"); }
+static inline void cpu_pause(void) { __asm__ __volatile__("pause" ::: "memory"); }
 static inline void cpu_fence(void) { __asm__ __volatile__("mfence" ::: "memory"); }
 static inline void cpu_sti(void)   { __asm__ __volatile__("sti"); }
 static inline void cpu_cli(void)   { __asm__ __volatile__("cli"); }
