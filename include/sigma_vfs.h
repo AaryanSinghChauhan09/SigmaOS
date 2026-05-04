@@ -7,51 +7,52 @@
 extern "C" {
 #endif
 
-typedef struct sigma_vfs_node {
-    char name[128];
-    sigma_u32 type;
-    sigma_u32 size;
-    void* private_data;
-    
-    // Interface Pattern (Function Pointers)
-    sigma_ssize_t (*read)(struct sigma_vfs_node* node, void* buffer, sigma_size_t size);
-    sigma_ssize_t (*write)(struct sigma_vfs_node* node, const void* buffer, sigma_size_t size);
-    void (*close)(struct sigma_vfs_node* node);
+/* --- C-Linkage Types --- */
+typedef struct {
+    char      name[128];
+    sigma_u64 size;
+    sigma_u32 flags;
+    sigma_u32 inode;
 } sigma_vfs_node_t;
 
 #ifdef __cplusplus
+} // Close extern "C"
+
 namespace SigmaOS {
 namespace Kernel {
 namespace FS {
 
 class SovereignVFS {
 public:
-    static SovereignVFS& getInstance();
+    static SovereignVFS& getInstance() {
+        static SovereignVFS instance;
+        return instance;
+    }
 
     void init();
-    sigma_vfs_node_t* open(const char* path);
-    sigma_ssize_t read(sigma_vfs_node_t* node, void* buf, sigma_size_t size);
-    sigma_ssize_t write(sigma_vfs_node_t* node, const void* buf, sigma_size_t size);
-    void close(sigma_vfs_node_t* node);
+    void mount(const char* source, const char* target);
+    void listFiles(const char* path);
+
+private:
+    SovereignVFS() : m_mount_count(0) {}
+    sigma_u32 m_mount_count;
 };
 
 } // namespace FS
 } // namespace Kernel
 } // namespace SigmaOS
-#endif
 
-#ifdef __cplusplus
 extern "C" {
 #endif
 
+/* --- C Bridge Functions --- */
 void vfs_init(void);
-sigma_vfs_node_t* vfs_open(const char* path);
-sigma_ssize_t vfs_read(sigma_vfs_node_t* node, void* buf, sigma_size_t size);
-sigma_ssize_t vfs_write(sigma_vfs_node_t* node, const void* buf, sigma_size_t size);
-void vfs_close(sigma_vfs_node_t* node);
+void vfs_mount(const char* source, const char* target);
+void vfs_list_files(const char* path);
 
 #ifdef __cplusplus
 }
 #endif
 
 #endif /* SIGMA_VFS_H */
+

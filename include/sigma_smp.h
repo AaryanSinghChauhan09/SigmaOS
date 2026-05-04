@@ -4,6 +4,10 @@
 #include "sigma_types.h"
 
 #ifdef __cplusplus
+namespace SigmaOS {
+namespace Kernel {
+namespace System {
+
 /**
  * SovereignTicketLock: Industrial-grade, fair spinlock.
  */
@@ -21,7 +25,10 @@ private:
 
 class SovereignSMPEngine {
 public:
-    static SovereignSMPEngine& getInstance();
+    static SovereignSMPEngine& getInstance() {
+        static SovereignSMPEngine instance;
+        return instance;
+    }
 
     void init();
     void igniteCores();
@@ -39,6 +46,10 @@ private:
     sigma_u32 initialized;
     SovereignTicketLock m_global_lattice_lock;
 };
+
+} // namespace System
+} // namespace Kernel
+} // namespace SigmaOS
 #endif
 
 #ifdef __cplusplus

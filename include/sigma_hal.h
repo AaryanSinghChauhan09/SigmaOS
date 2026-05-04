@@ -1,61 +1,61 @@
-/*
- * =========================================================================
- * Σ SIGMAOS: SOVEREIGN HARDWARE ABSTRACTION LAYER (HAL)
- * =========================================================================
- * Mission: Zero-dependency silicon orchestration.
- * =========================================================================
- */
-
 #ifndef SIGMA_HAL_H
 #define SIGMA_HAL_H
 
-#include "SovereignLibC.h"
-
 #include "sigma_types.h"
 
-/* --- Serial I/O (Step 3: Kernel Debugging) --- */
-#define COM1 0x3F8
+#ifdef __cplusplus
+namespace SigmaOS {
+namespace Kernel {
+namespace HAL {
 
-static inline void serial_init(void) {
-    port_outb(COM1 + 1, 0x00);    // Disable all interrupts
-    port_outb(COM1 + 3, 0x80);    // Enable DLAB (set baud rate divisor)
-    port_outb(COM1 + 0, 0x03);    // Set divisor to 3 (38400 baud)
-    port_outb(COM1 + 1, 0x00);    //                  hi byte
-    port_outb(COM1 + 3, 0x03);    // 8 bits, no parity, one stop bit
-    port_outb(COM1 + 2, 0xC7);    // Enable FIFO, clear them, with 14-byte threshold
-    port_outb(COM1 + 4, 0x0B);    // IRQs enabled, RTS/DSR set
-}
+enum class DeviceType {
+    STORAGE,
+    NETWORK,
+    DISPLAY,
+    INPUT,
+    UNKNOWN
+};
 
-static inline int is_transmit_empty(void) {
-    return port_inb(COM1 + 5) & 0x20;
-}
+struct DeviceDescriptor {
+    char name[32];
+    DeviceType type;
+    sigma_u32 vendor_id;
+    sigma_u32 device_id;
+};
 
-static inline void serial_putc(char c) {
-    while (is_transmit_empty() == 0);
-    port_outb(COM1, c);
-}
+class SovereignHAL {
+public:
+    static SovereignHAL& getInstance() {
+        static SovereignHAL instance;
+        return instance;
+    }
+
+    void init();
+    void probeBus();
+    void registerDriver(const char* name, DeviceType type);
+    
+    sigma_u32 getDeviceCount() const { return m_device_count; }
+
+private:
+    SovereignHAL() : m_device_count(0) {}
+    sigma_u32 m_device_count;
+    DeviceDescriptor m_lattice_devices[256];
+};
+
+} // namespace HAL
+} // namespace Kernel
+} // namespace SigmaOS
+#endif
 
 #ifdef __cplusplus
 extern "C" {
 #endif
 
-/* --- Silicon Lifecycle --- */
 void hal_init(void);
-void hal_shutdown(void);
-
-/* --- Assertions (Step 3: Kernel Debugging) --- */
-#define sigma_assert(condition) \
-    if (!(condition)) { \
-        sigma_printf("[PANIC] ASSERTION FAILED: %s at %s:%d\n", #condition, __FILE__, __LINE__); \
-        hal_shutdown(); \
-    }
+void hal_probe(void);
 
 #ifdef __cplusplus
 }
 #endif
 
-
-
 #endif /* SIGMA_HAL_H */
-
-

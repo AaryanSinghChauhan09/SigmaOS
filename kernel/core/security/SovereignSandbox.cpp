@@ -5,11 +5,6 @@ namespace SigmaOS {
 namespace Kernel {
 namespace Security {
 
-SovereignSandboxEngine& SovereignSandboxEngine::getInstance() {
-    static SovereignSandboxEngine instance;
-    return instance;
-}
-
 void SovereignSandboxEngine::init() {
     sigma_log("[SANDBOX] Initializing Sovereign Zero-Trust Sandbox Isolation...");
     this->initialized = 1u;

@@ -1,6 +1,10 @@
 #include "../../../include/sigma_smp.h"
 #include "../../../include/SovereignLibC.h"
 
+namespace SigmaOS {
+namespace Kernel {
+namespace System {
+
 /* --- SovereignTicketLock Implementation --- */
 
 void SovereignTicketLock::lock() {
@@ -15,11 +19,6 @@ void SovereignTicketLock::unlock() {
 }
 
 /* --- SovereignSMPEngine Implementation --- */
-
-SovereignSMPEngine& SovereignSMPEngine::getInstance() {
-    static SovereignSMPEngine instance;
-    return instance;
-}
 
 void SovereignSMPEngine::init() {
     sigma_log("[SMP] Initializing Sovereign Silicon-Parallel Execution (SPE)...");
@@ -41,19 +40,24 @@ void SovereignSMPEngine::broadcastIPI(sigma_u32 vector) {
     sigma_printf("[SMP] SPE: Dispatching Inter-Processor Interrupt (Vector: 0x%02X).\n", vector);
 }
 
+} // namespace System
+} // namespace Kernel
+} // namespace SigmaOS
+
 /* --- C Bridge --- */
 extern "C" void smp_init() {
-    SovereignSMPEngine::getInstance().init();
+    SigmaOS::Kernel::System::SovereignSMPEngine::getInstance().init();
 }
 
 extern "C" void smp_ignite_cores() {
-    SovereignSMPEngine::getInstance().igniteCores();
+    SigmaOS::Kernel::System::SovereignSMPEngine::getInstance().igniteCores();
 }
 
 extern "C" void smp_broadcast_ipi(sigma_u32 vector) {
-    SovereignSMPEngine::getInstance().broadcastIPI(vector);
+    SigmaOS::Kernel::System::SovereignSMPEngine::getInstance().broadcastIPI(vector);
 }
 
 extern "C" sigma_u32 smp_get_core_count() {
-    return SovereignSMPEngine::getInstance().getCoreCount();
+    return SigmaOS::Kernel::System::SovereignSMPEngine::getInstance().getCoreCount();
 }
+

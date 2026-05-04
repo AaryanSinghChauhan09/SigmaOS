@@ -13,7 +13,10 @@ namespace Memory {
 
 class SovereignPMM : public SigmaObject {
 public:
-    static SovereignPMM& getInstance();
+    static SovereignPMM& getInstance() {
+        static SovereignPMM instance;
+        return instance;
+    }
 
     const char* type_name() const noexcept override { return "SovereignPMM"; }
 

@@ -5,11 +5,6 @@ namespace SigmaOS {
 namespace Kernel {
 namespace AI {
 
-SovereignAISchedEngine& SovereignAISchedEngine::getInstance() {
-    static SovereignAISchedEngine instance;
-    return instance;
-}
-
 void SovereignAISchedEngine::init() {
     sigma_log("[AISCHED] Initializing Sovereign AI-Optimized Scheduler (NPWO Algorithm)...");
     this->initialized = 1u;
@@ -60,3 +55,4 @@ extern "C" void aisched_set_mode(sigma_aisched_mode_t mode) {
 extern "C" sigma_u64 aisched_get_prediction_count() {
     return SigmaOS::Kernel::AI::SovereignAISchedEngine::getInstance().getPredictionCount();
 }
+

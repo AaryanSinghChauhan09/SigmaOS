@@ -1,47 +1,39 @@
+#include "../../../include/sigma_thermaliq.h"
 #include "../../../include/SovereignLibC.h"
-#include "../../../include/sigma_types.h"
-#include "sigma_hal.h"
+
 extern "C" void energysched_set_shard_state(sigma_u32 shard_id, sigma_u32 state);
 
-/**
- * SigmaOS Sovereign ThermalIQ - PTR Algorithm
- * ZERO-DEPENDENCY: Strictly bare-metal thermal regulation.
- * Design: C-linkage singleton struct (no OOP redefinition).
- */
+namespace SigmaOS {
+namespace Kernel {
+namespace Hardware {
 
-
-static struct {
-    sigma_u32 temp_history[4];
-    sigma_u32 history_ptr;
-    sigma_u32 initialized;
-} SovereignThermalState = {
-    {60u, 60u, 60u, 60u},
-    0u,
-    0u
-};
-
-extern "C" void thermaliq_init() {
-    sigma_log("[THERMALIQ] Initializing Sovereign Thermal Intelligence (PTR Algorithm)...");
-    SovereignThermalState.initialized = 1u;
+SovereignThermalIQ& SovereignThermalIQ::getInstance() {
+    static SovereignThermalIQ instance;
+    return instance;
 }
 
-extern "C" sigma_u32 thermaliq_get_package_temp() {
+void SovereignThermalIQ::init() {
+    sigma_log("[THERMALIQ] Initializing Sovereign Thermal Intelligence (PTR Algorithm)...");
+    this->initialized = 1u;
+}
+
+sigma_u32 SovereignThermalIQ::getPackageTemp() {
     sigma_log("[THERMALIQ] PTR: Reading package thermal diode...");
     return 62u; /* 62 degrees C simulated */
 }
 
-extern "C" void thermaliq_apply_thermal_policy() {
+void SovereignThermalIQ::applyThermalPolicy() {
     /* PTR (Predictive Thermal Regulation) Algorithm
      * Uses trend analysis to throttle before hitting critical temp zones. */
 
-    sigma_u32 current_temp = thermaliq_get_package_temp();
-    SovereignThermalState.temp_history[SovereignThermalState.history_ptr % 4u] = current_temp;
-    SovereignThermalState.history_ptr++;
+    sigma_u32 current_temp = this->getPackageTemp();
+    this->temp_history[this->history_ptr % 4u] = current_temp;
+    this->history_ptr++;
 
-    sigma_u32 avg_temp = (SovereignThermalState.temp_history[0] +
-                          SovereignThermalState.temp_history[1] +
-                          SovereignThermalState.temp_history[2] +
-                          SovereignThermalState.temp_history[3]) / 4u;
+    sigma_u32 avg_temp = (this->temp_history[0] +
+                          this->temp_history[1] +
+                          this->temp_history[2] +
+                          this->temp_history[3]) / 4u;
 
     sigma_printf("[THERMALIQ] PTR: Current: %u C, 4-sample average: %u C.\n", current_temp, avg_temp);
 
@@ -51,6 +43,28 @@ extern "C" void thermaliq_apply_thermal_policy() {
     }
 }
 
-extern "C" void thermaliq_emergency_throttle(sigma_u32 threshold_celsius) {
+void SovereignThermalIQ::emergencyThrottle(sigma_u32 threshold_celsius) {
     sigma_printf("[THERMALIQ] PTR: EMERGENCY THROTTLE engaged at %u C.\n", threshold_celsius);
 }
+
+} // namespace Hardware
+} // namespace Kernel
+} // namespace SigmaOS
+
+/* --- C Bridge --- */
+extern "C" void thermaliq_init() {
+    SigmaOS::Kernel::Hardware::SovereignThermalIQ::getInstance().init();
+}
+
+extern "C" sigma_u32 thermaliq_get_package_temp() {
+    return SigmaOS::Kernel::Hardware::SovereignThermalIQ::getInstance().getPackageTemp();
+}
+
+extern "C" void thermaliq_apply_thermal_policy() {
+    SigmaOS::Kernel::Hardware::SovereignThermalIQ::getInstance().applyThermalPolicy();
+}
+
+extern "C" void thermaliq_emergency_throttle(sigma_u32 threshold_celsius) {
+    SigmaOS::Kernel::Hardware::SovereignThermalIQ::getInstance().emergencyThrottle(threshold_celsius);
+}
+

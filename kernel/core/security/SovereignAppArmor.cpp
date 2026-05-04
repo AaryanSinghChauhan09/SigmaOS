@@ -43,3 +43,8 @@ extern "C" void apparmor_init() {
 extern "C" void apparmor_load_profile(const char* name, const void* rules) {
     SigmaOS::Kernel::Security::SovereignAppArmor::getInstance().loadProfile(name, rules);
 }
+
+extern "C" void apparmor_audit() {
+    SigmaOS::Kernel::Security::SovereignAppArmor::getInstance().audit();
+}
+

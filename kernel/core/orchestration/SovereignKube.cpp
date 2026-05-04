@@ -3,7 +3,7 @@
 
 namespace SigmaOS {
 namespace Kernel {
-namespace AI {
+namespace Orchestration {
 
 SovereignKubeEngine& SovereignKubeEngine::getInstance() {
     static SovereignKubeEngine instance;
@@ -99,32 +99,33 @@ sigma_kube_deployment_t* SovereignKubeEngine::findDeployment(sigma_u32 id) {
     return SIGMA_NULL;
 }
 
-} // namespace AI
+} // namespace Orchestration
 } // namespace Kernel
 } // namespace SigmaOS
 
 /* --- C Bridge --- */
 extern "C" void kube_init() {
-    SigmaOS::Kernel::AI::SovereignKubeEngine::getInstance().init();
+    SigmaOS::Kernel::Orchestration::SovereignKubeEngine::getInstance().init();
 }
 
 extern "C" sigma_u32 kube_create_deployment(const char* name, sigma_u32 container_id,
                                             sigma_u32 pattern, sigma_u32 replicas) {
-    return SigmaOS::Kernel::AI::SovereignKubeEngine::getInstance().createDeployment(name, container_id, pattern, replicas);
+    return SigmaOS::Kernel::Orchestration::SovereignKubeEngine::getInstance().createDeployment(name, container_id, pattern, replicas);
 }
 
 extern "C" void kube_scale_deployment(sigma_u32 deployment_id, sigma_u32 replicas) {
-    SigmaOS::Kernel::AI::SovereignKubeEngine::getInstance().scaleDeployment(deployment_id, replicas);
+    SigmaOS::Kernel::Orchestration::SovereignKubeEngine::getInstance().scaleDeployment(deployment_id, replicas);
 }
 
 extern "C" void kube_delete_deployment(sigma_u32 deployment_id) {
-    SigmaOS::Kernel::AI::SovereignKubeEngine::getInstance().deleteDeployment(deployment_id);
+    SigmaOS::Kernel::Orchestration::SovereignKubeEngine::getInstance().deleteDeployment(deployment_id);
 }
 
 extern "C" void kube_reconcile_lattice() {
-    SigmaOS::Kernel::AI::SovereignKubeEngine::getInstance().reconcileLattice();
+    SigmaOS::Kernel::Orchestration::SovereignKubeEngine::getInstance().reconcileLattice();
 }
 
 extern "C" const sigma_kube_state_t* kube_get_state() {
-    return SigmaOS::Kernel::AI::SovereignKubeEngine::getInstance().getState();
+    return SigmaOS::Kernel::Orchestration::SovereignKubeEngine::getInstance().getState();
 }
+

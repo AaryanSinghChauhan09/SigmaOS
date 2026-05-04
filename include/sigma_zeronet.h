@@ -23,6 +23,7 @@ public:
     void init();
     void transfer(void* data, sigma_size_t len, const char* destination);
     bool establishConnection(uint32_t source, uint32_t target);
+    void verifyTraffic(uint32_t conn_id, const void* payload, uint32_t size);
 
 private:
     SovereignZeroNet() : packets_processed(0), initialized(false) {}

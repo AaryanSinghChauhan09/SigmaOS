@@ -30,6 +30,10 @@ sigma_u64 aisched_get_prediction_count(void);
 #ifdef __cplusplus
 }
 
+namespace SigmaOS {
+namespace Kernel {
+namespace AI {
+
 class SovereignAISchedEngine {
 public:
     static SovereignAISchedEngine& getInstance() {
@@ -49,6 +53,10 @@ private:
     sigma_u64            prediction_count;
     sigma_u32            initialized;
 };
+
+} // namespace AI
+} // namespace Kernel
+} // namespace SigmaOS
 #endif
 
 #endif /* SIGMA_AISCHED_H */

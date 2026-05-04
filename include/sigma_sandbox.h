@@ -25,7 +25,10 @@ namespace Security {
 
 class SovereignSandboxEngine {
 public:
-    static SovereignSandboxEngine& getInstance();
+    static SovereignSandboxEngine& getInstance() {
+        static SovereignSandboxEngine instance;
+        return instance;
+    }
 
     void init();
     sigma_u32 createContainer(const sigma_sandbox_config_t* config);

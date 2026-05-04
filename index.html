@@ -980,7 +980,8 @@ https://chatgpt.com/?q={{prompt}}</textarea>
             <div class="browser-toolbar">
                 <button type="button" class="util-btn" onclick="sigmaBrowseBack()">←</button>
                 <button type="button" class="util-btn" onclick="sigmaBrowseForward()">→</button>
-                <input type="text" id="browser-url" class="browser-url" value="sigma://lattice" />
+                <label for="browser-url" class="sr-only">Sigma URL</label>
+                <input type="text" id="browser-url" class="browser-url" value="sigma://lattice" title="Browser Address Bar" aria-label="Enter Sigma URL" />
                 <button type="button" class="util-btn" onclick="sigmaBrowseGo()">Go</button>
             </div>
             <iframe id="browser-frame" class="browser-frame" title="Sigma browser" srcdoc="&lt;!DOCTYPE html&gt;&lt;html&gt;&lt;body style=background:#0a0a0f;color:#7dd3fc;font-family:system-ui;padding:2rem&gt;&lt;h1&gt;σ Lattice Home&lt;/h1&gt;&lt;p&gt;Simulated sigma:// page.&lt;/p&gt;&lt;a href=&quot;https://github.com/AaryanSinghChauhan09/SigmaOS&quot; style=color:#fbbf24&gt;GitHub — SigmaOS&lt;/a&gt;&lt;/body&gt;&lt;/html&gt;"></iframe>

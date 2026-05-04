@@ -32,6 +32,7 @@ extern "C" {
 
 void apparmor_init(void);
 void apparmor_load_profile(const char* name, const void* rules);
+void apparmor_audit(void);
 
 #ifdef __cplusplus
 }

@@ -41,7 +41,7 @@ typedef struct {
 #ifdef __cplusplus
 namespace SigmaOS {
 namespace Kernel {
-namespace AI {
+namespace Orchestration {
 
 class SovereignKubeEngine {
 public:
@@ -69,7 +69,7 @@ private:
     sigma_u32          initialized;
 };
 
-} // namespace AI
+} // namespace Orchestration
 } // namespace Kernel
 } // namespace SigmaOS
 #endif

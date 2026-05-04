@@ -5,40 +5,17 @@ namespace SigmaOS {
 namespace Kernel {
 namespace FS {
 
-SovereignVFS& SovereignVFS::getInstance() {
-    static SovereignVFS instance;
-    return instance;
-}
-
 void SovereignVFS::init() {
     sigma_log("Σ [VFS]: Initializing Sovereign Virtual File System...");
-    // Setup root node, etc.
 }
 
-sigma_vfs_node_t* SovereignVFS::open(const char* path) {
-    sigma_printf("Σ [VFS]: Opening node '%s'...\n", path);
-    // Find node in lattice
-    return SIGMA_NULL;
+void SovereignVFS::mount(const char* source, const char* target) {
+    sigma_printf("Σ [VFS]: Mounting shard %s to %s...\n", source, target);
+    this->m_mount_count++;
 }
 
-sigma_ssize_t SovereignVFS::read(sigma_vfs_node_t* node, void* buf, sigma_size_t size) {
-    if (node && node->read) {
-        return node->read(node, buf, size);
-    }
-    return -1;
-}
-
-sigma_ssize_t SovereignVFS::write(sigma_vfs_node_t* node, const void* buf, sigma_size_t size) {
-    if (node && node->write) {
-        return node->write(node, buf, size);
-    }
-    return -1;
-}
-
-void SovereignVFS::close(sigma_vfs_node_t* node) {
-    if (node && node->close) {
-        node->close(node);
-    }
+void SovereignVFS::listFiles(const char* path) {
+    sigma_printf("Σ [VFS]: Listing files in lattice zone %s...\n", path);
 }
 
 } // namespace FS
@@ -50,18 +27,11 @@ extern "C" void vfs_init() {
     SigmaOS::Kernel::FS::SovereignVFS::getInstance().init();
 }
 
-extern "C" sigma_vfs_node_t* vfs_open(const char* path) {
-    return SigmaOS::Kernel::FS::SovereignVFS::getInstance().open(path);
+extern "C" void vfs_mount(const char* source, const char* target) {
+    SigmaOS::Kernel::FS::SovereignVFS::getInstance().mount(source, target);
 }
 
-extern "C" sigma_ssize_t vfs_read(sigma_vfs_node_t* node, void* buf, sigma_size_t size) {
-    return SigmaOS::Kernel::FS::SovereignVFS::getInstance().read(node, buf, size);
+extern "C" void vfs_list_files(const char* path) {
+    SigmaOS::Kernel::FS::SovereignVFS::getInstance().listFiles(path);
 }
 
-extern "C" sigma_ssize_t vfs_write(sigma_vfs_node_t* node, const void* buf, sigma_size_t size) {
-    return SigmaOS::Kernel::FS::SovereignVFS::getInstance().write(node, buf, size);
-}
-
-extern "C" void vfs_close(sigma_vfs_node_t* node) {
-    SigmaOS::Kernel::FS::SovereignVFS::getInstance().close(node);
-}

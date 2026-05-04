@@ -1,0 +1,41 @@
+#include "../../../include/sigma_hal.h"
+#include "../../../include/SovereignLibC.h"
+
+namespace SigmaOS {
+namespace Kernel {
+namespace HAL {
+
+void SovereignHAL::init() {
+    sigma_log("Σ [HAL]: Initializing Universal Hardware Abstraction Shard...");
+    sigma_log("Σ [HAL]: Device Tree lattice active.");
+}
+
+void SovereignHAL::probeBus() {
+    sigma_log("Σ [HAL]: Probing Silicon Lattice for peripheral nodes...");
+    
+    // Simulate finding a few devices (inspired by Linux PCI probing)
+    m_device_count = 3;
+    
+    sigma_printf("Σ [HAL]: Found 00:01.0 - Network Controller [8086:1533]\n");
+    sigma_printf("Σ [HAL]: Found 00:02.0 - Storage Controller [10ec:8168]\n");
+    sigma_printf("Σ [HAL]: Found 00:03.0 - Display Adapter [10de:1c03]\n");
+    
+    sigma_log("Σ [HAL]: All hardware shards mapped to Sovereign drivers.");
+}
+
+void SovereignHAL::registerDriver(const char* name, DeviceType type) {
+    sigma_printf("Σ [HAL]: Registering Driver '%s' for Shard-Type %d\n", name, (int)type);
+}
+
+} // namespace HAL
+} // namespace Kernel
+} // namespace SigmaOS
+
+/* --- C Bridge --- */
+extern "C" void hal_init() {
+    SigmaOS::Kernel::HAL::SovereignHAL::getInstance().init();
+}
+
+extern "C" void hal_probe() {
+    SigmaOS::Kernel::HAL::SovereignHAL::getInstance().probeBus();
+}

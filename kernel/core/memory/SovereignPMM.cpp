@@ -5,11 +5,6 @@ namespace SigmaOS {
 namespace Kernel {
 namespace Memory {
 
-SovereignPMM& SovereignPMM::getInstance() {
-    static SovereignPMM instance;
-    return instance;
-}
-
 void SovereignPMM::init(sigma_u64 mem_size) {
     (void)mem_size;
     sigma_log("Σ [PMM]: Initializing Sovereign Physical Memory Shard...");
