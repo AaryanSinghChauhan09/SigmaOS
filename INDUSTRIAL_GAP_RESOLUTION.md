@@ -2,22 +2,23 @@
 
 This document tracks the resolution of architectural gaps between SigmaOS and legacy monolithic kernels.
 
-## Industrial Maturity Gap Resolution
+## Active Resolution Matrix
 
 | Shard | Gap | Action | Status |
 | :--- | :--- | :--- | :--- |
 | **SMP Shard** | Multicore race conditions. | Implement distributed spinlocks. | [FIXED] |
-| **VFS-Sync** | Cache invalidation drift. | Lattice-wide TTL enforcement. | [IN-PROGRESS] |
+| **VFS-Sync** | Cache invalidation drift. | Lattice-wide TTL enforcement. | [FIXED] |
 | **PQC-Bridge** | Handshake latency. | Silicon-level pre-computation. | [FIXED] |
 | **ZKEP-Vault** | Entropy starvation. | Hardware-direct jitter collection. | [FIXED] |
-| **Lattice-Net** | Shard collision. | Priority-based lane switching. | [IN-PROGRESS] |
+| **Lattice-Net** | Shard collision. | Priority-based lane switching. | [FIXED] |
 | **UI-Zenith** | Inline style debt. | **Resolved**: Obsidian CSS Shard. | [FIXED] |
+| **Kernel Core** | Code modularity debt. | **Resolved**: Header Extraction & Singleton Refactor. | [FIXED] |
 
 ## Completed Gap Analysis
 
 | Feature Shard           | Legacy OS Status                        | SigmaOS Resolution                   | Status  |
 | :---------------------- | :-------------------------------------- | :---------------------------------- | :------ |
-| **Kernel Architecture** | Monolithic (Bloated, 30M+ lines)        | **600-Shard Atomic Lattice**         | ✅ 100% |
+| **Kernel Architecture** | Monolithic (Bloated, 30M+ lines)        | **600-Shard Modular Lattice**        | ✅ 100% |
 | **Memory Isolation**    | Standard Paging (Vulnerable to Spectre) | **Amnesic Shard Isolation**          | ✅ 100% |
 | **Boot Sequence**       | Initrd/SystemD (Slow, Sequential)       | **Parallel Silicon Ignition**        | ✅ 100% |
 | **User Interface**      | X11/Wayland (Legacy Overhead)           | **Morphic Zenith (Glassmorphism)**   | ✅ 100% |
@@ -42,3 +43,8 @@ This document tracks the resolution of architectural gaps between SigmaOS and le
 
 - **Shard**: `SovereignUSR.cpp`
 - **Solution**: Replaces legacy service managers with an amnesic-protected, ring-0 service discovery engine.
+
+### 2. Modular Kernel Headers
+
+- **Status**: **Implemented (Phase 45)**
+- **Solution**: All kernel classes (PMM, VMM, VFS, Scheduler) extracted to `include/*.h` to ensure industrial compile-time safety and cross-shard visibility.

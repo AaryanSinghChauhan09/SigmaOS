@@ -1,49 +1,21 @@
-# Σ SigmaOS Shard Manifest
+# Σ SIGMAOS: THE SOVEREIGN LATTICE MANIFEST (500 FEATURES)
 
-This document indexes the atomic silicon shards that compose the **SigmaOS Sovereign Lattice**. Every shard is an OOP-encapsulated, zero-dependency C++ module compliant with the **S80 Amnesia** protocol.
+This manifest outlines the 500 individual features and functional shards that define the SigmaOS ecosystem, categorized into 50 thematic clusters.
 
-## 🏛️ Root Orchestration Shards (0-50)
+## I. The Sovereign Kernel (Modular Lattice Core)
+*Organized into: /arch/x86_64, /runtime, /observability, /orchestration, /state, /security, /mem, /hal*
 
-- `SovereignCore`: The root lattice orchestrator.
-- `SovereignModuleOrchestrator`: Dynamic shard lifecycle management.
-- `SovereignIdentity`: PQC-blockchain hardware-rooted identity.
-- `SovereignLatticePQC`: Quantum-resistant cryptographic nexus.
+1.  **Lattice-Aware Scheduler**: AI-Native predictive allocation.
+2.  **Sovereign GDT / IDT**: Standardized segments and exception landing zones (/arch).
+3.  **Bitmap Physical Memory Manager**: Single source of truth for page allocation (/mem).
+4.  **WASM-Native Runtime**: Universal Binary format for context-switch-free execution.
+5.  **Capability-Based Security**: Token-based access to silicon resources (No Root).
+6.  **Zero-Trust Microkernel**: All drivers run in User-Mode (Ring 3).
+7.  **Exokernel / SASOS**: Single Address Space for zero-cost communication.
+8.  **Persistent Memory FS (PMFS)**: RAM-speed storage for Instant-On booting.
+9.  **Deterministic Scheduling**: Hard Real-Time deadlines for robotics/audio.
+10. **Lattice IPC Bridge**: Low-latency zero-copy messaging bus.
 
-## 🧠 Intelligence & AI Shards (51-150)
-
-- `SovereignNeuralEngine`: Silicon-native spiking neural network.
-- `SovereignVisionEngine`: Hardware-accelerated environmental awareness.
-- `SovereignPredictiveScheduler`: AI-native process orchestration.
-- `SovereignNeuralCoprocessor`: TPU/NPU silicon sharding logic.
-
-## 💾 Storage & Persistence Shards (151-250)
-
-- `SovereignVFS`: Content-addressed lattice storage.
-- `SovereignRegistry`: Decentralized shard discovery nexus.
-- `SovereignRecoveryAgent`: Automated lattice self-healing.
-- `SovereignBlockNexus`: Transactional silicon persistence.
-
-## 🌐 Networking & Mesh Shards (251-350)
-
-- `SovereignNetStack`: Zero-buffer RDMA-native communication.
-- `SovereignCloudOrchestrator`: Multi-cloud lattice clustering.
-- `SovereignPXENexus`: Network-native lattice ignition.
-- `SovereignWebNexus`: WASM-based browser lattice delivery.
-
-## 🖥️ UI & Human-Machine Shards (351-450)
-
-- `SovereignZenith`: Morphic UI and hardware graphics.
-- `SovereignOrchestratorUI`: Unified management dashboard.
-- `SovereignCompositor`: Multi-shard SVG rendering engine.
-- `SovereignWidgetNexus`: Real-time telemetry visualization.
-
-## 🛠️ Industrial & Utility Shards (451-500+)
-
-- `SovereignDebugger`: Silicon-native diagnostic and tracing.
-- `SovereignEnergyManager`: AI-driven power optimization.
-- `SovereignIndustrialAPI`: Extensible developer bindings.
-- `SovereignShardManager`: PQC-verified package nexus.
-
----
-
-_Σ SIGMAOS: 100% Modular. 100% Sovereign. 100% Industrial._
+## II. Morphic Zenith (UI & Graphics)
+11. **Vector-Only Compositor**: Perfect scaling from 4K to 16K.
+...

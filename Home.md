@@ -10,12 +10,24 @@ SigmaOS is a next-generation, industrial-grade operating system designed for spe
 
 SigmaOS aims to be the fastest and most secure platform for sovereign computing, blending the purity of a 600-shard Sovereign Lattice with silicon-native AI, spatial computing, and cognitive UX.
 
+## ⚡ The Disruptor Edge (Why it beats Linux)
+
+| Advantage | Strategic Implementation |
+| :--- | :--- |
+| **Safety** | **Capability Tokens** - Token-based access instead of "Root." |
+| **Stability**| **Zero-Trust Microkernel** - Drivers isolated in Ring 3. |
+| **Speed** | **SASOS / Exokernel** - Single Address Space with hardware PKeys. |
+| **Execution**| **WASM-Native** - Context-switch-free universal binaries. |
+| **Boot** | **Instant-On** - Persistent Memory FS (PMFS) for zero-second resume. |
+
 ## 📖 Wiki Contents
 
 | Document | Description |
 | :--- | :--- |
 | [Shard Index](AUTO_SOVEREIGN_WIKI.md) | Complete 500-shard technical breakdown |
 | [Architecture Overview](Architecture_Overview.md) | Kernel diagrams and data flow |
+| [Feature Backlog](SigmaOS_100_ITEM_BACKLOG.md) | 100-item industrial roadmap |
+| [Ultimate Evolution](ULTIMATE_EVOLUTION.md) | 1000+ aspirational features |
 | [Developer Guide](DEVELOPER_GUIDE.md) | Setup, coding standards, shard creation |
 | [Contributing](CONTRIBUTING.md) | PR checklist, issue labels, branch strategy |
 | [Modular Architecture](MODULAR_ARCHITECTURE_BLUEPRINT.md) | Core → Infinite layer breakdown |

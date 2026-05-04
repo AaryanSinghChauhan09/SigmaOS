@@ -4,6 +4,7 @@
 
 - [The Sovereign Lattice](Architecture.md)
 - [Architecture Overview](Architecture_Overview.md)
+- [Cloud-Native Manifest](CLOUD_NATIVE_MANIFEST.md)
 - [Architecture Update](Architecture_Update.md)
 - [Philosophy](Architecture_Philosophy.md)
 - [GPU Modularity](GPU_MODULARITY.md)
@@ -20,6 +21,8 @@
 
 - [Expansion Roadmap](EXPANSION_ROADMAP.md)
 - [Industrial Evolution Roadmap](INDUSTRIAL_EVOLUTION_ROADMAP.md)
+- [100-Item Feature Backlog](SigmaOS_100_ITEM_BACKLOG.md)
+- [Ultimate Evolution (1000+)](ULTIMATE_EVOLUTION.md)
 - [Future Suggestions](FUTURE_SUGGESTIONS.md)
 - [Ideas Backlog](IDEAS_BACKLOG.md)
 - [Phase 4: UX Maturity](Phase_4_UX.md)
