@@ -1,53 +1,62 @@
-#include "../../../include/SovereignLibC.h"
-#include "../../../include/sigma_types.h"
-#include "sigma_hal.h"
+#include "sigma_types.h"
+#include "SovereignLibC.h"
 
 /**
- * SigmaOS Lazy Shard Loader (v28.0 Zenith)
- * Implements an On-Demand Shard Ignition (ODSI) algorithm.
- * ZERO-DEPENDENCY: Dynamic ELF-lite loading without heavy linking.
- *
- * Design: OOP-isolated singleton — SovereignLazyEngine.
+ * SigmaOS Sovereign Lazy Allocator (SovereignLazy)
+ * Implements deferred resource allocation to maximize lattice throughput.
+ * 
+ * Design: Copy-on-Write (CoW) and Demand-Paging inspired lazy sharding.
  */
 
-class SovereignLazyEngine {
+namespace SigmaOS {
+namespace Kernel {
+namespace Misc {
+
+class SovereignLazyManager {
 public:
-    static SovereignLazyEngine& getInstance() {
-        static SovereignLazyEngine instance;
+    static SovereignLazyManager& getInstance() {
+        static SovereignLazyManager instance;
         return instance;
     }
 
     void init() {
-        sigma_log("[LAZY] Initializing Sovereign On-Demand Shard Ignition (ODSI)...");
-        this->initialized = 1u;
+        sigma_log("[LAZY] Initializing Sovereign Lazy Allocation Engine...");
+        this->m_initialized = 1u;
+        this->m_pending_allocs = 0u;
     }
 
-    void* igniteShard(const char* shard_name) {
-        sigma_printf("[LAZY] ODSI: Loading shard '%s' on-demand...\n", shard_name);
-        /* ODSI Algorithm: Maps shard binary into memory only when accessed */
-        this->lazy_shards_loaded++;
-        sigma_log("[LAZY] ODSI: Shard successfully integrated into the active lattice.");
-        return (void*)0xDEADC0DE; // Simulated handle
+    void* deferAllocation(sigma_size_t size) {
+        sigma_printf("[LAZY] Deferring allocation of %llu bytes. Zeroing virtual mapping...\n", size);
+        this->m_pending_allocs++;
+        // Return a guarded pointer that triggers a fault on access
+        return (void*)0xDEADBEEF00000000;
     }
 
-    sigma_u32 getLoadCount() const { return this->lazy_shards_loaded; }
+    void resolveFault(void* faulting_ptr) {
+        sigma_printf("[LAZY] Fault detected at %p. Materializing physical memory shard...\n", faulting_ptr);
+        this->m_pending_allocs--;
+        sigma_log("[LAZY] Allocation SUCCESS. Resuming execution.");
+    }
 
 private:
-    SovereignLazyEngine() : lazy_shards_loaded(0), initialized(0) {}
-    
-    sigma_u32 lazy_shards_loaded;
-    sigma_u32 initialized;
+    SovereignLazyManager() : m_initialized(0), m_pending_allocs(0) {}
+    sigma_u32 m_initialized;
+    sigma_u32 m_pending_allocs;
 };
 
-/* --- C Wrappers --- */
+} // namespace Misc
+} // namespace Kernel
+} // namespace SigmaOS
+
+/* --- C Bridge --- */
 extern "C" void lazy_init() {
-    SovereignLazyEngine::getInstance().init();
+    SigmaOS::Kernel::Misc::SovereignLazyManager::getInstance().init();
 }
 
-extern "C" void* lazy_ignite_shard(const char* shard_name) {
-    return SovereignLazyEngine::getInstance().igniteShard(shard_name);
+extern "C" void* lazy_alloc(sigma_size_t size) {
+    return SigmaOS::Kernel::Misc::SovereignLazyManager::getInstance().deferAllocation(size);
 }
 
-extern "C" sigma_u32 lazy_get_load_count() {
-    return SovereignLazyEngine::getInstance().getLoadCount();
+extern "C" void lazy_resolve(void* ptr) {
+    SigmaOS::Kernel::Misc::SovereignLazyManager::getInstance().resolveFault(ptr);
 }

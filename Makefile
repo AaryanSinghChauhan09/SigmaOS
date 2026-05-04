@@ -70,6 +70,8 @@ KERNEL_SHARDS = kernel/core/system/SovereignMain.o \
                 kernel/core/deployment/SovereignAtomicUpdater.o \
                 kernel/core/hal/SovereignHotplug.o \
                 kernel/core/observability/SovereignDump.o \
+                kernel/core/observability/SovereignDiag.o \
+                kernel/core/misc_utils/SovereignLazy.o \
                 kernel/shards/system/SovereignLibC.o \
                 kernel/core/container/SovereignContainer.o \
                 kernel/core/misc_utils/SovereignTests.o
