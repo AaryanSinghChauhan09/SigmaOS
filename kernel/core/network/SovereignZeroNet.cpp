@@ -1,5 +1,5 @@
-#include "../../../include/SovereignLibC.h"
-#include "../../../include/sigma_zeronet.h"
+#include "SovereignLibC.h"
+#include "sigma_zeronet.h"
 
 namespace SigmaOS {
 namespace Kernel {

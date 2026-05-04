@@ -1,5 +1,5 @@
-#include "../../../include/sigma_virtio.h"
-#include "../../../include/SovereignLibC.h"
+#include "sigma_virtio.h"
+#include "SovereignLibC.h"
 
 namespace SigmaOS {
 namespace Kernel {

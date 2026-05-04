@@ -60,6 +60,8 @@ KERNEL_SHARDS = kernel/core/system/SovereignMain.o \
                 kernel/core/security/SovereignQKD.o \
                 kernel/core/security/SovereignVault.o \
                 kernel/core/network/SovereignMeshLattice.o \
+                kernel/core/network/SovereignZeroNet.o \
+                kernel/core/deployment/SovereignKube.o \
                 kernel/core/security/SovereignFocus.o \
                 kernel/core/memory/SovereignPMM.o \
                 kernel/core/memory/SovereignVMM.o \
