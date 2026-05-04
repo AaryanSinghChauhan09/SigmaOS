@@ -58,6 +58,8 @@ KERNEL_SHARDS = kernel/core/system/SovereignMain.o \
                 kernel/core/security/SovereignAppArmor.o \
                 kernel/core/security/SovereignAmnesicIncognito.o \
                 kernel/core/security/SovereignRBAC.o \
+                kernel/core/security/SovereignTrustFabric.o \
+                kernel/core/security/SovereignEnclave.o \
                 kernel/core/network/SovereignMeshLattice.o \
                 kernel/core/network/SovereignZeroNet.o \
                 kernel/core/network/SovereignAetherNet.o \

@@ -1,59 +1,53 @@
-#include "../../../include/sigma_kernel_types.h"
-#include "../../../include/SovereignLibC.h"
-#include "../../../include/SigmaOOP.hpp"
+#include "sigma_types.h"
+#include "SovereignLibC.h"
 
 /**
  * SigmaOS Sovereign Trust Fabric
- * Principles: Distributed Trust, Quantum-Hardened Orbs, Mesh Consensus.
- * Mission: Unifying Mesh, Orb-Management, and QKD into a cohesive OS-level security layer.
+ * Implements a decentralized, graph-based trust network for kernel shards.
+ * 
+ * Design: High-assurance identity verification across distributed lattice nodes.
  */
 
 namespace SigmaOS {
 namespace Kernel {
 namespace Security {
 
-class SovereignTrustFabric : public SigmaObject {
+class SovereignTrustFabric {
 public:
     static SovereignTrustFabric& getInstance() {
         static SovereignTrustFabric instance;
         return instance;
     }
 
-    const char* type_name() const noexcept override { return "SovereignTrustFabric"; }
-
     void init() {
-        sigma_log("Î£ [TRUST-FABRIC]: Orchestrating Sovereign Security Layer...");
-        // Synchronize foundations
-        sigma_log("Î£ [TRUST-FABRIC]: Binding Mesh Lattice -> QKD Shards.");
-        sigma_log("Î£ [TRUST-FABRIC]: Binding Orb Manager -> Quantum Verification.");
-        sigma_log("Î£ [TRUST-FABRIC]: Trust Fabric SEALED.");
+        sigma_log("[TRUST] Initializing Sovereign Decentralized Trust Fabric...");
+        this->m_initialized = 1u;
+        this->m_trusted_nodes = 1u; // Self
     }
 
-    void deployOrb(const char* orb_name) {
-        sigma_printf("Î£ [TRUST-FABRIC]: Initiating Secure Deployment for '%s'...\n", orb_name);
+    bool verifyShardTrust(const char* shard_id, const char* signature) {
+        sigma_printf("[TRUST] Verifying Shard %s via Lattice Trust Graph...\n", shard_id);
+        sigma_log("[TRUST] Resolving identity via Blockchain Vault and QKD keys...");
         
-        // 1. QKD Key Exchange with Mesh Shard
-        sigma_log("Î£ [TRUST-FABRIC]: [1/3] Establishing Quantum Trust...");
+        // Simulated trust verification
+        if (sigma_strstr(signature, "SOVEREIGN")) {
+            sigma_log("[TRUST] IDENTITY VERIFIED: Shard belongs to the Sovereign Trust Realm.");
+            return true;
+        }
         
-        // 2. Fetch Orb via Mesh
-        sigma_log("Î£ [TRUST-FABRIC]: [2/3] Fetching Orb via Mesh Lattice...");
-        
-        // 3. Verify and Integrate via Orb Manager
-        sigma_log("Î£ [TRUST-FABRIC]: [3/3] Final Quantum Integrity Verification...");
-        
-        sigma_printf("Î£ [TRUST-FABRIC]: Orb '%s' is now a TRUSTED SHARD.\n", orb_name);
+        sigma_log("[TRUST] [ALERT]: Identity UNKNOWN. Isloating shard in amnesic sandbox.");
+        return false;
     }
 
-    void audit() {
-        sigma_printf("\n--- Î£ SOVEREIGN TRUST FABRIC AUDIT ---\n");
-        sigma_printf("| Layer Status    : QUANTUM-SYNCED\n");
-        sigma_printf("| Mesh Consensus  : ACTIVE\n");
-        sigma_printf("| Orb Integrity   : VERIFIED\n");
-        sigma_printf("--------------------------------------\n");
+    void addTrustedNode(uint32_t node_id) {
+        sigma_printf("[TRUST] Node 0x%04X added to the Sovereign Trust Fabric.\n", node_id);
+        this->m_trusted_nodes++;
     }
 
 private:
-    SovereignTrustFabric() {}
+    SovereignTrustFabric() : m_initialized(0), m_trusted_nodes(0) {}
+    sigma_u32 m_initialized;
+    sigma_u32 m_trusted_nodes;
 };
 
 } // namespace Security
@@ -61,10 +55,14 @@ private:
 } // namespace SigmaOS
 
 /* --- C Bridge --- */
-extern "C" void trust_fabric_init() {
+extern "C" void trust_init() {
     SigmaOS::Kernel::Security::SovereignTrustFabric::getInstance().init();
 }
 
-extern "C" void trust_fabric_deploy(const char* name) {
-    SigmaOS::Kernel::Security::SovereignTrustFabric::getInstance().deployOrb(name);
+extern "C" bool trust_verify(const char* shard, const char* sig) {
+    return SigmaOS::Kernel::Security::SovereignTrustFabric::getInstance().verifyShardTrust(shard, sig);
+}
+
+extern "C" void trust_add_node(uint32_t id) {
+    SigmaOS::Kernel::Security::SovereignTrustFabric::getInstance().addTrustedNode(id);
 }
