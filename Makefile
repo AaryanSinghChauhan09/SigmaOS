@@ -20,6 +20,7 @@ KERNEL_SHARDS = kernel/core/system/SovereignMain.o \
                 kernel/core/hal/SovereignSMP.o \
                 kernel/core/misc_utils/SovereignLazy.o \
                 kernel/core/misc_utils/SovereignSnap.o \
+                kernel/core/misc_utils/SovereignSearch.o \
                 kernel/core/ai/SovereignKube.o \
                 kernel/core/system/SovereignInstall.o \
                 kernel/core/network/SovereignBluetooth.o \
