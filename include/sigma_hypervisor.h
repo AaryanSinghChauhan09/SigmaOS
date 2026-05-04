@@ -61,15 +61,17 @@ public:
     void handleVMExit();
     sigma_u64 getExitCount() const { return this->exits_handled; }
     void getState(sigma_hypervisor_state_t* out_state) const;
+    void enableLegacySupport();
 
 private:
-    SovereignHyperEngine() : vm_count(0), exits_handled(0), nested_page_faults(0), initialized(0) {}
+    SovereignHyperEngine() : vm_count(0), exits_handled(0), nested_page_faults(0), initialized(0), legacy_support(0) {}
     
     sigma_vm_t vms[8];
     sigma_u32  vm_count;
     sigma_u64  exits_handled;
     sigma_u64  nested_page_faults;
     sigma_u32  initialized;
+    sigma_u32  legacy_support;
 };
 #endif
 

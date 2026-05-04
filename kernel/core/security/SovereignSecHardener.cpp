@@ -22,10 +22,10 @@
  * sigma_hardened_strcpy — CWE-119 fix for unsafe strcpy usage.
  * All string copies in the lattice MUST use this instead of strcpy.
  */
-extern "C" void sigma_hardened_strcpy(char* dest, const char* src, uint32_t max_len) {
+extern "C" void sigma_hardened_strcpy(char* dest, const char* src, sigma_size_t max_len) {
     if (!dest || !src || max_len == 0) return;  /* CWE-20: Input validation */
 
-    uint32_t i = 0;
+    sigma_size_t i = 0;
     while (i < (max_len - 1) && src[i] != '\0') {
         dest[i] = src[i];
         ++i;
@@ -36,7 +36,7 @@ extern "C" void sigma_hardened_strcpy(char* dest, const char* src, uint32_t max_
 /**
  * sigma_hardened_snprintf — CWE-119 fix for unsafe sprintf/printf patterns.
  */
-extern "C" int sigma_hardened_snprintf(char* dest, uint32_t max_len, const char* fmt, ...) {
+extern "C" int sigma_hardened_snprintf(char* dest, sigma_size_t max_len, const char* fmt, ...) {
     if (!dest || max_len == 0 || !fmt) return -1; /* CWE-20: Input validation */
     /* Bounds-limited formatting via sigma_libc vsnprintf */
     /* In production: wraps silicon-native vsnprintf with strict size enforcement */

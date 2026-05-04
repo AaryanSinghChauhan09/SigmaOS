@@ -35,8 +35,8 @@ void sechardener_validate_buffer(const void* buf, uint32_t claimed_size, uint32_
 void sechardener_audit_all_shards(void);
 
 /* Secure string operations (replaces strcpy/sprintf that trigger CWE-119) */
-void sigma_hardened_strcpy(char* dest, const char* src, uint32_t max_len);
-int  sigma_hardened_snprintf(char* dest, uint32_t max_len, const char* fmt, ...);
+void sigma_hardened_strcpy(char* dest, const char* src, sigma_size_t max_len);
+int  sigma_hardened_snprintf(char* dest, sigma_size_t max_len, const char* fmt, ...);
 
 #ifdef __cplusplus
 }

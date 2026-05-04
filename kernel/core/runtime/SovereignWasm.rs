@@ -1,3 +1,5 @@
+#![no_std]
+
 // SigmaOS Sovereign WASM Runtime (v28.0 Zenith)
 // Implements a Portable Shard Execution (PSE) algorithm.
 // Language: Rust (Safety, Modularity, Performance)
@@ -27,8 +29,8 @@ impl SovereignWasmEngine {
         self.initialized = true;
     }
 
-    pub fn execute_module(&mut self, module_id: u32) {
-        sigma_log(&format!("[WASM] PSE: Executing sandboxed module M{:02}...", module_id));
+    pub fn execute_module(&mut self, _module_id: u32) {
+        sigma_log("[WASM] PSE: Executing sandboxed module...");
         // PSE Algorithm: JIT/AOT compilation of WASM shards to silicon-native machine state
         self.modules_loaded += 1;
         sigma_log("[WASM] PSE: Execution complete. Shard isolated.");

@@ -1,83 +1,75 @@
-#include "../../../include/sigma_vfs.h"
-#include "../../../include/sigma_types.h"
 #include "../../../include/SovereignLibC.h"
-#include "../../../include/SigmaOOP.hpp"
+#include "../../../include/sigma_vfs.h"
 
 /**
- * SigmaOS Sovereign VFS (Virtual File System) Shard
- * Principles: Amnesic Sharding, High-Speed I/O, Silicon-Direct.
+ * SigmaOS Sovereign Virtual File System (VFS)
+ * Implementation: Polymorphic trait-based abstraction for devices and files.
  */
 
 namespace SigmaOS {
 namespace Kernel {
 namespace FS {
 
-class SovereignVFS : public SigmaObject {
+class SovereignVFS {
 public:
     static SovereignVFS& getInstance() {
         static SovereignVFS instance;
         return instance;
     }
 
-    const char* type_name() const noexcept override { return "SovereignVFS"; }
-
     void init() {
-        sigma_log("[VFS] Orchestrating Sovereign Lattice Filesystem...");
-        m_nodes = new SigmaMap<const char*, sigma_file_t*>();
-        // Simulated mount of the Initial RAM Shard (IRS)
-        sigma_log("[VFS] IRS Shard mounted at lattice root (/).");
+        sigma_log("Σ [VFS]: Initializing Sovereign Virtual File System...");
+        // Setup root node, etc.
     }
 
-    sigma_file_t* open(const char* path) {
-        sigma_printf("[VFS] Accessing shard: %s\n", path);
-        for (sigma_u32 i = 0; i < m_nodes->size(); i++) {
-            if (sigma_streq(m_nodes->key_at(i), path)) {
-                return *m_nodes->at_index(i);
-            }
+    sigma_vfs_node_t* open(const char* path) {
+        sigma_printf("Σ [VFS]: Opening node '%s'...\n", path);
+        // Find node in lattice
+        return SIGMA_NULL;
+    }
+
+    sigma_ssize_t read(sigma_vfs_node_t* node, void* buf, sigma_size_t size) {
+        if (node && node->read) {
+            return node->read(node, buf, size);
         }
-        return SIGMA_NULL; 
+        return -1;
     }
 
-    void registerShard(const char* path, sigma_file_t* file) {
-        m_nodes->insert(path, file);
+    sigma_ssize_t write(sigma_vfs_node_t* node, const void* buf, sigma_size_t size) {
+        if (node && node->write) {
+            return node->write(node, buf, size);
+        }
+        return -1;
     }
 
-    sigma_status read(sigma_file_t* file, void* buf, sigma_u32 size) {
-        if (!file || !file->buffer) return 1;
-        sigma_u32 read_size = (size > file->size) ? file->size : size;
-        sigma_memcpy(buf, file->buffer, read_size);
-        return 0;
-    }
-
-    sigma_status write(sigma_file_t* file, const void* buf, sigma_u32 size) {
-        if (!file || !file->buffer) return 1;
-        sigma_memcpy(file->buffer, buf, size);
-        file->size = size;
-        return 0;
-    }
-
-    void audit() {
-        sigma_printf("\n--- Σ SOVEREIGN VFS AUDIT ---\n");
-        sigma_printf("| Mounted Shards : %d\n", m_nodes->size());
-        for (sigma_u32 i = 0; i < m_nodes->size(); i++) {
-            sigma_printf("| [%d] %-15s | Size: %u bytes\n", i, m_nodes->key_at(i), (*m_nodes->at_index(i))->size);
+    void close(sigma_vfs_node_t* node) {
+        if (node && node->close) {
+            node->close(node);
         }
     }
-
-private:
-    SovereignVFS() : m_nodes(SIGMA_NULL) {}
-    SigmaMap<const char*, sigma_file_t*>* m_nodes;
 };
 
 } // namespace FS
 } // namespace Kernel
 } // namespace SigmaOS
 
-/* --- C Interface for Kernel Interop --- */
+/* --- C Bridge --- */
 extern "C" void vfs_init() {
     SigmaOS::Kernel::FS::SovereignVFS::getInstance().init();
 }
 
-extern "C" sigma_file_t* vfs_open(const char* path) {
+extern "C" sigma_vfs_node_t* vfs_open(const char* path) {
     return SigmaOS::Kernel::FS::SovereignVFS::getInstance().open(path);
+}
+
+extern "C" sigma_ssize_t vfs_read(sigma_vfs_node_t* node, void* buf, sigma_size_t size) {
+    return SigmaOS::Kernel::FS::SovereignVFS::getInstance().read(node, buf, size);
+}
+
+extern "C" sigma_ssize_t vfs_write(sigma_vfs_node_t* node, const void* buf, sigma_size_t size) {
+    return SigmaOS::Kernel::FS::SovereignVFS::getInstance().write(node, buf, size);
+}
+
+extern "C" void vfs_close(sigma_vfs_node_t* node) {
+    SigmaOS::Kernel::FS::SovereignVFS::getInstance().close(node);
 }

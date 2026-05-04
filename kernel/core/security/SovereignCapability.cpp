@@ -1,80 +1,76 @@
-#include "../../../include/sigma_types.h"
-#include "sigma_hal.h"
 #include "../../../include/SovereignLibC.h"
+#include "../../../include/sigma_types.h"
 
 /**
- * SigmaOS Sovereign Capability Engine
- * Per-process capability bitmask for syscall gating.
- *
- * USP: Replaces Linux's coarse-grained `sudo` with a mathematically precise
- * per-process capability vector. Each shard only possesses the capabilities
- * it explicitly declared — zero privilege escalation possible.
- *
- * Design: OOP-isolated singleton — SovereignCapabilityEngine.
+ * SigmaOS Sovereign Capability Vault
+ * Implements token-based access control (No Root model).
+ * Architecture: Capability-Based Addressing (CBA).
  */
 
-typedef sigma_u64 sigma_caps_t;
+namespace SigmaOS {
+namespace Kernel {
+namespace Security {
 
-// Capability bitmask definitions
-#define SIGMA_CAP_NET_SEND    (1ULL << 0)
-#define SIGMA_CAP_FS_WRITE    (1ULL << 1)
-#define SIGMA_CAP_EXEC_CHILD  (1ULL << 2)
-#define SIGMA_CAP_GPU_ACCESS  (1ULL << 3)
-#define SIGMA_CAP_AUDIO       (1ULL << 4)
-#define SIGMA_CAP_ENCLAVE     (1ULL << 5)
+enum class CapabilityType : sigma_u32 {
+    RESOURCE_NONE    = 0,
+    RESOURCE_MEMORY  = 1 << 0,
+    RESOURCE_NETWORK = 1 << 1,
+    RESOURCE_DRIVER  = 1 << 2,
+    RESOURCE_IPC     = 1 << 3,
+    RESOURCE_SYSTEM  = 1 << 4
+};
 
-class SovereignCapabilityEngine {
+typedef sigma_u64 sigma_capability_t;
+
+class SovereignCapabilityVault {
 public:
-    static SovereignCapabilityEngine& getInstance() {
-        static SovereignCapabilityEngine instance;
+    static SovereignCapabilityVault& getInstance() {
+        static SovereignCapabilityVault instance;
         return instance;
     }
 
     void init() {
-        sigma_log("[CAPABILITY] Initializing Sovereign Per-Process Capability Engine...");
-        this->process_count = 0;
+        sigma_log("Σ [CAP-VAULT]: Initializing Capability-Based Access Control (CBAC)...");
+        this->tokens_issued = 0;
+        this->initialized = true;
     }
 
-    void grantCapabilities(sigma_u32 pid, sigma_caps_t caps) {
-        if (this->process_count >= 512) return;
-        this->pids[this->process_count] = pid;
-        this->caps[this->process_count] = caps;
-        this->process_count++;
-        sigma_printf("[CAPABILITY] PID %u granted capability mask: 0x%016llX\n",
-                     pid, (unsigned long long)caps);
+    sigma_capability_t issueToken(sigma_u32 resource_id, sigma_u32 permissions) {
+        sigma_capability_t token = ((sigma_capability_t)resource_id << 32) | permissions;
+        this->tokens_issued++;
+        sigma_printf("Σ [CAP-VAULT]: Issued Token 0x%llX for Resource %u\n", token, resource_id);
+        return token;
     }
 
-    bool checkCapability(sigma_u32 pid, sigma_caps_t required_cap) {
-        for (sigma_u32 i = 0; i < this->process_count; i++) {
-            if (this->pids[i] == pid) {
-                bool granted = (this->caps[i] & required_cap) != 0;
-                if (!granted) {
-                    sigma_printf("[CAPABILITY] ACCESS DENIED: PID %u lacks cap 0x%llX\n",
-                                 pid, (unsigned long long)required_cap);
-                }
-                return granted;
-            }
+    bool validate(sigma_capability_t token, sigma_u32 resource_id, sigma_u32 required_perm) {
+        sigma_u32 res = (sigma_u32)(token >> 32);
+        sigma_u32 perm = (sigma_u32)(token & 0xFFFFFFFFu);
+        
+        if (res == resource_id && (perm & required_perm) == required_perm) {
+            return true;
         }
-        sigma_printf("[CAPABILITY] PID %u not registered — DENY ALL.\n", pid);
         return false;
     }
 
 private:
-    SovereignCapabilityEngine() : process_count(0) {}
-    sigma_u32 pids[512];
-    sigma_caps_t caps[512];
-    sigma_u32 process_count;
+    SovereignCapabilityVault() : tokens_issued(0), initialized(false) {}
+    sigma_u64 tokens_issued;
+    bool initialized;
 };
 
-/* --- C Wrappers --- */
-extern "C" void capability_init() {
-    SovereignCapabilityEngine::getInstance().init();
+} // namespace Security
+} // namespace Kernel
+} // namespace SigmaOS
+
+/* --- C Bridge --- */
+extern "C" void cap_vault_init() {
+    SigmaOS::Kernel::Security::SovereignCapabilityVault::getInstance().init();
 }
 
-extern "C" void capability_grant(sigma_u32 pid, sigma_u64 caps) {
-    SovereignCapabilityEngine::getInstance().grantCapabilities(pid, caps);
+extern "C" sigma_u64 cap_vault_issue(sigma_u32 res, sigma_u32 perm) {
+    return SigmaOS::Kernel::Security::SovereignCapabilityVault::getInstance().issueToken(res, perm);
 }
 
-extern "C" bool capability_check(sigma_u32 pid, sigma_u64 required) {
-    return SovereignCapabilityEngine::getInstance().checkCapability(pid, required);
+extern "C" int cap_vault_validate(sigma_u64 token, sigma_u32 res, sigma_u32 perm) {
+    return SigmaOS::Kernel::Security::SovereignCapabilityVault::getInstance().validate(token, res, perm) ? 1 : 0;
 }

@@ -2,6 +2,15 @@
 #include "../../../include/SovereignLibC.h"
 #include "../../../include/sigma_types.h"
 
+/* va_list support in freestanding mode via compiler builtins */
+#ifndef va_list
+typedef __builtin_va_list va_list;
+#define va_start(ap, last) __builtin_va_start(ap, last)
+#define va_arg(ap, type)   __builtin_va_arg(ap, type)
+#define va_end(ap)         __builtin_va_end(ap)
+#endif
+
+
 // --- sigma_print ---
 void sigma_print(const char* str) {
     if (!str) return;
@@ -93,6 +102,10 @@ void sigma_hardened_strcpy(char* dest, const char* src, sigma_size_t dest_size) 
         dest[i] = src[i];
     }
     dest[i] = '\0';
+}
+
+void sigma_strcpy(char* dest, const char* src, sigma_size_t n) {
+    sigma_hardened_strcpy(dest, src, n);
 }
 
 // --- sigma_strcat ---
@@ -208,6 +221,5 @@ void* sigma_malloc(sigma_size_t size) {
 }
 
 void sigma_free(void* ptr) {
-    // In this zero-latency shard, we do not reclaim small blocks yet.
-    // Genuine SigmaOS memory management is per-process shard cleanup.
+    (void)ptr; // No-op: bump-pointer slab; per-process cleanup on exit.
 }

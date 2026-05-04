@@ -17,8 +17,8 @@
  * SILICON-DIRECT SYSCALL BRIDGE (x86_64)
  * Used only when running on Linux host for testing (not in bare-metal kernel)
  * ========================================================================= */
-static inline long sigma_syscall(long n, long a1, long a2, long a3) {
-    long ret;
+static inline sigma_i64 sigma_syscall(sigma_i64 n, sigma_i64 a1, sigma_i64 a2, sigma_i64 a3) {
+    sigma_i64 ret;
     __asm__ __volatile__ (
         "syscall"
         : "=a"(ret)
@@ -85,11 +85,15 @@ void sigma_strcpy_safe(char* dst, const char* src, sigma_usize max) {
     dst[i] = '\0';
 }
 
-/* String comparison â€ returns 0 if equal */
+/* String comparison — returns 0 if equal
+ * Guard prevents redefinition against sigma_kernel_types.h static inline version */
+#ifndef SIGMA_STRCMP_DEFINED
+#define SIGMA_STRCMP_DEFINED
 int sigma_strcmp(const char* s1, const char* s2) {
     while (*s1 && (*s1 == *s2)) { s1++; s2++; }
     return (unsigned char)*s1 - (unsigned char)*s2;
 }
+#endif
 
 /* Case-insensitive compare */
 int sigma_strcasecmp(const char* s1, const char* s2) {
@@ -263,7 +267,7 @@ CPUIDResult sigma_cpuid(sigma_u32 leaf) {
 
 /* Write to serial COM1 (Linux testing path) */
 void k_print_raw(const char* s) {
-    sigma_syscall(1, 1, (long)s, (long)sigma_strlen(s));
+    sigma_syscall(1, 1, (sigma_i64)s, (sigma_i64)sigma_strlen(s));
 }
 
 /* =========================================================================
@@ -303,6 +307,10 @@ sigma_bool rb_pop(RingBuffer* rb, sigma_u8* out) {
  * ========================================================================= */
 typedef volatile sigma_u32 spinlock_t;
 
+static inline void spinlock_init(spinlock_t* l)    __attribute__((unused));
+static inline void spinlock_acquire(spinlock_t* l) __attribute__((unused));
+static inline void spinlock_release(spinlock_t* l) __attribute__((unused));
+
 static inline void spinlock_init(spinlock_t* l)    { *l = 0; }
 static inline void spinlock_acquire(spinlock_t* l) {
     while (__sync_lock_test_and_set(l, 1)) { cpu_pause(); }
@@ -314,7 +322,7 @@ static inline void spinlock_release(spinlock_t* l) {
 /* =========================================================================
  * ENTROPY GENERATOR (RDTSC-seeded XorShift64 â€ zero-dep PRNG)
  * ========================================================================= */
-static sigma_u64 g_entropy_state = 0xDEADC0DESIGMAULL;
+static sigma_u64 g_entropy_state = 0xDEADC0DEULL;
 
 sigma_u64 sigma_rand64(void) {
     sigma_u64 x = g_entropy_state ^ cpu_rdtsc();
@@ -332,6 +340,10 @@ sigma_u32 sigma_rand32(void) {
 /* =========================================================================
  * ATOMIC OPERATIONS (x86_64 LOCK prefix)
  * ========================================================================= */
+static inline sigma_u32   sigma_atomic_add(volatile sigma_u32* ptr, sigma_u32 val)                           __attribute__((unused));
+static inline sigma_u32   sigma_atomic_sub(volatile sigma_u32* ptr, sigma_u32 val)                           __attribute__((unused));
+static inline sigma_bool  sigma_atomic_cas(volatile sigma_u32* ptr, sigma_u32 expected, sigma_u32 desired)   __attribute__((unused));
+
 static inline sigma_u32 sigma_atomic_add(volatile sigma_u32* ptr, sigma_u32 val) {
     return __sync_fetch_and_add(ptr, val);
 }

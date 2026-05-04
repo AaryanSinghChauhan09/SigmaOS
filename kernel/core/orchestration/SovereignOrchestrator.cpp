@@ -41,7 +41,6 @@ extern "C" {
     void hil_sim_init();
     void neural_init();
     void pqc_init();
-    void qkd_init();
     void netstack_init();
     void vpn_init();
     void routing_init();
@@ -88,6 +87,8 @@ extern "C" {
     void perf_init();
     void snap_init();
     void power_init();
+    void zenith_desktop_init();
+    void edge_node_init();
 }
 
 /**

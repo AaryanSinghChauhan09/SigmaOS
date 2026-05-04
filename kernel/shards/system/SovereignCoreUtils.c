@@ -32,17 +32,7 @@ void sigma_hexdump(const void* ptr, sigma_size_t len) {
     sigma_print("\n");
 }
 
-/* =========================================================================
- * Sovereign String Copy (pure C11 â€ no strncpy from libc)
- * ========================================================================= */
-void sigma_strcpy(char* dest, const char* src, sigma_size_t maxlen) {
-    sigma_size_t i = 0;
-    while (i < maxlen - 1 && src[i] != '\0') {
-        dest[i] = src[i];
-        i++;
-    }
-    dest[i] = '\0';
-}
+/* Using unified sigma_strcpy from SovereignLibC.h */
 
 /* =========================================================================
  * Sovereign Number-to-String (decimal â€ no sprintf)

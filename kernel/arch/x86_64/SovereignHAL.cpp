@@ -7,7 +7,6 @@
  * Principles: Silicon-Direct, Ring-0 Hardware Sharding.
  */
 
-extern "C" void serial_init();
 
 namespace SigmaOS {
 namespace Kernel {

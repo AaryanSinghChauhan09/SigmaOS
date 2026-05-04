@@ -142,6 +142,8 @@ static inline sigma_usize sigma_strlen(const char* s) {
     return len;
 }
 
+#ifndef SIGMA_STRCMP_DEFINED
+#define SIGMA_STRCMP_DEFINED
 static inline int sigma_strcmp(const char* s1, const char* s2) {
     if (!s1 || !s2) return 0;
     while (*s1 && (*s1 == *s2)) {
@@ -149,6 +151,7 @@ static inline int sigma_strcmp(const char* s1, const char* s2) {
     }
     return *(sigma_u8*)s1 - *(sigma_u8*)s2;
 }
+#endif
 
 static inline void sigma_strncpy(char* dest, const char* src, sigma_usize n) {
     if (!dest || !src) return;
@@ -165,13 +168,19 @@ void sigma_panic(const char* msg, sigma_u64 rip, sigma_u64 rsp);
 #define SIGMA_ASSERT(cond, msg) \
     do { if (!(cond)) sigma_panic(msg, 0, 0); } while (0)
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 /* ---- Common Kernel Function Declarations ---- */
 void kprintf(const char* fmt, ...);
 sigma_u32  cpu_get_id(void);
-void serial_init(void);
-void serial_putc(char c);
-void serial_puts(const char* s);
+
 void vga_clear(sigma_u8 color);
 void vga_putc_at(sigma_u8 x, sigma_u8 y, char c, sigma_u8 color);
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif /* SIGMA_KERNEL_TYPES_H */

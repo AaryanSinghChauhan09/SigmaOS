@@ -1,49 +1,49 @@
 #include "../../../include/SovereignLibC.h"
 #include "../../../include/sigma_types.h"
-#include "sigma_zeronet.h"
-#include "sigma_hal.h"
 
 /**
- * SigmaOS Sovereign Zero-Trust Network
- * Implements an Internal Cryptographic Tunneling (ICT) algorithm.
- * ZERO-DEPENDENCY: Strictly bare-metal secure networking.
+ * SigmaOS Sovereign ZeroNet Stack
+ * Goal: Achieve zero-copy data transfer for distributed RPC and Blob orchestration.
  */
 
-/* --- Sovereign ZeroNet Manager (OOPS Isolation) --- */
-static struct {
-    sigma_zeronet_conn_t active_connections[256];
-    uint32_t connection_count;
-} SovereignZeroNetManager = {
-    .connection_count = 0
+namespace SigmaOS {
+namespace Kernel {
+namespace Network {
+
+class SovereignZeroNet {
+public:
+    static SovereignZeroNet& getInstance() {
+        static SovereignZeroNet instance;
+        return instance;
+    }
+
+    void init() {
+        sigma_log("Σ [ZERONET]: Initializing Zero-Copy Lattice Networking...");
+        this->packets_processed = 0;
+        this->initialized = true;
+    }
+
+    void transfer(void* data, sigma_size_t len, const char* destination) {
+        (void)data; // Stub: will map to NIC DMA buffer
+        sigma_printf("Σ [ZERONET]: Zero-Copy Transfer of %llu bytes to %s\n", len, destination);
+        this->packets_processed++;
+    }
+
+private:
+    SovereignZeroNet() : packets_processed(0), initialized(false) {}
+    sigma_u64 packets_processed;
+    bool initialized;
 };
 
+} // namespace Network
+} // namespace Kernel
+} // namespace SigmaOS
+
+/* --- C Bridge --- */
 extern "C" void zeronet_init() {
-    sigma_log("[ZERONET] Initializing Sovereign Zero-Trust Network (OOPS Isolation)...");
+    SigmaOS::Kernel::Network::SovereignZeroNet::getInstance().init();
 }
 
-extern "C" bool zeronet_establish_connection(uint32_t source, uint32_t target) {
-    if (SovereignZeroNetManager.connection_count >= 256) return false;
-    
-    sigma_printf("[ZERONET] ICT: Negotiating secure tunnel between S%02d and S%02d...\n", (int)source, (int)target);
-    
-    uint32_t id = ++SovereignZeroNetManager.connection_count;
-    SovereignZeroNetManager.active_connections[id - 1].connection_id = id;
-    SovereignZeroNetManager.active_connections[id - 1].source_shard = source;
-    SovereignZeroNetManager.active_connections[id - 1].target_shard = target;
-    SovereignZeroNetManager.active_connections[id - 1].is_verified = true;
-    
-    sigma_log("[ZERONET] ICT: Tunnel Established and VERIFIED.");
-    return true;
-}
-
-extern "C" void zeronet_verify_traffic(uint32_t conn_id, const void* payload, uint32_t size) {
-    if (conn_id == 0 || conn_id > SovereignZeroNetManager.connection_count) return;
-    
-    sigma_zeronet_conn_t* conn = &SovereignZeroNetManager.active_connections[conn_id - 1];
-    if (!conn->is_verified) {
-        sigma_log("[ZERONET] [CRITICAL] ICT: Unverified traffic detected.");
-        return;
-    }
-    
-    sigma_printf("[ZERONET] ICT: Traffic on Conn %d validated (%d bytes).\n", (int)conn_id, (int)size);
+extern "C" void zeronet_transfer(void* data, sigma_size_t len, const char* dest) {
+    SigmaOS::Kernel::Network::SovereignZeroNet::getInstance().transfer(data, len, dest);
 }

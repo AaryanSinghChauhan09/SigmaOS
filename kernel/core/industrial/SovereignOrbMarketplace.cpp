@@ -40,7 +40,7 @@ public:
         sigma_printf("Σ [MARKET]: Summoning Orb Shard '%s' from Mesh Lattice...\n", id);
         
         // Zero-Trust Enforcement: Verify Quantum Signature before download
-        bool is_secure = SovereignQKD::getInstance().verifyQuantumIntegrity();
+        bool is_secure = SigmaOS::Kernel::Security::SovereignQKD::getInstance().verifyQuantumIntegrity();
         
         if (!is_secure) {
             sigma_printf("Σ [MARKET]: [ERROR] Orb '%s' failed QKD verification. Summoning ABORTED.\n", id);

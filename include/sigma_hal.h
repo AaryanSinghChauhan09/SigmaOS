@@ -13,16 +13,6 @@
 
 #include "sigma_types.h"
 
-#ifdef __cplusplus
-extern "C" {
-#endif
-
-/* --- Silicon Lifecycle --- */
-void hal_init(void);
-void hal_shutdown(void);
-
-/* Intrinsics: cpu_pause, cpu_halt, port_inb/outb — sigma_kernel_types.h (via sigma_types.h) */
-
 /* --- Serial I/O (Step 3: Kernel Debugging) --- */
 #define COM1 0x3F8
 
@@ -44,6 +34,14 @@ static inline void serial_putc(char c) {
     while (is_transmit_empty() == 0);
     port_outb(COM1, c);
 }
+
+#ifdef __cplusplus
+extern "C" {
+#endif
+
+/* --- Silicon Lifecycle --- */
+void hal_init(void);
+void hal_shutdown(void);
 
 /* --- Assertions (Step 3: Kernel Debugging) --- */
 #define sigma_assert(condition) \

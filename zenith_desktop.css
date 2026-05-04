@@ -947,6 +947,9 @@ body {
     position: absolute;
     box-shadow: 0 0 10px var(--success);
 }
+.util-input {
+    background: rgba(0, 0, 0, 0.4);
+    border: 1px solid var(--glass-border);
     border-radius: 8px;
     color: white;
     padding: 15px;
@@ -954,6 +957,7 @@ body {
     font-size: 0.9em;
     resize: none;
     margin-bottom: 15px;
+    width: 100%;
 }
 
 .util-actions {
@@ -1359,3 +1363,72 @@ body {
 .ai-chat-input-row { display: flex; gap: 8px; }
 .ai-chat-input { flex: 1; padding: 10px 12px; border-radius: 8px; border: 1px solid var(--glass-border); background: rgba(0,0,0,0.35); color: var(--text); font-family: inherit; }
 
+        @keyframes shatter {
+            0% { transform: scale(1) rotate(0); opacity: 1; filter: blur(0); }
+            100% { transform: scale(1.2) rotate(10deg); opacity: 0; filter: blur(20px); }
+        }
+        .shattering {
+            animation: shatter 0.4s forwards ease-in;
+            pointer-events: none;
+        }
+        .focus-mode-active .desktop-overlay {
+            background: rgba(0,0,0,0.8);
+            -webkit-backdrop-filter: grayscale(1);
+            backdrop-filter: grayscale(1);
+        }
+        .focus-mode-active .widgets-container, .focus-mode-active .desktop-icons {
+            opacity: 0.1;
+            pointer-events: none;
+        }
+        .util-nav {
+            padding: 10px;
+            cursor: pointer;
+            border-radius: 4px;
+            color: var(--text-muted);
+            transition: 0.3s;
+            font-size: 0.85em;
+        }
+        .util-nav:hover, .util-nav.active {
+            background: rgba(255,255,255,0.05);
+            color: var(--accent);
+        }
+        .util-btn {
+            background: rgba(255,255,255,0.05);
+            border: 1px solid rgba(255,255,255,0.1);
+            color: white;
+            padding: 8px 15px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 0.8em;
+            transition: 0.3s;
+        }
+        .util-btn:hover {
+            border-color: var(--accent);
+            color: var(--accent);
+            background: rgba(0,255,255,0.05);
+        }
+        @keyframes neuralPulse {
+            0% { transform: scale(1); opacity: 0.5; }
+            50% { transform: scale(1.1); opacity: 0.8; }
+            100% { transform: scale(1); opacity: 0.5; }
+        }
+        .lattice-node {
+            animation: neuralPulse 4s infinite ease-in-out;
+        }
+        .lattice-line {
+            stroke-dasharray: 100;
+            animation: latticeFlow 10s infinite linear;
+        }
+        @keyframes latticeFlow {
+            from { stroke-dashoffset: 200; }
+            to { stroke-dashoffset: 0; }
+        }
+        @keyframes neuralBreathe {
+            0% { transform: scale(1); box-shadow: 0 0 5px rgba(0,255,255,0.2); }
+            50% { transform: scale(1.02); box-shadow: 0 0 15px rgba(0,255,255,0.4); }
+            100% { transform: scale(1); box-shadow: 0 0 5px rgba(0,255,255,0.2); }
+        }
+        .neural-active {
+            animation: neuralBreathe 3s infinite ease-in-out;
+            border-color: var(--accent) !important;
+        }

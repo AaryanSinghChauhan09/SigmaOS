@@ -7,18 +7,23 @@
 extern "C" {
 #endif
 
-typedef struct sigma_file {
+typedef struct sigma_vfs_node {
     char name[128];
+    sigma_u32 type;
     sigma_u32 size;
-    sigma_u32 flags;
-    void* buffer;
-} sigma_file_t;
+    void* private_data;
+    
+    // Interface Pattern (Function Pointers)
+    sigma_ssize_t (*read)(struct sigma_vfs_node* node, void* buffer, sigma_size_t size);
+    sigma_ssize_t (*write)(struct sigma_vfs_node* node, const void* buffer, sigma_size_t size);
+    void (*close)(struct sigma_vfs_node* node);
+} sigma_vfs_node_t;
 
 void vfs_init(void);
-sigma_file_t* vfs_open(const char* path);
-sigma_status vfs_read(sigma_file_t* file, void* buf, sigma_u32 size);
-sigma_status vfs_write(sigma_file_t* file, const void* buf, sigma_u32 size);
-void vfs_close(sigma_file_t* file);
+sigma_vfs_node_t* vfs_open(const char* path);
+sigma_ssize_t vfs_read(sigma_vfs_node_t* node, void* buf, sigma_size_t size);
+sigma_ssize_t vfs_write(sigma_vfs_node_t* node, const void* buf, sigma_size_t size);
+void vfs_close(sigma_vfs_node_t* node);
 
 #ifdef __cplusplus
 }
