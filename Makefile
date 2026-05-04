@@ -38,6 +38,7 @@ KERNEL_SHARDS = kernel/core/system/SovereignMain.o \
                 kernel/core/memory/SovereignPMM.o \
                 kernel/core/memory/SovereignVMM.o \
                 kernel/core/system/SovereignTime.o \
+                kernel/core/system/SovereignConfig.o \
                 kernel/core/system/SovereignAppShard.o \
                 kernel/core/fs/SovereignDNACompression.o \
                 kernel/core/security/SovereignQKD.o \
@@ -51,6 +52,10 @@ KERNEL_SHARDS = kernel/core/system/SovereignMain.o \
                 kernel/core/ai/SovereignNeuralAutomator.o \
                 kernel/core/community/SovereignGovernance.o \
                 kernel/core/security/SovereignSandbox.o \
+                kernel/core/security/SovereignAppArmor.o \
+                kernel/core/security/SovereignAmnesicIncognito.o \
+                kernel/core/memory/SovereignPMM.o \
+                kernel/core/memory/SovereignVMM.o \
                 kernel/core/process/SovereignPSE.o \
                 kernel/core/deployment/SovereignCI.o \
                 kernel/core/deployment/SovereignAtomicUpdater.o \

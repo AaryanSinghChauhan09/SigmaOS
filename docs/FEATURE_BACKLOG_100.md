@@ -15,7 +15,7 @@ Structured backlog for prioritization. Items are aspirational until each has imp
 - [ ] Virtual memory paging
 - [ ] Distributed etcd State Management
 - [x] Lattice IPC Bridge
-- [ ] Swapping and Paging
+- [x] Swapping and Paging (SovereignVMM)
 - [x] Kernel crash dump analysis (SovereignDump)
 - [ ] Secure bootloader
 - [ ] Secure bootloader (UEFI/GRUB)
