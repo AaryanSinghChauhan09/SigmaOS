@@ -51,6 +51,11 @@ KERNEL_SHARDS = kernel/core/system/SovereignMain.o \
                 kernel/core/ai/SovereignNeuralAutomator.o \
                 kernel/core/community/SovereignGovernance.o \
                 kernel/core/security/SovereignSandbox.o \
+                kernel/core/process/SovereignPSE.o \
+                kernel/core/deployment/SovereignCI.o \
+                kernel/core/deployment/SovereignAtomicUpdater.o \
+                kernel/core/hal/SovereignHotplug.o \
+                kernel/core/observability/SovereignDump.o \
                 kernel/shards/system/SovereignLibC.o \
                 kernel/core/container/SovereignContainer.o \
                 kernel/core/misc_utils/SovereignTests.o
