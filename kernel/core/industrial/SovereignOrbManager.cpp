@@ -1,7 +1,7 @@
-#include "../../../include/sigma_kernel_types.h"
-#include "../../../include/SovereignLibC.h"
-#include "../../../include/SigmaOOP.hpp"
-#include "../security/SovereignQKD.hpp"
+#include "sigma_kernel_types.h"
+#include "SovereignLibC.h"
+#include "SigmaOOP.hpp"
+#include "SovereignQKD.hpp"
 
 /**
  * SigmaOS Sovereign Orb Manager (Package Management Shard)

@@ -49,6 +49,7 @@ KERNEL_SHARDS = kernel/core/system/SovereignMain.o \
                 kernel/core/hal/SovereignHAL.o \
                 kernel/core/network/SovereignMeshLattice.o \
                 kernel/core/industrial/SovereignOrbMarketplace.o \
+                kernel/core/industrial/SovereignOrbRegistry.o \
                 kernel/core/industrial/SovereignOrbManager.o \
                 kernel/core/ai/SovereignNeuralNexus.o \
                 kernel/core/ai/SovereignNeuralAutomator.o \
