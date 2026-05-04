@@ -17,6 +17,7 @@ The following table tracks the implementation status of the 100 core features of
 | **DevOps** | Kubernetes Operator | [x] | `SovereignKube` |
 | **UX/UI** | Web-Srv Dashboard (Zenith) | [x] | `zenith_desktop.css` / `index.html` |
 | **UX/UI** | Spatial Window Snapping | [x] | `SovereignSnap` |
+| **Core** | Lattice IPC Bridge | [x] | `SovereignMessageBus` |
 
 ## Full Backlog Registry
 
