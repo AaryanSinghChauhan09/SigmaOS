@@ -31,232 +31,246 @@
                 <div class="user-status">Authorized Shard Master</div>
             </div>
             <div class="window-controls">
-                <div class="win-btn minimize"></div>
-                <div class="win-btn close" onclick="toggleStart()"></div>
-            </div>
+        <div class="win-btn minimize" onclick="minimizeWindow('start-menu')"></div>
+        <div class="win-btn close" onclick="toggleStart()"></div>
+    </div>
+</div>
+<div class="start-content">
+    <div class="start-section">
+        <div class="section-title">Pinned Shards</div>
+        <div class="start-item" onclick="toggleStart()">
+            <span class="icon">⌨️</span>
+            <span>OmniShell v100.0</span>
         </div>
-        <div class="start-content">
-            <div class="start-section">
-                <div class="section-title">Pinned Shards</div>
-                <div class="start-item" onclick="toggleStart()">
-                    <span class="icon">⌨️</span>
-                    <span>OmniShell v5.1</span>
-                </div>
-                <div class="start-item" onclick="toggleStart()">
-                    <span class="icon">📝</span>
-                    <span>Zenith Editor</span>
-                </div>
-                <div class="start-item" onclick="toggleStart()">
-                    <span class="icon">🛡️</span>
-                    <span>Quantum Shield</span>
-                </div>
-                <div class="start-item" onclick="launchApp('Markup Forge')">
-                    <span class="icon">📝</span>
-                    <span>Markup Forge</span>
-                </div>
-                <div class="start-item" onclick="launchApp('Utility Nexus')">
-                    <span class="icon">🛠️</span>
-                    <span>Utility Nexus</span>
-                </div>
-            </div>
-            <div class="start-section">
-                <div class="section-title">System Shards</div>
-                <div class="start-item">
-                    <span class="icon">⚙️</span>
-                    <span>Lattice Settings</span>
-                </div>
-                <div class="start-item">
-                    <span class="icon">📈</span>
-                    <span>Performance Matrix</span>
-                </div>
-                <div class="start-item" onclick="toggleStart()">
-                    <span class="icon">🚀</span>
-                    <span>Live Boot Nexus</span>
-                </div>
-                <div class="start-item" onclick="toggleStart()">
-                    <span class="icon">☁️</span>
-                    <span>Hypervisor Shard</span>
-                </div>
-            </div>
+        <div class="start-item" onclick="toggleStart()">
+            <span class="icon">📝</span>
+            <span>Zenith Editor</span>
         </div>
-        <div class="start-footer">
-            <div class="footer-item" onclick="location.reload()">Reboot</div>
-            <div class="footer-item" onclick="toggleStart()">Lock</div>
+        <div class="start-item" onclick="toggleStart()">
+            <span class="icon">🛡️</span>
+            <span>Quantum Shield</span>
+        </div>
+        <div class="start-item" onclick="launchApp('Markup Forge')">
+            <span class="icon">📝</span>
+            <span>Markup Forge</span>
+        </div>
+        <div class="start-item" onclick="launchApp('Utility Nexus')">
+            <span class="icon">🛠️</span>
+            <span>Utility Nexus</span>
         </div>
     </div>
-    <!-- Command Palette (Ctrl+K / Ctrl+Space) -->
-    <div class="command-palette" id="cmd-palette">
-        <label for="cmd-input" class="sr-only">Command Filter</label>
-        <input type="text" class="command-input" placeholder="Filter commands…" id="cmd-input" autocomplete="off" aria-label="Search and filter lattice commands">
-        <div class="command-results" id="cmd-results">
-            <div class="command-item" onclick="launchApp('File Manager')"><span>File Manager</span><kbd>Files</kbd></div>
-            <div class="command-item" onclick="launchApp('Sigma Browser')"><span>Sigma Browser</span><kbd>Web</kbd></div>
-            <div class="command-item" onclick="launchApp('AI Assistant')"><span>AI Assistant</span><kbd>AI</kbd></div>
-            <div class="command-item" onclick="launchApp('Utility Nexus')"><span>Utility Nexus</span><kbd>Utils</kbd></div>
-            <div class="command-item" onclick="launchApp('Markup Forge')"><span>Markup Forge</span><kbd>MD</kbd></div>
-            <div class="command-item" onclick="launchApp('Marketplace')"><span>Marketplace</span><kbd>Store</kbd></div>
-            <div class="command-item" onclick="launchApp('Lattice Settings')"><span>Lattice Settings</span><kbd>Set</kbd></div>
-            <div class="command-item" onclick="setTheme('cyan')"><span>Theme: Neon Cyan</span><kbd>Th+1</kbd></div>
-            <div class="command-item" onclick="setTheme('gold')"><span>Theme: Solar Gold</span><kbd>Th+2</kbd></div>
-            <div class="command-item" onclick="setTheme('crimson')"><span>Theme: Crimson Shard</span><kbd>Th+3</kbd></div>
-            <div class="command-item" onclick="setTheme('solar')"><span>Theme: Adaptive Solar</span><kbd>Th+4</kbd></div>
-            <div class="command-item" onclick="addLog('Σ [AUTO]: Optimizing Shard Lattice...', 'success')"><span>Optimize Lattice</span><kbd>Opt</kbd></div>
+    <div class="start-section">
+        <div class="section-title">System Shards</div>
+        <div class="start-item">
+            <span class="icon">⚙️</span>
+            <span>Lattice Settings</span>
+        </div>
+        <div class="start-item">
+            <span class="icon">📈</span>
+            <span>Performance Matrix</span>
+        </div>
+        <div class="start-item" onclick="toggleStart()">
+            <span class="icon">🚀</span>
+            <span>Live Boot Nexus</span>
+        </div>
+        <div class="start-item" onclick="toggleStart()">
+            <span class="icon">☁️</span>
+            <span>Hypervisor Shard</span>
         </div>
     </div>
+</div>
+<div class="start-footer">
+    <div class="footer-item" onclick="location.reload()">Reboot</div>
+    <div class="footer-item" onclick="toggleStart()">Lock</div>
+</div>
+</div>
+<!-- Command Palette (Ctrl+K / Ctrl+Space) -->
+<div class="command-palette" id="cmd-palette">
+<label for="cmd-input" class="sr-only">Command Filter</label>
+<input type="text" class="command-input" placeholder="Filter commands…" id="cmd-input" autocomplete="off" aria-label="Search and filter lattice commands">
+<div class="command-results" id="cmd-results">
+    <div class="command-item" onclick="launchApp('File Manager')"><span>File Manager</span><kbd>Files</kbd></div>
+    <div class="command-item" onclick="launchApp('Sigma Browser')"><span>Sigma Browser</span><kbd>Web</kbd></div>
+    <div class="command-item" onclick="launchApp('AI Assistant')"><span>AI Assistant</span><kbd>AI</kbd></div>
+    <div class="command-item" onclick="launchApp('Utility Nexus')"><span>Utility Nexus</span><kbd>Utils</kbd></div>
+    <div class="command-item" onclick="launchApp('Markup Forge')"><span>Markup Forge</span><kbd>MD</kbd></div>
+    <div class="command-item" onclick="launchApp('Marketplace')"><span>Marketplace</span><kbd>Store</kbd></div>
+    <div class="command-item" onclick="launchApp('Lattice Settings')"><span>Lattice Settings</span><kbd>Set</kbd></div>
+    <div class="command-item" onclick="setTheme('cyan')"><span>Theme: Neon Cyan</span><kbd>Th+1</kbd></div>
+    <div class="command-item" onclick="setTheme('gold')"><span>Theme: Solar Gold</span><kbd>Th+2</kbd></div>
+    <div class="command-item" onclick="setTheme('crimson')"><span>Theme: Crimson Shard</span><kbd>Th+3</kbd></div>
+    <div class="command-item" onclick="setTheme('solar')"><span>Theme: Adaptive Solar</span><kbd>Th+4</kbd></div>
+    <div class="command-item" onclick="addLog('Σ [AUTO]: Optimizing Shard Lattice...', 'success')"><span>Optimize Lattice</span><kbd>Opt</kbd></div>
+</div>
+</div>
 
-    <!-- Central Clock & Theme Selector -->
-    <div class="zenith-top-panel">
-        <div class="theme-shards">
-            <div class="theme-shard cyan" onclick="setTheme('cyan')" title="Neon Cyan"></div>
-            <div class="theme-shard gold" onclick="setTheme('gold')" title="Solar Gold"></div>
-            <div class="theme-shard crimson" onclick="setTheme('crimson')" title="Crimson Shard"></div>
-            <div class="theme-shard solar" onclick="setTheme('solar')" title="Adaptive Solar"></div>
+<!-- Central Clock & Theme Selector -->
+<div class="zenith-top-panel">
+<div class="theme-shards">
+    <div class="theme-shard cyan" onclick="setTheme('cyan')" title="Neon Cyan"></div>
+    <div class="theme-shard gold" onclick="setTheme('gold')" title="Solar Gold"></div>
+    <div class="theme-shard crimson" onclick="setTheme('crimson')" title="Crimson Shard"></div>
+    <div class="theme-shard solar" onclick="setTheme('solar')" title="Adaptive Solar"></div>
+</div>
+<div class="clock-container">
+    <div id="clock-time">00:00</div>
+    <div id="clock-date">Tuesday, April 28</div>
+</div>
+<div class="persona-indicator" onclick="launchApp('Lattice Settings')">
+    <div class="persona-avatar">Σ</div>
+    <span id="top-user-name">Sovereign_User</span>
+</div>
+</div>
+
+<!-- Notification Center / Kernel Logs -->
+<div class="notification-center" id="kernel-logs">
+<!-- Logs will be injected here -->
+</div>
+
+<div id="zenith-desktop" class="zenith-desktop-root">
+<!-- Widgets -->
+<div class="widgets-container">
+<!-- Silicon Thermal Heatmap Widget -->
+<div class="widget">
+    <div class="widget-title">
+        <span>Silicon Heat Map</span>
+        <span class="accent">Thermal IQ</span>
+    </div>
+    <div class="thermal-grid">
+        <div class="thermal-shard ts-1"></div>
+        <div class="thermal-shard ts-2"></div>
+        <div class="thermal-shard ts-3"></div>
+        <div class="thermal-shard ts-4"></div>
+        <div class="thermal-shard ts-5"></div>
+        <div class="thermal-shard ts-6"></div>
+        <div class="thermal-shard ts-7"></div>
+        <div class="thermal-shard ts-8"></div>
+    </div>
+    <div class="stat-label">Avg Temp: 34°C (Optimal)</div>
+</div>
+
+<!-- Sovereign Trust Fabric Widget -->
+<div class="widget">
+    <div class="widget-title">
+        <span>Trust Fabric</span>
+        <span class="accent">Quantum-Synced</span>
+    </div>
+    <div class="stat-value" id="trust-level">99.9%</div>
+    <div class="stat-label">Keys Active: <span id="qkd-keys">128</span></div>
+    <div class="stat-bar">
+        <div class="stat-progress security" id="trust-progress" class="full-width"></div>
+    </div>
+    <div class="audit-info">Lattice Entropy: OPTIMAL</div>
+</div>
+
+<!-- NEW: Modular Shard Lattice Widget -->
+<div class="widget">
+    <div class="widget-title">
+        <span>Modular Lattice</span>
+        <span class="accent">600 Shards</span>
+    </div>
+    <div class="stat-value" id="shard-modularity">94.0%</div>
+    <div class="stat-label">Namespaces: <span class="accent">ISOLATED</span></div>
+    <div class="stat-bar">
+        <div class="stat-progress primary eighty-five-width"></div>
+    </div>
+    <div class="audit-info">Lattice State: ZENITH</div>
+</div>
+
+<!-- Sovereign Orb Marketplace Widget -->
+<div class="widget">
+    <div class="widget-title">
+        <span>Orb Marketplace</span>
+        <span class="accent">Mesh-Live</span>
+    </div>
+    <div class="market-list">
+        <div class="market-item">
+            <span>NeuralVisualizer-v2</span>
+            <button class="cyber-btn small-btn primary" onclick="addLog('Σ [MARKET]: Summoning Shard...')">SUMMON</button>
         </div>
-        <div class="clock-container">
-            <div id="clock-time">00:00</div>
-            <div id="clock-date">Tuesday, April 28</div>
-        </div>
-        <div class="persona-indicator" onclick="launchApp('Lattice Settings')">
-            <div class="persona-avatar">Σ</div>
-            <span id="top-user-name">Sovereign_User</span>
+        <div class="market-item">
+            <span>BioFS-DNA-Module</span>
+            <button class="cyber-btn small-btn primary" onclick="addLog('Σ [MARKET]: Summoning Shard...')">SUMMON</button>
         </div>
     </div>
+    <div class="audit-info">Trending: QuantumSieve-PQC</div>
+</div>
 
-    <!-- Notification Center / Kernel Logs -->
-    <div class="notification-center" id="kernel-logs">
-        <!-- Logs will be injected here -->
+<!-- Sovereign App Sharding Matrix Widget -->
+<div class="widget">
+    <div class="widget-title">
+        <span>App Sharding Matrix</span>
+        <span class="accent">Lattice-Dist</span>
     </div>
-
-    <div id="zenith-desktop" class="zenith-desktop-root">
-    <!-- Widgets -->
-    <div class="widgets-container">
-        <!-- Silicon Thermal Heatmap Widget -->
-        <div class="widget">
-            <div class="widget-title">
-                <span>Silicon Heat Map</span>
-                <span class="accent">Thermal IQ</span>
+    <div class="app-shard-list">
+        <div class="app-shard-item">
+            <div class="shard-item-header">
+                <span>OmniShell-v100</span>
+                <span class="accent">4 Shards</span>
             </div>
-            <div class="thermal-grid">
-                <div class="thermal-shard ts-1"></div>
-                <div class="thermal-shard ts-2"></div>
-                <div class="thermal-shard ts-3"></div>
-                <div class="thermal-shard ts-4"></div>
-                <div class="thermal-shard ts-5"></div>
-                <div class="thermal-shard ts-6"></div>
-                <div class="thermal-shard ts-7"></div>
-                <div class="thermal-shard ts-8"></div>
-            </div>
-            <div class="stat-label">Avg Temp: 34°C (Optimal)</div>
-        </div>
-
-        <!-- Sovereign Trust Fabric Widget -->
-        <div class="widget">
-            <div class="widget-title">
-                <span>Trust Fabric</span>
-                <span class="accent">Quantum-Synced</span>
-            </div>
-            <div class="stat-value" id="trust-level">99.9%</div>
-            <div class="stat-label">Keys Active: <span id="qkd-keys">128</span></div>
-            <div class="stat-bar">
-                <div class="stat-progress security" id="trust-progress" class="full-width"></div>
-            </div>
-            <div class="audit-info">Lattice Entropy: OPTIMAL</div>
-        </div>
-
-        <!-- Sovereign Orb Marketplace Widget -->
-        <div class="widget">
-            <div class="widget-title">
-                <span>Orb Marketplace</span>
-                <span class="accent">Mesh-Live</span>
-            </div>
-            <div class="market-list">
-                <div class="market-item">
-                    <span>NeuralVisualizer-v2</span>
-                    <button class="cyber-btn small-btn primary" onclick="addLog('Σ [MARKET]: Summoning Shard...')">SUMMON</button>
-                </div>
-                <div class="market-item">
-                    <span>BioFS-DNA-Module</span>
-                    <button class="cyber-btn small-btn primary" onclick="addLog('Σ [MARKET]: Summoning Shard...')">SUMMON</button>
-                </div>
-            </div>
-            <div class="audit-info">Trending: QuantumSieve-PQC</div>
-        </div>
-
-        <!-- Sovereign App Sharding Matrix Widget -->
-        <div class="widget">
-            <div class="widget-title">
-                <span>App Sharding Matrix</span>
-                <span class="accent">Lattice-Dist</span>
-            </div>
-            <div class="app-shard-list">
-                <div class="app-shard-item">
-                    <div class="shard-item-header">
-                        <span>OmniShell-v5</span>
-                        <span class="accent">4 Shards</span>
-                    </div>
-                    <div class="stat-bar thin-bar">
-                        <div class="stat-progress primary full-width"></div>
-                    </div>
-                </div>
-                <div class="app-shard-item">
-                    <div class="shard-item-header">
-                        <span>Zenith-Desktop-Pro</span>
-                        <span class="accent">12 Shards</span>
-                    </div>
-                    <div class="stat-bar thin-bar">
-                        <div class="stat-progress primary eighty-five-width"></div>
-                    </div>
-                </div>
-            </div>
-            <div class="audit-info">Active Shards: 16 | Efficiency: 99%</div>
-        </div>
-
-        <!-- Live Kernel Console Shard -->
-        <div class="kernel-console-shard" id="kernel-console">
-            <div class="console-header">
-                <span>LIVE KERNEL TELEMETRY</span>
-                <span>SHARD-ID: 0x8F2</span>
-            </div>
-            <div id="console-output" class="console-output">
-                <div>[0.000] Σ [ORCHESTRATOR]: Sharding Foundation...</div>
-                <div>[0.012] Σ [PMM]: Silicon Memory Shard ONLINE.</div>
-                <div>[0.045] Σ [VMM]: PML4 Tables Orchestrated.</div>
-                <div>[0.102] Σ [SEL]: Zero-Trust Policy Active.</div>
-                <div>[0.158] Σ [SYSBRIDGE]: POSIX-lite Shards Ready.</div>
-                <div>[0.210] Σ [LATTICE]: Heartbeat Sync Active.</div>
-                <div>[0.255] Σ [QKD]: BB84 Quantum Lattice Established.</div>
-                <div>[0.312] Σ [TRUST]: Fabric Unified & Sealed.</div>
-                <div>[0.380] Σ [APP-SHARD]: OmniShell Partitioned (4 Shards).</div>
-                <div>[0.445] Σ [PREDICT]: Shard Dispatch -> Node-0x8F (2ms).</div>
-                <div>[0.512] Σ [LATTICE]: Application Fabric ONLINE.</div>
+            <div class="stat-bar thin-bar">
+                <div class="stat-progress primary full-width"></div>
             </div>
         </div>
-
-        <div class="widget">
-            <div class="widget-title">
-                <span>Silicon Audit</span>
-                <span class="accent">16 Cores</span>
+        <div class="app-shard-item">
+            <div class="shard-item-header">
+                <span>Zenith-Desktop-Pro</span>
+                <span class="accent">12 Shards</span>
             </div>
-            <div class="stat-value" id="cpu-load">12%</div>
-            <svg viewBox="0 0 300 40" class="widget-graph">
-                <polyline id="cpu-graph" fill="none" stroke="var(--accent)" stroke-width="2"
-                    points="0,40 30,30 60,35 90,20 120,25 150,10 180,15 210,5 240,12 270,8 300,20" />
-            </svg>
-            <div class="stat-bar">
-                <div class="stat-progress" id="cpu-progress"></div>
+            <div class="stat-bar thin-bar">
+                <div class="stat-progress primary eighty-five-width"></div>
             </div>
         </div>
+    </div>
+    <div class="audit-info">Active Shards: 16 | Efficiency: 99%</div>
+</div>
 
-        <div class="widget">
-            <div class="widget-title">
-                <span>Memory Zenith</span>
-                <span class="accent">Slab Alloc</span>
-            </div>
-            <div class="stat-value" id="mem-load">4.2 GB</div>
-            <div class="stat-bar">
-                <div class="stat-progress" id="mem-progress"></div>
-            </div>
-        </div>
+<!-- Live Kernel Console Shard -->
+<div class="kernel-console-shard" id="kernel-console">
+    <div class="console-header">
+        <span>LIVE KERNEL TELEMETRY</span>
+        <span>SHARD-ID: 0x8F2</span>
+    </div>
+    <div id="console-output" class="console-output">
+        <div>[0.000] Σ [ORCHESTRATOR]: Sharding Foundation...</div>
+        <div>[0.012] Σ [PMM]: Silicon Memory Shard ONLINE.</div>
+        <div>[0.045] Σ [VMM]: PML4 Tables Orchestrated.</div>
+        <div>[0.102] Σ [SEL]: Zero-Trust Policy Active.</div>
+        <div>[0.158] Σ [SYSBRIDGE]: POSIX-lite Shards Ready.</div>
+        <div>[0.210] Σ [LATTICE]: Heartbeat Sync Active.</div>
+        <div>[0.255] Σ [QKD]: BB84 Quantum Lattice Established.</div>
+        <div>[0.312] Σ [TRUST]: Fabric Unified & Sealed.</div>
+        <div>[0.380] Σ [APP-SHARD]: OmniShell Partitioned (4 Shards).</div>
+        <div>[0.445] Σ [PREDICT]: Shard Dispatch -> Node-0x8F (2ms).</div>
+        <div>[0.512] Σ [LATTICE]: Application Fabric ONLINE.</div>
+    </div>
+</div>
+
+<div class="widget">
+    <div class="widget-title">
+        <span>Silicon Audit</span>
+        <span class="accent">16 Cores</span>
+    </div>
+    <div class="stat-value" id="cpu-load">12%</div>
+    <svg viewBox="0 0 300 40" class="widget-graph">
+        <polyline id="cpu-graph" fill="none" stroke="var(--accent)" stroke-width="2"
+            points="0,40 30,30 60,35 90,20 120,25 150,10 180,15 210,5 240,12 270,8 300,20" />
+    </svg>
+    <div class="stat-bar">
+        <div class="stat-progress" id="cpu-progress"></div>
+    </div>
+</div>
+
+<div class="widget">
+    <div class="widget-title">
+        <span>Memory Zenith</span>
+        <span class="accent">Slab Alloc</span>
+    </div>
+    <div class="stat-value" id="mem-load">4.2 GB</div>
+    <div class="stat-bar">
+        <div class="stat-progress" id="mem-progress"></div>
+    </div>
+</div>
 
         <div class="widget">
             <div class="widget-title">
