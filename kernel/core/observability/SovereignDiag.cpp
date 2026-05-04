@@ -1,28 +1,12 @@
-#include "sigma_diag.h"
-#include "sigma_hal.h"
+#include "../../../include/sigma_diag.h"
+#include "../../../include/sigma_hal.h"
 #include "../../../include/SovereignLibC.h"
 
-extern "C" uint32_t time_get_uptime_ms(void);
+extern "C" sigma_u32 time_get_uptime_ms(void);
 
-/**
- * SigmaOS Sovereign Diag — SDFL Implementation
- * OOP-isolated singleton — SovereignDiagEngine.
- */
-
-class SovereignDiagEngine {
-public:
-    static SovereignDiagEngine& getInstance();
-
-    void init();
-    void reportFault(uint32_t component_id, uint32_t error_code);
-    void localizeFault();
-
-private:
-    SovereignDiagEngine() : fault_count(0) {}
-    
-    sigma_diag_event_t fault_lattice[256];
-    uint32_t fault_count;
-};
+namespace SigmaOS {
+namespace Kernel {
+namespace Observability {
 
 SovereignDiagEngine& SovereignDiagEngine::getInstance() {
     static SovereignDiagEngine instance;
@@ -34,7 +18,7 @@ void SovereignDiagEngine::init() {
     this->fault_count = 0;
 }
 
-void SovereignDiagEngine::reportFault(uint32_t component_id, uint32_t error_code) {
+void SovereignDiagEngine::reportFault(sigma_u32 component_id, sigma_u32 error_code) {
     if (this->fault_count >= 256) return;
 
     sigma_diag_event_t* event = &this->fault_lattice[this->fault_count++];
@@ -49,22 +33,26 @@ void SovereignDiagEngine::reportFault(uint32_t component_id, uint32_t error_code
 
 void SovereignDiagEngine::localizeFault() {
     sigma_log("[DIAG] SDFL: Localizing machine-state anomalies...");
-    for (uint32_t i = 0; i < this->fault_count; i++) {
+    for (sigma_u32 i = 0; i < this->fault_count; i++) {
         sigma_printf("[DIAG] SDFL: Correlating C%02u -> Silicon Gate G%u\n",
                      this->fault_lattice[i].component_id, i % 8u);
     }
     sigma_log("[DIAG] Localization COMPLETE. Faulty shards isolated.");
 }
 
-/* --- C Wrappers --- */
+} // namespace Observability
+} // namespace Kernel
+} // namespace SigmaOS
+
+/* --- C Bridge --- */
 extern "C" void diag_init() {
-    SovereignDiagEngine::getInstance().init();
+    SigmaOS::Kernel::Observability::SovereignDiagEngine::getInstance().init();
 }
 
-extern "C" void diag_report_fault(uint32_t component_id, uint32_t error_code) {
-    SovereignDiagEngine::getInstance().reportFault(component_id, error_code);
+extern "C" void diag_report_fault(sigma_u32 component_id, sigma_u32 error_code) {
+    SigmaOS::Kernel::Observability::SovereignDiagEngine::getInstance().reportFault(component_id, error_code);
 }
 
 extern "C" void diag_localize_fault() {
-    SovereignDiagEngine::getInstance().localizeFault();
+    SigmaOS::Kernel::Observability::SovereignDiagEngine::getInstance().localizeFault();
 }

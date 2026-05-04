@@ -13,10 +13,6 @@
 
 #include "sigma_types.h"
 
-#ifdef __cplusplus
-extern "C" {
-#endif
-
 /* --- Orchestration Patterns --- */
 #define SIGMA_KUBE_PATTERN_SINGLETON  0x00u  /* Exactly one shard active     */
 #define SIGMA_KUBE_PATTERN_REPLICA    0x01u  /* N identical shards (HA)      */
@@ -41,6 +37,46 @@ typedef struct {
     sigma_u32 total_pods;      /* Total active shards managed      */
     sigma_u32 self_heals;      /* Telemetry: automatic recoveries  */
 } sigma_kube_state_t;
+
+#ifdef __cplusplus
+namespace SigmaOS {
+namespace Kernel {
+namespace AI {
+
+class SovereignKubeEngine {
+public:
+    static SovereignKubeEngine& getInstance();
+
+    void init();
+    sigma_u32 createDeployment(const char* name, sigma_u32 container_id,
+                              sigma_u32 pattern, sigma_u32 replicas);
+    void scaleDeployment(sigma_u32 deployment_id, sigma_u32 replicas);
+    void deleteDeployment(sigma_u32 deployment_id);
+    void reconcileLattice();
+    const sigma_kube_state_t* getState() const;
+
+private:
+    SovereignKubeEngine() : next_deployment_id(1), initialized(0) {
+        this->state.active_deployments = 0u;
+        this->state.total_pods = 0u;
+        this->state.self_heals = 0u;
+    }
+
+    sigma_kube_deployment_t* findDeployment(sigma_u32 id);
+
+    sigma_kube_state_t state;
+    sigma_u32          next_deployment_id;
+    sigma_u32          initialized;
+};
+
+} // namespace AI
+} // namespace Kernel
+} // namespace SigmaOS
+#endif
+
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 /* --- Kube Primitives --- */
 void      kube_init(void);

@@ -1,18 +1,14 @@
+#include "../../../include/sigma_aisched.h"
 #include "../../../include/SovereignLibC.h"
-#include "../../../include/sigma_types.h"
-#include "sigma_hal.h"
-#include "sigma_aisched.h"
 
-/**
- * SigmaOS Sovereign AI-Optimized Scheduler
- * Implements a Neural Predictive Workload Orchestration (NPWO) algorithm.
- * ZERO-DEPENDENCY: Strictly bare-metal ML-driven scheduling.
- *
- * Design: OOP-isolated singleton — SovereignAISchedEngine.
- */
+namespace SigmaOS {
+namespace Kernel {
+namespace AI {
 
-
-/* --- Sovereign AI Scheduler Engine (OOP Isolation) --- */
+SovereignAISchedEngine& SovereignAISchedEngine::getInstance() {
+    static SovereignAISchedEngine instance;
+    return instance;
+}
 
 void SovereignAISchedEngine::init() {
     sigma_log("[AISCHED] Initializing Sovereign AI-Optimized Scheduler (NPWO Algorithm)...");
@@ -44,20 +40,23 @@ void SovereignAISchedEngine::setMode(sigma_aisched_mode_t mode) {
     sigma_printf("[AISCHED] Scheduler mode updated to %u\n", (unsigned)mode);
 }
 
-/* --- C Wrappers --- */
+} // namespace AI
+} // namespace Kernel
+} // namespace SigmaOS
+
+/* --- C Bridge --- */
 extern "C" void aisched_init() {
-    SovereignAISchedEngine::getInstance().init();
+    SigmaOS::Kernel::AI::SovereignAISchedEngine::getInstance().init();
 }
 
 extern "C" void aisched_predict_workload(sigma_u32 process_id) {
-    SovereignAISchedEngine::getInstance().predictWorkload(process_id);
+    SigmaOS::Kernel::AI::SovereignAISchedEngine::getInstance().predictWorkload(process_id);
 }
 
 extern "C" void aisched_set_mode(sigma_aisched_mode_t mode) {
-    SovereignAISchedEngine::getInstance().setMode(mode);
+    SigmaOS::Kernel::AI::SovereignAISchedEngine::getInstance().setMode(mode);
 }
 
 extern "C" sigma_u64 aisched_get_prediction_count() {
-    return SovereignAISchedEngine::getInstance().getPredictionCount();
+    return SigmaOS::Kernel::AI::SovereignAISchedEngine::getInstance().getPredictionCount();
 }
-

@@ -1432,3 +1432,136 @@ body {
             animation: neuralBreathe 3s infinite ease-in-out;
             border-color: var(--accent) !important;
         }
+
+/* Utility Shards & Component Overrides */
+.market-item {
+    background: rgba(255,255,255,0.05);
+    padding: 8px;
+    border-radius: 6px;
+    font-size: 0.8em;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 8px;
+    border: 1px solid transparent;
+    transition: all 0.3s var(--transition);
+}
+.market-item:hover {
+    background: var(--panel-bg);
+    border-color: var(--accent);
+}
+
+.app-shard-item {
+    background: rgba(255,255,255,0.05);
+    padding: 8px;
+    border-radius: 6px;
+    font-size: 0.8em;
+    margin-bottom: 8px;
+}
+
+.shard-item-header {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 4px;
+}
+
+.stat-bar.thin-bar {
+    height: 4px;
+}
+
+.kernel-console-shard {
+    position: fixed;
+    bottom: 60px;
+    right: 20px;
+    width: 350px;
+    height: 220px;
+    background: rgba(0,0,0,0.85);
+    -webkit-backdrop-filter: blur(20px);
+    backdrop-filter: blur(20px);
+    border: 1px solid rgba(0,255,255,0.2);
+    border-radius: 12px;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+    z-index: 1000;
+}
+
+.console-header {
+    background: rgba(255,255,255,0.05);
+    padding: 8px 12px;
+    font-size: 0.7em;
+    color: var(--accent);
+    display: flex;
+    justify-content: space-between;
+    border-bottom: 1px solid rgba(255,255,255,0.1);
+}
+
+.console-output {
+    flex: 1;
+    padding: 10px;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.75em;
+    color: rgba(255,255,255,0.8);
+    overflow-y: auto;
+}
+
+.cognitive-queue {
+    margin-top: 10px;
+    max-height: 40px;
+    overflow: hidden;
+    font-size: 0.8em;
+    color: var(--accent);
+}
+
+.broadcast-textarea {
+    height: 100px !important;
+}
+
+.broadcast-sites-textarea {
+    height: 120px !important;
+}
+
+.hidden-window { display: none; }
+.full-width { width: 100%; }
+.accent-bg { background: var(--accent) !important; box-shadow: 0 0 15px var(--accent-glow); }
+.success-bg { background: var(--success) !important; box-shadow: 0 0 10px var(--success); }
+
+.mesh-svg-canvas {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+}
+
+.firewall-controls {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 15px;
+}
+
+.firewall-input {
+    height: 45px !important;
+    margin: 0 !important;
+}
+
+.firewall-btn {
+    height: 45px;
+}
+
+.blocked-list {
+    max-height: 200px;
+    overflow-y: auto;
+}
+
+.market-list, .app-shard-list {
+    margin-top: 10px;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.eighty-five-width { width: 85%; }
+
