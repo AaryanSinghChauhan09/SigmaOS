@@ -57,14 +57,12 @@ KERNEL_SHARDS = kernel/core/system/SovereignMain.o \
                 kernel/core/security/SovereignSandbox.o \
                 kernel/core/security/SovereignAppArmor.o \
                 kernel/core/security/SovereignAmnesicIncognito.o \
-                kernel/core/security/SovereignQKD.o \
-                kernel/core/security/SovereignVault.o \
                 kernel/core/network/SovereignMeshLattice.o \
                 kernel/core/network/SovereignZeroNet.o \
+                kernel/core/network/SovereignAetherNet.o \
+                kernel/core/industrial/SovereignOrbRegistry.o \
                 kernel/core/deployment/SovereignKube.o \
                 kernel/core/security/SovereignFocus.o \
-                kernel/core/memory/SovereignPMM.o \
-                kernel/core/memory/SovereignVMM.o \
                 kernel/core/process/SovereignPSE.o \
                 kernel/core/deployment/SovereignCI.o \
                 kernel/core/deployment/SovereignAtomicUpdater.o \
