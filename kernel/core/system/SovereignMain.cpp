@@ -14,7 +14,7 @@ SovereignKernelMain& SovereignKernelMain::getInstance() {
 }
 
 void SovereignKernelMain::ignite() {
-    sigma_printf("\nΣ SIGMAOS ZENITH SUPREME (v94.0) IGNITING...\n");
+    sigma_printf("\nΣ SIGMAOS ZENITH SINGULARITY (v100.0) IGNITING...\n");
     sigma_printf("--------------------------------------------------\n");
 
     // Sovereign 4-Phase Shard Orchestration
