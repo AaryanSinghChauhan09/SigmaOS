@@ -54,6 +54,7 @@ KERNEL_SHARDS = kernel/core/system/SovereignMain.o \
                 kernel/core/ai/SovereignNeuralNexus.o \
                 kernel/core/ai/SovereignNeuralAutomator.o \
                 kernel/core/ai/SovereignTaskAutomator.o \
+                kernel/core/ai/SovereignScriptNexus.o \
                 kernel/core/community/SovereignGovernance.o \
                 kernel/core/security/SovereignSandbox.o \
                 kernel/core/security/SovereignAppArmor.o \

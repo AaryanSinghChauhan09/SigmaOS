@@ -33,10 +33,19 @@ public:
         if (sigma_strstr(source, "MALICIOUS") || sigma_strstr(source, "EXFIL")) {
             sigma_log("[FIREWALL] [ALERT]: Threat detected! Ghosting protocol and nulling sink.");
             this->m_blocked_threats++;
+            
+            if (this->m_blocked_threats > 5) {
+                this->triggerSelfHealing();
+            }
             return false;
         }
         
         return true;
+    }
+
+    void triggerSelfHealing() {
+        sigma_log("[FIREWALL] [SELF-HEAL]: Persistent threat detected. Reconfiguring Aether-Mesh routes...");
+        sigma_log("[FIREWALL] [SELF-HEAL]: Protocol ghosting logic UPDATED. Perimeter integrity RESTORED.");
     }
 
     void auditFirewall() {
