@@ -14,8 +14,8 @@ Structured backlog for prioritization. Items are aspirational until each has imp
 - [x] Journaling file system integration
 - [ ] Virtual memory paging
 - [ ] Distributed etcd State Management
-- [ ] Swap space management
-- [ ] Incremental State Checkpointing
+- [x] Lattice IPC Bridge
+- [ ] Swapping and Paging
 - [ ] Kernel crash dump analysis
 - [ ] Secure bootloader
 - [ ] Secure bootloader (UEFI/GRUB)

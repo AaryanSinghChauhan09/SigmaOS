@@ -1,57 +1,64 @@
-/*
- * =========================================================================
- * Σ SIGMAOS: SOVEREIGN INTER-PROCESS COMMUNICATION (IPC)
- * =========================================================================
- * Mission: Zero-copy shard-mapped message passing.
- * =========================================================================
- */
-
 #ifndef SIGMA_IPC_H
 #define SIGMA_IPC_H
 
-#include "sigma_types.h"
+#include "sigma_kernel_types.h"
+#include "SigmaOOP.hpp"
+
+namespace SigmaOS {
+namespace Kernel {
+namespace IPC {
+
+class SovereignSharedMemory : public SigmaObject {
+public:
+    static SovereignSharedMemory& getInstance() {
+        static SovereignSharedMemory instance;
+        return instance;
+    }
+
+    const char* type_name() const noexcept override { return "SovereignSharedMemory"; }
+
+    void init();
+    void* createSegment(const char* segment_id, sigma_usize size);
+    void audit();
+
+private:
+    SovereignSharedMemory() {}
+};
+
+class SovereignMessageBus : public SigmaObject {
+public:
+    static SovereignMessageBus& getInstance() {
+        static SovereignMessageBus instance;
+        return instance;
+    }
+
+    const char* type_name() const noexcept override { return "SovereignMessageBus"; }
+
+    void init();
+    void sendMessage(sigma_u32 target_id, const void* data, sigma_usize size);
+    void receiveMessage(void* buffer, sigma_usize max_size);
+
+private:
+    SovereignMessageBus() {}
+};
+
+} // namespace IPC
+} // namespace Kernel
+} // namespace SigmaOS
 
 #ifdef __cplusplus
 extern "C" {
 #endif
 
-typedef struct {
-    sigma_u32 target_shard;
-    sigma_u32 message_type;
-    sigma_u32 payload[8];
-} sigma_ipc_msg_t;
+void  shmem_init(void);
+void* shmem_create(const char* id, sigma_usize sz);
+void  shmem_audit(void);
 
-/* --- IPC Primitives --- */
-void      ipc_init(void);
-bool      ipc_send_optimized(sigma_u32 target, sigma_u32 type, sigma_u32* data);
-bool      ipc_receive_optimized(sigma_ipc_msg_t* out_msg);
-sigma_u64 ipc_get_dispatched_count(void);
+void  ipc_bus_init(void);
+void  ipc_bus_send(sigma_u32 target, const void* data, sigma_usize sz);
 
 #ifdef __cplusplus
 }
-
-class SovereignIPCManager {
-public:
-    static SovereignIPCManager& getInstance() {
-        static SovereignIPCManager instance;
-        return instance;
-    }
-
-    void init();
-    bool sendOptimized(sigma_u32 target, sigma_u32 type, sigma_u32* data);
-    bool receiveOptimized(sigma_ipc_msg_t* out_msg);
-    sigma_u64 getDispatchedCount() const { return this->messages_dispatched; }
-
-private:
-    SovereignIPCManager() : head(0), tail(0), queue_size(256), messages_dispatched(0), initialized(0) {}
-    
-    sigma_ipc_msg_t queue[256];
-    sigma_u32       head;
-    sigma_u32       tail;
-    sigma_u32       queue_size;
-    sigma_u64       messages_dispatched;
-    sigma_u32       initialized;
-};
 #endif
 
-#endif /* SIGMA_IPC_H */
+#endif // SIGMA_IPC_H
