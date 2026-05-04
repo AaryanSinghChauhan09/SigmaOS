@@ -1,5 +1,5 @@
-#include "../../../include/sigma_main.h"
-#include "../../../include/SovereignLibC.h"
+#include "sigma_main.h"
+#include "SovereignLibC.h"
 
 // Engine Initialisers (Extern C)
 extern "C" void sigma_bootstrap_lattice();

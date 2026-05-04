@@ -1,6 +1,6 @@
-#include "../../../include/sigma_time.h"
-#include "../../../include/SovereignLibC.h"
-#include "../../../include/SigmaOOP.hpp"
+#include "sigma_time.h"
+#include "SovereignLibC.h"
+#include "SigmaOOP.hpp"
 
 /**
  * SigmaOS Sovereign Time Engine
@@ -53,7 +53,7 @@ extern "C" sigma_u64 time_get_uptime_ms() {
 }
 
 extern "C" sigma_time_t time_now() {
-    sigma_time_t t = {0};
+    sigma_time_t t = {0, 0, 0, 0, 0, 0, 0};
     t.silicon_ticks = SigmaOS::Kernel::System::SovereignTime::getInstance().getUptimeMs();
     return t;
 }

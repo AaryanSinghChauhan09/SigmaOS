@@ -17,7 +17,7 @@ This document outlines 100 critical improvements across 10 strategic domains, to
 9. **Lattice-Wide IPC**: High-speed zero-copy message bus across nodes.
 10. **Self-Healing Syscalls**: Automated redirection of failing kernel services.
 
-*(Items 11–100 focus on: Atomic Paging, NUMA-aware allocation, Interrupt Sharding, Hyper-threading optimization, etc.)*
+> Items 11–100 focus on: Atomic Paging, NUMA-aware allocation, Interrupt Sharding, Hyper-threading optimization, etc.
 
 ## 2. Automations (ML-Driven Intelligence)
 
@@ -32,7 +32,7 @@ This document outlines 100 critical improvements across 10 strategic domains, to
 9. **Network Self-Healing**: Automated protocol ghosting when intrusion is detected.
 10. **Visual Node-Based Scripting**: No-code automation for system-level logic.
 
-*(Items 21–100 focus on: Automated dependency resolution, AI-native bug patching, etc.)*
+> Items 21–100 focus on: Automated dependency resolution, AI-native bug patching, etc.
 
 ## 3. Customizations (Shard-Level Sovereignty)
 
@@ -47,7 +47,7 @@ This document outlines 100 critical improvements across 10 strategic domains, to
 9. **Zenith Layout Shards**: Save and share workspace arrangements.
 10. **Hardware Emulation Shards**: Run legacy x86 logic in isolated containers.
 
-*(Items 31–100 focus on: Custom font rendering, Boot anims, Keymap sharding, etc.)*
+> Items 31–100 focus on: Custom font rendering, Boot anims, Keymap sharding, etc.
 
 ## 4. Personalisations (Habit & Emotion Sensing)
 
@@ -62,7 +62,7 @@ This document outlines 100 critical improvements across 10 strategic domains, to
 9. **Biometric Identity Shards**: Multi-factor iris/fingerprint workspace loading.
 10. **Community-Curated Personas**: Downloadable OS personalities.
 
-*(Items 41–100 focus on: Ambient light adaptation, Haptic feedback profiles, etc.)*
+> Items 41–100 focus on: Ambient light adaptation, Haptic feedback profiles, etc.
 
 ## 5. Ease of Use (Natural & Hybrid Interaction)
 
@@ -77,7 +77,7 @@ This document outlines 100 critical improvements across 10 strategic domains, to
 9. **Zero-Config Lattice Net**: Automated P2P discovery and connection.
 10. **Sovereign PWA Wrapper**: Installable dashboard on any browser-capable device.
 
-*(Items 51–100 focus on: Gesture navigation, Voice commands, Tooltip translation, etc.)*
+> Items 51–100 focus on: Gesture navigation, Voice commands, Tooltip translation, etc.
 
 ## 6. User Interface (Zenith v3 Graphics)
 
@@ -92,7 +92,7 @@ This document outlines 100 critical improvements across 10 strategic domains, to
 9. **Dynamic Gamut Shifting**: Real-time color space adaptation.
 10. **Retro-Shard CRT Mimicry**: Legacy terminal emulation with scanlines.
 
-*(Items 61–100 focus on: Neon accents, Fluid transitions, Dynamic shadows, etc.)*
+> Items 61–100 focus on: Neon accents, Fluid transitions, Dynamic shadows, etc.
 
 ## 7. User Experience (Spatial & Telepathic)
 
@@ -107,7 +107,7 @@ This document outlines 100 critical improvements across 10 strategic domains, to
 9. **Immersive Audio OS**: 3D spatial sound for system events.
 10. **Focus-Lock Hardware**: Silicon-level social media/distraction blocking.
 
-*(Items 71–100 focus on: Haptic UI, Distance-aware UI, Sleep-tracking, etc.)*
+> Items 71–100 focus on: Haptic UI, Distance-aware UI, Sleep-tracking, etc.
 
 ## 8. Cyber Security (Hardened Sovereignty)
 
@@ -122,7 +122,7 @@ This document outlines 100 critical improvements across 10 strategic domains, to
 9. **Bit-Rot Detection**: Background scanning for silicon decay.
 10. **Self-Destructing Data Shards**: Timed wiping for sensitive blobs.
 
-*(Items 81–100 focus on: Honey-shards, Intrusion wiping, BIOS hardening, etc.)*
+> Items 81–100 focus on: Honey-shards, Intrusion wiping, BIOS hardening, etc.
 
 ## 9. Cloud-Native Lattice (Orchestration)
 
@@ -137,7 +137,7 @@ This document outlines 100 critical improvements across 10 strategic domains, to
 9. **Edge-Node Synchronization**: Optimized sync for low-power IoT.
 10. **Universal Web-Bridge**: Participate in lattice via Browser WebSockets.
 
-*(Items 91–100 focus on: Multi-tenant isolation, Mesh-Net routing, etc.)*
+> Items 91–100 focus on: Multi-tenant isolation, Mesh-Net routing, etc.
 
 ## 10. Industrial Performance (Silicon Power)
 
@@ -152,7 +152,7 @@ This document outlines 100 critical improvements across 10 strategic domains, to
 9. **AVX Compositor Shard**: UI rendering offloaded to vector units.
 10. **Lattice Telemetry Graphing**: Visualizing hardware health in 4K.
 
-*(Items 101–1000+: Continuous industrial refinement through 600+ shards.)*
+> Items 101–1000+: Continuous industrial refinement through 600+ shards.
 
 ---
 

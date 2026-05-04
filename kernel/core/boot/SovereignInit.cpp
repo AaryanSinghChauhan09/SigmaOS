@@ -1,4 +1,4 @@
-#include "../../../include/SovereignLibC.h"
+#include "SovereignLibC.h"
 #include "sigma_hal.h"
 #include "SovereignNeuralNexus.hpp"
 #include "SovereignVFS.hpp"
@@ -13,6 +13,10 @@ extern "C" void allocator_init();
  * Design: OOP-isolated singleton — SovereignInitEngine.
  */
 
+namespace SigmaOS {
+namespace Kernel {
+namespace Boot {
+
 class SovereignInitEngine {
 public:
     static SovereignInitEngine& getInstance() {
@@ -22,7 +26,7 @@ public:
 
     void init() {
         sigma_log("[INIT] Initializing Sovereign Asynchronous Init Engine (ASI Algorithm)...");
-        this->initialized = 1u;
+        this->m_initialized = 1u;
     }
 
     void executePlan() {
@@ -37,12 +41,12 @@ public:
         sigma_log("[INIT] ASI: Igniting Sovereign Neural Nexus...");
         neural_init();
         char morphic_shard[64];
-        SovereignNeuralEngine::getInstance().transpileUI("zenith_desktop.css", morphic_shard);
+        SigmaOS::Kernel::AI::SovereignNeuralEngine::getInstance().transpileUI("zenith_desktop.css", morphic_shard);
         
         // Stage 3: Distributed VFS
         sigma_log("[INIT] ASI: Syncing Distributed VFS Shards...");
         vfs_init();
-        SovereignDistributedVFS::getInstance().atomicSync();
+        SigmaOS::Kernel::FS::SovereignDistributedVFS::getInstance().atomicSync();
         
         sigma_printf("[INIT] ASI: Parallel Group Ignited. 600 Shards Active.\n");
     }
@@ -52,19 +56,23 @@ public:
     }
 
 private:
-    SovereignInitEngine() : initialized(0) {}
-    sigma_u32 initialized;
+    SovereignInitEngine() : m_initialized(0) {}
+    sigma_u32 m_initialized;
 };
+
+} // namespace Boot
+} // namespace Kernel
+} // namespace SigmaOS
 
 /* --- C Wrappers --- */
 extern "C" void sinit_init() {
-    SovereignInitEngine::getInstance().init();
+    SigmaOS::Kernel::Boot::SovereignInitEngine::getInstance().init();
 }
 
 extern "C" void sinit_execute_plan() {
-    SovereignInitEngine::getInstance().executePlan();
+    SigmaOS::Kernel::Boot::SovereignInitEngine::getInstance().executePlan();
 }
 
 extern "C" void sinit_report_status() {
-    SovereignInitEngine::getInstance().reportStatus();
+    SigmaOS::Kernel::Boot::SovereignInitEngine::getInstance().reportStatus();
 }

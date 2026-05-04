@@ -13,11 +13,11 @@ CXXFLAGS = -ffreestanding -O2 -Wall -Wextra -Werror -fno-exceptions -fno-rtti -s
 ASFLAGS  = -f elf64
 
 KERNEL_SHARDS = kernel/core/system/SovereignMain.o \
-                kernel/core/system/SovereignInit.o \
-                kernel/core/system/SovereignIPC.o \
+                kernel/core/boot/SovereignInit.o \
+                kernel/core/ipc/SovereignIPC.o \
                 kernel/core/memory/SovereignMMU.o \
                 kernel/core/ai/SovereignAISched.o \
-                kernel/core/system/SovereignSMP.o \
+                kernel/core/hal/SovereignSMP.o \
                 kernel/core/misc_utils/SovereignLazy.o \
                 kernel/core/misc_utils/SovereignSnap.o \
                 kernel/core/ai/SovereignKube.o \
@@ -27,17 +27,16 @@ KERNEL_SHARDS = kernel/core/system/SovereignMain.o \
                 kernel/core/system/SovereignKernelIO.o \
                 kernel/core/memory/SovereignAllocator.o \
                 kernel/core/system/SovereignLog.o \
-                kernel/core/system/SovereignProcess.o \
-                kernel/core/system/SovereignHypervisor.o \
-                kernel/core/system/SovereignOrchestrator.o \
-                kernel/core/system/SovereignDiag.o \
+                kernel/core/process/SovereignProcess.o \
+                kernel/core/virtualization/SovereignHypervisor.o \
+                kernel/core/orchestration/SovereignOrchestrator.o \
+                kernel/core/observability/SovereignDiag.o \
                 kernel/core/system/SovereignBoot.o \
                 kernel/core/security/SovereignSecHardener.o \
                 kernel/core/fs/SovereignVFS.o \
                 kernel/core/security/SovereignEntropy.o \
                 kernel/core/memory/SovereignPMM.o \
                 kernel/core/memory/SovereignVMM.o \
-                kernel/core/system/SovereignDiag.o \
                 kernel/core/system/SovereignTime.o \
                 kernel/core/system/SovereignAppShard.o \
                 kernel/core/fs/SovereignDNACompression.o \
@@ -51,7 +50,9 @@ KERNEL_SHARDS = kernel/core/system/SovereignMain.o \
                 kernel/core/ai/SovereignNeuralNexus.o \
                 kernel/core/ai/SovereignNeuralAutomator.o \
                 kernel/core/community/SovereignGovernance.o \
+                kernel/core/security/SovereignSandbox.o \
                 kernel/shards/system/SovereignLibC.o \
+                kernel/core/container/SovereignContainer.o \
                 kernel/core/misc_utils/SovereignTests.o
 
 .PHONY: all singularity zenith-iso qemu clean

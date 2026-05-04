@@ -1,6 +1,6 @@
-#include "../../../include/sigma_pqc.h"
-#include "../../../include/sigma_hal.h"
-#include "../../../include/SovereignLibC.h"
+#include "sigma_pqc.h"
+#include "sigma_hal.h"
+#include "SovereignLibC.h"
 
 namespace SigmaOS {
 namespace Kernel {

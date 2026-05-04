@@ -1,5 +1,5 @@
-#include "../../../include/SovereignLibC.h"
-#include "../../../include/sigma_types.h"
+#include "SovereignLibC.h"
+#include "sigma_types.h"
 #include "sigma_hal.h"
 
 /**
@@ -12,6 +12,10 @@
  * Design: OOP-isolated singleton — SovereignContainerEngine.
  */
 
+namespace SigmaOS {
+namespace Kernel {
+namespace Container {
+
 class SovereignContainerEngine {
 public:
     static SovereignContainerEngine& getInstance() {
@@ -21,18 +25,18 @@ public:
 
     void init() {
         sigma_log("[CONTAINER] Initializing Sovereign Container Layer (Micro-VMs)...");
-        this->active_containers = 0;
-        this->initialized = true;
+        this->m_active_containers = 0;
+        this->m_initialized = true;
         sigma_log("[CONTAINER] Silicon-native container virtualization is ACTIVE.");
     }
 
     sigma_u32 spawnContainer(const char* image_name) {
-        if (!this->initialized || this->active_containers >= 32) {
+        if (!this->m_initialized || this->m_active_containers >= 32) {
             sigma_log("[CONTAINER] [ERROR] Max container limit reached or engine offline.");
             return 0;
         }
 
-        sigma_u32 container_id = ++this->active_containers;
+        sigma_u32 container_id = ++this->m_active_containers;
         sigma_printf("[CONTAINER] Spawning Micro-VM Container C%02X from image '%s'...\n", container_id, image_name);
         
         // Simulate namespace and cgroup isolation
@@ -42,26 +46,30 @@ public:
 
     void destroyContainer(sigma_u32 container_id) {
         sigma_printf("[CONTAINER] Terminating Micro-VM Container C%02X...\n", container_id);
-        this->active_containers--;
+        if (this->m_active_containers > 0) this->m_active_containers--;
         sigma_log("[CONTAINER] Resources freed. Container destroyed.");
     }
 
 private:
-    SovereignContainerEngine() : active_containers(0), initialized(false) {}
+    SovereignContainerEngine() : m_active_containers(0), m_initialized(false) {}
 
-    sigma_u32 active_containers;
-    bool initialized;
+    sigma_u32 m_active_containers;
+    bool m_initialized;
 };
+
+} // namespace Container
+} // namespace Kernel
+} // namespace SigmaOS
 
 /* --- C Wrappers --- */
 extern "C" void container_init() {
-    SovereignContainerEngine::getInstance().init();
+    SigmaOS::Kernel::Container::SovereignContainerEngine::getInstance().init();
 }
 
 extern "C" sigma_u32 container_spawn(const char* image_name) {
-    return SovereignContainerEngine::getInstance().spawnContainer(image_name);
+    return SigmaOS::Kernel::Container::SovereignContainerEngine::getInstance().spawnContainer(image_name);
 }
 
 extern "C" void container_destroy(sigma_u32 container_id) {
-    SovereignContainerEngine::getInstance().destroyContainer(container_id);
+    SigmaOS::Kernel::Container::SovereignContainerEngine::getInstance().destroyContainer(container_id);
 }

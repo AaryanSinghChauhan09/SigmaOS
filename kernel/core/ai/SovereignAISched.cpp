@@ -1,5 +1,5 @@
-#include "../../../include/sigma_aisched.h"
-#include "../../../include/SovereignLibC.h"
+#include "sigma_aisched.h"
+#include "SovereignLibC.h"
 
 namespace SigmaOS {
 namespace Kernel {
@@ -7,7 +7,7 @@ namespace AI {
 
 void SovereignAISchedEngine::init() {
     sigma_log("[AISCHED] Initializing Sovereign AI-Optimized Scheduler (NPWO Algorithm)...");
-    this->initialized = 1u;
+    this->m_initialized = 1u;
 }
 
 void SovereignAISchedEngine::predictWorkload(sigma_u32 process_id) {
@@ -15,9 +15,9 @@ void SovereignAISchedEngine::predictWorkload(sigma_u32 process_id) {
      * Uses lightweight on-device ML to predict process resource needs. */
     
     sigma_printf("[AISCHED] NPWO: Analyzing workload patterns for PID %u...\n", process_id);
-    this->prediction_count++;
+    this->m_prediction_count++;
     
-    switch (this->current_mode) {
+    switch (this->m_current_mode) {
         case AISCHED_MODE_ENERGY_EFFICIENT:
             sigma_log("[AISCHED] NPWO: Throttling non-critical threads for energy efficiency.");
             break;
@@ -31,7 +31,7 @@ void SovereignAISchedEngine::predictWorkload(sigma_u32 process_id) {
 }
 
 void SovereignAISchedEngine::setMode(sigma_aisched_mode_t mode) {
-    this->current_mode = mode;
+    this->m_current_mode = mode;
     sigma_printf("[AISCHED] Scheduler mode updated to %u\n", (unsigned)mode);
 }
 

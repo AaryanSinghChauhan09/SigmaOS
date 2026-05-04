@@ -1,6 +1,6 @@
-#include "../../../include/sigma_diag.h"
-#include "../../../include/sigma_hal.h"
-#include "../../../include/SovereignLibC.h"
+#include "sigma_diag.h"
+#include "sigma_hal.h"
+#include "SovereignLibC.h"
 
 extern "C" sigma_u32 time_get_uptime_ms(void);
 
@@ -15,13 +15,13 @@ SovereignDiagEngine& SovereignDiagEngine::getInstance() {
 
 void SovereignDiagEngine::init() {
     sigma_log("[DIAG] Initializing Sovereign System Diagnostics Nexus...");
-    this->fault_count = 0;
+    this->m_fault_count = 0;
 }
 
 void SovereignDiagEngine::reportFault(sigma_u32 component_id, sigma_u32 error_code) {
-    if (this->fault_count >= 256) return;
+    if (this->m_fault_count >= 256) return;
 
-    sigma_diag_event_t* event = &this->fault_lattice[this->fault_count++];
+    sigma_diag_event_t* event = &this->m_fault_lattice[this->m_fault_count++];
     event->component_id = component_id;
     event->error_vector  = error_code;
     event->silicon_tick  = time_get_uptime_ms();
@@ -33,9 +33,9 @@ void SovereignDiagEngine::reportFault(sigma_u32 component_id, sigma_u32 error_co
 
 void SovereignDiagEngine::localizeFault() {
     sigma_log("[DIAG] SDFL: Localizing machine-state anomalies...");
-    for (sigma_u32 i = 0; i < this->fault_count; i++) {
+    for (sigma_u32 i = 0; i < this->m_fault_count; i++) {
         sigma_printf("[DIAG] SDFL: Correlating C%02u -> Silicon Gate G%u\n",
-                     this->fault_lattice[i].component_id, i % 8u);
+                     this->m_fault_lattice[i].component_id, i % 8u);
     }
     sigma_log("[DIAG] Localization COMPLETE. Faulty shards isolated.");
 }

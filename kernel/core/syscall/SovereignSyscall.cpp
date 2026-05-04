@@ -1,8 +1,7 @@
-#include "../../../include/SovereignLibC.h"
+#include "SovereignLibC.h"
 #include "sigma_hal.h"
-#include "../../../include/sigma_types.h"
+#include "sigma_types.h"
 #include "sigma_syscall.h"
-#include "sigma_hal.h"
 #include "sigma_proc.h"
 #include "sigma_mem.h"
 #include "sigma_ipc.h"
@@ -15,18 +14,20 @@
  * Design: OOP-isolated singleton — SovereignSyscallEngine.
  */
 
-/* --- Sovereign Syscall Engine (OOP Isolation) --- */
+namespace SigmaOS {
+namespace Kernel {
+namespace Syscall {
 
 void SovereignSyscallEngine::init() {
     sigma_log("[SYSCALL] Initializing Sovereign FPST Gate...");
-    this->initialized = 1u;
+    this->m_initialized = 1u;
 }
 
 sigma_u32 SovereignSyscallEngine::dispatch(sigma_syscall_id_t id, sigma_u32 arg1, sigma_u32 arg2, sigma_u32 arg3) {
     /* FPST (Fast-Path Shard Transition) Algorithm
      * Dispatches kernel services with minimum context overhead. */
     
-    this->total_calls++;
+    this->m_total_calls++;
     sigma_printf("[SYSCALL] SSG Entry: ID 0x%02X, Args: [%08X, %08X, %08X]\n", (unsigned)id, (unsigned)arg1, (unsigned)arg2, (unsigned)arg3);
     
     switch (id) {
@@ -51,13 +52,17 @@ sigma_u32 SovereignSyscallEngine::dispatch(sigma_syscall_id_t id, sigma_u32 arg1
     }
 }
 
+} // namespace Syscall
+} // namespace Kernel
+} // namespace SigmaOS
+
 /* --- C Wrappers --- */
 extern "C" void syscall_init() {
-    SovereignSyscallEngine::getInstance().init();
+    SigmaOS::Kernel::Syscall::SovereignSyscallEngine::getInstance().init();
 }
 
 extern "C" sigma_u32 sigma_syscall(sigma_syscall_id_t id, sigma_u32 arg1, sigma_u32 arg2, sigma_u32 arg3) {
-    return SovereignSyscallEngine::getInstance().dispatch(id, arg1, arg2, arg3);
+    return SigmaOS::Kernel::Syscall::SovereignSyscallEngine::getInstance().dispatch(id, arg1, arg2, arg3);
 }
 
 extern "C" void syscall_handler_asm() {
@@ -66,6 +71,5 @@ extern "C" void syscall_handler_asm() {
 }
 
 extern "C" sigma_u64 syscall_get_total_calls() {
-    return SovereignSyscallEngine::getInstance().getTotalCalls();
+    return SigmaOS::Kernel::Syscall::SovereignSyscallEngine::getInstance().getTotalCalls();
 }
-

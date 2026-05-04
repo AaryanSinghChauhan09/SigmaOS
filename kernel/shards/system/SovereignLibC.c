@@ -59,9 +59,6 @@ void sigma_strcpy(char* dest, const char* src, sigma_size_t n) {
     dest[i] = '\0';
 }
 
-void sigma_strncpy(char* dest, const char* src, sigma_size_t n) {
-    sigma_strcpy(dest, src, n);
-}
 
 int sigma_atoi(const char* s) {
     if (!s) return 0;
