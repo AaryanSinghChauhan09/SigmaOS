@@ -3,6 +3,7 @@
 Structured backlog for prioritization. Items are aspirational until each has implementation, tests, and docs.
 
 ## Core System (15)
+
 - [x] Multi-core scheduling
 - [x] NUMA-aware memory management
 - [x] Dynamic kernel modules
@@ -13,15 +14,17 @@ Structured backlog for prioritization. Items are aspirational until each has imp
 - [x] Journaling file system integration
 - [ ] Virtual memory paging
 - [ ] Distributed etcd State Management
-- [ ] Swap space management
-- [ ] Incremental State Checkpointing
+- [x] Lattice IPC Bridge
+- [ ] Swapping and Paging
 - [ ] Kernel crash dump analysis
+- [ ] Secure bootloader
 - [ ] Secure bootloader (UEFI/GRUB)
 - [x] Virtio Universal Driver Layer (SovereignVirtio)
 - [ ] WASM-native proc execution (PSE)
 - [x] Kernel-level logging (SovereignLog)
 
 ## Security (15)
+
 - [ ] Role-based access control
 - [x] Mandatory access control (SovereignAppArmor)
 - [ ] Encrypted home directories
@@ -40,6 +43,7 @@ Structured backlog for prioritization. Items are aspirational until each has imp
 - [ ] Secure password vault
 
 ## Performance (15)
+
 - [ ] Adaptive resource allocation
 - [ ] Energy-aware scheduling
 - [ ] Smart caching layers
@@ -60,6 +64,7 @@ Structured backlog for prioritization. Items are aspirational until each has imp
 - [ ] Lightweight virtualization
 
 ## Networking (15)
+
 - [ ] IPv6 full stack
 - [ ] Built-in VPN support
 - [ ] Mesh networking
@@ -79,6 +84,7 @@ Structured backlog for prioritization. Items are aspirational until each has imp
 - [x] Zero-trust networking (SovereignZeroNet)
 
 ## Developer Tools (15)
+
 - [ ] Integrated package manager
 - [ ] Debugging suite with live tracing (CoSandbox Attach)
 - [ ] Configurable CLI shell
@@ -99,6 +105,7 @@ Structured backlog for prioritization. Items are aspirational until each has imp
 - [ ] Version control integration
 
 ## User Experience (15)
+
 - [ ] Zenith desktop enhancements
 - [ ] UXSrv: Industrial-Grade Workflow Orchestrator
 - [x] Web-Srv dashboard & Terminal (Zenith UI)
@@ -118,6 +125,7 @@ Structured backlog for prioritization. Items are aspirational until each has imp
 - [ ] User session management
 
 ## Future-Oriented (10)
+
 - [ ] AI-assisted workload balancing
 - [ ] Predictive failure detection
 - [ ] Self-healing kernel modules
@@ -132,3 +140,10 @@ Structured backlog for prioritization. Items are aspirational until each has imp
 - [ ] Quantum computing APIs
 - [ ] Hybrid Execution (Pause/Resume across Devices)
 - [ ] Autonomous resource orchestration
+
+## How to use this list
+
+- **Icebox**: Keep all 100; pull work into milestones when dependencies are ready.
+- **Define done**: Each item needs acceptance criteria (API, tests, docs).
+- **Honest sequencing**: Boot → memory/VM → scheduler → VFS → drivers → net → UX tooling.
+
