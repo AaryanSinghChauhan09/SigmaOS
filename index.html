@@ -1072,7 +1072,7 @@ https://chatgpt.com/?q={{prompt}}</textarea>
         <div class="task-icon" onclick="launchApp('Marketplace')" title="Marketplace">🛒</div>
         <div class="task-icon" onclick="launchApp('Customization Panel')" title="Customization">✨</div>
         <div class="taskbar-divider"></div>
-        <div class="task-icon task-icon--notif" onclick="toggleNotifications()" title="Notifications">🔔<span class="notif-badge" id="notif-badge" style="display:none;">0</span></div>
+        <div class="task-icon task-icon--notif" onclick="toggleNotifications()" title="Notifications">🔔<span class="notif-badge hidden-shard" id="notif-badge">0</span></div>
         <div class="task-icon" onclick="toggleBatteryPanel()" title="Power">🔋</div>
         <div class="taskbar-divider"></div>
         <div class="status-indicator-wasm" title="Silicon-WASM Nexus">
@@ -1091,7 +1091,7 @@ https://chatgpt.com/?q={{prompt}}</textarea>
 
     <div id="battery-panel" class="zenith-flyout zenith-flyout--battery">
         <div class="zenith-flyout__head"><span>Power</span></div>
-        <div class="battery-meter"><div id="battery-fill" class="battery-meter__fill" style="width:87%"></div></div>
+        <div class="battery-meter"><div id="battery-fill" class="battery-meter__fill eighty-seven-width"></div></div>
         <div id="battery-pct" class="battery-pct">87%</div>
         <div class="stat-label">Mode: <span id="power-mode-label">Balanced</span></div>
         <div class="power-actions">
