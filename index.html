@@ -4,6 +4,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="SigmaOS Sovereign Zenith: The next-generation shard-based industrial lattice operating system dashboard.">
+    <meta name="keywords" content="SigmaOS, Sovereign Lattice, Operating System, Zenith UI, Shard Architecture">
     <title>Σ SIGMAOS: SOVEREIGN ZENITH</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -84,7 +86,8 @@
     </div>
     <!-- Command Palette (Ctrl+K / Ctrl+Space) -->
     <div class="command-palette" id="cmd-palette">
-        <input type="text" class="command-input" placeholder="Filter commands…" id="cmd-input" autocomplete="off">
+        <label for="cmd-input" class="sr-only">Command Filter</label>
+        <input type="text" class="command-input" placeholder="Filter commands…" id="cmd-input" autocomplete="off" aria-label="Search and filter lattice commands">
         <div class="command-results" id="cmd-results">
             <div class="command-item" onclick="launchApp('File Manager')"><span>File Manager</span><kbd>Files</kbd></div>
             <div class="command-item" onclick="launchApp('Sigma Browser')"><span>Sigma Browser</span><kbd>Web</kbd></div>
@@ -1000,7 +1003,8 @@ https://chatgpt.com/?q={{prompt}}</textarea>
         <div class="window-content ai-chat-body">
             <div id="ai-chat-log" class="ai-chat-log"></div>
             <div class="ai-chat-input-row">
-                <input type="text" id="ai-chat-input" class="ai-chat-input" placeholder="Ask the lattice…" onkeydown="if(event.key==='Enter')sendAiChat()" />
+                <label for="ai-chat-input" class="sr-only">Neural Assistant Input</label>
+                <input type="text" id="ai-chat-input" class="ai-chat-input" placeholder="Ask the lattice…" onkeydown="if(event.key==='Enter')sendAiChat()" aria-label="Ask the neural assistant a question" />
                 <button type="button" class="util-btn" onclick="sendAiChat()">Send</button>
             </div>
         </div>
