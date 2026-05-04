@@ -18,7 +18,10 @@ namespace Network {
 
 class SovereignZeroNet {
 public:
-    static SovereignZeroNet& getInstance();
+    static SovereignZeroNet& getInstance() {
+        static SovereignZeroNet instance;
+        return instance;
+    }
 
     void init();
     void transfer(void* data, sigma_size_t len, const char* destination);

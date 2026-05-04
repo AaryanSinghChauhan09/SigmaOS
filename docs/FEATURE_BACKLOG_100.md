@@ -4,14 +4,14 @@ Structured backlog for prioritization. Items are aspirational until each has imp
 
 ## Core System (15)
 
-- [ ] Multi-core scheduling
-- [ ] NUMA-aware memory management
-- [ ] Dynamic kernel modules
+- [x] Multi-core scheduling
+- [x] NUMA-aware memory management
+- [x] Dynamic kernel modules
 - [ ] Hot-pluggable device support
 - [ ] Advanced interrupt handling
 - [ ] Real-time task prioritization
 - [ ] Multiple file system support (ext4, ZFS, Btrfs)
-- [ ] Journaling file system integration
+- [x] Journaling file system integration
 - [ ] Virtual memory paging
 - [ ] Distributed etcd State Management
 - [ ] Swap space management

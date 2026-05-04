@@ -5,11 +5,6 @@ namespace SigmaOS {
 namespace Kernel {
 namespace Network {
 
-SovereignZeroNet& SovereignZeroNet::getInstance() {
-    static SovereignZeroNet instance;
-    return instance;
-}
-
 void SovereignZeroNet::init() {
     sigma_log("Σ [ZERONET]: Initializing Zero-Copy Lattice Networking...");
     this->packets_processed = 0;
