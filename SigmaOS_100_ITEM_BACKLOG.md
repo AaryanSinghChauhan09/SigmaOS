@@ -7,7 +7,7 @@ Structured backlog for prioritization. Items are aspirational until each has imp
 - [x] Multi-core scheduling
 - [x] NUMA-aware memory management
 - [x] Dynamic kernel modules
-- [ ] Hot-pluggable device support
+- [x] Hot-pluggable device support (SovereignHotplug)
 - [ ] Advanced interrupt handling
 - [ ] Real-time task prioritization
 - [ ] Multiple file system support (ext4, ZFS, Btrfs)
@@ -16,11 +16,11 @@ Structured backlog for prioritization. Items are aspirational until each has imp
 - [ ] Distributed etcd State Management
 - [x] Lattice IPC Bridge
 - [ ] Swapping and Paging
-- [ ] Kernel crash dump analysis
+- [x] Kernel crash dump analysis (SovereignDump)
 - [ ] Secure bootloader
 - [ ] Secure bootloader (UEFI/GRUB)
 - [x] Virtio Universal Driver Layer (SovereignVirtio)
-- [ ] WASM-native proc execution (PSE)
+- [x] WASM-native proc execution (PSE)
 - [x] Kernel-level logging (SovereignLog)
 
 ## Security (15)
